@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -42,6 +42,8 @@ DeconvProcess::DeconvProcess(TopfdParaPtr topfd_para_ptr,
 
 std::string DeconvProcess::updateMsg(MsHeaderPtr header_ptr, int scan, 
                                      int total_scan_num) {
+
+									 
   std::string percentage = str_util::toString(scan * 100 / total_scan_num);
   std::string msg = "Processing spectrum scan " 
       + std::to_string(header_ptr->getFirstScanNum()) + " ...";
@@ -65,20 +67,22 @@ void DeconvProcess::prepareFileFolder() {
     file_util::delFile(ms2_env_name_); 
   }
 
-  //json file names
-  html_dir_ =  base_name_ + "_html";
-  ms1_json_dir_ = html_dir_ 
-      + file_util::getFileSeparator() + "topfd" 
-      + file_util::getFileSeparator() + "ms1_json";
-  ms2_json_dir_ = html_dir_ 
-      + file_util::getFileSeparator() + "topfd" 
-      + file_util::getFileSeparator() + "ms2_json";
-  if (file_util::exists(html_dir_)) {
-    file_util::delDir(html_dir_);
+  if (topfd_para_ptr_->gene_html_folder_){
+    //json file names
+    html_dir_ =  base_name_ + "_html";
+    ms1_json_dir_ = html_dir_ 
+        + file_util::getFileSeparator() + "topfd" 
+        + file_util::getFileSeparator() + "ms1_json";
+    ms2_json_dir_ = html_dir_ 
+        + file_util::getFileSeparator() + "topfd" 
+        + file_util::getFileSeparator() + "ms2_json";
+    if (file_util::exists(html_dir_)) {
+      file_util::delDir(html_dir_);
+    }
+    file_util::createFolder(html_dir_);
+    file_util::createFolder(ms1_json_dir_);
+    file_util::createFolder(ms2_json_dir_);
   }
-  file_util::createFolder(html_dir_);
-  file_util::createFolder(ms1_json_dir_);
-  file_util::createFolder(ms2_json_dir_);
 }
 
 void DeconvProcess::process() {
@@ -117,11 +121,15 @@ void DeconvProcess::processSpMissingLevelOne(DeconvOneSpPtr deconv_ptr,
   RawMsGroupPtr ms_group_ptr;
   int count2 = 0;
   ms_group_ptr = reader_ptr->getNextMsGroupPtr();
+  
+  
   while (ms_group_ptr != nullptr) {
     RawMsPtrVec ms_two_ptr_vec = ms_group_ptr->getMsTwoPtrVec();
+
     for (size_t i = 0; i < ms_two_ptr_vec.size(); i++) {
       PeakPtrVec peak_list = ms_two_ptr_vec[i]->getPeakPtrVec();
       MsHeaderPtr header_ptr = ms_two_ptr_vec[i]->getMsHeaderPtr();
+
       std::string msg = updateMsg(header_ptr, count2 + 1, total_scan_num);
       std::cout << "\r" << msg << std::flush;
       header_ptr->setPrecCharge(EnvPara::getDefaultMaxCharge());
@@ -140,7 +148,7 @@ void DeconvProcess::processSpMissingLevelOne(DeconvOneSpPtr deconv_ptr,
       if (topfd_para_ptr_->output_match_env_) {
         match_env_writer::write(ms2_env_name_, header_ptr, result_envs);
       }
-      if (topfd_para_ptr_->output_json_files_) {
+      if (topfd_para_ptr_->output_json_files_ &&topfd_para_ptr_->gene_html_folder_) {
         std::string json_file_name = ms2_json_dir_ 
             + file_util::getFileSeparator() 
             + "spectrum" + std::to_string(header_ptr->getId()) + ".js";
@@ -148,6 +156,7 @@ void DeconvProcess::processSpMissingLevelOne(DeconvOneSpPtr deconv_ptr,
       }
       count2++;
     }
+	ms_group_ptr = reader_ptr->getNextMsGroupPtr();
   }
 }
 
@@ -192,7 +201,9 @@ void DeconvProcess::deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   for (size_t i = 0; i < peak_list.size(); i++) {
     peak_list[i]->setIntensity(intensities[i]);
   }
-  if (topfd_para_ptr_->output_json_files_) {
+
+  //write only when html folder argument is true
+  if (topfd_para_ptr_->output_json_files_ && topfd_para_ptr_->gene_html_folder_) {
     std::string json_file_name = ms1_json_dir_ 
         + file_util::getFileSeparator() 
         + "spectrum" + std::to_string(header_ptr->getId()) + ".js";
@@ -220,7 +231,8 @@ void DeconvProcess::deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   if (topfd_para_ptr_->output_match_env_) {
     match_env_writer::write(ms2_env_name_, header_ptr, result_envs);
   }
-  if (topfd_para_ptr_->output_json_files_) {
+  //write only when html folder argument is true
+  if (topfd_para_ptr_->output_json_files_ && topfd_para_ptr_->gene_html_folder_) {
     std::string json_file_name = ms2_json_dir_ 
         + file_util::getFileSeparator() 
         + "spectrum" + std::to_string(ms_ptr->getMsHeaderPtr()->getId()) + ".js";

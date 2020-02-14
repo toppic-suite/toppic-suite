@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -375,6 +375,9 @@ void findMsOneFeatures(DeconvMsPtrVec &ms1_ptr_vec, PeakPtrVec2D & raw_peaks,
   std::sort(all_peaks.begin(), all_peaks.end(), Peak::cmpInteDec);
   int feat_id = 0;
   size_t peak_idx = 0;
+  
+ 
+  
   while (feat_id < para_ptr->feature_num_ && peak_idx < all_peaks.size()) {
     DeconvPeakPtr best_peak = all_peaks[peak_idx];
     if (peakExists(ms1_ptr_vec, best_peak)) {
@@ -417,8 +420,7 @@ void findMsOneFeatures(DeconvMsPtrVec &ms1_ptr_vec, PeakPtrVec2D & raw_peaks,
         feature_ptr->setPromexScore(promex_score);
         features.push_back(feature_ptr);
         feat_id++;
-      //}
-      removePeaks(ms1_ptr_vec, matched_peaks);
+       removePeaks(ms1_ptr_vec, matched_peaks);
     }
     peak_idx++;
   }

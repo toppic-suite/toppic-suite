@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -217,6 +217,7 @@ ProteoformPtrVec readFastaToProteoformPtrVec(const std::string &file_name,
   ProteoformPtrVec list;
   FastaSeqPtr seq_ptr = reader.getNextSeq();
   int count = 0;
+
   while (seq_ptr != nullptr) {
     ProteoformPtr proteo_ptr = geneDbProteoformPtr(seq_ptr, fix_mod_list);
     list.push_back(proteo_ptr);

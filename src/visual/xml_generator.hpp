@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -41,6 +41,8 @@ class XmlGenerator {
                const std::string &fname_suffix);
 
   void process();
+  
+  bool gene_html_folder = true;
 
  private:
   void outputPrsms();
@@ -78,6 +80,8 @@ class XmlGenerator {
   std::vector<DeconvMsPtrVec> deconv_ms_vec2d_;
 
   std::map<int, size_t> spec_id_extend_ms_map_;
+
+  
 };
 
 typedef std::shared_ptr<XmlGenerator> XmlGeneratorPtr;

@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -31,6 +31,9 @@ int topDiffProcess(std::map<std::string, std::string> &arguments,
   std::string ori_db_file_name = arguments["databaseFileName"];
   std::string db_file_name = ori_db_file_name + "_target";
   fasta_util::dbSimplePreprocess(ori_db_file_name, db_file_name);
+
+
+  std::cout << ori_db_file_name << " " << db_file_name << std::endl;
 
   std::string base_path = file_util::absoluteDir(input_file_list[0]);
   std::string output_file_name = base_path + file_util::getFileSeparator() 

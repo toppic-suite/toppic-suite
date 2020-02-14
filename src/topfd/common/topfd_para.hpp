@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -41,7 +41,9 @@ class TopfdPara {
   bool output_match_env_ = false;
   bool output_json_files_ = true;
   bool merge_files_ = false;
+  bool gene_html_folder_ = true;
   std::string merged_file_name_ = "";
+  std::string thread_number_ = "1";
 };
 
 typedef std::shared_ptr<TopfdPara> TopfdParaPtr;

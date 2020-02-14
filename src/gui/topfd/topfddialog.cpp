@@ -47,6 +47,7 @@ TopFDDialog::TopFDDialog(QWidget *parent) :
       ui->ms1snRatioEdit->setValidator(validator2);
       ui->ms2snRatioEdit->setValidator(validator2);
       QRegExp rx3("^\\d{1,4}\\.\\d{0,2}|10000$");
+      ui->threadNumberEdit->setValidator(new QIntValidator(0, 2147483647, this));
       QRegExpValidator *validator3 = new QRegExpValidator(rx3, this);
       ui->windowSizeEdit->setValidator(validator3);
       QFont font;
@@ -105,7 +106,9 @@ void TopFDDialog::on_defaultButton_clicked() {
   ui->ms1snRatioEdit->setText("3.0");
   ui->ms2snRatioEdit->setText("1.0");
   ui->windowSizeEdit->setText("3.0");
+  ui->threadNumberEdit->setText("1");
   ui->missLevelOneCheckBox->setChecked(false);
+  ui->skipHTMLCheckBox->setChecked(false);
   //ui->mergeCheckBox->setChecked(false);
   //ui->mergedFilenameLineEdit->setText("sample1");
   ui->outputTextBrowser->clear();
@@ -279,9 +282,13 @@ toppic::TopfdParaPtr TopFDDialog::getParaPtr() {
   para_ptr_->ms_two_sn_ratio_ = std::stod(ui->ms2snRatioEdit->text().toStdString());
   para_ptr_->prec_window_ = std::stod(ui->windowSizeEdit->text().toStdString());
   para_ptr_->missing_level_one_ = ui->missLevelOneCheckBox->isChecked(); 
+  para_ptr_->thread_number_ = ui->threadNumberEdit->text().toStdString();
   para_ptr_->merge_files_ = false;
   //para_ptr_->merge_files_ = ui->mergeCheckBox->isChecked();
   //para_ptr_->merged_file_name_ = ui->mergedFilenameLineEdit->text().toStdString();
+  if (ui->skipHTMLCheckBox->isChecked()){
+    para_ptr_->gene_html_folder_ = false;
+  }
   return para_ptr_;
 }
 
@@ -293,6 +300,7 @@ void TopFDDialog::lockDialog() {
   ui->mzErrorEdit->setEnabled(false);
   ui->ms1snRatioEdit->setEnabled(false);
   ui->ms2snRatioEdit->setEnabled(false);
+  ui->threadNumberEdit->setEnabled(false);
   ui->clearButton->setEnabled(false);
   ui->defaultButton->setEnabled(false);
   ui->startButton->setEnabled(false);
@@ -301,6 +309,7 @@ void TopFDDialog::lockDialog() {
   ui->outputButton->setEnabled(false);
   //ui->mergeCheckBox->setEnabled(false);
   //ui->mergedFilenameLineEdit->setEnabled(false);
+  ui->skipHTMLCheckBox->setEnabled(false);
 }
 
 void TopFDDialog::unlockDialog() {
@@ -311,6 +320,7 @@ void TopFDDialog::unlockDialog() {
   ui->mzErrorEdit->setEnabled(true);
   ui->ms1snRatioEdit->setEnabled(true);
   ui->ms2snRatioEdit->setEnabled(true);
+  ui->threadNumberEdit->setEnabled(true);
   ui->clearButton->setEnabled(true);
   ui->defaultButton->setEnabled(true);
   ui->startButton->setEnabled(true);
@@ -322,6 +332,7 @@ void TopFDDialog::unlockDialog() {
     //ui->mergeCheckBox->setEnabled(false);
     //ui->mergedFilenameLineEdit->setEnabled(false);
   }
+  ui->skipHTMLCheckBox->setEnabled(true);
 }
 
 bool TopFDDialog::checkError() {
@@ -366,7 +377,12 @@ bool TopFDDialog::checkError() {
                          QMessageBox::Yes);
     return true;
   }
-
+  if (ui->threadNumberEdit->text().isEmpty()) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("Thread number is empty!"),
+                         QMessageBox::Yes);
+    return true;
+  }
   /*
   if (ui->mergeCheckBox->isChecked() &&
       ui->mergedFilenameLineEdit->text().isEmpty()) {
