@@ -63,7 +63,7 @@ void Argument::initArguments() {
   arguments_["threadNumber"] = "1";
   arguments_["useFeatureFile"] = "true";
   arguments_["skipList"] = "";
-  arguments_["geneHTMLFolder"] = "true";
+  arguments_["geneHTMLFolder"] = "false";
 }
 
 void Argument::outputArguments(std::ostream &output, 
@@ -256,7 +256,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("no-topfd-feature,x", "No TopFD feature file for proteoform identification.")
         ("combined-file-name,c", po::value<std::string>(&combined_output_name) , "Specify a file name for the combined spectrum data file and analysis results.")
         ("keep-temp-files,k", "Keep temporary files.")
-        ("skip-html-folrder,X", "Skip the generation of html folder for topview.");
+        ("gene-html-folrder,X", "Generate html folder containing TopView and spectrum data in js format.");
 
     po::options_description desc("Options");
 
@@ -287,7 +287,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("skip-list", po::value<std::string>(&skip_list) , "A list of spectrum ids to skip in database search.")
         ("database-file-name", po::value<std::string>(&database_file_name)->required(), "Database file name with its path.")
         ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), "Spectrum file name with its path.")
-        ("skip-html-folder,X","Skip the generation of html folder for topview.");
+        ("gene-html-folder,W","");
 
     po::positional_options_description positional_options;
     positional_options.add("database-file-name", 1);
@@ -426,8 +426,8 @@ bool Argument::parse(int argc, char* argv[]) {
     if (vm.count("skip-list")) {
       arguments_["skipList"] = skip_list;
     }    
-    if (vm.count("skip-html-folder")) {
-      arguments_["geneHTMLFolder"] = "false";
+    if (vm.count("gene-html-folder")) {
+      arguments_["geneHTMLFolder"] = "true";
     }   
   }
   catch(std::exception&e ) {

@@ -108,7 +108,7 @@ void TopFDDialog::on_defaultButton_clicked() {
   ui->windowSizeEdit->setText("3.0");
   ui->threadNumberEdit->setText("1");
   ui->missLevelOneCheckBox->setChecked(false);
-  ui->skipHTMLCheckBox->setChecked(false);
+  ui->geneHTMLCheckBox->setChecked(false);
   //ui->mergeCheckBox->setChecked(false);
   //ui->mergedFilenameLineEdit->setText("sample1");
   ui->outputTextBrowser->clear();
@@ -286,9 +286,8 @@ toppic::TopfdParaPtr TopFDDialog::getParaPtr() {
   para_ptr_->merge_files_ = false;
   //para_ptr_->merge_files_ = ui->mergeCheckBox->isChecked();
   //para_ptr_->merged_file_name_ = ui->mergedFilenameLineEdit->text().toStdString();
-  if (ui->skipHTMLCheckBox->isChecked()){
-    para_ptr_->gene_html_folder_ = false;
-  }
+  para_ptr_->gene_html_folder_ = ui->geneHTMLCheckBox->isChecked();
+  
   return para_ptr_;
 }
 
@@ -309,7 +308,7 @@ void TopFDDialog::lockDialog() {
   ui->outputButton->setEnabled(false);
   //ui->mergeCheckBox->setEnabled(false);
   //ui->mergedFilenameLineEdit->setEnabled(false);
-  ui->skipHTMLCheckBox->setEnabled(false);
+  ui->geneHTMLCheckBox->setEnabled(false);
 }
 
 void TopFDDialog::unlockDialog() {
@@ -332,7 +331,7 @@ void TopFDDialog::unlockDialog() {
     //ui->mergeCheckBox->setEnabled(false);
     //ui->mergedFilenameLineEdit->setEnabled(false);
   }
-  ui->skipHTMLCheckBox->setEnabled(true);
+  ui->geneHTMLCheckBox->setEnabled(true);
 }
 
 bool TopFDDialog::checkError() {

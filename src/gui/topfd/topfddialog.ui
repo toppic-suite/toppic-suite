@@ -532,12 +532,12 @@ p, li { white-space: pre-wrap; }
       </widget>
      </item>
      <item>
-      <widget class="QCheckBox" name="skipHTMLCheckBox">
+      <widget class="QCheckBox" name="geneHTMLCheckBox">
        <property name="acceptDrops">
         <bool>false</bool>
        </property>
        <property name="text">
-        <string>No HTML folder</string>
+        <string>Create HTML folder</string>
        </property>
        <property name="checkable">
         <bool>true</bool>

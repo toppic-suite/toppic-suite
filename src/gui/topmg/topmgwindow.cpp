@@ -137,7 +137,7 @@ void topmgWindow::on_defaultButton_clicked() {
   ui->decoyCheckBox->setChecked(false);
   ui->topfdFeatureCheckBox->setChecked(false);
   ui->asfDiagCheckBox->setChecked(false);
-  ui->skipHTMLCheckBox->setChecked(false);
+  ui->geneHTMLCheckBox->setChecked(false);
 }
 
 void topmgWindow::updatedir(QString s) {
@@ -334,10 +334,10 @@ std::map<std::string, std::string> topmgWindow::getArguments() {
   } else {
     arguments_["useAsfDiag"] = "false";
   }
-  if (ui->skipHTMLCheckBox->isChecked()) {
-    arguments_["geneHTMLFolder"] = "false";
-  } else {
+  if (ui->geneHTMLCheckBox->isChecked()) {
     arguments_["geneHTMLFolder"] = "true";
+  } else {
+    arguments_["geneHTMLFolder"] = "false";
   }
   //showArguments();
   return arguments_;
@@ -434,7 +434,7 @@ void topmgWindow::lockDialog() {
   ui->outputButton->setEnabled(false);
   ui->addButton->setEnabled(false);
   ui->delButton->setEnabled(false);
-  ui->skipHTMLCheckBox->setEnabled(false);
+  ui->geneHTMLCheckBox->setEnabled(false);
 }
 
 void topmgWindow::unlockDialog() {
@@ -473,7 +473,7 @@ void topmgWindow::unlockDialog() {
   ui->outputButton->setDefault(true);
   ui->addButton->setEnabled(true);
   ui->delButton->setEnabled(true);
-  ui->skipHTMLCheckBox->setEnabled(true);
+  ui->geneHTMLCheckBox->setEnabled(true);
 }
 
 bool topmgWindow::checkError() {
