@@ -386,7 +386,7 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="skipHTMLCheckBox">
+        <widget class="QCheckBox" name="geneHTMLCheckBox">
          <property name="minimumSize">
           <size>
            <width>120</width>
@@ -394,7 +394,7 @@ p, li { white-space: pre-wrap; }
           </size>
          </property>
          <property name="text">
-          <string>No HTML folder</string>
+          <string>Create HTML folder</string>
          </property>
         </widget>
        </item>
