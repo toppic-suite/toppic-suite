@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@
 #include <mutex>
 #include <vector>
 #include <boost/filesystem.hpp>
+
 namespace toppic {
 
 std::mutex count_lock;
@@ -141,9 +142,7 @@ void DeconvProcess::deconvMissingMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_pt
   }
 
   count_lock.lock();
-  if (header_ptr->getId() > ms2_spec_num){
-    ms2_spec_num = header_ptr->getId();
-  }
+  ms2_spec_num++;
   count_lock.unlock();
 
   DeconvMsPtr deconv_ms_ptr = match_env_util::getDeconvMsPtr(header_ptr, result_envs);
@@ -185,7 +184,7 @@ void DeconvProcess::processSpMissingLevelOne(RawMsGroupReaderPtr reader_ptr) {
   RawMsGroupPtr ms_group_ptr;
   ms_group_ptr = reader_ptr->getNextMsGroupPtr();
 
-  int count = 1;
+  int count = 0;
 
   std::string ms_msalign_name;
   ms_msalign_name = base_name_ + "_ms2.msalign";
@@ -217,7 +216,7 @@ void DeconvProcess::processSpMissingLevelOne(RawMsGroupReaderPtr reader_ptr) {
 
     for (size_t t = 0; t < ms_two_ptr_vec.size(); t++){
       RawMsPtr ms_two_ptr = ms_two_ptr_vec[t];
-      std::string msg = updateMsg(ms_two_ptr->getMsHeaderPtr(), count, total_scan_num);
+      std::string msg = updateMsg(ms_two_ptr->getMsHeaderPtr(), count + 1, total_scan_num);
       std::cout << "\r" << msg << std::flush;
       count += 1;
     }
@@ -374,7 +373,6 @@ void DeconvProcess::mergeMsFiles(std::string fileName, int thread_num, int spec_
   spec_data_array = nullptr;
 }
 
-
 void DeconvProcess::deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
                                 MatchEnvPtrVec prec_envs, MsAlignWriterPtrVec ms1_writer_ptr_vec, SimpleThreadPoolPtr pool_ptr) { 
   
@@ -383,13 +381,11 @@ void DeconvProcess::deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
   LOG_DEBUG("ms level " << header_ptr->getMsLevel() );
   // int scan_num_ = header_ptr->getFirstScanNum();
-  
-  count_lock.lock();
-  if (header_ptr->getId() > ms1_spec_num){
-    ms1_spec_num = header_ptr->getId();
-  }
-  count_lock.unlock();
 
+  count_lock.lock();
+  ms1_spec_num++;
+  count_lock.unlock();
+  
   //remove precursor peaks
   std::vector<double> intensities;
   for (size_t i = 0; i < peak_list.size(); i++) {
@@ -450,11 +446,9 @@ void DeconvProcess::deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   double max_frag_mass = header_ptr->getPrecMonoMass();
 
   count_lock.lock();
-  if (header_ptr->getId() > ms2_spec_num){
-    ms2_spec_num = header_ptr->getId();
-  }
+  ms2_spec_num++;
   count_lock.unlock();
-
+  
   if (max_frag_mass == 0.0) {
     max_frag_mass = header_ptr->getPrecSpMass();
   }
@@ -513,9 +507,8 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
 
   ms_group_ptr = reader_ptr->getNextMsGroupPtr();
 
-  int count = 2;
+  int count = 0;
   
-  //the base name below should exclude the file path 
   std::string ms1_msalign_name, ms2_msalign_name;
 
   ms1_msalign_name = file_util::basename(spec_file_name_) + "_ms1.msalign";
@@ -524,7 +517,6 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
   SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(thread_num);  
   
   //generate vector that contains msalign writing information
-
   MsAlignWriterPtrVec ms1_writer_ptr_vec;
   MsAlignWriterPtrVec ms2_writer_ptr_vec;
 
@@ -541,15 +533,18 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
         boost::this_thread::sleep(boost::posix_time::milliseconds(100));
     }
     //it is creating a new shared pointer using the class constructor that takes shared pointer as input
-    //can create an class instance instead, but shared pointer is used in many functions in deconv. and envelope detection. 
+    //can create an class instance, but shared pointer is used in many functions in deconv. and envelope detection. 
+    //so created a shared pointer instead. 
     EnvParaPtr env_ptr_new = std::make_shared<EnvPara>(env_para_ptr_);
     DpParaPtr dp_ptr_new = std::make_shared<DpPara>(dp_para_ptr_);
-    
+
+    //deconv_process_ptr_ (DecovProcess instance) is needed because it has the information on the folder names, envelope file names
+    //pool_ptr needed for getting each thread id    
     DeconvOneSpPtr deconv_ptr = std::make_shared<DeconvOneSp>(env_ptr_new, dp_ptr_new);
 
     pool_ptr->Enqueue(geneTask(ms_group_ptr, deconv_ptr, ms1_writer_ptr_vec, ms2_writer_ptr_vec, pool_ptr, deconv_process_ptr_));
 
-    std::string msg = updateMsg(ms_group_ptr->getMsOnePtr()->getMsHeaderPtr(), count, total_scan_num);
+    std::string msg = updateMsg(ms_group_ptr->getMsOnePtr()->getMsHeaderPtr(), count + 2, total_scan_num);
     std::cout << "\r" << msg << std::flush;
 
     //count is 1 scan from msalign1 + n scan from msalign2 vector
@@ -570,9 +565,10 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
     //auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end-start);
     //std::cout << std::endl << "Read file " << duration.count() << std::endl;
 
-  mergeMsFiles(ms1_msalign_name, thread_num, ms1_spec_num + 1);
-  mergeMsFiles(ms2_msalign_name, thread_num, ms2_spec_num + 1);//ms1(ms2)_spec_num +1 because id started at 0, so to count all spectrums, +1.
-  
+  mergeMsFiles(ms1_msalign_name, thread_num, ms1_spec_num);
+  mergeMsFiles(ms2_msalign_name, thread_num, ms2_spec_num);
+  //ms1(ms2) spectrum numbers are used to set the array size containing spectrum data. 
+
   std::cout << std::endl;
 
   }
