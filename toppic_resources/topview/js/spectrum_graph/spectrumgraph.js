@@ -300,13 +300,14 @@ drawIons = function(svg,spectrumParameters,ionData){
 	ionData.forEach(function(element){
 		let percentInte = element.intensity/maxIntensity * 100 ;
 		let inLimit = false;
+		console.log(element.intensity);
 		if(element.mz > spectrumParameters.minMz && element.mz <= spectrumParameters.maxMz)
 		{
 			ions.append("text")
 			.attr("id","graph_matched_ions")
-			.attr("x",spectrumParameters.getPeakXPos((element.mz*spectrumParameters.fixedShiftRatio) + 0.1))
+			.attr("x",spectrumParameters.getPeakXPos((element.mz*spectrumParameters.fixedShiftRatio)-0.1))
 			.attr("y",function(d,i){
-				let y = spectrumParameters.getPeakYPos(element.intensity);
+				let y = spectrumParameters.getPeakYPos(element.intensity + (0.1*element.intensity));// Adding 10% to get the Ions on the max Intensity Peak
 				if(y <= spectrumParameters.padding.head) return spectrumParameters.padding.head ;
 				else return y ;
 			  })
