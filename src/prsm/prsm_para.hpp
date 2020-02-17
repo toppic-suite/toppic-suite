@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -29,9 +29,21 @@ class PrsmPara {
 
   std::string getSearchDbFileName() {return search_db_file_name_;}
 
+  std::string getOriDbName(){return ori_db_name_;}
+  
   std::string getSpectrumFileName() {return spec_file_name_;}
 
   std::string getResourceDir() {return resource_dir_;}
+
+  std::string getActivation() {return activation_;}
+
+  std::string getFixedMod() {return fixed_mod_;}
+
+  std::string getErrorTolerance() {return error_tol_;}
+
+  std::string getProtMod() {return allow_prot_mod_;}
+
+  std::string getSearchType() {return decoy_;}
 
   int getPPM() {return ppm_;}
 
@@ -45,12 +57,28 @@ class PrsmPara {
 
   bool doLocaliztion() {return localization_;}
 
+  std::string getIndexDir() {return index_file_dir_;}
+
+  void setIndexDir(std::string dir) {index_file_dir_ = dir;}
+
  private:
   std::string search_db_file_name_;
+
+  std::string ori_db_name_;
 
   std::string spec_file_name_;
 
   std::string resource_dir_;
+
+  std::string activation_;
+
+  std::string fixed_mod_;
+
+  std::string error_tol_;
+
+  std::string allow_prot_mod_;
+
+  std::string decoy_;
 
   int ppm_;
 
@@ -61,6 +89,8 @@ class PrsmPara {
   int group_spec_num_;
 
   bool localization_;
+
+  std::string index_file_dir_;
 
   /** spectrum parameters */
   SpParaPtr sp_para_ptr_;

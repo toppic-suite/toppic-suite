@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -211,6 +211,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     ZeroPtmFilterProcessorPtr zero_filter_processor
         = std::make_shared<ZeroPtmFilterProcessor>(zero_filter_mng_ptr);
     zero_filter_processor->process();
+
     zero_filter_processor = nullptr;
     std::cout << "Non PTM filtering - finished." << std::endl;
 

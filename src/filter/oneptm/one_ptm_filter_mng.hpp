@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ namespace toppic {
 
 class OnePtmFilterMng {
  public:
+  OnePtmFilterMng(PrsmParaPtr prsm_para_ptr){prsm_para_ptr_ = prsm_para_ptr;}
   OnePtmFilterMng(PrsmParaPtr prsm_para_ptr,
                   const std::string & output_file_ext,
                   int thread_num,
@@ -54,6 +55,8 @@ class OnePtmFilterMng {
   boost::mutex mutex_;
 
   std::vector<int> cnts_;
+
+  std::vector<std::string> file_names{"toppic_one_ptm_complete", "toppic_one_ptm_prefix", "toppic_one_ptm_suffix", "toppic_one_ptm_internal"};
 };
 
 typedef std::shared_ptr<OnePtmFilterMng> OnePtmFilterMngPtr;
