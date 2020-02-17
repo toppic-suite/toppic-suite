@@ -89,15 +89,16 @@ void XmlGenerator::outputPrsms() {
         writer.write(anno_prsm::geneAnnoPrsm(writer.getDoc(), prsm_ptr, mng_ptr_));
         writer.close();
 
-        std::vector<std::string> file_info;
-        file_info.push_back(file_name);
-        file_info.push_back(mng_ptr_->html_path_ 
-                            + file_util::getFileSeparator() + "data_js" 
-                            + file_util::getFileSeparator() + "prsms" 
-                            + file_util::getFileSeparator()
-                            + "prsm" + str_util::toString(prsm_ptr->getPrsmId()) + ".js");
-        anno_file_list_ptr_->file_list_.push_back(file_info); 
-
+        if (gene_html_folder){//if skip html folder is false 
+          std::vector<std::string> file_info;
+          file_info.push_back(file_name);
+          file_info.push_back(mng_ptr_->html_path_ 
+                              + file_util::getFileSeparator() + "data_js" 
+                              + file_util::getFileSeparator() + "prsms" 
+                              + file_util::getFileSeparator()
+                              + "prsm" + str_util::toString(prsm_ptr->getPrsmId()) + ".js");
+          anno_file_list_ptr_->file_list_.push_back(file_info); 
+        }
         cnt++;
         idx++;
         std::cout << std::flush << "Generating xml files - processing " << cnt << " PrSMs.\r";
@@ -200,15 +201,16 @@ void XmlGenerator::outputProteoforms(){
                                                        mng_ptr_, detail, add_ms));
       writer.close();
       LOG_DEBUG("output proteoform completed " << i);
-
-      std::vector<std::string> file_info;
-      file_info.push_back(file_name);
-      file_info.push_back(mng_ptr_->html_path_ 
-                          + file_util::getFileSeparator() + "data_js" 
-                          + file_util::getFileSeparator() + "proteoforms" 
-                          + file_util::getFileSeparator()
-                          + "proteoform"+str_util::toString(cluster_ids_[i])+".js");
-      anno_file_list_ptr_->file_list_.push_back(file_info);
+      if (gene_html_folder){//if skip html folder is false 
+        std::vector<std::string> file_info;
+        file_info.push_back(file_name);
+        file_info.push_back(mng_ptr_->html_path_ 
+                            + file_util::getFileSeparator() + "data_js" 
+                            + file_util::getFileSeparator() + "proteoforms" 
+                            + file_util::getFileSeparator()
+                            + "proteoform"+str_util::toString(cluster_ids_[i])+".js");
+        anno_file_list_ptr_->file_list_.push_back(file_info);
+      }
     }
   }
   std::cout << std::endl;
@@ -290,14 +292,16 @@ void XmlGenerator::outputProteins() {
       XmlWriterPtr writer = std::make_shared<XmlWriter>(file_name, "");
       anno_xml_util::writeProteinToXml(writer, prsm_ptrs, prot_id, cluster, mng_ptr_, true, false);
       writer->close();
-      std::vector<std::string> file_info;
-      file_info.push_back(file_name);
-      file_info.push_back(mng_ptr_->html_path_ 
-                          + file_util::getFileSeparator() + "data_js" 
-                          + file_util::getFileSeparator() + "proteins" 
-                          + file_util::getFileSeparator() 
-                          + "protein"+str_util::toString(prot_id)+".js");
-      anno_file_list_ptr_->file_list_.push_back(file_info);
+      if (gene_html_folder){//if skip html folder is false 
+        std::vector<std::string> file_info;
+        file_info.push_back(file_name);
+        file_info.push_back(mng_ptr_->html_path_ 
+                            + file_util::getFileSeparator() + "data_js" 
+                            + file_util::getFileSeparator() + "proteins" 
+                            + file_util::getFileSeparator() 
+                            + "protein"+str_util::toString(prot_id)+".js");
+        anno_file_list_ptr_->file_list_.push_back(file_info);
+      }
     }
   }
 }
@@ -349,11 +353,13 @@ void XmlGenerator::outputAllProteins() {
   std::cout << std::endl;
   writer.write(prot_elements);
   writer.close();
-  std::vector<std::string> file_info;
-  file_info.push_back(file_name);
-  file_info.push_back(mng_ptr_->html_path_+ file_util::getFileSeparator() + "data_js"
-                      + file_util::getFileSeparator() + "proteins.js");
-  anno_file_list_ptr_->file_list_.push_back(file_info);
+  if (gene_html_folder){//if skip html folder is false 
+    std::vector<std::string> file_info;
+    file_info.push_back(file_name);
+    file_info.push_back(mng_ptr_->html_path_+ file_util::getFileSeparator() + "data_js"
+                        + file_util::getFileSeparator() + "proteins.js");
+    anno_file_list_ptr_->file_list_.push_back(file_info);
+  }
 }
 
 void XmlGenerator::outputFileList() {

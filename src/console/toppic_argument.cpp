@@ -63,6 +63,7 @@ void Argument::initArguments() {
   arguments_["threadNumber"] = "1";
   arguments_["useFeatureFile"] = "true";
   arguments_["skipList"] = "";
+  arguments_["geneHTMLFolder"] = "false";
 }
 
 void Argument::outputArguments(std::ostream &output, 
@@ -254,7 +255,8 @@ bool Argument::parse(int argc, char* argv[]) {
         ("thread-number,u", po::value<std::string> (&thread_number), "<a positive integer>. Number of threads used in the computation. Default value: 1.")
         ("no-topfd-feature,x", "No TopFD feature file for proteoform identification.")
         ("combined-file-name,c", po::value<std::string>(&combined_output_name) , "Specify a file name for the combined spectrum data file and analysis results.")
-        ("keep-temp-files,k", "Keep temporary files.");
+        ("keep-temp-files,k", "Keep temporary files.")
+        ("gene-html-folrder,W", "Generate html folder containing TopView and spectrum data in js format.");
 
     po::options_description desc("Options");
 
@@ -284,7 +286,8 @@ bool Argument::parse(int argc, char* argv[]) {
         ("filtering-result-number", po::value<std::string>(&filtering_result_num), "Filtering result number. Default value: 20.")
         ("skip-list", po::value<std::string>(&skip_list) , "A list of spectrum ids to skip in database search.")
         ("database-file-name", po::value<std::string>(&database_file_name)->required(), "Database file name with its path.")
-        ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), "Spectrum file name with its path.");
+        ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), "Spectrum file name with its path.")
+        ("gene-html-folder,W","");
 
     po::positional_options_description positional_options;
     positional_options.add("database-file-name", 1);
@@ -423,6 +426,9 @@ bool Argument::parse(int argc, char* argv[]) {
     if (vm.count("skip-list")) {
       arguments_["skipList"] = skip_list;
     }    
+    if (vm.count("gene-html-folder")) {
+      arguments_["geneHTMLFolder"] = "true";
+    }   
   }
   catch(std::exception&e ) {
     std::cerr << "Unhandled Exception in parsing command line" << e.what() << ", application will now exit" << std::endl;

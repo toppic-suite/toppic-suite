@@ -32,7 +32,7 @@
    <string>TopFD</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="icon.qrc">
+   <iconset>
     <normaloff>:/icon/toppic.ico</normaloff>:/icon/toppic.ico</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
@@ -98,7 +98,7 @@
      <rect>
       <x>30</x>
       <y>200</y>
-      <width>291</width>
+      <width>221</width>
       <height>44</height>
      </rect>
     </property>
@@ -132,13 +132,13 @@
        </property>
        <property name="minimumSize">
         <size>
-         <width>80</width>
+         <width>70</width>
          <height>0</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>95</width>
+         <width>70</width>
          <height>16777215</height>
         </size>
        </property>
@@ -154,7 +154,7 @@
      <rect>
       <x>30</x>
       <y>240</y>
-      <width>291</width>
+      <width>221</width>
       <height>44</height>
      </rect>
     </property>
@@ -182,13 +182,13 @@
       <widget class="QLineEdit" name="maxMassEdit">
        <property name="minimumSize">
         <size>
-         <width>0</width>
+         <width>70</width>
          <height>0</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>95</width>
+         <width>70</width>
          <height>16777215</height>
         </size>
        </property>
@@ -202,9 +202,9 @@
    <widget class="QWidget" name="horizontalLayoutWidget_4">
     <property name="geometry">
      <rect>
-      <x>570</x>
+      <x>540</x>
       <y>240</y>
-      <width>194</width>
+      <width>151</width>
       <height>44</height>
      </rect>
     </property>
@@ -213,7 +213,7 @@
       <widget class="QLabel" name="label_4">
        <property name="minimumSize">
         <size>
-         <width>110</width>
+         <width>0</width>
          <height>0</height>
         </size>
        </property>
@@ -222,11 +222,11 @@
        </property>
       </widget>
      </item>
-     <item>
+     <item alignment="Qt::AlignLeft">
       <widget class="QLineEdit" name="mzErrorEdit">
        <property name="minimumSize">
         <size>
-         <width>0</width>
+         <width>40</width>
          <height>0</height>
         </size>
        </property>
@@ -246,9 +246,9 @@
    <widget class="QWidget" name="horizontalLayoutWidget_5">
     <property name="geometry">
      <rect>
-      <x>340</x>
+      <x>280</x>
       <y>200</y>
-      <width>211</width>
+      <width>231</width>
       <height>44</height>
      </rect>
     </property>
@@ -282,34 +282,6 @@
        </property>
        <property name="text">
         <string>3.0</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-   <widget class="QWidget" name="horizontalLayoutWidget_6">
-    <property name="geometry">
-     <rect>
-      <x>560</x>
-      <y>10</y>
-      <width>331</width>
-      <height>42</height>
-     </rect>
-    </property>
-    <layout class="QHBoxLayout" name="horizontalLayout_6">
-     <item>
-      <widget class="QCheckBox" name="missLevelOneCheckBox">
-       <property name="acceptDrops">
-        <bool>false</bool>
-       </property>
-       <property name="text">
-        <string>Missing MS1 spectra</string>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-       <property name="checked">
-        <bool>false</bool>
        </property>
       </widget>
      </item>
@@ -389,9 +361,9 @@
    <widget class="QWidget" name="horizontalLayoutWidget_8">
     <property name="geometry">
      <rect>
-      <x>570</x>
+      <x>540</x>
       <y>200</y>
-      <width>321</width>
+      <width>351</width>
       <height>44</height>
      </rect>
     </property>
@@ -443,16 +415,16 @@
      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Cantarell';&quot;&gt;Click the Start button to process the spectrum file.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Cantarell'; font-size:11pt;&quot;&gt;Click the Start button to process the spectrum file.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
    <widget class="QWidget" name="horizontalLayoutWidget_9">
     <property name="geometry">
      <rect>
-      <x>340</x>
+      <x>280</x>
       <y>240</y>
-      <width>211</width>
+      <width>231</width>
       <height>44</height>
      </rect>
     </property>
@@ -489,10 +461,96 @@ p, li { white-space: pre-wrap; }
      </rect>
     </property>
    </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget_10">
+    <property name="geometry">
+     <rect>
+      <x>700</x>
+      <y>240</y>
+      <width>191</width>
+      <height>44</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_9">
+     <item>
+      <widget class="QLabel" name="label_8">
+       <property name="minimumSize">
+        <size>
+         <width>110</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Thread number:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="threadNumberEdit">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>70</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>1</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget_11">
+    <property name="geometry">
+     <rect>
+      <x>530</x>
+      <y>10</y>
+      <width>411</width>
+      <height>40</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_10">
+     <item>
+      <widget class="QCheckBox" name="missLevelOneCheckBox">
+       <property name="acceptDrops">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>Missing MS1 spectra</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="geneHTMLCheckBox">
+       <property name="acceptDrops">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>Create HTML folder</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
   </widget>
  </widget>
- <resources>
-  <include location="icon.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

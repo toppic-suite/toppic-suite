@@ -41,6 +41,8 @@ class XmlGenerator {
                const std::string &fname_suffix);
 
   void process();
+  
+  bool gene_html_folder = true;
 
  private:
   void outputPrsms();
@@ -78,6 +80,8 @@ class XmlGenerator {
   std::vector<DeconvMsPtrVec> deconv_ms_vec2d_;
 
   std::map<int, size_t> spec_id_extend_ms_map_;
+
+  
 };
 
 typedef std::shared_ptr<XmlGenerator> XmlGeneratorPtr;
