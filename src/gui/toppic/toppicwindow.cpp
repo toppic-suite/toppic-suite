@@ -107,6 +107,7 @@ void toppicWindow::initArguments() {
   arguments_["threadNumber"] = "1";
   arguments_["useFeatureFile"] = "true";
   arguments_["skipList"] = "";
+  arguments_["geneHTMLFolder"] = "";
 }
 
 void toppicWindow::on_clearButton_clicked() {
@@ -145,6 +146,7 @@ void toppicWindow::on_defaultButton_clicked() {
   ui->decoyCheckBox->setChecked(false);
   ui->lookupTableCheckBox->setChecked(false);
   ui->topfdFeatureCheckBox->setChecked(false);
+  ui->geneHTMLCheckBox->setChecked(false);
 }
 
 void toppicWindow::updatedir(QString s) {
@@ -327,6 +329,11 @@ std::map<std::string, std::string> toppicWindow::getArguments() {
   } else {
     arguments_["useFeatureFile"] = "true";
   }
+  if (ui->geneHTMLCheckBox->isChecked()) {
+    arguments_["geneHTMLFolder"] = "true";
+  } else {
+    arguments_["geneHTMLFolder"] = "false";
+  }
   //showArguments();
   return arguments_;
 }
@@ -425,6 +432,7 @@ void toppicWindow::lockDialog() {
   ui->outputButton->setEnabled(false);
   ui->addButton->setEnabled(false);
   ui->delButton->setEnabled(false);
+  ui->geneHTMLCheckBox->setEnabled(false);
 }
 
 void toppicWindow::unlockDialog() {
@@ -465,6 +473,7 @@ void toppicWindow::unlockDialog() {
   ui->outputButton->setDefault(true);
   ui->addButton->setEnabled(true);
   ui->delButton->setEnabled(true);
+  ui->geneHTMLCheckBox->setEnabled(true);
 }
 
 bool toppicWindow::checkError() {

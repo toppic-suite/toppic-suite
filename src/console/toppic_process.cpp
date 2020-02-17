@@ -79,6 +79,9 @@ void copyTopView(std::map<std::string, std::string> &arguments) {
     LOG_WARN("The TopView directory " << topview_dir << " exists!");
     file_util::delDir(topview_dir);
   }
+  if (!file_util::exists(base_name_short + "_html")){//if _html folder was not created with topfd
+    file_util::createFolder(base_name_short + "_html");
+  }
 
   std::string resource_dir = arguments["resourceDir"];
   // copy resources 
@@ -423,18 +426,24 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     table_out = nullptr;
     std::cout << "Outputting PrSM table - finished." << std::endl;
 
-    copyTopView(arguments);
-
     std::cout << "Generating PrSM xml files - started." << std::endl;
     XmlGeneratorPtr xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, resource_dir, 
-                                                              cur_suffix, "toppic_prsm_cutoff");
+                                                                cur_suffix, "toppic_prsm_cutoff");
+    if (arguments["geneHTMLFolder"] == "false"){
+      xml_gene->gene_html_folder = false;
+    }
+    
     xml_gene->process();
     xml_gene = nullptr;
     std::cout << "Generating PrSM xml files - finished." << std::endl;
 
-    std::cout << "Converting PrSM xml files to json files - started." << std::endl;
-    jsonTranslate(arguments, "toppic_prsm_cutoff");
-    std::cout << "Converting PrSM xml files to json files - finished." << std::endl;
+    if (arguments["geneHTMLFolder"] == "true"){
+      copyTopView(arguments);
+  
+      std::cout << "Converting PrSM xml files to json files - started." << std::endl;
+      jsonTranslate(arguments, "toppic_prsm_cutoff");
+      std::cout << "Converting PrSM xml files to json files - finished." << std::endl;
+    }
 
     cutoff_type = (arguments["cutoffProteoformType"] == "FDR") ? "FORMFDR": "EVALUE";
     std::cout << "PrSM filtering by " << cutoff_type << " - started." << std::endl;
@@ -466,13 +475,19 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, resource_dir, 
                                               "toppic_form_cutoff", 
                                               "toppic_proteoform_cutoff");
+    if (arguments["geneHTMLFolder"] == "false"){
+      xml_gene->gene_html_folder = false;
+    }
+    
     xml_gene->process();
     xml_gene = nullptr;
     std::cout << "Generating proteoform xml files - finished." << std::endl;
 
-    std::cout << "Converting proteoform xml files to html files - started." << std::endl;
-    jsonTranslate(arguments, "toppic_proteoform_cutoff");
-    std::cout << "Converting proteoform xml files to html files - finished." << std::endl;
+    if (arguments["geneHTMLFolder"] == "true"){
+      std::cout << "Converting proteoform xml files to html files - started." << std::endl;
+      jsonTranslate(arguments, "toppic_proteoform_cutoff");
+      std::cout << "Converting proteoform xml files to html files - finished." << std::endl;
+    }
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;

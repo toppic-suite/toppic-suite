@@ -80,7 +80,9 @@ void copyTopView(std::map<std::string, std::string> &arguments) {
     LOG_WARN("The TopView directory " << topview_dir << " exists!");
     file_util::delDir(topview_dir);
   }
-
+  if (!file_util::exists(base_name_short + "_html")){//if _html folder was not created before
+    file_util::createFolder(base_name_short + "_html");
+  }
   std::string resource_dir = arguments["resourceDir"];
   // copy resources 
   std::string from_path(resource_dir + file_util::getFileSeparator() + "topview");
@@ -359,16 +361,25 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
     std::cout << "Outputting PrSM table - finished." << std::endl;
 
     std::cout << "Generating PrSM xml files - started." << std::endl;
-    copyTopView(arguments);
+    
     XmlGeneratorPtr xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, resource_dir, "topmg_prsm_cutoff", "topmg_prsm_cutoff");
+    
+    //do not generate html files if parameter for no html folder was used
+    if (arguments["geneHTMLFolder"] == "false"){
+      xml_gene->gene_html_folder = false;
+    }
     xml_gene->process();
     xml_gene = nullptr;
     std::cout << "Generating PrSM xml files - finished." << std::endl;
 
-    std::cout << "Converting PrSM xml files to html files - started." << std::endl;
-    jsonTranslate(arguments, "topmg_prsm_cutoff");
-    std::cout << "Converting PrSM xml files to html files - finished." << std::endl;
+    if (arguments["geneHTMLFolder"] == "true"){//only when the parameter is set to true
+      copyTopView(arguments);
 
+      std::cout << "Converting PrSM xml files to html files - started." << std::endl;
+      jsonTranslate(arguments, "topmg_prsm_cutoff");
+      std::cout << "Converting PrSM xml files to html files - finished." << std::endl;  
+    }
+    
     cutoff_type = (arguments["cutoffProteoformType"] == "FDR") ? "FORMFDR": "EVALUE";
     std::cout << "PrSM filtering by " << cutoff_type << " - started." << std::endl;
     std::istringstream(arguments["cutoffProteoformValue"]) >> cutoff_value;
@@ -396,14 +407,20 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
 
     std::cout << "Generating proteoform xml files - started." << std::endl;
     xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, resource_dir, "topmg_form_cutoff", "topmg_proteoform_cutoff");
+    
+    if (arguments["geneHTMLFolder"] == "false"){
+      xml_gene->gene_html_folder = false;
+    }
+    
     xml_gene->process();
     xml_gene = nullptr;
     std::cout << "Generating proteoform xml files - finished." << std::endl;
 
-    std::cout << "Converting proteoform xml files to html files - started." << std::endl;
-    jsonTranslate(arguments, "topmg_proteoform_cutoff");
-    std::cout << "Converting proteoform xml files to html files - finished." << std::endl;
-
+    if (arguments["geneHTMLFolder"] == "true"){//only when the parameter is set to true
+      std::cout << "Converting proteoform xml files to html files - started." << std::endl;
+      jsonTranslate(arguments, "topmg_proteoform_cutoff");
+      std::cout << "Converting proteoform xml files to html files - finished." << std::endl;
+    }
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;

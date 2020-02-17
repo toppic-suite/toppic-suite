@@ -61,6 +61,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("precursor-window,w", po::value<std::string> (&prec_window),
          "<a positive number>. Set the precursor window size. The default value is 3.0 m/z.")
         ("missing-level-one,o","The input spectrum file does not contain MS1 spectra.")
+        ("gene-html-folder,W","Generate html folder containing TopView and spectrum data in js format.")
         ;
 
     po::options_description desc("Options");
@@ -79,6 +80,7 @@ bool Argument::parse(int argc, char* argv[]) {
          "Merge deconvoluted files and specify the name of the merged file.")
         ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), 
          "Spectrum file name with its path.")
+        ("gene-html-folder,W","Generate html folder containing TopView and spectrum data in js format.")
         ;
 
     po::positional_options_description positional_options;
@@ -156,6 +158,9 @@ bool Argument::parse(int argc, char* argv[]) {
         topfd_para_ptr_->merge_files_ = true;
         topfd_para_ptr_->merged_file_name_ = merged_file_name;
       }
+    }
+    if (vm.count("gene-html-folder")) {
+      topfd_para_ptr_->gene_html_folder_ = true;
     }
   }
   catch(std::exception& e) {
