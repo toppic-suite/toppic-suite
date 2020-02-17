@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -25,13 +25,15 @@ class DiagFilterProcessor {
   DiagFilterProcessor(DiagFilterMngPtr mng_ptr): mng_ptr_(mng_ptr) {};
 
   void process();
+  void index_process();
 
  private:
   DiagFilterMngPtr mng_ptr_;
 
   void processBlock(DbBlockPtr block_ptr, int total_block_num,
-                    const std::vector<double> & mod_mass_list);
-
+                    const std::vector<double> & mod_mass_list, int block_num);
+  void createIndexFiles(DbBlockPtr block_ptr, int total_block_num,
+                    const std::vector<double> & mod_mass_list, int block_num, int *current_num);
 };
 
 typedef std::shared_ptr<DiagFilterProcessor> DiagFilterProcessorPtr;

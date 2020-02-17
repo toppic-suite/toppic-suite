@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
 //limitations under the License.
 
 #include <iostream>
+#include <chrono>
 
 #include "common/util/file_util.hpp"
 #include "common/base/mod_util.hpp"
@@ -27,6 +28,7 @@
 #include "prsm/simple_prsm_str_merge.hpp"
 #include "filter/diag/mass_diag_filter.hpp"
 #include "filter/diag/diag_filter_processor.hpp"
+#include "filter/diag/mass_diag_index_file.hpp"
 
 namespace toppic {
 
@@ -56,7 +58,7 @@ void DiagFilterProcessor::process() {
   for (size_t i = 0; i < db_block_ptr_vec.size(); i++) {
     std::cout << "Multiple PTM filtering - block " << (i + 1) << " out of "
         << db_block_ptr_vec.size() << " started." << std::endl;
-    processBlock(db_block_ptr_vec[i], db_block_ptr_vec.size(), mod_mass_list);
+    processBlock(db_block_ptr_vec[i], db_block_ptr_vec.size(), mod_mass_list, i);
     std::cout << "Multiple PTM filtering - block " << (i + 1) << " finished. " << std::endl;
   }
 
@@ -77,14 +79,20 @@ void DiagFilterProcessor::process() {
 }
 
 void DiagFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num,
-                                       const std::vector<double> & mod_mass_list) {
+                                       const std::vector<double> & mod_mass_list, int block_idx) {
+  std::string block_number = str_util::toString(block_idx);
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
   std::string db_block_file_name = prsm_para_ptr->getSearchDbFileName()
       + "_" + str_util::toString(block_ptr->getBlockIdx());
   ProteoformPtrVec raw_forms
       = proteoform_factory::readFastaToProteoformPtrVec(db_block_file_name,
                                                         prsm_para_ptr->getFixModPtrVec());
-  MassDiagFilterPtr filter_ptr = std::make_shared<MassDiagFilter>(raw_forms, mng_ptr_);
+  //timer
+  auto start = std::chrono::steady_clock::now();
+
+  MassDiagFilterPtr filter_ptr = std::make_shared<MassDiagFilter>(raw_forms, mng_ptr_, block_number);
+  auto end = std::chrono::steady_clock::now();
+ // std::cout << "multi_ptm process time: " << std::chrono::duration_cast<std::chrono::seconds>(end-start).count() << " sec" << std::endl;
 
   int group_spec_num = mng_ptr_->prsm_para_ptr_->getGroupSpecNum();
   SpParaPtr sp_para_ptr =  mng_ptr_->prsm_para_ptr_->getSpParaPtr();
@@ -161,6 +169,66 @@ void DiagFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num
   
   //Remove temporary files
   file_util::cleanTempFiles(sp_file_name, cur_output_ext + "_");
+}
+//below are used for index file generation
+/*
+std::function<void()> geneIndexTask(MassDiagFilterPtr filter_ptr,
+                               const PrmMsPtrVec & ms_ptr_vec,
+                               SimpleThreadPoolPtr  pool_ptr, 
+                               SimplePrsmXmlWriterPtrVec &writer_ptr_vec) {
+  return [filter_ptr, ms_ptr_vec, pool_ptr, writer_ptr_vec]() {
+    SimplePrsmPtrVec match_ptrs = filter_ptr->getBestMatch(ms_ptr_vec);
+    boost::thread::id thread_id = boost::this_thread::get_id();
+    int writer_id = pool_ptr->getId(thread_id);
+    writer_ptr_vec[writer_id]->write(match_ptrs);
+  };
+}*/
+
+void DiagFilterProcessor::index_process() {
+  std::string db_file_name = mng_ptr_->prsm_para_ptr_->getSearchDbFileName();
+  DbBlockPtrVec db_block_ptr_vec = DbBlock::readDbBlockIndex(db_file_name);
+
+  std::cout << "Generating Multi PTM index files --- started" << std::endl;
+
+  std::vector<double> mod_mass_list;
+  if (mng_ptr_->residueModFileName_ != "") {
+    mod_mass_list = mod_util::getModMassVec(mod_util::readModTxt(mng_ptr_->residueModFileName_)[2]);
+  }
+
+  SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(mng_ptr_->thread_num_);
+  int block_num = db_block_ptr_vec.size();
+  int current_num = 1; //show how many files have been processed. n in the message "n of 5 files processed"..
+
+  for (size_t i = 0; i < db_block_ptr_vec.size(); i++) {
+    
+    createIndexFiles(db_block_ptr_vec[i], db_block_ptr_vec.size(), mod_mass_list, block_num, &current_num);
+  }
+  pool_ptr->ShutDown();
+  std::cout << "Generating Multi PTM index files --- finished" << std::endl;
+}
+
+void DiagFilterProcessor::createIndexFiles(DbBlockPtr block_ptr, int total_block_num,
+                                       const std::vector<double> & mod_mass_list, int block_num, int *current_num) {
+  PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
+
+  std::string db_block_file_name = prsm_para_ptr->getSearchDbFileName()
+      + "_" + str_util::toString(block_ptr->getBlockIdx());
+
+  ProteoformPtrVec raw_forms
+      = proteoform_factory::readFastaToProteoformPtrVec(db_block_file_name,
+                                                        prsm_para_ptr->getFixModPtrVec());
+
+  std::string block_str = str_util::toString(block_ptr->getBlockIdx());
+
+  MassDiagIndexPtr filter_ptr = std::make_shared<MassDiagIndex>(raw_forms, mng_ptr_, block_str);
+  
+  mng_ptr_->mutex_.lock();
+
+    std::cout << "Multi PTM index files - processing " << *current_num << " of " << block_num << " files." << std::endl;
+    *current_num = *current_num + 1;
+
+    mng_ptr_->mutex_.unlock();
+
 }
 
 }  // namespace toppic

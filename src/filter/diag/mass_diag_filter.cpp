@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -13,23 +13,60 @@
 //limitations under the License.
 
 #include <algorithm>
+#include <iostream>
+#include <fstream>
+
+#include "common/util/file_util.hpp"
 
 #include "ms/spec/prm_ms.hpp"
+
 #include "prsm/simple_prsm_util.hpp"
+
 #include "filter/massmatch/filter_protein.hpp"
 #include "filter/massmatch/mass_match_factory.hpp"
 #include "filter/massmatch/mass_match_util.hpp"
 #include "filter/diag/mass_diag_filter.hpp"
 
+#include "console/topindex_file_name.hpp"
+
 namespace toppic {
 
 MassDiagFilter::MassDiagFilter(const ProteoformPtrVec &proteo_ptrs,
-                               DiagFilterMngPtr mng_ptr) {
+                               DiagFilterMngPtr mng_ptr, std::string block_str) {
   mng_ptr_ = mng_ptr;
   proteo_ptrs_ = proteo_ptrs;
-  index_ptr_ = MassMatchFactory::getPrmDiagMassMatchPtr(proteo_ptrs,
+  PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
+  
+  TopIndexFileName TopIndexFile;
+  std::string parameters = TopIndexFile.gene_file_name(prsm_para_ptr);
+	
+  std::string indexDirName = mng_ptr_->prsm_para_ptr_->getOriDbName() + "_idx";
+
+  bool indexFilesExist = true;
+
+  for (size_t t = 0; t < TopIndexFile.multi_ptm_file_vec.size(); t++){
+    if (!file_util::exists(indexDirName + file_util::getFileSeparator() + TopIndexFile.multi_ptm_file_vec[t] + parameters + block_str)){
+      indexFilesExist = false;//if any of the index files for this ptm is missing
+      break; 
+    }
+  }
+
+  if (indexFilesExist){ 
+    std::cout << "Loading index files                            " << std::endl;
+    index_ptr_ = std::make_shared<MassMatch>();
+
+    TopIndexFileName TopIndexFile;
+    std::string parameters = TopIndexFile.gene_file_name(prsm_para_ptr);
+    std::string fileName = TopIndexFile.multi_ptm_file_vec[0] + parameters + block_str;
+
+    index_ptr_->deserializeMassMatch(fileName, indexDirName);
+
+  }
+  else{
+    index_ptr_ = MassMatchFactory::getPrmDiagMassMatchPtr(proteo_ptrs,
                                                         mng_ptr->max_proteoform_mass_,
-                                                        mng_ptr->filter_scale_);
+                                                        mng_ptr->filter_scale_);                                                  
+  }
 }
 
 SimplePrsmPtrVec MassDiagFilter::getBestMatch(const PrmMsPtrVec &ms_ptr_vec) {
