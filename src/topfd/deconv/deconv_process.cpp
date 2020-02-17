@@ -32,6 +32,8 @@
 #include "topfd/msreader/raw_ms_writer.hpp"
 #include "topfd/deconv/deconv_process.hpp"
 
+#include "ms/spec/msalign_thread_merge.hpp"
+
 #include <mutex>
 #include <vector>
 #include <boost/filesystem.hpp>
@@ -186,15 +188,14 @@ void DeconvProcess::processSpMissingLevelOne(RawMsGroupReaderPtr reader_ptr) {
 
   int count = 0;
 
-  std::string ms_msalign_name;
-  ms_msalign_name = base_name_ + "_ms2.msalign";
+  std::string ms_msalign_name = file_util::basename(spec_file_name_) + ".ms2_msalign";
 
   SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(thread_num);  
 
   MsAlignWriterPtrVec ms_writer_ptr_vec;
 
   for (int i = 0; i < thread_num; i++) { 
-    MsAlignWriterPtr ms_ptr = std::make_shared<MsAlignWriter>(ms_msalign_name + "_" + str_util::toString(i) + "_ms");
+    MsAlignWriterPtr ms_ptr = std::make_shared<MsAlignWriter>(ms_msalign_name + "_" + str_util::toString(i));
 
     ms_writer_ptr_vec.push_back(ms_ptr);
   }
@@ -225,152 +226,11 @@ void DeconvProcess::processSpMissingLevelOne(RawMsGroupReaderPtr reader_ptr) {
   }
   pool_ptr->ShutDown();
 
-  mergeMsFiles(ms_msalign_name, thread_num, total_scan_num);
+  MsalignThreadMerge msalign_ms2_merge = MsalignThreadMerge(
+    file_util::basename(spec_file_name_), "ms2_msalign", 
+    thread_num, "ms2.msalign", topfd_para_ptr_-> getParaStr("#"));
 
   std::cout << std::endl;
-}
-
-void DeconvProcess::mergeSortedVec(std::vector<std::string> *spec_data_array, int start, int middle, int end){
-  int i, j, k;
-  int first_array_size = middle - start + 1;
-  int second_array_size = end - middle;
-  
-  std::vector<std::string> *first_half;
-  std::vector<std::string> *second_half;
-
-  first_half = new std::vector<std::string>[first_array_size];
-  second_half = new std::vector<std::string>[second_array_size];
-
-  for (i = 0; i < first_array_size; i++){
-    first_half[i] = spec_data_array[start + i];
-  }
-  for (j = 0; j < second_array_size; j++){
-    second_half[j] = spec_data_array[middle + 1 + j];
-  }
-
-  i = 0;
-  j = 0;
-  k = start;
-
-  while (i < first_array_size && j < second_array_size){
-    if (first_half[i].size() > 0 && second_half[j].size() > 0){
-      std::string line_i = first_half[i][1];
-      std::string line_j = second_half[j][1];    //ID is in line 1 of each vector
-
-      if (line_i.substr(0, 3) == "ID=" && line_j.substr(0,3) == "ID="){//should be always true
-        int id_i = std::stoi(line_i.substr(3));
-        int id_j = std::stoi(line_j.substr(3));
-
-        if (id_i <= id_j){
-          spec_data_array[k] = first_half[i];
-          i++;
-        }
-        else{
-          spec_data_array[k] = second_half[j];
-          j++;
-        }
-        k++;
-      }
-      else{
-        LOG_ERROR("ms files are not correctly merged");
-        break;
-      }
-    }
-    else{
-      LOG_ERROR("empty vector for a spectrum");
-      break;
-    }
-  }
-  while (i < first_array_size){
-      spec_data_array[k] = first_half[i];
-      i++;
-      k++;
-    }
-    while (j < second_array_size){
-      spec_data_array[k] = second_half[j];
-      j++;
-      k++;
-    }
-    delete[] first_half;
-    delete[] second_half;
-
-    first_half = nullptr;
-    second_half = nullptr;
-}
-
-void DeconvProcess::mergeSort(std::vector<std::string> *spec_data_array, int start, int end){
-  
-  if (start < end){
-    int middle = static_cast<int>((start + end)/2);
-
-    //mergeSort() for the first half
-    mergeSort(spec_data_array, start, middle);
-
-    //mergeSort() for the later half
-    mergeSort(spec_data_array, middle + 1, end);
- 
-    //merge() the returned result  
-     mergeSortedVec(spec_data_array, start, middle, end);
-
-  }
-}
-
-void DeconvProcess::readMsFile(std::string fileName, std::vector<std::string> *spec_data_array) {
-  std::ifstream ms(fileName);
-  std::string line;
-  std::vector<std::string> line_list;//one spectra
-  int idx = 0;
-  while (std::getline(ms, line)) {
-    str_util::trim(line);
-
-    if (line == "BEGIN IONS") {
-      line_list.push_back(line);
-    } else if (line == "END IONS") {
-      if (line_list.size() != 0) {
-        line_list.push_back(line);
-      }
-      spec_data_array[idx] = line_list;
-      line_list.clear();
-      idx++;
-      
-    }else if (line == "" || line[0] == '#') {
-      continue;
-    } else {
-      if (line_list.size() > 0) {
-        line_list.push_back(line);
-      }
-    }
-  }
-
-}
-void DeconvProcess::mergeMsFiles(std::string fileName, int thread_num, int spec_num){
-  std::string combinedFileName = fileName + "_concat" + "_ms";
-  
-  if (file_util::exists(combinedFileName)){
-    boost::filesystem::remove(combinedFileName);
-  }
-  std::ofstream combined_ms(combinedFileName, std::ios_base::binary | std::ios_base::app);
-
-  for (int i = 0; i < thread_num; i++){//concatenate all ms files
-    std::string msfileName = fileName + "_" + str_util::toString(i) + "_ms";
-    std::ifstream msfile(msfileName, std::ios_base::binary);
-
-    combined_ms.seekp(0, std::ios_base::end);
-    combined_ms << msfile.rdbuf();
-  };
-  combined_ms.close();
-
-  std::vector<std::string> *spec_data_array;
-  spec_data_array = new std::vector<std::string>[spec_num];
-
-  readMsFile(combinedFileName, spec_data_array);
-
-  mergeSort(spec_data_array, 0, spec_num-1);
-
-  writeMsalign(fileName, spec_data_array, spec_num);
-
-  delete[] spec_data_array;
-  spec_data_array = nullptr;
 }
 
 void DeconvProcess::deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
@@ -510,9 +370,9 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
   int count = 0;
   
   std::string ms1_msalign_name, ms2_msalign_name;
-
+  
   ms1_msalign_name = file_util::basename(spec_file_name_) + "_ms1.msalign";
-  ms2_msalign_name = file_util::basename(spec_file_name_) + "_ms2.msalign"; //names for msalign intermediate and final files
+  ms2_msalign_name = file_util::basename(spec_file_name_) + "_ms2.msalign";
 
   SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(thread_num);  
   
@@ -521,8 +381,8 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
   MsAlignWriterPtrVec ms2_writer_ptr_vec;
 
   for (int i = 0; i < thread_num; i++) { 
-    MsAlignWriterPtr ms1_ptr = std::make_shared<MsAlignWriter>(ms1_msalign_name + "_" + str_util::toString(i) + "_ms");
-    MsAlignWriterPtr ms2_ptr = std::make_shared<MsAlignWriter>(ms2_msalign_name + "_" + str_util::toString(i) + "_ms");
+    MsAlignWriterPtr ms1_ptr = std::make_shared<MsAlignWriter>(ms1_msalign_name + "_" + str_util::toString(i));
+    MsAlignWriterPtr ms2_ptr = std::make_shared<MsAlignWriter>(ms2_msalign_name + "_" + str_util::toString(i));
 
     ms1_writer_ptr_vec.push_back(ms1_ptr);
     ms2_writer_ptr_vec.push_back(ms2_ptr);
@@ -565,9 +425,16 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
     //auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end-start);
     //std::cout << std::endl << "Read file " << duration.count() << std::endl;
 
-  mergeMsFiles(ms1_msalign_name, thread_num, ms1_spec_num);
-  mergeMsFiles(ms2_msalign_name, thread_num, ms2_spec_num);
-  //ms1(ms2) spectrum numbers are used to set the array size containing spectrum data. 
+  MsalignThreadMerge msalign_ms1_merge = MsalignThreadMerge(
+    file_util::basename(spec_file_name_), "ms1.msalign", thread_num, 
+    "ms1.msalign", topfd_para_ptr_-> getParaStr("#"));
+
+  MsalignThreadMerge msalign_ms2_merge = MsalignThreadMerge(
+    file_util::basename(spec_file_name_), "ms2.msalign", thread_num, 
+    "ms2.msalign", topfd_para_ptr_-> getParaStr("#"));
+
+  msalign_ms1_merge.process();
+  msalign_ms2_merge.process();
 
   std::cout << std::endl;
 
