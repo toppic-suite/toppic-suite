@@ -42,7 +42,7 @@ void MsAlignWriter::close() {
 }
 
 void MsAlignWriter::writePara(const std::string &para_str) {
-  output_ << para_str;
+  output_ << para_str << "\n";
 }
 
 void MsAlignWriter::write(DeconvMsPtr ms_ptr) {
@@ -63,7 +63,7 @@ void MsAlignWriter::write(DeconvMsPtr ms_ptr) {
     }
     output_ << "MS_ONE_ID=" << header_ptr->getMsOneId() << std::endl;
     output_ << "MS_ONE_SCAN=" << header_ptr->getMsOneScan() << std::endl;
-    output_ << "PRECURSOR_MZ=" << std::setprecision(5) 
+    output_ << "PRECURSOR_MZ=" << std::setprecision(10) 
         << header_ptr->getPrecMonoMz() << std::endl;
     output_ << "PRECURSOR_CHARGE=" << header_ptr->getPrecCharge() << std::endl;
     output_ << "PRECURSOR_MASS=" << std::setprecision(5) 

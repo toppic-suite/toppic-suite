@@ -190,8 +190,9 @@ void MsAlignReader::readNext() {
   header_ptr->setMsOneScan(ms_one_scan);
 
   header_ptr->setPrecMonoMz(prec_mass /prec_charge + mass_constant::getProtonMass());
-
+  
   header_ptr->setPrecCharge(prec_charge);
+
 
   header_ptr->setPrecInte(prec_inte);
 

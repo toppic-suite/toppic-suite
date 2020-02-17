@@ -36,7 +36,6 @@ class MsAlignWriter {
  private:
   std::string file_name_;
   std::ofstream output_;
-
 };
 
 typedef std::shared_ptr<MsAlignWriter> MsAlignWriterPtr;
