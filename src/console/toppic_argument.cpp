@@ -256,7 +256,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("no-topfd-feature,x", "No TopFD feature file for proteoform identification.")
         ("combined-file-name,c", po::value<std::string>(&combined_output_name) , "Specify a file name for the combined spectrum data file and analysis results.")
         ("keep-temp-files,k", "Keep temporary files.")
-        ("gene-html-folrder,X", "Generate html folder containing TopView and spectrum data in js format.");
+        ("gene-html-folrder,W", "Generate html folder containing TopView and spectrum data in js format.");
 
     po::options_description desc("Options");
 
