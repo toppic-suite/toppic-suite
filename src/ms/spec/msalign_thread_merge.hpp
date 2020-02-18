@@ -26,7 +26,8 @@ class MsalignThreadMerge {
   MsalignThreadMerge(const std::string &spec_file_name,
                      const std::string &in_file_ext,
                      int in_num,
-                     const std::string &out_file_ext);
+                     const std::string &out_file_ext, 
+                     const std::string &para_str);
 
   void process();
 
@@ -34,6 +35,7 @@ class MsalignThreadMerge {
   std::string spec_file_name_;
   std::vector<std::string> input_file_exts_;
   std::string output_file_ext_;
+  std::string para_str_;
 };
 
 typedef std::shared_ptr<MsalignThreadMerge> MsalignThreadMergePtr;

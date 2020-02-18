@@ -205,6 +205,7 @@ DeconvMsPtr getDeconvMsPtr(MsHeaderPtr header_ptr, MatchEnvPtrVec &envs) {
     double inte = theo_env->compIntensitySum();
     int charge = theo_env->getCharge();
     double score = envs[i]->getScore();
+
     DeconvPeakPtr peak_ptr = std::make_shared<DeconvPeak>(sp_id, i, pos, inte, charge, score);
     peak_list.push_back(peak_ptr);
   }
