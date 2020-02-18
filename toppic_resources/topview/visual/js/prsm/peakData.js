@@ -52,7 +52,6 @@ PeakData = function() {
     }
     this.getIonData = function(prsm_data,specId,json_data){
         let envelopes =  json_data.envelopes;
-        console.log("envelopes : ", envelopes);
         let ionData = [];
         let intensity ;
         prsm_data.prsm.ms.peaks.peak.forEach(function(element){
@@ -71,8 +70,8 @@ PeakData = function() {
                         intensity = envelopes[i].env_peaks.sort(function(x,y){
                                         return d3.descending(x.intensity, y.intensity);
                                     })[0].intensity; //envelopes[i].env_peaks[0].intensity;
-                        console.log("intensity : ", intensity);
-                        ionDataTemp = {"mz":parseFloat(element.monoisotopic_mz),"intensity":parseFloat(intensity),"ion":ion};
+                        //Multiplying with 1.000484 to make the ions come to center of the max peak
+                        ionDataTemp = {"mz":(parseFloat(element.monoisotopic_mz)*1.000484),"intensity":parseFloat(intensity),"ion":ion};
                         ionData.push(ionDataTemp);
                         break;
                     }

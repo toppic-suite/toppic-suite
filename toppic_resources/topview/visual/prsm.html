@@ -29,6 +29,7 @@
 <script src="js/prsm/buttons.js"></script>
 <script src="js/prsm/peakData.js"></script>
 <script src="js/prsm/generateSpectrumGraphs.js"></script>
+<script src="js/prsm/drawMonoMassSpectrum.js"></script>
 <script src="js/prsm/multiscan.js"></script>
 <script src="js/topview/topview.js"></script>
 
@@ -39,6 +40,7 @@ var ms2_graph ;
 var ms1_graph;
 var spectrumParams_global = [] ;
 var correspondingSpecParams_g = [];
+var monoMassDataList = [];
 
 $(document).ready(function(){
 	var x = location.href;
@@ -124,7 +126,10 @@ $(document).ready(function(){
 		let scanIdList = prsm_data.prsm.ms.ms_header.scans.split(" ");
 		scanIdList = MultiScanObj.getUniqueScanIdList(scanIdList);
 		let ms2_uniqueList = MultiScanObj.getUniqueScanIdList(ms2_id_list);
-		MultiScanObj.promiseLoadDataJS(ms2_uniqueList,scanIdList,"ms2_json")
+		drawMonoMassSpectrum(ms2_uniqueList,scanIdList);
+
+		MultiScanObj.promiseLoadDataJS(ms2_uniqueList,scanIdList,"ms2_json");
+		//drawMonoMassSpectrum(ms2_uniqueList,scanIdList);
 		
 	}
 })
@@ -210,6 +215,24 @@ $(document).ready(function(){
 	</div>
 	 <!-- <svg id = "ms2svg" style = "background-color:#F8F8F8;display: none;"></svg> -->
 </div>
+
+<div id="monoMassGraph" style="display:none;">
+	<div class="row" id="monoMass_name">
+		<h5>MonoMass Spectrum</h5>
+	</div>
+	<div class="row" id="monomass_div">
+		
+		<ul class="nav nav-tabs graph_nav" id="monoMass_nav">
+		</ul>
+		<div class="text-center" id="monoMassDataLoading">
+			<div class="spinner-border "  role="status">
+				<span class="sr-only">Loading...</span>
+			</div><h3>&nbsp; Loading...</h3>
+		</div>
+		 <!-- <svg id = "ms2svg" style = "background-color:#F8F8F8;display: none;"></svg> -->
+	</div>
+</div>
+
 <table>
 <tr>
 	<td width = "55%">
@@ -372,11 +395,7 @@ $(document).ready(function(){
 			<table class="table table-sm table_modal">
 				<tbody>
 					<tr>
-						<div  >
-							<td class="td_popup_variables">Show Peaks: &nbsp;&nbsp;&nbsp;
-								<input type="radio" name="show_peaks" class = "show_peaks" >Yes
-								<input type="radio" name="show_peaks" class = "show_peaks" >No
-							</td>
+						<div >
 							<td class="td_popup_variables">Show Envelops: &nbsp;&nbsp;&nbsp;
 								<input type="radio" name="show_envelops" class = "show_envelops">Yes
 								 <input type="radio" name="show_envelops" class = "show_envelops">No

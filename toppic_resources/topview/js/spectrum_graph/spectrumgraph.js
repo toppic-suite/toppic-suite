@@ -300,12 +300,11 @@ drawIons = function(svg,spectrumParameters,ionData){
 	ionData.forEach(function(element){
 		let percentInte = element.intensity/maxIntensity * 100 ;
 		let inLimit = false;
-		console.log(element.intensity);
 		if(element.mz > spectrumParameters.minMz && element.mz <= spectrumParameters.maxMz)
 		{
 			ions.append("text")
 			.attr("id","graph_matched_ions")
-			.attr("x",spectrumParameters.getPeakXPos((element.mz*spectrumParameters.fixedShiftRatio)-0.1))
+			.attr("x",spectrumParameters.getPeakXPos((element.mz)))
 			.attr("y",function(d,i){
 				let y = spectrumParameters.getPeakYPos(element.intensity + (0.1*element.intensity));// Adding 10% to get the Ions on the max Intensity Peak
 				if(y <= spectrumParameters.padding.head) return spectrumParameters.padding.head ;
@@ -400,7 +399,6 @@ onMouseOut = function(){
 	d3.selectAll("#MyTextMassCharge").remove();
 }
 function drawSpectrum(svgId, spectrumParameters, peakData,ionData){
-	console.log("spectrumParameters : ", spectrumParameters);
 	// if(spectrumParameters.minMz > -500 )
 	// {
 		let svg = d3.select("body").select(svgId);
@@ -419,15 +417,12 @@ function drawSpectrum(svgId, spectrumParameters, peakData,ionData){
 		drawAxis(svg,spectrumParameters);
 		addDatatoAxis(svg,spectrumParameters);
 
-		if(spectrumParameters.showPeaks)
-		{
-			drawPeaks(svg, spectrumParameters, peakData);
-		}
-		if(spectrumParameters.showCircles)
+		drawPeaks(svg, spectrumParameters, peakData);
+		if(spectrumParameters.showCircles && peakData.envelope_list != null)
 		{
 			addCircles(svg,spectrumParameters,peakData);
 		}
-		if(spectrumParameters.showIons)
+		if(spectrumParameters.showIons && ionData != null)
 		{
 			drawIons(svg,spectrumParameters,ionData);
 		}

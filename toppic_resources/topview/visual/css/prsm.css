@@ -246,3 +246,12 @@ svg.l_popup_svg{
   padding-top: 25px !important;
   padding-left: 20px !important;
 }
+.monoMass_svg_graph_class {
+  background-color: #F8F8F8!important;
+}
+#monoMass_nav .active{
+  background-color: #F8F8F8 !important;
+}
+#monoMass_nav .nav-link{
+  border: 0px !important;
+}
