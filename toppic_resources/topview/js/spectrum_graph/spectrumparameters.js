@@ -2,7 +2,6 @@
  * 	the data-------------------------------------------------------------------*/
 SpectrumParameters = function() {
   /* Attributes to decide what to be shown on the graph */
-  this.showPeaks = true;
   this.showCircles = true;
   this.showIons = true;
   

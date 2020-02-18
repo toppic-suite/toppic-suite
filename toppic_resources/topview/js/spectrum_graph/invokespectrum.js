@@ -3,7 +3,10 @@ addSpectrum = function(id,peakList,envelopeList,monoMZ, ionData){
   	let specParameters = compSpectrumParameters(peakList, envelopeList, monoMZ);
 	let peakData = {};
 	peakData.peak_list = peakList ;
-	peakData.envelope_list = sortEnvelopes(envelopeList) ;
+	if(envelopeList != null)
+	{
+		peakData.envelope_list = sortEnvelopes(envelopeList) ;
+	}
 	id = "#"+id;
 	if(ionData == null)
 	{
@@ -14,7 +17,7 @@ addSpectrum = function(id,peakList,envelopeList,monoMZ, ionData){
 	return spectrumGraph;
 }
 compSpectrumParameters = function (peakList, envelopeList, monoMZ) {
-	let ratio = 1.000684;
+	let ratio = 1; 
 	let specParameters = new SpectrumParameters();
 	peakList.sort(function(x,y){
 		return d3.ascending(x.mz, y.mz);
@@ -27,19 +30,24 @@ compSpectrumParameters = function (peakList, envelopeList, monoMZ) {
 		return d3.ascending(x.intensity, y.intensity);
 	})
 
-  let maxEnvelope = -1;
-  let minEnvelope = 1000000000;
+	let maxEnvelope = -1;
+	let minEnvelope = 1000000000;
 
-	envelopeList.forEach(function(element){
-		element.env_peaks.forEach(function(e){
-			if (e.intensity > maxEnvelope){
-				maxEnvelope = e.intensity;
-			}
-			else if (e.intensity < minEnvelope){
-				minEnvelope = e.intensity;
-			}
+	if(envelopeList != null)
+	{
+		ratio = 1.000684;
+		envelopeList.forEach(function(element){
+			element.env_peaks.forEach(function(e){
+				if (e.intensity > maxEnvelope){
+					maxEnvelope = e.intensity;
+				}
+				else if (e.intensity < minEnvelope){
+					minEnvelope = e.intensity;
+				}
+			})
 		})
-	})
+	}
+	
 
 	let maxIntensity = peakList[listSize-1].intensity;
 	let minIntensity = peakList[0].intensity;

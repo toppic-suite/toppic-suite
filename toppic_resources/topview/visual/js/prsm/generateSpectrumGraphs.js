@@ -17,39 +17,45 @@ function svgIds()
     return this;
 }
 function generateCorrespondingGraph(current_data,id,prec_mz,specId){
-    let peak_data = new PeakData();
-    let peak_list = peak_data.getPeakData(current_data);
-    let envelope_list = peak_data.getEnvelopeData(current_data);
-    if(id != "popupspectrum")
+    let startOfId = id.split("_")[0];
+    if(startOfId == "monoMassSvg")
     {
-        let ionData = peak_data.getIonData(prsm_data,specId,current_data);
-        console.log("ionData : ", ionData);
-        ms2_graph = new addSpectrum(id, peak_list, envelope_list, prec_mz, ionData);
-        // Setting correspoding Spectrum params of the graph to its respective graph svg Ids
-    }
+        // Current Data itself contains Peak data
+        spectrumgraph = new addSpectrum(id, current_data, null, prec_mz, current_data);
+    }   
     else{
-        spectrumgraph = new addSpectrum(id, peak_list, envelope_list, prec_mz, null);
+        let peak_data = new PeakData();
+        let peak_list = peak_data.getPeakData(current_data);
+        let envelope_list = peak_data.getEnvelopeData(current_data);
+        if(id != "popupspectrum")
+        {
+            let ionData = peak_data.getIonData(prsm_data,specId,current_data);
+            ms2_graph = new addSpectrum(id, peak_list, envelope_list, prec_mz, ionData);
+            // Setting correspoding Spectrum params of the graph to its respective graph svg Ids
+        }
+        else{
+            spectrumgraph = new addSpectrum(id, peak_list, envelope_list, prec_mz, null);
+        }
     }
-    console.log("correspondingSpecParams_g : ", correspondingSpecParams_g);
 }
 
-function createMultipleSvgs(current_data)
-{
-    let div = document.getElementById("ms2svg_div"); 
-    current_data.forEach(function(element,i){
-        let id = "ms2svg_"+element.scanId;
-        let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");;
-        svg.setAttribute("id",id);
-        svg.setAttribute("class","ms2_svg_graph_class");
-        svg.style.backgroundColor = "#F8F8F8"; 
-        if(i != 0)
-        {
-            svg.style.display = "none"; 
-        }
-        div.appendChild(svg);
-        generateCorrespondingGraph(element.value,id,null,element.specId);
-    });
-}
+// function createMultipleSvgs(current_data)
+// {
+//     let div = document.getElementById("ms2svg_div"); 
+//     current_data.forEach(function(element,i){
+//         let id = "ms2svg_"+element.scanId;
+//         let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");;
+//         svg.setAttribute("id",id);
+//         svg.setAttribute("class","ms2_svg_graph_class");
+//         svg.style.backgroundColor = "#F8F8F8"; 
+//         if(i != 0)
+//         {
+//             svg.style.display = "none"; 
+//         }
+//         div.appendChild(svg);
+//         generateCorrespondingGraph(element.value,id,null,element.specId);
+//     });
+// }
 
 function reDrawWithSpecParams(current_data,id,spectrumParameters,specId)
 {
@@ -64,6 +70,22 @@ function reDrawWithSpecParams(current_data,id,spectrumParameters,specId)
     let svgId = "#"+id;
     let peakData = {peak_list:peak_list, envelope_list:envelope_list};
     new SpectrumGraph(svgId,spectrumParameters,peakData, ionData);
+}
+function createMultipleSvgs(divId,svgId,className,current_data){
+    let div = document.getElementById(divId); 
+    current_data.forEach(function(element,i){
+        let id = svgId+element.scanId;
+        let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");;
+        svg.setAttribute("id",id);
+        svg.setAttribute("class",className);
+        svg.style.backgroundColor = "#F8F8F8"; 
+        if(i != 0)
+        {
+            svg.style.display = "none"; 
+        }
+        div.appendChild(svg);
+        generateCorrespondingGraph(element.value,id,null,element.specId);
+    });
 }
 
 function createMultiplePopUpSvgs(current_data)
@@ -94,10 +116,10 @@ function createDummySpecParamsList(current_data){
     })
     return spectrumParams_global;
 }
-function showCorrespondingGraph(scanId)
+function showCorrespondingGraph(id,className)
 {
-    id = "ms2svg_"+scanId;
-    $(".ms2_svg_graph_class").hide();
+    //id = id+scanId;
+    $(className).hide();
     document.getElementById(id).style = "block";
 }
 
@@ -116,7 +138,6 @@ function graphOnClickActions(){
         //element.classList.add("active");  
         let id = "ms2svg_"+scanId;
         let specparams = correspondingSpecParams_g[id];
-        document.getElementsByName("show_peaks")[0].checked = specparams.showPeaks;
         document.getElementsByName("show_envelops")[0].checked = specparams.showCircles;
         document.getElementsByName("show_ions")[0].checked = specparams.showIons;
         console.log("specparams : ", id, specparams);
@@ -131,7 +152,7 @@ function graphOnClickActions(){
         let value = this.getAttribute('value');
         let [currentData,specId] = getCurrentData(ms2_ScansWithData,value);
         id = "ms2svg_"+value;
-        showCorrespondingGraph(value);
+        showCorrespondingGraph(id,".ms2_svg_graph_class");
 		$("#ms2_graph_nav .active").removeClass("active");
    		$(this).addClass("active");
 	})
@@ -142,6 +163,16 @@ function graphOnClickActions(){
 		$("#ms1_graph_nav .active").removeClass("active");
    		$(this).addClass("active");
     })
+    $(".monoMass_scanIds").click(function(){
+		let value = this.getAttribute('value');
+        let [currentData,specId] = getCurrentData(monoMassDataList,value);
+        console.log("value : ",value);
+        id = "monoMassSvg_"+value;
+        showCorrespondingGraph(id,".monoMass_svg_graph_class");
+		//generateCorrespondingGraph(currentData,"monoMassSvg_",null,specId);
+		$("#monoMass_nav .active").removeClass("active");
+   		$(this).addClass("active");
+    })
     
     $(".peakRows").click(function() {
 		let parent_id  = $(this).parent().parent().prop('id');
@@ -150,9 +181,16 @@ function graphOnClickActions(){
 		let peak_value = parseFloat(this.innerHTML).toFixed(3) ;
 		let [currentData,specId] = getCurrentData(ms2_ScansWithData,CurrentScanVal);
         let id = "ms2svg_"+CurrentScanVal;
-        showCorrespondingGraph(CurrentScanVal);
-		generateCorrespondingGraph(currentData,id,peak_value,specId);
-		activateCurrentnavbar("ms2_graph_nav",CurrentScanVal)
+        showCorrespondingGraph(id,".ms2_svg_graph_class");
+        generateCorrespondingGraph(currentData,id,peak_value,specId);
+        id = "monoMassSvg_"+CurrentScanVal;
+        showCorrespondingGraph(id,".monoMass_svg_graph_class");
+        [currentData,specId] = getCurrentData(monoMassDataList,CurrentScanVal);
+        let CurrentMonoMassVal = $("#"+parent_id+" .row_monoMass").html();//document.getElementById(parent_id)..innerHTML;
+        generateCorrespondingGraph(currentData,id,parseFloat(CurrentMonoMassVal),specId);
+        activateCurrentnavbar("ms2_graph_nav",CurrentScanVal);
+        activateCurrentnavbar("monoMass_nav",CurrentScanVal);
+        
 		showSpectrun();
     });
 
@@ -164,7 +202,6 @@ function graphOnClickActions(){
 		let [current_data,specId] = getCurrentData(ms2_ScansWithData,scanId);
         let id = "ms2svg_"+scanId;
         let specparams = correspondingSpecParams_g[id];
-        specparams.showPeaks =document.getElementsByName("show_peaks")[0].checked;
         specparams.showCircles = document.getElementsByName("show_envelops")[0].checked ;
         specparams.showIons = document.getElementsByName("show_ions")[0].checked ;
         console.log("specparams : ", id, specparams);

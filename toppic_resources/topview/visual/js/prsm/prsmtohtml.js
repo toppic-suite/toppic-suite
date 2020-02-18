@@ -112,16 +112,18 @@ function createTableElements(){
 			{
 				if(peak.spec_id == l_specIds[0]) l_scan = l_scans[0];
 				else l_scan = l_scans[1];
-
+				td.setAttribute("class","row_scanIds");
 				td.innerHTML = l_scan ;
 			}
 			if(i == 1)
 			{
 				td.innerHTML = parseInt(peak.peak_id) + 1 ;
+				td.setAttribute("class","row_peakNum");
 			}
 			if(i == 2)
 			{
 				td.innerHTML = peak.monoisotopic_mass;
+				td.setAttribute("class","row_monoMass");
 			}
 			if(i == 3)
 			{
@@ -135,10 +137,12 @@ function createTableElements(){
 			if(i == 4)
 			{
 				td.innerHTML = peak.intensity;
+				td.setAttribute("class","row_intensity");
 			}
 			if(i == 5)
 			{
 				td.innerHTML = peak.charge;
+				td.setAttribute("class","row_charge");
 			}
 			if(peak.hasOwnProperty('matched_ions_num'))
 			{

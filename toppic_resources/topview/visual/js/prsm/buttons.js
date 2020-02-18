@@ -57,6 +57,7 @@ function showSpectrun(){
 	document.getElementById("spectrum_help").style.display = "block";
 	document.getElementById("graph_download").style.display = "block";
 	document.getElementById("ms2svg_div").style.display = "block";
+	document.getElementById("monoMassGraph").style.display = "block";
 }
 function hideSpectrum(){
 	$("#show_ms2_spectrum").text('Show Spectrum'); 
@@ -64,4 +65,5 @@ function hideSpectrum(){
 	document.getElementById("spectrum_help").style.display = "none";
 	document.getElementById("graph_download").style.display = "none";
 	document.getElementById("ms2svg_div").style.display = "none";
+	document.getElementById("monoMassGraph").style.display = "none";
 }
