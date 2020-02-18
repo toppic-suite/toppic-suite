@@ -56,12 +56,12 @@ void MsalignThreadMerge::process() {
   size_t input_num = input_file_exts_.size();
   std::string base_name = file_util::basename(spec_file_name_);
   // open files
-  MsAlignReaderPtrVec reader_ptrs;
+  MsAlignReaderPtrVec reader_ptrs; 
   DeconvMsPtrVec ms_ptrs;
   for (size_t i = 0; i < input_num; i++) {
     std::string input_file_name = base_name + "_" + input_file_exts_[i];
     MsAlignReaderPtr reader_ptr
-        = std::make_shared<MsAlignReader>(input_file_name);
+        = std::make_shared<MsAlignReader>(input_file_name); 
     LOG_DEBUG("input file name " << input_file_name);
     DeconvMsPtr ms_ptr = reader_ptr->getNextMs();
     reader_ptrs.push_back(reader_ptr);
