@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -13,6 +13,10 @@
 //limitations under the License.
 
 #include <algorithm>
+#include <iomanip>
+#include <string>
+#include <iostream>
+#include <sstream> 
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
@@ -70,6 +74,9 @@ void PrsmFeatureCluster::setProtId(PrsmStrPtrVec& prsm_ptrs) {
 
 void PrsmFeatureCluster::setProteoClusterId(PrsmStrPtrVec& prsm_ptrs) {
   std::vector<PrsmStrPtrVec> clusters;
+  std::stringstream msg;
+  int prsm_count = prsm_ptrs.size();
+  
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     bool is_found = false;
     PrsmStrPtr cur_ptr = prsm_ptrs[i];
@@ -100,7 +107,11 @@ void PrsmFeatureCluster::setProteoClusterId(PrsmStrPtrVec& prsm_ptrs) {
       new_clusters.push_back(prsm_ptrs[i]);
       clusters.push_back(new_clusters);
     }
+    double perc = (i + 1) * 100.0 / prsm_count;
+    msg << std::flush << "Finding PrSM clusters - processing " << std::setprecision(3) << perc << "%.    \r";
+    std::cout << msg.str();
   }
+  std::cout << std::endl;
   for (size_t i = 0; i < clusters.size(); i++) {
     for (size_t j = 0; j < clusters[i].size(); j++) {
       clusters[i][j]->setClusterId(i);
@@ -119,8 +130,8 @@ void PrsmFeatureCluster::process() {
   // remove prsms without feature
   PrsmStrPtrVec filtered_prsm_ptrs;
   prsm_util::removePrsmsWithoutFeature(prsm_ptrs, filtered_prsm_ptrs);
-
   std::sort(filtered_prsm_ptrs.begin(), filtered_prsm_ptrs.end(), PrsmStr::cmpEValueInc);
+
   setProtId(filtered_prsm_ptrs);
   setProteoClusterId(filtered_prsm_ptrs);
   std::sort(filtered_prsm_ptrs.begin(), filtered_prsm_ptrs.end(), PrsmStr::cmpSpectrumIdIncPrecursorIdInc);
