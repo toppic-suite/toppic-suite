@@ -74,6 +74,8 @@ void DeconvProcess::writeMsalign(std::string resultFileName, std::vector<std::st
 
 std::string DeconvProcess::updateMsg(MsHeaderPtr header_ptr, int scan, 
                                      int total_scan_num) {
+
+									 
   std::string percentage = str_util::toString(scan * 100 / total_scan_num);
   std::string msg = "Processing spectrum scan " 
       + std::to_string(header_ptr->getFirstScanNum()) + " ...";
@@ -97,20 +99,22 @@ void DeconvProcess::prepareFileFolder() {
     file_util::delFile(ms2_env_name_); 
   }
 
-  //json file names
-  html_dir_ =  base_name_ + "_html";
-  ms1_json_dir_ = html_dir_ 
-      + file_util::getFileSeparator() + "topfd" 
-      + file_util::getFileSeparator() + "ms1_json";
-  ms2_json_dir_ = html_dir_ 
-      + file_util::getFileSeparator() + "topfd" 
-      + file_util::getFileSeparator() + "ms2_json";
-  if (file_util::exists(html_dir_)) {
-    file_util::delDir(html_dir_);
+  if (topfd_para_ptr_->gene_html_folder_){
+    //json file names
+    html_dir_ =  base_name_ + "_html";
+    ms1_json_dir_ = html_dir_ 
+        + file_util::getFileSeparator() + "topfd" 
+        + file_util::getFileSeparator() + "ms1_json";
+    ms2_json_dir_ = html_dir_ 
+        + file_util::getFileSeparator() + "topfd" 
+        + file_util::getFileSeparator() + "ms2_json";
+    if (file_util::exists(html_dir_)) {
+      file_util::delDir(html_dir_);
+    }
+    file_util::createFolder(html_dir_);
+    file_util::createFolder(ms1_json_dir_);
+    file_util::createFolder(ms2_json_dir_);
   }
-  file_util::createFolder(html_dir_);
-  file_util::createFolder(ms1_json_dir_);
-  file_util::createFolder(ms2_json_dir_);
 }
 
 void DeconvProcess::process() {
@@ -214,14 +218,13 @@ void DeconvProcess::processSpMissingLevelOne(RawMsGroupReaderPtr reader_ptr) {
     pool_ptr->Enqueue(geneTaskMissingMsOne(ms_group_ptr, deconv_ptr, deconv_process_ptr_, ms_writer_ptr_vec, pool_ptr));
 
     RawMsPtrVec ms_two_ptr_vec = ms_group_ptr->getMsTwoPtrVec();
-
+    
     for (size_t t = 0; t < ms_two_ptr_vec.size(); t++){
       RawMsPtr ms_two_ptr = ms_two_ptr_vec[t];
       std::string msg = updateMsg(ms_two_ptr->getMsHeaderPtr(), count + 1, total_scan_num);
       std::cout << "\r" << msg << std::flush;
       count += 1;
     }
-
     ms_group_ptr = reader_ptr->getNextMsGroupPtr();
   }
   pool_ptr->ShutDown();
@@ -287,7 +290,9 @@ void DeconvProcess::deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   for (size_t i = 0; i < peak_list.size(); i++) {
     peak_list[i]->setIntensity(intensities[i]);
   }
-  if (topfd_para_ptr_->output_json_files_) {
+
+  //write only when html folder argument is true
+  if (topfd_para_ptr_->output_json_files_ && topfd_para_ptr_->gene_html_folder_) {
     std::string json_file_name = ms1_json_dir_ 
         + file_util::getFileSeparator() 
         + "spectrum" + std::to_string(header_ptr->getId()) + ".js";
@@ -312,6 +317,7 @@ void DeconvProcess::deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   if (max_frag_mass == 0.0) {
     max_frag_mass = header_ptr->getPrecSpMass();
   }
+
     deconv_ptr->setMsLevel(header_ptr->getMsLevel());
     deconv_ptr->setData(peak_list, max_frag_mass, header_ptr->getPrecCharge());
     deconv_ptr->run();
@@ -355,6 +361,7 @@ std::function<void()> geneTask(RawMsGroupPtr ms_group_ptr, DeconvOneSpPtr deconv
   for (size_t i = 0; i < ms_two_ptr_vec.size(); i++) {
       RawMsPtr ms_two_ptr = ms_two_ptr_vec[i];
       deconv_process_ptr->deconvMsTwo(ms_two_ptr, deconv_ptr, ms2_writer_ptr_vec, pool_ptr);
+
   }
     
   };
