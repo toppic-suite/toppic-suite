@@ -23,11 +23,11 @@ namespace toppic {
 
 namespace deconv_data_util {
 
-DeconvDataPtr getDataPtr(PeakPtrVec &peak_list, double max_mass, 
+DeconvDataPtr getDataPtr(const PeakPtrVec &peak_list, double max_mass, 
                          int max_charge, double window_size);
 
 
-DeconvDataPtr getDataPtr(PeakPtrVec &peak_list, double spec_max_mass,
+DeconvDataPtr getDataPtr(const PeakPtrVec &peak_list, double spec_max_mass,
                          int spec_max_charge, double para_max_mass, 
                          int para_max_charge, double window_size);
 

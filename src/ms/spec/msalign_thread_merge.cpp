@@ -14,6 +14,7 @@
 
 #include <set>
 #include <algorithm>
+#include <iostream>
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
@@ -27,8 +28,9 @@ namespace toppic {
 MsalignThreadMerge::MsalignThreadMerge(const std::string &spec_file_name,
                                        const std::string &in_file_ext,
                                        int in_num,
-                                       const std::string &out_file_ext):
+                                       const std::string &out_file_ext, const std::string &para_str):
     spec_file_name_(spec_file_name),
+    para_str_(para_str),
     output_file_ext_(out_file_ext) {
       for (int i = 0; i < in_num; i ++) {
         std::string ext = in_file_ext + "_" + str_util::toString(i);
@@ -54,30 +56,31 @@ void MsalignThreadMerge::process() {
   size_t input_num = input_file_exts_.size();
   std::string base_name = file_util::basename(spec_file_name_);
   // open files
-  MsAlignReaderPtrVec reader_ptrs;
+  MsAlignReaderPtrVec reader_ptrs; 
   DeconvMsPtrVec ms_ptrs;
   for (size_t i = 0; i < input_num; i++) {
-    std::string input_file_name = base_name + "." + input_file_exts_[i];
+    std::string input_file_name = base_name + "_" + input_file_exts_[i];
     MsAlignReaderPtr reader_ptr
-        = std::make_shared<MsAlignReader>(input_file_name);
+        = std::make_shared<MsAlignReader>(input_file_name); 
     LOG_DEBUG("input file name " << input_file_name);
     DeconvMsPtr ms_ptr = reader_ptr->getNextMs();
     reader_ptrs.push_back(reader_ptr);
     ms_ptrs.push_back(ms_ptr);
   }
-
-  std::string output_filename = base_name + "." + output_file_ext_;
+  std::string output_filename = base_name + "_" + output_file_ext_;
   MsAlignWriterPtr writer = std::make_shared<MsAlignWriter>(output_filename); 
+  
+  writer->writePara(para_str_);
 
   // combine
   int spec_id = 0;
-  bool finish = false;
-  while (!finish) {
+  bool finish = true;
+  
+  while (finish) {
     // LOG_DEBUG("spec id " << spec_id << " input num " << input_num);
-    finish = true;
     int cur_ms_idx = getCurMsIndex(ms_ptrs);
+
     if (cur_ms_idx < 0) {
-      finish = true;
       break;
     }
     else { 

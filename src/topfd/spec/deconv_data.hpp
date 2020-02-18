@@ -24,7 +24,7 @@ namespace toppic {
 
 class DeconvData {
  public:
-  DeconvData(PeakPtrVec &peak_list, double max_mass, int max_charge, double win_size); 
+  DeconvData(PeakPtrVec peak_list, double max_mass, int max_charge, double win_size); 
 
 	int getBgnPeak(int i) {return win_bgn_peaks_[i];}
 

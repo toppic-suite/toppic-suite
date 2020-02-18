@@ -41,6 +41,8 @@ std::string TopfdPara::getParaStr(const std::string &prefix) {
   output << prefix << std::setw(gap) << std::left 
       << "MS/MS signal/noise ratio: " << "\t" << ms_two_sn_ratio_ << std::endl;
   output << prefix << std::setw(gap) << std::left 
+      << "Thread number: " << "\t" << thread_number_ << std::endl;
+  output << prefix << std::setw(gap) << std::left 
       << "Precursor window size: " << "\t" << prec_window_ << " m/z" << std::endl;
   //output << prefix << std::setw(gap) << std::left 
   //    << "Do final filtering: " << para_ptr->do_final_filtering_ << std::endl;
