@@ -99,6 +99,7 @@ void MsAlignReader::readNext() {
   int ms_one_id = -1;
   int ms_one_scan = -1;
   double prec_mass = -1;
+  double prec_mz = -1;
   int prec_charge = -1;
   double prec_inte = -1;
   //int feature_id = -1;
@@ -131,6 +132,8 @@ void MsAlignReader::readNext() {
         ms_one_id = std::stod(strs[1]);
       } else if (strs[0] == "MS_ONE_SCAN") {
         ms_one_scan = std::stod(strs[1]);
+      } else if (strs[0] == "PRECURSOR_MZ") {
+        prec_mz = std::stod(strs[1]);  
       } else if (strs[0] == "PRECURSOR_MASS") {
         prec_mass = std::stod(strs[1]);
       } else if (strs[0] == "PRECURSOR_CHARGE") {
@@ -189,10 +192,9 @@ void MsAlignReader::readNext() {
 
   header_ptr->setMsOneScan(ms_one_scan);
 
-  header_ptr->setPrecMonoMz(prec_mass /prec_charge + mass_constant::getProtonMass());
+  header_ptr->setPrecMonoMz(prec_mz);
   
   header_ptr->setPrecCharge(prec_charge);
-
 
   header_ptr->setPrecInte(prec_inte);
 

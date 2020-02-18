@@ -42,7 +42,7 @@ void processOneFile(TopfdParaPtr para_ptr,
     
     processor.process();
     std::cout << "Deconvolution finished." << std::endl;
-/*
+
     std::cout << "Deleting temporary files - started." << std::endl;
 
     std::string base_name_ms1 = file_util::basename(spec_file_name) + "_ms1.msalign";
@@ -58,7 +58,7 @@ void processOneFile(TopfdParaPtr para_ptr,
     file_util::cleanPrefix(base_name_ms2 + "_", fa_base_ms2 + "_");
  
     std::cout << "Deleting temporary files - finished." << std::endl; 
-*/
+
     std::cout << "Feature detection started." << std::endl;
     feature_detect::process(frac_id, 
                             spec_file_name,
