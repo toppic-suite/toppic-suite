@@ -44,7 +44,6 @@ class TopfdPara {
   std::string thread_number_ = "1";
   bool gene_html_folder_ = false;
   std::string merged_file_name_ = "";
-  std::string thread_number_ = "1";
 };
 
 typedef std::shared_ptr<TopfdPara> TopfdParaPtr;
