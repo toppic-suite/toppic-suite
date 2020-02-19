@@ -163,8 +163,9 @@ bool Argument::parse(int argc, char* argv[]) {
         topfd_para_ptr_->merged_file_name_ = merged_file_name;
       }
     }
-     if (vm.count("thread-number")) {
+    if (vm.count("thread-number")) {
       topfd_para_ptr_->thread_number_ = thread_number;
+    }
     if (vm.count("gene-html-folder")) {
       topfd_para_ptr_->gene_html_folder_ = true;
     }
