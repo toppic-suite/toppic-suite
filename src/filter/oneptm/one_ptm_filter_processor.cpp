@@ -164,15 +164,17 @@ inline void createIndexFiles(const ProteoformPtrVec & raw_forms,
     std::string block_str = str_util::toString(block_idx);
     PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
 
-    TopIndexFileName TopIndexFile;
-    std::string parameters = TopIndexFile.gene_file_name(prsm_para_ptr);
+    TopIndexFileNamePtr file_name_ptr = std::make_shared<TopIndexFileName>();
+    std::string parameters = file_name_ptr->geneFileName(prsm_para_ptr);
 
-    std::vector<std::string> file_vec{TopIndexFile.one_ptm_file_vec[0] + parameters + block_str, 
-    TopIndexFile.one_ptm_file_vec[1] + parameters + block_str, 
-    TopIndexFile.one_ptm_file_vec[2] + parameters + block_str, TopIndexFile.one_ptm_file_vec[3] + parameters + block_str};
+    std::vector<std::string> file_vec;
+
+    for (int i = 0; i < file_name_ptr->one_ptm_file_vec_.size(); i++){
+      file_vec.push_back(file_name_ptr->one_ptm_file_vec_[i] + parameters + block_str);
+    }
     
     MassOnePtmIndexPtr filter_ptr = std::make_shared<MassOnePtmIndex>(raw_forms, mng_ptr, file_vec);
-    
+   
     mng_ptr->mutex_.lock();
 
     std::cout << "One PTM index files - processing " << *current_num << " of " << block_num << " files." << std::endl;
@@ -195,7 +197,7 @@ std::function<void()> geneIndexTask(int block_idx,
     createIndexFiles(raw_forms, block_idx, mng_ptr, mod_mass_list, block_num, current_num);
   };
 }
-void OnePtmFilterProcessor::index_process(){
+void OnePtmFilterProcessor::indexProcess(){
   //for generating index files
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
   std::string db_file_name = prsm_para_ptr->getSearchDbFileName();

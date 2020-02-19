@@ -52,13 +52,13 @@ DeconvProcess::DeconvProcess(TopfdParaPtr topfd_para_ptr,
 
   spec_file_name_ = spec_file_name;
   frac_id_ = frac_id; 
-  thread_num = t;
+  thread_num_ = t;
   deconv_process_ptr_ = deconv_process_ptr;
   prepareFileFolder();
 
 }
-void DeconvProcess::writeMsalign(std::string resultFileName, std::vector<std::string> *spec_data_array, int spec_num){
-  std::ofstream msalign(resultFileName);
+void DeconvProcess::writeMsalign(std::string result_file_name, std::vector<std::string> *spec_data_array, int spec_num){
+  std::ofstream msalign(result_file_name);
   std::string para_str = topfd_para_ptr_-> getParaStr("#");
 
   msalign << para_str << "\n"; 
@@ -194,18 +194,18 @@ void DeconvProcess::processSpMissingLevelOne(RawMsGroupReaderPtr reader_ptr) {
 
   std::string ms_msalign_name = file_util::basename(spec_file_name_) + ".ms2_msalign";
 
-  SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(thread_num);  
+  SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(thread_num_);  
 
   MsAlignWriterPtrVec ms_writer_ptr_vec;
 
-  for (int i = 0; i < thread_num; i++) { 
+  for (int i = 0; i < thread_num_; i++) { 
     MsAlignWriterPtr ms_ptr = std::make_shared<MsAlignWriter>(ms_msalign_name + "_" + str_util::toString(i));
 
     ms_writer_ptr_vec.push_back(ms_ptr);
   }
 
   while (ms_group_ptr != nullptr) {
-    while(pool_ptr->getQueueSize() >= thread_num * 2){
+    while(pool_ptr->getQueueSize() >= thread_num_ * 2){
         boost::this_thread::sleep(boost::posix_time::milliseconds(100));
     }
 
@@ -231,7 +231,7 @@ void DeconvProcess::processSpMissingLevelOne(RawMsGroupReaderPtr reader_ptr) {
 
   MsalignThreadMerge msalign_ms2_merge = MsalignThreadMerge(
     file_util::basename(spec_file_name_), "ms2_msalign", 
-    thread_num, "ms2.msalign", topfd_para_ptr_-> getParaStr("#"));
+    thread_num_, "ms2.msalign", topfd_para_ptr_-> getParaStr("#"));
 
   std::cout << std::endl;
 }
@@ -381,13 +381,13 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
   ms1_msalign_name = file_util::basename(spec_file_name_) + "_ms1.msalign";
   ms2_msalign_name = file_util::basename(spec_file_name_) + "_ms2.msalign";
 
-  SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(thread_num);  
+  SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(thread_num_);  
   
   //generate vector that contains msalign writing information
   MsAlignWriterPtrVec ms1_writer_ptr_vec;
   MsAlignWriterPtrVec ms2_writer_ptr_vec;
 
-  for (int i = 0; i < thread_num; i++) { 
+  for (int i = 0; i < thread_num_; i++) { 
     MsAlignWriterPtr ms1_ptr = std::make_shared<MsAlignWriter>(ms1_msalign_name + "_" + str_util::toString(i));
     MsAlignWriterPtr ms2_ptr = std::make_shared<MsAlignWriter>(ms2_msalign_name + "_" + str_util::toString(i));
 
@@ -396,7 +396,7 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
   }
 
   while (ms_group_ptr != nullptr) {
-    while(pool_ptr->getQueueSize() >= thread_num * 2){
+    while(pool_ptr->getQueueSize() >= thread_num_ * 2){
         boost::this_thread::sleep(boost::posix_time::milliseconds(100));
     }
     //it is creating a new shared pointer using the class constructor that takes shared pointer as input
@@ -415,9 +415,9 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
     std::cout << "\r" << msg << std::flush;
 
     //count is 1 scan from msalign1 + n scan from msalign2 vector
-    int parsedScan = 1 + static_cast<int>((ms_group_ptr->getMsTwoPtrVec()).size());
+    int parsed_scan = 1 + static_cast<int>((ms_group_ptr->getMsTwoPtrVec()).size());
 
-    count += parsedScan;
+    count += parsed_scan;
     ms_group_ptr = reader_ptr->getNextMsGroupPtr();
   }
     pool_ptr->ShutDown();
@@ -432,16 +432,14 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
     //auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end-start);
     //std::cout << std::endl << "Read file " << duration.count() << std::endl;
 
-  MsalignThreadMerge msalign_ms1_merge = MsalignThreadMerge(
-    file_util::basename(spec_file_name_), "ms1.msalign", thread_num, 
-    "ms1.msalign", topfd_para_ptr_-> getParaStr("#"));
+  MsalignThreadMergePtr ms1_merge_ptr
+  = std::make_shared<MsalignThreadMerge>(file_util::basename(spec_file_name_), "ms1.msalign", thread_num_, "ms1.msalign", topfd_para_ptr_-> getParaStr("#"));
 
-  MsalignThreadMerge msalign_ms2_merge = MsalignThreadMerge(
-    file_util::basename(spec_file_name_), "ms2.msalign", thread_num, 
-    "ms2.msalign", topfd_para_ptr_-> getParaStr("#"));
+  MsalignThreadMergePtr ms2_merge_ptr 
+  = std::make_shared<MsalignThreadMerge>(file_util::basename(spec_file_name_), "ms2.msalign", thread_num_, "ms2.msalign", topfd_para_ptr_-> getParaStr("#"));
 
-  msalign_ms1_merge.process();
-  msalign_ms2_merge.process();
+  ms1_merge_ptr->process();
+  ms2_merge_ptr->process();
 
   std::cout << std::endl;
 

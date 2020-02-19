@@ -79,7 +79,7 @@ class DeconvProcess {
 
   std::string spec_file_name_;
   int frac_id_;
-  int thread_num;
+  int thread_num_;
 
   std::string base_name_;
   std::string ms1_env_name_;

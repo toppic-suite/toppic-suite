@@ -24,7 +24,7 @@ class OnePtmFilterProcessor {
  public:
   explicit OnePtmFilterProcessor(OnePtmFilterMngPtr mng_ptr): mng_ptr_(mng_ptr) {}
   void process();
-  void index_process();
+  void indexProcess();
 
  private:
   OnePtmFilterMngPtr mng_ptr_;

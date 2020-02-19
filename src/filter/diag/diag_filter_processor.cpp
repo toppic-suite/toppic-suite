@@ -184,7 +184,7 @@ std::function<void()> geneIndexTask(MassDiagFilterPtr filter_ptr,
   };
 }*/
 
-void DiagFilterProcessor::index_process() {
+void DiagFilterProcessor::indexProcess() {
   std::string db_file_name = mng_ptr_->prsm_para_ptr_->getSearchDbFileName();
   DbBlockPtrVec db_block_ptr_vec = DbBlock::readDbBlockIndex(db_file_name);
 

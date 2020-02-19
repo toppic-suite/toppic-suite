@@ -74,12 +74,12 @@ MassMatch::MassMatch(std::vector<std::vector<int>> &mass_2d,
   initIndexes(mass_2d, real_shift_2d, pos_2d);
   prm_ = prm;
 }
-void MassMatch::serializeMassMatch(std::string fileName, std::string dirName){
-  std::string filePath = dirName + file_util::getFileSeparator() + fileName;
-  std::ofstream newFile(filePath, std::ofstream::binary);
+void MassMatch::serializeMassMatch(std::string file_name, std::string dir_name){
+  std::string file_path = dir_name + file_util::getFileSeparator() + file_name;
+  std::ofstream new_file(file_path, std::ofstream::binary);
 
-  if(newFile.is_open()){
-    boost::archive::binary_oarchive oa(newFile, std::ios::binary);
+  if(new_file.is_open()){
+    boost::archive::binary_oarchive oa(new_file, std::ios::binary);
     oa << scale_;
     oa << proteo_num_;
     oa << col_num_; 
@@ -94,18 +94,18 @@ void MassMatch::serializeMassMatch(std::string fileName, std::string dirName){
     oa << col_index_ends_;
     oa << col_indexes_;
 
-    newFile.close();
+    new_file.close();
   }
 
 }
 
- void MassMatch::deserializeMassMatch(std::string fileName, std::string dirName){
-  std::string filePath = dirName + file_util::getFileSeparator() + fileName;
-  std::ifstream fileToRead(filePath, std::ifstream::binary);
+ void MassMatch::deserializeMassMatch(std::string new_file, std::string dir_name){
+  std::string file_path = dir_name + file_util::getFileSeparator() + new_file;
+  std::ifstream file_to_read(file_path, std::ifstream::binary);
 
-  if (fileToRead.is_open()) {
+  if (file_to_read.is_open()) {
 
-    boost::archive::binary_iarchive ia(fileToRead, std::ios::binary);
+    boost::archive::binary_iarchive ia(file_to_read, std::ios::binary);
   
     ia >> scale_;
     ia >> proteo_num_;
@@ -121,10 +121,8 @@ void MassMatch::serializeMassMatch(std::string fileName, std::string dirName){
     ia >> col_index_ends_;
     ia >> col_indexes_;
 
-    fileToRead.close();
+    file_to_read.close();
   } 
-  //else{}
-  
 }
 
 void MassMatch::initProteoformBeginEnds(std::vector<std::vector<double>> &shift_2d) {

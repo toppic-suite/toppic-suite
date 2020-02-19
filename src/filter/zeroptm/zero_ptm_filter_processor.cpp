@@ -13,11 +13,11 @@
 //limitations under the License.
 
 #include <iomanip>
-#include <chrono>
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "common/thread/simple_thread_pool.hpp"
+
 #include "seq/proteoform.hpp"
 #include "seq/proteoform_factory.hpp"
 
@@ -33,6 +33,7 @@
 
 #include "filter/zeroptm/mass_zero_ptm_index_file.hpp"
 #include "filter/zeroptm/zero_ptm_count_mng.hpp"
+#
 
 #include "console/topindex_file_name.hpp"
 
@@ -43,11 +44,7 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
   std::string block_str = str_util::toString(block_idx);
   int group_spec_num = mng_ptr->prsm_para_ptr_->getGroupSpecNum();
 
-  //timer
-  auto start = std::chrono::steady_clock::now();
   MassZeroPtmFilterPtr filter_ptr = std::make_shared<MassZeroPtmFilter>(raw_forms, mng_ptr, block_str);
-  auto end = std::chrono::steady_clock::now();
-  //std::cout << "zero_ptm process time: " << std::chrono::duration_cast<std::chrono::seconds>(end-start).count() << " sec" << std::endl;
 
   PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
@@ -144,12 +141,14 @@ inline void createIndexFiles(const ProteoformPtrVec & raw_forms,
     PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
     //index file names = fixed mod + n terminal + activation + error tolerance + decoy + block number
     
-    TopIndexFileName TopIndexFile;
-    std::string parameters = TopIndexFile.gene_file_name(prsm_para_ptr);
+    TopIndexFileNamePtr file_name_ptr = std::make_shared<TopIndexFileName>();
+    std::string parameters = file_name_ptr->geneFileName(prsm_para_ptr);
 
-    std::vector<std::string> file_vec{TopIndexFile.zero_ptm_file_vec[0] + parameters + block_str, 
-    TopIndexFile.zero_ptm_file_vec[1] + parameters + block_str, 
-    TopIndexFile.zero_ptm_file_vec[2] + parameters + block_str, TopIndexFile.zero_ptm_file_vec[3] + parameters + block_str};
+    std::vector<std::string> file_vec;
+
+    for (int i = 0; i < file_name_ptr->zero_ptm_file_vec_.size(); i++){
+      file_vec.push_back(file_name_ptr->zero_ptm_file_vec_[i] + parameters + block_str);
+    }
 
     MassZeroPtmIndexPtr filter_ptr = std::make_shared<MassZeroPtmIndex>(raw_forms, mng_ptr, file_vec);
 
@@ -175,7 +174,7 @@ std::function<void()> geneIndexTask(int block_idx,
     createIndexFiles(raw_forms, block_idx, mng_ptr, block_num, current_num);
   };
 }
-void ZeroPtmFilterProcessor::index_process(){
+void ZeroPtmFilterProcessor::indexProcess(){
   //for generating index files
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
   std::string db_file_name = prsm_para_ptr->getSearchDbFileName();

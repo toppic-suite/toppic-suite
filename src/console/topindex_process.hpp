@@ -19,22 +19,8 @@
 #include <map>
 #include <vector>
 
-#include "common/base/mod.hpp"
-#include "common/thread/simple_thread_pool.hpp"
-
-#include "seq/proteoform.hpp"
-#include "seq/db_block.hpp"
-
-#include "filter/zeroptm/mass_zero_ptm_filter.hpp"
-#include "filter/zeroptm/zero_ptm_filter_mng.hpp"
-#include "filter/oneptm/one_ptm_filter_mng.hpp"
-#include "filter/diag/diag_filter_mng.hpp"
-
-
-
 namespace toppic {
     void TopIndexProcess(std::map<std::string, std::string> & arguments);
-    void index_process(); 
 
 }  // namespace toppic
 
