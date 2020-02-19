@@ -25,7 +25,7 @@ class DiagFilterProcessor {
   DiagFilterProcessor(DiagFilterMngPtr mng_ptr): mng_ptr_(mng_ptr) {};
 
   void process();
-  void index_process();
+  void indexProcess();
 
  private:
   DiagFilterMngPtr mng_ptr_;

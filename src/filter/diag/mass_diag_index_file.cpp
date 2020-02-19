@@ -34,13 +34,14 @@ MassDiagIndex::MassDiagIndex(const ProteoformPtrVec &proteo_ptrs,
   index_ptr_ = MassMatchFactory::getPrmDiagMassMatchPtr(proteo_ptrs,
                                                         mng_ptr->max_proteoform_mass_,
                                                         mng_ptr->filter_scale_);
-  TopIndexFileName TopIndexFile;  
-  std::string parameters = TopIndexFile.gene_file_name(prsm_para_ptr);
+                                                        
+  TopIndexFileNamePtr file_name_ptr = std::make_shared<TopIndexFileName>();
+  std::string parameters = file_name_ptr->geneFileName(prsm_para_ptr);
 
-  std::string dirName = mng_ptr_->prsm_para_ptr_->getOriDbName() + "_idx";
-  std::string fileName = TopIndexFile.multi_ptm_file_vec[0] + parameters + block_str;
+  std::string dir_name = mng_ptr_->prsm_para_ptr_->getOriDbName() + "_idx";
+  std::string file_name = file_name_ptr->multi_ptm_file_vec_[0] + parameters + block_str;
 
-  index_ptr_->serializeMassMatch(fileName, dirName);
+  index_ptr_->serializeMassMatch(dir_name, file_name);
 
 }
 

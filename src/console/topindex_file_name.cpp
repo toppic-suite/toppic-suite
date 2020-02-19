@@ -15,7 +15,6 @@
 #include <map>
 #include <string>
 #include <vector>
-#include <iostream>
 #include <sstream> 
 
 #include "prsm/prsm_para.hpp"
@@ -23,10 +22,10 @@
 
 namespace toppic{
 
-std::string TopIndexFileName::gene_file_name(PrsmParaPtr prsm_para_ptr){
+std::string TopIndexFileName::geneFileName(PrsmParaPtr prsm_para_ptr){
     std::string fixed_mod = prsm_para_ptr->getFixedMod();
     std::string error_tol = prsm_para_ptr->getErrorTolerance();
-    std::string decoy = search_type_map.find(prsm_para_ptr->getSearchType())->second;
+    std::string decoy = search_type_map_.find(prsm_para_ptr->getSearchType())->second;
     std::string activation = prsm_para_ptr->getActivation();
     std::string prot_mod = prsm_para_ptr->getProtMod();
 
@@ -41,7 +40,7 @@ std::string TopIndexFileName::gene_file_name(PrsmParaPtr prsm_para_ptr){
     }
    
     for (size_t i = 0; i < prot_mod_vec.size(); i++){
-        std::string mod = prot_mod_map.find(prot_mod_vec[i])->second;
+        std::string mod = prot_mod_map_.find(prot_mod_vec[i])->second;
         if (final_prot_mod != ""){
            final_prot_mod = final_prot_mod + "_" + mod;     
         }else{
@@ -50,7 +49,7 @@ std::string TopIndexFileName::gene_file_name(PrsmParaPtr prsm_para_ptr){
     }
 
     std::vector<std::string>para_vec;//to determine if "_" is needed in between
-    std::string paraInfo;
+    std::string para_info;
 
     para_vec.push_back(fixed_mod);
     para_vec.push_back(final_prot_mod);
@@ -61,9 +60,9 @@ std::string TopIndexFileName::gene_file_name(PrsmParaPtr prsm_para_ptr){
     for (size_t t = 0; t < para_vec.size(); t++){
         if (para_vec[t] != ""){
             //if the parameter is used
-            paraInfo = paraInfo + "_" + para_vec[t];
+            para_info = para_info + "_" + para_vec[t];
         }
     }
-    return paraInfo;   
+    return para_info;   
     }
 }

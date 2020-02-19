@@ -37,29 +37,29 @@ MassDiagFilter::MassDiagFilter(const ProteoformPtrVec &proteo_ptrs,
   proteo_ptrs_ = proteo_ptrs;
   PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
   
-  TopIndexFileName TopIndexFile;
-  std::string parameters = TopIndexFile.gene_file_name(prsm_para_ptr);
+  TopIndexFileNamePtr file_name_ptr = std::make_shared<TopIndexFileName>();
+  std::string parameters = file_name_ptr->geneFileName(prsm_para_ptr);
+  std::string suffix = parameters + block_str;
 	
-  std::string indexDirName = mng_ptr_->prsm_para_ptr_->getOriDbName() + "_idx";
+  std::string index_dir = mng_ptr_->prsm_para_ptr_->getOriDbName() + "_idx";
 
-  bool indexFilesExist = true;
+  bool index_files_exist = true;
 
-  for (size_t t = 0; t < TopIndexFile.multi_ptm_file_vec.size(); t++){
-    if (!file_util::exists(indexDirName + file_util::getFileSeparator() + TopIndexFile.multi_ptm_file_vec[t] + parameters + block_str)){
-      indexFilesExist = false;//if any of the index files for this ptm is missing
+  for (size_t t = 0; t < file_name_ptr->multi_ptm_file_vec_.size(); t++){
+    std::string file_name = file_name_ptr->multi_ptm_file_vec_[t] + suffix;
+    if (!file_util::exists(index_dir + file_util::getFileSeparator() + file_name)){
+      index_files_exist = false;//if any of the index files for this ptm is missing
       break; 
     }
   }
 
-  if (indexFilesExist){ 
+  if (index_files_exist){ 
     std::cout << "Loading index files                            " << std::endl;
     index_ptr_ = std::make_shared<MassMatch>();
-
-    TopIndexFileName TopIndexFile;
-    std::string parameters = TopIndexFile.gene_file_name(prsm_para_ptr);
-    std::string fileName = TopIndexFile.multi_ptm_file_vec[0] + parameters + block_str;
-
-    index_ptr_->deserializeMassMatch(fileName, indexDirName);
+    
+    std::string file_name = file_name_ptr->multi_ptm_file_vec_[0] + suffix;
+    
+    index_ptr_->deserializeMassMatch(file_name, index_dir);
 
   }
   else{
