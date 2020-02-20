@@ -17,11 +17,11 @@
 #include "filter/massmatch/filter_protein.hpp"
 #include "filter/massmatch/mass_match_factory.hpp"
 #include "filter/massmatch/mass_match_util.hpp"
-#include "filter/zeroptm/mass_zero_ptm_index_file.hpp"
+#include "filter/zeroindex/zero_ptm_index_file.hpp"
 
 namespace toppic {
 
-MassZeroPtmIndex::MassZeroPtmIndex(const ProteoformPtrVec &proteo_ptrs,
+ZeroPtmIndexFile::ZeroPtmIndexFile(const ProteoformPtrVec &proteo_ptrs,
                                      ZeroPtmFilterMngPtr mng_ptr, std::vector<std::string> file_vec) {
   mng_ptr_ = mng_ptr;
   proteo_ptrs_ = proteo_ptrs;

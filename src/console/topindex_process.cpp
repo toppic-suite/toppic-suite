@@ -25,11 +25,11 @@
 #include "common/util/file_util.hpp"
 
 #include "filter/zeroptm/zero_ptm_filter_mng.hpp"
-#include "filter/zeroptm/zero_ptm_filter_processor.hpp"
+#include "filter/zeroindex/zero_ptm_index_processor.hpp"
 #include "filter/oneptm/one_ptm_filter_mng.hpp"
-#include "filter/oneptm/one_ptm_filter_processor.hpp"
+#include "filter/oneindex/one_ptm_index_processor.hpp"
 #include "filter/diag/diag_filter_mng.hpp"
-#include "filter/diag/diag_filter_processor.hpp"
+#include "filter/diagindex/diag_index_processor.hpp"
 
 #include "seq/fasta_util.hpp"
 #include "seq/db_block.hpp"
@@ -65,26 +65,26 @@ void TopIndexProcess(std::map<std::string, std::string> &arguments){
 
     ZeroPtmFilterMngPtr zero_filter_mng_ptr
         = std::make_shared<ZeroPtmFilterMng>(prsm_para_ptr, thread_num, "");
-    ZeroPtmFilterProcessorPtr zero_filter_processor
-        = std::make_shared<ZeroPtmFilterProcessor>(zero_filter_mng_ptr);
+    ZeroPtmIndexProcessorPtr zero_ptm_index_processor
+        = std::make_shared<ZeroPtmIndexProcessor>(zero_filter_mng_ptr);
 
-    zero_filter_processor->indexProcess();
-    zero_filter_processor = nullptr;
+    zero_ptm_index_processor->process();
+    zero_ptm_index_processor = nullptr;
 
     OnePtmFilterMngPtr one_ptm_filter_mng_ptr
         = std::make_shared<OnePtmFilterMng>(prsm_para_ptr, "toppic_one_filter", thread_num);
-    OnePtmFilterProcessorPtr one_filter_processor
-        = std::make_shared<OnePtmFilterProcessor>(one_ptm_filter_mng_ptr);
-    one_filter_processor->indexProcess();
-    one_filter_processor = nullptr;
+    OnePtmIndexProcessorPtr one_ptm_index_processor
+        = std::make_shared<OnePtmIndexProcessor>(one_ptm_filter_mng_ptr);
+    one_ptm_index_processor->process();
+    one_ptm_index_processor = nullptr;
 
     DiagFilterMngPtr diag_filter_mng_ptr
         = std::make_shared<DiagFilterMng>(prsm_para_ptr, filter_result_num,
                                             thread_num, "toppic_multi_filter");
-    DiagFilterProcessorPtr diag_filter_processor
-        = std::make_shared<DiagFilterProcessor>(diag_filter_mng_ptr);
-    diag_filter_processor->indexProcess();
-    diag_filter_processor = nullptr;
+    DiagIndexProcessorPtr diag_index_processor
+        = std::make_shared<DiagIndexProcessor>(diag_filter_mng_ptr);
+    diag_index_processor->process();
+    diag_index_processor = nullptr;
 
     std::cout << "Deleting temporary files - started." << std::endl;
 

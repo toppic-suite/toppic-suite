@@ -18,11 +18,11 @@
 #include "filter/massmatch/mass_match_factory.hpp"
 #include "filter/massmatch/mass_match_util.hpp"
 #include "filter/oneptm/mass_one_ptm_filter.hpp"
-#include "filter/oneptm/mass_one_ptm_index_file.hpp"
+#include "filter/oneindex/one_ptm_index_file.hpp"
 
 namespace toppic {
 
-MassOnePtmIndex::MassOnePtmIndex(const ProteoformPtrVec &proteo_ptrs,
+OnePtmIndexFile::OnePtmIndexFile(const ProteoformPtrVec &proteo_ptrs,
                                    OnePtmFilterMngPtr mng_ptr, std::vector<std::string> file_vec) {
   mng_ptr_ = mng_ptr;
   proteo_ptrs_ = proteo_ptrs;

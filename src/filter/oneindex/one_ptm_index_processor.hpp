@@ -12,29 +12,23 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_FILTER_DIAG_DIAG_FILTER_PROCESSOR_HPP_
-#define TOPPIC_FILTER_DIAG_DIAG_FILTER_PROCESSOR_HPP_
+#ifndef TOPPIC_FILTER_ONE_INDEX_ONE_PTM_INDEX_PROCESSOR_HPP_
+#define TOPPIC_FILTER_ONE_INDEX_ONE_PTM_INDEX_PROCESSOR_HPP_
 
+#include "filter/oneptm/one_ptm_filter_mng.hpp"
 #include "seq/db_block.hpp"
-#include "filter/diag/diag_filter_mng.hpp"
-
-namespace toppic {
-
-class DiagFilterProcessor {
+namespace toppic{
+    
+class OnePtmIndexProcessor {
  public:
-  DiagFilterProcessor(DiagFilterMngPtr mng_ptr): mng_ptr_(mng_ptr) {};
-
+  explicit OnePtmIndexProcessor(OnePtmFilterMngPtr mng_ptr): mng_ptr_(mng_ptr) {}
   void process();
-
+ 
  private:
-  DiagFilterMngPtr mng_ptr_;
-
-  void processBlock(DbBlockPtr block_ptr, int total_block_num,
-                    const std::vector<double> & mod_mass_list, int block_num);
+  OnePtmFilterMngPtr mng_ptr_;
 };
+typedef std::shared_ptr<OnePtmIndexProcessor> OnePtmIndexProcessorPtr;
 
-typedef std::shared_ptr<DiagFilterProcessor> DiagFilterProcessorPtr;
+}/* namespace toppic */
 
-}  // namespace toppic
-
-#endif /* PROT_DIAG_FILTER_PROCESSOR_HPP_ */
+#endif /* ONE_PTM_INDEX_PROCESSOR_HPP_ */

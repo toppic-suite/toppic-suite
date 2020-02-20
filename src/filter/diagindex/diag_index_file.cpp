@@ -21,11 +21,11 @@
 #include "filter/massmatch/mass_match_factory.hpp"
 #include "filter/massmatch/mass_match_util.hpp"
 #include "filter/diag/mass_diag_filter.hpp"
-#include "filter/diag/mass_diag_index_file.hpp"
+#include "filter/diagindex/diag_index_file.hpp"
 #include "console/topindex_file_name.hpp"
 namespace toppic {
 
-MassDiagIndex::MassDiagIndex(const ProteoformPtrVec &proteo_ptrs,
+DiagIndexFile::DiagIndexFile(const ProteoformPtrVec &proteo_ptrs,
                                DiagFilterMngPtr mng_ptr, std::string block_str) {
   mng_ptr_ = mng_ptr;
   proteo_ptrs_ = proteo_ptrs;

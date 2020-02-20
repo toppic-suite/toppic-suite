@@ -12,38 +12,32 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_FILTER_ONE_PTM_MASS_ONE_PTM_INDEX_FILE_H_
-#define TOPPIC_FILTER_ONE_PTM_MASS_ONE_PTM_INDEX_FILE_H_
+#ifndef TOPPIC_FILTER_DIAG_DIAG_INDEX_FILE_H_
+#define TOPPIC_FILTER_DIAG_DIAG_INDEX_FILE_H_
 
 #include "seq/proteoform.hpp"
 #include "ms/spec/prm_ms.hpp"
 #include "prsm/simple_prsm.hpp"
 #include "filter/massmatch/mass_match.hpp"
-#include "filter/oneptm/one_ptm_filter_mng.hpp"
+#include "filter/diag/diag_filter_mng.hpp"
 
 namespace toppic {
 
-class MassOnePtmIndex {
+class DiagIndexFile {
  public:
-  MassOnePtmIndex(const ProteoformPtrVec &proteo_ptrs,
-                   OnePtmFilterMngPtr mng_ptr, std::vector<std::string> file_vec);
+  DiagIndexFile(const ProteoformPtrVec &proteo_ptrs, DiagFilterMngPtr mng_ptr, std::string fileName);
+
+  SimplePrsmPtrVec getBestMatch(const PrmMsPtrVec &ms_ptr_vec);
 
  private:
-  OnePtmFilterMngPtr mng_ptr_;
+  DiagFilterMngPtr mng_ptr_;
   ProteoformPtrVec proteo_ptrs_;
+  MassMatchPtr index_ptr_;
 
-  MassMatchPtr diag_index_ptr_;
-  MassMatchPtr rev_diag_index_ptr_;
-  MassMatchPtr term_index_ptr_;
-  MassMatchPtr rev_term_index_ptr_;
-
-  SimplePrsmPtrVec comp_match_ptrs_;
-  SimplePrsmPtrVec pref_match_ptrs_;
-  SimplePrsmPtrVec suff_match_ptrs_;
-  SimplePrsmPtrVec internal_match_ptrs_;
+  SimplePrsmPtrVec compute(const PrmMsPtrVec &ms_ptr_vec);
 };
 
-typedef std::shared_ptr<MassOnePtmIndex> MassOnePtmIndexPtr;
+typedef std::shared_ptr<DiagIndexFile> DiagIndexFilePtr;
 } /* namespace toppic */
 
-#endif /* ONE_PTM_FILTER_H_ */
+#endif /* PROT_DIAG_FILTER_H_ */
