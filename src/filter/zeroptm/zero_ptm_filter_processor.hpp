@@ -24,7 +24,6 @@ class ZeroPtmFilterProcessor {
  public:
   explicit ZeroPtmFilterProcessor(ZeroPtmFilterMngPtr mng_ptr): mng_ptr_(mng_ptr) {}
   void process();
-  void indexProcess();
 
  private:
   ZeroPtmFilterMngPtr mng_ptr_;
