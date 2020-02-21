@@ -100,7 +100,7 @@ void toppicWindow::initArguments() {
   arguments_["executiveDir"] = ".";
   arguments_["resourceDir"] = "";
   arguments_["keepTempFiles"] = "false";
-  arguments_["localThreshold"] = "0.45";
+  arguments_["localThreshold"] = "0.15";
   arguments_["groupSpectrumNumber"] = "1";
   arguments_["filteringResultNumber"] = "20";
   arguments_["residueModFileName"] = "";
@@ -129,7 +129,7 @@ void toppicWindow::on_defaultButton_clicked() {
   ui->cutoffSpectralValueEdit->setText("0.01");
   ui->cutoffProteoformValueEdit->setText("0.01");
   ui->numCombinedEdit->setText("1");
-  ui->miscoreThresholdEdit->setText("0.45");
+  ui->miscoreThresholdEdit->setText("0.15");
   ui->threadNumberEdit->setText("1");
   ui->outputTextBrowser->setText("Click the Start button to process the spectrum files.");
   ui->fixedModComboBox->setCurrentIndex(0);
