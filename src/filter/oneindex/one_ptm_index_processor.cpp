@@ -28,10 +28,10 @@
 #include "prsm/simple_prsm_xml_writer_set.hpp"
 #include "prsm/simple_prsm_str_merge.hpp"
 
+#include "filter/zeroindex/topindex_file_name.hpp"
+
 #include "filter/oneindex/one_ptm_index_processor.hpp"
 #include "filter/oneindex/one_ptm_index_file.hpp"
-
-#include "console/topindex_file_name.hpp"
 
 namespace toppic{
 
