@@ -16,8 +16,6 @@
 #define TOPPIC_FILTER_DIAG_DIAG_INDEX_FILE_H_
 
 #include "seq/proteoform.hpp"
-#include "ms/spec/prm_ms.hpp"
-#include "prsm/simple_prsm.hpp"
 #include "filter/massmatch/mass_match.hpp"
 #include "filter/diag/diag_filter_mng.hpp"
 
@@ -25,19 +23,16 @@ namespace toppic {
 
 class DiagIndexFile {
  public:
-  DiagIndexFile(const ProteoformPtrVec &proteo_ptrs, DiagFilterMngPtr mng_ptr, std::string fileName);
-
-  SimplePrsmPtrVec getBestMatch(const PrmMsPtrVec &ms_ptr_vec);
+  DiagIndexFile(const ProteoformPtrVec &proteo_ptrs, DiagFilterMngPtr mng_ptr, 
+                std::string file_name);
 
  private:
   DiagFilterMngPtr mng_ptr_;
   ProteoformPtrVec proteo_ptrs_;
   MassMatchPtr index_ptr_;
-
-  SimplePrsmPtrVec compute(const PrmMsPtrVec &ms_ptr_vec);
 };
 
 typedef std::shared_ptr<DiagIndexFile> DiagIndexFilePtr;
 } /* namespace toppic */
 
-#endif /* PROT_DIAG_FILTER_H_ */
+#endif 
