@@ -13,8 +13,9 @@
 //limitations under the License.
 
 #include "common/util/logger.hpp"
+
 #include "seq/proteoform_util.hpp"
-#include "filter/massmatch/filter_protein.hpp"
+
 #include "filter/massmatch/mass_match_factory.hpp"
 #include "filter/massmatch/mass_match_util.hpp"
 #include "filter/zeroindex/zero_ptm_index_file.hpp"
@@ -22,7 +23,8 @@
 namespace toppic {
 
 ZeroPtmIndexFile::ZeroPtmIndexFile(const ProteoformPtrVec &proteo_ptrs,
-                                     ZeroPtmFilterMngPtr mng_ptr, std::vector<std::string> file_vec) {
+                                   ZeroPtmFilterMngPtr mng_ptr, 
+                                   std::vector<std::string> file_vec) {
   mng_ptr_ = mng_ptr;
   proteo_ptrs_ = proteo_ptrs;
   LOG_DEBUG("get shifts");

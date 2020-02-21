@@ -12,12 +12,9 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <map>
 #include <string>
-#include <vector>
 #include <sstream> 
 
-#include "prsm/prsm_para.hpp"
 #include "filter/zeroindex/topindex_file_name.hpp"
 
 namespace toppic{

@@ -16,8 +16,7 @@
 #define TOPPIC_FILTER_ONE_PTM_ONE_PTM_INDEX_FILE_H_
 
 #include "seq/proteoform.hpp"
-#include "ms/spec/prm_ms.hpp"
-#include "prsm/simple_prsm.hpp"
+
 #include "filter/massmatch/mass_match.hpp"
 #include "filter/oneptm/one_ptm_filter_mng.hpp"
 
@@ -36,14 +35,9 @@ class OnePtmIndexFile {
   MassMatchPtr rev_diag_index_ptr_;
   MassMatchPtr term_index_ptr_;
   MassMatchPtr rev_term_index_ptr_;
-
-  SimplePrsmPtrVec comp_match_ptrs_;
-  SimplePrsmPtrVec pref_match_ptrs_;
-  SimplePrsmPtrVec suff_match_ptrs_;
-  SimplePrsmPtrVec internal_match_ptrs_;
 };
 
 typedef std::shared_ptr<OnePtmIndexFile> OnePtmIndexFilePtr;
 } /* namespace toppic */
 
-#endif /* ONE_PTM_FILTER_H_ */
+#endif 

@@ -16,7 +16,7 @@
 #define TOPPIC_FILTER_ONE_INDEX_ONE_PTM_INDEX_PROCESSOR_HPP_
 
 #include "filter/oneptm/one_ptm_filter_mng.hpp"
-#include "seq/db_block.hpp"
+
 namespace toppic{
     
 class OnePtmIndexProcessor {

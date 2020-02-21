@@ -15,8 +15,6 @@
 #ifndef TOPPIC_FILTER_ZERO_PTM_ZERO_PTM_INDEX_FILE_HPP_
 #define TOPPIC_FILTER_ZERO_PTM_ZERO_PTM_INDEX_FILE_HPP_
 
-#include "ms/spec/extend_ms.hpp"
-#include "prsm/simple_prsm.hpp"
 #include "filter/massmatch/mass_match.hpp"
 #include "filter/zeroptm/zero_ptm_filter_mng.hpp"
 
@@ -36,15 +34,10 @@ class ZeroPtmIndexFile {
   MassMatchPtr term_index_ptr_;
   MassMatchPtr rev_term_index_ptr_;
   
-  SimplePrsmPtrVec comp_match_ptrs_;
-  SimplePrsmPtrVec pref_match_ptrs_;
-  SimplePrsmPtrVec suff_match_ptrs_;
-  SimplePrsmPtrVec internal_match_ptrs_;
-
   std::string block_str; //which db_block it is. Used when merging the output files by order.
 };
 
 typedef std::shared_ptr<ZeroPtmIndexFile> ZeroPtmIndexFilePtr;
 } /* namespace toppic */
 
-#endif /* ZERO_PTM_FILTER_H_ */
+#endif 

@@ -16,18 +16,9 @@
 
 #include "common/util/file_util.hpp"
 #include "common/base/mod_util.hpp"
-#include "common/base/base_data.hpp"
 #include "common/thread/simple_thread_pool.hpp"
 
-#include "seq/proteoform.hpp"
-#include "seq/db_block.hpp"
 #include "seq/proteoform_factory.hpp"
-
-#include "ms/spec/msalign_util.hpp"
-
-#include "prsm/simple_prsm_xml_writer.hpp"
-#include "prsm/simple_prsm_xml_writer_util.hpp"
-#include "prsm/simple_prsm_str_merge.hpp"
 
 #include "filter/diagindex/diag_index_processor.hpp"
 #include "filter/diagindex/diag_index_file.hpp"
@@ -47,18 +38,17 @@ void DiagIndexProcessor::process() {
 
   SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(mng_ptr_->thread_num_);
   int block_num = db_block_ptr_vec.size();
-  int current_num = 1; //show how many files have been processed. n in the message "n of 5 files processed"..
 
   for (size_t i = 0; i < db_block_ptr_vec.size(); i++) {
-    
-    createIndexFiles(db_block_ptr_vec[i], db_block_ptr_vec.size(), mod_mass_list, block_num, &current_num);
+    std::cout << "Multi PTM index files - processing " << (i+1) << " of " << block_num << " files." << std::endl;
+    createIndexFiles(db_block_ptr_vec[i], db_block_ptr_vec.size(), mod_mass_list);
   }
   pool_ptr->ShutDown();
   std::cout << "Generating Multi PTM index files --- finished" << std::endl;
 }
 
 void DiagIndexProcessor::createIndexFiles(DbBlockPtr block_ptr, int total_block_num,
-                                       const std::vector<double> & mod_mass_list, int block_num, int *current_num) {
+                                          const std::vector<double> & mod_mass_list) {
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
 
   std::string db_block_file_name = prsm_para_ptr->getSearchDbFileName()
@@ -69,17 +59,8 @@ void DiagIndexProcessor::createIndexFiles(DbBlockPtr block_ptr, int total_block_
                                                         prsm_para_ptr->getFixModPtrVec());
 
   std::string block_str = str_util::toString(block_ptr->getBlockIdx());
-
   DiagIndexFilePtr index_file_ptr = std::make_shared<DiagIndexFile>(raw_forms, mng_ptr_, block_str);
-  
-  mng_ptr_->mutex_.lock();
-
-    std::cout << "Multi PTM index files - processing " << *current_num << " of " << block_num << " files." << std::endl;
-    *current_num = *current_num + 1;
-
-    mng_ptr_->mutex_.unlock();
 
 }
-
 
 }

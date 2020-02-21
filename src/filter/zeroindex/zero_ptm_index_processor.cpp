@@ -11,11 +11,13 @@
 //WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //See the License for the specific language governing permissions and
 //limitations under the License.
+
 #include <iostream>
 
 #include "common/util/file_util.hpp"
 #include "common/thread/simple_thread_pool.hpp"
 
+#include "seq/db_block.hpp"
 #include "seq/proteoform.hpp"
 #include "seq/proteoform_factory.hpp"
 
@@ -27,7 +29,7 @@
 namespace toppic{
 
 inline void createIndexFiles(const ProteoformPtrVec & raw_forms,
-                          int block_idx, ZeroPtmFilterMngPtr mng_ptr, int block_num, int *current_num) {  
+                             int block_idx, ZeroPtmFilterMngPtr mng_ptr) {  
                         
     std::string block_str = str_util::toString(block_idx);
     PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
@@ -38,24 +40,15 @@ inline void createIndexFiles(const ProteoformPtrVec & raw_forms,
 
     std::vector<std::string> file_vec;
 
-    for (int i = 0; i < file_name_ptr->zero_ptm_file_vec_.size(); i++){
+    for (size_t i = 0; i < file_name_ptr->zero_ptm_file_vec_.size(); i++){
       file_vec.push_back(file_name_ptr->zero_ptm_file_vec_[i] + parameters + block_str);
     }
 
     ZeroPtmIndexFilePtr index_file_ptr = std::make_shared<ZeroPtmIndexFile>(raw_forms, mng_ptr, file_vec);
-
-    mng_ptr->mutex_.lock();
-
-    std::cout << "Non PTM index files - processing " << *current_num << " of " << block_num << " files." << std::endl;
-    *current_num = *current_num + 1;
-
-    mng_ptr->mutex_.unlock();
-  
 }
 
-std::function<void()> geneIndexTask(int block_idx, 
-                               ZeroPtmFilterMngPtr mng_ptr, int block_num, int *current_num) {
-  return[block_idx, mng_ptr, block_num, current_num] () {
+std::function<void()> geneIndexTask(int block_idx, ZeroPtmFilterMngPtr mng_ptr) {
+  return[block_idx, mng_ptr] () {
     PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
     std::string db_block_file_name = prsm_para_ptr->getSearchDbFileName()
         + "_" + str_util::toString(block_idx);
@@ -63,9 +56,10 @@ std::function<void()> geneIndexTask(int block_idx,
         = proteoform_factory::readFastaToProteoformPtrVec(db_block_file_name,
                                                           prsm_para_ptr->getFixModPtrVec());
 
-    createIndexFiles(raw_forms, block_idx, mng_ptr, block_num, current_num);
+    createIndexFiles(raw_forms, block_idx, mng_ptr);
   };
 }
+
 void ZeroPtmIndexProcessor::process(){
   //for generating index files
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
@@ -77,7 +71,6 @@ void ZeroPtmIndexProcessor::process(){
   SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(mng_ptr_->thread_num_);
   
   int block_num = db_block_ptr_vec.size();
-  int current_num = 1; //show how many files have been processed. n in the message "n of 5 files processed"..
 
   //logger::setLogLevel(2);
   std::cout << "Generating Non PTM index files --- started" << std::endl;
@@ -85,7 +78,8 @@ void ZeroPtmIndexProcessor::process(){
     while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ * 2) {
       boost::this_thread::sleep(boost::posix_time::milliseconds(100));
     }
-    pool_ptr->Enqueue(geneIndexTask(db_block_ptr_vec[i]->getBlockIdx(), mng_ptr_, block_num, &current_num));
+    std::cout << "Non PTM index files - processing " << (i+1) << " of " << block_num << " files." << std::endl;
+    pool_ptr->Enqueue(geneIndexTask(db_block_ptr_vec[i]->getBlockIdx(), mng_ptr_));
   }
   pool_ptr->ShutDown();
   std::cout << "Generating Non PTM index files --- finished" << std::endl;
