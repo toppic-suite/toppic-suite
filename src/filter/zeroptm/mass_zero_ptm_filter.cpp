@@ -18,12 +18,12 @@
 
 #include "seq/proteoform_util.hpp"
 
+#include "filter/zeroindex/topindex_file_name.hpp"
+
 #include "filter/massmatch/filter_protein.hpp"
 #include "filter/massmatch/mass_match_factory.hpp"
 #include "filter/massmatch/mass_match_util.hpp"
 #include "filter/zeroptm/mass_zero_ptm_filter.hpp"
-
-#include "console/topindex_file_name.hpp"
 
 namespace toppic {
 

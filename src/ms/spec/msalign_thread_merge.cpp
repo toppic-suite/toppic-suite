@@ -30,8 +30,8 @@ MsalignThreadMerge::MsalignThreadMerge(const std::string &spec_file_name,
                                        int in_num,
                                        const std::string &out_file_ext, const std::string &para_str):
     spec_file_name_(spec_file_name),
-    para_str_(para_str),
-    output_file_ext_(out_file_ext) {
+    output_file_ext_(out_file_ext),
+    para_str_(para_str) {
       for (int i = 0; i < in_num; i ++) {
         std::string ext = in_file_ext + "_" + str_util::toString(i);
         input_file_exts_.push_back(ext);

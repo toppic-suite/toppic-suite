@@ -19,19 +19,10 @@
 #include "seq/proteoform.hpp"
 #include "seq/proteoform_factory.hpp"
 
-#include "ms/spec/msalign_reader.hpp"
-#include "ms/spec/msalign_util.hpp"
-#include "ms/spec/spectrum_set.hpp"
-
-#include "prsm/simple_prsm_xml_writer_set.hpp"
-#include "prsm/simple_prsm_str_merge.hpp"
+#include "filter/zeroindex/topindex_file_name.hpp"
 
 #include "filter/zeroindex/zero_ptm_index_processor.hpp"
-
 #include "filter/zeroindex/zero_ptm_index_file.hpp"
-
-
-#include "console/topindex_file_name.hpp"
 
 namespace toppic{
 

@@ -20,9 +20,10 @@
 #include "filter/massmatch/filter_protein.hpp"
 #include "filter/massmatch/mass_match_factory.hpp"
 #include "filter/massmatch/mass_match_util.hpp"
+#include "filter/zeroindex/topindex_file_name.hpp"
 #include "filter/diag/mass_diag_filter.hpp"
 #include "filter/diagindex/diag_index_file.hpp"
-#include "console/topindex_file_name.hpp"
+
 namespace toppic {
 
 DiagIndexFile::DiagIndexFile(const ProteoformPtrVec &proteo_ptrs,
