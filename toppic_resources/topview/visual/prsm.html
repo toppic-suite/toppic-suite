@@ -21,6 +21,7 @@
 <script src="../js/spectrum_graph/spectrumparameters.js"></script>
 <script src="../js/spectrum_graph/spectrumgraph.js"></script>
 <script src="../js/spectrum_graph/spectrumdownload.js"></script>
+<script src="../js/spectrum_graph/graphFeatures.js"></script>
 <script src="js/util/coordinates_util.js"></script>
 <script src="js/util/prsmDataUtil.js"></script>
 <script src="js/util/drawSvg.js"></script>
@@ -115,11 +116,14 @@ $(document).ready(function(){
 
 		//Getting Ms1 Ids
 		let ms1_ids = prsm_data.prsm.ms.ms_header.ms1_ids ;
-		let ms1_id_1 = ms1_ids.split(" ");
-		let scanIdList_1 = prsm_data.prsm.ms.ms_header.ms1_scans.split(" ");
-		scanIdList_1 = MultiScanObj.getUniqueScanIdList(scanIdList_1);
-		let ms1_uniqueList = MultiScanObj.getUniqueScanIdList(ms1_id_1);
-		MultiScanObj.promiseLoadDataJS(ms1_uniqueList,scanIdList_1,"ms1_json")
+		let ms1_id_1 = ms1_ids.split(" ")[0];
+		let scanId_1 = prsm_data.prsm.ms.ms_header.ms1_scans.split(" ")[0];
+		//scanIdList_1 = MultiScanObj.getUniqueScanIdList(scanIdList_1);
+		let scanIdList_1 = [];
+		scanIdList_1.push(scanId_1);
+		let specIdList = [];
+		specIdList.push(ms1_id_1); //MultiScanObj.getUniqueScanIdList(ms1_id_1);
+		MultiScanObj.promiseLoadDataJS(specIdList,scanIdList_1,"ms1_json")
 
 		let ms2_ids = prsm_data.prsm.ms.ms_header.ids;
 		let ms2_id_list = ms2_ids.split(" ");

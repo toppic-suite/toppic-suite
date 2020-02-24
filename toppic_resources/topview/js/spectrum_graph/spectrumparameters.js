@@ -2,8 +2,9 @@
  * 	the data-------------------------------------------------------------------*/
 SpectrumParameters = function() {
   /* Attributes to decide what to be shown on the graph */
-  this.showCircles = true;
-  this.showIons = true;
+  
+  // this contain the showCircles,showIons,isAddbgColor,showSequene
+  this.graphFeatures = {};
   
   /*assign the mono m/z value when clicked on mono m/z*/
   this.minMz ;
@@ -20,11 +21,12 @@ SpectrumParameters = function() {
   this.fixedShiftRatio = 1.000684;
 
   this.svgWidth = 910;
-  this.svgHeight = 220;
+  this.svgHeight = 250;
 	/*	Set padding values to the svg------------------*/
-	this.padding = {left:70, right:20, head:10, bottom:50};
+	this.padding = {left:70, right:20, head:40, bottom:50};
 	this.specWidth = this.svgWidth - this.padding.left - this.padding.right;
-	this.specHeight = this.svgHeight - this.padding.head - this.padding.bottom;
+  this.specHeight = this.svgHeight - this.padding.head - this.padding.bottom;
+  this.labelAdjustVal = 15;
 
   this.specScale = 1.0;
   this.specX = 0;
