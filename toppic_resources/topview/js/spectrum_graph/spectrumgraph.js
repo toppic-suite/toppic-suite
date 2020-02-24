@@ -96,11 +96,7 @@ drawTicks = function(svg,spectrumParameters,spectrumgraph){
 		tickHeight = i*tickHeight * spectrumParameters.dataMaxInte /100;
 		tickHeight = parseFloat(spectrumParameters.getPeakYPos(tickHeight)) ;
 		let y =  tickHeight;
-		if(y < spectrumParameters.padding.head )
-		{
-			y =  -1000;
-		}
-		if(!isNaN(y))
+		if(!isNaN(y) && y >= spectrumParameters.padding.head)//y >= spectrumParameters.padding.head helps the ticks to be in the length of Y axis
 		{
 			this.addYTicks.append("line")
 						.attr("x1",spectrumParameters.padding.left)
@@ -130,7 +126,6 @@ drawAxis = function(svg,spectrumParameters,spectrumgraph){
 					.attr("stroke","black")
 					.attr("stroke-width","2")
 }
-
 addDatatoAxis = function(svg,spectrumParameters){
 	//let currentMinPeakVal;
 	//let currentMaxPeakVal;
@@ -199,6 +194,37 @@ addDatatoAxis = function(svg,spectrumParameters){
 		}
 	}
 	//return [currentMinPeakVal,currentMaxPeakVal];
+}
+addBackGround = function(svg,spectrumParameters){
+	let svg_temp = svg.append("g")
+					.attr("id", "svg_bgColor");
+
+	if(!((spectrumParameters.graphFeatures.bgMinMz < spectrumParameters.minMz && spectrumParameters.graphFeatures.bgMaxMz < spectrumParameters.minMz) 
+		|| (spectrumParameters.graphFeatures.bgMinMz > spectrumParameters.maxMz && spectrumParameters.graphFeatures.bgMaxMz > spectrumParameters.maxMz)))
+	{
+		let x = spectrumParameters.getPeakXPos(spectrumParameters.graphFeatures.bgMinMz);
+		let x2 = spectrumParameters.getPeakXPos(spectrumParameters.graphFeatures.bgMaxMz);
+		if(spectrumParameters.graphFeatures.bgMinMz < spectrumParameters.minMz)
+		{
+			x = spectrumParameters.getPeakXPos(spectrumParameters.minMz);
+		}
+		if(spectrumParameters.graphFeatures.bgMaxMz > spectrumParameters.maxMz)
+		{
+			x2 = spectrumParameters.getPeakXPos(spectrumParameters.maxMz);
+		}
+		svg_temp.append("rect")
+			.attr("x", x)
+			.attr("y", spectrumParameters.padding.head)
+			.attr("width", x2-x)
+			.attr("height", function(){
+				let y1 = spectrumParameters.svgHeight - spectrumParameters.padding.bottom;
+				let y2 = spectrumParameters.padding.head;
+				return y1-y2;
+			})
+			.style("fill", spectrumParameters.graphFeatures.bgColor)
+			.style("fill-opacity", ".4")
+			.style("stroke-width", "1.5px");
+	}
 }
 drawPeaks = function(svg,spectrumParameters,peakdata){
 	let peaks = svg.append("g")
@@ -319,17 +345,42 @@ drawIons = function(svg,spectrumParameters,ionData){
 	})
 
 }
+// drawSequence = function(svg,spectrumParameters,sequenceData){
+// 	let ions = svg.append("g").attr("id", "graph_sequence");
+// 	let maxIntensity = spectrumParameters.dataMaxInte ;
+// 	let limits=[0,0,0,0,0,0,0,0];
+// 	sequenceData.forEach(function(element){
+// 		let percentInte = element.intensity/maxIntensity * 100 ;
+// 		let inLimit = false;
+// 		if(element.mz > spectrumParameters.minMz && element.mz <= spectrumParameters.maxMz)
+// 		{
+// 			ions.append("text")
+// 			.attr("id","graph_matched_ions")
+// 			.attr("x",spectrumParameters.getPeakXPos((element.mz)))
+// 			.attr("y",function(d,i){
+// 				let y = spectrumParameters.getPeakYPos(element.intensity + (0.1*element.intensity));// Adding 10% to get the Ions on the max Intensity Peak
+// 				if(y <= spectrumParameters.padding.head) return spectrumParameters.padding.head ;
+// 				else return y ;
+// 			  })
+// 			.style("fill","black")
+// 			.style("opacity", "0.6")
+// 			//.style("stroke",envelope_list.color)
+// 			.style("stroke-width","2")
+// 			.text(element.ion);
+// 		}
+// 	})
 
+// }
 addLabels = function(svg, spectrumParameters){
 
 	svg.append("text").attr("id","label")
-						.attr("transform","translate(" + (spectrumParameters.svgWidth/2) + "," + (spectrumParameters.svgHeight-spectrumParameters.padding.head) + ")")
+						.attr("transform","translate(" + (spectrumParameters.svgWidth/2) + "," + (spectrumParameters.svgHeight-spectrumParameters.labelAdjustVal) + ")")
 					.attr("fill","black")
 					    .attr("font-family","Helvetica Neue,Helvetica,Arial,sans-serif")
 					    .attr("font-size","16px")
 					    .text("m/z");
 	svg.append("text").attr("id","label")
-					.attr("transform", "translate("+ spectrumParameters.padding.left/3 +","+spectrumParameters.svgHeight/2+")rotate(-90)")
+					.attr("transform", "translate("+ spectrumParameters.padding.left/3 +","+(spectrumParameters.svgHeight/2+spectrumParameters.labelAdjustVal)+")rotate(-90)")
 					.attr("fill","black")
 					    .attr("font-family","Helvetica Neue,Helvetica,Arial,sans-serif")
 					    .attr("font-size","16px")
@@ -404,6 +455,7 @@ function drawSpectrum(svgId, spectrumParameters, peakData,ionData){
 		let svg = d3.select("body").select(svgId);
 		svg.selectAll("#xtext").remove();
 		svg.selectAll("#ticks").remove();
+		svg.selectAll("#svg_bgColor").remove();
 		svg.selectAll("#peaks").remove();
 		svg.selectAll("#axisPoints").remove();
 		svg.selectAll("#axis").remove();
@@ -416,13 +468,16 @@ function drawSpectrum(svgId, spectrumParameters, peakData,ionData){
 		drawTicks(svg, spectrumParameters, peakData);
 		drawAxis(svg,spectrumParameters);
 		addDatatoAxis(svg,spectrumParameters);
-
+		if(spectrumParameters.graphFeatures.isAddbgColor)
+		{
+			addBackGround(svg, spectrumParameters);
+		}
 		drawPeaks(svg, spectrumParameters, peakData);
-		if(spectrumParameters.showCircles && peakData.envelope_list != null)
+		if(spectrumParameters.graphFeatures.showCircles && peakData.envelope_list != null)
 		{
 			addCircles(svg,spectrumParameters,peakData);
 		}
-		if(spectrumParameters.showIons && ionData != null)
+		if(spectrumParameters.graphFeatures.showIons && ionData != null)
 		{
 			drawIons(svg,spectrumParameters,ionData);
 		}

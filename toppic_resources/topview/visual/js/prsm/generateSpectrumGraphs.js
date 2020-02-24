@@ -18,10 +18,12 @@ function svgIds()
 }
 function generateCorrespondingGraph(current_data,id,prec_mz,specId){
     let startOfId = id.split("_")[0];
+    let graphFeatures = new GraphFeatures();
     if(startOfId == "monoMassSvg")
     {
+        graphFeatures.showSequene = true;
         // Current Data itself contains Peak data
-        spectrumgraph = new addSpectrum(id, current_data, null, prec_mz, current_data);
+        spectrumgraph = new addSpectrum(id, current_data, null, prec_mz, current_data,graphFeatures);
     }   
     else{
         let peak_data = new PeakData();
@@ -30,15 +32,38 @@ function generateCorrespondingGraph(current_data,id,prec_mz,specId){
         if(id != "popupspectrum")
         {
             let ionData = peak_data.getIonData(prsm_data,specId,current_data);
-            ms2_graph = new addSpectrum(id, peak_list, envelope_list, prec_mz, ionData);
+            ms2_graph = new addSpectrum(id, peak_list, envelope_list, prec_mz, ionData, graphFeatures);
             // Setting correspoding Spectrum params of the graph to its respective graph svg Ids
         }
         else{
-            spectrumgraph = new addSpectrum(id, peak_list, envelope_list, prec_mz, null);
+            graphFeatures.isAddbgColor = true;
+            let precursor_mass = prsm_data.prsm.ms.ms_header.precursor_mono_mass;
+            [graphFeatures.bgMinMz,graphFeatures.bgMaxMz] = getMinMzFromSpectrumData(envelope_list,precursor_mass);
+            spectrumgraph = new addSpectrum(id, peak_list, envelope_list, prec_mz, null,graphFeatures);
         }
     }
 }
-
+function getMinMzFromSpectrumData(envelope_list,precursor_mass)
+{
+    let env_peaks = [];
+    let minMz = 0;
+    let maxMz = 0;
+    envelope_list.forEach((element)=>{
+        if(parseFloat(element.mono_mass).toFixed(3) == parseFloat(precursor_mass).toFixed(3))
+        {
+            env_peaks = element.env_peaks;
+        }
+    });
+    if(env_peaks.length != 0)
+    {
+        env_peaks.sort(function(a, b){
+            return a.mz-b.mz;
+        })
+    }
+    minMz = env_peaks[0].mz;
+    maxMz = env_peaks[env_peaks.length-1].mz;
+    return[minMz,maxMz];
+}
 // function createMultipleSvgs(current_data)
 // {
 //     let div = document.getElementById("ms2svg_div"); 
@@ -156,13 +181,13 @@ function graphOnClickActions(){
 		$("#ms2_graph_nav .active").removeClass("active");
    		$(this).addClass("active");
 	})
-	$(".ms1_scanIds").click(function(){
-		let value = this.getAttribute('value');
-		let [currentData,specId] = getCurrentData(ms1_ScansWithData,value);
-		generateCorrespondingGraph(currentData,"popupspectrum",null,specId);
-		$("#ms1_graph_nav .active").removeClass("active");
-   		$(this).addClass("active");
-    })
+	// $(".ms1_scanIds").click(function(){
+	// 	let value = this.getAttribute('value');
+	// 	let [currentData,specId] = getCurrentData(ms1_ScansWithData,value);
+	// 	generateCorrespondingGraph(currentData,"popupspectrum",null,specId);
+	// 	$("#ms1_graph_nav .active").removeClass("active");
+   	// 	$(this).addClass("active");
+    // })
     $(".monoMass_scanIds").click(function(){
 		let value = this.getAttribute('value');
         let [currentData,specId] = getCurrentData(monoMassDataList,value);

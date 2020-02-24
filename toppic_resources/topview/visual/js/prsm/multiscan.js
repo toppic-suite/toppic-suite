@@ -35,26 +35,22 @@ class MultiScan{
                     let MultiScanObj = new MultiScan();
                     let current_data ;
                     let specId;
-                    [current_data,specId] = getCurrentData(scanListWithData,scanIdList[0]);
-                    
                     if(ms1_ms2_json == "ms1_json")
                     {
+
                         ms1_ScansWithData = scanListWithData;
                         MultiScanObj.createMs1NavEements(scanIdList,"popupspectrum");
                         let prec_mz = prsm_data.prsm.ms.ms_header.precursor_mz;
                         document.getElementById("popup_dataLoading").remove(); 
-                        generateCorrespondingGraph(current_data,"popupspectrum",prec_mz,specId);
+                        generateCorrespondingGraph(ms1_ScansWithData[0].value,"popupspectrum",prec_mz,specId);
                     }
                     else{
+                        [current_data,specId] = getCurrentData(scanListWithData,scanIdList[0]);
                         //Setting data to a global variable
                         ms2_ScansWithData = scanListWithData;
                         MultiScanObj.createMs2NavEements(scanIdList,"ms2_graph_nav");
                         document.getElementById("dataLoading").remove();
-                       // spectrumParams_global = createDummySpecParamsList(ms2_ScansWithData);
-                       createMultipleSvgs("ms2svg_div","ms2svg_","ms2_svg_graph_class",ms2_ScansWithData);
-                        //MultiScanObj.createMs2PopUpNavEements(scanIdList,"ms2_graph_popup_nav");
-                       // createMultiplePopUpSvgs(ms2_ScansWithData);
-                        //generateCorrespondingGraph(current_data,"ms2svg",null,specId);
+                        createMultipleSvgs("ms2svg_div","ms2svg_","ms2_svg_graph_class",ms2_ScansWithData);
                     }
                     graphOnClickActions();
                 }
@@ -114,22 +110,17 @@ class MultiScan{
             _ul.appendChild(li);
          })
     }
-    createMs1NavEements(scanidList,id){
+    createMs1NavEements(element,id){
         let _ul = document.getElementById("ms1_graph_nav");
-        scanidList.forEach(function(element,i){
-            let li = document.createElement("li");
-            li.setAttribute("class","nav-item");
-            let a = document.createElement("a");
-            if(i == 0)
-            {
-                a.setAttribute("class","nav-link ms1_scanIds active");
-            }
-            a.setAttribute("href","#!");
-            a.setAttribute("value",element);
-            a.innerHTML = "Scan "+ element;
-            li.appendChild(a);
-            _ul.appendChild(li);
-         })
+        let li = document.createElement("li");
+        li.setAttribute("class","nav-item");
+        let a = document.createElement("a");
+        a.setAttribute("class","nav-link ms1_scanIds active");
+        a.setAttribute("href","#!");
+        a.setAttribute("value",element);
+        a.innerHTML = "Scan "+ element;
+        li.appendChild(a);
+        _ul.appendChild(li);
     }
     createMonoMassNavEements(scanidList,id){
         let _ul = document.getElementById(id);

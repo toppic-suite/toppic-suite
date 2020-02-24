@@ -1,6 +1,7 @@
 /*	Spectrum start point */
-addSpectrum = function(id,peakList,envelopeList,monoMZ, ionData){
-  	let specParameters = compSpectrumParameters(peakList, envelopeList, monoMZ);
+addSpectrum = function(id,peakList,envelopeList,monoMZ, ionData, graphFeatures){
+	let specParameters = compSpectrumParameters(peakList, envelopeList, monoMZ);
+	specParameters.graphFeatures = graphFeatures;
 	let peakData = {};
 	peakData.peak_list = peakList ;
 	if(envelopeList != null)
@@ -10,7 +11,7 @@ addSpectrum = function(id,peakList,envelopeList,monoMZ, ionData){
 	id = "#"+id;
 	if(ionData == null)
 	{
-		specParameters.showIons = false ;
+		specParameters.graphFeatures.showIons = false ;
 	}
 	let spectrumGraph;
 	spectrumGraph = new SpectrumGraph(id,specParameters,peakData,ionData);
