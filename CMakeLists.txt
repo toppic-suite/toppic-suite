@@ -103,6 +103,9 @@ file(GLOB TOPPIC_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/toppic/*.cpp
 # classes for topmg
 file(GLOB TOPMG_FILTER_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/massmatch/*.cpp
                              ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/oneptm/*.cpp
+			     ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/oneindex/*.cpp
+			     ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/zeroindex/*.cpp
+			     ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/diagindex/*.cpp
                              ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/diag/*.cpp)
 
 file(GLOB GRAPH_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/search/graph/*.cpp)
@@ -176,7 +179,7 @@ add_executable(toppic_gui
 
 
 add_executable(topmg 
-	${TOPMG_CONSOLE_SRCS} ${TOPMG_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS} 
+	${TOPMG_CONSOLE_SRCS} ${TOPMG_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS}
   ${SEQ_SRCS} ${SPEC_SRCS} ${ENV_SRCS} ${FEATURE_SRCS} ${PRSM_SRCS} ${TOPMG_FILTER_SRCS} 
 	${ONE_PTM_SEARCH_SRCS} ${GRAPH_SRCS} ${GRAPH_ALIGN_SRCS} ${TDGF_SRCS} 
   ${MCMC_SRCS} ${VISUAL_SRCS})
