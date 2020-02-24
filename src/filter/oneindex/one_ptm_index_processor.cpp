@@ -66,7 +66,6 @@ std::function<void()> geneIndexTask(int block_idx,
   };
 }
 void OnePtmIndexProcessor::process(){
-  //for generating index files
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
   std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
   DbBlockPtrVec db_block_ptr_vec = DbBlock::readDbBlockIndex(db_file_name);

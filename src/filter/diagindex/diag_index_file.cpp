@@ -36,8 +36,7 @@ DiagIndexFile::DiagIndexFile(const ProteoformPtrVec &proteo_ptrs,
   std::string dir_name = mng_ptr_->prsm_para_ptr_->getOriDbName() + "_idx";
   std::string file_name = file_name_ptr->multi_ptm_file_vec_[0] + parameters + block_str;
 
-  index_ptr_->serializeMassMatch(dir_name, file_name);
-
+  index_ptr_->serializeMassMatch(file_name, dir_name);
 }
 
 } /* namespace toppic */

@@ -23,8 +23,6 @@ namespace toppic{
 class DiagIndexProcessor {
  public:
   DiagIndexProcessor(DiagFilterMngPtr mng_ptr): mng_ptr_(mng_ptr) {};
-  void createIndexFiles(DbBlockPtr block_ptr, int total_block_num,
-                        const std::vector<double> & mod_mass_list);
   void process();
 
  private:
