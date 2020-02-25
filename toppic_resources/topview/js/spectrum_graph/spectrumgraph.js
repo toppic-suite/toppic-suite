@@ -345,32 +345,30 @@ drawIons = function(svg,spectrumParameters,ionData){
 	})
 
 }
-// drawSequence = function(svg,spectrumParameters,sequenceData){
-// 	let ions = svg.append("g").attr("id", "graph_sequence");
-// 	let maxIntensity = spectrumParameters.dataMaxInte ;
-// 	let limits=[0,0,0,0,0,0,0,0];
-// 	sequenceData.forEach(function(element){
-// 		let percentInte = element.intensity/maxIntensity * 100 ;
-// 		let inLimit = false;
-// 		if(element.mz > spectrumParameters.minMz && element.mz <= spectrumParameters.maxMz)
-// 		{
-// 			ions.append("text")
-// 			.attr("id","graph_matched_ions")
-// 			.attr("x",spectrumParameters.getPeakXPos((element.mz)))
-// 			.attr("y",function(d,i){
-// 				let y = spectrumParameters.getPeakYPos(element.intensity + (0.1*element.intensity));// Adding 10% to get the Ions on the max Intensity Peak
-// 				if(y <= spectrumParameters.padding.head) return spectrumParameters.padding.head ;
-// 				else return y ;
-// 			  })
-// 			.style("fill","black")
-// 			.style("opacity", "0.6")
-// 			//.style("stroke",envelope_list.color)
-// 			.style("stroke-width","2")
-// 			.text(element.ion);
-// 		}
-// 	})
+drawSequence = function(svg,spectrumParameters){
+	console.log("spectrumParameters : ", spectrumParameters);
+	let seqSvg = svg.append("g").attr("id", "graph_sequence");
+	let maxIntensity = spectrumParameters.dataMaxInte ;
+	let limits=[0,0,0,0,0,0,0,0];
+	let sequenceData = spectrumParameters.graphFeatures.sequenceData;
+	sequenceData.forEach(function(element){
+		//let percentInte = element.intensity/maxIntensity * 100 ;
+		//let inLimit = false;
+		if(element.mass > spectrumParameters.minMz && element.mass <= spectrumParameters.maxMz)
+		{
+			seqSvg.append("text")
+			.attr("id","")
+			.attr("x",spectrumParameters.getPeakXPos((element.mass)))
+			.attr("y",spectrumParameters.padding.head-20)
+			.style("fill","black")
+			.style("opacity", "0.6")
+			//.style("stroke",envelope_list.color)
+			.style("stroke-width","2")
+			.text(element.acid);
+		}
+	})
 
-// }
+}
 addLabels = function(svg, spectrumParameters){
 
 	svg.append("text").attr("id","label")
@@ -461,6 +459,7 @@ function drawSpectrum(svgId, spectrumParameters, peakData,ionData){
 		svg.selectAll("#axis").remove();
 		svg.selectAll("#circles").remove();
 		svg.selectAll("#graph_ions").remove();
+		svg.selectAll("#graph_sequence").remove();
 		svg.selectAll("#label").remove();
 	/*call onMouseOut everytime to fix onHover bug adding multiple data when mouseover and zoomed up*/
 	
@@ -468,6 +467,7 @@ function drawSpectrum(svgId, spectrumParameters, peakData,ionData){
 		drawTicks(svg, spectrumParameters, peakData);
 		drawAxis(svg,spectrumParameters);
 		addDatatoAxis(svg,spectrumParameters);
+		addLabels(svg, spectrumParameters);
 		if(spectrumParameters.graphFeatures.isAddbgColor)
 		{
 			addBackGround(svg, spectrumParameters);
@@ -481,7 +481,11 @@ function drawSpectrum(svgId, spectrumParameters, peakData,ionData){
 		{
 			drawIons(svg,spectrumParameters,ionData);
 		}
-		addLabels(svg, spectrumParameters);
+		if(spectrumParameters.graphFeatures.showSequene)
+		{
+			drawSequence(svg,spectrumParameters);
+		}
+		
 		//SpectrumDownload.addDownloadRect(svgId, spectrumParameters);
 	// }
 //   addDownloadRect(svgId, spectrumParameters);

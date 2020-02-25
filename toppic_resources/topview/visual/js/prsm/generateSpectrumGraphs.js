@@ -21,7 +21,17 @@ function generateCorrespondingGraph(current_data,id,prec_mz,specId){
     let graphFeatures = new GraphFeatures();
     if(startOfId == "monoMassSvg")
     {
+        let calculatePrefixAndSuffixMassObj = new CalculatePrefixAndSuffixMass();
+        let massShift_in = calculatePrefixAndSuffixMassObj.getIonTypeMass("B");
+        let seq = calculatePrefixAndSuffixMassObj.getSequence(prsm_data);
+        let massShiftList = calculatePrefixAndSuffixMassObj.getUnknownMassList();
+        console.log("massShiftList : ", massShiftList);
+        let prefixMassList = calculatePrefixAndSuffixMassObj.getPrefixMassList(seq,massShiftList,massShift_in);
+        console.log("prefixMassList : ",prefixMassList);
         graphFeatures.showSequene = true;
+        graphFeatures.sequenceData = prefixMassList;
+        graphFeatures.svgHeight = graphFeatures.svgHeight+graphFeatures.adjustableHeightVal;
+        graphFeatures.padding.head = graphFeatures.padding.head + graphFeatures.adjustableHeightVal;
         // Current Data itself contains Peak data
         spectrumgraph = new addSpectrum(id, current_data, null, prec_mz, current_data,graphFeatures);
     }   

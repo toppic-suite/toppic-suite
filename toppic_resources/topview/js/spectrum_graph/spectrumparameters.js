@@ -21,9 +21,9 @@ SpectrumParameters = function() {
   this.fixedShiftRatio = 1.000684;
 
   this.svgWidth = 910;
-  this.svgHeight = 250;
+  this.svgHeight = 220;
 	/*	Set padding values to the svg------------------*/
-	this.padding = {left:70, right:20, head:40, bottom:50};
+	this.padding = {left:70, right:20, head:10, bottom:50};
 	this.specWidth = this.svgWidth - this.padding.left - this.padding.right;
   this.specHeight = this.svgHeight - this.padding.head - this.padding.bottom;
   this.labelAdjustVal = 15;
