@@ -330,7 +330,7 @@ drawIons = function(svg,spectrumParameters,ionData){
 		{
 			ions.append("text")
 			.attr("id","graph_matched_ions")
-			.attr("x",spectrumParameters.getPeakXPos((element.mz)))
+			.attr("x",(spectrumParameters.getPeakXPos((element.mz))-spectrumParameters.graphFeatures.adjustableIonPosition))
 			.attr("y",function(d,i){
 				let y = spectrumParameters.getPeakYPos(element.intensity + (0.1*element.intensity));// Adding 10% to get the Ions on the max Intensity Peak
 				if(y <= spectrumParameters.padding.head) return spectrumParameters.padding.head ;
