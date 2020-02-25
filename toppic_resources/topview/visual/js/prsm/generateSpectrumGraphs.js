@@ -25,13 +25,12 @@ function generateCorrespondingGraph(current_data,id,prec_mz,specId){
         let massShift_in = calculatePrefixAndSuffixMassObj.getIonTypeMass("B");
         let seq = calculatePrefixAndSuffixMassObj.getSequence(prsm_data);
         let massShiftList = calculatePrefixAndSuffixMassObj.getUnknownMassList();
-        console.log("massShiftList : ", massShiftList);
         let prefixMassList = calculatePrefixAndSuffixMassObj.getPrefixMassList(seq,massShiftList,massShift_in);
-        console.log("prefixMassList : ",prefixMassList);
         graphFeatures.showSequene = true;
         graphFeatures.sequenceData = prefixMassList;
         graphFeatures.svgHeight = graphFeatures.svgHeight+graphFeatures.adjustableHeightVal;
         graphFeatures.padding.head = graphFeatures.padding.head + graphFeatures.adjustableHeightVal;
+        graphFeatures.adjustableIonPosition = 10;
         // Current Data itself contains Peak data
         spectrumgraph = new addSpectrum(id, current_data, null, prec_mz, current_data,graphFeatures);
     }   
@@ -48,7 +47,8 @@ function generateCorrespondingGraph(current_data,id,prec_mz,specId){
         else{
             graphFeatures.isAddbgColor = true;
             let precursor_mass = prsm_data.prsm.ms.ms_header.precursor_mono_mass;
-            [graphFeatures.bgMinMz,graphFeatures.bgMaxMz] = getMinMzFromSpectrumData(envelope_list,precursor_mass);
+            graphFeatures.bgMinMz = (graphFeatures.ratio * prec_mz) - graphFeatures.fixedWidthOfBgColorForMs1;
+            graphFeatures.bgMaxMz = (graphFeatures.ratio * prec_mz) + graphFeatures.fixedWidthOfBgColorForMs1;
             spectrumgraph = new addSpectrum(id, peak_list, envelope_list, prec_mz, null,graphFeatures);
         }
     }
