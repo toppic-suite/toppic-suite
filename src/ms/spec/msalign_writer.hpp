@@ -33,9 +33,17 @@ class MsAlignWriter {
 
   void close();
 
+  void useCopiedMonoMass(bool use_copied_mono_mass){use_copied_mono_mass_ = use_copied_mono_mass;}
  private:
   std::string file_name_;
   std::ofstream output_;
+
+  //if true, it does not calculate mono mass again and use a value copied from the 
+  //msalign file that was parsed.
+  //for use in merge sort of msaligns. Recalculating mono mass produces inaccurate values. 
+  //because it is using input values that have reduced decimal points compared to
+  //the original mass from mzML file. 
+  bool use_copied_mono_mass_ = false;
 };
 
 typedef std::shared_ptr<MsAlignWriter> MsAlignWriterPtr;

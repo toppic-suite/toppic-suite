@@ -14,7 +14,7 @@
 
 #include <cmath>
 #include <sstream>
-
+#include <iomanip>
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
 #include "common/base/mass_constant.hpp"
@@ -99,8 +99,8 @@ void MsAlignReader::readNext() {
   int ms_one_id = -1;
   int ms_one_scan = -1;
   double prec_mass = -1;
-  double prec_mz = -1;
   int prec_charge = -1;
+  double prec_mz = -1;
   double prec_inte = -1;
   //int feature_id = -1;
   //double feature_inte = -1;
@@ -132,10 +132,12 @@ void MsAlignReader::readNext() {
         ms_one_id = std::stod(strs[1]);
       } else if (strs[0] == "MS_ONE_SCAN") {
         ms_one_scan = std::stod(strs[1]);
-      } else if (strs[0] == "PRECURSOR_MZ") {
-        prec_mz = std::stod(strs[1]);  
       } else if (strs[0] == "PRECURSOR_MASS") {
         prec_mass = std::stod(strs[1]);
+      } else if(strs[0] == "PRECURSOR_MZ"){
+        if (copy_values_){//if it is during merge sort 
+          prec_mz = std::stod(strs[1]);
+        }
       } else if (strs[0] == "PRECURSOR_CHARGE") {
         prec_charge = std::stoi(strs[1]);
       } else if (strs[0] == "PRECURSOR_INTENSITY") {
@@ -192,8 +194,14 @@ void MsAlignReader::readNext() {
 
   header_ptr->setMsOneScan(ms_one_scan);
 
-  header_ptr->setPrecMonoMz(prec_mz);
-  
+  header_ptr->setPrecMonoMz(prec_mass /prec_charge + mass_constant::getProtonMass());
+
+  if (copy_values_){
+    //during merge sort only, these two values are not calculated again and instead copied from the msalign being read
+    header_ptr->setPrecMonoMz(prec_mz);
+    header_ptr->setCopiedPrecMonoMass(prec_mass);
+  }
+
   header_ptr->setPrecCharge(prec_charge);
 
   header_ptr->setPrecInte(prec_inte);
