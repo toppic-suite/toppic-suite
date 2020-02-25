@@ -360,19 +360,15 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
     table_out = nullptr;
     std::cout << "Outputting PrSM table - finished." << std::endl;
 
-    std::cout << "Generating PrSM xml files - started." << std::endl;
-    
     XmlGeneratorPtr xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, resource_dir, "topmg_prsm_cutoff", "topmg_prsm_cutoff");
     
-    //do not generate html files if parameter for no html folder was used
-    if (arguments["geneHTMLFolder"] == "false"){
-      xml_gene->gene_html_folder = false;
-    }
-    xml_gene->process();
-    xml_gene = nullptr;
-    std::cout << "Generating PrSM xml files - finished." << std::endl;
-
     if (arguments["geneHTMLFolder"] == "true"){//only when the parameter is set to true
+    
+      std::cout << "Generating PrSM xml files - started." << std::endl;
+      xml_gene->process();
+      xml_gene = nullptr;
+      std::cout << "Generating PrSM xml files - finished." << std::endl;
+
       copyTopView(arguments);
 
       std::cout << "Converting PrSM xml files to html files - started." << std::endl;
@@ -405,18 +401,15 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
     form_out = nullptr;
     std::cout << "Outputting proteoform table - finished." << std::endl;
 
+    if (arguments["geneHTMLFolder"] == "true"){//only when the parameter is set to true
     std::cout << "Generating proteoform xml files - started." << std::endl;
     xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, resource_dir, "topmg_form_cutoff", "topmg_proteoform_cutoff");
-    
-    if (arguments["geneHTMLFolder"] == "false"){
-      xml_gene->gene_html_folder = false;
-    }
-    
+
     xml_gene->process();
     xml_gene = nullptr;
     std::cout << "Generating proteoform xml files - finished." << std::endl;
 
-    if (arguments["geneHTMLFolder"] == "true"){//only when the parameter is set to true
+    
       std::cout << "Converting proteoform xml files to html files - started." << std::endl;
       jsonTranslate(arguments, "topmg_proteoform_cutoff");
       std::cout << "Converting proteoform xml files to html files - finished." << std::endl;
