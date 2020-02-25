@@ -95,6 +95,7 @@
 
 	//set the checkbox based on the ion type used in the data, which is stored in local storage
 	let ionType = window.localStorage.getItem('ionType'); 
+	console.log("ionTYpe : ", ionType);
 	setIonCheckbox(ionType);
 
 	onLoadOfHTML(precursorMass);
