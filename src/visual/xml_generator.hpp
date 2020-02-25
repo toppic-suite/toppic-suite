@@ -41,8 +41,6 @@ class XmlGenerator {
                const std::string &fname_suffix);
 
   void process();
-  
-  bool gene_html_folder = true;
 
  private:
   void outputPrsms();

@@ -45,6 +45,8 @@ class MsAlignReader {
 
   static void readMsOneSpectra(const std::string &file_name, DeconvMsPtrVec &ms_ptr_vec); 
 
+  void setToCopyValues(bool copy_values){copy_values_ = copy_values;}
+
  private:
   std::string file_name_;
 
@@ -63,6 +65,19 @@ class MsAlignReader {
   std::set<std::string> skip_list_;
 
   int peak_num_limit_ = std::numeric_limits<int>::max();
+
+  //precursor mass and precursor m/z get different value when 
+  //they are parsed from msalign file and written to msalign file again 
+  //because they are stored as setprecision(5) values, which are not identical to 
+  //their original values during deconvolution process. 
+  //And during merge sort of mutliple small msaligns, their data is parsed and written again, 
+  //which cause the precursor mass and precursor m/z to be diffrent from their original values for some spectra.
+
+  //so for merge sort only, this boolean variable is going to be set to true
+  //if true, precursor mass and m/z are not calculated and instead copy the existing value from 
+  //the msalign file it is reading. 
+
+  bool copy_values_ = false; 
 
   void readNext();
 };

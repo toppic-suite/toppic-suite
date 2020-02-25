@@ -31,6 +31,8 @@ class MsHeader {
 
   double getPrecMonoMass();
 
+  double getCopiedPrecMonoMass(){return prec_mono_mass_copy_;}
+
   double getPrecSpMass();
 
   double getPrecMonoMassMinusWater();
@@ -127,6 +129,8 @@ class MsHeader {
 
   static bool cmpPrecInteDec(const MsHeaderPtr &a, const MsHeaderPtr &b);
 
+  void setCopiedPrecMonoMass(double prec_mono_mass_copy){prec_mono_mass_copy_ = prec_mono_mass_copy;}
+
  private:
   int id_ = -1;
 
@@ -167,6 +171,7 @@ class MsHeader {
   // feature inte
   double feature_inte_ = -1;
   */
+ double prec_mono_mass_copy_;
 };
 
 typedef std::vector<MsHeaderPtr> MsHeaderPtrVec;
