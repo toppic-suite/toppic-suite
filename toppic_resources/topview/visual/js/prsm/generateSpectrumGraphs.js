@@ -54,7 +54,7 @@ function generateCorrespondingGraph(current_data,id,prec_mz,specId){
     }
 }
 function getMinMzFromSpectrumData(envelope_list,precursor_mass)
-{
+{ 
     let env_peaks = [];
     let minMz = 0;
     let maxMz = 0;
