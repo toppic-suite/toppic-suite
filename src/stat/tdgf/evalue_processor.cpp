@@ -135,6 +135,15 @@ void EValueProcessor::process(bool is_separate) {
     std::cout << std::flush << "E-value computation - processing " << cnt << " of " 
         << spectrum_num << " spectra.\r";
   }
+  int remainder = spectrum_num - cnt;
+  if (prsm_para_ptr->getGroupSpecNum() > remainder && remainder > 0){
+      //if there are spectrum remaining because they were not combined due to not having enough pairs
+      //fix the message as the processing is completed.
+      //this code avoids error when no combined spectra is used but a scan is remaining unprocessed
+      //because then it will not satisfy the first condition
+      std::cout << std::flush <<  "E-value computation - processing " << spectrum_num
+        << " of " << spectrum_num << " spectra.\r";
+  } 
   pool_ptr->ShutDown();
   std::cout << std::endl;
   sp_reader.close();
