@@ -124,6 +124,9 @@ void OnePtmFilterProcessor::process() {
   }
   int spec_num = msalign_util::getSpNum(prsm_para_ptr->getSpectrumFileName());
   // n_spec_block = spec_num * block_num
+  if (prsm_para_ptr->getGroupSpecNum() > 1){
+    spec_num = (int)(spec_num/2);
+  }
   mng_ptr_->n_spec_block_ = spec_num * db_block_ptr_vec.size();
   SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(mng_ptr_->thread_num_);
   int block_num = db_block_ptr_vec.size();
