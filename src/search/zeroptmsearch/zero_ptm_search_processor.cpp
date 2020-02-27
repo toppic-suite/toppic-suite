@@ -189,6 +189,16 @@ void ZeroPtmSearchProcessor::process() {
     std::cout << std::flush <<  "Non PTM search - processing " << cnt
         << " of " << spectrum_num << " spectra.\r";
   }
+  int remainder = spectrum_num - cnt;
+  if (prsm_para_ptr->getGroupSpecNum() > remainder && remainder > 0){
+      //if there are spectrum remaining because they were not combined due to not having enough pairs
+      //fix the message as the processing is completed.
+      //this code avoids error when no combined spectra is used but a scan is remaining unprocessed
+      //because then it will not satisfy the first condition
+      std::cout << std::flush <<  "Non PTM search - processing " << spectrum_num
+        << " of " << spectrum_num << " spectra.\r";
+  } 
+
   sp_reader.close();
   comp_prsm_reader.close();
   pref_prsm_reader.close();
