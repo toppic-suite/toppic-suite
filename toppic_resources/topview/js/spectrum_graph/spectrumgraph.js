@@ -8,19 +8,16 @@ SpectrumGraph = function(svgId,spectrumParameters,peakData, ionData){
   this.ionData = ionData;
   let graph = this;
   let tempid = svgId.split("#")[1];
-
+	console.log(svgId);
 this.redraw = function(mono_mz,id) {
      this.para = compSpectrumParameters(this.data.peak_list, this.data.envelope_list, mono_mz);
- 	spectrumParameters = drawSpectrum(this.id, this.para, this.data,this.ionData);
- 	correspondingSpecParams_g[tempid] = spectrumParameters;
+	 spectrumParameters = drawSpectrum(this.id, this.para, this.data,this.ionData);
+	 if(svgId != spectrumParameters.graphFeatures.popupMs2SpectrumId)
+	 {
+		correspondingSpecParams_g[tempid] = jQuery.extend(true, {}, spectrumParameters);
+	 }
    }
-//   this.reDrawWithSpecParams = function(id,specParams){
-// 	  console.log(this.data);
-// 	  console.log(this.ionData);
-// 	  console.log(specParams);
-// 	  id = "#"+id;
-// 	spectrumParameters = drawSpectrum(id, specParams, this.data,this.ionData);
-//   }
+
   this.zoomed = function () {
     let transform = d3.event.transform;
     //let distance = transform.x - spectrumParameters.specX;
@@ -38,7 +35,10 @@ this.redraw = function(mono_mz,id) {
 	spectrumParameters = drawSpectrum(svgId, spectrumParameters, peakData, ionData);
 	// console.log("transform.x : ", transform.x);
 	// console.log("transform.k : ", transform.k);
-	correspondingSpecParams_g[tempid] = spectrumParameters;
+	if(svgId != spectrumParameters.graphFeatures.popupMs2SpectrumId)
+	{
+		correspondingSpecParams_g[tempid] = jQuery.extend(true, {}, spectrumParameters);//spectrumParameters;
+	}
  // console.log("correspondingSpecParams_g zoom : ", correspondingSpecParams_g);
   }
 
@@ -53,7 +53,10 @@ this.redraw = function(mono_mz,id) {
 	
 	// console.log("this.para : ", this.para);
 	spectrumParameters = drawSpectrum(svgId, spectrumParameters, peakData, ionData); 
-	correspondingSpecParams_g[tempid] = spectrumParameters;
+	if(svgId != spectrumParameters.graphFeatures.popupMs2SpectrumId)
+	{
+		correspondingSpecParams_g[tempid] = jQuery.extend(true, {}, spectrumParameters);
+	}
   	// console.log("correspondingSpecParams_g zoom : ", correspondingSpecParams_g);
 
   return graph;
@@ -322,10 +325,7 @@ drawIons = function(svg,spectrumParameters,ionData){
 
 	let ions = svg.append("g").attr("id", "graph_ions");
 	let maxIntensity = spectrumParameters.dataMaxInte ;
-	let limits=[0,0,0,0,0,0,0,0];
 	ionData.forEach(function(element){
-		let percentInte = element.intensity/maxIntensity * 100 ;
-		let inLimit = false;
 		if(element.mz > spectrumParameters.minMz && element.mz <= spectrumParameters.maxMz)
 		{
 			ions.append("text")
@@ -346,10 +346,7 @@ drawIons = function(svg,spectrumParameters,ionData){
 
 }
 drawSequence = function(svg,spectrumParameters){
-	console.log("spectrumParameters : ", spectrumParameters);
 	let seqSvg = svg.append("g").attr("id", "graph_sequence");
-	let maxIntensity = spectrumParameters.dataMaxInte ;
-	let limits=[0,0,0,0,0,0,0,0];
 	let sequenceData = spectrumParameters.graphFeatures.prefixSequenceData;
 	sequenceData.forEach(function(element){
 		//let percentInte = element.intensity/maxIntensity * 100 ;

@@ -253,7 +253,6 @@ class CalculatePrefixAndSuffixMass{
 	}
 	getMassofFixedPtm(abbrevation)
 	{
-		console.log(abbrevation);
 		let len = this.fixedPtmList.length;
 		for(let i=0;i<len;i++)
 		{

@@ -14,6 +14,7 @@ class GraphFeatures{
         this.adjustableIonPosition = 4;
         this.svgWidth = 910;
         this.svgHeight = 220;
+        this.popupMs2SpectrumId = "#popup_ms2_spectrum";
         this.padding = {left:70, right:20, head:10, bottom:50};
         this.adjustableHeightVal = 60;
         this.specWidth = this.svgWidth - this.padding.left - this.padding.right;
