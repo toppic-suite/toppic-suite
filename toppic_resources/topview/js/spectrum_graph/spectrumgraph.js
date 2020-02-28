@@ -1,71 +1,52 @@
-const circlesPerRange = 100;
-const peaksPerRange = 100;
+const circlesPerRange = 200;
+const peaksPerRange = 200;
 SpectrumGraph = function(svgId,spectrumParameters,peakData, ionData){
 	this.svg = d3.select("body").select(svgId);
-  this.id = svgId;
-  this.para = spectrumParameters;
-  this.data = peakData;
-  this.ionData = ionData;
-  let graph = this;
-  let tempid = svgId.split("#")[1];
-	console.log(svgId);
-this.redraw = function(mono_mz,id) {
-     this.para = compSpectrumParameters(this.data.peak_list, this.data.envelope_list, mono_mz);
-	 spectrumParameters = drawSpectrum(this.id, this.para, this.data,this.ionData);
-	 if(svgId != spectrumParameters.graphFeatures.popupMs2SpectrumId)
-	 {
+  	this.id = svgId;
+  	this.para = spectrumParameters;
+	this.data = peakData;
+	this.ionData = ionData;
+	let graph = this;
+	let tempid = svgId.split("#")[1];
+	this.redraw = function(mono_mz,id) {
+		this.para = compSpectrumParameters(this.data.peak_list, this.data.envelope_list, mono_mz);
+		spectrumParameters = drawSpectrum(this.id, this.para, this.data,this.ionData);
 		correspondingSpecParams_g[tempid] = jQuery.extend(true, {}, spectrumParameters);
-	 }
-   }
-
-  this.zoomed = function () {
-    let transform = d3.event.transform;
-    //let distance = transform.x - spectrumParameters.specX;
-    let distance = transform.x - spectrumParameters.specX;
-	  let ratio = transform.k / spectrumParameters.specScale;
-	  spectrumParameters.specX = transform.x;
-	  spectrumParameters.specScale = transform.k;
-    let mousePos = d3.mouse(this);
-    if (ratio == 1) {
-		spectrumParameters.drag(distance);
-    }
-    else {
-		spectrumParameters.zoom(mousePos[0], mousePos[1], ratio);
-    }
-	spectrumParameters = drawSpectrum(svgId, spectrumParameters, peakData, ionData);
-	// console.log("transform.x : ", transform.x);
-	// console.log("transform.k : ", transform.k);
-	if(svgId != spectrumParameters.graphFeatures.popupMs2SpectrumId)
-	{
-		correspondingSpecParams_g[tempid] = jQuery.extend(true, {}, spectrumParameters);//spectrumParameters;
 	}
- // console.log("correspondingSpecParams_g zoom : ", correspondingSpecParams_g);
-  }
 
-  this.zoom = d3.zoom()
-    .on("zoom", this.zoomed);
+	this.zoomed = function () {
+		let transform = d3.event.transform;
+		let distance = transform.x - spectrumParameters.specX;
+		let ratio = transform.k / spectrumParameters.specScale;
+		spectrumParameters.specX = transform.x;
+		spectrumParameters.specScale = transform.k;
+		let mousePos = d3.mouse(this);
+		if (ratio == 1) {
+			spectrumParameters.drag(distance);
+		}
+		else {
+			spectrumParameters.zoom(mousePos[0], mousePos[1], ratio);
+		}
+		spectrumParameters = drawSpectrum(svgId, spectrumParameters, peakData, ionData);
+		correspondingSpecParams_g[tempid] = jQuery.extend(true, {}, spectrumParameters);
+	}
 
+	this.zoom = d3.zoom()
+		.on("zoom", this.zoomed);
 	this.svg.attr("viewBox", "0 0 "+ spectrumParameters.svgWidth+" "+ spectrumParameters.svgHeight)
 					.attr("width", "100%")
 					.attr("height", "100%")
 					.call(this.zoom);
 	this.svg.call(this.zoom.transform, d3.zoomIdentity);
-	
-	// console.log("this.para : ", this.para);
-	spectrumParameters = drawSpectrum(svgId, spectrumParameters, peakData, ionData); 
-	if(svgId != spectrumParameters.graphFeatures.popupMs2SpectrumId)
-	{
-		correspondingSpecParams_g[tempid] = jQuery.extend(true, {}, spectrumParameters);
-	}
-  	// console.log("correspondingSpecParams_g zoom : ", correspondingSpecParams_g);
 
-  return graph;
+	spectrumParameters = drawSpectrum(svgId, spectrumParameters, peakData, ionData); 
+	correspondingSpecParams_g[tempid] = jQuery.extend(true, {}, spectrumParameters);
+
+	return graph;
 }
 
 drawTicks = function(svg,spectrumParameters,spectrumgraph){
-	
 	this.addXTicks = svg.append("g").attr("id","ticks");
-	
 	for(let i=0; i <= spectrumParameters.xTicks ; i++)
 	{
 		let tickWidth = spectrumParameters.getTickWidth();
@@ -92,7 +73,6 @@ drawTicks = function(svg,spectrumParameters,spectrumgraph){
 	}
 	this.addYTicks = svg.append("g").attr("id","ticks")
 									.attr("class","ticks");
-	
 	for(let i=0; i <= spectrumParameters.yTicks ; i++)
 	{
 		let tickHeight = spectrumParameters.getTickHeight();
@@ -130,8 +110,6 @@ drawAxis = function(svg,spectrumParameters,spectrumgraph){
 					.attr("stroke-width","2")
 }
 addDatatoAxis = function(svg,spectrumParameters){
-	//let currentMinPeakVal;
-	//let currentMaxPeakVal;
 	let maxMz = spectrumParameters.maxMz;
 	let minMz = spectrumParameters.minMz ;
 	let maxInte = spectrumParameters.dataMaxInte ;
@@ -196,7 +174,6 @@ addDatatoAxis = function(svg,spectrumParameters){
 						.style("font-size","14px")
 		}
 	}
-	//return [currentMinPeakVal,currentMaxPeakVal];
 }
 addBackGround = function(svg,spectrumParameters){
 	let svg_temp = svg.append("g")
@@ -349,8 +326,6 @@ drawSequence = function(svg,spectrumParameters){
 	let seqSvg = svg.append("g").attr("id", "graph_sequence");
 	let sequenceData = spectrumParameters.graphFeatures.prefixSequenceData;
 	sequenceData.forEach(function(element){
-		//let percentInte = element.intensity/maxIntensity * 100 ;
-		//let inLimit = false;
 		if(element.mass > spectrumParameters.minMz && element.mass <= spectrumParameters.maxMz)
 		{
 			seqSvg.append("text")
@@ -359,15 +334,12 @@ drawSequence = function(svg,spectrumParameters){
 			.attr("y",spectrumParameters.padding.head-40)
 			.style("fill","black")
 			.style("opacity", "0.6")
-			//.style("stroke",envelope_list.color)
 			.style("stroke-width","2")
 			.text(element.acid+"|");
 		}
 	})
 	sequenceData = spectrumParameters.graphFeatures.suffixSequeceData;
 	sequenceData.forEach(function(element){
-		//let percentInte = element.intensity/maxIntensity * 100 ;
-		//let inLimit = false;
 		if(element.mass > spectrumParameters.minMz && element.mass <= spectrumParameters.maxMz)
 		{
 			seqSvg.append("text")
@@ -376,7 +348,6 @@ drawSequence = function(svg,spectrumParameters){
 			.attr("y",spectrumParameters.padding.head-20)
 			.style("fill","black")
 			.style("opacity", "0.6")
-			//.style("stroke",envelope_list.color)
 			.style("stroke-width","2")
 			.text("|"+element.acid);
 		}
@@ -462,47 +433,39 @@ onMouseOut = function(){
 	d3.selectAll("#MyTextMassCharge").remove();
 }
 function drawSpectrum(svgId, spectrumParameters, peakData,ionData){
-	// if(spectrumParameters.minMz > -500 )
-	// {
-		let svg = d3.select("body").select(svgId);
-		svg.selectAll("#xtext").remove();
-		svg.selectAll("#ticks").remove();
-		svg.selectAll("#svg_bgColor").remove();
-		svg.selectAll("#peaks").remove();
-		svg.selectAll("#axisPoints").remove();
-		svg.selectAll("#axis").remove();
-		svg.selectAll("#circles").remove();
-		svg.selectAll("#graph_ions").remove();
-		svg.selectAll("#graph_sequence").remove();
-		svg.selectAll("#label").remove();
+	let svg = d3.select("body").select(svgId);
+	svg.selectAll("#xtext").remove();
+	svg.selectAll("#ticks").remove();
+	svg.selectAll("#svg_bgColor").remove();
+	svg.selectAll("#peaks").remove();
+	svg.selectAll("#axisPoints").remove();
+	svg.selectAll("#axis").remove();
+	svg.selectAll("#circles").remove();
+	svg.selectAll("#graph_ions").remove();
+	svg.selectAll("#graph_sequence").remove();
+	svg.selectAll("#label").remove();
 	/*call onMouseOut everytime to fix onHover bug adding multiple data when mouseover and zoomed up*/
-	
-		onMouseOut();
-		drawTicks(svg, spectrumParameters, peakData);
-		drawAxis(svg,spectrumParameters);
-		addDatatoAxis(svg,spectrumParameters);
-		addLabels(svg, spectrumParameters);
-		if(spectrumParameters.graphFeatures.isAddbgColor)
-		{
-			addBackGround(svg, spectrumParameters);
-		}
-		drawPeaks(svg, spectrumParameters, peakData);
-		if(spectrumParameters.graphFeatures.showCircles && peakData.envelope_list != null)
-		{
-			addCircles(svg,spectrumParameters,peakData);
-		}
-		if(spectrumParameters.graphFeatures.showIons && ionData != null)
-		{
-			drawIons(svg,spectrumParameters,ionData);
-		}
-		if(spectrumParameters.graphFeatures.showSequene)
-		{
-			drawSequence(svg,spectrumParameters);
-		}
-		
-		//SpectrumDownload.addDownloadRect(svgId, spectrumParameters);
-	// }
-//   addDownloadRect(svgId, spectrumParameters);
-	
+	onMouseOut();
+	drawTicks(svg, spectrumParameters, peakData);
+	drawAxis(svg,spectrumParameters);
+	addDatatoAxis(svg,spectrumParameters);
+	addLabels(svg, spectrumParameters);
+	if(spectrumParameters.graphFeatures.isAddbgColor)
+	{
+		addBackGround(svg, spectrumParameters);
+	}
+	drawPeaks(svg, spectrumParameters, peakData);
+	if(spectrumParameters.graphFeatures.showCircles && peakData.envelope_list != null)
+	{
+		addCircles(svg,spectrumParameters,peakData);
+	}
+	if(spectrumParameters.graphFeatures.showIons && ionData != null)
+	{
+		drawIons(svg,spectrumParameters,ionData);
+	}
+	if(spectrumParameters.graphFeatures.showSequene)
+	{
+		drawSequence(svg,spectrumParameters);
+	}
 	return spectrumParameters;
 }
