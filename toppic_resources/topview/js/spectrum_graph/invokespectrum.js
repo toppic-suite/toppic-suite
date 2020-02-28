@@ -16,6 +16,8 @@ addSpectrum = function(id,peakList,envelopeList,monoMZ, ionData, graphFeatures){
 	specParameters.padding = graphFeatures.padding;
 	specParameters.specWidth = graphFeatures.specWidth;
 	specParameters.specHeight = graphFeatures.specHeight;
+	specParameters.svgHeight = graphFeatures.svgHeight;
+	specParameters.padding.head = graphFeatures.padding.head;
 	let spectrumGraph;
 	spectrumGraph = new SpectrumGraph(id,specParameters,peakData,ionData);
 	return spectrumGraph;

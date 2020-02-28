@@ -173,6 +173,7 @@ function graphOnClickActions(){
         //let element = document.getElementById(id);
         //$(".ms2_popup_scanIds.active").removeClass("active");
         //element.classList.add("active");  
+        console.log(correspondingSpecParams_g)
         let id = "ms2svg_"+scanId;
         let specparams = jQuery.extend(true, {}, correspondingSpecParams_g[id]);//correspondingSpecParams_g[id];
         let graphFeatures = new GraphFeatures();
@@ -236,13 +237,13 @@ function graphOnClickActions(){
         let currentGraphNode = $('.ms2_scanIds.active')[0].text;
         let scanId = currentGraphNode.split(" ")[1];
 		let [current_data,specId] = getCurrentData(ms2_ScansWithData,scanId);
-        let id = "ms2svg_"+scanId;
+        let id = "popup_ms2_spectrum";
         //Copying as a new variable than referencing. Referencing will change the properties of parent if child properties are changes
         //However, this is a shallow copying, we need to do this for all needed objects in side specparams
         let specparams = jQuery.extend(true, {}, correspondingSpecParams_g[id]);
         specparams.graphFeatures = jQuery.extend(true, {}, correspondingSpecParams_g[id].graphFeatures);
         //let specparams = correspondingSpecParams_g[id];
-        specparams.graphFeatures.showCircles = false;//document.getElementsByName("show_envelops")[0].checked ;
+        specparams.graphFeatures.showCircles = document.getElementsByName("show_envelops")[0].checked ;
         specparams.graphFeatures.showIons = document.getElementsByName("show_ions")[0].checked ;
         reDrawWithSpecParams(current_data,"popup_ms2_spectrum",specparams,specId);
     })
