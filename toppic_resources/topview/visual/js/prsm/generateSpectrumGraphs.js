@@ -26,8 +26,11 @@ function generateCorrespondingGraph(current_data,id,prec_mz,specId){
         let seq = calculatePrefixAndSuffixMassObj.getSequence(prsm_data);
         let massShiftList = calculatePrefixAndSuffixMassObj.getUnknownMassList();
         let prefixMassList = calculatePrefixAndSuffixMassObj.getPrefixMassList(seq,massShiftList,massShift_in);
+        let suffixMassList = calculatePrefixAndSuffixMassObj.getSuffixMassList(seq,massShiftList,massShift_in);
+        console.log("suffixMassList: ", suffixMassList);
         graphFeatures.showSequene = true;
-        graphFeatures.sequenceData = prefixMassList;
+        graphFeatures.prefixSequenceData = prefixMassList;
+        graphFeatures.suffixSequeceData = suffixMassList;
         graphFeatures.svgHeight = graphFeatures.svgHeight+graphFeatures.adjustableHeightVal;
         graphFeatures.padding.head = graphFeatures.padding.head + graphFeatures.adjustableHeightVal;
         graphFeatures.adjustableIonPosition = 10;
