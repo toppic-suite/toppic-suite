@@ -1,5 +1,7 @@
 class CalculatePrefixAndSuffixMass{
 	constructor(){
+		this.fixedPtmList = [{name:"Carbamidomethylation",acid:"C",mass:57.021464},
+								{name:"Carboxymethyl",acid:"C",mass:58.005479}];
 	}
 
 	getIonTypeMass(ionType){
@@ -53,7 +55,7 @@ class CalculatePrefixAndSuffixMass{
 					let len = mass_shift.length;
 					mass_shift.forEach(function(each_mass_shift, i){
 						// Removing -1 as the sequece in inspect elements takes from 0
-						let position = parseInt(each_mass_shift.left_position) - 1 ;
+						let position = parseInt(each_mass_shift.left_position) ;
 						let mass = parseFloat(each_mass_shift.anno);
 						unknownMassShiftList.push({"position":position,"mass":mass})
 					})
@@ -61,7 +63,7 @@ class CalculatePrefixAndSuffixMass{
 				else if(mass_shift.shift_type == "unexpected")
 				{
 					// Removing -1 as the sequece in inspect elements takes from 0
-					let position = parseInt(mass_shift.left_position) - 1;
+					let position = parseInt(mass_shift.left_position);
 					let mass = parseFloat(mass_shift.anno);
 					unknownMassShiftList.push({"position":position,"mass":mass})
 				}
@@ -72,6 +74,7 @@ class CalculatePrefixAndSuffixMass{
 		let seqln = sequence.length;
 		let emptyMassList = [] ;
 		massShiftList = massShiftList.slice();
+		massShiftList = this.getFixedPTMMassList(massShiftList,prsm_data.prsm);
 		if(seqln != 0)
 		{
 			let prefixMassList = new Array(seqln);
@@ -117,13 +120,70 @@ class CalculatePrefixAndSuffixMass{
 			// Adding Mass Shift based on selection of Ion
 			// let utilFunctionsObj = new utilFunctions();
 			// let ionMassShiftVal = utilFunctionsObj.getNTerminusMassShiftVal();
-			for(let j=0;j<seqln;j++)
+			if(massShift_in != 0)
 			{
-				prefixMassList[j].mass = prefixMassList[j].mass + massShift_in;
+				for(let j=0;j<seqln;j++)
+				{
+					prefixMassList[j].mass = prefixMassList[j].mass + massShift_in;
+				}
 			}
 			return prefixMassList;
 		}
 		return emptyMassList;
+	}
+	getSuffixMassList(sequence,massShiftList,massShift_in){
+		let seqln = sequence.length;
+		let emptyMassList = [];
+		// As the elements starts from 0
+		if(seqln != 0)
+		{
+			let temp_seqln = seqln-1;
+			massShiftList = this.getFixedPTMMassList(massShiftList,prsm_data.prsm);;
+			let shiftListln = massShiftList.length;
+			let suffixMassList = new Array(seqln);
+			for(let i=temp_seqln ; i >= 0 ; i--)
+			{
+				// Get Calculated AminoAcidDistribution from aminoAcidDistributuion.js
+				let AcidMass = getAminoAcidDistribution(sequence[i])[0].mass;
+				if(i == temp_seqln)
+				{
+					// Add 1 to i as the seq start from 0 but the peak id starts from 1
+					let position = temp_seqln - i;
+					// Adding water mass for suffix, indirectly this will add water mass to all the masses
+					let mass = AcidMass;//
+					if(suffixMassList != 0)
+					{
+						mass = this.addMassShift(i,massShiftList,mass)
+					}
+					let tempObj = {acid:sequence[i],position:(i+1),mass:mass};
+					//let tempObj = {position:(position+1),mass:mass} ;
+					suffixMassList[position] = tempObj;
+				}
+				else
+				{
+					//Don't add water here
+					let position = temp_seqln - i;
+					let mass = suffixMassList[(position-1)].mass + AcidMass;
+					if(suffixMassList != 0)
+					{
+						mass = this.addMassShift(i,massShiftList,mass)
+					}
+					// Add 1 to i as the seq start from 0 but the peak id starts from 1
+					let tempObj = {acid:sequence[i],position:(i+1),mass:mass};
+					//let tempObj = {position:(position+1),mass:mass};
+					suffixMassList[position] = tempObj;
+				}
+			}
+			if(massShift_in != 0)
+			{
+				for(let j=0;j<seqln;j++)
+				{
+					suffixMassList[j].mass = suffixMassList[j].mass + massShift_in  ;
+				}
+			}
+			return suffixMassList;
+		}
+		return emptyMassList ;
 	}
 	addMassShift(position,massShiftList,mass){
 		let len = massShiftList.length;
@@ -135,6 +195,77 @@ class CalculatePrefixAndSuffixMass{
 				return mass ;
 			}
 		}
+		return mass ;
+	}
+	getFixedPTMMassList(massShiftList,prsm){
+		let occurence_list = [] ;
+		if(prsm.annotated_protein.annotation.hasOwnProperty("ptm") )
+		{
+			if(Array.isArray(prsm.annotated_protein.annotation.ptm))
+			{
+				prsm.annotated_protein.annotation.ptm.forEach(function(ptm,index){
+					if(ptm.ptm_type == "Fixed")
+					{
+						let mass = this.getMassofFixedPtm(ptm.ptm.abbreviation);
+
+						if(ptm.hasOwnProperty("occurence"))
+						{
+							if(Array.isArray(ptm.occurence))
+							{
+								ptm.occurence.forEach(function(occurence,i){
+									let tempObj = {"position":occurence.left_pos,"mass":mass}
+									massShiftList.push(tempObj);
+								});
+							}
+							else
+							{
+								let tempObj = {"position":occurence.left_pos,"mass":mass}
+								massShiftList.push(tempObj);
+							}
+						}
+					}
+				})
+			}
+			else
+			{
+				if(prsm.annotated_protein.annotation.ptm.hasOwnProperty("occurence"))
+				{
+					if(prsm.annotated_protein.annotation.ptm.ptm_type == "Fixed")
+					{
+						let mass = this.getMassofFixedPtm(prsm.annotated_protein.annotation.ptm.ptm.abbreviation);
+						if(Array.isArray(prsm.annotated_protein.annotation.ptm.occurence))
+						{
+							prsm.annotated_protein.annotation.ptm.occurence.forEach(function(occurence,i){
+								let tempObj = {"position":occurence.left_pos,"mass":mass}
+								massShiftList.push(tempObj);
+							});
+						}
+						else
+						{
+							let tempObj = {"position":prsm.annotated_protein.annotation.ptm.occurence.left_pos,"mass":mass}
+							massShiftList.push(tempObj);
+						}
+					}
+				}
+			}
+		}
+		return massShiftList ;
+	}
+	getMassofFixedPtm(abbrevation)
+	{
+		console.log(abbrevation);
+		let len = this.fixedPtmList.length;
+		for(let i=0;i<len;i++)
+		{
+			if(this.fixedPtmList[i].name == abbrevation)
+			{
+				return this.fixedPtmList[i].mass;
+			}
+		}
+	}
+	// Function to add water to SuffixMass List
+	addWaterMass(){
+		mass = getAminoAcidDistribution(WATER)[0].mass ;
 		return mass ;
 	}
 

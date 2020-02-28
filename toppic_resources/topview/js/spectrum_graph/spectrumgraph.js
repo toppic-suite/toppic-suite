@@ -350,7 +350,24 @@ drawSequence = function(svg,spectrumParameters){
 	let seqSvg = svg.append("g").attr("id", "graph_sequence");
 	let maxIntensity = spectrumParameters.dataMaxInte ;
 	let limits=[0,0,0,0,0,0,0,0];
-	let sequenceData = spectrumParameters.graphFeatures.sequenceData;
+	let sequenceData = spectrumParameters.graphFeatures.prefixSequenceData;
+	sequenceData.forEach(function(element){
+		//let percentInte = element.intensity/maxIntensity * 100 ;
+		//let inLimit = false;
+		if(element.mass > spectrumParameters.minMz && element.mass <= spectrumParameters.maxMz)
+		{
+			seqSvg.append("text")
+			.attr("id","")
+			.attr("x",spectrumParameters.getPeakXPos((element.mass)))
+			.attr("y",spectrumParameters.padding.head-40)
+			.style("fill","black")
+			.style("opacity", "0.6")
+			//.style("stroke",envelope_list.color)
+			.style("stroke-width","2")
+			.text(element.acid+"|");
+		}
+	})
+	sequenceData = spectrumParameters.graphFeatures.suffixSequeceData;
 	sequenceData.forEach(function(element){
 		//let percentInte = element.intensity/maxIntensity * 100 ;
 		//let inLimit = false;
@@ -364,7 +381,7 @@ drawSequence = function(svg,spectrumParameters){
 			.style("opacity", "0.6")
 			//.style("stroke",envelope_list.color)
 			.style("stroke-width","2")
-			.text(element.acid);
+			.text("|"+element.acid);
 		}
 	})
 
