@@ -27,7 +27,6 @@ function generateCorrespondingGraph(current_data,id,prec_mz,specId){
         let massShiftList = calculatePrefixAndSuffixMassObj.getUnknownMassList();
         let prefixMassList = calculatePrefixAndSuffixMassObj.getPrefixMassList(seq,massShiftList,massShift_in);
         let suffixMassList = calculatePrefixAndSuffixMassObj.getSuffixMassList(seq,massShiftList,massShift_in);
-        console.log("suffixMassList: ", suffixMassList);
         graphFeatures.showSequene = true;
         graphFeatures.prefixSequenceData = prefixMassList;
         graphFeatures.suffixSequeceData = suffixMassList;
@@ -175,10 +174,10 @@ function graphOnClickActions(){
         //$(".ms2_popup_scanIds.active").removeClass("active");
         //element.classList.add("active");  
         let id = "ms2svg_"+scanId;
-        let specparams = correspondingSpecParams_g[id];
-        document.getElementsByName("show_envelops")[0].checked = specparams.showCircles;
-        document.getElementsByName("show_ions")[0].checked = specparams.showIons;
-        console.log("specparams : ", id, specparams);
+        let specparams = jQuery.extend(true, {}, correspondingSpecParams_g[id]);//correspondingSpecParams_g[id];
+        let graphFeatures = new GraphFeatures();
+        document.getElementsByName("show_envelops")[0].checked = graphFeatures.showCircles;
+        document.getElementsByName("show_ions")[0].checked = graphFeatures.showIons;
         reDrawWithSpecParams(current_data,"popup_ms2_spectrum",specparams,specId);
 		$("#ms2spectrumpop").draggable({
 			appendTo: "body"
@@ -204,7 +203,6 @@ function graphOnClickActions(){
     $(".monoMass_scanIds").click(function(){
 		let value = this.getAttribute('value');
         let [currentData,specId] = getCurrentData(monoMassDataList,value);
-        console.log("value : ",value);
         id = "monoMassSvg_"+value;
         showCorrespondingGraph(id,".monoMass_svg_graph_class");
 		//generateCorrespondingGraph(currentData,"monoMassSvg_",null,specId);
@@ -239,10 +237,13 @@ function graphOnClickActions(){
         let scanId = currentGraphNode.split(" ")[1];
 		let [current_data,specId] = getCurrentData(ms2_ScansWithData,scanId);
         let id = "ms2svg_"+scanId;
-        let specparams = correspondingSpecParams_g[id];
-        specparams.showCircles = document.getElementsByName("show_envelops")[0].checked ;
-        specparams.showIons = document.getElementsByName("show_ions")[0].checked ;
-        console.log("specparams : ", id, specparams);
+        //Copying as a new variable than referencing. Referencing will change the properties of parent if child properties are changes
+        //However, this is a shallow copying, we need to do this for all needed objects in side specparams
+        let specparams = jQuery.extend(true, {}, correspondingSpecParams_g[id]);
+        specparams.graphFeatures = jQuery.extend(true, {}, correspondingSpecParams_g[id].graphFeatures);
+        //let specparams = correspondingSpecParams_g[id];
+        specparams.graphFeatures.showCircles = false;//document.getElementsByName("show_envelops")[0].checked ;
+        specparams.graphFeatures.showIons = document.getElementsByName("show_ions")[0].checked ;
         reDrawWithSpecParams(current_data,"popup_ms2_spectrum",specparams,specId);
     })
     
