@@ -39,7 +39,7 @@
 namespace toppic{
 
 void TopIndexProcess(std::map<std::string, std::string> &arguments){
-
+  try {
     Argument::outputArguments(std::cout, arguments);
     base_data::init();
 
@@ -95,6 +95,11 @@ void TopIndexProcess(std::map<std::string, std::string> &arguments){
     std::cout << "Deleting temporary files - finished." << std::endl; 
 
     std::cout << "TopIndex - finished." << std::endl;
+    } catch (const char* e) {
+    std::cout << "[Exception]" << std::endl;
+    std::cout << e << std::endl;
+    exit(EXIT_FAILURE);
+  }
 }
 
 

@@ -117,22 +117,28 @@ bool isValidFile(std::string &file_name) {
 
 void mergeFiles(TopfdParaPtr para_ptr, 
                 std::vector<std::string> &spec_file_lst) {
-  std::string para_str = para_ptr->getParaStr("#");
-  std::string merged_file_name = para_ptr->merged_file_name_;
-  std::cout << "Merging files started." << std::endl;
-  MsAlignFracMergePtr msalign_merger 
-      = std::make_shared<MsAlignFracMerge>(spec_file_lst, merged_file_name);
-  msalign_merger->process(para_str);
-  msalign_merger = nullptr;
-  DeconvJsonMergePtr json_merger 
-      = std::make_shared<DeconvJsonMerge>(spec_file_lst, merged_file_name);
-  json_merger->process();
-  json_merger = nullptr;
-  FeatureMergePtr feature_merger 
-      = std::make_shared<FeatureMerge>(spec_file_lst, merged_file_name);
-  feature_merger->process(para_str);
-  feature_merger = nullptr;
-  std::cout << "Merging files finished." << std::endl;
+  try{
+    std::string para_str = para_ptr->getParaStr("#");
+    std::string merged_file_name = para_ptr->merged_file_name_;
+    std::cout << "Merging files started." << std::endl;
+    MsAlignFracMergePtr msalign_merger 
+        = std::make_shared<MsAlignFracMerge>(spec_file_lst, merged_file_name);
+    msalign_merger->process(para_str);
+    msalign_merger = nullptr;
+    DeconvJsonMergePtr json_merger 
+        = std::make_shared<DeconvJsonMerge>(spec_file_lst, merged_file_name);
+    json_merger->process();
+    json_merger = nullptr;
+    FeatureMergePtr feature_merger 
+        = std::make_shared<FeatureMerge>(spec_file_lst, merged_file_name);
+    feature_merger->process(para_str);
+    feature_merger = nullptr;
+    std::cout << "Merging files finished." << std::endl;
+  } catch (const char* e) {
+    std::cout << "[Exception]" << std::endl;
+    std::cout << e << std::endl;
+    exit(EXIT_FAILURE);
+  }
 }
 
 int process(TopfdParaPtr para_ptr,  std::vector<std::string> spec_file_lst) {
