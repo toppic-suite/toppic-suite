@@ -31,7 +31,7 @@
 #include "ms/spec/deconv_json_merge.hpp"
 #include "ms/feature/feature_merge.hpp"
 
-#include "prsm/prsm_para.hpp"
+#include "para/prsm_para.hpp"
 #include "prsm/prsm_str_merge.hpp"
 #include "prsm/prsm_form_filter.hpp"
 #include "prsm/prsm_top_selector.hpp"

@@ -16,7 +16,7 @@
 #define TOPPIC_FILTER_DIAG_DIAG_FILTER_MNG_HPP_
 
 #include <boost/thread.hpp>
-#include "prsm/prsm_para.hpp"
+#include "para/prsm_para.hpp"
 
 namespace toppic {
 

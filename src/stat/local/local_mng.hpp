@@ -21,7 +21,7 @@
 #include <vector>
 #include <utility>
 
-#include "prsm/prsm_para.hpp"
+#include "para/prsm_para.hpp"
 #include "seq/proteoform.hpp"
 #include "common/base/base_data.hpp"
 #include "seq/fasta_reader.hpp"

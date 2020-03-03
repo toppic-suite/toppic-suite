@@ -15,7 +15,7 @@
 #ifndef TOPPIC_PRSM_SIMPLE_TABLE_WRITER_HPP_
 #define TOPPIC_PRSM_SIMPLE_TABLE_WRITER_HPP_
 
-#include "prsm/prsm_para.hpp"
+#include "para/prsm_para.hpp"
 
 namespace toppic {
 

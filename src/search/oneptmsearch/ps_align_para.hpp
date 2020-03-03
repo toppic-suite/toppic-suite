@@ -16,7 +16,7 @@
 #ifndef TOPPIC_SEARCH_ONE_PTM_SEARCH_PS_ALIGN_PARA_HPP_
 #define TOPPIC_SEARCH_ONE_PTM_SEARCH_PS_ALIGN_PARA_HPP_
 
-#include "prsm/prsm_para.hpp"
+#include "para/prsm_para.hpp"
 
 namespace toppic {
 
