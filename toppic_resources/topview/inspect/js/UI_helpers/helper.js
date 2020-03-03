@@ -178,7 +178,8 @@ class UIHelper{
       $(".peakRows").click(function() {
         /*	get Mono M/z value till 3 decimal values	*/
         let peak_value = parseFloat(this.innerHTML).toFixed(3) ;
-        ms2_graph.redraw(peak_value);
+        let graphFeatures = new GraphFeatures();
+        ms2_graph.redraw(peak_value,graphFeatures);
       });
     }
     // Function to diaplsy matched count and un-matched count
