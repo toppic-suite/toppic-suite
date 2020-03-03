@@ -18,7 +18,7 @@
 
 #include "ms/spec/deconv_ms.hpp"
 #include "ms/spec/extend_ms.hpp"
-#include "ms/spec/sp_para.hpp"
+#include "para/sp_para.hpp"
 
 namespace toppic {
 

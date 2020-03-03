@@ -16,7 +16,7 @@
 #include "common/base/activation_base.hpp"
 #include "common/xml/xml_dom_util.hpp"
 #include "common/xml/xml_dom_document.hpp"
-#include "ms/spec/sp_para.hpp"
+#include "para/sp_para.hpp"
 
 namespace toppic {
 
