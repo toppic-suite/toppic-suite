@@ -17,7 +17,7 @@
 #define TOPPIC_MS_SPEC_PRM_MS_HPP_
 
 #include "ms/spec/prm_peak.hpp"
-#include "ms/spec/peak_tolerance.hpp"
+#include "para/peak_tolerance.hpp"
 #include "ms/spec/ms.hpp"
 
 namespace toppic {

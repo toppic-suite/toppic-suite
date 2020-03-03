@@ -23,7 +23,7 @@
 
 #include "common/xml/xml_dom_element.hpp"
 #include "common/base/activation.hpp"
-#include "ms/spec/peak_tolerance.hpp"
+#include "para/peak_tolerance.hpp"
 
 namespace toppic {
 

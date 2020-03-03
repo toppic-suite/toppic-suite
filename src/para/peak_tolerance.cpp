@@ -15,7 +15,7 @@
 #include "common/util/str_util.hpp"
 #include "common/xml/xml_dom_util.hpp"
 #include "common/xml/xml_dom_document.hpp"
-#include "ms/spec/peak_tolerance.hpp"
+#include "para/peak_tolerance.hpp"
 
 namespace toppic {
 
