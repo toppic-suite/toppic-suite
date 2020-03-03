@@ -11,6 +11,7 @@ SpectrumGraph = function(svgId,spectrumParameters,peakData, ionData){
 	this.redraw = function(mono_mz,id) {
 		this.para = compSpectrumParameters(this.data.peak_list, this.data.envelope_list, mono_mz);
 		spectrumParameters = drawSpectrum(this.id, this.para, this.data,this.ionData);
+		//Copying as a new variable than referencing. Referencing will change the properties of parent if child properties are changes
 		correspondingSpecParams_g[tempid] = jQuery.extend(true, {}, spectrumParameters);
 	}
 
@@ -28,6 +29,7 @@ SpectrumGraph = function(svgId,spectrumParameters,peakData, ionData){
 			spectrumParameters.zoom(mousePos[0], mousePos[1], ratio);
 		}
 		spectrumParameters = drawSpectrum(svgId, spectrumParameters, peakData, ionData);
+		//Copying as a new variable than referencing. Referencing will change the properties of parent if child properties are changes
 		correspondingSpecParams_g[tempid] = jQuery.extend(true, {}, spectrumParameters);
 	}
 
@@ -40,6 +42,7 @@ SpectrumGraph = function(svgId,spectrumParameters,peakData, ionData){
 	this.svg.call(this.zoom.transform, d3.zoomIdentity);
 
 	spectrumParameters = drawSpectrum(svgId, spectrumParameters, peakData, ionData); 
+	//Copying as a new variable than referencing. Referencing will change the properties of parent if child properties are changes
 	correspondingSpecParams_g[tempid] = jQuery.extend(true, {}, spectrumParameters);
 
 	return graph;
@@ -299,27 +302,37 @@ addCircles = function(svg,spectrumParameters,peakData){
 	})
 }
 drawIons = function(svg,spectrumParameters,ionData){
-
 	let ions = svg.append("g").attr("id", "graph_ions");
-	let maxIntensity = spectrumParameters.dataMaxInte ;
-	ionData.forEach(function(element){
-		if(element.mz > spectrumParameters.minMz && element.mz <= spectrumParameters.maxMz)
+	let tickWidth = spectrumParameters.getTickWidth();
+	ionData.forEach((element)=>{
+		if(tickWidth <= spectrumParameters.graphFeatures.tickWidthThreshholdval)
+		{
+			element.forEach(innerElement=>{
+				placeIonOnGraph_innerFunc(innerElement);
+			})
+		}else{
+			let innerElement = element[0];
+			placeIonOnGraph_innerFunc(innerElement);
+		}
+	})
+	function placeIonOnGraph_innerFunc(innerElement){
+		if(innerElement.mz > spectrumParameters.minMz && innerElement.mz <= spectrumParameters.maxMz)
 		{
 			ions.append("text")
 			.attr("id","graph_matched_ions")
-			.attr("x",(spectrumParameters.getPeakXPos((element.mz))-spectrumParameters.graphFeatures.adjustableIonPosition))
+			.attr("x",(spectrumParameters.getPeakXPos((innerElement.mz))-spectrumParameters.graphFeatures.adjustableIonPosition))
 			.attr("y",function(d,i){
-				let y = spectrumParameters.getPeakYPos(element.intensity + (0.1*element.intensity));// Adding 10% to get the Ions on the max Intensity Peak
+				let y = spectrumParameters.getPeakYPos(innerElement.intensity + (0.1*innerElement.intensity));// Adding 10% to get the Ions on the max Intensity Peak
 				if(y <= spectrumParameters.padding.head) return spectrumParameters.padding.head ;
 				else return y ;
-			  })
+				})
 			.style("fill","black")
 			.style("opacity", "0.6")
 			//.style("stroke",envelope_list.color)
 			.style("stroke-width","2")
-			.text(element.ion);
+			.text(innerElement.ion);
 		}
-	})
+	}
 
 }
 drawSequence = function(svg,spectrumParameters){
@@ -335,6 +348,7 @@ drawSequence = function(svg,spectrumParameters){
 			.style("fill","black")
 			.style("opacity", "0.6")
 			.style("stroke-width","2")
+			.style("text-anchor","end")
 			.text(element.acid+"|");
 		}
 	})
@@ -349,6 +363,7 @@ drawSequence = function(svg,spectrumParameters){
 			.style("fill","black")
 			.style("opacity", "0.6")
 			.style("stroke-width","2")
+			.style("text-anchor","start")
 			.text("|"+element.acid);
 		}
 	})

@@ -8,7 +8,6 @@
  *      {createMs1NavEements}, {createMs2NavEements}. 
  * 3.   Once navigation elements are generated, {graphOnClickActions} function is called to set the 
  *      on click actions on the navigation buttons of the spectrum graph
- * 4.   
  */
 function svgIds()
 {
@@ -26,6 +25,7 @@ function generateCorrespondingGraph(current_data,id,prec_mz,specId){
         let seq = calculatePrefixAndSuffixMassObj.getSequence(prsm_data);
         let massShiftList = calculatePrefixAndSuffixMassObj.getUnknownMassList();
         let prefixMassList = calculatePrefixAndSuffixMassObj.getPrefixMassList(seq,massShiftList,massShift_in);
+        massShift_in = calculatePrefixAndSuffixMassObj.getIonTypeMass("Y");
         let suffixMassList = calculatePrefixAndSuffixMassObj.getSuffixMassList(seq,massShiftList,massShift_in);
         graphFeatures.showSequene = true;
         graphFeatures.prefixSequenceData = prefixMassList;
@@ -44,7 +44,6 @@ function generateCorrespondingGraph(current_data,id,prec_mz,specId){
         {
             let ionData = peak_data.getIonData(prsm_data,specId,current_data);
             ms2_graph = new addSpectrum(id, peak_list, envelope_list, prec_mz, ionData, graphFeatures);
-            // Setting correspoding Spectrum params of the graph to its respective graph svg Ids
         }
         else{
             graphFeatures.isAddbgColor = true;
@@ -76,24 +75,6 @@ function getMinMzFromSpectrumData(envelope_list,precursor_mass)
     maxMz = env_peaks[env_peaks.length-1].mz;
     return[minMz,maxMz];
 }
-// function createMultipleSvgs(current_data)
-// {
-//     let div = document.getElementById("ms2svg_div"); 
-//     current_data.forEach(function(element,i){
-//         let id = "ms2svg_"+element.scanId;
-//         let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");;
-//         svg.setAttribute("id",id);
-//         svg.setAttribute("class","ms2_svg_graph_class");
-//         svg.style.backgroundColor = "#F8F8F8"; 
-//         if(i != 0)
-//         {
-//             svg.style.display = "none"; 
-//         }
-//         div.appendChild(svg);
-//         generateCorrespondingGraph(element.value,id,null,element.specId);
-//     });
-// }
-
 function reDrawWithSpecParams(current_data,id,spectrumParameters,specId)
 {
     let peak_data = new PeakData();
@@ -127,7 +108,6 @@ function createMultipleSvgs(divId,svgId,className,current_data){
 
 function createMultiplePopUpSvgs(current_data)
 {
-    //<svg id = "ms2svg" style = "background-color:#F8F8F8;display: none;"></svg>
     let div = document.getElementById("ms2_graph_popup_nav_div"); 
     current_data.forEach(function(element,i){
         let id = "ms2svg_popup_"+element.scanId;
@@ -155,25 +135,15 @@ function createDummySpecParamsList(current_data){
 }
 function showCorrespondingGraph(id,className)
 {
-    //id = id+scanId;
     $(className).hide();
     document.getElementById(id).style = "block";
 }
-
-
 function graphOnClickActions(){
 
     $("#graph_download").click(function(){
-		//$("#ms2_graph_popup_nav li").remove();
-        //let scanIdList = prsm_data.prsm.ms.ms_header.scans.split(" ");
         let currentGraphNode = $('.ms2_scanIds.active')[0].text;
         let scanId = currentGraphNode.split(" ")[1];
 		let [current_data,specId] = getCurrentData(ms2_ScansWithData,scanId);
-        //let id = "ms2_popup_scanIds_"+scanId;
-        //let element = document.getElementById(id);
-        //$(".ms2_popup_scanIds.active").removeClass("active");
-        //element.classList.add("active");  
-        console.log(correspondingSpecParams_g)
         let id = "ms2svg_"+scanId;
         let specparams = jQuery.extend(true, {}, correspondingSpecParams_g[id]);//correspondingSpecParams_g[id];
         let graphFeatures = new GraphFeatures();
@@ -194,13 +164,7 @@ function graphOnClickActions(){
 		$("#ms2_graph_nav .active").removeClass("active");
    		$(this).addClass("active");
 	})
-	// $(".ms1_scanIds").click(function(){
-	// 	let value = this.getAttribute('value');
-	// 	let [currentData,specId] = getCurrentData(ms1_ScansWithData,value);
-	// 	generateCorrespondingGraph(currentData,"popupspectrum",null,specId);
-	// 	$("#ms1_graph_nav .active").removeClass("active");
-   	// 	$(this).addClass("active");
-    // })
+	
     $(".monoMass_scanIds").click(function(){
 		let value = this.getAttribute('value');
         let [currentData,specId] = getCurrentData(monoMassDataList,value);
@@ -223,7 +187,7 @@ function graphOnClickActions(){
         id = "monoMassSvg_"+CurrentScanVal;
         showCorrespondingGraph(id,".monoMass_svg_graph_class");
         [currentData,specId] = getCurrentData(monoMassDataList,CurrentScanVal);
-        let CurrentMonoMassVal = $("#"+parent_id+" .row_monoMass").html();//document.getElementById(parent_id)..innerHTML;
+        let CurrentMonoMassVal = $("#"+parent_id+" .row_monoMass").html();
         generateCorrespondingGraph(currentData,id,parseFloat(CurrentMonoMassVal),specId);
         activateCurrentnavbar("ms2_graph_nav",CurrentScanVal);
         activateCurrentnavbar("monoMass_nav",CurrentScanVal);
@@ -232,8 +196,6 @@ function graphOnClickActions(){
     });
 
     $("#ms2_popup_redraw").click(function(){
-		//$("#ms2_graph_popup_nav li").remove();
-        //let scanIdList = prsm_data.prsm.ms.ms_header.scans.split(" ");
         let currentGraphNode = $('.ms2_scanIds.active')[0].text;
         let scanId = currentGraphNode.split(" ")[1];
 		let [current_data,specId] = getCurrentData(ms2_ScansWithData,scanId);
@@ -242,7 +204,6 @@ function graphOnClickActions(){
         //However, this is a shallow copying, we need to do this for all needed objects in side specparams
         let specparams = jQuery.extend(true, {}, correspondingSpecParams_g[id]);
         specparams.graphFeatures = jQuery.extend(true, {}, correspondingSpecParams_g[id].graphFeatures);
-        //let specparams = correspondingSpecParams_g[id];
         specparams.graphFeatures.showCircles = document.getElementsByName("show_envelops")[0].checked ;
         specparams.graphFeatures.showIons = document.getElementsByName("show_ions")[0].checked ;
         reDrawWithSpecParams(current_data,"popup_ms2_spectrum",specparams,specId);
