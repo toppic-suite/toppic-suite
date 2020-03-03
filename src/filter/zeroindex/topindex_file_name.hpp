@@ -18,7 +18,7 @@
 #include <vector>
 #include <map>
 
-#include "prsm/prsm_para.hpp"
+#include "para/prsm_para.hpp"
 
 namespace toppic{
 class TopIndexFileName{

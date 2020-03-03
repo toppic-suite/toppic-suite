@@ -18,7 +18,7 @@
 
 #include <string>
 
-#include "prsm/prsm_para.hpp"
+#include "para/prsm_para.hpp"
 #include "search/oneptmsearch/ps_align_para.hpp"
 
 namespace toppic {

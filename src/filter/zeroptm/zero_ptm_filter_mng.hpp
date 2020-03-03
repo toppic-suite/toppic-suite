@@ -17,7 +17,7 @@
 
 #include <boost/thread.hpp>
 
-#include "prsm/prsm_para.hpp"
+#include "para/prsm_para.hpp"
 
 namespace toppic {
 

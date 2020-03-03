@@ -19,7 +19,7 @@
 #include <cmath>
 #include <string>
 
-#include "prsm/prsm_para.hpp"
+#include "para/prsm_para.hpp"
 
 namespace toppic {
 

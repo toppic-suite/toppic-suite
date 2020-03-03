@@ -20,7 +20,7 @@
 #include "common/base/mass_constant.hpp"
 #include "common/base/mod_util.hpp"
 #include "common/base/prot_mod_base.hpp"
-#include "prsm/prsm_para.hpp"
+#include "para/prsm_para.hpp"
 
 namespace toppic {
 
