@@ -13,12 +13,16 @@ addSpectrum = function(id,peakList,envelopeList,monoMZ, ionData, graphFeatures){
 	{
 		specParameters.graphFeatures.showIons = false ;
 	}
+	else{
+		ionData = groupBy(ionData,'ion');
+	}
 	specParameters.padding = graphFeatures.padding;
 	specParameters.specWidth = graphFeatures.specWidth;
 	specParameters.specHeight = graphFeatures.specHeight;
 	specParameters.svgHeight = graphFeatures.svgHeight;
 	specParameters.padding.head = graphFeatures.padding.head;
 	let spectrumGraph;
+	
 	spectrumGraph = new SpectrumGraph(id,specParameters,peakData,ionData);
 	return spectrumGraph;
 }
@@ -126,4 +130,14 @@ sortEnvelopes = function(envelopeList)
 	 	return d3.descending(x.env_peaks[0].intensity, y.env_peaks[0].intensity);
 	})
 	return envelopeList ;
+}
+function groupBy(listData,keyValue){
+	const map = new Map();
+    listData.forEach((element)=>{
+        const key = element[keyValue];
+        const collection = map.get(key);
+        if(!collection) map.set(key,[element]);
+        else collection.push(element);
+    });
+    return map;
 }

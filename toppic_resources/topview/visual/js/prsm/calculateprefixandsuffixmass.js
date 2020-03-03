@@ -263,10 +263,10 @@ class CalculatePrefixAndSuffixMass{
 		}
 	}
 	// Function to add water to SuffixMass List
-	addWaterMass(){
-		mass = getAminoAcidDistribution(WATER)[0].mass ;
-		return mass ;
-	}
+	// addWaterMass(){
+	// 	mass = getAminoAcidDistribution(WATER)[0].mass ;
+	// 	return mass ;
+	// }
 
 }
 
