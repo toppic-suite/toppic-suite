@@ -22,7 +22,7 @@
 
 #include "common/base/residue.hpp"
 
-#include "ms/spec/sp_para.hpp"
+#include "para/sp_para.hpp"
 
 #include "stat/mcmc/mcmc_mng.hpp"
 

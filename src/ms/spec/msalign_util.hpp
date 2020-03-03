@@ -16,7 +16,7 @@
 #ifndef TOPPIC_MS_SPEC_MSALIGN_UTIL_HPP_
 #define TOPPIC_MS_SPEC_MSALIGN_UTIL_HPP_
 
-#include "ms/spec/sp_para.hpp"
+#include "para/sp_para.hpp"
 #include "ms/spec/msalign_reader.hpp"
 
 namespace toppic {

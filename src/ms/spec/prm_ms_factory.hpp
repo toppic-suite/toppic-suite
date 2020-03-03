@@ -16,7 +16,7 @@
 #ifndef TOPPIC_MS_SPEC_PRM_MS_FACTORY_HPP_
 #define TOPPIC_MS_SPEC_PRM_MS_FACTORY_HPP_
 
-#include "ms/spec/sp_para.hpp"
+#include "para/sp_para.hpp"
 #include "ms/spec/deconv_ms.hpp"
 #include "ms/spec/prm_ms.hpp"
 
