@@ -8,8 +8,9 @@ SpectrumGraph = function(svgId,spectrumParameters,peakData, ionData){
 	this.ionData = ionData;
 	let graph = this;
 	let tempid = svgId.split("#")[1];
-	this.redraw = function(mono_mz,id) {
+	this.redraw = function(mono_mz,graphFeatures) {
 		this.para = compSpectrumParameters(this.data.peak_list, this.data.envelope_list, mono_mz);
+		this.para.graphFeatures = graphFeatures;
 		spectrumParameters = drawSpectrum(this.id, this.para, this.data,this.ionData);
 		//Copying as a new variable than referencing. Referencing will change the properties of parent if child properties are changes
 		correspondingSpecParams_g[tempid] = jQuery.extend(true, {}, spectrumParameters);
@@ -448,6 +449,7 @@ onMouseOut = function(){
 	d3.selectAll("#MyTextMassCharge").remove();
 }
 function drawSpectrum(svgId, spectrumParameters, peakData,ionData){
+	console.log("spectrumParameters : ", spectrumParameters);
 	let svg = d3.select("body").select(svgId);
 	svg.selectAll("#xtext").remove();
 	svg.selectAll("#ticks").remove();
