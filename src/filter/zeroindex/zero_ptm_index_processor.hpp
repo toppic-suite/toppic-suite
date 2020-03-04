@@ -15,7 +15,7 @@
 #ifndef TOPPIC_FILTER_ZERO_INDEX_ZERO_PTM_INDEX_PROCESSOR_HPP_
 #define TOPPIC_FILTER_ZERO_INDEX_ZERO_PTM_INDEX_PROCESSOR_HPP_
 
-#include "filter/zeroptm/zero_ptm_filter_mng.hpp"
+#include "filter/mng/zero_ptm_filter_mng.hpp"
 
 namespace toppic{
     

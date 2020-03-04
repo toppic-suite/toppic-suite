@@ -17,7 +17,7 @@
 #define TOPPIC_SEARCH_GRAPH_ALIGN_GRAPH_ALIGN_HPP_
 
 #include "prsm/prsm.hpp"
-#include "search/oneptmsearch/diagonal_header.hpp"
+#include "search/diag/diagonal_header.hpp"
 #include "search/graph/graph.hpp"
 #include "search/graph/proteo_graph.hpp"
 #include "search/graph/spec_graph.hpp"

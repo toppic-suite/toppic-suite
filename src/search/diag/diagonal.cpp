@@ -21,7 +21,7 @@
 #include "common/base/neutral_loss_base.hpp"
 #include "prsm/theo_peak_util.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
-#include "search/oneptmsearch/diagonal.hpp"
+#include "search/diag/diagonal.hpp"
 
 namespace toppic {
 

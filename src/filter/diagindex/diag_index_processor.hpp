@@ -16,7 +16,7 @@
 #define TOPPIC_FILTER_DIAG_INDEX_DIAG_INDEX_PROCESSOR_HPP_
 
 #include "seq/db_block.hpp"
-#include "filter/diag/diag_filter_mng.hpp"
+#include "filter/mng/diag_filter_mng.hpp"
 
 namespace toppic{
     

@@ -18,7 +18,7 @@
 #include "ms/spec/extend_ms.hpp"
 #include "prsm/simple_prsm.hpp"
 #include "filter/massmatch/mass_match.hpp"
-#include "filter/zeroptm/zero_ptm_filter_mng.hpp"
+#include "filter/mng/zero_ptm_filter_mng.hpp"
 
 namespace toppic {
 

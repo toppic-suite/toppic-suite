@@ -20,8 +20,8 @@
 #include <vector>
 #include "ms/spec/prm_peak.hpp"
 #include "search/oneptmsearch/pair.hpp"
-#include "search/oneptmsearch/diagonal.hpp"
-#include "search/oneptmsearch/diagonal_header.hpp"
+#include "search/diag/diagonal.hpp"
+#include "search/diag/diagonal_header.hpp"
 
 namespace toppic {
 

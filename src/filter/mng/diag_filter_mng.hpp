@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_FILTER_DIAG_DIAG_FILTER_MNG_HPP_
-#define TOPPIC_FILTER_DIAG_DIAG_FILTER_MNG_HPP_
+#ifndef TOPPIC_FILTER_MNG_DIAG_FILTER_MNG_HPP_
+#define TOPPIC_FILTER_MNG_DIAG_FILTER_MNG_HPP_
 
 #include <boost/thread.hpp>
 #include "para/prsm_para.hpp"

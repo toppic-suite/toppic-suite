@@ -24,17 +24,17 @@
 #include "common/base/base_data.hpp"
 #include "common/util/file_util.hpp"
 
-#include "filter/zeroptm/zero_ptm_filter_mng.hpp"
-#include "filter/zeroindex/zero_ptm_index_processor.hpp"
-#include "filter/oneptm/one_ptm_filter_mng.hpp"
-#include "filter/oneindex/one_ptm_index_processor.hpp"
-#include "filter/diag/diag_filter_mng.hpp"
-#include "filter/diagindex/diag_index_processor.hpp"
-
 #include "seq/fasta_util.hpp"
 #include "seq/db_block.hpp"
 #include "seq/proteoform.hpp"
 #include "seq/proteoform_factory.hpp"
+
+#include "filter/mng/zero_ptm_filter_mng.hpp"
+#include "filter/mng/one_ptm_filter_mng.hpp"
+#include "filter/mng/diag_filter_mng.hpp"
+#include "filter/zeroindex/zero_ptm_index_processor.hpp"
+#include "filter/oneindex/one_ptm_index_processor.hpp"
+#include "filter/diagindex/diag_index_processor.hpp"
 
 namespace toppic{
 

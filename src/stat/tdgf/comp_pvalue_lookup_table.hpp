@@ -19,9 +19,9 @@
 #include <vector>
 #include <fstream>
 
+#include "stat/count/count_test_num.hpp"
 #include "stat/tdgf/tdgf_mng.hpp"
 #include "stat/tdgf/comp_prob_value.hpp"
-#include "stat/tdgf/count_test_num.hpp"
 
 namespace toppic {
 

@@ -12,20 +12,18 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#ifndef TOPPIC_STAT_TDGF_TDGF_UTIL_HPP_
-#define TOPPIC_STAT_TDGF_TDGF_UTIL_HPP_
+#ifndef TOPPIC_STAT_COUNT_TDGF_UTIL_HPP_
+#define TOPPIC_STAT_COUNT_TDGF_UTIL_HPP_
 
 #include <vector>
 #include <string>
 
 #include "seq/proteoform.hpp"
 #include "common/base/residue_freq.hpp"
-#include "stat/tdgf/tdgf_mng.hpp"
 
 namespace toppic {
 
-namespace tdgf_util {
+namespace count_util {
 
 void updateNTermResidueCounts(ResiduePtrVec &residue_list, std::vector<double> &counts,
                               const ProteoformPtrVec &mod_proteo_ptrs);

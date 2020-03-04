@@ -12,7 +12,7 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include "filter/diag/diag_filter_mng.hpp"
+#include "filter/mng/diag_filter_mng.hpp"
 
 namespace toppic {
 

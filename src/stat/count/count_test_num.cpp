@@ -21,17 +21,17 @@
 #include "common/base/residue_base.hpp"
 #include "common/base/residue_util.hpp"
 #include "seq/proteoform_factory.hpp"
-#include "stat/tdgf/tdgf_util.hpp"
-#include "stat/tdgf/count_test_num.hpp"
-#include "stat/tdgf/comp_prob_value.hpp"
+#include "stat/count/count_util.hpp"
+#include "stat/count/count_test_num.hpp"
 
 namespace toppic {
 
-CountTestNum::CountTestNum(TdgfMngPtr mng_ptr) {
-  convert_ratio_ = mng_ptr->convert_ratio_;
-  max_ptm_mass_ = mng_ptr->max_ptm_mass_;
-  max_sp_len_ = static_cast<int>(std::round(mng_ptr->max_prec_mass_ * convert_ratio_));
-  init(mng_ptr->prsm_para_ptr_);
+CountTestNum::CountTestNum(double convert_ratio, double max_ptm_mass, 
+                           double max_prec_mass, PrsmParaPtr prsm_para_ptr) {
+  convert_ratio_ = convert_ratio;
+  max_ptm_mass_ = max_ptm_mass;
+  max_sp_len_ = static_cast<int>(std::round(max_prec_mass * convert_ratio_));
+  init(prsm_para_ptr);
   LOG_DEBUG("count numbers initialized");
 }
 
@@ -107,22 +107,22 @@ void CountTestNum::init(PrsmParaPtr para_ptr) {
     }
 
     // update residue counts 
-    tdgf_util::updateResidueCounts(residue_list,residue_counts, proteo_ptr);
+    count_util::updateResidueCounts(residue_list,residue_counts, proteo_ptr);
 
     // update n terminal residue counts
-    tdgf_util::updateNTermResidueCounts(n_term_residue_list, n_term_residue_counts, mod_proteo_ptrs);
+    count_util::updateNTermResidueCounts(n_term_residue_list, n_term_residue_counts, mod_proteo_ptrs);
 
     // next protein 
     seq_ptr = reader.getNextSeq();
   }
   // compute residue freq;
-  residue_ptrs_ =  tdgf_util::compResidueFreq(residue_list, residue_counts);
+  residue_ptrs_ =  count_util::compResidueFreq(residue_list, residue_counts);
 
   // compute residue average length
-  residue_avg_len_ = tdgf_util::computeAvgLength(residue_ptrs_, convert_ratio_);
+  residue_avg_len_ = count_util::computeAvgLength(residue_ptrs_, convert_ratio_);
 
   // compute n term residue freq;
-  prot_n_term_residue_ptrs_ =  tdgf_util::compResidueFreq(n_term_residue_list, n_term_residue_counts);
+  prot_n_term_residue_ptrs_ =  count_util::compResidueFreq(n_term_residue_list, n_term_residue_counts);
 
   // internal 
   initInternalMassCnt();

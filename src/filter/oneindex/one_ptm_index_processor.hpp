@@ -15,7 +15,7 @@
 #ifndef TOPPIC_FILTER_ONE_INDEX_ONE_PTM_INDEX_PROCESSOR_HPP_
 #define TOPPIC_FILTER_ONE_INDEX_ONE_PTM_INDEX_PROCESSOR_HPP_
 
-#include "filter/oneptm/one_ptm_filter_mng.hpp"
+#include "filter/mng/one_ptm_filter_mng.hpp"
 
 namespace toppic{
     

@@ -16,7 +16,7 @@
 #include <utility>
 #include <vector>
 
-#include "search/oneptmsearch/diagonal_header_util.hpp"
+#include "search/diag/diagonal_header_util.hpp"
 #include "search/ptmsearch/ptm_slow_match.hpp"
 
 namespace toppic {

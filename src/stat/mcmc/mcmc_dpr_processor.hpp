@@ -31,7 +31,7 @@
 #include "prsm/prsm.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 
-#include "stat/tdgf/count_test_num.hpp"
+#include "stat/count/count_test_num.hpp"
 #include "stat/tdgf/comp_pvalue_lookup_table.hpp"
 
 #include "stat/mcmc/mcmc_mng.hpp"

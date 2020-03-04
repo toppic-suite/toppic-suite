@@ -19,7 +19,7 @@
 #include "ms/spec/prm_ms.hpp"
 #include "prsm/simple_prsm.hpp"
 #include "filter/massmatch/mass_match.hpp"
-#include "filter/diag/diag_filter_mng.hpp"
+#include "filter/mng/diag_filter_mng.hpp"
 
 namespace toppic {
 

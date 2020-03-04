@@ -43,17 +43,17 @@
 #include "prsm/prsm_form_filter.hpp"
 #include "prsm/prsm_util.hpp"
 
-#include "filter/zeroptm/zero_ptm_filter_mng.hpp"
+#include "filter/mng/zero_ptm_filter_mng.hpp"
 #include "filter/zeroptm/zero_ptm_filter_processor.hpp"
 #include "search/zeroptmsearch/zero_ptm_search_mng.hpp"
 #include "search/zeroptmsearch/zero_ptm_search_processor.hpp"
 
-#include "filter/oneptm/one_ptm_filter_mng.hpp"
+#include "filter/mng/one_ptm_filter_mng.hpp"
 #include "filter/oneptm/one_ptm_filter_processor.hpp"
 #include "search/oneptmsearch/ptm_search_mng.hpp"
 #include "search/oneptmsearch/one_ptm_search_processor.hpp"
 
-#include "filter/diag/diag_filter_mng.hpp"
+#include "filter/mng/diag_filter_mng.hpp"
 #include "filter/diag/diag_filter_processor.hpp"
 #include "search/ptmsearch/ptm_search_processor.hpp"
 

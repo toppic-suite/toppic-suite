@@ -13,12 +13,12 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_STAT_TDGF_COUNT_TEST_NUM_HPP_
-#define TOPPIC_STAT_TDGF_COUNT_TEST_NUM_HPP_
+#ifndef TOPPIC_STAT_COUNT_COUNT_TEST_NUM_HPP_
+#define TOPPIC_STAT_COUNT_COUNT_TEST_NUM_HPP_
 
 #include "seq/proteoform.hpp"
 #include "common/base/residue_freq.hpp"
-#include "stat/tdgf/tdgf_mng.hpp"
+#include "para/prsm_para.hpp"
 
 namespace toppic {
 
@@ -31,7 +31,10 @@ class CountTestNum {
                double convert_ratio, double max_prec_mass,
                double max_ptm_mass);
                */
-  CountTestNum(TdgfMngPtr mng_ptr);
+  //CountTestNum(TdgfMngPtr mng_ptr);
+
+  CountTestNum(double convert_ratio, double max_ptm_mass, 
+               double max_prec_mass, PrsmParaPtr para_ptr);
 
   ~CountTestNum();
 
