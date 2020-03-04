@@ -12,16 +12,20 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include "filter/zeroptm/zero_ptm_filter_mng.hpp"
+#include "filter/mng/one_ptm_filter_mng.hpp"
 
 namespace toppic {
 
-ZeroPtmFilterMng::ZeroPtmFilterMng(PrsmParaPtr prsm_para_ptr,
-                                   int thread_num,
-                                   const std::string & output_file_ext):
+OnePtmFilterMng::OnePtmFilterMng(PrsmParaPtr prsm_para_ptr,
+                                 const std::string & output_file_ext,
+                                 int thread_num,
+                                 const std::string & residueModFileName,
+                                 int var_num):
     prsm_para_ptr_(prsm_para_ptr),
+    output_file_ext_(output_file_ext),
     thread_num_(thread_num),
-    output_file_ext_(output_file_ext) {}
+    residueModFileName_(residueModFileName),
+    var_num_(var_num) {}
 
+}  // namespace toppic
 
-} 

@@ -18,7 +18,7 @@
 #include "seq/proteoform.hpp"
 
 #include "filter/massmatch/mass_match.hpp"
-#include "filter/oneptm/one_ptm_filter_mng.hpp"
+#include "filter/mng/one_ptm_filter_mng.hpp"
 
 namespace toppic {
 

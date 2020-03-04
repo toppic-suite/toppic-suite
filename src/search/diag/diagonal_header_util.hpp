@@ -13,14 +13,14 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_SEARCH_ONE_PTM_SEARCH_DIAGONAL_HEADER_UTIL_HPP_
-#define TOPPIC_SEARCH_ONE_PTM_SEARCH_DIAGONAL_HEADER_UTIL_HPP_
+#ifndef TOPPIC_SEARCH_DIAG_DIAGONAL_HEADER_UTIL_HPP_
+#define TOPPIC_SEARCH_DIAG_DIAGONAL_HEADER_UTIL_HPP_
 
 #include <limits>
 #include <cmath>
 #include <vector>
 
-#include "search/oneptmsearch/diagonal_header.hpp"
+#include "search/diag/diagonal_header.hpp"
 
 namespace toppic {
 namespace DiagonalHeaderUtil {

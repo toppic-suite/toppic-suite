@@ -16,7 +16,7 @@
 #define TOPPIC_FILTER_ZERO_PTM_ZERO_PTM_FILTER_PROCESSOR_HPP_
 
 #include "seq/db_block.hpp"
-#include "filter/zeroptm/zero_ptm_filter_mng.hpp"
+#include "filter/mng/zero_ptm_filter_mng.hpp"
 
 namespace toppic {
 

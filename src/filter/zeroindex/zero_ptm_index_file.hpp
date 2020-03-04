@@ -16,7 +16,7 @@
 #define TOPPIC_FILTER_ZERO_PTM_ZERO_PTM_INDEX_FILE_HPP_
 
 #include "filter/massmatch/mass_match.hpp"
-#include "filter/zeroptm/zero_ptm_filter_mng.hpp"
+#include "filter/mng/zero_ptm_filter_mng.hpp"
 
 namespace toppic {
 

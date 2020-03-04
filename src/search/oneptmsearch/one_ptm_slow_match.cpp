@@ -16,7 +16,7 @@
 #include <chrono>
 #include <vector>
 
-#include "search/oneptmsearch/diagonal_header_util.hpp"
+#include "search/diag/diagonal_header_util.hpp"
 #include "search/oneptmsearch/one_ptm_slow_match.hpp"
 
 namespace toppic {

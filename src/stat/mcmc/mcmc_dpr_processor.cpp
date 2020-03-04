@@ -40,8 +40,8 @@
 #include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_xml_writer_util.hpp"
 
-#include "stat/tdgf/tdgf_mng.hpp"
-#include "stat/tdgf/count_test_num.hpp"
+//#include "stat/tdgf/tdgf_mng.hpp"
+#include "stat/count/count_test_num.hpp"
 
 #include "stat/mcmc/mcmc_dpr_processor.hpp"
 #include "stat/mcmc/comp_pvalue_mcmc.hpp"
@@ -62,10 +62,13 @@ void DprProcessor::init() {
 
   mass_table_ = mass_table_util::geneMassTable(mng_ptr_);
 
-  TdgfMngPtr tdgf_mng_ptr
-      = std::make_shared<TdgfMng>(mng_ptr_->prsm_para_ptr_, 0, 0.0, false, false, 1, "", "");
+  //TdgfMngPtr tdgf_mng_ptr
+  //    = std::make_shared<TdgfMng>(mng_ptr_->prsm_para_ptr_, 0, 0.0, false, false, 1, "", "");
 
-  test_num_ptr_ = std::make_shared<CountTestNum>(tdgf_mng_ptr);
+  test_num_ptr_ = std::make_shared<CountTestNum>(mng_ptr_->convert_ratio_,
+                                                 mng_ptr_->max_ptm_mass_,
+                                                 mng_ptr_->max_prec_mass_,
+                                                 mng_ptr_->prsm_para_ptr_);
 
   ptm_mass_vec2d_ = compPtmComb();
 }

@@ -16,11 +16,11 @@
 #include <string>
 
 #include "common/base/residue_util.hpp"
-#include "stat/tdgf/tdgf_util.hpp"
+#include "stat/count/count_util.hpp"
 
 namespace toppic {
 
-namespace tdgf_util {
+namespace count_util {
 
 void updateResidueCounts(const ResiduePtrVec &residue_list,
                          std::vector<double> &counts,

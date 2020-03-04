@@ -27,7 +27,10 @@ namespace toppic {
 CompPValueLookupTable::CompPValueLookupTable(TdgfMngPtr mng_ptr) {
   mng_ptr_ = mng_ptr;
   initTable();
-  test_num_ptr_ = std::make_shared<CountTestNum>(mng_ptr);
+  test_num_ptr_ = std::make_shared<CountTestNum>(mng_ptr->convert_ratio_,
+                                                 mng_ptr->max_ptm_mass_,
+                                                 mng_ptr->max_prec_mass_,
+                                                 mng_ptr->prsm_para_ptr_);
   LOG_DEBUG("test number initialized");
 }
 

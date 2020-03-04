@@ -16,7 +16,7 @@
 #define TOPPIC_FILTER_ONE_PTM_ONE_PTM_FILTER_PROCESSOR_HPP_
 
 #include "seq/db_block.hpp"
-#include "filter/oneptm/one_ptm_filter_mng.hpp"
+#include "filter/mng/one_ptm_filter_mng.hpp"
 
 namespace toppic {
 

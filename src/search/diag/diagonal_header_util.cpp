@@ -17,7 +17,7 @@
 #include <cmath>
 #include <vector>
 
-#include "search/oneptmsearch/diagonal_header_util.hpp"
+#include "search/diag/diagonal_header_util.hpp"
 
 namespace toppic {
 // get the header corresponding to the top left corner in the spectral grid

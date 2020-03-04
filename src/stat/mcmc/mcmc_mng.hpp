@@ -65,6 +65,10 @@ class MCMCMng {
 
   int int_tolerance_;
 
+  double max_ptm_mass_ = 1000000;
+
+  double max_prec_mass_ = 100000;  
+
   int getIntTolerance() {return int_tolerance_;}
 };
 

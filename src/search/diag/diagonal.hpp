@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_SEARCH_ONE_PTM_SEARCH_DIAGONAL_HPP_
-#define TOPPIC_SEARCH_ONE_PTM_SEARCH_DIAGONAL_HPP_
+#ifndef TOPPIC_SEARCH_DIAG_DIAGONAL_HPP_
+#define TOPPIC_SEARCH_DIAG_DIAGONAL_HPP_
 
 #include <memory>
 #include <vector>
@@ -22,7 +22,7 @@
 #include "ms/spec/theo_peak.hpp"
 #include "ms/spec/extend_ms.hpp"
 #include "prsm/peak_ion_pair.hpp"
-#include "search/oneptmsearch/diagonal_header.hpp"
+#include "search/diag/diagonal_header.hpp"
 
 namespace toppic {
 

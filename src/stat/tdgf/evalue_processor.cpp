@@ -33,7 +33,10 @@
 namespace toppic {
 
 void EValueProcessor::init() {
-  test_num_ptr_ = std::make_shared<CountTestNum>(mng_ptr_);
+  test_num_ptr_ = std::make_shared<CountTestNum>(mng_ptr_->convert_ratio_,
+                                                 mng_ptr_->max_ptm_mass_,
+                                                 mng_ptr_->max_prec_mass_,
+                                                 mng_ptr_->prsm_para_ptr_);
   LOG_DEBUG("Count test number initialized.");
 
   ResFreqPtrVec residue_freqs = test_num_ptr_->getResFreqPtrVec();

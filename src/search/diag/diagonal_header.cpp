@@ -20,7 +20,7 @@
 #include "common/base/mod_base.hpp"
 #include "seq/alter.hpp"
 #include "prsm/prsm_algo.hpp"
-#include "search/oneptmsearch/diagonal_header.hpp"
+#include "search/diag/diagonal_header.hpp"
 
 namespace toppic {
 
