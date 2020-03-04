@@ -12,12 +12,12 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_PARA_PEAK_TOLERANCE_HPP_
 #define TOPPIC_PARA_PEAK_TOLERANCE_HPP_
 
 #include <string>
 #include <memory>
+#include <vector>
 
 #include "common/xml/xml_dom_element.hpp"
 
@@ -30,7 +30,13 @@ class PeakTolerance {
   PeakTolerance(double ppo, bool use_min_tolerance,
                 double min_tolerance);
 
+  PeakTolerance(const std::string &name, double ppo, 
+                bool use_min_tolerance,
+                double min_tolerance);
+
   explicit PeakTolerance(xercesc::DOMElement* element);
+
+  std::string getName() {return name_;}
 
   double compStrictErrorTole(double mass);
 
@@ -56,6 +62,7 @@ class PeakTolerance {
   static std::string getXmlElementName() {return "peak_tolerance";}
 
  private:
+  std::string name_;
   double ppo_;
   /* whether or not use minimum tolerance */
   bool use_min_tolerance_;
@@ -63,6 +70,7 @@ class PeakTolerance {
 };
 
 typedef std::shared_ptr<PeakTolerance> PeakTolerancePtr;
+typedef std::vector<PeakTolerancePtr> PeakTolerancePtrVec;
 
 } /* namespace toppic */
 

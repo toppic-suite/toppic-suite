@@ -43,7 +43,7 @@ void TopIndexProcess(std::map<std::string, std::string> &arguments){
     Argument::outputArguments(std::cout, arguments);
     base_data::init();
 
-    PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
+    PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>("main", arguments);
 
     std::string ori_db_file_name = arguments["oriDatabaseFileName"];
     std::string db_file_name = arguments["databaseFileName"];

@@ -37,7 +37,14 @@ class SpPara {
          ActivationPtr activation_ptr,
          const std::set<std::string> & skip_list);
 
+  SpPara(const std::string &name, int min_peak_num, 
+         double min_mass, double min_extend_mass,
+         const std::vector<double> &ext_offsets,
+         ActivationPtr activation_ptr);
+
   explicit SpPara(xercesc::DOMElement* element);
+
+  std::string getName() {return name_;}
 
   double getMinMass() {return min_mass_;}
 
@@ -68,6 +75,8 @@ class SpPara {
   int prec_error_ = 1;
 
  private:
+  std::string name_;
+
   int min_peak_num_;
 
   // if the mass if smaller than min_mass, the mass is removed.
@@ -85,6 +94,7 @@ class SpPara {
 };
 
 typedef std::shared_ptr<SpPara> SpParaPtr;
+typedef std::vector<SpParaPtr> SpParaPtrVec;
 
 } /* namespace toppic */
 

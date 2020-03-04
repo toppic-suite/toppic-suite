@@ -16,6 +16,7 @@
 #define TOPPIC_PARA_PRSM_PARA_HPP_
 
 #include <map>
+#include <vector>
 
 #include "common/base/mod.hpp"
 #include "common/base/prot_mod.hpp"
@@ -25,7 +26,10 @@ namespace toppic {
 
 class PrsmPara {
  public:
-  PrsmPara(std::map<std::string,std::string> &arguments);
+  PrsmPara(const std::string &name, 
+           std::map<std::string,std::string> &arguments);
+
+  std::string getName() {return name_;}
 
   std::string getSearchDbFileName() {return search_db_file_name_;}
 
@@ -62,6 +66,8 @@ class PrsmPara {
   void setIndexDir(std::string dir) {index_file_dir_ = dir;}
 
  private:
+  std::string name_;
+
   std::string search_db_file_name_;
 
   std::string ori_db_name_;
@@ -97,6 +103,7 @@ class PrsmPara {
 };
 
 typedef std::shared_ptr<PrsmPara> PrsmParaPtr;
+typedef std::vector<PrsmParaPtr> PrsmParaPtrVec;
 
 } /* namespace toppic */
 

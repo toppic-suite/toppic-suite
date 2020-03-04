@@ -25,11 +25,20 @@ PeakTolerance::PeakTolerance(double ppo, bool use_min_tolerance,
     use_min_tolerance_(use_min_tolerance),
     min_tolerance_(min_tolerance) {}
 
+PeakTolerance::PeakTolerance(const std::string &name, 
+                             double ppo, bool use_min_tolerance,
+                             double min_tolerance):
+    name_(name),
+    ppo_(ppo), 
+    use_min_tolerance_(use_min_tolerance),
+    min_tolerance_(min_tolerance) {}
+
 double PeakTolerance::compRelaxErrorTole(double m1, double m2) {
   return compStrictErrorTole(m1 + m2);
 }
 
 PeakTolerance::PeakTolerance(xercesc::DOMElement* element) {
+  name_ = xml_dom_util::getChildValue(element, "name", 0);
   ppo_ = xml_dom_util::getDoubleChildValue(element, "ppo", 0);
   use_min_tolerance_ = xml_dom_util::getDoubleChildValue(element, "use_min_tolerance", 0);
   min_tolerance_ = xml_dom_util::getDoubleChildValue(element, "min_tolerance", 0);
@@ -47,6 +56,7 @@ void PeakTolerance::appendXml(XmlDOMDocument* xml_doc,
                               xercesc::DOMElement* parent) {
   std::string element_name = PeakTolerance::getXmlElementName();
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
+  xml_doc->addElement(element, "name", name_.c_str());
   std::string str = str_util::toString(ppo_);
   xml_doc->addElement(element, "ppo", str.c_str());
   str = str_util::toString(use_min_tolerance_);

@@ -133,7 +133,7 @@ int TopMG_testModFile(std::map<std::string, std::string> & arguments) {
     LOG_DEBUG("Init base data completed");
 
     // Test arguments
-    PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
+    PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>("main", arguments);
 
     if (arguments["varModFileName"] != "") {
       mod_util::readModTxt(arguments["varModFileName"]);
@@ -188,7 +188,7 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
     LOG_DEBUG("block size " << arguments["databaseBlockSize"]);
     int db_block_size = std::stoi(arguments["databaseBlockSize"]);
 
-    PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
+    PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>("main", arguments);
 
     fasta_util::dbPreprocess(ori_db_file_name, db_file_name, decoy, db_block_size);
     msalign_util::geneSpIndex(sp_file_name, prsm_para_ptr->getSpParaPtr());
@@ -297,7 +297,7 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
     std::string ori_db_file_name = arguments["oriDatabaseFileName"];
     std::string var_mod_file_name = arguments["varModFileName"];
 
-    PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
+    PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>("main", arguments);
     msalign_util::geneSpIndex(sp_file_name, prsm_para_ptr->getSpParaPtr());
 
     std::cout << "Finding PrSM clusters - started." << std::endl;
