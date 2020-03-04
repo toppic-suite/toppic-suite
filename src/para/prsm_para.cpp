@@ -24,7 +24,10 @@
 
 namespace toppic {
 
-PrsmPara::PrsmPara(std::map<std::string, std::string> &arguments) {
+PrsmPara::PrsmPara(const std::string &name, 
+                   std::map<std::string, std::string> &arguments) {
+  name_ = name;
+
   search_db_file_name_ = arguments["databaseFileName"];
 
   ori_db_name_ = arguments["oriDatabaseFileName"];
