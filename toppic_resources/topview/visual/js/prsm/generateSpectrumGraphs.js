@@ -87,7 +87,8 @@ function reDrawWithSpecParams(current_data,id,spectrumParameters,specId)
     envelope_list = sortEnvelopes(envelope_list) ;
     let svgId = "#"+id;
     let peakData = {peak_list:peak_list, envelope_list:envelope_list};
-    new SpectrumGraph(svgId,spectrumParameters,peakData, ionData);
+    let graphFeatures = new GraphFeatures();
+    new SpectrumGraph(svgId,spectrumParameters,peakData, ionData,graphFeatures);
 }
 function createMultipleSvgs(divId,svgId,className,current_data){
     let div = document.getElementById(divId); 
