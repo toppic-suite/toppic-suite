@@ -156,7 +156,7 @@ void SimplePrsmFilter(SimplePrsmPtrVec & selected_prsm_ptrs) {
 void GraphAlignProcessor::process() {
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
-  sp_para_ptr->prec_error_ = 0;
+  sp_para_ptr->setPrecError(0);
   std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
   LOG_DEBUG("Search db file name " << db_file_name);
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();

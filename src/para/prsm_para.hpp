@@ -26,10 +26,7 @@ namespace toppic {
 
 class PrsmPara {
  public:
-  PrsmPara(const std::string &name, 
-           std::map<std::string,std::string> &arguments);
-
-  std::string getName() {return name_;}
+  PrsmPara(std::map<std::string,std::string> &arguments);
 
   std::string getSearchDbFileName() {return search_db_file_name_;}
 
@@ -66,8 +63,6 @@ class PrsmPara {
   void setIndexDir(std::string dir) {index_file_dir_ = dir;}
 
  private:
-  std::string name_;
-
   std::string search_db_file_name_;
 
   std::string ori_db_name_;

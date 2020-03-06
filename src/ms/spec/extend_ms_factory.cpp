@@ -76,7 +76,8 @@ ExtendMsPtrVec geneMsThreePtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
                                  SpParaPtr sp_para_ptr, double new_prec_mass) {
   ExtendMsPtrVec extend_ms_ptr_vec;
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
-    extend_ms_ptr_vec.push_back(geneMsThreePtr(deconv_ms_ptr_vec[i], sp_para_ptr, new_prec_mass));
+    extend_ms_ptr_vec.push_back(
+        geneMsThreePtr(deconv_ms_ptr_vec[i], sp_para_ptr, new_prec_mass));
   }
   return extend_ms_ptr_vec;
 }

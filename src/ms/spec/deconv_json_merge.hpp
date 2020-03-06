@@ -23,8 +23,8 @@ namespace toppic {
 
 class DeconvJsonMerge {
  public:
-  DeconvJsonMerge(const std::vector<std::string> &spec_file_names, const
-                  std::string &output_file_name);
+  DeconvJsonMerge(const std::vector<std::string> &spec_file_names, 
+                  const std::string &output_file_name);
 
   void process();
 

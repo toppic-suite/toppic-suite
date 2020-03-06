@@ -92,13 +92,13 @@ int getMaxPos(const IntvDensPtrVec &dens) {
 
 
 double getMaxInte(const std::vector<double> &inte) {
-    double max_inte = -1;
-      for (size_t i = 0; i < inte.size(); i++) {
-            if (inte[i] > max_inte) {
-                    max_inte = inte[i];
-                        }
-              }
-        return max_inte;
+  double max_inte = -1;
+  for (size_t i = 0; i < inte.size(); i++) {
+    if (inte[i] > max_inte) {
+      max_inte = inte[i];
+    }
+  }
+  return max_inte;
 }
 
 double getBaseLine(const std::vector<double> &inte) {

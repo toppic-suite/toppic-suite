@@ -27,16 +27,9 @@ class XmlDOMDocument;
 
 class PeakTolerance {
  public:
-  PeakTolerance(double ppo, bool use_min_tolerance,
-                double min_tolerance);
-
-  PeakTolerance(const std::string &name, double ppo, 
-                bool use_min_tolerance,
-                double min_tolerance);
+  PeakTolerance(double ppo);
 
   explicit PeakTolerance(xercesc::DOMElement* element);
-
-  std::string getName() {return name_;}
 
   double compStrictErrorTole(double mass);
 
@@ -62,11 +55,10 @@ class PeakTolerance {
   static std::string getXmlElementName() {return "peak_tolerance";}
 
  private:
-  std::string name_;
   double ppo_;
   /* whether or not use minimum tolerance */
-  bool use_min_tolerance_;
-  double min_tolerance_;
+  bool use_min_tolerance_ = true;
+  double min_tolerance_ = 0.01;
 };
 
 typedef std::shared_ptr<PeakTolerance> PeakTolerancePtr;

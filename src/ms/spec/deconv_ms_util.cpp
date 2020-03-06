@@ -12,9 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <memory>
-#include <vector>
-
 #include "ms/spec/peak.hpp"
 #include "ms/spec/ms.hpp"
 #include "ms/spec/deconv_ms_util.hpp"

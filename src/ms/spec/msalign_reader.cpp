@@ -269,7 +269,7 @@ std::vector<SpectrumSetPtr> MsAlignReader::getNextSpectrumSet(SpParaPtr sp_para_
   // LOG_DEBUG("prec mass result " << prec_mono_mass);
   std::vector<double> prec_errors;
   prec_errors.push_back(0);
-  for (int i = 1; i <= sp_para_ptr->prec_error_; i++) {
+  for (int i = 1; i <= sp_para_ptr->getPrecError(); i++) {
     prec_errors.push_back(- i * mass_constant::getIsotopeMass());
     prec_errors.push_back(i * mass_constant::getIsotopeMass());
   }

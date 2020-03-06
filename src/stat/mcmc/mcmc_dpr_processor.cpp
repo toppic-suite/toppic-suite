@@ -133,7 +133,7 @@ void DprProcessor::process() {
 
   sp_para_ptr_ = prsm_para_ptr->getSpParaPtr();
 
-  sp_para_ptr_->prec_error_ = 0;
+  sp_para_ptr_->setPrecError(0);
 
   std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
