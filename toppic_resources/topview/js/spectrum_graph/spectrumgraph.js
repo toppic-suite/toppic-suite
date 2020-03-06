@@ -8,7 +8,7 @@ SpectrumGraph = function(svgId,spectrumParameters,peakData, ionData){
 	this.ionData = ionData;
 	let graph = this;
 	let tempid = svgId.split("#")[1];
-	this.redraw = function(mono_mz,graphFeatures) {
+	this.redraw = function(mono_mz,graphFeatures){
 		this.para = compSpectrumParameters(this.data.peak_list, this.data.envelope_list, mono_mz);
 		this.para.graphFeatures = graphFeatures;
 		spectrumParameters = drawSpectrum(this.id, this.para, this.data,this.ionData);
@@ -23,10 +23,10 @@ SpectrumGraph = function(svgId,spectrumParameters,peakData, ionData){
 		spectrumParameters.specX = transform.x;
 		spectrumParameters.specScale = transform.k;
 		let mousePos = d3.mouse(this);
-		if (ratio == 1) {
+		if(ratio == 1) {
 			spectrumParameters.drag(distance);
 		}
-		else {
+		else{
 			spectrumParameters.zoom(mousePos[0], mousePos[1], ratio);
 		}
 		spectrumParameters = drawSpectrum(svgId, spectrumParameters, peakData, ionData);
@@ -308,7 +308,7 @@ drawIons = function(svg,spectrumParameters,ionData){
 	ionData.forEach((element)=>{
 		if(tickWidth <= spectrumParameters.graphFeatures.tickWidthThreshholdval)
 		{
-			element.forEach(innerElement=>{
+			element.forEach((innerElement)=>{
 				placeIonOnGraph_innerFunc(innerElement);
 			})
 		}else{
@@ -316,6 +316,7 @@ drawIons = function(svg,spectrumParameters,ionData){
 			placeIonOnGraph_innerFunc(innerElement);
 		}
 	})
+
 	function placeIonOnGraph_innerFunc(innerElement){
 		if(innerElement.mz > spectrumParameters.minMz && innerElement.mz <= spectrumParameters.maxMz)
 		{
@@ -324,12 +325,12 @@ drawIons = function(svg,spectrumParameters,ionData){
 			.attr("x",(spectrumParameters.getPeakXPos((innerElement.mz))-spectrumParameters.graphFeatures.adjustableIonPosition))
 			.attr("y",function(d,i){
 				let y = spectrumParameters.getPeakYPos(innerElement.intensity + (0.1*innerElement.intensity));// Adding 10% to get the Ions on the max Intensity Peak
+				y = y - spectrumParameters.graphFeatures.fixedHeightOfIonAboveThePeak;
 				if(y <= spectrumParameters.padding.head) return spectrumParameters.padding.head ;
 				else return y ;
 				})
 			.style("fill","black")
 			.style("opacity", "0.6")
-			//.style("stroke",envelope_list.color)
 			.style("stroke-width","2")
 			.text(innerElement.ion);
 		}
@@ -339,36 +340,54 @@ drawIons = function(svg,spectrumParameters,ionData){
 drawSequence = function(svg,spectrumParameters){
 	let seqSvg = svg.append("g").attr("id", "graph_sequence");
 	let sequenceData = spectrumParameters.graphFeatures.prefixSequenceData;
-	sequenceData.forEach(function(element){
+	let x,y,text;
+	//Draw | at 0 for prefix mass list
+	x = spectrumParameters.getPeakXPos((0));
+	y = spectrumParameters.padding.head-40;
+	text = "|";
+	drawAcids_innerFunc(seqSvg,x,y,text);
+	sequenceData.forEach(function(element,index,prefixSequenceData){
 		if(element.mass > spectrumParameters.minMz && element.mass <= spectrumParameters.maxMz)
 		{
-			seqSvg.append("text")
+			let x1 = spectrumParameters.getPeakXPos(0);
+			if(index != 0) x1 = spectrumParameters.getPeakXPos(prefixSequenceData[index-1].mass);
+			x2 = spectrumParameters.getPeakXPos((element.mass));
+			x = (x1+x2)/2;
+			y = spectrumParameters.padding.head-40;
+			drawAcids_innerFunc(seqSvg,x,y,element.acid);
+			drawAcids_innerFunc(seqSvg,x2,y,"|");
+		}
+	})
+
+	sequenceData = spectrumParameters.graphFeatures.suffixSequeceData;
+	//Draw | at water mass for suffix mass list
+	x = spectrumParameters.getPeakXPos(18.010564683704);// Mass of water=18.010564683704
+	y = spectrumParameters.padding.head-20;
+	text = "|";
+	drawAcids_innerFunc(seqSvg,x,y,text);
+	sequenceData.forEach(function(element,index,suffixSequeceData){
+		if(element.mass > spectrumParameters.minMz && element.mass <= spectrumParameters.maxMz)
+		{
+			let x1 = spectrumParameters.getPeakXPos(18.010564683704);// Mass of water=18.010564683704
+			if(index != 0) x1 = spectrumParameters.getPeakXPos(suffixSequeceData[index-1].mass);
+			x2 = spectrumParameters.getPeakXPos((element.mass));
+			x = (x1+x2)/2;
+			y = spectrumParameters.padding.head-20;
+			drawAcids_innerFunc(seqSvg,x,y,element.acid);
+			drawAcids_innerFunc(seqSvg,x2,y,"|");
+		}
+	})
+	function drawAcids_innerFunc(svgId,x,y,text){
+		svgId.append("text")
 			.attr("id","")
-			.attr("x",spectrumParameters.getPeakXPos((element.mass)))
-			.attr("y",spectrumParameters.padding.head-40)
+			.attr("x",x)
+			.attr("y",y)
 			.style("fill","black")
 			.style("opacity", "0.6")
 			.style("stroke-width","2")
 			.style("text-anchor","end")
-			.text(element.acid+"|");
-		}
-	})
-	sequenceData = spectrumParameters.graphFeatures.suffixSequeceData;
-	sequenceData.forEach(function(element){
-		if(element.mass > spectrumParameters.minMz && element.mass <= spectrumParameters.maxMz)
-		{
-			seqSvg.append("text")
-			.attr("id","")
-			.attr("x",spectrumParameters.getPeakXPos((element.mass)))
-			.attr("y",spectrumParameters.padding.head-20)
-			.style("fill","black")
-			.style("opacity", "0.6")
-			.style("stroke-width","2")
-			.style("text-anchor","start")
-			.text("|"+element.acid);
-		}
-	})
-
+			.text(text);
+	}
 }
 addLabels = function(svg, spectrumParameters){
 
@@ -409,8 +428,7 @@ onMouseOverPeak = function(this_element,svg,peak,spectrumParameters)
 					.style("opacity", 2);
 	div.html(tooltipData).style("left", (d3.event.pageX + 12)  + "px")		
 				.style("top", (d3.event.pageY - 28)+ "px")
-				.style("fill", "black")
-				//.style("font-weight","bold");
+				.style("fill", "black");
 }
 onMouseOverCircle = function(this_element,svg,envelope_list,spectrumParameters)
 {
@@ -449,7 +467,6 @@ onMouseOut = function(){
 	d3.selectAll("#MyTextMassCharge").remove();
 }
 function drawSpectrum(svgId, spectrumParameters, peakData,ionData){
-	console.log("spectrumParameters : ", spectrumParameters);
 	let svg = d3.select("body").select(svgId);
 	svg.selectAll("#xtext").remove();
 	svg.selectAll("#ticks").remove();

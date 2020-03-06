@@ -17,6 +17,7 @@ class GraphFeatures{
         this.svgHeight = 220;
         this.padding = {left:70, right:20, head:10, bottom:50};
         this.adjustableHeightVal = 60;
+        this.fixedHeightOfIonAboveThePeak = 10;
         this.specWidth = this.svgWidth - this.padding.left - this.padding.right;
         this.specHeight = this.svgHeight - this.padding.head - this.padding.bottom;
     }
