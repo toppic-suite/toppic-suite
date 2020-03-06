@@ -31,7 +31,8 @@ void BpSpec::initBreakPoints(const ResSeqPtr &res_seq_ptr) {
     ext_len = 2;
   }
   // first breakpoint
-  BreakPointPtr first_ptr = std::make_shared<BreakPoint>(0, res_seq_ptr->getResMassSum());
+  BreakPointPtr first_ptr 
+      = std::make_shared<BreakPoint>(0, res_seq_ptr->getResMassSum());
   break_point_ptr_vec_.push_back(first_ptr);
 
   double prm = 0;
@@ -44,7 +45,8 @@ void BpSpec::initBreakPoints(const ResSeqPtr &res_seq_ptr) {
     break_point_ptr_vec_.push_back(std::make_shared<BreakPoint>(prm, srm));
   }
   // last breakpoint
-  BreakPointPtr last_ptr = std::make_shared<BreakPoint>(res_seq_ptr->getResMassSum(), 0);
+  BreakPointPtr last_ptr 
+      = std::make_shared<BreakPoint>(res_seq_ptr->getResMassSum(), 0);
   break_point_ptr_vec_.push_back(last_ptr);
 }
 

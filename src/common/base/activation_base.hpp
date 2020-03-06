@@ -25,7 +25,7 @@ class ActivationBase {
 
   static ActivationPtr getActivationPtrByName(const std::string &name);
 
-  static ActivationPtr getActivationPtrFromXml(XmlDOMElement * element);
+  static ActivationPtr getActivationPtrFromXml(XmlDOMElement* element);
 
  private:
   static ActivationPtrVec activation_ptr_vec_;
