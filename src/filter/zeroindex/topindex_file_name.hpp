@@ -26,6 +26,8 @@ class TopIndexFileName{
     TopIndexFileName(){};
     std::string geneFileName(PrsmParaPtr prsm_para_ptr);
 
+    std::string geneFileName(std::map<std::string, std::string> &arguments);
+
     std::vector<std::string> zero_ptm_file_vec_{"zero_ptm_term_index", "zero_ptm_diag_index", 
     "zero_ptm_rev_term_index", "zero_ptm_rev_diag_index"};//file name vector
 

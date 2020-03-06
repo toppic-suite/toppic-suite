@@ -20,46 +20,97 @@
 namespace toppic{
 
 std::string TopIndexFileName::geneFileName(PrsmParaPtr prsm_para_ptr){
-    std::string fixed_mod = prsm_para_ptr->getFixedMod();
-    std::string error_tol = prsm_para_ptr->getErrorTolerance();
-    std::string decoy = search_type_map_.find(prsm_para_ptr->getSearchType())->second;
-    std::string activation = prsm_para_ptr->getActivation();
-    std::string prot_mod = prsm_para_ptr->getProtMod();
+  std::string fixed_mod = prsm_para_ptr->getFixedMod();
+  std::string error_tol = prsm_para_ptr->getErrorTolerance();
+  std::string decoy = search_type_map_.find(prsm_para_ptr->getSearchType())->second;
+  std::string activation = prsm_para_ptr->getActivation();
+  std::string prot_mod = prsm_para_ptr->getProtMod();
 
-    std::vector<std::string> prot_mod_vec;
-    std::stringstream sstream(prot_mod);
-    std::string final_prot_mod = "";
+  std::vector<std::string> prot_mod_vec;
+  std::stringstream sstream(prot_mod);
+  std::string final_prot_mod = "";
 
-    while(sstream.good()){
-        std::string substring;
-        getline(sstream, substring, ',');
-        prot_mod_vec.push_back(substring);
+  while(sstream.good()){
+    std::string substring;
+    getline(sstream, substring, ',');
+    prot_mod_vec.push_back(substring);
+  }
+
+  for (size_t i = 0; i < prot_mod_vec.size(); i++){
+    std::string mod = prot_mod_map_.find(prot_mod_vec[i])->second;
+    if (final_prot_mod != ""){
+      final_prot_mod = final_prot_mod + "_" + mod;     
+    }else{
+      final_prot_mod = final_prot_mod + mod;
     }
-   
-    for (size_t i = 0; i < prot_mod_vec.size(); i++){
-        std::string mod = prot_mod_map_.find(prot_mod_vec[i])->second;
-        if (final_prot_mod != ""){
-           final_prot_mod = final_prot_mod + "_" + mod;     
-        }else{
-            final_prot_mod = final_prot_mod + mod;
-        }
-    }
+  }
 
-    std::vector<std::string>para_vec;//to determine if "_" is needed in between
-    std::string para_info;
+  std::vector<std::string>para_vec;//to determine if "_" is needed in between
+  std::string para_info;
 
-    para_vec.push_back(fixed_mod);
-    para_vec.push_back(final_prot_mod);
-    para_vec.push_back(activation);
-    para_vec.push_back(error_tol);
-    para_vec.push_back(decoy);
+  para_vec.push_back(fixed_mod);
+  para_vec.push_back(final_prot_mod);
+  para_vec.push_back(activation);
+  para_vec.push_back(error_tol);
+  para_vec.push_back(decoy);
 
-    for (size_t t = 0; t < para_vec.size(); t++){
-        if (para_vec[t] != ""){
-            //if the parameter is used
-            para_info = para_info + "_" + para_vec[t];
-        }
+  for (size_t t = 0; t < para_vec.size(); t++){
+    if (para_vec[t] != ""){
+      //if the parameter is used
+      para_info = para_info + "_" + para_vec[t];
     }
-    return para_info;   
+  }
+  return para_info;   
+}
+
+std::string TopIndexFileName::geneFileName(std::map<std::string, std::string> &arguments) {
+
+  std::string fixed_mod = arguments["fixedMod"];
+
+  std::string error_tol = arguments["massErrorTolerance"];
+
+  std::string search_type = arguments["searchType"];
+  std::string decoy = search_type_map_.find(search_type)->second;
+
+  std::string activation = arguments["activation"];
+  
+  std::string prot_mod = arguments["allowProtMod"];
+
+  std::vector<std::string> prot_mod_vec;
+  std::stringstream sstream(prot_mod);
+  std::string final_prot_mod = "";
+
+  while(sstream.good()){
+    std::string substring;
+    getline(sstream, substring, ',');
+    prot_mod_vec.push_back(substring);
+  }
+
+  for (size_t i = 0; i < prot_mod_vec.size(); i++){
+    std::string mod = prot_mod_map_.find(prot_mod_vec[i])->second;
+    if (final_prot_mod != ""){
+      final_prot_mod = final_prot_mod + "_" + mod;     
+    }else{
+      final_prot_mod = final_prot_mod + mod;
     }
+  }
+
+  std::vector<std::string>para_vec;//to determine if "_" is needed in between
+  std::string para_info;
+
+  para_vec.push_back(fixed_mod);
+  para_vec.push_back(final_prot_mod);
+  para_vec.push_back(activation);
+  para_vec.push_back(error_tol);
+  para_vec.push_back(decoy);
+
+  for (size_t t = 0; t < para_vec.size(); t++){
+    if (para_vec[t] != ""){
+      //if the parameter is used
+      para_info = para_info + "_" + para_vec[t];
+    }
+  }
+  return para_info;   
+}
+
 }

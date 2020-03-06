@@ -23,12 +23,15 @@ namespace toppic {
 
 class OnePtmFilterMng {
  public:
-  OnePtmFilterMng(PrsmParaPtr prsm_para_ptr){prsm_para_ptr_ = prsm_para_ptr;}
+  //OnePtmFilterMng(PrsmParaPtr prsm_para_ptr){prsm_para_ptr_ = prsm_para_ptr;}
   OnePtmFilterMng(PrsmParaPtr prsm_para_ptr,
+                  const std::string & index_file_para,
                   const std::string & output_file_ext,
                   int thread_num,
                   const std::string & residueModFileName = "",
                   int var_num = 0);
+
+  std::string getIndexFilePara() {return index_file_para_;}
 
   PrsmParaPtr prsm_para_ptr_;
 
@@ -41,6 +44,8 @@ class OnePtmFilterMng {
   unsigned int inte_num_ = 10;
   unsigned int shift_num_ = 10;
   int filter_scale_ = 100;
+
+  std::string index_file_para_;
 
   std::string output_file_ext_;
 

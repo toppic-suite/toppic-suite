@@ -56,8 +56,6 @@ class PrsmPara {
 
   SpParaPtr getSpParaPtr() {return sp_para_ptr_;}
 
-  bool doLocaliztion() {return localization_;}
-
   std::string getIndexDir() {return index_file_dir_;}
 
   void setIndexDir(std::string dir) {index_file_dir_ = dir;}
@@ -88,8 +86,6 @@ class PrsmPara {
   ProtModPtrVec prot_mod_list_;
 
   int group_spec_num_;
-
-  bool localization_;
 
   std::string index_file_dir_;
 
