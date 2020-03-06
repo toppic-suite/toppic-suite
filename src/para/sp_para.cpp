@@ -14,38 +14,26 @@
 
 #include "common/util/str_util.hpp"
 #include "common/base/activation_base.hpp"
+#include "common/base/mass_constant.hpp"
 #include "common/xml/xml_dom_util.hpp"
 #include "common/xml/xml_dom_document.hpp"
 #include "para/sp_para.hpp"
 
 namespace toppic {
 
-SpPara::SpPara(int min_peak_num, double min_mass, double min_extend_mass,
-               const std::vector<double> &ext_offsets,
-               PeakTolerancePtr peak_tolerance_ptr,
-               ActivationPtr activation_ptr,
-               const std::set<std::string> & skip_list):
-    min_peak_num_(min_peak_num),
-    min_mass_(min_mass),
-    extend_min_mass_(min_extend_mass),
-    ext_offsets_(ext_offsets),
-    peak_tolerance_ptr_(peak_tolerance_ptr),
-    activation_ptr_(activation_ptr),
-    skip_list_(skip_list) {}
-
-SpPara::SpPara(const std::string &name, int min_peak_num, 
-               double min_mass, double min_extend_mass,
-               const std::vector<double> &ext_offsets,
-               ActivationPtr activation_ptr):
-    name_(name),
-    min_peak_num_(min_peak_num),
-    min_mass_(min_mass),
-    extend_min_mass_(min_extend_mass),
-    ext_offsets_(ext_offsets),
-    activation_ptr_(activation_ptr) {}
+SpPara::SpPara(std::string activation_name, double ppm) {
+  if (activation_name != "FILE") {
+    activation_ptr_ = ActivationBase::getActivationPtrByName(activation_name);
+  }
+  double ppo = ppm *0.000001;
+  PeakTolerancePtr peak_tolerance_ptr = std::make_shared<PeakTolerance>(ppo); 
+  // extend sp parameter 
+  double IM = mass_constant::getIsotopeMass();
+  // the set of offsets used to expand the monoisotopic mass list 
+  ext_offsets_ = {{0, -IM, IM}};
+}
 
 SpPara::SpPara(xercesc::DOMElement* element) {
-  name_ = xml_dom_util::getChildValue(element, "name", 0);
   min_peak_num_ = xml_dom_util::getIntChildValue(element, "min_peak_num", 0);
   min_mass_ = xml_dom_util::getDoubleChildValue(element, "min_mass", 0);
   extend_min_mass_ = xml_dom_util::getDoubleChildValue(element, "extend_min_mass", 0);
@@ -67,7 +55,6 @@ SpPara::SpPara(xercesc::DOMElement* element) {
 void SpPara::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   std::string element_name = SpPara::getXmlElementName();
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
-  xml_doc->addElement(element, "name", name_.c_str());
   std::string str = str_util::toString(min_peak_num_);
   xml_doc->addElement(element, "min_peak_num", str.c_str());
   str = str_util::toString(min_mass_);

@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_PARA_SP_PARA_HPP_
 #define TOPPIC_PARA_SP_PARA_HPP_
 
@@ -31,26 +30,20 @@ class XmlDOMDocument;
 
 class SpPara {
  public:
-  SpPara(int min_peak_num, double min_mass, double min_extend_mass,
-         const std::vector<double> &ext_offsets,
-         PeakTolerancePtr peak_tolerance_ptr,
-         ActivationPtr activation_ptr,
-         const std::set<std::string> & skip_list);
 
-  SpPara(const std::string &name, int min_peak_num, 
-         double min_mass, double min_extend_mass,
-         const std::vector<double> &ext_offsets,
-         ActivationPtr activation_ptr);
+  SpPara(std::string activation_name, double ppm);
 
   explicit SpPara(xercesc::DOMElement* element);
-
-  std::string getName() {return name_;}
 
   double getMinMass() {return min_mass_;}
 
   double getExtendMinMass() {return extend_min_mass_;}
 
   const std::vector<double>& getExtendOffsets() {return ext_offsets_;}
+
+  int getPrecError() {return prec_error_;}
+
+  void setPrecError(int prec_error) {prec_error_ = prec_error;}
 
   PeakTolerancePtr getPeakTolerancePtr() {return peak_tolerance_ptr_;}
 
@@ -63,6 +56,8 @@ class SpPara {
 
   std::set<std::string> getSkipList() {return skip_list_;}
 
+  void setSkipList(std::set<std::string> skip_list) {skip_list_ = skip_list;} 
+
   int getMinPeakNum() {return min_peak_num_;}
 
   void setMinPeakNum(int min_peak_num) {min_peak_num_ = min_peak_num;}
@@ -71,26 +66,22 @@ class SpPara {
 
   static std::string getXmlElementName() {return "sp_para";}
 
+ private:
+  int min_peak_num_ = 10;
+  // if the mass if smaller than min_mass, the mass is removed.
+  double min_mass_ = 50.0;
+  // if the mass is smaller than extend_min_mass, the peak is not extended
+  double extend_min_mass_ = 5000;
   // the 1 Da error in precursor mass used in zeroptm searching
   int prec_error_ = 1;
-
- private:
-  std::string name_;
-
-  int min_peak_num_;
-
-  // if the mass if smaller than min_mass, the mass is removed.
-  double min_mass_;
-  // if the mass is smaller than extend_min_mass, the peak is not extended
-  double extend_min_mass_;
-
-  std::vector<double> ext_offsets_;
-
-  PeakTolerancePtr peak_tolerance_ptr_;
 
   ActivationPtr activation_ptr_;
 
   std::set<std::string> skip_list_;
+
+  std::vector<double> ext_offsets_;
+
+  PeakTolerancePtr peak_tolerance_ptr_;
 };
 
 typedef std::shared_ptr<SpPara> SpParaPtr;

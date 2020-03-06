@@ -91,7 +91,7 @@ void DiagFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num
 
   int group_spec_num = mng_ptr_->prsm_para_ptr_->getGroupSpecNum();
   SpParaPtr sp_para_ptr =  mng_ptr_->prsm_para_ptr_->getSpParaPtr();
-  sp_para_ptr->prec_error_ = 0;
+  sp_para_ptr->setPrecError(0);
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
   MsAlignReader reader(sp_file_name,
                        group_spec_num,

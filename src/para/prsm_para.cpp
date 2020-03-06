@@ -24,10 +24,7 @@
 
 namespace toppic {
 
-PrsmPara::PrsmPara(const std::string &name, 
-                   std::map<std::string, std::string> &arguments) {
-  name_ = name;
-
+PrsmPara::PrsmPara(std::map<std::string, std::string> &arguments) {
   search_db_file_name_ = arguments["databaseFileName"];
 
   ori_db_name_ = arguments["oriDatabaseFileName"];
@@ -62,25 +59,6 @@ PrsmPara::PrsmPara(const std::string &name,
   }
 
   std::string activation_name = arguments["activation"];
-  ActivationPtr activation_ptr; 
-  if (activation_name != "FILE") {
-    activation_ptr = ActivationBase::getActivationPtrByName(activation_name);
-  }
-
-  double ppo = ppm_ *0.000001;
-  bool use_min_tolerance = true;
-  double min_tolerance = 0.01;
-  PeakTolerancePtr peak_tolerance_ptr
-      = std::make_shared<PeakTolerance>(ppo, use_min_tolerance, min_tolerance);
-
-  // extend sp parameter 
-  double IM = mass_constant::getIsotopeMass();
-  // the set of offsets used to expand the monoisotopic mass list 
-  std::vector<double> ext_offsets {{0, -IM, IM}};
-  double extend_min_mass = 5000;
-
-  int min_peak_num = 10;
-  double min_mass = 50.0;
 
   if (arguments["residueModFileName"] != "") {
     localization_ = true;
@@ -103,9 +81,9 @@ PrsmPara::PrsmPara(const std::string &name,
     infile.close();
   }
 
-  sp_para_ptr_ = std::make_shared<SpPara>(min_peak_num, min_mass, extend_min_mass,
-                                          ext_offsets, peak_tolerance_ptr,
-                                          activation_ptr, skip_list);
+  sp_para_ptr_ = std::make_shared<SpPara>(activation_name, ppm_); 
+  
+  sp_para_ptr_->setSkipList(skip_list);
 }
 
 } /* namespace toppic */

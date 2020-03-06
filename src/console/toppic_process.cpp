@@ -135,7 +135,7 @@ int TopPIC_testModFile(std::map<std::string, std::string> & arguments) {
     LOG_DEBUG("Init base data completed");
 
     // Test arguments
-    PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>("main", arguments);
+    PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
 
     if (arguments["residueModFileName"] != "") {
       mod_util::readModTxt(arguments["residueModFileName"]);
@@ -193,7 +193,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
       use_gf = false;
     }
 
-    PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>("main", arguments);
+    PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
     LOG_DEBUG("prsm para inited");
 
     bool decoy = false;
@@ -342,7 +342,7 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
       localization = true;
     }
 
-    PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>("main", arguments);
+    PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
     msalign_util::geneSpIndex(sp_file_name, prsm_para_ptr->getSpParaPtr());
     LOG_DEBUG("prsm para inited");
 
@@ -512,6 +512,7 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
   std::cout << "TopPIC " << toppic::Version::getVersion() << std::endl;
 
   xercesc::XMLPlatformUtils::Initialize(); 
+
   TopPIC_testModFile(arguments);
 
   for (size_t k = 0; k < spec_file_lst.size(); k++) {
