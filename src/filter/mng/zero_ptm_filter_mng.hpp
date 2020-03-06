@@ -24,12 +24,17 @@ namespace toppic {
 class ZeroPtmFilterMng {
  public:
   ZeroPtmFilterMng(PrsmParaPtr prsm_para_ptr,
+                   const std::string &index_file_para,
                    int thread_num,
-                   const std::string & output_file_ext);
+                   const std::string &output_file_ext);
+
+  std::string getIndexFilePara() {return index_file_para_;}
 
   PrsmParaPtr prsm_para_ptr_;
 
   PrsmParaPtr getPrsmPtr(){return prsm_para_ptr_;}
+
+  std::string index_file_para_;
 
   /** parameters for fast filteration */
   int max_proteoform_mass_ = 100000;

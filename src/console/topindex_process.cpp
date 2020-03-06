@@ -60,6 +60,9 @@ void TopIndexProcess(std::map<std::string, std::string> &arguments){
       decoy = true;
     }
     //create a folder for index files 
+    // index file name
+    TopIndexFileNamePtr file_name_ptr = std::make_shared<TopIndexFileName>();
+    std::string index_file_para = file_name_ptr->geneFileName(arguments);
 
     fasta_util::dbPreprocess(ori_db_file_name, db_file_name, decoy, db_block_size);
 

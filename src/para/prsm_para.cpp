@@ -60,12 +60,6 @@ PrsmPara::PrsmPara(std::map<std::string, std::string> &arguments) {
 
   std::string activation_name = arguments["activation"];
 
-  if (arguments["residueModFileName"] != "") {
-    localization_ = true;
-  } else {
-    localization_ = false;
-  }
-
   std::set<std::string> skip_list;
 
   if (arguments["skipList"] != "") {

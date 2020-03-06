@@ -17,9 +17,11 @@
 namespace toppic {
 
 ZeroPtmFilterMng::ZeroPtmFilterMng(PrsmParaPtr prsm_para_ptr,
+                                   const std::string &index_file_para,
                                    int thread_num,
-                                   const std::string & output_file_ext):
+                                   const std::string &output_file_ext):
     prsm_para_ptr_(prsm_para_ptr),
+    index_file_para_(index_file_para),
     thread_num_(thread_num),
     output_file_ext_(output_file_ext) {}
 } 
