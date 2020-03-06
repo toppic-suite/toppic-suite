@@ -59,7 +59,7 @@ ActivationPtr ActivationBase::getActivationPtrByName(const std::string &name) {
   return ActivationPtr(nullptr);
 }
 
-ActivationPtr ActivationBase::getActivationPtrFromXml(XmlDOMElement * element) {
+ActivationPtr ActivationBase::getActivationPtrFromXml(XmlDOMElement* element) {
   std::string name = Activation::getNameFromXml(element);
   ActivationPtr activation_ptr = getActivationPtrByName(name);
   return activation_ptr;

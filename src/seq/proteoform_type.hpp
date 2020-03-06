@@ -30,7 +30,7 @@ class ProteoformType {
   static ProteoformTypePtr SUFFIX;
   static ProteoformTypePtr INTERNAL;
 
-  ProteoformType(const std::string &name, int id): name_(name), id_(id) {}
+  ProteoformType(const std::string &name, int id);
 
   std::string getName() {return name_;}
 

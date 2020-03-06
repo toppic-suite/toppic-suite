@@ -105,7 +105,7 @@ void MassShift::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
   parent->appendChild(element);
 }
 
-bool MassShift::cmpPosInc(const MassShiftPtr & a, const MassShiftPtr & b) {
+bool MassShift::cmpPosInc(const MassShiftPtr &a, const MassShiftPtr &b) {
   if (a->getLeftBpPos() < b->getLeftBpPos()) {
     return true;
   } else if (a->getLeftBpPos() > b->getLeftBpPos()) {

@@ -27,7 +27,7 @@ class Activation {
   Activation(const std::string &name, IonTypePtr n_ion_type_ptr,
              IonTypePtr c_ion_type_ptr);
 
-  explicit Activation(XmlDOMElement * element);
+  explicit Activation(XmlDOMElement* element);
 
   std::string getName() {return name_;}
 

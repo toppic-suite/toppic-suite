@@ -40,7 +40,7 @@ class AlterType {
 
   static const AlterTypePtr UNEXPECTED;
 
-  AlterType(int id, std::string name): id_(id), name_(name) {}
+  AlterType(int id, std::string name);
 
   int getId() {return id_;}
 
@@ -48,7 +48,7 @@ class AlterType {
 
   void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 
-  static AlterTypePtr getTypePtrFromXml(XmlDOMElement * element);
+  static AlterTypePtr getTypePtrFromXml(XmlDOMElement* element);
 
   static std::string getXmlElementName() {return "alter_type";}
 
