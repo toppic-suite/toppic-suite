@@ -15,7 +15,7 @@
 #include <string>
 #include <sstream> 
 
-#include "filter/zeroindex/topindex_file_name.hpp"
+#include "filter/mng/topindex_file_name.hpp"
 
 namespace toppic{
 

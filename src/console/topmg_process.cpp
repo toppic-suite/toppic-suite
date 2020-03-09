@@ -49,6 +49,7 @@
 #include "prsm/simple_prsm_str_merge.hpp"
 
 #include "filter/mng/one_ptm_filter_mng.hpp"
+#include "filter/mng/topindex_file_name.hpp"
 #include "filter/oneptm/one_ptm_filter_processor.hpp"
 
 #include "filter/mng/diag_filter_mng.hpp"
@@ -190,6 +191,10 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
 
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
 
+    // index file name
+    TopIndexFileNamePtr file_name_ptr = std::make_shared<TopIndexFileName>();
+    std::string index_file_para = file_name_ptr->geneFileName(arguments);
+
     fasta_util::dbPreprocess(ori_db_file_name, db_file_name, decoy, db_block_size);
     msalign_util::geneSpIndex(sp_file_name, prsm_para_ptr->getSpParaPtr());
 
@@ -197,7 +202,8 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
 
     std::cout << "ASF-One PTM filtering - started." << std::endl;
     OnePtmFilterMngPtr one_ptm_filter_mng_ptr =
-        std::make_shared<OnePtmFilterMng>(prsm_para_ptr, "topmg_one_filter", thread_num,
+        std::make_shared<OnePtmFilterMng>(prsm_para_ptr, index_file_para, 
+                                          "topmg_one_filter", thread_num,
                                           var_mod_file_name, 1);
     one_ptm_filter_mng_ptr->inte_num_ = 4;
     one_ptm_filter_mng_ptr->pref_suff_num_ = 4;
@@ -218,7 +224,8 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
       std::cout << "ASF-Diagonal PTM filtering - started." << std::endl;
       filter_result_num = 15;
       DiagFilterMngPtr diag_filter_mng_ptr
-          = std::make_shared<DiagFilterMng>(prsm_para_ptr, filter_result_num,
+          = std::make_shared<DiagFilterMng>(prsm_para_ptr, index_file_para, 
+                                            filter_result_num,
                                             thread_num, "topmg_multi_filter",
                                             var_mod_file_name, 1);
       DiagFilterProcessorPtr diag_filter_processor

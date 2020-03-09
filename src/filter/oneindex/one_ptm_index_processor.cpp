@@ -23,7 +23,7 @@
 #include "seq/proteoform.hpp"
 #include "seq/proteoform_factory.hpp"
 
-#include "filter/zeroindex/topindex_file_name.hpp"
+#include "filter/mng/topindex_file_name.hpp"
 
 #include "filter/oneindex/one_ptm_index_processor.hpp"
 #include "filter/oneindex/one_ptm_index_file.hpp"
