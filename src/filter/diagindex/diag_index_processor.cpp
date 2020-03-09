@@ -20,10 +20,10 @@
 
 #include "seq/proteoform_factory.hpp"
 
+#include "filter/mng/topindex_file_name.hpp"
+
 #include "filter/diagindex/diag_index_processor.hpp"
 #include "filter/diagindex/diag_index_file.hpp"
-
-#include "filter/zeroindex/topindex_file_name.hpp"
 
 namespace toppic{
 

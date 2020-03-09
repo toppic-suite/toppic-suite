@@ -44,7 +44,7 @@
 #include "prsm/prsm_util.hpp"
 
 #include "filter/mng/zero_ptm_filter_mng.hpp"
-#include "filter/zeroindex/topindex_file_name.hpp"
+#include "filter/mng/topindex_file_name.hpp"
 #include "filter/zeroptm/zero_ptm_filter_processor.hpp"
 #include "search/zeroptmsearch/zero_ptm_search_mng.hpp"
 #include "search/zeroptmsearch/zero_ptm_search_processor.hpp"

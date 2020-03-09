@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_FILTER_ZEROINDEX_TOPINDEX_FILE_NAME_HPP_
-#define TOPPIC_FILTER_ZEROINDEX_TOPINDEX_FILE_NAME_HPP_
+#ifndef TOPPIC_FILTER_MNG_TOPINDEX_FILE_NAME_HPP_
+#define TOPPIC_FILTER_MNG_TOPINDEX_FILE_NAME_HPP_
 
 #include <vector>
 #include <map>
