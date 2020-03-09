@@ -63,6 +63,7 @@ class MassShift {
 
   double shift_;
 
+  // A mass shift is annotated by a list of alterations. 
   std::vector<AlterPtr> alter_vec_;
 };
 
