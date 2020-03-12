@@ -31,7 +31,7 @@ void Argument::initArguments() {
   arguments_["fixedMod"] = "";
   arguments_["errorTolerance"] = "1.2";
   arguments_["toolName"] = "toppic";
-  arguments_["mergedOutputFileName"] = "sample_diff.csv";
+  arguments_["mergedOutputFileName"] = "sample_diff.tsv";
 }
 
 void Argument::outputArguments(std::ostream &output, std::map<std::string, std::string> arguments) {
@@ -65,7 +65,7 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string error_tole = "1.2";
   std::string tool_name = "toppic";
   std::string database_file_name = "";
-  std::string merged_output_name = "sample_diff.csv";
+  std::string merged_output_name = "sample_diff.tsv";
 
   /** Define and parse the program options*/
   try {
@@ -77,7 +77,7 @@ bool Argument::parse(int argc, char* argv[]) {
          "<C57|C58|a fixed modification file>. Fixed modifications. Three available options: C57, C58, or the name of a text file containing the information of fixed modifications. When C57 is selected, carbamidomethylation on cysteine is the only fixed modification. When C58 is selected, carboxymethylation on cysteine is the only fixed modification.")
         ("error-tolerance,e", po::value<std::string>(&error_tole) , "Error tolerance of precursor masses for mapping identified proteoforms. Default: 1.2 Dalton.")
         ("tool-name,t", po::value<std::string>(&tool_name) , "<toppic|topmg>. Database search tool name: toppic or topmg. Default: toppic.")
-        ("output,o", po::value<std::string>(&merged_output_name) , "Output file name. Default: sample_diff.csv.");
+        ("output,o", po::value<std::string>(&merged_output_name) , "Output file name. Default: sample_diff.tsv.");
     po::options_description desc("Options");
 
     desc.add_options() 

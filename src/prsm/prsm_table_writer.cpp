@@ -41,32 +41,34 @@ void PrsmTableWriter::write() {
   file.open(output_file_name.c_str());
   file << argu_str_;
   // write title
-  file << "Data file name" << ","
-      << "Prsm ID" << ","
-      << "Spectrum ID"<< ","
-      << "Fragmentation" << ","
-      << "Scan(s)" << ","
-      << "Retention time" << ","
-      << "#peaks"<< ","
-      << "Charge" << ","
-      << "Precursor mass" << ","
-      << "Adjusted precursor mass" << ","
-      << "Proteoform ID" << ","
-      << "Feature intensity" << ","
-      << "Feature score" << ","
-      << "Protein accession" << ","
-      << "Protein description" << ","
-      << "First residue" << ","
-      << "Last residue" << ","
-      << "Proteoform" << ","
-      << "#unexpected modifications" << ","
-      << "MIScore" << ","
-      << "#variable PTMs" << ","
-      << "#matched peaks" << ","
-      << "#matched fragment ions" << ","
-      << "P-value" << ","
-      << "E-value" << ","
-      << "Q-value (spectral FDR)" << ","
+  std::string delim = "\t";
+  
+  file << "Data file name" << delim
+      << "Prsm ID" << delim
+      << "Spectrum ID"<< delim
+      << "Fragmentation" << delim
+      << "Scan(s)" << delim
+      << "Retention time" << delim
+      << "#peaks"<< delim
+      << "Charge" << delim
+      << "Precursor mass" << delim
+      << "Adjusted precursor mass" << delim
+      << "Proteoform ID" << delim
+      << "Feature intensity" << delim
+      << "Feature score" << delim
+      << "Protein accession" << delim
+      << "Protein description" << delim
+      << "First residue" << delim
+      << "Last residue" << delim
+      << "Proteoform" << delim
+      << "#unexpected modifications" << delim
+      << "MIScore" << delim
+      << "#variable PTMs" << delim
+      << "#matched peaks" << delim
+      << "#matched fragment ions" << delim
+      << "P-value" << delim
+      << "E-value" << delim
+      << "Q-value (spectral FDR)" << delim
       << "Proteoform FDR" << std::endl;
 
   std::string input_file_name = file_util::basename(spectrum_file_name) + "." + input_file_ext_;
