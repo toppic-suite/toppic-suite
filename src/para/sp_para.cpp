@@ -26,7 +26,8 @@ SpPara::SpPara(std::string activation_name, double ppm) {
     activation_ptr_ = ActivationBase::getActivationPtrByName(activation_name);
   }
   double ppo = ppm *0.000001;
-  PeakTolerancePtr peak_tolerance_ptr = std::make_shared<PeakTolerance>(ppo); 
+  PeakTolerancePtr peak_tolerance_ptr = std::make_shared<PeakTolerance>(ppo);
+  setPeakTolerancePtr(peak_tolerance_ptr);
   // extend sp parameter 
   double IM = mass_constant::getIsotopeMass();
   // the set of offsets used to expand the monoisotopic mass list 
