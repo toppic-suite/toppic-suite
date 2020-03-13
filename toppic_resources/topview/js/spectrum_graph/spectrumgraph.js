@@ -385,7 +385,7 @@ drawSequence = function(svg,spectrumParameters){
 			.style("fill","black")
 			.style("opacity", "0.6")
 			.style("stroke-width","2")
-			.style("text-anchor","end")
+			//.style("text-anchor","end")
 			.text(text);
 	}
 }
