@@ -142,7 +142,7 @@ button.close {
 .td_fragments{
   text-align : center !important ;
 }
-#matched_fragments{
+.matched_fragments{
   background-color:hsla(120, 100%, 50%, 0.3);;
 }
 #helpModal{
@@ -176,4 +176,7 @@ button.close {
 }
 .seqvisualization a{
 color: #428bca !important;
+}
+.matched_fragments:hover{
+  cursor: pointer;
 }
