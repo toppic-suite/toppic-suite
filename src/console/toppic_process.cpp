@@ -209,7 +209,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     int db_block_size = std::stoi(arguments["databaseBlockSize"]);
 
     fasta_util::dbPreprocess(ori_db_file_name, db_file_name, decoy, db_block_size);
-    msalign_util::geneSpIndex(sp_file_name, prsm_para_ptr->getSpParaPtr());
+    msalign_util::geneSpIndex(sp_file_name);
 
     std::vector<std::string> input_exts;
 
@@ -351,7 +351,7 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     }
 
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
-    msalign_util::geneSpIndex(sp_file_name, prsm_para_ptr->getSpParaPtr());
+    msalign_util::geneSpIndex(sp_file_name);
     LOG_DEBUG("prsm para inited");
 
     std::cout << "Finding PrSM clusters - started." << std::endl;

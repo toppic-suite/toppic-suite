@@ -12,27 +12,21 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#ifndef TOPPIC_MS_SPEC_MSALIGN_UTIL_HPP_
-#define TOPPIC_MS_SPEC_MSALIGN_UTIL_HPP_
+#ifndef TOPPIC_MS_SPEC_SPECTRUM_SET_FACTORY_HPP_
+#define TOPPIC_MS_SPEC_SPECTRUM_SET_FACTORY_HPP_
 
 #include "para/sp_para.hpp"
-#include "ms/spec/msalign_reader.hpp"
+#include "ms/spec/spectrum_set.hpp"
 
 namespace toppic {
 
-namespace msalign_util {
+namespace spectrum_set_factory {
 
-int countSpNum(const std::string &spectrum_file);
+SpectrumSetPtr geneSpectrumSetPtr(DeconvMsPtrVec deconv_ms_ptr_vec, 
+                                  SpParaPtr sp_para_ptr,
+                                  double prec_mono_mass);
+}
 
-void geneSpIndex(const std::string &spectrum_file_name);
+} /* namespace toppic */
 
-int getSpNum(const std::string &spectrum_file_name);
-
-void mergeMsalignFiles(const std::vector<std::string> & spec_file_lst, int N,
-                       const std::string & output_file);
-
-}  // namespace msalign_util
-
-}  // namespace toppic
-#endif
+#endif /* SPECTRUM_SET_HPP_ */

@@ -196,7 +196,7 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
     std::string index_file_para = file_name_ptr->geneFileName(arguments);
 
     fasta_util::dbPreprocess(ori_db_file_name, db_file_name, decoy, db_block_size);
-    msalign_util::geneSpIndex(sp_file_name, prsm_para_ptr->getSpParaPtr());
+    msalign_util::geneSpIndex(sp_file_name);
 
     std::vector<std::string> input_exts;
 
@@ -305,7 +305,7 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
     std::string var_mod_file_name = arguments["varModFileName"];
 
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
-    msalign_util::geneSpIndex(sp_file_name, prsm_para_ptr->getSpParaPtr());
+    msalign_util::geneSpIndex(sp_file_name);
 
     std::cout << "Finding PrSM clusters - started." << std::endl;
     double form_error_tole = std::stod(arguments["proteoformErrorTolerance"]);

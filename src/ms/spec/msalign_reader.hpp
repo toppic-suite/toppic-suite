@@ -20,6 +20,7 @@
 #include <string>
 #include <vector>
 
+#include "para/sp_para.hpp"
 #include "ms/spec/deconv_ms.hpp"
 #include "ms/spec/spectrum_set.hpp"
 
