@@ -18,10 +18,6 @@
 #include <memory>
 #include <string>
 
-//#include "seq/proteoform.hpp"
-//#include "seq/fasta_reader.hpp"
-//#include "prsm/prsm.hpp"
-//#include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_str.hpp"
 
 namespace toppic {

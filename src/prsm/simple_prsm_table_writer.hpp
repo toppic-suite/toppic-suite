@@ -15,19 +15,17 @@
 #ifndef TOPPIC_PRSM_SIMPLE_TABLE_WRITER_HPP_
 #define TOPPIC_PRSM_SIMPLE_TABLE_WRITER_HPP_
 
-#include "para/prsm_para.hpp"
-
 namespace toppic {
 
 class SimplePrsmTableWriter {
  public:
-  SimplePrsmTableWriter(PrsmParaPtr prsm_para_ptr,
+  SimplePrsmTableWriter(const std::string &spec_file_name, 
                         const std::string &input_file_ext,
                         const std::string &output_file_ext);
   void write();
 
  private:
-  PrsmParaPtr prsm_para_ptr_;
+  std::string spec_file_name_; 
   std::string input_file_ext_;
   std::string output_file_ext_;
 };

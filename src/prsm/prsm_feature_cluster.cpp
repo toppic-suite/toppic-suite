@@ -14,7 +14,6 @@
 
 #include <algorithm>
 #include <iomanip>
-#include <string>
 #include <iostream>
 #include <sstream> 
 
@@ -32,15 +31,13 @@ PrsmFeatureCluster::PrsmFeatureCluster(const std::string &db_file_name,
                                        const std::string &input_file_ext,
                                        const std::string &output_file_ext,
                                        const ModPtrVec &fix_mod_ptr_vec,
-                                       double prec_error_tole,
-                                       PrsmParaPtr prsm_para_ptr):
+                                       double prec_error_tole):
     db_file_name_(db_file_name),
     spec_file_name_(spec_file_name),
     input_file_ext_(input_file_ext),
     output_file_ext_(output_file_ext),
     fix_mod_ptr_vec_(fix_mod_ptr_vec),
-    prec_error_tole_(prec_error_tole),
-    prsm_para_ptr_(prsm_para_ptr) {
+    prec_error_tole_(prec_error_tole) {
       feature_file_name_ = file_util::basename(spec_file_name) + ".feature";
     }
 

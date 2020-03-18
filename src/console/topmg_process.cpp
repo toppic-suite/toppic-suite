@@ -318,8 +318,7 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
                                                  "topmg_top",
                                                  "topmg_cluster",
                                                  fix_mod_list,
-                                                 form_error_tole,
-                                                 prsm_para_ptr);
+                                                 form_error_tole);
       prsm_clusters->process();
       prsm_clusters = nullptr;
     } else {
