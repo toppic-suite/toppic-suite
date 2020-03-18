@@ -15,14 +15,14 @@
 #ifndef TOPPIC_PRSM_PRSM_TABLE_WRITER_HPP_
 #define TOPPIC_PRSM_PRSM_TABLE_WRITER_HPP_
 
-#include "prsm/prsm.hpp"
 #include "para/prsm_para.hpp"
+#include "prsm/prsm.hpp"
 
 namespace toppic {
 
 class PrsmTableWriter {
  public:
-  PrsmTableWriter(PrsmParaPtr prsm_para_ptr, 
+  PrsmTableWriter(PrsmParaPtr prsm_para_ptr,  
                   std::string argu_str,
                   const std::string &input_file_ext, 
                   const std::string &output_file_ext);

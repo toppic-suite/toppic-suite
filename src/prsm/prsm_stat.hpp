@@ -15,8 +15,6 @@
 #ifndef TOPPIC_PRSM_PRSM_STAT_HPP_
 #define TOPPIC_PRSM_PRSM_STAT_HPP_
 
-#include <fstream>
-
 #include "para/prsm_para.hpp"
 #include "prsm/prsm.hpp"
 

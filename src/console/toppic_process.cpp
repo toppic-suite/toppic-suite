@@ -366,8 +366,7 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
                                                  "toppic_top",
                                                  "toppic_cluster",
                                                  fix_mod_list,
-                                                 form_error_tole,
-                                                 prsm_para_ptr);
+                                                 form_error_tole);
       prsm_clusters->process();
       prsm_clusters = nullptr;
     } else {
