@@ -28,11 +28,11 @@ class ZeroPtmFilterMng {
                    int thread_num,
                    const std::string &output_file_ext);
 
+  PrsmParaPtr getPrsmPtr(){return prsm_para_ptr_;}
+
   std::string getIndexFilePara() {return index_file_para_;}
 
   PrsmParaPtr prsm_para_ptr_;
-
-  PrsmParaPtr getPrsmPtr(){return prsm_para_ptr_;}
 
   std::string index_file_para_;
 
@@ -55,7 +55,10 @@ class ZeroPtmFilterMng {
 
   std::vector<int> cnts_;
 
-  std::vector<std::string> file_names{"toppic_zero_ptm_complete", "toppic_zero_ptm_prefix", "toppic_zero_ptm_suffix", "toppic_zero_ptm_internal"};
+  //std::vector<std::string> file_names_{"toppic_zero_ptm_complete", "toppic_zero_ptm_prefix", "toppic_zero_ptm_suffix", "toppic_zero_ptm_internal"};
+
+  std::vector<std::string> zero_ptm_file_vec_{"zero_ptm_term_index", "zero_ptm_diag_index", 
+    "zero_ptm_rev_term_index", "zero_ptm_rev_diag_index"};
 };
 
 typedef std::shared_ptr<ZeroPtmFilterMng> ZeroPtmFilterMngPtr;

@@ -19,38 +19,44 @@
 
 namespace toppic {
 
-OnePtmIndexFile::OnePtmIndexFile(const ProteoformPtrVec &proteo_ptrs,
-                                   OnePtmFilterMngPtr mng_ptr, std::vector<std::string> file_vec) {
-  mng_ptr_ = mng_ptr;
-  proteo_ptrs_ = proteo_ptrs;
+namespace one_ptm_index_file {
+
+void geneOnePtmIndexFile(const ProteoformPtrVec &proteo_ptrs,
+                         OnePtmFilterMngPtr mng_ptr, std::vector<std::string> file_vec) {
+
   std::vector<std::vector<double>> shift_2d
       = proteoform_util::getNTermShift2D(proteo_ptrs, mng_ptr->prsm_para_ptr_->getProtModPtrVec());
   std::vector<std::vector<double>> n_term_acet_2d
       = proteoform_util::getNTermAcet2D(proteo_ptrs, mng_ptr->prsm_para_ptr_->getProtModPtrVec());
-  term_index_ptr_ = MassMatchFactory::getPrmTermMassMatchPtr(proteo_ptrs, shift_2d,
-                                                             mng_ptr->max_proteoform_mass_,
-                                                             mng_ptr->filter_scale_);
-  diag_index_ptr_ = MassMatchFactory::getPrmDiagMassMatchPtr(proteo_ptrs,
-                                                             mng_ptr->max_proteoform_mass_,
-                                                             mng_ptr->filter_scale_);
+  MassMatchPtr term_index_ptr = MassMatchFactory::getPrmTermMassMatchPtr(proteo_ptrs, shift_2d,
+                                                                         mng_ptr->max_proteoform_mass_,
+                                                                         mng_ptr->filter_scale_);
+  MassMatchPtr diag_index_ptr = MassMatchFactory::getPrmDiagMassMatchPtr(proteo_ptrs,
+                                                                         mng_ptr->max_proteoform_mass_,
+                                                                         mng_ptr->filter_scale_);
   std::vector<std::vector<double>> rev_shift_2d;
   std::vector<double> shift_1d(1, 0);
   for (size_t i = 0; i < proteo_ptrs.size(); i++) {
     rev_shift_2d.push_back(shift_1d);
   }
-  rev_term_index_ptr_ = MassMatchFactory::getSrmTermMassMatchPtr(proteo_ptrs, rev_shift_2d, n_term_acet_2d,
-                                                                 mng_ptr->max_proteoform_mass_,
-                                                                 mng_ptr->filter_scale_);
-  rev_diag_index_ptr_ = MassMatchFactory::getSrmDiagMassMatchPtr(proteo_ptrs, n_term_acet_2d,
-                                                                 mng_ptr->max_proteoform_mass_,
-                                                                 mng_ptr->filter_scale_);
+  MassMatchPtr rev_term_index_ptr = MassMatchFactory::getSrmTermMassMatchPtr(proteo_ptrs, 
+                                                                             rev_shift_2d, 
+                                                                             n_term_acet_2d,
+                                                                             mng_ptr->max_proteoform_mass_,
+                                                                             mng_ptr->filter_scale_);
+  MassMatchPtr rev_diag_index_ptr = MassMatchFactory::getSrmDiagMassMatchPtr(proteo_ptrs, 
+                                                                             n_term_acet_2d,
+                                                                             mng_ptr->max_proteoform_mass_,
+                                                                             mng_ptr->filter_scale_);
 
-  std::string dir_name = mng_ptr_->prsm_para_ptr_->getOriDbName() + "_idx";
+  std::string dir_name = mng_ptr->prsm_para_ptr_->getOriDbName() + "_idx";
 
-  term_index_ptr_->serializeMassMatch(file_vec[0], dir_name);
-  diag_index_ptr_->serializeMassMatch(file_vec[1], dir_name);
-  rev_term_index_ptr_->serializeMassMatch(file_vec[2], dir_name);
-  rev_diag_index_ptr_->serializeMassMatch(file_vec[3], dir_name); 
-  
+  term_index_ptr->serializeMassMatch(file_vec[0], dir_name);
+  diag_index_ptr->serializeMassMatch(file_vec[1], dir_name);
+  rev_term_index_ptr->serializeMassMatch(file_vec[2], dir_name);
+  rev_diag_index_ptr->serializeMassMatch(file_vec[3], dir_name); 
 }
+
+}
+
 } /* namespace toppic */

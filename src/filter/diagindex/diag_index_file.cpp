@@ -14,29 +14,26 @@
 
 #include <iostream>
 
-#include "filter/mng/topindex_file_name.hpp"
 #include "filter/massmatch/mass_match_factory.hpp"
 #include "filter/diagindex/diag_index_file.hpp"
 
 namespace toppic {
 
-DiagIndexFile::DiagIndexFile(const ProteoformPtrVec &proteo_ptrs,
-                               DiagFilterMngPtr mng_ptr, std::string block_str) {
-  mng_ptr_ = mng_ptr;
-  proteo_ptrs_ = proteo_ptrs;
-  PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
+namespace diag_index_file {
 
-  index_ptr_ = MassMatchFactory::getPrmDiagMassMatchPtr(proteo_ptrs,
-                                                        mng_ptr->max_proteoform_mass_,
-                                                        mng_ptr->filter_scale_);
+void geneDiagIndexFile(const ProteoformPtrVec &proteo_ptrs,
+                       DiagFilterMngPtr mng_ptr, std::string block_str) {
+
+  MassMatchPtr index_ptr = MassMatchFactory::getPrmDiagMassMatchPtr(proteo_ptrs,
+                                                                    mng_ptr->max_proteoform_mass_,
+                                                                    mng_ptr->filter_scale_);
                                                         
-  TopIndexFileNamePtr file_name_ptr = std::make_shared<TopIndexFileName>();
-  std::string parameters = file_name_ptr->geneFileName(prsm_para_ptr);
+  std::string parameters = mng_ptr->getIndexFilePara();
+  std::string dir_name = mng_ptr->prsm_para_ptr_->getOriDbName() + "_idx";
+  std::string file_name = mng_ptr->multi_ptm_file_vec_[0] + parameters + block_str;
+  index_ptr->serializeMassMatch(file_name, dir_name);
+}
 
-  std::string dir_name = mng_ptr_->prsm_para_ptr_->getOriDbName() + "_idx";
-  std::string file_name = file_name_ptr->multi_ptm_file_vec_[0] + parameters + block_str;
-
-  index_ptr_->serializeMassMatch(file_name, dir_name);
 }
 
 } /* namespace toppic */

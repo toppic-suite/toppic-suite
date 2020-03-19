@@ -37,14 +37,15 @@ MassOnePtmFilter::MassOnePtmFilter(const ProteoformPtrVec &proteo_ptrs,
 
   std::string index_dir = mng_ptr_->prsm_para_ptr_->getOriDbName() + "_idx";
   
-  TopIndexFileNamePtr file_name_ptr = std::make_shared<TopIndexFileName>();
-  std::string parameters = file_name_ptr->geneFileName(prsm_para_ptr);
+  //TopIndexFileNamePtr file_name_ptr = std::make_shared<TopIndexFileName>();
+  //std::string parameters = file_name_ptr->geneFileName(prsm_para_ptr);
+  std::string parameters = mng_ptr->getIndexFilePara();
   std::string suffix = parameters + block_str;
 
- bool index_files_exist = true;
+  bool index_files_exist = true;
 
-  for (size_t t = 0; t < file_name_ptr->one_ptm_file_vec_.size(); t++){
-    std::string file_name = file_name_ptr->one_ptm_file_vec_[t] + suffix;
+  for (size_t t = 0; t < mng_ptr->one_ptm_file_vec_.size(); t++){
+    std::string file_name = mng_ptr->one_ptm_file_vec_[t] + suffix;
     if (!file_util::exists(index_dir + file_util::getFileSeparator() + file_name)){
       index_files_exist = false;//if any of the index files for this ptm is missing
       break; 
@@ -59,10 +60,10 @@ MassOnePtmFilter::MassOnePtmFilter(const ProteoformPtrVec &proteo_ptrs,
     rev_diag_index_ptr_ = std::make_shared<MassMatch>();
     
    //complete file name is a ptm type from topindexfile vector + parameters + db block id (block_str)
-    term_index_ptr_->deserializeMassMatch(file_name_ptr->one_ptm_file_vec_[0] + suffix, index_dir);
-    diag_index_ptr_->deserializeMassMatch(file_name_ptr->one_ptm_file_vec_[1] + suffix, index_dir);
-    rev_term_index_ptr_->deserializeMassMatch(file_name_ptr->one_ptm_file_vec_[2] + suffix, index_dir);
-    rev_diag_index_ptr_->deserializeMassMatch(file_name_ptr->one_ptm_file_vec_[3] + suffix, index_dir);
+    term_index_ptr_->deserializeMassMatch(mng_ptr->one_ptm_file_vec_[0] + suffix, index_dir);
+    diag_index_ptr_->deserializeMassMatch(mng_ptr->one_ptm_file_vec_[1] + suffix, index_dir);
+    rev_term_index_ptr_->deserializeMassMatch(mng_ptr->one_ptm_file_vec_[2] + suffix, index_dir);
+    rev_diag_index_ptr_->deserializeMassMatch(mng_ptr->one_ptm_file_vec_[3] + suffix, index_dir);
   }
   else{
 

@@ -25,7 +25,7 @@ namespace toppic {
 ProbPeak::ProbPeak(PrmPeakPtr peak_ptr, int spectrum_id, int height, 
                    bool strict, double convert_ratio) {
 
-  mass_ = (int) std::round(peak_ptr->getMonoMass() * convert_ratio);
+  mass_ = static_cast<int>(std::round(peak_ptr->getMonoMass() * convert_ratio));
   // we use NStrict and CRelax tolerance
   if (strict) {
     tolerance_ = std::ceil(peak_ptr->getStrictTolerance() * convert_ratio);
@@ -50,7 +50,7 @@ CompProbValue::CompProbValue(double convert_ratio, const ResFreqPtrVec &residue_
   residue_avg_len_ = residue_avg_len;
 
   for (size_t i = 0; i < residue_ptrs.size(); i++) {
-    int int_mass = (int)std::round(residue_ptrs[i]->getMass() * convert_ratio);
+    int int_mass = static_cast<int> (std::round(residue_ptrs[i]->getMass() * convert_ratio));
     residue_masses_.push_back(int_mass);
     residue_frequencies_.push_back(residue_ptrs[i]->getFreq());
   }
@@ -58,11 +58,11 @@ CompProbValue::CompProbValue(double convert_ratio, const ResFreqPtrVec &residue_
   max_layer_num_ = max_layer_num;
   max_table_height_ = max_table_height;
 
-  page_len_ = ORI_PAGE_LEN * (int) convert_ratio_;
-  block_len_ = ORI_BLOCK_LEN * (int) convert_ratio_;
+  page_len_ = ORI_PAGE_LEN * static_cast<int> (convert_ratio_);
+  block_len_ = ORI_BLOCK_LEN * static_cast<int> (convert_ratio_);
   page_table_ = new double[page_len_ * max_table_height_];
 
-  max_sp_len_ = (int) std::round(max_sp_prec_mass * convert_ratio_);
+  max_sp_len_ = static_cast<int>(std::round(max_sp_prec_mass * convert_ratio_));
   pos_scores_ = new short[max_sp_len_ + block_len_];
   tmp_pos_scores_ = new short[max_sp_len_ + block_len_];
   setFactors();

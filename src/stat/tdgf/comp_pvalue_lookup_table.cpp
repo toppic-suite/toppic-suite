@@ -36,7 +36,7 @@ CompPValueLookupTable::CompPValueLookupTable(TdgfMngPtr mng_ptr) {
 
 void CompPValueLookupTable::initTable() {
   // add init table
-  int ppm = mng_ptr_->prsm_para_ptr_->getPPM();
+  int ppm = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()->getIntPpm();
   LOG_DEBUG("ppm " << ppm);
 
   memset(ptm0_, 0, sizeof(ptm0_[0][0]) * 48 * 20);
