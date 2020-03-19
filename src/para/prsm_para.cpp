@@ -33,24 +33,11 @@ PrsmPara::PrsmPara(std::map<std::string, std::string> &arguments) {
 
   resource_dir_ = arguments["resourceDir"];
 
-  ppm_ = std::stoi(arguments["massErrorTolerance"]);
-
   group_spec_num_ = std::stoi(arguments["groupSpectrumNumber"]);
 
   fix_mod_list_ = mod_util::geneFixedModList(arguments["fixedMod"]);
 
-  activation_ = arguments["activation"];
-
-  fixed_mod_ = arguments["fixedMod"];
-
-  error_tol_ = arguments["massErrorTolerance"];
-
-  allow_prot_mod_ = arguments["allowProtMod"];
-
-  decoy_ = arguments["searchType"];
-
   std::string prot_mod_str = arguments["allowProtMod"];
-  //boost::split(strs, prot_mod_str, boost::is_any_of(","));
   std::vector<std::string> strs = str_util::split(prot_mod_str, ",");
   for (size_t i = 0; i < strs.size(); i++) {
     ProtModPtrVec mods = ProtModBase::getProtModPtrByType(strs[i]);
@@ -59,31 +46,8 @@ PrsmPara::PrsmPara(std::map<std::string, std::string> &arguments) {
   }
 
   std::string activation_name = arguments["activation"];
-
-  if (arguments["residueModFileName"] != "") {
-    localization_ = true;
-  } else {
-    localization_ = false;
-  }
-
-  std::set<std::string> skip_list;
-
-  if (arguments["skipList"] != "") {
-    std::ifstream infile(arguments["skipList"]);
-    std::string line;
-    while (std::getline(infile, line)) {
-      //boost::split(strs, line, boost::is_any_of(" "));
-      std::vector<std::string> strs = str_util::split(line, " "); 
-      for (size_t i = 0; i < strs.size(); i++) {
-        skip_list.insert(strs[i]);
-      }
-    }
-    infile.close();
-  }
-
-  sp_para_ptr_ = std::make_shared<SpPara>(activation_name, ppm_); 
-  
-  sp_para_ptr_->setSkipList(skip_list);
+  int ppm = std::stoi(arguments["massErrorTolerance"]);
+  sp_para_ptr_ = std::make_shared<SpPara>(activation_name, ppm); 
 }
 
 } /* namespace toppic */

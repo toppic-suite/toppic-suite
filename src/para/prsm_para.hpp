@@ -36,18 +36,6 @@ class PrsmPara {
 
   std::string getResourceDir() {return resource_dir_;}
 
-  std::string getActivation() {return activation_;}
-
-  std::string getFixedMod() {return fixed_mod_;}
-
-  std::string getErrorTolerance() {return error_tol_;}
-
-  std::string getProtMod() {return allow_prot_mod_;}
-
-  std::string getSearchType() {return decoy_;}
-
-  int getPPM() {return ppm_;}
-
   int getGroupSpecNum() {return group_spec_num_;}
 
   const ModPtrVec& getFixModPtrVec() {return fix_mod_list_;}
@@ -55,12 +43,6 @@ class PrsmPara {
   const ProtModPtrVec& getProtModPtrVec() {return prot_mod_list_;}
 
   SpParaPtr getSpParaPtr() {return sp_para_ptr_;}
-
-  bool doLocaliztion() {return localization_;}
-
-  std::string getIndexDir() {return index_file_dir_;}
-
-  void setIndexDir(std::string dir) {index_file_dir_ = dir;}
 
  private:
   std::string search_db_file_name_;
@@ -71,27 +53,11 @@ class PrsmPara {
 
   std::string resource_dir_;
 
-  std::string activation_;
-
-  std::string fixed_mod_;
-
-  std::string error_tol_;
-
-  std::string allow_prot_mod_;
-
-  std::string decoy_;
-
-  int ppm_;
-
   ModPtrVec fix_mod_list_;
 
   ProtModPtrVec prot_mod_list_;
 
   int group_spec_num_;
-
-  bool localization_;
-
-  std::string index_file_dir_;
 
   /** spectrum parameters */
   SpParaPtr sp_para_ptr_;

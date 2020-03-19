@@ -12,26 +12,21 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_PRSM_MASS_SHIFT_STR_HPP_
-#define TOPPIC_PRSM_MASS_SHIFT_STR_HPP_
+#ifndef TOPPIC_MS_SPEC_SPECTRUM_SET_FACTORY_HPP_
+#define TOPPIC_MS_SPEC_SPECTRUM_SET_FACTORY_HPP_
 
-#include <memory>
+#include "para/sp_para.hpp"
+#include "ms/spec/spectrum_set.hpp"
 
 namespace toppic {
 
-class MassShiftStr {
- public:
-  MassShiftStr(double mass_shift, int left_pos, int right_pos);
+namespace spectrum_set_factory {
 
-  double mass_shift_;
-  int left_pos_; 
-  int right_pos_;
-  static bool cmpPosInc(const std::shared_ptr<MassShiftStr> &a,
-                        const std::shared_ptr<MassShiftStr> &b);
-};
+SpectrumSetPtr geneSpectrumSetPtr(DeconvMsPtrVec deconv_ms_ptr_vec, 
+                                  SpParaPtr sp_para_ptr,
+                                  double prec_mono_mass);
+}
 
-typedef std::shared_ptr<MassShiftStr> MassShiftStrPtr;
+} /* namespace toppic */
 
-}  // namespace toppic
-
-#endif
+#endif /* SPECTRUM_SET_HPP_ */

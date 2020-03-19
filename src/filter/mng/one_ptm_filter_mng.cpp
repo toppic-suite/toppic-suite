@@ -17,11 +17,13 @@
 namespace toppic {
 
 OnePtmFilterMng::OnePtmFilterMng(PrsmParaPtr prsm_para_ptr,
+                                 const std::string & index_file_para,
                                  const std::string & output_file_ext,
                                  int thread_num,
                                  const std::string & residueModFileName,
                                  int var_num):
     prsm_para_ptr_(prsm_para_ptr),
+    index_file_para_(index_file_para),
     output_file_ext_(output_file_ext),
     thread_num_(thread_num),
     residueModFileName_(residueModFileName),

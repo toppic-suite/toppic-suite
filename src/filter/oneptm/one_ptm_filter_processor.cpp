@@ -22,6 +22,7 @@
 #include "seq/proteoform_factory.hpp"
 
 #include "ms/spec/msalign_util.hpp"
+#include "ms/spec/prm_ms_factory.hpp"
 #include "ms/spec/spectrum_set.hpp"
 
 #include "prsm/simple_prsm_xml_writer_set.hpp"
@@ -69,8 +70,13 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
           for (size_t k1 = 0; k1 < mod_mass.size(); k1++) {
             std::fill(mod_mass.begin(), mod_mass.end(), 0.0);
             mod_mass[k1] += mod_mass_list[i];
-            PrmMsPtrVec prm_ms_ptr_vec = spec_set_vec[0]->getMsTwoPtrVec(sp_para_ptr, mod_mass);
-            PrmMsPtrVec srm_ms_ptr_vec = spec_set_vec[0]->getSuffixMsTwoPtrVec(sp_para_ptr, mod_mass);
+            DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_vec[0]->getDeconvMsPtrVec();
+            double prec_mono_mass = spec_set_vec[0]->getPrecMonoMass();
+            PrmMsPtrVec prm_ms_ptr_vec = prm_ms_factory::geneMsTwoPtrVec(deconv_ms_ptr_vec,
+                                                                         sp_para_ptr,
+                                                                         prec_mono_mass, mod_mass);
+            PrmMsPtrVec srm_ms_ptr_vec = prm_ms_factory::geneSuffixMsTwoPtrVec(deconv_ms_ptr_vec, sp_para_ptr,
+                                                                               prec_mono_mass, mod_mass);
             filter_ptr->computeBestMatch(prm_ms_ptr_vec, srm_ms_ptr_vec);
             writers.getCompleteWriterPtr()->write(filter_ptr->getCompMatchPtrs());
             writers.getPrefixWriterPtr()->write(filter_ptr->getPrefMatchPtrs());

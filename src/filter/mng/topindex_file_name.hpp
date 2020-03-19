@@ -12,34 +12,32 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_PRSM_PRSM_STAT_HPP_
-#define TOPPIC_PRSM_PRSM_STAT_HPP_
+#ifndef TOPPIC_FILTER_MNG_TOPINDEX_FILE_NAME_HPP_
+#define TOPPIC_FILTER_MNG_TOPINDEX_FILE_NAME_HPP_
+
+#include <vector>
+#include <map>
 
 #include "para/prsm_para.hpp"
-#include "prsm/prsm.hpp"
 
-namespace toppic {
+namespace toppic{
 
-class PrsmStat {
+class TopIndexFileName{
+
  public:
-  PrsmStat(PrsmParaPtr prsm_para_ptr, 
-           const std::string &input_file_ext, 
-           const std::string &output_file_ext);
-  void process();
+  TopIndexFileName(){};
 
-  void writePrsm(std::ofstream &file, PrsmPtr prsm_ptr);
+  std::string geneFileName(std::map<std::string, std::string> &arguments);
 
- private:
-  PrsmParaPtr prsm_para_ptr_;
-  double min_mass_;
-  std::string input_file_ext_;
-  std::string output_file_ext_;
-  AminoAcidPtrVec acid_ptr_vec_;
+  std::map<std::string, std::string> prot_mod_map_ = {
+    {"", ""}, {"NONE", "N"}, {"NME", "NME"}, {"NME_ACETYLATION", "NMEA"}, {"M_ACETYLATION", "MA"}
+  };
+  std::map<std::string, std::string> search_type_map_ = {
+    {"TARGET", "no_decoy"}, {"TARGET+DECOY", "decoy"}};
 };
 
-typedef std::shared_ptr<PrsmStat> PrsmStatPtr;
+typedef std::shared_ptr<TopIndexFileName> TopIndexFileNamePtr;
 
+}
 
-} /* namespace toppic */
-
-#endif /* PRSM_STAT_HPP_ */
+#endif

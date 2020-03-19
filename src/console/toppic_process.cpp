@@ -44,6 +44,7 @@
 #include "prsm/prsm_util.hpp"
 
 #include "filter/mng/zero_ptm_filter_mng.hpp"
+#include "filter/mng/topindex_file_name.hpp"
 #include "filter/zeroptm/zero_ptm_filter_processor.hpp"
 #include "search/zeroptmsearch/zero_ptm_search_mng.hpp"
 #include "search/zeroptmsearch/zero_ptm_search_processor.hpp"
@@ -193,6 +194,10 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
       use_gf = false;
     }
 
+    // index file name
+    TopIndexFileNamePtr file_name_ptr = std::make_shared<TopIndexFileName>();
+    std::string index_file_para = file_name_ptr->geneFileName(arguments);
+
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
     LOG_DEBUG("prsm para inited");
 
@@ -204,13 +209,14 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     int db_block_size = std::stoi(arguments["databaseBlockSize"]);
 
     fasta_util::dbPreprocess(ori_db_file_name, db_file_name, decoy, db_block_size);
-    msalign_util::geneSpIndex(sp_file_name, prsm_para_ptr->getSpParaPtr());
+    msalign_util::geneSpIndex(sp_file_name);
 
     std::vector<std::string> input_exts;
 
     std::cout << "Non PTM filtering - started." << std::endl;
     ZeroPtmFilterMngPtr zero_filter_mng_ptr
-        = std::make_shared<ZeroPtmFilterMng>(prsm_para_ptr, thread_num, "toppic_zero_filter");
+        = std::make_shared<ZeroPtmFilterMng>(prsm_para_ptr, index_file_para, 
+                                             thread_num, "toppic_zero_filter");
     ZeroPtmFilterProcessorPtr zero_filter_processor
         = std::make_shared<ZeroPtmFilterProcessor>(zero_filter_mng_ptr);
     zero_filter_processor->process();
@@ -235,7 +241,8 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     if (ptm_num >= 1) {
       std::cout << "One PTM filtering - started." << std::endl;
       OnePtmFilterMngPtr one_ptm_filter_mng_ptr
-          = std::make_shared<OnePtmFilterMng>(prsm_para_ptr, "toppic_one_filter", thread_num);
+          = std::make_shared<OnePtmFilterMng>(prsm_para_ptr, index_file_para, 
+                                              "toppic_one_filter", thread_num);
       OnePtmFilterProcessorPtr one_filter_processor
           = std::make_shared<OnePtmFilterProcessor>(one_ptm_filter_mng_ptr);
       one_filter_processor->process();
@@ -263,8 +270,9 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
       std::cout << "Multiple PTM filtering - started." << std::endl;
       // thread number is used because diagonal filter uses only one index
       DiagFilterMngPtr diag_filter_mng_ptr
-          = std::make_shared<DiagFilterMng>(prsm_para_ptr, filter_result_num,
-                                            thread_num, "toppic_multi_filter");
+          = std::make_shared<DiagFilterMng>(prsm_para_ptr, index_file_para,  
+                                            filter_result_num, thread_num, 
+                                            "toppic_multi_filter");
       DiagFilterProcessorPtr diag_filter_processor
           = std::make_shared<DiagFilterProcessor>(diag_filter_mng_ptr);
       diag_filter_processor->process();
@@ -343,7 +351,7 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     }
 
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
-    msalign_util::geneSpIndex(sp_file_name, prsm_para_ptr->getSpParaPtr());
+    msalign_util::geneSpIndex(sp_file_name);
     LOG_DEBUG("prsm para inited");
 
     std::cout << "Finding PrSM clusters - started." << std::endl;
@@ -358,8 +366,7 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
                                                  "toppic_top",
                                                  "toppic_cluster",
                                                  fix_mod_list,
-                                                 form_error_tole,
-                                                 prsm_para_ptr);
+                                                 form_error_tole);
       prsm_clusters->process();
       prsm_clusters = nullptr;
     } else {

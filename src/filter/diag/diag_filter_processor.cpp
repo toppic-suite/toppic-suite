@@ -22,6 +22,7 @@
 #include "seq/db_block.hpp"
 #include "seq/proteoform_factory.hpp"
 #include "ms/spec/msalign_util.hpp"
+#include "ms/spec/prm_ms_factory.hpp"
 #include "prsm/simple_prsm_xml_writer.hpp"
 #include "prsm/simple_prsm_xml_writer_util.hpp"
 #include "prsm/simple_prsm_str_merge.hpp"
@@ -122,12 +123,16 @@ void DiagFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num
         }
         pool_ptr->Enqueue(geneTask(filter_ptr, ms_ptr_vec, pool_ptr, writer_ptr_vec));
       } else {
+        DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
+        double prec_mono_mass = spec_set_ptr->getPrecMonoMass();
         std::vector<double> mod_mass(3);
         for (size_t i = 0; i < mod_mass_list.size(); i++) {
           for (size_t k1 = 0; k1 < mod_mass.size(); k1++) {
             std::fill(mod_mass.begin(), mod_mass.end(), 0.0);
             mod_mass[k1] += mod_mass_list[i];
-            PrmMsPtrVec ms_ptr_vec = spec_set_ptr->getMsTwoPtrVec(sp_para_ptr, mod_mass);
+            PrmMsPtrVec ms_ptr_vec = prm_ms_factory::geneMsTwoPtrVec(deconv_ms_ptr_vec,
+                                                                     sp_para_ptr,
+                                                                     prec_mono_mass, mod_mass);
             while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ * 2) {
               boost::this_thread::sleep(boost::posix_time::milliseconds(100));
             }

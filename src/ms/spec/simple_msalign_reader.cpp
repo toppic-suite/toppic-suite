@@ -19,13 +19,11 @@
 #include "common/util/str_util.hpp"
 #include "common/base/mass_constant.hpp"
 #include "common/base/activation_base.hpp"
-#include "ms/spec/spectrum_set_factory.hpp"
-#include "ms/spec/msalign_reader.hpp"
+#include "ms/spec/simple_msalign_reader.hpp"
 
 namespace toppic {
 
-
-MsAlignReader::MsAlignReader(const std::string &file_name):
+SimpleMsAlignReader::SimpleMsAlignReader(const std::string &file_name):
     file_name_(file_name) {
       input_.open(file_name.c_str(), std::ios::in);
       if (!input_.is_open()) {
@@ -33,24 +31,14 @@ MsAlignReader::MsAlignReader(const std::string &file_name):
         exit(EXIT_FAILURE);
       }
       group_spec_num_ = 1;
-      activation_ptr_ = nullptr;
-      peak_num_limit_ = std::numeric_limits<int>::max();
     }
 
-MsAlignReader::~MsAlignReader() {
-  if (input_.is_open()) {
-    input_.close();
-  }
-}
-      
-MsAlignReader::MsAlignReader(const std::string &file_name, int group_spec_num,
-                             ActivationPtr act_ptr, const std::set<std::string> skip_list,
-                             int peak_num_limit):
+SimpleMsAlignReader::SimpleMsAlignReader(const std::string &file_name, 
+                                         int group_spec_num,
+                                         ActivationPtr activation_ptr):
     file_name_(file_name),
     group_spec_num_(group_spec_num),
-    activation_ptr_(act_ptr),
-    skip_list_(skip_list),
-    peak_num_limit_(peak_num_limit) {
+    activation_ptr_(activation_ptr) {
       input_.open(file_name.c_str(), std::ios::in);
       if (!input_.is_open()) {
         LOG_ERROR("msalign file  " << file_name << " does not exist.");
@@ -58,7 +46,13 @@ MsAlignReader::MsAlignReader(const std::string &file_name, int group_spec_num,
       }
     }
 
-std::vector<std::string> MsAlignReader::readOneStrSpectrum() {
+SimpleMsAlignReader::~SimpleMsAlignReader() {
+  if (input_.is_open()) {
+    input_.close();
+  }
+}
+      
+std::vector<std::string> SimpleMsAlignReader::readOneStrSpectrum() {
   std::string line;
   std::vector<std::string> line_list;
   while (std::getline(input_, line)) {
@@ -81,7 +75,7 @@ std::vector<std::string> MsAlignReader::readOneStrSpectrum() {
   return line_list;
 }
 
-void MsAlignReader::readNext() {
+void SimpleMsAlignReader::readNext() {
   deconv_ms_ptr_ = nullptr;
   spectrum_str_vec_ = readOneStrSpectrum();
   if (spectrum_str_vec_.size() == 0) {
@@ -101,7 +95,6 @@ void MsAlignReader::readNext() {
   int ms_one_scan = -1;
   double prec_mass = -1;
   int prec_charge = -1;
-  double prec_mz = -1;
   double prec_inte = -1;
   //int feature_id = -1;
   //double feature_inte = -1;
@@ -135,10 +128,6 @@ void MsAlignReader::readNext() {
         ms_one_scan = std::stod(strs[1]);
       } else if (strs[0] == "PRECURSOR_MASS") {
         prec_mass = std::stod(strs[1]);
-      } else if(strs[0] == "PRECURSOR_MZ"){
-        if (copy_values_){//if it is during merge sort 
-          prec_mz = std::stod(strs[1]);
-        }
       } else if (strs[0] == "PRECURSOR_CHARGE") {
         prec_charge = std::stoi(strs[1]);
       } else if (strs[0] == "PRECURSOR_INTENSITY") {
@@ -186,7 +175,6 @@ void MsAlignReader::readNext() {
     header_ptr->setActivationPtr(activation_ptr_);
   } else if (activation != "") {
     ActivationPtr activation_ptr = ActivationBase::getActivationPtrByName(activation);
-
     header_ptr->setActivationPtr(activation_ptr);
   }
   header_ptr->setMsLevel(level);
@@ -196,12 +184,6 @@ void MsAlignReader::readNext() {
   header_ptr->setMsOneScan(ms_one_scan);
 
   header_ptr->setPrecMonoMz(prec_mass /prec_charge + mass_constant::getProtonMass());
-
-  if (copy_values_){
-    //during merge sort only, these two values are not calculated again and instead copied from the msalign being read
-    header_ptr->setPrecMonoMz(prec_mz);
-    header_ptr->setCopiedPrecMonoMass(prec_mass);
-  }
 
   header_ptr->setPrecCharge(prec_charge);
 
@@ -223,42 +205,31 @@ void MsAlignReader::readNext() {
       DeconvPeakPtr peak_ptr = std::make_shared<DeconvPeak>(id, idx, mass, inte, charge);
       peak_ptr_list.push_back(peak_ptr);
       idx++;
-      if (static_cast<int>(peak_ptr_list.size()) >= peak_num_limit_) break;
     }
   }
 
   deconv_ms_ptr_ = std::make_shared<Ms<DeconvPeakPtr> >(header_ptr, peak_ptr_list);
-
   current_++;
-
 }
 
-DeconvMsPtr MsAlignReader::getNextMs() {
+DeconvMsPtr SimpleMsAlignReader::getNextMsPtr() {
   readNext();
-  while (deconv_ms_ptr_ != nullptr
-         && skip_list_.find(deconv_ms_ptr_->getMsHeaderPtr()->getScansString()) != skip_list_.end()) {
-    readNext();
-  }
   return deconv_ms_ptr_;
 }
 
-std::vector<SpectrumSetPtr> MsAlignReader::getNextSpectrumSet(SpParaPtr sp_para_ptr) {
-  std::vector<SpectrumSetPtr> spec_set_vec;
+DeconvMsPtrVec SimpleMsAlignReader::getNextMsPtrVec() {
   DeconvMsPtrVec deconv_ms_ptr_vec;
   for (int i = 0; i < group_spec_num_; i++) {
     readNext();
-    while (deconv_ms_ptr_ != nullptr
-           && skip_list_.find(deconv_ms_ptr_->getMsHeaderPtr()->getScansString()) != skip_list_.end()) {
-      readNext();
-    }
     if (deconv_ms_ptr_ == nullptr) {
-      spec_set_vec.push_back(nullptr);
-      return spec_set_vec;
+      deconv_ms_ptr_vec.clear();
+      return deconv_ms_ptr_vec;
     }
     deconv_ms_ptr_vec.push_back(deconv_ms_ptr_);
   }
   double prec_mono_mass = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMass();
-  // LOG_DEBUG("prec mass " << prec_mono_mass);
+  int charge = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecCharge();
+  // Get average precursor mass
   int count = 1;
   for (int i = 1; i < group_spec_num_; i++) {
     double new_mass = deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getPrecMonoMass();
@@ -267,39 +238,23 @@ std::vector<SpectrumSetPtr> MsAlignReader::getNextSpectrumSet(SpParaPtr sp_para_
       count++;
     }
   }
-  // LOG_DEBUG("prec mass result " << prec_mono_mass);
-  std::vector<double> prec_errors;
-  prec_errors.push_back(0);
-  for (int i = 1; i <= sp_para_ptr->getPrecError(); i++) {
-    prec_errors.push_back(- i * mass_constant::getIsotopeMass());
-    prec_errors.push_back(i * mass_constant::getIsotopeMass());
+
+  double prec_mono_mz = Peak::compMz(prec_mono_mass, charge);
+  for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
+    deconv_ms_ptr_vec[i]->getMsHeaderPtr()->setPrecMonoMz(prec_mono_mz);
   }
-  for (size_t i = 0; i< prec_errors.size(); i++) {
-    spec_set_vec.push_back(spectrum_set_factory::geneSpectrumSetPtr(deconv_ms_ptr_vec,
-                                                                    sp_para_ptr,
-                                                                    prec_mono_mass + prec_errors[i]));
-  }
-  return spec_set_vec;
+  return deconv_ms_ptr_vec;
 }
 
-void MsAlignReader::close() {
-  input_.close();
-}
-
-void MsAlignReader::readMsOneSpectra(const std::string &file_name, 
-                                     DeconvMsPtrVec &ms_ptr_vec) {
-  int sp_num_in_group = 1;
-  MsAlignReader sp_reader(file_name, sp_num_in_group,
-                          nullptr, std::set<std::string>());
+void SimpleMsAlignReader::readMsOneSpectra(const std::string &file_name, 
+                                           DeconvMsPtrVec &ms_ptr_vec) {
+  SimpleMsAlignReader sp_reader(file_name); 
 
   DeconvMsPtr ms_ptr;
-  //LOG_DEBUG("Start search");
-  while ((ms_ptr = sp_reader.getNextMs())!= nullptr) {
+  while ((ms_ptr = sp_reader.getNextMsPtr())!= nullptr) {
     ms_ptr->getMsHeaderPtr()->setMsLevel(1);
     ms_ptr_vec.push_back(ms_ptr);
-    //std::cout << std::flush <<  "reading spectrum " << ms_ptr_vec.size() << "\r";
   }
-  sp_reader.close();
 }
 
 }  // namespace toppic
