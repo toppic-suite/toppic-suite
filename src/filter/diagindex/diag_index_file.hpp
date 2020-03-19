@@ -16,23 +16,16 @@
 #define TOPPIC_FILTER_DIAG_DIAG_INDEX_FILE_H_
 
 #include "seq/proteoform.hpp"
-#include "filter/massmatch/mass_match.hpp"
 #include "filter/mng/diag_filter_mng.hpp"
 
 namespace toppic {
 
-class DiagIndexFile {
- public:
-  DiagIndexFile(const ProteoformPtrVec &proteo_ptrs, DiagFilterMngPtr mng_ptr, 
-                std::string file_name);
+namespace diag_index_file {
 
- private:
-  DiagFilterMngPtr mng_ptr_;
-  ProteoformPtrVec proteo_ptrs_;
-  MassMatchPtr index_ptr_;
-};
+void geneDiagIndexFile(const ProteoformPtrVec &proteo_ptrs, DiagFilterMngPtr mng_ptr, 
+                       std::string block_str);
+}
 
-typedef std::shared_ptr<DiagIndexFile> DiagIndexFilePtr;
 } /* namespace toppic */
 
 #endif 

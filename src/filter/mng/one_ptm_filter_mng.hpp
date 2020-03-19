@@ -23,7 +23,6 @@ namespace toppic {
 
 class OnePtmFilterMng {
  public:
-  //OnePtmFilterMng(PrsmParaPtr prsm_para_ptr){prsm_para_ptr_ = prsm_para_ptr;}
   OnePtmFilterMng(PrsmParaPtr prsm_para_ptr,
                   const std::string & index_file_para,
                   const std::string & output_file_ext,
@@ -61,7 +60,8 @@ class OnePtmFilterMng {
 
   std::vector<int> cnts_;
 
-  std::vector<std::string> file_names{"toppic_one_ptm_complete", "toppic_one_ptm_prefix", "toppic_one_ptm_suffix", "toppic_one_ptm_internal"};
+  std::vector<std::string> one_ptm_file_vec_{"one_ptm_term_index", "one_ptm_diag_index", 
+    "one_ptm_rev_term_index", "one_ptm_rev_diag_index"};//file name vector
 };
 
 typedef std::shared_ptr<OnePtmFilterMng> OnePtmFilterMngPtr;
