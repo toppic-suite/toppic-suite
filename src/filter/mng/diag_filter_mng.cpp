@@ -17,16 +17,18 @@
 namespace toppic {
 
 DiagFilterMng::DiagFilterMng(PrsmParaPtr prsm_para_ptr,
+                             const std::string & index_file_para, 
                              int filtering_result_num,
                              int thread_num,
-                             const std::string &output_file_ext,
-                             const std::string & residueModFileName,
+                             const std::string & output_file_ext,
+                             const std::string & residue_mod_file_name,
                              int var_num):
     prsm_para_ptr_(prsm_para_ptr),
+    index_file_para_(index_file_para),
     filter_result_num_(filtering_result_num),
     thread_num_(thread_num),
     output_file_ext_(output_file_ext),
-    residueModFileName_(residueModFileName),
+    residueModFileName_(residue_mod_file_name),
     var_num_(var_num) {}
 
 }  // namespace toppic

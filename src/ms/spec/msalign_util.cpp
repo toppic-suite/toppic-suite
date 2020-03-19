@@ -14,26 +14,25 @@
 
 
 #include "common/util/logger.hpp"
+#include "ms/spec/simple_msalign_reader.hpp"
 #include "ms/spec/msalign_util.hpp"
-#include "ms/spec/msalign_reader.hpp"
 
 namespace toppic {
 
 namespace msalign_util {
 
-int countSpNum(const std::string &spectrum_file_name, SpParaPtr sp_para_ptr) {
-  MsAlignReader reader(spectrum_file_name, 1, nullptr, sp_para_ptr->getSkipList());
+int countSpNum(const std::string &spectrum_file_name) {
+  SimpleMsAlignReader reader(spectrum_file_name);
   int cnt = 0;
   DeconvMsPtr deconv_ms_ptr;
-  while ((deconv_ms_ptr = reader.getNextMs()) != nullptr) {
+  while ((deconv_ms_ptr = reader.getNextMsPtr()) != nullptr) {
     cnt++;
   }
-  reader.close();
   return cnt;
 }
 
-void geneSpIndex(const std::string &spectrum_file_name, SpParaPtr sp_para_ptr) {
-  int sp_num = countSpNum(spectrum_file_name, sp_para_ptr); 
+void geneSpIndex(const std::string &spectrum_file_name) {
+  int sp_num = countSpNum(spectrum_file_name); 
   std::ofstream index_output;
   std::string index_file_name = spectrum_file_name + "_index";
   index_output.open(index_file_name.c_str(), std::ios::out);

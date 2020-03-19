@@ -39,6 +39,12 @@ MassShift::MassShift(MassShiftPtr shift_ptr, int start) {
   }
 }
 
+MassShift::MassShift(int left_bp_pos, int right_bp_pos, 
+                     double shift):
+    left_bp_pos_(left_bp_pos),
+    right_bp_pos_(right_bp_pos),
+    shift_(shift) {}
+
 AlterTypePtr MassShift::getTypePtr() {
   if (alter_vec_.size() == 0) {
     LOG_ERROR("Alter vector is empty!");

@@ -18,7 +18,7 @@
 
 #include "seq/proteoform_util.hpp"
 
-#include "filter/zeroindex/topindex_file_name.hpp"
+#include "filter/mng/topindex_file_name.hpp"
 
 #include "filter/massmatch/filter_protein.hpp"
 #include "filter/massmatch/mass_match_factory.hpp"
@@ -35,16 +35,17 @@ MassZeroPtmFilter::MassZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
   
   std::string index_dir = mng_ptr_->prsm_para_ptr_->getOriDbName() + "_idx";
 
-	TopIndexFileNamePtr file_name_ptr = std::make_shared<TopIndexFileName>();
-  std::string parameters = file_name_ptr->geneFileName(prsm_para_ptr);
+	//TopIndexFileNamePtr file_name_ptr = std::make_shared<TopIndexFileName>();
+  //std::string parameters = file_name_ptr->geneFileName(prsm_para_ptr);
+  std::string parameters = mng_ptr->getIndexFilePara();
   std::string suffix = parameters + block_str;//last part of file name
 
   //check if all index files for this ptm is present. if not, generate index files again.
 
  bool index_files_exist = true;
 
-  for (size_t t = 0; t < file_name_ptr->zero_ptm_file_vec_.size(); t++){
-    std::string file_name = file_name_ptr->zero_ptm_file_vec_[t] + suffix;
+  for (size_t t = 0; t < mng_ptr->zero_ptm_file_vec_.size(); t++){
+    std::string file_name = mng_ptr->zero_ptm_file_vec_[t] + suffix;
     if (!file_util::exists(index_dir + file_util::getFileSeparator() + file_name)){
       index_files_exist = false;//if any of the index files for this ptm is missing
       break; 
@@ -59,10 +60,10 @@ MassZeroPtmFilter::MassZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
     rev_term_index_ptr_ = std::make_shared<MassMatch>();
     rev_diag_index_ptr_ = std::make_shared<MassMatch>();
 
-    term_index_ptr_->deserializeMassMatch(file_name_ptr->zero_ptm_file_vec_[0] + suffix, index_dir);
-    diag_index_ptr_->deserializeMassMatch(file_name_ptr->zero_ptm_file_vec_[1] + suffix, index_dir);
-    rev_term_index_ptr_->deserializeMassMatch(file_name_ptr->zero_ptm_file_vec_[2] + suffix, index_dir);
-    rev_diag_index_ptr_->deserializeMassMatch(file_name_ptr->zero_ptm_file_vec_[3] + suffix, index_dir);
+    term_index_ptr_->deserializeMassMatch(mng_ptr->zero_ptm_file_vec_[0] + suffix, index_dir);
+    diag_index_ptr_->deserializeMassMatch(mng_ptr->zero_ptm_file_vec_[1] + suffix, index_dir);
+    rev_term_index_ptr_->deserializeMassMatch(mng_ptr->zero_ptm_file_vec_[2] + suffix, index_dir);
+    rev_diag_index_ptr_->deserializeMassMatch(mng_ptr->zero_ptm_file_vec_[3] + suffix, index_dir);
 
   }
   

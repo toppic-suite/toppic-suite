@@ -16,28 +16,17 @@
 #define TOPPIC_FILTER_ONE_PTM_ONE_PTM_INDEX_FILE_H_
 
 #include "seq/proteoform.hpp"
-
-#include "filter/massmatch/mass_match.hpp"
 #include "filter/mng/one_ptm_filter_mng.hpp"
 
 namespace toppic {
 
-class OnePtmIndexFile {
- public:
-  OnePtmIndexFile(const ProteoformPtrVec &proteo_ptrs,
-                   OnePtmFilterMngPtr mng_ptr, std::vector<std::string> file_vec);
+namespace one_ptm_index_file {
 
- private:
-  OnePtmFilterMngPtr mng_ptr_;
-  ProteoformPtrVec proteo_ptrs_;
+void geneOnePtmIndexFile(const ProteoformPtrVec &proteo_ptrs,
+                         OnePtmFilterMngPtr mng_ptr, 
+                         std::vector<std::string> file_vec);
+}
 
-  MassMatchPtr diag_index_ptr_;
-  MassMatchPtr rev_diag_index_ptr_;
-  MassMatchPtr term_index_ptr_;
-  MassMatchPtr rev_term_index_ptr_;
-};
+}
 
-typedef std::shared_ptr<OnePtmIndexFile> OnePtmIndexFilePtr;
-} /* namespace toppic */
-
-#endif 
+#endif

@@ -29,16 +29,16 @@ class SeqSegment {
 
   int getRightBpPos() {return right_bp_pos_;}
 
-  double getPepNTermShift() {return pep_n_term_shift_;}
+  double getNTermShift() {return n_term_shift_;}
 
-  double getPepCTermShift() {return pep_c_term_shift_;}
+  double getCTermShift() {return c_term_shift_;}
 
  private:
   // segment begin and end are based on break_points
   int left_bp_pos_;
   int right_bp_pos_;
-  double pep_n_term_shift_;
-  double pep_c_term_shift_;
+  double n_term_shift_;
+  double c_term_shift_;
 };
 
 typedef std::shared_ptr<SeqSegment> SeqSegmentPtr;

@@ -24,6 +24,8 @@ typedef std::shared_ptr<MassShift> MassShiftPtr;
 
 class MassShift {
  public:
+  explicit MassShift(int left_bp_pos, int right_bp_pos, double shift);
+
   explicit MassShift(AlterPtr alter_ptr);  
 
   explicit MassShift(MassShiftPtr shift_ptr, int start);
@@ -63,6 +65,7 @@ class MassShift {
 
   double shift_;
 
+  // A mass shift is annotated by a list of alterations. 
   std::vector<AlterPtr> alter_vec_;
 };
 

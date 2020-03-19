@@ -20,24 +20,13 @@
 
 namespace toppic {
 
-class ZeroPtmIndexFile {
- public:
-  ZeroPtmIndexFile(const ProteoformPtrVec &proteo_ptrs, ZeroPtmFilterMngPtr
-                    mng_ptr, std::vector<std::string> file_vec);
+namespace zero_ptm_index_file {
 
- private:
-  ZeroPtmFilterMngPtr mng_ptr_;
-  ProteoformPtrVec proteo_ptrs_;
+void geneZeroPtmIndexFile(const ProteoformPtrVec &proteo_ptrs, ZeroPtmFilterMngPtr
+                          mng_ptr, std::vector<std::string> file_vec);
 
-  MassMatchPtr diag_index_ptr_;
-  MassMatchPtr rev_diag_index_ptr_;
-  MassMatchPtr term_index_ptr_;
-  MassMatchPtr rev_term_index_ptr_;
-  
-  std::string block_str; //which db_block it is. Used when merging the output files by order.
-};
+}
 
-typedef std::shared_ptr<ZeroPtmIndexFile> ZeroPtmIndexFilePtr;
 } /* namespace toppic */
 
 #endif 

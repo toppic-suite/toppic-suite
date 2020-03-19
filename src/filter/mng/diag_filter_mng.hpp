@@ -15,22 +15,25 @@
 #ifndef TOPPIC_FILTER_MNG_DIAG_FILTER_MNG_HPP_
 #define TOPPIC_FILTER_MNG_DIAG_FILTER_MNG_HPP_
 
-#include <boost/thread.hpp>
 #include "para/prsm_para.hpp"
 
 namespace toppic {
 
 class DiagFilterMng {
  public:
-  DiagFilterMng(PrsmParaPtr prsm_para_ptr){prsm_para_ptr_ = prsm_para_ptr;}
   DiagFilterMng(PrsmParaPtr prsm_para_ptr,
+                const std::string & index_file_para,
                 int filtering_result_num,
                 int thread_num,
-                const std::string &output_file_ext,
+                const std::string & output_file_ext,
                 const std::string & residueModFileName = "",
                 int var_num = 0);
 
+  std::string getIndexFilePara() {return index_file_para_;}
+
   PrsmParaPtr prsm_para_ptr_;
+
+  std::string index_file_para_;
 
   /** parameters for fast filteration */
   int max_proteoform_mass_ = 40000;
@@ -44,11 +47,10 @@ class DiagFilterMng {
   std::string output_file_ext_;
   std::string residueModFileName_;
 
-  boost::mutex mutex_;
-
   int var_num_;
 
-    std::vector<std::string> file_names{"toppic_multi_ptm_complete", "toppic_multi_ptm_prefix", "toppic_multi_ptm_suffix", "toppic_multi_ptm_internal"};
+  std::vector<std::string> multi_ptm_file_vec_{"multi_ptm_index"};//file name vector
+
 };
 
 typedef std::shared_ptr<DiagFilterMng> DiagFilterMngPtr;

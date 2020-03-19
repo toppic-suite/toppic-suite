@@ -18,7 +18,7 @@
 #include <vector>
 #include <string>
 
-#include "prsm/mass_shift_str.hpp"
+#include "seq/mass_shift.hpp"
 
 namespace toppic {
 
@@ -73,7 +73,7 @@ class PrsmStr {
 
   double getAdjustedPrecMass() {return adjusted_prec_mass_;}
 
-  std::vector<MassShiftStrPtr> getChangeStrVec() {return mass_shift_vec_;}
+  std::vector<MassShiftPtr> getMassShiftVec() {return mass_shift_vec_;}
 
   std::string getProteinMatchSeq() {return protein_match_seq_;}
 
@@ -168,7 +168,7 @@ class PrsmStr {
 
   double proteoform_fdr_;
 
-  std::vector<MassShiftStrPtr> mass_shift_vec_;
+  std::vector<MassShiftPtr> mass_shift_vec_;
 
   std::string protein_match_seq_;
 

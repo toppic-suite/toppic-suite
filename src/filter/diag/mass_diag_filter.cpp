@@ -22,7 +22,7 @@
 
 #include "prsm/simple_prsm_util.hpp"
 
-#include "filter/zeroindex/topindex_file_name.hpp"
+#include "filter/mng/topindex_file_name.hpp"
 
 #include "filter/massmatch/filter_protein.hpp"
 #include "filter/massmatch/mass_match_factory.hpp"
@@ -37,16 +37,17 @@ MassDiagFilter::MassDiagFilter(const ProteoformPtrVec &proteo_ptrs,
   proteo_ptrs_ = proteo_ptrs;
   PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
   
-  TopIndexFileNamePtr file_name_ptr = std::make_shared<TopIndexFileName>();
-  std::string parameters = file_name_ptr->geneFileName(prsm_para_ptr);
+  //TopIndexFileNamePtr file_name_ptr = std::make_shared<TopIndexFileName>();
+  //std::string parameters = file_name_ptr->geneFileName(prsm_para_ptr);
+  std::string parameters = mng_ptr->getIndexFilePara();
   std::string suffix = parameters + block_str;
 	
   std::string index_dir = mng_ptr_->prsm_para_ptr_->getOriDbName() + "_idx";
 
   bool index_files_exist = true;
 
-  for (size_t t = 0; t < file_name_ptr->multi_ptm_file_vec_.size(); t++){
-    std::string file_name = file_name_ptr->multi_ptm_file_vec_[t] + suffix;
+  for (size_t t = 0; t < mng_ptr->multi_ptm_file_vec_.size(); t++){
+    std::string file_name = mng_ptr->multi_ptm_file_vec_[t] + suffix;
     if (!file_util::exists(index_dir + file_util::getFileSeparator() + file_name)){
       index_files_exist = false;//if any of the index files for this ptm is missing
       break; 
@@ -57,15 +58,15 @@ MassDiagFilter::MassDiagFilter(const ProteoformPtrVec &proteo_ptrs,
     std::cout << "Loading index files                            " << std::endl;
     index_ptr_ = std::make_shared<MassMatch>();
     
-    std::string file_name = file_name_ptr->multi_ptm_file_vec_[0] + suffix;
+    std::string file_name = mng_ptr->multi_ptm_file_vec_[0] + suffix;
     
     index_ptr_->deserializeMassMatch(file_name, index_dir);
 
   }
   else{
     index_ptr_ = MassMatchFactory::getPrmDiagMassMatchPtr(proteo_ptrs,
-                                                        mng_ptr->max_proteoform_mass_,
-                                                        mng_ptr->filter_scale_);                                                  
+                                                          mng_ptr->max_proteoform_mass_,
+                                                          mng_ptr->filter_scale_);
   }
 }
 

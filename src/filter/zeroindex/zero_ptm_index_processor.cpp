@@ -21,7 +21,7 @@
 #include "seq/proteoform.hpp"
 #include "seq/proteoform_factory.hpp"
 
-#include "filter/zeroindex/topindex_file_name.hpp"
+#include "filter/mng/topindex_file_name.hpp"
 
 #include "filter/zeroindex/zero_ptm_index_processor.hpp"
 #include "filter/zeroindex/zero_ptm_index_file.hpp"
@@ -32,19 +32,14 @@ inline void createIndexFiles(const ProteoformPtrVec & raw_forms,
                              int block_idx, ZeroPtmFilterMngPtr mng_ptr) {  
                         
     std::string block_str = str_util::toString(block_idx);
-    PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
-    
-    //index file names = fixed mod + n terminal + activation + error tolerance + decoy + block number
-    TopIndexFileNamePtr file_name_ptr = std::make_shared<TopIndexFileName>();
-    std::string parameters = file_name_ptr->geneFileName(prsm_para_ptr);
+    std::string parameters = mng_ptr->getIndexFilePara();
 
     std::vector<std::string> file_vec;
-
-    for (size_t i = 0; i < file_name_ptr->zero_ptm_file_vec_.size(); i++){
-      file_vec.push_back(file_name_ptr->zero_ptm_file_vec_[i] + parameters + block_str);
+    for (size_t i = 0; i < mng_ptr->zero_ptm_file_vec_.size(); i++){
+      file_vec.push_back(mng_ptr->zero_ptm_file_vec_[i] + parameters + block_str);
     }
 
-    ZeroPtmIndexFilePtr index_file_ptr = std::make_shared<ZeroPtmIndexFile>(raw_forms, mng_ptr, file_vec);
+    zero_ptm_index_file::geneZeroPtmIndexFile(raw_forms, mng_ptr, file_vec);
 }
 
 std::function<void()> geneIndexTask(int block_idx, ZeroPtmFilterMngPtr mng_ptr) {
@@ -65,8 +60,6 @@ void ZeroPtmIndexProcessor::process(){
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
   std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
   DbBlockPtrVec db_block_ptr_vec = DbBlock::readDbBlockIndex(db_file_name);
-
-  // n_spec_block = spec_num * block_num
 
   SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(mng_ptr_->thread_num_);
   

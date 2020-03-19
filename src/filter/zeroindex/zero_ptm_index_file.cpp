@@ -22,11 +22,11 @@
 
 namespace toppic {
 
-ZeroPtmIndexFile::ZeroPtmIndexFile(const ProteoformPtrVec &proteo_ptrs,
-                                   ZeroPtmFilterMngPtr mng_ptr, 
-                                   std::vector<std::string> file_vec) {
-  mng_ptr_ = mng_ptr;
-  proteo_ptrs_ = proteo_ptrs;
+namespace zero_ptm_index_file {
+
+void geneZeroPtmIndexFile(const ProteoformPtrVec &proteo_ptrs,
+                          ZeroPtmFilterMngPtr mng_ptr, 
+                          std::vector<std::string> file_vec) {
   LOG_DEBUG("get shifts");
   std::vector<std::vector<double> > shift_2d
       = proteoform_util::getNTermShift2D(proteo_ptrs, mng_ptr->prsm_para_ptr_->getProtModPtrVec());
@@ -34,13 +34,13 @@ ZeroPtmIndexFile::ZeroPtmIndexFile(const ProteoformPtrVec &proteo_ptrs,
       = proteoform_util::getNTermAcet2D(proteo_ptrs, mng_ptr->prsm_para_ptr_->getProtModPtrVec());
   LOG_DEBUG("get shifts complete");
   // N-terminal indexes
-  term_index_ptr_ = MassMatchFactory::getPrmTermMassMatchPtr(proteo_ptrs, shift_2d,
-                                                             mng_ptr->max_proteoform_mass_,
-                                                             mng_ptr->filter_scale_);
+  MassMatchPtr term_index_ptr = MassMatchFactory::getPrmTermMassMatchPtr(proteo_ptrs, shift_2d,
+                                                                         mng_ptr->max_proteoform_mass_,
+                                                                         mng_ptr->filter_scale_);
   // Prm indexes
-  diag_index_ptr_ = MassMatchFactory::getPrmDiagMassMatchPtr(proteo_ptrs,
-                                                             mng_ptr->max_proteoform_mass_,
-                                                             mng_ptr->filter_scale_);
+  MassMatchPtr diag_index_ptr = MassMatchFactory::getPrmDiagMassMatchPtr(proteo_ptrs,
+                                                                         mng_ptr->max_proteoform_mass_,
+                                                                         mng_ptr->filter_scale_);
   LOG_DEBUG("diag index");
   std::vector<std::vector<double> > rev_shift_2d;
   std::vector<double> shift_1d(1, 0);
@@ -48,22 +48,24 @@ ZeroPtmIndexFile::ZeroPtmIndexFile(const ProteoformPtrVec &proteo_ptrs,
     rev_shift_2d.push_back(shift_1d);
   }
   // C-terminal indexes
-  rev_term_index_ptr_ = MassMatchFactory::getSrmTermMassMatchPtr(proteo_ptrs, rev_shift_2d,
-                                                                 n_term_acet_2d,
-                                                                 mng_ptr->max_proteoform_mass_,
-                                                                 mng_ptr->filter_scale_);
+  MassMatchPtr rev_term_index_ptr = MassMatchFactory::getSrmTermMassMatchPtr(proteo_ptrs, rev_shift_2d,
+                                                                             n_term_acet_2d,
+                                                                             mng_ptr->max_proteoform_mass_,
+                                                                             mng_ptr->filter_scale_);
 
   // To generate SRM indexes, n terminal acetylation shifts are added into the SRM list. 
-  rev_diag_index_ptr_ = MassMatchFactory::getSrmDiagMassMatchPtr(proteo_ptrs, n_term_acet_2d,
-                                                                 mng_ptr->max_proteoform_mass_,
-                                                                 mng_ptr->filter_scale_);
+  MassMatchPtr rev_diag_index_ptr = MassMatchFactory::getSrmDiagMassMatchPtr(proteo_ptrs, n_term_acet_2d,
+                                                                             mng_ptr->max_proteoform_mass_,
+                                                                             mng_ptr->filter_scale_);
 
-  std::string dir_name = mng_ptr_->prsm_para_ptr_->getOriDbName() + "_idx";
+  std::string dir_name = mng_ptr->prsm_para_ptr_->getOriDbName() + "_idx";
 
-  term_index_ptr_->serializeMassMatch(file_vec[0], dir_name);
-  diag_index_ptr_->serializeMassMatch(file_vec[1], dir_name);
-  rev_term_index_ptr_->serializeMassMatch(file_vec[2], dir_name);
-  rev_diag_index_ptr_->serializeMassMatch(file_vec[3], dir_name);     
-                                                       
+  term_index_ptr->serializeMassMatch(file_vec[0], dir_name);
+  diag_index_ptr->serializeMassMatch(file_vec[1], dir_name);
+  rev_term_index_ptr->serializeMassMatch(file_vec[2], dir_name);
+  rev_diag_index_ptr->serializeMassMatch(file_vec[3], dir_name);     
 }
+
+}
+
 } /* namespace toppic */
