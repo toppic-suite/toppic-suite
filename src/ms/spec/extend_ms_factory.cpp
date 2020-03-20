@@ -24,29 +24,26 @@ ExtendMsPtr geneMsThreePtr(DeconvMsPtr deconv_ms_ptr, SpParaPtr sp_para_ptr,
                            double new_prec_mass) {
   MsHeaderPtr ori_header_ptr = deconv_ms_ptr->getMsHeaderPtr();
   MsHeaderPtr header_ptr = MsHeader::geneMsHeaderPtr(ori_header_ptr, new_prec_mass);
-
   ExtendPeakPtrVec list;
   double ext_min_mass = sp_para_ptr->getExtendMinMass();
   std::vector<double> ext_offsets = sp_para_ptr->getExtendOffsets();
+
   for (size_t i = 0; i < deconv_ms_ptr->size(); i++) {
     DeconvPeakPtr deconv_peak_ptr = deconv_ms_ptr->getPeakPtr(i);
     if (deconv_peak_ptr->getMonoMass() <= ext_min_mass) {
       double orig_mass = deconv_peak_ptr->getMonoMass();
-
       ExtendPeakPtr extend_peak_ptr
           = std::make_shared<ExtendPeak>(deconv_peak_ptr, orig_mass, 1.0);
       list.push_back(extend_peak_ptr);
     } else {
       for (size_t j = 0; j < ext_offsets.size(); j++) {
         double mass = deconv_peak_ptr->getMonoMass() + ext_offsets[j];
-
         ExtendPeakPtr extend_peak_ptr
             = std::make_shared<ExtendPeak>(deconv_peak_ptr, mass, 1.0);
         list.push_back(extend_peak_ptr);
       }
     }
   }
-
   // filter extend_peak
   ExtendPeakPtrVec list_filtered;
   double min_mass = sp_para_ptr->getMinMass();
@@ -59,7 +56,6 @@ ExtendMsPtr geneMsThreePtr(DeconvMsPtr deconv_ms_ptr, SpParaPtr sp_para_ptr,
   }
 
   std::sort(list_filtered.begin(), list_filtered.end(), ExtendPeak::cmpPosInc);
-
   // set error tolerance
   PeakTolerancePtr peak_tole_ptr = sp_para_ptr->getPeakTolerancePtr();
   for (size_t i = 0; i < list_filtered.size(); i++) {
