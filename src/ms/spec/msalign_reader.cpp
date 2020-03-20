@@ -226,9 +226,7 @@ void MsAlignReader::readNext() {
       if (static_cast<int>(peak_ptr_list.size()) >= peak_num_limit_) break;
     }
   }
-
   deconv_ms_ptr_ = std::make_shared<Ms<DeconvPeakPtr> >(header_ptr, peak_ptr_list);
-
   current_++;
 
 }
@@ -275,6 +273,7 @@ std::vector<SpectrumSetPtr> MsAlignReader::getNextSpectrumSet(SpParaPtr sp_para_
     prec_errors.push_back(i * mass_constant::getIsotopeMass());
   }
   for (size_t i = 0; i< prec_errors.size(); i++) {
+
     spec_set_vec.push_back(spectrum_set_factory::geneSpectrumSetPtr(deconv_ms_ptr_vec,
                                                                     sp_para_ptr,
                                                                     prec_mono_mass + prec_errors[i]));
