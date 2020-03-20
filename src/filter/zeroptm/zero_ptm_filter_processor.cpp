@@ -52,20 +52,25 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
   std::string output_file_name = file_util::basename(prsm_para_ptr->getSpectrumFileName())
       + "." + mng_ptr->output_file_ext_ + "_" + block_str;
   //writer
+  
   SimplePrsmXmlWriterSet writers(output_file_name);
+  
   std::vector<SpectrumSetPtr> spec_set_vec = reader.getNextSpectrumSet(sp_para_ptr);
   while (spec_set_vec[0] != nullptr) {
     for (size_t k = 0; k < spec_set_vec.size(); k++) {
       LOG_DEBUG("spec set ptr valid " << spec_set_vec[k]->isValid());
       if (spec_set_vec[k]->isValid()) {
+        
         ExtendMsPtrVec ms_ptr_vec = spec_set_vec[k]->getMsThreePtrVec();
         filter_ptr->computeBestMatch(ms_ptr_vec);
         writers.getCompleteWriterPtr()->write(filter_ptr->getCompMatchPtrs());
         writers.getPrefixWriterPtr()->write(filter_ptr->getPrefMatchPtrs());
         writers.getSuffixWriterPtr()->write(filter_ptr->getSuffMatchPtrs());
         writers.getInternalWriterPtr()->write(filter_ptr->getInternalMatchPtrs());
+        
       }
     }
+
     mng_ptr->cnts_[block_idx] = mng_ptr->cnts_[block_idx] + 1;
     int cnt_sum = 0;
     for (size_t i = 0; i < mng_ptr->cnts_.size(); i++) {
@@ -79,6 +84,7 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
     mng_ptr->mutex_.unlock();
     spec_set_vec = reader.getNextSpectrumSet(sp_para_ptr);
   }
+  
   reader.close();
   writers.close();
 }
