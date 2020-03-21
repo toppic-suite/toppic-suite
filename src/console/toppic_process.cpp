@@ -26,7 +26,6 @@
 #include "seq/fasta_reader.hpp"
 #include "seq/fasta_util.hpp"
 
-#include "ms/spec/msalign_reader.hpp"
 #include "ms/spec/msalign_util.hpp"
 #include "ms/spec/msalign_frac_merge.hpp"
 #include "ms/spec/deconv_json_merge.hpp"

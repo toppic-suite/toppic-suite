@@ -39,8 +39,10 @@ class Ms {
   T getPeakPtr(int i) {return peak_ptr_list_[i];}
 
   void setPeakPtrNull(int i) {peak_ptr_list_[i] = nullptr;}
-  
+
   std::vector<T> getPeakPtrVec() {return peak_ptr_list_;}
+
+  void setPeakPtrVec(std::vector<T> peak_ptr_list) {peak_ptr_list_ = peak_ptr_list;}
 
  private:
   MsHeaderPtr header_ptr_;

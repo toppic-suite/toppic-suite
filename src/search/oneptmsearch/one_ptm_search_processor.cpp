@@ -20,8 +20,9 @@
 #include "seq/proteoform.hpp"
 #include "seq/proteoform_factory.hpp"
 #include "seq/db_block.hpp"
-#include "ms/spec/msalign_reader.hpp"
 #include "ms/spec/msalign_util.hpp"
+#include "ms/spec/simple_msalign_reader.hpp"
+#include "ms/spec/spectrum_set_factory.hpp"
 #include "prsm/simple_prsm.hpp"
 #include "prsm/simple_prsm_reader.hpp"
 #include "prsm/prsm_xml_writer.hpp"
@@ -101,17 +102,16 @@ void OnePtmSearchProcessor::process() {
   FastaIndexReaderPtr reader_ptr = std::make_shared<FastaIndexReader>(db_file_name);
   int spectrum_num = msalign_util::getSpNum(sp_file_name);
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
-  sp_para_ptr->setPrecError(0);
   ModPtrVec fix_mod_ptr_vec = prsm_para_ptr->getFixModPtrVec();
 
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
-  MsAlignReader sp_reader(sp_file_name, group_spec_num,
-                          sp_para_ptr->getActivationPtr(),
-                          sp_para_ptr->getSkipList());
+  SimpleMsAlignReaderPtr msalign_reader_ptr = std::make_shared<SimpleMsAlignReader>(sp_file_name, 
+                                                                                    group_spec_num,
+                                                                                    sp_para_ptr->getActivationPtr());
   int cnt = 0;
   SpectrumSetPtr spec_set_ptr;
   // LOG_DEBUG("Start search");
-  while ((spec_set_ptr = sp_reader.getNextSpectrumSet(sp_para_ptr)[0])!= nullptr) {
+  while ((spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(msalign_reader_ptr,sp_para_ptr))!= nullptr) {
     cnt+= group_spec_num;
     if (spec_set_ptr->isValid()) {
       int spec_id = spec_set_ptr->getSpectrumId();
@@ -179,7 +179,6 @@ void OnePtmSearchProcessor::process() {
       std::cout << std::flush <<  "One PTM search - processing " << spectrum_num
         << " of " << spectrum_num << " spectra.\r";
   } 
-  sp_reader.close();
   comp_prsm_reader.close();
   pref_prsm_reader.close();
   suff_prsm_reader.close();

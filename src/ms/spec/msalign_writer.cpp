@@ -67,13 +67,15 @@ void MsAlignWriter::write(DeconvMsPtr ms_ptr) {
         << header_ptr->getPrecMonoMz() << std::endl;
     output_ << "PRECURSOR_CHARGE=" << header_ptr->getPrecCharge() << std::endl;
 
+    /*
     if (use_copied_mono_mass_){//for use in merge sort of msaligns
       output_ << std::fixed << "PRECURSOR_MASS=" << std::setprecision(5) 
         << header_ptr->getCopiedPrecMonoMass() << std::endl;
     }else{
-      output_ << std::fixed << "PRECURSOR_MASS=" << std::setprecision(5) 
+    */
+    output_ << std::fixed << "PRECURSOR_MASS=" << std::setprecision(5) 
         << header_ptr->getPrecMonoMass() << std::endl;
-    }
+    //}
     output_ << "PRECURSOR_INTENSITY=" << std::setprecision(2) 
         <<  header_ptr->getPrecInte() << std::endl;
     /*

@@ -19,10 +19,8 @@
 #include "common/util/file_util.hpp"
 #include "common/thread/simple_thread_pool.hpp"
 
-#include "ms/spec/msalign_reader.hpp"
 #include "ms/spec/msalign_writer.hpp"
 #include "ms/spec/baseline_util.hpp"
-#include "ms/spec/msalign_reader.hpp"
 
 #include "ms/env/env_base.hpp"
 #include "ms/env/match_env_util.hpp"
@@ -130,7 +128,8 @@ void DeconvProcess::process() {
   }
 }
 
-void DeconvProcess::deconvMissingMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, MsAlignWriterPtrVec ms_writer_ptr_vec, SimpleThreadPoolPtr pool_ptr){
+void DeconvProcess::deconvMissingMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
+                                       MsAlignWriterPtrVec ms_writer_ptr_vec, SimpleThreadPoolPtr pool_ptr){
   PeakPtrVec peak_list = ms_ptr->getPeakPtrVec();
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
 

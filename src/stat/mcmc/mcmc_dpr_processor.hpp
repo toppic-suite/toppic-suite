@@ -22,11 +22,12 @@
 #include <unordered_map>
 #include <string>
 
-#include "seq/proteoform.hpp"
 #include "common/base/activation.hpp"
 #include "common/thread/simple_thread_pool.hpp"
+#include "seq/proteoform.hpp"
 
 #include "ms/spec/deconv_ms.hpp"
+#include "ms/spec/spectrum_set.hpp"
 
 #include "prsm/prsm.hpp"
 #include "prsm/prsm_xml_writer.hpp"

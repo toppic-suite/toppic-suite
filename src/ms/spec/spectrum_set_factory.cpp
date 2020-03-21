@@ -13,6 +13,7 @@
 //limitations under the License.
 
 #include "common/util/logger.hpp"
+#include "ms/spec/deconv_ms_util.hpp"
 #include "ms/spec/extend_ms_factory.hpp"
 #include "ms/spec/prm_ms_factory.hpp"
 #include "ms/spec/spectrum_set_factory.hpp"
@@ -42,7 +43,6 @@ bool checkValid(DeconvMsPtrVec &deconv_ms_ptr_vec, SpParaPtr sp_para_ptr,
   }
   return true;
 }
-
 
 SpectrumSetPtr geneSpectrumSetPtr(DeconvMsPtrVec deconv_ms_ptr_vec,
                                   SpParaPtr sp_para_ptr,
@@ -77,6 +77,51 @@ SpectrumSetPtr geneSpectrumSetPtr(DeconvMsPtrVec deconv_ms_ptr_vec,
   return spec_set_ptr;
 }
 
+SpectrumSetPtr readNextSpectrumSetPtr(SimpleMsAlignReaderPtr reader_ptr, 
+                                      SpParaPtr sp_para_ptr) {
+  DeconvMsPtrVec deconv_ms_ptr_vec = reader_ptr->getNextMsPtrVec();
+  if (deconv_ms_ptr_vec.size() == 0) {
+    return nullptr;
+  }
+  double prec_mono_mass = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMass();
+
+  SpectrumSetPtr spec_set_ptr = geneSpectrumSetPtr(deconv_ms_ptr_vec,
+                                                   sp_para_ptr, prec_mono_mass);
+  return spec_set_ptr;
 }
 
+SpectrumSetPtr readNextSpectrumSetPtr(SimpleMsAlignReaderPtr reader_ptr, 
+                                      SpParaPtr sp_para_ptr, 
+                                      int peak_num_limit) {
+  DeconvMsPtrVec deconv_ms_ptr_vec = reader_ptr->getNextMsPtrVec();
+  if (deconv_ms_ptr_vec.size() == 0) {
+    return nullptr;
+  }
+  // keep only top peaks
+  deconv_ms_util::keepTopPeaks(deconv_ms_ptr_vec, peak_num_limit);
+  double prec_mono_mass = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMass();
+  SpectrumSetPtr spec_set_ptr = geneSpectrumSetPtr(deconv_ms_ptr_vec,
+                                                   sp_para_ptr, prec_mono_mass);
+  return spec_set_ptr;
+}
+
+
+SpectrumSetPtrVec geneSpectrumSetPtrVecWithPrecError(DeconvMsPtrVec deconv_ms_ptr_vec,  
+                                                     SpParaPtr sp_para_ptr) {
+  SpectrumSetPtrVec spec_set_vec;
+  if (deconv_ms_ptr_vec.size() == 0) {
+    return spec_set_vec;
+  }
+  double prec_mono_mass = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMass();
+  std::vector<double> prec_error_vec = sp_para_ptr->getPrecErrorVec(); 
+  for (size_t i = 0; i< prec_error_vec.size(); i++) {
+    SpectrumSetPtr spec_set_ptr = geneSpectrumSetPtr(deconv_ms_ptr_vec,
+                                                     sp_para_ptr, 
+                                                     prec_mono_mass + prec_error_vec[i]);
+    spec_set_vec.push_back(spec_set_ptr);
+  }
+  return spec_set_vec;
+}
+
+}
 }  // namespace toppic
