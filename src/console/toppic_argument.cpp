@@ -62,7 +62,6 @@ void Argument::initArguments() {
   arguments_["residueModFileName"] = "";
   arguments_["threadNumber"] = "1";
   arguments_["useFeatureFile"] = "true";
-  arguments_["skipList"] = "";
   arguments_["geneHTMLFolder"] = "false";
 }
 
@@ -71,11 +70,6 @@ void Argument::outputArguments(std::ostream &output,
   output << "********************** Parameters **********************" << std::endl;
   output << std::setw(44) << std::left << "Protein database file: " << "\t" << arguments["oriDatabaseFileName"] << std::endl;
   output << std::setw(44) << std::left << "Spectrum file: " << "\t" << arguments["spectrumFileName"] << std::endl;
-
-  if (arguments["skipList"] != "") {
-    output << std::setw(44) << std::left << "Skip list: " << "\t" << arguments["skipList"] << std::endl;
-  }
-
   output << std::setw(44) << std::left << "Number of combined spectra: " << "\t" << arguments["groupSpectrumNumber"] << std::endl;
   output << std::setw(44) << std::left << "Fragmentation method: " << "\t" << arguments["activation"] << std::endl;
   output << std::setw(44) << std::left << "Search type: " << "\t" << arguments["searchType"] << std::endl;
@@ -136,10 +130,6 @@ std::string Argument::outputCsvArguments(std::map<std::string, std::string> argu
   output << "********************** Parameters **********************" << std::endl;
   output << "Protein database file:," << arguments["oriDatabaseFileName"] << std::endl;
   output << "Spectrum file:," << arguments["spectrumFileName"] << std::endl;
-  if (arguments["skipList"] != "") {
-    output << "Skip list:," << arguments["skipList"] << std::endl;
-  }
-
   output << "Number of combined spectra:," << arguments["groupSpectrumNumber"] << std::endl;
   output << "Fragmentation method:," << arguments["activation"] << std::endl;
   output << "Search type:," << arguments["searchType"] << std::endl;
@@ -240,8 +230,8 @@ bool Argument::parse(int argc, char* argv[]) {
         ("decoy,d", "Use a decoy protein database to estimate false discovery rates.")
         ("mass-error-tolerance,e", po::value<std::string> (&mass_error_tole), "<a positive integer>. Error tolerance for precursor and fragment masses in PPM. Default value: 15.")
         ("proteoform-error-tolerance,p", po::value<std::string> (&form_error_tole), "<a positive number>. Error tolerance for identifying PrSM clusters. Default value: 1.2 Dalton.")
-        ("max-shift,M", po::value<std::string> (&max_ptm_mass), "Maximum value of the mass shift of an unexpected modification. Default value: 500 Dalton.")
         ("min-shift,m", po::value<std::string> (&min_ptm_mass), "Minimum value of the mass shift of an unexpected modification. Default value: -500 Dalton.")
+        ("max-shift,M", po::value<std::string> (&max_ptm_mass), "Maximum value of the mass shift of an unexpected modification. Default value: 500 Dalton.")
         ("num-shift,s", po::value<std::string> (&ptm_num), "<0|1|2>. Maximum number of unexpected modifications in a proteoform-spectrum-match. Default value: 1.")
         ("spectrum-cutoff-type,t", po::value<std::string> (&cutoff_spectral_type), "<EVALUE|FDR>. Spectrum-level cutoff type for filtering identified proteoform-spectrum-matches. Default value: EVALUE.")
         ("spectrum-cutoff-value,v", po::value<std::string> (&cutoff_spectral_value), "<a positive number>. Spectrum-level cutoff value for filtering identified proteoform-spectrum-matches. Default value: 0.01.")
@@ -256,7 +246,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("no-topfd-feature,x", "No TopFD feature file for proteoform identification.")
         ("combined-file-name,c", po::value<std::string>(&combined_output_name) , "Specify a file name for the combined spectrum data file and analysis results.")
         ("keep-temp-files,k", "Keep temporary files.")
-        ("gene-html-folrder,W", "Generate html folder containing TopView and spectrum data in js format.");
+        ("generate-html-folder,g", "Generate html folder containing TopView and spectrum data for visualization.");
 
     po::options_description desc("Options");
 
@@ -284,10 +274,9 @@ bool Argument::parse(int argc, char* argv[]) {
         ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "")
         ("miscore-threshold,H", po::value<std::string> (&local_threshold), "")
         ("filtering-result-number", po::value<std::string>(&filtering_result_num), "Filtering result number. Default value: 20.")
-        ("skip-list", po::value<std::string>(&skip_list) , "A list of spectrum ids to skip in database search.")
+        ("generate-html-folder,g","")
         ("database-file-name", po::value<std::string>(&database_file_name)->required(), "Database file name with its path.")
-        ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), "Spectrum file name with its path.")
-        ("gene-html-folder,W","");
+        ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), "Spectrum file name with its path.");
 
     po::positional_options_description positional_options;
     positional_options.add("database-file-name", 1);
@@ -422,11 +411,7 @@ bool Argument::parse(int argc, char* argv[]) {
     if (vm.count("no-topfd-feature")) {
       arguments_["useFeatureFile"] = "false";
     }
-
-    if (vm.count("skip-list")) {
-      arguments_["skipList"] = skip_list;
-    }    
-    if (vm.count("gene-html-folder")) {
+    if (vm.count("generate-html-folder")) {
       arguments_["geneHTMLFolder"] = "true";
     }   
   }
@@ -478,13 +463,6 @@ bool Argument::validateArguments() {
 
     if (str_util::endsWith(spec_file_list_[k], "_ms1.msalign")) {
       std::cerr << "Warning: Please make sure " << spec_file_list_[k] << " is the ms2 spectral file." << std::endl;
-    }
-  }
-
-  if (arguments_["skipList"] != "") {
-    if (!file_util::exists(arguments_["skipList"])) {
-      LOG_ERROR("Skip list " << arguments_["skipList"] << " does not exist!");
-      return false;
     }
   }
 
