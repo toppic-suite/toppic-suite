@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_MS_SPEC_SPECTRUM_SET_FACTORY_HPP_
-#define TOPPIC_MS_SPEC_SPECTRUM_SET_FACTORY_HPP_
+#ifndef TOPPIC_MS_FACTORY_SPECTRUM_SET_FACTORY_HPP_
+#define TOPPIC_MS_FACTORY_SPECTRUM_SET_FACTORY_HPP_
 
 #include "para/sp_para.hpp"
 #include "ms/spec/simple_msalign_reader.hpp"

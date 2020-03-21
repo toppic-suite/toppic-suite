@@ -17,6 +17,7 @@
 #include "common/util/file_util.hpp"
 
 #include "seq/proteoform_util.hpp"
+#include "ms/factory/extend_ms_factory.hpp"
 
 #include "filter/mng/topindex_file_name.hpp"
 
@@ -104,10 +105,10 @@ void MassZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec) {
   PeakTolerancePtr tole_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
   bool pref = true;
   std::vector<std::pair<int, int> > pref_mass_errors
-      = extend_ms::getExtendIntMassErrorList(ms_ptr_vec, pref, mng_ptr_->filter_scale_);
+      = extend_ms_factory::getExtendIntMassErrorList(ms_ptr_vec, pref, mng_ptr_->filter_scale_);
   pref = false;
   std::vector<std::pair<int, int> > suff_mass_errors
-      = extend_ms::getExtendIntMassErrorList(ms_ptr_vec, pref, mng_ptr_->filter_scale_);
+      = extend_ms_factory::getExtendIntMassErrorList(ms_ptr_vec, pref, mng_ptr_->filter_scale_);
   std::pair<int, int> prec_minus_water_mass_error
       = ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMassMinusWaterError(tole_ptr->getPpo(),
                                                                         mng_ptr_->filter_scale_);

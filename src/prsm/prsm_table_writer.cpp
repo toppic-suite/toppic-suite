@@ -17,8 +17,8 @@
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
-#include "ms/spec/extend_ms_factory.hpp"
-#include "ms/spec/spectrum_set_factory.hpp"
+#include "ms/factory/extend_ms_factory.hpp"
+#include "ms/factory/spectrum_set_factory.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_table_writer.hpp"
 

@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_MS_SPEC_PRM_MS_FACTORY_HPP_
-#define TOPPIC_MS_SPEC_PRM_MS_FACTORY_HPP_
+#ifndef TOPPIC_MS_FACTORY_PRM_MS_FACTORY_HPP_
+#define TOPPIC_MS_FACTORY_PRM_MS_FACTORY_HPP_
 
 #include "para/sp_para.hpp"
 #include "ms/spec/deconv_ms.hpp"
@@ -41,6 +41,15 @@ PrmMsPtrVec geneMsSixPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
 PrmMsPtrVec geneShiftMsSixPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
                                  SpParaPtr sp_para_ptr,
                                  double prec_mono_mass, double shift);
+
+
+std::vector<std::pair<int, int> > getIntMassErrorList(const PrmMsPtrVec &prm_ms_ptr_vec,
+                                                      PeakTolerancePtr tole_ptr,
+                                                      double scale, bool n_strict, bool c_strict);
+
+PrmPeakPtrVec getPrmPeakPtrs(const PrmMsPtrVec &prm_ms_ptr_vec, PeakTolerancePtr tole_ptr);
+
+
 }  // namespace prm_ms_factory
 
 }  // namespace toppic

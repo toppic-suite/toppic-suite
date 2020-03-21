@@ -24,9 +24,9 @@
 #include "common/util/file_util.hpp"
 #include "seq/mass_shift.hpp"
 
-#include "ms/spec/extend_ms_factory.hpp"
+#include "ms/factory/extend_ms_factory.hpp"
 #include "ms/spec/msalign_util.hpp"
-#include "ms/spec/spectrum_set_factory.hpp"
+#include "ms/factory/spectrum_set_factory.hpp"
 
 #include "prsm/prsm_reader.hpp"
 #include "prsm/peak_ion_pair_util.hpp"

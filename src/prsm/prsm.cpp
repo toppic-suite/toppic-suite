@@ -17,7 +17,7 @@
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
 #include "common/xml/xml_dom_util.hpp"
-#include "ms/spec/extend_ms_factory.hpp"
+#include "ms/factory/extend_ms_factory.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
 #include "prsm/prsm.hpp"
 

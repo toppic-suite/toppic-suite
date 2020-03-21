@@ -17,7 +17,7 @@
 #include <cstring>
 
 #include "common/util/logger.hpp"
-#include "ms/spec/prm_peak_factory.hpp"
+#include "ms/factory/prm_peak_factory.hpp"
 #include "stat/tdgf/comp_prob_value.hpp"
 
 namespace toppic {

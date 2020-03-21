@@ -30,8 +30,8 @@
 #include "ms/spec/simple_msalign_reader.hpp"
 #include "ms/spec/msalign_util.hpp"
 #include "ms/spec/theo_peak.hpp"
-#include "ms/spec/extend_ms_factory.hpp"
-#include "ms/spec/spectrum_set_factory.hpp"
+#include "ms/factory/extend_ms_factory.hpp"
+#include "ms/factory/spectrum_set_factory.hpp"
 
 #include "prsm/theo_peak_util.hpp"
 #include "prsm/prsm_algo.hpp"
@@ -237,7 +237,7 @@ std::function<void()> geneTask(SpectrumSetPtr spec_set_ptr,
 
     double tolerance = refine_ms_ptr_vec[0]->getMsHeaderPtr()->getErrorTolerance(ppo);
 
-    std::vector<double> ms_masses = extend_ms::getExtendMassVec(refine_ms_ptr_vec[0]);
+    std::vector<double> ms_masses = extend_ms_factory::getExtendMassVec(refine_ms_ptr_vec[0]);
 
     std::vector<int> ms_mass_int(ms_masses.size());
 

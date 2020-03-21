@@ -13,7 +13,7 @@
 //limitations under the License.
 
 #include "common/base/mass_constant.hpp"
-#include "ms/spec/spectrum_set_factory.hpp"
+#include "ms/factory/spectrum_set_factory.hpp"
 #include "search/graph/spec_graph_reader.hpp"
 
 namespace toppic {

@@ -34,8 +34,8 @@
 
 #include "ms/spec/msalign_util.hpp"
 #include "ms/spec/spectrum_set.hpp"
-#include "ms/spec/extend_ms_factory.hpp"
-#include "ms/spec/spectrum_set_factory.hpp"
+#include "ms/factory/extend_ms_factory.hpp"
+#include "ms/factory/spectrum_set_factory.hpp"
 
 #include "prsm/prsm.hpp"
 #include "prsm/peak_ion_pair.hpp"

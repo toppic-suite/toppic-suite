@@ -61,6 +61,7 @@ file(GLOB_RECURSE COMMON_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/common/*.cpp)
 file(GLOB SEQ_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/seq/*.cpp)
 file(GLOB PARA_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/para/*.cpp)
 file(GLOB SPEC_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/ms/spec/*.cpp
+                     ${CMAKE_CURRENT_SOURCE_DIR}/src/ms/factory/*.cpp
                      ${CMAKE_CURRENT_SOURCE_DIR}/src/ms/env/*.cpp
                      ${CMAKE_CURRENT_SOURCE_DIR}/src/ms/feature/*.cpp)
 file(GLOB PRSM_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/prsm/*.cpp)

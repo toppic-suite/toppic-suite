@@ -13,8 +13,8 @@
 //limitations under the License.
 
 #include "common/util/logger.hpp"
-#include "ms/spec/extend_ms_factory.hpp"
-#include "ms/spec/prm_ms_factory.hpp"
+#include "ms/factory/extend_ms_factory.hpp"
+#include "ms/factory/prm_ms_factory.hpp"
 #include "ms/spec/spectrum_set.hpp"
 
 namespace toppic {
