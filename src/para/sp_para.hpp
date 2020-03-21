@@ -42,26 +42,13 @@ class SpPara {
 
   const std::vector<double>& getExtendOffsets() {return ext_offsets_;}
 
-  int getPrecError() {return prec_error_;}
-
   const std::vector<double>& getPrecErrorVec() {return prec_error_vec_;}
 
   PeakTolerancePtr getPeakTolerancePtr() {return peak_tolerance_ptr_;}
 
-  void setPeakTolerancePtr(PeakTolerancePtr peak_tolerance_ptr) {
-    peak_tolerance_ptr_ = peak_tolerance_ptr;}
-
   ActivationPtr getActivationPtr() {return activation_ptr_;}
 
-  void setActivationPtr(ActivationPtr activation_ptr) {activation_ptr_ = activation_ptr;}
-
-  std::set<std::string> getSkipList() {return skip_list_;}
-
-  void setSkipList(std::set<std::string> skip_list) {skip_list_ = skip_list;} 
-
   int getMinPeakNum() {return min_peak_num_;}
-
-  void setMinPeakNum(int min_peak_num) {min_peak_num_ = min_peak_num;}
 
   void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 
@@ -73,16 +60,13 @@ class SpPara {
   double min_mass_ = 50.0;
   // if the mass is smaller than extend_min_mass, the peak is not extended
   double extend_min_mass_ = 5000;
+
   std::vector<double> ext_offsets_;
 
   ActivationPtr activation_ptr_;
 
   // the 1 Da error in precursor mass used in zeroptm filtering
-  int prec_error_ = 1;
-  std::vector<double> prec_error_vec_ 
-      = {0, -mass_constant::getIsotopeMass(), mass_constant::getIsotopeMass()};
-
-  std::set<std::string> skip_list_;
+  std::vector<double> prec_error_vec_;
 
   PeakTolerancePtr peak_tolerance_ptr_;
 };

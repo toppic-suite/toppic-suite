@@ -31,7 +31,9 @@ SpPara::SpPara(std::string activation_name, double ppm) {
   // extend sp parameter 
   double IM = mass_constant::getIsotopeMass();
   // the set of offsets used to expand the monoisotopic mass list 
-  ext_offsets_ = {{0, -IM, IM}};
+  ext_offsets_ = {0, -IM, IM};
+
+  std::vector<double> prec_error_vec_ = {0, -IM, IM};
 }
 
 SpPara::SpPara(xercesc::DOMElement* element) {
