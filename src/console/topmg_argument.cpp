@@ -63,7 +63,6 @@ void Argument::initArguments() {
   arguments_["varModFileName"] = "";
   arguments_["threadNumber"] = "1";
   arguments_["useFeatureFile"] = "true";
-  arguments_["skipList"] = "";
   arguments_["proteoGraphGap"] = "40";
   arguments_["useAsfDiag"] = "false";
   arguments_["varPtmNumber"] = "5";
@@ -75,11 +74,6 @@ void Argument::outputArguments(std::ostream &output, std::map<std::string, std::
   output << "********************** Parameters **********************" << std::endl;
   output << std::setw(50) << std::left << "Protein database file: " << "\t" << arguments["oriDatabaseFileName"] << std::endl;
   output << std::setw(50) << std::left << "Spectrum file: " << "\t" << arguments["spectrumFileName"] << std::endl;
-
-  if (arguments["skipList"] != "") {
-    output << std::setw(50) << std::left << "Skip list: " << "\t" << arguments["skipList"] << std::endl;
-  }
-
   output << std::setw(50) << std::left << "Fragmentation method: " << "\t" << arguments["activation"] << std::endl;
   output << std::setw(50) << std::left << "Search type: " << "\t" << arguments["searchType"] << std::endl;
 
@@ -132,11 +126,6 @@ std::string Argument::outputCsvArguments(std::map<std::string, std::string> argu
   output << "********************** Parameters **********************" << std::endl;
   output << "Protein database file:" << comma << arguments["oriDatabaseFileName"] << std::endl;
   output << "Spectrum file:" << comma << arguments["spectrumFileName"] << std::endl;
-
-  if (arguments["skipList"] != "") {
-    output << "Skip list:" << comma << arguments["skipList"] << std::endl;
-  }
-
   output << "Fragmentation method:" << comma << arguments["activation"] << std::endl;
   output << "Search type:" << comma << arguments["searchType"] << std::endl;
 
@@ -207,7 +196,6 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string var_mod_file_name = "";
   std::string proteo_graph_gap = "";
   std::string thread_number = "";
-  std::string skip_list = "";
   std::string var_ptm_num = "";
   std::string var_ptm_in_gap = "";
   std::string combined_output_name = "";
@@ -243,10 +231,8 @@ bool Argument::parse(int argc, char* argv[]) {
         ("num-shift,s", po::value<std::string> (&ptm_num), "<0|1|2>. Maximum number of unexpected modifications in a proteoform spectrum-match. Default value: 0.")
         ("combined-file-name,c", po::value<std::string>(&combined_output_name) , "Specify a file name for the combined spectrum data file and analysis results.")
         ("keep-temp-files,k", "Keep temporary files.")
-        ("gene-html-folder,W", "Generate html folder containing TopView and spectrum data in js format.");
+        ("generate-html-folder,g", "Generate an html folder containing TopView and spectrum data for visualization.");
     
-//("skip-list,l", po::value<std::string>(&skip_list) , "<a text file with its path>. The scans in this file will be skipped.")
-//
     po::options_description desc("Options");
 
     desc.add_options()
@@ -268,16 +254,15 @@ bool Argument::parse(int argc, char* argv[]) {
         ("mod-file-name,i", po::value<std::string>(&var_mod_file_name), "")
         ("thread-number,u", po::value<std::string> (&thread_number), "")
         ("no-topfd-feature,x", "")
-        ("skip-list,l", po::value<std::string>(&skip_list) , "")
         ("combined-file-name,c", po::value<std::string>(&combined_output_name) , "")
         ("proteo-graph-gap,j", po::value<std::string> (&proteo_graph_gap), "")
         ("var-ptm-in-gap,G", po::value<std::string>(&var_ptm_in_gap) , "")
         ("use-asf-diagonal,D", "")
         ("var-ptm,P", po::value<std::string>(&var_ptm_num) , "")
         ("num-shift,s", po::value<std::string> (&ptm_num), "")
+        ("generate-html-folder,g", "")
         ("database-file-name", po::value<std::string>(&database_file_name)->required(), "Database file name with its path.")
-        ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), "Spectrum file name with its path.")
-        ("gene-html-folder,W", "");
+        ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), "Spectrum file name with its path.");
 
     po::positional_options_description positional_options;
     positional_options.add("database-file-name", 1);
@@ -398,10 +383,6 @@ bool Argument::parse(int argc, char* argv[]) {
       arguments_["useFeatureFile"] = "false";
     }
 
-    if (vm.count("skip-list")) {
-      arguments_["skipList"] = skip_list;
-    }
-
     if (vm.count("use-asf-diagonal")) {
       arguments_["useAsfDiag"] = "true";
     }
@@ -417,7 +398,7 @@ bool Argument::parse(int argc, char* argv[]) {
     if (vm.count("var-ptm-in-gap")) {
       arguments_["varPtmNumInGap"] = var_ptm_in_gap;
     }
-    if (vm.count("gene-html-folder")) {
+    if (vm.count("generate-html-folder")) {
       arguments_["geneHTMLFolder"] = "true";
     }
   }
@@ -475,13 +456,6 @@ bool Argument::validateArguments() {
   if (!file_util::exists(arguments_["varModFileName"])) {
     LOG_ERROR("Modification file " << arguments_["varModFileName"] << " does not exist!");
     return false;
-  }
-
-  if (arguments_["skipList"] != "") {
-    if (!file_util::exists(arguments_["skipList"])) {
-      LOG_ERROR("Skip list " << arguments_["skipList"] << " does not exist!");
-      return false;
-    }
   }
 
   std::string activation = arguments_["activation"];
