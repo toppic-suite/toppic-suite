@@ -16,12 +16,12 @@
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
+#include "common/thread/simple_thread_pool.hpp"
 #include "seq/proteoform.hpp"
 #include "seq/fasta_reader.hpp"
-#include "common/thread/simple_thread_pool.hpp"
-#include "ms/spec/msalign_reader.hpp"
+#include "ms/spec/simple_msalign_reader.hpp"
 #include "ms/spec/msalign_util.hpp"
-#include "ms/spec/spectrum_set.hpp"
+#include "ms/spec/spectrum_set_factory.hpp"
 #include "prsm/prsm.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_str_merge.hpp"
@@ -103,9 +103,8 @@ void EValueProcessor::process(bool is_separate) {
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
   double ppo = sp_para_ptr->getPeakTolerancePtr()->getPpo();
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
-  MsAlignReader sp_reader(sp_file_name, group_spec_num,
-                          sp_para_ptr->getActivationPtr(),
-                          sp_para_ptr->getSkipList());
+  SimpleMsAlignReaderPtr reader_ptr = std::make_shared<SimpleMsAlignReader>(sp_file_name, group_spec_num,
+                                                                            sp_para_ptr->getActivationPtr());
 
   PrsmXmlWriterPtrVec writer_ptr_vec = 
       prsm_xml_writer_util::geneWriterPtrVec(output_file_name, mng_ptr_->thread_num_);
@@ -116,7 +115,7 @@ void EValueProcessor::process(bool is_separate) {
   SpectrumSetPtr spec_set_ptr;
 
   LOG_DEBUG("Start search");
-  while((spec_set_ptr = sp_reader.getNextSpectrumSet(sp_para_ptr)[0])!= nullptr){
+  while((spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(reader_ptr, sp_para_ptr))!= nullptr){
     cnt += group_spec_num;
     if(spec_set_ptr->isValid()){
       PrsmPtrVec selected_prsm_ptrs;
@@ -149,7 +148,6 @@ void EValueProcessor::process(bool is_separate) {
   } 
   pool_ptr->ShutDown();
   std::cout << std::endl;
-  sp_reader.close();
   prsm_reader.close();
   prsm_xml_writer_util::closeWriterPtrVec(writer_ptr_vec);
   writer.close();

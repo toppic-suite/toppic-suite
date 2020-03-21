@@ -16,6 +16,7 @@
 #define TOPPIC_MS_SPEC_SPECTRUM_SET_FACTORY_HPP_
 
 #include "para/sp_para.hpp"
+#include "ms/spec/simple_msalign_reader.hpp"
 #include "ms/spec/spectrum_set.hpp"
 
 namespace toppic {
@@ -25,6 +26,16 @@ namespace spectrum_set_factory {
 SpectrumSetPtr geneSpectrumSetPtr(DeconvMsPtrVec deconv_ms_ptr_vec, 
                                   SpParaPtr sp_para_ptr,
                                   double prec_mono_mass);
+
+SpectrumSetPtr readNextSpectrumSetPtr(SimpleMsAlignReaderPtr reader_ptr, 
+                                      SpParaPtr sp_para_ptr);
+
+SpectrumSetPtr readNextSpectrumSetPtr(SimpleMsAlignReaderPtr reader_ptr, 
+                                      SpParaPtr sp_para_ptr, 
+                                      int peak_num_limit);
+
+SpectrumSetPtrVec geneSpectrumSetPtrVecWithPrecError(DeconvMsPtrVec deconv_ms_ptr_vec,  
+                                                     SpParaPtr sp_para_ptr);
 }
 
 } /* namespace toppic */

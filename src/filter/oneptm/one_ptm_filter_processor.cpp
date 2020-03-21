@@ -23,7 +23,7 @@
 
 #include "ms/spec/msalign_util.hpp"
 #include "ms/spec/prm_ms_factory.hpp"
-#include "ms/spec/spectrum_set.hpp"
+#include "ms/spec/spectrum_set_factory.hpp"
 
 #include "prsm/simple_prsm_xml_writer_set.hpp"
 #include "prsm/simple_prsm_str_merge.hpp"
@@ -41,24 +41,24 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
 
   MassOnePtmFilterPtr filter_ptr = std::make_shared<MassOnePtmFilter>(raw_forms, mng_ptr, block_str);
 
-  int group_spec_num = mng_ptr->prsm_para_ptr_->getGroupSpecNum();
   PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
-  MsAlignReader reader(prsm_para_ptr->getSpectrumFileName(), 
-                       group_spec_num,
-                       prsm_para_ptr->getSpParaPtr()->getActivationPtr(),
-                       prsm_para_ptr->getSpParaPtr()->getSkipList());
+  std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
+  int group_spec_num = prsm_para_ptr->getGroupSpecNum();
+  SimpleMsAlignReaderPtr reader_ptr = std::make_shared<SimpleMsAlignReader>(sp_file_name, 
+                                                                            group_spec_num,
+                                                                            sp_para_ptr->getActivationPtr());
   std::string output_file_name = file_util::basename(prsm_para_ptr->getSpectrumFileName())
       + "." + mng_ptr->output_file_ext_ + "_" + block_str;
   SimplePrsmXmlWriterSet writers(output_file_name);
 
-  SpectrumSetPtrVec spec_set_vec = reader.getNextSpectrumSet(sp_para_ptr);
+  SpectrumSetPtr spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(reader_ptr, sp_para_ptr);
 
-  while (spec_set_vec[0] != nullptr) {
-    if (spec_set_vec[0]->isValid()) {
+  while (spec_set_ptr != nullptr) {
+    if (spec_set_ptr->isValid()) {
       if (mng_ptr->var_num_ == 0) {
-        PrmMsPtrVec prm_ms_ptr_vec = spec_set_vec[0]->getMsTwoPtrVec();
-        PrmMsPtrVec srm_ms_ptr_vec = spec_set_vec[0]->getSuffixMsTwoPtrVec();
+        PrmMsPtrVec prm_ms_ptr_vec = spec_set_ptr->getMsTwoPtrVec();
+        PrmMsPtrVec srm_ms_ptr_vec = spec_set_ptr->getSuffixMsTwoPtrVec();
         filter_ptr->computeBestMatch(prm_ms_ptr_vec, srm_ms_ptr_vec);
         writers.getCompleteWriterPtr()->write(filter_ptr->getCompMatchPtrs());
         writers.getPrefixWriterPtr()->write(filter_ptr->getPrefMatchPtrs());
@@ -70,8 +70,8 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
           for (size_t k1 = 0; k1 < mod_mass.size(); k1++) {
             std::fill(mod_mass.begin(), mod_mass.end(), 0.0);
             mod_mass[k1] += mod_mass_list[i];
-            DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_vec[0]->getDeconvMsPtrVec();
-            double prec_mono_mass = spec_set_vec[0]->getPrecMonoMass();
+            DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
+            double prec_mono_mass = spec_set_ptr->getPrecMonoMass();
             PrmMsPtrVec prm_ms_ptr_vec = prm_ms_factory::geneMsTwoPtrVec(deconv_ms_ptr_vec,
                                                                          sp_para_ptr,
                                                                          prec_mono_mass, mod_mass);
@@ -98,9 +98,8 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
     mng_ptr->mutex_.lock();
     std::cout << msg.str();
     mng_ptr->mutex_.unlock();
-    spec_set_vec = reader.getNextSpectrumSet(sp_para_ptr);
+    spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(reader_ptr, sp_para_ptr);
   }
-  reader.close();
   writers.close();
 }
 

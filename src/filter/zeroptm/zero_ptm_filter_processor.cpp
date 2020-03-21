@@ -21,9 +21,8 @@
 #include "seq/proteoform.hpp"
 #include "seq/proteoform_factory.hpp"
 
-#include "ms/spec/msalign_reader.hpp"
 #include "ms/spec/msalign_util.hpp"
-#include "ms/spec/spectrum_set.hpp"
+#include "ms/spec/spectrum_set_factory.hpp"
 
 #include "prsm/simple_prsm_xml_writer_set.hpp"
 #include "prsm/simple_prsm_str_merge.hpp"
@@ -39,22 +38,22 @@ namespace toppic {
 inline void filterBlock(const ProteoformPtrVec & raw_forms,
                         int block_idx, ZeroPtmFilterMngPtr mng_ptr) { 
   std::string block_str = str_util::toString(block_idx);
-  int group_spec_num = mng_ptr->prsm_para_ptr_->getGroupSpecNum();
-
   MassZeroPtmFilterPtr filter_ptr = std::make_shared<MassZeroPtmFilter>(raw_forms, mng_ptr, block_str);
 
   PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
-  MsAlignReader reader(prsm_para_ptr->getSpectrumFileName(),
-                       group_spec_num,
-                       prsm_para_ptr->getSpParaPtr()->getActivationPtr(),
-                       prsm_para_ptr->getSpParaPtr()->getSkipList());
+  int group_spec_num = prsm_para_ptr->getGroupSpecNum();
+  SimpleMsAlignReaderPtr reader_ptr = std::make_shared<SimpleMsAlignReader>(prsm_para_ptr->getSpectrumFileName(), 
+                                                                            group_spec_num,
+                                                                            sp_para_ptr->getActivationPtr());
   std::string output_file_name = file_util::basename(prsm_para_ptr->getSpectrumFileName())
       + "." + mng_ptr->output_file_ext_ + "_" + block_str;
   //writer
   SimplePrsmXmlWriterSet writers(output_file_name);
-  std::vector<SpectrumSetPtr> spec_set_vec = reader.getNextSpectrumSet(sp_para_ptr);
-  while (spec_set_vec[0] != nullptr) {
+  DeconvMsPtrVec deconv_ms_ptr_vec = reader_ptr->getNextMsPtrVec();
+  while (deconv_ms_ptr_vec.size() != 0) {
+    SpectrumSetPtrVec spec_set_vec 
+        = spectrum_set_factory::geneSpectrumSetPtrVecWithPrecError(deconv_ms_ptr_vec, sp_para_ptr);
     for (size_t k = 0; k < spec_set_vec.size(); k++) {
       LOG_DEBUG("spec set ptr valid " << spec_set_vec[k]->isValid());
       if (spec_set_vec[k]->isValid()) {
@@ -77,9 +76,8 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
     mng_ptr->mutex_.lock();
     std::cout << msg.str();
     mng_ptr->mutex_.unlock();
-    spec_set_vec = reader.getNextSpectrumSet(sp_para_ptr);
+    deconv_ms_ptr_vec = reader_ptr->getNextMsPtrVec();
   }
-  reader.close();
   writers.close();
 }
 

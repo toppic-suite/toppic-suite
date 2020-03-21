@@ -17,7 +17,6 @@
 #define TOPPIC_MS_SPEC_MSALIGN_UTIL_HPP_
 
 #include "para/sp_para.hpp"
-#include "ms/spec/msalign_reader.hpp"
 
 namespace toppic {
 
@@ -28,9 +27,6 @@ int countSpNum(const std::string &spectrum_file);
 void geneSpIndex(const std::string &spectrum_file_name);
 
 int getSpNum(const std::string &spectrum_file_name);
-
-void mergeMsalignFiles(const std::vector<std::string> & spec_file_lst, int N,
-                       const std::string & output_file);
 
 }  // namespace msalign_util
 
