@@ -164,7 +164,7 @@ bool Argument::parse(int argc, char* argv[]) {
       }
     }
     if (vm.count("thread-number")) {
-      topfd_para_ptr_->thread_number_ = thread_number;
+      topfd_para_ptr_->thread_number_ = std::stoi(thread_number);
     }
     if (vm.count("generate-html-folder")) {
       topfd_para_ptr_->gene_html_folder_ = true;
@@ -191,15 +191,14 @@ bool Argument::validateArguments() {
       return false;
     }
   }
-  std::string thread_number = topfd_para_ptr_->thread_number_;
+  int thread_number = topfd_para_ptr_->thread_number_;
   try {
-    int num = std::stoi(thread_number.c_str());
-    if (num <= 0) {
+    if (thread_number <= 0) {
       LOG_ERROR("Thread number " << thread_number << " error! The value should be positive.");
       return false;
     }
     int n = static_cast<int>(boost::thread::hardware_concurrency());
-    if(num > n){
+    if(thread_number >= n){
       LOG_ERROR("Thread number " << thread_number << " error! The value is too large. Only " << n << " threads are supported.");
       return false;
     }
