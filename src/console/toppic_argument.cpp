@@ -211,7 +211,6 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string filtering_result_num = "";
   std::string residue_mod_file_name = "";
   std::string thread_number = "";
-  std::string skip_list = "";
   std::string combined_output_name = "";
 
   /** Define and parse the program options*/
@@ -246,7 +245,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("no-topfd-feature,x", "No TopFD feature file for proteoform identification.")
         ("combined-file-name,c", po::value<std::string>(&combined_output_name) , "Specify a file name for the combined spectrum data file and analysis results.")
         ("keep-temp-files,k", "Keep temporary files.")
-        ("generate-html-folder,g", "Generate html folder containing TopView and spectrum data for visualization.");
+        ("generate-html-folder,g", "Generate an html folder containing TopView and spectrum data for visualization.");
 
     po::options_description desc("Options");
 
