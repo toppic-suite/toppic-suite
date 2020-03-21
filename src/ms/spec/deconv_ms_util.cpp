@@ -40,6 +40,21 @@ DeconvMsPtrVec getRefineMsPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
   return result_ptrs;
 }
 
+void keepTopPeaks(DeconvMsPtrVec &deconv_ms_ptr_vec, size_t peak_num) {
+  for (size_t m = 0; m < deconv_ms_ptr_vec.size(); m++) {
+    DeconvMsPtr deconv_ms_ptr = deconv_ms_ptr_vec[m];
+    std::vector<DeconvPeakPtr> peak_ptr_list;
+    for (size_t p = 0; p < deconv_ms_ptr->size(); p++) {
+      if (p >= peak_num) {
+        break;
+      }
+      DeconvPeakPtr peak_ptr = deconv_ms_ptr->getPeakPtr(p);
+      peak_ptr_list.push_back(peak_ptr);
+    }
+    deconv_ms_ptr->setPeakPtrVec(peak_ptr_list);
+  }
+}
+
 }  // namespace deconv_ms_util
 
 }  // namespace toppic

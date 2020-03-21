@@ -24,6 +24,8 @@ namespace deconv_ms_util {
 DeconvMsPtrVec  getRefineMsPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, 
                                   double new_prec_mass);
 
+void keepTopPeaks(DeconvMsPtrVec &deconv_ms_ptr_vec, size_t peak_num); 
+
 }  // namespace deconv_ms_util
 
 }  // namespace toppic

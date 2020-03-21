@@ -17,8 +17,8 @@
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
-#include "ms/spec/msalign_reader.hpp"
 #include "ms/spec/extend_ms_factory.hpp"
+#include "ms/spec/spectrum_set_factory.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_table_writer.hpp"
 
@@ -83,12 +83,12 @@ void PrsmTableWriter::write() {
   // init variables
   std::string sp_file_name = prsm_para_ptr_->getSpectrumFileName();
   int group_spec_num = prsm_para_ptr_->getGroupSpecNum();
-  MsAlignReader sp_reader(sp_file_name, group_spec_num,
-                          prsm_para_ptr_->getSpParaPtr()->getActivationPtr(),
-                          prsm_para_ptr_->getSpParaPtr()->getSkipList());
-  SpectrumSetPtr spec_set_ptr;
   SpParaPtr sp_para_ptr = prsm_para_ptr_->getSpParaPtr();
-  while ((spec_set_ptr = sp_reader.getNextSpectrumSet(sp_para_ptr)[0]) != nullptr) {
+  SimpleMsAlignReaderPtr ms_reader_ptr = std::make_shared<SimpleMsAlignReader>(sp_file_name, 
+                                                                               group_spec_num,
+                                                                               sp_para_ptr->getActivationPtr());
+  SpectrumSetPtr spec_set_ptr;
+  while ((spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(ms_reader_ptr, sp_para_ptr)) != nullptr) {
     if (spec_set_ptr->isValid()) {
       int spec_id = spec_set_ptr->getSpectrumId();
       while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_id) {
@@ -105,7 +105,6 @@ void PrsmTableWriter::write() {
       }
     }
   }
-  sp_reader.close();
   prsm_reader.close();
   // write end;
   file.close();

@@ -12,14 +12,14 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "seq/proteoform.hpp"
 #include "ms/spec/rm_break_type.hpp"
-#include "ms/spec/msalign_reader.hpp"
+#include "ms/spec/simple_msalign_reader.hpp"
 #include "ms/spec/msalign_util.hpp"
 #include "ms/spec/extend_ms_factory.hpp"
+#include "ms/spec/spectrum_set_factory.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_coverage.hpp"
@@ -45,9 +45,8 @@ void PrsmCoverage::processSingleCoverage() {
   // init variables
   int spectrum_num = msalign_util::getSpNum(sp_file_name);
   int group_spec_num = prsm_para_ptr_->getGroupSpecNum();
-  MsAlignReader sp_reader(sp_file_name, group_spec_num,
-                          prsm_para_ptr_->getSpParaPtr()->getActivationPtr(),
-                          prsm_para_ptr_->getSpParaPtr()->getSkipList());
+  SimpleMsAlignReaderPtr ms_reader_ptr = std::make_shared<SimpleMsAlignReader>(sp_file_name, group_spec_num,
+                                                                               prsm_para_ptr_->getSpParaPtr()->getActivationPtr());
   int cnt = 0;
   SpectrumSetPtr spec_set_ptr;
 
@@ -57,7 +56,7 @@ void PrsmCoverage::processSingleCoverage() {
   // write title
   printTitle(out_stream);
   SpParaPtr sp_para_ptr = prsm_para_ptr_->getSpParaPtr();
-  while ((spec_set_ptr = sp_reader.getNextSpectrumSet(sp_para_ptr)[0]) !=  nullptr) {
+  while ((spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(ms_reader_ptr, sp_para_ptr)) !=  nullptr) {
     cnt+= group_spec_num;
     if (spec_set_ptr->isValid()) {
       int spec_id = spec_set_ptr->getSpectrumId();
@@ -77,7 +76,6 @@ void PrsmCoverage::processSingleCoverage() {
         << " of " << spectrum_num << " spectra.\r";
   }
   LOG_DEBUG("Search completed");
-  sp_reader.close();
   prsm_reader.close();
   out_stream.close();
   std::cout << std::endl;
