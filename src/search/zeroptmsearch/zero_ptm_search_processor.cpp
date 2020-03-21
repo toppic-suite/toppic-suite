@@ -120,6 +120,9 @@ void ZeroPtmSearchProcessor::process() {
   while (deconv_ms_ptr_vec.size() > 0) {
     std::vector<SpectrumSetPtr> spec_set_vec 
         = spectrum_set_factory::geneSpectrumSetPtrVecWithPrecError(deconv_ms_ptr_vec, sp_para_ptr);
+    if (spec_set_vec.size() == 0) {
+      LOG_ERROR("Spectrum set size is 0!");
+    }
     cnt+= group_spec_num;
     if (spec_set_vec[0]->isValid()) {
       int spec_id = spec_set_vec[0]->getSpectrumId();
