@@ -125,8 +125,11 @@ void Argument::outputArguments(std::ostream &output,
   output << "********************** Parameters **********************" << std::endl;
 }
 
-std::string Argument::outputCsvArguments(std::map<std::string, std::string> arguments) {
+std::string Argument::outputTsvArguments(std::map<std::string, std::string> arguments) {
   std::stringstream output;
+  outputArguments(output, arguments); 
+  return output.str();
+  /*
   output << "********************** Parameters **********************" << std::endl;
   output << "Protein database file:," << arguments["oriDatabaseFileName"] << std::endl;
   output << "Spectrum file:," << arguments["spectrumFileName"] << std::endl;
@@ -182,7 +185,7 @@ std::string Argument::outputCsvArguments(std::map<std::string, std::string> argu
     output << "End time:," << arguments["endTime"] << std::endl;
   }
   output << "********************** Parameters **********************" << std::endl;
-  return output.str();
+  */
 }
 
 void Argument::showUsage(boost::program_options::options_description &desc) {
