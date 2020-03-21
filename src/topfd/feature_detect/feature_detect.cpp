@@ -25,7 +25,7 @@
 #include "seq/fasta_index_reader.hpp"
 #include "ms/spec/peak.hpp"
 #include "ms/spec/deconv_ms.hpp"
-#include "ms/spec/msalign_reader.hpp"
+#include "ms/spec/simple_msalign_reader.hpp"
 #include "ms/env/env_base.hpp"
 #include "ms/env/env_para.hpp"
 #include "ms/env/match_env.hpp"
@@ -444,16 +444,13 @@ void findMsOneFeatures(DeconvMsPtrVec &ms1_ptr_vec, PeakPtrVec2D & raw_peaks,
 }
 
 void readHeaders(const std::string & file_name, MsHeaderPtrVec &header_ptr_vec) {
-  int sp_num_in_group = 1;
-  MsAlignReader sp_reader(file_name, sp_num_in_group, nullptr,
-                          std::set<std::string>());
+  SimpleMsAlignReader sp_reader(file_name); 
   DeconvMsPtr ms_ptr;
   LOG_DEBUG("Start search");
-  while ((ms_ptr = sp_reader.getNextMs()) != nullptr) {
+  while ((ms_ptr = sp_reader.getNextMsPtr()) != nullptr) {
     header_ptr_vec.push_back(ms_ptr->getMsHeaderPtr());
     //std::cout << std::flush <<  "reading spectrum " << header_ptr_vec.size() << "\r";
   }
-  sp_reader.close();
   //std::cout << std::endl;
 }
 
@@ -574,7 +571,7 @@ void process(int frac_id, const std::string &sp_file_name,
   FracFeaturePtrVec frac_features;
   if (!missing_level_one) {
     std::string ms1_file_name = base_name + "_ms1.msalign";
-    MsAlignReader::readMsOneSpectra(ms1_file_name, ms1_ptr_vec);
+    SimpleMsAlignReader::readMsOneSpectra(ms1_file_name, ms1_ptr_vec);
     PeakPtrVec2D raw_peaks; 
     RawMsReaderPtr raw_reader_ptr = std::make_shared<RawMsReader>(sp_file_name);
     raw_reader_ptr->getMs1Peaks(raw_peaks);

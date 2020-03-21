@@ -27,12 +27,13 @@
 #include "prsm/extreme_value.hpp"
 #include "common/thread/simple_thread_pool.hpp"
 
-#include "ms/spec/msalign_reader.hpp"
+#include "ms/spec/simple_msalign_reader.hpp"
 #include "ms/spec/msalign_util.hpp"
 #include "ms/spec/theo_peak.hpp"
-#include "prsm/theo_peak_util.hpp"
 #include "ms/spec/extend_ms_factory.hpp"
+#include "ms/spec/spectrum_set_factory.hpp"
 
+#include "prsm/theo_peak_util.hpp"
 #include "prsm/prsm_algo.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_str_merge.hpp"
@@ -133,8 +134,6 @@ void DprProcessor::process() {
 
   sp_para_ptr_ = prsm_para_ptr->getSpParaPtr();
 
-  sp_para_ptr_->setPrecError(0);
-
   std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
   std::string input_file_name = file_util::basename(sp_file_name) + "." + mng_ptr_->input_file_ext_;
@@ -154,17 +153,21 @@ void DprProcessor::process() {
   PrsmPtr prsm_ptr = prsm_reader->readOnePrsm(fasta_reader_ptr, prsm_para_ptr->getFixModPtrVec());
 
   // no multi-spec support now
-  MsAlignReaderPtr sp_reader_ptr = std::make_shared<MsAlignReader>(
+  SimpleMsAlignReaderPtr sp_reader_ptr = std::make_shared<SimpleMsAlignReader>(
       sp_file_name,
       1,  // prsm_para_ptr->getGroupSpecNum()
-      sp_para_ptr_->getActivationPtr(), sp_para_ptr_->getSkipList(), 500);
+      sp_para_ptr_->getActivationPtr()); 
+
+  int peak_num_limit = 500;
 
   int spectrum_num = msalign_util::getSpNum(sp_file_name);
 
   int cnt = 0;
 
-  SpectrumSetPtr spec_set_ptr = sp_reader_ptr->getNextSpectrumSet(sp_para_ptr_)[0];
-
+  //SpectrumSetPtr spec_set_ptr = sp_reader_ptr->getNextSpectrumSet(sp_para_ptr_)[0];
+  SpectrumSetPtr spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(sp_reader_ptr,
+                                                                             sp_para_ptr_,
+                                                                             peak_num_limit);
   while (spec_set_ptr != nullptr) {
     cnt += prsm_para_ptr->getGroupSpecNum();
     if (spec_set_ptr->isValid()) {
@@ -182,14 +185,16 @@ void DprProcessor::process() {
         prsm_ptr = prsm_reader->readOnePrsm(fasta_reader_ptr, prsm_para_ptr->getFixModPtrVec());
       }
     }
-    spec_set_ptr = sp_reader_ptr->getNextSpectrumSet(sp_para_ptr_)[0];
+    //spec_set_ptr = sp_reader_ptr->getNextSpectrumSet(sp_para_ptr_)[0];
+    spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(sp_reader_ptr,
+                                                                sp_para_ptr_,
+                                                                peak_num_limit);
 
     std::cout << std::flush << "E-value computation - processing " << cnt << " of "
         << spectrum_num << " spectra.\r";
   }
   pool_ptr_->ShutDown();
   std::cout << std::endl;
-  sp_reader_ptr->close();
   prsm_reader->close();
   prsm_writer->close();
   prsm_xml_writer_util::closeWriterPtrVec(writer_ptr_vec_);

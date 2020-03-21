@@ -23,6 +23,7 @@
 #include "common/util/file_util.hpp"
 #include "seq/fasta_index_reader.hpp"
 #include "ms/spec/extend_ms_factory.hpp"
+#include "ms/spec/spectrum_set_factory.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_util.hpp"
 #include "prsm/prsm_cluster.hpp"
@@ -58,15 +59,15 @@ void XmlGenerator::outputPrsms() {
 
   std::string sp_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
   int group_spec_num = mng_ptr_->prsm_para_ptr_->getGroupSpecNum();
-  MsAlignReader sp_reader(sp_file_name, group_spec_num,
-                          mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getActivationPtr(),
-                          mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getSkipList());
-  SpectrumSetPtr spec_set_ptr;
   SpParaPtr sp_para_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr();
+  SimpleMsAlignReaderPtr ms_reader_ptr = std::make_shared<SimpleMsAlignReader>(sp_file_name, 
+                                                                               group_spec_num,
+                                                                               sp_para_ptr->getActivationPtr());
 
+  SpectrumSetPtr spec_set_ptr;
   size_t cnt = 0;
   size_t idx = 0;
-  while ((spec_set_ptr = sp_reader.getNextSpectrumSet(sp_para_ptr)[0])!= nullptr) {
+  while ((spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(ms_reader_ptr, sp_para_ptr))!= nullptr) {
     if (spec_set_ptr->isValid()) {
       int spec_id = spec_set_ptr->getSpectrumId();
       while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_id) {
@@ -110,8 +111,6 @@ void XmlGenerator::outputPrsms() {
   std::cout << std::endl;
 
   prsm_reader.close();
-  sp_reader.close();
-
   std::copy(cluster_id_set.begin(), cluster_id_set.end(), std::back_inserter(cluster_ids_));
   std::sort(cluster_ids_.begin(), cluster_ids_.end());
   std::copy(prot_id_set.begin(), prot_id_set.end(), std::back_inserter(prot_ids_));

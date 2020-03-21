@@ -25,16 +25,17 @@
 #include "common/base/mod_util.hpp"
 #include "common/base/residue_base.hpp"
 #include "common/base/residue_util.hpp"
-#include "seq/local_anno.hpp"
-#include "seq/mass_shift.hpp"
 #include "common/base/prot_mod.hpp"
 #include "common/base/prot_mod_base.hpp"
+
+#include "seq/local_anno.hpp"
+#include "seq/mass_shift.hpp"
 #include "seq/proteoform_factory.hpp"
 
-#include "ms/spec/msalign_reader.hpp"
+#include "ms/spec/msalign_util.hpp"
 #include "ms/spec/spectrum_set.hpp"
 #include "ms/spec/extend_ms_factory.hpp"
-#include "ms/spec/msalign_util.hpp"
+#include "ms/spec/spectrum_set_factory.hpp"
 
 #include "prsm/prsm.hpp"
 #include "prsm/peak_ion_pair.hpp"
@@ -61,6 +62,8 @@ void LocalProcessor::init() {
 }
 
 void LocalProcessor::process() {
+  
+
   std::string spec_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
 
   std::string input_file_name = file_util::basename(spec_file_name) + "." + mng_ptr_->input_file_ext_;
@@ -81,19 +84,19 @@ void LocalProcessor::process() {
 
   int group_spec_num = mng_ptr_->prsm_para_ptr_->getGroupSpecNum();
 
-  MsAlignReader sp_reader(spec_file_name, group_spec_num,
-                          mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getActivationPtr(),
-                          mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getSkipList());
+  SpParaPtr sp_para_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr();
+
+  SimpleMsAlignReaderPtr reader_ptr = std::make_shared<SimpleMsAlignReader>(spec_file_name, 
+                                                                            group_spec_num,
+                                                                            sp_para_ptr->getActivationPtr());
 
   SpectrumSetPtr spec_set_ptr;
-
-  SpParaPtr sp_para_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr();
 
   int spectrum_num = msalign_util::getSpNum(mng_ptr_->prsm_para_ptr_->getSpectrumFileName());
 
   int cnt = 0;
 
-  while ((spec_set_ptr = sp_reader.getNextSpectrumSet(sp_para_ptr)[0])!= nullptr) {
+  while ((spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(reader_ptr, sp_para_ptr))!= nullptr) {
     cnt += group_spec_num;
     if (spec_set_ptr->isValid()) {
       int spec_id = spec_set_ptr->getSpectrumId();
@@ -116,8 +119,6 @@ void LocalProcessor::process() {
     std::cout << std::flush << "PTM characterization is processing " << cnt
         << " of " << spectrum_num << " spectra.\r";
   }
-
-  sp_reader.close();
   prsm_reader->close();
   prsm_writer->close();
   std::cout << std::endl;

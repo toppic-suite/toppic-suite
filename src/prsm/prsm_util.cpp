@@ -19,7 +19,7 @@
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
 #include "ms/spec/extend_ms_factory.hpp"
-#include "ms/spec/msalign_reader.hpp"
+#include "ms/spec/spectrum_set_factory.hpp"
 #include "ms/feature/spec_feature.hpp"
 #include "ms/feature/spec_feature_reader.hpp"
 #include "prsm/prsm_reader.hpp"
@@ -120,12 +120,12 @@ bool isMatchMs(PrsmPtr prsm_ptr, MsHeaderPtr header_ptr) {
 }
 
 void addSpectrumPtrsToPrsms(PrsmPtrVec &prsm_ptrs, PrsmParaPtr prsm_para_ptr) {
-  MsAlignReader reader(prsm_para_ptr->getSpectrumFileName(),
-                       prsm_para_ptr->getGroupSpecNum(),
-                       prsm_para_ptr->getSpParaPtr()->getActivationPtr(),
-                       prsm_para_ptr->getSpParaPtr()->getSkipList());
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
-  SpectrumSetPtr spec_set_ptr = reader.getNextSpectrumSet(sp_para_ptr)[0];
+  SimpleMsAlignReaderPtr ms_reader_ptr 
+      = std::make_shared<SimpleMsAlignReader>(prsm_para_ptr->getSpectrumFileName(),
+                                              prsm_para_ptr->getGroupSpecNum(),
+                                              sp_para_ptr->getActivationPtr());
+  SpectrumSetPtr spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(ms_reader_ptr, sp_para_ptr);
   // use prsm order information (ordered by spectrum id then prec id)
   int start_prsm = 0;
   while (spec_set_ptr != nullptr) {
@@ -151,9 +151,8 @@ void addSpectrumPtrsToPrsms(PrsmPtrVec &prsm_ptrs, PrsmParaPtr prsm_para_ptr) {
         }
       }
     }
-    spec_set_ptr = reader.getNextSpectrumSet(sp_para_ptr)[0];
+    spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(ms_reader_ptr, sp_para_ptr);
   }
-  reader.close();
 }
 
 void addFeatureIDToPrsms(PrsmStrPtrVec &prsm_ptrs, const std::string & feature_file_name) {

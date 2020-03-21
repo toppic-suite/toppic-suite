@@ -26,7 +26,7 @@
 
 #include "ms/spec/extend_ms_factory.hpp"
 #include "ms/spec/msalign_util.hpp"
-#include "ms/spec/msalign_reader.hpp"
+#include "ms/spec/spectrum_set_factory.hpp"
 
 #include "prsm/prsm_reader.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
@@ -145,13 +145,13 @@ void GraphPostProcessor::process() {
                                               mng_ptr_->prsm_para_ptr_->getFixModPtrVec());
 
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
-  MsAlignReader sp_reader(sp_file_name, group_spec_num,
-                          sp_para_ptr->getActivationPtr(),
-                          sp_para_ptr->getSkipList());
+  SimpleMsAlignReaderPtr ms_reader_ptr = std::make_shared<SimpleMsAlignReader>(sp_file_name, 
+                                                                               group_spec_num,
+                                                                               sp_para_ptr->getActivationPtr());
 
   int cnt = 0;
 
-  SpectrumSetPtr spec_set_ptr = sp_reader.getNextSpectrumSet(sp_para_ptr)[0];
+  SpectrumSetPtr spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(ms_reader_ptr, sp_para_ptr);
 
   while (spec_set_ptr != nullptr) {
     cnt += group_spec_num;
@@ -270,9 +270,9 @@ void GraphPostProcessor::process() {
     }
     std::cout << std::flush <<  "Mass graph - post-processing " << cnt
         << " of " << spectrum_num << " spectra.\r";
-    spec_set_ptr = sp_reader.getNextSpectrumSet(sp_para_ptr)[0];
+
+    spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(ms_reader_ptr, sp_para_ptr);
   }
-  sp_reader.close();
   prsm_reader->close();
   prsm_writer->close();
   std::cout << std::endl;

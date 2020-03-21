@@ -29,6 +29,7 @@
 #include "common/base/mod_util.hpp"
 #include "seq/fasta_sub_util.hpp"
 #include "ms/spec/msalign_util.hpp"
+#include "ms/spec/spectrum_set_factory.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_str_merge.hpp"
@@ -58,9 +59,9 @@ std::function<void()> geneTask(GraphAlignMngPtr mng_ptr,
     SimplePrsmReader simple_prsm_reader(input_file_name);
     SimplePrsmStrPtr prsm_ptr = simple_prsm_reader.readOnePrsmStr();
     int group_spec_num = prsm_para_ptr->getGroupSpecNum();
-    MsAlignReader sp_reader(sp_file_name, group_spec_num,
-                            sp_para_ptr->getActivationPtr(),
-                            sp_para_ptr->getSkipList());
+    SimpleMsAlignReaderPtr ms_reader_ptr = std::make_shared<SimpleMsAlignReader>(sp_file_name, 
+                                                                                 group_spec_num,
+                                                                                 sp_para_ptr->getActivationPtr());
 
     SpecGraphReader spec_reader(sp_file_name,
                                 prsm_para_ptr->getGroupSpecNum(),
@@ -68,8 +69,9 @@ std::function<void()> geneTask(GraphAlignMngPtr mng_ptr,
                                 sp_para_ptr);
 
     PrsmXmlWriterPtr writer_ptr
-        = std::make_shared<PrsmXmlWriter>(file_util::basename(sp_file_name) + "." + mng_ptr->output_file_ext_ + "_" + str_util::toString(idx));
-    SpectrumSetPtr spec_set_ptr = sp_reader.getNextSpectrumSet(sp_para_ptr)[0];
+        = std::make_shared<PrsmXmlWriter>(file_util::basename(sp_file_name) + "." 
+                                          + mng_ptr->output_file_ext_ + "_" + str_util::toString(idx));
+    SpectrumSetPtr spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(ms_reader_ptr, sp_para_ptr);
     ProteoAnnoPtr proteo_anno_ptr
         = std::make_shared<ProteoAnno>(prsm_para_ptr->getFixModPtrVec(),
                                        prsm_para_ptr->getProtModPtrVec(),
@@ -129,7 +131,7 @@ std::function<void()> geneTask(GraphAlignMngPtr mng_ptr,
         std::cout << std::flush << "Mass graph alignment - processing " << cnt
             << " of " << spectrum_num << " spectra.\r";
       }
-      spec_set_ptr = sp_reader.getNextSpectrumSet(sp_para_ptr)[0];
+      spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(ms_reader_ptr, sp_para_ptr);
     }
     writer_ptr->close();
   };
@@ -156,7 +158,6 @@ void SimplePrsmFilter(SimplePrsmPtrVec & selected_prsm_ptrs) {
 void GraphAlignProcessor::process() {
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
-  sp_para_ptr->setPrecError(0);
   std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
   LOG_DEBUG("Search db file name " << db_file_name);
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();

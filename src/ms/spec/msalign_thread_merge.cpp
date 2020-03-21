@@ -19,7 +19,7 @@
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/str_util.hpp"
-#include "ms/spec/msalign_reader.hpp"
+#include "ms/spec/simple_msalign_reader.hpp"
 #include "ms/spec/msalign_writer.hpp"
 #include "ms/spec/msalign_thread_merge.hpp"
 
@@ -57,18 +57,18 @@ void MsalignThreadMerge::process() {
   size_t input_num = input_file_exts_.size();
   std::string base_name = file_util::basename(spec_file_name_);
   // open files
-  MsAlignReaderPtrVec reader_ptrs; 
+  SimpleMsAlignReaderPtrVec reader_ptrs; 
   DeconvMsPtrVec ms_ptrs;
   for (size_t i = 0; i < input_num; i++) {
     std::string input_file_name = base_name + "_" + input_file_exts_[i];
-    MsAlignReaderPtr reader_ptr
-        = std::make_shared<MsAlignReader>(input_file_name); 
+    SimpleMsAlignReaderPtr reader_ptr
+        = std::make_shared<SimpleMsAlignReader>(input_file_name); 
     //if set to true, it copies precursor mass and prec_m/z, instead of calculating
     //to avoid generating incorrect values during merge sort
     //more detail about the variable in msalign_reader.hpp
-    reader_ptr-> setToCopyValues(true);
+    //reader_ptr-> setToCopyValues(true);
     LOG_DEBUG("input file name " << input_file_name);
-    DeconvMsPtr ms_ptr = reader_ptr->getNextMs();
+    DeconvMsPtr ms_ptr = reader_ptr->getNextMsPtr();
     reader_ptrs.push_back(reader_ptr);
     ms_ptrs.push_back(ms_ptr);
   }
@@ -94,16 +94,13 @@ void MsalignThreadMerge::process() {
       spec_id++;
       //if set to true, it used mono mass value from the msalign file it is reading
       //and not recalcuate it--which causes incorrect result
-      writer-> useCopiedMonoMass(true);
+      //writer-> useCopiedMonoMass(true);
       writer->write(cur_ms_ptr);
-      ms_ptrs[cur_ms_idx] = reader_ptrs[cur_ms_idx]->getNextMs();
+      ms_ptrs[cur_ms_idx] = reader_ptrs[cur_ms_idx]->getNextMsPtr();
     }
   }
 
   // close files
-  for (size_t i = 0; i < input_num; i++) {
-    reader_ptrs[i]->close();
-  }
   writer->close();
 }
 

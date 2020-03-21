@@ -16,7 +16,6 @@
 #include "common/xml/xml_dom_document.hpp"
 #include "common/xml/xml_dom_util.hpp"
 #include "common/xml/xml_dom_impl.hpp"
-#include "ms/spec/msalign_reader.hpp"
 #include "prsm/simple_prsm_xml_writer.hpp"
 
 namespace toppic {

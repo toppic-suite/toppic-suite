@@ -22,6 +22,7 @@
 
 #include "common/xml/xml_dom_element.hpp"
 #include "common/base/activation.hpp"
+#include "common/base/mass_constant.hpp"
 #include "para/peak_tolerance.hpp"
 
 namespace toppic {
@@ -43,7 +44,7 @@ class SpPara {
 
   int getPrecError() {return prec_error_;}
 
-  void setPrecError(int prec_error) {prec_error_ = prec_error;}
+  const std::vector<double>& getPrecErrorVec() {return prec_error_vec_;}
 
   PeakTolerancePtr getPeakTolerancePtr() {return peak_tolerance_ptr_;}
 
@@ -72,14 +73,16 @@ class SpPara {
   double min_mass_ = 50.0;
   // if the mass is smaller than extend_min_mass, the peak is not extended
   double extend_min_mass_ = 5000;
-  // the 1 Da error in precursor mass used in zeroptm searching
-  int prec_error_ = 1;
+  std::vector<double> ext_offsets_;
 
   ActivationPtr activation_ptr_;
 
-  std::set<std::string> skip_list_;
+  // the 1 Da error in precursor mass used in zeroptm filtering
+  int prec_error_ = 1;
+  std::vector<double> prec_error_vec_ 
+      = {0, -mass_constant::getIsotopeMass(), mass_constant::getIsotopeMass()};
 
-  std::vector<double> ext_offsets_;
+  std::set<std::string> skip_list_;
 
   PeakTolerancePtr peak_tolerance_ptr_;
 };

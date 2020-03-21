@@ -23,8 +23,8 @@
 #include "seq/proteoform.hpp"
 #include "seq/proteoform_factory.hpp"
 #include "seq/db_block.hpp"
-#include "ms/spec/msalign_reader.hpp"
 #include "ms/spec/msalign_util.hpp"
+#include "ms/spec/spectrum_set_factory.hpp"
 #include "prsm/simple_prsm.hpp"
 #include "prsm/simple_prsm_reader.hpp"
 #include "prsm/prsm_xml_writer.hpp"
@@ -111,13 +111,15 @@ void ZeroPtmSearchProcessor::process() {
   ModPtrVec fix_mod_ptr_vec = prsm_para_ptr->getFixModPtrVec();
 
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
-  MsAlignReader sp_reader(sp_file_name, group_spec_num,
-                          sp_para_ptr->getActivationPtr(),
-                          sp_para_ptr->getSkipList());
+  SimpleMsAlignReaderPtr ms_reader_ptr = std::make_shared<SimpleMsAlignReader>(sp_file_name, 
+                                                                               group_spec_num,
+                                                                               sp_para_ptr->getActivationPtr());
   int cnt = 0;
-  std::vector<SpectrumSetPtr> spec_set_vec = sp_reader.getNextSpectrumSet(sp_para_ptr);
+  DeconvMsPtrVec deconv_ms_ptr_vec = ms_reader_ptr->getNextMsPtrVec(); 
   // LOG_DEBUG("Start search");
-  while (spec_set_vec[0] != nullptr) {
+  while (deconv_ms_ptr_vec.size() > 0) {
+    std::vector<SpectrumSetPtr> spec_set_vec 
+        = spectrum_set_factory::geneSpectrumSetPtrVecWithPrecError(deconv_ms_ptr_vec, sp_para_ptr);
     cnt+= group_spec_num;
     if (spec_set_vec[0]->isValid()) {
       int spec_id = spec_set_vec[0]->getSpectrumId();
@@ -185,7 +187,7 @@ void ZeroPtmSearchProcessor::process() {
         }
       }
     }
-    spec_set_vec = sp_reader.getNextSpectrumSet(sp_para_ptr);
+    deconv_ms_ptr_vec = ms_reader_ptr->getNextMsPtrVec(); 
     std::cout << std::flush <<  "Non PTM search - processing " << cnt
         << " of " << spectrum_num << " spectra.\r";
   }
@@ -199,7 +201,6 @@ void ZeroPtmSearchProcessor::process() {
         << " of " << spectrum_num << " spectra.\r";
   } 
 
-  sp_reader.close();
   comp_prsm_reader.close();
   pref_prsm_reader.close();
   suff_prsm_reader.close();
