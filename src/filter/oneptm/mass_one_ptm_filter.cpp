@@ -53,7 +53,7 @@ MassOnePtmFilter::MassOnePtmFilter(const ProteoformPtrVec &proteo_ptrs,
   }
 
   if (index_files_exist){//if exists
-    std::cout << "Loading index files                               " << std::endl;
+    //std::cout << "Loading index files                               " << std::endl;
     term_index_ptr_ = std::make_shared<MassMatch>();
     diag_index_ptr_ = std::make_shared<MassMatch>();
     rev_term_index_ptr_ = std::make_shared<MassMatch>();

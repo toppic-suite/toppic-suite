@@ -54,8 +54,7 @@ MassZeroPtmFilter::MassZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
   }
 
   if (index_files_exist){
-    std::cout << "Loading index files                            " << std::endl;
-
+    //std::cout << "Loading index files                            " << std::endl;
     term_index_ptr_ = std::make_shared<MassMatch>();
     diag_index_ptr_ = std::make_shared<MassMatch>();
     rev_term_index_ptr_ = std::make_shared<MassMatch>();
@@ -65,9 +64,7 @@ MassZeroPtmFilter::MassZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
     diag_index_ptr_->deserializeMassMatch(mng_ptr->zero_ptm_file_vec_[1] + suffix, index_dir);
     rev_term_index_ptr_->deserializeMassMatch(mng_ptr->zero_ptm_file_vec_[2] + suffix, index_dir);
     rev_diag_index_ptr_->deserializeMassMatch(mng_ptr->zero_ptm_file_vec_[3] + suffix, index_dir);
-
   }
-  
   else{
     LOG_DEBUG("get shifts");
     std::vector<std::vector<double> > shift_2d

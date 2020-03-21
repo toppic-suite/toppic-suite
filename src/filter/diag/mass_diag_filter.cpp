@@ -23,7 +23,6 @@
 #include "prsm/simple_prsm_util.hpp"
 
 #include "filter/mng/topindex_file_name.hpp"
-
 #include "filter/massmatch/filter_protein.hpp"
 #include "filter/massmatch/mass_match_factory.hpp"
 #include "filter/massmatch/mass_match_util.hpp"
@@ -55,7 +54,7 @@ MassDiagFilter::MassDiagFilter(const ProteoformPtrVec &proteo_ptrs,
   }
 
   if (index_files_exist){ 
-    std::cout << "Loading index files                            " << std::endl;
+    //std::cout << "Loading index files                            " << std::endl;
     index_ptr_ = std::make_shared<MassMatch>();
     
     std::string file_name = mng_ptr->multi_ptm_file_vec_[0] + suffix;
