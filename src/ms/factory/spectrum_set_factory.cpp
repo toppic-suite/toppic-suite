@@ -14,9 +14,9 @@
 
 #include "common/util/logger.hpp"
 #include "ms/spec/deconv_ms_util.hpp"
-#include "ms/spec/extend_ms_factory.hpp"
-#include "ms/spec/prm_ms_factory.hpp"
-#include "ms/spec/spectrum_set_factory.hpp"
+#include "ms/factory/extend_ms_factory.hpp"
+#include "ms/factory/prm_ms_factory.hpp"
+#include "ms/factory/spectrum_set_factory.hpp"
 
 namespace toppic {
 

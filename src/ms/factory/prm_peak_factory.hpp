@@ -12,26 +12,23 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#ifndef TOPPIC_MS_FACTORY_PRM_PEAK_FACTORY_HPP_
+#define TOPPIC_MS_FACTORY_PRM_PEAK_FACTORY_HPP_
 
-#ifndef TOPPIC_MS_SPEC_EXTEND_MS_FACTORY_HPP_
-#define TOPPIC_MS_SPEC_EXTEND_MS_FACTORY_HPP_
-
-#include "ms/spec/deconv_ms.hpp"
-#include "ms/spec/extend_ms.hpp"
-#include "para/sp_para.hpp"
+#include "para/peak_tolerance.hpp"
+#include "ms/spec/prm_peak.hpp"
 
 namespace toppic {
 
-namespace extend_ms_factory {
+namespace prm_peak_factory {
 
-ExtendMsPtr geneMsThreePtr(DeconvMsPtr deconv_ms_ptr, SpParaPtr sp_para_ptr,
-                           double new_prec_mass);
+PrmPeakPtr getZeroPeakPtr(int spec_id, double prec_mono_mass,
+                          PeakTolerancePtr tole_ptr, double score);
 
-ExtendMsPtrVec geneMsThreePtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, 
-                                 SpParaPtr sp_para_ptr, double new_prec_mass);
-
-}  // namespace extend_ms_factory
+PrmPeakPtr getPrecPeakPtr(int spec_id, double prec_mono_mass,
+                          PeakTolerancePtr tole_ptr, double score);
+}  // namespace prm_peak_factory
 
 }  // namespace toppic
 
-#endif 
+#endif

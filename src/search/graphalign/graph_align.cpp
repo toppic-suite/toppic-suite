@@ -19,7 +19,7 @@
 #include <limits>
 
 #include "seq/proteoform_factory.hpp"
-#include "ms/spec/extend_ms_factory.hpp"
+#include "ms/factory/extend_ms_factory.hpp"
 #include "search/diag/diagonal.hpp"
 #include "search/diag/diagonal_header.hpp"
 #include "search/graph/graph.hpp"

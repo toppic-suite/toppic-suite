@@ -18,7 +18,7 @@
 
 #include "common/util/file_util.hpp"
 
-#include "ms/spec/prm_ms.hpp"
+#include "ms/factory/prm_ms_factory.hpp"
 
 #include "prsm/simple_prsm_util.hpp"
 
@@ -93,7 +93,7 @@ SimplePrsmPtrVec MassDiagFilter::getBestMatch(const PrmMsPtrVec &ms_ptr_vec) {
 SimplePrsmPtrVec MassDiagFilter::compute(const PrmMsPtrVec &ms_ptr_vec) {
   PeakTolerancePtr tole_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
   std::vector<std::pair<int, int> > mass_errors
-      = prm_ms::getIntMassErrorList(ms_ptr_vec, tole_ptr, mng_ptr_->filter_scale_, true, false);
+      = prm_ms_factory::getIntMassErrorList(ms_ptr_vec, tole_ptr, mng_ptr_->filter_scale_, true, false);
   // LOG_DEBUG("mass error size " << mass_errors.size() << " filter result number " << mng_ptr_->filter_result_num_);
   SimplePrsmPtrVec match_ptrs;
   int row_num = index_ptr_->getRowNum();

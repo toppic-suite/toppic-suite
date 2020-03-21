@@ -19,7 +19,7 @@
 #include "seq/fasta_reader.hpp"
 #include "ms/spec/deconv_ms.hpp"
 #include "ms/spec/msalign_util.hpp"
-#include "ms/spec/spectrum_set_factory.hpp"
+#include "ms/factory/spectrum_set_factory.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_str_merge.hpp"
 #include "prsm/prsm_xml_writer.hpp"

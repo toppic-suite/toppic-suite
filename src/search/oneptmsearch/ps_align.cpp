@@ -18,7 +18,7 @@
 #include <vector>
 
 #include "seq/proteoform_factory.hpp"
-#include "ms/spec/extend_ms_factory.hpp"
+#include "ms/factory/extend_ms_factory.hpp"
 #include "search/oneptmsearch/ps_align.hpp"
 
 namespace toppic {

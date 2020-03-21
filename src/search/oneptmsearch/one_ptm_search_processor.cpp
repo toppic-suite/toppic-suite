@@ -22,7 +22,7 @@
 #include "seq/db_block.hpp"
 #include "ms/spec/msalign_util.hpp"
 #include "ms/spec/simple_msalign_reader.hpp"
-#include "ms/spec/spectrum_set_factory.hpp"
+#include "ms/factory/spectrum_set_factory.hpp"
 #include "prsm/simple_prsm.hpp"
 #include "prsm/simple_prsm_reader.hpp"
 #include "prsm/prsm_xml_writer.hpp"

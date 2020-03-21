@@ -13,7 +13,7 @@
 //limitations under the License.
 
 #include "common/base/ion_type_base.hpp"
-#include "ms/spec/prm_peak_factory.hpp"
+#include "ms/factory/prm_peak_factory.hpp"
 
 namespace toppic {
 

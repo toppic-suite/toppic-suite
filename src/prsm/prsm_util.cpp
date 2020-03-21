@@ -18,8 +18,8 @@
 
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
-#include "ms/spec/extend_ms_factory.hpp"
-#include "ms/spec/spectrum_set_factory.hpp"
+#include "ms/factory/extend_ms_factory.hpp"
+#include "ms/factory/spectrum_set_factory.hpp"
 #include "ms/feature/spec_feature.hpp"
 #include "ms/feature/spec_feature_reader.hpp"
 #include "prsm/prsm_reader.hpp"
