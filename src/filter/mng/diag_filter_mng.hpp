@@ -36,7 +36,7 @@ class DiagFilterMng {
   std::string index_file_para_;
 
   /** parameters for fast filteration */
-  int max_proteoform_mass_ = 40000;
+  int max_proteoform_mass_ = 50000;
 
   // Candidate protein number for each spectrum
   size_t filter_result_num_ = 20;
