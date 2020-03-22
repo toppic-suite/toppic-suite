@@ -31,7 +31,7 @@ SpectrumSet::SpectrumSet(DeconvMsPtrVec deconv_ms_ptr_vec,
     valid_(valid),
     extend_ms_three_ptr_vec_(extend_ms_three_ptr_vec),
     prm_ms_two_ptr_vec_(prm_ms_two_ptr_vec),
-    srm_ms_two_ptr_vec_(prm_ms_two_ptr_vec),
+    srm_ms_two_ptr_vec_(srm_ms_two_ptr_vec),
     prm_ms_six_ptr_vec_(prm_ms_six_ptr_vec) {}
 
 }  // namespace toppic
