@@ -1,4 +1,12 @@
-/*	Spectrum start point */
+/**
+ * Starting point of drawing spectrum graph
+ * @param {String} id - gets the svg id of the graph 
+ * @param {list} peakList - contains the list of data with mz and intensity used to draw lines on the graph 
+ * @param {list} envelopeList - contains the list of data with actual mass, mz and intensity used to draw circles on graph
+ * @param {float} monoMZ - Value to which tha graph as to point on click of mz value used to zoom the grpah to that location
+ * @param {list} ionData - contains the list of data with mass and acid name
+ * @param {object} graphFeatures - contains all the features needed for drawing the graphs
+ */
 addSpectrum = function(id,peakList,envelopeList,monoMZ, ionData, graphFeatures){
 	let specParameters = compSpectrumParameters(peakList, envelopeList, monoMZ);
 	specParameters.graphFeatures = graphFeatures;
@@ -21,28 +29,27 @@ addSpectrum = function(id,peakList,envelopeList,monoMZ, ionData, graphFeatures){
 	specParameters.specHeight = graphFeatures.specHeight;
 	specParameters.svgHeight = graphFeatures.svgHeight;
 	specParameters.padding.head = graphFeatures.padding.head;
-	let spectrumGraph;
-	
-	spectrumGraph = new SpectrumGraph(id,specParameters,peakData,ionData);
+	let spectrumGraph = new SpectrumGraph(id,specParameters,peakData,ionData);
 	return spectrumGraph;
 }
-compSpectrumParameters = function (peakList, envelopeList, monoMZ) {
+ //  Function to set spectrum perameters based on the data
+ function compSpectrumParameters(peakList, envelopeList, monoMZ){
 	let ratio = 1; 
 	let specParameters = new SpectrumParameters();
+	// Sort by mz
 	peakList.sort(function(x,y){
-		return d3.ascending(x.mz, y.mz);
-	})
+		return x.mz - y.mz;
+	});
 	let listSize = peakList.length;
 	let minMzData = peakList[0].mz;
 	let maxMzData = peakList[listSize-1].mz;
-
+	// Sort by intensity
 	peakList.sort(function(x,y){
-		return d3.ascending(x.intensity, y.intensity);
-	})
+		return x.intensity - y.intensity;
+	});
 
 	let maxEnvelope = -1;
-	let minEnvelope = 1000000000;
-
+	let minEnvelope = 1000000000; // A random onstant high value
 	if(envelopeList != null)
 	{
 		ratio = 1.000684;
@@ -57,15 +64,11 @@ compSpectrumParameters = function (peakList, envelopeList, monoMZ) {
 			})
 		})
 	}
-	
-
 	let maxIntensity = peakList[listSize-1].intensity;
 	let minIntensity = peakList[0].intensity;
 	let currminMz = minMzData ;
 	let currmaxMz = maxMzData ;
-	//let currentMaxIntensity = maxIntensity ;
 	let currentMaxIntensity;
-
 	if (maxIntensity > maxEnvelope) {
 		currentMaxIntensity = maxIntensity;
 	}
@@ -75,10 +78,9 @@ compSpectrumParameters = function (peakList, envelopeList, monoMZ) {
 
 	if(monoMZ != null)
 	{
-		//Initializing with 1% of total intensity. If there exists no peaks in the 
-		//current range the intensity can't be 0 or nothing which will produce an 
-		//error in arithmatic calculations
-
+		//  Initializing with 1% of total intensity. If there exists no peaks in the 
+		//  current range the intensity can't be 0 or nothing which will produce an 
+		//  error in arithmatic calculations
 		currentMaxIntensity = 0.01 * currentMaxIntensity ;
 		monoMZ = monoMZ * ratio;
 		currminMz = monoMZ - specParameters.onClickMassAdjacentRange ;
@@ -95,8 +97,7 @@ compSpectrumParameters = function (peakList, envelopeList, monoMZ) {
 		}
 	}
 
-	//for specParameters, going to pass whichever value between peak max and envelope max that is bigger.
-
+	//  for specParameters, going to pass whichever value between peak max and envelope max that is bigger
 	if (maxIntensity < maxEnvelope){
 		maxIntensity = maxEnvelope;
 	}
@@ -108,11 +109,10 @@ compSpectrumParameters = function (peakList, envelopeList, monoMZ) {
 	// Code must be included to get top 200 intensities at any given time
 	peakList.sort(function(x,y){
 		return d3.descending(x.intensity, y.intensity);
-	})
+	});
+	return specParameters;
+ }
 
-
-  return specParameters;
-}
 /**
  * Sorting envelopes based on intensity to show top 200 envelops with high intensitites
  */
@@ -131,6 +131,13 @@ sortEnvelopes = function(envelopeList)
 	})
 	return envelopeList ;
 }
+
+/**
+ * 
+ * @param {list} listData - contains list of data
+ * @param {string} keyValue - contains keyword based on which new group is created
+ * Function returns a map list with key and value 
+ */
 function groupBy(listData,keyValue){
 	const map = new Map();
     listData.forEach((element)=>{
