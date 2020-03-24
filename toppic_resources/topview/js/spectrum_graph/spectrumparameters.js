@@ -54,6 +54,10 @@ SpectrumParameters = function() {
   this.limits=[0,0,0,0,0];
   this.bufferPercent = 0.01; //10 percent
 
+  /**
+   * Initializing the spectrum Parameters with the data from the peak list and envilopelist
+   * initializing xScale, yScale
+   */
   this.initScale = function(currminMz, currmaxMz, dataMaxInte,dataMinInte,minMzData,maxMzData,currentMaxIntensity) {
     this.dataMinMz = minMzData;
     this.dataMaxMz = maxMzData + (0.10 * maxMzData);
@@ -67,40 +71,45 @@ SpectrumParameters = function() {
     this.centerMz = (this.minMz + this.maxMz)/2.0;
     this.xScale = this.specWidth/(this.maxMz - this.minMz);
 
-    /* add 1/4th of max intensity to keep the max point at 3/4 of the y axis*/
+    // add 1/4th of max intensity to keep the max point at 3/4 of the y axis*
     this.dataMaxInte = dataMaxInte + 0.25*dataMaxInte;
     this.dataMinInte = dataMinInte ;
-      //this.maxInte = dataMaxInte;
     this.maxInte = currentMaxIntensity;
-    /* add 1/4th of max intensity to keep the max point at 3/4 of the y axis*/
-    //dataMaxInte = dataMaxInte + 0.25*dataMaxInte ;
+    // add 1/4th of max intensity to keep the max point at 3/4 of the y axisd
+    // dataMaxInte = dataMaxInte + 0.25*dataMaxInte ;
     currentMaxIntensity = currentMaxIntensity + 0.25*currentMaxIntensity ;
       this.yScale = this.specHeight/currentMaxIntensity;
     this.setLimits();
   }
-  this.setColorToEnvelops = function(envelopes){
-      envelopes.sort(function(x,y){
-        return d3.ascending(x.env_peaks[0].mz, y.env_peaks[0].mz);
-      })
-      let colorListsize = this.spectrumColorArray.length;
-      let i = envelopes.length ;
-      while(i--)
-      {
-        envelopes[i].color = this.spectrumColorArray[i%colorListsize];
-      }
-      return envelopes;
-  }
+  // this.setColorToEnvelops = function(envelopes){
+  //     envelopes.sort(function(x,y){
+  //       return d3.ascending(x.env_peaks[0].mz, y.env_peaks[0].mz);
+  //     })
+  //     let colorListsize = this.spectrumColorArray.length;
+  //     let i = envelopes.length ;
+  //     while(i--)
+  //     {
+  //       envelopes[i].color = this.spectrumColorArray[i%colorListsize];
+  //     }
+  //     return envelopes;
+  // }
+  /**
+   * Function provides the x coordinate for the mass
+   */
   this.getPeakXPos = function (mz) {
     let peakX = (mz - this.minMz) * this.xScale + this.padding.left;
     return peakX;
   }
-
+  /**
+   * Function provides the y coordinate for the intensity
+   */
   this.getPeakYPos = function (intensity) {
-    //peakY = intensity * this.yScale + this.padding.bottom;
     let peakY = this.svgHeight - intensity * this.yScale - this.padding.bottom;
     return peakY;
   }
-
+  /**
+   * Function provides the radius of the circles drawn on the graph as zoomed in and out
+   */
   this.getCircleSize = function() {
     radius = this.mzRadius * this.xScale;
     if (radius < this.minRadius) {
@@ -111,24 +120,9 @@ SpectrumParameters = function() {
     }
     return radius;
   }
-	this.getTickWidthList = function(){
-    let tempDiff = this.maxMz - this.minMz;
-		let i = this.dataMaxMz/this.xTicks * 2 ;
-		let maxTickWidth = this.tickWidthList[0]
-		if(i > maxTickWidth)
-		{
-			this.tickWidthList.push(Math.ceil(i / 50)*50);
-			while(i > maxTickWidth){
-				i= i/2 ; 
-				// rounding the values to nearest 50
-				let val = Math.ceil(i / 50)*50 ;
-				this.tickWidthList.push(val);
-			}
-			this.tickWidthList = [... new Set(this.tickWidthList)];
-			this.tickWidthList.sort(function(a, b){return b-a});
-		}
-		return this.tickWidthList ;
-  }
+  /**
+   * Function Provides width between each tick when zoomed in and out or dragged
+   */
   this.getTickWidth = function(){
     let tempDiff = this.maxMz - this.minMz;
     let tickWidth = parseInt(this.tickWidthList[0]) ;
@@ -142,6 +136,9 @@ SpectrumParameters = function() {
     }
 	  return 	tickWidth ;
   }
+  /**
+   * Function Provides height between each tick when zoomed in and out or dragged
+   */
   this.getTickHeight = function(){
     let tickheight = parseInt(this.tickHeightList[0]) ;
     let maxIntPercent = this.maxInte/this.dataMaxInte * 100;
@@ -155,7 +152,10 @@ SpectrumParameters = function() {
     }
 	  return tickheight ;
   }
-
+  /**
+   * Function provides with current xScale, current minMz and MaxMz based on the zoom on x-axis
+   * Function also calls setLimita which helps in drawing limited number of peaks and circles per eachbin/range of mz values
+   */
   this.xZoom = function (mouseSvgX, ratio) {
    if ((ratio > 1.0) || ((this.maxMz - this.minMz) < this.dataMaxMz) ) {
       let mouseSpecX = mouseSvgX - this.padding.left;
@@ -167,7 +167,9 @@ SpectrumParameters = function() {
     }
     this.setLimits();
   }
-
+  /**
+   * Function provides with current yScale, current max Intensity based on the zoom on y-axis
+   */
   this.yZoom = function (ratio) {
     //Reducing zoom factor to smoothenup and remove gliches
     if(ratio > 1 ) ratio = 1.4;
@@ -177,10 +179,13 @@ SpectrumParameters = function() {
       this.maxInte = this.specHeight / this.yScale;
     }
   }
-
+  /**
+   * Function to invoke respective zoom functionality(zoom on x or y) based on position of X, Y 
+   * It fixes amount of zoom based on zooming in or out 
+   */
   this.zoom = function(mouseSvgX, mouseSvgY, ratio) {
-    if(ratio > 1 ) ratio = 1.4;
-    else if(ratio < 1) ratio = 0.9;
+    if(ratio > 1 ) ratio = 1.4; // Zooming in and fixing ration to 1.4 (fixed values based on testing the smooting of zoom)
+    else if(ratio < 1) ratio = 0.9; // Zooming out and fixing ration to 0.9 (fixed values based on testing the smooting of zoom)
     if (mouseSvgY > this.svgHeight - this.padding.bottom) {
       this.xZoom(mouseSvgX, ratio);
     }
@@ -188,6 +193,9 @@ SpectrumParameters = function() {
       this.yZoom(ratio);
     }
   }
+  /**
+   * Function provides minMz and maxMz based on the amount of drag done
+   */
   this.drag = function(distX) {
     let mzDist = distX / this.xScale;
     this.minMz = this.minMz - mzDist; 
@@ -195,6 +203,11 @@ SpectrumParameters = function() {
     this.centerMz = this.centerMz - mzDist;
     this.onDragLimits(mzDist);
   }
+  /**
+   * when zoomed function provides the bin ranges to divide the complete x axis into 5 bins
+   * This helps setting the number of peaks and circles to a limited number in each bin
+   * This speeds up the zoom and drag functionality
+   */
   this.setLimits = function(){
     let avg = (this.maxMz - this.minMz)/this.limits.length ;
     avg = avg + (this.bufferPercent*avg);
@@ -203,6 +216,11 @@ SpectrumParameters = function() {
       this.ranges[i] = this.minMz + (i*avg) ;
     }
   }
+  /**
+   * When dragged function provides the bin ranges to divide the complete x axis into 5 bins
+   * This helps setting the number of peaks and circles to a limited number in each bin
+   * This speeds up the zoom and drag functionality
+   */
   this.onDragLimits = function(mzDist){
     let tempRanges = this.ranges ;
     let avg = (this.maxMz - this.minMz)/this.limits.length ;
