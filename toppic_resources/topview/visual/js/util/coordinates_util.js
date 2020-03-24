@@ -1,3 +1,6 @@
+/**
+ * Fixed Parameters to draw the Sequence SVG
+ */
 function parameters()
 {
 	this.row_length = 30 ;
@@ -18,7 +21,12 @@ function parameters()
 	this.background_color = "#64E9EC";
 	this.svgBackground_color = "white" ;
 }	
-
+/**
+ * Function provides the Y coordinate based on the position of the Acid
+ * @param {Object} para - Contains parameters of the graph
+ * @param {number} position - Contains position of the Acid
+ * @param {number} start_value - Contains position of the first Acid
+ */
 function getY(para, position, start_value) 
 {
 	let row = parseInt((position - start_value) / para.row_length);
@@ -29,6 +37,12 @@ function getY(para, position, start_value)
 	}
   return y;
 }
+/**
+ * Function to provide x and y coordinates based on the position of the acid
+ * @param {Object} para - Contains parameters of the graph
+ * @param {number} position - Contains position of the Acid
+ * @param {number} start_value - Contains position of the first Acid
+ */
 function calibrateCoordinates(para,position,start_value)
 {
 	let position_temp = position - start_value ;
@@ -39,6 +53,9 @@ function calibrateCoordinates(para,position,start_value)
 	y = getY(para, position, start_value);
 	return [x,y] ;
 }
+/**
+ * Function provides position of the Numbers on the left side of the Acid Sequence
+ */
 function calibrateLeftNum(para,position,start_value) 
 {
 	/*console.log("para.left_margin : ", para.left_margin)*/
@@ -46,7 +63,9 @@ function calibrateLeftNum(para,position,start_value)
   let y = getY(para, position, start_value);
   return [x,y];
 }
-
+/**
+ * Function provides position of the Numbers on the right side of the Acid Sequence
+ */
 function calibrateRightNum(para,position,start_value) 
 {
   let x = para.left_margin + para.numerical_width + (para.row_length - 1 ) * para.letter_width;
@@ -55,13 +74,18 @@ function calibrateRightNum(para,position,start_value)
   let y = getY(para, position, start_value);
   return [x,y];
 }
-
+/**
+ * Function provides position to write information of skipped amino acids at the top of Sequence SVG
+ */
 function calibrateSkipStart(para, position, start_value)
 {
 	x = para.left_margin ;
 	y = para.top_margin; 
 	return [x, y]
 }
+/**
+ * Function provides position to write information of skipped amino acids at th bottom of Sequence SVG
+ */
 function calibrateSkipEnd(para, position, start_value)
 {
 	x = para.left_margin ;
