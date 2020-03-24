@@ -28,7 +28,7 @@ function proteoformToHtml(compatible_proteoform,index,folderpath)
 	if(compatible_proteoform.prsm.length > 0)
 	{
 		h2.innerHTML = "Proteoform #" + compatible_proteoform.proteoform_id + " Feature intensity: "
-						+ compatible_proteoform.prsm[0].ms.ms_header.precursor_inte;
+						+ compatible_proteoform.prsm[0].ms.ms_header.feature_inte;
 		let precursor_mass;
 		let prsm_id ;
 		[e_value,precursor_mass,prsm_id] = getBestPrsm(compatible_proteoform.prsm);
@@ -45,7 +45,7 @@ function proteoformToHtml(compatible_proteoform,index,folderpath)
 	else
 	{
 		h2.innerHTML = "Proteoform #" + compatible_proteoform.proteoform_id + " Feature intensity: "
-										+ compatible_proteoform.prsm.ms.ms_header.precursor_inte;
+										+ compatible_proteoform.prsm.ms.ms_header.feature_inte;
 		p.setAttribute("style","font-size:16px;");
 		let text1 = document.createElement("text");
 		text1.innerHTML = "There is only ";
