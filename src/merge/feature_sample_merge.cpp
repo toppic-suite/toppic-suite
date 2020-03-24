@@ -45,7 +45,7 @@ FeatureSampleMerge::FeatureSampleMerge(const std::vector<std::string> &input_fil
 void matchPrsms(FeaturePrsmPtrVec &features, PrsmStrPtrVec &prsms) {
   for (size_t i = 0; i < prsms.size(); i++) {
     PrsmStrPtr prsm = prsms[i];
-    int id = prsms[i]->getPrecFeatureId();
+    int id = prsms[i]->getSampleFeatureId();
     if (id < 0) {
       LOG_ERROR("Prsm file does not contain feature information!");
       exit(EXIT_FAILURE);

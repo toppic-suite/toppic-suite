@@ -32,10 +32,10 @@ PrsmStr::PrsmStr(const std::vector<std::string> &str_vec) {
   spectrum_scan_ = std::stoi(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<precursor_id>");
   precursor_id_ = std::stoi(prsm_util::getValueStr(line));
-  line = prsm_util::getXmlLine(str_vec_, "<precursor_feature_id>");
-  precursor_feature_id_ = std::stoi(prsm_util::getValueStr(line));
-  line = prsm_util::getXmlLine(str_vec_, "<precursor_feature_inte>");
-  precursor_feature_inte_ = std::stod(prsm_util::getValueStr(line));
+  line = prsm_util::getXmlLine(str_vec_, "<sample_feature_id>");
+  sample_feature_id_ = std::stoi(prsm_util::getValueStr(line));
+  line = prsm_util::getXmlLine(str_vec_, "<sample_feature_inte>");
+  sample_feature_inte_ = std::stod(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<ori_prec_mass>");
   ori_prec_mass_ = std::stod(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<adjusted_prec_mass>");
@@ -134,15 +134,15 @@ void PrsmStr::setSpectrumId(int id) {
 }
 
 void PrsmStr::setPrecFeatureId(int id) {
-  int i = getXmlLineIndex(str_vec_, "precursor_feature_id");
-  str_vec_[i] = "<precursor_feature_id>" + str_util::toString(id) + "</precursor_feature_id>";
-  precursor_feature_id_ = id;
+  int i = getXmlLineIndex(str_vec_, "sample_feature_id");
+  str_vec_[i] = "<sample_feature_id>" + str_util::toString(id) + "</sample_feature_id>";
+  sample_feature_id_ = id;
 }
 
 void PrsmStr::setPrecFeatureInte(double inte) {
-  int i = getXmlLineIndex(str_vec_, "precursor_feature_inte");
-  str_vec_[i] = "<precursor_feature_inte>" + str_util::toString(inte) + "</precursor_feature_inte>";
-  precursor_feature_inte_ = inte;
+  int i = getXmlLineIndex(str_vec_, "sample_feature_inte");
+  str_vec_[i] = "<sample_feature_inte>" + str_util::toString(inte) + "</sample_feature_inte>";
+  sample_feature_inte_ = inte;
 }
 
 void PrsmStr::setFracFeatureScore(double score) {

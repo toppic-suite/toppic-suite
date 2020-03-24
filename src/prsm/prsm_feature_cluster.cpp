@@ -80,7 +80,7 @@ void PrsmFeatureCluster::setProteoClusterId(PrsmStrPtrVec& prsm_ptrs) {
     for (size_t j = 0; j < clusters.size(); j++) {
       PrsmStrPtr ref_ptr = clusters[j][0];
       if (cur_ptr->getProtId() == ref_ptr->getProtId()) {
-        if (cur_ptr->getPrecFeatureId() == ref_ptr->getPrecFeatureId()) {
+        if (cur_ptr->getSampleFeatureId() == ref_ptr->getSampleFeatureId()) {
           clusters[j].push_back(cur_ptr);
           is_found = true;
           break;
