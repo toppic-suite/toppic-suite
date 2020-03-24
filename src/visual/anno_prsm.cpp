@@ -96,10 +96,10 @@ void addMsHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement* ms_element,
   str = str_util::fixedToString(precursor_mz, pos);
   xml_doc->addElement(ms_header_element, "precursor_mz", str.c_str());
 
-  double precursor_inte = prsm_ptr->getPrecFeatureInte();
-  if (precursor_inte > 0) {
-    str = str_util::toScientificStr(precursor_inte, pos);
-    xml_doc->addElement(ms_header_element, "precursor_inte", str.c_str());
+  double feature_inte = prsm_ptr->getSampleFeatureInte();
+  if (feature_inte > 0) {
+    str = str_util::toScientificStr(feature_inte, pos);
+    xml_doc->addElement(ms_header_element, "feature_inte", str.c_str());
   }
 }
 

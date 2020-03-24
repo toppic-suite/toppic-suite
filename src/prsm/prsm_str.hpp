@@ -51,13 +51,13 @@ class PrsmStr {
 
   int getPrecursorId() {return precursor_id_;}
 
-  int getPrecFeatureId() {return precursor_feature_id_;}
+  int getSampleFeatureId() {return sample_feature_id_;}
 
   int getUnexpectedPtmNum() {return unexpected_ptm_num_;}
 
   int getVariablePtmNum() {return variable_ptm_num_;}
 
-  double getPrecFeatureInte() {return precursor_feature_inte_;}
+  double getPrecFeatureInte() {return sample_feature_inte_;}
 
   double getMatchFragNum() {return match_frag_num_;}
 
@@ -142,7 +142,9 @@ class PrsmStr {
 
   int precursor_id_;
 
-  int precursor_feature_id_;
+  int sample_feature_id_;
+
+  double sample_feature_inte_;
 
   int unexpected_ptm_num_;
 
@@ -151,8 +153,6 @@ class PrsmStr {
   int proteoform_start_pos_;
 
   int proteoform_end_pos_;
-
-  double precursor_feature_inte_;
 
   double ori_prec_mass_;
 

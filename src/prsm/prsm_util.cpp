@@ -188,7 +188,7 @@ void addFeatureIDToPrsms(PrsmStrPtrVec &prsm_ptrs, const std::string & feature_f
 void removePrsmsWithoutFeature(PrsmStrPtrVec &prsm_ptrs, 
                                PrsmStrPtrVec &filtered_prsm_ptrs) {
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
-    if (prsm_ptrs[i]->getPrecFeatureId() >=0) {
+    if (prsm_ptrs[i]->getSampleFeatureId() >=0) {
       filtered_prsm_ptrs.push_back(prsm_ptrs[i]);
     }
   }
