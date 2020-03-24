@@ -244,6 +244,7 @@ function occurence_ptm(prsm)
 		div.appendChild(text2);
 	}
 }
+/* Get all the unknown ptms information */
 function getUnknownPtms(prsm)
 {
 	let data = " [";
@@ -460,6 +461,8 @@ function buttonsAndAlerts(para,prsm,id)
 		massShiftBackgroundColor(para,prsm,id);
 	});	
 }
+/* Function to produce a pop up window to provide name and set name to 
+*  the image while downloading the image of Graph SVG and Sequence SVG */
 function popupnamewindow(type,id,x,y){
 	d3.selectAll("#tooltip_imagename").remove() ;
 	var div = d3.select("body").append("div")

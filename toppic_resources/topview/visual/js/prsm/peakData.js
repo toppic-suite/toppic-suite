@@ -23,6 +23,9 @@ PeakData = function() {
         })
         return peakList;
     }
+    /**
+     * Get the sorted envelope data with color value attached for each envelope cluster
+     */
     this.getEnvelopeData = function(json_data){
         let envelopList = [];
         json_data.envelopes.sort(function(x,y){
@@ -50,6 +53,9 @@ PeakData = function() {
         }
         return envelopList;
     }
+    /**
+     * Get the Ion Data to draw upon the each cluster of matched peaks 
+     */
     this.getIonData = function(prsm_data,specId,json_data){
         let envelopes =  json_data.envelopes;
         let ionData = [];

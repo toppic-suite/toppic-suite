@@ -120,7 +120,6 @@ $(document).ready(function(){
 		let ms1_ids = prsm_data.prsm.ms.ms_header.ms1_ids ;
 		let ms1_id_1 = ms1_ids.split(" ")[0];
 		let scanId_1 = prsm_data.prsm.ms.ms_header.ms1_scans.split(" ")[0];
-		//scanIdList_1 = MultiScanObj.getUniqueScanIdList(scanIdList_1);
 		let scanIdList_1 = [];
 		scanIdList_1.push(scanId_1);
 		let specIdList = [];
@@ -133,10 +132,7 @@ $(document).ready(function(){
 		scanIdList = MultiScanObj.getUniqueScanIdList(scanIdList);
 		let ms2_uniqueList = MultiScanObj.getUniqueScanIdList(ms2_id_list);
 		drawMonoMassSpectrum(ms2_uniqueList,scanIdList);
-
 		MultiScanObj.promiseLoadDataJS(ms2_uniqueList,scanIdList,"ms2_json");
-		//drawMonoMassSpectrum(ms2_uniqueList,scanIdList);
-		
 	}
 })
 
