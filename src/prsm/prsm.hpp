@@ -73,6 +73,7 @@ class Prsm {
 
   double getMatchFragNum() {return match_fragment_num_;}
 
+  // Normalized match fragment number is used in TopMG for ranking PrSMs
   double getNormMatchFragNum();
 
   // ExtremeValue related functions
