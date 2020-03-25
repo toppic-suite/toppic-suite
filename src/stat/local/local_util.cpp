@@ -26,7 +26,7 @@
 #include "common/base/mass_constant.hpp"
 
 #include "seq/proteoform_factory.hpp"
-#include "ms/factory/extend_ms_factory.hpp"
+#include "ms/factory/extend_ms_util.hpp"
 
 #include "prsm/peak_ion_pair_util.hpp"
 #include "prsm/theo_peak_util.hpp"
@@ -158,7 +158,7 @@ void fillTableB(std::vector<std::vector<double> > & b_table, double mass1, doubl
 void compNumMatch(const std::vector<double> & b, std::vector<int> & s,
                   const ExtendMsPtr & extend_ms_ptr, double prec_mass) {
   std::vector<std::pair<double, double> > spec_peak
-      = extend_ms_factory::getExtendMassToleranceList(extend_ms_ptr);
+      = extend_ms_util::getExtendMassToleranceList(extend_ms_ptr);
   double n_shift = extend_ms_ptr->getMsHeaderPtr()->getActivationPtr()->getNShift();
 
   size_t i = 0, j = 0;

@@ -12,24 +12,25 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_MS_FACTORY_EXTEND_MS_FACTORY_HPP_
-#define TOPPIC_MS_FACTORY_EXTEND_MS_FACTORY_HPP_
+#ifndef TOPPIC_MS_FACTORY_PRM_MS_UTIL_HPP_
+#define TOPPIC_MS_FACTORY_PRM_MS_UTIL_HPP_
 
-#include "ms/spec/deconv_ms.hpp"
-#include "ms/spec/extend_ms.hpp"
 #include "para/sp_para.hpp"
+#include "ms/spec/deconv_ms.hpp"
+#include "ms/spec/prm_ms.hpp"
 
 namespace toppic {
 
-namespace extend_ms_factory {
+namespace prm_ms_util {
 
-ExtendMsPtr geneMsThreePtr(DeconvMsPtr deconv_ms_ptr, SpParaPtr sp_para_ptr,
-                           double new_prec_mass);
+std::vector<std::pair<int, int> > getIntMassErrorList(const PrmMsPtrVec &prm_ms_ptr_vec,
+                                                      PeakTolerancePtr tole_ptr,
+                                                      double scale, bool n_strict, bool c_strict);
 
-ExtendMsPtrVec geneMsThreePtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, 
-                                 SpParaPtr sp_para_ptr, double new_prec_mass);
+PrmPeakPtrVec getPrmPeakPtrs(const PrmMsPtrVec &prm_ms_ptr_vec, PeakTolerancePtr tole_ptr);
 
-}  // namespace extend_ms_factory
+
+}  // namespace prm_ms_factory
 
 }  // namespace toppic
 

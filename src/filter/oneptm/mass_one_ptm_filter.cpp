@@ -15,13 +15,9 @@
 #include <iostream>
 
 #include "common/util/file_util.hpp"
-
 #include "seq/proteoform_util.hpp"
-
-#include "ms/factory/prm_ms_factory.hpp"
-
+#include "ms/factory/prm_ms_util.hpp"
 #include "filter/mng/topindex_file_name.hpp"
-
 #include "filter/massmatch/filter_protein.hpp"
 #include "filter/massmatch/mass_match_factory.hpp"
 #include "filter/massmatch/mass_match_util.hpp"
@@ -95,9 +91,9 @@ void MassOnePtmFilter::computeBestMatch(const PrmMsPtrVec &prm_ms_ptr_vec,
                                         const PrmMsPtrVec &srm_ms_ptr_vec) {
   PeakTolerancePtr tole_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
   std::vector<std::pair<int, int>> pref_mass_errors
-      = prm_ms_factory::getIntMassErrorList(prm_ms_ptr_vec, tole_ptr, mng_ptr_->filter_scale_, true, false);
+      = prm_ms_util::getIntMassErrorList(prm_ms_ptr_vec, tole_ptr, mng_ptr_->filter_scale_, true, false);
   std::vector<std::pair<int, int>> suff_mass_errors
-      = prm_ms_factory::getIntMassErrorList(srm_ms_ptr_vec, tole_ptr, mng_ptr_->filter_scale_, false, true);
+      = prm_ms_util::getIntMassErrorList(srm_ms_ptr_vec, tole_ptr, mng_ptr_->filter_scale_, false, true);
 
   int term_row_num = term_index_ptr_->getRowNum();
   std::vector<short> term_scores(term_row_num, 0);
