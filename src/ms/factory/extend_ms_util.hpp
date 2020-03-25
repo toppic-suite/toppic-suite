@@ -12,24 +12,23 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_MS_FACTORY_EXTEND_MS_FACTORY_HPP_
-#define TOPPIC_MS_FACTORY_EXTEND_MS_FACTORY_HPP_
+#ifndef TOPPIC_MS_FACTORY_EXTEND_MS_UTIL_HPP_
+#define TOPPIC_MS_FACTORY_EXTEND_MS_UTIL_HPP_
 
-#include "ms/spec/deconv_ms.hpp"
 #include "ms/spec/extend_ms.hpp"
-#include "para/sp_para.hpp"
 
 namespace toppic {
 
-namespace extend_ms_factory {
+namespace extend_ms_util {
 
-ExtendMsPtr geneMsThreePtr(DeconvMsPtr deconv_ms_ptr, SpParaPtr sp_para_ptr,
-                           double new_prec_mass);
+std::vector<double> getExtendMassVec(ExtendMsPtr extend_ms_ptr);
 
-ExtendMsPtrVec geneMsThreePtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, 
-                                 SpParaPtr sp_para_ptr, double new_prec_mass);
+std::vector<std::pair<int, int> > getExtendIntMassErrorList(const ExtendMsPtrVec &ext_ms_ptr_vec,
+                                                            bool pref, double scale);
 
-}  // namespace extend_ms_factory
+std::vector<std::pair<double, double> > getExtendMassToleranceList(ExtendMsPtr extend_ms_ptr);
+
+}  // namespace extend_ms_util
 
 }  // namespace toppic
 

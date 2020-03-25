@@ -24,15 +24,16 @@
 #include "common/util/logger.hpp"
 #include "common/base/residue_util.hpp"
 #include "common/base/neutral_loss.hpp"
-#include "prsm/extreme_value.hpp"
 #include "common/thread/simple_thread_pool.hpp"
 
 #include "ms/spec/simple_msalign_reader.hpp"
 #include "ms/spec/msalign_util.hpp"
 #include "ms/spec/theo_peak.hpp"
+#include "ms/factory/extend_ms_util.hpp"
 #include "ms/factory/extend_ms_factory.hpp"
 #include "ms/factory/spectrum_set_factory.hpp"
 
+#include "prsm/extreme_value.hpp"
 #include "prsm/theo_peak_util.hpp"
 #include "prsm/prsm_algo.hpp"
 #include "prsm/prsm_reader.hpp"
@@ -237,7 +238,7 @@ std::function<void()> geneTask(SpectrumSetPtr spec_set_ptr,
 
     double tolerance = refine_ms_ptr_vec[0]->getMsHeaderPtr()->getErrorTolerance(ppo);
 
-    std::vector<double> ms_masses = extend_ms_factory::getExtendMassVec(refine_ms_ptr_vec[0]);
+    std::vector<double> ms_masses = extend_ms_util::getExtendMassVec(refine_ms_ptr_vec[0]);
 
     std::vector<int> ms_mass_int(ms_masses.size());
 
