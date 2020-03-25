@@ -41,7 +41,6 @@ function calibrateCoordinates(para,position,start_value)
 }
 function calibrateLeftNum(para,position,start_value) 
 {
-	/*console.log("para.left_margin : ", para.left_margin)*/
   let x = para.left_margin ;
   let y = getY(para, position, start_value);
   return [x,y];
