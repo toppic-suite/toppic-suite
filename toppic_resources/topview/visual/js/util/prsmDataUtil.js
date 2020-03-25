@@ -89,6 +89,7 @@ function json2FixedPtmOccurence(prsm){
 			}
 		}
 	}
+
 	return occurence_list ;
 }
 /*	Get left and right positions of background color and mass shift value */
@@ -117,5 +118,67 @@ function json2BackgroundColorArray(prsm)
 			
 		}
 	}
+	if(prsm.annotated_protein.annotation.hasOwnProperty('ptm'))
+	{
+		let otherPtmList = json2OtherPtmOccurences(prsm);
+		backgroundColorAndMassShift = backgroundColorAndMassShift.concat(otherPtmList);
+	}
 	return backgroundColorAndMassShift ;
+}
+/*	Get position and other ptm lists other than FIxed Ptms */
+function json2OtherPtmOccurences(prsm)
+{
+	let backgroundColorAndMassShift = [];
+	if(Array.isArray(prsm.annotated_protein.annotation.ptm))
+	{
+		prsm.annotated_protein.annotation.ptm.forEach(function(ptm,index){
+			if(ptm.hasOwnProperty("occurence"))
+			{
+				if(Array.isArray(ptm.occurence))
+				{
+					ptm.occurence.forEach(function(occurence,i){
+						let tempObj = {};
+						tempObj.anno = ptm.ptm.abbreviation;
+						tempObj.left_position = occurence.left_pos;
+						tempObj.right_position = occurence.right_pos;
+						backgroundColorAndMassShift.push(tempObj);
+					});
+				}
+				else
+				{
+					let tempObj = {};
+					tempObj.anno = ptm.ptm.abbreviation;
+					tempObj.left_position = ptm.occurence.left_pos;
+					tempObj.right_position = ptm.occurence.right_pos;
+					backgroundColorAndMassShift.push(tempObj);
+				}
+			}
+		})
+	}
+	else
+	{
+		if(prsm.annotated_protein.annotation.ptm.hasOwnProperty("occurence"))
+		{
+			let ptm = prsm.annotated_protein.annotation.ptm;
+			if(Array.isArray(prsm.annotated_protein.annotation.ptm.occurence))
+			{
+				prsm.annotated_protein.annotation.ptm.occurence.forEach(function(occurence,i){
+					let tempObj = {};
+					tempObj.anno = ptm.ptm.abbreviation;
+					tempObj.left_position = occurence.left_pos;
+					tempObj.right_position = occurence.right_pos;
+					backgroundColorAndMassShift.push(tempObj);
+				});
+			}
+			else
+			{
+				let tempObj = {};
+				tempObj.anno = ptm.ptm.abbreviation;
+				tempObj.left_position = ptm.occurence.left_pos;
+				tempObj.right_position = ptm.occurence.right_pos;
+				backgroundColorAndMassShift.push(tempObj);
+			}
+		}
+	}
+	return backgroundColorAndMassShift;
 }
