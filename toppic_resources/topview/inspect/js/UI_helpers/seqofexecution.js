@@ -80,6 +80,7 @@ class SeqOfExecution
 		/**
 		 * Get the combined mass shift, easier when combined to plot on the HTML
 		 */
+
 		completeShiftList = massShiftObj.getCombinedMassShiftList(massShiftList,fixedMassShiftList);
 		/**
 		 * Check if mass shift is entered by clicking on the acid. If entered 
@@ -109,6 +110,7 @@ class SeqOfExecution
 		let seqln = sequence.length;
 		let distributionList = [];
 		let matchedUnMatchedPeaks = [];
+
 		/**
 		 * Setting masserror threshold value and ppm error threshhold value
 		 */
@@ -188,7 +190,8 @@ class SeqOfExecution
 		if(peakListLen != 0)
 		{
 			let matchedPeaksObj = new MatchedPeaks();
-			distributionList = matchedPeaksObj.getDistribution(peakDataList,sequence,matchedUnMatchedPeaks);
+			//distributionList = matchedPeaksObj.getDistribution(peakDataList,sequence,matchedUnMatchedPeaks);
+			distributionList = matchedPeaksObj.getDistribution(peakDataList,sequence,matchedUnMatchedPeaks, completeShiftList);
 			/**
 			 * Display the graph formed
 			 */
