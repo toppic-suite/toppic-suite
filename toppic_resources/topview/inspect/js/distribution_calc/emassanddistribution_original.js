@@ -12,59 +12,22 @@ class CalculateEmassAndDistribution{
 		this.toleraceMassDiff = 0.02;
 	}
 	/**
-	 * Function to add fixedPTMMass to amino acid with ptm mass shift
-	 * Get the fixed ptm form the UI, iterate through the aminoAcidDist if aminoAcid == aminoID of fixed PTM
-	 * Can handle multiple fixed PTM as long as the UI does not change
-	 */
-	addFixedPtmMass(aminoAcid, aminoAcidDist){
-		let fixedPTM = document.getElementsByClassName("fixedptms");
-		for (let f = 0; f < fixedPTM.length; f++){
-			let aminoID = fixedPTM[f].querySelector("#fixedptmacid").value;
-			let aminoMass = fixedPTM[f].querySelector("#fixedptmmass").value;
-
-			if (aminoAcid == aminoID){
-				for (let i = 0; i < aminoAcidDist.length; i++){
-					aminoAcidDist[i].mass = parseFloat(aminoMass) + aminoAcidDist[i].mass;
-				}
-			}
-		}
-		return aminoAcidDist;
-	}
-	/**
-	 * Function to add mass shift value to amino acid distribution if 
-	 * Get the position of mass shift from the sequence in UI 
-	 * add the mass value to the first position in the possible mass shift sites only
-	 * (and it will be reflected in later sequence as well)
-	 */
-	addMassShift(curIndex, aminoacidDist, massShiftList){
-		//check massshiftlist position is same as index
-		for (let i = 0; i < massShiftList.length; i++){
-			if (curIndex == massShiftList[i].position){
-				for (let a = 0; a < aminoacidDist.length; a++){
-					aminoacidDist[a].mass = aminoacidDist[a].mass + massShiftList[i].mass;		
-				}
-			}
-		}
-		return aminoacidDist;
-	}
-	/**
 	 * Function to calculate the emass distrubution fo the given sequence
 	 * @param {String} seq - Contains the sequence provide by the user
 	 * @param {Array} peakDataList - Contains the peak list provided by the user
 	 * @param {Float} charge - Contains the chrage of the ion
 	 * @param {String} pref_suffInd - Indicator to indiace prefix or suffix
 	 */
-	emass(seq,peakDataList,charge,pref_suffInd, massShiftList)
+	
+	emass(seq,peakDataList,charge,pref_suffInd)
 	{
 		let AcidArray = seq ;
 		let AcidArrayLen= AcidArray.length;
 		let totDistributionList = [] ;
 		
 		for(let i = 0; i < AcidArrayLen ; i++)
-		{	
+		{
 			let aminoAcidDist = getAminoAcidDistribution(AcidArray[i]);
-			aminoAcidDist = this.addFixedPtmMass(AcidArray[i], aminoAcidDist);
-			//aminoAcidDist = this.addMassShift(i, aminoAcidDist, massShiftList);
 			totDistributionList = this.getMassAndIntensity(totDistributionList,aminoAcidDist) ;
 		}
 		
