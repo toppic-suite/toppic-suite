@@ -10,6 +10,7 @@
 	border-radius: 6px;
 	margin-bottom:0px;
 	padding:1%;
+	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
 /**
@@ -50,3 +51,23 @@
 .footer-copyright{
 	color: black;
 }
+#tooltip_pop #mass_shift{
+	width: 104;
+}
+#tooltip_pop select{
+	width: 70;
+}
+
+#tooltip_pop option{
+	width: 50;
+	height: 10;
+}
+#tooltip_pop option:hover{ 
+	background-color: #000 !important; 
+}
+#divtableContainer{
+	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+/* #peakdata{
+	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+} */

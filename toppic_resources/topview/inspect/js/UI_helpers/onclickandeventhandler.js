@@ -1,4 +1,4 @@
-onLoadOfHTML = function()
+onLoadOfHTML = function(precursorMass)
 {
     let massErrorthVal = 0.1 ;
     let ppmErrorthVal = 15 ;
@@ -47,6 +47,7 @@ onLoadOfHTML = function()
         let executionObj = new SeqOfExecution();
         executionObj.sequenceOfExecution(errorType,errorVal,"");
         document.getElementById("totalseqmass_h6").style.display = "block";
+        document.getElementById("massvariation_h6").style.display = "block";
     })
     /**
      * On Click action to hide and show the table of calculate theoretical
@@ -112,4 +113,21 @@ showNonMatchedPeaks = function()
 		elems[i].style.display = "";
 	}
 	$('div.dataTables_scrollBody').height(400);
+}
+function showIonPeaks(ids) {
+	console.log("ids : ", ids);
+	  var elems = document.getElementsByClassName('matched_peak');
+	  for(var i = 0; elems.length > i; i++) {
+	    elems[i].style.display = 'none';
+	  }
+	  elems = document.getElementsByClassName('unmatched_peak');
+	  for(var i = 0; elems.length > i; i++) {
+	    elems[i].style.display = 'none';
+	  }
+
+	 elems = document.getElementsByName(ids);
+	    for(var j = 0; elems.length > j; j++) {
+	      elems[j].style.display  =  "";
+	      elems[j].style.background  =  "#BEECFF";
+	    }
 }

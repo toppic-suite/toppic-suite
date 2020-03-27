@@ -45,7 +45,8 @@ class MassShifts {
 				 * remove 1 as the data starts from 0 and length starts from 1
 				 */
 				let tempPosition = position - 1;
-				let shiftobj = {mass:mass,position:tempPosition};
+				//Initially set the bg_color to null
+				let shiftobj = {mass:mass,position:tempPosition,bg_color:null};
 				/**
 				 * when the split occur at the end we get an extra "" in 
 				 * the list. This is to check if the mass is numeric.
@@ -67,7 +68,7 @@ class MassShifts {
 	 * @return{Array} with the new mass Shift value and position entered
 	 * or changes the existing mass shift value.
 	 */
-	appendtoMassShiftList(shiftPosition,massShiftVal,massShiftList){
+	appendtoMassShiftList(shiftPosition,massShiftVal,massShiftList,bg_color){
 		let newMassShiftList = [];
 		let len = massShiftList.length;
 		let matchFound = false ;
@@ -76,12 +77,13 @@ class MassShifts {
 			if(shiftPosition == massShiftList[i].position)
 			{
 				massShiftList[i].mass = massShiftVal;
+				massShiftList[i].bg_color = bg_color;
 				matchFound = true ;
 			}
 		}
 		if(!matchFound)
 		{
-			let tempShiftObj = {mass:massShiftVal,position:shiftPosition};
+			let tempShiftObj = {mass:massShiftVal,position:shiftPosition,bg_color:bg_color};
 			massShiftList.push(tempShiftObj);
 			matchFound = false;
 		}
@@ -117,7 +119,7 @@ class MassShifts {
 				{
 					if(seq[i] == fixedPtmAcid)
 					{
-						let tempObj = {position:i,mass:fixedPtmMass}
+						let tempObj = {position:i,mass:fixedPtmMass,bg_color:null}
 						fixedShiftList.push(tempObj);
 					}
 				}
@@ -169,6 +171,7 @@ class MassShifts {
 				if(combinedMassShiftList[j].position == fixedMassShiftList[i].position)
 				{
 					combinedMassShiftList[j].mass = fixedMassShiftList[i].mass ;
+					combinedMassShiftList[j].bg_color = fixedMassShiftList[i].bg_color ;
 					matched = true;
 					break;
 				}

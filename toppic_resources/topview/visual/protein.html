@@ -1,4 +1,7 @@
+
+<!DOCTYPE html>
 <html>
+<meta charset="utf-8">
 <head>
 <title>Protein</title>
 <link rel="stylesheet" type="text/css" href="../css/lib/jquery.dataTables.css">
@@ -32,7 +35,7 @@ $(document).ready(function(){
 	script.type= 'text/javascript';
 	script.src= file_name;
 	/* include the proteoform json data_file as script */
-	head.appendChild(script);
+	document.head.appendChild(script);
 	script.onload = function (data) {
 			/* invoke protein function to form HTML elements from protein.js */
 			protein(folderpath);
@@ -42,7 +45,6 @@ $(document).ready(function(){
 </head>
 <body>
 <div id="nav-bar"></div>
-	<br></br><br></br>
 <div class="container bodycontainer">
 	<div class="row">
 		<p style="font-size:16px;">
@@ -60,5 +62,10 @@ $(document).ready(function(){
 		</p>
 	</div>
 </div>
+<footer class="page-footer font-small blue">
+	<div class="footer-copyright text-center py-3">© 2019 Copyright: The Trustees of 
+		<a href="https://www.iu.edu/" target="#">Indiana University</a>
+	</div>
+</footer>
 </body>
 </html>

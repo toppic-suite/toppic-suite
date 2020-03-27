@@ -2,7 +2,7 @@
 <head>
 <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Visual inspection</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous"></head>
 <link rel="stylesheet" type="text/css" href="../css/lib/jquery.dataTables.css"/>
 <link rel="stylesheet" type="text/css" href="../css/lib/bootstrap.min.css">
 <link rel="stylesheet" type="text/css" href="../css/lib/nav_bar.css">
@@ -22,9 +22,11 @@
 <script src="js/UI_helpers/getmasstableofselectedions.js" ></script>
 <script src="js/UI_helpers/constants.js" ></script>
 <script src="js/UI_helpers/parseData.js" ></script>
+<script src="js/UI_helpers/addIonsToGraph.js" ></script>
 
 <script src="../js/spectrum_graph/invokespectrum.js" ></script>
 <script src="../js/spectrum_graph/spectrumgraph.js" ></script>
+<script src="../js/spectrum_graph/graphFeatures.js" ></script>
 <script src="../js/spectrum_graph/spectrumparameters.js" ></script>
 <script src="../js/spectrum_graph/spectrumdownload.js" ></script>
 
@@ -32,6 +34,7 @@
 <script src="js/distribution_calc/isotopes.js" ></script>
 <script src="js/distribution_calc/aminoaciddistribution.js" ></script>
 <script src="js/distribution_calc/molecularformulae.js" ></script>
+<script src="js/distribution_calc/calculateEnvelopeIntensity.js" ></script>
 
 <script src="js/sequence_svg/coordinates_util.js" ></script>
 <script src="js/sequence_svg/drawsvg.js" ></script>
@@ -56,15 +59,18 @@
 <!--check checkboxes that has ions in the data-->
 <script src="js/UI_helpers/checkIonCheckbox.js" ></script>
 
+<!--Add Background color to the Mass Shifted elements-->
+<script src="js/UI_helpers/rectbackgroundcolor.js" ></script>
 <!--draw nav bar-->
 <script src="../visual/js/util/navBar.js" ></script>
 
 
 
 <script>
- // define global variable ms2_graph
+ // define global variable ms2_graph and precursorMass
  var ms2_graph; 
-
+ var precursorMass ;
+ var correspondingSpecParams_g = [];
  $(document).ready(function(){
 	/*var peakAndIntensityList = JSON.parse(window.localStorage.getItem('peakAndIntensityList'));
 	var massAndIntensityList = JSON.parse(window.localStorage.getItem('massAndIntensityList'));
@@ -75,23 +81,26 @@
 	var massAndIntensityList = parsePeakMass('massAndIntensityList');
 	var sequence = parseSeq('sequence');
 	var l_fixedPtmList = parsePTM('fixedPtmList');
-	
+	let unknownMassShiftList = parseUnknowmassList('unknownMassShiftList');
+	precursorMass = parseFloat(JSON.parse(window.localStorage.getItem('precursorMass')));
 	if(peakAndIntensityList != null && massAndIntensityList != null
-		&& sequence != null)
+		&& sequence != null && precursorMass != null)
 	{	
-		let SetValuesToHtmlObj = new SetValuesToHtml(peakAndIntensityList,massAndIntensityList,sequence,l_fixedPtmList);
+		let SetValuesToHtmlObj = new SetValuesToHtml(peakAndIntensityList,massAndIntensityList,sequence,l_fixedPtmList,unknownMassShiftList,precursorMass);
 		SetValuesToHtmlObj.setDataToPeakAndIntensity();
 		SetValuesToHtmlObj.setDataToMassAndIntensity();
 		SetValuesToHtmlObj.setDataToSequence();
 		SetValuesToHtmlObj.setFixedMasses();
+		SetValuesToHtmlObj.setPrecursorMass();
 	}
 
 	//set the checkbox based on the ion type used in the data, which is stored in local storage
 	let ionType = window.localStorage.getItem('ionType'); 
+	console.log("ionTYpe : ", ionType);
 	setIonCheckbox(ionType);
 
-	onLoadOfHTML();
-  localStorage.clear();
+	onLoadOfHTML(precursorMass);
+  	localStorage.clear();
   
   //ion type data needs to be preserved because it is recorded only once when the prsm.html opens. 
   //Without this line it is going to break when the user tries to open inspect window again after closing.
@@ -106,12 +115,11 @@
 </style>
 </head>
 <body>
-	<div id="nav-bar"></div>
-<br></br><br></br><br>
+<div id="nav-bar"></div>
 <div class="container">
 	<div class="flex-rectangle">
 		<div class="row">
-			<div class="col-md-3 col-lg-3">
+			<div class="col-md-4 col-lg-4">
 				<!--<h5>Peaks <img src="images/info.png" id="peakintensityinfo"
             alt="nfo"></h5>-->
 				<h5>Peaks</h5>
@@ -230,13 +238,13 @@
 				</tbody>
 				</table>
 			</div>
-			<div class="col-md-3 col-lg-3">
+			<div class="col-md-2 col-lg-2">
 					<!--<h5>Fixed PTMs <img src="images/info.png" id="fixedptminfo"
               alt="info"></h5>-->
           <h5>Fixed PTMs</h5>
 				<div class="fixedptmslist">
-				<select class="browser-default custom-select" id="dropdownMenuLink">
-				</select>	
+					<select class="browser-default custom-select" id="dropdownMenuLink">
+					</select>	
 				<button type="button" class="btn btn-default btn-sm addnewrow">
 						<i class="fa fa-plus" ></i>
 				</button>
@@ -290,17 +298,23 @@
 	</div> 
 	<br>
 		<div class="row">
-			<div class="col-6">
+			<div class="col-3">
+				<h6 id="precursormass_h6" style="display:block"><text>Precursor mass:&nbsp;</text><text id="precursormass">0</text></h6>
+			</div>
+			<div class="col-3">
 				<h6 id="totalseqmass_h6" style="display:none"><text>Protein molecular mass:&nbsp;</text><text id="totalmass">0</text></h6>
 			</div>
-			<div class="col-6">
-					<div class="dropdown dropleft float-right">
-					<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" id="svg_download" style="display:none">
-					  Download
-					</button>
+			<div class="col-3">
+				<h6 id="massvariation_h6" style="display:none"><text>Mass Error:&nbsp;</text><text id="massvariation">0</text></h6>
+			</div>
+			<div class="col-3 seqvisualization">
+					<div class="dropdown dropup float-right">
+						<button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" id="svg_download" style="display:none">
+							Download
+						</button>
 					<div class="dropdown-menu">
-					  <a class="dropdown-item" href="#!" id="seq_download_png">Download as PNG</a>
-					  <a class="dropdown-item" href="#!" id="seq_download_svg">Download as SVG</a>
+					  <a class="dropdown-item" href="#!" id="seq_download_png"><i class="fas fa-download"></i><span>&nbsp;&nbsp;PNG</span></a>
+					  <a class="dropdown-item" href="#!" id="seq_download_svg"><i class="fas fa-download"></i><span>&nbsp;&nbsp;SVG</span></a>
 					</div>
 				  </div>
 			</div>
@@ -310,9 +324,6 @@
 				<svg id = "seqsvg" style="background-color:white;display:none"></svg>
 			</div>	
 		</div>
-	<div class="row">
-		
-	</div>
 	<div class="row">
 		<svg id = "spectrum" height="250" width = "1000" style="background-color:white;display:none"></svg>
 	</div>
@@ -326,8 +337,21 @@
 		<div class="col-3 pull-left" >
 			<a id="unmatched_peak_count" href="#!" onclick="showNonMatchedPeaks();">Non Matched Peaks</a>
 		</div>
-		<div class="col-5 pull-right" >
-			<button type="button" class="btn btn-primary float-right" id="hide_table">Hide Table</button>
+		<div class="col-5 prsmgraphdownload" >
+			<div class="dropup">
+				<button type="button" class="btn btn-primary btn-sm dropdown-toggle float-right" data-toggle="dropdown" id="graph_download">
+					Download
+				</button>
+				<div class="dropdown-menu">
+					<a class="dropdown-item" href="#!" id="graph_download_png">
+						<i class="fas fa-download"></i><span>&nbsp;&nbsp;PNG</span>
+					</a>
+					<a class="dropdown-item" href="#!" id="graph_download_svg">
+						<i class="fas fa-download"></i><span>&nbsp;&nbsp;SVG</span>
+					</a>
+				</div>
+			</div>
+			<button type="button" class="btn btn-primary btn-sm float-right" id="hide_table">Hide Table</button>
 		</div>
 	</div>
 	<div class="row">

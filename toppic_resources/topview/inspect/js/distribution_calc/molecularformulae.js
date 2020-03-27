@@ -50,7 +50,6 @@ class MolecularFormulae{
 				totDistributionList[k].mass = totDistributionList[k].mass + (IsotopicMass[0].mass * atomCountList[i].count) ;
 			}
 		}
-		console.log("totDistributionList 1 :", totDistributionList);
 		totDistributionList = this.getMZwithHighInte(totDistributionList,charge,massError,peakDataList);
 		totDistributionList = this.getNormalizedIntensity(totDistributionList,peakDataList);
 		return totDistributionList ;

@@ -4,10 +4,12 @@
  * @function {onClickSequenceOfExecution} executes when user enters mass shift 
  * on any amino acid and click "OK" button.
  */
+let backGroundColorList_g = []
 class SeqOfExecution
 {
 	constructor(){
 		this.onClickMassShift = {};
+		this.massShiftList = [];
 	}
 	/**
 	 * Function executes all the functionalities one by one and displays all the 
@@ -93,6 +95,7 @@ class SeqOfExecution
 		 * Form sequence with mass shift embedded in []
 		 */
 		let seqToUI = massShiftObj.formSequence(sequence,completeShiftList);
+		this.massShiftList.completeShiftList;
 		/**
 		 * Write back to UI
 		 */
@@ -191,9 +194,9 @@ class SeqOfExecution
 			 */
 			$("#"+Constants.SPECTRUMGRAPHID).show();
 			/**
-			 * Call addSpectrum function in invokeSpectrum function to draw graph 
+			 * Call generateCorrespondingGraph which calls addSpectrum function in invokeSpectrum file to draw graph 
 			 */
-			ms2_graph = addSpectrum("spectrum",peakDataList,distributionList,null);
+			generateCorrespondingGraph(peakDataList,distributionList,null);
 			$("#"+Constants.SPECTRUMDOWNLOADID).show();
 		}
 		/**
@@ -215,6 +218,8 @@ class SeqOfExecution
 			 */
 			let totalMass = calculatePrefixAndSuffixMassObj.getTotalSeqMass(sequence,completeShiftList);
 			UIHelperObj.setTotalSeqMass(totalMass);
+			//Set Mass Difference, precursorMass is a global variable form spectrum.html
+			UIHelperObj.setMassDifference(precursorMass,totalMass);
 		}	
 		/**
 		 * Do the below function when mono mass list entered is not empty
@@ -324,6 +329,7 @@ class SeqOfExecution
 	 * be considered when calculating matched peaks.
 	 */
 	onClickSequenceOfExecution(errorType,errorVal){
+		console.log("This.completeShiftList : ", this.massShiftList);
 		/**
 		 * unbind all the actions previously binded else each action will be 
 		 * binded multiple times.
@@ -332,6 +338,7 @@ class SeqOfExecution
 		$( "#"+Constants.SPECDOWNLOADSVG ).unbind();
 		$( "#"+Constants.SEQDOWNLOADPNG ).unbind();
 		$( "#"+Constants.SEQDOWNLOADSVG ).unbind();
+		$( ".rectBGColor").remove();
 		let massShiftList = [];
 		let sequence = "";
 		let massErrorthVal = null;
@@ -357,6 +364,8 @@ class SeqOfExecution
 		 */
 		let massShiftObj = new MassShifts();
 		[sequence,massShiftList] = massShiftObj.getSequenceFromUI();
+		let rectBGColorObj = new rectBGColor(backGroundColorList_g);
+		let bgColorList ;
 		/**
 		 * Check if mass shift is entered by clicking on the acid. If entered 
 		 * consider that mass shift and and append to the current mass shift list
@@ -365,8 +374,13 @@ class SeqOfExecution
 		{
 			let tempPosition = this.onClickMassShift.position;
 			let tempMass = this.onClickMassShift.mass;
-			massShiftList = massShiftObj.appendtoMassShiftList(tempPosition,tempMass,massShiftList);
+			let color = this.onClickMassShift.color;
+			bgColorList = rectBGColorObj.getMassListToColorBG(tempPosition,color);
+			massShiftList = massShiftObj.appendtoMassShiftList(tempPosition,tempMass,massShiftList,color);
 		}
+		//Add Background color to the massshifted elements
+		rectBGColorObj.setBackGroundColorOnMassShift(bgColorList);
+
 		let seqToUI = massShiftObj.formSequence(sequence,massShiftList);
 		massShiftObj.writeSeqToTextBox(seqToUI);
 		peakDataList = UIHelperObj.getPeakListFromUI();
@@ -465,11 +479,14 @@ class SeqOfExecution
 			 */
 			let totalMass = calculatePrefixAndSuffixMassObj.getTotalSeqMass(sequence,massShiftList);
 			UIHelperObj.setTotalSeqMass(totalMass);
+			//Set Mass Difference, precursorMass is a global variable
+			UIHelperObj.setMassDifference(precursorMass,totalMass);
+
 			$("#"+Constants.SPECTRUMGRAPHID).show();
 			/** 
-			 * Call addSpectrum function in invokeSpectrum function to draw graph 
+			 * Call generateCorrespondingGraph which calls addSpectrum function in invokeSpectrum file to draw graph 
 			 */
-			ms2_graph = addSpectrum("spectrum",peakDataList,distributionList,null);
+			generateCorrespondingGraph(peakDataList,distributionList,null);
 			$("#"+Constants.SPECTRUMDOWNLOADID).show();
 			/**
 			 * Display All-peaks/matched/non-matched buttons on click of submit
@@ -534,48 +551,34 @@ class SeqOfExecution
 		/**
 		 * On click action to download sequence SVG in .svg format
 		 */
-		$("#"+Constants.SEQDOWNLOADSVG).click(function(){
-			let name = "seq.svg"
-			let svg_element = d3.selectAll("#"+Constants.SEQSVGID).node();
-			svg2svg(svg_element,name);
+		d3.select("#"+Constants.SEQDOWNLOADSVG).on("click",function(){
+			x = d3.event.pageX;
+			y = d3.event.pageY - 40;
+			//function in prsmtohtml
+			popupnamewindow("svg","seq",Constants.SEQSVGID,x,y)
 		})
 		/**
-		 * On click action to download sequence SVG in .png format
+		 * On click action to download sequence svg in .svg format
 		 */
-		$("#"+Constants.SEQDOWNLOADPNG).click(function(){
-			let l_svgContainer = d3.select("#"+Constants.SEQSVGID);
-			let svgString = getSVGString(l_svgContainer.node());
-			let svg_element = document.getElementById(Constants.SEQSVGID);
-			let bBox = svg_element.getBBox();
-			let width = bBox.width;
-			let height = bBox.height ;
-			svgString2Image( svgString, 2*width, 2*height, 'png', save ); 
-			function save( dataBlob, filesize ){
-				saveAs( dataBlob, 'seq.png' ); 
-			}
+		d3.select("#"+Constants.SEQDOWNLOADPNG).on("click",function(){
+			x = d3.event.pageX;
+			y = d3.event.pageY ;
+			//function in prsmtohtml
+			popupnamewindow("png","seq", Constants.SEQSVGID,x,y)
 		})
-		// /**
-		//  * On click action to download spectrum graph SVG in .svg format
-		//  */
-		// $("#"+Constants.SPECDOWNLOADSVG).click(function(){
-		// 	let name = "spectrum.svg"
-		// 	let svg_element = d3.selectAll("#"+Constants.SPECTRUMGRAPHID).node();
-		// 	svg2svg(svg_element,name);
-		// })
-		// /**
-		//  * On click action to download spectrum graph PNG in .png format
-		//  */
-		// $("#"+Constants.SPECDOWNLOADPNG).click(function(){
-		// 	let l_svgContainer = d3.select("#"+Constants.SPECTRUMGRAPHID);
-		// 	let svgString = getSVGString(l_svgContainer.node());
-		// 	let svg_element = document.getElementById(Constants.SPECTRUMGRAPHID);
-		// 	let bBox = svg_element.getBBox();
-		// 	let width = bBox.width;
-		// 	let height = bBox.height ;
-		// 	svgString2Image( svgString, 2*width, 2*height, 'png', save ); 
-		// 	function save( dataBlob, filesize ){
-		// 		saveAs( dataBlob, 'spectrum.png' ); 
-		// 	}
-		// })
+
+		d3.select("#"+Constants.GRAPHDOWNLOADSVG).on("click",function(){
+			x = d3.event.pageX;
+			y = d3.event.pageY + 40;
+			//function in prsmtohtml
+			popupnamewindow("svg","graph", Constants.SPECTRUMGRAPHID,x,y)
+		})
+
+		d3.select("#"+Constants.GRAPHDOWNLOADPNG).on("click",function(){
+			x = d3.event.pageX;
+			y = d3.event.pageY + 80;
+			//function in prsmtohtml
+			popupnamewindow("png","graph", Constants.SPECTRUMGRAPHID,x,y)
+		})
 	}	
 }
