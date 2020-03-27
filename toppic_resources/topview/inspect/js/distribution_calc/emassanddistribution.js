@@ -12,32 +12,13 @@ class CalculateEmassAndDistribution{
 		this.toleraceMassDiff = 0.02;
 	}
 	/**
-	 * Function to add fixedPTMMass to amino acid with ptm mass shift
-	 * Get the fixed ptm form the UI, iterate through the aminoAcidDist if aminoAcid == aminoID of fixed PTM
-	 * Can handle multiple fixed PTM as long as the UI does not change
-	 */
-	addFixedPtmMass(aminoAcid, aminoAcidDist){
-		let fixedPTM = document.getElementsByClassName("fixedptms");
-		for (let f = 0; f < fixedPTM.length; f++){
-			let aminoID = fixedPTM[f].querySelector("#fixedptmacid").value;
-			let aminoMass = fixedPTM[f].querySelector("#fixedptmmass").value;
-
-			if (aminoAcid == aminoID){
-				for (let i = 0; i < aminoAcidDist.length; i++){
-					aminoAcidDist[i].mass = parseFloat(aminoMass) + aminoAcidDist[i].mass;
-				}
-			}
-		}
-		return aminoAcidDist;
-	}
-	/**
-	 * Function to add mass shift value to amino acid distribution if 
-	 * Get the position of mass shift from the sequence in UI 
-	 * add the mass value to the first position in the possible mass shift sites only
-	 * (and it will be reflected in later sequence as well)
+	 * Function to add fixed ptm and mass shift value to amino acid distribution 
+	 * Using the position of mass shift stored in completeMassShiftList, which was filtered
+	 * to have only those positions inside the seq passed to emass
+	 * add the mass value to the single site only
+	 * (then it will be reflected in later sequence as well)
 	 */
 	addMassShift(curIndex, aminoacidDist, massShiftList){
-		//check massshiftlist position is same as index
 		for (let i = 0; i < massShiftList.length; i++){
 			if (curIndex == massShiftList[i].position){
 				for (let a = 0; a < aminoacidDist.length; a++){
@@ -63,8 +44,7 @@ class CalculateEmassAndDistribution{
 		for(let i = 0; i < AcidArrayLen ; i++)
 		{	
 			let aminoAcidDist = getAminoAcidDistribution(AcidArray[i]);
-			aminoAcidDist = this.addFixedPtmMass(AcidArray[i], aminoAcidDist);
-			//aminoAcidDist = this.addMassShift(i, aminoAcidDist, massShiftList);
+			aminoAcidDist = this.addMassShift(i, aminoAcidDist, massShiftList);
 			totDistributionList = this.getMassAndIntensity(totDistributionList,aminoAcidDist) ;
 		}
 		

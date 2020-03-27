@@ -137,25 +137,21 @@ class MatchedPeaks {
       
 			if(matchedUnMatchedList[i].matchedInd == "Y")
 			{
-				console.log("emass running")
 				if(this.CONST_A == matchedUnMatchedList[i].ion[0] || this.CONST_B == matchedUnMatchedList[i].ion[0] 
 																		|| this.CONST_C == matchedUnMatchedList[i].ion[0])
 				{
 					let matchedPos = matchedUnMatchedList[i].position ;
 					let seq = sequence.slice(0,matchedPos) ;
-					/*compare with completeMassShiftList to see if the seq includes mass shift
-					compare matchedPos with positons in completeMassShiftList
-					it matchedPos is bigger, there is a mass shift. Send the position to emass so that
-					the mass shift is reflected in the toDistribution list after the acid*/
+					/*compare with completeMassShiftList to see if this seq includes mass shift
+					* compare matchedPos with positons in completeMassShiftList.
+					* if matchedPos is bigger, there is a mass shift inside seq. 
+					* Send the position to emass so that the mass shift is reflected in the toDistribution list after the acid*/
 					let massShiftList = [];
 					for (let i = 0; i < completeMassShiftList.length; i++){
 						if (matchedPos >= completeMassShiftList[i].position){
-							//mass shift value should be added
-							console.log("prefix")
 							massShiftList.push(completeMassShiftList[i]);
 						}
 					}
-
 					distributionList.mono_mass = matchedUnMatchedList[i].mass;
 					distributionList.charge = matchedUnMatchedList[i].charge;
 					distributionList.env_peaks = calEmassAndDistObj.emass(seq,peakDataList,matchedUnMatchedList[i].charge,this.PREFIX, massShiftList);
@@ -170,16 +166,16 @@ class MatchedPeaks {
 					let massShiftList = [];
 					for (let i = 0; i < completeMassShiftList.length; i++){
 						if (matchedPos <= completeMassShiftList[i].position){
-							//mass shift value should be added
-							//as the seq is a slice of original sequence, mass shift index should be adjusted
-							completeMassShiftList[i].position = completeMassShiftList[i].position - matchedPos;
-							massShiftList.push(completeMassShiftList[i]);
+							//as the seq is a slice of original sequence, mass shift position should be adjusted
+							let massData = {};
+							massData["position"] = completeMassShiftList[i].position - matchedPos;
+							massData["mass"] = completeMassShiftList[i].mass;
+							massShiftList.push(massData);
 						}
 					}
-					console.log("suffix")
 					distributionList.mono_mass = matchedUnMatchedList[i].mass;
 					distributionList.charge = matchedUnMatchedList[i].charge;
-					distributionList.env_peaks = calEmassAndDistObj.emass(seq,peakDataList,matchedUnMatchedList[i].charge,this.SUFFIX, completeMassShiftList);
+					distributionList.env_peaks = calEmassAndDistObj.emass(seq,peakDataList,matchedUnMatchedList[i].charge,this.SUFFIX, massShiftList);
 					totalDistribution.push(distributionList);
 				}
 			}
@@ -247,7 +243,7 @@ class MatchedPeaks {
 						orderMatched++;
 						for (let e = 0; e < molecular[i].env_peaks.length; e ++){
 							let mzDiff = Math.abs(molecular[i].env_peaks[e].mz - amino[j].env_peaks[e].mz);
-							let inteDiff = Math.abs(molecular[i].env_peaks[e].mz - amino[j].env_peaks[e].mz);
+							let inteDiff = Math.abs(molecular[i].env_peaks[e].intensity - amino[j].env_peaks[e].intensity);
 							
 							if (mzDiff <= 0.01){
 								mzCount["tole_0.01"]++;
