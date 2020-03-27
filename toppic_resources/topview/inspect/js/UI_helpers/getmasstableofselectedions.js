@@ -9,6 +9,7 @@ class GetMassTableOfSelectedIons{
      * @param {Array} matchedUnMatchedPeaks - list of all the calculated masses
      */
     createTableForSelectedFragmentIons(sequence,matchedUnMatchedPeaks){
+        console.log("matchedUnMatchedPeaks : ", matchedUnMatchedPeaks);
         /**
          * Remove if table already exist and rebuild the table
          */
@@ -92,17 +93,30 @@ class GetMassTableOfSelectedIons{
                 td1.setAttribute("class","td_fragments");
                 if(matchedUnMatchedPeaks[k].massList[index].matchedInd == "Y")
                 {
-                    td1.setAttribute("id","matched_fragments");
+                   // td1.setAttribute("id","matched_fragments");
+                    td1.setAttribute("class","td_fragments matched_fragments");
+                   
                 }
+                td1.setAttribute("charge",matchedUnMatchedPeaks[k].massList[index].charge);
                 td1.innerHTML = matchedUnMatchedPeaks[k].massList[index].mass.toFixed(4);
                 tr1.appendChild(td1);
             }
             tbody.appendChild(tr1);
         }
-        
         thead.appendChild(tr);
         table.appendChild(thead);
         table.appendChild(tbody);
         div.appendChild(table);
+        onClickofMatchedPeaks();
     }
+}
+function onClickofMatchedPeaks(){
+    $(".matched_fragments").click(function(){
+        let charge = $(this).attr("charge");
+        let mass = $(this).html();
+        let mz = mass/charge;
+        console.log(mz);
+        let graphFeatures = new GraphFeatures();
+        ms2_graph.redraw(mz,graphFeatures);
+    })
 }

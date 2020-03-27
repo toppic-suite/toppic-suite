@@ -13,7 +13,9 @@
 .headBlock{
 	  color: white;
 }
-
+.container{
+  padding-top: 100px !important;
+}
 /**
 *Increasing the container width
 */
@@ -26,7 +28,8 @@
 *Setting all the button colors to #428bca
 */
 .btn{
-	background-color:  #428bca !important;
+  background-color:  #428bca !important;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 /**
 *Adding padding to textare for mass and intensity, 
@@ -79,10 +82,9 @@ textarea {
 #dropdownMenuLink {
 	width: 75% !important;
 }
-.dropdown-menu{
-	width: 80% !important;
+.seqvisualization .dropdown-menu{
+	width: 100% !important;
 }
-
 /**
 *CCC to set error selection block to the right most 
 */
@@ -140,7 +142,7 @@ button.close {
 .td_fragments{
   text-align : center !important ;
 }
-#matched_fragments{
+.matched_fragments{
   background-color:hsla(120, 100%, 50%, 0.3);;
 }
 #helpModal{
@@ -148,4 +150,33 @@ button.close {
 }
 #errorAlertModal{
 	margin-top: 20%;
+}
+#divtableContainer a{
+  color: #428bca !important ;
+}
+.prsmgraphdownload .dropdown-menu{
+  min-width:6.0rem !important;
+}
+.prsmgraphdownload .dropdown-item{
+  padding-right: 1rem !important;
+  padding-left: 1rem !important;
+}
+.prsmgraphdownload a{
+  color: #428bca !important;
+}
+.prsmgraphdownload button{
+  margin: 1px !important;
+}
+.seqvisualization .dropdown-menu{
+  min-width:6.0rem !important;
+}
+.seqvisualization .dropdown-item{
+  padding-right: 1rem !important;
+  padding-left: 1rem !important;
+}
+.seqvisualization a{
+color: #428bca !important;
+}
+.matched_fragments:hover{
+  cursor: pointer;
 }

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <meta charset="utf-8">
+<head>
 <title>Protein identifications</title>
 <link rel="stylesheet" type="text/css" href="../css/lib/jquery.dataTables.css"/>
 <link rel="stylesheet" type="text/css" href="../css/lib/bootstrap.min.css"/>
@@ -13,6 +14,14 @@
 <script src="js/util/navBar.js"></script>
 <script>
 $(document).ready(function(){
+
+	var vendor = navigator.vendor.split(" ")[0];
+	if(vendor.trim() != "Google")
+	{
+		alert("Looks like you are not using Chrome, this application supports only Chrome");
+	}
+		
+	  
   $(".card-row").css('display','none');
   var x = location.href;
   //var n = x.search("?");
@@ -48,11 +57,12 @@ $(document).ready(function(){
   
 })
 </script>
+</head>
 <body>
-	<div id="nav-bar"></div>
-	<br></br>
-  <br></br>
-	 <div class="container-ori text-light">
+<div id="nav-bar"></div>
+<div class="container">
+	<div class = "container_img" >
+		<div class="container-ori text-light">
 		<div id="cards-up"  class="card-row">
 			<div class="card-title-container">
 				<h4 class="card-title">View TopPIC Results</h4>
@@ -60,9 +70,9 @@ $(document).ready(function(){
 				<div class="row justify-content-center">
 						<div class="cards-container">
 								<div class="card" >
-								  <div class="card-body" id="toppic_prsm_cutoff">
+									<div class="card-body" id="toppic_prsm_cutoff">
 									<p class="card-text">TopPIC identifications with  <br> a spectral level cutoff</p>
-								  </div>
+									</div>
 								</div>
 								<div class="card">
 									<div class="card-body" id="toppic_proteoform_cutoff">
@@ -82,9 +92,9 @@ $(document).ready(function(){
 				<div class="row justify-content-center">
 						<div class="cards-container">
 								<div class="card">
-								  <div class="card-body" id="topmg_prsm_cutoff">
+									<div class="card-body" id="topmg_prsm_cutoff">
 									<p class="card-text">TopMG identifications with  <br>  a spectral level cutoff</p>
-								  </div>
+									</div>
 								</div>
 								<div class="card">
 									<div class="card-body" id="topmg_proteoform_cutoff">
@@ -96,7 +106,8 @@ $(document).ready(function(){
 				</div>
 			</div>
 		</div>
-<div class="container allproteins"></div>
+	</div>
+</div> 
 <footer class="page-footer font-small blue">
 	<div class="footer-copyright text-center py-3">© 2019 Copyright: The Trustees of 
 		<a href="https://www.iu.edu/" target="#">Indiana University</a>

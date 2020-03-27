@@ -1,22 +1,27 @@
+
 /**
  * On Click implimentation of topview button
  */
-function onclickTopView(){
-    //let url = "../Spectrum-Visualization/spectrum.html"+"?"+"prsmid=87/"+"specId=";
-    let peakAndIntensityList = getDataFromPRSMtoSpectralView();
-    let massAndIntensityList = getMassAndIntensityData();
+function onclickTopView(scansWithData,scanId){
+    let currentSpectrumData;
+    [currentSpectrumData,specId] = getCurrentData(scansWithData,scanId);
+    let peakAndIntensityList = getDataFromPRSMtoSpectralView(currentSpectrumData);
+    let massAndIntensityList = getMassAndIntensityData(specId);
     let sequence = getSequence();
     let fixedPtmList = getFixedPTMMassList();
+    let unknownMassShiftList = getUnknownMassList();
+    let precursorMass = prsm_data.prsm.ms.ms_header.precursor_mono_mass;
 
     window.localStorage.setItem('peakAndIntensityList',  JSON.stringify(peakAndIntensityList));
     window.localStorage.setItem('massAndIntensityList',  JSON.stringify(massAndIntensityList));
     window.localStorage.setItem('sequence',  JSON.stringify(sequence));
     window.localStorage.setItem('fixedPtmList', JSON.stringify(fixedPtmList));
-
+    window.localStorage.setItem('unknownMassShiftList', JSON.stringify(unknownMassShiftList));
+    window.localStorage.setItem('precursorMass', JSON.stringify(precursorMass));
     window.open("../inspect/spectrum.html");
 }
 
-function getDataFromPRSMtoSpectralView(){
+function getDataFromPRSMtoSpectralView(ms2_data){
     let peakdata = new PeakData();
     let peakAndIntensity = [];
     ms2_data.peaks.forEach(function(eachrow){
@@ -26,14 +31,14 @@ function getDataFromPRSMtoSpectralView(){
     return peakAndIntensity;
 }
 
-function getMassAndIntensityData(){
+function getMassAndIntensityData(specId){
   let massAndIntensityList = [];
   let ms2_ids = prsm_data.prsm.ms.ms_header.ids;
   let ms2_id_list = ms2_ids.split(" ");
   let ms2_id_1 = ms2_id_list[0];
 
   prsm_data.prsm.ms.peaks.peak.forEach(function(eachPeak,i){
-    if (eachPeak.spec_id == ms2_id_1) {
+    if (eachPeak.spec_id == specId) {
       let tempObj = eachPeak.monoisotopic_mass + " "+eachPeak.intensity+ " "+eachPeak.charge;
       massAndIntensityList.push(tempObj);
     }
@@ -82,4 +87,56 @@ function getFixedPTMMassList()
         }
     }
     return fixedPTMList;
+}
+function getUnknownMassList()
+{
+    let unknownMassShiftList = [];
+    let l_prsm = prsm_data;
+    if(l_prsm.prsm.annotated_protein.annotation.hasOwnProperty('mass_shift'))
+	{
+        let mass_shift = l_prsm.prsm.annotated_protein.annotation.mass_shift ;
+			if(Array.isArray(mass_shift))
+			{
+				let len = mass_shift.length;
+				mass_shift.forEach(function(each_mass_shift, i){
+                    // Removing -1 as the sequece in inspect elements takes from 0
+                    let position = parseInt(each_mass_shift.left_position) - 1 ;
+                    let mass = parseFloat(each_mass_shift.anno);
+					unknownMassShiftList.push({"position":position,"mass":mass})
+				})
+			}
+			else if(mass_shift.shift_type == "unexpected")
+			{
+                 // Removing -1 as the sequece in inspect elements takes from 0
+                let position = parseInt(mass_shift.left_position) - 1;
+                let mass = parseFloat(mass_shift.anno);
+                unknownMassShiftList.push({"position":position,"mass":mass})
+			}
+    }
+    return unknownMassShiftList;
+}
+function setDropDownItemsForInspectButton(scanIdList,specIdList){
+    let dropdown_menu = $(".dropdownscanlist .dropdown-menu");
+    let len = scanIdList.length;
+    for(let i=0; i<len;i++)
+    {
+        let value = scanIdList[i];
+        let specId = specIdList[i];
+        let id = "scan_"+ value ;
+        let a = document.createElement("a");
+        a.setAttribute("class","dropdown-item");
+        a.setAttribute("href","#!");
+        a.setAttribute("id",id);
+        a.setAttribute("value",value);
+        a.setAttribute("specid", specId);
+        a.innerHTML = "Scan "+value;
+        dropdown_menu.append(a);
+    }
+    
+}
+function onClickToInspect(){
+    $(".dropdownscanlist .dropdown-item ").click(function(){
+        let scanId = $(this).attr('value')
+        onclickTopView(ms2_ScansWithData,scanId);
+    });  
 }

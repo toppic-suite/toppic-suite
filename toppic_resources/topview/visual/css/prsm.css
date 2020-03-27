@@ -2,8 +2,9 @@ div.container {
 	font-family : "Helvetica Neue",Helvetica,Arial,sans-serif;
   	font-size: 15px;
 	max-width: 1060px;
-	margin: 0 auto;
+  margin-top: 100px !important;
 }
+
 
 .table-borderless td,
 .table-borderless th {
@@ -41,6 +42,7 @@ white-space: nowrap;
 .btn{
   background-color:  #428bca !important;
   width: 80% !important;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 .btn-secondary{
 	background-color:  red !important;
@@ -138,6 +140,9 @@ svg.l_popup_svg{
 #spectrumpop .modal-sm{
   max-width: 70% !important;
 }
+#ms2spectrumpop .modal-sm{
+  max-width: 70% !important;
+}
 /* #tooltip_imagename {
   /* max-width: 350px !important; */
   /* If max-width does not work, try using width instead */
@@ -165,4 +170,88 @@ svg.l_popup_svg{
 #save-image-modal{
 	margin-top:20%;
 }
+.prsmgraphdownload .dropdown-menu{
+  min-width:7.7rem !important;
+}
+#ms2svg_div .active{
+  background-color: #F8F8F8 !important;
+}
+#ms2_graph_popup_nav .active{
+  background-color: #F8F8F8 !important;
+}
+#ms2_graph_popup_nav .nav-link{
+  border: 0px !important;
+}
+#ms2_graph_popup_nav a{
+	color: #428bca !important;
+}
+#ms2svg_div .nav-link{
+  border: 0px !important;
+}
+#ms1_graph_nav .active{
+  background-color: #F8F8F8 !important;
+}
+#ms1_graph_nav .nav-link{
+  border: 0px !important;
+}
+#ms1_graph_nav a{
+	color: #428bca !important;
+}
+#ms2_graph_nav .active{
+  background-color: #F8F8F8 !important;
+}
+#ms2_graph_nav .nav-link{
+  border: 0px !important;
+}
+#ms2_graph_nav a{
+	color: #428bca !important;
+}
+.modal{
+  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-size: 15px;
+}
+.filename p{
+  padding-left: 19px;
+  margin: 0px;
+}
+#l_svg{
+  /* box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); */
+}
+.footer-copyright
+{
+	background-color: #343a40!important;
+	color:white !important;
+}
+.dropdownscanlist .dropdown-menu {
+  min-width: 7.5rem !important;
+}
+.dropdown-toggle::after{
+  background-color: teal !important;
+}
+.btn:active {
+  outline-color: red !important;
+}
+.ms2_svg_graph_class {
+  background-color: #F8F8F8!important;
+}
 
+#ms2spectrumpop td{
+  border-top: 10 !important;
+  border-bottom: 5 !important;
+}
+.td_popup_button {
+  padding-top: 20px !important;
+}
+.td_popup_variables{
+  padding-top: 25px !important;
+  padding-left: 20px !important;
+}
+.monoMass_svg_graph_class {
+  background-color: #F8F8F8!important;
+}
+#monoMass_nav .active{
+  background-color: #F8F8F8 !important;
+}
+#monoMass_nav .nav-link{
+  border: 0px !important;
+}

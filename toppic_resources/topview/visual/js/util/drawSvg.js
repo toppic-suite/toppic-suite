@@ -26,10 +26,6 @@ function getNumOfRows(parameters,prsm)
 	let new_sequence_length = last_position - first_position ;
 	let num_of_rows = parseInt(new_sequence_length/parameters.row_length) ;
 	let skip_acid_count = 0 ;
-	/*if(num_of_rows > parseInt(num_of_rows))
-	{
-		num_of_rows = parseInt(num_of_rows) ;
-	}*/
 	if((start_info != null || end_info != null)&& parameters.show_skipped_lines)
 	{
 		skip_acid_count = skip_acid_count + 1;
@@ -228,7 +224,7 @@ function annotations(para,prsm,id)
 		}
 	})
 }
-/*	Draw the annotation when the ion type is B	*/
+/* Invoke drawAnnotation method to draw the annotation when the ion type is B	*/
 function drawAnnotation_B(para,prsm,annotation,l_charge,id)
 {
 	let first_position,last_position,start_info = null ,end_info = null ;
@@ -236,11 +232,12 @@ function drawAnnotation_B(para,prsm,annotation,l_charge,id)
 	let x,y ;
 	[x,y] = calibrateCoordinates(para,parseInt(annotation.position)-1,first_position);
 	x = x + (para.letter_width/2) ;
+	// Setting polyline coordinates
 	let coordinates = (x-2)+","+(y-13)+ " " +(x+4)+","+ (y-11)+" "+(x+4)+","+(y+2);
 	
 	drawAnnotation(annotation,l_charge,id,coordinates,x,y);
 }
-/* Draw the annotation when the ion type is Y*/
+/* Invoke drawAnnotation method to draw the annotation when the ion type is Y*/
 function drawAnnotation_Y(para,prsm,annotation,l_charge,id)
 {
 	let first_position,last_position,start_info = null ,end_info = null ;
@@ -248,10 +245,12 @@ function drawAnnotation_Y(para,prsm,annotation,l_charge,id)
 	let x,y ;
 	[x,y] = calibrateCoordinates(para,parseInt(annotation.position)-1,first_position);
 	x = x + (para.letter_width/2) ;
+	// Setting polyline coordinates
 	let coordinates = (x+4)+","+ (y-11)+" "+(x+4)+","+(y+2)+ " "+(x+10) + ","+(y+5);
 	drawAnnotation(annotation,l_charge,id,coordinates,x,y);
 	
 }
+/* invoke drawAnnotation method to draw the annotation when the ion type is Y and B*/
 function drawAnnotation_YB(para,prsm,annotation,l_charge,id)
 {
 	let first_position,last_position,start_info = null ,end_info = null ;
@@ -259,41 +258,43 @@ function drawAnnotation_YB(para,prsm,annotation,l_charge,id)
 	let x,y ;
 	[x,y] = calibrateCoordinates(para,parseInt(annotation.position)-1,first_position);
 	x = x + (para.letter_width/2) ;
+	// Setting polyline coordinates
 	let coordinates =  (x-2)+","+(y-13)+ " " + (x+4)+","+ (y-11)+" "+(x+4)+","+(y+2)+ " "+(x+10) + ","+(y+5);
 	drawAnnotation(annotation,l_charge,id,coordinates,x,y);
 }
+/* Function to draw the annotations based on annotation type and coordinates*/
 function drawAnnotation(annotation,l_charge,id,coordinates,x,y)
 {
 	let svgContainer = d3.select("#"+id+"_g");
-	let l_polyline = svgContainer.append("polyline")
-							.attr("points", coordinates)
-							.style("fill", "none")
-							.style("stroke", "1e90ff")
-							.style("stroke-width", "1");	
+	svgContainer.append("polyline")
+				.attr("points", coordinates)
+				.style("fill", "none")
+				.style("stroke", "1e90ff")
+				.style("stroke-width", "1");	
 		/*	Rectangle to have flexible on click and on mouse actions	*/
-		svgContainer.append("rect")
-					.attr("id","annoTooltip")
-					.attr("x", x)
-					.attr("y", y-14)
-					.attr("width", 13)
-					.attr("height", 23)
-					.style("opacity", 0)
-					.attr("cursor", "pointer")
-					.on("click",function(){
-						if(id == "l_svg")
-						{
-							input = annotation.ion_position;
-							showIonPeaks(input);
-						}
-					})
-					.on("mouseover", function(){
-						console.log("in mouse over");
-						appendTooltip(l_charge);
-					})
-					.on("mouseout", function(d){
-						removeToolTip();	
-					});
+	svgContainer.append("rect")
+				.attr("id","annoTooltip")
+				.attr("x", x)
+				.attr("y", y-14)
+				.attr("width", 13)
+				.attr("height", 23)
+				.style("opacity", 0)
+				.attr("cursor", "pointer")
+				.on("click",function(){
+					if(id == "l_svg")
+					{
+						input = annotation.ion_position;
+						showIonPeaks(input);
+					}
+				})
+				.on("mouseover", function(){
+					appendTooltip(l_charge);
+				})
+				.on("mouseout", function(d){
+					removeToolTip();	
+				});
 }
+/* Function to add tooltip to the polylines on mouseOver */
 function appendTooltip(charge)
 {
 	var div = d3.select("body").append("div")	
@@ -306,11 +307,12 @@ function appendTooltip(charge)
 		.style("left", (d3.event.pageX)  + "px")		
 		.style("top", (d3.event.pageY - 28)+ "px") ;
 }
+/* Function to remove tooltip to the polylines on mouseOver */
 function removeToolTip()
 {
 	d3.selectAll(".tooltip").remove();
 }
-/*	get the terminated acid information	*/
+/*	Function to show the notification text at the top and bottom of the SVG sequence SVG of skipped amino acids */
 function skip_list(para,prsm)
 {
 	let l_afirst_residue_position = parseInt(prsm.annotated_protein.annotation.first_residue_position) ;
@@ -349,8 +351,6 @@ function drawAnnoOfStartEndPosition(para,prsm,id)
 	let first_position,last_position,start_info = null ,end_info = null ;
 	[para,first_position, last_position,start_info,end_info] = skip_list(para,prsm);
 	let svgContainer = d3.select("#"+id+"_g");
-	let new_virtual_postion = first_residue_position - first_position ; 
-	let non_data_indicator = false;
 	if(first_residue_position != 0)
 	{
 		let x,y ;
@@ -507,6 +507,7 @@ function shiftAnnotation(para,prsm,index)
 	}
 	return isshiftNeeded ;
 }
+/* Check if over shifting is need when annotations collide with each other */
 function isShiftAnnotationNeeded(para,prsm)
 {
 	let isshiftNeeded = false ;

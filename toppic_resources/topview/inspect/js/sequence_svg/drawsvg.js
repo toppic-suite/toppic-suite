@@ -78,7 +78,7 @@ function buildSvg(parameters,seq,id,massShiftList,monoMassList)
 				if( i == massShiftList[k].position )
 				{
 					MassShift(this,massShiftList[k].mass,i);
-					return "red" ;
+					//return "red" ;
 					break;
 				}
 				else if(i == massShiftList[k].position)
@@ -97,12 +97,13 @@ function handleOnClick(d,i,id,seq,massShiftList,monoMassList){
 	   .attr("class", "tooltip")
 	   .attr("id","tooltip_pop")
 	   .style("opacity", 1);
-	
+	let colorsDropdown = addColorsToDropdown();
 	div.transition()
      .duration(200)
      .style("opacity", .9);
 	div.html(
-	        '<input list="browsers" name="myBrowser" type="text" id= "mass_shift" />'+
+			'<input list="browsers" name="myBrowser" type="text" id= "mass_shift" />'+
+			colorsDropdown +
 			'<button id="ok" style = "none" type="button">ok</button>'
 	        )
 	        .style("left", (d3.event.pageX - 30) + "px")             
@@ -113,13 +114,14 @@ function handleOnClick(d,i,id,seq,massShiftList,monoMassList){
 	
 	d3.select("#ok").on("click",function(){
 	let massShiftVal =  document.getElementById("mass_shift").value ;
+	let tooltipcolor =  document.getElementById("tooltip_color").value ;
 		d3.select("#tooltip_pop").remove() ;
 		massShiftVal = parseFloat(massShiftVal);
 		if(!isNaN(massShiftVal)){
 			let errorType = $(".error_dropdown").val();
 			let errorVal = parseFloat($("#errorval").val().trim());
 			let executionObj = new SeqOfExecution();
-			executionObj.onClickMassShift = {mass:massShiftVal,position:shiftPosition}
+			executionObj.onClickMassShift = {mass:massShiftVal,position:shiftPosition,color:tooltipcolor}
 			executionObj.onClickSequenceOfExecution(errorType,errorVal);
 		}
 	});
@@ -271,7 +273,7 @@ function drawAnnotation(position,charge,id,coordinates,x,y)
 function appendTooltip(charge)
 {
 	var div = d3.select("body").append("div")	
-								.attr("class", "tooltip")				
+								.attr("class", "tooltip annotation_tooltip")				
 								.style("opacity", 0); 
 		div.transition()		
 			.duration(10)		
@@ -282,7 +284,7 @@ function appendTooltip(charge)
 }
 function removeToolTip()
 {
-	d3.selectAll(".tooltip").remove();
+	d3.selectAll(".annotation_tooltip").remove();
 }
 
 /* Get the charge of the Ion */
@@ -324,4 +326,30 @@ function MassShift(thisElem,MassShift,position)
 				//.attr("text-anchor","middle")
 				.attr("fill","black")
 			   .attr("font-size","11px");
+}
+
+function addColorsToDropdown(){
+	let colors = ["white","green","yellow","blue","red"]
+	let startStatement = "<select id=\"tooltip_color\" style=\"background-color:"+colors[0]+"\">";
+	let endStatement = "</select>";
+	let stringyfyingHTML = startStatement;
+	let len = colors.length;
+	for(let i=0;i<len;i++)
+	{
+		stringyfyingHTML += drawRectagleWithColors(colors[i],i);
+	}
+	stringyfyingHTML = stringyfyingHTML + endStatement;
+	console.log("stringyfyingHTML : ", stringyfyingHTML);
+	return stringyfyingHTML;
+}
+function drawRectagleWithColors(color,index){
+	let option = "<option value=\""+color +"\"style=\"width:80px;height:5px;border:1px solid #000;background-color:"+color+"\">";
+	if(index == 0)
+	{
+		option = "<option value=\""+color +"\"style=\"width:80px;height:5px;border:1px solid #000;background-color:"+color+"\""+"selected"+">";
+	}
+
+	//let div = "<div style=\"width:80px;height:5px;border:1px solid #000;background-color:"+color+"\"></div>";
+	let finalOption = option+color+"</option>"; 
+	return finalOption;
 }

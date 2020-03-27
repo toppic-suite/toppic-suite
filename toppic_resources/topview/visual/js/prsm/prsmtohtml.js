@@ -42,8 +42,6 @@ function createTableElements(){
 
 	let l_scans = prsm_data.prsm.ms.ms_header.scans.split(" ") ;
 	let l_specIds = prsm_data.prsm.ms.ms_header.ids.split(" ") ;
-	console.log("l_scans : ", l_scans);
-	console.log("l_specIds : ", l_specIds);
 	let l_matched_peak_count = 0;
 	prsm_data.prsm.ms.peaks.peak.forEach(function(peak,i){
 		/*	Check if peak contain matched_ions_num attribute	*/
@@ -114,16 +112,18 @@ function createTableElements(){
 			{
 				if(peak.spec_id == l_specIds[0]) l_scan = l_scans[0];
 				else l_scan = l_scans[1];
-
+				td.setAttribute("class","row_scanIds");
 				td.innerHTML = l_scan ;
 			}
 			if(i == 1)
 			{
 				td.innerHTML = parseInt(peak.peak_id) + 1 ;
+				td.setAttribute("class","row_peakNum");
 			}
 			if(i == 2)
 			{
 				td.innerHTML = peak.monoisotopic_mass;
+				td.setAttribute("class","row_monoMass");
 			}
 			if(i == 3)
 			{
@@ -137,10 +137,12 @@ function createTableElements(){
 			if(i == 4)
 			{
 				td.innerHTML = peak.intensity;
+				td.setAttribute("class","row_intensity");
 			}
 			if(i == 5)
 			{
 				td.innerHTML = peak.charge;
+				td.setAttribute("class","row_charge");
 			}
 			if(peak.hasOwnProperty('matched_ions_num'))
 			{
@@ -242,6 +244,7 @@ function occurence_ptm(prsm)
 		div.appendChild(text2);
 	}
 }
+/* Get all the unknown ptms information */
 function getUnknownPtms(prsm)
 {
 	let data = " [";
@@ -332,15 +335,15 @@ function getFixedPtm(ptm)
 	else
 	{
 		//fixed_ptm = fixed_ptm + ptm.occurence.left_pos + "-" + ptm.occurence.right_pos ;
-    fixed_ptm = fixed_ptm + occurence.right_pos;
+    	fixed_ptm = fixed_ptm + occurence.right_pos;
 	}
 	fixed_ptm = ptm.ptm.abbreviation + fixed_ptm ;
-  console.log('fixed_ptm', fixed_ptm);
 	return fixed_ptm ;
 }
 /*	Create buttons to save the svg as png/svg and to redraw the svg with given dimensions*/
 function buttonsAndAlerts(para,prsm,id)
 {
+	let x,y;
 	/*	Id of the pop_up svg	*/
 	id = "l_popup_svg" ;
 	/*	On click action to get pop_up window	*/
@@ -377,17 +380,21 @@ function buttonsAndAlerts(para,prsm,id)
 		document.getElementsByName("show-skipped-lines")[0].checked = para.show_skipped_lines ;
 
     $("#myModal").draggable({
-      appendTo: "body"
-    });
+		appendTo: "body"
+		});
 	});
 
 	/*	Download the svg as ".svg" image	*/
 	d3.select('#download_SVG').on("click",function(){
-			popupnamewindow("svg",id);
+			x = d3.event.pageX;
+			y = d3.event.pageY;
+			popupnamewindow("svg",id,x,y);
 		});
 	/*	Download svg as PNG Image	*/
 	d3.select('#download_PNG').on("click", function(){
-		popupnamewindow("png",id);
+		x = d3.event.pageX;
+		y = d3.event.pageY;
+		popupnamewindow("png",id,x,y);
 	})	;
 
   d3.select('#image_help').on("click",function(){
@@ -431,15 +438,6 @@ function buttonsAndAlerts(para,prsm,id)
 		{
 			para.show_skipped_lines = false ;
 		}
-		/*
-		if(document.getElementById("svg_background").checked)
-		{
-			para.svgBackground_color = "white" ;
-		}
-		else
-		{
-			para.svgBackground_color = "none" ;
-		}*/
 		/*	Redraw the svg with new dimension parameters*/
 		prsm = prsm_data.prsm ;
 		[para,id] = buildSvg(para,prsm,id);
@@ -463,8 +461,9 @@ function buttonsAndAlerts(para,prsm,id)
 		massShiftBackgroundColor(para,prsm,id);
 	});	
 }
-function popupnamewindow(type,id){
-	console.log("in popup");
+/* Function to produce a pop up window to provide name and set name to 
+*  the image while downloading the image of Graph SVG and Sequence SVG */
+function popupnamewindow(type,id,x,y){
 	d3.selectAll("#tooltip_imagename").remove() ;
 	var div = d3.select("body").append("div")
 	.attr("class", "tooltip")
@@ -478,8 +477,8 @@ function popupnamewindow(type,id){
 			'<input type="text" placeholder="Image Name" id="imagename" />'+
 			'<button id="saveimage" style = "none" type="button">save</button>'
 			)
-	.style("left", (d3.event.pageX - 30) + "px")             
-	.style("top", (d3.event.pageY - 60) + "px")
+	.style("left", (x - 30) + "px")             
+	.style("top", (y - 60) + "px")
 	// .style("transform","translateX(-35%)!important")
 	.attr("box-sizing","border")
 	.attr("display","inline-block")
@@ -506,10 +505,9 @@ function popupnamewindow(type,id){
 			d3.selectAll("#tooltip_imagename").remove() ;
 			let l_svgContainer = d3.select("#"+id);
 			let svgString = getSVGString(l_svgContainer.node());
-			let svg_element = document.getElementById('l_popup_svg');
-			let bBox = svg_element.getBBox();
-			let width = bBox.width;
-			let height = bBox.height ;
+			let specParams =  new SpectrumParameters();
+			let width = specParams.svgWidth;
+			let height = specParams.svgHeight ;
 			svgString2Image( svgString, 2*width, 2*height, 'png', save ); 
 			function save( dataBlob, filesize ){
 				saveAs( dataBlob, imagename ); 
