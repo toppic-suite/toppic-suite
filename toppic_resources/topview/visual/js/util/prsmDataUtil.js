@@ -120,8 +120,11 @@ function json2BackgroundColorArray(prsm)
 	}
 	if(prsm.annotated_protein.annotation.hasOwnProperty('ptm'))
 	{
-		let otherPtmList = json2OtherPtmOccurences(prsm);
-		backgroundColorAndMassShift = backgroundColorAndMassShift.concat(otherPtmList);
+		if(prsm.annotated_protein.annotation.ptm.ptm_type != "Fixed")
+		{
+			let otherPtmList = json2OtherPtmOccurences(prsm);
+			backgroundColorAndMassShift = backgroundColorAndMassShift.concat(otherPtmList);
+		}
 	}
 	return backgroundColorAndMassShift ;
 }
