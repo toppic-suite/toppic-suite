@@ -332,10 +332,9 @@ function getFixedPtm(ptm)
 	else
 	{
 		//fixed_ptm = fixed_ptm + ptm.occurence.left_pos + "-" + ptm.occurence.right_pos ;
-    fixed_ptm = fixed_ptm + occurence.right_pos;
+    	fixed_ptm = fixed_ptm + ptm.occurence.right_pos;
 	}
 	fixed_ptm = ptm.ptm.abbreviation + fixed_ptm ;
-  console.log('fixed_ptm', fixed_ptm);
 	return fixed_ptm ;
 }
 /*	Create buttons to save the svg as png/svg and to redraw the svg with given dimensions*/
