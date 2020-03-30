@@ -120,11 +120,8 @@ function json2BackgroundColorArray(prsm)
 	}
 	if(prsm.annotated_protein.annotation.hasOwnProperty('ptm'))
 	{
-		if(prsm.annotated_protein.annotation.ptm.ptm_type != "Fixed")
-		{
-			let otherPtmList = json2OtherPtmOccurences(prsm);
-			backgroundColorAndMassShift = backgroundColorAndMassShift.concat(otherPtmList);
-		}
+		let otherPtmList = json2OtherPtmOccurences(prsm);
+		backgroundColorAndMassShift = backgroundColorAndMassShift.concat(otherPtmList);
 	}
 	return backgroundColorAndMassShift ;
 }
@@ -135,11 +132,43 @@ function json2OtherPtmOccurences(prsm)
 	if(Array.isArray(prsm.annotated_protein.annotation.ptm))
 	{
 		prsm.annotated_protein.annotation.ptm.forEach(function(ptm,index){
-			if(ptm.hasOwnProperty("occurence"))
+			if(ptm.ptm_type != "Fixed")
 			{
-				if(Array.isArray(ptm.occurence))
+				if(ptm.hasOwnProperty("occurence"))
 				{
-					ptm.occurence.forEach(function(occurence,i){
+					if(Array.isArray(ptm.occurence))
+					{
+						ptm.occurence.forEach(function(occurence,i){
+							let tempObj = {};
+							tempObj.anno = ptm.ptm.abbreviation;
+							tempObj.left_position = occurence.left_pos;
+							tempObj.right_position = occurence.right_pos;
+							backgroundColorAndMassShift.push(tempObj);
+						});
+					}
+					else
+					{
+						let tempObj = {};
+						tempObj.anno = ptm.ptm.abbreviation;
+						tempObj.left_position = ptm.occurence.left_pos;
+						tempObj.right_position = ptm.occurence.right_pos;
+						backgroundColorAndMassShift.push(tempObj);
+					}
+				}
+			}
+			
+		})
+	}
+	else
+	{
+		if(prsm.annotated_protein.annotation.ptm.hasOwnProperty("occurence"))
+		{
+			let ptm = prsm.annotated_protein.annotation.ptm;
+			if(ptm.ptm_type != "Fixed")
+			{
+				if(Array.isArray(prsm.annotated_protein.annotation.ptm.occurence))
+				{
+					prsm.annotated_protein.annotation.ptm.occurence.forEach(function(occurence,i){
 						let tempObj = {};
 						tempObj.anno = ptm.ptm.abbreviation;
 						tempObj.left_position = occurence.left_pos;
@@ -155,31 +184,6 @@ function json2OtherPtmOccurences(prsm)
 					tempObj.right_position = ptm.occurence.right_pos;
 					backgroundColorAndMassShift.push(tempObj);
 				}
-			}
-		})
-	}
-	else
-	{
-		if(prsm.annotated_protein.annotation.ptm.hasOwnProperty("occurence"))
-		{
-			let ptm = prsm.annotated_protein.annotation.ptm;
-			if(Array.isArray(prsm.annotated_protein.annotation.ptm.occurence))
-			{
-				prsm.annotated_protein.annotation.ptm.occurence.forEach(function(occurence,i){
-					let tempObj = {};
-					tempObj.anno = ptm.ptm.abbreviation;
-					tempObj.left_position = occurence.left_pos;
-					tempObj.right_position = occurence.right_pos;
-					backgroundColorAndMassShift.push(tempObj);
-				});
-			}
-			else
-			{
-				let tempObj = {};
-				tempObj.anno = ptm.ptm.abbreviation;
-				tempObj.left_position = ptm.occurence.left_pos;
-				tempObj.right_position = ptm.occurence.right_pos;
-				backgroundColorAndMassShift.push(tempObj);
 			}
 		}
 	}
