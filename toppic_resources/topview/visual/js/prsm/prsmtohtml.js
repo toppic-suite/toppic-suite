@@ -335,7 +335,11 @@ function getFixedPtm(ptm)
 	else
 	{
 		//fixed_ptm = fixed_ptm + ptm.occurence.left_pos + "-" + ptm.occurence.right_pos ;
+<<<<<<< HEAD
     	fixed_ptm = fixed_ptm + occurence.right_pos;
+=======
+    	fixed_ptm = fixed_ptm + ptm.occurence.right_pos;
+>>>>>>> 95acb8a1... Fixing #838
 	}
 	fixed_ptm = ptm.ptm.abbreviation + fixed_ptm ;
 	return fixed_ptm ;
