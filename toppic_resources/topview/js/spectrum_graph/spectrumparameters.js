@@ -48,6 +48,7 @@ SpectrumParameters = function() {
   this.yTicks = 5 ;
   //Height/size of the tick
   this.ticklength = 7 ;
+  this.errorYticks = 2;
   
   //Limiting the peaks and envelopes to 500
   this.ranges=[0,0,0,0,0,0];
@@ -105,6 +106,12 @@ SpectrumParameters = function() {
    */
   this.getPeakYPos = function (intensity) {
     let peakY = this.svgHeight - intensity * this.yScale - this.padding.bottom;
+    return peakY;
+  }
+  this.getErrorYPos = function(erroVal){
+    let yErrorScale = this.graphFeatures.heightForErrorPlot/(this.graphFeatures.errorThreshHoldVal*2);// Multiply with 2 as the coordinates has to be both positive and negative
+    console.log("yErrorScale : ", yErrorScale);
+    let peakY = this.svgHeight - (erroVal * yErrorScale) - this.graphFeatures.errorplot_padding.bottom - this.graphFeatures.heightForErrorPlot/2;
     return peakY;
   }
   /**

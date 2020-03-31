@@ -44,7 +44,7 @@ SpectrumGraph = function(svgId,spectrumParameters,peakData, ionData){
 
 	this.zoom = d3.zoom()
 		.on("zoom", this.zoomed);
-	this.svg.attr("viewBox", "0 0 "+ spectrumParameters.svgWidth+" "+ spectrumParameters.svgHeight)
+	this.svg.attr("viewBox", "0 0 "+ spectrumParameters.graphFeatures.svgWidth+" "+ spectrumParameters.graphFeatures.svgHeight)
 					.attr("width", "100%")
 					.attr("height", "100%")
 					.call(this.zoom);
@@ -162,7 +162,7 @@ addDatatoAxis = function(svg,spectrumParameters){
 				x <= (spectrumParameters.svgWidth - spectrumParameters.padding.right))
 		{
 			this.xAxisData.append("text").attr("id","xtext").attr("x",x)
-						.attr("y",spectrumParameters.svgHeight - (spectrumParameters.padding.bottom/1.6))// Dividing with 1.6 to set the position of the numbers under the ticks appropriately
+						.attr("y",(spectrumParameters.graphFeatures.svgHeight - spectrumParameters.graphFeatures.padding.bottom + 20))// Dividing with 1.6 to set the position of the numbers under the ticks appropriately
 						.attr("text-anchor","middle")
 						.text(function(){
 							// conditions to show more decimal values as we zoom in further and limit decimals when zoomed back
@@ -395,7 +395,11 @@ drawSequence = function(svg,spectrumParameters){
 	x = spectrumParameters.getPeakXPos((0));
 	y = spectrumParameters.padding.head-40;
 	text = "|";
-	drawAcids_innerFunc(seqSvg,x,y,text);
+	// Add "|" At the start of the prefix sequence
+	if(0 > spectrumParameters.minMz && 0 <= spectrumParameters.maxMz)
+	{
+		drawAcids_innerFunc(seqSvg,x,y,text);
+	}
 	sequenceData.forEach(function(element,index,prefixSequenceData){
 		if(element.mass > spectrumParameters.minMz && element.mass <= spectrumParameters.maxMz)
 		{
@@ -411,10 +415,14 @@ drawSequence = function(svg,spectrumParameters){
 
 	sequenceData = spectrumParameters.graphFeatures.suffixSequeceData;
 	// Draw | at water mass for suffix mass list
-	x = spectrumParameters.getPeakXPos(18.010564683704);// Mass of water=18.010564683704
+	let massOfWater = 18.010564683704;
+	x = spectrumParameters.getPeakXPos(massOfWater);// Mass of water=18.010564683704
 	y = spectrumParameters.padding.head-20;
 	text = "|";
-	drawAcids_innerFunc(seqSvg,x,y,text);
+	if(massOfWater > spectrumParameters.minMz && massOfWater <= spectrumParameters.maxMz)
+	{
+		drawAcids_innerFunc(seqSvg,x,y,text);
+	}
 	sequenceData.forEach(function(element,index,suffixSequeceData){
 		if(element.mass > spectrumParameters.minMz && element.mass <= spectrumParameters.maxMz)
 		{
@@ -439,13 +447,106 @@ drawSequence = function(svg,spectrumParameters){
 	}
 }
 /**
+ * Add Error Plot to the MonoMass Spectrum
+ */
+addErrorPlot = function(svg, spectrumParameters){
+	//Draw x-axis
+	this.xAxis = svg.append("g").attr("id", "xaxis_errorplot").append("line")
+					.attr("x1",spectrumParameters.graphFeatures.errorplot_padding.left)
+					.attr("y1",spectrumParameters.graphFeatures.svgHeight - spectrumParameters.graphFeatures.heightForErrorPlot/2 - spectrumParameters.graphFeatures.errorplot_padding.bottom)
+					.attr("x2",spectrumParameters.graphFeatures.specWidth + spectrumParameters.graphFeatures.errorplot_padding.left)
+					.attr("y2",spectrumParameters.graphFeatures.svgHeight - spectrumParameters.graphFeatures.heightForErrorPlot/2 - spectrumParameters.graphFeatures.errorplot_padding.bottom)
+					.attr("stroke","black")
+					.style("stroke-dasharray", ("5, 3"))
+					.attr("stroke-width","2")
+	// Draw y-axis
+	this.yAxis = svg.append("g").attr("id", "yaxis_errorplot").append("line")
+					.attr("x1",spectrumParameters.graphFeatures.errorplot_padding.left)
+					.attr("y1",spectrumParameters.graphFeatures.svgHeight - spectrumParameters.graphFeatures.errorplot_padding.bottom)
+					.attr("x2",spectrumParameters.graphFeatures.errorplot_padding.left)
+					.attr("y2",spectrumParameters.graphFeatures.svgHeight - spectrumParameters.graphFeatures.heightForErrorPlot - spectrumParameters.graphFeatures.errorplot_padding.bottom)
+					.attr("stroke","black")
+					.attr("stroke-width","2")
+}
+drawErrorYticks = function(svg, spectrumParameters){
+
+	let addYTicks = svg.append("g").attr("id","yErrorTicks")
+									.attr("class","yErrorTicks");
+	let tempTick = spectrumParameters.graphFeatures.errorThreshHoldVal/spectrumParameters.errorYticks;
+	//Draw tick at 0th position
+	let y = spectrumParameters.getErrorYPos(0);
+	inner_drawYTicks(y);
+	inner_addErrorYTickValues(0,y);
+	// Draw positive ticks above error x axis
+	for(let i=1;i<=spectrumParameters.errorYticks;i++)
+	{
+		y = spectrumParameters.getErrorYPos(i*tempTick);
+		inner_drawYTicks(y);
+		inner_addErrorYTickValues(i*tempTick,y);
+	}
+	//Draw negative ticks below error x axis
+	for(let i=1;i<=spectrumParameters.errorYticks;i++)
+	{
+		y = spectrumParameters.getErrorYPos(-(i*tempTick));
+		inner_drawYTicks(y);
+		inner_addErrorYTickValues(-(i*tempTick),y);
+	}
+	function inner_drawYTicks(y){
+		if(!isNaN(y) && y >= spectrumParameters.padding.head)//y >= spectrumParameters.padding.head helps the ticks to be in the length of Y axis
+		{
+			addYTicks.append("line")
+						.attr("x1",spectrumParameters.padding.left)
+						.attr("y1",y)
+						.attr("x2",spectrumParameters.padding.left - spectrumParameters.ticklength)
+						.attr("y2",y)
+						.attr("stroke","black")
+						.attr("stroke-width","1")
+		}
+	}
+	function inner_addErrorYTickValues(data,y){
+		if(!isNaN(y) && y >= spectrumParameters.padding.head)
+		{
+			addYTicks.append("text").attr("class","ytext").attr("x",spectrumParameters.padding.left - spectrumParameters.ticklength)
+						.attr("y",y)
+						.attr("text-anchor","end")
+						.attr("alignment-baseline","middle")
+						.text(data)
+						.style("font-size","14px")
+		}
+	}
+}
+drawErrorPoints = function(svg, spectrumParameters){
+	let circles = svg.append("g").attr("id", "error_circles");
+	spectrumParameters.graphFeatures.errorListData.forEach((element)=>{
+		if(parseFloat(element.theoretical_mass) > spectrumParameters.minMz && parseFloat(element.theoretical_mass) <= spectrumParameters.maxMz){
+			circles.append("circle")
+			.attr("class","error_circles")
+			.attr("cx",function(d,i){
+				return spectrumParameters.getPeakXPos(parseFloat(element.theoretical_mass));
+			})
+			.attr("cy",function(d,i){
+				let cy = spectrumParameters.getErrorYPos(parseFloat(element.mass_error));
+				if(cy < spectrumParameters.padding.head) return spectrumParameters.padding.head ;
+				else return cy ;
+			})
+			.attr("r",function(d,i){
+				return 3;
+			})
+			.style("fill","black")
+			.style("opacity", "1")
+			//.style("stroke",envelope_list.color)
+			.style("stroke-width","2");
+		}
+	})
+}
+/**
  * Function to add labels on x and y axis
  * @param{node} svg -  is a html node on which the graph is being ploted
  */
 addLabels = function(svg, spectrumParameters){
 
 	svg.append("text").attr("id","label")
-						.attr("transform","translate(" + (spectrumParameters.svgWidth/2) + "," + (spectrumParameters.svgHeight-spectrumParameters.labelAdjustVal) + ")")
+						.attr("transform","translate(" + (spectrumParameters.svgWidth/2) + "," + (spectrumParameters.svgHeight-spectrumParameters.graphFeatures.padding.bottom +spectrumParameters.graphFeatures.adjustableHeightVal) + ")")
 					.attr("fill","black")
 					    .attr("font-family","Helvetica Neue,Helvetica,Arial,sans-serif")
 					    .attr("font-size","16px")
@@ -574,6 +675,12 @@ function drawSpectrum(svgId, spectrumParameters, peakData,ionData){
 	if(spectrumParameters.graphFeatures.showSequene)
 	{
 		drawSequence(svg,spectrumParameters);
+	}
+	if(spectrumParameters.graphFeatures.addErrorPlot)
+	{
+		addErrorPlot(svg,spectrumParameters);
+		drawErrorYticks(svg,spectrumParameters);
+		drawErrorPoints(svg,spectrumParameters);
 	}
 	return spectrumParameters;
 }

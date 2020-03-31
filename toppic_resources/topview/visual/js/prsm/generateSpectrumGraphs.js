@@ -28,11 +28,14 @@ function generateCorrespondingGraph(current_data,id,prec_mz,specId){
         massShift_in = calculatePrefixAndSuffixMassObj.getIonTypeMass("Y");
         let suffixMassList = calculatePrefixAndSuffixMassObj.getSuffixMassList(seq,massShiftList,massShift_in);
         graphFeatures.showSequene = true;
+        graphFeatures.addErrorPlot = true;
         graphFeatures.prefixSequenceData = prefixMassList;
         graphFeatures.suffixSequeceData = suffixMassList;
-        graphFeatures.svgHeight = graphFeatures.svgHeight+graphFeatures.adjustableHeightVal;
+        graphFeatures.svgHeight = graphFeatures.svgHeight + graphFeatures.adjustableHeightVal + graphFeatures.heightForErrorPlot;
         graphFeatures.padding.head = graphFeatures.padding.head + graphFeatures.adjustableHeightVal;
+        graphFeatures.padding.bottom = graphFeatures.padding.bottom + graphFeatures.heightForErrorPlot;
         graphFeatures.adjustableIonPosition = 10;
+        graphFeatures.errorListData = json2ErrorDataList(prsm_data.prsm);
         // Current Data itself contains Peak data
         spectrumgraph = new addSpectrum(id, current_data, null, prec_mz, current_data,graphFeatures);
     }   

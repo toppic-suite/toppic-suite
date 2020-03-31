@@ -69,7 +69,6 @@ function createTableElements(){
 			loop_matched_ions(peak,i) ;
 		}
 	})
-	
 	//after looping through the prsm files, store the ion type data to local storage
 	window.localStorage.setItem('ionType', ionArray);
 	
