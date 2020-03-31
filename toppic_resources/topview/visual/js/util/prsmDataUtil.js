@@ -189,3 +189,13 @@ function json2OtherPtmOccurences(prsm)
 	}
 	return backgroundColorAndMassShift;
 }
+function json2ErrorDataList(prsm){
+	let errorDataList = [];
+	prsm.ms.peaks.peak.forEach((peak) => {
+		if(peak.hasOwnProperty('matched_ions_num'))
+		{
+			errorDataList.push(peak.matched_ions.matched_ion);
+		}
+	})
+	return errorDataList;
+}
