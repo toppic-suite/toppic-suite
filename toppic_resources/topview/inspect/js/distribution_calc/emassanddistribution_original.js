@@ -12,39 +12,22 @@ class CalculateEmassAndDistribution{
 		this.toleraceMassDiff = 0.02;
 	}
 	/**
-	 * Function to add fixed ptm and mass shift value to amino acid distribution 
-	 * Using the position of mass shift stored in completeMassShiftList, which was filtered
-	 * to have only those positions inside the seq passed to emass
-	 * add the mass value to the single site only
-	 * (then it will be reflected in later sequence as well)
-	 */
-	addMassShift(curIndex, aminoacidDist, massShiftList){
-		for (let i = 0; i < massShiftList.length; i++){
-			if (curIndex == massShiftList[i].position){
-				for (let a = 0; a < aminoacidDist.length; a++){
-					aminoacidDist[a].mass = aminoacidDist[a].mass + massShiftList[i].mass;		
-				}
-			}
-		}
-		return aminoacidDist;
-	}
-	/**
 	 * Function to calculate the emass distrubution fo the given sequence
 	 * @param {String} seq - Contains the sequence provide by the user
 	 * @param {Array} peakDataList - Contains the peak list provided by the user
 	 * @param {Float} charge - Contains the chrage of the ion
 	 * @param {String} pref_suffInd - Indicator to indiace prefix or suffix
 	 */
-	emass(seq,peakDataList,charge,pref_suffInd, massShiftList)
+	
+	emass(seq,peakDataList,charge,pref_suffInd)
 	{
 		let AcidArray = seq ;
 		let AcidArrayLen= AcidArray.length;
 		let totDistributionList = [] ;
 		
 		for(let i = 0; i < AcidArrayLen ; i++)
-		{	
+		{
 			let aminoAcidDist = getAminoAcidDistribution(AcidArray[i]);
-			aminoAcidDist = this.addMassShift(i, aminoAcidDist, massShiftList);
 			totDistributionList = this.getMassAndIntensity(totDistributionList,aminoAcidDist) ;
 		}
 		

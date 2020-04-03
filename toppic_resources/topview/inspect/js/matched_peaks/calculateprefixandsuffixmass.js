@@ -75,6 +75,7 @@ calculatePrefixAndSuffixMass = function(){
 			{
 				// Get Calculated AminoAcidDistribution from aminoAcidDistributuion.js
 				let AcidMass = getAminoAcidDistribution(sequence[i])[0].mass;
+
 				if(i == temp_seqln)
 				{
 					// Add 1 to i as the seq start from 0 but the peak id starts from 1
