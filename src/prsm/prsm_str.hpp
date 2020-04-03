@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 #include <vector>
 #include <string>
 
-#include "prsm/mass_shift_str.hpp"
+#include "seq/mass_shift.hpp"
 
 namespace toppic {
 
@@ -51,13 +51,13 @@ class PrsmStr {
 
   int getPrecursorId() {return precursor_id_;}
 
-  int getPrecFeatureId() {return precursor_feature_id_;}
+  int getSampleFeatureId() {return sample_feature_id_;}
 
   int getUnexpectedPtmNum() {return unexpected_ptm_num_;}
 
   int getVariablePtmNum() {return variable_ptm_num_;}
 
-  double getPrecFeatureInte() {return precursor_feature_inte_;}
+  double getPrecFeatureInte() {return sample_feature_inte_;}
 
   double getMatchFragNum() {return match_frag_num_;}
 
@@ -73,7 +73,7 @@ class PrsmStr {
 
   double getAdjustedPrecMass() {return adjusted_prec_mass_;}
 
-  std::vector<MassShiftStrPtr> getChangeStrVec() {return mass_shift_vec_;}
+  std::vector<MassShiftPtr> getMassShiftVec() {return mass_shift_vec_;}
 
   std::string getProteinMatchSeq() {return protein_match_seq_;}
 
@@ -142,7 +142,9 @@ class PrsmStr {
 
   int precursor_id_;
 
-  int precursor_feature_id_;
+  int sample_feature_id_;
+
+  double sample_feature_inte_;
 
   int unexpected_ptm_num_;
 
@@ -151,8 +153,6 @@ class PrsmStr {
   int proteoform_start_pos_;
 
   int proteoform_end_pos_;
-
-  double precursor_feature_inte_;
 
   double ori_prec_mass_;
 
@@ -168,7 +168,7 @@ class PrsmStr {
 
   double proteoform_fdr_;
 
-  std::vector<MassShiftStrPtr> mass_shift_vec_;
+  std::vector<MassShiftPtr> mass_shift_vec_;
 
   std::string protein_match_seq_;
 

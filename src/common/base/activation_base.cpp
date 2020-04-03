@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@ ActivationPtr ActivationBase::getActivationPtrByName(const std::string &name) {
   return ActivationPtr(nullptr);
 }
 
-ActivationPtr ActivationBase::getActivationPtrFromXml(XmlDOMElement * element) {
+ActivationPtr ActivationBase::getActivationPtrFromXml(XmlDOMElement* element) {
   std::string name = Activation::getNameFromXml(element);
   ActivationPtr activation_ptr = getActivationPtrByName(name);
   return activation_ptr;

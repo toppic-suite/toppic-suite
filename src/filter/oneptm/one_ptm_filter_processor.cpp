@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -22,7 +22,8 @@
 #include "seq/proteoform_factory.hpp"
 
 #include "ms/spec/msalign_util.hpp"
-#include "ms/spec/spectrum_set.hpp"
+#include "ms/factory/prm_ms_factory.hpp"
+#include "ms/factory/spectrum_set_factory.hpp"
 
 #include "prsm/simple_prsm_xml_writer_set.hpp"
 #include "prsm/simple_prsm_str_merge.hpp"
@@ -32,31 +33,32 @@
 
 namespace toppic {
 
-
 inline void filterBlock(const ProteoformPtrVec & raw_forms,
                         int block_idx, 
                         OnePtmFilterMngPtr mng_ptr,
                         const std::vector<double> & mod_mass_list) {
   std::string block_str = str_util::toString(block_idx);
-  MassOnePtmFilterPtr filter_ptr = std::make_shared<MassOnePtmFilter>(raw_forms, mng_ptr);
-  int group_spec_num = mng_ptr->prsm_para_ptr_->getGroupSpecNum();
+
+  MassOnePtmFilterPtr filter_ptr = std::make_shared<MassOnePtmFilter>(raw_forms, mng_ptr, block_str);
+
   PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
-  MsAlignReader reader(prsm_para_ptr->getSpectrumFileName(), 
-                       group_spec_num,
-                       prsm_para_ptr->getSpParaPtr()->getActivationPtr(),
-                       prsm_para_ptr->getSpParaPtr()->getSkipList());
+  std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
+  int group_spec_num = prsm_para_ptr->getGroupSpecNum();
+  SimpleMsAlignReaderPtr reader_ptr = std::make_shared<SimpleMsAlignReader>(sp_file_name, 
+                                                                            group_spec_num,
+                                                                            sp_para_ptr->getActivationPtr());
   std::string output_file_name = file_util::basename(prsm_para_ptr->getSpectrumFileName())
       + "." + mng_ptr->output_file_ext_ + "_" + block_str;
   SimplePrsmXmlWriterSet writers(output_file_name);
 
-  SpectrumSetPtrVec spec_set_vec = reader.getNextSpectrumSet(sp_para_ptr);
+  SpectrumSetPtr spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(reader_ptr, sp_para_ptr);
 
-  while (spec_set_vec[0] != nullptr) {
-    if (spec_set_vec[0]->isValid()) {
+  while (spec_set_ptr != nullptr) {
+    if (spec_set_ptr->isValid()) {
       if (mng_ptr->var_num_ == 0) {
-        PrmMsPtrVec prm_ms_ptr_vec = spec_set_vec[0]->getMsTwoPtrVec();
-        PrmMsPtrVec srm_ms_ptr_vec = spec_set_vec[0]->getSuffixMsTwoPtrVec();
+        PrmMsPtrVec prm_ms_ptr_vec = spec_set_ptr->getMsTwoPtrVec();
+        PrmMsPtrVec srm_ms_ptr_vec = spec_set_ptr->getSuffixMsTwoPtrVec();
         filter_ptr->computeBestMatch(prm_ms_ptr_vec, srm_ms_ptr_vec);
         writers.getCompleteWriterPtr()->write(filter_ptr->getCompMatchPtrs());
         writers.getPrefixWriterPtr()->write(filter_ptr->getPrefMatchPtrs());
@@ -68,8 +70,13 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
           for (size_t k1 = 0; k1 < mod_mass.size(); k1++) {
             std::fill(mod_mass.begin(), mod_mass.end(), 0.0);
             mod_mass[k1] += mod_mass_list[i];
-            PrmMsPtrVec prm_ms_ptr_vec = spec_set_vec[0]->getMsTwoPtrVec(sp_para_ptr, mod_mass);
-            PrmMsPtrVec srm_ms_ptr_vec = spec_set_vec[0]->getSuffixMsTwoPtrVec(sp_para_ptr, mod_mass);
+            DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
+            double prec_mono_mass = spec_set_ptr->getPrecMonoMass();
+            PrmMsPtrVec prm_ms_ptr_vec = prm_ms_factory::geneMsTwoPtrVec(deconv_ms_ptr_vec,
+                                                                         sp_para_ptr,
+                                                                         prec_mono_mass, mod_mass);
+            PrmMsPtrVec srm_ms_ptr_vec = prm_ms_factory::geneSuffixMsTwoPtrVec(deconv_ms_ptr_vec, sp_para_ptr,
+                                                                               prec_mono_mass, mod_mass);
             filter_ptr->computeBestMatch(prm_ms_ptr_vec, srm_ms_ptr_vec);
             writers.getCompleteWriterPtr()->write(filter_ptr->getCompMatchPtrs());
             writers.getPrefixWriterPtr()->write(filter_ptr->getPrefMatchPtrs());
@@ -91,9 +98,8 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
     mng_ptr->mutex_.lock();
     std::cout << msg.str();
     mng_ptr->mutex_.unlock();
-    spec_set_vec = reader.getNextSpectrumSet(sp_para_ptr);
+    spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(reader_ptr, sp_para_ptr);
   }
-  reader.close();
   writers.close();
 }
 
@@ -121,9 +127,11 @@ void OnePtmFilterProcessor::process() {
   if (mng_ptr_->residueModFileName_ != "") {
     mod_mass_list = mod_util::getModMassVec(mod_util::readModTxt(mng_ptr_->residueModFileName_)[2]);
   }
-
   int spec_num = msalign_util::getSpNum(prsm_para_ptr->getSpectrumFileName());
   // n_spec_block = spec_num * block_num
+  if (prsm_para_ptr->getGroupSpecNum() > 1){
+    spec_num = (int)(spec_num/2);
+  }
   mng_ptr_->n_spec_block_ = spec_num * db_block_ptr_vec.size();
   SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(mng_ptr_->thread_num_);
   int block_num = db_block_ptr_vec.size();
@@ -144,5 +152,4 @@ void OnePtmFilterProcessor::process() {
                                         mng_ptr_->comp_num_, mng_ptr_->pref_suff_num_, mng_ptr_->inte_num_ );
   std::cout << "One PTM filtering - combining blocks finished." << std::endl;
 }
-
 } /* namespace toppic */

@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 #ifndef TOPPIC_SEARCH_GRAPH_SPEC_GRAPH_READER_HPP_
 #define TOPPIC_SEARCH_GRAPH_SPEC_GRAPH_READER_HPP_
 
-#include "ms/spec/msalign_reader.hpp"
+#include "ms/spec/simple_msalign_reader.hpp"
 #include "search/graph/spec_graph.hpp"
 
 namespace toppic {
@@ -32,7 +32,7 @@ class SpecGraphReader {
   SpecGraphPtrVec getNextSpecGraphPtrVec(SpectrumSetPtr spec_set_ptr, int error);
 
  private:
-  MsAlignReaderPtr ms_reader_ptr_;
+  SimpleMsAlignReaderPtr ms_reader_ptr_;
   int group_sp_num_;
   double convert_ratio_;
   SpParaPtr sp_para_ptr_;

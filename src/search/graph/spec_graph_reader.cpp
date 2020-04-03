@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -13,6 +13,8 @@
 //limitations under the License.
 
 #include "common/base/mass_constant.hpp"
+#include "ms/factory/prm_ms_util.hpp"
+#include "ms/factory/spectrum_set_factory.hpp"
 #include "search/graph/spec_graph_reader.hpp"
 
 namespace toppic {
@@ -21,9 +23,8 @@ SpecGraphReader::SpecGraphReader(const std::string &sp_file_name,
                                  int group_sp_num,
                                  double convert_ratio,
                                  SpParaPtr sp_para_ptr) {
-  ms_reader_ptr_ = std::make_shared<MsAlignReader>(sp_file_name, group_sp_num,
-                                                   sp_para_ptr->getActivationPtr(),
-                                                   sp_para_ptr->getSkipList());
+  ms_reader_ptr_ = std::make_shared<SimpleMsAlignReader>(sp_file_name, group_sp_num,
+                                                         sp_para_ptr->getActivationPtr());
   group_sp_num_ = group_sp_num;
   convert_ratio_ = convert_ratio;
   sp_para_ptr_ = sp_para_ptr;
@@ -56,7 +57,7 @@ MassGraphPtr SpecGraphReader::getMassGraphPtr(const PrmPeakPtrVec &peak_vec) {
 }
 
 SpecGraphPtrVec SpecGraphReader::getNextSpecGraphPtrVec(int error) {
-  SpectrumSetPtr spec_set_ptr = ms_reader_ptr_->getNextSpectrumSet(sp_para_ptr_)[0];
+  SpectrumSetPtr spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(ms_reader_ptr_, sp_para_ptr_);
   return getNextSpecGraphPtrVec(spec_set_ptr, error);
 }
 
@@ -81,9 +82,9 @@ SpecGraphPtrVec SpecGraphReader::getNextSpecGraphPtrVec(SpectrumSetPtr spec_set_
     LOG_DEBUG("valid");
     for (size_t i = 0; i < prec_errors.size(); i++) {
       SpectrumSetPtr adjusted_spec_set_ptr
-          = std::make_shared<SpectrumSet>(deconv_ms_ptr_vec, sp_para_ptr_, prec_mono_mass + prec_errors[i]);
+          = spectrum_set_factory::geneSpectrumSetPtr(deconv_ms_ptr_vec, sp_para_ptr_, prec_mono_mass + prec_errors[i]);
       PrmMsPtrVec ms_six_vec = adjusted_spec_set_ptr->getMsSixPtrVec();
-      PrmPeakPtrVec peak_vec = prm_ms::getPrmPeakPtrs(ms_six_vec, sp_para_ptr_->getPeakTolerancePtr());
+      PrmPeakPtrVec peak_vec = prm_ms_util::getPrmPeakPtrs(ms_six_vec, sp_para_ptr_->getPeakTolerancePtr());
       MassGraphPtr graph_ptr = getMassGraphPtr(peak_vec); 
       LOG_DEBUG("search/graph complete");
       SpecGraphPtr spec_graph_ptr

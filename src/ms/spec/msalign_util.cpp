@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -14,26 +14,25 @@
 
 
 #include "common/util/logger.hpp"
+#include "ms/spec/simple_msalign_reader.hpp"
 #include "ms/spec/msalign_util.hpp"
-#include "ms/spec/msalign_reader.hpp"
 
 namespace toppic {
 
 namespace msalign_util {
 
-int countSpNum(const std::string &spectrum_file_name, SpParaPtr sp_para_ptr) {
-  MsAlignReader reader(spectrum_file_name, 1, nullptr, sp_para_ptr->getSkipList());
+int countSpNum(const std::string &spectrum_file_name) {
+  SimpleMsAlignReader reader(spectrum_file_name);
   int cnt = 0;
   DeconvMsPtr deconv_ms_ptr;
-  while ((deconv_ms_ptr = reader.getNextMs()) != nullptr) {
+  while ((deconv_ms_ptr = reader.getNextMsPtr()) != nullptr) {
     cnt++;
   }
-  reader.close();
   return cnt;
 }
 
-void geneSpIndex(const std::string &spectrum_file_name, SpParaPtr sp_para_ptr) {
-  int sp_num = countSpNum(spectrum_file_name, sp_para_ptr); 
+void geneSpIndex(const std::string &spectrum_file_name) {
+  int sp_num = countSpNum(spectrum_file_name); 
   std::ofstream index_output;
   std::string index_file_name = spectrum_file_name + "_index";
   index_output.open(index_file_name.c_str(), std::ios::out);
@@ -51,35 +50,6 @@ int getSpNum(const std::string &spectrum_file_name) {
   LOG_DEBUG("Get sp number " << sp_num);
   return sp_num;
 }
-
-/*
-void mergeMsalignFiles(const std::vector<std::string> & spec_file_lst,
-                       int N, const std::string & output_file) {
-  std::ofstream outfile; 
-  outfile.open(output_file.c_str());
-
-  for (size_t i = 0; i < spec_file_lst.size(); i++) {
-    MsAlignReader sp_reader(spec_file_lst[i], 1, nullptr, std::set<std::string>());
-    std::vector<std::string> ms_lines = sp_reader.readOneStrSpectrum();
-    while (ms_lines.size() > 0) {
-      for (size_t k = 0; k< ms_lines.size(); k++) {
-        if (ms_lines[k].substr(0, 3) == "ID=") {
-          outfile << "ID=" << (N * i + std::stoi(ms_lines[k].substr(3))) << std::endl;
-        } else if (ms_lines[k].substr(0, 10) == "MS_ONE_ID=") {
-          outfile << "MS_ONE_ID=" << (N * i + std::stoi(ms_lines[k].substr(10))) << std::endl;
-        } else {
-          outfile << ms_lines[k] << std::endl;
-        }
-      }
-      outfile << std::endl;
-      ms_lines = sp_reader.readOneStrSpectrum();
-    }
-    sp_reader.close();
-  }
-
-  outfile.close();
-}
-*/
 
 } // namespace msalign_util
 

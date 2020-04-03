@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ namespace toppic {
 
 namespace fasta_sub_util {
 
+// break sequences into subsequences with length 2000
 FastaSubSeqPtrVec breakSeq(FastaSeqPtr seq_ptr);
 
 FastaSubSeqPtrVec breakSeq(FastaSeqPtr seq_ptr, int N);

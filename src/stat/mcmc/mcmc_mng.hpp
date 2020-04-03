@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 
 #include <cmath>
 
-#include "prsm/prsm_para.hpp"
+#include "para/prsm_para.hpp"
 
 namespace toppic {
 
@@ -64,6 +64,10 @@ class MCMCMng {
   double error_tolerance_;
 
   int int_tolerance_;
+
+  double max_ptm_mass_ = 1000000;
+
+  double max_prec_mass_ = 100000;  
 
   int getIntTolerance() {return int_tolerance_;}
 };

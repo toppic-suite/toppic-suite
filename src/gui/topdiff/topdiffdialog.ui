@@ -372,7 +372,7 @@ p, li { white-space: pre-wrap; }
      <item>
       <widget class="QLineEdit" name="outputEdit">
        <property name="text">
-        <string>sample_diff.csv</string>
+        <string>sample_diff.tsv</string>
        </property>
       </widget>
      </item>

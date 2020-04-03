@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -21,16 +21,15 @@
 
 namespace toppic {
 
-SimplePrsmTableWriter::SimplePrsmTableWriter(PrsmParaPtr prsm_para_ptr,
+SimplePrsmTableWriter::SimplePrsmTableWriter(const std::string &spec_file_name, 
                                              const std::string &input_file_ext,
                                              const std::string &output_file_ext):
-    prsm_para_ptr_(prsm_para_ptr),
+    spec_file_name_(spec_file_name), 
     input_file_ext_(input_file_ext),
     output_file_ext_(output_file_ext) {}
 
 void SimplePrsmTableWriter::write() {
-  std::string spectrum_file_name  = prsm_para_ptr_->getSpectrumFileName();
-  std::string base_name = file_util::basename(spectrum_file_name);
+  std::string base_name = file_util::basename(spec_file_name_);
   std::string output_file_name = base_name + "." + output_file_ext_;
   std::ofstream file_;
   file_.open(output_file_name.c_str());

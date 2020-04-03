@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -13,9 +13,20 @@
 //limitations under the License.
 
 #include <cmath>
+#include <iostream>
+#include <fstream>
 
 #include "common/util/logger.hpp"
+#include "common/util/file_util.hpp"
+
 #include "filter/massmatch/mass_match.hpp"
+
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+
+#include <boost/serialization/vector.hpp>
+
+#include "console/toppic_argument.hpp"
 
 namespace toppic {
 
@@ -41,6 +52,77 @@ MassMatch::MassMatch(std::vector<std::vector<int>> &mass_2d,
 
   LOG_DEBUG("init indexes");
   initIndexes(mass_2d, real_shift_2d, pos_2d);
+
+}
+MassMatch::MassMatch(std::vector<std::vector<int>> &mass_2d,
+                     std::vector<std::vector<double>> &real_shift_2d,
+                     std::vector<std::vector<int>> &pos_2d,
+                     double max_proteoform_mass, double scale, bool prm) {
+  scale_ = scale;
+  LOG_DEBUG("Scale: " << scale_);
+  LOG_DEBUG("Proteoform number: " << mass_2d.size());
+
+  col_num_ = max_proteoform_mass * scale_;
+  proteo_num_ = real_shift_2d.size();
+  LOG_DEBUG("column number: " << col_num_);
+
+  LOG_DEBUG("start init");
+  initProteoformBeginEnds(real_shift_2d);
+  LOG_DEBUG("row number: " << row_num_);
+
+  LOG_DEBUG("init indexes");
+  initIndexes(mass_2d, real_shift_2d, pos_2d);
+  prm_ = prm;
+}
+void MassMatch::serializeMassMatch(std::string file_name, std::string dir_name){
+  std::string file_path = dir_name + file_util::getFileSeparator() + file_name;
+  std::ofstream new_file(file_path, std::ofstream::binary);
+
+  if(new_file.is_open()){
+    boost::archive::binary_oarchive oa(new_file, std::ios::binary);
+    oa << scale_;
+    oa << proteo_num_;
+    oa << col_num_; 
+    oa << row_num_;
+    
+    oa << proteo_row_begins_;
+    oa << proteo_row_ends_;
+    oa << row_proteo_ids_;
+    oa << trunc_shifts_;
+
+    oa << col_index_begins_;
+    oa << col_index_ends_;
+    oa << col_indexes_;
+
+    new_file.close();
+  }
+
+}
+
+ void MassMatch::deserializeMassMatch(std::string new_file, std::string dir_name){
+  std::string file_path = dir_name + file_util::getFileSeparator() + new_file;
+  std::ifstream file_to_read(file_path, std::ifstream::binary);
+
+  if (file_to_read.is_open()) {
+
+    boost::archive::binary_iarchive ia(file_to_read, std::ios::binary);
+  
+    ia >> scale_;
+    ia >> proteo_num_;
+    ia >> col_num_; 
+    ia >> row_num_;
+    
+    ia >> proteo_row_begins_;
+    ia >> proteo_row_ends_;
+    ia >> row_proteo_ids_;
+    ia >> trunc_shifts_;
+
+    ia >> col_index_begins_;
+    ia >> col_index_ends_;
+    ia >> col_indexes_;
+
+    file_to_read.close();
+  } 
 }
 
 void MassMatch::initProteoformBeginEnds(std::vector<std::vector<double>> &shift_2d) {

@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -12,11 +12,11 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include <chrono>
 #include <vector>
 
-#include "search/oneptmsearch/diagonal_header_util.hpp"
+#include "ms/factory/prm_ms_util.hpp"
+#include "search/diag/diagonal_header_util.hpp"
 #include "search/oneptmsearch/one_ptm_slow_match.hpp"
 
 namespace toppic {
@@ -149,7 +149,7 @@ void OnePtmSlowMatch::init() {
   // auto step_1 = std::chrono::high_resolution_clock::now();
   // LOG_DEBUG("Init n term diag time: " << std::chrono::duration_cast<std::chrono::nanoseconds>(step_1-start).count());
   PeakTolerancePtr tole_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
-  PrmPeakPtrVec prm_peaks = prm_ms::getPrmPeakPtrs(ms_six_ptr_vec_, tole_ptr);
+  PrmPeakPtrVec prm_peaks = prm_ms_util::getPrmPeakPtrs(ms_six_ptr_vec_, tole_ptr);
   int group_spec_num = ms_six_ptr_vec_.size();
   BasicDiagonalPtrVec diagonal_ptrs = geneDiagonals(n_term_shift_header_ptrs,
                                                     prm_peaks, group_spec_num,

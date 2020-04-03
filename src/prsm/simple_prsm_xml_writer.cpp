@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 #include "common/xml/xml_dom_document.hpp"
 #include "common/xml/xml_dom_util.hpp"
 #include "common/xml/xml_dom_impl.hpp"
-#include "ms/spec/msalign_reader.hpp"
 #include "prsm/simple_prsm_xml_writer.hpp"
 
 namespace toppic {

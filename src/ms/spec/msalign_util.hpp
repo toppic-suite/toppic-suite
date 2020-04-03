@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -16,21 +16,17 @@
 #ifndef TOPPIC_MS_SPEC_MSALIGN_UTIL_HPP_
 #define TOPPIC_MS_SPEC_MSALIGN_UTIL_HPP_
 
-#include "ms/spec/sp_para.hpp"
-#include "ms/spec/msalign_reader.hpp"
+#include "para/sp_para.hpp"
 
 namespace toppic {
 
 namespace msalign_util {
 
-int countSpNum(const std::string &spectrum_file, SpParaPtr sp_para_ptr);
+int countSpNum(const std::string &spectrum_file);
 
-void geneSpIndex(const std::string &spectrum_file_name, SpParaPtr sp_para_ptr);
+void geneSpIndex(const std::string &spectrum_file_name);
 
 int getSpNum(const std::string &spectrum_file_name);
-
-void mergeMsalignFiles(const std::vector<std::string> & spec_file_lst, int N,
-                       const std::string & output_file);
 
 }  // namespace msalign_util
 

@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
 
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
-#include "ms/spec/extend_ms_factory.hpp"
-#include "ms/spec/msalign_reader.hpp"
+#include "ms/factory/extend_ms_factory.hpp"
+#include "ms/factory/spectrum_set_factory.hpp"
 #include "ms/feature/spec_feature.hpp"
 #include "ms/feature/spec_feature_reader.hpp"
 #include "prsm/prsm_reader.hpp"
@@ -120,12 +120,12 @@ bool isMatchMs(PrsmPtr prsm_ptr, MsHeaderPtr header_ptr) {
 }
 
 void addSpectrumPtrsToPrsms(PrsmPtrVec &prsm_ptrs, PrsmParaPtr prsm_para_ptr) {
-  MsAlignReader reader(prsm_para_ptr->getSpectrumFileName(),
-                       prsm_para_ptr->getGroupSpecNum(),
-                       prsm_para_ptr->getSpParaPtr()->getActivationPtr(),
-                       prsm_para_ptr->getSpParaPtr()->getSkipList());
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
-  SpectrumSetPtr spec_set_ptr = reader.getNextSpectrumSet(sp_para_ptr)[0];
+  SimpleMsAlignReaderPtr ms_reader_ptr 
+      = std::make_shared<SimpleMsAlignReader>(prsm_para_ptr->getSpectrumFileName(),
+                                              prsm_para_ptr->getGroupSpecNum(),
+                                              sp_para_ptr->getActivationPtr());
+  SpectrumSetPtr spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(ms_reader_ptr, sp_para_ptr);
   // use prsm order information (ordered by spectrum id then prec id)
   int start_prsm = 0;
   while (spec_set_ptr != nullptr) {
@@ -151,9 +151,8 @@ void addSpectrumPtrsToPrsms(PrsmPtrVec &prsm_ptrs, PrsmParaPtr prsm_para_ptr) {
         }
       }
     }
-    spec_set_ptr = reader.getNextSpectrumSet(sp_para_ptr)[0];
+    spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(ms_reader_ptr, sp_para_ptr);
   }
-  reader.close();
 }
 
 void addFeatureIDToPrsms(PrsmStrPtrVec &prsm_ptrs, const std::string & feature_file_name) {
@@ -189,7 +188,7 @@ void addFeatureIDToPrsms(PrsmStrPtrVec &prsm_ptrs, const std::string & feature_f
 void removePrsmsWithoutFeature(PrsmStrPtrVec &prsm_ptrs, 
                                PrsmStrPtrVec &filtered_prsm_ptrs) {
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
-    if (prsm_ptrs[i]->getPrecFeatureId() >=0) {
+    if (prsm_ptrs[i]->getSampleFeatureId() >=0) {
       filtered_prsm_ptrs.push_back(prsm_ptrs[i]);
     }
   }

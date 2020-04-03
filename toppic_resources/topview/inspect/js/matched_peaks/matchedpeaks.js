@@ -131,6 +131,12 @@ class MatchedPeaks {
 		let calEmassAndDistObj = new CalculateEmassAndDistribution();
 		let molecularFormObj = new MolecularFormulae();
 		let seqln = sequence.length;
+		
+		//matchedUnmatchedlist sort by intensity
+		matchedUnMatchedList.sort(function(x,y){
+			return d3.descending(x.intensity, y.intensity);
+		})
+
 		for(let i = 0; i < len; i++)
 		{
 			let distributionList = {};
@@ -183,22 +189,26 @@ class MatchedPeaks {
 			{
 				distributionList.mono_mass = matchedUnMatchedList[i].mass;
 				distributionList.charge = matchedUnMatchedList[i].charge;
-				distributionList.env_peaks = molecularFormObj.emass(distributionList.mono_mass,distributionList.charge,peakDataList);
+				let peaks = molecularFormObj.emass(distributionList.mono_mass,distributionList.charge,peakDataList);
+				distributionList.env_peaks = peaks[0];
+				peakDataList = peaks[1];
+				
 				totalDistribution.push(distributionList);
 			}
 		}
 		if(totalDistribution.length != 0)
-		{
+		{	 
 			totalDistribution.sort(function(x,y){
 				return d3.ascending(x.env_peaks[0].mz, y.env_peaks[0].mz);
 			})
 		}
-		
 		let envlength = totalDistribution.length;
 		let colorListsize = this.colors.length;
+		
 		while(envlength--){
 			let index = envlength%colorListsize ;
 			totalDistribution[envlength].color = this.colors[index] ;
+			
 		}
 
 		let totalDistributionCopy = [];
@@ -228,6 +238,7 @@ class MatchedPeaks {
 		this.compareTwoComputation(totalDistribution, totalDistributionCopy)
 		return totalDistribution ;
 	}
+
 	compareTwoComputation(amino, molecular){
 		let orderMatched = 0;
 		let matchFound = false;
@@ -307,7 +318,6 @@ class MatchedPeaks {
 			}
 			let mass = prefixOrSuffixMassList[j].mass;
 			let matchedInd = "N";
-			let charge = 1;// Setting Default Value
 			for(let i=0; i < len; i++)
 			{
 				let massDiff = monoMassList_temp[i].mass - prefixOrSuffixMassList[j].mass ;
@@ -327,12 +337,11 @@ class MatchedPeaks {
 						}
 						mass = prefixOrSuffixMassList[j].mass;
 						matchedInd = "Y";
-						charge = monoMassList_temp[i].charge;
 						break;
 					}
 				}
 			}
-			MatchedAndUnMatchedListObj = {position:position,mass:mass,charge:charge,matchedInd:matchedInd};
+			MatchedAndUnMatchedListObj = {position:position,mass:mass,matchedInd:matchedInd};
 			MatchedAndUnMatchedList.push(MatchedAndUnMatchedListObj);
 		}
 		return MatchedAndUnMatchedList;

@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -17,10 +17,11 @@
 #include <vector>
 
 #include "common/util/logger.hpp"
+#include "common/base/activation.hpp"
 #include "seq/proteoform.hpp"
 #include "seq/proteoform_factory.hpp"
-#include "common/base/activation.hpp"
-#include "ms/spec/extend_ms_factory.hpp"
+#include "ms/factory/extend_ms_factory.hpp"
+#include "ms/factory/extend_ms_util.hpp"
 #include "ms/spec/theo_peak.hpp"
 #include "prsm/theo_peak_util.hpp"
 #include "prsm/prsm_algo.hpp"
@@ -91,7 +92,7 @@ void ZeroPtmSlowMatch::compScore (const ExtendMsPtrVec &refine_ms_ptr_vec) {
                                                  activation_ptr, min_mass);
 
     std::vector<double> theo_masses = theo_peak_util::getTheoMassVec(theo_peak_ptrs);
-    std::vector<double> ms_masses = extend_ms::getExtendMassVec(refine_ms_ptr_vec[i]);
+    std::vector<double> ms_masses = extend_ms_util::getExtendMassVec(refine_ms_ptr_vec[i]);
     score_ += prsm_algo::compNumMatchedTheoMasses(ms_masses, theo_masses, ppo);
   }
 }

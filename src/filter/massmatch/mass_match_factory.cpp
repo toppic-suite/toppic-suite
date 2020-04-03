@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -106,7 +106,8 @@ inline MassMatchPtr getMassMatchPtr(const ProteoformPtrVec &proteo_ptrs,
 
   LOG_DEBUG("pos 2d ver 1 complete");
   MassMatchPtr index_ptr = std::make_shared<MassMatch>(mass_2d, real_shift_2d, pos_2d,
-                                                       max_proteoform_mass, scale);
+                                                       max_proteoform_mass, scale, prm);
+ 
   return index_ptr;
 }
 

@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 #ifndef TOPPIC_SEARCH_ONE_PTM_SEARCH_DP_PAIR_HPP_
 #define TOPPIC_SEARCH_ONE_PTM_SEARCH_DP_PAIR_HPP_
 
+#include "search/diag/diagonal_header.hpp"
 #include "search/oneptmsearch/pair.hpp"
-#include "search/oneptmsearch/diagonal_header.hpp"
 
 namespace toppic {
 

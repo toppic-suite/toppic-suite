@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ FeatureSampleMerge::FeatureSampleMerge(const std::vector<std::string> &input_fil
 void matchPrsms(FeaturePrsmPtrVec &features, PrsmStrPtrVec &prsms) {
   for (size_t i = 0; i < prsms.size(); i++) {
     PrsmStrPtr prsm = prsms[i];
-    int id = prsms[i]->getPrecFeatureId();
+    int id = prsms[i]->getSampleFeatureId();
     if (id < 0) {
       LOG_ERROR("Prsm file does not contain feature information!");
       exit(EXIT_FAILURE);
@@ -327,44 +327,45 @@ void FeatureSampleMerge::outputTable(FeaturePrsmPtrVec2D &table,
   std::ofstream file;
   file.open(output_file_name_.c_str());
   // write title
-  file << "Protein accession" << ","
-      << "Protein description" << ","
-      << "First residue" << ","
-      << "Last residue" << ","
-      << "Proteoform" << ","
-      << "Precursor mass" << ",";
+  std::string delim = "\t";
+  file << "Protein accession" << delim
+      << "Protein description" << delim
+      << "First residue" << delim
+      << "Last residue" << delim
+      << "Proteoform" << delim
+      << "Precursor mass" << delim;
 
   for (int i = 0; i < sample_num; i++) {
-    file << input_file_names_[i] << " Abundance" << ","
-        << input_file_names_[i] << " Spectrum id" << ","
-        << input_file_names_[i] << " Retention time begin" << ","
-        << input_file_names_[i] << " Retention time end" << ",";
+    file << input_file_names_[i] << " Abundance" << delim
+        << input_file_names_[i] << " Spectrum id" << delim
+        << input_file_names_[i] << " Retention time begin" << delim
+        << input_file_names_[i] << " Retention time end" << delim;
   }
   file << std::endl;
   int cluster_num = table.size();
   for (int i = 0; i < cluster_num; i++) {
     FeaturePrsmPtr feature_ptr = examples[i];
-    file << feature_ptr->getProtName() << ","
-        << "\"" << feature_ptr->getProtDesc() << "\"" << ","
-        << (feature_ptr->getFirstResidue() + 1) << ","
-        << (feature_ptr->getLastResidue() + 1) << ","
-        << feature_ptr->getProteoform() << ","
-        << feature_ptr->getPrecMass() << ",";
+    file << feature_ptr->getProtName() << delim
+        << "\"" << feature_ptr->getProtDesc() << "\"" << delim
+        << (feature_ptr->getFirstResidue() + 1) << delim
+        << (feature_ptr->getLastResidue() + 1) << delim
+        << feature_ptr->getProteoform() << delim
+        << feature_ptr->getPrecMass() << delim;
     for (int j = 0; j < sample_num; j++) {
       FeaturePrsmPtr sample_feature = table[i][j];
       if (sample_feature == nullptr) {
-        file << "," << "," << "," << ",";
+        file << delim << delim << delim << delim;
       }
       else {
         file <<  std::setprecision(3) << std::scientific << sample_feature->getIntensity() << ",";
         if (sample_feature->getMs2Id()>= 0) {
-          file << std::fixed << sample_feature->getMs2Id() << ",";
+          file << std::fixed << sample_feature->getMs2Id() << delim;
         }
         else {
-          file << std::fixed << ",";
+          file << std::fixed << delim;
         }
-        file << sample_feature->getTimeBegin() << ","
-             << sample_feature->getTimeEnd() << ",";
+        file << sample_feature->getTimeBegin() << delim
+             << sample_feature->getTimeEnd() << delim;
       }
     }
     file << std::endl;

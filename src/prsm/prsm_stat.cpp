@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
 #include "common/util/file_util.hpp"
 #include "common/base/amino_acid_base.hpp"
 #include "ms/spec/peak.hpp"
-#include "ms/spec/extend_ms_factory.hpp"
-#include "ms/spec/msalign_reader.hpp"
+#include "ms/factory/extend_ms_factory.hpp"
+#include "ms/factory/spectrum_set_factory.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/peak_ion_pair.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
@@ -319,18 +319,18 @@ void PrsmStat::process() {
   PrsmPtr prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
 
   // init variables
-  MsAlignReader sp_reader(sp_file_name, group_spec_num,
-                          prsm_para_ptr_->getSpParaPtr()->getActivationPtr(),
-                          prsm_para_ptr_->getSpParaPtr()->getSkipList());
-
   SpParaPtr sp_para_ptr = prsm_para_ptr_->getSpParaPtr();
-  std::vector<SpectrumSetPtr> spec_set_vec = sp_reader.getNextSpectrumSet(sp_para_ptr);
+  SimpleMsAlignReaderPtr ms_reader_ptr = std::make_shared<SimpleMsAlignReader>(sp_file_name, 
+                                                                               group_spec_num,
+                                                                               sp_para_ptr->getActivationPtr());
 
-  while (spec_set_vec[0] != nullptr) {
-    if (spec_set_vec[0]->isValid()) {
-      int spec_id = spec_set_vec[0]->getSpectrumId();
+  SpectrumSetPtr spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(ms_reader_ptr, sp_para_ptr);
+
+  while (spec_set_ptr != nullptr) {
+    if (spec_set_ptr->isValid()) {
+      int spec_id = spec_set_ptr->getSpectrumId();
       while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_id) {
-        DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_vec[0]->getDeconvMsPtrVec();
+        DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
         prsm_ptr->setDeconvMsPtrVec(deconv_ms_ptr_vec);
         double new_prec_mass = prsm_ptr->getAdjustedPrecMass();
         ExtendMsPtrVec extend_ms_ptr_vec
@@ -340,10 +340,9 @@ void PrsmStat::process() {
         prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
       }
     }
-    spec_set_vec = sp_reader.getNextSpectrumSet(sp_para_ptr);
+    spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(ms_reader_ptr, sp_para_ptr);
   }
 
-  sp_reader.close();
   prsm_reader.close();
   // write end;
   file.close();

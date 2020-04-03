@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ namespace toppic {
 
 namespace deconv_data_util {
 
-DeconvDataPtr getDataPtr(PeakPtrVec &peak_list, double max_mass, 
+DeconvDataPtr getDataPtr(const PeakPtrVec &peak_list, double max_mass, 
                          int max_charge, double window_size) {
   if (peak_list.size() == 0) return nullptr;
   double max_mz = raw_ms_util::findMaxPos(peak_list);
@@ -29,13 +29,14 @@ DeconvDataPtr getDataPtr(PeakPtrVec &peak_list, double max_mass,
     LOG_WARN("Max mz is too large: " << max_mz);
     return nullptr;
   }
+
   return std::make_shared<DeconvData>(peak_list, max_mass, 
                                       max_charge, window_size);
 }
 
 
 // generate deconvolution data using given max mass, max charge
-DeconvDataPtr getDataPtr(PeakPtrVec &peak_list, double spec_max_mass,
+DeconvDataPtr getDataPtr(const PeakPtrVec &peak_list, double spec_max_mass,
                          int spec_max_charge, double para_max_mass, 
                          int para_max_charge, double window_size) {
   if (spec_max_charge < 1) {

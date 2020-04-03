@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@
 #include "ms/spec/deconv_ms.hpp"
 #include "ms/spec/extend_ms.hpp"
 #include "ms/spec/prm_ms.hpp"
-#include "ms/spec/sp_para.hpp"
 
 namespace toppic {
 
@@ -28,8 +27,13 @@ typedef std::vector<SpectrumSetPtr> SpectrumSetPtrVec;
 
 class SpectrumSet {
  public:
-  SpectrumSet(DeconvMsPtrVec deconv_ms_ptr_vec, SpParaPtr sp_para_ptr,
-              double prec_mono_mass);
+  SpectrumSet(DeconvMsPtrVec deconv_ms_ptr_vec, 
+              double prec_mono_mass,
+              bool valid, 
+              ExtendMsPtrVec extend_ms_three_ptr_vec,
+              PrmMsPtrVec prm_ms_two_ptr_vec,
+              PrmMsPtrVec srm_ms_two_ptr_vec,
+              PrmMsPtrVec prm_ms_six_ptr_vec);
 
   double getPrecMonoMass() {return prec_mono_mass_;}
 
@@ -43,20 +47,12 @@ class SpectrumSet {
 
   PrmMsPtrVec getMsTwoPtrVec() {return prm_ms_two_ptr_vec_;}
 
-  PrmMsPtrVec getMsTwoPtrVec(SpParaPtr sp_para_ptr, const std::vector<double> & mod_mass);
-
   PrmMsPtrVec getSuffixMsTwoPtrVec() {return srm_ms_two_ptr_vec_;}
-
-  PrmMsPtrVec getSuffixMsTwoPtrVec(SpParaPtr sp_para_ptr, const std::vector<double> & mod_mass);
 
   PrmMsPtrVec getMsSixPtrVec() {return prm_ms_six_ptr_vec_;}
 
-  PrmMsPtrVec getMsShiftSixPtrVec(double shift);
-
  private:
   DeconvMsPtrVec deconv_ms_ptr_vec_;
-
-  SpParaPtr sp_para_ptr_;
 
   double prec_mono_mass_;
 
@@ -70,7 +66,6 @@ class SpectrumSet {
 
   PrmMsPtrVec prm_ms_six_ptr_vec_;
 
-  bool checkValid(SpParaPtr sp_para_ptr);
 };
 
 } /* namespace toppic */

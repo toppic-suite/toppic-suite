@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -39,8 +39,10 @@ class Ms {
   T getPeakPtr(int i) {return peak_ptr_list_[i];}
 
   void setPeakPtrNull(int i) {peak_ptr_list_[i] = nullptr;}
-  
+
   std::vector<T> getPeakPtrVec() {return peak_ptr_list_;}
+
+  void setPeakPtrVec(std::vector<T> peak_ptr_list) {peak_ptr_list_ = peak_ptr_list;}
 
  private:
   MsHeaderPtr header_ptr_;

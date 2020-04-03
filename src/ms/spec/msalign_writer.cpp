@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this output_ except in compliance with the License.
@@ -42,7 +42,7 @@ void MsAlignWriter::close() {
 }
 
 void MsAlignWriter::writePara(const std::string &para_str) {
-  output_ << para_str;
+  output_ << para_str << "\n";
 }
 
 void MsAlignWriter::write(DeconvMsPtr ms_ptr) {
@@ -66,8 +66,16 @@ void MsAlignWriter::write(DeconvMsPtr ms_ptr) {
     output_ << "PRECURSOR_MZ=" << std::setprecision(5) 
         << header_ptr->getPrecMonoMz() << std::endl;
     output_ << "PRECURSOR_CHARGE=" << header_ptr->getPrecCharge() << std::endl;
-    output_ << "PRECURSOR_MASS=" << std::setprecision(5) 
+
+    /*
+    if (use_copied_mono_mass_){//for use in merge sort of msaligns
+      output_ << std::fixed << "PRECURSOR_MASS=" << std::setprecision(5) 
+        << header_ptr->getCopiedPrecMonoMass() << std::endl;
+    }else{
+    */
+    output_ << std::fixed << "PRECURSOR_MASS=" << std::setprecision(5) 
         << header_ptr->getPrecMonoMass() << std::endl;
+    //}
     output_ << "PRECURSOR_INTENSITY=" << std::setprecision(2) 
         <<  header_ptr->getPrecInte() << std::endl;
     /*

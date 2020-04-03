@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -76,12 +76,12 @@ TheoPeakPtrVec geneProteoformTheoPeak(ProteoformPtr proteoform_ptr,
     NeutralLossPtr neutral_loss_ptr
         = NeutralLossBase::getNeutralLossPtr_NONE();
     double max_mass = proteoform_ptr->getResSeqPtr()->getSeqMass()
-        + segments[i]->getPepNTermShift() + segments[i]->getPepCTermShift() - min_mass;
+        + segments[i]->getNTermShift() + segments[i]->getCTermShift() - min_mass;
     TheoPeakPtrVec  peaks = geneTheoPeak(bp_ptr,
                                          activation_ptr,
                                          neutral_loss_ptr,
-                                         segments[i]->getPepNTermShift(),
-                                         segments[i]->getPepCTermShift(),
+                                         segments[i]->getNTermShift(),
+                                         segments[i]->getCTermShift(),
                                          segments[i]->getLeftBpPos(),
                                          segments[i]->getRightBpPos(),
                                          min_mass,
