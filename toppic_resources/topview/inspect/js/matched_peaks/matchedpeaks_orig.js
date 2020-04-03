@@ -124,19 +124,13 @@ class MatchedPeaks {
 		return matchedAndUnmatchedList ;
 	}
 
-	getDistribution(peakDataList, sequence,matchedUnMatchedList)
+	getDistribution(peakDataList,sequence,matchedUnMatchedList)
 	{
 		let len = matchedUnMatchedList.length;
 		let totalDistribution = [] ;
 		let calEmassAndDistObj = new CalculateEmassAndDistribution();
 		let molecularFormObj = new MolecularFormulae();
 		let seqln = sequence.length;
-		
-		//matchedUnmatchedlist sort by intensity
-		matchedUnMatchedList.sort(function(x,y){
-			return d3.descending(x.intensity, y.intensity);
-		})
-
 		for(let i = 0; i < len; i++)
 		{
 			let distributionList = {};
@@ -168,33 +162,29 @@ class MatchedPeaks {
       */
 				distributionList.mono_mass = matchedUnMatchedList[i].mass;
 				distributionList.charge = matchedUnMatchedList[i].charge;
-				let peaks = molecularFormObj.emass(distributionList.mono_mass,distributionList.charge,peakDataList);
-				distributionList.env_peaks = peaks[0];
-				peakDataList = peaks[1];
-				
+				distributionList.env_peaks = molecularFormObj.emass(distributionList.mono_mass,distributionList.charge,peakDataList);
 				totalDistribution.push(distributionList);
 			//}
 		}
 		if(totalDistribution.length != 0)
-		{	 
+		{
 			totalDistribution.sort(function(x,y){
 				return d3.ascending(x.env_peaks[0].mz, y.env_peaks[0].mz);
 			})
 		}
+		
 		let envlength = totalDistribution.length;
 		let colorListsize = this.colors.length;
-		
 		while(envlength--){
 			let index = envlength%colorListsize ;
 			totalDistribution[envlength].color = this.colors[index] ;
-			
 		}
 		return totalDistribution ;
 	}
-	
 	getMatchedAndUnmatchedPrefixAndSuffixMassList(prefixOrSuffixMassList, monoMassList,
 																massErrorthVal,ppmErrorthVal,prefixInd)
 	{
+		console.log("monoMassList : ", monoMassList);
 		let MatchedAndUnMatchedList = [];
 		let monoMassList_temp = monoMassList.slice();
 		let len = monoMassList_temp.length;
@@ -210,6 +200,7 @@ class MatchedPeaks {
 			}
 			let mass = prefixOrSuffixMassList[j].mass;
 			let matchedInd = "N";
+			let charge = 1;// Setting Default Value
 			for(let i=0; i < len; i++)
 			{
 				let massDiff = monoMassList_temp[i].mass - prefixOrSuffixMassList[j].mass ;
@@ -229,11 +220,12 @@ class MatchedPeaks {
 						}
 						mass = prefixOrSuffixMassList[j].mass;
 						matchedInd = "Y";
+						charge = monoMassList_temp[i].charge;
 						break;
 					}
 				}
 			}
-			MatchedAndUnMatchedListObj = {position:position,mass:mass,matchedInd:matchedInd};
+			MatchedAndUnMatchedListObj = {position:position,mass:mass,charge:charge,matchedInd:matchedInd};
 			MatchedAndUnMatchedList.push(MatchedAndUnMatchedListObj);
 		}
 		return MatchedAndUnMatchedList;
