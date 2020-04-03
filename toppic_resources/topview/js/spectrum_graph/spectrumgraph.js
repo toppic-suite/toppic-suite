@@ -458,7 +458,7 @@ addErrorPlot = function(svg, spectrumParameters){
 					.attr("y2",spectrumParameters.graphFeatures.svgHeight - spectrumParameters.graphFeatures.heightForErrorPlot/2 - spectrumParameters.graphFeatures.errorplot_padding.bottom)
 					.attr("stroke","black")
 					.style("stroke-dasharray", ("5, 3"))
-					.attr("stroke-width","2")
+					.attr("stroke-width","1.5")
 	// Draw y-axis
 	this.yAxis = svg.append("g").attr("id", "yaxis_errorplot").append("line")
 					.attr("x1",spectrumParameters.graphFeatures.errorplot_padding.left)
@@ -466,7 +466,31 @@ addErrorPlot = function(svg, spectrumParameters){
 					.attr("x2",spectrumParameters.graphFeatures.errorplot_padding.left)
 					.attr("y2",spectrumParameters.graphFeatures.svgHeight - spectrumParameters.graphFeatures.heightForErrorPlot - spectrumParameters.graphFeatures.errorplot_padding.bottom)
 					.attr("stroke","black")
-					.attr("stroke-width","2")
+					.attr("stroke-width","1")
+}
+addErrorBlock = function(svg, spectrumParameters){
+	let rectBlock = svg.append("g").attr("id", "rect_errorplot");
+	rectBlock.append("line")
+			.attr("x1",spectrumParameters.graphFeatures.errorplot_padding.left)
+			.attr("y1",spectrumParameters.graphFeatures.svgHeight - spectrumParameters.graphFeatures.heightForErrorPlot - spectrumParameters.graphFeatures.errorplot_padding.bottom)
+			.attr("x2",spectrumParameters.graphFeatures.specWidth + spectrumParameters.graphFeatures.errorplot_padding.left)
+			.attr("y2",spectrumParameters.graphFeatures.svgHeight - spectrumParameters.graphFeatures.heightForErrorPlot - spectrumParameters.graphFeatures.errorplot_padding.bottom)
+			.attr("stroke","black")
+			.attr("stroke-width","1")
+	rectBlock.append("line")
+			.attr("x1",spectrumParameters.graphFeatures.errorplot_padding.left)
+			.attr("y1",spectrumParameters.graphFeatures.svgHeight - spectrumParameters.graphFeatures.errorplot_padding.bottom)
+			.attr("x2",spectrumParameters.graphFeatures.specWidth + spectrumParameters.graphFeatures.errorplot_padding.left)
+			.attr("y2",spectrumParameters.graphFeatures.svgHeight - spectrumParameters.graphFeatures.errorplot_padding.bottom)
+			.attr("stroke","black")
+			.attr("stroke-width","1")
+	rectBlock.append("line")
+			.attr("x1",spectrumParameters.graphFeatures.svgWidth - spectrumParameters.graphFeatures.errorplot_padding.right)
+			.attr("y1",spectrumParameters.graphFeatures.svgHeight - spectrumParameters.graphFeatures.errorplot_padding.bottom)
+			.attr("x2",spectrumParameters.graphFeatures.svgWidth - spectrumParameters.graphFeatures.errorplot_padding.right)
+			.attr("y2",spectrumParameters.graphFeatures.svgHeight - spectrumParameters.graphFeatures.heightForErrorPlot - spectrumParameters.graphFeatures.errorplot_padding.bottom)
+			.attr("stroke","black")
+			.attr("stroke-width","1")
 }
 drawErrorYticks = function(svg, spectrumParameters){
 
@@ -546,7 +570,8 @@ drawErrorPoints = function(svg, spectrumParameters){
 addLabels = function(svg, spectrumParameters){
 
 	svg.append("text").attr("id","label")
-						.attr("transform","translate(" + (spectrumParameters.svgWidth/2) + "," + (spectrumParameters.svgHeight-spectrumParameters.graphFeatures.padding.bottom +spectrumParameters.graphFeatures.adjustableHeightVal) + ")")
+						// -5 is added simply as buffer to place m/z on top of error rect plot
+						.attr("transform","translate(" + (spectrumParameters.svgWidth/2) + "," + (spectrumParameters.svgHeight-spectrumParameters.graphFeatures.padding.bottom +spectrumParameters.graphFeatures.adjustableHeightVal - 5) + ")")
 					.attr("fill","black")
 					    .attr("font-family","Helvetica Neue,Helvetica,Arial,sans-serif")
 					    .attr("font-size","16px")
@@ -681,6 +706,7 @@ function drawSpectrum(svgId, spectrumParameters, peakData,ionData){
 		addErrorPlot(svg,spectrumParameters);
 		drawErrorYticks(svg,spectrumParameters);
 		drawErrorPoints(svg,spectrumParameters);
+		addErrorBlock(svg,spectrumParameters);
 	}
 	return spectrumParameters;
 }
