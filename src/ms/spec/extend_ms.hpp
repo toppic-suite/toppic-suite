@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -24,17 +24,6 @@ namespace toppic {
 typedef std::shared_ptr<Ms<ExtendPeakPtr> > ExtendMsPtr;
 
 typedef std::vector<ExtendMsPtr> ExtendMsPtrVec;
-
-namespace extend_ms {
-
-std::vector<double> getExtendMassVec(ExtendMsPtr extend_ms_ptr);
-
-std::vector<std::pair<int, int> > getExtendIntMassErrorList(const ExtendMsPtrVec &ext_ms_ptr_vec,
-                                                            bool pref, double scale);
-
-std::vector<std::pair<double, double> > getExtendMassToleranceList(ExtendMsPtr extend_ms_ptr);
-
-}  // namespace extend_ms
 
 }  // namespace toppic
 

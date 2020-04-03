@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -19,24 +19,32 @@
 #include <vector>
 
 namespace toppic {
+  class DpPara;
+  typedef std::shared_ptr<DpPara> DpParaPtr;
 
-class DpPara {
- public:
-  // DP algorithm
-  // Check double increasing when two envelopes overlap 
-  bool check_double_increase_ = true;
-  std::vector<std::vector<bool>> coexist_table_;
+  class DpPara {
+  public:
+    DpPara(){};
+    DpPara(DpParaPtr dp_para_ptr){
+      check_double_increase_ = dp_para_ptr->check_double_increase_;
+      coexist_table_ = dp_para_ptr->coexist_table_;
+      max_env_num_per_peak_ = dp_para_ptr->max_env_num_per_peak_;
+      dp_env_num_ = dp_para_ptr->dp_env_num_;
+      max_env_num_per_vertex_ = dp_para_ptr->max_env_num_per_vertex_;
+    };
+    // DP algorithm
+    // Check double increasing when two envelopes overlap 
+    bool check_double_increase_ = true;
+    std::vector<std::vector<bool>> coexist_table_;
 
-  // maximum number of envelopes sharing one peak 
-  int max_env_num_per_peak_ = 2;
-  // used in dpB to specify the number of output envelopes 
-  int dp_env_num_ = 300;
-  // maximum number of vertices per window 
-  int max_env_num_per_vertex_ = 10;
-};
-
-typedef std::shared_ptr<DpPara> DpParaPtr;
-
+    // maximum number of envelopes sharing one peak 
+    int max_env_num_per_peak_ = 2;
+    // used in dpB to specify the number of output envelopes 
+    int dp_env_num_ = 300;
+    // maximum number of vertices per window 
+    int max_env_num_per_vertex_ = 10;
+  };
+  
 } /* namespace */
 
 #endif 

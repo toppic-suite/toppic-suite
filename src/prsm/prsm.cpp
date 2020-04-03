@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
 #include "common/xml/xml_dom_util.hpp"
-#include "ms/spec/extend_ms_factory.hpp"
+#include "ms/factory/extend_ms_factory.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
 #include "prsm/prsm.hpp"
 
@@ -32,8 +32,6 @@ Prsm::Prsm(ProteoformPtr proteoform_ptr, const DeconvMsPtrVec &deconv_ms_ptr_vec
       spectrum_id_ = header_ptr->getId();
       spectrum_scan_ = header_ptr->getScansString();
       precursor_id_ = header_ptr->getPrecId();
-//    prec_feature_id_ = header_ptr->getFeatureId();
-//    prec_feature_inte_ = header_ptr->getFeatureInte();
       spectrum_num_ = deconv_ms_ptr_vec.size();
       ori_prec_mass_ = header_ptr->getPrecMonoMass();
       init(sp_para_ptr);
@@ -46,22 +44,6 @@ Prsm::Prsm(XmlDOMElement* element, FastaIndexReaderPtr reader_ptr,
   XmlDOMElement* form_element
       = xml_dom_util::getChildElement(element, form_elem_name.c_str(), 0);
   proteoform_ptr_ = std::make_shared<Proteoform>(form_element, reader_ptr, fix_mod_list);
-}
-
-Prsm::Prsm(const Prsm &obj) {
-  adjusted_prec_mass_ = obj.adjusted_prec_mass_;
-  proteoform_ptr_ = obj.proteoform_ptr_;
-  deconv_ms_ptr_vec_ = obj.deconv_ms_ptr_vec_;
-  file_name_ = obj.file_name_;
-  spectrum_id_ = obj.spectrum_id_;
-  spectrum_scan_ = obj.spectrum_scan_;
-  precursor_id_ = obj.precursor_id_;
-  prec_feature_id_ = obj.prec_feature_id_;
-  prec_feature_inte_ = obj.prec_feature_inte_;
-  spectrum_num_ = obj.spectrum_num_;
-  ori_prec_mass_ = obj.ori_prec_mass_;
-  match_peak_num_ = obj.match_peak_num_;
-  match_fragment_num_ = obj.match_fragment_num_;
 }
 
 void Prsm::init(SpParaPtr sp_para_ptr) {
@@ -117,10 +99,10 @@ XmlDOMElement* Prsm::toXmlElement(XmlDOMDocument* xml_doc) {
   xml_doc->addElement(element, "spectrum_scan", spectrum_scan_.c_str());
   str = str_util::toString(precursor_id_);
   xml_doc->addElement(element, "precursor_id", str.c_str());
-  str = str_util::toString(prec_feature_id_);
-  xml_doc->addElement(element, "precursor_feature_id", str.c_str());
-  str = str_util::toString(prec_feature_inte_);
-  xml_doc->addElement(element, "precursor_feature_inte", str.c_str());
+  str = str_util::toString(sample_feature_id_);
+  xml_doc->addElement(element, "sample_feature_id", str.c_str());
+  str = str_util::toString(sample_feature_inte_);
+  xml_doc->addElement(element, "sample_feature_inte", str.c_str());
   str = str_util::toString(frac_feature_score_);
   xml_doc->addElement(element, "frac_feature_score", str.c_str());
   str = str_util::toString(spectrum_num_);
@@ -157,8 +139,8 @@ void Prsm::parseXml(XmlDOMElement *element) {
   spectrum_id_ = xml_dom_util::getIntChildValue(element, "spectrum_id", 0);
   spectrum_scan_ = xml_dom_util::getChildValue(element, "spectrum_scan", 0);
   precursor_id_ = xml_dom_util::getIntChildValue(element, "precursor_id", 0);
-  prec_feature_id_ = xml_dom_util::getIntChildValue(element, "precursor_feature_id", 0);
-  prec_feature_inte_ = xml_dom_util::getDoubleChildValue(element, "precursor_feature_inte", 0);
+  sample_feature_id_ = xml_dom_util::getIntChildValue(element, "sample_feature_id", 0);
+  sample_feature_inte_ = xml_dom_util::getDoubleChildValue(element, "sample_feature_inte", 0);
   frac_feature_score_ = xml_dom_util::getDoubleChildValue(element, "frac_feature_score", 0);
   spectrum_num_ = xml_dom_util::getIntChildValue(element, "spectrum_number", 0);
   ori_prec_mass_ = xml_dom_util::getDoubleChildValue(element, "ori_prec_mass", 0);

@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -100,13 +100,14 @@ void toppicWindow::initArguments() {
   arguments_["executiveDir"] = ".";
   arguments_["resourceDir"] = "";
   arguments_["keepTempFiles"] = "false";
-  arguments_["localThreshold"] = "0.45";
+  arguments_["localThreshold"] = "0.15";
   arguments_["groupSpectrumNumber"] = "1";
   arguments_["filteringResultNumber"] = "20";
   arguments_["residueModFileName"] = "";
   arguments_["threadNumber"] = "1";
   arguments_["useFeatureFile"] = "true";
   arguments_["skipList"] = "";
+  arguments_["geneHTMLFolder"] = "";
 }
 
 void toppicWindow::on_clearButton_clicked() {
@@ -128,7 +129,7 @@ void toppicWindow::on_defaultButton_clicked() {
   ui->cutoffSpectralValueEdit->setText("0.01");
   ui->cutoffProteoformValueEdit->setText("0.01");
   ui->numCombinedEdit->setText("1");
-  ui->miscoreThresholdEdit->setText("0.45");
+  ui->miscoreThresholdEdit->setText("0.15");
   ui->threadNumberEdit->setText("1");
   ui->outputTextBrowser->setText("Click the Start button to process the spectrum files.");
   ui->fixedModComboBox->setCurrentIndex(0);
@@ -145,6 +146,7 @@ void toppicWindow::on_defaultButton_clicked() {
   ui->decoyCheckBox->setChecked(false);
   ui->lookupTableCheckBox->setChecked(false);
   ui->topfdFeatureCheckBox->setChecked(false);
+  ui->geneHTMLCheckBox->setChecked(false);
 }
 
 void toppicWindow::updatedir(QString s) {
@@ -327,6 +329,11 @@ std::map<std::string, std::string> toppicWindow::getArguments() {
   } else {
     arguments_["useFeatureFile"] = "true";
   }
+  if (ui->geneHTMLCheckBox->isChecked()) {
+    arguments_["geneHTMLFolder"] = "true";
+  } else {
+    arguments_["geneHTMLFolder"] = "false";
+  }
   //showArguments();
   return arguments_;
 }
@@ -425,6 +432,7 @@ void toppicWindow::lockDialog() {
   ui->outputButton->setEnabled(false);
   ui->addButton->setEnabled(false);
   ui->delButton->setEnabled(false);
+  ui->geneHTMLCheckBox->setEnabled(false);
 }
 
 void toppicWindow::unlockDialog() {
@@ -465,6 +473,7 @@ void toppicWindow::unlockDialog() {
   ui->outputButton->setDefault(true);
   ui->addButton->setEnabled(true);
   ui->delButton->setEnabled(true);
+  ui->geneHTMLCheckBox->setEnabled(true);
 }
 
 bool toppicWindow::checkError() {

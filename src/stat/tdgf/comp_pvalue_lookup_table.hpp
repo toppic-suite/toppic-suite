@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@
 #include <vector>
 #include <fstream>
 
+#include "stat/count/count_test_num.hpp"
 #include "stat/tdgf/tdgf_mng.hpp"
 #include "stat/tdgf/comp_prob_value.hpp"
-#include "stat/tdgf/count_test_num.hpp"
 
 namespace toppic {
 

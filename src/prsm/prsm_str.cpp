@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -14,8 +14,6 @@
 
 
 #include <limits>
-#include <string>
-#include <vector>
 #include <algorithm>
 
 #include "common/util/logger.hpp"
@@ -34,10 +32,10 @@ PrsmStr::PrsmStr(const std::vector<std::string> &str_vec) {
   spectrum_scan_ = std::stoi(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<precursor_id>");
   precursor_id_ = std::stoi(prsm_util::getValueStr(line));
-  line = prsm_util::getXmlLine(str_vec_, "<precursor_feature_id>");
-  precursor_feature_id_ = std::stoi(prsm_util::getValueStr(line));
-  line = prsm_util::getXmlLine(str_vec_, "<precursor_feature_inte>");
-  precursor_feature_inte_ = std::stod(prsm_util::getValueStr(line));
+  line = prsm_util::getXmlLine(str_vec_, "<sample_feature_id>");
+  sample_feature_id_ = std::stoi(prsm_util::getValueStr(line));
+  line = prsm_util::getXmlLine(str_vec_, "<sample_feature_inte>");
+  sample_feature_inte_ = std::stod(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<ori_prec_mass>");
   ori_prec_mass_ = std::stod(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<adjusted_prec_mass>");
@@ -81,9 +79,9 @@ PrsmStr::PrsmStr(const std::vector<std::string> &str_vec) {
   std::vector<std::string> right_pos_lines = prsm_util::getXmlLineVec(str_vec_, "<right_bp_pos>");
 
   for (size_t i = 0; i < mass_lines.size(); i++) {
-    mass_shift_vec_.push_back(std::make_shared<MassShiftStr>(std::stod(prsm_util::getValueStr(mass_lines[i])),
-                                                             std::stoi(prsm_util::getValueStr(left_pos_lines[i])),
-                                                             std::stoi(prsm_util::getValueStr(right_pos_lines[i]))));
+    mass_shift_vec_.push_back(std::make_shared<MassShift>(std::stoi(prsm_util::getValueStr(left_pos_lines[i])),
+                                                          std::stoi(prsm_util::getValueStr(right_pos_lines[i])),
+                                                          std::stod(prsm_util::getValueStr(mass_lines[i]))));
   }
 }
 
@@ -136,15 +134,15 @@ void PrsmStr::setSpectrumId(int id) {
 }
 
 void PrsmStr::setPrecFeatureId(int id) {
-  int i = getXmlLineIndex(str_vec_, "precursor_feature_id");
-  str_vec_[i] = "<precursor_feature_id>" + str_util::toString(id) + "</precursor_feature_id>";
-  precursor_feature_id_ = id;
+  int i = getXmlLineIndex(str_vec_, "sample_feature_id");
+  str_vec_[i] = "<sample_feature_id>" + str_util::toString(id) + "</sample_feature_id>";
+  sample_feature_id_ = id;
 }
 
 void PrsmStr::setPrecFeatureInte(double inte) {
-  int i = getXmlLineIndex(str_vec_, "precursor_feature_inte");
-  str_vec_[i] = "<precursor_feature_inte>" + str_util::toString(inte) + "</precursor_feature_inte>";
-  precursor_feature_inte_ = inte;
+  int i = getXmlLineIndex(str_vec_, "sample_feature_inte");
+  str_vec_[i] = "<sample_feature_inte>" + str_util::toString(inte) + "</sample_feature_inte>";
+  sample_feature_inte_ = inte;
 }
 
 void PrsmStr::setFracFeatureScore(double score) {
@@ -203,22 +201,23 @@ bool PrsmStr::isStrictCompatiablePtmSpecies(const PrsmStrPtr & a, const PrsmStrP
     return false;
   }
 
-  if (a->getChangeStrVec().size() != b->getChangeStrVec().size()) {
+  if (a->getMassShiftVec().size() != b->getMassShiftVec().size()) {
     return false;
   }
 
   double shift_tolerance = a->getAdjustedPrecMass() * ppo;
-  std::vector<MassShiftStrPtr> a_shift_vec = a->getChangeStrVec();
-  std::vector<MassShiftStrPtr> b_shift_vec = b->getChangeStrVec();
-  std::sort(a_shift_vec.begin(), a_shift_vec.end(), MassShiftStr::cmpPosInc);
-  std::sort(b_shift_vec.begin(), b_shift_vec.end(), MassShiftStr::cmpPosInc);
-  for (size_t i = 0; i < a->getChangeStrVec().size(); i++) {
-    MassShiftStrPtr ac = a_shift_vec[i];
-    MassShiftStrPtr bc = b_shift_vec[i];
-    if (ac->right_pos_ <= bc->left_pos_ || bc->right_pos_ <= ac->left_pos_) {
+  std::vector<MassShiftPtr> a_shift_vec = a->getMassShiftVec();
+  std::vector<MassShiftPtr> b_shift_vec = b->getMassShiftVec();
+  std::sort(a_shift_vec.begin(), a_shift_vec.end(), MassShift::cmpPosInc);
+  std::sort(b_shift_vec.begin(), b_shift_vec.end(), MassShift::cmpPosInc);
+  for (size_t i = 0; i < a->getMassShiftVec().size(); i++) {
+    MassShiftPtr ac = a_shift_vec[i];
+    MassShiftPtr bc = b_shift_vec[i];
+    if (ac->getRightBpPos() <= bc->getLeftBpPos() 
+        || bc->getRightBpPos() <= ac->getLeftBpPos()) {
       return false;
     }
-    if (std::abs(ac->mass_shift_ - bc->mass_shift_) > shift_tolerance) {
+    if (std::abs(ac->getMassShift() - bc->getMassShift()) > shift_tolerance) {
       return false;
     }
   }

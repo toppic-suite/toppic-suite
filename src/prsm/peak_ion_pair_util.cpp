@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 #include <algorithm>
 
 #include "common/util/logger.hpp"
+#include "ms/factory/extend_ms_util.hpp"
 #include "prsm/theo_peak_util.hpp"
 #include "prsm/prsm_algo.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
@@ -76,7 +77,7 @@ PeakIonPairPtrVec findPairs(ExtendMsPtr ms_three_ptr,
                             TheoPeakPtrVec &theo_peak_ptrs,
                             int bgn, int end, double add_tolerance) {
   std::sort(theo_peak_ptrs.begin(), theo_peak_ptrs.end(), TheoPeak::cmpPosInc);
-  std::vector<double> ms_masses = extend_ms::getExtendMassVec(ms_three_ptr);
+  std::vector<double> ms_masses = extend_ms_util::getExtendMassVec(ms_three_ptr);
   std::vector<double> theo_masses = theo_peak_util::getTheoMassVec(theo_peak_ptrs);
 
   PeakIonPairPtrVec pair_ptrs;

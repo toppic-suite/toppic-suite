@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -15,14 +15,14 @@
 #ifndef TOPPIC_PRSM_PRSM_TABLE_WRITER_HPP_
 #define TOPPIC_PRSM_PRSM_TABLE_WRITER_HPP_
 
+#include "para/prsm_para.hpp"
 #include "prsm/prsm.hpp"
-#include "prsm/prsm_para.hpp"
 
 namespace toppic {
 
 class PrsmTableWriter {
  public:
-  PrsmTableWriter(PrsmParaPtr prsm_para_ptr, 
+  PrsmTableWriter(PrsmParaPtr prsm_para_ptr,  
                   std::string argu_str,
                   const std::string &input_file_ext, 
                   const std::string &output_file_ext);

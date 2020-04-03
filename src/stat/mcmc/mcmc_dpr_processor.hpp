@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -22,16 +22,17 @@
 #include <unordered_map>
 #include <string>
 
-#include "seq/proteoform.hpp"
 #include "common/base/activation.hpp"
 #include "common/thread/simple_thread_pool.hpp"
+#include "seq/proteoform.hpp"
 
 #include "ms/spec/deconv_ms.hpp"
+#include "ms/spec/spectrum_set.hpp"
 
 #include "prsm/prsm.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 
-#include "stat/tdgf/count_test_num.hpp"
+#include "stat/count/count_test_num.hpp"
 #include "stat/tdgf/comp_pvalue_lookup_table.hpp"
 
 #include "stat/mcmc/mcmc_mng.hpp"

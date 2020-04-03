@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -38,6 +38,12 @@ MassShift::MassShift(MassShiftPtr shift_ptr, int start) {
     alter_vec_.push_back(alter_ptr);
   }
 }
+
+MassShift::MassShift(int left_bp_pos, int right_bp_pos, 
+                     double shift):
+    left_bp_pos_(left_bp_pos),
+    right_bp_pos_(right_bp_pos),
+    shift_(shift) {}
 
 AlterTypePtr MassShift::getTypePtr() {
   if (alter_vec_.size() == 0) {
@@ -105,7 +111,7 @@ void MassShift::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
   parent->appendChild(element);
 }
 
-bool MassShift::cmpPosInc(const MassShiftPtr & a, const MassShiftPtr & b) {
+bool MassShift::cmpPosInc(const MassShiftPtr &a, const MassShiftPtr &b) {
   if (a->getLeftBpPos() < b->getLeftBpPos()) {
     return true;
   } else if (a->getLeftBpPos() > b->getLeftBpPos()) {

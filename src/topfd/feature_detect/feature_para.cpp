@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -25,10 +25,7 @@ FeaturePara::FeaturePara(int frac_id, const std::string &file_name,
   file_name_(file_name) {
 
   double ppo = 0.000015;
-  bool use_min_tolerance = true;
-  double min_tolerance = 0.01;
-  peak_tolerance_ptr_
-      = std::make_shared<PeakTolerance>(ppo, use_min_tolerance, min_tolerance);
+  peak_tolerance_ptr_ = std::make_shared<PeakTolerance>(ppo);
 
   // extend sp parameter 
   double IM = mass_constant::getIsotopeMass();

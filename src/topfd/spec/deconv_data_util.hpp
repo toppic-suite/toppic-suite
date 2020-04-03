@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -23,11 +23,11 @@ namespace toppic {
 
 namespace deconv_data_util {
 
-DeconvDataPtr getDataPtr(PeakPtrVec &peak_list, double max_mass, 
+DeconvDataPtr getDataPtr(const PeakPtrVec &peak_list, double max_mass, 
                          int max_charge, double window_size);
 
 
-DeconvDataPtr getDataPtr(PeakPtrVec &peak_list, double spec_max_mass,
+DeconvDataPtr getDataPtr(const PeakPtrVec &peak_list, double spec_max_mass,
                          int spec_max_charge, double para_max_mass, 
                          int para_max_charge, double window_size);
 

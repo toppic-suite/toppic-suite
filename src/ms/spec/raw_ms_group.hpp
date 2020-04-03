@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -29,9 +29,14 @@ class RawMsGroup {
 
   RawMsPtrVec getMsTwoPtrVec() {return ms2_ptr_vec_;}
 
+  int getTotalScanNum() {return total_scan_num_;}
+  void setTotalScanNum(int num) {total_scan_num_ = num;}
+
  private:
   RawMsPtr ms1_ptr_;
   RawMsPtrVec ms2_ptr_vec_;
+
+  int total_scan_num_;
 };
 
 typedef std::shared_ptr<RawMsGroup> RawMsGroupPtr;

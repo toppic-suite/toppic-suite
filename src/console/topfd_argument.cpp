@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 #include <iostream>
 #include <iomanip>
 
+#include "boost/thread/thread.hpp"
 #include "common/util/version.hpp"
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
@@ -40,6 +41,7 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string ms_one_sn_ratio = "";
   std::string prec_window = "";
   std::string merged_file_name = "";
+  std::string thread_number = "";
 
   // Define and parse the program options
   try {
@@ -61,6 +63,8 @@ bool Argument::parse(int argc, char* argv[]) {
         ("precursor-window,w", po::value<std::string> (&prec_window),
          "<a positive number>. Set the precursor window size. The default value is 3.0 m/z.")
         ("missing-level-one,o","The input spectrum file does not contain MS1 spectra.")
+        ("thread-number,u", po::value<std::string> (&thread_number), "<a positive integer>. Number of threads used in the computation. Default value: 1.")
+        ("generate-html-folder,g","Generate an html folder containing TopView and spectrum data for visualization.")
         ;
 
     po::options_description desc("Options");
@@ -73,7 +77,9 @@ bool Argument::parse(int argc, char* argv[]) {
         ("ms-two-sn-ratio,t", po::value<std::string> (&ms_two_sn_ratio), "")
         ("precursor-window,w", po::value<std::string> (&prec_window), "")
         ("missing-level-one,o", "")
-        ("multiple-mass,u", "Output multiple masses for one envelope.")
+        //("multiple-mass,u", "Output multiple masses for one envelope.")
+        ("thread-number,u", po::value<std::string> (&thread_number), "")
+        ("generate-html-folder,g","")
         ("keep,k", "Report monoisotopic masses extracted from low quality isotopic envelopes.")
         ("merged-file-name,f", po::value<std::string> (&merged_file_name), 
          "Merge deconvoluted files and specify the name of the merged file.")
@@ -157,6 +163,12 @@ bool Argument::parse(int argc, char* argv[]) {
         topfd_para_ptr_->merged_file_name_ = merged_file_name;
       }
     }
+    if (vm.count("thread-number")) {
+      topfd_para_ptr_->thread_number_ = std::stoi(thread_number);
+    }
+    if (vm.count("generate-html-folder")) {
+      topfd_para_ptr_->gene_html_folder_ = true;
+    }
   }
   catch(std::exception& e) {
     std::cerr << "Unhandled Exception in parsing command line "
@@ -178,6 +190,21 @@ bool Argument::validateArguments() {
       LOG_ERROR(spec_file_list_[k] << " does not exist!");
       return false;
     }
+  }
+  int thread_number = topfd_para_ptr_->thread_number_;
+  try {
+    if (thread_number <= 0) {
+      LOG_ERROR("Thread number " << thread_number << " error! The value should be positive.");
+      return false;
+    }
+    int n = static_cast<int>(boost::thread::hardware_concurrency());
+    if(thread_number >= n){
+      LOG_ERROR("Thread number " << thread_number << " error! The value is too large. Only " << n << " threads are supported.");
+      return false;
+    }
+  } catch (int e) {
+    LOG_ERROR("Thread number " << thread_number << " should be a number.");
+    return false;
   }
   return true;
 }

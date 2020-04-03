@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 #define TOPPIC_FILTER_ONE_PTM_ONE_PTM_FILTER_PROCESSOR_HPP_
 
 #include "seq/db_block.hpp"
-#include "filter/oneptm/one_ptm_filter_mng.hpp"
+#include "filter/mng/one_ptm_filter_mng.hpp"
 
 namespace toppic {
 
@@ -24,6 +24,7 @@ class OnePtmFilterProcessor {
  public:
   explicit OnePtmFilterProcessor(OnePtmFilterMngPtr mng_ptr): mng_ptr_(mng_ptr) {}
   void process();
+  void indexProcess();
 
  private:
   OnePtmFilterMngPtr mng_ptr_;

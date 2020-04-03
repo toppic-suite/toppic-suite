@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -96,10 +96,10 @@ void addMsHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement* ms_element,
   str = str_util::fixedToString(precursor_mz, pos);
   xml_doc->addElement(ms_header_element, "precursor_mz", str.c_str());
 
-  double precursor_inte = prsm_ptr->getPrecFeatureInte();
-  if (precursor_inte > 0) {
-    str = str_util::toScientificStr(precursor_inte, pos);
-    xml_doc->addElement(ms_header_element, "precursor_inte", str.c_str());
+  double feature_inte = prsm_ptr->getSampleFeatureInte();
+  if (feature_inte > 0) {
+    str = str_util::toScientificStr(feature_inte, pos);
+    xml_doc->addElement(ms_header_element, "feature_inte", str.c_str());
   }
 }
 

@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -92,13 +92,13 @@ int getMaxPos(const IntvDensPtrVec &dens) {
 
 
 double getMaxInte(const std::vector<double> &inte) {
-    double max_inte = -1;
-      for (size_t i = 0; i < inte.size(); i++) {
-            if (inte[i] > max_inte) {
-                    max_inte = inte[i];
-                        }
-              }
-        return max_inte;
+  double max_inte = -1;
+  for (size_t i = 0; i < inte.size(); i++) {
+    if (inte[i] > max_inte) {
+      max_inte = inte[i];
+    }
+  }
+  return max_inte;
 }
 
 double getBaseLine(const std::vector<double> &inte) {

@@ -13,8 +13,8 @@ function buttons(){
 		 }
 	});
 	
-	let specParameters = new SpectrumParameters();
-	let spectrumDownload = new SpectrumDownload();
+	// let specParameters = new SpectrumParameters();
+	// let spectrumDownload = new SpectrumDownload();
 	let x,y;
 	d3.select("#download_popupms2_png").on("click",function(){
 		x = d3.event.pageX;

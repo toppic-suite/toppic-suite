@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
+#include "common/thread/simple_thread_pool.hpp"
 #include "seq/proteoform.hpp"
 #include "seq/fasta_reader.hpp"
-#include "common/thread/simple_thread_pool.hpp"
-#include "ms/spec/msalign_reader.hpp"
+#include "ms/spec/simple_msalign_reader.hpp"
 #include "ms/spec/msalign_util.hpp"
-#include "ms/spec/spectrum_set.hpp"
+#include "ms/factory/spectrum_set_factory.hpp"
 #include "prsm/prsm.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_str_merge.hpp"
@@ -33,7 +33,10 @@
 namespace toppic {
 
 void EValueProcessor::init() {
-  test_num_ptr_ = std::make_shared<CountTestNum>(mng_ptr_);
+  test_num_ptr_ = std::make_shared<CountTestNum>(mng_ptr_->convert_ratio_,
+                                                 mng_ptr_->max_ptm_mass_,
+                                                 mng_ptr_->max_prec_mass_,
+                                                 mng_ptr_->prsm_para_ptr_);
   LOG_DEBUG("Count test number initialized.");
 
   ResFreqPtrVec residue_freqs = test_num_ptr_->getResFreqPtrVec();
@@ -100,9 +103,8 @@ void EValueProcessor::process(bool is_separate) {
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
   double ppo = sp_para_ptr->getPeakTolerancePtr()->getPpo();
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
-  MsAlignReader sp_reader(sp_file_name, group_spec_num,
-                          sp_para_ptr->getActivationPtr(),
-                          sp_para_ptr->getSkipList());
+  SimpleMsAlignReaderPtr reader_ptr = std::make_shared<SimpleMsAlignReader>(sp_file_name, group_spec_num,
+                                                                            sp_para_ptr->getActivationPtr());
 
   PrsmXmlWriterPtrVec writer_ptr_vec = 
       prsm_xml_writer_util::geneWriterPtrVec(output_file_name, mng_ptr_->thread_num_);
@@ -113,7 +115,7 @@ void EValueProcessor::process(bool is_separate) {
   SpectrumSetPtr spec_set_ptr;
 
   LOG_DEBUG("Start search");
-  while((spec_set_ptr = sp_reader.getNextSpectrumSet(sp_para_ptr)[0])!= nullptr){
+  while((spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(reader_ptr, sp_para_ptr))!= nullptr){
     cnt += group_spec_num;
     if(spec_set_ptr->isValid()){
       PrsmPtrVec selected_prsm_ptrs;
@@ -135,9 +137,17 @@ void EValueProcessor::process(bool is_separate) {
     std::cout << std::flush << "E-value computation - processing " << cnt << " of " 
         << spectrum_num << " spectra.\r";
   }
+  int remainder = spectrum_num - cnt;
+  if (prsm_para_ptr->getGroupSpecNum() > remainder && remainder > 0){
+      //if there are spectrum remaining because they were not combined due to not having enough pairs
+      //fix the message as the processing is completed.
+      //this code avoids error when no combined spectra is used but a scan is remaining unprocessed
+      //because then it will not satisfy the first condition
+      std::cout << std::flush <<  "E-value computation - processing " << spectrum_num
+        << " of " << spectrum_num << " spectra.\r";
+  } 
   pool_ptr->ShutDown();
   std::cout << std::endl;
-  sp_reader.close();
   prsm_reader.close();
   prsm_xml_writer_util::closeWriterPtrVec(writer_ptr_vec);
   writer.close();

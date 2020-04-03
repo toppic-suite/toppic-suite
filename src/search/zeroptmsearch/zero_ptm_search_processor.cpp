@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@
 #include "seq/proteoform.hpp"
 #include "seq/proteoform_factory.hpp"
 #include "seq/db_block.hpp"
-#include "ms/spec/msalign_reader.hpp"
 #include "ms/spec/msalign_util.hpp"
+#include "ms/factory/spectrum_set_factory.hpp"
 #include "prsm/simple_prsm.hpp"
 #include "prsm/simple_prsm_reader.hpp"
 #include "prsm/prsm_xml_writer.hpp"
@@ -111,13 +111,18 @@ void ZeroPtmSearchProcessor::process() {
   ModPtrVec fix_mod_ptr_vec = prsm_para_ptr->getFixModPtrVec();
 
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
-  MsAlignReader sp_reader(sp_file_name, group_spec_num,
-                          sp_para_ptr->getActivationPtr(),
-                          sp_para_ptr->getSkipList());
+  SimpleMsAlignReaderPtr ms_reader_ptr = std::make_shared<SimpleMsAlignReader>(sp_file_name, 
+                                                                               group_spec_num,
+                                                                               sp_para_ptr->getActivationPtr());
   int cnt = 0;
-  std::vector<SpectrumSetPtr> spec_set_vec = sp_reader.getNextSpectrumSet(sp_para_ptr);
+  DeconvMsPtrVec deconv_ms_ptr_vec = ms_reader_ptr->getNextMsPtrVec(); 
   // LOG_DEBUG("Start search");
-  while (spec_set_vec[0] != nullptr) {
+  while (deconv_ms_ptr_vec.size() > 0) {
+    std::vector<SpectrumSetPtr> spec_set_vec 
+        = spectrum_set_factory::geneSpectrumSetPtrVecWithPrecError(deconv_ms_ptr_vec, sp_para_ptr);
+    if (spec_set_vec.size() == 0) {
+      LOG_ERROR("Spectrum set size is 0!");
+    }
     cnt+= group_spec_num;
     if (spec_set_vec[0]->isValid()) {
       int spec_id = spec_set_vec[0]->getSpectrumId();
@@ -185,11 +190,20 @@ void ZeroPtmSearchProcessor::process() {
         }
       }
     }
-    spec_set_vec = sp_reader.getNextSpectrumSet(sp_para_ptr);
+    deconv_ms_ptr_vec = ms_reader_ptr->getNextMsPtrVec(); 
     std::cout << std::flush <<  "Non PTM search - processing " << cnt
         << " of " << spectrum_num << " spectra.\r";
   }
-  sp_reader.close();
+  int remainder = spectrum_num - cnt;
+  if (prsm_para_ptr->getGroupSpecNum() > remainder && remainder > 0){
+      //if there are spectrum remaining because they were not combined due to not having enough pairs
+      //fix the message as the processing is completed.
+      //this code avoids error when no combined spectra is used but a scan is remaining unprocessed
+      //because then it will not satisfy the first condition
+      std::cout << std::flush <<  "Non PTM search - processing " << spectrum_num
+        << " of " << spectrum_num << " spectra.\r";
+  } 
+
   comp_prsm_reader.close();
   pref_prsm_reader.close();
   suff_prsm_reader.close();

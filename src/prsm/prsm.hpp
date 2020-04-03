@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 #include "seq/proteoform.hpp"
 #include "ms/spec/deconv_ms.hpp"
 #include "ms/spec/extend_ms.hpp"
-#include "ms/spec/sp_para.hpp"
+#include "para/sp_para.hpp"
 #include "prsm/extreme_value.hpp"
 
 namespace toppic {
@@ -37,8 +37,6 @@ class Prsm {
   Prsm(XmlDOMElement* element, FastaIndexReaderPtr reader_ptr,
        const ModPtrVec &fix_mod_list);
 
-  Prsm(const Prsm &obj);
-
   std::string getFileName() {return file_name_;}
 
   int getPrsmId() {return prsm_id_;}
@@ -49,9 +47,9 @@ class Prsm {
 
   int getPrecursorId() {return precursor_id_;}
 
-  int getPrecFeatureId() {return prec_feature_id_;}
+  int getSampleFeatureId() {return sample_feature_id_;}
 
-  double getPrecFeatureInte() {return prec_feature_inte_;}
+  double getSampleFeatureInte() {return sample_feature_inte_;}
 
   double getFracFeatureScore() {return frac_feature_score_;}
 
@@ -75,6 +73,7 @@ class Prsm {
 
   double getMatchFragNum() {return match_fragment_num_;}
 
+  // Normalized match fragment number is used in TopMG for ranking PrSMs
   double getNormMatchFragNum();
 
   // ExtremeValue related functions
@@ -94,10 +93,6 @@ class Prsm {
   void setSpectrumScan(std::string spectrum_scan) {spectrum_scan_ = spectrum_scan;}
 
   void setPrecurorId(int precursor_id) {precursor_id_ = precursor_id;}
-
-  void setPrecFeatureId(int prec_feature_id) {prec_feature_id_ = prec_feature_id;}
-
-  void setPrecFeatureInte(double prec_feature_inte) {prec_feature_inte_ = prec_feature_inte;}
 
   void setFracFeatureScore(double score) {frac_feature_score_ = score;}
 
@@ -166,9 +161,9 @@ class Prsm {
 
   int spectrum_num_;
 
-  int prec_feature_id_ = -1;
+  int sample_feature_id_ = -1;
 
-  double prec_feature_inte_ = -1;
+  double sample_feature_inte_ = -1;
 
   double frac_feature_score_ = -1000;
 

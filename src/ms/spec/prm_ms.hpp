@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 #define TOPPIC_MS_SPEC_PRM_MS_HPP_
 
 #include "ms/spec/prm_peak.hpp"
-#include "ms/spec/peak_tolerance.hpp"
 #include "ms/spec/ms.hpp"
 
 namespace toppic {
@@ -25,16 +24,6 @@ namespace toppic {
 typedef std::shared_ptr<Ms<PrmPeakPtr> > PrmMsPtr;
 
 typedef std::vector<PrmMsPtr> PrmMsPtrVec;
-
-namespace prm_ms {
-
-std::vector<std::pair<int, int> > getIntMassErrorList(const PrmMsPtrVec &prm_ms_ptr_vec,
-                                                      PeakTolerancePtr tole_ptr,
-                                                      double scale, bool n_strict, bool c_strict);
-
-PrmPeakPtrVec getPrmPeakPtrs(const PrmMsPtrVec &prm_ms_ptr_vec, PeakTolerancePtr tole_ptr);
-
-}  // namespace prm_ms
 
 }  // namespace toppic
 

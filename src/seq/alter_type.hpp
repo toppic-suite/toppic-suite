@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ class AlterType {
 
   static const AlterTypePtr UNEXPECTED;
 
-  AlterType(int id, std::string name): id_(id), name_(name) {}
+  AlterType(int id, std::string name);
 
   int getId() {return id_;}
 
@@ -48,7 +48,7 @@ class AlterType {
 
   void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 
-  static AlterTypePtr getTypePtrFromXml(XmlDOMElement * element);
+  static AlterTypePtr getTypePtrFromXml(XmlDOMElement* element);
 
   static std::string getXmlElementName() {return "alter_type";}
 

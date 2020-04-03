@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -187,34 +187,31 @@ bool copyDir(const std::string &src_name,
 bool copyJsonDir(const std::string &src_name,
                  const std::string &des_name,
                  int id_base) {
-  fs::path source(src_name);
-  fs::path destination(des_name);
   try {
+    fs::path source(src_name);
+    fs::path destination(des_name);
     if (!fs::exists(source) || !fs::is_directory(source)) {
       LOG_ERROR("The source folder " << source.string() << " does not exist!");
       return false;
+    }
+
+    for (const auto& source_file : fs::directory_iterator(source)) {
+      if (fs::is_regular_file(source_file)) {
+        fs::path current(source_file.path());
+        std::string file_name = current.filename().string();
+        std::string id_str = file_name.substr(8, file_name.length() - 3 - 8);
+        //LOG_ERROR(file_name << " " << id_str);
+        int new_id = std::stoi(id_str) + id_base;
+        std::string new_name = "spectrum" + std::to_string(new_id) + ".js";
+        fs::path des_file(des_name + getFileSeparator() + new_name);
+        std::cout << "Copying file: "<< current << "\r";
+        fs::copy_file(current, des_file);
+      }
     }
   }
   catch(fs::filesystem_error const & e) {
     LOG_ERROR(e.what());
     return false;
-  }
-
-  for (fs::directory_iterator file(source); file != fs::directory_iterator(); ++file) {
-    try {
-      fs::path current(file->path());
-      std::string file_name = current.filename().string();
-      std::string id_str = file_name.substr(8, file_name.length() - 3 - 8);
-      //LOG_ERROR(file_name << " " << id_str);
-      int new_id = std::stoi(id_str) + id_base;
-      std::string new_name = "spectrum" + std::to_string(new_id) + ".js";
-      fs::path des_file(des_name + getFileSeparator() + new_name);
-      std::cout << "Copying file: "<< current << "\r";
-      fs::copy_file(current, des_file);
-    }
-    catch(fs::filesystem_error const & e) {
-      LOG_ERROR(e.what());
-    }
   }
   std::cout << "\n";
   return true;
@@ -257,10 +254,18 @@ void cleanPrefix(const std::string & ref_name,
   fs::path ref_path(ref_name);
   fs::path ref_dir = absolute(ref_path).parent_path(); 
   fs::directory_iterator end_iter;
+
+  //std::cout << ref_dir << " " << ref_path << std::endl;
+
+
   for (fs::directory_iterator dir_iter(ref_dir); 
        dir_iter != end_iter ; ++dir_iter) {
     std::string file_name = dir_iter->path().string();
     std::replace(file_name.begin(), file_name.end(), '\\', '/');
+
+    //std::cout << file_name << std::endl;
+
+
     if (file_name.compare(0, prefix.length(), prefix) == 0) {
       if (!fs::is_directory(fs::status(dir_iter->path())))
         fs::remove(dir_iter->path());

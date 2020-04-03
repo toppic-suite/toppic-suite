@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -27,13 +27,16 @@ namespace toppic {
 CompPValueLookupTable::CompPValueLookupTable(TdgfMngPtr mng_ptr) {
   mng_ptr_ = mng_ptr;
   initTable();
-  test_num_ptr_ = std::make_shared<CountTestNum>(mng_ptr);
+  test_num_ptr_ = std::make_shared<CountTestNum>(mng_ptr->convert_ratio_,
+                                                 mng_ptr->max_ptm_mass_,
+                                                 mng_ptr->max_prec_mass_,
+                                                 mng_ptr->prsm_para_ptr_);
   LOG_DEBUG("test number initialized");
 }
 
 void CompPValueLookupTable::initTable() {
   // add init table
-  int ppm = mng_ptr_->prsm_para_ptr_->getPPM();
+  int ppm = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()->getIntPpm();
   LOG_DEBUG("ppm " << ppm);
 
   memset(ptm0_, 0, sizeof(ptm0_[0][0]) * 48 * 20);

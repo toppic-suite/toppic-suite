@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -26,13 +26,12 @@
 #include "seq/fasta_reader.hpp"
 #include "seq/fasta_util.hpp"
 
-#include "ms/spec/msalign_reader.hpp"
 #include "ms/spec/msalign_util.hpp"
 #include "ms/spec/msalign_frac_merge.hpp"
 #include "ms/spec/deconv_json_merge.hpp"
 #include "ms/feature/feature_merge.hpp"
 
-#include "prsm/prsm_para.hpp"
+#include "para/prsm_para.hpp"
 #include "prsm/prsm_str_merge.hpp"
 #include "prsm/prsm_top_selector.hpp"
 #include "prsm/prsm_simple_cluster.hpp"
@@ -43,17 +42,18 @@
 #include "prsm/prsm_form_filter.hpp"
 #include "prsm/prsm_util.hpp"
 
-#include "filter/zeroptm/zero_ptm_filter_mng.hpp"
+#include "filter/mng/zero_ptm_filter_mng.hpp"
+#include "filter/mng/topindex_file_name.hpp"
 #include "filter/zeroptm/zero_ptm_filter_processor.hpp"
 #include "search/zeroptmsearch/zero_ptm_search_mng.hpp"
 #include "search/zeroptmsearch/zero_ptm_search_processor.hpp"
 
-#include "filter/oneptm/one_ptm_filter_mng.hpp"
+#include "filter/mng/one_ptm_filter_mng.hpp"
 #include "filter/oneptm/one_ptm_filter_processor.hpp"
 #include "search/oneptmsearch/ptm_search_mng.hpp"
 #include "search/oneptmsearch/one_ptm_search_processor.hpp"
 
-#include "filter/diag/diag_filter_mng.hpp"
+#include "filter/mng/diag_filter_mng.hpp"
 #include "filter/diag/diag_filter_processor.hpp"
 #include "search/ptmsearch/ptm_search_processor.hpp"
 
@@ -78,6 +78,9 @@ void copyTopView(std::map<std::string, std::string> &arguments) {
   if (file_util::exists(topview_dir)) {
     LOG_WARN("The TopView directory " << topview_dir << " exists!");
     file_util::delDir(topview_dir);
+  }
+  if (!file_util::exists(base_name_short + "_html")){//if _html folder was not created with topfd
+    file_util::createFolder(base_name_short + "_html");
   }
 
   std::string resource_dir = arguments["resourceDir"];
@@ -190,6 +193,10 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
       use_gf = false;
     }
 
+    // index file name
+    TopIndexFileNamePtr file_name_ptr = std::make_shared<TopIndexFileName>();
+    std::string index_file_para = file_name_ptr->geneFileName(arguments);
+
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
     LOG_DEBUG("prsm para inited");
 
@@ -201,16 +208,18 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     int db_block_size = std::stoi(arguments["databaseBlockSize"]);
 
     fasta_util::dbPreprocess(ori_db_file_name, db_file_name, decoy, db_block_size);
-    msalign_util::geneSpIndex(sp_file_name, prsm_para_ptr->getSpParaPtr());
+    msalign_util::geneSpIndex(sp_file_name);
 
     std::vector<std::string> input_exts;
 
     std::cout << "Non PTM filtering - started." << std::endl;
     ZeroPtmFilterMngPtr zero_filter_mng_ptr
-        = std::make_shared<ZeroPtmFilterMng>(prsm_para_ptr, thread_num, "toppic_zero_filter");
+        = std::make_shared<ZeroPtmFilterMng>(prsm_para_ptr, index_file_para, 
+                                             thread_num, "toppic_zero_filter");
     ZeroPtmFilterProcessorPtr zero_filter_processor
         = std::make_shared<ZeroPtmFilterProcessor>(zero_filter_mng_ptr);
     zero_filter_processor->process();
+
     zero_filter_processor = nullptr;
     std::cout << "Non PTM filtering - finished." << std::endl;
 
@@ -231,7 +240,8 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     if (ptm_num >= 1) {
       std::cout << "One PTM filtering - started." << std::endl;
       OnePtmFilterMngPtr one_ptm_filter_mng_ptr
-          = std::make_shared<OnePtmFilterMng>(prsm_para_ptr, "toppic_one_filter", thread_num);
+          = std::make_shared<OnePtmFilterMng>(prsm_para_ptr, index_file_para, 
+                                              "toppic_one_filter", thread_num);
       OnePtmFilterProcessorPtr one_filter_processor
           = std::make_shared<OnePtmFilterProcessor>(one_ptm_filter_mng_ptr);
       one_filter_processor->process();
@@ -259,8 +269,9 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
       std::cout << "Multiple PTM filtering - started." << std::endl;
       // thread number is used because diagonal filter uses only one index
       DiagFilterMngPtr diag_filter_mng_ptr
-          = std::make_shared<DiagFilterMng>(prsm_para_ptr, filter_result_num,
-                                            thread_num, "toppic_multi_filter");
+          = std::make_shared<DiagFilterMng>(prsm_para_ptr, index_file_para,  
+                                            filter_result_num, thread_num, 
+                                            "toppic_multi_filter");
       DiagFilterProcessorPtr diag_filter_processor
           = std::make_shared<DiagFilterProcessor>(diag_filter_mng_ptr);
       diag_filter_processor->process();
@@ -339,7 +350,7 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     }
 
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
-    msalign_util::geneSpIndex(sp_file_name, prsm_para_ptr->getSpParaPtr());
+    msalign_util::geneSpIndex(sp_file_name);
     LOG_DEBUG("prsm para inited");
 
     std::cout << "Finding PrSM clusters - started." << std::endl;
@@ -354,8 +365,7 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
                                                  "toppic_top",
                                                  "toppic_cluster",
                                                  fix_mod_list,
-                                                 form_error_tole,
-                                                 prsm_para_ptr);
+                                                 form_error_tole);
       prsm_clusters->process();
       prsm_clusters = nullptr;
     } else {
@@ -413,27 +423,30 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&end));
     arguments["endTime"] = buf;
 
-    std::string argu_str = Argument::outputCsvArguments(arguments);
+    std::string argu_str = Argument::outputTsvArguments(arguments);
 
     std::cout << "Outputting PrSM table - started." << std::endl;
     PrsmTableWriterPtr table_out
-        = std::make_shared<PrsmTableWriter>(prsm_para_ptr, argu_str, cur_suffix, "_toppic_prsm.csv");
+        = std::make_shared<PrsmTableWriter>(prsm_para_ptr, argu_str, cur_suffix, "_toppic_prsm.tsv");
     table_out->write();
     table_out = nullptr;
     std::cout << "Outputting PrSM table - finished." << std::endl;
 
-    copyTopView(arguments);
-
-    std::cout << "Generating PrSM xml files - started." << std::endl;
     XmlGeneratorPtr xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, resource_dir, 
-                                                              cur_suffix, "toppic_prsm_cutoff");
-    xml_gene->process();
-    xml_gene = nullptr;
-    std::cout << "Generating PrSM xml files - finished." << std::endl;
+                                                                cur_suffix, "toppic_prsm_cutoff");
+    if (arguments["geneHTMLFolder"] == "true"){
+      std::cout << "Generating PrSM xml files - started." << std::endl;
+    
+      xml_gene->process();
+      xml_gene = nullptr;
+      std::cout << "Generating PrSM xml files - finished." << std::endl;
 
-    std::cout << "Converting PrSM xml files to json files - started." << std::endl;
-    jsonTranslate(arguments, "toppic_prsm_cutoff");
-    std::cout << "Converting PrSM xml files to json files - finished." << std::endl;
+      copyTopView(arguments);
+  
+      std::cout << "Converting PrSM xml files to json files - started." << std::endl;
+      jsonTranslate(arguments, "toppic_prsm_cutoff");
+      std::cout << "Converting PrSM xml files to json files - finished." << std::endl;
+    }
 
     cutoff_type = (arguments["cutoffProteoformType"] == "FDR") ? "FORMFDR": "EVALUE";
     std::cout << "PrSM filtering by " << cutoff_type << " - started." << std::endl;
@@ -456,22 +469,27 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     std::cout << "Outputting proteoform table - started." << std::endl;
     PrsmTableWriterPtr form_out
         = std::make_shared<PrsmTableWriter>(prsm_para_ptr, argu_str,
-                                            "toppic_form_cutoff_form", "_toppic_proteoform.csv");
+                                            "toppic_form_cutoff_form", "_toppic_proteoform.tsv");
     form_out->write();
     form_out = nullptr;
     std::cout << "Outputting proteoform table - finished." << std::endl;
 
-    std::cout << "Generating proteoform xml files - started." << std::endl;
-    xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, resource_dir, 
+    if (arguments["geneHTMLFolder"] == "true"){
+
+      std::cout << "Generating proteoform xml files - started." << std::endl;
+      xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, resource_dir, 
                                               "toppic_form_cutoff", 
                                               "toppic_proteoform_cutoff");
-    xml_gene->process();
-    xml_gene = nullptr;
-    std::cout << "Generating proteoform xml files - finished." << std::endl;
+    
+      xml_gene->process();
+      xml_gene = nullptr;
+      std::cout << "Generating proteoform xml files - finished." << std::endl;
 
-    std::cout << "Converting proteoform xml files to html files - started." << std::endl;
-    jsonTranslate(arguments, "toppic_proteoform_cutoff");
-    std::cout << "Converting proteoform xml files to html files - finished." << std::endl;
+    
+      std::cout << "Converting proteoform xml files to html files - started." << std::endl;
+      jsonTranslate(arguments, "toppic_proteoform_cutoff");
+      std::cout << "Converting proteoform xml files to html files - finished." << std::endl;
+    }
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;
@@ -500,6 +518,7 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
   std::cout << "TopPIC " << toppic::Version::getVersion() << std::endl;
 
   xercesc::XMLPlatformUtils::Initialize(); 
+
   TopPIC_testModFile(arguments);
 
   for (size_t k = 0; k < spec_file_lst.size(); k++) {

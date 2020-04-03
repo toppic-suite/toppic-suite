@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -18,8 +18,7 @@
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/str_util.hpp"
-#include "ms/spec/msalign_reader.hpp"
-#include "ms/spec/msalign_writer.hpp"
+#include "ms/spec/simple_msalign_reader.hpp"
 #include "ms/spec/msalign_frac_merge.hpp"
 
 namespace toppic {
@@ -59,7 +58,7 @@ void MsAlignFracMerge::mergeFiles(const std::vector<std::string> &spec_file_lst,
   outfile << para_str;
 
   for (size_t i = 0; i < spec_file_lst.size(); i++) {
-    MsAlignReader sp_reader(spec_file_lst[i], 1, nullptr, std::set<std::string>());
+    SimpleMsAlignReader sp_reader(spec_file_lst[i]); 
     std::vector<std::string> ms_lines = sp_reader.readOneStrSpectrum();
     while (ms_lines.size() > 0) {
       for (size_t k = 0; k< ms_lines.size(); k++) {
@@ -76,7 +75,6 @@ void MsAlignFracMerge::mergeFiles(const std::vector<std::string> &spec_file_lst,
       outfile << std::endl;
       ms_lines = sp_reader.readOneStrSpectrum();
     }
-    sp_reader.close();
   }
 
   outfile.close();

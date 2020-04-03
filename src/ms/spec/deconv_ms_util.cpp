@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -11,9 +11,6 @@
 //WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //See the License for the specific language governing permissions and
 //limitations under the License.
-
-#include <memory>
-#include <vector>
 
 #include "ms/spec/peak.hpp"
 #include "ms/spec/ms.hpp"
@@ -41,6 +38,21 @@ DeconvMsPtrVec getRefineMsPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
     result_ptrs.push_back(ms_ptr);
   }
   return result_ptrs;
+}
+
+void keepTopPeaks(DeconvMsPtrVec &deconv_ms_ptr_vec, size_t peak_num) {
+  for (size_t m = 0; m < deconv_ms_ptr_vec.size(); m++) {
+    DeconvMsPtr deconv_ms_ptr = deconv_ms_ptr_vec[m];
+    std::vector<DeconvPeakPtr> peak_ptr_list;
+    for (size_t p = 0; p < deconv_ms_ptr->size(); p++) {
+      if (p >= peak_num) {
+        break;
+      }
+      DeconvPeakPtr peak_ptr = deconv_ms_ptr->getPeakPtr(p);
+      peak_ptr_list.push_back(peak_ptr);
+    }
+    deconv_ms_ptr->setPeakPtrVec(peak_ptr_list);
+  }
 }
 
 }  // namespace deconv_ms_util

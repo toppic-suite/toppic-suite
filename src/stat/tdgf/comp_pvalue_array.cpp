@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 #include "common/base/base_data.hpp"
 #include "common/base/mass_constant.hpp"
 #include "ms/spec/deconv_ms_util.hpp"
-#include "ms/spec/prm_ms_factory.hpp"
+#include "ms/factory/prm_ms_factory.hpp"
 #include "stat/tdgf/comp_pvalue_array.hpp"
 
 namespace toppic {

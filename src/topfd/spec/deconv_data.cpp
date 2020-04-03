@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 
 namespace toppic {
 
-DeconvData::DeconvData(PeakPtrVec &peak_list, double max_mass, int max_charge,
+DeconvData::DeconvData(PeakPtrVec peak_list, double max_mass, int max_charge,
                        double win_size): 
     peak_list_(peak_list),
     max_mass_(max_mass),

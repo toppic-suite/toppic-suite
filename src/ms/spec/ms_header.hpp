@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -30,6 +30,8 @@ class MsHeader {
   MsHeader(xercesc::DOMElement* element);
 
   double getPrecMonoMass();
+
+  double getCopiedPrecMonoMass(){return prec_mono_mass_copy_;}
 
   double getPrecSpMass();
 
@@ -127,6 +129,8 @@ class MsHeader {
 
   static bool cmpPrecInteDec(const MsHeaderPtr &a, const MsHeaderPtr &b);
 
+  void setCopiedPrecMonoMass(double prec_mono_mass_copy){prec_mono_mass_copy_ = prec_mono_mass_copy;}
+
  private:
   int id_ = -1;
 
@@ -167,6 +171,7 @@ class MsHeader {
   // feature inte
   double feature_inte_ = -1;
   */
+ double prec_mono_mass_copy_;
 };
 
 typedef std::vector<MsHeaderPtr> MsHeaderPtrVec;

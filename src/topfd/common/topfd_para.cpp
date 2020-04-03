@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -40,6 +40,8 @@ std::string TopfdPara::getParaStr(const std::string &prefix) {
       << "MS1 signal/noise ratio: " << "\t" << ms_one_sn_ratio_ << std::endl;
   output << prefix << std::setw(gap) << std::left 
       << "MS/MS signal/noise ratio: " << "\t" << ms_two_sn_ratio_ << std::endl;
+  output << prefix << std::setw(gap) << std::left 
+      << "Thread number: " << "\t" << thread_number_ << std::endl;
   output << prefix << std::setw(gap) << std::left 
       << "Precursor window size: " << "\t" << prec_window_ << " m/z" << std::endl;
   //output << prefix << std::setw(gap) << std::left 

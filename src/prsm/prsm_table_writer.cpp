@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
-#include "ms/spec/msalign_reader.hpp"
-#include "ms/spec/extend_ms_factory.hpp"
+#include "ms/factory/extend_ms_factory.hpp"
+#include "ms/factory/spectrum_set_factory.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_table_writer.hpp"
 
@@ -41,32 +41,34 @@ void PrsmTableWriter::write() {
   file.open(output_file_name.c_str());
   file << argu_str_;
   // write title
-  file << "Data file name" << ","
-      << "Prsm ID" << ","
-      << "Spectrum ID"<< ","
-      << "Fragmentation" << ","
-      << "Scan(s)" << ","
-      << "Retention time" << ","
-      << "#peaks"<< ","
-      << "Charge" << ","
-      << "Precursor mass" << ","
-      << "Adjusted precursor mass" << ","
-      << "Proteoform ID" << ","
-      << "Feature intensity" << ","
-      << "Feature score" << ","
-      << "Protein accession" << ","
-      << "Protein description" << ","
-      << "First residue" << ","
-      << "Last residue" << ","
-      << "Proteoform" << ","
-      << "#unexpected modifications" << ","
-      << "MIScore" << ","
-      << "#variable PTMs" << ","
-      << "#matched peaks" << ","
-      << "#matched fragment ions" << ","
-      << "P-value" << ","
-      << "E-value" << ","
-      << "Q-value (spectral FDR)" << ","
+  std::string delim = "\t";
+  
+  file << "Data file name" << delim
+      << "Prsm ID" << delim
+      << "Spectrum ID"<< delim
+      << "Fragmentation" << delim
+      << "Scan(s)" << delim
+      << "Retention time" << delim
+      << "#peaks"<< delim
+      << "Charge" << delim
+      << "Precursor mass" << delim
+      << "Adjusted precursor mass" << delim
+      << "Proteoform ID" << delim
+      << "Feature intensity" << delim
+      << "Feature score" << delim
+      << "Protein accession" << delim
+      << "Protein description" << delim
+      << "First residue" << delim
+      << "Last residue" << delim
+      << "Proteoform" << delim
+      << "#unexpected modifications" << delim
+      << "MIScore" << delim
+      << "#variable PTMs" << delim
+      << "#matched peaks" << delim
+      << "#matched fragment ions" << delim
+      << "P-value" << delim
+      << "E-value" << delim
+      << "Q-value (spectral FDR)" << delim
       << "Proteoform FDR" << std::endl;
 
   std::string input_file_name = file_util::basename(spectrum_file_name) + "." + input_file_ext_;
@@ -81,12 +83,12 @@ void PrsmTableWriter::write() {
   // init variables
   std::string sp_file_name = prsm_para_ptr_->getSpectrumFileName();
   int group_spec_num = prsm_para_ptr_->getGroupSpecNum();
-  MsAlignReader sp_reader(sp_file_name, group_spec_num,
-                          prsm_para_ptr_->getSpParaPtr()->getActivationPtr(),
-                          prsm_para_ptr_->getSpParaPtr()->getSkipList());
-  SpectrumSetPtr spec_set_ptr;
   SpParaPtr sp_para_ptr = prsm_para_ptr_->getSpParaPtr();
-  while ((spec_set_ptr = sp_reader.getNextSpectrumSet(sp_para_ptr)[0]) != nullptr) {
+  SimpleMsAlignReaderPtr ms_reader_ptr = std::make_shared<SimpleMsAlignReader>(sp_file_name, 
+                                                                               group_spec_num,
+                                                                               sp_para_ptr->getActivationPtr());
+  SpectrumSetPtr spec_set_ptr;
+  while ((spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(ms_reader_ptr, sp_para_ptr)) != nullptr) {
     if (spec_set_ptr->isValid()) {
       int spec_id = spec_set_ptr->getSpectrumId();
       while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_id) {
@@ -103,7 +105,6 @@ void PrsmTableWriter::write() {
       }
     }
   }
-  sp_reader.close();
   prsm_reader.close();
   // write end;
   file.close();
@@ -114,6 +115,8 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   std::string spec_activations;
   std::string spec_scans;
   std::string retention_time;
+  std::string delim = "\t";
+
   int ptm_num = prsm_ptr->getProteoformPtr()->getMassShiftNum(AlterType::UNEXPECTED);
   int peak_num = 0;
   DeconvMsPtrVec deconv_ms_ptr_vec = prsm_ptr->getDeconvMsPtrVec();
@@ -134,47 +137,47 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
 
   file << std::setprecision(10);
   LOG_DEBUG("start output prsm ");
-  file << prsm_ptr->getFileName() << ","
-      << prsm_ptr->getPrsmId() << ","
-      << spec_ids << ","
-      << spec_activations<< ","
-      << spec_scans << ","
-      << retention_time << ","
-      << peak_num << ","
-      << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecCharge() << ","
-      << prsm_ptr->getOriPrecMass()<< ","
-      << prsm_ptr->getAdjustedPrecMass() << ","
-      << prsm_ptr->getProteoformPtr()->getProteoClusterId() << ",";
+  file << prsm_ptr->getFileName() << delim
+      << prsm_ptr->getPrsmId() << delim
+      << spec_ids << delim
+      << spec_activations<< delim
+      << spec_scans << delim
+      << retention_time << delim
+      << peak_num << delim
+      << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecCharge() << delim
+      << prsm_ptr->getOriPrecMass()<< delim
+      << prsm_ptr->getAdjustedPrecMass() << delim
+      << prsm_ptr->getProteoformPtr()->getProteoClusterId() << delim;
 
-  if (prsm_ptr->getPrecFeatureInte() > 0) {
+  if (prsm_ptr->getSampleFeatureInte() > 0) {
     std::ostringstream str_stream;
     str_stream << std::scientific << std::setprecision(3);
-    str_stream << prsm_ptr->getPrecFeatureInte();
-    file << str_stream.str() << ",";
+    str_stream << prsm_ptr->getSampleFeatureInte();
+    file << str_stream.str() << delim;
   } else {
-    file << "-" << ",";
+    file << "-" << delim;
   }
 
-  file << prsm_ptr->getFracFeatureScore() << ",";
+  file << prsm_ptr->getFracFeatureScore() << delim;
 
-  file << prsm_ptr->getProteoformPtr()->getSeqName() << ","
-      << "\"" << prsm_ptr->getProteoformPtr()->getSeqDesc() << "\"" << ","
-      << (prsm_ptr->getProteoformPtr()->getStartPos() + 1) << ","
-      << (prsm_ptr->getProteoformPtr()->getEndPos() + 1) << ","
-      << "\"" << prsm_ptr->getProteoformPtr()->getProteinMatchSeq() << "\","
-      << ptm_num << ","
-      << prsm_ptr->getProteoformPtr()->getMIScore() << ","
-      << prsm_ptr->getProteoformPtr()->getVariablePtmNum() << ","
-      << prsm_ptr->getMatchPeakNum() << ","
-      << prsm_ptr->getMatchFragNum() << ","
-      << prsm_ptr->getPValue() << ","
-      << prsm_ptr->getEValue() << ",";
+  file << prsm_ptr->getProteoformPtr()->getSeqName() << delim
+      << "\"" << prsm_ptr->getProteoformPtr()->getSeqDesc() << "\"" << delim
+      << (prsm_ptr->getProteoformPtr()->getStartPos() + 1) << delim
+      << (prsm_ptr->getProteoformPtr()->getEndPos() + 1) << delim
+      << "\"" << prsm_ptr->getProteoformPtr()->getProteinMatchSeq() << "\"" << delim
+      << ptm_num << delim
+      << prsm_ptr->getProteoformPtr()->getMIScore() << delim
+      << prsm_ptr->getProteoformPtr()->getVariablePtmNum() << delim
+      << prsm_ptr->getMatchPeakNum() << delim
+      << prsm_ptr->getMatchFragNum() << delim
+      << prsm_ptr->getPValue() << delim
+      << prsm_ptr->getEValue() << delim;
 
   double fdr = prsm_ptr->getFdr();
   if (fdr >= 0) {
-    file << fdr << ",";
+    file << fdr << delim;
   } else {
-    file << "-" << ",";
+    file << "-" << delim;
   }
 
   double proteoform_fdr = prsm_ptr->getProteoformFdr();

@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@
 #include <limits>
 
 #include "seq/proteoform_factory.hpp"
-#include "ms/spec/extend_ms_factory.hpp"
-#include "search/oneptmsearch/diagonal.hpp"
-#include "search/oneptmsearch/diagonal_header.hpp"
+#include "ms/factory/extend_ms_factory.hpp"
+#include "search/diag/diagonal.hpp"
+#include "search/diag/diagonal_header.hpp"
 #include "search/graph/graph.hpp"
 #include "search/graphalign/graph_align_processor.hpp"
 #include "search/graphalign/graph_align.hpp"

@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 #define TOPPIC_SEARCH_GRAPH_ALIGN_GRAPH_ALIGN_HPP_
 
 #include "prsm/prsm.hpp"
-#include "search/oneptmsearch/diagonal_header.hpp"
+#include "search/diag/diagonal_header.hpp"
 #include "search/graph/graph.hpp"
 #include "search/graph/proteo_graph.hpp"
 #include "search/graph/spec_graph.hpp"

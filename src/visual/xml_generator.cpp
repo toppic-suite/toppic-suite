@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -22,7 +22,8 @@
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "seq/fasta_index_reader.hpp"
-#include "ms/spec/extend_ms_factory.hpp"
+#include "ms/factory/extend_ms_factory.hpp"
+#include "ms/factory/spectrum_set_factory.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_util.hpp"
 #include "prsm/prsm_cluster.hpp"
@@ -58,15 +59,15 @@ void XmlGenerator::outputPrsms() {
 
   std::string sp_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
   int group_spec_num = mng_ptr_->prsm_para_ptr_->getGroupSpecNum();
-  MsAlignReader sp_reader(sp_file_name, group_spec_num,
-                          mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getActivationPtr(),
-                          mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getSkipList());
-  SpectrumSetPtr spec_set_ptr;
   SpParaPtr sp_para_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr();
+  SimpleMsAlignReaderPtr ms_reader_ptr = std::make_shared<SimpleMsAlignReader>(sp_file_name, 
+                                                                               group_spec_num,
+                                                                               sp_para_ptr->getActivationPtr());
 
+  SpectrumSetPtr spec_set_ptr;
   size_t cnt = 0;
   size_t idx = 0;
-  while ((spec_set_ptr = sp_reader.getNextSpectrumSet(sp_para_ptr)[0])!= nullptr) {
+  while ((spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(ms_reader_ptr, sp_para_ptr))!= nullptr) {
     if (spec_set_ptr->isValid()) {
       int spec_id = spec_set_ptr->getSpectrumId();
       while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_id) {
@@ -92,12 +93,12 @@ void XmlGenerator::outputPrsms() {
         std::vector<std::string> file_info;
         file_info.push_back(file_name);
         file_info.push_back(mng_ptr_->html_path_ 
-                            + file_util::getFileSeparator() + "data_js" 
-                            + file_util::getFileSeparator() + "prsms" 
-                            + file_util::getFileSeparator()
-                            + "prsm" + str_util::toString(prsm_ptr->getPrsmId()) + ".js");
+                              + file_util::getFileSeparator() + "data_js" 
+                              + file_util::getFileSeparator() + "prsms" 
+                              + file_util::getFileSeparator()
+                              + "prsm" + str_util::toString(prsm_ptr->getPrsmId()) + ".js");
         anno_file_list_ptr_->file_list_.push_back(file_info); 
-
+    
         cnt++;
         idx++;
         std::cout << std::flush << "Generating xml files - processing " << cnt << " PrSMs.\r";
@@ -110,8 +111,6 @@ void XmlGenerator::outputPrsms() {
   std::cout << std::endl;
 
   prsm_reader.close();
-  sp_reader.close();
-
   std::copy(cluster_id_set.begin(), cluster_id_set.end(), std::back_inserter(cluster_ids_));
   std::sort(cluster_ids_.begin(), cluster_ids_.end());
   std::copy(prot_id_set.begin(), prot_id_set.end(), std::back_inserter(prot_ids_));
@@ -200,15 +199,14 @@ void XmlGenerator::outputProteoforms(){
                                                        mng_ptr_, detail, add_ms));
       writer.close();
       LOG_DEBUG("output proteoform completed " << i);
-
-      std::vector<std::string> file_info;
-      file_info.push_back(file_name);
-      file_info.push_back(mng_ptr_->html_path_ 
-                          + file_util::getFileSeparator() + "data_js" 
-                          + file_util::getFileSeparator() + "proteoforms" 
-                          + file_util::getFileSeparator()
-                          + "proteoform"+str_util::toString(cluster_ids_[i])+".js");
-      anno_file_list_ptr_->file_list_.push_back(file_info);
+        std::vector<std::string> file_info;
+        file_info.push_back(file_name);
+        file_info.push_back(mng_ptr_->html_path_ 
+                            + file_util::getFileSeparator() + "data_js" 
+                            + file_util::getFileSeparator() + "proteoforms" 
+                            + file_util::getFileSeparator()
+                            + "proteoform"+str_util::toString(cluster_ids_[i])+".js");
+        anno_file_list_ptr_->file_list_.push_back(file_info);
     }
   }
   std::cout << std::endl;
@@ -290,13 +288,14 @@ void XmlGenerator::outputProteins() {
       XmlWriterPtr writer = std::make_shared<XmlWriter>(file_name, "");
       anno_xml_util::writeProteinToXml(writer, prsm_ptrs, prot_id, cluster, mng_ptr_, true, false);
       writer->close();
+
       std::vector<std::string> file_info;
       file_info.push_back(file_name);
       file_info.push_back(mng_ptr_->html_path_ 
-                          + file_util::getFileSeparator() + "data_js" 
-                          + file_util::getFileSeparator() + "proteins" 
-                          + file_util::getFileSeparator() 
-                          + "protein"+str_util::toString(prot_id)+".js");
+                            + file_util::getFileSeparator() + "data_js" 
+                            + file_util::getFileSeparator() + "proteins" 
+                            + file_util::getFileSeparator() 
+                            + "protein"+str_util::toString(prot_id)+".js");
       anno_file_list_ptr_->file_list_.push_back(file_info);
     }
   }
@@ -349,11 +348,13 @@ void XmlGenerator::outputAllProteins() {
   std::cout << std::endl;
   writer.write(prot_elements);
   writer.close();
+
   std::vector<std::string> file_info;
   file_info.push_back(file_name);
   file_info.push_back(mng_ptr_->html_path_+ file_util::getFileSeparator() + "data_js"
-                      + file_util::getFileSeparator() + "proteins.js");
+                        + file_util::getFileSeparator() + "proteins.js");
   anno_file_list_ptr_->file_list_.push_back(file_info);
+  
 }
 
 void XmlGenerator::outputFileList() {

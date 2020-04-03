@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -24,15 +24,17 @@
 #include "common/util/logger.hpp"
 #include "common/base/residue_util.hpp"
 #include "common/base/neutral_loss.hpp"
-#include "prsm/extreme_value.hpp"
 #include "common/thread/simple_thread_pool.hpp"
 
-#include "ms/spec/msalign_reader.hpp"
+#include "ms/spec/simple_msalign_reader.hpp"
 #include "ms/spec/msalign_util.hpp"
 #include "ms/spec/theo_peak.hpp"
-#include "prsm/theo_peak_util.hpp"
-#include "ms/spec/extend_ms_factory.hpp"
+#include "ms/factory/extend_ms_util.hpp"
+#include "ms/factory/extend_ms_factory.hpp"
+#include "ms/factory/spectrum_set_factory.hpp"
 
+#include "prsm/extreme_value.hpp"
+#include "prsm/theo_peak_util.hpp"
 #include "prsm/prsm_algo.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_str_merge.hpp"
@@ -40,8 +42,8 @@
 #include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_xml_writer_util.hpp"
 
-#include "stat/tdgf/tdgf_mng.hpp"
-#include "stat/tdgf/count_test_num.hpp"
+//#include "stat/tdgf/tdgf_mng.hpp"
+#include "stat/count/count_test_num.hpp"
 
 #include "stat/mcmc/mcmc_dpr_processor.hpp"
 #include "stat/mcmc/comp_pvalue_mcmc.hpp"
@@ -62,10 +64,13 @@ void DprProcessor::init() {
 
   mass_table_ = mass_table_util::geneMassTable(mng_ptr_);
 
-  TdgfMngPtr tdgf_mng_ptr
-      = std::make_shared<TdgfMng>(mng_ptr_->prsm_para_ptr_, 0, 0.0, false, false, 1, "", "");
+  //TdgfMngPtr tdgf_mng_ptr
+  //    = std::make_shared<TdgfMng>(mng_ptr_->prsm_para_ptr_, 0, 0.0, false, false, 1, "", "");
 
-  test_num_ptr_ = std::make_shared<CountTestNum>(tdgf_mng_ptr);
+  test_num_ptr_ = std::make_shared<CountTestNum>(mng_ptr_->convert_ratio_,
+                                                 mng_ptr_->max_ptm_mass_,
+                                                 mng_ptr_->max_prec_mass_,
+                                                 mng_ptr_->prsm_para_ptr_);
 
   ptm_mass_vec2d_ = compPtmComb();
 }
@@ -130,8 +135,6 @@ void DprProcessor::process() {
 
   sp_para_ptr_ = prsm_para_ptr->getSpParaPtr();
 
-  sp_para_ptr_->prec_error_ = 0;
-
   std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
   std::string input_file_name = file_util::basename(sp_file_name) + "." + mng_ptr_->input_file_ext_;
@@ -151,17 +154,21 @@ void DprProcessor::process() {
   PrsmPtr prsm_ptr = prsm_reader->readOnePrsm(fasta_reader_ptr, prsm_para_ptr->getFixModPtrVec());
 
   // no multi-spec support now
-  MsAlignReaderPtr sp_reader_ptr = std::make_shared<MsAlignReader>(
+  SimpleMsAlignReaderPtr sp_reader_ptr = std::make_shared<SimpleMsAlignReader>(
       sp_file_name,
       1,  // prsm_para_ptr->getGroupSpecNum()
-      sp_para_ptr_->getActivationPtr(), sp_para_ptr_->getSkipList(), 500);
+      sp_para_ptr_->getActivationPtr()); 
+
+  int peak_num_limit = 500;
 
   int spectrum_num = msalign_util::getSpNum(sp_file_name);
 
   int cnt = 0;
 
-  SpectrumSetPtr spec_set_ptr = sp_reader_ptr->getNextSpectrumSet(sp_para_ptr_)[0];
-
+  //SpectrumSetPtr spec_set_ptr = sp_reader_ptr->getNextSpectrumSet(sp_para_ptr_)[0];
+  SpectrumSetPtr spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(sp_reader_ptr,
+                                                                             sp_para_ptr_,
+                                                                             peak_num_limit);
   while (spec_set_ptr != nullptr) {
     cnt += prsm_para_ptr->getGroupSpecNum();
     if (spec_set_ptr->isValid()) {
@@ -179,14 +186,16 @@ void DprProcessor::process() {
         prsm_ptr = prsm_reader->readOnePrsm(fasta_reader_ptr, prsm_para_ptr->getFixModPtrVec());
       }
     }
-    spec_set_ptr = sp_reader_ptr->getNextSpectrumSet(sp_para_ptr_)[0];
+    //spec_set_ptr = sp_reader_ptr->getNextSpectrumSet(sp_para_ptr_)[0];
+    spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(sp_reader_ptr,
+                                                                sp_para_ptr_,
+                                                                peak_num_limit);
 
     std::cout << std::flush << "E-value computation - processing " << cnt << " of "
         << spectrum_num << " spectra.\r";
   }
   pool_ptr_->ShutDown();
   std::cout << std::endl;
-  sp_reader_ptr->close();
   prsm_reader->close();
   prsm_writer->close();
   prsm_xml_writer_util::closeWriterPtrVec(writer_ptr_vec_);
@@ -229,7 +238,7 @@ std::function<void()> geneTask(SpectrumSetPtr spec_set_ptr,
 
     double tolerance = refine_ms_ptr_vec[0]->getMsHeaderPtr()->getErrorTolerance(ppo);
 
-    std::vector<double> ms_masses = extend_ms::getExtendMassVec(refine_ms_ptr_vec[0]);
+    std::vector<double> ms_masses = extend_ms_util::getExtendMassVec(refine_ms_ptr_vec[0]);
 
     std::vector<int> ms_mass_int(ms_masses.size());
 

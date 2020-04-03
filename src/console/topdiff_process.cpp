@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -24,34 +24,48 @@ namespace toppic {
 
 int topDiffProcess(std::map<std::string, std::string> &arguments,
                     std::vector<std::string> &input_file_list) {
+  try{
+    Argument::outputArguments(std::cout, arguments);
+    base_data::init();
 
-  Argument::outputArguments(std::cout, arguments);
-  base_data::init();
+    std::string ori_db_file_name = arguments["databaseFileName"];
+    std::string db_file_name = ori_db_file_name + "_target";
+    fasta_util::dbSimplePreprocess(ori_db_file_name, db_file_name);
 
-  std::string ori_db_file_name = arguments["databaseFileName"];
-  std::string db_file_name = ori_db_file_name + "_target";
-  fasta_util::dbSimplePreprocess(ori_db_file_name, db_file_name);
+    std::string base_path = file_util::absoluteDir(input_file_list[0]);
+    std::string output_file_name = base_path + file_util::getFileSeparator() 
+        + arguments["mergedOutputFileName"];
+    LOG_DEBUG("Output file name " << output_file_name);
+    std::string fixed_mod = arguments["fixedMod"];
 
-  std::string base_path = file_util::absoluteDir(input_file_list[0]);
-  std::string output_file_name = base_path + file_util::getFileSeparator() 
-      + arguments["mergedOutputFileName"];
-  LOG_DEBUG("Output file name " << output_file_name);
-  std::string fixed_mod = arguments["fixedMod"];
+    double error_tole = std::stod(arguments["errorTolerance"]);
+    std::string tool_name = arguments["toolName"];
 
-  double error_tole = std::stod(arguments["errorTolerance"]);
-  std::string tool_name = arguments["toolName"];
+    std::cout << "TopDiff - started." << std::endl;
+    FeatureSampleMergePtr merge_ptr 
+        = std::make_shared<FeatureSampleMerge>(input_file_list,
+                                                output_file_name,
+                                                db_file_name, 
+                                                fixed_mod, 
+                                                tool_name,
+                                                error_tole);
+    merge_ptr->process();
+    merge_ptr = nullptr;
+    
+    std::cout << "Deleting temporary files - started." << std::endl;
 
-  std::cout << "TopDiff - started." << std::endl;
-  FeatureSampleMergePtr merge_ptr 
-      = std::make_shared<FeatureSampleMerge>(input_file_list,
-                                             output_file_name,
-                                             db_file_name, 
-                                             fixed_mod, 
-                                             tool_name,
-                                             error_tole);
-  merge_ptr->process();
-  merge_ptr = nullptr;
-  std::cout << "TopDiff - finished." << std::endl;
+    std::string fa_base = file_util::absoluteName(ori_db_file_name);
+    std::replace(fa_base.begin(), fa_base.end(), '\\', '/');
+    file_util::cleanPrefix(ori_db_file_name, fa_base + "_");
+        
+    std::cout << "Deleting temporary files - finished." << std::endl; 
+
+    std::cout << "TopDiff - finished." << std::endl;
+  } catch (const char* e) {
+    std::cout << "[Exception]" << std::endl;
+    std::cout << e << std::endl;
+    exit(EXIT_FAILURE);
+  }
   return 0;
 }
 

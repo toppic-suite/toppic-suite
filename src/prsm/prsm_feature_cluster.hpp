@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 #ifndef TOPPIC_PRSM_PRSM_FEATURE_CLUSTER_HPP_
 #define TOPPIC_PRSM_PRSM_FEATURE_CLUSTER_HPP_
 
-#include "prsm/prsm_para.hpp"
+#include "common/base/mod.hpp"
 
 namespace toppic {
 
@@ -26,8 +26,7 @@ class PrsmFeatureCluster {
                      const std::string &input_file_ext,
                      const std::string &output_file_ext,
                      const ModPtrVec &fix_mod_ptr_vec,
-                     double prec_error_tole,
-                     PrsmParaPtr prsm_para_ptr);
+                     double prec_error_tole); 
 
   void process();
 
@@ -45,8 +44,6 @@ class PrsmFeatureCluster {
   ModPtrVec fix_mod_ptr_vec_;
 
   double prec_error_tole_;
-
-  PrsmParaPtr prsm_para_ptr_;
 
   void setProtId(PrsmStrPtrVec & prsm_ptrs);
 

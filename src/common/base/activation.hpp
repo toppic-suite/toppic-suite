@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ class Activation {
   Activation(const std::string &name, IonTypePtr n_ion_type_ptr,
              IonTypePtr c_ion_type_ptr);
 
-  explicit Activation(XmlDOMElement * element);
+  explicit Activation(XmlDOMElement* element);
 
   std::string getName() {return name_;}
 
