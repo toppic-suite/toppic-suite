@@ -34,7 +34,6 @@ class SeqOfExecution
 		let completeShiftList = [];
 		let fixedMassShiftList = [];
 		let peakDataList = [];
-		let modifiablePeakData = [];//will change value if shared peak
 		let massErrorthVal = null;
 		let matchedPeakList = [];
 
@@ -105,7 +104,6 @@ class SeqOfExecution
 		 * Get all the peak list data entered by the user 
 		 */
 		peakDataList = UIHelperObj.getPeakListFromUI();
-		modifiablePeakData = UIHelperObj.getPeakListFromUI();
 		let peakListLen = peakDataList.length;
 		let monoMassListLen = monoMassList.length;
 		let seqln = sequence.length;
@@ -190,8 +188,7 @@ class SeqOfExecution
 		if(peakListLen != 0)
 		{
 			let matchedPeaksObj = new MatchedPeaks();
-			distributionList = matchedPeaksObj.getDistribution(modifiablePeakData,sequence,matchedUnMatchedPeaks);
-			//distributionList = matchedPeaksObj.getDistribution(peakDataList,sequence,matchedUnMatchedPeaks);//original code without envelope adjustment
+			distributionList = matchedPeaksObj.getDistribution(peakDataList,sequence,matchedUnMatchedPeaks);
 			/**
 			 * Display the graph formed
 			 */
@@ -387,7 +384,6 @@ class SeqOfExecution
 		let seqToUI = massShiftObj.formSequence(sequence,massShiftList);
 		massShiftObj.writeSeqToTextBox(seqToUI);
 		peakDataList = UIHelperObj.getPeakListFromUI();
-		modifiablePeakData = UIHelperObj.getPeakListFromUI();//added for modified version of getNormalizedIntensity to adjust envelopes
 		let peakListLen = peakDataList.length;
 		let monoMassListLen = monoMassList.length;
 		let seqln = sequence.length;
@@ -468,8 +464,7 @@ class SeqOfExecution
 			/**
 			 * Get calculated distribution 
 			 */
-			let distributionList = matchedPeaksObj.getDistribution(modifiablePeakData,sequence,matchedUnMatchedPeaks);
-			//let distributionList = matchedPeaksObj.getDistribution(peakDataList,sequence,matchedUnMatchedPeaks);
+			let distributionList = matchedPeaksObj.getDistribution(peakDataList,sequence,matchedUnMatchedPeaks);
 			/**
 			 *  Draw SVG of Sequence
 			 */
