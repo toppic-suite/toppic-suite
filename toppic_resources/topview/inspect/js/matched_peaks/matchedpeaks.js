@@ -211,98 +211,11 @@ class MatchedPeaks {
 			
 		}
 
-		let totalDistributionCopy = [];
-
-		for(let i = 0; i < len; i++)
-		{
-			let distributionList = {};
-
-			distributionList.mono_mass = matchedUnMatchedList[i].mass;
-			distributionList.charge = matchedUnMatchedList[i].charge;
-			distributionList.env_peaks = molecularFormObj.emass(distributionList.mono_mass,distributionList.charge,peakDataList);
-			totalDistributionCopy.push(distributionList);
-		}
-		if(totalDistributionCopy.length != 0)
-		{
-			totalDistributionCopy.sort(function(x,y){
-				return d3.ascending(x.env_peaks[0].mz, y.env_peaks[0].mz);
-			})
-		}
-		
-		envlength = totalDistributionCopy.length;
-		colorListsize = this.colors.length;
-		while(envlength--){
-			let index = envlength%colorListsize ;
-			totalDistributionCopy[envlength].color = this.colors[index] ;
-		}
-		this.compareTwoComputation(totalDistribution, totalDistributionCopy)
 		return totalDistribution ;
-	}
-
-	compareTwoComputation(amino, molecular){
-		let orderMatched = 0;
-		let matchFound = false;
-		let monomassMismatch = 0;
-		let missingPeak = 0;
-		let mzCount = {"tole_0.01":0, "tole_0.1":0, "tole_1":0, "tole_10":0, "tole_bigger_than_10":0};
-		//console.log("amino envelopes: ", amino.length, ", molecular envelopes: ", molecular.length);
-		for(let i = 0; i < molecular.length; i++){
-			for (let j = 0; j < amino.length; j++){
-				if (molecular[i].mono_mass == amino[j].mono_mass && molecular[i].charge == amino[j].charge){
-					//compare env peaks
-					if (molecular[i].env_peaks.length == amino[j].env_peaks.length){
-						orderMatched++;
-						for (let e = 0; e < molecular[i].env_peaks.length; e ++){
-							let mzDiff = Math.abs(molecular[i].env_peaks[e].mz - amino[j].env_peaks[e].mz);
-							let inteDiff = Math.abs(molecular[i].env_peaks[e].intensity - amino[j].env_peaks[e].intensity);
-							
-							if (mzDiff <= 0.01){
-								mzCount["tole_0.01"]++;
-							}
-							else if (mzDiff <= 0.1){
-								mzCount["tole_0.1"]++;
-							}
-							else if(mzDiff <= 1){
-								mzCount["tole_1"]++;
-							}
-							else if (mzDiff <= 10){
-								mzCount["tole_10"]++;
-							}
-							else{
-								console.log("big difference in mz: ", molecular[i].env_peaks[e].mz, amino[j].env_peaks[e].mz)
-								mzCount["tole_bigger_than_10"]++;
-							}	
-						}
-						matchFound = true;
-						break;
-					}
-					else{
-						//console.log("env peaks length do not match")
-						//console.log("amino env peak: ", molecular[i].env_peaks)
-						//console.log("molecular env peak: ", amino[j].env_peaks)
-						missingPeak++;
-					}
-				}
-			}
-			if (matchFound == false){
-				//same mono mass and charge does not exist in second result
-				console.log("envelope not found")
-				console.log("molecular env peak", molecular[i])
-				console.log("corresponding amino peak: ", amino[j]);
-				
-				monomassMismatch++;
-			}
-		}
-		//result print
-		console.log("peaks order match in ", orderMatched, " of ", molecular.length);
-		console.log(monomassMismatch, " envelopes not matching")
-		console.log(missingPeak, " envelopes have diff num of peaks")
-		console.log("matchced mz by tolerannce level", mzCount);
 	}
 	getMatchedAndUnmatchedPrefixAndSuffixMassList(prefixOrSuffixMassList, monoMassList,
 																massErrorthVal,ppmErrorthVal,prefixInd)
 	{
-		//console.log("monoMassList : ", monoMassList);
 		let MatchedAndUnMatchedList = [];
 		let monoMassList_temp = monoMassList.slice();
 		let len = monoMassList_temp.length;

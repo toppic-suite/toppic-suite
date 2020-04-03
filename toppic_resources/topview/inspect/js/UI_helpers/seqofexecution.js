@@ -194,7 +194,7 @@ class SeqOfExecution
 			let matchedPeaksObj = new MatchedPeaks();
 
 			//distributionList = matchedPeaksObj.getDistribution(peakDataList,sequence,matchedUnMatchedPeaks);
-			distributionList = matchedPeaksObj.getDistribution(peakDataList,sequence,matchedUnMatchedPeaks, completeShiftList);
+			distributionList = matchedPeaksObj.getDistribution(modifiablePeakData,sequence,matchedUnMatchedPeaks, completeShiftList);
 
 			/**
 			 * Display the graph formed
