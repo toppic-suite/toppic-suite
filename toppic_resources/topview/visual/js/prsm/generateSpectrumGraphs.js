@@ -36,6 +36,8 @@ function generateCorrespondingGraph(current_data,id,prec_mz,specId){
         graphFeatures.padding.bottom = graphFeatures.padding.bottom + graphFeatures.heightForErrorPlot;
         graphFeatures.adjustableIonPosition = 10;
         graphFeatures.errorListData = json2ErrorDataList(prsm_data.prsm);
+        console.log(graphFeatures.errorListData);
+        graphFeatures.errorThreshHoldVal = getAbsoluteMaxValfromList(graphFeatures.errorListData);
         // Current Data itself contains Peak data
         spectrumgraph = new addSpectrum(id, current_data, null, prec_mz, current_data,graphFeatures);
     }   
@@ -213,4 +215,19 @@ function graphOnClickActions(){
         reDrawWithSpecParams(current_data,"popup_ms2_spectrum",specparams,specId);
     })
     
+}
+/**
+ * Function return the max error value from the list
+ */
+function getAbsoluteMaxValfromList(errorDataList){
+    let max = 0;
+    errorDataList.forEach((element,index)=>{
+        let val = Math.abs(element.mass_error);
+        if(max < val) max = val; 
+    })
+    //Getting the round off fraction value
+    max = max * 100;
+    max = Math.ceil(max)/100;
+    console.log("max : ", max);
+    return max;
 }
