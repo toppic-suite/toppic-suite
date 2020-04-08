@@ -86,12 +86,6 @@ void getMatchedPeaks(DeconvMsPtrVec &ms1_ptr_vec, double prec_mass,
       }
     }
   }
-  if (matched_peaks.size() > 0){}
-  else{
-    for (int i = 0; i < 100; i++){
-      std::cout << "mass diff: " << mass_diff_vec[i] << ", error_tole : " << error_tole_vec[i] << std::endl;
-    }
-  }
 }
 
 bool containPrecursor(DeconvMsPtr ms1_ptr, double prec_mass, int charge, FeatureParaPtr para_ptr) {
@@ -387,9 +381,7 @@ void findMsOneFeatures(DeconvMsPtrVec &ms1_ptr_vec, PeakPtrVec2D & raw_peaks,
   std::sort(all_peaks.begin(), all_peaks.end(), Peak::cmpInteDec);
   int feat_id = 0;
   size_t peak_idx = 0;
-  
- 
-  
+
   while (feat_id < para_ptr->feature_num_ && peak_idx < all_peaks.size()) {
     DeconvPeakPtr best_peak = all_peaks[peak_idx];
     if (peakExists(ms1_ptr_vec, best_peak)) {
@@ -449,9 +441,7 @@ void readHeaders(const std::string & file_name, MsHeaderPtrVec &header_ptr_vec) 
   LOG_DEBUG("Start search");
   while ((ms_ptr = sp_reader.getNextMsPtr()) != nullptr) {
     header_ptr_vec.push_back(ms_ptr->getMsHeaderPtr());
-    //std::cout << std::flush <<  "reading spectrum " << header_ptr_vec.size() << "\r";
   }
-  //std::cout << std::endl;
 }
 
 inline bool isMatch(FracFeaturePtr feature_ptr, MsHeaderPtr header, FeatureParaPtr para_ptr) {
@@ -605,4 +595,3 @@ void process(int frac_id, const std::string &sp_file_name,
 }  // namespace 
 
 }  // namespace toppic 
-
