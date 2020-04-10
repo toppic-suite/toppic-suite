@@ -15,6 +15,7 @@ class MassShifts {
 		 * Remove spaces if exists between sequences
 		 */
 		seq = seq.replace(/ +/g, "");
+		completeCalData.sequence = seq;
 		return [seq,massShiftList] ;
 	}
 	/**

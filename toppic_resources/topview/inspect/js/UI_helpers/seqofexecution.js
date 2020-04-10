@@ -59,6 +59,7 @@ class SeqOfExecution
 		 */
 		let UIHelperObj = new UIHelper();
 		let monoMassList = UIHelperObj.getMassListFromUI();
+		
 		/**
 		 * Get the parsed sequence after removing mass shift list from 
 		 * the entered sequence. 
@@ -66,7 +67,6 @@ class SeqOfExecution
 		 */
 		let massShiftObj = new MassShifts();
 		[sequence,massShiftList] = massShiftObj.getSequenceFromUI();
-		completeCalData.sequence = sequence;
 		/** 
 		* Get fixed mass selected by user
 		*/
@@ -183,7 +183,7 @@ class SeqOfExecution
 		 * Get combined list of both matched and unmatched peaks to write to table
 		 */
 		matchedUnMatchedPeaks = matchedPeaksObj.getMatchedAndUnMatchedList(monoMassList,matchedPeakList);
-		completeCalData.matchedandunmatcheddata = matchedUnMatchedPeaks;
+		
 		/**
 		 * Do the below function when peak list data is not empty
 		 */

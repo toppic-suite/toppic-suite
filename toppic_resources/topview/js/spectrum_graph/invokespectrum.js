@@ -34,6 +34,7 @@ addSpectrum = function(id,peakList,envelopeList,monoMZ, ionData, graphFeatures){
 }
  //  Function to set spectrum perameters based on the data
  function compSpectrumParameters(peakList, envelopeList, monoMZ){
+	 console.log("peakList : ",peakList);
 	let ratio = 1; 
 	let specParameters = new SpectrumParameters();
 	// Sort by mz

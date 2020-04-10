@@ -92,7 +92,6 @@ class MatchedPeaks {
 						matchedList.push(peak);
 					}
 				}
-
 			}
 		}
 		return matchedList;
@@ -121,6 +120,7 @@ class MatchedPeaks {
 			  matchedAndUnmatchedList.push(peak);
 			}
 		})
+		completeCalData.matchedandunmatcheddata = matchedAndUnmatchedList;
 		return matchedAndUnmatchedList ;
 	}
 
