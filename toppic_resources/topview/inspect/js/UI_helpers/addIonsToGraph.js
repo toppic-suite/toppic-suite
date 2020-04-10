@@ -51,20 +51,19 @@ function generateMonoMassGraph(monoMassList,prec_mz){
     graphFeatures.errorListData = errorListData;
     graphFeatures.errorThreshHoldVal = getAbsoluteMaxValfromList(graphFeatures.errorListData);
     
-    ms2_graph = addSpectrum("monoMassGraph",monoMassList_mz,null,prec_mz,ionData,graphFeatures);
+    addSpectrum("monoMassGraph",monoMassList_mz,null,prec_mz,ionData,graphFeatures);
 }
 /**
  * Function return the max error value from the list
  */
 function getAbsoluteMaxValfromList(errorDataList){
     let max = 0;
-    errorDataList.forEach((element,index)=>{
+    errorDataList.forEach((element)=>{
         let val = Math.abs(element.mass_error);
         if(max < val) max = val; 
     })
     //Getting the round off fraction value
     max = max * 100;
     max = Math.ceil(max)/100;
-    console.log("max : ", max);
     return max;
 }

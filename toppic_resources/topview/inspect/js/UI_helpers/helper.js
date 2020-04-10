@@ -50,6 +50,7 @@ class UIHelper{
                 }
             }
         }
+        completeCalData.monomasslist = spectrumDataList;
         return spectrumDataList ;
     }
     // Function to get data of peaks and intensity from UI
@@ -80,6 +81,7 @@ class UIHelper{
                 }
             }
         }	
+        completeCalData.peakdatalist = spectrumDataList;
 	    return spectrumDataList ;
     }
     // Function to create table
@@ -130,6 +132,7 @@ class UIHelper{
         {
             let rowSize = $("#tableContainer tbody tr").length;
             let tr = document.createElement("tr");
+            tr.setAttribute("id",i+"_row");
             tr.setAttribute("name",matchedPeaks[i].position);
             let id = 0;
             for(let j = 0; j < totalColCount ; j++)
@@ -151,7 +154,10 @@ class UIHelper{
                   td.appendChild(a);
                 }
                 else if(j == 4) td.innerHTML = matchedPeaks[i].intensity ;
-                else if(j == 5) td.innerHTML = matchedPeaks[i].thMass;
+                else if(j == 5){
+                    td.className = "th_mass";
+                    td.innerHTML = matchedPeaks[i].thMass;
+                } 
                 else if(j == 6) td.innerHTML = matchedPeaks[i].ion;
                 else if(j == 7) td.innerHTML = matchedPeaks[i].position;
                 else if(j == 8) td.innerHTML = matchedPeaks[i].massError;
@@ -180,6 +186,13 @@ class UIHelper{
         let peak_value = parseFloat(this.innerHTML).toFixed(3) ;
         let graphFeatures = new GraphFeatures();
         ms2_graph.redraw(peak_value,graphFeatures);
+        console.log("completeCalData : ", completeCalData);
+        let parent_id  = $(this).parent().parent().prop('id');
+        console.log("parent_id : ",parent_id);
+        let th_mass_val = $("#"+parent_id+" .th_mass").text();
+        console.log("th_mass_val : ",th_mass_val);
+        let monoMassList = completeCalData.monomasslist;
+        generateMonoMassGraph(monoMassList,th_mass_val);
       });
     }
     // Function to diaplsy matched count and un-matched count
