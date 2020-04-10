@@ -39,6 +39,8 @@ function generateCorrespondingGraph(current_data,id,prec_mz,specId){
         console.log(graphFeatures.errorListData);
         graphFeatures.errorThreshHoldVal = getAbsoluteMaxValfromList(graphFeatures.errorListData);
         // Current Data itself contains Peak data
+        console.log("current_data : ", current_data);
+        console.log("graphFeatures : ", graphFeatures);
         spectrumgraph = new addSpectrum(id, current_data, null, prec_mz, current_data,graphFeatures);
     }   
     else{

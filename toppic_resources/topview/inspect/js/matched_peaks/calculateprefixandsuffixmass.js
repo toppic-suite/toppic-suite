@@ -57,7 +57,7 @@ calculatePrefixAndSuffixMass = function(){
 				prefixMassList[j].mass = prefixMassList[j].mass + massShift_in;
 			}
 		
-			
+			completeCalData.prefixmasslist = prefixMassList;
 			return prefixMassList;
 		}
 		return emptyMassList;
@@ -108,6 +108,7 @@ calculatePrefixAndSuffixMass = function(){
 			{
 				suffixMassList[j].mass = suffixMassList[j].mass + massShift_in  ;
 			}
+			completeCalData.suffixmasslist = suffixMassList;
 			return suffixMassList;
 		}
 		return emptyMassList ;

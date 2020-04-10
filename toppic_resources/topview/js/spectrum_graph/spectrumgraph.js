@@ -393,21 +393,21 @@ drawSequence = function(svg,spectrumParameters){
 	let x,y,text;
 	// Draw | at 0 for prefix mass list
 	x = spectrumParameters.getPeakXPos((0));
-	y = spectrumParameters.padding.head-40;
+	y = spectrumParameters.padding.head-35;
 	text = "|";
 	// Add "|" At the start of the prefix sequence
-	if(0 > spectrumParameters.minMz && 0 <= spectrumParameters.maxMz)
+	if(0 >= spectrumParameters.minMz && 0 <= spectrumParameters.maxMz)
 	{
 		drawAcids_innerFunc(seqSvg,x,y,text);
 	}
 	sequenceData.forEach(function(element,index,prefixSequenceData){
-		if(element.mass > spectrumParameters.minMz && element.mass <= spectrumParameters.maxMz)
+		if(element.mass >= spectrumParameters.minMz && element.mass <= spectrumParameters.maxMz)
 		{
 			let x1 = spectrumParameters.getPeakXPos(0);
 			if(index != 0) x1 = spectrumParameters.getPeakXPos(prefixSequenceData[index-1].mass);
 			x2 = spectrumParameters.getPeakXPos((element.mass));
 			x = (x1+x2)/2;
-			y = spectrumParameters.padding.head-40;
+			y = spectrumParameters.padding.head-35;
 			drawAcids_innerFunc(seqSvg,x,y,element.acid);
 			drawAcids_innerFunc(seqSvg,x2,y,"|");
 		}
@@ -417,20 +417,20 @@ drawSequence = function(svg,spectrumParameters){
 	// Draw | at water mass for suffix mass list
 	let massOfWater = 18.010564683704;
 	x = spectrumParameters.getPeakXPos(massOfWater);// Mass of water=18.010564683704
-	y = spectrumParameters.padding.head-20;
+	y = spectrumParameters.padding.head-15;
 	text = "|";
-	if(massOfWater > spectrumParameters.minMz && massOfWater <= spectrumParameters.maxMz)
+	if(massOfWater >= spectrumParameters.minMz && massOfWater <= spectrumParameters.maxMz)
 	{
 		drawAcids_innerFunc(seqSvg,x,y,text);
 	}
 	sequenceData.forEach(function(element,index,suffixSequeceData){
-		if(element.mass > spectrumParameters.minMz && element.mass <= spectrumParameters.maxMz)
+		if(element.mass >= spectrumParameters.minMz && element.mass <= spectrumParameters.maxMz)
 		{
 			let x1 = spectrumParameters.getPeakXPos(18.010564683704);// Mass of water=18.010564683704
 			if(index != 0) x1 = spectrumParameters.getPeakXPos(suffixSequeceData[index-1].mass);
 			x2 = spectrumParameters.getPeakXPos((element.mass));
 			x = (x1+x2)/2;
-			y = spectrumParameters.padding.head-20;
+			y = spectrumParameters.padding.head-15;
 			drawAcids_innerFunc(seqSvg,x,y,element.acid);
 			drawAcids_innerFunc(seqSvg,x2,y,"|");
 		}

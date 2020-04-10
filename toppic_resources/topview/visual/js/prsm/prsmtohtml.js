@@ -324,7 +324,7 @@ function getFixedPtm(ptm)
 	{
 		ptm.occurence.forEach(function(occurence,i){
 			//fixed_ptm = fixed_ptm + occurence.left_pos + "-" + occurence.right_pos ;
-      fixed_ptm = fixed_ptm + occurence.right_pos;
+      	fixed_ptm = fixed_ptm + occurence.right_pos;
 			if(ptm.occurence.length-1 > i )
 			{
 				fixed_ptm = fixed_ptm + ";" ;

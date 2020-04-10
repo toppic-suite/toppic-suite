@@ -184,7 +184,7 @@ class MatchedPeaks {
 	getMatchedAndUnmatchedPrefixAndSuffixMassList(prefixOrSuffixMassList, monoMassList,
 																massErrorthVal,ppmErrorthVal,prefixInd)
 	{
-		console.log("monoMassList : ", monoMassList);
+		//console.log("monoMassList : ", monoMassList);
 		let MatchedAndUnMatchedList = [];
 		let monoMassList_temp = monoMassList.slice();
 		let len = monoMassList_temp.length;
