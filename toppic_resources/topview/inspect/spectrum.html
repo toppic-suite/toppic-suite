@@ -62,8 +62,8 @@
 <script src="js/UI_helpers/rectbackgroundcolor.js" ></script>
 <!--draw nav bar-->
 <script src="../visual/js/util/navBar.js" ></script>
-
-
+<!-- Store all the calculated Data -->
+<script src="js/UI_helpers/completeCalData.js" ></script>
 
 <script>
  // define global variable ms2_graph and precursorMass
@@ -325,6 +325,11 @@
 		</div>
 	<div class="row">
 		<svg id = "spectrum" height="250" width = "1000" style="background-color:white;display:none"></svg>
+	</div>
+	
+	<div class="row">
+		<h5 id="monoMasstitle" style="display:none">MonoMass Spectrum</h5>
+		<svg id = "monoMassGraph" height="250" width = "1000" style="background-color:white;display:none"></svg>
 	</div>
 	<div class="row" id="peakCount" style="display:none">
 		<div class="col-2 pull-left" >
