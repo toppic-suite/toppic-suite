@@ -148,7 +148,9 @@ void DeconvProcess::processSpMissingLevelOne(DeconvOneSpPtr deconv_ptr,
       }
       count2++;
     }
+    ms_group_ptr = reader_ptr->getNextMsGroupPtr();
   }
+  std::cout << std::endl;
 }
 
 void DeconvProcess::deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 

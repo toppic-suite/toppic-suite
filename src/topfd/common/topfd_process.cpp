@@ -58,12 +58,20 @@ void moveFiles(std::string &spec_file_name, bool move_mzrt) {
   std::string file_dir =  base_name + "_file";
   file_util::createFolder(file_dir);
   std::string file_name = base_name + "_ms1.msalign";
-  file_util::moveFile(file_name, file_dir);
-  //file_name = base_name + "_feature.xml";
-  //file_util::moveFile(file_name, file_dir);
-  if (move_mzrt) {
-    file_name = base_name + "_frac.mzrt.csv";
+  
+   //create folder only if ms1 msalign and frac mzrt csv exist  
+  //== when ms1 spectra was used
+  if (file_util::exists(file_name)) {//if there is ms1 msalign
+    file_util::createFolder(file_dir);
     file_util::moveFile(file_name, file_dir);
+    //file_name = base_name + "_feature.xml";
+    //file_util::moveFile(file_name, file_dir);
+    if (move_mzrt) {
+      file_name = base_name + "_frac.mzrt.csv";
+      if (file_util::exists(file_name)) {
+        file_util::moveFile(file_name, file_dir);
+      }
+    }
   }
   /*
   if (move_sample_feature) {

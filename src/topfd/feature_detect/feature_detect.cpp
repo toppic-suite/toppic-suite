@@ -560,27 +560,27 @@ void process(int frac_id, const std::string &sp_file_name,
     raw_reader_ptr->getMs1Peaks(raw_peaks);
     raw_reader_ptr = nullptr;
     findMsOneFeatures(ms1_ptr_vec, raw_peaks, para_ptr, frac_features, env_para_ptr);
+
+    LOG_DEBUG("start reading ms2");
+    std::string ms2_file_name = base_name + "_ms2.msalign";
+    MsHeaderPtrVec header_ptr_vec;
+    readHeaders(ms2_file_name, header_ptr_vec);
+    SpecFeaturePtrVec ms2_features;
+    getMs2Features(ms1_ptr_vec, header_ptr_vec, frac_features, para_ptr, ms2_features);
+
+    SampleFeaturePtrVec sample_features;
+    getSampleFeatures(sample_features, frac_features, ms2_features);
+
+    std::string output_file_name = base_name + "_feature.xml";
+    frac_feature_writer::writeXmlFeatures(output_file_name, frac_features);
+    std::string batmass_file_name = base_name + "_frac.mzrt.csv";
+    frac_feature_writer::writeBatMassFeatures(batmass_file_name, frac_features);
+    std::string sample_feature_file_name = base_name + "_ms1.feature";
+    sample_feature_writer::writeFeatures(sample_feature_file_name, sample_features);
+
+    output_file_name = base_name + "_ms2.feature";
+    spec_feature_writer::writeFeatures(output_file_name, ms2_features); 
   }
-
-  LOG_DEBUG("start reading ms2");
-  std::string ms2_file_name = base_name + "_ms2.msalign";
-  MsHeaderPtrVec header_ptr_vec;
-  readHeaders(ms2_file_name, header_ptr_vec);
-  SpecFeaturePtrVec ms2_features;
-  getMs2Features(ms1_ptr_vec, header_ptr_vec, frac_features, para_ptr, ms2_features);
-
-  SampleFeaturePtrVec sample_features;
-  getSampleFeatures(sample_features, frac_features, ms2_features);
-
-  std::string output_file_name = base_name + "_feature.xml";
-  frac_feature_writer::writeXmlFeatures(output_file_name, frac_features);
-  std::string batmass_file_name = base_name + "_frac.mzrt.csv";
-  frac_feature_writer::writeBatMassFeatures(batmass_file_name, frac_features);
-  std::string sample_feature_file_name = base_name + "_ms1.feature";
-  sample_feature_writer::writeFeatures(sample_feature_file_name, sample_features);
-
-  output_file_name = base_name + "_ms2.feature";
-  spec_feature_writer::writeFeatures(output_file_name, ms2_features); 
 }
 
 }  // namespace 
