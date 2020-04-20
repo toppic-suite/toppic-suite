@@ -39,7 +39,7 @@ class TopfdPara {
   bool output_multiple_mass_ = false;
   bool do_final_filtering_ = true;
   bool output_match_env_ = false;
-  bool output_json_files_ = true;
+  //bool output_json_files_ = true;
   bool merge_files_ = false;
   int  thread_number_ = 1;
   bool gene_html_folder_ = false;

@@ -161,7 +161,7 @@ void DeconvProcess::deconvMissingMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_pt
     match_env_writer::write(ms2_env_name_, header_ptr, result_envs);
   }
 
-  if (topfd_para_ptr_->output_json_files_) {
+  if (topfd_para_ptr_->gene_html_folder_) {
     std::string json_file_name = ms2_json_dir_ 
         + file_util::getFileSeparator() 
         + "spectrum" + std::to_string(header_ptr->getId()) + ".js";
@@ -291,7 +291,7 @@ void DeconvProcess::deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   }
 
   //write only when html folder argument is true
-  if (topfd_para_ptr_->output_json_files_ && topfd_para_ptr_->gene_html_folder_) {
+  if (topfd_para_ptr_->gene_html_folder_) {
     std::string json_file_name = ms1_json_dir_ 
         + file_util::getFileSeparator() 
         + "spectrum" + std::to_string(header_ptr->getId()) + ".js";
@@ -331,7 +331,7 @@ void DeconvProcess::deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
     if (topfd_para_ptr_->output_match_env_) {
       match_env_writer::write(ms2_env_name_, header_ptr, result_envs);
     }
-    if (topfd_para_ptr_->output_json_files_) {
+    if (topfd_para_ptr_->gene_html_folder_) {
       std::string json_file_name = ms2_json_dir_ 
           + file_util::getFileSeparator() 
           + "spectrum" + std::to_string(ms_ptr->getMsHeaderPtr()->getId()) + ".js";
