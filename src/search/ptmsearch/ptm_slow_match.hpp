@@ -38,7 +38,6 @@ class PtmSlowMatch {
   PtmSlowMatch(ProteoformPtr proteo_ptr,
                SpectrumSetPtr spectrum_set_ptr,
                ProteoformTypePtr align_type_ptr,
-               CompShiftLowMem comp_shift,
                PtmSearchMngPtr mng_ptr);
 
   ProteoformPtr getProteoform(){return proteo_ptr_;}
@@ -57,7 +56,6 @@ class PtmSlowMatch {
   PrmMsPtrVec ms_six_ptr_vec_;
   ExtendMsPtrVec ms_three_ptr_vec_;
   ProteoformTypePtr align_type_ptr_;
-  CompShiftLowMem comp_shift_;
   PSAlignPtr ps_align_ptr_;
 
   DiagonalHeaderPtrVec getNTermShiftListCommonHeaders();
