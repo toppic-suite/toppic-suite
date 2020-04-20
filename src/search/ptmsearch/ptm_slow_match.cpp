@@ -25,7 +25,6 @@ namespace toppic {
 PtmSlowMatch::PtmSlowMatch(ProteoformPtr proteo_ptr,
                            SpectrumSetPtr spectrum_set_ptr,
                            ProteoformTypePtr align_type_ptr,
-                           CompShiftLowMem comp_shift,
                            PtmSearchMngPtr mng_ptr) {
   proteo_ptr_ = proteo_ptr;
   deconv_ms_ptr_vec_ = spectrum_set_ptr->getDeconvMsPtrVec();
@@ -33,7 +32,6 @@ PtmSlowMatch::PtmSlowMatch(ProteoformPtr proteo_ptr,
   ms_three_ptr_vec_ = spectrum_set_ptr->getMsThreePtrVec();
   prec_mono_mass_ = spectrum_set_ptr->getPrecMonoMass();
   align_type_ptr_ = align_type_ptr;
-  comp_shift_ = comp_shift;
   mng_ptr_ = mng_ptr;
   init();
 }
@@ -46,12 +44,16 @@ DiagonalHeaderPtrVec PtmSlowMatch::getNTermShiftListCommonHeaders() {
   std::vector<std::pair<int, int>> sp_masses_toles
       = prm_ms_util::getIntMassErrorList(ms_six_ptr_vec_, tole_ptr, scale, true, false);
 
-  std::vector<double> best_shifts = comp_shift_.findBestShift(
+  CompShiftLowMemPtr comp_shift_ptr = std::make_shared<CompShiftLowMem>();
+
+  std::vector<double> best_shifts = comp_shift_ptr->findBestShift(
       sp_masses_toles,
       proteo_ptr_->getBpSpecPtr()->getScaledPrmMasses(scale),
       mng_ptr_->n_top_diagonals_,
       mng_ptr_->min_diagonal_gap_,
       scale);
+  // release memory for comp_shift
+  comp_shift_ptr = nullptr;
 
   DiagonalHeaderPtrVec header_ptrs;
   for (size_t i = 0; i < best_shifts.size(); i++) {

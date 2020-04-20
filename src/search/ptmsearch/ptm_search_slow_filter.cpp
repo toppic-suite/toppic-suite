@@ -23,7 +23,6 @@ namespace toppic {
 
 PtmSearchSlowFilter::PtmSearchSlowFilter(SpectrumSetPtr spectrum_set_ptr,
                                          SimplePrsmPtrVec simple_prsm_ptrs,
-                                         CompShiftLowMem comp_shift,
                                          PtmSearchMngPtr mng_ptr) {
   std::string db_file_name = mng_ptr->prsm_para_ptr_->getSearchDbFileName();
   FastaIndexReaderPtr reader_ptr = std::make_shared<FastaIndexReader>(db_file_name);
@@ -44,7 +43,7 @@ PtmSearchSlowFilter::PtmSearchSlowFilter(SpectrumSetPtr spectrum_set_ptr,
           = std::make_shared<PtmSlowMatch>(mod_form_ptr_vec[j],
                                            spectrum_set_ptr,
                                            ProteoformType::INTERNAL,
-                                           comp_shift, mng_ptr);
+                                           mng_ptr);
       complete_prefix_slow_match_ptrs_.push_back(ptm_slow_match_ptr);
     }
   }
