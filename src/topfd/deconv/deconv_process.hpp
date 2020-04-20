@@ -73,9 +73,6 @@ class DeconvProcess {
   
   DeconvProcess *deconv_process_ptr_;
   //std::string argu_str_;
-  //bool missing_level_one_;
-  //bool output_match_env_ = false;
-  //bool output_json_files_ = true;
 
   std::string spec_file_name_;
   int frac_id_;
