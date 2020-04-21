@@ -70,13 +70,13 @@ CompProbValue::CompProbValue(double convert_ratio, const ResFreqPtrVec &residue_
 
 CompProbValue::~CompProbValue() {
   if (page_table_ != nullptr) {
-    delete page_table_;
+    delete[] page_table_;
   }
   if (pos_scores_ != nullptr) {
-    delete pos_scores_;
+    delete[] pos_scores_;
   }
   if (tmp_pos_scores_ != nullptr) {
-    delete tmp_pos_scores_;
+    delete[] tmp_pos_scores_;
   }
 }
 
