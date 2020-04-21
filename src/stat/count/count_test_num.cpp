@@ -37,16 +37,16 @@ CountTestNum::CountTestNum(double convert_ratio, double max_ptm_mass,
 
 CountTestNum::~CountTestNum() {
   if (comp_mass_cnts_ != nullptr) {
-    delete comp_mass_cnts_;
+    delete[] comp_mass_cnts_;
   }
   if (pref_mass_cnts_ != nullptr) {
-    delete pref_mass_cnts_;
+    delete[] pref_mass_cnts_;
   }
   if (suff_mass_cnts_ != nullptr) {
-    delete suff_mass_cnts_;
+    delete[] suff_mass_cnts_;
   }
   if (internal_mass_cnts_ != nullptr) {
-    delete internal_mass_cnts_;
+    delete[] internal_mass_cnts_;
   }
 }
 
