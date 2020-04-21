@@ -52,16 +52,14 @@ void seleTopPrsms(const PrsmPtrVec &all_prsm_ptrs,
 std::function<void()> geneTask(SpectrumSetPtr spectrum_set_ptr, 
                                SimplePrsmPtrVec ori_simple_prsm_ptrs,
                                PtmSearchMngPtr mng_ptr,
-                               CompShiftLowMem comp_shift,
                                SimpleThreadPoolPtr pool_ptr, 
                                PrsmXmlWriterSetPtrVec writer_ptr_vec) {
 
-  return [spectrum_set_ptr, ori_simple_prsm_ptrs, mng_ptr, comp_shift, pool_ptr, writer_ptr_vec]() {
+  return [spectrum_set_ptr, ori_simple_prsm_ptrs, mng_ptr, pool_ptr, writer_ptr_vec]() {
     SimplePrsmPtrVec simple_prsm_ptrs = 
         simple_prsm_util::getUniqueMatches(ori_simple_prsm_ptrs);
     PtmSearchSlowFilterPtr slow_filter_ptr = 
-        std::make_shared<PtmSearchSlowFilter>(spectrum_set_ptr, simple_prsm_ptrs,
-                                              comp_shift, mng_ptr);
+        std::make_shared<PtmSearchSlowFilter>(spectrum_set_ptr, simple_prsm_ptrs, mng_ptr);
     boost::thread::id thread_id = boost::this_thread::get_id();
     int writer_id = pool_ptr->getId(thread_id);
     PrsmXmlWriterSetPtr writer_ptr = writer_ptr_vec[writer_id];
@@ -98,7 +96,6 @@ std::function<void()> geneTask(SpectrumSetPtr spectrum_set_ptr,
 
 PtmSearchProcessor::PtmSearchProcessor(PtmSearchMngPtr mng_ptr){
   mng_ptr_ = mng_ptr;
-  comp_shift_ = CompShiftLowMem();
 }
 
 
@@ -151,7 +148,7 @@ void PtmSearchProcessor::process(){
           boost::this_thread::sleep(boost::posix_time::milliseconds(100));
         }
         pool_ptr->Enqueue(geneTask(spec_set_ptr, selected_prsm_ptrs,
-                                   mng_ptr_, comp_shift_, pool_ptr, writer_set_ptr_vec));
+                                   mng_ptr_, pool_ptr, writer_set_ptr_vec));
       }
     }
     std::cout << std::flush <<  "Multiple PTM search - processing " << cnt 
