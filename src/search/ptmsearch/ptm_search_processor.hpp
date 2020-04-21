@@ -34,7 +34,6 @@ class PtmSearchProcessor {
 
  private:
   PtmSearchMngPtr mng_ptr_;
-  CompShiftLowMem comp_shift_;
 
   ProteoformPtrVec proteo_ptrs_;
   ProteoformPtrVec2D mod_proteo_2d_ptrs_;
