@@ -1,5 +1,5 @@
-// maximum number of peaks and envelopes points to be renderedon to graph per each bin(range)
-const circlesPerRange = 200;
+/** maximum number of peaks and envelopes points to be renderedon to graph per each bin(range) */
+const circlesPerRange = 200; 
 const peaksPerRange = 200;
 /**
  * Function draws the graph, binds zoom and drag function to the graph

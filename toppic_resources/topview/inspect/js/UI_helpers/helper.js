@@ -169,13 +169,13 @@ class UIHelper{
             // Creating classes with matched_peak even and odd, this will help to show only matched peaks on click of matched peaks
             if(matchedPeaks[i].matchedInd == "Y")
             {
-                if(id%2 == 0) classname = "matched_peak even"
-                else classname = "matched_peak odd"
+                if(id%2 == 0) classname = "matched_peak even";
+                else classname = "matched_peak odd";
             }
             else
             {
-                if(id%2 == 0) classname = "unmatched_peak even"
-                else classname = "unmatched_peak odd"
+                if(id%2 == 0) classname = "unmatched_peak even";
+                else classname = "unmatched_peak odd";
             }
             tr.setAttribute("class",classname);
             dataContainer_tbody.append(tr);
