@@ -2,7 +2,7 @@
 class MultiScan{
     constructor(){
     }
-    //ms1_ms2_json this give ms1_json folder or ms2_json folder
+    // ms1_ms2_json this give ms1_json folder or ms2_json folder
     promiseLoadDataJS(specidList,scanIdList,ms1_ms2_json){
         //let timeoutVal = 2000;
         let len = specidList.length;

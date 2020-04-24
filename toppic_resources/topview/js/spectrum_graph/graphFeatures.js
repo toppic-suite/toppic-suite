@@ -1,3 +1,4 @@
+/** Class with variables to set graph properties */
 class GraphFeatures{
     constructor(){
         this.showCircles = true;

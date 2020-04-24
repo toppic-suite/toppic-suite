@@ -1,4 +1,4 @@
-/*	Get data from global variable spectrum_data and utilities to manupulate----
+/**	Get data from global variable spectrum_data and utilities to manupulate----
  * 	the data-------------------------------------------------------------------*/
 SpectrumParameters = function() {
   /* Attributes to decide what to be shown on the graph */
