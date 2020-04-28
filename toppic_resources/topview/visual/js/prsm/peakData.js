@@ -1,5 +1,6 @@
-/*	Get data from global variable spectrum_data and utilities to manupulate----
- * 	the data-------------------------------------------------------------------*/
+/**
+ * Get data from global variable spectrum_data and utilities to manupulate the data
+ */
 PeakData = function() {
     this.peak_list = [];
     this.envelope_list = [];
