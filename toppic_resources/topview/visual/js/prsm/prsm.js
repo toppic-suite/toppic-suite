@@ -12,7 +12,7 @@
 } ); 	
 
 /**
- * Function to show only matched peaks on click of matched peaks
+ * Function to show only matched peaks on click of matched peaks button
  */
 function showMatchedPeaks() {
   var elems = document.getElementsByClassName("matched_peak");
@@ -27,7 +27,7 @@ function showMatchedPeaks() {
 }
 
 /**
- * Function to show only unmatched peaks on click of unmatched peaks
+ * Function to show only unmatched peaks on click of unmatched peaks button
  */
 function showNotMatchedPeaks() {
   var elems = document.getElementsByClassName("matched_peak");
@@ -42,7 +42,7 @@ function showNotMatchedPeaks() {
 }
 
 /**
- * Function to show all peaks on click of All peaks
+ * Function to show all peaks on click of All peaks button
  */
 function showAllPeaks() {
   var elems = document.getElementsByClassName('matched_peak');
@@ -56,7 +56,9 @@ function showAllPeaks() {
   $('div.dataTables_scrollBody').height(400);
 }
 /**
- * Function to add all the peaks on load of the page
+ * This gets invoked on click of annotation in the SVG of sequence at matched positions
+ * Function to show only ions matched at a particular position
+ * @param {String} ids - contains name of the tag
  */
 function showIonPeaks(ids) {
 	  var elems = document.getElementsByClassName('matched_peak');

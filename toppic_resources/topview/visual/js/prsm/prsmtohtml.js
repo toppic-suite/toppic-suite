@@ -77,9 +77,14 @@ function createTableElements(){
 			loop_matched_ions(peak,i) ;
 		}
 	})
+
 	//after looping through the prsm files, store the ion type data to local storage
 	window.localStorage.setItem('ionType', ionArray);
-	
+	/**
+	 * Inner function to create a rows and columns for monomass table
+	 * @param {object} peak - contains information of each peak 
+	 * @param {int} i - index of the peak
+	 */
 	function loop_matched_ions(peak,i){
 		/*	Create row for each peak value object in the table	*/
 		var tr = document.createElement('tr');
@@ -87,28 +92,32 @@ function createTableElements(){
 		let l_scan;
 		if((parseInt(peak.peak_id) + 1)%2 == 0)
 		{
-			l_class = "unmatched_peak even";
+			// class name helps to get unmatched peaks when clicking unmatched peaks
+			l_class = "unmatched_peak even"; 
 		}
 		else
 		{
-			l_class = "unmatched_peak odd";
+			// class name helps to get unmatched peaks when clicking unmatched peaks
+			l_class = "unmatched_peak odd"; 
 		}
 		if(peak.hasOwnProperty('matched_ions_num'))
 		{
 			id = id + peak.matched_ions.matched_ion.ion_type;
 			if((parseInt(peak.peak_id) + 1)%2 == 0)
 			{
+				// class name helps to get matched peaks when clicking matched peaks
 				l_class = "matched_peak even";
 			}
 			else
 			{
+				// class name helps to get matched peaks when clicking matched peaks
 				l_class = "matched_peak odd";
 			}
 			l_matched_peak_count++;
-			/*	create a name for each row */
+			//	create a name for each row
 			tr.setAttribute("name",peak.matched_ions.matched_ion.ion_position);
 		}
-		/*	Set "id","class name" and "role" for each row	*/
+		//	Set "id","class name" and "role" for each row
 		tr.setAttribute("id", id);
 		tr.setAttribute("class",l_class);
 		tr.setAttribute("role","row");
@@ -134,7 +143,7 @@ function createTableElements(){
 			}
 			if(i == 3)
 			{
-				/*	provide link to click on m/z value to view spectrum */
+				//	provide link to click on m/z value to view spectrum 
 				let a = document.createElement('a');
 				a.href="#!"
 				a.className = "peakRows"

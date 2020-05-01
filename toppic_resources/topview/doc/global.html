@@ -104,6 +104,166 @@
     
 
     
+    <h4 class="name" id="activateCurrentnavbar"><span class="type-signature"></span>activateCurrentnavbar<span class="signature">(id, currentValue)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Function highlights the active spectrum on clcik of the scan number
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Contains id of the SVG tag</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>currentValue</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">int</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Contains scan number</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="multiscan.js.html">multiscan.js</a>, <a href="multiscan.js.html#line205">line 205</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id="allProteins"><span class="type-signature"></span>allProteins<span class="signature">(folderName)</span><span class="type-signature"></span></h4>
     
 
@@ -630,6 +790,94 @@
     
 
     
+    <h4 class="name" id="buttons"><span class="type-signature"></span>buttons<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    On-click Actions to show spectrum graph and invoke downloads and other button actions
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="buttons.js.html">buttons.js</a>, <a href="buttons.js.html#line4">line 4</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id="buttonsAndAlerts"><span class="type-signature"></span>buttonsAndAlerts<span class="signature">(para, prsm, id)</span><span class="type-signature"></span></h4>
     
 
@@ -778,6 +1026,212 @@
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
         <a href="prsmtohtml.js.html">prsmtohtml.js</a>, <a href="prsmtohtml.js.html#line372">line 372</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="createMultipleSvgs"><span class="type-signature"></span>createMultipleSvgs<span class="signature">(divId, svgId, className, data)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    This generates spectrum for each spec Id
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>divId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Contains Id of the div tag under which the monomass graphs are drawn</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>svgId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Contains id as "monoMassSvg_" to which scan Id is added</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>className</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Contains class name to which the corresponding svg graphs are drawn</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>data</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">contains the data of all the scans available</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="generateSpectrumGraphs.js.html">generateSpectrumGraphs.js</a>, <a href="generateSpectrumGraphs.js.html#line108">line 108</a>
     </li></ul></dd>
     
 
@@ -1003,6 +1457,482 @@
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
         <a href="prsmtohtml.js.html">prsmtohtml.js</a>, <a href="prsmtohtml.js.html#line47">line 47</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="generateCorrespondingGraph"><span class="type-signature"></span>generateCorrespondingGraph<span class="signature">(current_data, id, prec_mz, specId)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>current_data</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Contains a list with ion data if it is generating Mono Mass spectrum, contians peaklist and enveloplist if generating spectrums of MS1/MS2</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Contains the id of spectrum svg with _ followed by scan number (monoMassSvg_872/ms2svg_870)</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>prec_mz</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Float</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Contains the mass to which the graph needs to be zoomed</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>specId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Int</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Contains the spectrum number</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="generateSpectrumGraphs.js.html">generateSpectrumGraphs.js</a>, <a href="generateSpectrumGraphs.js.html#line26">line 26</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="getAbsoluteMaxValfromList"><span class="type-signature"></span>getAbsoluteMaxValfromList<span class="signature">(errorDataList)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Function return the absolute max error value from the list
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>errorDataList</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Contains the list of mass errors</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="generateSpectrumGraphs.js.html">generateSpectrumGraphs.js</a>, <a href="generateSpectrumGraphs.js.html#line225">line 225</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="getAminoAcidDistribution"><span class="type-signature"></span>getAminoAcidDistribution<span class="signature">(aminoAcid)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    - Calculated distribution of amino-acid.The first element in each amino-acid list give tha mass of the amino acid.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>aminoAcid</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Char</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Contains the character of the Amino Acid</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="aminoaciddistribution.js.html">aminoaciddistribution.js</a>, <a href="aminoaciddistribution.js.html#line7">line 7</a>
     </li></ul></dd>
     
 
@@ -1335,6 +2265,303 @@
     
 
     
+    <h4 class="name" id="getCurrentData"><span class="type-signature"></span>getCurrentData<span class="signature">(dataList, scanId)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Function return data of particular Scan number
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>dataList</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Contains data of all the scans</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>scanId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">int</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Contains scan id of the spectrum</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="multiscan.js.html">multiscan.js</a>, <a href="multiscan.js.html#line185">line 185</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="getEnvelopeData"><span class="type-signature"></span>getEnvelopeData<span class="signature">(json_data)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    gets envelope data list with mono_mass,charge, env_peaks(contains mz and intensity) and color attributesThis function adds color to the each list of envelopes
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>json_data</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">contains complete data of spectrum</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="peakData.js.html">peakData.js</a>, <a href="peakData.js.html#line35">line 35</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id="getFixedPtm"><span class="type-signature"></span>getFixedPtm<span class="signature">(prsm)</span><span class="type-signature"></span></h4>
     
 
@@ -1437,6 +2664,189 @@
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
         <a href="prsmtohtml.js.html">prsmtohtml.js</a>, <a href="prsmtohtml.js.html#line345">line 345</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="getIonData"><span class="type-signature"></span>getIonData<span class="signature">(prsm_data, specId, json_data)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    gets ion data list with mz, intensity and ion name This function gets matched ion data
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>prsm_data</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">contains complete data of prsm</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>specId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">int</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">contains information of the spec Id</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>json_data</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">contains complete data of spectrum</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="peakData.js.html">peakData.js</a>, <a href="peakData.js.html#line68">line 68</a>
     </li></ul></dd>
     
 
@@ -1597,6 +3007,143 @@
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
         <a href="drawMonoMassSpectrum.js.html">drawMonoMassSpectrum.js</a>, <a href="drawMonoMassSpectrum.js.html#line6">line 6</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="getPeakData"><span class="type-signature"></span>getPeakData<span class="signature">(json_data)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    gets peak data list with mz and intensity attributes
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>json_data</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">contains complete data of prsm</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="peakData.js.html">peakData.js</a>, <a href="peakData.js.html#line14">line 14</a>
     </li></ul></dd>
     
 
@@ -1906,6 +3453,182 @@
     
 
     
+    <h4 class="name" id="graphOnClickActions"><span class="type-signature"></span>graphOnClickActions<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Generating Jquery Onclick actions
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="generateSpectrumGraphs.js.html">generateSpectrumGraphs.js</a>, <a href="generateSpectrumGraphs.js.html#line138">line 138</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="hideSpectrum"><span class="type-signature"></span>hideSpectrum<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Hide spectrum graphs on click of hide spectrum
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="buttons.js.html">buttons.js</a>, <a href="buttons.js.html#line69">line 69</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id="loadDatafromJson2Html"><span class="type-signature"></span>loadDatafromJson2Html<span class="signature">()</span><span class="type-signature"></span></h4>
     
 
@@ -2096,6 +3819,94 @@
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
         <a href="prsmtohtml.js.html">prsmtohtml.js</a>, <a href="prsmtohtml.js.html#line194">line 194</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="PeakData"><span class="type-signature"></span>PeakData<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Data extractor to a proper format to understand by the spectrum graphThis gets peak data from @function getPeakData which is inside the PeakData objectThis gets envelope data from @function getEnvelopeData which is inside the PeakData objectThis also gets data from @function getIonData which is inside the PeakData object
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="peakData.js.html">peakData.js</a>, <a href="peakData.js.html#line7">line 7</a>
     </li></ul></dd>
     
 
@@ -3137,6 +4948,212 @@
     
 
     
+    <h4 class="name" id="reDrawWithSpecParams"><span class="type-signature"></span>reDrawWithSpecParams<span class="signature">(current_data, id, spectrumParameters, specId)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Function to redraw the spectrum on popup window on click of download button for respected scan number
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>current_data</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">contains peak list and envelope list data of the corresponding spectrum(Scan Number)</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Contains the Id of the SVG tag to which the spectrum need to be drawn</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>spectrumParameters</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Contains spectrum parameters to apply same to the pop window spectrum</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>specId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Int</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Contains the Spec Id of the corresponding graph</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="generateSpectrumGraphs.js.html">generateSpectrumGraphs.js</a>, <a href="generateSpectrumGraphs.js.html#line86">line 86</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id="showAllPeaks"><span class="type-signature"></span>showAllPeaks<span class="signature">()</span><span class="type-signature"></span></h4>
     
 
@@ -3145,7 +5162,7 @@
 
 
 <div class="description">
-    Function to show all peaks on click of All peaks
+    Function to show all peaks on click of All peaks button
 </div>
 
 
@@ -3225,7 +5242,7 @@
     
 
     
-    <h4 class="name" id="showIonPeaks"><span class="type-signature"></span>showIonPeaks<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="showCorrespondingGraph"><span class="type-signature"></span>showCorrespondingGraph<span class="signature">(id, className)</span><span class="type-signature"></span></h4>
     
 
     
@@ -3233,7 +5250,7 @@
 
 
 <div class="description">
-    Function to add all the peaks on load of the page
+    Function to hide graphs of all other spectrums other than current showing spectrum
 </div>
 
 
@@ -3242,6 +5259,78 @@
 
 
 
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Contains Id of the SVG tag to be shown</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>className</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">className of the spectrums to be hidden</td>
+        </tr>
+
+    
+    </tbody>
+</table>
 
 
 
@@ -3277,7 +5366,144 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="prsm.js.html">prsm.js</a>, <a href="prsm.js.html#line61">line 61</a>
+        <a href="generateSpectrumGraphs.js.html">generateSpectrumGraphs.js</a>, <a href="generateSpectrumGraphs.js.html#line130">line 130</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="showIonPeaks"><span class="type-signature"></span>showIonPeaks<span class="signature">(ids)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    This gets invoked on click of annotation in the SVG of sequence at matched positionsFunction to show only ions matched at a particular position
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>ids</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">contains name of the tag</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="prsm.js.html">prsm.js</a>, <a href="prsm.js.html#line63">line 63</a>
     </li></ul></dd>
     
 
@@ -3321,7 +5547,7 @@
 
 
 <div class="description">
-    Function to show only matched peaks on click of matched peaks
+    Function to show only matched peaks on click of matched peaks button
 </div>
 
 
@@ -3409,7 +5635,7 @@
 
 
 <div class="description">
-    Function to show only unmatched peaks on click of unmatched peaks
+    Function to show only unmatched peaks on click of unmatched peaks button
 </div>
 
 
@@ -3484,6 +5710,94 @@
 
 
         
+            
+
+    
+
+    
+    <h4 class="name" id="showSpectrun"><span class="type-signature"></span>showSpectrun<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Show spectrum graphs on click of Show Spectrum
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="buttons.js.html">buttons.js</a>, <a href="buttons.js.html#line59">line 59</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
     
 
     
@@ -3499,13 +5813,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#allProteins">allProteins</a></li><li><a href="global.html#Build_BestPrSM">Build_BestPrSM</a></li><li><a href="global.html#BuildUrl">BuildUrl</a></li><li><a href="global.html#buttonsAndAlerts">buttonsAndAlerts</a></li><li><a href="global.html#createTableData">createTableData</a></li><li><a href="global.html#createTableElements">createTableElements</a></li><li><a href="global.html#getBestPrsm">getBestPrsm</a></li><li><a href="global.html#getFixedPtm">getFixedPtm</a></li><li><a href="global.html#getMonoMassDataList">getMonoMassDataList</a></li><li><a href="global.html#getUnknownPtms">getUnknownPtms</a></li><li><a href="global.html#getVariablePtm">getVariablePtm</a></li><li><a href="global.html#loadDatafromJson2Html">loadDatafromJson2Html</a></li><li><a href="global.html#occurence_ptm">occurence_ptm</a></li><li><a href="global.html#popupnamewindow">popupnamewindow</a></li><li><a href="global.html#protein">protein</a></li><li><a href="global.html#proteinToHtml">proteinToHtml</a></li><li><a href="global.html#proteoformMultirow">proteoformMultirow</a></li><li><a href="global.html#proteoformToHtml">proteoformToHtml</a></li><li><a href="global.html#proteoformUrl">proteoformUrl</a></li><li><a href="global.html#showAllPeaks">showAllPeaks</a></li><li><a href="global.html#showIonPeaks">showIonPeaks</a></li><li><a href="global.html#showMatchedPeaks">showMatchedPeaks</a></li><li><a href="global.html#showNotMatchedPeaks">showNotMatchedPeaks</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="CalculatePrefixAndSuffixMass.html">CalculatePrefixAndSuffixMass</a></li><li><a href="MultiScan.html">MultiScan</a></li></ul><h3>Global</h3><ul><li><a href="global.html#activateCurrentnavbar">activateCurrentnavbar</a></li><li><a href="global.html#allProteins">allProteins</a></li><li><a href="global.html#Build_BestPrSM">Build_BestPrSM</a></li><li><a href="global.html#BuildUrl">BuildUrl</a></li><li><a href="global.html#buttons">buttons</a></li><li><a href="global.html#buttonsAndAlerts">buttonsAndAlerts</a></li><li><a href="global.html#createMultipleSvgs">createMultipleSvgs</a></li><li><a href="global.html#createTableData">createTableData</a></li><li><a href="global.html#createTableElements">createTableElements</a></li><li><a href="global.html#generateCorrespondingGraph">generateCorrespondingGraph</a></li><li><a href="global.html#getAbsoluteMaxValfromList">getAbsoluteMaxValfromList</a></li><li><a href="global.html#getAminoAcidDistribution">getAminoAcidDistribution</a></li><li><a href="global.html#getBestPrsm">getBestPrsm</a></li><li><a href="global.html#getCurrentData">getCurrentData</a></li><li><a href="global.html#getEnvelopeData">getEnvelopeData</a></li><li><a href="global.html#getFixedPtm">getFixedPtm</a></li><li><a href="global.html#getIonData">getIonData</a></li><li><a href="global.html#getMonoMassDataList">getMonoMassDataList</a></li><li><a href="global.html#getPeakData">getPeakData</a></li><li><a href="global.html#getUnknownPtms">getUnknownPtms</a></li><li><a href="global.html#getVariablePtm">getVariablePtm</a></li><li><a href="global.html#graphOnClickActions">graphOnClickActions</a></li><li><a href="global.html#hideSpectrum">hideSpectrum</a></li><li><a href="global.html#loadDatafromJson2Html">loadDatafromJson2Html</a></li><li><a href="global.html#occurence_ptm">occurence_ptm</a></li><li><a href="global.html#PeakData">PeakData</a></li><li><a href="global.html#popupnamewindow">popupnamewindow</a></li><li><a href="global.html#protein">protein</a></li><li><a href="global.html#proteinToHtml">proteinToHtml</a></li><li><a href="global.html#proteoformMultirow">proteoformMultirow</a></li><li><a href="global.html#proteoformToHtml">proteoformToHtml</a></li><li><a href="global.html#proteoformUrl">proteoformUrl</a></li><li><a href="global.html#reDrawWithSpecParams">reDrawWithSpecParams</a></li><li><a href="global.html#showAllPeaks">showAllPeaks</a></li><li><a href="global.html#showCorrespondingGraph">showCorrespondingGraph</a></li><li><a href="global.html#showIonPeaks">showIonPeaks</a></li><li><a href="global.html#showMatchedPeaks">showMatchedPeaks</a></li><li><a href="global.html#showNotMatchedPeaks">showNotMatchedPeaks</a></li><li><a href="global.html#showSpectrun">showSpectrun</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Fri Apr 24 2020 12:51:25 GMT-0400 (Eastern Daylight Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Fri May 01 2020 03:24:19 GMT-0400 (Eastern Daylight Time)
 </footer>
 
 <script> prettyPrint(); </script>
