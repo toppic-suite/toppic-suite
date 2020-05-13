@@ -33,6 +33,12 @@ copy C:\msys64\mingw64\bin\libxalan-c.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libicuuc58.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libxalanMsg.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libicudt58.dll toppic-windows-%1
+copy C:\msys64\mingw64\bin\libicudt65.dll toppic-windows-%1
+
+copy C:\msys64\mingw64\bin\libzstd.dll toppic-windows-%1
+copy C:\msys64\mingw64\bin\libcurl-4.dll toppic-windows-%1
+copy C:\msys64\mingw64\bin\liblzma-5.dll toppic-windows-%1
+copy C:\msys64\mingw64\bin\libdouble-conversion.dll toppic-windows-%1
 
 copy C:\msys64\mingw64\bin\Qt5Core.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\Qt5Gui.dll toppic-windows-%1
