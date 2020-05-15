@@ -1,12 +1,14 @@
-//draw navigation bar while avoiding cross origin issue
-
+/**
+ * draw navigation bar while avoiding cross origin issue
+ */
 var drawNav = function(){
 	//depending on where it is being called... is it index html?
 	let x = location.href;
 	let n = x.lastIndexOf("/");
 	let htmlName = x.substring(n + 1, x.length)
-
-	let relPath;//the path to the other pages are different for index.html only
+	
+	//the path to the other pages are different for index.html only
+	let relPath;
 	
 	if (htmlName == "index.html"){
 		relPath = " ";

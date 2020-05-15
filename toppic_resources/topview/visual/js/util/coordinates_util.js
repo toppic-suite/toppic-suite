@@ -55,6 +55,9 @@ function calibrateCoordinates(para,position,start_value)
 }
 /**
  * Function provides position of the Numbers on the left side of the Acid Sequence
+ * @param {object} para - Contains the parameters to draw the SVG
+ * @param {Integer} position - Provides the position of the left side number
+ * @param {Integer} start_value - Provides starting number the sequnce after trimming the skipped scids
  */
 function calibrateLeftNum(para,position,start_value) 
 {
@@ -64,6 +67,9 @@ function calibrateLeftNum(para,position,start_value)
 }
 /**
  * Function provides position of the Numbers on the right side of the Acid Sequence
+ * @param {object} para - Contains the parameters to draw the SVG
+ * @param {Integer} position - Provides the position of the left side number
+ * @param {Integer} start_value - Provides starting number the sequnce after trimming the skipped scids
  */
 function calibrateRightNum(para,position,start_value) 
 {
@@ -75,8 +81,11 @@ function calibrateRightNum(para,position,start_value)
 }
 /**
  * Function provides position to write information of skipped amino acids at the top of Sequence SVG
+ * @param {object} para - Contains the parameters to draw the SVG
+ * @param {Integer} position - Not needed
+ * @param {Integer} start_value - Not needed
  */
-function calibrateSkipStart(para, position, start_value)
+function calibrateSkipStart(para)
 {
 	x = para.left_margin ;
 	y = para.top_margin; 
@@ -84,6 +93,9 @@ function calibrateSkipStart(para, position, start_value)
 }
 /**
  * Function provides position to write information of skipped amino acids at th bottom of Sequence SVG
+ * @param {object} para - Contains the parameters to draw the SVG
+ * @param {Integer} position - Provides the position of the left side number
+ * @param {Integer} start_value - Provides starting number the sequnce after trimming the skipped scids
  */
 function calibrateSkipEnd(para, position, start_value)
 {

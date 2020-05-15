@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: buttons.js</title>
+    <title>JSDoc: Source: navBar.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: buttons.js</h1>
+    <h1 class="page-title">Source: navBar.js</h1>
 
     
 
@@ -27,80 +27,30 @@
     <section>
         <article>
             <pre class="prettyprint source linenums"><code>/**
- * On-click Actions to show spectrum graph and invoke downloads and other button actions
+ * draw navigation bar while avoiding cross origin issue
  */
-function buttons(){
-	//	Invocation on click of Mono M/z at the table
-	$("#show_ms2_spectrum" ).click(function() {
-		 
-		 if($.trim($(this).text()) === 'Show Spectrum')
-		 {
-			 showSpectrun(this);
-		 }
-		 else
-		 {
-			hideSpectrum();
-		 }
-	});
+var drawNav = function(){
+	//depending on where it is being called... is it index html?
+	let x = location.href;
+	let n = x.lastIndexOf("/");
+	let htmlName = x.substring(n + 1, x.length)
 	
-	// Coordinates at which a pop window to be launched to give name for the image to be downloaded
-	// All the actions for different image buttons on different spectrums
-	let x,y;
-	d3.select("#download_popupms2_png").on("click",function(){
-		x = d3.event.pageX;
-		y = d3.event.pageY;
-		// function inside prsmtohtml.js to pop up a window
-		popupnamewindow("png", "popup_ms2_spectrum",x,y)
-	})
-	d3.select("#download_popupms2_svg").on("click",function(){
-		x = d3.event.pageX;
-		y = d3.event.pageY;
-		popupnamewindow("svg", "popup_ms2_spectrum",x,y)
-	})
-	d3.select("#download_popup_png").on("click",function(){
-		x = d3.event.pageX;
-		y = d3.event.pageY;
-		popupnamewindow("png", "popupspectrum",x,y)
-	})
-	d3.select("#download_popup_svg").on("click",function(){
-		x = d3.event.pageX;
-		y = d3.event.pageY;
-		popupnamewindow("svg", "popupspectrum",x,y)
-	})
+	//the path to the other pages are different for index.html only
+	let relPath;
+	
+	if (htmlName == "index.html"){
+		relPath = " ";
+	}
+	else{
+		relPath = "../";
+	}
 
-	$("#precursormz").click(function(){
-		let prec_mz = $("#precursormz").html();
-		$("#spectrumpop").draggable({
-			appendTo: "body"
-		});
-	});
-	// On click of help button, allow it to be dragged
-	$("#spectrum_help").click(function(){
-		$("#spectrumHelp").draggable({
-		appendTo: "body"
-		});
-	});
-}
-/**
- * Show spectrum graphs on click of Show Spectrum
- */
-function showSpectrun(){
-	$("#show_ms2_spectrum").text('Hide Spectrum');
-	document.getElementById("spectrum_help").style.display = "block";
-	document.getElementById("graph_download").style.display = "block";
-	document.getElementById("ms2svg_div").style.display = "block";
-	document.getElementById("monoMassGraph").style.display = "block";
-}
-/**
- * Hide spectrum graphs on click of hide spectrum
- */
-function hideSpectrum(){
-	$("#show_ms2_spectrum").text('Show Spectrum'); 
-	document.getElementById("spectrum_help").style.display = "none";
-	document.getElementById("graph_download").style.display = "none";
-	document.getElementById("ms2svg_div").style.display = "none";
-	document.getElementById("monoMassGraph").style.display = "none";
-}
+	let navCode = '&lt;nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark">&lt;div id="for-flex" style="display:flex; width: 100%">&lt;div class=" navcontainer">&lt;button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">&lt;span class="navbar-toggler-icon">&lt;/span>&lt;/button>&lt;div class="collapse navbar-collapse">&lt;a class="navbar-brand logo" href="' + relPath + 'index.html">&lt;span class="headBlock">&lt;h3>&lt;strong id="toppic_icon">T&lt;/strong>opView&lt;/h3>&lt;/span>&lt;/a>&lt;ul class="navbar-nav mr-auto mt-2 mt-lg-0">&lt;li class="navtab">|&lt;/li>&lt;li class="nav-item">&lt;a class="nav-link" href="' + relPath + 'visual/proteins.html">Identifications&lt;/a>&lt;/li>&lt;li class="navtab">|&lt;/li>&lt;li class="nav-item">&lt;a class="nav-link" href="' + relPath + 'inspect/spectrum.html">Visual Inspection&lt;/a>&lt;/li>&lt;/ul>&lt;/div>&lt;/div>&lt;/div>&lt;/nav>'
+	
+	 $(function(){
+	 $("#nav-bar").html(navCode)
+	 });
+}();
 </code></pre>
         </article>
     </section>
