@@ -1,4 +1,7 @@
-/*	Get the cleavage positions from the prsm data	*/
+/**
+ * Get the cleavage positions from the prsm data
+ * @param {object} prsm - json obeject with complete prsm data 
+ */
 function json2CleavagePositions(prsm)
 {
 	let matched_ion = [] ;
@@ -43,7 +46,10 @@ function json2CleavagePositions(prsm)
 	}
 	return matched_ion ;
 }
-/*	Get occurence of fixed ptm positions*/
+/**
+ * Get occurence of fixed ptm positions
+ * @param {object} prsm - json obeject with complete prsm data 
+ */
 function json2FixedPtmOccurence(prsm){
 	let occurence_list = [] ;
 	if(prsm.annotated_protein.annotation.hasOwnProperty("ptm") )
@@ -92,7 +98,10 @@ function json2FixedPtmOccurence(prsm){
 
 	return occurence_list ;
 }
-/*	Get left and right positions of background color and mass shift value */
+/**
+ * Get left and right positions of background color and mass shift value
+ * @param {object} prsm - json obeject with complete prsm data 
+ */
 function json2BackgroundColorArray(prsm)
 {
 	let backgroundColorAndMassShift = [];
@@ -125,7 +134,10 @@ function json2BackgroundColorArray(prsm)
 	}
 	return backgroundColorAndMassShift ;
 }
-/*	Get position and other ptm lists other than FIxed Ptms */
+/**
+ * Get position and other ptm lists other than FIxed Ptms
+ * @param {object} prsm - json obeject with complete prsm data 
+ */
 function json2OtherPtmOccurences(prsm)
 {
 	let backgroundColorAndMassShift = [];
@@ -189,6 +201,10 @@ function json2OtherPtmOccurences(prsm)
 	}
 	return backgroundColorAndMassShift;
 }
+/**
+ * Get the mass error from the prsm cleavage
+ * @param {object} prsm - json obeject with complete prsm data 
+ */
 function json2ErrorDataList(prsm){
 	let errorDataList = [];
 	prsm.ms.peaks.peak.forEach((peak) => {

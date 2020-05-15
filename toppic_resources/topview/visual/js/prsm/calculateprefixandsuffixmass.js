@@ -7,7 +7,10 @@ class CalculatePrefixAndSuffixMass{
 		this.fixedPtmList = [{name:"Carbamidomethylation",acid:"C",mass:57.021464},
 								{name:"Carboxymethyl",acid:"C",mass:58.005479}];
 	}
-	// Check for ionType and return the corresponding mass shift value
+	/**
+	 * Check for ionType and return the corresponding mass shift value
+	 * @param {String} ionType - String with Corresponding iontype
+	 */
 	getIonTypeMass(ionType){
 		let ionTypeMassList={
 			"A":-27.9949,
@@ -285,6 +288,10 @@ class CalculatePrefixAndSuffixMass{
 		}
 		return massShiftList ;
 	}
+	/**
+	 * Returns Fixed Mass for certain abbrivation
+	 * @param {String} abbrevation - Contains abbrevation to get corresponding fixed mass
+	 */
 	getMassofFixedPtm(abbrevation)
 	{
 		let len = this.fixedPtmList.length;

@@ -1,4 +1,32 @@
-/**
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: drawSvg.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: drawSvg.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
  * Get the size of the svg based on the no. of rows and row length and other parameter.,.
  * @param {Object} parameters - Contains parameters of width, letter space etc., to draw SVG
  * @param {Object} prsm - Contains the complete information of prsm. 
@@ -36,7 +64,7 @@ function getNumOfRows(parameters,prsm)
 	let new_sequence_length = last_position - first_position ;
 	let num_of_rows = parseInt(new_sequence_length/parameters.row_length) ;
 	let skip_acid_count = 0 ;
-	if((start_info != null || end_info != null)&& parameters.show_skipped_lines)
+	if((start_info != null || end_info != null)&amp;&amp; parameters.show_skipped_lines)
 	{
 		skip_acid_count = skip_acid_count + 1;
 	}
@@ -78,7 +106,7 @@ function buildSvg(parameters,prsm,id)
 	[parameters,first_position, last_position,start_info,end_info] = skip_list(parameters,prsm);
 	
 	prsm.annotated_protein.annotation.residue.forEach(function(input,index){
-		if(parseInt(input.position) >= first_position && parseInt(input.position) < last_position )
+		if(parseInt(input.position) >= first_position &amp;&amp; parseInt(input.position) &lt; last_position )
 		{
 			let x,y ;
 			//	Get the x and y coordinates of the acid position	
@@ -99,7 +127,7 @@ function buildSvg(parameters,prsm,id)
 					return d ;
 				})
 				.style("fill", function(d,i){
-					if(parseInt(input.position) < first_residue_position || parseInt(input.position) > last_residue_position)
+					if(parseInt(input.position) &lt; first_residue_position || parseInt(input.position) > last_residue_position)
 					{
 						return "grey" ;
 					}
@@ -163,7 +191,7 @@ function getNumValues(para,prsm,id)
 	[para,first_position, last_position,start_info,end_info] = skip_list(para,prsm);
 	let svgContainer = d3.select("#"+id+"_g") ;
 	prsm.annotated_protein.annotation.residue.forEach(function(input,index){
-		if(parseInt(input.position) >= first_position && parseInt(input.position) < last_position )
+		if(parseInt(input.position) >= first_position &amp;&amp; parseInt(input.position) &lt; last_position )
 		{
 			let x,y ;
 			l_position_temp = input.position ;
@@ -204,7 +232,7 @@ function getNumValues(para,prsm,id)
 					})
 					.style("fill", "black");
 				
-				if(parseInt(l_position_temp) == (last_position-1) && last_position%(para.row_length) ==  1)
+				if(parseInt(l_position_temp) == (last_position-1) &amp;&amp; last_position%(para.row_length) ==  1)
 				{
 					[x,y] = calibrateRightNum(para,parseInt(l_position_temp),first_position) ;
 					id_temp = "right_align" ;
@@ -235,7 +263,7 @@ function annotations(para,prsm,id)
 	annotations.forEach(function(annotation,index){
 		let l_charge = getIonCharge(annotations,annotation.position);
 		
-		if(annotation.exist_n_ion == "1" && annotation.exist_c_ion == "1")
+		if(annotation.exist_n_ion == "1" &amp;&amp; annotation.exist_c_ion == "1")
 		{
 			drawAnnotation_YB(para,prsm,annotation,l_charge,id) ;
 		}
@@ -396,13 +424,13 @@ function skip_list(para,prsm)
 	let new_last_position = l_alast_residue_position + 1 ;
 	let final_skip_count = 0 ;
 	let end_info = null ;
-	if(l_alast_residue_position+(para.row_length - (l_alast_residue_position%para.row_length) +para.row_length) < l_asequence_length)
+	if(l_alast_residue_position+(para.row_length - (l_alast_residue_position%para.row_length) +para.row_length) &lt; l_asequence_length)
 	{
 		new_last_position = l_alast_residue_position+( para.row_length - (l_alast_residue_position%para.row_length) + para.row_length)  ;
 		end_skip_count = l_asequence_length-new_last_position ;
 		end_info = "... "+end_skip_count + " amino acid residues are skipped at the C-terminus ... ";
 	}
-	else if(l_alast_residue_position+1 < l_asequence_length)
+	else if(l_alast_residue_position+1 &lt; l_asequence_length)
 	{
 		new_last_position = l_asequence_length ;
 	}
@@ -466,7 +494,7 @@ function massShiftBackgroundColor(para,prsm,id)
 		let right_position = parseInt(input.right_position) ;
 		let annotation = input.anno ;
 		let isShiftNeeded = shiftAnnotation(para,prsm,index) ;
-		while(left_position < right_position)
+		while(left_position &lt; right_position)
 		{
 			let leftPosition, rightPosition ;
 			[leftPosition,rightPosition] = getRightPosition(para,left_position,right_position) ;
@@ -520,7 +548,7 @@ function addColorToFixedPtms(prsm,id){
  */
 function getIonCharge(l_annotation_array,position){
 	let l_charge = "";
-	for(let j=0;j<l_annotation_array.length;j++){
+	for(let j=0;j&lt;l_annotation_array.length;j++){
 		if(position == l_annotation_array[j].position )
 		{
 			 l_charge = l_charge + l_annotation_array[j].ion_type+l_annotation_array[j].ion_display_position
@@ -596,7 +624,7 @@ function shiftAnnotation(para,prsm,index)
 	let font_width = 12 ;
 	let first_position, last_position,start_info,end_info ;
 	[para,first_position, last_position,start_info,end_info] = skip_list(para,prsm);
-	for(let i = 1; i<bgColorAndMassShift.length;i++)
+	for(let i = 1; i&lt;bgColorAndMassShift.length;i++)
 	{
 		if(i == index)
 		{
@@ -606,7 +634,7 @@ function shiftAnnotation(para,prsm,index)
 			let x2,y2 ;
 			[x2,y2] = calibrateCoordinates(para,parseInt(bgColorAndMassShift[i-1].left_position),first_position) ;
 			/* subtract -2 for CSS and alignment purpose*/
-			if((Math.abs(x2-x1) + font_width )< bgColorAndMassShift[i-1].anno.length*(font_width-2) )
+			if((Math.abs(x2-x1) + font_width )&lt; bgColorAndMassShift[i-1].anno.length*(font_width-2) )
 			{
 				isshiftNeeded = true ;
 			}
@@ -627,7 +655,7 @@ function isShiftAnnotationNeeded(para,prsm)
 	let font_width = 12 ;
 	let first_position, last_position,start_info,end_info ;
 	[para,first_position, last_position,start_info,end_info] = skip_list(para,prsm);
-	for(let i = 1; i<bgColorAndMassShift.length;i++)
+	for(let i = 1; i&lt;bgColorAndMassShift.length;i++)
 	{
 			let x1,y1 ;
 			[x1,y1] = calibrateCoordinates(para,parseInt(bgColorAndMassShift[i].left_position),first_position) ;
@@ -635,7 +663,7 @@ function isShiftAnnotationNeeded(para,prsm)
 			let x2,y2 ;
 			[x2,y2] = calibrateCoordinates(para,parseInt(bgColorAndMassShift[i-1].left_position),first_position) ;
 			/* subtract -2 for CSS and alignment purpose*/
-			if((Math.abs(x2-x1) + font_width )< bgColorAndMassShift[i-1].anno.length*(font_width-2) )
+			if((Math.abs(x2-x1) + font_width )&lt; bgColorAndMassShift[i-1].anno.length*(font_width-2) )
 			{
 				isshiftNeeded = true ;
 				break ;
@@ -643,3 +671,26 @@ function isShiftAnnotationNeeded(para,prsm)
 	}
 	return isshiftNeeded ;
 }
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="CalculatePrefixAndSuffixMass.html">CalculatePrefixAndSuffixMass</a></li><li><a href="MultiScan.html">MultiScan</a></li></ul><h3>Global</h3><ul><li><a href="global.html#activateCurrentnavbar">activateCurrentnavbar</a></li><li><a href="global.html#addColorToFixedPtms">addColorToFixedPtms</a></li><li><a href="global.html#allProteins">allProteins</a></li><li><a href="global.html#annotations">annotations</a></li><li><a href="global.html#appendTooltip">appendTooltip</a></li><li><a href="global.html#Build_BestPrSM">Build_BestPrSM</a></li><li><a href="global.html#buildSvg">buildSvg</a></li><li><a href="global.html#BuildUrl">BuildUrl</a></li><li><a href="global.html#buttons">buttons</a></li><li><a href="global.html#buttonsAndAlerts">buttonsAndAlerts</a></li><li><a href="global.html#calibrateCoordinates">calibrateCoordinates</a></li><li><a href="global.html#calibrateLeftNum">calibrateLeftNum</a></li><li><a href="global.html#calibrateRightNum">calibrateRightNum</a></li><li><a href="global.html#calibrateSkipEnd">calibrateSkipEnd</a></li><li><a href="global.html#calibrateSkipStart">calibrateSkipStart</a></li><li><a href="global.html#createMultipleSvgs">createMultipleSvgs</a></li><li><a href="global.html#createTableData">createTableData</a></li><li><a href="global.html#createTableElements">createTableElements</a></li><li><a href="global.html#drawAnnoOfStartEndPosition">drawAnnoOfStartEndPosition</a></li><li><a href="global.html#drawAnnotation">drawAnnotation</a></li><li><a href="global.html#drawAnnotation_B">drawAnnotation_B</a></li><li><a href="global.html#drawAnnotation_Y">drawAnnotation_Y</a></li><li><a href="global.html#drawAnnotation_YB">drawAnnotation_YB</a></li><li><a href="global.html#drawNav">drawNav</a></li><li><a href="global.html#generateCorrespondingGraph">generateCorrespondingGraph</a></li><li><a href="global.html#getAbsoluteMaxValfromList">getAbsoluteMaxValfromList</a></li><li><a href="global.html#getAminoAcidDistribution">getAminoAcidDistribution</a></li><li><a href="global.html#getBestPrsm">getBestPrsm</a></li><li><a href="global.html#getCurrentData">getCurrentData</a></li><li><a href="global.html#getDataFromPRSMtoSpectralView">getDataFromPRSMtoSpectralView</a></li><li><a href="global.html#getEnvelopeData">getEnvelopeData</a></li><li><a href="global.html#getFixedPtm">getFixedPtm</a></li><li><a href="global.html#getFixedPTMMassList">getFixedPTMMassList</a></li><li><a href="global.html#getIonCharge">getIonCharge</a></li><li><a href="global.html#getIonData">getIonData</a></li><li><a href="global.html#getMassAndIntensityData">getMassAndIntensityData</a></li><li><a href="global.html#getMonoMassDataList">getMonoMassDataList</a></li><li><a href="global.html#getNumOfRows">getNumOfRows</a></li><li><a href="global.html#getNumValues">getNumValues</a></li><li><a href="global.html#getPeakData">getPeakData</a></li><li><a href="global.html#getRightPosition">getRightPosition</a></li><li><a href="global.html#getSequence">getSequence</a></li><li><a href="global.html#getSvgSize">getSvgSize</a></li><li><a href="global.html#getUnknownMassList">getUnknownMassList</a></li><li><a href="global.html#getUnknownPtms">getUnknownPtms</a></li><li><a href="global.html#getVariablePtm">getVariablePtm</a></li><li><a href="global.html#getY">getY</a></li><li><a href="global.html#graphOnClickActions">graphOnClickActions</a></li><li><a href="global.html#hideSpectrum">hideSpectrum</a></li><li><a href="global.html#isShiftAnnotationNeeded">isShiftAnnotationNeeded</a></li><li><a href="global.html#json2BackgroundColorArray">json2BackgroundColorArray</a></li><li><a href="global.html#json2CleavagePositions">json2CleavagePositions</a></li><li><a href="global.html#json2ErrorDataList">json2ErrorDataList</a></li><li><a href="global.html#json2FixedPtmOccurence">json2FixedPtmOccurence</a></li><li><a href="global.html#json2OtherPtmOccurences">json2OtherPtmOccurences</a></li><li><a href="global.html#loadDatafromJson2Html">loadDatafromJson2Html</a></li><li><a href="global.html#MassShift">MassShift</a></li><li><a href="global.html#massShiftBackgroundColor">massShiftBackgroundColor</a></li><li><a href="global.html#occurence_ptm">occurence_ptm</a></li><li><a href="global.html#onClickToInspect">onClickToInspect</a></li><li><a href="global.html#onclickTopView">onclickTopView</a></li><li><a href="global.html#parameters">parameters</a></li><li><a href="global.html#PeakData">PeakData</a></li><li><a href="global.html#popupnamewindow">popupnamewindow</a></li><li><a href="global.html#protein">protein</a></li><li><a href="global.html#proteinToHtml">proteinToHtml</a></li><li><a href="global.html#proteoformMultirow">proteoformMultirow</a></li><li><a href="global.html#proteoformToHtml">proteoformToHtml</a></li><li><a href="global.html#proteoformUrl">proteoformUrl</a></li><li><a href="global.html#rect_Backgroundcolor">rect_Backgroundcolor</a></li><li><a href="global.html#reDrawWithSpecParams">reDrawWithSpecParams</a></li><li><a href="global.html#removeToolTip">removeToolTip</a></li><li><a href="global.html#setDropDownItemsForInspectButton">setDropDownItemsForInspectButton</a></li><li><a href="global.html#shiftAnnotation">shiftAnnotation</a></li><li><a href="global.html#showAllPeaks">showAllPeaks</a></li><li><a href="global.html#showCorrespondingGraph">showCorrespondingGraph</a></li><li><a href="global.html#showIonPeaks">showIonPeaks</a></li><li><a href="global.html#showMatchedPeaks">showMatchedPeaks</a></li><li><a href="global.html#showNotMatchedPeaks">showNotMatchedPeaks</a></li><li><a href="global.html#showSpectrun">showSpectrun</a></li><li><a href="global.html#skip_list">skip_list</a></li><li><a href="global.html#skippedAcidNotification">skippedAcidNotification</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Fri May 15 2020 11:28:08 GMT-0400 (Eastern Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

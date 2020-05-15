@@ -106,7 +106,7 @@ function proteoformToHtml(compatible_proteoform,index,folderpath)
 	// Determine the start and end position of the sequence
 	drawAnnoOfStartEndPosition(para,BestPrSM,id) ;
 	//	Get the position of the fixed ptms and color them to red
-	addColorToFixedPtms(para,BestPrSM,id);
+	addColorToFixedPtms(BestPrSM,id);
 	//	Color the background of occurence of mass shift
 	massShiftBackgroundColor(para,BestPrSM,id);
 }
