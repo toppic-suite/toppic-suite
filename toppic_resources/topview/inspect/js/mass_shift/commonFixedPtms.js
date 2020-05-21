@@ -80,7 +80,7 @@ class commonFixedPtms {
 		removeButton.setAttribute("class","form-control btn btn-default btn-sm removerow");
 		
 		let iRemoveFrame = document.createElement("i");
-		iRemoveFrame.setAttribute("class","fa fa-remove");
+		iRemoveFrame.setAttribute("class","fa fa-times");
 		removeButton.appendChild(iRemoveFrame);
 		
 		fixedptmsdiv.appendChild(inputAcid);
