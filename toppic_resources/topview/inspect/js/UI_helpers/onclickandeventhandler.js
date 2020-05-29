@@ -1,3 +1,8 @@
+/**
+ * @function onLoadOfHTML
+ * @description Gets invoked immediatley after loading html
+ * @param {Float} precursorMass - Contains precursorMass value
+ */
 onLoadOfHTML = function(precursorMass)
 {
     let massErrorthVal = 0.1 ;
@@ -67,7 +72,8 @@ onLoadOfHTML = function(precursorMass)
     })
 }
 /**
- * Function to display all peaks of data in table. This handles on click action
+ * @function showAllPeaks
+ * @description Function to display all peaks of data in table. This handles on click action
  * from html of show all peaks button.
  */
 showAllPeaks = function()
@@ -83,7 +89,8 @@ showAllPeaks = function()
 	$('div.dataTables_scrollBody').height(400);
 }
 /**
- * Function to display only matched peaks in table. This handles on click action 
+ * @function showMatchedPeaks
+ * @description Function to display only matched peaks in table. This handles on click action 
  * from html of show matched peaks button.
  */
 showMatchedPeaks = function()
@@ -99,7 +106,8 @@ showMatchedPeaks = function()
 	$('div.dataTables_scrollBody').height(400);
 }
 /**
- * Function to display only un matched peaks in table. This handles on click action
+ * @function showNonMatchedPeaks
+ * @description Function to display only un matched peaks in table. This handles on click action
  * from html of show un matched peaks button.
  */
 showNonMatchedPeaks = function() 
@@ -114,6 +122,10 @@ showNonMatchedPeaks = function()
 	}
 	$('div.dataTables_scrollBody').height(400);
 }
+/**
+ * Function to show only matched on unmatched peaks on click of matched or unmatched peak buttons
+ * @param {String} ids - Contains Ids of respective matched peaks or un matched peaks
+ */
 function showIonPeaks(ids) {
 	console.log("ids : ", ids);
 	  var elems = document.getElementsByClassName('matched_peak');

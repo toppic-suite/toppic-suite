@@ -2,11 +2,12 @@
 const circlesPerRange = 200; 
 const peaksPerRange = 200;
 /**
- * Function draws the graph, binds zoom and drag function to the graph
+ * @function SpectrumGraph
+ * @description Function draws the graph, binds zoom and drag function to the graph
  * @param {String} svgId - SVG id on which the graph needed to be drawn
  * @param {object} spectrumParameters - Contains the parameters like height, width etc.,. tht helps to draw the graph
- * @param {list} peakData - contains peakList and envelope list 
- * @param {list} ionData - Contains data with mass and ACID name to plot on the graph
+ * @param {Array} peakData - contains peakList and envelope list 
+ * @param {Array} ionData - Contains data with mass and ACID name to plot on the graph
  */
 SpectrumGraph = function(svgId,spectrumParameters,peakData, ionData){
 	this.svg = d3.select("body").select(svgId);
@@ -57,8 +58,10 @@ SpectrumGraph = function(svgId,spectrumParameters,peakData, ionData){
 	return graph;
 }
 /**
- * Function that draws ticks on x-axis and y-axis
- * @param{node} svg -  is a html node on which the graph is being ploted
+ * @function drawTicks
+ * @description Function that draws ticks on x-axis and y-axis
+ * @param{HTMLBaseElement} svg -  is a html node on which the graph is being ploted
+ * @param {object} spectrumParameters - Contains the parameters like height, width etc.,. tht helps to draw the graph
  */
 drawTicks = function(svg,spectrumParameters){
 	// Creating a group under svg node with id 'ticks' under which ticks are drawn 
@@ -112,8 +115,10 @@ drawTicks = function(svg,spectrumParameters){
 	}
 }
 /**
- * Function to draw x-axis and y-axis
- * @param{node} svg -  is a html node on which the graph is being ploted
+ * @function drawAxis
+ * @description Function to draw x-axis and y-axis
+ * @param {Node} svg -  is a html node on which the graph is being ploted
+ * @param {object} spectrumParameters - Contains the parameters like height, width etc.,. tht helps to draw the graph
  */
 drawAxis = function(svg,spectrumParameters){
 	//Draw x-axis
@@ -134,8 +139,10 @@ drawAxis = function(svg,spectrumParameters){
 					.attr("stroke-width","2")
 }
 /**
- * Function to add tick numbers on x and y axis
- * @param{node} svg -  is a html node on which the graph is being ploted
+ * @function addDatatoAxis
+ * @description Function to add tick numbers on x and y axis
+ * @param {Node} svg -  is a html node on which the graph is being ploted
+ * @param {object} spectrumParameters - Contains the parameters like height, width etc.,. tht helps to draw the graph
  */
 addDatatoAxis = function(svg,spectrumParameters){
 	let maxMz = spectrumParameters.maxMz;
@@ -204,8 +211,10 @@ addDatatoAxis = function(svg,spectrumParameters){
 	}
 }
 /**
- * Function to add backGround color to the spectrum graph for MS1 spectrum at precursor mz
- * @param{node} svg -  is a html node on which the graph is being ploted
+ * @function addBackGround
+ * @description Function to add backGround color to the spectrum graph for MS1 spectrum at precursor mz
+ * @param {Node} svg -  is a html node on which the graph is being ploted
+ * @param {object} spectrumParameters - Contains the parameters like height, width etc.,. tht helps to draw the graph
  */
 addBackGround = function(svg,spectrumParameters){
 	let svg_temp = svg.append("g")
@@ -239,8 +248,11 @@ addBackGround = function(svg,spectrumParameters){
 	}
 }
 /**
- * Function to draw peak lines on the graph
- * @param{node} svg -  is a html node on which the graph is being ploted
+ * @function drawPeaks
+ * @description Function to draw peak lines on the graph
+ * @param {Node} svg -  is a html node on which the graph is being ploted
+ * @param {object} spectrumParameters - Contains the parameters like height, width etc.,. tht helps to draw the graph
+ * @param {Array} peakdata - Contians both peak list and envelopelist
  */
 drawPeaks = function(svg,spectrumParameters,peakdata){
 	let peaks = svg.append("g")
@@ -289,8 +301,11 @@ drawPeaks = function(svg,spectrumParameters,peakdata){
 	  }
 }
 /**
- * Function to add circles for the envelope data
- * @param{node} svg -  is a html node on which the graph is being ploted
+ * @function addCircles
+ * @description Function to add circles for the envelope data
+ * @param {Node} svg -  is a html node on which the graph is being ploted
+ * @param {object} spectrumParameters - Contains the parameters like height, width etc.,. tht helps to draw the graph
+ * @param {Array} peakdata - Contians both peak list and envelopelist
  */
 addCircles = function(svg,spectrumParameters,peakData){
 	let circles = svg.append("g").attr("id", "circles");
@@ -344,8 +359,11 @@ addCircles = function(svg,spectrumParameters,peakData){
 	})
 }
 /**
- * Function to add IONS at the top of the peaks for each cluster of envelopes
- * @param{node} svg -  is a html node on which the graph is being ploted
+ * @function drawIons
+ * @description Function to add IONS at the top of the peaks for each cluster of envelopes
+ * @param {Node} svg -  is a html node on which the graph is being ploted
+ * @param {object} spectrumParameters - Contains the parameters like height, width etc.,. tht helps to draw the graph
+ * @param {Array} ionData - Contians Ion list to display on the graph
  */
 drawIons = function(svg,spectrumParameters,ionData){
 	let ions = svg.append("g").attr("id", "graph_ions");
@@ -384,8 +402,10 @@ drawIons = function(svg,spectrumParameters,ionData){
 	}
 }
 /**
- * Function to add Acid names at the top of the graph divided by | symbol
- * @param{node} svg -  is a html node on which the graph is being ploted
+ * @function drawSequence
+ * @description Draw Sequence on spectrum graph
+ * @param {Node} svg -  is a html node on which the graph is being ploted
+ * @param {object} spectrumParameters - Contains the parameters like height, width etc.,. tht helps to draw the graph
  */
 drawSequence = function(svg,spectrumParameters){
 	let seqSvg = svg.append("g").attr("id", "graph_sequence");
@@ -447,7 +467,10 @@ drawSequence = function(svg,spectrumParameters){
 	}
 }
 /**
- * Add Error Plot to the MonoMass Spectrum
+ * @function addErrorPlot
+ * @description Add Error Plot to the MonoMass Spectrum
+ * @param {Node} svg -  is a html node on which the graph is being ploted
+ * @param {object} spectrumParameters - Contains the parameters like height, width etc.,. tht helps to draw the graph
  */
 addErrorPlot = function(svg, spectrumParameters){
 	//Draw x-axis
@@ -468,6 +491,12 @@ addErrorPlot = function(svg, spectrumParameters){
 					.attr("stroke","black")
 					.attr("stroke-width","1")
 }
+/**
+ * @function addErrorBlock
+ * @description Draw Error plot
+ * @param {Node} svg -  is a html node on which the graph is being ploted
+ * @param {object} spectrumParameters - Contains the parameters like height, width etc.,. tht helps to draw the graph
+ */
 addErrorBlock = function(svg, spectrumParameters){
 	let rectBlock = svg.append("g").attr("id", "rect_errorplot");
 	rectBlock.append("line")
@@ -492,6 +521,12 @@ addErrorBlock = function(svg, spectrumParameters){
 			.attr("stroke","black")
 			.attr("stroke-width","1")
 }
+/**
+ * @function drawErrorYticks
+ * @description Draw Error plot y ticks
+ * @param {Node} svg -  is a html node on which the graph is being ploted
+ * @param {object} spectrumParameters - Contains the parameters like height, width etc.,. tht helps to draw the graph
+ */
 drawErrorYticks = function(svg, spectrumParameters){
 
 	let addYTicks = svg.append("g").attr("id","yErrorTicks")
@@ -539,6 +574,12 @@ drawErrorYticks = function(svg, spectrumParameters){
 		}
 	}
 }
+/**
+ * @function drawErrorPoints
+ * @description Draw Error points on the error graph
+ * @param {Node} svg -  is a html node on which the graph is being ploted
+ * @param {object} spectrumParameters - Contains the parameters like height, width etc.,. tht helps to draw the graph
+ */
 drawErrorPoints = function(svg, spectrumParameters){
 	let circles = svg.append("g").attr("id", "error_circles");
 	spectrumParameters.graphFeatures.errorListData.forEach((element)=>{
@@ -564,8 +605,10 @@ drawErrorPoints = function(svg, spectrumParameters){
 	})
 }
 /**
- * Function to add labels on x and y axis
- * @param{node} svg -  is a html node on which the graph is being ploted
+ * @function addLabels
+ * @description Function to add labels on x and y axis
+ * @param {Node} svg -  is a html node on which the graph is being ploted
+ * @param {object} spectrumParameters - Contains the parameters like height, width etc.,. tht helps to draw the graph
  */
 addLabels = function(svg, spectrumParameters){
 
@@ -584,8 +627,11 @@ addLabels = function(svg, spectrumParameters){
 					    .text("Intensity");
 }
 /**
- * Function to show the data of Mass and Intensity on mouse over of peaks
- * @param{node} svg -  is a html node on which the graph is being ploted
+ * @function onMouseOverPeak
+ * @description Function to show the data of Mass and Intensity on mouse over of peaks
+ * @param {Node} this_element -  is a html node. On mouse over generates tooltip based on the current peak
+ * @param {Object} - Contains mz and intensity value of the current peak
+ * @param {object} spectrumParameters - Contains the parameters like height, width etc.,. tht helps to draw the graph
  */
 onMouseOverPeak = function(this_element,peak,spectrumParameters)
 {
@@ -614,8 +660,11 @@ onMouseOverPeak = function(this_element,peak,spectrumParameters)
 				.style("fill", "black");
 }
 /**
- * Function to show the data of Mass and Intensity on mouse over of circles
- * @param{node} svg -  is a html node on which the graph is being ploted
+ * @function onMouseOverCircle
+ * @description Function to show the data of Mass and Intensity on mouse over of circles
+ * @param {Node} this_element - is a html node. On mouse over generates tooltip based on the current peak
+ * @param {Array} envelope_list - Contains Envelope List
+ * @param {object} spectrumParameters - Contains the parameters like height, width etc.,. tht helps to draw the graph
  */
 onMouseOverCircle = function(this_element,envelope_list,spectrumParameters)
 {
@@ -641,8 +690,11 @@ onMouseOverCircle = function(this_element,envelope_list,spectrumParameters)
 				.style("top", (d3.event.pageY - 28)+ "px")
 				.style("fill", "black");
 }
+
 /**
- * Function to reset to the original on mouse out of peaks
+ * @function onPeakMouseOut
+ * @description Function to reset to the original on mouse out of peaks
+ * @param {Node} this_element - is a html node. On mouse over generates tooltip based on the current peak
  */
 onPeakMouseOut = function(this_element)
 {
@@ -650,13 +702,15 @@ onPeakMouseOut = function(this_element)
 	d3.select(this_element).style("stroke","black");
 }
 /**
- * Function to reset to the original on mouse out of circle
+ * @function onCircleMouseOut
+ * @description Function to reset to the original on mouse out of peaks
  */
-onCircleMouseOut= function(){
+onCircleMouseOut = function(){
 	onMouseOut();
 }
 /**
- * Function to remove the tooltips on mouseout
+ * @function onMouseOut
+ * @description Function to remove the tooltips on mouseout
  */
 onMouseOut = function(){
 	d3.selectAll("#MyTextMZIN").remove();

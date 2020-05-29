@@ -19,10 +19,10 @@ class MassShifts {
 		return [seq,massShiftList] ;
 	}
 	/**
-	 * @param {string} seq - an argument with mass shift changes embeded
-	 * in [] square bracket.
-	 * @return {string,Array} parsedseq - sequence after removing the mass
-	 * Shifts. Array with {position,mass} position-position at which 
+	 * @param {string} seq - an argument with mass shift changes embeded in [] square bracket.
+	 * @return {string} parsedseq - sequence after removing the mass
+	 * Shifts. 
+	 * @returns {Array} massShiftList - Array with {position,mass} position-position at which 
 	 * mass shift occured, mass- mass shift value.
 	 */
 	getMassShiftList(seq){
@@ -66,7 +66,7 @@ class MassShifts {
 	 * @param {integer} massShiftVal - contains value of the mass entered.
 	 * @param {Array} massShiftList - contains list of all existing mass 
 	 * shifts with positions.
-	 * @return{Array} with the new mass Shift value and position entered
+	 * @return {Array} with the new mass Shift value and position entered
 	 * or changes the existing mass shift value.
 	 */
 	appendtoMassShiftList(shiftPosition,massShiftVal,massShiftList,bg_color){

@@ -82,8 +82,6 @@ function calibrateRightNum(para,position,start_value)
 /**
  * Function provides position to write information of skipped amino acids at the top of Sequence SVG
  * @param {object} para - Contains the parameters to draw the SVG
- * @param {Integer} position - Not needed
- * @param {Integer} start_value - Not needed
  */
 function calibrateSkipStart(para)
 {
