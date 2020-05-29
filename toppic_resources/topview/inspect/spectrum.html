@@ -69,13 +69,11 @@
  // define global variable ms2_graph and precursorMass
  var ms2_graph; 
  var precursorMass ;
+ // Global Variable with spec parameters for respetive Graphs
  var correspondingSpecParams_g = [];
+ // Gets executed once HTML is loaded
  $(document).ready(function(){
-	/*var peakAndIntensityList = JSON.parse(window.localStorage.getItem('peakAndIntensityList'));
-	var massAndIntensityList = JSON.parse(window.localStorage.getItem('massAndIntensityList'));
-	var sequence = JSON.parse(window.localStorage.getItem('sequence'));
-	var l_fixedPtmList = JSON.parse(window.localStorage.getItem('fixedPtmList'));
-	*/
+	// Get the data from local storage 
 	var peakAndIntensityList = parsePeakMass('peakAndIntensityList');
 	var massAndIntensityList = parsePeakMass('massAndIntensityList');
 	var sequence = parseSeq('sequence');

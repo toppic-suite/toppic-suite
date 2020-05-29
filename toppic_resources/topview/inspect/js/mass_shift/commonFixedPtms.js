@@ -3,8 +3,10 @@ class commonFixedPtms {
         this.fixedPtmList = [{name:"Carbamidomethylation",acid:"C",mass:57.021464},
 							 {name:"Carboxymethyl",acid:"C",mass:58.005479}];
 	}
-	
-	setFixedPtmListToUI = function(){
+	/**
+	 * Sets all the fixed ptms to UI under Fixed Ptm column
+	 */
+	setFixedPtmListToUI(){
 		let dropDownMenuLink = document.getElementById("dropdownMenuLink");
 		
 		this.fixedPtmList.forEach(function(fixedPtm){
@@ -14,13 +16,6 @@ class commonFixedPtms {
 			option.innerHTML = value;
 			dropDownMenuLink.appendChild(option);
 		})
-    /*
-		let value = "Other";
-		let option = document.createElement("option");
-		option.setAttribute("value",value);
-		option.innerHTML = value;
-		dropDownMenuLink.appendChild(option);
-    */
 		$('.addnewrow').click(function(){
 			let fixedptm = document.getElementById("dropdownMenuLink").value
 			if(fixedptm != "fixed_ptm")
@@ -29,7 +24,12 @@ class commonFixedPtms {
 			}
 		})
 	}
-
+	/**
+	 * @function addNewFixedPtmRow
+	 * @description 
+	 * On Click of '+' symbol under fixed ptms in the HTML, creates new block to add Acid and mass shift
+	 * @param {String} fixedptm - Contains Acid name and mass shift seperated by ':'
+	 */
 	static addNewFixedPtmRow = function(fixedptm){
 		console.log("fixedptm : ", fixedptm);
 		let acid = '' ;

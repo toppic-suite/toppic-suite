@@ -1,9 +1,19 @@
+/**
+ * Generates Corresponding graph on to the html by calling addSpectrum from invokespectrum.js
+ * @param {Array} peakDataList - Contains Peak list data
+ * @param {Array} distributionList - Contains envelope data
+ * @param {Float} prec_mz - contains mass to which the graph has to be zoomed
+ */
 function generateCorrespondingGraph(peakDataList,distributionList,prec_mz){
     let ionData = null;
     let graphFeatures = new GraphFeatures();
     ms2_graph = addSpectrum("spectrum",peakDataList,distributionList,prec_mz,ionData,graphFeatures);
 }
-//Generating Mono Mass Graph
+/**
+ * Generating Mono Mass Graph with calculated masses
+ * @param {Array} monoMassList - Contians the mono Mass list data
+ * @param {Float} prec_mz - Contains mass to which the graph has to be zoomed
+ */
 function generateMonoMassGraph(monoMassList,prec_mz){
     let ionData = [];
     //Draw MonoMass Graph
@@ -55,6 +65,7 @@ function generateMonoMassGraph(monoMassList,prec_mz){
 }
 /**
  * Function return the max error value from the list
+ * @param {Array} errorDataList - Contains list of error data to plot on the error graph
  */
 function getAbsoluteMaxValfromList(errorDataList){
     let max = 0;

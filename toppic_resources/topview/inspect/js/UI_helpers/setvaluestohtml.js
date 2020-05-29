@@ -1,3 +1,6 @@
+/**
+ * Class to set all the data retrieved from local storage on to html
+ */
 class SetValuesToHtml{
     constructor(peakAndIntensityList,massAndIntensityList,sequence,l_fixedPtmList,unknownMassShiftList,precursorMass){
         this.peakAndIntensityList = peakAndIntensityList;
@@ -7,29 +10,31 @@ class SetValuesToHtml{
         this.unknownMassShiftList = unknownMassShiftList ;
         this.precursorMass = precursorMass ;
     }
+    /**
+     * Set Peak List on to html
+     */
     setDataToPeakAndIntensity(){
         let peakdata = $("#peakdata");
         peakdata.val(this.peakAndIntensityList);
-        /*peakdata.val(this.peakAndIntensityList[0]);
-        for(let i=1;i<this.peakAndIntensityList.length;i++)
-        {
-            peakdata.val( peakdata.val() + "\n" + this.peakAndIntensityList[i]);
-        }*/
     }
+    /**
+     * Set Mass List on to html
+     */
     setDataToMassAndIntensity(){
         let massdata = $("#data");
         massdata.val(this.massAndIntensityList);
-        /*massdata.val(this.massAndIntensityList[0]);
-        for(let i=1;i<this.massAndIntensityList.length;i++)
-        {
-            massdata.val( massdata.val()+"\n"+this.massAndIntensityList[i]);
-        }*/
     }
+    /**
+     * Set Sequence on to html
+     */
     setDataToSequence(){
         let MassShiftsObj = new MassShifts();
         let modSequence = MassShiftsObj.formSequence(this.sequence,this.unknownMassShiftList);
         $("#sequencedata").val(modSequence);
     }
+    /**
+     * Set all the fixed masses on html
+     */
     setFixedMasses(){
         if(this.fixedPtmList.length !=0)
         {
@@ -49,6 +54,9 @@ class SetValuesToHtml{
             }
         } 
     }
+    /**
+     * Set Precursor mass on html 
+     */
     setPrecursorMass()
     {
         document.getElementById("precursormass").innerHTML = this.precursorMass;
