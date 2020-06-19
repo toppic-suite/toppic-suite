@@ -15,6 +15,7 @@
 #ifndef TOPPIC_TOPFD_DECONV_ONE_SP_HPP_
 #define TOPPIC_TOPFD_DECONV_ONE_SP_HPP_
 
+#include <src/envcnn/fdeep/model.hpp>
 #include "topfd/spec/deconv_data.hpp"
 #include "ms/env/env_para.hpp"
 #include "ms/env/match_env.hpp"
@@ -24,8 +25,15 @@ namespace toppic {
 
 class DeconvOneSp {
  public:
-  explicit DeconvOneSp(EnvParaPtr env_para_ptr, DpParaPtr dp_para_ptr): 
+/////////////////////////////////////// EnvCNN Changes ////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+  explicit DeconvOneSp(EnvParaPtr env_para_ptr, DpParaPtr dp_para_ptr):
       env_para_ptr_(env_para_ptr), dp_para_ptr_(dp_para_ptr) {}
+
+//  explicit DeconvOneSp(EnvParaPtr env_para_ptr, DpParaPtr dp_para_ptr, fdeep::model model):
+//            env_para_ptr_(env_para_ptr), dp_para_ptr_(dp_para_ptr), model_(model) {}
+
+///////////////////////////////////////////////////////////////////////////////////////////////
 
   void setData(PeakPtrVec &peak_list);
 
@@ -50,6 +58,12 @@ class DeconvOneSp {
   DeconvDataPtr data_ptr_;
   MatchEnvPtrVec result_envs_;
   int ms_level_;
+  /////////////////////////////////////// EnvCNN Changes ////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////////////////////
+
+//  fdeep::model model_;
+
+  ///////////////////////////////////////////////////////////////////////////////////////////////
 };
 
 typedef std::shared_ptr<DeconvOneSp> DeconvOneSpPtr;
