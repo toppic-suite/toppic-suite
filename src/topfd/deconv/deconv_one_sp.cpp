@@ -12,6 +12,7 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include <src/envcnn/score.hpp>
 #include "common/util/logger.hpp"
 #include "ms/spec/baseline_util.hpp"
 #include "topfd/spec/deconv_data_util.hpp"
@@ -101,7 +102,17 @@ MatchEnvPtrVec DeconvOneSp::postprocess(MatchEnvPtrVec  &dp_envs) {
     match_env_refine::mzRefine(dp_envs);
   }
 
-  // filtering 
+    /////////////////////////////////////// EnvCNN Changes ////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    /* Obtain EnvCNN Prediction Score for MS/MS envelopes */
+
+//    if (ms_level_ > 1){
+//        result_envs_ = MatchEnvFilterCNN::filter_using_cnn(dp_envs, peak_list, model_);
+//    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    // filtering
   if (env_para_ptr_->do_final_filtering_) {
     result_envs_ = MatchEnvFilter::filter(dp_envs, data_ptr_->getMaxMass(),
                                           env_para_ptr_);

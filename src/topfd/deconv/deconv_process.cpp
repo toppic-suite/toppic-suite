@@ -35,6 +35,7 @@
 #include <mutex>
 #include <vector>
 #include <boost/filesystem.hpp>
+#include <src/envcnn/score.hpp>
 
 namespace toppic {
 
@@ -193,6 +194,13 @@ void DeconvProcess::processSpMissingLevelOne(RawMsGroupReaderPtr reader_ptr) {
 
   std::string ms_msalign_name = file_util::basename(spec_file_name_) + ".ms2_msalign";
 
+  /////////////////////////// EnvCNN Changes ///////////////////
+  //////////////////////////////////////////////////////////////
+
+//  fdeep::model envcnn_model = MatchEnvFilterCNN::loadModel();
+
+  /////////////////////////////////////////////////////////////
+
   SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(thread_num_);  
 
   MsAlignWriterPtrVec ms_writer_ptr_vec;
@@ -213,7 +221,17 @@ void DeconvProcess::processSpMissingLevelOne(RawMsGroupReaderPtr reader_ptr) {
     EnvParaPtr env_ptr_new = std::make_shared<EnvPara>(env_para_ptr_);
     DpParaPtr dp_ptr_new = std::make_shared<DpPara>(dp_para_ptr_);
     
+
+
+    /////////////////////////////////////// EnvCNN Changes ////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
     DeconvOneSpPtr deconv_ptr = std::make_shared<DeconvOneSp>(env_ptr_new, dp_ptr_new);
+//    DeconvOneSpPtr deconv_ptr = std::make_shared<DeconvOneSp>(env_ptr_new, dp_ptr_new, envcnn_model);
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+
     pool_ptr->Enqueue(geneTaskMissingMsOne(ms_group_ptr, deconv_ptr, deconv_process_ptr_, ms_writer_ptr_vec, pool_ptr));
 
     RawMsPtrVec ms_two_ptr_vec = ms_group_ptr->getMsTwoPtrVec();
@@ -340,6 +358,7 @@ void DeconvProcess::deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
 
 }
 
+
 //DecovOne & Two
 std::function<void()> geneTask(RawMsGroupPtr ms_group_ptr, DeconvOneSpPtr deconv_ptr, MsAlignWriterPtrVec ms1_writer_ptr_vec, 
                               MsAlignWriterPtrVec ms2_writer_ptr_vec, SimpleThreadPoolPtr pool_ptr, DeconvProcess *deconv_process_ptr){
@@ -380,6 +399,13 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
   ms1_msalign_name = file_util::basename(spec_file_name_) + "_ms1.msalign";
   ms2_msalign_name = file_util::basename(spec_file_name_) + "_ms2.msalign";
 
+  /////////////////////////// EnvCNN Changes ///////////////////
+  //////////////////////////////////////////////////////////////
+
+//  fdeep::model envcnn_model = MatchEnvFilterCNN::loadModel();
+
+  /////////////////////////////////////////////////////////////
+
   SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(thread_num_);  
   
   //generate vector that contains msalign writing information
@@ -406,7 +432,14 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
 
     //deconv_process_ptr_ (DecovProcess instance) is needed because it has the information on the folder names, envelope file names
     //pool_ptr needed for getting each thread id    
+
+    /////////////////////////////////////// EnvCNN Changes ////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
     DeconvOneSpPtr deconv_ptr = std::make_shared<DeconvOneSp>(env_ptr_new, dp_ptr_new);
+//    DeconvOneSpPtr deconv_ptr = std::make_shared<DeconvOneSp>(env_ptr_new, dp_ptr_new, envcnn_model);
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
 
     pool_ptr->Enqueue(geneTask(ms_group_ptr, deconv_ptr, ms1_writer_ptr_vec, ms2_writer_ptr_vec, pool_ptr, deconv_process_ptr_));
 
