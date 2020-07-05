@@ -354,7 +354,6 @@ void FeatureSampleMerge::outputTable(FeaturePrsmPtrVec2D &table,
   std::ofstream file;
   file.open(output_file_name_.c_str());
   // write title
-<<<<<<< HEAD
   std::string delim = "\t";
   file << "Protein accession" << delim
       << "Protein description" << delim
@@ -362,7 +361,7 @@ void FeatureSampleMerge::outputTable(FeaturePrsmPtrVec2D &table,
       << "Last residue" << delim
       << "Proteoform" << delim
       << "Precursor mass" << delim
-      << "Match " << dilim;
+      << "Match " << delim;
 
   for (int i = 0; i < sample_num; i++) {
     file << input_file_names_[i] << " Abundance" << delim
@@ -376,7 +375,6 @@ void FeatureSampleMerge::outputTable(FeaturePrsmPtrVec2D &table,
   int match_num = 0;
   for (int i = 0; i < cluster_num; i++) {
     FeaturePrsmPtr feature_ptr = examples[i];
-<<<<<<< HEAD
     file << feature_ptr->getProtName() << delim
         << "\"" << feature_ptr->getProtDesc() << "\"" << delim
         << (feature_ptr->getFirstResidue() + 1) << delim
