@@ -56,6 +56,7 @@ inline int getCurMsIndex(DeconvMsPtrVec &ms_ptrs) {
 void MsalignThreadMerge::process() {
   size_t input_num = input_file_exts_.size();
   std::string base_name = file_util::basename(spec_file_name_);
+  
   // open files
   SimpleMsAlignReaderPtrVec reader_ptrs; 
   DeconvMsPtrVec ms_ptrs;
