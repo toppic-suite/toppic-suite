@@ -1,9 +1,16 @@
+/**
+ * Class to calculate prefix and suffix mass
+ */
 class CalculatePrefixAndSuffixMass{
+	// Constructor setting the default values of fixedptmlist with mass
 	constructor(){
 		this.fixedPtmList = [{name:"Carbamidomethylation",acid:"C",mass:57.021464},
 								{name:"Carboxymethyl",acid:"C",mass:58.005479}];
 	}
-
+	/**
+	 * Check for ionType and return the corresponding mass shift value
+	 * @param {String} ionType - String with Corresponding iontype
+	 */
 	getIonTypeMass(ionType){
 		let ionTypeMassList={
 			"A":-27.9949,
@@ -30,6 +37,10 @@ class CalculatePrefixAndSuffixMass{
 		};
 		return ionTypeMassList[ionType.toUpperCase()];
 	}
+	/**
+	 * Get the sequence from the prsm_data global variable from data file
+	 * @param {Object} prsm_data - This is a global object from data file which contains all the prsm information
+	 */
 	getSequence(prsm_data){
 		let sequence = [];
 		let firstposition = prsm_data.prsm.annotated_protein.annotation.first_residue_position;
@@ -43,6 +54,9 @@ class CalculatePrefixAndSuffixMass{
 		})
 	   return sequence;
 	}
+	/**
+	 * Get unknow mass list
+	 */
 	getUnknownMassList()
 	{
 		let unknownMassShiftList = [];
@@ -70,7 +84,13 @@ class CalculatePrefixAndSuffixMass{
 		}
 		return unknownMassShiftList;
 	}
-	getPrefixMassList(sequence,massShiftList,massShift_in){
+	/**
+	 * Calculate and generate Prefix mass list
+	 * @param {String} sequence - Contains sequence of the protein
+	 * @param {Array} massShiftList - Contains the Mass shift which are to be added in the corresponding positions 
+	 * @param {Float} ionType_massShift - Contains the mass based on the ion Type
+	 */
+	getPrefixMassList(sequence,massShiftList,ionType_massShift){
 		let seqln = sequence.length;
 		let emptyMassList = [] ;
 		massShiftList = massShiftList.slice();
@@ -82,7 +102,7 @@ class CalculatePrefixAndSuffixMass{
 			for(let i=0;i<seqln;i++)
 			{
 				// Get Calculated AminoAcidDistribution from aminoAcidDistributuion.js 
-				//evaluate the return value for the case when the user enters wrong character by mistake
+				// evaluate the return value for the case when the user enters wrong character by mistake
 				let AcidMass;
 				
 				try{
@@ -111,8 +131,8 @@ class CalculatePrefixAndSuffixMass{
 					}
 				}
 				catch(error){
-					//invalid character entered for protein sequence
-					//window.alert("Error! Invalid amino acid in the sequence.")
+					// invalid character entered for protein sequence
+					// window.alert("Error! Invalid amino acid in the sequence.")
 					$('#errorAlertModal').modal('show');
 					break;
 				}
@@ -120,18 +140,24 @@ class CalculatePrefixAndSuffixMass{
 			// Adding Mass Shift based on selection of Ion
 			// let utilFunctionsObj = new utilFunctions();
 			// let ionMassShiftVal = utilFunctionsObj.getNTerminusMassShiftVal();
-			if(massShift_in != 0)
+			if(ionType_massShift != 0)
 			{
 				for(let j=0;j<seqln;j++)
 				{
-					prefixMassList[j].mass = prefixMassList[j].mass + massShift_in;
+					prefixMassList[j].mass = prefixMassList[j].mass + ionType_massShift;
 				}
 			}
 			return prefixMassList;
 		}
 		return emptyMassList;
 	}
-	getSuffixMassList(sequence,massShiftList,massShift_in){
+	/**
+ 	* Generate Suffix mass list
+	* @param {String} sequence - Contains sequence of the protein
+	* @param {Array} massShiftList - Contains the Mass shift which are to be added in the corresponding positions 
+	* @param {Float} ionType_massShift - Contains the mass based on the ion Type
+	*/
+	getSuffixMassList(sequence,massShiftList,ionType_massShift){
 		let seqln = sequence.length;
 		let emptyMassList = [];
 		// As the elements starts from 0
@@ -174,17 +200,23 @@ class CalculatePrefixAndSuffixMass{
 					suffixMassList[position] = tempObj;
 				}
 			}
-			if(massShift_in != 0)
+			if(ionType_massShift != 0)
 			{
 				for(let j=0;j<seqln;j++)
 				{
-					suffixMassList[j].mass = suffixMassList[j].mass + massShift_in  ;
+					suffixMassList[j].mass = suffixMassList[j].mass + ionType_massShift  ;
 				}
 			}
 			return suffixMassList;
 		}
 		return emptyMassList ;
 	}
+	/**
+	 * Add mass shifts to massShift list
+	 * @param {int} position - position of the mass list
+	 * @param {Array} massShiftList - Contains the list of all the mass shifts
+	 * @param {Float} mass - Mass shift to be added to the list
+	 */
 	addMassShift(position,massShiftList,mass){
 		let len = massShiftList.length;
 		for(let i=0;i<len ; i++)
@@ -197,6 +229,11 @@ class CalculatePrefixAndSuffixMass{
 		}
 		return mass ;
 	}
+	/**
+	 * Get all the Fixed Ptms and add the corresponding mass shits to mass shift list
+	 * @param {Array} massShiftList - Contains all the mass shifts
+	 * @param {Object} prsm - Contains the data of the prsm(Attribute inside prsm_data global variable from data file)
+	 */
 	getFixedPTMMassList(massShiftList,prsm){
 		let occurence_list = [] ;
 		if(prsm.annotated_protein.annotation.hasOwnProperty("ptm") )
@@ -251,6 +288,10 @@ class CalculatePrefixAndSuffixMass{
 		}
 		return massShiftList ;
 	}
+	/**
+	 * Returns Fixed Mass for certain abbrivation
+	 * @param {String} abbrevation - Contains abbrevation to get corresponding fixed mass
+	 */
 	getMassofFixedPtm(abbrevation)
 	{
 		let len = this.fixedPtmList.length;
@@ -262,157 +303,5 @@ class CalculatePrefixAndSuffixMass{
 			}
 		}
 	}
-	// Function to add water to SuffixMass List
-	// addWaterMass(){
-	// 	mass = getAminoAcidDistribution(WATER)[0].mass ;
-	// 	return mass ;
-	// }
-
 }
 
-// calculatePrefixAndSuffixMass = function(){
-// 	const WATER = "H2O";
-// 	let protSequence = '';
-	
-// 	this.getPrefixMassList = function(sequence,massShiftList,massShift_in){
-// 		let seqln = sequence.length;
-// 		let emptyMassList = [] ;
-// 		massShiftList = massShiftList.slice();
-// 		if(seqln != 0)
-// 		{
-// 			let prefixMassList = new Array(seqln);
-// 			let shiftListln = massShiftList.length;
-// 			for(let i=0;i<seqln;i++)
-// 			{
-// 				// Get Calculated AminoAcidDistribution from aminoAcidDistributuion.js 
-// 				//evaluate the return value for the case when the user enters wrong character by mistake
-// 				let AcidMass;
-				
-// 				try{
-// 					AcidMass = getAminoAcidDistribution(sequence[i])[0].mass;
-
-// 					if(i == 0)
-// 					{
-// 						// Add 1 to i as the seq start from 0 but the peak id starts from 1
-// 						if(shiftListln != 0)
-// 						{
-// 							AcidMass = this.addMassShift(i,massShiftList,AcidMass);
-// 						}
-// 						let tempObj = {position:(i+1),mass:AcidMass} ;
-// 						prefixMassList[i] = tempObj;
-// 					}
-// 					else
-// 					{
-// 						let mass = prefixMassList[i-1].mass + AcidMass;
-// 						if(shiftListln != 0)
-// 						{
-// 							mass = this.addMassShift(i,massShiftList,mass);
-// 						}
-// 						// Add 1 to i as the seq start from 0 but the peak id starts from 1
-// 						let tempObj = {position:(i+1),mass:mass};
-// 						prefixMassList[i] = tempObj;
-// 					}
-// 				}
-// 				catch(error){
-// 					//invalid character entered for protein sequence
-// 					//window.alert("Error! Invalid amino acid in the sequence.")
-// 					$('#errorAlertModal').modal('show');
-// 					break;
-// 				}
-// 			}
-// 			// Adding Mass Shift based on selection of Ion
-// 			// let utilFunctionsObj = new utilFunctions();
-// 			// let ionMassShiftVal = utilFunctionsObj.getNTerminusMassShiftVal();
-// 			for(let j=0;j<seqln;j++)
-// 			{
-// 				prefixMassList[j].mass = prefixMassList[j].mass + massShift_in;
-// 			}
-// 			return prefixMassList;
-// 		}
-// 		return emptyMassList;
-// 	}
-// 	this.getSuffixMassList = function(sequence,massShiftList,massShift_in){
-// 		let seqln = sequence.length;
-// 		let emptyMassList = [];
-// 		// As the elements starts from 0
-// 		if(seqln != 0)
-// 		{
-// 			temp_seqln = seqln-1;
-// 			let shiftListln = massShiftList.length;
-// 			let suffixMassList = new Array(seqln);
-// 			for(let i=temp_seqln ; i >= 0 ; i--)
-// 			{
-// 				// Get Calculated AminoAcidDistribution from aminoAcidDistributuion.js
-// 				let AcidMass = getAminoAcidDistribution(sequence[i])[0].mass;
-// 				if(i == temp_seqln)
-// 				{
-// 					// Add 1 to i as the seq start from 0 but the peak id starts from 1
-// 					let position = temp_seqln - i;
-// 					// Adding water mass for suffix, indirectly this will add water mass to all the masses
-// 					let mass = AcidMass;//
-// 					if(suffixMassList != 0)
-// 					{
-// 						mass = this.addMassShift(i,massShiftList,mass)
-// 					}
-// 					let tempObj = {position:(position+1),mass:mass} ;
-// 					suffixMassList[position] = tempObj;
-// 				}
-// 				else
-// 				{
-// 					//Don't add water here
-// 					let position = temp_seqln - i;
-// 					let mass = suffixMassList[(position-1)].mass + AcidMass;
-// 					if(suffixMassList != 0)
-// 					{
-// 						mass = this.addMassShift(i,massShiftList,mass)
-// 					}
-// 					// Add 1 to i as the seq start from 0 but the peak id starts from 1
-// 					let tempObj = {position:(position+1),mass:mass};
-// 					suffixMassList[position] = tempObj;
-// 				}
-// 			}
-// 			// let utilFunctionsObj = new utilFunctions();
-// 			// let ionMassShift = utilFunctionsObj.getCTerminusMassShiftVal();
-// 			for(let j=0;j<seqln;j++)
-// 			{
-// 				suffixMassList[j].mass = suffixMassList[j].mass + massShift_in  ;
-// 			}
-// 			return suffixMassList;
-// 		}
-// 		return emptyMassList ;
-// 	}
-// 	this.getTotalSeqMass = function(seq,massShiftList){
-// 		let mass = 0 ;
-// 		let len = seq.length;
-// 		for(let i=0;i<len;i++)
-// 		{
-// 			mass = mass + getAminoAcidDistribution(seq[i])[0].mass;
-// 		}
-// 		let shiftlen = massShiftList.length;
-// 		for(let j=0;j<shiftlen;j++)
-// 		{
-// 			mass = mass + massShiftList[j].mass;
-// 		}
-// 		mass = mass + this.addWaterMass();
-
-// 		return mass ;
-// 	}
-// 	// Function to add mass shift
-// 	this.addMassShift = function(position,massShiftList,mass){
-// 		let len = massShiftList.length;
-// 		for(let i=0;i<len ; i++)
-// 		{
-// 			if(position == massShiftList[i].position)
-// 			{
-// 				mass = mass + massShiftList[i].mass ;
-// 				return mass ;
-// 			}
-// 		}
-// 		return mass ;
-// 	}
-// 	// Function to add water to SuffixMass List
-// 	this.addWaterMass = function(){
-// 		mass = getAminoAcidDistribution(WATER)[0].mass ;
-// 		return mass ;
-// 	}
-// }

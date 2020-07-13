@@ -1,5 +1,7 @@
-//map the ion name from the prsm.js files to the ion checkbox id  in the spectrum.html
-
+/**
+ * map the ion name from the prsm.js files to the ion checkbox id in the spectrum.html
+ * @param {Char} ionType - Contains ion types from check box
+ */
 function setIonCheckbox(ionType){
 	const ionNames = {
 		"B":"b",

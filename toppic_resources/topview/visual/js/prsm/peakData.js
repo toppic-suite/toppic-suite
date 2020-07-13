@@ -1,5 +1,9 @@
-/*	Get data from global variable spectrum_data and utilities to manupulate----
- * 	the data-------------------------------------------------------------------*/
+/**
+ * Data extractor to a proper format to understand by the spectrum graph
+ * This gets peak data from @function getPeakData which is inside the PeakData object
+ * This gets envelope data from @function getEnvelopeData which is inside the PeakData object
+ * This also gets data from @function getIonData which is inside the PeakData object
+ */
 PeakData = function() {
     this.peak_list = [];
     this.envelope_list = [];
@@ -7,6 +11,11 @@ PeakData = function() {
     this.maxPeakIntensity;
     this.maxMz;
     
+    /**
+     * @function getPeakData
+     * @description gets peak data list with mz and intensity attributes
+     * @param {object} json_data - contains complete data of prsm 
+     */
     this.getPeakData = function(json_data){
         let peakList = [];
         let i = json_data.peaks.length ;
@@ -24,7 +33,10 @@ PeakData = function() {
         return peakList;
     }
     /**
-     * Get the sorted envelope data with color value attached for each envelope cluster
+     * @function getEnvelopeData
+     * @description gets envelope data list with mono_mass,charge, env_peaks(contains mz and intensity) and color attributes
+     * This function adds color to the each list of envelopes
+     * @param {object} json_data - contains complete data of spectrum 
      */
     this.getEnvelopeData = function(json_data){
         let envelopList = [];
@@ -54,7 +66,12 @@ PeakData = function() {
         return envelopList;
     }
     /**
-     * Get the Ion Data to draw upon the each cluster of matched peaks 
+     * @function getIonData
+     * @description gets ion data list with mz, intensity and ion name 
+     * This function gets matched ion data
+     * @param {object} prsm_data - contains complete data of prsm 
+     * @param {int} specId - contains information of the spec Id
+     * @param {object} json_data - contains complete data of spectrum
      */
     this.getIonData = function(prsm_data,specId,json_data){
         let envelopes =  json_data.envelopes;
@@ -75,8 +92,8 @@ PeakData = function() {
                         
                         intensity = envelopes[i].env_peaks.sort(function(x,y){
                                         return d3.descending(x.intensity, y.intensity);
-                                    })[0].intensity; //envelopes[i].env_peaks[0].intensity;
-                        //Multiplying with 1.000484 to make the ions come to center of the max peak
+                                    })[0].intensity; 
+                        // Multiplying with 1.000484 to make the ions come to center of the max peak
                         ionDataTemp = {"mz":(parseFloat(element.monoisotopic_mz)*1.000484),"intensity":parseFloat(intensity),"ion":ion};
                         ionData.push(ionDataTemp);
                         break;

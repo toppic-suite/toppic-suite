@@ -1,6 +1,8 @@
-
 /**
- * On Click implimentation of topview button
+ * Function gets invoked when clicked on inspect button.
+ * This function stores all the information of a spectrum that is being inspected using local storage.
+ * @param {object} scansWithData - This is a json object with data of all the scan Ids
+ * @param {Integer} scanId - Contians the Scan numbers
  */
 function onclickTopView(scansWithData,scanId){
     let currentSpectrumData;
@@ -11,7 +13,7 @@ function onclickTopView(scansWithData,scanId){
     let fixedPtmList = getFixedPTMMassList();
     let unknownMassShiftList = getUnknownMassList();
     let precursorMass = prsm_data.prsm.ms.ms_header.precursor_mono_mass;
-
+    // Stores all the data in the variables respectively
     window.localStorage.setItem('peakAndIntensityList',  JSON.stringify(peakAndIntensityList));
     window.localStorage.setItem('massAndIntensityList',  JSON.stringify(massAndIntensityList));
     window.localStorage.setItem('sequence',  JSON.stringify(sequence));
@@ -20,9 +22,11 @@ function onclickTopView(scansWithData,scanId){
     window.localStorage.setItem('precursorMass', JSON.stringify(precursorMass));
     window.open("../inspect/spectrum.html");
 }
-
+/**
+ * Get the peaklist from respective spectrum.js to set the data for inspect page
+ * @param {object} ms2_data - json object with complete data spectrum for corresponding scan Id
+ */
 function getDataFromPRSMtoSpectralView(ms2_data){
-    let peakdata = new PeakData();
     let peakAndIntensity = [];
     ms2_data.peaks.forEach(function(eachrow){
         let tempObj = eachrow.mz + " " + eachrow.intensity;
@@ -30,12 +34,12 @@ function getDataFromPRSMtoSpectralView(ms2_data){
     })
     return peakAndIntensity;
 }
-
+/**
+ * Get the masslist from respective prsm.js to set the data for inspect page
+ * @param {Integer} specId - Contians spec Id to get the data of corrsponding mass list
+ */
 function getMassAndIntensityData(specId){
   let massAndIntensityList = [];
-  let ms2_ids = prsm_data.prsm.ms.ms_header.ids;
-  let ms2_id_list = ms2_ids.split(" ");
-  let ms2_id_1 = ms2_id_list[0];
 
   prsm_data.prsm.ms.peaks.peak.forEach(function(eachPeak,i){
     if (eachPeak.spec_id == specId) {
@@ -45,6 +49,9 @@ function getMassAndIntensityData(specId){
   })
   return massAndIntensityList;
 }
+/**
+ * Function to get the sequence of the protein from prsm.js
+ */
 function getSequence(){
     let sequence = [];
     let firstposition = prsm_data.prsm.annotated_protein.annotation.first_residue_position;
@@ -58,6 +65,9 @@ function getSequence(){
     })
    return sequence;
 }
+/**
+ * Gets all the masslist shifts of the Fixed ptms for prsm
+ */
 function getFixedPTMMassList()
 {
     let fixedPTMList = [];
@@ -88,6 +98,9 @@ function getFixedPTMMassList()
     }
     return fixedPTMList;
 }
+/**
+ * Get all the unknwon mass lists form the prsm
+ */
 function getUnknownMassList()
 {
     let unknownMassShiftList = [];
@@ -115,6 +128,11 @@ function getUnknownMassList()
     }
     return unknownMassShiftList;
 }
+/**
+ * Create HTML dropdown buttons based on the scan list
+ * @param {Array} scanIdList - Contains Scan id numbers
+ * @param {Array} specIdList - Contains Spec Id numbers
+ */
 function setDropDownItemsForInspectButton(scanIdList,specIdList){
     let dropdown_menu = $(".dropdownscanlist .dropdown-menu");
     let len = scanIdList.length;
@@ -134,6 +152,9 @@ function setDropDownItemsForInspectButton(scanIdList,specIdList){
     }
     
 }
+/**
+ * Onclick function, invoked on click of the inspect scn button
+ */
 function onClickToInspect(){
     $(".dropdownscanlist .dropdown-item ").click(function(){
         let scanId = $(this).attr('value')

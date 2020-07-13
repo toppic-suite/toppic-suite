@@ -1,4 +1,6 @@
 /**
+ * @function getIsotopicMassOfAtom
+ * @description 
  * Code to get absolute mass and intensity values of atoms
  */
 getIsotopicMassOfAtom = function(atom){

@@ -28,7 +28,6 @@
 <script src="../js/spectrum_graph/spectrumgraph.js" ></script>
 <script src="../js/spectrum_graph/graphFeatures.js" ></script>
 <script src="../js/spectrum_graph/spectrumparameters.js" ></script>
-<script src="../js/spectrum_graph/spectrumdownload.js" ></script>
 
 <script src="js/distribution_calc/emassanddistribution.js" ></script>
 <script src="js/distribution_calc/isotopes.js" ></script>
@@ -63,20 +62,18 @@
 <script src="js/UI_helpers/rectbackgroundcolor.js" ></script>
 <!--draw nav bar-->
 <script src="../visual/js/util/navBar.js" ></script>
-
-
+<!-- Store all the calculated Data -->
+<script src="js/UI_helpers/completeCalData.js" ></script>
 
 <script>
  // define global variable ms2_graph and precursorMass
  var ms2_graph; 
  var precursorMass ;
+ // Global Variable with spec parameters for respetive Graphs
  var correspondingSpecParams_g = [];
+ // Gets executed once HTML is loaded
  $(document).ready(function(){
-	/*var peakAndIntensityList = JSON.parse(window.localStorage.getItem('peakAndIntensityList'));
-	var massAndIntensityList = JSON.parse(window.localStorage.getItem('massAndIntensityList'));
-	var sequence = JSON.parse(window.localStorage.getItem('sequence'));
-	var l_fixedPtmList = JSON.parse(window.localStorage.getItem('fixedPtmList'));
-	*/
+	// Get the data from local storage 
 	var peakAndIntensityList = parsePeakMass('peakAndIntensityList');
 	var massAndIntensityList = parsePeakMass('massAndIntensityList');
 	var sequence = parseSeq('sequence');
@@ -326,6 +323,11 @@
 		</div>
 	<div class="row">
 		<svg id = "spectrum" height="250" width = "1000" style="background-color:white;display:none"></svg>
+	</div>
+	
+	<div class="row">
+		<h5 id="monoMasstitle" style="display:none">MonoMass Spectrum</h5>
+		<svg id = "monoMassGraph" height="250" width = "1000" style="background-color:white;display:none"></svg>
 	</div>
 	<div class="row" id="peakCount" style="display:none">
 		<div class="col-2 pull-left" >

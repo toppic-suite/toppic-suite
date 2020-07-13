@@ -1,7 +1,8 @@
 class iontabledata{
 	
 	/**
-	 * Dictionary to get correspoding actual heading for 
+	 * @function getActualIdvalues
+	 * @description Dictionary to get correspoding actual heading for 
 	 * all the Id's of Ion Fragmentation from UI.
 	 * @param {String} ionType - Id of the ion from UI
 	 */

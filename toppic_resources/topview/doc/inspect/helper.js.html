@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: helper.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: helper.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Class to help the get and put data into html file.
+ * This also helps to create HTML tags like creating table
+ */
+class UIHelper{
+    /**
+     * Function to set default error value to HTML in Da units
+     * @param {Float} massErrorthVal - Contains Mass Error Value in Da units
+     */
+    setMassErrorValue(massErrorthVal){
+        $("#errorval").val(massErrorthVal);
+        $("#errorunit").html("Da&amp;nbsp;&amp;nbsp;");
+    }
+    /**
+     * Function to Set Default error value to HTML in ppm units
+     * @param {Float} ppmErrorthVal - Contains Mass Error in ppm units
+     */
+    setPPMErrorValue(ppmErrorthVal){
+        $("#errorval").val(ppmErrorthVal);
+        $("#errorunit").html("ppm&amp;nbsp;&amp;nbsp;");
+    }
+    /**
+     * Set Total mass on to the html
+     * @param {*} totalMass 
+     */
+    setTotalSeqMass(totalMass){
+        totalMass = totalMass.toFixed(4);
+        $("#totalmass").html(totalMass);
+    }
+    /**
+     * Set Mass difference on to the html
+     * @param {Float} precursorMass - Contains Precursor mass
+     * @param {Float} proteinMass - Contains calculated protein Mass
+     */
+    setMassDifference(precursorMass, proteinMass){
+        let diff = proteinMass - precursorMass ;
+        document.getElementById("massvariation").innerHTML = diff.toFixed(4);
+        return (proteinMass - precursorMass);
+    }
+    /**
+     * Set Default Mass errors into html of both Da and ppm units 
+     * @param {Float} massErrorthVal - Contains Mass error in Da units
+     * @param {Float} ppmErrorthVal - Contains ppm error in ppm units
+     */
+    writeMassErrorThreshholdValueToUI(massErrorthVal,ppmErrorthVal){
+        if(massErrorthVal != "") $("#errorval").val(massErrorthVal);
+        else $("#errorval").val(ppmErrorthVal);
+    }
+    /**
+     * getlist of Mass,Intensity and charge from UI
+     */
+    getMassListFromUI()
+    {
+        let spectrumDataList = [];
+        // Read data line by line from the mass and intensity box
+        var lines = $('#data').val().split('\n');
+        for(var i = 0; i &lt; lines.length;i++){
+            let massAndInte = lines[i].trim() ;
+            if(massAndInte.length !=  0 )
+            {
+                let spectrumData = {};
+                // Get Mass,intensity and charge either by space seperated or tab seperated
+                let massInte = massAndInte.split(/[\s]+/);
+                if(massInte[0] != undefined &amp;&amp; massInte[1] != undefined 
+                        &amp;&amp; !isNaN(massInte[0]) &amp;&amp; !isNaN(massInte[1]))
+                {
+                    spectrumData.mass = parseFloat(massInte[0]);
+                    spectrumData.intensity = parseFloat(massInte[1]);
+                    spectrumData.charge = parseFloat(massInte[2]);
+                }
+                if(!jQuery.isEmptyObject(spectrumData))
+                {
+                    if((spectrumData.mass !== undefined) &amp;&amp;
+                        (spectrumData.intensity !== undefined))
+                    {
+                        spectrumDataList.push(spectrumData) ;
+                    }
+                }
+            }
+        }
+        completeCalData.monomasslist = spectrumDataList;
+        return spectrumDataList ;
+    }
+    /**
+     * Function to get data of peaks and intensity from UI
+     */
+    getPeakListFromUI()
+    {
+        let spectrumDataList = [];
+        // Read data line by line from peak and intensity box
+        var lines = $('#peakdata').val().split('\n');
+        for(var i = 0; i &lt; lines.length;i++){
+            let peakAndInte = lines[i].trim();
+            if(peakAndInte.length !=  0 )
+            {
+                let spectrumData = {};
+                let peakInte = peakAndInte.split(/[\s]+/);
+                if(peakInte[0] != undefined &amp;&amp; peakInte[1] != undefined 
+                        &amp;&amp; !isNaN(peakInte[0]) &amp;&amp; !isNaN(peakInte[1]))
+                {
+                    spectrumData.mz = parseFloat(peakInte[0])///spectrumData.charge ;
+                    spectrumData.intensity = parseFloat(peakInte[1]);
+                }
+                if(!jQuery.isEmptyObject(spectrumData))
+                {
+                    if((spectrumData.mz !== undefined) &amp;&amp;
+                        (spectrumData.intensity !== undefined))
+                    {
+                        spectrumDataList.push(spectrumData) ;
+                    }
+                }
+            }
+        }	
+        completeCalData.peakdatalist = spectrumDataList;
+	    return spectrumDataList ;
+    }
+    /**
+     * Function to create table
+     */
+    createMonoMassTable(){
+        // Remove if table already exist and rebuild the table
+        $("#tableContainer").remove();
+        // Remove if tableContainer_wrapper already exist and rebuild the table, wrapper is an inbuild class of bootstrap table
+        $("#divtableContainer #tableContainer_wrapper").remove();
+        let div = document.getElementById("divtableContainer");
+        let table = document.createElement("table");
+        table.setAttribute("id","tableContainer");
+        table.setAttribute("class","table table-striped display");
+        let thead = document.createElement("thead");
+        let tbody = document.createElement("tbody");
+        tbody.setAttribute("id","tableContainertbody");
+        let tr = document.createElement("tr");
+        tr.setAttribute("role","row");
+        let ColCount = 10;
+        // Create table header
+        for(let i = 0;i &lt; ColCount;i++)
+        {
+            let th = document.createElement("th");
+            th.setAttribute("class","th-sm");
+            if(i == 0) th.innerHTML = "Id";
+            if(i == 1) th.innerHTML = "Mono mass";
+            if(i == 2) th.innerHTML = "Charge";
+            if(i == 3) th.innerHTML = "Mono m/z";
+            if(i == 4) th.innerHTML = "Intensity";
+            if(i == 5) th.innerHTML = "Theoretical mass";
+            if(i == 6) th.innerHTML = "Ion";
+            if(i == 7) th.innerHTML = "Pos";
+            if(i == 8) th.innerHTML = "Mass error";
+            if(i == 9) th.innerHTML = "PPM error";
+            tr.appendChild(th);
+        }
+        thead.appendChild(tr);
+        table.appendChild(thead);
+        table.appendChild(tbody);
+        div.appendChild(table);
+    }
+    /**
+     * Add Data to the table created
+     * @param {Array} matchedPeaks - Contains List of Matched and unmatched peaks
+     */
+    addMassDataToTable(matchedPeaks)
+    {
+        let dataContainer_tbody = $("#tableContainer tbody");
+        const totalColCount = $("#tableContainer thead tr th").length;
+        let len = matchedPeaks.length;
+        for(let i=0; i&lt;len ; i++)
+        {
+            let rowSize = $("#tableContainer tbody tr").length;
+            let tr = document.createElement("tr");
+            tr.setAttribute("id",i+"_row");
+            tr.setAttribute("name",matchedPeaks[i].position);
+            let id = 0;
+            for(let j = 0; j &lt; totalColCount ; j++)
+            {
+                let td = document.createElement("td");
+                if(j == 0)
+                {
+                    id = matchedPeaks[i].peakId;
+                    td.innerHTML = matchedPeaks[i].peakId;
+                    td.style.fontWeight = "bold";
+                }else if(j == 1) td.innerHTML = matchedPeaks[i].mass ;
+                else if(j == 2) td.innerHTML = matchedPeaks[i].charge;
+                else if(j == 3) {
+                  let mz = matchedPeaks[i].mass / matchedPeaks[i].charge + 1.007276466879;
+                  let a = document.createElement('a');
+                  a.href="#!"
+                  a.className = "peakRows"
+                  a.innerHTML = mz.toFixed(4); 
+                  td.appendChild(a);
+                }
+                else if(j == 4) td.innerHTML = matchedPeaks[i].intensity ;
+                else if(j == 5){
+                    td.className = "th_mass";
+                    td.innerHTML = matchedPeaks[i].thMass;
+                } 
+                else if(j == 6) td.innerHTML = matchedPeaks[i].ion;
+                else if(j == 7) td.innerHTML = matchedPeaks[i].position;
+                else if(j == 8) td.innerHTML = matchedPeaks[i].massError;
+                else if(j == 9) td.innerHTML = matchedPeaks[i].PPMerror;
+                tr.appendChild(td);
+            }
+            tr.setAttribute("role","row");
+            let classname = "" ;
+            // Creating classes with matched_peak even and odd, this will help to show only matched peaks on click of matched peaks
+            if(matchedPeaks[i].matchedInd == "Y")
+            {
+                if(id%2 == 0) classname = "matched_peak even";
+                else classname = "matched_peak odd";
+            }
+            else
+            {
+                if(id%2 == 0) classname = "unmatched_peak even";
+                else classname = "unmatched_peak odd";
+            }
+            tr.setAttribute("class",classname);
+            dataContainer_tbody.append(tr);
+        }
+
+      $(".peakRows").click(function() {
+        /*	get Mono M/z value till 3 decimal values	*/
+        let peak_value = parseFloat(this.innerHTML).toFixed(3) ;
+        let graphFeatures = new GraphFeatures();
+        ms2_graph.redraw(peak_value,graphFeatures);
+        console.log("completeCalData : ", completeCalData);
+        let parent_id  = $(this).parent().parent().prop('id');
+        console.log("parent_id : ",parent_id);
+        let th_mass_val = $("#"+parent_id+" .th_mass").text();
+        console.log("th_mass_val : ",th_mass_val);
+        let monoMassList = completeCalData.monomasslist;
+        generateMonoMassGraph(monoMassList,th_mass_val);
+      });
+    }
+    /**
+     * Function to display matched count and un-matched count
+     */
+    showPeakCounts()
+    {
+        var matched_elems = document.getElementsByClassName("matched_peak");
+        var unmatche_elems = document.getElementsByClassName("unmatched_peak");
+        let totalCount = matched_elems.length + unmatche_elems.length;
+        let matchedCount = matched_elems.length ;
+        let unMatchedCount = unmatche_elems.length ;
+        $("#all_peak_count").html(function(){return "All Peaks ("+totalCount+")";}) 
+        $("#matched_peak_count").html(function(){return "Matched Peaks ("+ matchedCount +")";})
+        $("#unmatched_peak_count").html(function(){return "Non Matched Peaks ("+unMatchedCount +")";}) 
+    }
+    /**
+     * Function to show only matched or unmatched peaks
+     */
+    showIonPeaks(ids) 
+    {
+        var elems = document.getElementsByClassName('matched_peak');
+        for(var i = 0; elems.length > i; i++) {
+            elems[i].style.display = 'none';
+        }
+        elems = document.getElementsByClassName('unmatched_peak');
+        for(var i = 0; elems.length > i; i++) {
+            elems[i].style.display = 'none';
+        }
+
+        elems = document.getElementsByName(ids);
+            for(var j = 0; elems.length > j; j++) {
+            elems[j].style.display  =  "";
+            elems[j].style.background  =  "#BEECFF";
+            }
+    }
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="CalculateEmassAndDistribution.html">CalculateEmassAndDistribution</a></li><li><a href="Constants.html">Constants</a></li><li><a href="GetMassTableOfSelectedIons.html">GetMassTableOfSelectedIons</a></li><li><a href="MatchedPeaks.html">MatchedPeaks</a></li><li><a href="MolecularFormulae.html">MolecularFormulae</a></li><li><a href="rectBGColor.html">rectBGColor</a></li><li><a href="SetValuesToHtml.html">SetValuesToHtml</a></li><li><a href="UIHelper.html">UIHelper</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addColorsToDropdown">addColorsToDropdown</a></li><li><a href="global.html#addMassShift">addMassShift</a></li><li><a href="global.html#addNewFixedPtmRow">addNewFixedPtmRow</a></li><li><a href="global.html#addWaterMass">addWaterMass</a></li><li><a href="global.html#annotations">annotations</a></li><li><a href="global.html#appendTooltip">appendTooltip</a></li><li><a href="global.html#buildSvg">buildSvg</a></li><li><a href="global.html#calculatePrefixAndSuffixMass">calculatePrefixAndSuffixMass</a></li><li><a href="global.html#calibrateLeftNum">calibrateLeftNum</a></li><li><a href="global.html#calibrateRightNum">calibrateRightNum</a></li><li><a href="global.html#calibrateSkipEnd">calibrateSkipEnd</a></li><li><a href="global.html#calibrateSkipStart">calibrateSkipStart</a></li><li><a href="global.html#drawAnnotation">drawAnnotation</a></li><li><a href="global.html#drawAnnotation_B">drawAnnotation_B</a></li><li><a href="global.html#drawAnnotation_Y">drawAnnotation_Y</a></li><li><a href="global.html#drawAnnotation_YB">drawAnnotation_YB</a></li><li><a href="global.html#drawRectagleWithColors">drawRectagleWithColors</a></li><li><a href="global.html#generateCorrespondingGraph">generateCorrespondingGraph</a></li><li><a href="global.html#generateMonoMassGraph">generateMonoMassGraph</a></li><li><a href="global.html#getAbsoluteMaxValfromList">getAbsoluteMaxValfromList</a></li><li><a href="global.html#getActualIdvalues">getActualIdvalues</a></li><li><a href="global.html#getAminoAcidDistribution">getAminoAcidDistribution</a></li><li><a href="global.html#getCTerminusMassShiftVal">getCTerminusMassShiftVal</a></li><li><a href="global.html#getIonCharge">getIonCharge</a></li><li><a href="global.html#getIsotopicMassOfAtom">getIsotopicMassOfAtom</a></li><li><a href="global.html#getIsotopicMassRef">getIsotopicMassRef</a></li><li><a href="global.html#getMassShift">getMassShift</a></li><li><a href="global.html#getNormalizedIntensity">getNormalizedIntensity</a></li><li><a href="global.html#getNTerminusMassShiftVal">getNTerminusMassShiftVal</a></li><li><a href="global.html#getNumValues">getNumValues</a></li><li><a href="global.html#getPrefixMassList">getPrefixMassList</a></li><li><a href="global.html#getSuffixMassList">getSuffixMassList</a></li><li><a href="global.html#getSvgSize">getSvgSize</a></li><li><a href="global.html#getTerminus">getTerminus</a></li><li><a href="global.html#getTotalSeqMass">getTotalSeqMass</a></li><li><a href="global.html#getX">getX</a></li><li><a href="global.html#getY">getY</a></li><li><a href="global.html#handleOnClick">handleOnClick</a></li><li><a href="global.html#MassShift">MassShift</a></li><li><a href="global.html#onClickofMatchedPeaks">onClickofMatchedPeaks</a></li><li><a href="global.html#onLoadOfHTML">onLoadOfHTML</a></li><li><a href="global.html#parameters">parameters</a></li><li><a href="global.html#parsePeakMass">parsePeakMass</a></li><li><a href="global.html#parsePrecursorMass">parsePrecursorMass</a></li><li><a href="global.html#parsePTM">parsePTM</a></li><li><a href="global.html#parseSeq">parseSeq</a></li><li><a href="global.html#parseUnknowmassList">parseUnknowmassList</a></li><li><a href="global.html#removeToolTip">removeToolTip</a></li><li><a href="global.html#setIonCheckbox">setIonCheckbox</a></li><li><a href="global.html#showAllPeaks">showAllPeaks</a></li><li><a href="global.html#showIonPeaks">showIonPeaks</a></li><li><a href="global.html#showMatchedPeaks">showMatchedPeaks</a></li><li><a href="global.html#showNonMatchedPeaks">showNonMatchedPeaks</a></li><li><a href="global.html#utilFunctions">utilFunctions</a></li><li><a href="global.html#%257BonClickSequenceOfExecution%257Dexecuteswhenuserentersmassshiftonanyaminoacidandclick%2522OK%2522button.">{onClickSequenceOfExecution} executes when user enters mass shift on any amino acid and click "OK" button.</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Fri May 29 2020 03:46:05 GMT-0400 (Eastern Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -1,10 +1,12 @@
 /**
+ * @function addSpectrum
+ * @description
  * Starting point of drawing spectrum graph
  * @param {String} id - gets the svg id of the graph 
- * @param {list} peakList - contains the list of data with mz and intensity used to draw lines on the graph 
- * @param {list} envelopeList - contains the list of data with actual mass, mz and intensity used to draw circles on graph
+ * @param {Array} peakList - contains the list of data with mz and intensity used to draw lines on the graph 
+ * @param {Array} envelopeList - contains the list of data with actual mass, mz and intensity used to draw circles on graph
  * @param {float} monoMZ - Value to which tha graph as to point on click of mz value used to zoom the grpah to that location
- * @param {list} ionData - contains the list of data with mass and acid name
+ * @param {Array} ionData - contains the list of data with mass and acid name
  * @param {object} graphFeatures - contains all the features needed for drawing the graphs
  */
 addSpectrum = function(id,peakList,envelopeList,monoMZ, ionData, graphFeatures){
@@ -32,8 +34,14 @@ addSpectrum = function(id,peakList,envelopeList,monoMZ, ionData, graphFeatures){
 	let spectrumGraph = new SpectrumGraph(id,specParameters,peakData,ionData);
 	return spectrumGraph;
 }
- //  Function to set spectrum perameters based on the data
+ /**
+  * Function to set spectrum perameters based on the data
+  * @param {Array} peakList - contains the list of data with mz and intensity used to draw lines on the graph 
+  * @param {Array} envelopeList - contains the list of data with actual mass, mz and intensity used to draw circles on graph
+  * @param {float} monoMZ - Value to which tha graph as to point on click of mz value used to zoom the grpah to that location
+  */
  function compSpectrumParameters(peakList, envelopeList, monoMZ){
+	 console.log("peakList : ",peakList);
 	let ratio = 1; 
 	let specParameters = new SpectrumParameters();
 	// Sort by mz
@@ -115,8 +123,9 @@ addSpectrum = function(id,peakList,envelopeList,monoMZ, ionData, graphFeatures){
 
 /**
  * Sorting envelopes based on intensity to show top 200 envelops with high intensitites
+ * @param {Array} envelopeList - contains the list of data with actual mass, mz and intensity used to draw circles on graph
  */
-sortEnvelopes = function(envelopeList)
+function sortEnvelopes(envelopeList)
 {
 	envelopeList.forEach(function(envelope){
 		// ...env_peak converts arguments into list as sort function is not allowed on arguments
@@ -133,10 +142,9 @@ sortEnvelopes = function(envelopeList)
 }
 
 /**
- * 
+ * Function returns a map list with key and value
  * @param {list} listData - contains list of data
  * @param {string} keyValue - contains keyword based on which new group is created
- * Function returns a map list with key and value 
  */
 function groupBy(listData,keyValue){
 	const map = new Map();

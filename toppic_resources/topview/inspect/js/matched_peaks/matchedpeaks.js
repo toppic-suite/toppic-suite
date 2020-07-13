@@ -1,3 +1,6 @@
+/**
+ * Class to calculate Matched Peaks and distribution of the Amoino Acids
+ */
 class MatchedPeaks {
 	PREFIX = "PREFIX";
 	SUFFIX = "SUFFIX";
@@ -16,13 +19,22 @@ class MatchedPeaks {
 		this.matchedUnMatchedList = [];
 		this.million = 1000000;
 	}
-
+	/**
+	 * Function to form object with necessary attributes at each amino acid position
+	 * @param {Object} monoMassList_temp - Single element from mono Mass List
+	 * @param {String} id - Unique Id for each peak
+	 * @param {String} ion - Contains matched type(b/y) appended with charge
+	 * @param {Integer} position - Position of the amino acid
+	 * @param {Float} massDiff - Mass difference at particular position
+	 * @param {Float} mass - Mass at the position of the acid 
+	 * @param {Char} matchedInd - Indicator indicating matched/not matched. If matched containd "Y"
+	 */
 	matchedPeakAttributes(monoMassList_temp,id,ion,position,massDiff,mass,matchedInd)
 	{
 		let peak = monoMassList_temp;
 		let thMass = "";
 		let PPMerror = "";
-		// Check if Matched Indicator is Yes "Y" eles keep empty spaces in the new attributes
+		// Check if Matched Indicator is Yes "Y" else keep empty spaces in the new attributes
 		if(matchedInd == this.CONST_Y)
 		{
 			thMass = Math.round(mass * 10000)/10000 ;
@@ -37,9 +49,19 @@ class MatchedPeaks {
 		peak.thMass = thMass ;
 		peak.PPMerror = PPMerror;
 		peak.matchedInd = matchedInd;
+		console.log("peak : ", peak);
 		return peak;
 	}
-
+	/**
+	 * Returns Complete list with matched Indication
+	 * @param {Array} prefixOrSuffixMassList - List with either prefix or suffix mass list
+	 * @param {Array} monoMassList - Contains Mono Mass list from html page
+	 * @param {String} sequence - Protein sequence
+	 * @param {Float} massErrorthVal - Threshhold value entered by user to determine the mass error and matched peaks
+	 * @param {Float} ppmErrorthVal - Threshhold value entered by user to determine the mass error and matched peaks in ppm units
+	 * @param {String} ionType - Contains either y/b
+	 * @param {String} preOrSufInd - Contains information of either PREFIX/SUFFIX
+	 */
 	getMatchedPeakList(prefixOrSuffixMassList,monoMassList,sequence,massErrorthVal,ppmErrorthVal,ionType,preOrSufInd)
 	{
 		let matchedList = [];
@@ -92,11 +114,15 @@ class MatchedPeaks {
 						matchedList.push(peak);
 					}
 				}
-
 			}
 		}
 		return matchedList;
 	}
+	/**
+	 * Set matched indicator to complete data and Seperate matched and unmatched list of data with matchedInd attribute
+	 * @param {Array} monoMassList - Contains mono Mass list data
+	 * @param {Array} matchedList - Contains all the data of both matched and unmatched data
+	 */
 	getMatchedAndUnMatchedList(monoMassList,matchedList)
 	{
 		let matchedAndUnmatchedList = matchedList.map(x => ({...x}));
@@ -121,9 +147,16 @@ class MatchedPeaks {
 			  matchedAndUnmatchedList.push(peak);
 			}
 		})
+		completeCalData.matchedandunmatcheddata = matchedAndUnmatchedList;
 		return matchedAndUnmatchedList ;
 	}
 
+	/**
+	 * Get the envelopes/distribution for the sequence
+	 * @param {Array} peakDataList - Contains peak list information
+	 * @param {String} sequence - Contains protein sequence
+	 * @param {Array} matchedUnMatchedList - Contains all matched and unmatched list 
+	 */
 	getDistribution(peakDataList,sequence,matchedUnMatchedList, completeMassShiftList)
 	{
 		let len = matchedUnMatchedList.length;
@@ -213,9 +246,21 @@ class MatchedPeaks {
 
 		return totalDistribution ;
 	}
+	/**
+	 * Get All the matched positions and mass list seperated with a matched indicator
+	 * @param {Array} prefixOrSuffixMassList - List of prefix and suffix masses 
+	 * @param {Array} monoMassList - Contains Mono Mass list
+	 * @param {Float} massErrorthVal - Mass Error Threshold value entered by user
+	 * @param {Float} ppmErrorthVal - PPM Error Threshold value entered by user
+	 * @param {String} prefixInd - contains if the complete data is of prefix/suffix mass list
+	 */
 	getMatchedAndUnmatchedPrefixAndSuffixMassList(prefixOrSuffixMassList, monoMassList,
 																massErrorthVal,ppmErrorthVal,prefixInd)
 	{
+<<<<<<< HEAD
+=======
+		//console.log("monoMassList : ", monoMassList);
+>>>>>>> topview_skankara
 		let MatchedAndUnMatchedList = [];
 		let monoMassList_temp = monoMassList.slice();
 		let len = monoMassList_temp.length;

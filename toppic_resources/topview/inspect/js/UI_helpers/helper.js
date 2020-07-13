@@ -1,26 +1,54 @@
+/**
+ * Class to help the get and put data into html file.
+ * This also helps to create HTML tags like creating table
+ */
 class UIHelper{
+    /**
+     * Function to set default error value to HTML in Da units
+     * @param {Float} massErrorthVal - Contains Mass Error Value in Da units
+     */
     setMassErrorValue(massErrorthVal){
         $("#errorval").val(massErrorthVal);
         $("#errorunit").html("Da&nbsp;&nbsp;");
     }
+    /**
+     * Function to Set Default error value to HTML in ppm units
+     * @param {Float} ppmErrorthVal - Contains Mass Error in ppm units
+     */
     setPPMErrorValue(ppmErrorthVal){
         $("#errorval").val(ppmErrorthVal);
         $("#errorunit").html("ppm&nbsp;&nbsp;");
     }
+    /**
+     * Set Total mass on to the html
+     * @param {*} totalMass 
+     */
     setTotalSeqMass(totalMass){
         totalMass = totalMass.toFixed(4);
         $("#totalmass").html(totalMass);
     }
+    /**
+     * Set Mass difference on to the html
+     * @param {Float} precursorMass - Contains Precursor mass
+     * @param {Float} proteinMass - Contains calculated protein Mass
+     */
     setMassDifference(precursorMass, proteinMass){
         let diff = proteinMass - precursorMass ;
         document.getElementById("massvariation").innerHTML = diff.toFixed(4);
         return (proteinMass - precursorMass);
     }
+    /**
+     * Set Default Mass errors into html of both Da and ppm units 
+     * @param {Float} massErrorthVal - Contains Mass error in Da units
+     * @param {Float} ppmErrorthVal - Contains ppm error in ppm units
+     */
     writeMassErrorThreshholdValueToUI(massErrorthVal,ppmErrorthVal){
         if(massErrorthVal != "") $("#errorval").val(massErrorthVal);
         else $("#errorval").val(ppmErrorthVal);
     }
-    // get Mass,Intensity and charge from UI
+    /**
+     * getlist of Mass,Intensity and charge from UI
+     */
     getMassListFromUI()
     {
         let spectrumDataList = [];
@@ -50,9 +78,12 @@ class UIHelper{
                 }
             }
         }
+        completeCalData.monomasslist = spectrumDataList;
         return spectrumDataList ;
     }
-    // Function to get data of peaks and intensity from UI
+    /**
+     * Function to get data of peaks and intensity from UI
+     */
     getPeakListFromUI()
     {
         let spectrumDataList = [];
@@ -80,9 +111,12 @@ class UIHelper{
                 }
             }
         }	
+        completeCalData.peakdatalist = spectrumDataList;
 	    return spectrumDataList ;
     }
-    // Function to create table
+    /**
+     * Function to create table
+     */
     createMonoMassTable(){
         // Remove if table already exist and rebuild the table
         $("#tableContainer").remove();
@@ -120,7 +154,10 @@ class UIHelper{
         table.appendChild(tbody);
         div.appendChild(table);
     }
-    // Add Data to the table created
+    /**
+     * Add Data to the table created
+     * @param {Array} matchedPeaks - Contains List of Matched and unmatched peaks
+     */
     addMassDataToTable(matchedPeaks)
     {
         let dataContainer_tbody = $("#tableContainer tbody");
@@ -130,6 +167,7 @@ class UIHelper{
         {
             let rowSize = $("#tableContainer tbody tr").length;
             let tr = document.createElement("tr");
+            tr.setAttribute("id",i+"_row");
             tr.setAttribute("name",matchedPeaks[i].position);
             let id = 0;
             for(let j = 0; j < totalColCount ; j++)
@@ -151,7 +189,10 @@ class UIHelper{
                   td.appendChild(a);
                 }
                 else if(j == 4) td.innerHTML = matchedPeaks[i].intensity ;
-                else if(j == 5) td.innerHTML = matchedPeaks[i].thMass;
+                else if(j == 5){
+                    td.className = "th_mass";
+                    td.innerHTML = matchedPeaks[i].thMass;
+                } 
                 else if(j == 6) td.innerHTML = matchedPeaks[i].ion;
                 else if(j == 7) td.innerHTML = matchedPeaks[i].position;
                 else if(j == 8) td.innerHTML = matchedPeaks[i].massError;
@@ -163,13 +204,13 @@ class UIHelper{
             // Creating classes with matched_peak even and odd, this will help to show only matched peaks on click of matched peaks
             if(matchedPeaks[i].matchedInd == "Y")
             {
-                if(id%2 == 0) classname = "matched_peak even"
-                else classname = "matched_peak odd"
+                if(id%2 == 0) classname = "matched_peak even";
+                else classname = "matched_peak odd";
             }
             else
             {
-                if(id%2 == 0) classname = "unmatched_peak even"
-                else classname = "unmatched_peak odd"
+                if(id%2 == 0) classname = "unmatched_peak even";
+                else classname = "unmatched_peak odd";
             }
             tr.setAttribute("class",classname);
             dataContainer_tbody.append(tr);
@@ -180,9 +221,18 @@ class UIHelper{
         let peak_value = parseFloat(this.innerHTML).toFixed(3) ;
         let graphFeatures = new GraphFeatures();
         ms2_graph.redraw(peak_value,graphFeatures);
+        console.log("completeCalData : ", completeCalData);
+        let parent_id  = $(this).parent().parent().prop('id');
+        console.log("parent_id : ",parent_id);
+        let th_mass_val = $("#"+parent_id+" .th_mass").text();
+        console.log("th_mass_val : ",th_mass_val);
+        let monoMassList = completeCalData.monomasslist;
+        generateMonoMassGraph(monoMassList,th_mass_val);
       });
     }
-    // Function to diaplsy matched count and un-matched count
+    /**
+     * Function to display matched count and un-matched count
+     */
     showPeakCounts()
     {
         var matched_elems = document.getElementsByClassName("matched_peak");
@@ -194,6 +244,9 @@ class UIHelper{
         $("#matched_peak_count").html(function(){return "Matched Peaks ("+ matchedCount +")";})
         $("#unmatched_peak_count").html(function(){return "Non Matched Peaks ("+unMatchedCount +")";}) 
     }
+    /**
+     * Function to show only matched or unmatched peaks
+     */
     showIonPeaks(ids) 
     {
         var elems = document.getElementsByClassName('matched_peak');

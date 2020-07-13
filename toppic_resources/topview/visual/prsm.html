@@ -20,7 +20,6 @@
 <script src="../js/spectrum_graph/invokespectrum.js"></script>
 <script src="../js/spectrum_graph/spectrumparameters.js"></script>
 <script src="../js/spectrum_graph/spectrumgraph.js"></script>
-<!-- <script src="../js/spectrum_graph/spectrumdownload.js"></script> -->
 <script src="../js/spectrum_graph/graphFeatures.js"></script>
 <script src="js/util/coordinates_util.js"></script>
 <script src="js/util/prsmDataUtil.js"></script>
@@ -44,237 +43,294 @@ var ms1_graph;
 var spectrumParams_global = [] ;
 var correspondingSpecParams_g = [];
 var monoMassDataList = [];
-
+/**
+ * This function waits till all the HTML tags are loaded.
+ * Invokes functions to loads the complete prsm page and visualization
+ */
 $(document).ready(function(){
 	var x = location.href;
 	let l_split = x.split(/[?#]+/)[1];
 	let path_and_value = l_split.split("&");
 	let folder_path = path_and_value[0].split("=")[1];
-	/* get the proteoform Id number by splitting url with "?" and "="  */
+	// get the prsm Id number by splitting url with "?" and "=" 
 	let prsm_seq_num = path_and_value[1].split("=")[1];
 
 	let prsm_data_script= document.createElement('script');
-	/* get the proteoform Id number by splitting url with "?","=","#"  */
+	// get the prsm Id number by splitting url with "?","=","#"
 	let prsm_data_file_name = "../data/"+folder_path+"/prsms/prsm" + prsm_seq_num+".js";
 	prsm_data_script.type= 'text/javascript';
 	prsm_data_script.src= prsm_data_file_name;
-	/* Add data file as script to the html */
+	// Add data file to the script tag in the html
 	let head= document.getElementsByTagName('head')[0];
 	head.appendChild(prsm_data_script);
 
-	/* Call the functions onload of the data */
-  prsm_data_script.onload = function () {
-    /* Loading prsm.js after data is loaded to fix no data issue in Data table */
-    let prsm_script = document.createElement('script');
-    prsm_script.type= 'text/javascript';
-    prsm_script.src = "js/prsm/prsm.js" ;
-    head.appendChild(prsm_script);
+	// Wait till the data is losded before calling any functions
+	prsm_data_script.onload = function () {
+		// Loading prsm.js after data is loaded to fix no data issue in Data table
+		let prsm_script = document.createElement('script');
+		prsm_script.type= 'text/javascript';
+		prsm_script.src = "js/prsm/prsm.js" ;
+
+		// Append scrip tags to the head tag
+		head.appendChild(prsm_script);
 		
-	let MultiScanObj = new MultiScan();
+		// Build Urls to naviga back to proteoform page, proteins page and all protein page
 		BuildUrl(folder_path);
+
+		// Get the information of the PRSM to the HTML
 		loadDatafromJson2Html();
-		para = new parameters();
-    	/* prsm_data is defined in prsm_data_script */
+		
+		// Get the parameters to draw the SVG visualization 
+		let para = new parameters();
+
+		// Detting prsm data from prsm_data variable. prsm_data is a global variable from the prsm data file
 		let prsm = prsm_data.prsm ;
 		
-	  	/* SVG Id of the HTML */
-	  	let svg_id = "l_svg" ;
-    	buildSvg(para,prsm,svg_id);
+		// SVG Id for the visualization
+		let svg_id = "l_svg" ;
+
+		// Draws SVG visualization with acid sequence
+		buildSvg(para,prsm,svg_id);
 		
-		/*	Color the background of occurence of mass shift */
+		// Color the background of occurence of mass shift from the left position to the right position given in the data
 		massShiftBackgroundColor(para,prsm,svg_id);
-		/*	Get the amount of skipped acid and write the amount 
-		* 	of skipped acid at the start and end of the sequence 
-		*/
+
+		// Get the amount of skipped acid and write the amount of skipped acid at the start and end of the sequence 
 		skippedAcidNotification(para,prsm,svg_id) ;
 
 		//buildResidueAcids(para,prsm,id);
+		// If show number attribute is true 
 		if(para.show_num)
 		{
-			/*	Get the numerical count at the start and end of 
-			* 	each row of sequence */
+			// Get the numerical count at the start and end of each row of sequence
 			getNumValues(para,prsm,svg_id);
 		}
 		
-		/*	Determine the start and end position of the sequence */
+		// Determine the start and end position of the sequence
 		drawAnnoOfStartEndPosition(para,prsm,svg_id) ;
-		/*	Draw Annotations */
+
+		//	Draw Annotations based prefix and suffix match
 		annotations(para,prsm,svg_id);
-		/*	Get the position of the fixed ptms and color them to red */
-		addColorToFixedPtms(para,prsm,svg_id);
-		/* 	Onclick actions to save open pop up window and to save SVG as PNG/SVG */
+
+		// Get the position of the fixed ptms and color them to red
+		addColorToFixedPtms(prsm,svg_id);
+
+		// Onclick actions to save open pop up window and to save SVG as PNG/SVG
 		buttonsAndAlerts(para,prsm,svg_id); 
-		/* 	Get occurence ptms */
+
+		// Get occurence ptms
 		occurence_ptm(prsm);
-		/* Get Unknown Ptms */
+
+		// Get Unknown Ptms to show in the html
 		getUnknownPtms(prsm);
-		/* Create peaks data into table content */
+
+		// Create peaks data into table content
 		createTableElements();
+
+		// Calling function with actions on click of buttons
 		buttons();
+
+		// Get all the scanIds
 		let scanIds = prsm_data.prsm.ms.ms_header.scans.split(" ");
+		// Get all the SpecIds
 		let specIds = prsm_data.prsm.ms.ms_header.ids.split(" ");
+
+		// Add Buttong with dropdowns with Scan numbers to navigae to inspect page
 		setDropDownItemsForInspectButton(scanIds,specIds);
+
+		// Add all the data and set local storage variables 
 		onClickToInspect();
 
-		//Getting Ms1 Ids
+		// Creating class object with functions to handle when multiple scans are present for a prsm
+		let MultiScanObj = new MultiScan();
+
+		// Get Ms1 Ids to draw MS1 Spectrum
 		let ms1_ids = prsm_data.prsm.ms.ms_header.ms1_ids ;
 		let ms1_id_1 = ms1_ids.split(" ")[0];
+		// Get scan Ids of MS1 Spectrum
 		let scanId_1 = prsm_data.prsm.ms.ms_header.ms1_scans.split(" ")[0];
 		let scanIdList_1 = [];
 		scanIdList_1.push(scanId_1);
 		let specIdList = [];
 		specIdList.push(ms1_id_1); //MultiScanObj.getUniqueScanIdList(ms1_id_1);
+		// Code to load the complete data of both scans of ms1
 		MultiScanObj.promiseLoadDataJS(specIdList,scanIdList_1,"ms1_json")
 
+		// Get Ms2 ids to draw MS2 Spectrum
 		let ms2_ids = prsm_data.prsm.ms.ms_header.ids;
 		let ms2_id_list = ms2_ids.split(" ");
+		// Get scan Ids of MS2 Spectrum
 		let scanIdList = prsm_data.prsm.ms.ms_header.scans.split(" ");
 		scanIdList = MultiScanObj.getUniqueScanIdList(scanIdList);
 		let ms2_uniqueList = MultiScanObj.getUniqueScanIdList(ms2_id_list);
-		drawMonoMassSpectrum(ms2_uniqueList,scanIdList);
+		// Add tabs of scan Ids for Mono Mass Spectrum graph
+		// This function also adds data into monoMassDataList 
+		getMonoMassDataList(ms2_uniqueList,scanIdList);
+		// Code to load the complete data of both scans of ms2 spectrum and then draw the graph
 		MultiScanObj.promiseLoadDataJS(ms2_uniqueList,scanIdList,"ms2_json");
 	}
 })
-
 </script>
 </head>
 <body>
-	<div id="nav-bar"></div>
+<div id="nav-bar"></div>
 <div class="container bodycontainer">
-<p style="font-size:15px;">
-<a id="allprotein_url" href="proteins.html">All proteins</a> /
-      <a id ="protien_url" href = "#"></a> / 
-      <a id="proteoform_url" href="#"></a>
-</p>
-<div class="row">
-	<div class="col-10">
-			<h2 id = "Protein-Spectrum-Match-Id-SpecId" ></h2>
-	</div>
-	<div class="col-2" align = "right">
-		<div class="dropdown dropdownscanlist">
-			<button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" id="scanList">
-				Inspect
-			</button>
-			<div class="dropdown-menu">
+	<p style="font-size:15px;">
+		<a id = "allprotein_url" href="proteins.html">All proteins</a> /
+		<a id = "protien_url" href = "#"></a> / 
+		<a id = "proteoform_url" href="#"></a>
+	</p>
+	<div class="row">
+		<div class="col-10">
+				<h2 id = "Protein-Spectrum-Match-Id-SpecId" ></h2>
+		</div>
+		<div class="col-2" align = "right">
+			<div class="dropdown dropdownscanlist">
+				<button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" id="scanList">
+					Inspect
+				</button>
+				<div class="dropdown-menu">
+				</div>
 			</div>
 		</div>
-		  
-		<!-- <button id="topview" type="button" class="btn btn-primary btn-sm"
-      		onclick="onclickTopView()">Inspect</button> -->
 	</div>
-</div>
-
-<div class="row filename">
-	<p>File name: <span id='File_name'></span></p>
-</div>
-
-<table id = "_width_table" class="table table-borderless" style="font-size:15px">
-<tr>
-<td>PrSM ID:</td><td id = "PrSM_ID"></td><td>Scan(s):</td><td id = "Scan"></td><td>Precursor charge:</td><td id = "Precursor_charge"></td>
-</tr>
-<tr>
-<td>Precursor m/z:</td><td><a id = "precursormz" data-toggle="modal" data-target="#spectrumpop"></a></td>
-<td>Precursor mass:</td><td id = "Precursor_mass"></td>
-<td>Proteoform mass:</td><td id = "Proteoform_mass"></td>
-</tr>
-<tr>
-<td># matched peaks:</td><td id = "matched_peaks">28</td><td># matched fragment ions:</td><td id = "matched_fragment_ions">25</td><td># unexpected modifications:</td><td id = "unexpected_modifications">#</td>
-</tr>
-<tr>
-<td>E-value:</td><td id = "E_value">1.63e-021</td><td>P-value:</td><td id = "P_value">1.63e-021</td><td>Q-value (Spectral FDR):</td><td id = "Q_value">0</td>
-</tr>
-</table>
-<div id="alignment" >
-<svg id = "l_svg" ></svg>
-<table>
-<tr>
-	<td width = "85%">
-		<div id="ptm_abbreviation" style="font-size:16px;">
-		<!-- Data will be retrieved form Fixed_PTM()   -->
-		</div>
-	<td>
-	<td width = "15%" align = "right">
-		<button id = "saveImage" class="btn btn-primary btn-sm" data-toggle="modal"
-      data-target="#myModal" style="width:80%" >Save PrSM</button>
-	</td>
-</tr>
-<tr> 
-	<td>
-		<div id="ptm_unexpectedmodification"  style="display: none; font-size:16px;">
-		<!-- Data will be retrieved form Fixed_PTM()   -->
-		</div>
-	<td>
-</tr>
-</table>
-</div>
-<div class="row" id="ms2svg_div" style="display:none;">
-	<ul class="nav nav-tabs graph_nav" id="ms2_graph_nav">
-	</ul>
-	<div class="text-center" id="dataLoading">
-		<div class="spinner-border "  role="status">
-			<span class="sr-only">Loading...</span>
-		</div><h3>&nbsp; Loading...</h3>
+	<div class="row filename">
+		<p>File name: <span id='File_name'></span></p>
 	</div>
-	 <!-- <svg id = "ms2svg" style = "background-color:#F8F8F8;display: none;"></svg> -->
-</div>
-
-<div id="monoMassGraph" style="display:none;">
-	<div class="row" id="monoMass_name">
-		<h5>MonoMass Spectrum</h5>
+	<div class="row">
+		<table id = "_width_table" class="table table-borderless" style="font-size:15px">
+			<tr>
+				<td>PrSM ID:</td>
+				<td id = "PrSM_ID"></td>
+				<td>Scan(s):</td>
+				<td id = "Scan"></td>
+				<td>Precursor charge:</td>
+				<td id = "Precursor_charge"></td>
+			</tr>
+			<tr>
+				<td>Precursor m/z:</td>
+				<td><a id = "precursormz" data-toggle="modal" data-target="#spectrumpop"></a></td>
+				<td>Precursor mass:</td>
+				<td id = "Precursor_mass"></td>
+				<td>Proteoform mass:</td>
+				<td id = "Proteoform_mass"></td>
+			</tr>
+			<tr>
+				<td># matched peaks:</td>
+				<td id = "matched_peaks">28</td>
+				<td># matched fragment ions:</td>
+				<td id = "matched_fragment_ions">25</td>
+				<td># unexpected modifications:</td>
+				<td id = "unexpected_modifications">#</td>
+			</tr>
+			<tr>
+				<td>E-value:</td>
+				<td id = "E_value">1.63e-021</td>
+				<td>P-value:</td>
+				<td id = "P_value">1.63e-021</td>
+				<td>Q-value (Spectral FDR):</td>
+				<td id = "Q_value">0</td>
+			</tr>
+		</table>
 	</div>
-	<div class="row" id="monomass_div">
-		
-		<ul class="nav nav-tabs graph_nav" id="monoMass_nav">
-		</ul>
-		<div class="text-center" id="monoMassDataLoading">
+	<div id="alignment">
+		<svg id = "l_svg" ></svg>
+		<table>
+			<tr>
+				<td width = "85%">
+					<div id="ptm_abbreviation" style="font-size:16px;">
+					<!-- Data will be retrieved form Fixed_PTM()   -->
+					</div>
+				<td>
+				<td width = "15%" align = "right">
+					<button id = "saveImage" class="btn btn-primary btn-sm" data-toggle="modal"
+				  data-target="#myModal" style="width:80%" >Save PrSM</button>
+				</td>
+			</tr>
+			<tr> 
+				<td>
+					<div id="ptm_unexpectedmodification"  style="display: none; font-size:16px;">
+						<!-- Data will be retrieved form Fixed_PTM()   -->
+					</div>
+				<td>
+			</tr>
+		</table>
+	</div>
+	<div class="row" id="ms2svg_div" style="display:none;">
+		<ul class="nav nav-tabs graph_nav" id="ms2_graph_nav"></ul>
+		<div class="text-center" id="dataLoading">
 			<div class="spinner-border "  role="status">
 				<span class="sr-only">Loading...</span>
 			</div><h3>&nbsp; Loading...</h3>
 		</div>
-		 <!-- <svg id = "ms2svg" style = "background-color:#F8F8F8;display: none;"></svg> -->
+	</div>
+	<div class="row" id="monoMassGraph" style="display:none;">
+		<div class="row" id="monoMass_name">
+			<h5>MonoMass Spectrum</h5>
+		</div>
+		<div class="row" id="monomass_div">
+			<ul class="nav nav-tabs graph_nav" id="monoMass_nav"></ul>
+			<div class="text-center" id="monoMassDataLoading">
+				<div class="spinner-border "  role="status">
+					<span class="sr-only">Loading...</span>
+				</div><h3>&nbsp; Loading...</h3>
+			</div>
+		</div>
+	</div>
+	<table>
+		<tr>
+			<td width = "55%">
+				<div class = "peaks" style="font-size:16px;">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a id = "all_peak_count" href="#spectrum" onclick="showAllPeaks();"  >All peaks </a>
+				&nbsp;&nbsp;<a id = "matched_peak_count" href="#spectrum" onclick="showMatchedPeaks();">Matched peaks </a>
+				&nbsp;&nbsp;<a id = "not_matched_peak_count" href="#spectrum" onclick="showNotMatchedPeaks();">Not matched peaks </a>
+				</div>
+			<td>
+			<td width = "15%" align = "right">
+				<a id = "a_spectrum_help" href="#!">
+					<button type ="button" id = "spectrum_help" class="btn btn-primary btn-sm" style = "display:none;width:80%" data-toggle="modal" data-target="#spectrumHelp">Help</button>
+				</a>
+			</td>
+			<td width = "15%" align = "right">
+				<div class="prsmgraphdownload">
+					<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#ms2spectrumpop" id="graph_download" style="display:none">
+						Export Graph
+					</button>
+					</div>
+			</td>
+			<td width = "15%" align = "right">
+				<a id = "a_show_spectrum" href="#!"><button type ="button" id = "show_ms2_spectrum" class="btn btn-primary btn-sm" style="width:80%">Show Spectrum</button></a>
+			</td>
+		</tr>
+	</table>
+	<div class = "row">
+		<table id="spectrum" class="display" >
+			<thead>
+				<tr role="row">
+					<th width="25">Scan</th>
+					<th width="25">Peak</th>
+					<th width="90">Mono mass</th>
+					<th width="90">Mono m/z</th>
+					<th width="80" style="vertical-align:middle">Intensity</th>
+					<th width="75" style="vertical-align:middle">Charge</th>
+					<th width="103">Theoretical mass</th>
+					<th width="50" style="vertical-align:middle">Ion</th>
+					<th width="70" style="vertical-align:middle">Pos</th>
+					<th width="95">Mass error</th>
+					<th width="80">PPM error</th>
+				</tr>
+			</thead>
+		</table>
+	</div>
+	<div class = "row">
+		<p style="font-size:15px;">
+			<a id = "allprotein_url_end" href="proteins.html">All proteins</a> /
+			<a id = "protien_url_end" href = ""></a> / 
+			<a id= "proteoform_url_end" href=""></a>
+		</p>
 	</div>
 </div>
 
-<table>
-<tr>
-	<td width = "55%">
-		<div class = "peaks" style="font-size:16px;">
-		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a id = "all_peak_count" href="#spectrum" onclick="showAllPeaks();"  >All peaks </a>
-		&nbsp;&nbsp;<a id = "matched_peak_count" href="#spectrum" onclick="showMatchedPeaks();">Matched peaks </a>
-		&nbsp;&nbsp;<a id = "not_matched_peak_count" href="#spectrum" onclick="showNotMatchedPeaks();">Not matched peaks </a>
-		</div>
-	<td>
-	<td width = "15%" align = "right">
-		<a id = "a_spectrum_help" href="#!">
-			<button type ="button" id = "spectrum_help" class="btn btn-primary btn-sm" style = "display:none;width:80%" data-toggle="modal" data-target="#spectrumHelp">Help</button>
-		</a>
-	</td>
-	<td width = "15%" align = "right">
-		<div class="prsmgraphdownload">
-			<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#ms2spectrumpop" id="graph_download" style="display:none">
-				Export Graph
-			</button>
-	  	</div>
-	</td>
-	<td width = "15%" align = "right">
-		<a id = "a_show_spectrum" href="#!"><button type ="button" id = "show_ms2_spectrum" class="btn btn-primary btn-sm" style="width:80%">Show Spectrum</button></a>
-	</td>
-</tr>
-</table>
-
-<table id="spectrum" class="display" >
-<thead>
-<tr role="row">
-	<th width="25">Scan</th><th width="25">Peak</th><th width="90">Mono mass</th><th width="90">Mono m/z</th><th width="80" style="vertical-align:middle">Intensity</th><th width="75" style="vertical-align:middle">Charge</th><th width="103">Theoretical mass</th><th width="50" style="vertical-align:middle">Ion</th><th width="70" style="vertical-align:middle">Pos</th><th width="95">Mass error</th><th width="80">PPM error</th>
-</tr>
-</thead>
-</table>
-<p style="font-size:15px;">
-<a id = "allprotein_url_end" href="proteins.html">All proteins</a> /
-      <a id = "protien_url_end" href = ""></a> / 
-       <a id= "proteoform_url_end" href=""></a>
-</p>
-</div>
 <div class="modal" id="myModal" role="dialog">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content" id ="save-image-modal">
@@ -287,17 +343,17 @@ $(document).ready(function(){
        		<table class="table table-sm table_modal">
        			<tr>
 			      <td>Amino acids per row:</td>
-			      <td><input id="row-size" type="text" size="9" ></td>
+			      <td><input id="row-size" type="text" size="7" ></td>
 			      <td>Letter width:</td>
-			      <td><input id="letter-width" type="text" size="9"></td>
+			      <td><input id="letter-width" type="text" size="7"></td>
 			      <td>Row height:</td>
-			      <td><input id="row-height" type="text" size="9"></td>
+			      <td><input id="row-height" type="text" size="7"></td>
 			      <td>Gap between blocks:</td>
-			      <td><input id="block-width" type="text" size="9"></td>
+			      <td><input id="block-width" type="text" size="7"></td>
 			    </tr>
 			    <tr>
 			    	<td>Gap between num and seq:</td>
-			    	<td><input id="num-width" type="text" size="9" ></td>
+			    	<td><input id="num-width" type="text" size="7" ></td>
 			    	<td>Show numbers:</td>
 			    	<td>
 			    		<input type="radio" name="show-num" id = "show-num" >Yes
