@@ -1,6 +1,8 @@
 /**
- * Calculated distribution of amino-acid.
+ * @function
+ * @description - Calculated distribution of amino-acid.
  * The first element in each amino-acid list give tha mass of the amino acid.
+ * @param {Char} aminoAcid - Contains the character of the Amino Acid
  */
 getAminoAcidDistribution = function(aminoAcid){
 	let aminoAcidDisList = [];

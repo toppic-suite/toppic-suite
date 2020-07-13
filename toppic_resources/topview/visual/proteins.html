@@ -13,19 +13,22 @@
 <script type="text/javascript" src="js/proteins/allProteins.js"></script>
 <script src="js/util/navBar.js"></script>
 <script>
+/**
+ * This function waits till all the HTML tags are loaded.
+ * Loads the related proteins.js data file
+ */
 $(document).ready(function(){
-
+	// Gets the information of the browser. Only google gives the information in the variable.
+	// Check if it is "Google". If not, alert to use Google chrome. 
 	var vendor = navigator.vendor.split(" ")[0];
 	if(vendor.trim() != "Google")
 	{
 		alert("Looks like you are not using Chrome, this application supports only Chrome");
 	}
-		
-	  
   $(".card-row").css('display','none');
   var x = location.href;
-  //var n = x.search("?");
-  /* get the folder by splitting url with "?","=","#"  */
+  
+  // get the folder path by splitting url with "?","=","#"
   var l_split = x.split(/[?#]+/);
   if(l_split.length != 2)
   {
@@ -35,10 +38,8 @@ $(document).ready(function(){
 	});
 	$(".card-body").click(function(){
 		let folder = $(this).attr("id");
-		console.log("folder : ", folder);
 		let url = "proteins.html?folder=../../"+folder+"/data_js";
 		window.open(url, "_self");
-		console.log("folder opened");
 	})
   }
   else{
@@ -50,7 +51,9 @@ $(document).ready(function(){
 	script.type= 'text/javascript';
 	script.src= file_name;
 	head.appendChild(script);
+	// Wait till the data is loaded from proteins.js and start executing the code
 	script.onload = function () {
+		// Function builds the complete HTML
 		allProteins(folderName);
 	}
   }

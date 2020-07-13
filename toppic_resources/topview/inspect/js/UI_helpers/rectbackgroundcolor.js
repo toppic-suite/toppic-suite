@@ -1,8 +1,15 @@
+/**
+ * Class to add background color to the sequence when mass shift added by clicking on the acid
+ */
 class rectBGColor{
     constructor(bgColorList,massShiftList){
         this.bgColorList = bgColorList;
     }
-
+    /**
+     * Function to get all the positions and color to be add background color
+     * @param {Integer} position - Contains position at which mass shif to be added  
+     * @param {String} color - Contians background color(comes from dropdown list) to be added to the mass shift
+     */
     getMassListToColorBG(position, color){
         let bgColorList = this.bgColorList;
         let len = bgColorList.length;
@@ -29,7 +36,10 @@ class rectBGColor{
 
         return bgColorList;
     }
-
+    /**
+     * Function Adds selected background color to the amino acid
+     * @param {Array} bgColorList - Set all the aminoacids with desired background colors selected from drop down
+     */
     setBackGroundColorOnMassShift(bgColorList){
         let len = bgColorList.length;
         let para = parameters();
@@ -42,7 +52,13 @@ class rectBGColor{
         }
     }
     
-    /* Code to color the background of a occurence acids */
+    /**
+     * Function to add background color at occurence acids
+     * @param {Integer} x - Starting x position to add background color
+     * @param {Integer} y - Strating y position to add background color
+     * @param {String} id - Contains id of svg tag from html
+     * @param {String} color - Background color to be added
+     */
     rect_Backgroundcolor(x,y,id,color){
         /*	font-size 16px is equal to 12pt	*/
         let font_width = 15 ;
@@ -50,9 +66,6 @@ class rectBGColor{
         let font_height = 15 ;
         let svgContainer = d3.select("#"+id);
         x = x-3;
-        //Temporary Fix
-        console.log("svgContainer : ", svgContainer);
-    
         svgContainer.append("rect")
                         .attr("class","rectBGColor")
                         .attr("x", x)
@@ -62,6 +75,5 @@ class rectBGColor{
                         .attr("dy", "0em")
                         .style("fill", color)
                         .style("fill-opacity", ".6")
-                        // .style("stroke-width", "1.5px");
     }
 }

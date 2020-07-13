@@ -1,12 +1,13 @@
-// maximum number of peaks and envelopes points to be renderedon to graph per each bin(range)
-const circlesPerRange = 200;
+/** maximum number of peaks and envelopes points to be renderedon to graph per each bin(range) */
+const circlesPerRange = 200; 
 const peaksPerRange = 200;
 /**
- * Function draws the graph, binds zoom and drag function to the graph
+ * @function SpectrumGraph
+ * @description Function draws the graph, binds zoom and drag function to the graph
  * @param {String} svgId - SVG id on which the graph needed to be drawn
  * @param {object} spectrumParameters - Contains the parameters like height, width etc.,. tht helps to draw the graph
- * @param {list} peakData - contains peakList and envelope list 
- * @param {list} ionData - Contains data with mass and ACID name to plot on the graph
+ * @param {Array} peakData - contains peakList and envelope list 
+ * @param {Array} ionData - Contains data with mass and ACID name to plot on the graph
  */
 SpectrumGraph = function(svgId,spectrumParameters,peakData, ionData){
 	this.svg = d3.select("body").select(svgId);
@@ -44,7 +45,7 @@ SpectrumGraph = function(svgId,spectrumParameters,peakData, ionData){
 
 	this.zoom = d3.zoom()
 		.on("zoom", this.zoomed);
-	this.svg.attr("viewBox", "0 0 "+ spectrumParameters.svgWidth+" "+ spectrumParameters.svgHeight)
+	this.svg.attr("viewBox", "0 0 "+ spectrumParameters.graphFeatures.svgWidth+" "+ spectrumParameters.graphFeatures.svgHeight)
 					.attr("width", "100%")
 					.attr("height", "100%")
 					.call(this.zoom);
@@ -57,8 +58,10 @@ SpectrumGraph = function(svgId,spectrumParameters,peakData, ionData){
 	return graph;
 }
 /**
- * Function that draws ticks on x-axis and y-axis
- * @param{node} svg -  is a html node on which the graph is being ploted
+ * @function drawTicks
+ * @description Function that draws ticks on x-axis and y-axis
+ * @param{HTMLBaseElement} svg -  is a html node on which the graph is being ploted
+ * @param {object} spectrumParameters - Contains the parameters like height, width etc.,. tht helps to draw the graph
  */
 drawTicks = function(svg,spectrumParameters){
 	// Creating a group under svg node with id 'ticks' under which ticks are drawn 
@@ -112,8 +115,10 @@ drawTicks = function(svg,spectrumParameters){
 	}
 }
 /**
- * Function to draw x-axis and y-axis
- * @param{node} svg -  is a html node on which the graph is being ploted
+ * @function drawAxis
+ * @description Function to draw x-axis and y-axis
+ * @param {Node} svg -  is a html node on which the graph is being ploted
+ * @param {object} spectrumParameters - Contains the parameters like height, width etc.,. tht helps to draw the graph
  */
 drawAxis = function(svg,spectrumParameters){
 	//Draw x-axis
@@ -134,8 +139,10 @@ drawAxis = function(svg,spectrumParameters){
 					.attr("stroke-width","2")
 }
 /**
- * Function to add tick numbers on x and y axis
- * @param{node} svg -  is a html node on which the graph is being ploted
+ * @function addDatatoAxis
+ * @description Function to add tick numbers on x and y axis
+ * @param {Node} svg -  is a html node on which the graph is being ploted
+ * @param {object} spectrumParameters - Contains the parameters like height, width etc.,. tht helps to draw the graph
  */
 addDatatoAxis = function(svg,spectrumParameters){
 	let maxMz = spectrumParameters.maxMz;
@@ -162,7 +169,7 @@ addDatatoAxis = function(svg,spectrumParameters){
 				x <= (spectrumParameters.svgWidth - spectrumParameters.padding.right))
 		{
 			this.xAxisData.append("text").attr("id","xtext").attr("x",x)
-						.attr("y",spectrumParameters.svgHeight - (spectrumParameters.padding.bottom/1.6))// Dividing with 1.6 to set the position of the numbers under the ticks appropriately
+						.attr("y",(spectrumParameters.graphFeatures.svgHeight - spectrumParameters.graphFeatures.padding.bottom + 20))// Dividing with 1.6 to set the position of the numbers under the ticks appropriately
 						.attr("text-anchor","middle")
 						.text(function(){
 							// conditions to show more decimal values as we zoom in further and limit decimals when zoomed back
@@ -204,8 +211,10 @@ addDatatoAxis = function(svg,spectrumParameters){
 	}
 }
 /**
- * Function to add backGround color to the spectrum graph for MS1 spectrum at precursor mz
- * @param{node} svg -  is a html node on which the graph is being ploted
+ * @function addBackGround
+ * @description Function to add backGround color to the spectrum graph for MS1 spectrum at precursor mz
+ * @param {Node} svg -  is a html node on which the graph is being ploted
+ * @param {object} spectrumParameters - Contains the parameters like height, width etc.,. tht helps to draw the graph
  */
 addBackGround = function(svg,spectrumParameters){
 	let svg_temp = svg.append("g")
@@ -239,8 +248,11 @@ addBackGround = function(svg,spectrumParameters){
 	}
 }
 /**
- * Function to draw peak lines on the graph
- * @param{node} svg -  is a html node on which the graph is being ploted
+ * @function drawPeaks
+ * @description Function to draw peak lines on the graph
+ * @param {Node} svg -  is a html node on which the graph is being ploted
+ * @param {object} spectrumParameters - Contains the parameters like height, width etc.,. tht helps to draw the graph
+ * @param {Array} peakdata - Contians both peak list and envelopelist
  */
 drawPeaks = function(svg,spectrumParameters,peakdata){
 	let peaks = svg.append("g")
@@ -289,8 +301,11 @@ drawPeaks = function(svg,spectrumParameters,peakdata){
 	  }
 }
 /**
- * Function to add circles for the envelope data
- * @param{node} svg -  is a html node on which the graph is being ploted
+ * @function addCircles
+ * @description Function to add circles for the envelope data
+ * @param {Node} svg -  is a html node on which the graph is being ploted
+ * @param {object} spectrumParameters - Contains the parameters like height, width etc.,. tht helps to draw the graph
+ * @param {Array} peakdata - Contians both peak list and envelopelist
  */
 addCircles = function(svg,spectrumParameters,peakData){
 	let circles = svg.append("g").attr("id", "circles");
@@ -344,8 +359,11 @@ addCircles = function(svg,spectrumParameters,peakData){
 	})
 }
 /**
- * Function to add IONS at the top of the peaks for each cluster of envelopes
- * @param{node} svg -  is a html node on which the graph is being ploted
+ * @function drawIons
+ * @description Function to add IONS at the top of the peaks for each cluster of envelopes
+ * @param {Node} svg -  is a html node on which the graph is being ploted
+ * @param {object} spectrumParameters - Contains the parameters like height, width etc.,. tht helps to draw the graph
+ * @param {Array} ionData - Contians Ion list to display on the graph
  */
 drawIons = function(svg,spectrumParameters,ionData){
 	let ions = svg.append("g").attr("id", "graph_ions");
@@ -384,8 +402,10 @@ drawIons = function(svg,spectrumParameters,ionData){
 	}
 }
 /**
- * Function to add Acid names at the top of the graph divided by | symbol
- * @param{node} svg -  is a html node on which the graph is being ploted
+ * @function drawSequence
+ * @description Draw Sequence on spectrum graph
+ * @param {Node} svg -  is a html node on which the graph is being ploted
+ * @param {object} spectrumParameters - Contains the parameters like height, width etc.,. tht helps to draw the graph
  */
 drawSequence = function(svg,spectrumParameters){
 	let seqSvg = svg.append("g").attr("id", "graph_sequence");
@@ -393,17 +413,21 @@ drawSequence = function(svg,spectrumParameters){
 	let x,y,text;
 	// Draw | at 0 for prefix mass list
 	x = spectrumParameters.getPeakXPos((0));
-	y = spectrumParameters.padding.head-40;
+	y = spectrumParameters.padding.head-35;
 	text = "|";
-	drawAcids_innerFunc(seqSvg,x,y,text);
+	// Add "|" At the start of the prefix sequence
+	if(0 >= spectrumParameters.minMz && 0 <= spectrumParameters.maxMz)
+	{
+		drawAcids_innerFunc(seqSvg,x,y,text);
+	}
 	sequenceData.forEach(function(element,index,prefixSequenceData){
-		if(element.mass > spectrumParameters.minMz && element.mass <= spectrumParameters.maxMz)
+		if(element.mass >= spectrumParameters.minMz && element.mass <= spectrumParameters.maxMz)
 		{
 			let x1 = spectrumParameters.getPeakXPos(0);
 			if(index != 0) x1 = spectrumParameters.getPeakXPos(prefixSequenceData[index-1].mass);
 			x2 = spectrumParameters.getPeakXPos((element.mass));
 			x = (x1+x2)/2;
-			y = spectrumParameters.padding.head-40;
+			y = spectrumParameters.padding.head-35;
 			drawAcids_innerFunc(seqSvg,x,y,element.acid);
 			drawAcids_innerFunc(seqSvg,x2,y,"|");
 		}
@@ -411,18 +435,22 @@ drawSequence = function(svg,spectrumParameters){
 
 	sequenceData = spectrumParameters.graphFeatures.suffixSequeceData;
 	// Draw | at water mass for suffix mass list
-	x = spectrumParameters.getPeakXPos(18.010564683704);// Mass of water=18.010564683704
-	y = spectrumParameters.padding.head-20;
+	let massOfWater = 18.010564683704;
+	x = spectrumParameters.getPeakXPos(massOfWater);// Mass of water=18.010564683704
+	y = spectrumParameters.padding.head-15;
 	text = "|";
-	drawAcids_innerFunc(seqSvg,x,y,text);
+	if(massOfWater >= spectrumParameters.minMz && massOfWater <= spectrumParameters.maxMz)
+	{
+		drawAcids_innerFunc(seqSvg,x,y,text);
+	}
 	sequenceData.forEach(function(element,index,suffixSequeceData){
-		if(element.mass > spectrumParameters.minMz && element.mass <= spectrumParameters.maxMz)
+		if(element.mass >= spectrumParameters.minMz && element.mass <= spectrumParameters.maxMz)
 		{
 			let x1 = spectrumParameters.getPeakXPos(18.010564683704);// Mass of water=18.010564683704
 			if(index != 0) x1 = spectrumParameters.getPeakXPos(suffixSequeceData[index-1].mass);
 			x2 = spectrumParameters.getPeakXPos((element.mass));
 			x = (x1+x2)/2;
-			y = spectrumParameters.padding.head-20;
+			y = spectrumParameters.padding.head-15;
 			drawAcids_innerFunc(seqSvg,x,y,element.acid);
 			drawAcids_innerFunc(seqSvg,x2,y,"|");
 		}
@@ -439,13 +467,154 @@ drawSequence = function(svg,spectrumParameters){
 	}
 }
 /**
- * Function to add labels on x and y axis
- * @param{node} svg -  is a html node on which the graph is being ploted
+ * @function addErrorPlot
+ * @description Add Error Plot to the MonoMass Spectrum
+ * @param {Node} svg -  is a html node on which the graph is being ploted
+ * @param {object} spectrumParameters - Contains the parameters like height, width etc.,. tht helps to draw the graph
+ */
+addErrorPlot = function(svg, spectrumParameters){
+	//Draw x-axis
+	this.xAxis = svg.append("g").attr("id", "xaxis_errorplot").append("line")
+					.attr("x1",spectrumParameters.graphFeatures.errorplot_padding.left)
+					.attr("y1",spectrumParameters.graphFeatures.svgHeight - spectrumParameters.graphFeatures.heightForErrorPlot/2 - spectrumParameters.graphFeatures.errorplot_padding.bottom)
+					.attr("x2",spectrumParameters.graphFeatures.specWidth + spectrumParameters.graphFeatures.errorplot_padding.left)
+					.attr("y2",spectrumParameters.graphFeatures.svgHeight - spectrumParameters.graphFeatures.heightForErrorPlot/2 - spectrumParameters.graphFeatures.errorplot_padding.bottom)
+					.attr("stroke","black")
+					.style("stroke-dasharray", ("5, 3"))
+					.attr("stroke-width","1.5")
+	// Draw y-axis
+	this.yAxis = svg.append("g").attr("id", "yaxis_errorplot").append("line")
+					.attr("x1",spectrumParameters.graphFeatures.errorplot_padding.left)
+					.attr("y1",spectrumParameters.graphFeatures.svgHeight - spectrumParameters.graphFeatures.errorplot_padding.bottom)
+					.attr("x2",spectrumParameters.graphFeatures.errorplot_padding.left)
+					.attr("y2",spectrumParameters.graphFeatures.svgHeight - spectrumParameters.graphFeatures.heightForErrorPlot - spectrumParameters.graphFeatures.errorplot_padding.bottom)
+					.attr("stroke","black")
+					.attr("stroke-width","1")
+}
+/**
+ * @function addErrorBlock
+ * @description Draw Error plot
+ * @param {Node} svg -  is a html node on which the graph is being ploted
+ * @param {object} spectrumParameters - Contains the parameters like height, width etc.,. tht helps to draw the graph
+ */
+addErrorBlock = function(svg, spectrumParameters){
+	let rectBlock = svg.append("g").attr("id", "rect_errorplot");
+	rectBlock.append("line")
+			.attr("x1",spectrumParameters.graphFeatures.errorplot_padding.left)
+			.attr("y1",spectrumParameters.graphFeatures.svgHeight - spectrumParameters.graphFeatures.heightForErrorPlot - spectrumParameters.graphFeatures.errorplot_padding.bottom)
+			.attr("x2",spectrumParameters.graphFeatures.specWidth + spectrumParameters.graphFeatures.errorplot_padding.left)
+			.attr("y2",spectrumParameters.graphFeatures.svgHeight - spectrumParameters.graphFeatures.heightForErrorPlot - spectrumParameters.graphFeatures.errorplot_padding.bottom)
+			.attr("stroke","black")
+			.attr("stroke-width","1")
+	rectBlock.append("line")
+			.attr("x1",spectrumParameters.graphFeatures.errorplot_padding.left)
+			.attr("y1",spectrumParameters.graphFeatures.svgHeight - spectrumParameters.graphFeatures.errorplot_padding.bottom)
+			.attr("x2",spectrumParameters.graphFeatures.specWidth + spectrumParameters.graphFeatures.errorplot_padding.left)
+			.attr("y2",spectrumParameters.graphFeatures.svgHeight - spectrumParameters.graphFeatures.errorplot_padding.bottom)
+			.attr("stroke","black")
+			.attr("stroke-width","1")
+	rectBlock.append("line")
+			.attr("x1",spectrumParameters.graphFeatures.svgWidth - spectrumParameters.graphFeatures.errorplot_padding.right)
+			.attr("y1",spectrumParameters.graphFeatures.svgHeight - spectrumParameters.graphFeatures.errorplot_padding.bottom)
+			.attr("x2",spectrumParameters.graphFeatures.svgWidth - spectrumParameters.graphFeatures.errorplot_padding.right)
+			.attr("y2",spectrumParameters.graphFeatures.svgHeight - spectrumParameters.graphFeatures.heightForErrorPlot - spectrumParameters.graphFeatures.errorplot_padding.bottom)
+			.attr("stroke","black")
+			.attr("stroke-width","1")
+}
+/**
+ * @function drawErrorYticks
+ * @description Draw Error plot y ticks
+ * @param {Node} svg -  is a html node on which the graph is being ploted
+ * @param {object} spectrumParameters - Contains the parameters like height, width etc.,. tht helps to draw the graph
+ */
+drawErrorYticks = function(svg, spectrumParameters){
+
+	let addYTicks = svg.append("g").attr("id","yErrorTicks")
+									.attr("class","yErrorTicks");
+	let tempTick = spectrumParameters.graphFeatures.errorThreshHoldVal/spectrumParameters.errorYticks;
+	//Draw tick at 0th position
+	let y = spectrumParameters.getErrorYPos(0);
+	inner_drawYTicks(y);
+	inner_addErrorYTickValues(0,y);
+	// Draw positive ticks above error x axis
+	for(let i=1;i<=spectrumParameters.errorYticks;i++)
+	{
+		y = spectrumParameters.getErrorYPos(i*tempTick);
+		inner_drawYTicks(y);
+		inner_addErrorYTickValues(i*tempTick,y);
+	}
+	//Draw negative ticks below error x axis
+	for(let i=1;i<=spectrumParameters.errorYticks;i++)
+	{
+		y = spectrumParameters.getErrorYPos(-(i*tempTick));
+		inner_drawYTicks(y);
+		inner_addErrorYTickValues(-(i*tempTick),y);
+	}
+	function inner_drawYTicks(y){
+		if(!isNaN(y) && y >= spectrumParameters.padding.head)//y >= spectrumParameters.padding.head helps the ticks to be in the length of Y axis
+		{
+			addYTicks.append("line")
+						.attr("x1",spectrumParameters.padding.left)
+						.attr("y1",y)
+						.attr("x2",spectrumParameters.padding.left - spectrumParameters.ticklength)
+						.attr("y2",y)
+						.attr("stroke","black")
+						.attr("stroke-width","1")
+		}
+	}
+	function inner_addErrorYTickValues(data,y){
+		if(!isNaN(y) && y >= spectrumParameters.padding.head)
+		{
+			addYTicks.append("text").attr("class","ytext").attr("x",spectrumParameters.padding.left - spectrumParameters.ticklength)
+						.attr("y",y)
+						.attr("text-anchor","end")
+						.attr("alignment-baseline","middle")
+						.text(data)
+						.style("font-size","14px")
+		}
+	}
+}
+/**
+ * @function drawErrorPoints
+ * @description Draw Error points on the error graph
+ * @param {Node} svg -  is a html node on which the graph is being ploted
+ * @param {object} spectrumParameters - Contains the parameters like height, width etc.,. tht helps to draw the graph
+ */
+drawErrorPoints = function(svg, spectrumParameters){
+	let circles = svg.append("g").attr("id", "error_circles");
+	spectrumParameters.graphFeatures.errorListData.forEach((element)=>{
+		if(parseFloat(element.theoretical_mass) > spectrumParameters.minMz && parseFloat(element.theoretical_mass) <= spectrumParameters.maxMz){
+			circles.append("circle")
+			.attr("class","error_circles")
+			.attr("cx",function(d,i){
+				return spectrumParameters.getPeakXPos(parseFloat(element.theoretical_mass));
+			})
+			.attr("cy",function(d,i){
+				let cy = spectrumParameters.getErrorYPos(parseFloat(element.mass_error));
+				if(cy < spectrumParameters.padding.head) return spectrumParameters.padding.head ;
+				else return cy ;
+			})
+			.attr("r",function(d,i){
+				return 3;
+			})
+			.style("fill","black")
+			.style("opacity", "1")
+			//.style("stroke",envelope_list.color)
+			.style("stroke-width","2");
+		}
+	})
+}
+/**
+ * @function addLabels
+ * @description Function to add labels on x and y axis
+ * @param {Node} svg -  is a html node on which the graph is being ploted
+ * @param {object} spectrumParameters - Contains the parameters like height, width etc.,. tht helps to draw the graph
  */
 addLabels = function(svg, spectrumParameters){
 
 	svg.append("text").attr("id","label")
-						.attr("transform","translate(" + (spectrumParameters.svgWidth/2) + "," + (spectrumParameters.svgHeight-spectrumParameters.labelAdjustVal) + ")")
+						// -5 is added simply as buffer to place m/z on top of error rect plot
+						.attr("transform","translate(" + (spectrumParameters.svgWidth/2) + "," + (spectrumParameters.svgHeight-spectrumParameters.graphFeatures.padding.bottom +spectrumParameters.graphFeatures.adjustableHeightVal - 5) + ")")
 					.attr("fill","black")
 					    .attr("font-family","Helvetica Neue,Helvetica,Arial,sans-serif")
 					    .attr("font-size","16px")
@@ -458,8 +627,11 @@ addLabels = function(svg, spectrumParameters){
 					    .text("Intensity");
 }
 /**
- * Function to show the data of Mass and Intensity on mouse over of peaks
- * @param{node} svg -  is a html node on which the graph is being ploted
+ * @function onMouseOverPeak
+ * @description Function to show the data of Mass and Intensity on mouse over of peaks
+ * @param {Node} this_element -  is a html node. On mouse over generates tooltip based on the current peak
+ * @param {Object} - Contains mz and intensity value of the current peak
+ * @param {object} spectrumParameters - Contains the parameters like height, width etc.,. tht helps to draw the graph
  */
 onMouseOverPeak = function(this_element,peak,spectrumParameters)
 {
@@ -488,8 +660,11 @@ onMouseOverPeak = function(this_element,peak,spectrumParameters)
 				.style("fill", "black");
 }
 /**
- * Function to show the data of Mass and Intensity on mouse over of circles
- * @param{node} svg -  is a html node on which the graph is being ploted
+ * @function onMouseOverCircle
+ * @description Function to show the data of Mass and Intensity on mouse over of circles
+ * @param {Node} this_element - is a html node. On mouse over generates tooltip based on the current peak
+ * @param {Array} envelope_list - Contains Envelope List
+ * @param {object} spectrumParameters - Contains the parameters like height, width etc.,. tht helps to draw the graph
  */
 onMouseOverCircle = function(this_element,envelope_list,spectrumParameters)
 {
@@ -515,8 +690,11 @@ onMouseOverCircle = function(this_element,envelope_list,spectrumParameters)
 				.style("top", (d3.event.pageY - 28)+ "px")
 				.style("fill", "black");
 }
+
 /**
- * Function to reset to the original on mouse out of peaks
+ * @function onPeakMouseOut
+ * @description Function to reset to the original on mouse out of peaks
+ * @param {Node} this_element - is a html node. On mouse over generates tooltip based on the current peak
  */
 onPeakMouseOut = function(this_element)
 {
@@ -524,13 +702,15 @@ onPeakMouseOut = function(this_element)
 	d3.select(this_element).style("stroke","black");
 }
 /**
- * Function to reset to the original on mouse out of circle
+ * @function onCircleMouseOut
+ * @description Function to reset to the original on mouse out of peaks
  */
-onCircleMouseOut= function(){
+onCircleMouseOut = function(){
 	onMouseOut();
 }
 /**
- * Function to remove the tooltips on mouseout
+ * @function onMouseOut
+ * @description Function to remove the tooltips on mouseout
  */
 onMouseOut = function(){
 	d3.selectAll("#MyTextMZIN").remove();
@@ -574,6 +754,13 @@ function drawSpectrum(svgId, spectrumParameters, peakData,ionData){
 	if(spectrumParameters.graphFeatures.showSequene)
 	{
 		drawSequence(svg,spectrumParameters);
+	}
+	if(spectrumParameters.graphFeatures.addErrorPlot)
+	{
+		addErrorPlot(svg,spectrumParameters);
+		drawErrorYticks(svg,spectrumParameters);
+		drawErrorPoints(svg,spectrumParameters);
+		addErrorBlock(svg,spectrumParameters);
 	}
 	return spectrumParameters;
 }

@@ -1,4 +1,7 @@
-/*	Create title and url for "all proteins","protein" and "proteoform" of the prsm */
+/**
+ * Create title and navigation urls to "all proteins","protein" and "proteoform" of the prsm 
+ * @param {String} folderpath - provides folder path to the data and helps in building urls
+ */
 function BuildUrl(folderpath)
 {
 	document.title = "Protein-Spectrum-Match for Spectrum #"+prsm_data.prsm.ms.ms_header.ids;
@@ -17,7 +20,10 @@ function BuildUrl(folderpath)
 	document.getElementById("proteoform_url_end").href ="proteoform.html?folder="+folderpath+"&proteoform_Id="+prsm_data.prsm.annotated_protein.proteoform_id;
 	document.getElementById("Protein-Spectrum-Match-Id-SpecId").innerHTML ="Protein-Spectrum-Match #"+prsm_data.prsm.prsm_id+" for Spectrum #" + prsm_data.prsm.ms.ms_header.ids;
 }
-/*	Get the data of the prsm from data variable prsm_data and convert to Html */
+/**
+ * Get the data of the prsm from global data variable prsm_data.
+ * Build the data into html to show the information about the prsm 
+ */
 function loadDatafromJson2Html(){
 	document.getElementById("File_name").innerHTML = prsm_data.prsm.ms.ms_header.spectrum_file_name;
 	document.getElementById("PrSM_ID").innerHTML = prsm_data.prsm.prsm_id;
@@ -33,13 +39,15 @@ function loadDatafromJson2Html(){
 	document.getElementById("P_value").innerHTML = prsm_data.prsm.p_value;
 	document.getElementById("Q_value").innerHTML = prsm_data.prsm.fdr;
 }
-/*	Convert peak data into table format with link to m/z value */
+/**
+ * Build the monomass table with all the data from the peak variable of the prsm_data
+ * Provide a unique class name to the m/z values to provide on click action to xoom the
+ * spectrum graph to that position
+ */
 function createTableElements(){
 	var table = document.getElementById('spectrum');
 	var tbdy = document.createElement('tbody');
 	var ionArray = []; //contains the ion types used in the data
-
-
 	let l_scans = prsm_data.prsm.ms.ms_header.scans.split(" ") ;
 	let l_specIds = prsm_data.prsm.ms.ms_header.ids.split(" ") ;
 	let l_matched_peak_count = 0;
@@ -69,10 +77,14 @@ function createTableElements(){
 			loop_matched_ions(peak,i) ;
 		}
 	})
-	
+
 	//after looping through the prsm files, store the ion type data to local storage
 	window.localStorage.setItem('ionType', ionArray);
-	
+	/**
+	 * Inner function to create a rows and columns for monomass table
+	 * @param {object} peak - contains information of each peak 
+	 * @param {int} i - index of the peak
+	 */
 	function loop_matched_ions(peak,i){
 		/*	Create row for each peak value object in the table	*/
 		var tr = document.createElement('tr');
@@ -80,28 +92,32 @@ function createTableElements(){
 		let l_scan;
 		if((parseInt(peak.peak_id) + 1)%2 == 0)
 		{
-			l_class = "unmatched_peak even";
+			// class name helps to get unmatched peaks when clicking unmatched peaks
+			l_class = "unmatched_peak even"; 
 		}
 		else
 		{
-			l_class = "unmatched_peak odd";
+			// class name helps to get unmatched peaks when clicking unmatched peaks
+			l_class = "unmatched_peak odd"; 
 		}
 		if(peak.hasOwnProperty('matched_ions_num'))
 		{
 			id = id + peak.matched_ions.matched_ion.ion_type;
 			if((parseInt(peak.peak_id) + 1)%2 == 0)
 			{
+				// class name helps to get matched peaks when clicking matched peaks
 				l_class = "matched_peak even";
 			}
 			else
 			{
+				// class name helps to get matched peaks when clicking matched peaks
 				l_class = "matched_peak odd";
 			}
 			l_matched_peak_count++;
-			/*	create a name for each row */
+			//	create a name for each row
 			tr.setAttribute("name",peak.matched_ions.matched_ion.ion_position);
 		}
-		/*	Set "id","class name" and "role" for each row	*/
+		//	Set "id","class name" and "role" for each row
 		tr.setAttribute("id", id);
 		tr.setAttribute("class",l_class);
 		tr.setAttribute("role","row");
@@ -127,7 +143,7 @@ function createTableElements(){
 			}
 			if(i == 3)
 			{
-				/*	provide link to click on m/z value to view spectrum */
+				//	provide link to click on m/z value to view spectrum 
 				let a = document.createElement('a');
 				a.href="#!"
 				a.className = "peakRows"
@@ -180,18 +196,23 @@ function createTableElements(){
 	table.appendChild(tbdy);
 
 }
-/*	Get occurence of "Variable" and "Fixed", convert the data to HTML */
+/**
+ * Get occurence of "Variable" and "Fixed", convert the data to HTML
+ * @param {object} prsm - prsm is the data attribute inside global prsm_data variable
+ */
 function occurence_ptm(prsm)
 {
 	let variable_ptm = "";
 	let fixed_ptm = "" ;
+	// Check if annotation has ptm attribute inside it
 	if(prsm.annotated_protein.annotation.hasOwnProperty('ptm'))
 	{
 		let ptm = prsm.annotated_protein.annotation.ptm ;
+		// Check if ptm attribute is an array
 		if(Array.isArray(ptm))
 		{
 			ptm.forEach(function(ptm, index){
-				
+				// Check if there exist variable or fixed ptms
 				if(ptm.ptm_type == "Variable")
 				{
 					variable_ptm_raw = getVariablePtm(ptm).replace("[", " [");
@@ -206,6 +227,7 @@ function occurence_ptm(prsm)
 		}
 		else
 		{
+			// Check if there exist variable or fixed ptms
 			if(ptm.ptm_type == "Variable")
 			{
 				variable_ptm_raw = getVariablePtm(ptm).replace("[", " [");
@@ -218,7 +240,7 @@ function occurence_ptm(prsm)
 			}
 		}
 	}
-	/*	Convert ptms to Html	*/
+	// Add the information of fixed ptms to html at id - ptm_abbreviation
 	if(fixed_ptm != "")
 	{
 		let div = document.getElementById("ptm_abbreviation") ;
@@ -231,6 +253,7 @@ function occurence_ptm(prsm)
 		div.appendChild(text1);
 		div.appendChild(text2);
 	}
+	// Add the information of varibale ptms to html at id - ptm_abbreviation
 	if(variable_ptm != "")
 	{
 		let div = document.getElementById("ptm_abbreviation") ;
@@ -244,10 +267,14 @@ function occurence_ptm(prsm)
 		div.appendChild(text2);
 	}
 }
-/* Get all the unknown ptms information */
+/**
+ * Get the information about all the unknown ptms
+ * @param {object} prsm - prsm is the data attribute inside global prsm_data variable
+ */
 function getUnknownPtms(prsm)
 {
 	let data = " [";
+	// Check if annotation attribute has mass_shift attribute inside it
 	if(prsm.annotated_protein.annotation.hasOwnProperty('mass_shift'))
 	{
 		let mass_shift = prsm.annotated_protein.annotation.mass_shift ;
@@ -256,6 +283,7 @@ function getUnknownPtms(prsm)
 			{
 				let len = mass_shift.length;
 				mass_shift.forEach(function(each_mass_shift, i){
+					// Check for unexpected mass shifts
 					if(each_mass_shift.shift_type == "unexpected")
 					{
 						UnknownExist = true;
@@ -274,15 +302,15 @@ function getUnknownPtms(prsm)
 				UnknownExist = true;
 				data = data + mass_shift.anno + "]" ;
 			}
+			// If unexpected modifications exist add them to html at id - ptm_unexpectedmodifications
 			if(UnknownExist)
 			{
 				let val = "Unknown" + data;
 				document.getElementById("ptm_unexpectedmodification").style.display = "block";
-
 				let div = document.getElementById("ptm_unexpectedmodification") ;
 				let text1 = document.createElement("text");
 				let text2 = document.createElement("text");
-				text1.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+"Unexpected modifications: ";
+				text1.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+"Unexpected modifications: "; // Adding space using &nbsp;
 				text2.innerHTML = val ;
 				text2.target = "_blank";
 				text2.style = "color:red" ;
@@ -292,7 +320,10 @@ function getUnknownPtms(prsm)
 	}
 	
 }
-/*	Get all the variable ptms	*/
+/**
+ * Get all the variable ptms
+ * @param {object} prsm - prsm is the data attribute inside global prsm_data variable
+ */
 function getVariablePtm(ptm)
 {
 	let variable_ptm = "[" ;
@@ -316,7 +347,10 @@ function getVariablePtm(ptm)
 	variable_ptm = ptm.ptm.abbreviation + variable_ptm ;
 	return variable_ptm ;
 }
-/*	Get all the "Fixed" ptms*/
+/**
+ * Get all the "Fixed" ptms
+ * @param {object} prsm - prsm is the data attribute inside global prsm_data variable
+ */
 function getFixedPtm(ptm)
 {
 	let fixed_ptm = "[" ;
@@ -324,8 +358,7 @@ function getFixedPtm(ptm)
 	if(Array.isArray(ptm.occurence))
 	{
 		ptm.occurence.forEach(function(occurence,i){
-			//fixed_ptm = fixed_ptm + occurence.left_pos + "-" + occurence.right_pos ;
-      fixed_ptm = fixed_ptm + occurence.right_pos;
+      	fixed_ptm = fixed_ptm + occurence.right_pos;
 			if(ptm.occurence.length-1 > i )
 			{
 				fixed_ptm = fixed_ptm + ";" ;
@@ -334,43 +367,46 @@ function getFixedPtm(ptm)
 	}
 	else
 	{
-		//fixed_ptm = fixed_ptm + ptm.occurence.left_pos + "-" + ptm.occurence.right_pos ;
     	fixed_ptm = fixed_ptm + ptm.occurence.right_pos;
 	}
 	fixed_ptm = ptm.ptm.abbreviation + fixed_ptm ;
 	return fixed_ptm ;
 }
-/*	Create buttons to save the svg as png/svg and to redraw the svg with given dimensions*/
+/**
+ * Create buttons to save the svg as png/svg and to redraw the svg with given dimensions
+ * @param {object} para - contains the parameters to draw the sequence SVG 
+ * @param {object} prsm - prsm is the data attribute inside global prsm_data variable
+ * @param {String} id - id from the html at which the svg needs to be redraw (Here it is from the modal block)
+ */
 function buttonsAndAlerts(para,prsm,id)
 {
 	let x,y;
-	/*	Id of the pop_up svg	*/
+	//	Id of the pop_up svg
 	id = "l_popup_svg" ;
-	/*	On click action to get pop_up window	*/
+	//	On click action to get pop_up window
 	d3.select('#saveImage').on("click",function(){
 		d3.selectAll(".l_popup_svg_g").remove();
 		para = new parameters();
 		let prsm = prsm_data.prsm ;
 		[para,id] = buildSvg(para,prsm,id);
-		/*	Get the amount of skipped acid and write the amount 
-		 * 	of skipped acid at the start and end of the sequence 
-		 */
+		//	Get the amount of skipped acid and write the amount 
+		// 	of skipped acid at the start and end of the sequence 
 		skippedAcidNotification(para,prsm,id) ;
 		if(para.show_num)
 		{
-			/*Get the numerical count at the start enad end of 
-			 * each row of sequence */
+			// Get the numerical count at the start enad end of 
+			// each row of sequence
 			getNumValues(para,prsm,id);
 		}
-		/*	Determine the start and end position of the sequence */
+		//	Determine the start and end position of the sequence
 		drawAnnoOfStartEndPosition(para,prsm,id);
-		/*	Draw Annotations */
+		//	Draw Annotations
 		annotations(para,prsm,id);
-		/*	Get the position of the fixed ptms and color them to red */
+		//	Get the position of the fixed ptms and color them to red
 		addColorToFixedPtms(para,prsm,id);
-		/*	Color the background of occurence of mass shift */
+		//	Color the background of occurence of mass shift 
 		massShiftBackgroundColor(para,prsm,id);
-		/*	set the dimensions of popup svg to default values*/
+		//	set the dimensions of popup svg to default values
 		document.getElementById("row-size").value = para.row_length ;
 		document.getElementById("letter-width").value = para.letter_width ;
 		document.getElementById("row-height").value = para.row_height ;
@@ -379,34 +415,35 @@ function buttonsAndAlerts(para,prsm,id)
 		document.getElementsByName("show-num")[0].checked = para.show_num ;
 		document.getElementsByName("show-skipped-lines")[0].checked = para.show_skipped_lines ;
 
-    $("#myModal").draggable({
-		appendTo: "body"
+		// Allows to drag the pop up windows
+		$("#myModal").draggable({
+			appendTo: "body"
+			});
 		});
-	});
 
-	/*	Download the svg as ".svg" image	*/
-	d3.select('#download_SVG').on("click",function(){
+		//	Download the svg as ".svg" image
+		d3.select('#download_SVG').on("click",function(){
+				x = d3.event.pageX;
+				y = d3.event.pageY;
+				popupnamewindow("svg",id,x,y);
+			});
+		//	Download svg as PNG Image
+		d3.select('#download_PNG').on("click", function(){
 			x = d3.event.pageX;
 			y = d3.event.pageY;
-			popupnamewindow("svg",id,x,y);
-		});
-	/*	Download svg as PNG Image	*/
-	d3.select('#download_PNG').on("click", function(){
-		x = d3.event.pageX;
-		y = d3.event.pageY;
-		popupnamewindow("png",id,x,y);
-	})	;
+			popupnamewindow("png",id,x,y);
+		})	;
 
-  d3.select('#image_help').on("click",function(){
-    $("#helpModal").draggable({
-      appendTo: "#myModal"
-    });
-  });
+		d3.select('#image_help').on("click",function(){
+			$("#helpModal").draggable({
+			appendTo: "#myModal"
+			});
+	});
 
-	/*	On Click action to resize the svg with user dimensions	*/
+	//	On Click action to resize the svg with user dimensions
 	d3.select('#resize').on("click", function(){
 		d3.selectAll("."+id+"_g").remove();
-		/*	Get dimension parameters of svg	*/
+		//	Get dimension parameters of svg
 		var para = new parameters() ;
 		para.row_length = parseInt(document.getElementById("row-size").value);
 		para.letter_width = parseInt(document.getElementById("letter-width").value) ;
@@ -414,55 +451,58 @@ function buttonsAndAlerts(para,prsm,id)
 		para.gap_width = parseInt(document.getElementById("block-width").value) ;
 		para.numerical_width = parseInt(document.getElementById("num-width").value) ;
 
-		/*	Check whether show numbers is checked	*/
+		//	Check whether show numbers is checked
 		if(document.getElementsByName("show-num")[0].checked)
 		{
 			para.show_num = true ;
 		}
 		else
 		{
-			/*	Reduce the left and right margins when numbers are 
-			 * 	no needed at start and end of each row in svg		*/
+			//	Reduce the left and right margins when numbers are 
+			// 	no needed at start and end of each row in svg
 			para.show_num = false ;
-			//para.numerical_width = 0 ;
 			para.left_margin = 20;
 			para.right_margin = 20;
 		}
-		/*	Check to show skipped lines */
+		//	Check to show skipped lines 
 		if(document.getElementsByName("show-skipped-lines")[0].checked)
 		{
 			para.show_skipped_lines = true ;
-			//para.numerical_width = parseInt(document.getElementById("num-width").value);
 		}
 		else
 		{
 			para.show_skipped_lines = false ;
 		}
-		/*	Redraw the svg with new dimension parameters*/
+		//	Redraw the svg with new dimension parameters
 		prsm = prsm_data.prsm ;
 		[para,id] = buildSvg(para,prsm,id);
-		/*	Get the amount of skipped acid and write the amount 
-		 * 	of skipped acid at the start and end of the sequence 
-		 */
+		//	Get the amount of skipped acid and write the amount 
+		//	of skipped acid at the start and end of the sequence 
 		skippedAcidNotification(para,prsm,id) ;
 		if(para.show_num)
 		{
-			/*Get the numerical count at the start and end of 
-			 * each row of sequence */
+			// Get the numerical count at the start and end of 
+			// each row of sequence
 			getNumValues(para,prsm,id);
 		}
-		/*	Determine the start and end position of the sequence */
+		//	Determine the start and end position of the sequence
 		drawAnnoOfStartEndPosition(para,prsm,id) ;
-		/*	Draw Annotations */
+		//	Draw Annotations
 		annotations(para,prsm,id);
-		/*	Get the position of the fixed ptms and color them to red */
+		//	Get the position of the fixed ptms and color them to red
 		addColorToFixedPtms(para,prsm,id);
-		/*	Color the background of occurence of mass shift */
+		//	Color the background of occurence of mass shift
 		massShiftBackgroundColor(para,prsm,id);
 	});	
 }
-/* Function to produce a pop up window to provide name and set name to 
-*  the image while downloading the image of Graph SVG and Sequence SVG */
+/**
+ * Function to produce a pop up window to provide name and set name to 
+ * the image while downloading the image of Graph SVG and Sequence SVG
+ * @param {String} type - Provides if the image is downloaded as svg or png
+ * @param {String} id - Provides the id of the svg to be downloaded
+ * @param {Float} x - Provides coordinate on where to show a tooltip block to enter name of the image to be downloaded
+ * @param {Float} y - Provides coordinate on where to show a tooltip block to enter name of the image to be downloaded
+ */
 function popupnamewindow(type,id,x,y){
 	d3.selectAll("#tooltip_imagename").remove() ;
 	var div = d3.select("body").append("div")
@@ -470,16 +510,16 @@ function popupnamewindow(type,id,x,y){
 	.attr("id","tooltip_imagename")
 	.style("opacity", 1);
 
+	// Provides a tooltip to enter a name for the image to be downloaded
 	div.transition()
 	.duration(200)
 	.style("opacity", .9);
-	div.html(
+	div.html( 
 			'<input type="text" placeholder="Image Name" id="imagename" />'+
 			'<button id="saveimage" style = "none" type="button">save</button>'
 			)
-	.style("left", (x - 30) + "px")             
-	.style("top", (y - 60) + "px")
-	// .style("transform","translateX(-35%)!important")
+	.style("left", (x - 30) + "px")  // x Coordinate of the position of the tooltip           
+	.style("top", (y - 60) + "px")	// y Coordinate of the position of the tooltip 
 	.attr("box-sizing","border")
 	.attr("display","inline-block")
 	.attr("min-width","1.5em")
@@ -489,18 +529,21 @@ function popupnamewindow(type,id,x,y){
 	.attr("text-decoration","none")
 	.attr("border","1px solid #111111")
 	.attr("background-color","white");
-
+	
+	// On click action to save the image on click of download button
 	$("#saveimage").click(function(){
 		let imagename = $("#imagename").val();
 		if( imagename == null || imagename == "")
 		{
 			imagename = "spectrum";
 		}
+		// Check if the image needs to be downloaded as svg
 		if(type == "svg"){
 			d3.selectAll("#tooltip_imagename").remove() ;
 			let svg_element = d3.selectAll("#"+id).node();
 			svg2svg(svg_element,imagename);
 		}
+		// Check if the image needs to be downloaded as png
 		if(type == "png"){
 			d3.selectAll("#tooltip_imagename").remove() ;
 			let l_svgContainer = d3.select("#"+id);

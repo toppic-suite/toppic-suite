@@ -60,6 +60,7 @@ class SeqOfExecution
 		 */
 		let UIHelperObj = new UIHelper();
 		let monoMassList = UIHelperObj.getMassListFromUI();
+		
 		/**
 		 * Get the parsed sequence after removing mass shift list from 
 		 * the entered sequence. 
@@ -186,6 +187,7 @@ class SeqOfExecution
 		 * Get combined list of both matched and unmatched peaks to write to table
 		 */
 		matchedUnMatchedPeaks = matchedPeaksObj.getMatchedAndUnMatchedList(monoMassList,matchedPeakList);
+		
 		/**
 		 * Do the below function when peak list data is not empty
 		 */
@@ -200,6 +202,7 @@ class SeqOfExecution
 			 * Display the graph formed
 			 */
 			$("#"+Constants.SPECTRUMGRAPHID).show();
+			$("#"+Constants.MONOMASSGRAPHID).show();
 			/**
 			 * Call generateCorrespondingGraph which calls addSpectrum function in invokeSpectrum file to draw graph 
 			 */
@@ -321,11 +324,14 @@ class SeqOfExecution
 			$("#"+Constants.H_FRAGMENTEDTABLE).show();
 		}
 		getMassTableOfSelectedIonsObj.createTableForSelectedFragmentIons(sequence,completeListofMasswithMatchedInd);
+		$("#monoMasstitle").show();
+		generateMonoMassGraph(monoMassList,null);
 		/**
 		 * Set the properties for the table.
 		 */
 		this.setBootStarpropertiesforFragmentIons();
 		$("#divselectediontablecontainer").show();
+
 	}
 	/**
 	 * Function executes all the functionalities one by one and displays all the 
@@ -336,7 +342,7 @@ class SeqOfExecution
 	 * be considered when calculating matched peaks.
 	 */
 	onClickSequenceOfExecution(errorType,errorVal){
-		console.log("This.completeShiftList : ", this.massShiftList);
+		//console.log("This.completeShiftList : ", this.massShiftList);
 		/**
 		 * unbind all the actions previously binded else each action will be 
 		 * binded multiple times.
@@ -495,6 +501,7 @@ class SeqOfExecution
 			/** 
 			 * Call generateCorrespondingGraph which calls addSpectrum function in invokeSpectrum file to draw graph 
 			 */
+			document.getElementById("monoMasstitle").style.display = "block";
 			generateCorrespondingGraph(peakDataList,distributionList,null);
 			$("#"+Constants.SPECTRUMDOWNLOADID).show();
 			/**

@@ -1,5 +1,7 @@
-/*	Get data from global variable spectrum_data and utilities to manupulate----
- * 	the data-------------------------------------------------------------------*/
+/**	@function SpectrumParameters
+ * @description Get data from global variable spectrum_data and utilities to manupulate
+ * the data
+ */
 SpectrumParameters = function() {
   /* Attributes to decide what to be shown on the graph */
   
@@ -48,6 +50,7 @@ SpectrumParameters = function() {
   this.yTicks = 5 ;
   //Height/size of the tick
   this.ticklength = 7 ;
+  this.errorYticks = 2;
   
   //Limiting the peaks and envelopes to 500
   this.ranges=[0,0,0,0,0,0];
@@ -55,8 +58,9 @@ SpectrumParameters = function() {
   this.bufferPercent = 0.01; //10 percent
 
   /**
-   * Initializing the spectrum Parameters with the data from the peak list and envilopelist
-   * initializing xScale, yScale
+   * @function initScale
+   * @description Initializing the spectrum Parameters with the data from the peak list and envilopelist.
+   * initializing xScale, yScale.
    */
   this.initScale = function(currminMz, currmaxMz, dataMaxInte,dataMinInte,minMzData,maxMzData,currentMaxIntensity) {
     this.dataMinMz = minMzData;
@@ -94,21 +98,34 @@ SpectrumParameters = function() {
   //     return envelopes;
   // }
   /**
-   * Function provides the x coordinate for the mass
+   * @function getPeakXPos
+   * @description Function provides the x coordinate for the mass
    */
   this.getPeakXPos = function (mz) {
     let peakX = (mz - this.minMz) * this.xScale + this.padding.left;
     return peakX;
   }
   /**
-   * Function provides the y coordinate for the intensity
+   * @function getPeakYPos
+   * @description Function provides the y coordinate for the intensity
    */
   this.getPeakYPos = function (intensity) {
     let peakY = this.svgHeight - intensity * this.yScale - this.padding.bottom;
     return peakY;
   }
   /**
-   * Function provides the radius of the circles drawn on the graph as zoomed in and out
+   * @function getErrorYPos
+   * @description Function provides the y coordinate for the error val on the error plot
+   */
+  this.getErrorYPos = function(erroVal){
+    let yErrorScale = this.graphFeatures.heightForErrorPlot/(this.graphFeatures.errorThreshHoldVal*2);// Multiply with 2 as the coordinates has to be both positive and negative
+    console.log("yErrorScale : ", yErrorScale);
+    let peakY = this.svgHeight - (erroVal * yErrorScale) - this.graphFeatures.errorplot_padding.bottom - this.graphFeatures.heightForErrorPlot/2;
+    return peakY;
+  }
+  /**
+   * @function getCircleSize
+   * @description Function provides the radius of the circles drawn on the graph as zoomed in and out
    */
   this.getCircleSize = function() {
     radius = this.mzRadius * this.xScale;
@@ -121,7 +138,8 @@ SpectrumParameters = function() {
     return radius;
   }
   /**
-   * Function Provides width between each tick when zoomed in and out or dragged
+   * @function getTickWidth
+   * @description Function Provides width between each tick when zoomed in and out or dragged
    */
   this.getTickWidth = function(){
     let tempDiff = this.maxMz - this.minMz;
@@ -137,7 +155,8 @@ SpectrumParameters = function() {
 	  return 	tickWidth ;
   }
   /**
-   * Function Provides height between each tick when zoomed in and out or dragged
+   * @function getTickHeight
+   * @description Function Provides height between each tick when zoomed in and out or dragged
    */
   this.getTickHeight = function(){
     let tickheight = parseInt(this.tickHeightList[0]) ;
@@ -153,8 +172,9 @@ SpectrumParameters = function() {
 	  return tickheight ;
   }
   /**
-   * Function provides with current xScale, current minMz and MaxMz based on the zoom on x-axis
-   * Function also calls setLimita which helps in drawing limited number of peaks and circles per eachbin/range of mz values
+   * @function xZoom
+   * @description Function provides with current xScale, current minMz and MaxMz based on the zoom on x-axis.
+   * Function also calls setLimita which helps in drawing limited number of peaks and circles per eachbin/range of mz values.
    */
   this.xZoom = function (mouseSvgX, ratio) {
    if ((ratio > 1.0) || ((this.maxMz - this.minMz) < this.dataMaxMz) ) {
@@ -168,7 +188,8 @@ SpectrumParameters = function() {
     this.setLimits();
   }
   /**
-   * Function provides with current yScale, current max Intensity based on the zoom on y-axis
+   * @function yZoom
+   * @description Function provides with current yScale, current max Intensity based on the zoom on y-axis
    */
   this.yZoom = function (ratio) {
     //Reducing zoom factor to smoothenup and remove gliches
@@ -180,6 +201,8 @@ SpectrumParameters = function() {
     }
   }
   /**
+   * @function zoom
+   * @description 
    * Function to invoke respective zoom functionality(zoom on x or y) based on position of X, Y 
    * It fixes amount of zoom based on zooming in or out 
    */
@@ -194,6 +217,8 @@ SpectrumParameters = function() {
     }
   }
   /**
+   * @function drag
+   * @description 
    * Function provides minMz and maxMz based on the amount of drag done
    */
   this.drag = function(distX) {
@@ -204,9 +229,11 @@ SpectrumParameters = function() {
     this.onDragLimits(mzDist);
   }
   /**
-   * when zoomed function provides the bin ranges to divide the complete x axis into 5 bins
-   * This helps setting the number of peaks and circles to a limited number in each bin
-   * This speeds up the zoom and drag functionality
+   * @function setLimits
+   * @description
+   * when zoomed function provides the bin ranges to divide the complete x axis into 5 bins.
+   * This helps setting the number of peaks and circles to a limited number in each bin.
+   * This speeds up the zoom and drag functionality.
    */
   this.setLimits = function(){
     let avg = (this.maxMz - this.minMz)/this.limits.length ;
@@ -217,9 +244,11 @@ SpectrumParameters = function() {
     }
   }
   /**
-   * When dragged function provides the bin ranges to divide the complete x axis into 5 bins
-   * This helps setting the number of peaks and circles to a limited number in each bin
-   * This speeds up the zoom and drag functionality
+   * @function onDragLimits
+   * @description
+   * When dragged function provides the bin ranges to divide the complete x axis into 5 bins.
+   * This helps setting the number of peaks and circles to a limited number in each bin.
+   * This speeds up the zoom and drag functionality.
    */
   this.onDragLimits = function(mzDist){
     let tempRanges = this.ranges ;

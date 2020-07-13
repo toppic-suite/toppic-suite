@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: calculateEnvelopeIntensity.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: calculateEnvelopeIntensity.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Code to normalize the Intensity. 
+ * Take the average of intensity from the peaks entered by the user.
+ * Take the average of the calculated distribution for each Array element in the Array. 
+ * Make both of them equal and calculating the rest of the 
+ * distribution intensity based on the avg value from the peak list.
+ * @param {Array} totDistributionList - Total distribution calculated
+ * @param {Array} peakDataList - Peak Data entered by the user
+ */
+function getNormalizedIntensity(totDistributionList,peakDataList)
+{
+    let len = totDistributionList.length;
+    let peakListLen = peakDataList.length;
+    let intensity = 0;
+    let count = 0 ;
+    let distributionInte = 0;
+    for(let i=0;i&lt;len;i++)
+    {
+        for(let j=0;j&lt;peakListLen;j++)
+        {
+            if(Math.abs(totDistributionList[i].mz - peakDataList[j].mz) &lt;= this.toleraceMassDiff )
+            {
+                intensity = intensity + peakDataList[j].intensity ;
+                distributionInte = distributionInte + totDistributionList[i].intensity;
+                count = count + 1;
+            }
+        }
+    }
+    let avg = intensity/count ;
+    let distributionAvgInte = distributionInte/count;
+    for(let i=0;i&lt;len;i++)
+    {
+        totDistributionList[i].intensity = (avg * totDistributionList[i].intensity)/distributionAvgInte ;
+    }
+    return totDistributionList ;
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="CalculateEmassAndDistribution.html">CalculateEmassAndDistribution</a></li><li><a href="Constants.html">Constants</a></li><li><a href="GetMassTableOfSelectedIons.html">GetMassTableOfSelectedIons</a></li><li><a href="MatchedPeaks.html">MatchedPeaks</a></li><li><a href="MolecularFormulae.html">MolecularFormulae</a></li><li><a href="rectBGColor.html">rectBGColor</a></li><li><a href="SetValuesToHtml.html">SetValuesToHtml</a></li><li><a href="UIHelper.html">UIHelper</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addColorsToDropdown">addColorsToDropdown</a></li><li><a href="global.html#addMassShift">addMassShift</a></li><li><a href="global.html#addNewFixedPtmRow">addNewFixedPtmRow</a></li><li><a href="global.html#addWaterMass">addWaterMass</a></li><li><a href="global.html#annotations">annotations</a></li><li><a href="global.html#appendTooltip">appendTooltip</a></li><li><a href="global.html#buildSvg">buildSvg</a></li><li><a href="global.html#calculatePrefixAndSuffixMass">calculatePrefixAndSuffixMass</a></li><li><a href="global.html#calibrateLeftNum">calibrateLeftNum</a></li><li><a href="global.html#calibrateRightNum">calibrateRightNum</a></li><li><a href="global.html#calibrateSkipEnd">calibrateSkipEnd</a></li><li><a href="global.html#calibrateSkipStart">calibrateSkipStart</a></li><li><a href="global.html#drawAnnotation">drawAnnotation</a></li><li><a href="global.html#drawAnnotation_B">drawAnnotation_B</a></li><li><a href="global.html#drawAnnotation_Y">drawAnnotation_Y</a></li><li><a href="global.html#drawAnnotation_YB">drawAnnotation_YB</a></li><li><a href="global.html#drawRectagleWithColors">drawRectagleWithColors</a></li><li><a href="global.html#generateCorrespondingGraph">generateCorrespondingGraph</a></li><li><a href="global.html#generateMonoMassGraph">generateMonoMassGraph</a></li><li><a href="global.html#getAbsoluteMaxValfromList">getAbsoluteMaxValfromList</a></li><li><a href="global.html#getActualIdvalues">getActualIdvalues</a></li><li><a href="global.html#getAminoAcidDistribution">getAminoAcidDistribution</a></li><li><a href="global.html#getCTerminusMassShiftVal">getCTerminusMassShiftVal</a></li><li><a href="global.html#getIonCharge">getIonCharge</a></li><li><a href="global.html#getIsotopicMassOfAtom">getIsotopicMassOfAtom</a></li><li><a href="global.html#getIsotopicMassRef">getIsotopicMassRef</a></li><li><a href="global.html#getMassShift">getMassShift</a></li><li><a href="global.html#getNormalizedIntensity">getNormalizedIntensity</a></li><li><a href="global.html#getNTerminusMassShiftVal">getNTerminusMassShiftVal</a></li><li><a href="global.html#getNumValues">getNumValues</a></li><li><a href="global.html#getPrefixMassList">getPrefixMassList</a></li><li><a href="global.html#getSuffixMassList">getSuffixMassList</a></li><li><a href="global.html#getSvgSize">getSvgSize</a></li><li><a href="global.html#getTerminus">getTerminus</a></li><li><a href="global.html#getTotalSeqMass">getTotalSeqMass</a></li><li><a href="global.html#getX">getX</a></li><li><a href="global.html#getY">getY</a></li><li><a href="global.html#handleOnClick">handleOnClick</a></li><li><a href="global.html#MassShift">MassShift</a></li><li><a href="global.html#onClickofMatchedPeaks">onClickofMatchedPeaks</a></li><li><a href="global.html#onLoadOfHTML">onLoadOfHTML</a></li><li><a href="global.html#parameters">parameters</a></li><li><a href="global.html#parsePeakMass">parsePeakMass</a></li><li><a href="global.html#parsePrecursorMass">parsePrecursorMass</a></li><li><a href="global.html#parsePTM">parsePTM</a></li><li><a href="global.html#parseSeq">parseSeq</a></li><li><a href="global.html#parseUnknowmassList">parseUnknowmassList</a></li><li><a href="global.html#removeToolTip">removeToolTip</a></li><li><a href="global.html#setIonCheckbox">setIonCheckbox</a></li><li><a href="global.html#showAllPeaks">showAllPeaks</a></li><li><a href="global.html#showIonPeaks">showIonPeaks</a></li><li><a href="global.html#showMatchedPeaks">showMatchedPeaks</a></li><li><a href="global.html#showNonMatchedPeaks">showNonMatchedPeaks</a></li><li><a href="global.html#utilFunctions">utilFunctions</a></li><li><a href="global.html#%257BonClickSequenceOfExecution%257Dexecuteswhenuserentersmassshiftonanyaminoacidandclick%2522OK%2522button.">{onClickSequenceOfExecution} executes when user enters mass shift on any amino acid and click "OK" button.</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Fri May 29 2020 03:46:05 GMT-0400 (Eastern Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

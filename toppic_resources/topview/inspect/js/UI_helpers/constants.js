@@ -4,6 +4,7 @@
 class Constants{
     static SEQSVGID = "seqsvg";
     static SPECTRUMGRAPHID = "spectrum";
+    static MONOMASSGRAPHID = "monoMassGraph";
     static PEAKCOUNTID = "peakCount";
     static MASSERROR = "masserror";
     static MASSSHIFT_CLASSID = "massshift_class";

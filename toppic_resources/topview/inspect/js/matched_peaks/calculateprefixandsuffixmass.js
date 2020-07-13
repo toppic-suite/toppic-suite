@@ -1,7 +1,18 @@
+/**
+ * @function calculatePrefixAndSuffixMass
+ * @description Function calculates both prefix and suffix masses
+ */
 calculatePrefixAndSuffixMass = function(){
 	const WATER = "H2O";
 	let protSequence = '';
 	
+	/**
+	 * @function getPrefixMassList
+	 * @description Returns prefix mass list
+	 * @param {String} sequence - Contains Protein sequence
+	 * @param {Array} massShiftList - Contains list of mass shifts
+	 * @param {Float} massShift_in - Contains mass shift based on the Ion Types selected
+	 */
 	this.getPrefixMassList = function(sequence,massShiftList,massShift_in){
 		let seqln = sequence.length;
 		let emptyMassList = [] ;
@@ -57,11 +68,18 @@ calculatePrefixAndSuffixMass = function(){
 				prefixMassList[j].mass = prefixMassList[j].mass + massShift_in;
 			}
 		
-			
+			completeCalData.prefixmasslist = prefixMassList;
 			return prefixMassList;
 		}
 		return emptyMassList;
 	}
+	/**
+	 * @function getSuffixMassList
+	 * @description Returns suffix mass list
+	 * @param {String} sequence - Contains Protein sequence
+	 * @param {Array} massShiftList - Contains list of mass shifts
+	 * @param {Float} massShift_in - Contains mass shift based on the Ion Types selected
+	 */
 	this.getSuffixMassList = function(sequence,massShiftList,massShift_in){
 		let seqln = sequence.length;
 		let emptyMassList = [];
@@ -109,10 +127,17 @@ calculatePrefixAndSuffixMass = function(){
 			{
 				suffixMassList[j].mass = suffixMassList[j].mass + massShift_in  ;
 			}
+			completeCalData.suffixmasslist = suffixMassList;
 			return suffixMassList;
 		}
 		return emptyMassList ;
 	}
+	/**
+	 * @function getTotalSeqMass
+	 * @description Returns total mass of the sequence
+	 * @param {String} seq - Contains Protein sequence
+	 * @param {Array} massShiftList - Contains list of mass shifts
+	 */
 	this.getTotalSeqMass = function(seq,massShiftList){
 		let mass = 0 ;
 		let len = seq.length;
@@ -130,6 +155,13 @@ calculatePrefixAndSuffixMass = function(){
 		return mass ;
 	}
 	// Function to add mass shift
+	/**
+	 * @function addMassShift
+	 * @description Returns the current mass after adding mass shift 
+	 * @param {Integer} position - Contains position at which the mass shift needed to be added
+	 * @param {Array} massShiftList - List of mass shifts along with position
+	 * @param {Float} mass - Mass to which the mass shift to be added
+	 */
 	this.addMassShift = function(position,massShiftList,mass){
 		let len = massShiftList.length;
 		for(let i=0;i<len ; i++)
@@ -143,6 +175,10 @@ calculatePrefixAndSuffixMass = function(){
 		return mass ;
 	}
 	// Function to add water to SuffixMass List
+	/**
+	 * @function addWaterMass
+	 * @description Function to add mass of water to the suffix mass list
+	 */
 	this.addWaterMass = function(){
 		mass = getAminoAcidDistribution(WATER)[0].mass ;
 		return mass ;

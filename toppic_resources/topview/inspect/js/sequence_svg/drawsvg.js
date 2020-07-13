@@ -1,4 +1,8 @@
-/*	Get the size of the svg based on the no. of rows and row length and other parameter.,.*/
+/**
+ * Get the size of the svg based on the no. of rows and row length and other parameter.,.
+ * @param {Object} parameters - Contains parameters of width, letter space etc., to draw SVG
+ * @param {String} seq - Contains protein Sequence 
+ */
 function getSvgSize(parameters,seq)
 {
 	let seqLen = seq.length;
@@ -8,7 +12,14 @@ function getSvgSize(parameters,seq)
 	let height = parameters.row_height * num_of_rows + parameters.bottom_margin + parameters.top_margin ;
 	return [width,height];
 }
-/* get the sequence on to svg */
+/**
+ * Draw the sequence on to svg
+ * @param {Object} parameters - Contains parameters of width, letter space etc., to draw SVG
+ * @param {String} seq - Contains the protein sequence
+ * @param {String} id -Contians id of the SVG tag from html.
+ * @param {Array} massShiftList - Contains list of all the mass shifts
+ * @param {Array} monoMassList - Contains Mono Mass list data
+ */
 function buildSvg(parameters,seq,id,massShiftList,monoMassList)
 {
 	let massShiftListLen = massShiftList.length ;
@@ -61,13 +72,11 @@ function buildSvg(parameters,seq,id,massShiftList,monoMassList)
 			d3.select(this).style("cursor","pointer")
 			let id = "massshift_" + i;
 			d3.select("#"+id).attr("font-size","18px");
-							//.style("fill","red")
 		})
 		.on("mouseout",function(d,i){
 			d3.select(this).style("cursor","default")
 			let id = "massshift_" + i;
 			d3.select("#"+id).attr("font-size","11px");
-							//.style("fill","black")
 		})
 		.on("click",function(d,i){
 			handleOnClick(d,i,id,seq,massShiftList,monoMassList)
@@ -90,6 +99,17 @@ function buildSvg(parameters,seq,id,massShiftList,monoMassList)
 		})
 	return parameters;
 }
+/**
+ * Handles on click actions. 
+ * on click of any amino acid, provides a box to enter mass shift. 
+ * On click of ok, will re calculate and redraws entire page.
+ * @param {Char} d Current Amino Acid
+ * @param {Integer} i Index or position of the amino acid
+ * @param {String} id Contains Id of the SVG on which the sequence is drawn
+ * @param {String} seq Sequence of the amino acid
+ * @param {Array} massShiftList List of all the amino acids
+ * @param {Array} monoMassList List of Mono Mass data
+ */
 function handleOnClick(d,i,id,seq,massShiftList,monoMassList){
 	
 	d3.selectAll("#tooltip_pop").remove() ;
@@ -109,7 +129,6 @@ function handleOnClick(d,i,id,seq,massShiftList,monoMassList){
 	        .style("left", (d3.event.pageX - 30) + "px")             
 	        .style("top", (d3.event.pageY - 45) + "px");
 	
-	//i starts with 0
 	let shiftPosition = i;
 	
 	d3.select("#ok").on("click",function(){
@@ -127,7 +146,12 @@ function handleOnClick(d,i,id,seq,massShiftList,monoMassList){
 	});
 }
 
-/* Put the numerical positions at the start and end of each row of the sequence	*/
+/**
+ * Put the numerical positions at the start and end of each row of the sequence
+ * @param {Object} para Contains parameters of width, letter space etc., to draw SVG
+ * @param {Object} seq Amino Acid Sequence
+ * @param {String} id Id of the SVG from html
+ */
 function getNumValues(para,seq,id)
 {
 	//remove all the numbers if exist
@@ -157,8 +181,6 @@ function getNumValues(para,seq,id)
 				/*	Get the coordinates of right numerical	*/
 				[x,y] = calibrateRightNum(para,l_position_temp) ;
 				id_temp = "right_align" ;
-				//x = x + para.anno_width ;
-				//position =  position ; 
 			}
 			svgContainer.append("text")
 				.attr("class","numbers")
@@ -192,7 +214,12 @@ function getNumValues(para,seq,id)
 		}
 	}
 }
-/* Draw annotations*/
+/**
+ * Draw annotations
+ * @param {Object} para Contains parameters of width, letter space etc., to draw SVG
+ * @param {Array} matchedPeaks Contains Matched List
+ * @param {String} id Contains id of the SVG tag from html to draw sequence 
+ */
 function annotations(para,matchedPeaks,id)
 {
 	// remove all existing polylines with polyline id
@@ -216,7 +243,13 @@ function annotations(para,matchedPeaks,id)
 		}
 	})
 }
-/*	Draw the annotation when the ion type is B	*/
+/**
+ * Draw the annotation when the ion type is B
+ * @param {Object} para Contains parameters of width, letter space etc., to draw SVG
+ * @param {Integer} position Position of the amino acid
+ * @param {String} charge Contains the charge at the current position to display on hover of the annotation
+ * @param {String} id Contains id of the SVG tag from html to draw sequence 
+ */
 function drawAnnotation_B(para,position,charge,id)
 {
 	x = getX(para,position-1);
@@ -225,7 +258,13 @@ function drawAnnotation_B(para,position,charge,id)
 	let coordinates = (x-2)+","+(y-13)+ " " +(x+4)+","+ (y-11)+" "+(x+4)+","+(y+2);
 	drawAnnotation(position,charge,id,coordinates,x,y);
 }
-/* Draw the annotation when the ion type is Y*/
+/**
+ * Draw the annotation when the ion type is Y
+ * @param {Object} para Contains parameters of width, letter space etc., to draw SVG
+ * @param {Integer} position Position of the amino acid
+ * @param {String} charge Contains the charge at the current position to display on hover of the annotation
+ * @param {String} id Contains id of the SVG tag from html to draw sequence 
+ */
 function drawAnnotation_Y(para,position,charge,id)
 {
 	x = getX(para,position-1);
@@ -234,6 +273,13 @@ function drawAnnotation_Y(para,position,charge,id)
 	let coordinates = (x+4)+","+ (y-11)+" "+(x+4)+","+(y+2)+ " "+(x+10) + ","+(y+5);
 	drawAnnotation(position,charge,id,coordinates,x,y);
 }
+/**
+ * generate cooordinates to dray Y or B annotation
+ * @param {Object} para Contains parameters of width, letter space etc., to draw SVG
+ * @param {Integer} position Position of the amino acid
+ * @param {String} charge Contains the charge at the current position to display on hover of the annotation
+ * @param {String} id Contains id of the SVG tag from html to draw sequence 
+ */
 function drawAnnotation_YB(para,position,charge,id)
 {
 	x = getX(para,position-1);
@@ -242,6 +288,15 @@ function drawAnnotation_YB(para,position,charge,id)
 	let coordinates =  (x-2)+","+(y-13)+ " " + (x+4)+","+ (y-11)+" "+(x+4)+","+(y+2)+ " "+(x+10) + ","+(y+5);
 	drawAnnotation(position,charge,id,coordinates,x,y);
 }
+/**
+ * Draw Annotations
+ * @param {Integer} position Position of the amino acid
+ * @param {String} charge Contains the charge at the current position to display on hover of the annotation
+ * @param {String} id Contains id of the SVG tag from html to draw sequence 
+ * @param {String} coordinates Contains coordinates to draw the annotaion
+ * @param {Integer} x Contains x coordinate of start point to draw the annotation
+ * @param {Integer} y Contains y coordinate of start point to draw the annotation
+ */
 function drawAnnotation(position,charge,id,coordinates,x,y)
 {
 	let svgContainer = d3.select("#"+id+"_g");
@@ -251,7 +306,7 @@ function drawAnnotation(position,charge,id,coordinates,x,y)
 							.style("fill", "none")
 							.style("stroke", "1e90ff")
 							.style("stroke-width", 1 );	
-		/*	Rectangle to have flexible on click and on mouse actions	*/
+	//	Rectangle to have flexible on click and on mouse actions
 	svgContainer.append("rect")
 				.attr("id","annoTooltip")
 				.attr("x", x)
@@ -270,6 +325,10 @@ function drawAnnotation(position,charge,id,coordinates,x,y)
 					removeToolTip();	
 				});
 }
+/**
+ * Append Charge to the tool tip
+ * @param {String} charge Contains the charge at the current position to display on hover of the annotation
+ */
 function appendTooltip(charge)
 {
 	var div = d3.select("body").append("div")	
@@ -282,12 +341,18 @@ function appendTooltip(charge)
 		.style("left", (d3.event.pageX)  + "px")		
 		.style("top", (d3.event.pageY - 28)+ "px") ;
 }
+/**
+ * Remove tootltip on remove of the mouse from annotation
+ */
 function removeToolTip()
 {
 	d3.selectAll(".annotation_tooltip").remove();
 }
-
-/* Get the charge of the Ion */
+/**
+ * Get the charge of the Ion
+ * @param {Array} matchedPeaks Array with charge data at all the matched positions
+ * @param {Integer} position Position at which the charge data has to be consolidated to show on hover of an annotation
+ */
 function getIonCharge(matchedPeaks,position){
 	let l_charge = "";
 	for(let j=0;j<matchedPeaks.length;j++){
@@ -300,7 +365,12 @@ function getIonCharge(matchedPeaks,position){
 	return l_charge ;
 }
 
-/* MassShift value at the top of the acids */
+/**
+ * MassShift value at the top of the acids
+ * @param {Object} thisElem Current element of the amino acid
+ * @param {Float} MassShift Value of the mass shift
+ * @param {Integer} position Position of the amino acid
+ */
 function MassShift(thisElem,MassShift,position)
 {
 	let id = "massshift_" + position;
@@ -327,7 +397,9 @@ function MassShift(thisElem,MassShift,position)
 				.attr("fill","black")
 			   .attr("font-size","11px");
 }
-
+/**
+ * Provide a drop down to add different background colors to the mass shifted elements
+ */
 function addColorsToDropdown(){
 	let colors = ["white","green","yellow","blue","red"]
 	let startStatement = "<select id=\"tooltip_color\" style=\"background-color:"+colors[0]+"\">";
@@ -342,6 +414,11 @@ function addColorsToDropdown(){
 	console.log("stringyfyingHTML : ", stringyfyingHTML);
 	return stringyfyingHTML;
 }
+/**
+ * Add rectagular block with selected color
+ * @param {String} color Backgroung color added tot he amino acid
+ * @param {Integer} index Position at which the color needed to be added
+ */
 function drawRectagleWithColors(color,index){
 	let option = "<option value=\""+color +"\"style=\"width:80px;height:5px;border:1px solid #000;background-color:"+color+"\">";
 	if(index == 0)

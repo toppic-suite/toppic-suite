@@ -93,7 +93,6 @@ class GetMassTableOfSelectedIons{
                 td1.setAttribute("class","td_fragments");
                 if(matchedUnMatchedPeaks[k].massList[index].matchedInd == "Y")
                 {
-                   // td1.setAttribute("id","matched_fragments");
                     td1.setAttribute("class","td_fragments matched_fragments");
                    
                 }
@@ -110,6 +109,9 @@ class GetMassTableOfSelectedIons{
         onClickofMatchedPeaks();
     }
 }
+/**
+ * Function to zoom the graph to the mass point on click of matched mass
+ */
 function onClickofMatchedPeaks(){
     $(".matched_fragments").click(function(){
         let charge = $(this).attr("charge");
