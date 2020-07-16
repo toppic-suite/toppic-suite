@@ -257,10 +257,7 @@ class MatchedPeaks {
 	getMatchedAndUnmatchedPrefixAndSuffixMassList(prefixOrSuffixMassList, monoMassList,
 																massErrorthVal,ppmErrorthVal,prefixInd)
 	{
-<<<<<<< HEAD
-=======
 		//console.log("monoMassList : ", monoMassList);
->>>>>>> topview_skankara
 		let MatchedAndUnMatchedList = [];
 		let monoMassList_temp = monoMassList.slice();
 		let len = monoMassList_temp.length;
