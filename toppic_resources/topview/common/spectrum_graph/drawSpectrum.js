@@ -6,7 +6,7 @@
  * @param {list} peakData - Contains the data of Peaks and Envelopes to draws lines and circles on the graph
  * @param {list} ionData - Contains Ions to draw upon the peaks
  */
-drawSpectrum  = function(svgId, spectrumParameters, peaks, envelopes, ions) {
+drawSpectrum  = function(svgId, spectrumParameters, peaks, envPeaks, ions) {
   let svg = d3.select("body").select("#"+svgId);
   //svg.attr("width", spectrumParameters.svgWidth).attr("height", spectrumParameters.svgHeight);
   // Removes all the elements under SVG group 'svgGroup' everytime there this function is called
@@ -25,7 +25,7 @@ drawSpectrum  = function(svgId, spectrumParameters, peaks, envelopes, ions) {
   }
   drawPeaks(svg, spectrumParameters, peaks);
   if (spectrumParameters.showEnvelopes) {
-    drawEnvelopes(svg, spectrumParameters, envelopes);
+    drawEnvelopes(svg, spectrumParameters, envPeaks);
   }
   if (spectrumParameters.showIons) 
   {
@@ -100,19 +100,21 @@ onMouseOverPeak = function(this_element,peak,spectrumParameters)
  * @param {Array} envelope_list - Contains Envelope List
  * @param {object} spectrumParameters - Contains the parameters like height, width etc.,. tht helps to draw the graph
  */
-onMouseOverCircle = function(this_element,envelope,spectrumParameters)
+onMouseOverCircle = function(this_element,envelope, peak, spectrumParameters)
 {
   let x = parseFloat(d3.select(this_element).attr("cx"));
   let y = parseFloat(d3.select(this_element).attr("cy")) ;
-  let mass = "Mass:"+envelope.mono_mass.toFixed(2);
-  let charge = "Charge:"+ envelope.charge ;
+  let mz = "m/z:"+peak.mz.toFixed(3);
+  let inte = "inte:"+peak.intensity.toFixed(2);
+  let mass = "mass:"+envelope.mono_mass.toFixed(3);
+  let charge = "charge:"+ envelope.charge ;
   y = y - spectrumParameters.mouseOverPadding.head ;
   if(y<=spectrumParameters.mouseOverPadding.head)
   {
     y = spectrumParameters.mouseOverPadding.head;
   }
 
-  let tooltipData = mass + "<br>" + charge ;
+  let tooltipData = mz + "<br>" + inte + "<br>" + mass + "<br>" + charge ;
   /*	Rectangle to have flexible on click and on mouse actions	*/
   var div = d3.select("body").append("div")
     .attr("id", "MyTextMassCharge")
@@ -155,11 +157,12 @@ drawTicks = function(svg,spectrumParameters){
     }
   }
   addYTicks = svg.append("g").attr("id","y_ticks").attr("class","ticks");
+  let tickHeight = spectrumParameters.getTickHeight();
   for(let i=0; i <= spectrumParameters.yTickNum ; i++)
   {
     // Get the default tick height and calculate the actual tick height position
-    let tickHeight = spectrumParameters.getTickHeight();
-    tickHeight = i*tickHeight * spectrumParameters.dataMaxInte /100;
+    tickPos = i*tickHeight; 
+    //* spectrumParameters.dataMaxInte /100;
     let y = parseFloat(spectrumParameters.getPeakYPos(tickHeight)) ;
     if(!isNaN(y) && y >= spectrumParameters.padding.head)//y >= spectrumParameters.padding.head helps the ticks to be in the length of Y axis
     {
@@ -359,7 +362,7 @@ drawPeaks = function(svg,spectrumParameters,peakList){
  * @param {object} spectrumParameters - Contains the parameters like height, width etc.,. tht helps to draw the graph
  * @param {Array} peakdata - Contians both peak list and envelopelist
  */
-drawEnvelopes = function(svg,spectrumParameters,envList) {
+drawEnvelopes = function(svg,spectrumParameters,envPeakList) {
   let circles = svg.append("g").attr("id", "circles");
   let minPercentage = 0.0;
   let maxIntensity = spectrumParameters.dataMaxInte ;
@@ -367,45 +370,43 @@ drawEnvelopes = function(svg,spectrumParameters,envList) {
   // so that we can limit tha peak count to circlesPerRange count
   let limits = new Array(spectrumParameters.binNum).fill(0);
   let binWidth = spectrumParameters.getBinWidth();
-  for (let i = 0; i < envList.length; i++) {
-    let env = envList[i];
-    for (let j = 0; j < env.env_peaks.length; j++) {
-      let peak = env.env_peaks[j];
-      let color = "red";
-      //Show only envelopes with minimum of 0.5%
-      let percentInte = peak.intensity/maxIntensity * 100 ;
-      if(peak.mz >= spectrumParameters.winMinMz && peak.mz < spectrumParameters.winMaxMz && percentInte >= minPercentage) 
-      { 
-        let binIndex = Math.floor((peak.mz - spectrumParameters.winMinMz)/binWidth); 
-        if (binIndex < spectrumParameters.binNum) 
+  for (let i = 0; i < envPeakList.length; i++) {
+    let peak = envPeakList[i]; 
+    let env = peak.env; 
+    let color = env.color;
+    //Show only envelopes with minimum of 0.5%
+    let percentInte = peak.intensity/maxIntensity * 100 ;
+    if(peak.mz >= spectrumParameters.winMinMz && peak.mz < spectrumParameters.winMaxMz && percentInte >= minPercentage) 
+    { 
+      let binIndex = Math.floor((peak.mz - spectrumParameters.winMinMz)/binWidth); 
+      if (binIndex < spectrumParameters.binNum) 
+      {
+        limits[binIndex] = limits[binIndex]+1;
+        if (limits[binIndex] <= spectrumParameters.peakNumPerBin) 
         {
-          limits[binIndex] = limits[binIndex]+1;
-          if (limits[binIndex] <= spectrumParameters.peakNumPerBin) 
-          {
-            circles.append("circle")
-              .attr("id","circles")
-              .attr("cx",function(){
-                return spectrumParameters.getPeakXPos(peak.mz);
-              })
-              .attr("cy",function(){
-                let cy = spectrumParameters.getPeakYPos(peak.intensity);
-                if(cy < spectrumParameters.padding.head) return spectrumParameters.padding.head;
-                else return cy ;
-              })
-              .attr("r",function(){
-                return spectrumParameters.getCircleSize();
-              })
-              .style("fill","white")
-              .style("opacity", "0.6")
-              .style("stroke",color)
-              .style("stroke-width","2")
-              .on("mouseover",function(){
-                onMouseOverCircle(this,env,spectrumParameters);
-              })
-              .on("mouseout",function(){
-                onCircleMouseOut(this);
-              });
-          }
+          circles.append("circle")
+            .attr("id","circles")
+            .attr("cx",function(){
+              return spectrumParameters.getPeakXPos(peak.mz);
+            })
+            .attr("cy",function(){
+              let cy = spectrumParameters.getPeakYPos(peak.intensity);
+              if(cy < spectrumParameters.padding.head) return spectrumParameters.padding.head;
+              else return cy ;
+            })
+            .attr("r",function(){
+              return spectrumParameters.getCircleSize();
+            })
+            .style("fill","white")
+            .style("opacity", "0.6")
+            .style("stroke",color)
+            .style("stroke-width","2")
+            .on("mouseover",function(){
+              onMouseOverCircle(this,env,peak,spectrumParameters);
+            })
+            .on("mouseout",function(){
+              onCircleMouseOut(this);
+            });
         }
       }
     }

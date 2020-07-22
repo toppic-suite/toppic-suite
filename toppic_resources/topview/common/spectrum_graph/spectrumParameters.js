@@ -33,6 +33,8 @@ SpectrumParameters = function() {
   // Intensity range of peaks
   this.dataMaxInte = 30000;
   this.dataMinInte = 0;
+  // add a margin so that the visuable intensity range is [0, dataMaxInte * inteMargin]
+  this.inteMargin = 1.2;
 
   // scale m/z to x coordinate
   this.xScale = 0.35;
@@ -59,6 +61,8 @@ SpectrumParameters = function() {
   this.defaultRadius = 0.05;
   this.minRadius = 2;
   this.maxRadius = 5;
+  //	Colors for the envelope circles	
+  this.envColorList = ["red","orange","blue","green"];
 
   // Parameters related to annoated ions
   this.showIons = false;
@@ -219,9 +223,9 @@ SpectrumParameters = function() {
     [dataMinMz, dataMaxMz, dataMaxInte] = this.compDataRanges(peakList);
     this.dataMinMz = dataMinMz;
     this.dataMaxMz = dataMaxMz + (0.10 * dataMaxMz);
+    this.dataMaxInte = dataMaxInte;
     // add 1/4th of max intensity to keep the max point at 3/4 of the y axis*
-    this.dataMaxInte = dataMaxInte + 0.25*dataMaxInte;
-    this.updateScale(this.dataMinMz, this.dataMaxMz, this.dataMaxInte);
+    this.updateScale(this.dataMinMz, this.dataMaxMz, this.dataMaxInte * this.inteMargin);
   }
 
   /**
@@ -259,12 +263,13 @@ SpectrumParameters = function() {
     //Reducing zoom factor to smoothenup and remove gliches
     if(ratio > 1 ) ratio = 1.4;
     else if(ratio < 1) ratio = 0.9;
-    if ((ratio > 1.0 && this.winMaxInte >= this.dataMinInte ) 
-      || (ratio < 1.0 && this.winMaxInte <= this.dataMaxInte)) {
+    if ((ratio > 1.0 && this.winMaxInte >= this.dataMinInte * this.inteMargin) 
+      || (ratio < 1.0 && this.winMaxInte <= this.dataMaxInte * this.inteMargin)) {
       this.yScale = this.yScale * ratio;
       this.winMaxInte = this.specHeight / this.yScale;
     }
   }
+
   /**
    * @function zoom
    * @description 
@@ -279,6 +284,22 @@ SpectrumParameters = function() {
     }
     else {
       this.yZoom(ratio);
+    }
+  }
+
+  /**
+   * @function addColorToEnvelopes
+   * @description 
+   * Add color to envelopes.
+   */
+  this.addColorToEnvelopes = function(envList){
+    envList.sort(function(x,y){
+      return (x.env_peaks[0].mz - y.env_peaks[0].mz);
+    })
+    let colorNum = this.envColorList.length; 
+    for (let i = 0; i < envList.length; i++) 
+    {
+      envList[i].color = this.envColorList[i%colorNum];
     }
   }
 }
