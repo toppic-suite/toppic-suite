@@ -6,13 +6,37 @@
  * @param {Array} peakData - contains peakList and envelope list 
  * @param {Array} ionData - Contains data with mass and ACID name to plot on the graph
  */
-SpectrumGraph = function(svgId, peakList, envList, ionList){
+class SpectrumGraph {
+  // parameters for zoom
+  transformX = 0;
+  transformScale = 1.0;
+  
+  constructor(svgId, peakList, envList, ionList){
+    this.id = svgId;
+    this.para = new SpectrumParameters();
+    this.peakList = peakList;
+    this.para.initParameters(peakList);
+    this.peakList.sort(function(x,y){
+      return y.intensity - x.intensity; 
+    });
+    this.envList = envList;
+    this.envPeakList = this.getEnvPeakList(this.envList);
+    this.ionList = ionList;
+    $("#" + svgId).data("graph", this);
+    // add zoom function
+    this.svg = d3.select("body").select("#"+svgId);
+    this.svg.attr("viewBox", "0 0 "+ this.para.svgWidth+" "+ this.para.svgHeight)
+      .attr("width", "100%")
+      .attr("height", "100%")
+      .call(this.zoom);
+  }
 
-  this.redraw = function(){
+  redraw = function(){
+    console.log(this.envList);
     drawSpectrum(this.id, this.para, this.peakList, this.envPeakList, this.ionList);
   }
 
-  this.zoomed = function () {
+  zoomed = function () {
     let transform = d3.event.transform;
     let graph = $("#"+ this.id).data("graph");
     let distance = transform.x - graph.transformX;
@@ -29,16 +53,15 @@ SpectrumGraph = function(svgId, peakList, envList, ionList){
     graph.redraw(); 
   }
 
-  this.zoom = d3.zoom()
+  zoom = d3.zoom()
     .on("zoom", this.zoomed);
 
-
-  this.getEnvPeakList = function(envList) {
+  getEnvPeakList = function(envList) {
     let envPeakList = [];
-    for (let i = 0; i < envList.length; i++) 
+    for (let i = 0; i < envList.length; i++)
     {
       let env = envList[i];
-      for (let j = 0; j < env.env_peaks.length; j++) 
+      for (let j = 0; j < env.env_peaks.length; j++)
       {
         let peak = env.env_peaks[j];
         peak.env = env;
@@ -46,33 +69,8 @@ SpectrumGraph = function(svgId, peakList, envList, ionList){
       }
     }
     envPeakList.sort(function(x,y){
-      return y.intensity - x.intensity; 
+      return y.intensity - x.intensity;
     });
-    return envPeakList;  
+    return envPeakList;
   }
-
-  // parameters for zoom
-  this.transformX = 0;
-  this.transformScale = 1.0;
-
-  this.id = svgId;
-  this.para = new SpectrumParameters();
-  this.peakList = peakList;
-  this.para.initParameters(peakList);
-  this.peakList.sort(function(x,y){
-    return y.intensity - x.intensity; 
-  });
-  this.envList = envList;
-  this.para.addColorToEnvelopes(this.envList);
-  this.envPeakList = this.getEnvPeakList(this.envList);
-  this.ionList = ionList;
-  $("#" + svgId).data("graph", this);
-
-  // add zoom function
-  this.svg = d3.select("body").select("#"+svgId);
-  this.svg.attr("viewBox", "0 0 "+ this.para.svgWidth+" "+ this.para.svgHeight)
-    .attr("width", "100%")
-    .attr("height", "100%")
-    .call(this.zoom);
-  this.redraw();
 }
