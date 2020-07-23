@@ -20,6 +20,7 @@ class SpectrumGraph {
       return y.intensity - x.intensity; 
     });
     this.envList = envList;
+    this.para.addColorToEnvelopes(envList);
     this.envPeakList = this.getEnvPeakList(this.envList);
     this.ionList = ionList;
     $("#" + svgId).data("graph", this);
@@ -32,7 +33,7 @@ class SpectrumGraph {
   }
 
   redraw = function(){
-    console.log(this.envList);
+    //console.log(this.envList);
     drawSpectrum(this.id, this.para, this.peakList, this.envPeakList, this.ionList);
   }
 
