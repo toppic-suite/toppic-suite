@@ -2,81 +2,84 @@
  * @description Get data from global variable spectrum_data and utilities to manupulate
  * the data
  */
-SpectrumParameters = function() {
+class SpectrumParameters {
   // SVG size
-  this.svgWidth = 910;
-  this.svgHeight = 220;
+  svgWidth = 910;
+  svgHeight = 220;
 	// SVG padding 
-	this.padding = {left:70, right:20, head:10, bottom:50};
+	padding = {left:70, right:20, head:10, bottom:50};
   // spectrum size
-	this.specWidth = this.svgWidth - this.padding.left - this.padding.right;
-  this.specHeight = this.svgHeight - this.padding.head - this.padding.bottom;
+	specWidth = this.svgWidth - this.padding.left - this.padding.right;
+  specHeight = this.svgHeight - this.padding.head - this.padding.bottom;
 
   // M/z range of visuable window
-  this.winMinMz = 0 ;
-  this.winMaxMz = 2000;
-  this.winCenterMz = 1000;
+  winMinMz = 0 ;
+  winMaxMz = 2000;
+  winCenterMz = 1000;
   // Ratio between average and monoisopotic mass
-  this.avgToMonoRatio = 1.000684;
+  avgToMonoRatio = 1.000684;
 
   // M/z range of peaks
-  this.dataMinMz = 0;
-  this.dataMaxMz = 2000;
+  dataMinMz = 0;
+  dataMaxMz = 2000;
 
   // M/z range, color of highlighted part.
-  this.showHighlight = false;
-  this.hlMinMz = 600;
-  this.hlMaxMz = 700;
-  this.hlColor = "orange";
+  showHighlight = false;
+  hlMinMz = 600;
+  hlMaxMz = 700;
+  hlColor = "orange";
 
   // Max intensity of visuable window
-  this.winMaxInte = 30000;
+  winMaxInte = 30000;
 
   // Intensity range of peaks
-  this.dataMaxInte = 30000;
-  this.dataMinInte = 0;
+  dataMaxInte = 30000;
+  dataMinInte = 0;
   // add a margin so that the visuable intensity range is [0, dataMaxInte * inteMargin]
-  this.inteMargin = 1.2;
+  inteMargin = 1.2;
 
   // scale m/z to x coordinate
-  this.xScale = 0.35;
+  xScale = 0.35;
   // scale intensity to y coordinate
-  this.yScale = 0.005;
+  yScale = 0.005;
 
   // Numbers of ticks
-  this.xTickNum = 10;
-  this.yTickNum = 5 ;
-  this.tickLength = 7 ;
+  xTickNum = 10;
+  yTickNum = 5 ;
+  tickLength = 7 ;
   // Tick width list used in the function getTickWidth
-  this.tickWidthList = [10000,8000,6000,5000,4000,3000,2000,1000,800,700,600,500,450,400,350,300,250,200,150,100,50,20,10,5,3,2,1,0.5,0.2,0.1,0.05,0.01,0.005,0.001,0.0005,0.0001,0.00005,0.00001,0.000005,0.000001];
+  tickWidthList = [10000,8000,6000,5000,4000,3000,2000,1000,800,700,600,500,450,400,350,300,250,200,150,100,50,20,10,5,3,2,1,0.5,0.2,0.1,0.05,0.01,0.005,0.001,0.0005,0.0001,0.00005,0.00001,0.000005,0.000001];
   // Tick height list used in the function getTickHeight
-  this.tickHeightList = [50,40,30,25,20,15,10,5,3,2,1,0.5,0.2,0.1,0.05,0.01,0.005,0.001];
+  tickHeightList = [50,40,30,25,20,15,10,5,3,2,1,0.5,0.2,0.1,0.05,0.01,0.005,0.001];
 
   //Limiting the peaks and envelopes to 4000 using 20 bins
-  this.binNum = 20;
-  this.peakNumPerBin = 200;
+  binNum = 20;
+  peakNumPerBin = 200;
   //Padding for mouse over peak floatings.
-  this.mouseOverPadding = {head:20,middle:14};
+  mouseOverPadding = {head:20,middle:14};
 
   // Envelope circle size: min and max radius	
-  this.showEnvelopes = true;
-  this.defaultRadius = 0.05;
-  this.minRadius = 2;
-  this.maxRadius = 5;
+  showEnvelopes = true;
+  defaultRadius = 0.05;
+  minRadius = 2;
+  maxRadius = 5;
   //	Colors for the envelope circles	
-  this.envColorList = ["red","orange","blue","green"];
+  envColorList = ["red","orange","blue","green"];
 
   // Parameters related to annoated ions
-  this.showIons = false;
-  this.tickWidthThreshhold = 0.5;
-  this.adjustableIonPosition = 4;
-  this.fixedHeightOfIonAboveThePeak = 10;
+  showIons = false;
+  tickWidthThreshhold = 0.5;
+  adjustableIonPosition = 4;
+  fixedHeightOfIonAboveThePeak = 10;
+
+  constructor() {
+  }
 
   /**
    * @function getTickWidth
    * @description Function Provides width between each tick when zoomed in and out or dragged
    */
-  this.getTickWidth = function(){
+  getTickWidth = function(){
     let tempDiff = this.winMaxMz - this.winMinMz;
     let tickWidth = parseInt(this.tickWidthList[0]) ;
     for(let i = 0; i < this.tickWidthList.length; i++)
@@ -91,8 +94,8 @@ SpectrumParameters = function() {
     return 	tickWidth ;
   }
 
-  this.getXTickPosList = function() {
-    posList = new Array(this.xTickNum + 1);
+  getXTickPosList = function() {
+    let posList = new Array(this.xTickNum + 1);
     let tickWidth = this.getTickWidth();
     for(let i=0; i <= this.xTickNum ; i++)
     {
@@ -115,7 +118,7 @@ SpectrumParameters = function() {
    * @function getTickHeight
    * @description Function Provides height between each tick when zoomed in and out or dragged
    */
-  this.getTickHeight = function(){
+  getTickHeight = function(){
     let tickheight = parseInt(this.tickHeightList[0]) ;
     let maxIntPercent = this.winMaxInte/this.dataMaxInte * 100;
 		for(let i = 0; i < this.tickHeightList.length; i++)
@@ -134,7 +137,7 @@ SpectrumParameters = function() {
    * @function getPeakXPos
    * @description Function provides the x coordinate for the mass
    */
-  this.getPeakXPos = function (mz) {
+  getPeakXPos = function (mz) {
     let peakX = (mz - this.winMinMz) * this.xScale + this.padding.left;
     return peakX;
   }
@@ -142,7 +145,7 @@ SpectrumParameters = function() {
    * @function getPeakYPos
    * @description Function provides the y coordinate for the intensity
    */
-  this.getPeakYPos = function (intensity) {
+  getPeakYPos = function (intensity) {
     let peakY = this.svgHeight - intensity * this.yScale - this.padding.bottom;
     return peakY;
   }
@@ -151,7 +154,7 @@ SpectrumParameters = function() {
    * @function getBinWidth
    * @description Function to compute bin width
    **/
-  this.getBinWidth = function() {
+  getBinWidth = function() {
     let width = (this.winMaxMz - this.winMinMz)/this.binNum;
     return width;
   }
@@ -160,8 +163,8 @@ SpectrumParameters = function() {
    * @function getCircleSize
    * @description Function provides the radius of the circles drawn on the graph as zoomed in and out
    */
-  this.getCircleSize = function() {
-    radius = this.defaultRadius * this.xScale;
+  getCircleSize = function() {
+    let radius = this.defaultRadius * this.xScale;
     if (radius < this.minRadius) {
       radius = this.minRadius;
     }
@@ -175,7 +178,7 @@ SpectrumParameters = function() {
    * Function to set spectrum perameters based on the data
    * @param {Array} peakList - contains the list of data with mz and intensity used to draw lines on the graph 
    */
-  this.compDataRanges = function(peakList){
+  compDataRanges = function(peakList){
     let minMz = 0;
     let maxMz = 2000;
     let maxInte = 100;
@@ -201,7 +204,7 @@ SpectrumParameters = function() {
    * @description Initializing the spectrum Parameters with the data from the peak list and envilopelist.
    * initializing xScale, yScale.
    */
-  this.updateScale = function(winMinMz, winMaxMz, winMaxInte) {
+  updateScale = function(winMinMz, winMaxMz, winMaxInte) {
     this.winMinMz = winMinMz;
     this.winMaxMz = winMaxMz;
     if(winMinMz == this.dataMinMz && winMaxMz == this.dataMaxMz)
@@ -221,8 +224,8 @@ SpectrumParameters = function() {
    * @description Initializing the spectrum Parameters with the data from the peak list and envilopelist.
    * initializing xScale, yScale.
    */
-  this.initParameters = function(peakList) {
-    [dataMinMz, dataMaxMz, dataMaxInte] = this.compDataRanges(peakList);
+  initParameters = function(peakList) {
+    let [dataMinMz, dataMaxMz, dataMaxInte] = this.compDataRanges(peakList);
     this.dataMinMz = dataMinMz;
     this.dataMaxMz = dataMaxMz + (0.10 * dataMaxMz);
     this.dataMaxInte = dataMaxInte;
@@ -235,7 +238,7 @@ SpectrumParameters = function() {
    * @description 
    * Function provides minMz and maxMz based on the amount of drag done
    */
-  this.drag = function(distX) {
+  drag = function(distX) {
     let mzDist = distX / this.xScale;
     this.winMinMz = this.winMinMz - mzDist; 
     this.winMaxMz = this.winMaxMz - mzDist;
@@ -247,7 +250,7 @@ SpectrumParameters = function() {
    * @description Function provides with current xScale, current minMz and MaxMz based on the zoom on x-axis.
    * Function also calls setLimita which helps in drawing limited number of peaks and circles per eachbin/range of mz values.
    */
-  this.xZoom = function (mouseSvgX, ratio) {
+  xZoom = function (mouseSvgX, ratio) {
    if ((ratio > 1.0) || ((this.winMaxMz - this.winMinMz) < this.dataMaxMz) ) {
       let mouseSpecX = mouseSvgX - this.padding.left;
       this.winCenterMz =  mouseSpecX/this.xScale + this.winMinMz;
@@ -261,7 +264,7 @@ SpectrumParameters = function() {
    * @function yZoom
    * @description Function provides with current yScale, current max Intensity based on the zoom on y-axis
    */
-  this.yZoom = function (ratio) {
+  yZoom = function (ratio) {
     //Reducing zoom factor to smoothenup and remove gliches
     if(ratio > 1 ) ratio = 1.4;
     else if(ratio < 1) ratio = 0.9;
@@ -278,7 +281,7 @@ SpectrumParameters = function() {
    * Function to invoke respective zoom functionality(zoom on x or y) based on position of X, Y 
    * It fixes amount of zoom based on zooming in or out 
    */
-  this.zoom = function(mouseSvgX, mouseSvgY, ratio) {
+  zoom = function(mouseSvgX, mouseSvgY, ratio) {
     if(ratio > 1 ) ratio = 1.4; // Zooming in and fixing ration to 1.4 (fixed values based on testing the smooting of zoom)
     else if(ratio < 1) ratio = 0.9; // Zooming out and fixing ration to 0.9 (fixed values based on testing the smooting of zoom)
     if (mouseSvgY > this.svgHeight - this.padding.bottom) {
@@ -294,7 +297,7 @@ SpectrumParameters = function() {
    * @description 
    * Add color to envelopes.
    */
-  this.addColorToEnvelopes = function(envList){
+  addColorToEnvelopes = function(envList){
     envList.sort(function(x,y){
       return (x.env_peaks[0].mz - y.env_peaks[0].mz);
     })
@@ -310,7 +313,7 @@ SpectrumParameters = function() {
    * @description 
    * set highlight region for MS1 precursor envelope
    */
-  this.setHighlight = function(precMonoMz, charge) {
+  setHighlight = function(precMonoMz, charge) {
     this.showHighlight = true;
     let monoMz = parseFloat(precMonoMz);
     let centerMz = monoMz * this.avgToMonoRatio;
@@ -324,7 +327,7 @@ SpectrumParameters = function() {
    * @function updataMzRange
    * @description 
    */
-  this.updateMzRange = function(monoMz) {
+  updateMzRange = function(monoMz) {
     let centerMz = parseFloat(monoMz) * this.avgToMonoRatio;
     this.winMinMz = centerMz - 5;
     this.winMaxMz = centerMz + 5;

@@ -375,7 +375,9 @@ drawEnvelopes = function(svg,para,envPeakList) {
   for (let i = 0; i < envPeakList.length; i++) {
     let peak = envPeakList[i]; 
     let env = peak.env; 
-    let color = env.color;
+    console.log(env);
+    //let color = env.color;
+    let color = "red";
     //Show only envelopes with minimum of 0.5%
     let percentInte = peak.intensity/maxIntensity * 100 ;
     if(peak.mz >= para.winMinMz && peak.mz < para.winMaxMz && percentInte >= minPercentage) 
