@@ -16,6 +16,8 @@ SpectrumParameters = function() {
   this.winMinMz = 0 ;
   this.winMaxMz = 2000;
   this.winCenterMz = 1000;
+  // Ratio between average and monoisopotic mass
+  this.avgToMonoRatio = 1.000684;
 
   // M/z range of peaks
   this.dataMinMz = 0;
@@ -301,5 +303,31 @@ SpectrumParameters = function() {
     {
       envList[i].color = this.envColorList[i%colorNum];
     }
+  }
+
+  /**
+   * @function setHighlight
+   * @description 
+   * set highlight region for MS1 precursor envelope
+   */
+  this.setHighlight = function(precMonoMz, charge) {
+    this.showHighlight = true;
+    let monoMz = parseFloat(precMonoMz);
+    let centerMz = monoMz * this.avgToMonoRatio;
+    let dist = centerMz - monoMz + 0.02;
+    this.hlMinMz = centerMz - dist; 
+    this.hlMaxMz = centerMz + dist;
+    //console.log(precMonoMz, this.hlMinMz, this.hlMaxMz);
+  }
+
+  /**
+   * @function updataMzRange
+   * @description 
+   */
+  this.updateMzRange = function(monoMz) {
+    let centerMz = parseFloat(monoMz) * this.avgToMonoRatio;
+    this.winMinMz = centerMz - 5;
+    this.winMaxMz = centerMz + 5;
+    this.updateScale(this.winMinMz, this.winMaxMz, this.winMaxInte);
   }
 }
