@@ -13,5 +13,5 @@ let distributionList.env_peaks = calEmassAndDistObj.emass(seq,peakDataList,charg
 Use MolecularFormulae class:
 ```javascript
 let molecularFormObj = new MolecularFormulae();
-let peaks = emass(mass,charge, modifiedPeakList);
+let peaks = molecularFormObj.emass(mass,charge, modifiedPeakList);
 ```
