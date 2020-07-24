@@ -22,7 +22,9 @@ SpectrumGraph = function(svgId,spectrumParameters,peakData, ionData){
 		this.para.graphFeatures = graphFeatures;
 		spectrumParameters = drawSpectrum(this.id, this.para, this.data,this.ionData);
 		//Copying as a new variable than referencing. Referencing will change the properties of parent if child properties are changes
-		correspondingSpecParams_g[tempid] = jQuery.extend(true, {}, spectrumParameters);
+		if (typeof correspondingSpecParams_g !== "undefined") {
+			correspondingSpecParams_g[tempid] = jQuery.extend(true, {}, spectrumParameters);
+		}
 	}
 
 	this.zoomed = function () {
@@ -40,7 +42,9 @@ SpectrumGraph = function(svgId,spectrumParameters,peakData, ionData){
 		}
 		spectrumParameters = drawSpectrum(svgId, spectrumParameters, peakData, ionData);
 		//Copying as a new variable than referencing. Referencing will change the properties of parent if child properties are changes
-		correspondingSpecParams_g[tempid] = jQuery.extend(true, {}, spectrumParameters);
+		if (typeof correspondingSpecParams_g !== "undefined") {
+			correspondingSpecParams_g[tempid] = jQuery.extend(true, {}, spectrumParameters);
+		}
 	}
 
 	this.zoom = d3.zoom()
@@ -53,8 +57,9 @@ SpectrumGraph = function(svgId,spectrumParameters,peakData, ionData){
 
 	spectrumParameters = drawSpectrum(svgId, spectrumParameters, peakData, ionData); 
 	//Copying as a new variable than referencing. Referencing will change the properties of parent if child properties are changes
-	correspondingSpecParams_g[tempid] = jQuery.extend(true, {}, spectrumParameters);
-
+	if (typeof correspondingSpecParams_g !== "undefined") {
+		correspondingSpecParams_g[tempid] = jQuery.extend(true, {}, spectrumParameters);
+	}
 	return graph;
 }
 /**
