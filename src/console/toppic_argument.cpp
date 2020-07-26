@@ -523,8 +523,8 @@ bool Argument::validateArguments() {
     return false;
   }
 
-  if(use_lookup_table == "true" && arguments_["errorTolerance"] !="5" && arguments_["errorTolerance"]!="10" && arguments_["errorTolerance"]!="15"){
-    LOG_ERROR("Error tolerance can only be 5, 10 or 15 when the lookup table approach for E-value computation is not selected!");
+  if(use_lookup_table == "true" && arguments_["massErrorTolerance"] !="5" && arguments_["massErrorTolerance"]!="10" && arguments_["massErrorTolerance"]!="15"){
+    LOG_ERROR("Error tolerance can only be 5, 10 or 15 when the lookup table approach for E-value computation is selected!");
     return false;
   }
 
