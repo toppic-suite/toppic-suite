@@ -329,8 +329,8 @@ class SpectrumParameters {
    */
   updateMzRange = function(monoMz) {
     let centerMz = parseFloat(monoMz) * this.avgToMonoRatio;
-    this.winMinMz = centerMz - 5;
-    this.winMaxMz = centerMz + 5;
+    this.winMinMz = centerMz - 3;
+    this.winMaxMz = centerMz + 3;
     this.updateScale(this.winMinMz, this.winMaxMz, this.winMaxInte);
   }
 }

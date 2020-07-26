@@ -29,7 +29,7 @@ function loadDatafromJson2Html(){
 	document.getElementById("PrSM_ID").innerHTML = prsm_data.prsm.prsm_id;
 	document.getElementById("Scan").innerHTML = prsm_data.prsm.ms.ms_header.scans;
 	document.getElementById("Precursor_charge").innerHTML = prsm_data.prsm.ms.ms_header.precursor_charge;
-	document.getElementById("precursormz").innerHTML = prsm_data.prsm.ms.ms_header.precursor_mz ;
+	document.getElementById("precursor_mz").innerHTML = prsm_data.prsm.ms.ms_header.precursor_mz ;
 	document.getElementById("Precursor_mass").innerHTML = prsm_data.prsm.ms.ms_header.precursor_mono_mass;
 	document.getElementById("Proteoform_mass").innerHTML = prsm_data.prsm.annotated_protein.proteoform_mass;
 	document.getElementById("matched_peaks").innerHTML = prsm_data.prsm.matched_peak_number;
@@ -52,9 +52,9 @@ function createTableElements(){
 	let l_specIds = prsm_data.prsm.ms.ms_header.ids.split(" ") ;
 	let l_matched_peak_count = 0;
 	prsm_data.prsm.ms.peaks.peak.forEach(function(peak,i){
-		/*	Check if peak contain matched_ions_num attribute	*/
-
-		//for each peak, get the ion type and store it in ionArray to determine which ion type to be checked in Inspect
+		// Check if peak contain matched_ions_num attribute	
+		// for each peak, get the ion type and store it in ionArray 
+    // to determine which ion type to be checked in Inspect
 		if (parseInt(peak.matched_ions_num)>0){
 			let ion = peak.matched_ions.matched_ion.ion_type;
 			if (ionArray.length < 1){
@@ -146,7 +146,7 @@ function createTableElements(){
 				//	provide link to click on m/z value to view spectrum 
 				let a = document.createElement('a');
 				a.href="#!"
-				a.className = "peakRows"
+				a.className = "row_mono_mz"
 				a.innerHTML = peak.monoisotopic_mz;
 				td.appendChild(a);
 			}
@@ -372,189 +372,4 @@ function getFixedPtm(ptm)
 	fixed_ptm = ptm.ptm.abbreviation + fixed_ptm ;
 	return fixed_ptm ;
 }
-/**
- * Create buttons to save the svg as png/svg and to redraw the svg with given dimensions
- * @param {object} para - contains the parameters to draw the sequence SVG 
- * @param {object} prsm - prsm is the data attribute inside global prsm_data variable
- * @param {String} id - id from the html at which the svg needs to be redraw (Here it is from the modal block)
- */
-function buttonsAndAlerts(para,prsm,id)
-{
-	let x,y;
-	//	Id of the pop_up svg
-	id = "l_popup_svg" ;
-	//	On click action to get pop_up window
-	d3.select('#saveImage').on("click",function(){
-		d3.selectAll(".l_popup_svg_g").remove();
-		para = new parameters();
-		let prsm = prsm_data.prsm ;
-		[para,id] = buildSvg(para,prsm,id);
-		//	Get the amount of skipped acid and write the amount 
-		// 	of skipped acid at the start and end of the sequence 
-		skippedAcidNotification(para,prsm,id) ;
-		if(para.show_num)
-		{
-			// Get the numerical count at the start enad end of 
-			// each row of sequence
-			getNumValues(para,prsm,id);
-		}
-		//	Determine the start and end position of the sequence
-		drawAnnoOfStartEndPosition(para,prsm,id);
-		//	Draw Annotations
-		annotations(para,prsm,id);
-		//	Get the position of the fixed ptms and color them to red
-		addColorToFixedPtms(para,prsm,id);
-		//	Color the background of occurence of mass shift 
-		massShiftBackgroundColor(para,prsm,id);
-		//	set the dimensions of popup svg to default values
-		document.getElementById("row-size").value = para.row_length ;
-		document.getElementById("letter-width").value = para.letter_width ;
-		document.getElementById("row-height").value = para.row_height ;
-		document.getElementById("block-width").value = para.gap_width ;
-		document.getElementById("num-width").value = para.numerical_width ;
-		document.getElementsByName("show-num")[0].checked = para.show_num ;
-		document.getElementsByName("show-skipped-lines")[0].checked = para.show_skipped_lines ;
 
-		// Allows to drag the pop up windows
-		$("#myModal").draggable({
-			appendTo: "body"
-			});
-		});
-
-		//	Download the svg as ".svg" image
-		d3.select('#download_SVG').on("click",function(){
-				x = d3.event.pageX;
-				y = d3.event.pageY;
-				popupnamewindow("svg",id,x,y);
-			});
-		//	Download svg as PNG Image
-		d3.select('#download_PNG').on("click", function(){
-			x = d3.event.pageX;
-			y = d3.event.pageY;
-			popupnamewindow("png",id,x,y);
-		})	;
-
-		d3.select('#image_help').on("click",function(){
-			$("#helpModal").draggable({
-			appendTo: "#myModal"
-			});
-	});
-
-	//	On Click action to resize the svg with user dimensions
-	d3.select('#resize').on("click", function(){
-		d3.selectAll("."+id+"_g").remove();
-		//	Get dimension parameters of svg
-		var para = new parameters() ;
-		para.row_length = parseInt(document.getElementById("row-size").value);
-		para.letter_width = parseInt(document.getElementById("letter-width").value) ;
-		para.row_height = parseInt(document.getElementById("row-height").value) ;
-		para.gap_width = parseInt(document.getElementById("block-width").value) ;
-		para.numerical_width = parseInt(document.getElementById("num-width").value) ;
-
-		//	Check whether show numbers is checked
-		if(document.getElementsByName("show-num")[0].checked)
-		{
-			para.show_num = true ;
-		}
-		else
-		{
-			//	Reduce the left and right margins when numbers are 
-			// 	no needed at start and end of each row in svg
-			para.show_num = false ;
-			para.left_margin = 20;
-			para.right_margin = 20;
-		}
-		//	Check to show skipped lines 
-		if(document.getElementsByName("show-skipped-lines")[0].checked)
-		{
-			para.show_skipped_lines = true ;
-		}
-		else
-		{
-			para.show_skipped_lines = false ;
-		}
-		//	Redraw the svg with new dimension parameters
-		prsm = prsm_data.prsm ;
-		[para,id] = buildSvg(para,prsm,id);
-		//	Get the amount of skipped acid and write the amount 
-		//	of skipped acid at the start and end of the sequence 
-		skippedAcidNotification(para,prsm,id) ;
-		if(para.show_num)
-		{
-			// Get the numerical count at the start and end of 
-			// each row of sequence
-			getNumValues(para,prsm,id);
-		}
-		//	Determine the start and end position of the sequence
-		drawAnnoOfStartEndPosition(para,prsm,id) ;
-		//	Draw Annotations
-		annotations(para,prsm,id);
-		//	Get the position of the fixed ptms and color them to red
-		addColorToFixedPtms(para,prsm,id);
-		//	Color the background of occurence of mass shift
-		massShiftBackgroundColor(para,prsm,id);
-	});	
-}
-/**
- * Function to produce a pop up window to provide name and set name to 
- * the image while downloading the image of Graph SVG and Sequence SVG
- * @param {String} type - Provides if the image is downloaded as svg or png
- * @param {String} id - Provides the id of the svg to be downloaded
- * @param {Float} x - Provides coordinate on where to show a tooltip block to enter name of the image to be downloaded
- * @param {Float} y - Provides coordinate on where to show a tooltip block to enter name of the image to be downloaded
- */
-function popupnamewindow(type,id,x,y){
-	d3.selectAll("#tooltip_imagename").remove() ;
-	var div = d3.select("body").append("div")
-	.attr("class", "tooltip")
-	.attr("id","tooltip_imagename")
-	.style("opacity", 1);
-
-	// Provides a tooltip to enter a name for the image to be downloaded
-	div.transition()
-	.duration(200)
-	.style("opacity", .9);
-	div.html( 
-			'<input type="text" placeholder="Image Name" id="imagename" />'+
-			'<button id="saveimage" style = "none" type="button">save</button>'
-			)
-	.style("left", (x - 30) + "px")  // x Coordinate of the position of the tooltip           
-	.style("top", (y - 60) + "px")	// y Coordinate of the position of the tooltip 
-	.attr("box-sizing","border")
-	.attr("display","inline-block")
-	.attr("min-width","1.5em")
-	.attr("padding","2px")
-	.attr("margin-left","0px")
-	.attr("text-align","center")
-	.attr("text-decoration","none")
-	.attr("border","1px solid #111111")
-	.attr("background-color","white");
-	
-	// On click action to save the image on click of download button
-	$("#saveimage").click(function(){
-		let imagename = $("#imagename").val();
-		if( imagename == null || imagename == "")
-		{
-			imagename = "spectrum";
-		}
-		// Check if the image needs to be downloaded as svg
-		if(type == "svg"){
-			d3.selectAll("#tooltip_imagename").remove() ;
-			let svg_element = d3.selectAll("#"+id).node();
-			svg2svg(svg_element,imagename);
-		}
-		// Check if the image needs to be downloaded as png
-		if(type == "png"){
-			d3.selectAll("#tooltip_imagename").remove() ;
-			let l_svgContainer = d3.select("#"+id);
-			let svgString = getSVGString(l_svgContainer.node());
-			let specParams =  new SpectrumParameters();
-			let width = specParams.svgWidth;
-			let height = specParams.svgHeight ;
-			svgString2Image( svgString, 2*width, 2*height, 'png', save ); 
-			function save( dataBlob, filesize ){
-				saveAs( dataBlob, imagename ); 
-			}
-		}
-	})
-}

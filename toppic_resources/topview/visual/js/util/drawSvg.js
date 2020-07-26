@@ -338,7 +338,7 @@ function drawAnnotation(annotation,l_charge,id,coordinates,x,y)
 				.style("opacity", 0)
 				.attr("cursor", "pointer")
 				.on("click",function(){
-					if(id == "l_svg")
+					if(id == "prsm_svg")
 					{
 						input = annotation.ion_position;
 						showIonPeaks(input);

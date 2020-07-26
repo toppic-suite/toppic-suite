@@ -2,10 +2,10 @@
 *CSS to set the width of the Navigation bar
 */
 .navbar {
-	padding-top: 1rem !important;
-    padding-right: 1rem !important;
-    padding-bottom: 1rem !important;
-    padding-left: 1rem !important;
+  padding-top: 1rem !important;
+  padding-right: 1rem !important;
+  padding-bottom: 1rem !important;
+  padding-left: 1rem !important;
 }
 /**
 *Increasing the container width
@@ -31,13 +31,15 @@ mark{
 .navbar-right{
 	margin: 0px 0px 0px 430px;
 }
+
 .navtab{
     color: #fff !important;
     align-content: center !important;
     padding-top: 0.4rem;
 }
+
 #tooltip_imagename {
-    transform: translateX(-35%)!important;
-  }
+  transform: translateX(-35%)!important;
+}
 
 

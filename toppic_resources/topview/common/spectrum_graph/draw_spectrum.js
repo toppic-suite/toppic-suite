@@ -427,6 +427,7 @@ drawIons = function(svg,para,ionData){
   let ions = svg.append("g").attr("id", "graph_ions");
   // Get the default tick width and calculate the actual tick width position based on the current minMz value on the xaxis
   let tickWidth = para.getTickWidth();
+  console.log(ionData);
   ionData.forEach((element)=>{
     if(tickWidth <= para.tickWidthThreshhold)
     {
