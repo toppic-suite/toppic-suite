@@ -1,7 +1,7 @@
 /**
  * Code to set width of the monomass tables and sorting the table based on the first column
  */ 
- $(document).ready(function() {
+$(document).ready(function() {
   $('#spectrum').dataTable( {
     "scrollY":        "400px",
     "scrollCollapse": true,
@@ -17,13 +17,13 @@
 function showMatchedPeaks() {
   var elems = document.getElementsByClassName("matched_peak");
   for(var i = 0; elems.length > i; i++) {
-    elems[i].style.display = "";
+    elems[i].style.display = "inline";
   }
   elems = document.getElementsByClassName("unmatched_peak");
   for(var i = 0; elems.length > i; i++) {
     elems[i].style.display = "none";
   }
-  $('div.dataTables_scrollBody').height(400);
+  //$('div.dataTables_scrollBody').height(400);
 }
 
 /**
@@ -36,9 +36,9 @@ function showNotMatchedPeaks() {
   }
   elems = document.getElementsByClassName("unmatched_peak");
   for(var i = 0; elems.length > i; i++) {
-    elems[i].style.display = "";
+    elems[i].style.display = "inline";
   }
-  $('div.dataTables_scrollBody').height(400);
+  //$('div.dataTables_scrollBody').height(400);
 }
 
 /**
@@ -47,13 +47,13 @@ function showNotMatchedPeaks() {
 function showAllPeaks() {
   var elems = document.getElementsByClassName('matched_peak');
   for(var i = 0; elems.length > i; i++) {
-    elems[i].style.display = '';
+    elems[i].style.display = "inline";
   }
   elems = document.getElementsByClassName('unmatched_peak');
   for(var i = 0; elems.length > i; i++) {
-    elems[i].style.display = '';
+    elems[i].style.display = "inline";
   }
-  $('div.dataTables_scrollBody').height(400);
+  //$('div.dataTables_scrollBody').height(400);
 }
 /**
  * This gets invoked on click of annotation in the SVG of sequence at matched positions
@@ -61,18 +61,19 @@ function showAllPeaks() {
  * @param {String} ids - contains name of the tag
  */
 function showIonPeaks(ids) {
-	  var elems = document.getElementsByClassName('matched_peak');
-	  for(var i = 0; elems.length > i; i++) {
-	    elems[i].style.display = 'none';
-	  }
-	  elems = document.getElementsByClassName('unmatched_peak');
-	  for(var i = 0; elems.length > i; i++) {
-	    elems[i].style.display = 'none';
-	  }
+  console.log("show ion peaks");
+  var elems = document.getElementsByClassName('matched_peak');
+  for(var i = 0; elems.length > i; i++) {
+    elems[i].style.display = 'none';
+  }
+  elems = document.getElementsByClassName('unmatched_peak');
+  for(var i = 0; elems.length > i; i++) {
+    elems[i].style.display = 'none';
+  }
 
-	 elems = document.getElementsByName(ids);
-	    for(var j = 0; elems.length > j; j++) {
-	      elems[j].style.display  =  "";
-	      elems[j].style.background  =  "#BEECFF";
-	    }
+  elems = document.getElementsByName(ids);
+  for(var j = 0; elems.length > j; j++) {
+    elems[j].style.display  =  "";
+    elems[j].style.background  =  "#BEECFF";
+  }
 }
