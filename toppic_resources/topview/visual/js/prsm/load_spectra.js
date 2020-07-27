@@ -21,6 +21,7 @@ function loadMsOne(filename, ms1SvgId){
 
 function loadMsTwo(specIdList, fileList, divId, navId){
   let len = fileList.length;
+  let cnt = 0;
   let specList = [];
   let graphList = [];
   for (let i = 0; i < len; i++) {
@@ -30,25 +31,49 @@ function loadMsTwo(specIdList, fileList, divId, navId){
     document.head.appendChild(script);
     script.onload = function () {
       specList.push(ms2_data);
+      cnt = cnt+1;
       // As data loading is an asynchronous process, 
       // we need to wait till all the data is loaded to execute the below functions
-      if (i == len - 1) {
+      if (cnt == len) {
         document.getElementById("dataLoading").remove();
-        for (let i = 0; i < specList.length; i++) {
+        specList.sort(function(x,y){
+            return d3.ascending(x.scan, y.scan);
+        })
+        for (let j = 0; j < specList.length; j++) {
           //console.log(specList[i]);
-          let svgId = divId + "_graph_" + i;
-          createMs2NavElement(i, divId, navId, svgId, specList[i].scan);
-          createSvg(i, divId, svgId, "ms2_svg_graph_class");
-          let peaks = specList[i].peaks;
-          let envelopes = specList[i].envelopes;
+          let svgId = divId + "_graph_" + j;
+          createMs2NavElement(j, divId, navId, specList[j].scan);
+          createSvg(j, divId, svgId, "ms2_svg_graph_class");
+          let peaks = specList[j].peaks;
+          let envelopes = specList[j].envelopes;
           let ions = [];
           let spGraph = new SpectrumGraph(svgId,peaks,envelopes,ions);
           spGraph.redraw();
           graphList.push(spGraph);
         }
+        // add action for nav bar
+        $(".ms2_graph_list").click(function(){
+          let ms2Id = this.id;
+          //console.log("ms2id", ms2Id);
+          let ms2Split = ms2Id.split("_");
+          let ms2Index = parseInt(ms2Split[ms2Split.length-1]);
+          for (let i = 0; i < ms2GraphList.length; i++) {
+            let listId = "ms2_svg_div_list_" + i;
+            let graphId = "ms2_svg_div_graph_" + i;
+            //console.log(listId, graphId);
+            let listElement = document.getElementById(listId);
+            let graphElement = document.getElementById(graphId);
+            if (i== ms2Index) {
+              listElement.classList.add("active");
+              graphElement.style.display="inline";
+            }
+            else {
+              listElement.classList.remove("active");
+              graphElement.style.display="none";
+            }
+          }
+        })
       }
-      // Set on click actions once tabs to naviage between spectrums are created
-      //addGraphOnClickActions();
     }
   }
   return [specList, graphList];
@@ -59,7 +84,7 @@ function loadMsTwo(specIdList, fileList, divId, navId){
  * @param {Array} scanidList - Contains scan Id List
  * @param {String} id - Contains Id of the avg on which spectrum to be drawn
  */
-function createMs2NavElement(i, divId, navId, svgId, specScan){
+function createMs2NavElement(i, divId, navId, specScan){
   let _ul = document.getElementById(navId);
   let li = document.createElement("li");
   let li_id = divId+"_list_"+ i;
@@ -73,7 +98,6 @@ function createMs2NavElement(i, divId, navId, svgId, specScan){
   let a = document.createElement("a");
   a.setAttribute("class","nav-link");
   a.setAttribute("href","#!");
-  a.setAttribute("value", svgId);
   a.innerHTML = "Scan "+ specScan;
   li.appendChild(a);
   _ul.appendChild(li);
@@ -91,60 +115,12 @@ function createSvg(i, divId, svgId, className){
   svg.setAttribute("id",svgId);
   svg.setAttribute("class",className);
   svg.style.backgroundColor = "#F8F8F8"; 
-  if(i != 0)
-  {
+  if(i != 0) {
     svg.style.display = "none"; 
+  }
+  else {
+    svg.style.display = "inline"; 
   }
   div.appendChild(svg);
 }
 
-
-/**
- * Generating Jquery Onclick actions
- */
-/*
-function addMsTwoGraphOnClickActions(){
-  // On click of mono mass mz, zoom all the graph to the corresponding point
-  $(".fragMonoMz").click(function() {
-    let parent_id  = $(this).parent().parent().prop('id');
-    let CurrentScanVal = document.getElementById(parent_id).firstChild.innerHTML;
-    //	get Mono M/z value till 3 decimal values	
-    let peak_value = parseFloat(this.innerHTML).toFixed(3) ;
-    let [currentData,specId] = getCurrentData(ms2_ScansWithData,CurrentScanVal);
-    let id = "ms2svg_"+CurrentScanVal;
-    showCorrespondingGraph(id,".ms2_svg_graph_class");
-    generateCorrespondingGraph(currentData,id,peak_value,specId);
-    id = "monoMassSvg_"+CurrentScanVal;
-    showCorrespondingGraph(id,".monoMass_svg_graph_class");
-    [currentData,specId] = getCurrentData(monoMassDataList,CurrentScanVal);
-    let CurrentMonoMassVal = $("#"+parent_id+" .row_monoMass").html();
-    generateCorrespondingGraph(currentData,id,parseFloat(CurrentMonoMassVal),specId);
-    activateCurrentnavbar("ms2_graph_nav",CurrentScanVal);
-    activateCurrentnavbar("monoMass_nav",CurrentScanVal);
-
-    showSpectrun();
-  });
-  // ms2_scanIds is the Id of the nav tabs for multiple navs.
-  // On Click shows corresponding graph by hiding others.
-  $(".ms2_scanIds").click(function(){
-    let value = this.getAttribute('value');
-    let [currentData,specId] = getCurrentData(ms2_ScansWithData,value);
-    id = "ms2svg_"+value;
-    // Hide all the graphs except the one clicked
-    showCorrespondingGraph(id,".ms2_svg_graph_class");
-    $("#ms2_graph_nav .active").removeClass("active");
-    $(this).addClass("active");
-  })
-    
-  // Hide all othe graphs of monomass spectrum other than the one clicked
-  $(".monoMass_scanIds").click(function(){
-    let value = this.getAttribute('value');
-    let [currentData,specId] = getCurrentData(monoMassDataList,value);
-    id = "monoMassSvg_"+value;
-    // Hide all the graphs except the one clicked
-    showCorrespondingGraph(id,".monoMass_svg_graph_class");
-    $("#monoMass_nav .active").removeClass("active");
-    $(this).addClass("active");
-  })
-}
-*/
