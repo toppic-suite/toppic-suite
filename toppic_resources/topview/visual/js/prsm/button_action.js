@@ -161,7 +161,7 @@ function addButtonActions() {
     let ms2Id = $('.ms2_graph_list.active')[0].id;
     let ms2Split = ms2Id.split("_");
     let ms2Index = parseInt(ms2Split[ms2Split.length-1]);
-    console.log(ms2Index);
+    //console.log(ms2Index);
     let svgId = "popup_ms2_svg";
     let peaks = ms2SpecList[ms2Index].peaks;
     let envelopes = ms2SpecList[ms2Index].envelopes;
@@ -211,20 +211,25 @@ function addButtonActions() {
     let scanNum = document.getElementById(parentId).firstChild.innerHTML;
     /*	get Mono M/z value till 3 decimal values	*/
     let monoMz = parseFloat(this.innerHTML).toFixed(3) ;
-    let index = 0;
     for (let i = 0; i < ms2SpecList.length; i++) {
+      let listId = "ms2_svg_div_list_" + i;
+      let graphId = "ms2_svg_div_graph_" + i;
+      let listElement = document.getElementById(listId);
+      let graphElement = document.getElementById(graphId);
       if (scanNum == ms2SpecList[i].scan) {
-        index = i; 
-        //console.log("match index", i);
-        break;
+        listElement.classList.add("active");
+        graphElement.style.display="inline";
+        let spGraph = ms2GraphList[i]; 
+        // set monoMz to do
+        spGraph.para.updateMzRange(monoMz);
+        spGraph.redraw();
+      }
+      else {
+        listElement.classList.remove("active");
+        graphElement.style.display="none";
       }
     }
     showMs2Graph();
-    activateCurrentNavbar("ms2_graph_nav", index);
-    let spGraph = ms2GraphList[index]; 
-    // set monoMz to do
-    spGraph.para.updateMzRange(monoMz);
-    spGraph.redraw();
   });
 }
 /**
@@ -314,23 +319,3 @@ function popupNameWindow(type,id,x,y){
 	})
 }
 
-/**
- * Function highlights the active spectrum on clcik of the scan number
- * @param {String} id - Contains id of the SVG tag  
- * @param {int} currentValue - Contains scan number
- * To modify
- */
-function activateCurrentNavbar(id, value){
-  let childs = $("#"+id).children();
-  let len = childs.length;
-  /*
-  for(let i=0;i<len;i++) {
-    let grandchildValue = $(childs[i]).children().attr('value');
-    if(grandchildValue == currentValue) {
-      $("#"+id+" .active").removeClass("active");
-      $(childs[i]).children().addClass("active");
-      break;
-    }
-  }
-  */
-}

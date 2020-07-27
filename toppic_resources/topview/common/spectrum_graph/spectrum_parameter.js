@@ -25,8 +25,8 @@ class SpectrumParameters {
 
   // M/z range, color of highlighted part.
   showHighlight = false;
-  hlMinMz = 600;
-  hlMaxMz = 700;
+  hlMinMz = 0;
+  hlMaxMz = 0;
   hlColor = "orange";
 
   // Max intensity of visuable window
@@ -54,7 +54,7 @@ class SpectrumParameters {
 
   //Limiting the peaks and envelopes to 4000 using 20 bins
   binNum = 20;
-  peakNumPerBin = 200;
+  peakNumPerBin = 50;
   //Padding for mouse over peak floatings.
   mouseOverPadding = {head:20,middle:14};
 
