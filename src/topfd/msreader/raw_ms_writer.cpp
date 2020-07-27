@@ -38,8 +38,10 @@ void write(std::string &file_name, RawMsPtr ms_ptr, MatchEnvPtrVec &envs) {
 
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
   int ms_level = header_ptr->getMsLevel();
+  int scan_id = header_ptr->getId();
   int scan_num = header_ptr->getFirstScanNum();
   double retention_time = header_ptr->getRetentionTime();
+  doc.AddMember("id", scan_id, allocator);
   doc.AddMember("scan", scan_num, allocator);
   doc.AddMember("retention_time", retention_time, allocator);
   
