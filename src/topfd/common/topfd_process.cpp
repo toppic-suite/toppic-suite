@@ -31,14 +31,14 @@ namespace topfd_process {
 
 void processOneFile(TopfdParaPtr para_ptr,  
                     const std::string &spec_file_name, 
-                   int frac_id) {
+                    int frac_id) {
   try {
     int thread_number = para_ptr->thread_number_;
 
     std::cout << "Processing " << spec_file_name << " started." << std::endl;
     std::cout << "Deconvolution started." << std::endl;
 
-    DeconvProcess processor(para_ptr, spec_file_name, frac_id, thread_number, &processor);
+    DeconvProcess processor(para_ptr, spec_file_name, frac_id, thread_number);
     
     processor.process();
     std::cout << "Deconvolution finished." << std::endl;

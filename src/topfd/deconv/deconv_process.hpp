@@ -31,7 +31,7 @@ class DeconvProcess {
   DeconvProcess(){};
   DeconvProcess(TopfdParaPtr topfd_para_ptr, 
                 const std::string &spec_file_name, 
-                int frac_id, int thread_num, DeconvProcess *deconv_ptr);
+                int frac_id, int thread_num);
 
   void prepareFileFolder();
 
@@ -44,26 +44,38 @@ class DeconvProcess {
   EnvParaPtr getEnvParaPtr(){
       return env_para_ptr_;
   }
-  void deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, MatchEnvPtrVec prec_envs, MsAlignWriterPtrVec ms1_writer_ptr_vec, SimpleThreadPoolPtr pool_ptr); 
 
-  void deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, MsAlignWriterPtrVec ms2_writer_ptr_vec, SimpleThreadPoolPtr pool_ptr); 
+  /*
+  void deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
+                   MatchEnvPtrVec prec_envs, MsAlignWriterPtrVec ms1_writer_ptr_vec, 
+                   SimpleThreadPoolPtr pool_ptr); 
+
+  void deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
+                   MsAlignWriterPtrVec ms2_writer_ptr_vec, 
+                   SimpleThreadPoolPtr pool_ptr); 
                    
-  void deconvMissingMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, MsAlignWriterPtrVec ms_writer_ptr_vec, SimpleThreadPoolPtr pool_ptr);            
-
-  std::string updateMsg(MsHeaderPtr header_ptr, int scan, int total_scan_num);
+  void deconvMissingMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
+                          MsAlignWriterPtrVec ms_writer_ptr_vec, 
+                          SimpleThreadPoolPtr pool_ptr);            
 
   void mergeMsFiles(std::string filePrefix, int thread_num, int spec_num);
 
   void readMsFile(std::string fileName, std::vector<std::string> *spec_data_array);
-  
+
   void mergeSort(std::vector<std::string> *spec_data_array, int start, int end);
 
   void mergeSortedVec(std::vector<std::string> *spec_data_array, int start, int middle, int end);
  
-  void writeMsalign(std::string resultFileName, std::vector<std::string> *spec_data_array, int total_scan_num);
+  void writeMsalign(std::string resultFileName, std::vector<std::string> *spec_data_array, 
+                    int total_scan_num);
+  */
 
-  int ms1_spec_num = 0;
-  int ms2_spec_num = 0;
+  std::string updateMsg(MsHeaderPtr header_ptr, int scan, int total_scan_num);
+
+  
+
+  static int ms1_spec_num_;
+  static int ms2_spec_num_;
 
  private:
 
@@ -71,19 +83,21 @@ class DeconvProcess {
   DpParaPtr dp_para_ptr_;
   TopfdParaPtr topfd_para_ptr_;
   
-  DeconvProcess *deconv_process_ptr_;
+  //DeconvProcess *deconv_process_ptr_;
   //std::string argu_str_;
 
   std::string spec_file_name_;
   int frac_id_;
   int thread_num_;
 
-  std::string base_name_;
-  std::string ms1_env_name_;
-  std::string ms2_env_name_;
+  //std::string base_name_;
+  //std::string ms1_env_name_;
+  //std::string ms2_env_name_;
   std::string html_dir_;
   std::string ms1_json_dir_;
   std::string ms2_json_dir_; 
 };
+
 }
+
 #endif
