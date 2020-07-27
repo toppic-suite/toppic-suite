@@ -61,7 +61,6 @@ function showAllPeaks() {
  * @param {String} ids - contains name of the tag
  */
 function showIonPeaks(ids) {
-  console.log("show ion peaks");
   var elems = document.getElementsByClassName('matched_peak');
   for(var i = 0; elems.length > i; i++) {
     elems[i].style.display = 'none';
