@@ -57,24 +57,6 @@ DeconvProcess::DeconvProcess(TopfdParaPtr topfd_para_ptr,
   prepareFileFolder();
 }
 
-/*
-void DeconvProcess::writeMsalign(std::string result_file_name, 
-                                 std::vector<std::string> *spec_data_array, int spec_num){
-  std::ofstream msalign(result_file_name);
-  std::string para_str = topfd_para_ptr_-> getParaStr("#");
-
-  msalign << para_str << "\n"; 
-
-  for (int i = 0; i < spec_num; i++){
-    for (size_t t = 0; t < spec_data_array[i].size(); t++){
-      msalign << spec_data_array[i][t] << "\n"; 
-    }
-    msalign << "\n";
-  }
-  msalign.close();
-}
-*/
-
 std::string DeconvProcess::updateMsg(MsHeaderPtr header_ptr, int scan, 
                                      int total_scan_num) {
 
