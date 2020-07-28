@@ -65,7 +65,7 @@ function generateCorrespondingGraph(current_data,id,prec_mz,specId){
         massShift_in = calculatePrefixAndSuffixMassObj.getIonTypeMass("Y");
         let suffixMassList = calculatePrefixAndSuffixMassObj.getSuffixMassList(seq,massShiftList,massShift_in);
         // Setting the graphFeatures object with all the features needed for the graph
-        graphFeatures.showSequene = true;
+        graphFeatures.showSequence = true;
         graphFeatures.addErrorPlot = true;
         graphFeatures.prefixSequenceData = prefixMassList;
         graphFeatures.suffixSequeceData = suffixMassList;
