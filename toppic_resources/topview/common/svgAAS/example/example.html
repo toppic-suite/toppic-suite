@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+            <title>Draw Amino Acid Squence</title>
+
+            <script src="../../../node_modules/jquery/dist/jquery.js"></script>
+            <script src="../../../node_modules/d3/dist/d3.js"></script>
+
+            <script src="../coordinates_util.js"></script>
+            <script src="../prsm_data_util.js"></script>
+            <script src="../draw_svg.js"></script>
+            <script src="../svgAAS.js"></script>
+
+
+            <script type="text/javascript" src="./prsm96.js"></script>
+            <!-- <script type="text/javascript" src="js/prsm/prsm.js"></script> -->
+
+            
+            <script>
+                $(document).ready(function(){
+                    svgAAS(prsm_data, "l_svg");
+                })
+                
+            </script>
+
+            
+    </head>
+
+    <body>
+        <svg id = "l_svg" ></svg>
+    </body>
+</html>
