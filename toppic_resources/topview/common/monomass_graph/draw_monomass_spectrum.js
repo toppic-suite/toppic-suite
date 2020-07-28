@@ -28,6 +28,7 @@ function getMonoMassDataList(specidList,scanIdList){ //drawMonoMassSpectrum
         }
     })
     // document.getElementById("monoMassDataLoading").remove();
+    // console.log("dataWithScanIdList:", dataWithScanIdList);
     createMultipleSvgs("monomass_div","monoMassSvg_","monoMass_svg_graph_class",dataWithScanIdList);
     monoMassDataList = [...dataWithScanIdList];
     return monoMassDataList;

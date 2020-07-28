@@ -35,7 +35,7 @@ function generateMonoMassGraph(monoMassList,prec_mz){
         return tempElement;
     });
     let graphFeatures = new GraphFeatures();
-    graphFeatures.showSequene = true;
+    graphFeatures.showSequence = true;
     let prefixSequenceData = [];
     let suffixSequeceData = [];
     completeCalData.prefixmasslist.forEach((eachElem,index)=>{

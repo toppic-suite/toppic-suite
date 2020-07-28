@@ -1,32 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <title>JSDoc: Source: spectrumparameters.js</title>
-
-    <script src="scripts/prettify/prettify.js"> </script>
-    <script src="scripts/prettify/lang-css.js"> </script>
-    <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
-    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
-</head>
-
-<body>
-
-<div id="main">
-
-    <h1 class="page-title">Source: spectrumparameters.js</h1>
-
-    
-
-
-
-    
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>/**	@function SpectrumParameters
+/**	@function SpectrumParameters
  * @description Get data from global variable spectrum_data and utilities to manupulate
  * the data
  */
@@ -95,7 +67,7 @@ SpectrumParameters = function() {
     this.dataMaxMz = maxMzData + (0.10 * maxMzData);
     this.minMz = currminMz;
     this.maxMz = currmaxMz;
-    if(currminMz == minMzData &amp;&amp; currmaxMz == maxMzData)
+    if(currminMz == minMzData && currmaxMz == maxMzData)
     {
       this.minMz = 0;
       this.maxMz = this.maxMz + (0.10*this.maxMz);
@@ -157,7 +129,7 @@ SpectrumParameters = function() {
    */
   this.getCircleSize = function() {
     radius = this.mzRadius * this.xScale;
-    if (radius &lt; this.minRadius) {
+    if (radius < this.minRadius) {
       radius = this.minRadius;
     }
     if (radius > this.maxRadius) {
@@ -172,9 +144,9 @@ SpectrumParameters = function() {
   this.getTickWidth = function(){
     let tempDiff = this.maxMz - this.minMz;
     let tickWidth = parseInt(this.tickWidthList[0]) ;
-    for(let i = 0; i &lt; this.tickWidthList.length; i++)
+    for(let i = 0; i < this.tickWidthList.length; i++)
     {
-      if(tempDiff/this.xTicks &lt;= parseFloat(this.tickWidthList[i]) &amp;&amp; tempDiff/this.xTicks > parseFloat(this.tickWidthList[i+1]))
+      if(tempDiff/this.xTicks <= parseFloat(this.tickWidthList[i]) && tempDiff/this.xTicks > parseFloat(this.tickWidthList[i+1]))
       {
         tickWidth = parseFloat(this.tickWidthList[i]);
         break ;
@@ -189,9 +161,9 @@ SpectrumParameters = function() {
   this.getTickHeight = function(){
     let tickheight = parseInt(this.tickHeightList[0]) ;
     let maxIntPercent = this.maxInte/this.dataMaxInte * 100;
-		for(let i = 0; i &lt; this.tickHeightList.length; i++)
+		for(let i = 0; i < this.tickHeightList.length; i++)
 		{
-			if(maxIntPercent/this.yTicks &lt;= parseFloat(this.tickHeightList[i]) &amp;&amp; maxIntPercent/this.yTicks > parseFloat(this.tickHeightList[i+1]))
+			if(maxIntPercent/this.yTicks <= parseFloat(this.tickHeightList[i]) && maxIntPercent/this.yTicks > parseFloat(this.tickHeightList[i+1]))
 			{
 				tickheight = parseFloat(this.tickHeightList[i]);
 				break ;
@@ -205,7 +177,7 @@ SpectrumParameters = function() {
    * Function also calls setLimita which helps in drawing limited number of peaks and circles per eachbin/range of mz values.
    */
   this.xZoom = function (mouseSvgX, ratio) {
-   if ((ratio > 1.0) || ((this.maxMz - this.minMz) &lt; this.dataMaxMz) ) {
+   if ((ratio > 1.0) || ((this.maxMz - this.minMz) < this.dataMaxMz) ) {
       let mouseSpecX = mouseSvgX - this.padding.left;
       this.centerMz =  mouseSpecX/this.xScale + this.minMz;
       /*self is a global variable of datasource object containing all the data needed to use when zoomed*/
@@ -222,8 +194,8 @@ SpectrumParameters = function() {
   this.yZoom = function (ratio) {
     //Reducing zoom factor to smoothenup and remove gliches
     if(ratio > 1 ) ratio = 1.4;
-    else if(ratio &lt; 1) ratio = 0.9;
-    if ((ratio > 1.0 &amp;&amp; this.maxInte >= this.dataMinInte ) || (ratio &lt; 1.0 &amp;&amp; this.maxInte &lt;= this.dataMaxInte)) {
+    else if(ratio < 1) ratio = 0.9;
+    if ((ratio > 1.0 && this.maxInte >= this.dataMinInte ) || (ratio < 1.0 && this.maxInte <= this.dataMaxInte)) {
       this.yScale = this.yScale * ratio;
       this.maxInte = this.specHeight / this.yScale;
     }
@@ -236,7 +208,7 @@ SpectrumParameters = function() {
    */
   this.zoom = function(mouseSvgX, mouseSvgY, ratio) {
     if(ratio > 1 ) ratio = 1.4; // Zooming in and fixing ration to 1.4 (fixed values based on testing the smooting of zoom)
-    else if(ratio &lt; 1) ratio = 0.9; // Zooming out and fixing ration to 0.9 (fixed values based on testing the smooting of zoom)
+    else if(ratio < 1) ratio = 0.9; // Zooming out and fixing ration to 0.9 (fixed values based on testing the smooting of zoom)
     if (mouseSvgY > this.svgHeight - this.padding.bottom) {
       this.xZoom(mouseSvgX, ratio);
     }
@@ -266,7 +238,7 @@ SpectrumParameters = function() {
   this.setLimits = function(){
     let avg = (this.maxMz - this.minMz)/this.limits.length ;
     avg = avg + (this.bufferPercent*avg);
-    for(let i=0; i&lt;this.ranges.length;i++)
+    for(let i=0; i<this.ranges.length;i++)
     {
       this.ranges[i] = this.minMz + (i*avg) ;
     }
@@ -282,10 +254,10 @@ SpectrumParameters = function() {
     let tempRanges = this.ranges ;
     let avg = (this.maxMz - this.minMz)/this.limits.length ;
     avg = avg + (avg*this.bufferPercent);
-    if(mzDist &lt; 0)
+    if(mzDist < 0)
     {
-      if(tempRanges[0] &lt; (this.minMz-avg)) tempRanges.shift();
-      if(tempRanges[(tempRanges.length-1)] &lt; (this.maxMz))
+      if(tempRanges[0] < (this.minMz-avg)) tempRanges.shift();
+      if(tempRanges[(tempRanges.length-1)] < (this.maxMz))
       {
         let tempVal = tempRanges[(tempRanges.length-1)]+avg;
         tempRanges.push(tempVal);
@@ -302,26 +274,4 @@ SpectrumParameters = function() {
     }
     this.ranges = tempRanges;
   }
-}</code></pre>
-        </article>
-    </section>
-
-
-
-
-</div>
-
-<nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="GraphFeatures.html">GraphFeatures</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addBackGround">addBackGround</a></li><li><a href="global.html#addCircles">addCircles</a></li><li><a href="global.html#addDatatoAxis">addDatatoAxis</a></li><li><a href="global.html#addErrorBlock">addErrorBlock</a></li><li><a href="global.html#addErrorPlot">addErrorPlot</a></li><li><a href="global.html#addLabels">addLabels</a></li><li><a href="global.html#addSpectrum">addSpectrum</a></li><li><a href="global.html#circlesPerRange">circlesPerRange</a></li><li><a href="global.html#compSpectrumParameters">compSpectrumParameters</a></li><li><a href="global.html#drag">drag</a></li><li><a href="global.html#drawAxis">drawAxis</a></li><li><a href="global.html#drawErrorPoints">drawErrorPoints</a></li><li><a href="global.html#drawErrorYticks">drawErrorYticks</a></li><li><a href="global.html#drawIons">drawIons</a></li><li><a href="global.html#drawPeaks">drawPeaks</a></li><li><a href="global.html#drawSequence">drawSequence</a></li><li><a href="global.html#drawSpectrum">drawSpectrum</a></li><li><a href="global.html#drawTicks">drawTicks</a></li><li><a href="global.html#getCircleSize">getCircleSize</a></li><li><a href="global.html#getErrorYPos">getErrorYPos</a></li><li><a href="global.html#getPeakXPos">getPeakXPos</a></li><li><a href="global.html#getPeakYPos">getPeakYPos</a></li><li><a href="global.html#getTickHeight">getTickHeight</a></li><li><a href="global.html#getTickWidth">getTickWidth</a></li><li><a href="global.html#groupBy">groupBy</a></li><li><a href="global.html#initScale">initScale</a></li><li><a href="global.html#onCircleMouseOut">onCircleMouseOut</a></li><li><a href="global.html#onDragLimits">onDragLimits</a></li><li><a href="global.html#onMouseOut">onMouseOut</a></li><li><a href="global.html#onMouseOverCircle">onMouseOverCircle</a></li><li><a href="global.html#onMouseOverPeak">onMouseOverPeak</a></li><li><a href="global.html#onPeakMouseOut">onPeakMouseOut</a></li><li><a href="global.html#setLimits">setLimits</a></li><li><a href="global.html#sortEnvelopes">sortEnvelopes</a></li><li><a href="global.html#SpectrumGraph">SpectrumGraph</a></li><li><a href="global.html#SpectrumParameters">SpectrumParameters</a></li><li><a href="global.html#xZoom">xZoom</a></li><li><a href="global.html#yZoom">yZoom</a></li><li><a href="global.html#zoom">zoom</a></li></ul>
-</nav>
-
-<br class="clear">
-
-<footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Fri May 29 2020 03:46:27 GMT-0400 (Eastern Daylight Time)
-</footer>
-
-<script> prettyPrint(); </script>
-<script src="scripts/linenumber.js"> </script>
-</body>
-</html>
+}

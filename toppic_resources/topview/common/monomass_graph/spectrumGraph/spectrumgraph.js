@@ -1,32 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <title>JSDoc: Source: spectrumgraph.js</title>
-
-    <script src="scripts/prettify/prettify.js"> </script>
-    <script src="scripts/prettify/lang-css.js"> </script>
-    <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
-    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
-</head>
-
-<body>
-
-<div id="main">
-
-    <h1 class="page-title">Source: spectrumgraph.js</h1>
-
-    
-
-
-
-    
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>/** maximum number of peaks and envelopes points to be renderedon to graph per each bin(range) */
+/** maximum number of peaks and envelopes points to be renderedon to graph per each bin(range) */
 const circlesPerRange = 200; 
 const peaksPerRange = 200;
 /**
@@ -99,11 +71,11 @@ SpectrumGraph = function(svgId,spectrumParameters,peakData, ionData){
 drawTicks = function(svg,spectrumParameters){
 	// Creating a group under svg node with id 'ticks' under which ticks are drawn 
 	this.addXTicks = svg.append("g").attr("id","ticks");
-	for(let i=0; i &lt;= spectrumParameters.xTicks ; i++)
+	for(let i=0; i <= spectrumParameters.xTicks ; i++)
 	{
 		// Get the default tick width and calculate the actual tick width position based on the current minMz value on the xaxis
 		let tickWidth = spectrumParameters.getTickWidth();
-		if(tickWidth &lt; 1 &amp;&amp; tickWidth != 0)
+		if(tickWidth < 1 && tickWidth != 0)
 		{
 			tickWidth = (i*tickWidth + spectrumParameters.minMz) - parseFloat((i*tickWidth + spectrumParameters.minMz)%tickWidth) ;
 		}
@@ -114,8 +86,8 @@ drawTicks = function(svg,spectrumParameters){
 		// get the x position of the tick 
 		x = spectrumParameters.getPeakXPos(tickWidth);
 		// Below condition helps the ticks to be to the right of the y - axis 
-		if(x >= spectrumParameters.padding.left &amp;&amp; 
-				x &lt;= (spectrumParameters.svgWidth - spectrumParameters.padding.right))
+		if(x >= spectrumParameters.padding.left && 
+				x <= (spectrumParameters.svgWidth - spectrumParameters.padding.right))
 		{
 			this.addXTicks.append("line")
 							.attr("x1",x)
@@ -128,14 +100,14 @@ drawTicks = function(svg,spectrumParameters){
 	}
 	this.addYTicks = svg.append("g").attr("id","ticks")
 									.attr("class","ticks");
-	for(let i=0; i &lt;= spectrumParameters.yTicks ; i++)
+	for(let i=0; i <= spectrumParameters.yTicks ; i++)
 	{
 		// Get the default tick height and calculate the actual tick height position
 		let tickHeight = spectrumParameters.getTickHeight();
 		tickHeight = i*tickHeight * spectrumParameters.dataMaxInte /100;
 		tickHeight = parseFloat(spectrumParameters.getPeakYPos(tickHeight)) ;
 		let y =  tickHeight;
-		if(!isNaN(y) &amp;&amp; y >= spectrumParameters.padding.head)//y >= spectrumParameters.padding.head helps the ticks to be in the length of Y axis
+		if(!isNaN(y) && y >= spectrumParameters.padding.head)//y >= spectrumParameters.padding.head helps the ticks to be in the length of Y axis
 		{
 			this.addYTicks.append("line")
 						.attr("x1",spectrumParameters.padding.left)
@@ -184,11 +156,11 @@ addDatatoAxis = function(svg,spectrumParameters){
 	this.xAxisData = svg.append("g")
 						.attr("id", "xAxisPoints");
 						
-	for(let i = 0 ; i &lt;=spectrumParameters.xTicks ; i++)
+	for(let i = 0 ; i <=spectrumParameters.xTicks ; i++)
 	{
 		// Get the default tick width and calculate the actual tick width position based on the current minMz value on the xaxis
 		let tickWidth = spectrumParameters.getTickWidth();
-		if(tickWidth &lt; 1 &amp;&amp; tickWidth != 0)
+		if(tickWidth < 1 && tickWidth != 0)
 		{
 			tickWidth = i*tickWidth + spectrumParameters.minMz - parseFloat((i*tickWidth + spectrumParameters.minMz)%tickWidth) ;
 		}
@@ -198,21 +170,21 @@ addDatatoAxis = function(svg,spectrumParameters){
 		}
 		x = spectrumParameters.getPeakXPos(tickWidth);
 		let l_tickWidth = tickWidth;
-		if(x >= spectrumParameters.padding.left &amp;&amp; 
-				x &lt;= (spectrumParameters.svgWidth - spectrumParameters.padding.right))
+		if(x >= spectrumParameters.padding.left && 
+				x <= (spectrumParameters.svgWidth - spectrumParameters.padding.right))
 		{
 			this.xAxisData.append("text").attr("id","xtext").attr("x",x)
 						.attr("y",(spectrumParameters.graphFeatures.svgHeight - spectrumParameters.graphFeatures.padding.bottom + 20))// Dividing with 1.6 to set the position of the numbers under the ticks appropriately
 						.attr("text-anchor","middle")
 						.text(function(){
 							// conditions to show more decimal values as we zoom in further and limit decimals when zoomed back
-							if(maxMz - minMz &lt;=0.0001) return parseFloat(l_tickWidth).toFixed(6);
-							else if(maxMz - minMz &lt;=0.001) return parseFloat(l_tickWidth).toFixed(5);
-							else if(maxMz - minMz &lt;=0.01) return parseFloat(l_tickWidth).toFixed(4);
-							else if(maxMz - minMz &lt;=0.1) return parseFloat(l_tickWidth).toFixed(3);
-							else if(maxMz - minMz &lt;=1) return parseFloat(l_tickWidth).toFixed(2);
-							else if(maxMz - minMz &lt;= 3) return parseFloat(l_tickWidth).toFixed(2)
-							else if(maxMz - minMz &lt;= 5) return parseFloat(l_tickWidth).toFixed(1)
+							if(maxMz - minMz <=0.0001) return parseFloat(l_tickWidth).toFixed(6);
+							else if(maxMz - minMz <=0.001) return parseFloat(l_tickWidth).toFixed(5);
+							else if(maxMz - minMz <=0.01) return parseFloat(l_tickWidth).toFixed(4);
+							else if(maxMz - minMz <=0.1) return parseFloat(l_tickWidth).toFixed(3);
+							else if(maxMz - minMz <=1) return parseFloat(l_tickWidth).toFixed(2);
+							else if(maxMz - minMz <= 3) return parseFloat(l_tickWidth).toFixed(2)
+							else if(maxMz - minMz <= 5) return parseFloat(l_tickWidth).toFixed(1)
 							return parseInt(l_tickWidth)
 						})
 						.style("font-size","14px")
@@ -221,18 +193,18 @@ addDatatoAxis = function(svg,spectrumParameters){
 	// Creating a group wih id 'axisPoints' under which the code to add tick numbers is added  
 	this.yAxisData = svg.append("g")
 							.attr("id", "yAxisPoints");
-	for(let i = 0 ; i &lt;= spectrumParameters.yTicks ; i++)
+	for(let i = 0 ; i <= spectrumParameters.yTicks ; i++)
 	{
 		let tickHeight = 0;
 		// Get the default tick height and calculate the actual tick height position
 		tickHeight = spectrumParameters.getTickHeight();
 		let data = i*tickHeight ;
-		if(data &lt;= 1 &amp;&amp; data != 0) data = data.toFixed(1);
+		if(data <= 1 && data != 0) data = data.toFixed(1);
 		tickHeight = i*tickHeight * spectrumParameters.dataMaxInte /100;
 		tickHeight = parseFloat(spectrumParameters.getPeakYPos(tickHeight)) ;
 
 		let y =  tickHeight;
-		if(!isNaN(y) &amp;&amp; y >= spectrumParameters.padding.head)
+		if(!isNaN(y) && y >= spectrumParameters.padding.head)
 		{
 			this.yAxisData.append("text").attr("class","ytext").attr("x",spectrumParameters.padding.left - spectrumParameters.ticklength)
 						.attr("y",y)
@@ -253,12 +225,12 @@ addBackGround = function(svg,spectrumParameters){
 	let svg_temp = svg.append("g")
 					.attr("id", "svg_bgColor");
 
-	if(!((spectrumParameters.graphFeatures.bgMinMz &lt; spectrumParameters.minMz &amp;&amp; spectrumParameters.graphFeatures.bgMaxMz &lt; spectrumParameters.minMz) 
-		|| (spectrumParameters.graphFeatures.bgMinMz > spectrumParameters.maxMz &amp;&amp; spectrumParameters.graphFeatures.bgMaxMz > spectrumParameters.maxMz)))
+	if(!((spectrumParameters.graphFeatures.bgMinMz < spectrumParameters.minMz && spectrumParameters.graphFeatures.bgMaxMz < spectrumParameters.minMz) 
+		|| (spectrumParameters.graphFeatures.bgMinMz > spectrumParameters.maxMz && spectrumParameters.graphFeatures.bgMaxMz > spectrumParameters.maxMz)))
 	{
 		let x = spectrumParameters.getPeakXPos(spectrumParameters.graphFeatures.bgMinMz);
 		let x2 = spectrumParameters.getPeakXPos(spectrumParameters.graphFeatures.bgMaxMz);
-		if(spectrumParameters.graphFeatures.bgMinMz &lt; spectrumParameters.minMz)
+		if(spectrumParameters.graphFeatures.bgMinMz < spectrumParameters.minMz)
 		{
 			x = spectrumParameters.getPeakXPos(spectrumParameters.minMz);
 		}
@@ -294,20 +266,20 @@ drawPeaks = function(svg,spectrumParameters,peakdata){
 	  // limits provide current count of number of peaks drawn on graph per bin(range) 
 	  // so that we can limit tha peak count to peaksPerRange count
 	  let limits=[0,0,0,0,0,0,0,0];
-	  for(let i =0;i&lt;len;i++)
+	  for(let i =0;i<len;i++)
 	  {
 		let peak = peakdata.peak_list[i];
 		let inLimit = false;
-		for(let j=0;j&lt;(spectrumParameters.ranges.length-1);j++)
+		for(let j=0;j<(spectrumParameters.ranges.length-1);j++)
 		{
-			if(peak.mz > spectrumParameters.ranges[j] &amp;&amp; peak.mz &lt; spectrumParameters.ranges[j+1])
+			if(peak.mz > spectrumParameters.ranges[j] && peak.mz < spectrumParameters.ranges[j+1])
 			{
 				limits[j] = limits[j]+1;
-				if(limits[j] &lt;= peaksPerRange) inLimit = true;
+				if(limits[j] <= peaksPerRange) inLimit = true;
 				break;
 			}
 		}
-		if(peak.mz >= spectrumParameters.minMz &amp;&amp; peak.mz &lt;= spectrumParameters.maxMz &amp;&amp; inLimit == true)
+		if(peak.mz >= spectrumParameters.minMz && peak.mz <= spectrumParameters.maxMz && inLimit == true)
 		{
 			peaks.append("line")
 		  .attr("x1",function(d,i){
@@ -315,7 +287,7 @@ drawPeaks = function(svg,spectrumParameters,peakdata){
 			  })
 		  .attr("y1",function(d,i){
 				let y = spectrumParameters.getPeakYPos(peak.intensity);
-				if(y&lt;=spectrumParameters.padding.head) return spectrumParameters.padding.head ;
+				if(y<=spectrumParameters.padding.head) return spectrumParameters.padding.head ;
 				else return y ;
 			  })
 		  .attr("x2",function(d,i){
@@ -352,17 +324,17 @@ addCircles = function(svg,spectrumParameters,peakData){
 			//Show only envelopes with minimum of 0.5% 
 			let percentInte = env_peaks.intensity/maxIntensity * 100 ;
 			let inLimit = false;
-			for(let i=0;i&lt;(spectrumParameters.ranges.length-1);i++)
+			for(let i=0;i<(spectrumParameters.ranges.length-1);i++)
 			{
-				if(env_peaks.mz > spectrumParameters.ranges[i] &amp;&amp; env_peaks.mz &lt; spectrumParameters.ranges[i+1])
+				if(env_peaks.mz > spectrumParameters.ranges[i] && env_peaks.mz < spectrumParameters.ranges[i+1])
 				{
 					limits[i] = limits[i]+1;
-					if(limits[i] &lt;= circlesPerRange) inLimit = true;
+					if(limits[i] <= circlesPerRange) inLimit = true;
 					break;
 				}
 			}
 			// Condition keeps the circles to the right of the y axis till the end of the x-axis
-			if(env_peaks.mz > spectrumParameters.minMz &amp;&amp; env_peaks.mz &lt;= spectrumParameters.maxMz &amp;&amp; percentInte >= minPercentage &amp;&amp; inLimit == true)
+			if(env_peaks.mz > spectrumParameters.minMz && env_peaks.mz <= spectrumParameters.maxMz && percentInte >= minPercentage && inLimit == true)
 			{
 				circles.append("circle")
 				.attr("id","circles")
@@ -371,7 +343,7 @@ addCircles = function(svg,spectrumParameters,peakData){
 				})
 				.attr("cy",function(d,i){
 					let cy = spectrumParameters.getPeakYPos(env_peaks.intensity);
-					if(cy &lt; spectrumParameters.padding.head) return spectrumParameters.padding.head ;
+					if(cy < spectrumParameters.padding.head) return spectrumParameters.padding.head ;
 					else return cy ;
 				})
 				.attr("r",function(d,i){
@@ -403,7 +375,7 @@ drawIons = function(svg,spectrumParameters,ionData){
 	// Get the default tick width and calculate the actual tick width position based on the current minMz value on the xaxis
 	let tickWidth = spectrumParameters.getTickWidth();
 	ionData.forEach((element)=>{
-		if(tickWidth &lt;= spectrumParameters.graphFeatures.tickWidthThreshholdval)
+		if(tickWidth <= spectrumParameters.graphFeatures.tickWidthThreshholdval)
 		{
 			element.forEach((innerElement)=>{
 				placeIonOnGraph_innerFunc(innerElement);
@@ -416,7 +388,7 @@ drawIons = function(svg,spectrumParameters,ionData){
 
 	// Inner function to draw ions on the graph at respective position
 	function placeIonOnGraph_innerFunc(innerElement){
-		if(innerElement.mz > spectrumParameters.minMz &amp;&amp; innerElement.mz &lt;= spectrumParameters.maxMz)
+		if(innerElement.mz > spectrumParameters.minMz && innerElement.mz <= spectrumParameters.maxMz)
 		{
 			ions.append("text")
 			.attr("id","graph_matched_ions")
@@ -424,7 +396,7 @@ drawIons = function(svg,spectrumParameters,ionData){
 			.attr("y",function(d,i){
 				let y = spectrumParameters.getPeakYPos(innerElement.intensity + (0.1*innerElement.intensity));// Adding 10% to get the Ions on the max Intensity Peak
 				y = y - spectrumParameters.graphFeatures.fixedHeightOfIonAboveThePeak;
-				if(y &lt;= spectrumParameters.padding.head) return spectrumParameters.padding.head ;
+				if(y <= spectrumParameters.padding.head) return spectrumParameters.padding.head ;
 				else return y ;
 				})
 			.style("fill","black")
@@ -449,12 +421,12 @@ drawSequence = function(svg,spectrumParameters){
 	y = spectrumParameters.padding.head-35;
 	text = "|";
 	// Add "|" At the start of the prefix sequence
-	if(0 >= spectrumParameters.minMz &amp;&amp; 0 &lt;= spectrumParameters.maxMz)
+	if(0 >= spectrumParameters.minMz && 0 <= spectrumParameters.maxMz)
 	{
 		drawAcids_innerFunc(seqSvg,x,y,text);
 	}
 	sequenceData.forEach(function(element,index,prefixSequenceData){
-		if(element.mass >= spectrumParameters.minMz &amp;&amp; element.mass &lt;= spectrumParameters.maxMz)
+		if(element.mass >= spectrumParameters.minMz && element.mass <= spectrumParameters.maxMz)
 		{
 			let x1 = spectrumParameters.getPeakXPos(0);
 			if(index != 0) x1 = spectrumParameters.getPeakXPos(prefixSequenceData[index-1].mass);
@@ -472,12 +444,12 @@ drawSequence = function(svg,spectrumParameters){
 	x = spectrumParameters.getPeakXPos(massOfWater);// Mass of water=18.010564683704
 	y = spectrumParameters.padding.head-15;
 	text = "|";
-	if(massOfWater >= spectrumParameters.minMz &amp;&amp; massOfWater &lt;= spectrumParameters.maxMz)
+	if(massOfWater >= spectrumParameters.minMz && massOfWater <= spectrumParameters.maxMz)
 	{
 		drawAcids_innerFunc(seqSvg,x,y,text);
 	}
 	sequenceData.forEach(function(element,index,suffixSequeceData){
-		if(element.mass >= spectrumParameters.minMz &amp;&amp; element.mass &lt;= spectrumParameters.maxMz)
+		if(element.mass >= spectrumParameters.minMz && element.mass <= spectrumParameters.maxMz)
 		{
 			let x1 = spectrumParameters.getPeakXPos(18.010564683704);// Mass of water=18.010564683704
 			if(index != 0) x1 = spectrumParameters.getPeakXPos(suffixSequeceData[index-1].mass);
@@ -570,21 +542,21 @@ drawErrorYticks = function(svg, spectrumParameters){
 	inner_drawYTicks(y);
 	inner_addErrorYTickValues(0,y);
 	// Draw positive ticks above error x axis
-	for(let i=1;i&lt;=spectrumParameters.errorYticks;i++)
+	for(let i=1;i<=spectrumParameters.errorYticks;i++)
 	{
 		y = spectrumParameters.getErrorYPos(i*tempTick);
 		inner_drawYTicks(y);
 		inner_addErrorYTickValues(i*tempTick,y);
 	}
 	//Draw negative ticks below error x axis
-	for(let i=1;i&lt;=spectrumParameters.errorYticks;i++)
+	for(let i=1;i<=spectrumParameters.errorYticks;i++)
 	{
 		y = spectrumParameters.getErrorYPos(-(i*tempTick));
 		inner_drawYTicks(y);
 		inner_addErrorYTickValues(-(i*tempTick),y);
 	}
 	function inner_drawYTicks(y){
-		if(!isNaN(y) &amp;&amp; y >= spectrumParameters.padding.head)//y >= spectrumParameters.padding.head helps the ticks to be in the length of Y axis
+		if(!isNaN(y) && y >= spectrumParameters.padding.head)//y >= spectrumParameters.padding.head helps the ticks to be in the length of Y axis
 		{
 			addYTicks.append("line")
 						.attr("x1",spectrumParameters.padding.left)
@@ -596,7 +568,7 @@ drawErrorYticks = function(svg, spectrumParameters){
 		}
 	}
 	function inner_addErrorYTickValues(data,y){
-		if(!isNaN(y) &amp;&amp; y >= spectrumParameters.padding.head)
+		if(!isNaN(y) && y >= spectrumParameters.padding.head)
 		{
 			addYTicks.append("text").attr("class","ytext").attr("x",spectrumParameters.padding.left - spectrumParameters.ticklength)
 						.attr("y",y)
@@ -616,7 +588,7 @@ drawErrorYticks = function(svg, spectrumParameters){
 drawErrorPoints = function(svg, spectrumParameters){
 	let circles = svg.append("g").attr("id", "error_circles");
 	spectrumParameters.graphFeatures.errorListData.forEach((element)=>{
-		if(parseFloat(element.theoretical_mass) > spectrumParameters.minMz &amp;&amp; parseFloat(element.theoretical_mass) &lt;= spectrumParameters.maxMz){
+		if(parseFloat(element.theoretical_mass) > spectrumParameters.minMz && parseFloat(element.theoretical_mass) <= spectrumParameters.maxMz){
 			circles.append("circle")
 			.attr("class","error_circles")
 			.attr("cx",function(d,i){
@@ -624,7 +596,7 @@ drawErrorPoints = function(svg, spectrumParameters){
 			})
 			.attr("cy",function(d,i){
 				let cy = spectrumParameters.getErrorYPos(parseFloat(element.mass_error));
-				if(cy &lt; spectrumParameters.padding.head) return spectrumParameters.padding.head ;
+				if(cy < spectrumParameters.padding.head) return spectrumParameters.padding.head ;
 				else return cy ;
 			})
 			.attr("r",function(d,i){
@@ -673,14 +645,14 @@ onMouseOverPeak = function(this_element,peak,spectrumParameters)
 	intensity =" I:"+ parseFloat(peak.intensity).toFixed(3);
 	mz = "M:"+parseFloat(peak.mz).toFixed(3);
 	y = y - spectrumParameters.mouseOverPadding.head ;
-	if(y&lt;=spectrumParameters.mouseOverPadding.head)
+	if(y<=spectrumParameters.mouseOverPadding.head)
 	{
 		y = spectrumParameters.mouseOverPadding.head;
 	}
 	d3.select(this_element).style("stroke","red")
 							.style("stroke-width","2");
 	
-	let tooltipData = mz + "&lt;br>" + intensity ;						
+	let tooltipData = mz + "<br>" + intensity ;						
 	/*	Rectangle to have flexible on click and on mouse actions	*/
 	var div = d3.select("body").append("div")
 							.attr("id", "MyTextMZIN")	
@@ -706,12 +678,12 @@ onMouseOverCircle = function(this_element,envelope_list,spectrumParameters)
 	let mass = "Mass:"+envelope_list.mono_mass.toFixed(2);
 	let charge = "Charge:"+ envelope_list.charge ;
 	y = y - spectrumParameters.mouseOverPadding.head ;
-	if(y&lt;=spectrumParameters.mouseOverPadding.head)
+	if(y<=spectrumParameters.mouseOverPadding.head)
 	{
 		y = spectrumParameters.mouseOverPadding.head;
 	}
 	
-	let tooltipData = mass + "&lt;br>" + charge ;						
+	let tooltipData = mass + "<br>" + charge ;						
 	/*	Rectangle to have flexible on click and on mouse actions	*/
 	var div = d3.select("body").append("div")
 							.attr("id", "MyTextMassCharge")	
@@ -776,11 +748,11 @@ function drawSpectrum(svgId, spectrumParameters, peakData,ionData){
 		addBackGround(svg, spectrumParameters);
 	}
 	drawPeaks(svg, spectrumParameters, peakData);
-	if(spectrumParameters.graphFeatures.showCircles &amp;&amp; peakData.envelope_list != null)
+	if(spectrumParameters.graphFeatures.showCircles && peakData.envelope_list != null)
 	{
 		addCircles(svg,spectrumParameters,peakData);
 	}
-	if(spectrumParameters.graphFeatures.showIons &amp;&amp; ionData != null)
+	if(spectrumParameters.graphFeatures.showIons && ionData != null)
 	{
 		drawIons(svg,spectrumParameters,ionData);
 	}
@@ -797,26 +769,3 @@ function drawSpectrum(svgId, spectrumParameters, peakData,ionData){
 	}
 	return spectrumParameters;
 }
-</code></pre>
-        </article>
-    </section>
-
-
-
-
-</div>
-
-<nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="GraphFeatures.html">GraphFeatures</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addBackGround">addBackGround</a></li><li><a href="global.html#addCircles">addCircles</a></li><li><a href="global.html#addDatatoAxis">addDatatoAxis</a></li><li><a href="global.html#addErrorBlock">addErrorBlock</a></li><li><a href="global.html#addErrorPlot">addErrorPlot</a></li><li><a href="global.html#addLabels">addLabels</a></li><li><a href="global.html#addSpectrum">addSpectrum</a></li><li><a href="global.html#circlesPerRange">circlesPerRange</a></li><li><a href="global.html#compSpectrumParameters">compSpectrumParameters</a></li><li><a href="global.html#drag">drag</a></li><li><a href="global.html#drawAxis">drawAxis</a></li><li><a href="global.html#drawErrorPoints">drawErrorPoints</a></li><li><a href="global.html#drawErrorYticks">drawErrorYticks</a></li><li><a href="global.html#drawIons">drawIons</a></li><li><a href="global.html#drawPeaks">drawPeaks</a></li><li><a href="global.html#drawSequence">drawSequence</a></li><li><a href="global.html#drawSpectrum">drawSpectrum</a></li><li><a href="global.html#drawTicks">drawTicks</a></li><li><a href="global.html#getCircleSize">getCircleSize</a></li><li><a href="global.html#getErrorYPos">getErrorYPos</a></li><li><a href="global.html#getPeakXPos">getPeakXPos</a></li><li><a href="global.html#getPeakYPos">getPeakYPos</a></li><li><a href="global.html#getTickHeight">getTickHeight</a></li><li><a href="global.html#getTickWidth">getTickWidth</a></li><li><a href="global.html#groupBy">groupBy</a></li><li><a href="global.html#initScale">initScale</a></li><li><a href="global.html#onCircleMouseOut">onCircleMouseOut</a></li><li><a href="global.html#onDragLimits">onDragLimits</a></li><li><a href="global.html#onMouseOut">onMouseOut</a></li><li><a href="global.html#onMouseOverCircle">onMouseOverCircle</a></li><li><a href="global.html#onMouseOverPeak">onMouseOverPeak</a></li><li><a href="global.html#onPeakMouseOut">onPeakMouseOut</a></li><li><a href="global.html#setLimits">setLimits</a></li><li><a href="global.html#sortEnvelopes">sortEnvelopes</a></li><li><a href="global.html#SpectrumGraph">SpectrumGraph</a></li><li><a href="global.html#SpectrumParameters">SpectrumParameters</a></li><li><a href="global.html#xZoom">xZoom</a></li><li><a href="global.html#yZoom">yZoom</a></li><li><a href="global.html#zoom">zoom</a></li></ul>
-</nav>
-
-<br class="clear">
-
-<footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Fri May 29 2020 03:46:27 GMT-0400 (Eastern Daylight Time)
-</footer>
-
-<script> prettyPrint(); </script>
-<script src="scripts/linenumber.js"> </script>
-</body>
-</html>

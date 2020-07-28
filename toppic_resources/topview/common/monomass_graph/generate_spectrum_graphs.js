@@ -26,6 +26,7 @@
 function generateCorrespondingGraph(current_data,id,prec_mz,specId){
     // Gets the svg id of the spectrum
     let startOfId = id.split("_")[0];
+    // console.log("current_data:", current_data);
     let graphFeatures = new GraphFeatures();
     if(startOfId == "monoMassSvg")
     {
@@ -36,8 +37,9 @@ function generateCorrespondingGraph(current_data,id,prec_mz,specId){
         let prefixMassList = calculatePrefixAndSuffixMassObj.getPrefixMassList(seq,massShiftList,massShift_in);
         massShift_in = calculatePrefixAndSuffixMassObj.getIonTypeMass("Y");
         let suffixMassList = calculatePrefixAndSuffixMassObj.getSuffixMassList(seq,massShiftList,massShift_in);
+
         // Setting the graphFeatures object with all the features needed for the graph
-        graphFeatures.showSequene = true;
+        graphFeatures.showSequence = true;
         graphFeatures.addErrorPlot = true;
         graphFeatures.prefixSequenceData = prefixMassList;
         graphFeatures.suffixSequeceData = suffixMassList;
@@ -47,10 +49,11 @@ function generateCorrespondingGraph(current_data,id,prec_mz,specId){
         graphFeatures.adjustableIonPosition = 10; // Random tested value for alignment
         // Gets the data list with mass error to plot in the monomass spectrum 
         graphFeatures.errorListData = json2ErrorDataList(prsm_data.prsm); 
-        console.log(graphFeatures.errorListData);
+        // console.log(graphFeatures.errorListData);
         // Gets the absolute max and minimum value for upper bound and lower bound of y axis to draw the error plot
         graphFeatures.errorThreshHoldVal = getAbsoluteMaxValfromList(graphFeatures.errorListData);
         // Invoking spectrum function to draw the spectrum
+        // let spectrumgraph = new SpectrumGraph(id, current_data, current_data, null);
         spectrumgraph = new addSpectrum(id, current_data, null, prec_mz, current_data,graphFeatures);
     }   
     else{
