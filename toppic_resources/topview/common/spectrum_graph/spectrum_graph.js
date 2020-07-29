@@ -11,7 +11,7 @@ class SpectrumGraph {
   transformX = 0;
   transformScale = 1.0;
   
-  constructor(svgId, peakList, envList, ionList){
+  constructor(svgId, peakList, envList){
     this.id = svgId;
     this.para = new SpectrumParameters();
     this.peakList = peakList;
@@ -22,7 +22,7 @@ class SpectrumGraph {
     this.envList = envList;
     this.para.addColorToEnvelopes(envList);
     this.envPeakList = this.getEnvPeakList(this.envList);
-    this.ionList = ionList;
+    this.ionList = this.getIonList(this.envList);
     $("#" + svgId).data("graph", this);
     // add zoom function
     this.svg = d3.select("body").select("#"+svgId);
@@ -59,11 +59,9 @@ class SpectrumGraph {
 
   getEnvPeakList = function(envList) {
     let envPeakList = [];
-    for (let i = 0; i < envList.length; i++)
-    {
+    for (let i = 0; i < envList.length; i++) {
       let env = envList[i];
-      for (let j = 0; j < env.env_peaks.length; j++)
-      {
+      for (let j = 0; j < env.env_peaks.length; j++) {
         let peak = env.env_peaks[j];
         peak.env = env;
         envPeakList.push(peak);
@@ -73,5 +71,18 @@ class SpectrumGraph {
       return y.intensity - x.intensity;
     });
     return envPeakList;
+  }
+
+  getIonList = function(envList) {
+    let ionList = [];
+    for (let i = 0; i < envList.length; i++) {
+      let env = envList[i];
+      if (typeof env.ion !== "undefined") {
+        let ion = env.ion;
+        ion.env = env; 
+        ionList.push(ion);
+      }
+    }
+    return ionList;
   }
 }

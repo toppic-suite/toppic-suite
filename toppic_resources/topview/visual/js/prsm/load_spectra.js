@@ -9,8 +9,7 @@ function loadMsOne(filename, ms1SvgId){
   script.onload = function(){
     let peaks = ms1_data.peaks;
     let envelopes = ms1_data.envelopes;
-    let ions = [];
-    spGraph = new SpectrumGraph(ms1SvgId,peaks,envelopes,ions);
+    spGraph = new SpectrumGraph(ms1SvgId,peaks,envelopes);
     let precMonoMz = prsm_data.prsm.ms.ms_header.precursor_mz;
     spGraph.para.updateMzRange(precMonoMz);
     spGraph.para.setHighlight(precMonoMz);
@@ -44,10 +43,12 @@ function loadMsTwo(specIdList, fileList, divId, navId){
           let svgId = divId + "_graph_" + j;
           createMs2NavElement(j, divId, navId, specList[j].scan);
           createSvg(j, divId, svgId, "ms2_svg_graph_class");
+          let specId = specList[j].id;
           let peaks = specList[j].peaks;
           let envelopes = specList[j].envelopes;
-          let ions = [];
-          let spGraph = new SpectrumGraph(svgId,peaks,envelopes,ions);
+          let deconvPeaks = prsm_data.prsm.ms.peaks.peak;
+          addIonToEnvelopes(specId, deconvPeaks, envelopes);
+          let spGraph = new SpectrumGraph(svgId,peaks,envelopes);
           spGraph.redraw();
           graphList.push(spGraph);
         }
@@ -122,5 +123,58 @@ function createSvg(i, divId, svgId, className){
     svg.style.display = "inline"; 
   }
   div.appendChild(svg);
+}
+
+
+/**
+ * @function getIonData
+ * @description gets ion data list with mz, intensity and ion name 
+ * This function gets matched ion data
+ * @param {object} prsm_data - contains complete data of prsm 
+ * @param {int} specId - contains information of the spec Id
+ * @param {object} json_data - contains complete data of spectrum
+ */
+function addIonToEnvelopes(specId, deconvPeaks, envelopes){
+  envelopes.sort(function(x,y) {
+    return d3.ascending(x.id, y.id);
+  })
+  //console.log(deconvPeaks);
+  //console.log(specId);
+  deconvPeaks.forEach(function(element) {
+    if(element.hasOwnProperty('matched_ions_num') && 
+      element.spec_id == specId) {
+      let ionText = "";
+      if (parseInt(element.matched_ions_num) == 1) {
+        let matchedIon = element.matched_ions.matched_ion;
+        let ionType = matchedIon.ion_type;
+        if (ionType == "Z_DOT") {
+          ionType = "Z\u02D9";
+        }
+        ionText = ionType + matchedIon.ion_display_position;
+      }
+      else {
+        //console.log(element.matched_ions.length);
+        for (let i = 0; i < element.matched_ions.length; i++) {
+          let matchedIon = element.matched_ions[i];
+          let ionType = matchedIon.ion_type;
+          if (ionType == "Z_DOT") {
+            ionType = "Z\u02D9";
+          }
+          let curIonText = ionType + matchedIon.ion_display_position;
+          ionText = ionText + curIonText + " ";
+        }
+      }
+      let peakId = element.peak_id;
+      //console.log(peakId, envelopes.length, specId);
+      let envPeaks = envelopes[peakId].env_peaks;
+      envPeaks.sort(function(x,y){
+        return d3.descending(x.intensity, y.intensity);
+      });
+      let x = parseFloat(envPeaks[0].mz);
+      let y = parseFloat(envPeaks[0].intensity);
+      let ionData = {"mz": x, "intensity": y, "text": ionText};
+      envelopes[peakId].ion = ionData;
+    }
+  });
 }
 

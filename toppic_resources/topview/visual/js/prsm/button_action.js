@@ -161,33 +161,25 @@ function addButtonActions() {
     let ms2Id = $('.ms2_graph_list.active')[0].id;
     let ms2Split = ms2Id.split("_");
     let ms2Index = parseInt(ms2Split[ms2Split.length-1]);
-    //console.log(ms2Index);
     let svgId = "popup_ms2_svg";
     let peaks = ms2SpecList[ms2Index].peaks;
     let envelopes = ms2SpecList[ms2Index].envelopes;
-    let ions = {};
-    let spGraph = new SpectrumGraph(svgId,peaks,envelopes,ions);
-    spGraph.redraw();
+    ms2PopupGraph = new SpectrumGraph(svgId,peaks,envelopes);
+    // copy parameters
+    Object.assign(ms2PopupGraph.para, ms2GraphList[ms2Index].para);
+    ms2PopupGraph.redraw();
     // This allows pop up window to be moved
     $("#ms2_graph_popup_window").draggable({
       appendTo: "body"
     });
   })
 
-  // By changing the graph features, on click of redraw invoke this and generate the pop spectrun repectively to be downloaded
+  // Click of redraw invoke this and generate the popup spectrum
   $("#ms2_popup_redraw_btn").click(function(){
-    let ms2Id = $('.ms2_graph_list.active')[0].id;
-    let ms2Split = ms2Id.split("_");
-    let ms2Index = parseInt(ms2Split[ms2Split.length-1]);
-    let svgId = "popup_ms2_svg";
-    let peaks = ms2SpecList[ms2Index].peaks;
-    let envelopes = ms2SpecList[ms2Index].envelopes;
-    let ions = [];
-    let spGraph = new SpectrumGraph(svgId,peaks,envelopes,ions);
-    let para = spGraph.para; 
+    let para = ms2PopupGraph.para; 
     para.showEnvelopes = document.getElementsByName("show_envelops")[0].checked ;
     para.showIons = document.getElementsByName("show_ions")[0].checked ;
-    spGraph.redraw();
+    ms2PopupGraph.redraw();
   })
     
 	
