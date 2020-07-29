@@ -3,6 +3,9 @@
  * the data
  */
 class SpectrumParameters {
+  // Ratio between average and monoisopotic mass
+  avgToMonoRatio = 1.000684;
+
   // SVG size
   svgWidth = 910;
   svgHeight = 220;
@@ -16,8 +19,6 @@ class SpectrumParameters {
   winMinMz = 0 ;
   winMaxMz = 2000;
   winCenterMz = 1000;
-  // Ratio between average and monoisopotic mass
-  avgToMonoRatio = 1.000684;
 
   // M/z range of peaks
   dataMinMz = 0;
@@ -27,7 +28,7 @@ class SpectrumParameters {
   showHighlight = false;
   hlMinMz = 0;
   hlMaxMz = 0;
-  hlColor = "orange";
+  hlColor = "gray";
 
   // Max intensity of visuable window
   winMaxInte = 30000;
@@ -64,13 +65,12 @@ class SpectrumParameters {
   minRadius = 2;
   maxRadius = 5;
   //	Colors for the envelope circles	
-  envColorList = ["red","orange","blue","green"];
+  envColorList = ["red","darkorange","blue"];
 
   // Parameters related to annoated ions
-  showIons = false;
-  tickWidthThreshhold = 0.5;
-  adjustableIonPosition = 4;
-  fixedHeightOfIonAboveThePeak = 10;
+  showIons = true;
+  ionXShift = -5;
+  ionYShift = -15;
 
   constructor() {
   }

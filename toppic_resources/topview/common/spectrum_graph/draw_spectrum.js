@@ -19,16 +19,14 @@ drawSpectrum  = function(svgId, para, peaks, envPeaks, ions) {
   drawTicks(svg, para);
   drawAxis(svg,para);
   addDatatoAxis(svg,para);
-  if (para.showHighlight) 
-  {
+  if (para.showHighlight) {
     addHighlight(svg, para);
   }
   drawPeaks(svg, para, peaks);
   if (para.showEnvelopes) {
     drawEnvelopes(svg, para, envPeaks);
   }
-  if (para.showIons) 
-  {
+  if (para.showIons) {
     drawIons(svg, para, ions);
   }
 }
@@ -280,7 +278,6 @@ addHighlight = function(svg,para){
   {
     let x = para.getPeakXPos(para.hlMinMz);
     let x2 = para.getPeakXPos(para.hlMaxMz);
-    //console.log(x, x2, para.hlMaxMz);
     if(para.hlMinMz < para.winMinMz)
     {
       x = para.getPeakXPos(para.winMinMz);
@@ -401,7 +398,7 @@ drawEnvelopes = function(svg,para,envPeakList) {
               return para.getCircleSize();
             })
             .style("fill","white")
-            .style("opacity", "0.6")
+            .style("opacity", "0.8")
             .style("stroke",color)
             .style("stroke-width","2")
             .on("mouseover",function(){
@@ -423,40 +420,24 @@ drawEnvelopes = function(svg,para,envPeakList) {
  * @param {object} para - Contains the parameters like height, width etc.,. tht helps to draw the graph
  * @param {Array} ionData - Contians Ion list to display on the graph
  */
-drawIons = function(svg,para,ionData){
-  let ions = svg.append("g").attr("id", "graph_ions");
-  // Get the default tick width and calculate the actual tick width position based on the current minMz value on the xaxis
-  let tickWidth = para.getTickWidth();
-  console.log(ionData);
-  ionData.forEach((element)=>{
-    if(tickWidth <= para.tickWidthThreshhold)
-    {
-      element.forEach((innerElement)=>{
-        placeIonOnGraph_innerFunc(innerElement);
-      })
-    }else{
-      let innerElement = element[0];
-      placeIonOnGraph_innerFunc(innerElement);
-    }
-  })
-
-  // Inner function to draw ions on the graph at respective position
-  function placeIonOnGraph_innerFunc(innerElement){
-    if(innerElement.mz > para.minMz && innerElement.mz <= para.maxMz)
-    {
-      ions.append("text")
+drawIons = function(svg,para,ions){
+  let ionGroup = svg.append("g").attr("id", "graph_ions");
+  //console.log(ions);
+  for (let i = 0; i < ions.length; i++) {
+    let ion = ions[i];
+    let x = ion.mz;
+    if(x >= para.winMinMz && x <= para.winMaxMz) {
+      let xPos = para.getPeakXPos(x) + para.ionXShift;
+      let yPos = para.getPeakYPos(ion.intensity) + para.ionYShift;
+      let color = ion.env.color;
+      ionGroup.append("text")
         .attr("id","graph_matched_ions")
-        .attr("x",(para.getPeakXPos((innerElement.mz))-para.adjustableIonPosition))
-        .attr("y",function(){
-          let y = para.getPeakYPos(innerElement.intensity + (0.1*innerElement.intensity));// Adding 10% to get the Ions on the max Intensity Peak
-          y = y - para.fixedHeightOfIonAboveThePeak;
-          if(y <= para.padding.head) return para.padding.head ;
-          else return y ;
-        })
-        .style("fill","black")
-        .style("opacity", "0.6")
+        .attr("x", xPos)
+        .attr("y", yPos) 
+        .style("fill", color)
+        .style("opacity", "0.8")
         .style("stroke-width","2")
-        .text(innerElement.ion);
+        .text(ion.text);
     }
   }
 }
