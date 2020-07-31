@@ -8,14 +8,14 @@
         <script src="../../../node_modules/jquery/dist/jquery.js"></script>
         <script src="../../../node_modules/d3/dist/d3.js"></script>
 
-        <script src="../multiscan.js"></script>
-        <script src="../calculate_prefix_and_suffix_mass.js"></script>
+        <script src="../../multi_scan/multiscan.js"></script>
+        <script src="../../calculate_prefix_and_suffix_mass/calculate_prefix_and_suffix_mass.js"></script>
+        <script src="../../distribution_calc/amino_acid_distribution.js"></script>
+        <script src="../../prsm_data_util/prsm_data_util.js"></script>
+
+
         <script src="../generate_spectrum_graphs.js"></script>
-        <script src="../prsm_data_util.js"></script>
-        <script src="../draw_monomass_spectrum.js"></script>
-        <script src="../amino_acid_distribution.js"></script>
         <script src="../monomass_graph.js"></script>
-        <script src="../peakData.js"></script>
 
         <script src="../spectrumGraph/graphFeatures.js"></script>
         <script src="../spectrumGraph/invokespectrum.js"></script>
@@ -26,7 +26,8 @@
         
         <script>
             $(document).ready(function(){
-                monomassGraph(prsm_data);
+                let monomassObj = new MonomassGraph(prsm_data, "monoMass_nav", "monomass_div");
+                monomassObj.drawGraph();
             })
             
         </script>
