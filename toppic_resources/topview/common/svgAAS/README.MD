@@ -5,6 +5,7 @@ svgAAS is a library for drawing Amino Acid Sequence table on svg.
 ## Dependencies
 
 D3 and jQuery
+Topview library: prsm_data_util
 
 ## Usage
 
@@ -12,7 +13,6 @@ Include all files from svgAAS folder to head of html file:
 ```html
 <script src="your_dir/svgAAS/coordinates_util.js"></script>
 <script src="your_dir/svgAAS/draw_svg.js"></script>
-<script src="your_dir/svgAAS/prsm_data_util.js"></script>
 <script src="your_dir/svgAAS/svgAAS.js"></script>
 ```
 
