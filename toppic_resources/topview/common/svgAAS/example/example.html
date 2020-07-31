@@ -6,9 +6,10 @@
 
             <script src="../../../node_modules/jquery/dist/jquery.js"></script>
             <script src="../../../node_modules/d3/dist/d3.js"></script>
+            <script src="../../prsm_data_util/prsm_data_util.js"></script>
+
 
             <script src="../coordinates_util.js"></script>
-            <script src="../prsm_data_util.js"></script>
             <script src="../draw_svg.js"></script>
             <script src="../svgAAS.js"></script>
 
@@ -19,7 +20,8 @@
             
             <script>
                 $(document).ready(function(){
-                    svgAAS(prsm_data, "l_svg");
+                    let svgAAS = new SvgAAS(prsm_data, "l_svg");
+                    svgAAS.drawGraph();
                 })
                 
             </script>
