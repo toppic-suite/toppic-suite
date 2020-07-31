@@ -114,6 +114,9 @@ void compDistWithNorm(const std::vector<double>& real,
   best_dist = std::numeric_limits<double>::infinity();
   best_ratio = -1;
   for (size_t i = 0; i < real.size(); i++) {
+    if (theo[i] == 0.0) {
+      continue;
+    }
     double ratio = real[i] / theo[i];
     if (ratio <= 0) {
       continue;
@@ -127,6 +130,9 @@ void compDistWithNorm(const std::vector<double>& real,
         best_ratio = cur_ratio;
       }
     }
+  }
+  if (std::isnan(best_ratio)) {
+    LOG_ERROR("The best ratio is not a number!");
   }
 }
 
