@@ -3,8 +3,9 @@
  * This function invokes all the functions that draw the graph
  * @param {string} svgId - Contains the Id from html on which the graph should be drawn
  * @param {object} para - Contains the parameters to help draw the graph
- * @param {list} peakData - Contains the data of Peaks and Envelopes to draws lines and circles on the graph
- * @param {list} ionData - Contains Ions to draw upon the peaks
+ * @param {list} peaks - Contains the data of Peaks to draw lines on the graph
+ * @param {list} envPeaks - Contains the data of Envelope peaks to draw circles on the graph
+ * @param {list} ions - Contains Ions to draw upon the peaks
  */
 drawSpectrum  = function(svgId, para, peaks, envPeaks, ions) {
   let svg = d3.select("body").select("#"+svgId);
