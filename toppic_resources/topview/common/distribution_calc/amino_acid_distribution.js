@@ -50,5 +50,9 @@ getAminoAcidDistribution = function(aminoAcid){
 
   	aminoAcidDisList["H2O"] = [{"mass":18.010564683704,"intensity":100},{"mass":19.016841429473,"intensity":0.0610952},{"mass":20.023118175242,"intensity":0.20550948508742448},{"mass":21.02733525688,"intensity":0.000047270708872938315},{"mass":22.02736462568,"intensity":2.7183440429353995e-9}]
 
-	return aminoAcidDisList[aminoAcid];
+	if (aminoAcidDisList.hasOwnProperty(aminoAcid)) {
+		return aminoAcidDisList[aminoAcid];
+	} else {
+		return null;
+	}
 }
