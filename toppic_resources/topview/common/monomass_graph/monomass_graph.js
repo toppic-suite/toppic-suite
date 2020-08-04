@@ -26,6 +26,8 @@ class MonomassGraph {
             dataWithScanIdList.push(tempObj);
         });
 
+        console.log("dataWithScanIdList:", dataWithScanIdList);
+
         let len = ms2_uniqueList.length;
         this.prsm_data.prsm.ms.peaks.peak.forEach(function(element,i){
             let ion = "";

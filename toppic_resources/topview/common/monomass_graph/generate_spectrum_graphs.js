@@ -25,13 +25,22 @@ function generateCorrespondingGraph(current_data,id,prec_mz,specId){
     let graphFeatures = new GraphFeatures();
     if(startOfId == "monoMassSvg")
     {
-        let calculatePrefixAndSuffixMassObj = new CalculatePrefixAndSuffixMass();
-        let massShift_in = calculatePrefixAndSuffixMassObj.getIonTypeMass("B");
-        let seq = calculatePrefixAndSuffixMassObj.getSequence(prsm_data);
-        let massShiftList = calculatePrefixAndSuffixMassObj.getUnknownMassList();
-        let prefixMassList = calculatePrefixAndSuffixMassObj.getPrefixMassList(seq,massShiftList,massShift_in);
-        massShift_in = calculatePrefixAndSuffixMassObj.getIonTypeMass("Y");
-        let suffixMassList = calculatePrefixAndSuffixMassObj.getSuffixMassList(seq,massShiftList,massShift_in);
+        let sequenceObj = new Sequence(prsm_data);
+        let sequence = sequenceObj.getSequence();
+
+        let ionMassShiftObj = new IonMassShift("B");
+        let ionShift = ionMassShiftObj.getIonTypeMass();
+
+        let massShiftListObj = new MassShiftList(prsm_data);
+        let massShiftList = massShiftListObj.getMassShiftList();
+
+        let cpsmObj = new CalcPrefixSuffixMassList(sequence, massShiftList);
+        let prefixMassList = cpsmObj.getPrefixMassList(ionShift);
+
+        ionMassShiftObj.ionType = "Y";
+        ionShift = ionMassShiftObj.getIonTypeMass();
+
+        let suffixMassList = cpsmObj.getSuffixMassList(ionShift);
 
         // Setting the graphFeatures object with all the features needed for the graph
         graphFeatures.showSequence = true;
@@ -43,7 +52,8 @@ function generateCorrespondingGraph(current_data,id,prec_mz,specId){
         graphFeatures.padding.bottom = graphFeatures.padding.bottom + graphFeatures.heightForErrorPlot;
         graphFeatures.adjustableIonPosition = 10; // Random tested value for alignment
         // Gets the data list with mass error to plot in the monomass spectrum 
-        graphFeatures.errorListData = json2ErrorDataList(prsm_data.prsm); 
+        let prsmDataUtilObj = new PrsmDataUtil(prsm_data);
+        graphFeatures.errorListData = prsmDataUtilObj.json2ErrorDataList(); 
         // console.log(graphFeatures.errorListData);
         // Gets the absolute max and minimum value for upper bound and lower bound of y axis to draw the error plot
         graphFeatures.errorThreshHoldVal = getAbsoluteMaxValfromList(graphFeatures.errorListData);
