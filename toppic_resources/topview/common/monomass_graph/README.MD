@@ -5,13 +5,12 @@ monomassGraph is a library for drawing mono mass graph on html page.
 ## Dependencies
 
 D3, jQuery
-Topview library: spectrum_graph, multiscan, calculate_prefix_and_suffix_mass, amino_acid_distribution
+Topview library: spectrum_graph, calculate_prefix_and_suffix_mass, amino_acid_distribution
 
 ## Usage
 
 Include javascript files
 ```html
-<script src="your_dir/generate_spectrum_graphs.js"></script>
 <script src="your_dir/monomass_graph.js"></script>
 ```
 
