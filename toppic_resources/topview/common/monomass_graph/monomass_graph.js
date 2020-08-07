@@ -1,5 +1,5 @@
 class MonomassGraph {
-    // prsm_data;
+    prsm_data;
     navID;
     divID;
     specIDList;
@@ -92,8 +92,6 @@ class MonomassGraph {
     }
 
     generateCorrespondingGraph(mz_intensity_ion_data,svgId,prec_mz){
-        // let graphFeatures = new GraphFeatures();
-
         let sequenceObj = new Sequence(this.prsm_data);
         let sequence = sequenceObj.getSequence();
 
