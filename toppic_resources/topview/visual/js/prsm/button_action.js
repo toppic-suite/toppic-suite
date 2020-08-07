@@ -22,38 +22,16 @@ function addButtonActions() {
 
 	// Save PrSM popup window
   d3.select('#save_prsm_btn').on("click",function(){
-    //	Id of the pop_up svg
-    let svgId = "prsm_popup_svg" ;
-    let svg = d3.select("body").select("#"+svgId);
-    svg.selectAll("#"+svgId + "_g").remove();
-    let para = new parameters();
-    let prsm = prsm_data.prsm ;
-    [para,svgId] = buildSvg(para,prsm,svgId);
-    //	Get the amount of skipped acid and write the amount 
-    // 	of skipped acid at the start and end of the sequence 
-    skippedAcidNotification(para,prsm,svgId) ;
-    if(para.show_num)
-    {
-      // Get the numerical count at the start enad end of 
-      // each row of sequence
-      getNumValues(para,prsm,svgId);
-    }
-    //	Determine the start and end position of the sequence
-    drawAnnoOfStartEndPosition(para,prsm,svgId);
-    //	Draw Annotations
-    annotations(para,prsm,svgId);
-    //	Get the position of the fixed ptms and color them to red
-    addColorToFixedPtms(prsm,svgId);
-    //	Color the background of occurence of mass shift 
-    massShiftBackgroundColor(para,prsm,svgId);
+    popupPrsmGraph.redraw();
     //	set the dimensions of popup svg to default values
-    document.getElementById("row-size").value = para.row_length ;
-    document.getElementById("letter-width").value = para.letter_width ;
-    document.getElementById("row-height").value = para.row_height ;
-    document.getElementById("block-width").value = para.gap_width ;
-    document.getElementById("num-width").value = para.numerical_width ;
-    document.getElementsByName("show-num")[0].checked = para.show_num ;
-    document.getElementsByName("show-skipped-lines")[0].checked = para.show_skipped_lines ;
+    let para = popupPrsmGraph.para;
+    document.getElementById("row-size").value = para.rowLength ;
+    document.getElementById("letter-width").value = para.letterWidth ;
+    document.getElementById("row-height").value = para.rowHeight ;
+    document.getElementById("block-width").value = para.gapWidth ;
+    document.getElementById("num-width").value = para.numericalWidth ;
+    document.getElementsByName("show-num")[0].checked = para.showNum ;
+    document.getElementsByName("show-skipped-lines")[0].checked = para.showSkippedLines ;
 
     // Allows to drag the pop up windows
 		$("#save_prsm_popup_window").draggable({
@@ -62,59 +40,28 @@ function addButtonActions() {
   });
 
 	d3.select('#prsm_graph_redraw_btn').on("click", function(){
-    let svgId = "prsm_popup_svg" ;
-    let svg = d3.select("body").select("#"+svgId);
-    svg.selectAll("#"+svgId + "_g").remove();
-		//	Get dimension parameters of svg
-		var para = new parameters() ;
-		para.row_length = parseInt(document.getElementById("row-size").value);
-		para.letter_width = parseInt(document.getElementById("letter-width").value) ;
-		para.row_height = parseInt(document.getElementById("row-height").value) ;
-		para.gap_width = parseInt(document.getElementById("block-width").value) ;
-		para.numerical_width = parseInt(document.getElementById("num-width").value) ;
+    let para = popupPrsmGraph.para;
+		para.rowLength = parseInt(document.getElementById("row-size").value);
+		para.letterWidth = parseInt(document.getElementById("letter-width").value) ;
+		para.rowHeight = parseInt(document.getElementById("row-height").value) ;
+		para.gapWidth = parseInt(document.getElementById("block-width").value) ;
+		para.numericalWidth = parseInt(document.getElementById("num-width").value) ;
 
 		//	Check whether show numbers is checked
-		if(document.getElementsByName("show-num")[0].checked)
-		{
-			para.show_num = true ;
+		if(document.getElementsByName("show-num")[0].checked) {
+			para.setShowNum(true);
 		}
-		else
-		{
-			//	Reduce the left and right margins when numbers are 
-			// 	no needed at start and end of each row in svg
-			para.show_num = false ;
-			para.left_margin = 20;
-			para.right_margin = 20;
+		else {
+      para.setShowNum(false);
 		}
 		//	Check to show skipped lines 
-		if(document.getElementsByName("show-skipped-lines")[0].checked)
-		{
-			para.show_skipped_lines = true ;
+		if(document.getElementsByName("show-skipped-lines")[0].checked) {
+			para.showSkippedLines = true ;
 		}
-		else
-		{
-			para.show_skipped_lines = false ;
+		else {
+			para.showSkippedLines = false ;
 		}
-		//	Redraw the svg with new dimension parameters
-		prsm = prsm_data.prsm ;
-		[para,svgId] = buildSvg(para,prsm,svgId);
-		//	Get the amount of skipped acid and write the amount 
-		//	of skipped acid at the start and end of the sequence 
-		skippedAcidNotification(para,prsm,svgId) ;
-		if(para.show_num)
-		{
-			// Get the numerical count at the start and end of 
-			// each row of sequence
-			getNumValues(para,prsm,svgId);
-		}
-		//	Determine the start and end position of the sequence
-		drawAnnoOfStartEndPosition(para,prsm,svgId) ;
-		//	Draw Annotations
-		annotations(para,prsm,svgId);
-		//	Get the position of the fixed ptms and color them to red
-		addColorToFixedPtms(prsm,svgId);
-		//	Color the background of occurence of mass shift
-		massShiftBackgroundColor(para,prsm,svgId);
+    popupPrsmGraph.redraw();
 	});	
 
 	$("#prsm_popup_help_btn").click(function(){
@@ -177,7 +124,7 @@ function addButtonActions() {
   // Click of redraw invoke this and generate the popup spectrum
   $("#ms2_popup_redraw_btn").click(function(){
     let para = ms2PopupGraph.para; 
-    para.showEnvelopes = document.getElementsByName("show_envelops")[0].checked ;
+    para.showEnvelopes = document.getElementsByName("show_envelopes")[0].checked ;
     para.showIons = document.getElementsByName("show_ions")[0].checked ;
     ms2PopupGraph.redraw();
   })
@@ -222,6 +169,12 @@ function addButtonActions() {
       }
     }
     showMs2Graph();
+  });
+
+  // On click of break points
+  $(".break_point").click(function() {
+    let pos = $(this).attr("ion_pos"); 
+    showIonPeaks(pos); 
   });
 }
 /**
