@@ -34,7 +34,7 @@ class SpectrumGraph {
 
   redraw = function(){
     //console.log(this.envList);
-    drawSpectrum(this.id, this.para, this.peakList, this.envPeakList, this.ionList);
+    drawSpectrum(this.id, this.para, this.peakList, this.envPeakList, this.ionList, this.prefixSequence, this.suffixSequence, this.errorList);
   }
 
   zoomed = function () {
@@ -58,6 +58,7 @@ class SpectrumGraph {
     .on("zoom", this.zoomed);
 
   getEnvPeakList = function(envList) {
+    if (!envList || typeof envList.env_peaks === "undefined") {return [];}
     let envPeakList = [];
     for (let i = 0; i < envList.length; i++) {
       let env = envList[i];
@@ -78,11 +79,47 @@ class SpectrumGraph {
     for (let i = 0; i < envList.length; i++) {
       let env = envList[i];
       if (typeof env.ion !== "undefined") {
-        let ion = env.ion;
-        ion.env = env; 
-        ionList.push(ion);
+        let ionObj = {};
+        ionObj.mz = env.mz;
+        ionObj.intensity = env.intensity;
+        ionObj.text = env.ion;
+        if (typeof env.color !== "undefined") {
+          ionObj.color = env.color;
+        }
+        ionList.push(ionObj);
+        // let ion = env.ion;
+        // ion.env = env; 
+        // ionList.push(ion);
       }
     }
     return ionList;
+  }
+
+  drawMonoMassGraph(prefixSequence, suffixSequence, errorList) {
+    // Setting the graphFeatures object with all the features needed for the graph
+    this.para.showSequence = true;
+    this.para.showErrorPlots = true;
+    this.prefixSequence = prefixSequence;
+    this.suffixSequence = suffixSequence;
+    this.errorList = errorList;
+    this.para.svgHeight = this.para.svgHeight + this.para.adjustableHeightVal + this.para.heightForErrorPlot;
+    this.para.padding.head = this.para.padding.head + this.para.adjustableHeightVal;
+    this.para.padding.bottom = this.para.padding.bottom + this.para.heightForErrorPlot;
+    // Gets the absolute max and minimum value for upper bound and lower bound of y axis to draw the error plot
+    this.para.errorThreshHoldVal = this.getAbsoluteMaxValfromList(errorList);
+    this.svg.attr("viewBox", "0 0 "+ this.para.svgWidth+" "+ this.para.svgHeight);
+    this.redraw();
+  }
+
+  getAbsoluteMaxValfromList(errorDataList){
+    let max = 0;
+    errorDataList.forEach((element)=>{
+        let val = Math.abs(element.mass_error);
+        if(max < val) max = val; 
+    })
+    //Getting the round off fraction value
+    max = max * 100;
+    max = Math.ceil(max)/100;
+    return max;
   }
 }

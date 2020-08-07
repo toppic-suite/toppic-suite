@@ -91,48 +91,31 @@ class MonomassGraph {
          })
     }
 
-    generateCorrespondingGraph(current_data,id,prec_mz){
-        // Gets the svg id of the spectrum
-        let startOfId = id.split("_")[0];
-        
-        if(startOfId == "monoMassSvg")
-        {
-            let graphFeatures = new GraphFeatures();
-    
-            let sequenceObj = new Sequence(this.prsm_data);
-            let sequence = sequenceObj.getSequence();
-    
-            let ionMassShiftObj = new IonMassShift("B");
-            let ionShift = ionMassShiftObj.getIonTypeMass();
-    
-            let massShiftListObj = new MassShiftList(this.prsm_data);
-            let massShiftList = massShiftListObj.getMassShiftList();
-    
-            let cpsmObj = new CalcPrefixSuffixMassList(sequence, massShiftList);
-            let prefixMassList = cpsmObj.getPrefixMassList(ionShift);
-    
-            ionMassShiftObj.ionType = "Y";
-            ionShift = ionMassShiftObj.getIonTypeMass();
-    
-            let suffixMassList = cpsmObj.getSuffixMassList(ionShift);
-    
-            // Setting the graphFeatures object with all the features needed for the graph
-            graphFeatures.showSequence = true;
-            graphFeatures.addErrorPlot = true;
-            graphFeatures.prefixSequenceData = prefixMassList;
-            graphFeatures.suffixSequeceData = suffixMassList;
-            graphFeatures.svgHeight = graphFeatures.svgHeight + graphFeatures.adjustableHeightVal + graphFeatures.heightForErrorPlot;
-            graphFeatures.padding.head = graphFeatures.padding.head + graphFeatures.adjustableHeightVal;
-            graphFeatures.padding.bottom = graphFeatures.padding.bottom + graphFeatures.heightForErrorPlot;
-            graphFeatures.adjustableIonPosition = 10; // Random tested value for alignment
-            // Gets the data list with mass error to plot in the monomass spectrum 
-            let prsmDataUtilObj = new PrsmDataUtil(prsm_data);
-            graphFeatures.errorListData = prsmDataUtilObj.json2ErrorDataList(); 
-            // Gets the absolute max and minimum value for upper bound and lower bound of y axis to draw the error plot
-            graphFeatures.errorThreshHoldVal = this.getAbsoluteMaxValfromList(graphFeatures.errorListData);
-            // Invoking spectrum function to draw the spectrum
-            let spectrumgraph = new addSpectrum(id, current_data, null, prec_mz, current_data,graphFeatures);
-        }
+    generateCorrespondingGraph(mz_intensity_ion_data,svgId,prec_mz){
+        // let graphFeatures = new GraphFeatures();
+
+        let sequenceObj = new Sequence(this.prsm_data);
+        let sequence = sequenceObj.getSequence();
+
+        let ionMassShiftObj = new IonMassShift("B");
+        let ionShift = ionMassShiftObj.getIonTypeMass();
+
+        let massShiftListObj = new MassShiftList(this.prsm_data);
+        let massShiftList = massShiftListObj.getMassShiftList();
+
+        let cpsmObj = new CalcPrefixSuffixMassList(sequence, massShiftList);
+        let prefixMassList = cpsmObj.getPrefixMassList(ionShift);
+
+        ionMassShiftObj.ionType = "Y";
+        ionShift = ionMassShiftObj.getIonTypeMass();
+
+        let suffixMassList = cpsmObj.getSuffixMassList(ionShift);
+
+        let prsmDataUtilObj = new PrsmDataUtil(prsm_data);
+        let errorListData = prsmDataUtilObj.json2ErrorDataList();
+
+        let monoMassGraph = new SpectrumGraph(svgId, mz_intensity_ion_data, mz_intensity_ion_data);
+        monoMassGraph.drawMonoMassGraph(prefixMassList, suffixMassList, errorListData);
     }
 
     createMultipleSvgs(divId,svgId,className,dataWithScanIdList){
@@ -149,7 +132,7 @@ class MonomassGraph {
                 svg.style.display = "none"; 
             }
             div.appendChild(svg);
-            self.generateCorrespondingGraph(element.value, id, null);
+            self.generateCorrespondingGraph(element.value, id);
         });
     }
 
@@ -157,17 +140,5 @@ class MonomassGraph {
     {
         $(className).hide();
         document.getElementById(id).style = "block";
-    }
-    
-    getAbsoluteMaxValfromList(errorDataList){
-        let max = 0;
-        errorDataList.forEach((element)=>{
-            let val = Math.abs(element.mass_error);
-            if(max < val) max = val; 
-        })
-        //Getting the round off fraction value
-        max = max * 100;
-        max = Math.ceil(max)/100;
-        return max;
     }
 }

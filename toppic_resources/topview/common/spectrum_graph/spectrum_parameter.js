@@ -72,6 +72,19 @@ class SpectrumParameters {
   ionXShift = -5;
   ionYShift = -15;
 
+  // Parameters related to sequence
+  showSequence = false;
+  adjustableHeightVal = 40;
+
+  // Parameters related to error plots
+  showErrorPlots = false;
+  errorThreshHoldVal = 0.2;
+  heightForErrorPlot = 60;
+  adjustableIonPosition = 10;
+  errorplot_padding = {left:70, right:20, head:10, bottom:10};
+  errorYticks = 2;
+
+
   constructor() {
   }
 
@@ -298,6 +311,7 @@ class SpectrumParameters {
    * Add color to envelopes.
    */
   addColorToEnvelopes = function(envList){
+    if(!envList || typeof envList.env_peaks === "undefined") return;
     envList.sort(function(x,y){
       return (x.env_peaks[0].mz - y.env_peaks[0].mz);
     })
@@ -332,5 +346,15 @@ class SpectrumParameters {
     this.winMinMz = centerMz - 3;
     this.winMaxMz = centerMz + 3;
     this.updateScale(this.winMinMz, this.winMaxMz, this.winMaxInte);
+  }
+
+  /**
+   * @function getErrorYPos
+   * @description Function provides the y coordinate for the error val on the error plot
+   */
+  getErrorYPos = function(erroVal){
+    let yErrorScale = this.heightForErrorPlot/(this.errorThreshHoldVal*2);// Multiply with 2 as the coordinates has to be both positive and negative
+    let peakY = this.svgHeight - (erroVal * yErrorScale) - this.errorplot_padding.bottom - this.heightForErrorPlot/2;
+    return peakY;
   }
 }
