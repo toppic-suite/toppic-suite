@@ -7,9 +7,9 @@
  * @param {list} envPeaks - Contains the data of Envelope peaks to draw circles on the graph
  * @param {list} ions - Contains Ions to draw upon the peaks
  */
-drawSpectrum  = function(svgId, para, peaks, envPeaks, ions) {
+drawSpectrum  = function(svgId, para, peaks, envPeaks, ions, prefixSequence, suffixSequence, errorList) {
   let svg = d3.select("body").select("#"+svgId);
-  //svg.attr("width", para.svgWidth).attr("height", para.svgHeight);
+  // svg.attr("width", para.svgWidth).attr("height", para.svgHeight);
   // Removes all the elements under SVG group 'svgGroup' everytime there this function is called
   svg.selectAll("#svgGroup").remove();
   // Create a group under which all the fucntions of the graph will be appended
@@ -30,6 +30,16 @@ drawSpectrum  = function(svgId, para, peaks, envPeaks, ions) {
   if (para.showIons) {
     drawIons(svg, para, ions);
   }
+  if (para.showSequence) {
+    drawSequence(svg, para, prefixSequence, suffixSequence);
+  }
+  if(para.showErrorPlots)
+	{
+		addErrorPlot(svg, para);
+		drawErrorYticks(svg,para);
+		drawErrorPoints(svg,para, errorList);
+		addErrorBlock(svg,para);
+	}
 }
 
 /**
@@ -423,15 +433,17 @@ drawEnvelopes = function(svg,para,envPeakList) {
  */
 drawIons = function(svg,para,ions){
   let ionGroup = svg.append("g").attr("id", "graph_ions");
-  //console.log(ions);
+  // console.log(ions);
   for (let i = 0; i < ions.length; i++) {
     let ion = ions[i];
     let x = ion.mz;
     if(x >= para.winMinMz && x <= para.winMaxMz) {
       let xPos = para.getPeakXPos(x) + para.ionXShift;
       let yPos = para.getPeakYPos(ion.intensity) + para.ionYShift;
-      let color = ion.env.color;
-      ionGroup.append("text")
+      // let color = ion.env.color;
+      if (typeof ion.color !== "undefined") {
+        let color = ion.color;
+        ionGroup.append("text")
         .attr("id","graph_matched_ions")
         .attr("x", xPos)
         .attr("y", yPos) 
@@ -439,6 +451,16 @@ drawIons = function(svg,para,ions){
         .style("opacity", "0.8")
         .style("stroke-width","2")
         .text(ion.text);
+      } else {
+        ionGroup.append("text")
+        .attr("id","graph_matched_ions")
+        .attr("x", xPos)
+        .attr("y", yPos) 
+        .style("opacity", "0.8")
+        .style("stroke-width","2")
+        .text(ion.text);
+      }
+      
     }
   }
 }
@@ -449,24 +471,23 @@ drawIons = function(svg,para,ions){
  * @param {Node} svg -  is a html node on which the graph is being ploted
  * @param {object} para - Contains the parameters like height, width etc.,. tht helps to draw the graph
  */
-/*
-drawSequence = function(svg,para, sequence){
+drawSequence = function(svg, para, prefixSequence, suffixSequence){
 	let seqSvg = svg.append("g").attr("id", "graph_sequence");
-	let x,y,text;
+  let x,y,text;
 	// Draw | at 0 for prefix mass list
 	x = para.getPeakXPos((0));
 	y = para.padding.head-35;
 	text = "|";
 	// Add "|" At the start of the prefix sequence
-	if(0 >= para.minMz && 0 <= para.maxMz)
+	if(0 >= para.winMinMz && 0 <= para.winMaxMz)
 	{
 		drawAcids_innerFunc(seqSvg,x,y,text);
 	}
-	sequence.forEach(function(element,index,sequenceData){
-		if(element.mass >= para.minMz && element.mass <= para.maxMz)
+	prefixSequence.forEach(function(element,index,prefixSequence){
+		if(element.mass >= para.winMinMz && element.mass <= para.winMaxMz)
 		{
 			let x1 = para.getPeakXPos(0);
-			if(index != 0) x1 = para.getPeakXPos(prefixSequenceData[index-1].mass);
+			if(index !== 0) x1 = para.getPeakXPos(prefixSequence[index-1].mass);
 			x2 = para.getPeakXPos((element.mass));
 			x = (x1+x2)/2;
 			y = para.padding.head-35;
@@ -475,21 +496,20 @@ drawSequence = function(svg,para, sequence){
 		}
 	})
 
-	sequenceData = para.graphFeatures.suffixSequeceData;
 	// Draw | at water mass for suffix mass list
 	let massOfWater = 18.010564683704;
 	x = para.getPeakXPos(massOfWater);// Mass of water=18.010564683704
 	y = para.padding.head-15;
 	text = "|";
-	if(massOfWater >= para.minMz && massOfWater <= para.maxMz)
+	if(massOfWater >= para.winMinMz && massOfWater <= para.winMaxMz)
 	{
 		drawAcids_innerFunc(seqSvg,x,y,text);
 	}
-	sequenceData.forEach(function(element,index,suffixSequeceData){
-		if(element.mass >= para.minMz && element.mass <= para.maxMz)
+	suffixSequence.forEach(function(element,index,suffixSequence){
+		if(element.mass >= para.winMinMz && element.mass <= para.winMaxMz)
 		{
 			let x1 = para.getPeakXPos(18.010564683704);// Mass of water=18.010564683704
-			if(index != 0) x1 = para.getPeakXPos(suffixSequeceData[index-1].mass);
+			if(index != 0) x1 = para.getPeakXPos(suffixSequence[index-1].mass);
 			x2 = para.getPeakXPos((element.mass));
 			x = (x1+x2)/2;
 			y = para.padding.head-15;
@@ -508,78 +528,78 @@ drawSequence = function(svg,para, sequence){
 			.text(text);
 	}
 }
-*/
+
 /**
  * @function addErrorPlot
  * @description Add Error Plot to the MonoMass Spectrum
  * @param {Node} svg -  is a html node on which the graph is being ploted
  * @param {object} para - Contains the parameters like height, width etc.,. tht helps to draw the graph
  */
-/*
+
 addErrorPlot = function(svg, para){
 	//Draw x-axis
 	this.xAxis = svg.append("g").attr("id", "xaxis_errorplot").append("line")
-					.attr("x1",para.graphFeatures.errorplot_padding.left)
-					.attr("y1",para.graphFeatures.svgHeight - para.graphFeatures.heightForErrorPlot/2 - para.graphFeatures.errorplot_padding.bottom)
-					.attr("x2",para.graphFeatures.specWidth + para.graphFeatures.errorplot_padding.left)
-					.attr("y2",para.graphFeatures.svgHeight - para.graphFeatures.heightForErrorPlot/2 - para.graphFeatures.errorplot_padding.bottom)
+					.attr("x1",para.errorplot_padding.left)
+					.attr("y1",para.svgHeight - para.heightForErrorPlot/2 - para.errorplot_padding.bottom)
+					.attr("x2",para.specWidth + para.errorplot_padding.left)
+					.attr("y2",para.svgHeight - para.heightForErrorPlot/2 - para.errorplot_padding.bottom)
 					.attr("stroke","black")
 					.style("stroke-dasharray", ("5, 3"))
 					.attr("stroke-width","1.5")
 	// Draw y-axis
 	this.yAxis = svg.append("g").attr("id", "yaxis_errorplot").append("line")
-					.attr("x1",para.graphFeatures.errorplot_padding.left)
-					.attr("y1",para.graphFeatures.svgHeight - para.graphFeatures.errorplot_padding.bottom)
-					.attr("x2",para.graphFeatures.errorplot_padding.left)
-					.attr("y2",para.graphFeatures.svgHeight - para.graphFeatures.heightForErrorPlot - para.graphFeatures.errorplot_padding.bottom)
+					.attr("x1",para.errorplot_padding.left)
+					.attr("y1",para.svgHeight - para.errorplot_padding.bottom)
+					.attr("x2",para.errorplot_padding.left)
+					.attr("y2",para.svgHeight - para.heightForErrorPlot - para.errorplot_padding.bottom)
 					.attr("stroke","black")
 					.attr("stroke-width","1")
 }
-*/
+
 /**
  * @function addErrorBlock
  * @description Draw Error plot
  * @param {Node} svg -  is a html node on which the graph is being ploted
  * @param {object} para - Contains the parameters like height, width etc.,. tht helps to draw the graph
  */
-/*
+
 addErrorBlock = function(svg, para){
 	let rectBlock = svg.append("g").attr("id", "rect_errorplot");
 	rectBlock.append("line")
-			.attr("x1",para.graphFeatures.errorplot_padding.left)
-			.attr("y1",para.graphFeatures.svgHeight - para.graphFeatures.heightForErrorPlot - para.graphFeatures.errorplot_padding.bottom)
-			.attr("x2",para.graphFeatures.specWidth + para.graphFeatures.errorplot_padding.left)
-			.attr("y2",para.graphFeatures.svgHeight - para.graphFeatures.heightForErrorPlot - para.graphFeatures.errorplot_padding.bottom)
+			.attr("x1",para.errorplot_padding.left)
+			.attr("y1",para.svgHeight - para.heightForErrorPlot - para.errorplot_padding.bottom)
+			.attr("x2",para.specWidth + para.errorplot_padding.left)
+			.attr("y2",para.svgHeight - para.heightForErrorPlot - para.errorplot_padding.bottom)
 			.attr("stroke","black")
 			.attr("stroke-width","1")
 	rectBlock.append("line")
-			.attr("x1",para.graphFeatures.errorplot_padding.left)
-			.attr("y1",para.graphFeatures.svgHeight - para.graphFeatures.errorplot_padding.bottom)
-			.attr("x2",para.graphFeatures.specWidth + para.graphFeatures.errorplot_padding.left)
-			.attr("y2",para.graphFeatures.svgHeight - para.graphFeatures.errorplot_padding.bottom)
+			.attr("x1",para.errorplot_padding.left)
+			.attr("y1",para.svgHeight - para.errorplot_padding.bottom)
+			.attr("x2",para.specWidth + para.errorplot_padding.left)
+			.attr("y2",para.svgHeight - para.errorplot_padding.bottom)
 			.attr("stroke","black")
 			.attr("stroke-width","1")
 	rectBlock.append("line")
-			.attr("x1",para.graphFeatures.svgWidth - para.graphFeatures.errorplot_padding.right)
-			.attr("y1",para.graphFeatures.svgHeight - para.graphFeatures.errorplot_padding.bottom)
-			.attr("x2",para.graphFeatures.svgWidth - para.graphFeatures.errorplot_padding.right)
-			.attr("y2",para.graphFeatures.svgHeight - para.graphFeatures.heightForErrorPlot - para.graphFeatures.errorplot_padding.bottom)
+			.attr("x1",para.svgWidth - para.errorplot_padding.right)
+			.attr("y1",para.svgHeight - para.errorplot_padding.bottom)
+			.attr("x2",para.svgWidth - para.errorplot_padding.right)
+			.attr("y2",para.svgHeight - para.heightForErrorPlot - para.errorplot_padding.bottom)
 			.attr("stroke","black")
 			.attr("stroke-width","1")
 }
-*/
+
 /**
  * @function drawErrorYticks
  * @description Draw Error plot y ticks
  * @param {Node} svg -  is a html node on which the graph is being ploted
  * @param {object} para - Contains the parameters like height, width etc.,. tht helps to draw the graph
  */
-/*
+
 drawErrorYticks = function(svg, para){
 
 	let addYTicks = svg.append("g").attr("id","yErrorTicks")
 									.attr("class","yErrorTicks");
-	let tempTick = para.graphFeatures.errorThreshHoldVal/para.errorYticks;
+	let tempTick = para.errorThreshHoldVal/para.errorYticks;
 	//Draw tick at 0th position
 	let y = para.getErrorYPos(0);
 	inner_drawYTicks(y);
@@ -604,7 +624,7 @@ drawErrorYticks = function(svg, para){
 			addYTicks.append("line")
 						.attr("x1",para.padding.left)
 						.attr("y1",y)
-						.attr("x2",para.padding.left - para.ticklength)
+						.attr("x2",para.padding.left - para.tickLength)
 						.attr("y2",y)
 						.attr("stroke","black")
 						.attr("stroke-width","1")
@@ -613,7 +633,7 @@ drawErrorYticks = function(svg, para){
 	function inner_addErrorYTickValues(data,y){
 		if(!isNaN(y) && y >= para.padding.head)
 		{
-			addYTicks.append("text").attr("class","ytext").attr("x",para.padding.left - para.ticklength)
+			addYTicks.append("text").attr("class","ytext").attr("x",para.padding.left - para.tickLength)
 						.attr("y",y)
 						.attr("text-anchor","end")
 						.attr("alignment-baseline","middle")
@@ -622,18 +642,18 @@ drawErrorYticks = function(svg, para){
 		}
 	}
 }
-*/
+
 /**
  * @function drawErrorPoints
  * @description Draw Error points on the error graph
  * @param {Node} svg -  is a html node on which the graph is being ploted
  * @param {object} para - Contains the parameters like height, width etc.,. tht helps to draw the graph
  */
-/*
-drawErrorPoints = function(svg, para){
+
+drawErrorPoints = function(svg, para, errorList){
 	let circles = svg.append("g").attr("id", "error_circles");
-	para.graphFeatures.errorListData.forEach((element)=>{
-		if(parseFloat(element.theoretical_mass) > para.minMz && parseFloat(element.theoretical_mass) <= para.maxMz){
+	errorList.forEach((element)=>{
+		if(parseFloat(element.theoretical_mass) > para.winMinMz && parseFloat(element.theoretical_mass) <= para.winMaxMz){
 			circles.append("circle")
 			.attr("class","error_circles")
 			.attr("cx",function(d,i){
@@ -654,7 +674,7 @@ drawErrorPoints = function(svg, para){
 		}
 	})
 }
-*/
+
 /**
  * @function addLabels
  * @description Function to add labels on x and y axis
