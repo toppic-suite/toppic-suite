@@ -28,12 +28,14 @@
 <script src="../common/spectrum_graph/spectrum_graph.js"></script>
 <script src="../common/spectrum_graph/draw_spectrum.js"></script>
 
+<script src="../common/prsm_graph/prsm_data.js"></script>
+<script src="../common/prsm_graph/prsm_para.js"></script>
+<script src="../common/prsm_graph/draw_prsm.js"></script>
+<script src="../common/prsm_graph/prsm_graph.js"></script>
+
 <script src="js/prsm/load_spectra.js"></script>
 <script src="js/prsm/button_action.js"></script>
 
-<script src="js/util/coordinates_util.js"></script>
-<script src="js/util/prsmDataUtil.js"></script>
-<script src="js/util/drawSvg.js"></script>
 <script src="js/prsm/prsmtohtml.js"></script>
 <script src="js/prsm/drawMonoMassSpectrum.js"></script>
 <script src="js/prsm/calculateprefixandsuffixmass.js"></script>
@@ -45,14 +47,8 @@ var ms1Graph;
 var ms2GraphList = [];
 var ms2SpecList = [];
 var ms2PopupGraph;
-/*
-var ms2_ScansWithData = [];	
-var ms1_ScansWithData = [];
-var spectrumParams_global = [] ;
-var correspondingSpecParams_g = [];
-var monoMassDataList = [];
-*/
-
+var prsmGraph;
+var popupPrsmGraph;
 /**
  * This function waits till all the HTML tags are loaded.
  * Invokes functions to loads the complete prsm page and visualization
@@ -90,46 +86,22 @@ $(document).ready(function(){
 		// Get the information of the PRSM to the HTML
 		loadDatafromJson2Html();
 		
-		// Get the parameters to draw the SVG visualization 
-		let para = new parameters();
-
 		// Detting prsm data from prsm_data variable. prsm_data is a global variable from the prsm data file
 		let prsm = prsm_data.prsm ;
 		
 		// SVG Id for the visualization
-		let svg_id = "prsm_svg" ;
+		let prsmSvgId = "prsm_svg" ;
+    prsmGraph = new PrsmGraph(prsmSvgId, prsm_data.prsm);
+    prsmGraph.redraw();
 
-		// Draws SVG visualization with acid sequence
-		buildSvg(para,prsm,svg_id);
-		
-		// Color the background of occurence of mass shift from the left position to the right position given in the data
-		massShiftBackgroundColor(para,prsm,svg_id);
+    let popupSvgId = "prsm_popup_svg";
+    popupPrsmGraph = new PrsmGraph(popupSvgId, prsm_data.prsm);
 
-		// Get the amount of skipped acid and write the amount of skipped acid at the start and end of the sequence 
-		skippedAcidNotification(para,prsm,svg_id) ;
+		// Get occurence ptms in prsmtohtml.js
+		occurence_ptm(prsm_data.prsm);
 
-		//buildResidueAcids(para,prsm,id);
-		// If show number attribute is true 
-		if(para.show_num)
-		{
-			// Get the numerical count at the start and end of each row of sequence
-			getNumValues(para,prsm,svg_id);
-		}
-		
-		// Determine the start and end position of the sequence
-		drawAnnoOfStartEndPosition(para,prsm,svg_id) ;
-
-		//	Draw Annotations based prefix and suffix match
-		annotations(para,prsm,svg_id);
-
-		// Get the position of the fixed ptms and color them to red
-		addColorToFixedPtms(prsm,svg_id);
-
-		// Get occurence ptms
-		occurence_ptm(prsm);
-
-		// Get Unknown Ptms to show in the html
-		getUnknownPtms(prsm);
+		// Get Unknown Ptms to show in the html in prsmtohtml.js
+		getUnknownPtms(prsm_data.prsm);
 
 		// Create peaks data into table content
 		createTableElements();
@@ -479,12 +451,15 @@ $(document).ready(function(){
               <tbody>
                 <tr>
                   <div >
-                    <td class="td_popup_variables">Show Envelops: &nbsp;&nbsp;&nbsp;
-                      <input type="radio" name="show_envelops" class = "show_envelops"
-                                          checked>Yes
-                                          <input type="radio" name="show_envelops" class = "show_envelops">No
+                    <td class="td_popup_variables">Show envelopes: &nbsp;&nbsp;&nbsp;
+                      <input type="radio" name="show_envelopes" 
+                                          class = "show_envelopes"
+                                          checked>Yes</input>
+                      <input type="radio"
+                             name="show_envelopes" 
+                             class = "show_envelopes">No</input>
                     </td>
-                    <td class="td_popup_variables">Show Ions: &nbsp;&nbsp;&nbsp;
+                    <td class="td_popup_variables">Show ions: &nbsp;&nbsp;&nbsp;
                       <input type="radio" name="show_ions" class = "show_ions" checked>Yes
                       <input type="radio" name="show_ions" class = "show_ions">No
                     </td>
