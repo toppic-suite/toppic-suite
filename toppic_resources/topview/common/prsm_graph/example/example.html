@@ -6,30 +6,25 @@
 
             <script src="../../../node_modules/jquery/dist/jquery.js"></script>
             <script src="../../../node_modules/d3/dist/d3.js"></script>
-            <script src="../../prsm_data_util/prsm_data_util.js"></script>
 
-
-            <script src="../coordinates_util.js"></script>
-            <script src="../draw_svg.js"></script>
-            <script src="../svgAAS.js"></script>
-
+            <script src="../draw_prsm.js"></script>
+            <script src="../prsm_data.js"></script>
+            <script src="../prsm_graph.js"></script>
+            <script src="../prsm_para.js"></script>
 
             <script type="text/javascript" src="./prsm96.js"></script>
-            <!-- <script type="text/javascript" src="js/prsm/prsm.js"></script> -->
-
             
             <script>
                 $(document).ready(function(){
-                    let svgAAS = new SvgAAS(prsm_data, "l_svg");
-                    svgAAS.drawGraph();
+                    let prsmGraph = new PrsmGraph("svg", prsm_data.prsm);
+                    prsmGraph.redraw();
                 })
                 
             </script>
 
-            
     </head>
 
     <body>
-        <svg id = "l_svg" ></svg>
+        <svg id = "svg"></svg>
     </body>
 </html>
