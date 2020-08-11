@@ -15,7 +15,7 @@ drawSpectrum  = function(svgId, para, peaks, envPeaks, ions) {
   // Create a group under which all the fucntions of the graph will be appended
   svg = svg.append("g").attr("id","svgGroup");
 
-  /*call onMouseOut everytime to fix onHover bug adding multiple data when mouseover and zoomed up*/
+  //call onMouseOut everytime to fix onHover bug adding multiple data when mouseover and zoomed up
   onMouseOut();
   drawTicks(svg, para);
   drawAxis(svg,para);
@@ -35,10 +35,10 @@ drawSpectrum  = function(svgId, para, peaks, envPeaks, ions) {
 /**
  * @function onPeakMouseOut
  * @description Function to reset to the original on mouse out of peaks
- * @param {Node} this_element - is a html node. On mouse over generates tooltip based on the current peak
+ * @param {Node} this_element - is a html node. 
+ * On mouse over generates tooltip based on the current peak
  */
-onPeakMouseOut = function(this_element)
-{
+onPeakMouseOut = function(this_element) {
   this.onMouseOut();
   d3.select(this_element).style("stroke","black");
 }
@@ -65,21 +65,25 @@ onMouseOut = function(){
  * @param {Object} - Contains mz and intensity value of the current peak
  * @param {object} para - Contains the parameters like height, width etc.,. tht helps to draw the graph
  */
-onMouseOverPeak = function(this_element,peak,para)
-{
+onMouseOverPeak = function(this_element,peak,para) {
   let x = para.getPeakXPos(peak.mz);
   let y = para.getPeakYPos(peak.intensity);
   intensity =" inte:"+ parseFloat(peak.intensity).toFixed(3);
-  mz = "m/z:"+parseFloat(peak.mz).toFixed(3);
+  pos = parseFloat(peak.mz).toFixed(3);
+  if (para.isMonoMassGraph) {
+    pos = "mass:" + pos;
+  }
+  else {
+    pos = "m/z:"+ pos;
+  }
   y = y - para.mouseOverPadding.head ;
-  if(y<=para.mouseOverPadding.head)
-  {
+  if(y<=para.mouseOverPadding.head) {
     y = para.mouseOverPadding.head;
   }
   d3.select(this_element).style("stroke","red")
     .style("stroke-width","2");
 
-  let tooltipData = mz + "<br>" + intensity ;
+  let tooltipData = pos + "<br>" + intensity ;
   /*	Rectangle to have flexible on click and on mouse actions	*/
   var div = d3.select("body").append("div")
     .attr("id", "MyTextMZIN")
@@ -430,7 +434,10 @@ drawIons = function(svg,para,ions){
     if(x >= para.winMinMz && x <= para.winMaxMz) {
       let xPos = para.getPeakXPos(x) + para.ionXShift;
       let yPos = para.getPeakYPos(ion.intensity) + para.ionYShift;
-      let color = ion.env.color;
+      let color = "black";
+      if (typeof ion.env !== "undefined") {
+        color = ion.env.color;
+      }
       ionGroup.append("text")
         .attr("id","graph_matched_ions")
         .attr("x", xPos)

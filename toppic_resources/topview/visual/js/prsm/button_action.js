@@ -108,12 +108,27 @@ function addButtonActions() {
     let ms2Id = $('.ms2_graph_list.active')[0].id;
     let ms2Split = ms2Id.split("_");
     let ms2Index = parseInt(ms2Split[ms2Split.length-1]);
+    let type = parseInt(ms2Split[ms2Split.length-2]);
     let svgId = "popup_ms2_svg";
-    let peaks = ms2SpecList[ms2Index].peaks;
-    let envelopes = ms2SpecList[ms2Index].envelopes;
-    ms2PopupGraph = new SpectrumGraph(svgId,peaks,envelopes);
+    let peaks, envelopes, ions;
+    if (type == "graphlist") {
+      peaks = ms2SpecList[ms2Index].peaks;
+      envelopes = ms2SpecList[ms2Index].envelopes;
+      ions = ms2SpecList[ms2Index].ions;
+    }
+    else {
+      peaks = ms2SpecList[ms2Index].monoMasses;
+      envelopes = ms2SpecList[ms2Index].monoEnvelopes;
+      ions = ms2SpecList[ms2Index].monoIons;
+    }
+    ms2PopupGraph = new SpectrumGraph(svgId,peaks,envelopes, ions);
     // copy parameters
-    Object.assign(ms2PopupGraph.para, ms2GraphList[ms2Index].para);
+    if (type == "graphlist") {
+      Object.assign(ms2PopupGraph.para, ms2GraphList[ms2Index].para);
+    }
+    else {
+      Object.assign(ms2PopupGraph.para, ms2MonoGraphList[ms2Index].para);
+    }
     ms2PopupGraph.redraw();
     // This allows pop up window to be moved
     $("#ms2_graph_popup_window").draggable({
@@ -151,13 +166,19 @@ function addButtonActions() {
     /*	get Mono M/z value till 3 decimal values	*/
     let monoMz = parseFloat(this.innerHTML).toFixed(3) ;
     for (let i = 0; i < ms2SpecList.length; i++) {
-      let listId = "ms2_svg_div_list_" + i;
+      let listId = "ms2_svg_div_graphlist_" + i;
       let graphId = "ms2_svg_div_graph_" + i;
+      let monolistId = "ms2_svg_div_monographlist_" + i;
+      let monoGraphId = "ms2_svg_div_mono_graph_" + i;
       let listElement = document.getElementById(listId);
       let graphElement = document.getElementById(graphId);
+      let monoListElement = document.getElementById(monolistId);
+      let monoGraphElement = document.getElementById(monoGraphId);
       if (scanNum == ms2SpecList[i].scan) {
         listElement.classList.add("active");
-        graphElement.style.display="inline";
+        graphElement.style.display="";
+        monoListElement.classList.remove("active");
+        monoGraphElement.style.display="none";
         let spGraph = ms2GraphList[i]; 
         // set monoMz to do
         spGraph.para.updateMzRange(monoMz);
@@ -166,6 +187,8 @@ function addButtonActions() {
       else {
         listElement.classList.remove("active");
         graphElement.style.display="none";
+        monoListElement.classList.remove("active");
+        monoGraphElement.style.display="none";
       }
     }
     showMs2Graph();
