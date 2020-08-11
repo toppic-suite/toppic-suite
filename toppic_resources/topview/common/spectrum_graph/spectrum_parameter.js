@@ -72,6 +72,9 @@ class SpectrumParameters {
   ionXShift = -5;
   ionYShift = -15;
 
+  // Mono mass graph
+  isMonoMassGraph = false;
+
   constructor() {
   }
 
