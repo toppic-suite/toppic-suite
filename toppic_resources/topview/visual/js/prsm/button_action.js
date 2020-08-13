@@ -108,7 +108,7 @@ function addButtonActions() {
     let ms2Id = $('.ms2_graph_list.active')[0].id;
     let ms2Split = ms2Id.split("_");
     let ms2Index = parseInt(ms2Split[ms2Split.length-1]);
-    let type = parseInt(ms2Split[ms2Split.length-2]);
+    let type = ms2Split[ms2Split.length-2];
     let svgId = "popup_ms2_svg";
     let peaks, envelopes, ions;
     if (type == "graphlist") {
@@ -121,7 +121,8 @@ function addButtonActions() {
       envelopes = ms2SpecList[ms2Index].monoEnvelopes;
       ions = ms2SpecList[ms2Index].monoIons;
     }
-    ms2PopupGraph = new SpectrumGraph(svgId,peaks,envelopes, ions);
+    let proteoform = prsmGraph.data.proteoform;
+    ms2PopupGraph = new SpectrumGraph(svgId,peaks,envelopes, ions, proteoform);
     // copy parameters
     if (type == "graphlist") {
       Object.assign(ms2PopupGraph.para, ms2GraphList[ms2Index].para);

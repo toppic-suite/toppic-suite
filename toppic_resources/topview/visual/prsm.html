@@ -28,17 +28,17 @@
 <script src="../common/spectrum_graph/spectrum_graph.js"></script>
 <script src="../common/spectrum_graph/draw_spectrum.js"></script>
 
+<script src="../common/proteoform/protein_constant.js"></script>
+<script src="../common/proteoform/proteoform.js"></script>
+
 <script src="../common/prsm_graph/prsm_data.js"></script>
 <script src="../common/prsm_graph/prsm_para.js"></script>
 <script src="../common/prsm_graph/draw_prsm.js"></script>
 <script src="../common/prsm_graph/prsm_graph.js"></script>
 
+<script src="js/prsm/prsm_to_html.js"></script>
 <script src="js/prsm/load_spectra.js"></script>
 <script src="js/prsm/button_action.js"></script>
-
-<script src="js/prsm/prsmtohtml.js"></script>
-<script src="js/prsm/calculateprefixandsuffixmass.js"></script>
-<script src="js/prsm/aminoaciddistribution.js"></script>
 <script src="js/prsm/inspect.js"></script>
 
 <script>
@@ -135,7 +135,8 @@ $(document).ready(function(){
       ms2FileList.push(ms2Filename);
     }
     [ms2SpecList, ms2GraphList, ms2MonoGraphList] 
-      = loadMsTwo(ms2SpecIdList, ms2FileList, "ms2_svg_div", "ms2_graph_nav");
+      = loadMsTwo(ms2SpecIdList, ms2FileList, prsmGraph.data.proteoform, 
+        "ms2_svg_div", "ms2_graph_nav");
 		//getMonoMassDataList(ms2ScanIdList);
 	}
 })

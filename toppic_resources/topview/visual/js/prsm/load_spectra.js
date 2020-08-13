@@ -19,7 +19,7 @@ function loadMsOne(filename, ms1SvgId){
   }
 }
 
-function loadMsTwo(specIdList, fileList, divId, navId){
+function loadMsTwo(specIdList, fileList, proteoform, divId, navId){
   let len = fileList.length;
   let cnt = 0;
   let specList = [];
@@ -55,7 +55,7 @@ function loadMsTwo(specIdList, fileList, divId, navId){
           let deconvPeaks = prsm_data.prsm.ms.peaks.peak;
           let [ions, monoIons] = getIons(specId, deconvPeaks, envelopes);
           specList[j].ions = ions;
-          let spGraph = new SpectrumGraph(svgId,peaks,envelopes,ions);
+          let spGraph = new SpectrumGraph(svgId,peaks,envelopes,ions,proteoform);
           spGraph.redraw();
           graphList.push(spGraph);
           //mono mass svg
@@ -68,8 +68,8 @@ function loadMsTwo(specIdList, fileList, divId, navId){
           specList[j].monoMasses = monoMasses;
           specList[j].monoEnvelopes = monoEnvelopes;
           specList[j].monoIons = monoIons;
-          let monoSpGraph = new SpectrumGraph(monoSvgId,monoMasses,monoEnvelopes,monoIons);
-          monoSpGraph.para.isMonoMassGraph = true;
+          let monoSpGraph = new SpectrumGraph(monoSvgId,monoMasses,monoEnvelopes,monoIons,proteoform);
+          monoSpGraph.para.setMonoMassGraph(true);
           monoSpGraph.redraw();
           monoGraphList.push(monoSpGraph);
         }
@@ -81,28 +81,34 @@ function loadMsTwo(specIdList, fileList, divId, navId){
           let ms2Index = parseInt(ms2Split[ms2Split.length-1]);
           let type = ms2Split[ms2Split.length - 2];
           for (let i = 0; i < ms2GraphList.length; i++) {
-            let listId = "ms2_svg_div_" + type + "_" + i;
+            let listId = "ms2_svg_div_graphlist_" + i;
+            let monoListId = "ms2_svg_div_monographlist_" + i;
             let graphId = "ms2_svg_div_graph_" + i;
-            let monoId = "ms2_svg_div_mono_graph_" + i;
+            let monoGraphId = "ms2_svg_div_mono_graph_" + i;
             //console.log(listId, graphId);
             let listElement = document.getElementById(listId);
+            let monoListElement = document.getElementById(monoListId);
             let graphElement = document.getElementById(graphId);
-            let monoElement = document.getElementById(monoId);
+            let monoGraphElement = document.getElementById(monoGraphId);
             if (i== ms2Index) {
-              listElement.classList.add("active");
               if (type == "graphlist") {
+                listElement.classList.add("active");
+                monoListElement.classList.remove("active");
                 graphElement.style.display="";
-                monoElement.style.display="none";
+                monoGraphElement.style.display="none";
               }
               else {
+                listElement.classList.remove("active");
+                monoListElement.classList.add("active");
                 graphElement.style.display="none";
-                monoElement.style.display="";
+                monoGraphElement.style.display="";
               }
             }
             else {
               listElement.classList.remove("active");
+              monoListElement.classList.remove("active");
               graphElement.style.display="none";
-              monoElement.style.display="none";
+              monoGraphElement.style.display="none";
             }
           }
         })
@@ -198,6 +204,7 @@ function getIons(specId, deconvPeaks, envelopes){
     if(element.hasOwnProperty('matched_ions_num') && 
       element.spec_id == specId) {
       let ionText = "";
+      let massError = 0;
       if (parseInt(element.matched_ions_num) == 1) {
         let matchedIon = element.matched_ions.matched_ion;
         let ionType = matchedIon.ion_type;
@@ -205,6 +212,7 @@ function getIons(specId, deconvPeaks, envelopes){
           ionType = "Z\u02D9";
         }
         ionText = ionType + matchedIon.ion_display_position;
+        massError = parseFloat(matchedIon.mass_error);
       }
       else {
         //console.log(element.matched_ions.length);
@@ -216,6 +224,9 @@ function getIons(specId, deconvPeaks, envelopes){
           }
           let curIonText = ionType + matchedIon.ion_display_position;
           ionText = ionText + curIonText + " ";
+          if (parseFloat(matchedIon.mass_error) > 0) {
+            massError = parseFloat(matchedIon.mass_error);
+          }
         }
       }
       let peakId = element.peak_id;
@@ -226,14 +237,14 @@ function getIons(specId, deconvPeaks, envelopes){
       });
       let x = parseFloat(envPeaks[0].mz);
       let y = parseFloat(envPeaks[0].intensity);
-      let ionData = {"mz": x, "intensity": y, "text": ionText};
+      let ionData = {"mz": x, "intensity": y, "text": ionText, "error": massError};
       //console.log(ionData);
       ionData.env = envelopes[peakId]; 
       ions.push(ionData);
       let monoX = parseFloat(envelopes[peakId].mono_mass);
       let monoY = 0; 
       envPeaks.forEach(element => monoY += element.intensity); 
-      let monoIonData = {"mz": monoX, "intensity": monoY, "text": ionText};
+      let monoIonData = {"mz": monoX, "intensity": monoY, "text": ionText, "error": massError};
       addOneIon(monoIons, monoIonData);
     }
   });
