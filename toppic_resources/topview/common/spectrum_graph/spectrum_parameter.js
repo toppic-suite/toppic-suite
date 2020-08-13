@@ -8,9 +8,9 @@ class SpectrumParameters {
 
   // SVG size
   svgWidth = 910;
-  svgHeight = 220;
+  svgHeight = 270;
 	// SVG padding 
-	padding = {left:70, right:20, head:10, bottom:50};
+	padding = {left:70, right:50, head:10, bottom:50};
   // spectrum size
 	specWidth = this.svgWidth - this.padding.left - this.padding.right;
   specHeight = this.svgHeight - this.padding.head - this.padding.bottom;
@@ -72,18 +72,12 @@ class SpectrumParameters {
   ionXShift = -5;
   ionYShift = -15;
 
-  // Parameters related to sequence
-  showSequence = false;
-  adjustableHeightVal = 40;
-
-  // Parameters related to error plots
-  showErrorPlots = false;
-  errorThreshHoldVal = 0.2;
-  heightForErrorPlot = 60;
-  adjustableIonPosition = 10;
-  errorplot_padding = {left:70, right:20, head:10, bottom:10};
-  errorYticks = 2;
-
+  // Mono mass graph
+  isMonoMassGraph = false;
+  errorPlotPadding = {left:70, right:50, head:10, bottom:10};
+  errorPlotHeight = 40;
+  errorThreshold = 0.2;
+  errorYTickNum = 2;
 
   constructor() {
   }
@@ -161,6 +155,18 @@ class SpectrumParameters {
   getPeakYPos = function (intensity) {
     let peakY = this.svgHeight - intensity * this.yScale - this.padding.bottom;
     return peakY;
+  }
+
+  /**
+   * @function getErrorYPos
+   * @description Function provides the y coordinate for the error val on the error plot
+   */
+  getErrorYPos(errorVal) {
+    // Multiply with 2 as the coordinates has to be both positive and negative
+    let yErrorScale = this.errorPlotHeight/(this.errorThreshold*2);
+    let pos = this.svgHeight - (errorVal * yErrorScale) 
+      - this.errorPlotPadding.bottom - this.errorPlotHeight/2;
+    return pos;
   }
 
   /**
@@ -335,6 +341,20 @@ class SpectrumParameters {
     this.hlMinMz = centerMz - dist; 
     this.hlMaxMz = centerMz + dist;
     //console.log(precMonoMz, this.hlMinMz, this.hlMaxMz);
+  }
+
+  setMonoMassGraph(isMonoMass) {
+    this.isMonoMassGraph = isMonoMass;
+    if (isMonoMass) {
+      this.padding.head = 60;
+      this.padding.bottom = 75;
+    }
+    else {
+      this.padding.head = 20;
+      this.padding.bottom = 50;
+    }
+    this.specHeight = this.svgHeight - this.padding.head - this.padding.bottom;
+    this.updateScale(this.winMinMz, this.winMaxMz, this.winMaxInte);
   }
 
   /**

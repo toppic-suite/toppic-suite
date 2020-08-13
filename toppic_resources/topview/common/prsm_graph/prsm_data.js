@@ -3,9 +3,11 @@ class PrsmData {
   formFirstPos;
   formLastPos;
   breakPoints;
+
+  sequence;
   fixedPtms;
   massShifts;
-  //massErrors;
+  proteoform;
 
   rowNum;
   displayFirstPos;
@@ -30,7 +32,8 @@ class PrsmData {
     this.breakPoints = json2BreakPoints(prsm);
     this.fixedPtms = json2FixedPtms(prsm);
     this.massShifts = json2MassShifts(prsm);
-    //this.massErrors = json2MassErrors(prsm);
+    this.sequence = this.getAminoAcidSequence();
+    this.proteoform = new Proteoform(this.sequence, this.fixedPtms, this.massShifts);
   }
 
   updatePara = function(para) {
@@ -86,7 +89,16 @@ class PrsmData {
       }
     }
   }
-}	
+
+  getAminoAcidSequence = function() {
+    let sequence = "";
+    for (let i = this.formFirstPos; i <= this.formLastPos; i++) {
+      sequence = sequence + this.residues[i].acid;
+    }
+    //console.log("sequence", sequence);
+    return sequence;
+  }
+}
 
 /**
  * Get the cleavage positions from the prsm data
@@ -222,23 +234,3 @@ function json2MassShifts(prsm) {
 	return massShifts ;
 }
 
-/**
- * Get the mass error from the prsm cleavage
- * @param {object} prsm - json obeject with complete prsm data 
- */
-function json2MassErrors(prsm){
-	let list = [];
-  prsm.ms.peaks.peak.forEach((peak) => {
-    if(peak.hasOwnProperty('matched_ions_num')) {
-      let ions = getJsonList(peak.matched_ions.matched_ion);
-      for (let i = 0; i < ions.length; i++) {
-        let massError = {};
-        massError.mass = ions[i].theoretical_mass;
-        massError.error = ions[i].mass_error;
-        list.push(massError);
-      }
-    }
-  })
-  //console.log(list);
-	return list;
-}

@@ -17,7 +17,7 @@ $(document).ready(function() {
 function showMatchedPeaks() {
   var elems = document.getElementsByClassName("matched_peak");
   for(var i = 0; elems.length > i; i++) {
-    elems[i].style.display = "inline";
+    elems[i].style.display = "";
   }
   elems = document.getElementsByClassName("unmatched_peak");
   for(var i = 0; elems.length > i; i++) {
@@ -36,7 +36,7 @@ function showNotMatchedPeaks() {
   }
   elems = document.getElementsByClassName("unmatched_peak");
   for(var i = 0; elems.length > i; i++) {
-    elems[i].style.display = "inline";
+    elems[i].style.display = "";
   }
   //$('div.dataTables_scrollBody').height(400);
 }
@@ -47,11 +47,11 @@ function showNotMatchedPeaks() {
 function showAllPeaks() {
   var elems = document.getElementsByClassName('matched_peak');
   for(var i = 0; elems.length > i; i++) {
-    elems[i].style.display = "inline";
+    elems[i].style.display = "";
   }
   elems = document.getElementsByClassName('unmatched_peak');
   for(var i = 0; elems.length > i; i++) {
-    elems[i].style.display = "inline";
+    elems[i].style.display = "";
   }
   //$('div.dataTables_scrollBody').height(400);
 }

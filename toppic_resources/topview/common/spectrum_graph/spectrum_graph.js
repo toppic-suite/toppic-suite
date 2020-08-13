@@ -11,7 +11,7 @@ class SpectrumGraph {
   transformX = 0;
   transformScale = 1.0;
   
-  constructor(svgId, peakList, envList){
+  constructor(svgId, peakList, envList, ionList, proteoform){
     this.id = svgId;
     this.para = new SpectrumParameters();
     this.peakList = peakList;
@@ -22,7 +22,8 @@ class SpectrumGraph {
     this.envList = envList;
     this.para.addColorToEnvelopes(envList);
     this.envPeakList = this.getEnvPeakList(this.envList);
-    this.ionList = this.getIonList(this.envList);
+    this.ionList = ionList; 
+    this.proteoform = proteoform;
     $("#" + svgId).data("graph", this);
     // add zoom function
     this.svg = d3.select("body").select("#"+svgId);
@@ -34,7 +35,7 @@ class SpectrumGraph {
 
   redraw = function(){
     //console.log(this.envList);
-    drawSpectrum(this.id, this.para, this.peakList, this.envPeakList, this.ionList, this.prefixSequence, this.suffixSequence, this.errorList);
+    drawSpectrum(this.id, this.para, this.peakList, this.envPeakList, this.proteoform, this.ionList);
   }
 
   zoomed = function () {
@@ -72,54 +73,5 @@ class SpectrumGraph {
       return y.intensity - x.intensity;
     });
     return envPeakList;
-  }
-
-  getIonList = function(envList) {
-    let ionList = [];
-    for (let i = 0; i < envList.length; i++) {
-      let env = envList[i];
-      if (typeof env.ion !== "undefined") {
-        let ionObj = {};
-        ionObj.mz = env.mz;
-        ionObj.intensity = env.intensity;
-        ionObj.text = env.ion;
-        if (typeof env.color !== "undefined") {
-          ionObj.color = env.color;
-        }
-        ionList.push(ionObj);
-        // let ion = env.ion;
-        // ion.env = env; 
-        // ionList.push(ion);
-      }
-    }
-    return ionList;
-  }
-
-  drawMonoMassGraph(prefixSequence, suffixSequence, errorList) {
-    // Setting the graphFeatures object with all the features needed for the graph
-    this.para.showSequence = true;
-    this.para.showErrorPlots = true;
-    this.prefixSequence = prefixSequence;
-    this.suffixSequence = suffixSequence;
-    this.errorList = errorList;
-    this.para.svgHeight = this.para.svgHeight + this.para.adjustableHeightVal + this.para.heightForErrorPlot;
-    this.para.padding.head = this.para.padding.head + this.para.adjustableHeightVal;
-    this.para.padding.bottom = this.para.padding.bottom + this.para.heightForErrorPlot;
-    // Gets the absolute max and minimum value for upper bound and lower bound of y axis to draw the error plot
-    this.para.errorThreshHoldVal = this.getAbsoluteMaxValfromList(errorList);
-    this.svg.attr("viewBox", "0 0 "+ this.para.svgWidth+" "+ this.para.svgHeight);
-    this.redraw();
-  }
-
-  getAbsoluteMaxValfromList(errorDataList){
-    let max = 0;
-    errorDataList.forEach((element)=>{
-        let val = Math.abs(element.mass_error);
-        if(max < val) max = val; 
-    })
-    //Getting the round off fraction value
-    max = max * 100;
-    max = Math.ceil(max)/100;
-    return max;
   }
 }
