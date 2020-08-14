@@ -479,16 +479,14 @@ function drawIons(svg,para,ions){
         .style("opacity", "0.8")
         .style("stroke-width","2")
         .text(ion.text);
-      } else {
-        ionGroup.append("text")
-        .attr("id","graph_matched_ions")
-        .attr("x", xPos)
-        .attr("y", yPos) 
-        .style("opacity", "0.8")
-        .style("stroke-width","2")
-        .text(ion.text);
-      }
-      
+    } else {
+    ionGroup.append("text")
+    .attr("id","graph_matched_ions")
+    .attr("x", xPos)
+    .attr("y", yPos) 
+    .style("opacity", "0.8")
+    .style("stroke-width","2")
+    .text(ion.text);
     }
   }
 }
