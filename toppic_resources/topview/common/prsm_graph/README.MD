@@ -5,6 +5,7 @@ PrsmGraph is a library for drawing Amino Acid Sequence table on html page.
 ## Dependencies
 
 D3, jQuery
+Topview library: proteoform
 
 ## Usage
 
