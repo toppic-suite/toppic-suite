@@ -12,12 +12,12 @@ function setIonCheckbox(ionType){
 		"X":"x"		
 	}
 	
-	let ionsAll = document.getElementsByClassName("custom-control-input");
+	let ionsAll = elements.customControlInput;
 	let ionTypeSplit = ionType.split(',');
 
 	ionTypeSplit.forEach(function(ionTy){
 		for (let i = 0; i<ionsAll.length;i++){
-			if (ionNames[ionTy] == ionsAll[i].id){
+			if (ionNames[ionTy] === ionsAll[i].id){
 				 ionsAll[i].checked = true;
 			}
 		}
