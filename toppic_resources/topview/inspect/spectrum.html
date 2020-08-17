@@ -81,9 +81,9 @@
 	var sequence = parseSeq('sequence');
 	var l_fixedPtmList = parsePTM('fixedPtmList');
 	let unknownMassShiftList = parseUnknowmassList('unknownMassShiftList');
-	precursorMass = parseFloat(JSON.parse(window.localStorage.getItem('precursorMass')));
-	if(peakAndIntensityList != null && massAndIntensityList != null
-		&& sequence != null && precursorMass != null)
+	precursorMass = parsePrecursorMass("precursorMass");
+	if(peakAndIntensityList !== null && massAndIntensityList !== null
+		&& sequence !== null && precursorMass !== null)
 	{	
 		let SetValuesToHtmlObj = new SetValuesToHtml(peakAndIntensityList,massAndIntensityList,sequence,l_fixedPtmList,unknownMassShiftList,precursorMass);
 		SetValuesToHtmlObj.setDataToPeakAndIntensity();
