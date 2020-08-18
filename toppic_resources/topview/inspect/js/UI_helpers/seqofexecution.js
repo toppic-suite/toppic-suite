@@ -71,13 +71,13 @@ class SeqOfExecution
 		/** 
 		* Get fixed mass selected by user
 		*/
-		fixedMassShiftList = massShiftObj.getFixedMassList(sequence);
+		fixedMassShiftList = massShiftObj.getFixedMassList(selectedFixedMassShiftList);
 		/**
 		 * If user removed fixed ptm mass, remove the mass from the list
 		 */
 		if(removeAcid !== "")
 		{
-			massShiftList = massShiftObj.removeFixedMassList(sequence,massShiftList,removeAcid);
+			massShiftList = massShiftObj.removeFixedMassList(massShiftList,removeAcid);
 		}
 		/**
 		 * Get the combined mass shift, easier when combined to plot on the HTML
