@@ -12,7 +12,7 @@ function setIonCheckbox(ionType){
 		"X":"x"		
 	}
 	
-	let ionsAll = elements.customControlInput;
+	let ionsAll = domElements.customControlInput;
 	let ionTypeSplit = ionType.split(',');
 
 	ionTypeSplit.forEach(function(ionTy){

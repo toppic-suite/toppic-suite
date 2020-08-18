@@ -3,5 +3,5 @@
  */
 function setPrecursorMass(precursorMass)
 {
-    elements.precursorMass.innerHTML = precursorMass;
+    domElements.precursorMass.innerHTML = precursorMass;
 }

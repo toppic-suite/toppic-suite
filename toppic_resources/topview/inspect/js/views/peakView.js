@@ -2,7 +2,7 @@
  * Set Peak List on to html
  */
 function setDataToPeakAndIntensity(peakAndIntensityList){
-    elements.peakData.val(peakAndIntensityList);
+    jqueryElements.peakData.val(peakAndIntensityList);
 }
 /**
  * Function to get data of peaks and intensity from UI
