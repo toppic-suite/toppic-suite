@@ -1,6 +1,8 @@
-class MassShifts {
-	constructor(){
+class MassShift {
+	constructor(sequence){
+		this.sequence = sequence;
 	}
+
 	/**
 	 * @param {string} seq - an argument with mass shift changes embeded in [] square bracket.
 	 * @return {string} parsedseq - sequence after removing the mass
@@ -8,7 +10,7 @@ class MassShifts {
 	 * @returns {Array} massShiftList - Array with {position,mass} position-position at which 
 	 * mass shift occured, mass- mass shift value.
 	 */
-	getMassShiftList(seq){
+	parseSequenceMassShift(seq){
 		let massShiftList = [] ;
 		let parsedseq = "";
 		let splitStr = seq.split(/\[(.*?)\]/);
@@ -43,6 +45,81 @@ class MassShifts {
 		}
 		return [parsedseq,massShiftList] ;
 	}
+
+
+	/**
+	 * Get mass shift list by given unexpected mass shift list and fixed PTM shift list
+	 * @param {Array} unexpectedMassShiftList
+	 * @param {Array} fixedPtmShiftList
+	 */
+	getMassShiftList(unexpectedMassShiftList, fixedPtmShiftList) {
+		function ifMatch(position, fixedPtmShiftList) {
+			for (let i = 0; i < fixedPtmShiftList.length; i++) {
+				if(position === fixedPtmShiftList[i].position) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		let result = [...fixedPtmShiftList];
+		for (let i = 0; i < unexpectedMassShiftList.length; i++) {
+			// add unexpected mass shift if its position does not match any fixed PTM shift
+			if(!ifMatch(unexpectedMassShiftList[i].position, fixedPtmShiftList)) {
+				let tempObj = {mass:unexpectedMassShiftList[i].mass, position: unexpectedMassShiftList[i].position, bg_color: unexpectedMassShiftList[i].bg_color};
+				result.push(tempObj);
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * Get shift mass list based on selected fixed ptm list
+	 * @param {Array} selectedFixedPtmList - an array which contains fixed mass shift selected by users, EX. [{acid: X, mass: 12}]
+	 * @return {Array} - Returns an Array of fixed mass shift with positions. EX. [{position:i, mass:x, bg_color:null}]
+	 */
+	getFixedMassShiftList(selectedFixedPtmList){
+		let result = [];
+		let fixedPtmAcid = null;
+		let fixedPtmMass = null;
+		// let selectedFixedPtmList = getFixedPtmCheckList();
+		for(let k=0; k<selectedFixedPtmList.length; k++)
+		{
+			fixedPtmAcid = selectedFixedPtmList[k].acid;
+			fixedPtmMass = selectedFixedPtmList[k].mass;
+			for(let i = 0 ; i<this.sequence.length; i++)
+			{
+				if(this.sequence[i] === fixedPtmAcid)
+				{
+					let tempObj = {position:i, mass:fixedPtmMass, bg_color:null}
+					result.push(tempObj);
+				}
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * Remove acid mass shift from fixed mass list
+	 * @param {string} sequence - sequence without mass shifts
+	 * @param {Array} fixedMassShiftList - Fixed mass shift list
+	 * @param {Char} removeAcid - mass to be removed of a specific Acid
+	 */
+	removeFixedMassList(fixedMassShiftList,removeAcid)
+	{
+		let result  = [];
+		removeAcid = removeAcid.toUpperCase()
+		for(let i=0;i<fixedMassShiftList.length;i++)
+		{
+			let pos = fixedMassShiftList[i].position;
+			if(this.sequence[pos] !== removeAcid)
+			{
+				result.push(fixedMassShiftList[i]);
+			}
+		}
+		return result ;
+	}
+
 	/**
 	 * @param {integer} shiftPosition - contains the position of the new mass
 	 * shift entered in text box on click of any amino acid.
@@ -81,91 +158,8 @@ class MassShifts {
 		}
 		return newMassShiftList ;
 	}
-	/**
-	 * Get the fixed ptm mass list with position
-	 * @param {string} seq - plain sequence entered by the user.
-	 * @param {Array} selectedFixedMassShiftList - an array which contains fixed mass shift selected by users, EX. [{acid: X, mass: 12}]
-	 * @return {Array} - Returns an Array of fixed mass shift with positions.
-	 */
-	getFixedMassList(seq, selectedFixedMassShiftList){
-		let fixedShiftList = [];
-		let fixedPtmAcid = null;
-		let fixedPtmMass = null;
-		// let selectedFixedMassShiftList = getFixedPtmCheckList();
-		for(let k=0; k<selectedFixedMassShiftList.length; k++)
-		{
-			fixedPtmAcid = selectedFixedMassShiftList[k].acid;
-			fixedPtmMass = selectedFixedMassShiftList[k].mass;
-			for(let i = 0 ; i<seq.length;i++)
-			{
-				if(seq[i] === fixedPtmAcid)
-				{
-					let tempObj = {position:i, mass:fixedPtmMass, bg_color:null}
-					fixedShiftList.push(tempObj);
-				}
-			}
-		}
-		return fixedShiftList;
-	}
-	/**
-	 * Remove acid mass shift from fixed mass list
-	 * @param {string} sequence - sequence without mass shifts
-	 * @param {Array} fixedMassShiftList - Fixed mass shift list
-	 * @param {Char} removeAcid - mass to be removed of a specific Acid
-	 */
-	removeFixedMassList(sequence,fixedMassShiftList,removeAcid)
-	{
-		let result  = [];
-		removeAcid = removeAcid.toUpperCase()
-		for(let i=0;i<fixedMassShiftList.length;i++)
-		{
-			let pos = fixedMassShiftList[i].position;
-			if(sequence[pos] !== removeAcid)
-			{
-				result.push(fixedMassShiftList[i]);
-			}
-		}
-		return result ;
-	}
-	/**
-	 * This returns combined List of both Fixed and user entered mass shifts
-	 * @param {Array} massShiftList - List of all the mass Shifts from sequence
-	 * @param {Array} fixedMassShiftList - List of all selected fixed masses
-	 * @returns {Array} combinedMassShiftList - List of combined lists by checking 
-	 * over lapping posiitons
-	 */
-	getCombinedMassShiftList(massShiftList,fixedMassShiftList){
-		let combinedMassShiftList = massShiftList;
-		let fixedMasslen = fixedMassShiftList.length;
-		let massShiftlen = massShiftList.length;
-		
-		for(let i=0; i<fixedMasslen ; i++)
-		{
-			let matched = false;
-			for(let j=0;j<massShiftlen;j++)
-			{
-				/**
-				 * Check if both has mass shift at common position and over ride the mass shift with fixed mass shift
-				 */
-				if(combinedMassShiftList[j].position == fixedMassShiftList[i].position)
-				{
-					combinedMassShiftList[j].mass = fixedMassShiftList[i].mass ;
-					combinedMassShiftList[j].bg_color = fixedMassShiftList[i].bg_color ;
-					matched = true;
-					break;
-				}
-			}
-			/**
-			 * If no match found then copy to the new combined list
-			 */
-			if(!matched)
-			{
-				combinedMassShiftList.push(fixedMassShiftList[i]);
-			}
-		}
-		
-		return combinedMassShiftList ;
-	}
+	
+	
 	/**
 	 * forms the seq with all the mass lists and selected fixed ptms
 	 * @param {string} seq - sequence with only aminoacids and without mass lists embedded
