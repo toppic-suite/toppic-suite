@@ -84,53 +84,48 @@ class MassShifts {
 	/**
 	 * Get the fixed ptm mass list with position
 	 * @param {string} seq - plain sequence entered by the user.
+	 * @param {Array} selectedFixedMassShiftList - an array which contains fixed mass shift selected by users, EX. [{acid: X, mass: 12}]
 	 * @return {Array} - Returns an Array of fixed mass shift with positions.
 	 */
-	getFixedMassList(seq){
+	getFixedMassList(seq, selectedFixedMassShiftList){
 		let fixedShiftList = [];
 		let fixedPtmAcid = null;
 		let fixedPtmMass = null;
-		let fixedMassShiftList = this.getFixedPtmChecklist();
-		let fixedMassLen = fixedMassShiftList.length;
-		for(let k=0; k<fixedMassLen; k++)
+		// let selectedFixedMassShiftList = getFixedPtmCheckList();
+		for(let k=0; k<selectedFixedMassShiftList.length; k++)
 		{
-			fixedPtmAcid = fixedMassShiftList[k].acid;
-			fixedPtmMass = fixedMassShiftList[k].mass;
-			if( fixedPtmAcid != null && fixedPtmMass != null)
+			fixedPtmAcid = selectedFixedMassShiftList[k].acid;
+			fixedPtmMass = selectedFixedMassShiftList[k].mass;
+			for(let i = 0 ; i<seq.length;i++)
 			{
-				let seqln = seq.length ;
-				for(let i = 0 ; i<seqln;i++)
+				if(seq[i] === fixedPtmAcid)
 				{
-					if(seq[i] == fixedPtmAcid)
-					{
-						let tempObj = {position:i,mass:fixedPtmMass,bg_color:null}
-						fixedShiftList.push(tempObj);
-					}
+					let tempObj = {position:i, mass:fixedPtmMass, bg_color:null}
+					fixedShiftList.push(tempObj);
 				}
 			}
 		}
-		return fixedShiftList ;
+		return fixedShiftList;
 	}
 	/**
-	 * Remove the removed fixed mass from fixed mass list
+	 * Remove acid mass shift from fixed mass list
 	 * @param {string} sequence - sequence without mass shifts
 	 * @param {Array} fixedMassShiftList - Fixed mass shift list
 	 * @param {Char} removeAcid - mass to be removed of a specific Acid
 	 */
 	removeFixedMassList(sequence,fixedMassShiftList,removeAcid)
 	{
-		let newList  = [];
-		let len = fixedMassShiftList.length;
+		let result  = [];
 		removeAcid = removeAcid.toUpperCase()
-		for(let i=0;i<len;i++)
+		for(let i=0;i<fixedMassShiftList.length;i++)
 		{
-			let pos = fixedMassShiftList[i].position ;
-			if(sequence[pos] != removeAcid)
+			let pos = fixedMassShiftList[i].position;
+			if(sequence[pos] !== removeAcid)
 			{
-				newList.push(fixedMassShiftList[i]);
+				result.push(fixedMassShiftList[i]);
 			}
 		}
-		return newList ;
+		return result ;
 	}
 	/**
 	 * This returns combined List of both Fixed and user entered mass shifts
@@ -195,8 +190,8 @@ class MassShifts {
 			/**
 			 * Dont show when the mass is 0 in the string
 			 */
-			if(massShiftList[i].mass != 0){
-				if(i == 0)
+			if(massShiftList[i].mass !== 0){
+				if(i === 0)
 				{
 					/**
 					 * Add +1 as we need to append the mass after the current position

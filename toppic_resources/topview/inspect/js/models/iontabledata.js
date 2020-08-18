@@ -54,7 +54,7 @@ class iontabledata{
 		return ions;
 	}
 	/**
-	 * Get all the checked C ternimus ions fro UI
+	 * Get all the checked C ternimus ions from UI
 	 */
 	getCterminusCheckedList(){
 		var ions = [];

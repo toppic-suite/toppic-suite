@@ -103,3 +103,17 @@ function createTableForSelectedFragmentIons(sequence,matchedUnMatchedPeaks){
     div.appendChild(table);
     onClickofMatchedPeaks();
 }
+
+/**
+ * Function to zoom the graph to the mass point on click of matched mass
+ */
+function onClickofMatchedPeaks(){
+    $(".matched_fragments").click(function(){
+        let charge = $(this).attr("charge");
+        let mass = $(this).html();
+        let mz = mass/charge;
+        console.log(mz);
+        let graphFeatures = new GraphFeatures();
+        ms2_graph.redraw(mz,graphFeatures);
+    })
+}
