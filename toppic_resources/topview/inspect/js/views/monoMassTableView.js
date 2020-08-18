@@ -133,9 +133,11 @@ function showPeakCounts()
 
 
 /**
- * Function to show only matched or unmatched peaks
+ * Function to show only matched on unmatched peaks on click of matched or unmatched peak buttons
+ * @param {String} ids - Contains Ids of respective matched peaks or un matched peaks
  */
-function showIonPeaks(ids){
+function showIonPeaks(ids) {
+	//console.log("ids : ", ids);
     var elems = document.getElementsByClassName('matched_peak');
     for(var i = 0; elems.length > i; i++) {
         elems[i].style.display = 'none';
@@ -146,8 +148,8 @@ function showIonPeaks(ids){
     }
 
     elems = document.getElementsByName(ids);
-        for(var j = 0; elems.length > j; j++) {
+    for(var j = 0; elems.length > j; j++) {
         elems[j].style.display  =  "";
         elems[j].style.background  =  "#BEECFF";
-        }
+    }
 }

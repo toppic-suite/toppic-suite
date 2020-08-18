@@ -3,8 +3,8 @@
  * @param {Float} massErrorthVal - Contains Mass Error Value in Da units
  */
 function setMassErrorValue(massErrorthVal){
-    $("#errorval").val(massErrorthVal);
-    $("#errorunit").html("Da&nbsp;&nbsp;");
+    jqueryElements.errorValue.val(massErrorthVal);
+    jqueryElements.errorUnit.html("Da&nbsp;&nbsp;");
 }
 /**
  * Function to Set Default error value to HTML in ppm units

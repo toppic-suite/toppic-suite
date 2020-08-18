@@ -5,18 +5,16 @@
  */
 onLoadOfHTML = function(precursorMass)
 {
-    let massErrorthVal = 0.1 ;
-    let ppmErrorthVal = 15 ;
+    let massErrorthVal = 0.1;
+    let ppmErrorthVal = 15;
     /**
      * set All the common fixed PTM's to Fixed Ptm dropdown menu
      */
-    let commonFixedPtmsObj = new commonFixedPtms();
-    commonFixedPtmsObj.setFixedPtmListToUI();
+    setFixedPtmListToUI(COMMON_FIXED_PTM_LIST);
     /**
      * Set Error Threshhold value to default {massErrorthVal}
      */
-    let UIHelperObj = new UIHelper();
-    UIHelperObj.setMassErrorValue(massErrorthVal);
+    setMassErrorValue(massErrorthVal);
     /**
      * On Change Event handler. Changes the thresholds values from
      * from {massErrorthVal} to {ppmErrorthVal}
@@ -76,15 +74,14 @@ onLoadOfHTML = function(precursorMass)
  * @description Function to display all peaks of data in table. This handles on click action
  * from html of show all peaks button.
  */
-showAllPeaks = function()
-{
-	var elems = document.getElementsByClassName('matched_peak');
+showAllPeaks = function() {
+	var elems = domElements.matchedPeaks;
 	for(var i = 0; elems.length > i; i++) {
 		elems[i].style.display = '';
 	}
-	elems = document.getElementsByClassName('unmatched_peak');
+	elems = domElements.unmatchedPeaks;
 	for(var i = 0; elems.length > i; i++) {
-	elems[i].style.display = '';
+	    elems[i].style.display = '';
 	}
 	$('div.dataTables_scrollBody').height(400);
 }
@@ -95,11 +92,11 @@ showAllPeaks = function()
  */
 showMatchedPeaks = function()
 {
-	var elems = document.getElementsByClassName("matched_peak");
+	var elems = domElements.matchedPeaks;
 	for(var i = 0; elems.length > i; i++) {
 		elems[i].style.display = "";
 	}
-	elems = document.getElementsByClassName("unmatched_peak");
+	elems = domElements.unmatchedPeaks;
 	for(var i = 0; elems.length > i; i++) {
 		elems[i].style.display = "none";
 	}
@@ -112,48 +109,13 @@ showMatchedPeaks = function()
  */
 showNonMatchedPeaks = function() 
 {
-	var elems = document.getElementsByClassName("matched_peak");
+	var elems = domElements.matchedPeaks;
 	for(var i = 0; elems.length > i; i++) {
 		elems[i].style.display = "none";
 	}
-	elems = document.getElementsByClassName("unmatched_peak");
+	elems = domElements.unmatchedPeaks;
 	for(var i = 0; elems.length > i; i++) {
 		elems[i].style.display = "";
 	}
 	$('div.dataTables_scrollBody').height(400);
-}
-/**
- * Function to show only matched on unmatched peaks on click of matched or unmatched peak buttons
- * @param {String} ids - Contains Ids of respective matched peaks or un matched peaks
- */
-function showIonPeaks(ids) {
-	console.log("ids : ", ids);
-	  var elems = document.getElementsByClassName('matched_peak');
-	  for(var i = 0; elems.length > i; i++) {
-	    elems[i].style.display = 'none';
-	  }
-	  elems = document.getElementsByClassName('unmatched_peak');
-	  for(var i = 0; elems.length > i; i++) {
-	    elems[i].style.display = 'none';
-	  }
-
-	 elems = document.getElementsByName(ids);
-	    for(var j = 0; elems.length > j; j++) {
-	      elems[j].style.display  =  "";
-	      elems[j].style.background  =  "#BEECFF";
-	    }
-}
-
-/**
- * Function to zoom the graph to the mass point on click of matched mass
- */
-function onClickofMatchedPeaks(){
-    $(".matched_fragments").click(function(){
-        let charge = $(this).attr("charge");
-        let mass = $(this).html();
-        let mz = mass/charge;
-        console.log(mz);
-        let graphFeatures = new GraphFeatures();
-        ms2_graph.redraw(mz,graphFeatures);
-    })
 }

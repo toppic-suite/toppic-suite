@@ -75,7 +75,7 @@ class SeqOfExecution
 		/**
 		 * If user removed fixed ptm mass, remove the mass from the list
 		 */
-		if(removeAcid != "")
+		if(removeAcid !== "")
 		{
 			massShiftList = massShiftObj.removeFixedMassList(sequence,massShiftList,removeAcid);
 		}
@@ -117,7 +117,7 @@ class SeqOfExecution
 		/**
 		 * Setting masserror threshold value and ppm error threshhold value
 		 */
-		if(errorType == Constants.MASSERROR) massErrorthVal = errorVal ;
+		if(errorType === Constants.MASSERROR) massErrorthVal = errorVal ;
 		else ppmErrorthVal = errorVal ;
 		
 		let calculatePrefixAndSuffixMassObj = new calculatePrefixAndSuffixMass();
@@ -319,7 +319,7 @@ class SeqOfExecution
 		/**
 		 * Disply the table of masses for all the fragmented ions
 		 */
-		if(completeListofMasswithMatchedInd.length !=0)
+		if(completeListofMasswithMatchedInd.length !== 0)
 		{
 			$("#"+Constants.H_FRAGMENTEDTABLE).show();
 		}

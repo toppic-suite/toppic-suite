@@ -6,7 +6,7 @@ class MassShifts {
 	 * Get the sequence entered from the HTML.
 	 */
 	getSequenceFromUI(){
-		var seq = $(this.SEQUENCEDATA_ID).val().trim();
+		var seq = jqueryElements.sequenceData.val().trim();
 		seq = seq.toUpperCase();//set the sequence to be upper case automatically -- for user convenience
 		
 		let massShiftList = [] ;
@@ -221,7 +221,8 @@ class MassShifts {
 		 * sorting the lists with position
 		 */
 		massShiftList.sort(function(x,y){
-			return d3.ascending(x.position, y.position);
+			return x.position - y.position;
+			// return d3.ascending(x.position, y.position);
 		})
 		for(let i=0;i<len;i++)
 		{
@@ -256,12 +257,4 @@ class MassShifts {
 		}
 		return newSeq ;
 	}
-	/**
-	 * write the sequence with embedded mass in [] to the screen(sequence box)
-	 * @param {string} seqToUI - sequence with mass shifts embedded in []
-	 */
-	writeSeqToTextBox(seqToUI){
-		$(this.SEQUENCEDATA_ID).val(seqToUI);
-	}
-
 }
