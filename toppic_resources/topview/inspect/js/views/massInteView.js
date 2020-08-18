@@ -2,7 +2,7 @@
  * Set Mass List on to html
  */
 function setDataToMassAndIntensity(massAndIntensityList){
-    elements.massData.val(massAndIntensityList);
+    jqueryElements.massData.val(massAndIntensityList);
 }
 /**
  * getlist of Mass,Intensity and charge from UI

@@ -21,53 +21,53 @@ onLoadOfHTML = function(precursorMass)
      * On Change Event handler. Changes the thresholds values from
      * from {massErrorthVal} to {ppmErrorthVal}
      */
-    $('#error_dropdown').change(function(){
-        let errorType = $("#error_dropdown").val();
-        if(errorType == "masserror")
+    jqueryElements.errorDropdown.change(() => {
+        let errorType = jqueryElements.errorDropdown.val();
+        if(errorType === "masserror")
         {
-            $("#errorval").val(massErrorthVal);
-            $("#errorunit").html("Da&nbsp;&nbsp;");
+            jqueryElements.errorValue.val(massErrorthVal);
+            jqueryElements.errorUnit.html("Da&nbsp;&nbsp;");
         }
         else
         {
-            $("#errorval").val(ppmErrorthVal);
-            $("#errorunit").html("ppm&nbsp;&nbsp;");
+            jqueryElements.errorValue.val(ppmErrorthVal);
+            jqueryElements.errorUnit.html("ppm&nbsp;&nbsp;");
         }
     });
     /**
      * On Click Event handler. Gets invoked on click of submit button
      * in HTML
      */
-    $("#submit").click(function(){
+    jqueryElements.submit.click(function(){
         let errorVal ;
-        let errorType = $("#error_dropdown").val();
-        if(errorType == "masserror") {
-            errorVal = parseFloat($("#errorval").val().trim());
+        let errorType = jqueryElements.errorDropdown.val();
+        if(errorType === "masserror") {
+            errorVal = parseFloat(jqueryElements.errorValue.val().trim());
             massErrorthVal = errorVal ;
         }
         else {
-            errorVal = parseFloat($("#errorval").val().trim());
+            errorVal = parseFloat(jqueryElements.errorValue.val().trim());
             ppmErrorthVal = errorVal ;
         }
         let executionObj = new SeqOfExecution();
         executionObj.sequenceOfExecution(errorType,errorVal,"");
-        document.getElementById("totalseqmass_h6").style.display = "block";
-        document.getElementById("massvariation_h6").style.display = "block";
+        domElements.totalSeqMass.style.display = "block";
+        domElements.massVariation.style.display = "block";
     })
     /**
      * On Click action to hide and show the table of calculate theoretical
      * masses with matched and unmatched masses
      */
-    $("#hide_table").click(function(){
-        let text_val = $("#hide_table").html().trim();
-        if( text_val == "Hide Table"){
-            $("#hide_table").html("Show Table");
-            $("#divtableContainer").hide();
+    jqueryElements.hideTable.click(function(){
+        let text_val = jqueryElements.hideTable.html().trim();
+        if( text_val === "Hide Table"){
+            jqueryElements.hideTable.html("Show Table");
+            jqueryElements.divTableContainer.hide();
         }
-        if(text_val == "Show Table")
+        if(text_val === "Show Table")
         {
-            $("#hide_table").html("Hide Table");
-            $("#divtableContainer").show();
+            jqueryElements.hideTable.html("Hide Table");
+            jqueryElements.divTableContainer.show();
         }
     })
 }
