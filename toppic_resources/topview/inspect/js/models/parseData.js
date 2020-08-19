@@ -55,3 +55,46 @@ function parsePrecursorMass(dataName){
 	let data = parseFloat(JSON.parse(window.localStorage.getItem(dataName)));
 	return data;
 }
+
+/**
+ * @param {string} seq - an argument with mass shift changes embeded in [] square bracket.
+ * @return {string} parsedseq - sequence after removing the mass
+ * Shifts. 
+ * @returns {Array} massShiftList - Array with {position,mass} position-position at which 
+ * mass shift occured, mass- mass shift value.
+ */
+function parseSequenceMassShift(seq){
+	let massShiftList = [] ;
+	let parsedseq = "";
+	let splitStr = seq.split(/\[(.*?)\]/);
+	let splitArraylen = splitStr.length;
+	let position = 0;
+	
+	for(let i = 0 ; i<splitArraylen;i++)
+	{
+		if(isNaN(splitStr[i]))
+		{
+			parsedseq = parsedseq + splitStr[i] ;
+			position = position + splitStr[i].length ;
+		}
+		else
+		{
+			let mass = parseFloat(splitStr[i]);
+			/**
+			 * remove 1 as the data starts from 0 and length starts from 1
+			 */
+			let tempPosition = position - 1;
+			//Initially set the bg_color to null
+			let shiftobj = {mass:mass,position:tempPosition,bg_color:null};
+			/**
+			 * when the split occur at the end we get an extra "" in 
+			 * the list. This is to check if the mass is numeric.
+			 */
+			if(!isNaN(mass))
+			{
+				massShiftList.push(shiftobj);
+			}
+		}
+	}
+	return [parsedseq,massShiftList] ;
+}
