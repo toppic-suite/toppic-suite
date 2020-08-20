@@ -8,11 +8,11 @@ class MassShift {
 	}
 
 	/**
-	 * Get mass shift list by given unexpected mass shift list and fixed PTM shift list
+	 * Generate mass shift list by given unexpected mass shift list and fixed PTM shift list
 	 * @param {Array} unexpectedMassShiftList
 	 * @param {Array} fixedPtmShiftList
 	 */
-	getMassShiftList(unexpectedMassShiftList, fixedPtmShiftList) {
+	generateMassShiftList(unexpectedMassShiftList, fixedPtmShiftList) {
 		function ifMatch(position, fixedPtmShiftList) {
 			for (let i = 0; i < fixedPtmShiftList.length; i++) {
 				if(position === fixedPtmShiftList[i].position) {
@@ -115,9 +115,6 @@ class MassShift {
 	formSequence(){
 		let result = this.sequence;
 		let count = 0;
-		/**
-		 * sorting the lists with position
-		 */
 		// sort mass shift list by position, ascending
 		this.massShiftList.sort(function(x,y){
             return x.position - y.position;
@@ -125,9 +122,6 @@ class MassShift {
 		})
 		for(let i=0; i<this.massShiftList.length; i++)
 		{
-			/**
-			 * Dont show when the mass is 0 in the string
-			 */
 			if(this.massShiftList[i].mass !== 0){
 				if(i > 0)
 				{
@@ -135,10 +129,7 @@ class MassShift {
 					let tempString = "["+this.massShiftList[i-1].mass+"]";
 					count = count + tempString.length;
 				}
-				/**
-				 * add +1 as the position need to be added after 
-				 * the position of the acid.
-				 */
+				// add +1 as the position need to be added after the position of the acid.
 				let tempPosition = this.massShiftList[i].position + 1 + count;
 				result = result.slice(0, tempPosition) + "["+ this.massShiftList[i].mass + "]" + result.slice(tempPosition);
 			}
