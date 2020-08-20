@@ -60,12 +60,12 @@ onLoadOfHTML = function(precursorMass)
         let text_val = jqueryElements.hideTable.html().trim();
         if( text_val === "Hide Table"){
             jqueryElements.hideTable.html("Show Table");
-            jqueryElements.divTableContainer.hide();
+            jqueryElements.monoMassTableContainer.hide();
         }
         if(text_val === "Show Table")
         {
             jqueryElements.hideTable.html("Hide Table");
-            jqueryElements.divTableContainer.show();
+            jqueryElements.monoMassTableContainer.show();
         }
     })
 }

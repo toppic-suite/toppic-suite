@@ -11,8 +11,8 @@ function setMassErrorValue(massErrorthVal){
  * @param {Float} ppmErrorthVal - Contains Mass Error in ppm units
  */
 function setPPMErrorValue(ppmErrorthVal){
-    $("#errorval").val(ppmErrorthVal);
-    $("#errorunit").html("ppm&nbsp;&nbsp;");
+    jqueryElements.errorValue.val(ppmErrorthVal);
+    jqueryElements.errorUnit.html("ppm&nbsp;&nbsp;");
 }
 
 /**
@@ -21,6 +21,6 @@ function setPPMErrorValue(ppmErrorthVal){
  * @param {Float} ppmErrorthVal - Contains ppm error in ppm units
  */
 function writeMassErrorThreshholdValueToUI(massErrorthVal,ppmErrorthVal){
-    if(massErrorthVal != "") $("#errorval").val(massErrorthVal);
-    else $("#errorval").val(ppmErrorthVal);
+    if(massErrorthVal !== "") jqueryElements.errorValue.val(massErrorthVal);
+    else jqueryElements.errorValue.val(ppmErrorthVal);
 }

@@ -4,6 +4,7 @@
 function setFixedPtmListToUI(commonFixedPtmList){
     let dropDownMenuLink = domElements.dropDownMenuLink;
     
+    // commonFixedPtmList EX. [{acid: XX, mass: XX}]
     commonFixedPtmList.forEach((fixedPtm) => {
         let value = fixedPtm.acid+" : "+fixedPtm.mass;
         let option = document.createElement("option");
@@ -111,14 +112,14 @@ function addNewFixedPtmRow(fixedPtm){
 function setFixedMasses(fixedPtmList){
     if(fixedPtmList.length !=0)
     {
-        let commonfixedPtmList = [{name:"Carbamidomethylation",acid:"C",mass:57.021464},{name:"Carboxymethyl",acid:"C",mass:58.005479}];
+        // let commonfixedPtmList = [{name:"Carbamidomethylation",acid:"C",mass:57.021464},{name:"Carboxymethyl",acid:"C",mass:58.005479}];
         for(let i=0;i<fixedPtmList.length;i++)
         {
-            for(let j=0; j<commonfixedPtmList.length;j++)
+            for(let j=0; j<COMMON_FIXED_PTM_LIST.length;j++)
             {
-                if(fixedPtmList[i].name.toUpperCase() ===  commonfixedPtmList[j].name.toUpperCase())
+                if(fixedPtmList[i].name.toUpperCase() ===  COMMON_FIXED_PTM_LIST[j].name.toUpperCase())
                 {
-                    let fixedptm = commonfixedPtmList[j].acid + ":" + commonfixedPtmList[j].mass;
+                    let fixedptm = COMMON_FIXED_PTM_LIST[j].acid + ":" + COMMON_FIXED_PTM_LIST[j].mass;
                     addNewFixedPtmRow(fixedptm);
                     break;
                 }
@@ -132,16 +133,15 @@ function setFixedMasses(fixedPtmList){
  */
 getFixedPtmCheckList()
 {
-    let FixedPtmList = [];
-    let divs = $( ".fixedptms").get();
-    $( ".fixedptms" ).each(function( index ) {
+    let result = [];
+    jqueryElements.fixedPtms.each(() => {
         let acid = $( this ).find('#fixedptmacid').val().toUpperCase();
         let mass = parseFloat($( this ).find('#fixedptmmass').val());
-        if(acid.length !=0  && mass.length != 0 && !isNaN(mass))
+        if(acid.length !== 0  && !isNaN(mass))
         {
             let tempfixedptm = {acid:acid,mass:mass}
-            FixedPtmList.push(tempfixedptm);
+            result.push(tempfixedptm);
         }
     });
-    return FixedPtmList;
+    return result;
 }

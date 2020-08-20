@@ -1,10 +1,18 @@
 /**
+ * Set Precursor mass on html 
+ */
+function setPrecursorMass(precursorMass)
+{
+    domElements.precursorMass.innerHTML = precursorMass;
+}
+
+/**
  * Set Total mass on to the html
  * @param {*} totalMass 
  */
 function setTotalSeqMass(totalMass){
     totalMass = totalMass.toFixed(4);
-    $("#totalmass").html(totalMass);
+    jqueryElements.totalMass.html(totalMass);
 }
 
 /**
@@ -14,6 +22,5 @@ function setTotalSeqMass(totalMass){
  */
 function setMassDifference(precursorMass, proteinMass){
     let diff = proteinMass - precursorMass ;
-    document.getElementById("massvariation").innerHTML = diff.toFixed(4);
-    return (proteinMass - precursorMass);
+    domElements.massDifference.innerHTML = diff.toFixed(4);
 }
