@@ -10,10 +10,10 @@ function setDataToPeakAndIntensity(peakAndIntensityList){
 function getPeakListFromUI(){
     let spectrumDataList = [];
     // Read data line by line from peak and intensity box
-    var lines = $('#peakdata').val().split('\n');
+    var lines = jqueryElements.peakData.val().split('\n');
     for(var i = 0; i < lines.length;i++){
         let peakAndInte = lines[i].trim();
-        if(peakAndInte.length !=  0 )
+        if(peakAndInte.length !== 0)
         {
             let spectrumData = {};
             let peakInte = peakAndInte.split(/[\s]+/);
@@ -33,6 +33,6 @@ function getPeakListFromUI(){
             }
         }
     }	
-    completeCalData.peakdatalist = spectrumDataList;
+    // completeCalData.peakdatalist = spectrumDataList;
     return spectrumDataList ;
 }

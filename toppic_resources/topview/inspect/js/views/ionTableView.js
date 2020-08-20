@@ -4,13 +4,13 @@
  * @param {Array} matchedUnMatchedPeaks - list of all the calculated masses
  */
 function createTableForSelectedFragmentIons(sequence,matchedUnMatchedPeaks){
-    console.log("matchedUnMatchedPeaks : ", matchedUnMatchedPeaks);
+    // console.log("matchedUnMatchedPeaks : ", matchedUnMatchedPeaks);
     /**
      * Remove if table already exist and rebuild the table
      */
-    $("#selectedIonTableContainer").remove();
-    $("#divselectediontablecontainer #selectedIonTableContainer_wrapper").remove();
-    let div = document.getElementById("divselectediontablecontainer");
+    // $("#selectedIonTableContainer").remove();
+    jqueryElements.ionTableContainer.remove();
+    let div = domElements.ionTableContainer;
     let table = document.createElement("table");
     table.setAttribute("id","selectedIonTableContainer");
     table.setAttribute("class","table table-striped display");
@@ -81,9 +81,9 @@ function createTableForSelectedFragmentIons(sequence,matchedUnMatchedPeaks){
                 || matchedUnMatchedPeaks[k].ionFragment[0] == "z")
             {
                 /**
-                 * position when suffix mass list is writtent o table
+                 * position when suffix mass list is written to table
                  */
-                index = seqln-j-1;
+                index = seqln-j;
             }
             td1.setAttribute("class","td_fragments");
             if(matchedUnMatchedPeaks[k].massList[index].matchedInd == "Y")
@@ -108,11 +108,11 @@ function createTableForSelectedFragmentIons(sequence,matchedUnMatchedPeaks){
  * Function to zoom the graph to the mass point on click of matched mass
  */
 function onClickofMatchedPeaks(){
-    $(".matched_fragments").click(function(){
+    jqueryElements.matchedFragments.click(() => {
         let charge = $(this).attr("charge");
-        let mass = $(this).html();
+        let mass = parseFloat($(this).html());
         let mz = mass/charge;
-        console.log(mz);
+        // console.log(mz);
         let graphFeatures = new GraphFeatures();
         ms2_graph.redraw(mz,graphFeatures);
     })

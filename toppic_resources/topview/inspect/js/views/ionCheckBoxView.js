@@ -1,6 +1,6 @@
 /**
  * map the ion name from the prsm.js files to the ion checkbox id in the spectrum.html
- * @param {Char} ionType - Contains ion types from check box
+ * @param {Char} ionType - Contains ion types from check box EX. "Y,B"
  */
 function setIonCheckbox(ionType){
 	const ionNames = {
@@ -18,7 +18,7 @@ function setIonCheckbox(ionType){
 	ionTypeSplit.forEach(function(ionTy){
 		for (let i = 0; i<ionsAll.length;i++){
 			if (ionNames[ionTy] === ionsAll[i].id){
-				 ionsAll[i].checked = true;
+				ionsAll[i].checked = true;
 			}
 		}
 	})

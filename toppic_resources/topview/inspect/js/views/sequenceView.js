@@ -1,10 +1,12 @@
 /**
  * Set Sequence on to html
  */
-function setDataToSequence(sequence, unknownMassShiftList){
-    let massShiftsObj = new MassShifts();
-    let modSequence = massShiftsObj.formSequence(sequence,unknownMassShiftList);
-    jqueryElements.sequenceData.val(modSequence);
+function setDataToSequence(sequence, massShiftList){
+    let massShiftObj = new MassShift();
+    massShiftObj.sequence = sequence;
+    massShiftObj.massShiftList = massShiftList;
+    let modifiedSequence = massShiftObj.formSequence();
+    jqueryElements.sequenceData.val(modifiedSequence);
 }
 /**
  * Get the sequence entered from the HTML.
@@ -12,15 +14,15 @@ function setDataToSequence(sequence, unknownMassShiftList){
 function getSequenceFromUI(){
     var seq = jqueryElements.sequenceData.val().trim();
     seq = seq.toUpperCase();//set the sequence to be upper case automatically -- for user convenience
-    
-    let massShiftList = [] ;
-    [seq,massShiftList]= getMassShiftList(seq);
-    /**
-     * Remove spaces if exists between sequences
-     */
+    // Remove spaces if exists between sequences
     seq = seq.replace(/ +/g, "");
-    completeCalData.sequence = seq;
-    return [seq,massShiftList] ;
+    return seq;
+
+    // let massShiftList = [];
+    // [seq,massShiftList]= parseSequenceMassShift(seq);
+
+    // completeCalData.sequence = seq;
+    // return [seq,massShiftList] ;
 }
 
 /**
