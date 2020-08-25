@@ -1,10 +1,12 @@
 class PrsmGraph {
 
-  constructor(svgId, prsm){
+  constructor(svgId, prsm, data = new PrsmData(), para = new PrsmPara()){
     this.id = svgId;
-    this.para = new PrsmPara();
-    this.data = new PrsmData(); 
-    this.data.initData(prsm, this.para); 
+    this.para = para;
+    this.data = data;
+    if (prsm) {
+      this.data.initData(prsm, this.para); 
+    }
   }
 
   redraw = function(){

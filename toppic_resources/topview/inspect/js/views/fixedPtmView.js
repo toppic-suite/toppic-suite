@@ -131,10 +131,10 @@ function setFixedMasses(fixedPtmList){
 /**
  * @return {Array} FixedPtmList - return all the selected fixed ptms with acid and mass
  */
-getFixedPtmCheckList()
+function getFixedPtmCheckList()
 {
     let result = [];
-    jqueryElements.fixedPtms.each(() => {
+    $(".fixedPtms").each(function(){
         let acid = $( this ).find('#fixedptmacid').val().toUpperCase();
         let mass = parseFloat($( this ).find('#fixedptmmass').val());
         if(acid.length !== 0  && !isNaN(mass))

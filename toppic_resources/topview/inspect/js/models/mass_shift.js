@@ -1,4 +1,4 @@
-class MassShift {
+class MassShifts {
 	sequence;
 	massShiftList;
 	

@@ -37,8 +37,8 @@ class SeqOfExecution
 		let modifiablePeakData = [];//will change value if shared peak
 		let massErrorthVal = null;
 		let matchedPeakList = [];
-
 		let ppmErrorthVal = null;
+
 		/**
 		 * Hide everything when page launched before data is computed
 		 */
@@ -58,32 +58,38 @@ class SeqOfExecution
 		/**
 		 * Get all the Mass List data entered by the user.
 		 */
-		let UIHelperObj = new UIHelper();
-		let monoMassList = UIHelperObj.getMassListFromUI();
+		let monoMassList = getMassListFromUI();
 		
 		/**
 		 * Get the parsed sequence after removing mass shift list from 
 		 * the entered sequence. 
 		 * Returns mass list embedded in [] in sequence of user entered sequence.
 		 */
-		let massShiftObj = new MassShifts();
-		[sequence,massShiftList] = massShiftObj.getSequenceFromUI();
+		sequence = getSequenceFromUI();
+		[sequence, massShiftList] = parseSequenceMassShift(sequence);
+		let selectedFixedMassShiftList = getFixedPtmCheckList();
+		console.log("massShiftList:", massShiftList);
+		console.log("selectedFixedMassShiftList:", selectedFixedMassShiftList);
 		/** 
 		* Get fixed mass selected by user
 		*/
-		fixedMassShiftList = massShiftObj.getFixedMassList(selectedFixedMassShiftList);
+		let massShiftObj = new MassShifts(sequence);
+
+		fixedMassShiftList = massShiftObj.getFixedMassShiftList(selectedFixedMassShiftList);
+		console.log("fixedMassShiftList:", fixedMassShiftList);
+		massShiftObj.generateMassShiftList(massShiftList, fixedMassShiftList);
 		/**
 		 * If user removed fixed ptm mass, remove the mass from the list
 		 */
 		if(removeAcid !== "")
 		{
-			massShiftList = massShiftObj.removeFixedMassList(massShiftList,removeAcid);
+			massShiftList = massShiftObj.removeFixedMassList(removeAcid);
 		}
 		/**
 		 * Get the combined mass shift, easier when combined to plot on the HTML
 		 */
 
-		completeShiftList = massShiftObj.getCombinedMassShiftList(massShiftList,fixedMassShiftList);
+		// completeShiftList = massShiftObj.getCombinedMassShiftList(massShiftList,fixedMassShiftList);
 		/**
 		 * Check if mass shift is entered by clicking on the acid. If entered 
 		 * consider that mass shift and and append to the current mass shift list
@@ -92,27 +98,26 @@ class SeqOfExecution
 		{
 			let tempPosition = this.onClickMassShift.position;
 			let tempMass = this.onClickMassShift.mass;
-			completeShiftList = massShiftObj.appendtoMassShiftList(tempPosition,tempMass,completeShiftList);
+			completeShiftList = massShiftObj.appendtoMassShiftList(tempPosition,tempMass);
 		}
+		completeShiftList = massShiftObj.massShiftList;
 		/**
 		 * Form sequence with mass shift embedded in []
 		 */
-		let seqToUI = massShiftObj.formSequence(sequence,completeShiftList);
-		this.massShiftList.completeShiftList;
+		let seqToUI = massShiftObj.formSequence();
 		/**
 		 * Write back to UI
 		 */
-		massShiftObj.writeSeqToTextBox(seqToUI);
+		writeSeqToTextBox(seqToUI);
 		/**
 		 * Get all the peak list data entered by the user 
 		 */
-		peakDataList = UIHelperObj.getPeakListFromUI();
-		modifiablePeakData = UIHelperObj.getPeakListFromUI();
-		let peakListLen = peakDataList.length;
+		peakDataList = getPeakListFromUI();
+		modifiablePeakData = getPeakListFromUI();
 		let monoMassListLen = monoMassList.length;
 		let seqln = sequence.length;
-		let distributionList = [];
 		let matchedUnMatchedPeaks = [];
+		let distributionList;
 
 		/**
 		 * Setting masserror threshold value and ppm error threshhold value
@@ -120,12 +125,14 @@ class SeqOfExecution
 		if(errorType === Constants.MASSERROR) massErrorthVal = errorVal ;
 		else ppmErrorthVal = errorVal ;
 		
-		let calculatePrefixAndSuffixMassObj = new calculatePrefixAndSuffixMass();
-		let iontabledataObj = new iontabledata();
+		let proteoformObj = new Proteoform(sequence, fixedMassShiftList, massShiftList);
+		console.log("residueMasses:",proteoformObj.unexpectedMasses);
+		console.log("getPrefix:",proteoformObj.suffixMasses);
+		// let calculatePrefixAndSuffixMassObj = new calculatePrefixAndSuffixMass();
 		/**
 		 * Get all the n terminus ions selected.
 		 */
-		let n_TerminusList = iontabledataObj.getNterminusCheckedList();
+		let n_TerminusList = getNterminusCheckedList();
 		/**
 		 * Get all the matched peaks for all the n terminus fragmented ions selected.
 		 */
@@ -138,13 +145,14 @@ class SeqOfExecution
 			/**
 			 * Get claculated prefix mass list
 			 */
-			prefixMassList = calculatePrefixAndSuffixMassObj
-											.getPrefixMassList(sequence,completeShiftList,massShift);
+			prefixMassList = proteoformObj.getPrefixMassList(massShift);
 			/**
 			 * Get matched peak list
 			 */
 			matchedPeaks = matchedPeaksObj.getMatchedPeakList(prefixMassList,monoMassList,
-												sequence,massErrorthVal,ppmErrorthVal,ionType,"prefix");	
+												sequence,massErrorthVal,ppmErrorthVal,ionType,"prefix");
+												
+			console.log("matchedPeaks test:", matchedPeaks);
 			/**
 			 * copy the matched peaks to a new list for each ion selected
 			 */									
@@ -154,7 +162,7 @@ class SeqOfExecution
 		/**
 		 * Get all the c terminus ions selected
 		 */
-		let c_TerminusList = iontabledataObj.getCterminusCheckedList();
+		let c_TerminusList = getCterminusCheckedList();
 		/**
 		 * Get all the matched peaks for all the c terminus fragmented ions selected.
 		 */
@@ -168,36 +176,34 @@ class SeqOfExecution
 			/**
 			 * Get claculated suffix mass list
 			 */
-			suffixMassList = calculatePrefixAndSuffixMassObj
-												.getSuffixMassList(sequence,
-																		completeShiftList,massShift);
+			suffixMassList = proteoformObj.getSuffixMassList(massShift);
 			/**
 			 * Get matched peak list
 			 */															
-			matchedPeaks	= matchedPeaksObj.getMatchedPeakList(suffixMassList,monoMassList,
-														sequence,massErrorthVal,ppmErrorthVal,ionType,"suffix");	
+			matchedPeaks = matchedPeaksObj.getMatchedPeakList(suffixMassList,monoMassList,sequence,massErrorthVal,ppmErrorthVal,ionType,"suffix");
 			/**
 			 * copy the matched peaks to a new list for each ion selected
 			 */												
 			let temp_matchedPeaks =  matchedPeaks.map(x => ({...x}));
 			matchedPeakList = matchedPeakList.concat(temp_matchedPeaks);													
 		})
+		console.log("matchedPeakList:", matchedPeakList);
 		let matchedPeaksObj = new MatchedPeaks();
 		/**
 		 * Get combined list of both matched and unmatched peaks to write to table
 		 */
 		matchedUnMatchedPeaks = matchedPeaksObj.getMatchedAndUnMatchedList(monoMassList,matchedPeakList);
-		
+		console.log("matchedUnmatchedpeaks:", matchedUnMatchedPeaks);
 		/**
 		 * Do the below function when peak list data is not empty
 		 */
-		if(peakListLen != 0)
+		if(peakDataList.length !== 0)
 		{
 			let matchedPeaksObj = new MatchedPeaks();
 
 			//distributionList = matchedPeaksObj.getDistribution(peakDataList,sequence,matchedUnMatchedPeaks);
 			distributionList = matchedPeaksObj.getDistribution(modifiablePeakData,sequence,matchedUnMatchedPeaks, completeShiftList);
-
+			console.log("distributionList:", distributionList);
 			/**
 			 * Display the graph formed
 			 */
@@ -206,35 +212,55 @@ class SeqOfExecution
 			/**
 			 * Call generateCorrespondingGraph which calls addSpectrum function in invokeSpectrum file to draw graph 
 			 */
-			generateCorrespondingGraph(peakDataList,distributionList,null);
+			let spectrumGraphObj = new SpectrumGraph(Constants.SPECTRUMGRAPHID, peakDataList, distributionList);
+			spectrumGraphObj.para.showIons = false;
+			console.log("envPeakList:", spectrumGraphObj.envPeakList);
+			spectrumGraphObj.redraw();
+
+			// generateCorrespondingGraph(peakDataList,distributionList,null);
 			$("#"+Constants.SPECTRUMDOWNLOADID).show();
 		}
 		/**
 		 * Do the below function when Sequence entered is not empty
 		 */
-		if(seqln != 0)
+		if(seqln !== 0)
 		{
 			/**
 			 *  Draw SVG of Sequence
 			 */
-			let para = new parameters();
-			para = buildSvg(para,sequence,Constants.SEQSVGID,completeShiftList,monoMassList);
-			getNumValues(para,sequence,Constants.SEQSVGID);
-			annotations(para,matchedPeakList,Constants.SEQSVGID);
+			console.log("show sequence before form residues:", sequence);
+			let residues = formResidues(sequence);
+			console.log("residues:", residues);
+			// form fixedPtms
+			console.log("show massShiftList before form:", massShiftList);
+			let formedFixedPtmsList = formFixedPtms(fixedMassShiftList, parsePTM('fixedPtmList'), sequence);
+			console.log("formedFixedPtmsList:", formedFixedPtmsList);
+			let formedMassShifts = formMassShifts(massShiftList);
+			console.log("formedMassShifts", formedMassShifts);
+			let prsmDataObj = new PrsmData();
+			prsmDataObj.setData(residues, 0, residues.length - 1, formedFixedPtmsList, formedMassShifts, sequence, []);
+			prsmDataObj.addColor();
+			let prsmGraphObj = new PrsmGraph(Constants.SEQSVGID,null,prsmDataObj);
+			prsmGraphObj.para.rowLength = 40;
+			prsmGraphObj.para.letterWidth = 25;
+			prsmGraphObj.redraw();
+
 			$("#"+Constants.SEQSVGID).show();
 			$("#"+Constants.SVGDOWNLOADID).show();
 			/**
 			 * Get total mass and wite to HTML
 			 */
-			let totalMass = calculatePrefixAndSuffixMassObj.getTotalSeqMass(sequence,completeShiftList);
-			UIHelperObj.setTotalSeqMass(totalMass);
+			console.log("completeShiftList:", completeShiftList);
+			let totalMass = getTotalSeqMass(sequence,completeShiftList);
+			console.log("totalMass:", totalMass);
+			setTotalSeqMass(totalMass);
 			//Set Mass Difference, precursorMass is a global variable form spectrum.html
-			UIHelperObj.setMassDifference(precursorMass,totalMass);
+			setMassDifference(precursorMass,totalMass);
 		}	
 		/**
 		 * Do the below function when mono mass list entered is not empty
 		 */
-		if(monoMassListLen != 0)
+		if(monoMassListLen !== 0)
 		{
 			$("#"+Constants.DIVTABLECONTAINER).show();
 			/**
@@ -244,11 +270,11 @@ class SeqOfExecution
 			/**
 			 * Create tabe to display the input mass list data and calculated data
 			 */
-			UIHelperObj.createMonoMassTable();
+			createMonoMassTable();
 			/**
 			 * 	Add data to the table
 			 */
-			UIHelperObj.addMassDataToTable(matchedUnMatchedPeaks);
+			addMassDataToTable(matchedUnMatchedPeaks);
 			/**
 			 * function to show the count of matched peaks, un matched peaks and All peaks
 			 */
@@ -258,7 +284,7 @@ class SeqOfExecution
 			 * and setting properties to the table.
 			 */
 			this.setBootStarpTableProperties();
-			UIHelperObj.showPeakCounts();
+			showPeakCounts();
 		}
 		/**
 		 * Local function to set the actions on click of download button in HTML
@@ -279,8 +305,7 @@ class SeqOfExecution
 			/**
 			 * Get calculated prefix mass 
 			 */
-			prefixMassList = calculatePrefixAndSuffixMassObj
-								.getPrefixMassList(sequence,completeShiftList,massShift);
+			prefixMassList = proteoformObj.getPrefixMassList(massShift);
 			/**
 			 * Get Matched peaks
 			 */
@@ -302,8 +327,7 @@ class SeqOfExecution
 			/**
 			 * Get calculated prefix mass 
 			 */
-			suffixMassList = calculatePrefixAndSuffixMassObj
-								.getSuffixMassList(sequence,completeShiftList,massShift);
+			suffixMassList = proteoformObj.getSuffixMassList(massShift);
 			/**
 			 * Get Matched peaks
 			 */					
@@ -315,7 +339,7 @@ class SeqOfExecution
 			 */	
 			completeListofMasswithMatchedInd.push(matchedAndUnMatchedListObj);													
 		})
-		let getMassTableOfSelectedIonsObj = new GetMassTableOfSelectedIons();
+		console.log("completeListofMasswithMatchedInd:", completeListofMasswithMatchedInd);
 		/**
 		 * Disply the table of masses for all the fragmented ions
 		 */
@@ -323,15 +347,21 @@ class SeqOfExecution
 		{
 			$("#"+Constants.H_FRAGMENTEDTABLE).show();
 		}
-		getMassTableOfSelectedIonsObj.createTableForSelectedFragmentIons(sequence,completeListofMasswithMatchedInd);
+		createTableForSelectedFragmentIons(sequence,completeListofMasswithMatchedInd);
 		$("#monoMasstitle").show();
-		generateMonoMassGraph(monoMassList,null);
+		let ions = getIons(monoMassList);
+		let monoMassGraphObj = new SpectrumGraph("monoMassGraph",peakDataList, null, ions, proteoformObj);
+		monoMassGraphObj.para.showIons = false;
+		monoMassGraphObj.para.showEnvelopes = false;
+
+		monoMassGraphObj.para.isMonoMassGraph = true;
+		monoMassGraphObj.redraw();
+		// generateMonoMassGraph(monoMassList,null);
 		/**
 		 * Set the properties for the table.
 		 */
 		this.setBootStarpropertiesforFragmentIons();
 		$("#divselectediontablecontainer").show();
-
 	}
 	/**
 	 * Function executes all the functionalities one by one and displays all the 
@@ -432,7 +462,7 @@ class SeqOfExecution
 				/**
 				 * Get matched peak list
 				 */
-				matchedPeaks	= matchedPeaksObj.getMatchedPeakList(prefixMassList,monoMassList,
+				matchedPeaks = matchedPeaksObj.getMatchedPeakList(prefixMassList,monoMassList,
 													sequence,massErrorthVal,ppmErrorthVal,ionType,"prefix");	
 				/**
 				 * copy the matched peaks to a new list for each ion selected

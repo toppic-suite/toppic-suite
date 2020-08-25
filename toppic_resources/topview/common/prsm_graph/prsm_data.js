@@ -36,6 +36,17 @@ class PrsmData {
     this.proteoform = new Proteoform(this.sequence, this.fixedPtms, this.massShifts);
   }
 
+  setData = (residues, formFirstPos, formLastPos, fixedPtms, massShifts, sequence, breakPoints) => {
+    this.residues = residues;
+    this.formFirstPos = formFirstPos;
+    this.formLastPos = formLastPos;
+    this.fixedPtms = fixedPtms;
+    this.massShifts = massShifts;
+    this.sequence = sequence;
+    this.proteoform = new Proteoform(this.sequence, this.fixedPtms, this.massShifts);
+    this.breakPoints = breakPoints;
+  }
+
   updatePara = function(para) {
     let len = this.residues.length; 
     //console.log(this.formFirstPos, this.formLastPos, len, para.rowLength);

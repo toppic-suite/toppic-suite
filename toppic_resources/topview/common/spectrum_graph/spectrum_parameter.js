@@ -374,7 +374,7 @@ class SpectrumParameters {
    */
   getErrorYPos = function(erroVal){
     let yErrorScale = this.heightForErrorPlot/(this.errorThreshHoldVal*2);// Multiply with 2 as the coordinates has to be both positive and negative
-    let peakY = this.svgHeight - (erroVal * yErrorScale) - this.errorplot_padding.bottom - this.heightForErrorPlot/2;
+    let peakY = this.svgHeight - (erroVal * yErrorScale) - this.errorPlotPadding.bottom - this.heightForErrorPlot/2;
     return peakY;
   }
 }

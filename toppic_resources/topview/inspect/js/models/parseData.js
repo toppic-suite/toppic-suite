@@ -5,7 +5,7 @@
 function parsePeakMass(dataName){
 	let data = window.localStorage.getItem(dataName);
 	
-	console.log(data == null)
+	console.log(data === null)
 	
 	if (data != "" && data != null){
 		data = data.replace("[", "")
@@ -85,7 +85,7 @@ function parseSequenceMassShift(seq){
 			 */
 			let tempPosition = position - 1;
 			//Initially set the bg_color to null
-			let shiftobj = {mass:mass,position:tempPosition,bg_color:null};
+			let shiftobj = {position:tempPosition, mass:mass, bg_color:null};
 			/**
 			 * when the split occur at the end we get an extra "" in 
 			 * the list. This is to check if the mass is numeric.
@@ -97,4 +97,92 @@ function parseSequenceMassShift(seq){
 		}
 	}
 	return [parsedseq,massShiftList] ;
+}
+
+// form residues from sequence
+let formResidues = (sequence) => {
+	let residues = [];
+	for (let i = 0; i < sequence.length; i++) {
+		let tempObj = {
+			position: i.toString(),
+			acid: sequence.charAt(i).toUpperCase()
+		}
+		residues.push(tempObj);
+	}
+	return residues;
+}
+
+// form fixed ptms
+let formFixedPtms = (fixedMassShiftList, fixedPtmNameList, sequence) => {
+	let result = [];
+	result.push(fixedPtmNameList[0]);
+	let tempArray = [];
+	fixedMassShiftList.forEach((element) => {
+		let tempObj = {
+			pos: element.position.toString(),
+			acid: sequence.charAt(element.position)
+		};
+		tempArray.push(tempObj);
+	});
+	result[0].posList = tempArray;
+	return result;
+}
+
+let formMassShifts = (unknownMassShiftList) => {
+	let result = [];
+	unknownMassShiftList.forEach((element)=> {
+		let tempObj = {
+			anno: element.mass.toString(),
+			leftPos: (element.position).toString(),
+			rightPos: (element.position + 1).toString()
+		}
+		result.push(tempObj);
+	})
+	return result;
+}
+
+/**
+ * @function getTotalSeqMass
+ * @description Returns total mass of the sequence
+ * @param {String} seq - Contains Protein sequence
+ * @param {Array} massShiftList - Contains list of mass shifts
+ */
+let getTotalSeqMass = (seq,massShiftList) => {
+	let mass = 0 ;
+	let len = seq.length;
+	for(let i=0;i<len;i++)
+	{
+		mass = mass + getAminoAcidDistribution(seq[i])[0].mass;
+	}
+	let shiftlen = massShiftList.length;
+	for(let j=0;j<shiftlen;j++)
+	{
+		mass = mass + massShiftList[j].mass;
+	}
+	mass = mass + getAminoAcidDistribution("H2O")[0].mass;
+
+	return mass ;
+}
+
+let getIons = (monoMassList) => {
+	let ionData = [];
+    //Draw MonoMass Graph
+    const monoMassList_mz = monoMassList.map((element)=>{
+        let tempElement = {
+            "mz":element.mass,
+            "intensity":element.intensity,
+            "charge": element.charge,
+            "peakId": element.peakId,
+            "ion": element.ion,
+            "position": element.position,
+            "massError": element.massError,
+            "thMass": element.thMass,
+            "PPMerror": element.PPMerror,
+            "matchedInd": element.matchedInd
+        };
+        let tempIonData = {"mz":element.mass,"intensity":element.intensity,"ion": element.ion};
+        ionData.push(tempIonData);
+        return tempElement;
+	});
+	return ionData;
 }
