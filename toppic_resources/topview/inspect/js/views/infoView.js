@@ -13,6 +13,7 @@ function setPrecursorMass(precursorMass)
 function setTotalSeqMass(totalMass){
     totalMass = totalMass.toFixed(4);
     jqueryElements.totalMass.html(totalMass);
+    domElements.totalSeqMass.style = 'block';
 }
 
 /**
@@ -23,4 +24,5 @@ function setTotalSeqMass(totalMass){
 function setMassDifference(precursorMass, proteinMass){
     let diff = proteinMass - precursorMass ;
     domElements.massDifference.innerHTML = diff.toFixed(4);
+    domElements.massVariation.style = 'block';
 }

@@ -16,11 +16,16 @@
             <script src="../../proteoform/mass_shift_list.js"></script>
             <script src="../../proteoform/protein_constant.js"></script>
 
-            <script type="text/javascript" src="./prsm96.js"></script>
+            <script type="text/javascript" src="./prsm40.js"></script>
             
             <script>
                 $(document).ready(function(){
                     let prsmGraph = new PrsmGraph("svg", prsm_data.prsm);
+                    console.log("fixedPtms:",prsmGraph.data.fixedPtms);
+                    console.log("sequence:", prsmGraph.data.sequence);
+                    console.log("massShifts:", prsmGraph.data.massShifts);
+                    console.log("proteoform:", prsmGraph.data.proteoform);
+                    console.log("residues:", prsm_data.prsm.annotated_protein.annotation.residue);
                     prsmGraph.redraw();
                 })
                 

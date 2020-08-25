@@ -2,10 +2,11 @@
  * Set Sequence on to html
  */
 function setDataToSequence(sequence, massShiftList){
-    let massShiftObj = new MassShift();
-    massShiftObj.sequence = sequence;
-    massShiftObj.massShiftList = massShiftList;
+    let massShiftObj = new MassShifts(sequence, massShiftList);
+    // massShiftObj.sequence = sequence;
+    // massShiftObj.massShiftList = massShiftList;
     let modifiedSequence = massShiftObj.formSequence();
+    console.log(modifiedSequence);
     jqueryElements.sequenceData.val(modifiedSequence);
 }
 /**

@@ -49,7 +49,7 @@ class MatchedPeaks {
 		peak.thMass = thMass ;
 		peak.PPMerror = PPMerror;
 		peak.matchedInd = matchedInd;
-		console.log("peak : ", peak);
+		// console.log("peak : ", peak);
 		return peak;
 	}
 	/**
@@ -75,19 +75,19 @@ class MatchedPeaks {
 			let peak = {};
 			for(let j = 0; j<preOrSufListln; j++)
 			{
-				let massDiff = monoMassList_temp[i].mass - prefixOrSuffixMassList[j].mass ;
+				let massDiff = monoMassList_temp[i].mass - prefixOrSuffixMassList[j];
 				if(massErrorthVal != null || isNaN(massErrorthVal))
 				{
 					if(Math.abs(massDiff) <= massErrorthVal)
 					{
 						//increment the position as the seq starts from 0 but the data in table starts from 1
-						let ion = ionType + prefixOrSuffixMassList[j].position ;
-						let position = prefixOrSuffixMassList[j].position ;
+						let ion = ionType + (j + 1);
+						let position = (j+1);
 						if(preOrSufInd == "suffix")
 						{
 							position = seqln - position;
 						}
-						let mass = prefixOrSuffixMassList[j].mass;
+						let mass = prefixOrSuffixMassList[j];
 						let matchedInd = "Y";
 						peak = this.matchedPeakAttributes(monoMassList_temp[i],peakId,ion,position,
 																massDiff,mass,matchedInd);
@@ -96,18 +96,18 @@ class MatchedPeaks {
 				}
 				else{
 					let prefDiff = Math.round(massDiff * 10000)/10000;
-					let prefMassRounded = Math.round(prefixOrSuffixMassList[j].mass * 10000)/10000;
+					let prefMassRounded = Math.round(prefixOrSuffixMassList[j] * 10000)/10000;
 					let prePPMerror = prefDiff/prefMassRounded * this.million ;
 					if(Math.abs(prePPMerror) <= ppmErrorthVal)
 					{
 						//increment the position as the seq starts from 0 but the data in table starts from 1
-						let ion = ionType + prefixOrSuffixMassList[j].position ;
-						let position = prefixOrSuffixMassList[j].position ;
+						let ion = ionType + (j + 1);
+						let position = j + 1;
 						if(preOrSufInd == "suffix")
 						{
 							position = seqln - position;
 						}
-						let mass = prefixOrSuffixMassList[j].mass;
+						let mass = prefixOrSuffixMassList[j];
 						let matchedInd = "Y";
 						peak = this.matchedPeakAttributes(monoMassList_temp[i],peakId,ion,position,
 																massDiff,mass,matchedInd);
@@ -266,18 +266,18 @@ class MatchedPeaks {
 
 		for(let j = 0; j<preOrSufListln; j++)
 		{
-			let position = prefixOrSuffixMassList[j].position;
+			let position = j + 1;
 			if(prefixInd != "prefix")
 			{
 				position = preOrSufListln-position+1;
 			}
-			let mass = prefixOrSuffixMassList[j].mass;
+			let mass = prefixOrSuffixMassList[j];
 			let matchedInd = "N";
 			for(let i=0; i < len; i++)
 			{
-				let massDiff = monoMassList_temp[i].mass - prefixOrSuffixMassList[j].mass ;
+				let massDiff = monoMassList_temp[i].mass - prefixOrSuffixMassList[j] ;
 				let prefDiff = Math.round(massDiff * 10000)/10000;
-				let prefMassRounded = Math.round(prefixOrSuffixMassList[j].mass * 10000)/10000;
+				let prefMassRounded = Math.round(prefixOrSuffixMassList[j] * 10000)/10000;
 				let prePPMerror = prefDiff/prefMassRounded * this.million ;
 				if((massErrorthVal != null || isNaN(massErrorthVal) )|| 
 								(ppmErrorthVal != null || isNaN(ppmErrorthVal) ))
@@ -285,12 +285,12 @@ class MatchedPeaks {
 					if((Math.abs(massDiff) <= massErrorthVal) || (Math.abs(prePPMerror) <= ppmErrorthVal))
 					{
 						//increment the position as the seq starts from 0 but the data in table starts from 1
-						position = prefixOrSuffixMassList[j].position ;
+						position = j + 1;
 						if(prefixInd != "prefix")
 						{
-							position = preOrSufListln-prefixOrSuffixMassList[j].position +1;
+							position = preOrSufListln- position +1;
 						}
-						mass = prefixOrSuffixMassList[j].mass;
+						mass = prefixOrSuffixMassList[j];
 						matchedInd = "Y";
 						break;
 					}

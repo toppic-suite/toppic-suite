@@ -1,15 +1,17 @@
 class Proteoform {
   sequence = [];
-  fixedPtm;
   residueMasses = [];
   fixedPtmMasses = [];
+  fixedPtmMassShift=[];
+  unexpectedMassShift=[];
   unexpectedMasses = [];
   prefixMasses = [];
   suffixMasses = [];
 
-  constructor(sequence, fixedPtm, massShifts) {
+  constructor(sequence = "", fixedPtmMassShift =[], unexpectedMassShift=[]) {
     this.sequence = sequence;
-    this.fixedPtm = fixedPtm;
+    this.fixedPtmMassShift = fixedPtmMassShift;
+    this.unexpectedMassShift = unexpectedMassShift;
     this.getResidueMasses();
     this.getFixedPtmMasses();
     this.getUnexpectedMasses();
@@ -29,10 +31,18 @@ class Proteoform {
 
   getFixedPtmMasses() {
     this.fixedPtmMasses = new Array(this.sequence.length).fill(0);
+    this.fixedPtmMassShift.forEach((element) => {
+      this.fixedPtmMasses[element.position] = element.mass;
+    });
+    return this.fixedPtmMasses;
   }
 
   getUnexpectedMasses() {
     this.unexpectedMasses = new Array(this.sequence.length).fill(0);
+    this.unexpectedMassShift.forEach((element) => {
+      this.unexpectedMasses[element.position] = element.mass;
+    });
+    return this.unexpectedMasses;
   }
 
   getPrefixMassList(ionMassShift) {
