@@ -53,11 +53,11 @@ textarea {
 /**
 *CSS to set fixed PTM drop down and to add fixed ptms
 */
-#fixedptmacid {
-	width:40px
+.fixedptmacid {
+	width:40px !important;
 } 
-#fixedptmmass {
-	width:75px
+.fixedptmmass {
+	width:75px !important;
 } 
 #modal_fixedptmacid{
 	padding-right: 10px !important;

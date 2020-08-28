@@ -42,7 +42,6 @@ class MassShifts {
 		let result = [];
 		let fixedPtmAcid = null;
 		let fixedPtmMass = null;
-		// let selectedFixedPtmList = getFixedPtmCheckList();
 		for(let k=0; k<selectedFixedPtmList.length; k++)
 		{
 			fixedPtmAcid = selectedFixedPtmList[k].acid;
@@ -69,7 +68,7 @@ class MassShifts {
 		for(let i=0;i<this.massShiftList.length;i++)
 		{
 			let position = this.massShiftList[i].position;
-			if(sequence[position] === removeAcid)
+			if(this.sequence[position] === removeAcid)
 			{
 				this.massShiftList.splice(i,1);
 			}
@@ -118,7 +117,6 @@ class MassShifts {
 		// sort mass shift list by position, ascending
 		this.massShiftList.sort(function(x,y){
             return x.position - y.position;
-			// return d3.ascending(x.position, y.position);
 		})
 		for(let i=0; i<this.massShiftList.length; i++)
 		{

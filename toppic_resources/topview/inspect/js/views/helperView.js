@@ -1,0 +1,3 @@
+$("#helpModal").draggable({
+    appendTo: "body"
+});

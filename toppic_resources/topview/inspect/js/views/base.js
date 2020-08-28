@@ -23,17 +23,17 @@ const jqueryElements = {
     hideTable : $('#hide_table'),
     monoMassTableContainer : $("#divtableContainer"),
     addFixedPtmRow : $('.addnewrow'),
-    removeFixedPtmRow : $('.removerow'),
     fixedPtms : $(".fixedptms"),
     ionTableContainer : $("#divselectediontablecontainer"),
-    matchedFragments : $(".matched_fragments"),
+    // matchedFragments : $(".matched_fragments"),
     totalMass : $("#totalmass"),
     monoMassTableBody : $("#tableContainer tbody"),
     monoMassTableColumns : $("#tableContainer thead tr th"),
-    peakRow : $(".peakRows"),
+    // peakRow : $(".peakRows"),
     allPeakCount : $("#all_peak_count"),
     matchedPeakCount : $("#matched_peak_count"),
-    unmatchedPeakCount : $("#unmatched_peak_count")
+    unmatchedPeakCount : $("#unmatched_peak_count"),
+    peakCount: $("#peakCount"),
 }
 
 

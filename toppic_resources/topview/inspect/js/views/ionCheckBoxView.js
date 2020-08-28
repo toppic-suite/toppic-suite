@@ -23,3 +23,7 @@ function setIonCheckbox(ionType){
 		}
 	})
 }
+
+const getIonType = () => {
+	return window.localStorage.getItem('ionType');
+}

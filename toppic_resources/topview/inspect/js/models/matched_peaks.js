@@ -81,8 +81,8 @@ class MatchedPeaks {
 					if(Math.abs(massDiff) <= massErrorthVal)
 					{
 						//increment the position as the seq starts from 0 but the data in table starts from 1
-						let ion = ionType + (j + 1);
-						let position = (j+1);
+						let ion = ionType + j;
+						let position = j;
 						if(preOrSufInd == "suffix")
 						{
 							position = seqln - position;
@@ -101,8 +101,8 @@ class MatchedPeaks {
 					if(Math.abs(prePPMerror) <= ppmErrorthVal)
 					{
 						//increment the position as the seq starts from 0 but the data in table starts from 1
-						let ion = ionType + (j + 1);
-						let position = j + 1;
+						let ion = ionType + j;
+						let position = j;
 						if(preOrSufInd == "suffix")
 						{
 							position = seqln - position;
@@ -147,7 +147,7 @@ class MatchedPeaks {
 			  matchedAndUnmatchedList.push(peak);
 			}
 		})
-		completeCalData.matchedandunmatcheddata = matchedAndUnmatchedList;
+		// completeCalData.matchedandunmatcheddata = matchedAndUnmatchedList;
 		return matchedAndUnmatchedList ;
 	}
 
@@ -229,20 +229,20 @@ class MatchedPeaks {
 				totalDistribution.push(distributionList);
 			}
 		}
-		if(totalDistribution.length != 0)
+		if(totalDistribution.length !== 0)
 		{	 
 			totalDistribution.sort(function(x,y){
 				return d3.ascending(x.env_peaks[0].mz, y.env_peaks[0].mz);
 			})
 		}
-		let envlength = totalDistribution.length;
-		let colorListsize = this.colors.length;
+		// let envlength = totalDistribution.length;
+		// let colorListsize = this.colors.length;
 		
-		while(envlength--){
-			let index = envlength%colorListsize ;
-			totalDistribution[envlength].color = this.colors[index] ;
+		// while(envlength--){
+		// 	let index = envlength%colorListsize ;
+		// 	totalDistribution[envlength].color = this.colors[index] ;
 			
-		}
+		// }
 
 		return totalDistribution ;
 	}
@@ -267,7 +267,8 @@ class MatchedPeaks {
 		for(let j = 0; j<preOrSufListln; j++)
 		{
 			let position = j + 1;
-			if(prefixInd != "prefix")
+			// let charge = null;
+			if(prefixInd !== "prefix")
 			{
 				position = preOrSufListln-position+1;
 			}
@@ -286,11 +287,12 @@ class MatchedPeaks {
 					{
 						//increment the position as the seq starts from 0 but the data in table starts from 1
 						position = j + 1;
-						if(prefixInd != "prefix")
+						if(prefixInd !== "prefix")
 						{
 							position = preOrSufListln- position +1;
 						}
 						mass = prefixOrSuffixMassList[j];
+						// charge = monoMassList_temp[i].charge;
 						matchedInd = "Y";
 						break;
 					}

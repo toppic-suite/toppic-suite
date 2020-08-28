@@ -2,10 +2,10 @@
 <head>
 <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Visual inspection</title>
-<!-- <link rel="stylesheet" type="text/css" href="../node_modules/@fortawesome/fontawesome-free/css/all.css"> -->
+<link rel="stylesheet" type="text/css" href="../node_modules/@fortawesome/fontawesome-free/css/all.css">
 <link rel="stylesheet" type="text/css" href="../node_modules/datatables.net-dt/css/jquery.dataTables.css"/>
 <link rel="stylesheet" type="text/css" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
-<!-- <link rel="stylesheet" type="text/css" href="../common/nav_bar/css/nav_bar.css"> -->
+<link rel="stylesheet" type="text/css" href="../common/topview_nav_bar/css/topview_nav_bar.css">
 <link rel="stylesheet" type="text/css" href="css/spectrum.css">
 <link rel="stylesheet" type="text/css" href="css/modal.css">
 <link rel="stylesheet" type="text/css" href="css/svg.css">
@@ -19,22 +19,12 @@
 
 <!--Save Image-->
 <script src="../node_modules/file-saver/dist/FileSaver.js" ></script>
-<!-- <script src="../common/save_image/saveImage.js" ></script> -->
+<script src="../common/save_image/save_image.js" ></script>
 <!--draw nav bar-->
-<!-- <script src="../common/nav_bar/js/navBar.js" ></script> -->
-
-<script src="js/UI_helpers/seqofexecution.js" ></script>
-
-
-<script src="js/sequence_svg/coordinates_util.js" ></script>
-<script src="js/sequence_svg/drawsvg.js" ></script>
-
-<script src="js/mass_shift/utilfunctions.js" ></script>
+<script src="../common/topview_nav_bar/js/topview_nav_bar.js" ></script>
 
 <!--Add Background color to the Mass Shifted elements-->
-<script src="js/UI_helpers/rectbackgroundcolor.js" ></script>
-<!-- Store all the calculated Data -->
-<script src="js/UI_helpers/completeCalData.js" ></script>
+<!-- <script src="js/UI_helpers/rectbackgroundcolor.js" ></script> -->
 
 <!-- Views -->
 <script src="js/views/errorView.js"></script>
@@ -46,10 +36,12 @@
 <script src="js/views/monoMassTableView.js"></script>
 <script src="js/views/peakView.js"></script>
 <script src="js/views/sequenceView.js"></script>
+<script src="js/views/popUpWindowView.js"></script>
+<script src="js/views/helperView.js"></script>
 
 <!-- Models -->
 <script src="js/models/mass_shift.js"></script>
-<script src="js/models/matchedpeaks.js"></script>
+<script src="js/models/matched_peaks.js"></script>
 <script src="js/models/parseData.js"></script>
 
 <script src="../common/prsm_graph/draw_prsm.js"></script>
@@ -70,13 +62,10 @@
 <script src="../common/distribution_calc/isotopes.js"></script>
 <script src="../common/distribution_calc/molecular_formulae.js"></script>
 <!-- Controller -->
-<script src="js/index.js"></script>
+<script src="js/controllers/index.js"></script>
+<script src="js/controllers/seqofexecution.js"></script>
+
 <script>
- // define global variable ms2_graph and precursorMass
- var ms2_graph; 
- var precursorMass ;
- // Global Variable with spec parameters for respetive Graphs
- var correspondingSpecParams_g = [];
  // Gets executed once HTML is loaded
  $(document).ready(function(){
 	// set localStorage for testing
@@ -88,40 +77,13 @@
 	localStorage.setItem('ionType', `Y,B`); 
 	localStorage.setItem('precursorMass', "7958.8813"); 
 
-	// Get the data from local storage 
-	var peakAndIntensityList = parsePeakMass('peakAndIntensityList');
-	// console.log(peakAndIntensityList);
-	var massAndIntensityList = parsePeakMass('massAndIntensityList');
-	var sequence = parseSeq('sequence');
-	var l_fixedPtmList = parsePTM('fixedPtmList');
-	let unknownMassShiftList = parseUnknowmassList('unknownMassShiftList');
-	precursorMass = parsePrecursorMass("precursorMass");
-	if(peakAndIntensityList !== null && massAndIntensityList !== null
-		&& sequence !== null && precursorMass !== null)
-	{	
-		// let SetValuesToHtmlObj = new SetValuesToHtml(peakAndIntensityList,massAndIntensityList,sequence,l_fixedPtmList,unknownMassShiftList,precursorMass);
-		setDataToPeakAndIntensity(peakAndIntensityList);
-		setDataToMassAndIntensity(massAndIntensityList);
-		setDataToSequence(sequence, unknownMassShiftList);
-		setFixedMasses(l_fixedPtmList);
-		setPrecursorMass(precursorMass);
-	}
-
-	//set the checkbox based on the ion type used in the data, which is stored in local storage
-	let ionType = window.localStorage.getItem('ionType'); 
-	console.log("ionTYpe : ", ionType);
-	setIonCheckbox(ionType);
-
-	onLoadOfHTML(precursorMass);
+	onLoadOfHTML();
+	
   	// localStorage.clear();
   
 	//ion type data needs to be preserved because it is recorded only once when the prsm.html opens. 
 	//Without this line it is going to break when the user tries to open inspect window again after closing.
-	localStorage.setItem('ionType', ionType); 
-	
-	$("#helpModal").draggable({
-		appendTo: "body"
-	});
+	// localStorage.setItem('ionType', ionType); 
 });
 </script>
 <style>
