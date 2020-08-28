@@ -59,7 +59,7 @@ class SpectrumGraph {
     .on("zoom", this.zoomed);
 
   getEnvPeakList = function(envList) {
-    if (!envList || typeof envList[0].env_peaks === "undefined") {return [];}
+    if (!envList || envList.length === 0 || typeof envList[0].env_peaks === "undefined") {return [];}
     let envPeakList = [];
     for (let i = 0; i < envList.length; i++) {
       let env = envList[i];

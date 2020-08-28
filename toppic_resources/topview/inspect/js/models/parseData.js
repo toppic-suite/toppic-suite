@@ -4,9 +4,7 @@
  */
 function parsePeakMass(dataName){
 	let data = window.localStorage.getItem(dataName);
-	
-	console.log(data === null)
-	
+		
 	if (data != "" && data != null){
 		data = data.replace("[", "")
 		data = data.replace("]", "")
@@ -166,23 +164,39 @@ let getTotalSeqMass = (seq,massShiftList) => {
 
 let getIons = (monoMassList) => {
 	let ionData = [];
-    //Draw MonoMass Graph
-    const monoMassList_mz = monoMassList.map((element)=>{
-        let tempElement = {
-            "mz":element.mass,
-            "intensity":element.intensity,
-            "charge": element.charge,
-            "peakId": element.peakId,
-            "ion": element.ion,
-            "position": element.position,
-            "massError": element.massError,
-            "thMass": element.thMass,
-            "PPMerror": element.PPMerror,
-            "matchedInd": element.matchedInd
-        };
-        let tempIonData = {"mz":element.mass,"intensity":element.intensity,"ion": element.ion};
+	monoMassList.forEach((element) => {
+		let tempIonData = {"mz":element.mass,"intensity":element.intensity,"text": element.ion, "error": element.massError};
         ionData.push(tempIonData);
-        return tempElement;
 	});
 	return ionData;
+}
+
+let ifNIon = (ionType) => {
+	if(ionType === "a" || ionType === "b" || ionType === "c") return true ;
+	else return false ;
+}
+
+let formBreakPoints = (matchedPeakList, sequenceLength) => {
+	let breakPointsMap = new Map();
+	let result = [];
+	matchedPeakList.forEach((element) => {
+		if (breakPointsMap.has(element.position)) {
+			let tempObj = breakPointsMap.get(element.position);
+			tempObj.existNIon = (ifNIon(element.ion[0]) || tempObj.existNIon);
+			tempObj.existCIon = (!ifNIon(element.ion[0]) || tempObj.existCIon);
+			tempObj.anno = [tempObj.anno, [element.ion.toUpperCase(), element.charge + "+"].join(" ")].join(" ");
+			breakPointsMap.set(element.position, tempObj);
+		} else {
+			let tempObj = {};
+			tempObj.position = element.position;
+			tempObj.anno = [element.ion.toUpperCase(), element.charge + "+"].join(" ");
+			tempObj.existNIon = ifNIon(element.ion[0]);
+			tempObj.existCIon = !ifNIon(element.ion[0]);
+			breakPointsMap.set(element.position, tempObj);
+		}
+	});
+	breakPointsMap.forEach((val, key) => {
+		result.push(val);
+	});
+	return result;
 }

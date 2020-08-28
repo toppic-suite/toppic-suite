@@ -21,7 +21,7 @@ class SeqOfExecution
 	 * @param {char} removeAcid - This gives the acid up on which the fixed ptm 
 	 * mass has to be removed when "X" is clicked at fixed ptms.
 	 */
-	sequenceOfExecution(errorType,errorVal,removeAcid){
+	sequenceOfExecution(errorType,errorVal,removeAcid,precursorMass){
 		/**
 		 * unbind all the actions previously binded else each action will be 
 		 * binded multiple times.
@@ -42,7 +42,7 @@ class SeqOfExecution
 		/**
 		 * Hide everything when page launched before data is computed
 		 */
-		$("#"+Constants.SEQSVGID ).hide();
+		$("#"+Constants.SEQSVGID).hide();
 		$("#"+Constants.SVGDOWNLOADID).hide();
 		$("#"+Constants.SPECTRUMGRAPHID).hide();
 		$("#"+Constants.SPECTRUMDOWNLOADID).hide();
@@ -68,7 +68,7 @@ class SeqOfExecution
 		sequence = getSequenceFromUI();
 		[sequence, massShiftList] = parseSequenceMassShift(sequence);
 		let selectedFixedMassShiftList = getFixedPtmCheckList();
-		console.log("massShiftList:", massShiftList);
+		// console.log("massShiftList:", massShiftList);
 		console.log("selectedFixedMassShiftList:", selectedFixedMassShiftList);
 		/** 
 		* Get fixed mass selected by user
@@ -83,13 +83,8 @@ class SeqOfExecution
 		 */
 		if(removeAcid !== "")
 		{
-			massShiftList = massShiftObj.removeFixedMassList(removeAcid);
+			massShiftObj.removeFixedMassList(removeAcid);
 		}
-		/**
-		 * Get the combined mass shift, easier when combined to plot on the HTML
-		 */
-
-		// completeShiftList = massShiftObj.getCombinedMassShiftList(massShiftList,fixedMassShiftList);
 		/**
 		 * Check if mass shift is entered by clicking on the acid. If entered 
 		 * consider that mass shift and and append to the current mass shift list
@@ -98,17 +93,18 @@ class SeqOfExecution
 		{
 			let tempPosition = this.onClickMassShift.position;
 			let tempMass = this.onClickMassShift.mass;
-			completeShiftList = massShiftObj.appendtoMassShiftList(tempPosition,tempMass);
+			massShiftObj.appendtoMassShiftList(tempPosition,tempMass);
 		}
 		completeShiftList = massShiftObj.massShiftList;
+		console.log("completeShiftList:", completeShiftList);
 		/**
 		 * Form sequence with mass shift embedded in []
 		 */
-		let seqToUI = massShiftObj.formSequence();
+		// let seqToUI = massShiftObj.formSequence();
 		/**
 		 * Write back to UI
 		 */
-		writeSeqToTextBox(seqToUI);
+		// writeSeqToTextBox(seqToUI);
 		/**
 		 * Get all the peak list data entered by the user 
 		 */
@@ -126,8 +122,8 @@ class SeqOfExecution
 		else ppmErrorthVal = errorVal ;
 		
 		let proteoformObj = new Proteoform(sequence, fixedMassShiftList, massShiftList);
-		console.log("residueMasses:",proteoformObj.unexpectedMasses);
-		console.log("getPrefix:",proteoformObj.suffixMasses);
+		// console.log("residueMasses:",proteoformObj.unexpectedMasses);
+		// console.log("getPrefix:",proteoformObj.suffixMasses);
 		// let calculatePrefixAndSuffixMassObj = new calculatePrefixAndSuffixMass();
 		/**
 		 * Get all the n terminus ions selected.
@@ -152,7 +148,7 @@ class SeqOfExecution
 			matchedPeaks = matchedPeaksObj.getMatchedPeakList(prefixMassList,monoMassList,
 												sequence,massErrorthVal,ppmErrorthVal,ionType,"prefix");
 												
-			console.log("matchedPeaks test:", matchedPeaks);
+			// console.log("matchedPeaks test:", matchedPeaks);
 			/**
 			 * copy the matched peaks to a new list for each ion selected
 			 */									
@@ -187,7 +183,7 @@ class SeqOfExecution
 			let temp_matchedPeaks =  matchedPeaks.map(x => ({...x}));
 			matchedPeakList = matchedPeakList.concat(temp_matchedPeaks);													
 		})
-		console.log("matchedPeakList:", matchedPeakList);
+		// console.log("matchedPeakList:", matchedPeakList);
 		let matchedPeaksObj = new MatchedPeaks();
 		/**
 		 * Get combined list of both matched and unmatched peaks to write to table
@@ -212,33 +208,27 @@ class SeqOfExecution
 			/**
 			 * Call generateCorrespondingGraph which calls addSpectrum function in invokeSpectrum file to draw graph 
 			 */
-			let spectrumGraphObj = new SpectrumGraph(Constants.SPECTRUMGRAPHID, peakDataList, distributionList);
-			spectrumGraphObj.para.showIons = false;
+			let spectrumGraphObj = new SpectrumGraph(Constants.SPECTRUMGRAPHID, peakDataList, distributionList,[],null);
 			console.log("envPeakList:", spectrumGraphObj.envPeakList);
 			spectrumGraphObj.redraw();
 
-			// generateCorrespondingGraph(peakDataList,distributionList,null);
 			$("#"+Constants.SPECTRUMDOWNLOADID).show();
 		}
 		/**
 		 * Do the below function when Sequence entered is not empty
 		 */
 		if(seqln !== 0)
-		{
+		{	
+			let breakPointsList = formBreakPoints(matchedPeakList);
 			/**
 			 *  Draw SVG of Sequence
 			 */
-			console.log("show sequence before form residues:", sequence);
 			let residues = formResidues(sequence);
-			console.log("residues:", residues);
 			// form fixedPtms
-			console.log("show massShiftList before form:", massShiftList);
 			let formedFixedPtmsList = formFixedPtms(fixedMassShiftList, parsePTM('fixedPtmList'), sequence);
-			console.log("formedFixedPtmsList:", formedFixedPtmsList);
 			let formedMassShifts = formMassShifts(massShiftList);
-			console.log("formedMassShifts", formedMassShifts);
 			let prsmDataObj = new PrsmData();
-			prsmDataObj.setData(residues, 0, residues.length - 1, formedFixedPtmsList, formedMassShifts, sequence, []);
+			prsmDataObj.setData(residues, 0, residues.length - 1, formedFixedPtmsList, formedMassShifts, sequence, breakPointsList);
 			prsmDataObj.addColor();
 			let prsmGraphObj = new PrsmGraph(Constants.SEQSVGID,null,prsmDataObj);
 			prsmGraphObj.para.rowLength = 40;
@@ -250,9 +240,7 @@ class SeqOfExecution
 			/**
 			 * Get total mass and wite to HTML
 			 */
-			console.log("completeShiftList:", completeShiftList);
 			let totalMass = getTotalSeqMass(sequence,completeShiftList);
-			console.log("totalMass:", totalMass);
 			setTotalSeqMass(totalMass);
 			//Set Mass Difference, precursorMass is a global variable form spectrum.html
 			setMassDifference(precursorMass,totalMass);
@@ -262,11 +250,11 @@ class SeqOfExecution
 		 */
 		if(monoMassListLen !== 0)
 		{
-			$("#"+Constants.DIVTABLECONTAINER).show();
+			jqueryElements.monoMassTableContainer.show();
 			/**
 			 * Display All-peaks/matched/non-matched buttons on click of submit
 			 */
-			$("#peakCount").show();
+			// jqueryElements.peakCount.show();
 			/**
 			 * Create tabe to display the input mass list data and calculated data
 			 */
@@ -278,7 +266,7 @@ class SeqOfExecution
 			/**
 			 * function to show the count of matched peaks, un matched peaks and All peaks
 			 */
-			$("#"+Constants.PEAKCOUNTID).show();
+			jqueryElements.peakCount.show();
 			/**
 			 * Bootstrap syntax to keep the table box to 400px height 
 			 * and setting properties to the table.
@@ -306,6 +294,8 @@ class SeqOfExecution
 			 * Get calculated prefix mass 
 			 */
 			prefixMassList = proteoformObj.getPrefixMassList(massShift);
+			prefixMassList.shift();
+			prefixMassList.pop();
 			/**
 			 * Get Matched peaks
 			 */
@@ -328,6 +318,9 @@ class SeqOfExecution
 			 * Get calculated prefix mass 
 			 */
 			suffixMassList = proteoformObj.getSuffixMassList(massShift);
+			suffixMassList.shift();
+			suffixMassList.pop();
+			console.log("monoMassList:",monoMassList);
 			/**
 			 * Get Matched peaks
 			 */					
@@ -348,20 +341,22 @@ class SeqOfExecution
 			$("#"+Constants.H_FRAGMENTEDTABLE).show();
 		}
 		createTableForSelectedFragmentIons(sequence,completeListofMasswithMatchedInd);
-		$("#monoMasstitle").show();
-		let ions = getIons(monoMassList);
-		let monoMassGraphObj = new SpectrumGraph("monoMassGraph",peakDataList, null, ions, proteoformObj);
-		monoMassGraphObj.para.showIons = false;
-		monoMassGraphObj.para.showEnvelopes = false;
-
-		monoMassGraphObj.para.isMonoMassGraph = true;
-		monoMassGraphObj.redraw();
-		// generateMonoMassGraph(monoMassList,null);
-		/**
-		 * Set the properties for the table.
-		 */
 		this.setBootStarpropertiesforFragmentIons();
-		$("#divselectediontablecontainer").show();
+
+		$("#monoMasstitle").show();
+		let ions = getIons(matchedPeakList);
+
+		console.log("prsm graph input", ions);
+		let monoMassGraphObj = new SpectrumGraph("monoMassGraph",ions, [], ions, proteoformObj);
+		monoMassGraphObj.para.showIons = true;
+		monoMassGraphObj.para.showEnvelopes = false;
+		monoMassGraphObj.para.svgHeight += 80;
+		monoMassGraphObj.para.padding.head += 40;
+		monoMassGraphObj.para.padding.bottom += 40;
+		monoMassGraphObj.para.isMonoMassGraph = true;
+		// monoMassGraphObj.para.errorThreshold = 0.06;
+
+		monoMassGraphObj.redraw();
 	}
 	/**
 	 * Function executes all the functionalities one by one and displays all the 
@@ -566,7 +561,7 @@ class SeqOfExecution
 	 */
 	setBootStarpTableProperties()
 	{
-		$("#"+Constants.TABLECONTAINERID).DataTable({
+		$("#tableContainer").DataTable({
 			"scrollY": Constants.TABLEHEIGHT,
 			"scrollCollapse": true,
 			"paging":         false,
@@ -580,7 +575,7 @@ class SeqOfExecution
 	 */
 	setBootStarpropertiesforFragmentIons()
 	{
-		$("#"+Constants.FRAGMENTIONTABLECONTAINER).DataTable({
+		$("#selectedIonTableContainer").DataTable({
 			"scrollY": Constants.TABLEHEIGHT,
 			"scrollCollapse": true,
 			"paging":         false,

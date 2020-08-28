@@ -1,10 +1,31 @@
 /**
  * @function onLoadOfHTML
  * @description Gets invoked immediatley after loading html
- * @param {Float} precursorMass - Contains precursorMass value
  */
-onLoadOfHTML = function(precursorMass)
+onLoadOfHTML = function()
 {
+    // Get the data from local storage 
+	let peakAndIntensityList = parsePeakMass('peakAndIntensityList');
+	// console.log(peakAndIntensityList);
+	let massAndIntensityList = parsePeakMass('massAndIntensityList');
+	let sequence = parseSeq('sequence');
+	let l_fixedPtmList = parsePTM('fixedPtmList');
+	let unknownMassShiftList = parseUnknowmassList('unknownMassShiftList');
+	let precursorMass = parsePrecursorMass("precursorMass");
+	if(peakAndIntensityList !== null && massAndIntensityList !== null
+		&& sequence !== null && precursorMass !== null)
+	{	
+		setDataToPeakAndIntensity(peakAndIntensityList);
+		setDataToMassAndIntensity(massAndIntensityList);
+		setDataToSequence(sequence, unknownMassShiftList);
+		setFixedMasses(l_fixedPtmList);
+		setPrecursorMass(precursorMass);
+    }
+    //set the checkbox based on the ion type used in the data, which is stored in local storage
+	let ionType = getIonType();
+	setIonCheckbox(ionType);
+    
+
     let massErrorthVal = 0.1;
     let ppmErrorthVal = 15;
     /**
@@ -48,9 +69,9 @@ onLoadOfHTML = function(precursorMass)
             ppmErrorthVal = errorVal ;
         }
         let executionObj = new SeqOfExecution();
-        executionObj.sequenceOfExecution(errorType,errorVal,"");
-        domElements.totalSeqMass.style.display = "block";
-        domElements.massVariation.style.display = "block";
+        executionObj.sequenceOfExecution(errorType,errorVal,"", precursorMass);
+        // domElements.totalSeqMass.style.display = "block";
+        // domElements.massVariation.style.display = "block";
     })
     /**
      * On Click action to hide and show the table of calculate theoretical
@@ -69,6 +90,9 @@ onLoadOfHTML = function(precursorMass)
         }
     })
 }
+
+
+
 /**
  * @function showAllPeaks
  * @description Function to display all peaks of data in table. This handles on click action

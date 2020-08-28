@@ -8,9 +8,10 @@ function createTableForSelectedFragmentIons(sequence,matchedUnMatchedPeaks){
     /**
      * Remove if table already exist and rebuild the table
      */
-    // $("#selectedIonTableContainer").remove();
-    jqueryElements.ionTableContainer.remove();
-    let div = domElements.ionTableContainer;
+    $("#selectedIonTableContainer").remove();
+    $("#divselectediontablecontainer #selectedIonTableContainer_wrapper").remove();
+    // jqueryElements.ionTableContainer.remove();
+    let div = document.getElementById("divselectediontablecontainer");
     let table = document.createElement("table");
     table.setAttribute("id","selectedIonTableContainer");
     table.setAttribute("class","table table-striped display");
@@ -70,6 +71,17 @@ function createTableForSelectedFragmentIons(sequence,matchedUnMatchedPeaks){
         td0.innerHTML = j+1;
         tr1.appendChild(td0);
         tr1.appendChild(td);
+        if (j === seqln - 1) {
+            for (let k =0; k < len; k++) {
+                let td1 = document.createElement("td");
+                td1.setAttribute("class","td_fragments");
+                td1.setAttribute("charge",null);
+                td1.innerHTML = "Null";
+                tr1.appendChild(td1);
+            }
+            tbody.appendChild(tr1);
+            break;
+        }
         /**
          * Add mass data to respected columns 
          */
@@ -77,19 +89,18 @@ function createTableForSelectedFragmentIons(sequence,matchedUnMatchedPeaks){
         {
             let td1 = document.createElement("td");
             let index = j;
-            if(matchedUnMatchedPeaks[k].ionFragment[0] == "x" || matchedUnMatchedPeaks[k].ionFragment[0] == "y"
-                || matchedUnMatchedPeaks[k].ionFragment[0] == "z")
+            if(matchedUnMatchedPeaks[k].ionFragment[0] === "x" || matchedUnMatchedPeaks[k].ionFragment[0] === "y"
+                || matchedUnMatchedPeaks[k].ionFragment[0] === "z")
             {
                 /**
                  * position when suffix mass list is written to table
                  */
-                index = seqln-j;
+                index = seqln-j-2;
             }
             td1.setAttribute("class","td_fragments");
-            if(matchedUnMatchedPeaks[k].massList[index].matchedInd == "Y")
+            if(matchedUnMatchedPeaks[k].massList[index].matchedInd === "Y")
             {
                 td1.setAttribute("class","td_fragments matched_fragments");
-                
             }
             td1.setAttribute("charge",matchedUnMatchedPeaks[k].massList[index].charge);
             td1.innerHTML = matchedUnMatchedPeaks[k].massList[index].mass.toFixed(4);
@@ -108,13 +119,11 @@ function createTableForSelectedFragmentIons(sequence,matchedUnMatchedPeaks){
  * Function to zoom the graph to the mass point on click of matched mass
  */
 function onClickofMatchedPeaks(){
-    jqueryElements.matchedFragments.click(() => {
-        let charge = $(this).attr("charge");
+    $(".matched_fragments").click(function() {
+        // let charge = $(this).attr("charge");
         let mass = parseFloat($(this).html());
-        let mz = mass/charge;
-        // console.log(mz);
-        let graphFeatures = new GraphFeatures();
-        ms2_graph.redraw(mz,graphFeatures);
+        // let mz = mass/charge;
+        console.log("mass:",mass);
     })
 }
 

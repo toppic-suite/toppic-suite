@@ -3,9 +3,10 @@
  */
 function createMonoMassTable(){
     // Remove if table already exist and rebuild the table
-    // $("#tableContainer").remove();
+    $("#tableContainer").remove();
+    $("#divtableContainer #tableContainer_wrapper").remove();
     // Remove if tableContainer_wrapper already exist and rebuild the table, wrapper is an inbuild class of bootstrap table
-    jqueryElements.monoMassTableContainer.remove();
+    // jqueryElements.monoMassTableContainer.remove();
     let div = domElements.monoMassTableContainer;
     let table = document.createElement("table");
     table.setAttribute("id","tableContainer");
@@ -45,8 +46,8 @@ function createMonoMassTable(){
  */
 function addMassDataToTable(matchedPeaks)
 {
-    let dataContainer_tbody = jqueryElements.monoMassTableBody;
-    const totalColCount = jqueryElements.monoMassTableColumns.length;
+    let dataContainer_tbody = $("#tableContainer tbody");
+    const totalColCount = $("#tableContainer thead tr th").length;
     let len = matchedPeaks.length;
     for(let i=0; i<len; i++)
     {
@@ -101,18 +102,13 @@ function addMassDataToTable(matchedPeaks)
         dataContainer_tbody.append(tr);
     }
 
-    jqueryElements.peakRow.click(() => {
+    $(".peakRows").click(function() {
         /*	get Mono M/z value till 3 decimal values	*/
         let peak_value = parseFloat(this.innerHTML).toFixed(3) ;
-        let graphFeatures = new GraphFeatures();
-        ms2_graph.redraw(peak_value,graphFeatures);
-        // console.log("completeCalData : ", completeCalData);
         let parent_id  = $(this).parent().parent().prop('id');
         // console.log("parent_id : ",parent_id);
         let th_mass_val = $("#"+parent_id+" .th_mass").text();
-        // console.log("th_mass_val : ",th_mass_val);
-        let monoMassList = completeCalData.monomasslist;
-        generateMonoMassGraph(monoMassList,th_mass_val);
+        console.log("th_mass_val : ",th_mass_val);
     });
 }
 

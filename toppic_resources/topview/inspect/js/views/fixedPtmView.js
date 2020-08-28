@@ -1,16 +1,14 @@
 /**
  * Sets all the fixed ptms to UI under Fixed Ptm column
  */
-function setFixedPtmListToUI(commonFixedPtmList){
-    let dropDownMenuLink = domElements.dropDownMenuLink;
-    
+function setFixedPtmListToUI(commonFixedPtmList){    
     // commonFixedPtmList EX. [{acid: XX, mass: XX}]
     commonFixedPtmList.forEach((fixedPtm) => {
         let value = fixedPtm.acid+" : "+fixedPtm.mass;
         let option = document.createElement("option");
         option.setAttribute("value",value);
         option.innerHTML = value;
-        dropDownMenuLink.appendChild(option);
+        domElements.dropDownMenuLink.appendChild(option);
     })
     jqueryElements.addFixedPtmRow.click(() => {
         let fixedPtm = domElements.dropDownMenuLink.value;
@@ -31,13 +29,21 @@ function addNewFixedPtmRow(fixedPtm){
     // console.log("fixedptm : ", fixedptm);
     let acid = '';
     let mass = '';
+    let ifExist = false;
     if(fixedPtm !== "other")
     {
         let splitVal = fixedPtm.split(":");
         acid = splitVal[0].trim();
         mass = splitVal[1].trim();
+        let existingPtmList = getFixedPtmCheckList();
+        existingPtmList.forEach((element) => {
+            if (element.acid === acid && element.mass === parseFloat(mass)) {
+                console.log("This ptm already exists");
+                ifExist = true;
+            }
+        });
     }
-    
+    if (ifExist) return;
     let fixedPtmListDiv = domElements.fixedPtmList;
     let fixedptmsdiv = document.createElement("div");
     fixedptmsdiv.setAttribute("class","fixedptms");
@@ -45,8 +51,8 @@ function addNewFixedPtmRow(fixedPtm){
     //Creating div with input fixed acid and fixed mass 
     let inputAcid = document.createElement("input");
     inputAcid.setAttribute("type","text");
-    inputAcid.setAttribute("class","form-control");
-    inputAcid.setAttribute("id","fixedptmacid");
+    inputAcid.setAttribute("class","form-control fixedptmacid");
+    // inputAcid.setAttribute("id","fixedptmacid");
     inputAcid.setAttribute("value",acid);
     
     let span = document.createElement("span");
@@ -54,8 +60,8 @@ function addNewFixedPtmRow(fixedPtm){
     
     let inputMass = document.createElement("input");
     inputMass.setAttribute("type","text");
-    inputMass.setAttribute("class","form-control");
-    inputMass.setAttribute("id","fixedptmmass");
+    inputMass.setAttribute("class","form-control fixedptmmass");
+    // inputMass.setAttribute("id","fixedptmmass");
     inputMass.setAttribute("value",mass);
     
     let span2 = document.createElement("span");
@@ -87,8 +93,8 @@ function addNewFixedPtmRow(fixedPtm){
     fixedptmsdiv.appendChild(removeButton);
     fixedPtmListDiv.appendChild(fixedptmsdiv);	
     
-    jqueryElements.removeFixedPtmRow.click(() => {
-        let acid = $(this).parent().find("#fixedptmacid").val();
+    $('.removerow').click(function(){
+        let acid = $(this).parent().find(".fixedptmacid").val();
         $(this).parent().remove();
         //temp code
         let errorVal ;
@@ -101,8 +107,8 @@ function addNewFixedPtmRow(fixedPtm){
         }
         // here
         // reload seqOfExecution to refresh result
-        let executionObj = new SeqOfExecution();
-        executionObj.sequenceOfExecution(errorType,errorVal,acid);
+        // let executionObj = new SeqOfExecution();
+        // executionObj.sequenceOfExecution(errorType,errorVal,acid);
     })
 }
 
@@ -135,8 +141,8 @@ function getFixedPtmCheckList()
 {
     let result = [];
     $(".fixedPtms").each(function(){
-        let acid = $( this ).find('#fixedptmacid').val().toUpperCase();
-        let mass = parseFloat($( this ).find('#fixedptmmass').val());
+        let acid = $( this ).find('.fixedptmacid').val().toUpperCase();
+        let mass = parseFloat($( this ).find('.fixedptmmass').val());
         if(acid.length !== 0  && !isNaN(mass))
         {
             let tempfixedptm = {acid:acid,mass:mass}

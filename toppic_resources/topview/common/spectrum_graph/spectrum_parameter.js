@@ -161,7 +161,7 @@ class SpectrumParameters {
    * @function getErrorYPos
    * @description Function provides the y coordinate for the error val on the error plot
    */
-  getErrorYPos(errorVal) {
+  getErrorYPos = function(errorVal) {
     // Multiply with 2 as the coordinates has to be both positive and negative
     let yErrorScale = this.errorPlotHeight/(this.errorThreshold*2);
     let pos = this.svgHeight - (errorVal * yErrorScale) 
@@ -317,7 +317,7 @@ class SpectrumParameters {
    * Add color to envelopes.
    */
   addColorToEnvelopes = function(envList){
-    if(!envList || typeof envList.env_peaks === "undefined") return;
+    if(!envList || envList.length === 0 || typeof envList[0].env_peaks === "undefined") return;
     envList.sort(function(x,y){
       return (x.env_peaks[0].mz - y.env_peaks[0].mz);
     })
@@ -366,15 +366,5 @@ class SpectrumParameters {
     this.winMinMz = centerMz - 3;
     this.winMaxMz = centerMz + 3;
     this.updateScale(this.winMinMz, this.winMaxMz, this.winMaxInte);
-  }
-
-  /**
-   * @function getErrorYPos
-   * @description Function provides the y coordinate for the error val on the error plot
-   */
-  getErrorYPos = function(erroVal){
-    let yErrorScale = this.heightForErrorPlot/(this.errorThreshHoldVal*2);// Multiply with 2 as the coordinates has to be both positive and negative
-    let peakY = this.svgHeight - (erroVal * yErrorScale) - this.errorPlotPadding.bottom - this.heightForErrorPlot/2;
-    return peakY;
   }
 }
