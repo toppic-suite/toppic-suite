@@ -37,7 +37,8 @@ function addNewFixedPtmRow(fixedPtm){
         mass = splitVal[1].trim();
         let existingPtmList = getFixedPtmCheckList();
         existingPtmList.forEach((element) => {
-            if (element.acid === acid && element.mass === parseFloat(mass)) {
+            //  && element.mass === parseFloat(mass)
+            if (element.acid === acid) {
                 console.log("This ptm already exists");
                 ifExist = true;
             }

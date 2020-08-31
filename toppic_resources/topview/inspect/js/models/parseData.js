@@ -111,9 +111,10 @@ let formResidues = (sequence) => {
 }
 
 // form fixed ptms
-let formFixedPtms = (fixedMassShiftList, fixedPtmNameList, sequence) => {
+let formFixedPtms = (fixedMassShiftList, sequence) => {
 	let result = [];
-	result.push(fixedPtmNameList[0]);
+	result.push({});
+	// result.push(fixedPtmNameList[0]);
 	let tempArray = [];
 	fixedMassShiftList.forEach((element) => {
 		let tempObj = {

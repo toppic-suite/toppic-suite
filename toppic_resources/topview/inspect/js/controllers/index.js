@@ -1,3 +1,13 @@
+// Gets executed once HTML is loaded
+$(document).ready(function(){
+	onLoadOfHTML();
+  	// localStorage.clear();
+  
+	//ion type data needs to be preserved because it is recorded only once when the prsm.html opens. 
+	//Without this line it is going to break when the user tries to open inspect window again after closing.
+	// localStorage.setItem('ionType', ionType); 
+});
+
 /**
  * @function onLoadOfHTML
  * @description Gets invoked immediatley after loading html
@@ -18,13 +28,13 @@ onLoadOfHTML = function()
 		setDataToPeakAndIntensity(peakAndIntensityList);
 		setDataToMassAndIntensity(massAndIntensityList);
 		setDataToSequence(sequence, unknownMassShiftList);
-		setFixedMasses(l_fixedPtmList);
+        setFixedMasses(l_fixedPtmList);
 		setPrecursorMass(precursorMass);
     }
     //set the checkbox based on the ion type used in the data, which is stored in local storage
-	let ionType = getIonType();
-	setIonCheckbox(ionType);
-    
+    let ionType = getIonType();
+    localStorage.clear();
+    setIonCheckbox(ionType);
 
     let massErrorthVal = 0.1;
     let ppmErrorthVal = 15;

@@ -69,14 +69,14 @@ class SeqOfExecution
 		[sequence, massShiftList] = parseSequenceMassShift(sequence);
 		let selectedFixedMassShiftList = getFixedPtmCheckList();
 		// console.log("massShiftList:", massShiftList);
-		console.log("selectedFixedMassShiftList:", selectedFixedMassShiftList);
+		// console.log("selectedFixedMassShiftList:", selectedFixedMassShiftList);
 		/** 
 		* Get fixed mass selected by user
 		*/
 		let massShiftObj = new MassShifts(sequence);
 
 		fixedMassShiftList = massShiftObj.getFixedMassShiftList(selectedFixedMassShiftList);
-		console.log("fixedMassShiftList:", fixedMassShiftList);
+		// console.log("fixedMassShiftList:", fixedMassShiftList);
 		massShiftObj.generateMassShiftList(massShiftList, fixedMassShiftList);
 		/**
 		 * If user removed fixed ptm mass, remove the mass from the list
@@ -96,7 +96,7 @@ class SeqOfExecution
 			massShiftObj.appendtoMassShiftList(tempPosition,tempMass);
 		}
 		completeShiftList = massShiftObj.massShiftList;
-		console.log("completeShiftList:", completeShiftList);
+		// console.log("completeShiftList:", completeShiftList);
 		/**
 		 * Form sequence with mass shift embedded in []
 		 */
@@ -189,7 +189,7 @@ class SeqOfExecution
 		 * Get combined list of both matched and unmatched peaks to write to table
 		 */
 		matchedUnMatchedPeaks = matchedPeaksObj.getMatchedAndUnMatchedList(monoMassList,matchedPeakList);
-		console.log("matchedUnmatchedpeaks:", matchedUnMatchedPeaks);
+		// console.log("matchedUnmatchedpeaks:", matchedUnMatchedPeaks);
 		/**
 		 * Do the below function when peak list data is not empty
 		 */
@@ -199,7 +199,7 @@ class SeqOfExecution
 
 			//distributionList = matchedPeaksObj.getDistribution(peakDataList,sequence,matchedUnMatchedPeaks);
 			distributionList = matchedPeaksObj.getDistribution(modifiablePeakData,sequence,matchedUnMatchedPeaks, completeShiftList);
-			console.log("distributionList:", distributionList);
+			// console.log("distributionList:", distributionList);
 			/**
 			 * Display the graph formed
 			 */
@@ -209,7 +209,7 @@ class SeqOfExecution
 			 * Call generateCorrespondingGraph which calls addSpectrum function in invokeSpectrum file to draw graph 
 			 */
 			let spectrumGraphObj = new SpectrumGraph(Constants.SPECTRUMGRAPHID, peakDataList, distributionList,[],null);
-			console.log("envPeakList:", spectrumGraphObj.envPeakList);
+			// console.log("envPeakList:", spectrumGraphObj.envPeakList);
 			spectrumGraphObj.redraw();
 
 			$("#"+Constants.SPECTRUMDOWNLOADID).show();
@@ -225,7 +225,7 @@ class SeqOfExecution
 			 */
 			let residues = formResidues(sequence);
 			// form fixedPtms
-			let formedFixedPtmsList = formFixedPtms(fixedMassShiftList, parsePTM('fixedPtmList'), sequence);
+			let formedFixedPtmsList = formFixedPtms(fixedMassShiftList, sequence);
 			let formedMassShifts = formMassShifts(massShiftList);
 			let prsmDataObj = new PrsmData();
 			prsmDataObj.setData(residues, 0, residues.length - 1, formedFixedPtmsList, formedMassShifts, sequence, breakPointsList);
@@ -320,7 +320,7 @@ class SeqOfExecution
 			suffixMassList = proteoformObj.getSuffixMassList(massShift);
 			suffixMassList.shift();
 			suffixMassList.pop();
-			console.log("monoMassList:",monoMassList);
+			// console.log("monoMassList:",monoMassList);
 			/**
 			 * Get Matched peaks
 			 */					
@@ -332,7 +332,7 @@ class SeqOfExecution
 			 */	
 			completeListofMasswithMatchedInd.push(matchedAndUnMatchedListObj);													
 		})
-		console.log("completeListofMasswithMatchedInd:", completeListofMasswithMatchedInd);
+		// console.log("completeListofMasswithMatchedInd:", completeListofMasswithMatchedInd);
 		/**
 		 * Disply the table of masses for all the fragmented ions
 		 */
@@ -346,7 +346,7 @@ class SeqOfExecution
 		$("#monoMasstitle").show();
 		let ions = getIons(matchedPeakList);
 
-		console.log("prsm graph input", ions);
+		// console.log("prsm graph input", ions);
 		let monoMassGraphObj = new SpectrumGraph("monoMassGraph",ions, [], ions, proteoformObj);
 		monoMassGraphObj.para.showIons = true;
 		monoMassGraphObj.para.showEnvelopes = false;
