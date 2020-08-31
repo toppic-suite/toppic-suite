@@ -104,9 +104,8 @@ function addMassDataToTable(matchedPeaks)
 
     $(".peakRows").click(function() {
         /*	get Mono M/z value till 3 decimal values	*/
-        let peak_value = parseFloat(this.innerHTML).toFixed(3) ;
+        let peak_value = parseFloat(this.innerHTML).toFixed(3);
         let parent_id  = $(this).parent().parent().prop('id');
-        // console.log("parent_id : ",parent_id);
         let th_mass_val = $("#"+parent_id+" .th_mass").text();
         console.log("th_mass_val : ",th_mass_val);
     });

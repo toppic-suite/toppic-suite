@@ -1,3 +1,5 @@
-$("#helpModal").draggable({
-    appendTo: "body"
+$(document).ready(function(){
+    $("#helpModal").draggable({
+        appendTo: "body"
+    });
 });

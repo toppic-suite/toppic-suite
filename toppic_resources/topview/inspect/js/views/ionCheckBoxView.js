@@ -11,6 +11,7 @@ function setIonCheckbox(ionType){
 		"Z_DOT":"z_",
 		"X":"x"		
 	}
+	if(!ionType) return;
 	
 	let ionsAll = domElements.customControlInput;
 	let ionTypeSplit = ionType.split(',');
