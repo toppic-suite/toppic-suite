@@ -1,7 +1,7 @@
 // Gets executed once HTML is loaded
 $(document).ready(function(){
 	onLoadOfHTML();
-  	// localStorage.clear();
+  	localStorage.clear();
   
 	//ion type data needs to be preserved because it is recorded only once when the prsm.html opens. 
 	//Without this line it is going to break when the user tries to open inspect window again after closing.
@@ -33,7 +33,6 @@ onLoadOfHTML = function()
     }
     //set the checkbox based on the ion type used in the data, which is stored in local storage
     let ionType = getIonType();
-    localStorage.clear();
     setIonCheckbox(ionType);
 
     let massErrorthVal = 0.1;
