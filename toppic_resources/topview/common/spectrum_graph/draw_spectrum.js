@@ -32,6 +32,7 @@ function drawSpectrum(svgId, para, peaks, envPeaks, proteoform, ions) {
     drawIons(svg, para, ions);
   }
   if (para.isMonoMassGraph) {
+    updateViewBox(svgId, para.svgWidth, para.svgHeight);
     drawSequence(svg, para, proteoform);
     addErrorPlot(svg, para);
     addErrorBox(svg, para);
@@ -464,9 +465,9 @@ function drawIons(svg,para,ions){
   for (let i = 0; i < ions.length; i++) {
     let ion = ions[i];
     let x = ion.mz;
+    let xPos = para.getPeakXPos(x) + para.ionXShift;
+    let yPos = para.getPeakYPos(ion.intensity) + para.ionYShift;
     if(x >= para.winMinMz && x <= para.winMaxMz) {
-      let xPos = para.getPeakXPos(x) + para.ionXShift;
-      let yPos = para.getPeakYPos(ion.intensity) + para.ionYShift;
       let color = "black";
       if (typeof ion.env !== "undefined") {
         color = ion.env.color;
@@ -480,13 +481,13 @@ function drawIons(svg,para,ions){
         .style("stroke-width","2")
         .text(ion.text);
     } else {
-    ionGroup.append("text")
-    .attr("id","graph_matched_ions")
-    .attr("x", xPos)
-    .attr("y", yPos) 
-    .style("opacity", "0.8")
-    .style("stroke-width","2")
-    .text(ion.text);
+      ionGroup.append("text")
+      .attr("id","graph_matched_ions")
+      .attr("x", xPos)
+      .attr("y", yPos) 
+      .style("opacity", "0.8")
+      .style("stroke-width","2")
+      .text(ion.text);
     }
   }
 }
@@ -625,7 +626,7 @@ function drawErrorYTicks(svg, para){
 
 	let addYTicks = svg.append("g").attr("id","yErrorTicks")
 									.attr("class","yErrorTicks");
-	let tickSize = para.errorThreshold/para.errorYTickNum;
+  let tickSize = para.errorThreshold/para.errorYTickNum;
 	// Draw ticks
 	for(let i=-para.errorYTickNum;i<=para.errorYTickNum;i++) {
 		y = para.getErrorYPos(i*tickSize);
@@ -679,4 +680,9 @@ function drawErrorPoints(svg, para, ionList){
         .style("stroke-width","2");
     }
   })
+}
+
+function updateViewBox(svgId, width, height) {
+  let svg = d3.select("body").select("#"+svgId);
+  svg.attr("viewBox", "0 0 "+ width +" "+ height);
 }
