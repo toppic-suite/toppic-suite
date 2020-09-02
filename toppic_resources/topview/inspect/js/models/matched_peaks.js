@@ -128,7 +128,7 @@ class MatchedPeaks {
 		let matchedAndUnmatchedList = matchedList.map(x => ({...x}));
 		//matchedAndUnmatchedList.concat(matchedList);
 		let len = matchedList.length;
-		let MatchedPeaksObj = new MatchedPeaks();
+		// let MatchedPeaksObj = new MatchedPeaks();
 		monoMassList.forEach(function(eachElement,i){
 			let matched = false;
 			let peakId = i+1;
@@ -143,7 +143,7 @@ class MatchedPeaks {
 			if(!matched)
 			{
 				let matchedInd = "N";
-				let peak = MatchedPeaksObj.matchedPeakAttributes(monoMassList[i],peakId,"","","","",matchedInd);
+				let peak = this.matchedPeakAttributes(monoMassList[i],peakId,"","","","",matchedInd);
 			  matchedAndUnmatchedList.push(peak);
 			}
 		})

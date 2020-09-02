@@ -68,11 +68,11 @@ class InteRtGraph {
         let width = this.width;
         let height = this.height;
 
-        var maxInte = d3.max(this.inteRtArray, function(d) {
+        let maxInte = d3.max(this.inteRtArray, function(d) {
             return d.inteSum;
         });
     
-        var formatPercent = d3.format(".0%");
+        let formatPercent = d3.format(".0%");
     
         this.inteRtArray.forEach(function (element) {
             element.rt = element.rt/60;
@@ -80,40 +80,40 @@ class InteRtGraph {
         });
         this.inteRtArray.sort((a,b) => {a.rt > b.rt ? 1:-1});
     
-        var min = d3.min(this.inteRtArray, function(d) {
+        let min = d3.min(this.inteRtArray, function(d) {
             return d.intePercentage;
         });
-        var max = d3.max(this.inteRtArray, function(d) {
+        let max = d3.max(this.inteRtArray, function(d) {
             return d.intePercentage;
         });
     
-        var minRT = d3.min(this.inteRtArray, function(d) {
+        let minRT = d3.min(this.inteRtArray, function(d) {
             return d.rt;
         });
-        var maxRT = d3.max(this.inteRtArray, function(d) {
+        let maxRT = d3.max(this.inteRtArray, function(d) {
             return d.rt;
         });
-        var xScale = d3.scaleLinear()
+        let xScale = d3.scaleLinear()
             .domain([0, maxRT+5])
             .range([0, this.width - this.padding.left - this.padding.right]);
         this.xScale_g = xScale;
 
-        var yScale = d3.scaleLinear()
+        let yScale = d3.scaleLinear()
             .domain([0, max])
             .range([this.height - this.padding.top - this.padding.bottom, 0]);
     
-        var svg = d3.select(this.svg_ID)
+        let svg = d3.select(this.svg_ID)
             .append('svg')
             .attr('viewBox', "0 0 "+ this.width + " "+this.height)
             .attr('preserveAspectRatio', 'xMidYMid meet')
             .attr('width', '100%')
             .attr('height', '100%');
     
-        var xAxis = d3.axisBottom()
+        let xAxis = d3.axisBottom()
             .scale(xScale)
             .ticks(20);
     
-        var yAxis = d3.axisLeft()
+        let yAxis = d3.axisLeft()
             .scale(yScale)
             .tickFormat(formatPercent)
             .ticks(5);
@@ -144,7 +144,7 @@ class InteRtGraph {
             .style("text-anchor", "middle")
             .text("Intensity");
     
-        var linePath = d3.line()
+        let linePath = d3.line()
             .x(function(d){ return xScale(d.rt) })
             .y(function(d){ return yScale(d.intePercentage) }).curve(d3.curveBasis);
     
@@ -159,15 +159,14 @@ class InteRtGraph {
 
     
         //Line chart mouse over
-        var vis = svg;
-        var hoverLineGroup = vis.append("g")
+        let hoverLineGroup = svg.append("g")
             .attr("class", "hover-line");
-        var hoverLine = hoverLineGroup
+        let hoverLine = hoverLineGroup
             .append("line")
             .attr("stroke", "#ff0000")
             .attr("x1", this.padding.left).attr("x2", this.padding.left)
             .attr("y1", this.padding.top).attr("y2", this.height-this.padding.bottom);
-        var fixedLine = hoverLineGroup
+        let fixedLine = hoverLineGroup
             .append("line")
             .attr("stroke", "#ff8000")
             .attr("x1", this.padding.left).attr("x2", this.padding.left)
@@ -176,32 +175,32 @@ class InteRtGraph {
     
         hoverLine.style("opacity", 1e-6);
 
-        vis
+        svg
             .on("mouseout", hoverMouseOff)
             .on("mouseover mousemove touchmove", hoverMouseOn)
             .on("click", mouseClick);
     
     
-        var bisectRT = d3.bisector(function(d) { return d.rt; }).right;
+        let bisectRT = d3.bisector(function(d) { return d.rt; }).right;
     
         function mouseClick() {
-            var mouse_x = d3.mouse(this)[0];
-            var mouse_y = d3.mouse(this)[1];
-            var maxMouse = xScale(maxRT);
-            var mouseRT = xScale.invert(mouse_x-padding.left);
-            var i = bisectRT(inteRtArray, mouseRT); // returns the index to the current data item
+            let mouse_x = d3.mouse(this)[0];
+            let mouse_y = d3.mouse(this)[1];
+            let maxMouse = xScale(maxRT);
+            let mouseRT = xScale.invert(mouse_x-padding.left);
+            let i = bisectRT(inteRtArray, mouseRT); // returns the index to the current data item
     
             if(i>0 && i < inteRtArray.length && mouse_y < height-padding.bottom && mouse_y > padding.top) {
-                var d0 = inteRtArray[i - 1];
-                var d1 = inteRtArray[i];
+                let d0 = inteRtArray[i - 1];
+                let d1 = inteRtArray[i];
                 // work out which date value is closest to the mouse
-                var d = mouseRT - d0.rt > d1.rt - mouseRT ? d1 : d0;
+                let d = mouseRT - d0.rt > d1.rt - mouseRT ? d1 : d0;
                 fixedLine.attr("x1", mouse_x).attr("x2", mouse_x);
                 fixedLine.style("opacity", 1);
                 // findNextLevelOneScan(d.scanNum);
             } else if (i === inteRtArray.length && mouse_x -padding.left<= maxMouse+1 && mouse_y < height-padding.bottom && mouse_y > padding.top)
             {
-                var d = inteRtArray[i-1];
+                let d = inteRtArray[i-1];
                 fixedLine.attr("x1", mouse_x).attr("x2", mouse_x);
                 fixedLine.style("opacity", 1);
                 // findNextLevelOneScan(d.scanNum);
@@ -211,21 +210,21 @@ class InteRtGraph {
         }
 
         function hoverMouseOn() {
-            var mouse_x = d3.mouse(this)[0];
-            var mouse_y = d3.mouse(this)[1];
-            var maxMouse = xScale(maxRT);
+            let mouse_x = d3.mouse(this)[0];
+            let mouse_y = d3.mouse(this)[1];
+            let maxMouse = xScale(maxRT);
             hoverLine.attr("x1", mouse_x).attr("x2", mouse_x);
             hoverLine.style("opacity", 1);
-            var graph_y = yScale.invert(mouse_y);
-            var graph_x = xScale.invert(mouse_x-padding.left);
+            let graph_y = yScale.invert(mouse_y);
+            let graph_x = xScale.invert(mouse_x-padding.left);
     
-            var mouseRT = xScale.invert(mouse_x-padding.left);
-            var i = bisectRT(inteRtArray, mouseRT); // returns the index to the current data item
+            let mouseRT = xScale.invert(mouse_x-padding.left);
+            let i = bisectRT(inteRtArray, mouseRT); // returns the index to the current data item
             if(i>0 && i < inteRtArray.length && mouse_y < height-padding.bottom && mouse_y > padding.top) {
-                var d0 = inteRtArray[i - 1];
-                var d1 = inteRtArray[i];
+                let d0 = inteRtArray[i - 1];
+                let d1 = inteRtArray[i];
                 // work out which date value is closest to the mouse
-                var d = mouseRT - d0.rt > d1.rt - mouseRT ? d1 : d0;
+                let d = mouseRT - d0.rt > d1.rt - mouseRT ? d1 : d0;
                 if(document.getElementById(rt_ID)) {
                     document.getElementById(rt_ID).innerHTML = Math.round(d.rt * 100)/100;
                 }
@@ -236,7 +235,7 @@ class InteRtGraph {
                 hoverLine.style("opacity", 1);
             } else if (i === inteRtArray.length&& mouse_x-padding.left <= maxMouse+1 && mouse_y < height-padding.bottom && mouse_y > padding.top)
             {
-                var d = inteRtArray[i-1];
+                let d = inteRtArray[i-1];
                 if(document.getElementById(rt_ID)) {
                     document.getElementById(rt_ID).innerHTML = Math.round(d.rt * 100)/100;
                 }
@@ -261,7 +260,7 @@ class InteRtGraph {
     }
 
     moveLine(rt) {
-        var newX = this.xScale_g(rt) + this.padding.left;
+        let newX = this.xScale_g(rt) + this.padding.left;
         this.fixedLine_g.attr("x1", newX).attr("x2", newX);
         this.fixedLine_g.style("opacity", 1);
     }
