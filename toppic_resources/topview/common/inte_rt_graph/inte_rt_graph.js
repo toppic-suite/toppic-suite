@@ -11,7 +11,9 @@ class InteRtGraph {
     width;
     height;
 
-    constructor(svg_ID, inteRtArray, rt_ID = 'rt-hover', inte_ID = 'intensity-hover', height = 120, width = 1100, padding = {top: 10, right: 10, bottom: 50, left: 80}) {
+    onClickFunc;
+
+    constructor(svg_ID, inteRtArray, onClickFunc = ()=>{}, rt_ID = 'rt-hover', inte_ID = 'intensity-hover', height = 120, width = 1100, padding = {top: 10, right: 10, bottom: 50, left: 80}) {
         this.inteRtArray = inteRtArray;
 
         this.svg_ID = "#"+svg_ID;
@@ -21,6 +23,7 @@ class InteRtGraph {
         this.width = width;
         this.height = height;
         this.padding = padding;
+        this.onClickFunc = onClickFunc;
     }
 
     set padding(obj) {
@@ -174,7 +177,7 @@ class InteRtGraph {
         this.fixedLine_g = fixedLine;
     
         hoverLine.style("opacity", 1e-6);
-
+        let self = this;
         svg
             .on("mouseout", hoverMouseOff)
             .on("mouseover mousemove touchmove", hoverMouseOn)
@@ -197,13 +200,13 @@ class InteRtGraph {
                 let d = mouseRT - d0.rt > d1.rt - mouseRT ? d1 : d0;
                 fixedLine.attr("x1", mouse_x).attr("x2", mouse_x);
                 fixedLine.style("opacity", 1);
-                // findNextLevelOneScan(d.scanNum);
+                self.onClickFunc(d.scanNum);
             } else if (i === inteRtArray.length && mouse_x -padding.left<= maxMouse+1 && mouse_y < height-padding.bottom && mouse_y > padding.top)
             {
                 let d = inteRtArray[i-1];
                 fixedLine.attr("x1", mouse_x).attr("x2", mouse_x);
                 fixedLine.style("opacity", 1);
-                // findNextLevelOneScan(d.scanNum);
+                self.onClickFunc(d.scanNum);
             } else {
                 //fixedLine.style("opacity", 1e-6);
             }
