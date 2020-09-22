@@ -38,7 +38,8 @@ class SeqOfExecution
 		let massErrorthVal = null;
 		let matchedPeakList = [];
 		let ppmErrorthVal = null;
-
+		let spectrumGraphObj;
+		let monoMassGraphObj;
 		/**
 		 * Hide everything when page launched before data is computed
 		 */
@@ -208,7 +209,7 @@ class SeqOfExecution
 			/**
 			 * Call generateCorrespondingGraph which calls addSpectrum function in invokeSpectrum file to draw graph 
 			 */
-			let spectrumGraphObj = new SpectrumGraph(Constants.SPECTRUMGRAPHID, peakDataList, distributionList,[],null);
+			spectrumGraphObj = new SpectrumGraph(Constants.SPECTRUMGRAPHID, peakDataList, distributionList,[],null);
 			// console.log("envPeakList:", spectrumGraphObj.envPeakList);
 			spectrumGraphObj.redraw();
 
@@ -262,7 +263,7 @@ class SeqOfExecution
 			/**
 			 * 	Add data to the table
 			 */
-			addMassDataToTable(matchedUnMatchedPeaks);
+			addMassDataToTable(matchedUnMatchedPeaks, spectrumGraphObj);
 			/**
 			 * function to show the count of matched peaks, un matched peaks and All peaks
 			 */
@@ -333,6 +334,7 @@ class SeqOfExecution
 			completeListofMasswithMatchedInd.push(matchedAndUnMatchedListObj);													
 		})
 		// console.log("completeListofMasswithMatchedInd:", completeListofMasswithMatchedInd);
+		// console.log("monomasslist:", monoMassList);
 		/**
 		 * Disply the table of masses for all the fragmented ions
 		 */
@@ -340,14 +342,13 @@ class SeqOfExecution
 		{
 			$("#"+Constants.H_FRAGMENTEDTABLE).show();
 		}
-		createTableForSelectedFragmentIons(sequence,completeListofMasswithMatchedInd);
-		this.setBootStarpropertiesforFragmentIons();
+		
 
 		$("#monoMasstitle").show();
 		let ions = getIons(matchedPeakList);
 
 		// console.log("prsm graph input", ions);
-		let monoMassGraphObj = new SpectrumGraph("monoMassGraph",ions, [], ions, proteoformObj);
+		monoMassGraphObj = new SpectrumGraph("monoMassGraph",ions, [], ions, proteoformObj);
 		monoMassGraphObj.para.showIons = true;
 		monoMassGraphObj.para.showEnvelopes = false;
 		monoMassGraphObj.para.svgHeight += 80;
@@ -357,6 +358,9 @@ class SeqOfExecution
 		// monoMassGraphObj.para.errorThreshold = 0.06;
 
 		monoMassGraphObj.redraw();
+
+		createTableForSelectedFragmentIons(sequence,completeListofMasswithMatchedInd,monoMassGraphObj);
+		this.setBootStarpropertiesforFragmentIons();
 	}
 	/**
 	 * Function executes all the functionalities one by one and displays all the 

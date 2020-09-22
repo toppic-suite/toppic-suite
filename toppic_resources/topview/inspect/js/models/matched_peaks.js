@@ -258,17 +258,17 @@ class MatchedPeaks {
 	getMatchedAndUnmatchedPrefixAndSuffixMassList(prefixOrSuffixMassList, monoMassList,
 																massErrorthVal,ppmErrorthVal,prefixInd)
 	{
-		//console.log("monoMassList : ", monoMassList);
+		// console.log("monoMassList : ", monoMassList);
 		let MatchedAndUnMatchedList = [];
 		let monoMassList_temp = monoMassList.slice();
 		let len = monoMassList_temp.length;
 		let preOrSufListln = prefixOrSuffixMassList.length;
 		let MatchedAndUnMatchedListObj = {};
-
+		// console.log("monoMassList_temp:", monoMassList_temp);
 		for(let j = 0; j<preOrSufListln; j++)
 		{
 			let position = j + 1;
-			// let charge = null;
+			let charge = null;
 			if(prefixInd !== "prefix")
 			{
 				position = preOrSufListln-position+1;
@@ -293,13 +293,13 @@ class MatchedPeaks {
 							position = preOrSufListln- position +1;
 						}
 						mass = prefixOrSuffixMassList[j];
-						// charge = monoMassList_temp[i].charge;
+						charge = monoMassList_temp[i].charge;
 						matchedInd = "Y";
 						break;
 					}
 				}
 			}
-			MatchedAndUnMatchedListObj = {position:position,mass:mass,matchedInd:matchedInd};
+			MatchedAndUnMatchedListObj = {position:position,mass:mass,matchedInd:matchedInd,charge:charge};
 			MatchedAndUnMatchedList.push(MatchedAndUnMatchedListObj);
 		}
 		return MatchedAndUnMatchedList;
