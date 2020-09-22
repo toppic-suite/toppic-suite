@@ -33,8 +33,10 @@ class SpectrumGraph {
       .call(this.zoom);
   }
 
-  redraw = function(){
-    //console.log(this.envList);
+  redraw = function(monoMz){
+    if(monoMz) {
+      this.para.updateMzRange(monoMz);
+    }
     drawSpectrum(this.id, this.para, this.peakList, this.envPeakList, this.proteoform, this.ionList);
   }
 
