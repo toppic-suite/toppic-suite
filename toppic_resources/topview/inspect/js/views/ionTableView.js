@@ -3,7 +3,7 @@
  * @param {string} sequence - user entered sequence without mass shifts embedded
  * @param {Array} matchedUnMatchedPeaks - list of all the calculated masses
  */
-function createTableForSelectedFragmentIons(sequence,matchedUnMatchedPeaks){
+function createTableForSelectedFragmentIons(sequence,matchedUnMatchedPeaks,spectrumGraph){
     // console.log("matchedUnMatchedPeaks : ", matchedUnMatchedPeaks);
     /**
      * Remove if table already exist and rebuild the table
@@ -112,18 +112,20 @@ function createTableForSelectedFragmentIons(sequence,matchedUnMatchedPeaks){
     table.appendChild(thead);
     table.appendChild(tbody);
     div.appendChild(table);
-    onClickofMatchedPeaks();
+    onClickofMatchedPeaks(spectrumGraph);
 }
 
 /**
  * Function to zoom the graph to the mass point on click of matched mass
  */
-function onClickofMatchedPeaks(){
+function onClickofMatchedPeaks(spectrumGraph){
     $(".matched_fragments").click(function() {
-        // let charge = $(this).attr("charge");
+        let charge = $(this).attr("charge");
         let mass = parseFloat($(this).html());
-        // let mz = mass/charge;
-        console.log("mass:",mass);
+        let mz = mass/charge;
+        // console.log("mass:",mass);
+        // console.log("mz:", mz);
+        spectrumGraph.redraw(mass);
     })
 }
 

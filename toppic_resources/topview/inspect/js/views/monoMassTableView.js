@@ -44,7 +44,7 @@ function createMonoMassTable(){
  * Add Data to the table created
  * @param {Array} matchedPeaks - Contains List of Matched and unmatched peaks
  */
-function addMassDataToTable(matchedPeaks)
+function addMassDataToTable(matchedPeaks, graphObj)
 {
     let dataContainer_tbody = $("#tableContainer tbody");
     const totalColCount = $("#tableContainer thead tr th").length;
@@ -107,7 +107,8 @@ function addMassDataToTable(matchedPeaks)
         let peak_value = parseFloat(this.innerHTML).toFixed(3);
         let parent_id  = $(this).parent().parent().prop('id');
         let th_mass_val = $("#"+parent_id+" .th_mass").text();
-        console.log("th_mass_val : ",th_mass_val);
+        // console.log("th_mass_val : ",th_mass_val);
+        graphObj.redraw(peak_value);
     });
 }
 
