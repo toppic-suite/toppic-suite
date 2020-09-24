@@ -367,4 +367,11 @@ class SpectrumParameters {
     this.winMaxMz = centerMz + 3;
     this.updateScale(this.winMinMz, this.winMaxMz, this.winMaxInte);
   }
+
+  updateMassRange = function(mass) {
+    let centerMass = parseFloat(mass);
+    this.winMinMz = centerMass - 3;
+    this.winMaxMz = centerMass + 3;
+    this.updateScale(this.winMinMz, this.winMaxMz, this.winMaxInte);
+  }
 }
