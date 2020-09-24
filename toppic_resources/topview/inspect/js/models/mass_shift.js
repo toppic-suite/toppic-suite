@@ -114,6 +114,9 @@ class MassShifts {
 	formSequence(){
 		let result = this.sequence;
 		let count = 0;
+		if(!this.massShiftList) {
+			return result;
+		}
 		// sort mass shift list by position, ascending
 		this.massShiftList.sort(function(x,y){
             return x.position - y.position;
