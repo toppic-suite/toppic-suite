@@ -34,7 +34,9 @@ class SpectrumGraph {
   }
 
   redraw = function(monoMz){
-    if(monoMz) {
+    if (this.para.isMonoMassGraph && monoMz) {
+      this.para.updateMassRange(monoMz);
+    } else if(monoMz) {
       this.para.updateMzRange(monoMz);
     }
     drawSpectrum(this.id, this.para, this.peakList, this.envPeakList, this.proteoform, this.ionList);
