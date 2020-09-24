@@ -21,16 +21,29 @@ onLoadOfHTML = function()
 	let sequence = parseSeq('sequence');
 	let l_fixedPtmList = parsePTM('fixedPtmList');
 	let unknownMassShiftList = parseUnknowmassList('unknownMassShiftList');
-	let precursorMass = parsePrecursorMass("precursorMass");
-	if(peakAndIntensityList !== null && massAndIntensityList !== null
-		&& sequence !== null && precursorMass !== null)
-	{	
-		setDataToPeakAndIntensity(peakAndIntensityList);
+    let precursorMass = parsePrecursorMass("precursorMass");
+    if(peakAndIntensityList !== null && massAndIntensityList !== null){
+        setDataToPeakAndIntensity(peakAndIntensityList);
 		setDataToMassAndIntensity(massAndIntensityList);
-		setDataToSequence(sequence, unknownMassShiftList);
+    }
+    if(sequence) {
+        setDataToSequence(sequence, unknownMassShiftList);
+    }
+    if(l_fixedPtmList) {
         setFixedMasses(l_fixedPtmList);
+    }
+    if(precursorMass) {
 		setPrecursorMass(precursorMass);
     }
+	// if(peakAndIntensityList !== null && massAndIntensityList !== null
+	// 	&& sequence !== null && precursorMass !== null)
+	// {	
+	// 	setDataToPeakAndIntensity(peakAndIntensityList);
+	// 	setDataToMassAndIntensity(massAndIntensityList);
+	// 	setDataToSequence(sequence, unknownMassShiftList);
+    //     setFixedMasses(l_fixedPtmList);
+	// 	setPrecursorMass(precursorMass);
+    // }
     //set the checkbox based on the ion type used in the data, which is stored in local storage
     let ionType = getIonType();
     setIonCheckbox(ionType);
