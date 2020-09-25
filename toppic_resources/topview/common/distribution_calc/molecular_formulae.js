@@ -1,3 +1,5 @@
+const getIsotopicMassOfAtom = require('./isotopes');
+
 /**
  * Code to calculate distribution based on molecular formula
  */
@@ -478,3 +480,5 @@ class MolecularFormulae{
 	}
 
 }
+
+module.exports = MolecularFormulae;

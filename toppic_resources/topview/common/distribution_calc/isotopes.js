@@ -115,3 +115,5 @@ getSulfurRef = function(isotope){
 	l_asulfurIsotopes.push(S36);
 	return l_asulfurIsotopes;
 }
+
+module.exports = getIsotopicMassOfAtom;
