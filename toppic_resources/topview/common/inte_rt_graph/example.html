@@ -19,7 +19,7 @@
                         console.log(test);
                     };
                     
-                    let graphObj = new InteRtGraph("rt-sum",data, testFunc);
+                    let graphObj = new InteRtGraph("rt-sum",data,testFunc);
                     graphObj.drawGraph();
                     graphObj.moveLine(4);
                 })
@@ -29,12 +29,17 @@
     <body>
         <div class="col-sm-4">
             <div class="row">
-                <div class="col-sm-3">
+                <div class="col-sm-4">
                     RT:<span id="rt-hover">0</span>
                 </div> 
-                <div class="col-sm-6">
-                    <div id="shiftRight">
+                <div class="col-sm-4">
+                    <div>
                         Intensity:<span id="intensity-hover">0</span>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div>
+                        Scan:<span id="scan-hover">0</span>
                     </div>
                 </div>
             </div>

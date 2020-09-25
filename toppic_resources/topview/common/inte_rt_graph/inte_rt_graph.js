@@ -13,13 +13,12 @@ class InteRtGraph {
 
     onClickFunc;
 
-    constructor(svg_ID, inteRtArray, onClickFunc = ()=>{}, rt_ID = 'rt-hover', inte_ID = 'intensity-hover', height = 120, width = 1100, padding = {top: 10, right: 10, bottom: 50, left: 80}) {
+    constructor(svg_ID, inteRtArray, onClickFunc = ()=>{}, scanNum_ID = 'scan-hover', rt_ID = 'rt-hover', inte_ID = 'intensity-hover', height = 120, width = 1100, padding = {top: 10, right: 10, bottom: 50, left: 80}) {
         this.inteRtArray = inteRtArray;
-
         this.svg_ID = "#"+svg_ID;
         this.rt_ID = rt_ID;
         this.inte_ID = inte_ID;
-
+        this.scanNum_ID = scanNum_ID;
         this.width = width;
         this.height = height;
         this.padding = padding;
@@ -68,6 +67,7 @@ class InteRtGraph {
         let padding = this.padding;
         let rt_ID = this.rt_ID;
         let inte_ID = this.inte_ID;
+        let scanNum_ID = this.scanNum_ID;
         let width = this.width;
         let height = this.height;
 
@@ -234,6 +234,9 @@ class InteRtGraph {
                 if (document.getElementById(inte_ID)) {
                     document.getElementById(inte_ID).innerHTML = d.inteSum.toExponential(2);
                 }
+                if (document.getElementById(inte_ID)) {
+                    document.getElementById(scanNum_ID).innerHTML = d.scanNum;
+                }
     
                 hoverLine.style("opacity", 1);
             } else if (i === inteRtArray.length&& mouse_x-padding.left <= maxMouse+1 && mouse_y < height-padding.bottom && mouse_y > padding.top)
@@ -245,6 +248,9 @@ class InteRtGraph {
                 if (document.getElementById(inte_ID)) {
                     document.getElementById(inte_ID).innerHTML = d.inteSum.toExponential(2);
                 }
+                if (document.getElementById(inte_ID)) {
+                    document.getElementById(scanNum_ID).innerHTML = d.scanNum;
+                }
     
                 hoverLine.style("opacity", 1);
             } else {
@@ -253,6 +259,9 @@ class InteRtGraph {
                 }
                 if (document.getElementById(inte_ID)) {
                     document.getElementById(inte_ID).innerHTML = 0;
+                }
+                if (document.getElementById(inte_ID)) {
+                    document.getElementById(scanNum_ID).innerHTML = 0;
                 }
                 hoverLine.style("opacity", 0);
             }
