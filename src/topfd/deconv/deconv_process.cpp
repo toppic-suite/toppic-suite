@@ -182,9 +182,8 @@ std::function<void()> geneTaskMissingMsOne(RawMsGroupPtr ms_group_ptr,
 }
 
 void DeconvProcess::processSpMissingLevelOne(RawMsGroupReaderPtr reader_ptr) {
-  /////////////////////////// EnvCNN Changes ///////////////////
-  //  fdeep::model envcnn_model = MatchEnvFilterCNN::loadModel();
-  /////////////////////////////////////////////////////////////
+  // EnvCNN Changes
+  fdeep::model envcnn_model = MatchEnvFilterCNN::loadModel(topfd_para_ptr_->resource_dir_ + file_util::getFileSeparator() + "envcnn_models" + file_util::getFileSeparator());
 
   SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(thread_num_);  
 
@@ -214,10 +213,9 @@ void DeconvProcess::processSpMissingLevelOne(RawMsGroupReaderPtr reader_ptr) {
     EnvParaPtr env_ptr_new = std::make_shared<EnvPara>(env_para_ptr_);
     DpParaPtr dp_ptr_new = std::make_shared<DpPara>(dp_para_ptr_);
     
-    /////////////////////////////////////// EnvCNN Changes ////////////////////////////////////////
-    DeconvOneSpPtr deconv_ptr = std::make_shared<DeconvOneSp>(env_ptr_new, dp_ptr_new);
-//  DeconvOneSpPtr deconv_ptr = std::make_shared<DeconvOneSp>(env_ptr_new, dp_ptr_new, envcnn_model);
-    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // EnvCNN Changes
+    //DeconvOneSpPtr deconv_ptr = std::make_shared<DeconvOneSp>(env_ptr_new, dp_ptr_new);
+    DeconvOneSpPtr deconv_ptr = std::make_shared<DeconvOneSp>(env_ptr_new, dp_ptr_new, envcnn_model);
 
     pool_ptr->Enqueue(geneTaskMissingMsOne(ms_group_ptr, deconv_ptr, 
                                            ms_writer_ptr_vec, pool_ptr, 
@@ -408,12 +406,8 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
   ms1_msalign_name = file_util::basename(spec_file_name_) + "_ms1.msalign";
   ms2_msalign_name = file_util::basename(spec_file_name_) + "_ms2.msalign";
 
-  /////////////////////////// EnvCNN Changes ///////////////////
-  //////////////////////////////////////////////////////////////
-
-//  fdeep::model envcnn_model = MatchEnvFilterCNN::loadModel();
-
-  /////////////////////////////////////////////////////////////
+  // EnvCNN Changes
+  fdeep::model envcnn_model = MatchEnvFilterCNN::loadModel(topfd_para_ptr_->resource_dir_ + file_util::getFileSeparator() + "envcnn_models" + file_util::getFileSeparator());
 
   SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(thread_num_);  
   
@@ -443,13 +437,9 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
     //deconv_process_ptr_ (DecovProcess instance) is needed because it has the information on the folder names, envelope file names
     //pool_ptr needed for getting each thread id    
 
-    /////////////////////////////////////// EnvCNN Changes ////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-
-    DeconvOneSpPtr deconv_ptr = std::make_shared<DeconvOneSp>(env_ptr_new, dp_ptr_new);
-//    DeconvOneSpPtr deconv_ptr = std::make_shared<DeconvOneSp>(env_ptr_new, dp_ptr_new, envcnn_model);
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // EnvCNN Changes
+    //DeconvOneSpPtr deconv_ptr = std::make_shared<DeconvOneSp>(env_ptr_new, dp_ptr_new);
+    DeconvOneSpPtr deconv_ptr = std::make_shared<DeconvOneSp>(env_ptr_new, dp_ptr_new, envcnn_model);
 
     pool_ptr->Enqueue(geneTask(ms_group_ptr, deconv_ptr, ms1_writer_ptr_vec, 
                                ms2_writer_ptr_vec, pool_ptr, topfd_para_ptr_->gene_html_folder_, 
