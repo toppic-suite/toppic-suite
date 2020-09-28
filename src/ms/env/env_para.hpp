@@ -72,6 +72,7 @@ class EnvPara {
     multiple_min_charge_ =env_para_ptr->multiple_min_charge_;
     multiple_min_ratio_ = env_para_ptr->multiple_min_ratio_;
     prec_deconv_interval_ = env_para_ptr->prec_deconv_interval_;
+    use_envcnn_ = env_para_ptr->use_envcnn_;
   }; 
 
   int getMassGroup(double base_mass);
@@ -229,6 +230,9 @@ class EnvPara {
 
   // PrecDeconv
   double prec_deconv_interval_ = 3.0;
+
+  // Use EnvCNN
+  bool use_envcnn_ = false;
 };
 
 } /* namespace */

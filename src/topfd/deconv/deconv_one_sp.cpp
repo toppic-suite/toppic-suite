@@ -102,17 +102,12 @@ MatchEnvPtrVec DeconvOneSp::postprocess(MatchEnvPtrVec  &dp_envs) {
     match_env_refine::mzRefine(dp_envs);
   }
 
-    /////////////////////////////////////// EnvCNN Changes ////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    /* Obtain EnvCNN Prediction Score for MS/MS envelopes */
+  /* Obtain EnvCNN Prediction Score for MS/MS envelopes */
+  if (env_para_ptr_->use_envcnn_ && ms_level_ > 1){
+    result_envs_ = MatchEnvFilterCNN::filter_using_cnn(dp_envs, peak_list, model_);
+  }
 
-//    if (ms_level_ > 1){
-//        result_envs_ = MatchEnvFilterCNN::filter_using_cnn(dp_envs, peak_list, model_);
-//    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-
-    // filtering
+  // filtering
   if (env_para_ptr_->do_final_filtering_) {
     result_envs_ = MatchEnvFilter::filter(dp_envs, data_ptr_->getMaxMass(),
                                           env_para_ptr_);

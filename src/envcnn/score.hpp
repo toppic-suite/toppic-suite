@@ -25,7 +25,7 @@ namespace toppic {
     public:
         static MatchEnvPtrVec filter_using_cnn(MatchEnvPtrVec &ori_envs, PeakPtrVec &peak_list, fdeep::model model);
 
-        static fdeep::model loadModel();
+        static fdeep::model loadModel(std::string path);
     };
 }
 

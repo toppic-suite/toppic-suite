@@ -36,6 +36,7 @@ class TopfdPara {
   double ms_two_sn_ratio_ = 1.0;
   double prec_window_ = 3.0;
   bool keep_unused_peaks_ = false;
+  bool use_envcnn_ = false;
   bool output_multiple_mass_ = false;
   bool do_final_filtering_ = true;
   bool output_match_env_ = false;

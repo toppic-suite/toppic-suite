@@ -32,9 +32,8 @@ namespace toppic {
         return ori_envs;
     }
 
-    fdeep::model MatchEnvFilterCNN::loadModel() {
-        std::string model_file = "C:\\Users\\abbash\\Documents\\proteomics_cpp\\toppic_resources\\my_model.json";
-        // std::string model_file = para_ptr_->resource_dir_ + file_util::getFileSeparator() + "my_model.json";
+    fdeep::model MatchEnvFilterCNN::loadModel(std::string path) {
+        std::string model_file = path + file_util::getFileSeparator() + "my_model.json";
         const auto model = fdeep::load_model(model_file);
         return model;
     }
