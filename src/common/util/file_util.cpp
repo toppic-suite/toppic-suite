@@ -83,11 +83,7 @@ std::string getResourceDir(const std::string &exec_dir) {
   exit(EXIT_FAILURE);
 }
 std::string basenameFromEntirePath(const std::string &s) {
-  #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
-  size_t slash_pos= s.find_last_of("\\");
-  #else
   size_t slash_pos = s.find_last_of("\\/");
-  #endif
   if (slash_pos < s.length()) {
     return basename(s.substr(slash_pos + 1));
   }
