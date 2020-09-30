@@ -47,16 +47,11 @@ MassZeroPtmFilter::MassZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
 
   for (size_t t = 0; t < mng_ptr->zero_ptm_file_vec_.size(); t++){
     std::string file_name = mng_ptr->zero_ptm_file_vec_[t] + suffix;
-
-    std::cout << file_name << std::endl;
-
     if (!file_util::exists(index_dir + file_util::getFileSeparator() + file_name)){
       index_files_exist = false;//if any of the index files for this ptm is missing
       break; 
     }
   }
-
-  std::cout << "index file is used " << index_files_exist << std::endl;
 
   if (index_files_exist){
     //std::cout << "Loading index files                            " << std::endl;
