@@ -16,12 +16,16 @@
 #include <sstream> 
 
 #include "filter/mng/topindex_file_name.hpp"
+#include "common/util/file_util.hpp"
 
 namespace toppic{
 
 std::string TopIndexFileName::geneFileName(std::map<std::string, std::string> &arguments) {
 
   std::string fixed_mod = arguments["fixedMod"];
+
+  //keep only the file name from the entire path
+  fixed_mod = file_util::basenameFromEntirePath(fixed_mod);
 
   std::string error_tol = arguments["massErrorTolerance"];
 
