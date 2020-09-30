@@ -25,6 +25,8 @@ std::string getExecutiveDir(const std::string &argv_0);
 
 std::string getFileSeparator();
 
+std::string basenameFromEntirePath(const std::string &s);
+
 std::string basename(const std::string &s);
 
 std::string directory(const std::string &s);

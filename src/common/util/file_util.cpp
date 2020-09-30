@@ -82,6 +82,13 @@ std::string getResourceDir(const std::string &exec_dir) {
   LOG_ERROR("The resource directory " << resource_dir << " does not exist!"); 
   exit(EXIT_FAILURE);
 }
+std::string basenameFromEntirePath(const std::string &s) {
+  size_t slash_pos = s.find_last_of("\\/");
+  if (slash_pos < s.length()) {
+    return basename(s.substr(slash_pos + 1));
+  }
+  return basename(s);
+}
 
 std::string basename(const std::string &s) {
   size_t dot_pos = s.find_last_of(".");
