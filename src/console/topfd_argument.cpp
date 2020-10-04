@@ -62,6 +62,7 @@ bool Argument::parse(int argc, char* argv[]) {
          "<a positive number>. Set the signal/noise ratio for MS/MS spectra. The default value is 1.")
         ("precursor-window,w", po::value<std::string> (&prec_window),
          "<a positive number>. Set the precursor window size. The default value is 3.0 m/z.")
+        ("env-cnn,n", "Use EnvCNN for scoring the MS/MS spectral envelopes.")
         ("missing-level-one,o","The input spectrum file does not contain MS1 spectra.")
         ("thread-number,u", po::value<std::string> (&thread_number), "<a positive integer>. Number of threads used in the computation. Default value: 1.")
         ("generate-html-folder,g","Generate an html folder containing TopView and spectrum data for visualization.")
@@ -81,7 +82,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("thread-number,u", po::value<std::string> (&thread_number), "")
         ("generate-html-folder,g","")
         ("keep,k", "Report monoisotopic masses extracted from low quality isotopic envelopes.")
-        ("envcnn,d", "Use EnvCNN for scoring the MS/MS spectral envelopes.")
+        ("env-cnn,n", "Use EnvCNN for scoring the MS/MS spectral envelopes.")
         ("merged-file-name,f", po::value<std::string> (&merged_file_name), 
          "Merge deconvoluted files and specify the name of the merged file.")
         ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), 
@@ -126,8 +127,8 @@ bool Argument::parse(int argc, char* argv[]) {
       topfd_para_ptr_->keep_unused_peaks_ = true;
     }
 
-    if (vm.count("envcnn")) {
-      topfd_para_ptr_->use_envcnn_ = true;
+    if (vm.count("env-cnn")) {
+      topfd_para_ptr_->use_env_cnn_ = true;
     }
 
     if (vm.count("max-mass")) {

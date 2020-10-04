@@ -11,6 +11,10 @@
 //WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //See the License for the specific language governing permissions and
 //limitations under the License.
+//
+#include <mutex>
+#include <vector>
+#include <boost/filesystem.hpp>
 
 #include "common/util/logger.hpp"
 #include "common/util/version.hpp"
@@ -21,6 +25,7 @@
 
 #include "ms/spec/msalign_writer.hpp"
 #include "ms/spec/baseline_util.hpp"
+#include "ms/spec/msalign_thread_merge.hpp"
 
 #include "ms/env/env_base.hpp"
 #include "ms/env/match_env_util.hpp"
@@ -28,14 +33,8 @@
 
 #include "topfd/common/topfd_para.hpp"
 #include "topfd/msreader/raw_ms_writer.hpp"
+#include "topfd/envcnn/env_cnn.hpp" 
 #include "topfd/deconv/deconv_process.hpp"
-
-#include "ms/spec/msalign_thread_merge.hpp"
-
-#include <mutex>
-#include <vector>
-#include <boost/filesystem.hpp>
-#include <src/envcnn/score.hpp>
 
 namespace toppic {
 
@@ -109,6 +108,7 @@ void DeconvProcess::process() {
       = std::make_shared<RawMsGroupReader>(spec_file_name_, 
                                            topfd_para_ptr_->missing_level_one_,
                                            frac_id_);
+  env_cnn::initModel(topfd_para_ptr_->resource_dir_);
   if (topfd_para_ptr_->missing_level_one_) {
     processSpMissingLevelOne(reader_ptr);
   }
@@ -182,9 +182,6 @@ std::function<void()> geneTaskMissingMsOne(RawMsGroupPtr ms_group_ptr,
 }
 
 void DeconvProcess::processSpMissingLevelOne(RawMsGroupReaderPtr reader_ptr) {
-  // EnvCNN Changes
-  fdeep::model envcnn_model = MatchEnvFilterCNN::loadModel(topfd_para_ptr_->resource_dir_ + file_util::getFileSeparator() + "envcnn_models" + file_util::getFileSeparator());
-
   SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(thread_num_);  
 
   MsAlignWriterPtrVec ms_writer_ptr_vec;
@@ -206,16 +203,11 @@ void DeconvProcess::processSpMissingLevelOne(RawMsGroupReaderPtr reader_ptr) {
         boost::this_thread::sleep(boost::posix_time::milliseconds(100));
     }
 
-    //it is creating a new shared pointer using the class constructor 
-    //that takes shared pointer as input
-    //can create an class instance instead, but shared pointer 
-    //is used in many functions in deconv. and envelope detection. 
+    //Here we create new instances of Env Para and Dp Para 
+    //to make sure that multiple threads do not share these parameter instances. 
     EnvParaPtr env_ptr_new = std::make_shared<EnvPara>(env_para_ptr_);
     DpParaPtr dp_ptr_new = std::make_shared<DpPara>(dp_para_ptr_);
-    
-    // EnvCNN Changes
-    //DeconvOneSpPtr deconv_ptr = std::make_shared<DeconvOneSp>(env_ptr_new, dp_ptr_new);
-    DeconvOneSpPtr deconv_ptr = std::make_shared<DeconvOneSp>(env_ptr_new, dp_ptr_new, envcnn_model);
+    DeconvOneSpPtr deconv_ptr = std::make_shared<DeconvOneSp>(env_ptr_new, dp_ptr_new);
 
     pool_ptr->Enqueue(geneTaskMissingMsOne(ms_group_ptr, deconv_ptr, 
                                            ms_writer_ptr_vec, pool_ptr, 
@@ -406,9 +398,6 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
   ms1_msalign_name = file_util::basename(spec_file_name_) + "_ms1.msalign";
   ms2_msalign_name = file_util::basename(spec_file_name_) + "_ms2.msalign";
 
-  // EnvCNN Changes
-  fdeep::model envcnn_model = MatchEnvFilterCNN::loadModel(topfd_para_ptr_->resource_dir_ + file_util::getFileSeparator() + "envcnn_models" + file_util::getFileSeparator());
-
   SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(thread_num_);  
   
   //generate vector that contains msalign writing information
@@ -428,18 +417,14 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
     while(pool_ptr->getQueueSize() >= thread_num_ * 2){
         boost::this_thread::sleep(boost::posix_time::milliseconds(100));
     }
-    //it is creating a new shared pointer using the class constructor that takes shared pointer as input
-    //can create an class instance, but shared pointer is used in many functions in deconv. and envelope detection. 
-    //so created a shared pointer instead. 
+    //Here we create new Env Para and Dp Para instances to make sure that
+    //multiple threads do not share the same parameter instances. 
     EnvParaPtr env_ptr_new = std::make_shared<EnvPara>(env_para_ptr_);
     DpParaPtr dp_ptr_new = std::make_shared<DpPara>(dp_para_ptr_);
 
     //deconv_process_ptr_ (DecovProcess instance) is needed because it has the information on the folder names, envelope file names
     //pool_ptr needed for getting each thread id    
-
-    // EnvCNN Changes
-    //DeconvOneSpPtr deconv_ptr = std::make_shared<DeconvOneSp>(env_ptr_new, dp_ptr_new);
-    DeconvOneSpPtr deconv_ptr = std::make_shared<DeconvOneSp>(env_ptr_new, dp_ptr_new, envcnn_model);
+    DeconvOneSpPtr deconv_ptr = std::make_shared<DeconvOneSp>(env_ptr_new, dp_ptr_new);
 
     pool_ptr->Enqueue(geneTask(ms_group_ptr, deconv_ptr, ms1_writer_ptr_vec, 
                                ms2_writer_ptr_vec, pool_ptr, topfd_para_ptr_->gene_html_folder_, 

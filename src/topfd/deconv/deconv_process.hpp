@@ -18,12 +18,12 @@
 
 #include <map>
 
+#include "common/thread/simple_thread_pool.hpp"
 #include "ms/spec/msalign_writer.hpp"
+#include "ms/env/env_para.hpp"
 #include "topfd/common/topfd_para.hpp"
 #include "topfd/msreader/raw_ms_group_reader.hpp"
-#include "ms/env/env_para.hpp"
 #include "topfd/deconv/deconv_one_sp.hpp"
-#include "common/thread/simple_thread_pool.hpp"
 
 namespace toppic {
 class DeconvProcess {
