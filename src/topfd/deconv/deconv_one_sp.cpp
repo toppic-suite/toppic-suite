@@ -95,7 +95,7 @@ void DeconvOneSp::preprocess() {
   }
 }
 
-MatchEnvPtrVec DeconvOneSp::postprocess(MatchEnvPtrVec  &dp_envs) {
+MatchEnvPtrVec DeconvOneSp::postprocess(MatchEnvPtrVec &dp_envs) {
   // assign intensity
   PeakPtrVec peak_list = data_ptr_->getPeakList();
   match_env_util::assignIntensity(peak_list, dp_envs);
