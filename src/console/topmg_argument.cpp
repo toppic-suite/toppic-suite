@@ -235,7 +235,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("num-shift,s", po::value<std::string> (&ptm_num), "<0|1|2>. Maximum number of unexpected modifications in a proteoform spectrum-match. Default value: 0.")
         ("combined-file-name,c", po::value<std::string>(&combined_output_name) , "Specify a file name for the combined spectrum data file and analysis results.")
         ("keep-temp-files,k", "Keep temporary files.")
-        ("generate-html-folder,g", "Skip generating an html folder containing TopView and spectrum data for visualization.");
+        ("skip-html-folder,g", "Skip generating an html folder containing TopView and spectrum data for visualization.");
   
     po::options_description desc("Options");
 
@@ -264,7 +264,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("use-asf-diagonal,D", "")
         ("var-ptm,P", po::value<std::string>(&var_ptm_num) , "")
         ("num-shift,s", po::value<std::string> (&ptm_num), "")
-        ("generate-html-folder,g", "")
+        ("skip-html-folder,g", "")
         ("database-file-name", po::value<std::string>(&database_file_name)->required(), "Database file name with its path.")
         ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), "Spectrum file name with its path.");
 
@@ -402,7 +402,7 @@ bool Argument::parse(int argc, char* argv[]) {
     if (vm.count("var-ptm-in-gap")) {
       arguments_["varPtmNumInGap"] = var_ptm_in_gap;
     }
-    if (vm.count("generate-html-folder")) {
+    if (vm.count("skip-html-folder")) {
       arguments_["geneHTMLFolder"] = "false";
     }
   }

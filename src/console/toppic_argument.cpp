@@ -248,7 +248,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("no-topfd-feature,x", "No TopFD feature file for proteoform identification.")
         ("combined-file-name,c", po::value<std::string>(&combined_output_name) , "Specify a file name for the combined spectrum data file and analysis results.")
         ("keep-temp-files,k", "Keep temporary files.")
-        ("generate-html-folder,g", "Skip generating an html folder containing TopView and spectrum data for visualization.");
+        ("skip-html-folder,g", "Skip generating an html folder containing TopView and spectrum data for visualization.");
 
     po::options_description desc("Options");
 
@@ -276,7 +276,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "")
         ("miscore-threshold,H", po::value<std::string> (&local_threshold), "")
         ("filtering-result-number", po::value<std::string>(&filtering_result_num), "Filtering result number. Default value: 20.")
-        ("generate-html-folder,g","")
+        ("skip-html-folder,g","")
         ("database-file-name", po::value<std::string>(&database_file_name)->required(), "Database file name with its path.")
         ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), "Spectrum file name with its path.");
 
@@ -413,7 +413,7 @@ bool Argument::parse(int argc, char* argv[]) {
     if (vm.count("no-topfd-feature")) {
       arguments_["useFeatureFile"] = "false";
     }
-    if (vm.count("generate-html-folder")) {
+    if (vm.count("skip-html-folder")) {
       arguments_["geneHTMLFolder"] = "false";
     }   
   }
