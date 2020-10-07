@@ -67,7 +67,7 @@ void Argument::initArguments() {
   arguments_["useAsfDiag"] = "false";
   arguments_["varPtmNumber"] = "5";
   arguments_["varPtmNumInGap"] = "5";
-  arguments_["geneHTMLFolder"] = "false";
+  arguments_["geneHTMLFolder"] = "true";
 }
 
 void Argument::outputArguments(std::ostream &output, std::map<std::string, std::string> arguments) {
@@ -235,8 +235,8 @@ bool Argument::parse(int argc, char* argv[]) {
         ("num-shift,s", po::value<std::string> (&ptm_num), "<0|1|2>. Maximum number of unexpected modifications in a proteoform spectrum-match. Default value: 0.")
         ("combined-file-name,c", po::value<std::string>(&combined_output_name) , "Specify a file name for the combined spectrum data file and analysis results.")
         ("keep-temp-files,k", "Keep temporary files.")
-        ("generate-html-folder,g", "Generate an html folder containing TopView and spectrum data for visualization.");
-    
+        ("generate-html-folder,g", "Skip generating an html folder containing TopView and spectrum data for visualization.");
+  
     po::options_description desc("Options");
 
     desc.add_options()
@@ -403,7 +403,7 @@ bool Argument::parse(int argc, char* argv[]) {
       arguments_["varPtmNumInGap"] = var_ptm_in_gap;
     }
     if (vm.count("generate-html-folder")) {
-      arguments_["geneHTMLFolder"] = "true";
+      arguments_["geneHTMLFolder"] = "false";
     }
   }
   catch(std::exception & e) {

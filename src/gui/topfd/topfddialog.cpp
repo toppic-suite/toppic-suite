@@ -108,7 +108,7 @@ void TopFDDialog::on_defaultButton_clicked() {
   ui->windowSizeEdit->setText("3.0");
   ui->threadNumberEdit->setText("1");
   ui->missLevelOneCheckBox->setChecked(false);
-  ui->geneHTMLCheckBox->setChecked(false);
+  ui->geneHTMLCheckBox->setChecked(true);
   //ui->mergeCheckBox->setChecked(false);
   //ui->mergedFilenameLineEdit->setText("sample1");
   ui->outputTextBrowser->clear();
