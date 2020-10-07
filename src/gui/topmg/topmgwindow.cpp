@@ -137,7 +137,7 @@ void topmgWindow::on_defaultButton_clicked() {
   ui->decoyCheckBox->setChecked(false);
   ui->topfdFeatureCheckBox->setChecked(false);
   ui->asfDiagCheckBox->setChecked(false);
-  ui->geneHTMLCheckBox->setChecked(false);
+  ui->geneHTMLCheckBox->setChecked(true);
 }
 
 void topmgWindow::updatedir(QString s) {

@@ -543,7 +543,7 @@ p, li { white-space: pre-wrap; }
         <bool>true</bool>
        </property>
        <property name="checked">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
       </widget>
      </item>

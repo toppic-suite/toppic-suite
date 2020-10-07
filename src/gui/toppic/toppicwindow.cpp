@@ -146,7 +146,7 @@ void toppicWindow::on_defaultButton_clicked() {
   ui->decoyCheckBox->setChecked(false);
   ui->lookupTableCheckBox->setChecked(false);
   ui->topfdFeatureCheckBox->setChecked(false);
-  ui->geneHTMLCheckBox->setChecked(false);
+  ui->geneHTMLCheckBox->setChecked(true);
 }
 
 void toppicWindow::updatedir(QString s) {
