@@ -43,7 +43,7 @@ class TopfdPara {
   //bool output_json_files_ = true;
   bool merge_files_ = false;
   int  thread_number_ = 1;
-  bool gene_html_folder_ = false;
+  bool gene_html_folder_ = true;
   std::string merged_file_name_ = "";
 };
 

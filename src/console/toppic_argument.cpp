@@ -62,7 +62,7 @@ void Argument::initArguments() {
   arguments_["residueModFileName"] = "";
   arguments_["threadNumber"] = "1";
   arguments_["useFeatureFile"] = "true";
-  arguments_["geneHTMLFolder"] = "false";
+  arguments_["geneHTMLFolder"] = "true";
 }
 
 void Argument::outputArguments(std::ostream &output, 
@@ -248,7 +248,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("no-topfd-feature,x", "No TopFD feature file for proteoform identification.")
         ("combined-file-name,c", po::value<std::string>(&combined_output_name) , "Specify a file name for the combined spectrum data file and analysis results.")
         ("keep-temp-files,k", "Keep temporary files.")
-        ("generate-html-folder,g", "Generate an html folder containing TopView and spectrum data for visualization.");
+        ("generate-html-folder,g", "Skip generating an html folder containing TopView and spectrum data for visualization.");
 
     po::options_description desc("Options");
 
@@ -414,7 +414,7 @@ bool Argument::parse(int argc, char* argv[]) {
       arguments_["useFeatureFile"] = "false";
     }
     if (vm.count("generate-html-folder")) {
-      arguments_["geneHTMLFolder"] = "true";
+      arguments_["geneHTMLFolder"] = "false";
     }   
   }
   catch(std::exception&e ) {

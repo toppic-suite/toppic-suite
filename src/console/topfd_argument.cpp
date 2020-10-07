@@ -64,7 +64,7 @@ bool Argument::parse(int argc, char* argv[]) {
          "<a positive number>. Set the precursor window size. The default value is 3.0 m/z.")
         ("missing-level-one,o","The input spectrum file does not contain MS1 spectra.")
         ("thread-number,u", po::value<std::string> (&thread_number), "<a positive integer>. Number of threads used in the computation. Default value: 1.")
-        ("generate-html-folder,g","Generate an html folder containing TopView and spectrum data for visualization.")
+        ("generate-html-folder,g","Skip generating an html folder containing TopView and spectrum data for visualization.")
         ;
 
     po::options_description desc("Options");
@@ -172,7 +172,7 @@ bool Argument::parse(int argc, char* argv[]) {
       topfd_para_ptr_->thread_number_ = std::stoi(thread_number);
     }
     if (vm.count("generate-html-folder")) {
-      topfd_para_ptr_->gene_html_folder_ = true;
+      topfd_para_ptr_->gene_html_folder_ = false;
     }
   }
   catch(std::exception& e) {

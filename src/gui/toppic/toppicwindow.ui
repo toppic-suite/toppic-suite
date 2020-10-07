@@ -393,6 +393,9 @@ p, li { white-space: pre-wrap; }
            <height>0</height>
           </size>
          </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
          <property name="text">
           <string>Create HTML folder</string>
          </property>
