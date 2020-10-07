@@ -64,7 +64,7 @@ bool Argument::parse(int argc, char* argv[]) {
          "<a positive number>. Set the precursor window size. The default value is 3.0 m/z.")
         ("missing-level-one,o","The input spectrum file does not contain MS1 spectra.")
         ("thread-number,u", po::value<std::string> (&thread_number), "<a positive integer>. Number of threads used in the computation. Default value: 1.")
-        ("generate-html-folder,g","Skip generating an html folder containing TopView and spectrum data for visualization.")
+        ("skip-html-folder,g","Skip generating an html folder containing TopView and spectrum data for visualization.")
         ;
 
     po::options_description desc("Options");
@@ -79,7 +79,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("missing-level-one,o", "")
         //("multiple-mass,u", "Output multiple masses for one envelope.")
         ("thread-number,u", po::value<std::string> (&thread_number), "")
-        ("generate-html-folder,g","")
+        ("skip-html-folder,g","")
         ("keep,k", "Report monoisotopic masses extracted from low quality isotopic envelopes.")
         ("envcnn,d", "Use EnvCNN for scoring the MS/MS spectral envelopes.")
         ("merged-file-name,f", po::value<std::string> (&merged_file_name), 
@@ -171,7 +171,7 @@ bool Argument::parse(int argc, char* argv[]) {
     if (vm.count("thread-number")) {
       topfd_para_ptr_->thread_number_ = std::stoi(thread_number);
     }
-    if (vm.count("generate-html-folder")) {
+    if (vm.count("skip-html-folder")) {
       topfd_para_ptr_->gene_html_folder_ = false;
     }
   }
