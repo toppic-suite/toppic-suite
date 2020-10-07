@@ -264,7 +264,7 @@ void computeEnvScores(MatchEnvPtrVec &ori_env, PeakPtrVec &peak_list) {
     if (avail_vec[i]) {
       index = i;
       avail_vec[i] = false;
-      return;
+      break;
     }
   }
   avail_lock.unlock();
