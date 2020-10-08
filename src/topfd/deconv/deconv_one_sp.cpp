@@ -104,8 +104,8 @@ MatchEnvPtrVec DeconvOneSp::postprocess(MatchEnvPtrVec &dp_envs) {
     match_env_refine::mzRefine(dp_envs);
   }
 
-  // Obtain EnvCNN Prediction Score for MS1 and  MS/MS envelopes 
-  if (env_para_ptr_->use_env_cnn_){
+  // Obtain EnvCNN Prediction Score for MS/MS envelopes
+  if (env_para_ptr_->use_env_cnn_ && ms_level_ != 1){
     env_cnn::computeEnvScores(dp_envs, peak_list);
     std::sort(dp_envs.begin(), dp_envs.end(), MatchEnv::cmpScoreDec);
   }

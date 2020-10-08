@@ -189,9 +189,9 @@ void addNoisePeaksInMatrix(const std::vector<double> &peak_mass,
   }
 }
 
-void generateTensors(std::vector<fdeep::tensor> &tensorsL,
+void generateTensors(std::vector<fdeep::tensors> &tensorsL,
                      const std::vector<std::vector<double>> &matrix) {
-  fdeep::tensor_shape tensor_shape(1, 1, 1, 300, 5);
+  fdeep::tensor_shape tensor_shape(300, 5);
   fdeep::tensor t(tensor_shape, 0.0f);
   for (int y = 0; y < 300; ++y)
     for (int x = 0; x < 5; ++x)
@@ -199,12 +199,12 @@ void generateTensors(std::vector<fdeep::tensor> &tensorsL,
 
   std::vector<fdeep::tensor> tensors;
   tensors.push_back(t);
-  tensorsL.insert(tensorsL.end(), tensors.begin(), tensors.end());
+  tensorsL.push_back(tensors);
 }
 
 
-std::vector<fdeep::tensor> getTensor(MatchEnvPtrVec &ori_envs, PeakPtrVec &peak_list) {
-  std::vector<fdeep::tensor> tensorsL;
+std::vector<fdeep::tensors> getTensor(MatchEnvPtrVec &ori_envs, PeakPtrVec &peak_list) {
+  std::vector<fdeep::tensors> tensorsL;
   double baseline_intensity;
   getBaseLineUsingPeaklist(peak_list, baseline_intensity);
   std::sort(ori_envs.begin(), ori_envs.end(), MatchEnv::cmpScoreDec);
@@ -248,11 +248,11 @@ std::vector<fdeep::tensor> getTensor(MatchEnvPtrVec &ori_envs, PeakPtrVec &peak_
 }
 
 void compute(MatchEnvPtrVec &ori_envs, PeakPtrVec &peak_list, int index) {
-  std::vector<fdeep::tensor> tensorsL = getTensor(ori_envs, peak_list);
+  std::vector<fdeep::tensors> tensorsL = getTensor(ori_envs, peak_list);
   if (!tensorsL.empty()) {
-    std::vector<fdeep::tensor> pred_scores = model_vec[index].predict(tensorsL);
+    std::vector<fdeep::tensors> pred_scores = model_vec[index].predict_multi(tensorsL, false);
     for (size_t i = 0; i < ori_envs.size(); i++) {
-      ori_envs[i]->setScore(pred_scores[i].get(0, 0, 0, 0, 0));
+      ori_envs[i]->setScore(pred_scores[i][0].get(0, 0, 0, 0, 0));
     }
   }
 }
