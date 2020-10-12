@@ -401,7 +401,7 @@ void FeatureSampleMerge::outputTable(FeaturePrsmPtrVec2D &table,
         file << delim << delim << delim << delim;
       }
       else {
-        file <<  std::setprecision(3) << std::scientific << sample_feature->getIntensity() << ",";
+        file <<  std::setprecision(3) << std::scientific << sample_feature->getIntensity() << delim;
         if (sample_feature->getMs2Id()>= 0) {
           file << std::fixed << sample_feature->getMs2Id() << delim;
         }
