@@ -108,7 +108,7 @@ void TopDiffDialog::initArguments() {
   arguments_["fixedMod"] = "";
   arguments_["errorTolerance"] = "1.2";
   arguments_["toolName"] = "toppic";
-  arguments_["mergedOutputFileName"] = "sample_diff.csv";
+  arguments_["mergedOutputFileName"] = "sample_diff.tsv";
 }
 
 void TopDiffDialog::on_clearButton_clicked() {
@@ -124,7 +124,7 @@ void TopDiffDialog::on_defaultButton_clicked() {
   on_fixedModComboBox_currentIndexChanged(0);
   ui->toolComboBox->setCurrentIndex(0);
   ui->precErrorEdit->setText("1.2");
-  ui->outputEdit->setText("sample_diff.csv");
+  ui->outputEdit->setText("sample_diff.tsv");
   ui->outputTextBrowser->setText("Click the Start button to process the data.");
 }
 
