@@ -28,7 +28,7 @@ EnvPara::EnvPara(TopfdParaPtr topfd_para_ptr) {
   output_multiple_mass_ = topfd_para_ptr->output_multiple_mass_;
   prec_deconv_interval_ = topfd_para_ptr->prec_window_; 
   do_final_filtering_ = topfd_para_ptr->do_final_filtering_;
-  use_envcnn_ = topfd_para_ptr->use_envcnn_;
+  use_env_cnn_ = topfd_para_ptr->use_env_cnn_;
 }
 
 void EnvPara::setMinInte(double min_inte, int ms_level) {
