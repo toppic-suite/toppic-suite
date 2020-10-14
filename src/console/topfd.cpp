@@ -12,15 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-//#include <map>
-//#include <string>
-
-//#include "common/util/file_util.hpp"
-//#include "common/util/str_util.hpp"
-//#include "common/util/time_util.hpp"
-//#include "ms/spec/msalign_frac_merge.hpp"
-//#include "ms/feature/feature_merge.hpp"
-
 #include "topfd/common/topfd_para.hpp"
 #include "topfd/common/topfd_process.hpp"
 #include "console/topfd_argument.hpp"

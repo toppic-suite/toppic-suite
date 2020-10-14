@@ -12,18 +12,20 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <src/envcnn/score.hpp>
+#include <algorithm>
+
 #include "common/util/logger.hpp"
 #include "ms/spec/baseline_util.hpp"
-#include "topfd/spec/deconv_data_util.hpp"
 #include "ms/env/match_env_util.hpp"
 #include "ms/env/match_env_refine.hpp"
 #include "ms/env/match_env_filter.hpp"
 #include "ms/env/env_detect.hpp"
 #include "ms/env/env_filter.hpp"
 #include "ms/env/env_assign.hpp"
+#include "topfd/spec/deconv_data_util.hpp"
 #include "topfd/dp/co_table.hpp"
 #include "topfd/dp/dp_a.hpp"
+#include "topfd/envcnn/env_cnn.hpp" 
 #include "topfd/deconv/deconv_one_sp.hpp"
 
 //#include "ms/env/env_rescore.hpp"
@@ -93,7 +95,7 @@ void DeconvOneSp::preprocess() {
   }
 }
 
-MatchEnvPtrVec DeconvOneSp::postprocess(MatchEnvPtrVec  &dp_envs) {
+MatchEnvPtrVec DeconvOneSp::postprocess(MatchEnvPtrVec &dp_envs) {
   // assign intensity
   PeakPtrVec peak_list = data_ptr_->getPeakList();
   match_env_util::assignIntensity(peak_list, dp_envs);
@@ -102,9 +104,10 @@ MatchEnvPtrVec DeconvOneSp::postprocess(MatchEnvPtrVec  &dp_envs) {
     match_env_refine::mzRefine(dp_envs);
   }
 
-  /* Obtain EnvCNN Prediction Score for MS/MS envelopes */
-  if (env_para_ptr_->use_envcnn_ && ms_level_ > 1){
-    result_envs_ = MatchEnvFilterCNN::filter_using_cnn(dp_envs, peak_list, model_);
+  // Obtain EnvCNN Prediction Score for MS/MS envelopes
+  if (env_para_ptr_->use_env_cnn_ && ms_level_ != 1){
+    env_cnn::computeEnvScores(dp_envs, peak_list);
+    std::sort(dp_envs.begin(), dp_envs.end(), MatchEnv::cmpScoreDec);
   }
 
   // filtering
