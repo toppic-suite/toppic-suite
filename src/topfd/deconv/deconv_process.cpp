@@ -188,7 +188,7 @@ void DeconvProcess::processSpMissingLevelOne(RawMsGroupReaderPtr reader_ptr) {
   SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(thread_num_);  
 
   MsAlignWriterPtrVec ms_writer_ptr_vec;
-  std::string ms_msalign_name = file_util::basename(spec_file_name_) + ".ms2_msalign";
+  std::string ms_msalign_name = file_util::basename(spec_file_name_) + "_ms2.msalign";
   for (int i = 0; i < thread_num_; i++) { 
     MsAlignWriterPtr ms_ptr = 
         std::make_shared<MsAlignWriter>(ms_msalign_name + "_" + str_util::toString(i));
@@ -233,9 +233,16 @@ void DeconvProcess::processSpMissingLevelOne(RawMsGroupReaderPtr reader_ptr) {
   }
   pool_ptr->ShutDown();
 
-  MsalignThreadMerge msalign_ms2_merge = MsalignThreadMerge(
+  /*MsalignThreadMerge msalign_ms2_merge = MsalignThreadMerge(
       file_util::basename(spec_file_name_), "ms2_msalign", 
-      thread_num_, "ms2.msalign", topfd_para_ptr_-> getParaStr("#"));
+      thread_num_, "ms2.msalign", topfd_para_ptr_-> getParaStr("#"));*/
+
+  MsalignThreadMergePtr ms2_merge_ptr 
+      = std::make_shared<MsalignThreadMerge>(file_util::basename(spec_file_name_), "ms2.msalign", 
+                                             thread_num_, "ms2.msalign", 
+                                             topfd_para_ptr_-> getParaStr("#"));
+
+  ms2_merge_ptr->process();
 
   std::cout << std::endl;
 }
