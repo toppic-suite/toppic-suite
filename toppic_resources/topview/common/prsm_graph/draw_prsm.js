@@ -1,24 +1,26 @@
 function drawPrsm(svgId, para, prsm) {
+  let extraMargin = 0; //extra space is needed when the start of sequence is skipped 
   let svg = d3.select("body").select("#"+svgId);
   // Removes all the elements under SVG group 'svgGroup' everytime there this function is called
   $("#" + svgId).children().remove();
   initSvg(svg, para, prsm);
   if (prsm.showStartSkipped) {
     addStartSkippedLine(svg,para,prsm.startSkippedInfo);
+    extraMargin = 36;
   }
   if (prsm.showEndSkipped) {
-    addEndSkippedLine(svg,para,prsm.displayFirstPos, prsm.displayLastPos + 1, prsm.endSkippedInfo);
+    addEndSkippedLine(svg,para,prsm.displayFirstPos, prsm.displayLastPos + 1, prsm.endSkippedInfo, extraMargin);
   }
 
-  addMassShiftAnnos(svg, para, prsm.displayFirstPos, prsm.massShifts);
-  addMassShiftBackground(svg, para, prsm.displayFirstPos, prsm.massShifts);
-  addAminoAcids(svg, para, prsm.residues, prsm.displayFirstPos, prsm.displayLastPos);
+  addMassShiftAnnos(svg, para, prsm.displayFirstPos, prsm.massShifts, extraMargin);
+  addMassShiftBackground(svg, para, prsm.displayFirstPos, prsm.massShifts, extraMargin);
+  addAminoAcids(svg, para, prsm.residues, prsm.displayFirstPos, prsm.displayLastPos, extraMargin);
   if (para.showNum) {
-    addPosNums(svg, para, prsm.displayFirstPos, prsm.displayLastPos, prsm.rowNum);
+    addPosNums(svg, para, prsm.displayFirstPos, prsm.displayLastPos, prsm.rowNum, extraMargin);
   }
-  drawStartSymbol(svg, para, prsm.displayFirstPos, prsm.formFirstPos);
-  drawEndSymbol(svg, para, prsm.displayFirstPos, prsm.displayLastPos, prsm.formLastPos);
-  drawBreakPoints(svg, para, prsm.displayFirstPos, prsm.formFirstPos, prsm.breakPoints);
+  drawStartSymbol(svg, para, prsm.displayFirstPos, prsm.formFirstPos, extraMargin);
+  drawEndSymbol(svg, para, prsm.displayFirstPos, prsm.displayLastPos, prsm.formLastPos, extraMargin);
+  drawBreakPoints(svg, para, prsm.displayFirstPos, prsm.formFirstPos, prsm.breakPoints, extraMargin);
 }
 
 function initSvg(svg, para, prsm) {
@@ -54,9 +56,13 @@ function addStartSkippedLine(svg, para, info) {
  * @param {Object} para - Contains parameters of width, letter space etc., to draw SVG
  * @param {Object} info - Contains the skipped information. 
  */
-function addEndSkippedLine(svg, para, startPos, linePos, info) {
+function addEndSkippedLine(svg, para, startPos, linePos, info, extraMargin) {
   let [x,y] = para.getSkipEndCoordinates(linePos, startPos);
   //console.log("x", x, "y", y, "info", info);
+  console.log(y, y + extraMargin)
+
+  y = y + extraMargin;
+  
   //	Get the coordinates to write the skip information at the start of acid
   svg.append("text")
     .attr("x", x)
@@ -71,7 +77,7 @@ function addEndSkippedLine(svg, para, startPos, linePos, info) {
  * @param {String} svg - Svg element.
  * @param {String} seq - Contains the protein sequence
  */
-function addAminoAcids (svg, para, residues, start, end) {
+function addAminoAcids (svg, para, residues, start, end, extraMargin) {
   let aaGroup = svg.append("g")
     .attr("id", "amino_acid")
     .attr("class","prsm_svg_group")
@@ -83,6 +89,9 @@ function addAminoAcids (svg, para, residues, start, end) {
       let xPos = para.getX(pos, start); 
       let yPos = para.getY(pos, start);
       let color = residues[i].color;
+
+      yPos = yPos + extraMargin;
+      
       //console.log(letter, xPos, yPos, color);
       aaGroup.append("text")
         .attr("x", xPos)
@@ -99,7 +108,7 @@ function addAminoAcids (svg, para, residues, start, end) {
  * @param {Object} prsm - Contains the complete information of prsm. 
  * @param {String} id - Contians id of the SVG tag from html.
  */
-function addPosNums (svg, para, startPos, lastPos, rowNum) {
+function addPosNums (svg, para, startPos, lastPos, rowNum, extraMargin) {
   let numGroup = svg.append("g")
     .attr("id", "pos_num")
     .attr("class","prsm_svg_group");
@@ -107,6 +116,9 @@ function addPosNums (svg, para, startPos, lastPos, rowNum) {
     let leftPos = startPos + i * para.rowLength;
     let [lx,ly] = para.getLeftNumCoordinates (leftPos, startPos);
     let leftText = leftPos + 1;
+   
+    ly = ly + extraMargin;
+   
     numGroup.append("text")
       .attr("x",lx)
       .attr("y",ly)
@@ -120,6 +132,9 @@ function addPosNums (svg, para, startPos, lastPos, rowNum) {
     }
     let [rx,ry] = para.getRightNumCoordinates (rightPos, startPos);
     let rightText = rightPos + 1;
+
+    ry = ry + extraMargin;
+    
     numGroup.append("text")
       .attr("x",rx)
       .attr("y",ry)
@@ -134,12 +149,15 @@ function addPosNums (svg, para, startPos, lastPos, rowNum) {
  * @param {String} svg - Contians id of the SVG tag from html.
  * @param {Object} para - Contains parameters of width, letter space etc., to draw SVG
  */
-function drawStartSymbol(svg, para, dispFirstPos, formFirstPos) {
+function drawStartSymbol(svg, para, dispFirstPos, formFirstPos, extraMargin) {
   //console.log(dispFirstPos, formFirstPos);
   if (dispFirstPos !== formFirstPos) {
 		let [x,y] = para.getAACoordinates(formFirstPos, dispFirstPos);
 		x = x - (para.letterWidth/2) ;
     //console.log(x, y);
+
+    y = y + extraMargin;
+    
 		let coordinates = (x)+","+(y+2)+ " " +(x+5)+","+ (y+2)+" "+(x+5)+","+(y-12)+ " "+(x) + ","+(y-12);
     svg.append("polyline")
       .attr("class","prsm_svg_group")
@@ -150,12 +168,15 @@ function drawStartSymbol(svg, para, dispFirstPos, formFirstPos) {
   }
 }
 
-function drawEndSymbol(svg, para, dispFirstPos, dispLastPos, formLastPos) {
+function drawEndSymbol(svg, para, dispFirstPos, dispLastPos, formLastPos, extraMargin) {
   if (dispLastPos !== formLastPos) {
 		let [x,y] = para.getAACoordinates(formLastPos, dispFirstPos);
 		x = x + (para.letterWidth/2) ;
 		let coordinates = (x+7)+","+(y-12)+ " " +(x+2)+","+ (y-12)+" "+(x+2)+","+(y+2)+ " "+(x+7) + ","+(y+2);
-		svg.append("polyline")
+    
+    y = y + extraMargin;
+    
+    svg.append("polyline")
           .attr("class","prsm_svg_group")
 					.attr("points", coordinates)
 					.style("fill", "none")
@@ -171,7 +192,7 @@ function drawEndSymbol(svg, para, dispFirstPos, dispLastPos, formLastPos) {
  * @param {Object} para - Contains parameters of width, letter space etc., to draw SVG
  * @param {Object} breakPoints - Json object with information of the position
  */
-function drawBreakPoints(svg, para, dispFirstPos, formFirstPos, breakPoints) {
+function drawBreakPoints(svg, para, dispFirstPos, formFirstPos, breakPoints, extraMargin) {
   let bpGroup = svg.append("g")
     .attr("id", "break_point")
     .attr("class","prsm_svg_group");
@@ -179,6 +200,9 @@ function drawBreakPoints(svg, para, dispFirstPos, formFirstPos, breakPoints) {
     let bp = breakPoints[i];
     //console.log(bp.position, dispFirstPos);
     let [x,y] = para.getBpCoordinates(bp.position, dispFirstPos);
+
+    y = y + extraMargin;
+    
     // Setting polyline coordinates
     let coordinates; 
     if (bp.existNIon && !bp.existCIon) {
@@ -247,7 +271,7 @@ function removeBpAnno() {
  * @param {Object} para - Contains parameters of width, letter space etc., to draw SVG
  * @param {Object} shifts - Contains the complete information of mass shifts. 
  */
-function addMassShiftAnnos(svg, para, firstPos, shifts) {
+function addMassShiftAnnos(svg, para, firstPos, shifts, extraMargin) {
   let annoGroup = svg.append("g")
     .attr("id", "mass_shift_anno")
     .attr("class","prsm_svg_group");
@@ -279,6 +303,9 @@ function addMassShiftAnnos(svg, para, firstPos, shifts) {
     }
     y1 = y1 + para.modAnnoYShifts[yShiftIdx];
     let anno = shifts[i].anno;
+
+    y1 = y1 + extraMargin;
+
     annoGroup.append("text")
       .attr("x", x1)
       .attr("y", y1)
@@ -296,7 +323,7 @@ function addMassShiftAnnos(svg, para, firstPos, shifts) {
  * @param {Integer} width - Contains width to whuich backgroud color has to be added
  * @param {Object} para - Contains parameters of width, letter space etc., to draw SVG
  */
-function addMassShiftBackground(svg, para, firstPos, shifts) {
+function addMassShiftBackground(svg, para, firstPos, shifts, extraMargin) {
   let bgGroup = svg.append("g")
     .attr("id", "background")
     .attr("class","prsm_svg_group");
@@ -319,6 +346,10 @@ function addMassShiftBackground(svg, para, firstPos, shifts) {
       //console.log("row left", rowLeft, "row right", rowRight);
       let [x1,y1] = para.getAACoordinates(rowLeft, firstPos);
       let [x2,y2] = para.getAACoordinates(rowRight, firstPos);
+
+      y1 = y1 + extraMargin;
+      y2 = y2 + extraMargin;
+    
       bgGroup.append("rect")
         .attr("x", x1-para.fontWidth*0.1)
         .attr("y", y1-para.fontHeight*0.7)
