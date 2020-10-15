@@ -9,6 +9,7 @@ class PrsmPara {
   bottomMargin = 10 ;
   rightMargin = 50;
   leftMargin = 50;
+  middleMargin = 40;//extra space is needed when the start of sequence is skipped 
   numericalWidth = 20;
   showNum = true ;
   showSkippedLines = true ;
