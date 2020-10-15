@@ -7,8 +7,8 @@ class PrsmPara {
   rowHeight = 40;
   topMargin = 36;
   bottomMargin = 10 ;
-  rightMargin = 30;
-  leftMargin = 30;
+  rightMargin = 50;
+  leftMargin = 50;
   numericalWidth = 20;
   showNum = true ;
   showSkippedLines = true ;
@@ -104,7 +104,7 @@ class PrsmPara {
    */
   getSkipStartCoordinates = function () {
     let x = this.leftMargin ;
-    let y = this.topMargin ; 
+    let y = this.topMargin; 
     return [x, y]
   }
 
