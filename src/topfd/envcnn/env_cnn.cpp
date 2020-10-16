@@ -32,8 +32,8 @@ void initModel(const std::string &dir_name, int thread_num) {
       + file_util::getFileSeparator() + "envcnn_2_block_model.json";
 
   for (int i = 0; i < thread_num; i++) {
-    fdeep::model model = fdeep::load_model(file_name);
-    model_vec.push_back(model); 
+    fdeep::model model = fdeep::load_model(file_name, true, fdeep::dev_null_logger);
+	model_vec.push_back(model); 
     avail_vec.push_back(true);
   }
 }
