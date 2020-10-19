@@ -53,19 +53,19 @@ bool Argument::parse(int argc, char* argv[]) {
         ("max-charge,c", po::value<std::string> (&max_charge),
          "<a positive integer>. Set the maximum charge state of precursor and fragment ions. The default value is 30.")
         ("max-mass,m", po::value<std::string> (&max_mass),
-         "<a positive number>. Set the maximum monoisotopic mass of precursor and fragment ions. The default value is 100000 Dalton.")
+         "<a positive number>. Set the maximum monoisotopic mass of precursor and fragment ions. The default value is 100,000 Dalton.")
         ("mz-error,e", po::value<std::string> (&mz_error),
          "<a positive number>. Set the error tolerance of m/z values of spectral peaks. The default value is 0.02 m/z.")
         ("ms-one-sn-ratio,r", po::value<std::string> (&ms_one_sn_ratio),
-         "<a positive number>. Set the signal/noise ratio for MS1 spectra. The default value is 3.")
+         "<a positive number>. Set the signal-to-noise ratio for MS1 spectra. The default value is 3.")
         ("ms-two-sn-ratio,t", po::value<std::string> (&ms_two_sn_ratio),
-         "<a positive number>. Set the signal/noise ratio for MS/MS spectra. The default value is 1.")
+         "<a positive number>. Set the signal-to-noise ratio for MS/MS spectra. The default value is 1.")
         ("precursor-window,w", po::value<std::string> (&prec_window),
          "<a positive number>. Set the precursor window size. The default value is 3.0 m/z.")
-        ("env-cnn,n", "Use EnvCNN for scoring the MS/MS spectral envelopes.")
-        ("missing-level-one,o","The input spectrum file does not contain MS1 spectra.")
-        ("thread-number,u", po::value<std::string> (&thread_number), "<a positive integer>. Number of threads used in the computation. Default value: 1.")
-        ("skip-html-folder,g","Skip generating an html folder containing TopView and spectrum data for visualization.")
+        ("env-cnn,n", "Use EnvCNN as the scoring function of isotopic envelopes.")
+        ("missing-level-one,o","MS1 spectra are missing in the input file.")
+        ("thread-number,u", po::value<std::string> (&thread_number), "<a positive integer>. Number of threads used in spectral deconvolution. Default value: 1.")
+        ("skip-html-folder,g","Skip the generation of html files for the visualization of spectra and identifications.")
         ;
 
     po::options_description desc("Options");
@@ -78,11 +78,10 @@ bool Argument::parse(int argc, char* argv[]) {
         ("ms-two-sn-ratio,t", po::value<std::string> (&ms_two_sn_ratio), "")
         ("precursor-window,w", po::value<std::string> (&prec_window), "")
         ("missing-level-one,o", "")
-        //("multiple-mass,u", "Output multiple masses for one envelope.")
         ("thread-number,u", po::value<std::string> (&thread_number), "")
         ("skip-html-folder,g","")
         ("keep,k", "Report monoisotopic masses extracted from low quality isotopic envelopes.")
-        ("env-cnn,n", "Use EnvCNN for scoring the MS/MS spectral envelopes.")
+        ("env-cnn,n", "")
         ("merged-file-name,f", po::value<std::string> (&merged_file_name), 
          "Merge deconvoluted files and specify the name of the merged file.")
         ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), 
@@ -94,7 +93,8 @@ bool Argument::parse(int argc, char* argv[]) {
 
     po::variables_map vm;
     try {
-      po::store(po::command_line_parser(argc, argv).options(desc).positional(positional_options).run(), vm);
+      po::store(
+          po::command_line_parser(argc, argv).options(desc).positional(positional_options).run(), vm);
       if (vm.count("help")) {
         showUsage(display_desc);
         return false;

@@ -559,7 +559,7 @@ p, li { white-space: pre-wrap; }
         <bool>false</bool>
        </property>
        <property name="text">
-        <string>Create HTML folder</string>
+        <string>Generate HTML files</string>
        </property>
        <property name="checkable">
         <bool>true</bool>
