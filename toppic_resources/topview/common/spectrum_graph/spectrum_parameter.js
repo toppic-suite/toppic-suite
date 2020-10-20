@@ -78,7 +78,7 @@ class SpectrumParameters {
   errorPlotHeight = 40;
   errorThreshold = 0.2;
   errorYTickNum = 2;
-
+  
   constructor() {
   }
 
