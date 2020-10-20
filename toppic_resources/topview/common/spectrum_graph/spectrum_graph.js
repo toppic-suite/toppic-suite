@@ -11,6 +11,9 @@ class SpectrumGraph {
   transformX = 0;
   transformScale = 1.0;
   
+  //store previous envelope data to skip redrawing when dragging
+  envCircles = [];
+
   constructor(svgId, peakList, envList, ionList, proteoform){
     this.id = svgId;
     this.para = new SpectrumParameters();
@@ -32,6 +35,14 @@ class SpectrumGraph {
       .attr("height", "100%")
       .call(this.zoom);
   }
+  redrawPartial = function(monoMz){
+    if (this.para.isMonoMassGraph && monoMz) {
+      this.para.updateMassRange(monoMz);
+    } else if(monoMz) {
+      this.para.updateMzRange(monoMz);
+    }
+    moveSpectrum(this.id, this.para, this.peakList, this.envPeakList, this.proteoform, this.ionList);
+  }
 
   redraw = function(monoMz){
     if (this.para.isMonoMassGraph && monoMz) {
@@ -52,11 +63,12 @@ class SpectrumGraph {
     let mousePos = d3.mouse(this);
     if(ratio == 1) {
       graph.para.drag(distance);
+      graph.redrawPartial(); 
     }
     else{
       graph.para.zoom(mousePos[0], mousePos[1], ratio);
+      graph.redraw(); 
     }
-    graph.redraw(); 
   }
 
   zoom = d3.zoom()
