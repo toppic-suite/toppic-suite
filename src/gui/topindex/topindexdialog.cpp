@@ -122,7 +122,6 @@ void TopIndexDialog::on_defaultButton_clicked() {
   ui->errorToleranceEdit_2->setText("15");
   ui->fixedModComboBox->setCurrentIndex(0);
   on_fixedModComboBox_currentIndexChanged(0);
-  ui->activationComboBox->setCurrentIndex(0);
   ui->NONECheckBox->setChecked(true);
   ui->NMECheckBox->setChecked(true);
   ui->NMEACCheckBox->setChecked(true);
@@ -237,7 +236,6 @@ std::map<std::string, std::string> TopIndexDialog::getArguments() {
   arguments_["executiveDir"] = exe_dir;
   arguments_["resourceDir"] = toppic::file_util::getResourceDir(exe_dir);
   arguments_["oriDatabaseFileName"] = ui->databaseFileEdit->text().toStdString();
-  arguments_["activation"] = ui->activationComboBox->currentText().toStdString();
 
   if (ui->decoyCheckBox->isChecked()) {
   arguments_["searchType"] = "TARGET+DECOY";
@@ -288,7 +286,6 @@ void TopIndexDialog::lockDialog() {
   ui->databaseFileButton->setEnabled(false);
   ui->databaseFileEdit->setEnabled(false);
   ui->threadNumberEdit->setEnabled(false);
-  ui->activationComboBox->setEnabled(false);
   ui->NONECheckBox->setEnabled(false);
   ui->NMECheckBox->setEnabled(false);
   ui->NMEACCheckBox->setEnabled(false);
@@ -310,7 +307,6 @@ void TopIndexDialog::unlockDialog() {
   ui->threadNumberEdit->setEnabled(true);
   ui->fixedModComboBox->setEnabled(true);
   on_fixedModComboBox_currentIndexChanged(ui->fixedModComboBox->currentIndex());
-  ui->activationComboBox->setEnabled(true);
   ui->NONECheckBox->setEnabled(true);
   ui->NMECheckBox->setEnabled(true);
   ui->NMEACCheckBox->setEnabled(true);
