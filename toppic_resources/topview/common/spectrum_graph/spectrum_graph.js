@@ -10,9 +10,6 @@ class SpectrumGraph {
   // parameters for zoom
   transformX = 0;
   transformScale = 1.0;
-  
-  //store previous envelope data to skip redrawing when dragging
-  envCircles = [];
 
   constructor(svgId, peakList, envList, ionList, proteoform){
     this.id = svgId;
