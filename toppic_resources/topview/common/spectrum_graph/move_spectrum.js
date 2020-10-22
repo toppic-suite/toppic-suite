@@ -67,11 +67,12 @@ function movePeaks(svg,para,peakList){
         minMz = 0;
       }
       let binIndex = Math.floor((peak.mz)/binWidth); 
-      if (binIndex < minBin + para.binNum - 1) 
+
+      if (binIndex <= minBin + para.binNum) 
       {
-        limits[binIndex - minBin] = limits[binIndex-minBin]+1;
-        if (limits[binIndex - minBin] <= para.peakNumPerBin) {
-          console.log("peak drawing")
+        limits[binIndex - minBin - 1] = limits[binIndex - minBin - 1]+1;
+        if (limits[binIndex - minBin - 1] <= para.peakNumPerBin) {
+         // console.log("peak drawing")
           peaks.append("line")
             .attr("x1",function(){
               return para.getPeakXPos(peak.mz);
@@ -127,15 +128,13 @@ function moveEnvelopes(svg, para, envPeakList) {
     
     if(peak.mz >= para.winMinMz && peak.mz < para.winMaxMz && percentInte >= minPercentage) 
     { 
-      //let binIndex = Math.floor((peak.mz - minMz)/binWidth); 
-    
       let binIndex = Math.floor((peak.mz)/binWidth); 
       
-      //if (binIndex < para.binNum) 
-      if (binIndex < minBin + para.binNum - 1) 
+      if (binIndex <= minBin + para.binNum)//so that this evaluation is looking at the current view range of graph
       {
-        limits[binIndex - minBin] = limits[binIndex - minBin]+1;
-        if (limits[binIndex - minBin] <= para.peakNumPerBin) 
+        limits[binIndex - minBin - 1] = limits[binIndex - minBin - 1]+1;
+        //binIndex - minBin -1 because limits array starts from index 0. 
+        if (limits[binIndex - minBin - 1] <= para.peakNumPerBin) 
         {
           circles.append("circle")
             .attr("id","circles")
