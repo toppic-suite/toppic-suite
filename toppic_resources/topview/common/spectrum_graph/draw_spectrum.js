@@ -408,6 +408,7 @@ function drawEnvelopes(svg,para,envPeakList) {
   // so that we can limit tha peak count to circlesPerRange count
   let limits = new Array(para.binNum).fill(0);
   let binWidth = para.getBinWidth();
+
   for (let i = 0; i < envPeakList.length; i++) {
     let peak = envPeakList[i]; 
     let env = peak.env; 
