@@ -240,8 +240,27 @@ function json2MassShifts(prsm) {
         }
       }
     }
-	}
-  //console.log(massShifts);
-	return massShifts ;
+  }
+  let noDupMassShift = [];
+  let duplicate = false;
+  //remove duplicate mass shifts
+  for (let a = 0; a < massShifts.length; a++){
+    let massShiftA = massShifts[a];
+    for (let b = 0; b < noDupMassShift.length; b++){
+      let massShiftB = noDupMassShift[b];
+      if (massShiftA.anno == massShiftB.anno){
+        if (massShiftA.leftPos == massShiftB.leftPos){
+          if (massShiftA.rightPos == massShiftB.rightPos){
+            duplicate = true;
+          }
+        }
+      }
+    }
+    if (!duplicate){
+      noDupMassShift.push(massShiftA);
+      duplicate = false;
+    }
+  }
+	return noDupMassShift ;
 }
 
