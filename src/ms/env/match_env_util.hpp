@@ -37,7 +37,7 @@ void assignIntensity(PeakPtrVec &ms, MatchEnvPtrVec &envs);
 
 PeakPtrVec rmAnnoPeak(PeakPtrVec &ms, MatchEnvPtrVec &envs);
 
-MatchEnvPtrVec addLowMassPeak(MatchEnvPtrVec &envs, std::vector<PeakPtr> &ms, double tolerance);
+MatchEnvPtrVec addUnusedMasses(MatchEnvPtrVec &envs, std::vector<PeakPtr> &ms, double tolerance);
 
 MatchEnvPtr getNewMatchEnv(PeakPtrVec &ms, int idx, double tolerance);
 
