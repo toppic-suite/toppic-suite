@@ -44,8 +44,30 @@ std::string TopfdPara::getParaStr(const std::string &prefix) {
       << "Thread number: " << "\t" << thread_number_ << std::endl;
   output << prefix << std::setw(gap) << std::left 
       << "Precursor window size: " << "\t" << prec_window_ << " m/z" << std::endl;
-  output << prefix << std::setw(gap) << std::left 
-      << "Use Env CNN model: " << "\t" << use_env_cnn_ << std::endl;
+  if (use_env_cnn_) {
+    output << prefix << std::setw(gap) << std::left 
+        << "Use Env CNN model: " << "\t" << "Yes" << std::endl;
+  }
+  else {
+    output << prefix << std::setw(gap) << std::left 
+        << "Use Env CNN model: " << "\t" << "No" << std::endl;
+  }
+  if (missing_level_one_) {
+    output << prefix << std::setw(gap) << std::left 
+        << "Miss MS1 spectra: " << "\t" << "Yes" << std::endl;
+  }
+  else {
+    output << prefix << std::setw(gap) << std::left 
+        << "Miss MS1 spectra: " << "\t" << "No" << std::endl;
+  }
+  if (gene_html_folder_) {
+    output << prefix << std::setw(gap) << std::left 
+        << "Generate Html files: " << "\t" << "Yes" << std::endl;
+  }
+  else {
+    output << prefix << std::setw(gap) << std::left 
+        << "Generate Html files: " << "\t" << "No" << std::endl;
+  }
   //output << prefix << std::setw(gap) << std::left 
   //    << "Do final filtering: " << para_ptr->do_final_filtering_ << std::endl;
   output << prefix << "###################### Parameters ######################" << std::endl;
