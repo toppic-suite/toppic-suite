@@ -99,7 +99,7 @@ PeakPtrVec  rmAnnoPeak(PeakPtrVec &ms, MatchEnvPtrVec &envs) {
   return new_list;
 }
 
-MatchEnvPtrVec addLowMassPeak(MatchEnvPtrVec &envs, PeakPtrVec &ms, double tolerance) {
+MatchEnvPtrVec addUnusedMasses(MatchEnvPtrVec &envs, PeakPtrVec &ms, double tolerance) {
   std::vector<bool> is_uses(ms.size(), false);
   for (size_t i = 0; i < envs.size(); i++) {
     MatchEnvPtr env = envs[i];
@@ -111,15 +111,15 @@ MatchEnvPtrVec addLowMassPeak(MatchEnvPtrVec &envs, PeakPtrVec &ms, double toler
     }
   }
 
-  MatchEnvPtrVec low_mass_envs;
+  MatchEnvPtrVec unused_mass_envs;
   for (size_t i = 0; i < is_uses.size(); i++) {
     if (!is_uses[i]) {
-      low_mass_envs.push_back(getNewMatchEnv(ms, i, tolerance));
+      unused_mass_envs.push_back(getNewMatchEnv(ms, i, tolerance));
     }
   }
 
   MatchEnvPtrVec result;
-  result.insert(std::end(result), std::begin(low_mass_envs), std::end(low_mass_envs));
+  result.insert(std::end(result), std::begin(unused_mass_envs), std::end(unused_mass_envs));
   result.insert(std::end(result), std::begin(envs), std::end(envs));
   std::sort(result.begin(), result.end(), MatchEnv::cmpScoreDec);
   return result;

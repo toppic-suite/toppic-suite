@@ -119,7 +119,7 @@ MatchEnvPtrVec DeconvOneSp::postprocess(MatchEnvPtrVec &dp_envs) {
     result_envs_ = dp_envs;
   }
   if (env_para_ptr_->keep_unused_peaks_) {
-    match_env_util::addLowMassPeak(result_envs_, peak_list, env_para_ptr_->getMzTolerance());
+    match_env_util::addUnusedMasses(result_envs_, peak_list, env_para_ptr_->getMzTolerance());
   }
   // reassign intensity
   match_env_util::assignIntensity(peak_list, result_envs_);
