@@ -31,8 +31,6 @@ std::string TopIndexFileName::geneFileName(std::map<std::string, std::string> &a
 
   std::string search_type = arguments["searchType"];
   std::string decoy = search_type_map_.find(search_type)->second;
-
-  std::string activation = arguments["activation"];
   
   std::string prot_mod = arguments["allowProtMod"];
 
@@ -60,7 +58,6 @@ std::string TopIndexFileName::geneFileName(std::map<std::string, std::string> &a
 
   para_vec.push_back(fixed_mod);
   para_vec.push_back(final_prot_mod);
-  para_vec.push_back(activation);
   para_vec.push_back(error_tol);
   para_vec.push_back(decoy);
 
