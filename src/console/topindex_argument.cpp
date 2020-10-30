@@ -35,30 +35,26 @@ void Argument::initArguments() {
   arguments_["oriDatabaseFileName"]="";
   arguments_["databaseFileName"] = "";
   arguments_["databaseBlockSize"] = "1000000";
-  arguments_["spectrumFileName"] = "";
-  arguments_["activation"] = "FILE";
   arguments_["searchType"] = "TARGET";
   arguments_["fixedMod"] = "";
-  arguments_["ptmNumber"] = "1";
   arguments_["massErrorTolerance"] = "15";
   arguments_["allowProtMod"] = "NONE,NME,NME_ACETYLATION,M_ACETYLATION";
-  arguments_["numOfTopPrsms"] = "1";
   arguments_["executiveDir"] = ".";
   arguments_["resourceDir"] = "";
-  arguments_["filteringResultNumber"] = "20";
   arguments_["threadNumber"] = "1";
+
+  // filtering result number is for diagonal filter
+  arguments_["filteringResultNumber"] = "20";
+  
+  // the following two arguments are used for the initializatio of prsm para
   arguments_["groupSpectrumNumber"] = "1";
-  arguments_["residueModFileName"] = "";
-  arguments_["skipList"] = "";
+  arguments_["activation"] = "FILE";
 }
 
 void Argument::outputArguments(std::ostream &output, 
                                std::map<std::string, std::string> arguments) {
   output << "********************** Parameters **********************" << std::endl;
   output << std::setw(44) << std::left << "Protein database file: " << "\t" << arguments["oriDatabaseFileName"] << std::endl;
-  output << std::setw(44) << std::left << "Spectrum file: " << "\t" << arguments["spectrumFileName"] << std::endl;
-
-  output << std::setw(44) << std::left << "Fragmentation method: " << "\t" << arguments["activation"] << std::endl;
   output << std::setw(44) << std::left << "Search type: " << "\t" << arguments["searchType"] << std::endl;
 
   if (arguments["fixedMod"] == "") {
@@ -79,12 +75,6 @@ void Argument::outputArguments(std::ostream &output,
 
   output << std::setw(44) << std::left << "Allowed N-terminal forms: " << "\t" <<  arguments["allowProtMod"] << std::endl;
   output << std::setw(44) << std::left << "Thread number: " << "\t" << arguments["threadNumber"] << std::endl;
-
-  output << std::setw(44) << std::left << "Executable file directory: " << "\t" << arguments["executiveDir"] << std::endl;
-  output << std::setw(44) << std::left << "Start time: " << "\t" << arguments["startTime"] << std::endl;
-  if (arguments["endTime"] != "") {
-    output << std::setw(44) << std::left << "End time: " << "\t" << arguments["endTime"] << std::endl;
-  }
   output << "********************** Parameters **********************" << std::endl;
 }
 
@@ -98,15 +88,12 @@ bool Argument::parse(int argc, char* argv[]) {
   
   std::string database_file_name = "";
   std::string argument_file_name = "";
-  std::string activation = "";
   std::string fixed_mod = "";
   std::string allow_mod = "";
-  std::string ptm_num = "";
   std::string mass_error_tole = "";
   std::string thread_number = "";
 
   /** Define and parse the program options*/
-  
   try {
     namespace po = boost::program_options;
     po::options_description display_desc("Options");
@@ -125,7 +112,6 @@ bool Argument::parse(int argc, char* argv[]) {
 
     desc.add_options() 
         ("help,h", "") 
-        ("activation,a", po::value<std::string>(&activation), "")
         ("fixed-mod,f", po::value<std::string> (&fixed_mod), "")
         ("n-terminal-form,n", po::value<std::string> (&allow_mod), "")
         ("decoy,d", "")
@@ -135,7 +121,6 @@ bool Argument::parse(int argc, char* argv[]) {
 
     po::positional_options_description positional_options;
     positional_options.add("database-file-name", 1);
-    positional_options.add("spectrum-file-name", -1);
 
     po::variables_map vm;
     try {
@@ -169,10 +154,6 @@ bool Argument::parse(int argc, char* argv[]) {
 
     arguments_["oriDatabaseFileName"] = database_file_name;
 
-    if (vm.count("activation")) {
-      arguments_["activation"] = activation;
-    }
-
     if (vm.count("decoy")) {
       arguments_["searchType"] = "TARGET+DECOY";
     }
@@ -190,10 +171,6 @@ bool Argument::parse(int argc, char* argv[]) {
     if (vm.count("n-terminal-form")) {
       arguments_["allowProtMod"] = allow_mod;
     }    
-
-    if (vm.count("num-shift")) {
-      arguments_["ptmNumber"] = ptm_num;
-    }
 
     if (vm.count("mass-error-tolerance")) {
       arguments_["massErrorTolerance"] = mass_error_tole;
@@ -233,21 +210,9 @@ bool Argument::validateArguments() {
     return false;
   }
 
-  std::string activation = arguments_["activation"];
-  if(activation != "CID" && activation != "HCD" 
-     && activation != "ETD" && activation != "FILE" && activation != "UVPD") {
-    LOG_ERROR("Activation type " << activation << " error! The value should be CID|HCD|ETD|UVPD|FILE!");
-    return false;
-  }
-
   std::string search_type = arguments_["searchType"];
   if(search_type != "TARGET" && search_type != "TARGET+DECOY"){
     LOG_ERROR("Search type " << search_type << " error! The value should be TARGET|TARGET+DECOY!");
-    return false;
-  }
-  std::string ptm_number = arguments_["ptmNumber"];
-  if (ptm_number != "0" && ptm_number != "1" && ptm_number != "2") {
-    LOG_ERROR("PTM number "<< ptm_number <<" error! The value should be 0|1|2!");
     return false;
   }
 
