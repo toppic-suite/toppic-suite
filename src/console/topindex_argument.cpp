@@ -67,10 +67,9 @@ void Argument::outputArguments(std::ostream &output,
     output << std::setw(44) << std::left << "Fixed modifications: " << "\t" << "C58:carboxymethylation on cysteine" << std::endl;
   }
   else {
-    output << std::setw(44) << std::left << "Fixed modifications:," << arguments["fixedMod"] << std::endl;
+    output << std::setw(44) << std::left << "Fixed modifications:," << "\t" << arguments["fixedMod"] << std::endl;
   }
 
-  output << std::setw(44) << std::left << "Maximum number of unexpected modifications: " << "\t" << arguments["ptmNumber"] << std::endl;
   output << std::setw(44) << std::left << "Error tolerance for matching masses: " << "\t" << arguments["massErrorTolerance"] << " ppm" << std::endl;
 
   output << std::setw(44) << std::left << "Allowed N-terminal forms: " << "\t" <<  arguments["allowProtMod"] << std::endl;
