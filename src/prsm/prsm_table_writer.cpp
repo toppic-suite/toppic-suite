@@ -66,10 +66,10 @@ void PrsmTableWriter::write() {
       << "#variable PTMs" << delim
       << "#matched peaks" << delim
       << "#matched fragment ions" << delim
-      << "P-value" << delim
+      //<< "P-value" << delim
       << "E-value" << delim
-      << "Q-value (spectral FDR)" << delim
-      << "Proteoform FDR" << std::endl;
+      << "Spectrum-level Q-value" << delim
+      << "Proteoform-level Q-value" << std::endl;
 
   std::string input_file_name = file_util::basename(spectrum_file_name) + "." + input_file_ext_;
   std::string db_file_name = prsm_para_ptr_->getSearchDbFileName();
@@ -84,11 +84,13 @@ void PrsmTableWriter::write() {
   std::string sp_file_name = prsm_para_ptr_->getSpectrumFileName();
   int group_spec_num = prsm_para_ptr_->getGroupSpecNum();
   SpParaPtr sp_para_ptr = prsm_para_ptr_->getSpParaPtr();
-  SimpleMsAlignReaderPtr ms_reader_ptr = std::make_shared<SimpleMsAlignReader>(sp_file_name, 
-                                                                               group_spec_num,
-                                                                               sp_para_ptr->getActivationPtr());
+  SimpleMsAlignReaderPtr ms_reader_ptr 
+      = std::make_shared<SimpleMsAlignReader>(sp_file_name, 
+                                              group_spec_num,
+                                              sp_para_ptr->getActivationPtr());
   SpectrumSetPtr spec_set_ptr;
-  while ((spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(ms_reader_ptr, sp_para_ptr)) != nullptr) {
+  while ((spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(ms_reader_ptr, sp_para_ptr)) 
+         != nullptr) {
     if (spec_set_ptr->isValid()) {
       int spec_id = spec_set_ptr->getSpectrumId();
       while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_id) {
@@ -170,7 +172,7 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
       << prsm_ptr->getProteoformPtr()->getVariablePtmNum() << delim
       << prsm_ptr->getMatchPeakNum() << delim
       << prsm_ptr->getMatchFragNum() << delim
-      << prsm_ptr->getPValue() << delim
+      //<< prsm_ptr->getPValue() << delim
       << prsm_ptr->getEValue() << delim;
 
   double fdr = prsm_ptr->getFdr();
