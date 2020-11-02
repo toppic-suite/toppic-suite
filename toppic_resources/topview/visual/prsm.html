@@ -60,7 +60,6 @@ $(document).ready(function(){
 	let folder_path = path_and_value[0].split("=")[1];
 	// get the prsm Id number by splitting url with "?" and "=" 
 	let prsm_seq_num = path_and_value[1].split("=")[1];
-
 	let prsm_data_script= document.createElement('script');
 	// get the prsm Id number by splitting url with "?","=","#"
 	let prsm_data_file_name = "../data/"+folder_path+"/prsms/prsm" + prsm_seq_num+".js";
@@ -115,10 +114,10 @@ $(document).ready(function(){
 		let specIds = prsm_data.prsm.ms.ms_header.ids.split(" ");
 
 		// Add Buttong with dropdowns with Scan numbers to navigae to inspect page
-		//setDropDownItemsForInspectButton(scanIds,specIds);
+		setDropDownItemsForInspectButton(scanIds,specIds);
 
 		// Add all the data and set local storage variables 
-		//onClickToInspect();
+		onClickToInspect();
 
     // Using spectrum graph library
 		// Get Ms1 Id to draw MS1 Spectrum
@@ -156,7 +155,6 @@ $(document).ready(function(){
         <h2 id = "Protein-Spectrum-Match-Id-SpecId" ></h2>
       </div>
       <div class="col-2" align = "right">
-        <!--
         <div class="dropdown dropdownscanlist">
           <button type="button" 
                   class="btn btn-primary btn-sm dropdown-toggle" 
@@ -167,7 +165,6 @@ $(document).ready(function(){
           <div class="dropdown-menu">
           </div>
         </div>
-        --!>
       </div>
     </div>
     <div class="row filename">
