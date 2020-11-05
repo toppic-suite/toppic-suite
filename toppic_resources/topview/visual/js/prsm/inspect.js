@@ -4,7 +4,7 @@
  * @param {object} scansWithData - This is a json object with data of all the scan Ids
  * @param {Integer} scanId - Contians the Scan numbers
  */
-function onclickTopView(scansWithData,scanId){
+/*function onclickTopView(scansWithData,scanId){
     let currentSpectrumData;
     [currentSpectrumData,specId] = getCurrentData(scansWithData,scanId);
     let peakAndIntensityList = getDataFromPRSMtoSpectralView(currentSpectrumData);
@@ -21,6 +21,34 @@ function onclickTopView(scansWithData,scanId){
     window.localStorage.setItem('unknownMassShiftList', JSON.stringify(unknownMassShiftList));
     window.localStorage.setItem('precursorMass', JSON.stringify(precursorMass));
     window.open("../inspect/spectrum.html");
+}*/
+function onclickTopView(){
+    let title = document.getElementById("Protein-Spectrum-Match-Id-SpecId").innerHTML;
+    let specID = title.split("#").pop();
+    let folderName = "../../topfd";
+    folderName = folderName.split("&")[0];
+    let script= document.createElement('script');
+    let body = document.getElementsByTagName('body')[0];
+    let fileName = folderName+"/ms2_json/spectrum"+specID+".js";
+
+	script.src = fileName;
+	body.append(script);
+	script.onload = function(){
+        let peakAndIntensityList = getDataFromPRSMtoSpectralView(ms2_data);
+        let massAndIntensityList = getMassAndIntensityData(specID);
+        let sequence = getSequence();
+        let fixedPtmList = getFixedPTMMassList();
+        let unknownMassShiftList = getUnknownMassList();
+        let precursorMass = prsm_data.prsm.ms.ms_header.precursor_mono_mass;
+        // Stores all the data in the variables respectively
+        window.localStorage.setItem('peakAndIntensityList',  JSON.stringify(peakAndIntensityList));
+        window.localStorage.setItem('massAndIntensityList',  JSON.stringify(massAndIntensityList));
+        window.localStorage.setItem('sequence',  JSON.stringify(sequence));
+        window.localStorage.setItem('fixedPtmList', JSON.stringify(fixedPtmList));
+        window.localStorage.setItem('unknownMassShiftList', JSON.stringify(unknownMassShiftList));
+        window.localStorage.setItem('precursorMass', JSON.stringify(precursorMass));
+        window.open("../inspect/spectrum.html");
+    }    
 }
 /**
  * Get the peaklist from respective spectrum.js to set the data for inspect page
@@ -157,7 +185,6 @@ function setDropDownItemsForInspectButton(scanIdList,specIdList){
  */
 function onClickToInspect(){
     $(".dropdownscanlist .dropdown-item ").click(function(){
-        let scanId = $(this).attr('value')
-        onclickTopView(ms2_ScansWithData,scanId);
+        onclickTopView();
     });  
 }
