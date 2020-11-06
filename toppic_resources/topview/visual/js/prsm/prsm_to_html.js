@@ -36,7 +36,6 @@ function loadDatafromJson2Html(){
 	document.getElementById("matched_fragment_ions").innerHTML = prsm_data.prsm.matched_fragment_number;
 	document.getElementById("unexpected_modifications").innerHTML = prsm_data.prsm.annotated_protein.unexpected_shift_number;
 	document.getElementById("E_value").innerHTML = prsm_data.prsm.e_value;
-	document.getElementById("P_value").innerHTML = prsm_data.prsm.p_value;
 	document.getElementById("Q_value").innerHTML = prsm_data.prsm.fdr;
 }
 /**
