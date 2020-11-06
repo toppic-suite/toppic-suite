@@ -30,7 +30,6 @@ function onclickTopView(){
     let script= document.createElement('script');
     let body = document.getElementsByTagName('body')[0];
     let fileName = folderName+"/ms2_json/spectrum"+specID+".js";
-
 	script.src = fileName;
 	body.append(script);
 	script.onload = function(){
@@ -48,6 +47,8 @@ function onclickTopView(){
         window.localStorage.setItem('unknownMassShiftList', JSON.stringify(unknownMassShiftList));
         window.localStorage.setItem('precursorMass', JSON.stringify(precursorMass));
         window.open("../inspect/spectrum.html");
+
+        
     }    
 }
 /**
@@ -136,23 +137,28 @@ function getUnknownMassList()
     if(l_prsm.prsm.annotated_protein.annotation.hasOwnProperty('mass_shift'))
 	{
         let mass_shift = l_prsm.prsm.annotated_protein.annotation.mass_shift ;
-			if(Array.isArray(mass_shift))
-			{
-				let len = mass_shift.length;
-				mass_shift.forEach(function(each_mass_shift, i){
-                    // Removing -1 as the sequece in inspect elements takes from 0
-                    let position = parseInt(each_mass_shift.left_position) - 1 ;
-                    let mass = parseFloat(each_mass_shift.anno);
-					unknownMassShiftList.push({"position":position,"mass":mass})
-				})
-			}
-			else if(mass_shift.shift_type == "unexpected")
-			{
-                 // Removing -1 as the sequece in inspect elements takes from 0
-                let position = parseInt(mass_shift.left_position) - 1;
-                let mass = parseFloat(mass_shift.anno);
+        //adjust position based on firstPos and lastPos of sequence
+        //console.log(l_prsm)
+        let firstPos = l_prsm.prsm.annotated_protein.annotation.first_residue_position;
+        //let lastPos = l_prsm.prsm.annotated_protein.annotation.last_residue_position;
+
+        if(Array.isArray(mass_shift))
+        {
+            let len = mass_shift.length;
+            mass_shift.forEach(function(each_mass_shift, i){
+                // Removing -1 as the sequece in inspect elements takes from 0
+                let position = parseInt(each_mass_shift.left_position) - firstPos;
+                let mass = parseFloat(each_mass_shift.anno);
                 unknownMassShiftList.push({"position":position,"mass":mass})
-			}
+            })
+        }
+        else if(mass_shift.shift_type == "unexpected")
+        {
+                // Removing -1 as the sequece in inspect elements takes from 0
+            let position = parseInt(mass_shift.left_position) - firstPos;
+            let mass = parseFloat(mass_shift.anno);
+            unknownMassShiftList.push({"position":position,"mass":mass})
+        }
     }
     return unknownMassShiftList;
 }

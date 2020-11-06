@@ -424,6 +424,7 @@ class SeqOfExecution
 		rectBGColorObj.setBackGroundColorOnMassShift(bgColorList);
 
 		let seqToUI = massShiftObj.formSequence(sequence,massShiftList);
+
 		massShiftObj.writeSeqToTextBox(seqToUI);
 		peakDataList = UIHelperObj.getPeakListFromUI();
 		modifiablePeakData = UIHelperObj.getPeakListFromUI();//added for modified version of getNormalizedIntensity to adjust envelopes
