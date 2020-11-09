@@ -45,6 +45,8 @@ class SeqOfExecution
 		 */
 		$("#"+Constants.SEQSVGID).hide();
 		$("#"+Constants.SVGDOWNLOADID).hide();
+		$("#"+Constants.GRAPHDOWNLOAD).hide();
+		$("#"+Constants.MONOGRAPHDOWNLOAD).hide();
 		$("#"+Constants.SPECTRUMGRAPHID).hide();
 		$("#"+Constants.SPECTRUMDOWNLOADID).hide();
 		$("#"+Constants.DIVTABLECONTAINER).hide();
@@ -238,6 +240,9 @@ class SeqOfExecution
 
 			$("#"+Constants.SEQSVGID).show();
 			$("#"+Constants.SVGDOWNLOADID).show();
+			$("#"+Constants.GRAPHDOWNLOAD).show();
+			$("#"+Constants.MONOGRAPHDOWNLOAD).show();
+			
 			/**
 			 * Get total mass and wite to HTML
 			 */
@@ -519,6 +524,9 @@ class SeqOfExecution
 			annotations(para,matchedPeakList,Constants.SEQSVGID);
 			$("#"+Constants.SEQSVGID).show();
 			$("#"+Constants.SVGDOWNLOADID).show();
+			$("#"+Constants.GRAPHDOWNLOAD).show();
+			$("#"+Constants.MONOGRAPHDOWNLOAD).show();
+			
 			/**
 			 * Get total mass and wite to HTML
 			 */
@@ -625,6 +633,20 @@ class SeqOfExecution
 			y = d3.event.pageY + 80;
 			//function in prsmtohtml
 			popupnamewindow("png","graph", Constants.SPECTRUMGRAPHID,x,y)
+		})
+
+		d3.select("#"+Constants.MONOGRAPHDOWNLOADSVG).on("click",function(){
+			x = d3.event.pageX;
+			y = d3.event.pageY + 40;
+			//function in prsmtohtml
+			popupnamewindow("svg","graph", Constants.MONOMASSGRAPHID,x,y)
+		})
+
+		d3.select("#"+Constants.MONOGRAPHDOWNLOADPNG).on("click",function(){
+			x = d3.event.pageX;
+			y = d3.event.pageY + 80;
+			//function in prsmtohtml
+			popupnamewindow("png","graph", Constants.MONOMASSGRAPHID,x,y)
 		})
 	}	
 }
