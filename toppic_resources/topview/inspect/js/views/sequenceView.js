@@ -2,7 +2,6 @@
  * Set Sequence on to html
  */
 function setDataToSequence(sequence, massShiftList){
-    console.log(sequence, massShiftList)
     let massShiftObj = new MassShifts(sequence, massShiftList);
     let modifiedSequence = massShiftObj.formSequence();
     jqueryElements.sequenceData.val(modifiedSequence);
