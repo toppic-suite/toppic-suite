@@ -66,7 +66,7 @@
 <script src="js/controllers/seqofexecution.js"></script>
 
 <!-- Testing -->
-<!--<script src="./example/setLocalStorage.js"></script>-->
+<script src="./example/setLocalStorage.js"></script>
 
 </head>
 <body>
@@ -279,10 +279,45 @@
 				<svg id = "seqsvg" style="background-color:white;display:none"></svg>
 			</div>	
 		</div>
+		<div class="row">
+			<div class="col-9"></div>
+			<div class="col-3 prsmgraphdownload">
+				<div class="dropup dropdown">
+					<button type="button" class="btn btn-primary btn-sm dropdown-toggle float-right" data-toggle="dropdown" id="graph_download" style="display:none">
+						Download
+					</button>
+					<div class="dropdown-menu">
+						<a class="dropdown-item" href="#!" id="graph_download_png">
+							<i class="fas fa-download"></i><span>&nbsp;&nbsp;PNG</span>
+						</a>
+						<a class="dropdown-item" href="#!" id="graph_download_svg">
+							<i class="fas fa-download"></i><span>&nbsp;&nbsp;SVG</span>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<svg id = "spectrum" height="250" width = "1000" style="background-color:white;display:none"></svg>
+		</div>
 	<div class="row">
-		<svg id = "spectrum" height="250" width = "1000" style="background-color:white;display:none"></svg>
+		<div class="col-9"></div>
+		<div class="col-3 monographdownload">
+			<div class="dropup dropdown">
+				<button type="button" class="btn btn-primary btn-sm dropdown-toggle float-right" data-toggle="dropdown" id="mono_graph_download" style="display:none">
+					Download
+				</button>
+				<div class="dropdown-menu">
+					<a class="dropdown-item" href="#!" id="mono_graph_download_png">
+						<i class="fas fa-download"></i><span>&nbsp;&nbsp;PNG</span>
+					</a>
+					<a class="dropdown-item" href="#!" id="mono_graph_download_svg">
+						<i class="fas fa-download"></i><span>&nbsp;&nbsp;SVG</span>
+					</a>
+				</div>
+			</div>
+		</div>
 	</div>
-	
 	<div class="row">
 		<h5 id="monoMasstitle" style="display:none">MonoMass Spectrum</h5>
 		<svg id = "monoMassGraph" height="250" width = "1000" style="background-color:white;display:none"></svg>
@@ -298,19 +333,6 @@
 			<a id="unmatched_peak_count" href="#!" onclick="showNonMatchedPeaks();">Non Matched Peaks</a>
 		</div>
 		<div class="col-5 prsmgraphdownload" >
-			<div class="dropup">
-				<button type="button" class="btn btn-primary btn-sm dropdown-toggle float-right" data-toggle="dropdown" id="graph_download">
-					Download
-				</button>
-				<div class="dropdown-menu">
-					<a class="dropdown-item" href="#!" id="graph_download_png">
-						<i class="fas fa-download"></i><span>&nbsp;&nbsp;PNG</span>
-					</a>
-					<a class="dropdown-item" href="#!" id="graph_download_svg">
-						<i class="fas fa-download"></i><span>&nbsp;&nbsp;SVG</span>
-					</a>
-				</div>
-			</div>
 			<button type="button" class="btn btn-primary btn-sm float-right" id="hide_table">Hide Table</button>
 		</div>
 	</div>
