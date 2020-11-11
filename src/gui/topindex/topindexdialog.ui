@@ -343,14 +343,14 @@ p, li { white-space: pre-wrap; }
      <item>
       <widget class="QGroupBox" name="groupBox">
        <property name="title">
-        <string>N-terminal forms</string>
+        <string/>
        </property>
        <widget class="QWidget" name="gridLayoutWidget">
         <property name="geometry">
          <rect>
           <x>9</x>
-          <y>26</y>
-          <width>381</width>
+          <y>30</y>
+          <width>340</width>
           <height>61</height>
          </rect>
         </property>
@@ -402,6 +402,19 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
         </layout>
+       </widget>
+       <widget class="QLabel" name="label_24">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>391</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>N-terminal modifications:</string>
+        </property>
        </widget>
       </widget>
      </item>

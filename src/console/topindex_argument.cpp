@@ -72,7 +72,7 @@ void Argument::outputArguments(std::ostream &output,
 
   output << std::setw(44) << std::left << "Error tolerance for matching masses: " << "\t" << arguments["massErrorTolerance"] << " ppm" << std::endl;
 
-  output << std::setw(44) << std::left << "Allowed N-terminal forms: " << "\t" <<  arguments["allowProtMod"] << std::endl;
+  output << std::setw(44) << std::left << "Allowed N-terminal modifications: " << "\t" <<  arguments["allowProtMod"] << std::endl;
   output << std::setw(44) << std::left << "Thread number: " << "\t" << arguments["threadNumber"] << std::endl;
   output << "********************** Parameters **********************" << std::endl;
 }
