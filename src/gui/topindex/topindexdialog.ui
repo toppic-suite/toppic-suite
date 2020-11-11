@@ -413,7 +413,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="text">
-         <string>N-terminal modifications:</string>
+         <string>N-terminal forms:</string>
         </property>
        </widget>
       </widget>
