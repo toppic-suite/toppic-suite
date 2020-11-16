@@ -402,9 +402,8 @@ class CalculateEmassAndDistribution{
 				end--;
 			}
 			else if (startEnvInte <= endEnvInte && removeStartEnv){
-				envList[start].mz = -100000;
-				envList[start].intensity = -100000;
-				start++;
+				envList.splice(start, 1);
+				end--;
 			}
 		}
 		return envList;
