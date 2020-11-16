@@ -168,108 +168,6 @@ class MolecularFormulae{
 		}
 		return newtotDistributionList ;
 	}
-	/*getNormalizedIntensityWithHeightAdjustment(totDistributionList,modifiedPeakList)
-	{
-		let maxMz = 0;//mzrange of envelope
-		let minMz = 10000000;
-		let len = totDistributionList.length;
-		let peakListLen = modifiedPeakList.length;
-		let maxinte = 0;
-		let mininte = 1000000;
-		let peakMaxinte = 0;
-		let peakMininte = 10000000;
-
-		let matchedPeakList = [];
-
-		for(let i = 0; i<totDistributionList.length; i++){
-			let mzDiff = 100000;
-			let envPeakIdx = -1;
-			let theoPeakIdx = -1;
-			for (let j = 0; j < modifiedPeakList.length; j++){
-				let diff = Math.abs(totDistributionList[i].mz - modifiedPeakList[j].mz);
-				if (diff <= this.toleraceMassDiff && diff < mzDiff){
-					envPeakIdx = i;
-					theoPeakIdx = j;
-					mzDiff = diff;
-				}
-			}
-			if (envPeakIdx > -1){
-				matchedPeakList.push({"envPeak":envPeakIdx, "theoPeak":theoPeakIdx});//i is env_peak index, j is theo_peak index
-				
-				if (totDistributionList[envPeakIdx].mz < minMz){
-					minMz = totDistributionList[envPeakIdx].mz;
-				}
-				if(totDistributionList[envPeakIdx].mz > maxMz){
-					maxMz = totDistributionList[envPeakIdx].mz;
-				}
-			}
-		}
-		maxMz = maxMz + this.toleraceMassDiff;
-		minMz = minMz - this.toleraceMassDiff;
-
-		for(let i=0;i<len;i++)
-		{
-			if(minMz <= totDistributionList[i].mz &&  totDistributionList[i].mz <= maxMz)
-			{
-				if(maxinte < totDistributionList[i].intensity){
-					maxinte = totDistributionList[i].intensity;
-				}
-				if(mininte > totDistributionList[i].intensity){
-					mininte = totDistributionList[i].intensity;
-				}
-			}
-		}
-		/*previous function skews the result if there are > 1 peaks in the mz range and later one has high intensity
-		make sure the max min value changed when it is the peak that is closest to the given env
-		for now, will check if the peak has any envelopes within error tolerance
-		*/
-/*
-		for(let j=0;j<peakListLen;j++)
-		{
-			if(modifiedPeakList[j].mz >= minMz && modifiedPeakList[j].mz <= maxMz)
-			{
-				if(peakMaxinte < modifiedPeakList[j].intensity){
-					//for all env dots, check if this peak really belongs to this envelope
-					for (let env = 0; env < totDistributionList.length; env++){
-						if (Math.abs(totDistributionList[env].mz - modifiedPeakList[j].mz) <= this.toleraceMassDiff){
-							peakMaxinte = modifiedPeakList[j].intensity;
-						}
-					}
-				}
-				if(peakMininte > modifiedPeakList[j].intensity){
-					for (let env = 0; env < totDistributionList.length; env++){
-						if (Math.abs(totDistributionList[env].mz - modifiedPeakList[j].mz) <= this.toleraceMassDiff){
-							peakMininte = modifiedPeakList[j].intensity;
-						}
-					}
-					
-				}
-			}
-		}
-		if(matchedPeakList.length > 0 )
-		{
-			let avg ;
-			let distributionAvgInte;
-
-			avg = (peakMaxinte + peakMininte)/2;
-			distributionAvgInte = (maxinte+mininte)/2;
-
-			for(let i=0;i<len;i++)
-			{
-				totDistributionList[i].intensity = (avg * totDistributionList[i].intensity)/distributionAvgInte ;
-				//if it has a matching peak, adjust that peak's intensity
-				for (let j = 0; j < matchedPeakList.length; j++){
-					if (matchedPeakList[j].envPeak == i){
-						let peakIdx = matchedPeakList[j].theoPeak;
-						modifiedPeakList[peakIdx].intensity = modifiedPeakList[peakIdx].intensity - totDistributionList[i].intensity;
-					}
-				}
-			}
-		}
-		//totDistributionList = this.removeEnvelopes(totDistributionList, matchedPeakList);
-
-		return [totDistributionList, modifiedPeakList];
-	}*/
 	//modification of getNormalizedIntensity to add envelope y pos adjustment 
 	getNormalizedIntensityAndAdjustedEnvelopes(totDistributionList,modifiedPeakList)
 	{
@@ -576,9 +474,8 @@ class MolecularFormulae{
 				end--;
 			}
 			else if (startEnvInte <= endEnvInte && removeStartEnv){
-				envList[start].mz = -100000;
-				envList[start].intensity = -100000;
-				start++;
+				envList.splice(start, 1);
+				end--;
 			}
 		}
 		return envList;
