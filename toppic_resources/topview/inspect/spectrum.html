@@ -198,10 +198,8 @@
               alt="info"></h5>-->
           <h5>Fixed PTMs</h5>
 				<div class="fixedptmslist">
-					<select class="browser-default custom-select" id="dropdownMenuLink">
-					</select>	
-				<button type="button" class="btn btn-default btn-sm addnewrow">
-						<i class="fa fa-plus" ></i>
+				<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#fixedPTMModal">
+						Add a PTM
 				</button>
 					<form class="form-inline mr-auto">
 						<div id = "fixedptmslist" > 
@@ -358,7 +356,27 @@
 		<a href="https://www.iu.edu/" target="#">Indiana University</a>
 	</div>
 </footer>
-
+<div class="modal" id="fixedPtmModal" role="dialog">
+	<div class="modal-dialog modal-lg" role="document">
+	  <div class="modal-content" id ="help-window">
+		<div class="modal-header ">
+		  <h4>Add a fixed PTM
+		  </h4>
+		  <button type="button" class="close" data-dismiss="modal">&times;</button>
+		</div>
+		<div class="modal-body" >
+		  <p>To add a fixed PTM, select "C:57.0271464" or "C:58.005479" and click the
+		  "+" button.
+		  </p>
+		  <select class="browser-default custom-select" id="dropdownMenuLink">
+		</select>	
+		<button type="button" class="btn btn-default btn-sm addnewrow" data-dismiss="modal">
+			<i class="fa fa-plus" ></i>
+		</button>
+		</div> 
+	  </div>
+	</div>
+</div>
 <div class="modal" id="helpModal" role="dialog">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content" id ="help-window">
