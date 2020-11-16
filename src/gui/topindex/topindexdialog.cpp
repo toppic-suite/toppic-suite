@@ -134,7 +134,6 @@ void TopIndexDialog::updatedir(QString s) {
     lastDir_ = s;
   }
 }
-
 void TopIndexDialog::on_startButton_clicked() {
   std::stringstream buffer;
   std::streambuf *oldbuf = std::cout.rdbuf(buffer.rdbuf());
@@ -145,7 +144,7 @@ void TopIndexDialog::on_startButton_clicked() {
   
   ui->outputTextBrowser->setText(showInfo);
   std::map<std::string, std::string> argument = this->getArguments();
-  
+
   thread_->setPar(argument);
   thread_->start();
 
@@ -220,12 +219,11 @@ bool TopIndexDialog::continueToClose() {
 }
 
 void TopIndexDialog::on_outputButton_clicked() {
-  std::string spec_file_name = "";
-  if (spec_file_lst_.size() > 0) {
-    spec_file_name = spec_file_lst_[0];
-  }
-  std::string dir = toppic::file_util::directory(spec_file_name);
+  std::string db_file_name = ui->databaseFileEdit->text().toStdString();
+
+  std::string dir = toppic::file_util::directory(db_file_name);
   QString outPath = dir.c_str();
+
   QDesktopServices::openUrl(QUrl(outPath, QUrl::TolerantMode));
 }
 
