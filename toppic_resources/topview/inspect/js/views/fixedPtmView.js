@@ -39,8 +39,19 @@ function addNewFixedPtmRow(fixedPtm){
         existingPtmList.forEach((element) => {
             //  && element.mass === parseFloat(mass)
             if (element.acid === acid) {
-                console.log("This ptm already exists");
-                ifExist = true;
+                let replace = confirm("Fixed ptm is already applied for acid " + acid + ". Do you want to replace it?")         
+                if (replace){
+                   //let acid = element.acid;
+                   // $(this).parent().remove();
+                   $(".fixedPtms").each(function(){
+                    let acid = $( this ).find('.fixedptmacid').val().toUpperCase();
+                    if (acid == element.acid){
+                        $( this ).remove();
+                    }
+                });
+                }else{
+                    ifExist = true;
+                }    
             }
         });
     }
