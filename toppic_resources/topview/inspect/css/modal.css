@@ -20,3 +20,15 @@
     border-bottom-left-radius: .3rem;
 } */
 
+#helpModal{
+	margin-top: 0;
+	height:95%;
+	overflow:hidden;
+}
+#help-window{
+	overflow-y:scroll;
+	height:100%;
+}
+#errorAlertModal{
+	margin-top: 20%;
+}
