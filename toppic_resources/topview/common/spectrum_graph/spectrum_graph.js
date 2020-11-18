@@ -32,14 +32,6 @@ class SpectrumGraph {
       .attr("height", "100%")
       .call(this.zoom);
   }
-  redrawPartial = function(monoMz){
-    if (this.para.isMonoMassGraph && monoMz) {
-      this.para.updateMassRange(monoMz);
-    } else if(monoMz) {
-      this.para.updateMzRange(monoMz);
-    }
-    moveSpectrum(this.id, this.para, this.peakList, this.envPeakList, this.proteoform, this.ionList);
-  }
 
   redraw = function(monoMz){
     if (this.para.isMonoMassGraph && monoMz) {
@@ -58,14 +50,8 @@ class SpectrumGraph {
     graph.transformX = transform.x;
     graph.transformScale = transform.k;
     let mousePos = d3.mouse(this);
-    if(ratio == 1) {
-      graph.para.drag(distance);
-      graph.redrawPartial(); 
-    }
-    else{
-      graph.para.zoom(mousePos[0], mousePos[1], ratio);
-      graph.redraw(); 
-    }
+    graph.para.zoom(mousePos[0], mousePos[1], ratio);
+    graph.redraw(); 
   }
 
   zoom = d3.zoom()

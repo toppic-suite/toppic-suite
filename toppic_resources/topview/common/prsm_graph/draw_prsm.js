@@ -299,7 +299,7 @@ function addMassShiftAnnos(svg, para, firstPos, shifts, isStartSkipped) {
       let [x2,y2] = para.getAACoordinates(prevPos, firstPos);
 			// subtract -2 for CSS and alignment purpose
       let annoLen = shifts[i-1].anno.length * (para.fontWidth-2);
-      console.log(shifts[i-1].anno, annoLen, x2, x1);
+      //console.log(shifts[i-1].anno, annoLen, x2, x1);
 			if(y1 == y2 && (x1-x2 < annoLen)) {
         overlap = true;
 			}

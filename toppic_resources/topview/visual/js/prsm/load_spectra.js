@@ -148,7 +148,7 @@ function createMs2NavElement(i, divId, navId, specScan){
   a = document.createElement("a");
   a.setAttribute("class","nav-link");
   a.setAttribute("href","#!");
-  a.innerHTML = "Mass scan "+ specScan ;
+  a.innerHTML = "Scan "+ specScan + " masses";
   li.appendChild(a);
   ul.appendChild(li);
 }
