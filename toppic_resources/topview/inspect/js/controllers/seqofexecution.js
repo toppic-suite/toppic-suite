@@ -231,6 +231,7 @@ class SeqOfExecution
 			let formedFixedPtmsList = formFixedPtms(fixedMassShiftList, sequence);
 			let formedMassShifts = formMassShifts(massShiftList);
 			let prsmDataObj = new PrsmData();
+
 			prsmDataObj.setData(residues, 0, residues.length - 1, formedFixedPtmsList, formedMassShifts, sequence, breakPointsList);
 			prsmDataObj.addColor();
 			let prsmGraphObj = new PrsmGraph(Constants.SEQSVGID,null,prsmDataObj);
@@ -247,6 +248,7 @@ class SeqOfExecution
 			 * Get total mass and wite to HTML
 			 */
 			let totalMass = getTotalSeqMass(sequence,completeShiftList);
+			//console.log("completeShiftList", completeShiftList)
 			setTotalSeqMass(totalMass);
 			//Set Mass Difference, precursorMass is a global variable form spectrum.html
 			setMassDifference(precursorMass,totalMass);
