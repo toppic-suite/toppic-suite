@@ -50,6 +50,9 @@ class SpectrumGraph {
     graph.transformX = transform.x;
     graph.transformScale = transform.k;
     let mousePos = d3.mouse(this);
+    if (ratio == 1) {
+      graph.para.drag(distance);
+    }
     graph.para.zoom(mousePos[0], mousePos[1], ratio);
     graph.redraw(); 
   }
