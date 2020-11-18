@@ -313,7 +313,6 @@ function addMassShiftAnnos(svg, para, firstPos, shifts, isStartSkipped) {
     }
     y1 = y1 + para.modAnnoYShifts[yShiftIdx];
     let anno = shifts[i].anno;
-
     if (isStartSkipped){
       y1 = y1 + para.middleMargin;
     }
