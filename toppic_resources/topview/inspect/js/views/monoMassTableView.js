@@ -22,11 +22,11 @@ function createMonoMassTable(){
     {
         let th = document.createElement("th");
         th.setAttribute("class","th-sm");
-        if(i === 0) th.innerHTML = "Id";
+        if(i === 0) th.innerHTML = "Peak";
         if(i === 1) th.innerHTML = "Mono mass";
-        if(i === 2) th.innerHTML = "Charge";
-        if(i === 3) th.innerHTML = "Mono m/z";
-        if(i === 4) th.innerHTML = "Intensity";
+        if(i === 2) th.innerHTML = "Mono m/z";
+        if(i === 3) th.innerHTML = "Intensity";
+        if(i === 4) th.innerHTML = "Charge";
         if(i === 5) th.innerHTML = "Theoretical mass";
         if(i === 6) th.innerHTML = "Ion";
         if(i === 7) th.innerHTML = "Pos";
