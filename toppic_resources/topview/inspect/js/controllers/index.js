@@ -20,14 +20,16 @@ onLoadOfHTML = function()
 	let massAndIntensityList = parsePeakMass('massAndIntensityList');
 	let sequence = parseSeq('sequence');
 	let l_fixedPtmList = parsePTM('fixedPtmList');
-	let unknownMassShiftList = parseUnknowmassList('unknownMassShiftList');
+    let l_variablePtmList = parsePTM('variablePtmList');
+    let unknownMassShiftList = parseUnknowmassList('unknownMassShiftList');
     let precursorMass = parsePrecursorMass("precursorMass");
+        
     if(peakAndIntensityList !== null && massAndIntensityList !== null){
         setDataToPeakAndIntensity(peakAndIntensityList);
 		setDataToMassAndIntensity(massAndIntensityList);
     }
     if(sequence) {
-        setDataToSequence(sequence, unknownMassShiftList);
+        setDataToSequence(sequence, unknownMassShiftList, l_variablePtmList);
     }
     if(l_fixedPtmList) {
         setFixedMasses(l_fixedPtmList);

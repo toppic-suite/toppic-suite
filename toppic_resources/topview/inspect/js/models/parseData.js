@@ -62,18 +62,35 @@ function parsePrecursorMass(dataName){
  * mass shift occured, mass- mass shift value.
  */
 function parseSequenceMassShift(seq){
-	let massShiftList = [] ;
+	let massShiftList = [];
 	let parsedseq = "";
 	let splitStr = seq.split(/\[(.*?)\]/);
 	let splitArraylen = splitStr.length;
 	let position = 0;
 	
+	/*this function checks for all modification marked by [], including unimod ptm.
+	so if the value inside [] is NaN, 
+	need to check if it is a protein variable mod included in unimod ptm list */
+
 	for(let i = 0 ; i<splitArraylen;i++)
 	{
 		if(isNaN(splitStr[i]))
 		{
-			parsedseq = parsedseq + splitStr[i] ;
-			position = position + splitStr[i].length ;
+			let isPTM = false;
+			//check if it is in unimodPTM
+			for (let j = 0; j < unimod_ptm.ptms.length; j++){
+				if ((unimod_ptm.ptms[j].name).toUpperCase() == splitStr[i]){
+					isPTM = true;
+					let tempPosition = position - 1;
+					let shiftobj = {position:tempPosition, label: unimod_ptm.ptms[j].name, mass:unimod_ptm.ptms[j].mono_mass, bg_color:null};
+					massShiftList.push(shiftobj);
+					break;
+				}
+			}
+			if (!isPTM){
+				parsedseq = parsedseq + splitStr[i] ;
+				position = position + splitStr[i].length ;	
+			}
 		}
 		else
 		{
@@ -83,7 +100,7 @@ function parseSequenceMassShift(seq){
 			 */
 			let tempPosition = position - 1;
 			//Initially set the bg_color to null
-			let shiftobj = {position:tempPosition, mass:mass, bg_color:null};
+			let shiftobj = {position:tempPosition, mass:mass, label:mass, bg_color:null};
 			/**
 			 * when the split occur at the end we get an extra "" in 
 			 * the list. This is to check if the mass is numeric.
@@ -127,11 +144,27 @@ let formFixedPtms = (fixedMassShiftList, sequence) => {
 	return result;
 }
 
+// form variable ptms
+let formVariablePtms = (variablePtmsList, sequence) => {
+	let result = [];
+	result.push({});
+	// result.push(fixedPtmNameList[0]);
+	let tempArray = [];
+	variablePtmsList.forEach((element) => {
+		let tempObj = {
+			pos: element.position.toString(),
+			acid: sequence.charAt(element.position)
+		};
+		tempArray.push(tempObj);
+	});
+	result[0].posList = tempArray;
+	return result;
+}
 let formMassShifts = (unknownMassShiftList) => {
 	let result = [];
 	unknownMassShiftList.forEach((element)=> {
 		let tempObj = {
-			anno: element.mass.toString(),
+			anno: element.label.toString(),
 			leftPos: (element.position).toString(),
 			rightPos: (element.position + 1).toString()
 		}

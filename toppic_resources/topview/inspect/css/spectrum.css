@@ -145,12 +145,7 @@ button.close {
 .matched_fragments{
   background-color:hsla(120, 100%, 50%, 0.3);;
 }
-#helpModal{
-	margin-top: 10%;
-}
-#errorAlertModal{
-	margin-top: 20%;
-}
+
 #divtableContainer a{
   color: #428bca !important ;
 }
