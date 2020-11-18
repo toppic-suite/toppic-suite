@@ -9,6 +9,7 @@
 <link rel="stylesheet" type="text/css" href="css/spectrum.css">
 <link rel="stylesheet" type="text/css" href="css/modal.css">
 <link rel="stylesheet" type="text/css" href="css/svg.css">
+<link rel="stylesheet" type="text/css" href="css/inspect.css">
 
 <script src="../node_modules/popper.js/dist/umd/popper.js"></script>
 <script src="../node_modules/jquery/dist/jquery.js"></script>
@@ -36,6 +37,7 @@
 <script src="js/views/sequenceView.js"></script>
 <script src="js/views/popUpWindowView.js"></script>
 <script src="js/views/helperView.js"></script>
+<script src="js/views/graphTabView.js"></script>
 
 <!-- Models -->
 <script src="js/models/mass_shift.js"></script>
@@ -298,7 +300,12 @@
 				</div>
 			</div>
 		</div>
-		<div class="row">
+		<div class="row" id="ms2_svg_div">
+			<ul class="nav nav-tabs graph_nav" id="ms2_graph_nav"></ul>
+			<svg id = "spectrum" height="250" width = "1000" style="background-color:white;display:none"></svg>
+			<svg id = "monoMassGraph" height="250" width = "1000" style="background-color:white;display:none"></svg>
+		</div>
+		<!---<div class="row">
 			<svg id = "spectrum" height="250" width = "1000" style="background-color:white;display:none"></svg>
 		</div>
 	<div class="row">
@@ -322,7 +329,7 @@
 	<div class="row">
 		<h5 id="monoMasstitle" style="display:none">MonoMass Spectrum</h5>
 		<svg id = "monoMassGraph" height="250" width = "1000" style="background-color:white;display:none"></svg>
-	</div>
+	</div>-->
 	<div class="row" id="peakCount" style="display:none">
 		<div class="col-2 pull-left" >
 			<a id="all_peak_count" href="#!" onclick="showAllPeaks();">All Peaks</a>

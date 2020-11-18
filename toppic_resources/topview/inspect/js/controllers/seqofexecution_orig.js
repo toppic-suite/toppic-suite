@@ -196,16 +196,6 @@ class SeqOfExecution
 		/**
 		 * Do the below function when peak list data is not empty
 		 */
-
-		/**
-		 * create a nav bar and a tab for ms2 graph and mono mass graph 
-		 */
-		createMs2NavElement(Constants.GRAPHTABDIV, Constants.GRAPHTABNAV);
-		addEventNavBar();
-
-		/**
-		 * calculate envelope distribution and draw spectrum graph 
-		 */
 		if(peakDataList.length !== 0)
 		{
 			let matchedPeaksObj = new MatchedPeaks();
@@ -217,7 +207,7 @@ class SeqOfExecution
 			 * Display the graph formed
 			 */
 			$("#"+Constants.SPECTRUMGRAPHID).show();
-			//$("#"+Constants.MONOMASSGRAPHID).show();
+			$("#"+Constants.MONOMASSGRAPHID).show();
 			/**
 			 * Call generateCorrespondingGraph which calls addSpectrum function in invokeSpectrum file to draw graph 
 			 */

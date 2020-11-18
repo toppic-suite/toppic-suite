@@ -65,4 +65,6 @@ class Constants{
     static MONOGRAPHDOWNLOAD = "mono_graph_download";
     static MONOGRAPHDOWNLOADPNG = "mono_graph_download_png";
     static MONOGRAPHDOWNLOADSVG = "mono_graph_download_svg";
+    static GRAPHTABDIV = "ms2_svg_div";
+    static GRAPHTABNAV = "ms2_graph_nav";
 }
