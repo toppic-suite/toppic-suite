@@ -24,13 +24,7 @@
         max-width: 1200px;
     }
 }
-/**
-*Setting all the button colors to #428bca
-*/
-.btn{
-  background-color:  #428bca !important;
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-}
+
 /**
 *Adding padding to textare for mass and intensity, 
 *peak and intensity blocks.

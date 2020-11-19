@@ -20,6 +20,29 @@
     border-bottom-left-radius: .3rem;
 } */
 
+.modal{
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+	font-size: 15px;
+}
+.modal-header {
+	min-height: 1.42857143px !important;
+	padding: 5px !important;
+	border-bottom: 0px solid #e5e5e5 !important;
+}  
+.modal-lg {
+	max-width: 70% !important;
+} 
+.modal-body{
+	overflow-x:auto;
+}
+.table_modal tr {
+	border-top: 0px !important;
+  border-bottom: 0px !important;
+}
+.table_modal td {
+  border-top: 0 !important;
+  border-bottom: 0 !important;
+} 
 #helpModal{
 	margin-top: 0;
 	height:95%;
@@ -31,4 +54,12 @@
 }
 #errorAlertModal{
 	margin-top: 20%;
+}
+/*.modal-btn{
+	background-color:  #428bca !important;
+	width: 80% !important;
+	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  }*/
+.custom{
+	width: 10% !important;
 }

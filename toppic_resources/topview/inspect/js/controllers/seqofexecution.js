@@ -253,7 +253,7 @@ class SeqOfExecution
 			$("#"+Constants.SVGDOWNLOADID).show();
 			$("#"+Constants.GRAPHDOWNLOAD).show();
 			$("#"+Constants.MONOGRAPHDOWNLOAD).show();
-			
+
 			/**
 			 * Get total mass and wite to HTML
 			 */
@@ -262,6 +262,13 @@ class SeqOfExecution
 			setTotalSeqMass(totalMass);
 			//Set Mass Difference, precursorMass is a global variable form spectrum.html
 			setMassDifference(precursorMass,totalMass);
+
+			/**
+			 * draw for the prsm download modal 
+			 */
+			let prsmModalGraphObj = new PrsmGraph(Constants.SEQSVGMODALID,null,prsmDataObj);
+			let savePrsmObj = new SavePrsm(prsmModalGraphObj);
+			savePrsmObj.main();
 		}	
 		/**
 		 * Do the below function when mono mass list entered is not empty

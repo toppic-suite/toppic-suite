@@ -11,6 +11,8 @@
                        href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
 <link rel="stylesheet" type="text/css"
                        href="../common/topview_nav_bar/css/topview_nav_bar.css"/>
+<link rel="stylesheet" type="text/css"
+                       href="../common/shared/css/common.css"/>
 <link rel="stylesheet" type="text/css" href="css/prsm.css">
 
 <script src="../node_modules/popper.js/dist/umd/popper.js"></script>
@@ -28,6 +30,9 @@
 <script src="../common/spectrum_graph/spectrum_graph.js"></script>
 <script src="../common/spectrum_graph/draw_spectrum.js"></script>
 <script src="../common/spectrum_graph/move_spectrum.js"></script>
+
+<!--library for downloading graphs-->
+<script src="../common/save_image/save_prsm.js"></script>
 
 <script src="../common/proteoform/protein_constant.js"></script>
 <script src="../common/proteoform/proteoform.js"></script>
@@ -88,7 +93,6 @@ $(document).ready(function(){
 		
 		// Detting prsm data from prsm_data variable. prsm_data is a global variable from the prsm data file
 		let prsm = prsm_data.prsm ;
-		
 		// SVG Id for the visualization
 		let prsmSvgId = "prsm_svg" ;
     prsmGraph = new PrsmGraph(prsmSvgId, prsm_data.prsm);
@@ -97,6 +101,9 @@ $(document).ready(function(){
     let popupSvgId = "prsm_popup_svg";
     popupPrsmGraph = new PrsmGraph(popupSvgId, prsm_data.prsm);
 
+    let savePrsmObj = new SavePrsm(popupPrsmGraph);
+    savePrsmObj.main();
+    
 		// Get occurence ptms in prsmtohtml.js
 		occurence_ptm(prsm_data.prsm);
 
