@@ -6,6 +6,7 @@
 <link rel="stylesheet" type="text/css" href="../node_modules/datatables.net-dt/css/jquery.dataTables.css"/>
 <link rel="stylesheet" type="text/css" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
 <link rel="stylesheet" type="text/css" href="../common/topview_nav_bar/css/topview_nav_bar.css">
+<link rel="stylesheet" type="text/css" href="../common/shared/css/common.css">
 <link rel="stylesheet" type="text/css" href="css/spectrum.css">
 <link rel="stylesheet" type="text/css" href="css/modal.css">
 <link rel="stylesheet" type="text/css" href="css/svg.css">
@@ -66,6 +67,9 @@
 <!-- Controller -->
 <script src="js/controllers/index.js"></script>
 <script src="js/controllers/seqofexecution.js"></script>
+
+<!--library for downloading graphs-->
+<script src="../common/save_image/save_prsm.js"></script>
 
 <!-- Testing -->
 <!--<script src="./example/setLocalStorage.js"></script>-->
@@ -266,7 +270,7 @@
 				<h6 id="massvariation_h6" style="display:none"><text>Mass Error:&nbsp;</text><text id="massvariation">0</text></h6>
 			</div>
 			<div class="col-3 seqvisualization">
-					<div class="dropdown dropup float-right">
+					<!--<div class="dropdown dropup float-right">
 						<button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" id="svg_download" style="display:none">
 							Download
 						</button>
@@ -274,7 +278,8 @@
 					  <a class="dropdown-item" href="#!" id="seq_download_png"><i class="fas fa-download"></i><span>&nbsp;&nbsp;PNG</span></a>
 					  <a class="dropdown-item" href="#!" id="seq_download_svg"><i class="fas fa-download"></i><span>&nbsp;&nbsp;SVG</span></a>
 					</div>
-				  </div>
+				  </div>-->
+				  
 			</div>
 		</div>
 		<div class="row">
@@ -285,7 +290,7 @@
 		<div class="row">
 			<div class="col-9"></div>
 			<div class="col-3 prsmgraphdownload">
-				<div class="dropup dropdown">
+				<!--<div class="dropup dropdown">
 					<button type="button" class="btn btn-primary btn-sm dropdown-toggle float-right" data-toggle="dropdown" id="graph_download" style="display:none">
 						Download
 					</button>
@@ -297,7 +302,10 @@
 							<i class="fas fa-download"></i><span>&nbsp;&nbsp;SVG</span>
 						</a>
 					</div>
-				</div>
+				</div>-->
+				<button class="btn btn-primary btn-sm float-right" data-toggle="modal" data-target="#save_prsm_popup_window" style="display:none" id="svg_download">
+					Save PrSM
+				</button>
 			</div>
 		</div>
 		<div class="row" id="ms2_svg_div">
@@ -443,6 +451,7 @@
     </div>
   </div>
 </div>
+
 <script type="text/javascript" src="js/views/base.js"></script>
 </body>
 </html>

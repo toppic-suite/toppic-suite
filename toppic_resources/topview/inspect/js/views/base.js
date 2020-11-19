@@ -45,6 +45,7 @@ const COMMON_FIXED_PTM_LIST = [{name:"Carbamidomethylation",acid:"C",mass:57.021
  */
 class Constants{
     static SEQSVGID = "seqsvg";
+    static SEQSVGMODALID = "prsm_popup_svg";
     static SPECTRUMGRAPHID = "spectrum";
     static MONOMASSGRAPHID = "monoMassGraph";
     static PEAKCOUNTID = "peakCount";
