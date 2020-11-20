@@ -1,4 +1,4 @@
-function popupnamewindow(type,svgtype,id,x,y){
+/*function popupnamewindow(type,svgtype,id,x,y){
 	// console.log("in popup : ", id);
 	d3.selectAll("#tooltip_imagename").remove() ;
 	var div = d3.select("body").append("div")
@@ -53,4 +53,4 @@ function popupnamewindow(type,svgtype,id,x,y){
 			}
 		}
 	})
-}
+}*/

@@ -1,5 +1,6 @@
 class SavePrsm{
   prsmGraphObj;
+  prsmModalGraphObj;
 
   constructor(prsmGraphObj){
     this.prsmGraphObj = prsmGraphObj;
@@ -72,12 +73,16 @@ class SavePrsm{
     //append to body
     $("body").append(prsmModal);
   }
+  createPrsmModalGraph = () => {
+    this.prsmModalGraphObj = new PrsmGraph("prsm_popup_svg",null,this.prsmGraphObj.data);
+
+  }
   initPrsmModalEventHandler = () => {
     // Save PrSM popup window
     d3.select('#save_prsm_btn').on("click", () => {
-      this.prsmGraphObj.redraw();
+      this.prsmModalGraphObj.redraw();
       //	set the dimensions of popup svg to default values
-      let para = this.prsmGraphObj.para;
+      let para = this.prsmModalGraphObj.para;
       document.getElementById("row-size").value = para.rowLength ;
       document.getElementById("letter-width").value = para.letterWidth ;
       document.getElementById("row-height").value = para.rowHeight ;
@@ -93,7 +98,7 @@ class SavePrsm{
     });
 
     d3.select('#prsm_graph_redraw_btn').on("click", () => {
-      let para = this.prsmGraphObj.para;
+      let para = this.prsmModalGraphObj.para;
       para.rowLength = parseInt(document.getElementById("row-size").value);
       para.letterWidth = parseInt(document.getElementById("letter-width").value) ;
       para.rowHeight = parseInt(document.getElementById("row-height").value) ;
@@ -114,7 +119,7 @@ class SavePrsm{
       else {
         para.showSkippedLines = false ;
       }
-      this.prsmGraphObj.redraw();
+      this.prsmModalGraphObj.redraw();
     });	
 
     $("#prsm_popup_help_btn").click(() => {
@@ -139,20 +144,13 @@ class SavePrsm{
     });
   }
   drawPrsmModalGraph = () => {
-		this.prsmGraphObj.para.rowLength = 40;
-		this.prsmGraphObj.para.letterWidth = 28;
-		this.prsmGraphObj.redraw();
+		this.prsmModalGraphObj.para.rowLength = 40;
+		this.prsmModalGraphObj.para.letterWidth = 28;
+		this.prsmModalGraphObj.redraw();
   }
-
-  /*addSpectrumModal
-  addMonoMassModal
-  drawSpectrumModalGraph
-  drawMonoMassModalGraph
-  initSpectrumModalEventHandler
-  initMonoMassModalGraph*/
-
   main = () => {
     this.addPrsmModal();
+    this.createPrsmModalGraph();
     this.initPrsmModalEventHandler();
     this.drawPrsmModalGraph();
   }
