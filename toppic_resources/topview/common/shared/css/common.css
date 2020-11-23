@@ -1,5 +1,28 @@
-/*css for common properties shared by all buttons in the app*/
+/*css for common properties*/
 
+/*entire page*/
+.bodycontainer a{
+	color: #428bca !important;
+}
+
+/*nav bar*/
+.navbar {
+	padding-top: 1rem !important;
+    padding-right: 1rem !important;
+    padding-bottom: 1rem !important;
+    padding-left: 1rem !important;
+}
+.headBlock{
+  color: white;
+}
+/**
+*Increasing the container width
+*/
+@media (min-width: 1200px) {
+  .container{
+      max-width: 1200px;
+  }
+}
 /*button*/
 .btn{
     background-color:  #428bca !important;
@@ -13,6 +36,9 @@ button.close {
 }
 .btn:active {
   outline-color: red !important;
+}
+.custom{
+	width: 10% !important;
 }
 
 /*div*/
@@ -41,13 +67,15 @@ td {
 white-space: nowrap; 
 /* max-width:150px; */
 }
-
-
-/*table*/
+#all_peak_count,#matched_peak_count,#unmatched_peak_count {
+	color: #428bca !important;
+}
 .row{
   margin-left: 0px !important;
   margin-right: 0px !important;
 }
+
+/*footer*/
 .footer-copyright
 {
 	background-color: #343a40!important;
@@ -73,6 +101,18 @@ white-space: nowrap;
 .modal-sm {
    	max-width: 50% !important;
 }    
+/*modal for saving graphs*/
+.td_popup_button {
+  padding-top: 20px !important;
+}
+.td_popup_variables{
+  padding-top: 25px !important;
+  padding-left: 20px !important;
+}
+
+#save-image-modal{
+	margin-top:20%;
+}
 
 /*svg*/
 svg{
@@ -91,6 +131,9 @@ svg{
 #ms2_graph_nav a{
 	color: #428bca !important;
 }
+#ms2_svg_div svg{
+  background-color: #F8F8F8 !important;
+}
 
 /*font*/
 #MyTextMZIN,#MyTextMassCharge{
@@ -98,4 +141,5 @@ svg{
 	font-size: 18px !important;
 	text-align: left !important;
 }
+
 
