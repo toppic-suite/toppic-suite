@@ -23,9 +23,11 @@
 <script src="../node_modules/canvas-toBlob/canvas-toBlob.js"></script>
 <script src="../node_modules/datatables.net/js/jquery.dataTables.js"></script>
 <script src="../node_modules/file-saver/dist/FileSaver.js"></script>
-// save image
+<!--save image-->
 <script src="../common/save_image/save_image.js"></script>
+<!--draw nav bar-->
 <script src="../common/topview_nav_bar/js/topview_nav_bar.js"></script>
+
 <script src="../common/spectrum_graph/spectrum_parameter.js"></script>
 <script src="../common/spectrum_graph/spectrum_graph.js"></script>
 <script src="../common/spectrum_graph/draw_spectrum.js"></script>
@@ -138,6 +140,8 @@ $(document).ready(function(){
     let ms2FileList = [];
     for (let i = 0; i < ms2SpecIdList.length; i++) {
       let ms2Filename = "../../topfd/ms2_json/spectrum"+ms2SpecIdList[i]+".js";
+      console.log(ms2Filename)
+      console.log(ms2SpecIdList)
       ms2FileList.push(ms2Filename);
     }
     [ms2SpecList, ms2GraphList, ms2MonoGraphList] 

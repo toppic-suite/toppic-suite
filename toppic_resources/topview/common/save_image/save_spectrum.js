@@ -70,51 +70,53 @@ class SaveSpectrum{
     let spectrumModal = 
     `<div class="modal" id="ms2_graph_popup_window" role="dialog">
       <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-header ">
-          <h3>Save MS/MS Spectrum</h3>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-        </div>
-        <div class="modal-body">
-          <div> 
-            <table class="table table-sm table_modal">
-              <tbody>
-                <tr>
-                  <div >
-                    <td class="td_popup_variables">Show envelopes: &nbsp;&nbsp;&nbsp;
-                      <input type="radio" name="show_envelopes" 
-                                          class = "show_envelopes"
-                                          checked>Yes</input>
-                      <input type="radio"
-                             name="show_envelopes" 
-                             class = "show_envelopes">No</input>
-                    </td>
-                    <td class="td_popup_variables">Show ions: &nbsp;&nbsp;&nbsp;
-                      <input type="radio" name="show_ions" class = "show_ions" checked>Yes
-                      <input type="radio" name="show_ions" class = "show_ions">No
-                    </td>
-                  </div>
-                  <td class="td_popup_button">
-                    <button type = "button" class="btn btn-primary btn-sm "  id =
-                    "ms2_popup_redraw_btn" >Redraw</button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+        <div class="modal-content">
+          <div class="modal-header ">
+            <h3>Save MS/MS Spectrum</h3>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
           </div>
-        </div>
-        <div class="modal-body" id="ms2_graph_popup_svg_div">
-          <svg id="popup_ms2_svg" style="background-color:#F8F8F8;"></svg>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-primary btn-sm custom " id =
-          "download_ms2_graph_png_btn" >
-            <i class="fas fa-download"></i><span>&nbsp;&nbsp;PNG</span>
-          </button>
-          <button type="button" class="btn btn-primary btn-sm custom " id =
-          "download_ms2_graph_svg_btn" >
-            <i class="fas fa-download"></i><span>&nbsp;&nbsp;SVG</span>
-          </button>
-          <button type="button" class="btn btn-primary btn-sm custom " data-dismiss="modal">Close</button>
+          <div class="modal-body">
+            <div> 
+              <table class="table table-sm table_modal">
+                <tbody>
+                  <tr>
+                    <div >
+                      <td class="td_popup_variables">Show envelopes: &nbsp;&nbsp;&nbsp;
+                        <input type="radio" name="show_envelopes" 
+                                            class = "show_envelopes"
+                                            checked>Yes</input>
+                        <input type="radio"
+                              name="show_envelopes" 
+                              class = "show_envelopes">No</input>
+                      </td>
+                      <td class="td_popup_variables">Show ions: &nbsp;&nbsp;&nbsp;
+                        <input type="radio" name="show_ions" class = "show_ions" checked>Yes
+                        <input type="radio" name="show_ions" class = "show_ions">No
+                      </td>
+                    </div>
+                    <td class="td_popup_button">
+                      <button type = "button" class="btn btn-primary btn-sm "  id =
+                      "ms2_popup_redraw_btn" >Redraw</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="modal-body" id="ms2_graph_popup_svg_div">
+            <svg id="popup_ms2_svg" style="background-color:#F8F8F8;"></svg>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary btn-sm custom " id =
+            "download_ms2_graph_png_btn" >
+              <i class="fas fa-download"></i><span>&nbsp;&nbsp;PNG</span>
+            </button>
+            <button type="button" class="btn btn-primary btn-sm custom " id =
+            "download_ms2_graph_svg_btn" >
+              <i class="fas fa-download"></i><span>&nbsp;&nbsp;SVG</span>
+            </button>
+            <button type="button" class="btn btn-primary btn-sm custom " data-dismiss="modal">Close</button>
+          </div>
         </div>
       </div>
     </div>`
