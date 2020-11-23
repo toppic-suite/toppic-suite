@@ -3,6 +3,7 @@
 <head>
 <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Protein-Spectrum-Match for Spectrum</title>
+
 <link ref="stylesheet" type="text/css" 
                        href="../node_modules/@fortawesome/fontawesome-free/css/all.css">
 <link rel="stylesheet" type="text/css" 
@@ -11,9 +12,8 @@
                        href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
 <link rel="stylesheet" type="text/css"
                        href="../common/topview_nav_bar/css/topview_nav_bar.css"/>
-<link rel="stylesheet" type="text/css"
-                       href="../common/shared/css/common.css"/>
-<!--<link rel="stylesheet" type="text/css" href="css/prsm.css">-->
+<link rel="stylesheet" type="text/css" href="../common/shared/css/common.css"/>
+<link rel="stylesheet" type="text/css" href="css/inspect.css">
 
 <script src="../node_modules/popper.js/dist/umd/popper.js"></script>
 <script src="../node_modules/jquery/dist/jquery.js"></script>
@@ -98,13 +98,13 @@
 			<div class="col-md-3 col-lg-3">
 				<!--<h5>Masses & intensities <img src="images/info.png"
             id="massintensityinfo" alt="info"></h5> -->
-        <h5>Masses & intensities </h5>
+        		<h5>Masses & intensities </h5>
 				<textarea id="data" class="form-control col-xs-12" rows="10" cols="50"></textarea>
 			</div>
 			<div class="col-md-3 col-lg-3">
 				<!--<h5>Ion types <img src="images/info.png" id="ionfragmentinfo"
             alt="info"></h5> -->
-        <h5>Ion types</h5>
+        		<h5>Ion types</h5>
 				<table class="table table-sm table-bordered ionfragments">
 				<tbody>
 					<tr>
@@ -211,11 +211,11 @@
 			<div class="col-md-2 col-lg-2">
 					<!--<h5>Fixed PTMs <img src="images/info.png" id="fixedptminfo"
               alt="info"></h5>-->
-          <h5>Fixed PTMs</h5>
+          		<h5>Fixed PTMs</h5>
 				<div class="fixedptmslist">
-				<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#fixedPTMModal">
-						Add a PTM
-				</button>
+					<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#fixed">
+							Add a PTM
+					</button>
 					<form class="form-inline mr-auto">
 						<div id = "fixedptmslist" > 
 							<br>
@@ -275,7 +275,7 @@
 		<div class="col-3">
 			<h6 id="massvariation_h6" style="display:none"><text>Mass Error:&nbsp;</text><text id="massvariation">0</text></h6>
 		</div>
-		<div class="col-3 seqvisualization">
+		<div class="col-3">
 		</div>
 	</div>
 	<div class="row">
@@ -336,31 +336,29 @@
 		</div>
 	</div>
 </div>
-  <footer class="page-footer font-small blue">
+<footer class="page-footer font-small blue">
 	<div class="footer-copyright text-center py-3">© 2019 Copyright: The Trustees of 
 		<a href="https://www.iu.edu/" target="#">Indiana University</a>
 	</div>
 </footer> 
-<div class="modal" id="fixedPtmModal" role="dialog">
+<div class="modal" id="fixed" role="dialog">
 	<div class="modal-dialog modal-lg" role="document">
-	  <div class="modal-content" id ="help-window">
-		<div class="modal-header ">
-		  <h4>Add a fixed PTM
-		  </h4>
-		  <button type="button" class="close" data-dismiss="modal">&times;</button>
+		<div class="modal-content">
+		  <div class="modal-header ">
+			  <h4>Add a fixed PTM</h4>
+			  <button type="button" class="close" data-dismiss="modal">&times;</button>
+		  </div>
+		  <div class="modal-body" >
+			  <p>To add a fixed PTM, select "C:57.0271464" or "C:58.005479" and click the
+			  "+" button.
+			  </p>
+			  <select class="browser-default custom-select" id="dropdownMenuLink"></select>	
+			  <button type="button" class="btn btn-default btn-sm addnewrow" data-dismiss="modal">
+				  <i class="fa fa-plus" ></i>
+			  </button>
+		  </div> 
 		</div>
-		<div class="modal-body" >
-		  <p>To add a fixed PTM, select "C:57.0271464" or "C:58.005479" and click the
-		  "+" button.
-		  </p>
-		  <select class="browser-default custom-select" id="dropdownMenuLink">
-		</select>	
-		<button type="button" class="btn btn-default btn-sm addnewrow" data-dismiss="modal">
-			<i class="fa fa-plus" ></i>
-		</button>
-		</div> 
 	  </div>
-	</div>
 </div>
 <div class="modal" id="helpModal" role="dialog">
   <div class="modal-dialog modal-lg" role="document">

@@ -152,7 +152,7 @@ function setFixedMasses(fixedPtmList){
 function getFixedPtmCheckList()
 {
     let result = [];
-    $(".fixedPtms").each(function(){
+    $(".fixedptms").each(function(){
         let acid = $( this ).find('.fixedptmacid').val().toUpperCase();
         let mass = parseFloat($( this ).find('.fixedptmmass').val());
         if(acid.length !== 0  && !isNaN(mass))
