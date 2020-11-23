@@ -1,17 +1,19 @@
+<!DOCTYPE html>
 <html>
 <head>
 <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Visual inspection</title>
-<link rel="stylesheet" type="text/css" href="../node_modules/@fortawesome/fontawesome-free/css/all.css">
-<link rel="stylesheet" type="text/css" href="../node_modules/datatables.net-dt/css/jquery.dataTables.css"/>
-<link rel="stylesheet" type="text/css" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
-<link rel="stylesheet" type="text/css" href="../common/topview_nav_bar/css/topview_nav_bar.css">
-<!--<link rel="stylesheet" type="text/css" href="css/spectrum.css">
-<link rel="stylesheet" type="text/css" href="css/modal.css">
-<link rel="stylesheet" type="text/css" href="css/svg.css">-->
-<link rel="stylesheet" type="text/css" href="css/inspect.css">
-<link rel="stylesheet" type="text/css" href="../common/shared/css/common.css">
-
+<title>Protein-Spectrum-Match for Spectrum</title>
+<link ref="stylesheet" type="text/css" 
+                       href="../node_modules/@fortawesome/fontawesome-free/css/all.css">
+<link rel="stylesheet" type="text/css" 
+                       href="../node_modules/datatables.net-dt/css/jquery.dataTables.css">
+<link rel="stylesheet" type="text/css" 
+                       href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css"
+                       href="../common/topview_nav_bar/css/topview_nav_bar.css"/>
+<link rel="stylesheet" type="text/css"
+                       href="../common/shared/css/common.css"/>
+<!--<link rel="stylesheet" type="text/css" href="css/prsm.css">-->
 
 <script src="../node_modules/popper.js/dist/umd/popper.js"></script>
 <script src="../node_modules/jquery/dist/jquery.js"></script>
@@ -80,10 +82,11 @@
 <!-- uniMod ptm data -->
 <script src="../../base_data/unimod_ptm.js"></script>
 
+
 </head>
 <body>
-<div id="nav-bar"></div>
-<div class="container">
+  <div id="nav-bar"></div>
+  <div class="container bodycontainer">
 	<div class="flex-rectangle">
 		<div class="row">
 			<div class="col-md-4 col-lg-4">
@@ -262,37 +265,37 @@
 		</div>
 	</div> 
 	<br>
-		<div class="row">
-			<div class="col-3">
-				<h6 id="precursormass_h6" style="display:block"><text>Precursor mass:&nbsp;</text><text id="precursormass">0</text></h6>
-			</div>
-			<div class="col-3">
-				<h6 id="totalseqmass_h6" style="display:none"><text>Protein molecular mass:&nbsp;</text><text id="totalmass">0</text></h6>
-			</div>
-			<div class="col-3">
-				<h6 id="massvariation_h6" style="display:none"><text>Mass Error:&nbsp;</text><text id="massvariation">0</text></h6>
-			</div>
-			<div class="col-3 seqvisualization">
-			</div>
+	<div class="row">
+		<div class="col-3">
+			<h6 id="precursormass_h6" style="display:block"><text>Precursor mass:&nbsp;</text><text id="precursormass">0</text></h6>
 		</div>
-		<div class="row">
-			<div class="rounded mx-auto d-block" >
-				<svg id = "seqsvg" style="background-color:white;display:none"></svg>
-			</div>	
+		<div class="col-3">
+			<h6 id="totalseqmass_h6" style="display:none"><text>Protein molecular mass:&nbsp;</text><text id="totalmass">0</text></h6>
 		</div>
-		<div class="row">
-			<div class="col-9"></div>
-			<div class="col-3 prsmgraphdownload">
-				<button class="btn btn-primary btn-sm float-right" data-toggle="modal" data-target="#save_prsm_popup_window" style="display:none" id="svg_download">
-					Save PrSM
-				</button>
-			</div>
+		<div class="col-3">
+			<h6 id="massvariation_h6" style="display:none"><text>Mass Error:&nbsp;</text><text id="massvariation">0</text></h6>
 		</div>
-		<div class="row" id="ms2_svg_div">
-			<ul class="nav nav-tabs graph_nav" id="ms2_graph_nav"></ul>
-			<svg id = "spectrum" height="250" width = "1000" style="background-color:white;display:none"></svg>
-			<svg id = "monoMassGraph" height="250" width = "1000" style="background-color:white;display:none"></svg>
+		<div class="col-3 seqvisualization">
 		</div>
+	</div>
+	<div class="row">
+		<div class="rounded mx-auto d-block" >
+			<svg id = "seqsvg" style="background-color:white;display:none"></svg>
+		</div>	
+	</div>
+	<div class="row">
+		<div class="col-9"></div>
+		<div class="col-3 prsmgraphdownload">
+			<button class="btn btn-primary btn-sm float-right" data-toggle="modal" data-target="#save_prsm_popup_window" style="display:none" id="svg_download">
+				Save PrSM
+			</button>
+		</div>
+	</div>
+	<div class="row" id="ms2_svg_div">
+		<ul class="nav nav-tabs graph_nav" id="ms2_graph_nav"></ul>
+		<svg id = "spectrum" height="250" width = "1000" style="background-color:white;display:none"></svg>
+		<svg id = "monoMassGraph" height="250" width = "1000" style="background-color:white;display:none"></svg>
+	</div>
 	<div class="row" id="peakCount" style="display:none">
 		<div class="col-2 pull-left" >
 			<a id="all_peak_count" href="#!" onclick="showAllPeaks();">All Peaks</a>
@@ -333,13 +336,11 @@
 		</div>
 	</div>
 </div>
-
-
-<footer class="page-footer font-small blue">
+  <footer class="page-footer font-small blue">
 	<div class="footer-copyright text-center py-3">© 2019 Copyright: The Trustees of 
 		<a href="https://www.iu.edu/" target="#">Indiana University</a>
 	</div>
-</footer>
+</footer> 
 <div class="modal" id="fixedPtmModal" role="dialog">
 	<div class="modal-dialog modal-lg" role="document">
 	  <div class="modal-content" id ="help-window">
@@ -417,7 +418,6 @@
     </div>
   </div>
 </div>
-
 <script type="text/javascript" src="js/views/base.js"></script>
 </body>
 </html>
