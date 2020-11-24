@@ -116,7 +116,6 @@ onLoadOfHTML = function()
 }
 
 
-
 /**
  * @function showAllPeaks
  * @description Function to display all peaks of data in table. This handles on click action
