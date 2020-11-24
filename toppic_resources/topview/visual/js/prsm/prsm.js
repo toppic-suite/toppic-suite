@@ -73,6 +73,6 @@ function showIonPeaks(ids) {
   elems = document.getElementsByName(ids);
   for(var j = 0; elems.length > j; j++) {
     elems[j].style.display  =  "";
-    elems[j].style.background  =  "#BEECFF";
+    //elems[j].style.background  =  "#BEECFF";
   }
 }
