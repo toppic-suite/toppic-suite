@@ -38,8 +38,18 @@ function createMonoMassTable(){
     table.appendChild(thead);
     table.appendChild(tbody);
     div.appendChild(table);
-}
 
+    addPrsmGraphClickHandler();
+}
+/** add event handler to the table
+ * (filter rows when breakpoint in clicked in prsm graph)
+*/
+function addPrsmGraphClickHandler(){
+    $(".break_point").click(function() {
+        let pos = $(this).attr("ion_pos"); 
+        showIonPeaks(pos); 
+    });
+}
 /**
  * Add Data to the table created
  * @param {Array} matchedPeaks - Contains List of Matched and unmatched peaks
@@ -146,6 +156,6 @@ function showIonPeaks(id) {
     elems = document.getElementsByName(id);
     for(let j = 0; j < elems.length; j++) {
         elems[j].style.display = "";
-        elems[j].style.background = "#BEECFF";
+        /*elems[j].style.background = "#BEECFF";*/
     }
 }
