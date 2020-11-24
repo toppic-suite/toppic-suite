@@ -2,9 +2,13 @@
 
 /*entire page*/
 .bodycontainer a{
-	color: #428bca !important;
+  color: #428bca !important;
 }
-
+@media (min-width: 1200px) {
+  .container{
+      max-width: 1200px;
+  }
+}
 /*nav bar*/
 .navbar {
 	padding-top: 1rem !important;
@@ -18,15 +22,11 @@
 /**
 *Increasing the container width
 */
-@media (min-width: 1200px) {
-  .container{
-      max-width: 1200px;
-  }
-}
+
 /*button*/
 .btn{
     background-color:  #428bca !important;
-    width: 80% !important;
+    /*width: 80% !important;*/
     max-width: 80% !important;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
@@ -38,16 +38,10 @@ button.close {
   outline-color: red !important;
 }
 .custom{
-	width: 10% !important;
+	width: 15% !important;
 }
 
-/*div*/
-div.container {
-	font-family : "Helvetica Neue",Helvetica,Arial,sans-serif;
-  font-size: 15px;
-	max-width: 1060px;
-  margin-top: 100px !important;
-}
+
 div.tooltip {
   box-sizing: border-box;
   display: inline-block;

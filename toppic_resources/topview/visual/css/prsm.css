@@ -1,3 +1,11 @@
+
+/*div*/
+div.container {
+	font-family : "Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-size: 15px;
+	max-width: 1060px;
+  margin-top: 100px !important;
+}
 .table-borderless{
   margin-left: 1rem !important;
 }
@@ -15,6 +23,9 @@
 }
 .dataTables_filter, .dataTables_info {
 	display: none;
+}
+.table-nonfluid {
+  width: auto;
 }
 svg.l_popup_svg{
   font-family : 'FreeMono',Miltonian,monospace !important;
