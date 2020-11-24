@@ -112,6 +112,7 @@ function addPosNums (svg, para, startPos, lastPos, rowNum, isStartSkipped) {
   let numGroup = svg.append("g")
     .attr("id", "pos_num")
     .attr("class","prsm_svg_group");
+
   for (let i = 0; i < rowNum; i++) {
     let leftPos = startPos + i * para.rowLength;
     let [lx,ly] = para.getLeftNumCoordinates (leftPos, startPos);

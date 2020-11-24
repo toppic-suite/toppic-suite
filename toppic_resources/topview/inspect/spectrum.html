@@ -1,14 +1,19 @@
+<!DOCTYPE html>
 <html>
 <head>
 <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Visual inspection</title>
-<link rel="stylesheet" type="text/css" href="../node_modules/@fortawesome/fontawesome-free/css/all.css">
-<link rel="stylesheet" type="text/css" href="../node_modules/datatables.net-dt/css/jquery.dataTables.css"/>
-<link rel="stylesheet" type="text/css" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
-<link rel="stylesheet" type="text/css" href="../common/topview_nav_bar/css/topview_nav_bar.css">
-<link rel="stylesheet" type="text/css" href="css/spectrum.css">
-<link rel="stylesheet" type="text/css" href="css/modal.css">
-<link rel="stylesheet" type="text/css" href="css/svg.css">
+<title>Protein-Spectrum-Match for Spectrum</title>
+
+<link rel="stylesheet" type="text/css" 
+                       href="../node_modules/@fortawesome/fontawesome-free/css/all.css">
+<link rel="stylesheet" type="text/css" 
+                       href="../node_modules/datatables.net-dt/css/jquery.dataTables.css">
+<link rel="stylesheet" type="text/css" 
+                       href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css"
+                       href="../common/topview_nav_bar/css/topview_nav_bar.css"/>
+<link rel="stylesheet" type="text/css" href="../common/shared/css/common.css"/>
+<link rel="stylesheet" type="text/css" href="css/inspect.css">
 
 <script src="../node_modules/popper.js/dist/umd/popper.js"></script>
 <script src="../node_modules/jquery/dist/jquery.js"></script>
@@ -36,6 +41,7 @@
 <script src="js/views/sequenceView.js"></script>
 <script src="js/views/popUpWindowView.js"></script>
 <script src="js/views/helperView.js"></script>
+<script src="js/views/graphTabView.js"></script>
 
 <!-- Models -->
 <script src="js/models/mass_shift.js"></script>
@@ -65,16 +71,22 @@
 <script src="js/controllers/index.js"></script>
 <script src="js/controllers/seqofexecution.js"></script>
 
+<!--library for downloading graphs-->
+<script src="../common/save_image/save_prsm.js"></script>
+<script src="../common/save_image/save_spectrum.js"></script>
+<script src="../common/save_image/util.js"></script>
+
 <!-- Testing -->
-<!--<script src="./example/setLocalStorage.js"></script>-->
+<script src="./example/setLocalStorage.js"></script>
 
 <!-- uniMod ptm data -->
 <script src="../../base_data/unimod_ptm.js"></script>
 
+
 </head>
 <body>
-<div id="nav-bar"></div>
-<div class="container">
+  <div id="nav-bar"></div>
+  <div class="container bodycontainer">
 	<div class="flex-rectangle">
 		<div class="row">
 			<div class="col-md-4 col-lg-4">
@@ -86,13 +98,13 @@
 			<div class="col-md-3 col-lg-3">
 				<!--<h5>Masses & intensities <img src="images/info.png"
             id="massintensityinfo" alt="info"></h5> -->
-        <h5>Masses & intensities </h5>
+        		<h5>Masses & intensities </h5>
 				<textarea id="data" class="form-control col-xs-12" rows="10" cols="50"></textarea>
 			</div>
 			<div class="col-md-3 col-lg-3">
 				<!--<h5>Ion types <img src="images/info.png" id="ionfragmentinfo"
             alt="info"></h5> -->
-        <h5>Ion types</h5>
+        		<h5>Ion types</h5>
 				<table class="table table-sm table-bordered ionfragments">
 				<tbody>
 					<tr>
@@ -199,11 +211,11 @@
 			<div class="col-md-2 col-lg-2">
 					<!--<h5>Fixed PTMs <img src="images/info.png" id="fixedptminfo"
               alt="info"></h5>-->
-          <h5>Fixed PTMs</h5>
+          		<h5>Fixed PTMs</h5>
 				<div class="fixedptmslist">
-				<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#fixedPTMModal">
-						Add a PTM
-				</button>
+					<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#fixed">
+							Add a PTM
+					</button>
 					<form class="form-inline mr-auto">
 						<div id = "fixedptmslist" > 
 							<br>
@@ -253,74 +265,35 @@
 		</div>
 	</div> 
 	<br>
-		<div class="row">
-			<div class="col-3">
-				<h6 id="precursormass_h6" style="display:block"><text>Precursor mass:&nbsp;</text><text id="precursormass">0</text></h6>
-			</div>
-			<div class="col-3">
-				<h6 id="totalseqmass_h6" style="display:none"><text>Protein molecular mass:&nbsp;</text><text id="totalmass">0</text></h6>
-			</div>
-			<div class="col-3">
-				<h6 id="massvariation_h6" style="display:none"><text>Mass Error:&nbsp;</text><text id="massvariation">0</text></h6>
-			</div>
-			<div class="col-3 seqvisualization">
-					<div class="dropdown dropup float-right">
-						<button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" id="svg_download" style="display:none">
-							Download
-						</button>
-					<div class="dropdown-menu">
-					  <a class="dropdown-item" href="#!" id="seq_download_png"><i class="fas fa-download"></i><span>&nbsp;&nbsp;PNG</span></a>
-					  <a class="dropdown-item" href="#!" id="seq_download_svg"><i class="fas fa-download"></i><span>&nbsp;&nbsp;SVG</span></a>
-					</div>
-				  </div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="rounded mx-auto d-block" >
-				<svg id = "seqsvg" style="background-color:white;display:none"></svg>
-			</div>	
-		</div>
-		<div class="row">
-			<div class="col-9"></div>
-			<div class="col-3 prsmgraphdownload">
-				<div class="dropup dropdown">
-					<button type="button" class="btn btn-primary btn-sm dropdown-toggle float-right" data-toggle="dropdown" id="graph_download" style="display:none">
-						Download
-					</button>
-					<div class="dropdown-menu">
-						<a class="dropdown-item" href="#!" id="graph_download_png">
-							<i class="fas fa-download"></i><span>&nbsp;&nbsp;PNG</span>
-						</a>
-						<a class="dropdown-item" href="#!" id="graph_download_svg">
-							<i class="fas fa-download"></i><span>&nbsp;&nbsp;SVG</span>
-						</a>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="row">
-			<svg id = "spectrum" height="250" width = "1000" style="background-color:white;display:none"></svg>
-		</div>
 	<div class="row">
-		<div class="col-9"></div>
-		<div class="col-3 monographdownload">
-			<div class="dropup dropdown">
-				<button type="button" class="btn btn-primary btn-sm dropdown-toggle float-right" data-toggle="dropdown" id="mono_graph_download" style="display:none">
-					Download
-				</button>
-				<div class="dropdown-menu">
-					<a class="dropdown-item" href="#!" id="mono_graph_download_png">
-						<i class="fas fa-download"></i><span>&nbsp;&nbsp;PNG</span>
-					</a>
-					<a class="dropdown-item" href="#!" id="mono_graph_download_svg">
-						<i class="fas fa-download"></i><span>&nbsp;&nbsp;SVG</span>
-					</a>
-				</div>
-			</div>
+		<div class="col-3">
+			<h6 id="precursormass_h6" style="display:block"><text>Precursor mass:&nbsp;</text><text id="precursormass">0</text></h6>
+		</div>
+		<div class="col-3">
+			<h6 id="totalseqmass_h6" style="display:none"><text>Protein molecular mass:&nbsp;</text><text id="totalmass">0</text></h6>
+		</div>
+		<div class="col-3">
+			<h6 id="massvariation_h6" style="display:none"><text>Mass Error:&nbsp;</text><text id="massvariation">0</text></h6>
+		</div>
+		<div class="col-3">
 		</div>
 	</div>
 	<div class="row">
-		<h5 id="monoMasstitle" style="display:none">MonoMass Spectrum</h5>
+		<div class="rounded mx-auto d-block" >
+			<svg id = "seqsvg" style="background-color:white;display:none"></svg>
+		</div>	
+	</div>
+	<div class="row">
+		<div class="col-9"></div>
+		<div class="col-3 prsmgraphdownload">
+			<button class="btn btn-primary btn-sm float-right" data-toggle="modal" data-target="#save_prsm_popup_window" style="display:none" id="svg_download">
+				Save PrSM
+			</button>
+		</div>
+	</div>
+	<div class="row" id="ms2_svg_div">
+		<ul class="nav nav-tabs graph_nav" id="ms2_graph_nav"></ul>
+		<svg id = "spectrum" height="250" width = "1000" style="background-color:white;display:none"></svg>
 		<svg id = "monoMassGraph" height="250" width = "1000" style="background-color:white;display:none"></svg>
 	</div>
 	<div class="row" id="peakCount" style="display:none">
@@ -334,7 +307,18 @@
 			<a id="unmatched_peak_count" href="#!" onclick="showNonMatchedPeaks();">Non Matched Peaks</a>
 		</div>
 		<div class="col-5 prsmgraphdownload" >
-			<button type="button" class="btn btn-primary btn-sm float-right" id="hide_table">Hide Table</button>
+			<div class="row">
+				<div class="col-6 spectrumgraphdownload">
+					<button class="btn btn-primary btn-sm float-right" data-toggle="modal" data-target="#ms2_graph_popup_window" style="display:none" id="ms2_graph_save_btn">
+						Save Spectrum
+					</button>
+				</div>
+				<div class="col-6 spectrumgraphdownload">
+					<button type="button" class="btn btn-primary btn-sm float-right" id="hide_table">
+						Hide Table
+					</button>
+				</div>
+			</div>
 		</div>
 	</div>
 	<div class="row">
@@ -352,33 +336,29 @@
 		</div>
 	</div>
 </div>
-
-
 <footer class="page-footer font-small blue">
 	<div class="footer-copyright text-center py-3">© 2019 Copyright: The Trustees of 
 		<a href="https://www.iu.edu/" target="#">Indiana University</a>
 	</div>
-</footer>
-<div class="modal" id="fixedPtmModal" role="dialog">
+</footer> 
+<div class="modal" id="fixed" role="dialog">
 	<div class="modal-dialog modal-lg" role="document">
-	  <div class="modal-content" id ="help-window">
-		<div class="modal-header ">
-		  <h4>Add a fixed PTM
-		  </h4>
-		  <button type="button" class="close" data-dismiss="modal">&times;</button>
+		<div class="modal-content">
+		  <div class="modal-header ">
+			  <h4>Add a fixed PTM</h4>
+			  <button type="button" class="close" data-dismiss="modal">&times;</button>
+		  </div>
+		  <div class="modal-body" >
+			  <p>To add a fixed PTM, select "C:57.0271464" or "C:58.005479" and click the
+			  "+" button.
+			  </p>
+			  <select class="browser-default custom-select" id="dropdownMenuLink"></select>	
+			  <button type="button" class="btn btn-default btn-sm addnewrow" data-dismiss="modal">
+				  <i class="fa fa-plus" ></i>
+			  </button>
+		  </div> 
 		</div>
-		<div class="modal-body" >
-		  <p>To add a fixed PTM, select "C:57.0271464" or "C:58.005479" and click the
-		  "+" button.
-		  </p>
-		  <select class="browser-default custom-select" id="dropdownMenuLink">
-		</select>	
-		<button type="button" class="btn btn-default btn-sm addnewrow" data-dismiss="modal">
-			<i class="fa fa-plus" ></i>
-		</button>
-		</div> 
 	  </div>
-	</div>
 </div>
 <div class="modal" id="helpModal" role="dialog">
   <div class="modal-dialog modal-lg" role="document">

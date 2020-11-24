@@ -3,7 +3,7 @@
 <head>
 <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Protein-Spectrum-Match for Spectrum</title>
-<link ref="stylesheet" type="text/css" 
+<link rel="stylesheet" type="text/css" 
                        href="../node_modules/@fortawesome/fontawesome-free/css/all.css">
 <link rel="stylesheet" type="text/css" 
                        href="../node_modules/datatables.net-dt/css/jquery.dataTables.css">
@@ -11,6 +11,8 @@
                        href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
 <link rel="stylesheet" type="text/css"
                        href="../common/topview_nav_bar/css/topview_nav_bar.css"/>
+<link rel="stylesheet" type="text/css"
+                       href="../common/shared/css/common.css"/>
 <link rel="stylesheet" type="text/css" href="css/prsm.css">
 
 <script src="../node_modules/popper.js/dist/umd/popper.js"></script>
@@ -21,13 +23,20 @@
 <script src="../node_modules/canvas-toBlob/canvas-toBlob.js"></script>
 <script src="../node_modules/datatables.net/js/jquery.dataTables.js"></script>
 <script src="../node_modules/file-saver/dist/FileSaver.js"></script>
-// save image
+<!--save image-->
 <script src="../common/save_image/save_image.js"></script>
+<!--draw nav bar-->
 <script src="../common/topview_nav_bar/js/topview_nav_bar.js"></script>
+
 <script src="../common/spectrum_graph/spectrum_parameter.js"></script>
 <script src="../common/spectrum_graph/spectrum_graph.js"></script>
 <script src="../common/spectrum_graph/draw_spectrum.js"></script>
 <script src="../common/spectrum_graph/move_spectrum.js"></script>
+
+<!--library for downloading graphs-->
+<script src="../common/save_image/save_spectrum.js"></script>
+<script src="../common/save_image/save_prsm.js"></script>
+<script src="../common/save_image/util.js"></script>
 
 <script src="../common/proteoform/protein_constant.js"></script>
 <script src="../common/proteoform/proteoform.js"></script>
@@ -88,14 +97,13 @@ $(document).ready(function(){
 		
 		// Detting prsm data from prsm_data variable. prsm_data is a global variable from the prsm data file
 		let prsm = prsm_data.prsm ;
-		
 		// SVG Id for the visualization
 		let prsmSvgId = "prsm_svg" ;
     prsmGraph = new PrsmGraph(prsmSvgId, prsm_data.prsm);
     prsmGraph.redraw();
-
-    let popupSvgId = "prsm_popup_svg";
-    popupPrsmGraph = new PrsmGraph(popupSvgId, prsm_data.prsm);
+    // add prsm graph to popup
+    let savePrsmObj = new SavePrsm(prsmGraph);
+    savePrsmObj.main();
 
 		// Get occurence ptms in prsmtohtml.js
 		occurence_ptm(prsm_data.prsm);
@@ -132,19 +140,20 @@ $(document).ready(function(){
     let ms2FileList = [];
     for (let i = 0; i < ms2SpecIdList.length; i++) {
       let ms2Filename = "../../topfd/ms2_json/spectrum"+ms2SpecIdList[i]+".js";
+      console.log(ms2Filename)
+      console.log(ms2SpecIdList)
       ms2FileList.push(ms2Filename);
     }
     [ms2SpecList, ms2GraphList, ms2MonoGraphList] 
       = loadMsTwo(ms2SpecIdList, ms2FileList, prsmGraph.data.proteoform, 
         "ms2_svg_div", "ms2_graph_nav");
-		//getMonoMassDataList(ms2ScanIdList);
+    //getMonoMassDataList(ms2ScanIdList);
 	}
 })
 </script>
 </head>
 <body>
-  <div id="nav-bar">
-  </div>
+  <div id="nav-bar"></div>
   <div class="container bodycontainer">
     <p style="font-size:15px;">
     <a id = "allprotein_url" href="proteins.html">All proteins</a> /
@@ -333,69 +342,6 @@ $(document).ready(function(){
     </div>
   </div>
 
-  <div class="modal" id="save_prsm_popup_window" role="dialog">
-    <div class="modal-dialog modal-lg" role="document">
-      <div class="modal-content" id ="save-image-modal">
-        <div class="modal-header ">
-          <!-- Your first column here -->
-          <h5 class="modal-title ml-auto">Save PrSM Image</h5>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-        </div>
-        <div class="modal-header modal2-header pb-0">
-          <table class="table table-sm table_modal">
-            <tr>
-              <td>Amino acids per row:</td>
-              <td><input id="row-size" type="text" size="7" value=30></td>
-              <td>Letter width:</td>
-              <td><input id="letter-width" type="text" size="7" value=28></td>
-              <td>Row height:</td>
-              <td><input id="row-height" type="text" size="7" value=40></td>
-            </tr>
-            <tr>
-              <td>Gap between blocks:</td>
-              <td><input id="block-width" type="text" size="7" value=20></td>
-              <td>Gap between num and seq:</td>
-              <td><input id="num-width" type="text" size="7" value="20"></td>
-              <td>Show numbers:</td>
-              <td>
-                <input type="radio" name="show-num" id = "show-num" checked>Yes
-                <input type="radio" name="show-num" id = "show-num" >No
-              </td>
-            </tr>
-            <tr>
-              <td>Show skipping information:</td>
-              <td>
-                <input type="radio" name="show-skipped-lines" id=
-                "show-skipped-lines" checked>Yes
-                <input type="radio" name="show-skipped-lines" id= "show-skipped-lines">No
-              </td>
-              <td></td>
-              <td>
-                <button type = "button" class="btn btn-primary btn-sm "  id =
-                "prsm_graph_redraw_btn" style="width:77%" >Redraw</button>
-              </td>
-            </tr>
-          </table>
-        </div>
-        <div class="modal-body">
-          <svg id = "prsm_popup_svg" class="prsm_popup_svg" style="background-color:white"></svg>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-primary btn-sm custom "  
-                  id="prsm_popup_help_btn" data-toggle="modal"
-                                           data-target="#prsm_help_popup_window">Help</button>
-          <button type="button" class="btn btn-primary btn-sm custom " id = "prsm_popup_png_btn" ><i class="fas fa-download">
-          </i><span>&nbsp;&nbsp;PNG</span>
-          </button>
-          <button type="button" class="btn btn-primary btn-sm custom " id = "prsm_popup_svg_btn" >
-          <i class="fas fa-download"></i><span>&nbsp;&nbsp;SVG</span>
-          </button>
-          <button type="button" class="btn btn-primary btn-sm custom " data-dismiss="modal">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <div class="modal" id="prsm_help_popup_window" role="dialog">
     <div class="modal-dialog modal-sm" role="document">
       <div class="modal-content help-window">
@@ -431,61 +377,6 @@ $(document).ready(function(){
               x-axis and use the mouse wheel to zoom in or out. </li>
           </ul> 
         </div> 
-      </div>
-    </div>
-  </div>
-
-
-  <div class="modal" id="ms2_graph_popup_window" role="dialog">
-    <div class="modal-dialog modal-sm" role="document">
-      <div class="modal-content">
-        <div class="modal-header ">
-          <h3>Save MS/MS Spectrum</h3>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-        </div>
-        <div class="modal-body">
-          <div> 
-            <table class="table table-sm table_modal">
-              <tbody>
-                <tr>
-                  <div >
-                    <td class="td_popup_variables">Show envelopes: &nbsp;&nbsp;&nbsp;
-                      <input type="radio" name="show_envelopes" 
-                                          class = "show_envelopes"
-                                          checked>Yes</input>
-                      <input type="radio"
-                             name="show_envelopes" 
-                             class = "show_envelopes">No</input>
-                    </td>
-                    <td class="td_popup_variables">Show ions: &nbsp;&nbsp;&nbsp;
-                      <input type="radio" name="show_ions" class = "show_ions" checked>Yes
-                      <input type="radio" name="show_ions" class = "show_ions">No
-                    </td>
-                  </div>
-                  <td class="td_popup_button">
-                    <button type = "button" class="btn btn-primary btn-sm "  id =
-                    "ms2_popup_redraw_btn" >Redraw</button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div class="modal-body" id="ms2_graph_popup_svg_div">
-            <svg id="popup_ms2_svg" style="background-color:#F8F8F8" ></svg>
-          </div> 
-          <div class="modal-footer">
-            <button type="button" class="btn btn-primary btn-sm custom " id =
-            "download_ms2_graph_png_btn" >
-              <i class="fas fa-download"></i><span>&nbsp;&nbsp;PNG</span>
-            </button>
-            <button type="button" class="btn btn-primary btn-sm custom " id =
-            "download_ms2_graph_svg_btn" >
-              <i class="fas fa-download"></i><span>&nbsp;&nbsp;SVG</span>
-            </button>
-            <button type="button" class="btn btn-primary btn-sm custom " data-dismiss="modal">Close</button>
-          </div>
-        </div>
       </div>
     </div>
   </div>
