@@ -115,6 +115,11 @@ function loadMsTwo(specIdList, fileList, proteoform, divId, navId){
       }
     }
   }
+  //if the below lines are outside this scope, they execute before
+  //graphList and monoGraphList are returned with valid values
+  let saveSpectrumObj = new SaveSpectrum(graphList, monoGraphList);
+  saveSpectrumObj.main();
+
   return [specList, graphList, monoGraphList];
 }
 

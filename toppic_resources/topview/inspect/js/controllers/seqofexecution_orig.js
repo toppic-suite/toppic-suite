@@ -26,6 +26,10 @@ class SeqOfExecution
 		 * unbind all the actions previously binded else each action will be 
 		 * binded multiple times.
 		 */
+		$( "#"+Constants.SPECDOWNLOADPNG ).unbind();
+		$( "#"+Constants.SPECDOWNLOADSVG ).unbind();
+		$( "#"+Constants.SEQDOWNLOADPNG ).unbind();
+		$( "#"+Constants.SEQDOWNLOADSVG ).unbind();
 		let massShiftList = [];//contains variablePTM and unknown mass shifts
 		let fixedMassShiftList = [];//contains fixedPTM
 		let completeShiftList = [];//contains all 3 kinds of mass shifts
@@ -42,6 +46,7 @@ class SeqOfExecution
 		$("#"+Constants.SEQSVGID).hide();
 		$("#"+Constants.SVGDOWNLOADID).hide();
 		$("#"+Constants.GRAPHDOWNLOAD).hide();
+		$("#"+Constants.MONOGRAPHDOWNLOAD).hide();
 		$("#"+Constants.SPECTRUMGRAPHID).hide();
 		$("#"+Constants.SPECTRUMDOWNLOADID).hide();
 		$("#"+Constants.DIVTABLECONTAINER).hide();
@@ -191,13 +196,27 @@ class SeqOfExecution
 		/**
 		 * Do the below function when peak list data is not empty
 		 */
+		if(peakDataList.length !== 0)
+		{
+			let matchedPeaksObj = new MatchedPeaks();
 
-		/**
-		 * create a nav bar and a tab for ms2 graph and mono mass graph 
-		 */
-		createMs2NavElement(0, Constants.GRAPHTABDIV, Constants.GRAPHTABNAV, "");
-		addEventNavBar();
+			//distributionList = matchedPeaksObj.getDistribution(peakDataList,sequence,matchedUnMatchedPeaks);
+			distributionList = matchedPeaksObj.getDistribution(modifiablePeakData,sequence,matchedUnMatchedPeaks, completeShiftList);
+			// console.log("distributionList:", distributionList);
+			/**
+			 * Display the graph formed
+			 */
+			$("#"+Constants.SPECTRUMGRAPHID).show();
+			$("#"+Constants.MONOMASSGRAPHID).show();
+			/**
+			 * Call generateCorrespondingGraph which calls addSpectrum function in invokeSpectrum file to draw graph 
+			 */
+			spectrumGraphObj = new SpectrumGraph(Constants.SPECTRUMGRAPHID, peakDataList, distributionList,[],null);
+			// console.log("envPeakList:", spectrumGraphObj.envPeakList);
+			spectrumGraphObj.redraw();
 
+			$("#"+Constants.SPECTRUMDOWNLOADID).show();
+		}
 		/**
 		 * Do the below function when Sequence entered is not empty
 		 */
@@ -223,7 +242,8 @@ class SeqOfExecution
 			$("#"+Constants.SEQSVGID).show();
 			$("#"+Constants.SVGDOWNLOADID).show();
 			$("#"+Constants.GRAPHDOWNLOAD).show();
-
+			$("#"+Constants.MONOGRAPHDOWNLOAD).show();
+			
 			/**
 			 * Get total mass and wite to HTML
 			 */
@@ -232,36 +252,7 @@ class SeqOfExecution
 			setTotalSeqMass(totalMass);
 			//Set Mass Difference, precursorMass is a global variable form spectrum.html
 			setMassDifference(precursorMass,totalMass);
-
-			/**
-			 * draw for the prsm download modal 
-			 */
-			let savePrsmObj = new SavePrsm(prsmGraphObj);
-			savePrsmObj.main();
 		}	
-		/**
-		 * calculate envelope distribution and draw spectrum graph 
-		 */
-		if(peakDataList.length !== 0)
-		{
-			let matchedPeaksObj = new MatchedPeaks();
-
-			//distributionList = matchedPeaksObj.getDistribution(peakDataList,sequence,matchedUnMatchedPeaks);
-			distributionList = matchedPeaksObj.getDistribution(modifiablePeakData,sequence,matchedUnMatchedPeaks, completeShiftList);
-			// console.log("distributionList:", distributionList);
-			/**
-			 * Display the graph formed
-			 */
-			$("#"+Constants.SPECTRUMGRAPHID).show();
-			//$("#"+Constants.MONOMASSGRAPHID).show();
-			/**
-			 * Call generateCorrespondingGraph which calls addSpectrum function in invokeSpectrum file to draw graph 
-			 */
-			spectrumGraphObj = new SpectrumGraph(Constants.SPECTRUMGRAPHID, peakDataList, distributionList,[],null);
-			// console.log("envPeakList:", spectrumGraphObj.envPeakList);
-			spectrumGraphObj.redraw();
-			
-		}
 		/**
 		 * Do the below function when mono mass list entered is not empty
 		 */
@@ -373,12 +364,6 @@ class SeqOfExecution
 		// monoMassGraphObj.para.errorThreshold = 0.06;
 
 		monoMassGraphObj.redraw();
-
-		/**
-		 * add download for mono mass and spectrum graph 
-		 */
-		let saveSpectrumObj = new SaveSpectrum([spectrumGraphObj], [monoMassGraphObj]);
-		saveSpectrumObj.main();
 
 		createTableForSelectedFragmentIons(sequence,completeListofMasswithMatchedInd,monoMassGraphObj);
 		this.setBootStarpropertiesforFragmentIons();

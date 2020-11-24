@@ -1,0 +1,151 @@
+/*inspect page layout*/
+.flex-rectangle{
+  width: 100%;
+  background: #E5E5E5;
+  border: 2px solid #cccccc;
+  border-radius: 6px;
+  margin-bottom:0px;
+  padding:1%;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+.container{
+  padding-top: 100px !important;
+}
+/** Below CSS codes are formatting the information box at the top of inspect page
+*/
+  /**
+  * CSS to arrange io fragmentation blocks
+  */
+  .ionfragments td{
+    text-align: left !important;
+    width:10% !important;
+  }
+  .ionfragments {
+    border-radius: 6px !important;
+    border:2px solid white;
+  }
+  .custom-control{
+    position: relative;
+      display: block;
+      min-height: 1.5rem;
+      padding-left: 2rem;
+  }
+  .ionfragments.table-bordered > tbody > tr > td{
+      border:1px solid white;
+  }
+  /**
+  *CSS to set info image size
+  */
+  #sequenceinfo,#fixedptminfo,
+  #ionfragmentinfo,#massintensityinfo,#peakintensityinfo{
+    width: 15px;
+    height: 15px;
+  }
+  /**
+  *Adding padding to textare for mass and intensity, 
+  *peak and intensity blocks.
+  */
+  textarea {
+    padding: relative;
+  }
+  #tableContainer td,th {
+    text-align: center !important;  
+  }
+  #tableContainer thead,th { 
+    border-top: none !important; 
+  }
+  /**
+  *CSS to set td span from left of Ion Fragments
+  */
+  .ionfragments td{
+    padding: .2rem !important;
+  }
+  /**
+  *CCC to set error selection block to the right most 
+  */
+  #errorval{
+    text-align: center!important; 
+    width: 80 !important;
+  }
+  .error_input{
+    vertical-align: bottom !important;
+    position:relative;
+    right:0px;
+    bottom:-22px;
+  }
+/*inspect page modals*/
+.modal-dialog{
+  overflow-y: initial !important
+}
+#help-modal-body{
+  height: 80vh;
+  overflow-y: auto;
+}
+#errorAlertModal{
+	margin-top: 20%;
+}
+/*fixedptm box property*/
+.fixedptmcheckbox{
+	box-shadow: 0px 0px 0px 0px !important;
+  margin-right: 10px !important;
+}
+.fixedptmfooter{
+	padding-right: 1rem !important;
+	padding-bottom: 0rem !important;
+    border-top: 0px !important;
+    border-bottom-right-radius: 0rem;
+    border-bottom-left-radius: .3rem;
+} 
+.fixedptmacid {
+	width:40px !important;
+} 
+.fixedptmmass {
+	width:75px !important;
+} 
+#dropdownMenuLink {
+	width: 75% !important;
+}
+.fa-plus,.fa-remove{
+  font-weight: 900 !important;
+}
+
+/*tooltip css properties -- currently not used*/
+#tooltip_pop #mass_shift{
+	width: 104;
+}
+#tooltip_pop select{
+	width: 70;
+}
+#tooltip_pop option{
+	width: 50;
+	height: 10;
+}
+#tooltip_pop option:hover{ 
+	background-color: #000 !important; 
+}
+
+/*datatable*/
+#divtableContainer{
+	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+#divtableContainer a{
+  color: #428bca !important ;
+}
+
+/**
+*CSS to set the color of matched fragments in the fragment table
+*/
+.td_fragments{
+  text-align : center !important ;
+}
+.matched_fragments{
+  background-color:hsla(120, 100%, 50%, 0.3);;
+}
+.matched_fragments:hover{
+  cursor: pointer;
+}
+
+/*buttons*/
+.prsmgraphdownload button{
+  margin: 1px !important;
+}

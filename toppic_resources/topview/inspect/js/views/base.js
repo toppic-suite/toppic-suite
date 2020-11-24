@@ -45,6 +45,7 @@ const COMMON_FIXED_PTM_LIST = [{name:"Carbamidomethylation",acid:"C",mass:57.021
  */
 class Constants{
     static SEQSVGID = "seqsvg";
+    static SVGDOWNLOADID = "svg_download"
     static SPECTRUMGRAPHID = "spectrum";
     static MONOMASSGRAPHID = "monoMassGraph";
     static PEAKCOUNTID = "peakCount";
@@ -53,16 +54,9 @@ class Constants{
     static TABLECONTAINERID = "tableContainer";
     static FRAGMENTIONTABLECONTAINER = "selectedIonTableContainer";
     static H_FRAGMENTEDTABLE = "h_fragmentedtable";
-    static SVGDOWNLOADID = "svg_download";
-    static SPECTRUMDOWNLOADID = "spectrum_download";
-    static SEQDOWNLOADPNG = "seq_download_png";
-    static SEQDOWNLOADSVG = "seq_download_svg";
     static DIVTABLECONTAINER = "divtableContainer";
     static TABLEHEIGHT = "400px";
-    static GRAPHDOWNLOAD = "graph_download";
-    static GRAPHDOWNLOADPNG = "graph_download_png";
-    static GRAPHDOWNLOADSVG = "graph_download_svg";
-    static MONOGRAPHDOWNLOAD = "mono_graph_download";
-    static MONOGRAPHDOWNLOADPNG = "mono_graph_download_png";
-    static MONOGRAPHDOWNLOADSVG = "mono_graph_download_svg";
+    static GRAPHDOWNLOAD = "ms2_graph_save_btn";
+    static GRAPHTABDIV = "ms2_svg_div";
+    static GRAPHTABNAV = "ms2_graph_nav";
 }

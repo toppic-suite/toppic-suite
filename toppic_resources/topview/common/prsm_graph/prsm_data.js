@@ -61,6 +61,7 @@ class PrsmData {
       this.displayLastPos = len -1;
     }
     this.rowNum = Math.ceil((this.displayLastPos - this.displayFirstPos + 1)/para.rowLength);
+    
     // skipping line
     this.showStartSkipped = false;
     this.showEndSkipped = false;
