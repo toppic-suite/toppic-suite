@@ -10,6 +10,7 @@ class PrsmPara {
   rightMargin = 50;
   leftMargin = 50;
   middleMargin = 40;//extra space is needed when the start of sequence is skipped 
+  extraPadding = 20;//increase svg width by this amount to prevent rightmost side of svg getting cutoff
   numericalWidth = 20;
   showNum = true ;
   showSkippedLines = true ;
@@ -19,6 +20,7 @@ class PrsmPara {
   svgBackgroundColor = "white" ;
   massShiftColor = "#64E9EC";
   modAnnoYShifts = [-15, -30];
+
 
   setShowNum = function (isShowNum) {
     if (isShowNum) {
@@ -75,7 +77,6 @@ class PrsmPara {
     return [x,y];
   }
 
-
   /**
    * Function provides position of the Numbers on the left side of the Acid Sequence
    * @param {Integer} position - Provides the position of the left side number
@@ -127,7 +128,7 @@ class PrsmPara {
 
   getSvgSize = function(rowNum, skipBegin, skipEnd) {
     let blockNum = this.rowLength/this.blockLength - 1 ;
-    let width = this.letterWidth * (this.rowLength - 1) + blockNum * this.gapWidth + this.rightMargin + this.leftMargin; 
+    let width = this.letterWidth * (this.rowLength - 1) + blockNum * this.gapWidth + this.rightMargin + this.leftMargin + this.extraPadding; 
     if(this.showNum) {
       width = width + this.numericalWidth * 2;
     }
