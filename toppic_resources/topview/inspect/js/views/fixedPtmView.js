@@ -43,7 +43,7 @@ function addNewFixedPtmRow(fixedPtm){
                 if (replace){
                    //let acid = element.acid;
                    // $(this).parent().remove();
-                   $(".fixedPtms").each(function(){
+                   $(".fixedptms").each(function(){
                     let acid = $( this ).find('.fixedptmacid').val().toUpperCase();
                     if (acid == element.acid){
                         $( this ).remove();
@@ -85,6 +85,7 @@ function addNewFixedPtmRow(fixedPtm){
     
     let iAddFrame = document.createElement("i");
     iAddFrame.setAttribute("class","fa fa-plus");
+    
     addButton.appendChild(iAddFrame);
     
     let span3 = document.createElement("span");
@@ -93,7 +94,7 @@ function addNewFixedPtmRow(fixedPtm){
     let removeButton = document.createElement("button");
     removeButton.setAttribute("type","button");
     removeButton.setAttribute("class","form-control btn btn-default btn-sm removerow");
-    
+
     let iRemoveFrame = document.createElement("i");
     iRemoveFrame.setAttribute("class","fa fa-times");
     removeButton.appendChild(iRemoveFrame);

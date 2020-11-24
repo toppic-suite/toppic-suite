@@ -58,11 +58,11 @@ class SavePrsm{
             <button class="btn btn-primary btn-sm custom "  
                     id="prsm_popup_help_btn" data-toggle="modal"
                                             data-target="#prsm_help_popup_window">Help</button>
-            <button type="button" class="btn btn-primary btn-sm custom " id = "prsm_popup_png_btn" ><i class="fas fa-download">
-            </i><span>&nbsp;&nbsp;PNG</span>
+            <button type="button" class="btn btn-primary btn-sm custom " id = "prsm_popup_png_btn" >
+            <i class="fa fa-download"></i><span>&nbsp;&nbsp;PNG</span>
             </button>
             <button type="button" class="btn btn-primary btn-sm custom " id = "prsm_popup_svg_btn" >
-            <i class="fas fa-download"></i><span>&nbsp;&nbsp;SVG</span>
+            <i class="fa fa-download"></i><span>&nbsp;&nbsp;SVG</span>
             </button>
             <button type="button" class="btn btn-primary btn-sm custom " data-dismiss="modal">Close</button>
           </div>

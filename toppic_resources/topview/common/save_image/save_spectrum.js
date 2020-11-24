@@ -109,11 +109,11 @@ class SaveSpectrum{
           <div class="modal-footer">
             <button type="button" class="btn btn-primary btn-sm custom " id =
             "download_ms2_graph_png_btn" >
-              <i class="fas fa-download"></i><span>&nbsp;&nbsp;PNG</span>
+              <i class="fa fa-download"></i><span>&nbsp;&nbsp;PNG</span>
             </button>
             <button type="button" class="btn btn-primary btn-sm custom " id =
             "download_ms2_graph_svg_btn" >
-              <i class="fas fa-download"></i><span>&nbsp;&nbsp;SVG</span>
+              <i class="fa fa-download"></i><span>&nbsp;&nbsp;SVG</span>
             </button>
             <button type="button" class="btn btn-primary btn-sm custom " data-dismiss="modal">Close</button>
           </div>
