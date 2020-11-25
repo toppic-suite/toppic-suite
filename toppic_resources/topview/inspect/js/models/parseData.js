@@ -196,12 +196,30 @@ let getTotalSeqMass = (seq,massShiftList) => {
 	return mass ;
 }
 
-let getIons = (monoMassList) => {
+let getIonsMassGraph = (monoMassList) => {
 	let ionData = [];
 	monoMassList.forEach((element) => {
 		let tempIonData = {"mz":element.mass,"intensity":element.intensity,"text": element.ion, "error": element.massError};
         ionData.push(tempIonData);
 	});
+	return ionData;
+}
+let getIonsSpectrumGraph = (matchedPeakList, distributionList) => {
+	let ionData = [];
+	//generate ion list
+	for (let i = 0; i < matchedPeakList.length; i++){
+		for (let j = 0; j < distributionList.length; j++){
+			let env = distributionList[j];
+			let peak = matchedPeakList[i];
+			if (env.mono_mass == peak.mass){
+				env.env_peaks.sort(function(x,y){
+					return d3.descending(x.intensity, y.intensity);
+				})
+				let ion = {"env":env, "error":peak.massError, "intensity":env.env_peaks[0].intensity, "mz":env.env_peaks[0].mz, "text":peak.ion.toUpperCase()};
+				ionData.push(ion);
+			}
+		}
+	}
 	return ionData;
 }
 
