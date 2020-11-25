@@ -39,12 +39,15 @@ class Ptm {
 
   const std::string& getAbbrName() {return abbr_name_;}
 
-  /* Get  monoisotopic mass. */
+  // Get  monoisotopic mass. 
   double getMonoMass() {return mono_mass_;}
 
   int getUnimodId() {return unimod_id_;}
 
   void appendAbbrNameToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
+
+  // Add mass for visualization 
+  void appendAbbrNameMassToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 
   static std::string getAbbrNameFromXml(XmlDOMElement * element);
 
