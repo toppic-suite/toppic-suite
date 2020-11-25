@@ -257,7 +257,8 @@ class SeqOfExecution
 			/**
 			 * Call generateCorrespondingGraph which calls addSpectrum function in invokeSpectrum file to draw graph 
 			 */
-			spectrumGraphObj = new SpectrumGraph(Constants.SPECTRUMGRAPHID, peakDataList, distributionList,[],null);
+			let ionList = getIonsSpectrumGraph(matchedPeakList, distributionList);
+			spectrumGraphObj = new SpectrumGraph(Constants.SPECTRUMGRAPHID, peakDataList, distributionList,ionList,null);
 			// console.log("envPeakList:", spectrumGraphObj.envPeakList);
 			spectrumGraphObj.redraw();
 			
@@ -360,7 +361,7 @@ class SeqOfExecution
 		}
 		
 		$("#monoMasstitle").show();
-		let ions = getIons(matchedPeakList);
+		let ions = getIonsMassGraph(matchedPeakList);
 
 		// console.log("prsm graph input", ions);
 
