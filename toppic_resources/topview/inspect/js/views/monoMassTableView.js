@@ -75,8 +75,8 @@ function addMassDataToTable(matchedPeaks, graphObj)
                 td.innerHTML = matchedPeaks[i].peakId;
                 td.style.fontWeight = "bold";
             }else if(j === 1) td.innerHTML = matchedPeaks[i].mass;
-            else if(j === 2) td.innerHTML = matchedPeaks[i].charge;
-            else if(j === 3) {
+            else if(j === 4) td.innerHTML = matchedPeaks[i].charge;
+            else if(j === 2) {
                 let mz = matchedPeaks[i].mass / matchedPeaks[i].charge + 1.007276466879;
                 let a = document.createElement('a');
                 a.href="#!"
@@ -84,7 +84,7 @@ function addMassDataToTable(matchedPeaks, graphObj)
                 a.innerHTML = mz.toFixed(4); 
                 td.appendChild(a);
             }
-            else if(j === 4) td.innerHTML = matchedPeaks[i].intensity ;
+            else if(j === 3) td.innerHTML = matchedPeaks[i].intensity ;
             else if(j === 5){
                 td.className = "th_mass";
                 td.innerHTML = matchedPeaks[i].thMass;
