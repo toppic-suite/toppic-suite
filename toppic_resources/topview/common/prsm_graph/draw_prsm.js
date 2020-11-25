@@ -155,11 +155,9 @@ function addPosNums (svg, para, startPos, lastPos, rowNum, isStartSkipped) {
  * @param {Object} para - Contains parameters of width, letter space etc., to draw SVG
  */
 function drawStartSymbol(svg, para, dispFirstPos, formFirstPos, isStartSkipped) {
-  //console.log(dispFirstPos, formFirstPos);
   if (dispFirstPos !== formFirstPos) {
 		let [x,y] = para.getAACoordinates(formFirstPos, dispFirstPos);
 		x = x - (para.letterWidth/2) ;
-    //console.log(x, y);
 
     if (isStartSkipped){
       y = y + para.middleMargin;
@@ -179,12 +177,13 @@ function drawEndSymbol(svg, para, dispFirstPos, dispLastPos, formLastPos, isStar
   if (dispLastPos !== formLastPos) {
 		let [x,y] = para.getAACoordinates(formLastPos, dispFirstPos);
 		x = x + (para.letterWidth/2) ;
-		let coordinates = (x+7)+","+(y-12)+ " " +(x+2)+","+ (y-12)+" "+(x+2)+","+(y+2)+ " "+(x+7) + ","+(y+2);
     
     if (isStartSkipped){
       y = y + para.middleMargin;
     }
     
+    let coordinates = (x+7)+","+(y-12)+ " " +(x+2)+","+ (y-12)+" "+(x+2)+","+(y+2)+ " "+(x+7) + ","+(y+2);
+
     svg.append("polyline")
           .attr("class","prsm_svg_group")
 					.attr("points", coordinates)
