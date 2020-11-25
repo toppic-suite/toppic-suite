@@ -363,7 +363,13 @@ class SeqOfExecution
 		let ions = getIons(matchedPeakList);
 
 		// console.log("prsm graph input", ions);
-		monoMassGraphObj = new SpectrumGraph("monoMassGraph",ions, [], ions, proteoformObj);
+
+		//because SpectrumGraph class requires x-axis values to be "mz"
+		for (let i = 0; i < monoMassList.length; i++){
+			monoMassList[i]["mz"] = monoMassList[i].mass;
+		}
+
+		monoMassGraphObj = new SpectrumGraph("monoMassGraph",monoMassList, [], ions, proteoformObj);
 		monoMassGraphObj.para.showIons = true;
 		monoMassGraphObj.para.showEnvelopes = false;
 		monoMassGraphObj.para.svgHeight += 80;
