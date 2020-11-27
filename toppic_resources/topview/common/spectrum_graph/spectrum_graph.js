@@ -39,6 +39,7 @@ class SpectrumGraph {
   addMonoMassSpectrumAnno(ionList, proteoform, nIonType, cIonType){
     this.ionList = ionList; 
     this.proteoform = proteoform;
+    //console.log(nIonType, cIonType);
     this.nMassList = proteoform.getNMasses(nIonType); 
     //console.log(this.nMassList);
     this.cMassList = proteoform.getCMasses(cIonType);
