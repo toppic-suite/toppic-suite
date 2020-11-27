@@ -1,78 +1,136 @@
 class Proteoform {
   sequence = [];
   residueMasses = [];
+  fixedPtms=[];
   fixedPtmMasses = [];
-  fixedPtmMassShift=[];
-  unexpectedMassShift=[];
+  variablePtms = [];
+  variablePtmMasses = [];
+  unexpectedMassShifts=[];
   unexpectedMasses = [];
+  modResidueMasses = [];
   prefixMasses = [];
   suffixMasses = [];
+  proteoformMass = 0.0;
 
-  constructor(sequence = "", fixedPtmMassShift =[], unexpectedMassShift=[]) {
+  constructor(sequence = "", firstPos, fixedPtms =[], variablePtms =[], unexpectedMassShifts=[]) {
     this.sequence = sequence;
-    this.fixedPtmMassShift = fixedPtmMassShift;
-    this.unexpectedMassShift = unexpectedMassShift;
-    this.getResidueMasses();
-    this.getFixedPtmMasses();
-    this.getUnexpectedMasses();
-    let nTermMassShift = getIonMassShift("B");
-    this.prefixMasses = this.getPrefixMassList(nTermMassShift);
-    let cTermMassShift = getIonMassShift("Y");
-    this.suffixMasses = this.getSuffixMassList(cTermMassShift);
+    this.fixedPtms = fixedPtms;
+    this.variablePtms = variablePtms;
+    this.unexpectedMassShifts = unexpectedMassShifts;
+    this.compResidueMasses();
+    this.compFixedPtmMasses(firstPos);
+    this.compVariablePtmMasses(firstPos);
+    this.compUnexpectedMasses(firstPos);
+    this.compModResidueMasses();
+    this.compPrefixMasses();
+    this.compSuffixMasses();
+    this.compProteoformMass();
   }
 
-  getResidueMasses() {
+  compResidueMasses() {
     this.residueMasses = new Array(this.sequence.length);
     for (let i = 0; i < this.sequence.length; i++) {
       let isotopes = getAminoAcidIsotopes(this.sequence[i]);
       this.residueMasses[i] = isotopes[0].mass;
     }
+    //console.log(this.residueMasses);
   }
 
-  getFixedPtmMasses() {
+  compFixedPtmMasses(firstPos) {
     this.fixedPtmMasses = new Array(this.sequence.length).fill(0);
-    this.fixedPtmMassShift.forEach((element) => {
-      this.fixedPtmMasses[element.position] = element.mass;
-    });
-    return this.fixedPtmMasses;
-  }
-
-  getUnexpectedMasses() {
-    this.unexpectedMasses = new Array(this.sequence.length).fill(0);
-    this.unexpectedMassShift.forEach((element) => {
-      this.unexpectedMasses[element.position] = element.mass;
-    });
-    return this.unexpectedMasses;
-  }
-
-  getPrefixMassList(ionMassShift) {
-    if (this.sequence) {
-      let prefixMassList = []; 
-      let mass = 0;
-      prefixMassList.push(mass);
-      for (let i = 0; i < this.sequence.length; i++) {
-        mass = mass + this.residueMasses[i] + this.fixedPtmMasses[i] 
-          + this.unexpectedMasses[i];
-        prefixMassList.push(mass+ionMassShift);
+    this.fixedPtms.forEach((element) => {
+      for (let i = 0; i < element.posList.length; i++) {
+        let pos = element.posList[i].pos; 
+        //console.log(pos);
+        this.fixedPtmMasses[pos-firstPos] = parseFloat(element.mono_mass);
       }
-      return prefixMassList;
-    } else {
-      return [];
+    });
+    //console.log(this.fixedPtmMasses);
+  }
+
+  compVariablePtmMasses(firstPos) {
+    this.variablePtmMasses = new Array(this.sequence.length).fill(0);
+    this.variablePtms.forEach((element) => {
+      //console.log(element);
+      for (let i = 0; i < element.posList.length; i++) {
+        let pos = element.posList[i].pos; 
+        //console.log(pos);
+        this.variablePtmMasses[pos-firstPos] = parseFloat(element.mono_mass);
+      }
+    });
+    //console.log(this.variablePtmMasses);
+  }
+
+  compUnexpectedMasses(firstPos) {
+    this.unexpectedMasses = new Array(this.sequence.length).fill(0);
+    this.unexpectedMassShifts.forEach((element) => {
+      //console.log(element);
+      this.unexpectedMasses[element.leftPos - firstPos] = parseFloat(element.anno);
+    });
+    //console.log(this.unexpectedMasses);
+  }
+
+  compModResidueMasses() {
+    this.modResidueMasses = new Array(this.sequence.length).fill(0);
+    for (let i = 0; i < this.sequence.length; i++) {
+      let mass = this.residueMasses[i] + this.fixedPtmMasses[i]  
+        + this.variablePtmMasses[i] + this.unexpectedMasses[i];
+      this.modResidueMasses[i] = mass;
     }
   }
 
-  getSuffixMassList(ionMassShift) {
+  compPrefixMasses() {
     if (this.sequence) {
-      let suffixMassList = []; 
       let mass = 0;
-      suffixMassList.push(mass);
-      for (let i = this.sequence.length - 1; i >= 0; i--) {
-        mass = mass + this.residueMasses[i] + this.fixedPtmMasses[i] + this.unexpectedMasses[i];
-        suffixMassList.push(mass + ionMassShift);
+      for (let i = 0; i < this.sequence.length - 1; i++) {
+        mass = mass + this.modResidueMasses[i];
+        this.prefixMasses.push(mass);
       }
-      return suffixMassList;
-    }else {
-      return [];
-    }  
+    } 
+  }
+
+  compSuffixMasses() {
+    if (this.sequence) {
+      let mass = 0;
+      for (let i = this.sequence.length - 1; i > 0; i--) {
+        mass = mass + this.modResidueMasses[i];
+        this.suffixMasses.push(mass);
+      }
+    }
+  }
+
+  compProteoformMass() {
+    let mass = 0;
+    if (this.sequence) {
+      for (let i = 0; i < this.sequence.length; i++) {
+        mass = mass + this.modResidueMasses[i];
+      }
+      mass = mass + getWaterMass(); 
+    } 
+    this.proteoformMass = mass;
+  }
+
+  getNMasses(nIonType) {
+    let ionMassShift = getIonMassShift(nIonType);
+    //console.log("N mass shift", ionMassShift);
+    let massList = []; 
+    massList.push(0.0);
+    for (let i = 0; i < this.prefixMasses.length; i++) {
+      massList.push(this.prefixMasses[i] + ionMassShift);
+    }
+    massList.push(this.proteoformMass);
+    return massList;
+  }
+
+  getCMasses(cIonType) {
+    let ionMassShift = getIonMassShift(cIonType);
+    //console.log("C mass shift", ionMassShift);
+    let massList = []; 
+    massList.push(0.0);
+    for (let i = 0; i < this.suffixMasses.length; i++) {
+      massList.push(this.suffixMasses[i] + ionMassShift);
+    }
+    massList.push(this.proteoformMass);
+    return massList;
   }
 }

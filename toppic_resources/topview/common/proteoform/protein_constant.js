@@ -88,3 +88,8 @@ function getIonMassShift(ionType){
     return undefined;
   }
 }
+
+function getWaterMass() {
+  return 18.01056468362; 
+}
+
