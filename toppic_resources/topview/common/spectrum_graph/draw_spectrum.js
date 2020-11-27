@@ -332,9 +332,9 @@ function addDatatoAxis(svg,para){
  * @param {object} para - Contains the parameters like height, width etc.,. tht helps to draw the graph
  */
 function addLabels(svg, para){
-  let text = "m/z";
+  let text = "M/Z";
   if (para.isMonoMassGraph) {
-    text = "mass";
+    text = "Mass";
   }
   svg.append("text").attr("id","label")
   // -5 is added simply as buffer to place m/z on top of error rect plot
