@@ -10,7 +10,8 @@ function loadMsOne(filename, ms1SvgId){
     let peaks = ms1_data.peaks;
     let envelopes = ms1_data.envelopes;
     let ions = [];
-    spGraph = new SpectrumGraph(ms1SvgId,peaks,envelopes,ions);
+    spGraph = new SpectrumGraph(ms1SvgId,peaks);
+    spGraph.addRawSpectrumAnno(envelopes, ions);
     let precMonoMz = prsm_data.prsm.ms.ms_header.precursor_mz;
     spGraph.para.updateMzRange(precMonoMz);
     spGraph.para.setHighlight(precMonoMz);
@@ -55,7 +56,8 @@ function loadMsTwo(specIdList, fileList, proteoform, divId, navId){
           let deconvPeaks = prsm_data.prsm.ms.peaks.peak;
           let [ions, monoIons] = getIons(specId, deconvPeaks, envelopes);
           specList[j].ions = ions;
-          let spGraph = new SpectrumGraph(svgId,peaks,envelopes,ions,proteoform);
+          let spGraph = new SpectrumGraph(svgId,peaks);
+          spGraph.addRawSpectrumAnno(envelopes,ions); 
           spGraph.redraw();
           graphList.push(spGraph);
           //mono mass svg
@@ -64,11 +66,12 @@ function loadMsTwo(specIdList, fileList, proteoform, divId, navId){
           createSvg(show, divId, monoSvgId, "ms2_svg_graph_class");
           let monoMasses = getMonoMasses(deconvPeaks);
           //console.log(deconvPeaks, monoMasses);
-          let monoEnvelopes = [];
           specList[j].monoMasses = monoMasses;
-          specList[j].monoEnvelopes = monoEnvelopes;
           specList[j].monoIons = monoIons;
-          let monoSpGraph = new SpectrumGraph(monoSvgId,monoMasses,monoEnvelopes,monoIons,proteoform);
+          let nIonType = specList[j].n_ion_type;
+          let cIonType = specList[j].c_ion_type;
+          let monoSpGraph = new SpectrumGraph(monoSvgId,monoMasses); 
+          monoSpGraph.addMonoMassSpectrumAnno(monoIons,proteoform, nIonType, cIonType);
           monoSpGraph.para.setMonoMassGraph(true);
           monoSpGraph.redraw();
           monoGraphList.push(monoSpGraph);

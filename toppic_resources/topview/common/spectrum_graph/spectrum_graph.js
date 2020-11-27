@@ -11,7 +11,7 @@ class SpectrumGraph {
   transformX = 0;
   transformScale = 1.0;
 
-  constructor(svgId, peakList, envList, ionList, proteoform){
+  constructor(svgId, peakList) {
     this.id = svgId;
     this.para = new SpectrumParameters();
     this.peakList = peakList;
@@ -19,11 +19,6 @@ class SpectrumGraph {
     this.peakList.sort(function(x,y){
       return y.intensity - x.intensity; 
     });
-    this.envList = envList;
-    this.para.addColorToEnvelopes(envList);
-    this.envPeakList = this.getEnvPeakList(this.envList);
-    this.ionList = ionList; 
-    this.proteoform = proteoform;
     $("#" + svgId).data("graph", this);
     // add zoom function
     this.svg = d3.select("body").select("#"+svgId);
@@ -33,13 +28,37 @@ class SpectrumGraph {
       .call(this.zoom);
   }
 
+
+  addRawSpectrumAnno(envList, ionList){
+    this.envList = envList;
+    this.para.addColorToEnvelopes(envList);
+    this.envPeakList = this.getEnvPeakList(this.envList);
+    this.ionList = ionList; 
+  }
+
+  addMonoMassSpectrumAnno(ionList, proteoform, nIonType, cIonType){
+    this.ionList = ionList; 
+    this.proteoform = proteoform;
+    this.nMassList = proteoform.getNMasses(nIonType); 
+    //console.log(this.nMassList);
+    this.cMassList = proteoform.getCMasses(cIonType);
+    //console.log(this.cMassList);
+  }
+
   redraw = function(monoMz){
     if (this.para.isMonoMassGraph && monoMz) {
       this.para.updateMassRange(monoMz);
     } else if(monoMz) {
       this.para.updateMzRange(monoMz);
     }
-    drawSpectrum(this.id, this.para, this.peakList, this.envPeakList, this.proteoform, this.ionList);
+    drawBasicSpectrum(this.id, this.para, this.peakList, this.ionList);
+
+    if (this.para.isMonoMassGraph) {
+      drawMonoMassSpectrum(this.id, this.para, this.proteoform, this.nMassList, this.cMassList, this.ionList);
+    }
+    else {
+      drawRawSpectrum(this.id, this.para, this.envPeakList);
+    }
   }
 
   zoomed = function () {
