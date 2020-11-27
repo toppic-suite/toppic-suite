@@ -76,9 +76,9 @@ var ION_MASS_SHIFT_LIST ={
   "Z":0.984,
   "Z-H2O":-17.026,
   "Z-NH3":-16.04652,
-  "Z0":1.9919,
-  "Z0-H2O":-16.018664,
-  "Z0-NH3":-15.03862
+  "Z_DOT":1.9919,
+  "Z_DOT-H2O":-16.018664,
+  "Z_DOT-NH3":-15.03862
 };
 
 function getIonMassShift(ionType){
