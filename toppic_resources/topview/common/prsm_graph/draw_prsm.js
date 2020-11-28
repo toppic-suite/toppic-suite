@@ -9,8 +9,8 @@ function drawPrsm(svgId, para, prsm) {
   if (prsm.showEndSkipped) {
     addEndSkippedLine(svg,para,prsm.displayFirstPos, prsm.displayLastPos + 1, prsm.endSkippedInfo, prsm.showStartSkipped);
   }
-  addMassShiftAnnos(svg, para, prsm.displayFirstPos, prsm.massShifts, prsm.showStartSkipped);
-  addMassShiftBackground(svg, para, prsm.displayFirstPos, prsm.massShifts, prsm.showStartSkipped);
+  addAnnos(svg, para, prsm.displayFirstPos, prsm.annotations, prsm.showStartSkipped);
+  addAnnoBackground(svg, para, prsm.displayFirstPos, prsm.annotations, prsm.showStartSkipped);
   addAminoAcids(svg, para, prsm.residues, prsm.displayFirstPos, prsm.displayLastPos, prsm.showStartSkipped);
   if (para.showNum) {
     addPosNums(svg, para, prsm.displayFirstPos, prsm.displayLastPos, prsm.rowNum, prsm.showStartSkipped);
@@ -281,24 +281,21 @@ function removeBpAnno() {
  * @param {Object} para - Contains parameters of width, letter space etc., to draw SVG
  * @param {Object} shifts - Contains the complete information of mass shifts. 
  */
-function addMassShiftAnnos(svg, para, firstPos, shifts, isStartSkipped) {
+function addAnnos(svg, para, firstPos, annos, isStartSkipped) {
   let annoGroup = svg.append("g")
     .attr("id", "mass_shift_anno")
     .attr("class","prsm_svg_group");
   let yShiftIdx = 0;
-  shifts.sort(function(x,y){
-    return x.leftPos - y.leftPos;
-  });
-  for (let i = 0; i < shifts.length; i++) {
-    let leftPos = shifts[i].leftPos;
+  for (let i = 0; i < annos.length; i++) {
+    let leftPos = annos[i].leftPos;
     let [x1,y1] = para.getAACoordinates(leftPos, firstPos);
-
+    //console.log(leftPos, x1, y1);
     let overlap = false;
     if (i > 0) {
-      let prevPos = parseInt(shifts[i-1].leftPos);
+      let prevPos = parseInt(annos[i-1].leftPos);
       let [x2,y2] = para.getAACoordinates(prevPos, firstPos);
 			// subtract -2 for CSS and alignment purpose
-      let annoLen = shifts[i-1].anno.length * (para.fontWidth-2);
+      let annoLen = annos[i-1].annoText.length * (para.fontWidth-2);
       //console.log(shifts[i-1].anno, annoLen, x2, x1);
 			if(y1 == y2 && (x1-x2 < annoLen)) {
         overlap = true;
@@ -312,7 +309,7 @@ function addMassShiftAnnos(svg, para, firstPos, shifts, isStartSkipped) {
       yShiftIdx = 0;
     }
     y1 = y1 + para.modAnnoYShifts[yShiftIdx];
-    let anno = shifts[i].anno;
+    let annoText = annos[i].annoText;
     if (isStartSkipped){
       y1 = y1 + para.middleMargin;
     }
@@ -320,7 +317,7 @@ function addMassShiftAnnos(svg, para, firstPos, shifts, isStartSkipped) {
     annoGroup.append("text")
       .attr("x", x1)
       .attr("y", y1)
-      .text(anno)
+      .text(annoText)
       .attr("fill","black")
       .attr("font-size","15px");
   }
@@ -334,13 +331,13 @@ function addMassShiftAnnos(svg, para, firstPos, shifts, isStartSkipped) {
  * @param {Integer} width - Contains width to whuich backgroud color has to be added
  * @param {Object} para - Contains parameters of width, letter space etc., to draw SVG
  */
-function addMassShiftBackground(svg, para, firstPos, shifts, isStartSkipped) {
+function addAnnoBackground(svg, para, firstPos, annos, isStartSkipped) {
   let bgGroup = svg.append("g")
     .attr("id", "background")
     .attr("class","prsm_svg_group");
-  for (let i = 0; i < shifts.length; i++) {
-    let leftPos = shifts[i].leftPos;
-    let rightPos = shifts[i].rightPos;
+  for (let i = 0; i < annos.length; i++) {
+    let leftPos = annos[i].leftPos;
+    let rightPos = annos[i].rightPos;
     //console.log("left", leftPos, "right", rightPos);
     let startRow = Math.floor((leftPos -firstPos)/para.rowLength);
     let endRow = Math.floor((rightPos - 1 - firstPos)/para.rowLength);
