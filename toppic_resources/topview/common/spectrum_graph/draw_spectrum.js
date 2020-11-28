@@ -558,8 +558,12 @@ function drawSequence(svg, para, proteoform, nMasses, cMasses){
 	y = 5;
   let seq = proteoform.sequence;
   let prevMass = -1.0;
+  let residues = "";
   for (let i = 0; i < nMasses.length; i++) {
     let curMass = nMasses[i];
+    if (i > 0) {
+      residues = residues + seq[i-1];
+    }
     if (curMass > prevMass) {
       if (curMass >= para.winMinMz - 10 && curMass <= para.winMaxMz) {
         let x = para.getPeakXPos(curMass);
@@ -569,8 +573,9 @@ function drawSequence(svg, para, proteoform, nMasses, cMasses){
         let mz = (prevMass + curMass)/2
         if (mz >= para.winMinMz && mz <= para.winMaxMz) {
           let x = para.getPeakXPos(mz) - 5;
-          interAddAminoAcid(seqGroup,x,y+12,seq[i-1]);
+          interAddAminoAcid(seqGroup,x,y+12,residues);
         }
+        residues = "";
       }
       prevMass = curMass;
     }
@@ -579,8 +584,12 @@ function drawSequence(svg, para, proteoform, nMasses, cMasses){
 	x = para.getPeakXPos(0);
   y = 25;
   prevMass = -1.0;
+  resiudes = "";
   for (let i = 0; i < cMasses.length; i++) {
     let curMass = cMasses[i];
+    if (i > 0) {
+      residues = residues + seq[seq.length - i];
+    }
     if (curMass > prevMass) {
       if (curMass >= para.winMinMz - 10 && curMass <= para.winMaxMz) {
         let x = para.getPeakXPos(curMass);
@@ -590,8 +599,9 @@ function drawSequence(svg, para, proteoform, nMasses, cMasses){
         let mz = (prevMass + curMass)/2
         if (mz >= para.winMinMz && mz <= para.winMaxMz) {
           let x = para.getPeakXPos(mz) - 5;
-          interAddAminoAcid(seqGroup,x,y+12,seq[seq.length - i]);
+          interAddAminoAcid(seqGroup,x,y+12,residues);
         }
+        residues = "";
       }
       prevMass = curMass;
     }
