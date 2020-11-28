@@ -7,6 +7,7 @@
  * @param {list} envPeaks - Contains the data of Envelope peaks to draw circles on the graph
  * @param {list} ions - Contains Ions to draw upon the peaks
  */
+/**
 function drawSpectrum(svgId, para, peaks, envPeaks, proteoform, ions) {
   let svg = d3.select("body").select("#"+svgId);
   // svg.attr("width", para.svgWidth).attr("height", para.svgHeight);
@@ -25,7 +26,7 @@ function drawSpectrum(svgId, para, peaks, envPeaks, proteoform, ions) {
     addHighlight(svg, para);
   }
   drawPeaks(svg, para, peaks);
-  if (para.showEnvelopes) {
+  if (para.showEnvelopes && envPeaks != null) {
     drawEnvelopes(svg, para, envPeaks);
   }
   if (para.showIons) {
@@ -39,6 +40,56 @@ function drawSpectrum(svgId, para, peaks, envPeaks, proteoform, ions) {
     drawErrorYTicks(svg, para);
     drawErrorPoints(svg, para, ions);
   }
+}
+*/
+
+/**
+ * Function gets invokes whenever zoom or drag is invoked and redraws the graph whenever there is zoom or draw
+ * This function invokes all the functions that draw the graph
+ * @param {string} svgId - Contains the Id from html on which the graph should be drawn
+ * @param {object} para - Contains the parameters to help draw the graph
+ * @param {list} peaks - Contains the data of Peaks to draw lines on the graph
+ * @param {list} envPeaks - Contains the data of Envelope peaks to draw circles on the graph
+ * @param {list} ions - Contains Ions to draw upon the peaks
+ */
+function drawBasicSpectrum(svgId, para, peaks, ions) {
+  let svg = d3.select("body").select("#"+svgId);
+  // svg.attr("width", para.svgWidth).attr("height", para.svgHeight);
+  // Removes all the elements under SVG group 'svgGroup' everytime there this function is called
+  svg.selectAll("#svgGroup").remove();
+  // Create a group under which all the fucntions of the graph will be appended
+  svg = svg.append("g").attr("id","svgGroup");
+
+  //call onMouseOut everytime to fix onHover bug adding multiple data when mouseover and zoomed up
+  onMouseOut();
+  drawTicks(svg, para);
+  drawAxis(svg,para);
+  addDatatoAxis(svg,para);
+  addLabels(svg,para);
+  if (para.showHighlight) {
+    addHighlight(svg, para);
+  }
+  drawPeaks(svg, para, peaks);
+  if (para.showIons) {
+    drawIons(svg, para, ions);
+  }
+}
+
+function drawRawSpectrum(svgId, para, envPeaks) {
+  let svg = d3.select("body").select("#"+svgId).select("#svgGroup");
+  if (para.showEnvelopes && envPeaks != null) {
+    drawEnvelopes(svg, para, envPeaks);
+  }
+}
+
+function drawMonoMassSpectrum(svgId, para, proteoform, nMasses, cMasses, ions) {
+  let svg = d3.select("body").select("#"+svgId).select("#svgGroup");
+  updateViewBox(svgId, para.svgWidth, para.svgHeight);
+  drawSequence(svg, para, proteoform, nMasses, cMasses);
+  addErrorPlot(svg, para);
+  addErrorBox(svg, para);
+  drawErrorYTicks(svg, para);
+  drawErrorPoints(svg, para, ions);
 }
 
 /**
@@ -281,9 +332,9 @@ function addDatatoAxis(svg,para){
  * @param {object} para - Contains the parameters like height, width etc.,. tht helps to draw the graph
  */
 function addLabels(svg, para){
-  let text = "m/z";
+  let text = "M/Z";
   if (para.isMonoMassGraph) {
-    text = "mass";
+    text = "Mass";
   }
   svg.append("text").attr("id","label")
   // -5 is added simply as buffer to place m/z on top of error rect plot
@@ -499,43 +550,60 @@ function drawIons(svg,para,ions){
  * @param {Node} svg -  is a html node on which the graph is being ploted
  * @param {object} para - Contains the parameters like height, width etc.,. tht helps to draw the graph
  */
-function drawSequence(svg, para, proteoform){
+function drawSequence(svg, para, proteoform, nMasses, cMasses){
 	let seqGroup = svg.append("g").attr("id", "graph_sequence");
 	let x,y;
 	// Draw | at 0 for prefix mass list
 	x = para.getPeakXPos(0);
 	y = 5;
-  let prefixMasses = proteoform.prefixMasses;
-  prefixMasses.forEach(function(element) {
-    if (element >= para.winMinMz - 10 && element <= para.winMaxMz) {
-      let x = para.getPeakXPos(element);
-		  interAddLine(seqGroup,x,y);
-    }
-  })
   let seq = proteoform.sequence;
-  for (let i = 0; i < seq.length; i++) {
-    let mz = (prefixMasses[i] + prefixMasses[i+1])/2
-    if (mz >= para.winMinMz && mz <= para.winMaxMz) {
-      let x = para.getPeakXPos(mz) - 5;
-		  interAddAminoAcid(seqGroup,x,y+12,seq[i]);
+  let prevMass = -1.0;
+  let residues = "";
+  for (let i = 0; i < nMasses.length; i++) {
+    let curMass = nMasses[i];
+    if (i > 0) {
+      residues = residues + seq[i-1];
+    }
+    if (curMass > prevMass) {
+      if (curMass >= para.winMinMz - 10 && curMass <= para.winMaxMz) {
+        let x = para.getPeakXPos(curMass);
+        interAddLine(seqGroup,x,y);
+      }
+      if (i > 0) {
+        let mz = (prevMass + curMass)/2
+        if (mz >= para.winMinMz && mz <= para.winMaxMz) {
+          let x = para.getPeakXPos(mz) - 5;
+          interAddAminoAcid(seqGroup,x,y+12,residues);
+        }
+        residues = "";
+      }
+      prevMass = curMass;
     }
   }
-  
+
 	x = para.getPeakXPos(0);
   y = 25;
-  let suffixMasses = proteoform.suffixMasses;
-  suffixMasses.forEach(function(element) {
-    if (element >= para.winMinMz - 10 && element <= para.winMaxMz) {
-      let x = para.getPeakXPos(element);
-      interAddLine(seqGroup,x,y);
+  prevMass = -1.0;
+  resiudes = "";
+  for (let i = 0; i < cMasses.length; i++) {
+    let curMass = cMasses[i];
+    if (i > 0) {
+      residues = residues + seq[seq.length - i];
     }
-  })
-
-  for (let i = 0; i < seq.length; i++) {
-    let mz = (suffixMasses[i] + suffixMasses[i+1])/2
-    if (mz >= para.winMinMz && mz <= para.winMaxMz) {
-      let x = para.getPeakXPos(mz) - 5;
-		  interAddAminoAcid(seqGroup,x,y+12,seq[seq.length-1 - i]);
+    if (curMass > prevMass) {
+      if (curMass >= para.winMinMz - 10 && curMass <= para.winMaxMz) {
+        let x = para.getPeakXPos(curMass);
+        interAddLine(seqGroup,x,y);
+      }
+      if (i > 0) {
+        let mz = (prevMass + curMass)/2
+        if (mz >= para.winMinMz && mz <= para.winMaxMz) {
+          let x = para.getPeakXPos(mz) - 5;
+          interAddAminoAcid(seqGroup,x,y+12,residues);
+        }
+        residues = "";
+      }
+      prevMass = curMass;
     }
   }
 
@@ -548,6 +616,7 @@ function drawSequence(svg, para, proteoform){
       .attr("stroke","black")
       .attr("stroke-width","1")
   }
+
 	function interAddAminoAcid(svgGroup,x,y,text){
 		svgGroup.append("text")
 			.attr("id","")

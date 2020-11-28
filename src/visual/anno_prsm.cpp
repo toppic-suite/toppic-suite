@@ -68,10 +68,11 @@ void addMsHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement* ms_element,
   std::string ms1_ids, ms2_ids;
   std::string ms1_scans, ms2_scans;
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
-    ms1_ids = ms1_ids + str_util::toString(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getMsOneId()) + " ";
-    ms1_scans = ms1_scans + str_util::toString(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getMsOneScan()) + " ";
-    ms2_ids = ms2_ids + str_util::toString(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getId()) + " ";
-    ms2_scans = ms2_scans + deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getScansString() + " ";
+    MsHeaderPtr header_ptr = deconv_ms_ptr_vec[i]->getMsHeaderPtr();
+    ms1_ids = ms1_ids + str_util::toString(header_ptr->getMsOneId()) + " ";
+    ms1_scans = ms1_scans + str_util::toString(header_ptr->getMsOneScan()) + " ";
+    ms2_ids = ms2_ids + str_util::toString(header_ptr->getId()) + " ";
+    ms2_scans = ms2_scans + header_ptr->getScansString() + " ";
   }
   str_util::trim(ms1_ids);
   str_util::trim(ms1_scans);
