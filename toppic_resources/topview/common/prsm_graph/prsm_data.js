@@ -8,6 +8,7 @@ class PrsmData {
   fixedPtms;
   variablePtms;
   massShifts;
+  annotations;
   proteoform;
 
   rowNum;
@@ -33,6 +34,7 @@ class PrsmData {
     this.breakPoints = json2BreakPoints(prsm);
     [this.fixedPtms, this.variablePtms] = json2Ptms(prsm);
     this.massShifts = json2MassShifts(prsm);
+    this.annotations = getAnnotations(this.variablePtms, this.massShifts);
     this.sequence = this.getAminoAcidSequence();
     this.proteoform = new Proteoform(this.sequence, this.formFirstPos, this.fixedPtms, 
       this.variablePtms, this.massShifts);
@@ -177,6 +179,32 @@ function getJsonList(item) {
   return valueList;
 }
 
+function getAnnotations(variablePtms, massShifts) {
+  let annos = [];
+  for (let i = 0; i < variablePtms.length; i++) {
+    let ptm = variablePtms[i]; 
+    for (let j = 0; j < ptm.posList.length; j++) {
+      let pos = ptm.posList[j].pos; 
+      let anno = {};
+      anno.annoText = ptm.name;
+      anno.leftPos = pos;
+      anno.rightPos = pos + 1;
+      annos.push(anno);
+    }
+  }
+
+  for (let i = 0; i < massShifts.length; i++) {
+    let anno = {};
+    anno.annoText = massShifts[i].anno;
+    anno.leftPos = massShifts[i].leftPos;
+    anno.rightPos = massShifts[i].rightPos;
+    annos.push(anno);
+  }
+  annos.sort(function(x,y){
+    return x.leftPos - y.leftPos;
+  });
+  return annos;
+}
 /**
  * Get occurence of fixed ptm positions
  * @param {object} prsm - json obeject with complete prsm data 

@@ -208,6 +208,7 @@ function getIons(specId, deconvPeaks, envelopes){
   //console.log(specId, deconvPeaks);
   let ions = [];
   let monoIons = [];
+  //console.log(deconvPeaks);
   deconvPeaks.forEach(function(element) {
     if(element.hasOwnProperty('matched_ions_num') && 
       element.spec_id == specId) {
@@ -239,6 +240,7 @@ function getIons(specId, deconvPeaks, envelopes){
       }
       let peakId = element.peak_id;
       //console.log(peakId, envelopes.length, specId);
+      //console.log(envelopes[peakId]);
       let envPeaks = envelopes[peakId].env_peaks;
       envPeaks.sort(function(x,y){
         return d3.descending(x.intensity, y.intensity);
