@@ -26,6 +26,7 @@ function getAcidMass(acid){
 	
 	return aminoAcid.aa[acid];
 }
+
 AminoAcid = function(){
 	this.A = {code:"A",	shortName:"Ala",	name:"Alanine",			mono:71.037113805,	avgMass:71.0779}
 	this.R = {code:"R",	shortName:"Arg",	name:"Arginine",		mono:156.101111050,	avgMass:156.18568}

@@ -6,7 +6,9 @@ class PrsmData {
 
   sequence;
   fixedPtms;
+  variablePtms;
   massShifts;
+  annotations;
   proteoform;
 
   rowNum;
@@ -30,22 +32,27 @@ class PrsmData {
     this.formFirstPos = parseInt(prsm.annotated_protein.annotation.first_residue_position);
     this.formLastPos = parseInt(prsm.annotated_protein.annotation.last_residue_position);
     this.breakPoints = json2BreakPoints(prsm);
-    this.fixedPtms = json2FixedPtms(prsm);
+    [this.fixedPtms, this.variablePtms] = json2Ptms(prsm);
     this.massShifts = json2MassShifts(prsm);
+    this.annotations = getAnnotations(this.variablePtms, this.massShifts);
     this.sequence = this.getAminoAcidSequence();
-    this.proteoform = new Proteoform(this.sequence, this.fixedPtms, this.massShifts);
+    this.proteoform = new Proteoform(this.sequence, this.formFirstPos, this.fixedPtms, 
+      this.variablePtms, this.massShifts);
   }
 
-  setData = (residues, formFirstPos, formLastPos, fixedPtms, massShifts, sequence, breakPoints) => {
+  /*
+  setData = (residues, formFirstPos, formLastPos, fixedPtms, variablePtms, massShifts, sequence, breakPoints) => {
     this.residues = residues;
     this.formFirstPos = formFirstPos;
     this.formLastPos = formLastPos;
     this.fixedPtms = fixedPtms;
+    this.variablePtms = variablePtms;
     this.massShifts = massShifts;
     this.sequence = sequence;
-    this.proteoform = new Proteoform(this.sequence, this.fixedPtms, this.massShifts);
+    this.proteoform = new Proteoform(this.sequence, this.fixedPtms, this.variablePtms, this.massShifts);
     this.breakPoints = breakPoints;
   }
+  */
 
   updatePara = function(para) {
     let len = this.residues.length; 
@@ -172,35 +179,74 @@ function getJsonList(item) {
   return valueList;
 }
 
+function getAnnotations(variablePtms, massShifts) {
+  let annos = [];
+  for (let i = 0; i < variablePtms.length; i++) {
+    let ptm = variablePtms[i]; 
+    for (let j = 0; j < ptm.posList.length; j++) {
+      let pos = ptm.posList[j].pos; 
+      let anno = {};
+      anno.annoText = ptm.name;
+      anno.leftPos = pos;
+      anno.rightPos = pos + 1;
+      annos.push(anno);
+    }
+  }
+
+  for (let i = 0; i < massShifts.length; i++) {
+    let anno = {};
+    anno.annoText = massShifts[i].anno;
+    anno.leftPos = massShifts[i].leftPos;
+    anno.rightPos = massShifts[i].rightPos;
+    annos.push(anno);
+  }
+  annos.sort(function(x,y){
+    return x.leftPos - y.leftPos;
+  });
+  return annos;
+}
 /**
  * Get occurence of fixed ptm positions
  * @param {object} prsm - json obeject with complete prsm data 
  */
-function json2FixedPtms(prsm){
-  let ptmList = [] ;
+function json2Ptms(prsm){
+  let fixedPtmList = [];
+  let varPtmList = [];
   if(!prsm.annotated_protein.annotation.hasOwnProperty("ptm") ) {
-    return ptmList;
+    return [fixedPtmList, varPtmList];
   }
   let dataPtmList = getJsonList(prsm.annotated_protein.annotation.ptm); 
   for (let i = 0; i < dataPtmList.length; i++) {
     let dataPtm = dataPtmList[i];
+    //console.log(dataPtm);
     let ptm = {};
     ptm.name = dataPtm.ptm.abbreviation;
+    ptm.mono_mass = dataPtm.ptm.mono_mass;
     ptm.posList = [];
-    if(dataPtm.ptm_type == "Fixed" && dataPtm.hasOwnProperty("occurence")) {
-      let occList = getJsonList(dataPtm.occurence);
-      for (let j = 0; j < occList.length; j++) {
-        let occurence = occList[j];
-        let pos = {};
-        pos.pos = occurence.left_pos;
-        pos.acid = occurence.anno;
-        ptm.posList.push(pos);
+    if(dataPtm.ptm_type == "Fixed" || dataPtm.ptm_type == "Protein variable" 
+      || dataPtm.ptm_type == "Variable") {
+      if (dataPtm.hasOwnProperty("occurence")) {
+        let occList = getJsonList(dataPtm.occurence);
+        //console.log(occList);
+        for (let j = 0; j < occList.length; j++) {
+          let occurence = occList[j];
+          let pos = {};
+          pos.pos = occurence.left_pos;
+          pos.acid = occurence.anno;
+          ptm.posList.push(pos);
+        }
       }
     }
-    ptmList.push(ptm);
+    if (dataPtm.ptm_type == "Fixed") {
+      fixedPtmList.push(ptm);
+    }
+    else {
+      varPtmList.push(ptm);
+    }
   }
-  //console.log(ptmList);
-  return ptmList;
+  //console.log(fixedPtmList);
+  //console.log(varPtmList);
+  return [fixedPtmList, varPtmList];
 }
 
 /**
@@ -225,6 +271,8 @@ function json2MassShifts(prsm) {
       }
     }
 	}
+  return massShifts;
+  /*
   // add protein N-terminal modifications			
   if(prsm.annotated_protein.annotation.hasOwnProperty('ptm')) {
     let ptms = getJsonList(prsm.annotated_protein.annotation.ptm); 
@@ -263,5 +311,6 @@ function json2MassShifts(prsm) {
     }
   }
 	return noDupMassShift ;
+  */
 }
 
