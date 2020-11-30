@@ -95,7 +95,7 @@ $(document).ready(function(){
 		loadDatafromJson2Html();
 		
 		// Detting prsm data from prsm_data variable. prsm_data is a global variable from the prsm data file
-		let prsm = prsm_data.prsm ;
+    let prsm = prsm_data.prsm ;
 		// SVG Id for the visualization
 		let prsmSvgId = "prsm_svg" ;
     prsmGraph = new PrsmGraph(prsmSvgId, prsm_data.prsm);
@@ -117,7 +117,8 @@ $(document).ready(function(){
 		addButtonActions();
 
 		// Get all the scanIds
-		let scanIds = prsm_data.prsm.ms.ms_header.scans.split(" ");
+    let scanIds = prsm_data.prsm.ms.ms_header.scans.split(" ");
+
 		// Get all the SpecIds
 		let specIds = prsm_data.prsm.ms.ms_header.ids.split(" ");
 
