@@ -76,6 +76,7 @@ class SeqOfExecution
 		let massShiftObj = new MassShifts(sequence);
 
 		fixedMassShiftList = massShiftObj.getFixedMassShiftList(selectedFixedMassShiftList);
+		// console.log("fixedMassShiftList:", fixedMassShiftList);
 		massShiftObj.generateMassShiftList(massShiftList, variableMassShiftList, fixedMassShiftList);
 		/**
 		 * If user removed fixed ptm mass, remove the mass from the list
