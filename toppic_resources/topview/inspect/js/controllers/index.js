@@ -23,7 +23,6 @@ onLoadOfHTML = function()
     let l_variablePtmList = parsePTM('variablePtmList');
     let unknownMassShiftList = parseUnknowmassList('unknownMassShiftList');
     let precursorMass = parsePrecursorMass("precursorMass");
-        
     if(peakAndIntensityList !== null && massAndIntensityList !== null){
         setDataToPeakAndIntensity(peakAndIntensityList);
 		setDataToMassAndIntensity(massAndIntensityList);
@@ -33,6 +32,9 @@ onLoadOfHTML = function()
     }
     if(l_fixedPtmList) {
         setFixedMasses(l_fixedPtmList);
+    }
+    if(l_variablePtmList) {
+        setVariablePTMList(l_variablePtmList);
     }
     if(precursorMass) {
 		setPrecursorMass(precursorMass);
@@ -165,4 +167,16 @@ showNonMatchedPeaks = function()
 		elems[i].style.display = "";
 	}
 	$('div.dataTables_scrollBody').height(400);
+}
+/**
+ * @function setVariablePTM
+ * @description Function to display only un matched peaks in table. This handles on click action
+ * from html of show un matched peaks button.
+ */
+setVariablePTMList = function(l_variablePtmList)
+{
+    for (let i = 0; i < l_variablePtmList.length; i++){
+        let temp = {"name":l_variablePtmList[i].name, "position":l_variablePtmList[i].position, "mono_mass":l_variablePtmList[i].mono_mass};
+        VAR_PTM_LIST.push(temp);
+    }
 }

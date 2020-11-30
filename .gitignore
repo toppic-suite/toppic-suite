@@ -10,6 +10,8 @@ releases/toppic-win-*
 releases/topfd-win-*
 releases/win-lib/*
 
+toppic_resources/topview/debug.log
+
 toppic_resources/topfd/*
 toppic_resources/toppic_prsm_cutoff/*
 toppic_resources/toppic_proteoform_cutoff/*

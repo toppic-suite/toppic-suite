@@ -11,9 +11,12 @@ class MassShifts {
 	 * Generate mass shift list by given unexpected mass shift list and fixed PTM shift list
 	 * @param {Array} unexpectedMassShiftList
 	 * @param {Array} fixedPtmShiftList
+	 * @param {Array} variablePtmShiftList
 	 */
-	generateMassShiftList(unexpectedMassShiftList, fixedPtmShiftList) {
-		function ifMatch(position, fixedPtmShiftList) {
+	generateMassShiftList(unexpectedMassShiftList, variablePtmShiftList, fixedPtmShiftList) {
+		this.massShiftList = [];
+
+		const ifMatch = (position, fixedPtmShiftList) => {
 			for (let i = 0; i < fixedPtmShiftList.length; i++) {
 				if(position === fixedPtmShiftList[i].position) {
 					return true;
@@ -21,16 +24,27 @@ class MassShifts {
 			}
 			return false;
 		}
+		//reformat fixed and variable ptm shift list and add to massShiftList
+		const addToMassShiftList = (ptmList) => {
+			for (let i = 0; i < ptmList.length; i++) {
+				for (let j = 0; j < ptmList[i].posList.length; j++){
+					let position = ptmList[i].posList[j];
+					let tempObj = {position: position.pos, mass:ptmList[i].mono_mass, bg_color: ptmList[i].bg_color};
+					this.massShiftList.push(tempObj);
+				}
+			}
+		}
+		addToMassShiftList(fixedPtmShiftList);
+		addToMassShiftList(variablePtmShiftList);
 
-		this.massShiftList = [...fixedPtmShiftList];
 		for (let i = 0; i < unexpectedMassShiftList.length; i++) {
-			// add unexpected mass shift if its position does not match any fixed PTM shift
-			if(!ifMatch(unexpectedMassShiftList[i].position, fixedPtmShiftList)) {
+			// add unexpected mass shift if its position does not match any fixed PTM shift or variable PTM shift
+			if(!ifMatch(unexpectedMassShiftList[i].position, fixedPtmShiftList) && 
+			   !ifMatch(unexpectedMassShiftList[i].position, variablePtmShiftList)) {
 				let tempObj = {position: unexpectedMassShiftList[i].position, mass:unexpectedMassShiftList[i].mass, bg_color: unexpectedMassShiftList[i].bg_color};
 				this.massShiftList.push(tempObj);
 			}
 		}
-		return this.massShiftList;
 	}
 
 	/**
@@ -46,14 +60,16 @@ class MassShifts {
 		{
 			fixedPtmAcid = selectedFixedPtmList[k].acid;
 			fixedPtmMass = selectedFixedPtmList[k].mass;
+
+			let tempObj = {mono_mass:fixedPtmMass, name:fixedPtmAcid, posList:[]}
 			for(let i = 0 ; i<this.sequence.length; i++)
 			{
 				if(this.sequence[i] === fixedPtmAcid)
 				{
-					let tempObj = {position:i, mass:fixedPtmMass, bg_color:null}
-					result.push(tempObj);
+					tempObj.posList.push({pos:i, acid:fixedPtmAcid});
 				}
 			}
+			result.push(tempObj);
 		}
 		return result;
 	}

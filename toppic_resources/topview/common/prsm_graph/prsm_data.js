@@ -40,20 +40,40 @@ class PrsmData {
       this.variablePtms, this.massShifts);
   }
 
-  /*
-  setData = (residues, formFirstPos, formLastPos, fixedPtms, variablePtms, massShifts, sequence, breakPoints) => {
+  setDataFromUserInput = function(residues, formFirstPos, formLastPos, breakPoints, proteoformObj){
+    //because Inspect page does not have prsm object, it cannot use the function above
+    //but it can use proteoform object instead, which contains similar information as prsm 
+    //which is generated based on user input
     this.residues = residues;
     this.formFirstPos = formFirstPos;
     this.formLastPos = formLastPos;
-    this.fixedPtms = fixedPtms;
-    this.variablePtms = variablePtms;
-    this.massShifts = massShifts;
-    this.sequence = sequence;
-    this.proteoform = new Proteoform(this.sequence, this.fixedPtms, this.variablePtms, this.massShifts);
+    this.fixedPtms = proteoformObj.fixedPtms;
+    this.variablePtms = proteoformObj.variablePtms;
+    this.massShifts = proteoformObj.unexpectedMassShifts;
+    this.sequence = proteoformObj.sequence;
+    this.proteoform = proteoformObj;
     this.breakPoints = breakPoints;
-  }
-  */
 
+    function generateAnnotation(variablePtm, massShift){
+      let anno = [];
+      //annotation in prsm object contains only variable and unknown shifts
+      for (let i = 0; i < variablePtm.length; i++){
+        let temp = {"annoText":variablePtm[i].name, "leftPos":0, "rightPos":0};
+        for (let j = 0; j < variablePtm[i].posList.length; j++){
+          temp.leftPos = variablePtm[i].posList[j].pos;
+          temp.rightPos = temp.leftPos + 1;
+          anno.push(temp);
+        }
+      }
+      for (let i = 0; i < massShift.length; i++){
+        let temp = {"annoText":massShift[i].label, "leftPos":massShift[i].leftPos, "rightPos":massShift[i].rightPos};
+        anno.push(temp);
+      }
+      return anno;
+    }
+    this.annotations = generateAnnotation(this.variablePtms, this.massShifts);
+  }
+  
   updatePara = function(para) {
     let len = this.residues.length; 
     //console.log(this.formFirstPos, this.formLastPos, len, para.rowLength);
