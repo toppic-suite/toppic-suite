@@ -26,8 +26,9 @@ class SeqOfExecution
 		 * unbind all the actions previously binded else each action will be 
 		 * binded multiple times.
 		 */
-		let massShiftList = [];//contains variablePTM and unknown mass shifts
+		let massShiftList = [];//contains unknown mass shifts
 		let fixedMassShiftList = [];//contains fixedPTM
+		let variableMassShiftList = [];//contains variablePTM
 		let completeShiftList = [];//contains all 3 kinds of mass shifts
 		let peakDataList = [];
 		let modifiablePeakData = [];//will change value if shared peak
@@ -64,7 +65,7 @@ class SeqOfExecution
 		 * Returns mass list embedded in [] in sequence of user entered sequence.
 		 */
 		sequence = getSequenceFromUI();
-		[sequence, massShiftList] = parseSequenceMassShift(sequence);
+		[sequence, massShiftList, variableMassShiftList] = parseSequenceMassShift(sequence);
 		let selectedFixedMassShiftList = getFixedPtmCheckList();
 		// console.log("massShiftList:", massShiftList);
 		// console.log("selectedFixedMassShiftList:", selectedFixedMassShiftList);
@@ -74,8 +75,7 @@ class SeqOfExecution
 		let massShiftObj = new MassShifts(sequence);
 
 		fixedMassShiftList = massShiftObj.getFixedMassShiftList(selectedFixedMassShiftList);
-		// console.log("fixedMassShiftList:", fixedMassShiftList);
-		massShiftObj.generateMassShiftList(massShiftList, fixedMassShiftList);
+		massShiftObj.generateMassShiftList(massShiftList, variableMassShiftList, fixedMassShiftList);
 		/**
 		 * If user removed fixed ptm mass, remove the mass from the list
 		 */
@@ -119,7 +119,7 @@ class SeqOfExecution
 		if(errorType === Constants.MASSERROR) massErrorthVal = errorVal ;
 		else ppmErrorthVal = errorVal ;
 		
-		let proteoformObj = new Proteoform(sequence, fixedMassShiftList, massShiftList);
+		let proteoformObj = new Proteoform(sequence, 0, fixedMassShiftList, variableMassShiftList, massShiftList);
 		// console.log("residueMasses:",proteoformObj.unexpectedMasses);
 		// console.log("getPrefix:",proteoformObj.suffixMasses);
 		// let calculatePrefixAndSuffixMassObj = new calculatePrefixAndSuffixMass();
@@ -139,7 +139,8 @@ class SeqOfExecution
 			/**
 			 * Get claculated prefix mass list
 			 */
-			prefixMassList = proteoformObj.getPrefixMassList(massShift);
+			//prefixMassList = proteoformObj.getPrefixMassList(massShift);
+			prefixMassList = proteoformObj.getNMasses(ionType);
 			/**
 			 * Get matched peak list
 			 */
@@ -170,7 +171,7 @@ class SeqOfExecution
 			/**
 			 * Get claculated suffix mass list
 			 */
-			suffixMassList = proteoformObj.getSuffixMassList(massShift);
+			suffixMassList = proteoformObj.getCMasses(ionType);
 			/**
 			 * Get matched peak list
 			 */															
@@ -211,9 +212,12 @@ class SeqOfExecution
 			// form fixedPtms
 			let formedFixedPtmsList = formFixedPtms(fixedMassShiftList, sequence);
 			let formedMassShifts = formMassShifts(massShiftList);
+			let formedVariablePtmsList = formVariablePtms(variableMassShiftList, sequence);
 			let prsmDataObj = new PrsmData();
-
-			prsmDataObj.setData(residues, 0, residues.length - 1, formedFixedPtmsList, formedMassShifts, sequence, breakPointsList);
+			//console.log("formedFixedPtmsList", formedFixedPtmsList)
+			//console.log("formedMassShifts", formedMassShifts)
+			//console.log("formedVariablePtmsList", formedVariablePtmsList)
+			prsmDataObj.setDataFromUserInput(residues, 0, residues.length - 1, breakPointsList, proteoformObj);
 			prsmDataObj.addColor();
 			let prsmGraphObj = new PrsmGraph(Constants.SEQSVGID,null,prsmDataObj);
 			prsmGraphObj.para.rowLength = 40;
@@ -258,7 +262,8 @@ class SeqOfExecution
 			 * Call generateCorrespondingGraph which calls addSpectrum function in invokeSpectrum file to draw graph 
 			 */
 			let ionList = getIonsSpectrumGraph(matchedPeakList, distributionList);
-			spectrumGraphObj = new SpectrumGraph(Constants.SPECTRUMGRAPHID, peakDataList, distributionList,ionList,null);
+			spectrumGraphObj = new SpectrumGraph(Constants.SPECTRUMGRAPHID, peakDataList);
+			spectrumGraphObj.addRawSpectrumAnno(distributionList,ionList);
 			// console.log("envPeakList:", spectrumGraphObj.envPeakList);
 			spectrumGraphObj.redraw();
 			
@@ -297,6 +302,8 @@ class SeqOfExecution
 		 */
 		this.download();
 		let completeListofMasswithMatchedInd = [];
+		let nIonType = [];
+		let cIonType = [];
 		/**
 		 * Code to form the second table with all the prefix masses with matched 
 		 * masses for each ion fragment selected.
@@ -308,10 +315,12 @@ class SeqOfExecution
 			let matchedAndUnMatchedListObj = {};
 			let massShift = parseFloat(ion.mass);
 			let ionType = ion.ionType;
+
+			nIonType.push(ionType);
 			/**
 			 * Get calculated prefix mass 
 			 */
-			prefixMassList = proteoformObj.getPrefixMassList(massShift);
+			prefixMassList = proteoformObj.getNMasses(ionType);
 			prefixMassList.shift();
 			prefixMassList.pop();
 			/**
@@ -332,10 +341,12 @@ class SeqOfExecution
 			let matchedAndUnMatchedListObj = {};
 			let massShift = parseFloat(ion.mass);
 			let ionType = ion.ionType;
+
+			cIonType.push(ionType);
 			/**
 			 * Get calculated prefix mass 
 			 */
-			suffixMassList = proteoformObj.getSuffixMassList(massShift);
+			suffixMassList = proteoformObj.getCMasses(ionType);
 			suffixMassList.shift();
 			suffixMassList.pop();
 			// console.log("monoMassList:",monoMassList);
@@ -370,14 +381,15 @@ class SeqOfExecution
 			monoMassList[i]["mz"] = monoMassList[i].mass;
 		}
 
-		monoMassGraphObj = new SpectrumGraph("monoMassGraph",monoMassList, [], ions, proteoformObj);
+		monoMassGraphObj = new SpectrumGraph("monoMassGraph",monoMassList);
 		monoMassGraphObj.para.showIons = true;
 		monoMassGraphObj.para.showEnvelopes = false;
 		monoMassGraphObj.para.svgHeight += 80;
 		monoMassGraphObj.para.padding.head += 40;
 		monoMassGraphObj.para.padding.bottom += 40;
-		monoMassGraphObj.para.isMonoMassGraph = true;
 		// monoMassGraphObj.para.errorThreshold = 0.06;
+		monoMassGraphObj.addMonoMassSpectrumAnno(ions,proteoformObj, nIonType, cIonType);
+		monoMassGraphObj.para.setMonoMassGraph(true);
 
 		monoMassGraphObj.redraw();
 

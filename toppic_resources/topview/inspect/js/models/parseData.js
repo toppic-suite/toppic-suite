@@ -62,7 +62,8 @@ function parsePrecursorMass(dataName){
  * mass shift occured, mass- mass shift value.
  */
 function parseSequenceMassShift(seq){
-	let massShiftList = [];
+	let unknownMassShiftList = [];
+	let variableMassShiftList = [];
 	let parsedseq = "";
 	let splitStr = seq.split(/\[(.*?)\]/);
 	let splitArraylen = splitStr.length;
@@ -76,20 +77,19 @@ function parseSequenceMassShift(seq){
 	{
 		if(isNaN(splitStr[i]))
 		{
-			let isPTM = false;
-			//check if it is in unimodPTM
-			for (let j = 0; j < unimod_ptm.ptms.length; j++){
-				if ((unimod_ptm.ptms[j].name).toUpperCase() == splitStr[i]){
-					isPTM = true;
-					let tempPosition = position - 1;
-					let shiftobj = {position:tempPosition, label: unimod_ptm.ptms[j].name, mass:unimod_ptm.ptms[j].mono_mass, bg_color:null};
-					massShiftList.push(shiftobj);
-					break;
+			for (let j = 0; j < VAR_PTM_LIST.length; j++){
+				//because mass information is needed, which is not written in sequence
+				if (VAR_PTM_LIST[j].name.toUpperCase() == splitStr[i]){
+					let tempPosition = position -1;
+					//let shiftobj = {leftPos:tempPosition, rightPos:tempPosition + 1, label: VAR_PTM_LIST[j].name, anno:VAR_PTM_LIST[j].mono_mass, bg_color:null};
+					let shiftobj = {posList:[{pos:tempPosition, acid:splitStr[i-1]}], name: VAR_PTM_LIST[j].name, mono_mass:VAR_PTM_LIST[j].mono_mass, bg_color:null};
+					variableMassShiftList.push(shiftobj);
+					break;		
 				}
-			}
-			if (!isPTM){
-				parsedseq = parsedseq + splitStr[i] ;
-				position = position + splitStr[i].length ;	
+				else{
+					parsedseq = parsedseq + splitStr[i] ;
+					position = position + splitStr[i].length ;
+				}
 			}
 		}
 		else
@@ -100,18 +100,18 @@ function parseSequenceMassShift(seq){
 			 */
 			let tempPosition = position - 1;
 			//Initially set the bg_color to null
-			let shiftobj = {position:tempPosition, mass:mass, label:mass, bg_color:null};
+			let shiftobj = {leftPos:tempPosition, rightPos:tempPosition + 1, anno:mass, label:mass, bg_color:null};
 			/**
 			 * when the split occur at the end we get an extra "" in 
 			 * the list. This is to check if the mass is numeric.
 			 */
 			if(!isNaN(mass))
 			{
-				massShiftList.push(shiftobj);
+				unknownMassShiftList.push(shiftobj);
 			}
 		}
 	}
-	return [parsedseq,massShiftList] ;
+	return [parsedseq,unknownMassShiftList, variableMassShiftList] ;
 }
 
 // form residues from sequence
@@ -134,11 +134,13 @@ let formFixedPtms = (fixedMassShiftList, sequence) => {
 	// result.push(fixedPtmNameList[0]);
 	let tempArray = [];
 	fixedMassShiftList.forEach((element) => {
-		let tempObj = {
-			pos: element.position.toString(),
-			acid: sequence.charAt(element.position)
-		};
-		tempArray.push(tempObj);
+		for (let i = 0; i < element.posList.length; i++) {
+			let tempObj = {
+				pos: element.posList[i].pos.toString(),
+				acid: sequence.charAt(element.posList[i].pos)
+			};
+			tempArray.push(tempObj);
+		}
 	});
 	result[0].posList = tempArray;
 	return result;
@@ -151,11 +153,13 @@ let formVariablePtms = (variablePtmsList, sequence) => {
 	// result.push(fixedPtmNameList[0]);
 	let tempArray = [];
 	variablePtmsList.forEach((element) => {
-		let tempObj = {
-			pos: element.position.toString(),
-			acid: sequence.charAt(element.position)
-		};
-		tempArray.push(tempObj);
+		for (let i = 0; i < element.posList.length; i++) {
+			let tempObj = {
+				pos: element.posList[i].pos.toString(),
+				acid: sequence.charAt(element.posList[i].pos)
+			};
+			tempArray.push(tempObj);
+		}
 	});
 	result[0].posList = tempArray;
 	return result;
@@ -164,9 +168,9 @@ let formMassShifts = (unknownMassShiftList) => {
 	let result = [];
 	unknownMassShiftList.forEach((element)=> {
 		let tempObj = {
-			anno: element.label.toString(),
-			leftPos: (element.position).toString(),
-			rightPos: (element.position + 1).toString()
+			anno: element.anno.toString(),
+			leftPos: (element.leftPos).toString(),
+			rightPos: (element.rightPos).toString()
 		}
 		result.push(tempObj);
 	})
@@ -189,10 +193,10 @@ let getTotalSeqMass = (seq,massShiftList) => {
 	let shiftlen = massShiftList.length;
 	for(let j=0;j<shiftlen;j++)
 	{
-		mass = mass + massShiftList[j].mass;
+		mass = mass + parseFloat(massShiftList[j].mass);
 	}
 	mass = mass + getAminoAcidDistribution("H2O")[0].mass;
-
+	
 	return mass ;
 }
 

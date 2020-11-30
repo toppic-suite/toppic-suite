@@ -29,6 +29,7 @@ class Proteoform {
   }
 
   compResidueMasses() {
+    //debugger
     this.residueMasses = new Array(this.sequence.length);
     for (let i = 0; i < this.sequence.length; i++) {
       let isotopes = getAminoAcidIsotopes(this.sequence[i]);
@@ -38,11 +39,11 @@ class Proteoform {
   }
 
   compFixedPtmMasses(firstPos) {
+    //debugger
     this.fixedPtmMasses = new Array(this.sequence.length).fill(0);
     this.fixedPtms.forEach((element) => {
       for (let i = 0; i < element.posList.length; i++) {
         let pos = element.posList[i].pos; 
-        //console.log(pos);
         this.fixedPtmMasses[pos-firstPos] = parseFloat(element.mono_mass);
       }
     });
@@ -52,7 +53,6 @@ class Proteoform {
   compVariablePtmMasses(firstPos) {
     this.variablePtmMasses = new Array(this.sequence.length).fill(0);
     this.variablePtms.forEach((element) => {
-      //console.log(element);
       for (let i = 0; i < element.posList.length; i++) {
         let pos = element.posList[i].pos; 
         //console.log(pos);
@@ -66,7 +66,6 @@ class Proteoform {
     this.unexpectedPrefixMasses = new Array(this.sequence.length).fill(0);
     this.unexpectedSuffixMasses = new Array(this.sequence.length).fill(0);
     this.unexpectedMassShifts.forEach((element) => {
-      //console.log(element);
       this.unexpectedPrefixMasses[element.leftPos - firstPos] = parseFloat(element.anno);
       this.unexpectedSuffixMasses[element.rightPos - 1 - firstPos] = parseFloat(element.anno);
     });

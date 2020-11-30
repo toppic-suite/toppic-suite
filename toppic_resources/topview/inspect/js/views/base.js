@@ -40,6 +40,10 @@ const jqueryElements = {
 const COMMON_FIXED_PTM_LIST = [{name:"Carbamidomethylation",acid:"C",mass:57.021464},{name:"Carboxymethyl",acid:"C",mass:58.005479}];
 // const commonFixedPtmList = [{name:"Carbamidomethylation",acid:"C",mass:57.021464},{name:"Carboxymethyl",acid:"C",mass:58.005479}];
 
+let VAR_PTM_LIST = [];
+//it is not const because the variable PTM in the original prsm 
+//will be added to this list in index.js
+
 /**
  * Class contains all the id's and class names used in HTML
  */
