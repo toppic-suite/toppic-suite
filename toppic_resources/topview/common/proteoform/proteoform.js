@@ -66,7 +66,7 @@ class Proteoform {
     this.unexpectedPrefixMasses = new Array(this.sequence.length).fill(0);
     this.unexpectedSuffixMasses = new Array(this.sequence.length).fill(0);
     this.unexpectedMassShifts.forEach((element) => {
-      //console.log(element);
+      console.log(element);
       this.unexpectedPrefixMasses[element.leftPos - firstPos] = parseFloat(element.anno);
       this.unexpectedSuffixMasses[element.rightPos - 1 - firstPos] = parseFloat(element.anno);
     });

@@ -129,7 +129,7 @@ function getVariablePTMMassList()
 				{
                     let abbrevation = ptm.ptm.abbreviation ;
                     let position = parseInt(ptm.occurence.left_pos) - firstPos;
-                    let tempObj = {"name":abbrevation, "position":position};
+                    let tempObj = {"name":abbrevation, "position":position, "mono_mass":ptm.ptm.mono_mass};
                     variablePTMList.push(tempObj);
 				}
 			})
@@ -140,7 +140,7 @@ function getVariablePTMMassList()
             {
                 let abbrevation = ptm.ptm.abbreviation ;
                 let position = parseInt(ptm.occurence.left_pos) - firstPos;
-                let tempObj = {"name":abbrevation, "position":position};
+                let tempObj = {"name":abbrevation, "position":position, "mono_mass":ptm.ptm.mono_mass};
                 variablePTMList.push(tempObj);
             }
         }

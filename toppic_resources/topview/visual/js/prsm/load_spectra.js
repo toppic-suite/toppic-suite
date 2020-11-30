@@ -70,6 +70,7 @@ function loadMsTwo(specIdList, fileList, proteoform, divId, navId){
           specList[j].monoIons = monoIons;
           let nIonType = specList[j].n_ion_type;
           let cIonType = specList[j].c_ion_type;
+
           let monoSpGraph = new SpectrumGraph(monoSvgId,monoMasses); 
           monoSpGraph.addMonoMassSpectrumAnno(monoIons,proteoform, nIonType, cIonType);
           monoSpGraph.para.setMonoMassGraph(true);
