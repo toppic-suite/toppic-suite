@@ -66,6 +66,7 @@ class SeqOfExecution
 		 */
 		sequence = getSequenceFromUI();
 		[sequence, massShiftList, variableMassShiftList] = parseSequenceMassShift(sequence);
+
 		let selectedFixedMassShiftList = getFixedPtmCheckList();
 		// console.log("massShiftList:", massShiftList);
 		// console.log("selectedFixedMassShiftList:", selectedFixedMassShiftList);
@@ -217,6 +218,7 @@ class SeqOfExecution
 			//console.log("formedFixedPtmsList", formedFixedPtmsList)
 			//console.log("formedMassShifts", formedMassShifts)
 			//console.log("formedVariablePtmsList", formedVariablePtmsList)
+
 			prsmDataObj.setDataFromUserInput(residues, 0, residues.length - 1, breakPointsList, proteoformObj);
 			prsmDataObj.addColor();
 			let prsmGraphObj = new PrsmGraph(Constants.SEQSVGID,null,prsmDataObj);
@@ -302,8 +304,8 @@ class SeqOfExecution
 		 */
 		this.download();
 		let completeListofMasswithMatchedInd = [];
-		let nIonType = [];
-		let cIonType = [];
+		let nIonType;
+		let cIonType;
 		/**
 		 * Code to form the second table with all the prefix masses with matched 
 		 * masses for each ion fragment selected.
@@ -315,8 +317,8 @@ class SeqOfExecution
 			let matchedAndUnMatchedListObj = {};
 			let massShift = parseFloat(ion.mass);
 			let ionType = ion.ionType;
+			nIonType = ionType;
 
-			nIonType.push(ionType);
 			/**
 			 * Get calculated prefix mass 
 			 */
@@ -341,8 +343,7 @@ class SeqOfExecution
 			let matchedAndUnMatchedListObj = {};
 			let massShift = parseFloat(ion.mass);
 			let ionType = ion.ionType;
-
-			cIonType.push(ionType);
+			cIonType = ionType;
 			/**
 			 * Get calculated prefix mass 
 			 */
@@ -382,12 +383,8 @@ class SeqOfExecution
 		}
 
 		monoMassGraphObj = new SpectrumGraph("monoMassGraph",monoMassList);
-		monoMassGraphObj.para.showIons = true;
-		monoMassGraphObj.para.showEnvelopes = false;
-		monoMassGraphObj.para.svgHeight += 80;
-		monoMassGraphObj.para.padding.head += 40;
-		monoMassGraphObj.para.padding.bottom += 40;
 		// monoMassGraphObj.para.errorThreshold = 0.06;
+
 		monoMassGraphObj.addMonoMassSpectrumAnno(ions,proteoformObj, nIonType, cIonType);
 		monoMassGraphObj.para.setMonoMassGraph(true);
 

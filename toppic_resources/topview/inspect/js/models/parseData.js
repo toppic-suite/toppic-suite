@@ -77,20 +77,24 @@ function parseSequenceMassShift(seq){
 	{
 		if(isNaN(splitStr[i]))
 		{
-			for (let j = 0; j < VAR_PTM_LIST.length; j++){
-				//because mass information is needed, which is not written in sequence
-				if (VAR_PTM_LIST[j].name.toUpperCase() == splitStr[i]){
-					let tempPosition = position -1;
-					//let shiftobj = {leftPos:tempPosition, rightPos:tempPosition + 1, label: VAR_PTM_LIST[j].name, anno:VAR_PTM_LIST[j].mono_mass, bg_color:null};
-					let shiftobj = {posList:[{pos:tempPosition, acid:splitStr[i-1]}], name: VAR_PTM_LIST[j].name, mono_mass:VAR_PTM_LIST[j].mono_mass, bg_color:null};
-					variableMassShiftList.push(shiftobj);
-					break;		
-				}
-				else{
-					parsedseq = parsedseq + splitStr[i] ;
-					position = position + splitStr[i].length ;
+			isPTM = false;
+			if (VAR_PTM_LIST.length > 0){
+				for (let j = 0; j < VAR_PTM_LIST.length; j++){
+					//because mass information is needed, which is not written in sequence
+					if (VAR_PTM_LIST[j].name.toUpperCase() == splitStr[i]){
+						let tempPosition = position -1;
+						let shiftobj = {posList:[{pos:tempPosition, acid:splitStr[i-1]}], name: VAR_PTM_LIST[j].name, mono_mass:VAR_PTM_LIST[j].mono_mass, bg_color:null};
+						variableMassShiftList.push(shiftobj);
+						isPTM = true;
+						break;		
+					}
 				}
 			}
+			if (!isPTM) {
+				parsedseq = parsedseq + splitStr[i] ;
+				position = position + splitStr[i].length ;
+			}
+			
 		}
 		else
 		{
