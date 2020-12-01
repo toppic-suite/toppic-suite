@@ -198,6 +198,7 @@ class SeqOfExecution
 		/**
 		 * create a nav bar and a tab for ms2 graph and mono mass graph 
 		 */
+		clearMs2NavElement(Constants.GRAPHTABNAV);
 		createMs2NavElement(0, Constants.GRAPHTABDIV, Constants.GRAPHTABNAV, "");
 		addEventNavBar();
 
