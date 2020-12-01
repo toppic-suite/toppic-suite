@@ -24,7 +24,7 @@ class SaveSpectrum{
                 <tbody>
                   <tr>
                     <div >
-                      <td class="td_popup_variables">Show envelopes: &nbsp;&nbsp;&nbsp;
+                      <td class="td_popup_variables" id="popup-env-btns">Show envelopes: &nbsp;&nbsp;&nbsp;
                         <input type="radio" name="show_envelopes" 
                                             class = "show_envelopes"
                                             checked>Yes</input>
@@ -32,7 +32,7 @@ class SaveSpectrum{
                               name="show_envelopes" 
                               class = "show_envelopes">No</input>
                       </td>
-                      <td class="td_popup_variables">Show ions: &nbsp;&nbsp;&nbsp;
+                      <td class="td_popup_variables" id="popup-ion-btns">Show ions: &nbsp;&nbsp;&nbsp;
                         <input type="radio" name="show_ions" class = "show_ions" checked>Yes
                         <input type="radio" name="show_ions" class = "show_ions">No
                       </td>
@@ -80,12 +80,13 @@ class SaveSpectrum{
         currentSpectrum = this.spectrumGraphList[ms2Index];
         this.graphModalObj = new SpectrumGraph(svgId,currentSpectrum.peakList);
         this.graphModalObj.addRawSpectrumAnno(currentSpectrum.envList, currentSpectrum.ionList);
-  
+        $("#popup-env-btns").show();
       }else{
         currentSpectrum = this.massGraphList[ms2Index];
         this.graphModalObj = new SpectrumGraph(svgId,currentSpectrum.peakList);
 		    this.graphModalObj.addMonoMassSpectrumAnno(currentSpectrum.ionList, currentSpectrum.proteoform, currentSpectrum.nIon, currentSpectrum.cIon);
-		    this.graphModalObj.para.setMonoMassGraph(true);
+        this.graphModalObj.para.setMonoMassGraph(true);
+        $("#popup-env-btns").hide();
       }
   }
   initSpectrumModalEventHandler = () => {
