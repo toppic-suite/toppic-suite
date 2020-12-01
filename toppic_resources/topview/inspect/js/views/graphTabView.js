@@ -5,6 +5,9 @@
  * @param {String} navId - id of the nav bar
  * These functions need to be rewritten as a library later
  */
+ function clearMs2NavElement(navId){
+    $("#"+navId).empty();
+}
 function createMs2NavElement(i, divId, navId, specScan){
     let ul = document.getElementById(navId);
     let li = document.createElement("li");
