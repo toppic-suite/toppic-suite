@@ -227,7 +227,7 @@ function drawBreakPoints(svg, para, dispFirstPos, formFirstPos, breakPoints, isS
     bpGroup.append("polyline")
       .attr("points", coordinates)
       .style("fill", "none")
-      .style("stroke", "1e90ff")
+      .style("stroke", "#1e90ff")
       .style("stroke-width", "1");	
     //	Rectangle to have flexible on click and on mouse actions	
     let anno = bp.anno;
