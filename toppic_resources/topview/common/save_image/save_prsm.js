@@ -68,7 +68,26 @@ class SavePrsm{
           </div>
         </div>
       </div>
-    </div>`
+    </div>
+    <div class="modal" id="prsm_help_popup_window" role="dialog">
+    <div class="modal-dialog modal-sm" role="document">
+      <div class="modal-content help-window">
+        <div class="modal-header ">
+          <h5 class="modal-title ml-auto">Help</h5>
+          <button type="button" class="close" id = "prsm-help-window-close-btn" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body" >
+          <ul>
+            <li>Show skipping information: When the protein sequence is not a whole
+              sequence, the option will add additional lines with information about
+              the number of amino acids not included in the image.</li>
+            <!--<li>White b/g: it will add a white background to the image.</li> -->
+          </ul> 
+        </div> 
+      </div>
+    </div>
+  </div>
+  `
   
     //append to body
     $("body").append(prsmModal);
@@ -122,12 +141,18 @@ class SavePrsm{
       this.prsmModalGraphObj.redraw();
     });	
 
-    $("#prsm_popup_help_btn").click(() => {
+    $("#prsm_popup_help_btn").on("click",() => {
       $("#prsm_help_popup_window").draggable({
         appendTo: "body"
       });
+      //grey out other parts of screen
+      $(".modal-backdrop").css('z-index',3000);      
+      $("#prsm_help_popup_window").css('z-index',3001);     
     });
 
+    $("#prsm-help-window-close-btn").on("click",() => {
+      $(".modal-backdrop").css('z-index',1040);  
+    })
       //	Download the svg as ".svg" image
     d3.select('#prsm_popup_svg_btn').on("click",() => {
       let svgId = "prsm_popup_svg" ;
