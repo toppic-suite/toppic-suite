@@ -22,9 +22,10 @@
     window.localStorage.setItem('precursorMass', JSON.stringify(precursorMass));
     window.open("../inspect/spectrum.html");
 }*/
-function onclickTopView(){
+function onclickTopView(e){
     let title = document.getElementById("Protein-Spectrum-Match-Id-SpecId").innerHTML;
-    let specID = title.split("#").pop();
+    //let specID = title.split("#").pop();
+    let specID = e.currentTarget.getAttribute('specid');
     let folderName = "../../topfd";
     folderName = folderName.split("&")[0];
     let script= document.createElement('script');
@@ -243,7 +244,7 @@ function setDropDownItemsForInspectButton(scanIdList,specIdList){
  * Onclick function, invoked on click of the inspect scn button
  */
 function onClickToInspect(){
-    $(".dropdownscanlist .dropdown-item ").click(function(){
-        onclickTopView();
+    $(".dropdownscanlist .dropdown-item ").click(function(e){
+        onclickTopView(e);
     });  
 }
