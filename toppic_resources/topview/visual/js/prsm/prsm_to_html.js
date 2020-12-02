@@ -50,26 +50,51 @@ function createTableElements(){
 	let l_scans = prsm_data.prsm.ms.ms_header.scans.split(" ") ;
 	let l_specIds = prsm_data.prsm.ms.ms_header.ids.split(" ") ;
 	let l_matched_peak_count = 0;
+	let ion;
+
 	prsm_data.prsm.ms.peaks.peak.forEach(function(peak,i){
 		// Check if peak contain matched_ions_num attribute	
 		// for each peak, get the ion type and store it in ionArray 
     // to determine which ion type to be checked in Inspect
 		if (parseInt(peak.matched_ions_num)>0){
-			let ion = peak.matched_ions.matched_ion.ion_type;
-			if (ionArray.length < 1){
-				ionArray.push(ion);
-			}			
-			else if (ionArray.indexOf(ion) < 0) {
-				ionArray.push(ion);
+			if (Array.isArray(peak.matched_ions.matched_ion)){
+				peak.matched_ions.matched_ion.forEach((ion) => {
+					ion = ion.ion_type;
+					if (ionArray.length < 1){
+						ionArray.push(ion);
+					}			
+					else if (ionArray.indexOf(ion) < 0) {
+						ionArray.push(ion);
+					}
+				})
+			}else{
+				ion = peak.matched_ions.matched_ion.ion_type;
+				if (ionArray.length < 1){
+					ionArray.push(ion);
+				}			
+				else if (ionArray.indexOf(ion) < 0) {
+					ionArray.push(ion);
+				}
 			}
 		}
 		
 		if(peak.hasOwnProperty('matched_ions_num') && parseInt(peak.matched_ions_num)>1)
 		{
-			peak.matched_ions.matched_ion.forEach(function(matched_ion,i){
+			let origMatchedIons = [];
+			//because matched ion array gets overwritten in the code below
+			//which leads to missing ion information in mass graph
+			//so store the original value in this array and re-overwrite the ion information
+			//after writing to the table is finished
+			
+			for (let i = 0; i < peak.matched_ions.matched_ion.length; i++){
+				origMatchedIons.push(peak.matched_ions.matched_ion[i]);
+			}
+
+			peak.matched_ions.matched_ion.forEach((matched_ion,i) => {
 				peak.matched_ions.matched_ion = matched_ion ;
 				loop_matched_ions(peak,i) ;
 			})
+			peak.matched_ions.matched_ion = origMatchedIons;
 		}
 		else
 		{
@@ -79,6 +104,7 @@ function createTableElements(){
 
 	//after looping through the prsm files, store the ion type data to local storage
 	window.localStorage.setItem('ionType', ionArray);
+
 	/**
 	 * Inner function to create a rows and columns for monomass table
 	 * @param {object} peak - contains information of each peak 
@@ -193,7 +219,6 @@ function createTableElements(){
 	document.getElementById("not_matched_peak_count").innerHTML = "Not Matched peaks (" + l_not_matched_peak_count + ")" ;
 	
 	table.appendChild(tbdy);
-
 }
 /**
  * Get occurence of "Variable" and "Fixed", convert the data to HTML
