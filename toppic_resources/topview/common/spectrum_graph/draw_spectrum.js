@@ -503,7 +503,6 @@ function drawEnvelopes(svg,para,envPeakList) {
     }
   }
 }
-
 /**
  * @function drawIons
  * @description Function to add IONS at the top of the peaks for each cluster of envelopes
@@ -513,7 +512,12 @@ function drawEnvelopes(svg,para,envPeakList) {
  */
 function drawIons(svg,para,ions){
   let ionGroup = svg.append("g").attr("id", "graph_ions");
-  // console.log(ions);
+  
+  ions.sort(function(x,y){
+    return d3.ascending(x.mz, y.mz);
+  })
+  //console.log(ions);
+
   for (let i = 0; i < ions.length; i++) {
     let ion = ions[i];
     let x = ion.mz;
@@ -523,6 +527,13 @@ function drawIons(svg,para,ions){
       let color = "black";
       if (typeof ion.env !== "undefined") {
         color = ion.env.color;
+      }
+      if (i > 0){
+        //check if this ion is annotating the same peak as the previous ion
+        //if so, its yPos should be adjusted
+        if (ion.mz == ions[i-1].mz){
+          yPos = yPos + 15;
+        }
       }
       ionGroup.append("text")
         .attr("id","graph_matched_ions")
