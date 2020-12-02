@@ -216,6 +216,7 @@ function getIons(specId, deconvPeaks, envelopes){
       element.spec_id == specId) {
       let ionData;
       let monoIonData;
+      let ionText = "";
       let massError = 0;
       let peakId = element.peak_id;
       //console.log(peakId, envelopes.length, specId);
@@ -233,7 +234,7 @@ function getIons(specId, deconvPeaks, envelopes){
         if (ionType == "Z_DOT") {
           ionType = "Z\u02D9";
         }
-        let ionText = ionType + matchedIon.ion_display_position;
+        ionText = ionType + matchedIon.ion_display_position;
         massError = parseFloat(matchedIon.mass_error);
 
         ionData = {"mz": x, "intensity": y, "text": ionText, "error": massError};
@@ -253,7 +254,7 @@ function getIons(specId, deconvPeaks, envelopes){
           if (ionType == "Z_DOT") {
             ionType = "Z\u02D9";
           }
-          let ionText = ionType + matchedIon.ion_display_position;
+          ionText = ionType + matchedIon.ion_display_position;
           if (parseFloat(matchedIon.mass_error) > 0) {
             massError = parseFloat(matchedIon.mass_error);
           }
@@ -286,7 +287,6 @@ function addOneIon(ionList, ion) {
     ionList.push(ion);
   }
   else {
-    //console.log(ion, ion.intensity, ionList[idx].intensity)
     if (ion.intensity > ionList[idx].intensity) {
       ionList[idx].intensity = ion.intensity;
     }
