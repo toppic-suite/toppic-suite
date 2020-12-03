@@ -50,6 +50,7 @@ function createTableElements(){
 	let l_scans = prsm_data.prsm.ms.ms_header.scans.split(" ") ;
 	let l_specIds = prsm_data.prsm.ms.ms_header.ids.split(" ") ;
 	let l_matched_peak_count = 0;
+	let duplicatePeaks = [];//Id of peaks that were matched by more than 1 ion
 	let ion;
 
 	prsm_data.prsm.ms.peaks.peak.forEach(function(peak,i){
@@ -141,6 +142,13 @@ function createTableElements(){
 			l_matched_peak_count++;
 			//	create a name for each row
 			tr.setAttribute("name",peak.matched_ions.matched_ion.ion_position);
+
+			if (parseInt(peak.matched_ions_num) > 1){
+				let peakId = peak.peak_id;
+				if (duplicatePeaks.indexOf(peakId) < 0){
+					duplicatePeaks.push(peakId);
+				}
+			}
 		}
 		//	Set "id","class name" and "role" for each row
 		tr.setAttribute("id", id);
@@ -213,7 +221,10 @@ function createTableElements(){
 		tbdy.appendChild(tr);
 	}
 	let l_All_Peaks = prsm_data.prsm.ms.peaks.peak.length;
+	let l_duc_peak_count = duplicatePeaks.length;
+	l_matched_peak_count = l_matched_peak_count - l_duc_peak_count;
 	let l_not_matched_peak_count = l_All_Peaks - l_matched_peak_count; 
+	
 	document.getElementById("all_peak_count").innerHTML = "All peaks (" + l_All_Peaks + ")" ;
 	document.getElementById("matched_peak_count").innerHTML = "Matched peaks (" + l_matched_peak_count + ")" ;
 	document.getElementById("not_matched_peak_count").innerHTML = "Not Matched peaks (" + l_not_matched_peak_count + ")" ;
