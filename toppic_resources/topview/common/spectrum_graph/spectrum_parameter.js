@@ -259,9 +259,22 @@ class SpectrumParameters {
    */
   drag = function(distX) {
     let mzDist = distX / this.xScale;
-    this.winMinMz = this.winMinMz - mzDist; 
-    this.winMaxMz = this.winMaxMz - mzDist;
-    this.winCenterMz = this.winCenterMz - mzDist;
+    let minMz = -50;
+    //allow drag up to -50 m/z to give some padding 
+
+    if (this.winMinMz - mzDist < minMz){
+        let minMaxDiff = this.winMaxMz - this.winMinMz;
+        let centerDiff = this.winCenterMz - this.winMinMz;
+
+        this.winMinMz = minMz;
+        this.winMaxMz = this.winMinMz + minMaxDiff;
+        this.winCenterMz = this.winMinMz + centerDiff;
+    }
+    else{
+      this.winMinMz = this.winMinMz - mzDist; 
+      this.winMaxMz = this.winMaxMz - mzDist;
+      this.winCenterMz = this.winCenterMz - mzDist;
+    }
   }
 
   /**
