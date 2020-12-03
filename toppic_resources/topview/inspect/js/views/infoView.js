@@ -3,9 +3,23 @@
  */
 function setPrecursorMass(precursorMass)
 {
-    domElements.precursorMass.innerHTML = precursorMass;
+    domElements.precursorMass.value = precursorMass;
 }
-
+/**
+ * get Precursor mass 
+ */
+function getPrecursorMass()
+{
+    return domElements.precursorMass.value;
+}
+function setPrecursorMassEventHandler()
+{
+    jqueryElements.precursorMassSubmit.click(function(){
+        let precursorMass = domElements.precursorMass.value;
+        let totalMass = jqueryElements.totalMass.html();
+        setMassDifference(precursorMass,totalMass);
+    })
+}
 /**
  * Set Total mass on to the html
  * @param {*} totalMass 

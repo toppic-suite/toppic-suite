@@ -149,3 +149,8 @@
 .prsmgraphdownload button{
   margin: 1px !important;
 }
+/*precursor mass text box*/
+#precursormass{
+  width:80px;
+
+}

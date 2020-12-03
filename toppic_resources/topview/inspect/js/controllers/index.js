@@ -95,7 +95,10 @@ onLoadOfHTML = function()
             ppmErrorthVal = errorVal ;
         }
         let executionObj = new SeqOfExecution();
-        executionObj.sequenceOfExecution(errorType,errorVal,"", precursorMass);
+        //instead of passing precursor mass as argument, get the value inside the sequenceofexecution.js
+        //because precursor mass may become different from initial value from prsm
+        //after the user edited the precursor mass value
+        executionObj.sequenceOfExecution(errorType,errorVal,"");
         // domElements.totalSeqMass.style.display = "block";
         // domElements.massVariation.style.display = "block";
     })
