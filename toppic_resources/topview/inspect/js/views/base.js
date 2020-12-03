@@ -34,6 +34,7 @@ const jqueryElements = {
     matchedPeakCount : $("#matched_peak_count"),
     unmatchedPeakCount : $("#unmatched_peak_count"),
     peakCount: $("#peakCount"),
+    precursorMassSubmit : $("#precursormass-submit"),
 }
 
 
