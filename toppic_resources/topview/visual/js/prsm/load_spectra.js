@@ -272,7 +272,6 @@ function getIons(specId, deconvPeaks, envelopes){
       }
     }
   });
-  console.log(ions)
   return [ions, monoIons];
 }
 
