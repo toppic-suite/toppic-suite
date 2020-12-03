@@ -125,18 +125,21 @@ function addMassDataToTable(matchedPeaks, graphObj)
 /**
  * Function to display matched count and un-matched count
  */
-function showPeakCounts()
+function showPeakCounts(monoMassList, matchedIonList)
 {
-    let matched_elems = domElements.matchedPeaks;
-    let unmatche_elems = domElements.unmatchedPeaks;
-    let totalCount = matched_elems.length + unmatche_elems.length;
-    let matchedCount = matched_elems.length;
-    let unMatchedCount = unmatche_elems.length;
+    let totalCount = monoMassList.length;
+    let peakId = [];//array containing unique peak ids
+    for (let i = 0; i < matchedIonList.length; i++){
+        if (peakId.indexOf(matchedIonList[i].peakId) < 0){
+            peakId.push(matchedIonList[i].peakId);
+        }
+    }
+    let matchedCount = peakId.length;
+    let unMatchedCount = totalCount - matchedCount;
     jqueryElements.allPeakCount.html("All Peaks ("+totalCount+")");
     jqueryElements.matchedPeakCount.html("Matched Peaks ("+ matchedCount +")");
     jqueryElements.unmatchedPeakCount.html("Non Matched Peaks ("+unMatchedCount +")");
 }
-
 
 /**
  * Function to show only matched on unmatched peaks on click of matched or unmatched peak buttons

@@ -271,8 +271,7 @@ class SeqOfExecution
 			// console.log("envPeakList:", spectrumGraphObj.envPeakList);
 			spectrumGraphObj.redraw();
 			
-		}
-		/**
+		}/**
 		 * Do the below function when mono mass list entered is not empty
 		 */
 		if(monoMassListLen !== 0)
@@ -299,7 +298,7 @@ class SeqOfExecution
 			 * and setting properties to the table.
 			 */
 			this.setBootStarpTableProperties();
-			showPeakCounts();
+			showPeakCounts(monoMassList, matchedPeakList);
 		}
 		/**
 		 * Local function to set the actions on click of download button in HTML
@@ -366,18 +365,15 @@ class SeqOfExecution
 		})
 		// console.log("completeListofMasswithMatchedInd:", completeListofMasswithMatchedInd);
 		// console.log("monomasslist:", monoMassList);
-		/**
-		 * Disply the table of masses for all the fragmented ions
-		 */
+		
 		if(completeListofMasswithMatchedInd.length !== 0)
 		{
 			$("#"+Constants.H_FRAGMENTEDTABLE).show();
 		}
 		
 		$("#monoMasstitle").show();
-		let ions = getIonsMassGraph(matchedPeakList);
 
-		// console.log("prsm graph input", ions);
+		let ions = getIonsMassGraph(matchedPeakList);
 
 		//because SpectrumGraph class requires x-axis values to be "mz"
 		for (let i = 0; i < monoMassList.length; i++){
@@ -386,7 +382,6 @@ class SeqOfExecution
 
 		monoMassGraphObj = new SpectrumGraph("monoMassGraph",monoMassList);
 		// monoMassGraphObj.para.errorThreshold = 0.06;
-
 		monoMassGraphObj.addMonoMassSpectrumAnno(ions,proteoformObj, nIonType, cIonType);
 		monoMassGraphObj.para.setMonoMassGraph(true);
 
@@ -397,7 +392,10 @@ class SeqOfExecution
 		 */
 		let saveSpectrumObj = new SaveSpectrum([spectrumGraphObj], [monoMassGraphObj]);
 		saveSpectrumObj.main();
-
+		
+		/**
+		 * Disply the table of masses for all the fragmented ions
+		 */
 		createTableForSelectedFragmentIons(sequence,completeListofMasswithMatchedInd,monoMassGraphObj);
 		this.setBootStarpropertiesforFragmentIons();
 	}

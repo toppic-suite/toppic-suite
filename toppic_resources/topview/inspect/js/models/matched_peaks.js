@@ -177,8 +177,17 @@ class MatchedPeaks {
 			distributionList.mono_mass = matchedUnMatchedList[i].mass;
 			distributionList.charge = matchedUnMatchedList[i].charge;
 			distributionList.env_peaks = molecularFormObj.emass(distributionList.mono_mass,distributionList.charge,peakDataList);
-			totalDistribution.push(distributionList);
-      
+
+			//check if the envelope for the current peak has already been generated
+			//push to the totalDistribution only if this envelope is unique
+			if (totalDistribution.length < 1){
+				totalDistribution.push(distributionList);
+			}
+			else{
+				if (distributionList.mono_mass != totalDistribution[totalDistribution.length - 1].mono_mass){	
+					totalDistribution.push(distributionList);
+				}
+			}
 			/*if(matchedUnMatchedList[i].matchedInd == "Y")
 			{
 				if(this.CONST_A == matchedUnMatchedList[i].ion[0] || this.CONST_B == matchedUnMatchedList[i].ion[0] 
