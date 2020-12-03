@@ -203,15 +203,39 @@ let getTotalSeqMass = (seq,massShiftList) => {
 	
 	return mass ;
 }
+//modified version of addOneIon function from loadSpectra.js from visual/prsm. 
+let addOneIon = (ionList, ion) => {
+	//console.log("ion", ion)
+	let idx = -1;
+	for (let i = 0; i < ionList.length; i++) {
+		if (ion.ion == ionList[i].text) {
+			idx = i;
+			break;
+		}
+	}
+	if (idx == -1) {
+		let tempIonData = {"mz":ion.mass,"intensity":ion.intensity,"text": ion.ion, "error": ion.massError};
+		ionList.push(tempIonData);
+	}
+	else {
+		if (ion.intensity > ionList[idx].intensity) {
+			ionList[idx].intensity = ion.intensity;
+		}
+	}
+}
 
-let getIonsMassGraph = (monoMassList) => {
+let getIonsMassGraph = (matchedPeakList) => {
 	let ionData = [];
-	monoMassList.forEach((element) => {
+	/*monoMassList.forEach((element) => {
 		let tempIonData = {"mz":element.mass,"intensity":element.intensity,"text": element.ion, "error": element.massError};
         ionData.push(tempIonData);
-	});
+	});*/
+	matchedPeakList.forEach((element) => {
+		addOneIon(ionData, element);
+	})
 	return ionData;
 }
+
 let getIonsSpectrumGraph = (matchedPeakList, distributionList) => {
 	let ionData = [];
 	//generate ion list
