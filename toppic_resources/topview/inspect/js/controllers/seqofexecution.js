@@ -21,7 +21,7 @@ class SeqOfExecution
 	 * @param {char} removeAcid - This gives the acid up on which the fixed ptm 
 	 * mass has to be removed when "X" is clicked at fixed ptms.
 	 */
-	sequenceOfExecution(errorType,errorVal,removeAcid,precursorMass){
+	sequenceOfExecution(errorType,errorVal,removeAcid){
 		/**
 		 * unbind all the actions previously binded else each action will be 
 		 * binded multiple times.
@@ -37,6 +37,12 @@ class SeqOfExecution
 		let ppmErrorthVal = null;
 		let spectrumGraphObj;
 		let monoMassGraphObj;
+
+		/**
+		 * show submit button for precursor mass and add event handler
+		 */
+		jqueryElements.precursorMassSubmit.show();
+		setPrecursorMassEventHandler();
 		/**
 		 * Hide everything when page launched before data is computed
 		 */
@@ -239,6 +245,7 @@ class SeqOfExecution
 			//console.log("completeShiftList", completeShiftList)
 			setTotalSeqMass(totalMass);
 			//Set Mass Difference, precursorMass is a global variable form spectrum.html
+			let precursorMass = getPrecursorMass();
 			setMassDifference(precursorMass,totalMass);
 
 			/**
