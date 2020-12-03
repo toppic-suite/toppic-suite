@@ -76,8 +76,8 @@
 <script src="../common/save_image/save_spectrum.js"></script>
 <script src="../common/save_image/util.js"></script>
 
-<!-- Testing 
-<script src="./example/setLocalStorage.js"></script>-->
+<!-- Testing -->
+<script src="./example/setLocalStorage.js"></script>
 
 </head>
 <body>
@@ -262,8 +262,18 @@
 	</div> 
 	<br>
 	<div class="row">
-		<div class="col-3">
+		<!--<div class="col-3">
 			<h6 id="precursormass_h6" style="display:block"><text>Precursor mass:&nbsp;</text><text id="precursormass">0</text></h6>
+		</div>-->
+		<div class="col-4">
+			<div class="row">
+				<div class="col-8">
+					<h6 id="precursormass_h6" style="display:block"><text>Precursor mass:&nbsp;</text><input type="text" id="precursormass"></h6>
+				</div>
+				<div class="col-4">
+					<button id="precursormass-submit" type="button" class="btn btn-primary btn-sm" style="display:none" >Submit</button>
+				</div>
+			</div>
 		</div>
 		<div class="col-3">
 			<h6 id="totalseqmass_h6" style="display:none"><text>Protein molecular mass:&nbsp;</text><text id="totalmass">0</text></h6>
@@ -271,7 +281,7 @@
 		<div class="col-3">
 			<h6 id="massvariation_h6" style="display:none"><text>Mass Error:&nbsp;</text><text id="massvariation">0</text></h6>
 		</div>
-		<div class="col-3">
+		<div class="col-2">
 		</div>
 	</div>
 	<div class="row">
