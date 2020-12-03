@@ -375,9 +375,8 @@ class SeqOfExecution
 		}
 		
 		$("#monoMasstitle").show();
-		let ions = getIonsMassGraph(matchedPeakList);
 
-		// console.log("prsm graph input", ions);
+		let ions = getIonsMassGraph(matchedPeakList);
 
 		//because SpectrumGraph class requires x-axis values to be "mz"
 		for (let i = 0; i < monoMassList.length; i++){
@@ -386,7 +385,6 @@ class SeqOfExecution
 
 		monoMassGraphObj = new SpectrumGraph("monoMassGraph",monoMassList);
 		// monoMassGraphObj.para.errorThreshold = 0.06;
-
 		monoMassGraphObj.addMonoMassSpectrumAnno(ions,proteoformObj, nIonType, cIonType);
 		monoMassGraphObj.para.setMonoMassGraph(true);
 
