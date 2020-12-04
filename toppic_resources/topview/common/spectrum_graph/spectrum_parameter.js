@@ -306,9 +306,8 @@ class SpectrumParameters {
       let residueCount = 0;
 
       d3.selectAll("#graph_sequence").selectAll("text").each(function(d, i){
-        residueCount++;//get number of total residues drawn in current window
+        residueCount += this.innerHTML.length; //get number of total residues drawn in current window
       })
-
       if (residueCount < this.seqLength * 2){//because residueCount includes both prefix and suffix
         let mouseSpecX = mouseSvgX - this.padding.left;
         this.winCenterMz =  mouseSpecX/this.xScale + this.winMinMz;
