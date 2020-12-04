@@ -20,6 +20,10 @@ class SpectrumParameters {
   winMaxMz = 2000;
   winCenterMz = 1000;
 
+  //minimum possible m/z after zooming/dragging, to prevent dragging/zooming into negative m/z value
+  //if new m/z is less than this value, it is reset to this value
+  minPossibleMz = -50;
+
   // M/z range of peaks
   dataMinMz = 0;
   dataMaxMz = 2000;
@@ -79,6 +83,10 @@ class SpectrumParameters {
   errorThreshold = 0.2;
   errorYTickNum = 2;
   
+  //sequence length
+  //for determining max m/z window based on seq length in mass graph
+  seqLength = -1; 
+
   constructor() {
   }
 
@@ -259,14 +267,13 @@ class SpectrumParameters {
    */
   drag = function(distX) {
     let mzDist = distX / this.xScale;
-    let minMz = -50;
-    //allow drag up to -50 m/z to give some padding 
+    //allow drag up to -50 m/z (this.minPossibleMz) to give some padding 
 
-    if (this.winMinMz - mzDist < minMz){
+    if (this.winMinMz - mzDist < this.minPossibleMz){
         let minMaxDiff = this.winMaxMz - this.winMinMz;
         let centerDiff = this.winCenterMz - this.winMinMz;
 
-        this.winMinMz = minMz;
+        this.winMinMz = this.minPossibleMz;
         this.winMaxMz = this.winMinMz + minMaxDiff;
         this.winCenterMz = this.winMinMz + centerDiff;
     }
@@ -290,6 +297,29 @@ class SpectrumParameters {
       this.xScale = this.xScale * ratio ; 
       this.winMinMz = this.winCenterMz - mouseSpecX / this.xScale; 
       this.winMaxMz = this.winCenterMz + (this.specWidth - mouseSpecX) / this.xScale;
+    }
+    else if (this.seqLength > 0) {
+      //if mass graph, this.seqLength > 0 (if not, this.seqLength is -1)
+      //in mass graph, further zoom out may be necessary if sequence is long
+      //in mass graph, allow zooming out until the entire sequence is visible
+
+      let residueCount = 0;
+
+      d3.selectAll("#graph_sequence").selectAll("text").each(function(d, i){
+        residueCount++;//get number of total residues drawn in current window
+      })
+
+      if (residueCount < this.seqLength * 2){//because residueCount includes both prefix and suffix
+        let mouseSpecX = mouseSvgX - this.padding.left;
+        this.winCenterMz =  mouseSpecX/this.xScale + this.winMinMz;
+        /*self is a global variable of datasource object containing all the data needed to use when zoomed*/
+        this.xScale = this.xScale * ratio ; 
+        this.winMinMz = this.winCenterMz - mouseSpecX / this.xScale; 
+        this.winMaxMz = this.winCenterMz + (this.specWidth - mouseSpecX) / this.xScale;
+        if (this.winMinMz < this.minPossibleMz){//prevent zooming out into negative mass
+          this.winMinMz = this.minPossibleMz;
+        }
+      }
     }
   }
   /**

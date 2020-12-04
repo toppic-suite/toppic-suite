@@ -11,9 +11,10 @@ class SpectrumGraph {
   transformX = 0;
   transformScale = 1.0;
 
-  constructor(svgId, peakList) {
+  constructor(svgId, peakList, sequenceLength = -1) {
     this.id = svgId;
     this.para = new SpectrumParameters();
+    this.para.seqLength = sequenceLength;
     this.peakList = peakList;
     this.para.initParameters(peakList);
     this.peakList.sort(function(x,y){
@@ -80,7 +81,7 @@ class SpectrumGraph {
   }
 
   zoom = d3.zoom()
-    .on("zoom", this.zoomed);
+    .on("zoom", this.zoomed)
 
   getEnvPeakList = function(envList) {
     if (!envList || envList.length === 0 || typeof envList[0].env_peaks === "undefined") {return [];}
