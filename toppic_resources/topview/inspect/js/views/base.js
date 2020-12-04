@@ -50,7 +50,7 @@ let VAR_PTM_LIST = [];
  */
 class Constants{
     static SEQSVGID = "seqsvg";
-    static SVGDOWNLOADID = "svg_download"
+    static SVGDOWNLOADID = "save_prsm_btn"
     static SPECTRUMGRAPHID = "spectrum";
     static MONOMASSGRAPHID = "monoMassGraph";
     static PEAKCOUNTID = "peakCount";

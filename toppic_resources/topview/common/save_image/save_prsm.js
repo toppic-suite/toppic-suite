@@ -100,8 +100,8 @@ class SavePrsm{
     // Save PrSM popup window
     d3.select('#save_prsm_btn').on("click", () => {
       this.prsmModalGraphObj.redraw();
-      //	set the dimensions of popup svg to default values
-      let para = this.prsmModalGraphObj.para;
+      //	set the dimensions of popup svg to be same as prsm in the html page
+      let para = this.prsmGraphObj.para;
       document.getElementById("row-size").value = para.rowLength ;
       document.getElementById("letter-width").value = para.letterWidth ;
       document.getElementById("row-height").value = para.rowHeight ;
@@ -169,8 +169,8 @@ class SavePrsm{
     });
   }
   drawPrsmModalGraph = () => {
-		this.prsmModalGraphObj.para.rowLength = 40;
-		this.prsmModalGraphObj.para.letterWidth = 28;
+		this.prsmModalGraphObj.para.rowLength = this.prsmGraphObj.para.rowLength;
+    this.prsmModalGraphObj.para.letterWidth = this.prsmGraphObj.para.letterWidth;
 		this.prsmModalGraphObj.redraw();
   }
   main = () => {
