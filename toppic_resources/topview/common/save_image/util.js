@@ -53,8 +53,8 @@ function popupNameWindow(type,id,x,y){
 			d3.selectAll("#tooltip_imagename").remove() ;
 			let l_svgContainer = d3.select("#"+id);
 			let svgString = getSVGString(l_svgContainer.node());
-			let width = d3.select("#prsm_svg").attr("width");
-			let height = d3.select("#prsm_svg").attr("height");
+			let width = d3.select("#prsm_popup_svg").attr("width");
+			let height = d3.select("#prsm_popup_svg").attr("height");
 			svgString2Image( svgString, 2*width, 2*height, 'png', save ); 
 			function save( dataBlob, filesize ){
 				saveAs( dataBlob, imagename ); 
