@@ -55,6 +55,10 @@ function loadMsTwo(specIdList, fileList, proteoform, divId, navId){
           let envelopes = specList[j].envelopes;
           let deconvPeaks = prsm_data.prsm.ms.peaks.peak;
           let [ions, monoIons] = getIons(specId, deconvPeaks, envelopes);
+
+          let spectrumData = new SpectrumData();
+          spectrumData.assignLevel(peaks);
+
           specList[j].ions = ions;
           let spGraph = new SpectrumGraph(svgId,peaks);
           spGraph.addRawSpectrumAnno(envelopes,ions); 
