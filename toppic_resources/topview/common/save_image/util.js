@@ -43,7 +43,7 @@ function popupNameWindow(type,id,x,y){
 		// Check if the image needs to be downloaded as svg
 		if(type == "svg"){
 			d3.selectAll("#tooltip_imagename").remove() ;
-      console.log(id);
+      		//console.log(id);
 			let svgContainer = d3.select("#"+id);
 			let svgElement = svgContainer.node();
 			svg2svg(svgElement,imagename);
@@ -53,9 +53,8 @@ function popupNameWindow(type,id,x,y){
 			d3.selectAll("#tooltip_imagename").remove() ;
 			let l_svgContainer = d3.select("#"+id);
 			let svgString = getSVGString(l_svgContainer.node());
-			let specParams =  new SpectrumParameters();
-			let width = specParams.svgWidth;
-			let height = specParams.svgHeight ;
+			let width = d3.select("#prsm_svg").attr("width");
+			let height = d3.select("#prsm_svg").attr("height");
 			svgString2Image( svgString, 2*width, 2*height, 'png', save ); 
 			function save( dataBlob, filesize ){
 				saveAs( dataBlob, imagename ); 
