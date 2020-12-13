@@ -3,8 +3,10 @@ class Proteoform {
   residueMasses = [];
   fixedPtms=[];
   fixedPtmMasses = [];
+  protVarPtms = [];
   variablePtms = [];
-  variablePtmMasses = [];
+  variablePtmPrefixMasses = [];
+  variablePtmSuffixMasses = [];
   unexpectedMassShifts=[];
   unexpectedPrefixMasses = [];
   unexpectedSuffixMasses = [];
@@ -13,11 +15,16 @@ class Proteoform {
   suffixMasses = [];
   proteoformMass = 0.0;
 
-  constructor(sequence = "", firstPos, fixedPtms =[], variablePtms =[], unexpectedMassShifts=[]) {
+  constructor(sequence = "", firstPos, fixedPtms =[], protVarPtms = [], variablePtms =[], unexpectedMassShifts=[]) {
     this.sequence = sequence;
+    //console.log(this.sequence);
     this.fixedPtms = fixedPtms;
+    //console.log(this.fixedPtms);
+    this.protVarPtms = protVarPtms;
     this.variablePtms = variablePtms;
+    //console.log(this.variablePtms);
     this.unexpectedMassShifts = unexpectedMassShifts;
+    //console.log(this.unexpectedMassShifts);
     this.compResidueMasses();
     this.compFixedPtmMasses(firstPos);
     this.compVariablePtmMasses(firstPos);
@@ -41,25 +48,37 @@ class Proteoform {
     this.fixedPtmMasses = new Array(this.sequence.length).fill(0);
     this.fixedPtms.forEach((element) => {
       for (let i = 0; i < element.posList.length; i++) {
-        let pos = element.posList[i].pos; 
+        let pos = element.posList[i].leftPos; 
         //console.log(pos);
-        this.fixedPtmMasses[pos-firstPos] = parseFloat(element.mono_mass);
+        this.fixedPtmMasses[pos-firstPos] = parseFloat(element.monoMass);
       }
     });
     //console.log(this.fixedPtmMasses);
   }
 
   compVariablePtmMasses(firstPos) {
-    this.variablePtmMasses = new Array(this.sequence.length).fill(0);
+    this.variablePtmPrefixMasses = new Array(this.sequence.length).fill(0);
+    this.variablePtmSuffixMasses = new Array(this.sequence.length).fill(0);
+    this.protVarPtms.forEach((element) => {
+      //console.log(element);
+      for (let i = 0; i < element.posList.length; i++) {
+        let pos = element.posList[i].leftPos; 
+        //console.log(pos);
+        this.variablePtmPrefixMasses[pos-firstPos] += parseFloat(element.monoMass);
+      }
+    });
     this.variablePtms.forEach((element) => {
       //console.log(element);
       for (let i = 0; i < element.posList.length; i++) {
-        let pos = element.posList[i].pos; 
+        let leftPos = element.posList[i].leftPos; 
+        let rightPos = element.posList[i].rightPos; 
         //console.log(pos);
-        this.variablePtmMasses[pos-firstPos] = parseFloat(element.mono_mass);
+        this.variablePtmPrefixMasses[leftPos-firstPos] += parseFloat(element.monoMass);
+        this.variablePtmSuffixMasses[rightPos-firstPos] += parseFloat(element.monoMass);
       }
     });
-    //console.log(this.variablePtmMasses);
+    //console.log(this.variablePtmPrefixMasses);
+    //console.log(this.variablePtmSuffixMasses);
   }
 
   compUnexpectedMasses(firstPos) {
@@ -67,8 +86,8 @@ class Proteoform {
     this.unexpectedSuffixMasses = new Array(this.sequence.length).fill(0);
     this.unexpectedMassShifts.forEach((element) => {
       //console.log(element);
-      this.unexpectedPrefixMasses[element.leftPos - firstPos] = parseFloat(element.anno);
-      this.unexpectedSuffixMasses[element.rightPos - 1 - firstPos] = parseFloat(element.anno);
+      this.unexpectedPrefixMasses[element.leftPos - firstPos] += parseFloat(element.anno);
+      this.unexpectedSuffixMasses[element.rightPos - 1 - firstPos] += parseFloat(element.anno);
     });
     //console.log(this.unexpectedMasses);
   }
@@ -77,7 +96,7 @@ class Proteoform {
     this.prefixModResidueMasses = new Array(this.sequence.length).fill(0);
     for (let i = 0; i < this.sequence.length; i++) {
       let mass = this.residueMasses[i] + this.fixedPtmMasses[i]  
-        + this.variablePtmMasses[i] + this.unexpectedPrefixMasses[i];
+        + this.variablePtmPrefixMasses[i] + this.unexpectedPrefixMasses[i];
       this.prefixModResidueMasses[i] = mass;
     }
   }
@@ -87,7 +106,7 @@ class Proteoform {
       let mass = 0;
       for (let i = 0; i < this.sequence.length - 1; i++) {
         mass = mass + this.residueMasses[i] + this.fixedPtmMasses[i]  
-        + this.variablePtmMasses[i] + this.unexpectedPrefixMasses[i];
+        + this.variablePtmPrefixMasses[i] + this.unexpectedPrefixMasses[i];
         this.prefixMasses.push(mass);
       }
     } 
@@ -98,7 +117,7 @@ class Proteoform {
       let mass = 0;
       for (let i = this.sequence.length - 1; i > 0; i--) {
         mass = mass + this.residueMasses[i] + this.fixedPtmMasses[i]  
-        + this.variablePtmMasses[i] + this.unexpectedSuffixMasses[i];
+        + this.variablePtmSuffixMasses[i] + this.unexpectedSuffixMasses[i];
         this.suffixMasses.push(mass);
       }
     }
@@ -124,6 +143,7 @@ class Proteoform {
       massList.push(this.prefixMasses[i] + ionMassShift);
     }
     massList.push(this.proteoformMass);
+    //console.log("massList", massList);
     return massList;
   }
 
