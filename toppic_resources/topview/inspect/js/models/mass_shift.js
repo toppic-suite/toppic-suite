@@ -13,13 +13,15 @@ class MassShifts {
 	 * @param {Array} fixedPtmShiftList
 	 * @param {Array} variablePtmShiftList
 	 */
-	generateMassShiftList(unexpectedMassShiftList, variablePtmShiftList, fixedPtmShiftList) {
+	generateMassShiftList(unexpectedMassShiftList, protVarPtmsList, variablePtmsList, fixedPtmShiftList) {
 		this.massShiftList = [];
-
-		const ifMatch = (position, fixedPtmShiftList) => {
-			for (let i = 0; i < fixedPtmShiftList.length; i++) {
-				if(position === fixedPtmShiftList[i].position) {
-					return true;
+		//console.log(unexpectedMassShiftList, protVarPtmsList, variablePtmsList, fixedPtmShiftList)
+		const ifMatch = (position, ptmShiftList) => {
+			for (let i = 0; i < ptmShiftList.length; i++) {
+				for (let j = 0; j < ptmShiftList[i].posList.length; j++){
+					if(position === ptmShiftList[i].posList[j].leftPos) {
+						return true;
+					}	
 				}
 			}
 			return false;
@@ -27,21 +29,20 @@ class MassShifts {
 		//reformat fixed and variable ptm shift list and add to massShiftList
 		const addToMassShiftList = (ptmList) => {
 			for (let i = 0; i < ptmList.length; i++) {
-				for (let j = 0; j < ptmList[i].posList.length; j++){
-					let position = ptmList[i].posList[j];
-					let tempObj = {position: position.pos, mass:ptmList[i].mono_mass, bg_color: ptmList[i].bg_color};
-					this.massShiftList.push(tempObj);
-				}
+				let tempObj = {position: ptmList[i].posList, mass:ptmList[i].mono_mass, bg_color: ptmList[i].bg_color};
+				this.massShiftList.push(tempObj);
 			}
 		}
 		addToMassShiftList(fixedPtmShiftList);
-		addToMassShiftList(variablePtmShiftList);
+		addToMassShiftList(protVarPtmsList);
+		addToMassShiftList(variablePtmsList);
 
 		for (let i = 0; i < unexpectedMassShiftList.length; i++) {
 			// add unexpected mass shift if its position does not match any fixed PTM shift or variable PTM shift
 			if(!ifMatch(unexpectedMassShiftList[i].position, fixedPtmShiftList) && 
-			   !ifMatch(unexpectedMassShiftList[i].position, variablePtmShiftList)) {
-				let tempObj = {position: unexpectedMassShiftList[i].position, mass:unexpectedMassShiftList[i].mass, bg_color: unexpectedMassShiftList[i].bg_color};
+			   !ifMatch(unexpectedMassShiftList[i].position, protVarPtmsList) && 
+			   !ifMatch(unexpectedMassShiftList[i].position, variablePtmsList)) {
+				let tempObj = {position: unexpectedMassShiftList[i].leftPos, mass:unexpectedMassShiftList[i].anno, bg_color: unexpectedMassShiftList[i].bg_color};
 				this.massShiftList.push(tempObj);
 			}
 		}
@@ -66,7 +67,7 @@ class MassShifts {
 			{
 				if(this.sequence[i] === fixedPtmAcid)
 				{
-					tempObj.posList.push({pos:i, acid:fixedPtmAcid});
+					tempObj.posList.push({leftPos:i, rightPos: i + 1, acid:fixedPtmAcid});
 				}
 			}
 			result.push(tempObj);

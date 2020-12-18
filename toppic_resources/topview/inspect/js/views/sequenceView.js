@@ -1,26 +1,37 @@
 /**
  * Set Sequence on to html
  */
-function setDataToSequence(sequence, massShiftList, l_variablePtmList){
+function setDataToSequence(sequence, massShiftList, protVarPtmsList, variablePtmsList){
     let massShiftObj = new MassShifts(sequence, massShiftList);
     let modifiedSequence = massShiftObj.formSequence();
-    if(l_variablePtmList){
-        modifiedSequence = addVariablePtm(modifiedSequence, l_variablePtmList);
+    if(protVarPtmsList || variablePtmsList){
+        modifiedSequence = addVariablePtm(modifiedSequence, protVarPtmsList, variablePtmsList);
     }
     jqueryElements.sequenceData.val(modifiedSequence);
 }
-function addToSequence(sequence, l_variablePtm){
+function addToSequence(sequence, protVarPtms, variablePtms){
     let tempSeq;
     let isResidue = true;
     let residuePos = 0;
 
     for (let i = 0; i < sequence.length; i++){
-        if (residuePos == l_variablePtm.position){
-            let tempString = "["+l_variablePtm.name+"]";
-            let leftString = sequence.slice(0, i + 1);
-            let rightString = sequence.slice(i + 1);
-            tempSeq = leftString + tempString + rightString;
-            return tempSeq;
+        for (let j = 0; j < protVarPtms.posList.length; j++){
+            if (residuePos == protVarPtms.posList[j].leftPos){
+                let tempString = "["+protVarPtms.name+"]";
+                let leftString = sequence.slice(0, i + 1);
+                let rightString = sequence.slice(i + 1);
+                tempSeq = leftString + tempString + rightString;
+                return tempSeq;
+            }
+        }
+        for (let j = 0; j < variablePtms.posList.length; j++){
+            if (residuePos == variablePtms.posList[j].leftPos){
+                let tempString = "["+variablePtms.name+"]";
+                let leftString = sequence.slice(0, i + 1);
+                let rightString = sequence.slice(i + 1);
+                tempSeq = leftString + tempString + rightString;
+                return tempSeq;
+            }
         }
         if (sequence[i] == "["){
             isResidue = false;
@@ -35,11 +46,13 @@ function addToSequence(sequence, l_variablePtm){
     }
     return sequence;
 }
-function addVariablePtm(sequence, l_variablePtmList){
+function addVariablePtm(sequence, protVarPtmsList, variablePtmsList){
     let newSeq = sequence;
-
-    for (let i = 0; i < l_variablePtmList.length; i++){
-        newSeq = addToSequence(newSeq, l_variablePtmList[i]);
+    for (let i = 0; i < protVarPtmsList.length; i++){
+        newSeq = addToSequence(newSeq, protVarPtmsList[i]);
+    }
+    for (let i = 0; i < variablePtmsList.length; i++){
+        newSeq = addToSequence(newSeq, variablePtmsList[i]);
     }
     return newSeq;
 }
