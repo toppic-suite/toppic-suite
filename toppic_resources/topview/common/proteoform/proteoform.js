@@ -66,6 +66,7 @@ class Proteoform {
         let pos = element.posList[i].leftPos; 
         //console.log(pos);
         this.variablePtmPrefixMasses[pos-firstPos] += parseFloat(element.mono_mass);
+        this.variablePtmSuffixMasses[pos-firstPos] += parseFloat(element.mono_mass);
       }
     });
     this.variablePtms.forEach((element) => {
