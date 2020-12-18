@@ -34,9 +34,9 @@ onLoadOfHTML = function()
     if(l_fixedPtmList) {
         setFixedMasses(l_fixedPtmList);
     }
-    if(protVarPtmsList || variablePtmsList) {
+    /*if(protVarPtmsList || variablePtmsList) {//not distinguishing variable PTM from unknown mass shifts
         setVariablePTMList(protVarPtmsList, variablePtmsList);
-    }
+    }*/
     if(precursorMass) {
 		setPrecursorMass(precursorMass);
     }

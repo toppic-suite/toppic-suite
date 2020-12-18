@@ -72,6 +72,7 @@ class SeqOfExecution
 		 * Returns mass list embedded in [] in sequence of user entered sequence.
 		 */
 		sequence = getSequenceFromUI();
+	
 		[sequence, massShiftList, protVarPtmsList, variablePtmsList] = parseSequenceMassShift(sequence);
 
 		let selectedFixedMassShiftList = getFixedPtmCheckList();
@@ -231,7 +232,7 @@ class SeqOfExecution
 			//console.log("formedMassShifts", formedMassShifts)
 			//console.log("formedVariablePtmsList", formedVariablePtmsList)
 			
-			console.log("proteoform", proteoformObj)
+			//console.log("proteoform", proteoformObj)
 
 			let prsmDataObj = new PrsmData();
 			prsmDataObj.setDataFromUserInput(residues, 0, residues.length - 1, breakPointsList, proteoformObj);

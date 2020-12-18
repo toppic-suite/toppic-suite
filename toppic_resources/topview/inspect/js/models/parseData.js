@@ -75,7 +75,7 @@ function parseSequenceMassShift(seq){
 		if(isNaN(splitStr[i]))
 		{
 			isPTM = false;
-			if (VAR_PTM_LIST.length > 0){
+			/*if (VAR_PTM_LIST.length > 0){
 				//console.log("var_ptm_list", VAR_PTM_LIST)
 				for (let j = 0; j < VAR_PTM_LIST.length; j++){
 					//because mass information is needed, which is not written in sequence
@@ -94,12 +94,11 @@ function parseSequenceMassShift(seq){
 						break;		
 					}
 				}
-			}
+			}*/
 			if (!isPTM) {
 				parsedseq = parsedseq + splitStr[i] ;
 				position = position + splitStr[i].length ;
 			}
-			
 		}
 		else
 		{
