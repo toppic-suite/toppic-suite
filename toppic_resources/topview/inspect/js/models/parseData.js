@@ -63,38 +63,42 @@ function parsePrecursorMass(dataName){
  */
 function parseSequenceMassShift(seq){
 	let unknownMassShiftList = [];
-	let variableMassShiftList = [];
+	let variablePtmsList = [];
+	let protVarPtmsList = [];
 	let parsedseq = "";
 	let splitStr = seq.split(/\[(.*?)\]/);
 	let splitArraylen = splitStr.length;
 	let position = 0;
-	
-	/*this function checks for all modification marked by [], including unimod ptm.
-	so if the value inside [] is NaN, 
-	need to check if it is a protein variable mod included in unimod ptm list */
 
 	for(let i = 0 ; i<splitArraylen;i++)
 	{
 		if(isNaN(splitStr[i]))
 		{
 			isPTM = false;
-			if (VAR_PTM_LIST.length > 0){
+			/*if (VAR_PTM_LIST.length > 0){
+				//console.log("var_ptm_list", VAR_PTM_LIST)
 				for (let j = 0; j < VAR_PTM_LIST.length; j++){
 					//because mass information is needed, which is not written in sequence
 					if (VAR_PTM_LIST[j].name.toUpperCase() == splitStr[i]){
-						let tempPosition = position -1;
-						let shiftobj = {posList:[{pos:tempPosition, acid:splitStr[i-1]}], name: VAR_PTM_LIST[j].name, mono_mass:VAR_PTM_LIST[j].mono_mass, bg_color:null};
-						variableMassShiftList.push(shiftobj);
+						//let tempPosition = position -1;
+						let shiftobj = {posList:VAR_PTM_LIST[j].posList, name: VAR_PTM_LIST[j].name, mono_mass:VAR_PTM_LIST[j].mono_mass, bg_color:null};
 						isPTM = true;
+						if (VAR_PTM_LIST[j].type == "Protein variable")
+						{
+							protVarPtmsList.push(shiftobj);
+						}
+						else
+						{
+							variablePtmsList.push(shiftobj);
+						}
 						break;		
 					}
 				}
-			}
+			}*/
 			if (!isPTM) {
 				parsedseq = parsedseq + splitStr[i] ;
 				position = position + splitStr[i].length ;
 			}
-			
 		}
 		else
 		{
@@ -115,7 +119,7 @@ function parseSequenceMassShift(seq){
 			}
 		}
 	}
-	return [parsedseq,unknownMassShiftList, variableMassShiftList] ;
+	return [parsedseq,unknownMassShiftList, protVarPtmsList, variablePtmsList] ;
 }
 
 // form residues from sequence

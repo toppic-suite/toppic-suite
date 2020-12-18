@@ -28,7 +28,8 @@ class SeqOfExecution
 		 */
 		let massShiftList = [];//contains unknown mass shifts
 		let fixedMassShiftList = [];//contains fixedPTM
-		let variableMassShiftList = [];//contains variablePTM
+		let protVarPtmsList = [];//contains protein variable PTM
+		let variablePtmsList = [];//contains non-protein variable PTM
 		let completeShiftList = [];//contains all 3 kinds of mass shifts
 		let peakDataList = [];
 		let modifiablePeakData = [];//will change value if shared peak
@@ -71,7 +72,8 @@ class SeqOfExecution
 		 * Returns mass list embedded in [] in sequence of user entered sequence.
 		 */
 		sequence = getSequenceFromUI();
-		[sequence, massShiftList, variableMassShiftList] = parseSequenceMassShift(sequence);
+	
+		[sequence, massShiftList, protVarPtmsList, variablePtmsList] = parseSequenceMassShift(sequence);
 
 		let selectedFixedMassShiftList = getFixedPtmCheckList();
 		// console.log("massShiftList:", massShiftList);
@@ -83,7 +85,7 @@ class SeqOfExecution
 
 		fixedMassShiftList = massShiftObj.getFixedMassShiftList(selectedFixedMassShiftList);
 		// console.log("fixedMassShiftList:", fixedMassShiftList);
-		massShiftObj.generateMassShiftList(massShiftList, variableMassShiftList, fixedMassShiftList);
+		massShiftObj.generateMassShiftList(massShiftList, protVarPtmsList, variablePtmsList, fixedMassShiftList);
 		/**
 		 * If user removed fixed ptm mass, remove the mass from the list
 		 */
@@ -102,7 +104,7 @@ class SeqOfExecution
 			massShiftObj.appendtoMassShiftList(tempPosition,tempMass);
 		}
 		completeShiftList = massShiftObj.massShiftList;
-		// console.log("completeShiftList:", completeShiftList);
+		//console.log("completeShiftList:", completeShiftList);
 		/**
 		 * Form sequence with mass shift embedded in []
 		 */
@@ -127,7 +129,11 @@ class SeqOfExecution
 		if(errorType === Constants.MASSERROR) massErrorthVal = errorVal ;
 		else ppmErrorthVal = errorVal ;
 		
-		let proteoformObj = new Proteoform(sequence, 0, fixedMassShiftList, variableMassShiftList, massShiftList);
+		//console.log("fixedMassShiftList", fixedMassShiftList)
+		//console.log("protVarPtmsList", protVarPtmsList);
+		//console.log("massShiftList", massShiftList)
+
+		let proteoformObj = new Proteoform(sequence, 0, fixedMassShiftList, protVarPtmsList, variablePtmsList, massShiftList);
 		// console.log("residueMasses:",proteoformObj.unexpectedMasses);
 		// console.log("getPrefix:",proteoformObj.suffixMasses);
 		// let calculatePrefixAndSuffixMassObj = new calculatePrefixAndSuffixMass();
@@ -219,14 +225,16 @@ class SeqOfExecution
 			 */
 			let residues = formResidues(sequence);
 			// form fixedPtms
-			let formedFixedPtmsList = formFixedPtms(fixedMassShiftList, sequence);
-			let formedMassShifts = formMassShifts(massShiftList);
-			let formedVariablePtmsList = formVariablePtms(variableMassShiftList, sequence);
-			let prsmDataObj = new PrsmData();
+			//let formedFixedPtmsList = formFixedPtms(fixedMassShiftList, sequence);
+			//let formedMassShifts = formMassShifts(massShiftList);
+			//let formedVariablePtmsList = formVariablePtms(variableMassShiftList, sequence);
 			//console.log("formedFixedPtmsList", formedFixedPtmsList)
 			//console.log("formedMassShifts", formedMassShifts)
 			//console.log("formedVariablePtmsList", formedVariablePtmsList)
+			
+			//console.log("proteoform", proteoformObj)
 
+			let prsmDataObj = new PrsmData();
 			prsmDataObj.setDataFromUserInput(residues, 0, residues.length - 1, breakPointsList, proteoformObj);
 			prsmDataObj.addColor();
 			let prsmGraphObj = new PrsmGraph(Constants.SEQSVGID,null,prsmDataObj);
