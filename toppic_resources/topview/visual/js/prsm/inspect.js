@@ -34,6 +34,8 @@ function onclickTopView(e){
 
     let massAndIntensityList = [];
     let ionArray = [];
+    let protVarPtms = [];
+    let variablePtms = [];
 
 	script.src = fileName;
 	body.append(script);
@@ -42,7 +44,7 @@ function onclickTopView(e){
         [massAndIntensityList, ionArray] = getMassAndIntensityData(specID);
         let sequence = getSequence();
         let fixedPtmList = getFixedPTMMassList();
-        let variablePtmList = getVariablePTMMassList();
+        [protVarPtms, variablePtms] = getVariablePTMMassList();
         let unknownMassShiftList = getUnknownMassList();
         let precursorMass = prsm_data.prsm.ms.ms_header.precursor_mono_mass;
         // Stores all the data in the variables respectively
@@ -51,7 +53,8 @@ function onclickTopView(e){
         window.localStorage.setItem('ionType', ionArray);
         window.localStorage.setItem('sequence',  JSON.stringify(sequence));
         window.localStorage.setItem('fixedPtmList', JSON.stringify(fixedPtmList));
-        window.localStorage.setItem('variablePtmList', JSON.stringify(variablePtmList));
+        window.localStorage.setItem('protVarPtmsList', JSON.stringify(protVarPtms));
+        window.localStorage.setItem('variablePtmsList', JSON.stringify(variablePtms));
         window.localStorage.setItem('unknownMassShiftList', JSON.stringify(unknownMassShiftList));
         window.localStorage.setItem('precursorMass', JSON.stringify(precursorMass));
         window.open("../inspect/spectrum.html"); 
@@ -116,7 +119,8 @@ function getSequence(){
  */
 function getVariablePTMMassList()
 {
-    let variablePTMList = [];
+    let protVarPtmsList = [];
+    let variablePtmsList = [];
     let l_prsm = prsm_data;
     let firstPos = parseInt(l_prsm.prsm.annotated_protein.annotation.first_residue_position);
 
@@ -125,28 +129,40 @@ function getVariablePTMMassList()
         let ptm = l_prsm.prsm.annotated_protein.annotation.ptm ;
 		if(Array.isArray(ptm))
 		{
-			ptm.forEach(function(ptm, index){
+			ptm.forEach(function(ptm){
+                let abbrevation = ptm.ptm.abbreviation ;
+                let position = parseInt(ptm.occurence.left_pos) - firstPos;
+                let tempObj = {"name":abbrevation, "posList":[], "mono_mass":ptm.ptm.mono_mass};
+                tempObj.posList.push({"leftPos":position, "rightPos":position+1, "acid":ptm.occurence.anno});
+    
 				if(ptm.ptm_type == "Protein variable")
 				{
-                    let abbrevation = ptm.ptm.abbreviation ;
-                    let position = parseInt(ptm.occurence.left_pos) - firstPos;
-                    let tempObj = {"name":abbrevation, "position":position, "mono_mass":ptm.ptm.mono_mass};
-                    variablePTMList.push(tempObj);
-				}
+                    protVarPtmsList.push(tempObj);
+                }
+                else if(!ptm.ptm_type == "Fixed")
+                {
+                    variablePtmsList.push(tempObj);
+                }
 			})
         }
         else
         {
+            let abbrevation = ptm.ptm.abbreviation ;
+            let position = parseInt(ptm.occurence.left_pos) - firstPos;
+            let tempObj = {"name":abbrevation, "posList":[], "mono_mass":ptm.ptm.mono_mass};
+            tempObj.posList.push({"leftPos":position, "rightPos":position+1, "acid":ptm.occurence.anno});
+
             if(ptm.ptm_type == "Protein variable")
             {
-                let abbrevation = ptm.ptm.abbreviation ;
-                let position = parseInt(ptm.occurence.left_pos) - firstPos;
-                let tempObj = {"name":abbrevation, "position":position, "mono_mass":ptm.ptm.mono_mass};
-                variablePTMList.push(tempObj);
+                protVarPtmsList.push(tempObj);
+            }
+            else if(!ptm.ptm_type == "Fixed")
+            {   
+                variablePtmsList.push(tempObj);
             }
         }
     }
-    return variablePTMList;
+    return [protVarPtmsList, variablePtmsList];
 }
 /**
  * Gets all the masslist shifts of the Fixed ptms for prsm

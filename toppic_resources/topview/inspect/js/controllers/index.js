@@ -20,7 +20,8 @@ onLoadOfHTML = function()
 	let massAndIntensityList = parsePeakMass('massAndIntensityList');
 	let sequence = parseSeq('sequence');
 	let l_fixedPtmList = parsePTM('fixedPtmList');
-    let l_variablePtmList = parsePTM('variablePtmList');
+    let protVarPtmsList = parsePTM('protVarPtmsList');
+    let variablePtmsList = parsePTM('variablePtmsList');
     let unknownMassShiftList = parseUnknowmassList('unknownMassShiftList');
     let precursorMass = parsePrecursorMass("precursorMass");
     if(peakAndIntensityList !== null && massAndIntensityList !== null){
@@ -28,13 +29,13 @@ onLoadOfHTML = function()
 		setDataToMassAndIntensity(massAndIntensityList);
     }
     if(sequence) {
-        setDataToSequence(sequence, unknownMassShiftList, l_variablePtmList);
+        setDataToSequence(sequence, unknownMassShiftList, protVarPtmsList, variablePtmsList);
     }
     if(l_fixedPtmList) {
         setFixedMasses(l_fixedPtmList);
     }
-    if(l_variablePtmList) {
-        setVariablePTMList(l_variablePtmList);
+    if(protVarPtmsList || variablePtmsList) {
+        setVariablePTMList(protVarPtmsList, variablePtmsList);
     }
     if(precursorMass) {
 		setPrecursorMass(precursorMass);
@@ -176,10 +177,18 @@ showNonMatchedPeaks = function()
  * @description Function to display only un matched peaks in table. This handles on click action
  * from html of show un matched peaks button.
  */
-setVariablePTMList = function(l_variablePtmList)
+setVariablePTMList = function(protVarPtmsList, variablePtmsList)
 {
-    for (let i = 0; i < l_variablePtmList.length; i++){
-        let temp = {"name":l_variablePtmList[i].name, "position":l_variablePtmList[i].position, "mono_mass":l_variablePtmList[i].mono_mass};
-        VAR_PTM_LIST.push(temp);
+    for (let i = 0; i < protVarPtmsList.length; i++){
+        for (let j = 0; j < protVarPtmsList[i].posList.length; j++){
+            let temp = {"name":protVarPtmsList[i].name, "posList":[protVarPtmsList[i].posList[j]], "mono_mass":parseFloat(protVarPtmsList[i].mono_mass), "type":"Protein variable"};
+            VAR_PTM_LIST.push(temp);
+        }
+    }
+    for (let i = 0; i < variablePtmsList.length; i++){
+        for (let j = 0; j < variablePtmsList[i].posList.length; j++){
+            let temp = {"name":variablePtmsList[i].name, "posList":[variablePtmsList[i].posList[j]], "mono_mass":parseFloat(variablePtmsList[i].mono_mass), "type":"non-Protein variable"};
+            VAR_PTM_LIST.push(temp);
+        }
     }
 }

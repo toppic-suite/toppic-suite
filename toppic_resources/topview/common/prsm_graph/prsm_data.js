@@ -34,6 +34,7 @@ class PrsmData {
     this.formLastPos = parseInt(prsm.annotated_protein.annotation.last_residue_position);
     this.breakPoints = json2BreakPoints(prsm);
     [this.fixedPtms, this.protVarPtms, this.variablePtms] = json2Ptms(prsm);
+    console.log(this.fixedPtms, this.protVarPtms, this.variablePtms)
     this.massShifts = json2MassShifts(prsm);
     this.annotations = getAnnotations(this.protVarPtms, prsm);
     this.sequence = this.getAminoAcidSequence();
@@ -49,15 +50,24 @@ class PrsmData {
     this.formFirstPos = formFirstPos;
     this.formLastPos = formLastPos;
     this.fixedPtms = proteoformObj.fixedPtms;
+    this.protVariablePtms = proteoformObj.protVarPtms;
     this.variablePtms = proteoformObj.variablePtms;
     this.massShifts = proteoformObj.unexpectedMassShifts;
     this.sequence = proteoformObj.sequence;
     this.proteoform = proteoformObj;
     this.breakPoints = breakPoints;
 
-    function generateAnnotation(variablePtm, massShift){
+    function generateAnnotation(protVarPtm, variablePtm, massShift){
       let anno = [];
       //annotation in prsm object contains only variable and unknown shifts
+      for (let i = 0; i < protVarPtm.length; i++){
+        let temp = {"annoText":protVarPtm[i].name, "leftPos":0, "rightPos":0};
+        for (let j = 0; j < protVarPtm[i].posList.length; j++){
+          temp.leftPos = protVarPtm[i].posList[j].leftPos;
+          temp.rightPos = temp.leftPos + 1;
+          anno.push(temp);
+        }
+      }
       for (let i = 0; i < variablePtm.length; i++){
         let temp = {"annoText":variablePtm[i].name, "leftPos":0, "rightPos":0};
         for (let j = 0; j < variablePtm[i].posList.length; j++){
@@ -72,7 +82,7 @@ class PrsmData {
       }
       return anno;
     }
-    this.annotations = generateAnnotation(this.variablePtms, this.massShifts);
+    this.annotations = generateAnnotation(this.protVariablePtms, this.variablePtms, this.massShifts);
   }
   
   updatePara = function(para) {
@@ -213,7 +223,7 @@ function getAnnotations(protVarPtms, prsm) {
       annos.push(anno);
     }
   }
-
+ 
   if(prsm.annotated_protein.annotation.hasOwnProperty('mass_shift')) {
     let dataMassShifts = getJsonList(prsm.annotated_protein.annotation.mass_shift); 
     for (let i = 0; i < dataMassShifts.length; i++) {
