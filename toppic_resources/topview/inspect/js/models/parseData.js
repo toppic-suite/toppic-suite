@@ -66,6 +66,62 @@ function parseSequenceMassShift(seq){
 	let variablePtmsList = [];
 	let protVarPtmsList = [];
 	let parsedseq = "";
+	let position = 0;
+	let massShift = "";
+	let isMassShift = false;
+
+	for (let i = 0; i < seq.length; i++){
+		if (seq[i] == "["){//mass shift
+			isMassShift = true;
+		}
+		else if (seq[i] == "]"){//mass shift
+			isMassShift = false;
+			//check mass shift value
+			//massShift = massShift.slice(1);//"[" is included in mass shift string
+			if (isNaN(massShift)){
+				alert("Please enter a numeric value for mass shift.");
+			}
+			else{
+				let mass = parseFloat(massShift);
+				/**
+				 * remove 1 as the data starts from 0 and length starts from 1
+				 */
+				let tempPosition = position - 1;
+				//Initially set the bg_color to null
+				let shiftobj = {leftPos:tempPosition, rightPos:tempPosition + 1, anno:mass, label:mass, bg_color:null};
+				/**
+				 * when the split occur at the end we get an extra "" in 
+				 * the list. This is to check if the mass is numeric.
+				 */
+				if(!isNaN(mass))
+				{
+					unknownMassShiftList.push(shiftobj);
+				}
+			}
+			massShift = "";
+		}
+		else{
+			if (isMassShift){
+				massShift = massShift + seq[i];
+			}
+			else{
+				if (seq[i].charCodeAt(0) >= 65 && seq[i].charCodeAt(0) <= 90){//if it is  alphabet
+					parsedseq = parsedseq + seq[i];
+					position++;
+				}
+				else{
+					alert("Invalid character found in the sequence.");
+				}
+			}
+		}
+	}
+	return [parsedseq,unknownMassShiftList, protVarPtmsList, variablePtmsList] ;
+}
+/*function parseSequenceMassShift(seq){
+	let unknownMassShiftList = [];
+	let variablePtmsList = [];
+	let protVarPtmsList = [];
+	let parsedseq = "";
 	let splitStr = seq.split(/\[(.*?)\]/);
 	let splitArraylen = splitStr.length;
 	let position = 0;
@@ -95,7 +151,7 @@ function parseSequenceMassShift(seq){
 					}
 				}
 			}*/
-			if (!isPTM) {
+			/*if (!isPTM) {
 				parsedseq = parsedseq + splitStr[i] ;
 				position = position + splitStr[i].length ;
 			}
@@ -106,21 +162,21 @@ function parseSequenceMassShift(seq){
 			/**
 			 * remove 1 as the data starts from 0 and length starts from 1
 			 */
-			let tempPosition = position - 1;
+			/*let tempPosition = position - 1;
 			//Initially set the bg_color to null
 			let shiftobj = {leftPos:tempPosition, rightPos:tempPosition + 1, anno:mass, label:mass, bg_color:null};
 			/**
 			 * when the split occur at the end we get an extra "" in 
 			 * the list. This is to check if the mass is numeric.
 			 */
-			if(!isNaN(mass))
+			/*if(!isNaN(mass))
 			{
 				unknownMassShiftList.push(shiftobj);
 			}
 		}
 	}
 	return [parsedseq,unknownMassShiftList, protVarPtmsList, variablePtmsList] ;
-}
+}*/
 
 // form residues from sequence
 let formResidues = (sequence) => {
