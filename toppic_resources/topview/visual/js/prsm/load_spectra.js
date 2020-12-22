@@ -87,9 +87,9 @@ function loadMsTwo(specIdList, fileList, proteoform, divId, navId){
           let nIonType = specList[j].n_ion_type;
           let cIonType = specList[j].c_ion_type;
 
-          //console.log("monoMasses",monoMasses)
-          //console.log("monoIons", monoIons)
           //let monoSpGraph = new SpectrumGraph(monoSvgId,monoMasses); 
+          let spectrumDataMonoPeaks = new SpectrumData();
+          spectrumDataMonoPeaks.assignLevelPeaks(monoMasses);
           let monoSpGraph = new SpectrumGraph(monoSvgId,monoMasses, proteoform.sequence.length);
           monoSpGraph.addMonoMassSpectrumAnno(monoIons,proteoform, nIonType, cIonType);
           monoSpGraph.para.setMonoMassGraph(true);
