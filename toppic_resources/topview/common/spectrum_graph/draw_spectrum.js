@@ -405,6 +405,47 @@ function drawPeaks(svg,para,peakList){
   var len = peakList.length;
   // limits provide current count of number of peaks drawn on graph per bin(range) 
   // so that we can limit tha peak count to peaksPerRange count
+  let ratio = (para.winMaxMz - para.winMinMz) / (para.dataMaxMz - para.dataMinMz);
+  ratio = Math.min(1, ratio);
+  let spectrumData = new SpectrumData();
+
+  for(let i =0;i<len;i++)
+  {
+    let peak = peakList[i];
+    if(peak.mz >= para.winMinMz && peak.mz < para.winMaxMz)
+    {
+      if (peak.level / (spectrumData.mzLevel.length - 3)>= ratio || ratio <= 0.2){
+        peaks.append("line")
+        .attr("x1",function(){
+          return para.getPeakXPos(peak.mz);
+        })
+        .attr("y1",function(){
+          let y = para.getPeakYPos(peak.intensity);
+          if(y<=para.padding.head) return para.padding.head ;
+          else return y ;
+        })
+        .attr("x2",function(){
+          return para.getPeakXPos(peak.mz);
+        })
+        .attr("y2",para.svgHeight - para.padding.bottom )
+        .attr("stroke","black")
+        .attr("stroke-width","2")
+        .on("mouseover",function(){
+          onMouseOverPeak(this,peak,para);
+        })
+        .on("mouseout",function(){
+          onPeakMouseOut(this);
+        });
+      }
+    }
+  }
+}
+/*function drawPeaks(svg,para,peakList){
+  let peaks = svg.append("g")
+    .attr("id", "peaks");
+  var len = peakList.length;
+  // limits provide current count of number of peaks drawn on graph per bin(range) 
+  // so that we can limit tha peak count to peaksPerRange count
   let limits = new Array(para.binNum).fill(0);
   let binWidth = para.getBinWidth();
   for(let i =0;i<len;i++)
@@ -442,7 +483,7 @@ function drawPeaks(svg,para,peakList){
       }
     }
   }
-}
+}*/
 
 /**
  * @function drawEnvelopes
@@ -452,6 +493,55 @@ function drawPeaks(svg,para,peakList){
  * @param {Array} peakdata - Contians both peak list and envelopelist
  */
 function drawEnvelopes(svg,para,envPeakList) {
+  let circles = svg.append("g").attr("id", "circles");
+  let minPercentage = 0.0;
+  let maxIntensity = para.dataMaxInte ;
+  let spectrumData = new SpectrumData();
+
+  // limits provide current count of number of peaks drawn on graph per bin(range)
+  // so that we can limit tha peak count to circlesPerRange count
+  let ratio = (para.winMaxMz - para.winMinMz) / (para.dataMaxMz - para.dataMinMz);
+  ratio = Math.min(1, ratio);
+
+  for (let i = 0; i < envPeakList.length; i++) {
+    let peak = envPeakList[i]; 
+    let env = peak.env; 
+    //console.log(env);
+    let color = env.color;
+    //Show only envelopes with minimum of 0.5%
+    let percentInte = peak.intensity/maxIntensity * 100 ;
+    if(peak.mz >= para.winMinMz && peak.mz < para.winMaxMz && percentInte >= minPercentage) 
+    { 
+      if (env.level / (spectrumData.mzLevel.length - 3) >= ratio || ratio <= 0.2){
+        //display envelopes based on level, but when the ratio falls below threshold, show all envs in the range
+        circles.append("circle")
+        .attr("id","circles")
+        .attr("cx",function(){
+          return para.getPeakXPos(peak.mz);
+        })
+        .attr("cy",function(){
+          let cy = para.getPeakYPos(peak.intensity);
+          if(cy < para.padding.head) return para.padding.head;
+          else return cy ;
+        })
+        .attr("r",function(){
+          return para.getCircleSize();
+        })
+        .style("fill","white")
+        .style("opacity", "0.8")
+        .style("stroke",color)
+        .style("stroke-width","2")
+        .on("mouseover",function(){
+          onMouseOverCircle(this,env,peak,para);
+        })
+        .on("mouseout",function(){
+          onCircleMouseOut(this);
+        });
+      }
+    }
+  }
+}
+/*function drawEnvelopes(svg,para,envPeakList) {
   let circles = svg.append("g").attr("id", "circles");
   let minPercentage = 0.0;
   let maxIntensity = para.dataMaxInte ;
@@ -502,7 +592,7 @@ function drawEnvelopes(svg,para,envPeakList) {
       }
     }
   }
-}
+}*/
 /**
  * @function drawIons
  * @description Function to add IONS at the top of the peaks for each cluster of envelopes
