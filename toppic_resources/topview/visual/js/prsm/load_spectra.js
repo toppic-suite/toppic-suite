@@ -10,6 +10,12 @@ function loadMsOne(filename, ms1SvgId){
     let peaks = ms1_data.peaks;
     let envelopes = ms1_data.envelopes;
     let ions = [];
+
+    let spectrumDataPeaks = new SpectrumData();
+    let spectrumDataEnvs = new SpectrumData();
+    spectrumDataPeaks.assignLevelPeaks(peaks);
+    spectrumDataEnvs.assignLevelEnvs(envelopes);
+
     spGraph = new SpectrumGraph(ms1SvgId,peaks);
     spGraph.addRawSpectrumAnno(envelopes, ions);
     let precMonoMz = prsm_data.prsm.ms.ms_header.precursor_mz;
@@ -17,6 +23,7 @@ function loadMsOne(filename, ms1SvgId){
     spGraph.para.setHighlight(precMonoMz);
     spGraph.redraw();
     return spGraph;
+    
   }
 }
 
@@ -55,9 +62,17 @@ function loadMsTwo(specIdList, fileList, proteoform, divId, navId){
           let envelopes = specList[j].envelopes;
           let deconvPeaks = prsm_data.prsm.ms.peaks.peak;
           let [ions, monoIons] = getIons(specId, deconvPeaks, envelopes);
+
           specList[j].ions = ions;
+
           let spGraph = new SpectrumGraph(svgId,peaks);
           spGraph.addRawSpectrumAnno(envelopes,ions); 
+
+          let spectrumDataPeaks = new SpectrumData();
+          let spectrumDataEnvs = new SpectrumData();
+          spectrumDataPeaks.assignLevelPeaks(peaks);
+          spectrumDataEnvs.assignLevelEnvs(envelopes);
+
           spGraph.redraw();
           graphList.push(spGraph);
           //mono mass svg

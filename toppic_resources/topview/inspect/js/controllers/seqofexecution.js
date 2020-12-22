@@ -280,6 +280,11 @@ class SeqOfExecution
 			/**
 			 * Call generateCorrespondingGraph which calls addSpectrum function in invokeSpectrum file to draw graph 
 			 */
+			let spectrumDataPeaks = new SpectrumData();
+			let spectrumDataEnvs = new SpectrumData();
+			spectrumDataPeaks.assignLevelPeaks(peakDataList);
+			spectrumDataEnvs.assignLevelEnvs(distributionList);
+
 			let ionList = getIonsSpectrumGraph(matchedPeakList, distributionList);
 			spectrumGraphObj = new SpectrumGraph(Constants.SPECTRUMGRAPHID, peakDataList);
 			spectrumGraphObj.addRawSpectrumAnno(distributionList,ionList);
