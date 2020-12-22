@@ -166,33 +166,32 @@ let getCterminusCheckedList = () => {
  */
 let getActualIdvalues = (ionType) => {
     let dict = [];
-    dict["a"] = "a";
-    dict['a1'] = "a-H<sub>2</sub>O";
-    dict['a2'] = "a-NH<sub>3</sub>";
+    dict["a"] = "A";
+    dict['a1'] = "A-H2O";
+    dict['a2'] = "A-NH3";
 
-    dict["b"] = "b";
-    dict['b1'] = "b-H<sub>2</sub>O";
-    dict['b2'] = "b-NH<sub>3</sub>";
+    dict["b"] = "B";
+    dict['b1'] = "B-H2O";
+    dict['b2'] = "B-NH3";
 
-    dict["c"] = "c";
-    dict['c1'] = "c-H<sub>2</sub>O";
-    dict['c2'] = "c-NH<sub>3</sub>";
+    dict["c"] = "C";
+    dict['c1'] = "C-H2O";
+    dict['c2'] = "C-NH3";
 
-    dict["x"] = "x";
-    dict['x1'] = "x-H<sub>2</sub>O";
-    dict['x2'] = "x-NH<sub>3</sub>";
+    dict["x"] = "X";
+    dict['x1'] = "X-H2O";
+    dict['x2'] = "X-NH3";
 
-    dict["y"] = "y";
-    dict['y1'] = "y-H<sub>2</sub>O";
-    dict['y2'] = "y-NH<sub>3</sub>";
+    dict["y"] = "Y";
+    dict['y1'] = "Y-H2O";
+    dict['y2'] = "Y-NH3";
 
-    dict["z"] = "z";
-    dict['z1'] = "z-H<sub>2</sub>O";
-    dict['z2'] = "z-NH<sub>3</sub>";
+    dict["z"] = "Z";
+    dict['z1'] = "Z-H2O";
+    dict['z2'] = "Z-NH3";
 
-    dict["z_"] = "z&deg;";
-    dict['z_1'] = "z&deg;-H<sub>2</sub>O";
-    dict['z_2'] = "z&deg;-NH<sub>3</sub>";
-
+    dict["z_"] = "Z_DOT";
+    dict['z_1'] = "Z_DOT-H2O";
+    dict['z_2'] = "Z_DOT-NH3";
     return dict[ionType];
 }

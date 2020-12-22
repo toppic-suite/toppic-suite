@@ -289,8 +289,7 @@ class SeqOfExecution
 			spectrumGraphObj = new SpectrumGraph(Constants.SPECTRUMGRAPHID, peakDataList);
 			spectrumGraphObj.addRawSpectrumAnno(distributionList,ionList);
 			// console.log("envPeakList:", spectrumGraphObj.envPeakList);
-			spectrumGraphObj.redraw();
-			
+			spectrumGraphObj.redraw();			
 		}/**
 		 * Do the below function when mono mass list entered is not empty
 		 */
@@ -331,6 +330,7 @@ class SeqOfExecution
 		 * Code to form the second table with all the prefix masses with matched 
 		 * masses for each ion fragment selected.
 		 */
+		
 		n_TerminusList.forEach(function(ion){
 			let matchedPeaksObj = new MatchedPeaks();
 			let prefixMassList = new Array();
@@ -399,6 +399,8 @@ class SeqOfExecution
 		for (let i = 0; i < monoMassList.length; i++){
 			monoMassList[i]["mz"] = monoMassList[i].mass;
 		}
+		let spectrumDataMonoPeaks = new SpectrumData();
+		spectrumDataMonoPeaks.assignLevelPeaks(monoMassList);
 
 		monoMassGraphObj = new SpectrumGraph("monoMassGraph",monoMassList);
 		// monoMassGraphObj.para.errorThreshold = 0.06;
