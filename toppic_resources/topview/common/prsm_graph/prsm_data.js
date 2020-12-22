@@ -34,7 +34,7 @@ class PrsmData {
     this.formLastPos = parseInt(prsm.annotated_protein.annotation.last_residue_position);
     this.breakPoints = json2BreakPoints(prsm);
     [this.fixedPtms, this.protVarPtms, this.variablePtms] = json2Ptms(prsm);
-    console.log(this.fixedPtms, this.protVarPtms, this.variablePtms)
+    //console.log(this.fixedPtms, this.protVarPtms, this.variablePtms)
     this.massShifts = json2MassShifts(prsm);
     this.annotations = getAnnotations(this.protVarPtms, prsm);
     this.sequence = this.getAminoAcidSequence();
@@ -252,7 +252,7 @@ function json2Ptms(prsm){
   let protVarPtmList = [];
   let varPtmList = [];
   if(!prsm.annotated_protein.annotation.hasOwnProperty("ptm") ) {
-    return [fixedPtmList, varPtmList];
+    return [fixedPtmList, protVarPtmList, varPtmList];
   }
   let dataPtmList = getJsonList(prsm.annotated_protein.annotation.ptm); 
   for (let i = 0; i < dataPtmList.length; i++) {
