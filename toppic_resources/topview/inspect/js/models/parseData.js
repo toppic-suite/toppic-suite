@@ -267,14 +267,24 @@ let getTotalSeqMass = (seq,massShiftList) => {
 let addOneIon = (ionList, ion) => {
 	//console.log("ion", ion)
 	let idx = -1;
+	let ionId = ion.ion;
+
+	if (ionId.indexOf("Z_DOT") > -1){//if ion is z_dot, ionList[i].text is already converted from Z_DOT to Z˙
+		ionId = ionId.replace("Z_DOT", "Z˙");
+	}
+
 	for (let i = 0; i < ionList.length; i++) {
-		if (ion.ion == ionList[i].text) {
+		if (ionId == ionList[i].text) {
 			idx = i;
 			break;
 		}
 	}
 	if (idx == -1) {
 		let tempIonData = {"mz":ion.mass,"intensity":ion.intensity,"text": ion.ion, "error": ion.massError};
+		//if it is z_dot ion, text should be converted 
+		if (tempIonData.text.indexOf("Z_DOT") > -1){
+			tempIonData.text = tempIonData.text.replace("Z_DOT", "Z˙");
+		}
 		ionList.push(tempIonData);
 	}
 	else {
@@ -308,6 +318,10 @@ let getIonsSpectrumGraph = (matchedPeakList, distributionList) => {
 					return d3.descending(x.intensity, y.intensity);
 				})
 				let ion = {"env":env, "error":peak.massError, "intensity":env.env_peaks[0].intensity, "mz":env.env_peaks[0].mz, "text":peak.ion.toUpperCase()};
+				//if it is z_dot ion, text should be converted 
+				if (ion.text.indexOf("Z_DOT") > -1){
+					ion.text = ion.text.replace("Z_DOT", "Z˙");
+				}
 				ionData.push(ion);
 			}
 		}
