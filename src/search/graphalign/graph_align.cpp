@@ -163,10 +163,23 @@ void GraphAlign::initTable() {
     table_.push_back(node_vec);
   }
   LOG_DEBUG("init table step 1");
-  for (int i = 0; i < proteo_ver_num_; i++) {
-    table_[i][0]->updateTable(0, 0, GRAPH_ALIGN_TYPE_NULL, 0,  nullptr, node_score);
-    table_[i][0]->updateBestShiftNode(0, 0, 0, table_[i][0]);
-    // LOG_DEBUG("type " << table_[i][0]->getType(0) << " first index " << table_[i][0]->getFirstIdx() << " second index " << table_[i][0]->getSecondIdx());
+  if (mng_ptr_->whole_protein_only_) {
+    int init_aa_num = 2;
+    if (init_aa_num > proteo_ver_num_) {
+      init_aa_num = proteo_ver_num_;
+    }
+    for (int i = 0; i < init_aa_num; i++) {
+      table_[i][0]->updateTable(0, 0, GRAPH_ALIGN_TYPE_NULL, 0,  nullptr, node_score);
+      table_[i][0]->updateBestShiftNode(0, 0, 0, table_[i][0]);
+      // LOG_DEBUG("type " << table_[i][0]->getType(0) << " first index " << table_[i][0]->getFirstIdx() << " second index " << table_[i][0]->getSecondIdx());
+    }
+  }
+  else {
+    for (int i = 0; i < proteo_ver_num_; i++) {
+      table_[i][0]->updateTable(0, 0, GRAPH_ALIGN_TYPE_NULL, 0,  nullptr, node_score);
+      table_[i][0]->updateBestShiftNode(0, 0, 0, table_[i][0]);
+      // LOG_DEBUG("type " << table_[i][0]->getType(0) << " first index " << table_[i][0]->getFirstIdx() << " second index " << table_[i][0]->getSecondIdx());
+    }
   }
   LOG_DEBUG("init table end");
 }
@@ -278,11 +291,21 @@ GraphResultNodePtrVec GraphAlign::backtrace(int s, int m) {
   int best_score = -1;
   GraphDpNodePtr best_node_ptr = nullptr;
 
-  for (int i = 0; i < proteo_ver_num_; i++) {
-    int score = table_[i][spec_ver_num_-1]->getBestScore(s, m);
+  // if whole sequence only
+  if (mng_ptr_->whole_protein_only_) {
+    int score = table_[proteo_ver_num_-1][spec_ver_num_-1]->getBestScore(s, m);
     if (score > best_score) {
       best_score = score;
-      best_node_ptr = table_[i][spec_ver_num_-1];
+      best_node_ptr = table_[proteo_ver_num_-1][spec_ver_num_-1];
+    }
+  }
+  else {
+    for (int i = 0; i < proteo_ver_num_; i++) {
+      int score = table_[i][spec_ver_num_-1]->getBestScore(s, m);
+      if (score > best_score) {
+        best_score = score;
+        best_node_ptr = table_[i][spec_ver_num_-1];
+      }
     }
   }
   int shift = s;
