@@ -76,8 +76,8 @@ class Proteoform {
         let leftPos = element.posList[i].leftPos; 
         let rightPos = element.posList[i].rightPos; 
         //console.log(pos);
-        this.variablePtmPrefixMasses[leftPos-firstPos] += parseFloat(element.mono_mass);
-        this.variablePtmSuffixMasses[rightPos-firstPos] += parseFloat(element.mono_mass);
+        this.variablePtmPrefixMasses[leftPos-firstPos] += parseFloat(element.monoMass);
+        this.variablePtmSuffixMasses[rightPos-firstPos] += parseFloat(element.monoMass);
       }
     });
     //console.log(this.variablePtmPrefixMasses);
