@@ -161,4 +161,28 @@ class Proteoform {
     massList.push(this.proteoformMass);
     return massList;
   }
+
+  getFixedPtmList() {
+    let fixedPtmList = [];
+    if (this.fixedPtms.length > 0) {
+      //console.log(this.fixedPtms[0]);
+      fixedPtmList.push({"name":this.fixedPtms[0].name});
+    }
+    return fixedPtmList;
+  }
+
+  /**
+   * Get all the unknwon mass lists form the prsm
+   */
+  getUnknownMassList() {
+    let unknownMassShiftList = [];
+    for (let i = 0; i < this.sequence.length; i++) {
+      let mass = this.variablePtmPrefixMasses[i] + this.unexpectedPrefixMasses[i];
+      if (mass != 0.0) {
+        unknownMassShiftList.push({"position":i,"mass":mass})
+      }
+    }
+    return unknownMassShiftList;
+  }
+
 }
