@@ -4,7 +4,6 @@
  * @param {Array} matchedUnMatchedPeaks - list of all the calculated masses
  */
 function createTableForSelectedFragmentIons(sequence,matchedUnMatchedPeaks,spectrumGraph){
-    console.log("matchedUnMatchedPeaks : ", matchedUnMatchedPeaks);
     /**
      * Remove if table already exist and rebuild the table
      */

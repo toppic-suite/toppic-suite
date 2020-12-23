@@ -330,7 +330,7 @@ let getIonsSpectrumGraph = (matchedPeakList, distributionList) => {
 }
 
 let ifNIon = (ionType) => {
-	if(ionType === "a" || ionType === "b" || ionType === "c") return true ;
+	if(ionType === "A" || ionType === "B" || ionType === "C") return true ;
 	else return false ;
 }
 
