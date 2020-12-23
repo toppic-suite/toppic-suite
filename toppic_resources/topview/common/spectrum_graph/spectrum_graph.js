@@ -44,6 +44,7 @@ class SpectrumGraph {
     this.cIon = cIonType;
     //console.log(nIonType, cIonType);
     this.nMassList = proteoform.getNMasses(nIonType); 
+    //console.log(proteoform);
     //console.log(this.nMassList);
     this.cMassList = proteoform.getCMasses(cIonType);
     //console.log(this.cMassList);
