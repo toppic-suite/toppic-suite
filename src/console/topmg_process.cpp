@@ -71,22 +71,22 @@
 
 namespace toppic {
 
-void copyTopView(std::map<std::string, std::string> &arguments) {
+void copyTopMSV(std::map<std::string, std::string> &arguments) {
   std::string spectrum_file_name = arguments["spectrumFileName"];
   std::string base_name = file_util::basename(spectrum_file_name);
   std::string base_name_short = base_name.substr(0, base_name.length() - 4);
-  std::string topview_dir = base_name_short + "_html" +  file_util::getFileSeparator() + "topview";
-  if (file_util::exists(topview_dir)) {
-    LOG_WARN("The TopView directory " << topview_dir << " exists!");
-    file_util::delDir(topview_dir);
+  std::string topmsv_dir = base_name_short + "_html" +  file_util::getFileSeparator() + "topmsv";
+  if (file_util::exists(topmsv_dir)) {
+    LOG_WARN("The TopMSV directory " << topmsv_dir << " exists!");
+    file_util::delDir(topmsv_dir);
   }
   if (!file_util::exists(base_name_short + "_html")){//if _html folder was not created before
     file_util::createFolder(base_name_short + "_html");
   }
   std::string resource_dir = arguments["resourceDir"];
   // copy resources 
-  std::string from_path(resource_dir + file_util::getFileSeparator() + "topview");
-  file_util::copyDir(from_path, topview_dir);
+  std::string from_path(resource_dir + file_util::getFileSeparator() + "topmsv");
+  file_util::copyDir(from_path, topmsv_dir);
 }
 
 void cleanTopmgDir(const std::string &fa_name, 
@@ -374,7 +374,7 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
       xml_gene = nullptr;
       std::cout << "Generating PrSM xml files - finished." << std::endl;
 
-      copyTopView(arguments);
+      copyTopMSV(arguments);
 
       std::cout << "Converting PrSM xml files to html files - started." << std::endl;
       jsonTranslate(arguments, "topmg_prsm_cutoff");
