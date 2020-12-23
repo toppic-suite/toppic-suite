@@ -60,7 +60,7 @@ void jsonTranslate(std::map<std::string, std::string> &arguments,
   }
 
   // copy resources 
-  //std::string from_path(resource_dir + file_util::getFileSeparator() + "topview");
+  //std::string from_path(resource_dir + file_util::getFileSeparator() + "topmsv");
   //file_util::copyDir(from_path, html_dir);
 
   // data js files
