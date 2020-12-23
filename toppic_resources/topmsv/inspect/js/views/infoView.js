@@ -36,7 +36,7 @@ function setTotalSeqMass(totalMass){
  * @param {Float} proteinMass - Contains calculated protein Mass
  */
 function setMassDifference(precursorMass, proteinMass){
-    let diff = proteinMass - precursorMass ;
+    let diff = precursorMass - proteinMass;
     domElements.massDifference.innerHTML = diff.toFixed(4);
     domElements.massVariation.style = 'block';
 }
