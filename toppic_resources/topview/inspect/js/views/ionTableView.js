@@ -4,7 +4,7 @@
  * @param {Array} matchedUnMatchedPeaks - list of all the calculated masses
  */
 function createTableForSelectedFragmentIons(sequence,matchedUnMatchedPeaks,spectrumGraph){
-    // console.log("matchedUnMatchedPeaks : ", matchedUnMatchedPeaks);
+    console.log("matchedUnMatchedPeaks : ", matchedUnMatchedPeaks);
     /**
      * Remove if table already exist and rebuild the table
      */
@@ -25,7 +25,6 @@ function createTableForSelectedFragmentIons(sequence,matchedUnMatchedPeaks,spect
     tr.setAttribute("role","row");
     
     let len = matchedUnMatchedPeaks.length;
-
     let seqln = sequence.length;
     /**
      * Create ID column Header
@@ -71,17 +70,7 @@ function createTableForSelectedFragmentIons(sequence,matchedUnMatchedPeaks,spect
         td0.innerHTML = j+1;
         tr1.appendChild(td0);
         tr1.appendChild(td);
-        if (j === seqln - 1) {
-            for (let k =0; k < len; k++) {
-                let td1 = document.createElement("td");
-                td1.setAttribute("class","td_fragments");
-                td1.setAttribute("charge",null);
-                td1.innerHTML = "Null";
-                tr1.appendChild(td1);
-            }
-            tbody.appendChild(tr1);
-            break;
-        }
+        
         /**
          * Add mass data to respected columns 
          */
@@ -89,21 +78,44 @@ function createTableForSelectedFragmentIons(sequence,matchedUnMatchedPeaks,spect
         {
             let td1 = document.createElement("td");
             let index = j;
-            if(matchedUnMatchedPeaks[k].ionFragment[0] === "x" || matchedUnMatchedPeaks[k].ionFragment[0] === "y"
-                || matchedUnMatchedPeaks[k].ionFragment[0] === "z")
+            let isNull = false;//write Null if true
+
+            if(matchedUnMatchedPeaks[k].ionFragment[0] === "X" || matchedUnMatchedPeaks[k].ionFragment[0] === "Y"
+                || matchedUnMatchedPeaks[k].ionFragment[0] === "Z")
             {
-                /**
+                if (index === 0)//at the first row in the c-term column
+                {
+                    isNull = true;
+                }
+                 /**
                  * position when suffix mass list is written to table
                  */
-                index = seqln-j-2;
+                index = seqln-j-1;
             }
-            td1.setAttribute("class","td_fragments");
-            if(matchedUnMatchedPeaks[k].massList[index].matchedInd === "Y")
+            else if(matchedUnMatchedPeaks[k].ionFragment[0] === "A" || matchedUnMatchedPeaks[k].ionFragment[0] === "B"
+            || matchedUnMatchedPeaks[k].ionFragment[0] === "C")
             {
-                td1.setAttribute("class","td_fragments matched_fragments");
+                if (index === seqln - 1)//at the last row in the n-term column
+                {
+                    isNull = true;
+                }
             }
-            td1.setAttribute("charge",matchedUnMatchedPeaks[k].massList[index].charge);
-            td1.innerHTML = matchedUnMatchedPeaks[k].massList[index].mass.toFixed(4);
+            if(isNull)
+            {
+                td1.setAttribute("class","td_fragments");
+                td1.setAttribute("charge",null);
+                td1.innerHTML = "Null";
+            }
+            else
+            {
+                td1.setAttribute("class","td_fragments");
+                if(matchedUnMatchedPeaks[k].massList[index].matchedInd === "Y")
+                {
+                    td1.setAttribute("class","td_fragments matched_fragments");
+                }
+                td1.setAttribute("charge",matchedUnMatchedPeaks[k].massList[index].charge);
+                td1.innerHTML = matchedUnMatchedPeaks[k].massList[index].mass.toFixed(4);
+            }
             tr1.appendChild(td1);
         }
         tbody.appendChild(tr1);
