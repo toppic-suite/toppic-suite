@@ -338,7 +338,9 @@ class SeqOfExecution
 			let matchedAndUnMatchedListObj = {};
 			let massShift = parseFloat(ion.mass);
 			let ionType = ion.ionType;
-			nIonType = ionType;
+      if (ionType == "A" || ionType == "B" || ionType == "C") {
+			  nIonType = ionType;
+      }
 
 			/**
 			 * Get calculated prefix mass 
@@ -364,7 +366,9 @@ class SeqOfExecution
 			let matchedAndUnMatchedListObj = {};
 			let massShift = parseFloat(ion.mass);
 			let ionType = ion.ionType;
-			cIonType = ionType;
+      if (ionType == "X" || ionType == "Y" || ionType == "Z" || ionType == "Z_DOT") {
+			  cIonType = ionType;
+      }
 			/**
 			 * Get calculated prefix mass 
 			 */
