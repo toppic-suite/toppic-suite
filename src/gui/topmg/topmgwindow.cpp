@@ -103,6 +103,7 @@ void topmgWindow::initArguments() {
   arguments_["varPtmNumber"] = "10";
   arguments_["varPtmNumInGap"] = "5";
   arguments_["geneHTMLFolder"] = "";
+  arguments_["wholeProteinOnly"] ="false";
 }
 
 void topmgWindow::on_clearButton_clicked() {
@@ -138,6 +139,7 @@ void topmgWindow::on_defaultButton_clicked() {
   ui->topfdFeatureCheckBox->setChecked(false);
   ui->asfDiagCheckBox->setChecked(false);
   ui->geneHTMLCheckBox->setChecked(true);
+  ui->wholeProteinCheckBox->setChecked(false);
 }
 
 void topmgWindow::updatedir(QString s) {
@@ -339,6 +341,11 @@ std::map<std::string, std::string> topmgWindow::getArguments() {
   } else {
     arguments_["geneHTMLFolder"] = "false";
   }
+  if (ui->wholeProteinCheckBox->isChecked()) {
+    arguments_["wholeProteinOnly"] = "true";
+  } else {
+    arguments_["wholeProteinOnly"] = "false";
+  }
   //showArguments();
   return arguments_;
 }
@@ -435,6 +442,7 @@ void topmgWindow::lockDialog() {
   ui->addButton->setEnabled(false);
   ui->delButton->setEnabled(false);
   ui->geneHTMLCheckBox->setEnabled(false);
+  ui->wholeProteinCheckBox->setEnabled(false);
 }
 
 void topmgWindow::unlockDialog() {
@@ -474,6 +482,7 @@ void topmgWindow::unlockDialog() {
   ui->addButton->setEnabled(true);
   ui->delButton->setEnabled(true);
   ui->geneHTMLCheckBox->setEnabled(true);
+  ui->wholeProteinCheckBox->setEnabled(true);
 }
 
 bool topmgWindow::checkError() {
