@@ -1,7 +1,7 @@
 {
-  "name": "external_libraries_for_topview",
+  "name": "external_libraries_for_topmsv",
   "version": "1.0.0",
-  "description": "Provide external libraries for topview, files will be located in node_modules.",
+  "description": "Provide external libraries for topmsv, files will be located in node_modules.",
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.14.0",
     "bootstrap": "^4.5.0",
