@@ -9,7 +9,6 @@ function onclickTopView(e){
   let fileName = folderName+"/ms2_json/spectrum"+specID+".js";
 
   let massAndIntensityList = [];
-  let ionArray = [];
   let protVarPtmList = [];
   let variablePtmList = [];
 
@@ -17,7 +16,11 @@ function onclickTopView(e){
   body.append(script);
   script.onload = function(){
     let peakAndIntensityList = getDataFromPRSMtoSpectralView(ms2_data);
-    [massAndIntensityList, ionArray] = getMassAndIntensityData(specID);
+    let ionList = [];
+    ionList.push(ms2_data.n_ion_type);
+    ionList.push(ms2_data.c_ion_type);
+    //console.log(ionList);
+    massAndIntensityList = getMassAndIntensityData(specID);
     //console.log(prsmGraph.data.proteoform);
     let sequence = prsmGraph.data.proteoform.sequence; 
     let fixedPtmList = prsmGraph.data.proteoform.getFixedPtmList(); 
@@ -27,7 +30,7 @@ function onclickTopView(e){
     // Stores all the data in the variables respectively
     window.localStorage.setItem('peakAndIntensityList',  JSON.stringify(peakAndIntensityList));
     window.localStorage.setItem('massAndIntensityList',  JSON.stringify(massAndIntensityList));
-    window.localStorage.setItem('ionType', ionArray);
+    window.localStorage.setItem('ionType', ionList);
     window.localStorage.setItem('sequence',  JSON.stringify(sequence));
     window.localStorage.setItem('fixedPtmList', JSON.stringify(fixedPtmList));
     window.localStorage.setItem('protVarPtmsList', JSON.stringify(protVarPtmList));
@@ -55,26 +58,14 @@ function getDataFromPRSMtoSpectralView(ms2_data){
  * @param {Integer} specId - Contians spec Id to get the data of corrsponding mass list
  */
 function getMassAndIntensityData(specId){
-  //to save time, retrieve ion array from along with peaks and intensity data, instead of iterating the same data again
   let massAndIntensityList = [];
-  let ionArray = [];
- 
   prsm_data.prsm.ms.peaks.peak.forEach(function(eachPeak,i){
     if (eachPeak.spec_id == specId) {
       let tempObj = eachPeak.monoisotopic_mass + " "+eachPeak.intensity+ " "+eachPeak.charge;
       massAndIntensityList.push(tempObj);
     }
-    if (parseInt(eachPeak.matched_ions_num)>0){
-        let ion = eachPeak.matched_ions.matched_ion.ion_type;
-        if (ionArray.length < 1){
-            ionArray.push(ion);
-        }			
-        else if (ionArray.indexOf(ion) < 0) {
-            ionArray.push(ion);
-        }
-    }
   })
-  return [massAndIntensityList, ionArray];
+  return massAndIntensityList; 
 }
 
 /**
