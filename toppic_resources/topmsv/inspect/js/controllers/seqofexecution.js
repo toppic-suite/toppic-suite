@@ -324,8 +324,8 @@ class SeqOfExecution
 		 */
 		this.download();
 		let completeListofMasswithMatchedInd = [];
-		let nIonType;
-		let cIonType;
+		let nIonType = "B";
+		let cIonType = "Y";
 		/**
 		 * Code to form the second table with all the prefix masses with matched 
 		 * masses for each ion fragment selected.
