@@ -71,7 +71,6 @@ void PrsmFeatureCluster::setProtId(PrsmStrPtrVec& prsm_ptrs) {
 
 void PrsmFeatureCluster::setProteoClusterId(PrsmStrPtrVec& prsm_ptrs) {
   std::vector<PrsmStrPtrVec> clusters;
-  std::stringstream msg;
   int prsm_count = prsm_ptrs.size();
   
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
@@ -105,8 +104,8 @@ void PrsmFeatureCluster::setProteoClusterId(PrsmStrPtrVec& prsm_ptrs) {
       clusters.push_back(new_clusters);
     }
     double perc = (i + 1) * 100.0 / prsm_count;
-    msg << std::flush << "Finding PrSM clusters - processing " << std::setprecision(3) << perc << "%.    \r";
-    std::cout << msg.str();
+    std::cout << std::flush << "Finding PrSM clusters - processing " 
+        << std::setprecision(3) << perc << "%. \r";
   }
   std::cout << std::endl;
   for (size_t i = 0; i < clusters.size(); i++) {
