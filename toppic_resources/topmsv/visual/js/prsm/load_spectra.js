@@ -39,6 +39,7 @@ function loadMsTwo(specIdList, fileList, proteoform, divId, navId){
     script.src = filename;
     document.head.appendChild(script);
     script.onload = function () {
+      ms2_data.id = specIdList[i];
       specList.push(ms2_data);
       cnt = cnt+1;
       // As data loading is an asynchronous process, 
