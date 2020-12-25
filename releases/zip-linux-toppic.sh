@@ -9,6 +9,7 @@ rm -rf toppic-linux-${1}
 mkdir toppic-linux-${1}
 mkdir toppic-linux-${1}/example_files
 cp ../bin/toppic toppic-linux-${1}
+cp ../bin/topindex toppic-linux-${1} 
 cp ../bin/topfd toppic-linux-${1} 
 cp ../bin/topmg toppic-linux-${1} 
 cp ../bin/topdiff toppic-linux-${1} 
@@ -20,6 +21,7 @@ cp ../testcases/data/mzxml_test.fasta toppic-linux-${1}/example_files
 cp ../testcases/data/mzxml_test.mzXML toppic-linux-${1}/example_files
 
 cp -r ../toppic_resources toppic-linux-${1}
+rm ./toppic-linux-${1}/toppic_resources/envcnn_models/envcnn_5_block_model.json
 
 mkdir toppic-linux-${1}/toppic_resources/lib
 
