@@ -7,51 +7,6 @@
  * @param {list} envPeaks - Contains the data of Envelope peaks to draw circles on the graph
  * @param {list} ions - Contains Ions to draw upon the peaks
  */
-/**
-function drawSpectrum(svgId, para, peaks, envPeaks, proteoform, ions) {
-  let svg = d3.select("body").select("#"+svgId);
-  // svg.attr("width", para.svgWidth).attr("height", para.svgHeight);
-  // Removes all the elements under SVG group 'svgGroup' everytime there this function is called
-  svg.selectAll("#svgGroup").remove();
-  // Create a group under which all the fucntions of the graph will be appended
-  svg = svg.append("g").attr("id","svgGroup");
-
-  //call onMouseOut everytime to fix onHover bug adding multiple data when mouseover and zoomed up
-  onMouseOut();
-  drawTicks(svg, para);
-  drawAxis(svg,para);
-  addDatatoAxis(svg,para);
-  addLabels(svg,para);
-  if (para.showHighlight) {
-    addHighlight(svg, para);
-  }
-  drawPeaks(svg, para, peaks);
-  if (para.showEnvelopes && envPeaks != null) {
-    drawEnvelopes(svg, para, envPeaks);
-  }
-  if (para.showIons) {
-    drawIons(svg, para, ions);
-  }
-  if (para.isMonoMassGraph) {
-    updateViewBox(svgId, para.svgWidth, para.svgHeight);
-    drawSequence(svg, para, proteoform);
-    addErrorPlot(svg, para);
-    addErrorBox(svg, para);
-    drawErrorYTicks(svg, para);
-    drawErrorPoints(svg, para, ions);
-  }
-}
-*/
-
-/**
- * Function gets invokes whenever zoom or drag is invoked and redraws the graph whenever there is zoom or draw
- * This function invokes all the functions that draw the graph
- * @param {string} svgId - Contains the Id from html on which the graph should be drawn
- * @param {object} para - Contains the parameters to help draw the graph
- * @param {list} peaks - Contains the data of Peaks to draw lines on the graph
- * @param {list} envPeaks - Contains the data of Envelope peaks to draw circles on the graph
- * @param {list} ions - Contains Ions to draw upon the peaks
- */
 function drawBasicSpectrum(svgId, para, peaks, ions) {
   let svg = d3.select("body").select("#"+svgId);
   // svg.attr("width", para.svgWidth).attr("height", para.svgHeight);
@@ -109,6 +64,13 @@ onPeakMouseOut = function(this_element) {
 onCircleMouseOut = function(){
   this.onMouseOut();
 }
+
+onFragmentMassMouseOut = function(this_element) {
+  this.onMouseOut();
+  d3.select(this_element).style("stroke","black")
+    .style("stroke-width","1");
+}
+
 /**
  * @function onMouseOut
  * @description Function to remove the tooltips on mouseout
@@ -116,6 +78,7 @@ onCircleMouseOut = function(){
 onMouseOut = function(){
   d3.selectAll("#MyTextMZIN").remove();
   d3.selectAll("#MyTextMassCharge").remove();
+  d3.selectAll("#MyTextFragmentMass").remove();
 }
 
 /**
@@ -126,29 +89,22 @@ onMouseOut = function(){
  * @param {object} para - Contains the parameters like height, width etc.,. tht helps to draw the graph
  */
 onMouseOverPeak = function(this_element,peak,para) {
-  let x = para.getPeakXPos(peak.mz);
-  let y = para.getPeakYPos(peak.intensity);
-  intensity =" inte:"+ parseFloat(peak.intensity).toFixed(3);
-  pos = parseFloat(peak.mz).toFixed(3);
+  let intensity =" inte:"+ parseFloat(peak.intensity).toFixed(3);
+  let pos = parseFloat(peak.mz).toFixed(3);
   if (para.isMonoMassGraph) {
     pos = "mass:" + pos;
   }
   else {
     pos = "m/z:"+ pos;
   }
-  y = y - para.mouseOverPadding.head ;
-  if(y<=para.mouseOverPadding.head) {
-    y = para.mouseOverPadding.head;
-  }
+
   d3.select(this_element).style("stroke","red")
     .style("stroke-width","2");
-
   let tooltipData = pos + "<br>" + intensity ;
   /*	Rectangle to have flexible on click and on mouse actions	*/
   var div = d3.select("body").append("div")
     .attr("id", "MyTextMZIN")
     .attr("class", "tooltip")
-
   div.transition().duration(30)
     .style("opacity", 2);
   div.html(tooltipData).style("left", (d3.event.pageX + 12)  + "px")
@@ -163,25 +119,38 @@ onMouseOverPeak = function(this_element,peak,para) {
  * @param {Array} envelope_list - Contains Envelope List
  * @param {object} para - Contains the parameters like height, width etc.,. tht helps to draw the graph
  */
-onMouseOverCircle = function(this_element,envelope, peak, para) {
-  let x = parseFloat(d3.select(this_element).attr("cx"));
-  let y = parseFloat(d3.select(this_element).attr("cy")) ;
+onMouseOverCircle = function(this_element,envelope, peak) {
   let mz = "m/z:"+peak.mz.toFixed(3);
   let inte = "inte:"+peak.intensity.toFixed(2);
   let mass = "mass:"+envelope.mono_mass.toFixed(3);
   let charge = "charge:"+ envelope.charge ;
-  y = y - para.mouseOverPadding.head ;
-  if(y<=para.mouseOverPadding.head)
-  {
-    y = para.mouseOverPadding.head;
-  }
-
   let tooltipData = mz + "<br>" + inte + "<br>" + mass + "<br>" + charge ;
   /*	Rectangle to have flexible on click and on mouse actions	*/
   var div = d3.select("body").append("div")
     .attr("id", "MyTextMassCharge")
     .attr("class", "tooltip")
+  div.transition().duration(30)
+    .style("opacity", 2);
+  div.html(tooltipData).style("left", (d3.event.pageX + 12)  + "px")
+    .style("top", (d3.event.pageY - 28)+ "px")
+    .style("fill", "black");
+}
 
+/**
+ * @function onMouseOverFragmentMass
+ * @description Function to show the theoretical mass on mouse over of peaks
+ */
+onMouseOverFragmentMass = function(this_element, mass) {
+  let pos = parseFloat(mass).toFixed(3);
+  let tooltipData = "mass:" + pos;
+
+  d3.select(this_element).style("stroke","red")
+    .style("stroke-width","2");
+
+  /*	Rectangle to have flexible on click and on mouse actions	*/
+  var div = d3.select("body").append("div")
+    .attr("id", "MyTextFragmentMass")
+    .attr("class", "tooltip")
   div.transition().duration(30)
     .style("opacity", 2);
   div.html(tooltipData).style("left", (d3.event.pageX + 12)  + "px")
@@ -440,50 +409,6 @@ function drawPeaks(svg,para,peakList){
     }
   }
 }
-/*function drawPeaks(svg,para,peakList){
-  let peaks = svg.append("g")
-    .attr("id", "peaks");
-  var len = peakList.length;
-  // limits provide current count of number of peaks drawn on graph per bin(range) 
-  // so that we can limit tha peak count to peaksPerRange count
-  let limits = new Array(para.binNum).fill(0);
-  let binWidth = para.getBinWidth();
-  for(let i =0;i<len;i++)
-  {
-    let peak = peakList[i];
-    if(peak.mz >= para.winMinMz && peak.mz < para.winMaxMz)
-    {
-      let binIndex = Math.floor((peak.mz - para.winMinMz)/binWidth); 
-      if (binIndex < para.binNum) 
-      {
-        limits[binIndex] = limits[binIndex]+1;
-        if (limits[binIndex] <= para.peakNumPerBin) {
-          peaks.append("line")
-            .attr("x1",function(){
-              return para.getPeakXPos(peak.mz);
-            })
-            .attr("y1",function(){
-              let y = para.getPeakYPos(peak.intensity);
-              if(y<=para.padding.head) return para.padding.head ;
-              else return y ;
-            })
-            .attr("x2",function(){
-              return para.getPeakXPos(peak.mz);
-            })
-            .attr("y2",para.svgHeight - para.padding.bottom )
-            .attr("stroke","black")
-            .attr("stroke-width","2")
-            .on("mouseover",function(){
-              onMouseOverPeak(this,peak,para);
-            })
-            .on("mouseout",function(){
-              onPeakMouseOut(this);
-            });
-        }
-      }
-    }
-  }
-}*/
 
 /**
  * @function drawEnvelopes
@@ -532,7 +457,7 @@ function drawEnvelopes(svg,para,envPeakList) {
         .style("stroke",color)
         .style("stroke-width","2")
         .on("mouseover",function(){
-          onMouseOverCircle(this,env,peak,para);
+          onMouseOverCircle(this,env,peak);
         })
         .on("mouseout",function(){
           onCircleMouseOut(this);
@@ -541,58 +466,7 @@ function drawEnvelopes(svg,para,envPeakList) {
     }
   }
 }
-/*function drawEnvelopes(svg,para,envPeakList) {
-  let circles = svg.append("g").attr("id", "circles");
-  let minPercentage = 0.0;
-  let maxIntensity = para.dataMaxInte ;
-  // limits provide current count of number of peaks drawn on graph per bin(range)
-  // so that we can limit tha peak count to circlesPerRange count
-  let limits = new Array(para.binNum).fill(0);
-  let binWidth = para.getBinWidth();
 
-  for (let i = 0; i < envPeakList.length; i++) {
-    let peak = envPeakList[i]; 
-    let env = peak.env; 
-    //console.log(env);
-    let color = env.color;
-    //Show only envelopes with minimum of 0.5%
-    let percentInte = peak.intensity/maxIntensity * 100 ;
-    if(peak.mz >= para.winMinMz && peak.mz < para.winMaxMz && percentInte >= minPercentage) 
-    { 
-      let binIndex = Math.floor((peak.mz - para.winMinMz)/binWidth); 
-      if (binIndex < para.binNum) 
-      {
-        limits[binIndex] = limits[binIndex]+1;
-        if (limits[binIndex] <= para.peakNumPerBin) 
-        {
-          circles.append("circle")
-            .attr("id","circles")
-            .attr("cx",function(){
-              return para.getPeakXPos(peak.mz);
-            })
-            .attr("cy",function(){
-              let cy = para.getPeakYPos(peak.intensity);
-              if(cy < para.padding.head) return para.padding.head;
-              else return cy ;
-            })
-            .attr("r",function(){
-              return para.getCircleSize();
-            })
-            .style("fill","white")
-            .style("opacity", "0.8")
-            .style("stroke",color)
-            .style("stroke-width","2")
-            .on("mouseover",function(){
-              onMouseOverCircle(this,env,peak,para);
-            })
-            .on("mouseout",function(){
-              onCircleMouseOut(this);
-            });
-        }
-      }
-    }
-  }
-}*/
 /**
  * @function drawIons
  * @description Function to add IONS at the top of the peaks for each cluster of envelopes
@@ -668,7 +542,7 @@ function drawSequence(svg, para, proteoform, nMasses, cMasses){
     if (curMass > prevMass) {
       if (curMass >= para.winMinMz - 10 && curMass <= para.winMaxMz) {
         let x = para.getPeakXPos(curMass);
-        interAddLine(seqGroup,x,y);
+        interAddLine(seqGroup,x,y, curMass);
       }
       if (i > 0) {
         let mz = (prevMass + curMass)/2
@@ -694,7 +568,7 @@ function drawSequence(svg, para, proteoform, nMasses, cMasses){
     if (curMass > prevMass) {
       if (curMass >= para.winMinMz - 10 && curMass <= para.winMaxMz) {
         let x = para.getPeakXPos(curMass);
-        interAddLine(seqGroup,x,y);
+        interAddLine(seqGroup,x,y, curMass);
       }
       if (i > 0) {
         let mz = (prevMass + curMass)/2
@@ -708,7 +582,7 @@ function drawSequence(svg, para, proteoform, nMasses, cMasses){
     }
   }
 
-  function interAddLine(svgGroup, x,y) {
+  function interAddLine(svgGroup, x,y, mass) {
     svgGroup.append("line")
       .attr("x1",x)
       .attr("y1",y)
@@ -716,6 +590,12 @@ function drawSequence(svg, para, proteoform, nMasses, cMasses){
       .attr("y2",y+15)
       .attr("stroke","black")
       .attr("stroke-width","1")
+      .on("mouseover",function(){
+        onMouseOverFragmentMass(this, mass);
+      })
+      .on("mouseout",function(){
+        onFragmentMassMouseOut(this);
+      });
   }
 
 	function interAddAminoAcid(svgGroup,x,y,text){
