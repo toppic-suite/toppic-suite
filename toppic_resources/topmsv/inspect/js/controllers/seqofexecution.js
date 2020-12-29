@@ -658,21 +658,35 @@ class SeqOfExecution
 	 */
 	setBootStarpropertiesforFragmentIons()
 	{
+		//to be correctly sorted, column type should be num for each ion column
+		//this code will work regardless of number of ions selected
+
+		let columnCnt = 0;
+		let columnTypes = [];
+
+		$("#selectedIonTableContainer .th-sm").each(function () {
+			columnCnt++;
+		});
+
+		for (let i = 0; i < columnCnt; i++){
+			let type = null;
+			if (i != 1){
+				type = { "type": "num" };
+			}
+			columnTypes.push(type);
+		}
 		$("#selectedIonTableContainer").DataTable({
 			"scrollY": Constants.TABLEHEIGHT,
 			"scrollCollapse": true,
-			"paging":         false,
+			"paging": false,
 			"bSortClasses": false,
 			"searching": false,
 			"bInfo" : false,
-			"columns":[
-				{ "type": "num" },
-				null, 
-				{ "type": "num" },
-				{ "type": "num" }
-			]
+			"columns":columnTypes
 		});
 	}
+
+
 	/**
 	 * Download function to download the SVG's
 	 */
