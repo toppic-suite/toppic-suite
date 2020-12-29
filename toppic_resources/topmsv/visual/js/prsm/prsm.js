@@ -7,7 +7,20 @@ $(document).ready(function() {
     "scrollCollapse": true,
     "paging":         false,
     "order": [[ 1, "asc" ]],
-    "bSortClasses": false
+    "bSortClasses": false,
+    "columns":[
+      { "type": "num" },
+      { "type": "num" },
+      { "type": "num" },
+      null,
+      { "type": "num" },
+      { "type": "num" },
+      { "type": "num" },
+      null,
+      { "type": "num" },
+      { "type": "num" },
+      { "type": "num" }
+    ]
   } );
 } ); 	
 
