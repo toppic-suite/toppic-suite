@@ -90,7 +90,18 @@ function addMassDataToTable(matchedPeaks, graphObj)
                 td.innerHTML = matchedPeaks[i].thMass;
             } 
             else if(j === 6) td.innerHTML = matchedPeaks[i].ion;
-            else if(j === 7) td.innerHTML = matchedPeaks[i].position;
+            else if(j === 7) {
+                //if c-term ion, pos = pos + 1
+                let ion = matchedPeaks[i].ion;
+                if (ion.indexOf("X") >= 0 || ion.indexOf("Y") >= 0 || ion.indexOf("Z") >= 0)
+                {
+                    td.innerHTML = parseInt(matchedPeaks[i].position) + 1;
+                }
+                else
+                {
+                    td.innerHTML = matchedPeaks[i].position;
+                }
+            }
             else if(j === 8) td.innerHTML = matchedPeaks[i].massError;
             else if(j === 9) td.innerHTML = matchedPeaks[i].PPMerror;
             tr.appendChild(td);
