@@ -205,7 +205,16 @@ function createTableElements(){
 				}
 				if(i == 8)
 				{
-					td.innerHTML = peak.matched_ions.matched_ion.ion_position;
+					//if c-term ion, pos = pos + 1
+					let ion = peak.matched_ions.matched_ion.ion_type;
+					if (ion.indexOf("X") >= 0 || ion.indexOf("Y") >= 0 || ion.indexOf("Z") >= 0)
+					{
+						td.innerHTML = parseInt(peak.matched_ions.matched_ion.ion_position) + 1;
+					}
+					else
+					{
+						td.innerHTML = peak.matched_ions.matched_ion.ion_position;
+					}
 				}
 				if(i == 9)
 				{
