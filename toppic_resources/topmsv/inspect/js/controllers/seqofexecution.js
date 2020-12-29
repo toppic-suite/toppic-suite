@@ -638,7 +638,19 @@ class SeqOfExecution
 			"paging":         false,
 			"bSortClasses": false,
 			"searching": false,
-			"bInfo" : false
+			"bInfo" : false,
+			"columns":[
+				{ "type": "num" },
+				{ "type": "num" },
+				null,
+				{ "type": "num" },
+				{ "type": "num" },
+				{ "type": "num" },
+				null,
+				{ "type": "num" },
+				{ "type": "num" },
+				{ "type": "num" }
+			]
 		});
 	}
 	/**
@@ -652,7 +664,13 @@ class SeqOfExecution
 			"paging":         false,
 			"bSortClasses": false,
 			"searching": false,
-			"bInfo" : false
+			"bInfo" : false,
+			"columns":[
+				{ "type": "num" },
+				null, 
+				{ "type": "num" },
+				{ "type": "num" }
+			]
 		});
 	}
 	/**
