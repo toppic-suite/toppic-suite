@@ -5,7 +5,7 @@ class PrsmPara {
   letterSize = 12 ;
   gapWidth = 20;
   rowHeight = 40;
-  topMargin = 36;
+  topMargin = 46;
   bottomMargin = 10 ;
   rightMargin = 50;
   leftMargin = 50;
