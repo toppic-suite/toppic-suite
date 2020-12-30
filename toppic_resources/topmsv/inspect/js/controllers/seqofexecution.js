@@ -54,6 +54,8 @@ class SeqOfExecution
 		$("#"+Constants.SPECTRUMDOWNLOADID).hide();
 		$("#"+Constants.DIVTABLECONTAINER).hide();
 		$("#"+Constants.PEAKCOUNTID).hide();
+		$("#"+Constants.SPECTRUMGRAPHID).hide();
+		$("#"+Constants.MONOMASSGRAPHID).hide();
 		
 		let sequence = "";
 		let massShift_ClassId = "."+ Constants.MASSSHIFT_CLASSID;

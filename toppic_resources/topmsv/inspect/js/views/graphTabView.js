@@ -61,28 +61,3 @@ function addEventNavBar(){
         }
     })
 }
-/*function addEventNavBar(){
-    // add action for nav bar
-    $(".ms2_graph_list").click(function(){
-        let Id = this.id;
-        let ms2GraphList = document.getElementsByClassName("ms2_graph_list");
-        for (let i = 0; i < ms2GraphList.length; i++){
-            if (ms2GraphList[i].id == Id){
-                ms2GraphList[i].classList.add("active");
-                let svgId  = ms2GraphList[i].id;
-                let svgIdSplit = svgId.split("_");
-                let type = svgIdSplit[3];
-                //svgId = svgId.slice(svgId.lastIndexOf("_") + 1);
-                
-                document.getElementById(svgId).style.display="";
-            }else{
-                ms2GraphList[i].classList.remove("active");
-                let svgId  = ms2GraphList[i].id;
-                
-                svgId = svgId.slice(svgId.lastIndexOf("_") + 1);
-                console.log(ms2GraphList[i])
-                document.getElementById(svgId).style.display="none";
-            }
-        }
-    })
-}*/
