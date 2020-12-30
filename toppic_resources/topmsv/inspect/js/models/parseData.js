@@ -282,9 +282,7 @@ let addOneIon = (ionList, ion) => {
 	if (idx == -1) {
 		let tempIonData = {"mz":ion.mass,"intensity":ion.intensity,"text": ion.ion, "error": ion.massError};
 		//if it is z_dot ion, text should be converted 
-		if (tempIonData.text.indexOf("Z_DOT") > -1){
-			tempIonData.text = tempIonData.text.replace("Z_DOT", "Z˙");
-		}
+		tempIonData.text = convertIonName(tempIonData.text);
 		ionList.push(tempIonData);
 	}
 	else {
@@ -305,7 +303,19 @@ let getIonsMassGraph = (matchedPeakList) => {
 	})
 	return ionData;
 }
-
+let convertIonName = (ionName) => {
+	//if Z_DOT, H2O, NH3 are included in the ion name, convert them
+	if (ionName.indexOf("Z_DOT") > -1){
+		ionName = ionName.replace("Z_DOT", "Z˙");
+	}
+	if (ionName.indexOf("H2O") > -1){
+		ionName = ionName.replace("H2O", "H₂O");
+	}
+	if (ionName.indexOf("NH3") > -1){
+		ionName = ionName.replace("NH3", "NH₃");
+	}
+	return ionName;
+}
 let getIonsSpectrumGraph = (matchedPeakList, distributionList) => {
 	let ionData = [];
 	//generate ion list
@@ -319,9 +329,7 @@ let getIonsSpectrumGraph = (matchedPeakList, distributionList) => {
 				})
 				let ion = {"env":env, "error":peak.massError, "intensity":env.env_peaks[0].intensity, "mz":env.env_peaks[0].mz, "text":peak.ion.toUpperCase()};
 				//if it is z_dot ion, text should be converted 
-				if (ion.text.indexOf("Z_DOT") > -1){
-					ion.text = ion.text.replace("Z_DOT", "Z˙");
-				}
+				ion.text = convertIonName(ion.text);
 				ionData.push(ion);
 			}
 		}

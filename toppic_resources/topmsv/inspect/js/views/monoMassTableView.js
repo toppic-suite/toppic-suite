@@ -89,7 +89,11 @@ function addMassDataToTable(matchedPeaks, graphObj)
                 td.className = "th_mass";
                 td.innerHTML = matchedPeaks[i].thMass;
             } 
-            else if(j === 6) td.innerHTML = matchedPeaks[i].ion;
+            else if(j === 6) {
+                let ionName = matchedPeaks[i].ion;
+                ionName = convertIonName(ionName);
+                td.innerHTML = ionName;
+            }
             else if(j === 7) {
                 //if c-term ion, pos = pos + 1
                 let ion = matchedPeaks[i].ion;
