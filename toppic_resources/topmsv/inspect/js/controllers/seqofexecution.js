@@ -54,6 +54,8 @@ class SeqOfExecution
 		$("#"+Constants.SPECTRUMDOWNLOADID).hide();
 		$("#"+Constants.DIVTABLECONTAINER).hide();
 		$("#"+Constants.PEAKCOUNTID).hide();
+		$("#"+Constants.SPECTRUMGRAPHID).hide();
+		$("#"+Constants.MONOMASSGRAPHID).hide();
 		
 		let sequence = "";
 		let massShift_ClassId = "."+ Constants.MASSSHIFT_CLASSID;
@@ -338,9 +340,9 @@ class SeqOfExecution
 			let matchedAndUnMatchedListObj = {};
 			let massShift = parseFloat(ion.mass);
 			let ionType = ion.ionType;
-      if (ionType == "A" || ionType == "B" || ionType == "C") {
-			  nIonType = ionType;
-      }
+			if (ionType.indexOf("A") > -1 || ionType.indexOf("B") > -1 || ionType.indexOf("C") > -1) {
+				nIonType = ionType;
+			}
 
 			/**
 			 * Get calculated prefix mass 
@@ -366,9 +368,9 @@ class SeqOfExecution
 			let matchedAndUnMatchedListObj = {};
 			let massShift = parseFloat(ion.mass);
 			let ionType = ion.ionType;
-      if (ionType == "X" || ionType == "Y" || ionType == "Z" || ionType == "Z_DOT") {
-			  cIonType = ionType;
-      }
+			if (ionType.indexOf("X") > -1 || ionType.indexOf("Y") > -1 || ionType.indexOf("Z") > -1 || ionType.indexOf("Z_DOT") > -1) {
+				cIonType = ionType;
+			}
 			/**
 			 * Get calculated prefix mass 
 			 */
