@@ -257,7 +257,7 @@ function occurence_ptm(prsm)
 		{
 			ptm.forEach(function(ptm, index){
 				// Check if there exist variable or fixed ptms
-				if(ptm.ptm_type == "Variable")
+				if(ptm.ptm_type == "Protein variable")
 				{
 					variable_ptm_raw = getVariablePtm(ptm).replace("[", " [");
 					variable_ptm = variable_ptm + variable_ptm_raw + "] " ;
@@ -272,7 +272,7 @@ function occurence_ptm(prsm)
 		else
 		{
 			// Check if there exist variable or fixed ptms
-			if(ptm.ptm_type == "Variable")
+			if(ptm.ptm_type == "Protein variable")
 			{
 				variable_ptm_raw = getVariablePtm(ptm).replace("[", " [");
 				variable_ptm = variable_ptm + variable_ptm_raw  + "]" ;
@@ -368,7 +368,7 @@ function getUnknownPtms(prsm)
  * Get all the variable ptms
  * @param {object} prsm - prsm is the data attribute inside global prsm_data variable
  */
-function getVariablePtm(ptm)
+/*function getVariablePtm(ptm)
 {
 	let variable_ptm = "[" ;
 	let abbrevation = ptm.ptm.abbreviation ;
@@ -387,6 +387,27 @@ function getVariablePtm(ptm)
 	{
     let left = parseInt(ptm.occurence.left_pos) + 1;
 		variable_ptm = variable_ptm + left + "-" + ptm.occurence.right_pos ;
+	}
+	variable_ptm = ptm.ptm.abbreviation + variable_ptm ;
+	return variable_ptm ;
+}*/
+function getVariablePtm(ptm)
+{
+	let variable_ptm = "[" ;
+	let abbrevation = ptm.ptm.abbreviation ;
+	if(Array.isArray(ptm.occurence))
+	{
+		ptm.occurence.forEach(function(occurence,i){
+			variable_ptm = variable_ptm + occurence.right_pos;
+			if(ptm.occurence.length-1 > i )
+			{
+				variable_ptm = variable_ptm + ";" ;
+			}
+		})
+	}
+	else
+	{
+    	variable_ptm = variable_ptm + ptm.occurence.right_pos;
 	}
 	variable_ptm = ptm.ptm.abbreviation + variable_ptm ;
 	return variable_ptm ;
