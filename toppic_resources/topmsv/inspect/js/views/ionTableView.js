@@ -45,8 +45,11 @@ function createTableForSelectedFragmentIons(sequence,matchedUnMatchedPeaks,spect
     for(let i=0;i<len;i++)
     {
         let th = document.createElement("th");
+        let ionName = matchedUnMatchedPeaks[i].ionFragment;
+        ionName = convertIonName(ionName); 
+        
         th.setAttribute("class","th-sm");
-        th.innerHTML = matchedUnMatchedPeaks[i].ionFragment;
+        th.innerHTML = ionName;
         tr.appendChild(th);
     }
     /**
