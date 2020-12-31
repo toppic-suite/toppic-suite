@@ -101,7 +101,7 @@ white-space: nowrap;
 }
 .td_popup_variables{
   padding-top: 25px !important;
-  padding-left: 20px !important;
+  /*padding-left: 20px !important;*/
 }
 
 #save-image-modal{
