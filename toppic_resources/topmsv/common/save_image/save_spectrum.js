@@ -23,8 +23,8 @@ class SaveSpectrum{
               <table class="table table-sm table_modal">
                 <tbody>
                   <tr>
-                    <div >
-                      <td class="td_popup_variables" id="popup-env-btns">Show envelopes: &nbsp;&nbsp;&nbsp;
+                    <div>
+                      <td class="td_popup_variables" id="popup-env-btns" style="text-align:left">Show envelopes: &nbsp;&nbsp;&nbsp;
                         <input type="radio" name="show_envelopes" 
                                             class = "show_envelopes"
                                             checked>Yes</input>
@@ -36,11 +36,10 @@ class SaveSpectrum{
                         <input type="radio" name="show_ions" class = "show_ions" checked>Yes
                         <input type="radio" name="show_ions" class = "show_ions">No
                       </td>
-                    </div>
-                    <td class="td_popup_button">
-                      <button type = "button" class="btn btn-primary btn-sm "  id =
-                      "ms2_popup_redraw_btn" >Redraw</button>
+                      <td class="td_popup_button" style="text-align:right">
+                        <button type = "button" class="btn btn-primary btn-sm "  id ="ms2_popup_redraw_btn" >Redraw</button>
                     </td>
+                    </div>
                   </tr>
                 </tbody>
               </table>

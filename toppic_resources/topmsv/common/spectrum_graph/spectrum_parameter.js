@@ -22,7 +22,7 @@ class SpectrumParameters {
 
   //minimum possible m/z after zooming/dragging, to prevent dragging/zooming into negative m/z value
   //if new m/z is less than this value, it is reset to this value
-  minPossibleMz = -50;
+  minPossibleMz = -100;
 
   // M/z range of peaks
   dataMinMz = 0;
@@ -290,35 +290,15 @@ class SpectrumParameters {
    * Function also calls setLimita which helps in drawing limited number of peaks and circles per eachbin/range of mz values.
    */
   xZoom = function (mouseSvgX, ratio) {
-   if ((ratio > 1.0) || ((this.winMaxMz - this.winMinMz) < this.dataMaxMz) ) {
-      let mouseSpecX = mouseSvgX - this.padding.left;
-      this.winCenterMz =  mouseSpecX/this.xScale + this.winMinMz;
-      /*self is a global variable of datasource object containing all the data needed to use when zoomed*/
-      this.xScale = this.xScale * ratio ; 
-      this.winMinMz = this.winCenterMz - mouseSpecX / this.xScale; 
-      this.winMaxMz = this.winCenterMz + (this.specWidth - mouseSpecX) / this.xScale;
-    }
-    else if (this.seqLength > 0) {
-      //if mass graph, this.seqLength > 0 (if not, this.seqLength is -1)
-      //in mass graph, further zoom out may be necessary if sequence is long
-      //in mass graph, allow zooming out until the entire sequence is visible
+    let mouseSpecX = mouseSvgX - this.padding.left;
+    this.winCenterMz =  mouseSpecX/this.xScale + this.winMinMz;
+    /*self is a global variable of datasource object containing all the data needed to use when zoomed*/
+    this.xScale = this.xScale * ratio ; 
+    this.winMinMz = this.winCenterMz - mouseSpecX / this.xScale; 
+    this.winMaxMz = this.winCenterMz + (this.specWidth - mouseSpecX) / this.xScale;
 
-      let residueCount = 0;
-
-      d3.selectAll("#graph_sequence").selectAll("text").each(function(d, i){
-        residueCount += this.innerHTML.length; //get number of total residues drawn in current window
-      })
-      if (residueCount < this.seqLength * 2){//because residueCount includes both prefix and suffix
-        let mouseSpecX = mouseSvgX - this.padding.left;
-        this.winCenterMz =  mouseSpecX/this.xScale + this.winMinMz;
-        /*self is a global variable of datasource object containing all the data needed to use when zoomed*/
-        this.xScale = this.xScale * ratio ; 
-        this.winMinMz = this.winCenterMz - mouseSpecX / this.xScale; 
-        this.winMaxMz = this.winCenterMz + (this.specWidth - mouseSpecX) / this.xScale;
-        if (this.winMinMz < this.minPossibleMz){//prevent zooming out into negative mass
-          this.winMinMz = this.minPossibleMz;
-        }
-      }
+    if (this.winMinMz < this.minPossibleMz){//prevent zooming out into negative mass
+      this.winMinMz = this.minPossibleMz;
     }
   }
   /**
