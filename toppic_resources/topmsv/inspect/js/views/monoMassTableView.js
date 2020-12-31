@@ -134,6 +134,9 @@ function addMassDataToTable(matchedPeaks, graphObj)
         let th_mass_val = $("#"+parent_id+" .th_mass").text();
         // console.log("th_mass_val : ",th_mass_val);
         graphObj.redraw(peak_value);
+
+        //switch the graph tab to spectrum graph 
+        switchTab("graphlist");
     });
 }
 

@@ -140,6 +140,9 @@ function onClickofMatchedPeaks(spectrumGraph){
         // console.log("mass:",mass);
         // console.log("mz:", mz);
         spectrumGraph.redraw(mass);
+
+        //switch the graph tab to mass graph 
+        switchTab("monographlist");
     })
 }
 

@@ -61,3 +61,26 @@ function addEventNavBar(){
         }
     })
 }
+function switchTab(graphType){
+    let ms2GraphList = document.getElementsByClassName("ms2_graph_list");
+    
+    for (let i = 0; i < ms2GraphList.length; i++){
+        let svgId  = ms2GraphList[i].id;
+        let svgIdSplit = svgId.split("_");
+        let type = svgIdSplit[3];
+        if (type == graphType){
+            ms2GraphList[i].classList.add("active");
+        }
+        else{
+            ms2GraphList[i].classList.remove("active");
+        }
+    }
+    if (graphType == "monographlist"){
+        $("#"+Constants.SPECTRUMGRAPHID).hide();
+        $("#"+Constants.MONOMASSGRAPHID).show();    
+    }
+    else{
+        $("#"+Constants.SPECTRUMGRAPHID).show();
+        $("#"+Constants.MONOMASSGRAPHID).hide();    
+    }
+}
