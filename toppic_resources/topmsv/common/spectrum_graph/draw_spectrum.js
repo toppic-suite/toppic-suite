@@ -487,7 +487,16 @@ function drawIons(svg,para,ions){
     let x = ion.mz;
     let xPos = para.getPeakXPos(x) + para.ionXShift;
     let yPos = para.getPeakYPos(ion.intensity) + para.ionYShift;
+    //console.log("yPos", yPos);
+   // console.log("para.getPeakYPos(ion.intensity)",para.getPeakYPos(ion.intensity))
+    
     if(x >= para.winMinMz && x <= para.winMaxMz) {
+      if (para.isMonoMassGraph){
+        //if mass graph, to avoid overlapping with annotation with the sequence
+        if (yPos < 50){
+          continue;
+        }
+      }
       let color = "black";
       if (typeof ion.env !== "undefined") {
         color = ion.env.color;
