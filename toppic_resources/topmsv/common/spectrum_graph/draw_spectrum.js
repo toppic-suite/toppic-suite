@@ -40,7 +40,7 @@ function drawRawSpectrum(svgId, para, envPeaks) {
 function drawMonoMassSpectrum(svgId, para, proteoform, nMasses, cMasses, ions) {
   let svg = d3.select("body").select("#"+svgId).select("#svgGroup");
   updateViewBox(svgId, para.svgWidth, para.svgHeight);
-  drawSequence(svg, para, proteoform, nMasses, cMasses);
+  drawSequence(svg, para, proteoform, nMasses, cMasses, ions);
   addErrorPlot(svg, para);
   addErrorBox(svg, para);
   drawErrorYTicks(svg, para);
@@ -65,7 +65,7 @@ onCircleMouseOut = function(){
   this.onMouseOut();
 }
 
-onFragmentMassMouseOut = function(this_element) {
+onFragmentMassAndIonTypeMouseOut = function(this_element) {
   this.onMouseOut();
   d3.select(this_element).style("stroke","black")
     .style("stroke-width","1");
@@ -137,12 +137,15 @@ onMouseOverCircle = function(this_element,envelope, peak) {
 }
 
 /**
- * @function onMouseOverFragmentMass
- * @description Function to show the theoretical mass on mouse over of peaks
+ * @function onMouseOverFragmentMassAndIonType
+ * @description Function to show the theoretical mass and matched ion type on mouse over of peaks
  */
-onMouseOverFragmentMass = function(this_element, mass) {
+onMouseOverFragmentMassAndIonType = function(this_element, mass, ionData) {
   let pos = parseFloat(mass).toFixed(3);
-  let tooltipData = "mass:" + pos;
+  let tooltipData = "mass: " + pos + ", " + "ion type: " + ionData;
+  if (ionData == null){
+    tooltipData = "mass: " + pos;
+  }
 
   d3.select(this_element).style("stroke","red")
     .style("stroke-width","2");
@@ -534,12 +537,11 @@ function drawIons(svg,para,ions){
  * @param {Node} svg -  is a html node on which the graph is being ploted
  * @param {object} para - Contains the parameters like height, width etc.,. tht helps to draw the graph
  */
-function drawSequence(svg, para, proteoform, nMasses, cMasses){
-	let seqGroup = svg.append("g").attr("id", "graph_sequence");
+function drawSequence(svg, para, proteoform, nMasses, cMasses, ions){
 	let x,y;
 	// Draw | at 0 for prefix mass list
 	x = para.getPeakXPos(0);
-	y = 5;
+	y = 15;
   let seq = proteoform.sequence;
   let prevMass = -1.0;
   let residues = "";
@@ -551,13 +553,13 @@ function drawSequence(svg, para, proteoform, nMasses, cMasses){
     if (curMass > prevMass) {
       if (curMass >= para.winMinMz - 10 && curMass <= para.winMaxMz) {
         let x = para.getPeakXPos(curMass);
-        interAddLine(seqGroup,x,y, curMass);
+        interAddLineAndAnno(svg,x,y, curMass, i, ions, "n")
       }
       if (i > 0) {
         let mz = (prevMass + curMass)/2
         if (mz >= para.winMinMz && mz <= para.winMaxMz) {
           let x = para.getPeakXPos(mz) - 5;
-          interAddAminoAcid(seqGroup,x,y+12,residues);
+          interAddAminoAcid(x,y+12,residues);
         }
         residues = "";
       }
@@ -566,7 +568,7 @@ function drawSequence(svg, para, proteoform, nMasses, cMasses){
   }
 
 	x = para.getPeakXPos(0);
-  y = 25;
+  y = 35;
   prevMass = -1.0;
   resiudes = "";
   for (let i = 0; i < cMasses.length; i++) {
@@ -577,22 +579,45 @@ function drawSequence(svg, para, proteoform, nMasses, cMasses){
     if (curMass > prevMass) {
       if (curMass >= para.winMinMz - 10 && curMass <= para.winMaxMz) {
         let x = para.getPeakXPos(curMass);
-        interAddLine(seqGroup,x,y, curMass);
+        interAddLineAndAnno(svg,x,y, curMass, i, ions, "c");
       }
       if (i > 0) {
         let mz = (prevMass + curMass)/2
         if (mz >= para.winMinMz && mz <= para.winMaxMz) {
           let x = para.getPeakXPos(mz) - 5;
-          interAddAminoAcid(seqGroup,x,y+12,residues);
+          interAddAminoAcid(x,y+12,residues);
         }
         residues = "";
       }
       prevMass = curMass;
     }
   }
+  function getMatchedIon(residuePos, ions, terminal){
+    for (let i = 0; i < ions.length; i++){
+      if (parseInt(residuePos) == parseInt(ions[i].pos)){
+        let text = ions[i].text.split(ions[i].pos)[0]
+        if ((terminal == "n" && (text[0] == "A" || text[0] == "B" || text[0] == "C")) ||
+            (terminal == "c" && (text[0] == "X" || text[0] == "Y" || text[0] == "Z"))){
+              //return text;
+              return ions[i].text
+        }
+      }
+    }
+    return null;
+  }
+ 
+  function interAddLineAndAnno(svg, x,y, mass, residuePos, ions, terminal) {
+    let lineGroup = svg.append("g").attr("id", "seq_peak_line_anno");
+    let seqGroup = svg.append("g").attr("id", "graph_sequence");
+    let ionData = getMatchedIon(residuePos, ions, terminal);
 
-  function interAddLine(svgGroup, x,y, mass) {
-    svgGroup.append("line")
+    let lineYPos = 180;
+
+    if (terminal == "c"){
+      lineYPos = 160;
+    }
+
+    seqGroup.append("line")
       .attr("x1",x)
       .attr("y1",y)
       .attr("x2",x)
@@ -600,14 +625,26 @@ function drawSequence(svg, para, proteoform, nMasses, cMasses){
       .attr("stroke","black")
       .attr("stroke-width","1")
       .on("mouseover",function(){
-        onMouseOverFragmentMass(this, mass);
+        onMouseOverFragmentMassAndIonType(this, mass, ionData);
       })
       .on("mouseout",function(){
-        onFragmentMassMouseOut(this);
+        onFragmentMassAndIonTypeMouseOut(this);
       });
-  }
 
-	function interAddAminoAcid(svgGroup,x,y,text){
+      if (ionData){//if matched peak exists, draw a dotted line
+        lineGroup.append("line")
+        .attr("x1",x)
+        .attr("y1",y+16)
+        .attr("x2",x)
+        .attr("y2",y+lineYPos)
+        .attr("stroke","black")
+        .attr("stroke-width","1")
+        .style("stroke-dasharray", ("3, 3"))
+      }
+  }
+ 
+	function interAddAminoAcid(x,y,text){
+    let svgGroup = d3.select("#seq_peak_line_anno");
 		svgGroup.append("text")
 			.attr("id","")
 			.attr("x",x)
