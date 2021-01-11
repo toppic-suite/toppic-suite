@@ -280,7 +280,7 @@ let addOneIon = (ionList, ion) => {
 		}
 	}
 	if (idx == -1) {
-		let tempIonData = {"mz":ion.mass,"intensity":ion.intensity,"text": ion.ion, "error": ion.massError};
+		let tempIonData = {"mz":ion.mass,"intensity":ion.intensity,"text": ion.ion, "pos":ion.ionPos,"error": ion.massError};
 		//if it is z_dot ion, text should be converted 
 		tempIonData.text = convertIonName(tempIonData.text);
 		ionList.push(tempIonData);

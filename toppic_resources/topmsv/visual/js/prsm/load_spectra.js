@@ -261,7 +261,7 @@ function getIons(specId, deconvPeaks, envelopes){
         let monoX = parseFloat(envelopes[peakId].mono_mass);
         let monoY = 0; 
         envPeaks.forEach(element => monoY += element.intensity); 
-        monoIonData = {"mz": monoX, "intensity": monoY, "text": ionText, "error": massError};
+        monoIonData = {"mz": monoX, "intensity": monoY, "text": ionText, "pos":matchedIon.ion_display_position, "error": massError};
         addOneIon(monoIons, monoIonData);
       }
       else {
@@ -283,7 +283,7 @@ function getIons(specId, deconvPeaks, envelopes){
           let monoX = parseFloat(envelopes[peakId].mono_mass);
           let monoY = 0; 
           envPeaks.forEach(element => monoY += element.intensity); 
-          monoIonData = {"mz": monoX, "intensity": monoY, "text": ionText, "error": massError};
+          monoIonData = {"mz": monoX, "intensity": monoY, "text": ionText, "pos":matchedIon.ion_display_position, "error": massError};
           addOneIon(monoIons, monoIonData);
         }
       }

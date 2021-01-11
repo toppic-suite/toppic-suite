@@ -29,7 +29,7 @@ class MatchedPeaks {
 	 * @param {Float} mass - Mass at the position of the acid 
 	 * @param {Char} matchedInd - Indicator indicating matched/not matched. If matched containd "Y"
 	 */
-	matchedPeakAttributes(monoMassList_temp,id,ion,position,massDiff,mass,matchedInd)
+	matchedPeakAttributes(monoMassList_temp,id,ion,ionPos,position,massDiff,mass,matchedInd)
 	{
 		let peak = monoMassList_temp;
 		let thMass = "";
@@ -44,6 +44,7 @@ class MatchedPeaks {
 		}
 		peak.peakId = id ;
 		peak.ion = ion;
+		peak.ionPos = ionPos;
 		peak.position = position;
 		peak.massError = massDiff;
 		peak.thMass = thMass ;
@@ -89,7 +90,7 @@ class MatchedPeaks {
 						}
 						let mass = prefixOrSuffixMassList[j];
 						let matchedInd = "Y";
-						peak = this.matchedPeakAttributes(monoMassList_temp[i],peakId,ion,position,
+						peak = this.matchedPeakAttributes(monoMassList_temp[i],peakId,ion,j,position,
 																massDiff,mass,matchedInd);
 						matchedList.push(peak);		
 					}
@@ -109,7 +110,7 @@ class MatchedPeaks {
 						}
 						let mass = prefixOrSuffixMassList[j];
 						let matchedInd = "Y";
-						peak = this.matchedPeakAttributes(monoMassList_temp[i],peakId,ion,position,
+						peak = this.matchedPeakAttributes(monoMassList_temp[i],peakId,ion,j,position,
 																massDiff,mass,matchedInd);
 						matchedList.push(peak);
 					}
@@ -144,7 +145,7 @@ class MatchedPeaks {
 			if(!matched)
 			{
 				let matchedInd = "N";
-				let peak = self.matchedPeakAttributes(monoMassList[i],peakId,"","","","",matchedInd);
+				let peak = self.matchedPeakAttributes(monoMassList[i],peakId,"","","","","",matchedInd);
 			  matchedAndUnmatchedList.push(peak);
 			}
 		})
