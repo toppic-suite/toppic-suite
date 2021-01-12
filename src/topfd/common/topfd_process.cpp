@@ -150,26 +150,34 @@ int process(TopfdParaPtr para_ptr,  std::vector<std::string> spec_file_lst) {
   for (size_t k = 0; k < spec_file_lst.size(); k++) {
     if (isValidFile(spec_file_lst[k])) {
       processOneFile(para_ptr, spec_file_lst[k], k);
+      bool move_mzrt = true;
+      moveFiles(spec_file_lst[k], move_mzrt); 
     }
   }
 
   // merge files
+  /*
   if (para_ptr->merge_files_) {
     mergeFiles(para_ptr, spec_file_lst);
   }
+  */
 
   // Move some files to the folder basename_file
+  /*
   for (size_t k = 0; k < spec_file_lst.size(); k++) {
     if (isValidFile(spec_file_lst[k])) {
       bool move_mzrt = true;
       moveFiles(spec_file_lst[k], move_mzrt); 
     }
   }
+  */
 
+  /*
   if (para_ptr->merge_files_) {
     bool move_mzrt = false;
     moveFiles(para_ptr->merged_file_name_, move_mzrt);
   }
+  */
 
   std::cout << "TopFD finished." << std::endl << std::flush;
 
