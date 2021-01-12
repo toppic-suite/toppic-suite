@@ -42,6 +42,7 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string prec_window = "";
   std::string merged_file_name = "";
   std::string thread_number = "";
+  std::string activation = "";
 
   // Define and parse the program options
   try {
@@ -50,6 +51,8 @@ bool Argument::parse(int argc, char* argv[]) {
 
     display_desc.add_options()
         ("help,h", "Print this help message.")
+        ("activation,a", po::value<std::string> (&activation),
+        "<CID|HCD|ETD|UVPD|FILE>. Fragmentation method of tandem mass spectra. When FILE is used, fragmentation methods of spectra are given in the input spectral data file. Default value: FILE.")
         ("max-charge,c", po::value<std::string> (&max_charge),
          "<a positive integer>. Set the maximum charge state of precursor and fragment ions. The default value is 30.")
         ("max-mass,m", po::value<std::string> (&max_mass),
@@ -71,6 +74,7 @@ bool Argument::parse(int argc, char* argv[]) {
     po::options_description desc("Options");
     desc.add_options() 
         ("help,h", "Print this help message.") 
+        ("activation,a", po::value<std::string> (&activation), "")
         ("max-charge,c", po::value<std::string> (&max_charge), "")
         ("max-mass,m", po::value<std::string> (&max_mass), "")
         ("mz-error,e", po::value<std::string> (&mz_error), "")
@@ -118,6 +122,10 @@ bool Argument::parse(int argc, char* argv[]) {
     std::string exec_dir = file_util::getExecutiveDir(argv_0);
 
     topfd_para_ptr_->resource_dir_ = file_util::getResourceDir(exec_dir);
+
+    if (vm.count("activation")) {
+      topfd_para_ptr_->activation_ = activation;
+    }
 
     if (vm.count("max-charge")) {
       topfd_para_ptr_->max_charge_ = std::stoi(max_charge);

@@ -23,7 +23,7 @@ namespace toppic {
 
 class RawMsGroupReader {
  public:
-  RawMsGroupReader(const std::string & file_name, bool missing_level_one, 
+  RawMsGroupReader(const std::string & file_name, bool missing_level_one, std::string activation, 
                    int fraction_id);
 
   RawMsPtr readNextRawMs();
@@ -44,6 +44,7 @@ class RawMsGroupReader {
   bool do_refine_prec_mass_ = true;
   bool missing_level_one_ = false;
 
+  std::string activation_;
 };
 
 typedef std::shared_ptr<RawMsGroupReader> RawMsGroupReaderPtr;

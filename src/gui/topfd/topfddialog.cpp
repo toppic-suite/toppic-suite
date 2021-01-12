@@ -96,6 +96,7 @@ void TopFDDialog::on_clearButton_clicked() {
   ui->listWidget->clear();
   ui->outputTextBrowser->clear();
   ui->outputTextBrowser->setText("Click the Start button to process the spectrum files.");
+  ui->activationComboBox->setCurrentIndex(0);
   lastDir_ = "/";
 }
 
@@ -114,6 +115,7 @@ void TopFDDialog::on_defaultButton_clicked() {
   //ui->mergedFilenameLineEdit->setText("sample1");
   ui->outputTextBrowser->clear();
   ui->outputTextBrowser->setText("Click the Start button to process the spectrum files.");
+  ui->activationComboBox->setCurrentIndex(0);
 }
 
 std::vector<std::string> TopFDDialog::getSpecFileList() {
@@ -289,6 +291,7 @@ toppic::TopfdParaPtr TopFDDialog::getParaPtr() {
   //para_ptr_->merged_file_name_ = ui->mergedFilenameLineEdit->text().toStdString();
   para_ptr_->gene_html_folder_ = ui->geneHTMLCheckBox->isChecked();
   para_ptr_->use_env_cnn_ = ui->envCNNCheckBox->isChecked();
+  para_ptr_->activation_ = ui->activationComboBox->currentText().toStdString();
 
   return para_ptr_;
 }
@@ -312,6 +315,7 @@ void TopFDDialog::lockDialog() {
   //ui->mergedFilenameLineEdit->setEnabled(false);
   ui->geneHTMLCheckBox->setEnabled(false);
   ui->envCNNCheckBox->setEnabled(false);
+  ui->activationComboBox->setEnabled(false);
 }
 
 void TopFDDialog::unlockDialog() {
@@ -336,6 +340,7 @@ void TopFDDialog::unlockDialog() {
   }
   ui->geneHTMLCheckBox->setEnabled(true);
   ui->envCNNCheckBox->setEnabled(true);
+  ui->activationComboBox->setEnabled(true);
 }
 
 bool TopFDDialog::checkError() {

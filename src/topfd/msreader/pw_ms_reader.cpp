@@ -22,9 +22,18 @@
 #include "topfd/msreader/pw_ms_reader.hpp"
 
 namespace toppic {
-
 PwMsReader::PwMsReader(const std::string & file_name):
     file_name_(file_name),
+    input_sp_id_(0),
+    output_sp_id_(0) {
+      msd_ptr_ = std::make_shared<pwiz::msdata::MSDataFile>(file_name, &readers_);
+      spec_list_ptr_ =  msd_ptr_->run.spectrumListPtr;
+      input_sp_num_ = spec_list_ptr_->size();
+    }
+
+PwMsReader::PwMsReader(const std::string & file_name, std::string activation):
+    file_name_(file_name),
+    activation_(activation),
     input_sp_id_(0),
     output_sp_id_(0) {
       msd_ptr_ = std::make_shared<pwiz::msdata::MSDataFile>(file_name, &readers_);
@@ -40,7 +49,6 @@ bool PwMsReader::readOneMs(int sp_id, PeakPtrVec &peak_list, MsHeaderPtr &header
  
   cur_spec_ptr = spec_list_ptr_->spectrum(sp_id, get_binary_data);
   if (cur_spec_ptr == nullptr) {return false;}
-
 
   std::vector<pwiz::msdata::MZIntensityPair> pairs;
   cur_spec_ptr->getMZIntensityPairs(pairs);
@@ -103,26 +111,32 @@ bool PwMsReader::readOneMs(int sp_id, PeakPtrVec &peak_list, MsHeaderPtr &header
     // here is average mz
     header_ptr->setPrecSpMz(prec_mz);
     header_ptr->setRetentionTime(spec_info.retentionTime);
-
-    std::string ac_name;
-    if (cur_spec_ptr->precursors.size() != 0) {
-      std::vector<pwiz::data::CVParam> cv_list = cur_spec_ptr->precursors[0].activation.cvParams;
-      for (size_t i = 0; i < cv_list.size(); i++) {
-        LOG_DEBUG("cv list " << i << " " << cv_list[i].cvid << " " << cv_list[i].value);
-        if (cv_list[i].cvid == pwiz::cv::MS_CID) {
-          ac_name = "CID";
-          break;
-        } else if (cv_list[i].cvid == pwiz::cv::MS_HCD) {
-          ac_name = "HCD";
-          break;
-        } else if (cv_list[i].cvid == pwiz::cv::MS_ETD) {
-          ac_name = "ETD";
-          break;
+    
+    std::string ac_name = activation_;
+    if (ac_name == "" || ac_name == "FILE"){
+      ac_name = "";
+      if (cur_spec_ptr->precursors.size() != 0) {
+        std::vector<pwiz::data::CVParam> cv_list = cur_spec_ptr->precursors[0].activation.cvParams;
+        for (size_t i = 0; i < cv_list.size(); i++) {
+          LOG_DEBUG("cv list " << i << " " << cv_list[i].cvid << " " << cv_list[i].value);
+          if (cv_list[i].cvid == pwiz::cv::MS_CID) {
+            ac_name = "CID";
+            break;
+          } else if (cv_list[i].cvid == pwiz::cv::MS_HCD) {
+            ac_name = "HCD";
+            break;
+          } else if (cv_list[i].cvid == pwiz::cv::MS_ETD) {
+            ac_name = "ETD";
+            break;
+          }
         }
       }
     }
     if (ac_name == "") {
       LOG_WARN("No activation information is available in reading the spectrum with scan " << spec_info.scanNumber);
+      std::cout << "\nERROR: Unable to read the activation method from the file. Please select an activation method out of CID|HCD|ETD|UVPD and provide it as a parameter. Example: -a CID" << std::endl;
+      //exit(0);
+      exit(EXIT_FAILURE);
     }
     LOG_DEBUG("ac name " << ac_name);
     ActivationPtr activation_ptr = ActivationBase::getActivationPtrByName(ac_name);

@@ -22,8 +22,9 @@ namespace toppic {
 
 RawMsGroupReader::RawMsGroupReader(const std::string & file_name, 
                                    bool missing_level_one,
+                                   std::string activation,
                                    int fraction_id) {
-  reader_ptr_ = std::make_shared<PwMsReader>(file_name);
+  reader_ptr_ = std::make_shared<PwMsReader>(file_name, activation);
   missing_level_one_ = missing_level_one;
   fraction_id_ = fraction_id;
   if (!missing_level_one_) {
