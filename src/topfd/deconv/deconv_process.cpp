@@ -107,6 +107,7 @@ void DeconvProcess::process() {
   RawMsGroupReaderPtr reader_ptr 
       = std::make_shared<RawMsGroupReader>(spec_file_name_, 
                                            topfd_para_ptr_->missing_level_one_,
+                                           topfd_para_ptr_->activation_,
                                            frac_id_);
   if (topfd_para_ptr_->use_env_cnn_) {
     env_cnn::initModel(topfd_para_ptr_->resource_dir_, topfd_para_ptr_->thread_number_);
