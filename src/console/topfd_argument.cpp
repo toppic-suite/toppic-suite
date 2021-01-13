@@ -20,6 +20,7 @@
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/time_util.hpp"
+#include "common/util/custom_exception.hpp"
 #include "console/topfd_argument.hpp"
 
 namespace toppic {
@@ -220,6 +221,15 @@ bool Argument::validateArguments() {
     LOG_ERROR("Thread number " << thread_number << " should be a number.");
     return false;
   }
+  //validate activation method
+  std::string activation = topfd_para_ptr_->activation_;
+  if (activation != "FILE" && activation != "CID" && activation != "ETD"
+    && activation != "HCD" && activation != "UVPD"){
+    //throw InvalidActivation();
+    LOG_ERROR("Activation method should be one out of |FILE|CID|ETD|HCD|UVPD.");
+    return false;
+  }
+
   return true;
 }
 
