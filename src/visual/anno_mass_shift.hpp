@@ -26,6 +26,7 @@ namespace toppic {
 class AnnoMassShift {
  public:
   AnnoMassShift(int id, int left_pos, int right_pos, 
+                double mass_shift,
                 const std::string & anno_str, 
                 AlterTypePtr & mass_shift_type);
 
@@ -37,6 +38,8 @@ class AnnoMassShift {
   int left_pos_;
 
   int right_pos_;
+
+  double mass_shift_;
 
   std::string anno_str_;
 

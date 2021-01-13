@@ -62,7 +62,7 @@ class MassShifts {
 			fixedPtmAcid = selectedFixedPtmList[k].acid;
 			fixedPtmMass = selectedFixedPtmList[k].mass;
 
-			let tempObj = {mono_mass:fixedPtmMass, name:fixedPtmAcid, posList:[]}
+			let tempObj = {monoMass:fixedPtmMass, name:fixedPtmAcid, posList:[]}
 			for(let i = 0 ; i<this.sequence.length; i++)
 			{
 				if(this.sequence[i] === fixedPtmAcid)
