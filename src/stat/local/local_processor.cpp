@@ -364,15 +364,15 @@ ProteoformPtr LocalProcessor::onePtmTermAdjust(ProteoformPtr proteoform, const E
       new_mass_shift_vec.push_back(mass_shift_ptr);
       std::sort(new_mass_shift_vec.begin(), new_mass_shift_vec.end(), MassShift::cmpPosInc);
 
-      proteoform = proteoform_factory::geneProteoform(proteoform,
-                                                      ori_start + i,
-                                                      ori_end + j,
-                                                      new_mass_shift_vec,
-                                                      mng_ptr_->prsm_para_ptr_->getFixModPtrVec());
+      ProteoformPtr tmp_proteoform = proteoform_factory::geneProteoform(proteoform,
+                                                                        ori_start + i,
+                                                                        ori_end + j,
+                                                                        new_mass_shift_vec,
+                                                                        mng_ptr_->prsm_para_ptr_->getFixModPtrVec());
 
       double raw_scr;
       std::vector<double> scr_vec;
-      compOnePtmScr(proteoform, extend_ms_ptr_vec, scr_vec, raw_scr, ptm_vec_tmp);
+      compOnePtmScr(tmp_proteoform, extend_ms_ptr_vec, scr_vec, raw_scr, ptm_vec_tmp);
       raw_scr_vec.push_back(raw_scr);
     }
   }
@@ -488,13 +488,13 @@ ProteoformPtr LocalProcessor::twoPtmTermAdjust(ProteoformPtr proteoform, int num
 
       std::sort(new_mass_shift_vec.begin(), new_mass_shift_vec.end(), MassShift::cmpPosInc);
 
-      proteoform = proteoform_factory::geneProteoform(proteoform,
-                                                      ori_start + i,
-                                                      ori_end + j,
-                                                      new_mass_shift_vec,
-                                                      mng_ptr_->prsm_para_ptr_->getFixModPtrVec());
+      ProteoformPtr tmp_proteoform = proteoform_factory::geneProteoform(proteoform,
+                                                                        ori_start + i,
+                                                                        ori_end + j,
+                                                                        new_mass_shift_vec,
+                                                                        mng_ptr_->prsm_para_ptr_->getFixModPtrVec());
       double raw_scr;
-      compTwoPtmScr(proteoform, num_match, extend_ms_ptr_vec, prec_mass, raw_scr, ptm_pair_vec);
+      compTwoPtmScr(tmp_proteoform, num_match, extend_ms_ptr_vec, prec_mass, raw_scr, ptm_pair_vec);
       raw_scr_vec.push_back(raw_scr);
     }
   }
