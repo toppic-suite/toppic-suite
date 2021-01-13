@@ -121,10 +121,12 @@ void addAnnoMassShifts(ProteoformPtr proteoform_ptr, MassShiftPtrVec & shift_ptr
   for (size_t i = 0; i < shift_ptrs.size(); i++) {
     int left_db_bp = shift_ptrs[i]->getLeftBpPos() + start_pos;
     int right_db_bp = shift_ptrs[i]->getRightBpPos() + start_pos;
+    double mass_shift = shift_ptrs[i]->getMassShift();
     std::string anno_str = shift_ptrs[i]->getAnnoStr();
     AlterTypePtr type_ptr = shift_ptrs[i]->getTypePtr();
     AnnoMassShiftPtr anno_shift_ptr 
-        = std::make_shared<AnnoMassShift>(i, left_db_bp, right_db_bp, anno_str, type_ptr);
+        = std::make_shared<AnnoMassShift>(i, left_db_bp, right_db_bp, mass_shift, 
+                                          anno_str, type_ptr);
     anno_shift_ptrs.push_back(anno_shift_ptr);
   }
 }

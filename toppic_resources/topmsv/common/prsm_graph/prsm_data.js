@@ -306,6 +306,7 @@ function json2MassShifts(prsm) {
 			if(dataShift.shift_type == "unexpected" && dataShift.right_position != "0") {
         let shift = {};
         shift.anno = dataShift.anno; 
+        shift.shift = dataShift.shift;
         shift.leftPos = dataShift.left_position; 
         shift.rightPos = dataShift.right_position;
 				massShifts.push(shift) ;
