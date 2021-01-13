@@ -88,7 +88,7 @@ function parseSequenceMassShift(seq){
 				 */
 				let tempPosition = position - 1;
 				//Initially set the bg_color to null
-				let shiftobj = {leftPos:tempPosition, rightPos:tempPosition + 1, anno:mass, label:mass, bg_color:null};
+				let shiftobj = {leftPos:tempPosition, rightPos:tempPosition + 1, shift:mass, anno:mass, label:mass, bg_color:null};
 				/**
 				 * when the split occur at the end we get an extra "" in 
 				 * the list. This is to check if the mass is numeric.
@@ -233,6 +233,7 @@ let formMassShifts = (unknownMassShiftList) => {
 	unknownMassShiftList.forEach((element)=> {
 		let tempObj = {
 			anno: element.anno.toString(),
+      shift: element.anno.toSring(),
 			leftPos: (element.leftPos).toString(),
 			rightPos: (element.rightPos).toString()
 		}
