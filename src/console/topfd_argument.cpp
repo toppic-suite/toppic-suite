@@ -70,6 +70,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("missing-level-one,o","MS1 spectra are missing in the input file.")
         ("thread-number,u", po::value<std::string> (&thread_number), "<a positive integer>. Number of threads used in spectral deconvolution. Default value: 1.")
         ("skip-html-folder,g","Skip the generation of html files for the visualization of spectra and identifications.")
+        ("disable-final-filtering,d","Skip the final filtering of envelopes.")
         ;
 
     po::options_description desc("Options");
@@ -91,6 +92,7 @@ bool Argument::parse(int argc, char* argv[]) {
          "Merge deconvoluted files and specify the name of the merged file.")
         ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), 
          "Spectrum file name with its path.")
+         ("disable-final-filtering,d", "")
         ;
 
     po::positional_options_description positional_options;
@@ -183,6 +185,9 @@ bool Argument::parse(int argc, char* argv[]) {
     }
     if (vm.count("skip-html-folder")) {
       topfd_para_ptr_->gene_html_folder_ = false;
+    }
+    if (vm.count("disable-final-filtering")) {
+      topfd_para_ptr_->do_final_filtering_ = false;
     }
   }
   catch(std::exception& e) {
