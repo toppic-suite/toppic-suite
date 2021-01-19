@@ -111,6 +111,7 @@ void TopFDDialog::on_defaultButton_clicked() {
   ui->envCNNCheckBox->setChecked(false);
   ui->missLevelOneCheckBox->setChecked(false);
   ui->geneHTMLCheckBox->setChecked(true);
+  ui->finalFilteringCheckBox->setChecked(false);
   //ui->mergeCheckBox->setChecked(false);
   //ui->mergedFilenameLineEdit->setText("sample1");
   ui->outputTextBrowser->clear();
@@ -292,6 +293,7 @@ toppic::TopfdParaPtr TopFDDialog::getParaPtr() {
   para_ptr_->gene_html_folder_ = ui->geneHTMLCheckBox->isChecked();
   para_ptr_->use_env_cnn_ = ui->envCNNCheckBox->isChecked();
   para_ptr_->activation_ = ui->activationComboBox->currentText().toStdString();
+  para_ptr_->do_final_filtering_ = !(ui->finalFilteringCheckBox->isChecked());
 
   return para_ptr_;
 }
@@ -316,6 +318,7 @@ void TopFDDialog::lockDialog() {
   ui->geneHTMLCheckBox->setEnabled(false);
   ui->envCNNCheckBox->setEnabled(false);
   ui->activationComboBox->setEnabled(false);
+  ui->finalFilteringCheckBox->setEnabled(false);
 }
 
 void TopFDDialog::unlockDialog() {
@@ -341,6 +344,7 @@ void TopFDDialog::unlockDialog() {
   ui->geneHTMLCheckBox->setEnabled(true);
   ui->envCNNCheckBox->setEnabled(true);
   ui->activationComboBox->setEnabled(true);
+  ui->finalFilteringCheckBox->setEnabled(true);
 }
 
 bool TopFDDialog::checkError() {
