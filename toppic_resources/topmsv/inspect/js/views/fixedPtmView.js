@@ -136,11 +136,21 @@ function setFixedMasses(fixedPtmList){
         {
             for(let j=0; j<COMMON_FIXED_PTM_LIST.length;j++)
             {
-                if(fixedPtmList[i].name.toUpperCase() ===  COMMON_FIXED_PTM_LIST[j].name.toUpperCase())
-                {
-                    let fixedptm = COMMON_FIXED_PTM_LIST[j].acid + ":" + COMMON_FIXED_PTM_LIST[j].mass;
-                    addNewFixedPtmRow(fixedptm);
-                    break;
+                if(fixedPtmList[i].getAnnotation().toUpperCase() ===  COMMON_FIXED_PTM_LIST[j].name.toUpperCase()){
+                    let existingPtmList = getFixedPtmCheckList();
+                    let isNewPtm = true;
+                    if (existingPtmList.length > 0){//prevent same ptm added again
+                        existingPtmList.forEach(ptm => {
+                            if (ptm.mass.toFixed(4) == fixedPtmList[i].getShift()){
+                                isNewPtm = false;
+                            }  
+                        })
+                    }
+                    if (isNewPtm){
+                        let fixedptm = COMMON_FIXED_PTM_LIST[j].acid + ":" + COMMON_FIXED_PTM_LIST[j].mass;
+                        addNewFixedPtmRow(fixedptm);
+                        break;    
+                    }
                 }
             }
         }

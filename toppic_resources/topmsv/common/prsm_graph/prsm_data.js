@@ -61,23 +61,19 @@ class PrsmData {
       let anno = [];
       //annotation in prsm object contains only variable and unknown shifts
       for (let i = 0; i < protVarPtm.length; i++){
-        let temp = {"annoText":protVarPtm[i].name, "leftPos":0, "rightPos":0};
-        for (let j = 0; j < protVarPtm[i].posList.length; j++){
-          temp.leftPos = protVarPtm[i].posList[j].leftPos;
-          temp.rightPos = temp.leftPos + 1;
-          anno.push(temp);
-        }
+        let temp = {"annoText":protVarPtm[i].getAnnotation(), "leftPos":0, "rightPos":0};
+        temp.leftPos = protVarPtm[i].getLeftPos();
+        temp.rightPos = temp.leftPos + 1;
+        anno.push(temp);
       }
       for (let i = 0; i < variablePtm.length; i++){
-        let temp = {"annoText":variablePtm[i].name, "leftPos":0, "rightPos":0};
-        for (let j = 0; j < variablePtm[i].posList.length; j++){
-          temp.leftPos = variablePtm[i].posList[j].pos;
-          temp.rightPos = temp.leftPos + 1;
-          anno.push(temp);
-        }
+        let temp = {"annoText":variablePtm[i].getAnnotation(), "leftPos":0, "rightPos":0};
+        temp.leftPos = variablePtm[i].getLeftPos();
+        temp.rightPos = temp.leftPos + 1;
+        anno.push(temp);
       }
       for (let i = 0; i < massShift.length; i++){
-        let temp = {"annoText":massShift[i].label, "leftPos":massShift[i].leftPos, "rightPos":massShift[i].rightPos};
+        let temp = {"annoText":massShift[i].getAnnotation(), "leftPos":massShift[i].getLeftPos(), "rightPos":massShift[i].getRightPos()};
         anno.push(temp);
       }
       return anno;
@@ -133,10 +129,8 @@ class PrsmData {
     }
     for (let i = 0; i < this.fixedPtms.length; i++) {
       let ptm = this.fixedPtms[i];
-      for (let j = 0; j < ptm.posList.length; j++) {
-        let pos = ptm.posList[j].leftPos;
-        this.residues[pos].color = "red";
-      }
+      let pos = ptm.getLeftPos();
+      this.residues[pos].color = "red";
     }
   }
 
@@ -214,14 +208,12 @@ function getAnnotations(protVarPtms, prsm) {
   let annos = [];
   for (let i = 0; i < protVarPtms.length; i++) {
     let ptm = protVarPtms[i]; 
-    for (let j = 0; j < ptm.posList.length; j++) {
-      let pos = ptm.posList[j].leftPos; 
-      let anno = {};
-      anno.annoText = ptm.name;
-      anno.leftPos = pos;
-      anno.rightPos = pos + 1;
-      annos.push(anno);
-    }
+    let pos = ptm.getLeftPos(); 
+    let anno = {};
+    anno.annoText = ptm.getAnnotation();
+    anno.leftPos = pos;
+    anno.rightPos = pos + 1;
+    annos.push(anno);
   }
  
   if(prsm.annotated_protein.annotation.hasOwnProperty('mass_shift')) {
@@ -255,13 +247,9 @@ function json2Ptms(prsm){
     return [fixedPtmList, protVarPtmList, varPtmList];
   }
   let dataPtmList = getJsonList(prsm.annotated_protein.annotation.ptm); 
+
   for (let i = 0; i < dataPtmList.length; i++) {
     let dataPtm = dataPtmList[i];
-    //console.log(dataPtm);
-    let ptm = {};
-    ptm.name = dataPtm.ptm.abbreviation;
-    ptm.monoMass = dataPtm.ptm.mono_mass;
-    ptm.posList = [];
     if(dataPtm.ptm_type == "Fixed" || dataPtm.ptm_type == "Protein variable" 
       || dataPtm.ptm_type == "Variable") {
       if (dataPtm.hasOwnProperty("occurence")) {
@@ -269,23 +257,24 @@ function json2Ptms(prsm){
         //console.log(occList);
         for (let j = 0; j < occList.length; j++) {
           let occurence = occList[j];
-          let pos = {};
-          pos.leftPos = occurence.left_pos;
-          pos.rightPos = occurence.right_pos;
-          pos.acid = occurence.anno;
-          ptm.posList.push(pos);
+
+          let ptm = new Ptm(occurence.anno, dataPtm.ptm.mono_mass, dataPtm.ptm.abbreviation);
+          let massShift = new MassShift(occurence.left_pos, occurence.right_pos, ptm.getShift(), dataPtm.ptm_type, ptm.getName(), ptm);
+          
+          if (dataPtm.ptm_type == "Fixed") {
+            fixedPtmList.push(massShift);
+          }
+          else if (dataPtm.ptm_type == "Protein variable") {
+            protVarPtmList.push(massShift);
+          }
+          else {
+            varPtmList.push(massShift);
+          }
         }
       }
     }
-    if (dataPtm.ptm_type == "Fixed") {
-      fixedPtmList.push(ptm);
-    }
-    else if (dataPtm.ptm_type == "Protein variable") {
-      protVarPtmList.push(ptm);
-    }
-    else {
-      varPtmList.push(ptm);
-    }
+    //console.log(dataPtm);
+    
   }
   //console.log("fixed", fixedPtmList);
   //console.log("prot var", protVarPtmList);
@@ -304,12 +293,8 @@ function json2MassShifts(prsm) {
     for (let i = 0; i < dataMassShifts.length; i++) {
       let dataShift = dataMassShifts[i];
 			if(dataShift.shift_type == "unexpected" && dataShift.right_position != "0") {
-        let shift = {};
-        shift.anno = dataShift.anno; 
-        shift.shift = dataShift.shift;
-        shift.leftPos = dataShift.left_position; 
-        shift.rightPos = dataShift.right_position;
-				massShifts.push(shift) ;
+        let massShift = new MassShift(dataShift.left_position, dataShift.right_position, dataShift.shift, dataShift.shift_type, dataShift.shift);
+				massShifts.push(massShift) ;
 			}
       else if (dataShift.right_position == 0) {
         console.log("Mass shift right position is 0!", dataShift);
@@ -358,4 +343,3 @@ function json2MassShifts(prsm) {
 	return noDupMassShift ;
   */
 }
-

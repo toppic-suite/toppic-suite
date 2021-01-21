@@ -35,7 +35,13 @@ function parsePTM(dataName){
 	//ptm is an object inside array, so to preserve its structure, using JSON parse
 	//it is relatively small to other lists so the performance should not deteriorate much
 	let data = JSON.parse(window.localStorage.getItem(dataName));
-	return data;
+	let massShiftList = [];
+
+	data.forEach(d =>{
+		let massShift = new MassShift(d.leftPos_, d.rightPos_, d.massShift_, d.type_, d.annotation_, d.ptmList_);
+		massShiftList.push(massShift);
+	})
+	return massShiftList;
 }
 /**
  * Function returns a json formatted data after getting unknow mass list data from local storage
@@ -43,7 +49,13 @@ function parsePTM(dataName){
  */
 function parseUnknowmassList(dataName){
 	let data = JSON.parse(window.localStorage.getItem(dataName));
-	return data;
+	let massShiftList = [];
+
+	data.forEach(d =>{
+		let massShift = new MassShift(d.leftPos_, d.rightPos_, d.massShift_, d.type_, d.annotation_);
+		massShiftList.push(massShift);
+	})
+	return massShiftList;
 }
 /**
  * Function returns a json formatted data after getting precursor mass data from local storage
@@ -87,15 +99,15 @@ function parseSequenceMassShift(seq){
 				 * remove 1 as the data starts from 0 and length starts from 1
 				 */
 				let tempPosition = position - 1;
-				//Initially set the bg_color to null
-				let shiftobj = {leftPos:tempPosition, rightPos:tempPosition + 1, shift:mass, anno:mass, label:mass, bg_color:null};
+
 				/**
 				 * when the split occur at the end we get an extra "" in 
 				 * the list. This is to check if the mass is numeric.
 				 */
 				if(!isNaN(mass))
 				{
-					unknownMassShiftList.push(shiftobj);
+					let unknownMassShift = new MassShift(tempPosition, tempPosition + 1, mass, "unexpected", mass);
+					unknownMassShiftList.push(unknownMassShift);
 				}
 			}
 			massShift = "";
