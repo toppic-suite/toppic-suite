@@ -26,6 +26,7 @@ function onclickTopView(e){
     let fixedPtmList = prsmGraph.data.proteoform.getFixedPtmList(); 
     //console.log(fixedPtmList);
     let unknownMassShiftList = prsmGraph.data.proteoform.getUnknownMassList();
+    //console.log(unknownMassShiftList);
     let precursorMass = prsm_data.prsm.ms.ms_header.precursor_mono_mass;
     // Stores all the data in the variables respectively
     window.localStorage.setItem('peakAndIntensityList',  JSON.stringify(peakAndIntensityList));

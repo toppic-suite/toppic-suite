@@ -26,11 +26,11 @@ class SeqOfExecution
 		 * unbind all the actions previously binded else each action will be 
 		 * binded multiple times.
 		 */
-		let massShiftList = [];//contains unknown mass shifts
 		let fixedMassShiftList = [];//contains fixedPTM
 		let protVarPtmsList = [];//contains protein variable PTM
 		let variablePtmsList = [];//contains non-protein variable PTM
 		let completeShiftList = [];//contains all 3 kinds of mass shifts
+		let unknownMassShiftList = [];//contains unknown mass shifts
 		let peakDataList = [];
 		let modifiablePeakData = [];//will change value if shared peak
 		let massErrorthVal = null;
@@ -74,8 +74,7 @@ class SeqOfExecution
 		 * Returns mass list embedded in [] in sequence of user entered sequence.
 		 */
 		sequence = getSequenceFromUI();
-	
-		[sequence, massShiftList, protVarPtmsList, variablePtmsList] = parseSequenceMassShift(sequence);
+		[sequence,unknownMassShiftList, protVarPtmsList, variablePtmsList] = parseSequenceMassShift(sequence);
 
 		let selectedFixedMassShiftList = getFixedPtmCheckList();
 		// console.log("massShiftList:", massShiftList);
@@ -83,30 +82,58 @@ class SeqOfExecution
 		/** 
 		* Get fixed mass selected by user
 		*/
-		let massShiftObj = new MassShifts(sequence);
-
-		fixedMassShiftList = massShiftObj.getFixedMassShiftList(selectedFixedMassShiftList);
-		// console.log("fixedMassShiftList:", fixedMassShiftList);
-		massShiftObj.generateMassShiftList(massShiftList, protVarPtmsList, variablePtmsList, fixedMassShiftList);
+		let checkedFixedPtm = getFixedPtmCheckList();
+		checkedFixedPtm.forEach(ptm => {
+			let fixedPtm;
+			
+			for(let j=0; j<COMMON_FIXED_PTM_LIST.length;j++)
+            {
+                if(ptm.mass == COMMON_FIXED_PTM_LIST[j].mass)
+                {
+					let name = COMMON_FIXED_PTM_LIST[j].name;
+					fixedPtm = new Ptm(ptm.acid, ptm.mass, name);
+                    break;
+                }
+			}
+			for(let i = 0 ; i<sequence.length; i++)
+			{
+				if(sequence[i] === ptm.acid)
+				{
+					let massShift = new MassShift(i, i + 1, fixedPtm.getShift(), "Fixed", fixedPtm.getName(), fixedPtm);
+					fixedMassShiftList.push(massShift);
+				}
+			}
+		})
+		//console.log("fixedMassShiftList:", fixedMassShiftList);
 		/**
 		 * If user removed fixed ptm mass, remove the mass from the list
 		 */
 		if(removeAcid !== "")
 		{
-			massShiftObj.removeFixedMassList(removeAcid);
+			removeAcid = removeAcid.toUpperCase()
+			for(let i=0;i<fixedMassShiftList.length;i++)
+			{
+				let position = fixedMassShiftList[i].getLeftPos();
+				if(this.sequence_[position] === removeAcid)
+				{
+					fixedMassShiftList.splice(i,1);
+				}
+			}
 		}
 		/**
 		 * Check if mass shift is entered by clicking on the acid. If entered 
 		 * consider that mass shift and and append to the current mass shift list
 		 */
-		if(!$.isEmptyObject(this.onClickMassShift))
+		/*if(!$.isEmptyObject(this.onClickMassShift))
 		{
 			let tempPosition = this.onClickMassShift.position;
 			let tempMass = this.onClickMassShift.mass;
 			massShiftObj.appendtoMassShiftList(tempPosition,tempMass);
-		}
-		completeShiftList = massShiftObj.massShiftList;
+		}*/
+
+		completeShiftList = fixedMassShiftList.concat(protVarPtmsList, variablePtmsList, unknownMassShiftList);
 		//console.log("completeShiftList:", completeShiftList);
+		
 		/**
 		 * Form sequence with mass shift embedded in []
 		 */
@@ -135,7 +162,7 @@ class SeqOfExecution
 		//console.log("protVarPtmsList", protVarPtmsList);
 		//console.log("massShiftList", massShiftList)
 
-		let proteoformObj = new Proteoform(sequence, 0, fixedMassShiftList, protVarPtmsList, variablePtmsList, massShiftList);
+		let proteoformObj = new Proteoform(sequence, 0, fixedMassShiftList, protVarPtmsList, variablePtmsList, unknownMassShiftList);
 		// console.log("residueMasses:",proteoformObj.unexpectedMasses);
 		// console.log("getPrefix:",proteoformObj.suffixMasses);
 		// let calculatePrefixAndSuffixMassObj = new calculatePrefixAndSuffixMass();

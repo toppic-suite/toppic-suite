@@ -2,8 +2,7 @@
  * Set Sequence on to html
  */
 function setDataToSequence(sequence, massShiftList, protVarPtmsList, variablePtmsList){
-    let massShiftObj = new MassShifts(sequence, massShiftList);
-    let modifiedSequence = massShiftObj.formSequence();
+    let modifiedSequence = formSequence(sequence, massShiftList, protVarPtmsList, variablePtmsList);
     if(protVarPtmsList || variablePtmsList){
         modifiedSequence = addVariablePtm(modifiedSequence, protVarPtmsList, variablePtmsList);
     }
@@ -126,4 +125,35 @@ function getSequenceFromUI(){
  */
 function writeSeqToTextBox(seqToUI){
     jqueryElements.sequenceData.val(seqToUI);
+}
+/**
+* forms the seq with all the mass lists and selected fixed ptms
+* @return {string} result - sequence with mass shifts embedded in []
+*/
+function formSequence(sequence, massShiftList, protVarPtmsList, variablePtmsList){
+    let result = sequence;
+    let count = 0;
+    if(!massShiftList) {
+        return result;
+    }
+    // sort mass shift list by position, ascending
+    massShiftList.sort(function(x,y){
+        return x.getLeftPos() - y.getLeftPos();
+    })
+    for(let i=0; i<massShiftList.length; i++)
+    {
+        if(massShiftList[i].getShift() !== 0){
+            if(i > 0)
+            {
+                // this is the previous added mass
+                let tempString = "["+ massShiftList[i-1].getShift()+"]";
+                count = count + tempString.length;
+            }
+            
+            // add +1 as the position need to be added after the position of the acid.
+            let tempPosition = massShiftList[i].getLeftPos() + 1 + count;
+            result = result.slice(0, tempPosition) + "["+ massShiftList[i].getShift() + "]" + result.slice(tempPosition);
+        }
+    }
+    return result;
 }

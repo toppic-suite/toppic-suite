@@ -1,4 +1,5 @@
-class MassShiftList {
+/* THIS FILE DOES NOT SEEM TO BE USED
+/**class MassShiftList {
     prsm_data;
     fixedPtmList;
 
@@ -101,4 +102,4 @@ class MassShiftList {
 			}
 		}
 	}
-}
+}*/
