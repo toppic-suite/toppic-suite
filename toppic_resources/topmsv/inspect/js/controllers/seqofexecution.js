@@ -26,15 +26,11 @@ class SeqOfExecution
 		 * unbind all the actions previously binded else each action will be 
 		 * binded multiple times.
 		 */
-		let massShiftList = [];//contains unknown mass shifts
 		let fixedMassShiftList = [];//contains fixedPTM
 		let protVarPtmsList = [];//contains protein variable PTM
 		let variablePtmsList = [];//contains non-protein variable PTM
 		let completeShiftList = [];//contains all 3 kinds of mass shifts
-		let unknownMassShiftList = [];
-		let protVarPtmsList = [];
-		let variablePtmsList = [];
-		let fixedMassShiftList = [];
+		let unknownMassShiftList = [];//contains unknown mass shifts
 		let peakDataList = [];
 		let modifiablePeakData = [];//will change value if shared peak
 		let massErrorthVal = null;
@@ -109,10 +105,6 @@ class SeqOfExecution
 			}
 		})
 		//console.log("fixedMassShiftList:", fixedMassShiftList);
-
-		fixedMassShiftList = massShiftObj.getFixedMassShiftList(selectedFixedMassShiftList);
-		// console.log("fixedMassShiftList:", fixedMassShiftList);
-		massShiftObj.generateMassShiftList(massShiftList, protVarPtmsList, variablePtmsList, fixedMassShiftList);
 		/**
 		 * If user removed fixed ptm mass, remove the mass from the list
 		 */
