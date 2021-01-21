@@ -212,16 +212,16 @@ class SpectrumParameters {
     if (peakList != null && peakList.length > 0) {
       // Sort by mz
       peakList.sort(function(x,y){
-        return x.mz - y.mz;
+        return x.getMz() - y.getMz();
       });
       let listSize = peakList.length;
-      maxMz = parseFloat(peakList[listSize-1].mz);
+      maxMz = parseFloat(peakList[listSize-1].getMz());
 
       // Sort by intensity
       peakList.sort(function(x,y){
-        return x.intensity - y.intensity;
+        return x.getIntensity() - y.getIntensity();
       });
-      maxInte = parseFloat(peakList[listSize-1].intensity);
+      maxInte = parseFloat(peakList[listSize-1].getIntensity());
     }
     return [minMz, maxMz, maxInte];
   }

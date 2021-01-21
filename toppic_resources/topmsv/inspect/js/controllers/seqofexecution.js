@@ -76,9 +76,6 @@ class SeqOfExecution
 		sequence = getSequenceFromUI();
 		[sequence,unknownMassShiftList, protVarPtmsList, variablePtmsList] = parseSequenceMassShift(sequence);
 
-		let selectedFixedMassShiftList = getFixedPtmCheckList();
-		// console.log("massShiftList:", massShiftList);
-		// console.log("selectedFixedMassShiftList:", selectedFixedMassShiftList);
 		/** 
 		* Get fixed mass selected by user
 		*/
@@ -147,6 +144,7 @@ class SeqOfExecution
 		 */
 		peakDataList = getPeakListFromUI();
 		modifiablePeakData = getPeakListFromUI();
+
 		let monoMassListLen = monoMassList.length;
 		let seqln = sequence.length;
 		let matchedUnMatchedPeaks = [];
@@ -279,7 +277,7 @@ class SeqOfExecution
 			 * Get total mass and wite to HTML
 			 */
 			//let totalMass = getTotalSeqMass(sequence,completeShiftList);
-      let totalMass = proteoformObj.proteoformMass; 
+      		let totalMass = proteoformObj.proteoformMass; 
 			//console.log("completeShiftList", completeShiftList)
 			setTotalSeqMass(totalMass);
 			//Set Mass Difference, precursorMass is a global variable form spectrum.html
@@ -429,14 +427,16 @@ class SeqOfExecution
 
 		let ions = getIonsMassGraph(matchedPeakList);
 
-		//because SpectrumGraph class requires x-axis values to be "mz"
+		let monoMassPeakList = [];
+
 		for (let i = 0; i < monoMassList.length; i++){
-			monoMassList[i]["mz"] = monoMassList[i].mass;
+			let peak = new Peak(monoMassList[i].peakId, monoMassList[i].mass, monoMassList[i].intensity)
+			monoMassPeakList.push(peak);
 		}
 		let spectrumDataMonoPeaks = new SpectrumData();
-		spectrumDataMonoPeaks.assignLevelPeaks(monoMassList);
+		spectrumDataMonoPeaks.assignLevelPeaks(monoMassPeakList);
 
-		monoMassGraphObj = new SpectrumGraph("monoMassGraph",monoMassList);
+		monoMassGraphObj = new SpectrumGraph("monoMassGraph",monoMassPeakList);
 		// monoMassGraphObj.para.errorThreshold = 0.06;
 		monoMassGraphObj.addMonoMassSpectrumAnno(ions,proteoformObj, nIonType, cIonType);
 		monoMassGraphObj.para.setMonoMassGraph(true);

@@ -89,8 +89,8 @@ onMouseOut = function(){
  * @param {object} para - Contains the parameters like height, width etc.,. tht helps to draw the graph
  */
 onMouseOverPeak = function(this_element,peak,para) {
-  let intensity =" inte:"+ parseFloat(peak.intensity).toFixed(3);
-  let pos = parseFloat(peak.mz).toFixed(3);
+  let intensity =" inte:"+ parseFloat(peak.getIntensity()).toFixed(3);
+  let pos = parseFloat(peak.getMz()).toFixed(3);
   if (para.isMonoMassGraph) {
     pos = "mass:" + pos;
   }
@@ -384,20 +384,20 @@ function drawPeaks(svg,para,peakList){
   for(let i =0;i<len;i++)
   {
     let peak = peakList[i];
-    if(peak.mz >= para.winMinMz && peak.mz < para.winMaxMz)
+    if(peak.getMz() >= para.winMinMz && peak.getMz() < para.winMaxMz)
     {
-      if (peak.level / (spectrumData.mzLevel.length - 3)>= ratio || ratio <= 0.2){
+      if (peak.getLevel() / (spectrumData.mzLevel.length - 3)>= ratio || ratio <= 0.2){
         peaks.append("line")
         .attr("x1",function(){
-          return para.getPeakXPos(peak.mz);
+          return para.getPeakXPos(peak.getMz());
         })
         .attr("y1",function(){
-          let y = para.getPeakYPos(peak.intensity);
+          let y = para.getPeakYPos(peak.getIntensity());
           if(y<=para.padding.head) return para.padding.head ;
           else return y ;
         })
         .attr("x2",function(){
-          return para.getPeakXPos(peak.mz);
+          return para.getPeakXPos(peak.getMz());
         })
         .attr("y2",para.svgHeight - para.padding.bottom )
         .attr("stroke","black")

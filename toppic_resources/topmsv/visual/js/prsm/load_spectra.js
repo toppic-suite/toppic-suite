@@ -7,7 +7,13 @@ function loadMsOne(filename, ms1SvgId){
   script.src = filename;
   document.head.appendChild(script);
   script.onload = function(){
-    let peaks = ms1_data.peaks;
+    let peaks = [];
+
+    for (let i = 0; i < ms1_data.peaks.length; i++){
+      let peakObj = new Peak(i, ms1_data.peaks[i].mz, ms1_data.peaks[i].intensity);
+      peaks.push(peakObj);
+    }
+
     let envelopes = ms1_data.envelopes;
     let ions = [];
 
@@ -59,7 +65,14 @@ function loadMsTwo(specIdList, fileList, proteoform, divId, navId){
           let svgId = divId + "_graph_" + j;
           createSvg(show, divId, svgId, "ms2_svg_graph_class");
           let specId = specList[j].id;
-          let peaks = specList[j].peaks;
+          let peaks = [];
+ 
+          for (let i = 0; i < specList[j].peaks.length; i++){
+            let peak = specList[j].peaks[i];
+            let peakObj = new Peak(i, peak.mz, peak.intensity);
+            peaks.push(peakObj);
+          }
+
           let envelopes = specList[j].envelopes;
           let deconvPeaks = prsm_data.prsm.ms.peaks.peak;
           let [ions, monoIons] = getIons(specId, deconvPeaks, envelopes);
@@ -81,7 +94,6 @@ function loadMsTwo(specIdList, fileList, proteoform, divId, navId){
           show = false;
           createSvg(show, divId, monoSvgId, "ms2_svg_graph_class");
           let monoMasses = getMonoMasses(deconvPeaks);
-          //console.log(deconvPeaks, monoMasses);
           
           specList[j].monoMasses = monoMasses;
           specList[j].monoIons = monoIons;
@@ -206,10 +218,8 @@ function createSvg(show, divId, svgId, className){
 function getMonoMasses(deconvPeaks) {
   let masses = [];
   for (let i = 0; i < deconvPeaks.length; i++) {
-    let mass = {};
-    mass.mz = deconvPeaks[i].monoisotopic_mass;
-    mass.intensity = deconvPeaks[i].intensity;
-    masses.push(mass);
+    let peakObj = new Peak(deconvPeaks[i].peak_id, deconvPeaks[i].monoisotopic_mass, deconvPeaks[i].intensity);
+    masses.push(peakObj);
   }
   return masses;
 }

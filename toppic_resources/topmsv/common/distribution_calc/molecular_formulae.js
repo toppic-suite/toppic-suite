@@ -150,7 +150,7 @@ class MolecularFormulae{
 		let peakListLen = modifiedPeakList.length;
 		for(let k=0;k<peakListLen ; k++)
 		{
-			if(modifiedPeakList[k].intensity > overaAllMaxIntensity) overaAllMaxIntensity = modifiedPeakList[k].intensity ;
+			if(modifiedPeakList[k].getIntensity() > overaAllMaxIntensity) overaAllMaxIntensity = modifiedPeakList[k].getIntensity() ;
 		}
 		onePerctInte = overaAllMaxIntensity/100 ;
 		for(let i=0;i<len;i++)
@@ -190,7 +190,7 @@ class MolecularFormulae{
 			let maxMzDifference = 0;
 			for(let j=0;j<peakListLen;j++)//iterating through theo peaks in the data
 			{
-				let mzDifference = Math.abs(totDistributionList[i].mz - modifiedPeakList[j].mz);
+				let mzDifference = Math.abs(totDistributionList[i].mz - modifiedPeakList[j].getMz());
 				if(mzDifference <= this.toleraceMassDiff)
 				{
 					if(maxMz < totDistributionList[i].mz){
@@ -230,20 +230,20 @@ class MolecularFormulae{
 
 		for(let j=0;j<peakListLen;j++)
 		{
-			if(modifiedPeakList[j].mz >= minMz && modifiedPeakList[j].mz <= maxMz)
+			if(modifiedPeakList[j].getMz() >= minMz && modifiedPeakList[j].getMz() <= maxMz)
 			{
-				if(peakMaxinte < modifiedPeakList[j].intensity){
+				if(peakMaxinte < modifiedPeakList[j].getIntensity()){
 					//for all env dots, check if this peak really belongs to this envelope
 					for (let env = 0; env < totDistributionList.length; env++){
-						if (Math.abs(totDistributionList[env].mz - modifiedPeakList[j].mz) <= this.toleraceMassDiff){
-							peakMaxinte = modifiedPeakList[j].intensity;
+						if (Math.abs(totDistributionList[env].mz - modifiedPeakList[j].getMz()) <= this.toleraceMassDiff){
+							peakMaxinte = modifiedPeakList[j].getIntensity();
 						}
 					}
 				}
-				if(peakMininte > modifiedPeakList[j].intensity){
+				if(peakMininte > modifiedPeakList[j].getIntensity()){
 					for (let env = 0; env < totDistributionList.length; env++){
-						if (Math.abs(totDistributionList[env].mz - modifiedPeakList[j].mz) <= this.toleraceMassDiff){
-							peakMininte = modifiedPeakList[j].intensity;
+						if (Math.abs(totDistributionList[env].mz - modifiedPeakList[j].getMz()) <= this.toleraceMassDiff){
+							peakMininte = modifiedPeakList[j].getIntensity();
 						}
 					}
 					
@@ -282,15 +282,16 @@ class MolecularFormulae{
 						//store original peak intensity value only when it is evaluted for the first time
 						//not going to run when called from peakData because it is already evaluated there
 
-						if (Object.keys(modifiedPeakList[p]).indexOf("isPeakShared") < 0){
+						/*if (Object.keys(modifiedPeakList[p]).indexOf("isPeakShared") < 0){
 							modifiedPeakList[p]["origIntensity"] = modifiedPeakList[p].intensity;
-						}
-						modifiedPeakList[p].intensity = modifiedPeakList[p].intensity - totDistributionList[i].intensity;
+						}*/
+						let newInte = modifiedPeakList[p].getIntensity() - totDistributionList[i].intensity;
+						modifiedPeakList[p].setIntensity(newInte)
 					
-						if (modifiedPeakList[p].intensity < 0){
-							modifiedPeakList[p].intensity = 0;
+						if (modifiedPeakList[p].getIntensity() < 0){
+							modifiedPeakList[p].setIntensity(0);
 						}
-					modifiedPeakList[p]["isPeakShared"] = true;
+						modifiedPeakList[p]["isPeakShared"] = true;
 					}
 				}
 			}

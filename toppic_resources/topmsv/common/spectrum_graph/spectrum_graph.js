@@ -18,7 +18,7 @@ class SpectrumGraph {
     this.peakList = peakList;
     this.para.initParameters(peakList);
     this.peakList.sort(function(x,y){
-      return y.intensity - x.intensity; 
+      return y.getIntensity() - x.getIntensity(); 
     });
     $("#" + svgId).data("graph", this);
     // add zoom function
