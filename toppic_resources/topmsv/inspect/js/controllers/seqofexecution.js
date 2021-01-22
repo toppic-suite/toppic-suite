@@ -148,7 +148,7 @@ class SeqOfExecution
 		let monoMassListLen = monoMassList.length;
 		let seqln = sequence.length;
 		let matchedUnMatchedPeaks = [];
-		let distributionList;
+		let envelopeList;
 
 		/**
 		 * Setting masserror threshold value and ppm error threshhold value
@@ -298,8 +298,8 @@ class SeqOfExecution
 			let matchedPeaksObj = new MatchedPeaks();
 
 			//distributionList = matchedPeaksObj.getDistribution(peakDataList,sequence,matchedUnMatchedPeaks);
-			distributionList = matchedPeaksObj.getDistribution(modifiablePeakData,sequence,matchedUnMatchedPeaks, completeShiftList);
-			// console.log("distributionList:", distributionList);
+			envelopeList = matchedPeaksObj.getDistribution(modifiablePeakData,sequence,matchedUnMatchedPeaks,completeShiftList);
+			//console.log("envelopeList:", envelopeList);
 			/**
 			 * Display the graph formed
 			 */
@@ -311,11 +311,11 @@ class SeqOfExecution
 			let spectrumDataPeaks = new SpectrumData();
 			let spectrumDataEnvs = new SpectrumData();
 			spectrumDataPeaks.assignLevelPeaks(peakDataList);
-			spectrumDataEnvs.assignLevelEnvs(distributionList);
+			spectrumDataEnvs.assignLevelEnvs(envelopeList);
 
-			let ionList = getIonsSpectrumGraph(matchedPeakList, distributionList);
+			let ionList = getIonsSpectrumGraph(matchedPeakList, envelopeList);
 			spectrumGraphObj = new SpectrumGraph(Constants.SPECTRUMGRAPHID, peakDataList);
-			spectrumGraphObj.addRawSpectrumAnno(distributionList,ionList);
+			spectrumGraphObj.addRawSpectrumAnno(envelopeList,ionList);
 			// console.log("envPeakList:", spectrumGraphObj.envPeakList);
 			spectrumGraphObj.redraw();			
 		}/**

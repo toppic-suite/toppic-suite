@@ -33,7 +33,7 @@ class SpectrumGraph {
   addRawSpectrumAnno(envList, ionList){
     this.envList = envList;
     this.para.addColorToEnvelopes(envList);
-    this.envPeakList = this.getEnvPeakList(this.envList);
+    //this.envPeakList = this.getEnvPeakList(this.envList);
     this.ionList = ionList; 
   }
 
@@ -62,7 +62,8 @@ class SpectrumGraph {
       drawMonoMassSpectrum(this.id, this.para, this.proteoform, this.nMassList, this.cMassList, this.ionList);
     }
     else {
-      drawRawSpectrum(this.id, this.para, this.envPeakList);
+      //drawRawSpectrum(this.id, this.para, this.envPeakList);
+      drawRawSpectrum(this.id, this.para, this.envList);
     }
   }
 
@@ -84,20 +85,21 @@ class SpectrumGraph {
   zoom = d3.zoom()
     .on("zoom", this.zoomed)
 
-  getEnvPeakList = function(envList) {
-    if (!envList || envList.length === 0 || typeof envList[0].env_peaks === "undefined") {return [];}
+  /*getEnvPeakList = function(envList) {
+    if (!envList || envList.length === 0 || typeof envList[0].getTheoPeaks() === "undefined") {return [];}
     let envPeakList = [];
     for (let i = 0; i < envList.length; i++) {
       let env = envList[i];
-      for (let j = 0; j < env.env_peaks.length; j++) {
-        let peak = env.env_peaks[j];
-        peak.env = env;
+      for (let j = 0; j < env.getTheoPeaks().length; j++) {
+        let peak = env.getTheoPeaks()[j];
+        //peak.env = env;
         envPeakList.push(peak);
       }
     }
     envPeakList.sort(function(x,y){
-      return y.intensity - x.intensity;
+      return y.getIntensity() - x.getIntensity();
     });
+    console.log("envPeakList", envPeakList)
     return envPeakList;
-  }
+  }*/
 }

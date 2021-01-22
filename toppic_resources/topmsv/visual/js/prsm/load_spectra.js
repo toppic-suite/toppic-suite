@@ -8,13 +8,21 @@ function loadMsOne(filename, ms1SvgId){
   document.head.appendChild(script);
   script.onload = function(){
     let peaks = [];
+    let envelopes = [];
 
     for (let i = 0; i < ms1_data.peaks.length; i++){
       let peakObj = new Peak(i, ms1_data.peaks[i].mz, ms1_data.peaks[i].intensity);
       peaks.push(peakObj);
     }
-
-    let envelopes = ms1_data.envelopes;
+    for (let i = 0; i < ms1_data.envelopes.length; i++){
+      let env = ms1_data.envelopes[i];
+      let envObj = new Envelope(env.mono_mass, env.charge)
+      for (let j = 0; j < env.env_peaks.length; j++){
+        let peak = new Peak(j, env.env_peaks[j].mz, env.env_peaks[j].intensity);
+        envObj.addTheoPeaks(peak);
+      }
+      envelopes.push(envObj);
+    }
     let ions = [];
 
     let spectrumDataPeaks = new SpectrumData();
@@ -67,13 +75,24 @@ function loadMsTwo(specIdList, fileList, proteoform, divId, navId){
           let specId = specList[j].id;
           let peaks = [];
  
-          for (let i = 0; i < specList[j].peaks.length; i++){
-            let peak = specList[j].peaks[i];
-            let peakObj = new Peak(i, peak.mz, peak.intensity);
+          for (let k = 0; k < specList[j].peaks.length; k++){
+            let peak = specList[j].peaks[k];
+            let peakObj = new Peak(k, peak.mz, peak.intensity);
             peaks.push(peakObj);
           }
 
-          let envelopes = specList[j].envelopes;
+          let envelopes = [];
+
+          for (let m = 0; m < specList[j].envelopes.length; m++){
+            let env = specList[j].envelopes[m];
+            let envObj = new Envelope(env.mono_mass, env.charge)
+            for (let n = 0; n < env.env_peaks.length; n++){
+              let peak = new Peak(n, env.env_peaks[n].mz, env.env_peaks[n].intensity);
+              envObj.addTheoPeaks(peak);
+            }
+            envelopes.push(envObj);
+          }
+
           let deconvPeaks = prsm_data.prsm.ms.peaks.peak;
           let [ions, monoIons] = getIons(specId, deconvPeaks, envelopes);
 
@@ -248,12 +267,12 @@ function getIons(specId, deconvPeaks, envelopes){
       let peakId = element.peak_id;
       //console.log(peakId, envelopes.length, specId);
       //console.log(envelopes[peakId]);
-      let envPeaks = envelopes[peakId].env_peaks;
+      let envPeaks = envelopes[peakId].getTheoPeaks();
       envPeaks.sort(function(x,y){
-        return d3.descending(x.intensity, y.intensity);
+        return d3.descending(x.getIntensity(), y.getIntensity());
       });
-      let x = parseFloat(envPeaks[0].mz);
-      let y = parseFloat(envPeaks[0].intensity);
+      let x = parseFloat(envPeaks[0].getMz());
+      let y = parseFloat(envPeaks[0].getIntensity());
 
       if (parseInt(element.matched_ions_num) == 1) {
         let matchedIon = element.matched_ions.matched_ion;
@@ -268,9 +287,9 @@ function getIons(specId, deconvPeaks, envelopes){
         //console.log(ionData);
         ionData.env = envelopes[peakId]; 
         ions.push(ionData);
-        let monoX = parseFloat(envelopes[peakId].mono_mass);
+        let monoX = parseFloat(envelopes[peakId].getMonoMass());
         let monoY = 0; 
-        envPeaks.forEach(element => monoY += element.intensity); 
+        envPeaks.forEach(element => monoY += element.getIntensity()); 
         monoIonData = {"mz": monoX, "intensity": monoY, "text": ionText, "pos":matchedIon.ion_display_position, "error": massError};
         addOneIon(monoIons, monoIonData);
       }
@@ -290,9 +309,9 @@ function getIons(specId, deconvPeaks, envelopes){
           ionData.env = envelopes[peakId]; 
           ions.push(ionData);
 
-          let monoX = parseFloat(envelopes[peakId].mono_mass);
+          let monoX = parseFloat(envelopes[peakId].getMonoMass());
           let monoY = 0; 
-          envPeaks.forEach(element => monoY += element.intensity); 
+          envPeaks.forEach(element => monoY += element.getIntensity()); 
           monoIonData = {"mz": monoX, "intensity": monoY, "text": ionText, "pos":matchedIon.ion_display_position, "error": massError};
           addOneIon(monoIons, monoIonData);
         }

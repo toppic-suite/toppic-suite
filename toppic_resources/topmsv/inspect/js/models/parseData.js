@@ -329,18 +329,18 @@ let convertIonName = (ionName) => {
 	}
 	return ionName;
 }
-let getIonsSpectrumGraph = (matchedPeakList, distributionList) => {
+let getIonsSpectrumGraph = (matchedPeakList, envelopeList) => {
 	let ionData = [];
 	//generate ion list
 	for (let i = 0; i < matchedPeakList.length; i++){
-		for (let j = 0; j < distributionList.length; j++){
-			let env = distributionList[j];
+		for (let j = 0; j < envelopeList.length; j++){
+			let env = envelopeList[j];
 			let peak = matchedPeakList[i];
-			if (env.mono_mass == peak.mass){
-				env.env_peaks.sort(function(x,y){
-					return d3.descending(x.intensity, y.intensity);
+			if (env.getMonoMass() == peak.mass){
+				env.getTheoPeaks().sort(function(x,y){
+					return d3.descending(x.getIntensity(), y.getIntensity());
 				})
-				let ion = {"env":env, "error":peak.massError, "intensity":env.env_peaks[0].intensity, "mz":env.env_peaks[0].mz, "text":peak.ion.toUpperCase()};
+				let ion = {"env":env, "error":peak.massError, "intensity":env.getTheoPeaks()[0].getIntensity(), "mz":env.getTheoPeaks()[0].getMz(), "text":peak.ion.toUpperCase()};
 				//if it is z_dot ion, text should be converted 
 				ion.text = convertIonName(ion.text);
 				ionData.push(ion);

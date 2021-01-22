@@ -339,14 +339,14 @@ class SpectrumParameters {
    * Add color to envelopes.
    */
   addColorToEnvelopes = function(envList){
-    if(!envList || envList.length === 0 || typeof envList[0].env_peaks === "undefined") return;
+    if(!envList || envList.length === 0 || typeof envList[0].getTheoPeaks() === "undefined") return;
     envList.sort(function(x,y){
-      return (x.env_peaks[0].mz - y.env_peaks[0].mz);
+      return (x.getTheoPeaks()[0].getMz() - y.getTheoPeaks()[0].getMz());
     })
     let colorNum = this.envColorList.length; 
     for (let i = 0; i < envList.length; i++) 
     {
-      envList[i].color = this.envColorList[i%colorNum];
+      envList[i].setColor(this.envColorList[i%colorNum]);
     }
   }
 

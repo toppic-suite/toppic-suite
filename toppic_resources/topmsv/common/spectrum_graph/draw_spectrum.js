@@ -120,10 +120,10 @@ onMouseOverPeak = function(this_element,peak,para) {
  * @param {object} para - Contains the parameters like height, width etc.,. tht helps to draw the graph
  */
 onMouseOverCircle = function(this_element,envelope, peak) {
-  let mz = "m/z:"+peak.mz.toFixed(3);
-  let inte = "inte:"+peak.intensity.toFixed(2);
-  let mass = "mass:"+envelope.mono_mass.toFixed(3);
-  let charge = "charge:"+ envelope.charge ;
+  let mz = "m/z:"+peak.getMz().toFixed(3);
+  let inte = "inte:"+peak.getIntensity().toFixed(2);
+  let mass = "mass:"+envelope.getMonoMass().toFixed(3);
+  let charge = "charge:"+ envelope.getCharge() ;
   let tooltipData = mz + "<br>" + inte + "<br>" + mass + "<br>" + charge ;
   /*	Rectangle to have flexible on click and on mouse actions	*/
   var div = d3.select("body").append("div")
@@ -420,7 +420,57 @@ function drawPeaks(svg,para,peakList){
  * @param {object} para - Contains the parameters like height, width etc.,. tht helps to draw the graph
  * @param {Array} peakdata - Contians both peak list and envelopelist
  */
-function drawEnvelopes(svg,para,envPeakList) {
+function drawEnvelopes(svg,para,envList) {
+  let circles = svg.append("g").attr("id", "circles");
+  let minPercentage = 0.0;
+  let maxIntensity = para.dataMaxInte ;
+  let spectrumData = new SpectrumData();
+  // limits provide current count of number of peaks drawn on graph per bin(range)
+  // so that we can limit tha peak count to circlesPerRange count
+  let ratio = (para.winMaxMz - para.winMinMz) / (para.dataMaxMz - para.dataMinMz);
+  ratio = Math.min(1, ratio);
+
+  envList.forEach(env => {
+    let peaks = env.getTheoPeaks(); 
+    let color = env.getColor();
+    
+    if(peaks[0].getMz() >= para.winMinMz && peaks[0].getMz() < para.winMaxMz) 
+    { 
+      if (env.getLevel() / (spectrumData.mzLevel.length - 3) >= ratio || ratio <= 0.2){
+        //display envelopes based on level, but when the ratio falls below threshold, show all envs in the range
+        peaks.forEach(peak => {
+          let percentInte = peak.getIntensity()/maxIntensity * 100 ;
+          if (percentInte >= minPercentage){//Show only envelopes with minimum of 0.5%
+            circles.append("circle")
+            .attr("id","circles")
+            .attr("cx",function(){
+              return para.getPeakXPos(peak.getMz());
+            })
+            .attr("cy",function(){
+              let cy = para.getPeakYPos(peak.getIntensity());
+              if(cy < para.padding.head) return para.padding.head;
+              else return cy ;
+            })
+            .attr("r",function(){
+              return para.getCircleSize();
+            })
+            .style("fill","white")
+            .style("opacity", "0.8")
+            .style("stroke",color)
+            .style("stroke-width","2")
+            .on("mouseover",function(){
+              onMouseOverCircle(this,env,peak);
+            })
+            .on("mouseout",function(){
+              onCircleMouseOut(this);
+            });
+          }
+        })
+      }
+    }
+  })
+}
+/*function drawEnvelopes(svg,para,envPeakList) {
   let circles = svg.append("g").attr("id", "circles");
   let minPercentage = 0.0;
   let maxIntensity = para.dataMaxInte ;
@@ -434,8 +484,8 @@ function drawEnvelopes(svg,para,envPeakList) {
   for (let i = 0; i < envPeakList.length; i++) {
     let peak = envPeakList[i]; 
     let env = peak.env; 
-    //console.log(env);
-    let color = env.color;
+    console.log(peak);
+    let color = env.getColor();
     //Show only envelopes with minimum of 0.5%
     let percentInte = peak.intensity/maxIntensity * 100 ;
     if(peak.mz >= para.winMinMz && peak.mz < para.winMaxMz && percentInte >= minPercentage) 
@@ -468,7 +518,7 @@ function drawEnvelopes(svg,para,envPeakList) {
       }
     }
   }
-}
+}*/
 
 /**
  * @function drawIons
@@ -502,7 +552,7 @@ function drawIons(svg,para,ions){
       }
       let color = "black";
       if (typeof ion.env !== "undefined") {
-        color = ion.env.color;
+        color = ion.env.getColor();
       }
       if (i > 0){
         //check if this ion is annotating the same peak as the previous ion
