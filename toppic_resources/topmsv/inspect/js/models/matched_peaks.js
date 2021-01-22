@@ -162,7 +162,7 @@ class MatchedPeaks {
 	getDistribution(peakDataList,sequence,matchedUnMatchedList, completeMassShiftList)
 	{
 		let len = matchedUnMatchedList.length;
-		let totalDistribution = [] ;
+		let totalEnvelopes = [] ;
 		let calEmassAndDistObj = new CalculateEmassAndDistribution();
 		let molecularFormObj = new MolecularFormulae();
 		let seqln = sequence.length;
@@ -171,22 +171,23 @@ class MatchedPeaks {
 		matchedUnMatchedList.sort(function(x,y){
 			return d3.descending(x.intensity, y.intensity);
 		})
+
 		for(let i = 0; i < len; i++)
 		{
-			let distributionList = {};
-
-			distributionList.mono_mass = matchedUnMatchedList[i].mass;
-			distributionList.charge = matchedUnMatchedList[i].charge;
-			distributionList.env_peaks = molecularFormObj.emass(distributionList.mono_mass,distributionList.charge,peakDataList);
-
+			let envelope = new Envelope(matchedUnMatchedList[i].mass, matchedUnMatchedList[i].charge, matchedUnMatchedList[i].intensity);
+			let theoPeaks = molecularFormObj.emass(envelope.getMonoMass(), envelope.getCharge(), peakDataList);
+			for (let j = 0; j < theoPeaks.length; j++){
+				let peak = new Peak(j, theoPeaks[j].mz, theoPeaks[j].intensity)
+				envelope.addTheoPeaks(peak);
+			}
 			//check if the envelope for the current peak has already been generated
 			//push to the totalDistribution only if this envelope is unique
-			if (totalDistribution.length < 1){
-				totalDistribution.push(distributionList);
+			if (totalEnvelopes.length < 1){
+				totalEnvelopes.push(envelope);
 			}
 			else{
-				if (distributionList.mono_mass != totalDistribution[totalDistribution.length - 1].mono_mass){	
-					totalDistribution.push(distributionList);
+				if (envelope.getMonoMass() != totalEnvelopes[totalEnvelopes.length - 1].getMonoMass()){	
+					totalEnvelopes.push(envelope);
 				}
 			}
 			/*if(matchedUnMatchedList[i].matchedInd == "Y")
@@ -241,10 +242,10 @@ class MatchedPeaks {
 				totalDistribution.push(distributionList);
 			}*/
 		}
-		if(totalDistribution.length !== 0)
+		if(totalEnvelopes.length !== 0)
 		{	 
-			totalDistribution.sort(function(x,y){
-				return d3.ascending(x.env_peaks[0].mz, y.env_peaks[0].mz);
+			totalEnvelopes.sort(function(x,y){
+				return d3.ascending(x.getTheoPeaks()[0].getMz(), y.getTheoPeaks()[0].getMz());
 			})
 		}
 		// let envlength = totalDistribution.length;
@@ -256,7 +257,7 @@ class MatchedPeaks {
 			
 		// }
 
-		return totalDistribution ;
+		return totalEnvelopes ;
 	}
 	/**
 	 * Get All the matched positions and mass list seperated with a matched indicator

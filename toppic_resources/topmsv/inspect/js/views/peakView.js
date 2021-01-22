@@ -15,20 +15,19 @@ function getPeakListFromUI(){
         let peakAndInte = lines[i].trim();
         if(peakAndInte.length !== 0)
         {
-            let spectrumData = {};
+            let peak = null;
             let peakInte = peakAndInte.split(/[\s]+/);
             if(peakInte[0] != undefined && peakInte[1] != undefined 
                     && !isNaN(peakInte[0]) && !isNaN(peakInte[1]))
             {
-                spectrumData.mz = parseFloat(peakInte[0])///spectrumData.charge ;
-                spectrumData.intensity = parseFloat(peakInte[1]);
+                peak = new Peak(i, parseFloat(peakInte[0]), parseFloat(peakInte[1]))
             }
-            if(!jQuery.isEmptyObject(spectrumData))
+            if(peak)
             {
-                if((spectrumData.mz !== undefined) &&
-                    (spectrumData.intensity !== undefined))
+                if((peak.getMz() !== undefined) &&
+                    (peak.getIntensity() !== undefined))
                 {
-                    spectrumDataList.push(spectrumData) ;
+                    spectrumDataList.push(peak) ;
                 }
             }
         }
