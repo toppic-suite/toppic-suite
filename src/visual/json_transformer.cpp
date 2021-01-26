@@ -56,17 +56,19 @@ void jsonTranslate(std::map<std::string, std::string> &arguments,
   // check if the html dir exists 
   if (file_util::exists(html_dir)) {
     LOG_WARN("The html directory " << html_dir << " exists!");
-    file_util::delDir(html_dir);
+    //file_util::delDir(html_dir);
   }
+  else{
+    // data js files
+    file_util::createFolder(json_dir + file_util::getFileSeparator() +"proteoforms");
+    file_util::createFolder(json_dir + file_util::getFileSeparator() +"prsms");
+    file_util::createFolder(json_dir + file_util::getFileSeparator() +"proteins");
+  }
+  
 
   // copy resources 
   //std::string from_path(resource_dir + file_util::getFileSeparator() + "topmsv");
   //file_util::copyDir(from_path, html_dir);
-
-  // data js files
-  file_util::createFolder(json_dir + file_util::getFileSeparator() +"proteoforms");
-  file_util::createFolder(json_dir + file_util::getFileSeparator() +"prsms");
-  file_util::createFolder(json_dir + file_util::getFileSeparator() +"proteins");
 
   std::string xml_file_list = xml_dir + file_util::getFileSeparator() + "files.xml";
   std::vector<std::vector<std::string>> anno_file_list = AnnoFileList::readFromXml(xml_file_list);

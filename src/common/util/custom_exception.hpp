@@ -5,3 +5,9 @@ struct InvalidActivation : public std::exception{
         return "No Activation Information";
     }
 };
+
+struct FileInUse : public std::exception{
+    const char * what () const throw () {
+        return "File/Folder in use";
+    }
+};
