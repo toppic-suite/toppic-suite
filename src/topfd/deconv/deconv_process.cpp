@@ -93,12 +93,12 @@ void DeconvProcess::prepareFileFolder() {
     ms2_json_dir_ = html_dir_ 
         + file_util::getFileSeparator() + "topfd" 
         + file_util::getFileSeparator() + "ms2_json";
-    if (file_util::exists(html_dir_)) {
-      file_util::delDir(html_dir_);
+    if (!file_util::exists(html_dir_)) {
+      //file_util::delDir(html_dir_);
+      file_util::createFolder(html_dir_);
+      file_util::createFolder(ms1_json_dir_);
+      file_util::createFolder(ms2_json_dir_);
     }
-    file_util::createFolder(html_dir_);
-    file_util::createFolder(ms1_json_dir_);
-    file_util::createFolder(ms2_json_dir_);
   }
 }
 
