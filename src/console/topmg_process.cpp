@@ -21,6 +21,7 @@
 #include "common/base/base_data.hpp"
 #include "common/util/file_util.hpp"
 #include "common/base/mod_util.hpp"
+#include "common/util/custom_exception.hpp"
 
 #include "seq/fasta_reader.hpp"
 #include "seq/fasta_util.hpp"
@@ -78,15 +79,17 @@ void copyTopMSV(std::map<std::string, std::string> &arguments) {
   std::string topmsv_dir = base_name_short + "_html" +  file_util::getFileSeparator() + "topmsv";
   if (file_util::exists(topmsv_dir)) {
     LOG_WARN("The TopMSV directory " << topmsv_dir << " exists!");
-    file_util::delDir(topmsv_dir);
+    //file_util::delDir(topmsv_dir);
   }
-  if (!file_util::exists(base_name_short + "_html")){//if _html folder was not created before
-    file_util::createFolder(base_name_short + "_html");
+  else{
+    if (!file_util::exists(base_name_short + "_html")){//if _html folder was not created before
+      file_util::createFolder(base_name_short + "_html");
+    }
+    std::string resource_dir = arguments["resourceDir"];
+    // copy resources 
+    std::string from_path(resource_dir + file_util::getFileSeparator() + "topmsv");
+    file_util::copyDir(from_path, topmsv_dir);
   }
-  std::string resource_dir = arguments["resourceDir"];
-  // copy resources 
-  std::string from_path(resource_dir + file_util::getFileSeparator() + "topmsv");
-  file_util::copyDir(from_path, topmsv_dir);
 }
 
 void cleanTopmgDir(const std::string &fa_name, 
@@ -421,6 +424,8 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
       jsonTranslate(arguments, "topmg_proteoform_cutoff");
       std::cout << "Converting proteoform xml files to html files - finished." << std::endl;
     }
+  } catch (FileInUse& e){
+      std::cout << "[Exception] " << e.what() << std::endl;
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;

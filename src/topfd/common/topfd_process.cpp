@@ -71,6 +71,8 @@ void processOneFile(TopfdParaPtr para_ptr,
 
   } catch (InvalidActivation& e){
       std::cout << "[Exception] " << e.what() << std::endl;
+  } catch (FileInUse& e){
+      std::cout << "[Exception] " << e.what() << std::endl;
   } catch (const char* e) {
     std::cout << "the error is coming from here" << std::endl;
     std::cout << "[Exception] " << e << std::endl;
@@ -87,7 +89,9 @@ void moveFiles(std::string &spec_file_name, bool move_mzrt) {
   //create folder only if ms1 msalign and frac mzrt csv exist  
   //== when ms1 spectra was used
   if (file_util::exists(file_name)) {//if there is ms1 msalign
-    file_util::createFolder(file_dir);
+    if (!file_util::exists(file_dir)) {
+      file_util::createFolder(file_dir);
+    }
     file_util::moveFile(file_name, file_dir);
     //file_name = base_name + "_feature.xml";
     //file_util::moveFile(file_name, file_dir);

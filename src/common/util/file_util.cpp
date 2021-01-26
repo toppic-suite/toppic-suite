@@ -11,7 +11,6 @@
 //WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //See the License for the specific language governing permissions and
 //limitations under the License.
-
 #include <string>
 
 #ifndef BOOST_SYSTEM_NO_DEPRECATED
@@ -32,6 +31,7 @@
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
+#include "common/util/custom_exception.hpp"
 
 namespace fs = boost::filesystem;
 
@@ -118,7 +118,13 @@ std::string directory(const std::string &s) {
 
 void createFolder(const std::string &folder_name) {
   fs::path path(folder_name);
-  fs::create_directories(path);
+  try{
+      fs::create_directories(path);
+    }
+    catch(const boost::filesystem::filesystem_error& e) {
+      std::cout << "ERROR: Output file/folder could not be generated because it was in use. Please close any open output files/folders from the previous run and try again." << std::endl;
+      throw FileInUse();
+    }
 }
 
 void createLink(const std::string &a_link, const std::string &a_dir, const std::string &b) {
@@ -230,8 +236,15 @@ bool exists(const std::string &path) {
 
 void delDir(const std::string &path) {
   fs::path dir(path);
-  if (fs::exists(dir))
-    fs::remove_all(dir);
+  if (fs::exists(dir)){
+    try{
+      fs::remove_all(dir);
+    }
+    catch(const boost::filesystem::filesystem_error& e) {
+      std::cout << "ERROR: Output file/folder is in use. Please close all output folders and files from previous run and try again" << std::endl;
+      throw FileInUse();
+    }
+  }
 }
 
 void delFile(const std::string &path) {
