@@ -71,6 +71,19 @@ namespace pwiz {
 namespace util {
 
 
+/// returns true iff process is Windows executable running under Wine
+PWIZ_API_DECL bool running_on_wine();
+
+
+/// on Windows, closes all file handles and memory mapped sections relating to the given filepath
+PWIZ_API_DECL void force_close_handles_to_filepath(const std::string& filepath, bool closeMemoryMappedSections = false) noexcept(true);
+
+
+/// adds utf8_codecvt_facet to boost::filesystem::path's default behavior so it works with UTF-8 std::strings;
+/// uses a singleton so the imbuement is only done once
+PWIZ_API_DECL void enable_utf8_path_operations();
+
+
 /// expands (aka globs) a pathmask to zero or more matching paths and returns the number of matching paths
 /// - matching paths can be either files or directories
 /// - matching paths will be absolute if input pathmask was absolute

@@ -40,6 +40,21 @@ using namespace minimxml::SAXParser;
 using namespace util;
 
 
+template <typename object_type>
+void writeList(minimxml::XMLWriter& writer, const vector<object_type>& objectPtrs, const string& label)
+{
+    if (!objectPtrs.empty())
+    {
+        XMLWriter::Attributes attributes;
+        attributes.add("count", objectPtrs.size());
+        writer.startElement(label, attributes);
+        for (typename vector<object_type>::const_iterator it = objectPtrs.begin(); it != objectPtrs.end(); ++it)
+            write(writer, **it);
+        writer.endElement();
+    }
+}
+
+
 //
 // CV
 //
@@ -461,16 +476,8 @@ PWIZ_API_DECL void write(minimxml::XMLWriter& writer, const FileDescription& fd)
 {
     writer.startElement("fileDescription");
     write(writer, fd.fileContent);
-
-    XMLWriter::Attributes attributes;
-    attributes.add("count", fd.sourceFilePtrs.size());
-    writer.startElement("sourceFileList", attributes);
-
-    for (vector<SourceFilePtr>::const_iterator it=fd.sourceFilePtrs.begin(); 
-         it!=fd.sourceFilePtrs.end(); ++it)
-         write(writer, **it);
-
-    writer.endElement();
+    
+    writeList(writer, fd.sourceFilePtrs, "sourceFileList");
 
     for (vector<Contact>::const_iterator it=fd.contacts.begin(); 
          it!=fd.contacts.end(); ++it)
@@ -662,6 +669,9 @@ PWIZ_API_DECL void read(std::istream& is, Component& component)
 
 PWIZ_API_DECL void write(minimxml::XMLWriter& writer, const ComponentList& componentList)
 {
+    if (componentList.empty()) // componentList not required by schema
+        return;
+
     int count = (int) componentList.size();
 
     XMLWriter::Attributes attributes;
@@ -1604,9 +1614,8 @@ PWIZ_API_DECL void read(std::istream& is, ScanList& scanList)
 // BinaryData
 //
 
-PWIZ_API_DECL
-void write(minimxml::XMLWriter& writer, const BinaryDataArray& binaryDataArray,
-           const BinaryDataEncoder::Config& config)
+template <typename BinaryDataArrayType>
+void writeBinaryDataArray(minimxml::XMLWriter& writer, const BinaryDataArrayType& binaryDataArray, const BinaryDataEncoder::Config& config)
 {
     BinaryDataEncoder::Config usedConfig = config;
     map<CVID, BinaryDataEncoder::Precision>::const_iterator overrideItr = config.precisionOverrides.find(binaryDataArray.cvParamChild(MS_binary_data_array).cvid);
@@ -1640,10 +1649,11 @@ void write(minimxml::XMLWriter& writer, const BinaryDataArray& binaryDataArray,
     if (BinaryDataEncoder::Numpress_None == usedConfig.numpress)
     {
         if (usedConfig.precision == BinaryDataEncoder::Precision_32)
-            write(writer, MS_32_bit_float);
+            write(writer, typeid(BinaryDataArrayType) == typeid(IntegerDataArray) ? MS_32_bit_integer : MS_32_bit_float);
         else
-            write(writer, MS_64_bit_float);
+            write(writer, typeid(BinaryDataArrayType) == typeid(IntegerDataArray) ? MS_64_bit_integer : MS_64_bit_float);
     }
+
     if (usedConfig.byteOrder == BinaryDataEncoder::ByteOrder_BigEndian)
         throw runtime_error("[IO::write()] mzML: must use little endian encoding.");
 
@@ -1694,15 +1704,33 @@ void write(minimxml::XMLWriter& writer, const BinaryDataArray& binaryDataArray,
 }
 
 
+PWIZ_API_DECL
+void write(minimxml::XMLWriter& writer, const BinaryDataArray& binaryDataArray, const BinaryDataEncoder::Config& config)
+{
+    writeBinaryDataArray(writer, binaryDataArray, config);
+}
+
+PWIZ_API_DECL
+void write(minimxml::XMLWriter& writer, const IntegerDataArray& binaryDataArray, const BinaryDataEncoder::Config& config)
+{
+    writeBinaryDataArray(writer, binaryDataArray, config);
+}
+
+
 struct HandlerBinaryDataArray : public HandlerParamContainer
 {
-    BinaryDataArray* binaryDataArray;
+    std::vector<BinaryDataArrayPtr>* binaryDataArrayPtrs;
+    std::vector<IntegerDataArrayPtr>* integerDataArrayPtrs;
     const MSData* msd;
     size_t defaultArrayLength;
     BinaryDataEncoder::Config config;
+    ParamContainer paramContainer;
+    DataProcessingPtr dataProcessingPtr;
+    CVID cvidBinaryDataType;
 
-    HandlerBinaryDataArray(BinaryDataArray* _binaryDataArray = 0, const MSData* _msd = 0)
-    :   binaryDataArray(_binaryDataArray),
+    HandlerBinaryDataArray(std::vector<BinaryDataArrayPtr>* binaryDataArrayPtrs = 0, std::vector<IntegerDataArrayPtr>* integerDataArrayPtrs = 0, const MSData* _msd = 0)
+      : binaryDataArrayPtrs(binaryDataArrayPtrs),
+        integerDataArrayPtrs(integerDataArrayPtrs),
         msd(_msd),
         defaultArrayLength(0),
         arrayLength_(0),
@@ -1716,33 +1744,62 @@ struct HandlerBinaryDataArray : public HandlerParamContainer
                                 const Attributes& attributes,
                                 stream_offset position)
     {
-        if (!binaryDataArray)
-            throw runtime_error("[IO::HandlerBinaryDataArray] Null binaryDataArray.");
-
         if (name != "cvParam") // most common, but not handled here
         { 
             if (name == "binaryDataArray")
             {
+                paramContainer.clear();
+
                 // note: placeholder
                 string dataProcessingRef;
                 decode_xml_id(getAttribute(attributes, "dataProcessingRef", dataProcessingRef));
                 if (!dataProcessingRef.empty())
-                    binaryDataArray->dataProcessingPtr = DataProcessingPtr(new DataProcessing(dataProcessingRef));
+                    dataProcessingPtr.reset(new DataProcessing(dataProcessingRef));
+                else
+                    dataProcessingPtr.reset();
 
-                    getAttribute(attributes, "encodedLength", encodedLength_, NoXMLUnescape);
-                    getAttribute(attributes, "arrayLength", arrayLength_, NoXMLUnescape, defaultArrayLength);
+                getAttribute(attributes, "encodedLength", encodedLength_, NoXMLUnescape);
+                getAttribute(attributes, "arrayLength", arrayLength_, NoXMLUnescape, defaultArrayLength);
 
                 return Status::Ok;
             }
             else if (name == "binary")
             {
-                if (msd) References::resolve(*binaryDataArray, *msd);
+                if (msd) References::resolve(paramContainer, *msd);
                 config = getConfig();
+
+                switch (cvidBinaryDataType)
+                {
+                    case MS_32_bit_float:
+                    case MS_64_bit_float:
+                    {
+                        BinaryDataArrayPtr binaryDataArray = boost::make_shared<BinaryDataArray>();
+                        binaryDataArrayPtrs->emplace_back(binaryDataArray);
+                        swap(static_cast<ParamContainer&>(*binaryDataArray), paramContainer);
+                        binaryDataArray->dataProcessingPtr = dataProcessingPtr;
+                    }
+                    break;
+
+                    case MS_32_bit_integer:
+                    case MS_64_bit_integer:
+                    {
+                        IntegerDataArrayPtr binaryDataArray = boost::make_shared<IntegerDataArray>();
+                        integerDataArrayPtrs->emplace_back(binaryDataArray);
+                        swap(static_cast<ParamContainer&>(*binaryDataArray), paramContainer);
+                        binaryDataArray->dataProcessingPtr = dataProcessingPtr;
+                    }
+                    break;
+
+                    case CVID_Unknown:
+                    default:
+                        throw runtime_error("[IO::HandlerBinaryDataArray] Unknown binary data type.");
+                }
+
                 return Status::Ok;
             }
         } // end if not cvParam
 
-        HandlerParamContainer::paramContainer = binaryDataArray;
+        HandlerParamContainer::paramContainer = &paramContainer;
         return HandlerParamContainer::startElement(name, attributes, position);
     }
 
@@ -1750,15 +1807,41 @@ struct HandlerBinaryDataArray : public HandlerParamContainer
     virtual Status characters(const SAXParser::saxstring& text,
                               stream_offset position)
     {
-        if (!binaryDataArray)
-            throw runtime_error("[IO::HandlerBinaryDataArray] Null binaryDataArray."); 
-
         BinaryDataEncoder encoder(config);
-        encoder.decode(text.c_str(), text.length(), binaryDataArray->data); 
 
-        if (binaryDataArray->data.size() != arrayLength_)
-            throw runtime_error((format("[IO::HandlerBinaryDataArray] At position %d: expected array of size %d, but decoded array is actually size %d.")
-                                 % position % arrayLength_ % binaryDataArray->data.size()).str()); 
+        switch (cvidBinaryDataType)
+        {
+            case MS_32_bit_float:
+            case MS_64_bit_float:
+                {
+                    auto& binaryDataArray = binaryDataArrayPtrs->back();
+                    encoder.decode(text.c_str(), text.length(), binaryDataArray->data);
+
+                    if (binaryDataArray->data.size() != arrayLength_)
+                        throw runtime_error((format("[IO::HandlerBinaryDataArray] At position %d: expected array of size %d, but decoded array is actually size %d.")
+                                                % position % arrayLength_ % binaryDataArray->data.size()).str());
+                }
+                break;
+
+            case MS_32_bit_integer:
+            case MS_64_bit_integer:
+                {
+                    auto& binaryDataArray = integerDataArrayPtrs->back();
+                    encoder.decode(text.c_str(), text.length(), binaryDataArray->data);
+
+                    if (binaryDataArray->data.size() != arrayLength_)
+                        throw runtime_error((format("[IO::HandlerBinaryDataArray] At position %d: expected array of size %d, but decoded array is actually size %d.")
+                            % position % arrayLength_ % binaryDataArray->data.size()).str());
+
+                    swap(static_cast<ParamContainer&>(*binaryDataArray), paramContainer);
+                    binaryDataArray->dataProcessingPtr = dataProcessingPtr;
+                }
+                break;
+
+            case CVID_Unknown:
+            default:
+                throw runtime_error("[IO::HandlerBinaryDataArray] Unknown binary data type.");
+        }
 
         if (text.length() != encodedLength_)
             throw runtime_error("[IO::HandlerBinaryDataArray] At position " + lexical_cast<string>(position) + ": encoded lengths differ."); 
@@ -1814,9 +1897,6 @@ struct HandlerBinaryDataArray : public HandlerParamContainer
 
     BinaryDataEncoder::Config getConfig()
     {
-        if (!binaryDataArray)
-            throw runtime_error("[IO::HandlerBinaryDataArray] Null binaryDataArray."); 
-
         BinaryDataEncoder::Config config;
 
         //
@@ -1825,14 +1905,14 @@ struct HandlerBinaryDataArray : public HandlerParamContainer
         // and remove them from the BinaryDataArray struct (extractCVParam does the removal).
         //
 
-        CVID cvidBinaryDataType = extractCVParam(*binaryDataArray, MS_binary_data_type);
+        cvidBinaryDataType = extractCVParam(paramContainer, MS_binary_data_type);
  
         // handle mix of zlib and numpress compression
         CVID cvidCompressionType;
         config.compression = BinaryDataEncoder::Compression_None;
         config.numpress = BinaryDataEncoder::Numpress_None;
         vector<CVID> children;
-        extractCVParams(*binaryDataArray, MS_binary_data_compression_type, children);
+        extractCVParams(paramContainer, MS_binary_data_compression_type, children);
         BOOST_FOREACH(cvidCompressionType,children)
         {
             switch (cvidCompressionType)
@@ -1869,16 +1949,33 @@ struct HandlerBinaryDataArray : public HandlerParamContainer
             }
         }
 
+        // if numpress is on, make sure output is directed to BinaryDataArray instead of IntegerDataArray
+        if (BinaryDataEncoder::Numpress_None != config.numpress)
+            switch (cvidBinaryDataType)
+            {
+                case MS_32_bit_integer:
+                    cvidBinaryDataType = MS_32_bit_float;
+                    break;
+                case MS_64_bit_integer:
+                    cvidBinaryDataType = MS_64_bit_float;
+                    break;
+                case CVID_Unknown:
+                    throw runtime_error("[IO::HandlerBinaryDataArray] Unknown binary data type.");
+                default:
+                    break;
+            }
+
         switch (cvidBinaryDataType)
         {
             case MS_32_bit_float:
+            case MS_32_bit_integer:
                 if (BinaryDataEncoder::Numpress_None == config.numpress)
                     config.precision = BinaryDataEncoder::Precision_32;
                 break;
             case MS_64_bit_float:
+            case MS_64_bit_integer:
                 config.precision = BinaryDataEncoder::Precision_64;
                 break;
-            case MS_32_bit_integer:
             case CVID_Unknown:
                 if (BinaryDataEncoder::Numpress_None == config.numpress) // 32 vs 64 bit is meaningless in numpress
                     throw runtime_error("[IO::HandlerBinaryDataArray] Missing binary data type.");
@@ -1887,15 +1984,14 @@ struct HandlerBinaryDataArray : public HandlerParamContainer
                 throw runtime_error("[IO::HandlerBinaryDataArray] Unknown binary data type.");
         }
 
-
         return config;
     }
 };
 
 
-PWIZ_API_DECL void read(std::istream& is, BinaryDataArray& binaryDataArray, const MSData* msd)
+PWIZ_API_DECL void read(std::istream& is, std::vector<BinaryDataArrayPtr>& binaryDataArrayPtrs, std::vector<IntegerDataArrayPtr>& integerDataArrayPtrs, const MSData* msd)
 {
-    HandlerBinaryDataArray handler(&binaryDataArray, msd);
+    HandlerBinaryDataArray handler(&binaryDataArrayPtrs, &integerDataArrayPtrs, msd);
     SAXParser::parse(is, handler);
 }
 
@@ -1952,15 +2048,17 @@ void write(minimxml::XMLWriter& writer, const Spectrum& spectrum, const MSData& 
         writer.endElement();
     }
 
-    if (!spectrum.binaryDataArrayPtrs.empty())
+    if (spectrum.binaryDataArrayPtrs.size() + spectrum.integerDataArrayPtrs.size() > 0)
     {
         attributes.clear();
-        attributes.add("count", spectrum.binaryDataArrayPtrs.size());
+        attributes.add("count", spectrum.binaryDataArrayPtrs.size() + spectrum.integerDataArrayPtrs.size());
         writer.startElement("binaryDataArrayList", attributes);
 
-        for (vector<BinaryDataArrayPtr>::const_iterator it=spectrum.binaryDataArrayPtrs.begin(); 
-             it!=spectrum.binaryDataArrayPtrs.end(); ++it)
-             write(writer, **it, config);
+        for (const auto& itr : spectrum.binaryDataArrayPtrs)
+            writeBinaryDataArray(writer, *itr, config);
+
+        for (const auto& itr : spectrum.integerDataArrayPtrs)
+            writeBinaryDataArray(writer, *itr, config);
 
         writer.endElement(); // binaryDataArrayList
     }
@@ -2059,8 +2157,8 @@ struct HandlerSpectrum : public HandlerParamContainer
                 if (binaryDataFlag == IgnoreBinaryData)
                     return Status::Done;
 
-                spectrum->binaryDataArrayPtrs.push_back(BinaryDataArrayPtr(new BinaryDataArray()));
-                handlerBinaryDataArray_.binaryDataArray = spectrum->binaryDataArrayPtrs.back().get();
+                handlerBinaryDataArray_.binaryDataArrayPtrs = &spectrum->binaryDataArrayPtrs;
+                handlerBinaryDataArray_.integerDataArrayPtrs = &spectrum->integerDataArrayPtrs;
                 handlerBinaryDataArray_.defaultArrayLength = spectrum->defaultArrayLength;
                 handlerBinaryDataArray_.msd = msd;
                 return Status(Status::Delegate, &handlerBinaryDataArray_);
@@ -2140,15 +2238,17 @@ void write(minimxml::XMLWriter& writer, const Chromatogram& chromatogram,
     if (!chromatogram.product.empty())
         write(writer, chromatogram.product);
 
-    if (!chromatogram.binaryDataArrayPtrs.empty())
+    if (chromatogram.binaryDataArrayPtrs.size() + chromatogram.integerDataArrayPtrs.size() > 0)
     {
         attributes.clear();
-        attributes.add("count", chromatogram.binaryDataArrayPtrs.size());
+        attributes.add("count", chromatogram.binaryDataArrayPtrs.size() + chromatogram.integerDataArrayPtrs.size());
         writer.startElement("binaryDataArrayList", attributes);
 
-        for (vector<BinaryDataArrayPtr>::const_iterator it=chromatogram.binaryDataArrayPtrs.begin(); 
-             it!=chromatogram.binaryDataArrayPtrs.end(); ++it)
-             write(writer, **it, config);
+        for (const auto& itr : chromatogram.binaryDataArrayPtrs)
+            writeBinaryDataArray(writer, *itr, config);
+
+        for (const auto& itr : chromatogram.integerDataArrayPtrs)
+            writeBinaryDataArray(writer, *itr, config);
 
         writer.endElement(); // binaryDataArrayList
     }
@@ -2206,8 +2306,8 @@ struct HandlerChromatogram : public HandlerParamContainer
             if (binaryDataFlag == IgnoreBinaryData)
                 return Status::Done;
 
-            chromatogram->binaryDataArrayPtrs.push_back(BinaryDataArrayPtr(new BinaryDataArray()));
-            handlerBinaryDataArray_.binaryDataArray = chromatogram->binaryDataArrayPtrs.back().get();
+            handlerBinaryDataArray_.binaryDataArrayPtrs = &chromatogram->binaryDataArrayPtrs;
+            handlerBinaryDataArray_.integerDataArrayPtrs = &chromatogram->integerDataArrayPtrs;
             handlerBinaryDataArray_.defaultArrayLength = chromatogram->defaultArrayLength;
             return Status(Status::Delegate, &handlerBinaryDataArray_);
         }
@@ -2245,7 +2345,8 @@ PWIZ_API_DECL
 void write(minimxml::XMLWriter& writer, const SpectrumList& spectrumList, const MSData& msd,
            const BinaryDataEncoder::Config& config,
            vector<boost::iostreams::stream_offset>* spectrumPositions,
-           const IterationListenerRegistry* iterationListenerRegistry)
+           const IterationListenerRegistry* iterationListenerRegistry,
+           bool useWorkerThreads)
 {
     XMLWriter::Attributes attributes;
     attributes.add("count", spectrumList.size());
@@ -2254,8 +2355,9 @@ void write(minimxml::XMLWriter& writer, const SpectrumList& spectrumList, const 
         attributes.push_back(make_pair("defaultDataProcessingRef", 
                                         spectrumList.dataProcessingPtr()->id));
 
-    writer.startElement("spectrumList", attributes);
-    SpectrumWorkerThreads spectrumWorkers(spectrumList);
+    writer.startElement("spectrumList", attributes); // required by schema, even if empty
+
+    SpectrumWorkerThreads spectrumWorkers(spectrumList, useWorkerThreads);
 
     for (size_t i=0; i<spectrumList.size(); i++)
     {
@@ -2265,7 +2367,7 @@ void write(minimxml::XMLWriter& writer, const SpectrumList& spectrumList, const 
 
         if (iterationListenerRegistry)
             status = iterationListenerRegistry->broadcastUpdateMessage(
-                IterationListener::UpdateMessage(i, spectrumList.size()));
+                IterationListener::UpdateMessage(i, spectrumList.size(), "converting spectra"));
 
         if (status == IterationListener::Status_Cancel)
             break;
@@ -2349,6 +2451,9 @@ void write(minimxml::XMLWriter& writer, const ChromatogramList& chromatogramList
            vector<boost::iostreams::stream_offset>* chromatogramPositions,
            const IterationListenerRegistry* iterationListenerRegistry)
 {
+    if (chromatogramList.empty()) // chromatogramList not required by schema
+        return;
+
     XMLWriter::Attributes attributes;
     attributes.add("count", chromatogramList.size());
 
@@ -2366,7 +2471,7 @@ void write(minimxml::XMLWriter& writer, const ChromatogramList& chromatogramList
 
         if (iterationListenerRegistry)
             status = iterationListenerRegistry->broadcastUpdateMessage(
-                IterationListener::UpdateMessage(i, chromatogramList.size()));
+                IterationListener::UpdateMessage(i, chromatogramList.size(), "converting chromatograms"));
 
         if (status == IterationListener::Status_Cancel)
             break;
@@ -2445,7 +2550,8 @@ void write(minimxml::XMLWriter& writer, const Run& run, const MSData& msd,
            const BinaryDataEncoder::Config& config,
            vector<boost::iostreams::stream_offset>* spectrumPositions,
            vector<boost::iostreams::stream_offset>* chromatogramPositions,
-           const pwiz::util::IterationListenerRegistry* iterationListenerRegistry)
+           const pwiz::util::IterationListenerRegistry* iterationListenerRegistry,
+           bool useWorkerThreads)
 {
     XMLWriter::Attributes attributes;
     attributes.add("id", encode_xml_id_copy(run.id));
@@ -2475,7 +2581,7 @@ void write(minimxml::XMLWriter& writer, const Run& run, const MSData& msd,
     bool hasChromatogramList = run.chromatogramListPtr.get() && run.chromatogramListPtr->size() > 0;
 
     if (hasSpectrumList)
-        write(writer, *run.spectrumListPtr, msd, config, spectrumPositions, iterationListenerRegistry);
+        write(writer, *run.spectrumListPtr, msd, config, spectrumPositions, iterationListenerRegistry, useWorkerThreads);
 
     if (hasChromatogramList)
         write(writer, *run.chromatogramListPtr, config, chromatogramPositions, iterationListenerRegistry);
@@ -2580,28 +2686,13 @@ void read(std::istream& is, Run& run,
 //
 
 
-template <typename object_type>
-void writeList(minimxml::XMLWriter& writer, const vector<object_type>& objectPtrs, 
-               const string& label)
-{
-    if (!objectPtrs.empty())
-    {
-        XMLWriter::Attributes attributes;
-        attributes.add("count", objectPtrs.size());
-        writer.startElement(label, attributes);
-        for (typename vector<object_type>::const_iterator it=objectPtrs.begin(); it!=objectPtrs.end(); ++it)
-            write(writer, **it);
-        writer.endElement();
-    }
-}
-
-
 PWIZ_API_DECL
 void write(minimxml::XMLWriter& writer, const MSData& msd,
            const BinaryDataEncoder::Config& config,
            vector<boost::iostreams::stream_offset>* spectrumPositions,
            vector<boost::iostreams::stream_offset>* chromatogramPositions,
-           const pwiz::util::IterationListenerRegistry* iterationListenerRegistry)
+           const pwiz::util::IterationListenerRegistry* iterationListenerRegistry,
+           bool useWorkerThreads)
 {
     XMLWriter::Attributes attributes;
     attributes.add("xmlns", "http://psi.hupo.org/ms/mzml");
@@ -2644,7 +2735,7 @@ void write(minimxml::XMLWriter& writer, const MSData& msd,
 
     writeList(writer, msd.allDataProcessingPtrs(), "dataProcessingList");
 
-    write(writer, msd.run, msd, config, spectrumPositions, chromatogramPositions, iterationListenerRegistry);
+    write(writer, msd.run, msd, config, spectrumPositions, chromatogramPositions, iterationListenerRegistry, useWorkerThreads);
 
     writer.endElement();
 }

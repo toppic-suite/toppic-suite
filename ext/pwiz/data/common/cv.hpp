@@ -41,9 +41,9 @@
 // [psi-ms.obo]
 #define _PSI_MS_OBO_
 //   format-version: 1.2
-//   data-version: 4.1.12
-//   date: 24:07:2018 14:50
-//   saved-by: Gerhard Mayer
+//   data-version: 4.1.41
+//   date: 30:07:2020 18:25
+//   saved-by: Matt Chambers
 //   auto-generated-by: OBO-Edit 2.3.1
 //   import: http://ontologies.berkeleybop.org/pato.obo
 //   import: http://ontologies.berkeleybop.org/uo.obo
@@ -71,7 +71,7 @@
 // [unimod.obo]
 #define _UNIMOD_OBO_
 //   format-version: 1.2
-//   date: 2018:08:13 13:42
+//   date: 2020:06:09 11:01
 //
 // [unit.obo]
 #define _UNIT_OBO_
@@ -116,149 +116,170 @@ enum PWIZ_API_DECL CVID
     /// Proteomics Standards Initiative Mass Spectrometry Vocabularies: Proteomics Standards Initiative Mass Spectrometry Vocabularies.
     MS_Proteomics_Standards_Initiative_Mass_Spectrometry_Vocabularies = 0,
 
-    /// PEFF CV term: PSI Extended FASTA Format Controlled Vocabulary term.
+    /// PEFF CV term: PSI Extended FASTA Format controlled vocabulary term.
     PEFF_PEFF_CV_term = 100000001,
 
-    /// File Header Section term: CV term that may appear in a PEFF File Header Section.
-    PEFF_File_Header_Section_term = 100000002,
+    /// PEFF file header section term: CV term that may appear in a PEFF file header section.
+    PEFF_PEFF_file_header_section_term = 100000002,
 
-    /// Individual Sequence Entries Section term: CV term that may appear in a PEFF Individual Entry Section.
-    PEFF_Individual_Sequence_Entries_Section_term = 100000003,
+    /// PEFF file sequence entry term: CV term that may appear in a description line of a PEFF file individual sequence entry.
+    PEFF_PEFF_file_sequence_entry_term = 100000003,
 
-    /// DbName: Sequence Database Name.
+    /// DbName: PEFF keyword for the sequence database name.
     PEFF_DbName = 100000008,
 
-    /// Prefix: Sequence Database Prefix.
+    /// Prefix: PEFF keyword for the sequence database prefix.
     PEFF_Prefix = 100000009,
 
-    /// DbDescription: Sequence Database Short description.
+    /// DbDescription: PEFF keyword for the sequence database short description.
     PEFF_DbDescription = 100000010,
 
-    /// Decoy: Specifies whether the Sequence Database is a Decoy.
+    /// Decoy: PEFF keyword for the specifying whether the sequence database is a decoy database.
     PEFF_Decoy = 100000011,
 
-    /// DbSource: Source of the database file.
+    /// DbSource: PEFF keyword for the source of the database file.
     PEFF_DbSource = 100000012,
 
-    /// DbVersion: Database version (release date) according to database provider.
+    /// DbVersion: PEFF keyword for the database version (release date) according to database provider.
     PEFF_DbVersion = 100000013,
 
-    /// DbDate: Database date (release or file date of the source) according to database provider.
+    /// DbDate: PEFF keyword for the database date (release or file date of the source) according to database provider.
     PEFF_DbDate_OBSOLETE = 100000014,
 
-    /// NumberOfEntries: Number of sequence entries in the database.
+    /// NumberOfEntries: PEFF keyword for the sumber of sequence entries in the database.
     PEFF_NumberOfEntries = 100000015,
 
-    /// Conversion: Description of the conversion from original format to this current one.
+    /// Conversion: PEFF keyword for the description of the conversion from original format to this current one.
     PEFF_Conversion = 100000016,
 
-    /// SequenceType: Molecular type of the sequences.
+    /// SequenceType: PEFF keyword for the molecular type of the sequences.
     PEFF_SequenceType = 100000017,
 
-    /// SpecificKey: Db specific information (not included in the current list of allowed keys).
+    /// SpecificKey: PEFF keyword for database specific keywords not included in the current controlled vocabulary.
     PEFF_SpecificKey = 100000018,
 
-    /// SpecificValue: PEFF specific values for a defined key.
+    /// SpecificValue: PEFF keyword for the specific values for a custom key.
     PEFF_SpecificValue = 100000019,
 
-    /// DatabaseDescription: Short Description of the PEFF.
+    /// DatabaseDescription: PEFF keyword for the short description of the PEFF file.
     PEFF_DatabaseDescription = 100000020,
 
-    /// GeneralComment: PEFF file general comment.
+    /// GeneralComment: PEFF keyword for a general comment.
     PEFF_GeneralComment = 100000021,
 
-    /// ProteoformDb: Proteoform database flag.
+    /// ProteoformDb: PEFF keyword that when set to 'true' indicates that the database contains complete proteoforms.
     PEFF_ProteoformDb = 100000022,
 
-    /// CustomTag: A tag (short string) used to categorize a sequence annotation (variant or modification).
-    PEFF_CustomTag = 100000023,
+    /// OptionalTagDef: PEFF keyword for the short tag (abbreviation) and longer definition used to annotate a sequence annotation (such as variant or modification) in the OptionalTag location.
+    PEFF_OptionalTagDef = 100000023,
 
-    /// DbUniqueId: Sequence Database unique identifier.
-    PEFF_DbUniqueId = 100001001,
+    /// HasAnnotationIdentifiers: PEFF keyword that when set to 'true' indicates that entries in the database have identifiers for each annotation.
+    PEFF_HasAnnotationIdentifiers = 100000024,
 
-    /// PName: Protein Name, description.
+    /// DbUniqueId: Sequence database unique identifier.
+    PEFF_DbUniqueId_OBSOLETE = 100001001,
+
+    /// PName: PEFF keyword for the protein full name.
     PEFF_PName = 100001002,
 
-    /// NcbiTaxId: NCBI taxonomy identifier.
+    /// NcbiTaxId: PEFF keyword for the NCBI taxonomy identifier.
     PEFF_NcbiTaxId = 100001003,
 
-    /// TaxName: Taxonomy name (latin or common name).
+    /// TaxName: PEFF keyword for the taxonomy name (latin or common name).
     PEFF_TaxName = 100001004,
 
-    /// GName: Gene name.
+    /// GName: PEFF keyword for the gene name.
     PEFF_GName = 100001005,
 
-    /// Length: Sequence length.
+    /// Length: PEFF keyword for the sequence length.
     PEFF_Length = 100001006,
 
-    /// SV: Sequence version.
+    /// SV: PEFF keyword for the sequence version.
     PEFF_SV = 100001007,
 
-    /// EV: Entry version.
+    /// EV: PEFF keyword for the entry version.
     PEFF_EV = 100001008,
 
-    /// PE: Protein Evidence; A UniprotKB code.
+    /// PE: PEFF keyword for the Protein Evidence; A UniProtKB code 1-5.
     PEFF_PE = 100001009,
 
-    /// Processed: Processed Molecule.
+    /// Processed: PEFF keyword for information on how the full length original protein sequence can be processed into shorter components such as signal peptides and chains.
     PEFF_Processed = 100001010,
 
-    /// Variant: DEPRECATED in favor of VariantSimple and VariantComplex. Former definition: Sequence variation (substitution, insertion, deletion).
-    PEFF_Variant = 100001011,
+    /// Variant: Sequence variation (substitution, insertion, deletion).
+    PEFF_Variant_OBSOLETE = 100001011,
 
-    /// ModResPsi: Modified residue with PSI-MOD identifier.
+    /// ModResPsi: PEFF keyword for the modified residue with PSI-MOD identifier.
     PEFF_ModResPsi = 100001012,
 
-    /// ModRes: Modified residue without PSI-MOD identifier.
+    /// ModRes: PEFF keyword for the modified residue without aPSI-MOD or UniMod identifier.
     PEFF_ModRes = 100001013,
 
-    /// AltAC: Alternative Accession Code.
+    /// AltAC: PEFF keyword for the Alternative Accession Code.
     PEFF_AltAC = 100001014,
 
-    /// SeqStatus: Sequence Status. Complete or Fragment.
+    /// SeqStatus: PEFF keyword for the sequence status. Complete or Fragment.
     PEFF_SeqStatus = 100001015,
 
-    /// CC: Entry associated comment.
+    /// CC: PEFF keyword for the entry associated comment.
     PEFF_CC = 100001016,
 
-    /// KW: Entry associated keyword(s).
+    /// KW: PEFF keyword for the entry associated keyword(s).
     PEFF_KW = 100001017,
 
-    /// GO: Gene Ontology code.
+    /// GO: PEFF keyword for the Gene Ontology code.
     PEFF_GO = 100001018,
 
-    /// XRef: Cross-reference to an external resource.
+    /// XRef: PEFF keyword for the cross-reference to an external resource.
     PEFF_XRef = 100001019,
 
-    /// Chain: Sequence range of active processed polypeptide.
-    PEFF_Chain = 100001020,
+    /// mature protein: Portion of a newly synthesized protein that contributes to a final structure after other components such as signal peptides are removed.
+    PEFF_mature_protein = 100001020,
 
-    /// Signal: Sequence range of signal peptide.
-    PEFF_Signal = 100001021,
+    /// signal peptide: Short peptide present at the N-terminus of a newly synthesized protein that is cleaved off and is not part of the final mature protein.
+    PEFF_signal_peptide = 100001021,
 
-    /// Transit: Sequence range of transit peptide.
-    PEFF_Transit = 100001022,
+    /// transit peptide: Short peptide present at the N-terminus of a newly synthesized protein that helps the protein through the membrane of its destination organelle.
+    PEFF_transit_peptide = 100001022,
 
-    /// Conflict: Sequence conflict; a UniProtKB term.
+    /// Conflict: PEFF keyword for the sequence conflict; a UniProtKB term.
     PEFF_Conflict = 100001023,
 
-    /// Crc64: Sequence checksum in crc64.
+    /// Crc64: PEFF keyword for the Sequence checksum in crc64.
     PEFF_Crc64 = 100001024,
 
-    /// Domain: Sequence range of a domain.
+    /// Domain: PEFF keyword for the sequence range of a domain.
     PEFF_Domain = 100001025,
 
-    /// ID: UniProtKB specific Protein identifier ID; a UniProtKB term.
+    /// ID: PEFF keyword for the UniProtKB specific Protein identifier ID; a UniProtKB term.
     PEFF_ID = 100001026,
 
-    /// ModResUnimod: Modified residue with Unimod identifier.
+    /// ModResUnimod: PEFF keyword for the modified residue with UniMod identifier.
     PEFF_ModResUnimod = 100001027,
 
-    /// VariantSimple: Simple sequence variation of a single amino acid change. A change to a stop codon is permitted with a * symbol. More complex variations must be encoded with the VariantComplex term.
+    /// VariantSimple: PEFF keyword for the simple sequence variation of a single amino acid change. A change to a stop codon is permitted with a * symbol. More complex variations must be encoded with the VariantComplex term.
     PEFF_VariantSimple = 100001028,
 
-    /// VariantComplex: Simple sequence variation of a single amino acid change. A change to a stop codon is permitted with a * symbol. More complex variations must be encoded with the VariantComplex term.
+    /// VariantComplex: PEFF keyword for a sequence variation that is more complex than a single amino acid change or change to a stop codon.
     PEFF_VariantComplex = 100001029,
+
+    /// Proteoform: PEFF keyword for the proteoforms of this protein, constructed as a set of annotation identifiers.
+    PEFF_Proteoform = 100001030,
+
+    /// DisulfideBond: PEFF keyword for the disulfide bonds in this protein, constructed as a sets of annotation identifiers of two half-cystine modifications.
+    PEFF_DisulfideBond = 100001031,
+
+    /// PEFF molecule processing keyword: PEFF keyword describing the type of processing event being described.
+    PEFF_PEFF_molecule_processing_keyword = 100001032,
+
+    /// Comment: PEFF keyword for the individual protein entry comment. It is discouraged to put parsable information here. This is only for free-text commentary.
+    PEFF_Comment = 100001033,
+
+    /// propeptide: Short peptide that is cleaved off a newly synthesized protein and generally immediately degraded in the process of protein maturation, and is not a signal peptide or transit peptide.
+    PEFF_propeptide = 100001034,
+
+    /// initiator methionine: N-terminal methionine residue of a protein that can be co-translationally cleaved.
+    PEFF_initiator_methionine = 100001035,
 
     /// sample number: A reference number relevant to the sample under study.
     MS_sample_number = 1000001,
@@ -392,10 +413,10 @@ enum PWIZ_API_DECL CVID
     /// thomson (m/z): Three-character symbol m/z is used to denote the quantity formed by dividing the mass of an ion in unified atomic mass units by its charge number (regardless of sign). The symbol is written in italicized lower case letters with no spaces. Note 1: The term mass-to-charge-ratio is deprecated. Mass-to-charge ratio has been used for the abscissa of a mass spectrum, although the quantity measured is not the quotient of the ion's mass to its electric charge. The three-character symbol m/z is recommended for the quantity that is the independent variable in a mass spectrum Note 2: The proposed unit thomson (Th) is deprecated.
     MS_thomson = MS_m_z,
 
-    /// charge state: The charge state of the ion, single or multiple and positive or negatively charged.
+    /// charge state: Number of net charges, positive or negative, on an ion.
     MS_charge_state = 1000041,
 
-    /// z (charge state): The charge state of the ion, single or multiple and positive or negatively charged.
+    /// z (charge state): Number of net charges, positive or negative, on an ion.
     MS_z = MS_charge_state,
 
     /// peak intensity: Intensity of ions as measured by the height or area of a peak in a mass spectrum.
@@ -1061,8 +1082,8 @@ enum PWIZ_API_DECL CVID
     /// mass number: The sum of the protons and neutrons in an atom, molecule or ion.
     MS_mass_number_OBSOLETE = 1000223,
 
-    /// molecular mass: The mass of one mole of a molecular substance (6.022 1415(10) x 10^23 molecules).
-    MS_molecular_mass_OBSOLETE = 1000224,
+    /// molecular mass: Mass of a molecule measured in unified atomic mass units (u or Da).
+    MS_molecular_mass = 1000224,
 
     /// monoisotopic mass: The mass of an ion or molecule calculated using the mass of the most abundant isotope of each element.
     MS_monoisotopic_mass_OBSOLETE = 1000225,
@@ -1103,10 +1124,10 @@ enum PWIZ_API_DECL CVID
     /// mass resolving power: In a mass spectrum, the observed mass divided by the difference between two masses that can be separated. The method by which delta m was obtained and the mass at which the measurement was made should be reported.
     MS_mass_resolving_power_OBSOLETE = 1000234,
 
-    /// total ion current chromatogram: Chromatogram obtained by plotting the total ion current detected in each of a series of mass spectra recorded as a function of retention time.
+    /// total ion current chromatogram: Representation of the total ion current detected in each of a series of mass spectra versus time.
     MS_total_ion_current_chromatogram = 1000235,
 
-    /// TIC chromatogram (total ion current chromatogram): Chromatogram obtained by plotting the total ion current detected in each of a series of mass spectra recorded as a function of retention time.
+    /// TIC chromatogram (total ion current chromatogram): Representation of the total ion current detected in each of a series of mass spectra versus time.
     MS_TIC_chromatogram = MS_total_ion_current_chromatogram,
 
     /// transmission: The ratio of the number of ions leaving a region of a mass spectrometer to the number entering that region.
@@ -1904,7 +1925,7 @@ enum PWIZ_API_DECL CVID
     /// scan: Function or process of the mass spectrometer where it records a spectrum.
     MS_scan = 1000441,
 
-    /// spectrum: A mass spectrum is an intensity vs m/z (mass-to-charge ratio) plot representing a chemical analysis.
+    /// spectrum: Representation of intensity values corresponding to a range of measurement space.
     MS_spectrum = 1000442,
 
     /// mass analyzer type: Mass analyzer separates the ions according to their mass-to-charge ratio.
@@ -2090,16 +2111,16 @@ enum PWIZ_API_DECL CVID
     /// instrument attribute: Instrument properties that are associated with a value.
     MS_instrument_attribute = 1000496,
 
-    /// zoom scan: Special scan mode, where data with improved resolution is acquired. This is typically achieved by scanning a more narrow m/z window or scanning with a lower scan rate.
+    /// zoom scan: Special scan mode where data with improved resolution is acquired. This is typically achieved by scanning a more narrow m/z window or scanning with a lower scan rate.
     MS_zoom_scan = 1000497,
 
-    /// enhanced resolution scan (zoom scan): Special scan mode, where data with improved resolution is acquired. This is typically achieved by scanning a more narrow m/z window or scanning with a lower scan rate.
+    /// enhanced resolution scan (zoom scan): Special scan mode where data with improved resolution is acquired. This is typically achieved by scanning a more narrow m/z window or scanning with a lower scan rate.
     MS_enhanced_resolution_scan = MS_zoom_scan,
 
     /// full scan: Feature of the ion trap mass spectrometer where MS data is acquired over a mass range.
     MS_full_scan_OBSOLETE = 1000498,
 
-    /// spectrum attribute: Spectrum properties that are associated with a value.
+    /// spectrum attribute: Nonphysical characteristic attributed to a spectrum.
     MS_spectrum_attribute = 1000499,
 
     /// scan window upper limit: The lower m/z bound of a mass spectrometer scan window.
@@ -2111,7 +2132,7 @@ enum PWIZ_API_DECL CVID
     /// dwell time: The time spent gathering data across a peak.
     MS_dwell_time = 1000502,
 
-    /// scan attribute: Scan properties that are associated with a value.
+    /// scan attribute: Nonphysical characteristic attributed to a spectrum acquisition scan.
     MS_scan_attribute = 1000503,
 
     /// base peak m/z: M/z value of the signal of highest intensity in the mass spectrum.
@@ -2123,8 +2144,8 @@ enum PWIZ_API_DECL CVID
     /// ion role: Ion Role.
     MS_ion_role_OBSOLETE = 1000506,
 
-    /// ion attribute: Ion properties that are associated with a value.
-    MS_ion_attribute_OBSOLETE = 1000507,
+    /// ion property: Nonphysical characteristic attributed to an ion.
+    MS_ion_property = 1000507,
 
     /// ion chemical type: Ion Type.
     MS_ion_chemical_type_OBSOLETE = 1000508,
@@ -2135,7 +2156,7 @@ enum PWIZ_API_DECL CVID
     /// precursor activation attribute: Precursor Activation Attribute.
     MS_precursor_activation_attribute = 1000510,
 
-    /// ms level: Stages of ms achieved in a multi stage mass spectrometry experiment.
+    /// ms level: Stage number achieved in a multi stage mass spectrometry acquisition.
     MS_ms_level = 1000511,
 
     /// filter string: A string unique to Thermo instrument describing instrument settings for the scan.
@@ -2336,11 +2357,11 @@ enum PWIZ_API_DECL CVID
     /// no compression: No Compression.
     MS_no_compression = 1000576,
 
-    /// raw data file: Describes the type of file and its content.
-    MS_raw_data_file = 1000577,
+    /// source data file: Data file from which an entity is sourced.
+    MS_source_data_file = 1000577,
 
-    /// source file (raw data file): Describes the type of file and its content.
-    MS_source_file = MS_raw_data_file,
+    /// source file (source data file): Data file from which an entity is sourced.
+    MS_source_file = MS_source_data_file,
 
     /// LCQ Fleet: LCQ Fleet.
     MS_LCQ_Fleet = 1000578,
@@ -2540,19 +2561,19 @@ enum PWIZ_API_DECL CVID
     /// image current detector (inductive detector): Inductive detector.
     MS_image_current_detector = MS_inductive_detector,
 
-    /// chromatogram: The representation of detector response versus time.
+    /// chromatogram: Representation of a chromatographic separation attribute measurement versus time.
     MS_chromatogram = 1000625,
 
-    /// chromatogram type: Broad category or type of a chromatogram.
+    /// chromatogram type: Type of chromatogram measurement being represented.
     MS_chromatogram_type = 1000626,
 
-    /// selected ion current chromatogram: Chromatogram created by creating an array of the measurements of a specific single ion current at each time point.
+    /// selected ion current chromatogram: Representation of an array of the measurements of a specific single ion current versus time.
     MS_selected_ion_current_chromatogram = 1000627,
 
-    /// SIC chromatogram (selected ion current chromatogram): Chromatogram created by creating an array of the measurements of a specific single ion current at each time point.
+    /// SIC chromatogram (selected ion current chromatogram): Representation of an array of the measurements of a specific single ion current versus time.
     MS_SIC_chromatogram = MS_selected_ion_current_chromatogram,
 
-    /// basepeak chromatogram: Chromatogram created by creating an array of the most intense peaks at each time point.
+    /// basepeak chromatogram: Representation of an array of the most intense peaks versus time.
     MS_basepeak_chromatogram = 1000628,
 
     /// low intensity threshold: Threshold below which some action is taken.
@@ -3071,7 +3092,7 @@ enum PWIZ_API_DECL CVID
     /// no combination: Use this term if only one scan was recorded or there is no information about scans available.
     MS_no_combination = 1000795,
 
-    /// spectrum title: A free-form text title describing a spectrum.
+    /// spectrum title: Free-form text title describing a spectrum, usually a series of key value pairs as used in an MGF file.
     MS_spectrum_title = 1000796,
 
     /// peak list scans: A list of scan numbers and or scan ranges associated with a peak list. If possible the list of scans should be converted to native spectrum identifiers instead of using this term.
@@ -3122,19 +3143,19 @@ enum PWIZ_API_DECL CVID
     /// chromatogram title: A free-form text title describing a chromatogram.
     MS_chromatogram_title = 1000809,
 
-    /// mass chromatogram: A plot of the relative abundance of a beam or other collection of ions as a function of the retention time.
-    MS_mass_chromatogram = 1000810,
+    /// ion current chromatogram: Representation of the current of ions versus time.
+    MS_ion_current_chromatogram = 1000810,
 
-    /// electromagnetic radiation chromatogram: The measurement of electromagnetic properties as a function of the retention time.
+    /// electromagnetic radiation chromatogram: Representation of electromagnetic properties versus time.
     MS_electromagnetic_radiation_chromatogram = 1000811,
 
-    /// EMR radiation chromatogram (electromagnetic radiation chromatogram): The measurement of electromagnetic properties as a function of the retention time.
+    /// EMR radiation chromatogram (electromagnetic radiation chromatogram): Representation of electromagnetic properties versus time.
     MS_EMR_radiation_chromatogram = MS_electromagnetic_radiation_chromatogram,
 
-    /// absorption chromatogram: The measurement of light absorbed by the sample as a function of the retention time.
+    /// absorption chromatogram: Representation of light absorbed by the sample versus time.
     MS_absorption_chromatogram = 1000812,
 
-    /// emission chromatogram: The measurement of light emitted by the sample as a function of the retention time.
+    /// emission chromatogram: Representation of light emitted by the sample versus time.
     MS_emission_chromatogram = 1000813,
 
     /// counts per second: The number of counted events observed per second in one or a group of elements of a detector.
@@ -3269,14 +3290,14 @@ enum PWIZ_API_DECL CVID
     /// fraction identifier: Identier string that describes the sample fraction. This identifier should contain the fraction number(s) or similar information.
     MS_fraction_identifier = 1000858,
 
-    /// molecule: A molecules is a fundamental component of a chemical compound that is the smallest part of the compound that can participate in a chemical reaction.
+    /// molecule: Group of two or more atoms held together by chemical bonds.
     MS_molecule = 1000859,
 
-    /// peptide: A compound of low molecular weight that is composed of two or more amino acids.
+    /// peptide: A molecule of low molecular weight that is composed of two or more amino acid residues.
     MS_peptide = 1000860,
 
-    /// chemical compound attribute: A describable property of a chemical compound.
-    MS_chemical_compound_attribute = 1000861,
+    /// molecular entity property: A physical characteristic of a molecular entity.
+    MS_molecular_entity_property = 1000861,
 
     /// isoelectric point: The pH of a solution at which a charged molecule does not migrate in an electric field.
     MS_isoelectric_point = 1000862,
@@ -3290,8 +3311,8 @@ enum PWIZ_API_DECL CVID
     /// predicted pI (predicted isoelectric point): The pH of a solution at which a charged molecule would not migrate in an electric field, as predicted by a software algorithm.
     MS_predicted_pI = MS_predicted_isoelectric_point,
 
-    /// chemical compound formula: A combination of symbols used to express the chemical composition of a compound.
-    MS_chemical_compound_formula = 1000864,
+    /// chemical formula: A combination of symbols used to express the chemical composition of a molecule.
+    MS_chemical_formula = 1000864,
 
     /// empirical formula: A chemical formula which expresses the proportions of the elements present in a substance.
     MS_empirical_formula = 1000865,
@@ -3302,8 +3323,8 @@ enum PWIZ_API_DECL CVID
     /// structural formula: A chemical formula showing the number of atoms of each element in a molecule, their spatial arrangement, and their linkage to each other.
     MS_structural_formula = 1000867,
 
-    /// SMILES string: The simplified molecular input line entry specification or SMILES is a specification for unambiguously describing the structure of a chemical compound using a short ASCII string.
-    MS_SMILES_string = 1000868,
+    /// SMILES formula: The simplified molecular input line entry specification or SMILES is a specification for unambiguously describing the structure of a chemical compound using a short ASCII string.
+    MS_SMILES_formula = 1000868,
 
     /// collision gas pressure: The gas pressure of the collision gas used for collisional excitation.
     MS_collision_gas_pressure = 1000869,
@@ -3341,47 +3362,47 @@ enum PWIZ_API_DECL CVID
     /// interchannel delay: The duration of intervals between scanning, during which the instrument configuration is switched.
     MS_interchannel_delay = 1000880,
 
-    /// chemical compound: A substance formed by chemical union of two or more elements or ingredients in definite proportion by weight.
-    MS_chemical_compound = 1000881,
+    /// molecular entity: Constitutionally or isotopically distinct atom, molecule, ion, ion pair, radical, radical ion, complex, conformer, etc., identifiable as a separately distinguishable entity.
+    MS_molecular_entity = 1000881,
 
-    /// protein: A compound composed of one or more chains of amino acids in a specific order determined by the base sequence of nucleotides in the DNA coding for the protein.
+    /// protein: A compound composed of one or more chains of amino acids in a specific order determined by the base sequence of nucleotides in the DNA of a gene.
     MS_protein = 1000882,
 
     /// protein short name: A short name or symbol of a protein (e.g., HSF 1 or HSF1_HUMAN).
     MS_protein_short_name = 1000883,
 
-    /// protein attribute: An nonphysical attribute describing a specific protein.
+    /// protein attribute: An nonphysical characterstic attributed to a specific protein.
     MS_protein_attribute = 1000884,
 
-    /// protein accession: Accession number for a specific protein in a database.
+    /// protein accession: Identifier for a specific protein in a database.
     MS_protein_accession = 1000885,
 
     /// protein name: A long name describing the function of the protein.
     MS_protein_name = 1000886,
 
-    /// peptide attribute: A nonphysical attribute that can be used to describe a peptide.
+    /// peptide attribute: Nonphysical characteristic attributed to a peptide.
     MS_peptide_attribute = 1000887,
 
-    /// unmodified peptide sequence: A sequence of letter symbols denoting the order of amino acids that compose the peptide, without encoding any amino acid mass modifications that might be present.
-    MS_unmodified_peptide_sequence = 1000888,
+    /// stripped peptide sequence: Sequence of letter symbols denoting the order of amino acids that compose the peptide, with any amino acid mass modifications that might be present having been stripped away.
+    MS_stripped_peptide_sequence = 1000888,
 
-    /// modified peptide sequence: A sequence of letter symbols denoting the order of amino acids that compose the peptide plus the encoding any amino acid modifications that are present.
-    MS_modified_peptide_sequence = 1000889,
+    /// peptidoform sequence: Sequence of letter symbols denoting the order of amino acid residues that compose the peptidoform including the encoding of any residue modifications that are present.
+    MS_peptidoform_sequence = 1000889,
 
-    /// peptide labeling state: A state description of how a peptide might be isotopically or isobarically labelled.
-    MS_peptide_labeling_state = 1000890,
+    /// peptidoform labeling state: A state description of how a peptide might be isotopically or isobarically labelled.
+    MS_peptidoform_labeling_state = 1000890,
 
-    /// heavy labeled peptide: A peptide that has been created or labelled with some heavier-than-usual isotopes.
-    MS_heavy_labeled_peptide = 1000891,
+    /// heavy labeled peptidoform: A peptide that has been created or labelled with some heavier-than-usual isotopes.
+    MS_heavy_labeled_peptidoform = 1000891,
 
-    /// unlabeled peptide: A peptide that has not been labelled with heavier-than-usual isotopes. This is often referred to as \"light\" to distinguish from \"heavy\".
-    MS_unlabeled_peptide = 1000892,
+    /// unlabeled peptidoform: A peptide that has not been labelled with heavier-than-usual isotopes. This is often referred to as \"light\" to distinguish from \"heavy\".
+    MS_unlabeled_peptidoform = 1000892,
 
-    /// light labeled peptide (unlabeled peptide): A peptide that has not been labelled with heavier-than-usual isotopes. This is often referred to as \"light\" to distinguish from \"heavy\".
-    MS_light_labeled_peptide = MS_unlabeled_peptide,
+    /// light labeled peptide (unlabeled peptidoform): A peptide that has not been labelled with heavier-than-usual isotopes. This is often referred to as \"light\" to distinguish from \"heavy\".
+    MS_light_labeled_peptide = MS_unlabeled_peptidoform,
 
-    /// peptide group label: An arbitrary string label used to mark a set of peptides that belong together in a set, whereby the members are differentiated by different isotopic labels. For example, the heavy and light forms of the same peptide will both be assigned the same peptide group label.
-    MS_peptide_group_label = 1000893,
+    /// peptidoform group label: An arbitrary string label used to mark a set of peptides that belong together in a set, whereby the members are differentiated by different isotopic labels. For example, the heavy and light forms of the same peptide will both be assigned the same peptide group label.
+    MS_peptidoform_group_label = 1000893,
 
     /// retention time: A time interval from the start of chromatography when an analyte exits a chromatographic column.
     MS_retention_time = 1000894,
@@ -3542,8 +3563,8 @@ enum PWIZ_API_DECL CVID
     /// database original uri: URI, from where the search database was originally downloaded.
     MS_database_original_uri = 1001015,
 
-    /// database version: OBSOLETE: Use attribute in mzIdentML instead. Version of the search database.
-    MS_database_version_OBSOLETE = 1001016,
+    /// database version: Version of the search database. In mzIdentML use the attribute instead.
+    MS_database_version = 1001016,
 
     /// database release date: OBSOLETE: Use attribute in mzIdentML instead. Release date of the search database.
     MS_database_release_date_OBSOLETE = 1001017,
@@ -3791,10 +3812,10 @@ enum PWIZ_API_DECL CVID
     /// SEQUEST:Full: 
     MS_SEQUEST_Full = 1001111,
 
-    /// n-terminal flanking residue: The residue preceding the first amino acid in the peptide sequence as it occurs in the protein. Use 'N-term' to denote if the peptide starts at the N terminus of the protein.
+    /// n-terminal flanking residue: Residue preceding the first amino acid in the peptide sequence as it occurs in the protein. Use 'N-term' to denote if the peptide starts at the N terminus of the protein.
     MS_n_terminal_flanking_residue = 1001112,
 
-    /// c-terminal flanking residue: The residue following the last amino acid in the peptide sequence as it occurs in the protein. Use 'C-term' to denote if the peptide ends at the C terminus of the protein.
+    /// c-terminal flanking residue: Residue following the last amino acid in the peptide sequence as it occurs in the protein. Use 'C-term' to denote if the peptide ends at the C terminus of the protein.
     MS_c_terminal_flanking_residue = 1001113,
 
     /// retention time(s): Retention time of the spectrum from the source file.
@@ -4808,22 +4829,22 @@ enum PWIZ_API_DECL CVID
     /// peptide modification details: The children of this term can be used to describe modifications.
     MS_peptide_modification_details = 1001471,
 
-    /// selected ion monitoring chromatogram: Chromatogram created by creating an array of the measurements of a selectively monitored ion at each time point.
+    /// selected ion monitoring chromatogram: Representation of an array of the measurements of a selectively monitored ion versus time.
     MS_selected_ion_monitoring_chromatogram = 1001472,
 
-    /// SIM chromatogram (selected ion monitoring chromatogram): Chromatogram created by creating an array of the measurements of a selectively monitored ion at each time point.
+    /// SIM chromatogram (selected ion monitoring chromatogram): Representation of an array of the measurements of a selectively monitored ion versus time.
     MS_SIM_chromatogram = MS_selected_ion_monitoring_chromatogram,
 
-    /// selected reaction monitoring chromatogram: Chromatogram created by creating an array of the measurements of a selectively monitored reaction at each time point.
+    /// selected reaction monitoring chromatogram: Representation of an array of the measurements of a selectively monitored reaction versus time.
     MS_selected_reaction_monitoring_chromatogram = 1001473,
 
-    /// SRM chromatogram (selected reaction monitoring chromatogram): Chromatogram created by creating an array of the measurements of a selectively monitored reaction at each time point.
+    /// SRM chromatogram (selected reaction monitoring chromatogram): Representation of an array of the measurements of a selectively monitored reaction versus time.
     MS_SRM_chromatogram = MS_selected_reaction_monitoring_chromatogram,
 
-    /// consecutive reaction monitoring chromatogram: Chromatogram created by creating an array of the measurements of a series of monitored reactions at each time point.
+    /// consecutive reaction monitoring chromatogram: Representation of an array of the measurements of a series of monitored reactions versus time.
     MS_consecutive_reaction_monitoring_chromatogram_OBSOLETE = 1001474,
 
-    /// CRM chromatogram (consecutive reaction monitoring chromatogram): Chromatogram created by creating an array of the measurements of a series of monitored reactions at each time point.
+    /// CRM chromatogram (consecutive reaction monitoring chromatogram): Representation of an array of the measurements of a series of monitored reactions versus time.
     MS_CRM_chromatogram_OBSOLETE = MS_consecutive_reaction_monitoring_chromatogram_OBSOLETE,
 
     /// OMSSA: Open Mass Spectrometry Search Algorithm was used to analyze the spectra.
@@ -6140,7 +6161,7 @@ enum PWIZ_API_DECL CVID
     /// Velos Plus: Thermo Scientific second generation Velos.
     MS_Velos_Plus = 1001909,
 
-    /// LTQ Orbitrap Elite: Thermo Scientific second generation Velos and Orbitrap.
+    /// LTQ Orbitrap Elite: Thermo Scientific LTQ Orbitrap Elite, often just referred to as the Orbitrap Elite.
     MS_LTQ_Orbitrap_Elite = 1001910,
 
     /// Q Exactive: Thermo Scientific Q Exactive.
@@ -6554,11 +6575,11 @@ enum PWIZ_API_DECL CVID
     /// dataset submitter: A person who submits a dataset to a repository.
     MS_dataset_submitter = 1002037,
 
-    /// unlabeled sample: A sample that has not been labelled or modified. This is often referred to as \"light\" to distinguish from \"heavy\".
-    MS_unlabeled_sample = 1002038,
+    /// label free sample: A sample that has not been labelled or modified. This is often referred to as \"light\" to distinguish from \"heavy\".
+    MS_label_free_sample = 1002038,
 
-    /// light labeled sample (unlabeled sample): A sample that has not been labelled or modified. This is often referred to as \"light\" to distinguish from \"heavy\".
-    MS_light_labeled_sample = MS_unlabeled_sample,
+    /// light sample (label free sample): A sample that has not been labelled or modified. This is often referred to as \"light\" to distinguish from \"heavy\".
+    MS_light_sample = MS_label_free_sample,
 
     /// inlet attribute: Inlet properties that are associated with a value.
     MS_inlet_attribute = 1002039,
@@ -7312,6 +7333,9 @@ enum PWIZ_API_DECL CVID
 
     /// iProphet: A program in the TPP that calculates distinct peptide probabilities based on several lines of corroborating evidence including search results from multiple search engines via the pepXML format.
     MS_iProphet = 1002288,
+
+    /// InterProphet (iProphet): A program in the TPP that calculates distinct peptide probabilities based on several lines of corroborating evidence including search results from multiple search engines via the pepXML format.
+    MS_InterProphet = MS_iProphet,
 
     /// ProteinProphet: A program in the TPP that calculates protein-level probabilities based on input PSM or peptide-level probabilities from PeptideProphet or iProphet. The output is written in the protXML format.
     MS_ProteinProphet = 1002289,
@@ -8255,8 +8279,8 @@ enum PWIZ_API_DECL CVID
     /// mzTab: Tabular result format for proteomics and metabolomics experiments.
     MS_mzTab = 1002601,
 
-    /// quantification reagent: Reagent used in labeled quantification methods.
-    MS_quantification_reagent = 1002602,
+    /// sample label: Reagent used in labeled quantification methods.
+    MS_sample_label = 1002602,
 
     /// ICAT reagent: Isotope coded affinity tag reagent.
     MS_ICAT_reagent = 1002603,
@@ -8834,7 +8858,7 @@ enum PWIZ_API_DECL CVID
     /// 8800 Triple Quadrupole ICP-MS: The 8800 Quadrupole ICP-MS system is a Agilent inductively couple plasma instrument combined with a Agilent quadrupole mass spectrometer.
     MS_8800_Triple_Quadrupole_ICP_MS = 1002805,
 
-    /// ion: An atomic or molecular species having a net positive or negative electric charge.
+    /// ion: Molecular entity having a net positive or negative electric charge.
     MS_ion = 1002806,
 
     /// positive mode adduct ion: Adduct ion with positive ionization.
@@ -8843,11 +8867,11 @@ enum PWIZ_API_DECL CVID
     /// negative mode adduct ion: Adduct ion with negative ionization.
     MS_negative_mode_adduct_ion = 1002808,
 
-    /// adduct ion attribute: Attribute describing an adduct formation.
+    /// adduct ion attribute: Nonphysical characteristic attributed to an adduct ion.
     MS_adduct_ion_attribute = 1002809,
 
-    /// adduct ion mass: Mass of an adduct formation specified by the given value.
-    MS_adduct_ion_mass = 1002810,
+    /// adduct ion X m/z: Theoretical m/z of the X component in the adduct M+X or M-X. This term was formerly called 'adduct ion mass', but it is not really a mass. It corresponds to the column mislabelled as 'mass' at https://fiehnlab.ucdavis.edu/staff/kind/Metabolomics/MS-Adduct-Calculator.
+    MS_adduct_ion_X_m_z = 1002810,
 
     /// adduct ion isotope: Isotope of the matrix molecule M of an adduct formation.
     MS_adduct_ion_isotope = 1002811,
@@ -8855,7 +8879,7 @@ enum PWIZ_API_DECL CVID
     /// Regular expression for adduct ion formula: (\[[:digit:]{0,1}M([+][:digit:]{0,1}(H|K|(Na)|(Li)|(Cl)|(Br)|(NH3)|(NH4)|(CH3OH)|(IsoProp)|(DMSO)|(FA)|(Hac)|(TFA)|(NaCOOH)|(HCOOH)|(CF3COOH)|(ACN))){0,}([-][:digit:]{0,1}(H|(H2O)|(CH2)|(CH4)|(NH3)|(CO)|(CO2)|(COCH2)|(HCOOH)|(C2H4)|(C4H8)|(C3H2O3)|(C5H8O4)|(C6H10O4)|(C6H10O5)|(C6H8O6))){0,}\][:digit:]{0,1}[+-]).
     MS_Regular_expression_for_adduct_ion_formula = 1002812,
 
-    /// adduct ion formula: Adduct formation formula specified by the given value.
+    /// adduct ion formula: Adduct formation formula of the form M+X or M-X, as constrained by the provided regular expression.
     MS_adduct_ion_formula = 1002813,
 
     /// volt-second per square centimeter: An electrical mobility unit that equals the speed [cm/s] an ion reaches when pulled through a gas by a Voltage[V] over a certain distance [cm].
@@ -8867,8 +8891,8 @@ enum PWIZ_API_DECL CVID
     /// inverse reduced ion mobility: Ion mobility measurement for an ion or spectrum of ions as measured in an ion mobility mass spectrometer. This might refer to the central value of a bin into which all ions within a narrow range of mobilities have been aggregated.
     MS_inverse_reduced_ion_mobility = 1002815,
 
-    /// mean inverse reduced ion mobility array: Array of drift times or inverse reduced ion mobilities, averaged from a matrix of binned m/z and ion mobility values, corresponding to a spectrum of individual peaks encoded with an m/z array.
-    MS_mean_inverse_reduced_ion_mobility_array = 1002816,
+    /// mean ion mobility array: Array of drift times, averaged from a matrix of binned m/z and ion mobility values, corresponding to a spectrum of individual peaks encoded with an m/z array.
+    MS_mean_ion_mobility_array = 1002816,
 
     /// Bruker TDF format: Bruker TDF raw file format.
     MS_Bruker_TDF_format = 1002817,
@@ -8879,10 +8903,10 @@ enum PWIZ_API_DECL CVID
     /// Bruker TDF nativeID format, combined spectra: Bruker TDF comma separated list of spectra that have been combined prior to searching or interpretation.
     MS_Bruker_TDF_nativeID_format__combined_spectra = 1002819,
 
-    /// M+H ion: M+H ion from positive ion mode (M in the property ionMass denotes the mass of the neutral molecule).
+    /// M+H ion: Adduct formed by protonation of a matrix molecule M, i.e. the addition of a matrix molecule M plus a proton.
     MS_M_H_ion_1002820 = 1002820,
 
-    /// M-H ion: M-H ion from negative ion mode (M in the property ionMass denotes the mass of the neutral molecule).
+    /// M-H ion: Adduct formed by deprotonation of a matrix molecule M, i.e. the removal of a proton from a matrix molecule M.
     MS_M_H_ion_1002821 = 1002821,
 
     /// OpenMS file format: File format developed by the OpenMS team.
@@ -8987,10 +9011,10 @@ enum PWIZ_API_DECL CVID
     /// Non peer-reviewed dataset: Dataset that has not been peer-reviewed by any means.
     MS_Non_peer_reviewed_dataset = 1002855,
 
-    /// Supported dataset by repository: The PX dataset is supported by and is available through the submission repository.
+    /// Supported dataset by repository: Dataset for which the identifications and/or spectra/traces are in formats that can be parsed by the hosting data repository such that internal references between identifications and spectra/traces are preserved and browsable at the repository. This is usually called a complete submission.
     MS_Supported_dataset_by_repository = 1002856,
 
-    /// Unsupported dataset by repository: The PX dataset is not fully supported by the submission repository.
+    /// Unsupported dataset by repository: Dataset for which the identifications and/or spectra/traces are in formats that cannot be parsed by the hosting data repository and thus internal references between identifications and spectra/traces are not browsable at the repository. This is usually called a partial submission.
     MS_Unsupported_dataset_by_repository = 1002857,
 
     /// Dataset with its publication pending: A dataset which has an associated manuscript pending for publication.
@@ -9364,6 +9388,390 @@ enum PWIZ_API_DECL CVID
 
     /// Proline: The Proline software suite for mass spectrometry based proteomics.
     MS_Proline = 1002981,
+
+    /// PepNovo: PepNovo tool for de novo peptide sequencing.
+    MS_PepNovo = 1002982,
+
+    /// pNovo: pNovo tool for de novo peptide sequencing and identification using HCD spectra.
+    MS_pNovo = 1002983,
+
+    /// Novor: Novor real-time peptide de novo sequencing software tool.
+    MS_Novor = 1002984,
+
+    /// in-gel digestion: Digestion of proteins separated by gel electrophoresis for mass spectrometric characterization of proteins and proteomes.
+    MS_in_gel_digestion = 1002985,
+
+    /// in-solution digestion: Digestion of proteins in solution for mass spectrometric characterization of proteins and proteomes.
+    MS_in_solution_digestion = 1002986,
+
+    /// IdentiPy: IdentiPy.
+    MS_IdentiPy = 1002987,
+
+    /// IdentiPy:RHNS: The IdentiPy result 'RHNS'.
+    MS_IdentiPy_RHNS = 1002988,
+
+    /// IdentiPy:hyperscore: The IdentiPy result 'hyperscore'.
+    MS_IdentiPy_hyperscore = 1002989,
+
+    /// ms_deisotope: ms_deisotope, a library for deisotoping and charge state deconvolution of mass spectra.
+    MS_ms_deisotope = 1002990,
+
+    /// python-psims: python-psims, a library for generating mzML and mzIdentML.
+    MS_python_psims = 1002991,
+
+    /// Andromeda:PEP: Posterior error probability of the best identified peptide of the Andromeda search engine.
+    MS_Andromeda_PEP = 1002995,
+
+    /// Andromeda:apl file format: Peak list file format of the Andromeda search engine.
+    MS_Andromeda_apl_file_format = 1002996,
+
+    /// ProteomeXchange dataset identifier reanalysis number: Index number of a reanalysis within a ProteomeXchange reprocessed dataset identifier container (RPXD).
+    MS_ProteomeXchange_dataset_identifier_reanalysis_number = 1002997,
+
+    /// LCMS-9030: Shimadzu Scientific Instruments LCMS-9030 Q-TOF MS.
+    MS_LCMS_9030 = 1002998,
+
+    /// LCMS-8060: Shimadzu Scientific Instruments LCMS-8060 MS.
+    MS_LCMS_8060 = 1002999,
+
+    /// LCMS-8050: Shimadzu Scientific Instruments LCMS-8050 MS.
+    MS_LCMS_8050 = 1003000,
+
+    /// LCMS-8045: Shimadzu Scientific Instruments LCMS-8045 MS.
+    MS_LCMS_8045 = 1003001,
+
+    /// LCMS-8040: Shimadzu Scientific Instruments LCMS-8040 MS.
+    MS_LCMS_8040 = 1003002,
+
+    /// LCMS-2020: Shimadzu Scientific Instruments LCMS-2020.
+    MS_LCMS_2020 = 1003003,
+
+    /// maXis II: Bruker Daltonics' maXis II.
+    MS_maXis_II = 1003004,
+
+    /// timsTOF Pro: Bruker Daltonics' timsTOF Pro.
+    MS_timsTOF_Pro = 1003005,
+
+    /// mean inverse reduced ion mobility array: Array of inverse reduced ion mobilities, averaged from a matrix of binned m/z and ion mobility values, corresponding to a spectrum of individual peaks encoded with an m/z array.
+    MS_mean_inverse_reduced_ion_mobility_array = 1003006,
+
+    /// raw ion mobility array: Array of raw drift times.
+    MS_raw_ion_mobility_array = 1003007,
+
+    /// raw inverse reduced ion mobility array: Array of raw inverse reduced ion mobilities.
+    MS_raw_inverse_reduced_ion_mobility_array = 1003008,
+
+    /// Shimadzu Biotech LCD format: Shimadzu Biotech LCD file format.
+    MS_Shimadzu_Biotech_LCD_format = 1003009,
+
+    /// LPPtiger: Software for lipidome-specific prediction and identification of oxidized phospholipids from LC-MS datasets.
+    MS_LPPtiger = 1003010,
+
+    /// pFind: Sequence-tag-based search engine pFind.
+    MS_pFind = 1003011,
+
+    /// KSDP score: Kernel mass spectral dot product scoring function.
+    MS_KSDP_score = 1003012,
+
+    /// i3tms: i3-tms search engine and data-analysis software.
+    MS_i3tms = 1003013,
+
+    /// MSFragger: A database search-based peptide identification tool.
+    MS_MSFragger = 1003014,
+
+    /// razor peptide: Peptide that is shared between protein groups and assigned to the protein group with the largest number of identified peptides.
+    MS_razor_peptide = 1003015,
+
+    /// ProteinProphet:peptide weight: Fraction of peptide evidence attributable to a protein or a set of indistinguishable proteins.
+    MS_ProteinProphet_peptide_weight = 1003016,
+
+    /// ProteinProphet:peptide group weight: Fraction of peptide evidence attributable to a group of proteins.
+    MS_ProteinProphet_peptide_group_weight = 1003017,
+
+    /// Philosopher: General proteomics processing toolkit for shotgun proteomics.
+    MS_Philosopher = 1003018,
+
+    /// pressure chromatogram: Representation of chromatographic pressure versus time.
+    MS_pressure_chromatogram = 1003019,
+
+    /// flow rate chromatogram: Representation of the chromatographic flow rate versus time.
+    MS_flow_rate_chromatogram = 1003020,
+
+    /// Fixed modification: Post-translational modification which is assumed to be present at each instance of a residue type.
+    MS_Fixed_modification = 1003021,
+
+    /// Variable modification: Post-translational modification which may or may not be present at a residue type.
+    MS_Variable_modification = 1003022,
+
+    /// OpenPepXL: Cross-Linking MS search engine.
+    MS_OpenPepXL = 1003023,
+
+    /// OpenPepXL:score: The OpenPepXL score for a cross-link spectrum match.
+    MS_OpenPepXL_score = 1003024,
+
+    /// named element: A named element that is an attribute in a proteomics standards file.
+    MS_named_element = 1003025,
+
+    /// named element in mzIdentML: A named element that is an attribute in a mzIdentML file.
+    MS_named_element_in_mzIdentML = 1003026,
+
+    /// named element in mzML: A named element that is an attribute in a mzML file.
+    MS_named_element_in_mzML = 1003027,
+
+    /// Orbitrap Exploris 480: Thermo Scientific Orbitrap Exploris 480 Quadrupole Orbitrap MS.
+    MS_Orbitrap_Exploris_480 = 1003028,
+
+    /// Orbitrap Eclipse: Thermo Scientific Orbitrap Eclipse mass spectrometer with Tribrid architecture consisting of quadrupole mass filter, linear ion trap and Orbitrap mass analyzers.
+    MS_Orbitrap_Eclipse = 1003029,
+
+    /// Mascot:MinNumSigUniqueSeqs: Minimum number of significant unique sequences required in a protein hit. The setting is only relevant if the protein grouping strategy is 'family clustering'.
+    MS_Mascot_MinNumSigUniqueSeqs = 1003030,
+
+    /// CPTAC accession number: Main identifier of a CPTAC dataset.
+    MS_CPTAC_accession_number = 1003031,
+
+    /// compound identification confidence code in MS-DIAL: The confidence code to describe the confidence of annotated compounds as defined by the MS-DIAL program.
+    MS_compound_identification_confidence_code_in_MS_DIAL = 1003032,
+
+    /// molecular entity attribute: Non-inherent characteristic attributed to a molecular entity.
+    MS_molecular_entity_attribute = 1003033,
+
+    /// atom: Smallest constituent unit of ordinary matter that constitutes a chemical element.
+    MS_atom = 1003034,
+
+    /// small molecule: Low molecular weight (< 900 daltons) organic compound that may regulate a biological process.
+    MS_small_molecule = 1003035,
+
+    /// metabolite: Small molecule that is the intermediate end product of metabolism.
+    MS_metabolite = 1003036,
+
+    /// ribonucleotide: Nucleotide containing ribose as its pentose component.
+    MS_ribonucleotide = 1003037,
+
+    /// deoxyribonucleotide: Monomer, or single unit, of DNA, or deoxyribonucleic acid.
+    MS_deoxyribonucleotide = 1003038,
+
+    /// amino acid: Organic molecule that contains amine (-NH2) and carboxyl (-COOH) functional groups, along with a side chain (R group) that is specific to each amino acid.
+    MS_amino_acid = 1003039,
+
+    /// monosaccharide: Simplest form of sugar and the most basic units of carbohydrate that cannot be further hydrolyzed to a simpler molecule.
+    MS_monosaccharide = 1003040,
+
+    /// nucleic acid: Molecule composed of a chain of nucleotides.
+    MS_nucleic_acid = 1003041,
+
+    /// polysaccharide: Polymeric carbohydrate molecules composed of long chains of monosaccharide units bound together by glycosidic linkages.
+    MS_polysaccharide = 1003042,
+
+    /// number of residues: Number of amino acid residues in a peptide, commonly referred to as the peptide length.
+    MS_number_of_residues = 1003043,
+
+    /// number of missed cleavages: Number of amino acid residue bonds that should have been cleaved by the cleavage agent used, but were not.
+    MS_number_of_missed_cleavages = 1003044,
+
+    /// peptide-to-protein mapping: Process of mapping a peptide sequence to a protein sequence.
+    MS_peptide_to_protein_mapping = 1003045,
+
+    /// peptide-to-protein mapping attribute: Nonphysical characteristic attributed to the result of peptide-to-protein mapping.
+    MS_peptide_to_protein_mapping_attribute = 1003046,
+
+    /// protein sequence offset: Offset in number of residues from the n terminus of the protein at which the peptide begins. Use 1 when the first residue of the peptide sequence is the first residue of the protein sequence.
+    MS_protein_sequence_offset = 1003047,
+
+    /// number of enzymatic termini: Total number of termini that match standard rules for the cleavage agent, 2 when both termini match cleavage agent rules, 1 when only one terminus does, and 0 if neither terminus matches cleavage agent rules.
+    MS_number_of_enzymatic_termini = 1003048,
+
+    /// peptidoform: Peptide that contains zero or more mass modifications on the termini or side chains of its amino acid residues, and may be differentiated from other peptidoforms with the same peptide sequence but different mass modification configurations.
+    MS_peptidoform = 1003049,
+
+    /// peptidoform attribute: Non-inherent characteristic attributed to a peptidoform.
+    MS_peptidoform_attribute = 1003050,
+
+    /// peptidoform ion: Peptidoform that has formed an adduct with an ion, thereby rendering it potentially detectable with a mass spectrometer. Commonly called a 'precursor' or 'precursor ion' or 'parent ion'.
+    MS_peptidoform_ion = 1003051,
+
+    /// peptidoform ion property: Inherent or measurable characteristic of a peptidoform ion.
+    MS_peptidoform_ion_property = 1003052,
+
+    /// theoretical monoisotopic m/z: Mass-to-charge ratio of a peptidoform ion composed of the most common isotope of each atom computed from the putative knowledge of its molecular constituents.
+    MS_theoretical_monoisotopic_m_z = 1003053,
+
+    /// theoretical average m/z: Mass-to-charge ratio of a peptidoform ion computed from the putative knowledge of its molecular constituents, averaged over the distribution of naturally occurring isotopes.
+    MS_theoretical_average_m_z = 1003054,
+
+    /// adduct: Product of a direct addition of two or more distinct molecules, resulting in a single reaction product containing all atoms of all components. The resultant is considered a distinct molecular species.
+    MS_adduct = 1003055,
+
+    /// adduct ion property: Physical measurable characteristic of an adduct ion.
+    MS_adduct_ion_property = 1003056,
+
+    /// scan number: Ordinal number of the scan indicating its order of acquisition within a mass spectrometry acquisition run.
+    MS_scan_number = 1003057,
+
+    /// spectrum property: Inherent or measurable characteristic of a spectrum.
+    MS_spectrum_property = 1003058,
+
+    /// number of peaks: Number of peaks or features in a spectrum. For a peak-picked spectrum, this will correspond to the number of data points. For a non-peak-picked spectrum, this corresponds to the number of features discernable in the spectrum, which will be fewer than the number of data points.
+    MS_number_of_peaks = 1003059,
+
+    /// number of data points: Number of data points in a spectrum. For a peak-picked spectrum, this will correspond to the number of peaks. For a non-peak-picked spectrum, this corresponds to the number of values in the data array, which are not all peaks.
+    MS_number_of_data_points = 1003060,
+
+    /// spectrum name: Label attached to a spectrum uniquely naming it within a collection of spectra, often in a spectral library. It is often a string combination of peptide sequence, charge, mass modifications, collision energy, but will obviously be different for small molecules or unidentified spectra. It must be unique within a collection.
+    MS_spectrum_name = 1003061,
+
+    /// spectrum index: Integer index value associated with a spectrum within a collection of spectra, often in a spectral library. By custom, index counters should begin with 0.
+    MS_spectrum_index = 1003062,
+
+    /// universal spectrum identifier: PSI universal spectrum identifier (USI) multipart key that uniquely identifies a spectrum available in a ProteomeXchange datasets or spectral library.
+    MS_universal_spectrum_identifier = 1003063,
+
+    /// spectrum aggregation attribute: Non-inherent characteristic attributed to spectrum aggregation.
+    MS_spectrum_aggregation_attribute = 1003064,
+
+    /// spectrum aggregation type: Categorization of a spectrum based on its type of aggregation (e.g., individual spectrum, consensus spectrum, best replicate spectrum, etc.).
+    MS_spectrum_aggregation_type = 1003065,
+
+    /// singleton spectrum: Spectrum that is not the result of some aggregation process.
+    MS_singleton_spectrum = 1003066,
+
+    /// consensus spectrum: Spectrum that is the result of merging several replicate spectra to form a spectrum that is more representative of its class and ideally less noisy that any of its source replicates.
+    MS_consensus_spectrum = 1003067,
+
+    /// best replicate spectrum: Spectrum that is considered the most representative from a pool of replicate spectra.
+    MS_best_replicate_spectrum = 1003068,
+
+    /// number of replicate spectra available: Number of replicate spectra available for use during the aggregation process.
+    MS_number_of_replicate_spectra_available = 1003069,
+
+    /// number of replicate spectra used: Number of replicate spectra used during the aggregation process. This is generally applicable when there are many replicates available, but some are discarded as being low S/N, blended, or otherwise unsuitable, and the remaining set is then used for merging via a consensus algorithm.
+    MS_number_of_replicate_spectra_used = 1003070,
+
+    /// spectrum origin attribute: Non-inherent characteristic attributed to spectrum aggregation.
+    MS_spectrum_origin_attribute = 1003071,
+
+    /// spectrum origin type: Categorization of a spectrum based on its origin (e.g., observed spectrum, predicted spectrum, demultiplexed spectrum, etc.).
+    MS_spectrum_origin_type = 1003072,
+
+    /// observed spectrum: Spectrum that originates from an analysis attempt of a single analyte species on an instrument.
+    MS_observed_spectrum = 1003073,
+
+    /// predicted spectrum: Spectrum that originates from a compututational algorithm that attempts to predict spectra.
+    MS_predicted_spectrum = 1003074,
+
+    /// demultiplexed spectrum: Spectrum that originates from an attempted extraction of a single ion spieces from a multiplexed spectrum that contains multiple ion species.
+    MS_demultiplexed_spectrum = 1003075,
+
+    /// uninterpreted spectrum: Spectrum provided in the form of plain numerical values without any information pertaining to the interpretation of features.
+    MS_uninterpreted_spectrum = 1003076,
+
+    /// interpreted spectrum: Spectrum provided in a form where specific features of the spectrum are interpreted to provide putative explanations for some feature.
+    MS_interpreted_spectrum = 1003077,
+
+    /// interpreted spectrum attribute: Non-inherent characteristic attributed to an interpreted spectrum.
+    MS_interpreted_spectrum_attribute = 1003078,
+
+    /// total unassigned intensity fraction: Fraction of intensity summed from all unassigned peaks divided by the intensity summed from all peaks in the spectrum.
+    MS_total_unassigned_intensity_fraction = 1003079,
+
+    /// top 20 peak unassigned intensity fraction: Fraction of intensity summed from unassigned peaks among the top 20 divided by the intensity summed from all top 20 peaks in the spectrum.
+    MS_top_20_peak_unassigned_intensity_fraction = 1003080,
+
+    /// unidentified modification monoisotopic mass delta: Monoisotopic mass delta in Daltons of an amino acid residue modification whose atomic composition or molecular identity has not been determined. This term should not be used for modifications of known molecular identity such as those available in Unimod, RESID or PSI-MOD. This term MUST NOT be used inside the <Modification> element in mzIdentML.
+    MS_unidentified_modification_monoisotopic_mass_delta = 1003081,
+
+    /// MS-DIAL: Data processing software for untargeted metabolomics and lipidomics that supports multiple instruments and MS vendors.
+    MS_MS_DIAL = 1003082,
+
+    /// raw data file: Data file that contains original data as generated by an instrument, although not necessarily in the original data format (i.e. an original raw file converted to a different format is still a raw data file).
+    MS_raw_data_file = 1003083,
+
+    /// processed data file: File that contains data that has been substantially processed or transformed from what was originally acquired by an instrument.
+    MS_processed_data_file = 1003084,
+
+    /// previous MSn-1 scan precursor intensity: Intensity of the precursor ion in the previous MSn-1 scan (prior in time to the referencing MSn scan). For an MS2 scan, this means the MS1 precursor intensity. It is unspecified on whether this is an apex (across m/z) intensity, integrated (across m/z) intensity, a centroided peak intensity of unknown origin, or even summed across several isotopes.
+    MS_previous_MSn_1_scan_precursor_intensity = 1003085,
+
+    /// precursor apex intensity: Intensity of the precursor ion current as measured by its apex point over time and m/z. It is unspecified whether this is the intensity of the selected isotope or the most intense isotope.
+    MS_precursor_apex_intensity = 1003086,
+
+    /// supported by repository but incomplete data and/or metadata: Dataset for which the identifications and/or spectra/traces are in formats that can be parsed by the hosting data repository such that internal references between identifications and spectra/traces are preserved and browsable at the repository. However, some metadata is not properly described due to lack of CV terms or some auxiliary data, such as data used to create a spectral library or a sequence search database crucial to the analysis, is not available.
+    MS_supported_by_repository_but_incomplete_data_and_or_metadata = 1003087,
+
+    /// truncation and zlib compression: Data array compression using mantissa bit truncation followed by zlib compression.
+    MS_truncation_and_zlib_compression = 1003088,
+
+    /// truncation, delta prediction and zlib compression: Data array compression using mantissa bit truncation, delta prediction and zlib compression.
+    MS_truncation__delta_prediction_and_zlib_compression = 1003089,
+
+    /// truncation, linear prediction and zlib compression: Data array compression using mantissa bit truncation, linear prediction and zlib compression.
+    MS_truncation__linear_prediction_and_zlib_compression = 1003090,
+
+    /// binary data compression parameter: Settable parameter for a binary data compression event.
+    MS_binary_data_compression_parameter = 1003091,
+
+    /// number of mantissa bits truncated: Number of extraneous mantissa bits truncated to improve subsequent compression.
+    MS_number_of_mantissa_bits_truncated = 1003092,
+
+    /// Lys-N: Metalloendopeptidase found in the mushroom Grifola frondosa that cleaves proteins on the amino side of lysine residues.
+    MS_Lys_N = 1003093,
+
+    /// Orbitrap Exploris 240: Thermo Scientific Orbitrap Exploris 240 Quadrupole Orbitrap MS.
+    MS_Orbitrap_Exploris_240 = 1003094,
+
+    /// Orbitrap Exploris 120: Thermo Scientific Orbitrap Exploris 120 Quadrupole Orbitrap MS.
+    MS_Orbitrap_Exploris_120 = 1003095,
+
+    /// LTQ Orbitrap Velos Pro: Thermo Scientific LTQ Orbitrap Velos Pro, often just referred to as the Orbitrap Velos Pro.
+    MS_LTQ_Orbitrap_Velos_Pro = 1003096,
+
+    /// MaxQuant protein group-level score: The probability based MaxQuant protein group score.
+    MS_MaxQuant_protein_group_level_score = 1003097,
+
+    /// Andromeda peptide PEP: Peptide probability from Andromeda.
+    MS_Andromeda_peptide_PEP = 1003098,
+
+    /// MaxQuant-DIA peptide PEP: Peptide probability from MaxQuant-DIA algorithm.
+    MS_MaxQuant_DIA_peptide_PEP = 1003099,
+
+    /// MaxQuant-DIA score: PSM evidence score from MaxQuant-DIA algorithm.
+    MS_MaxQuant_DIA_score = 1003100,
+
+    /// MaxQuant-DIA PEP: PSM evidence PEP probability from MaxQuant-DIA algorithm.
+    MS_MaxQuant_DIA_PEP = 1003101,
+
+    /// NIST msp comment: Term for a comment field withing the NIST msp file format
+    MS_NIST_msp_comment = 1003102,
+
+    /// ion interpretation format: Interpretation format used for annotating individual spectrum ion peaks.
+    MS_ion_interpretation_format = 1003103,
+
+    /// peptide ion interpretation format: Interpretation format designed primarily for peptides, with allowances for generic chemical formulas and other miscellaneous named ions.
+    MS_peptide_ion_interpretation_format = 1003104,
+
+    /// cross-linked peptide ion interpretation format: Interpretation format designed specifically for cross-linked peptide ion peaks.
+    MS_cross_linked_peptide_ion_interpretation_format = 1003105,
+
+    /// glycan ion interpretation format: Interpretation format designed specifically for glycan ion peaks.
+    MS_glycan_ion_interpretation_format = 1003106,
+
+    /// lipid ion interpretation format: Interpretation format designed specifically for lipid ion peaks.
+    MS_lipid_ion_interpretation_format = 1003107,
+
+    /// PatternLab: PatternLab for Proteomics is an integrated computational environment for analyzing shotgun proteomic data.
+    MS_PatternLab = 1003108,
+
+    /// SIM-XL: Identifying cross-linked peptides in complex protein mixtures
+    MS_SIM_XL = 1003109,
+
+    /// SIM-XL score: SIM-XL identification search engine score
+    MS_SIM_XL_score = 1003110,
+
+    /// QUIN-XL: Quantification of cross-linked peptides in complex protein mixtures
+    MS_QUIN_XL = 1003111,
+
+    /// Orbitrap ID-X: Thermo Scientific Orbitrap ID-X mass spectrometer with Tribrid architecture consisting of quadrupole mass filter, linear ion trap and Orbitrap mass analyzers.
+    MS_Orbitrap_ID_X = 1003112,
 
     /// unimod root node: The root node of the unimod modifications ontology.
     UNIMOD_unimod_root_node = 200000000,
@@ -9842,7 +10250,7 @@ enum PWIZ_API_DECL CVID
     /// CAF: Sulfonation of N-terminus.
     UNIMOD_CAF = 200000272,
 
-    /// Nitrosyl: S-nitrosylation.
+    /// Nitrosyl: Nitrosylation.
     UNIMOD_Nitrosyl = 200000275,
 
     /// AEBS: Aminoethylbenzenesulfonylation.
@@ -12101,7 +12509,7 @@ enum PWIZ_API_DECL CVID
     /// Label:13C(3): 13C3 label for SILAC.
     UNIMOD_Label_13C_3_ = 200001296,
 
-    /// Label:13C(3)15N(1): 13C3 15N1 label for SILAC.
+    /// Label:13C(3)15N(1): SILAC or AQUA label.
     UNIMOD_Label_13C_3_15N_1_ = 200001297,
 
     /// Label:13C(4)15N(1): 13C4 15N1 label for SILAC.
@@ -12266,7 +12674,7 @@ enum PWIZ_API_DECL CVID
     /// Homocysteic_acid: Methionine oxidation to homocysteic acid.
     UNIMOD_Homocysteic_acid = 200001384,
 
-    /// Hydroxamic_acid: Conversion of carboxylic acid to hydroxamic acid.
+    /// Hydroxamic_acid: ADP-ribosylation followed by conversion to hydroxamic acid via hydroxylamine.
     UNIMOD_Hydroxamic_acid = 200001385,
 
     /// 3-phosphoglyceryl: 3-phosphoglyceryl.
@@ -13481,8 +13889,8 @@ enum PWIZ_API_DECL CVID
     /// Gluratylation: Glutarylation.
     UNIMOD_Gluratylation = 200001848,
 
-    /// 2-hydroxyisobutyrylation: 2-hydroxyisobutyrylation.
-    UNIMOD_2_hydroxyisobutyrylation = 200001849,
+    /// hydroxyisobutyryl: 2-hydroxyisobutyrylation.
+    UNIMOD_hydroxyisobutyryl = 200001849,
 
     /// MeMePhosphorothioate: S-Methyl Methyl phosphorothioate.
     UNIMOD_MeMePhosphorothioate = 200001868,
@@ -13799,6 +14207,42 @@ enum PWIZ_API_DECL CVID
     /// TMPP-Ac:13C(9): Heavy tris(2,4,6-trimethoxyphenyl)phosphonium acetic acid N-hydroxysuccinimide ester derivative.
     UNIMOD_TMPP_Ac_13C_9_ = 200001993,
 
+    /// Xlink:DST[56]: DST crosslinker cleaved by sodium periodate.
+    UNIMOD_Xlink_DST_56_ = 200001999,
+
+    /// ZQG: Carbobenzoxy-L-glutaminyl-glycine.
+    UNIMOD_ZQG = 200002001,
+
+    /// Haloxon: O-Dichloroethylphosphate.
+    UNIMOD_Haloxon = 200002006,
+
+    /// Methamidophos-S: S-methyl amino phosphinate.
+    UNIMOD_Methamidophos_S = 200002007,
+
+    /// Methamidophos-O: O-methyl amino phosphinate.
+    UNIMOD_Methamidophos_O = 200002008,
+
+    /// Nitrene: Loss of O2; nitro photochemical decomposition.
+    UNIMOD_Nitrene = 200002014,
+
+    /// shTMT: Super Heavy Tandem Mass Tag.
+    UNIMOD_shTMT = 200002015,
+
+    /// TMTpro: TMTpro 16plex Tandem Mass Tag.
+    UNIMOD_TMTpro = 200002016,
+
+    /// TMTpro_zero: Native TMTpro Tandem Mass Tag.
+    UNIMOD_TMTpro_zero = 200002017,
+
+    /// Kdo: Glycosylation with KDO.
+    UNIMOD_Kdo = 200002022,
+
+    /// Andro-H2O: Andrographolide with the loss of H2O.
+    UNIMOD_Andro_H2O = 200002025,
+
+    /// His+O(2): Photo-induced histidine adduct.
+    UNIMOD_His_O_2_ = 200002027,
+
     /// unit: A unit of measurement is a standardized quantity of a physical quality.
     UO_unit = 300000000,
 
@@ -13917,7 +14361,7 @@ enum PWIZ_API_DECL CVID
     UO_microampere = 300000038,
 
     /// micromole: A substance unit equal to a millionth of a mol or 10^[-6] mol.
-    UO_micromole = 300000039,
+    UO_micromole_300000039 = 300000039,
 
     /// millimole: A substance unit equal to a thousandth of a mol or 10^[-3] mol.
     UO_millimole = 300000040,
@@ -14907,7 +15351,37 @@ enum PWIZ_API_DECL CVID
     UO_ton = 300010038,
 
     /// slug: An imperial gravitational unit which is equivalent to a mass that accelerates by 1ft/s² when a force of one pound (lbf) is exerted on it.
-    UO_slug = 300010039
+    UO_slug = 300010039,
+
+    /// teaspoon: A metric teaspoon is a unit of measurement of volume widely used in cooking recipes and pharmaceutic prescriptions. It equals a 5mL volume.
+    UO_teaspoon = 300010040,
+
+    /// united states customary teaspoon: A United States customary units teaspoon is a unit of measurement of volume widely used in cooking recipes and pharmaceutic prescriptions in America. It equals a 4.93 mL volume.
+    UO_united_states_customary_teaspoon = 300010041,
+
+    /// tablespoon: A metric tablespoon is a unit of measurement of volume widely used in cooking recipes and pharmaceutic prescriptions. It equals a 15mL volume.
+    UO_tablespoon = 300010042,
+
+    /// australian metric tablespoon: An Australian metric tablespoon is a unit of measurement of volume used in Australia for cooking recipes and pharmaceutic prescriptions. It equals a 20mL volume.
+    UO_australian_metric_tablespoon = 300010043,
+
+    /// united states customary tablespoon: A United States customary units tablespoon is a unit of measurement of volume widely used in cooking recipes and pharmaceutic prescriptions in America. It equals a 14.79 mL volume.
+    UO_united_states_customary_tablespoon = 300010044,
+
+    /// metric cup: A metric cup is a unit of measurement of volume widely used in cooking recipes and pharmaceutic prescriptions. It equals a 250mL volume.
+    UO_metric_cup = 300010045,
+
+    /// united states customary cup: A United States customary units cup is a unit of measurement of volume widely used in cooking recipes and pharmaceutic prescriptions in America. It equals a 236.59 mL volume.
+    UO_united_states_customary_cup = 300010046,
+
+    /// united states fda cup: A United States FDA cup is a unit of measurement of volume used by the US Federal Department of Agriculture as a nutritional serving measure. It equals a 240 mL volume.
+    UO_united_states_fda_cup = 300010047,
+
+    /// micromole: A substance unit which is equal to one millionth of a mole.
+    UO_micromole_300010048 = 300010048,
+
+    /// gram per square meter: An area density unit which is equal to the mass of an object in grams divided by the surface area in meters squared.
+    UO_gram_per_square_meter = 300010049
 }; // enum CVID
 
 

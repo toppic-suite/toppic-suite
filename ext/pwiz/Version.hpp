@@ -25,7 +25,7 @@
 #define _PWIZ_VERSION_HPP_
 
 
-#include "common/utility/misc/Export.hpp"
+#include "utility/misc/Export.hpp"
 #include <string>
 
 

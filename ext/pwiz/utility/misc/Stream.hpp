@@ -27,10 +27,13 @@
 #include <iomanip>
 #include <boost/iostreams/operations.hpp>
 #include "pwiz/utility/misc/optimized_lexical_cast.hpp"
-
+#include <boost/nowide/fstream.hpp>
+#include <boost/nowide/iostream.hpp>
+#include <boost/nowide/system.hpp>
+#include <boost/nowide/args.hpp>
 
 namespace bio = boost::iostreams;
-
+namespace bnw = boost::nowide;
 
 using std::ios;
 using std::iostream;
@@ -40,9 +43,9 @@ using std::ostream;
 using std::istream_iterator;
 using std::ostream_iterator;
 
-using std::fstream;
-using std::ifstream;
-using std::ofstream;
+using bnw::fstream;
+using bnw::ifstream;
+using bnw::ofstream;
 
 using std::stringstream;
 using std::istringstream;
@@ -54,9 +57,12 @@ using std::streampos;
 using std::streamoff;
 using std::streamsize;
 
-using std::cin;
-using std::cout;
-using std::cerr;
+// This breaks VS2019 usage
+using bnw::system; // unqualified system() calls will be ambiguous, by intention, to force developers to consider UTF-8 compatibility
+
+using bnw::cin;
+using bnw::cout;
+using bnw::cerr;
 using std::endl;
 using std::flush;
 
