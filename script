@@ -1,0 +1,9 @@
+mkdir build
+cd build
+cmake ..
+make topfd -j8
+make topindex -j8
+make toppic -j8
+make topmg -j8
+make topdiff -j8
+cd ../bin/toppic_resources
