@@ -28,9 +28,8 @@
 #include "Exception.hpp"
 #include "DateTime.hpp"
 #include "Filesystem.hpp"
+#include "Stream.hpp"
 #include "pwiz/utility/math/round.hpp"
-#include <string>
-#include <sstream>
 #include <cmath>
 #include <boost/filesystem/detail/utf8_codecvt_facet.hpp>
 
@@ -193,11 +192,13 @@ inline std::string escape_teamcity_string(const std::string& str)
 
 // without PWIZ_DOCTEST defined, disable doctest macros; when it is defined, doctest will be configured with main()
 #if !defined(PWIZ_DOCTEST) && !defined(PWIZ_DOCTEST_NO_MAIN)
+#ifndef __cplusplus_cli
 #define DOCTEST_CONFIG_DISABLE
-#include "libraries/doctest.h"
+#include "pwiz/utility/doctest.h"
+#endif
 #else
 #define DOCTEST_CONFIG_IMPLEMENT
-#include "libraries/doctest.h"
+#include "pwiz/utility/doctest.h"
 
 #ifndef PWIZ_DOCTEST_NO_MAIN
 int main(int argc, char* argv[])
@@ -209,7 +210,7 @@ int main(int argc, char* argv[])
         doctest::Context context;
         testExitStatus = context.run();
     }
-    catch (exception& e)
+    catch (std::exception& e)
     {
         TEST_FAILED(e.what())
     }

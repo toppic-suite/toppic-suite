@@ -38,6 +38,7 @@ namespace msdata {
 using boost::iostreams::stream_offset;
 using boost::iostreams::offset_to_position;
 using namespace pwiz::chemistry;
+using namespace pwiz::util;
 
 
 namespace {
@@ -143,7 +144,7 @@ class SpectrumList_MSnImpl : public SpectrumList_MSn
   size_t find(const string& id) const
   {
     map<string, size_t>::const_iterator it = idToIndex_.find(id);
-    return it != idToIndex_.end() ? it->second : size();
+    return it != idToIndex_.end() ? it->second : checkNativeIdFindResult(size(), id);
   }
   
   size_t findNative(const string& nativeID) const
@@ -233,8 +234,8 @@ class SpectrumList_MSnImpl : public SpectrumList_MSn
     double basePeakIntensity = 0;
     spectrum.defaultArrayLength = 0;
     spectrum.setMZIntensityArrays(vector<double>(), vector<double>(), MS_number_of_detector_counts);
-    vector<double>& mzArray = spectrum.getMZArray()->data;
-    vector<double>& intensityArray = spectrum.getIntensityArray()->data;
+    BinaryData<double>& mzArray = spectrum.getMZArray()->data;
+    BinaryData<double>& intensityArray = spectrum.getIntensityArray()->data;
     double precursor_mz = 0;
     
     // start reading the file
@@ -586,8 +587,8 @@ class SpectrumList_MSnImpl : public SpectrumList_MSn
     double basePeakIntensity = 0;
     spectrum.defaultArrayLength = 0;
     spectrum.setMZIntensityArrays(vector<double>(), vector<double>(), MS_number_of_detector_counts);
-    vector<double>& mzArray = spectrum.getMZArray()->data;
-    vector<double>& intensityArray = spectrum.getIntensityArray()->data;
+    BinaryData<double>& mzArray = spectrum.getMZArray()->data;
+    BinaryData<double>& intensityArray = spectrum.getIntensityArray()->data;
     double mz = 0;
     float intensity = 0;
 
