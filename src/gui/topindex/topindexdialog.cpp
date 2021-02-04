@@ -265,9 +265,7 @@ std::map<std::string, std::string> TopIndexDialog::getArguments() {
   if (ui->MACCheckBox->isChecked()) {
     arguments_["allowProtMod"] = arguments_["allowProtMod"] + ",M_ACETYLATION";
   }
-  std::cout << "argument: " << arguments_["allowProtMod"] << std::endl;
-    arguments_["threadNumber"] = ui->threadNumberEdit->text().toStdString();
-  
+  arguments_["threadNumber"] = ui->threadNumberEdit->text().toStdString();
 
   return arguments_;
 }

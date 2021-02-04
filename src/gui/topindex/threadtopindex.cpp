@@ -19,6 +19,5 @@
 
 void ThreadTopIndex::run() {
   //std::sort(spec_file_lst_.begin(), spec_file_lst_.end());
-  std::cout << "thread running" << std::endl;
   toppic::TopIndexProcess(arguments_);
 }

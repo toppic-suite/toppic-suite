@@ -23,6 +23,7 @@
 
 #include "common/base/base_data.hpp"
 #include "common/util/file_util.hpp"
+#include "common/util/version.hpp"
 
 #include "seq/fasta_util.hpp"
 #include "seq/db_block.hpp"
@@ -41,6 +42,8 @@ namespace toppic{
 
 void TopIndexProcess(std::map<std::string, std::string> &arguments){
   try {
+    std::cout << "TopIndex " << Version::getVersion() << std::endl;
+
     Argument::outputArguments(std::cout, arguments);
     base_data::init();
 
