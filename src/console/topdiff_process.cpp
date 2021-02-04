@@ -14,6 +14,7 @@
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
+#include "common/util/version.hpp"
 #include "common/base/base_data.hpp"
 #include "seq/fasta_util.hpp"
 #include "merge/feature_sample_merge.hpp"
@@ -25,6 +26,8 @@ namespace toppic {
 int topDiffProcess(std::map<std::string, std::string> &arguments,
                     std::vector<std::string> &input_file_list) {
   try{
+    std::cout << "TopDiff " << Version::getVersion() << std::endl;
+
     Argument::outputArguments(std::cout, arguments);
     base_data::init();
 
