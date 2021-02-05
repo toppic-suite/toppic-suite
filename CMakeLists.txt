@@ -12,7 +12,7 @@ SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/../lib)
 SET(CMAKE_INSTALL_PREFIX ${HOME}/toppic)
 
 # The options c++14 and mavx are set for the frugally-deep library
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++14 -O3 -DWITHOUT_MZ5 -fPIC")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unknown-pragmas -std=c++14 -O3 -DWITHOUT_MZ5 -fPIC")
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall  -g -std=c++11  -DWITHOUT_MZ5 -fPIC")
 #SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -std=c++11 -O2 -pg -fPIC")
 message(STATUS "system name " ${CMAKE_SYSTEM_NAME})
