@@ -177,7 +177,7 @@ add_executable(topfd
 
 add_executable(topfd_gui 
   ${TOPFD_GUI_SRCS} ${TOPFD_SRCS} ${COMMON_SRCS} ${PARA_SRCS} 
-  ${SPEC_SRCS} ${ENV_SRCS} ${FEATURE_SRCS} ${PWIZ_SRCS})
+  ${SPEC_SRCS} ${ENV_SRCS} ${FEATURE_SRCS} ${PWIZ_SRCS} ${NOWIDE_SRCS})
 
 add_executable(topindex 
   ${TOPINDEX_CONSOLE_SRCS} ${TOPINDEX_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS}
@@ -259,7 +259,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     SET(QTOPTION -Wl,-subsystem,windows)
     target_link_libraries(topfd_gui ${QTOPTION} Qt5Widgets Qt5Core Qt5Gui
         xerces-c boost_filesystem-mt boost_system-mt boost_thread-mt 
-	    	boost_iostreams-mt boost_chrono-mt pthread z Ws2_32)
+	    	boost_iostreams-mt boost_chrono-mt pthread z psapi Ws2_32)
 
     target_link_libraries(toppic_gui ${QTOPTION} Qt5Widgets Qt5Core Qt5Gui xerces-c
         boost_filesystem-mt boost_system-mt 
