@@ -11,10 +11,17 @@ SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/../lib)
 
 SET(CMAKE_INSTALL_PREFIX ${HOME}/toppic)
 
+IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+  # Linux specific code
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unknown-pragmas -std=c++14 -O3 -DWITHOUT_MZ5 -fPIC")
+ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
+
+IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+  # Windows specific code
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unknown-pragmas -std=c++14 -O3 -DWITHOUT_MZ5 -fPIC -fpermissive")
+ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+
 # The options c++14 and mavx are set for the frugally-deep library
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unknown-pragmas -std=c++14 -O3 -DWITHOUT_MZ5 -fPIC")
-#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall  -g -std=c++11  -DWITHOUT_MZ5 -fPIC")
-#SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -std=c++11 -O2 -pg -fPIC")
 message(STATUS "system name " ${CMAKE_SYSTEM_NAME})
 
 # for Qt
@@ -53,6 +60,8 @@ file(GLOB PWIZ_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/utility/minimxml/*.cpp
                     ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/utility/misc/*.cpp
                     ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/data/common/*.cpp
                     ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/data/msdata/*.cpp)
+# nowide
+file(GLOB NOWIDE_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/ext/boost/nowide/*.cpp)
 
 # hts
 file(GLOB HTS_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/ext/htslib/*.c)
@@ -160,7 +169,7 @@ file(GLOB UNIT_TEST_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/*.cpp)
 
 add_executable(topfd 
   ${TOPFD_CONSOLE_SRCS} ${TOPFD_SRCS} ${COMMON_SRCS} ${PARA_SRCS} 
-  ${SPEC_SRCS} ${ENV_SRCS} ${FEATURE_SRCS} ${PWIZ_SRCS})
+  ${SPEC_SRCS} ${ENV_SRCS} ${FEATURE_SRCS} ${PWIZ_SRCS} ${NOWIDE_SRCS})
 
 #add_executable(topfd_single 
 #  ${TOPFD_SINGLE_CONSOLE_SRCS} ${TOPFD_SINGLE_PROC_SRCS} ${TOPFD_SRCS}
@@ -168,7 +177,7 @@ add_executable(topfd
 
 add_executable(topfd_gui 
   ${TOPFD_GUI_SRCS} ${TOPFD_SRCS} ${COMMON_SRCS} ${PARA_SRCS} 
-  ${SPEC_SRCS} ${ENV_SRCS} ${FEATURE_SRCS} ${PWIZ_SRCS})
+  ${SPEC_SRCS} ${ENV_SRCS} ${FEATURE_SRCS} ${PWIZ_SRCS} ${NOWIDE_SRCS})
 
 add_executable(topindex 
   ${TOPINDEX_CONSOLE_SRCS} ${TOPINDEX_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS}
@@ -224,7 +233,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     target_link_libraries(topfd xerces-c
         boost_program_options-mt boost_filesystem-mt
         boost_system-mt boost_thread-mt
-        boost_iostreams-mt boost_chrono-mt pthread z Ws2_32)
+        boost_iostreams-mt boost_chrono-mt pthread z psapi Ws2_32)
 
       #   target_link_libraries(topfd_single xerces-c
       #  boost_program_options-mt boost_filesystem-mt
@@ -250,7 +259,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     SET(QTOPTION -Wl,-subsystem,windows)
     target_link_libraries(topfd_gui ${QTOPTION} Qt5Widgets Qt5Core Qt5Gui
         xerces-c boost_filesystem-mt boost_system-mt boost_thread-mt 
-	    	boost_iostreams-mt boost_chrono-mt pthread z Ws2_32)
+	    	boost_iostreams-mt boost_chrono-mt pthread z psapi Ws2_32)
 
     target_link_libraries(toppic_gui ${QTOPTION} Qt5Widgets Qt5Core Qt5Gui xerces-c
         boost_filesystem-mt boost_system-mt 

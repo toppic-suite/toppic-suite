@@ -58,7 +58,7 @@ using std::streamoff;
 using std::streamsize;
 
 // This breaks VS2019 usage
-using bnw::system; // unqualified system() calls will be ambiguous, by intention, to force developers to consider UTF-8 compatibility
+//using bnw::system; // unqualified system() calls will be ambiguous, by intention, to force developers to consider UTF-8 compatibility
 
 using bnw::cin;
 using bnw::cout;
