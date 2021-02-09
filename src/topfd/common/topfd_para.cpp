@@ -70,11 +70,11 @@ std::string TopfdPara::getParaStr(const std::string &prefix) {
   }
   if (do_final_filtering_) {
     output << prefix << std::setw(gap) << std::left 
-      << "Do final filtering: " << "\t" << "Yes" << std::endl;
+      << "Do final filtering:   " << "\t" << "Yes" << std::endl;
   }
   else {
     output << prefix << std::setw(gap) << std::left 
-      << "Do final filtering: " << "\t" << "No" << std::endl;
+      << "Do final filtering:   " << "\t" << "No" << std::endl;
   }
   //output << prefix << std::setw(gap) << std::left 
      // << "Do final filtering: " << para_ptr->do_final_filtering_ << std::endl;
