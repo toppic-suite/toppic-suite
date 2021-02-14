@@ -121,7 +121,6 @@ void generateDbBlock(const std::string &db_file_name, int block_size, int max_fr
       seq_size = seq_size + (seq_len - max_frag_len) * max_frag_len 
 	      + (max_frag_len * (max_frag_len + 1) /2);
     }
-    std::cout << seq_size << std::endl;
     //seq_size += seq.length();
     if (seq_size > block_size) {
       block_output.close();
