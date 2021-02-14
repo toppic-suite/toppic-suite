@@ -92,7 +92,8 @@ void TopIndexDialog::closeEvent(QCloseEvent *event) {
 void TopIndexDialog::initArguments() {
   arguments_["oriDatabaseFileName"]="";
   arguments_["databaseFileName"] = "";
-  arguments_["databaseBlockSize"] = "1000000";
+  arguments_["databaseBlockSize"] = "400000000";
+  arguments_["maxFragmentLength"] = "1000";
   arguments_["spectrumFileName"] = "";
   arguments_["activation"] = "FILE";
   arguments_["searchType"] = "TARGET";

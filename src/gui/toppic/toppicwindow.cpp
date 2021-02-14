@@ -80,7 +80,8 @@ toppicWindow::~toppicWindow() {
 void toppicWindow::initArguments() {
   arguments_["oriDatabaseFileName"]="";
   arguments_["databaseFileName"] = "";
-  arguments_["databaseBlockSize"] = "1000000";
+  arguments_["databaseBlockSize"] = "400000000";
+  arguments_["maxFragmentLength"] = "1000";
   arguments_["combinedOutputName"] = "";
   arguments_["activation"] = "FILE";
   arguments_["searchType"] = "TARGET";
