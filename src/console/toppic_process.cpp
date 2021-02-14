@@ -208,8 +208,9 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     }
     LOG_DEBUG("block size " << arguments["databaseBlockSize"]);
     int db_block_size = std::stoi(arguments["databaseBlockSize"]);
+    int max_frag_len = std::stoi(arguments["maxFragmentLength"]);
 
-    fasta_util::dbPreprocess(ori_db_file_name, db_file_name, decoy, db_block_size);
+    fasta_util::dbPreprocess(ori_db_file_name, db_file_name, decoy, db_block_size, max_frag_len);
     msalign_util::geneSpIndex(sp_file_name);
 
     std::vector<std::string> input_exts;
