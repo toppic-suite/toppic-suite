@@ -94,7 +94,7 @@ void generateStandardDb(const std::string &ori_file_name,
   standard_db.close();
 }
 
-void generateDbBlock(const std::string &db_file_name, int block_size) {
+void generateDbBlock(const std::string &db_file_name, int block_size, int max_frag_len) {
   int block_idx = 0;
   int seq_idx = 0;
 
@@ -113,7 +113,16 @@ void generateDbBlock(const std::string &db_file_name, int block_size) {
     std::string name = seq_info->getName();
     std::string desc = seq_info->getDesc();
     std::string seq = seq_info->getRawSeq();
-    seq_size += seq.length();
+    int seq_len = seq.length();
+    if (seq_len <= max_frag_len) {
+      seq_size = seq_size + (seq_len * (seq_len + 1)/2);
+    }
+    else {
+      seq_size = seq_size + (seq_len - max_frag_len) * max_frag_len 
+	      + (max_frag_len * (max_frag_len + 1) /2);
+    }
+    std::cout << seq_size << std::endl;
+    //seq_size += seq.length();
     if (seq_size > block_size) {
       block_output.close();
       block_idx++;
@@ -140,7 +149,7 @@ void dbSimplePreprocess(const std::string &ori_db_file_name,
 
 void dbPreprocess(const std::string &ori_db_file_name,
                   const std::string &db_file_name,
-                  bool decoy, int block_size) {
+                  bool decoy, int block_size, int max_frag_len) {
   std::string standard_db_file_name = ori_db_file_name + "_standard";
   generateStandardDb(ori_db_file_name, standard_db_file_name);
 
@@ -150,7 +159,7 @@ void dbPreprocess(const std::string &ori_db_file_name,
     bool over_write = true;
     file_util::copyFile(standard_db_file_name, db_file_name, over_write);
   }
-  generateDbBlock(db_file_name, block_size);
+  generateDbBlock(db_file_name, block_size, max_frag_len);
   fai_build(db_file_name.c_str());
 }
 
