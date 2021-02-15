@@ -190,6 +190,7 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
     LOG_DEBUG("Decoy " << decoy);
     LOG_DEBUG("block size " << arguments["databaseBlockSize"]);
     int db_block_size = std::stoi(arguments["databaseBlockSize"]);
+	int max_frag_len = std::stoi(arguments["maxFragmentLength"]);
 
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
 
@@ -197,7 +198,7 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
     TopIndexFileNamePtr file_name_ptr = std::make_shared<TopIndexFileName>();
     std::string index_file_para = file_name_ptr->geneFileName(arguments);
 
-    fasta_util::dbPreprocess(ori_db_file_name, db_file_name, decoy, db_block_size);
+    fasta_util::dbPreprocess(ori_db_file_name, db_file_name, decoy, db_block_size, max_frag_len);
     msalign_util::geneSpIndex(sp_file_name);
 
     std::vector<std::string> input_exts;
