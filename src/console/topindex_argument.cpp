@@ -34,7 +34,8 @@ Argument::Argument() {
 void Argument::initArguments() {
   arguments_["oriDatabaseFileName"]="";
   arguments_["databaseFileName"] = "";
-  arguments_["databaseBlockSize"] = "1000000";
+  arguments_["databaseBlockSize"] = "400000000";
+  arguments_["maxFragmentLength"] = "1000";
   arguments_["searchType"] = "TARGET";
   arguments_["fixedMod"] = "";
   arguments_["massErrorTolerance"] = "15";
