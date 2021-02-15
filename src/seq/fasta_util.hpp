@@ -29,7 +29,7 @@ void dbSimplePreprocess(const std::string &ori_db_file_name,
 
 void dbPreprocess(const std::string &ori_db_file_name,
                   const std::string &db_file_name,
-                  bool decoy, int block_size);
+                  bool decoy, int block_size, int max_frag_len);
 
 int countProteinNum(const std::string &fasta_file);
 

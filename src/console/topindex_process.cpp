@@ -52,7 +52,6 @@ void TopIndexProcess(std::map<std::string, std::string> &arguments){
     std::string ori_db_file_name = arguments["oriDatabaseFileName"];
     std::string db_file_name = arguments["databaseFileName"];
 
-    int db_block_size = std::stoi(arguments["databaseBlockSize"]);
     int thread_num = std::stoi(arguments["threadNumber"]);
     int filter_result_num = std::stoi(arguments["filteringResultNumber"]);
 
@@ -70,7 +69,9 @@ void TopIndexProcess(std::map<std::string, std::string> &arguments){
     TopIndexFileNamePtr file_name_ptr = std::make_shared<TopIndexFileName>();
     std::string index_file_para = file_name_ptr->geneFileName(arguments);
 
-    fasta_util::dbPreprocess(ori_db_file_name, db_file_name, decoy, db_block_size);
+    int db_block_size = std::stoi(arguments["databaseBlockSize"]);
+    int max_frag_len = std::stoi(arguments["maxFragmentLength"]);
+    fasta_util::dbPreprocess(ori_db_file_name, db_file_name, decoy, db_block_size, max_frag_len);
 
     ZeroPtmFilterMngPtr zero_filter_mng_ptr
         = std::make_shared<ZeroPtmFilterMng>(prsm_para_ptr, index_file_para, 

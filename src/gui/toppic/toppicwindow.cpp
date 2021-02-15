@@ -80,7 +80,8 @@ toppicWindow::~toppicWindow() {
 void toppicWindow::initArguments() {
   arguments_["oriDatabaseFileName"]="";
   arguments_["databaseFileName"] = "";
-  arguments_["databaseBlockSize"] = "1000000";
+  arguments_["databaseBlockSize"] = "400000000";
+  arguments_["maxFragmentLength"] = "1000";
   arguments_["combinedOutputName"] = "";
   arguments_["activation"] = "FILE";
   arguments_["searchType"] = "TARGET";
@@ -271,7 +272,8 @@ std::map<std::string, std::string> toppicWindow::getArguments() {
   arguments_["oriDatabaseFileName"] = ui->databaseFileEdit->text().toStdString();
   
   arguments_["combinedOutputName"] = ui->combinedOutputEdit->text().trimmed().toStdString();
-  arguments_["databaseBlockSize"] = "1000000";
+  arguments_["databaseBlockSize"] = "400000000";
+  arguments_["maxFragmentLength"] = "1000";
   arguments_["activation"] = ui->activationComboBox->currentText().toStdString();
   if (ui->decoyCheckBox->isChecked()) {
     arguments_["searchType"] = "TARGET+DECOY";
@@ -593,6 +595,7 @@ void toppicWindow::showArguments() {
                                         "\noriDatabaseFileName:" + arguments_["oriDatabaseFileName"] +
                                         "\ndatabaseFileName:" + arguments_["databaseFileName"] +
                                         "\ndatabaseBlockSize:" + arguments_["databaseBlockSize"] +
+                                        "\maxFragmentLength:" + arguments_["maxFragmentLength"] +
                                         "\ncombinedOutputName:" + arguments_["combinedOutputName"] +
                                         "\nactivation:" + arguments_["activation"] +
                                         "\nsearchType:" + arguments_["searchType"] +
