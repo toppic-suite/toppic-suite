@@ -83,11 +83,11 @@ void copyTopMSV(std::map<std::string, std::string> &arguments) {
   else{
     if (!file_util::exists(base_name_short + "_html")){//if _html folder was not created with topfd
       file_util::createFolder(base_name_short + "_html");
-      std::string resource_dir = arguments["resourceDir"];
-      // copy resources 
-      std::string from_path(resource_dir + file_util::getFileSeparator() + "topmsv");
-      file_util::copyDir(from_path, topmsv_dir);
     }
+    std::string resource_dir = arguments["resourceDir"];
+    // copy resources 
+    std::string from_path(resource_dir + file_util::getFileSeparator() + "topmsv");
+    file_util::copyDir(from_path, topmsv_dir);
   }
 }
 
