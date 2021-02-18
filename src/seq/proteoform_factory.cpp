@@ -157,13 +157,24 @@ ProteoformPtr geneProteoform(ProteoformPtr proteoform, int start_pos, int end_po
       residue_util::convertStrToResiduePtrVec(
           proteoform->getFastaSeqPtr()->getRawSeq().substr(start_pos, end_pos - start_pos + 1), 
           mod_ptr_vec));
+  MassShiftPtrVec new_mass_shift_vec;
+  int min_pos = 0;
+  int max_pos = end_pos - start_pos + 1;
   for (size_t i = 0; i < mass_shift_vec.size(); i++) {
     int left = proteoform->getStartPos() + mass_shift_vec[i]->getLeftBpPos() - start_pos;
     int right = proteoform->getStartPos() + mass_shift_vec[i]->getRightBpPos() - start_pos;
-    mass_shift_vec[i]->setLeftBpPos(left);
-    mass_shift_vec[i]->setRightBpPos(right);
+    if (right > min_pos && left < max_pos) {
+      if (left < min_pos) {
+        left = min_pos;
+      }
+      if (right > max_pos) {
+        right = max_pos;
+      }
+      mass_shift_vec[i]->setLeftBpPos(left);
+      mass_shift_vec[i]->setRightBpPos(right);
+      new_mass_shift_vec.push_back(mass_shift_vec[i]);
+    }
   }
-
   return std::make_shared<Proteoform>(proteoform->getFastaSeqPtr(),
                                       proteoform->getProtModPtr(), start_pos, end_pos, 
                                       new_res_seq, mass_shift_vec);
