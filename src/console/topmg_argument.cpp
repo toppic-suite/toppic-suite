@@ -70,6 +70,7 @@ void Argument::initArguments() {
   arguments_["varPtmNumInGap"] = "5";
   arguments_["geneHTMLFolder"] = "true";
   arguments_["wholeProteinOnly"] = "false";
+  arguments_["version"] = "";
 }
 
 void Argument::outputArguments(std::ostream &output, std::map<std::string, std::string> arguments) {
@@ -120,6 +121,8 @@ void Argument::outputArguments(std::ostream &output, std::map<std::string, std::
   if (arguments["endTime"] != "") {
     output << std::setw(50) << std::left << "End time: " << "\t" << arguments["endTime"] << std::endl;
   }
+  output << std::setw(50) << std::left << "Version: " << "\t" << arguments["version"] << std::endl;
+
   output << "********************** Parameters **********************" << std::endl;
 }
 
