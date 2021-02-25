@@ -89,7 +89,7 @@ void Argument::outputArguments(std::ostream &output, std::map<std::string, std::
     output << std::setw(50) << std::left << "Fixed modifications: " << "\t" << "C58:carboxymethylation on cysteine" << std::endl;
   }
   else {
-    output << std::setw(50) << std::left << "Fixed modifications:," << arguments["fixedMod"] << std::endl;
+    output << std::setw(50) << std::left << "Fixed modifications: " << "\t" << arguments["fixedMod"] << std::endl;
   }
 
   if (arguments["useFeatureFile"] == "true") {
