@@ -543,12 +543,14 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
     std::cout << "Merging msalign files started." << std::endl;
     MsAlignFracMerge::mergeFiles(spec_file_lst, full_combined_name + "_ms2.msalign", para_str);
     std::cout << "Merging msalign files finished." << std::endl;
-    std::cout << "Merging json files started." << std::endl;
-    DeconvJsonMergePtr json_merger 
-        = std::make_shared<DeconvJsonMerge>(spec_file_lst, full_combined_name);
-    json_merger->process();
-    json_merger = nullptr;
-    std::cout << "Merging json files finished." << std::endl;
+    if (arguments["geneHTMLFolder"] == "true"){
+      std::cout << "Merging json files started." << std::endl;
+      DeconvJsonMergePtr json_merger 
+          = std::make_shared<DeconvJsonMerge>(spec_file_lst, full_combined_name);
+      json_merger->process();
+      json_merger = nullptr;
+      std::cout << "Merging json files finished." << std::endl;
+    }
     std::cout << "Merging feature files started." << std::endl;
     FeatureMergePtr feature_merger 
         = std::make_shared<FeatureMerge>(spec_file_lst, full_combined_name);
