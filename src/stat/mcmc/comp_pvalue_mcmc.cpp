@@ -186,7 +186,9 @@ double CompPValueMCMC::compOneProbMCMC(PrsmPtr prsm_ptr, ActivationPtr act,
       p[i] = p[i] / sum;
       // LOG_DEBUG("p[" << i << "] " << p[i]);
     }
-
+    if (scr >= p.size()){ 
+        scr = p.size() - 1;
+    }
     if (prsm_ptr->getMatchFragNum() < 10) {
       int corrected_scr = std::min(scr, static_cast<int>(prsm_ptr->getMatchFragNum()));
       one_prob = std::accumulate(p.begin() + corrected_scr, p.end(), 0.0);

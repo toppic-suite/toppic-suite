@@ -49,7 +49,7 @@ class MCMCMng {
 
   std::string residue_mod_file_;
 
-  int n_ = 100;
+  int n_ = 300;
 
   int N_ = 10000;
 
