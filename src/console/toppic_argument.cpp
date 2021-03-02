@@ -64,6 +64,7 @@ void Argument::initArguments() {
   arguments_["threadNumber"] = "1";
   arguments_["useFeatureFile"] = "true";
   arguments_["geneHTMLFolder"] = "true";
+  arguments_["version"] = "";
 }
 
 void Argument::outputArguments(std::ostream &output, 
@@ -85,7 +86,7 @@ void Argument::outputArguments(std::ostream &output,
     output << std::setw(44) << std::left << "Fixed modifications: " << "\t" << "C58:carboxymethylation on cysteine" << std::endl;
   }
   else {
-    output << std::setw(44) << std::left << "Fixed modifications:," << arguments["fixedMod"] << std::endl;
+    output << std::setw(44) << std::left << "Fixed modifications: " << "\t" << arguments["fixedMod"] << std::endl;
   }
 
   if (arguments["useFeatureFile"] == "true") {
@@ -123,6 +124,7 @@ void Argument::outputArguments(std::ostream &output,
   if (arguments["endTime"] != "") {
     output << std::setw(44) << std::left << "End time: " << "\t" << arguments["endTime"] << std::endl;
   }
+  output << std::setw(44) << std::left << "Version: " << "\t" << arguments["version"] << std::endl;
   output << "********************** Parameters **********************" << std::endl;
 }
 

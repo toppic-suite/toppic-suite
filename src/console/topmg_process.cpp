@@ -454,6 +454,7 @@ int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
   std::string combined_start_time = buf;
 
   std::cout << "TopMG " << Version::getVersion() << std::endl;
+  arguments["version"] = Version::getVersion();
 
   xercesc::XMLPlatformUtils::Initialize(); 
   TopMG_testModFile(arguments);
