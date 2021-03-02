@@ -521,6 +521,7 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
   std::string combined_start_time = buf;
 
   std::cout << "TopPIC " << toppic::Version::getVersion() << std::endl;
+  arguments["version"] = toppic::Version::getVersion();
 
   xercesc::XMLPlatformUtils::Initialize(); 
 
