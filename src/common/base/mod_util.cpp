@@ -48,6 +48,52 @@ ModPtrVec readModXml(const std::string &file_name) {
   }
   return mod_ptr_vec;
 }
+std::vector<std::vector<std::string>> readModTxtForTsv(const std::string &file_name) {
+  //parse mod text file to get mass and mod name to be written in a tsv file
+  std::vector<std::vector<std::string>> mod_data;
+  std::ifstream infile(file_name.c_str());
+  if (!infile.is_open()) {
+    LOG_ERROR("PTM file " << file_name <<  "can not be opened!");
+    exit(EXIT_FAILURE);
+  }
+  std::string line;
+  while (std::getline(infile, line)) {
+    if (line.size() == 0) continue;
+    if (line[0] == '#') continue;
+    line = str_util::rmComment(line);
+    if (line == "") continue;
+    try {
+      std::vector<std::string> l = str_util::split(line, ",");
+      if (l.size() != 5) throw "The number of commas is not 4.";
+      
+      std::string mod_name;
+      std::string mass;
+      
+      try {
+        mod_name = l[0];
+      }
+      catch(std::invalid_argument& e){
+        throw "Error in PTM name.";
+      }
+      try {
+        mass = l[1];
+      }
+      catch(std::invalid_argument& e){
+        throw "Error in PTM mass.";
+      }
+      std::vector<std::string> single_mod{mod_name, mass};
+      mod_data.push_back(single_mod);
+    }catch (char const* e) {
+      std::cout << "Errors in the PTM file: "
+          << file_name << std::endl
+          << "Please check the line" << std::endl
+          << "\t" << line << std::endl
+          << "Error message: " << e << std::endl;
+      exit(EXIT_FAILURE);
+    }
+  }
+  return mod_data;
+}
 
 std::vector<ModPtrVec> readModTxt(const std::string &file_name) {
   LOG_DEBUG("mod txt file " << file_name);
