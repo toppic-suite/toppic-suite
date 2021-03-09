@@ -24,7 +24,7 @@ namespace toppic {
 class RawMsReader {
  public:
   RawMsReader(const std::string & file_name);
-
+  RawMsReader(const std::string & file_name, const std::string & activation);
   RawMsPtr getNextMs(double prec_win_size, int max_charge);
 
   void getMs1Peaks(PeakPtrVec2D &raw_peaks);
