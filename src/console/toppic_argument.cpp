@@ -23,6 +23,7 @@
 #include "common/util/file_util.hpp"
 #include "common/xml/xml_dom_util.hpp"
 #include "common/util/str_util.hpp"
+#include "common/base/mod_util.hpp"
 
 #include "console/toppic_argument.hpp"
 
@@ -126,6 +127,38 @@ void Argument::outputArguments(std::ostream &output,
   }
   output << std::setw(44) << std::left << "Version: " << "\t" << arguments["version"] << std::endl;
   output << "********************** Parameters **********************" << std::endl;
+
+  if (arguments["fixedMod"] == "") {
+    return;
+  }
+  else{
+    //add fixed PTM information 
+    output << "********************** Fixed PTM **********************" << std::endl;
+    if (arguments["fixedMod"] == "C57") {
+      output << std::setw(44) << std::left << "Carbamidomethylation" << "\t" << 57.021464 << std::endl;
+    }
+    else if (arguments["fixedMod"] == "C58") {
+      output << std::setw(44) << std::left << "Carboxymethylation" << "\t" << 58.005479 << std::endl;
+    }
+    else {
+      std::vector<std::vector<std::string>> mod_data = mod_util::readModTxtForTsv(arguments["fixedMod"]);
+      for (int i = 0; i < mod_data.size(); i++) {
+        output << std::setw(44) << std::left << mod_data[i][0] << "\t" << mod_data[i][1] << std::endl;
+      }
+    }
+    output << "********************** Fixed PTM **********************" << std::endl;
+  }
+  if (arguments["residueModFileName"] == "") {
+    return;
+  } 
+  else{
+    output << "********************** Common PTM **********************" << std::endl;
+    std::vector<std::vector<std::string>> mod_data = mod_util::readModTxtForTsv(arguments["residueModFileName"]);
+    for (int i = 0; i < mod_data.size(); i++) {
+      output << std::setw(44) << std::left << mod_data[i][0] << "\t" << mod_data[i][1] << std::endl;
+    }
+    output << "********************** Common PTM **********************" << std::endl;
+  }
 }
 
 std::string Argument::outputTsvArguments(std::map<std::string, std::string> arguments) {
