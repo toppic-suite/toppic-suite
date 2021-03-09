@@ -550,7 +550,7 @@ void getSampleFeatures(SampleFeaturePtrVec &sample_features, FracFeaturePtrVec &
 }
 
 void process(int frac_id, const std::string &sp_file_name, 
-             bool missing_level_one, const std::string &resource_dir) { 
+             bool missing_level_one, const std::string &resource_dir, const std::string &activation) { 
   //logger::setLogLevel(2);
   FeatureParaPtr para_ptr 
       = std::make_shared<FeaturePara>(frac_id, sp_file_name, resource_dir);
@@ -563,7 +563,7 @@ void process(int frac_id, const std::string &sp_file_name,
     std::string ms1_file_name = base_name + "_ms1.msalign";
     SimpleMsAlignReader::readMsOneSpectra(ms1_file_name, ms1_ptr_vec);
     PeakPtrVec2D raw_peaks; 
-    RawMsReaderPtr raw_reader_ptr = std::make_shared<RawMsReader>(sp_file_name);
+    RawMsReaderPtr raw_reader_ptr = std::make_shared<RawMsReader>(sp_file_name, activation);
     raw_reader_ptr->getMs1Peaks(raw_peaks);
     raw_reader_ptr = nullptr;
     findMsOneFeatures(ms1_ptr_vec, raw_peaks, para_ptr, frac_features, env_para_ptr);
