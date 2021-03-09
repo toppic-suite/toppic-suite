@@ -24,6 +24,10 @@ RawMsReader::RawMsReader(const std::string & file_name) {
   reader_ptr_ = std::make_shared<PwMsReader>(file_name);
 }
 
+RawMsReader::RawMsReader(const std::string & file_name, const std::string & activation) {
+  reader_ptr_ = std::make_shared<PwMsReader>(file_name, activation);
+}
+
 RawMsPtr RawMsReader::getNextMs(double prec_win_size, int max_charge) {
   reader_ptr_->readNext();
   PeakPtrVec peak_list = reader_ptr_->getPeakList();

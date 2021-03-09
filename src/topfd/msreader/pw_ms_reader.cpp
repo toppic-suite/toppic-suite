@@ -114,7 +114,7 @@ bool PwMsReader::readOneMs(int sp_id, PeakPtrVec &peak_list, MsHeaderPtr &header
     header_ptr->setRetentionTime(spec_info.retentionTime);
     
     std::string ac_name = activation_;
-    if (ac_name == "" || ac_name == "FILE"){
+        if (ac_name == "" || ac_name == "FILE"){
       ac_name = "";
       if (cur_spec_ptr->precursors.size() != 0) {
         std::vector<pwiz::data::CVParam> cv_list = cur_spec_ptr->precursors[0].activation.cvParams;
