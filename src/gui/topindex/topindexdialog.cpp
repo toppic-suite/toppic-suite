@@ -25,6 +25,7 @@
 
 #include "common/util/file_util.hpp"
 #include "common/base/base_data.hpp"
+#include "common/util/version.hpp"
 
 #include "gui/topindex/topindexdialog.h"
 #include "gui/topindex/ui_topindexdialog.h"
@@ -36,6 +37,9 @@ TopIndexDialog::TopIndexDialog(QWidget *parent) :
     ui(new Ui::TopIndexDialog) {
       initArguments();
       ui->setupUi(this);
+      std::string title = "TopIndex v." + toppic::Version::getVersion();
+      QString qstr = QString::fromStdString(title);
+      this->setWindowTitle(qstr);
       lastDir_ = ".";
       QFont font;
 #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)

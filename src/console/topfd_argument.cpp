@@ -30,8 +30,9 @@ Argument::Argument() {
 }
 
 void Argument::showUsage(boost::program_options::options_description &desc) {
-  std::cout << "Usage: toppfd [options] spectrum-file-name" << std::endl;
+  std::cout << "Usage: topfd [options] spectrum-file-name" << std::endl;
   std::cout << desc << std::endl;
+  std::cout << "Version: " << Version::getVersion() << std::endl;
 }
 
 bool Argument::parse(int argc, char* argv[]) {
