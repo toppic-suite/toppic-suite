@@ -19,6 +19,7 @@
 #include "common/util/str_util.hpp"
 #include "common/xml/xml_dom_util.hpp"
 #include "console/topdiff_argument.hpp"
+#include "common/util/version.hpp"
 
 namespace toppic {
 
@@ -58,6 +59,7 @@ void Argument::outputArguments(std::ostream &output, std::map<std::string, std::
 void Argument::showUsage(boost::program_options::options_description &desc) {
   std::cout << "Usage: topdiff [options] database-file-name spectrum-file-names" << std::endl; 
   std::cout << desc << std::endl; 
+  std::cout << "Version: " << Version::getVersion() << std::endl;
 }
 
 bool Argument::parse(int argc, char* argv[]) {

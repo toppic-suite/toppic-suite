@@ -28,6 +28,7 @@
 #include "common/xml/xml_dom_util.hpp"
 #include "common/util/str_util.hpp"
 #include "common/base/mod_util.hpp"
+#include "common/util/version.hpp"
 
 #include "console/topmg_argument.hpp"
 
@@ -163,6 +164,7 @@ std::string Argument::outputTsvArguments(std::map<std::string, std::string> argu
 void Argument::showUsage(boost::program_options::options_description &desc) {
   std::cout << "Usage: topmg [options] database-file-name spectrum-file-name" << std::endl;
   std::cout << desc << std::endl;
+  std::cout << "Version: " << Version::getVersion() << std::endl;
 }
 
 bool Argument::parse(int argc, char* argv[]) {

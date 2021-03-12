@@ -16,6 +16,8 @@
 #include <string>
 #include <vector>
 
+#include "common/util/version.hpp"
+
 #include <QFileDialog>
 #include <QElapsedTimer>
 #include <QMessageBox>
@@ -32,6 +34,9 @@ topmgWindow::topmgWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::topmgWindow) {
       ui->setupUi(this);
+      std::string title = "TopMG v." + toppic::Version::getVersion();
+      QString qstr = QString::fromStdString(title);
+      this->setWindowTitle(qstr);
       lastDir_ = ".";
       QRegExp rx1("^\\d{1,8}\\.\\d{0,2}$");
       QRegExpValidator *validator1 = new QRegExpValidator(rx1, this);

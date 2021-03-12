@@ -25,6 +25,7 @@
 
 #include "common/util/file_util.hpp"
 #include "common/base/base_data.hpp"
+#include "common/util/version.hpp"
 
 #include "ui_topfddialog.h"
 #include "gui/topfd/threadtopfd.hpp"
@@ -35,6 +36,9 @@ TopFDDialog::TopFDDialog(QWidget *parent) :
     ui(new Ui::TopFDDialog) {
       para_ptr_ = std::make_shared<toppic::TopfdPara>();
       ui->setupUi(this);
+      std::string title = "TopFD v." + toppic::Version::getVersion();
+      QString qstr = QString::fromStdString(title);
+      this->setWindowTitle(qstr);
       lastDir_ = ".";
       percentage_ = 0;
       ui->maxChargeEdit->setValidator(new QIntValidator(1, 100, this));

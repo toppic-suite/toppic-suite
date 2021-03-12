@@ -24,6 +24,8 @@
 #include <QToolTip>
 #include <QDesktopServices>
 
+#include "common/util/version.hpp"
+
 #include "toppicwindow.h"
 #include "ui_toppicwindow.h"
 #include "threadtoppic.h"
@@ -32,6 +34,9 @@ toppicWindow::toppicWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::toppicWindow) {
       ui->setupUi(this);
+      std::string title = "TopPIC v." + toppic::Version::getVersion();
+      QString qstr = QString::fromStdString(title);
+      this->setWindowTitle(qstr);
       lastDir_ = ".";
       QRegExp rx1("^\\d{1,8}\\.\\d{0,2}$");
       QRegExpValidator *validator1 = new QRegExpValidator(rx1, this);

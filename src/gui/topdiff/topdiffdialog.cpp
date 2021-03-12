@@ -25,6 +25,7 @@
 
 #include "common/util/file_util.hpp"
 #include "common/base/base_data.hpp"
+#include "common/util/version.hpp"
 
 #include "gui/topdiff/topdiffdialog.h"
 #include "gui/topdiff/ui_topdiffdialog.h"
@@ -36,6 +37,9 @@ TopDiffDialog::TopDiffDialog(QWidget *parent) :
     ui(new Ui::TopDiffDialog) {
       initArguments();
       ui->setupUi(this);
+      std::string title = "TopDiff v." + toppic::Version::getVersion();
+      QString qstr = QString::fromStdString(title);
+      this->setWindowTitle(qstr);
       lastDir_ = ".";
       QFont font;
 #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
