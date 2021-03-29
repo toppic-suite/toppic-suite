@@ -1,0 +1,3 @@
+[submodule "toppic_resources/topmsv"]
+	path = toppic_resources/topmsv
+	url = https://github.iu.edu/inkwchoi/TopMSVLib.git
