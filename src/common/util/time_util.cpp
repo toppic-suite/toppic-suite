@@ -28,20 +28,6 @@ std::string getTimeStr() {
   return time_str;
 }
 
-/*
-void addTimeStamp(std::string &para_str) {
-  std::time_t cur_time = time(nullptr);
-  char buf[50];
-  std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&cur_time));
-  std::string time_str = buf;
-
-  LOG_DEBUG(para_str);
-  LOG_DEBUG(TIME_STAMP_STR);
-  size_t pos = para_str.find(TIME_STAMP_STR);
-  para_str.replace(pos, TIME_STAMP_STR.length(), time_str);
-}
-*/
-
 }  // namespace time_util
 
 }  // namespace toppic
