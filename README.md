@@ -20,7 +20,9 @@ sudo apt-get install zlib1g-dev libboost-filesystem-dev \
                      libboost-thread-dev \
                      libboost-iostreams-dev \
                      libboost-chrono-dev \
-		     libeigen3-dev
+                     libeigen3-dev \
+                     nlohmann-json3-dev
+
 
 # install the catch unit test framework (https://github.com/philsquared/Catch)
 sudo apt-get install catch
