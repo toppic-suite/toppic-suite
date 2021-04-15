@@ -154,12 +154,17 @@
        </item>
        <item>
         <property name="text">
+         <string>ETD</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
          <string>HCD</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>ETD</string>
+         <string>MPD</string>
         </property>
        </item>
        <item>
