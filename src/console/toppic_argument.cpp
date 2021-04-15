@@ -227,7 +227,7 @@ bool Argument::parse(int argc, char* argv[]) {
     display_desc.add_options() 
         ("help,h", "Print the help message.") 
         ("activation,a", po::value<std::string>(&activation),
-         "<CID|HCD|ETD|UVPD|FILE>. Fragmentation method of tandem mass spectra. When FILE is used, fragmentation methods of spectra are given in the input spectral data file. Default value: FILE.")
+         "<CID|ETD|HCD|MPD|UVPD|FILE>. Fragmentation method of tandem mass spectra. When FILE is used, fragmentation methods of spectra are given in the input spectral data file. Default value: FILE.")
         ("fixed-mod,f", po::value<std::string> (&fixed_mod), 
          "<C57|C58|a fixed modification file>. Fixed modifications. Three available options: C57, C58, or the name of a text file containing the information of fixed modifications. When C57 is selected, carbamidomethylation on cysteine is the only fixed modification. When C58 is selected, carboxymethylation on cysteine is the only fixed modification.")
         ("n-terminal-form,n", po::value<std::string> (&allow_mod), 
@@ -472,9 +472,9 @@ bool Argument::validateArguments() {
   }
 
   std::string activation = arguments_["activation"];
-  if(activation != "CID" && activation != "HCD" 
+  if(activation != "CID" && activation != "HCD" && activation != "MPD" 
      && activation != "ETD" && activation != "FILE" && activation != "UVPD") {
-    LOG_ERROR("Activation type " << activation << " error! The value should be CID|HCD|ETD|UVPD|FILE!");
+    LOG_ERROR("Activation type " << activation << " error! The value should be CID|ETD|HCD|MPD|UVPD|FILE!");
     return false;
   }
 

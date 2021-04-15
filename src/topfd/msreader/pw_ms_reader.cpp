@@ -129,6 +129,9 @@ bool PwMsReader::readOneMs(int sp_id, PeakPtrVec &peak_list, MsHeaderPtr &header
           } else if (cv_list[i].cvid == pwiz::cv::MS_ETD) {
             ac_name = "ETD";
             break;
+          } else if (cv_list[i].cvid == pwiz::cv::MS_MPD) {
+            ac_name = "MPD";
+            break;
           }
         }
       }
