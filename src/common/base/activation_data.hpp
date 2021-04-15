@@ -37,6 +37,11 @@ std::string activation_base_data = R"(
 	<c_ion_type>Z_DOT</c_ion_type>
 </activation>
 <activation>
+	<name>MPD</name>
+	<n_ion_type>A</n_ion_type>
+	<c_ion_type>Y</c_ion_type>
+</activation>
+<activation>
 	<name>UVPD</name>
 	<n_ion_type>A</n_ion_type>
 	<c_ion_type>Y</c_ion_type>
