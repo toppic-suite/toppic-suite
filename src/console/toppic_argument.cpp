@@ -143,7 +143,7 @@ void Argument::outputArguments(std::ostream &output,
     }
     else {
       std::vector<std::vector<std::string>> mod_data = mod_util::readModTxtForTsv(arguments["fixedMod"]);
-      for (int i = 0; i < mod_data.size(); i++) {
+      for (size_t i = 0; i < mod_data.size(); i++) {
         output << std::setw(44) << std::left << mod_data[i][0] << "\t" << mod_data[i][1] << std::endl;
       }
     }
@@ -155,7 +155,7 @@ void Argument::outputArguments(std::ostream &output,
   else{
     output << "********************** Common PTM **********************" << std::endl;
     std::vector<std::vector<std::string>> mod_data = mod_util::readModTxtForTsv(arguments["residueModFileName"]);
-    for (int i = 0; i < mod_data.size(); i++) {
+    for (size_t i = 0; i < mod_data.size(); i++) {
       output << std::setw(44) << std::left << mod_data[i][0] << "\t" << mod_data[i][1] << std::endl;
     }
     output << "********************** Common PTM **********************" << std::endl;

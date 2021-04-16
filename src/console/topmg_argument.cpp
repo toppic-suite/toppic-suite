@@ -140,7 +140,7 @@ void Argument::outputArguments(std::ostream &output, std::map<std::string, std::
     }
     else {
       std::vector<std::vector<std::string>> mod_data = mod_util::readModTxtForTsv(arguments["fixedMod"]);
-      for (int i = 0; i < mod_data.size(); i++) {
+      for (size_t i = 0; i < mod_data.size(); i++) {
         output << std::setw(50) << std::left << mod_data[i][0] << "\t" << mod_data[i][1] << std::endl;
       }
     }
@@ -148,7 +148,7 @@ void Argument::outputArguments(std::ostream &output, std::map<std::string, std::
   }
   output << "********************** Variable PTM **********************" << std::endl;
   std::vector<std::vector<std::string>> mod_data = mod_util::readModTxtForTsv(arguments["varModFileName"]);
-  for (int i = 0; i < mod_data.size(); i++) {
+  for (size_t i = 0; i < mod_data.size(); i++) {
     output << std::setw(50) << std::left << mod_data[i][0] << "\t" << mod_data[i][1] << std::endl;
   }
   output << "********************** Variable PTM **********************" << std::endl;
