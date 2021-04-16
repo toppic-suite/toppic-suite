@@ -12,37 +12,37 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_COMMON_XML_XML_DOM_UTIL_HPP_
 #define TOPPIC_COMMON_XML_XML_DOM_UTIL_HPP_
 
 #include <string>
 
-#include <xercesc/dom/DOMElement.hpp>
 #include <xercesc/dom/DOMDocument.hpp>
 #include <xercesc/dom/DOMLSSerializer.hpp>
+
+#include "common/xml/xml_dom_element.hpp"
 
 namespace toppic {
 
 namespace xml_dom_util {
 
-xercesc::DOMNodeList* getChildElements(xercesc::DOMElement *parent, const char* tag);
+xercesc::DOMNodeList* getChildElements(XmlDOMElement *parent, const char* tag);
 
-xercesc::DOMElement* getChildElement(xercesc::DOMElement* parent, const char* tag, int index);
+XmlDOMElement* getChildElement(XmlDOMElement* parent, const char* tag, int index);
 
-std::string getChildValue(xercesc::DOMElement* parent, const char* child_tag, int index);
+std::string getChildValue(XmlDOMElement* parent, const char* child_tag, int index);
 
-double getScientificChildValue(xercesc::DOMElement* parent, const char* child_tag, int index);
+double getScientificChildValue(XmlDOMElement* parent, const char* child_tag, int index);
 
-double getDoubleChildValue(xercesc::DOMElement* parent, const char* child_tag, int index);
+double getDoubleChildValue(XmlDOMElement* parent, const char* child_tag, int index);
 
-int getIntChildValue(xercesc::DOMElement* parent, const char* child_tag, int index);
+int getIntChildValue(XmlDOMElement* parent, const char* child_tag, int index);
 
-bool getBoolChildValue(xercesc::DOMElement* parent, const char* child_tag, int index);
+bool getBoolChildValue(XmlDOMElement* parent, const char* child_tag, int index);
 
-int getChildCount(xercesc::DOMElement * parent, const char* child_tag);
+int getChildCount(XmlDOMElement* parent, const char* child_tag);
 
-std::string getAttributeValue(xercesc::DOMElement * parent, const char* attribute_tag);
+std::string getAttributeValue(XmlDOMElement* parent, const char* attribute_tag);
 
 std::string writeToString(xercesc::DOMLSSerializer* serializer, xercesc::DOMNode *node);
 

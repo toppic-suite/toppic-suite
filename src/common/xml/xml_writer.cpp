@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include "common/util/logger.hpp"
 #include "common/xml/xml_dom_impl.hpp"
 #include "common/xml/xml_dom_util.hpp"
@@ -34,6 +33,9 @@ XmlWriter::XmlWriter(const std::string &file_name, const std::string &root) {
 }
 
 XmlWriter::~XmlWriter() {
+  if (file_.is_open()) {
+    file_.close();
+  }
   serializer_->release();
   delete doc_;
 }

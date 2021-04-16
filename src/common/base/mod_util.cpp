@@ -11,6 +11,7 @@
 //WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //See the License for the specific language governing permissions and
 //limitations under the License.
+
 #include <string>
 #include <cmath>
 #include <fstream>
@@ -48,12 +49,13 @@ ModPtrVec readModXml(const std::string &file_name) {
   }
   return mod_ptr_vec;
 }
+
 std::vector<std::vector<std::string>> readModTxtForTsv(const std::string &file_name) {
   //parse mod text file to get mass and mod name to be written in a tsv file
   std::vector<std::vector<std::string>> mod_data;
   std::ifstream infile(file_name.c_str());
   if (!infile.is_open()) {
-    LOG_ERROR("PTM file " << file_name <<  "can not be opened!");
+    LOG_ERROR("PTM file " << file_name <<  "cannot be opened!");
     exit(EXIT_FAILURE);
   }
   std::string line;
@@ -83,12 +85,10 @@ std::vector<std::vector<std::string>> readModTxtForTsv(const std::string &file_n
       }
       std::vector<std::string> single_mod{mod_name, mass};
       mod_data.push_back(single_mod);
-    }catch (char const* e) {
-      std::cout << "Errors in the PTM file: "
-          << file_name << std::endl
-          << "Please check the line" << std::endl
-          << "\t" << line << std::endl
-          << "Error message: " << e << std::endl;
+    } catch (char const* e) {
+      LOG_ERROR("Errors in the PTM file: " << file_name);
+      LOG_ERROR("Please check the line:" << line);
+      LOG_ERROR("Error message: " << e);
       exit(EXIT_FAILURE);
     }
   }
@@ -100,7 +100,7 @@ std::vector<ModPtrVec> readModTxt(const std::string &file_name) {
   std::vector<ModPtrVec> mod_ptr_vec2d(3);
   std::ifstream infile(file_name.c_str());
   if (!infile.is_open()) {
-    LOG_ERROR("Variable PTM file " << file_name <<  "can not be opened!");
+    LOG_ERROR("Variable PTM file " << file_name <<  "cannot be opened!");
     exit(EXIT_FAILURE);
   }
   std::string line;
@@ -157,11 +157,9 @@ std::vector<ModPtrVec> readModTxt(const std::string &file_name) {
         }
       }
     } catch (char const* e) {
-      std::cout << "Errors in the Variable PTM file: "
-          << file_name << std::endl
-          << "Please check the line" << std::endl
-          << "\t" << line << std::endl
-          << "Error message: " << e << std::endl;
+      LOG_ERROR("Errors in the Variable PTM file: " << file_name);
+      LOG_ERROR("Please check the line: " << line);
+      LOG_ERROR("Error message: " << e);
       exit(EXIT_FAILURE);
     }
   }
@@ -183,8 +181,7 @@ ModPtrVec geneFixedModList(const std::string &str) {
       return readModTxt(str)[2];
     }
   } catch (const char* e) {
-    std::cout << "[Exception]" << std::endl;
-    std::cout << e << std::endl;
+    LOG_ERROR("[Exception]" << e);
     exit(EXIT_FAILURE);
   }
 }

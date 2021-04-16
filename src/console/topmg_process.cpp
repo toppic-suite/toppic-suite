@@ -17,11 +17,11 @@
 #include <algorithm>
 #include <vector>
 
-#include "common/util/version.hpp"
-#include "common/base/base_data.hpp"
-#include "common/util/file_util.hpp"
 #include "common/base/mod_util.hpp"
-#include "common/util/custom_exception.hpp"
+#include "common/base/base_data.hpp"
+
+#include "common/util/version.hpp"
+#include "common/util/file_util.hpp"
 
 #include "seq/fasta_reader.hpp"
 #include "seq/fasta_util.hpp"
@@ -424,11 +424,8 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
       jsonTranslate(arguments, "topmg_proteoform_cutoff");
       std::cout << "Converting proteoform xml files to html files - finished." << std::endl;
     }
-  } catch (FileInUse& e){
-      std::cout << "[Exception] " << e.what() << std::endl;
   } catch (const char* e) {
-    std::cout << "[Exception]" << std::endl;
-    std::cout << e << std::endl;
+    LOG_ERROR("[Exception]" << e);
   }
   return 0;
 }

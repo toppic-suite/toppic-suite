@@ -11,6 +11,7 @@
 //WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //See the License for the specific language governing permissions and
 //limitations under the License.
+
 #include <string>
 
 #include "common/util/logger.hpp"
@@ -57,7 +58,7 @@ NeutralLossPtr NeutralLossBase::getNeutralLossPtrByName(const std::string &name)
       return neutral_loss_ptr_vec_[i];
     }
   }
-  LOG_ERROR("Neutral loss " << name << " cannot be found!");
+  LOG_WARN("Neutral loss " << name << " cannot be found!");
   return NeutralLossPtr(nullptr);
 }
 

@@ -17,6 +17,7 @@
 
 #include <iostream>
 #include <cstring>
+
 namespace toppic {
 
 namespace logger {
