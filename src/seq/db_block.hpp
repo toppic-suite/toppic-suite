@@ -25,6 +25,7 @@ class DbBlock;
 typedef std::shared_ptr<DbBlock> DbBlockPtr;
 typedef std::vector<DbBlockPtr> DbBlockPtrVec;
 
+// A large fasta database is divided into several database blocks (DbBlock)
 class DbBlock {
  public:
   DbBlock(int block_index, int seq_index);

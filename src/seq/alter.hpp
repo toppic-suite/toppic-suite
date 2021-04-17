@@ -24,6 +24,12 @@ namespace toppic {
 
 class XmlDOMDocument;
 
+// A mass shift is explained by a list of alterations (alter class).
+// If the PTM in an alteration is identified and localized, 
+// then the PTM information is store in mod_ptr_.
+// If the alteration mass is charaterized by MIScore, but not fulled 
+// charaterized, then the output of MIScore method is store in local_anno_ptr_. 
+
 class Alter;
 typedef std::shared_ptr<Alter> AlterPtr;
 

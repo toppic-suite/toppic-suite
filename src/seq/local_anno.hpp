@@ -20,6 +20,7 @@
 
 namespace toppic {
 
+// Contain PTM localization results of the MIScore method 
 class LocalAnno {
  public:
   explicit LocalAnno(XmlDOMElement* element);
@@ -42,7 +43,7 @@ class LocalAnno {
 
   double getRawScr() {return raw_scr_;}
 
-  void getRawScr(double s) {raw_scr_ = s;}
+  void setRawScr(double s) {raw_scr_ = s;}
 
   double getMassShift() {return mass_shift_;}
 

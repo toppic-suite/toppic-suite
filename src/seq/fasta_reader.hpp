@@ -34,6 +34,7 @@ class FastaReader {
   void close();
 
  private:
+  std::string file_name_;
   std::ifstream input_;
   std::string ori_name_;
 };

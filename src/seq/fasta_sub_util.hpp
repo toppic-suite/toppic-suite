@@ -21,8 +21,8 @@ namespace toppic {
 
 namespace fasta_sub_util {
 
-// break sequences into subsequences with length 2000
-FastaSubSeqPtrVec breakSeq(FastaSeqPtr seq_ptr);
+// break sequences into subsequences, default length is 2000
+FastaSubSeqPtrVec breakSeq(FastaSeqPtr seq_ptr); 
 
 FastaSubSeqPtrVec breakSeq(FastaSeqPtr seq_ptr, int N);
 

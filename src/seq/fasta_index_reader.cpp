@@ -33,7 +33,7 @@ FastaSeqPtr FastaIndexReader::readFastaSeq(const std::string &name,
   int seq_len;
   char *seq = fai_fetch(fai_, name.c_str(), &seq_len);
   if (seq_len < 0) {
-    LOG_ERROR("Failed to fetch sequence " << name);
+    LOG_WARN("Failed to fetch protein sequence " << name);
   }
   std::string ori_seq(seq);
 

@@ -20,6 +20,7 @@
 namespace toppic {
 
 FastaReader::FastaReader(const std::string &file_name) {
+  file_name_ = file_name;
   input_.open(file_name.c_str(), std::ios::in);
   if (!input_.is_open()) {
     LOG_ERROR("Fasta file  " << file_name << " does not exist.");
@@ -56,7 +57,8 @@ FastaSeqPtr FastaReader::getNextSeq() {
     str_util::trim(line);
     ori_seq = ori_seq + line;
     if (ori_seq.size() >= 1000000) {
-      LOG_ERROR("Protein sequences are too long! Incorrect fasta file format!");
+      LOG_ERROR("Protein sequences in " << file_name_ 
+                << " are too long! Incorrect fasta file format!");
       exit(EXIT_FAILURE);
     }
   }

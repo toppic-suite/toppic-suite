@@ -40,7 +40,7 @@ void BpSpec::initBreakPoints(const ResSeqPtr &res_seq_ptr) {
     prm += res_seq_ptr->getResiduePtr(i)->getMass();
     double srm = res_seq_ptr->getResMassSum()-prm;
     if (srm < 0) {
-      LOG_WARN("prms is larger than total mass! ");
+      LOG_WARN("Prefix residue mass is larger than the total mass of the protein!");
     }
     break_point_ptr_vec_.push_back(std::make_shared<BreakPoint>(prm, srm));
   }
