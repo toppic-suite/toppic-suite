@@ -17,6 +17,8 @@
 
 #include <string>
 
+#include "common/util/str_util.hpp"
+
 namespace toppic {
 
 namespace fasta_util {
