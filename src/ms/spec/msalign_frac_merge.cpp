@@ -13,12 +13,11 @@
 //limitations under the License.
 
 #include "common/util/file_util.hpp"
+#include "para/sp_para.hpp"
 #include "ms/spec/simple_msalign_reader.hpp"
 #include "ms/spec/msalign_frac_merge.hpp"
 
 namespace toppic {
-
-int MsAlignFracMerge::MAX_SPEC_NUM_PER_FILE = 1000000;
 
 MsAlignFracMerge::MsAlignFracMerge(
     const std::vector<std::string> &spec_file_names,
@@ -58,11 +57,11 @@ void MsAlignFracMerge::mergeFiles(const std::vector<std::string> &spec_file_lst,
     while (ms_lines.size() > 0) {
       for (size_t k = 0; k< ms_lines.size(); k++) {
         if (ms_lines[k].substr(0, 3) == "ID=") {
-          outfile << "ID=" << (MAX_SPEC_NUM_PER_FILE * i + std::stoi(ms_lines[k].substr(3))) 
+          outfile << "ID=" << (SpPara::getMaxSpecNumPerFile() * i + std::stoi(ms_lines[k].substr(3))) 
               << std::endl;
         } else if (ms_lines[k].substr(0, 10) == "MS_ONE_ID=") {
           outfile << "MS_ONE_ID=" 
-              << (MAX_SPEC_NUM_PER_FILE * i + std::stoi(ms_lines[k].substr(10))) << std::endl;
+              << (SpPara::getMaxSpecNumPerFile() * i + std::stoi(ms_lines[k].substr(10))) << std::endl;
         } else {
           outfile << ms_lines[k] << std::endl;
         }

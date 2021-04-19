@@ -14,11 +14,10 @@
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
+#include "para/sp_para.hpp"
 #include "ms/spec/deconv_json_merge.hpp"
 
 namespace toppic {
-
-int DeconvJsonMerge::MAX_SPEC_NUM_PER_FILE = 1000000;
 
 DeconvJsonMerge::DeconvJsonMerge(
     const std::vector<std::string> &spec_file_names,
@@ -52,11 +51,11 @@ void DeconvJsonMerge::process() {
 
   if (file_util::exists(ms1_folder_names[0])) {
     mergeFiles(ms1_folder_names, ms1_output_folder, 
-             MAX_SPEC_NUM_PER_FILE); 
+               SpPara::getMaxSpecNumPerFile()); 
   }
   if (file_util::exists(ms2_folder_names[0])) {
     mergeFiles(ms2_folder_names, ms2_output_folder, 
-             MAX_SPEC_NUM_PER_FILE); 
+               SpPara::getMaxSpecNumPerFile()); 
   }
 }
 

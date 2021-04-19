@@ -129,10 +129,7 @@ void mergeFiles(TopfdParaPtr para_ptr,
         = std::make_shared<DeconvJsonMerge>(spec_file_lst, merged_file_name);
     json_merger->process();
     json_merger = nullptr;
-    FeatureMergePtr feature_merger 
-        = std::make_shared<FeatureMerge>(spec_file_lst, merged_file_name);
-    feature_merger->process(para_str);
-    feature_merger = nullptr;
+    feature_merge::process(spec_file_lst, merged_file_name, para_str);
     std::cout << "Merging files finished." << std::endl;
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;

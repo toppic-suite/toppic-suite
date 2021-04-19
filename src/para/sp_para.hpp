@@ -54,6 +54,10 @@ class SpPara {
 
   static std::string getXmlElementName() {return "sp_para";}
 
+  static int getMaxSpecNumPerFile() {return 1000000;}
+
+  static int getMaxFeatureNumPerFile() {return 1000000;}
+
  private:
   int min_peak_num_ = 10;
   // if the mass if smaller than min_mass, the mass is removed.
