@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_TOPFD_ENV_ENVELOPE_BASE_HPP_
 #define TOPPIC_TOPFD_ENV_ENVELOPE_BASE_HPP_
 
@@ -24,6 +23,7 @@ class EnvBase;
 
 typedef std::shared_ptr<EnvBase> EnvBasePtr;
 
+// A list of envelopes read from a file theo_patt.txt
 class EnvBase {
  public:
   EnvBase(std::string file_name_, int entry_num_, double mass_interval_);

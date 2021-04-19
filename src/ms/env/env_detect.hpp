@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_TOPFD_ENV_ENV_DETECT_HPP_
 #define TOPPIC_TOPFD_ENV_ENV_DETECT_HPP_
 
@@ -22,20 +21,20 @@
 
 namespace toppic {
 
-class EnvDetect {
- public:
-  static double calcInteRatio(const PeakPtrVec &peak_list, EnvelopePtr theo_env, 
-                              double tolerance);
+namespace env_detect {
 
-  static MatchEnvPtr detectEnv(const PeakPtrVec &peak_list, int base_peak,
-                               int charge, double max_mass, EnvParaPtr env_para_ptr);
+double calcInteRatio(const PeakPtrVec &peak_list, EnvelopePtr theo_env, 
+                     double tolerance);
 
-  static MatchEnvPtr detectEnv(const PeakPtrVec &peak_list, double mono_mass, 
-                               int charge, EnvParaPtr env_para_ptr);
+MatchEnvPtr detectEnv(const PeakPtrVec &peak_list, int base_peak,
+                      int charge, double max_mass, EnvParaPtr env_para_ptr);
 
-  static MatchEnvPtr2D getCandidate(const PeakPtrVec &peak_list, int max_charge, 
-                                    double max_mass, EnvParaPtr env_para_ptr);
-};
+MatchEnvPtr detectEnv(const PeakPtrVec &peak_list, double mono_mass, 
+                      int charge, EnvParaPtr env_para_ptr);
+
+MatchEnvPtr2D getCandidate(const PeakPtrVec &peak_list, int max_charge, 
+                           double max_mass, EnvParaPtr env_para_ptr);
+}
 
 }
 

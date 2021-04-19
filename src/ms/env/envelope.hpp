@@ -30,6 +30,7 @@ class Envelope {
 
   Envelope(Envelope &env); 
 
+  //used by env_base to create envelopes
   Envelope(int num, std::vector<std::string> &line_List);
 
   Envelope(int refer_idx, int charge, double mono_mz, EnvPeakPtrVec &peaks);

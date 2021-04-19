@@ -131,7 +131,7 @@ MatchEnvPtr2D initMatchEnv(EnvParaPtr env_para_ptr, PeakPtrVec &peak_list,
         if (max_mass > env_para_ptr->max_mass_) {
           max_mass = env_para_ptr->max_mass_;
         } else {
-          env_ptr  = EnvDetect::detectEnv(peak_list, idx, charge, max_mass, env_para_ptr);
+          env_ptr  = env_detect::detectEnv(peak_list, idx, charge, max_mass, env_para_ptr);
         }
         // LOG_DEBUG("env detection complete");
         if (env_ptr != nullptr) {

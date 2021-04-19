@@ -53,10 +53,10 @@ void DeconvOneSp::run() {
   LOG_DEBUG("preprocess complete");
   // envelope detection
   PeakPtrVec peak_list = data_ptr_->getPeakList();
-  MatchEnvPtr2D cand_envs = EnvDetect::getCandidate(peak_list, 
-                                                    data_ptr_->getMaxCharge(),
-                                                    data_ptr_->getMaxMass(),
-                                                    env_para_ptr_);
+  MatchEnvPtr2D cand_envs = env_detect::getCandidate(peak_list, 
+                                                     data_ptr_->getMaxCharge(),
+                                                     data_ptr_->getMaxMass(),
+                                                     env_para_ptr_);
   LOG_DEBUG("candidate complete");
   // envelope filter
   EnvFilter::filter(cand_envs, peak_list, env_para_ptr_);
@@ -127,8 +127,8 @@ MatchEnvPtrVec DeconvOneSp::postprocess(MatchEnvPtrVec &dp_envs) {
   if (env_para_ptr_->output_multiple_mass_) {
     // envelope detection
     PeakPtrVec peak_list = data_ptr_->getPeakList();
-    MatchEnvPtr2D cand_envs = EnvDetect::getCandidate(peak_list, data_ptr_->getMaxCharge(), 
-                                                      data_ptr_->getMaxMass(), env_para_ptr_);
+    MatchEnvPtr2D cand_envs = env_detect::getCandidate(peak_list, data_ptr_->getMaxCharge(), 
+                                                       data_ptr_->getMaxMass(), env_para_ptr_);
     // envelope filter
     EnvFilter::multipleMassFilter(cand_envs, env_para_ptr_);
     result_envs_ = match_env_util::addMultipleMass(result_envs_, cand_envs,

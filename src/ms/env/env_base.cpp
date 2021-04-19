@@ -22,14 +22,15 @@ namespace toppic {
 
 EnvBasePtr EnvBase::env_base_ptr_;
 
-EnvBase::EnvBase(std::string file_name, int entry_num, double mass_interval):
+EnvBase::EnvBase(std::string file_name, int entry_num, 
+                 double mass_interval):
     entry_num_(entry_num),
     mass_interval_(mass_interval) {
       std::ifstream input;
       input.open(file_name.c_str(), std::ios::in);
       if (!input.is_open()) {
-        LOG_ERROR("env file  " << file_name << " does not exist.");
-        throw "env file does not exist.";
+        LOG_ERROR("Envelope file  " << file_name << " does not exist.");
+        exit(EXIT_FAILURE); 
       }
       LOG_DEBUG("start reading");
       for (int i = 0; i < entry_num_; i++) {
@@ -88,10 +89,10 @@ void EnvBase::initBaseMassIdx() {
 EnvelopePtr EnvBase::getEnvByMonoMass(double mass) {
   int idx = static_cast<int>(mass / mass_interval_);
   if (idx < 0) {
-    LOG_ERROR("Invalid mass");
-    exit(1);
+    LOG_ERROR("Invalid mass!");
+    exit(EXIT_FAILURE);
   } else if (idx >= entry_num_) {
-    LOG_DEBUG("mass out of bound");
+    LOG_WARN("Mass out of bound!");
     return nullptr;
   }
   return envs_[idx];
@@ -102,9 +103,9 @@ EnvelopePtr EnvBase::getEnvByBaseMass(double mass) {
   int idx = static_cast<int>(mass / mass_interval_);
   if (idx < 0) {
     LOG_ERROR("Invalid mass");
-    exit(1);
+    exit(EXIT_FAILURE);
   } else if (idx >= entry_num_) {
-    LOG_DEBUG("Mass out of bound");
+    LOG_WARN("Mass out of bound!");
     return nullptr;
   }
   return envs_[base_mass_idxes_[idx]];
