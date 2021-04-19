@@ -33,7 +33,7 @@
 
 namespace toppic {
 
-namespace feature_merger {
+namespace feature_merge {
 
 void mergeFiles(const std::vector<std::string> &frac_xml_feature_file_lst,
                 const std::string &frac_xml_feature_output_file_name, 

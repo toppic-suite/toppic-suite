@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_PRSM_PEAK_ION_PAIR_HPP_
 #define TOPPIC_PRSM_PEAK_ION_PAIR_HPP_
 
@@ -30,6 +29,7 @@ class XmlDOMDocument;
 class PeakIonPair;
 typedef std::shared_ptr<PeakIonPair> PeakIonPairPtr;
 
+// A pair of matched theoretical mass and experimental mass
 class PeakIonPair {
  public:
   PeakIonPair(MsHeaderPtr ms_header_ptr, ExtendPeakPtr real_peak_ptr,
