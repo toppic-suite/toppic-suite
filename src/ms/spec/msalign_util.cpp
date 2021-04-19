@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include "common/util/logger.hpp"
 #include "ms/spec/simple_msalign_reader.hpp"
 #include "ms/spec/msalign_util.hpp"

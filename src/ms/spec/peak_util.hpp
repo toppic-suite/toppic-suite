@@ -12,31 +12,19 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_MS_SPEC_RAW_MS_UTIL_HPP_
-#define TOPPIC_MS_SPEC_RAW_MS_UTIL_HPP_
-
-#include "ms/spec/peak.hpp"
+#ifndef TOPPIC_MS_SPEC_PEAK_UTIL_HPP_
+#define TOPPIC_MS_SPEC_PEAK_UTIL_HPP_
 
 namespace toppic {
 
-namespace raw_ms_util {
+namespace peak_util {
 
-double findMaxPos(const PeakPtrVec &ptr_list);
+  double compPeakNeutralMass(double mono_mz, int charge);
 
-int searchPos(const PeakPtrVec &ptr_list, double pos);
+  double compMz(double neutral_mass, int charge);
 
-int getNearPeakIdx(const PeakPtrVec  &ptr_list, double pos, double tolerance);
+}
 
-PeakPtrVec rmPeaks(const PeakPtrVec &ptr_list, std::vector<bool> &keep);
-
-PeakPtrVec getPeaksInWindow(const PeakPtrVec &ptr_list, double center, 
-                            double win_size);
-
-double getHighestPeakInte(const PeakPtrVec &ptr_list); 
-
-double getMedianPeakInte(PeakPtrVec ptr_list);
-
-}  // namespace raw_ms_util
 
 }  // namespace toppic
 

@@ -12,9 +12,7 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <set>
-#include <algorithm>
-#include <iostream>
+#include <limits>
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
@@ -64,10 +62,6 @@ void MsalignThreadMerge::process() {
     std::string input_file_name = base_name + "_" + input_file_exts_[i];
     SimpleMsAlignReaderPtr reader_ptr
         = std::make_shared<SimpleMsAlignReader>(input_file_name); 
-    //if set to true, it copies precursor mass and prec_m/z, instead of calculating
-    //to avoid generating incorrect values during merge sort
-    //more detail about the variable in msalign_reader.hpp
-    //reader_ptr-> setToCopyValues(true);
     LOG_DEBUG("input file name " << input_file_name);
     DeconvMsPtr ms_ptr = reader_ptr->getNextMsPtr();
     reader_ptrs.push_back(reader_ptr);
@@ -83,9 +77,7 @@ void MsalignThreadMerge::process() {
   bool finish = true;
   
   while (finish) {
-    // LOG_DEBUG("spec id " << spec_id << " input num " << input_num);
     int cur_ms_idx = getCurMsIndex(ms_ptrs);
-
     if (cur_ms_idx < 0) {
       break;
     }
@@ -93,9 +85,6 @@ void MsalignThreadMerge::process() {
       DeconvMsPtr cur_ms_ptr = ms_ptrs[cur_ms_idx];
       cur_ms_ptr->getMsHeaderPtr()->setId(spec_id);
       spec_id++;
-      //if set to true, it used mono mass value from the msalign file it is reading
-      //and not recalcuate it--which causes incorrect result
-      //writer-> useCopiedMonoMass(true);
       writer->write(cur_ms_ptr);
       ms_ptrs[cur_ms_idx] = reader_ptrs[cur_ms_idx]->getNextMsPtr();
     }

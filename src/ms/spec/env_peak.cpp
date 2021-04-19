@@ -41,16 +41,16 @@ bool EnvPeak::cmpInteInc(const EnvPeakPtr &a, const EnvPeakPtr &b) {
   return a->getIntensity() < b->getIntensity();
 }
 
-EnvPeak::EnvPeak(xercesc::DOMElement* element):
+EnvPeak::EnvPeak(XmlDOMElement* element):
     Peak(xml_dom_util::getDoubleChildValue(element, "position", 0),
          xml_dom_util::getDoubleChildValue(element, "intensity", 0)) {
       idx_ = xml_dom_util::getIntChildValue(element, "index", 0);
     }
 
 void EnvPeak::appendXml(XmlDOMDocument* xml_doc, 
-                        xercesc::DOMElement* parent) {
+                        XmlDOMElement* parent) {
   std::string element_name = EnvPeak::getXmlElementName();
-  xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
+  XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
   std::string str = str_util::toString(getPosition());
   xml_doc->addElement(element, "position", str.c_str());
   str = str_util::toString(getIntensity());

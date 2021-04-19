@@ -29,14 +29,9 @@ class RawMsGroup {
 
   RawMsPtrVec getMsTwoPtrVec() {return ms2_ptr_vec_;}
 
-  int getTotalScanNum() {return total_scan_num_;}
-  void setTotalScanNum(int num) {total_scan_num_ = num;}
-
  private:
   RawMsPtr ms1_ptr_;
   RawMsPtrVec ms2_ptr_vec_;
-
-  int total_scan_num_;
 };
 
 typedef std::shared_ptr<RawMsGroup> RawMsGroupPtr;

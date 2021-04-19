@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_MS_SPEC_MS_HEADER_HPP_
 #define TOPPIC_MS_SPEC_MS_HEADER_HPP_
 
@@ -27,11 +26,9 @@ class MsHeader {
  public:
   MsHeader() {};
 
-  MsHeader(xercesc::DOMElement* element);
+  MsHeader(XmlDOMElement* element);
 
   double getPrecMonoMass();
-
-  double getCopiedPrecMonoMass(){return prec_mono_mass_copy_;}
 
   double getPrecSpMass();
 
@@ -49,8 +46,6 @@ class MsHeader {
 
   // get functions 
   ActivationPtr getActivationPtr() {return activation_ptr_;}
-
- // double getFeatureInte() {return feature_inte_;}
 
   int getId() {return id_;}
 
@@ -79,8 +74,6 @@ class MsHeader {
   double getErrorTolerance(double ppo) {return getPrecMonoMass() * ppo;}
 
   double getPrecInte() {return prec_inte_;}
-
-  //int getFeatureId() {return feature_id_;}
 
   // set function 
   void setActivationPtr(ActivationPtr acti_ptr) {activation_ptr_ = acti_ptr;}
@@ -115,21 +108,15 @@ class MsHeader {
 
   void setPrecInte(double inte) {prec_inte_ = inte;}
 
-  //void setFeatureId(int feature_id) {feature_id_ = feature_id;}
+  XmlDOMElement* getHeaderXml(XmlDOMDocument* xml_doc);
 
-  //void setFeatureInte(double feature_inte) {feature_inte_ = feature_inte;}
-
-  xercesc::DOMElement* getHeaderXml(XmlDOMDocument* xml_doc);
-
-  void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+  void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 
   static std::string getXmlElementName() {return "ms_header";}
 
   static MsHeaderPtr geneMsHeaderPtr(MsHeaderPtr ori_ptr, double new_prec_mass);
 
   static bool cmpPrecInteDec(const MsHeaderPtr &a, const MsHeaderPtr &b);
-
-  void setCopiedPrecMonoMass(double prec_mono_mass_copy){prec_mono_mass_copy_ = prec_mono_mass_copy;}
 
  private:
   int id_ = -1;
@@ -165,13 +152,6 @@ class MsHeader {
   int prec_charge_ = -1;
   // precursor intensity 
   double prec_inte_ = 0;
-  /*
-  // feature id
-  int feature_id_ = -1;
-  // feature inte
-  double feature_inte_ = -1;
-  */
- double prec_mono_mass_copy_;
 };
 
 typedef std::vector<MsHeaderPtr> MsHeaderPtrVec;

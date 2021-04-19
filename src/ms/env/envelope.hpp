@@ -12,10 +12,10 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_TOPFD_ENV_ENVELOPE_HPP_
 #define TOPPIC_TOPFD_ENV_ENVELOPE_HPP_
 
+#include "ms/spec/peak_util.hpp"
 #include "ms/spec/env_peak.hpp"
 
 namespace toppic {
@@ -82,7 +82,7 @@ class Envelope {
 
   double getIntensitySum();
 
-  double getMonoNeutralMass() {return Peak::compPeakNeutralMass(mono_mz_, charge_);}
+  double getMonoNeutralMass() {return peak_util::compPeakNeutralMass(mono_mz_, charge_);}
 
   double getMonoMz() {return mono_mz_;}
 
@@ -101,7 +101,7 @@ class Envelope {
 
   double getReferMz() {return peaks_[refer_idx_]->getPosition();}
 
-  double getRefNeutralMass() {return Peak::compPeakNeutralMass(getReferMz(), charge_);}
+  double getRefNeutralMass() {return peak_util::compPeakNeutralMass(getReferMz(), charge_);}
 
   void setIntensity(int i, double intensity) {peaks_[i]->setIntensity(intensity);}
 

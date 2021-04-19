@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include <string>
 
 #include "common/util/str_util.hpp"
@@ -31,9 +30,9 @@ ExtendPeak::ExtendPeak(DeconvPeakPtr base_peak_ptr,
     reverse_tolerance_(0.0) {}
 
 void ExtendPeak::appendXml(XmlDOMDocument* xml_doc,
-                           xercesc::DOMElement* parent) {
+                           XmlDOMElement* parent) {
   std::string element_name = ExtendPeak::getXmlElementName();
-  xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
+  XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
   std::string str = str_util::toString(getPosition());
   xml_doc->addElement(element, "position", str.c_str());
   str = str_util::toString(getIntensity());

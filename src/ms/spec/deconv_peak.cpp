@@ -37,7 +37,7 @@ DeconvPeak::DeconvPeak(int sp_id, int id, double mono_mass,
     charge_(charge),
     score_(score) {}
 
-DeconvPeak::DeconvPeak(xercesc::DOMElement* element):
+DeconvPeak::DeconvPeak(XmlDOMElement* element):
     Peak(xml_dom_util::getDoubleChildValue(element, "position", 0),
          xml_dom_util::getDoubleChildValue(element, "intensity", 0)) {
       sp_id_ = xml_dom_util::getIntChildValue(element, "sp_id", 0);
@@ -46,9 +46,9 @@ DeconvPeak::DeconvPeak(xercesc::DOMElement* element):
       score_ = xml_dom_util::getDoubleChildValue(element, "score", 0);
     }
 
-void DeconvPeak::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
+void DeconvPeak::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
   std::string element_name = DeconvPeak::getXmlElementName();
-  xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
+  XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
   std::string str = str_util::toString(getPosition());
   xml_doc->addElement(element, "position", str.c_str());
   str = str_util::toString(getIntensity());

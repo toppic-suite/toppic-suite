@@ -44,7 +44,7 @@ class ExtendPeak : public Peak {
   void setReverseTolerance(double reverse_tolerance) {
     reverse_tolerance_ = reverse_tolerance;}
 
-  void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
+  void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 
   static bool cmpPosInc(const ExtendPeakPtr &a, const ExtendPeakPtr &b) {
     return a->getPosition() < b->getPosition();}

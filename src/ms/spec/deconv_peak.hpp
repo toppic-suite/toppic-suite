@@ -15,6 +15,7 @@
 #ifndef TOPPIC_MS_SPEC_DECONV_PEAK_HPP_
 #define TOPPIC_MS_SPEC_DECONV_PEAK_HPP_
 
+#include "ms/spec/peak_util.hpp"
 #include "ms/spec/peak.hpp"
 
 namespace toppic {
@@ -30,7 +31,7 @@ class DeconvPeak : public Peak {
   DeconvPeak(int sp_id, int id, double mono_mass, 
              double intensity, int charge, double score);
 
-  explicit DeconvPeak(xercesc::DOMElement* element);
+  explicit DeconvPeak(XmlDOMElement* element);
 
   int getCharge() {return charge_;}
 
@@ -40,7 +41,7 @@ class DeconvPeak : public Peak {
 
   double getMonoMass() {return getPosition();}
 
-  double getMonoMz() {return compMz(getMonoMass(), charge_);}
+  double getMonoMz() {return peak_util::compMz(getMonoMass(), charge_);}
 
   double getScore() {return score_;}
 
@@ -48,7 +49,7 @@ class DeconvPeak : public Peak {
 
   void setSpId(int sp_id) {sp_id_ = sp_id;}
 
-  void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
+  void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 
   static bool cmpPosInc(const DeconvPeakPtr &a, const DeconvPeakPtr &b) {
     return a->getPosition() < b->getPosition();}

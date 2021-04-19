@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_MS_SPEC_SUPPORT_PEAK_HPP_
 #define TOPPIC_MS_SPEC_SUPPORT_PEAK_HPP_
 
@@ -43,6 +42,7 @@ class SupportPeak {
 
   SPTypePtr peak_type_ptr_;
 };
+
 typedef std::shared_ptr<SupportPeak> SupportPeakPtr;
 typedef std::vector<SupportPeakPtr> SupportPeakPtrVec;
 

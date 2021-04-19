@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include <cmath>
 #include <sstream>
 
@@ -22,19 +21,19 @@
 #include "common/xml/xml_dom_util.hpp"
 #include "common/base/activation_base.hpp"
 #include "common/base/mass_constant.hpp"
-#include "ms/spec/peak.hpp"
+#include "ms/spec/peak_util.hpp"
 #include "ms/spec/ms_header.hpp"
 
 namespace toppic {
 
-MsHeader::MsHeader(xercesc::DOMElement* element) {
+MsHeader::MsHeader(XmlDOMElement* element) {
   file_name_ = xml_dom_util::getChildValue(element, "file_name", 0);
   id_ = xml_dom_util::getIntChildValue(element, "id", 0);
   prec_id_ = xml_dom_util::getIntChildValue(element, "prec_id", 0);
   title_ = xml_dom_util::getChildValue(element, "title", 0);
   level_ = xml_dom_util::getIntChildValue(element, "level", 0);
 
-  xercesc::DOMElement* scan_element
+  XmlDOMElement* scan_element
       = xml_dom_util::getChildElement(element, "scan_list", 0);
   int scans = xml_dom_util::getChildCount(scan_element, "scan");
   for (int i = 0; i < scans; i++) {
@@ -45,17 +44,17 @@ MsHeader::MsHeader(xercesc::DOMElement* element) {
   prec_mono_mz_ = xml_dom_util::getDoubleChildValue(element, "prec_mono_mz", 0);
   prec_charge_ = xml_dom_util::getIntChildValue(element, "prec_charge", 0);
   std::string element_name = Activation::getXmlElementName();
-  xercesc::DOMElement* ac_element
+  XmlDOMElement* ac_element
       = xml_dom_util::getChildElement(element, element_name.c_str(), 0);
   activation_ptr_ = ActivationBase::getActivationPtrFromXml(ac_element);
 }
 
 double MsHeader::getPrecMonoMass() {
   if (prec_mono_mz_ < 0 || std::isnan(prec_mono_mz_)) {
-    LOG_INFO("id " << id_ << " monoisotopic mass is not initialized");
+    LOG_WARN("id " << id_ << " monoisotopic mass is not initialized!");
     return 0.0;
   } else {
-    return Peak::compPeakNeutralMass(prec_mono_mz_, prec_charge_);
+    return peak_util::compPeakNeutralMass(prec_mono_mz_, prec_charge_);
   }
 }
 
@@ -64,7 +63,7 @@ double MsHeader::getPrecSpMass() {
     LOG_WARN("id " << id_ << " precursor spectrum mass is not initialized");
     return 0.0;
   } else {
-    return Peak::compPeakNeutralMass(prec_sp_mz_, prec_charge_);
+    return peak_util::compPeakNeutralMass(prec_sp_mz_, prec_charge_);
   }
 }
 
@@ -79,10 +78,10 @@ double MsHeader::getPrecMonoMz() {
 
 double MsHeader::getPrecMonoMassMinusWater() {
   if (prec_mono_mz_ < 0 || std::isnan(prec_mono_mz_)) {
-    LOG_WARN("monoisotopic mass is not initialized");
+    LOG_WARN("monoisotopic mass is not initialized!");
     return 0.0;
   } else {
-    return Peak::compPeakNeutralMass(prec_mono_mz_, prec_charge_)
+    return peak_util::compPeakNeutralMass(prec_mono_mz_, prec_charge_)
         - mass_constant::getWaterMass();
   }
 }
@@ -130,10 +129,10 @@ void MsHeader::setScans(const std::string &s) {
   }
 }
 
-xercesc::DOMElement* MsHeader::getHeaderXml(XmlDOMDocument* xml_doc) {
+XmlDOMElement* MsHeader::getHeaderXml(XmlDOMDocument* xml_doc) {
   // float number precison
   int precison = 4;
-  xercesc::DOMElement* element = xml_doc->createElement("ms_header");
+  XmlDOMElement* element = xml_doc->createElement("ms_header");
   xml_doc->addElement(element, "file_name", file_name_.c_str());
   std::string str = str_util::toString(id_);
   xml_doc->addElement(element, "id", str.c_str());
@@ -144,7 +143,7 @@ xercesc::DOMElement* MsHeader::getHeaderXml(XmlDOMDocument* xml_doc) {
   xml_doc->addElement(element, "level", str.c_str());
   str = getScansString();
   xml_doc->addElement(element, "scans", str.c_str());
-  xercesc::DOMElement* scans = xml_doc->createElement("scan_list");
+  XmlDOMElement* scans = xml_doc->createElement("scan_list");
   for (size_t i = 0; i < scans_.size(); i++) {
     str = str_util::toString(scans_[i]);
     xml_doc->addElement(scans, "scan", str.c_str());
@@ -162,13 +161,13 @@ xercesc::DOMElement* MsHeader::getHeaderXml(XmlDOMDocument* xml_doc) {
   return element;
 }
 
-void MsHeader::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
+void MsHeader::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
   parent->appendChild(getHeaderXml(xml_doc));
 }
 
 MsHeaderPtr MsHeader::geneMsHeaderPtr(MsHeaderPtr ori_ptr, double new_prec_mass) {
   MsHeaderPtr new_header_ptr = std::make_shared<MsHeader>(*ori_ptr.get());
-  double mono_mz = Peak::compMz(new_prec_mass, ori_ptr->getPrecCharge());
+  double mono_mz = peak_util::compMz(new_prec_mass, ori_ptr->getPrecCharge());
   new_header_ptr->setPrecMonoMz(mono_mz);
   return new_header_ptr;
 }
