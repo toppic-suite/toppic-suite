@@ -20,7 +20,7 @@
 
 namespace toppic {
 
-namespace EnvRescore {
+namespace env_rescore {
 
 std::vector<double> diff(MatchEnvPtr env, MatchEnvPtr2D &match_envs) {
   std::vector<double> result(2);
@@ -149,6 +149,6 @@ void rescore(MatchEnvPtr2D &match_envs, const std::vector<std::vector<double> > 
   }
 }
 
-}  // namespace EnvRescore
+}  // namespace env_score
 }  // namespace toppic
 

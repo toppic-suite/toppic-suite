@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_TOPFD_ENV_ENV_RESCORE_HPP_
 #define TOPPIC_TOPFD_ENV_ENV_RESCORE_HPP_
 
@@ -24,9 +23,11 @@ namespace toppic {
 
 namespace env_rescore {
 
+// Use the scoring function in msalign+ paper to compute scores of envelopes
+// We are NOT using the function in TopFD.
 void rescore(MatchEnvPtr2D &match_envs, const std::vector<std::vector<double> > &para);
 
-}  // namespace EnvRescore
+}  // namespace env_rescore
 
 }  // namespace toppic
 #endif

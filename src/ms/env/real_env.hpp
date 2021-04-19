@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_TOPFD_ENV_REAL_ENVELOPE_HPP_
 #define TOPPIC_TOPFD_ENV_REAL_ENVELOPE_HPP_
 
@@ -54,9 +53,6 @@ class RealEnv : public Envelope {
 
  private:
   int sp_id_;
-  // peak index in the spectrum 
-  // if peak_idx[i] == NO_EXIST_PEAK, it does not exist 
-  // std::vector<int> peak_idxes_;
   // number of missing peaks 
   int miss_peak_num_;
   // maximum number of consecutive peaks 

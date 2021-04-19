@@ -18,62 +18,19 @@
 #include <memory>
 #include <vector>
 #include <string>
-#include <map>
 
 #include "topfd/common/topfd_para.hpp"
 
 namespace toppic {
+
 class EnvPara;
 typedef std::shared_ptr<EnvPara> EnvParaPtr;
 
 class EnvPara {
  public:
   EnvPara(){};
+
   EnvPara(TopfdParaPtr topfd_para_ptr); 
-  EnvPara(EnvParaPtr env_para_ptr){
-    max_charge_ = env_para_ptr->max_charge_;
-    max_mass_ = env_para_ptr->max_mass_;
-    window_size_ = env_para_ptr->window_size_;
-    estimate_min_inte_ = env_para_ptr->estimate_min_inte_;
-    ms_two_sn_ratio_ = env_para_ptr->ms_two_sn_ratio_;
-    ms_one_sn_ratio_ = env_para_ptr->ms_one_sn_ratio_;
-    min_inte_ = env_para_ptr->min_inte_;
-    min_refer_inte_ = env_para_ptr->min_refer_inte_;
-    mz_tolerance_ = env_para_ptr->mz_tolerance_;
-    min_mass_ = env_para_ptr->min_mass_;
-    mass_group_boundary_ = env_para_ptr->mass_group_boundary_;
-    percentage_bound_ = env_para_ptr->percentage_bound_;
-    max_back_peak_num_ = env_para_ptr->max_back_peak_num_;
-    max_forw_peak_num_ = env_para_ptr->max_forw_peak_num_;
-    min_match_peak_num_ = env_para_ptr->min_match_peak_num_;
-    check_consecutive_peak_num_ = env_para_ptr->check_consecutive_peak_num_;
-    relative_consecutive_peak_num_ = env_para_ptr-> relative_consecutive_peak_num_;
-    min_consecutive_peak_num_ = env_para_ptr-> min_consecutive_peak_num_;
-    do_mz_shift_ = env_para_ptr->do_mz_shift_;
-    shift_scale_ = env_para_ptr->shift_scale_;
-    do_inte_ratio_ = env_para_ptr->do_inte_ratio_;
-    inte_ratio_scale_ = env_para_ptr->inte_ratio_scale_;
-    bgn_ratio_ = env_para_ptr->bgn_ratio_;
-    end_ratio_ = env_para_ptr->end_ratio_;
-    score_error_tolerance_ = env_para_ptr->score_error_tolerance_;
-    min_match_env_score_ = env_para_ptr->min_match_env_score_;
-    charge_computation_bgn_ = env_para_ptr->charge_computation_bgn_;
-    charge_computation_mz_tolerance_ = env_para_ptr->charge_computation_mz_tolerance_;
-    rank_peak_distance_ = env_para_ptr->rank_peak_distance_;
-    max_similar_mz_env_rank_ = env_para_ptr->max_similar_mz_env_rank_;
-    env_num_per_window_ = env_para_ptr->env_num_per_window_;
-    do_final_filtering_ = env_para_ptr->do_final_filtering_;
-    low_high_dividor_ = env_para_ptr->low_high_dividor_;
-    aa_avg_mass_ = env_para_ptr->aa_avg_mass_;
-    peak_density_ = env_para_ptr->peak_density_;
-    keep_unused_peaks_ = env_para_ptr->keep_unused_peaks_;
-    output_multiple_mass_ = env_para_ptr->output_multiple_mass_;
-    multiple_min_mass_ = env_para_ptr->multiple_min_mass_;
-    multiple_min_charge_ =env_para_ptr->multiple_min_charge_;
-    multiple_min_ratio_ = env_para_ptr->multiple_min_ratio_;
-    prec_deconv_interval_ = env_para_ptr->prec_deconv_interval_;
-    use_env_cnn_ = env_para_ptr->use_env_cnn_;
-  }; 
 
   int getMassGroup(double base_mass);
 
@@ -112,22 +69,6 @@ class EnvPara {
   // min_refer_inte_ = min_inte * sn_ratio_ 
   double min_refer_inte_ = 0;
 
-
-  /*************************************
-  // Distribution Envelope factory 
-  // initialized before deconvolution 
-
-  // EnvBasePtr is moved to the class EnvBase
-  //static EnvBasePtr env_base_ptr_;
-  //std::string distr_file_name_ = "/base_data/theo_patt.txt";
-  //int distr_entry_num_ = 11000;
-  //double distr_mass_interval_ = 10;
-
-  //std::string env_rescore_para_file_name_ = "/base_data/env_rescore_para.txt";
-
-  //std::vector<std::vector<double> > env_rescore_para_;
-  **/
-
   // Envelope detection
   // min_inte and min_ref_inte are used in envelope detection
 
@@ -164,12 +105,12 @@ class EnvPara {
   // 2. filtering using score
 
   // parameters for computing scores of matching envelopes 
-  // if small mz shift is used 
+  // Optimize the score using small shifts of theoretical m/z values 
   bool do_mz_shift_ = false;
 
   // when mz shift is used, the minimum shift is 0.001, shift_fold = 1/0.001
   int shift_scale_ = 1000;
-  // if intensity ratio is used 
+  // Optimize the score using a scale ratio of theoretical peak intensities 
   bool do_inte_ratio_ = false;
 
   // when intensity ratio is used, the minimum shift is 0.01, ratio_fold =
@@ -183,38 +124,33 @@ class EnvPara {
   // minimum score for matching envelopes 
   double min_match_env_score_ = 0;
 
-  // 3. fitering using envelopes with charge X, 2X, 3X, ... no parameters here
-  // 4. filtering by comparing envelopes with similar charge
+  // 3. fitering using envelopes with charge Z, 2 times of Z, 3 times of Z, 
+  // no parameters here
+
+  // 4. filtering by comparing envelopes with similar charge.
+  // If two envelopes uses the same reference peak and their
+  // charge states are Z and Z+1, then one envelope is removed. 
+  // This step is applied to only high charge state (Z>= 15) envelopes
   int charge_computation_bgn_ = 15;
   double charge_computation_mz_tolerance_ = 0.002;
 
   // 5. filtering by comparing envelopes with similar mz and same charge
-  // filtering on mz 
+  // If two envelopes have the same charge and their monoisotopic mass 
+  // difference is less than 12 Dalton, then only the top scoring one is keep.
   double rank_peak_distance_ = 12;
+  // Only keep the top envelope
   int max_similar_mz_env_rank_ = 0;
 
   // Envelope assigned to 1 m/z intervals
   // number of envelopes per window 
+  // use a small number of envelopes to speed up computation
   int env_num_per_window_ = 5;
 
-  // DP algorithm
-  //DpParaPtr dp_para_ptr_ = std::make_shared<DpPara>();
-  /*  
-  // Check double increasing when two envelopes overlap 
-  bool check_double_increase_ = true;
-  std::vector<std::vector<bool>> coexist_table_;
-
-  // maximum number of envelopes sharing one peak 
-  int max_env_num_per_peak_ = 2;
-  // used in dpB to specify the number of output envelopes 
-  int dp_env_num_ = 300;
-  // maximum number of vertices per window 
-  int max_env_num_per_vertex_ = 10;
-  */
-
   // envelope final filtering
-  // use filtering to  only highest peaks. 
+  // use filtering to keep only highest peaks. 
   bool do_final_filtering_ = true;
+  // Monoisotopic masses are divided into two groups 
+  // < 1500 and > 1500 in filtering
   double low_high_dividor_ = 1500;
   double aa_avg_mass_ = 120;
   double peak_density_ = 2;
@@ -222,13 +158,18 @@ class EnvPara {
   //  unused peaks
   bool keep_unused_peaks_ = false;
 
-  //  multiple mass 
+  // Output multiple masses 
+  // For one envelope, if we cannot determine its
+  // charge state and monoisotopic mass, we will 
+  // add several envelopes with two consecutive charges
+  // and envelopes with -1 and +1 Dalton shift
+  // See match_env_util::addMultipleMass
   bool output_multiple_mass_ = false;
   double multiple_min_mass_ = 5000;
   int multiple_min_charge_ = 20;
   double multiple_min_ratio_ = 0.9;
 
-  // PrecDeconv
+  // precursor ion window size
   double prec_deconv_interval_ = 3.0;
 
   // Use EnvCNN

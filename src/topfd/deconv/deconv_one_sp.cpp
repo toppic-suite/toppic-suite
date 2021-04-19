@@ -59,7 +59,7 @@ void DeconvOneSp::run() {
                                                      env_para_ptr_);
   LOG_DEBUG("candidate complete");
   // envelope filter
-  EnvFilter::filter(cand_envs, peak_list, env_para_ptr_);
+  env_filter::filter(cand_envs, peak_list, env_para_ptr_);
   // envelope rescoring
   //if (ms_level_ > 1) {
     //EnvRescore::rescore(cand_envs, env_para_ptr_->env_rescore_para_);
@@ -112,8 +112,8 @@ MatchEnvPtrVec DeconvOneSp::postprocess(MatchEnvPtrVec &dp_envs) {
 
   // filtering
   if (env_para_ptr_->do_final_filtering_) {
-    result_envs_ = MatchEnvFilter::filter(dp_envs, data_ptr_->getMaxMass(),
-                                          env_para_ptr_);
+    result_envs_ = match_env_filter::filter(dp_envs, data_ptr_->getMaxMass(),
+                                            env_para_ptr_);
   }
   else {
     result_envs_ = dp_envs;
@@ -130,11 +130,11 @@ MatchEnvPtrVec DeconvOneSp::postprocess(MatchEnvPtrVec &dp_envs) {
     MatchEnvPtr2D cand_envs = env_detect::getCandidate(peak_list, data_ptr_->getMaxCharge(), 
                                                        data_ptr_->getMaxMass(), env_para_ptr_);
     // envelope filter
-    EnvFilter::multipleMassFilter(cand_envs, env_para_ptr_);
+    env_filter::multipleMassFilter(cand_envs, env_para_ptr_);
     result_envs_ = match_env_util::addMultipleMass(result_envs_, cand_envs,
-                                                 env_para_ptr_->multiple_min_mass_,
-                                                 env_para_ptr_->multiple_min_charge_,
-                                                 env_para_ptr_->multiple_min_ratio_);
+                                                   env_para_ptr_->multiple_min_mass_,
+                                                   env_para_ptr_->multiple_min_charge_,
+                                                   env_para_ptr_->multiple_min_ratio_);
   }
 
   return result_envs_;

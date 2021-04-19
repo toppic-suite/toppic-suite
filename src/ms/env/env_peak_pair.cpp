@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include "ms/env/env_peak_pair.hpp"
 
 namespace toppic {
@@ -29,7 +28,6 @@ EnvPeakPair::EnvPeakPair(EnvPeakPairPtr pair_ptr) {
 
 double EnvPeakPair::getTheoIntensity() {
   return env_ptr_->getTheoEnvPtr()->getIntensity(pos_idx_);
-
 }
 
 double EnvPeakPair::getPeakScore(double intensity_sum, double tolerance) {

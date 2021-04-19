@@ -100,19 +100,18 @@ double MatchEnv::calcScrWithSftRatio(double shift, double ratio, double toleranc
   return s;
 }
 
-
 // function of mz accuracy 
 double MatchEnv::calcMzFactor(int id_x, double shift, double tolerance) {
   double mz_factor;
-    if (real_env_ptr_->isExist(id_x)) {
+  if (real_env_ptr_->isExist(id_x)) {
     double dist = std::abs(theo_env_ptr_->getMz(id_x) + shift - real_env_ptr_->getMz(id_x));
     mz_factor = (tolerance - dist) / tolerance;
     if (mz_factor < 0) {
       mz_factor = 0;
     }
-  } else {
+  } 
+  else {
     mz_factor = 0;
-
   }
   return mz_factor;
 }
@@ -121,7 +120,7 @@ double MatchEnv::calcMzFactor(int id_x, double shift, double tolerance) {
 double MatchEnv::calcIntensityFactor(double theo_inte, double real_inte) {
   double ratio = theo_inte / real_inte;
   double intensity_factor;
-  // notice the special curve here : 2.0* and sqrt() 
+  // Note that a special curve is used here: 2.0* and sqrt() 
   if (ratio > 1.0) {
     intensity_factor = 1.0 - 2.0 * (ratio - 1.0);
   } else {
@@ -144,7 +143,6 @@ double MatchEnv::calcIntensityFactor(int id_x, double ratio) {
   }
   return factor;
 }
-
 
 double MatchEnv::calcPeakScr(int id_x, double inte_sum, double tolerance) {
   double mz_factor = calcMzFactor(id_x, 0, tolerance);

@@ -291,6 +291,4 @@ void Envelope::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   parent->appendChild(element);
 }
 
-
 }  // namespace toppic
-

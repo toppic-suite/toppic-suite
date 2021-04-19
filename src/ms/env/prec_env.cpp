@@ -95,7 +95,6 @@ int initMaxChrg(PeakPtrVec &peak_list, PeakIntv peak_intv, int argu_max_charge) 
   if (max_charge > argu_max_charge) {
     max_charge = argu_max_charge;
   }
-  // LOG_DEBUG("maximum charge: " << max_charge);
   return max_charge;
 }
 
@@ -119,28 +118,22 @@ MatchEnvPtr2D initMatchEnv(EnvParaPtr env_para_ptr, PeakPtrVec &peak_list,
                            PeakIntv peak_intv, int peak_num, 
                            int max_charge, double min_inte) {
   MatchEnvPtr2D result;
-  // LOG_DEBUG("peak intv bgn " << peak_intv.bgn << " end " << peak_intv.end);
   for (int idx = peak_intv.bgn; idx <= peak_intv.end; idx++) {
     MatchEnvPtrVec env_ptrs(max_charge);
-    // LOG_DEBUG("idx " << idx << " mz " << peak_list[idx]->getPosition());
     if (peak_list[idx]->getIntensity() >= min_inte) {
       for (int charge = 1; charge <= max_charge; charge++) {
         double max_mass = peak_list[idx]->getPosition() * charge + 1;
-        // LOG_DEBUG("max_mass " << max_mass);
         MatchEnvPtr env_ptr;
         if (max_mass > env_para_ptr->max_mass_) {
           max_mass = env_para_ptr->max_mass_;
         } else {
           env_ptr  = env_detect::detectEnv(peak_list, idx, charge, max_mass, env_para_ptr);
         }
-        // LOG_DEBUG("env detection complete");
         if (env_ptr != nullptr) {
-          // LOG_DEBUG("FILTER REAL ENVELOPE!!!");
-          if (!EnvFilter::testRealEnvValid(env_ptr, env_para_ptr)) {
+          if (!env_filter::testRealEnvValid(env_ptr, env_para_ptr)) {
             env_ptr = nullptr;
           } else {
             env_ptr->compScr(env_para_ptr);
-            // LOG_DEBUG("GOOD ENVELOPE FOUNDER!!!");
           }
         }
         env_ptrs[charge-1] = env_ptr;
@@ -167,7 +160,6 @@ MatchEnvPtr findBest(MatchEnvPtr2D &env_ptrs) {
 
 MatchEnvPtr deconv(double prec_win_size, PeakPtrVec &peak_list,
                   double prec_mz, int prec_charge, int argu_max_charge) {
-  LOG_DEBUG("Prec: " << prec_mz << " charge: " << prec_charge);
   if (prec_mz <= 0) {
     return nullptr;
   }
@@ -186,13 +178,6 @@ MatchEnvPtr deconv(double prec_win_size, PeakPtrVec &peak_list,
   LOG_DEBUG("Do filtering...");
   MatchEnvPtr env_ptr = findBest(match_envs);
   return env_ptr;
-  /*
-  if (env_ptr != nullptr) {
-    return env_ptr;->getRealEnvPtr();
-  } else {
-    return nullptr;
-  }
-  */
 }
 
 }

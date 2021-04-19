@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_TOPFD_ENV_PREC_ENV_HPP_
 #define TOPPIC_TOPFD_ENV_PREC_ENV_HPP_
 
@@ -23,7 +22,7 @@ namespace toppic {
 namespace prec_env {
 
 MatchEnvPtr deconv(double prec_win_size, PeakPtrVec &peak_list, 
-                  double prec_mz, int prec_charge, int argu_max_charge);
+                   double prec_mz, int prec_charge, int argu_max_charge);
 
 }  // namespace prec_env
 
