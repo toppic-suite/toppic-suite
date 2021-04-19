@@ -15,8 +15,7 @@
 #ifndef TOPPIC_MS_FACTORY_PRM_MS_UTIL_HPP_
 #define TOPPIC_MS_FACTORY_PRM_MS_UTIL_HPP_
 
-#include "para/sp_para.hpp"
-#include "ms/spec/deconv_ms.hpp"
+#include "para/peak_tolerance.hpp"
 #include "ms/spec/prm_ms.hpp"
 
 namespace toppic {

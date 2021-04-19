@@ -18,7 +18,6 @@
 #include "common/util/logger.hpp"
 #include "common/base/mass_constant.hpp"
 #include "ms/spec/base_peak_type.hpp"
-#include "ms/factory/prm_peak_factory.hpp"
 #include "ms/factory/prm_ms_factory.hpp"
 
 namespace toppic {

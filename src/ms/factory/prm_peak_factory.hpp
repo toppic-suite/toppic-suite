@@ -27,6 +27,7 @@ PrmPeakPtr getZeroPeakPtr(int spec_id, double prec_mono_mass,
 
 PrmPeakPtr getPrecPeakPtr(int spec_id, double prec_mono_mass,
                           PeakTolerancePtr tole_ptr, double score);
+
 }  // namespace prm_peak_factory
 
 }  // namespace toppic
