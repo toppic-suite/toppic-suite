@@ -17,30 +17,16 @@
 
 #include <string>
 
-#include "prsm/prsm_str.hpp"
-
 namespace toppic {
 
-class PrsmFdr {
- public:
-  PrsmFdr(const std::string &db_file_name,
-          const std::string &spec_file_name,
-          const std::string &input_file_ext,
-          const std::string &output_file_ext);
+namespace prsm_fdr {
 
-  void process();
- private:
-  std::string db_file_name_;
-  std::string spec_file_name_;
-  std::string input_file_ext_;
-  std::string output_file_ext_;
+void process(const std::string &spec_file_name,
+             const std::string &input_file_ext,
+             const std::string &output_file_ext);
 
-  void computeFdr(PrsmStrPtrVec &target, PrsmStrPtrVec &decoy);
-
-  void computeProteoformFdr(PrsmStrPtrVec2D &target, PrsmStrPtrVec2D &decoy);
-};
-typedef std::shared_ptr<PrsmFdr> PrsmFdrPtr;
+}
 
 }  // namespace toppic
 
-#endif /* PRSMFDR_HPP_ */
+#endif 

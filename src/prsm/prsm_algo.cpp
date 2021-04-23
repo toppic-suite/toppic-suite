@@ -164,7 +164,7 @@ int getLastResPos(double c_term_shift, const std::vector<double> &prm_masses) {
     }
   }
   if (best_pos < 0) {
-    LOG_ERROR("get last residue position error! ");
+    LOG_ERROR("Get last residue position error! ");
     exit(EXIT_FAILURE); 
   }
   return best_pos - 1;

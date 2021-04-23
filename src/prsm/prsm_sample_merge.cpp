@@ -16,7 +16,7 @@
 
 #include "common/base/mod_util.hpp"
 #include "seq/fasta_index_reader.hpp"
-#include "prsm/prsm_reader.hpp"
+#include "prsm/prsm_reader_util.hpp"
 #include "prsm/prsm_sample_merge.hpp"
 
 namespace toppic {
@@ -135,8 +135,9 @@ void PrsmSampleMerge::process() {
   size_t sample_num = input_file_names_.size();
   for (size_t k = 0; k < sample_num; k++) {
     std::string input_file_name = input_file_names_[k];
-    PrsmStrPtrVec prsms = PrsmReader::readAllPrsmStrsMatchSeq(input_file_name, seq_reader,
-                                                              fix_mod_ptr_vec);
+    PrsmStrPtrVec prsms = prsm_reader_util::readAllPrsmStrsMatchSeq(input_file_name, 
+                                                                    seq_reader,
+                                                                    fix_mod_ptr_vec);
     for (size_t i = 0; i < prsms.size(); i++) {
       prsms[i]->setSampleId(k);
     }

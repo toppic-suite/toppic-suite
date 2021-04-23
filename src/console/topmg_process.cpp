@@ -317,16 +317,14 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
     if (arguments["useFeatureFile"] == "true") {
       // TopFD msalign file with feature ID
       ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();
-      PrsmFeatureClusterPtr prsm_clusters
-          = std::make_shared<PrsmFeatureCluster>(db_file_name,
-                                                 sp_file_name,
-                                                 "topmg_top",
-                                                 "topmg_cluster",
-                                                 fix_mod_list,
-                                                 form_error_tole);
-      prsm_clusters->process();
-      prsm_clusters = nullptr;
-    } else {
+      prsm_feature_cluster::process(db_file_name,
+                                    sp_file_name,
+                                    "topmg_top",
+                                    "topmg_cluster",
+                                    fix_mod_list,
+                                    form_error_tole);
+    } 
+    else {
       PrsmSimpleClusterPtr prsm_clusters
           = std::make_shared<PrsmSimpleCluster>(db_file_name, sp_file_name,
                                                 "topmg_top", prsm_para_ptr->getFixModPtrVec(),
@@ -340,9 +338,7 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
 
     if (arguments["searchType"] == "TARGET+DECOY") {
       std::cout << "FDR computation - started. " << std::endl;
-      PrsmFdrPtr fdr = std::make_shared<PrsmFdr>(db_file_name, sp_file_name, "topmg_cluster", "topmg_cluster_fdr");
-      fdr->process();
-      fdr = nullptr;
+      prsm_fdr::process(sp_file_name, "topmg_cluster", "topmg_cluster_fdr");
       std::cout << "FDR computation - finished." << std::endl;
       cur_suffix = "topmg_cluster_fdr";
     }
@@ -350,11 +346,8 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
     std::string cutoff_type = arguments["cutoffSpectralType"];
     std::cout << "PrSM filtering by " << cutoff_type << " - started." << std::endl;
     double cutoff_value = std::stod(arguments["cutoffSpectralValue"]);
-    PrsmCutoffSelectorPtr cutoff_selector
-        = std::make_shared<PrsmCutoffSelector>(db_file_name, sp_file_name, cur_suffix,
-                                               "topmg_prsm_cutoff", cutoff_type, cutoff_value);
-    cutoff_selector->process();
-    cutoff_selector = nullptr;
+    prsm_cutoff_selector::process(db_file_name, sp_file_name, cur_suffix,
+                                  "topmg_prsm_cutoff", cutoff_type, cutoff_value);
     std::cout << "PrSM filtering by " << cutoff_type << " - finished." << std::endl;
 
     std::time_t end = time(nullptr);
@@ -390,18 +383,13 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
     cutoff_type = (arguments["cutoffProteoformType"] == "FDR") ? "FORMFDR": "EVALUE";
     std::cout << "PrSM filtering by " << cutoff_type << " - started." << std::endl;
     std::istringstream(arguments["cutoffProteoformValue"]) >> cutoff_value;
-    cutoff_selector = std::make_shared<PrsmCutoffSelector>(db_file_name, sp_file_name, cur_suffix,
-                                                           "topmg_form_cutoff", cutoff_type, cutoff_value);
-    cutoff_selector->process();
-    cutoff_selector = nullptr;
+    prsm_cutoff_selector::process(db_file_name, sp_file_name, cur_suffix,
+                                  "topmg_form_cutoff", cutoff_type, cutoff_value);
     std::cout << "PrSM filtering by " << cutoff_type << " - finished." << std::endl;
 
     std::cout << "Selecting top PrSMs for proteoforms - started." << std::endl;
-    PrsmFormFilterPtr form_filter
-        = std::make_shared<PrsmFormFilter>(db_file_name, sp_file_name, "topmg_form_cutoff",
-                                           "topmg_form_cutoff_form");
-    form_filter->process();
-    form_filter = nullptr;
+    prsm_form_filter::process(db_file_name, sp_file_name, "topmg_form_cutoff",
+                              "topmg_form_cutoff_form");
     std::cout << "Selecting top PrSMs for proteoforms - finished." << std::endl;
 
     std::cout << "Outputting proteoform table - started." << std::endl;

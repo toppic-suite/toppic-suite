@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_PRSM_PRSM_READER_HPP_
-#define TOPPIC_PRSM_PRSM_READER_HPP_
+#ifndef TOPPIC_PRSM_PRSM_READER_UTIL_HPP_
+#define TOPPIC_PRSM_PRSM_READER_UTIL_HPP_
 
 #include <fstream>
 
@@ -24,26 +24,20 @@
 
 namespace toppic {
 
-class PrsmReader {
- public:
-  explicit PrsmReader(const std::string &file_name);
+namespace prsm_reader_util {
 
-  ~PrsmReader();
+PrsmStrPtrVec readAllPrsmStrs(const std::string &input_file_name);
 
-  std::vector<std::string> readOnePrsmLines();
+PrsmStrPtrVec readAllPrsmStrsMatchSeq(const std::string &input_file_name,
+                                      FastaIndexReaderPtr fasta_reader_ptr,
+                                      const ModPtrVec fix_mod_list);
 
-  PrsmStrPtr readOnePrsmStr();
+PrsmPtrVec readAllPrsms(const std::string &prsm_file_name,
+                        const std::string &db_file_name,
+                        const ModPtrVec  &fix_mod_list);
 
-  PrsmPtr readOnePrsm(FastaIndexReaderPtr reader_ptr, const ModPtrVec fix_mod_list);
+}
 
-  void close();
-
- private:
-  std::ifstream input_;
-};
-
-typedef std::shared_ptr<PrsmReader> PrsmReaderPtr;
-typedef std::vector<PrsmReaderPtr> PrsmReaderPtrVec;
 
 } /* namespace toppic */
 

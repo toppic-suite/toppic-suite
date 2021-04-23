@@ -24,7 +24,6 @@
 #include "ms/spec/extend_ms.hpp"
 #include "prsm/peak_ion_pair.hpp"
 
-
 namespace toppic {
 
 namespace peak_ion_pair_util {

@@ -19,38 +19,16 @@
 
 namespace toppic {
 
-class PrsmFeatureCluster {
- public:
-  PrsmFeatureCluster(const std::string &db_file_name,
-                     const std::string &spec_file_name,
-                     const std::string &input_file_ext,
-                     const std::string &output_file_ext,
-                     const ModPtrVec &fix_mod_ptr_vec,
-                     double prec_error_tole); 
+namespace prsm_feature_cluster {
 
-  void process();
+void process(const std::string &db_file_name,
+             const std::string &spec_file_name,
+             const std::string &input_file_ext,
+             const std::string &output_file_ext,
+             const ModPtrVec &fix_mod_ptr_vec,
+             double prec_error_tole); 
 
- private:
-  std::string db_file_name_;
-
-  std::string spec_file_name_;
-
-  std::string feature_file_name_;
-
-  std::string input_file_ext_;
-
-  std::string output_file_ext_;
-
-  ModPtrVec fix_mod_ptr_vec_;
-
-  double prec_error_tole_;
-
-  void setProtId(PrsmStrPtrVec & prsm_ptrs);
-
-  void setProteoClusterId(PrsmStrPtrVec & prsm_ptrs);
-};
-
-typedef std::shared_ptr<PrsmFeatureCluster> PrsmFeatureClusterPtr;
+}
 
 }  // namespace toppic
 

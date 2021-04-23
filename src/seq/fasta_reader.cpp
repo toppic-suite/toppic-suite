@@ -67,7 +67,9 @@ FastaSeqPtr FastaReader::getNextSeq() {
 }
 
 void FastaReader::close() {
-  input_.close();
+  if (input_.is_open()) {
+    input_.close();
+  }
 }
 
 }  // namespace toppic

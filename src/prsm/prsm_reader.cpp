@@ -24,6 +24,12 @@ PrsmReader::PrsmReader(const std::string &file_name) {
   input_.open(file_name.c_str(), std::ios::in);
 }
 
+PrsmReader::~PrsmReader() {
+  if (input_.is_open()) {
+    input_.close();
+  }
+}
+
 std::vector<std::string> PrsmReader::readOnePrsmLines() {
   std::string line;
   std::vector<std::string> line_list;
@@ -81,53 +87,9 @@ PrsmPtr PrsmReader::readOnePrsm(FastaIndexReaderPtr reader_ptr,
 }
 
 void PrsmReader::close() {
-  input_.close();
-}
-
-PrsmStrPtrVec PrsmReader::readAllPrsmStrs(const std::string &input_file_name) {
-  PrsmReader reader(input_file_name);
-  PrsmStrPtrVec prsm_str_ptrs;
-  PrsmStrPtr prsm_str_ptr = reader.readOnePrsmStr();
-  while (prsm_str_ptr != nullptr) {
-    prsm_str_ptrs.push_back(prsm_str_ptr);
-    prsm_str_ptr = reader.readOnePrsmStr();
+  if (input_.is_open()) {
+    input_.close();
   }
-  reader.close();
-  return prsm_str_ptrs;
-}
-
-PrsmStrPtrVec PrsmReader::readAllPrsmStrsMatchSeq(const std::string &input_file_name,
-                                                  FastaIndexReaderPtr fasta_reader_ptr,
-                                                  const ModPtrVec fix_mod_list) {
-  PrsmReaderPtr str_reader = std::make_shared<PrsmReader>(input_file_name);
-  PrsmReaderPtr prsm_reader = std::make_shared<PrsmReader>(input_file_name);
-  PrsmStrPtrVec prsm_str_ptrs;
-  PrsmStrPtr prsm_str_ptr = str_reader->readOnePrsmStr();
-  PrsmPtr prsm_ptr = prsm_reader->readOnePrsm(fasta_reader_ptr, fix_mod_list);
-  while (prsm_str_ptr != nullptr) {
-    prsm_str_ptr->setProteinMatchSeq(prsm_ptr->getProteoformPtr()->getProteinMatchSeq());
-    prsm_str_ptrs.push_back(prsm_str_ptr);
-    prsm_str_ptr = str_reader->readOnePrsmStr();
-    prsm_ptr = prsm_reader->readOnePrsm(fasta_reader_ptr, fix_mod_list);
-  }
-  str_reader->close();
-  prsm_reader->close();
-  return prsm_str_ptrs;
-}
-
-PrsmPtrVec PrsmReader::readAllPrsms(const std::string &prsm_file_name,
-                                    const std::string &db_file_name,
-                                    const ModPtrVec  &fix_mod_list) {
-  FastaIndexReaderPtr fasta_reader_ptr = std::make_shared<FastaIndexReader>(db_file_name);
-  PrsmReader reader(prsm_file_name);
-  PrsmPtrVec prsm_ptrs;
-  PrsmPtr prsm_ptr = reader.readOnePrsm(fasta_reader_ptr, fix_mod_list);
-  while (prsm_ptr != nullptr) {
-    prsm_ptrs.push_back(prsm_ptr);
-    prsm_ptr = reader.readOnePrsm(fasta_reader_ptr, fix_mod_list);
-  }
-  reader.close();
-  return prsm_ptrs;
 }
 
 }  // namespace toppic

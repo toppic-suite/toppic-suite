@@ -25,6 +25,7 @@
 #include "ms/factory/extend_ms_factory.hpp"
 #include "ms/factory/spectrum_set_factory.hpp"
 #include "prsm/prsm_reader.hpp"
+#include "prsm/prsm_reader_util.hpp"
 #include "prsm/prsm_util.hpp"
 #include "prsm/prsm_cluster.hpp"
 #include "prsm/prsm_xml_writer.hpp"
@@ -180,7 +181,7 @@ void XmlGenerator::outputProteoforms(){
     std::string input_file_name = file_util::basename(spectrum_file_name) 
         + ".proteoform_" + str_util::toString(cluster_ids_[i]);
     PrsmPtrVec select_prsm_ptrs 
-        = PrsmReader::readAllPrsms(input_file_name, db_file_name, fix_mod_ptr_vec);
+        = prsm_reader_util::readAllPrsms(input_file_name, db_file_name, fix_mod_ptr_vec);
     for (size_t k = 0; k < select_prsm_ptrs.size(); k++) {
       select_prsm_ptrs[k]->setDeconvMsPtrVec(
           deconv_ms_vec2d_[spec_id_extend_ms_map_[select_prsm_ptrs[k]->getSpectrumId()]]);
@@ -274,7 +275,8 @@ void XmlGenerator::outputProteins() {
     int prot_id = prot_ids_[i]; 
     std::string input_file_name = file_util::basename(spectrum_file_name) 
         + ".prot_" + str_util::toString(prot_id);
-    PrsmPtrVec prsm_ptrs = PrsmReader::readAllPrsms(input_file_name, db_file_name, fix_mod_ptr_vec);
+    PrsmPtrVec prsm_ptrs 
+        = prsm_reader_util::readAllPrsms(input_file_name, db_file_name, fix_mod_ptr_vec);
     for (size_t k = 0; k < prsm_ptrs.size(); k++) {
       prsm_ptrs[k]->setDeconvMsPtrVec(
           deconv_ms_vec2d_[spec_id_extend_ms_map_[prsm_ptrs[k]->getSpectrumId()]]);
@@ -314,7 +316,8 @@ void XmlGenerator::outputAllProteins() {
         << std::ceil(cnt / 3.0) << " proteins.\r";
     std::string input_file_name = file_util::basename(spectrum_file_name) 
         + ".prot_" + str_util::toString(prot_ids_[i]);
-    PrsmPtrVec prsm_ptrs = PrsmReader::readAllPrsms(input_file_name, db_file_name, fix_mod_ptr_vec);
+    PrsmPtrVec prsm_ptrs 
+        = prsm_reader_util::readAllPrsms(input_file_name, db_file_name, fix_mod_ptr_vec);
     for (size_t k = 0; k < prsm_ptrs.size(); k++) {
       prsm_ptrs[k]->setDeconvMsPtrVec(
           deconv_ms_vec2d_[spec_id_extend_ms_map_[prsm_ptrs[k]->getSpectrumId()]]);
@@ -337,7 +340,8 @@ void XmlGenerator::outputAllProteins() {
     int prot_id = best_prsm_vec[i]->getProteoformPtr()->getProtId();
     std::string input_file_name = file_util::basename(spectrum_file_name) 
         + ".prot_" + str_util::toString(prot_id);
-    PrsmPtrVec prsm_ptrs = PrsmReader::readAllPrsms(input_file_name, db_file_name, fix_mod_ptr_vec);
+    PrsmPtrVec prsm_ptrs 
+        = prsm_reader_util::readAllPrsms(input_file_name, db_file_name, fix_mod_ptr_vec);
     std::vector<int> cluster = prsm_util::getClusterIds(prsm_ptrs);
     if (!cluster.empty()) {
       prot_elements->appendChild(

@@ -19,29 +19,16 @@
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
-#include "prsm/prsm_reader.hpp"
+#include "prsm/prsm_reader_util.hpp"
 #include "prsm/prsm_util.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_feature_cluster.hpp"
 
 namespace toppic {
 
-PrsmFeatureCluster::PrsmFeatureCluster(const std::string &db_file_name,
-                                       const std::string &spec_file_name,
-                                       const std::string &input_file_ext,
-                                       const std::string &output_file_ext,
-                                       const ModPtrVec &fix_mod_ptr_vec,
-                                       double prec_error_tole):
-    db_file_name_(db_file_name),
-    spec_file_name_(spec_file_name),
-    input_file_ext_(input_file_ext),
-    output_file_ext_(output_file_ext),
-    fix_mod_ptr_vec_(fix_mod_ptr_vec),
-    prec_error_tole_(prec_error_tole) {
-      feature_file_name_ = file_util::basename(spec_file_name) + ".feature";
-    }
+namespace prsm_feature_cluster {
 
-void PrsmFeatureCluster::setProtId(PrsmStrPtrVec& prsm_ptrs) {
+void setProtId(PrsmStrPtrVec& prsm_ptrs) {
   std::vector<PrsmStrPtrVec> proteins;
   std::vector<std::string> protein_names;
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
@@ -69,7 +56,8 @@ void PrsmFeatureCluster::setProtId(PrsmStrPtrVec& prsm_ptrs) {
   }
 }
 
-void PrsmFeatureCluster::setProteoClusterId(PrsmStrPtrVec& prsm_ptrs) {
+void setProteoClusterId(PrsmStrPtrVec& prsm_ptrs,
+                        double prec_error_tole) {
   std::vector<PrsmStrPtrVec> clusters;
   int prsm_count = prsm_ptrs.size();
   
@@ -84,7 +72,8 @@ void PrsmFeatureCluster::setProteoClusterId(PrsmStrPtrVec& prsm_ptrs) {
           is_found = true;
           break;
         }
-        if (std::abs(cur_ptr->getAdjustedPrecMass() - ref_ptr->getAdjustedPrecMass()) <= prec_error_tole_) {
+        if (std::abs(cur_ptr->getAdjustedPrecMass() - ref_ptr->getAdjustedPrecMass()) 
+            <= prec_error_tole) {
           clusters[j].push_back(cur_ptr);
           //LOG_DEBUG("Proteoform merging by mass!");
           is_found = true;
@@ -115,27 +104,37 @@ void PrsmFeatureCluster::setProteoClusterId(PrsmStrPtrVec& prsm_ptrs) {
   }
 }
 
-void PrsmFeatureCluster::process() {
-  std::string base_name = file_util::basename(spec_file_name_);
-  std::string input_file_name = base_name + "." + input_file_ext_;
-  FastaIndexReaderPtr seq_reader = std::make_shared<FastaIndexReader>(db_file_name_);
-  PrsmStrPtrVec prsm_ptrs = PrsmReader::readAllPrsmStrsMatchSeq(input_file_name, seq_reader,
-                                                                fix_mod_ptr_vec_);
+void process(const std::string &db_file_name,
+             const std::string &spec_file_name,
+             const std::string &input_file_ext,
+             const std::string &output_file_ext,
+             const ModPtrVec &fix_mod_ptr_vec,
+             double prec_error_tole) {
+  std::string base_name = file_util::basename(spec_file_name);
+  std::string input_file_name = base_name + "." + input_file_ext;
+  FastaIndexReaderPtr seq_reader = std::make_shared<FastaIndexReader>(db_file_name);
+  PrsmStrPtrVec prsm_ptrs = prsm_reader_util::readAllPrsmStrsMatchSeq(input_file_name, 
+                                                                      seq_reader,
+                                                                      fix_mod_ptr_vec);
 
-  prsm_util::addFeatureIDToPrsms(prsm_ptrs, feature_file_name_);
+  std::string feature_file_name = base_name + ".feature";
+  prsm_util::addFeatureIDToPrsms(prsm_ptrs, feature_file_name);
   // remove prsms without feature
   PrsmStrPtrVec filtered_prsm_ptrs;
   prsm_util::removePrsmsWithoutFeature(prsm_ptrs, filtered_prsm_ptrs);
   std::sort(filtered_prsm_ptrs.begin(), filtered_prsm_ptrs.end(), PrsmStr::cmpEValueInc);
 
   setProtId(filtered_prsm_ptrs);
-  setProteoClusterId(filtered_prsm_ptrs);
-  std::sort(filtered_prsm_ptrs.begin(), filtered_prsm_ptrs.end(), PrsmStr::cmpSpectrumIdIncPrecursorIdInc);
+  setProteoClusterId(filtered_prsm_ptrs, prec_error_tole);
+  std::sort(filtered_prsm_ptrs.begin(), filtered_prsm_ptrs.end(), 
+            PrsmStr::cmpSpectrumIdIncPrecursorIdInc);
   // output
-  std::string output_file_name = base_name + "." + output_file_ext_;
+  std::string output_file_name = base_name + "." + output_file_ext;
   PrsmXmlWriter writer(output_file_name);
   writer.writeVector(filtered_prsm_ptrs);
   writer.close();
+}
+
 }
 
 }  // namespace toppic

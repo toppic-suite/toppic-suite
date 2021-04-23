@@ -16,7 +16,7 @@
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
-#include "prsm/prsm_reader.hpp"
+#include "prsm/prsm_reader_util.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_simple_cluster.hpp"
 
@@ -100,7 +100,7 @@ void PrsmSimpleCluster::process() {
   std::string base_name = file_util::basename(spec_file_name_);
   std::string input_file_name = base_name + "." + input_file_ext_;
   LOG_DEBUG("Reading prsm strings started");
-  PrsmStrPtrVec prsm_ptrs = PrsmReader::readAllPrsmStrs(input_file_name);
+  PrsmStrPtrVec prsm_ptrs = prsm_reader_util::readAllPrsmStrs(input_file_name);
   LOG_DEBUG("Reading prsm strings finished");
   sort(prsm_ptrs.begin(), prsm_ptrs.end(), PrsmStr::cmpEValueInc);
   PrsmStrPtrVec2D protein_prsms = setProtId(prsm_ptrs);

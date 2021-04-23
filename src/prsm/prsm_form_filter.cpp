@@ -15,28 +15,26 @@
 #include <algorithm>
 
 #include "common/util/file_util.hpp"
-#include "prsm/prsm_reader.hpp"
+#include "prsm/prsm_reader_util.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_form_filter.hpp"
 
 namespace toppic {
 
-PrsmFormFilter::PrsmFormFilter(const std::string &db_file_name,
-                               const std::string &spec_file_name,
-                               const std::string &input_file_ext,
-                               const std::string &output_file_ext):
-    db_file_name_(db_file_name),
-    spec_file_name_(spec_file_name),
-    input_file_ext_(input_file_ext),
-    output_file_ext_(output_file_ext) {}
+namespace prsm_form_filter {
 
-void PrsmFormFilter::process() {
-  std::string base_name = file_util::basename(spec_file_name_);
-  std::string input_file_name = base_name + "." + input_file_ext_;
+void process(const std::string &db_file_name,
+             const std::string &spec_file_name,
+             const std::string &input_file_ext,
+             const std::string &output_file_ext) {
 
-  // PrsmStrPtrVec prsms = PrsmReader::readAllPrsmStrs(input_file_name);
+  std::string base_name = file_util::basename(spec_file_name);
+  std::string input_file_name = base_name + "." + input_file_ext;
+
   ModPtrVec fix_mod_list;
-  PrsmPtrVec prsms = PrsmReader::readAllPrsms(input_file_name, db_file_name_, fix_mod_list);
+  PrsmPtrVec prsms = prsm_reader_util::readAllPrsms(input_file_name, 
+                                                    db_file_name, 
+                                                    fix_mod_list);
 
   std::sort(prsms.begin(), prsms.end(), Prsm::cmpEValueInc);
 
@@ -58,11 +56,13 @@ void PrsmFormFilter::process() {
   }
 
   // output
-  std::string output_file_name = base_name + "." + output_file_ext_;
+  std::string output_file_name = base_name + "." + output_file_ext;
   PrsmXmlWriter writer(output_file_name);
   std::sort(selected_forms.begin(), selected_forms.end(), Prsm::cmpSpectrumIdIncPrecursorIdInc);
   writer.writeVector(selected_forms);
   writer.close();
+}
+
 }
 
 } /* namespace toppic */
