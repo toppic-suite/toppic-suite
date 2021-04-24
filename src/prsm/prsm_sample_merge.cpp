@@ -21,20 +21,11 @@
 
 namespace toppic {
 
-PrsmSampleMerge::PrsmSampleMerge(const std::string &db_file_name,
-                                 const std::vector<std::string> &input_file_names,
-                                 const std::string &output_file_name,
-                                 const std::string &fix_mod,
-                                 double error_tole):
-    db_file_name_(db_file_name),
-    input_file_names_(input_file_names),
-    output_file_name_(output_file_name),
-    fix_mod_(fix_mod),
-    error_tole_(error_tole) {}
+namespace prsm_sample_merge {
 
-
-void PrsmSampleMerge::getPrsmClusters(PrsmStrPtrVec& prsm_ptrs,
-                                      PrsmStrPtrVec2D& clusters) {
+void getPrsmClusters(PrsmStrPtrVec& prsm_ptrs,
+                     PrsmStrPtrVec2D& clusters, 
+                     double error_tole) {
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     bool is_found = false;
     PrsmStrPtr cur_ptr = prsm_ptrs[i];
@@ -42,7 +33,7 @@ void PrsmSampleMerge::getPrsmClusters(PrsmStrPtrVec& prsm_ptrs,
       PrsmStrPtr ref_ptr = clusters[j][0];
       if (cur_ptr->getProtId() == ref_ptr->getProtId()) {
         if (std::abs(cur_ptr->getAdjustedPrecMass() - ref_ptr->getAdjustedPrecMass()) 
-            <= error_tole_) {
+            <= error_tole) {
           clusters[j].push_back(cur_ptr);
           is_found = true;
           break;
@@ -61,10 +52,9 @@ void PrsmSampleMerge::getPrsmClusters(PrsmStrPtrVec& prsm_ptrs,
   }
 }
 
-
-void PrsmSampleMerge::convertClustersToTable(PrsmStrPtrVec2D &clusters, 
-                                             PrsmStrPtrVec2D &table_prsms,
-                                             int sample_num) {
+void convertClustersToTable(PrsmStrPtrVec2D &clusters, 
+                            PrsmStrPtrVec2D &table_prsms,
+                            int sample_num) {
   int cluster_num = clusters.size();
   PrsmStrPtr null_prsm = nullptr;
   for (int i = 0; i < cluster_num; i++) {
@@ -78,11 +68,13 @@ void PrsmSampleMerge::convertClustersToTable(PrsmStrPtrVec2D &clusters,
   }
 }
 
-void PrsmSampleMerge::outputTable(PrsmStrPtrVec2D &clusters,
-                                  PrsmStrPtrVec2D &table_prsms,
-                                  int sample_num) {
+void outputTable(PrsmStrPtrVec2D &clusters,
+                 PrsmStrPtrVec2D &table_prsms,
+                 int sample_num,
+                 const std::vector<std::string> &input_file_names,
+                 const std::string &output_file_name) {
   std::ofstream file;
-  file.open(output_file_name_.c_str());
+  file.open(output_file_name.c_str());
   // write title
   file << "Protein accession" << ","
       << "Protein description" << ","
@@ -94,8 +86,8 @@ void PrsmSampleMerge::outputTable(PrsmStrPtrVec2D &clusters,
       << "#unexpected modifications" << ",";
 
   for (int i = 0; i < sample_num; i++) {
-    file << input_file_names_[i] << " abundance" << ","
-        << input_file_names_[i] << " E-value" << ",";
+    file << input_file_names[i] << " abundance" << ","
+        << input_file_names[i] << " E-value" << ",";
   }
   file << std::endl;
   int cluster_num = clusters.size();
@@ -128,13 +120,17 @@ void PrsmSampleMerge::outputTable(PrsmStrPtrVec2D &clusters,
   file.close();
 }
 
-void PrsmSampleMerge::process() {
-  FastaIndexReaderPtr seq_reader = std::make_shared<FastaIndexReader>(db_file_name_);
-  ModPtrVec fix_mod_ptr_vec = mod_util::geneFixedModList(fix_mod_);
+void process(const std::string &db_file_name,
+             const std::vector<std::string> &input_file_names,
+             const std::string &output_file_name,
+             const std::string &fix_mod,
+             double error_tole) {
+  FastaIndexReaderPtr seq_reader = std::make_shared<FastaIndexReader>(db_file_name);
+  ModPtrVec fix_mod_ptr_vec = mod_util::geneFixedModList(fix_mod);
   PrsmStrPtrVec all_prsms; 
-  size_t sample_num = input_file_names_.size();
+  size_t sample_num = input_file_names.size();
   for (size_t k = 0; k < sample_num; k++) {
-    std::string input_file_name = input_file_names_[k];
+    std::string input_file_name = input_file_names[k];
     PrsmStrPtrVec prsms = prsm_reader_util::readAllPrsmStrsMatchSeq(input_file_name, 
                                                                     seq_reader,
                                                                     fix_mod_ptr_vec);
@@ -145,11 +141,13 @@ void PrsmSampleMerge::process() {
   }
   std::sort(all_prsms.begin(), all_prsms.end(), PrsmStr::cmpEValueInc);
   PrsmStrPtrVec2D clusters; 
-  getPrsmClusters(all_prsms, clusters);
+  getPrsmClusters(all_prsms, clusters, error_tole);
   
   PrsmStrPtrVec2D table_prsms; 
   convertClustersToTable(clusters, table_prsms, sample_num);
-  outputTable(clusters, table_prsms, sample_num);
+  outputTable(clusters, table_prsms, sample_num, input_file_names, output_file_name);
+}
+
 }
 
 }  // namespace toppic

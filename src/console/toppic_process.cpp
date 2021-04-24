@@ -367,13 +367,11 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
                                     "toppic_cluster",
                                     fix_mod_list,
                                     form_error_tole);
-    } else {
-      PrsmSimpleClusterPtr prsm_clusters
-          = std::make_shared<PrsmSimpleCluster>(db_file_name, sp_file_name,
-                                                "toppic_top", prsm_para_ptr->getFixModPtrVec(),
-                                                "toppic_cluster", form_error_tole);
-      prsm_clusters->process();
-      prsm_clusters = nullptr;
+    } 
+    else {
+      prsm_simple_cluster::process(db_file_name, sp_file_name,
+                                   "toppic_top", prsm_para_ptr->getFixModPtrVec(),
+                                   "toppic_cluster", form_error_tole);
     }
     std::cout << "Finding PrSM clusters - finished." << std::endl;
     std::string cur_suffix = "toppic_cluster";

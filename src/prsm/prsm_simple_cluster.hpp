@@ -22,32 +22,16 @@
 
 namespace toppic {
 
-class PrsmSimpleCluster {
- public:
-  PrsmSimpleCluster(const std::string &db_file_name,
-                    const std::string &spec_file_name,
-                    const std::string &input_file_ext,
-                    const ModPtrVec &fix_mod_ptr_vec,
-                    const std::string &output_file_ext,
-                    double error_tole);
+namespace prsm_simple_cluster {
 
-  void process();
+void process(const std::string &db_file_name,
+             const std::string &spec_file_name,
+             const std::string &input_file_ext,
+             const ModPtrVec &fix_mod_ptr_vec,
+             const std::string &output_file_ext,
+             double error_tole);
 
- private:
-  std::string db_file_name_;
-  std::string spec_file_name_;
-  std::string input_file_ext_;
-  ModPtrVec fix_mod_ptr_vec_;
-  std::string output_file_ext_;
-  ResiduePtrVec residue_ptr_vec_;
-  double error_tole_;
-
-  PrsmStrPtrVec2D setProtId(PrsmStrPtrVec& prsm_ptrs);
-
-  void setClusterId(PrsmStrPtrVec2D& protein_prsms);
-};
-
-typedef std::shared_ptr<PrsmSimpleCluster> PrsmSimpleClusterPtr;
+}
 
 }  // namespace toppic
 

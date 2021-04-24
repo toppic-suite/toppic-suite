@@ -22,20 +22,9 @@
 
 namespace toppic {
 
-PrsmSimpleCluster::PrsmSimpleCluster(const std::string &db_file_name,
-                                     const std::string &spec_file_name,
-                                     const std::string &input_file_ext,
-                                     const ModPtrVec &fix_mod_ptr_vec,
-                                     const std::string &output_file_ext,
-                                     double error_tole):
-    db_file_name_(db_file_name),
-    spec_file_name_(spec_file_name),
-    input_file_ext_(input_file_ext),
-    fix_mod_ptr_vec_(fix_mod_ptr_vec),
-    output_file_ext_(output_file_ext),
-    error_tole_(error_tole) {}
+namespace prsm_simple_cluster {
 
-PrsmStrPtrVec2D PrsmSimpleCluster::setProtId(PrsmStrPtrVec& prsm_ptrs) {
+PrsmStrPtrVec2D setProtId(PrsmStrPtrVec& prsm_ptrs) {
   PrsmStrPtrVec2D proteins;
   std::vector<std::string> protein_names;
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
@@ -64,9 +53,8 @@ PrsmStrPtrVec2D PrsmSimpleCluster::setProtId(PrsmStrPtrVec& prsm_ptrs) {
   return proteins;
 }
 
-void PrsmSimpleCluster::setClusterId(PrsmStrPtrVec2D & proteins) {
+void setClusterId(PrsmStrPtrVec2D & proteins, double error_tole) {
   PrsmStrPtrVec2D clusters; 
-
   for (size_t i = 0; i < proteins.size(); i++) {
     PrsmStrPtrVec2D protein_clusters;
     for (size_t j = 0; j < proteins[i].size(); j++) {
@@ -74,7 +62,7 @@ void PrsmSimpleCluster::setClusterId(PrsmStrPtrVec2D & proteins) {
       PrsmStrPtr cur_prsm = proteins[i][j];
       for (size_t m = 0; m < protein_clusters.size(); m++) {
         PrsmStrPtr ref_prsm = protein_clusters[m][0]; 
-        if (PrsmStr::isSimpleMatch(cur_prsm, ref_prsm, error_tole_)) {
+        if (PrsmStr::isSimpleMatch(cur_prsm, ref_prsm, error_tole)) {
           protein_clusters[m].push_back(cur_prsm);
           is_found = true;
           break;
@@ -96,21 +84,28 @@ void PrsmSimpleCluster::setClusterId(PrsmStrPtrVec2D & proteins) {
   }
 }
 
-void PrsmSimpleCluster::process() {
-  std::string base_name = file_util::basename(spec_file_name_);
-  std::string input_file_name = base_name + "." + input_file_ext_;
+void process(const std::string &db_file_name,
+             const std::string &spec_file_name,
+             const std::string &input_file_ext,
+             const ModPtrVec &fix_mod_ptr_vec,
+             const std::string &output_file_ext,
+             double error_tole)  {
+  std::string base_name = file_util::basename(spec_file_name);
+  std::string input_file_name = base_name + "." + input_file_ext;
   LOG_DEBUG("Reading prsm strings started");
   PrsmStrPtrVec prsm_ptrs = prsm_reader_util::readAllPrsmStrs(input_file_name);
   LOG_DEBUG("Reading prsm strings finished");
   sort(prsm_ptrs.begin(), prsm_ptrs.end(), PrsmStr::cmpEValueInc);
   PrsmStrPtrVec2D protein_prsms = setProtId(prsm_ptrs);
-  setClusterId(protein_prsms);
+  setClusterId(protein_prsms, error_tole);
   sort(prsm_ptrs.begin(), prsm_ptrs.end(), PrsmStr::cmpSpectrumIdIncPrecursorIdInc);
   // output
-  std::string output_file_name = base_name + "." + output_file_ext_;
+  std::string output_file_name = base_name + "." + output_file_ext;
   PrsmXmlWriter writer(output_file_name);
   writer.writeVector(prsm_ptrs);
   writer.close();
+}
+
 }
 
 }  // namespace toppic
