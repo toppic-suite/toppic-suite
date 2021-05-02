@@ -21,17 +21,10 @@
 
 namespace toppic {
 
-PrsmTopSelector::PrsmTopSelector(const std::string &db_file_name,
-                                 const std::string &spec_file_name,
-                                 const std::string &in_file_ext, 
-                                 const std::string &out_file_ext, int n_top): 
-    spec_file_name_(spec_file_name), 
-    db_file_name_(db_file_name),
-    input_file_ext_(in_file_ext),
-    output_file_ext_(out_file_ext),
-    n_top_(n_top) {}
+namespace prsm_top_selector {
 
-bool containsSameFastaSeq(const PrsmStrPtrVec prsm_ptrs, PrsmStrPtr target_prsm_ptr) {
+bool containsSameFastaSeq(const PrsmStrPtrVec prsm_ptrs, 
+                          PrsmStrPtr target_prsm_ptr) {
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     if (prsm_ptrs[i]->getSeqName() == target_prsm_ptr->getSeqName()) {
       return true;
@@ -53,13 +46,17 @@ PrsmStrPtrVec getTopPrsms(PrsmStrPtrVec &prsm_str_ptrs, int n_top) {
   return result_ptrs;
 }
 
-void PrsmTopSelector::process() {
-  std::string base_name = file_util::basename(spec_file_name_);
-  std::string input_file_name = base_name+"."+input_file_ext_;
+void process(const std::string &spec_file_name,
+             const std::string &input_file_ext, 
+             const std::string &output_file_ext, 
+             int n_top) { 
+
+  std::string base_name = file_util::basename(spec_file_name);
+  std::string input_file_name = base_name+"."+input_file_ext;
   PrsmReader reader(input_file_name);
   PrsmStrPtr prsm_str_ptr = reader.readOnePrsmStr();
 
-  PrsmXmlWriter writer(base_name +"."+output_file_ext_);
+  PrsmXmlWriter writer(base_name +"."+output_file_ext);
 
   int spec_id = 0;
   while (prsm_str_ptr != nullptr) {
@@ -68,7 +65,7 @@ void PrsmTopSelector::process() {
       cur_str_ptrs.push_back(prsm_str_ptr);
       prsm_str_ptr = reader.readOnePrsmStr();
     }
-    PrsmStrPtrVec result_ptrs = getTopPrsms(cur_str_ptrs, n_top_);
+    PrsmStrPtrVec result_ptrs = getTopPrsms(cur_str_ptrs, n_top);
     for (size_t i = 0; i < result_ptrs.size(); i++) {
       writer.write(result_ptrs[i]);
     }
@@ -78,6 +75,8 @@ void PrsmTopSelector::process() {
 
   reader.close();
   writer.close();
+}
+
 }
 
 } /* namespace toppic */

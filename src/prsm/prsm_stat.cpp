@@ -28,8 +28,9 @@ namespace prsm_stat {
 
 int countCoverage(const std::vector<bool> &match_ion_vec, int start, int end) {
   int count = 0;
-  for (size_t i = 0; i < match_ion_vec.size(); i++) {
-    if (static_cast<int>(i) >= start && static_cast<int>(i) < end && match_ion_vec[i]) {
+  int size = static_cast<int>(match_ion_vec.size());
+  for (int i = 0; i < size; i++) {
+    if (i >= start && i < end && match_ion_vec[i]) {
       count++;
     }
   }

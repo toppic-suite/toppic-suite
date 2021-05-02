@@ -122,8 +122,8 @@ XmlDOMElement* Prsm::toXmlElement(XmlDOMDocument* xml_doc) {
   str = str_util::toString(getNormMatchFragNum());
   xml_doc->addElement(element, "norm_match_fragment_num", str.c_str());
   proteoform_ptr_->appendXml(xml_doc, element);
-  if (extreme_value_ptr_ != nullptr) {
-    extreme_value_ptr_->appendXml(xml_doc, element);
+  if (expected_value_ptr_ != nullptr) {
+    expected_value_ptr_->appendXml(xml_doc, element);
   }
   return element;
 }
@@ -154,34 +154,34 @@ void Prsm::parseXml(XmlDOMElement *element) {
   if (prob_count != 0) {
     XmlDOMElement* prob_element
         = xml_dom_util::getChildElement(element, "extreme_value", 0);
-    extreme_value_ptr_ = std::make_shared<ExtremeValue>(prob_element);
+    expected_value_ptr_ = std::make_shared<ExpectedValue>(prob_element);
   }
 }
 
 double Prsm::getEValue() {
-  if (extreme_value_ptr_ == nullptr) {
+  if (expected_value_ptr_ == nullptr) {
     LOG_WARN("Probability pointer is null.");
     return -1;
   } else {
-    return extreme_value_ptr_->getEValue();
+    return expected_value_ptr_->getEValue();
   }
 }
 
 double Prsm::getPValue() {
-  if (extreme_value_ptr_ == nullptr) {
+  if (expected_value_ptr_ == nullptr) {
     LOG_WARN("Probability pointer is null.");
     return -1;
   } else {
-    return extreme_value_ptr_->getPValue();
+    return expected_value_ptr_->getPValue();
   }
 }
 
 double Prsm::getOneProtProb() {
-  if (extreme_value_ptr_ == nullptr) {
+  if (expected_value_ptr_ == nullptr) {
     LOG_WARN("Probability pointer is null.");
     return -1;
   } else {
-    return extreme_value_ptr_->getOneProtProb();
+    return expected_value_ptr_->getOneProtProb();
   }
 }
 

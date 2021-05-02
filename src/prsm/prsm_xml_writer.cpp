@@ -29,6 +29,12 @@ PrsmXmlWriter::PrsmXmlWriter(const std::string &file_name) {
   file_name_ = file_util::basename(file_name) + ".msalign";
 }
 
+PrsmXmlWriter::~PrsmXmlWriter() {
+  if (file_.is_open()) {
+    close();
+  }
+}
+
 void PrsmXmlWriter::close() {
   file_ << "</prsm_list>" << std::endl;
   file_.close();
@@ -56,9 +62,7 @@ void PrsmXmlWriter::write(PrsmPtr prsm_ptr) {
       prsm_ptr->setFileName(file_name_);
     }
     XmlDOMElement* element = prsm_ptr->toXmlElement(&doc);
-    // LOG_DEBUG("Element generated");
     std::string str = xml_dom_util::writeToString(serializer, element);
-    // LOG_DEBUG("String generated");
     xml_dom_util::writeToStreamByRemovingDoubleLF(file_, str);
     element->release();
     serializer->release();

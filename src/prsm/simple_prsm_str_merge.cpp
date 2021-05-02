@@ -82,7 +82,6 @@ void SimplePrsmStrMerge::process() {
   int spec_id = 0;
   bool finish = false;
   while (!finish) {
-    // LOG_DEBUG("spec id " << spec_id << " input num " << input_num);
     finish = true;
     SimplePrsmStrPtrVec cur_str_ptrs;
     for (size_t i = 0; i < input_num; i++) {
@@ -95,7 +94,6 @@ void SimplePrsmStrMerge::process() {
         }
       }
     }
-    // LOG_DEBUG("finish " << finish);
 
     if (cur_str_ptrs.size() > 0) {
       std::sort(cur_str_ptrs.begin(), cur_str_ptrs.end(), SimplePrsmStr::cmpScoreDec);

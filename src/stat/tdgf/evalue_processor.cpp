@@ -66,11 +66,11 @@ std::function<void()> geneTask(SpectrumSetPtr spec_set_ptr,
 
     for (unsigned i = 0; i < prsm_vec.size(); i++) {
       if (std::round(prsm_vec[i]->getMatchFragNum()) <= std::round(mng_ptr->comp_evalue_min_match_frag_num_)) {
-        prsm_vec[i]->setExtremeValuePtr(ExtremeValue::getMaxEvaluePtr());
+        prsm_vec[i]->setExpectedValuePtr(ExpectedValue::getMaxEvaluePtr());
       } else {
         if (prsm_vec[i]->getEValue() == 0.0) {
           LOG_WARN("Invalid e value!");
-          prsm_vec[i]->setExtremeValuePtr(ExtremeValue::getMaxEvaluePtr());
+          prsm_vec[i]->setExpectedValuePtr(ExpectedValue::getMaxEvaluePtr());
         }
       }
     }
@@ -171,7 +171,7 @@ void EValueProcessor::process(bool is_separate) {
 
 bool EValueProcessor::checkPrsms(const PrsmPtrVec &prsm_ptrs) {
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
-    ExtremeValuePtr extreme_value_ptr = prsm_ptrs[i]->getExtremeValuePtr();
+    ExpectedValuePtr extreme_value_ptr = prsm_ptrs[i]->getExpectedValuePtr();
     if (extreme_value_ptr != nullptr) {
       double evalue = extreme_value_ptr->getEValue();
       double frag_num = prsm_ptrs[i]->getMatchFragNum();
@@ -200,11 +200,11 @@ void EValueProcessor::compEvalues(SpectrumSetPtr spec_set_ptr, PrsmPtrVec &sele_
     LOG_DEBUG("Fragment number " << sele_prsm_ptrs[i]->getMatchFragNum());
     if (std::round(sele_prsm_ptrs[i]->getMatchFragNum()) <= std::round(mng_ptr_->comp_evalue_min_match_frag_num_)) {
       LOG_DEBUG("Set max e value ");
-      sele_prsm_ptrs[i]->setExtremeValuePtr(ExtremeValue::getMaxEvaluePtr());
+      sele_prsm_ptrs[i]->setExpectedValuePtr(ExpectedValue::getMaxEvaluePtr());
     } else {
       if (sele_prsm_ptrs[i]->getEValue() == 0.0) {
         LOG_WARN("Invalid e value!");
-        sele_prsm_ptrs[i]->setExtremeValuePtr(ExtremeValue::getMaxEvaluePtr());
+        sele_prsm_ptrs[i]->setExpectedValuePtr(ExpectedValue::getMaxEvaluePtr());
       }
     }
   }

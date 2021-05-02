@@ -26,6 +26,8 @@ class PrsmXmlWriter {
  public:
   explicit PrsmXmlWriter(const std::string &file_name);
 
+  ~PrsmXmlWriter();
+
   void close();
 
   void write(PrsmStrPtr prsm_str_ptr);

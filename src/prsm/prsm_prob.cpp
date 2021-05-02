@@ -38,7 +38,7 @@ void process(const std::string &db_file_name,
   while (prsm_ptr != nullptr) {
     int shift_num = prsm_ptr->getProteoformPtr()->getMassShiftNum(AlterType::UNEXPECTED);
     ProteoformTypePtr type_ptr = prsm_ptr->getProteoformPtr()->getProteoformType();
-    ExtremeValuePtr prob_ptr = prsm_ptr->getExtremeValuePtr();
+    ExpectedValuePtr prob_ptr = prsm_ptr->getExpectedValuePtr();
     if (shift_num == 1) {
       prob_ptr->setOneProtProb(prob_ptr->getOneProtProb() * K1);
     }

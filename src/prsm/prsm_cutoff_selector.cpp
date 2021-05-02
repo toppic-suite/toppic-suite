@@ -64,8 +64,8 @@ void process(const std::string &db_file_name,
       id++;
     } else if (frag_cutoff && prsms[i]->getMatchFragNum() >= cutoff_value) {
       prsms[i]->setPrsmId(id);
-      ExtremeValuePtr ev_ptr = std::make_shared<ExtremeValue>(-prsms[i]->getMatchFragNum(), 1, 1);
-      prsms[i]->setExtremeValuePtr(ev_ptr);
+      ExpectedValuePtr ev_ptr = std::make_shared<ExpectedValue>(-prsms[i]->getMatchFragNum(), 1, 1);
+      prsms[i]->setExpectedValuePtr(ev_ptr);
       selected_prsms.push_back(prsms[i]);
       id++;
     }   

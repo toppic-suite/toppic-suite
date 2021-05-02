@@ -17,33 +17,33 @@
 #include "common/util/str_util.hpp"
 #include "common/xml/xml_dom_document.hpp"
 #include "common/xml/xml_dom_util.hpp"
-#include "prsm/extreme_value.hpp"
+#include "prsm/expected_value.hpp"
 
 namespace toppic {
 
-ExtremeValue::ExtremeValue(double one_prot_prob, double test_num, 
-                           double adjust_factor):
+ExpectedValue::ExpectedValue(double one_prot_prob, double test_num, 
+                             double adjust_factor):
     one_prot_prob_(one_prot_prob),
     test_num_(test_num),
     adjust_factor_(adjust_factor) {
       init();
     }
 
-void ExtremeValue::setOneProtProb(double one_prot_prob) {
+void ExpectedValue::setOneProtProb(double one_prot_prob) {
   one_prot_prob_ = one_prot_prob;
   init();
 }
 
-ExtremeValue::ExtremeValue(XmlDOMElement* element) {
+ExpectedValue::ExpectedValue(XmlDOMElement* element) {
   one_prot_prob_ = xml_dom_util::getScientificChildValue(element, "one_protein_probability", 0);
   test_num_ = xml_dom_util::getScientificChildValue(element, "test_number", 0);
   adjust_factor_ = xml_dom_util::getDoubleChildValue(element, "adjust_factor", 0);
   init();
 }
 
-void ExtremeValue::init() {
+void ExpectedValue::init() {
   e_value_ = one_prot_prob_ * test_num_ * adjust_factor_;
-  if (one_prot_prob_ >= 1 || test_num_ == ExtremeValue::getMaxDouble()) {
+  if (one_prot_prob_ >= 1 || test_num_ == ExpectedValue::getMaxDouble()) {
     p_value_  = 1.0;
   } else {
     double n = std::max(test_num_ * adjust_factor_, 1.0);
@@ -57,7 +57,7 @@ void ExtremeValue::init() {
   }
 }
 
-void ExtremeValue::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
+void ExpectedValue::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
   std::string element_name = getXmlElementName();
   XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
   std::string str = str_util::toScientificStr(one_prot_prob_, 4);
@@ -73,9 +73,9 @@ void ExtremeValue::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
   parent->appendChild(element);
 }
 
-ExtremeValuePtr ExtremeValue::getMaxEvaluePtr() {
-  ExtremeValuePtr evalue_ptr
-      = std::make_shared<ExtremeValue>(1.0, ExtremeValue::getMaxDouble(), 1.0);
+ExpectedValuePtr ExpectedValue::getMaxEvaluePtr() {
+  ExpectedValuePtr evalue_ptr
+      = std::make_shared<ExpectedValue>(1.0, ExpectedValue::getMaxDouble(), 1.0);
   return evalue_ptr;
 }
 

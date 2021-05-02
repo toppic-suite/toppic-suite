@@ -317,11 +317,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     std::cout << "E-value computation - finished." << std::endl;
 
     std::cout << "Top PrSM selecting - started" << std::endl;
-    PrsmTopSelectorPtr selector
-        = std::make_shared<PrsmTopSelector>(db_file_name, sp_file_name, 
-                                            "toppic_evalue", "toppic_top", n_top);
-    selector->process();
-    selector = nullptr;
+    prsm_top_selector::process(sp_file_name, "toppic_evalue", "toppic_top", n_top);
     std::cout << "Top PrSM selecting - finished." << std::endl;
 
   } catch (const char* e) {

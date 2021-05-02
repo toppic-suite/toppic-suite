@@ -34,6 +34,9 @@ SimplePrsmXmlWriter::SimplePrsmXmlWriter(const std::string &file_name) {
 SimplePrsmXmlWriter::~SimplePrsmXmlWriter() {
   serializer_->release();
   delete doc_;
+  if (file_.is_open()) {
+    close();
+  }
 }
 
 void SimplePrsmXmlWriter::close() {
@@ -55,11 +58,6 @@ void SimplePrsmXmlWriter::write(const SimplePrsmPtrVec &simple_prsm_ptrs) {
 }
 
 void SimplePrsmXmlWriter::write(SimplePrsmPtr simple_prsm_ptr) {
-  /*
-  if (simple_prsm_ptr->getFileName() == "") {
-    simple_prsm_ptr->setFileName(file_name_);
-  }
-  */
   XmlDOMElement * element = simple_prsm_ptr->toXml(doc_);
   std::string str = xml_dom_util::writeToString(serializer_, element);
   xml_dom_util::writeToStreamByRemovingDoubleLF(file_, str);

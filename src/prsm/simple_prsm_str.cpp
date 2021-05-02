@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include "common/util/logger.hpp"
 #include "prsm/prsm_util.hpp"
 #include "prsm/simple_prsm_str.hpp"
 

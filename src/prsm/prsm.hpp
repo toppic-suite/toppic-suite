@@ -22,7 +22,7 @@
 #include "ms/spec/deconv_ms.hpp"
 #include "ms/spec/extend_ms.hpp"
 #include "para/sp_para.hpp"
-#include "prsm/extreme_value.hpp"
+#include "prsm/expected_value.hpp"
 
 namespace toppic {
 
@@ -59,7 +59,7 @@ class Prsm {
 
   ProteoformPtr getProteoformPtr() {return proteoform_ptr_;}
 
-  ExtremeValuePtr getExtremeValuePtr() {return extreme_value_ptr_;}
+  ExpectedValuePtr getExpectedValuePtr() {return expected_value_ptr_;}
 
   double getFdr() {return fdr_;}
 
@@ -76,7 +76,7 @@ class Prsm {
   // Normalized match fragment number is used in TopMG for ranking PrSMs
   double getNormMatchFragNum();
 
-  // ExtremeValue related functions
+  // Expected related functions
   double getEValue();
 
   double getPValue();
@@ -102,7 +102,7 @@ class Prsm {
 
   void setProteoformPtr(ProteoformPtr proteoform, SpParaPtr sp_para_ptr);
 
-  void setExtremeValuePtr(ExtremeValuePtr ev_ptr) {extreme_value_ptr_ = ev_ptr;}
+  void setExpectedValuePtr(ExpectedValuePtr ev_ptr) {expected_value_ptr_ = ev_ptr;}
 
   void setFdr(double fdr) {fdr_ = fdr;}
 
@@ -174,7 +174,7 @@ class Prsm {
   /* protein sequence */
   ProteoformPtr proteoform_ptr_;
 
-  ExtremeValuePtr extreme_value_ptr_;
+  ExpectedValuePtr expected_value_ptr_;
 
   double fdr_ = -1;
 

@@ -26,16 +26,16 @@ void addPrsmHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement* element,
                    PrsmPtr prsm_ptr, PrsmViewMngPtr mng_ptr) {
   std::string str = str_util::toString(prsm_ptr->getPrsmId());
   xml_doc->addElement(element, "prsm_id", str.c_str());
-  if (prsm_ptr->getExtremeValuePtr().get() != nullptr) {
-    str = str_util::evalueToString(prsm_ptr->getExtremeValuePtr()->getPValue(), 
+  if (prsm_ptr->getExpectedValuePtr().get() != nullptr) {
+    str = str_util::evalueToString(prsm_ptr->getExpectedValuePtr()->getPValue(), 
                                    mng_ptr->decimal_point_num_);
     xml_doc->addElement(element, "p_value", str.c_str());
   } else {
     xml_doc->addElement(element, "p_value", "N/A");
   }
 
-  if (prsm_ptr->getExtremeValuePtr().get() != nullptr) {
-    str = str_util::evalueToString(prsm_ptr->getExtremeValuePtr()->getEValue(), 
+  if (prsm_ptr->getExpectedValuePtr().get() != nullptr) {
+    str = str_util::evalueToString(prsm_ptr->getExpectedValuePtr()->getEValue(), 
                                    mng_ptr->decimal_point_num_);
     xml_doc->addElement(element, "e_value", str.c_str());
   } else {

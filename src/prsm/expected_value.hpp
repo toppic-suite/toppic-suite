@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_PRSM_EXTREME_VALUE_HPP_
-#define TOPPIC_PRSM_EXTREME_VALUE_HPP_
+#ifndef TOPPIC_PRSM_EXPECTED_VALUE_HPP_
+#define TOPPIC_PRSM_EXPECTED_VALUE_HPP_
 
 #include <memory>
 #include <vector>
@@ -25,15 +25,15 @@ namespace toppic {
 
 class XmlDOMDocument;
 
-class ExtremeValue;
-typedef std::shared_ptr<ExtremeValue> ExtremeValuePtr;
+class ExpectedValue;
+typedef std::shared_ptr<ExpectedValue> ExpectedValuePtr;
 
-class ExtremeValue {
+class ExpectedValue {
  public:
-  ExtremeValue(double one_prot_prob, double test_num, 
+  ExpectedValue(double one_prot_prob, double test_num, 
                double adjust_factor);
 
-  explicit ExtremeValue(XmlDOMElement* element);
+  explicit ExpectedValue(XmlDOMElement* element);
 
   double getPValue() {return p_value_;}
 
@@ -53,7 +53,7 @@ class ExtremeValue {
 
   static double getMaxDouble() {return 1e+300;}
 
-  static ExtremeValuePtr getMaxEvaluePtr();
+  static ExpectedValuePtr getMaxEvaluePtr();
 
  private:
   // one_prot_prob is the probability that the spectrum and a randem problem
@@ -71,7 +71,7 @@ class ExtremeValue {
   void init();
 };
 
-typedef std::vector<ExtremeValuePtr> ExtremeValuePtrVec;
+typedef std::vector<ExpectedValuePtr> ExpectedValuePtrVec;
 
 }  // namespace toppic
 

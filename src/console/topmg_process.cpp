@@ -285,10 +285,7 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
     int n_top = std::stoi(arguments["numOfTopPrsms"]);
 
     std::cout << "Top PrSM selecting - started" << std::endl;
-    PrsmTopSelectorPtr selector
-        = std::make_shared<PrsmTopSelector>(db_file_name, sp_file_name, "topmg_evalue", "topmg_top", n_top);
-    selector->process();
-    selector = nullptr;
+    prsm_top_selector::process(sp_file_name, "topmg_evalue", "topmg_top", n_top);
     std::cout << "Top PrSM selecting - finished." << std::endl;
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
