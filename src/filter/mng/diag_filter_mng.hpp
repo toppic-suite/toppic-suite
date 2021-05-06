@@ -26,7 +26,7 @@ class DiagFilterMng {
                 int filtering_result_num,
                 int thread_num,
                 const std::string & output_file_ext,
-                const std::string & residueModFileName = "",
+                const std::string & residue_mod_file_name = "",
                 int var_num = 0);
 
   std::string getIndexFilePara() {return index_file_para_;}
@@ -45,11 +45,12 @@ class DiagFilterMng {
   int thread_num_ = 1;
 
   std::string output_file_ext_;
-  std::string residueModFileName_;
+  std::string residue_mod_file_name_;
 
   int var_num_;
 
-  std::vector<std::string> multi_ptm_file_vec_{"multi_ptm_index"};//file name vector
+  // file name vector
+  std::vector<std::string> multi_ptm_file_vec_{"multi_ptm_index"};
 
 };
 

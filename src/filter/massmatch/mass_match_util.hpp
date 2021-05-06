@@ -15,19 +15,19 @@
 #ifndef TOPPIC_FILTER_MASS_MATCH_MASS_MATCH_UTIL_HPP_
 #define TOPPIC_FILTER_MASS_MATCH_MASS_MATCH_UTIL_HPP_
 
-#include "filter/massmatch/filter_protein.hpp"
+#include "filter/massmatch/prot_candidate.hpp"
 #include "filter/massmatch/mass_match.hpp"
 
 namespace toppic {
 
 namespace mass_match_util {
 
-FilterProteinPtrVec findTopProteins(std::vector<short> &scores, 
+ProtCandidatePtrVec findTopProteins(std::vector<short> &scores, 
                                     std::vector<int> &proteo_row_begins,
                                     std::vector<int> &proteo_row_ends,
                                     int threshold, int num);
 
-FilterProteinPtrVec findTopProteins(std::vector<short> &scores, 
+ProtCandidatePtrVec findTopProteins(std::vector<short> &scores, 
                                     std::vector<short> &rev_scores, 
                                     MassMatchPtr index_ptr,
                                     MassMatchPtr rev_index_ptr,

@@ -18,7 +18,7 @@
 #include "seq/proteoform_util.hpp"
 #include "ms/factory/prm_ms_util.hpp"
 #include "filter/mng/topindex_file_name.hpp"
-#include "filter/massmatch/filter_protein.hpp"
+#include "filter/massmatch/prot_candidate.hpp"
 #include "filter/massmatch/mass_match_factory.hpp"
 #include "filter/massmatch/mass_match_util.hpp"
 #include "filter/oneptm/mass_one_ptm_filter.hpp"
@@ -67,22 +67,25 @@ MassOnePtmFilter::MassOnePtmFilter(const ProteoformPtrVec &proteo_ptrs,
         = proteoform_util::getNTermShift2D(proteo_ptrs, mng_ptr->prsm_para_ptr_->getProtModPtrVec());
     std::vector<std::vector<double>> n_term_acet_2d
         = proteoform_util::getNTermAcet2D(proteo_ptrs, mng_ptr->prsm_para_ptr_->getProtModPtrVec());
-    term_index_ptr_ = MassMatchFactory::getPrmTermMassMatchPtr(proteo_ptrs, shift_2d,
-                                                              mng_ptr->max_proteoform_mass_,
-                                                              mng_ptr->filter_scale_);
-    diag_index_ptr_ = MassMatchFactory::getPrmDiagMassMatchPtr(proteo_ptrs,
-                                                              mng_ptr->max_proteoform_mass_,
-                                                              mng_ptr->filter_scale_);
+    term_index_ptr_ = mass_match_factory::getPrmTermMassMatchPtr(proteo_ptrs, shift_2d,
+                                                                 mng_ptr->max_proteoform_mass_,
+                                                                 mng_ptr->filter_scale_);
+    diag_index_ptr_ = mass_match_factory::getPrmDiagMassMatchPtr(proteo_ptrs,
+                                                                 mng_ptr->max_proteoform_mass_,
+                                                                 mng_ptr->filter_scale_);
     std::vector<std::vector<double>> rev_shift_2d;
     std::vector<double> shift_1d(1, 0);
     for (size_t i = 0; i < proteo_ptrs.size(); i++) {
       rev_shift_2d.push_back(shift_1d);
     }
-    rev_term_index_ptr_ = MassMatchFactory::getSrmTermMassMatchPtr(proteo_ptrs, rev_shift_2d, n_term_acet_2d,
-                                                                  mng_ptr->max_proteoform_mass_,
-                                                                  mng_ptr->filter_scale_);
-    rev_diag_index_ptr_ = MassMatchFactory::getSrmDiagMassMatchPtr(proteo_ptrs, n_term_acet_2d,
-                                                                  mng_ptr->max_proteoform_mass_,mng_ptr->filter_scale_);
+    rev_term_index_ptr_ 
+        = mass_match_factory::getSrmTermMassMatchPtr(proteo_ptrs, rev_shift_2d, n_term_acet_2d,
+                                                     mng_ptr->max_proteoform_mass_,
+                                                     mng_ptr->filter_scale_);
+    rev_diag_index_ptr_ 
+        = mass_match_factory::getSrmDiagMassMatchPtr(proteo_ptrs, n_term_acet_2d,
+                                                     mng_ptr->max_proteoform_mass_,
+                                                     mng_ptr->filter_scale_);
                                                           
   };
 }
@@ -113,7 +116,7 @@ void MassOnePtmFilter::computeBestMatch(const PrmMsPtrVec &prm_ms_ptr_vec,
 
   int threshold = 4;
   bool add_shifts = true;
-  FilterProteinPtrVec comp_prots
+  ProtCandidatePtrVec comp_prots
       = mass_match_util::findTopProteins(term_scores, rev_term_scores, term_index_ptr_, rev_term_index_ptr_,
                                        threshold, mng_ptr_->comp_num_, add_shifts, mng_ptr_->shift_num_);
   comp_match_ptrs_.clear();
@@ -126,7 +129,7 @@ void MassOnePtmFilter::computeBestMatch(const PrmMsPtrVec &prm_ms_ptr_vec,
                                                             proteo_ptrs_[id], score));
   }
 
-  FilterProteinPtrVec pref_prots
+  ProtCandidatePtrVec pref_prots
       = mass_match_util::findTopProteins(term_scores, rev_diag_scores, term_index_ptr_, rev_diag_index_ptr_,
                                        threshold, mng_ptr_->pref_suff_num_, add_shifts, mng_ptr_->shift_num_);
   pref_match_ptrs_.clear();
@@ -141,7 +144,7 @@ void MassOnePtmFilter::computeBestMatch(const PrmMsPtrVec &prm_ms_ptr_vec,
     pref_match_ptrs_.push_back(prsm_ptr);
   }
 
-  FilterProteinPtrVec suff_prots
+  ProtCandidatePtrVec suff_prots
       = mass_match_util::findTopProteins(diag_scores, rev_term_scores, diag_index_ptr_, rev_term_index_ptr_,
                                        threshold, mng_ptr_->pref_suff_num_, add_shifts, mng_ptr_->shift_num_);
   suff_match_ptrs_.clear();
@@ -155,9 +158,11 @@ void MassOnePtmFilter::computeBestMatch(const PrmMsPtrVec &prm_ms_ptr_vec,
     suff_match_ptrs_.push_back(prsm_ptr);
   }
 
-  FilterProteinPtrVec internal_prots
-      = mass_match_util::findTopProteins(diag_scores, rev_diag_scores, diag_index_ptr_, rev_diag_index_ptr_,
-                                       threshold, mng_ptr_->inte_num_, add_shifts, mng_ptr_->shift_num_);
+  ProtCandidatePtrVec internal_prots
+      = mass_match_util::findTopProteins(diag_scores, rev_diag_scores, 
+                                         diag_index_ptr_, rev_diag_index_ptr_,
+                                         threshold, mng_ptr_->inte_num_, 
+                                         add_shifts, mng_ptr_->shift_num_);
   internal_match_ptrs_.clear();
   for (size_t i = 0; i < internal_prots.size(); i++) {
     int id = internal_prots[i]->getProteinId();

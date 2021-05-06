@@ -60,8 +60,9 @@ class OnePtmFilterMng {
 
   std::vector<int> cnts_;
 
+  //file name vector
   std::vector<std::string> one_ptm_file_vec_{"one_ptm_term_index", "one_ptm_diag_index", 
-    "one_ptm_rev_term_index", "one_ptm_rev_diag_index"};//file name vector
+    "one_ptm_rev_term_index", "one_ptm_rev_diag_index"};
 };
 
 typedef std::shared_ptr<OnePtmFilterMng> OnePtmFilterMngPtr;

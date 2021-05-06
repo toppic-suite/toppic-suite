@@ -20,7 +20,7 @@
 #include "ms/factory/prm_ms_util.hpp"
 #include "prsm/simple_prsm_util.hpp"
 #include "filter/mng/topindex_file_name.hpp"
-#include "filter/massmatch/filter_protein.hpp"
+#include "filter/massmatch/prot_candidate.hpp"
 #include "filter/massmatch/mass_match_factory.hpp"
 #include "filter/massmatch/mass_match_util.hpp"
 #include "filter/diag/mass_diag_filter.hpp"
@@ -60,9 +60,9 @@ MassDiagFilter::MassDiagFilter(const ProteoformPtrVec &proteo_ptrs,
 
   }
   else{
-    index_ptr_ = MassMatchFactory::getPrmDiagMassMatchPtr(proteo_ptrs,
-                                                          mng_ptr->max_proteoform_mass_,
-                                                          mng_ptr->filter_scale_);
+    index_ptr_ = mass_match_factory::getPrmDiagMassMatchPtr(proteo_ptrs,
+                                                            mng_ptr->max_proteoform_mass_,
+                                                            mng_ptr->filter_scale_);
   }
 }
 
@@ -99,7 +99,7 @@ SimplePrsmPtrVec MassDiagFilter::compute(const PrmMsPtrVec &ms_ptr_vec) {
   for (size_t i = 0; i < mass_errors.size(); i++) {
     std::vector<short> scores(row_num, 0);
     index_ptr_->compScores(mass_errors, i, -mass_errors[i].first, scores);
-    FilterProteinPtrVec results
+    ProtCandidatePtrVec results
         = mass_match_util::findTopProteins(scores, proteo_row_begins, proteo_row_ends, threshold,
                                            mng_ptr_->filter_result_num_);
     // LOG_DEBUG("result size " << results.size());

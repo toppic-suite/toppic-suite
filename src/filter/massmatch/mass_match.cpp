@@ -16,17 +16,15 @@
 #include <iostream>
 #include <fstream>
 
-#include "common/util/logger.hpp"
-#include "common/util/file_util.hpp"
-
-#include "filter/massmatch/mass_match.hpp"
-
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 
 #include <boost/serialization/vector.hpp>
 
-#include "console/toppic_argument.hpp"
+#include "common/util/logger.hpp"
+#include "common/util/file_util.hpp"
+
+#include "filter/massmatch/mass_match.hpp"
 
 namespace toppic {
 
@@ -54,6 +52,7 @@ MassMatch::MassMatch(std::vector<std::vector<int>> &mass_2d,
   initIndexes(mass_2d, real_shift_2d, pos_2d);
 
 }
+
 MassMatch::MassMatch(std::vector<std::vector<int>> &mass_2d,
                      std::vector<std::vector<double>> &real_shift_2d,
                      std::vector<std::vector<int>> &pos_2d,
@@ -74,11 +73,12 @@ MassMatch::MassMatch(std::vector<std::vector<int>> &mass_2d,
   initIndexes(mass_2d, real_shift_2d, pos_2d);
   prm_ = prm;
 }
+
 void MassMatch::serializeMassMatch(std::string file_name, std::string dir_name){
   std::string file_path = dir_name + file_util::getFileSeparator() + file_name;
   std::ofstream new_file(file_path, std::ofstream::binary);
 
-  if(new_file.is_open()){
+  if(new_file.is_open()) {
     boost::archive::binary_oarchive oa(new_file, std::ios::binary);
     oa << scale_;
     oa << proteo_num_;
@@ -96,22 +96,25 @@ void MassMatch::serializeMassMatch(std::string file_name, std::string dir_name){
 
     new_file.close();
   }
-
+  else {
+    LOG_ERROR("Failed to open the index file:" << file_path);
+    exit(EXIT_FAILURE);
+  }
 }
 
- void MassMatch::deserializeMassMatch(std::string new_file, std::string dir_name){
+void MassMatch::deserializeMassMatch(std::string new_file, std::string dir_name){
   std::string file_path = dir_name + file_util::getFileSeparator() + new_file;
   std::ifstream file_to_read(file_path, std::ifstream::binary);
 
   if (file_to_read.is_open()) {
 
     boost::archive::binary_iarchive ia(file_to_read, std::ios::binary);
-  
+
     ia >> scale_;
     ia >> proteo_num_;
     ia >> col_num_; 
     ia >> row_num_;
-    
+
     ia >> proteo_row_begins_;
     ia >> proteo_row_ends_;
     ia >> row_proteo_ids_;
@@ -123,6 +126,10 @@ void MassMatch::serializeMassMatch(std::string file_name, std::string dir_name){
 
     file_to_read.close();
   } 
+  else {
+    LOG_ERROR("Failed to open the index file:" << file_path);
+    exit(EXIT_FAILURE);
+  }
 }
 
 void MassMatch::initProteoformBeginEnds(std::vector<std::vector<double>> &shift_2d) {
@@ -134,7 +141,6 @@ void MassMatch::initProteoformBeginEnds(std::vector<std::vector<double>> &shift_
     proteo_row_begins_[i] = pnt;
     int len = shift_2d[i].size();
     proteo_row_ends_[i] = pnt + len - 1;
-    // LOG_DEBUG("begin " << proteo_row_begins_[i] << " end " << proteo_row_ends_[i]);
     pnt += len;
   }
   row_num_ = pnt;
@@ -211,7 +217,7 @@ void MassMatch::initIndexes(std::vector<std::vector<int>> &mass_2d,
   std::vector<std::vector<int>> shift_2d = convertToInt(real_shift_2d, scale_);
   LOG_DEBUG("column num " << col_num_);
   std::vector<int> col_match_nums(col_num_, 0);
-  // no need to initalize
+  // no need to initialize
   std::vector<int> col_index_pnts(col_num_);
   col_index_begins_.resize(col_num_);
   col_index_ends_.resize(col_num_);
@@ -225,7 +231,7 @@ void MassMatch::initIndexes(std::vector<std::vector<int>> &mass_2d,
     col_index_ends_[i] = pnt + col_match_nums[i]-1;
     pnt += col_match_nums[i];
   }
-  // no need to init
+  // no need to initialize
   col_indexes_.resize(pnt, 0);
   LOG_DEBUG("indexes size: "<< pnt);
   fillColumnIndex(mass_2d, shift_2d, pos_2d, col_index_pnts);
@@ -254,13 +260,11 @@ void MassMatch::compScores(const std::vector<std::pair<int, int>> &pref_mass_err
     if (right < 0 || right >= col_num_) {
       continue;
     }
-    // LOG_DEBUG("left " << left << " right " << right);
     begin_index = col_index_begins_[left];
     end_index   = col_index_ends_[right];
 
     for (int j = begin_index; j <= end_index; j++) {
       scores[col_indexes_[j]]++;
-      // LOG_DEBUG("ROW INDEX " << col_indexes_[j] << " m " << m << " left " << left << " right " << right << " score " << scores[col_indexes_[j]]);
     }
   }
 }
@@ -284,7 +288,6 @@ void MassMatch::compMatchScores(const std::vector<std::pair<int, int>> &pref_mas
     // update scores
     begin_index = col_index_begins_[left];
     end_index   = col_index_ends_[right];
-    // LOG_DEBUG("prec left " << left << " pref right " << right << " begin index " << begin_index << " end index " << end_index);
     for (int j = begin_index; j <= end_index; j++) {
       scores[col_indexes_[j]] += getPrecursorMatchScore();
     }

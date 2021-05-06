@@ -28,7 +28,7 @@ DiagFilterMng::DiagFilterMng(PrsmParaPtr prsm_para_ptr,
     filter_result_num_(filtering_result_num),
     thread_num_(thread_num),
     output_file_ext_(output_file_ext),
-    residueModFileName_(residue_mod_file_name),
+    residue_mod_file_name_(residue_mod_file_name),
     var_num_(var_num) {}
 
 }  // namespace toppic

@@ -24,9 +24,9 @@ namespace diag_index_file {
 void geneDiagIndexFile(const ProteoformPtrVec &proteo_ptrs,
                        DiagFilterMngPtr mng_ptr, std::string block_str) {
 
-  MassMatchPtr index_ptr = MassMatchFactory::getPrmDiagMassMatchPtr(proteo_ptrs,
-                                                                    mng_ptr->max_proteoform_mass_,
-                                                                    mng_ptr->filter_scale_);
+  MassMatchPtr index_ptr = mass_match_factory::getPrmDiagMassMatchPtr(proteo_ptrs,
+                                                                      mng_ptr->max_proteoform_mass_,
+                                                                      mng_ptr->filter_scale_);
                                                         
   std::string parameters = mng_ptr->getIndexFilePara();
   std::string dir_name = mng_ptr->prsm_para_ptr_->getOriDbName() + "_idx";

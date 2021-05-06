@@ -49,8 +49,9 @@ void DiagFilterProcessor::process() {
   DbBlockPtrVec db_block_ptr_vec = DbBlock::readDbBlockIndex(db_file_name);
 
   std::vector<double> mod_mass_list;
-  if (mng_ptr_->residueModFileName_ != "") {
-    mod_mass_list = mod_util::getModMassVec(mod_util::readModTxt(mng_ptr_->residueModFileName_)[2]);
+  if (mng_ptr_->residue_mod_file_name_ != "") {
+    mod_mass_list 
+        = mod_util::getModMassVec(mod_util::readModTxt(mng_ptr_->residue_mod_file_name_)[2]);
   }
 
   for (size_t i = 0; i < db_block_ptr_vec.size(); i++) {

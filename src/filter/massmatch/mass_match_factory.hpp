@@ -20,26 +20,25 @@
 
 namespace toppic {
 
-class MassMatchFactory {
- public:
+namespace mass_match_factory {
 
-  static MassMatchPtr getPrmDiagMassMatchPtr(const ProteoformPtrVec &proteo_ptrs,
-                                             double max_proteoform_mass, double scale);
+MassMatchPtr getPrmDiagMassMatchPtr(const ProteoformPtrVec &proteo_ptrs,
+                                    double max_proteoform_mass, double scale);
 
-  static MassMatchPtr getSrmDiagMassMatchPtr(const ProteoformPtrVec &proteo_ptrs,
-                                             std::vector<std::vector<double>> &n_ace_shift_2d,
-                                             double max_proteoform_mass, double scale);
+MassMatchPtr getSrmDiagMassMatchPtr(const ProteoformPtrVec &proteo_ptrs,
+                                    std::vector<std::vector<double>> &n_ace_shift_2d,
+                                    double max_proteoform_mass, double scale);
 
-  static MassMatchPtr getPrmTermMassMatchPtr(const ProteoformPtrVec &proteo_ptrs, 
-                                             std::vector<std::vector<double>> &real_shift_2d,
-                                             double max_proteoform_mass, double scale);
+MassMatchPtr getPrmTermMassMatchPtr(const ProteoformPtrVec &proteo_ptrs, 
+                                    std::vector<std::vector<double>> &real_shift_2d,
+                                    double max_proteoform_mass, double scale);
 
 
-  static MassMatchPtr getSrmTermMassMatchPtr(const ProteoformPtrVec &proteo_ptrs, 
-                                             std::vector<std::vector<double>> &real_shift_2d,
-                                             std::vector<std::vector<double>> &n_ace_shift_2d,
-                                             double max_proteoform_mass, double scale);
-};
+MassMatchPtr getSrmTermMassMatchPtr(const ProteoformPtrVec &proteo_ptrs, 
+                                    std::vector<std::vector<double>> &real_shift_2d,
+                                    std::vector<std::vector<double>> &n_ace_shift_2d,
+                                    double max_proteoform_mass, double scale);
+}
 
 } /* namespace toppic */
 
