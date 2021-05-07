@@ -12,22 +12,18 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_FILTER_ONE_INDEX_ONE_PTM_INDEX_PROCESSOR_HPP_
-#define TOPPIC_FILTER_ONE_INDEX_ONE_PTM_INDEX_PROCESSOR_HPP_
+#ifndef TOPPIC_FILTER_INDEX_ONE_PTM_INDEX_HPP_
+#define TOPPIC_FILTER_INDEX_ONE_PTM_INDEX_HPP_
 
 #include "filter/mng/one_ptm_filter_mng.hpp"
 
 namespace toppic{
-    
-class OnePtmIndexProcessor {
- public:
-  explicit OnePtmIndexProcessor(OnePtmFilterMngPtr mng_ptr): mng_ptr_(mng_ptr) {}
-  void process();
- 
- private:
-  OnePtmFilterMngPtr mng_ptr_;
-};
-typedef std::shared_ptr<OnePtmIndexProcessor> OnePtmIndexProcessorPtr;
+
+namespace one_ptm_index {
+
+void process(OnePtmFilterMngPtr mng_ptr);
+
+}
 
 }/* namespace toppic */
 

@@ -12,9 +12,9 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include <iomanip>
 #include <iostream>
 
-#include "common/util/logger.hpp"
 #include "common/thread/simple_thread_pool.hpp"
 
 #include "seq/db_block.hpp"
@@ -22,47 +22,43 @@
 #include "seq/proteoform_factory.hpp"
 
 #include "filter/massmatch/mass_match_factory.hpp"
-#include "filter/index/zero_ptm_index.hpp"
+#include "filter/index/one_ptm_index.hpp"
 
 namespace toppic{
 
-namespace zero_ptm_index {
+namespace one_ptm_index {
 
-void geneZeroPtmIndexFile(const ProteoformPtrVec &proteo_ptrs,
-                          ZeroPtmFilterMngPtr mng_ptr, 
-                          std::vector<std::string> &file_vec) {
-  LOG_DEBUG("get shifts");
-  std::vector<std::vector<double> > shift_2d
-      = proteoform_util::getNTermShift2D(proteo_ptrs, mng_ptr->prsm_para_ptr_->getProtModPtrVec());
-  std::vector<std::vector<double> > n_term_acet_2d
-      = proteoform_util::getNTermAcet2D(proteo_ptrs, mng_ptr->prsm_para_ptr_->getProtModPtrVec());
-  LOG_DEBUG("get shifts complete");
-  // N-terminal indexes
+void geneOnePtmIndexFile(const ProteoformPtrVec &proteo_ptrs,
+                         OnePtmFilterMngPtr mng_ptr, std::vector<std::string> file_vec) {
+
+  std::vector<std::vector<double>> shift_2d
+      = proteoform_util::getNTermShift2D(proteo_ptrs, 
+                                         mng_ptr->prsm_para_ptr_->getProtModPtrVec());
+  std::vector<std::vector<double>> n_term_acet_2d
+      = proteoform_util::getNTermAcet2D(proteo_ptrs, 
+                                        mng_ptr->prsm_para_ptr_->getProtModPtrVec());
   MassMatchPtr term_index_ptr 
       = mass_match_factory::getPrmTermMassMatchPtr(proteo_ptrs, shift_2d,
                                                    mng_ptr->max_proteoform_mass_,
                                                    mng_ptr->filter_scale_);
-  // Prm indexes
   MassMatchPtr diag_index_ptr 
       = mass_match_factory::getPrmDiagMassMatchPtr(proteo_ptrs,
                                                    mng_ptr->max_proteoform_mass_,
                                                    mng_ptr->filter_scale_);
-  LOG_DEBUG("diag index");
-  std::vector<std::vector<double> > rev_shift_2d;
+  std::vector<std::vector<double>> rev_shift_2d;
   std::vector<double> shift_1d(1, 0);
   for (size_t i = 0; i < proteo_ptrs.size(); i++) {
     rev_shift_2d.push_back(shift_1d);
   }
-  // C-terminal indexes
   MassMatchPtr rev_term_index_ptr 
-      = mass_match_factory::getSrmTermMassMatchPtr(proteo_ptrs, rev_shift_2d,
+      = mass_match_factory::getSrmTermMassMatchPtr(proteo_ptrs, 
+                                                   rev_shift_2d, 
                                                    n_term_acet_2d,
                                                    mng_ptr->max_proteoform_mass_,
                                                    mng_ptr->filter_scale_);
-
-  // To generate SRM indexes, n terminal acetylation shifts are added into the SRM list. 
   MassMatchPtr rev_diag_index_ptr 
-      = mass_match_factory::getSrmDiagMassMatchPtr(proteo_ptrs, n_term_acet_2d,
+      = mass_match_factory::getSrmDiagMassMatchPtr(proteo_ptrs, 
+                                                   n_term_acet_2d,
                                                    mng_ptr->max_proteoform_mass_,
                                                    mng_ptr->filter_scale_);
 
@@ -71,24 +67,24 @@ void geneZeroPtmIndexFile(const ProteoformPtrVec &proteo_ptrs,
   term_index_ptr->serializeMassMatch(file_vec[0], dir_name);
   diag_index_ptr->serializeMassMatch(file_vec[1], dir_name);
   rev_term_index_ptr->serializeMassMatch(file_vec[2], dir_name);
-  rev_diag_index_ptr->serializeMassMatch(file_vec[3], dir_name);     
+  rev_diag_index_ptr->serializeMassMatch(file_vec[3], dir_name); 
 }
 
 void createIndexFiles(const ProteoformPtrVec & raw_forms,
-                      int block_idx, ZeroPtmFilterMngPtr mng_ptr) {  
-                        
-    std::string block_str = str_util::toString(block_idx);
-    std::string parameters = mng_ptr->getIndexFilePara();
+                      int block_idx, 
+                      OnePtmFilterMngPtr mng_ptr) {
+  std::string block_str = str_util::toString(block_idx);
+  std::string parameters = mng_ptr->getIndexFilePara();
+  std::vector<std::string> file_vec;
+  for (size_t i = 0; i < mng_ptr->one_ptm_file_vec_.size(); i++){
+    file_vec.push_back(mng_ptr->one_ptm_file_vec_[i] + parameters + block_str);
+  }
 
-    std::vector<std::string> file_vec;
-    for (size_t i = 0; i < mng_ptr->zero_ptm_file_vec_.size(); i++){
-      file_vec.push_back(mng_ptr->zero_ptm_file_vec_[i] + parameters + block_str);
-    }
-
-    geneZeroPtmIndexFile(raw_forms, mng_ptr, file_vec);
+  geneOnePtmIndexFile(raw_forms, mng_ptr, file_vec);
 }
 
-std::function<void()> geneIndexTask(int block_idx, ZeroPtmFilterMngPtr mng_ptr) {
+std::function<void()> geneIndexTask(int block_idx, 
+                                    OnePtmFilterMngPtr mng_ptr) {
   return[block_idx, mng_ptr] () {
     PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
     std::string db_block_file_name = prsm_para_ptr->getSearchDbFileName()
@@ -96,32 +92,30 @@ std::function<void()> geneIndexTask(int block_idx, ZeroPtmFilterMngPtr mng_ptr) 
     ProteoformPtrVec raw_forms
         = proteoform_factory::readFastaToProteoformPtrVec(db_block_file_name,
                                                           prsm_para_ptr->getFixModPtrVec());
-
     createIndexFiles(raw_forms, block_idx, mng_ptr);
   };
 }
 
-void process(ZeroPtmFilterMngPtr mng_ptr) {
-  // Generate index files
+void process(OnePtmFilterMngPtr mng_ptr) {
   PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
   std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
   DbBlockPtrVec db_block_ptr_vec = DbBlock::readDbBlockIndex(db_file_name);
 
+  std::cout << "Generating One PTM index files --- started" << std::endl;
+
   SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(mng_ptr->thread_num_);
-  
   int block_num = db_block_ptr_vec.size();
 
-  std::cout << "Generating Non PTM index files --- started" << std::endl;
   for (int i = 0; i < block_num; i++) {
     while (pool_ptr->getQueueSize() >= mng_ptr->thread_num_ * 2) {
       boost::this_thread::sleep(boost::posix_time::milliseconds(100));
     }
-    std::cout << "Non PTM index files - processing " << (i+1) 
+    std::cout << "One PTM index files - processing " << (i+1) 
         << " of " << block_num << " files." << std::endl;
     pool_ptr->Enqueue(geneIndexTask(db_block_ptr_vec[i]->getBlockIdx(), mng_ptr));
   }
   pool_ptr->ShutDown();
-  std::cout << "Generating Non PTM index files --- finished" << std::endl;
+  std::cout << "Generating One PTM index files --- finished" << std::endl;
 }
 
 }

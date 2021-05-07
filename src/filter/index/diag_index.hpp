@@ -12,20 +12,19 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_FILTER_DIAG_DIAG_INDEX_FILE_H_
-#define TOPPIC_FILTER_DIAG_DIAG_INDEX_FILE_H_
+#ifndef TOPPIC_FILTER_INDEX_DIAG_INDEX_HPP_
+#define TOPPIC_FILTER_INDEX_DIAG_INDEX_HPP_
 
-#include "seq/proteoform.hpp"
 #include "filter/mng/diag_filter_mng.hpp"
 
-namespace toppic {
+namespace toppic{
 
-namespace diag_index_file {
+namespace diag_index {
 
-void geneDiagIndexFile(const ProteoformPtrVec &proteo_ptrs, DiagFilterMngPtr mng_ptr, 
-                       std::string block_str);
+void process(DiagFilterMngPtr mng_ptr);
+
 }
 
-} /* namespace toppic */
+}/* namespace toppic */
 
-#endif 
+#endif /* DIAG_INDEX_PROCESSOR_HPP_ */
