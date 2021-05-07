@@ -34,7 +34,7 @@
 #include "filter/mng/one_ptm_filter_mng.hpp"
 #include "filter/mng/diag_filter_mng.hpp"
 #include "filter/mng/topindex_file_name.hpp"
-#include "filter/zeroindex/zero_ptm_index_processor.hpp"
+#include "filter/index/zero_ptm_index.hpp"
 #include "filter/oneindex/one_ptm_index_processor.hpp"
 #include "filter/diagindex/diag_index_processor.hpp"
 
@@ -76,11 +76,7 @@ void TopIndexProcess(std::map<std::string, std::string> &arguments){
     ZeroPtmFilterMngPtr zero_filter_mng_ptr
         = std::make_shared<ZeroPtmFilterMng>(prsm_para_ptr, index_file_para, 
                                              thread_num, "");
-    ZeroPtmIndexProcessorPtr zero_ptm_index_processor
-        = std::make_shared<ZeroPtmIndexProcessor>(zero_filter_mng_ptr);
-
-    zero_ptm_index_processor->process();
-    zero_ptm_index_processor = nullptr;
+    zero_ptm_index::process(zero_filter_mng_ptr);
 
     OnePtmFilterMngPtr one_ptm_filter_mng_ptr
         = std::make_shared<OnePtmFilterMng>(prsm_para_ptr, index_file_para, 

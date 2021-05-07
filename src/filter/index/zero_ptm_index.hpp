@@ -12,22 +12,18 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_FILTER_ZERO_INDEX_ZERO_PTM_INDEX_PROCESSOR_HPP_
-#define TOPPIC_FILTER_ZERO_INDEX_ZERO_PTM_INDEX_PROCESSOR_HPP_
+#ifndef TOPPIC_FILTER_INDEX_ZERO_PTM_INDEX_HPP_
+#define TOPPIC_FILTER_INDEX_ZERO_PTM_INDEX_HPP_
 
 #include "filter/mng/zero_ptm_filter_mng.hpp"
 
 namespace toppic{
-    
-class ZeroPtmIndexProcessor {
- public:
-  explicit ZeroPtmIndexProcessor(ZeroPtmFilterMngPtr mng_ptr): mng_ptr_(mng_ptr) {}
-  void process();
 
- private:
-  ZeroPtmFilterMngPtr mng_ptr_;
-};
-typedef std::shared_ptr<ZeroPtmIndexProcessor> ZeroPtmIndexProcessorPtr;
+namespace zero_ptm_index {
+
+void process(ZeroPtmFilterMngPtr mng_ptr);
+
+}
 
 }/* namespace toppic */
 

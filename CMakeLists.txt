@@ -149,7 +149,7 @@ file(GLOB TOPDIFF_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topdiff/*.cpp
 # topindex classes
 file(GLOB FILTER_INDEX_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/massmatch/*.cpp
                             ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/mng/*.cpp
-                            ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/zeroindex/*.cpp
+                            ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/index/*.cpp
                             ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/oneindex/*.cpp
                             ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/diagindex/*.cpp)
 
