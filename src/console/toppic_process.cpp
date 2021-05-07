@@ -218,11 +218,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     ZeroPtmFilterMngPtr zero_filter_mng_ptr
         = std::make_shared<ZeroPtmFilterMng>(prsm_para_ptr, index_file_para, 
                                              thread_num, "toppic_zero_filter");
-    ZeroPtmFilterProcessorPtr zero_filter_processor
-        = std::make_shared<ZeroPtmFilterProcessor>(zero_filter_mng_ptr);
-    zero_filter_processor->process();
-
-    zero_filter_processor = nullptr;
+    zero_ptm_filter_processor::process(zero_filter_mng_ptr);
     std::cout << "Non PTM filtering - finished." << std::endl;
 
     std::cout << "Non PTM search - started." << std::endl;

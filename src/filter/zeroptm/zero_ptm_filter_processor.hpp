@@ -15,26 +15,16 @@
 #ifndef TOPPIC_FILTER_ZERO_PTM_ZERO_PTM_FILTER_PROCESSOR_HPP_
 #define TOPPIC_FILTER_ZERO_PTM_ZERO_PTM_FILTER_PROCESSOR_HPP_
 
-#include "seq/db_block.hpp"
 #include "filter/mng/zero_ptm_filter_mng.hpp"
 
 namespace toppic {
 
-class ZeroPtmFilterProcessor {
- public:
-  explicit ZeroPtmFilterProcessor(ZeroPtmFilterMngPtr mng_ptr): mng_ptr_(mng_ptr) {}
-  void process();
+namespace zero_ptm_filter_processor {
 
- private:
-  ZeroPtmFilterMngPtr mng_ptr_;
+void process(ZeroPtmFilterMngPtr mng_ptr);
 
-  //void processBlock(DbBlockPtr block_ptr);
-
-  //void combineBlockResults();
-};
-
-typedef std::shared_ptr<ZeroPtmFilterProcessor> ZeroPtmFilterProcessorPtr;
+}
 
 } /* namespace toppic */
 
-#endif /* ZERO_PTM_FILTER_PROCESSOR_HPP_ */
+#endif 

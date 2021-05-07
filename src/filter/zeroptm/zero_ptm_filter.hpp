@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_FILTER_ZERO_PTM_MASS_ZERO_PTM_FILTER_HPP_
-#define TOPPIC_FILTER_ZERO_PTM_MASS_ZERO_PTM_FILTER_HPP_
+#ifndef TOPPIC_FILTER_ZERO_PTM_ZERO_PTM_FILTER_HPP_
+#define TOPPIC_FILTER_ZERO_PTM_ZERO_PTM_FILTER_HPP_
 
 #include "ms/spec/extend_ms.hpp"
 #include "prsm/simple_prsm.hpp"
@@ -22,10 +22,11 @@
 
 namespace toppic {
 
-class MassZeroPtmFilter {
+class ZeroPtmFilter {
  public:
-  MassZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs, ZeroPtmFilterMngPtr
-                    mng_ptr, std::string block_str);
+  ZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs, 
+                ZeroPtmFilterMngPtr mng_ptr, 
+                std::string block_str);
   void computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec);
 
   SimplePrsmPtrVec getCompMatchPtrs() {return comp_match_ptrs_;}
@@ -46,16 +47,18 @@ class MassZeroPtmFilter {
   MassMatchPtr rev_diag_index_ptr_;
   MassMatchPtr term_index_ptr_;
   MassMatchPtr rev_term_index_ptr_;
-  
+
   SimplePrsmPtrVec comp_match_ptrs_;
   SimplePrsmPtrVec pref_match_ptrs_;
   SimplePrsmPtrVec suff_match_ptrs_;
   SimplePrsmPtrVec internal_match_ptrs_;
 
-  std::string block_str; //which db_block it is. Used when merging the output files by order.
+  //which db_block it is. Used when merging the output files by order.
+  std::string block_str; 
 };
 
-typedef std::shared_ptr<MassZeroPtmFilter> MassZeroPtmFilterPtr;
+typedef std::shared_ptr<ZeroPtmFilter> ZeroPtmFilterPtr;
+
 } /* namespace toppic */
 
-#endif /* ZERO_PTM_FILTER_H_ */
+#endif 

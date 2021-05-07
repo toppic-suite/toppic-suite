@@ -11,7 +11,6 @@
 //WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //See the License for the specific language governing permissions and
 //limitations under the License.
-#include <iostream>
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
@@ -19,42 +18,37 @@
 #include "seq/proteoform_util.hpp"
 #include "ms/factory/extend_ms_util.hpp"
 
-#include "filter/mng/topindex_file_name.hpp"
-
 #include "filter/massmatch/prot_candidate.hpp"
 #include "filter/massmatch/mass_match_factory.hpp"
 #include "filter/massmatch/mass_match_util.hpp"
-#include "filter/zeroptm/mass_zero_ptm_filter.hpp"
+#include "filter/zeroptm/zero_ptm_filter.hpp"
 
 namespace toppic {
 
-MassZeroPtmFilter::MassZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
-                                     ZeroPtmFilterMngPtr mng_ptr, std::string block_str) {
+ZeroPtmFilter::ZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
+                             ZeroPtmFilterMngPtr mng_ptr, 
+                             std::string block_str) {
   mng_ptr_ = mng_ptr;
   proteo_ptrs_ = proteo_ptrs;
   PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
   
   std::string index_dir = mng_ptr_->prsm_para_ptr_->getOriDbName() + "_idx";
 
-	//TopIndexFileNamePtr file_name_ptr = std::make_shared<TopIndexFileName>();
-  //std::string parameters = file_name_ptr->geneFileName(prsm_para_ptr);
   std::string parameters = mng_ptr->getIndexFilePara();
   std::string suffix = parameters + block_str;//last part of file name
 
   //check if all index files for this ptm is present. if not, generate index files again.
-
- bool index_files_exist = true;
-
+  bool index_files_exist = true;
   for (size_t t = 0; t < mng_ptr->zero_ptm_file_vec_.size(); t++){
     std::string file_name = mng_ptr->zero_ptm_file_vec_[t] + suffix;
     if (!file_util::exists(index_dir + file_util::getFileSeparator() + file_name)){
-      index_files_exist = false;//if any of the index files for this ptm is missing
+      //if any of the index files for this ptm is missing
+      index_files_exist = false;
       break; 
     }
   }
 
   if (index_files_exist){
-    //std::cout << "Loading index files                            " << std::endl;
     term_index_ptr_ = std::make_shared<MassMatch>();
     diag_index_ptr_ = std::make_shared<MassMatch>();
     rev_term_index_ptr_ = std::make_shared<MassMatch>();
@@ -98,7 +92,8 @@ MassZeroPtmFilter::MassZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
                                                                      mng_ptr->filter_scale_);
  }
 }
-void MassZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec) {
+
+void ZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec) {
   PeakTolerancePtr tole_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
   bool pref = true;
   std::vector<std::pair<int, int> > pref_mass_errors
@@ -183,8 +178,5 @@ void MassZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec) {
                                                                 proteo_ptrs_[id], score));
   }
 }
-
-
-
 
 } /* namespace toppic */
