@@ -240,10 +240,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
       OnePtmFilterMngPtr one_ptm_filter_mng_ptr
           = std::make_shared<OnePtmFilterMng>(prsm_para_ptr, index_file_para, 
                                               "toppic_one_filter", thread_num);
-      OnePtmFilterProcessorPtr one_filter_processor
-          = std::make_shared<OnePtmFilterProcessor>(one_ptm_filter_mng_ptr);
-      one_filter_processor->process();
-      one_filter_processor = nullptr;
+      one_ptm_filter_processor::process(one_ptm_filter_mng_ptr);
       std::cout << "One PTM filtering - finished." << std::endl;
 
       std::cout << "One PTM search - started." << std::endl;

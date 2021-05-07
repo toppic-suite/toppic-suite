@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_FILTER_ONE_PTM_MASS_ONE_PTM_FILTER_H_
-#define TOPPIC_FILTER_ONE_PTM_MASS_ONE_PTM_FILTER_H_
+#ifndef TOPPIC_FILTER_ONE_PTM_ONE_PTM_FILTER_H_
+#define TOPPIC_FILTER_ONE_PTM_ONE_PTM_FILTER_H_
 
 #include "seq/proteoform.hpp"
 #include "ms/spec/prm_ms.hpp"
@@ -23,10 +23,10 @@
 
 namespace toppic {
 
-class MassOnePtmFilter {
+class OnePtmFilter {
  public:
-  MassOnePtmFilter(const ProteoformPtrVec &proteo_ptrs,
-                   OnePtmFilterMngPtr mng_ptr, std::string block_str);
+  OnePtmFilter(const ProteoformPtrVec &proteo_ptrs,
+               OnePtmFilterMngPtr mng_ptr, std::string block_str);
   void computeBestMatch(const PrmMsPtrVec &prm_ms_ptr_vec,
                         const PrmMsPtrVec &srm_ms_ptr_vec);
 
@@ -50,7 +50,7 @@ class MassOnePtmFilter {
   SimplePrsmPtrVec internal_match_ptrs_;
 };
 
-typedef std::shared_ptr<MassOnePtmFilter> MassOnePtmFilterPtr;
+typedef std::shared_ptr<OnePtmFilter> OnePtmFilterPtr;
 } /* namespace toppic */
 
-#endif /* ONE_PTM_FILTER_H_ */
+#endif 
