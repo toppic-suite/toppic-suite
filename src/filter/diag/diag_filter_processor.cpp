@@ -16,10 +16,7 @@
 
 #include "common/util/file_util.hpp"
 #include "common/base/mod_util.hpp"
-#include "common/base/base_data.hpp"
 #include "common/thread/simple_thread_pool.hpp"
-#include "seq/proteoform.hpp"
-#include "seq/db_block.hpp"
 #include "seq/proteoform_factory.hpp"
 #include "ms/spec/msalign_util.hpp"
 #include "ms/factory/prm_ms_factory.hpp"
@@ -27,12 +24,13 @@
 #include "prsm/simple_prsm_xml_writer.hpp"
 #include "prsm/simple_prsm_xml_writer_util.hpp"
 #include "prsm/simple_prsm_str_merge.hpp"
-#include "filter/diag/mass_diag_filter.hpp"
+
+#include "filter/diag/diag_filter.hpp"
 #include "filter/diag/diag_filter_processor.hpp"
 
 namespace toppic {
 
-std::function<void()> geneTask(MassDiagFilterPtr filter_ptr,
+std::function<void()> geneTask(DiagFilterPtr filter_ptr,
                                const PrmMsPtrVec & ms_ptr_vec,
                                SimpleThreadPoolPtr  pool_ptr, 
                                SimplePrsmXmlWriterPtrVec &writer_ptr_vec) {
@@ -62,7 +60,6 @@ void DiagFilterProcessor::process() {
   }
 
   std::cout << "Multiple PTM filtering - combining blocks started." << std::endl;
-
   std::string sp_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
   int block_num = db_block_ptr_vec.size();
   SimplePrsmStrMergePtr merge_ptr
@@ -73,7 +70,6 @@ void DiagFilterProcessor::process() {
   merge_ptr = nullptr;
   //Remove temporary files
   file_util::cleanTempFiles(sp_file_name, mng_ptr_->output_file_ext_ + "_");
-
   std::cout << "Multiple PTM filtering - combining blocks finished." << std::endl;
 }
 
@@ -88,7 +84,7 @@ void DiagFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num
                                                         prsm_para_ptr->getFixModPtrVec());
 
 
-  MassDiagFilterPtr filter_ptr = std::make_shared<MassDiagFilter>(raw_forms, mng_ptr_, block_number);
+  DiagFilterPtr filter_ptr = std::make_shared<DiagFilter>(raw_forms, mng_ptr_, block_number);
 
   int group_spec_num = mng_ptr_->prsm_para_ptr_->getGroupSpecNum();
   SpParaPtr sp_para_ptr =  mng_ptr_->prsm_para_ptr_->getSpParaPtr();
@@ -110,7 +106,6 @@ void DiagFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num
   int spectrum_num = msalign_util::getSpNum(prsm_para_ptr->getSpectrumFileName());
 
   int cnt = 0;
-
   while (spec_set_ptr != nullptr) {
     cnt += group_spec_num;
     if (spec_set_ptr->isValid()) {
@@ -143,7 +138,6 @@ void DiagFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num
     msg << std::flush << "Multiple PTM filtering - processing " << cnt
         << " of " << spectrum_num << " spectra.\r";
     std::cout << msg.str();
-    // spec_set_ptr = reader.getNextSpectrumSet(sp_para_ptr)[0];
     spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(reader_ptr, sp_para_ptr);
   }
   pool_ptr->ShutDown();

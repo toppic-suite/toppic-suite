@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_FILTER_MNG_TOPINDEX_FILE_NAME_HPP_
-#define TOPPIC_FILTER_MNG_TOPINDEX_FILE_NAME_HPP_
+#ifndef TOPPIC_FILTER_MNG_INDEX_FILE_NAME_HPP_
+#define TOPPIC_FILTER_MNG_INDEX_FILE_NAME_HPP_
 
 #include <vector>
 #include <map>
@@ -22,10 +22,10 @@
 
 namespace toppic{
 
-class TopIndexFileName{
+class IndexFileName{
 
  public:
-  TopIndexFileName(){};
+  IndexFileName(){};
 
   std::string geneFileName(std::map<std::string, std::string> &arguments);
 
@@ -36,7 +36,7 @@ class TopIndexFileName{
     {"TARGET", "no_decoy"}, {"TARGET+DECOY", "decoy"}};
 };
 
-typedef std::shared_ptr<TopIndexFileName> TopIndexFileNamePtr;
+typedef std::shared_ptr<IndexFileName> IndexFileNamePtr;
 
 }
 

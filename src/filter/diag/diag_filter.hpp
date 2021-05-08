@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_FILTER_DIAG_MASS_DIAG_FILTER_H_
-#define TOPPIC_FILTER_DIAG_MASS_DIAG_FILTER_H_
+#ifndef TOPPIC_FILTER_DIAG_DIAG_FILTER_H_
+#define TOPPIC_FILTER_DIAG_DIAG_FILTER_H_
 
 #include "seq/proteoform.hpp"
 #include "ms/spec/prm_ms.hpp"
@@ -23,9 +23,9 @@
 
 namespace toppic {
 
-class MassDiagFilter {
+class DiagFilter {
  public:
-  MassDiagFilter(const ProteoformPtrVec &proteo_ptrs, DiagFilterMngPtr mng_ptr, std::string block_str);
+  DiagFilter(const ProteoformPtrVec &proteo_ptrs, DiagFilterMngPtr mng_ptr, std::string block_str);
 
   SimplePrsmPtrVec getBestMatch(const PrmMsPtrVec &ms_ptr_vec);
 
@@ -37,7 +37,7 @@ class MassDiagFilter {
   SimplePrsmPtrVec compute(const PrmMsPtrVec &ms_ptr_vec);
 };
 
-typedef std::shared_ptr<MassDiagFilter> MassDiagFilterPtr;
+typedef std::shared_ptr<DiagFilter> DiagFilterPtr;
 } /* namespace toppic */
 
-#endif /* PROT_DIAG_FILTER_H_ */
+#endif

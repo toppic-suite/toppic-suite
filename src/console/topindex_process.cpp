@@ -33,7 +33,7 @@
 #include "filter/mng/zero_ptm_filter_mng.hpp"
 #include "filter/mng/one_ptm_filter_mng.hpp"
 #include "filter/mng/diag_filter_mng.hpp"
-#include "filter/mng/topindex_file_name.hpp"
+#include "filter/mng/index_file_name.hpp"
 #include "filter/index/zero_ptm_index.hpp"
 #include "filter/index/one_ptm_index.hpp"
 #include "filter/index/diag_index.hpp"
@@ -66,7 +66,7 @@ void TopIndexProcess(std::map<std::string, std::string> &arguments){
     }
     //create a folder for index files 
     // index file name
-    TopIndexFileNamePtr file_name_ptr = std::make_shared<TopIndexFileName>();
+    IndexFileNamePtr file_name_ptr = std::make_shared<IndexFileName>();
     std::string index_file_para = file_name_ptr->geneFileName(arguments);
 
     int db_block_size = std::stoi(arguments["databaseBlockSize"]);

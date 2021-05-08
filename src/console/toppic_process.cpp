@@ -43,7 +43,7 @@
 #include "prsm/prsm_util.hpp"
 
 #include "filter/mng/zero_ptm_filter_mng.hpp"
-#include "filter/mng/topindex_file_name.hpp"
+#include "filter/mng/index_file_name.hpp"
 #include "filter/zeroptm/zero_ptm_filter_processor.hpp"
 #include "search/zeroptmsearch/zero_ptm_search_mng.hpp"
 #include "search/zeroptmsearch/zero_ptm_search_processor.hpp"
@@ -195,7 +195,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     }
 
     // index file name
-    TopIndexFileNamePtr file_name_ptr = std::make_shared<TopIndexFileName>();
+    IndexFileNamePtr file_name_ptr = std::make_shared<IndexFileName>();
     std::string index_file_para = file_name_ptr->geneFileName(arguments);
 
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);

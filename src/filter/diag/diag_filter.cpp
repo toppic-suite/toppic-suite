@@ -13,28 +13,24 @@
 //limitations under the License.
 
 #include <algorithm>
-#include <iostream>
-#include <fstream>
 
 #include "common/util/file_util.hpp"
 #include "ms/factory/prm_ms_util.hpp"
 #include "prsm/simple_prsm_util.hpp"
-#include "filter/mng/topindex_file_name.hpp"
+
 #include "filter/massmatch/prot_candidate.hpp"
 #include "filter/massmatch/mass_match_factory.hpp"
 #include "filter/massmatch/mass_match_util.hpp"
-#include "filter/diag/mass_diag_filter.hpp"
+#include "filter/diag/diag_filter.hpp"
 
 namespace toppic {
 
-MassDiagFilter::MassDiagFilter(const ProteoformPtrVec &proteo_ptrs,
+DiagFilter::DiagFilter(const ProteoformPtrVec &proteo_ptrs,
                                DiagFilterMngPtr mng_ptr, std::string block_str) {
   mng_ptr_ = mng_ptr;
   proteo_ptrs_ = proteo_ptrs;
   PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
   
-  //TopIndexFileNamePtr file_name_ptr = std::make_shared<TopIndexFileName>();
-  //std::string parameters = file_name_ptr->geneFileName(prsm_para_ptr);
   std::string parameters = mng_ptr->getIndexFilePara();
   std::string suffix = parameters + block_str;
 	
@@ -45,19 +41,16 @@ MassDiagFilter::MassDiagFilter(const ProteoformPtrVec &proteo_ptrs,
   for (size_t t = 0; t < mng_ptr->multi_ptm_file_vec_.size(); t++){
     std::string file_name = mng_ptr->multi_ptm_file_vec_[t] + suffix;
     if (!file_util::exists(index_dir + file_util::getFileSeparator() + file_name)){
-      index_files_exist = false;//if any of the index files for this ptm is missing
+      //if any of the index files for this ptm is missing
+      index_files_exist = false;
       break; 
     }
   }
 
   if (index_files_exist){ 
-    //std::cout << "Loading index files                            " << std::endl;
     index_ptr_ = std::make_shared<MassMatch>();
-    
     std::string file_name = mng_ptr->multi_ptm_file_vec_[0] + suffix;
-    
     index_ptr_->deserializeMassMatch(file_name, index_dir);
-
   }
   else{
     index_ptr_ = mass_match_factory::getPrmDiagMassMatchPtr(proteo_ptrs,
@@ -66,7 +59,7 @@ MassDiagFilter::MassDiagFilter(const ProteoformPtrVec &proteo_ptrs,
   }
 }
 
-SimplePrsmPtrVec MassDiagFilter::getBestMatch(const PrmMsPtrVec &ms_ptr_vec) {
+SimplePrsmPtrVec DiagFilter::getBestMatch(const PrmMsPtrVec &ms_ptr_vec) {
   SimplePrsmPtrVec match_ptrs = compute(ms_ptr_vec);
   SimplePrsmPtrVec unique_match_ptrs = simple_prsm_util::getUniqueMatches(match_ptrs);
   std::sort(unique_match_ptrs.begin(), unique_match_ptrs.end(), SimplePrsm::cmpScoreDec);
@@ -86,11 +79,10 @@ SimplePrsmPtrVec MassDiagFilter::getBestMatch(const PrmMsPtrVec &ms_ptr_vec) {
   return result_ptrs;
 }
 
-SimplePrsmPtrVec MassDiagFilter::compute(const PrmMsPtrVec &ms_ptr_vec) {
+SimplePrsmPtrVec DiagFilter::compute(const PrmMsPtrVec &ms_ptr_vec) {
   PeakTolerancePtr tole_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
   std::vector<std::pair<int, int> > mass_errors
       = prm_ms_util::getIntMassErrorList(ms_ptr_vec, tole_ptr, mng_ptr_->filter_scale_, true, false);
-  // LOG_DEBUG("mass error size " << mass_errors.size() << " filter result number " << mng_ptr_->filter_result_num_);
   SimplePrsmPtrVec match_ptrs;
   int row_num = index_ptr_->getRowNum();
   std::vector<int> proteo_row_begins = index_ptr_->getProteoRowBegins();
@@ -102,7 +94,6 @@ SimplePrsmPtrVec MassDiagFilter::compute(const PrmMsPtrVec &ms_ptr_vec) {
     ProtCandidatePtrVec results
         = mass_match_util::findTopProteins(scores, proteo_row_begins, proteo_row_ends, threshold,
                                            mng_ptr_->filter_result_num_);
-    // LOG_DEBUG("result size " << results.size());
     for (size_t j = 0; j < results.size(); j++) {
       int id = results[j]->getProteinId();
       int score = results[j]->getScore();

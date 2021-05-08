@@ -15,12 +15,13 @@
 #include <string>
 #include <sstream> 
 
-#include "filter/mng/topindex_file_name.hpp"
 #include "common/util/file_util.hpp"
+#include "filter/mng/index_file_name.hpp"
 
 namespace toppic{
 
-std::string TopIndexFileName::geneFileName(std::map<std::string, std::string> &arguments) {
+std::string IndexFileName::geneFileName(std::map<std::string, 
+                                        std::string> &arguments) {
 
   std::string fixed_mod = arguments["fixedMod"];
 
@@ -53,7 +54,8 @@ std::string TopIndexFileName::geneFileName(std::map<std::string, std::string> &a
     }
   }
 
-  std::vector<std::string>para_vec;//to determine if "_" is needed in between
+  //to determine if "_" is needed in between
+  std::vector<std::string>para_vec;
   std::string para_info;
 
   para_vec.push_back(fixed_mod);

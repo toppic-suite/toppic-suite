@@ -37,4 +37,4 @@ typedef std::shared_ptr<DiagFilterProcessor> DiagFilterProcessorPtr;
 
 }  // namespace toppic
 
-#endif /* PROT_DIAG_FILTER_PROCESSOR_HPP_ */
+#endif 

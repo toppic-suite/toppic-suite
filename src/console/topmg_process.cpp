@@ -49,7 +49,7 @@
 #include "prsm/simple_prsm_str_merge.hpp"
 
 #include "filter/mng/one_ptm_filter_mng.hpp"
-#include "filter/mng/topindex_file_name.hpp"
+#include "filter/mng/index_file_name.hpp"
 #include "filter/oneptm/one_ptm_filter_processor.hpp"
 
 #include "filter/mng/diag_filter_mng.hpp"
@@ -190,12 +190,12 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
     LOG_DEBUG("Decoy " << decoy);
     LOG_DEBUG("block size " << arguments["databaseBlockSize"]);
     int db_block_size = std::stoi(arguments["databaseBlockSize"]);
-	int max_frag_len = std::stoi(arguments["maxFragmentLength"]);
+    int max_frag_len = std::stoi(arguments["maxFragmentLength"]);
 
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
 
     // index file name
-    TopIndexFileNamePtr file_name_ptr = std::make_shared<TopIndexFileName>();
+    IndexFileNamePtr file_name_ptr = std::make_shared<IndexFileName>();
     std::string index_file_para = file_name_ptr->geneFileName(arguments);
 
     fasta_util::dbPreprocess(ori_db_file_name, db_file_name, decoy, db_block_size, max_frag_len);
