@@ -21,6 +21,14 @@
 
 namespace toppic {
 
+ZeroPtmFastMatch::ZeroPtmFastMatch(ProteoformPtr proteo_ptr, 
+                                   double score, 
+                                   int begin, int end):
+      proteo_ptr_(proteo_ptr),
+      score_(score),
+      begin_(begin),
+      end_(end) {}
+
 /*
  * in the computing of diagonal score in fast filtering, we allow to use n
  * terminal large error tolerance
@@ -63,7 +71,6 @@ double compScore(ExtendMsPtr ms_ptr, ProteoformPtr proteo_ptr, double n_shift,
   IonTypePtr c_ion_type_ptr = activation->getCIonTypePtr();
   masses = proteo_ptr->getBpSpecPtr()->getBreakPointMasses(c_ion_type_ptr);
   score += compDiagScr(ms_ptr, masses, c_shift);
-  // LOG_TRACE("score " << score);
   return score;
 }
 
@@ -83,10 +90,6 @@ ZpFastMatchPtr computeCompMatch(const ExtendMsPtrVec &ms_ptr_vec,
   double res_sum_mass = header_ptr->getPrecMonoMassMinusWater();
   double prot_mass = proteo_ptr->getResSeqPtr()->getResMassSum();
   double error = std::abs(res_sum_mass - prot_mass);
-  // LOG_TRACE("complete protein mass " << prot_mass
-  //          << " precursor mass " << res_sum_mass
-  //          << " proteoform name " << proteo_ptr->getSeqName()
-  //          << " error " << error << " error tolerance " << max_error);
   double score = 0;
   if (error <= max_error) {
     score = compScore(ms_ptr_vec, proteo_ptr, 0, 0);
@@ -106,13 +109,6 @@ ZpFastMatchPtr computePrefixMatch(const ExtendMsPtrVec &ms_ptr_vec,
   bool is_prefix = false;
   int seq_end = 0;
   for (size_t i = 0; i < prms.size() - 1; i++) {
-    /*
-       LOG_TRACE("residue sum mass " << res_sum_mass << " prsm  " << prms[i] 
-       << " residue " << proteo_ptr->getResSeqPtr()->getResiduePtr(i)->toString()
-       << " error " << std::abs(res_sum_mass - prms[i])
-       << " max error " << max_error << " "
-       << proteo_ptr->getDbResSeqPtr()->getName());
-       */
     if (std::abs(res_sum_mass - prms[i]) <= max_error) {
       is_prefix = true;
       seq_end = i - 1;
@@ -225,7 +221,6 @@ ZpFastMatchPtrVec ZeroPtmFastMatch::filter(ProteoformTypePtr align_type_ptr,
 
   // sort
   std::sort(match_vec.begin(), match_vec.end(), ZeroPtmFastMatch::cmpScoreDec);
-  // LOG_DEBUG("sort  finished BEST SCORE " << match_vec[0]->getScore());
 
   size_t num = report_num;
   if (num > proteo_ptrs.size()) {

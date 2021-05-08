@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_SEARCH_ZERO_PTM_SEARCH_ZERO_PTM_SLOW_MATCH_HPP_
 #define TOPPIC_SEARCH_ZERO_PTM_SEARCH_ZERO_PTM_SLOW_MATCH_HPP_
 
@@ -63,9 +62,6 @@ class ZeroPtmSlowMatch {
                           const ZpSlowMatchPtr &b) {
     return a->getScore() > b->getScore();
   }
-
-  //double recal_ = 0;
-  //bool isValid (double recal, double ppo);
 };
 
 }

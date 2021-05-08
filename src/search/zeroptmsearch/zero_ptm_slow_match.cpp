@@ -12,13 +12,11 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include <algorithm>
 #include <vector>
 
 #include "common/util/logger.hpp"
 #include "common/base/activation.hpp"
-#include "seq/proteoform.hpp"
 #include "seq/proteoform_factory.hpp"
 #include "ms/factory/extend_ms_factory.hpp"
 #include "ms/factory/extend_ms_util.hpp"
@@ -35,7 +33,6 @@ ZeroPtmSlowMatch::ZeroPtmSlowMatch(const DeconvMsPtrVec &deconv_ms_ptr_vec,
     mng_ptr_(mng_ptr),
     deconv_ms_ptr_vec_(deconv_ms_ptr_vec),
     fast_match_ptr_(fast_match_ptr) {
-
       proteoform_ptr_ = proteoform_factory::geneSubProteoform(fast_match_ptr->getProteoformPtr(), 
                                                               fast_match_ptr->getBegin(), 
                                                               fast_match_ptr->getEnd());
@@ -49,8 +46,8 @@ ZeroPtmSlowMatch::ZeroPtmSlowMatch(const DeconvMsPtrVec &deconv_ms_ptr_vec,
       compScore(refine_ms_ptr_vec_);
     }
 
-ZeroPtmSlowMatch::ZeroPtmSlowMatch(const DeconvMsPtrVec &deconv_ms_ptr_vec,                               
-                                   ProteoformPtr proteoform_ptr,                                        
+ZeroPtmSlowMatch::ZeroPtmSlowMatch(const DeconvMsPtrVec &deconv_ms_ptr_vec,
+                                   ProteoformPtr proteoform_ptr,
                                    ZeroPtmSearchMngPtr mng_ptr):
     mng_ptr_(mng_ptr),
     deconv_ms_ptr_vec_(deconv_ms_ptr_vec),
@@ -115,7 +112,6 @@ ZpSlowMatchPtrVec ZeroPtmSlowMatch::filter(const DeconvMsPtrVec &deconv_ms_ptr_v
   }
   // sort 
   std::sort(slow_matches.begin(), slow_matches.end(), ZeroPtmSlowMatch::cmpScoreDec);
-
   return slow_matches;
 }
 

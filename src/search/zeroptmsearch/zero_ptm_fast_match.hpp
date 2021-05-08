@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_SEARCH_ZERO_PTM_SEARCH_ZERO_PTM_FAST_MATCH_HPP_
 #define TOPPIC_SEARCH_ZERO_PTM_SEARCH_ZERO_PTM_FAST_MATCH_HPP_
 
@@ -29,11 +28,7 @@ typedef std::vector<ZpFastMatchPtr> ZpFastMatchPtrVec;
 
 class ZeroPtmFastMatch {
  public:
-  ZeroPtmFastMatch(ProteoformPtr proteo_ptr, double score, int begin, int end):
-      proteo_ptr_(proteo_ptr),
-      score_(score),
-      begin_(begin),
-      end_(end) {}
+  ZeroPtmFastMatch(ProteoformPtr proteo_ptr, double score, int begin, int end);
 
   double getScore() {return score_;}
 
