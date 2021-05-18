@@ -79,10 +79,10 @@ void PtmSlowMatch::addPrefixDiagonals(DiagonalHeaderPtrVec &common_header_ptrs,
   for (size_t i = 0; i < common_header_ptrs.size(); i++) {
     double s = common_header_ptrs[i]->getProtNTermShift();
     // find a similar shift in n_term_match_shifts
-    int best_n_pos = DiagonalHeaderUtil::findSimilarShiftPos(n_term_match_shifts, s);
+    int best_n_pos = diagonal_header_util::findSimilarShiftPos(n_term_match_shifts, s);
     if (best_n_pos >= 0) {
       double new_shift = n_term_match_shifts[best_n_pos];
-      if (!DiagonalHeaderUtil::isExistHeader(n_extend_header_ptrs, new_shift)) {
+      if (!diagonal_header_util::isExistHeader(n_extend_header_ptrs, new_shift)) {
         // n_term strict; c_term nostrict; prot n_term no_match; prot c_term no_match
         // pep n_term match; pep c_term no_match
         DiagonalHeaderPtr header_ptr
@@ -106,12 +106,12 @@ void PtmSlowMatch::addSuffixDiagonals(DiagonalHeaderPtrVec &common_header_ptrs,
   // add trunc headers that have similar shift to best shift headers
   for (size_t i = 0; i < common_header_ptrs.size(); i++) {
     double s = common_header_ptrs[i]->getProtNTermShift();
-    int best_c_pos = DiagonalHeaderUtil::findSimilarShiftPos(c_term_match_shifts, s);
+    int best_c_pos = diagonal_header_util::findSimilarShiftPos(c_term_match_shifts, s);
     // LOG_DEBUG("Shift " << s <<" C term position " << best_c_pos);
     if (best_c_pos >= 0) {
       double new_shift = c_term_match_shifts[best_c_pos];
       // LOG_DEBUG("Shift " << s <<" C term shift " << new_shift);
-      if (!DiagonalHeaderUtil::isExistHeader(c_extend_header_ptrs, new_shift)) {
+      if (!diagonal_header_util::isExistHeader(c_extend_header_ptrs, new_shift)) {
         // n term nostrict, c_term strict, prot n_term no match ; prot c_term no match
         // pep n_term no match, pep c_term match
         DiagonalHeaderPtr header_ptr
@@ -128,7 +128,7 @@ DiagonalHeaderPtrVec PtmSlowMatch::geneNTermShiftHeaders() {
 
   // add corner diagonals for all types of alignments
   double seq_mass = proteo_ptr_->getResSeqPtr()->getSeqMass();
-  DiagonalHeaderUtil::addCornerDiagonals(n_extend_header_ptrs,
+  diagonal_header_util::addCornerDiagonals(n_extend_header_ptrs,
                                          c_extend_header_ptrs,
                                          seq_mass,
                                          prec_mono_mass_);

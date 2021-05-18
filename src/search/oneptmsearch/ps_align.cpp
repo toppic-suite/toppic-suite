@@ -19,6 +19,8 @@
 
 #include "seq/proteoform_factory.hpp"
 #include "ms/factory/extend_ms_factory.hpp"
+#include "search/diag/diagonal_util.hpp"
+#include "search/diag/diagonal_header_util.hpp"
 #include "search/oneptmsearch/ps_align.hpp"
 
 namespace toppic {
@@ -267,11 +269,11 @@ DiagonalHeaderPtrVec PSAlign::backtrace(int s) {
       cur_end = pre->getY();
     } else if (pre == first_pair_ptr_) {
       cur_bgn = p->getY();
-      list.push_back(geneDiagonalHeaderPtr(cur_bgn, cur_end, cur_header));
+      list.push_back(diagonal_header_util::geneDiagonalHeaderPtr(cur_bgn, cur_end, cur_header));
     } else {
       if (p->getType(s) == PATH_TYPE_SHIFT) {
         cur_bgn = p->getY();
-        list.push_back(geneDiagonalHeaderPtr(cur_bgn, cur_end, cur_header));
+        list.push_back(diagonal_header_util::geneDiagonalHeaderPtr(cur_bgn, cur_end, cur_header));
         cur_header = pre->getDiagonalHeader();
         cur_end = pre->getY();
       }
@@ -302,23 +304,26 @@ PrsmPtr PSAlign::geneResult(int shift_num, ProteoformPtr proteo_ptr,
   double min_mass = prsm_para_ptr->getSpParaPtr()->getMinMass();
   double ppo = prsm_para_ptr->getSpParaPtr()->getPeakTolerancePtr()->getPpo();
 
-  double refine_prec_mass = refinePrecursorAndHeaderShift(proteo_ptr, ms_three_ptr_vec,
-                                                          header_ptrs, ppo, min_mass,
-                                                          para_ptr_->refine_prec_step_width_);
+  double refine_prec_mass 
+      = diagonal_util::refinePrecursorAndHeaderShift(proteo_ptr, ms_three_ptr_vec,
+                                                     header_ptrs, ppo, min_mass,
+                                                     para_ptr_->refine_prec_step_width_);
 
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
   ExtendMsPtrVec refine_ms_ptr_vec = extend_ms_factory::geneMsThreePtrVec(deconv_ms_ptr_vec,
                                                                           sp_para_ptr, refine_prec_mass);
 
-  DiagonalHeaderPtrVec refined_header_ptrs = refineHeadersBgnEnd(proteo_ptr, refine_ms_ptr_vec,
-                                                                 header_ptrs, min_mass);
+  DiagonalHeaderPtrVec refined_header_ptrs = diagonal_util::refineHeadersBgnEnd(proteo_ptr, 
+                                                                                refine_ms_ptr_vec,
+                                                                                header_ptrs, 
+                                                                                min_mass);
 
   if (refined_header_ptrs.size() == 0) {
     return nullptr;
   }
 
-  MassShiftPtrVec shifts = getDiagonalMassChanges(refined_header_ptrs, first_pos,
-                                                  last_pos, AlterType::UNEXPECTED);
+  MassShiftPtrVec shifts = diagonal_header_util::getDiagonalMassChanges(refined_header_ptrs, first_pos,
+                                                                      last_pos, AlterType::UNEXPECTED);
   sub_proteo_ptr->addMassShiftPtrVec(shifts);
 
   return std::make_shared<Prsm>(sub_proteo_ptr, deconv_ms_ptr_vec, refine_prec_mass,

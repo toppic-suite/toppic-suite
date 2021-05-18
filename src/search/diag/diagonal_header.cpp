@@ -12,17 +12,22 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#include <cmath>
-#include <vector>
-
-#include "common/base/prot_mod.hpp"
-#include "common/base/mod_base.hpp"
-#include "seq/alter.hpp"
 #include "prsm/prsm_algo.hpp"
 #include "search/diag/diagonal_header.hpp"
 
 namespace toppic {
+
+DiagonalHeader::DiagonalHeader(double n_term_shift,
+                               bool n_strict, bool c_strict,
+                               bool prot_n_match, bool prot_c_match,
+                               bool pep_n_match, bool pep_c_match):
+    prot_N_term_shift_(n_term_shift),
+    n_strict_(n_strict),
+    c_strict_(c_strict),
+    prot_N_term_match_(prot_n_match),
+    prot_C_term_match_(prot_c_match),
+    pep_N_term_match_(pep_n_match),
+    pep_C_term_match_(pep_c_match) {}
 
 DiagonalHeaderPtr DiagonalHeader::clone() {
   DiagonalHeaderPtr cloned
@@ -43,12 +48,14 @@ DiagonalHeaderPtr DiagonalHeader::clone() {
   return cloned;
 }
 
-DiagonalHeaderPtr geneDiagonalHeaderPtr(int bgn, int end,
-                                        DiagonalHeaderPtr header_ptr) {
-  DiagonalHeaderPtr new_header_ptr = header_ptr->clone();
-  new_header_ptr->setMatchFirstBpPos(bgn);
-  new_header_ptr->setMatchLastBpPos(end);
-  return new_header_ptr;
+void DiagonalHeader::changeOnlyNTermShift(double s) {
+  prot_N_term_shift_ += s;
+  pep_N_term_shift_  += s;
+}
+
+void DiagonalHeader::changeOnlyCTermShift(double s) {
+  prot_C_term_shift_ += s;
+  pep_C_term_shift_  += s;
 }
 
 void DiagonalHeader::initHeader(double c_shift, ProteoformPtr proteo_ptr,
@@ -76,86 +83,6 @@ void DiagonalHeader::initHeader(double c_shift, ProteoformPtr proteo_ptr,
   } else {
     is_align_suffix_ = false;
   }
-}
-
-MassShiftPtrVec getDiagonalMassChanges(const DiagonalHeaderPtrVec &header_ptrs,
-                                       int first_res_pos, int last_res_pos,
-                                       AlterTypePtr type_ptr) {
-  MassShiftPtrVec shift_list;
-  ModPtr none_ptr = ModBase::getNoneModPtr();
-  if (!header_ptrs[0]->isPepNTermMatch() && !header_ptrs[0]->isProtNTermMatch()) {
-    AlterPtr alter_ptr
-        = std::make_shared<Alter>(0, header_ptrs[0]->getMatchFirstBpPos()-first_res_pos,
-                                       type_ptr, header_ptrs[0]->getPepNTermShift(), none_ptr);
-    MassShiftPtr shift = std::make_shared<MassShift>(alter_ptr);
-    shift_list.push_back(shift);
-  }
-
-  for (size_t i = 0; i < header_ptrs.size() - 1; i++) {
-    AlterPtr alter_ptr
-        = std::make_shared<Alter>(header_ptrs[i]->getMatchLastBpPos() - first_res_pos,
-                                       header_ptrs[i + 1]->getMatchFirstBpPos() - first_res_pos,
-                                       type_ptr,
-                                       header_ptrs[i + 1]->getProtNTermShift() 
-                                         - header_ptrs[i]->getProtNTermShift(),
-                                       none_ptr);
-    MassShiftPtr shift = std::make_shared<MassShift>(alter_ptr);
-    shift_list.push_back(shift);
-  }
-
-  DiagonalHeaderPtr last_header_ptr = header_ptrs[header_ptrs.size() - 1];
-  if (!last_header_ptr->isPepCTermMatch() && !last_header_ptr->isProtCTermMatch()) {
-    AlterPtr alter_ptr
-        = std::make_shared<Alter>(last_header_ptr->getMatchLastBpPos() - first_res_pos,
-                                       (last_res_pos + 1) - first_res_pos,
-                                       type_ptr, last_header_ptr->getPepCTermShift(),
-                                       none_ptr);
-    MassShiftPtr shift = std::make_shared<MassShift>(alter_ptr);
-    shift_list.push_back(shift);
-  }
-  return shift_list;
-}
-
-MassShiftPtrVec getDiagonalMassChanges(const DiagonalHeaderPtrVec &header_ptrs,
-                                       int first_res_pos, int last_res_pos,
-                                       const AlterTypePtrVec & types) {
-  MassShiftPtrVec shift_list;
-  ModPtr none_ptr = ModBase::getNoneModPtr();
-  if (!header_ptrs[0]->isPepNTermMatch() && !header_ptrs[0]->isProtNTermMatch()) {
-    AlterPtr alter_ptr
-        = std::make_shared<Alter>(0, header_ptrs[0]->getMatchFirstBpPos() - first_res_pos,
-                                       types[0],
-                                       header_ptrs[0]->getPepNTermShift(), none_ptr);
-
-    MassShiftPtr shift = std::make_shared<MassShift>(alter_ptr);
-    shift_list.push_back(shift);
-  }
-
-  for (size_t i = 0; i < header_ptrs.size() - 1; i++) {
-    AlterPtr alter_ptr
-        = std::make_shared<Alter>(header_ptrs[i]->getMatchLastBpPos() - first_res_pos,
-                                       header_ptrs[i + 1]->getMatchFirstBpPos() - first_res_pos,
-                                       types[i + 1],
-                                       header_ptrs[i + 1]->getProtNTermShift() 
-                                       - header_ptrs[i]->getProtNTermShift(),
-                                       none_ptr);
-    MassShiftPtr shift = std::make_shared<MassShift>(alter_ptr);
-    shift_list.push_back(shift);
-  }
-
-  DiagonalHeaderPtr last_header_ptr = header_ptrs[header_ptrs.size() - 1];
-
-  if (!last_header_ptr->isPepCTermMatch() && !last_header_ptr->isProtCTermMatch()) {
-    AlterPtr alter_ptr
-        = std::make_shared<Alter>(last_header_ptr->getMatchLastBpPos() - first_res_pos,
-                                       (last_res_pos + 1) - first_res_pos,
-                                       AlterType::UNEXPECTED,
-                                       last_header_ptr->getPepCTermShift(),
-                                       none_ptr);
-    MassShiftPtr shift = std::make_shared<MassShift>(alter_ptr);
-    shift_list.push_back(shift);
-  }
-  return shift_list;
 }
 
 }  // namespace toppic

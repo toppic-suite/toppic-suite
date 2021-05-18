@@ -12,16 +12,9 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_SEARCH_DIAG_DIAGONAL_HPP_
 #define TOPPIC_SEARCH_DIAG_DIAGONAL_HPP_
 
-#include <memory>
-#include <vector>
-
-#include "ms/spec/theo_peak.hpp"
-#include "ms/spec/extend_ms.hpp"
-#include "prsm/peak_ion_pair.hpp"
 #include "search/diag/diagonal_header.hpp"
 
 namespace toppic {
@@ -31,15 +24,16 @@ class Diagonal {
  public:
   Diagonal() {}
 
-  Diagonal(DiagonalHeaderPtr header_ptr) {
-    header_ptr_ = header_ptr; 
-  }
+  // Add contruction method here because a template 
+  // is used. 
+  explicit Diagonal(DiagonalHeaderPtr header_ptr):
+      header_ptr_(header_ptr) {}
 
   // need init pair_ptr_list after create
-  Diagonal(DiagonalHeaderPtr header_ptr, std::vector<T> pair_ptr_list) {
-    header_ptr_ = header_ptr;
-    pair_ptr_list_ = pair_ptr_list;
-  }
+  explicit Diagonal(DiagonalHeaderPtr header_ptr, 
+                    std::vector<T> pair_ptr_list):
+      header_ptr_(header_ptr),
+      pair_ptr_list_(pair_ptr_list) {}
 
   size_t size() {return pair_ptr_list_.size(); }
 
@@ -54,27 +48,6 @@ class Diagonal {
 
   std::vector<T> pair_ptr_list_;
 };
-
-double refinePrecursorAndHeaderShift(ProteoformPtr proteo_ptr,
-                                     const ExtendMsPtrVec &ms_three_ptr_vec,
-                                     DiagonalHeaderPtrVec &header_ptrs,
-                                     double ppo, double min_mass,
-                                     double refine_prec_step_width);
-
-DiagonalHeaderPtrVec refineHeadersBgnEnd(ProteoformPtr proteo_ptr,
-                                         const ExtendMsPtrVec &ms_three_ptr_vec,
-                                         const DiagonalHeaderPtrVec& heade_ptrs,
-                                         double min_mass);
-
-DiagonalHeaderPtrVec2D refineHeadersBgnEnd(ProteoformPtr proteo_ptr,
-                                           const ExtendMsPtrVec &ms_three_ptr_vec,
-                                           const DiagonalHeaderPtrVec2D& header_ptrs_2d,
-                                           const DiagonalHeaderPtrVec& header_ptrs_1d,
-                                           double min_mass);
-
-int getNewBgn(const PeakIonPairPtrVec& pair_ptrs);
-
-int getNewEnd(const PeakIonPairPtrVec& pair_ptrs);
 
 } /* namespace toppic */
 

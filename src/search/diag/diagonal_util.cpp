@@ -12,18 +12,18 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include <limits>
 #include <cmath>
-#include <vector>
 
 #include "common/util/logger.hpp"
 #include "common/base/neutral_loss_base.hpp"
 #include "prsm/theo_peak_util.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
-#include "search/diag/diagonal.hpp"
+#include "search/diag/diagonal_util.hpp"
 
 namespace toppic {
+
+namespace diagonal_util {
 
 inline TheoPeakPtrVec getDiagonalTheoPeak(ProteoformPtr proteo_ptr,
                                           ActivationPtr activation_ptr,
@@ -141,17 +141,14 @@ double refinePrecursorAndHeaderShift(ProteoformPtr proteo_ptr,
   int best_pos = one_side_step_num;
   for (size_t i = 0; i < counts.size(); i++) {
     int next_sum = sum + counts[i];
-    // LOG_DEBUG("pos " << i << " count " << counts[i]);
     if (sum <= median && median <= next_sum) {
       best_pos = i;
-      // LOG_DEBUG("best pos " << best_pos << " count " << counts[best_pos]);
       break;
     }
     sum = next_sum;
   }
 
   double best_delta = - (best_pos - one_side_step_num) * refine_prec_step_width;
-  // LOG_DEBUG("best delta " << best_delta);
 
   for (size_t i = 0; i < header_ptrs.size() - 1; i++) {
     header_ptrs[i]->changeOnlyCTermShift(best_delta);
@@ -287,6 +284,8 @@ int getNewEnd(const PeakIonPairPtrVec &pair_ptrs) {
     }
   }
   return new_end;
+}
+
 }
 
 }  // namespace toppic

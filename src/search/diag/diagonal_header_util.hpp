@@ -12,18 +12,15 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_SEARCH_DIAG_DIAGONAL_HEADER_UTIL_HPP_
 #define TOPPIC_SEARCH_DIAG_DIAGONAL_HEADER_UTIL_HPP_
-
-#include <limits>
-#include <cmath>
-#include <vector>
 
 #include "search/diag/diagonal_header.hpp"
 
 namespace toppic {
-namespace DiagonalHeaderUtil {
+
+namespace diagonal_header_util {
+
 // get the header corresponding to the top left corner in the spectral grid
 DiagonalHeaderPtr getTopLeftCornerHeader();
 
@@ -36,7 +33,20 @@ void addCornerDiagonals(DiagonalHeaderPtrVec &n_extend_header_ptrs,
 int findSimilarShiftPos(const std::vector<double> &shifts, double s);
 
 bool isExistHeader(const DiagonalHeaderPtrVec &header_ptrs, double shift);
-}  // namespace DiagonalHeaderUtil
+
+// generate (clone) a new diagonal header with new bgn and end
+DiagonalHeaderPtr geneDiagonalHeaderPtr(int bgn, int end, DiagonalHeaderPtr diag_ptr);
+
+MassShiftPtrVec getDiagonalMassChanges(const DiagonalHeaderPtrVec &diag_ptrs,
+                                       int first_res_pos, int last_res_pos,
+                                       AlterTypePtr type_ptr);
+
+MassShiftPtrVec getDiagonalMassChanges(const DiagonalHeaderPtrVec &header_ptrs,
+                                       int first_res_pos, int last_res_pos,
+                                       const AlterTypePtrVec & type_ptrs);
+
+}  // namespace diagonal_header_util
+
 }  // namespace toppic
 
 #endif

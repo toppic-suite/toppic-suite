@@ -12,14 +12,12 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_SEARCH_DIAG_DIAGONAL_HEADER_HPP_
 #define TOPPIC_SEARCH_DIAG_DIAGONAL_HEADER_HPP_
 
 #include <vector>
 
 #include "seq/proteoform.hpp"
-#include "ms/spec/prm_peak.hpp"
 
 namespace toppic {
 
@@ -35,28 +33,16 @@ class DiagonalHeader {
   DiagonalHeader(double n_term_shift,
                  bool n_strict, bool c_strict,
                  bool prot_n_match, bool prot_c_match,
-                 bool pep_n_match, bool pep_c_match):
-      prot_N_term_shift_(n_term_shift),
-      n_strict_(n_strict),
-      c_strict_(c_strict),
-      prot_N_term_match_(prot_n_match),
-      prot_C_term_match_(prot_c_match),
-      pep_N_term_match_(pep_n_match),
-      pep_C_term_match_(pep_c_match) {}
+                 bool pep_n_match, bool pep_c_match);
 
   DiagonalHeaderPtr clone();
 
-  void initHeader(double c_shift, ProteoformPtr proteoform, double align_pref_suff_shift_thresh);
+  void initHeader(double c_shift, ProteoformPtr proteoform, 
+                  double align_pref_suff_shift_thresh);
 
-  void changeOnlyNTermShift(double s) {
-    prot_N_term_shift_ += s;
-    pep_N_term_shift_  += s;
-  }
+  void changeOnlyNTermShift(double s);
 
-  void changeOnlyCTermShift(double s) {
-    prot_C_term_shift_ += s;
-    pep_C_term_shift_  += s;
-  }
+  void changeOnlyCTermShift(double s);
 
   int getTruncFirstResPos() {return trunc_first_res_pos_;}
 
@@ -158,17 +144,6 @@ class DiagonalHeader {
   // if protCTermShift is not large
   bool is_align_suffix_ = false;
 };
-
-// generate (clone) a new diagonal header with new bgn and end
-DiagonalHeaderPtr geneDiagonalHeaderPtr(int bgn, int end, DiagonalHeaderPtr diag_ptr);
-
-MassShiftPtrVec getDiagonalMassChanges(const DiagonalHeaderPtrVec &diag_ptrs,
-                                       int first_res_pos, int last_res_pos,
-                                       AlterTypePtr type_ptr);
-
-MassShiftPtrVec getDiagonalMassChanges(const DiagonalHeaderPtrVec &header_ptrs,
-                                       int first_res_pos, int last_res_pos,
-                                       const AlterTypePtrVec & type_ptrs);
 
 } /* namespace toppic */
 
