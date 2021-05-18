@@ -13,10 +13,7 @@
 //limitations under the License.
 
 #include <algorithm>
-#include <vector>
 
-#include "common/util/logger.hpp"
-#include "common/base/base_data.hpp"
 #include "search/zeroptmsearch/zero_ptm_fast_match.hpp"
 
 namespace toppic {

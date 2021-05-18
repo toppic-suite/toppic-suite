@@ -13,9 +13,7 @@
 //limitations under the License.
 
 #include <algorithm>
-#include <vector>
 
-#include "common/util/logger.hpp"
 #include "common/base/activation.hpp"
 #include "seq/proteoform_factory.hpp"
 #include "ms/factory/extend_ms_factory.hpp"

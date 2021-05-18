@@ -15,14 +15,11 @@
 #include <cmath>
 #include <algorithm>
 
-#include "htslib/faidx.h"
-
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "seq/proteoform_factory.hpp"
 #include "ms/spec/msalign_util.hpp"
 #include "ms/factory/spectrum_set_factory.hpp"
-#include "prsm/simple_prsm.hpp"
 #include "prsm/simple_prsm_reader.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 #include "search/zeroptmsearch/zero_ptm_fast_match.hpp"

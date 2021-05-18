@@ -32,8 +32,6 @@ class ZeroPtmSearchMng {
 
   PrsmParaPtr prsm_para_ptr_;
 
-  /** parameters for zero ptm search */
-
   /** zero ptm fast filtering */
   int zero_ptm_filter_result_num_ = 20;
   /** number of reported Prsms for each spectrum */
