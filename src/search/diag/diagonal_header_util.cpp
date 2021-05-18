@@ -74,7 +74,7 @@ bool isExistHeader(const DiagonalHeaderPtrVec &header_ptrs, double shift) {
 
 DiagonalHeaderPtr geneDiagonalHeaderPtr(int bgn, int end,
                                         DiagonalHeaderPtr header_ptr) {
-  DiagonalHeaderPtr new_header_ptr = header_ptr->clone();
+  DiagonalHeaderPtr new_header_ptr = std::make_shared<DiagonalHeader>(*header_ptr);
   new_header_ptr->setMatchFirstBpPos(bgn);
   new_header_ptr->setMatchLastBpPos(end);
   return new_header_ptr;

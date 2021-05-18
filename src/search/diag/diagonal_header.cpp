@@ -29,25 +29,6 @@ DiagonalHeader::DiagonalHeader(double n_term_shift,
     pep_N_term_match_(pep_n_match),
     pep_C_term_match_(pep_c_match) {}
 
-DiagonalHeaderPtr DiagonalHeader::clone() {
-  DiagonalHeaderPtr cloned
-      = std::make_shared<DiagonalHeader>(prot_N_term_shift_, n_strict_, c_strict_,
-                                         prot_N_term_match_, prot_C_term_match_,
-                                         pep_N_term_match_, pep_C_term_match_);
-  cloned->setId(id_);
-  cloned->setTruncFirstResPos(trunc_first_res_pos_);
-  cloned->setMatchFirstBpPos(match_first_bp_pos_);
-  cloned->setPepNTermShift(pep_N_term_shift_);
-  cloned->setProtNTermShift(prot_N_term_shift_);
-  cloned->setAlignPrefix(is_align_prefix_);
-  cloned->setTruncLastResPos(trunc_last_res_pos_);
-  cloned->setMatchLastBpPos(match_last_bp_pos_);
-  cloned->setPepCTermShift(pep_C_term_shift_);
-  cloned->setProtCTermShift(prot_C_term_shift_);
-  cloned->setAlignSuffix(is_align_suffix_);
-  return cloned;
-}
-
 void DiagonalHeader::changeOnlyNTermShift(double s) {
   prot_N_term_shift_ += s;
   pep_N_term_shift_  += s;

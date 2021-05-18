@@ -35,8 +35,6 @@ class DiagonalHeader {
                  bool prot_n_match, bool prot_c_match,
                  bool pep_n_match, bool pep_c_match);
 
-  DiagonalHeaderPtr clone();
-
   void initHeader(double c_shift, ProteoformPtr proteoform, 
                   double align_pref_suff_shift_thresh);
 
