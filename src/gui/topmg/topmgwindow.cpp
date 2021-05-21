@@ -141,6 +141,8 @@ void topmgWindow::on_defaultButton_clicked() {
   ui->asfDiagCheckBox->setChecked(false);
   ui->geneHTMLCheckBox->setChecked(true);
   ui->wholeProteinCheckBox->setChecked(false);
+  ui->maxGapLength->setText("40");
+  ui->maxVarPTMGap->setText("5");
 }
 
 void topmgWindow::updatedir(QString s) {
@@ -321,11 +323,11 @@ std::map<std::string, std::string> topmgWindow::getArguments() {
   arguments_["useGf"] = "false";  // default
   arguments_["groupSpectrumNumber"] = "1";  // default
   //arguments_["skipList"] = ui->skipListEdit->text().toStdString();
-  arguments_["proteoGraphGap"] = "40";  // default
+  arguments_["proteoGraphGap"] = ui->maxGapLength->text().toStdString();
   arguments_["useAsfDiag"] = "false";  // default
   arguments_["varPtmNumber"] = ui->numModComboBox->currentText().toStdString();
   arguments_["ptmNumber"] = ui->numUnknownShiftComboBox->currentText().toStdString();
-  arguments_["varPtmNumInGap"] = "5";  // default
+  arguments_["varPtmNumInGap"] = ui->maxVarPTMGap->text().toStdString();
   arguments_["varModFileName"] = ui->modFileEdit->text().toStdString();
   arguments_["threadNumber"] = ui->threadNumberEdit->text().toStdString();
   if (ui->topfdFeatureCheckBox->isChecked()) {
@@ -445,6 +447,8 @@ void topmgWindow::lockDialog() {
   ui->delButton->setEnabled(false);
   ui->geneHTMLCheckBox->setEnabled(false);
   ui->wholeProteinCheckBox->setEnabled(false);
+  ui->maxGapLength->setEnabled(false);
+  ui->maxVarPTMGap->setEnabled(false);
 }
 
 void topmgWindow::unlockDialog() {
@@ -485,6 +489,8 @@ void topmgWindow::unlockDialog() {
   ui->delButton->setEnabled(true);
   ui->geneHTMLCheckBox->setEnabled(true);
   ui->wholeProteinCheckBox->setEnabled(true);
+  ui->maxGapLength->setEnabled(true);
+  ui->maxVarPTMGap->setEnabled(true);
 }
 
 bool topmgWindow::checkError() {
@@ -565,6 +571,18 @@ bool topmgWindow::checkError() {
   if (ui->threadNumberEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
                          tr("Thread number is empty!"),
+                         QMessageBox::Yes);
+    return true;
+  }
+  if (ui->maxGapLength->text().isEmpty()) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("Maximum gap length is empty!"),
+                         QMessageBox::Yes);
+    return true;
+  }
+  if (ui->maxVarPTMGap->text().isEmpty()) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("Maximum variable PTM in a gap is empty!"),
                          QMessageBox::Yes);
     return true;
   }
