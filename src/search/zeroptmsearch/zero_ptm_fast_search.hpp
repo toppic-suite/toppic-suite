@@ -12,16 +12,24 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#ifndef TOPPIC_SEARCH_ZERO_PTM_SEARCH_ZERO_PTM_FAST_SEARCH_HPP_
+#define TOPPIC_SEARCH_ZERO_PTM_SEARCH_ZERO_PTM_FAST_SEARCH_HPP_
+
+#include "seq/proteoform.hpp"
+#include "ms/spec/extend_ms.hpp"
 #include "search/zeroptmsearch/zero_ptm_fast_match.hpp"
 
 namespace toppic {
 
-ZeroPtmFastMatch::ZeroPtmFastMatch(ProteoformPtr proteo_ptr, 
-                                   double score, 
-                                   int begin, int end):
-      proteo_ptr_(proteo_ptr),
-      score_(score),
-      begin_(begin),
-      end_(end) {}
+namespace zero_ptm_fast_search {
+
+ZpFastMatchPtrVec filter(ProteoformTypePtr align_type_ptr,
+                         const ExtendMsPtrVec &ms_ptr_ptr,
+                         const ProteoformPtrVec &proteo_ptrs,
+                         int report_num, double ppo);
+
+}
 
 }  // namespace toppic
+#endif
+

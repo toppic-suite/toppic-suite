@@ -20,8 +20,8 @@
 
 #include "seq/proteoform_factory.hpp"
 #include "ms/factory/extend_ms_factory.hpp"
-#include "search/diag/diagonal.hpp"
-#include "search/diag/diagonal_header.hpp"
+#include "search/diag/diagonal_util.hpp"
+#include "search/diag/diagonal_header_util.hpp"
 #include "search/graph/graph.hpp"
 #include "search/graphalign/graph_align_processor.hpp"
 #include "search/graphalign/graph_align.hpp"
@@ -544,16 +544,16 @@ PrsmPtr GraphAlign::geneResult(int s, int m) {
   double min_mass = sp_para_ptr->getMinMass();
   double ppo = sp_para_ptr->getPeakTolerancePtr()->getPpo();
   LOG_DEBUG("begin refine");
-  double refine_prec_mass = refinePrecursorAndHeaderShift(proteo_ptr, ms_three_ptr_vec,
-                                                          diag_headers_, ppo, min_mass,
-                                                          mng_ptr_->refine_prec_step_width_);
+  double refine_prec_mass = diagonal_util::refinePrecursorAndHeaderShift(proteo_ptr, ms_three_ptr_vec,
+                                                                        diag_headers_, ppo, min_mass,
+                                                                        mng_ptr_->refine_prec_step_width_);
   LOG_DEBUG("get reine prec mass" << refine_prec_mass);
 
   DeconvMsPtrVec deconv_ms_ptr_vec = spec_graph_ptr_->getSpectrumSetPtr()->getDeconvMsPtrVec();
   ExtendMsPtrVec refine_ms_ptr_vec
       = extend_ms_factory::geneMsThreePtrVec(deconv_ms_ptr_vec,  sp_para_ptr, refine_prec_mass);
 
-  DiagonalHeaderPtrVec2D refined_headers_2d = refineHeadersBgnEnd(
+  DiagonalHeaderPtrVec2D refined_headers_2d = diagonal_util::refineHeadersBgnEnd(
       proteo_ptr, refine_ms_ptr_vec, diag_headers_2d_, diag_headers_, min_mass);
 
   if (refined_headers_2d.size() == 0) {
@@ -578,7 +578,8 @@ PrsmPtr GraphAlign::geneResult(int s, int m) {
     }
   }
 
-  MassShiftPtrVec shifts = getDiagonalMassChanges(refined_headers, first_pos, last_pos, shift_types);
+  MassShiftPtrVec shifts 
+      = diagonal_header_util::getDiagonalMassChanges(refined_headers, first_pos, last_pos, shift_types);
 
   sub_proteo_ptr->addMassShiftPtrVec(shifts);
   sub_proteo_ptr->setVariablePtmNum(m);

@@ -18,7 +18,6 @@
 #include <vector>
 
 #include "seq/proteoform.hpp"
-#include "ms/spec/extend_ms.hpp"
 
 namespace toppic {
 
@@ -41,11 +40,6 @@ class ZeroPtmFastMatch {
   static bool cmpScoreDec(const ZpFastMatchPtr &a, const ZpFastMatchPtr &b) {
     return a->getScore() > b->getScore();
   }
-
-  static ZpFastMatchPtrVec filter(ProteoformTypePtr align_type_ptr,
-                                  const ExtendMsPtrVec &ms_ptr_ptr,
-                                  const ProteoformPtrVec &proteo_ptrs,
-                                  int report_num, double ppo);
 
  private:
   ProteoformPtr proteo_ptr_;

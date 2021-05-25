@@ -22,8 +22,8 @@
 #include "ms/factory/spectrum_set_factory.hpp"
 #include "prsm/simple_prsm_reader.hpp"
 #include "prsm/prsm_xml_writer.hpp"
-#include "search/zeroptmsearch/zero_ptm_fast_match.hpp"
-#include "search/zeroptmsearch/zero_ptm_slow_match.hpp"
+#include "search/zeroptmsearch/zero_ptm_fast_search.hpp"
+#include "search/zeroptmsearch/zero_ptm_util.hpp"
 #include "search/zeroptmsearch/zero_ptm_search_processor.hpp"
 
 namespace toppic {
@@ -58,14 +58,15 @@ PrsmPtrVec ZeroPtmSearchProcessor::zeroPtmSearchOneSpec(SpectrumSetPtr spec_set_
   }
   double ppo = mng_ptr->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()->getPpo();
   ZpFastMatchPtrVec fast_matches
-      = ZeroPtmFastMatch::filter(type_ptr, ms_three_vec, proteoform_ptr_vec,
+      = zero_ptm_fast_search::filter(type_ptr, ms_three_vec, proteoform_ptr_vec,
                                  mng_ptr->zero_ptm_filter_result_num_, ppo);
   DeconvMsPtrVec deconv_ms_vec = spec_set_ptr->getDeconvMsPtrVec();
-  ZpSlowMatchPtrVec slow_matches = ZeroPtmSlowMatch::filter(deconv_ms_vec, fast_matches, mng_ptr);
+  SpParaPtr sp_para_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr();
 
   PrsmPtrVec prsms;
-  for (size_t i = 0; i < slow_matches.size(); i++) {
-    prsms.push_back(slow_matches[i]->geneResult());
+  for (size_t i = 0; i < fast_matches.size(); i++) {
+    PrsmPtr prsm_ptr = zero_ptm_util::getPrsmPtr(deconv_ms_vec, fast_matches[i], sp_para_ptr);
+    prsms.push_back(prsm_ptr);
   }
 
   std::sort(prsms.begin(), prsms.end(), Prsm::cmpMatchFragmentDecMatchPeakDec);

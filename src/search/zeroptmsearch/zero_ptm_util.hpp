@@ -12,16 +12,28 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#ifndef TOPPIC_SEARCH_ZERO_PTM_SEARCH_ZERO_PTM_UTIL_HPP_
+#define TOPPIC_SEARCH_ZERO_PTM_SEARCH_ZERO_PTM_UTIL_HPP_
+
+#include "para/sp_para.hpp"
+#include "ms/spec/deconv_peak.hpp"
+#include "prsm/prsm.hpp"
 #include "search/zeroptmsearch/zero_ptm_fast_match.hpp"
 
 namespace toppic {
 
-ZeroPtmFastMatch::ZeroPtmFastMatch(ProteoformPtr proteo_ptr, 
-                                   double score, 
-                                   int begin, int end):
-      proteo_ptr_(proteo_ptr),
-      score_(score),
-      begin_(begin),
-      end_(end) {}
+namespace zero_ptm_util {
 
-}  // namespace toppic
+PrsmPtr getPrsmPtr(const DeconvMsPtrVec &deconv_ms_ptr_vec, 
+                   ZpFastMatchPtr fast_match_ptr,
+                   SpParaPtr sp_para_ptr);
+
+PrsmPtr getPrsmPtr(const DeconvMsPtrVec &deconv_ms_ptr_vec, 
+                   ProteoformPtr proteoform_ptr,
+                   SpParaPtr sp_para_ptr);
+
+}
+
+}
+
+#endif

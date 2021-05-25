@@ -32,14 +32,15 @@ class ZeroPtmSearchMng {
 
   PrsmParaPtr prsm_para_ptr_;
 
-  /** zero ptm fast filtering */
+  // zero ptm fast filtering result 
   int zero_ptm_filter_result_num_ = 20;
-  /** number of reported Prsms for each spectrum */
+  // number of reported Prsms for each spectrum 
   int report_num_ = 1;
 
-  /** recalibration is used in ZeroPtmSlowMatch */
+  // recalibration is used in ZeroPtmSlowMatch 
   bool   do_recalibration_ = false;
-  double recal_ppo_ = 0.000015;  // 15 ppm
+  // 15 ppm
+  double recal_ppo_ = 0.000015;  
   bool   ms_one_ms_two_same_recal_ = true;
 
   std::string input_file_ext_;
