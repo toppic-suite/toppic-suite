@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include <algorithm>
 #include <vector>
 
@@ -110,9 +109,6 @@ BasicDiagonalPtr getDiagonalPtr(DiagonalHeaderPtr header_ptr,
                                 int group_spec_num,
                                 ProteoformPtr proteo_ptr) {
   BpSpecPtr bp_spec_ptr = proteo_ptr->getBpSpecPtr();
-  /*double n_shift = header_ptr->getProtNTermShift();*/
-  //double c_shift = prec_mono_mass - proteo_ptr->getResSeqPtr()->getSeqMass() - n_shift;
-  /*header_ptr->initData(c_shift, proteo_ptr, mng_ptr->align_prefix_suffix_shift_thresh_);*/
 
   std::vector<double> prm_masses = bp_spec_ptr->getPrmMasses();
   BasicDiagPairPtrVec diag_pair_list = compDiagPair(prm_peaks, group_spec_num, prm_masses, header_ptr);

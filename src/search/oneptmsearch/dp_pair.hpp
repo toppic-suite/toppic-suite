@@ -12,19 +12,14 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_SEARCH_ONE_PTM_SEARCH_DP_PAIR_HPP_
 #define TOPPIC_SEARCH_ONE_PTM_SEARCH_DP_PAIR_HPP_
 
 #include "search/diag/diagonal_header.hpp"
 #include "search/oneptmsearch/pair.hpp"
+#include "search/oneptmsearch/path_type.hpp"
 
 namespace toppic {
-
-#define PATH_TYPE_NULL -1
-#define PATH_TYPE_DIAGONAL 0
-#define PATH_TYPE_SHIFT 1
-#define PATH_TYPE_TRUNC 2
 
 class DPPair;
 typedef std::shared_ptr<DPPair>  DPPairPtr;
@@ -32,6 +27,7 @@ typedef std::vector<DPPairPtr> DPPairPtrVec;
 
 class DPPair : public Pair{
  public:
+
   DPPair(int x,int y,double pair_score,double diff,
          int order,int n_shift, DiagonalHeaderPtr header_ptr);
 

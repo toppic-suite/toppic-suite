@@ -12,43 +12,19 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_SEARCH_ONE_PTM_SEARCH_PTM_SEARCH_PAIR_HPP_
-#define TOPPIC_SEARCH_ONE_PTM_SEARCH_PTM_SEARCH_PAIR_HPP_
-
-#include <memory>
+#ifndef TOPPIC_SEARCH_ONE_PTM_SEARCH_PATH_TYPE_HPP_
+#define TOPPIC_SEARCH_ONE_PTM_SEARCH_PATH_TYPE_HPP_
 
 namespace toppic {
 
-class Pair;
-
-typedef std::shared_ptr<Pair> PairPtr;
-
-class Pair {
+class PathType {
  public:
-  Pair(int x, int y): x_(x), y_(y) {}
-
-  int getX() {return x_;}
-
-  int getY() {return y_;}
-
-  void setX(int x) {x_ = x;}
-
-  void setY(int y) {y_ = y;}
-
-  static bool cmpPosInc(const PairPtr &a, const PairPtr &b) {
-    if (a->getY() != b->getY()) {
-      return a->getY() < b->getY();
-    }
-    return a->getX() < b->getX();
-  }
-
- protected:
-  int x_ = 0;
-
-  int y_ = 0;
+  static int TYPE_NULL;
+  static int TYPE_DIAGONAL;
+  static int TYPE_SHIFT;
+  static int TYPE_TRUNC;
 };
-
 
 } /* namespace toppic */
 
-#endif /* PAIR_HPP_ */
+#endif 

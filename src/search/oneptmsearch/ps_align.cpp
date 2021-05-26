@@ -21,6 +21,7 @@
 #include "ms/factory/extend_ms_factory.hpp"
 #include "search/diag/diagonal_util.hpp"
 #include "search/diag/diagonal_header_util.hpp"
+#include "search/oneptmsearch/path_type.hpp"
 #include "search/oneptmsearch/ps_align.hpp"
 
 namespace toppic {
@@ -123,7 +124,7 @@ void PSAlign::initDPPair() {
 void PSAlign::dpPrep() {
   std::sort(dp_pair_ptrs_.begin(), dp_pair_ptrs_.end(), Pair::cmpPosInc);
   for (int s = 0; s < para_ptr_->n_unknown_shift_ + 1; s++) {
-    dp_pair_ptrs_[0]->updateTable(s, 0, PATH_TYPE_NULL, nullptr);
+    dp_pair_ptrs_[0]->updateTable(s, 0, PathType::TYPE_NULL, nullptr);
   }
 }
 
@@ -224,16 +225,16 @@ void PSAlign::dp(ProteoformTypePtr align_type_ptr) {
       if (trunc_score >= diag_score && trunc_score >= shift_score) {
         if (trunc_score ==  - std::numeric_limits<double>::max()) {
           dp_pair_ptrs_[p]->updateTable(s, -std::numeric_limits<double>::max(),
-                                        PATH_TYPE_NULL, nullptr);
+                                        PathType::TYPE_NULL, nullptr);
         } else {
-          dp_pair_ptrs_[p]->updateTable(s, trunc_score + new_score, PATH_TYPE_TRUNC,
+          dp_pair_ptrs_[p]->updateTable(s, trunc_score + new_score, PathType::TYPE_TRUNC,
                                         trunc_prev_ptr);
         }
       } else if (diag_score >= shift_score) {
-        dp_pair_ptrs_[p]->updateTable(s, diag_score + new_score, PATH_TYPE_DIAGONAL,
+        dp_pair_ptrs_[p]->updateTable(s, diag_score + new_score, PathType::TYPE_DIAGONAL,
                                       diag_prev);
       } else {
-        dp_pair_ptrs_[p]->updateTable(s, shift_score + new_score, PATH_TYPE_SHIFT,
+        dp_pair_ptrs_[p]->updateTable(s, shift_score + new_score, PathType::TYPE_SHIFT,
                                       shift_prev);
       }
     }
@@ -271,14 +272,14 @@ DiagonalHeaderPtrVec PSAlign::backtrace(int s) {
       cur_bgn = p->getY();
       list.push_back(diagonal_header_util::geneDiagonalHeaderPtr(cur_bgn, cur_end, cur_header));
     } else {
-      if (p->getType(s) == PATH_TYPE_SHIFT) {
+      if (p->getType(s) == PathType::TYPE_SHIFT) {
         cur_bgn = p->getY();
         list.push_back(diagonal_header_util::geneDiagonalHeaderPtr(cur_bgn, cur_end, cur_header));
         cur_header = pre->getDiagonalHeader();
         cur_end = pre->getY();
       }
     }
-    if (p->getType(s) == PATH_TYPE_SHIFT) {
+    if (p->getType(s) == PathType::TYPE_SHIFT) {
       s--;
     }
     p = pre;
