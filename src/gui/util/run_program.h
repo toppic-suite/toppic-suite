@@ -18,6 +18,8 @@
 #include <iostream>
 #include <string>
 #include <map>
+#include <vector>
+
 namespace toppic {
 class RunProgram {
  public:
@@ -38,7 +40,8 @@ class RunProgram {
     {"useFeatureFile", "-x "},
     {"combinedOutputName", "-c "},
     {"keepTempFiles", "-k "},
-    {"geneHTMLFolder", "-g "}
+    {"geneHTMLFolder", "-g "},
+    {"databaseFileName", ""}
   };
 
   std::map<std::string, std::string> topindex_para {
@@ -69,8 +72,8 @@ class RunProgram {
     {"toolName", "-t "}
   };
 
-  std::string geneCommand(std::map<std::string, std::string> arguments_, std::string appName);
+  std::string geneCommand(std::map<std::string, std::string> arguments_, std::vector<std::string> spec_file_lst_, std::string appName);
   void run(std::string command); 
 };
-
 }
+#endif
