@@ -22,6 +22,7 @@
 #include "common/base/mod_util.hpp"
 #include "seq/fasta_index_reader.hpp"
 #include "prsm/prsm_reader.hpp"
+#include "prsm/prsm_reader_util.hpp"
 #include "merge/feature_prsm_reader.hpp"
 #include "merge/feature_sample_merge.hpp"
 
@@ -445,7 +446,7 @@ void FeatureSampleMerge::process() {
     LOG_DEBUG("prsm file name " << prsm_file_name);
     FastaIndexReaderPtr seq_reader = std::make_shared<FastaIndexReader>(db_file_name_);
     ModPtrVec fix_mod_ptr_vec = mod_util::geneFixedModList(fix_mod_str_);
-    PrsmStrPtrVec prsms = PrsmReader::readAllPrsmStrsMatchSeq(prsm_file_name,
+    PrsmStrPtrVec prsms = prsm_reader_util::readAllPrsmStrsMatchSeq(prsm_file_name,
                                                               seq_reader,
                                                               fix_mod_ptr_vec);
     if (prsms.size() == 0) {
