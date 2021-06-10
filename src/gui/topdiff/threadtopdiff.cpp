@@ -16,13 +16,12 @@
 
 #include "console/topdiff_process.hpp"
 #include "gui/topdiff/threadtopdiff.h"
-#include "gui/util/run_program.h"
+#include "gui/util/run_exe.h"
 
 void ThreadTopDiff::run() {
   //std::sort(spec_file_lst_.begin(), spec_file_lst_.end());
   //toppic::topDiffProcess(arguments_, spec_file_lst_);
-  toppic::RunProgram runProgram;
-  
-  std::string cmd = runProgram.geneCommand(arguments_, spec_file_lst_, "topdiff");
-  runProgram.run(cmd);
+  toppic::RunExe runExe;
+  std::string cmd = runExe.geneCommand(arguments_, spec_file_lst_, "topdiff");
+  runExe.run(cmd);
 }

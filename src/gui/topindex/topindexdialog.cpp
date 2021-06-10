@@ -98,21 +98,15 @@ void TopIndexDialog::initArguments() {
   arguments_["databaseFileName"] = "";
   arguments_["databaseBlockSize"] = "400000000";
   arguments_["maxFragmentLength"] = "1000";
-  arguments_["spectrumFileName"] = "";
   arguments_["activation"] = "FILE";
   arguments_["searchType"] = "TARGET";
   arguments_["fixedMod"] = "";
-  arguments_["ptmNumber"] = "1";
   arguments_["massErrorTolerance"] = "15";
   arguments_["allowProtMod"] = "";
   arguments_["numOfTopPrsms"] = "1";
   arguments_["executiveDir"] = ".";
   arguments_["resourceDir"] = "";
-  arguments_["filteringResultNumber"] = "20";
   arguments_["threadNumber"] = "1";
-  arguments_["groupSpectrumNumber"] = "1";
-  arguments_["residueModFileName"] = "";
-  arguments_["skipList"] = "";
 }
 
 void TopIndexDialog::on_clearButton_clicked() {

@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef GUI_RUN_PROGRAM_H
-#define GUI_RUN_PROGRAM_H
+#ifndef GUI_RUN_EXE_H
+#define GUI_RUN_EXE_H
 
 #include <iostream>
 #include <string>
@@ -21,7 +21,7 @@
 #include <vector>
 
 namespace toppic {
-class RunProgram {
+class RunExe {
  public:
   std::map<std::string, std::string> common_para {
     {"activation", "-a "},
@@ -43,9 +43,14 @@ class RunProgram {
     {"geneHTMLFolder", "-g "},
     {"databaseFileName", ""}
   };
+  std::vector<std::string> skip_para {//parameters to skip
+    "executiveDir", "resourceDir", "databaseBlockSize","filteringResultNumber",
+    "groupSpectrumNumber","maxFragmentLength","numOfTopPrsms","skipList"
+  };
 
   std::map<std::string, std::string> topindex_para {
-    {"massErrorTolerance", "-e "}
+    {"massErrorTolerance", "-e "},
+    {"oriDatabaseFileName", ""}
   };
 
   std::map<std::string, std::string> toppic_para {
@@ -71,7 +76,7 @@ class RunProgram {
     {"mergedOutputFileName", "-o "},
     {"toolName", "-t "}
   };
-
+  std::string geneCommand(std::map<std::string, std::string> arguments_, std::string appName);
   std::string geneCommand(std::map<std::string, std::string> arguments_, std::vector<std::string> spec_file_lst_, std::string appName);
   void run(std::string command); 
 };
