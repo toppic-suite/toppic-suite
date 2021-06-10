@@ -14,7 +14,9 @@ For manual and reference, please visit http://proteomics.informatics.iupui.edu/s
 sudo apt-get install build-essential cmake
 
 # install other dependencies
-sudo apt-get install zlib1g-dev libboost-filesystem-dev \
+sudo apt-get install zlib1g-dev \
+                     libxerces-c-dev \ 
+                     libboost-filesystem-dev \
                      libboost-program-options-dev \
                      libboost-system-dev \
                      libboost-thread-dev \
