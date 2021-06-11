@@ -108,7 +108,8 @@ void TopDiffDialog::closeEvent(QCloseEvent *event) {
 void TopDiffDialog::initArguments() {
   arguments_["executiveDir"] = "";
   arguments_["resourceDir"] = "";
-  arguments_["databaseFileName"] = "";
+  //arguments_["databaseFileName"] = "";
+  arguments_["oriDatabaseFileName"] = "";
   arguments_["fixedMod"] = "";
   arguments_["errorTolerance"] = "1.2";
   arguments_["toolName"] = "toppic";
@@ -284,7 +285,7 @@ std::map<std::string, std::string> TopDiffDialog::getArguments() {
   std::string exe_dir = toppic::file_util::getExecutiveDir(path.toStdString());
   arguments_["executiveDir"] = exe_dir;
   arguments_["resourceDir"] = toppic::file_util::getResourceDir(exe_dir);
-  arguments_["databaseFileName"] = ui->databaseFileEdit->text().toStdString();
+  arguments_["oriDatabaseFileName"] = ui->databaseFileEdit->text().toStdString();
 
   arguments_["fixedMod"] = ui->fixedModComboBox->currentText().toStdString();
   if (arguments_["fixedMod"] == "NONE") {

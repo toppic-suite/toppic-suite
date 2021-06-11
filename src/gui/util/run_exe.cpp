@@ -30,9 +30,8 @@ std::string RunExe::geneCommand(std::map<std::string, std::string> arguments_, s
     else if (common_para.find(it->first) != common_para.end()) { //if one of the common parameters
       //some parameters require extra processing
       if (it->first == "fixedMod" && it->second == "") continue; //don't add -f
-      if (it->first == "databaseFileName") continue; //for topindex, db path is oriDatabaseFile
-      if (it->first == "activation") continue; //for topindex, activation para should be skipped
-      if (it->first == "searchType") {
+      else if (it->first == "activation") continue; //for topindex, activation para should be skipped
+      else if (it->first == "searchType") {
         if (it->second != "TARGET") {
           command = command + "-d ";
         }
@@ -60,22 +59,51 @@ std::string RunExe::geneCommand(std::map<std::string, std::string> arguments_, s
   for (std::map<std::string, std::string>::iterator it = arguments_.begin(); it != arguments_.end(); ++it) {
     if (std::count(skip_para.begin(), skip_para.end(), it->first)) continue;
     else if (common_para.find(it->first) != common_para.end()) { //if one of the common parameters
-      //some parameters require extra processing
-      if (it->first == "fixedMod" && it->second == "") continue; //don't add -f
-      if (it->first == "searchType") {
-        if (it->second != "TARGET") {
-          command = command + "-d ";
+      //skip some paramters based on parameter values
+      if (it->first == "fixedMod" && it->second == "") continue;
+      else if (it->first == "combinedOutputName" && it->second == "") continue;
+      else if (it->first == "useFeatureFile") {
+        if (it->second == "false") {
+          command = command + common_para[it->first] + " ";
         }
-        continue;
       }
-      command = command + common_para[it->first] + it->second + " ";
+      else if (it->first == "searchType") {
+        if (it->second != "TARGET") {
+          command = command + common_para[it->first] + " ";
+        }
+      }
+      else if (it->first == "keepTempFiles" || it->first == "geneHTMLFolder") {
+        if (it->second == "true") {
+          command = command + common_para[it->first] + " ";
+        }
+      }
+      else{
+        command = command + common_para[it->first] + it->second + " ";
+      }
     }
     else if (app_name == "topfd") {}// this needs separate processing
     else if (app_name == "toppic" && toppic_para.find(it->first) != toppic_para.end()) {
-      command = command + toppic_para[it->first] + it->second + " ";
+      //some parameters require extra processing
+      if (it->first == "residueModFileName" && it->second == "") continue; //don't add -i
+      else if (it->first == "useLookupTable") {
+        if (it->second == "true") {
+          command = command + toppic_para[it->first] + " ";
+        }
+      }
+      else {
+        command = command + toppic_para[it->first] + it->second + " ";
+      }
     }
     else if (app_name == "topmg" && topmg_para.find(it->first) != topmg_para.end()) {
-      command = command + topmg_para[it->first] + it->second + " ";
+      //some parameters require extra processing
+      if (it->first == "useAsfDiag" || it->first == "wholeProteinOnly") {
+        if (it->second == "true") {
+          command = command + topmg_para[it->first] + " ";
+        }
+      }
+      else {
+        command = command + topmg_para[it->first] + it->second + " ";
+      }
     }
     else if (app_name == "topdiff" && topdiff_para.find(it->first) != topdiff_para.end()) {
       command = command + topdiff_para[it->first] + it->second + " ";
@@ -84,14 +112,11 @@ std::string RunExe::geneCommand(std::map<std::string, std::string> arguments_, s
       LOG_ERROR("Parameter " << it->first << " from " << app_name << " was not found in any apps!");
       return "";
     }
-  }
-  if (app_name == "topfd") {}
-  else if (app_name == "toppic") {}
-  else if (app_name == "topmg") {}
-  else if (app_name == "topdiff") {
-    for (int i = 0; i < spec_file_lst_.size(); i++) {
-      command = command + spec_file_lst_[i] + " ";
-    }
+  }  
+  command = command + arguments_["oriDatabaseFileName"] + " ";
+
+  for (int i = 0; i < spec_file_lst_.size(); i++) {
+    command = command + spec_file_lst_[i] + " ";
   }
   return command;
 };

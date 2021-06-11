@@ -41,16 +41,16 @@ class RunExe {
     {"combinedOutputName", "-c "},
     {"keepTempFiles", "-k "},
     {"geneHTMLFolder", "-g "},
-    {"databaseFileName", ""}
+    //{"oriDatabaseFileName", ""}
   };
   std::vector<std::string> skip_para {//parameters to skip
     "executiveDir", "resourceDir", "databaseBlockSize","filteringResultNumber",
-    "groupSpectrumNumber","maxFragmentLength","numOfTopPrsms","skipList"
+    "groupSpectrumNumber","maxFragmentLength","numOfTopPrsms","skipList",
+    "databaseFileName","oriDatabaseFileName"
   };
 
   std::map<std::string, std::string> topindex_para {
-    {"massErrorTolerance", "-e "},
-    {"oriDatabaseFileName", ""}
+    {"massErrorTolerance", "-e "}
   };
 
   std::map<std::string, std::string> toppic_para {
@@ -74,7 +74,8 @@ class RunExe {
   std::map<std::string, std::string> topdiff_para {
     {"errorTolerance", "-e "},
     {"mergedOutputFileName", "-o "},
-    {"toolName", "-t "}
+    {"toolName", "-t "},
+    //{"databaseFileName", ""}
   };
   std::string geneCommand(std::map<std::string, std::string> arguments_, std::string appName);
   std::string geneCommand(std::map<std::string, std::string> arguments_, std::vector<std::string> spec_file_lst_, std::string appName);
