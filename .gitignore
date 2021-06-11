@@ -49,3 +49,4 @@ topmg
 !src/gui/topmg*
 
 /.vscode
+/src/.vscode

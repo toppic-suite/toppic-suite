@@ -282,6 +282,7 @@ void TopFDDialog::on_outputButton_clicked() {
 toppic::TopfdParaPtr TopFDDialog::getParaPtr() {
   QString path = QCoreApplication::applicationFilePath();
   std::string exe_dir = toppic::file_util::getExecutiveDir(path.toStdString());
+  para_ptr_->exe_dir_ = exe_dir;
   para_ptr_->resource_dir_ = toppic::file_util::getResourceDir(exe_dir);
   para_ptr_->max_charge_ = std::stoi(ui->maxChargeEdit->text().toStdString());
   para_ptr_->max_mass_ = std::stod(ui->maxMassEdit->text().toStdString());

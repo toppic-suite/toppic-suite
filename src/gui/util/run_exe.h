@@ -15,10 +15,10 @@
 #ifndef GUI_RUN_EXE_H
 #define GUI_RUN_EXE_H
 
-#include <iostream>
-#include <string>
-#include <map>
+#include "topfd/common/topfd_para.hpp"
 #include <vector>
+#include <map>
+#include <string>
 
 namespace toppic {
 class RunExe {
@@ -46,9 +46,8 @@ class RunExe {
   std::vector<std::string> skip_para {//parameters to skip
     "executiveDir", "resourceDir", "databaseBlockSize","filteringResultNumber",
     "groupSpectrumNumber","maxFragmentLength","numOfTopPrsms","skipList",
-    "databaseFileName","oriDatabaseFileName"
+    "databaseFileName","oriDatabaseFileName","useGf"
   };
-
   std::map<std::string, std::string> topindex_para {
     {"massErrorTolerance", "-e "}
   };
@@ -77,8 +76,9 @@ class RunExe {
     {"toolName", "-t "},
     //{"databaseFileName", ""}
   };
-  std::string geneCommand(std::map<std::string, std::string> arguments_, std::string appName);
-  std::string geneCommand(std::map<std::string, std::string> arguments_, std::vector<std::string> spec_file_lst_, std::string appName);
+  std::string geneCommand(std::map<std::string, std::string> arguments_, std::string app_name);
+  std::string geneCommand(TopfdParaPtr para_ptr, std::vector<std::string> spec_file_lst_, std::string app_name);
+  std::string geneCommand(std::map<std::string, std::string> arguments_, std::vector<std::string> spec_file_lst_, std::string app_name);
   void run(std::string command); 
 };
 }

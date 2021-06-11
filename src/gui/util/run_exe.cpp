@@ -14,14 +14,12 @@
 
 #include "common/util/logger.hpp"
 #include "gui/util/run_exe.h"
-#include <vector>
 #include <algorithm>
+#include <iostream>
 
 namespace toppic {
 /*function for topindex*/
 std::string RunExe::geneCommand(std::map<std::string, std::string> arguments_, std::string app_name) {
-  //have each argument converted to command line parameter
-  //create a string for a command at the end
   std::string exe_path = arguments_["executiveDir"] + "\\" + app_name + ".exe ";
   std::string command = exe_path;
 
@@ -49,10 +47,40 @@ std::string RunExe::geneCommand(std::map<std::string, std::string> arguments_, s
   }
   return command;
 };
+/*function for topfd*/ 
+std::string RunExe::geneCommand(TopfdParaPtr para_ptr, std::vector<std::string> spec_file_lst_, std::string app_name) {
+  std::string exe_path = para_ptr->exe_dir_ + "\\" + app_name + ".exe ";
+  std::string command = exe_path;
+
+  command = command + "-c " + std::to_string(para_ptr->max_charge_) + " ";
+  command = command + "-m " + std::to_string(para_ptr->max_mass_) + " ";
+  command = command + "-e " + std::to_string(para_ptr->mz_error_) + " ";
+  command = command + "-r " + std::to_string(para_ptr->ms_one_sn_ratio_) + " ";
+  command = command + "-t " + std::to_string(para_ptr->ms_two_sn_ratio_) + " ";
+  command = command + "-w " + std::to_string(para_ptr->prec_window_) + " ";
+  command = command + "-u " + std::to_string(para_ptr->thread_number_) + " ";
+  command = command + "-a " + para_ptr->activation_ + " ";
+  
+  if (para_ptr->missing_level_one_) {
+    command = command + "-o ";
+  }
+  if (!para_ptr->gene_html_folder_) {
+    command = command + "-g ";
+  }
+  if (para_ptr->use_env_cnn_) {
+    command = command + "-n ";
+  }
+  if (!para_ptr->do_final_filtering_) {
+    command = command + "-d ";
+  }
+  for (int i = 0; i < spec_file_lst_.size(); i++) {
+    command = command + spec_file_lst_[i] + " ";
+  }
+  return command;
+}
+
 /*function for toppic, topmg, topdiff*/
 std::string RunExe::geneCommand(std::map<std::string, std::string> arguments_, std::vector<std::string> spec_file_lst_, std::string app_name) {
-  //have each argument converted to command line parameter
-  //create a string for a command at the end
   std::string exe_path = arguments_["executiveDir"] + "\\" + app_name + ".exe ";
   std::string command = exe_path;
 
@@ -81,7 +109,6 @@ std::string RunExe::geneCommand(std::map<std::string, std::string> arguments_, s
         command = command + common_para[it->first] + it->second + " ";
       }
     }
-    else if (app_name == "topfd") {}// this needs separate processing
     else if (app_name == "toppic" && toppic_para.find(it->first) != toppic_para.end()) {
       //some parameters require extra processing
       if (it->first == "residueModFileName" && it->second == "") continue; //don't add -i
