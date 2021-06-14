@@ -20,6 +20,7 @@
 #include <map>
 #include <string>
 
+
 namespace toppic {
 class RunExe {
  public:
@@ -74,7 +75,6 @@ class RunExe {
     {"errorTolerance", "-e "},
     {"mergedOutputFileName", "-o "},
     {"toolName", "-t "},
-    //{"databaseFileName", ""}
   };
   std::string geneCommand(std::map<std::string, std::string> arguments_, std::string app_name);
   std::string geneCommand(TopfdParaPtr para_ptr, std::vector<std::string> spec_file_lst_, std::string app_name);

@@ -16,6 +16,10 @@
 #include "gui/util/run_exe.h"
 #include <algorithm>
 #include <iostream>
+#include <windows.h> 
+#include <tchar.h>
+#include <stdio.h> 
+#include <strsafe.h>
 
 namespace toppic {
 /*function for topindex*/
@@ -45,6 +49,7 @@ std::string RunExe::geneCommand(std::map<std::string, std::string> arguments_, s
       return "";
     }
   }
+  command = command + arguments_["oriDatabaseFileName"] + " ";
   return command;
 };
 /*function for topfd*/ 
@@ -148,20 +153,61 @@ std::string RunExe::geneCommand(std::map<std::string, std::string> arguments_, s
   return command;
 };
 void RunExe::run(std::string command) {
-  if (command == "") {
+  std::cout << command << std::endl;
+  HANDLE g_hChildStd_IN_Rd = NULL;
+  HANDLE g_hChildStd_IN_Wr = NULL;
+  HANDLE g_hChildStd_OUT_Rd = NULL;
+  HANDLE g_hChildStd_OUT_Wr = NULL;
+
+  SECURITY_ATTRIBUTES saAttr; 
+
+  //Set the bInheritHandle flag so pipe handles are inherited. 
+  saAttr.nLength = sizeof(SECURITY_ATTRIBUTES); 
+  saAttr.bInheritHandle = TRUE; 
+  saAttr.lpSecurityDescriptor = NULL; 
+
+  CreatePipe(&g_hChildStd_OUT_Rd, &g_hChildStd_OUT_Wr, &saAttr, 0);
+  CreatePipe(&g_hChildStd_IN_Rd, &g_hChildStd_IN_Wr, &saAttr, 0);
+
+  SetHandleInformation(g_hChildStd_OUT_Rd, HANDLE_FLAG_INHERIT, 0);
+  SetHandleInformation(g_hChildStd_IN_Wr, HANDLE_FLAG_INHERIT, 0);
+
+  PROCESS_INFORMATION piProcInfo; 
+  STARTUPINFO siStartInfo;
+  BOOL bSuccess = FALSE; 
+ 
+  ZeroMemory( &piProcInfo, sizeof(PROCESS_INFORMATION) );
+  ZeroMemory( &siStartInfo, sizeof(STARTUPINFO));
+
+  siStartInfo.cb = sizeof(STARTUPINFO); 
+  siStartInfo.hStdError = g_hChildStd_OUT_Wr;
+  siStartInfo.hStdOutput = g_hChildStd_OUT_Wr;
+  siStartInfo.hStdInput = g_hChildStd_IN_Rd;
+  siStartInfo.dwFlags |= STARTF_USESTDHANDLES;
+ 
+  //Create the child process. 
+  bSuccess = CreateProcess(NULL, command.c_str(), NULL, NULL, TRUE, CREATE_NO_WINDOW, NULL, NULL, &siStartInfo, &piProcInfo);  // receives PROCESS_INFORMATION 
+  
+  if (!bSuccess ) {
+    std::cout << "error occured" << std::endl;
     return;
   }
-  std::cout << "cmd: " << command << std::endl;
-  char buffer[500];
-  FILE* pipe = _popen(command.c_str(), "r");
-  if (!pipe) {
-      LOG_ERROR("popen failed!");
+  else {
+    CloseHandle(piProcInfo.hProcess);
+    CloseHandle(piProcInfo.hThread);
+    CloseHandle(g_hChildStd_OUT_Wr);
+    CloseHandle(g_hChildStd_IN_Rd);
+  }   
+  DWORD dwRead, dwWritten; 
+  CHAR buf[4096]; 
+  BOOL readSuccess = FALSE;
+  HANDLE hParentStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
+  bSuccess = ReadFile( g_hChildStd_OUT_Rd, buf, 4096, &dwRead, NULL);
+  while (bSuccess == TRUE) {
+    buf[dwRead] = '\0';
+    OutputDebugStringA(buf);
+    std::cout << buf;
+    bSuccess = ReadFile(g_hChildStd_OUT_Rd, buf, 1024, &dwRead, NULL);
   }
-  while (!feof(pipe)) {
-    if (fgets(buffer, 128, pipe) != NULL) {
-        std::cout << buffer;
-    }
-  }
-  _pclose(pipe);
 };
 }
