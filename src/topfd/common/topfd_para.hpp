@@ -26,6 +26,7 @@ class TopfdPara {
 
   std::string getParaStr(const std::string &prefix);
 
+  std::string exe_dir_;
   std::string resource_dir_;
   bool refine_prec_mass_ = true;
   bool missing_level_one_ = false;

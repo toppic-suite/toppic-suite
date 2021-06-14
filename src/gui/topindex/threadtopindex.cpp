@@ -16,8 +16,13 @@
 
 #include "console/topindex_process.hpp"
 #include "gui/topindex/threadtopindex.h"
+#include "gui/util/run_exe.h"
 
 void ThreadTopIndex::run() {
   //std::sort(spec_file_lst_.begin(), spec_file_lst_.end());
-  toppic::TopIndexProcess(arguments_);
+  //toppic::TopIndexProcess(arguments_);
+  toppic::RunExe runExe;
+  std::string cmd = runExe.geneCommand(arguments_, "topindex");
+  runExe.run(cmd);
 }
+

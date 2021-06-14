@@ -470,7 +470,7 @@ bool Argument::validateArguments() {
   }
 
   if (!file_util::exists(arguments_["oriDatabaseFileName"])) {
-    LOG_ERROR("Database file " << arguments_["databaseFileName"] << " does not exist!");
+    LOG_ERROR("Database file " << arguments_["oriDatabaseFileName"] << " does not exist!");
     return false;
   }
 
