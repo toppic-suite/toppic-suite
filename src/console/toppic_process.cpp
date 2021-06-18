@@ -523,10 +523,11 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
       json_merger = nullptr;
       std::cout << "Merging json files finished." << std::endl;
     }
-    std::cout << "Merging feature files started." << std::endl;
-    feature_merge::process(spec_file_lst, full_combined_name, para_str);
-    std::cout << "Merging feature files finished." << std::endl;
-
+	if (arguments["useFeatureFile"] == "true") {//only when feature files are being used
+      std::cout << "Merging feature files started." << std::endl;
+      feature_merge::process(spec_file_lst, full_combined_name, para_str);
+      std::cout << "Merging feature files finished." << std::endl;
+    }
     // merge TOP files
     std::cout << "Merging identification files started." << std::endl;
     std::vector<std::string> prsm_file_lst(spec_file_lst.size());
@@ -566,4 +567,3 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
 }
 
 }  // namespace toppic
-
