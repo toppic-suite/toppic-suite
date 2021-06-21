@@ -15,11 +15,11 @@
 #include <limits>
 
 #include "common/base/mod_base.hpp"
-#include "search/diag/diagonal_header_util.hpp"
+#include "search/diag/diag_header_util.hpp"
 
 namespace toppic {
 
-namespace diagonal_header_util {
+namespace diag_header_util {
 
 // get the header corresponding to the top left corner in the spectral grid
 DiagHeaderPtr getTopLeftCornerHeader() {
@@ -41,7 +41,7 @@ void addCornerDiagonals(DiagHeaderPtrVec &n_extend_header_ptrs,
                         DiagHeaderPtrVec &c_extend_header_ptrs,
                         double seq_mass, double prec_mass) {
   // get top-left corner header in spectral grid (shift is 0)
-  DiagHeaderPtr top_left_corner_header_ptr = diagonal_header_util::getTopLeftCornerHeader();
+  DiagHeaderPtr top_left_corner_header_ptr = diag_header_util::getTopLeftCornerHeader();
   n_extend_header_ptrs.push_back(top_left_corner_header_ptr);
 
   // get bottom-right corner header in the spectral grid

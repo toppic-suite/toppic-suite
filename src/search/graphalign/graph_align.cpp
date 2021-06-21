@@ -21,7 +21,7 @@
 #include "seq/proteoform_factory.hpp"
 #include "ms/factory/extend_ms_factory.hpp"
 #include "search/diag/diagonal_util.hpp"
-#include "search/diag/diagonal_header_util.hpp"
+#include "search/diag/diag_header_util.hpp"
 #include "search/graph/graph.hpp"
 #include "search/graphalign/graph_align_processor.hpp"
 #include "search/graphalign/graph_align.hpp"
@@ -579,7 +579,7 @@ PrsmPtr GraphAlign::geneResult(int s, int m) {
   }
 
   MassShiftPtrVec shifts 
-      = diagonal_header_util::getDiagonalMassChanges(refined_headers, first_pos, last_pos, shift_types);
+      = diag_header_util::getDiagonalMassChanges(refined_headers, first_pos, last_pos, shift_types);
 
   sub_proteo_ptr->addMassShiftPtrVec(shifts);
   sub_proteo_ptr->setVariablePtmNum(m);

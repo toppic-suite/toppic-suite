@@ -16,7 +16,7 @@
 #include <vector>
 
 #include "ms/factory/prm_ms_util.hpp"
-#include "search/diag/diagonal_header_util.hpp"
+#include "search/diag/diag_header_util.hpp"
 #include "search/diag/diag_pair_util.hpp"
 #include "search/oneptmsearch/one_ptm_slow_match.hpp"
 
@@ -42,7 +42,7 @@ inline void OnePtmSlowMatch::addPrefixDiagonals(DiagHeaderPtrVec &n_extend_heade
   std::vector<double> shifts = simple_prsm_ptr_->getNTruncShifts();
   for (size_t i = 0; i < shifts.size(); i++) {
     double new_shift = shifts[i] - proteo_ptr_->getProtModPtr()->getProtShift();
-    if (!diagonal_header_util::isExistHeader(n_extend_header_ptrs, new_shift)) {
+    if (!diag_header_util::isExistHeader(n_extend_header_ptrs, new_shift)) {
       // n_term strict; c_term nostrict; prot n_term no_match; prot c_term no_match
       // pep n_term match; pep c_term no_match
       DiagHeaderPtr header_ptr = std::make_shared<DiagHeader>(new_shift, true, false, false, false, true, false);
@@ -63,10 +63,10 @@ inline void OnePtmSlowMatch::addComplementDiagonals(DiagHeaderPtrVec &n_extend_h
   for (size_t i = 0; i < c_extend_header_ptrs.size(); i++) {
     double s = c_extend_header_ptrs[i]->getProtNTermShift();
     // find a similar shift in n_term_match_shifts
-    int best_n_pos = diagonal_header_util::findSimilarShiftPos(n_term_match_shifts, s);
+    int best_n_pos = diag_header_util::findSimilarShiftPos(n_term_match_shifts, s);
     if (best_n_pos >= 0) {
       double new_shift = n_term_match_shifts[best_n_pos];
-      if (!diagonal_header_util::isExistHeader(n_extend_header_ptrs, new_shift)) {
+      if (!diag_header_util::isExistHeader(n_extend_header_ptrs, new_shift)) {
         // n_term strict; c_term nostrict; prot n_term no_match; prot c_term no_match
         // pep n_term match; pep c_term no_match
         DiagHeaderPtr header_ptr = std::make_shared<DiagHeader>(new_shift, true, false, false, false, true, false);
@@ -85,12 +85,12 @@ inline void OnePtmSlowMatch::addComplementDiagonals(DiagHeaderPtrVec &n_extend_h
   // add c trunc headers that have similar shift to n trunc headers
   for (size_t i = 0; i < n_extend_header_ptrs.size(); i++) {
     double s = n_extend_header_ptrs[i]->getProtNTermShift();
-    int best_c_pos = diagonal_header_util::findSimilarShiftPos(c_term_match_shifts, s);
+    int best_c_pos = diag_header_util::findSimilarShiftPos(c_term_match_shifts, s);
     // LOG_DEBUG("Shift " << s <<" C term position " << best_c_pos);
     if (best_c_pos >= 0) {
       double new_shift = c_term_match_shifts[best_c_pos];
       // LOG_DEBUG("Shift " << s <<" C term shift " << new_shift);
-      if (!diagonal_header_util::isExistHeader(c_extend_header_ptrs, new_shift)) {
+      if (!diag_header_util::isExistHeader(c_extend_header_ptrs, new_shift)) {
         // n term nostrict, c_term strict, prot n_term no match ; prot c_term no match
         // pep n_term no match, pep c_term match
         DiagHeaderPtr header_ptr = std::make_shared<DiagHeader>(new_shift, false, true, false, false, false, true);
@@ -104,7 +104,7 @@ inline void OnePtmSlowMatch::addSuffixDiagonals(DiagHeaderPtrVec &c_extend_heade
   std::vector<double>shifts = simple_prsm_ptr_->getCTruncShifts();
   for (size_t i = 0; i < shifts.size(); i++) {
     double new_shift = shifts[i] - proteo_ptr_->getProtModPtr()->getProtShift();
-    if (!diagonal_header_util::isExistHeader(c_extend_header_ptrs, new_shift)) {
+    if (!diag_header_util::isExistHeader(c_extend_header_ptrs, new_shift)) {
       // n term nostrict, c_term strict, prot n_term no match ; prot c_term no match
       // pep n_term no match, pep c_term match
       DiagHeaderPtr header_ptr = std::make_shared<DiagHeader>(new_shift, false, true, false, false, false, true);
@@ -119,7 +119,7 @@ inline DiagHeaderPtrVec OnePtmSlowMatch::geneOnePtmNTermShiftHeaders() {
 
   // add corner diagonals for all types of alignments
   double seq_mass = proteo_ptr_->getResSeqPtr()->getSeqMass();
-  diagonal_header_util::addCornerDiagonals(n_extend_header_ptrs, c_extend_header_ptrs, seq_mass, prec_mono_mass_);
+  diag_header_util::addCornerDiagonals(n_extend_header_ptrs, c_extend_header_ptrs, seq_mass, prec_mono_mass_);
 
   // if not complete alignment, find best shifts
   if (align_type_ptr_ != ProteoformType::COMPLETE) {

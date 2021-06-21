@@ -12,14 +12,14 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_SEARCH_DIAG_DIAGONAL_HEADER_UTIL_HPP_
-#define TOPPIC_SEARCH_DIAG_DIAGONAL_HEADER_UTIL_HPP_
+#ifndef TOPPIC_SEARCH_DIAG_DIAG_HEADER_UTIL_HPP_
+#define TOPPIC_SEARCH_DIAG_DIAG_HEADER_UTIL_HPP_
 
 #include "search/diag/diag_header.hpp"
 
 namespace toppic {
 
-namespace diagonal_header_util {
+namespace diag_header_util {
 
 // get the header corresponding to the top left corner in the spectral grid
 DiagHeaderPtr getTopLeftCornerHeader();
@@ -45,7 +45,7 @@ MassShiftPtrVec getDiagonalMassChanges(const DiagHeaderPtrVec &header_ptrs,
                                        int first_res_pos, int last_res_pos,
                                        const AlterTypePtrVec & type_ptrs);
 
-}  // namespace diagonal_header_util
+}  // namespace diag_header_util
 
 }  // namespace toppic
 

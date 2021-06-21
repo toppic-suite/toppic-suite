@@ -29,15 +29,15 @@ double refinePrecursorAndHeaderShift(ProteoformPtr proteo_ptr,
                                      double refine_prec_step_width);
 
 DiagHeaderPtrVec refineHeadersBgnEnd(ProteoformPtr proteo_ptr,
-                                         const ExtendMsPtrVec &ms_three_ptr_vec,
-                                         const DiagHeaderPtrVec& heade_ptrs,
-                                         double min_mass);
+                                     const ExtendMsPtrVec &ms_three_ptr_vec,
+                                     const DiagHeaderPtrVec& heade_ptrs,
+                                     double min_mass);
 
 DiagHeaderPtrVec2D refineHeadersBgnEnd(ProteoformPtr proteo_ptr,
-                                           const ExtendMsPtrVec &ms_three_ptr_vec,
-                                           const DiagHeaderPtrVec2D& header_ptrs_2d,
-                                           const DiagHeaderPtrVec& header_ptrs_1d,
-                                           double min_mass);
+                                       const ExtendMsPtrVec &ms_three_ptr_vec,
+                                       const DiagHeaderPtrVec2D& header_ptrs_2d,
+                                       const DiagHeaderPtrVec& header_ptrs_1d,
+                                       double min_mass);
 
 int getNewBgn(const PeakIonPairPtrVec& pair_ptrs);
 

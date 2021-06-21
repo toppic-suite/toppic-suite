@@ -20,7 +20,7 @@
 #include "seq/proteoform_factory.hpp"
 #include "ms/factory/extend_ms_factory.hpp"
 #include "search/diag/diagonal_util.hpp"
-#include "search/diag/diagonal_header_util.hpp"
+#include "search/diag/diag_header_util.hpp"
 #include "search/oneptmsearch/path_type.hpp"
 #include "search/oneptmsearch/ps_align.hpp"
 
@@ -270,11 +270,11 @@ DiagHeaderPtrVec PSAlign::backtrace(int s) {
       cur_end = pre->getY();
     } else if (pre == first_pair_ptr_) {
       cur_bgn = p->getY();
-      list.push_back(diagonal_header_util::geneDiagHeaderPtr(cur_bgn, cur_end, cur_header));
+      list.push_back(diag_header_util::geneDiagHeaderPtr(cur_bgn, cur_end, cur_header));
     } else {
       if (p->getType(s) == PathType::TYPE_SHIFT) {
         cur_bgn = p->getY();
-        list.push_back(diagonal_header_util::geneDiagHeaderPtr(cur_bgn, cur_end, cur_header));
+        list.push_back(diag_header_util::geneDiagHeaderPtr(cur_bgn, cur_end, cur_header));
         cur_header = pre->getDiagHeader();
         cur_end = pre->getY();
       }
@@ -293,8 +293,6 @@ PrsmPtr PSAlign::geneResult(int shift_num, ProteoformPtr proteo_ptr,
                             ExtendMsPtrVec &ms_three_ptr_vec,
                             PrsmParaPtr prsm_para_ptr) {
   DiagHeaderPtrVec header_ptrs = getDiagHeaders(shift_num);
-  // double score = ps_align_ptr_->getAlignScr(shift_num);
-  // LOG_DEBUG("Shift " << shift_num << " score " << score);
   if (header_ptrs.size() == 0) {
     return nullptr;
   }
@@ -323,8 +321,8 @@ PrsmPtr PSAlign::geneResult(int shift_num, ProteoformPtr proteo_ptr,
     return nullptr;
   }
 
-  MassShiftPtrVec shifts = diagonal_header_util::getDiagonalMassChanges(refined_header_ptrs, first_pos,
-                                                                      last_pos, AlterType::UNEXPECTED);
+  MassShiftPtrVec shifts = diag_header_util::getDiagonalMassChanges(refined_header_ptrs, first_pos,
+                                                                    last_pos, AlterType::UNEXPECTED);
   sub_proteo_ptr->addMassShiftPtrVec(shifts);
 
   return std::make_shared<Prsm>(sub_proteo_ptr, deconv_ms_ptr_vec, refine_prec_mass,

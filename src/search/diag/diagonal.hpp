@@ -26,32 +26,32 @@ typedef std::shared_ptr<Diagonal> DiagonalPtr;
 typedef std::vector<DiagonalPtr>  DiagonalPtrVec;
 
 class Diagonal {
- public:
-  Diagonal() {}
+  public:
+    Diagonal() {}
 
-  // Add contruction method here because a template 
-  // is used. 
-  explicit Diagonal(DiagHeaderPtr header_ptr):
+    // Add contruction method here because a template 
+    // is used. 
+    explicit Diagonal(DiagHeaderPtr header_ptr):
       header_ptr_(header_ptr) {}
 
-  // need init pair_ptr_list after create
-  explicit Diagonal(DiagHeaderPtr header_ptr, 
-                    DiagPairPtrVec pair_ptr_list):
+    // need init pair_ptr_list after create
+    explicit Diagonal(DiagHeaderPtr header_ptr, 
+                      DiagPairPtrVec pair_ptr_list):
       header_ptr_(header_ptr),
       pair_ptr_list_(pair_ptr_list) {}
 
-  size_t size() {return pair_ptr_list_.size(); }
+    size_t size() {return pair_ptr_list_.size(); }
 
-  DiagHeaderPtr getHeader() {return header_ptr_;}
+    DiagHeaderPtr getHeader() {return header_ptr_;}
 
-  const DiagPairPtrVec& getDiagPair() {return pair_ptr_list_;}
+    const DiagPairPtrVec& getDiagPair() {return pair_ptr_list_;}
 
-  DiagPairPtr getDiagPair(int i) {return pair_ptr_list_[i];}
+    DiagPairPtr getDiagPair(int i) {return pair_ptr_list_[i];}
 
- private:
-  DiagHeaderPtr header_ptr_;
+  private:
+    DiagHeaderPtr header_ptr_;
 
-  DiagPairPtrVec pair_ptr_list_;
+    DiagPairPtrVec pair_ptr_list_;
 };
 
 } /* namespace toppic */

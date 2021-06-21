@@ -17,7 +17,7 @@
 
 #include "ms/factory/prm_ms_factory.hpp"
 #include "ms/factory/prm_ms_util.hpp"
-#include "search/diag/diagonal_header_util.hpp"
+#include "search/diag/diag_header_util.hpp"
 #include "search/diag/diag_pair_util.hpp"
 #include "search/ptmsearch/ptm_slow_match.hpp"
 
@@ -80,10 +80,10 @@ void PtmSlowMatch::addPrefixDiagonals(DiagHeaderPtrVec &common_header_ptrs,
   for (size_t i = 0; i < common_header_ptrs.size(); i++) {
     double s = common_header_ptrs[i]->getProtNTermShift();
     // find a similar shift in n_term_match_shifts
-    int best_n_pos = diagonal_header_util::findSimilarShiftPos(n_term_match_shifts, s);
+    int best_n_pos = diag_header_util::findSimilarShiftPos(n_term_match_shifts, s);
     if (best_n_pos >= 0) {
       double new_shift = n_term_match_shifts[best_n_pos];
-      if (!diagonal_header_util::isExistHeader(n_extend_header_ptrs, new_shift)) {
+      if (!diag_header_util::isExistHeader(n_extend_header_ptrs, new_shift)) {
         // n_term strict; c_term nostrict; prot n_term no_match; prot c_term no_match
         // pep n_term match; pep c_term no_match
         DiagHeaderPtr header_ptr
@@ -107,12 +107,12 @@ void PtmSlowMatch::addSuffixDiagonals(DiagHeaderPtrVec &common_header_ptrs,
   // add trunc headers that have similar shift to best shift headers
   for (size_t i = 0; i < common_header_ptrs.size(); i++) {
     double s = common_header_ptrs[i]->getProtNTermShift();
-    int best_c_pos = diagonal_header_util::findSimilarShiftPos(c_term_match_shifts, s);
+    int best_c_pos = diag_header_util::findSimilarShiftPos(c_term_match_shifts, s);
     // LOG_DEBUG("Shift " << s <<" C term position " << best_c_pos);
     if (best_c_pos >= 0) {
       double new_shift = c_term_match_shifts[best_c_pos];
       // LOG_DEBUG("Shift " << s <<" C term shift " << new_shift);
-      if (!diagonal_header_util::isExistHeader(c_extend_header_ptrs, new_shift)) {
+      if (!diag_header_util::isExistHeader(c_extend_header_ptrs, new_shift)) {
         // n term nostrict, c_term strict, prot n_term no match ; prot c_term no match
         // pep n_term no match, pep c_term match
         DiagHeaderPtr header_ptr
@@ -129,10 +129,10 @@ DiagHeaderPtrVec PtmSlowMatch::geneNTermShiftHeaders() {
 
   // add corner diagonals for all types of alignments
   double seq_mass = proteo_ptr_->getResSeqPtr()->getSeqMass();
-  diagonal_header_util::addCornerDiagonals(n_extend_header_ptrs,
-                                         c_extend_header_ptrs,
-                                         seq_mass,
-                                         prec_mono_mass_);
+  diag_header_util::addCornerDiagonals(n_extend_header_ptrs,
+                                       c_extend_header_ptrs,
+                                       seq_mass,
+                                       prec_mono_mass_);
 
   DiagHeaderPtrVec header_ptrs;
   // if not complete alignment, find best shifts
