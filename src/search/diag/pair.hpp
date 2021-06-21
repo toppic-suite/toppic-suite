@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_SEARCH_ONE_PTM_SEARCH_PTM_SEARCH_PAIR_HPP_
-#define TOPPIC_SEARCH_ONE_PTM_SEARCH_PTM_SEARCH_PAIR_HPP_
+#ifndef TOPPIC_SEARCH_DIAGONAL_PAIR_HPP_
+#define TOPPIC_SEARCH_DIAGONAL_PAIR_HPP_
 
 #include <memory>
 

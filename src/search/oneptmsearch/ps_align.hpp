@@ -19,9 +19,10 @@
 #include <vector>
 
 #include "prsm/prsm.hpp"
-#include "search/oneptmsearch/ps_align_para.hpp"
+#include "search/diag/diag_pair.hpp"
+#include "search/diag/diagonal.hpp"
 #include "search/oneptmsearch/dp_pair.hpp"
-#include "search/oneptmsearch/basic_diag_pair.hpp"
+#include "search/oneptmsearch/ps_align_para.hpp"
 
 namespace toppic {
 
@@ -29,7 +30,7 @@ class PSAlign {
  public:
   PSAlign(const std::vector<double> &ms_masses,
           const std::vector<double> &seq_masses,
-          const BasicDiagonalPtrVec &diagonal_ptrs,
+          const DiagonalPtrVec &diagonal_ptrs,
           PsAlignParaPtr para_ptr):
       para_ptr_(para_ptr),
       ms_masses_(ms_masses),
@@ -62,7 +63,7 @@ class PSAlign {
 
   std::vector<double> seq_masses_;
 
-  BasicDiagonalPtrVec diagonal_ptrs_;
+  DiagonalPtrVec diagonal_ptrs_;
 
   std::vector<std::vector<int>> idxes_;
 

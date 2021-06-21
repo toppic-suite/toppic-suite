@@ -26,9 +26,8 @@
 #include "prsm/prsm.hpp"
 #include "prsm/simple_prsm.hpp"
 #include "search/diag/diagonal_header.hpp"
+#include "search/diag/diag_pair.hpp"
 #include "search/oneptmsearch/ptm_search_mng.hpp"
-//#include "ptmsearch/comp_shift_low_mem.hpp"
-#include "search/oneptmsearch/basic_diag_pair.hpp"
 #include "search/oneptmsearch/ps_align.hpp"
 
 namespace toppic {

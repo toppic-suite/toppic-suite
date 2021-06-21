@@ -16,10 +16,15 @@
 #define TOPPIC_SEARCH_DIAG_DIAGONAL_HPP_
 
 #include "search/diag/diagonal_header.hpp"
+#include "search/diag/diag_pair.hpp"
 
 namespace toppic {
 
-template <class T>
+class Diagonal;
+
+typedef std::shared_ptr<Diagonal> DiagonalPtr;
+typedef std::vector<DiagonalPtr>  DiagonalPtrVec;
+
 class Diagonal {
  public:
   Diagonal() {}
@@ -31,7 +36,7 @@ class Diagonal {
 
   // need init pair_ptr_list after create
   explicit Diagonal(DiagonalHeaderPtr header_ptr, 
-                    std::vector<T> pair_ptr_list):
+                    DiagPairPtrVec pair_ptr_list):
       header_ptr_(header_ptr),
       pair_ptr_list_(pair_ptr_list) {}
 
@@ -39,14 +44,14 @@ class Diagonal {
 
   DiagonalHeaderPtr getHeader() {return header_ptr_;}
 
-  const std::vector<T>& getDiagPair() {return pair_ptr_list_;}
+  const DiagPairPtrVec& getDiagPair() {return pair_ptr_list_;}
 
-  T getDiagPair(int i) {return pair_ptr_list_[i];}
+  DiagPairPtr getDiagPair(int i) {return pair_ptr_list_[i];}
 
  private:
   DiagonalHeaderPtr header_ptr_;
 
-  std::vector<T> pair_ptr_list_;
+  DiagPairPtrVec pair_ptr_list_;
 };
 
 } /* namespace toppic */

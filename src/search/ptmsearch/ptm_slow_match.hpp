@@ -25,8 +25,8 @@
 #include "ms/spec/spectrum_set.hpp"
 #include "prsm/prsm.hpp"
 #include "search/diag/diagonal_header.hpp"
+#include "search/diag/diag_pair.hpp"
 #include "search/oneptmsearch/ptm_search_mng.hpp"
-#include "search/oneptmsearch/basic_diag_pair.hpp"
 #include "search/oneptmsearch/ps_align.hpp"
 
 #include "search/ptmsearch/comp_shift_low_mem.hpp"

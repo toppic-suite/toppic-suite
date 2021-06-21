@@ -15,8 +15,8 @@
 #ifndef TOPPIC_SEARCH_ONE_PTM_SEARCH_DP_PAIR_HPP_
 #define TOPPIC_SEARCH_ONE_PTM_SEARCH_DP_PAIR_HPP_
 
+#include "search/diag/pair.hpp"
 #include "search/diag/diagonal_header.hpp"
-#include "search/oneptmsearch/pair.hpp"
 #include "search/oneptmsearch/path_type.hpp"
 
 namespace toppic {
