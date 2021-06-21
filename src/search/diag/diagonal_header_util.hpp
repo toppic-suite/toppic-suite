@@ -15,33 +15,33 @@
 #ifndef TOPPIC_SEARCH_DIAG_DIAGONAL_HEADER_UTIL_HPP_
 #define TOPPIC_SEARCH_DIAG_DIAGONAL_HEADER_UTIL_HPP_
 
-#include "search/diag/diagonal_header.hpp"
+#include "search/diag/diag_header.hpp"
 
 namespace toppic {
 
 namespace diagonal_header_util {
 
 // get the header corresponding to the top left corner in the spectral grid
-DiagonalHeaderPtr getTopLeftCornerHeader();
+DiagHeaderPtr getTopLeftCornerHeader();
 
-DiagonalHeaderPtr getBottomRightCornerHeader(double seq_mass, double prec_mass);
+DiagHeaderPtr getBottomRightCornerHeader(double seq_mass, double prec_mass);
 
-void addCornerDiagonals(DiagonalHeaderPtrVec &n_extend_header_ptrs,
-                        DiagonalHeaderPtrVec &c_extend_header_ptrs,
+void addCornerDiagonals(DiagHeaderPtrVec &n_extend_header_ptrs,
+                        DiagHeaderPtrVec &c_extend_header_ptrs,
                         double seq_mass, double prec_mass);
 
 int findSimilarShiftPos(const std::vector<double> &shifts, double s);
 
-bool isExistHeader(const DiagonalHeaderPtrVec &header_ptrs, double shift);
+bool isExistHeader(const DiagHeaderPtrVec &header_ptrs, double shift);
 
 // generate (clone) a new diagonal header with new bgn and end
-DiagonalHeaderPtr geneDiagonalHeaderPtr(int bgn, int end, DiagonalHeaderPtr diag_ptr);
+DiagHeaderPtr geneDiagHeaderPtr(int bgn, int end, DiagHeaderPtr diag_ptr);
 
-MassShiftPtrVec getDiagonalMassChanges(const DiagonalHeaderPtrVec &diag_ptrs,
+MassShiftPtrVec getDiagonalMassChanges(const DiagHeaderPtrVec &diag_ptrs,
                                        int first_res_pos, int last_res_pos,
                                        AlterTypePtr type_ptr);
 
-MassShiftPtrVec getDiagonalMassChanges(const DiagonalHeaderPtrVec &header_ptrs,
+MassShiftPtrVec getDiagonalMassChanges(const DiagHeaderPtrVec &header_ptrs,
                                        int first_res_pos, int last_res_pos,
                                        const AlterTypePtrVec & type_ptrs);
 

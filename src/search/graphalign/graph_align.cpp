@@ -377,7 +377,7 @@ void GraphAlign::getNodeDiagonals(int s, int m) {
   nodes_2d_.push_back(cur_vec);
 }
 
-DiagonalHeaderPtr getFirstDiagonal(ProteoGraphPtr proteo_ptr,
+DiagHeaderPtr getFirstDiagonal(ProteoGraphPtr proteo_ptr,
                                    const GraphResultNodePtrVec & nodes,
                                    const std::vector<double> & prm_masses,
                                    bool only_diag) {
@@ -408,7 +408,7 @@ DiagonalHeaderPtr getFirstDiagonal(ProteoGraphPtr proteo_ptr,
       pep_c_term = true;
     }
   }
-  DiagonalHeaderPtr header_ptr = std::make_shared<DiagonalHeader>(shift, true, false,
+  DiagHeaderPtr header_ptr = std::make_shared<DiagHeader>(shift, true, false,
                                                                   prot_n_term, prot_c_term,
                                                                   pep_n_term, pep_c_term);
   LOG_DEBUG("first diagonal first " << prot_idx << " last " << last_prot_idx);
@@ -417,7 +417,7 @@ DiagonalHeaderPtr getFirstDiagonal(ProteoGraphPtr proteo_ptr,
   return header_ptr;
 }
 
-DiagonalHeaderPtr getLastDiagonal(const GraphResultNodePtrVec & nodes,
+DiagHeaderPtr getLastDiagonal(const GraphResultNodePtrVec & nodes,
                                   const std::vector<double> & prm_masses,
                                   const PrmPeakPtrVec & prm_peaks) {
   int last_node_idx = nodes.size() - 1;
@@ -436,7 +436,7 @@ DiagonalHeaderPtr getLastDiagonal(const GraphResultNodePtrVec & nodes,
   } else {
     pep_c_term = true;
   }
-  DiagonalHeaderPtr header_ptr = std::make_shared<DiagonalHeader>(shift, false, true,
+  DiagHeaderPtr header_ptr = std::make_shared<DiagHeader>(shift, false, true,
                                                                   false, prot_c_term,
                                                                   false, pep_c_term);
   int first_prot_idx = nodes[0]->getFirstIdx();
@@ -446,7 +446,7 @@ DiagonalHeaderPtr getLastDiagonal(const GraphResultNodePtrVec & nodes,
   return header_ptr;
 }
 
-DiagonalHeaderPtr getInternalDiagonal(const GraphResultNodePtrVec & nodes,
+DiagHeaderPtr getInternalDiagonal(const GraphResultNodePtrVec & nodes,
                                       const std::vector<double> & prm_masses,
                                       const PrmPeakPtrVec & prm_peaks) {
   double shift_sum = 0.0;
@@ -459,8 +459,8 @@ DiagonalHeaderPtr getInternalDiagonal(const GraphResultNodePtrVec & nodes,
     shift_sum += shift;
   }
   double average_shift = shift_sum / nodes.size();
-  DiagonalHeaderPtr header_ptr
-      = std::make_shared<DiagonalHeader>(average_shift, true, false,
+  DiagHeaderPtr header_ptr
+      = std::make_shared<DiagHeader>(average_shift, true, false,
                                          false, false, false, false);
   int first_prot_idx = nodes[0]->getFirstIdx();
   header_ptr->setMatchFirstBpPos(first_prot_idx);
@@ -506,7 +506,7 @@ void GraphAlign::geneHeaders() {
 
   // generate 2d diagonals: first dimension is shift, second dimension is
   // variable mod
-  DiagonalHeaderPtrVec cur_vec;
+  DiagHeaderPtrVec cur_vec;
   for (size_t i = 0; i < diag_headers_.size(); i++) {
     if (nodes_2d_[i][0]->getPrevEdgeType() == GRAPH_ALIGN_TYPE_UNEXPECTED) {
       diag_headers_2d_.push_back(cur_vec);
@@ -553,14 +553,14 @@ PrsmPtr GraphAlign::geneResult(int s, int m) {
   ExtendMsPtrVec refine_ms_ptr_vec
       = extend_ms_factory::geneMsThreePtrVec(deconv_ms_ptr_vec,  sp_para_ptr, refine_prec_mass);
 
-  DiagonalHeaderPtrVec2D refined_headers_2d = diagonal_util::refineHeadersBgnEnd(
+  DiagHeaderPtrVec2D refined_headers_2d = diagonal_util::refineHeadersBgnEnd(
       proteo_ptr, refine_ms_ptr_vec, diag_headers_2d_, diag_headers_, min_mass);
 
   if (refined_headers_2d.size() == 0) {
     return nullptr;
   }
 
-  DiagonalHeaderPtrVec refined_headers;
+  DiagHeaderPtrVec refined_headers;
 
   AlterTypePtrVec shift_types;
 

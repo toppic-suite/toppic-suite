@@ -96,19 +96,19 @@ void PSAlign::initDPPair() {
 
       int prev_y = prev_pair_ptr->getY();
 
-      double prev_pair_nterm_shift = prev_pair_ptr->getDiagonalHeader()->getProtNTermShift();
+      double prev_pair_nterm_shift = prev_pair_ptr->getDiagHeader()->getProtNTermShift();
 
-      double cur_pair_nterm_shift = cur_pair_ptr->getDiagonalHeader()->getProtNTermShift();
+      double cur_pair_nterm_shift = cur_pair_ptr->getDiagHeader()->getProtNTermShift();
 
       double shift = cur_pair_nterm_shift - prev_pair_nterm_shift;
 
       if (prev_x >= cur_x || prev_y >= cur_y
-          || prev_pair_ptr->getDiagonalHeader() == cur_pair_ptr->getDiagonalHeader()
+          || prev_pair_ptr->getDiagHeader() == cur_pair_ptr->getDiagHeader()
           || shift > para_ptr_->align_max_shift_ || shift < para_ptr_->align_min_shift_) {
         continue;
       }
 
-      int diag_id = prev_pair_ptr->getDiagonalHeader()->getId();
+      int diag_id = prev_pair_ptr->getDiagHeader()->getId();
 
       ends[diag_id] = j;
 
@@ -136,14 +136,14 @@ inline DPPairPtr PSAlign::getTruncPre(DPPairPtr cur_pair_ptr, int s,
     for (size_t i = 0; i < segment_end_pair_ptrs_.size(); i++) {
       DPPairPtr prev_pair_ptr = segment_end_pair_ptrs_[i];
       if (align_type_ptr == ProteoformType::COMPLETE || align_type_ptr == ProteoformType::SUFFIX) {
-        if (prev_pair_ptr->getDiagonalHeader()->isProtCTermMatch()) {
+        if (prev_pair_ptr->getDiagHeader()->isProtCTermMatch()) {
           if (prev_pair_ptr->getScore(s) > trunc_score) {
             trunc_prev_ptr = prev_pair_ptr;
             trunc_score = prev_pair_ptr->getScore(s);
           }
         }
       } else {
-        if (prev_pair_ptr->getDiagonalHeader()->isPepCTermMatch()) {
+        if (prev_pair_ptr->getDiagHeader()->isPepCTermMatch()) {
           if (prev_pair_ptr->getScore(s) > trunc_score) {
             trunc_prev_ptr = prev_pair_ptr;
             trunc_score = prev_pair_ptr->getScore(s);
@@ -156,11 +156,11 @@ inline DPPairPtr PSAlign::getTruncPre(DPPairPtr cur_pair_ptr, int s,
     if (cur_pair_ptr->getDiagOrder() == 0) {
       if (align_type_ptr == ProteoformType::COMPLETE
           || align_type_ptr == ProteoformType::PREFIX) {
-        if (cur_pair_ptr->getDiagonalHeader()->isProtNTermMatch()) {
+        if (cur_pair_ptr->getDiagHeader()->isProtNTermMatch()) {
           trunc_prev_ptr = first_pair_ptr_;
         }
       } else {
-        if (cur_pair_ptr->getDiagonalHeader()->isPepNTermMatch()) {
+        if (cur_pair_ptr->getDiagHeader()->isPepNTermMatch()) {
           trunc_prev_ptr = first_pair_ptr_;
         }
       }
@@ -250,9 +250,9 @@ void PSAlign::backtrace() {
   }
 }
 
-DiagonalHeaderPtrVec PSAlign::backtrace(int s) {
-  DiagonalHeaderPtrVec list;
-  DiagonalHeaderPtr cur_header;
+DiagHeaderPtrVec PSAlign::backtrace(int s) {
+  DiagHeaderPtrVec list;
+  DiagHeaderPtr cur_header;
   int cur_end = -1;
   int cur_bgn = -1;
   DPPairPtr p = last_pair_ptr_;
@@ -266,16 +266,16 @@ DiagonalHeaderPtrVec PSAlign::backtrace(int s) {
     DPPairPtr pre = p->getPrevPairPtr(s);
     // LOG_DEBUG("p " << p << " pre ptr " << pre);
     if (p == last_pair_ptr_) {
-      cur_header = pre->getDiagonalHeader();
+      cur_header = pre->getDiagHeader();
       cur_end = pre->getY();
     } else if (pre == first_pair_ptr_) {
       cur_bgn = p->getY();
-      list.push_back(diagonal_header_util::geneDiagonalHeaderPtr(cur_bgn, cur_end, cur_header));
+      list.push_back(diagonal_header_util::geneDiagHeaderPtr(cur_bgn, cur_end, cur_header));
     } else {
       if (p->getType(s) == PathType::TYPE_SHIFT) {
         cur_bgn = p->getY();
-        list.push_back(diagonal_header_util::geneDiagonalHeaderPtr(cur_bgn, cur_end, cur_header));
-        cur_header = pre->getDiagonalHeader();
+        list.push_back(diagonal_header_util::geneDiagHeaderPtr(cur_bgn, cur_end, cur_header));
+        cur_header = pre->getDiagHeader();
         cur_end = pre->getY();
       }
     }
@@ -292,7 +292,7 @@ PrsmPtr PSAlign::geneResult(int shift_num, ProteoformPtr proteo_ptr,
                             DeconvMsPtrVec &deconv_ms_ptr_vec,
                             ExtendMsPtrVec &ms_three_ptr_vec,
                             PrsmParaPtr prsm_para_ptr) {
-  DiagonalHeaderPtrVec header_ptrs = getDiagonalHeaders(shift_num);
+  DiagHeaderPtrVec header_ptrs = getDiagHeaders(shift_num);
   // double score = ps_align_ptr_->getAlignScr(shift_num);
   // LOG_DEBUG("Shift " << shift_num << " score " << score);
   if (header_ptrs.size() == 0) {
@@ -314,7 +314,7 @@ PrsmPtr PSAlign::geneResult(int shift_num, ProteoformPtr proteo_ptr,
   ExtendMsPtrVec refine_ms_ptr_vec = extend_ms_factory::geneMsThreePtrVec(deconv_ms_ptr_vec,
                                                                           sp_para_ptr, refine_prec_mass);
 
-  DiagonalHeaderPtrVec refined_header_ptrs = diagonal_util::refineHeadersBgnEnd(proteo_ptr, 
+  DiagHeaderPtrVec refined_header_ptrs = diagonal_util::refineHeadersBgnEnd(proteo_ptr, 
                                                                                 refine_ms_ptr_vec,
                                                                                 header_ptrs, 
                                                                                 min_mass);

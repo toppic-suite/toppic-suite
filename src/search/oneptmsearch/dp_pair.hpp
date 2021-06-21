@@ -16,7 +16,7 @@
 #define TOPPIC_SEARCH_ONE_PTM_SEARCH_DP_PAIR_HPP_
 
 #include "search/diag/pair.hpp"
-#include "search/diag/diagonal_header.hpp"
+#include "search/diag/diag_header.hpp"
 #include "search/oneptmsearch/path_type.hpp"
 
 namespace toppic {
@@ -29,7 +29,7 @@ class DPPair : public Pair{
  public:
 
   DPPair(int x,int y,double pair_score,double diff,
-         int order,int n_shift, DiagonalHeaderPtr header_ptr);
+         int order,int n_shift, DiagHeaderPtr header_ptr);
 
   DPPairPtr getDiagPrevPairPtr() {return diag_prev_pair_ptr_;}
 
@@ -38,7 +38,7 @@ class DPPair : public Pair{
 
   double getDiff() {return diff_;}
 
-  DiagonalHeaderPtr getDiagonalHeader() {return header_ptr_;}
+  DiagHeaderPtr getDiagHeader() {return header_ptr_;}
 
   int getDiagOrder() {return order_;}
 
@@ -55,7 +55,7 @@ class DPPair : public Pair{
   void updateTable(int s,double score,int path_type,DPPairPtr prev_pair);
 
  private:
-  DiagonalHeaderPtr header_ptr_;
+  DiagHeaderPtr header_ptr_;
   double diff_;
   double pair_score_;
   int order_;

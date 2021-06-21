@@ -17,14 +17,14 @@
 
 #include "seq/proteoform.hpp"
 #include "ms/spec/prm_peak.hpp"
-#include "search/diag/diagonal_header.hpp"
+#include "search/diag/diag_header.hpp"
 #include "search/diag/diagonal.hpp"
 
 namespace toppic {
 
 namespace diag_pair_util {
 
-DiagonalPtrVec geneDiagonals(const DiagonalHeaderPtrVec& header_ptr_vec,
+DiagonalPtrVec geneDiagonals(const DiagHeaderPtrVec& header_ptr_vec,
     const PrmPeakPtrVec &prm_peaks,
     int group_spec_num, ProteoformPtr proteo_ptr);
 }

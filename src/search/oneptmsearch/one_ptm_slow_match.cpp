@@ -38,21 +38,21 @@ OnePtmSlowMatch::OnePtmSlowMatch(ProteoformPtr proteo_ptr,
   init();
 }
 
-inline void OnePtmSlowMatch::addPrefixDiagonals(DiagonalHeaderPtrVec &n_extend_header_ptrs) {
+inline void OnePtmSlowMatch::addPrefixDiagonals(DiagHeaderPtrVec &n_extend_header_ptrs) {
   std::vector<double> shifts = simple_prsm_ptr_->getNTruncShifts();
   for (size_t i = 0; i < shifts.size(); i++) {
     double new_shift = shifts[i] - proteo_ptr_->getProtModPtr()->getProtShift();
     if (!diagonal_header_util::isExistHeader(n_extend_header_ptrs, new_shift)) {
       // n_term strict; c_term nostrict; prot n_term no_match; prot c_term no_match
       // pep n_term match; pep c_term no_match
-      DiagonalHeaderPtr header_ptr = std::make_shared<DiagonalHeader>(new_shift, true, false, false, false, true, false);
+      DiagHeaderPtr header_ptr = std::make_shared<DiagHeader>(new_shift, true, false, false, false, true, false);
       n_extend_header_ptrs.push_back(header_ptr);
     }
   }
 }
 
-inline void OnePtmSlowMatch::addComplementDiagonals(DiagonalHeaderPtrVec &n_extend_header_ptrs,
-                                                    DiagonalHeaderPtrVec &c_extend_header_ptrs) {
+inline void OnePtmSlowMatch::addComplementDiagonals(DiagHeaderPtrVec &n_extend_header_ptrs,
+                                                    DiagHeaderPtrVec &c_extend_header_ptrs) {
   std::vector<double> prm_masses = proteo_ptr_->getBpSpecPtr()->getPrmMasses();
   // shifts for n_term matches
   std::vector<double> n_term_match_shifts;
@@ -69,7 +69,7 @@ inline void OnePtmSlowMatch::addComplementDiagonals(DiagonalHeaderPtrVec &n_exte
       if (!diagonal_header_util::isExistHeader(n_extend_header_ptrs, new_shift)) {
         // n_term strict; c_term nostrict; prot n_term no_match; prot c_term no_match
         // pep n_term match; pep c_term no_match
-        DiagonalHeaderPtr header_ptr = std::make_shared<DiagonalHeader>(new_shift, true, false, false, false, true, false);
+        DiagHeaderPtr header_ptr = std::make_shared<DiagHeader>(new_shift, true, false, false, false, true, false);
         n_extend_header_ptrs.push_back(header_ptr);
       }
     }
@@ -93,29 +93,29 @@ inline void OnePtmSlowMatch::addComplementDiagonals(DiagonalHeaderPtrVec &n_exte
       if (!diagonal_header_util::isExistHeader(c_extend_header_ptrs, new_shift)) {
         // n term nostrict, c_term strict, prot n_term no match ; prot c_term no match
         // pep n_term no match, pep c_term match
-        DiagonalHeaderPtr header_ptr = std::make_shared<DiagonalHeader>(new_shift, false, true, false, false, false, true);
+        DiagHeaderPtr header_ptr = std::make_shared<DiagHeader>(new_shift, false, true, false, false, false, true);
         c_extend_header_ptrs.push_back(header_ptr);
       }
     }
   }
 }
 
-inline void OnePtmSlowMatch::addSuffixDiagonals(DiagonalHeaderPtrVec &c_extend_header_ptrs) {
+inline void OnePtmSlowMatch::addSuffixDiagonals(DiagHeaderPtrVec &c_extend_header_ptrs) {
   std::vector<double>shifts = simple_prsm_ptr_->getCTruncShifts();
   for (size_t i = 0; i < shifts.size(); i++) {
     double new_shift = shifts[i] - proteo_ptr_->getProtModPtr()->getProtShift();
     if (!diagonal_header_util::isExistHeader(c_extend_header_ptrs, new_shift)) {
       // n term nostrict, c_term strict, prot n_term no match ; prot c_term no match
       // pep n_term no match, pep c_term match
-      DiagonalHeaderPtr header_ptr = std::make_shared<DiagonalHeader>(new_shift, false, true, false, false, false, true);
+      DiagHeaderPtr header_ptr = std::make_shared<DiagHeader>(new_shift, false, true, false, false, false, true);
       c_extend_header_ptrs.push_back(header_ptr);
     }
   }
 }
 
-inline DiagonalHeaderPtrVec OnePtmSlowMatch::geneOnePtmNTermShiftHeaders() {
-  DiagonalHeaderPtrVec n_extend_header_ptrs;
-  DiagonalHeaderPtrVec c_extend_header_ptrs;
+inline DiagHeaderPtrVec OnePtmSlowMatch::geneOnePtmNTermShiftHeaders() {
+  DiagHeaderPtrVec n_extend_header_ptrs;
+  DiagHeaderPtrVec c_extend_header_ptrs;
 
   // add corner diagonals for all types of alignments
   double seq_mass = proteo_ptr_->getResSeqPtr()->getSeqMass();
@@ -132,7 +132,7 @@ inline DiagonalHeaderPtrVec OnePtmSlowMatch::geneOnePtmNTermShiftHeaders() {
     }
     addComplementDiagonals(n_extend_header_ptrs, c_extend_header_ptrs);
   }
-  DiagonalHeaderPtrVec header_ptrs;
+  DiagHeaderPtrVec header_ptrs;
   header_ptrs.insert(header_ptrs.end(), n_extend_header_ptrs.begin(), n_extend_header_ptrs.end());
   header_ptrs.insert(header_ptrs.end(), c_extend_header_ptrs.begin(), c_extend_header_ptrs.end());
   for (size_t i = 0; i < header_ptrs.size(); i++) {
@@ -146,7 +146,7 @@ inline DiagonalHeaderPtrVec OnePtmSlowMatch::geneOnePtmNTermShiftHeaders() {
 // initialize ps_align
 void OnePtmSlowMatch::init() {
   // auto start = std::chrono::high_resolution_clock::now();
-  DiagonalHeaderPtrVec n_term_shift_header_ptrs = geneOnePtmNTermShiftHeaders(); 
+  DiagHeaderPtrVec n_term_shift_header_ptrs = geneOnePtmNTermShiftHeaders(); 
   // auto step_1 = std::chrono::high_resolution_clock::now();
   // LOG_DEBUG("Init n term diag time: " << std::chrono::duration_cast<std::chrono::nanoseconds>(step_1-start).count());
   PeakTolerancePtr tole_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();

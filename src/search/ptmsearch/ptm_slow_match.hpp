@@ -24,7 +24,7 @@
 #include "ms/spec/deconv_ms.hpp"
 #include "ms/spec/spectrum_set.hpp"
 #include "prsm/prsm.hpp"
-#include "search/diag/diagonal_header.hpp"
+#include "search/diag/diag_header.hpp"
 #include "search/diag/diag_pair.hpp"
 #include "search/oneptmsearch/ptm_search_mng.hpp"
 #include "search/oneptmsearch/ps_align.hpp"
@@ -58,15 +58,15 @@ class PtmSlowMatch {
   ProteoformTypePtr align_type_ptr_;
   PSAlignPtr ps_align_ptr_;
 
-  DiagonalHeaderPtrVec getNTermShiftListCommonHeaders();
+  DiagHeaderPtrVec getNTermShiftListCommonHeaders();
 
-  void addPrefixDiagonals(DiagonalHeaderPtrVec &common_header_ptrs,
-                          DiagonalHeaderPtrVec &n_extend_header_ptrs);
+  void addPrefixDiagonals(DiagHeaderPtrVec &common_header_ptrs,
+                          DiagHeaderPtrVec &n_extend_header_ptrs);
 
-  void addSuffixDiagonals(DiagonalHeaderPtrVec &common_header_ptrs,
-                          DiagonalHeaderPtrVec &c_extend_header_ptrs);
+  void addSuffixDiagonals(DiagHeaderPtrVec &common_header_ptrs,
+                          DiagHeaderPtrVec &c_extend_header_ptrs);
 
-  DiagonalHeaderPtrVec geneNTermShiftHeaders();
+  DiagHeaderPtrVec geneNTermShiftHeaders();
 };
 
 typedef std::shared_ptr<PtmSlowMatch> PtmSlowMatchPtr;

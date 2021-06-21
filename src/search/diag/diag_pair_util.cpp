@@ -22,13 +22,13 @@ namespace toppic {
 namespace diag_pair_util {
 
 inline DiagPairPtrVec compDiagPair(const PrmPeakPtrVec &prm_peaks,
-    int group_spec_num, const std::vector<double> &seq_masses,
-    DiagonalHeaderPtr header_ptr) {
+                                   int group_spec_num, const std::vector<double> &seq_masses,
+                                   DiagHeaderPtr header_ptr) {
 
-  std::vector<std::vector<double>> n_term_scores(
-      group_spec_num, std::vector<double>(seq_masses.size(), 0));
-  std::vector<std::vector<double>> c_term_scores(
-      group_spec_num, std::vector<double>(seq_masses.size(), 0));
+  std::vector<std::vector<double>> n_term_scores(group_spec_num, 
+                                                 std::vector<double>(seq_masses.size(), 0));
+  std::vector<std::vector<double>> c_term_scores(group_spec_num, 
+                                                 std::vector<double>(seq_masses.size(), 0));
   std::vector<double> top_scores(seq_masses.size(), 0);
   std::vector<int> top_positions(seq_masses.size(), -1);
 
@@ -71,7 +71,7 @@ inline DiagPairPtrVec compDiagPair(const PrmPeakPtrVec &prm_peaks,
       }
     }
     if (prsm_algo::increaseIJ(i, j, deviation, peak->getNRelaxCStrictTolerance(),
-          real_masses, seq_masses)) {
+                              real_masses, seq_masses)) {
       i++;
     } else {
       j++;
@@ -102,10 +102,10 @@ inline DiagPairPtrVec compDiagPair(const PrmPeakPtrVec &prm_peaks,
   return pair_list;
 }
 
-DiagonalPtr getDiagonalPtr(DiagonalHeaderPtr header_ptr,
-    const PrmPeakPtrVec &prm_peaks,
-    int group_spec_num,
-    ProteoformPtr proteo_ptr) {
+DiagonalPtr getDiagonalPtr(DiagHeaderPtr header_ptr,
+                           const PrmPeakPtrVec &prm_peaks,
+                           int group_spec_num,
+                           ProteoformPtr proteo_ptr) {
   BpSpecPtr bp_spec_ptr = proteo_ptr->getBpSpecPtr();
 
   std::vector<double> prm_masses = bp_spec_ptr->getPrmMasses();
@@ -121,13 +121,13 @@ DiagonalPtr getDiagonalPtr(DiagonalHeaderPtr header_ptr,
   return nullptr;
 }
 
-DiagonalPtrVec geneDiagonals(const DiagonalHeaderPtrVec& header_ptr_vec,
-    const PrmPeakPtrVec &prm_peaks,
-    int group_spec_num, ProteoformPtr proteo_ptr) {
+DiagonalPtrVec geneDiagonals(const DiagHeaderPtrVec& header_ptr_vec,
+                             const PrmPeakPtrVec &prm_peaks,
+                             int group_spec_num, ProteoformPtr proteo_ptr) {
   DiagonalPtrVec diagonal_list;
   for (size_t i = 0; i < header_ptr_vec.size(); i++) {
     DiagonalPtr diagonal_ptr = getDiagonalPtr(header_ptr_vec[i], prm_peaks,
-        group_spec_num, proteo_ptr);
+                                              group_spec_num, proteo_ptr);
     if (diagonal_ptr != nullptr) {
       diagonal_list.push_back(diagonal_ptr);
     }

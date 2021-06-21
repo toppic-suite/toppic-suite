@@ -19,7 +19,7 @@
 namespace toppic {
 
 DPPair::DPPair(int x,int y,double pair_score,double diff,
-               int order,int n_shift,DiagonalHeaderPtr header_ptr):Pair(x,y){
+               int order,int n_shift,DiagHeaderPtr header_ptr):Pair(x,y){
   diff_ = diff;
   pair_score_ = pair_score;
   order_= order;

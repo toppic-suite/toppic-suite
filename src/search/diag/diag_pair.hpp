@@ -18,7 +18,6 @@
 #include <memory>
 #include <vector>
 #include "search/diag/pair.hpp"
-#include "search/diag/diagonal_header.hpp"
 
 namespace toppic {
 

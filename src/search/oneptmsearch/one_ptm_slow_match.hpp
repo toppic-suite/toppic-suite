@@ -25,7 +25,7 @@
 #include "ms/spec/spectrum_set.hpp"
 #include "prsm/prsm.hpp"
 #include "prsm/simple_prsm.hpp"
-#include "search/diag/diagonal_header.hpp"
+#include "search/diag/diag_header.hpp"
 #include "search/diag/diag_pair.hpp"
 #include "search/oneptmsearch/ptm_search_mng.hpp"
 #include "search/oneptmsearch/ps_align.hpp"
@@ -57,14 +57,14 @@ class OnePtmSlowMatch {
   SimplePrsmPtr simple_prsm_ptr_;
   PSAlignPtr ps_align_ptr_;
 
-  void addPrefixDiagonals(DiagonalHeaderPtrVec &n_extend_header_ptrs);
+  void addPrefixDiagonals(DiagHeaderPtrVec &n_extend_header_ptrs);
 
-  void addSuffixDiagonals(DiagonalHeaderPtrVec &c_extend_header_ptrs);
+  void addSuffixDiagonals(DiagHeaderPtrVec &c_extend_header_ptrs);
 
-  void addComplementDiagonals(DiagonalHeaderPtrVec &n_extend_header_ptrs,
-                              DiagonalHeaderPtrVec &c_extend_header_ptrs);
+  void addComplementDiagonals(DiagHeaderPtrVec &n_extend_header_ptrs,
+                              DiagHeaderPtrVec &c_extend_header_ptrs);
 
-  DiagonalHeaderPtrVec geneOnePtmNTermShiftHeaders();
+  DiagHeaderPtrVec geneOnePtmNTermShiftHeaders();
 };
 
 typedef std::shared_ptr<OnePtmSlowMatch> OnePtmSlowMatchPtr;

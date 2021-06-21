@@ -47,11 +47,11 @@ class PSAlign {
 
   void backtrace();
 
-  DiagonalHeaderPtrVec backtrace(int s);
+  DiagHeaderPtrVec backtrace(int s);
 
   double getAlignScr(int s) {return align_scores_[s];}
 
-  DiagonalHeaderPtrVec getDiagonalHeaders(int s) {return backtrack_diagonal_ptrs_[s];}
+  DiagHeaderPtrVec getDiagHeaders(int s) {return backtrack_diagonal_ptrs_[s];}
 
   PrsmPtr geneResult(int shift_num, ProteoformPtr proteo_ptr, DeconvMsPtrVec &deconv_ms_ptr_vec,
                      ExtendMsPtrVec &ms_three_ptr_vec, PrsmParaPtr prsm_para_ptr);
@@ -81,7 +81,7 @@ class PSAlign {
 
   DPPairPtrVec dp_pair_ptrs_;
 
-  DiagonalHeaderPtrVec2D backtrack_diagonal_ptrs_;
+  DiagHeaderPtrVec2D backtrack_diagonal_ptrs_;
 
   std::vector<double> align_scores_;
 
