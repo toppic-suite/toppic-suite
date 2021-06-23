@@ -14,11 +14,12 @@
 
 #include <limits>
 
+#include "search/oneptmsearch/path_type.hpp"
 #include "search/oneptmsearch/dp_pair.hpp"
 
 namespace toppic {
 
-DPPair::DPPair(int x,int y,double pair_score,double diff,
+DpPair::DpPair(int x,int y,double pair_score,double diff,
                int order,int n_shift,DiagHeaderPtr header_ptr):Pair(x,y){
   diff_ = diff;
   pair_score_ = pair_score;
@@ -27,14 +28,14 @@ DPPair::DPPair(int x,int y,double pair_score,double diff,
   for(int i=0;i<n_shift+1;i++){
     prev_pair_ptrs_.push_back(nullptr);
     scores_.push_back(-std::numeric_limits<double>::max());
-    types_.push_back(PathType::TYPE_NULL);
+    types_.push_back(path_type::TYPE_NULL);
   }
 }
 
-void DPPair::updateTable(int s,double score,int path_type,DPPairPtr prev_pair_ptr){
-    scores_[s] = score;
-    types_[s] = path_type;
-    prev_pair_ptrs_[s] = prev_pair_ptr;
+void DpPair::updateTable(int s,double score,int path_type,DpPairPtr prev_pair_ptr){
+  scores_[s] = score;
+  types_[s] = path_type;
+  prev_pair_ptrs_[s] = prev_pair_ptr;
 }
 
 } /* namespace toppic */

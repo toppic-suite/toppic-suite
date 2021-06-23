@@ -17,13 +17,14 @@
 
 namespace toppic {
 
-class PathType {
- public:
-  static int TYPE_NULL;
-  static int TYPE_DIAGONAL;
-  static int TYPE_SHIFT;
-  static int TYPE_TRUNC;
-};
+namespace path_type {
+
+extern int TYPE_NULL;
+extern int TYPE_DIAGONAL;
+extern int TYPE_SHIFT;
+extern int TYPE_TRUNC;
+
+}
 
 } /* namespace toppic */
 

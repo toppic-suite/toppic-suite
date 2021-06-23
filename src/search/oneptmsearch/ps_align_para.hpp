@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_SEARCH_ONE_PTM_SEARCH_PS_ALIGN_PARA_HPP_
 #define TOPPIC_SEARCH_ONE_PTM_SEARCH_PS_ALIGN_PARA_HPP_
 
@@ -29,10 +28,10 @@ class PsAlignPara {
 
   int getUnknownShiftNum() {return n_unknown_shift_;}
 
-  /* parameters for ptm search */
+  // parameters for ptm search 
   int n_unknown_shift_ =2;
 
-  /* parameters for ps alignment */
+  // parameters for ps alignment 
   double align_max_shift_ = 1000000;
 
   double align_min_shift_ = -1000000;

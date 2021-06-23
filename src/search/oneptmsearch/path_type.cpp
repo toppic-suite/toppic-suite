@@ -12,13 +12,16 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include "search/oneptmsearch/path_type.hpp"
-
 namespace toppic {
 
-int PathType::TYPE_NULL = -1;
-int PathType::TYPE_DIAGONAL = 0;
-int PathType::TYPE_SHIFT = 1;
-int PathType::TYPE_TRUNC = 2;
+namespace path_type {
+
+int TYPE_NULL = -1;
+int TYPE_DIAGONAL = 0;
+int TYPE_SHIFT = 1;
+int TYPE_TRUNC = 2;
+
+}
 
 } /* namespace toppic */
+

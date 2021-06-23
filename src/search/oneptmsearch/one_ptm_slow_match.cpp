@@ -12,9 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <chrono>
-#include <vector>
-
 #include "ms/factory/prm_ms_util.hpp"
 #include "search/diag/diag_header_util.hpp"
 #include "search/diag/diag_pair_util.hpp"
@@ -86,10 +83,8 @@ inline void OnePtmSlowMatch::addComplementDiagonals(DiagHeaderPtrVec &n_extend_h
   for (size_t i = 0; i < n_extend_header_ptrs.size(); i++) {
     double s = n_extend_header_ptrs[i]->getProtNTermShift();
     int best_c_pos = diag_header_util::findSimilarShiftPos(c_term_match_shifts, s);
-    // LOG_DEBUG("Shift " << s <<" C term position " << best_c_pos);
     if (best_c_pos >= 0) {
       double new_shift = c_term_match_shifts[best_c_pos];
-      // LOG_DEBUG("Shift " << s <<" C term shift " << new_shift);
       if (!diag_header_util::isExistHeader(c_extend_header_ptrs, new_shift)) {
         // n term nostrict, c_term strict, prot n_term no match ; prot c_term no match
         // pep n_term no match, pep c_term match
@@ -145,28 +140,20 @@ inline DiagHeaderPtrVec OnePtmSlowMatch::geneOnePtmNTermShiftHeaders() {
 
 // initialize ps_align
 void OnePtmSlowMatch::init() {
-  // auto start = std::chrono::high_resolution_clock::now();
   DiagHeaderPtrVec n_term_shift_header_ptrs = geneOnePtmNTermShiftHeaders(); 
-  // auto step_1 = std::chrono::high_resolution_clock::now();
-  // LOG_DEBUG("Init n term diag time: " << std::chrono::duration_cast<std::chrono::nanoseconds>(step_1-start).count());
   PeakTolerancePtr tole_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
   PrmPeakPtrVec prm_peaks = prm_ms_util::getPrmPeakPtrs(ms_six_ptr_vec_, tole_ptr);
   int group_spec_num = ms_six_ptr_vec_.size();
   DiagonalPtrVec diagonal_ptrs = diag_pair_util::geneDiagonals(n_term_shift_header_ptrs,
-      prm_peaks, group_spec_num,
-      proteo_ptr_);
-  // auto step_2 = std::chrono::high_resolution_clock::now();
-  // LOG_DEBUG("Init diag time: " << std::chrono::duration_cast<std::chrono::nanoseconds>(step_2-step_1).count());
+                                                               prm_peaks, group_spec_num,
+                                                               proteo_ptr_);
 
   std::vector<double> seq_masses = proteo_ptr_->getBpSpecPtr()->getPrmMasses();
   std::vector<double> ms_masses(prm_peaks.size());
   for (size_t i = 0; i < prm_peaks.size(); i++) {
     ms_masses[i] = prm_peaks[i]->getPosition();
   }
-  ps_align_ptr_ = std::make_shared<PSAlign>(ms_masses, seq_masses, diagonal_ptrs, mng_ptr_->align_para_ptr_);
-
-  // auto step_3 = std::chrono::high_resolution_clock::now();
-  // LOG_DEBUG("Init ps time: " << std::chrono::duration_cast<std::chrono::nanoseconds>(step_3-step_2).count());
+  ps_align_ptr_ = std::make_shared<PsAlign>(ms_masses, seq_masses, diagonal_ptrs, mng_ptr_->align_para_ptr_);
 }
 
 PrsmPtr OnePtmSlowMatch::compute(int shift_num) {

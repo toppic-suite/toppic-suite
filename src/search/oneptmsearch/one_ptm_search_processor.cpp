@@ -12,21 +12,18 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <string>
 #include <algorithm>
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "seq/proteoform.hpp"
 #include "seq/proteoform_factory.hpp"
-#include "seq/db_block.hpp"
 #include "ms/spec/msalign_util.hpp"
 #include "ms/spec/simple_msalign_reader.hpp"
 #include "ms/factory/spectrum_set_factory.hpp"
 #include "prsm/simple_prsm.hpp"
 #include "prsm/simple_prsm_reader.hpp"
 #include "prsm/prsm_xml_writer.hpp"
-#include "prsm/prsm_str_merge.hpp"
 #include "search/oneptmsearch/one_ptm_slow_match.hpp"
 #include "search/oneptmsearch/one_ptm_search_processor.hpp"
 
@@ -60,16 +57,11 @@ PrsmPtrVec OnePtmSearchProcessor::onePtmSearchOneSpec(SpectrumSetPtr spec_set_pt
   for (size_t i = 0; i < proteoform_ptr_vec.size(); i++) {
     OnePtmSlowMatch slow_match(proteoform_ptr_vec[i], spec_set_ptr,
                                prsm_vec[i], type_ptr, mng_ptr);
-    //auto step_1 = std::chrono::high_resolution_clock::now();
-    //LOG_DEBUG("Init time: " << std::chrono::duration_cast<std::chrono::nanoseconds>(step_1-start).count());
     PrsmPtr tmp = slow_match.compute(1);
-    //auto step_2 = std::chrono::high_resolution_clock::now();
-    //LOG_DEBUG("Alignment time: " << std::chrono::duration_cast<std::chrono::nanoseconds>(step_2-step_1).count());
 
     if (tmp != nullptr)
       prsms.push_back(tmp);
   }
-  // LOG_DEBUG("prsm generation ended size " << prsms.size());
   std::sort(prsms.begin(), prsms.end(), Prsm::cmpMatchFragmentDecMatchPeakDec);
   if (prsms.size() > 0) {
     prsms.erase(prsms.begin() + 1, prsms.end());
