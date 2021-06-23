@@ -56,7 +56,7 @@ class PtmSlowMatch {
   PrmMsPtrVec ms_six_ptr_vec_;
   ExtendMsPtrVec ms_three_ptr_vec_;
   ProteoformTypePtr align_type_ptr_;
-  PSAlignPtr ps_align_ptr_;
+  PsAlignPtr ps_align_ptr_;
 
   DiagHeaderPtrVec getNTermShiftListCommonHeaders();
 

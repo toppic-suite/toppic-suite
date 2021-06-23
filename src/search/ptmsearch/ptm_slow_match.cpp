@@ -176,7 +176,7 @@ void PtmSlowMatch::init() {
   for (size_t i = 0; i < prm_peaks.size(); i++) {
     ms_masses[i] = prm_peaks[i]->getPosition();
   }
-  ps_align_ptr_ = std::make_shared<PSAlign>(ms_masses, seq_masses,
+  ps_align_ptr_ = std::make_shared<PsAlign>(ms_masses, seq_masses,
                                             diagonal_ptrs, mng_ptr_->align_para_ptr_);
 }
 
