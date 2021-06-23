@@ -12,17 +12,12 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_PTM_SEARCH_PTM_SEARCH_PROCESSOR_HPP_
 #define TOPPIC_PTM_SEARCH_PTM_SEARCH_PROCESSOR_HPP_
 
-#include "seq/fasta_index_reader.hpp"
 #include "seq/proteoform.hpp"
-#include "ms/spec/spectrum_set.hpp"
 #include "prsm/simple_prsm.hpp"
-#include "prsm/prsm_xml_writer.hpp"
 #include "search/oneptmsearch/ptm_search_mng.hpp"
-#include "search/ptmsearch/comp_shift_low_mem.hpp"
 
 namespace toppic {
 
@@ -45,4 +40,4 @@ typedef std::shared_ptr<PtmSearchProcessor> PtmSearchProcessorPtr;
 
 } /* namespace toppic */
 
-#endif /* PTM_PROCESSOR_HPP_ */
+#endif /* PTM_SEARCH_PROCESSOR_HPP_ */

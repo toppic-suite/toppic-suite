@@ -12,13 +12,10 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <utility>
-#include <vector>
-
-#include "ms/factory/prm_ms_factory.hpp"
 #include "ms/factory/prm_ms_util.hpp"
 #include "search/diag/diag_header_util.hpp"
 #include "search/diag/diag_pair_util.hpp"
+#include "search/ptmsearch/comp_shift_low_mem.hpp"
 #include "search/ptmsearch/ptm_slow_match.hpp"
 
 namespace toppic {
@@ -108,10 +105,8 @@ void PtmSlowMatch::addSuffixDiagonals(DiagHeaderPtrVec &common_header_ptrs,
   for (size_t i = 0; i < common_header_ptrs.size(); i++) {
     double s = common_header_ptrs[i]->getProtNTermShift();
     int best_c_pos = diag_header_util::findSimilarShiftPos(c_term_match_shifts, s);
-    // LOG_DEBUG("Shift " << s <<" C term position " << best_c_pos);
     if (best_c_pos >= 0) {
       double new_shift = c_term_match_shifts[best_c_pos];
-      // LOG_DEBUG("Shift " << s <<" C term shift " << new_shift);
       if (!diag_header_util::isExistHeader(c_extend_header_ptrs, new_shift)) {
         // n term nostrict, c_term strict, prot n_term no match ; prot c_term no match
         // pep n_term no match, pep c_term match

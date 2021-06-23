@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_PTM_SEARCH_PTM_SLOW_MATCH_HPP_
 #define TOPPIC_PTM_SEARCH_PTM_SLOW_MATCH_HPP_
 
@@ -20,16 +19,12 @@
 #include <vector>
 
 #include "seq/proteoform.hpp"
-#include "ms/spec/prm_peak.hpp"
 #include "ms/spec/deconv_ms.hpp"
 #include "ms/spec/spectrum_set.hpp"
 #include "prsm/prsm.hpp"
 #include "search/diag/diag_header.hpp"
-#include "search/diag/diag_pair.hpp"
 #include "search/oneptmsearch/ptm_search_mng.hpp"
 #include "search/oneptmsearch/ps_align.hpp"
-
-#include "search/ptmsearch/comp_shift_low_mem.hpp"
 
 namespace toppic {
 
