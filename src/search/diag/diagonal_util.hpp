@@ -16,7 +16,7 @@
 #define TOPPIC_SEARCH_DIAG_DIAGONAL_UTIL_HPP_
 
 #include "prsm/peak_ion_pair.hpp"
-#include "search/diag/diagonal_header.hpp"
+#include "search/diag/diag_header.hpp"
 
 namespace toppic {
 
@@ -24,20 +24,20 @@ namespace diagonal_util {
 
 double refinePrecursorAndHeaderShift(ProteoformPtr proteo_ptr,
                                      const ExtendMsPtrVec &ms_three_ptr_vec,
-                                     DiagonalHeaderPtrVec &header_ptrs,
+                                     DiagHeaderPtrVec &header_ptrs,
                                      double ppo, double min_mass,
                                      double refine_prec_step_width);
 
-DiagonalHeaderPtrVec refineHeadersBgnEnd(ProteoformPtr proteo_ptr,
-                                         const ExtendMsPtrVec &ms_three_ptr_vec,
-                                         const DiagonalHeaderPtrVec& heade_ptrs,
-                                         double min_mass);
+DiagHeaderPtrVec refineHeadersBgnEnd(ProteoformPtr proteo_ptr,
+                                     const ExtendMsPtrVec &ms_three_ptr_vec,
+                                     const DiagHeaderPtrVec& heade_ptrs,
+                                     double min_mass);
 
-DiagonalHeaderPtrVec2D refineHeadersBgnEnd(ProteoformPtr proteo_ptr,
-                                           const ExtendMsPtrVec &ms_three_ptr_vec,
-                                           const DiagonalHeaderPtrVec2D& header_ptrs_2d,
-                                           const DiagonalHeaderPtrVec& header_ptrs_1d,
-                                           double min_mass);
+DiagHeaderPtrVec2D refineHeadersBgnEnd(ProteoformPtr proteo_ptr,
+                                       const ExtendMsPtrVec &ms_three_ptr_vec,
+                                       const DiagHeaderPtrVec2D& header_ptrs_2d,
+                                       const DiagHeaderPtrVec& header_ptrs_1d,
+                                       double min_mass);
 
 int getNewBgn(const PeakIonPairPtrVec& pair_ptrs);
 

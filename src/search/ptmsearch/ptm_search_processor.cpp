@@ -14,22 +14,17 @@
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
-#include "common/base/prot_mod.hpp"
 #include "common/thread/simple_thread_pool.hpp"
-#include "seq/fasta_reader.hpp"
-#include "ms/spec/deconv_ms.hpp"
 #include "ms/spec/msalign_util.hpp"
 #include "ms/factory/spectrum_set_factory.hpp"
-#include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_str_merge.hpp"
-#include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_xml_writer_set.hpp"
 #include "prsm/simple_prsm.hpp"
 #include "prsm/simple_prsm_reader.hpp"
 #include "prsm/simple_prsm_util.hpp"
 #include "prsm/prsm.hpp"
-#include "search/ptmsearch/ptm_search_processor.hpp"
 #include "search/ptmsearch/ptm_search_slow_filter.hpp"
+#include "search/ptmsearch/ptm_search_processor.hpp"
 
 namespace toppic {
 

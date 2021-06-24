@@ -12,32 +12,43 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <iomanip>
-#include <map>
-#include <string>
-#include <vector>
+#ifndef TOPPIC_SEARCH_DIAG_PAIR_HPP_
+#define TOPPIC_SEARCH_DIAG_PAIR_HPP_
 
-#include "console/topindex_argument.hpp"
-#include "console/topindex_process.hpp"
+#include <memory>
 
-using namespace toppic;
+namespace toppic {
 
-int main(int argc, char* argv[]) {
-  
-  toppic::logger::log_level = 5;
-  std::cout << std::setprecision(10);
+class Pair;
 
-  toppic::Argument argu_processor;
+typedef std::shared_ptr<Pair> PairPtr;
 
-  bool success = argu_processor.parse(argc, argv);
+class Pair {
+ public:
+  Pair(int x, int y): x_(x), y_(y) {}
 
-  if (!success) {
-    return 1;
+  int getX() {return x_;}
+
+  int getY() {return y_;}
+
+  void setX(int x) {x_ = x;}
+
+  void setY(int y) {y_ = y;}
+
+  static bool cmpPosInc(const PairPtr &a, const PairPtr &b) {
+    if (a->getY() != b->getY()) {
+      return a->getY() < b->getY();
+    }
+    return a->getX() < b->getX();
   }
 
-  std::map<std::string, std::string> arguments = argu_processor.getArguments();
+ protected:
+  int x_ = 0;
 
-  TopIndexProcess(arguments);
+  int y_ = 0;
+};
 
-  return 0;
-}
+
+} /* namespace toppic */
+
+#endif 

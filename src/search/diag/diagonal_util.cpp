@@ -27,10 +27,10 @@ namespace diagonal_util {
 
 inline TheoPeakPtrVec getDiagonalTheoPeak(ProteoformPtr proteo_ptr,
                                           ActivationPtr activation_ptr,
-                                          const DiagonalHeaderPtrVec &header_ptrs,
+                                          const DiagHeaderPtrVec &header_ptrs,
                                           int i, double min_mass) {
-  DiagonalHeaderPtr first_header_ptr = header_ptrs[0];
-  DiagonalHeaderPtr last_header_ptr = header_ptrs[header_ptrs.size()-1];
+  DiagHeaderPtr first_header_ptr = header_ptrs[0];
+  DiagHeaderPtr last_header_ptr = header_ptrs[header_ptrs.size()-1];
   int first_res_pos = first_header_ptr->getTruncFirstResPos();
   int last_res_pos = last_header_ptr->getTruncLastResPos();
   ResSeqPtr subseq_ptr = proteo_ptr->getResSeqPtr()->getSubResidueSeq(first_res_pos, last_res_pos);
@@ -74,7 +74,7 @@ inline TheoPeakPtrVec getNTermTheoPeakPtrs(const TheoPeakPtrVec theo_peak_ptrs) 
 
 double refinePrecursorAndHeaderShift(ProteoformPtr proteo_ptr,
                                      const ExtendMsPtrVec &ms_three_ptr_vec,
-                                     DiagonalHeaderPtrVec &header_ptrs,
+                                     DiagHeaderPtrVec &header_ptrs,
                                      double ppo, double min_mass,
                                      double refine_prec_step_width) {
   double prec_mass = ms_three_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMass();
@@ -153,17 +153,17 @@ double refinePrecursorAndHeaderShift(ProteoformPtr proteo_ptr,
   for (size_t i = 0; i < header_ptrs.size() - 1; i++) {
     header_ptrs[i]->changeOnlyCTermShift(best_delta);
   }
-  DiagonalHeaderPtr last_header_ptr = header_ptrs[header_ptrs.size()-1];
+  DiagHeaderPtr last_header_ptr = header_ptrs[header_ptrs.size()-1];
   last_header_ptr->changeOnlyNTermShift(best_delta);
 
   return prec_mass + best_delta;
 }
 
-DiagonalHeaderPtrVec refineHeadersBgnEnd(ProteoformPtr proteo_ptr,
+DiagHeaderPtrVec refineHeadersBgnEnd(ProteoformPtr proteo_ptr,
                                          const ExtendMsPtrVec &ms_three_ptr_vec,
-                                         const DiagonalHeaderPtrVec& header_ptrs,
+                                         const DiagHeaderPtrVec& header_ptrs,
                                          double min_mass) {
-  DiagonalHeaderPtrVec result_list;
+  DiagHeaderPtrVec result_list;
   int first_res_pos = header_ptrs[0]->getTruncFirstResPos();
   int last_res_pos = header_ptrs[header_ptrs.size()-1]->getTruncLastResPos();
   for (size_t i = 0; i < header_ptrs.size(); i++) {
@@ -207,19 +207,19 @@ DiagonalHeaderPtrVec refineHeadersBgnEnd(ProteoformPtr proteo_ptr,
   return result_list;
 }
 
-DiagonalHeaderPtrVec2D refineHeadersBgnEnd(ProteoformPtr proteo_ptr,
+DiagHeaderPtrVec2D refineHeadersBgnEnd(ProteoformPtr proteo_ptr,
                                            const ExtendMsPtrVec &ms_three_ptr_vec,
-                                           const DiagonalHeaderPtrVec2D& header_ptrs_2d,
-                                           const DiagonalHeaderPtrVec& header_ptrs_1d,
+                                           const DiagHeaderPtrVec2D& header_ptrs_2d,
+                                           const DiagHeaderPtrVec& header_ptrs_1d,
                                            double min_mass) {
-  DiagonalHeaderPtrVec2D result_list;
-  DiagonalHeaderPtr first_header = header_ptrs_1d[0];
-  DiagonalHeaderPtr last_header = header_ptrs_1d[header_ptrs_1d.size()-1];
+  DiagHeaderPtrVec2D result_list;
+  DiagHeaderPtr first_header = header_ptrs_1d[0];
+  DiagHeaderPtr last_header = header_ptrs_1d[header_ptrs_1d.size()-1];
   int first_res_pos = first_header->getTruncFirstResPos();
   int last_res_pos = last_header->getTruncLastResPos();
   int index = 0;
   for (size_t i = 0; i < header_ptrs_2d.size(); i++) {
-    DiagonalHeaderPtrVec cur_vec;
+    DiagHeaderPtrVec cur_vec;
     for (size_t j=0; j < header_ptrs_2d[i].size(); j++) {
       int bgn = header_ptrs_2d[i][j]->getMatchFirstBpPos()-first_res_pos;
       int end = header_ptrs_2d[i][j]->getMatchLastBpPos()-first_res_pos;

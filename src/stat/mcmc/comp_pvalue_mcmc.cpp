@@ -186,7 +186,7 @@ double CompPValueMCMC::compOneProbMCMC(PrsmPtr prsm_ptr, ActivationPtr act,
       p[i] = p[i] / sum;
       // LOG_DEBUG("p[" << i << "] " << p[i]);
     }
-    if (scr >= p.size()){ 
+    if (scr >= static_cast<int>(p.size())){ 
         scr = p.size() - 1;
     }
     if (prsm_ptr->getMatchFragNum() < 10) {

@@ -15,37 +15,37 @@
 #include <limits>
 
 #include "common/base/mod_base.hpp"
-#include "search/diag/diagonal_header_util.hpp"
+#include "search/diag/diag_header_util.hpp"
 
 namespace toppic {
 
-namespace diagonal_header_util {
+namespace diag_header_util {
 
 // get the header corresponding to the top left corner in the spectral grid
-DiagonalHeaderPtr getTopLeftCornerHeader() {
+DiagHeaderPtr getTopLeftCornerHeader() {
   double shift = 0;
   // n_term strict; c_term nostrict; prot n_term match; prot c_term no_match
   // pep n_term no_match; pep c_term no_match
-  return std::make_shared<DiagonalHeader>(shift, true, false, true, false, false, false);
+  return std::make_shared<DiagHeader>(shift, true, false, true, false, false, false);
 }
 
-DiagonalHeaderPtr getBottomRightCornerHeader(double seq_mass,
+DiagHeaderPtr getBottomRightCornerHeader(double seq_mass,
                                              double prec_mass) {
   double shift = prec_mass - seq_mass;
   // n term nostrict, c_term strict, prot n_term no match ; prot c_term match
   // pep n_term no match, pep c_term no match
-  return std::make_shared<DiagonalHeader>(shift, false, true, false, true, false, false);
+  return std::make_shared<DiagHeader>(shift, false, true, false, true, false, false);
 }
 
-void addCornerDiagonals(DiagonalHeaderPtrVec &n_extend_header_ptrs,
-                        DiagonalHeaderPtrVec &c_extend_header_ptrs,
+void addCornerDiagonals(DiagHeaderPtrVec &n_extend_header_ptrs,
+                        DiagHeaderPtrVec &c_extend_header_ptrs,
                         double seq_mass, double prec_mass) {
   // get top-left corner header in spectral grid (shift is 0)
-  DiagonalHeaderPtr top_left_corner_header_ptr = diagonal_header_util::getTopLeftCornerHeader();
+  DiagHeaderPtr top_left_corner_header_ptr = diag_header_util::getTopLeftCornerHeader();
   n_extend_header_ptrs.push_back(top_left_corner_header_ptr);
 
   // get bottom-right corner header in the spectral grid
-  DiagonalHeaderPtr bottom_right_corner_header_ptr
+  DiagHeaderPtr bottom_right_corner_header_ptr
       = getBottomRightCornerHeader(seq_mass, prec_mass);
   c_extend_header_ptrs.push_back(bottom_right_corner_header_ptr);
 }
@@ -62,7 +62,7 @@ int findSimilarShiftPos(const std::vector<double> &shifts, double s) {
   return best_pos;
 }
 
-bool isExistHeader(const DiagonalHeaderPtrVec &header_ptrs, double shift) {
+bool isExistHeader(const DiagHeaderPtrVec &header_ptrs, double shift) {
   for (size_t i = 0; i < header_ptrs.size(); i++) {
     if (std::abs(header_ptrs[i]->getProtNTermShift()- shift) <= 0.01) {
       return true;
@@ -72,15 +72,15 @@ bool isExistHeader(const DiagonalHeaderPtrVec &header_ptrs, double shift) {
 }
 
 
-DiagonalHeaderPtr geneDiagonalHeaderPtr(int bgn, int end,
-                                        DiagonalHeaderPtr header_ptr) {
-  DiagonalHeaderPtr new_header_ptr = std::make_shared<DiagonalHeader>(*header_ptr);
+DiagHeaderPtr geneDiagHeaderPtr(int bgn, int end,
+                                        DiagHeaderPtr header_ptr) {
+  DiagHeaderPtr new_header_ptr = std::make_shared<DiagHeader>(*header_ptr);
   new_header_ptr->setMatchFirstBpPos(bgn);
   new_header_ptr->setMatchLastBpPos(end);
   return new_header_ptr;
 }
 
-MassShiftPtrVec getDiagonalMassChanges(const DiagonalHeaderPtrVec &header_ptrs,
+MassShiftPtrVec getDiagonalMassChanges(const DiagHeaderPtrVec &header_ptrs,
                                        int first_res_pos, int last_res_pos,
                                        AlterTypePtr type_ptr) {
   MassShiftPtrVec shift_list;
@@ -105,7 +105,7 @@ MassShiftPtrVec getDiagonalMassChanges(const DiagonalHeaderPtrVec &header_ptrs,
     shift_list.push_back(shift);
   }
 
-  DiagonalHeaderPtr last_header_ptr = header_ptrs[header_ptrs.size() - 1];
+  DiagHeaderPtr last_header_ptr = header_ptrs[header_ptrs.size() - 1];
   if (!last_header_ptr->isPepCTermMatch() && !last_header_ptr->isProtCTermMatch()) {
     AlterPtr alter_ptr
         = std::make_shared<Alter>(last_header_ptr->getMatchLastBpPos() - first_res_pos,
@@ -118,7 +118,7 @@ MassShiftPtrVec getDiagonalMassChanges(const DiagonalHeaderPtrVec &header_ptrs,
   return shift_list;
 }
 
-MassShiftPtrVec getDiagonalMassChanges(const DiagonalHeaderPtrVec &header_ptrs,
+MassShiftPtrVec getDiagonalMassChanges(const DiagHeaderPtrVec &header_ptrs,
                                        int first_res_pos, int last_res_pos,
                                        const AlterTypePtrVec & types) {
   MassShiftPtrVec shift_list;
@@ -145,7 +145,7 @@ MassShiftPtrVec getDiagonalMassChanges(const DiagonalHeaderPtrVec &header_ptrs,
     shift_list.push_back(shift);
   }
 
-  DiagonalHeaderPtr last_header_ptr = header_ptrs[header_ptrs.size() - 1];
+  DiagHeaderPtr last_header_ptr = header_ptrs[header_ptrs.size() - 1];
 
   if (!last_header_ptr->isPepCTermMatch() && !last_header_ptr->isProtCTermMatch()) {
     AlterPtr alter_ptr

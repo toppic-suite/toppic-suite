@@ -12,32 +12,20 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <iomanip>
-#include <map>
-#include <string>
-#include <vector>
+#ifndef TOPPIC_SEARCH_ONE_PTM_SEARCH_PATH_TYPE_HPP_
+#define TOPPIC_SEARCH_ONE_PTM_SEARCH_PATH_TYPE_HPP_
 
-#include "console/topindex_argument.hpp"
-#include "console/topindex_process.hpp"
+namespace toppic {
 
-using namespace toppic;
+namespace path_type {
 
-int main(int argc, char* argv[]) {
-  
-  toppic::logger::log_level = 5;
-  std::cout << std::setprecision(10);
+extern int TYPE_NULL;
+extern int TYPE_DIAGONAL;
+extern int TYPE_SHIFT;
+extern int TYPE_TRUNC;
 
-  toppic::Argument argu_processor;
-
-  bool success = argu_processor.parse(argc, argv);
-
-  if (!success) {
-    return 1;
-  }
-
-  std::map<std::string, std::string> arguments = argu_processor.getArguments();
-
-  TopIndexProcess(arguments);
-
-  return 0;
 }
+
+} /* namespace toppic */
+
+#endif 

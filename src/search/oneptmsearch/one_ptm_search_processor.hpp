@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_SEARCH_ONE_PTM_SEARCH_ONE_PTM_SEARCH_HPP_
 #define TOPPIC_SEARCH_ONE_PTM_SEARCH_ONE_PTM_SEARCH_HPP_
 

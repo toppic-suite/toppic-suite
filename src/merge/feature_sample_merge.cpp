@@ -34,12 +34,12 @@ FeatureSampleMerge::FeatureSampleMerge(const std::vector<std::string> &input_fil
                                        const std::string &fix_mod_str, 
                                        const std::string &tool_name, 
                                        double error_tole):
-    input_file_names_(input_file_names),
-    output_file_name_(output_file_name),
-    db_file_name_(db_file_name),
-    fix_mod_str_(fix_mod_str),
-    tool_name_(tool_name),
-    error_tole_(error_tole) {}
+  input_file_names_(input_file_names),
+  output_file_name_(output_file_name),
+  db_file_name_(db_file_name),
+  fix_mod_str_(fix_mod_str),
+  tool_name_(tool_name),
+  error_tole_(error_tole) {}
 
 
 
@@ -169,12 +169,9 @@ void sampleAlignTime(FeaturePrsmPtrVec &first, FeaturePrsmPtrVec &second,
 
   size_t a_size = a.size();
   size_t b_size = b.size();
-  LOG_DEBUG("a size " << a_size << " b size " << b_size);
   CellPtrVec2D cell_2d = initCells(a_size, b_size, a);
-  LOG_DEBUG("cell inited ");
   //alignment
   for (size_t i = 1; i < a_size + 1; i++) {
-    LOG_DEBUG("alignment  " << i);
     for (size_t j = 1; j < b_size + 1; j++) {
       double left_sim = cell_2d[i][j-1]->sim_;
       double up_sim = cell_2d[i-1][j]->sim_;
@@ -200,7 +197,6 @@ void sampleAlignTime(FeaturePrsmPtrVec &first, FeaturePrsmPtrVec &second,
       }
     }
   }
-  LOG_DEBUG("alignment finished ");
   //backtracking
   size_t i = a_size;
   size_t j = b_size;
@@ -216,14 +212,14 @@ void sampleAlignTime(FeaturePrsmPtrVec &first, FeaturePrsmPtrVec &second,
       int pos = findMatch(a[i-1], b, j-1, mass_tole); 
       if (pos >= 0) {
         LOG_DEBUG("i " << (i-1) 
-            << " time " << a[i-1]->getTimeMiddle() 
-            << " mass " << a[i-1]->getMonoMass() 
-            << " intensity " << a[i-1]->getIntensity() 
-            << " j " << (j-1) 
-            << " j " << pos 
-            << " time " << b[pos]->getTimeMiddle() 
-            << " mass " << b[pos]->getMonoMass() 
-            << " intensity " << b[pos]->getIntensity()); 
+                  << " time " << a[i-1]->getTimeMiddle() 
+                  << " mass " << a[i-1]->getMonoMass() 
+                  << " intensity " << a[i-1]->getIntensity() 
+                  << " j " << (j-1) 
+                  << " j " << pos 
+                  << " time " << b[pos]->getTimeMiddle() 
+                  << " mass " << b[pos]->getMonoMass() 
+                  << " intensity " << b[pos]->getIntensity()); 
       }
       i--;
       j--;
@@ -237,7 +233,6 @@ void sampleAlignTime(FeaturePrsmPtrVec &first, FeaturePrsmPtrVec &second,
   }
   std::pair<double,double> first_pair(0,0);
   time_pairs.push_back(first_pair);
-  LOG_DEBUG("backtrack finished ");
   std::reverse(time_pairs.begin(), time_pairs.end());
 }
 
@@ -333,8 +328,6 @@ void getFeatureTable(FeaturePrsmPtrVec& all_features, FeaturePrsmPtrVec2D& featu
       continue;
     }
     int cur_sample = all_features[i]->getSampleId();
-    LOG_DEBUG("Feature protein" << all_features[i]->getProtName() 
-              << " mass " << all_features[i]->getPrecMass());
 
     FeaturePrsmPtrVec cur_row(sample_size);
     for (size_t j = 0; j < sample_size; j++) {
@@ -357,19 +350,19 @@ void FeatureSampleMerge::outputTable(FeaturePrsmPtrVec2D &table,
   // write title
   std::string delim = "\t";
   file << "Protein accession" << delim
-      << "Protein description" << delim
-      << "First residue" << delim
-      << "Last residue" << delim
-      << "Proteoform" << delim
-      << "Precursor mass" << delim
-      << "Match " << delim;
+    << "Protein description" << delim
+    << "First residue" << delim
+    << "Last residue" << delim
+    << "Proteoform" << delim
+    << "Precursor mass" << delim
+    << "Match " << delim;
 
   for (int i = 0; i < sample_num; i++) {
     file << input_file_names_[i] << " Abundance" << delim
-        << input_file_names_[i] << " Spectrum id" << delim
-        << input_file_names_[i] << " Retention time begin" << delim
-        << input_file_names_[i] << " Retention time end" << delim
-        << input_file_names_[i] << " Normalized time middle" << delim;
+      << input_file_names_[i] << " Spectrum id" << delim
+      << input_file_names_[i] << " Retention time begin" << delim
+      << input_file_names_[i] << " Retention time end" << delim
+      << input_file_names_[i] << " Normalized time middle" << delim;
   }
   file << std::endl;
   int cluster_num = table.size();
@@ -377,11 +370,11 @@ void FeatureSampleMerge::outputTable(FeaturePrsmPtrVec2D &table,
   for (int i = 0; i < cluster_num; i++) {
     FeaturePrsmPtr feature_ptr = examples[i];
     file << feature_ptr->getProtName() << delim
-        << "\"" << feature_ptr->getProtDesc() << "\"" << delim
-        << (feature_ptr->getFirstResidue() + 1) << delim
-        << (feature_ptr->getLastResidue() + 1) << delim
-        << feature_ptr->getProteoform() << delim
-        << feature_ptr->getPrecMass() << delim;
+      << "\"" << feature_ptr->getProtDesc() << "\"" << delim
+      << (feature_ptr->getFirstResidue() + 1) << delim
+      << (feature_ptr->getLastResidue() + 1) << delim
+      << feature_ptr->getProteoform() << delim
+      << feature_ptr->getPrecMass() << delim;
     bool match = true;
     for (int j = 0; j < sample_num; j++) {
       if (table[i][j] == nullptr) {
@@ -410,8 +403,8 @@ void FeatureSampleMerge::outputTable(FeaturePrsmPtrVec2D &table,
           file << std::fixed << delim;
         }
         file << sample_feature->getTimeBegin() << delim
-             << sample_feature->getTimeEnd() << delim
-             << sample_feature->getAlignTimeMiddle() << delim;
+          << sample_feature->getTimeEnd() << delim
+          << sample_feature->getAlignTimeMiddle() << delim;
       }
     }
     file << std::endl;
@@ -422,7 +415,6 @@ void FeatureSampleMerge::outputTable(FeaturePrsmPtrVec2D &table,
 
 
 void FeatureSampleMerge::process() {
-  LOG_DEBUG("start process ");
   FeaturePrsmPtrVec2D features_2d; 
   FeaturePrsmPtrVec all_features; 
   size_t sample_num = input_file_names_.size();
@@ -432,7 +424,6 @@ void FeatureSampleMerge::process() {
     std::string base_name = file_util::basename(input_file_name);
     if (str_util::endsWith(base_name, "_ms2")) {
       base_name = base_name.substr(0, base_name.size() - 4);
-      LOG_DEBUG("base name " << base_name);
     }
     else {
       LOG_ERROR("The file name " << input_file_name << " does not end with _ms1.feature!");
@@ -440,19 +431,16 @@ void FeatureSampleMerge::process() {
     FeaturePrsmReader reader(base_name + "_ms1.feature");
     FeaturePrsmPtrVec features = reader.readAllFeatures();
     reader.close();
-    LOG_DEBUG("feature number " << features.size());
 
     std::string prsm_file_name = base_name + "_ms2_" + tool_name_ + "_proteoform.xml";
-    LOG_DEBUG("prsm file name " << prsm_file_name);
     FastaIndexReaderPtr seq_reader = std::make_shared<FastaIndexReader>(db_file_name_);
     ModPtrVec fix_mod_ptr_vec = mod_util::geneFixedModList(fix_mod_str_);
     PrsmStrPtrVec prsms = prsm_reader_util::readAllPrsmStrsMatchSeq(prsm_file_name,
-                                                              seq_reader,
-                                                              fix_mod_ptr_vec);
+                                                                    seq_reader,
+                                                                    fix_mod_ptr_vec);
     if (prsms.size() == 0) {
       LOG_WARN("The file " << prsm_file_name  << " does not contain any PrSM identifications!");
     }
-    LOG_DEBUG("prsm number " << prsms.size());
     matchPrsms(features, prsms);
     std::sort(features.begin(), features.end(), FeaturePrsm::cmpTimeInc);
     for (size_t i = 0; i < features.size(); i++) {
@@ -467,16 +455,13 @@ void FeatureSampleMerge::process() {
     features_2d.push_back(features);
     all_features.insert(all_features.end(), features.begin(), features.end());
   }
-  LOG_DEBUG("step 4 feature size " << all_features.size()); 
   std::sort(all_features.begin(), all_features.end(), FeaturePrsm::cmpInteDec);
   for (size_t k = 0; k < sample_num; k++) {
     std::sort(features_2d[k].begin(), features_2d[k].end(), FeaturePrsm::cmpInteDec);
-    LOG_DEBUG("step 5 sample feature size " << k << " size " << features_2d[k].size()); 
   }
   FeaturePrsmPtrVec2D table; 
   FeaturePrsmPtrVec examples; 
   getFeatureTable(all_features, features_2d, table, examples, error_tole_);
-  LOG_DEBUG("step 6 table size " << table.size()); 
   outputTable(table, examples, sample_num);
 }
 

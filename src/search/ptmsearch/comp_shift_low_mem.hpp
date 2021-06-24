@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_PTM_SEARCH_COMP_SHIFT_LOW_MEM_HPP_
 #define TOPPIC_PTM_SEARCH_COMP_SHIFT_LOW_MEM_HPP_
 
@@ -30,14 +29,6 @@ class CompShiftLowMem {
   std::vector<double> findBestShift(const std::vector<std::pair<int,int>> &a_e,
                                     const std::vector<int> &b,
                                     int total,int minimum_gap, double scale);
-
-  /*
-  std::vector<double> findBestShift(const std::vector<int> &a,
-                                    const std::vector<int> &errors,
-                                    const std::vector<int> &b,
-                                    int total,int minimum_gap,
-                                    double scale);
-                                    */
 
   std::vector<std::vector<int>> findBestShift(const std::vector<int> &a,
                                               const std::vector<int> &errors,
@@ -59,6 +50,7 @@ class CompShiftLowMem {
 };
 
 typedef std::shared_ptr<CompShiftLowMem> CompShiftLowMemPtr;
+
 } /* namespace toppic */
 
 #endif /* COMP_SHIFT_LOW_MEM_HPP_ */

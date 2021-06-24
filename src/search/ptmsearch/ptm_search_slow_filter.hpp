@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_PTM_SEARCH_PTM_SEARCH_SLOW_FILTER_HPP_
 #define TOPPIC_PTM_SEARCH_PTM_SEARCH_SLOW_FILTER_HPP_
 
@@ -22,7 +21,6 @@
 #include "prsm/simple_prsm.hpp"
 #include "search/oneptmsearch/ptm_search_mng.hpp"
 #include "search/ptmsearch/ptm_slow_match.hpp"
-#include "search/ptmsearch/comp_shift_low_mem.hpp"
 
 namespace toppic {
 

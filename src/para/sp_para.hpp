@@ -18,11 +18,9 @@
 #include <string>
 #include <memory>
 #include <vector>
-#include <set>
 
 #include "common/xml/xml_dom_element.hpp"
 #include "common/base/activation.hpp"
-#include "common/base/mass_constant.hpp"
 #include "para/peak_tolerance.hpp"
 
 namespace toppic {

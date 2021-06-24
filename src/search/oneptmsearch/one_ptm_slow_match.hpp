@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_SEARCH_ONE_PTM_SEARCH_ONE_PTM_SLOW_MATCH_HPP_
 #define TOPPIC_SEARCH_ONE_PTM_SEARCH_ONE_PTM_SLOW_MATCH_HPP_
 
@@ -25,10 +24,8 @@
 #include "ms/spec/spectrum_set.hpp"
 #include "prsm/prsm.hpp"
 #include "prsm/simple_prsm.hpp"
-#include "search/diag/diagonal_header.hpp"
+#include "search/diag/diag_header.hpp"
 #include "search/oneptmsearch/ptm_search_mng.hpp"
-//#include "ptmsearch/comp_shift_low_mem.hpp"
-#include "search/oneptmsearch/basic_diag_pair.hpp"
 #include "search/oneptmsearch/ps_align.hpp"
 
 namespace toppic {
@@ -56,16 +53,16 @@ class OnePtmSlowMatch {
   ExtendMsPtrVec ms_three_ptr_vec_;
   ProteoformTypePtr align_type_ptr_;
   SimplePrsmPtr simple_prsm_ptr_;
-  PSAlignPtr ps_align_ptr_;
+  PsAlignPtr ps_align_ptr_;
 
-  void addPrefixDiagonals(DiagonalHeaderPtrVec &n_extend_header_ptrs);
+  void addPrefixDiagonals(DiagHeaderPtrVec &n_extend_header_ptrs);
 
-  void addSuffixDiagonals(DiagonalHeaderPtrVec &c_extend_header_ptrs);
+  void addSuffixDiagonals(DiagHeaderPtrVec &c_extend_header_ptrs);
 
-  void addComplementDiagonals(DiagonalHeaderPtrVec &n_extend_header_ptrs,
-                              DiagonalHeaderPtrVec &c_extend_header_ptrs);
+  void addComplementDiagonals(DiagHeaderPtrVec &n_extend_header_ptrs,
+                              DiagHeaderPtrVec &c_extend_header_ptrs);
 
-  DiagonalHeaderPtrVec geneOnePtmNTermShiftHeaders();
+  DiagHeaderPtrVec geneOnePtmNTermShiftHeaders();
 };
 
 typedef std::shared_ptr<OnePtmSlowMatch> OnePtmSlowMatchPtr;

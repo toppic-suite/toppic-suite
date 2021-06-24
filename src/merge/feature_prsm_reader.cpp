@@ -19,16 +19,16 @@
 namespace toppic {
 
 FeaturePrsmReader::FeaturePrsmReader(const std::string &file_name):
-    file_name_(file_name) {
-      input_.open(file_name.c_str(), std::ios::in);
-      if (!input_.is_open()) {
-        LOG_ERROR("msalign file  " << file_name << " does not exist.");
-        throw "msalign file does not exist.";
-      }
-      // read header line
-      std::string line;
-      std::getline(input_, line);
+  file_name_(file_name) {
+    input_.open(file_name.c_str(), std::ios::in);
+    if (!input_.is_open()) {
+      LOG_ERROR("Msalign file  " << file_name << " does not exist.");
+      exit(EXIT_FAILURE);
     }
+    // read header line
+    std::string line;
+    std::getline(input_, line);
+  }
 
 void FeaturePrsmReader::close() {
   input_.close();
@@ -38,9 +38,7 @@ FeaturePrsmPtr FeaturePrsmReader::readOneFeature() {
   std::string line; 
   if (std::getline(input_, line)) {
     str_util::trim(line);
-    //std::cout << "line " << line << std::endl;
     FeaturePrsmPtr feature = std::make_shared<FeaturePrsm>(line);
-    //std::cout << "feature created " << std::endl;
     return feature;
   }
   else {
@@ -57,6 +55,5 @@ FeaturePrsmPtrVec FeaturePrsmReader::readAllFeatures() {
   }
   return all_features;
 }
-
 
 }  // namespace prot

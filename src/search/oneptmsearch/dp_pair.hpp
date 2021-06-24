@@ -12,37 +12,31 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_SEARCH_ONE_PTM_SEARCH_DP_PAIR_HPP_
 #define TOPPIC_SEARCH_ONE_PTM_SEARCH_DP_PAIR_HPP_
 
-#include "search/diag/diagonal_header.hpp"
-#include "search/oneptmsearch/pair.hpp"
+#include "search/diag/pair.hpp"
+#include "search/diag/diag_header.hpp"
 
 namespace toppic {
 
-#define PATH_TYPE_NULL -1
-#define PATH_TYPE_DIAGONAL 0
-#define PATH_TYPE_SHIFT 1
-#define PATH_TYPE_TRUNC 2
+class DpPair;
+typedef std::shared_ptr<DpPair>  DpPairPtr;
+typedef std::vector<DpPairPtr> DpPairPtrVec;
 
-class DPPair;
-typedef std::shared_ptr<DPPair>  DPPairPtr;
-typedef std::vector<DPPairPtr> DPPairPtrVec;
-
-class DPPair : public Pair{
+class DpPair : public Pair{
  public:
-  DPPair(int x,int y,double pair_score,double diff,
-         int order,int n_shift, DiagonalHeaderPtr header_ptr);
+  DpPair(int x,int y,double pair_score,double diff,
+         int order,int n_shift, DiagHeaderPtr header_ptr);
 
-  DPPairPtr getDiagPrevPairPtr() {return diag_prev_pair_ptr_;}
+  DpPairPtr getDiagPrevPairPtr() {return diag_prev_pair_ptr_;}
 
-  void setDiagPrevPairPtr(DPPairPtr diag_prev_pair_ptr) {
+  void setDiagPrevPairPtr(DpPairPtr diag_prev_pair_ptr) {
     diag_prev_pair_ptr_ = diag_prev_pair_ptr;}
 
   double getDiff() {return diff_;}
 
-  DiagonalHeaderPtr getDiagonalHeader() {return header_ptr_;}
+  DiagHeaderPtr getDiagHeader() {return header_ptr_;}
 
   int getDiagOrder() {return order_;}
 
@@ -50,21 +44,21 @@ class DPPair : public Pair{
 
   double getScore(int s) {return scores_[s];}
 
-  DPPairPtr getPrevPairPtr(int s){return prev_pair_ptrs_[s];}
+  DpPairPtr getPrevPairPtr(int s){return prev_pair_ptrs_[s];}
 
   int getType(int s){return types_[s];}
 
   bool isAssisting(){ return (pair_score_==0.0); }
 
-  void updateTable(int s,double score,int path_type,DPPairPtr prev_pair);
+  void updateTable(int s,double score,int path_type,DpPairPtr prev_pair);
 
  private:
-  DiagonalHeaderPtr header_ptr_;
+  DiagHeaderPtr header_ptr_;
   double diff_;
   double pair_score_;
   int order_;
-  DPPairPtr diag_prev_pair_ptr_;
-  DPPairPtrVec prev_pair_ptrs_;
+  DpPairPtr diag_prev_pair_ptr_;
+  DpPairPtrVec prev_pair_ptrs_;
   std::vector<double> scores_;
   std::vector<int> types_;
 };

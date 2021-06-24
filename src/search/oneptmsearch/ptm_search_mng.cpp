@@ -12,32 +12,23 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_PTM_SEARCH_PTM_SEARCH_PROCESSOR_HPP_
-#define TOPPIC_PTM_SEARCH_PTM_SEARCH_PROCESSOR_HPP_
-
-#include "seq/proteoform.hpp"
-#include "prsm/simple_prsm.hpp"
 #include "search/oneptmsearch/ptm_search_mng.hpp"
 
 namespace toppic {
 
-class PtmSearchProcessor {
- public:
-  PtmSearchProcessor(PtmSearchMngPtr mng_ptr);
-
-  void process();
-
- private:
-  PtmSearchMngPtr mng_ptr_;
-
-  ProteoformPtrVec proteo_ptrs_;
-  ProteoformPtrVec2D mod_proteo_2d_ptrs_;
-  SimplePrsmPtrVec simple_prsm_ptrs_;
-
-};
-
-typedef std::shared_ptr<PtmSearchProcessor> PtmSearchProcessorPtr;
+PtmSearchMng::PtmSearchMng(PrsmParaPtr prsm_para_ptr, int n_report,
+                           double align_max_shift,
+                           double align_min_shift,
+                           int shift_num,
+                           int thread_num,
+                           const std::string &input_file_ext,
+                           const std::string &output_file_ext):
+  prsm_para_ptr_(prsm_para_ptr),
+  n_report_(n_report),
+  thread_num_(thread_num),
+  input_file_ext_(input_file_ext),
+  output_file_ext_(output_file_ext) {
+    align_para_ptr_ = std::make_shared<PsAlignPara>(shift_num, align_max_shift, align_min_shift);
+  }
 
 } /* namespace toppic */
-
-#endif /* PTM_SEARCH_PROCESSOR_HPP_ */

@@ -12,45 +12,39 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_SEARCH_ONE_PTM_SEARCH_PS_ALIGN_HPP_
 #define TOPPIC_SEARCH_ONE_PTM_SEARCH_PS_ALIGN_HPP_
 
 #include <vector>
 
 #include "prsm/prsm.hpp"
-#include "search/oneptmsearch/ps_align_para.hpp"
+#include "search/diag/diag_header.hpp"
+#include "search/diag/diagonal.hpp"
 #include "search/oneptmsearch/dp_pair.hpp"
-#include "search/oneptmsearch/basic_diag_pair.hpp"
+#include "search/oneptmsearch/ps_align_para.hpp"
 
 namespace toppic {
 
-class PSAlign {
+class PsAlign {
  public:
-  PSAlign(const std::vector<double> &ms_masses,
+  PsAlign(const std::vector<double> &ms_masses,
           const std::vector<double> &seq_masses,
-          const BasicDiagonalPtrVec &diagonal_ptrs,
-          PsAlignParaPtr para_ptr):
-      para_ptr_(para_ptr),
-      ms_masses_(ms_masses),
-      seq_masses_(seq_masses),
-      diagonal_ptrs_(diagonal_ptrs) {
-        initDPPair();
-      }
+          const DiagonalPtrVec &diagonal_ptrs,
+          PsAlignParaPtr para_ptr);
 
   void compute(ProteoformTypePtr type_ptr);
 
-  void initDPPair();
+  void initDpPair();
 
   void dp(ProteoformTypePtr type_ptr);
 
   void backtrace();
 
-  DiagonalHeaderPtrVec backtrace(int s);
+  DiagHeaderPtrVec backtrace(int s);
 
   double getAlignScr(int s) {return align_scores_[s];}
 
-  DiagonalHeaderPtrVec getDiagonalHeaders(int s) {return backtrack_diagonal_ptrs_[s];}
+  DiagHeaderPtrVec getDiagHeaders(int s) {return backtrack_diagonal_ptrs_[s];}
 
   PrsmPtr geneResult(int shift_num, ProteoformPtr proteo_ptr, DeconvMsPtrVec &deconv_ms_ptr_vec,
                      ExtendMsPtrVec &ms_three_ptr_vec, PrsmParaPtr prsm_para_ptr);
@@ -62,37 +56,37 @@ class PSAlign {
 
   std::vector<double> seq_masses_;
 
-  BasicDiagonalPtrVec diagonal_ptrs_;
+  DiagonalPtrVec diagonal_ptrs_;
 
   std::vector<std::vector<int>> idxes_;
 
   std::vector<std::vector<bool>> penalties_;
 
-  std::vector<DPPairPtrVec> dp_2d_pair_ptrs_;
+  std::vector<DpPairPtrVec> dp_2d_pair_ptrs_;
 
-  DPPairPtr first_pair_ptr_;
+  DpPairPtr first_pair_ptr_;
 
-  DPPairPtr last_pair_ptr_;
+  DpPairPtr last_pair_ptr_;
 
-  DPPairPtrVec segment_bgn_pair_ptrs_;
+  DpPairPtrVec segment_bgn_pair_ptrs_;
 
-  DPPairPtrVec segment_end_pair_ptrs_;
+  DpPairPtrVec segment_end_pair_ptrs_;
 
-  DPPairPtrVec dp_pair_ptrs_;
+  DpPairPtrVec dp_pair_ptrs_;
 
-  DiagonalHeaderPtrVec2D backtrack_diagonal_ptrs_;
+  DiagHeaderPtrVec2D backtrack_diagonal_ptrs_;
 
   std::vector<double> align_scores_;
 
   void dpPrep();
 
-  DPPairPtr getTruncPre(DPPairPtr cur_pair_ptr, int s, ProteoformTypePtr type_ptr);
+  DpPairPtr getTruncPre(DpPairPtr cur_pair_ptr, int s, ProteoformTypePtr type_ptr);
 
-  DPPairPtr getShiftPre(int p, int s);
+  DpPairPtr getShiftPre(int p, int s);
 };
 
-typedef std::shared_ptr<PSAlign> PSAlignPtr;
-typedef std::vector<PSAlignPtr> PSAlignPtrVec;
+typedef std::shared_ptr<PsAlign> PsAlignPtr;
+typedef std::vector<PsAlignPtr> PsAlignPtrVec;
 
 } /* namespace toppic */
 
