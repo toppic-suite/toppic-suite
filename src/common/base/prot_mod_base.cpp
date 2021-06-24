@@ -61,7 +61,7 @@ ProtModPtr ProtModBase::getProtModPtrByName(const std::string &name) {
       return prot_mod_ptr_vec_[i];
     }
   }
-  LOG_ERROR("Protein modification " << name << " cannot be found!");
+  LOG_WARN("Protein modification " << name << " cannot be found!");
   return ProtModPtr(nullptr);
 }
 

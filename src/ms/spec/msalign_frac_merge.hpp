@@ -32,12 +32,9 @@ class MsAlignFracMerge {
                          const std::string &output_file, 
                          const std::string &para_str);
 
-  static int getMaxSpecNumPerFile() {return MAX_SPEC_NUM_PER_FILE;}
-
  private:
   std::vector<std::string> spec_file_names_;
   std::string output_file_name_;
-  static int MAX_SPEC_NUM_PER_FILE;
 };
 
 typedef std::shared_ptr<MsAlignFracMerge> MsAlignFracMergePtr;

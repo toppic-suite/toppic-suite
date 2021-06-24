@@ -21,9 +21,9 @@
 
 namespace toppic {
 
-PeakIonPair::PeakIonPair(MsHeaderPtr ms_header_ptr, ExtendPeakPtr real_peak_ptr,
+PeakIonPair::PeakIonPair(int spec_id, ExtendPeakPtr real_peak_ptr,
                          TheoPeakPtr theo_peak_ptr): 
-    ms_header_ptr_(ms_header_ptr),
+    spec_id_(spec_id),
     real_peak_ptr_(real_peak_ptr),
     theo_peak_ptr_(theo_peak_ptr) {}
 
@@ -36,7 +36,7 @@ void PeakIonPair::appendRealPeakToXml(XmlDOMDocument* xml_doc,
   xml_doc->addElement(element, "ion_position", str.c_str());
   str = str_util::toString(theo_peak_ptr_->getIonPtr()->getDisplayPos());
   xml_doc->addElement(element, "ion_display_position", str.c_str());
-  str = str_util::toString(ms_header_ptr_->getId());
+  str = str_util::toString(spec_id_);
   xml_doc->addElement(element, "spec_id", str.c_str());
   str = str_util::toString(real_peak_ptr_->getBasePeakPtr()->getId());
   xml_doc->addElement(element, "peak_id", str.c_str());

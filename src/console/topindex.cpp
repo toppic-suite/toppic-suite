@@ -24,7 +24,7 @@ using namespace toppic;
 
 int main(int argc, char* argv[]) {
   
-  //toppic::log_level = 3;
+  toppic::logger::log_level = 5;
   std::cout << std::setprecision(10);
 
   toppic::Argument argu_processor;

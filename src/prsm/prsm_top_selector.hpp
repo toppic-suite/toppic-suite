@@ -20,27 +20,14 @@
 
 namespace toppic {
 
-class PrsmTopSelector {
- public:
-  PrsmTopSelector(const std::string &db_file_name,
-                  const std::string &spec_file_name,
-                  const std::string &in_file_ext, 
-                  const std::string &out_file_ext, int n_top);
+namespace prsm_top_selector {
 
-  void process();
- private:
-  std::string spec_file_name_;
+void process(const std::string &spec_file_name,
+             const std::string &input_file_ext, 
+             const std::string &output_file_ext, 
+             int n_top);
 
-  std::string db_file_name_;
-
-  std::string input_file_ext_;
-
-  std::string output_file_ext_;
-
-  int n_top_;
-};
-
-typedef std::shared_ptr<PrsmTopSelector> PrsmTopSelectorPtr;
+}
 
 } /* namespace toppic */
 

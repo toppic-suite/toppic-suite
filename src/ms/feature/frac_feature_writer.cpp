@@ -20,7 +20,7 @@
 #include "common/util/str_util.hpp"
 #include "common/xml/xml_dom_impl.hpp"
 #include "common/xml/xml_dom_util.hpp"
-#include "ms/spec/peak.hpp"
+#include "ms/spec/peak_util.hpp"
 #include "ms/env/envelope.hpp"
 #include "ms/env/env_base.hpp"
 #include "ms/feature/frac_feature_writer.hpp"
@@ -105,7 +105,7 @@ void writeBatMassFeatures(const std::string &output_file_name,
     for (size_t j = 0; j < single_features.size(); j++) {
       SingleChargeFeaturePtr single_feature = single_features[j];
       int charge = single_feature->getCharge();
-      double mono_mz = Peak::compMz(mono_mass, charge);
+      double mono_mz = peak_util::compMz(mono_mass, charge);
       EnvelopePtr ref_env = EnvBase::getStaticEnvByMonoMass(mono_mass);
       EnvelopePtr theo_env = ref_env->distrToTheoMono(mono_mz, charge);
       double min_inte = 0.03;

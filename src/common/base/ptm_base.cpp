@@ -66,7 +66,7 @@ void PtmBase::initBase() {
   }
   if (empty_ptm_ptr_ == nullptr || acetylation_ptr_ == nullptr
       || c57_ptr_ == nullptr || c58_ptr_ == nullptr) {
-    LOG_ERROR("There are some PTMs missing in initialization!");
+    LOG_WARN("There are some PTMs missing in initialization!");
   }
   std::sort(ptm_ptr_vec_.begin(), ptm_ptr_vec_.end(), Ptm::cmpMassInc);
 }
@@ -80,6 +80,7 @@ PtmPtr PtmBase::getPtmPtrByAbbrName(const std::string &abbr_name) {
       return ptm_ptr_vec_[i];
     }
   }
+  LOG_WARN("PTM" << abbr_name << " cannot be found!")
   return PtmPtr(nullptr);
 }
 

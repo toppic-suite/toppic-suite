@@ -12,11 +12,10 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_MS_SPEC_MSALIGN_UTIL_HPP_
 #define TOPPIC_MS_SPEC_MSALIGN_UTIL_HPP_
 
-#include "para/sp_para.hpp"
+#include <string>
 
 namespace toppic {
 

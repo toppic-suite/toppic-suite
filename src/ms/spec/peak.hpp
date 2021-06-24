@@ -23,6 +23,8 @@
 
 namespace toppic {
 
+// Use forword declaration instead of header files
+// to speed up compilation
 class XmlDOMDocument;
 
 class Peak;
@@ -46,13 +48,9 @@ class Peak {
 
   void shiftPosition(double shift) {position_ = position_ + shift;}
 
-  void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
+  void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 
   static std::string getXmlElementName() {return "peak";}
-
-  static double compPeakNeutralMass(double mono_mz, int charge);
-
-  static double compMz(double neutral_mass, int charge);
 
   static bool cmpInteDec(const PeakPtr &a, const PeakPtr &b) { 
     return a->getIntensity() > b->getIntensity();}

@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include <string>
 
 #include "common/util/logger.hpp"
@@ -47,7 +46,7 @@ char replaceResidueLetter(char c) {
     r = 'I';
   }
   if (r != c) {
-    LOG_INFO("Found non standard amino acid " << c << " in protein sequences!");
+    LOG_WARN("Found non standard amino acid " << c << " in protein sequences!");
   }
   return r;
 }

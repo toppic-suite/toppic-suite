@@ -14,28 +14,16 @@
 
 #include <algorithm>
 
-#include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
-#include "prsm/prsm_reader.hpp"
+#include "prsm/prsm_reader_util.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_cluster.hpp"
 
 namespace toppic {
 
-PrsmCluster::PrsmCluster(const std::string &db_file_name,
-                         const std::string &spec_file_name,
-                         const std::string &input_file_ext,
-                         const ModPtrVec &fix_mod_ptr_vec,
-                         const std::string &output_file_ext,
-                         double ppo):
-    db_file_name_(db_file_name),
-    spec_file_name_(spec_file_name),
-    input_file_ext_(input_file_ext),
-    fix_mod_ptr_vec_(fix_mod_ptr_vec),
-    output_file_ext_(output_file_ext),
-    ppo_(ppo) {}
+namespace prsm_cluster {
 
-std::vector<PrsmStrPtrVec> PrsmCluster::groupProteins(const PrsmStrPtrVec &prsm_ptrs) {
+std::vector<PrsmStrPtrVec> groupProteins(const PrsmStrPtrVec &prsm_ptrs) {
   // get max shift number
   int max_shift_number = 0;
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
@@ -58,7 +46,8 @@ std::vector<PrsmStrPtrVec> PrsmCluster::groupProteins(const PrsmStrPtrVec &prsm_
   return proteogroups;
 }
 
-std::vector<PrsmStrPtrVec> PrsmCluster::getZeroPtmList(const PrsmStrPtrVec& proteo_ptrs, double ppo) {
+std::vector<PrsmStrPtrVec> getZeroPtmList(const PrsmStrPtrVec& proteo_ptrs, 
+                                          double ppo) {
   std::vector<PrsmStrPtrVec> clusters;
   for (size_t i = 0; i < proteo_ptrs.size(); i++) {
     bool is_found = false;
@@ -78,7 +67,7 @@ std::vector<PrsmStrPtrVec> PrsmCluster::getZeroPtmList(const PrsmStrPtrVec& prot
   return clusters;
 }
 
-void PrsmCluster::setProtId(PrsmStrPtrVec& prsm_ptrs) {
+void setProtId(PrsmStrPtrVec& prsm_ptrs) {
   std::vector<PrsmStrPtrVec> proteins;
   std::vector<std::string> protein_names;
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
@@ -106,7 +95,7 @@ void PrsmCluster::setProtId(PrsmStrPtrVec& prsm_ptrs) {
   }
 }
 
-void PrsmCluster::setClusterId(PrsmStrPtrVec& prsm_ptrs, double ppo) {
+void setClusterId(PrsmStrPtrVec& prsm_ptrs, double ppo) {
   std::vector<PrsmStrPtrVec> proteo_groups = groupProteins(prsm_ptrs);
 
   // find zero ptm clusters
@@ -137,22 +126,25 @@ void PrsmCluster::setClusterId(PrsmStrPtrVec& prsm_ptrs, double ppo) {
   }
 }
 
-void PrsmCluster::process() {
-  std::string base_name = file_util::basename(spec_file_name_);
-  std::string input_file_name = base_name + "." + input_file_ext_;
-  LOG_DEBUG("Reading prsm strings started");
-  PrsmStrPtrVec prsm_ptrs = PrsmReader::readAllPrsmStrs(input_file_name);
-  LOG_DEBUG("Reading prsm strings finished");
+void process(const std::string &spec_file_name,
+             const std::string &input_file_ext,
+             const std::string &output_file_ext,
+             double ppo)  {
+  std::string base_name = file_util::basename(spec_file_name);
+  std::string input_file_name = base_name + "." + input_file_ext;
+  PrsmStrPtrVec prsm_ptrs = prsm_reader_util::readAllPrsmStrs(input_file_name);
   sort(prsm_ptrs.begin(), prsm_ptrs.end(), PrsmStr::cmpEValueInc);
   setProtId(prsm_ptrs);
-  setClusterId(prsm_ptrs, ppo_);
+  setClusterId(prsm_ptrs, ppo);
   sort(prsm_ptrs.begin(), prsm_ptrs.end(), PrsmStr::cmpSpectrumIdIncPrecursorIdInc);
   // output
-  std::string output_file_name = base_name + "." + output_file_ext_;
+  std::string output_file_name = base_name + "." + output_file_ext;
   PrsmXmlWriter writer(output_file_name);
   writer.writeVector(prsm_ptrs);
   writer.close();
 }
+
+}  // namespace prsm_cluster
 
 }  // namespace toppic
 

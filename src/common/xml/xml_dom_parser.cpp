@@ -19,8 +19,6 @@
 #include "common/xml/xml_dom_err_handler.hpp"
 #include "common/xml/xml_dom_parser.hpp"
 
-//#include <xercesc/util/OutOfMemoryException.hpp>
- 
 namespace toppic {
 
 XmlDOMParser* XmlDOMParserFactory::dom_parser_ = nullptr;

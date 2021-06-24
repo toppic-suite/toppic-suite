@@ -30,7 +30,7 @@ class EnvPeak : public Peak {
 
   EnvPeak(EnvPeakPtr peak_ptr);
 
-  EnvPeak(xercesc::DOMElement* element);
+  EnvPeak(XmlDOMElement* element);
 
   int getIdx() {return idx_;}
 
@@ -38,7 +38,7 @@ class EnvPeak : public Peak {
 
   bool isExist();
 
-  void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
+  void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 
   static int getNonExistPeakIdx() {return -1;}
 

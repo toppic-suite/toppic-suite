@@ -15,13 +15,11 @@
 #ifndef TOPPIC_MS_SPEC_SIMPLE_MSALIGN_READER_HPP_
 #define TOPPIC_MS_SPEC_SIMPLE_MSALIGN_READER_HPP_
 
-#include <limits>
 #include <fstream>
 #include <string>
 #include <vector>
 
 #include "ms/spec/deconv_ms.hpp"
-#include "ms/spec/spectrum_set.hpp"
 
 namespace toppic {
 

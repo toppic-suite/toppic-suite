@@ -33,7 +33,7 @@
 #include "ms/factory/extend_ms_factory.hpp"
 #include "ms/factory/spectrum_set_factory.hpp"
 
-#include "prsm/extreme_value.hpp"
+#include "prsm/expected_value.hpp"
 #include "prsm/theo_peak_util.hpp"
 #include "prsm/prsm_algo.hpp"
 #include "prsm/prsm_reader.hpp"
@@ -277,8 +277,8 @@ std::function<void()> geneTask(SpectrumSetPtr spec_set_ptr,
     if (cand_num < 1) {cand_num = 1;}
 
     LOG_DEBUG("cand_num " << cand_num);
-    ExtremeValuePtr evalue = std::make_shared<ExtremeValue>(one_prob, cand_num, 0.005);
-    prsm_ptr->setExtremeValuePtr(evalue);
+    ExpectedValuePtr evalue = std::make_shared<ExpectedValue>(one_prob, cand_num, 0.005);
+    prsm_ptr->setExpectedValuePtr(evalue);
 
     boost::thread::id thread_id = boost::this_thread::get_id();
     int writer_id = pool_ptr->getId(thread_id);
@@ -289,7 +289,7 @@ std::function<void()> geneTask(SpectrumSetPtr spec_set_ptr,
 void DprProcessor::processOnePrsm(PrsmPtr prsm_ptr, SpectrumSetPtr spec_set_ptr,
                                   PrsmXmlWriterPtr prsm_writer) {
   if (prsm_ptr->getMatchFragNum() < 4) {
-    prsm_ptr->setExtremeValuePtr(ExtremeValue::getMaxEvaluePtr());
+    prsm_ptr->setExpectedValuePtr(ExpectedValue::getMaxEvaluePtr());
     prsm_writer->write(prsm_ptr);
     return;
   }

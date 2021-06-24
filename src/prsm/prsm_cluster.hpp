@@ -22,36 +22,15 @@
 
 namespace toppic {
 
-class PrsmCluster {
- public:
-  PrsmCluster(const std::string &db_file_name,
-              const std::string &spec_file_name,
-              const std::string &input_file_ext,
-              const ModPtrVec &fix_mod_ptr_vec,
-              const std::string &output_file_ext,
-              double ppo);
+// This method is not used in the latest version 
+// of TopPIC (replaced by simple_prsm_cluster).
+namespace prsm_cluster {
 
-  void process();
-
- private:
-  std::string db_file_name_;
-  std::string spec_file_name_;
-  std::string input_file_ext_;
-  ModPtrVec fix_mod_ptr_vec_;
-  std::string output_file_ext_;
-  ResiduePtrVec residue_ptr_vec_;
-  double ppo_;
-
-  std::vector<PrsmStrPtrVec> groupProteins(const PrsmStrPtrVec &prsm_ptrs);
-
-  std::vector<PrsmStrPtrVec> getZeroPtmList(const PrsmStrPtrVec& proteo_ptrs, double ppo);
-
-  void setProtId(PrsmStrPtrVec& prsm_ptrs);
-
-  void setClusterId(PrsmStrPtrVec& prsm_ptrs, double ppo);
-};
-
-typedef std::shared_ptr<PrsmCluster> PrsmClusterPtr;
+void process(const std::string &spec_file_name,
+             const std::string &input_file_ext,
+             const std::string &output_file_ext,
+             double ppo);
+}
 
 }  // namespace toppic
 

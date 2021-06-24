@@ -18,7 +18,7 @@
 #include <boost/math/distributions/normal.hpp>
 
 #include "common/util/logger.hpp"
-#include "ms/spec/peak.hpp"
+#include "ms/spec/peak_util.hpp"
 #include "ms/spec/env_peak.hpp"
 #include "ms/spec/raw_ms_util.hpp"
 #include "ms/feature/peak_cluster.hpp"
@@ -263,7 +263,7 @@ void PeakCluster::updateScore(PeakPtrVec2D &raw_peaks, bool check_pvalue) {
   for (int i = 0; i < row_num; i++) {
     int charge = i + min_charge_;
     double ref_neutral_mass = theo_env_->getRefNeutralMass();
-    double ref_mz = Peak::compMz(ref_neutral_mass, charge); 
+    double ref_mz = peak_util::compMz(ref_neutral_mass, charge); 
     std::fill(summed_intensities.begin(), summed_intensities.end(), 0.0);
 
     charge_xic[i].resize(xic_len, 0.0);

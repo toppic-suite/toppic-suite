@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_BASE_RM_BREAK_TYPE_HPP_
 #define TOPPIC_BASE_RM_BREAK_TYPE_HPP_
 

@@ -22,7 +22,6 @@
 #include "common/base/base_data.hpp"
 #include "common/base/mod_util.hpp"
 #include "common/util/version.hpp"
-#include "common/util/custom_exception.hpp"
 
 #include "seq/fasta_reader.hpp"
 #include "seq/fasta_util.hpp"
@@ -44,7 +43,7 @@
 #include "prsm/prsm_util.hpp"
 
 #include "filter/mng/zero_ptm_filter_mng.hpp"
-#include "filter/mng/topindex_file_name.hpp"
+#include "filter/mng/index_file_name.hpp"
 #include "filter/zeroptm/zero_ptm_filter_processor.hpp"
 #include "search/zeroptmsearch/zero_ptm_search_mng.hpp"
 #include "search/zeroptmsearch/zero_ptm_search_processor.hpp"
@@ -196,7 +195,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     }
 
     // index file name
-    TopIndexFileNamePtr file_name_ptr = std::make_shared<TopIndexFileName>();
+    IndexFileNamePtr file_name_ptr = std::make_shared<IndexFileName>();
     std::string index_file_para = file_name_ptr->geneFileName(arguments);
 
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
@@ -219,11 +218,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     ZeroPtmFilterMngPtr zero_filter_mng_ptr
         = std::make_shared<ZeroPtmFilterMng>(prsm_para_ptr, index_file_para, 
                                              thread_num, "toppic_zero_filter");
-    ZeroPtmFilterProcessorPtr zero_filter_processor
-        = std::make_shared<ZeroPtmFilterProcessor>(zero_filter_mng_ptr);
-    zero_filter_processor->process();
-
-    zero_filter_processor = nullptr;
+    zero_ptm_filter_processor::process(zero_filter_mng_ptr);
     std::cout << "Non PTM filtering - finished." << std::endl;
 
     std::cout << "Non PTM search - started." << std::endl;
@@ -245,10 +240,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
       OnePtmFilterMngPtr one_ptm_filter_mng_ptr
           = std::make_shared<OnePtmFilterMng>(prsm_para_ptr, index_file_para, 
                                               "toppic_one_filter", thread_num);
-      OnePtmFilterProcessorPtr one_filter_processor
-          = std::make_shared<OnePtmFilterProcessor>(one_ptm_filter_mng_ptr);
-      one_filter_processor->process();
-      one_filter_processor = nullptr;
+      one_ptm_filter_processor::process(one_ptm_filter_mng_ptr);
       std::cout << "One PTM filtering - finished." << std::endl;
 
       std::cout << "One PTM search - started." << std::endl;
@@ -318,11 +310,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     std::cout << "E-value computation - finished." << std::endl;
 
     std::cout << "Top PrSM selecting - started" << std::endl;
-    PrsmTopSelectorPtr selector
-        = std::make_shared<PrsmTopSelector>(db_file_name, sp_file_name, 
-                                            "toppic_evalue", "toppic_top", n_top);
-    selector->process();
-    selector = nullptr;
+    prsm_top_selector::process(sp_file_name, "toppic_evalue", "toppic_top", n_top);
     std::cout << "Top PrSM selecting - finished." << std::endl;
 
   } catch (const char* e) {
@@ -362,31 +350,24 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     if (arguments["useFeatureFile"] == "true") {
       // TopFD msalign file with feature ID
       ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();
-      PrsmFeatureClusterPtr prsm_clusters
-          = std::make_shared<PrsmFeatureCluster>(db_file_name,
-                                                 sp_file_name,
-                                                 "toppic_top",
-                                                 "toppic_cluster",
-                                                 fix_mod_list,
-                                                 form_error_tole);
-      prsm_clusters->process();
-      prsm_clusters = nullptr;
-    } else {
-      PrsmSimpleClusterPtr prsm_clusters
-          = std::make_shared<PrsmSimpleCluster>(db_file_name, sp_file_name,
-                                                "toppic_top", prsm_para_ptr->getFixModPtrVec(),
-                                                "toppic_cluster", form_error_tole);
-      prsm_clusters->process();
-      prsm_clusters = nullptr;
+      prsm_feature_cluster::process(db_file_name,
+                                    sp_file_name,
+                                    "toppic_top",
+                                    "toppic_cluster",
+                                    fix_mod_list,
+                                    form_error_tole);
+    } 
+    else {
+      prsm_simple_cluster::process(db_file_name, sp_file_name,
+                                   "toppic_top", prsm_para_ptr->getFixModPtrVec(),
+                                   "toppic_cluster", form_error_tole);
     }
     std::cout << "Finding PrSM clusters - finished." << std::endl;
     std::string cur_suffix = "toppic_cluster";
 
     if (arguments["searchType"] == "TARGET+DECOY") {
       std::cout << "FDR computation - started. " << std::endl;
-      PrsmFdrPtr fdr = std::make_shared<PrsmFdr>(db_file_name, sp_file_name, "toppic_cluster", "toppic_cluster_fdr");
-      fdr->process();
-      fdr = nullptr;
+      prsm_fdr::process(sp_file_name, "toppic_cluster", "toppic_cluster_fdr");
       std::cout << "FDR computation - finished." << std::endl;
       cur_suffix = "toppic_cluster_fdr";
     }
@@ -395,11 +376,8 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     std::cout << "PrSM filtering by " << cutoff_type << " - started." << std::endl;
     double cutoff_value;
     std::istringstream(arguments["cutoffSpectralValue"]) >> cutoff_value;
-    PrsmCutoffSelectorPtr cutoff_selector
-        = std::make_shared<PrsmCutoffSelector>(db_file_name, sp_file_name, cur_suffix,
-                                               "toppic_prsm_cutoff", cutoff_type, cutoff_value);
-    cutoff_selector->process();
-    cutoff_selector = nullptr;
+    prsm_cutoff_selector::process(db_file_name, sp_file_name, cur_suffix,
+                                  "toppic_prsm_cutoff", cutoff_type, cutoff_value);
     std::cout << "PrSM filtering by " << cutoff_type << " - finished." << std::endl;
     cur_suffix = "toppic_prsm_cutoff";
 
@@ -454,19 +432,14 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     cutoff_type = (arguments["cutoffProteoformType"] == "FDR") ? "FORMFDR": "EVALUE";
     std::cout << "PrSM filtering by " << cutoff_type << " - started." << std::endl;
     std::istringstream(arguments["cutoffProteoformValue"]) >> cutoff_value;
-    cutoff_selector = std::make_shared<PrsmCutoffSelector>(db_file_name, sp_file_name, cur_suffix,
-                                                           "toppic_form_cutoff", cutoff_type,
-                                                           cutoff_value);
-    cutoff_selector->process();
-    cutoff_selector = nullptr;
+    prsm_cutoff_selector::process(db_file_name, sp_file_name, cur_suffix,
+                                  "toppic_form_cutoff", cutoff_type,
+                                  cutoff_value);
     std::cout << "PrSM filtering by " << cutoff_type << " - finished." << std::endl;
 
     std::cout << "Selecting top PrSMs for proteoforms - started." << std::endl;
-    PrsmFormFilterPtr form_filter
-        = std::make_shared<PrsmFormFilter>(db_file_name, sp_file_name, "toppic_form_cutoff",
-                                           "toppic_form_cutoff_form");
-    form_filter->process();
-    form_filter = nullptr;
+    prsm_form_filter::process(db_file_name, sp_file_name, "toppic_form_cutoff",
+                              "toppic_form_cutoff_form");
     std::cout << "Selecting top PrSMs for proteoforms - finished." << std::endl;
 
     std::cout << "Outputting proteoform table - started." << std::endl;
@@ -493,8 +466,6 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
       jsonTranslate(arguments, "toppic_proteoform_cutoff");
       std::cout << "Converting proteoform xml files to html files - finished." << std::endl;
     }
-  } catch (FileInUse& e){
-      std::cout << "[Exception] " << e.what() << std::endl;
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;
@@ -552,13 +523,11 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
       json_merger = nullptr;
       std::cout << "Merging json files finished." << std::endl;
     }
-    std::cout << "Merging feature files started." << std::endl;
-    FeatureMergePtr feature_merger 
-        = std::make_shared<FeatureMerge>(spec_file_lst, full_combined_name);
-    feature_merger->process(para_str);
-    feature_merger = nullptr;
-    std::cout << "Merging feature files finished." << std::endl;
-
+	if (arguments["useFeatureFile"] == "true") {//only when feature files are being used
+      std::cout << "Merging feature files started." << std::endl;
+      feature_merge::process(spec_file_lst, full_combined_name, para_str);
+      std::cout << "Merging feature files finished." << std::endl;
+    }
     // merge TOP files
     std::cout << "Merging identification files started." << std::endl;
     std::vector<std::string> prsm_file_lst(spec_file_lst.size());
@@ -598,4 +567,3 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
 }
 
 }  // namespace toppic
-

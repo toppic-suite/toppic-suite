@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include "ms/spec/ms_header.hpp"
 #include "ms/env/match_env.hpp"
 
@@ -25,7 +24,6 @@ void write_env(std::ofstream &file, MsHeaderPtr header, MatchEnvPtr match_env);
 void write_env_vec(std::ofstream &file, MsHeaderPtr header, const MatchEnvPtrVec & envs); 
 
 void write(const std::string & file, MsHeaderPtr header, const MatchEnvPtrVec & envs); 
-
 
 }  // namespace msalign_writer
 

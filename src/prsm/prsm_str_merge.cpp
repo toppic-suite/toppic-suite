@@ -88,13 +88,11 @@ void PrsmStrMerge::process(bool norm) {
         std::sort(cur_str_ptrs.begin(), cur_str_ptrs.end(), PrsmStr::cmpMatchFragmentDec);
       } else {
         std::sort(cur_str_ptrs.begin(), cur_str_ptrs.end(), PrsmStr::cmpNormMatchFragmentDec);
-        auto it = std::unique(cur_str_ptrs.begin(), cur_str_ptrs.end(),
-                              [](const PrsmStrPtr & a, const PrsmStrPtr & b) {
-                                return a->getSeqName() == b->getSeqName();
-                              });
+        // Remove duplicated PrSMs from the same sequence.  
+        auto it = std::unique(cur_str_ptrs.begin(), cur_str_ptrs.end(), PrsmStr::isSameSeq);
         cur_str_ptrs.erase(it, cur_str_ptrs.end());
       }
-      for (unsigned i = 0; i < top_num_; i++) {
+      for (size_t i = 0; i < top_num_; i++) {
         if (i >= cur_str_ptrs.size()) {
           break;
         }

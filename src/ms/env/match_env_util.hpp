@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_TOPFD_ENV_MATCH_ENV_UTIL_HPP_
 #define TOPPIC_TOPFD_ENV_MATCH_ENV_UTIL_HPP_
 
@@ -41,6 +40,10 @@ MatchEnvPtrVec addUnusedMasses(MatchEnvPtrVec &envs, std::vector<PeakPtr> &ms, d
 
 MatchEnvPtr getNewMatchEnv(PeakPtrVec &ms, int idx, double tolerance);
 
+// For one envelope, if we cannot determine its
+// charge state and monoisotopic mass, we will 
+// add several envelopes with two consecutive charges
+// and envelopes with -1 and +1 Dalton shift
 MatchEnvPtrVec addMultipleMass(MatchEnvPtrVec &envs, MatchEnvPtr2D &candidates,
                                double multi_min_mass, int multi_min_charge, double min_ratio);
 

@@ -20,21 +20,17 @@
 
 namespace toppic {
 
+namespace mass_match_factory {
+
 inline std::vector<int> getScaledSrmMasses(ProteoformPtr proteo_ptr,
                                            std::vector<double> &n_ace_shifts,
                                            double scale) {
   std::vector<int> masses = proteo_ptr->getBpSpecPtr()->getScaledPrmMasses(scale);
   for (size_t i = 0; i < n_ace_shifts.size(); i++) {
     int ace_mass = static_cast<int>(std::round(- n_ace_shifts[i] * scale));
-    // LOG_DEBUG("ace shift " << n_ace_shifts[i] <<  " ace mass " << ace_mass);
     masses.push_back(ace_mass);
   }
   std::sort(masses.begin(), masses.end(), std::less<int>());
-  /*
-     for (size_t i = 0; i < masses.size(); i++) {
-     LOG_DEBUG("integer mass " << i << " " << masses[i]);
-     }
-     */
   std::vector<int> rev_masses;
   int len = masses.size();
   for (int i = len -1 ; i >= 0; i--) {
@@ -112,8 +108,8 @@ inline MassMatchPtr getMassMatchPtr(const ProteoformPtrVec &proteo_ptrs,
 }
 
 
-MassMatchPtr MassMatchFactory::getPrmDiagMassMatchPtr(const ProteoformPtrVec &proteo_ptrs,
-                                                      double max_proteoform_mass, double scale) {
+MassMatchPtr getPrmDiagMassMatchPtr(const ProteoformPtrVec &proteo_ptrs,
+                                    double max_proteoform_mass, double scale) {
   std::vector<std::vector<int>> mass_2d;
   for (size_t i = 0; i < proteo_ptrs.size(); i++) {
     std::vector<int> masses = proteo_ptrs[i]->getBpSpecPtr()->getScaledPrmMasses(scale);
@@ -124,12 +120,11 @@ MassMatchPtr MassMatchFactory::getPrmDiagMassMatchPtr(const ProteoformPtrVec &pr
   return getMassMatchPtr(proteo_ptrs, mass_2d, max_proteoform_mass, scale, prm);
 }
 
-MassMatchPtr MassMatchFactory::getSrmDiagMassMatchPtr(const ProteoformPtrVec &proteo_ptrs,
-                                                      std::vector<std::vector<double>> &n_ace_shift_2d,
-                                                      double max_proteoform_mass, double scale) {
+MassMatchPtr getSrmDiagMassMatchPtr(const ProteoformPtrVec &proteo_ptrs,
+                                    std::vector<std::vector<double>> &n_ace_shift_2d,
+                                    double max_proteoform_mass, double scale) {
   std::vector<std::vector<int>> mass_2d;
   for (size_t i = 0; i < proteo_ptrs.size(); i++) {
-    // std::vector<int> masses = proteo_ptrs[i]->getBpSpecPtr()->getScaledSrmMasses(scale);
     std::vector<int> masses = getScaledSrmMasses(proteo_ptrs[i], n_ace_shift_2d[i], scale);
     mass_2d.push_back(masses);
   }
@@ -149,9 +144,9 @@ inline void getPos2d(const ProteoformPtrVec &proteo_ptrs,
   LOG_DEBUG("pos 2d complete");
 }
 
-MassMatchPtr MassMatchFactory::getPrmTermMassMatchPtr(const ProteoformPtrVec &proteo_ptrs,
-                                                      std::vector<std::vector<double>> &real_shift_2d,
-                                                      double max_proteoform_mass, double scale) {
+MassMatchPtr getPrmTermMassMatchPtr(const ProteoformPtrVec &proteo_ptrs,
+                                    std::vector<std::vector<double>> &real_shift_2d,
+                                    double max_proteoform_mass, double scale) {
   std::vector<std::vector<int>> mass_2d;
   for (size_t i = 0; i < proteo_ptrs.size(); i++) {
     std::vector<int> masses = proteo_ptrs[i]->getBpSpecPtr()->getScaledPrmMasses(scale);
@@ -168,13 +163,12 @@ MassMatchPtr MassMatchFactory::getPrmTermMassMatchPtr(const ProteoformPtrVec &pr
   return index_ptr;
 }
 
-MassMatchPtr MassMatchFactory::getSrmTermMassMatchPtr(const ProteoformPtrVec &proteo_ptrs,
-                                                      std::vector<std::vector<double>> &real_shift_2d,
-                                                      std::vector<std::vector<double>> &n_ace_shift_2d,
-                                                      double max_proteoform_mass, double scale) {
+MassMatchPtr getSrmTermMassMatchPtr(const ProteoformPtrVec &proteo_ptrs,
+                                    std::vector<std::vector<double>> &real_shift_2d,
+                                    std::vector<std::vector<double>> &n_ace_shift_2d,
+                                    double max_proteoform_mass, double scale) {
   std::vector<std::vector<int>> mass_2d;
   for (size_t i = 0; i < proteo_ptrs.size(); i++) {
-    // std::vector<int> masses = proteo_ptrs[i]->getBpSpecPtr()->getScaledSrmMasses(scale);
     std::vector<int> masses = getScaledSrmMasses(proteo_ptrs[i], n_ace_shift_2d[i], scale);
     mass_2d.push_back(masses);
   }
@@ -187,6 +181,8 @@ MassMatchPtr MassMatchFactory::getSrmTermMassMatchPtr(const ProteoformPtrVec &pr
   MassMatchPtr index_ptr = std::make_shared<MassMatch>(mass_2d, real_shift_2d, pos_2d,
                                                        max_proteoform_mass, scale);
   return index_ptr;
+}
+
 }
 
 }  // namespace toppic

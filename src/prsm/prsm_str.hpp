@@ -117,6 +117,10 @@ class PrsmStr {
 
   static bool cmpSpectrumIdIncPrecursorIdInc(const PrsmStrPtr &a, const PrsmStrPtr &b);
 
+  static bool isSameSeq(const PrsmStrPtr &a, const PrsmStrPtr &b) {
+    return a->getSeqName() == b->getSeqName();
+  }
+
   static bool isSameSeqAndMass(const PrsmStrPtr &a, const PrsmStrPtr &b, double ppo);
 
   static bool isSimpleMatch(const PrsmStrPtr &a, const PrsmStrPtr &b, double ppo);

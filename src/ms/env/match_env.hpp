@@ -59,7 +59,7 @@ class MatchEnv {
 
  private:
   int id_;
-  // we divide envelopes into several groups based on monoisotopic  masses  
+  // we divide envelopes into several groups based on monoisotopic masses  
   int mass_group_;
   double score_;
   EnvelopePtr theo_env_ptr_;

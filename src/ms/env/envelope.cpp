@@ -35,14 +35,9 @@ Envelope::Envelope(Envelope &env):
 
 Envelope::Envelope(int num, std::vector<std::string> &line_list) {
   charge_ = 1;
-  //boost::split(words, line_list[0], boost::is_any_of(" "));
   std::vector<std::string> words = str_util::split(line_list[0], " ");
-  // LOG_DEBUG("line list size " << line_list.size() << " num " << num);
-  // mono_mz in the theo_envelope file are not consistent with peak intensities
-  //mono_mz_ = std::stod(words[7]);
   peaks_.resize(num);
   for (int i = 0; i < num; i++) {
-    //boost::split(words, line_list[i+1], boost::is_any_of(" "));
     words = str_util::split(line_list[i+1], " ");
     double mz = std::stod(words[0]);
     double inte = std::stod(words[1]) / 100;
@@ -170,7 +165,6 @@ EnvelopePtr Envelope::getSubEnv(double min_inte) {
       }
     }
   }
-
   return getSubEnv(refer_idx_ - left, right - refer_idx_); 
 }
 
@@ -297,6 +291,4 @@ void Envelope::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   parent->appendChild(element);
 }
 
-
 }  // namespace toppic
-

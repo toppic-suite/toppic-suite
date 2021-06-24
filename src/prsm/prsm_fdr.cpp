@@ -16,21 +16,14 @@
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
-#include "prsm/prsm_reader.hpp"
+#include "prsm/prsm_reader_util.hpp"
 #include "prsm/prsm_str.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_fdr.hpp"
 
 namespace toppic {
 
-PrsmFdr::PrsmFdr(const std::string &db_file_name,
-                 const std::string &spec_file_name,
-                 const std::string &input_file_ext,
-                 const std::string &output_file_ext): 
-    db_file_name_(db_file_name),
-    spec_file_name_(spec_file_name),
-    input_file_ext_(input_file_ext),
-    output_file_ext_(output_file_ext) {}
+namespace prsm_fdr {
 
 inline PrsmStrPtrVec2D getGroups(PrsmStrPtrVec &prsm_ptrs) {
   PrsmStrPtrVec2D results;
@@ -52,11 +45,57 @@ inline PrsmStrPtrVec2D getGroups(PrsmStrPtrVec &prsm_ptrs) {
   return results;
 }
 
-void PrsmFdr::process(){
-  std::string base_name = file_util::basename(spec_file_name_);
-  std::string input_file_name = base_name + "." + input_file_ext_;
+void computeFdr(PrsmStrPtrVec &target_ptrs, PrsmStrPtrVec &decoy_ptrs){
+  for(size_t i = 0; i < target_ptrs.size(); i++){
+    int n_target = i + 1;
+    double target_evalue = target_ptrs[i]->getEValue();
+    int n_decoy = 0;
+    for(size_t j = 0; j < decoy_ptrs.size(); j++){
+      if(decoy_ptrs[j]->getEValue() <= target_evalue){
+        n_decoy++;
+      } else{
+        break;
+      }
+    }
+    double fdr = static_cast<double>(n_decoy) / static_cast<double>(n_target);
+    if (fdr > 1) {
+      fdr = 1.0;
+    }
+    target_ptrs[i]->setFdr(fdr);
+  }
+}
 
-  PrsmStrPtrVec prsm_str_ptrs = PrsmReader::readAllPrsmStrs(input_file_name);
+void computeProteoformFdr(PrsmStrPtrVec2D &target_proteoforms,
+                          PrsmStrPtrVec2D &decoy_proteoforms) {
+  for(size_t i = 0; i < target_proteoforms.size(); i++) {
+    int n_target= i + 1;
+    double target_evalue = target_proteoforms[i][0]->getEValue();
+    int n_decoy = 0;
+    for (size_t j = 0; j < decoy_proteoforms.size(); j++) {
+      if (decoy_proteoforms[j][0]->getEValue() <= target_evalue) {
+        n_decoy++;
+      } else {
+        break;
+      }
+    }
+    double fdr = static_cast<double>(n_decoy) / static_cast<double>(n_target);
+    if(fdr > 1){
+      fdr = 1.0;
+    }
+    for (size_t k = 0; k < target_proteoforms[i].size(); k++) {
+      target_proteoforms[i][k]->setProteoformFdr(fdr);
+    }
+  }
+}
+
+
+void process(const std::string &spec_file_name,
+             const std::string &input_file_ext,
+             const std::string &output_file_ext) { 
+  std::string base_name = file_util::basename(spec_file_name);
+  std::string input_file_name = base_name + "." + input_file_ext;
+
+  PrsmStrPtrVec prsm_str_ptrs = prsm_reader_util::readAllPrsmStrs(input_file_name);
 
   PrsmStrPtrVec target_ptrs;
   PrsmStrPtrVec decoy_ptrs;
@@ -83,54 +122,13 @@ void PrsmFdr::process(){
 
   computeProteoformFdr(target_proteoforms, decoy_proteoforms);
 
-  std::string output_file_name = base_name + "." + output_file_ext_;
+  std::string output_file_name = base_name + "." + output_file_ext;
   PrsmXmlWriter writer(output_file_name);
   std::sort(target_ptrs.begin(), target_ptrs.end(), PrsmStr::cmpSpectrumIdInc);
   writer.writeVector(target_ptrs);
   writer.close();
 }
 
-void PrsmFdr::computeFdr(PrsmStrPtrVec &target_ptrs, PrsmStrPtrVec &decoy_ptrs){
-  for(size_t i = 0; i < target_ptrs.size(); i++){
-    int n_target = i + 1;
-    double target_evalue = target_ptrs[i]->getEValue();
-    int n_decoy = 0;
-    for(size_t j = 0; j < decoy_ptrs.size(); j++){
-      if(decoy_ptrs[j]->getEValue() <= target_evalue){
-        n_decoy++;
-      } else{
-        break;
-      }
-    }
-    double fdr = static_cast<double>(n_decoy) / static_cast<double>(n_target);
-    if (fdr > 1) {
-      fdr = 1.0;
-    }
-    target_ptrs[i]->setFdr(fdr);
-  }
-}
-
-void PrsmFdr::computeProteoformFdr(PrsmStrPtrVec2D &target_proteoforms,
-                                   PrsmStrPtrVec2D &decoy_proteoforms) {
-  for(size_t i = 0; i < target_proteoforms.size(); i++) {
-    int n_target= i + 1;
-    double target_evalue = target_proteoforms[i][0]->getEValue();
-    int n_decoy = 0;
-    for (size_t j = 0; j < decoy_proteoforms.size(); j++) {
-      if (decoy_proteoforms[j][0]->getEValue() <= target_evalue) {
-        n_decoy++;
-      } else {
-        break;
-      }
-    }
-    double fdr = static_cast<double>(n_decoy) / static_cast<double>(n_target);
-    if(fdr > 1){
-      fdr = 1.0;
-    }
-    for (size_t k = 0; k < target_proteoforms[i].size(); k++) {
-      target_proteoforms[i][k]->setProteoformFdr(fdr);
-    }
-  }
 }
 
 }  // namespace toppic

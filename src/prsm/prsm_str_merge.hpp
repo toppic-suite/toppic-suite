@@ -41,7 +41,7 @@ class PrsmStrMerge {
   std::string spec_file_name_;
   std::vector<std::string> input_file_exts_;
   std::string output_file_ext_;
-  unsigned top_num_;
+  size_t top_num_;
 };
 
 typedef std::shared_ptr<PrsmStrMerge> PrsmStrMergePtr;

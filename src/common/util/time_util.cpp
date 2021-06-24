@@ -11,6 +11,7 @@
 //WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //See the License for the specific language governing permissions and
 //limitations under the License.
+
 #include <ctime>
 
 #include "common/util/logger.hpp"
@@ -27,20 +28,6 @@ std::string getTimeStr() {
   std::string time_str = buf;
   return time_str;
 }
-
-/*
-void addTimeStamp(std::string &para_str) {
-  std::time_t cur_time = time(nullptr);
-  char buf[50];
-  std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&cur_time));
-  std::string time_str = buf;
-
-  LOG_DEBUG(para_str);
-  LOG_DEBUG(TIME_STAMP_STR);
-  size_t pos = para_str.find(TIME_STAMP_STR);
-  para_str.replace(pos, TIME_STAMP_STR.length(), time_str);
-}
-*/
 
 }  // namespace time_util
 

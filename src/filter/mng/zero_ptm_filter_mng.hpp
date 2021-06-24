@@ -36,7 +36,7 @@ class ZeroPtmFilterMng {
 
   std::string index_file_para_;
 
-  /** parameters for fast filteration */
+  //Parameters for fast filteration 
   int max_proteoform_mass_ = 100000;
 
   //Candidate protein number for each spectrum
@@ -54,8 +54,6 @@ class ZeroPtmFilterMng {
   boost::mutex mutex_;
 
   std::vector<int> cnts_;
-
-  //std::vector<std::string> file_names_{"toppic_zero_ptm_complete", "toppic_zero_ptm_prefix", "toppic_zero_ptm_suffix", "toppic_zero_ptm_internal"};
 
   std::vector<std::string> zero_ptm_file_vec_{"zero_ptm_term_index", "zero_ptm_diag_index", 
     "zero_ptm_rev_term_index", "zero_ptm_rev_diag_index"};

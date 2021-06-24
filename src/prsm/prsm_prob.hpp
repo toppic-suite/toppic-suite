@@ -19,31 +19,17 @@
 
 namespace toppic {
 
-class PrsmProb {
- public:
-  PrsmProb(const std::string &db_file_name,
-           const std::string &spec_file_name,
-           const ModPtrVec &fix_mod_ptr_vec,
-           const std::string &in_file_ext,
-           const std::string &out_file_ext,
-           double K1, double K2,
-           double pref, double inte);
+namespace prsm_prob {
 
-  void process();
+void process(const std::string &db_file_name,
+             const std::string &spec_file_name,
+             const ModPtrVec &fix_mod_ptr_vec,
+             const std::string &in_file_ext,
+             const std::string &out_file_ext,
+             double K1, double K2,
+             double pref, double inte);
+}
 
- private:
-  std::string db_file_name_;
-  std::string spec_file_name_;
-  ModPtrVec fix_mod_ptr_vec_;
-  std::string input_file_ext_;
-  std::string output_file_ext_;
-  double K1_;
-  double K2_;
-  double pref_;
-  double inte_;
-};
-
-typedef std::shared_ptr<PrsmProb> PrsmProbPtr;
 } /* namespace toppic */
 
 #endif /* TOPPIC_PRSM_PROB_HPP_ */

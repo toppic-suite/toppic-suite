@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include <iomanip>
 
 #include "common/util/logger.hpp"
@@ -21,13 +20,12 @@
 namespace toppic {
 
 MsAlignWriter::MsAlignWriter(const std::string &file_name) {
-      output_.open(file_name);
-      if (!output_.is_open()) {
-        LOG_ERROR("Can not open the msalign file  " << file_name << "!");
-        exit(EXIT_FAILURE);
-      }
-      output_.precision(16);
-    }
+  output_.open(file_name);
+  if (!output_.is_open()) {
+    LOG_ERROR("Cannot open the msalign file  " << file_name << "!");
+    exit(EXIT_FAILURE);
+  }
+}
 
 MsAlignWriter::~MsAlignWriter() {
   if (output_.is_open()) {
@@ -53,7 +51,7 @@ void MsAlignWriter::write(DeconvMsPtr ms_ptr) {
   output_ << "FRACTION_ID=" << header_ptr->getFractionId() << std::endl;
   output_ << "FILE_NAME=" << header_ptr->getFileName() << std::endl;
   output_ << "SCANS=" << header_ptr->getScansString() << std::endl;
-  output_ << "RETENTION_TIME=" << std::setprecision(2)
+  output_ << "RETENTION_TIME=" << std::fixed << std::setprecision(2)
       << header_ptr->getRetentionTime() << std::endl;
   output_ << "LEVEL=" << header_ptr->getMsLevel() << std::endl;
 
@@ -63,36 +61,22 @@ void MsAlignWriter::write(DeconvMsPtr ms_ptr) {
     }
     output_ << "MS_ONE_ID=" << header_ptr->getMsOneId() << std::endl;
     output_ << "MS_ONE_SCAN=" << header_ptr->getMsOneScan() << std::endl;
-    output_ << "PRECURSOR_MZ=" << std::setprecision(5) 
+    output_ << "PRECURSOR_MZ=" << std::fixed << std::setprecision(5) 
         << header_ptr->getPrecMonoMz() << std::endl;
     output_ << "PRECURSOR_CHARGE=" << header_ptr->getPrecCharge() << std::endl;
-
-    /*
-    if (use_copied_mono_mass_){//for use in merge sort of msaligns
-      output_ << std::fixed << "PRECURSOR_MASS=" << std::setprecision(5) 
-        << header_ptr->getCopiedPrecMonoMass() << std::endl;
-    }else{
-    */
-    output_ << std::fixed << "PRECURSOR_MASS=" << std::setprecision(5) 
+    // The precision for mass is 5
+    output_ << "PRECURSOR_MASS=" << std::fixed << std::setprecision(5) 
         << header_ptr->getPrecMonoMass() << std::endl;
-    //}
-    output_ << "PRECURSOR_INTENSITY=" << std::setprecision(2) 
+    output_ << "PRECURSOR_INTENSITY=" << std::fixed << std::setprecision(2) 
         <<  header_ptr->getPrecInte() << std::endl;
-    /*
-    if (header_ptr->getFeatureId() >= 0) {
-      output_ << "FEATURE_ID=" << header_ptr->getFeatureId() << std::endl;
-      output_ << "FEATURE_INTENSITY=" << std::setprecision(2) 
-          << header_ptr->getFeatureInte() << std::endl;
-    }
-    */
   }
 
   for (size_t i = 0; i < ms_ptr->size(); i++) {
     DeconvPeakPtr peak_ptr = ms_ptr->getPeakPtr(i);
-    output_ << std::setprecision(5) << peak_ptr->getPosition();
-    output_ << "\t" << std::setprecision(2) << peak_ptr->getIntensity();
+    output_ << std::fixed << std::setprecision(5) << peak_ptr->getPosition();
+    output_ << "\t" << std::fixed << std::setprecision(2) << peak_ptr->getIntensity();
     output_ << "\t" << peak_ptr->getCharge();
-    //output_ << "\t" << std::setprecision(2) << peak_ptr->getScore();
+    //output_ << "\t" << std::fixed << std::setprecision(2) << peak_ptr->getScore();
     output_ << std::endl;
   }
   output_ << "END IONS" << std::endl;

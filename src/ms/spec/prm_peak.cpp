@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include "common/util/logger.hpp"
 #include "common/base/support_peak_type_base.hpp"
 #include "ms/spec/prm_peak.hpp"

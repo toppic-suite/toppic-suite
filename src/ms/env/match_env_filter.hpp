@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_TOPFD_ENV_MATCH_ENV_FILTER_HPP_
 #define TOPPIC_TOPFD_ENV_MATCH_ENV_FILTER_HPP_
 
@@ -21,10 +20,10 @@
 
 namespace toppic {
 
-class MatchEnvFilter {
- public:
-  static MatchEnvPtrVec filter(MatchEnvPtrVec &ori_envs, double prec_mass, EnvParaPtr env_para_ptr);
-};
+namespace match_env_filter {
+  MatchEnvPtrVec filter(MatchEnvPtrVec &ori_envs, double prec_mass, 
+                        EnvParaPtr env_para_ptr);
+}
 
 }
 

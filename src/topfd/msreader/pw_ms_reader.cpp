@@ -19,7 +19,6 @@
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
 #include "common/base/activation_base.hpp"
-#include "common/util/custom_exception.hpp"
 #include "topfd/msreader/pw_ms_reader.hpp"
 
 namespace toppic {
@@ -129,6 +128,9 @@ bool PwMsReader::readOneMs(int sp_id, PeakPtrVec &peak_list, MsHeaderPtr &header
           } else if (cv_list[i].cvid == pwiz::cv::MS_ETD) {
             ac_name = "ETD";
             break;
+          } else if (cv_list[i].cvid == pwiz::cv::MS_MPD) {
+            ac_name = "MPD";
+            break;
           }
         }
       }
@@ -136,7 +138,7 @@ bool PwMsReader::readOneMs(int sp_id, PeakPtrVec &peak_list, MsHeaderPtr &header
     if (ac_name == "") {
       LOG_WARN("No activation information is available in reading the spectrum with scan " << spec_info.scanNumber);
       std::cout << "\nERROR: Unable to read the activation method from the file. Please select an activation method out of CID|HCD|ETD|UVPD and provide it as a parameter. Example: -a CID" << std::endl;
-      throw InvalidActivation();
+      exit(EXIT_FAILURE);
     }
     LOG_DEBUG("ac name " << ac_name);
     ActivationPtr activation_ptr = ActivationBase::getActivationPtrByName(ac_name);

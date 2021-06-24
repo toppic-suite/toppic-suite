@@ -20,25 +20,13 @@
 
 namespace toppic {
 
-class PrsmStat {
- public:
-  PrsmStat(PrsmParaPtr prsm_para_ptr, 
-           const std::string &input_file_ext, 
-           const std::string &output_file_ext);
-  void process();
+namespace prsm_stat {
 
-  void writePrsm(std::ofstream &file, PrsmPtr prsm_ptr);
+void process(PrsmParaPtr prsm_para_ptr, 
+             const std::string &input_file_ext, 
+             const std::string &output_file_ext);
 
- private:
-  PrsmParaPtr prsm_para_ptr_;
-  double min_mass_;
-  std::string input_file_ext_;
-  std::string output_file_ext_;
-  AminoAcidPtrVec acid_ptr_vec_;
-};
-
-typedef std::shared_ptr<PrsmStat> PrsmStatPtr;
-
+}
 
 } /* namespace toppic */
 

@@ -66,7 +66,6 @@ void PrsmTableWriter::write() {
       << "#variable PTMs" << delim
       << "#matched peaks" << delim
       << "#matched fragment ions" << delim
-      //<< "P-value" << delim
       << "E-value" << delim
       << "Spectrum-level Q-value" << delim
       << "Proteoform-level Q-value" << std::endl;
@@ -76,9 +75,7 @@ void PrsmTableWriter::write() {
   FastaIndexReaderPtr seq_reader = std::make_shared<FastaIndexReader>(db_file_name);
   ModPtrVec fix_mod_ptr_vec = prsm_para_ptr_->getFixModPtrVec();
   PrsmReader prsm_reader(input_file_name);
-  // LOG_DEBUG("start read prsm");
   PrsmPtr prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
-  // LOG_DEBUG("end read prsm");
 
   // init variables
   std::string sp_file_name = prsm_para_ptr_->getSpectrumFileName();
@@ -101,9 +98,7 @@ void PrsmTableWriter::write() {
             = extend_ms_factory::geneMsThreePtrVec(deconv_ms_ptr_vec, sp_para_ptr, new_prec_mass);
         prsm_ptr->setRefineMsVec(extend_ms_ptr_vec);
         writePrsm(file, prsm_ptr);
-        // LOG_DEBUG("start read prsm");
         prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
-        // LOG_DEBUG("end read prsm");
       }
     }
   }
@@ -118,16 +113,19 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   std::string spec_scans;
   std::string retention_time;
   std::string delim = "\t";
+  std::string empty_str = "-";
 
   int ptm_num = prsm_ptr->getProteoformPtr()->getMassShiftNum(AlterType::UNEXPECTED);
   int peak_num = 0;
   DeconvMsPtrVec deconv_ms_ptr_vec = prsm_ptr->getDeconvMsPtrVec();
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
     spec_ids = spec_ids + str_util::toString(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getId()) + " ";
-    spec_activations = spec_activations + deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getActivationPtr()->getName() + " ";
+    spec_activations = spec_activations 
+        + deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getActivationPtr()->getName() + " ";
     spec_scans = spec_scans + deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getScansString() + " ";
     peak_num += deconv_ms_ptr_vec[i]->size();
-    retention_time = retention_time + str_util::fixedToString(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getRetentionTime(), 2) + " ";
+    retention_time = retention_time 
+        + str_util::fixedToString(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getRetentionTime(), 2) + " ";
   }
 
   str_util::trim(spec_ids);
@@ -135,8 +133,9 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   str_util::trim(spec_scans);
   str_util::trim(retention_time);
 
-  if (deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getRetentionTime() <= 0.0) retention_time = "-";
-
+  if (deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getRetentionTime() <= 0.0) {
+    retention_time = empty_str;
+  }
   file << std::setprecision(10);
   LOG_DEBUG("start output prsm ");
   file << prsm_ptr->getFileName() << delim
@@ -157,36 +156,35 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
     str_stream << prsm_ptr->getSampleFeatureInte();
     file << str_stream.str() << delim;
   } else {
-    file << "-" << delim;
+    file << empty_str << delim;
   }
 
   file << prsm_ptr->getFracFeatureScore() << delim;
 
   file << prsm_ptr->getProteoformPtr()->getSeqName() << delim
-      << "\"" << prsm_ptr->getProteoformPtr()->getSeqDesc() << "\"" << delim
+      << prsm_ptr->getProteoformPtr()->getSeqDesc() << delim
       << (prsm_ptr->getProteoformPtr()->getStartPos() + 1) << delim
       << (prsm_ptr->getProteoformPtr()->getEndPos() + 1) << delim
-      << "\"" << prsm_ptr->getProteoformPtr()->getProteinMatchSeq() << "\"" << delim
+      << prsm_ptr->getProteoformPtr()->getProteinMatchSeq() << delim
       << ptm_num << delim
       << prsm_ptr->getProteoformPtr()->getMIScore() << delim
       << prsm_ptr->getProteoformPtr()->getVariablePtmNum() << delim
       << prsm_ptr->getMatchPeakNum() << delim
       << prsm_ptr->getMatchFragNum() << delim
-      //<< prsm_ptr->getPValue() << delim
       << prsm_ptr->getEValue() << delim;
 
   double fdr = prsm_ptr->getFdr();
   if (fdr >= 0) {
     file << fdr << delim;
   } else {
-    file << "-" << delim;
+    file << empty_str << delim;
   }
 
   double proteoform_fdr = prsm_ptr->getProteoformFdr();
   if (proteoform_fdr >= 0) {
     file << proteoform_fdr << std::endl;
   } else {
-    file << "-" << std::endl;
+    file << empty_str << std::endl;
   }
 }
 

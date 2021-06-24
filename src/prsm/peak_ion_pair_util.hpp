@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_PRSM_PEAK_ION_PAIR_UTIL_HPP_
 #define TOPPIC_PRSM_PEAK_ION_PAIR_UTIL_HPP_
 
@@ -24,7 +23,6 @@
 #include "ms/spec/theo_peak.hpp"
 #include "ms/spec/extend_ms.hpp"
 #include "prsm/peak_ion_pair.hpp"
-
 
 namespace toppic {
 

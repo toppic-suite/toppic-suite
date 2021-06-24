@@ -17,7 +17,6 @@
 #include <map>
 
 #include "common/util/logger.hpp"
-#include "common/util/str_util.hpp"
 #include "ms/factory/extend_ms_factory.hpp"
 #include "ms/factory/spectrum_set_factory.hpp"
 #include "ms/feature/spec_feature.hpp"
@@ -34,7 +33,6 @@ std::string getValueStr(std::string line) {
   int start = line.find(">");
   int end = line.find("<", start);
   std::string num_str = line.substr(start + 1, end - start - 1);
-  // LOG_DEBUG(line << "  Num str: " << num_str);
   return num_str;
 }
 
@@ -110,11 +108,10 @@ bool isMatchMs(PrsmPtr prsm_ptr, MsHeaderPtr header_ptr) {
   int prec_id = header_ptr->getPrecId();
   if (prsm_ptr->getSpectrumId() == id && prsm_ptr->getPrecursorId() == prec_id) {
     if (prsm_ptr->getSpectrumScan() != scan) {
-      LOG_ERROR("Error in Prsm.");
+      LOG_ERROR("Error in Prsm! Spectrum id:" << prsm_ptr->getSpectrumId());
     }
     return true;
   } else {
-    LOG_TRACE("prsm spectrum id " << prec_id << " ms spectrum id " << id);
     return false;
   }
 }
@@ -125,7 +122,8 @@ void addSpectrumPtrsToPrsms(PrsmPtrVec &prsm_ptrs, PrsmParaPtr prsm_para_ptr) {
       = std::make_shared<SimpleMsAlignReader>(prsm_para_ptr->getSpectrumFileName(),
                                               prsm_para_ptr->getGroupSpecNum(),
                                               sp_para_ptr->getActivationPtr());
-  SpectrumSetPtr spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(ms_reader_ptr, sp_para_ptr);
+  SpectrumSetPtr spec_set_ptr 
+      = spectrum_set_factory::readNextSpectrumSetPtr(ms_reader_ptr, sp_para_ptr);
   // use prsm order information (ordered by spectrum id then prec id)
   int start_prsm = 0;
   while (spec_set_ptr != nullptr) {

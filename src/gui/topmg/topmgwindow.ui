@@ -137,7 +137,7 @@ p, li { white-space: pre-wrap; }
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="tab_4">
      <attribute name="title">
@@ -638,12 +638,17 @@ p, li { white-space: pre-wrap; }
          </item>
          <item>
           <property name="text">
+           <string>ETD</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
            <string>HCD</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>ETD</string>
+           <string>MPD</string>
           </property>
          </item>
          <item>
@@ -808,7 +813,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>70</y>
+        <y>60</y>
         <width>361</width>
         <height>91</height>
        </rect>
@@ -923,7 +928,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>480</x>
-        <y>170</y>
+        <y>180</y>
         <width>361</width>
         <height>33</height>
        </rect>
@@ -937,6 +942,77 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
       </layout>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_4">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>170</y>
+        <width>361</width>
+        <height>91</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Advanced Options</string>
+      </property>
+      <widget class="QWidget" name="gridLayoutWidget_2">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>17</y>
+         <width>337</width>
+         <height>70</height>
+        </rect>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_15">
+          <property name="text">
+           <string>Max. length of a proteoform graph gap:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="maxGapLength">
+          <property name="maximumSize">
+           <size>
+            <width>110</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>40</string>
+          </property>
+          <property name="readOnly">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_16">
+          <property name="text">
+           <string>Max. variable PTM in a proteoform graph gap:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="maxVarPTMGap">
+          <property name="maximumSize">
+           <size>
+            <width>110</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>5</string>
+          </property>
+          <property name="readOnly">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </widget>
    </widget>

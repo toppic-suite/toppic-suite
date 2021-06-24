@@ -180,9 +180,9 @@ void CompPValueLookupTable::process(const DeconvMsPtrVec &deconv_ms_ptr_vec, Prs
     double cand_num = test_num_ptr_->compCandNum(type_ptr, unexpected_shift_num,
                                                  refine_prec_mass, tolerance);
 
-    ExtremeValuePtr ev_ptr = std::make_shared<ExtremeValue>(prot_prob, cand_num, 1);
+    ExpectedValuePtr ev_ptr = std::make_shared<ExpectedValue>(prot_prob, cand_num, 1);
 
-    prsm_ptrs[i]->setExtremeValuePtr(ev_ptr);
+    prsm_ptrs[i]->setExpectedValuePtr(ev_ptr);
   }
 }
 

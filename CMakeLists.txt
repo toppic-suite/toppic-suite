@@ -149,9 +149,7 @@ file(GLOB TOPDIFF_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topdiff/*.cpp
 # topindex classes
 file(GLOB FILTER_INDEX_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/massmatch/*.cpp
                             ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/mng/*.cpp
-                            ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/zeroindex/*.cpp
-                            ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/oneindex/*.cpp
-                            ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/diagindex/*.cpp)
+                            ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/index/*.cpp)
 
 # topindex console main
 file(GLOB TOPINDEX_PROC_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topindex_process.cpp
@@ -167,6 +165,9 @@ file(GLOB TOPINDEX_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topindex/*.cpp
 # unit test using catch
 file(GLOB UNIT_TEST_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/*.cpp)
 
+#gui to run exe in command line in windows
+file(GLOB GUI_UTIL_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/util/*.cpp)
+
 add_executable(topfd 
   ${TOPFD_CONSOLE_SRCS} ${TOPFD_SRCS} ${COMMON_SRCS} ${PARA_SRCS} 
   ${SPEC_SRCS} ${ENV_SRCS} ${FEATURE_SRCS} ${PWIZ_SRCS} ${NOWIDE_SRCS})
@@ -177,7 +178,7 @@ add_executable(topfd
 
 add_executable(topfd_gui 
   ${TOPFD_GUI_SRCS} ${TOPFD_SRCS} ${COMMON_SRCS} ${PARA_SRCS} 
-  ${SPEC_SRCS} ${ENV_SRCS} ${FEATURE_SRCS} ${PWIZ_SRCS} ${NOWIDE_SRCS})
+  ${SPEC_SRCS} ${ENV_SRCS} ${FEATURE_SRCS} ${PWIZ_SRCS} ${NOWIDE_SRCS} ${GUI_UTIL_SRCS})
 
 add_executable(topindex 
   ${TOPINDEX_CONSOLE_SRCS} ${TOPINDEX_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS}
@@ -185,7 +186,7 @@ add_executable(topindex
 
 add_executable(topindex_gui 
   ${TOPINDEX_GUI_SRCS} ${TOPINDEX_PROC_SRCS} ${HTS_SRCS} 
-  ${COMMON_SRCS} ${SEQ_SRCS} ${PARA_SRCS} ${FILTER_INDEX_SRCS})
+  ${COMMON_SRCS} ${SEQ_SRCS} ${PARA_SRCS} ${FILTER_INDEX_SRCS} ${GUI_UTIL_SRCS})
 
 add_executable(toppic 
 	${TOPPIC_CONSOLE_SRCS} ${TOPPIC_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS} 
@@ -197,7 +198,7 @@ add_executable(toppic_gui
 	${TOPPIC_GUI_SRCS} ${TOPPIC_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS} 
   ${SEQ_SRCS} ${PARA_SRCS} ${SPEC_SRCS}  
   ${PRSM_SRCS} ${FILTER_SRCS} ${SEARCH_SRCS}  
-  ${TDGF_SRCS} ${LOCAL_SRCS} ${VISUAL_SRCS})
+  ${TDGF_SRCS} ${LOCAL_SRCS} ${VISUAL_SRCS} ${GUI_UTIL_SRCS})
 
 add_executable(topmg 
 	${TOPMG_CONSOLE_SRCS} ${TOPMG_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS}
@@ -207,7 +208,7 @@ add_executable(topmg
 add_executable(topmg_gui 
 	${TOPMG_GUI_SRCS} ${TOPMG_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS} 
   ${SEQ_SRCS} ${PARA_SRCS} ${SPEC_SRCS} ${PRSM_SRCS} ${FILTER_SRCS}  
-	${GRAPH_ALIGN_SRCS} ${MCMC_SRCS} ${VISUAL_SRCS})
+	${GRAPH_ALIGN_SRCS} ${MCMC_SRCS} ${VISUAL_SRCS} ${GUI_UTIL_SRCS})
 
 add_executable(topdiff 
   ${TOPDIFF_CONSOLE_SRCS} ${TOPDIFF_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS}
@@ -215,7 +216,7 @@ add_executable(topdiff
 
 add_executable(topdiff_gui ${TOPDIFF_GUI_SRCS} ${TOPDIFF_GUI_QRC}
   ${TOPDIFF_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS} 
-  ${SEQ_SRCS} ${PARA_SRCS} ${SPEC_SRCS} ${PRSM_SRCS} ${DIFF_SRCS})
+  ${SEQ_SRCS} ${PARA_SRCS} ${SPEC_SRCS} ${PRSM_SRCS} ${DIFF_SRCS} ${GUI_UTIL_SRCS})
 
 
 #add_executable(toppic_test 

@@ -16,7 +16,6 @@
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/str_util.hpp"
-#include "common/util/custom_exception.hpp"
 #include "common/base/base_data.hpp"
 #include "ms/spec/msalign_frac_merge.hpp"
 #include "ms/spec/deconv_json_merge.hpp"
@@ -69,15 +68,8 @@ void processOneFile(TopfdParaPtr para_ptr,
     std::cout << "Feature detection finished." << std::endl;
     
     std::cout << "Processing " << spec_file_name << " finished." << std::endl;
-
-  } catch (InvalidActivation& e){
-      std::cout << "[Exception] " << e.what() << std::endl;
-  } catch (FileInUse& e){
-      std::cout << "[Exception] " << e.what() << std::endl;
   } catch (const char* e) {
-    std::cout << "the error is coming from here" << std::endl;
-    std::cout << "[Exception] " << e << std::endl;
-    std::cout << e << std::endl;
+    LOG_ERROR("[Exception] " << e);
     exit(EXIT_FAILURE);
   } 
 }
@@ -137,10 +129,7 @@ void mergeFiles(TopfdParaPtr para_ptr,
         = std::make_shared<DeconvJsonMerge>(spec_file_lst, merged_file_name);
     json_merger->process();
     json_merger = nullptr;
-    FeatureMergePtr feature_merger 
-        = std::make_shared<FeatureMerge>(spec_file_lst, merged_file_name);
-    feature_merger->process(para_str);
-    feature_merger = nullptr;
+    feature_merge::process(spec_file_lst, merged_file_name, para_str);
     std::cout << "Merging files finished." << std::endl;
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;

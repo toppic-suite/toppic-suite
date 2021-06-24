@@ -12,9 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#ifndef TOPPIC_QUANT_FEATURE_PRSM_HPP_
-#define TOPPIC_QUANT_FEATURE_PRSM_HPP_
+#ifndef TOPPIC_MERGE_FEATURE_PRSM_HPP_
+#define TOPPIC_MERGE_FEATURE_PRSM_HPP_
 
 #include "prsm/prsm_str.hpp"
 #include "ms/feature/sample_feature.hpp"
@@ -76,4 +75,5 @@ typedef std::vector<FeaturePrsmPtr> FeaturePrsmPtrVec;
 typedef std::vector<FeaturePrsmPtrVec> FeaturePrsmPtrVec2D;
 
 }
+
 #endif

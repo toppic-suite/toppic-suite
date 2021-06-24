@@ -35,26 +35,25 @@ class XmlDOMDocument {
                  const std::string &root);
   ~XmlDOMDocument();
 
-  xercesc::DOMElement* createElement(const char* tag);
+  XmlDOMElement* createElement(const char* tag);
 
   xercesc::DOMText* createTextNode(const char* text);
 
-  void addElement(xercesc::DOMElement* element, 
+  void addElement(XmlDOMElement* element, 
                   const char* tag, const char* value);
 
-  xercesc::DOMElement* getDocumentElement() {
+  XmlDOMElement* getDocumentElement() {
     return doc_->getDocumentElement();
   }
 
-  void addElement(xercesc::DOMElement* element);
-  void addElement(xercesc::DOMElement* parent,xercesc::DOMElement* child);
+  void addElement(XmlDOMElement* element);
+  void addElement(XmlDOMElement* parent, XmlDOMElement* child);
 
   int writeXmlDOMDocument(const char * filename);
 
  private:
   xercesc::DOMDocument* doc_;
 };
-
 
 }
 

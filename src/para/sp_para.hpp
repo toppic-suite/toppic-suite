@@ -18,11 +18,9 @@
 #include <string>
 #include <memory>
 #include <vector>
-#include <set>
 
 #include "common/xml/xml_dom_element.hpp"
 #include "common/base/activation.hpp"
-#include "common/base/mass_constant.hpp"
 #include "para/peak_tolerance.hpp"
 
 namespace toppic {
@@ -53,6 +51,10 @@ class SpPara {
   void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 
   static std::string getXmlElementName() {return "sp_para";}
+
+  static int getMaxSpecNumPerFile() {return 1000000;}
+
+  static int getMaxFeatureNumPerFile() {return 1000000;}
 
  private:
   int min_peak_num_ = 10;

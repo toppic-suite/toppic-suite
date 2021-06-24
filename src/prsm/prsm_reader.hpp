@@ -28,6 +28,8 @@ class PrsmReader {
  public:
   explicit PrsmReader(const std::string &file_name);
 
+  ~PrsmReader();
+
   std::vector<std::string> readOnePrsmLines();
 
   PrsmStrPtr readOnePrsmStr();
@@ -35,16 +37,6 @@ class PrsmReader {
   PrsmPtr readOnePrsm(FastaIndexReaderPtr reader_ptr, const ModPtrVec fix_mod_list);
 
   void close();
-
-  static PrsmStrPtrVec readAllPrsmStrs(const std::string &input_file_name);
-
-  static PrsmStrPtrVec readAllPrsmStrsMatchSeq(const std::string &input_file_name,
-                                               FastaIndexReaderPtr fasta_reader_ptr,
-                                               const ModPtrVec fix_mod_list);
-
-  static PrsmPtrVec readAllPrsms(const std::string &prsm_file_name,
-                                 const std::string &db_file_name,
-                                 const ModPtrVec  &fix_mod_list);
 
  private:
   std::ifstream input_;

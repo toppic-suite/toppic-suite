@@ -17,9 +17,13 @@
 
 #include <string>
 
+#include "common/util/str_util.hpp"
+
 namespace toppic {
 
 namespace fasta_util {
+
+std::string getString(const StringPairVec &str_pair_vec);
 
 void generateShuffleDb(const std::string &file_name,
                        const std::string &target_decoy_file_name);

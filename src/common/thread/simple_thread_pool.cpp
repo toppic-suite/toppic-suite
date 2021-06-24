@@ -100,7 +100,7 @@ int SimpleThreadPool::getId(boost::thread::id thread_id) {
       return thread_ptr_vec_[i]->getId();
     }
   }
-  LOG_ERROR("Thread Error: no writer found");
+  LOG_ERROR("Thread Error: thread id " << thread_id << " cannot be found!");
   exit(EXIT_FAILURE);
 }
 

@@ -123,5 +123,6 @@ SpectrumSetPtrVec geneSpectrumSetPtrVecWithPrecError(DeconvMsPtrVec deconv_ms_pt
   return spec_set_vec;
 }
 
-}
-}  // namespace toppic
+} // namespace spectrum_set_factory
+
+} // namespace toppic

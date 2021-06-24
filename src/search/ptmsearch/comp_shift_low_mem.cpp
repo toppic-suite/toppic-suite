@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include <cmath>
 
 #include "common/util/logger.hpp"
@@ -42,21 +41,6 @@ std::vector<double> CompShiftLowMem::findBestShift(const std::vector<std::pair<i
   }
   return result;
 }
-
-/*
-std::vector<double> CompShiftLowMem::findBestShift(const std::vector<int> &a,
-                                                   const std::vector<int> &errors,
-                                                   const std::vector<int> &b,
-                                                   int total,int min_gap,
-                                                   double scale){
-  std::vector<std::vector<int>> list = findBestShift(a,errors,b,total,min_gap);
-  std::vector<double> result;
-  for(size_t i = 0;i<list.size();i++){
-    result.push_back(list[i][0]/scale);
-  }
-  return result;
-}
-*/
 
 inline void CompShiftLowMem::resetNumbers(const std::vector<int> &a,
                                           const std::vector<int> &errors,
@@ -121,7 +105,6 @@ std::vector<std::vector<int>> CompShiftLowMem::findBestShift(
   }
 
   resetNumbers(a, errors, b);
-  // resetNumbers();
 
   int current_minimum =1;
 
@@ -162,7 +145,6 @@ inline std::vector<std::vector<int>> CompShiftLowMem::findBestShift(
   }
 
   resetNumbers(a, b);
-  //resetNumbers();
 
   int cur_min =1;
 

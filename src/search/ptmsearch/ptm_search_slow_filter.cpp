@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include <string>
 
 #include "common/base/prot_mod_base.hpp"
@@ -59,16 +58,12 @@ PtmSearchSlowFilter::PtmSearchSlowFilter(SpectrumSetPtr spectrum_set_ptr,
   // compute complete and prefix prsms
   for (size_t i = 0; i < complete_prefix_slow_match_ptrs_.size(); i++) {
     PrsmPtrVec comp_ptrs;
-    // LOG_DEBUG("Compute complete prsm " << i);
     complete_prefix_slow_match_ptrs_[i]->compute(ProteoformType::COMPLETE, comp_ptrs);
     complete_prsm_2d_ptrs_.push_back(comp_ptrs);
     PrsmPtrVec prefix_ptrs;
-    // LOG_DEBUG("Compute prefix prsm " << i);
     complete_prefix_slow_match_ptrs_[i]->compute(ProteoformType::PREFIX, prefix_ptrs);
     prefix_prsm_2d_ptrs_.push_back(prefix_ptrs);
-    // LOG_DEBUG("compute prefi completed");
   }
-  // LOG_DEBUG("complete prefix completed");
 
   // compute suffix and internal prsms
   for (size_t i = 0; i < suffix_internal_slow_match_ptrs_.size(); i++) {
@@ -79,7 +74,6 @@ PtmSearchSlowFilter::PtmSearchSlowFilter(SpectrumSetPtr spectrum_set_ptr,
     suffix_internal_slow_match_ptrs_[i]->compute(ProteoformType::INTERNAL, internal_ptrs);
     internal_prsm_2d_ptrs_.push_back(internal_ptrs);
   }
-  // LOG_DEBUG("suffix internal completed");
 }
 
 PrsmPtrVec PtmSearchSlowFilter::getPrsms(int shift_num, ProteoformTypePtr type_ptr) {

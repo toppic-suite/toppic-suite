@@ -15,7 +15,7 @@
 #ifndef TOPPIC_COMMON_BASE_ACTIVATION_DATA_HPP_
 #define TOPPIC_COMMON_BASE_ACTIVATION_DATA_HPP_
 
-# include <string>
+#include <string>
 
 namespace toppic {
 
@@ -35,6 +35,11 @@ std::string activation_base_data = R"(
 	<name>ETD</name>
 	<n_ion_type>C</n_ion_type>
 	<c_ion_type>Z_DOT</c_ion_type>
+</activation>
+<activation>
+	<name>MPD</name>
+	<n_ion_type>A</n_ion_type>
+	<c_ion_type>Y</c_ion_type>
 </activation>
 <activation>
 	<name>UVPD</name>

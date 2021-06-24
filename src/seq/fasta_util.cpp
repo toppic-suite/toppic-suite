@@ -19,7 +19,6 @@
 #include "htslib/faidx.h"
 
 #include "common/util/logger.hpp"
-#include "common/util/str_util.hpp"
 #include "common/util/file_util.hpp"
 #include "common/base/ptm_base.hpp"
 #include "seq/fasta_reader.hpp"

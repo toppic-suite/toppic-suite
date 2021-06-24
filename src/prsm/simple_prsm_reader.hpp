@@ -26,6 +26,8 @@ class SimplePrsmReader {
  public:
   SimplePrsmReader(const std::string &file_name);
 
+  ~SimplePrsmReader();
+
   std::vector<std::string> readOnePrsmLines();
 
   SimplePrsmStrPtr readOnePrsmStr();

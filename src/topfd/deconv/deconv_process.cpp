@@ -136,7 +136,7 @@ void deconvMissingMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
 
   if (peak_list.size() > 0) {
     deconv_ptr->setData(peak_list, EnvPara::getDefaultMaxMass(),
-                            EnvPara::getDefaultMaxCharge());
+                        EnvPara::getDefaultMaxCharge());
     deconv_ptr->run();
     result_envs = deconv_ptr->getResult();
   }
@@ -208,7 +208,7 @@ void DeconvProcess::processSpMissingLevelOne(RawMsGroupReaderPtr reader_ptr) {
 
     //Here we create new instances of Env Para and Dp Para 
     //to make sure that multiple threads do not share these parameter instances. 
-    EnvParaPtr env_ptr_new = std::make_shared<EnvPara>(env_para_ptr_);
+    EnvParaPtr env_ptr_new = std::make_shared<EnvPara>(*env_para_ptr_.get());
     DpParaPtr dp_ptr_new = std::make_shared<DpPara>(dp_para_ptr_);
     DeconvOneSpPtr deconv_ptr = std::make_shared<DeconvOneSp>(env_ptr_new, dp_ptr_new);
 
@@ -332,11 +332,14 @@ void deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   if (max_frag_mass == 0.0) {
     max_frag_mass = header_ptr->getPrecSpMass();
   }
+  MatchEnvPtrVec result_envs;
 
-  deconv_ptr->setMsLevel(header_ptr->getMsLevel());
-  deconv_ptr->setData(peak_list, max_frag_mass, header_ptr->getPrecCharge());
-  deconv_ptr->run();
-  MatchEnvPtrVec result_envs = deconv_ptr->getResult();
+  if (peak_list.size() > 0) {
+    deconv_ptr->setMsLevel(header_ptr->getMsLevel());
+    deconv_ptr->setData(peak_list, max_frag_mass, header_ptr->getPrecCharge());
+    deconv_ptr->run();
+    result_envs = deconv_ptr->getResult();
+  }
   DeconvMsPtr deconv_ms_ptr = match_env_util::getDeconvMsPtr(header_ptr, result_envs);
 
   boost::thread::id thread_id = boost::this_thread::get_id();
@@ -429,10 +432,11 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
     }
     //Here we create new Env Para and Dp Para instances to make sure that
     //multiple threads do not share the same parameter instances. 
-    EnvParaPtr env_ptr_new = std::make_shared<EnvPara>(env_para_ptr_);
+    EnvParaPtr env_ptr_new = std::make_shared<EnvPara>(*env_para_ptr_.get());
     DpParaPtr dp_ptr_new = std::make_shared<DpPara>(dp_para_ptr_);
 
-    //deconv_process_ptr_ (DecovProcess instance) is needed because it has the information on the folder names, envelope file names
+    //deconv_process_ptr_ (DecovProcess instance) is needed because 
+    //it has the information on the folder names, envelope file names
     //pool_ptr needed for getting each thread id    
     DeconvOneSpPtr deconv_ptr = std::make_shared<DeconvOneSp>(env_ptr_new, dp_ptr_new);
 

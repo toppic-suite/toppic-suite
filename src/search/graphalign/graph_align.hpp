@@ -17,7 +17,7 @@
 #define TOPPIC_SEARCH_GRAPH_ALIGN_GRAPH_ALIGN_HPP_
 
 #include "prsm/prsm.hpp"
-#include "search/diag/diagonal_header.hpp"
+#include "search/diag/diag_header.hpp"
 #include "search/graph/graph.hpp"
 #include "search/graph/proteo_graph.hpp"
 #include "search/graph/spec_graph.hpp"
@@ -69,9 +69,9 @@ class GraphAlign {
 
   GraphResultNodePtrVec2D nodes_2d_;
 
-  DiagonalHeaderPtrVec diag_headers_; 
+  DiagHeaderPtrVec diag_headers_; 
 
-  DiagonalHeaderPtrVec2D diag_headers_2d_; 
+  DiagHeaderPtrVec2D diag_headers_2d_; 
 
   void getConsistentPairs();
 

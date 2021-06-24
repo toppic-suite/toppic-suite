@@ -27,7 +27,7 @@ namespace ptm_util {
 PtmPtrVec readPtmTxt(const std::string &file_name) {
   std::ifstream infile(file_name.c_str());
   if (!infile.is_open()) {
-    LOG_ERROR("Variable PTM file " << file_name <<  " can not be opened!");
+    LOG_ERROR("Variable PTM file " << file_name <<  " cannot be opened!");
     exit(EXIT_FAILURE);
   }
 

@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include "seq/proteoform_type.hpp"
 #include "prsm/prsm_xml_writer_set.hpp"
 

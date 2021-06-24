@@ -24,20 +24,13 @@
 
 namespace toppic {
 
-PrsmStat::PrsmStat(PrsmParaPtr prsm_para_ptr,
-                   const std::string &input_file_ext,
-                   const std::string &output_file_ext) {
-  prsm_para_ptr_ = prsm_para_ptr;
-  min_mass_ = prsm_para_ptr_->getSpParaPtr()->getMinMass();
-  input_file_ext_ = input_file_ext;
-  output_file_ext_ = output_file_ext;
-  acid_ptr_vec_ = AminoAcidBase::getBaseAminoAcidPtrVec();
-}
+namespace prsm_stat {
 
 int countCoverage(const std::vector<bool> &match_ion_vec, int start, int end) {
   int count = 0;
-  for (size_t i = 0; i < match_ion_vec.size(); i++) {
-    if (static_cast<int>(i) >= start && static_cast<int>(i) < end && match_ion_vec[i]) {
+  int size = static_cast<int>(match_ion_vec.size());
+  for (int i = 0; i < size; i++) {
+    if (i >= start && i < end && match_ion_vec[i]) {
       count++;
     }
   }
@@ -76,7 +69,7 @@ int countAcidRightCoverage(ResSeqPtr res_seq_ptr, AminoAcidPtr acid_ptr,
   return count;
 }
 
-void PrsmStat::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
+void writePrsm(std::ofstream &file, PrsmPtr prsm_ptr, PrsmParaPtr prsm_para_ptr) {
   std::string spec_ids;
   std::string spec_activations;
   std::string spec_scans;
@@ -91,7 +84,7 @@ void PrsmStat::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   str_util::trim(spec_ids);
   str_util::trim(spec_activations);
   str_util::trim(spec_scans);
-  file << prsm_para_ptr_->getSpectrumFileName() << "\t"
+  file << prsm_para_ptr->getSpectrumFileName() << "\t"
       << prsm_ptr->getPrsmId() << "\t"
       << spec_ids << "\t"
       << spec_activations<< "\t"
@@ -134,12 +127,14 @@ void PrsmStat::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   std::vector<std::vector<bool>> n_ion_2d;
   std::vector<std::vector<bool>> c_ion_2d;
   std::vector<std::vector<bool>> both_ion_2d;
+
+  double min_mass = prsm_para_ptr->getSpParaPtr()->getMinMass();
   for (size_t s = 0; s < deconv_ms_ptr_vec.size(); s++) {
     // get ion_pair
     PeakIonPairPtrVec pair_ptrs
         = peak_ion_pair_util::genePeakIonPairs(prsm_ptr->getProteoformPtr(),
                                                refine_ms_ptr_vec[s],
-                                               min_mass_);
+                                               min_mass);
     std::vector<bool> n_ion(proteo_len + 1, false);
     std::vector<bool> c_ion(proteo_len + 1, false);
     std::vector<bool> both_ion(proteo_len + 1, false);
@@ -197,8 +192,9 @@ void PrsmStat::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
 
   ResSeqPtr res_seq_ptr = proteo_ptr->getResSeqPtr();
 
-  for (size_t i = 0; i < acid_ptr_vec_.size(); i++) {
-    AminoAcidPtr acid = acid_ptr_vec_[i];
+  AminoAcidPtrVec acid_ptr_vec = AminoAcidBase::getBaseAminoAcidPtrVec();
+  for (size_t i = 0; i < acid_ptr_vec.size(); i++) {
+    AminoAcidPtr acid = acid_ptr_vec[i];
     file << countAcid(res_seq_ptr, acid) << "\t";
     for (size_t j = 0; j < deconv_ms_ptr_vec.size(); j++) {
       file << countAcidLeftCoverage(res_seq_ptr, acid, n_ion_2d[j]) << "\t";
@@ -222,10 +218,12 @@ void PrsmStat::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   file << std::endl;
 }
 
-void PrsmStat::process() {
-  std::string spectrum_file_name  = prsm_para_ptr_->getSpectrumFileName();
+void process(PrsmParaPtr prsm_para_ptr,
+             const std::string &input_file_ext,
+             const std::string &output_file_ext) {
+  std::string spectrum_file_name  = prsm_para_ptr->getSpectrumFileName();
   std::string base_name = file_util::basename(spectrum_file_name);
-  std::string output_file_name = base_name + "." + output_file_ext_;
+  std::string output_file_name = base_name + "." + output_file_ext;
   std::ofstream file;
   file.open(output_file_name.c_str());
   // write title
@@ -250,7 +248,7 @@ void PrsmStat::process() {
       << "E-Value" << "\t"
       << "One_Protein_probabilty"<< "\t"
       << "FDR" << "\t";
-  int group_spec_num = prsm_para_ptr_->getGroupSpecNum();
+  int group_spec_num = prsm_para_ptr->getGroupSpecNum();
 
   file << "Total break point number " << "\t"
       << "Left break point number " <<  "\t"
@@ -288,8 +286,10 @@ void PrsmStat::process() {
       << "Combined spectra middle_both_term_ion_coverage" << "\t"
       << "Combined spectra right_both_term_ion_coverage" << "\t";
 
-  for (size_t i = 0; i < acid_ptr_vec_.size(); i++) {
-    std::string acid = acid_ptr_vec_[i]->getOneLetter();
+  AminoAcidPtrVec acid_ptr_vec = AminoAcidBase::getBaseAminoAcidPtrVec();
+
+  for (size_t i = 0; i < acid_ptr_vec.size(); i++) {
+    std::string acid = acid_ptr_vec[i]->getOneLetter();
     file << acid << " number" << "\t";
     for (int j = 0; j < group_spec_num; j++) {
       file << "Spectrum " << j << " " << acid << " left N term" << "\t";
@@ -309,17 +309,17 @@ void PrsmStat::process() {
 
   file << std::endl;
 
-  std::string input_file_name = file_util::basename(spectrum_file_name) + "." + input_file_ext_;
-  std::string db_file_name = prsm_para_ptr_->getSearchDbFileName();
-  ModPtrVec fix_mod_ptr_vec = prsm_para_ptr_->getFixModPtrVec();
+  std::string input_file_name = file_util::basename(spectrum_file_name) + "." + input_file_ext;
+  std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
+  ModPtrVec fix_mod_ptr_vec = prsm_para_ptr->getFixModPtrVec();
 
-  std::string sp_file_name = prsm_para_ptr_->getSpectrumFileName();
+  std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
   FastaIndexReaderPtr seq_reader = std::make_shared<FastaIndexReader>(db_file_name);
   PrsmReader prsm_reader(input_file_name);
   PrsmPtr prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
 
   // init variables
-  SpParaPtr sp_para_ptr = prsm_para_ptr_->getSpParaPtr();
+  SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
   SimpleMsAlignReaderPtr ms_reader_ptr = std::make_shared<SimpleMsAlignReader>(sp_file_name, 
                                                                                group_spec_num,
                                                                                sp_para_ptr->getActivationPtr());
@@ -336,7 +336,7 @@ void PrsmStat::process() {
         ExtendMsPtrVec extend_ms_ptr_vec
             = extend_ms_factory::geneMsThreePtrVec(deconv_ms_ptr_vec, sp_para_ptr, new_prec_mass);
         prsm_ptr->setRefineMsVec(extend_ms_ptr_vec);
-        writePrsm(file, prsm_ptr);
+        writePrsm(file, prsm_ptr, prsm_para_ptr);
         prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
       }
     }
@@ -346,6 +346,8 @@ void PrsmStat::process() {
   prsm_reader.close();
   // write end;
   file.close();
+}
+
 }
 
 }  // namespace toppic

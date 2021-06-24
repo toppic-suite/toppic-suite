@@ -17,11 +17,11 @@
 #include <algorithm>
 #include <vector>
 
-#include "common/util/version.hpp"
-#include "common/base/base_data.hpp"
-#include "common/util/file_util.hpp"
 #include "common/base/mod_util.hpp"
-#include "common/util/custom_exception.hpp"
+#include "common/base/base_data.hpp"
+
+#include "common/util/version.hpp"
+#include "common/util/file_util.hpp"
 
 #include "seq/fasta_reader.hpp"
 #include "seq/fasta_util.hpp"
@@ -49,7 +49,7 @@
 #include "prsm/simple_prsm_str_merge.hpp"
 
 #include "filter/mng/one_ptm_filter_mng.hpp"
-#include "filter/mng/topindex_file_name.hpp"
+#include "filter/mng/index_file_name.hpp"
 #include "filter/oneptm/one_ptm_filter_processor.hpp"
 
 #include "filter/mng/diag_filter_mng.hpp"
@@ -190,12 +190,12 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
     LOG_DEBUG("Decoy " << decoy);
     LOG_DEBUG("block size " << arguments["databaseBlockSize"]);
     int db_block_size = std::stoi(arguments["databaseBlockSize"]);
-	int max_frag_len = std::stoi(arguments["maxFragmentLength"]);
+    int max_frag_len = std::stoi(arguments["maxFragmentLength"]);
 
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
 
     // index file name
-    TopIndexFileNamePtr file_name_ptr = std::make_shared<TopIndexFileName>();
+    IndexFileNamePtr file_name_ptr = std::make_shared<IndexFileName>();
     std::string index_file_para = file_name_ptr->geneFileName(arguments);
 
     fasta_util::dbPreprocess(ori_db_file_name, db_file_name, decoy, db_block_size, max_frag_len);
@@ -211,10 +211,7 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
     one_ptm_filter_mng_ptr->inte_num_ = 4;
     one_ptm_filter_mng_ptr->pref_suff_num_ = 4;
     one_ptm_filter_mng_ptr->comp_num_ = 4;
-    OnePtmFilterProcessorPtr one_filter_processor =
-        std::make_shared<OnePtmFilterProcessor>(one_ptm_filter_mng_ptr);
-    one_filter_processor->process();
-    one_filter_processor = nullptr;
+    one_ptm_filter_processor::process(one_ptm_filter_mng_ptr);
     std::cout << "ASF-One PTM filtering - finished." << std::endl;
 
     input_exts.push_back("topmg_one_filter_complete");
@@ -285,10 +282,7 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
     int n_top = std::stoi(arguments["numOfTopPrsms"]);
 
     std::cout << "Top PrSM selecting - started" << std::endl;
-    PrsmTopSelectorPtr selector
-        = std::make_shared<PrsmTopSelector>(db_file_name, sp_file_name, "topmg_evalue", "topmg_top", n_top);
-    selector->process();
-    selector = nullptr;
+    prsm_top_selector::process(sp_file_name, "topmg_evalue", "topmg_top", n_top);
     std::cout << "Top PrSM selecting - finished." << std::endl;
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
@@ -317,22 +311,20 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
     if (arguments["useFeatureFile"] == "true") {
       // TopFD msalign file with feature ID
       ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();
-      PrsmFeatureClusterPtr prsm_clusters
-          = std::make_shared<PrsmFeatureCluster>(db_file_name,
-                                                 sp_file_name,
-                                                 "topmg_top",
-                                                 "topmg_cluster",
-                                                 fix_mod_list,
-                                                 form_error_tole);
-      prsm_clusters->process();
-      prsm_clusters = nullptr;
-    } else {
-      PrsmSimpleClusterPtr prsm_clusters
-          = std::make_shared<PrsmSimpleCluster>(db_file_name, sp_file_name,
-                                                "topmg_top", prsm_para_ptr->getFixModPtrVec(),
-                                                "topmg_cluster", form_error_tole);
-      prsm_clusters->process();
-      prsm_clusters = nullptr;
+      prsm_feature_cluster::process(db_file_name,
+                                    sp_file_name,
+                                    "topmg_top",
+                                    "topmg_cluster",
+                                    fix_mod_list,
+                                    form_error_tole);
+    } 
+    else {
+      prsm_simple_cluster::process(db_file_name, 
+                                   sp_file_name,
+                                   "topmg_top", 
+                                   prsm_para_ptr->getFixModPtrVec(),
+                                   "topmg_cluster", 
+                                   form_error_tole);
     }
     std::cout << "Finding PrSM clusters - finished." << std::endl;
 
@@ -340,9 +332,7 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
 
     if (arguments["searchType"] == "TARGET+DECOY") {
       std::cout << "FDR computation - started. " << std::endl;
-      PrsmFdrPtr fdr = std::make_shared<PrsmFdr>(db_file_name, sp_file_name, "topmg_cluster", "topmg_cluster_fdr");
-      fdr->process();
-      fdr = nullptr;
+      prsm_fdr::process(sp_file_name, "topmg_cluster", "topmg_cluster_fdr");
       std::cout << "FDR computation - finished." << std::endl;
       cur_suffix = "topmg_cluster_fdr";
     }
@@ -350,11 +340,8 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
     std::string cutoff_type = arguments["cutoffSpectralType"];
     std::cout << "PrSM filtering by " << cutoff_type << " - started." << std::endl;
     double cutoff_value = std::stod(arguments["cutoffSpectralValue"]);
-    PrsmCutoffSelectorPtr cutoff_selector
-        = std::make_shared<PrsmCutoffSelector>(db_file_name, sp_file_name, cur_suffix,
-                                               "topmg_prsm_cutoff", cutoff_type, cutoff_value);
-    cutoff_selector->process();
-    cutoff_selector = nullptr;
+    prsm_cutoff_selector::process(db_file_name, sp_file_name, cur_suffix,
+                                  "topmg_prsm_cutoff", cutoff_type, cutoff_value);
     std::cout << "PrSM filtering by " << cutoff_type << " - finished." << std::endl;
 
     std::time_t end = time(nullptr);
@@ -390,18 +377,13 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
     cutoff_type = (arguments["cutoffProteoformType"] == "FDR") ? "FORMFDR": "EVALUE";
     std::cout << "PrSM filtering by " << cutoff_type << " - started." << std::endl;
     std::istringstream(arguments["cutoffProteoformValue"]) >> cutoff_value;
-    cutoff_selector = std::make_shared<PrsmCutoffSelector>(db_file_name, sp_file_name, cur_suffix,
-                                                           "topmg_form_cutoff", cutoff_type, cutoff_value);
-    cutoff_selector->process();
-    cutoff_selector = nullptr;
+    prsm_cutoff_selector::process(db_file_name, sp_file_name, cur_suffix,
+                                  "topmg_form_cutoff", cutoff_type, cutoff_value);
     std::cout << "PrSM filtering by " << cutoff_type << " - finished." << std::endl;
 
     std::cout << "Selecting top PrSMs for proteoforms - started." << std::endl;
-    PrsmFormFilterPtr form_filter
-        = std::make_shared<PrsmFormFilter>(db_file_name, sp_file_name, "topmg_form_cutoff",
-                                           "topmg_form_cutoff_form");
-    form_filter->process();
-    form_filter = nullptr;
+    prsm_form_filter::process(db_file_name, sp_file_name, "topmg_form_cutoff",
+                              "topmg_form_cutoff_form");
     std::cout << "Selecting top PrSMs for proteoforms - finished." << std::endl;
 
     std::cout << "Outputting proteoform table - started." << std::endl;
@@ -424,11 +406,8 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
       jsonTranslate(arguments, "topmg_proteoform_cutoff");
       std::cout << "Converting proteoform xml files to html files - finished." << std::endl;
     }
-  } catch (FileInUse& e){
-      std::cout << "[Exception] " << e.what() << std::endl;
   } catch (const char* e) {
-    std::cout << "[Exception]" << std::endl;
-    std::cout << e << std::endl;
+    LOG_ERROR("[Exception]" << e);
   }
   return 0;
 }
@@ -482,13 +461,11 @@ int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
       json_merger = nullptr;
       std::cout << "Merging json files finished." << std::endl;
     }
-    std::cout << "Merging feature files started." << std::endl;
-    FeatureMergePtr feature_merger 
-        = std::make_shared<FeatureMerge>(spec_file_lst, full_combined_name);
-    feature_merger->process(para_str);
-    feature_merger = nullptr;
-    std::cout << "Merging feature files finished." << std::endl;
-
+	if (arguments["useFeatureFile"] == "true") {//only when feature files are being used
+      std::cout << "Merging feature files started." << std::endl;
+      feature_merge::process(spec_file_lst, full_combined_name, para_str);
+      std::cout << "Merging feature files finished." << std::endl;
+    }
     // merge TOP files
     std::cout << "Merging identification files started." << std::endl;
     std::vector<std::string> prsm_file_lst(spec_file_lst.size());

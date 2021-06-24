@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_TOPFD_ENV_ENV_FILTER_HPP_
 #define TOPPIC_TOPFD_ENV_ENV_FILTER_HPP_
 
@@ -21,15 +20,18 @@
 
 namespace toppic {
 
-class EnvFilter {
- public:
-  static void filter(MatchEnvPtr2D &match_envs, const PeakPtrVec &peak_list,
-                     EnvParaPtr env_para_ptr);
-  
-  static void multipleMassFilter(MatchEnvPtr2D &match_env, EnvParaPtr env_para_ptr);
+namespace env_filter {
 
-  static bool testRealEnvValid(MatchEnvPtr env, EnvParaPtr env_para_ptr);
-};
+void filter(MatchEnvPtr2D &match_envs, const PeakPtrVec &peak_list,
+            EnvParaPtr env_para_ptr);
+
+// Filtering envelopes without removing envelopes with different 
+// candidate charge states and monoisotopic masses. For example,
+// The same envelope with -1/+1 Dalton shift or -1/+1 charge difference
+void multipleMassFilter(MatchEnvPtr2D &match_env, EnvParaPtr env_para_ptr);
+
+bool testRealEnvValid(MatchEnvPtr env, EnvParaPtr env_para_ptr);
+}
 
 }
 

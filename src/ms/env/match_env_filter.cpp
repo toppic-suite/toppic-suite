@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include <algorithm>
 
 #include "common/util/logger.hpp"
@@ -20,8 +19,10 @@
 
 namespace toppic {
 
-MatchEnvPtrVec MatchEnvFilter::filter(MatchEnvPtrVec &ori_envs, double prec_mass,
-                                      EnvParaPtr env_para_ptr) {
+namespace match_env_filter {
+
+MatchEnvPtrVec filter(MatchEnvPtrVec &ori_envs, double prec_mass,
+                      EnvParaPtr env_para_ptr) {
   MatchEnvPtrVec low_mass_envs;
   MatchEnvPtrVec high_mass_envs;
   std::sort(ori_envs.begin(), ori_envs.end(), MatchEnv::cmpScoreDec);
@@ -44,6 +45,8 @@ MatchEnvPtrVec MatchEnvFilter::filter(MatchEnvPtrVec &ori_envs, double prec_mass
   result.insert(std::end(result), std::begin(high_mass_envs), std::end(high_mass_envs));
   std::sort(result.begin(), result.end(), MatchEnv::cmpScoreDec); 
   return result;
+}
+
 }
 
 }

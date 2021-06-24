@@ -60,16 +60,16 @@ XmlDOMDocument::~XmlDOMDocument() {
   }
 }
 
-void XmlDOMDocument::addElement(xercesc::DOMElement* element) {
+void XmlDOMDocument::addElement(XmlDOMElement* element) {
     doc_->appendChild(element);
 }
 
-void XmlDOMDocument::addElement(xercesc::DOMElement* parent,xercesc::DOMElement* child){
+void XmlDOMDocument::addElement(XmlDOMElement* parent, XmlDOMElement* child){
     parent->appendChild(child);
 }
 
-xercesc::DOMElement* XmlDOMDocument::createElement(const char* tag) {
-  xercesc::DOMElement* element = doc_->createElement(X(tag));
+XmlDOMElement* XmlDOMDocument::createElement(const char* tag) {
+  XmlDOMElement* element = doc_->createElement(X(tag));
   return element;
 }
 
@@ -80,7 +80,7 @@ xercesc::DOMText* XmlDOMDocument::createTextNode(const char* text) {
 
 void XmlDOMDocument::addElement(xercesc::DOMElement* element, 
                 const char* tag, const char* value) {
-  xercesc::DOMElement* child = createElement(tag);
+  XmlDOMElement* child = createElement(tag);
   element->appendChild(child);
   xercesc::DOMText* text_node = createTextNode(value);
   child->appendChild(text_node);

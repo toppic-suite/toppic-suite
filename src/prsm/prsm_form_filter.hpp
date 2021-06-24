@@ -19,22 +19,14 @@
 
 namespace toppic {
 
-class PrsmFormFilter {
- public:
-  PrsmFormFilter(const std::string &db_file_name,
-                 const std::string &spec_file_name,
-                 const std::string &input_file_ext,
-                 const std::string &output_file_ext);
+namespace prsm_form_filter {
 
-  void process();
- private:
-  std::string db_file_name_;
-  std::string spec_file_name_;
-  std::string input_file_ext_;
-  std::string output_file_ext_;
-};
+void process(const std::string &db_file_name,
+             const std::string &spec_file_name,
+             const std::string &input_file_ext,
+             const std::string &output_file_ext);
 
-typedef std::shared_ptr<PrsmFormFilter> PrsmFormFilterPtr;
+}
 
 }  // namespace toppic
 

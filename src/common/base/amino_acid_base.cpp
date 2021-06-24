@@ -69,7 +69,7 @@ void AminoAcidBase::initBase() {
 AminoAcidPtr AminoAcidBase::getAminoAcidPtrByName(const std::string &name) {
   AminoAcidPtr amino_acid_ptr = amino_acid_name_map_[name];
   if (amino_acid_ptr == nullptr) {
-    LOG_ERROR("Amino acid " << name << " cannot be found!");
+    LOG_WARN("Amino acid " << name << " cannot be found!");
   }
   return amino_acid_ptr;
 }
@@ -77,15 +77,16 @@ AminoAcidPtr AminoAcidBase::getAminoAcidPtrByName(const std::string &name) {
 AminoAcidPtr AminoAcidBase::getAminoAcidPtrByOneLetter(const std::string &one_letter) {
   AminoAcidPtr amino_acid_ptr = amino_acid_one_letter_map_[one_letter];
   if (amino_acid_ptr == nullptr) {
-    LOG_ERROR("Amino acid " << one_letter << " cannot be found!");
+    LOG_WARN("Amino acid " << one_letter << " cannot be found!");
   }
   return amino_acid_ptr;
 }
 
-AminoAcidPtr AminoAcidBase::getAminoAcidPtrByThreeLetter(const std::string &three_letter) {
+AminoAcidPtr 
+AminoAcidBase::getAminoAcidPtrByThreeLetter(const std::string &three_letter) {
   AminoAcidPtr amino_acid_ptr = amino_acid_three_letter_map_[three_letter];
   if (amino_acid_ptr == nullptr) {
-    LOG_ERROR("Amino acid " << three_letter << " cannot be found!");
+    LOG_WARN("Amino acid " << three_letter << " cannot be found!");
   }
   return amino_acid_ptr;
 }

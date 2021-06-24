@@ -11,8 +11,10 @@
 //WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //See the License for the specific language governing permissions and
 //limitations under the License.
+
 #include <string>
 
+//Deprecated features in boost are excluded.
 #ifndef BOOST_SYSTEM_NO_DEPRECATED
 #define BOOST_SYSTEM_NO_DEPRECATED 1
 #endif
@@ -31,7 +33,6 @@
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
-#include "common/util/custom_exception.hpp"
 
 namespace fs = boost::filesystem;
 
@@ -82,6 +83,7 @@ std::string getResourceDir(const std::string &exec_dir) {
   LOG_ERROR("The resource directory " << resource_dir << " does not exist!"); 
   exit(EXIT_FAILURE);
 }
+
 std::string basenameFromEntirePath(const std::string &s) {
   size_t slash_pos = s.find_last_of("\\/");
   if (slash_pos < s.length()) {
@@ -118,16 +120,19 @@ std::string directory(const std::string &s) {
 
 void createFolder(const std::string &folder_name) {
   fs::path path(folder_name);
-  try{
-      fs::create_directories(path);
-    }
-    catch(const boost::filesystem::filesystem_error& e) {
-      std::cout << "ERROR: Output file/folder could not be generated because it was in use. Please close any open output files/folders from the previous run and try again." << std::endl;
-      throw FileInUse();
-    }
+  try {
+    fs::create_directories(path);
+  }
+  catch(const boost::filesystem::filesystem_error& e) {
+    LOG_ERROR("Output file/folder" << folder_name 
+              << "could not be created because it was in use." 
+              << "Please close the files/folders and try again.");
+    exit(EXIT_FAILURE);
+  }
 }
 
-void createLink(const std::string &a_link, const std::string &a_dir, const std::string &b) {
+void createLink(const std::string &a_link, const std::string &a_dir, 
+                const std::string &b) {
 #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
   copyDir(a_dir, b);
 #else
@@ -160,22 +165,22 @@ bool copyDir(const std::string &src_name,
   fs::path destination(des_name);
   try {
     if (!fs::exists(source) || !fs::is_directory(source)) {
-      LOG_ERROR("The source folder " << source.string() << " does not exist!");
+      LOG_WARN("The source folder " << source.string() << " does not exist!");
       return false;
     }
     if (fs::exists(destination)) {
-      LOG_ERROR("The destination folder " << destination.string() 
+      LOG_WARN("The destination folder " << destination.string() 
           << " already exists. Fail to create the destination directory.");
       return false;
     }
     if (!fs::create_directory(destination)) {
-      LOG_ERROR("Unable to create the destination folder "
+      LOG_WARN("Unable to create the destination folder "
                 << destination.string());
       return false;
     }
   }
   catch(fs::filesystem_error const & e) {
-    LOG_ERROR(e.what());
+    LOG_WARN(e.what());
     return false;
   }
 
@@ -191,7 +196,7 @@ bool copyDir(const std::string &src_name,
       }
     }
     catch(fs::filesystem_error const & e) {
-      LOG_ERROR(e.what());
+      LOG_WARN("[Exception] " << e.what());
     }
   }
   return true;
@@ -204,7 +209,7 @@ bool copyJsonDir(const std::string &src_name,
     fs::path source(src_name);
     fs::path destination(des_name);
     if (!fs::exists(source) || !fs::is_directory(source)) {
-      LOG_ERROR("The source folder " << source.string() << " does not exist!");
+      LOG_WARN("The source folder " << source.string() << " does not exist!");
       return false;
     }
 
@@ -223,7 +228,7 @@ bool copyJsonDir(const std::string &src_name,
     }
   }
   catch(fs::filesystem_error const & e) {
-    LOG_ERROR(e.what());
+    LOG_WARN("[Exception] " << e.what());
     return false;
   }
   std::cout << "\n";
@@ -241,8 +246,9 @@ void delDir(const std::string &path) {
       fs::remove_all(dir);
     }
     catch(const boost::filesystem::filesystem_error& e) {
-      std::cout << "ERROR: Output file/folder is in use. Please close all output folders and files from previous run and try again" << std::endl;
-      throw FileInUse();
+      LOG_ERROR("Output file/folder" << path << " is in use."
+                << "Please close all output folders and files and try again");
+      exit(EXIT_FAILURE);
     }
   }
 }
@@ -263,7 +269,8 @@ void rename(const std::string &ori_name,
 
 void moveFile(std::string &path_name, std::string &folder_name) {
   fs::path ori_path(path_name);
-  std::string new_path_name = folder_name + getFileSeparator() + ori_path.filename().string();
+  std::string new_path_name = folder_name + getFileSeparator() 
+      + ori_path.filename().string();
   bool over_write = true;
   copyFile(path_name, new_path_name, over_write); 
   delFile(path_name);
@@ -275,16 +282,10 @@ void cleanPrefix(const std::string & ref_name,
   fs::path ref_dir = absolute(ref_path).parent_path(); 
   fs::directory_iterator end_iter;
 
-  //std::cout << ref_dir << " " << ref_path << std::endl;
-
-
   for (fs::directory_iterator dir_iter(ref_dir); 
        dir_iter != end_iter ; ++dir_iter) {
     std::string file_name = dir_iter->path().string();
     std::replace(file_name.begin(), file_name.end(), '\\', '/');
-
-    //std::cout << file_name << std::endl;
-
 
     if (file_name.compare(0, prefix.length(), prefix) == 0) {
       if (!fs::is_directory(fs::status(dir_iter->path())))

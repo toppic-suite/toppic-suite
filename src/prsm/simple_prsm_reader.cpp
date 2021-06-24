@@ -24,6 +24,12 @@ SimplePrsmReader::SimplePrsmReader(const std::string &file_name) {
   input_.open(file_name.c_str(), std::ios::in);
 }
 
+SimplePrsmReader::~SimplePrsmReader() {
+  if (input_.is_open()) {
+    close();
+  }
+}
+
 std::vector<std::string> SimplePrsmReader::readOnePrsmLines() {
   std::string line;
   std::vector<std::string> line_list;

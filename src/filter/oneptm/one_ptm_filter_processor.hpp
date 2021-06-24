@@ -15,25 +15,16 @@
 #ifndef TOPPIC_FILTER_ONE_PTM_ONE_PTM_FILTER_PROCESSOR_HPP_
 #define TOPPIC_FILTER_ONE_PTM_ONE_PTM_FILTER_PROCESSOR_HPP_
 
-#include "seq/db_block.hpp"
 #include "filter/mng/one_ptm_filter_mng.hpp"
 
 namespace toppic {
 
-class OnePtmFilterProcessor {
- public:
-  explicit OnePtmFilterProcessor(OnePtmFilterMngPtr mng_ptr): mng_ptr_(mng_ptr) {}
-  void process();
-  void indexProcess();
+namespace one_ptm_filter_processor {
 
- private:
-  OnePtmFilterMngPtr mng_ptr_;
+void process(OnePtmFilterMngPtr mng_ptr);
 
-  void processBlock(DbBlockPtr block_ptr, const std::vector<double> & mod_mass_list);
-};
-
-typedef std::shared_ptr<OnePtmFilterProcessor> OnePtmFilterProcessorPtr;
+}
 
 }  // namespace toppic
 
-#endif /* PTM_FAST_FILTER_PROCESSOR_HPP_ */
+#endif 

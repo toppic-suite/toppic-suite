@@ -65,8 +65,6 @@ class FastaSeq {
   StringPairVec acid_ptm_pair_vec_;
 
   void compAcidPtmPairVec();
-
-  void compRawSeq();
 };
 
 }  // namespace toppic

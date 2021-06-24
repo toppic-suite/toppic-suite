@@ -19,7 +19,7 @@
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/str_util.hpp"
-#include "ms/spec/msalign_frac_merge.hpp"
+#include "para/sp_para.hpp"
 #include "ms/feature/spec_feature.hpp"
 #include "ms/feature/spec_feature_reader.hpp"
 #include "ms/feature/spec_feature_writer.hpp"
@@ -33,48 +33,16 @@
 
 namespace toppic {
 
-int FeatureMerge::MAX_FEATURE_NUM_PER_FILE = 1000000;
+namespace feature_merge {
 
-FeatureMerge::FeatureMerge(
-    const std::vector<std::string> &spec_file_names,
-    const std::string &output_file_name):
-    spec_file_names_(spec_file_names),
-    output_file_name_(output_file_name) {
-    }
-
-void FeatureMerge::process(std::string &para_str) {
-  //std::vector<std::string> frac_feature_names;
-  std::vector<std::string> frac_xml_feature_names;
-  std::vector<std::string> spec_feature_names;
-  for (size_t i = 0; i < spec_file_names_.size(); i++) { 
-    std::string file_name = file_util::basename(spec_file_names_[i]);
-    std::string base_name = file_name.substr(0, file_name.length() - 4);
-    std::string frac_xml_feature = base_name + "_feature.xml";
-    frac_xml_feature_names.push_back(frac_xml_feature);
-    std::string spec_feature = base_name + "_ms2.feature";
-    spec_feature_names.push_back(spec_feature);
-  }
-  
-  std::string sample_feature_output_name = output_file_name_ + "_ms1.feature";
-  std::string frac_xml_feature_output_name = output_file_name_ + "_feature.xml";
-  std::string spec_feature_output_name = output_file_name_ + "_ms2.feature";
-
-  mergeFiles(frac_xml_feature_names, frac_xml_feature_output_name, 
-             spec_feature_names, spec_feature_output_name,
-             sample_feature_output_name,
-             MsAlignFracMerge::getMaxSpecNumPerFile(), 
-             MAX_FEATURE_NUM_PER_FILE,
-             para_str); 
-}
-
-void FeatureMerge::mergeFiles(const std::vector<std::string> &frac_xml_feature_file_lst,
-                              const std::string &frac_xml_feature_output_file_name, 
-                              const std::vector<std::string> &spec_feature_file_lst,
-                              const std::string &spec_feature_output_file_name,
-                              const std::string &sample_feature_output_file_name,
-                              int max_spec_num_per_file, 
-                              int max_feature_num_per_file, 
-                              const std::string &para_str) {
+void mergeFiles(const std::vector<std::string> &frac_xml_feature_file_lst,
+                const std::string &frac_xml_feature_output_file_name, 
+                const std::vector<std::string> &spec_feature_file_lst,
+                const std::string &spec_feature_output_file_name,
+                const std::string &sample_feature_output_file_name,
+                int max_spec_num_per_file, 
+                int max_feature_num_per_file, 
+                const std::string &para_str) {
   FracFeaturePtrVec all_frac_features;
   for (size_t i = 0; i < frac_xml_feature_file_lst.size(); i++) {
     FracXmlFeatureReader ft_reader(frac_xml_feature_file_lst[i]); 
@@ -89,10 +57,12 @@ void FeatureMerge::mergeFiles(const std::vector<std::string> &frac_xml_feature_f
   }
 
   FracFeaturePtrVec2D clusters;
+  //In simpleCluster, we do not merge fraction features with similar 
+  //masses and charge states. 
+  frac_feature_cluster::simpleCluster(all_frac_features, clusters);
   //double mass_tolerance = 0.2;
   //double time_tolerance = 600;
   //frac_feature_cluster::cluster(all_frac_features, clusters, mass_tolerance, time_tolerance);
-  frac_feature_cluster::simpleCluster(all_frac_features, clusters);
   
   //sample features;
   SampleFeaturePtrVec sample_features;
@@ -102,8 +72,7 @@ void FeatureMerge::mergeFiles(const std::vector<std::string> &frac_xml_feature_f
   }
   sample_feature_writer::writeFeatures(sample_feature_output_file_name, sample_features);
 
-  //frac features
-  // set sample feature id;
+  //Set sample feature id for fraction features
   for (size_t i = 0; i < clusters.size(); i++) {
     double sample_feature_inte = sample_features[i]->getIntensity();
     for (size_t j = 0; j < clusters[i].size(); j++) {
@@ -138,6 +107,35 @@ void FeatureMerge::mergeFiles(const std::vector<std::string> &frac_xml_feature_f
   }
 
   spec_feature_writer::writeFeatures(spec_feature_output_file_name, all_spec_features);
+}
+
+void process(const std::vector<std::string> &spec_file_names,
+             const std::string &output_file_name, 
+             std::string &para_str) {
+  std::vector<std::string> frac_xml_feature_names;
+  std::vector<std::string> spec_feature_names;
+  for (size_t i = 0; i < spec_file_names.size(); i++) { 
+    std::string file_name = file_util::basename(spec_file_names[i]);
+    std::string base_name = file_name.substr(0, file_name.length() - 4);
+    std::string frac_xml_feature = base_name + "_feature.xml";
+    frac_xml_feature_names.push_back(frac_xml_feature);
+    std::string spec_feature = base_name + "_ms2.feature";
+    spec_feature_names.push_back(spec_feature);
+  }
+  
+  std::string sample_feature_output_name = output_file_name + "_ms1.feature";
+  std::string frac_xml_feature_output_name = output_file_name + "_feature.xml";
+  std::string spec_feature_output_name = output_file_name + "_ms2.feature";
+
+  mergeFiles(frac_xml_feature_names, frac_xml_feature_output_name, 
+             spec_feature_names, spec_feature_output_name,
+             sample_feature_output_name,
+             SpPara::getMaxSpecNumPerFile(), 
+             SpPara::getMaxFeatureNumPerFile(), 
+             para_str); 
+}
+
+
 }
 
 } /* namespace toppic */

@@ -17,6 +17,7 @@
 #include "common/xml/xml_dom_document.hpp"
 #include "common/base/ptm_base.hpp"
 #include "common/base/residue_util.hpp"
+#include "seq/fasta_util.hpp"
 #include "seq/fasta_seq.hpp"
 
 namespace toppic {
@@ -39,7 +40,7 @@ FastaSeq::FastaSeq(const std::string &name,
       compAcidPtmPairVec();
     }
 
-// This function need to be tested
+// Create a FastaSeq using a subsequence of another FastaSeq
 FastaSeq::FastaSeq(FastaSeqPtr seq_ptr, int start, int len) {
   name_ = seq_ptr->getName();
   desc_ = seq_ptr->getDesc();
@@ -47,9 +48,11 @@ FastaSeq::FastaSeq(FastaSeqPtr seq_ptr, int start, int len) {
   acid_ptm_pair_vec_.insert(acid_ptm_pair_vec_.begin(), 
                             str_pair_vec.begin() + start, 
                             str_pair_vec.begin() + start + len); 
-  compRawSeq();
+
+  seq_ = fasta_util::getString(acid_ptm_pair_vec_);
 }
 
+// Read fasta sequence with PTMs
 void FastaSeq::compAcidPtmPairVec() {
   size_t pos = 0;
   int count = 0;
@@ -74,17 +77,6 @@ void FastaSeq::compAcidPtmPairVec() {
     else {
       LOG_WARN("In sequence " << seq_);
       LOG_WARN("The residue " << acid_one_letter << " is invalid!");
-    }
-  }
-}
-
-void FastaSeq::compRawSeq() {
-  for (size_t i = 0; i < acid_ptm_pair_vec_.size(); i++) {
-    std::string amino_str = acid_ptm_pair_vec_[i].first;
-    seq_ = seq_ + amino_str; 
-    std::string ptm_str = acid_ptm_pair_vec_[i].second;
-    if (ptm_str != PtmBase::getEmptyPtmPtr()->getAbbrName()) {
-      seq_ = seq_ + "[" + ptm_str + "]";
     }
   }
 }

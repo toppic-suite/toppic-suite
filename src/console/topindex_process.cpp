@@ -33,10 +33,10 @@
 #include "filter/mng/zero_ptm_filter_mng.hpp"
 #include "filter/mng/one_ptm_filter_mng.hpp"
 #include "filter/mng/diag_filter_mng.hpp"
-#include "filter/mng/topindex_file_name.hpp"
-#include "filter/zeroindex/zero_ptm_index_processor.hpp"
-#include "filter/oneindex/one_ptm_index_processor.hpp"
-#include "filter/diagindex/diag_index_processor.hpp"
+#include "filter/mng/index_file_name.hpp"
+#include "filter/index/zero_ptm_index.hpp"
+#include "filter/index/one_ptm_index.hpp"
+#include "filter/index/diag_index.hpp"
 
 namespace toppic{
 
@@ -66,7 +66,7 @@ void TopIndexProcess(std::map<std::string, std::string> &arguments){
     }
     //create a folder for index files 
     // index file name
-    TopIndexFileNamePtr file_name_ptr = std::make_shared<TopIndexFileName>();
+    IndexFileNamePtr file_name_ptr = std::make_shared<IndexFileName>();
     std::string index_file_para = file_name_ptr->geneFileName(arguments);
 
     int db_block_size = std::stoi(arguments["databaseBlockSize"]);
@@ -76,45 +76,31 @@ void TopIndexProcess(std::map<std::string, std::string> &arguments){
     ZeroPtmFilterMngPtr zero_filter_mng_ptr
         = std::make_shared<ZeroPtmFilterMng>(prsm_para_ptr, index_file_para, 
                                              thread_num, "");
-    ZeroPtmIndexProcessorPtr zero_ptm_index_processor
-        = std::make_shared<ZeroPtmIndexProcessor>(zero_filter_mng_ptr);
-
-    zero_ptm_index_processor->process();
-    zero_ptm_index_processor = nullptr;
+    zero_ptm_index::process(zero_filter_mng_ptr);
 
     OnePtmFilterMngPtr one_ptm_filter_mng_ptr
         = std::make_shared<OnePtmFilterMng>(prsm_para_ptr, index_file_para, 
                                             "toppic_one_filter", thread_num);
-    OnePtmIndexProcessorPtr one_ptm_index_processor
-        = std::make_shared<OnePtmIndexProcessor>(one_ptm_filter_mng_ptr);
-    one_ptm_index_processor->process();
-    one_ptm_index_processor = nullptr;
+    one_ptm_index::process(one_ptm_filter_mng_ptr);
 
     DiagFilterMngPtr diag_filter_mng_ptr
         = std::make_shared<DiagFilterMng>(prsm_para_ptr, index_file_para, 
                                           filter_result_num, thread_num, 
                                           "toppic_multi_filter");
-    DiagIndexProcessorPtr diag_index_processor
-        = std::make_shared<DiagIndexProcessor>(diag_filter_mng_ptr);
-    diag_index_processor->process();
-    diag_index_processor = nullptr;
+    diag_index::process(diag_filter_mng_ptr);
 
     std::cout << "Deleting temporary files - started." << std::endl;
-
     std::string fa_base = file_util::absoluteName(ori_db_file_name);
     std::replace(fa_base.begin(), fa_base.end(), '\\', '/');
     file_util::cleanPrefix(ori_db_file_name, fa_base + "_");
-    
     std::cout << "Deleting temporary files - finished." << std::endl; 
 
     std::cout << "TopIndex - finished." << std::endl;
-    } catch (const char* e) {
+  } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;
     exit(EXIT_FAILURE);
   }
 }
 
-
-    
 }

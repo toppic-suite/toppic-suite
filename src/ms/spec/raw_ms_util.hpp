@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_MS_SPEC_RAW_MS_UTIL_HPP_
 #define TOPPIC_MS_SPEC_RAW_MS_UTIL_HPP_
 

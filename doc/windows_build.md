@@ -19,7 +19,9 @@ pacman -S mingw-w64-x86_64-qt5
 
 pacman -S mingw-w64-x86_64-xerces-c
 
-pacman -S mingw-w64-x86_64-xalan-c
+pacman -S mingw-w64-x86_64-eigen3
+
+pacman -S mingw-w64-x86_64-nlohmann-json
 ```
 
 Thanks to MSYS2, we can install them very easily. Now we have `C:\msys64\mingw64\include` and `C:\msys64\mingw64\lib` for include and linking.

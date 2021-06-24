@@ -15,39 +15,17 @@
 #ifndef TOPPIC_PRSM_PRSM_SAMPLE_MERGE_HPP_
 #define TOPPIC_PRSM_PRSM_SAMPLE_MERGE_HPP_
 
-#include "prsm/prsm.hpp"
-
 namespace toppic {
 
-class PrsmSampleMerge {
- public:
-  PrsmSampleMerge(const std::string &db_file_name,
-                  const std::vector<std::string> &input_file_names,
-                  const std::string &output_file_name,
-                  const std::string &fix_mod,
-                  double error_tole);
+namespace prsm_sample_merge {
 
-  void process();
+void process(const std::string &db_file_name,
+             const std::vector<std::string> &input_file_names,
+             const std::string &output_file_name,
+             const std::string &fix_mod,
+             double error_tole);
 
-  void getPrsmClusters(PrsmStrPtrVec& prsm_ptrs, PrsmStrPtrVec2D& clusters);
-
-  void convertClustersToTable(PrsmStrPtrVec2D &clusters, 
-                              PrsmStrPtrVec2D &table_prsms,
-                              int sample_num);
-
-  void outputTable(PrsmStrPtrVec2D &cluster,
-                   PrsmStrPtrVec2D &table_prsms,
-                   int sample_num);
-
- private:
-  std::string db_file_name_;
-  std::vector<std::string> input_file_names_;
-  std::string output_file_name_;
-  std::string fix_mod_;
-  double error_tole_;
-};
-
-typedef std::shared_ptr<PrsmSampleMerge> PrsmSampleMergePtr;
+}
 
 }  // namespace toppic
 

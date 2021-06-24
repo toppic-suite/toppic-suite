@@ -20,7 +20,6 @@
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/time_util.hpp"
-#include "common/util/custom_exception.hpp"
 #include "console/topfd_argument.hpp"
 
 namespace toppic {
@@ -54,7 +53,7 @@ bool Argument::parse(int argc, char* argv[]) {
     display_desc.add_options()
         ("help,h", "Print this help message.")
         ("activation,a", po::value<std::string> (&activation),
-        "<CID|HCD|ETD|UVPD|FILE>. Fragmentation method of tandem mass spectra. When FILE is used, fragmentation methods of spectra are given in the input spectral data file. Default value: FILE.")
+        "<CID|ETD|HCD|MPD|UVPD|FILE>. Fragmentation method of tandem mass spectra. When FILE is used, fragmentation methods of spectra are given in the input spectral data file. Default value: FILE.")
         ("max-charge,c", po::value<std::string> (&max_charge),
          "<a positive integer>. Set the maximum charge state of precursor and fragment ions. The default value is 30.")
         ("max-mass,m", po::value<std::string> (&max_mass),
@@ -229,10 +228,10 @@ bool Argument::validateArguments() {
   }
   //validate activation method
   std::string activation = topfd_para_ptr_->activation_;
-  if (activation != "FILE" && activation != "CID" && activation != "ETD"
-    && activation != "HCD" && activation != "UVPD"){
+  if (activation != "FILE" && activation != "CID" && activation != "ETD" 
+      && activation != "MPD" && activation != "HCD" && activation != "UVPD"){
     //throw InvalidActivation();
-    LOG_ERROR("Activation method should be one out of |FILE|CID|ETD|HCD|UVPD.");
+    LOG_ERROR("Activation method should be one out of |FILE|CID|ETD|HCD|MPD|UVPD.");
     return false;
   }
 

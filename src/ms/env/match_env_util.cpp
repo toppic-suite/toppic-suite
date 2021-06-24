@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include <algorithm>
 
 #include "common/util/logger.hpp"
@@ -148,14 +147,17 @@ MatchEnvPtrVec addMultipleMass(MatchEnvPtrVec &envs, MatchEnvPtr2D &candidates,
     int refer_peak = envs[i]->getRealEnvPtr()->getReferPeakIdx();
     MatchEnvPtrVec charge_envs(2, nullptr);
     // we use non-overlapping envelopes here
+    // Current charge stored in [ref_peak][charge-1]
     charge_envs[0] = candidates[refer_peak][charge-1];
     double min_score = charge_envs[0]->getScore() * min_ratio;
     if (charge >= multi_min_charge) {
       double score_minus_one  = 0;
+      // Envelope for charge - 1
       if (charge > 1 && candidates[refer_peak][charge-2] != nullptr) {
         score_minus_one = candidates[refer_peak][charge-2]->getScore();
       }
       double score_plus_one = 0;
+      // Envelope for charge + 1
       if (charge < static_cast<int>(candidates[0].size()) && candidates[refer_peak][charge] != nullptr) {
         score_plus_one = candidates[refer_peak][charge]->getScore();
       }
@@ -174,7 +176,7 @@ MatchEnvPtrVec addMultipleMass(MatchEnvPtrVec &envs, MatchEnvPtr2D &candidates,
       RealEnvPtr real_env_ptr = charge_envs[j]->getRealEnvPtr();
       int refer_idx = real_env_ptr->getReferIdx();
       if (mono_mass >= multi_min_mass) {
-        /* check left shift */
+        // check left -1 Dalton
         if (refer_idx > 0) {
           int p = real_env_ptr->getPeakIdx(refer_idx-1);
           if (p >=0 && candidates[p][charge-1] != nullptr &&
@@ -182,6 +184,7 @@ MatchEnvPtrVec addMultipleMass(MatchEnvPtrVec &envs, MatchEnvPtr2D &candidates,
             mass_envs.push_back(candidates[p][charge-1]);
           }
         }
+        // check right +1 Dalton
         if (refer_idx < real_env_ptr->getPeakNum() - 1) {
           int p = real_env_ptr->getPeakIdx(refer_idx+1);
           if (p >=0 && candidates[p][charge-1] != nullptr &&

@@ -12,13 +12,11 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <cmath>
-#include <sstream>
-#include <iomanip>
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
 #include "common/base/mass_constant.hpp"
 #include "common/base/activation_base.hpp"
+#include "ms/spec/peak_util.hpp"
 #include "ms/spec/simple_msalign_reader.hpp"
 
 namespace toppic {
@@ -133,13 +131,6 @@ void SimpleMsAlignReader::readNext() {
       } else if (strs[0] == "PRECURSOR_INTENSITY") {
         prec_inte = std::stod(strs[1]);
       } 
-      /*
-      else if (strs[0] == "FEATURE_ID") {
-        feature_id = std::stoi(strs[1]);
-      } else if (strs[0] == "FEATURE_INTENSITY") {
-        feature_inte = std::stod(strs[1]);
-      }
-      */
     }
   }
   if (id < 0 || prec_charge < 0 || prec_mass < 0) {
@@ -164,9 +155,8 @@ void SimpleMsAlignReader::readNext() {
   // LOG_DEBUG("retention time " << retention_time);
 
   if (title != "") {
-    std::stringstream ss;
-    ss << "sp_" << id;
-    header_ptr->setTitle(ss.str());
+    std::string sp_str = "sp_" + str_util::toString(id);
+    header_ptr->setTitle(sp_str);
   } else {
     header_ptr->setTitle(title);
   }
@@ -188,10 +178,6 @@ void SimpleMsAlignReader::readNext() {
   header_ptr->setPrecCharge(prec_charge);
 
   header_ptr->setPrecInte(prec_inte);
-
-  //header_ptr->setFeatureId(feature_id);
-
-  //header_ptr->setFeatureInte(feature_inte);
 
   std::vector<DeconvPeakPtr> peak_ptr_list;
   int idx = 0;
@@ -239,7 +225,7 @@ DeconvMsPtrVec SimpleMsAlignReader::getNextMsPtrVec() {
     }
   }
 
-  double prec_mono_mz = Peak::compMz(prec_mono_mass, charge);
+  double prec_mono_mz = peak_util::compMz(prec_mono_mass, charge);
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
     deconv_ms_ptr_vec[i]->getMsHeaderPtr()->setPrecMonoMz(prec_mono_mz);
   }
