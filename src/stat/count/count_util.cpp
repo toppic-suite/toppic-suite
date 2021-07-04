@@ -11,9 +11,8 @@
 //WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //See the License for the specific language governing permissions and
 //limitations under the License.
+
 #include <cmath>
-#include <vector>
-#include <string>
 
 #include "common/base/residue_util.hpp"
 #include "stat/count/count_util.hpp"

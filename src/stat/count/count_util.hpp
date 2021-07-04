@@ -16,7 +16,6 @@
 #define TOPPIC_STAT_COUNT_TDGF_UTIL_HPP_
 
 #include <vector>
-#include <string>
 
 #include "seq/proteoform.hpp"
 #include "common/base/residue_freq.hpp"
@@ -37,7 +36,7 @@ ResFreqPtrVec compResidueFreq(const ResiduePtrVec &residue_list,
 
 int computeAvgLength(const ResFreqPtrVec &residue_ptrs, double convert_ratio);
 
-}  // namespace tdgf_util
+}  // namespace count_util
 
 }  // namespace toppic
 

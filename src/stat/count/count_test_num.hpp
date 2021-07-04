@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_STAT_COUNT_COUNT_TEST_NUM_HPP_
 #define TOPPIC_STAT_COUNT_COUNT_TEST_NUM_HPP_
 
@@ -24,15 +23,6 @@ namespace toppic {
 
 class CountTestNum {
  public:
-  /*
-  CountTestNum(const ProteoformPtrVec &raw_proteo_ptrs, 
-               const ProteoformPtrVec &mod_proteo_ptrs,
-               const ResFreqPtrVec &residue_ptrs, 
-               double convert_ratio, double max_prec_mass,
-               double max_ptm_mass);
-               */
-  //CountTestNum(TdgfMngPtr mng_ptr);
-
   CountTestNum(double convert_ratio, double max_ptm_mass, 
                double max_prec_mass, PrsmParaPtr para_ptr);
 
@@ -48,9 +38,6 @@ class CountTestNum {
  private:
   static double PREFIX_SUFFIX_ADJUST() {return 0.693;}
   static double INTERNAL_ADJUST() {return 0.508;}
-
-  //ProteoformPtrVec raw_proteo_ptrs_;
-  //ProteoformPtrVec mod_proteo_ptrs_;
 
   double *comp_mass_cnts_;
   double *pref_mass_cnts_;

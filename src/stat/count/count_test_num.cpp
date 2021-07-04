@@ -12,14 +12,12 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include <cmath>
 
 #include "common/util/logger.hpp"
 #include "seq/fasta_reader.hpp"
 #include "common/base/mod_util.hpp"
 #include "common/base/residue_base.hpp"
-#include "common/base/residue_util.hpp"
 #include "seq/proteoform_factory.hpp"
 #include "stat/count/count_util.hpp"
 #include "stat/count/count_test_num.hpp"
@@ -32,7 +30,6 @@ CountTestNum::CountTestNum(double convert_ratio, double max_ptm_mass,
   max_ptm_mass_ = max_ptm_mass;
   max_sp_len_ = static_cast<int>(std::round(max_prec_mass * convert_ratio_));
   init(prsm_para_ptr);
-  LOG_DEBUG("count numbers initialized");
 }
 
 CountTestNum::~CountTestNum() {
