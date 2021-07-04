@@ -51,7 +51,7 @@ MsHeader::MsHeader(XmlDOMElement* element) {
 
 double MsHeader::getPrecMonoMass() {
   if (prec_mono_mz_ < 0 || std::isnan(prec_mono_mz_)) {
-    LOG_WARN("id " << id_ << " monoisotopic mass is not initialized!");
+    LOG_INFO("id " << id_ << " monoisotopic mass is not initialized!");
     return 0.0;
   } else {
     return peak_util::compPeakNeutralMass(prec_mono_mz_, prec_charge_);
