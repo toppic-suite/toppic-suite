@@ -12,10 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_STAT_TDGF_TDGF_MNG_HPP_
 #define TOPPIC_STAT_TDGF_TDGF_MNG_HPP_
-
 
 #include <string>
 
@@ -27,15 +25,7 @@ class TdgfMng {
  public:
   TdgfMng(PrsmParaPtr prsm_para_ptr, int shift_num, double max_ptm_mass, bool use_gf, 
           bool variable_ptm, int thread_num, const std::string &input_file_ext, 
-          const std::string & output_file_ext):
-      input_file_ext_(input_file_ext),
-      output_file_ext_(output_file_ext),
-      prsm_para_ptr_(prsm_para_ptr),
-      use_gf_(use_gf),
-      variable_ptm_(variable_ptm),
-      max_ptm_mass_(max_ptm_mass),
-      unexpected_shift_num_(shift_num),
-      thread_num_(thread_num) {}
+          const std::string & output_file_ext);
 
   std::string input_file_ext_;
 
@@ -43,23 +33,23 @@ class TdgfMng {
 
   PrsmParaPtr prsm_para_ptr_;
 
-  /** Prsm filter */
+  // Prsm filter 
   double comp_evalue_min_match_frag_num_ = 4.0;
 
   bool use_gf_ = false;
 
   bool variable_ptm_ = false;
 
-  /* max ptm mass is used in the function for counting sequence numbers*/
+  // Max ptm mass is used in the function for counting sequence numbers
   double max_ptm_mass_ = 1000000;
 
-  /** do tdgf computation if poisson report evalue > 10^-8 
-   * or match frag num < 25 */
+  // Do tdgf computation if poisson report evalue > 10^-8 
+  // or match frag num < 25 
   double computation_evalue_cutoff = 0.00000001;
 
   int computation_frag_num_cutoff = 25;
 
-  /** dp table */
+  // dp table 
   // number of mass shift
   int unexpected_shift_num_ = 2;
 

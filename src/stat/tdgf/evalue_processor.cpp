@@ -17,9 +17,6 @@
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "common/thread/simple_thread_pool.hpp"
-#include "seq/proteoform.hpp"
-#include "seq/fasta_reader.hpp"
-#include "ms/spec/simple_msalign_reader.hpp"
 #include "ms/spec/msalign_util.hpp"
 #include "ms/factory/spectrum_set_factory.hpp"
 #include "prsm/prsm.hpp"
@@ -37,7 +34,6 @@ void EValueProcessor::init() {
                                                  mng_ptr_->max_ptm_mass_,
                                                  mng_ptr_->max_prec_mass_,
                                                  mng_ptr_->prsm_para_ptr_);
-  LOG_DEBUG("Count test number initialized.");
 
   ResFreqPtrVec residue_freqs = test_num_ptr_->getResFreqPtrVec();
   if (!mng_ptr_->use_gf_) {
@@ -45,7 +41,6 @@ void EValueProcessor::init() {
   }
 
   comp_pvalue_ptr_ = std::make_shared<CompPValueArray>(test_num_ptr_, mng_ptr_);
-  LOG_DEBUG("comp pvalue array initialized");
 
 }
 
@@ -83,7 +78,7 @@ std::function<void()> geneTask(SpectrumSetPtr spec_set_ptr,
   };
 }
 
-/* compute E-value. Separate: compute E-value separately or not */
+// Compute E-value. Separate: compute E-values for PrSMs separately or not 
 void EValueProcessor::process(bool is_separate) {
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
@@ -95,7 +90,6 @@ void EValueProcessor::process(bool is_separate) {
   ModPtrVec fix_mod_ptr_vec = prsm_para_ptr->getFixModPtrVec();
   std::string input_file_name = file_util::basename(sp_file_name) + "." + mng_ptr_->input_file_ext_;
   PrsmReader prsm_reader(input_file_name);
-  LOG_DEBUG("start read prsm");
   PrsmPtr prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
 
   // init variables
@@ -114,7 +108,6 @@ void EValueProcessor::process(bool is_separate) {
   int cnt = 0;
   SpectrumSetPtr spec_set_ptr;
 
-  LOG_DEBUG("Start search");
   while((spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(reader_ptr, sp_para_ptr))!= nullptr){
     cnt += group_spec_num;
     if(spec_set_ptr->isValid()){
@@ -189,7 +182,7 @@ void EValueProcessor::compEvalues(SpectrumSetPtr spec_set_ptr, PrsmPtrVec &sele_
   if (!mng_ptr_->use_gf_ 
       && comp_pvalue_table_ptr_->inTable(spec_set_ptr->getDeconvMsPtrVec(), sele_prsm_ptrs)) {
     comp_pvalue_table_ptr_->process(spec_set_ptr->getDeconvMsPtrVec(), sele_prsm_ptrs, ppo);
-    LOG_DEBUG("Using table");
+    //LOG_DEBUG("Using table");
   } else {
     comp_pvalue_ptr_->process(spec_set_ptr, sele_prsm_ptrs, ppo, is_separate);
   }
@@ -197,9 +190,9 @@ void EValueProcessor::compEvalues(SpectrumSetPtr spec_set_ptr, PrsmPtrVec &sele_
   // if matched peak number is too small or E-value is 0, replace it
   // with a max evalue.
   for (unsigned i = 0; i < sele_prsm_ptrs.size(); i++) {
-    LOG_DEBUG("Fragment number " << sele_prsm_ptrs[i]->getMatchFragNum());
+    //LOG_DEBUG("Fragment number " << sele_prsm_ptrs[i]->getMatchFragNum());
     if (std::round(sele_prsm_ptrs[i]->getMatchFragNum()) <= std::round(mng_ptr_->comp_evalue_min_match_frag_num_)) {
-      LOG_DEBUG("Set max e value ");
+      //LOG_DEBUG("Set max e value ");
       sele_prsm_ptrs[i]->setExpectedValuePtr(ExpectedValue::getMaxEvaluePtr());
     } else {
       if (sele_prsm_ptrs[i]->getEValue() == 0.0) {
@@ -214,21 +207,16 @@ void EValueProcessor::processOneSpectrum(SpectrumSetPtr spec_set_ptr,
                                          PrsmPtrVec &sele_prsm_ptrs,
                                          double ppo, bool is_separate,
                                          PrsmXmlWriter &writer) {
-  //LOG_DEBUG("sele prsm number " << sele_prsm_ptrs.size());
   if (spec_set_ptr->isValid()) {
 
     bool need_comp = checkPrsms(sele_prsm_ptrs);
-    //LOG_DEBUG("Need computation: " << need_comp );
 
     if (need_comp) {
       compEvalues(spec_set_ptr, sele_prsm_ptrs, ppo, is_separate);
     }
 
-    //LOG_DEBUG("start sort");
     std::sort(sele_prsm_ptrs.begin(), sele_prsm_ptrs.end(), Prsm::cmpEValueInc);
-    LOG_DEBUG("sele_prsm_ptrs size " << sele_prsm_ptrs.size());
     writer.writeVector(sele_prsm_ptrs);
-    //LOG_DEBUG("writing complete");
   }
 }
 

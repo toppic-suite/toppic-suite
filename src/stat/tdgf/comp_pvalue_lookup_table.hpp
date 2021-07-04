@@ -12,16 +12,16 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_STAT_TDGF_COMP_PVALUE_LOOKUP_TABLE_HPP_
 #define TOPPIC_STAT_TDGF_COMP_PVALUE_LOOKUP_TABLE_HPP_
 
 #include <vector>
 #include <fstream>
 
+#include "ms/spec/deconv_ms.hpp"
+#include "prsm/prsm.hpp"
 #include "stat/count/count_test_num.hpp"
 #include "stat/tdgf/tdgf_mng.hpp"
-#include "stat/tdgf/comp_prob_value.hpp"
 
 namespace toppic {
 
@@ -54,15 +54,6 @@ class CompPValueLookupTable {
 };
 
 typedef std::shared_ptr<CompPValueLookupTable> CompPValueLookupTablePtr;
-
-int getPeakIndex(int i);
-
-int getFragIndex(int i);
-
-// get x1, x2, y1, y2
-std::vector<int> getFourIndex(int peak_num, int frag_num);
-
-int getPeakNumFromIndex(int idx);
 
 }  // namespace toppic
 

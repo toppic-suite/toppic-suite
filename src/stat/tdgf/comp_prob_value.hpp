@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_STAT_TDGF_COMP_PROB_VALUE_HPP_
 #define TOPPIC_STAT_TDGF_COMP_PROB_VALUE_HPP_
 
@@ -20,27 +19,10 @@
 
 #include "common/base/residue_freq.hpp"
 #include "ms/spec/prm_peak.hpp"
-#include "ms/spec/base_peak_type.hpp"
 #include "prsm/prsm.hpp"
+#include "stat/tdgf/prob_peak.hpp"
 
 namespace toppic {
-
-class ProbPeak {
- public:
-  ProbPeak(PrmPeakPtr peak_ptr, int spectrum_id, int height, 
-           bool strict, double convert_ratio);
-  int mass_;
-  int tolerance_;
-  BasePeakTypePtr base_type_ptr_;
-  int spectrum_id_;
-  int mass_bgn_;
-  int mass_end_;
-  int table_bgn_;
-  int table_end_;
-};
-
-class CompProbValue;
-typedef std::shared_ptr<CompProbValue> CompProbValuePtr;
 
 class CompProbValue {
  public:
@@ -58,55 +40,51 @@ class CompProbValue {
   double getCondProb(int shift, int thresh);
   double getCondProbOneValue(int shift, int value);
 
-  static void compProbArray(CompProbValuePtr comp_prob_ptr, const ResFreqPtrVec &n_term_residue_ptrs, 
-                            const PrmPeakPtrVec2D &peak_ptr_2d, const PrsmPtrVec &prsm_ptrs, bool strict,
-                            double prob_prec_mass, PeakTolerancePtr tole_ptr, std::vector<double> &results);
-
  private:
   static int const ORI_PAGE_LEN = 5000;
   static int const ORI_BLOCK_LEN = 50;
   static double K1() {return 0.1;}
   static double K2() {return 0.1;}
 
-  /* double to integer convert ratio */
+  // double to integer convert ratio 
   double convert_ratio_;
 
-  /**********************************************************
-   * Amino acids
-   **********************************************************/
+  //**********************************************************
+  // Amino acids
+  //**********************************************************
   std::vector<int> n_term_acid_masses_;
   std::vector<double> n_term_acid_frequencies_;
   std::vector<int> residue_masses_;
   std::vector<double> residue_frequencies_;
   int residue_avg_len_ = 0;
 
-  /**********************************************************
-   * DP Table
-   **********************************************************/
-  /** number of unexpected mutations */
+  //**********************************************************
+  // DP Table
+  //**********************************************************
+  // Number of unexpected mutations 
   int max_layer_num_ = 0;
-  /** maximum score */
+  // Maximum score 
   int max_table_height_ = 0;
 
-  /** page length in integer */
+  // Page length in integer 
   int page_len_ = 0;
   int block_len_ = 0;
 
-  /** spectrum */
+  // Spectrum 
   int max_sp_len_ = 0;
 
   std::vector<ProbPeak> prob_peaks_;
   int sp_len_;
 
-  /** table height */
+  // table height 
   int height_;
 
   int sp_table_size_;      // spLen * height
   int page_table_size_;    // pageLen * height
   int block_table_size_;   // blockLen * height
 
-  std::vector<int> acid_dists_;   // acidMass * height;
-  std::vector<double> factors_; //normalization factors;
+  std::vector<int> acid_dists_; // acidMass * height;
+  std::vector<double> factors_; // normalization factors;
 
   int shift_num_;
 
@@ -153,6 +131,8 @@ class CompProbValue {
                     std::vector<std::vector<double>> &cur_results);
 
 };
+
+typedef std::shared_ptr<CompProbValue> CompProbValuePtr;
 
 }
 #endif

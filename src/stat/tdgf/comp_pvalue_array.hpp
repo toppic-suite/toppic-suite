@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_STAT_TDGF_COMP_PVALUE_ARRAY_HPP_
 #define TOPPIC_STAT_TDGF_COMP_PVALUE_ARRAY_HPP_
 

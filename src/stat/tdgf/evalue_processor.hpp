@@ -12,11 +12,9 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_STAT_TDGF_EVALUE_PROCESSOR_HPP_
 #define TOPPIC_STAT_TDGF_EVALUE_PROCESSOR_HPP_
 
-#include "seq/proteoform.hpp"
 #include "prsm/prsm.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 #include "stat/tdgf/tdgf_mng.hpp"

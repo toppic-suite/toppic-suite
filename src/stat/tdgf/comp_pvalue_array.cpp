@@ -12,16 +12,13 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include <cmath>
-#include <limits>
-#include <vector>
 
 #include "common/util/logger.hpp"
-#include "common/base/base_data.hpp"
 #include "common/base/mass_constant.hpp"
 #include "ms/spec/deconv_ms_util.hpp"
 #include "ms/factory/prm_ms_factory.hpp"
+#include "stat/tdgf/comp_prob_value_array.hpp"
 #include "stat/tdgf/comp_pvalue_array.hpp"
 
 namespace toppic {
@@ -38,10 +35,9 @@ CompPValueArray::CompPValueArray(CountTestNumPtr test_num_ptr, TdgfMngPtr mng_pt
                                                    mng_ptr_->unexpected_shift_num_ + 1,
                                                    mng_ptr_->max_table_height_,
                                                    mng_ptr_->max_prec_mass_);
-  LOG_DEBUG("comp prob value initialized")
 }
 
-/* set alignment */
+// set alignment 
 void CompPValueArray::compMultiExpectedValues(const PrmMsPtrVec &ms_six_ptr_vec,
                                               PrsmPtrVec &prsm_ptrs,
                                               double ppo, bool strict) {
@@ -63,16 +59,15 @@ void CompPValueArray::compMultiExpectedValues(const PrmMsPtrVec &ms_six_ptr_vec,
   }
   PeakTolerancePtr tole_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
   std::vector<double> prot_probs;
-  CompProbValue::compProbArray(comp_prob_ptr_, prot_n_term_residue_ptrs_,
-                               prm_ptr_2d, prsm_ptrs, strict, prob_prec_mass, tole_ptr, prot_probs);
+  comp_prob_value_array::compProbArray(comp_prob_ptr_, prot_n_term_residue_ptrs_,
+                                      prm_ptr_2d, prsm_ptrs, strict, 
+                                      prob_prec_mass, tole_ptr, prot_probs);
   std::vector<double> pep_probs;
-  CompProbValue::compProbArray(comp_prob_ptr_, pep_n_term_residue_ptrs_,
+  comp_prob_value_array::compProbArray(comp_prob_ptr_, pep_n_term_residue_ptrs_,
                                prm_ptr_2d, prsm_ptrs, strict, prob_prec_mass, tole_ptr, pep_probs);
-  // LOG_DEBUG("probability computation complete");
   double tolerance = ms_six_ptr_vec[0]->getMsHeaderPtr()->getErrorTolerance(ppo);
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     double prec_mass = ms_six_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMassMinusWater();
-    // LOG_DEBUG("prsm " << i << " prsm size " << prsm_ptrs.size());
     int unexpect_shift_num = prsm_ptrs[i]->getProteoformPtr()->getMassShiftNum(AlterType::UNEXPECTED);
     ProteoformTypePtr type_ptr = prsm_ptrs[i]->getProteoformPtr()->getProteoformType();
 
@@ -84,7 +79,8 @@ void CompPValueArray::compMultiExpectedValues(const PrmMsPtrVec &ms_six_ptr_vec,
       if (std::abs(prsm_ptrs[i]->getOriPrecMass() - prsm_ptrs[i]->getAdjustedPrecMass()) > tolerance) {
         if (prsm_ptrs[i]->getOriPrecMass() < prsm_ptrs[i]->getAdjustedPrecMass()) {
           prec_mass += mass_constant::getIsotopeMass();
-        } else {
+        } 
+        else {
           prec_mass -= mass_constant::getIsotopeMass();
         }
       }
@@ -95,19 +91,17 @@ void CompPValueArray::compMultiExpectedValues(const PrmMsPtrVec &ms_six_ptr_vec,
       // need to be improved
       if (unexpect_shift_num == 0) {
         index = 1;
-      } else {
+      } 
+      else {
         index = unexpect_shift_num;
       }
-    } else {
+    } 
+    else {
       index = unexpect_shift_num;
     }
 
-    LOG_DEBUG("prec_mass " << prec_mass);
     double cand_num = test_num_ptr_->compCandNum(type_ptr, index, prec_mass, tolerance);
 
-    // LOG_DEBUG("Shift number " << unexpect_shift_num << " type " << type_ptr->getName()
-    // << " one prob " << prot_probs[i] << " cand num " << cand_num);
-    // LOG_DEBUG("candidate number " << cand_num);
     if (cand_num == 0.0) {
       LOG_WARN("Zero candidate number");
       cand_num = ExpectedValue::getMaxDouble();
@@ -116,11 +110,11 @@ void CompPValueArray::compMultiExpectedValues(const PrmMsPtrVec &ms_six_ptr_vec,
     if (type_ptr == ProteoformType::COMPLETE || type_ptr == ProteoformType::PREFIX) {
       ExpectedValuePtr ev_ptr = std::make_shared<ExpectedValue>(prot_probs[i], cand_num, 1);
       prsm_ptrs[i]->setExpectedValuePtr(ev_ptr);
-    } else {
+    } 
+    else {
       ExpectedValuePtr ev_ptr = std::make_shared<ExpectedValue>(pep_probs[i], cand_num, 1);
       prsm_ptrs[i]->setExpectedValuePtr(ev_ptr);
     }
-    // LOG_DEBUG("assignment complete");
   }
 }
 
@@ -129,12 +123,6 @@ void CompPValueArray::compSingleExpectedValue(const DeconvMsPtrVec &ms_ptr_vec,
   double refine_prec_mass = prsm_ptr->getAdjustedPrecMass();
   DeconvMsPtrVec refine_ms_ptr_vec = deconv_ms_util::getRefineMsPtrVec(ms_ptr_vec, refine_prec_mass);
 
-  /*
-     LOG_DEBUG("recalibration " << prsm_ptr->getCalibration()
-     << " original precursor "
-     << ms_ptr->getHeaderPtr()->getPrecMonoMass()
-     << " precursor " << refine_prec_mass);
-     */
   PrmMsPtrVec prm_ms_ptr_vec = prm_ms_factory::geneMsSixPtrVec(refine_ms_ptr_vec,
                                                                mng_ptr_->prsm_para_ptr_->getSpParaPtr(),
                                                                refine_prec_mass);
@@ -150,7 +138,8 @@ void CompPValueArray::process(SpectrumSetPtr spec_set_ptr, PrsmPtrVec &prsm_ptrs
     for (unsigned i = 0; i < prsm_ptrs.size(); i++) {
       compSingleExpectedValue(spec_set_ptr->getDeconvMsPtrVec(), prsm_ptrs[i], ppo);
     }
-  } else {
+  } 
+  else {
     compMultiExpectedValues(spec_set_ptr->getMsSixPtrVec(), prsm_ptrs, ppo, false);
   }
 }
