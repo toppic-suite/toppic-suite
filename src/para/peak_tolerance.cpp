@@ -12,6 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include <cmath>
+
 #include "common/util/str_util.hpp"
 #include "common/xml/xml_dom_util.hpp"
 #include "common/xml/xml_dom_document.hpp"
@@ -30,6 +32,10 @@ PeakTolerance::PeakTolerance(xercesc::DOMElement* element) {
   ppo_ = xml_dom_util::getDoubleChildValue(element, "ppo", 0);
   use_min_tolerance_ = xml_dom_util::getDoubleChildValue(element, "use_min_tolerance", 0);
   min_tolerance_ = xml_dom_util::getDoubleChildValue(element, "min_tolerance", 0);
+}
+
+int PeakTolerance::getIntPpm() {
+  return static_cast<int>(std::round(ppo_ * 1000000));
 }
 
 double PeakTolerance::compStrictErrorTole(double mass) {

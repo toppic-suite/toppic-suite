@@ -13,6 +13,7 @@
 //limitations under the License.
 
 #include <cmath>
+#include <exception>
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
@@ -154,40 +155,53 @@ void CompPValueLookupTable::initTable() {
   std::vector<std::string> strs;
 
   input_.open(
-      mng_ptr_->prsm_para_ptr_->getResourceDir() + file_util::getFileSeparator() + "p_value_table"
-      + file_util::getFileSeparator() + "ppm" + str_util::toString(ppm) + "_ptm0.txt",
-      std::ios::in);
+              mng_ptr_->prsm_para_ptr_->getResourceDir() + file_util::getFileSeparator() + "p_value_table"
+              + file_util::getFileSeparator() + "ppm" + str_util::toString(ppm) + "_ptm0.txt",
+              std::ios::in);
+  if (!input_.is_open()) {
+    LOG_ERROR("Exception in reading the lookup table file for E-value computation!");
+    exit(EXIT_FAILURE);
+  }
 
   while (std::getline(input_, line)) {
     strs = str_util::split(line, " \t");
     ptm0_[getPeakIndex(std::stoi(strs[0]))][getFragIndex(std::stoi(strs[1]))] =
-        std::stod(strs[2]);
+      std::stod(strs[2]);
   }
 
   input_.close();
 
   input_.open(
-      mng_ptr_->prsm_para_ptr_->getResourceDir() + file_util::getFileSeparator() + "p_value_table"
-      + file_util::getFileSeparator() + "ppm" + str_util::toString(ppm) + "_ptm1.txt",
-      std::ios::in);
+              mng_ptr_->prsm_para_ptr_->getResourceDir() + file_util::getFileSeparator() + "p_value_table"
+              + file_util::getFileSeparator() + "ppm" + str_util::toString(ppm) + "_ptm1.txt",
+              std::ios::in);
+
+  if (!input_.is_open()) {
+    LOG_ERROR("Exception in reading the lookup table file for E-value computation!");
+    exit(EXIT_FAILURE);
+  }
 
   while (std::getline(input_, line)) {
     strs = str_util::split(line, " \t");
     ptm1_[getPeakIndex(std::stoi(strs[0]))][getFragIndex(std::stoi(strs[1]))] =
-        std::stod(strs[2]);
+      std::stod(strs[2]);
   }
 
   input_.close();
 
   input_.open(
-      mng_ptr_->prsm_para_ptr_->getResourceDir() + file_util::getFileSeparator() + "p_value_table"
-      + file_util::getFileSeparator() + "ppm" + str_util::toString(ppm) + "_ptm2.txt",
-      std::ios::in);
+              mng_ptr_->prsm_para_ptr_->getResourceDir() + file_util::getFileSeparator() + "p_value_table"
+              + file_util::getFileSeparator() + "ppm" + str_util::toString(ppm) + "_ptm2.txt",
+              std::ios::in);
+  if (!input_.is_open()) {
+    LOG_ERROR("Exception in reading the lookup table file for E-value computation!");
+    exit(EXIT_FAILURE);
+  }
 
   while (std::getline(input_, line)) {
     strs = str_util::split(line, " \t");
     ptm2_[getPeakIndex(std::stoi(strs[0]))][getFragIndex(std::stoi(strs[1]))] =
-        std::stod(strs[2]);
+      std::stod(strs[2]);
   }
 
   input_.close();

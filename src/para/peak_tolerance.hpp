@@ -38,7 +38,7 @@ class PeakTolerance {
 
   double getPpo() {return ppo_;}
 
-  int getIntPpm() {return static_cast<int>(ppo_ * 1000000);}
+  int getIntPpm();
 
   bool isUseMinTolerance() {return use_min_tolerance_;}
 
