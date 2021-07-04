@@ -83,7 +83,9 @@ std::vector<std::vector<std::string>> readModTxtForTsv(const std::string &file_n
       catch(std::invalid_argument& e){
         throw "Error in PTM mass.";
       }
-      std::vector<std::string> single_mod{mod_name, mass};
+      // amino acid
+      if (l[2] == "*") l[2] = "ARNDCEQGHILKMFPSTWYV";
+      std::vector<std::string> single_mod{mod_name, mass, l[2]};
       mod_data.push_back(single_mod);
     } catch (char const* e) {
       LOG_ERROR("Errors in the PTM file: " << file_name);

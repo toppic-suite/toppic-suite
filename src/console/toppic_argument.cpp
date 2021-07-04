@@ -78,6 +78,30 @@ void Argument::outputArguments(std::ostream &output,
   output << std::setw(44) << std::left << "Fragmentation method: " << "\t" << arguments["activation"] << std::endl;
   output << std::setw(44) << std::left << "Search type: " << "\t" << arguments["searchType"] << std::endl;
 
+  if (arguments["fixedMod"] != "") {
+    //add fixed PTM information 
+    if (arguments["fixedMod"] == "C57") {
+      output << std::setw(44) << std::left << "Fixed PTMs BEGIN" << std::endl;
+      output << std::setw(44) << std::left << "Carbamidomethylation" << "\t" << 57.021464 << "\t" << "C" << std::endl;
+      output << std::setw(44) << std::left << "Fixed PTMs END" << std::endl;
+    }
+    else if (arguments["fixedMod"] == "C58") {
+      output << std::setw(44) << std::left << "Fixed PTMs BEGIN" << std::endl;
+      output << std::setw(44) << std::left << "Carboxymethylation" << "\t" << 58.005479 << "\t" << "C" << std::endl;
+      output << std::setw(44) << std::left << "Fixed PTMs END" << std::endl;
+    }
+    else {
+      output << std::setw(44) << std::left << "Fixed PTMs file name: " << "\t" << arguments["fixedMod"] << std::endl;
+      output << std::setw(44) << std::left << "Fixed PTMs BEGIN" << std::endl;
+      std::vector<std::vector<std::string>> mod_data = mod_util::readModTxtForTsv(arguments["fixedMod"]);
+      for (size_t i = 0; i < mod_data.size(); i++) {
+        output << std::setw(44) << std::left << mod_data[i][0] << "\t" << mod_data[i][1] << "\t" << mod_data[i][2] << std::endl;
+      }
+      output << std::setw(44) << std::left << "Fixed PTMs END" << std::endl;
+    }
+  }
+
+  /*
   if (arguments["fixedMod"] == "") {
     output << std::setw(44) << std::left << "Fixed modifications: " << "\t" << "None" << std::endl;
   } 
@@ -90,6 +114,7 @@ void Argument::outputArguments(std::ostream &output,
   else {
     output << std::setw(44) << std::left << "Fixed modifications: " << "\t" << arguments["fixedMod"] << std::endl;
   }
+  */
 
   if (arguments["useFeatureFile"] == "true") {
     output << std::setw(44) << std::left << "Use TopFD feature file: " << "\t" << "True" << std::endl;
@@ -119,8 +144,21 @@ void Argument::outputArguments(std::ostream &output,
 
   if (arguments["residueModFileName"] != "") {
     output << std::setw(44) << std::left << "Common modification file name: " << "\t" << arguments["residueModFileName"] << std::endl;
+    output << std::setw(44) << std::left <<  "PTMs for MIScore BEGIN" << std::endl;
+    std::vector<std::vector<std::string>> mod_data = mod_util::readModTxtForTsv(arguments["residueModFileName"]);
+    for (size_t i = 0; i < mod_data.size(); i++) {
+      output << std::setw(44) << std::left << mod_data[i][0] << "\t" << mod_data[i][1] << "\t" << mod_data[i][2] << std::endl;
+    }
+    output << std::setw(44) << std::left <<  "PTMs for MIScore END" << std::endl;
     output << std::setw(44) << std::left << "MIScore threshold: " << "\t" << arguments["localThreshold"] << std::endl;
   }
+
+  /*
+  if (arguments["residueModFileName"] != "") {
+    output << std::setw(44) << std::left << "Common modification file name: " << "\t" << arguments["residueModFileName"] << std::endl;
+    output << std::setw(44) << std::left << "MIScore threshold: " << "\t" << arguments["localThreshold"] << std::endl;
+  }
+  */
   output << std::setw(44) << std::left << "Executable file directory: " << "\t" << arguments["executiveDir"] << std::endl;
   output << std::setw(44) << std::left << "Start time: " << "\t" << arguments["startTime"] << std::endl;
   if (arguments["endTime"] != "") {
@@ -129,37 +167,6 @@ void Argument::outputArguments(std::ostream &output,
   output << std::setw(44) << std::left << "Version: " << "\t" << arguments["version"] << std::endl;
   output << "********************** Parameters **********************" << std::endl;
 
-  if (arguments["fixedMod"] == "") {
-    return;
-  }
-  else{
-    //add fixed PTM information 
-    output << "********************** Fixed PTM **********************" << std::endl;
-    if (arguments["fixedMod"] == "C57") {
-      output << std::setw(44) << std::left << "Carbamidomethylation" << "\t" << 57.021464 << std::endl;
-    }
-    else if (arguments["fixedMod"] == "C58") {
-      output << std::setw(44) << std::left << "Carboxymethylation" << "\t" << 58.005479 << std::endl;
-    }
-    else {
-      std::vector<std::vector<std::string>> mod_data = mod_util::readModTxtForTsv(arguments["fixedMod"]);
-      for (size_t i = 0; i < mod_data.size(); i++) {
-        output << std::setw(44) << std::left << mod_data[i][0] << "\t" << mod_data[i][1] << std::endl;
-      }
-    }
-    output << "********************** Fixed PTM **********************" << std::endl;
-  }
-  if (arguments["residueModFileName"] == "") {
-    return;
-  } 
-  else{
-    output << "********************** Common PTM **********************" << std::endl;
-    std::vector<std::vector<std::string>> mod_data = mod_util::readModTxtForTsv(arguments["residueModFileName"]);
-    for (size_t i = 0; i < mod_data.size(); i++) {
-      output << std::setw(44) << std::left << mod_data[i][0] << "\t" << mod_data[i][1] << std::endl;
-    }
-    output << "********************** Common PTM **********************" << std::endl;
-  }
 }
 
 std::string Argument::outputTsvArguments(std::map<std::string, std::string> arguments) {
