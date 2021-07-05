@@ -13,25 +13,13 @@
 //limitations under the License.
 
 #include <algorithm>
-#include <utility>
-#include <string>
-#include <vector>
 #include <numeric>
 
-#include "common/base/amino_acid_base.hpp"
-#include "common/base/activation_base.hpp"
-#include "common/base/mod_util.hpp"
 #include "common/base/residue_base.hpp"
-#include "common/base/residue_util.hpp"
 #include "common/base/mass_constant.hpp"
-
-#include "seq/proteoform_factory.hpp"
 #include "ms/factory/extend_ms_util.hpp"
-
 #include "prsm/peak_ion_pair_util.hpp"
 #include "prsm/theo_peak_util.hpp"
-
-#include "stat/local/local_mng.hpp"
 #include "stat/local/local_util.hpp"
 
 namespace toppic {

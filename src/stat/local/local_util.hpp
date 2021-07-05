@@ -12,20 +12,12 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_STAT_LOCAL_UTIL_HPP_
 #define TOPPIC_STAT_LOCAL_UTIL_HPP_
 
-#include <vector>
-
-#include "common/base/amino_acid_base.hpp"
 #include "common/base/ptm.hpp"
 #include "seq/mass_shift.hpp"
-#include "common/base/ptm.hpp"
-
 #include "prsm/prsm.hpp"
-#include "prsm/peak_ion_pair_util.hpp"
-
 #include "stat/local/local_mng.hpp"
 
 namespace toppic {

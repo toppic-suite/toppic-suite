@@ -12,35 +12,18 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_STAT_LOCAL_PROCESSOR_HPP_
 #define TOPPIC_STAT_LOCAL_PROCESSOR_HPP_
 
-#include <vector>
-
 #include "common/base/ptm.hpp"
-#include "seq/local_anno.hpp"
-#include "prsm/prsm_xml_writer.hpp"
-#include "prsm/prsm_reader.hpp"
-#include "ms/spec/theo_peak.hpp"
-#include "stat/tdgf/tdgf_mng.hpp"
+#include "prsm/prsm.hpp"
 #include "stat/local/local_mng.hpp"
 
 namespace toppic {
 
 class LocalProcessor {
  public:
-  explicit LocalProcessor(LocalMngPtr mng_ptr):
-      mng_ptr_(mng_ptr),
-      ppo_(mng_ptr->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()->getPpo()),
-      theta_(mng_ptr->theta_),
-      threshold_(mng_ptr->threshold_),
-      beta_(mng_ptr->beta_),
-      min_mass_(mng_ptr->min_mass_),
-      p1_(mng_ptr->p1_),
-      p2_(mng_ptr->p2_) {
-        init();
-      }
+  explicit LocalProcessor(LocalMngPtr mng_ptr);
 
   void process();
 

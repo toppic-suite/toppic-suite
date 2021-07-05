@@ -12,14 +12,12 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <string>
 #include <algorithm>
-#include <vector>
-#include <functional>
 #include <cmath>
 #include <numeric>
 
 #include "common/util/logger.hpp"
+#include "common/util/file_util.hpp"
 #include "common/base/ptm.hpp"
 #include "common/base/ptm_util.hpp"
 #include "common/base/mod_util.hpp"
@@ -38,13 +36,25 @@
 #include "ms/factory/spectrum_set_factory.hpp"
 
 #include "prsm/prsm.hpp"
-#include "prsm/peak_ion_pair.hpp"
-#include "prsm/peak_ion_pair_util.hpp"
+#include "prsm/prsm_reader.hpp"
+#include "prsm/prsm_xml_writer.hpp"
 
-#include "stat/local/local_processor.hpp"
 #include "stat/local/local_util.hpp"
+#include "stat/local/local_processor.hpp"
 
 namespace toppic {
+
+LocalProcessor::LocalProcessor(LocalMngPtr mng_ptr):
+  mng_ptr_(mng_ptr),
+  ppo_(mng_ptr->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()->getPpo()),
+  theta_(mng_ptr->theta_),
+  threshold_(mng_ptr->threshold_),
+  beta_(mng_ptr->beta_),
+  min_mass_(mng_ptr->min_mass_),
+  p1_(mng_ptr->p1_),
+  p2_(mng_ptr->p2_) {
+    init();
+  }
 
 void LocalProcessor::init() {
   ptm_vec_ = ptm_util::readPtmTxt(mng_ptr_->residueModFileName_);
@@ -62,8 +72,6 @@ void LocalProcessor::init() {
 }
 
 void LocalProcessor::process() {
-  
-
   std::string spec_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
 
   std::string input_file_name = file_util::basename(spec_file_name) + "." + mng_ptr_->input_file_ext_;
@@ -151,7 +159,7 @@ PrsmPtr LocalProcessor::processOnePtm(PrsmPtr prsm) {
     int new_num_match_ion = local_util::compMatchFragNum(one_known_proteoform,
                                                          prsm->getRefineMsPtrVec(),
                                                          mng_ptr_->min_mass_);
-    if (new_num_match_ion > ori_num_match_ion - DESC_MATCH_LIMIT
+    if (new_num_match_ion > ori_num_match_ion - mng_ptr_->DESC_MATCH_LIMIT_
         && new_num_match_ion > ori_num_match_ion * mng_ptr_->desc_ratio_) {
       prsm->setProteoformPtr(one_known_proteoform, mng_ptr_->prsm_para_ptr_->getSpParaPtr());
       return prsm;
@@ -164,7 +172,7 @@ PrsmPtr LocalProcessor::processOnePtm(PrsmPtr prsm) {
     double new_num_match_ion = local_util::compMatchFragNum(two_known_prsm,
                                                             prsm->getRefineMsPtrVec(),
                                                             mng_ptr_->min_mass_);
-    if (new_num_match_ion > ori_num_match_ion - DESC_MATCH_LIMIT
+    if (new_num_match_ion > ori_num_match_ion - mng_ptr_->DESC_MATCH_LIMIT_
         && new_num_match_ion > ori_num_match_ion * mng_ptr_->desc_ratio_) {
       prsm->setProteoformPtr(two_known_prsm, mng_ptr_->prsm_para_ptr_->getSpParaPtr());
       return prsm;
@@ -549,7 +557,7 @@ void LocalProcessor::getNtermTruncRange(ProteoformPtr proteoform, const ExtendMs
   MassShiftPtr mass_shift_ptr = proteoform->getMassShiftPtrVec(AlterType::UNEXPECTED)[0];
   local_util::compSupPeakNum(proteoform, extend_ms_ptr_vec, mass_shift_ptr, mng_ptr_->min_mass_, left_sup, tmp);
 
-  if (left_sup > LEFT_SUP_LIMIT) {
+  if (left_sup > mng_ptr_->LEFT_SUP_LIMIT_) {
     min = max = 0;
     return;
   }
@@ -590,7 +598,7 @@ void LocalProcessor::getCtermTruncRange(ProteoformPtr proteoform, const ExtendMs
   int right_sup, tmp;
   local_util::compSupPeakNum(proteoform, extend_ms_ptr_vec, mass_shift_ptr, mng_ptr_->min_mass_, tmp, right_sup);
 
-  if (right_sup > RIGHT_SUP_LIMIT) {
+  if (right_sup > mng_ptr_->RIGHT_SUP_LIMIT_) {
     min = max = 0;
     return;
   }
@@ -754,7 +762,7 @@ PrsmPtr LocalProcessor::processTwoPtm(PrsmPtr prsm) {
     int new_num_match_ion = local_util::compMatchFragNum(two_known_prsm,
                                                          prsm->getRefineMsPtrVec(),
                                                          mng_ptr_->min_mass_);
-    if (new_num_match_ion > ori_num_match_ion - DESC_MATCH_LIMIT
+    if (new_num_match_ion > ori_num_match_ion - mng_ptr_->DESC_MATCH_LIMIT_
         && new_num_match_ion > ori_num_match_ion * mng_ptr_->desc_ratio_) {
       prsm->setProteoformPtr(two_known_prsm, mng_ptr_->prsm_para_ptr_->getSpParaPtr());
       return prsm;
@@ -767,7 +775,7 @@ PrsmPtr LocalProcessor::processTwoPtm(PrsmPtr prsm) {
     double new_num_match_ion = local_util::compMatchFragNum(one_known_prsm,
                                                             prsm->getRefineMsPtrVec(),
                                                             mng_ptr_->min_mass_);
-    if (new_num_match_ion > ori_num_match_ion - DESC_MATCH_LIMIT
+    if (new_num_match_ion > ori_num_match_ion - mng_ptr_->DESC_MATCH_LIMIT_
         && new_num_match_ion > ori_num_match_ion * mng_ptr_->desc_ratio_) {
       prsm->setProteoformPtr(one_known_prsm, mng_ptr_->prsm_para_ptr_->getSpParaPtr());
       return prsm;
