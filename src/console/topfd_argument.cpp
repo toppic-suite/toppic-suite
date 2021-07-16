@@ -20,6 +20,7 @@
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/time_util.hpp"
+#include "common/util/mem_check.hpp"
 #include "console/topfd_argument.hpp"
 
 namespace toppic {
@@ -181,6 +182,11 @@ bool Argument::parse(int argc, char* argv[]) {
       }
     }
     if (vm.count("thread-number")) {
+      int max_thread = mem_check::getMaxThreads();
+      if (max_thread < std::stoi(thread_number)) {
+        std::cout << "ALERT: Based on the memory size, up to " << max_thread << " threads can be used on this computer. Please reset the thread number to " << max_thread << " or less and run the program again." << std::endl;
+        return false;
+      }
       topfd_para_ptr_->thread_number_ = std::stoi(thread_number);
     }
     if (vm.count("skip-html-folder")) {
