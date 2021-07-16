@@ -23,6 +23,7 @@
 #include "common/util/file_util.hpp"
 #include "common/util/str_util.hpp"
 #include "common/util/version.hpp"
+#include "common/util/mem_check.hpp"
 
 #include "console/topindex_argument.hpp"
 
@@ -179,6 +180,11 @@ bool Argument::parse(int argc, char* argv[]) {
     }
 
     if (vm.count("thread-number")) {
+      int max_thread = mem_check::getMaxThreads();
+      if (max_thread < std::stoi(thread_number)) {
+        std::cout << "ALERT: Based on the memory size, up to " << max_thread << " threads can be used on this computer. Please reset the thread number to " << max_thread << " or less and run the program again." << std::endl;
+        return false;
+      }
       arguments_["threadNumber"] = thread_number;
     }
   }

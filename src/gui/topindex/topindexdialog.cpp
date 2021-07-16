@@ -26,6 +26,7 @@
 #include "common/util/file_util.hpp"
 #include "common/base/base_data.hpp"
 #include "common/util/version.hpp"
+#include "common/util/mem_check.hpp"
 
 #include "gui/topindex/topindexdialog.h"
 #include "gui/topindex/ui_topindexdialog.h"
@@ -331,6 +332,13 @@ bool TopIndexDialog::checkError() {
   if (ui->errorToleranceEdit_2->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
                          tr("Mass error tolerance is empty!"),
+                         QMessageBox::Yes);
+    return true;
+  }
+  if (ui->threadNumberEdit->text().toInt() > toppic::mem_check::getMaxThreads()) {
+    int max_thread = toppic::mem_check::getMaxThreads();
+    QMessageBox::warning(this, tr("Warning"),
+                         QString("Thread number is too large! Based on the memory size, up to %1 threads can run on this computer. Please update the value and run the program again.").arg(max_thread).arg(max_thread),
                          QMessageBox::Yes);
     return true;
   }
