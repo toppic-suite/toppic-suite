@@ -51,8 +51,11 @@ MassShiftPtrVec massShiftFilter(const MassShiftPtrVec & mass_shift_vec, AlterTyp
 
 MassShiftPtrVec copyMassShiftVec(const MassShiftPtrVec & mass_shift_vec);
 
+// Sum up the shift values of unexpected modifications
 double compMassShift(const MassShiftPtrVec & mass_shift_vec);
 
+// Generate a new mass shift instance using the left bp pos, right bp pos of
+// the argument "shift" and the shift value as the argument "mass"
 MassShiftPtr geneMassShift(MassShiftPtr shift, double mass, AlterTypePtr type);
 
 void normalize(std::vector<double> & scr);

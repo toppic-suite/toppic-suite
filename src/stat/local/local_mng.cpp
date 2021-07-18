@@ -28,13 +28,10 @@ LocalMng::LocalMng(PrsmParaPtr prsm_para_ptr,
   output_file_ext_(output_file_ext),
   residueModFileName_(residueModFileName),
   threshold_(local_threshold),
-  theta_(0.994),
-  beta_(0.8),
   min_mass_(prsm_para_ptr->getSpParaPtr()->getMinMass()),
   max_ptm_mass_(max_ptm_mass),
-  min_ptm_mass_(min_ptm_mass),
-  p1_(0.915258),
-  p2_(21.1822) {}
-
+  min_ptm_mass_(min_ptm_mass) {
+    ppo_= prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()->getPpo();
+  }
 }  // namespace toppic
 

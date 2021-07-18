@@ -234,9 +234,9 @@ MassShiftPtr geneMassShift(MassShiftPtr shift, double mass, AlterTypePtr type) {
   ModPtr mod_ptr = std::make_shared<Mod>(ResidueBase::getEmptyResiduePtr(),
                                          ResidueBase::getEmptyResiduePtr());
   AlterPtr alter = std::make_shared<Alter>(shift->getLeftBpPos(),
-                                                     shift->getRightBpPos(),
-                                                     type, mass,
-                                                     mod_ptr);
+                                           shift->getRightBpPos(),
+                                           type, mass,
+                                           mod_ptr);
   MassShiftPtr mass_shift = std::make_shared<MassShift>(alter);
   return mass_shift;
 }

@@ -70,26 +70,15 @@ class LocalProcessor {
 
   LocalMngPtr mng_ptr_;
 
-  double ppo_;
-
-  double theta_;  // the weight for known/unknown ptm
-
-  double threshold_;  // threshold for MIScore
-
-  double beta_;  // the weight for one/two ptm
-
-  double min_mass_;
-
-  double p1_, p2_;
-
+  // Single PTMs
   PtmPtrVec ptm_vec_;
-
+  // Ptm Pairs
   PtmPairVec ptm_pair_vec_;
-
+  // N-terminal modification list
   ModPtrVec mod_list_N_;
-
+  // C-terminal modification list
   ModPtrVec mod_list_C_;
-
+  // Modification list for any positions
   ModPtrVec mod_list_any_;
 };
 

@@ -37,9 +37,9 @@ class LocalMng {
   std::string output_file_ext_;
   std::string residueModFileName_;
 
-  double threshold_;
+  double ppo_;
 
-  double theta_, beta_;
+  double threshold_;
 
   double min_mass_;
 
@@ -47,8 +47,14 @@ class LocalMng {
 
   double min_ptm_mass_;
 
-  double p1_, p2_;
-  
+  double theta_ = 0.994;  // the weight for known/unknown ptm
+
+  double beta_ = 0.8;     // the weight for one/two ptm
+
+  double p1_ = 0.915258; 
+
+  double p2_ = 21.1822; 
+
   double desc_ratio_ = 0.67;
 
   int LEFT_SUP_LIMIT_ = 10;
