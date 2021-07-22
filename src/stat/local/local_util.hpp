@@ -58,6 +58,8 @@ double compMassShift(const MassShiftPtrVec & mass_shift_vec);
 // the argument "shift" and the shift value as the argument "mass"
 MassShiftPtr geneMassShift(MassShiftPtr shift, double mass, AlterTypePtr type);
 
+MassShiftPtr geneMassShift(int left_pos, int right_pos, double mass, AlterTypePtr type); 
+
 void normalize(std::vector<double> & scr);
 
 int compMatchFragNum(ProteoformPtr proteoform_ptr, const ExtendMsPtrVec &ms_ptr_vec, double min_mass);

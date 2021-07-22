@@ -241,6 +241,17 @@ MassShiftPtr geneMassShift(MassShiftPtr shift, double mass, AlterTypePtr type) {
   return mass_shift;
 }
 
+MassShiftPtr geneMassShift(int left_pos, int right_pos, double mass, AlterTypePtr type) {
+  ModPtr mod_ptr = std::make_shared<Mod>(ResidueBase::getEmptyResiduePtr(),
+                                         ResidueBase::getEmptyResiduePtr());
+  AlterPtr alter = std::make_shared<Alter>(left_pos, 
+                                           right_pos, 
+                                           type, mass,
+                                           mod_ptr);
+  MassShiftPtr mass_shift = std::make_shared<MassShift>(alter);
+  return mass_shift;
+}
+
 void normalize(std::vector<double> & scr) {
   // to avoid overflow if the scores are too large
   double max = *std::max_element(scr.begin(), scr.end());

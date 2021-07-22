@@ -31,7 +31,7 @@ LocalMng::LocalMng(PrsmParaPtr prsm_para_ptr,
   min_mass_(prsm_para_ptr->getSpParaPtr()->getMinMass()),
   max_ptm_mass_(max_ptm_mass),
   min_ptm_mass_(min_ptm_mass) {
-    ppo_= prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()->getPpo();
+    peak_tole_ptr_= prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
   }
 }  // namespace toppic
 

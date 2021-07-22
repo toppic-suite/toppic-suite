@@ -50,11 +50,11 @@ LocalProcessor::LocalProcessor(LocalMngPtr mng_ptr):
   }
 
 void LocalProcessor::init() {
-  ptm_vec_ = ptm_util::readPtmTxt(mng_ptr_->residueModFileName_);
+  ptm_ptr_vec_ = ptm_util::readPtmTxt(mng_ptr_->residueModFileName_);
 
-  for (size_t i = 0; i < ptm_vec_.size(); i++) {
-    for (size_t j = 0; j < ptm_vec_.size(); j++) {
-      ptm_pair_vec_.push_back(std::make_pair(ptm_vec_[i], ptm_vec_[j]));
+  for (size_t i = 0; i < ptm_ptr_vec_.size(); i++) {
+    for (size_t j = 0; j < ptm_ptr_vec_.size(); j++) {
+      ptm_pair_vec_.push_back(std::make_pair(ptm_ptr_vec_[i], ptm_ptr_vec_[j]));
     }
   }
 
@@ -127,15 +127,15 @@ void LocalProcessor::process() {
 
 PrsmPtr LocalProcessor::processOnePrsm(PrsmPtr prsm) {
   int mass_shift_num = prsm->getProteoformPtr()->getMassShiftNum(AlterType::UNEXPECTED);
+  double err_tole = mng_ptr_->peak_tole_ptr_->compStrictErrorTole(prsm->getAdjustedPrecMass());
   if (mass_shift_num == 1) {
     double mass = prsm->getProteoformPtr()->getMassShiftPtrVec(AlterType::UNEXPECTED)[0]->getMassShift();
-
     // if the mass shift is between [-1, 1], we don't characterize it
-    if (std::abs(mass) <= 1 + prsm->getAdjustedPrecMass() * mng_ptr_->ppo_) return prsm;
-
+    if (std::abs(mass) <= 1 + err_tole) return prsm;
     return processOnePtm(prsm);
   } else if (mass_shift_num == 2) {
-    return processTwoPtm(prsm);
+    //TO DO We will add the function of processTwoPtm later.
+    //return processTwoPtm(prsm);
   }
   return prsm;
 }
@@ -159,6 +159,7 @@ PrsmPtr LocalProcessor::processOnePtm(PrsmPtr prsm) {
     }
   }
 
+  /* TO DO we will add two known prsm later
   ProteoformPtr two_known_prsm = processTwoKnownPtm(prsm);
 
   if (two_known_prsm != nullptr) {
@@ -171,11 +172,217 @@ PrsmPtr LocalProcessor::processOnePtm(PrsmPtr prsm) {
       return prsm;
     }
   }
+  */
 
   return prsm;
 }
 
 // we will get a nullptr if the mass shift can't be explained by a variable ptm
+ProteoformPtr LocalProcessor::processOneKnownPtm(PrsmPtr prsm_ptr) {
+
+  ExtendMsPtrVec extend_ms_ptr_vec = prsm_ptr->getRefineMsPtrVec();
+  double adjust_prec_mass = prsm_ptr->getAdjustedPrecMass();
+  double err_tole = mng_ptr_->peak_tole_ptr_->compStrictErrorTole(adjust_prec_mass);
+
+  // 1. Check the orignal form
+  ProteoformPtr ori_form_ptr = prsm_ptr->getProteoformPtr();
+  MassShiftPtrVec ori_shift_ptr_vec = ori_form_ptr->getMassShiftPtrVec();
+  MassShiftPtrVec exp_shift_ptr_vec = local_util::massShiftFilter(ori_shift_ptr_vec,
+                                                                  AlterType::UNEXPECTED);
+  ProteoformPtr form_ptr
+    = std::make_shared<Proteoform>(ori_form_ptr->getFastaSeqPtr(),
+                                   ori_form_ptr->getProtModPtr(),
+                                   ori_form_ptr->getStartPos(),
+                                   ori_form_ptr->getEndPos(),
+                                   ori_form_ptr->getResSeqPtr(),
+                                   exp_shift_ptr_vec);
+
+  LocalScore local_result = onePtmLocalize(form_ptr, extend_ms_ptr_vec, 
+                                            adjust_prec_mass, err_tole); 
+
+  if (local_result.form_ptr_ != nullptr) {
+    local_result.form_ptr_->setProteoClusterId(ori_form_ptr->getProteoClusterId());
+    local_result.form_ptr_->setProtId(ori_form_ptr->getProtId());
+  }
+
+  return local_result.form_ptr_;
+}
+
+LocalScore LocalProcessor::onePtmLocalize(ProteoformPtr form_ptr, const ExtendMsPtrVec & extend_ms_ptr_vec, 
+                                          double prec_mass, double err_tole) {
+
+  // Check if the unexpected mass shift can be explained by a PTM
+  // sum of all expected shift values, in most cases, there is only one unexpected shift
+  double unexp_shift_mass = prec_mass - form_ptr->getMass(); 
+
+  // Get candidate Ptms with similar mass shifts
+  PtmPtrVec match_ptm_ptr_vec = local_util::getPtmPtrVecByMass(unexp_shift_mass, err_tole, ptm_ptr_vec_);
+
+  // if there is a match, find the best ptm and its best similarity score
+  if (match_ptm_ptr_vec.size() != 0) {
+
+    // compute similarity score for each possible site of the PTM
+    LocalScore local_score = compOnePtmScr(form_ptr, extend_ms_ptr_vec, unexp_shift_mass, match_ptm_ptr_vec);
+    return local_score;
+  }
+
+  // return a result with -1 score. 
+  LocalScore result;
+  return result;
+}
+
+ProteoformPtr LocalProcessor::createProteoformPtr(ProteoformPtr base_form_ptr, 
+                                                  double shift_mass, LocalScore local_score) {
+  if (local_score.match_score_ <= 0) {
+    return nullptr;
+  }
+  int bgn, end;
+  double conf;
+  local_util::scrFilter(local_score.scr_vec_, bgn, end, conf, mng_ptr_->threshold_);
+
+  if (bgn == -1) return nullptr;
+
+  LocalAnnoPtr anno = std::make_shared<LocalAnno>(bgn, end, conf, local_score.scr_vec_,
+                                                  local_score.match_score_, local_score.ptm_ptr_);
+
+  AlterPtr alter = std::make_shared<Alter>(anno->getLeftBpPos(),
+                                           anno->getRightBpPos() + 1,
+                                           AlterType::UNEXPECTED, 
+                                           shift_mass,
+                                           std::make_shared<Mod>(ResidueBase::getEmptyResiduePtr(),
+                                                                 ResidueBase::getEmptyResiduePtr()));
+
+  alter->setLocalAnno(anno);
+
+  MassShiftPtr unexp_shift_ptr = std::make_shared<MassShift>(alter);
+
+  MassShiftPtrVec all_shift_ptr_vec = base_form_ptr->getMassShiftPtrVec(); 
+  all_shift_ptr_vec.push_back(unexp_shift_ptr);
+  std::sort(all_shift_ptr_vec.begin(), all_shift_ptr_vec.end(), MassShift::cmpPosInc);
+
+  ProteoformPtr shift_form_ptr = std::make_shared<Proteoform>(base_form_ptr->getFastaSeqPtr(),
+                                                              base_form_ptr->getProtModPtr(),
+                                                              base_form_ptr->getStartPos(),
+                                                              base_form_ptr->getEndPos(),
+                                                              base_form_ptr->getResSeqPtr(),
+                                                              all_shift_ptr_vec);
+
+
+  return shift_form_ptr;
+}
+
+LocalScore LocalProcessor::compOnePtmScr(ProteoformPtr base_form_ptr, 
+                                         const ExtendMsPtrVec & extend_ms_ptr_vec,
+                                         double shift_mass, 
+                                         PtmPtrVec & ptm_ptr_vec) {
+  if (ptm_ptr_vec.size() == 0) {
+    LOG_ERROR("The list of PTMs is empty!");
+    exit(EXIT_FAILURE);
+  }
+
+  // generate a new shift using the sum of shift masses
+  int left_pos = 0;
+  int right_pos = 1;
+  MassShiftPtr unexp_shift_ptr = local_util::geneMassShift(left_pos, right_pos, shift_mass,
+                                                           AlterType::UNEXPECTED);
+  MassShiftPtrVec all_shift_ptr_vec = base_form_ptr->getMassShiftPtrVec();
+  all_shift_ptr_vec.push_back(unexp_shift_ptr);
+
+  ProteoformPtr shift_form_ptr
+    = std::make_shared<Proteoform>(base_form_ptr->getFastaSeqPtr(),
+                                   base_form_ptr->getProtModPtr(),
+                                   base_form_ptr->getStartPos(),
+                                   base_form_ptr->getEndPos(),
+                                   base_form_ptr->getResSeqPtr(),
+                                   all_shift_ptr_vec);
+
+  int len = shift_form_ptr->getLen();
+
+  LocalScore result;
+  // current score vector
+  std::vector<double> cur_scr_vec;
+
+  for (size_t i = 0; i < ptm_ptr_vec.size(); i++) {
+    cur_scr_vec.clear();
+    // number of modification sites
+    int cur_count = 0;
+    // best best match
+    int cur_best_match = -1;
+    for (int j = 0; j < len; j++) {
+      if (modifiable(shift_form_ptr, j, ptm_ptr_vec[i])) {
+        cur_count++;
+        unexp_shift_ptr->setLeftBpPos(j);
+        unexp_shift_ptr->setRightBpPos(j + 1);
+        int match = static_cast<int>(local_util::compMatchFragNum(shift_form_ptr,
+                                                                  extend_ms_ptr_vec,
+                                                                  mng_ptr_->min_mass_));
+
+        cur_scr_vec.push_back(std::pow(mng_ptr_->p1_, len - match) * std::pow(mng_ptr_->p2_, match));
+        if (match > cur_best_match) {
+          cur_best_match = match;
+        }
+      } else {
+        cur_scr_vec.push_back(0.0);
+      }
+    }
+
+    // check if it is the best match
+    if (cur_count > 0 && cur_best_match > result.match_score_) {
+      result.match_score_ = cur_best_match;
+      result.ptm_ptr_ = ptm_ptr_vec[i];
+      result.scr_vec_ = cur_scr_vec;
+    }
+  }
+  
+  // normalize
+  if (result.match_score_ > 0) {
+    local_util::normalize(result.scr_vec_);
+    result.form_ptr_ = createProteoformPtr(base_form_ptr, shift_mass, result);
+  }
+
+  return result;
+}
+
+bool LocalProcessor::modifiable(ProteoformPtr proteoform_ptr, int i, PtmPtr ptm_ptr) {
+  if (ptm_ptr == nullptr) return true;
+
+  MassShiftPtrVec fixed_shift_vec = proteoform_ptr->getMassShiftPtrVec(AlterType::FIXED);
+
+  for (size_t k = 0; k < fixed_shift_vec.size(); k++) {
+    if (fixed_shift_vec[k]->getLeftBpPos() <= i && i < fixed_shift_vec[k]->getRightBpPos()) {
+      return false;
+    }
+  }
+
+  int start = proteoform_ptr->getStartPos();
+  int end = proteoform_ptr->getEndPos();
+
+  ResiduePtr residue_ptr = proteoform_ptr->getResSeqPtr()->getResiduePtr(i);
+
+  ModPtrVec mod_list;
+
+  if (i == 0 && start == 0) {
+    mod_list = mod_list_N_;
+  } else if (i + start == end) {
+    mod_list = mod_list_C_;
+  } else {
+    mod_list = mod_list_any_;
+  }
+
+  for (size_t j = 0; j < mod_list.size(); j++) {
+    if (mod_list[j]->getOriResiduePtr()->isSame(residue_ptr) &&
+        mod_list[j]->getModResiduePtr()->getPtmPtr()->isSame(ptm_ptr))
+      return true;
+  }
+
+  return false;
+}
+
+
+
+
+// we will get a nullptr if the mass shift can't be explained by a variable ptm
+/*
 ProteoformPtr LocalProcessor::processOneKnownPtm(PrsmPtr prsm) {
   ProteoformPtr ori_prot_form = prsm->getProteoformPtr();
 
@@ -306,6 +513,59 @@ ProteoformPtr LocalProcessor::processOneKnownPtm(PrsmPtr prsm) {
   one_shift_proteoform->setProtId(ori_prot_form->getProtId());
   return one_shift_proteoform;
 }
+*/
+
+/*
+void findBestPtm(FastaSeqPtr fasta_seq_ptr, ProtModPtr prot_mod_ptr, 
+                 int start_pos, int end_pos, 
+                 ResSeqPtr res_seq_ptr, 
+                 MassShiftPtrVec &expected_shift_vec, 
+                 double unexpected_mass_shift, 
+                 PtmPtrVec &ptm_ptr_vec) {
+
+  if (ptm_ptr_vec.size() == 0) {
+    LOG_ERROR("Ptm list is empty!");
+    exit(EXIT_FAILURE);
+  }
+
+  MassShiftPtrVec all_shift_vec = expected_shift_vec;
+  all_shift_vec.push_back(unexpe_mass_shift_ptr);
+  std::sort(all_shift_vec.begin(), all_shift_vec.end(), MassShift::cmpPosInc);
+  ProteoformPtr one_shift_proteoform
+      = std::make_shared<Proteoform>(fast_seq_ptr, 
+                                     prot_mod_ptr, 
+                                     start_pos, 
+                                     end_pos, 
+                                     res_seq_ptr, 
+                                     all_shift_vec);
+
+  // confidence score
+  std::vector<double> scr_vec;
+  int len = end_pos - start_pos + 1;
+  for (size_t i = 0; i < ptm_ptr_vec.size(); i++) {
+    scr_vec.clear();
+    for (int j = 0; j < len; j++) {
+      if (modifiable(proteoform, j, ptm_vec[i])) {
+        mass_shift->setLeftBpPos(j);
+        mass_shift->setRightBpPos(j + 1);
+        int match = static_cast<int>(local_util::compMatchFragNum(proteoform,
+                                                                  extend_ms_ptr_vec,
+                                                                  mng_ptr_->min_mass_));
+
+        scr_vec.push_back(std::pow(mng_ptr_->p1_, n - match) * std::pow(mng_ptr_->p2_, match));
+      } else {
+        scr_vec.push_back(0.0);
+      }
+    }
+    scr_vec2d.push_back(scr_vec);
+    temp.push_back(std::accumulate(scr_vec.begin(), scr_vec.end(), 0.0));
+  }
+
+
+}
+*/
+
+/*
 
 // Match the unexpected mass shift to variable PTMs by adjusting the starting or ending positions of 
 // the proteoform. 
@@ -786,89 +1046,6 @@ PrsmPtr LocalProcessor::processTwoPtm(PrsmPtr prsm) {
   return prsm;
 }
 
-bool LocalProcessor::modifiable(ProteoformPtr proteoform_ptr, int i, PtmPtr ptm_ptr) {
-  if (ptm_ptr == nullptr) return true;
-
-  MassShiftPtrVec fixed_shift_vec = proteoform_ptr->getMassShiftPtrVec(AlterType::FIXED);
-
-  for (size_t k = 0; k < fixed_shift_vec.size(); k++) {
-    if (fixed_shift_vec[k]->getLeftBpPos() <= i && i < fixed_shift_vec[k]->getRightBpPos()) {
-      return false;
-    }
-  }
-
-  int start = proteoform_ptr->getStartPos();
-  int end = proteoform_ptr->getEndPos();
-
-  ResiduePtr residue_ptr = proteoform_ptr->getResSeqPtr()->getResiduePtr(i);
-
-  ModPtrVec mod_list;
-
-  if (i == 0 && start == 0) {
-    mod_list = mod_list_N_;
-  } else if (i + start == end) {
-    mod_list = mod_list_C_;
-  } else {
-    mod_list = mod_list_any_;
-  }
-
-  for (size_t j = 0; j < mod_list.size(); j++) {
-    if (mod_list[j]->getOriResiduePtr()->isSame(residue_ptr) &&
-        mod_list[j]->getModResiduePtr()->getPtmPtr()->isSame(ptm_ptr))
-      return true;
-  }
-
-  return false;
-}
-
-void LocalProcessor::compOnePtmScr(ProteoformPtr proteoform,
-                                   const ExtendMsPtrVec & extend_ms_ptr_vec,
-                                   std::vector<double> &scr_vec, double & raw_scr,
-                                   PtmPtrVec & ptm_vec) {
-  raw_scr = 0.0;
-
-  MassShiftPtr mass_shift = proteoform->getMassShiftPtrVec(AlterType::UNEXPECTED)[0];
-
-  if (ptm_vec.size() == 0) ptm_vec.push_back(nullptr);
-
-  std::vector<double> temp;
-  std::vector<std::vector<double> > scr_vec2d;
-  int n = proteoform->getLen();
-  int count = 0;
-
-  for (size_t i = 0; i < ptm_vec.size(); i++) {
-    scr_vec.clear();
-    for (int j = 0; j < n; j++) {
-      if (modifiable(proteoform, j, ptm_vec[i])) {
-        count++;
-        mass_shift->setLeftBpPos(j);
-        mass_shift->setRightBpPos(j + 1);
-        int match = static_cast<int>(local_util::compMatchFragNum(proteoform,
-                                                                  extend_ms_ptr_vec,
-                                                                  mng_ptr_->min_mass_));
-
-        scr_vec.push_back(std::pow(mng_ptr_->p1_, n - match) * std::pow(mng_ptr_->p2_, match));
-      } else {
-        scr_vec.push_back(0.0);
-      }
-    }
-    scr_vec2d.push_back(scr_vec);
-    temp.push_back(std::accumulate(scr_vec.begin(), scr_vec.end(), 0.0));
-  }
-
-  scr_vec.clear();
-  int idx = std::distance(temp.begin(), std::max_element(temp.begin(), temp.end()));
-
-  if (temp[idx] == 0) return;
-
-  raw_scr = std::accumulate(scr_vec2d[idx].begin(), scr_vec2d[idx].end(), 0.0) / count;
-  scr_vec = scr_vec2d[idx];
-  local_util::normalize(scr_vec);
-
-  PtmPtr p = ptm_vec[idx];
-  ptm_vec.clear();
-  ptm_vec.push_back(p);
-}
 
 void LocalProcessor::compTwoPtmScr(ProteoformPtr proteoform, int num_match,
                                    const ExtendMsPtrVec & extend_ms_ptr_vec, double prec_mass,
@@ -1160,6 +1337,7 @@ ProteoformPtr LocalProcessor::compSplitPoint(ProteoformPtr proteoform, int h,
 
   return proteoform;
 }
+*/
 
 }  // namespace toppic
 

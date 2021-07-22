@@ -18,6 +18,7 @@
 #include "common/base/ptm.hpp"
 #include "prsm/prsm.hpp"
 #include "stat/local/local_mng.hpp"
+#include "stat/local/local_score.hpp"
 
 namespace toppic {
 
@@ -42,8 +43,15 @@ class LocalProcessor {
 
   bool modifiable(ProteoformPtr proteoform_ptr, int i, PtmPtr ptm_ptr);
 
-  void compOnePtmScr(ProteoformPtr proteoform, const ExtendMsPtrVec & extend_ms_ptr_vec,
-                     std::vector<double> &scr_vec, double & raw_scr, PtmPtrVec & ptm_vec);
+  LocalScore onePtmLocalize(ProteoformPtr base_form_ptr, const ExtendMsPtrVec & extend_ms_ptr_vec, 
+                            double prec_mass, double err_tole); 
+
+  ProteoformPtr createProteoformPtr(ProteoformPtr base_form_ptr, double shift_mass, LocalScore local_score); 
+
+  LocalScore compOnePtmScr(ProteoformPtr base_form_ptr, 
+                           const ExtendMsPtrVec & extend_ms_ptr_vec,
+                           double unexp_shift_mass, 
+                           PtmPtrVec & ptm_ptr_vec); 
 
   void compTwoPtmScr(ProteoformPtr proteoform, int num_match,
                      const ExtendMsPtrVec & extend_ms_ptr_vec, double prec_mass,
@@ -71,7 +79,7 @@ class LocalProcessor {
   LocalMngPtr mng_ptr_;
 
   // Single PTMs
-  PtmPtrVec ptm_vec_;
+  PtmPtrVec ptm_ptr_vec_;
   // Ptm Pairs
   PtmPairVec ptm_pair_vec_;
   // N-terminal modification list
