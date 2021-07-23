@@ -39,7 +39,8 @@ class PwMsReader {
   MsHeaderPtr getHeaderPtr() {return header_ptr_;}
   int getInputSpNum() {return input_sp_num_;}
   bool readOneMs(int sp_id, PeakPtrVec &peak_list, MsHeaderPtr &header_ptr);
-
+  MSDataFilePtr getMsdPtr() {return msd_ptr_;}
+  
  private:
   std::string file_name_;
   std::string activation_;

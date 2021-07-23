@@ -109,6 +109,27 @@ void DeconvProcess::process() {
                                            topfd_para_ptr_->missing_level_one_,
                                            topfd_para_ptr_->activation_,
                                            frac_id_);
+  //check if it is centroid data
+  std::vector<pwiz::msdata::DataProcessingPtr> dt_proc_ptr = reader_ptr->getReaderPtr()->getMsdPtr()->dataProcessingPtrs;
+  
+  bool is_profile_data = true;
+
+  if (dt_proc_ptr.size() > 0) {
+    for (int i = 0; i < dt_proc_ptr.size(); i++) {
+      for (int j = 0; j < dt_proc_ptr[i]->processingMethods.size(); j++) {
+        pwiz::msdata::ProcessingMethod proc_method = dt_proc_ptr[i]->processingMethods[j];
+        int cvid_for_peak_picking = 1000035;
+        if (proc_method.hasCVParam(cvid_for_peak_picking)) {
+          is_profile_data = false;
+        }
+      }
+    }
+  }
+  if (is_profile_data) {
+    std::cout << "[ALERT] You are not using a centroid data. TopFD supports centroid data only. Please try again with a different dataset." << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
   if (topfd_para_ptr_->use_env_cnn_) {
     env_cnn::initModel(topfd_para_ptr_->resource_dir_, topfd_para_ptr_->thread_number_);
   }
