@@ -126,7 +126,7 @@ void DeconvProcess::process() {
     }
   }
   if (is_profile_data) {
-    std::cout << "[ALERT] You are not using a centroid data. TopFD supports centroid data only. Please try again with a different dataset." << std::endl;
+    LOG_ERROR("You are not using a centroid data. TopFD supports centroid data only. Please try again with a different dataset.");
     exit(EXIT_FAILURE);
   }
 

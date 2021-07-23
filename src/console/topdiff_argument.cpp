@@ -177,6 +177,10 @@ bool Argument::validateArguments() {
       return false;
     }
   }
+  if (spectrum_file_list_.size() < 2) {
+    LOG_ERROR("Only 1 spectrum file added. Please add at least 2 spectum files to make a comparison.");
+    return false;
+  }
 
   return true;
 }
