@@ -12,14 +12,19 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
+#include <windows.h> 
+#include <tchar.h>
+#include <strsafe.h>
+#else
+#include <array>
+#endif
+
 #include "common/util/logger.hpp"
 #include "gui/util/run_exe.h"
 #include <algorithm>
 #include <iostream>
-#include <windows.h> 
-#include <tchar.h>
 #include <stdio.h> 
-#include <strsafe.h>
 
 namespace toppic {
 /*function for topindex*/
@@ -154,6 +159,7 @@ std::string RunExe::geneCommand(std::map<std::string, std::string> arguments_, s
 };
 void RunExe::run(std::string command) {
   std::cout << command << std::endl;
+  #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
   HANDLE g_hChildStd_IN_Rd = NULL;
   HANDLE g_hChildStd_IN_Wr = NULL;
   HANDLE g_hChildStd_OUT_Rd = NULL;
@@ -209,5 +215,17 @@ void RunExe::run(std::string command) {
     std::cout << buf;
     bSuccess = ReadFile(g_hChildStd_OUT_Rd, buf, 1024, &dwRead, NULL);
   }
+  #else
+    //std::array<char, 128> buffer;
+    char buf[4096]; 
+    FILE* pipe = popen(command.c_str(), "r");
+    if (!pipe) {
+      std::cout << "error occured when opening pipe" << std::endl;
+    }
+    while (fgets(buf, 4096, pipe) != NULL) {
+        std::cout << buf;
+    }
+    pclose(pipe);
+  #endif
 };
 }
