@@ -43,7 +43,7 @@ XmlGenerator::XmlGenerator(PrsmParaPtr prsm_para_ptr,
   input_file_ext_ = input_file_ext;
   mng_ptr_ = std::make_shared<PrsmViewMng>(prsm_para_ptr, resource_dir, fname_suffix);
   anno_file_list_ptr_ = std::make_shared<AnnoFileList>();
-  fasta_reader_ptr_ = std::make_shared<FastaIndexReader>(prsm_para_ptr->getSearchDbFileName());
+  fasta_reader_ptr_ = std::make_shared<FastaIndexReader>(prsm_para_ptr->getOriDbName() + "_idx" + file_util::getFileSeparator() + prsm_para_ptr->getSearchDbFileName());
   writer_block_size_ = 300;
 }
 
@@ -171,7 +171,8 @@ void XmlGenerator::splitByProteoformId() {
 void XmlGenerator::outputProteoforms(){
   LOG_DEBUG("prsm cluster id size " << cluster_ids_.size());
   std::string spectrum_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
-  std::string db_file_name = mng_ptr_->prsm_para_ptr_->getSearchDbFileName();
+  //std::string db_file_name = mng_ptr_->prsm_para_ptr_->getSearchDbFileName();
+  std::string db_file_name = mng_ptr_->prsm_para_ptr_->getOriDbName() + "_idx" + file_util::getFileSeparator() + mng_ptr_->prsm_para_ptr_->getSearchDbFileName();
   ModPtrVec fix_mod_ptr_vec = mng_ptr_->prsm_para_ptr_->getFixModPtrVec();
 
   size_t cnt = 0;
@@ -265,7 +266,8 @@ void XmlGenerator::splitByProtId() {
 void XmlGenerator::outputProteins() {
   LOG_DEBUG("protein id size " << prot_ids_.size());
   std::string spectrum_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
-  std::string db_file_name = mng_ptr_->prsm_para_ptr_->getSearchDbFileName();
+  //std::string db_file_name = mng_ptr_->prsm_para_ptr_->getSearchDbFileName();
+  std::string db_file_name = mng_ptr_->prsm_para_ptr_->getOriDbName() + "_idx" + file_util::getFileSeparator() + mng_ptr_->prsm_para_ptr_->getSearchDbFileName();
   ModPtrVec fix_mod_ptr_vec = mng_ptr_->prsm_para_ptr_->getFixModPtrVec();
   size_t cnt = 0;
   for (size_t i = 0; i < prot_ids_.size(); i++) {
@@ -305,7 +307,8 @@ void XmlGenerator::outputProteins() {
 
 void XmlGenerator::outputAllProteins() {
   std::string spectrum_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
-  std::string db_file_name = mng_ptr_->prsm_para_ptr_->getSearchDbFileName();
+  //std::string db_file_name = mng_ptr_->prsm_para_ptr_->getSearchDbFileName();
+  std::string db_file_name = mng_ptr_->prsm_para_ptr_->getOriDbName() + "_idx" + file_util::getFileSeparator() + mng_ptr_->prsm_para_ptr_->getSearchDbFileName();
   ModPtrVec fix_mod_ptr_vec = mng_ptr_->prsm_para_ptr_->getFixModPtrVec();
 
   PrsmPtrVec best_prsm_vec(prot_ids_.size());

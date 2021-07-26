@@ -47,10 +47,12 @@ std::string getString(const StringPairVec &str_pair_vec) {
 
 void generateShuffleDb(const std::string &file_name,
                        const std::string &target_decoy_file_name) {
+  if (file_util::exists(target_decoy_file_name)) {
+    return;
+  }
   std::ofstream output;
   output.open(target_decoy_file_name.c_str(), std::ios::out);
   FastaReader reader(file_name);
-
   FastaSeqPtr seq_info = reader.getNextSeq();
   std::mt19937 r{std::random_device{}()};
   r.seed(std::mt19937::default_seed);
@@ -79,9 +81,13 @@ void generateShuffleDb(const std::string &file_name,
 
 void generateStandardDb(const std::string &ori_file_name,
                         const std::string &st_file_name) {
+  if (file_util::exists(st_file_name)) {
+    return;
+  }
   std::ifstream ori_db(ori_file_name);
   std::string line;
   std::ofstream standard_db;
+
   standard_db.open(st_file_name.c_str(), std::ios::out);
 
   while (std::getline(ori_db, line)) {
@@ -96,14 +102,17 @@ void generateStandardDb(const std::string &ori_file_name,
 void generateDbBlock(const std::string &db_file_name, int block_size, int max_frag_len) {
   int block_idx = 0;
   int seq_idx = 0;
+  std::string index_file_name = db_file_name + "_block_index";
+  std::string block_file_name = db_file_name + "_" + str_util::toString(block_idx);
+
+  if (file_util::exists(index_file_name) && file_util::exists(block_file_name)) {
+    return;
+  };
 
   std::ofstream index_output;
-  std::string index_file_name = db_file_name + "_block_index";
   index_output.open(index_file_name.c_str(), std::ios::out);
   std::ofstream block_output;
-  std::string block_file_name = db_file_name + "_" + str_util::toString(block_idx);
   block_output.open(block_file_name.c_str(), std::ios::out);
-
   FastaReader reader(db_file_name);
   FastaSeqPtr seq_info = reader.getNextSeq();
   index_output << block_idx << "\t" << seq_idx << std::endl;
@@ -148,17 +157,17 @@ void dbSimplePreprocess(const std::string &ori_db_file_name,
 void dbPreprocess(const std::string &ori_db_file_name,
                   const std::string &db_file_name,
                   bool decoy, int block_size, int max_frag_len) {
-  std::string standard_db_file_name = ori_db_file_name + "_standard";
+  std::string standard_db_file_name = ori_db_file_name + "_idx" + file_util::getFileSeparator() + ori_db_file_name + "_standard";
+  std::string db_file_path = ori_db_file_name + "_idx" + file_util::getFileSeparator() + db_file_name;
   generateStandardDb(ori_db_file_name, standard_db_file_name);
-
   if (decoy) {
-    generateShuffleDb(standard_db_file_name, db_file_name);
+    generateShuffleDb(standard_db_file_name, db_file_path);
   } else {
     bool over_write = true;
-    file_util::copyFile(standard_db_file_name, db_file_name, over_write);
+    file_util::copyFile(standard_db_file_name, db_file_path, over_write);
   }
-  generateDbBlock(db_file_name, block_size, max_frag_len);
-  fai_build(db_file_name.c_str());
+  generateDbBlock(db_file_path, block_size, max_frag_len);
+  fai_build(db_file_path.c_str());
 }
 
 int countProteinNum(const std::string &fasta_file) {

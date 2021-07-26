@@ -135,7 +135,8 @@ void DprProcessor::process() {
 
   sp_para_ptr_ = prsm_para_ptr->getSpParaPtr();
 
-  std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
+  //std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
+  std::string db_file_name = prsm_para_ptr->getOriDbName() + "_idx" + file_util::getFileSeparator() + prsm_para_ptr->getSearchDbFileName();
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
   std::string input_file_name = file_util::basename(sp_file_name) + "." + mng_ptr_->input_file_ext_;
   std::string output_file_name = file_util::basename(sp_file_name) + "." + mng_ptr_->output_file_ext_;

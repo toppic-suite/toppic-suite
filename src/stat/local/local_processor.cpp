@@ -72,7 +72,8 @@ void LocalProcessor::process() {
 
   PrsmXmlWriterPtr prsm_writer = std::make_shared<PrsmXmlWriter>(output_file_name);
 
-  std::string db_file_name = mng_ptr_->prsm_para_ptr_->getSearchDbFileName();
+  //std::string db_file_name = mng_ptr_->prsm_para_ptr_->getSearchDbFileName();
+  std::string db_file_name = mng_ptr_->prsm_para_ptr_->getOriDbName() + "_idx" + file_util::getFileSeparator() + mng_ptr_->prsm_para_ptr_->getSearchDbFileName();
 
   FastaIndexReaderPtr seq_reader = std::make_shared<FastaIndexReader>(db_file_name);
 

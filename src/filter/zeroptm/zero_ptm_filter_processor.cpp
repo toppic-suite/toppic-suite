@@ -89,7 +89,9 @@ std::function<void()> geneTask(int block_idx,
                                ZeroPtmFilterMngPtr mng_ptr) {
   return[block_idx, mng_ptr] () {
     PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
-    std::string db_block_file_name = prsm_para_ptr->getSearchDbFileName()
+    //std::string db_block_file_name = prsm_para_ptr->getSearchDbFileName()
+    //    + "_" + str_util::toString(block_idx);
+    std::string db_block_file_name = prsm_para_ptr->getOriDbName() + "_idx" + file_util::getFileSeparator() + prsm_para_ptr->getSearchDbFileName()
         + "_" + str_util::toString(block_idx);
 
     ProteoformPtrVec raw_forms
@@ -102,7 +104,8 @@ std::function<void()> geneTask(int block_idx,
 
 void process(ZeroPtmFilterMngPtr mng_ptr) {
   PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
-  std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
+  //std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
+  std::string db_file_name = prsm_para_ptr->getOriDbName() + "_idx" + file_util::getFileSeparator() + prsm_para_ptr->getSearchDbFileName();
   DbBlockPtrVec db_block_ptr_vec = DbBlock::readDbBlockIndex(db_file_name);
 
   int spec_num = msalign_util::getSpNum(prsm_para_ptr->getSpectrumFileName());

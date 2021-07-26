@@ -68,7 +68,6 @@ void TopIndexProcess(std::map<std::string, std::string> &arguments){
     // index file name
     IndexFileNamePtr file_name_ptr = std::make_shared<IndexFileName>();
     std::string index_file_para = file_name_ptr->geneFileName(arguments);
-
     int db_block_size = std::stoi(arguments["databaseBlockSize"]);
     int max_frag_len = std::stoi(arguments["maxFragmentLength"]);
     fasta_util::dbPreprocess(ori_db_file_name, db_file_name, decoy, db_block_size, max_frag_len);
@@ -89,12 +88,12 @@ void TopIndexProcess(std::map<std::string, std::string> &arguments){
                                           "toppic_multi_filter");
     diag_index::process(diag_filter_mng_ptr);
 
-    std::cout << "Deleting temporary files - started." << std::endl;
+    /*(std::cout << "Deleting temporary files - started." << std::endl;
     std::string fa_base = file_util::absoluteName(ori_db_file_name);
     std::replace(fa_base.begin(), fa_base.end(), '\\', '/');
     file_util::cleanPrefix(ori_db_file_name, fa_base + "_");
     std::cout << "Deleting temporary files - finished." << std::endl; 
-
+*/
     std::cout << "TopIndex - finished." << std::endl;
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
