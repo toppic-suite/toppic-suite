@@ -32,7 +32,7 @@ int topDiffProcess(std::map<std::string, std::string> &arguments,
     base_data::init();
 
     std::string ori_db_file_name = arguments["databaseFileName"];
-    std::string db_file_name = ori_db_file_name + "_target";
+    std::string db_file_name = ori_db_file_name + "_idx" + file_util::getFileSeparator() + ori_db_file_name + "_target";
     fasta_util::dbSimplePreprocess(ori_db_file_name, db_file_name);
 
     std::string base_path = file_util::absoluteDir(input_file_list[0]);
@@ -55,13 +55,13 @@ int topDiffProcess(std::map<std::string, std::string> &arguments,
     merge_ptr->process();
     merge_ptr = nullptr;
     
-    std::cout << "Deleting temporary files - started." << std::endl;
+    /*std::cout << "Deleting temporary files - started." << std::endl;
 
     std::string fa_base = file_util::absoluteName(ori_db_file_name);
     std::replace(fa_base.begin(), fa_base.end(), '\\', '/');
     file_util::cleanPrefix(ori_db_file_name, fa_base + "_");
         
-    std::cout << "Deleting temporary files - finished." << std::endl; 
+    std::cout << "Deleting temporary files - finished." << std::endl;*/
 
     std::cout << "TopDiff - finished." << std::endl;
   } catch (const char* e) {

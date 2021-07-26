@@ -310,7 +310,9 @@ void process(PrsmParaPtr prsm_para_ptr,
   file << std::endl;
 
   std::string input_file_name = file_util::basename(spectrum_file_name) + "." + input_file_ext;
-  std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
+  //std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
+  std::string db_file_name = prsm_para_ptr->getOriDbName() + "_idx" + file_util::getFileSeparator() + prsm_para_ptr->getSearchDbFileName();
+
   ModPtrVec fix_mod_ptr_vec = prsm_para_ptr->getFixModPtrVec();
 
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();

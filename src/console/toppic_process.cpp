@@ -93,8 +93,8 @@ void copyTopMSV(std::map<std::string, std::string> &arguments) {
 void cleanToppicDir(const std::string &fa_name, 
                     const std::string & sp_name,
                     bool keep_temp_files) {
-  std::string fa_base = file_util::absoluteName(fa_name);
-  std::replace(fa_base.begin(), fa_base.end(), '\\', '/');
+  //std::string fa_base = file_util::absoluteName(fa_name);
+  //std::replace(fa_base.begin(), fa_base.end(), '\\', '/');
   std::string abs_sp_name = file_util::absoluteName(sp_name);
   std::string sp_base = file_util::basename(abs_sp_name);
   std::replace(sp_base.begin(), sp_base.end(), '\\', '/');
@@ -102,7 +102,7 @@ void cleanToppicDir(const std::string &fa_name,
   file_util::rename(sp_base + ".toppic_form_cutoff_form",
                     sp_base + "_toppic_proteoform.xml");
   if (!keep_temp_files) {
-    file_util::cleanPrefix(fa_name, fa_base + "_");
+    //file_util::cleanPrefix(fa_name, fa_base + "_");
     file_util::cleanPrefix(sp_name, sp_base + ".msalign_");
     file_util::delFile(abs_sp_name + "_index");
     file_util::cleanPrefix(sp_name, sp_base + ".toppic_zero_filter_");
@@ -328,10 +328,9 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     base_data::init();
     LOG_DEBUG("Init base data completed");
 
-    std::string db_file_name = arguments["databaseFileName"];
     std::string sp_file_name = arguments["spectrumFileName"];
     std::string ori_db_file_name = arguments["oriDatabaseFileName"];
-
+    std::string db_file_name = ori_db_file_name + "_idx" + file_util::getFileSeparator() + arguments["databaseFileName"];
     double max_ptm_mass = std::stod(arguments["maxPtmMass"]);
     double min_ptm_mass = std::stod(arguments["minPtmMass"]);
 

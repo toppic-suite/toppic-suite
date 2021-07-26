@@ -13,7 +13,7 @@
 //limitations under the License.
 
 #include <string>
-
+#include "common/util/file_util.hpp"
 #include "common/base/prot_mod_base.hpp"
 #include "seq/proteoform_factory.hpp"
 #include "search/ptmsearch/ptm_search_slow_filter.hpp"
@@ -23,7 +23,8 @@ namespace toppic {
 PtmSearchSlowFilter::PtmSearchSlowFilter(SpectrumSetPtr spectrum_set_ptr,
                                          SimplePrsmPtrVec simple_prsm_ptrs,
                                          PtmSearchMngPtr mng_ptr) {
-  std::string db_file_name = mng_ptr->prsm_para_ptr_->getSearchDbFileName();
+  //std::string db_file_name = mng_ptr->prsm_para_ptr_->getSearchDbFileName();
+  std::string db_file_name = mng_ptr->prsm_para_ptr_->getOriDbName() + "_idx" + file_util::getFileSeparator() + mng_ptr->prsm_para_ptr_->getSearchDbFileName();
   FastaIndexReaderPtr reader_ptr = std::make_shared<FastaIndexReader>(db_file_name);
   ModPtrVec fix_mod_list = mng_ptr->prsm_para_ptr_->getFixModPtrVec();
   ProtModPtrVec prot_mod_ptr_vec = mng_ptr->prsm_para_ptr_->getProtModPtrVec();

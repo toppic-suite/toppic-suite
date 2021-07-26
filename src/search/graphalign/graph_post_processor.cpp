@@ -125,7 +125,8 @@ void GraphPostProcessor::geneMassPtmMap() {
 void GraphPostProcessor::process() {
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
-  std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
+  //std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
+  std::string db_file_name = prsm_para_ptr->getOriDbName() + "_idx" + file_util::getFileSeparator() + prsm_para_ptr->getSearchDbFileName();
   LOG_DEBUG("Search db file name " << db_file_name);
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
 
@@ -139,7 +140,7 @@ void GraphPostProcessor::process() {
   PrsmXmlWriterPtr prsm_writer = std::make_shared<PrsmXmlWriter>(output_file_name);
 
   FastaIndexReaderPtr fasta_reader
-      = std::make_shared<FastaIndexReader>(prsm_para_ptr->getSearchDbFileName());
+      = std::make_shared<FastaIndexReader>(db_file_name);
 
   PrsmPtr prsm_ptr = prsm_reader->readOnePrsm(fasta_reader,
                                               mng_ptr_->prsm_para_ptr_->getFixModPtrVec());

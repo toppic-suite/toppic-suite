@@ -16,6 +16,7 @@
 #include <iostream>
 
 #include "common/thread/simple_thread_pool.hpp"
+#include "common/util/file_util.hpp"
 
 #include "seq/db_block.hpp"
 #include "seq/proteoform_util.hpp"
@@ -87,7 +88,9 @@ std::function<void()> geneIndexTask(int block_idx,
                                     OnePtmFilterMngPtr mng_ptr) {
   return[block_idx, mng_ptr] () {
     PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
-    std::string db_block_file_name = prsm_para_ptr->getSearchDbFileName()
+    //std::string db_block_file_name = prsm_para_ptr->getSearchDbFileName()
+    //    + "_" + str_util::toString(block_idx);
+    std::string db_block_file_name = prsm_para_ptr->getOriDbName() + "_idx" + file_util::getFileSeparator() + prsm_para_ptr->getSearchDbFileName()
         + "_" + str_util::toString(block_idx);
     ProteoformPtrVec raw_forms
         = proteoform_factory::readFastaToProteoformPtrVec(db_block_file_name,
@@ -98,7 +101,8 @@ std::function<void()> geneIndexTask(int block_idx,
 
 void process(OnePtmFilterMngPtr mng_ptr) {
   PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
-  std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
+  //std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
+  std::string db_file_name = prsm_para_ptr->getOriDbName() + "_idx" + file_util::getFileSeparator() + prsm_para_ptr->getSearchDbFileName();
   DbBlockPtrVec db_block_ptr_vec = DbBlock::readDbBlockIndex(db_file_name);
 
   std::cout << "Generating One PTM index files --- started" << std::endl;
