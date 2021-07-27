@@ -150,6 +150,10 @@ void generateDbBlock(const std::string &db_file_name, int block_size, int max_fr
 
 void dbSimplePreprocess(const std::string &ori_db_file_name,
                         const std::string &db_file_name) {
+  if (!file_util::exists(ori_db_file_name + "_idx")){//if _idx folder doesn't exist yet
+      file_util::createFolder(ori_db_file_name + "_idx");
+  }
+  
   generateStandardDb(ori_db_file_name, db_file_name);
   fai_build(db_file_name.c_str());
 }
@@ -159,6 +163,11 @@ void dbPreprocess(const std::string &ori_db_file_name,
                   bool decoy, int block_size, int max_frag_len) {
   std::string standard_db_file_name = ori_db_file_name + "_idx" + file_util::getFileSeparator() + ori_db_file_name + "_standard";
   std::string db_file_path = ori_db_file_name + "_idx" + file_util::getFileSeparator() + db_file_name;
+  
+  if (!file_util::exists(ori_db_file_name + "_idx")){//if _idx folder doesn't exist yet
+      file_util::createFolder(ori_db_file_name + "_idx");
+  }
+
   generateStandardDb(ori_db_file_name, standard_db_file_name);
   if (decoy) {
     generateShuffleDb(standard_db_file_name, db_file_path);

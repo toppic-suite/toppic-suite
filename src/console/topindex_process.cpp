@@ -55,7 +55,7 @@ void TopIndexProcess(std::map<std::string, std::string> &arguments){
     int thread_num = std::stoi(arguments["threadNumber"]);
     int filter_result_num = std::stoi(arguments["filteringResultNumber"]);
 
-    if (!file_util::exists(ori_db_file_name + "_idx")){//if _html folder was not created with topfd
+    if (!file_util::exists(ori_db_file_name + "_idx")){
       file_util::createFolder(ori_db_file_name + "_idx");
     }
     //prsm_para_ptr->setIndexDir(ori_db_file_name + "_idx"); //this gives seg fault
