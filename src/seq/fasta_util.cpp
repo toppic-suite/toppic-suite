@@ -155,6 +155,10 @@ void dbSimplePreprocess(const std::string &ori_db_file_name,
   }
   
   generateStandardDb(ori_db_file_name, db_file_name);
+
+  if (file_util::exists(db_file_name + ".fai")) {
+    return;
+  }
   fai_build(db_file_name.c_str());
 }
 
@@ -176,6 +180,10 @@ void dbPreprocess(const std::string &ori_db_file_name,
     file_util::copyFile(standard_db_file_name, db_file_path, over_write);
   }
   generateDbBlock(db_file_path, block_size, max_frag_len);
+
+  if (file_util::exists(db_file_path + ".fai")) {
+    return;
+  }
   fai_build(db_file_path.c_str());
 }
 
