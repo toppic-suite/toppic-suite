@@ -23,7 +23,8 @@ namespace prsm_fdr {
 
 void process(const std::string &spec_file_name,
              const std::string &input_file_ext,
-             const std::string &output_file_ext);
+             const std::string &output_file_ext,
+             std::string keep_decoy_results);
 
 }
 

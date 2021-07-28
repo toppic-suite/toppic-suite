@@ -67,6 +67,7 @@ void Argument::initArguments() {
   arguments_["threadNumber"] = "1";
   arguments_["useFeatureFile"] = "true";
   arguments_["geneHTMLFolder"] = "true";
+  arguments_["keepDecoyResults"] = "false";
   arguments_["version"] = "";
 }
 
@@ -294,6 +295,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("no-topfd-feature,x", "No TopFD feature file for proteoform identification.")
         ("combined-file-name,c", po::value<std::string>(&combined_output_name) , "Specify a file name for the combined spectrum data file and analysis results.")
         ("keep-temp-files,k", "Keep temporary files.")
+        ("keep-decoy-ids,K", "Keep decoy identifications.")
         ("skip-html-folder,g", "Skip generating an html folder containing TopView and spectrum data for visualization.");
 
     po::options_description desc("Options");
@@ -314,6 +316,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("proteoform-cutoff-type,T", po::value<std::string> (&cutoff_proteoform_type), "")
         ("proteoform-cutoff-value,V", po::value<std::string> (&cutoff_proteoform_value), "")
         ("keep-temp-files,k", "")
+        ("keep-decoy-ids,K", "")
         ("lookup-table,l", "")
         ("num-combined-spectra,r", po::value<std::string> (&group_num), "")
         ("thread-number,u", po::value<std::string> (&thread_number), "")
@@ -431,7 +434,9 @@ bool Argument::parse(int argc, char* argv[]) {
     if (vm.count("keep-temp-files")) {
       arguments_["keepTempFiles"] = "true";
     }
-
+    if (vm.count("keep-decoy-ids")) {
+      arguments_["keepDecoyResults"] = "true";
+    }
     if (vm.count("lookup-table")) {
       arguments_["useLookupTable"] = "true";
     }

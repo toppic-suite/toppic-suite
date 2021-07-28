@@ -73,6 +73,7 @@ void Argument::initArguments() {
   arguments_["varPtmNumInGap"] = "5";
   arguments_["geneHTMLFolder"] = "true";
   arguments_["wholeProteinOnly"] = "false";
+  arguments_["keepDecoyResults"] = "false";
   arguments_["version"] = "";
 }
 
@@ -223,6 +224,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("whole-protein-only,w", "Report only proteoforms from whole proteins.")
         ("combined-file-name,c", po::value<std::string>(&combined_output_name) , "Specify a file name for the combined spectrum data file and analysis results.")
         ("keep-temp-files,k", "Keep temporary files.")
+        ("keep-decoy-ids,K", "Keep decoy identifications.")
         ("skip-html-folder,g", "Skip generating an html folder containing TopView and spectrum data for visualization.");
   
     po::options_description desc("Options");
@@ -253,6 +255,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("num-shift,s", po::value<std::string> (&ptm_num), "")
         ("whole-protein-only,w", "")
         ("keep-temp-files,k", "")
+        ("keep-decoy-ids,K", "")
         ("skip-html-folder,g", "")
         ("database-file-name", po::value<std::string>(&database_file_name)->required(), "Database file name with its path.")
         ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), "Spectrum file name with its path.");
@@ -400,6 +403,10 @@ bool Argument::parse(int argc, char* argv[]) {
 
     if (vm.count("keep-temp-files")) {
       arguments_["keepTempFiles"] = "true";
+    }
+
+    if (vm.count("keep-decoy-ids")) {
+      arguments_["keepDecoyResults"] = "true";
     }
 
     if (vm.count("skip-html-folder")) {

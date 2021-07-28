@@ -91,12 +91,13 @@ void computeProteoformFdr(PrsmStrPtrVec2D &target_proteoforms,
 
 void process(const std::string &spec_file_name,
              const std::string &input_file_ext,
-             const std::string &output_file_ext) { 
+             const std::string &output_file_ext, 
+             std::string keep_decoy_results) { 
   std::string base_name = file_util::basename(spec_file_name);
   std::string input_file_name = base_name + "." + input_file_ext;
 
   PrsmStrPtrVec prsm_str_ptrs = prsm_reader_util::readAllPrsmStrs(input_file_name);
-
+  PrsmStrPtrVec all_ptrs;
   PrsmStrPtrVec target_ptrs;
   PrsmStrPtrVec decoy_ptrs;
   for(size_t i = 0; i < prsm_str_ptrs.size(); i++){
@@ -119,13 +120,23 @@ void process(const std::string &spec_file_name,
 
   PrsmStrPtrVec2D target_proteoforms = getGroups(target_ptrs);
   PrsmStrPtrVec2D decoy_proteoforms = getGroups(decoy_ptrs);
-
   computeProteoformFdr(target_proteoforms, decoy_proteoforms);
 
   std::string output_file_name = base_name + "." + output_file_ext;
   PrsmXmlWriter writer(output_file_name);
-  std::sort(target_ptrs.begin(), target_ptrs.end(), PrsmStr::cmpSpectrumIdInc);
-  writer.writeVector(target_ptrs);
+
+  if (keep_decoy_results == "true") {
+    //concat target_ptrs and decoy_ptrs;
+    all_ptrs.insert(all_ptrs.begin(), target_ptrs.begin(), target_ptrs.end());
+    all_ptrs.insert(all_ptrs.end(), decoy_ptrs.begin(), decoy_ptrs.end());
+    std::sort(all_ptrs.begin(), all_ptrs.end(), PrsmStr::cmpSpectrumIdInc);
+    std::cout << "target_ptrs: " << target_ptrs.size() << ", decoy_ptrs: " << decoy_ptrs.size() << std::endl;
+    writer.writeVector(all_ptrs);
+  }
+  else {
+    std::sort(target_ptrs.begin(), target_ptrs.end(), PrsmStr::cmpSpectrumIdInc);
+    writer.writeVector(target_ptrs);
+  }
   writer.close();
 }
 

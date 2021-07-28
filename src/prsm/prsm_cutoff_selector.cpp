@@ -13,6 +13,7 @@
 //limitations under the License.
 
 #include <algorithm>
+#include <iostream>
 
 #include "common/util/file_util.hpp"
 #include "prsm/prsm.hpp"
@@ -33,14 +34,13 @@ void process(const std::string &db_file_name,
 
   std::string base_name = file_util::basename(spec_file_name);
   std::string input_file_name = base_name + "." + input_file_ext;
-
+  
   ModPtrVec fix_mod_list;
   PrsmPtrVec prsms = prsm_reader_util::readAllPrsms(input_file_name, 
                                                     db_file_name, 
                                                     fix_mod_list );
 
   std::sort(prsms.begin(), prsms.end(), Prsm::cmpSpectrumIdIncPrecursorIdInc);
-
   bool evalue_cutoff = (cutoff_type == "EVALUE");
   bool fdr_cutoff = (cutoff_type == "FDR");
   bool form_fdr_cutoff = (cutoff_type == "FORMFDR");
@@ -53,7 +53,7 @@ void process(const std::string &db_file_name,
       prsms[i]->setPrsmId(id);
       selected_prsms.push_back(prsms[i]);
       id++;
-    } else if(fdr_cutoff && prsms[i]->getFdr() <= cutoff_value){
+    } else if((fdr_cutoff && prsms[i]->getFdr() <= cutoff_value)){
       prsms[i]->setPrsmId(id);
       selected_prsms.push_back(prsms[i]);
       id++;
@@ -68,7 +68,7 @@ void process(const std::string &db_file_name,
       prsms[i]->setExpectedValuePtr(ev_ptr);
       selected_prsms.push_back(prsms[i]);
       id++;
-    }   
+    } 
   }
 
   // output

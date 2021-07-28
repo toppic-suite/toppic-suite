@@ -366,7 +366,7 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
 
     if (arguments["searchType"] == "TARGET+DECOY") {
       std::cout << "FDR computation - started. " << std::endl;
-      prsm_fdr::process(sp_file_name, "toppic_cluster", "toppic_cluster_fdr");
+      prsm_fdr::process(sp_file_name, "toppic_cluster", "toppic_cluster_fdr", arguments["keepDecoyResults"]);
       std::cout << "FDR computation - finished." << std::endl;
       cur_suffix = "toppic_cluster_fdr";
     }
