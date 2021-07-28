@@ -59,11 +59,11 @@ bool Argument::parse(int argc, char* argv[]) {
          "<a positive integer>. Set the maximum charge state of precursor and fragment ions. The default value is 30.")
         ("max-mass,m", po::value<std::string> (&max_mass),
          "<a positive number>. Set the maximum monoisotopic mass of precursor and fragment ions. The default value is 100,000 Dalton.")
-        ("mz-error,e", po::value<std::string> (&mz_error),
+        ("mz-error,t", po::value<std::string> (&mz_error),
          "<a positive number>. Set the error tolerance of m/z values of spectral peaks. The default value is 0.02 m/z.")
         ("ms-one-sn-ratio,r", po::value<std::string> (&ms_one_sn_ratio),
          "<a positive number>. Set the signal-to-noise ratio for MS1 spectra. The default value is 3.")
-        ("ms-two-sn-ratio,t", po::value<std::string> (&ms_two_sn_ratio),
+        ("ms-two-sn-ratio,s", po::value<std::string> (&ms_two_sn_ratio),
          "<a positive number>. Set the signal-to-noise ratio for MS/MS spectra. The default value is 1.")
         ("precursor-window,w", po::value<std::string> (&prec_window),
          "<a positive number>. Set the precursor window size. The default value is 3.0 m/z.")
@@ -80,9 +80,9 @@ bool Argument::parse(int argc, char* argv[]) {
         ("activation,a", po::value<std::string> (&activation), "")
         ("max-charge,c", po::value<std::string> (&max_charge), "")
         ("max-mass,m", po::value<std::string> (&max_mass), "")
-        ("mz-error,e", po::value<std::string> (&mz_error), "")
+        ("mz-error,t", po::value<std::string> (&mz_error), "")
         ("ms-one-sn-ratio,r", po::value<std::string> (&ms_one_sn_ratio), "")
-        ("ms-two-sn-ratio,t", po::value<std::string> (&ms_two_sn_ratio), "")
+        ("ms-two-sn-ratio,s", po::value<std::string> (&ms_two_sn_ratio), "")
         ("precursor-window,w", po::value<std::string> (&prec_window), "")
         ("missing-level-one,o", "")
         ("thread-number,u", po::value<std::string> (&thread_number), "")
