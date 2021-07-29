@@ -118,8 +118,9 @@ void DeconvProcess::process() {
     for (int i = 0; i < dt_proc_ptr.size(); i++) {
       for (int j = 0; j < dt_proc_ptr[i]->processingMethods.size(); j++) {
         pwiz::msdata::ProcessingMethod proc_method = dt_proc_ptr[i]->processingMethods[j];
-        int cvid_for_peak_picking = 1000035;
-        if (proc_method.hasCVParam(cvid_for_peak_picking)) {
+	pwiz::cv::CVID cvid_peak_picking;
+	cvid_peak_picking = pwiz::cv::MS_peak_picking;
+        if (proc_method.hasCVParam(cvid_peak_picking)) {
           is_profile_data = false;
         }
       }
