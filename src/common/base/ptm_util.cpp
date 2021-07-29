@@ -14,6 +14,7 @@
 
 #include <fstream>
 #include <string>
+#include <exception>
 
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
@@ -23,6 +24,12 @@
 namespace toppic {
 
 namespace ptm_util {
+
+struct DuplicatePtmError: public std::exception {
+  const char * what () const throw () {
+    return "";
+  }
+};
 
 PtmPtrVec readPtmTxt(const std::string &file_name) {
   std::ifstream infile(file_name.c_str());
@@ -48,12 +55,24 @@ PtmPtrVec readPtmTxt(const std::string &file_name) {
       int unimod_id = std::stoi(l[4]);
       PtmPtr ptm_ptr = PtmBase::getPtmPtr(
           std::make_shared<Ptm>(name, name, mass, unimod_id)); 
+
+      //check if same name exists in the ptm_vec
+      for (size_t i = 0; i < ptm_vec.size(); i++) {
+        if (ptm_vec[i]->getName() == name) {
+          throw DuplicatePtmError();
+        }
+      }
       ptm_vec.push_back(ptm_ptr);
     } catch (char const* e) {
       LOG_ERROR("Errors in the Variable PTM file: " << file_name);
       LOG_ERROR("Errors in the line: " << line);
       exit(EXIT_FAILURE);
-    }
+    } catch (DuplicatePtmError& e) {
+      LOG_ERROR("Errors in the Variable PTM file: " << file_name);
+      LOG_ERROR("Errors in the line: " << line);
+      std::cout << "Mod file cannot have two ptms with the same name. Please review and edit the file." << std::endl;
+      exit(EXIT_FAILURE);
+    } 
   }
   infile.close();
 
