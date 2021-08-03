@@ -14,6 +14,8 @@
 
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
+#include "common/util/file_util.hpp"
+
 #include "common/base/mod_util.hpp"
 #include "common/base/prot_mod_base.hpp"
 #include "para/prsm_para.hpp"
@@ -21,7 +23,7 @@
 namespace toppic {
 
 PrsmPara::PrsmPara(std::map<std::string, std::string> &arguments) {
-  search_db_file_name_ = arguments["databaseFileName"];
+  search_db_file_name_ = file_util::basenameFromEntirePathKeepDot(arguments["databaseFileName"]);
 
   ori_db_name_ = arguments["oriDatabaseFileName"];
 

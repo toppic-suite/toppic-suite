@@ -89,7 +89,7 @@ std::string RunExe::geneCommand(TopfdParaPtr para_ptr, std::vector<std::string> 
   return command;
 }
 
-/*function for toppic, topmg, topdiff*/
+/*function for toppic, topmg, topmerge, topdiff*/
 std::string RunExe::geneCommand(std::map<std::string, std::string> arguments_, std::vector<std::string> spec_file_lst_, std::string app_name) {
   std::string exe_path = arguments_["executiveDir"] + "\\" + app_name + ".exe ";
   std::string command = exe_path;
@@ -99,7 +99,6 @@ std::string RunExe::geneCommand(std::map<std::string, std::string> arguments_, s
     else if (common_para.find(it->first) != common_para.end()) { //if one of the common parameters
       //skip some paramters based on parameter values
       if (it->first == "fixedMod" && it->second == "") continue;
-      else if (it->first == "combinedOutputName" && it->second == "") continue;
       else if (it->first == "useFeatureFile") {
         if (it->second == "false") {
           command = command + common_para[it->first] + " ";
@@ -110,7 +109,7 @@ std::string RunExe::geneCommand(std::map<std::string, std::string> arguments_, s
           command = command + common_para[it->first] + " ";
         }
       }
-      else if (it->first == "keepTempFiles" || it->first == "geneHTMLFolder") {
+      else if (it->first == "keepTempFiles" || it->first == "geneHTMLFolder" || it->first == "keepDecoyResults") {
         if (it->second == "true") {
           command = command + common_para[it->first] + " ";
         }
@@ -144,6 +143,18 @@ std::string RunExe::geneCommand(std::map<std::string, std::string> arguments_, s
     }
     else if (app_name == "topdiff" && topdiff_para.find(it->first) != topdiff_para.end()) {
       command = command + topdiff_para[it->first] + it->second + " ";
+    }
+    else if (app_name == "topmerge") {
+      //some parameters require extra processing
+      if (it->first == "residueModFileName" && it->second == "") continue; //don't add -i
+      else if (it->first == "useLookupTable") {
+        if (it->second == "true") {
+          command = command + topmerge_para[it->first] + " ";
+        }
+      }
+      else {
+        command = command + topmerge_para[it->first] + it->second + " ";
+      }
     }
     else {//parameter is not found anywhere
       LOG_ERROR("Parameter " << it->first << " from " << app_name << " was not found in any apps!");

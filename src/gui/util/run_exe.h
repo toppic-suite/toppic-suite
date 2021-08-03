@@ -38,8 +38,8 @@ class RunExe {
     {"cutoffProteoformValue", "-V "},
     {"ptmNumber", "-s "},
     {"useFeatureFile", "-x "},
-    {"combinedOutputName", "-c "},
     {"keepTempFiles", "-k "},
+    {"keepDecoyResults", "-K "},
     {"geneHTMLFolder", "-g "},
     //{"oriDatabaseFileName", ""}
   };
@@ -75,6 +75,14 @@ class RunExe {
     {"mergedOutputFileName", "-o "},
     {"toolName", "-t "},
   };
+
+  std::map<std::string, std::string> topmerge_para {
+    {"combinedOutputName", "-c "},
+    {"residueModFileName", "-i "},
+    {"localThreshold", "-H "},
+    {"massErrorTolerance", "-e "}
+  };
+
   std::string geneCommand(std::map<std::string, std::string> arguments_, std::string app_name);
   std::string geneCommand(TopfdParaPtr para_ptr, std::vector<std::string> spec_file_lst_, std::string app_name);
   std::string geneCommand(std::map<std::string, std::string> arguments_, std::vector<std::string> spec_file_lst_, std::string app_name);

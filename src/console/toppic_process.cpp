@@ -118,7 +118,7 @@ void cleanToppicDir(const std::string &fa_name,
     file_util::delFile(sp_base + ".toppic_combined");
     file_util::delFile(sp_base + ".toppic_evalue");
     file_util::cleanPrefix(sp_name, sp_base + ".toppic_evalue_");
-    file_util::delFile(sp_base + ".toppic_top");
+    //file_util::delFile(sp_base + ".toppic_top");
     file_util::delFile(sp_base + ".toppic_cluster");
     file_util::delFile(sp_base + ".toppic_cluster_fdr");
     file_util::delFile(sp_base + ".toppic_prsm_cutoff");
@@ -310,7 +310,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     std::cout << "E-value computation - finished." << std::endl;
 
     std::cout << "Top PrSM selecting - started" << std::endl;
-    prsm_top_selector::process(sp_file_name, "toppic_evalue", "toppic_top", n_top);
+    prsm_top_selector::process(sp_file_name, "toppic_evalue", "toppic_prsm", n_top);
     std::cout << "Top PrSM selecting - finished." << std::endl;
 
   } catch (const char* e) {
@@ -346,19 +346,20 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     std::cout << "Finding PrSM clusters - started." << std::endl;
     double form_error_tole = std::stod(arguments["proteoformErrorTolerance"]);
     LOG_DEBUG("form error tole " << form_error_tole);
+
     if (arguments["useFeatureFile"] == "true") {
       // TopFD msalign file with feature ID
       ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();
       prsm_feature_cluster::process(db_file_name,
                                     sp_file_name,
-                                    "toppic_top",
+                                    "toppic_prsm",
                                     "toppic_cluster",
                                     fix_mod_list,
                                     form_error_tole);
     } 
     else {
       prsm_simple_cluster::process(db_file_name, sp_file_name,
-                                   "toppic_top", prsm_para_ptr->getFixModPtrVec(),
+                                   "toppic_prsm", prsm_para_ptr->getFixModPtrVec(),
                                    "toppic_cluster", form_error_tole);
     }
     std::cout << "Finding PrSM clusters - finished." << std::endl;
@@ -531,10 +532,10 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
     std::cout << "Merging identification files started." << std::endl;
     std::vector<std::string> prsm_file_lst(spec_file_lst.size());
     for (size_t i = 0; i < spec_file_lst.size(); i++) {
-      prsm_file_lst[i] = file_util::basename(spec_file_lst[i]) + ".toppic_top"; 
+      prsm_file_lst[i] = file_util::basename(spec_file_lst[i]) + ".toppic_prsm"; 
     }
     int N = 1000000;
-    prsm_util::mergePrsmFiles(prsm_file_lst, N , full_combined_name + "_ms2.toppic_top");
+    prsm_util::mergePrsmFiles(prsm_file_lst, N , full_combined_name + "_ms2.toppic_prsm");
     std::cout << "Merging identification files finished." << std::endl;
     std::cout << "Merging files - finished." << std::endl;
 

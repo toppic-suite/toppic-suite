@@ -12,40 +12,29 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_GUI_THREADTOPPIC_H
-#define TOPPIC_GUI_THREADTOPPIC_H
 
+#ifndef TOPPIC_GUI_THREADTOPMERGE_H
+#define TOPPIC_GUI_THREADTOPMERGE_H
 
-#include <iostream>
-#include <iomanip>
 #include <map>
 #include <string>
+#include <iostream>
+#include <algorithm>
 #include <vector>
-#include <ctime>
-
-#include "common/util/version.hpp"
-#include "common/util/file_util.hpp"
-#include "common/util/str_util.hpp"
-
-#include "ms/spec/msalign_util.hpp"
-
-#include "prsm/prsm_util.hpp"
-
-#include "console/toppic_argument.hpp"
-#include "console/toppic_process.hpp"
 
 #include <QThread>
 
 namespace Ui {
-class threadtoppic;
+class ThreadTopMerge;
 }
 
-class threadtoppic : public QThread {
- Q_OBJECT
- public:
-  explicit threadtoppic(QObject* par) : QThread(par) {}
+class ThreadTopMerge : public QThread {
+  Q_OBJECT
 
-  ~threadtoppic() {}
+ public:
+  explicit ThreadTopMerge(QObject* par) : QThread(par) {}
+
+  ~ThreadTopMerge() {}
 
   void run();
 
@@ -60,4 +49,5 @@ class threadtoppic : public QThread {
   std::vector<std::string> spec_file_lst_;
 };
 
-#endif  // TOPPIC_GUI_THREADTOPPIC_H
+#endif
+
