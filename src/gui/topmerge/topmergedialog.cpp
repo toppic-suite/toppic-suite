@@ -223,6 +223,15 @@ bool TopMergeDialog::continueToClose() {
     return false;
   }
 }
+void TopMergeDialog::on_modFileButton_clicked() {
+  QString s = QFileDialog::getOpenFileName(
+      this,
+      "Select a modification file for PTM localization",
+      lastDir_,
+      "Modification files(*.txt);;All files(*.*)");
+  updatedir(s);
+  ui->modFileEdit->setText(s);
+}
 
 void TopMergeDialog::on_outputButton_clicked() {
   std::string db_file_name = ui->databaseFileEdit->text().toStdString();
