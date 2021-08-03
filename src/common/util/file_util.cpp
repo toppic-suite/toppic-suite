@@ -92,6 +92,15 @@ std::string basenameFromEntirePath(const std::string &s) {
   return basename(s);
 }
 
+std::string basenameFromEntirePathKeepDot(const std::string &s) {
+  //for files like */uniprot-st.fasta_target
+  size_t slash_pos = s.find_last_of("\\/");
+  if (slash_pos < s.length()) {
+    return s.substr(slash_pos + 1);
+  }
+  return s;
+}
+
 std::string basename(const std::string &s) {
   size_t dot_pos = s.find_last_of(".");
   if (dot_pos < s.length()) {
