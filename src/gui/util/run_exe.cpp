@@ -109,8 +109,13 @@ std::string RunExe::geneCommand(std::map<std::string, std::string> arguments_, s
           command = command + common_para[it->first] + " ";
         }
       }
-      else if (it->first == "keepTempFiles" || it->first == "geneHTMLFolder" || it->first == "keepDecoyResults") {
+      else if (it->first == "keepTempFiles" || it->first == "keepDecoyResults") {
         if (it->second == "true") {
+          command = command + common_para[it->first] + " ";
+        }
+      }
+      else if (it->first == "geneHTMLFolder" ) {//for geneHTML folder, the argument should be added when the value is false
+        if (it->second != "true") {
           command = command + common_para[it->first] + " ";
         }
       }
