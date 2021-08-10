@@ -96,7 +96,11 @@ void DeconvProcess::prepareFileFolder() {
     if (!file_util::exists(html_dir_)) {
       //file_util::delDir(html_dir_);
       file_util::createFolder(html_dir_);
+    }
+    if (!file_util::exists(ms1_json_dir_)) {
       file_util::createFolder(ms1_json_dir_);
+    }
+    if (!file_util::exists(ms2_json_dir_)) {
       file_util::createFolder(ms2_json_dir_);
     }
   }
@@ -324,7 +328,6 @@ void deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   for (size_t i = 0; i < peak_list.size(); i++) {
     peak_list[i]->setIntensity(intensities[i]);
   }
-
   //write only when html folder argument is true
   if (gene_html_dir) {
     std::string json_file_name = ms1_json_dir 
@@ -419,7 +422,6 @@ std::function<void()> geneTask(RawMsGroupPtr ms_group_ptr,
 }
 
 void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
-
   int total_scan_num = reader_ptr->getInputSpNum();//this is spectrum count, not same as scan ID count
 
   RawMsGroupPtr ms_group_ptr;
