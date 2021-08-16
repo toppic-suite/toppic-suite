@@ -14,7 +14,6 @@
 
 #include <iomanip>
 #include <sstream>
-#include <iostream>
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
