@@ -26,7 +26,7 @@ FracFeature::FracFeature(int id, int frac_id,
                          double time_begin, double time_end,
                          int scan_begin, int scan_end,
                          int min_charge, int max_charge, 
-                         int env_num): 
+                         int env_num, double time_apex): 
     id_(id),
     frac_id_(frac_id),
     file_name_(file_name),
@@ -40,7 +40,8 @@ FracFeature::FracFeature(int id, int frac_id,
     scan_end_(scan_end),
     min_charge_(min_charge),
     max_charge_(max_charge),
-    env_num_(env_num) {
+    env_num_(env_num),
+    time_apex_(time_apex) {
     }
 
 FracFeature::FracFeature(std::string line) {

@@ -32,10 +32,11 @@ void writeHeader(std::ofstream &of) {
       << "Intensity" << "\t"
       << "Time_begin" << "\t"
       << "Time_end" << "\t"
+      << "Time_apex" << "\t"
       << "Minimum_charge_state" << "\t"
       << "Maximum_charge_state" << "\t"
       << "Minimum_fraction_id" << "\t"
-      << "Maximum_fraction_id"
+      << "Maximum_fraction_id" 
       << std::endl;
 }
 
@@ -46,6 +47,7 @@ void writeOneFeature(std::ofstream &of, SampleFeaturePtr feature) {
       << feature->getIntensity() << "\t"
       << feature->getTimeBegin() << "\t"
       << feature->getTimeEnd() << "\t"
+      << feature->getTimeApex() << "\t"
       << feature->getMinCharge() << "\t"
       << feature->getMaxCharge() << "\t"
       << feature->getMinFracId() << "\t"

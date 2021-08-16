@@ -66,6 +66,8 @@ class SpecFeature {
 
   double getFracFeatureScore() {return frac_feature_score_;}
 
+  double getFracFeatureTimeApex() {return frac_feature_time_apex_;}
+
   int getSampleFeatureId() {return sample_feature_id_;}
 
   double getSampleFeatureInte() {return sample_feature_inte_;}
@@ -96,6 +98,7 @@ class SpecFeature {
   int frac_feature_id_;
   double frac_feature_inte_;
   double frac_feature_score_;
+  double frac_feature_time_apex_;
   int sample_feature_id_;
   double sample_feature_inte_;
 };

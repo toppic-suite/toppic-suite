@@ -50,6 +50,7 @@ void writeHeader(std::ofstream &of) {
       << "Fraction_feature_ID" << "\t"
       << "Fraction_feature_intensity" << "\t"
       << "Fraction_feature_score" << "\t"
+      << "Fraction_feature_time_apex" << "\t"
       << "Sample_feature_ID" << "\t"
       << "Sample_feature_intensity"
       << std::endl;
@@ -67,6 +68,7 @@ void writeOneFeature(std::ofstream &of, SpecFeaturePtr feature) {
       << feature->getFracFeatureId() << "\t"
       << feature->getFracFeatureInte() << "\t"
       << feature->getFracFeatureScore() << "\t"
+      << feature->getFracFeatureTimeApex() << "\t"
       << feature->getSampleFeatureId() << "\t"
       << feature->getSampleFeatureInte() 
       << std::endl;

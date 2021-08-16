@@ -75,6 +75,8 @@ class MsHeader {
 
   double getPrecInte() {return prec_inte_;}
 
+  double getTimeApex() {return time_apex_;}
+
   // set function 
   void setActivationPtr(ActivationPtr acti_ptr) {activation_ptr_ = acti_ptr;}
 
@@ -152,6 +154,8 @@ class MsHeader {
   int prec_charge_ = -1;
   // precursor intensity 
   double prec_inte_ = 0;
+  //rt with the highest intensity in this feature
+  double time_apex_;
 };
 
 typedef std::vector<MsHeaderPtr> MsHeaderPtrVec;

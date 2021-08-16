@@ -14,6 +14,7 @@
 
 #include <iomanip>
 #include <sstream>
+#include <iostream>
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
@@ -56,6 +57,7 @@ void PrsmTableWriter::write() {
       << "Proteoform ID" << delim
       << "Feature intensity" << delim
       << "Feature score" << delim
+      << "Feature apex" << delim
       << "Protein accession" << delim
       << "Protein description" << delim
       << "First residue" << delim
@@ -70,7 +72,7 @@ void PrsmTableWriter::write() {
       << "Spectrum-level Q-value" << delim
       << "Proteoform-level Q-value" << std::endl;
 
-  std::string input_file_name = file_util::basename(spectrum_file_name) + "." + input_file_ext_;
+  std::string input_file_name = file_util::basename(spectrum_file_name) + "." + input_file_ext_;  
   //std::string db_file_name = prsm_para_ptr_->getSearchDbFileName();
   std::string db_file_name = prsm_para_ptr_->getOriDbName() + "_idx" + file_util::getFileSeparator() + prsm_para_ptr_->getSearchDbFileName();
   FastaIndexReaderPtr seq_reader = std::make_shared<FastaIndexReader>(db_file_name);
@@ -161,6 +163,7 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   }
 
   file << prsm_ptr->getFracFeatureScore() << delim;
+  file << prsm_ptr->getTimeApex() << delim;
 
   file << prsm_ptr->getProteoformPtr()->getSeqName() << delim
       << prsm_ptr->getProteoformPtr()->getSeqDesc() << delim

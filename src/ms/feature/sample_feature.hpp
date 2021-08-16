@@ -50,6 +50,8 @@ class SampleFeature {
 
   double getTimeMiddle() {return (time_begin_ + time_end_)/2;}
 
+  double getTimeApex() {return time_apex_;}
+
   int getMinCharge() {return min_charge_;}
 
   int getMaxCharge() {return max_charge_;}
@@ -79,6 +81,7 @@ class SampleFeature {
   double intensity_;
   double time_begin_;
   double time_end_;
+  double time_apex_;
   int min_charge_;
   int max_charge_;
   int min_frac_id_;
