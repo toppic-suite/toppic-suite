@@ -38,7 +38,7 @@ class FracFeature {
               double retent_begin, double retent_end,
               int scan_begin, int scan_end,
               int min_charge, int max_charge, 
-              int env_num);
+              int env_num, double time_apex);
 
   FracFeature(std::string line);
 
@@ -75,6 +75,8 @@ class FracFeature {
   int getMaxCharge() {return max_charge_;}
 
   int getEnvNum() {return env_num_;}
+
+  double getTimeApex() {return time_apex_;}
 
   int getSampleFeatureId() {return sample_feature_id_;}
 
@@ -133,6 +135,7 @@ class FracFeature {
   int min_charge_;
   int max_charge_;
   int env_num_ = 0;
+  double time_apex_;
   int sample_feature_id_ = -1;
   double sample_feature_inte_ = 0;
   SingleChargeFeaturePtrVec single_features_;

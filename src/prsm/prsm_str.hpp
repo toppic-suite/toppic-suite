@@ -103,6 +103,8 @@ class PrsmStr {
 
   void setSampleId(int sample_id) {sample_id_ = sample_id;}
 
+  void setTimeApex(double time_apex) {time_apex_ = time_apex;}
+
   static bool cmpEValueInc(const PrsmStrPtr &a, const PrsmStrPtr &b) {
     return a->getEValue() < b->getEValue();}
 
@@ -177,6 +179,8 @@ class PrsmStr {
   std::string protein_match_seq_;
 
   int sample_id_;
+
+  double time_apex_;
 };
 
 typedef std::vector<PrsmStrPtr> PrsmStrPtrVec;

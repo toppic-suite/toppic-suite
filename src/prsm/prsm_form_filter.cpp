@@ -13,7 +13,6 @@
 //limitations under the License.
 
 #include <algorithm>
-
 #include "common/util/file_util.hpp"
 #include "prsm/prsm_reader_util.hpp"
 #include "prsm/prsm_xml_writer.hpp"

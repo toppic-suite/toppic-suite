@@ -441,7 +441,6 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     prsm_form_filter::process(db_file_name, sp_file_name, "toppic_form_cutoff",
                               "toppic_form_cutoff_form");
     std::cout << "Selecting top PrSMs for proteoforms - finished." << std::endl;
-
     std::cout << "Outputting proteoform table - started." << std::endl;
     PrsmTableWriterPtr form_out
         = std::make_shared<PrsmTableWriter>(prsm_para_ptr, argu_str,
@@ -559,7 +558,7 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
     std::string sp_file_name = full_combined_name + "_ms2.msalign";
     cleanToppicDir(ori_db_file_name, sp_file_name, keep_temp_files);
   }
-  std::cout << "Deleting temporary files - finished." << std::endl; 
+  std::cout << "Deleting temporary files - finished." << std::endl;
 
   std::cout << "TopPIC finished." << std::endl << std::flush;
 

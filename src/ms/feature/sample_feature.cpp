@@ -44,6 +44,7 @@ SampleFeature::SampleFeature(FracFeaturePtr frac_feature, int id) {
   max_charge_ = first_ft->getMaxCharge();
   min_frac_id_ = first_ft->getFracId();
   max_frac_id_ = first_ft->getFracId();
+  time_apex_ = first_ft->getTimeApex();
 }
 
 SampleFeature::SampleFeature(FracFeaturePtrVec &frac_features, int id) {

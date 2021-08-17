@@ -83,6 +83,8 @@ class Prsm {
 
   double getOneProtProb();
 
+  double getTimeApex() {return time_apex_;};
+
   // setter
   void setFileName(const std::string & fname) {file_name_ = fname;}
 
@@ -179,6 +181,8 @@ class Prsm {
   double fdr_ = -1;
 
   double proteoform_fdr_ = -1;
+
+  double time_apex_;
 
   /* The following are not saved in xml */
   DeconvMsPtrVec deconv_ms_ptr_vec_;

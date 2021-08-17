@@ -121,6 +121,8 @@ XmlDOMElement* Prsm::toXmlElement(XmlDOMDocument* xml_doc) {
   xml_doc->addElement(element, "match_fragment_num", str.c_str());
   str = str_util::toString(getNormMatchFragNum());
   xml_doc->addElement(element, "norm_match_fragment_num", str.c_str());
+  str = str_util::toString(time_apex_);
+  xml_doc->addElement(element, "fraction_feature_time_apex", str.c_str());
   proteoform_ptr_->appendXml(xml_doc, element);
   if (expected_value_ptr_ != nullptr) {
     expected_value_ptr_->appendXml(xml_doc, element);

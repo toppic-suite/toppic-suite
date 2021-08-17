@@ -70,7 +70,6 @@ void MsAlignWriter::write(DeconvMsPtr ms_ptr) {
     output_ << "PRECURSOR_INTENSITY=" << std::fixed << std::setprecision(2) 
         <<  header_ptr->getPrecInte() << std::endl;
   }
-
   for (size_t i = 0; i < ms_ptr->size(); i++) {
     DeconvPeakPtr peak_ptr = ms_ptr->getPeakPtr(i);
     output_ << std::fixed << std::setprecision(5) << peak_ptr->getPosition();
