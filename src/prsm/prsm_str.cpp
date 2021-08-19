@@ -47,6 +47,8 @@ PrsmStr::PrsmStr(const std::vector<std::string> &str_vec) {
   match_frag_num_ = std::stod(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<norm_match_fragment_num>");
   norm_match_frag_num_ = std::stod(prsm_util::getValueStr(line));
+  line = prsm_util::getXmlLine(str_vec_, "<fraction_feature_time_apex>");
+  time_apex_ =  std::stod(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<e_value>");
   if (line == "") {
     e_value_ = 0.0;

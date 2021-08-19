@@ -182,7 +182,7 @@ class Prsm {
 
   double proteoform_fdr_ = -1;
 
-  double time_apex_;
+  double time_apex_ = -1;
 
   /* The following are not saved in xml */
   DeconvMsPtrVec deconv_ms_ptr_vec_;

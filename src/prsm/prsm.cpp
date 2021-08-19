@@ -151,6 +151,7 @@ void Prsm::parseXml(XmlDOMElement *element) {
   proteoform_fdr_ = xml_dom_util::getDoubleChildValue(element, "proteoform_fdr", 0);
   match_peak_num_ = xml_dom_util::getDoubleChildValue(element, "match_peak_num", 0);
   match_fragment_num_ = xml_dom_util::getDoubleChildValue(element, "match_fragment_num", 0);
+  time_apex_ = xml_dom_util::getDoubleChildValue(element, "fraction_feature_time_apex", 0);
 
   int prob_count = xml_dom_util::getChildCount(element, "extreme_value");
   if (prob_count != 0) {
