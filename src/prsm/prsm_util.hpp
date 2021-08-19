@@ -25,6 +25,8 @@ namespace prsm_util {
 
 std::string getValueStr(std::string line);
 
+void setValueStr(std::vector<std::string> &str_vec, const std::string &property, std::string val);
+
 std::string getXmlLine(const std::vector<std::string> &str_vec,
                        const std::string &property);
 

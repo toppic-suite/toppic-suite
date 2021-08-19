@@ -56,8 +56,9 @@ SpecFeature::SpecFeature(std::string line) {
   frac_feature_id_ = std::stoi(strs[8]);
   frac_feature_inte_ = std::stod(strs[9]);
   frac_feature_score_ = std::stod(strs[10]);
-  sample_feature_id_ = std::stoi(strs[11]);
-  sample_feature_inte_ = std::stod(strs[12]);
+  frac_feature_time_apex_ = std::stod(strs[11]);
+  sample_feature_inte_ = std::stod(strs[13]);
+  sample_feature_id_ = std::stoi(strs[12]);
 }
 
 SpecFeature::SpecFeature(MsHeaderPtr header, FracFeaturePtr feature) {

@@ -79,6 +79,8 @@ class PrsmStr {
 
   int getSampleId() {return sample_id_;}
 
+  double getTimeApex() {return time_apex_;}
+
   void setFileName(const std::string & fname);
 
   void setSpectrumId(int id);
@@ -180,7 +182,7 @@ class PrsmStr {
 
   int sample_id_;
 
-  double time_apex_;
+  double time_apex_ = -1;
 };
 
 typedef std::vector<PrsmStrPtr> PrsmStrPtrVec;

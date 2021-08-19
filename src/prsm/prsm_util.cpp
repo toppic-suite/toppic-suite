@@ -29,6 +29,20 @@ namespace toppic {
 
 namespace prsm_util {
 
+void setValueStr(std::vector<std::string> &str_vec, const std::string &property, std::string val) {
+  for (size_t i = 0; i < str_vec.size(); i++) {
+    size_t found = str_vec[i].find(property);
+    if (found != std::string::npos) {
+      std::string line = str_vec[i];
+      int start = line.find(">");
+      int end = line.find("<", start);
+      std::string start_tag = line.substr(0, start + 1);
+      std::string end_tag = line.substr(end);
+      str_vec[i] = start_tag + val + end_tag;
+    }
+  }
+};
+
 std::string getValueStr(std::string line) {
   int start = line.find(">");
   int end = line.find("<", start);

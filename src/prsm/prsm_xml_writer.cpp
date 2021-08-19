@@ -17,6 +17,7 @@
 #include "common/xml/xml_dom_impl.hpp"
 #include "common/xml/xml_dom_util.hpp"
 #include "prsm/prsm_xml_writer.hpp"
+#include "prsm/prsm_util.hpp"
 
 namespace toppic {
 
@@ -42,6 +43,7 @@ void PrsmXmlWriter::close() {
 
 void PrsmXmlWriter::write(PrsmStrPtr prsm_str_ptr) {
   std::vector<std::string> strs = prsm_str_ptr->getStrVec();
+  prsm_util::setValueStr(strs, "<fraction_feature_time_apex>", str_util::toString(prsm_str_ptr->getTimeApex()));
   for (size_t i = 0; i < strs.size(); i++) {
     file_ << strs[i] << std::endl;
   }
