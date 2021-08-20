@@ -165,8 +165,7 @@ void dbSimplePreprocess(const std::string &ori_db_file_name,
 void dbPreprocess(const std::string &ori_db_file_name,
                   const std::string &db_file_name,
                   bool decoy, int block_size, int max_frag_len) {
-  std::string standard_db_file_name = ori_db_file_name + "_idx" + file_util::getFileSeparator() + ori_db_file_name + "_standard";
-  std::string db_file_path = ori_db_file_name + "_idx" + file_util::getFileSeparator() + file_util::basenameFromEntirePathKeepDot(db_file_name);
+std::string standard_db_file_name = ori_db_file_name + "_idx" + file_util::getFileSeparator() + file_util::basenameFromEntirePathKeepDot(ori_db_file_name) + "_standard";  std::string db_file_path = ori_db_file_name + "_idx" + file_util::getFileSeparator() + file_util::basenameFromEntirePathKeepDot(db_file_name);
   
   if (!file_util::exists(ori_db_file_name + "_idx")){//if _idx folder doesn't exist yet
       file_util::createFolder(ori_db_file_name + "_idx");

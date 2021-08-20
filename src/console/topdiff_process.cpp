@@ -27,7 +27,7 @@ int topDiffProcess(std::map<std::string, std::string> &arguments,
                     std::vector<std::string> &input_file_list) {
   try{
     std::cout << "TopDiff " << Version::getVersion() << std::endl;
-
+    arguments["version"] = toppic::Version::getVersion();
     Argument::outputArguments(std::cout, arguments);
     base_data::init();
 

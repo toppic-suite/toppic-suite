@@ -107,6 +107,7 @@ void toppicWindow::initArguments() {
   arguments_["executiveDir"] = ".";
   arguments_["resourceDir"] = "";
   arguments_["keepTempFiles"] = "false";
+  arguments_["keepDecoyResults"] = "false";
   arguments_["localThreshold"] = "0.15";
   arguments_["groupSpectrumNumber"] = "1";
   arguments_["filteringResultNumber"] = "20";
@@ -326,7 +327,16 @@ std::map<std::string, std::string> toppicWindow::getArguments() {
   } else {
     arguments_["useLookupTable"] = "false";
   }
-  arguments_["keepTempFiles"] = "false";   // default
+  if (ui->keepTempCheckBox->isChecked()) {
+    arguments_["keepTempFiles"] = "true";
+  } else {
+    arguments_["keepTempFiles"] = "false";
+  }
+  if (ui->keepDecoyCheckBox->isChecked()) {
+    arguments_["keepDecoyResults"] = "true";
+  } else {
+    arguments_["keepDecoyResults"] = "false";
+  }
   arguments_["localThreshold"] = ui->miscoreThresholdEdit->text().toStdString();
   arguments_["groupSpectrumNumber"] = ui->numCombinedEdit->text().toStdString();
   arguments_["filteringResultNumber"] = "20";  // default

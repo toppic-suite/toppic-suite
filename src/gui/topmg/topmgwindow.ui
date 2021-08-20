@@ -137,7 +137,7 @@ p, li { white-space: pre-wrap; }
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab_4">
      <attribute name="title">
@@ -393,6 +393,13 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
+       <item>
+        <widget class="QCheckBox" name="topfdFeatureCheckBox">
+         <property name="text">
+          <string>Missing MS1 feature file</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="horizontalLayoutWidget_11">
@@ -585,9 +592,16 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="topfdFeatureCheckBox">
+        <widget class="QCheckBox" name="keepDecoyCheckBox">
          <property name="text">
-          <string>Missing MS1 feature file</string>
+          <string>Keep decoy identifications</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="keepTempCheckBox">
+         <property name="text">
+          <string>Keep intermediate files</string>
          </property>
         </widget>
        </item>

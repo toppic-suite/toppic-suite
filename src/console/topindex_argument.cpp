@@ -45,7 +45,7 @@ void Argument::initArguments() {
   arguments_["executiveDir"] = ".";
   arguments_["resourceDir"] = "";
   arguments_["threadNumber"] = "1";
-
+  arguments_["version"] = "";
   // filtering result number is for diagonal filter
   arguments_["filteringResultNumber"] = "20";
   
@@ -77,6 +77,7 @@ void Argument::outputArguments(std::ostream &output,
 
   output << std::setw(44) << std::left << "Allowed N-terminal forms: " << "\t" <<  arguments["allowProtMod"] << std::endl;
   output << std::setw(44) << std::left << "Thread number: " << "\t" << arguments["threadNumber"] << std::endl;
+  output << std::setw(44) << std::left << "Version: " << "\t" << arguments["version"] << std::endl;
   output << "********************** Parameters **********************" << std::endl;
 }
 

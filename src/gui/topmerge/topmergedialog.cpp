@@ -112,7 +112,7 @@ void TopMergeDialog::on_clearButton_clicked() {
   ui->listWidget->clear();
   ui->outputTextBrowser->setText("Click the Start button to process the data.");
   ui->combinedOutputEdit->setText("combined");
-  ui->outputButton->setEnabled(false);
+  ui->outputButton->setEnabled(true);
 }
 
 void TopMergeDialog::on_defaultButton_clicked() {

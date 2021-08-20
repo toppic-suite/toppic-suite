@@ -18,6 +18,7 @@
 #include "common/util/version.hpp"
 #include "common/util/time_util.hpp"
 #include "topfd/common/topfd_para.hpp"
+#include "common/util/version.hpp"
 
 namespace toppic {
 
@@ -78,6 +79,7 @@ std::string TopfdPara::getParaStr(const std::string &prefix) {
   }
   //output << prefix << std::setw(gap) << std::left 
      // << "Do final filtering: " << para_ptr->do_final_filtering_ << std::endl;
+  output << prefix << std::setw(gap) << std::left << "Version: " << "\t" << Version::getVersion() << std::endl;   
   output << prefix << "###################### Parameters ######################" << std::endl;
   return output.str();
 }

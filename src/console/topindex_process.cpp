@@ -43,7 +43,7 @@ namespace toppic{
 void TopIndexProcess(std::map<std::string, std::string> &arguments){
   try {
     std::cout << "TopIndex " << Version::getVersion() << std::endl;
-
+    arguments["version"] = toppic::Version::getVersion();
     Argument::outputArguments(std::cout, arguments);
     base_data::init();
 

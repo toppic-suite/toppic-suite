@@ -99,6 +99,7 @@ void topmgWindow::initArguments() {
   arguments_["executiveDir"] = ".";
   arguments_["resourceDir"] = "";
   arguments_["keepTempFiles"] = "false";
+  arguments_["keepDecoyResults"] = "false";
   arguments_["groupSpectrumNumber"] = "1";
   arguments_["filteringResultNumber"] = "20";
   arguments_["varModFileName"] = "";
@@ -340,6 +341,16 @@ std::map<std::string, std::string> topmgWindow::getArguments() {
     arguments_["useFeatureFile"] = "false";
   } else {
     arguments_["useFeatureFile"] = "true";
+  }
+  if (ui->keepTempCheckBox->isChecked()) {
+    arguments_["keepTempFiles"] = "true";
+  } else {
+    arguments_["keepTempFiles"] = "false";
+  }
+  if (ui->keepDecoyCheckBox->isChecked()) {
+    arguments_["keepDecoyResults"] = "true";
+  } else {
+    arguments_["keepDecoyResults"] = "false";
   }
   if (ui->asfDiagCheckBox->isChecked()) {
     arguments_["useAsfDiag"] = "true";
