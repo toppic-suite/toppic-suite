@@ -33,6 +33,7 @@ void Argument::initArguments() {
   arguments_["errorTolerance"] = "1.2";
   arguments_["toolName"] = "toppic";
   arguments_["mergedOutputFileName"] = "sample_diff.tsv";
+  arguments_["version"] = "";
 }
 
 void Argument::outputArguments(std::ostream &output, std::map<std::string, std::string> arguments) {
@@ -53,6 +54,7 @@ void Argument::outputArguments(std::ostream &output, std::map<std::string, std::
   output << std::setw(44) << std::left << "Error tolerance: " << "\t" << arguments["errorTolerance"] << " Dalton " << std::endl;
   output << std::setw(44) << std::left << "Database search tool name: " << "\t" << arguments["toolName"] << std::endl;
   output << std::setw(44) << std::left << "Output file name: " << "\t" << arguments["mergedOutputFileName"] << std::endl;
+  output << std::setw(44) << std::left << "Version: " << "\t" << arguments["version"] << std::endl;
   output << "******************** Parameters ********************" << std::endl;
 }
 

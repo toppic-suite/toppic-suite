@@ -64,9 +64,9 @@ std::string RunExe::geneCommand(TopfdParaPtr para_ptr, std::vector<std::string> 
 
   command = command + "-c " + std::to_string(para_ptr->max_charge_) + " ";
   command = command + "-m " + std::to_string(para_ptr->max_mass_) + " ";
-  command = command + "-e " + std::to_string(para_ptr->mz_error_) + " ";
+  command = command + "-t " + std::to_string(para_ptr->mz_error_) + " ";
   command = command + "-r " + std::to_string(para_ptr->ms_one_sn_ratio_) + " ";
-  command = command + "-t " + std::to_string(para_ptr->ms_two_sn_ratio_) + " ";
+  command = command + "-s " + std::to_string(para_ptr->ms_two_sn_ratio_) + " ";
   command = command + "-w " + std::to_string(para_ptr->prec_window_) + " ";
   command = command + "-u " + std::to_string(para_ptr->thread_number_) + " ";
   command = command + "-a " + para_ptr->activation_ + " ";
@@ -99,6 +99,7 @@ std::string RunExe::geneCommand(std::map<std::string, std::string> arguments_, s
     else if (common_para.find(it->first) != common_para.end()) { //if one of the common parameters
       //skip some paramters based on parameter values
       if (it->first == "fixedMod" && it->second == "") continue;
+      else if (it->first == "combinedOutputName" && it->second == "") continue;
       else if (it->first == "useFeatureFile") {
         if (it->second == "false") {
           command = command + common_para[it->first] + " ";

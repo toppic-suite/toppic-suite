@@ -330,8 +330,7 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
 
     std::string sp_file_name = arguments["spectrumFileName"];
     std::string ori_db_file_name = arguments["oriDatabaseFileName"];
-    std::string db_file_name = ori_db_file_name + "_idx" + file_util::getFileSeparator() + arguments["databaseFileName"];
-    double max_ptm_mass = std::stod(arguments["maxPtmMass"]);
+std::string db_file_name = ori_db_file_name + "_idx" + file_util::getFileSeparator() + file_util::basenameFromEntirePathKeepDot(arguments["databaseFileName"]);    double max_ptm_mass = std::stod(arguments["maxPtmMass"]);
     double min_ptm_mass = std::stod(arguments["minPtmMass"]);
 
     bool localization = false;

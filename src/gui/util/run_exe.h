@@ -41,6 +41,7 @@ class RunExe {
     {"keepTempFiles", "-k "},
     {"keepDecoyResults", "-K "},
     {"geneHTMLFolder", "-g "},
+    {"combinedOutputName", "-c "}
     //{"oriDatabaseFileName", ""}
   };
   std::vector<std::string> skip_para {//parameters to skip
@@ -77,7 +78,6 @@ class RunExe {
   };
 
   std::map<std::string, std::string> topmerge_para {
-    {"combinedOutputName", "-c "},
     {"residueModFileName", "-i "},
     {"localThreshold", "-H "},
     {"massErrorTolerance", "-e "}
