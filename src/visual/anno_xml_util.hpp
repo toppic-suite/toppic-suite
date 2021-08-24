@@ -51,6 +51,14 @@ xercesc::DOMElement* geneXmlForProteinList(XmlDOMDocument* xml_doc,
                                            PrsmViewMngPtr mng_ptr, 
                                            bool detail = true, 
                                            bool add_ms = true);
+// prsm list
+xercesc::DOMElement* geneXmlForPrsmList(XmlDOMDocument* xml_doc,
+                                           const PrsmPtrVec &prsm_ptrs,
+                                           int prot_id,
+                                           const std::vector<int> &cluster_ids,
+                                           PrsmViewMngPtr mng_ptr, 
+                                           bool detail = true, 
+                                           bool add_ms = true);                                           
 }  // namespace anno_xml_util
 
 }  // namespace toppic

@@ -18,6 +18,8 @@
 #include "visual/anno_proteoform.hpp"
 #include "visual/anno_prsm.hpp"
 
+#include <iostream>
+
 namespace toppic {
 
 namespace anno_prsm {
@@ -84,24 +86,25 @@ void addMsHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement* ms_element,
   xml_doc->addElement(ms_header_element, "ids", ms2_ids.c_str());
   xml_doc->addElement(ms_header_element, "scans", ms2_scans.c_str());
 
-  int pos = mng_ptr->precise_point_num_;
+  if (deconv_ms_ptr_vec.size() > 0) {
+    int pos = mng_ptr->precise_point_num_;
+    double precursor_mass = prsm_ptr->getOriPrecMass();
+    std::string str = str_util::fixedToString(precursor_mass, pos);
+    xml_doc->addElement(ms_header_element, "precursor_mono_mass", str.c_str());
 
-  double precursor_mass = prsm_ptr->getOriPrecMass();
-  std::string str = str_util::fixedToString(precursor_mass, pos);
-  xml_doc->addElement(ms_header_element, "precursor_mono_mass", str.c_str());
+    int precursor_charge = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecCharge();
+    str = str_util::toString(precursor_charge);
+    xml_doc->addElement(ms_header_element, "precursor_charge", str.c_str());
 
-  int precursor_charge = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecCharge();
-  str = str_util::toString(precursor_charge);
-  xml_doc->addElement(ms_header_element, "precursor_charge", str.c_str());
+    double precursor_mz = peak_util::compMz(precursor_mass, precursor_charge);
+    str = str_util::fixedToString(precursor_mz, pos);
+    xml_doc->addElement(ms_header_element, "precursor_mz", str.c_str());
 
-  double precursor_mz = peak_util::compMz(precursor_mass, precursor_charge);
-  str = str_util::fixedToString(precursor_mz, pos);
-  xml_doc->addElement(ms_header_element, "precursor_mz", str.c_str());
-
-  double feature_inte = prsm_ptr->getSampleFeatureInte();
-  if (feature_inte > 0) {
-    str = str_util::toScientificStr(feature_inte, pos);
-    xml_doc->addElement(ms_header_element, "feature_inte", str.c_str());
+    double feature_inte = prsm_ptr->getSampleFeatureInte();
+    if (feature_inte > 0) {
+      str = str_util::toScientificStr(feature_inte, pos);
+      xml_doc->addElement(ms_header_element, "feature_inte", str.c_str());
+    }
   }
 }
 
@@ -186,6 +189,5 @@ xercesc::DOMElement* geneAnnoPrsm(XmlDOMDocument* xml_doc, PrsmPtr prsm_ptr,
   }
   return prsm_element;
 }
-
 }
 }  // namespace toppic
