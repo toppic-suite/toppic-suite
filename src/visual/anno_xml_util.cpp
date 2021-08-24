@@ -94,7 +94,30 @@ xercesc::DOMElement* geneXmlForProteinList(XmlDOMDocument* xml_doc,
   }
   return prot_element;
 }
-
+xercesc::DOMElement* geneXmlForPrsmList(XmlDOMDocument* xml_doc,
+                                           const PrsmPtrVec &prsm_ptrs,
+                                           int prot_id,
+                                           const std::vector<int> &cluster_ids,
+                                           PrsmViewMngPtr mng_ptr,
+                                           bool detail, bool add_ms) {
+  xercesc::DOMElement* prot_element = xml_doc->createElement("prsm");
+  std::string str = str_util::toString(prot_id);
+  xml_doc->addElement(prot_element, "sequence_id", str.c_str());
+  str = prsm_ptrs[0]->getProteoformPtr()->getSeqName();
+  xml_doc->addElement(prot_element, "sequence_name", str.c_str());
+  str = prsm_ptrs[0]->getProteoformPtr()->getSeqDesc();
+  xml_doc->addElement(prot_element, "sequence_description", str.c_str());
+  int count = cluster_ids.size();
+  str = str_util::toString(count);
+  xml_doc->addElement(prot_element, "compatible_proteoform_number", str.c_str());
+  for (size_t i = 0; i < cluster_ids.size(); i++) {
+    PrsmPtrVec select_prsm_ptrs = prsm_util::selectClusterPrsms(prsm_ptrs, cluster_ids[i]);
+    std::sort(select_prsm_ptrs.begin(), select_prsm_ptrs.end(), Prsm::cmpEValueInc);
+    prot_element->appendChild(geneXmlForProteoform(xml_doc, select_prsm_ptrs, 
+                                                   mng_ptr, detail, add_ms));
+  }
+  return prot_element;
+}
 }  // namespace anno_xml_util
 
 }  // namespace toppic

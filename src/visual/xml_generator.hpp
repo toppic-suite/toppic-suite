@@ -44,6 +44,8 @@ class XmlGenerator {
  private:
   void outputPrsms();
 
+  void outputAllPrsms();
+
   void outputProteoforms();
 
   void outputProteins();
