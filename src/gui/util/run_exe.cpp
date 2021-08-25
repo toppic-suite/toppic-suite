@@ -175,7 +175,7 @@ std::string RunExe::geneCommand(std::map<std::string, std::string> arguments_, s
   return command;
 };
 void RunExe::run(std::string command) {
-  std::cout << command << std::endl;
+  //std::cout << command << std::endl;
   #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
   HANDLE g_hChildStd_IN_Rd = NULL;
   HANDLE g_hChildStd_IN_Wr = NULL;

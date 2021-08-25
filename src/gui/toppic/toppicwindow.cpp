@@ -293,6 +293,12 @@ std::map<std::string, std::string> toppicWindow::getArguments() {
   if (arguments_["fixedMod"] == "NONE") {
     arguments_["fixedMod"] = "";
   }
+  else if (arguments_["fixedMod"] == "Carbamidomethylation on cysteine") {
+    arguments_["fixedMod"] = "C57";
+  }
+  else if (arguments_["fixedMod"] == "Carboxymethylation on cysteine") {
+    arguments_["fixedMod"] = "C58";
+  }
   if (ui->fixedModComboBox->currentIndex() == 3) {
     arguments_["fixedMod"] = ui->fixedModFileEdit->text().toStdString();
   }
