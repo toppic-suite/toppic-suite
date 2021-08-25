@@ -326,12 +326,12 @@ p, li { white-space: pre-wrap; }
          </item>
          <item>
           <property name="text">
-           <string>C57</string>
+           <string>Carbamidomethylation on cysteine</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>C58</string>
+           <string>Carboxymethylation on cysteine</string>
           </property>
          </item>
          <item>
