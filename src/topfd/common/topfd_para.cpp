@@ -21,13 +21,16 @@
 #include "common/util/version.hpp"
 
 namespace toppic {
-
 std::string TopfdPara::getParaStr(const std::string &prefix) {
   std::stringstream output;
   int gap = 45;
   output << prefix << "TopFD " << Version::getVersion() << std::endl;
   output << prefix << "Timestamp: " << time_util::getTimeStr() << std::endl;
   output << prefix << "###################### Parameters ######################" << std::endl;
+  output << prefix << std::setw(gap) << std::left 
+      << "Activation type:       " << "\t"  << activation_ << std::endl;
+  output << prefix << std::setw(gap) << std::left 
+      << "Number of MS/MS scans:       " << "\t"  << scan_num_ << std::endl;
   output << prefix << std::setw(gap) << std::left 
       << "Spectral data type:       " << "\t"  << "Centroid" << std::endl;
   output << prefix << std::setw(gap) << std::left 

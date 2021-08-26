@@ -23,7 +23,8 @@ namespace toppic {
 class TopfdPara {
  public:
   TopfdPara() {};
-
+  void setScanNumber(int scan_num) {scan_num_ = scan_num;}
+  
   std::string getParaStr(const std::string &prefix);
 
   std::string exe_dir_;
@@ -47,6 +48,7 @@ class TopfdPara {
   std::string activation_ = "FILE";
   bool gene_html_folder_ = true;
   std::string merged_file_name_ = "";
+  int scan_num_ = -1;
 };
 
 typedef std::shared_ptr<TopfdPara> TopfdParaPtr;

@@ -138,13 +138,33 @@ void mergeFiles(TopfdParaPtr para_ptr,
   }
 }
 
+int getMs2ScanCount(std::string spectrum_file_name) {
+  typedef std::shared_ptr<pwiz::msdata::MSDataFile> MSDataFilePtr;
+  pwiz::msdata::DefaultReaderList readers_;
+  MSDataFilePtr msd_ptr_ = std::make_shared<pwiz::msdata::MSDataFile>(spectrum_file_name, &readers_);
+  pwiz::msdata::SpectrumListPtr spec_list_ptr_ =  msd_ptr_->run.spectrumListPtr;
+  
+  int sp_size = spec_list_ptr_->size();
+  int cnt = 0;
+
+  for(int i = 0; i < sp_size; i++){
+      int scan_level = spec_list_ptr_->spectrum(i)->cvParam(pwiz::msdata::MS_ms_level).valueAs<int>(); // check scanLevel
+      if (scan_level == 2) {
+        cnt++;
+      }
+  }
+  return cnt;
+}
+
 int process(TopfdParaPtr para_ptr,  std::vector<std::string> spec_file_lst) {
   base_data::init();
-  std::string print_str = para_ptr->getParaStr("");
-  std::cout << print_str;
 
   EnvBase::initBase(para_ptr->resource_dir_);
   for (size_t k = 0; k < spec_file_lst.size(); k++) {
+    para_ptr->setScanNumber(getMs2ScanCount(spec_file_lst[k]));
+    std::string print_str = para_ptr->getParaStr("");//print parameter for each file
+    std::cout << print_str;
+
     if (isValidFile(spec_file_lst[k])) {
       processOneFile(para_ptr, spec_file_lst[k], k);
       bool move_mzrt = true;
@@ -181,8 +201,6 @@ int process(TopfdParaPtr para_ptr,  std::vector<std::string> spec_file_lst) {
   return 0;
 }
 
-
 } // namespace topfd_process 
 
 }  // namespace toppic
-
