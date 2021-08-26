@@ -20,6 +20,13 @@
 
 #include "topfd/common/topfd_para.hpp"
 
+#include "pwiz/data/msdata/DefaultReaderList.hpp"
+#include "pwiz/data/msdata/MSDataFile.hpp"
+
+#include "pwiz/data/msdata/SpectrumList_mzML.hpp"
+#include "pwiz/data/msdata/SpectrumInfo.hpp"
+#include "pwiz/utility/misc/Std.hpp"
+
 namespace toppic {
 
 namespace topfd_process {
@@ -31,8 +38,9 @@ int processOneFile(TopfdParaPtr para_ptr,
 int process(TopfdParaPtr para_ptr,  
             std::vector<std::string> spec_file_lst); 
 
-}
+int getMs2ScanCount(std::string spectrum_file_name);
 
+}
 }
 
 #endif
