@@ -52,6 +52,57 @@ RawMsPtr RawMsGroupReader::readNextRawMs() {
   return ms_ptr;
 }
 
+RawMsGroupPtr RawMsGroupReader::getNextMsGroupPtrFaime() {
+  if (missing_level_one_) {
+    RawMsPtr null_ms_one_ptr(nullptr);
+    RawMsPtrVec ms_two_ptr_vec;
+    RawMsPtr ms_two_ptr = readNextRawMs();
+    if (ms_two_ptr == nullptr) {
+      return nullptr;
+    }
+    ms_two_ptr_vec.push_back(ms_two_ptr);
+    RawMsGroupPtr ms_group_ptr = std::make_shared<RawMsGroup>(null_ms_one_ptr, ms_two_ptr_vec);
+    return ms_group_ptr;
+  }
+
+  // if not missing level one
+  if (ms_one_ptr_ == nullptr) {
+    return nullptr;
+  }
+
+  RawMsPtrVec ms_two_ptr_vec;
+  RawMsPtr found_ms_one_ptr = nullptr;
+  RawMsPtr ms_ptr;
+  while ((ms_ptr = readNextRawMs()) != nullptr) {
+    MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
+    if (header_ptr->getMsLevel() == 1) {
+      ms_one_ptr_vec_.push_back(ms_ptr);
+      break;
+    }
+    else {
+      if (found_ms_one_ptr == nullptr) {
+        int prec_scan = ms_ptr->getMsHeaderPtr()->getMsOneScan();
+        for (int i = 0; i < ms_one_ptr_vec_.size(); i++) {
+          if (ms_one_ptr_vec_[i]->getFirstScanNum() == prec_scan) {
+            found_ms_one_ptr = ms_one_ptr_vec_[i];
+          }
+        }
+        ms_one_ptr_vec_.erase(ms_one_ptr_vec_.begin(),ms_one_ptr_vec_.begin() + i);
+        //find_ms_one_ptr and assign to found_ms_one_ptr
+        //pop from ms_one_ptr_vec_ all ms_one scans prior to the found_ms_one_ptr
+      }
+
+      header_ptr->setMsOneId(ms_one_ptr_->getMsHeaderPtr()->getId());
+      header_ptr->setMsOneScan(ms_one_ptr_->getMsHeaderPtr()->getFirstScanNum());
+      ms_two_ptr_vec.push_back(ms_ptr);
+    }
+  }
+
+  RawMsGroupPtr ms_group_ptr = std::make_shared<RawMsGroup>(ms_one_ptr_, ms_two_ptr_vec);
+  ms_one_ptr_ = found_ms_one_ptr;
+  return ms_group_ptr;
+}
+
 RawMsGroupPtr RawMsGroupReader::getNextMsGroupPtr() {
   if (missing_level_one_) {
     RawMsPtr null_ms_one_ptr(nullptr);
