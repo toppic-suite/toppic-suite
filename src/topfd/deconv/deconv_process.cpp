@@ -224,7 +224,8 @@ void DeconvProcess::processSpMissingLevelOne(RawMsGroupReaderPtr reader_ptr) {
   // reader_ptr
   int total_scan_num = reader_ptr->getInputSpNum();
   RawMsGroupPtr ms_group_ptr;
-  ms_group_ptr = reader_ptr->getNextMsGroupPtr();
+  //ms_group_ptr = reader_ptr->getNextMsGroupPtr();
+  ms_group_ptr = reader_ptr->getNextMsGroupPtrWithFaime();
 
   int count = 0;
   while (ms_group_ptr != nullptr) {
@@ -250,7 +251,9 @@ void DeconvProcess::processSpMissingLevelOne(RawMsGroupReaderPtr reader_ptr) {
       std::cout << "\r" << msg << std::flush;
       count += 1;
     }
-    ms_group_ptr = reader_ptr->getNextMsGroupPtr();
+    //ms_group_ptr = reader_ptr->getNextMsGroupPtr();
+    ms_group_ptr = reader_ptr->getNextMsGroupPtrWithFaime();
+
   }
   pool_ptr->ShutDown();
 
@@ -426,7 +429,8 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
 
   RawMsGroupPtr ms_group_ptr;
 
-  ms_group_ptr = reader_ptr->getNextMsGroupPtr();
+  //ms_group_ptr = reader_ptr->getNextMsGroupPtr();
+  ms_group_ptr = reader_ptr->getNextMsGroupPtrWithFaime();
 
   int count = 0;
   
@@ -470,12 +474,12 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
 
     std::string msg = updateMsg(ms_group_ptr->getMsOnePtr()->getMsHeaderPtr(), count + 2, total_scan_num);
     std::cout << "\r" << msg << std::flush;
-
     //count is 1 scan from msalign1 + n scan from msalign2 vector
     int parsed_scan = 1 + static_cast<int>((ms_group_ptr->getMsTwoPtrVec()).size());
 
     count += parsed_scan;
-    ms_group_ptr = reader_ptr->getNextMsGroupPtr();
+    //ms_group_ptr = reader_ptr->getNextMsGroupPtr();
+    ms_group_ptr = reader_ptr->getNextMsGroupPtrWithFaime();
   }
   pool_ptr->ShutDown();
 
@@ -488,7 +492,6 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
   //auto end = std::chrono::high_resolution_clock::now();
   //auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end-start);
   //std::cout << std::endl << "Read file " << duration.count() << std::endl;
-
   MsalignThreadMergePtr ms1_merge_ptr
       = std::make_shared<MsalignThreadMerge>(spec_file_name_, "ms1.msalign", 
                                              thread_num_, "ms1.msalign", 

@@ -28,7 +28,7 @@ class RawMsGroupReader {
 
   RawMsPtr readNextRawMs();
 
-  RawMsGroupPtr getNextMsGroupPtrFaime();
+  RawMsGroupPtr getNextMsGroupPtrWithFaime();
   RawMsGroupPtr getNextMsGroupPtr();
 
   static void obtainPrecEnvs(RawMsGroupPtr ms_group_ptr, 
