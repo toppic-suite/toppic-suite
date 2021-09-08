@@ -73,12 +73,13 @@ RawMsGroupPtr RawMsGroupReader::getNextMsGroupPtrWithFaime() {
 
   RawMsPtrVec ms_two_ptr_vec;
   RawMsPtr found_ms_one_ptr = nullptr;
+  RawMsPtr most_recent_ms_one_ptr = nullptr;//stores a pointer to the most recently parsed ms1 scan. Prevents error when a group only contains ms1 scans. 
+  //because found_ms_one_ptr is nullptr if the group has no ms2 scans, we need one more pointer to store the previous ms1 scan information.
   RawMsPtr ms_ptr;
   while ((ms_ptr = readNextRawMs()) != nullptr) {
     MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
-    //std::cout << "evaluating scan : " << header_ptr->getFirstScanNum() << std::endl;
     if (header_ptr->getMsLevel() == 1) {
-      ms_one_ptr_ = ms_ptr;
+      most_recent_ms_one_ptr = ms_ptr;
       ms_one_ptr_vec_.push_back(ms_ptr);
       break;
     }
@@ -87,11 +88,10 @@ RawMsGroupPtr RawMsGroupReader::getNextMsGroupPtrWithFaime() {
         int prec_scan = ms_ptr->getMsHeaderPtr()->getMsOneScan();
         int ms1_scan_pos = -1;
 
-        found_ms_one_ptr = ms_one_ptr_;
-
         for (int i = 0; i < ms_one_ptr_vec_.size(); i++) {
           if (ms_one_ptr_vec_[i]->getMsHeaderPtr()->getFirstScanNum() == prec_scan) {//find_ms_one_ptr and assign to found_ms_one_ptr
             found_ms_one_ptr = ms_one_ptr_vec_[i];
+            ms_one_ptr_ = found_ms_one_ptr;
             ms1_scan_pos = i;
           }
         }
@@ -106,19 +106,8 @@ RawMsGroupPtr RawMsGroupReader::getNextMsGroupPtrWithFaime() {
       ms_two_ptr_vec.push_back(ms_ptr);
     }
   }
-  if (ms_two_ptr_vec.size()> 0) {
-    std::cout << "ms1 scan: " << found_ms_one_ptr->getMsHeaderPtr()->getFirstScanNum() << std::endl;
-    for (int j = 0; j < ms_two_ptr_vec.size(); j++) {
-      std::cout << "ms2 scan: " << ms_two_ptr_vec[j]->getMsHeaderPtr()->getFirstScanNum() << std::endl;
-    }
-  }
-  if (ms_one_ptr_vec_.size() > 0) {
-    found_ms_one_ptr = ms_one_ptr_;
-  }
-  RawMsGroupPtr ms_group_ptr = std::make_shared<RawMsGroup>(found_ms_one_ptr, ms_two_ptr_vec);
-  ms_one_ptr_ = found_ms_one_ptr;
-  //std::cout << "ms_one_ptr_ : " << ms_one_ptr_->getMsHeaderPtr()->getFirstScanNum() << std::endl;
-
+  RawMsGroupPtr ms_group_ptr = std::make_shared<RawMsGroup>(ms_one_ptr_, ms_two_ptr_vec);
+  ms_one_ptr_ = most_recent_ms_one_ptr;
   return ms_group_ptr;
 }
 
@@ -155,13 +144,8 @@ RawMsGroupPtr RawMsGroupReader::getNextMsGroupPtr() {
       ms_two_ptr_vec.push_back(ms_ptr);
     }
   }
-  std::cout << "ms1 scan: " << ms_one_ptr_->getMsHeaderPtr()->getFirstScanNum() << std::endl;
-    for (int j = 0; j < ms_two_ptr_vec.size(); j++) {
-      std::cout << "ms2 scan: " << ms_two_ptr_vec[j]->getMsHeaderPtr()->getFirstScanNum() << std::endl;
-  }
   RawMsGroupPtr ms_group_ptr = std::make_shared<RawMsGroup>(ms_one_ptr_, ms_two_ptr_vec);
   ms_one_ptr_ = new_ms_one_ptr;
-  //std::cout << "ms_one_ptr_ : " << ms_one_ptr_->getMsHeaderPtr()->getFirstScanNum() << std::endl;
   return ms_group_ptr;
 }
 
