@@ -29,7 +29,12 @@
 namespace toppic {
 /*function for topindex*/
 std::string RunExe::geneCommand(std::map<std::string, std::string> arguments_, std::string app_name) {
+  #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
   std::string exe_path = arguments_["executiveDir"] + "\\" + app_name + ".exe ";
+  #else
+  std::string exe_path = arguments_["executiveDir"] + "/" + app_name + " ";
+  #endif
+
   std::string command = exe_path;
 
   for (std::map<std::string, std::string>::iterator it = arguments_.begin(); it != arguments_.end(); ++it) {
@@ -59,9 +64,13 @@ std::string RunExe::geneCommand(std::map<std::string, std::string> arguments_, s
 };
 /*function for topfd*/ 
 std::string RunExe::geneCommand(TopfdParaPtr para_ptr, std::vector<std::string> spec_file_lst_, std::string app_name) {
+  #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
   std::string exe_path = para_ptr->exe_dir_ + "\\" + app_name + ".exe ";
-  std::string command = exe_path;
+  #else
+  std::string exe_path = para_ptr->exe_dir_ + "/" + app_name + " ";
+  #endif
 
+  std::string command = exe_path;
   command = command + "-c " + std::to_string(para_ptr->max_charge_) + " ";
   command = command + "-m " + std::to_string(para_ptr->max_mass_) + " ";
   command = command + "-t " + std::to_string(para_ptr->mz_error_) + " ";
@@ -91,7 +100,12 @@ std::string RunExe::geneCommand(TopfdParaPtr para_ptr, std::vector<std::string> 
 
 /*function for toppic, topmg, topmerge, topdiff*/
 std::string RunExe::geneCommand(std::map<std::string, std::string> arguments_, std::vector<std::string> spec_file_lst_, std::string app_name) {
+  #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
   std::string exe_path = arguments_["executiveDir"] + "\\" + app_name + ".exe ";
+  #else
+  std::string exe_path = arguments_["executiveDir"] + "/" + app_name + " ";
+  #endif
+
   std::string command = exe_path;
 
   for (std::map<std::string, std::string>::iterator it = arguments_.begin(); it != arguments_.end(); ++it) {
