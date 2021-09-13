@@ -124,10 +124,14 @@ RawMsGroupPtr RawMsGroupReader::getNextMsGroupPtrWithFaime() {
       if (alpha_ms_two_ptr_vec_.size() > 0) {
         int first_ms_one_scan = ms_one_ptr_vec_[0]->getMsHeaderPtr()->getFirstScanNum();
         if (first_ms_one_scan != alpha_ms_one_scan_) {
-          LOG_ERROR("More than 1 MS scan left at the end of data.");
+          LOG_ERROR("Previous MS1 scan not added to a group.");
           return nullptr;
         }
+        for (int k = 0; k < alpha_ms_two_ptr_vec_.size(); k++) {
+          alpha_ms_two_ptr_vec_[k]->getMsHeaderPtr()->setMsOneId(ms_one_ptr_vec_[0]->getMsHeaderPtr()->getId());
+        }
         RawMsGroupPtr ms_group_ptr = std::make_shared<RawMsGroup>(ms_one_ptr_vec_[0], alpha_ms_two_ptr_vec_);
+        ms_one_ptr_vec_.erase(ms_one_ptr_vec_.begin(), ms_one_ptr_vec_.begin() + 1);
         alpha_ms_two_ptr_vec_.clear();
         return ms_group_ptr;
       }
@@ -157,6 +161,11 @@ RawMsGroupPtr RawMsGroupReader::getNextMsGroupPtrWithFaime() {
       else {
         // first ms one scan == alpha_ms_one_scan
         //get ms group with first ms one spectra and all ms2 spectra in alpha_ms_two_ptr_vec_. 
+        //assign ms1Id to msHeaderPtr for ms2ptrs
+        for (int k = 0; k < alpha_ms_two_ptr_vec_.size(); k++) {
+          alpha_ms_two_ptr_vec_[k]->getMsHeaderPtr()->setMsOneId(ms_one_ptr_vec_[0]->getMsHeaderPtr()->getId());
+        }
+
         RawMsGroupPtr ms_group_ptr = std::make_shared<RawMsGroup>(ms_one_ptr_vec_[0], alpha_ms_two_ptr_vec_);
 
         alpha_ms_two_ptr_vec_ = beta_ms_two_ptr_vec_;
