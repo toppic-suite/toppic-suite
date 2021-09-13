@@ -28,6 +28,7 @@ class RawMsGroupReader {
 
   RawMsPtr readNextRawMs();
 
+  RawMsGroupPtr getNextMsGroupPtrWithFaime();
   RawMsGroupPtr getNextMsGroupPtr();
 
   static void obtainPrecEnvs(RawMsGroupPtr ms_group_ptr, 
@@ -39,7 +40,14 @@ class RawMsGroupReader {
   
  private:
   PwMsReaderPtr reader_ptr_;
-  RawMsPtr ms_one_ptr_; 
+  //RawMsPtr ms_one_ptr_; 
+  //RawMsPtr not_written_ms_one_ptr_;
+
+  RawMsPtrVec ms_one_ptr_vec_;
+  RawMsPtrVec alpha_ms_two_ptr_vec_;
+  RawMsPtrVec beta_ms_two_ptr_vec_;
+  int alpha_ms_one_scan_ = -1;
+
   int fraction_id_;
 
   bool do_refine_prec_mass_ = true;

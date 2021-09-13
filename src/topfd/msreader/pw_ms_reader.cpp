@@ -111,7 +111,14 @@ bool PwMsReader::readOneMs(int sp_id, PeakPtrVec &peak_list, MsHeaderPtr &header
     // here is average mz
     header_ptr->setPrecSpMz(prec_mz);
     header_ptr->setRetentionTime(spec_info.retentionTime);
-    
+
+    //get precursor scan ID from mzML
+    //header_ptr->setMsOneScan(cur_spec_ptr->);
+    std::string line = cur_spec_ptr->precursors[0].spectrumID;
+    std::string delimiter = "=";
+    int prec_scan_id = std::stoi(line.substr(line.find_last_of(delimiter) + 1)); 
+    header_ptr->setMsOneScan(prec_scan_id);
+
     std::string ac_name = activation_;
         if (ac_name == "" || ac_name == "FILE"){
       ac_name = "";
