@@ -392,7 +392,7 @@ void FeatureSampleMerge::outputTable(FeaturePrsmPtrVec2D &table,
     for (int j = 0; j < sample_num; j++) {
       FeaturePrsmPtr sample_feature = table[i][j];
       if (sample_feature == nullptr) {
-        file << delim << delim << delim << delim;
+        file << delim << delim << delim << delim << delim;
       }
       else {
         file <<  std::setprecision(3) << std::scientific << sample_feature->getIntensity() << delim;
