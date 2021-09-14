@@ -433,6 +433,8 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
   ms_group_ptr = reader_ptr->getNextMsGroupPtrWithFaime();
 
   int count = 0;
+
+  std::vector voltage_vec;//store voltages that have appeared in the msgroup so far
   
   std::string ms1_msalign_name, ms2_msalign_name;
   
@@ -480,6 +482,8 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
     count += parsed_scan;
     //ms_group_ptr = reader_ptr->getNextMsGroupPtr();
     ms_group_ptr = reader_ptr->getNextMsGroupPtrWithFaime();
+
+    //check if the voltage from this msgroup is new or not to determine whether to create a new set of writer vectors
   }
   pool_ptr->ShutDown();
 

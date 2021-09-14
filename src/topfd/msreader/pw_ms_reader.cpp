@@ -113,7 +113,6 @@ bool PwMsReader::readOneMs(int sp_id, PeakPtrVec &peak_list, MsHeaderPtr &header
     header_ptr->setRetentionTime(spec_info.retentionTime);
 
     //get precursor scan ID from mzML
-    //header_ptr->setMsOneScan(cur_spec_ptr->);
     std::string line = cur_spec_ptr->precursors[0].spectrumID;
     std::string delimiter = "=";
     int prec_scan_id = std::stoi(line.substr(line.find_last_of(delimiter) + 1)); 
@@ -160,6 +159,14 @@ bool PwMsReader::readOneMs(int sp_id, PeakPtrVec &peak_list, MsHeaderPtr &header
     header_ptr->setFileName(file_name_);
     header_ptr->setTitle("Scan_" + str_util::toString(spec_info.scanNumber));
     header_ptr->setRetentionTime(spec_info.retentionTime);
+  }
+  //add voltage information if it exists
+  std::vector<pwiz::data::CVParam> cv_list = (*cur_spec_ptr).cvParams;
+  for (size_t i = 0; i < cv_list.size(); i++) {
+    if (cv_list[i].cvid == pwiz::cv::MS_FAIMS_compensation_voltage) {
+      header_ptr->setVoltage(cv_list[i].value);
+      break;
+    }
   }
   return true;
 }
