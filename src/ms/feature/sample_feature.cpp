@@ -27,10 +27,10 @@ SampleFeature::SampleFeature(const std::string &line) {
   intensity_ = std::stod(strs[3]);
   time_begin_ = std::stod(strs[4]);
   time_end_ = std::stod(strs[5]);
-  min_charge_ = std::stoi(strs[6]);
-  max_charge_ = std::stoi(strs[7]);
-  min_frac_id_ = std::stoi(strs[8]);
-  max_frac_id_ = std::stoi(strs[9]);
+  min_charge_ = std::stoi(strs[7]);
+  max_charge_ = std::stoi(strs[8]);
+  min_frac_id_ = std::stoi(strs[9]);
+  max_frac_id_ = std::stoi(strs[10]);
 }
 
 SampleFeature::SampleFeature(FracFeaturePtr frac_feature, int id) {

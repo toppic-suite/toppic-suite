@@ -32,7 +32,8 @@ int topDiffProcess(std::map<std::string, std::string> &arguments,
     base_data::init();
 
     std::string ori_db_file_name = arguments["databaseFileName"];
-    std::string db_file_name = ori_db_file_name + "_idx" + file_util::getFileSeparator() + ori_db_file_name + "_target";
+    std::string db_file_name = ori_db_file_name + "_idx" + file_util::getFileSeparator() + file_util::basenameFromEntirePathKeepDot(ori_db_file_name) + "_target";
+
     fasta_util::dbSimplePreprocess(ori_db_file_name, db_file_name);
 
     std::string base_path = file_util::absoluteDir(input_file_list[0]);
