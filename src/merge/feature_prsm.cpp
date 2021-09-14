@@ -21,7 +21,7 @@ FeaturePrsm::FeaturePrsm(std::string line):
     SampleFeature(line) {
   std::vector<std::string> strs;
   strs = str_util::split(line, "\t");
-  if (strs.size() > 10) {
+  if (strs.size() > 11) {
     prot_name_ = strs[10];
     prot_desc_ = strs[11];
     first_residue_ = std::stoi(strs[12]) - 1;
