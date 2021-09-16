@@ -433,15 +433,26 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
   ms_group_ptr = reader_ptr->getNextMsGroupPtrWithFaime();
 
   int count = 0;
-
-  std::vector voltage_vec;//store voltages that have appeared in the msgroup so far
+  int vec_idx = 0; //index of the vector containing MsAlignWriterPtr for current msgroup
   
   std::string ms1_msalign_name, ms2_msalign_name;
   
-  ms1_msalign_name = file_util::basename(spec_file_name_) + "_ms1.msalign";
-  ms2_msalign_name = file_util::basename(spec_file_name_) + "_ms2.msalign";
+  ms1_msalign_name = file_util::basename(spec_file_name_) + "_ms1_0.msalign";
+  ms2_msalign_name = file_util::basename(spec_file_name_) + "_ms2_0.msalign";
 
   SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(thread_num_);  
+  
+  std::vector<double> voltage_vec;//store voltages that have appeared in the msgroup so far
+
+  if (ms_group_ptr != nullptr) {
+    voltage_vec.push_back(ms_group_ptr->getMsOnePtr()->getMsHeaderPtr()->getVoltage());
+  }
+
+  std::vector<MsAlignWriterPtrVec> all_file_ms1_writer_ptr_vec;
+  std::vector<MsAlignWriterPtrVec> all_file_ms2_writer_ptr_vec;
+
+  MsAlignWriterPtrVec single_file_ms1_writer_ptr_vec;
+  MsAlignWriterPtrVec single_file_ms2_writer_ptr_vec;
   
   //generate vector that contains msalign writing information
   MsAlignWriterPtrVec ms1_writer_ptr_vec;
@@ -452,9 +463,11 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
         = std::make_shared<MsAlignWriter>(ms1_msalign_name + "_" + str_util::toString(i));
     MsAlignWriterPtr ms2_ptr 
         = std::make_shared<MsAlignWriter>(ms2_msalign_name + "_" + str_util::toString(i));
-    ms1_writer_ptr_vec.push_back(ms1_ptr);
-    ms2_writer_ptr_vec.push_back(ms2_ptr);
+    single_file_ms1_writer_ptr_vec.push_back(ms1_ptr);
+    single_file_ms2_writer_ptr_vec.push_back(ms2_ptr);
   }
+  all_file_ms1_writer_ptr_vec.push_back(single_file_ms1_writer_ptr_vec);
+  all_file_ms2_writer_ptr_vec.push_back(single_file_ms2_writer_ptr_vec);
 
   while (ms_group_ptr != nullptr) {
     while(pool_ptr->getQueueSize() >= thread_num_ * 2){
@@ -470,6 +483,9 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
     //pool_ptr needed for getting each thread id    
     DeconvOneSpPtr deconv_ptr = std::make_shared<DeconvOneSp>(env_ptr_new, dp_ptr_new);
 
+    ms1_writer_ptr_vec = all_file_ms1_writer_ptr_vec[vec_idx];
+    ms2_writer_ptr_vec = all_file_ms2_writer_ptr_vec[vec_idx];
+
     pool_ptr->Enqueue(geneTask(ms_group_ptr, deconv_ptr, ms1_writer_ptr_vec, 
                                ms2_writer_ptr_vec, pool_ptr, topfd_para_ptr_->gene_html_folder_, 
                                ms1_json_dir_, ms2_json_dir_));
@@ -483,7 +499,46 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
     //ms_group_ptr = reader_ptr->getNextMsGroupPtr();
     ms_group_ptr = reader_ptr->getNextMsGroupPtrWithFaime();
 
-    //check if the voltage from this msgroup is new or not to determine whether to create a new set of writer vectors
+    if (ms_group_ptr != nullptr) {
+      //check if the voltage from this msgroup is new or not to determine whether to create a new set of writer vectors
+      double cur_voltage = ms_group_ptr->getMsOnePtr()->getMsHeaderPtr()->getVoltage();
+      if (cur_voltage == -1) {
+        //this is not a FAIME dataset. Just use one msalign file each for ms1 and ms2. 
+        continue;
+      }
+      std::vector<double>::iterator it = std::find(voltage_vec.begin(), voltage_vec.end(), cur_voltage); 
+      if (it != voltage_vec.end()) {
+        //if found, add to the matching msalign
+        int idx = std::distance(voltage_vec.begin(), it);
+        vec_idx = idx;
+      }
+      else {
+        //new file needs to be created
+        std::string ms1_name, ms2_name;
+        std::string file_num = str_util::toString(voltage_vec.size());
+    
+        ms1_name = file_util::basename(spec_file_name_) + "_ms1_" + file_num + ".msalign";
+        ms2_name = file_util::basename(spec_file_name_) + "_ms2_" + file_num + ".msalign";
+        
+        voltage_vec.push_back(cur_voltage);
+
+        single_file_ms1_writer_ptr_vec.clear();
+        single_file_ms2_writer_ptr_vec.clear();
+
+        for (int i = 0; i < thread_num_; i++) { 
+          MsAlignWriterPtr ms1_ptr 
+              = std::make_shared<MsAlignWriter>(ms1_name + "_" + str_util::toString(i));
+          MsAlignWriterPtr ms2_ptr 
+              = std::make_shared<MsAlignWriter>(ms2_name + "_" + str_util::toString(i));
+          single_file_ms1_writer_ptr_vec.push_back(ms1_ptr);
+          single_file_ms2_writer_ptr_vec.push_back(ms2_ptr);
+        }
+        all_file_ms1_writer_ptr_vec.push_back(single_file_ms1_writer_ptr_vec);
+        all_file_ms2_writer_ptr_vec.push_back(single_file_ms2_writer_ptr_vec);
+
+        vec_idx = all_file_ms1_writer_ptr_vec.size() -1;
+      }
+    }
   }
   pool_ptr->ShutDown();
 
@@ -496,21 +551,25 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
   //auto end = std::chrono::high_resolution_clock::now();
   //auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end-start);
   //std::cout << std::endl << "Read file " << duration.count() << std::endl;
-  MsalignThreadMergePtr ms1_merge_ptr
-      = std::make_shared<MsalignThreadMerge>(spec_file_name_, "ms1.msalign", 
-                                             thread_num_, "ms1.msalign", 
-                                             topfd_para_ptr_-> getParaStr("#"));
+  for (int j = 0; j < voltage_vec.size(); j++) {
+    std::string ms1_file_name = "ms1_" + str_util::toString(j) + ".msalign";
+    std::string ms2_file_name = "ms2_" + str_util::toString(j) + ".msalign";
 
-  MsalignThreadMergePtr ms2_merge_ptr 
-      = std::make_shared<MsalignThreadMerge>(spec_file_name_, "ms2.msalign", 
-                                             thread_num_, "ms2.msalign", 
-                                             topfd_para_ptr_-> getParaStr("#"));
+    MsalignThreadMergePtr ms1_merge_ptr
+          = std::make_shared<MsalignThreadMerge>(spec_file_name_, ms1_file_name, 
+                                                thread_num_, ms1_file_name, 
+                                                topfd_para_ptr_-> getParaStr("#"));
 
-  ms1_merge_ptr->process();
-  ms2_merge_ptr->process();
+    MsalignThreadMergePtr ms2_merge_ptr 
+          = std::make_shared<MsalignThreadMerge>(spec_file_name_, ms2_file_name, 
+                                                thread_num_, ms2_file_name, 
+                                                topfd_para_ptr_-> getParaStr("#"));
+    ms1_merge_ptr->process();
+    ms2_merge_ptr->process();
 
+    msalign_num_ = voltage_vec.size();
+  }
   std::cout << std::endl;
-
 }
 
 }; // namespace toppic

@@ -164,7 +164,7 @@ bool PwMsReader::readOneMs(int sp_id, PeakPtrVec &peak_list, MsHeaderPtr &header
   std::vector<pwiz::data::CVParam> cv_list = (*cur_spec_ptr).cvParams;
   for (size_t i = 0; i < cv_list.size(); i++) {
     if (cv_list[i].cvid == pwiz::cv::MS_FAIMS_compensation_voltage) {
-      header_ptr->setVoltage(cv_list[i].value);
+      header_ptr->setVoltage(std::stod(cv_list[i].value));
       break;
     }
   }

@@ -75,7 +75,7 @@ namespace toppic {
 void copyTopMSV(std::map<std::string, std::string> &arguments) {
   std::string spectrum_file_name = arguments["spectrumFileName"];
   std::string base_name = file_util::basename(spectrum_file_name);
-  std::string base_name_short = base_name.substr(0, base_name.length() - 4);
+  std::string base_name_short = base_name.substr(0, base_name.length() - 6);
   std::string topmsv_dir = base_name_short + "_html" +  file_util::getFileSeparator() + "topmsv";
   if (file_util::exists(topmsv_dir)) {
     LOG_WARN("The TopMSV directory " << topmsv_dir << " exists!");

@@ -161,7 +161,7 @@ class MsHeader {
   //rt with the highest intensity in this feature
   double time_apex_;
   //compensation voltage for FAIME data
-  double voltage_;
+  double voltage_ = -1;
 };
 
 typedef std::vector<MsHeaderPtr> MsHeaderPtrVec;

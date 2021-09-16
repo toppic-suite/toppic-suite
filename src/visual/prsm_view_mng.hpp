@@ -33,7 +33,7 @@ class PrsmViewMng {
         std::string spectrum_file_name = prsm_para_ptr_->getSpectrumFileName();
         std::string base_name = file_util::basename(spectrum_file_name);
         xml_path_ = base_name + "_" + fname_suffix + "_xml";
-        html_path_ = base_name.substr(0, base_name.length() - 4) + "_html" 
+        html_path_ = base_name.substr(0, base_name.length() - 6) + "_html" 
             + file_util::getFileSeparator() + fname_suffix;
         LOG_DEBUG("html path " << html_path_);
         resource_dir_ = resource_dir;
