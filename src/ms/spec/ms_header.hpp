@@ -77,6 +77,8 @@ class MsHeader {
 
   double getTimeApex() {return time_apex_;}
 
+  double getVoltage() {return voltage_;}
+
   // set function 
   void setActivationPtr(ActivationPtr acti_ptr) {activation_ptr_ = acti_ptr;}
 
@@ -109,6 +111,8 @@ class MsHeader {
   void setPrecId(int prec_id) {prec_id_ = prec_id;}
 
   void setPrecInte(double inte) {prec_inte_ = inte;}
+
+  void setVoltage(double voltage) {voltage_ = voltage;}
 
   XmlDOMElement* getHeaderXml(XmlDOMDocument* xml_doc);
 
@@ -156,6 +160,8 @@ class MsHeader {
   double prec_inte_ = 0;
   //rt with the highest intensity in this feature
   double time_apex_;
+  //compensation voltage for FAIME data
+  double voltage_ = -1;
 };
 
 typedef std::vector<MsHeaderPtr> MsHeaderPtrVec;

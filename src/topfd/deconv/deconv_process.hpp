@@ -48,6 +48,8 @@ class DeconvProcess {
   static int ms1_spec_num_;
   static int ms2_spec_num_;
 
+  int msalign_num_ = 1;//number of ms1/ms2 msalign. it is > 1 if FAIME data.   
+
  private:
 
   EnvParaPtr env_para_ptr_;
