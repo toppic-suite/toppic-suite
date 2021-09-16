@@ -240,6 +240,7 @@ void RunExe::run(std::string command) {
   BOOL readSuccess = FALSE;
   HANDLE hParentStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
   bSuccess = ReadFile( g_hChildStd_OUT_Rd, buf, 4096, &dwRead, NULL);
+  std::ios::sync_with_stdio(true);
   while (bSuccess == TRUE) {
     buf[dwRead] = '\0';
     OutputDebugStringA(buf);
