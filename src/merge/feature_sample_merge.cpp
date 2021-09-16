@@ -422,17 +422,18 @@ void FeatureSampleMerge::process() {
   for (size_t k = 0; k < sample_num; k++) {
     std::string input_file_name = input_file_names_[k];
     std::string base_name = file_util::basename(input_file_name);
-    if (str_util::endsWith(base_name, "_ms2")) {
-      base_name = base_name.substr(0, base_name.size() - 4);
+    std::string file_num = base_name.substr(base_name.length() - 1);
+    if (str_util::endsWith(base_name.substr(0,base_name.size() - 2), "_ms2")) {
+      base_name = base_name.substr(0, base_name.size() - 6);
     }
     else {
       LOG_ERROR("The file name " << input_file_name << " does not end with _ms1.feature!");
     }
-    FeaturePrsmReader reader(base_name + "_ms1.feature");
+    FeaturePrsmReader reader(base_name + "_ms1_" + file_num + ".feature");
     FeaturePrsmPtrVec features = reader.readAllFeatures();
     reader.close();
 
-    std::string prsm_file_name = base_name + "_ms2_" + tool_name_ + "_proteoform.xml";
+    std::string prsm_file_name = base_name + "_ms2_" + file_num + "_" + tool_name_ + "_proteoform.xml";
     FastaIndexReaderPtr seq_reader = std::make_shared<FastaIndexReader>(db_file_name_);
     ModPtrVec fix_mod_ptr_vec = mod_util::geneFixedModList(fix_mod_str_);
     PrsmStrPtrVec prsms = prsm_reader_util::readAllPrsmStrsMatchSeq(prsm_file_name,
