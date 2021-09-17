@@ -44,9 +44,14 @@ void processOneFile(TopfdParaPtr para_ptr,
     std::cout << "Deconvolution finished." << std::endl;
 
     std::cout << "Deleting temporary files - started." << std::endl;
+    
+    std::string file_num = "";
+
     for (int i = 0; i < processor.msalign_num_; i++) {
-      std::string base_name_ms1 = file_util::basename(spec_file_name) + "_ms1_" + str_util::toString(i) + ".msalign";
-      std::string base_name_ms2 = file_util::basename(spec_file_name) + "_ms2_" + str_util::toString(i) + ".msalign";
+      if (processor.msalign_num_ > 1) {file_num = str_util::toString(i) + "_";} // if FAIME Data
+
+      std::string base_name_ms1 = file_util::basename(spec_file_name) + "_" + file_num + "ms1.msalign";
+      std::string base_name_ms2 = file_util::basename(spec_file_name) + "_" + file_num + "ms2.msalign";
 
       std::string fa_base_ms1 = file_util::absoluteName(base_name_ms1);
       std::string fa_base_ms2 = file_util::absoluteName(base_name_ms2);
@@ -77,32 +82,48 @@ void processOneFile(TopfdParaPtr para_ptr,
 void moveFiles(std::string &spec_file_name, bool move_mzrt) {
   std::string base_name = file_util::basename(spec_file_name);
   std::string file_dir =  base_name + "_file";
-  std::string file_name = base_name + "_ms1_0.msalign";
+  std::string file_name = base_name + "_ms1.msalign";
 
   //create folder only if ms1 msalign and frac mzrt csv exist  
   //== when ms1 spectra was used
+  //non-FAIME data
   if (file_util::exists(file_name)) {//if there is ms1 msalign
     if (!file_util::exists(file_dir)) {
       file_util::createFolder(file_dir);
     }
-    int file_num = 0;
-    while (file_util::exists(file_name)) {
-      file_util::moveFile(file_name, file_dir);
-      file_num++;
-      file_name = base_name + "_ms1_" + str_util::toString(file_num) + ".msalign";
-    }
+    file_util::moveFile(file_name, file_dir);
     //file_name = base_name + "_feature.xml";
     //file_util::moveFile(file_name, file_dir);
     if (move_mzrt) {
-      file_num = 0;
-      file_name = base_name + "_frac.mzrt_" + str_util::toString(file_num) + ".csv";
-      while (file_util::exists(file_name)) {
+      file_name = base_name + "_frac.mzrt.csv";
+      if (file_util::exists(file_name)) {
         file_util::moveFile(file_name, file_dir);
-        file_num++;
-        file_name = base_name + "_frac.mzrt_" + str_util::toString(file_num) + ".csv";
       }
     }
   }
+  //FAIME data
+  int file_num = 0; 
+
+  file_dir =  base_name + "_" + str_util::toString(file_num) + "_file";
+  file_name = base_name + "_" + str_util::toString(file_num) + "_ms1.msalign";
+  std::string frac_file_name = base_name + "_" + str_util::toString(file_num) + "_frac.mzrt.csv";
+
+  while (file_util::exists(file_name)) {
+    if (!file_util::exists(file_dir)) {
+      file_util::createFolder(file_dir);
+    }
+    file_util::moveFile(file_name, file_dir);
+
+    if (move_mzrt) {
+      file_util::moveFile(frac_file_name, file_dir);
+    }
+    file_num++;
+    file_name = base_name + "_" + str_util::toString(file_num) + "_ms1.msalign";
+    file_dir =  base_name + "_" + str_util::toString(file_num) + "_file";
+    frac_file_name = base_name + "_" + str_util::toString(file_num) + "_frac.mzrt.csv";
+  }  
+    //file_name = base_name + "_feature.xml";
+    //file_util::moveFile(file_name, file_dir);
   /*
   if (move_sample_feature) {
     file_name = base_name + "_ms1.feature";

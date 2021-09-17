@@ -33,7 +33,7 @@ class DeconvProcess {
                 const std::string &spec_file_name, 
                 int frac_id, int thread_num);
 
-  void prepareFileFolder();
+  void prepareFileFolder(std::string file_num);
 
   void process();
 

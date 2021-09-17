@@ -567,11 +567,13 @@ void process(int frac_id, const std::string &sp_file_name,
   std::string base_name = file_util::basename(sp_file_name);
   // read ms1 deconvoluted spectra
   if (!missing_level_one) {
+    std::string file_num = "";
     for (int i = 0; i < msalign_num; i++) {
+      if (msalign_num > 1) {file_num = str_util::toString(i) + "_";} // if FAIME Data
+
       DeconvMsPtrVec ms1_ptr_vec;
       FracFeaturePtrVec frac_features;
-
-      std::string ms1_file_name = base_name + "_ms1_" + str_util::toString(i) + ".msalign";
+      std::string ms1_file_name = base_name + "_" + file_num + "ms1.msalign";
       SimpleMsAlignReader::readMsOneSpectra(ms1_file_name, ms1_ptr_vec);
       PeakPtrVec2D raw_peaks; 
       RawMsReaderPtr raw_reader_ptr = std::make_shared<RawMsReader>(sp_file_name, activation);
@@ -580,7 +582,7 @@ void process(int frac_id, const std::string &sp_file_name,
       findMsOneFeatures(ms1_ptr_vec, raw_peaks, para_ptr, frac_features, env_para_ptr);
 
       LOG_DEBUG("start reading ms2");
-      std::string ms2_file_name = base_name + "_ms2_" + str_util::toString(i) + ".msalign";
+      std::string ms2_file_name = base_name + "_" + file_num + "ms2.msalign";
       MsHeaderPtrVec header_ptr_vec;
       readHeaders(ms2_file_name, header_ptr_vec);
 
@@ -590,14 +592,14 @@ void process(int frac_id, const std::string &sp_file_name,
       SampleFeaturePtrVec sample_features;
       getSampleFeatures(sample_features, frac_features, ms2_features);
 
-      std::string output_file_name = base_name + "_feature_" + str_util::toString(i) + ".xml";
+      std::string output_file_name = base_name + "_" + file_num + "feature.xml";
       frac_feature_writer::writeXmlFeatures(output_file_name, frac_features);
-      std::string batmass_file_name = base_name + "_frac.mzrt_" + str_util::toString(i) + ".csv";
+      std::string batmass_file_name = base_name + "_" + file_num + "frac.mzrt.csv";
       frac_feature_writer::writeBatMassFeatures(batmass_file_name, frac_features);
-      std::string sample_feature_file_name = base_name + "_ms1_" + str_util::toString(i) + ".feature";
+      std::string sample_feature_file_name = base_name + "_" + file_num + "ms1.feature";
       sample_feature_writer::writeFeatures(sample_feature_file_name, sample_features);
 
-      output_file_name = base_name + "_ms2_" + str_util::toString(i) + ".feature";
+      output_file_name = base_name + "_" + file_num + "ms2.feature";
       spec_feature_writer::writeFeatures(output_file_name, ms2_features); 
     }
   }
