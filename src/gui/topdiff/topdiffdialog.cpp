@@ -146,7 +146,7 @@ void TopDiffDialog::on_addButton_clicked() {
       this,
       "Select spectrum files",
       lastDir_,
-      "Spectrum files(*ms2_*.msalign)");
+      "Spectrum files(*ms2.msalign)");
   for (int i = 0; i < idfiles.size(); i++) {
     QString idfile = idfiles.at(i);
     updatedir(idfile);
