@@ -64,6 +64,15 @@ bool allowMod(ProtModPtr prot_mod_ptr, const ResiduePtrVec &residues) {
   return true;
 }
 
-} // namespace toppic_mod_util
+bool containMod(ProtModPtrVec prot_mod_ptr_vec, ProtModPtr prot_mod_ptr) {
+  for (size_t i = 0; i < prot_mod_ptr_vec.size(); i++) {
+    if (prot_mod_ptr_vec[i] == prot_mod_ptr) {
+      return true;
+    }
+  }
+  return false;
+}
+
+} // namespace prot_mod_util
 
 }  // namespace toppic

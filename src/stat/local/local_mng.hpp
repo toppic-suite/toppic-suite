@@ -58,9 +58,14 @@ class LocalMng {
 
   double desc_ratio_ = 0.67;
 
-  int LEFT_SUP_LIMIT_ = 10;
+  int n_term_range_ = 5;
+  
+  int c_term_range_ = 5;
+  
 
-  int RIGHT_SUP_LIMIT_ = 10;
+  //int LEFT_SUP_LIMIT_ = 10;
+
+  //int RIGHT_SUP_LIMIT_ = 10;
 
   int DESC_MATCH_LIMIT_ = 5;
 };

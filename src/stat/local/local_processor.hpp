@@ -18,7 +18,7 @@
 #include "common/base/ptm.hpp"
 #include "prsm/prsm.hpp"
 #include "stat/local/local_mng.hpp"
-#include "stat/local/local_score.hpp"
+#include "stat/local/local_result.hpp"
 
 namespace toppic {
 
@@ -39,19 +39,25 @@ class LocalProcessor {
 
   ProteoformPtr processOneKnownPtm(PrsmPtr prsm);
 
+  ProteoformPtrVec createCandidateForm(FastaSeqPtr seq_ptr, int ori_start_pos, 
+                                       int form_start_pos, int form_end_pos, 
+                                       MassShiftPtrVec & exp_shift_ptr_vec); 
+
+  ProteoformPtrVec getOneKnownPtmCandidateForms(ProteoformPtr ori_form_ptr); 
+
   ProteoformPtr processTwoKnownPtm(PrsmPtr prsm);
 
   bool modifiable(ProteoformPtr proteoform_ptr, int i, PtmPtr ptm_ptr);
 
-  LocalScore onePtmLocalize(ProteoformPtr base_form_ptr, const ExtendMsPtrVec & extend_ms_ptr_vec, 
-                            double prec_mass, double err_tole); 
+  LocalResultPtr onePtmLocalize(ProteoformPtr base_form_ptr, const ExtendMsPtrVec & extend_ms_ptr_vec, 
+                                double prec_mass, double err_tole); 
 
-  ProteoformPtr createProteoformPtr(ProteoformPtr base_form_ptr, double shift_mass, LocalScore local_score); 
+  ProteoformPtr createProteoformPtr(ProteoformPtr base_form_ptr, double shift_mass, LocalResultPtr result_ptr); 
 
-  LocalScore compOnePtmScr(ProteoformPtr base_form_ptr, 
-                           const ExtendMsPtrVec & extend_ms_ptr_vec,
-                           double unexp_shift_mass, 
-                           PtmPtrVec & ptm_ptr_vec); 
+  LocalResultPtr compOnePtmScr(ProteoformPtr base_form_ptr, 
+                               const ExtendMsPtrVec & extend_ms_ptr_vec,
+                               double unexp_shift_mass, 
+                               PtmPtrVec & ptm_ptr_vec); 
 
   void compTwoPtmScr(ProteoformPtr proteoform, int num_match,
                      const ExtendMsPtrVec & extend_ms_ptr_vec, double prec_mass,
@@ -70,11 +76,9 @@ class LocalProcessor {
   ProteoformPtr compSplitPoint(ProteoformPtr proteoform, int h, const ExtendMsPtrVec & extend_ms_ptr_vec,
                                double prec_mass);
 
-  void getNtermTruncRange(ProteoformPtr proteoform, const ExtendMsPtrVec & extend_ms_ptr_vec,
-                          int & min, int & max);
+  void getNtermTruncRange(ProteoformPtr proteoform, int & min, int & max);
 
-  void getCtermTruncRange(ProteoformPtr proteoform, const ExtendMsPtrVec & extend_ms_ptr_vec,
-                          int & min, int & max);
+  void getCtermTruncRange(ProteoformPtr proteoform, int & min, int & max);
 
   LocalMngPtr mng_ptr_;
 

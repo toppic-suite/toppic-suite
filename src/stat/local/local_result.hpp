@@ -17,18 +17,22 @@
 #define TOPPIC_STAT_LOCAL_LOCAL_SCORE_HPP_
 
 #include <vector>
+#include <memory>
 
 #include "common/base/ptm.hpp"
 #include "seq/proteoform.hpp"
 
 namespace toppic {
 
-struct LocalScore {
+class LocalResult {
+ public:
   int match_score_ = -1;
   std::vector<double> scr_vec_; 
-  PtmPtr ptm_ptr_;
   ProteoformPtr form_ptr_;
+  PtmPtr ptm_ptr_;
 };
+
+typedef std::shared_ptr<LocalResult> LocalResultPtr;
 
 }
 

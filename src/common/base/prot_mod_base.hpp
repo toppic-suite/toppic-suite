@@ -35,7 +35,11 @@ class ProtModBase {
 
   static ProtModPtr getProtModPtr_NONE() {return prot_mod_ptr_NONE_;}
 
+  static ProtModPtr getProtModPtr_NME() {return prot_mod_ptr_NME_;}
+
   static ProtModPtr getProtModPtr_M_ACETYLATION() {return prot_mod_ptr_M_ACETYLATION_;}
+
+  static ProtModPtr getProtModPtr_NME_ACETYLATION() {return prot_mod_ptr_NME_ACETYLATION_;}
 
   static std::string getType_NME_ACETYLATION() {return "NME_ACETYLATION";}
 
@@ -49,6 +53,10 @@ class ProtModBase {
   static ProtModPtr prot_mod_ptr_NONE_;
 
   static ProtModPtr prot_mod_ptr_M_ACETYLATION_;
+
+  static ProtModPtr prot_mod_ptr_NME_;
+
+  static ProtModPtr prot_mod_ptr_NME_ACETYLATION_;
 
   static std::string getType_NONE() {return "NONE";}
 };
