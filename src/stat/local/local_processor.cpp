@@ -66,6 +66,9 @@ void LocalProcessor::init() {
 }
 
 void LocalProcessor::process() {
+
+  //logger::log_level=2; 
+
   std::string spec_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
 
   std::string input_file_name = file_util::basename(spec_file_name) + "." + mng_ptr_->input_file_ext_;
@@ -111,6 +114,7 @@ void LocalProcessor::process() {
         prsm_ptr->setRefineMsVec(extend_ms_ptr_vec);
 
         if (prsm_ptr->getProteoformPtr()->getMassShiftNum(AlterType::UNEXPECTED) > 0) {
+          LOG_DEBUG("Start localization");
           prsm_ptr = processOnePrsm(prsm_ptr);
         }
 
@@ -226,7 +230,11 @@ ProteoformPtrVec LocalProcessor::createCandidateForm(FastaSeqPtr seq_ptr, int or
     if (shift_start_pos >= form_start_pos && shift_end_pos <= form_end_pos) {
       int left_bp_pos = shift_ptr->getLeftBpPos() + ori_start_pos - form_start_pos;
       int right_bp_pos = shift_ptr->getRightBpPos() + ori_start_pos - form_start_pos;
-      MassShiftPtr new_shift_ptr = std::make_shared<MassShift>(left_bp_pos, right_bp_pos, shift_ptr->getMassShift());
+      AlterPtr alter_ptr = std::make_shared<Alter>(left_bp_pos, right_bp_pos,  
+                                                   shift_ptr->getTypePtr(), 
+                                                   shift_ptr->getMassShift(), 
+                                                   shift_ptr->getAlterPtr(0)->getModPtr());
+      MassShiftPtr new_shift_ptr = std::make_shared<MassShift>(alter_ptr);
       valid_shift_ptr_vec.push_back(new_shift_ptr);
     }
   }
@@ -372,6 +380,7 @@ ProteoformPtrVec LocalProcessor::getOneKnownPtmCandidateForms(ProteoformPtr ori_
 // we will get a nullptr if the mass shift can't be explained by a variable ptm
 ProteoformPtr LocalProcessor::processOneKnownPtm(PrsmPtr prsm_ptr) {
 
+  LOG_DEBUG("One known PTM");
   //get canidate forms
   ProteoformPtr ori_form_ptr = prsm_ptr->getProteoformPtr();
   ProteoformPtrVec cand_form_vec = getOneKnownPtmCandidateForms(ori_form_ptr);
@@ -385,8 +394,10 @@ ProteoformPtr LocalProcessor::processOneKnownPtm(PrsmPtr prsm_ptr) {
 
   for (size_t i = 0; i < cand_form_vec.size(); i++) {
     ProteoformPtr cand_form_ptr = cand_form_vec[i];
+    LOG_DEBUG("Start one ptm localization");
     LocalResultPtr local_result_ptr = onePtmLocalize(cand_form_ptr, extend_ms_ptr_vec, 
                                                      adjust_prec_mass, err_tole); 
+    LOG_DEBUG("End one ptm localization");
     if (local_result_ptr != nullptr && local_result_ptr->match_score_ > best_match_score) {
       best_match_score = local_result_ptr->match_score_;
       best_form_ptr = local_result_ptr->form_ptr_;
@@ -402,11 +413,13 @@ LocalResultPtr LocalProcessor::onePtmLocalize(ProteoformPtr form_ptr, const Exte
   // sum of all expected shift values, in most cases, there is only one unexpected shift
   double unexp_shift_mass = prec_mass - form_ptr->getMass(); 
 
+  LOG_DEBUG("Get PTM by Mass");
   // Get candidate Ptms with similar mass shifts
   PtmPtrVec match_ptm_ptr_vec = local_util::getPtmPtrVecByMass(unexp_shift_mass, err_tole, ptm_ptr_vec_);
 
   // if there is a match, find the best ptm and its best similarity score
   if (match_ptm_ptr_vec.size() != 0) {
+    LOG_DEBUG("computer ptm score");
     // compute similarity score for each possible site of the PTM
     LocalResultPtr local_result_ptr = compOnePtmScr(form_ptr, extend_ms_ptr_vec, unexp_shift_mass, match_ptm_ptr_vec);
     return local_result_ptr;
