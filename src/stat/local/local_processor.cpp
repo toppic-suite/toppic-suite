@@ -332,7 +332,7 @@ ProteoformPtrVec LocalProcessor::getOneKnownPtmCandidateForms(ProteoformPtr ori_
   MassShiftPtrVec tmp_vec = local_util::massShiftFilter(ori_shift_ptr_vec,
                                                         AlterType::UNEXPECTED);
   MassShiftPtrVec exp_shift_ptr_vec = local_util::massShiftFilter(tmp_vec, 
-                                                                  AlterType::UNEXPECTED);
+                                                                  AlterType::PROTEIN_VARIABLE);
   FastaSeqPtr fasta_seq_ptr = ori_form_ptr->getFastaSeqPtr();
   int ori_start_pos = ori_form_ptr->getStartPos();
   int ori_end_pos = ori_form_ptr->getEndPos();
