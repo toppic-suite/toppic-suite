@@ -68,8 +68,10 @@ void processOneFile(TopfdParaPtr para_ptr,
     feature_detect::process(frac_id, 
                             spec_file_name,
                             para_ptr->missing_level_one_, 
-                            para_ptr->resource_dir_,
-			    para_ptr->activation_, processor.msalign_num_);
+                            para_ptr->resource_dir_,             
+			                      para_ptr->activation_, 
+                            processor.msalign_num_,
+                            processor.voltage_vec_);
     std::cout << "Feature detection finished." << std::endl;
     
     std::cout << "Processing " << spec_file_name << " finished." << std::endl;

@@ -55,14 +55,18 @@ RawMsPtr RawMsReader::getNextMs(double prec_win_size, int max_charge) {
   return ms_ptr;
 }
 
-void RawMsReader::getMs1Peaks(PeakPtrVec2D &raw_peaks) {
+void RawMsReader::getMs1Peaks(PeakPtrVec2D &raw_peaks, double cur_voltage) {
   while (true) {
     reader_ptr_->readNext();
     MsHeaderPtr header_ptr = reader_ptr_->getHeaderPtr();
     if (header_ptr == nullptr) {
       break;
     }
-    if (header_ptr->getMsLevel() == 1) {
+    if (header_ptr->getMsLevel() == 1 && header_ptr->getVoltage() == -1) {//if not a FAIME data
+      PeakPtrVec peak_list = reader_ptr_->getPeakList();
+      raw_peaks.push_back(peak_list);
+    }
+    else if (header_ptr->getMsLevel() == 1 && header_ptr->getVoltage() == cur_voltage) {//FAIME data
       PeakPtrVec peak_list = reader_ptr_->getPeakList();
       raw_peaks.push_back(peak_list);
     }

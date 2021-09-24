@@ -27,7 +27,7 @@ class RawMsReader {
   RawMsReader(const std::string & file_name, const std::string & activation);
   RawMsPtr getNextMs(double prec_win_size, int max_charge);
 
-  void getMs1Peaks(PeakPtrVec2D &raw_peaks);
+  void getMs1Peaks(PeakPtrVec2D &raw_peaks, double cur_voltage);
 
   void refinePrecChrg(RawMsPtr ms_one, RawMsPtr ms_two, 
                       double prec_win_size, int max_charge);
