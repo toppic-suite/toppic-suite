@@ -391,7 +391,6 @@ void findMsOneFeatures(DeconvMsPtrVec &ms1_ptr_vec, PeakPtrVec2D & raw_peaks,
   std::sort(all_peaks.begin(), all_peaks.end(), Peak::cmpInteDec);
   int feat_id = 0;
   size_t peak_idx = 0;
-
   while (feat_id < para_ptr->feature_num_ && peak_idx < all_peaks.size()) {
     DeconvPeakPtr best_peak = all_peaks[peak_idx];
     if (peakExists(ms1_ptr_vec, best_peak)) {
@@ -433,7 +432,6 @@ void findMsOneFeatures(DeconvMsPtrVec &ms1_ptr_vec, PeakPtrVec2D & raw_peaks,
           LOG_DEBUG("get promex score done");
           feature_ptr->setPromexScore(promex_score);
           features.push_back(feature_ptr);
-          
         //}
         removePeaks(ms1_ptr_vec, matched_peaks);
       }
@@ -559,7 +557,8 @@ void getSampleFeatures(SampleFeaturePtrVec &sample_features, FracFeaturePtrVec &
 }
 
 void process(int frac_id, const std::string &sp_file_name, 
-             bool missing_level_one, const std::string &resource_dir, const std::string &activation, int msalign_num) { 
+             bool missing_level_one, const std::string &resource_dir, const std::string &activation, 
+             int msalign_num, const std::vector<std::pair<double, int>> voltage_vec_) { 
   //logger::setLogLevel(2);
   FeatureParaPtr para_ptr 
       = std::make_shared<FeaturePara>(frac_id, sp_file_name, resource_dir);
@@ -570,17 +569,16 @@ void process(int frac_id, const std::string &sp_file_name,
     std::string file_num = "";
     for (int i = 0; i < msalign_num; i++) {
       if (msalign_num > 1) {file_num = str_util::toString(i) + "_";} // if FAIME Data
-
       DeconvMsPtrVec ms1_ptr_vec;
       FracFeaturePtrVec frac_features;
       std::string ms1_file_name = base_name + "_" + file_num + "ms1.msalign";
       SimpleMsAlignReader::readMsOneSpectra(ms1_file_name, ms1_ptr_vec);
+      double cur_voltage = voltage_vec_[i].first;//if this is -1, it is non-FAIME data
       PeakPtrVec2D raw_peaks; 
       RawMsReaderPtr raw_reader_ptr = std::make_shared<RawMsReader>(sp_file_name, activation);
-      raw_reader_ptr->getMs1Peaks(raw_peaks);
+      raw_reader_ptr->getMs1Peaks(raw_peaks, cur_voltage);
       raw_reader_ptr = nullptr;
       findMsOneFeatures(ms1_ptr_vec, raw_peaks, para_ptr, frac_features, env_para_ptr);
-
       LOG_DEBUG("start reading ms2");
       std::string ms2_file_name = base_name + "_" + file_num + "ms2.msalign";
       MsHeaderPtrVec header_ptr_vec;

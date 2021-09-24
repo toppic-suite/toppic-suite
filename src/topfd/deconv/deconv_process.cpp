@@ -442,9 +442,6 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
 
   SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(thread_num_);  
   
-  std::vector<std::pair<double, int>> voltage_vec;//{voltage, count of scans with that voltage}
-  //store voltages that have appeared in the msgroup so far along with the number of scans with that voltage so far
-
   if (ms_group_ptr == nullptr) {
     LOG_ERROR("No spectrum to read in mzML file!");
     return;
@@ -460,7 +457,7 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
     ms2_msalign_name = file_util::basename(spec_file_name_) + "_0_ms2.msalign";
     prepareFileFolder("0_");
   }
-  voltage_vec.push_back(std::make_pair(ms_group_ptr->getMsOnePtr()->getMsHeaderPtr()->getVoltage(), 0));
+  voltage_vec_.push_back(std::make_pair(ms_group_ptr->getMsOnePtr()->getMsHeaderPtr()->getVoltage(), 0));
 
   std::vector<MsAlignWriterPtrVec> all_file_ms1_writer_ptr_vec;
   std::vector<MsAlignWriterPtrVec> all_file_ms2_writer_ptr_vec;
@@ -501,14 +498,14 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
     if (ms_group_ptr != nullptr) {
       //check if the voltage from this msgroup is new or not to determine whether to create a new set of writer vectors
       double cur_voltage = ms_group_ptr->getMsOnePtr()->getMsHeaderPtr()->getVoltage();
-      for (int i = 0; i < voltage_vec.size(); i++) {
-        if (voltage_vec[i].first == ms_group_ptr->getMsOnePtr()->getMsHeaderPtr()->getVoltage()) {
-          int spec_id = voltage_vec[i].second;
+      for (int i = 0; i < voltage_vec_.size(); i++) {
+        if (voltage_vec_[i].first == ms_group_ptr->getMsOnePtr()->getMsHeaderPtr()->getVoltage()) {
+          int spec_id = voltage_vec_[i].second;
           RawMsPtrVec ms_two_ptr_vec = ms_group_ptr->getMsTwoPtrVec();
           for (int j = 0; j < ms_two_ptr_vec.size(); j++) {
             ms_two_ptr_vec[j]->getMsHeaderPtr()->setMsOneId(spec_id);
           }
-          voltage_vec[i].second++;
+          voltage_vec_[i].second++;
           is_new_voltage = false;
           vec_idx = i;
           break;
@@ -517,13 +514,22 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
       if (is_new_voltage) {
         //new file needs to be created
         std::string ms1_name, ms2_name;
-        std::string file_num = str_util::toString(voltage_vec.size());
+        std::string file_num = str_util::toString(voltage_vec_.size());
     
         ms1_name = file_util::basename(spec_file_name_) + "_" + file_num + "_ms1.msalign";
         ms2_name = file_util::basename(spec_file_name_) + "_" + file_num + "_ms2.msalign";
         prepareFileFolder(file_num + "_");
 
-        voltage_vec.push_back(std::make_pair(cur_voltage, 0));
+        voltage_vec_.push_back(std::make_pair(cur_voltage, 0));
+
+        int spec_id = 0;
+
+        RawMsPtrVec ms_two_ptr_vec = ms_group_ptr->getMsTwoPtrVec();
+
+        for (int j = 0; j < ms_two_ptr_vec.size(); j++) {
+          ms_two_ptr_vec[j]->getMsHeaderPtr()->setMsOneId(spec_id);
+        }
+        voltage_vec_.back().second++;
 
         single_file_ms1_writer_ptr_vec.clear();
         single_file_ms2_writer_ptr_vec.clear();
@@ -572,7 +578,7 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
   std::string ms1_file_name = "ms1.msalign";
   std::string ms2_file_name = "ms2.msalign";
 
-  if (voltage_vec[0].first == -1) {
+  if (voltage_vec_[0].first == -1) {
     //non-FAIME dataset
     MsalignThreadMergePtr ms1_merge_ptr
             = std::make_shared<MsalignThreadMerge>(spec_file_name_, ms1_file_name, 
@@ -587,7 +593,7 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
     ms2_merge_ptr->process();
   }
   else {
-    for (int j = 0; j < voltage_vec.size(); j++) {
+    for (int j = 0; j < voltage_vec_.size(); j++) {
       ms1_file_name = str_util::toString(j) + "_ms1.msalign";
       ms2_file_name = str_util::toString(j) + "_ms2.msalign";
 
@@ -603,7 +609,7 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
       ms1_merge_ptr->process();
       ms2_merge_ptr->process();
 
-      msalign_num_ = voltage_vec.size();
+      msalign_num_ = voltage_vec_.size();
     }
   }
   
