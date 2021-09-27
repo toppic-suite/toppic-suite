@@ -25,7 +25,7 @@ SpPara::SpPara(std::string activation_name, double ppm) {
   if (activation_name != "FILE") {
     activation_ptr_ = ActivationBase::getActivationPtrByName(activation_name);
   }
-  double ppo = ppm *0.000001;
+  double ppo = ppm * 0.000001;
   peak_tolerance_ptr_ = std::make_shared<PeakTolerance>(ppo); 
 
   // extend sp parameter 

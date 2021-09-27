@@ -19,12 +19,24 @@
 #include "common/base/mass_constant.hpp"
 #include "ms/factory/extend_ms_util.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
+#include "prsm/prsm_algo.hpp"
 #include "prsm/theo_peak_util.hpp"
 #include "stat/local/local_util.hpp"
 
 namespace toppic {
 
 namespace local_util {
+
+MassShiftPtrVec massShiftFilter(const MassShiftPtrVec & mass_shift_vec,
+                                AlterTypePtr type) {
+  MassShiftPtrVec res;
+  for (size_t k = 0; k < mass_shift_vec.size(); k++) {
+    if (mass_shift_vec[k]->getTypePtr() != type) {
+      res.push_back(mass_shift_vec[k]);
+    }
+  }
+  return res;
+}
 
 void scrFilter(std::vector<double> & scr, int & bgn, int & end, double & conf, double threshold) {
   conf = 0.0;
@@ -70,9 +82,8 @@ PtmPtrVec getPtmPtrVecByMass(double mass, double err, const PtmPtrVec & ptm_vec)
   return res;
 }
 
-PtmPairVec getPtmPairVecByMass(double mass1, double mass2, double err, const PtmPairVec & ptm_pair_vec) {
+PtmPairVec getPtmPairVecByMass(double mass, double err, const PtmPairVec & ptm_pair_vec) {
   PtmPairVec res;
-  double mass = mass1 + mass2;
   for (size_t i = 0; i < ptm_pair_vec.size(); i++) {
     double pair_mass = ptm_pair_vec[i].first->getMonoMass() + ptm_pair_vec[i].second->getMonoMass();
 
@@ -143,6 +154,33 @@ void fillTableB(std::vector<std::vector<double> > & b_table, double mass1, doubl
   }
 }
 
+void updateSTable(const std::vector<double> &ori_theo_masses, double shift, 
+                  const std::vector<double> &exp_masses, 
+                  PeakTolerancePtr tole_ptr,  
+                  std::vector<int> &s_table) {
+  std::vector<double> theo_masses;
+  for (size_t k = 0; k < ori_theo_masses.size(); k++) {
+    theo_masses.push_back(ori_theo_masses[k] + shift);
+  }
+  size_t i = 0;
+  size_t j = 0;
+  while (i < exp_masses.size() && j < theo_masses.size()) {
+    double deviation = exp_masses[i] - theo_masses[j];
+    double err = tole_ptr->compStrictErrorTole(exp_masses[i]); 
+    if (std::abs(deviation) <= err) {
+      if (j > 0 && j < theo_masses.size() - 1) {
+        s_table[j] = s_table[j] + 1;
+      }
+    }
+
+    if (prsm_algo::increaseIJ(i, j, deviation, err, exp_masses, theo_masses)) {
+      i++;
+    } else {
+      j++;
+    }
+  }
+}
+
 void compNumMatch(const std::vector<double> & b, std::vector<int> & s,
                   const ExtendMsPtr & extend_ms_ptr, double prec_mass) {
   std::vector<std::pair<double, double> > spec_peak
@@ -202,16 +240,6 @@ std::vector<double> geneNTheoMass(ProteoformPtr proteoform, ExtendMsPtr extend_m
   return res;
 }
 
-MassShiftPtrVec massShiftFilter(const MassShiftPtrVec & mass_shift_vec,
-                                AlterTypePtr type) {
-  MassShiftPtrVec res;
-  for (size_t k = 0; k < mass_shift_vec.size(); k++) {
-    if (mass_shift_vec[k]->getTypePtr() != type) {
-      res.push_back(mass_shift_vec[k]);
-    }
-  }
-  return res;
-}
 
 MassShiftPtrVec copyMassShiftVec(const MassShiftPtrVec & mass_shift_vec) {
   MassShiftPtrVec new_mass_shift_vec;

@@ -33,6 +33,7 @@
 
 #include "ms/spec/msalign_util.hpp"
 #include "ms/spec/spectrum_set.hpp"
+#include "ms/factory/extend_ms_util.hpp"
 #include "ms/factory/extend_ms_factory.hpp"
 #include "ms/factory/spectrum_set_factory.hpp"
 
@@ -41,6 +42,7 @@
 #include "prsm/prsm_xml_writer.hpp"
 
 #include "stat/local/local_util.hpp"
+#include "stat/local/local_proteoform.hpp"
 #include "stat/local/local_processor.hpp"
 
 namespace toppic {
@@ -68,27 +70,16 @@ void LocalProcessor::init() {
 void LocalProcessor::process() {
 
   //logger::log_level=2; 
-
   std::string spec_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
-
   std::string input_file_name = file_util::basename(spec_file_name) + "." + mng_ptr_->input_file_ext_;
-
   std::string output_file_name = file_util::basename(spec_file_name) + "." + mng_ptr_->output_file_ext_;
-
   PrsmXmlWriterPtr prsm_writer = std::make_shared<PrsmXmlWriter>(output_file_name);
-
   std::string db_file_name = mng_ptr_->prsm_para_ptr_->getSearchDbFileName();
-
   FastaIndexReaderPtr seq_reader = std::make_shared<FastaIndexReader>(db_file_name);
-
   PrsmReaderPtr prsm_reader = std::make_shared<PrsmReader>(input_file_name);
-
   ModPtrVec fix_mod_list = mng_ptr_->prsm_para_ptr_->getFixModPtrVec();
-
   PrsmPtr prsm_ptr = prsm_reader->readOnePrsm(seq_reader, fix_mod_list);
-
   int group_spec_num = mng_ptr_->prsm_para_ptr_->getGroupSpecNum();
-
   SpParaPtr sp_para_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr();
 
   SimpleMsAlignReaderPtr reader_ptr = std::make_shared<SimpleMsAlignReader>(spec_file_name, 
@@ -166,224 +157,30 @@ PrsmPtr LocalProcessor::processOnePtm(PrsmPtr prsm) {
     }
   }
 
-  /* TO DO we will add two known prsm later
-  ProteoformPtr two_known_prsm = processTwoKnownPtm(prsm);
+  // Check if the mass shift can be explained by two common PTMs
+  ProteoformPtr two_known_proteoform = processTwoKnownPtm(prsm);
 
-  if (two_known_prsm != nullptr) {
-    double new_num_match_ion = local_util::compMatchFragNum(two_known_prsm,
+  if (two_known_proteoform != nullptr) {
+    double new_num_match_ion = local_util::compMatchFragNum(two_known_proteoform,
                                                             prsm->getRefineMsPtrVec(),
                                                             mng_ptr_->min_mass_);
     if (new_num_match_ion > ori_num_match_ion - mng_ptr_->DESC_MATCH_LIMIT_
         && new_num_match_ion > ori_num_match_ion * mng_ptr_->desc_ratio_) {
-      prsm->setProteoformPtr(two_known_prsm, mng_ptr_->prsm_para_ptr_->getSpParaPtr());
+      two_known_proteoform->setProteoClusterId(prsm->getProteoformPtr()->getProteoClusterId());
+      two_known_proteoform->setProtId(prsm->getProteoformPtr()->getProtId());
+      prsm->setProteoformPtr(two_known_proteoform, mng_ptr_->prsm_para_ptr_->getSpParaPtr());
       return prsm;
     }
   }
-  */
 
   return prsm;
 }
 
-void LocalProcessor::getNtermTruncRange(ProteoformPtr proteoform, int & min, int & max) {
-
-  int ori_start = proteoform->getStartPos();
-  int ori_end = proteoform->getEndPos();
-
-  min = ori_start - mng_ptr_->n_term_range_;
-  if (min < 0) {
-    min = 0;
-  }
-
-  max = ori_start + mng_ptr_->n_term_range_;
-  if (max > ori_end) {
-    max = ori_end;
-  }
-}
-
-void LocalProcessor::getCtermTruncRange(ProteoformPtr proteoform, int & min, int & max) {
-
-  int ori_start = proteoform->getStartPos();
-  int ori_end = proteoform->getEndPos();
-
-  min = ori_end - mng_ptr_->c_term_range_;
-  if (min < ori_start) {
-    min = ori_start;
-  }
-
-  int raw_seq_len = static_cast<int>(proteoform->getFastaSeqPtr()->getRawSeq().length());
-  max = ori_end + mng_ptr_->c_term_range_;
-  if (max > raw_seq_len - 1) {
-    max = raw_seq_len - 1;
-  }
-}
-
-ProteoformPtrVec LocalProcessor::createCandidateForm(FastaSeqPtr seq_ptr, int ori_start_pos, 
-                                                     int form_start_pos, int form_end_pos, 
-                                                     MassShiftPtrVec & exp_shift_ptr_vec) {
-  ProteoformPtrVec result_vec;
-  // update mass shifts
-  MassShiftPtrVec valid_shift_ptr_vec;
-  for (size_t i = 0; i < exp_shift_ptr_vec.size(); i++) {
-    MassShiftPtr shift_ptr = exp_shift_ptr_vec[i];
-    int shift_start_pos = shift_ptr->getLeftBpPos() + ori_start_pos;
-    int shift_end_pos = shift_ptr->getRightBpPos() + ori_start_pos - 1;
-    if (shift_start_pos >= form_start_pos && shift_end_pos <= form_end_pos) {
-      int left_bp_pos = shift_ptr->getLeftBpPos() + ori_start_pos - form_start_pos;
-      int right_bp_pos = shift_ptr->getRightBpPos() + ori_start_pos - form_start_pos;
-      AlterPtr alter_ptr = std::make_shared<Alter>(left_bp_pos, right_bp_pos,  
-                                                   shift_ptr->getTypePtr(), 
-                                                   shift_ptr->getMassShift(), 
-                                                   shift_ptr->getAlterPtr(0)->getModPtr());
-      MassShiftPtr new_shift_ptr = std::make_shared<MassShift>(alter_ptr);
-      valid_shift_ptr_vec.push_back(new_shift_ptr);
-    }
-  }
-
-  // obtain res_seq
-  std::string whole_seq = seq_ptr->getRawSeq();
-  std::string sub_seq = whole_seq.substr(form_start_pos, form_end_pos - form_start_pos + 1); 
-  ModPtrVec fixed_mod_ptr_vec = mng_ptr_->prsm_para_ptr_->getFixModPtrVec();
-  ResSeqPtr db_res_seq_ptr = std::make_shared<ResidueSeq>(residue_util::convertStrToResiduePtrVec(whole_seq, fixed_mod_ptr_vec));
-  ResSeqPtr sub_res_seq_ptr = std::make_shared<ResidueSeq>(residue_util::convertStrToResiduePtrVec(sub_seq, fixed_mod_ptr_vec));
-
-  // obtain protein mod
-  ProtModPtr prot_mod_ptr = ProtModBase::getProtModPtr_NONE(); 
-  if (form_start_pos == 1) {
-    ProtModPtr nme = ProtModBase::getProtModPtr_NME();
-    if (prot_mod_util::containMod(mng_ptr_->prsm_para_ptr_->getProtModPtrVec(), nme) && 
-        prot_mod_util::allowMod(nme, db_res_seq_ptr->getResidues())) {
-      prot_mod_ptr = nme;
-    }
-  }
-
-  ProteoformPtr form_ptr
-    = std::make_shared<Proteoform>(seq_ptr, 
-                                   prot_mod_ptr, 
-                                   form_start_pos, 
-                                   form_end_pos, 
-                                   sub_res_seq_ptr,
-                                   valid_shift_ptr_vec);
-  result_vec.push_back(form_ptr);
-
-  // check possible N-terminal acetylation form
-  if (form_start_pos == 0) {
-    ProtModPtr m_actyl = ProtModBase::getProtModPtr_M_ACETYLATION();
-    if (prot_mod_util::containMod(mng_ptr_->prsm_para_ptr_->getProtModPtrVec(), m_actyl) && 
-        prot_mod_util::allowMod(m_actyl, db_res_seq_ptr->getResidues())) {
-      prot_mod_ptr = m_actyl;
-      // apply mod
-      ModPtr mod_ptr = prot_mod_ptr->getModPtr();
-      ResiduePtrVec res_vec = sub_res_seq_ptr->getResidues();
-      int pos = 0;
-      res_vec[pos] = mod_ptr->getModResiduePtr();
-      ResSeqPtr new_seq_ptr = std::make_shared<ResidueSeq>(res_vec);
-
-      AlterPtr alter_ptr = std::make_shared<Alter>(pos, pos + 1, 
-                                                   AlterType::PROTEIN_VARIABLE,
-                                                   mod_ptr->getShift(), mod_ptr);
-      MassShiftPtr shift_ptr = std::make_shared<MassShift>(alter_ptr); 
-      valid_shift_ptr_vec.push_back(shift_ptr);
-
-      form_ptr = std::make_shared<Proteoform>(seq_ptr, 
-                                              prot_mod_ptr, 
-                                              form_start_pos, 
-                                              form_end_pos, 
-                                              new_seq_ptr,
-                                              valid_shift_ptr_vec);
-      result_vec.push_back(form_ptr);
-    }
-  }
-  else if (form_start_pos == 1) {
-    ProtModPtr nme_actyl = ProtModBase::getProtModPtr_NME_ACETYLATION();
-    if (prot_mod_util::containMod(mng_ptr_->prsm_para_ptr_->getProtModPtrVec(), nme_actyl) && 
-        prot_mod_util::allowMod(nme_actyl, db_res_seq_ptr->getResidues())) {
-      prot_mod_ptr = nme_actyl;
-      // apply mod
-      ModPtr mod_ptr = prot_mod_ptr->getModPtr();
-      ResiduePtrVec res_vec = sub_res_seq_ptr->getResidues();
-      int pos = 0;
-      res_vec[pos] = mod_ptr->getModResiduePtr();
-      ResSeqPtr new_seq_ptr = std::make_shared<ResidueSeq>(res_vec);
-
-      AlterPtr alter_ptr = std::make_shared<Alter>(pos, pos + 1, 
-                                                   AlterType::PROTEIN_VARIABLE,
-                                                   mod_ptr->getShift(), mod_ptr);
-      MassShiftPtr shift_ptr = std::make_shared<MassShift>(alter_ptr); 
-      valid_shift_ptr_vec.push_back(shift_ptr);
-
-      form_ptr = std::make_shared<Proteoform>(seq_ptr, 
-                                              prot_mod_ptr, 
-                                              form_start_pos, 
-                                              form_end_pos, 
-                                              new_seq_ptr,
-                                              valid_shift_ptr_vec);
-      result_vec.push_back(form_ptr);
-    }
-  }
-  return result_vec;
-}
-
-
-ProteoformPtrVec LocalProcessor::getOneKnownPtmCandidateForms(ProteoformPtr ori_form_ptr) { 
-  ProteoformPtrVec result_form_vec; 
-
-  MassShiftPtrVec ori_shift_ptr_vec = ori_form_ptr->getMassShiftPtrVec();
-  // Filter out unexpected mass shifts and protein N-terminal variable PTMs
-  MassShiftPtrVec tmp_vec = local_util::massShiftFilter(ori_shift_ptr_vec,
-                                                        AlterType::UNEXPECTED);
-  MassShiftPtrVec exp_shift_ptr_vec = local_util::massShiftFilter(tmp_vec, 
-                                                                  AlterType::PROTEIN_VARIABLE);
-  FastaSeqPtr fasta_seq_ptr = ori_form_ptr->getFastaSeqPtr();
-  int ori_start_pos = ori_form_ptr->getStartPos();
-  int ori_end_pos = ori_form_ptr->getEndPos();
-  // 1. Add the orignal form
-  ProteoformPtrVec base_form_ptr_vec = createCandidateForm(fasta_seq_ptr, 
-                                                           ori_start_pos,
-                                                           ori_start_pos,
-                                                           ori_end_pos,
-                                                           exp_shift_ptr_vec);
-  result_form_vec.insert(std::end(result_form_vec), std::begin(base_form_ptr_vec), std::end(base_form_ptr_vec));
-
-  // 2. N-term trancations
-  int start_pos_min, start_pos_max; 
-  getNtermTruncRange(ori_form_ptr, start_pos_min, start_pos_max);
-  for (int i = start_pos_min; i <= start_pos_max; i++) {
-    if (i == ori_start_pos) {
-      continue;
-    }
-    ProteoformPtrVec form_ptr_vec = createCandidateForm(fasta_seq_ptr, 
-                                                        ori_start_pos,
-                                                        i,
-                                                        ori_end_pos,
-                                                        exp_shift_ptr_vec);
-    result_form_vec.insert(std::end(result_form_vec), std::begin(form_ptr_vec), std::end(form_ptr_vec));
-  }
-
-  // 3. C-term truncations
-  int end_pos_min, end_pos_max; 
-  getCtermTruncRange(ori_form_ptr, end_pos_min, end_pos_max);
-  for (int i = end_pos_min; i <= end_pos_max; i++) {
-    if (i == ori_end_pos) {
-      continue;
-    }
-    ProteoformPtrVec form_ptr_vec = createCandidateForm(fasta_seq_ptr, 
-                                                        ori_start_pos,
-                                                        ori_start_pos,
-                                                        i,
-                                                        exp_shift_ptr_vec);
-    result_form_vec.insert(std::end(result_form_vec), std::begin(form_ptr_vec), std::end(form_ptr_vec));
-  }
-
-  return result_form_vec;
-}
-
 // we will get a nullptr if the mass shift can't be explained by a variable ptm
 ProteoformPtr LocalProcessor::processOneKnownPtm(PrsmPtr prsm_ptr) {
-
-  LOG_DEBUG("One known PTM");
   //get canidate forms
   ProteoformPtr ori_form_ptr = prsm_ptr->getProteoformPtr();
-  ProteoformPtrVec cand_form_vec = getOneKnownPtmCandidateForms(ori_form_ptr);
+  ProteoformPtrVec cand_form_vec = local_proteoform::getAllCandidateForms(ori_form_ptr, mng_ptr_);
 
   ExtendMsPtrVec extend_ms_ptr_vec = prsm_ptr->getRefineMsPtrVec();
   double adjust_prec_mass = prsm_ptr->getAdjustedPrecMass();
@@ -404,6 +201,50 @@ ProteoformPtr LocalProcessor::processOneKnownPtm(PrsmPtr prsm_ptr) {
     }
   }
   return best_form_ptr;
+}
+
+// similar to processOneKnownPtm, we might get a nullptr from this function
+ProteoformPtr LocalProcessor::processTwoKnownPtm(PrsmPtr prsm_ptr) {
+  ProteoformPtr ori_form_ptr = prsm_ptr->getProteoformPtr();
+  ProteoformPtrVec cand_form_vec = local_proteoform::getAllCandidateForms(ori_form_ptr, mng_ptr_);
+
+  ExtendMsPtrVec extend_ms_ptr_vec = prsm_ptr->getRefineMsPtrVec();
+  double adjust_prec_mass = prsm_ptr->getAdjustedPrecMass();
+  double err_tole = mng_ptr_->peak_tole_ptr_->compStrictErrorTole(adjust_prec_mass);
+  
+  int best_match_score = 0;
+  ProteoformPtr best_form_ptr = nullptr;
+  PtmPair best_ptm_pair;
+
+  for (size_t i = 0; i < cand_form_vec.size(); i++) {
+    ProteoformPtr cand_form_ptr = cand_form_vec[i];
+    // Check if the unexpected mass shift can be explained by a PTM
+    // sum of all expected shift values, in most cases, there is only one unexpected shift
+    double unexp_shift_mass = adjust_prec_mass - cand_form_ptr->getMass(); 
+    LOG_DEBUG("Get PTM by Mass");
+    // Get candidate Ptm pairs with similar mass shifts
+    PtmPairVec ptm_pair_vec = local_util::getPtmPairVecByMass(unexp_shift_mass, err_tole, ptm_pair_vec_);
+
+    for (size_t k = 0; k < ptm_pair_vec.size(); k++) {
+      int score = dpTwoPtmScr(cand_form_ptr, extend_ms_ptr_vec,
+                              ptm_pair_vec[k].first, ptm_pair_vec[k].second);
+      if (score > best_match_score) {
+        best_match_score = score;
+        best_form_ptr = cand_form_ptr;
+        best_ptm_pair = ptm_pair_vec[k];
+      }
+    }
+  }
+
+  int ori_match_score = prsm_ptr->getMatchPeakNum();
+
+  if (best_match_score == 0 
+      || best_match_score < ori_match_score - mng_ptr_->DESC_MATCH_LIMIT_
+      || best_match_score < ori_match_score * mng_ptr_->desc_ratio_) {
+    return nullptr;
+  }
+
+  return nullptr;
 }
 
 LocalResultPtr LocalProcessor::onePtmLocalize(ProteoformPtr form_ptr, const ExtendMsPtrVec & extend_ms_ptr_vec, 
@@ -427,45 +268,22 @@ LocalResultPtr LocalProcessor::onePtmLocalize(ProteoformPtr form_ptr, const Exte
   return nullptr;
 }
 
-ProteoformPtr LocalProcessor::createProteoformPtr(ProteoformPtr base_form_ptr, 
-                                                  double shift_mass, LocalResultPtr result_ptr) {
-  if (result_ptr->match_score_ <= 0) {
-    return nullptr;
+/*
+LocalResultPtr LocalProcessor::twoPtmLocalize(ProteoformPtr form_ptr, const ExtendMsPtrVec & extend_ms_ptr_vec, 
+                                              double prec_mass, double err_tole) {
+
+
+  // if there is a match, find the best ptm and its best similarity score
+  if (match_ptm_pair_vec.size() != 0) {
+    LOG_DEBUG("computer ptm score");
+    // compute similarity score for each possible site of the PTM
+    // LocalResultPtr local_result_ptr = compTwoPtmScr(form_ptr, extend_ms_ptr_vec, unexp_shift_mass, 
+    //                                                 match_ptm_pair_vec, ori_match_num);
+    return local_result_ptr;
   }
-  int bgn, end;
-  double conf;
-  local_util::scrFilter(result_ptr->scr_vec_, bgn, end, conf, mng_ptr_->threshold_);
-
-  if (bgn == -1) return nullptr;
-
-  LocalAnnoPtr anno = std::make_shared<LocalAnno>(bgn, end, conf, result_ptr->scr_vec_,
-                                                  result_ptr->match_score_, result_ptr->ptm_ptr_);
-
-  AlterPtr alter = std::make_shared<Alter>(anno->getLeftBpPos(),
-                                           anno->getRightBpPos() + 1,
-                                           AlterType::UNEXPECTED, 
-                                           shift_mass,
-                                           std::make_shared<Mod>(ResidueBase::getEmptyResiduePtr(),
-                                                                 ResidueBase::getEmptyResiduePtr()));
-
-  alter->setLocalAnno(anno);
-
-  MassShiftPtr unexp_shift_ptr = std::make_shared<MassShift>(alter);
-
-  MassShiftPtrVec all_shift_ptr_vec = base_form_ptr->getMassShiftPtrVec(); 
-  all_shift_ptr_vec.push_back(unexp_shift_ptr);
-  std::sort(all_shift_ptr_vec.begin(), all_shift_ptr_vec.end(), MassShift::cmpPosInc);
-
-  ProteoformPtr shift_form_ptr = std::make_shared<Proteoform>(base_form_ptr->getFastaSeqPtr(),
-                                                              base_form_ptr->getProtModPtr(),
-                                                              base_form_ptr->getStartPos(),
-                                                              base_form_ptr->getEndPos(),
-                                                              base_form_ptr->getResSeqPtr(),
-                                                              all_shift_ptr_vec);
-
-
-  return shift_form_ptr;
+  return nullptr;
 }
+*/
 
 LocalResultPtr LocalProcessor::compOnePtmScr(ProteoformPtr base_form_ptr, 
                                              const ExtendMsPtrVec & extend_ms_ptr_vec,
@@ -505,6 +323,7 @@ LocalResultPtr LocalProcessor::compOnePtmScr(ProteoformPtr base_form_ptr,
     for (int j = 0; j < len; j++) {
       if (modifiable(shift_form_ptr, j, ptm_ptr_vec[i])) {
         cur_count++;
+        unexp_shift_ptr->setMassShift(ptm_ptr_vec[i]->getMonoMass());
         unexp_shift_ptr->setLeftBpPos(j);
         unexp_shift_ptr->setRightBpPos(j + 1);
         int match = static_cast<int>(local_util::compMatchFragNum(shift_form_ptr,
@@ -532,7 +351,8 @@ LocalResultPtr LocalProcessor::compOnePtmScr(ProteoformPtr base_form_ptr,
   // normalize
   if (result_ptr->match_score_ > 0) {
     local_util::normalize(result_ptr->scr_vec_);
-    ProteoformPtr local_form_ptr = createProteoformPtr(base_form_ptr, shift_mass, result_ptr);
+    ProteoformPtr local_form_ptr = local_proteoform::createProteoformPtr(base_form_ptr, shift_mass, 
+                                                                         result_ptr, mng_ptr_);
     if (local_form_ptr != nullptr) {
       result_ptr->form_ptr_ = local_form_ptr;
       return result_ptr;
@@ -541,6 +361,75 @@ LocalResultPtr LocalProcessor::compOnePtmScr(ProteoformPtr base_form_ptr,
 
   return nullptr;
 }
+
+double LocalProcessor::dpTwoPtmScr(ProteoformPtr form_ptr, const ExtendMsPtrVec & extend_ms_ptr_vec,
+                                   PtmPtr ptm_ptr_1, PtmPtr ptm_ptr_2) {
+  int g = form_ptr->getLen();
+  if (g <= 0) {
+    return 0;
+  }
+
+  int mass_1 = ptm_ptr_1->getMonoMass();
+  int mass_2 = ptm_ptr_2->getMonoMass();
+
+  // score table with size 3 * g
+  std::vector<std::vector<int>> s_table;
+  for (int i = 0; i < 3; i++) {
+    std::vector<int> row(g + 1, 0);
+    s_table.push_back(row);
+  }
+
+  BpSpecPtr bp_spec_ptr = form_ptr->getBpSpecPtr();
+  std::vector<double> prm_masses = bp_spec_ptr->getPrmMasses();
+  std::vector<double> srm_masses = bp_spec_ptr->getSrmMasses();
+  // sort srm in the decreasing order
+  std::sort(srm_masses.begin(), srm_masses.end(), std::greater<double>());
+  PeakTolerancePtr tole_ptr = mng_ptr_->peak_tole_ptr_;
+
+  for (size_t i = 0; i < extend_ms_ptr_vec.size(); i++) {
+    std::vector<double> ms_masses = extend_ms_util::getExtendMassVec(extend_ms_ptr_vec[i]);
+    // updated S table using prm masses 
+    double n_shift = extend_ms_ptr_vec[i]->getMsHeaderPtr()->getActivationPtr()->getNShift();
+    local_util::updateSTable(prm_masses, n_shift, ms_masses, tole_ptr, s_table[0]);  
+    local_util::updateSTable(prm_masses, n_shift + mass_1, ms_masses, tole_ptr, s_table[1]);  
+    local_util::updateSTable(prm_masses, n_shift + mass_1 + mass_2, ms_masses, tole_ptr, s_table[2]);  
+
+    // updated S table using srm masses 
+    double c_shift = extend_ms_ptr_vec[i]->getMsHeaderPtr()->getActivationPtr()->getCShift();
+    local_util::updateSTable(srm_masses, c_shift + mass_1 + mass_2, ms_masses, tole_ptr, s_table[0]);  
+    local_util::updateSTable(srm_masses, c_shift + mass_2, ms_masses, tole_ptr, s_table[1]);  
+    local_util::updateSTable(srm_masses, c_shift, ms_masses, tole_ptr, s_table[2]);  
+  }
+
+  // fill D(f, g)
+  int d_table[3][g + 1];
+  memset(d_table, 0, sizeof(int) * 3 * (g + 1));
+  d_table[0][0] = 1;
+
+  // layer 0
+  for (int i = 1; i <= g; i++) {
+    d_table[0][i] = d_table[0][i-1] + s_table[0][i];
+  }
+
+  // layer 1
+  for (int i = 1; i <= g; i++) {
+    d_table[1][i] = d_table[1][i-1] + s_table[1][i];
+    if (modifiable(form_ptr, i - 1, ptm_ptr_1) && d_table[0][i-1] > d_table[1][i-1]) {
+      d_table[1][i] = d_table[0][i-1] + s_table[1][i];
+    }
+  }
+
+  // layer 2
+  for (int i = 1; i <= g; i++) {
+    d_table[2][i] = d_table[2][i-1] + s_table[2][i];
+    if (modifiable(form_ptr, i - 1, ptm_ptr_2) && d_table[1][i-1] > d_table[2][i-1]) {
+      d_table[2][i] = d_table[1][i-1] + s_table[2][i];
+    } 
+  }
+
+  return d_table[2][g]; 
+}
+
 
 bool LocalProcessor::modifiable(ProteoformPtr proteoform_ptr, int i, PtmPtr ptm_ptr) {
   if (ptm_ptr == nullptr) return true;
@@ -560,7 +449,7 @@ bool LocalProcessor::modifiable(ProteoformPtr proteoform_ptr, int i, PtmPtr ptm_
 
   ModPtrVec mod_list;
 
-  if (i == 0 && start == 0) {
+  if (i == 0) {
     mod_list = mod_list_N_;
   } else if (i + start == end) {
     mod_list = mod_list_C_;
@@ -628,249 +517,6 @@ void findBestPtm(FastaSeqPtr fasta_seq_ptr, ProtModPtr prot_mod_ptr,
 */
 
 /*
-ProteoformPtr LocalProcessor::twoPtmTermAdjust(ProteoformPtr proteoform, int num_match,
-                                               const ExtendMsPtrVec & extend_ms_ptr_vec, double prec_mass,
-                                               double & mass1, double & mass2) {
-  int n_trunc_min, n_trunc_max, c_trunc_min, c_trunc_max;
-  getNtermTruncRange(proteoform, extend_ms_ptr_vec, n_trunc_min, n_trunc_max);
-  getCtermTruncRange(proteoform, extend_ms_ptr_vec, c_trunc_min, c_trunc_max);
-
-  MassShiftPtrVec ori_mass_shift_vec = proteoform->getMassShiftPtrVec();
-
-  MassShiftPtrVec ori_fix_mass_shift_vec
-      = local_util::massShiftFilter(ori_mass_shift_vec, AlterType::UNEXPECTED);
-
-  MassShiftPtr mass_shift1 = proteoform->getMassShiftPtrVec(AlterType::UNEXPECTED)[0];
-  MassShiftPtr mass_shift2 = proteoform->getMassShiftPtrVec(AlterType::UNEXPECTED)[1];
-
-  double err = prec_mass * mng_ptr_->ppo_;
-
-  int ori_start = proteoform->getStartPos();
-  int ori_end = proteoform->getEndPos();
-
-  double ori_mass1 = mass_shift1->getMassShift();
-  double ori_mass2 = mass_shift2->getMassShift();
-  mass1 = ori_mass1;
-  mass2 = ori_mass2;
-
-  std::vector<bool> ptm1_known_vec, ptm2_known_vec;
-  std::vector<int> c_vec, n_vec;
-  std::string n_seq, c_seq;
-  std::vector<double> raw_scr_vec;
-
-  for (int i = n_trunc_min; i <= n_trunc_max; i++) {
-    for (int j = c_trunc_min; j <= c_trunc_max; j++) {
-      if (i < 0) {
-        n_seq = proteoform->getFastaSeqPtr()->getRawSeq().substr(ori_start + i, -i);
-        mass1 = ori_mass1 - residue_util::compResiduePtrVecMass(n_seq, mng_ptr_->prsm_para_ptr_->getFixModPtrVec());
-      } else {
-        n_seq = proteoform->getFastaSeqPtr()->getRawSeq().substr(ori_start, i);
-        mass1 = ori_mass1 + residue_util::compResiduePtrVecMass(n_seq, mng_ptr_->prsm_para_ptr_->getFixModPtrVec());
-      }
-      if (j >= 0) {
-        c_seq = proteoform->getFastaSeqPtr()->getRawSeq().substr(ori_end + 1, j);
-        mass2 = ori_mass2 - residue_util::compResiduePtrVecMass(c_seq, mng_ptr_->prsm_para_ptr_->getFixModPtrVec());
-      } else {
-        c_seq = proteoform->getFastaSeqPtr()->getRawSeq().substr(ori_end + 1 + j, -j);
-        mass2 = ori_mass2 + residue_util::compResiduePtrVecMass(c_seq, mng_ptr_->prsm_para_ptr_->getFixModPtrVec());
-      }
-
-      if ((mass1 > mng_ptr_->max_ptm_mass_ || mass1 < mng_ptr_->min_ptm_mass_
-           || mass2 > mng_ptr_->max_ptm_mass_ || mass2 < mng_ptr_->min_ptm_mass_) && (i != 0 || j != 0))
-        continue;
-
-      n_vec.push_back(i);
-      c_vec.push_back(j);
-
-      PtmPairVec ptm_pair_vec = local_util::getPtmPairVecByMass(mass1, mass2, err, ptm_pair_vec_);
-      if (ptm_pair_vec.size() == 0) {
-        ptm_pair_vec.push_back(std::make_pair(nullptr, nullptr));
-      }
-
-      ptm1_known_vec.push_back(local_util::getPtmPtrVecByMass(mass1, err, ptm_vec_).size() > 0);
-      ptm2_known_vec.push_back(local_util::getPtmPtrVecByMass(mass2, err, ptm_vec_).size() > 0);
-
-      mass_shift1 = local_util::geneMassShift(mass_shift1, mass1, AlterType::UNEXPECTED);
-      mass_shift2 = local_util::geneMassShift(mass_shift2, mass2, AlterType::UNEXPECTED);
-
-      MassShiftPtrVec new_mass_shift_vec = local_util::copyMassShiftVec(ori_fix_mass_shift_vec);
-      new_mass_shift_vec.push_back(mass_shift1);
-      new_mass_shift_vec.push_back(mass_shift2);
-
-      std::sort(new_mass_shift_vec.begin(), new_mass_shift_vec.end(), MassShift::cmpPosInc);
-
-      ProteoformPtr tmp_proteoform = proteoform_factory::geneProteoform(proteoform,
-                                                                        ori_start + i,
-                                                                        ori_end + j,
-                                                                        new_mass_shift_vec,
-                                                                        mng_ptr_->prsm_para_ptr_->getFixModPtrVec());
-      double raw_scr;
-      compTwoPtmScr(tmp_proteoform, num_match, extend_ms_ptr_vec, prec_mass, raw_scr, ptm_pair_vec);
-      raw_scr_vec.push_back(raw_scr);
-    }
-  }
-
-  for (size_t i = 0; i < raw_scr_vec.size(); i++) {
-    if (ptm1_known_vec[i] && ptm2_known_vec[i]) {
-      raw_scr_vec[i] = raw_scr_vec[i] * mng_ptr_->theta_ * mng_ptr_->theta_;
-    } else if (ptm1_known_vec[i] || ptm2_known_vec[i]) {
-      raw_scr_vec[i] = raw_scr_vec[i] * mng_ptr_->theta_ * (1 - mng_ptr_->theta_);
-    } else {
-      raw_scr_vec[i] = raw_scr_vec[i] * (1 - mng_ptr_->theta_) * (1 - mng_ptr_->theta_);
-    }
-  }
-
-  int idx = std::distance(raw_scr_vec.begin(), std::max_element(raw_scr_vec.begin(), raw_scr_vec.end()));
-
-  if (n_vec[idx] < 0) {
-    n_seq = proteoform->getFastaSeqPtr()->getRawSeq().substr(ori_start + n_vec[idx], -n_vec[idx]);
-    mass1 = ori_mass1 - residue_util::compResiduePtrVecMass(n_seq, mng_ptr_->prsm_para_ptr_->getFixModPtrVec());
-  } else {
-    n_seq = proteoform->getFastaSeqPtr()->getRawSeq().substr(ori_start, n_vec[idx]);
-    mass1 = ori_mass1 + residue_util::compResiduePtrVecMass(n_seq, mng_ptr_->prsm_para_ptr_->getFixModPtrVec());
-  }
-
-  if (c_vec[idx] >= 0) {
-    c_seq = proteoform->getFastaSeqPtr()->getRawSeq().substr(ori_end + 1, c_vec[idx]);
-    mass2 = ori_mass2 - residue_util::compResiduePtrVecMass(c_seq, mng_ptr_->prsm_para_ptr_->getFixModPtrVec());
-  } else {
-    c_seq = proteoform->getFastaSeqPtr()->getRawSeq().substr(ori_end + 1 + c_vec[idx], -c_vec[idx]);
-    mass2 = ori_mass2 + residue_util::compResiduePtrVecMass(c_seq, mng_ptr_->prsm_para_ptr_->getFixModPtrVec());
-  }
-
-  mass_shift1 = local_util::geneMassShift(mass_shift1, mass1, AlterType::UNEXPECTED);
-  mass_shift2 = local_util::geneMassShift(mass_shift2, mass2, AlterType::UNEXPECTED);
-
-  MassShiftPtrVec new_mass_shift_vec = local_util::copyMassShiftVec(ori_fix_mass_shift_vec);
-  new_mass_shift_vec.push_back(mass_shift1);
-  new_mass_shift_vec.push_back(mass_shift2);
-
-  std::sort(new_mass_shift_vec.begin(), new_mass_shift_vec.end(), MassShift::cmpPosInc);
-
-  return proteoform_factory::geneProteoform(proteoform,
-                                            ori_start + n_vec[idx],
-                                            ori_end + c_vec[idx],
-                                            new_mass_shift_vec,
-                                            mng_ptr_->prsm_para_ptr_->getFixModPtrVec());
-}
-
-
-// similar to processOneKnownPtm, we might get a nullptr from this function
-ProteoformPtr LocalProcessor::processTwoKnownPtm(PrsmPtr prsm) {
-  ProteoformPtr ori_prot_form = prsm->getProteoformPtr();
-
-  MassShiftPtrVec ori_mass_shift_vec = ori_prot_form->getMassShiftPtrVec();
-
-  MassShiftPtrVec unexpected_shift_vec
-      = ori_prot_form->getMassShiftPtrVec(AlterType::UNEXPECTED);
-
-  MassShiftPtrVec expected_shift_vec = local_util::massShiftFilter(ori_mass_shift_vec,
-                                                                   AlterType::UNEXPECTED);
-
-  MassShiftPtr unexpected_shift1 = local_util::geneMassShift(unexpected_shift_vec[0],
-                                                             unexpected_shift_vec[0]->getMassShift(),
-                                                             AlterType::UNEXPECTED);
-
-  MassShiftPtr unexpected_shift2;
-
-  if (unexpected_shift_vec.size() == 2) {
-    unexpected_shift2 = local_util::geneMassShift(unexpected_shift_vec[1],
-                                                  unexpected_shift_vec[1]->getMassShift(),
-                                                  AlterType::UNEXPECTED);
-  } else {
-    unexpected_shift2 = local_util::geneMassShift(unexpected_shift_vec[0],
-                                                  0.0, AlterType::UNEXPECTED);
-  }
-
-  double shift_mass1 = unexpected_shift1->getMassShift();
-
-  double shift_mass2 = unexpected_shift2->getMassShift();
-
-  expected_shift_vec.push_back(unexpected_shift1);
-
-  expected_shift_vec.push_back(unexpected_shift2);
-
-  std::sort(expected_shift_vec.begin(), expected_shift_vec.end(), MassShift::cmpPosInc);
-
-  ProteoformPtr two_shift_proteoform
-      = std::make_shared<Proteoform>(ori_prot_form->getFastaSeqPtr(),
-                                     ori_prot_form->getProtModPtr(),
-                                     ori_prot_form->getStartPos(),
-                                     ori_prot_form->getEndPos(),
-                                     ori_prot_form->getResSeqPtr(),
-                                     expected_shift_vec);
-
-  double err = prsm->getAdjustedPrecMass() * mng_ptr_->ppo_;
-
-  PtmPairVec ptm_pair_vec = local_util::getPtmPairVecByMass(shift_mass1, shift_mass2,
-                                                            err, ptm_pair_vec_);
-
-  if (ptm_pair_vec.size() == 0) {
-    if (two_shift_proteoform->getProtModPtr()->getType() == ProtModBase::getType_NME_ACETYLATION()
-        || two_shift_proteoform->getProtModPtr()->getType() == ProtModBase::getType_M_ACETYLATION()) {
-      MassShiftPtrVec expected_shift_vec = local_util::massShiftFilter(ori_mass_shift_vec,
-                                                                       AlterType::UNEXPECTED);
-      for (size_t k = 0; k < expected_shift_vec.size(); k++) {
-        if (expected_shift_vec[k]->getTypePtr() == AlterType::PROTEIN_VARIABLE) {
-          shift_mass1 += expected_shift_vec[k]->getMassShift();
-          expected_shift_vec.erase(expected_shift_vec.begin() + k);
-          break;
-        }
-      }
-
-      unexpected_shift1 = local_util::geneMassShift(unexpected_shift1, shift_mass1,
-                                                    AlterType::UNEXPECTED);
-
-      expected_shift_vec.push_back(unexpected_shift1);
-
-      expected_shift_vec.push_back(unexpected_shift2);
-
-      std::sort(expected_shift_vec.begin(), expected_shift_vec.end(), MassShift::cmpPosInc);
-
-      two_shift_proteoform = std::make_shared<Proteoform>(ori_prot_form->getFastaSeqPtr(),
-                                                          ori_prot_form->getProtModPtr(),
-                                                          ori_prot_form->getStartPos(),
-                                                          ori_prot_form->getEndPos(),
-                                                          ori_prot_form->getResSeqPtr(),
-                                                          expected_shift_vec);
-    }
-
-    twoPtmTermAdjust(two_shift_proteoform, prsm->getMatchPeakNum(), prsm->getRefineMsPtrVec(),
-                     prsm->getAdjustedPrecMass(), shift_mass1, shift_mass2);
-
-    ptm_pair_vec = local_util::getPtmPairVecByMass(shift_mass1, shift_mass2, err, ptm_pair_vec_);
-  }
-
-  if (ptm_pair_vec.size() == 0) return nullptr;
-
-  double raw_scr;
-  ExtendMsPtrVec extend_ms_ptr_vec = prsm->getRefineMsPtrVec();
-
-  compTwoPtmScr(two_shift_proteoform, prsm->getMatchPeakNum(), extend_ms_ptr_vec,
-                prsm->getAdjustedPrecMass(),
-                raw_scr, ptm_pair_vec);
-
-  // can be explained by a variable ptm, but no modifiable site
-  if (raw_scr == 0) return nullptr;
-
-  two_shift_proteoform->setProteoClusterId(ori_prot_form->getProteoClusterId());
-  two_shift_proteoform->setProtId(ori_prot_form->getProtId());
-
-  PtmPtr ptm1 = ptm_pair_vec[0].first;
-  PtmPtr ptm2 = ptm_pair_vec[0].second;
-  raw_scr = raw_scr * mng_ptr_->theta_ * mng_ptr_->theta_ * (1 - mng_ptr_->beta_);
-
-  std::vector<double> empty_scr_vec;
-  LocalAnnoPtr anno1 = std::make_shared<LocalAnno>(0, 0, 0, empty_scr_vec, raw_scr, ptm1);
-  two_shift_proteoform->getMassShiftPtrVec(AlterType::UNEXPECTED)[0]->getAlterPtr(0)->setLocalAnno(anno1);
-
-  LocalAnnoPtr anno2 = std::make_shared<LocalAnno>(0, 0, 0, empty_scr_vec, raw_scr, ptm2);
-  two_shift_proteoform->getMassShiftPtrVec(AlterType::UNEXPECTED)[1]->getAlterPtr(0)->setLocalAnno(anno2);
-
-  return compSplitPoint(two_shift_proteoform, prsm->getMatchPeakNum(),
-                        extend_ms_ptr_vec, prsm->getAdjustedPrecMass());
-}
-
 PrsmPtr LocalProcessor::processTwoPtm(PrsmPtr prsm) {
   int ori_num_match_ion = local_util::compMatchFragNum(prsm->getProteoformPtr(),
                                                        prsm->getRefineMsPtrVec(),
@@ -906,100 +552,6 @@ PrsmPtr LocalProcessor::processTwoPtm(PrsmPtr prsm) {
 }
 
 
-void LocalProcessor::compTwoPtmScr(ProteoformPtr proteoform, int num_match,
-                                   const ExtendMsPtrVec & extend_ms_ptr_vec, double prec_mass,
-                                   double & raw_scr, PtmPairVec & ptm_pair_vec) {
-  MassShiftPtrVec ori_mass_shift_vec = proteoform->getMassShiftPtrVec();
-  double shift_mass1 = proteoform->getMassShiftPtrVec(AlterType::UNEXPECTED)[0]->getMassShift();
-  double shift_mass2 = proteoform->getMassShiftPtrVec(AlterType::UNEXPECTED)[1]->getMassShift();
-  ProteoformPtr no_shift_proteoform
-      = proteoform_factory::geneProteoform(proteoform,
-                                           proteoform->getStartPos(),
-                                           proteoform->getEndPos(),
-                                           local_util::massShiftFilter(ori_mass_shift_vec, AlterType::UNEXPECTED),
-                                           mng_ptr_->prsm_para_ptr_->getFixModPtrVec());
-
-  std::vector<double> scr_vec;
-
-  for (size_t k = 0; k < ptm_pair_vec.size(); k++) {
-    local_util::ptmMassAdjust(shift_mass1, shift_mass2, ptm_pair_vec[k].first, ptm_pair_vec[k].second);
-    scr_vec.push_back(dpTwoPtmScr(no_shift_proteoform, num_match, extend_ms_ptr_vec, prec_mass,
-                                  shift_mass1, shift_mass2, ptm_pair_vec[k].first, ptm_pair_vec[k].second));
-  }
-
-  int idx = std::distance(scr_vec.begin(), std::max_element(scr_vec.begin(), scr_vec.end()));
-  raw_scr = scr_vec[idx];
-  PtmPtr p1 = ptm_pair_vec[idx].first;
-  PtmPtr p2 = ptm_pair_vec[idx].second;
-  ptm_pair_vec.clear();
-  ptm_pair_vec.push_back(std::make_pair(p1, p2));
-}
-
-double LocalProcessor::dpTwoPtmScr(ProteoformPtr proteoform, int h,
-                                   const ExtendMsPtrVec & extend_ms_ptr_vec,
-                                   double prec_mass, double mass1, double mass2, PtmPtr ptm1, PtmPtr ptm2) {
-  int g = proteoform->getLen();
-  if (g <= 0) {
-    return 0;
-  }
-  double scr = 0.0;
-  int count = 0;
-
-  for (size_t k = 0; k < extend_ms_ptr_vec.size(); k++) {
-    std::vector<std::vector<double>> b_table(3);
-    b_table[0] = local_util::geneNTheoMass(proteoform, extend_ms_ptr_vec[k], mng_ptr_->min_mass_);
-    local_util::fillTableB(b_table, mass1, mass2);
-
-    std::vector<std::vector<int>> s_table(3);
-    local_util::fillTableS(b_table, s_table, extend_ms_ptr_vec[k], prec_mass);
-
-    // fill D(f,g,h)
-    int d_table[3][g + 1][h + 1];
-    memset(d_table, 0, sizeof(int) * 3 * (g + 1) * (h + 1));
-    d_table[0][0][0] = 1;
-
-    for (int i = 1; i <= g; i++) {
-      for (int j = 0; j <= h; j++) {
-        if (j >= s_table[0][i - 1]) {
-          d_table[0][i][j] = d_table[0][i - 1][j - s_table[0][i - 1]];
-        } else {
-          d_table[0][i][j] = 0;
-        }
-      }
-    }
-
-    for (int i = 1; i <= g; i++) {
-      for (int j = 0; j <= h; j++) {
-        if (modifiable(proteoform, i - 1, ptm1) && j >= s_table[1][i - 1]) {
-          d_table[1][i][j] = d_table[0][i - 1][j - s_table[1][i - 1]] + d_table[1][i - 1][j - s_table[1][i - 1]];
-        } else if (j >= s_table[1][i - 1]) {
-          d_table[1][i][j] = d_table[1][i - 1][j - s_table[1][i - 1]];
-        } else {
-          d_table[1][i][j] = 0;
-        }
-      }
-    }
-
-    for (int i = 1; i <= g; i++) {
-      for (int j = 0; j <= h; j++) {
-        if (modifiable(proteoform, i - 1, ptm2) && j >= s_table[2][i - 1]) {
-          d_table[2][i][j] = d_table[1][i - 1][j - s_table[2][i - 1]] + d_table[2][i - 1][j - s_table[2][i - 1]];
-        } else if (j >= s_table[2][i - 1]) {
-          d_table[2][i][j] = d_table[2][i - 1][j - s_table[2][i - 1]];
-        } else {
-          d_table[2][i][j] = 0;
-        }
-      }
-    }
-
-    for (int i = 0; i <= h; i++) {
-      count += d_table[2][g][i];
-      scr += d_table[2][g][i] * std::pow(mng_ptr_->p1_, g - i) * std::pow(mng_ptr_->p2_, i);
-    }
-  }
-
-  return scr / count;
-}
 
 ProteoformPtr LocalProcessor::compSplitPoint(ProteoformPtr proteoform, int h,
                                              const ExtendMsPtrVec & extend_ms_ptr_vec,

@@ -24,12 +24,15 @@ namespace toppic {
 
 namespace local_util {
 
+MassShiftPtrVec massShiftFilter(const MassShiftPtrVec & mass_shift_vec, AlterTypePtr type);
+
 void scrFilter(std::vector<double> & scr, int & bgn, int & end, double & conf, double threshold);
 
 PtmPtrVec getPtmPtrVecByMass(double mass, double err, const PtmPtrVec & ptm_vec);
 
-PtmPairVec getPtmPairVecByMass(double mass1, double mass2, double err, const PtmPairVec & ptm_pair_vec);
+PtmPairVec getPtmPairVecByMass(double mass, double err, const PtmPairVec & ptm_pair_vec);
 
+//
 void compSupPeakNum(ProteoformPtr proteoform, const ExtendMsPtrVec & extend_ms_ptr_vec,
                     MassShiftPtr mass_shift, double min_mass, int & left, int & right);
 
@@ -44,10 +47,14 @@ void fillTableS(std::vector<std::vector<double> > & b_table,
                 std::vector<std::vector<int> > & s_table,
                 ExtendMsPtr extend_ms_ptr, double prec_mass);
 
+void updateSTable(const std::vector<double> &ori_theo_masses, double shift, 
+                  const std::vector<double> &exp_masses, 
+                  PeakTolerancePtr tole_ptr,  
+                  std::vector<int> &s_table); 
+
 std::vector<double> geneNTheoMass(ProteoformPtr proteoform, ExtendMsPtr extend_ms_ptr_vec,
                                   double min_mass);
 
-MassShiftPtrVec massShiftFilter(const MassShiftPtrVec & mass_shift_vec, AlterTypePtr type);
 
 MassShiftPtrVec copyMassShiftVec(const MassShiftPtrVec & mass_shift_vec);
 
