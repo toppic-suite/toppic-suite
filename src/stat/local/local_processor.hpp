@@ -41,8 +41,6 @@ class LocalProcessor {
 
   ProteoformPtr processTwoKnownPtm(PrsmPtr prsm);
 
-  bool modifiable(ProteoformPtr proteoform_ptr, int i, PtmPtr ptm_ptr);
-
   LocalResultPtr onePtmLocalize(ProteoformPtr base_form_ptr, const ExtendMsPtrVec & extend_ms_ptr_vec, 
                                 double prec_mass, double err_tole); 
 
@@ -58,8 +56,7 @@ class LocalProcessor {
   double dpTwoPtmScr(ProteoformPtr proteoform, const ExtendMsPtrVec & extend_ms_ptr_vec,
                      PtmPtr ptm1, PtmPtr ptm2);
 
-  ProteoformPtr compSplitPoint(ProteoformPtr proteoform, int h, const ExtendMsPtrVec & extend_ms_ptr_vec,
-                               double prec_mass);
+  bool modifiable(ProteoformPtr proteoform_ptr, int i, PtmPtr ptm_ptr);
 
   LocalMngPtr mng_ptr_;
 

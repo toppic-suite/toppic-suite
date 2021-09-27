@@ -172,9 +172,45 @@ PrsmPtr LocalProcessor::processOnePtm(PrsmPtr prsm) {
       return prsm;
     }
   }
+  return prsm;
+}
+
+/*
+PrsmPtr LocalProcessor::processTwoPtm(PrsmPtr prsm) {
+  int ori_num_match_ion = local_util::compMatchFragNum(prsm->getProteoformPtr(),
+                                                       prsm->getRefineMsPtrVec(),
+                                                       mng_ptr_->min_mass_);
+
+  ProteoformPtr two_known_prsm = processTwoKnownPtm(prsm);
+
+  if (two_known_prsm != nullptr) {
+    int new_num_match_ion = local_util::compMatchFragNum(two_known_prsm,
+                                                         prsm->getRefineMsPtrVec(),
+                                                         mng_ptr_->min_mass_);
+    if (new_num_match_ion > ori_num_match_ion - mng_ptr_->DESC_MATCH_LIMIT_
+        && new_num_match_ion > ori_num_match_ion * mng_ptr_->desc_ratio_) {
+      prsm->setProteoformPtr(two_known_prsm, mng_ptr_->prsm_para_ptr_->getSpParaPtr());
+      return prsm;
+    }
+  }
+
+  ProteoformPtr one_known_prsm = processOneKnownPtm(prsm);
+
+  if (one_known_prsm != nullptr) {
+    double new_num_match_ion = local_util::compMatchFragNum(one_known_prsm,
+                                                            prsm->getRefineMsPtrVec(),
+                                                            mng_ptr_->min_mass_);
+    if (new_num_match_ion > ori_num_match_ion - mng_ptr_->DESC_MATCH_LIMIT_
+        && new_num_match_ion > ori_num_match_ion * mng_ptr_->desc_ratio_) {
+      prsm->setProteoformPtr(one_known_prsm, mng_ptr_->prsm_para_ptr_->getSpParaPtr());
+      return prsm;
+    }
+  }
 
   return prsm;
 }
+*/
+
 
 // we will get a nullptr if the mass shift can't be explained by a variable ptm
 ProteoformPtr LocalProcessor::processOneKnownPtm(PrsmPtr prsm_ptr) {
@@ -268,23 +304,6 @@ LocalResultPtr LocalProcessor::onePtmLocalize(ProteoformPtr form_ptr, const Exte
   return nullptr;
 }
 
-/*
-LocalResultPtr LocalProcessor::twoPtmLocalize(ProteoformPtr form_ptr, const ExtendMsPtrVec & extend_ms_ptr_vec, 
-                                              double prec_mass, double err_tole) {
-
-
-  // if there is a match, find the best ptm and its best similarity score
-  if (match_ptm_pair_vec.size() != 0) {
-    LOG_DEBUG("computer ptm score");
-    // compute similarity score for each possible site of the PTM
-    // LocalResultPtr local_result_ptr = compTwoPtmScr(form_ptr, extend_ms_ptr_vec, unexp_shift_mass, 
-    //                                                 match_ptm_pair_vec, ori_match_num);
-    return local_result_ptr;
-  }
-  return nullptr;
-}
-*/
-
 LocalResultPtr LocalProcessor::compOnePtmScr(ProteoformPtr base_form_ptr, 
                                              const ExtendMsPtrVec & extend_ms_ptr_vec,
                                              double shift_mass, 
@@ -362,18 +381,11 @@ LocalResultPtr LocalProcessor::compOnePtmScr(ProteoformPtr base_form_ptr,
   return nullptr;
 }
 
-double LocalProcessor::dpTwoPtmScr(ProteoformPtr form_ptr, const ExtendMsPtrVec & extend_ms_ptr_vec,
-                                   PtmPtr ptm_ptr_1, PtmPtr ptm_ptr_2) {
+void compTwoPtmSTable(std::vector<std::vector<int>> &s_table, ProteoformPtr form_ptr, 
+                      const ExtendMsPtrVec & extend_ms_ptr_vec,
+                      PtmPtr ptm_ptr_1, PtmPtr ptm_ptr_2, LocalMngPtr mng_ptr) {
+
   int g = form_ptr->getLen();
-  if (g <= 0) {
-    return 0;
-  }
-
-  int mass_1 = ptm_ptr_1->getMonoMass();
-  int mass_2 = ptm_ptr_2->getMonoMass();
-
-  // score table with size 3 * g
-  std::vector<std::vector<int>> s_table;
   for (int i = 0; i < 3; i++) {
     std::vector<int> row(g + 1, 0);
     s_table.push_back(row);
@@ -384,7 +396,10 @@ double LocalProcessor::dpTwoPtmScr(ProteoformPtr form_ptr, const ExtendMsPtrVec 
   std::vector<double> srm_masses = bp_spec_ptr->getSrmMasses();
   // sort srm in the decreasing order
   std::sort(srm_masses.begin(), srm_masses.end(), std::greater<double>());
-  PeakTolerancePtr tole_ptr = mng_ptr_->peak_tole_ptr_;
+  PeakTolerancePtr tole_ptr = mng_ptr->peak_tole_ptr_;
+
+  int mass_1 = ptm_ptr_1->getMonoMass();
+  int mass_2 = ptm_ptr_2->getMonoMass();
 
   for (size_t i = 0; i < extend_ms_ptr_vec.size(); i++) {
     std::vector<double> ms_masses = extend_ms_util::getExtendMassVec(extend_ms_ptr_vec[i]);
@@ -400,6 +415,19 @@ double LocalProcessor::dpTwoPtmScr(ProteoformPtr form_ptr, const ExtendMsPtrVec 
     local_util::updateSTable(srm_masses, c_shift + mass_2, ms_masses, tole_ptr, s_table[1]);  
     local_util::updateSTable(srm_masses, c_shift, ms_masses, tole_ptr, s_table[2]);  
   }
+}
+
+double LocalProcessor::dpTwoPtmScr(ProteoformPtr form_ptr, const ExtendMsPtrVec & extend_ms_ptr_vec,
+                                   PtmPtr ptm_ptr_1, PtmPtr ptm_ptr_2) {
+  int g = form_ptr->getLen();
+  if (g <= 0) {
+    return 0;
+  }
+
+
+  // score table with size 3 * g
+  std::vector<std::vector<int>> s_table;
+  compTwoPtmSTable(s_table, form_ptr, extend_ms_ptr_vec, ptm_ptr_1, ptm_ptr_2, mng_ptr_);
 
   // fill D(f, g)
   int d_table[3][g + 1];
@@ -429,7 +457,6 @@ double LocalProcessor::dpTwoPtmScr(ProteoformPtr form_ptr, const ExtendMsPtrVec 
 
   return d_table[2][g]; 
 }
-
 
 bool LocalProcessor::modifiable(ProteoformPtr proteoform_ptr, int i, PtmPtr ptm_ptr) {
   if (ptm_ptr == nullptr) return true;
@@ -465,290 +492,6 @@ bool LocalProcessor::modifiable(ProteoformPtr proteoform_ptr, int i, PtmPtr ptm_
 
   return false;
 }
-
-/*
-void findBestPtm(FastaSeqPtr fasta_seq_ptr, ProtModPtr prot_mod_ptr, 
-                 int start_pos, int end_pos, 
-                 ResSeqPtr res_seq_ptr, 
-                 MassShiftPtrVec &expected_shift_vec, 
-                 double unexpected_mass_shift, 
-                 PtmPtrVec &ptm_ptr_vec) {
-
-  if (ptm_ptr_vec.size() == 0) {
-    LOG_ERROR("Ptm list is empty!");
-    exit(EXIT_FAILURE);
-  }
-
-  MassShiftPtrVec all_shift_vec = expected_shift_vec;
-  all_shift_vec.push_back(unexpe_mass_shift_ptr);
-  std::sort(all_shift_vec.begin(), all_shift_vec.end(), MassShift::cmpPosInc);
-  ProteoformPtr one_shift_proteoform
-      = std::make_shared<Proteoform>(fast_seq_ptr, 
-                                     prot_mod_ptr, 
-                                     start_pos, 
-                                     end_pos, 
-                                     res_seq_ptr, 
-                                     all_shift_vec);
-
-  // confidence score
-  std::vector<double> scr_vec;
-  int len = end_pos - start_pos + 1;
-  for (size_t i = 0; i < ptm_ptr_vec.size(); i++) {
-    scr_vec.clear();
-    for (int j = 0; j < len; j++) {
-      if (modifiable(proteoform, j, ptm_vec[i])) {
-        mass_shift->setLeftBpPos(j);
-        mass_shift->setRightBpPos(j + 1);
-        int match = static_cast<int>(local_util::compMatchFragNum(proteoform,
-                                                                  extend_ms_ptr_vec,
-                                                                  mng_ptr_->min_mass_));
-
-        scr_vec.push_back(std::pow(mng_ptr_->p1_, n - match) * std::pow(mng_ptr_->p2_, match));
-      } else {
-        scr_vec.push_back(0.0);
-      }
-    }
-    scr_vec2d.push_back(scr_vec);
-    temp.push_back(std::accumulate(scr_vec.begin(), scr_vec.end(), 0.0));
-  }
-
-
-}
-*/
-
-/*
-PrsmPtr LocalProcessor::processTwoPtm(PrsmPtr prsm) {
-  int ori_num_match_ion = local_util::compMatchFragNum(prsm->getProteoformPtr(),
-                                                       prsm->getRefineMsPtrVec(),
-                                                       mng_ptr_->min_mass_);
-
-  ProteoformPtr two_known_prsm = processTwoKnownPtm(prsm);
-
-  if (two_known_prsm != nullptr) {
-    int new_num_match_ion = local_util::compMatchFragNum(two_known_prsm,
-                                                         prsm->getRefineMsPtrVec(),
-                                                         mng_ptr_->min_mass_);
-    if (new_num_match_ion > ori_num_match_ion - mng_ptr_->DESC_MATCH_LIMIT_
-        && new_num_match_ion > ori_num_match_ion * mng_ptr_->desc_ratio_) {
-      prsm->setProteoformPtr(two_known_prsm, mng_ptr_->prsm_para_ptr_->getSpParaPtr());
-      return prsm;
-    }
-  }
-
-  ProteoformPtr one_known_prsm = processOneKnownPtm(prsm);
-
-  if (one_known_prsm != nullptr) {
-    double new_num_match_ion = local_util::compMatchFragNum(one_known_prsm,
-                                                            prsm->getRefineMsPtrVec(),
-                                                            mng_ptr_->min_mass_);
-    if (new_num_match_ion > ori_num_match_ion - mng_ptr_->DESC_MATCH_LIMIT_
-        && new_num_match_ion > ori_num_match_ion * mng_ptr_->desc_ratio_) {
-      prsm->setProteoformPtr(one_known_prsm, mng_ptr_->prsm_para_ptr_->getSpParaPtr());
-      return prsm;
-    }
-  }
-
-  return prsm;
-}
-
-
-
-ProteoformPtr LocalProcessor::compSplitPoint(ProteoformPtr proteoform, int h,
-                                             const ExtendMsPtrVec & extend_ms_ptr_vec,
-                                             double prec_mass) {
-  MassShiftPtrVec ori_mass_shift_vec = proteoform->getMassShiftPtrVec();
-
-  MassShiftPtr shift_ptr1 = proteoform->getMassShiftPtrVec(AlterType::UNEXPECTED)[0];
-  MassShiftPtr shift_ptr2 = proteoform->getMassShiftPtrVec(AlterType::UNEXPECTED)[1];
-
-  double mass1 = shift_ptr1->getMassShift();
-  double mass2 = shift_ptr2->getMassShift();
-
-  PtmPtr ptm1 = shift_ptr1->getAlterPtr(0)->getLocalAnno()->getPtmPtr();
-  PtmPtr ptm2 = shift_ptr2->getAlterPtr(0)->getLocalAnno()->getPtmPtr();
-
-  local_util::ptmMassAdjust(mass1, mass2, ptm1, ptm2);
-
-  shift_ptr1 = local_util::geneMassShift(shift_ptr1, mass1, AlterType::UNEXPECTED);
-
-  shift_ptr2 = local_util::geneMassShift(shift_ptr2, mass2, AlterType::UNEXPECTED);
-
-  MassShiftPtrVec expected_shift_vec = local_util::massShiftFilter(ori_mass_shift_vec, AlterType::UNEXPECTED);
-
-  expected_shift_vec.push_back(shift_ptr1);
-
-  expected_shift_vec.push_back(shift_ptr2);
-
-  int prot_cluster_id = proteoform->getProteoClusterId();
-
-  int prot_id = proteoform->getProtId();
-
-  proteoform = proteoform_factory::geneProteoform(proteoform,
-                                                  proteoform->getStartPos(),
-                                                  proteoform->getEndPos(),
-                                                  expected_shift_vec,
-                                                  mng_ptr_->prsm_para_ptr_->getFixModPtrVec());
-
-  proteoform->setProteoClusterId(prot_cluster_id);
-
-  proteoform->setProtId(prot_id);
-
-  int g = proteoform->getLen();
-
-  ProteoformPtr no_shift_proteoform
-      = proteoform_factory::geneProteoform(proteoform,
-                                           proteoform->getStartPos(),
-                                           proteoform->getEndPos(),
-                                           local_util::massShiftFilter(ori_mass_shift_vec, AlterType::UNEXPECTED),
-                                           mng_ptr_->prsm_para_ptr_->getFixModPtrVec());
-
-  std::vector<double> split_scr_vec;
-  for (int k = 1; k < g; k++) {
-    double scr = 0.0;
-    for (size_t i = 0; i < extend_ms_ptr_vec.size(); i++) {
-      std::vector<std::vector<double>> b_table(3);
-      b_table[0] = local_util::geneNTheoMass(no_shift_proteoform, extend_ms_ptr_vec[i], mng_ptr_->min_mass_);
-      local_util::fillTableB(b_table, mass1, mass2);
-
-      std::vector<std::vector<int>> s_table(3);
-      local_util::fillTableS(b_table, s_table, extend_ms_ptr_vec[i], prec_mass);
-
-      int d_table[3][g + 1][h + 1];
-
-      memset(d_table, 0, sizeof(int) * 3 * (g + 1) * (h + 1));
-      d_table[0][0][0] = 1;
-
-      for (int i = 1; i <= g; i++) {
-        for (int j = 0; j <= h; j++) {
-          if (j >= s_table[0][i - 1]) {
-            d_table[0][i][j] = d_table[0][i - 1][j - s_table[0][i - 1]];
-          } else {
-            d_table[0][i][j] = 0;
-          }
-        }
-      }
-
-      for (int i = 1; i <= g; i++) {
-        for (int j = 0; j <= h; j++) {
-          if (modifiable(proteoform, i - 1, ptm1) && j >= s_table[1][i - 1] && i <= k) {
-            d_table[1][i][j] = d_table[0][i - 1][j - s_table[1][i - 1]] + d_table[1][i - 1][j - s_table[1][i - 1]];
-          } else if (j >= s_table[1][i - 1]) {
-            d_table[1][i][j] = d_table[1][i - 1][j - s_table[1][i - 1]];
-          } else {
-            d_table[1][i][j] = 0;
-          }
-        }
-      }
-
-      for (int i = 1; i <= g; i++) {
-        for (int j = 0; j <= h; j++) {
-          if (modifiable(proteoform, i - 1, ptm2) && j >= s_table[2][i - 1] && i > k) {
-            d_table[2][i][j] = d_table[1][i - 1][j - s_table[2][i - 1]] + d_table[2][i - 1][j - s_table[2][i - 1]];
-          } else if (j >= s_table[2][i - 1]) {
-            d_table[2][i][j] = d_table[2][i - 1][j - s_table[2][i - 1]];
-          } else {
-            d_table[2][i][j] = 0;
-          }
-        }
-      }
-
-      for (int i = 0; i <= h; i++) {
-        scr += d_table[2][g][i] * std::pow(mng_ptr_->p1_, i) * std::pow(mng_ptr_->p2_, i);
-      }
-    }
-    split_scr_vec.push_back(scr);
-  }
-
-  int split_point = std::distance(split_scr_vec.begin(), std::max_element(split_scr_vec.begin(), split_scr_vec.end()));
-
-  double split_max = *std::max_element(split_scr_vec.begin(), split_scr_vec.end());
-
-  double split_scr = 0.0;
-
-  int split_end = split_scr_vec.size();
-
-  for (; split_end > 0; split_end--) {
-    if (split_scr_vec[split_end] == split_max)
-      break;
-  }
-
-  for (int i = split_point; i <= split_end; i++) {
-    split_scr += split_scr_vec[i];
-  }
-
-  split_point = (split_point + split_end) / 2;
-
-  split_scr = split_scr / std::accumulate(split_scr_vec.begin(), split_scr_vec.end(), 0.0);
-
-  if (split_scr <= mng_ptr_->threshold_) {
-    return nullptr;
-  }
-
-  std::vector<double> ptm_scr;
-
-  for (int i = 0; i <= split_point; i++) {
-    shift_ptr1->setLeftBpPos(i);
-    shift_ptr1->setRightBpPos(i + 1);
-    if (modifiable(proteoform, i, ptm1)) {
-      int match = static_cast<int>(local_util::compMatchFragNum(proteoform,
-                                                                extend_ms_ptr_vec,
-                                                                mng_ptr_->min_mass_));
-      ptm_scr.push_back(std::pow(mng_ptr_->p1_, split_point - match) * std::pow(mng_ptr_->p2_, match));
-    } else {
-      ptm_scr.push_back(0.0);
-    }
-  }
-
-  local_util::normalize(ptm_scr);
-  int bgn, end;
-  double conf;
-  std::transform(ptm_scr.begin(), ptm_scr.end(), ptm_scr.begin(),
-                 std::bind1st(std::multiplies<double>(), split_scr));
-  local_util::scrFilter(ptm_scr, bgn, end, conf, mng_ptr_->threshold_);
-
-  if (bgn == -1) {
-    return nullptr;
-  } else {
-    LocalAnnoPtr anno1 = std::make_shared<LocalAnno>(bgn, end, conf, ptm_scr, 0, ptm1);
-    shift_ptr1->getAlterPtr(0)->setLocalAnno(anno1);
-    shift_ptr1->setLeftBpPos(anno1->getLeftBpPos());
-    shift_ptr1->setRightBpPos(anno1->getRightBpPos() + 1);
-  }
-
-  ptm_scr.clear();
-  int len = proteoform->getLen();
-  for (int i = split_point + 1; i < len; i++) {
-    shift_ptr2->setLeftBpPos(i);
-    shift_ptr2->setRightBpPos(i + 1);
-    if (modifiable(proteoform, i, ptm2)) {
-      int match = static_cast<int>(local_util::compMatchFragNum(proteoform,
-                                                                extend_ms_ptr_vec,
-                                                                mng_ptr_->min_mass_));
-      ptm_scr.push_back(std::pow(mng_ptr_->p1_, len - match) * std::pow(mng_ptr_->p2_, match));
-    } else {
-      ptm_scr.push_back(0.0);
-    }
-  }
-
-  local_util::normalize(ptm_scr);
-
-  std::transform(ptm_scr.begin(), ptm_scr.end(), ptm_scr.begin(),
-                 std::bind1st(std::multiplies<double>(), split_scr));
-
-  local_util::scrFilter(ptm_scr, bgn, end, conf, mng_ptr_->threshold_);
-
-  if (bgn == -1) {
-    return nullptr;
-  } else {
-    LocalAnnoPtr anno2 = std::make_shared<LocalAnno>(split_point + bgn + 1, split_point + end + 1, conf, ptm_scr, 0, ptm2);
-    shift_ptr2->getAlterPtr(0)->setLocalAnno(anno2);
-    shift_ptr2->setLeftBpPos(anno2->getLeftBpPos());
-    shift_ptr2->setRightBpPos(anno2->getRightBpPos() + 1);
-  }
-
-  return proteoform;
-}
-*/
 
 }  // namespace toppic
 
