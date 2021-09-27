@@ -32,6 +32,21 @@ PtmPtrVec getPtmPtrVecByMass(double mass, double err, const PtmPtrVec & ptm_vec)
 
 PtmPairVec getPtmPairVecByMass(double mass, double err, const PtmPairVec & ptm_pair_vec);
 
+void compMTable(const std::vector<double> &ori_theo_masses, double shift, 
+    const std::vector<double> &exp_masses, 
+    PeakTolerancePtr tole_ptr,  
+    std::vector<int> &m_table); 
+
+void addTwoVectors(std::vector<int> &row_1, std::vector<int> &row_2); 
+
+std::vector<int> compPrecScore(std::vector<int> & row); 
+
+std::vector<int> compSuffScore(std::vector<int> & row); 
+
+void compOnePtmSTable(std::vector<int> &s_table, ProteoformPtr form_ptr, 
+                      const ExtendMsPtrVec & extend_ms_ptr_vec,
+                      PtmPtr ptm_ptr, LocalMngPtr mng_ptr); 
+
 //
 void compSupPeakNum(ProteoformPtr proteoform, const ExtendMsPtrVec & extend_ms_ptr_vec,
                     MassShiftPtr mass_shift, double min_mass, int & left, int & right);

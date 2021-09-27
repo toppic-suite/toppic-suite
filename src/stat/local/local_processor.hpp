@@ -41,13 +41,16 @@ class LocalProcessor {
 
   ProteoformPtr processTwoKnownPtm(PrsmPtr prsm);
 
+  int compOnePtmScr(ProteoformPtr base_form_ptr, 
+      const ExtendMsPtrVec & extend_ms_ptr_vec,
+      PtmPtr ptm_ptr); 
+
   LocalResultPtr onePtmLocalize(ProteoformPtr base_form_ptr, const ExtendMsPtrVec & extend_ms_ptr_vec, 
                                 double prec_mass, double err_tole); 
 
-  LocalResultPtr compOnePtmScr(ProteoformPtr base_form_ptr, 
-                               const ExtendMsPtrVec & extend_ms_ptr_vec,
-                               double unexp_shift_mass, 
-                               PtmPtrVec & ptm_ptr_vec); 
+  ProteoformPtr twoPtmLocalize(ProteoformPtr form_ptr, const ExtendMsPtrVec &extend_ms_ptr_vec,
+      PtmPtr ptm_ptr_1, PtmPtr ptm_ptr_2); 
+
 
   void compTwoPtmScr(ProteoformPtr proteoform, int num_match,
                      const ExtendMsPtrVec & extend_ms_ptr_vec, double prec_mass,

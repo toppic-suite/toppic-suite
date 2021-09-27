@@ -33,8 +33,9 @@ ProteoformPtrVec createCandidateForm(FastaSeqPtr seq_ptr, int ori_start_pos,
 ProteoformPtrVec getAllCandidateForms(ProteoformPtr ori_form_ptr, 
                                       LocalMngPtr mng_ptr); 
 
-ProteoformPtr createProteoformPtr(ProteoformPtr base_form_ptr, double shift_mass, 
-                                  LocalResultPtr result_ptr, LocalMngPtr mng_ptr); 
+ProteoformPtr createProteoformPtr(ProteoformPtr base_form_ptr, 
+                                  double shift_mass, LocalResultPtr result_ptr,
+                                  LocalMngPtr mng_ptr); 
 
 void getNtermTruncRange(ProteoformPtr proteoform, LocalMngPtr mng_ptr, int & min, int & max);
 
