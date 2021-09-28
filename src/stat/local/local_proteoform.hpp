@@ -25,17 +25,19 @@ namespace toppic {
 
 namespace local_proteoform {
 
-ProteoformPtrVec createCandidateForm(FastaSeqPtr seq_ptr, int ori_start_pos, 
-                                     int form_start_pos, int form_end_pos, 
-                                     MassShiftPtrVec & exp_shift_ptr_vec, 
-                                     LocalMngPtr mng_ptr); 
+ProteoformPtrVec getCandidateForm(FastaSeqPtr seq_ptr, int ori_start_pos, 
+                                  int form_start_pos, int form_end_pos, 
+                                  MassShiftPtrVec & exp_shift_ptr_vec, 
+                                  LocalMngPtr mng_ptr); 
 
 ProteoformPtrVec getAllCandidateForms(ProteoformPtr ori_form_ptr, 
                                       LocalMngPtr mng_ptr); 
 
+
 ProteoformPtr createProteoformPtr(ProteoformPtr base_form_ptr, 
-                                  double shift_mass, LocalResultPtr result_ptr,
-                                  LocalMngPtr mng_ptr); 
+                                  double shift_mass, int match_score, 
+                                  std::vector<double> scr_vec, PtmPtr ptm_ptr,
+                                  LocalMngPtr mng_ptr);
 
 void getNtermTruncRange(ProteoformPtr proteoform, LocalMngPtr mng_ptr, int & min, int & max);
 

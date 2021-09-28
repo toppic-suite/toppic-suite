@@ -59,10 +59,10 @@ void getCtermTruncRange(ProteoformPtr proteoform, LocalMngPtr mng_ptr, int & min
   }
 }
 
-ProteoformPtrVec createCandidateForm(FastaSeqPtr seq_ptr, int ori_start_pos, 
-                                     int form_start_pos, int form_end_pos, 
-                                     MassShiftPtrVec & exp_shift_ptr_vec, 
-                                     LocalMngPtr mng_ptr) {
+ProteoformPtrVec getCandidateForm(FastaSeqPtr seq_ptr, int ori_start_pos, 
+                                  int form_start_pos, int form_end_pos, 
+                                  MassShiftPtrVec & exp_shift_ptr_vec, 
+                                  LocalMngPtr mng_ptr) {
   ProteoformPtrVec result_vec;
   // update mass shifts
   MassShiftPtrVec valid_shift_ptr_vec;
@@ -181,12 +181,12 @@ ProteoformPtrVec getAllCandidateForms(ProteoformPtr ori_form_ptr,
   int ori_start_pos = ori_form_ptr->getStartPos();
   int ori_end_pos = ori_form_ptr->getEndPos();
   // 1. Add the orignal form
-  ProteoformPtrVec base_form_ptr_vec = createCandidateForm(fasta_seq_ptr, 
-                                                           ori_start_pos,
-                                                           ori_start_pos,
-                                                           ori_end_pos,
-                                                           exp_shift_ptr_vec,
-                                                           mng_ptr);
+  ProteoformPtrVec base_form_ptr_vec = getCandidateForm(fasta_seq_ptr, 
+                                                        ori_start_pos,
+                                                        ori_start_pos,
+                                                        ori_end_pos,
+                                                        exp_shift_ptr_vec,
+                                                        mng_ptr);
   result_form_vec.insert(std::end(result_form_vec), std::begin(base_form_ptr_vec), std::end(base_form_ptr_vec));
 
   // 2. N-term trancations
@@ -196,12 +196,12 @@ ProteoformPtrVec getAllCandidateForms(ProteoformPtr ori_form_ptr,
     if (i == ori_start_pos) {
       continue;
     }
-    ProteoformPtrVec form_ptr_vec = createCandidateForm(fasta_seq_ptr, 
-                                                        ori_start_pos,
-                                                        i,
-                                                        ori_end_pos,
-                                                        exp_shift_ptr_vec,
-                                                        mng_ptr);
+    ProteoformPtrVec form_ptr_vec = getCandidateForm(fasta_seq_ptr, 
+                                                     ori_start_pos,
+                                                     i,
+                                                     ori_end_pos,
+                                                     exp_shift_ptr_vec,
+                                                     mng_ptr);
     result_form_vec.insert(std::end(result_form_vec), std::begin(form_ptr_vec), std::end(form_ptr_vec));
   }
 
@@ -212,12 +212,12 @@ ProteoformPtrVec getAllCandidateForms(ProteoformPtr ori_form_ptr,
     if (i == ori_end_pos) {
       continue;
     }
-    ProteoformPtrVec form_ptr_vec = createCandidateForm(fasta_seq_ptr, 
-                                                        ori_start_pos,
-                                                        ori_start_pos,
-                                                        i,
-                                                        exp_shift_ptr_vec, 
-                                                        mng_ptr);
+    ProteoformPtrVec form_ptr_vec = getCandidateForm(fasta_seq_ptr, 
+                                                     ori_start_pos,
+                                                     ori_start_pos,
+                                                     i,
+                                                     exp_shift_ptr_vec, 
+                                                     mng_ptr);
     result_form_vec.insert(std::end(result_form_vec), std::begin(form_ptr_vec), std::end(form_ptr_vec));
   }
 
@@ -225,19 +225,17 @@ ProteoformPtrVec getAllCandidateForms(ProteoformPtr ori_form_ptr,
 }
 
 ProteoformPtr createProteoformPtr(ProteoformPtr base_form_ptr, 
-                                  double shift_mass, LocalResultPtr result_ptr,
+                                  double shift_mass, int match_score, 
+                                  std::vector<double> scr_vec, PtmPtr ptm_ptr,
                                   LocalMngPtr mng_ptr) {
-  if (result_ptr->match_score_ <= 0) {
-    return nullptr;
-  }
   int bgn, end;
   double conf;
-  local_util::scrFilter(result_ptr->scr_vec_, bgn, end, conf, mng_ptr->threshold_);
+  local_util::scrFilter(scr_vec, bgn, end, conf, mng_ptr->threshold_);
 
   if (bgn == -1) return nullptr;
 
-  LocalAnnoPtr anno = std::make_shared<LocalAnno>(bgn, end, conf, result_ptr->scr_vec_,
-                                                  result_ptr->match_score_, result_ptr->ptm_ptr_);
+  LocalAnnoPtr anno = std::make_shared<LocalAnno>(bgn, end, conf, scr_vec,
+                                                  match_score, ptm_ptr);
 
   AlterPtr alter = std::make_shared<Alter>(anno->getLeftBpPos(),
                                            anno->getRightBpPos() + 1,

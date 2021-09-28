@@ -38,8 +38,6 @@ class LocalMng {
   std::string output_file_ext_;
   std::string residueModFileName_;
 
-  //double ppo_;
-
   double threshold_;
 
   double min_mass_;
@@ -48,26 +46,34 @@ class LocalMng {
 
   double min_ptm_mass_;
 
-  double theta_ = 0.994;  // the weight for known/unknown ptm
+  // prob ratio between a matched fragment and an unmatched fragment
+  double prob_ratio_ = 23.1434;
 
-  double beta_ = 0.8;     // the weight for one/two ptm
-
-  double p1_ = 0.915258; 
-
-  double p2_ = 21.1822; 
-
+  // threshold for the deduction of matched fragments
+  // when a PTM is localized
   double desc_ratio_ = 0.67;
+  int DESC_MATCH_LIMIT_ = 5;
 
+  // the range for checking possible starting position
+  // of the N-terminus
   int n_term_range_ = 5;
   
+  // the range for checking possible starting position
+  // of the C-terminus
   int c_term_range_ = 5;
-  
+
+  //double theta_ = 0.994;  // the weight for known/unknown ptm
+
+  //double beta_ = 0.8;     // the weight for one/two ptm
+
+  //double p1_ = 0.915258; 
+
+  //double p2_ = 21.1822; 
 
   //int LEFT_SUP_LIMIT_ = 10;
 
   //int RIGHT_SUP_LIMIT_ = 10;
 
-  int DESC_MATCH_LIMIT_ = 5;
 };
 
 typedef std::shared_ptr<LocalMng> LocalMngPtr;
