@@ -245,7 +245,6 @@ bool LocalProcessor::modifiable(ProteoformPtr proteoform_ptr, int i, PtmPtr ptm_
         mod_list[j]->getModResiduePtr()->getPtmPtr()->isSame(ptm_ptr))
       return true;
   }
-
   return false;
 }
 
@@ -288,9 +287,10 @@ ProteoformPtr LocalProcessor::processOneKnownPtm(PrsmPtr prsm_ptr) {
   if (best_match_score == 0 || best_form_ptr == nullptr) {
     return nullptr;
   }
-
-  return  onePtmLocalize(best_form_ptr, extend_ms_ptr_vec, best_mass_shift, 
-                         best_match_score, best_ptm_ptr);
+  else {
+    return onePtmLocalize(best_form_ptr, extend_ms_ptr_vec, best_mass_shift, 
+                          best_match_score, best_ptm_ptr);
+  }
 }
 
 
@@ -395,52 +395,7 @@ ProteoformPtr LocalProcessor::processTwoKnownPtm(PrsmPtr prsm_ptr) {
   return nullptr;
 }
 
-/*
-double LocalProcessor::dpTwoPtmScr(ProteoformPtr form_ptr, const ExtendMsPtrVec & extend_ms_ptr_vec,
-                                   PtmPtr ptm_ptr_1, PtmPtr ptm_ptr_2) {
-  int g = form_ptr->getLen();
-  if (g <= 0) {
-    return 0;
-  }
-
-
-  // score table with size 3 * (g + 1)
-  std::vector<std::vector<int>> s_table;
-  compTwoPtmSTable(s_table, form_ptr, extend_ms_ptr_vec, ptm_ptr_1, ptm_ptr_2, mng_ptr_);
-
-  // fill D(f, g)
-  int d_table[3][g + 1];
-  memset(d_table, 0, sizeof(int) * 3 * (g + 1));
-  d_table[0][0] = 1;
-
-  // layer 0
-  for (int i = 1; i <= g; i++) {
-    d_table[0][i] = d_table[0][i-1] + s_table[0][i];
-  }
-
-  // layer 1
-  for (int i = 1; i <= g; i++) {
-    d_table[1][i] = d_table[1][i-1] + s_table[1][i];
-    if (modifiable(form_ptr, i - 1, ptm_ptr_1) && d_table[0][i-1] > d_table[1][i-1]) {
-      d_table[1][i] = d_table[0][i-1] + s_table[1][i];
-    }
-  }
-
-  // layer 2
-  for (int i = 1; i <= g; i++) {
-    d_table[2][i] = d_table[2][i-1] + s_table[2][i];
-    if (modifiable(form_ptr, i - 1, ptm_ptr_2) && d_table[1][i-1] > d_table[2][i-1]) {
-      d_table[2][i] = d_table[1][i-1] + s_table[2][i];
-    } 
-  }
-
-  return d_table[2][g]; 
-}
-*/
-
-  
-/*
-void compTwoPtmSTable(std::vector<std::vector<int>> &s_table, ProteoformPtr form_ptr, 
+void compTwoPtmMTable(std::vector<std::vector<int>> &s_table, ProteoformPtr form_ptr, 
                       const ExtendMsPtrVec & extend_ms_ptr_vec,
                       PtmPtr ptm_ptr_1, PtmPtr ptm_ptr_2, LocalMngPtr mng_ptr) {
 
@@ -464,7 +419,7 @@ void compTwoPtmSTable(std::vector<std::vector<int>> &s_table, ProteoformPtr form
     std::vector<double> ms_masses = extend_ms_util::getExtendMassVec(extend_ms_ptr_vec[i]);
     // updated S table using prm masses 
     double n_shift = extend_ms_ptr_vec[i]->getMsHeaderPtr()->getActivationPtr()->getNShift();
-    local_util::updateSTable(prm_masses, n_shift, ms_masses, tole_ptr, s_table[0]);  
+    local_util::compMTable(prm_masses, n_shift, ms_masses, tole_ptr, s_table[0]);  
     local_util::updateSTable(prm_masses, n_shift + mass_1, ms_masses, tole_ptr, s_table[1]);  
     local_util::updateSTable(prm_masses, n_shift + mass_1 + mass_2, ms_masses, tole_ptr, s_table[2]);  
 
@@ -475,8 +430,48 @@ void compTwoPtmSTable(std::vector<std::vector<int>> &s_table, ProteoformPtr form
     local_util::updateSTable(srm_masses, c_shift, ms_masses, tole_ptr, s_table[2]);  
   }
 }
-*/
 
+double LocalProcessor::compTwoPtmScr(ProteoformPtr form_ptr, const ExtendMsPtrVec & extend_ms_ptr_vec,
+                                     PtmPtr ptm_ptr_1, PtmPtr ptm_ptr_2) {
+  int g = form_ptr->getLen();
+  if (g <= 0) {
+    return 0;
+  }
+
+  // matching table with size 3 * (g + 1)
+  std::vector<std::vector<int>> m_table;
+  compTwoPtmMTable(m_table, form_ptr, extend_ms_ptr_vec, ptm_ptr_1, ptm_ptr_2, mng_ptr_);
+
+  // fill D(f, g)
+  int d_table[3][g + 1];
+  memset(d_table, 0, sizeof(int) * 3 * (g + 1));
+  d_table[0][0] = 1;
+
+  // layer 0
+  for (int i = 1; i <= g; i++) {
+    d_table[0][i] = d_table[0][i-1] + m_table[0][i];
+  }
+
+  // layer 1
+  for (int i = 1; i <= g; i++) {
+    d_table[1][i] = d_table[1][i-1] + m_table[1][i];
+    if (modifiable(form_ptr, i - 1, ptm_ptr_1) && d_table[0][i-1] > d_table[1][i-1]) {
+      d_table[1][i] = d_table[0][i-1] + m_table[1][i];
+    }
+  }
+
+  // layer 2
+  for (int i = 1; i <= g; i++) {
+    d_table[2][i] = d_table[2][i-1] + m_table[2][i];
+    if (modifiable(form_ptr, i - 1, ptm_ptr_2) && d_table[1][i-1] > d_table[2][i-1]) {
+      d_table[2][i] = d_table[1][i-1] + m_table[2][i];
+    } 
+  }
+
+  return d_table[2][g]; 
+}
+
+  
 /*
 ProteoformPtr LocalProcessor::twoPtmLocalize(ProteoformPtr form_ptr, const ExtendMsPtrVec &extend_ms_ptr_vec,
                                              PtmPtr ptm_ptr_1, PtmPtr ptm_ptr_2) {
