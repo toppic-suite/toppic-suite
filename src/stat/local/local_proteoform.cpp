@@ -14,6 +14,7 @@
 
 #include <algorithm>
 
+#include "common/util/logger.hpp"
 #include "common/base/residue_base.hpp"
 #include "common/base/prot_mod_util.hpp"
 #include "common/base/prot_mod_base.hpp"
@@ -224,8 +225,7 @@ ProteoformPtrVec getAllCandidateForms(ProteoformPtr ori_form_ptr,
   return result_form_vec;
 }
 
-ProteoformPtr createProteoformPtr(ProteoformPtr base_form_ptr, 
-                                  double shift_mass, int match_score, 
+ProteoformPtr createProteoformPtr(ProteoformPtr base_form_ptr, int match_score, 
                                   std::vector<double> scr_vec, PtmPtr ptm_ptr,
                                   LocalMngPtr mng_ptr) {
   int bgn, end;
@@ -240,7 +240,7 @@ ProteoformPtr createProteoformPtr(ProteoformPtr base_form_ptr,
   AlterPtr alter = std::make_shared<Alter>(anno->getLeftBpPos(),
                                            anno->getRightBpPos() + 1,
                                            AlterType::UNEXPECTED, 
-                                           shift_mass,
+                                           ptm_ptr->getMonoMass(),  
                                            std::make_shared<Mod>(ResidueBase::getEmptyResiduePtr(),
                                                                  ResidueBase::getEmptyResiduePtr()));
 
@@ -262,6 +262,72 @@ ProteoformPtr createProteoformPtr(ProteoformPtr base_form_ptr,
 
   return shift_form_ptr;
 }
+
+ProteoformPtr createProteoformPtr(ProteoformPtr base_form_ptr, 
+                                  int match_score, int break_pos,
+                                  std::vector<double> scr_vec_1, 
+                                  std::vector<double> scr_vec_2,
+                                  PtmPtr ptm_ptr_1, PtmPtr ptm_ptr_2,
+                                  LocalMngPtr mng_ptr) {
+  int bgn_1, end_1;
+  double conf_1;
+  local_util::scrFilter(scr_vec_1, bgn_1, end_1, conf_1, mng_ptr->threshold_);
+  if (bgn_1 == -1) return nullptr;
+
+  int bgn_2, end_2;
+  double conf_2;
+  local_util::scrFilter(scr_vec_2, bgn_2, end_2, conf_2, mng_ptr->threshold_);
+  if (bgn_2 == -1) return nullptr;
+
+  if (end_1 > break_pos || bgn_2 <= break_pos) {
+    LOG_ERROR("ERROR in localization!");
+    exit(EXIT_FAILURE);
+  }
+
+  LocalAnnoPtr anno_1 = std::make_shared<LocalAnno>(bgn_1, end_1, conf_1, scr_vec_1,
+                                                    match_score, ptm_ptr_1);
+
+  AlterPtr alter_1 = std::make_shared<Alter>(anno_1->getLeftBpPos(),
+                                             break_pos + 1,
+                                             AlterType::UNEXPECTED, 
+                                             ptm_ptr_1->getMonoMass(), 
+                                             std::make_shared<Mod>(ResidueBase::getEmptyResiduePtr(),
+                                                                   ResidueBase::getEmptyResiduePtr()));
+
+  alter_1->setLocalAnno(anno_1);
+
+  LocalAnnoPtr anno_2 = std::make_shared<LocalAnno>(bgn_2, end_2, conf_2, scr_vec_2,
+                                                    match_score, ptm_ptr_2);
+
+  AlterPtr alter_2 = std::make_shared<Alter>(break_pos + 1, 
+                                             anno_2->getRightBpPos() + 1,
+                                             AlterType::UNEXPECTED, 
+                                             ptm_ptr_2->getMonoMass(),
+                                             std::make_shared<Mod>(ResidueBase::getEmptyResiduePtr(),
+                                                                   ResidueBase::getEmptyResiduePtr()));
+
+  alter_2->setLocalAnno(anno_2);
+
+
+  MassShiftPtrVec all_shift_ptr_vec = base_form_ptr->getMassShiftPtrVec(); 
+  MassShiftPtr unexp_shift_ptr_1 = std::make_shared<MassShift>(alter_1);
+  all_shift_ptr_vec.push_back(unexp_shift_ptr_1);
+  MassShiftPtr unexp_shift_ptr_2 = std::make_shared<MassShift>(alter_2);
+  all_shift_ptr_vec.push_back(unexp_shift_ptr_2);
+
+  std::sort(all_shift_ptr_vec.begin(), all_shift_ptr_vec.end(), MassShift::cmpPosInc);
+
+  ProteoformPtr shift_form_ptr = std::make_shared<Proteoform>(base_form_ptr->getFastaSeqPtr(),
+                                                              base_form_ptr->getProtModPtr(),
+                                                              base_form_ptr->getStartPos(),
+                                                              base_form_ptr->getEndPos(),
+                                                              base_form_ptr->getResSeqPtr(),
+                                                              all_shift_ptr_vec);
+
+
+  return shift_form_ptr;
+}
+
 
 }
 

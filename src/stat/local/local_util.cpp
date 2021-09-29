@@ -131,7 +131,7 @@ void addTwoVectors(std::vector<int> &row_1, std::vector<int> &row_2) {
   }
 }
 
-std::vector<int> compPrecScore(std::vector<int> & row) {
+std::vector<int> compPrefScore(std::vector<int> & row) {
   std::vector<int> result(row.size(), 0);
   int total_score = 0;
   for (size_t i = 0; i < row.size(); i++) {
@@ -190,7 +190,7 @@ void compOnePtmSTable(std::vector<int> &s_table, ProteoformPtr form_ptr,
     local_util::addTwoVectors(row_2, row_2_c);
   }
 
-  std::vector<int> n_prec_score = local_util::compPrecScore(row_1);
+  std::vector<int> n_prec_score = local_util::compPrefScore(row_1);
   std::vector<int> c_suff_score = local_util::compSuffScore(row_2);
 
   // get result table
@@ -198,6 +198,59 @@ void compOnePtmSTable(std::vector<int> &s_table, ProteoformPtr form_ptr,
     s_table.push_back(n_prec_score[i] + c_suff_score[i+1]);
   }
 }
+
+void compTwoPtmMTable(std::vector<std::vector<int>> &s_table, ProteoformPtr form_ptr, 
+                      const ExtendMsPtrVec & extend_ms_ptr_vec,
+                      PtmPtr ptm_ptr_1, PtmPtr ptm_ptr_2, LocalMngPtr mng_ptr) {
+
+  int len = form_ptr->getLen();
+  for (int i = 0; i < 3; i++) {
+    std::vector<int> row(len + 1, 0);
+    s_table.push_back(row);
+  }
+
+  BpSpecPtr bp_spec_ptr = form_ptr->getBpSpecPtr();
+  std::vector<double> prm_masses = bp_spec_ptr->getPrmMasses();
+  std::vector<double> srm_masses = bp_spec_ptr->getSrmMasses();
+  // sort srm in the decreasing order
+  std::sort(srm_masses.begin(), srm_masses.end(), std::greater<double>());
+  PeakTolerancePtr tole_ptr = mng_ptr->peak_tole_ptr_;
+
+  int mass_1 = ptm_ptr_1->getMonoMass();
+  int mass_2 = ptm_ptr_2->getMonoMass();
+
+  for (size_t i = 0; i < extend_ms_ptr_vec.size(); i++) {
+    std::vector<double> ms_masses = extend_ms_util::getExtendMassVec(extend_ms_ptr_vec[i]);
+    // updated S table using prm masses 
+    double n_shift = extend_ms_ptr_vec[i]->getMsHeaderPtr()->getActivationPtr()->getNShift();
+    std::vector<int> row_1_n(len + 1, 0);
+    compMTable(prm_masses, n_shift, ms_masses, tole_ptr, row_1_n);
+    addTwoVectors(s_table[0], row_1_n);
+
+    std::vector<int> row_2_n(len + 1, 0);
+    compMTable(prm_masses, n_shift + mass_1, ms_masses, tole_ptr, row_2_n);
+    addTwoVectors(s_table[1], row_2_n);
+
+    std::vector<int> row_3_n(len + 1, 0);
+    compMTable(prm_masses, n_shift + mass_1 + mass_2, ms_masses, tole_ptr, row_3_n);  
+    addTwoVectors(s_table[2], row_3_n);
+
+    // updated S table using srm masses 
+    double c_shift = extend_ms_ptr_vec[i]->getMsHeaderPtr()->getActivationPtr()->getCShift();
+    std::vector<int> row_1_c(len + 1, 0);
+    compMTable(srm_masses, c_shift + mass_1 + mass_2, ms_masses, tole_ptr, row_1_c);  
+    addTwoVectors(s_table[0], row_1_c);
+
+    std::vector<int> row_2_c(len + 1, 0);
+    compMTable(srm_masses, c_shift + mass_2, ms_masses, tole_ptr, row_2_c);  
+    addTwoVectors(s_table[1], row_2_c);
+
+    std::vector<int> row_3_c(len + 1, 0);
+    compMTable(srm_masses, c_shift, ms_masses, tole_ptr, row_3_c);  
+    addTwoVectors(s_table[2], row_3_c);
+  }
+}
+
 
 void compSupPeakNum(ProteoformPtr proteoform, const ExtendMsPtrVec & extend_ms_ptr_vec,
                     MassShiftPtr mass_shift, double min_mass, int & left, int & right) {

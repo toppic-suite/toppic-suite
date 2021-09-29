@@ -39,13 +39,17 @@ void compMTable(const std::vector<double> &ori_theo_masses, double shift,
 
 void addTwoVectors(std::vector<int> &row_1, std::vector<int> &row_2); 
 
-std::vector<int> compPrecScore(std::vector<int> & row); 
+std::vector<int> compPrefScore(std::vector<int> & row); 
 
 std::vector<int> compSuffScore(std::vector<int> & row); 
 
 void compOnePtmSTable(std::vector<int> &s_table, ProteoformPtr form_ptr, 
                       const ExtendMsPtrVec & extend_ms_ptr_vec,
                       PtmPtr ptm_ptr, LocalMngPtr mng_ptr); 
+
+void compTwoPtmMTable(std::vector<std::vector<int>> &s_table, ProteoformPtr form_ptr, 
+                      const ExtendMsPtrVec & extend_ms_ptr_vec,
+                      PtmPtr ptm_ptr_1, PtmPtr ptm_ptr_2, LocalMngPtr mng_ptr); 
 
 //
 void compSupPeakNum(ProteoformPtr proteoform, const ExtendMsPtrVec & extend_ms_ptr_vec,

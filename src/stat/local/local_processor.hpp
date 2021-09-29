@@ -33,13 +33,13 @@ class LocalProcessor {
 
   PrsmPtr processOnePrsm(PrsmPtr prsm);
 
-  PrsmPtr processOnePtm(PrsmPtr prsm);
+  PrsmPtr processOneMassShift(PrsmPtr prsm);
 
-  PrsmPtr processTwoPtm(PrsmPtr prsm);
+  PrsmPtr processTwoMassShifts(PrsmPtr prsm);
 
   ProteoformPtr processOneKnownPtm(PrsmPtr prsm);
 
-  ProteoformPtr processTwoKnownPtm(PrsmPtr prsm);
+  ProteoformPtr processTwoKnownPtms(PrsmPtr prsm);
 
   int compOnePtmScr(ProteoformPtr base_form_ptr, 
                     const ExtendMsPtrVec & extend_ms_ptr_vec,
@@ -50,17 +50,11 @@ class LocalProcessor {
                                double shift_mass, int match_score,
                                PtmPtr ptm_ptr);
 
-  void compTwoPtmScr(ProteoformPtr proteoform, int num_match,
-                     const ExtendMsPtrVec & extend_ms_ptr_vec, double prec_mass,
-                     double & raw_scr, PtmPairVec & ptm_pair_vec);
+  int compTwoPtmScr(ProteoformPtr proteoform, const ExtendMsPtrVec & extend_ms_ptr_vec, 
+                    PtmPtr ptm_ptr_1, PtmPtr ptm_ptr_2); 
 
   ProteoformPtr twoPtmLocalize(ProteoformPtr form_ptr, const ExtendMsPtrVec &extend_ms_ptr_vec,
-                               PtmPtr ptm_ptr_1, PtmPtr ptm_ptr_2); 
-
-
-
-  double dpTwoPtmScr(ProteoformPtr proteoform, const ExtendMsPtrVec & extend_ms_ptr_vec,
-                     PtmPtr ptm1, PtmPtr ptm2);
+                               int match_score, PtmPtr ptm_ptr_1, PtmPtr ptm_ptr_2); 
 
   bool modifiable(ProteoformPtr proteoform_ptr, int i, PtmPtr ptm_ptr);
 

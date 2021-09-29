@@ -34,9 +34,15 @@ ProteoformPtrVec getAllCandidateForms(ProteoformPtr ori_form_ptr,
                                       LocalMngPtr mng_ptr); 
 
 
-ProteoformPtr createProteoformPtr(ProteoformPtr base_form_ptr, 
-                                  double shift_mass, int match_score, 
+ProteoformPtr createProteoformPtr(ProteoformPtr base_form_ptr, int match_score, 
                                   std::vector<double> scr_vec, PtmPtr ptm_ptr,
+                                  LocalMngPtr mng_ptr);
+
+ProteoformPtr createProteoformPtr(ProteoformPtr base_form_ptr, 
+                                  int match_score, int break_pos,
+                                  std::vector<double> scr_vec_1, 
+                                  std::vector<double> scr_vec_2,
+                                  PtmPtr ptm_ptr_1, PtmPtr ptm_ptr_2,
                                   LocalMngPtr mng_ptr);
 
 void getNtermTruncRange(ProteoformPtr proteoform, LocalMngPtr mng_ptr, int & min, int & max);
