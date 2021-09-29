@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <cmath>
 #include <numeric>
+#include <iomanip>
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
@@ -68,8 +69,6 @@ void LocalProcessor::init() {
 }
 
 void LocalProcessor::process() {
-
-  //logger::log_level=2; 
   std::string spec_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
   std::string input_file_name = file_util::basename(spec_file_name) + "." + mng_ptr_->input_file_ext_;
   std::string output_file_name = file_util::basename(spec_file_name) + "." + mng_ptr_->output_file_ext_;
@@ -104,8 +103,19 @@ void LocalProcessor::process() {
           = extend_ms_factory::geneMsThreePtrVec(deconv_ms_ptr_vec, sp_para_ptr, new_prec_mass);
         prsm_ptr->setRefineMsVec(extend_ms_ptr_vec);
 
+        if (spec_id == 201) { 
+          logger::log_level=2;
+        }
+        else {
+          logger::log_level=5;
+          if (spec_id > 201) {
+            exit(EXIT_FAILURE);
+          }
+        }
+
+        
         if (prsm_ptr->getProteoformPtr()->getMassShiftNum(AlterType::UNEXPECTED) > 0) {
-          LOG_DEBUG("Start localization");
+          //LOG_DEBUG("Start localization");
           prsm_ptr = processOnePrsm(prsm_ptr);
         }
 
@@ -128,8 +138,10 @@ PrsmPtr LocalProcessor::processOnePrsm(PrsmPtr prsm) {
     double mass = prsm->getProteoformPtr()->getMassShiftPtrVec(AlterType::UNEXPECTED)[0]->getMassShift();
     // if the mass shift is between [-1, 1], we don't characterize it
     if (std::abs(mass) <= 1 + err_tole) return prsm;
+    //LOG_DEBUG("start one mass shift analysis");
     return processOneMassShift(prsm);
   } else if (mass_shift_num == 2) {
+    //LOG_DEBUG("start two mass shifts analysis");
     return processTwoMassShifts(prsm);
   }
   return prsm;
@@ -141,6 +153,7 @@ PrsmPtr LocalProcessor::processOneMassShift(PrsmPtr prsm) {
                                                        mng_ptr_->min_mass_);
 
   // we will get a nullptr if the mass shift can't be explained by a known variable ptm
+  LOG_DEBUG("start one known ptm localization")
   ProteoformPtr one_known_proteoform = processOneKnownPtm(prsm);
 
   if (one_known_proteoform != nullptr) {
@@ -157,6 +170,8 @@ PrsmPtr LocalProcessor::processOneMassShift(PrsmPtr prsm) {
   }
 
   // Check if the mass shift can be explained by two common PTMs
+  /*
+  LOG_DEBUG("start two known ptm localization")
   ProteoformPtr two_known_proteoform = processTwoKnownPtms(prsm);
 
   if (two_known_proteoform != nullptr) {
@@ -171,6 +186,7 @@ PrsmPtr LocalProcessor::processOneMassShift(PrsmPtr prsm) {
       return prsm;
     }
   }
+  */
   return prsm;
 }
 
@@ -245,11 +261,15 @@ ProteoformPtr LocalProcessor::processOneKnownPtm(PrsmPtr prsm_ptr) {
   ProteoformPtr best_form_ptr = nullptr;
   PtmPtr best_ptm_ptr = nullptr;
 
+  LOG_DEBUG("form number " << cand_form_vec.size());
   for (size_t i = 0; i < cand_form_vec.size(); i++) {
     ProteoformPtr cand_form_ptr = cand_form_vec[i];
     double unexp_shift_mass = adjust_prec_mass - cand_form_ptr->getMass(); 
+    //LOG_DEBUG(cand_form_ptr->getProteinMatchSeq());
+    //LOG_DEBUG(std::setprecision(10) << "adjust prec mass " << adjust_prec_mass << " form mass " << cand_form_ptr->getMass());
     // Get candidate Ptms with similar mass shifts
     PtmPtrVec match_ptm_ptr_vec = local_util::getPtmPtrVecByMass(unexp_shift_mass, err_tole, ptm_ptr_vec_);
+    LOG_DEBUG("ptm number " << match_ptm_ptr_vec.size() << " shift " << unexp_shift_mass);
 
     // if there is a match, find the best ptm and its best similarity score
     for (size_t j = 0; j < match_ptm_ptr_vec.size(); j++) {
@@ -340,7 +360,7 @@ ProteoformPtr LocalProcessor::processTwoKnownPtms(PrsmPtr prsm_ptr) {
     // Check if the unexpected mass shift can be explained by a PTM
     // sum of all expected shift values, in most cases, there is only one unexpected shift
     double unexp_shift_mass = adjust_prec_mass - cand_form_ptr->getMass(); 
-    LOG_DEBUG("Get PTM by Mass");
+    //LOG_DEBUG("Get PTM by Mass");
     // Get candidate Ptm pairs with similar mass shifts
     PtmPairVec ptm_pair_vec = local_util::getPtmPairVecByMass(unexp_shift_mass, err_tole, ptm_pair_vec_);
 

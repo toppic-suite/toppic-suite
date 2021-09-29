@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <numeric>
 
+#include "common/util/logger.hpp"
 #include "common/base/residue_base.hpp"
 #include "common/base/mass_constant.hpp"
 #include "ms/factory/extend_ms_util.hpp"
@@ -144,7 +145,7 @@ std::vector<int> compPrefScore(std::vector<int> & row) {
 std::vector<int> compSuffScore(std::vector<int> & row) {
   std::vector<int> result(row.size(), 0);
   int total_score = 0;
-  for (size_t i = row.size() - 1; i >=0; i--) {
+  for (int i = row.size() - 1; i >=0; i--) {
     total_score = total_score + row[i];
     result[i] = total_score; 
   }
@@ -159,44 +160,56 @@ void compOnePtmSTable(std::vector<int> &s_table, ProteoformPtr form_ptr,
   std::vector<int> row_1(len + 1, 0);
   std::vector<int> row_2(len + 1, 0);
 
+  LOG_DEBUG("s table 1");
   BpSpecPtr bp_spec_ptr = form_ptr->getBpSpecPtr();
   std::vector<double> prm_masses = bp_spec_ptr->getPrmMasses();
   std::vector<double> srm_masses = bp_spec_ptr->getSrmMasses();
+  LOG_DEBUG("prm size " << prm_masses.size() << " len " << len);
+  LOG_DEBUG("srm size " << srm_masses.size() << " len " << len);
   // sort srm in the decreasing order
   std::sort(srm_masses.begin(), srm_masses.end(), std::greater<double>());
   PeakTolerancePtr tole_ptr = mng_ptr->peak_tole_ptr_;
 
+  LOG_DEBUG("s table 2");
   int shift_mass = ptm_ptr->getMonoMass();
   for (size_t i = 0; i < extend_ms_ptr_vec.size(); i++) {
     std::vector<double> ms_masses = extend_ms_util::getExtendMassVec(extend_ms_ptr_vec[i]);
+    LOG_DEBUG("s table 2.1");
     // updated Match table using prm masses 
     double n_shift = extend_ms_ptr_vec[i]->getMsHeaderPtr()->getActivationPtr()->getNShift();
     std::vector<int> row_1_n(len + 1, 0);
     local_util::compMTable(prm_masses, n_shift, ms_masses, tole_ptr, row_1_n);
     local_util::addTwoVectors(row_1, row_1_n);
 
+    LOG_DEBUG("s table 2.2");
     std::vector<int> row_2_n(len + 1, 0);
     local_util::compMTable(prm_masses, n_shift + shift_mass, ms_masses, tole_ptr, row_2_n);  
     local_util::addTwoVectors(row_2, row_2_n);
 
+    LOG_DEBUG("s table 2.3");
     // updated Match table using srm masses 
     double c_shift = extend_ms_ptr_vec[i]->getMsHeaderPtr()->getActivationPtr()->getCShift();
     std::vector<int> row_1_c(len + 1, 0);
     local_util::compMTable(srm_masses, c_shift + shift_mass, ms_masses, tole_ptr, row_1_c);  
     local_util::addTwoVectors(row_1, row_1_c);
 
+    LOG_DEBUG("s table 2.4");
     std::vector<int> row_2_c(len + 1, 0);
     local_util::compMTable(srm_masses, c_shift, ms_masses, tole_ptr, row_2_c);  
     local_util::addTwoVectors(row_2, row_2_c);
   }
 
+  LOG_DEBUG("s table 3");
   std::vector<int> n_prec_score = local_util::compPrefScore(row_1);
+  LOG_DEBUG("prec_score size " << n_prec_score.size() << " len " << len);
   std::vector<int> c_suff_score = local_util::compSuffScore(row_2);
+  LOG_DEBUG("suff score size " << c_suff_score.size() << " len " << len);
 
   // get result table
   for (int i = 0; i < len; i++) {
     s_table.push_back(n_prec_score[i] + c_suff_score[i+1]);
   }
+  LOG_DEBUG("s table 4");
 }
 
 void compTwoPtmMTable(std::vector<std::vector<int>> &s_table, ProteoformPtr form_ptr, 
