@@ -31,7 +31,7 @@ void DeconvJsonMerge::process() {
   std::vector<std::string> ms2_folder_names;
   for (size_t i = 0; i < spec_file_names_.size(); i++) { 
     std::string file_name = file_util::basename(spec_file_names_[i]);
-    std::string base_name = file_name.substr(0, file_name.length() - 6);
+    std::string base_name = file_name.substr(0, file_name.length() - 4);
     std::string ms1_folder = base_name + "_html" 
         + file_util::getFileSeparator()
         + "topfd" + file_util::getFileSeparator() + "ms1_json";
@@ -48,6 +48,9 @@ void DeconvJsonMerge::process() {
   std::string ms2_output_folder = output_file_name_ + "_html" 
       + file_util::getFileSeparator() 
       + "topfd" + file_util::getFileSeparator() + "ms2_json";
+
+  std::cout << "folder_name: " << ms1_folder_names[0] << std::endl;
+  std::cout << "folder_name: " << ms2_folder_names[0] << std::endl;
 
   if (file_util::exists(ms1_folder_names[0])) {
     mergeFiles(ms1_folder_names, ms1_output_folder, 
