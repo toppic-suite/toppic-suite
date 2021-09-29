@@ -18,7 +18,6 @@
 #include "common/base/ptm.hpp"
 #include "prsm/prsm.hpp"
 #include "stat/local/local_mng.hpp"
-#include "stat/local/local_result.hpp"
 
 namespace toppic {
 

@@ -51,44 +51,45 @@ void compTwoPtmMTable(std::vector<std::vector<int>> &s_table, ProteoformPtr form
                       const ExtendMsPtrVec & extend_ms_ptr_vec,
                       PtmPtr ptm_ptr_1, PtmPtr ptm_ptr_2, LocalMngPtr mng_ptr); 
 
-//
-void compSupPeakNum(ProteoformPtr proteoform, const ExtendMsPtrVec & extend_ms_ptr_vec,
-                    MassShiftPtr mass_shift, double min_mass, int & left, int & right);
-
-void ptmMassAdjust(double & mass1, double & mass2, PtmPtr p1, PtmPtr p2);
-
-void fillTableB(std::vector<std::vector<double>> & b_table, double mass1, double mass2);
-
-void compNumMatch(const std::vector<double> & b, std::vector<int> & s,
-                  const ExtendMsPtr & extend_ms_ptr, double prec_mass);
-
-void fillTableS(std::vector<std::vector<double> > & b_table,
-                std::vector<std::vector<int> > & s_table,
-                ExtendMsPtr extend_ms_ptr, double prec_mass);
-
-void updateSTable(const std::vector<double> &ori_theo_masses, double shift, 
-                  const std::vector<double> &exp_masses, 
-                  PeakTolerancePtr tole_ptr,  
-                  std::vector<int> &s_table); 
-
-std::vector<double> geneNTheoMass(ProteoformPtr proteoform, ExtendMsPtr extend_ms_ptr_vec,
-                                  double min_mass);
-
-
-MassShiftPtrVec copyMassShiftVec(const MassShiftPtrVec & mass_shift_vec);
-
-// Sum up the shift values of unexpected modifications
-double compMassShift(const MassShiftPtrVec & mass_shift_vec);
-
-// Generate a new mass shift instance using the left bp pos, right bp pos of
-// the argument "shift" and the shift value as the argument "mass"
-MassShiftPtr geneMassShift(MassShiftPtr shift, double mass, AlterTypePtr type);
-
-MassShiftPtr geneMassShift(int left_pos, int right_pos, double mass, AlterTypePtr type); 
-
 void normalize(std::vector<double> & scr);
 
 int compMatchFragNum(ProteoformPtr proteoform_ptr, const ExtendMsPtrVec &ms_ptr_vec, double min_mass);
+
+//
+//void compSupPeakNum(ProteoformPtr proteoform, const ExtendMsPtrVec & extend_ms_ptr_vec,
+//                    MassShiftPtr mass_shift, double min_mass, int & left, int & right);
+
+//void ptmMassAdjust(double & mass1, double & mass2, PtmPtr p1, PtmPtr p2);
+
+//void fillTableB(std::vector<std::vector<double>> & b_table, double mass1, double mass2);
+
+//void compNumMatch(const std::vector<double> & b, std::vector<int> & s,
+//                  const ExtendMsPtr & extend_ms_ptr, double prec_mass);
+
+//void fillTableS(std::vector<std::vector<double> > & b_table,
+//                std::vector<std::vector<int> > & s_table,
+//                ExtendMsPtr extend_ms_ptr, double prec_mass);
+
+//void updateSTable(const std::vector<double> &ori_theo_masses, double shift, 
+//                  const std::vector<double> &exp_masses, 
+//                  PeakTolerancePtr tole_ptr,  
+//                  std::vector<int> &s_table); 
+
+//std::vector<double> geneNTheoMass(ProteoformPtr proteoform, ExtendMsPtr extend_ms_ptr_vec,
+//                                  double min_mass);
+
+
+//MassShiftPtrVec copyMassShiftVec(const MassShiftPtrVec & mass_shift_vec);
+
+// Sum up the shift values of unexpected modifications
+//double compMassShift(const MassShiftPtrVec & mass_shift_vec);
+
+// Generate a new mass shift instance using the left bp pos, right bp pos of
+// the argument "shift" and the shift value as the argument "mass"
+//MassShiftPtr geneMassShift(MassShiftPtr shift, double mass, AlterTypePtr type);
+
+//MassShiftPtr geneMassShift(int left_pos, int right_pos, double mass, AlterTypePtr type); 
+
 
 }  // namespace local_util
 

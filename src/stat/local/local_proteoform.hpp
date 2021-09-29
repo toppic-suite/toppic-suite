@@ -19,7 +19,6 @@
 #include "seq/fasta_seq.hpp"
 #include "seq/proteoform.hpp"
 #include "stat/local/local_mng.hpp"
-#include "stat/local/local_result.hpp"
 
 namespace toppic {
 
