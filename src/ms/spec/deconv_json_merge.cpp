@@ -49,9 +49,6 @@ void DeconvJsonMerge::process() {
       + file_util::getFileSeparator() 
       + "topfd" + file_util::getFileSeparator() + "ms2_json";
 
-  std::cout << "folder_name: " << ms1_folder_names[0] << std::endl;
-  std::cout << "folder_name: " << ms2_folder_names[0] << std::endl;
-
   if (file_util::exists(ms1_folder_names[0])) {
     mergeFiles(ms1_folder_names, ms1_output_folder, 
                SpPara::getMaxSpecNumPerFile()); 
