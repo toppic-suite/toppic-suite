@@ -14,6 +14,7 @@
 
 #include <algorithm>
 #include <numeric>
+#include <iomanip>
 
 #include "common/util/logger.hpp"
 #include "common/base/residue_base.hpp"
@@ -132,6 +133,14 @@ void addTwoVectors(std::vector<int> &row_1, std::vector<int> &row_2) {
   }
 }
 
+void addReverseTwoVectors(std::vector<int> &row_1, std::vector<int> &row_2) {
+  int len = row_1.size();
+  for (size_t i = 0; i < row_1.size(); i++) {
+    row_1[i] = row_1[i] + row_2[len - 1 - i];
+  }
+}
+
+
 std::vector<int> compPrefScore(std::vector<int> & row) {
   std::vector<int> result(row.size(), 0);
   int total_score = 0;
@@ -160,56 +169,73 @@ void compOnePtmSTable(std::vector<int> &s_table, ProteoformPtr form_ptr,
   std::vector<int> row_1(len + 1, 0);
   std::vector<int> row_2(len + 1, 0);
 
-  LOG_DEBUG("s table 1");
+  //LOG_DEBUG("s table 1");
   BpSpecPtr bp_spec_ptr = form_ptr->getBpSpecPtr();
   std::vector<double> prm_masses = bp_spec_ptr->getPrmMasses();
+  // srm is in the increasing order 
   std::vector<double> srm_masses = bp_spec_ptr->getSrmMasses();
-  LOG_DEBUG("prm size " << prm_masses.size() << " len " << len);
-  LOG_DEBUG("srm size " << srm_masses.size() << " len " << len);
-  // sort srm in the decreasing order
-  std::sort(srm_masses.begin(), srm_masses.end(), std::greater<double>());
+  //LOG_DEBUG("prm size " << prm_masses.size() << " len " << len);
+  //LOG_DEBUG("srm size " << srm_masses.size() << " len " << len);
   PeakTolerancePtr tole_ptr = mng_ptr->peak_tole_ptr_;
 
-  LOG_DEBUG("s table 2");
-  int shift_mass = ptm_ptr->getMonoMass();
+  double shift_mass = ptm_ptr->getMonoMass();
   for (size_t i = 0; i < extend_ms_ptr_vec.size(); i++) {
     std::vector<double> ms_masses = extend_ms_util::getExtendMassVec(extend_ms_ptr_vec[i]);
-    LOG_DEBUG("s table 2.1");
     // updated Match table using prm masses 
-    double n_shift = extend_ms_ptr_vec[i]->getMsHeaderPtr()->getActivationPtr()->getNShift();
+    double n_shift = extend_ms_ptr_vec[i]->getMsHeaderPtr()->getActivationPtr()->getN_BYShift();
+    //LOG_DEBUG("n shift " << n_shift << " shift " << shift_mass);
     std::vector<int> row_1_n(len + 1, 0);
     local_util::compMTable(prm_masses, n_shift, ms_masses, tole_ptr, row_1_n);
     local_util::addTwoVectors(row_1, row_1_n);
 
-    LOG_DEBUG("s table 2.2");
     std::vector<int> row_2_n(len + 1, 0);
     local_util::compMTable(prm_masses, n_shift + shift_mass, ms_masses, tole_ptr, row_2_n);  
     local_util::addTwoVectors(row_2, row_2_n);
+    /*
+    for (int j = 0; j < len+1; j++) {
+      LOG_DEBUG(std::setprecision(8) << " first row prefix " << j << " " << row_1_n[j] << " " << (prm_masses[j] + n_shift) << " " << row_1[j]);
+    }
+    */
 
-    LOG_DEBUG("s table 2.3");
     // updated Match table using srm masses 
-    double c_shift = extend_ms_ptr_vec[i]->getMsHeaderPtr()->getActivationPtr()->getCShift();
+    double c_shift = extend_ms_ptr_vec[i]->getMsHeaderPtr()->getActivationPtr()->getC_BYShift() 
+      + mass_constant::getWaterMass();
+    //ActivationPtr act_ptr = extend_ms_ptr_vec[i]->getMsHeaderPtr()->getActivationPtr();
+    //LOG_DEBUG("activation type " << act_ptr->getName());
+    //LOG_DEBUG(std::setprecision(8) << "c shift " << c_shift);
     std::vector<int> row_1_c(len + 1, 0);
+    LOG_DEBUG(std::setprecision(8) << "c shift " << c_shift);
     local_util::compMTable(srm_masses, c_shift + shift_mass, ms_masses, tole_ptr, row_1_c);  
-    local_util::addTwoVectors(row_1, row_1_c);
+    local_util::addReverseTwoVectors(row_1, row_1_c);
 
-    LOG_DEBUG("s table 2.4");
     std::vector<int> row_2_c(len + 1, 0);
     local_util::compMTable(srm_masses, c_shift, ms_masses, tole_ptr, row_2_c);  
-    local_util::addTwoVectors(row_2, row_2_c);
+    local_util::addReverseTwoVectors(row_2, row_2_c);
+    /*
+    for (int j = 0; j < len+1; j++) {
+      LOG_DEBUG(std::setprecision(8) << " first row suffix " << j << " " << row_1_c[len+ 1 - j] << " " << (srm_masses[len+1 - j] + c_shift + shift_mass) << " " << row_1[j]);
+    }
+    */
   }
 
-  LOG_DEBUG("s table 3");
   std::vector<int> n_prec_score = local_util::compPrefScore(row_1);
-  LOG_DEBUG("prec_score size " << n_prec_score.size() << " len " << len);
+  //LOG_DEBUG("prec_score size " << n_prec_score.size() << " len " << len);
   std::vector<int> c_suff_score = local_util::compSuffScore(row_2);
-  LOG_DEBUG("suff score size " << c_suff_score.size() << " len " << len);
+  //LOG_DEBUG("suff score size " << c_suff_score.size() << " len " << len);
+  /*
+  for (int j = 0; j < len+1; j++) {
+    LOG_DEBUG(std::setprecision(8) << " prec_score  " << j << " " << n_prec_score[j]);
+  }
+
+  for (int j = 0; j < len+1; j++) {
+    LOG_DEBUG(std::setprecision(8) << " suff_score  " << j << " " << c_suff_score[j]);
+  }
+  */
 
   // get result table
   for (int i = 0; i < len; i++) {
     s_table.push_back(n_prec_score[i] + c_suff_score[i+1]);
   }
-  LOG_DEBUG("s table 4");
 }
 
 void compTwoPtmMTable(std::vector<std::vector<int>> &s_table, ProteoformPtr form_ptr, 
@@ -229,13 +255,13 @@ void compTwoPtmMTable(std::vector<std::vector<int>> &s_table, ProteoformPtr form
   std::sort(srm_masses.begin(), srm_masses.end(), std::greater<double>());
   PeakTolerancePtr tole_ptr = mng_ptr->peak_tole_ptr_;
 
-  int mass_1 = ptm_ptr_1->getMonoMass();
-  int mass_2 = ptm_ptr_2->getMonoMass();
+  double mass_1 = ptm_ptr_1->getMonoMass();
+  double mass_2 = ptm_ptr_2->getMonoMass();
 
   for (size_t i = 0; i < extend_ms_ptr_vec.size(); i++) {
     std::vector<double> ms_masses = extend_ms_util::getExtendMassVec(extend_ms_ptr_vec[i]);
     // updated S table using prm masses 
-    double n_shift = extend_ms_ptr_vec[i]->getMsHeaderPtr()->getActivationPtr()->getNShift();
+    double n_shift = extend_ms_ptr_vec[i]->getMsHeaderPtr()->getActivationPtr()->getN_BYShift();
     std::vector<int> row_1_n(len + 1, 0);
     compMTable(prm_masses, n_shift, ms_masses, tole_ptr, row_1_n);
     addTwoVectors(s_table[0], row_1_n);
@@ -249,7 +275,8 @@ void compTwoPtmMTable(std::vector<std::vector<int>> &s_table, ProteoformPtr form
     addTwoVectors(s_table[2], row_3_n);
 
     // updated S table using srm masses 
-    double c_shift = extend_ms_ptr_vec[i]->getMsHeaderPtr()->getActivationPtr()->getCShift();
+    double c_shift = extend_ms_ptr_vec[i]->getMsHeaderPtr()->getActivationPtr()->getC_BYShift()
+          + mass_constant::getWaterMass();
     std::vector<int> row_1_c(len + 1, 0);
     compMTable(srm_masses, c_shift + mass_1 + mass_2, ms_masses, tole_ptr, row_1_c);  
     addTwoVectors(s_table[0], row_1_c);

@@ -31,9 +31,9 @@ class Activation {
 
   std::string getName() {return name_;}
 
-  double getNShift() {return n_ion_type_ptr_->getBYShift();}
+  double getN_BYShift() {return n_ion_type_ptr_->getBYShift();}
 
-  double getCShift() {return c_ion_type_ptr_->getBYShift();}
+  double getC_BYShift() {return c_ion_type_ptr_->getBYShift();}
 
   IonTypePtr getNIonTypePtr() {return n_ion_type_ptr_;}
 

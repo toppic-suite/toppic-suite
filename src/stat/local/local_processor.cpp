@@ -103,16 +103,17 @@ void LocalProcessor::process() {
           = extend_ms_factory::geneMsThreePtrVec(deconv_ms_ptr_vec, sp_para_ptr, new_prec_mass);
         prsm_ptr->setRefineMsVec(extend_ms_ptr_vec);
 
-        if (spec_id == 201) { 
+        /*
+        if (spec_id == 315) { 
           logger::log_level=2;
         }
         else {
           logger::log_level=5;
-          if (spec_id > 201) {
+          if (spec_id > 316) {
             exit(EXIT_FAILURE);
           }
         }
-
+        */
         
         if (prsm_ptr->getProteoformPtr()->getMassShiftNum(AlterType::UNEXPECTED) > 0) {
           //LOG_DEBUG("Start localization");
@@ -153,7 +154,6 @@ PrsmPtr LocalProcessor::processOneMassShift(PrsmPtr prsm) {
                                                        mng_ptr_->min_mass_);
 
   // we will get a nullptr if the mass shift can't be explained by a known variable ptm
-  LOG_DEBUG("start one known ptm localization")
   ProteoformPtr one_known_proteoform = processOneKnownPtm(prsm);
 
   if (one_known_proteoform != nullptr) {
@@ -261,7 +261,7 @@ ProteoformPtr LocalProcessor::processOneKnownPtm(PrsmPtr prsm_ptr) {
   ProteoformPtr best_form_ptr = nullptr;
   PtmPtr best_ptm_ptr = nullptr;
 
-  LOG_DEBUG("form number " << cand_form_vec.size());
+  //LOG_DEBUG("form number " << cand_form_vec.size());
   for (size_t i = 0; i < cand_form_vec.size(); i++) {
     ProteoformPtr cand_form_ptr = cand_form_vec[i];
     double unexp_shift_mass = adjust_prec_mass - cand_form_ptr->getMass(); 
@@ -269,13 +269,14 @@ ProteoformPtr LocalProcessor::processOneKnownPtm(PrsmPtr prsm_ptr) {
     //LOG_DEBUG(std::setprecision(10) << "adjust prec mass " << adjust_prec_mass << " form mass " << cand_form_ptr->getMass());
     // Get candidate Ptms with similar mass shifts
     PtmPtrVec match_ptm_ptr_vec = local_util::getPtmPtrVecByMass(unexp_shift_mass, err_tole, ptm_ptr_vec_);
-    LOG_DEBUG("ptm number " << match_ptm_ptr_vec.size() << " shift " << unexp_shift_mass);
+    //LOG_DEBUG("ptm number " << match_ptm_ptr_vec.size() << " shift " << unexp_shift_mass);
 
     // if there is a match, find the best ptm and its best similarity score
     for (size_t j = 0; j < match_ptm_ptr_vec.size(); j++) {
       PtmPtr ptm_ptr = match_ptm_ptr_vec[j];
       // compute similarity score for each possible site of the PTM
       int score = compOnePtmScr(cand_form_ptr, extend_ms_ptr_vec, ptm_ptr); 
+      //LOG_DEBUG("score " << score);
       if (score > best_match_score) {
         best_match_score = score;
         best_form_ptr = cand_form_ptr;
@@ -302,10 +303,12 @@ int LocalProcessor::compOnePtmScr(ProteoformPtr base_form_ptr,
   int len = base_form_ptr->getLen();
   // score table with size len  
   std::vector<int> s_table;
+  //LOG_DEBUG("ptm mass " << ptm_ptr->getMonoMass());
   local_util::compOnePtmSTable(s_table, base_form_ptr, extend_ms_ptr_vec, ptm_ptr, mng_ptr_);
 
   int max_score = 0;
   for (int i = 0; i < len; i++) {
+    LOG_DEBUG(i << " " << s_table[i]);
     if (modifiable(base_form_ptr, i, ptm_ptr) && s_table[i] > max_score) {
       max_score = s_table[i];
     }

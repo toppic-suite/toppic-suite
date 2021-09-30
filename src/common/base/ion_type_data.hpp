@@ -29,7 +29,7 @@ std::string ion_type_base_data = R"(
 <ion_type>
 	<name>Y</name>
 	<n_term>false</n_term>
-	<shift>18.0106</shift>
+	<shift>18.01056468362</shift>
 </ion_type>
 <ion_type>
 	<name>C</name>
