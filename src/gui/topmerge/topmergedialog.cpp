@@ -284,6 +284,11 @@ std::map<std::string, std::string> TopMergeDialog::getArguments() {
   } else {
     arguments_["keepDecoyResults"] = "false";
   }
+  if (ui->geneHTMLCheckBox->isChecked()) {
+    arguments_["geneHTMLFolder"] = "true";
+  } else {
+    arguments_["geneHTMLFolder"] = "false";
+  }
   return arguments_;
 }
 std::vector<std::string> TopMergeDialog::getSpecFileList() {
