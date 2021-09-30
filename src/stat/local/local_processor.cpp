@@ -104,19 +104,18 @@ void LocalProcessor::process() {
         prsm_ptr->setRefineMsVec(extend_ms_ptr_vec);
 
         /*
-        if (spec_id == 315) { 
+        if (spec_id == 322) { 
           logger::log_level=2;
         }
         else {
           logger::log_level=5;
-          if (spec_id > 316) {
+          if (spec_id > 322) {
             exit(EXIT_FAILURE);
           }
         }
+        std::cout << "spectrum id " << spec_id << std::endl;
         */
-        
         if (prsm_ptr->getProteoformPtr()->getMassShiftNum(AlterType::UNEXPECTED) > 0) {
-          //LOG_DEBUG("Start localization");
           prsm_ptr = processOnePrsm(prsm_ptr);
         }
 
@@ -170,7 +169,6 @@ PrsmPtr LocalProcessor::processOneMassShift(PrsmPtr prsm) {
   }
 
   // Check if the mass shift can be explained by two common PTMs
-  /*
   LOG_DEBUG("start two known ptm localization")
   ProteoformPtr two_known_proteoform = processTwoKnownPtms(prsm);
 
@@ -178,6 +176,8 @@ PrsmPtr LocalProcessor::processOneMassShift(PrsmPtr prsm) {
     double new_num_match_ion = local_util::compMatchFragNum(two_known_proteoform,
                                                             prsm->getRefineMsPtrVec(),
                                                             mng_ptr_->min_mass_);
+    //LOG_DEBUG("orig score " << ori_num_match_ion << " new match num " << new_num_match_ion);
+    //LOG_DEBUG("two known form " << two_known_proteoform->getProteinMatchSeq());
     if (new_num_match_ion > ori_num_match_ion - mng_ptr_->DESC_MATCH_LIMIT_
         && new_num_match_ion > ori_num_match_ion * mng_ptr_->desc_ratio_) {
       two_known_proteoform->setProteoClusterId(prsm->getProteoformPtr()->getProteoClusterId());
@@ -186,7 +186,6 @@ PrsmPtr LocalProcessor::processOneMassShift(PrsmPtr prsm) {
       return prsm;
     }
   }
-  */
   return prsm;
 }
 
@@ -265,7 +264,6 @@ ProteoformPtr LocalProcessor::processOneKnownPtm(PrsmPtr prsm_ptr) {
   for (size_t i = 0; i < cand_form_vec.size(); i++) {
     ProteoformPtr cand_form_ptr = cand_form_vec[i];
     double unexp_shift_mass = adjust_prec_mass - cand_form_ptr->getMass(); 
-    //LOG_DEBUG(cand_form_ptr->getProteinMatchSeq());
     //LOG_DEBUG(std::setprecision(10) << "adjust prec mass " << adjust_prec_mass << " form mass " << cand_form_ptr->getMass());
     // Get candidate Ptms with similar mass shifts
     PtmPtrVec match_ptm_ptr_vec = local_util::getPtmPtrVecByMass(unexp_shift_mass, err_tole, ptm_ptr_vec_);
@@ -308,7 +306,7 @@ int LocalProcessor::compOnePtmScr(ProteoformPtr base_form_ptr,
 
   int max_score = 0;
   for (int i = 0; i < len; i++) {
-    LOG_DEBUG(i << " " << s_table[i]);
+    //LOG_DEBUG(i << " " << s_table[i]);
     if (modifiable(base_form_ptr, i, ptm_ptr) && s_table[i] > max_score) {
       max_score = s_table[i];
     }
@@ -378,9 +376,20 @@ ProteoformPtr LocalProcessor::processTwoKnownPtms(PrsmPtr prsm_ptr) {
     }
   }
 
-  int ori_match_score = prsm_ptr->getMatchPeakNum();
+  LOG_DEBUG("best_match_score " << best_match_score);
+  if (best_form_ptr != nullptr) {
+    LOG_DEBUG(best_form_ptr->getProteinMatchSeq());
+  }
+  if (best_ptm_pair.first != nullptr) {
+    LOG_DEBUG(best_ptm_pair.first->getName());
+  }
+  if (best_ptm_pair.second != nullptr) {
+    LOG_DEBUG(best_ptm_pair.second->getName());
+  }
 
-  if (best_match_score == 0 
+
+  int ori_match_score = prsm_ptr->getMatchPeakNum();
+  if (best_match_score <= 0 
       || best_match_score < ori_match_score - mng_ptr_->DESC_MATCH_LIMIT_
       || best_match_score < ori_match_score * mng_ptr_->desc_ratio_) {
     return nullptr;
@@ -406,19 +415,24 @@ int LocalProcessor::compTwoPtmScr(ProteoformPtr form_ptr, const ExtendMsPtrVec &
   // fill D(f, g)
   int d_table[3][len + 1];
   memset(d_table, 0, sizeof(int) * 3 * (len + 1));
-  d_table[0][0] = 1;
+  d_table[0][0] = 0;
+  d_table[1][0] = std::numeric_limits<int>::min();
+  d_table[2][0] = std::numeric_limits<int>::min();
 
   // layer 0
   for (int i = 1; i <= len; i++) {
     d_table[0][i] = d_table[0][i-1] + m_table[0][i];
+    //LOG_DEBUG("row 1 " << i << " " << d_table[0][i]);
   }
 
   // layer 1
   for (int i = 1; i <= len; i++) {
     d_table[1][i] = d_table[1][i-1] + m_table[1][i];
     if (modifiable(form_ptr, i - 1, ptm_ptr_1) && d_table[0][i-1] > d_table[1][i-1]) {
+      //LOG_DEBUG("MODIFY" << i );
       d_table[1][i] = d_table[0][i-1] + m_table[1][i];
     }
+    //LOG_DEBUG("row 2 " << i << " " << d_table[1][i]);
   }
 
   // layer 2
@@ -449,6 +463,7 @@ ProteoformPtr LocalProcessor::twoPtmLocalize(ProteoformPtr form_ptr, const Exten
     for (int end = bgn ; end < len + 1; end++) {
       total_score = total_score + m_table[1][end]; 
       mid_scores[bgn][end] = total_score;
+      //LOG_DEBUG("mid score " << bgn << " " << end << " " << total_score);
     }
   }
   std::vector<int> ptm_1_pos_list;
@@ -456,18 +471,19 @@ ProteoformPtr LocalProcessor::twoPtmLocalize(ProteoformPtr form_ptr, const Exten
   for (int i = 0; i < len; i++) {
     if (modifiable(form_ptr, i, ptm_ptr_1)) {
       ptm_1_pos_list.push_back(i);
+      LOG_DEBUG("ptm 1 pos " << i);
     }
     if (modifiable(form_ptr, i, ptm_ptr_2)) {
       ptm_2_pos_list.push_back(i);
     }
   }
 
-  int a_table[len][len];
-  std::fill((int *)a_table, (int *)a_table + (len*len), 0);
   double b_table[len][len];
-  double zero = 0.0;
-  std::fill((double *)b_table, (double *)b_table + (len*len), zero);
-
+  for (int i = 0; i < len; i++) {
+    for (int j = 0; j < len; j++) {
+      b_table[i][j] = 0.0;
+    }
+  }
   double total_prob = 0.0;
   for (size_t i = 0; i < ptm_1_pos_list.size(); i++) {
     int pos_1 = ptm_1_pos_list[i];
@@ -475,9 +491,9 @@ ProteoformPtr LocalProcessor::twoPtmLocalize(ProteoformPtr form_ptr, const Exten
       int pos_2 = ptm_2_pos_list[j];
       if (pos_2 > pos_1) {
         int score = n_term_scores[pos_1] + c_term_scores[pos_2 + 1] + mid_scores[pos_1+1][pos_2];
-        a_table[pos_1][pos_2] = score;
         b_table[pos_1][pos_2] = std::pow(mng_ptr_->prob_ratio_, score); 
-        total_prob = b_table[pos_1][pos_2];
+        total_prob = total_prob + b_table[pos_1][pos_2];
+        LOG_DEBUG("pos " << pos_1 << " " << pos_2 << " " << score << " " << b_table[pos_1][pos_2] << " " << total_prob);
       }
     }
   }
@@ -514,16 +530,22 @@ ProteoformPtr LocalProcessor::twoPtmLocalize(ProteoformPtr form_ptr, const Exten
       s = s - b_table[i][col];
     }
     break_scores.push_back(s);
+    //LOG_DEBUG("break score " << pos << " " << s);
   }
   int best_break_pos = std::distance(break_scores.begin(), std::max_element(break_scores.begin(), break_scores.end()));
+  LOG_DEBUG("break pos " << best_break_pos);
 
   // get two score vectors
   std::vector<double> scr_vec_1 (len, 0);
   for (size_t i = 0; i < ptm_1_pos_list.size(); i++) {
     int pos_1 = ptm_1_pos_list[i];
-    int pos_scr = 0;
-    for (size_t j = ptm_2_pos_list.size() - 1; j >= 0;  j--) {
+    if (pos_1 > best_break_pos) {
+      break;
+    }
+    double pos_scr = 0;
+    for (int j = ptm_2_pos_list.size() - 1; j >= 0;  j--) {
       int pos_2 = ptm_2_pos_list[j];
+      //LOG_DEBUG("pos 1 " << pos_1 << " pos 2 " << pos_2 << " " << b_table[pos_1][pos_2] << " " << pos_scr);
       if (pos_2 > pos_1 && pos_2 > best_break_pos) {
         pos_scr = pos_scr + b_table[pos_1][pos_2];
       }
@@ -532,11 +554,15 @@ ProteoformPtr LocalProcessor::twoPtmLocalize(ProteoformPtr form_ptr, const Exten
       }
     }
     scr_vec_1[pos_1] = pos_scr;
+    //LOG_DEBUG("scr vec one  " << pos_1 << " " << pos_scr);
   }
   std::vector<double> scr_vec_2 (len, 0);
   for (size_t j = 0; j < ptm_2_pos_list.size(); j++) {
     int pos_2 = ptm_2_pos_list[j];
-    int pos_scr = 0;
+    if (pos_2 <= best_break_pos) {
+      continue; 
+    }
+    double pos_scr = 0;
     for (size_t i = 0; i < ptm_1_pos_list.size(); i++) {
       int pos_1 = ptm_1_pos_list[i];
       if (pos_1 < pos_2 && pos_1 <= best_break_pos) {
@@ -547,6 +573,7 @@ ProteoformPtr LocalProcessor::twoPtmLocalize(ProteoformPtr form_ptr, const Exten
       }
     }
     scr_vec_2[pos_2] = pos_scr;
+    //LOG_DEBUG("scr vec two  " << pos_2 << " " << pos_scr);
   }
 
   ProteoformPtr local_form_ptr = local_proteoform::createProteoformPtr(form_ptr, match_score, best_break_pos, 
