@@ -429,7 +429,6 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
 
   RawMsGroupPtr ms_group_ptr;
 
-  //ms_group_ptr = reader_ptr->getNextMsGroupPtr();
   ms_group_ptr = reader_ptr->getNextMsGroupPtrWithFaime();
 
   int count = 0;
@@ -456,8 +455,9 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
     ms1_msalign_name = file_util::basename(spec_file_name_) + "_0_ms1.msalign";
     ms2_msalign_name = file_util::basename(spec_file_name_) + "_0_ms2.msalign";
     prepareFileFolder("0_");
+    isFaims_ = true;
   }
-  voltage_vec_.push_back(std::make_pair(ms_group_ptr->getMsOnePtr()->getMsHeaderPtr()->getVoltage(), 0));
+  voltage_vec_.push_back(std::make_pair(ms_group_ptr->getMsOnePtr()->getMsHeaderPtr()->getVoltage(), 0));//don't add voltage to vector if it is non-FAIME 
 
   std::vector<MsAlignWriterPtrVec> all_file_ms1_writer_ptr_vec;
   std::vector<MsAlignWriterPtrVec> all_file_ms2_writer_ptr_vec;
@@ -484,7 +484,6 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
         boost::this_thread::sleep(boost::posix_time::milliseconds(100));
     }
     bool is_new_voltage = true;
-
     //Here we create new Env Para and Dp Para instances to make sure that
     //multiple threads do not share the same parameter instances. 
     EnvParaPtr env_ptr_new = std::make_shared<EnvPara>(*env_para_ptr_.get());
@@ -561,8 +560,7 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
     int parsed_scan = 1 + static_cast<int>((ms_group_ptr->getMsTwoPtrVec()).size());
 
     count += parsed_scan;
-    //ms_group_ptr = reader_ptr->getNextMsGroupPtr();
-    ms_group_ptr = reader_ptr->getNextMsGroupPtrWithFaime();
+    ms_group_ptr = reader_ptr->getNextMsGroupPtrWithFaime();    
   }
   pool_ptr->ShutDown();
 

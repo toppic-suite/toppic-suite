@@ -22,7 +22,7 @@ namespace toppic {
 namespace feature_detect {
 
 void process(int frac_id, const std::string &sp_file_name, 
-             bool miss_level_one, const std::string &resource_dir, const std::string &activation, int msalign_num, const std::vector<std::pair<double, int>> voltage_vec_); 
+             bool miss_level_one, const std::string &resource_dir, const std::string &activation, bool isFaims, const std::vector<std::pair<double, int>> voltage_vec); 
 };
 
 }

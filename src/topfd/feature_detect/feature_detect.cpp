@@ -558,7 +558,7 @@ void getSampleFeatures(SampleFeaturePtrVec &sample_features, FracFeaturePtrVec &
 
 void process(int frac_id, const std::string &sp_file_name, 
              bool missing_level_one, const std::string &resource_dir, const std::string &activation, 
-             int msalign_num, const std::vector<std::pair<double, int>> voltage_vec_) { 
+             bool isFaims, const std::vector<std::pair<double, int>> voltage_vec) { 
   //logger::setLogLevel(2);
   FeatureParaPtr para_ptr 
       = std::make_shared<FeaturePara>(frac_id, sp_file_name, resource_dir);
@@ -567,13 +567,13 @@ void process(int frac_id, const std::string &sp_file_name,
   // read ms1 deconvoluted spectra
   if (!missing_level_one) {
     std::string file_num = "";
-    for (int i = 0; i < msalign_num; i++) {
-      if (msalign_num > 1) {file_num = str_util::toString(i) + "_";} // if FAIME Data
+    for (int i = 0; i < voltage_vec.size(); i++) {
+      if (isFaims) {file_num = str_util::toString(i) + "_";} // if FAIME Data
       DeconvMsPtrVec ms1_ptr_vec;
       FracFeaturePtrVec frac_features;
       std::string ms1_file_name = base_name + "_" + file_num + "ms1.msalign";
       SimpleMsAlignReader::readMsOneSpectra(ms1_file_name, ms1_ptr_vec);
-      double cur_voltage = voltage_vec_[i].first;//if this is -1, it is non-FAIME data
+      double cur_voltage = voltage_vec[i].first;//if this is -1, it is non-FAIME data
       PeakPtrVec2D raw_peaks; 
       RawMsReaderPtr raw_reader_ptr = std::make_shared<RawMsReader>(sp_file_name, activation);
       raw_reader_ptr->getMs1Peaks(raw_peaks, cur_voltage);
