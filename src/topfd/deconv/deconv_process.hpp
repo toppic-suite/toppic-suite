@@ -49,6 +49,8 @@ class DeconvProcess {
   static int ms2_spec_num_;
 
   int msalign_num_ = 1;//number of ms1/ms2 msalign. it is > 1 if FAIME data.   
+  bool isFaims_ = false;//if data is FAIMS data or not
+
   std::vector<std::pair<double, int>> voltage_vec_;  //{voltage, count of scans with that voltage}
   //store voltages that have appeared in the msgroup so far along with the number of scans with that voltage so far
 

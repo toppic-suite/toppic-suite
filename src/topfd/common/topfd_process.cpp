@@ -48,7 +48,7 @@ void processOneFile(TopfdParaPtr para_ptr,
     std::string file_num = "";
 
     for (int i = 0; i < processor.msalign_num_; i++) {
-      if (processor.msalign_num_ > 1) {file_num = str_util::toString(i) + "_";} // if FAIME Data
+      if (processor.isFaims_) {file_num = str_util::toString(i) + "_";} // if FAIME Data
 
       std::string base_name_ms1 = file_util::basename(spec_file_name) + "_" + file_num + "ms1.msalign";
       std::string base_name_ms2 = file_util::basename(spec_file_name) + "_" + file_num + "ms2.msalign";
@@ -70,7 +70,7 @@ void processOneFile(TopfdParaPtr para_ptr,
                             para_ptr->missing_level_one_, 
                             para_ptr->resource_dir_,             
 			                      para_ptr->activation_, 
-                            processor.msalign_num_,
+                            processor.isFaims_,
                             processor.voltage_vec_);
     std::cout << "Feature detection finished." << std::endl;
     
