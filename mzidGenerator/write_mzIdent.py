@@ -1,8 +1,5 @@
 import os
 import sys
-sys.path.append("psims")
-from psims.controlled_vocabulary.vendor import *
-from psims.validation import *
 from psims.mzid import MzIdentMLWriter
 import csv
 import re
