@@ -10,7 +10,7 @@ sudo apt-get install python3.6
 #use pip2 if using python2
 pip3 install lxml
 pip3 install six
-pip3 install sqlalchemy
+pip3 install sqlalchemy==1.3.24
 pip3 install numpy
 pip3 install pyteomics
 ```

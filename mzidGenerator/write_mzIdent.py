@@ -97,7 +97,11 @@ class IdentiPyMzIdentMLWriter(object):
         return spec
     
     def transform_search_modifications(self):#generate a list of ptms used for database search
-        fmods = self.param['Fixed modifications']
+        if 'Fixed modifications' in self.param:
+            fmods = self.param['Fixed modifications']
+        else:
+            fmods = "None"
+            
         modifications = []
 
         #fixed ptm information
@@ -371,12 +375,13 @@ def parse_tsv(path):
                         tmp = row[1]
                         name = row[0].strip()[:-1]
                         parameters[name] = row[1]
-                    except:#fixed ptm file name is not written in tsv format in the toppic used in topmsv server
-                        name = row[0].split(',')[0]
-                        name = name.strip()[:-1]
-                        file_path = (row[0].split(',')[1]) 
+                    except:#skip modification information in tsv
+                        continue
+                        #name = row[0].split(',')[0]
+                        #name = name.strip()[:-1]
+                        #file_path = (row[0].split(',')[1]) 
 
-                        parameters[name] = file_path
+                        #parameters[name] = file_path
                 else:
                     if not isSkip:
                         tmp = {}
@@ -404,4 +409,6 @@ if __name__ == "__main__":
     total_ptm = user_fixed_ptm + ptm_data + common_ptm + var_ptm#all ptm used for sequence annotation
     
     IdentiPyMzIdentMLWriter.write_mzid(param, data, db_data, total_ptm, user_fixed_ptm, var_ptm)
+
+    print("mzidGenerator finished")
 
