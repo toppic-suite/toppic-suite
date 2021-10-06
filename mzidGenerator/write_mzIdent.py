@@ -1,5 +1,4 @@
 import os
-import sys
 from psims.mzid import MzIdentMLWriter
 import csv
 import re
