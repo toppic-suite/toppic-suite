@@ -61,6 +61,9 @@ void addAnnoHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement *anno_element,
 
   str = str_util::toString(proteoform_ptr->getEndPos());
   xml_doc->addElement(anno_element, "last_residue_position", str.c_str());
+
+  str = proteoform_ptr->getProteinMatchSeq();
+  xml_doc->addElement(anno_element, "annotated_seq", str.c_str());
 }
 
 // addKnownPtms for fixed and protein variable PTMs
