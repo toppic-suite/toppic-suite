@@ -113,6 +113,8 @@ class Prsm {
   void setRefineMsVec(ExtendMsPtrVec refine_ms_three_vec) {
     refine_ms_three_vec_ = refine_ms_three_vec;}
 
+  void setAdjustedPrecMass(double new_prec_mass);
+
   // comparion
   static bool cmpEValueInc(const PrsmPtr &a, const PrsmPtr &b) {
     return a->getEValue() < b->getEValue();}

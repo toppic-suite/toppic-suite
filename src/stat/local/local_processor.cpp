@@ -139,6 +139,7 @@ PrsmPtr LocalProcessor::processOneMassShift(PrsmPtr prsm) {
       one_known_proteoform->setProteoClusterId(prsm->getProteoformPtr()->getProteoClusterId());
       one_known_proteoform->setProtId(prsm->getProteoformPtr()->getProtId());
       prsm->setProteoformPtr(one_known_proteoform, mng_ptr_->prsm_para_ptr_->getSpParaPtr());
+      prsm->setAdjustedPrecMass(one_known_proteoform->getMass());
       return prsm;
     }
   }
@@ -173,15 +174,18 @@ PrsmPtr LocalProcessor::processTwoMassShifts(PrsmPtr prsm) {
                                                        prsm->getRefineMsPtrVec(),
                                                        mng_ptr_->min_mass_);
 
-  ProteoformPtr two_known_prsm = processTwoKnownPtms(prsm);
+  ProteoformPtr two_known_proteoform = processTwoKnownPtms(prsm);
 
-  if (two_known_prsm != nullptr) {
-    int new_num_match_ion = local_util::compMatchFragNum(two_known_prsm,
+  if (two_known_proteoform != nullptr) {
+    int new_num_match_ion = local_util::compMatchFragNum(two_known_proteoform,
                                                          prsm->getRefineMsPtrVec(),
                                                          mng_ptr_->min_mass_);
     if (new_num_match_ion > ori_num_match_ion - mng_ptr_->DESC_MATCH_LIMIT_
         && new_num_match_ion > ori_num_match_ion * mng_ptr_->desc_ratio_) {
-      prsm->setProteoformPtr(two_known_prsm, mng_ptr_->prsm_para_ptr_->getSpParaPtr());
+      two_known_proteoform->setProteoClusterId(prsm->getProteoformPtr()->getProteoClusterId());
+      two_known_proteoform->setProtId(prsm->getProteoformPtr()->getProtId());
+      prsm->setProteoformPtr(two_known_proteoform, mng_ptr_->prsm_para_ptr_->getSpParaPtr());
+      prsm->setAdjustedPrecMass(two_known_proteoform->getMass());
       return prsm;
     }
   }
