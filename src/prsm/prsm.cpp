@@ -46,6 +46,15 @@ Prsm::Prsm(XmlDOMElement* element, FastaIndexReaderPtr reader_ptr,
   proteoform_ptr_ = std::make_shared<Proteoform>(form_element, reader_ptr, fix_mod_list);
 }
 
+void Prsm::setAdjustedPrecMass(double new_prec_mass) {
+  adjusted_prec_mass_ = new_prec_mass;
+  for (size_t i = 0; i < refine_ms_three_vec_.size(); i++) {
+    MsHeaderPtr ms_header_ptr = refine_ms_three_vec_[i]->getMsHeaderPtr();
+    double mono_mz = peak_util::compMz(new_prec_mass, ms_header_ptr->getPrecCharge());
+    ms_header_ptr->setPrecMonoMz(mono_mz);
+  }
+}
+
 void Prsm::init(SpParaPtr sp_para_ptr) {
   refine_ms_three_vec_
       = extend_ms_factory::geneMsThreePtrVec(deconv_ms_ptr_vec_, sp_para_ptr, adjusted_prec_mass_);

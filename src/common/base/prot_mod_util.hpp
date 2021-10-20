@@ -23,6 +23,8 @@ namespace prot_mod_util {
 
 bool allowMod(ProtModPtr prot_mod_ptr, const ResiduePtrVec &residues);
 
+bool containMod(ProtModPtrVec prot_mod_ptr_vec, ProtModPtr prot_mod_ptr);
+
 }  // namespace prot_mod_util
 
 }  // namespace toppic

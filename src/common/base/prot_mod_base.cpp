@@ -26,6 +26,8 @@ namespace toppic {
 ProtModPtrVec ProtModBase::prot_mod_ptr_vec_;
 ProtModPtr ProtModBase::prot_mod_ptr_NONE_;
 ProtModPtr ProtModBase::prot_mod_ptr_M_ACETYLATION_;
+ProtModPtr ProtModBase::prot_mod_ptr_NME_;
+ProtModPtr ProtModBase::prot_mod_ptr_NME_ACETYLATION_;
 
 void ProtModBase::initBase() {
   toppic::XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
@@ -50,6 +52,12 @@ void ProtModBase::initBase() {
     }
     if (prot_mod_ptr->getType() == getType_M_ACETYLATION()) {
       prot_mod_ptr_M_ACETYLATION_ = prot_mod_ptr;
+    }
+    if (prot_mod_ptr->getType() == getType_NME()) {
+      prot_mod_ptr_NME_ = prot_mod_ptr;
+    }
+    if (prot_mod_ptr->getType() == getType_NME_ACETYLATION()) {
+      prot_mod_ptr_NME_ACETYLATION_ = prot_mod_ptr;
     }
   }
 }

@@ -41,6 +41,7 @@ class LocalAnno {
 
   PtmPtr getPtmPtr() {return ptm_ptr_;}
 
+  // raw score is not used in toppic and topmg
   double getRawScr() {return raw_scr_;}
 
   void setRawScr(double s) {raw_scr_ = s;}

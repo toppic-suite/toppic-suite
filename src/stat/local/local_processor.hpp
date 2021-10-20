@@ -12,35 +12,18 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_STAT_LOCAL_PROCESSOR_HPP_
 #define TOPPIC_STAT_LOCAL_PROCESSOR_HPP_
 
-#include <vector>
-
 #include "common/base/ptm.hpp"
-#include "seq/local_anno.hpp"
-#include "prsm/prsm_xml_writer.hpp"
-#include "prsm/prsm_reader.hpp"
-#include "ms/spec/theo_peak.hpp"
-#include "stat/tdgf/tdgf_mng.hpp"
+#include "prsm/prsm.hpp"
 #include "stat/local/local_mng.hpp"
 
 namespace toppic {
 
 class LocalProcessor {
  public:
-  explicit LocalProcessor(LocalMngPtr mng_ptr):
-      mng_ptr_(mng_ptr),
-      ppo_(mng_ptr->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()->getPpo()),
-      theta_(mng_ptr->theta_),
-      threshold_(mng_ptr->threshold_),
-      beta_(mng_ptr->beta_),
-      min_mass_(mng_ptr->min_mass_),
-      p1_(mng_ptr->p1_),
-      p2_(mng_ptr->p2_) {
-        init();
-      }
+  explicit LocalProcessor(LocalMngPtr mng_ptr);
 
   void process();
 
@@ -49,64 +32,42 @@ class LocalProcessor {
 
   PrsmPtr processOnePrsm(PrsmPtr prsm);
 
-  PrsmPtr processOnePtm(PrsmPtr prsm);
+  PrsmPtr processOneMassShift(PrsmPtr prsm);
 
-  PrsmPtr processTwoPtm(PrsmPtr prsm);
+  PrsmPtr processTwoMassShifts(PrsmPtr prsm);
 
   ProteoformPtr processOneKnownPtm(PrsmPtr prsm);
 
-  ProteoformPtr processTwoKnownPtm(PrsmPtr prsm);
+  ProteoformPtr processTwoKnownPtms(PrsmPtr prsm);
+
+  int compOnePtmScr(ProteoformPtr base_form_ptr, 
+                    const ExtendMsPtrVec & extend_ms_ptr_vec,
+                    PtmPtr ptm_ptr); 
+
+  ProteoformPtr onePtmLocalize(ProteoformPtr base_form_ptr, 
+                               const ExtendMsPtrVec & extend_ms_ptr_vec,
+                               double shift_mass, int match_score,
+                               PtmPtr ptm_ptr);
+
+  int compTwoPtmScr(ProteoformPtr proteoform, const ExtendMsPtrVec & extend_ms_ptr_vec, 
+                    PtmPtr ptm_ptr_1, PtmPtr ptm_ptr_2); 
+
+  ProteoformPtr twoPtmLocalize(ProteoformPtr form_ptr, const ExtendMsPtrVec &extend_ms_ptr_vec,
+                               int match_score, PtmPtr ptm_ptr_1, PtmPtr ptm_ptr_2); 
 
   bool modifiable(ProteoformPtr proteoform_ptr, int i, PtmPtr ptm_ptr);
 
-  void compOnePtmScr(ProteoformPtr proteoform, const ExtendMsPtrVec & extend_ms_ptr_vec,
-                     std::vector<double> &scr_vec, double & raw_scr, PtmPtrVec & ptm_vec);
-
-  void compTwoPtmScr(ProteoformPtr proteoform, int num_match,
-                     const ExtendMsPtrVec & extend_ms_ptr_vec, double prec_mass,
-                     double & raw_scr, PtmPairVec & ptm_pair_vec);
-
-  double dpTwoPtmScr(ProteoformPtr proteoform, int h, const ExtendMsPtrVec & extend_ms_ptr_vec,
-                     double prec_mass, double mass1, double mass2, PtmPtr ptm1, PtmPtr ptm2);
-
-  ProteoformPtr onePtmTermAdjust(ProteoformPtr proteoform, const ExtendMsPtrVec & extend_ms_ptr_vec,
-                                 double & shift_mass, double err);
-
-  ProteoformPtr twoPtmTermAdjust(ProteoformPtr proteoform, int num_match,
-                                 const ExtendMsPtrVec & extend_ms_ptr_vec, double prec_mass,
-                                 double & mass1, double & mass2);
-
-  ProteoformPtr compSplitPoint(ProteoformPtr proteoform, int h, const ExtendMsPtrVec & extend_ms_ptr_vec,
-                               double prec_mass);
-
-  void getNtermTruncRange(ProteoformPtr proteoform, const ExtendMsPtrVec & extend_ms_ptr_vec,
-                          int & min, int & max);
-
-  void getCtermTruncRange(ProteoformPtr proteoform, const ExtendMsPtrVec & extend_ms_ptr_vec,
-                          int & min, int & max);
-
   LocalMngPtr mng_ptr_;
 
-  double ppo_;
-
-  double theta_;  // the weight for known/unknown ptm
-
-  double threshold_;  // threshold for MIScore
-
-  double beta_;  // the weight for one/two ptm
-
-  double min_mass_;
-
-  double p1_, p2_;
-
-  PtmPtrVec ptm_vec_;
-
+  // Single PTMs
+  PtmPtrVec ptm_ptr_vec_;
+  // Ptm Pairs
   PtmPairVec ptm_pair_vec_;
-
+  // N-terminal modification list
   ModPtrVec mod_list_N_;
-
+  // C-terminal modification list
   ModPtrVec mod_list_C_;
-
+  // Modification list for any positions
   ModPtrVec mod_list_any_;
 };
 

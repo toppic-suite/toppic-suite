@@ -13,30 +13,31 @@
 //limitations under the License.
 
 #include <algorithm>
-#include <utility>
-#include <string>
-#include <vector>
 #include <numeric>
+#include <iomanip>
 
-#include "common/base/amino_acid_base.hpp"
-#include "common/base/activation_base.hpp"
-#include "common/base/mod_util.hpp"
-#include "common/base/residue_base.hpp"
-#include "common/base/residue_util.hpp"
+#include "common/util/logger.hpp"
 #include "common/base/mass_constant.hpp"
-
-#include "seq/proteoform_factory.hpp"
 #include "ms/factory/extend_ms_util.hpp"
-
 #include "prsm/peak_ion_pair_util.hpp"
+#include "prsm/prsm_algo.hpp"
 #include "prsm/theo_peak_util.hpp"
-
-#include "stat/local/local_mng.hpp"
 #include "stat/local/local_util.hpp"
 
 namespace toppic {
 
 namespace local_util {
+
+MassShiftPtrVec massShiftFilter(const MassShiftPtrVec & mass_shift_vec,
+                                AlterTypePtr type) {
+  MassShiftPtrVec res;
+  for (size_t k = 0; k < mass_shift_vec.size(); k++) {
+    if (mass_shift_vec[k]->getTypePtr() != type) {
+      res.push_back(mass_shift_vec[k]);
+    }
+  }
+  return res;
+}
 
 void scrFilter(std::vector<double> & scr, int & bgn, int & end, double & conf, double threshold) {
   conf = 0.0;
@@ -82,9 +83,8 @@ PtmPtrVec getPtmPtrVecByMass(double mass, double err, const PtmPtrVec & ptm_vec)
   return res;
 }
 
-PtmPairVec getPtmPairVecByMass(double mass1, double mass2, double err, const PtmPairVec & ptm_pair_vec) {
+PtmPairVec getPtmPairVecByMass(double mass, double err, const PtmPairVec & ptm_pair_vec) {
   PtmPairVec res;
-  double mass = mass1 + mass2;
   for (size_t i = 0; i < ptm_pair_vec.size(); i++) {
     double pair_mass = ptm_pair_vec[i].first->getMonoMass() + ptm_pair_vec[i].second->getMonoMass();
 
@@ -96,161 +96,192 @@ PtmPairVec getPtmPairVecByMass(double mass1, double mass2, double err, const Ptm
   return res;
 }
 
-void compSupPeakNum(ProteoformPtr proteoform, const ExtendMsPtrVec & extend_ms_ptr_vec,
-                    MassShiftPtr mass_shift, double min_mass, int & left, int & right) {
-  left = right = 0;
-  PeakIonPairPtrVec pair_ptrs =
-      peak_ion_pair_util::genePeakIonPairs(proteoform, extend_ms_ptr_vec, min_mass);
+// compute match table
+void compMTable(const std::vector<double> &ori_theo_masses, double shift, 
+    const std::vector<double> &exp_masses, 
+    PeakTolerancePtr tole_ptr,  
+    std::vector<int> &m_table) {
 
-  for (size_t i = 0; i < pair_ptrs.size(); i++) {
-    std::string ion_name =
-        pair_ptrs[i]->getTheoPeakPtr()->getIonPtr()->getIonTypePtr()->getName();
-    // A, B, C are for N-terminal ions
-    if (ion_name == "A" || ion_name == "B" || ion_name == "C") {
-      if (pair_ptrs[i]->getTheoPeakPtr()->getIonPtr()->getDisplayPos()
-          <= mass_shift->getLeftBpPos()) {
-        left++;
-      } else if (pair_ptrs[i]->getTheoPeakPtr()->getIonPtr()->getDisplayPos()
-                 >= mass_shift->getRightBpPos()) {
-        right++;
-      }
-    } else {
-      if (pair_ptrs[i]->getTheoPeakPtr()->getIonPtr()->getDisplayPos()
-          >= proteoform->getLen() - mass_shift->getLeftBpPos()) {
-        left++;
-      } else if (pair_ptrs[i]->getTheoPeakPtr()->getIonPtr()->getDisplayPos()
-                 <= proteoform->getLen() - mass_shift->getRightBpPos()) {
-        right++;
+  std::vector<double> theo_masses;
+  for (size_t k = 0; k < ori_theo_masses.size(); k++) {
+    theo_masses.push_back(ori_theo_masses[k] + shift);
+  }
+  size_t i = 0;
+  size_t j = 0;
+  while (i < exp_masses.size() && j < theo_masses.size()) {
+    double deviation = exp_masses[i] - theo_masses[j];
+    double err = tole_ptr->compStrictErrorTole(exp_masses[i]); 
+    if (std::abs(deviation) <= err) {
+      if (j > 0 && j < theo_masses.size() - 1) {
+        if (m_table[j] == 0) {
+          m_table[j] = 1;
+        }
       }
     }
-  }
-}
-
-void ptmMassAdjust(double & mass1, double & mass2, PtmPtr p1, PtmPtr p2) {
-  if (p1 == nullptr || p2 == nullptr) return;
-  double err = mass1 + mass2 - p1->getMonoMass() - p2->getMonoMass();
-  if (std::abs(err) < mass_constant::getIsotopeMass()) {
-    mass1 = p1->getMonoMass() + err / 2;
-    mass2 = p2->getMonoMass() + err / 2;
-  } else if (err > mass_constant::getIsotopeMass()) {
-    err = err - mass_constant::getIsotopeMass();
-    mass1 = p1->getMonoMass() + mass_constant::getIsotopeMass() + err / 2;
-    mass2 = p2->getMonoMass() + err / 2;
-  } else {
-    err = err + mass_constant::getIsotopeMass();
-    mass1 = p1->getMonoMass() - mass_constant::getIsotopeMass() + err / 2;
-    mass2 = p2->getMonoMass() + err / 2;
-  }
-}
-
-void fillTableB(std::vector<std::vector<double> > & b_table, double mass1, double mass2) { 
-  for (size_t i = 1; i < b_table.size(); i++) {
-    b_table[i].resize(b_table[0].size());
-    std::fill(b_table[i].begin(), b_table[i].end(), 0);
-  }
-
-  for (size_t i = 0; i < b_table[0].size(); i++) {
-    b_table[1][i] = b_table[0][i] + mass1;
-    b_table[2][i] = b_table[1][i] + mass2;
-  }
-}
-
-void compNumMatch(const std::vector<double> & b, std::vector<int> & s,
-                  const ExtendMsPtr & extend_ms_ptr, double prec_mass) {
-  std::vector<std::pair<double, double> > spec_peak
-      = extend_ms_util::getExtendMassToleranceList(extend_ms_ptr);
-  double n_shift = extend_ms_ptr->getMsHeaderPtr()->getActivationPtr()->getNShift();
-
-  size_t i = 0, j = 0;
-  while (i < b.size() && j < spec_peak.size()) {
-    if (std::abs(spec_peak[j].first - b[i] - n_shift) <= spec_peak[j].second) {
-      s[i]++; i++; j++;
-    } else if (b[i] + n_shift > spec_peak[j].first) {
-      j++;
-    } else {
+    if (prsm_algo::increaseIJ(i, j, deviation, err, exp_masses, theo_masses)) {
       i++;
-    }
-  }
-
-  i = b.size() - 1, j = 0;
-  while (static_cast<int>(i) >= 0 && j < spec_peak.size()) {
-    if (std::abs(spec_peak[j].first - prec_mass + b[i] + n_shift) <= spec_peak[j].second) {
-      s[i]++; i--; j++;
-    } else if (prec_mass - b[i] - n_shift > spec_peak[j].first) {
-      j++;
     } else {
-      i--;
+      j++;
     }
   }
 }
 
-void fillTableS(std::vector<std::vector<double> > & b_table,
-                std::vector<std::vector<int> > & s_table,
-                ExtendMsPtr extend_ms_ptr, double prec_mass) {
-  for (size_t i = 0; i < s_table.size(); i++) {
-    s_table[i].resize(b_table[i].size() + 1);
-    std::fill(s_table[i].begin(), s_table[i].end(), 0);
-  }
-
-  for (int j = 0; j < 3; j++) {
-    compNumMatch(b_table[j], s_table[j], extend_ms_ptr, prec_mass);
+void addTwoVectors(std::vector<int> &row_1, std::vector<int> &row_2) {
+  for (size_t i = 0; i < row_1.size(); i++) {
+    row_1[i] = row_1[i] + row_2[i];
   }
 }
 
-std::vector<double> geneNTheoMass(ProteoformPtr proteoform, ExtendMsPtr extend_ms_ptr,
-                                  double min_mass) {
-  TheoPeakPtrVec theo_peaks =
-      theo_peak_util::geneProteoformTheoPeak(proteoform,
-                                             extend_ms_ptr->getMsHeaderPtr()->getActivationPtr(),
-                                             min_mass);
-
-  std::vector<double> res;
-  for (size_t i = 0; i < theo_peaks.size(); i++) {
-    if (theo_peaks[i]->getIonPtr()->getIonTypePtr()->isNTerm()) {
-      res.push_back(theo_peaks[i]->getModMass());
-    }
+void addReverseTwoVectors(std::vector<int> &row_1, std::vector<int> &row_2) {
+  int len = row_1.size();
+  for (size_t i = 0; i < row_1.size(); i++) {
+    row_1[i] = row_1[i] + row_2[len - 1 - i];
   }
-  std::sort(res.begin(), res.end());
-  return res;
 }
 
-MassShiftPtrVec massShiftFilter(const MassShiftPtrVec & mass_shift_vec,
-                                AlterTypePtr type) {
-  MassShiftPtrVec res;
-  for (size_t k = 0; k < mass_shift_vec.size(); k++) {
-    if (mass_shift_vec[k]->getTypePtr() != type) {
-      res.push_back(mass_shift_vec[k]);
-    }
+
+std::vector<int> compPrefScore(std::vector<int> & row) {
+  std::vector<int> result(row.size(), 0);
+  int total_score = 0;
+  for (size_t i = 0; i < row.size(); i++) {
+    total_score = total_score + row[i];
+    result[i] = total_score;
   }
-  return res;
+  return result;
 }
 
-MassShiftPtrVec copyMassShiftVec(const MassShiftPtrVec & mass_shift_vec) {
-  MassShiftPtrVec new_mass_shift_vec;
-  for (size_t k = 0; k < mass_shift_vec.size(); k++) {
-    MassShiftPtr mass_shift = std::make_shared<MassShift>(mass_shift_vec[k], 0);
-    new_mass_shift_vec.push_back(mass_shift);
+std::vector<int> compSuffScore(std::vector<int> & row) {
+  std::vector<int> result(row.size(), 0);
+  int total_score = 0;
+  for (int i = row.size() - 1; i >=0; i--) {
+    total_score = total_score + row[i];
+    result[i] = total_score; 
   }
-  return new_mass_shift_vec;
+  return result;
 }
 
-double compMassShift(const MassShiftPtrVec & mass_shift_vec) {
-  double mass = 0.0;
-  for (size_t k = 0; k < mass_shift_vec.size(); k++) {
-    mass += mass_shift_vec[k]->getMassShift();
+void compOnePtmSTable(std::vector<int> &s_table, ProteoformPtr form_ptr, 
+                      const ExtendMsPtrVec & extend_ms_ptr_vec,
+                      PtmPtr ptm_ptr, LocalMngPtr mng_ptr) {
+
+  int len = form_ptr->getLen();
+  std::vector<int> row_1(len + 1, 0);
+  std::vector<int> row_2(len + 1, 0);
+
+  //LOG_DEBUG("s table 1");
+  BpSpecPtr bp_spec_ptr = form_ptr->getBpSpecPtr();
+  std::vector<double> prm_masses = bp_spec_ptr->getPrmMasses();
+  // srm is in the increasing order 
+  std::vector<double> srm_masses = bp_spec_ptr->getSrmMasses();
+  //LOG_DEBUG("prm size " << prm_masses.size() << " len " << len);
+  //LOG_DEBUG("srm size " << srm_masses.size() << " len " << len);
+  PeakTolerancePtr tole_ptr = mng_ptr->peak_tole_ptr_;
+
+  double shift_mass = ptm_ptr->getMonoMass();
+  for (size_t i = 0; i < extend_ms_ptr_vec.size(); i++) {
+    std::vector<double> ms_masses = extend_ms_util::getExtendMassVec(extend_ms_ptr_vec[i]);
+    // updated Match table using prm masses 
+    double n_shift = extend_ms_ptr_vec[i]->getMsHeaderPtr()->getActivationPtr()->getN_BYShift();
+    //LOG_DEBUG("n shift " << n_shift << " shift " << shift_mass);
+    std::vector<int> row_1_n(len + 1, 0);
+    local_util::compMTable(prm_masses, n_shift, ms_masses, tole_ptr, row_1_n);
+    local_util::addTwoVectors(row_1, row_1_n);
+
+    std::vector<int> row_2_n(len + 1, 0);
+    local_util::compMTable(prm_masses, n_shift + shift_mass, ms_masses, tole_ptr, row_2_n);  
+    local_util::addTwoVectors(row_2, row_2_n);
+
+    // updated Match table using srm masses 
+    double c_shift = extend_ms_ptr_vec[i]->getMsHeaderPtr()->getActivationPtr()->getC_BYShift() 
+      + mass_constant::getWaterMass();
+    //ActivationPtr act_ptr = extend_ms_ptr_vec[i]->getMsHeaderPtr()->getActivationPtr();
+    //LOG_DEBUG("activation type " << act_ptr->getName());
+    //LOG_DEBUG(std::setprecision(8) << "c shift " << c_shift);
+    std::vector<int> row_1_c(len + 1, 0);
+    LOG_DEBUG(std::setprecision(8) << "c shift " << c_shift);
+    local_util::compMTable(srm_masses, c_shift + shift_mass, ms_masses, tole_ptr, row_1_c);  
+    local_util::addReverseTwoVectors(row_1, row_1_c);
+
+    std::vector<int> row_2_c(len + 1, 0);
+    local_util::compMTable(srm_masses, c_shift, ms_masses, tole_ptr, row_2_c);  
+    local_util::addReverseTwoVectors(row_2, row_2_c);
   }
-  return mass;
+
+  std::vector<int> n_prec_score = local_util::compPrefScore(row_1);
+  //LOG_DEBUG("prec_score size " << n_prec_score.size() << " len " << len);
+  std::vector<int> c_suff_score = local_util::compSuffScore(row_2);
+  //LOG_DEBUG("suff score size " << c_suff_score.size() << " len " << len);
+
+  // get result table
+  for (int i = 0; i < len; i++) {
+    s_table.push_back(n_prec_score[i] + c_suff_score[i+1]);
+  }
 }
 
-MassShiftPtr geneMassShift(MassShiftPtr shift, double mass, AlterTypePtr type) {
-  ModPtr mod_ptr = std::make_shared<Mod>(ResidueBase::getEmptyResiduePtr(),
-                                         ResidueBase::getEmptyResiduePtr());
-  AlterPtr alter = std::make_shared<Alter>(shift->getLeftBpPos(),
-                                                     shift->getRightBpPos(),
-                                                     type, mass,
-                                                     mod_ptr);
-  MassShiftPtr mass_shift = std::make_shared<MassShift>(alter);
-  return mass_shift;
+void compTwoPtmMTable(std::vector<std::vector<int>> &m_table, ProteoformPtr form_ptr, 
+                      const ExtendMsPtrVec & extend_ms_ptr_vec,
+                      PtmPtr ptm_ptr_1, PtmPtr ptm_ptr_2, LocalMngPtr mng_ptr) {
+
+  int len = form_ptr->getLen();
+  for (int i = 0; i < 3; i++) {
+    std::vector<int> row(len + 1, 0);
+    m_table.push_back(row);
+  }
+
+  BpSpecPtr bp_spec_ptr = form_ptr->getBpSpecPtr();
+  std::vector<double> prm_masses = bp_spec_ptr->getPrmMasses();
+  //srm mass is in the increasing order
+  std::vector<double> srm_masses = bp_spec_ptr->getSrmMasses();
+  PeakTolerancePtr tole_ptr = mng_ptr->peak_tole_ptr_;
+
+  double mass_1 = ptm_ptr_1->getMonoMass();
+  double mass_2 = ptm_ptr_2->getMonoMass();
+
+  for (size_t i = 0; i < extend_ms_ptr_vec.size(); i++) {
+    std::vector<double> ms_masses = extend_ms_util::getExtendMassVec(extend_ms_ptr_vec[i]);
+    // updated S table using prm masses 
+    double n_shift = extend_ms_ptr_vec[i]->getMsHeaderPtr()->getActivationPtr()->getN_BYShift();
+    std::vector<int> row_1_n(len + 1, 0);
+    compMTable(prm_masses, n_shift, ms_masses, tole_ptr, row_1_n);
+    addTwoVectors(m_table[0], row_1_n);
+
+    std::vector<int> row_2_n(len + 1, 0);
+    compMTable(prm_masses, n_shift + mass_1, ms_masses, tole_ptr, row_2_n);
+    addTwoVectors(m_table[1], row_2_n);
+
+    std::vector<int> row_3_n(len + 1, 0);
+    compMTable(prm_masses, n_shift + mass_1 + mass_2, ms_masses, tole_ptr, row_3_n);  
+    addTwoVectors(m_table[2], row_3_n);
+
+    // updated S table using srm masses 
+    double c_shift = extend_ms_ptr_vec[i]->getMsHeaderPtr()->getActivationPtr()->getC_BYShift()
+          + mass_constant::getWaterMass();
+    std::vector<int> row_1_c(len + 1, 0);
+    compMTable(srm_masses, c_shift + mass_1 + mass_2, ms_masses, tole_ptr, row_1_c);  
+    addReverseTwoVectors(m_table[0], row_1_c);
+
+    std::vector<int> row_2_c(len + 1, 0);
+    compMTable(srm_masses, c_shift + mass_2, ms_masses, tole_ptr, row_2_c);  
+    addReverseTwoVectors(m_table[1], row_2_c);
+
+    std::vector<int> row_3_c(len + 1, 0);
+    compMTable(srm_masses, c_shift, ms_masses, tole_ptr, row_3_c);  
+    addReverseTwoVectors(m_table[2], row_3_c);
+  }
+
+  /*
+  for (int j = 0; j < len+1; j++) {
+    LOG_DEBUG(std::setprecision(8) << " m_table[0]  " << j << " " << prm_masses[j] << " "  << m_table[0][j]);
+  }
+
+  for (int j = 0; j < len+1; j++) {
+    LOG_DEBUG(std::setprecision(8) << " m_table[1]  " << j << " " << prm_masses[j] << " "  << m_table[1][j]);
+  }
+
+  for (int j = 0; j < len+1; j++) {
+    LOG_DEBUG(std::setprecision(8) << " m_table[2]  " << j << " " << prm_masses[j] << " "  << m_table[2][j]);
+  }
+  */
 }
 
 void normalize(std::vector<double> & scr) {
@@ -269,6 +300,6 @@ int compMatchFragNum(ProteoformPtr proteoform_ptr, const ExtendMsPtrVec &ms_ptr_
   return static_cast<int>(peak_ion_pair_util::genePeakIonPairs(proteoform_ptr, ms_ptr_vec, min_mass).size());
 }
 
-}  // namespace local_util
+}
 
-}  // namespace toppic
+}

@@ -48,9 +48,9 @@ IntPairVec getExtendIntMassErrorList(const ExtendMsPtrVec &ext_ms_ptr_vec,
     ExtendMsPtr ext_ms_ptr = ext_ms_ptr_vec[i];
     double shift = 0;
     if (pref) {
-      shift = ext_ms_ptr->getMsHeaderPtr()->getActivationPtr()->getNShift();
+      shift = ext_ms_ptr->getMsHeaderPtr()->getActivationPtr()->getN_BYShift();
     } else {
-      shift = ext_ms_ptr->getMsHeaderPtr()->getActivationPtr()->getCShift()
+      shift = ext_ms_ptr->getMsHeaderPtr()->getActivationPtr()->getC_BYShift()
           + mass_constant::getWaterMass();
     }
 

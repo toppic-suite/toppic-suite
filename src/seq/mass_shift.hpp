@@ -50,6 +50,8 @@ class MassShift {
 
   double getMassShift() {return shift_;}
 
+  void setMassShift(double shift) {shift_ = shift;}
+
   std::string getAnnoStr();
 
   static std::string getXmlElementName() {return "mass_shift";}

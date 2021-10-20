@@ -27,7 +27,7 @@ namespace prm_ms_factory {
 void addTwoMasses(PrmPeakPtrVec &list, int spec_id, DeconvPeakPtr deconv_peak_ptr,
                   double prec_mono_mass, ActivationPtr active_type_ptr, PeakTolerancePtr tole_ptr) {
   double ori_mass = deconv_peak_ptr->getMonoMass();
-  double n_term_mass = ori_mass - active_type_ptr->getNShift();
+  double n_term_mass = ori_mass - active_type_ptr->getN_BYShift();
   PrmPeakPtr new_peak_ptr
       = std::make_shared<PrmPeak>(spec_id, deconv_peak_ptr,
                                   BasePeakType::ORIGINAL, n_term_mass, 1);
@@ -35,7 +35,7 @@ void addTwoMasses(PrmPeakPtrVec &list, int spec_id, DeconvPeakPtr deconv_peak_pt
   new_peak_ptr->setNStrictCRelacTolerance(tole_ptr->compStrictErrorTole(ori_mass));
   new_peak_ptr->setNRelaxCStrictTolerance(tole_ptr->compRelaxErrorTole(ori_mass, prec_mono_mass));
   list.push_back(new_peak_ptr);
-  double reverse_mass = prec_mono_mass - (deconv_peak_ptr->getMonoMass()-active_type_ptr->getCShift());
+  double reverse_mass = prec_mono_mass - (deconv_peak_ptr->getMonoMass()-active_type_ptr->getC_BYShift());
   PrmPeakPtr reverse_peak_ptr
       = std::make_shared<PrmPeak>(spec_id, deconv_peak_ptr,
                                   BasePeakType::REVERSED, reverse_mass, 1);
@@ -49,14 +49,14 @@ void addSuffixTwoMasses(PrmPeakPtrVec &list, int spec_id, DeconvPeakPtr deconv_p
                         double prec_mono_mass, ActivationPtr active_type_ptr,
                         PeakTolerancePtr tole_ptr) {
   double ori_mass = deconv_peak_ptr->getMonoMass();
-  double c_res_mass = ori_mass - active_type_ptr->getCShift() - mass_constant::getWaterMass();
+  double c_res_mass = ori_mass - (active_type_ptr->getC_BYShift() + mass_constant::getWaterMass());
   PrmPeakPtr new_peak_ptr
       = std::make_shared<PrmPeak>(spec_id, deconv_peak_ptr, BasePeakType::ORIGINAL, c_res_mass, 1);
   new_peak_ptr->setStrictTolerance(tole_ptr->compStrictErrorTole(ori_mass));
   new_peak_ptr->setNStrictCRelacTolerance(tole_ptr->compRelaxErrorTole(ori_mass, prec_mono_mass));
   new_peak_ptr->setNRelaxCStrictTolerance(tole_ptr->compStrictErrorTole(ori_mass));
   list.push_back(new_peak_ptr);
-  double reverse_mass = prec_mono_mass - (deconv_peak_ptr->getMonoMass()-active_type_ptr->getNShift())
+  double reverse_mass = prec_mono_mass - (deconv_peak_ptr->getMonoMass()-active_type_ptr->getN_BYShift())
       - mass_constant::getWaterMass();
   PrmPeakPtr reverse_peak_ptr
       = std::make_shared<PrmPeak>(spec_id, deconv_peak_ptr,
@@ -72,7 +72,7 @@ void addSixMasses(PrmPeakPtrVec &list, int spec_id, DeconvPeakPtr deconv_peak_pt
                   PeakTolerancePtr tole_ptr, const std::vector<double> &offsets) {
   double ori_mass = deconv_peak_ptr->getMonoMass();
   for (size_t i = 0; i < offsets.size(); i++) {
-    double mass = ori_mass - active_type_ptr->getNShift() + offsets[i];
+    double mass = ori_mass - active_type_ptr->getN_BYShift() + offsets[i];
     PrmPeakPtr peak_ptr = std::make_shared<PrmPeak>(spec_id, deconv_peak_ptr,
                                                     BasePeakType::ORIGINAL, mass, 1);
     peak_ptr->setStrictTolerance(tole_ptr->compStrictErrorTole(ori_mass));
@@ -81,7 +81,7 @@ void addSixMasses(PrmPeakPtrVec &list, int spec_id, DeconvPeakPtr deconv_peak_pt
     list.push_back(peak_ptr);
   }
   for (size_t i = 0; i < offsets.size(); i++) {
-    double mass = prec_mono_mass-(ori_mass-active_type_ptr->getCShift()+offsets[i]);
+    double mass = prec_mono_mass-(ori_mass-active_type_ptr->getC_BYShift()+offsets[i]);
     PrmPeakPtr peak_ptr = std::make_shared<PrmPeak>(spec_id, deconv_peak_ptr,
                                                     BasePeakType::REVERSED, mass, 1);
     peak_ptr->setStrictTolerance(tole_ptr->compStrictErrorTole(ori_mass));

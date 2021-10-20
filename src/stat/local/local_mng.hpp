@@ -12,28 +12,14 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_STAT_LOCAL_MNG_HPP_
 #define TOPPIC_STAT_LOCAL_MNG_HPP_
 
-
 #include <string>
-#include <vector>
-#include <utility>
 
 #include "para/prsm_para.hpp"
-#include "seq/proteoform.hpp"
-#include "common/base/base_data.hpp"
-#include "seq/fasta_reader.hpp"
-#include "common/util/file_util.hpp"
 
 namespace toppic {
-
-const int LEFT_SUP_LIMIT = 10;
-
-const int RIGHT_SUP_LIMIT = 10;
-
-const int DESC_MATCH_LIMIT = 5;
 
 class LocalMng {
  public:
@@ -43,21 +29,10 @@ class LocalMng {
            double max_ptm_mass,
            double min_ptm_mass,
            const std::string &input_file_ext,
-           const std::string &output_file_ext):
-      prsm_para_ptr_(prsm_para_ptr),
-      input_file_ext_(input_file_ext),
-      output_file_ext_(output_file_ext),
-      residueModFileName_(residueModFileName),
-      threshold_(local_threshold),
-      theta_(0.994),
-      beta_(0.8),
-      min_mass_(prsm_para_ptr->getSpParaPtr()->getMinMass()),
-      max_ptm_mass_(max_ptm_mass),
-      min_ptm_mass_(min_ptm_mass),
-      p1_(0.915258),
-      p2_(21.1822) {}
+           const std::string &output_file_ext);
 
   PrsmParaPtr prsm_para_ptr_;
+  PeakTolerancePtr peak_tole_ptr_;
 
   std::string input_file_ext_;
   std::string output_file_ext_;
@@ -65,17 +40,35 @@ class LocalMng {
 
   double threshold_;
 
-  double theta_, beta_;
-
   double min_mass_;
 
   double max_ptm_mass_;
 
   double min_ptm_mass_;
 
-  double p1_, p2_;
-  
+  // prob ratio between a matched fragment and an unmatched fragment
+  double prob_ratio_ = 23.1434;
+
+  // threshold for the deduction of matched fragments
+  // when a PTM is localized
   double desc_ratio_ = 0.67;
+  int DESC_MATCH_LIMIT_ = 5;
+
+  // the range for checking possible starting position
+  // of the N-terminus
+  int n_term_range_ = 5;
+  
+  // the range for checking possible starting position
+  // of the C-terminus
+  int c_term_range_ = 5;
+
+  //double theta_ = 0.994;  // the weight for known/unknown ptm
+
+  //double beta_ = 0.8;     // the weight for one/two ptm
+
+  //double p1_ = 0.915258; 
+
+  //double p2_ = 21.1822; 
 };
 
 typedef std::shared_ptr<LocalMng> LocalMngPtr;
