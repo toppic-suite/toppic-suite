@@ -80,6 +80,7 @@ void cleanTopMergeDir(const std::string &fa_name,
   std::replace(sp_base.begin(), sp_base.end(), '\\', '/');
   file_util::rename(sp_base + ".toppic_form_cutoff_form",
                     sp_base + "_toppic_proteoform.xml");
+  
   if (!keep_temp_files) {
     //file_util::cleanPrefix(fa_name, fa_base + "_");
     file_util::cleanPrefix(sp_name, sp_base + ".msalign_");
@@ -330,7 +331,7 @@ void TopMergeProcess(std::map<std::string, std::string> & arguments,
       cleanTopMergeDir(ori_db_file_name, sp_file_name, keep_temp_files);
     }*/
 
-    if (spec_file_lst.size() > 1 && arguments["combinedOutputName"] != "") {
+    if (arguments["combinedOutputName"] != "") {
       std::string sp_file_name = full_combined_name + "_ms2.msalign";
       cleanTopMergeDir(ori_db_file_name, sp_file_name, keep_temp_files);
     }
