@@ -17,7 +17,6 @@
 #include <iomanip>
 
 #include "common/util/logger.hpp"
-#include "common/base/residue_base.hpp"
 #include "common/base/mass_constant.hpp"
 #include "ms/factory/extend_ms_util.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
@@ -191,11 +190,6 @@ void compOnePtmSTable(std::vector<int> &s_table, ProteoformPtr form_ptr,
     std::vector<int> row_2_n(len + 1, 0);
     local_util::compMTable(prm_masses, n_shift + shift_mass, ms_masses, tole_ptr, row_2_n);  
     local_util::addTwoVectors(row_2, row_2_n);
-    /*
-    for (int j = 0; j < len+1; j++) {
-      LOG_DEBUG(std::setprecision(8) << " first row prefix " << j << " " << row_1_n[j] << " " << (prm_masses[j] + n_shift) << " " << row_1[j]);
-    }
-    */
 
     // updated Match table using srm masses 
     double c_shift = extend_ms_ptr_vec[i]->getMsHeaderPtr()->getActivationPtr()->getC_BYShift() 
@@ -211,26 +205,12 @@ void compOnePtmSTable(std::vector<int> &s_table, ProteoformPtr form_ptr,
     std::vector<int> row_2_c(len + 1, 0);
     local_util::compMTable(srm_masses, c_shift, ms_masses, tole_ptr, row_2_c);  
     local_util::addReverseTwoVectors(row_2, row_2_c);
-    /*
-    for (int j = 0; j < len+1; j++) {
-      LOG_DEBUG(std::setprecision(8) << " first row suffix " << j << " " << row_1_c[len+ 1 - j] << " " << (srm_masses[len+1 - j] + c_shift + shift_mass) << " " << row_1[j]);
-    }
-    */
   }
 
   std::vector<int> n_prec_score = local_util::compPrefScore(row_1);
   //LOG_DEBUG("prec_score size " << n_prec_score.size() << " len " << len);
   std::vector<int> c_suff_score = local_util::compSuffScore(row_2);
   //LOG_DEBUG("suff score size " << c_suff_score.size() << " len " << len);
-  /*
-  for (int j = 0; j < len+1; j++) {
-    LOG_DEBUG(std::setprecision(8) << " prec_score  " << j << " " << n_prec_score[j]);
-  }
-
-  for (int j = 0; j < len+1; j++) {
-    LOG_DEBUG(std::setprecision(8) << " suff_score  " << j << " " << c_suff_score[j]);
-  }
-  */
 
   // get result table
   for (int i = 0; i < len; i++) {

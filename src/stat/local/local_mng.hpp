@@ -69,11 +69,6 @@ class LocalMng {
   //double p1_ = 0.915258; 
 
   //double p2_ = 21.1822; 
-
-  //int LEFT_SUP_LIMIT_ = 10;
-
-  //int RIGHT_SUP_LIMIT_ = 10;
-
 };
 
 typedef std::shared_ptr<LocalMng> LocalMngPtr;

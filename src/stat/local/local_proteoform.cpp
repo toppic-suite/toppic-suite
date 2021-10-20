@@ -328,7 +328,6 @@ ProteoformPtr createProteoformPtr(ProteoformPtr base_form_ptr,
   return shift_form_ptr;
 }
 
-
 }
 
 }

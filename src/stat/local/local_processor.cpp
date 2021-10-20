@@ -15,30 +15,17 @@
 #include <algorithm>
 #include <cmath>
 #include <numeric>
-#include <iomanip>
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
-#include "common/base/ptm.hpp"
 #include "common/base/ptm_util.hpp"
 #include "common/base/mod_util.hpp"
-#include "common/base/residue_base.hpp"
 #include "common/base/residue_util.hpp"
-#include "common/base/prot_mod.hpp"
-#include "common/base/prot_mod_base.hpp"
-#include "common/base/prot_mod_util.hpp"
-
-#include "seq/local_anno.hpp"
-#include "seq/mass_shift.hpp"
-#include "seq/proteoform_factory.hpp"
 
 #include "ms/spec/msalign_util.hpp"
-#include "ms/spec/spectrum_set.hpp"
-#include "ms/factory/extend_ms_util.hpp"
 #include "ms/factory/extend_ms_factory.hpp"
 #include "ms/factory/spectrum_set_factory.hpp"
 
-#include "prsm/prsm.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 
@@ -103,18 +90,6 @@ void LocalProcessor::process() {
           = extend_ms_factory::geneMsThreePtrVec(deconv_ms_ptr_vec, sp_para_ptr, new_prec_mass);
         prsm_ptr->setRefineMsVec(extend_ms_ptr_vec);
 
-        /*
-        if (spec_id == 322) { 
-          logger::log_level=2;
-        }
-        else {
-          logger::log_level=5;
-          if (spec_id > 322) {
-            exit(EXIT_FAILURE);
-          }
-        }
-        std::cout << "spectrum id " << spec_id << std::endl;
-        */
         if (prsm_ptr->getProteoformPtr()->getMassShiftNum(AlterType::UNEXPECTED) > 0) {
           prsm_ptr = processOnePrsm(prsm_ptr);
         }
@@ -168,6 +143,9 @@ PrsmPtr LocalProcessor::processOneMassShift(PrsmPtr prsm) {
     }
   }
 
+  /*
+  TWO PTM explanation may introduce some problems of proteoform annotation.
+  We will add the function after proteoform annotation is reviewed. 
   // Check if the mass shift can be explained by two common PTMs
   LOG_DEBUG("start two known ptm localization")
   ProteoformPtr two_known_proteoform = processTwoKnownPtms(prsm);
@@ -186,6 +164,7 @@ PrsmPtr LocalProcessor::processOneMassShift(PrsmPtr prsm) {
       return prsm;
     }
   }
+  */
   return prsm;
 }
 
@@ -341,6 +320,29 @@ ProteoformPtr LocalProcessor::onePtmLocalize(ProteoformPtr base_form_ptr,
   return local_form_ptr;
 }
 
+bool massShiftOverlap(ProteoformPtr form_ptr_1, ProteoformPtr form_ptr_2) {
+  MassShiftPtrVec shift_ptr_vec_1 = form_ptr_1->getMassShiftPtrVec(AlterType::UNEXPECTED);
+  std::sort(shift_ptr_vec_1.begin(), shift_ptr_vec_1.end(), MassShift::cmpPosInc);
+  MassShiftPtrVec shift_ptr_vec_2 = form_ptr_2->getMassShiftPtrVec(AlterType::UNEXPECTED);
+  std::sort(shift_ptr_vec_2.begin(), shift_ptr_vec_2.end(), MassShift::cmpPosInc);
+  if (shift_ptr_vec_1.size() != 2 || shift_ptr_vec_2.size() != 2) {
+    LOG_ERROR("Mass shift number is incorrect!");
+    exit(EXIT_FAILURE);
+  }
+  for (int i = 0; i < 2; i++) {
+    MassShiftPtr shift_1 = shift_ptr_vec_1[i];
+    MassShiftPtr shift_2 = shift_ptr_vec_2[i];
+    int left_1 = form_ptr_1->getStartPos() + shift_1->getLeftBpPos();
+    int right_1 = form_ptr_1->getStartPos() + shift_1->getRightBpPos();
+    int left_2 = form_ptr_2->getStartPos() + shift_2->getLeftBpPos();
+    int right_2 = form_ptr_2->getStartPos() + shift_2->getRightBpPos();
+    if (right_1 <= left_2 || right_2 <= left_1) {
+      return false;
+    }
+  }
+  return true;
+}
+
 
 // similar to processOneKnownPtm, we might get a nullptr from this function
 ProteoformPtr LocalProcessor::processTwoKnownPtms(PrsmPtr prsm_ptr) {
@@ -397,7 +399,14 @@ ProteoformPtr LocalProcessor::processTwoKnownPtms(PrsmPtr prsm_ptr) {
   else {
     ProteoformPtr result_ptr = twoPtmLocalize(best_form_ptr, extend_ms_ptr_vec, best_match_score, 
                                               best_ptm_pair.first, best_ptm_pair.second);
-    return result_ptr;
+    // check if the PTM localization results are overlapping with the original
+    // mass shifts
+    if (massShiftOverlap(ori_form_ptr, result_ptr)) {
+      return result_ptr;
+    }
+    else {
+      return nullptr;
+    }
   }
 }
 
