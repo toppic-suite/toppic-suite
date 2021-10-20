@@ -67,6 +67,12 @@ class MsHeader {
 
   double getPrecMonoMz();
 
+  double getPrecTargetMz() {return prec_target_mz_;}
+
+  double getIsolationLeftBound() {return prec_target_mz_ - isolation_lower_offset_;}
+
+  double getIsolationRightBound() {return prec_target_mz_ + isolation_upper_offset_;}
+
   double getRetentionTime() {return retention_time_;}
 
   int getPrecId() {return prec_id_;}
@@ -99,6 +105,12 @@ class MsHeader {
   void setPrecCharge(int prec_charge) {prec_charge_ = prec_charge;}
 
   void setPrecMonoMz(double prec_mono_mz) {prec_mono_mz_ = prec_mono_mz;}
+
+  void setPrecTargetMz(double prec_target_mz) {prec_target_mz_ = prec_target_mz;}
+
+  void setIsolationLowerOffset(double offset) {isolation_lower_offset_ = offset;}
+
+  void setIsolationUpperOffset(double offset) {isolation_upper_offset_ = offset;}
 
   void setRetentionTime(double retention_time) {retention_time_ = retention_time;}
 
@@ -149,17 +161,24 @@ class MsHeader {
   // ms1 scan number
   int ms_one_scan_ = -1;
   // retention time 
-  double retention_time_ = 0.0;
-  // precursor m/z value in the MS1 spectrum 
+  double retention_time_ = -1;
+  // precursor m/z value in the mzML file. 
+  // In Thermo data, they are monoisotpic precursor m/z value  
   double prec_sp_mz_ = -1;
   // computed monoisotopic precursor m/z value 
   double prec_mono_mz_ = -1;
+  // isolation window targeted m/z
+  double prec_target_mz_ = -1;
+  // isolation window lower offset
+  double isolation_lower_offset_ = -1;
+  // isolation window upper offset
+  double isolation_upper_offset_ = -1;
   // precursor charge state  
   int prec_charge_ = -1;
   // precursor intensity 
   double prec_inte_ = 0;
   //rt with the highest intensity in this feature
-  double time_apex_;
+  double time_apex_ = -1;
   //compensation voltage for FAIME data
   double voltage_ = -1;
 };
