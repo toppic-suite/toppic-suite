@@ -26,11 +26,12 @@ class RawMsReader {
   RawMsReader(const std::string & file_name, double isolation_window);
   RawMsReader(const std::string & file_name, const std::string & activation,
               double isolation_window);
-  RawMsPtr getNextMs(int max_charge);
+  RawMsPtr getNextMs(double max_mass, int max_charge);
 
   void getMs1Peaks(PeakPtrVec2D &raw_peaks, double cur_voltage);
 
-  void refinePrecChrg(RawMsPtr ms_one, RawMsPtr ms_two, int max_charge);
+  void refinePrecChrg(RawMsPtr ms_one, RawMsPtr ms_two, 
+                      double max_mass, int max_charge);
 
   int getInputSpNum() {return reader_ptr_->getInputSpNum();}
 
