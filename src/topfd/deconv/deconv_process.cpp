@@ -411,6 +411,7 @@ std::function<void()> geneTask(RawMsGroupPtr ms_group_ptr,
     EnvParaPtr env_para_ptr = deconv_ptr->getEnvParaPtr();
 
     RawMsGroupReader::obtainPrecEnvs(ms_group_ptr, prec_envs, 
+                                     env_para_ptr->max_mass_,
                                      env_para_ptr->max_charge_); 
 
     deconvMsOne(ms_one_ptr, deconv_ptr, prec_envs, ms1_writer_ptr_vec, 
