@@ -47,9 +47,6 @@ std::string getString(const StringPairVec &str_pair_vec) {
 
 void generateShuffleDb(const std::string &file_name,
                        const std::string &target_decoy_file_name) {
-  if (file_util::exists(target_decoy_file_name)) {
-    return;
-  }
   std::ofstream output;
   output.open(target_decoy_file_name.c_str(), std::ios::out);
   FastaReader reader(file_name);
@@ -81,9 +78,6 @@ void generateShuffleDb(const std::string &file_name,
 
 void generateStandardDb(const std::string &ori_file_name,
                         const std::string &st_file_name) {
-  if (file_util::exists(st_file_name)) {
-    return;
-  }
   std::ifstream ori_db(ori_file_name);
   std::string line;
   std::ofstream standard_db;
@@ -104,10 +98,6 @@ void generateDbBlock(const std::string &db_file_name, int block_size, int max_fr
   int seq_idx = 0;
   std::string index_file_name = db_file_name + "_block_index";
   std::string block_file_name = db_file_name + "_" + str_util::toString(block_idx);
-
-  if (file_util::exists(index_file_name) && file_util::exists(block_file_name)) {
-    return;
-  };
 
   std::ofstream index_output;
   index_output.open(index_file_name.c_str(), std::ios::out);
@@ -151,9 +141,11 @@ void generateDbBlock(const std::string &db_file_name, int block_size, int max_fr
 void dbSimplePreprocess(const std::string &ori_db_file_name,
                         const std::string &db_file_name) {
   if (!file_util::exists(ori_db_file_name + "_idx")){//if _idx folder doesn't exist yet
-      file_util::createFolder(ori_db_file_name + "_idx");
+    file_util::createFolder(ori_db_file_name + "_idx");
   }
-  
+  if (file_util::exists(db_file_name)) {
+    return;
+  }
   generateStandardDb(ori_db_file_name, db_file_name);
 
   if (file_util::exists(db_file_name + ".fai")) {
@@ -165,18 +157,28 @@ void dbSimplePreprocess(const std::string &ori_db_file_name,
 void dbPreprocess(const std::string &ori_db_file_name,
                   const std::string &db_file_name,
                   bool decoy, int block_size, int max_frag_len) {
-std::string standard_db_file_name = ori_db_file_name + "_idx" + file_util::getFileSeparator() + file_util::basenameFromEntirePathKeepDot(ori_db_file_name) + "_standard";  std::string db_file_path = ori_db_file_name + "_idx" + file_util::getFileSeparator() + file_util::basenameFromEntirePathKeepDot(db_file_name);
+  std::string standard_db_file_name = ori_db_file_name + "_idx" + file_util::getFileSeparator() + file_util::filenameFromEntirePath(ori_db_file_name) + "_standard";  
+  std::string db_file_path = ori_db_file_name + "_idx" + file_util::getFileSeparator() + file_util::filenameFromEntirePath(db_file_name);
   
   if (!file_util::exists(ori_db_file_name + "_idx")){//if _idx folder doesn't exist yet
-      file_util::createFolder(ori_db_file_name + "_idx");
+    file_util::createFolder(ori_db_file_name + "_idx");
   }
-
+  if (file_util::exists(standard_db_file_name)) {
+    return;
+  }
   generateStandardDb(ori_db_file_name, standard_db_file_name);
+
   if (decoy) {
+    if (file_util::exists(db_file_path)) {
+      return;
+    }
     generateShuffleDb(standard_db_file_name, db_file_path);
   } else {
     bool over_write = true;
     file_util::copyFile(standard_db_file_name, db_file_path, over_write);
+  }
+  if (file_util::exists(db_file_path + "_block_index") && file_util::exists(db_file_path + "_0")) {
+    return;
   }
   generateDbBlock(db_file_path, block_size, max_frag_len);
 

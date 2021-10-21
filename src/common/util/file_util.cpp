@@ -92,7 +92,7 @@ std::string basenameFromEntirePath(const std::string &s) {
   return basename(s);
 }
 
-std::string basenameFromEntirePathKeepDot(const std::string &s) {
+std::string filenameFromEntirePath(const std::string &s) {
   //for files like */uniprot-st.fasta_target
   size_t slash_pos = s.find_last_of("\\/");
   if (slash_pos < s.length()) {

@@ -298,7 +298,7 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
     base_data::init();
     LOG_DEBUG("Initialization completed");
     std::string ori_db_file_name = arguments["oriDatabaseFileName"];
-std::string db_file_name = ori_db_file_name + "_idx" + file_util::getFileSeparator() + file_util::basenameFromEntirePathKeepDot(arguments["databaseFileName"]);    //std::string db_file_name = arguments["databaseFileName"];
+std::string db_file_name = ori_db_file_name + "_idx" + file_util::getFileSeparator() + file_util::filenameFromEntirePath(arguments["databaseFileName"]);    //std::string db_file_name = arguments["databaseFileName"];
     std::string sp_file_name = arguments["spectrumFileName"];
     std::string var_mod_file_name = arguments["varModFileName"];
 

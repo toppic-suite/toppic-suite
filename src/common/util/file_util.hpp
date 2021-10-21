@@ -27,7 +27,7 @@ std::string getFileSeparator();
 
 std::string basenameFromEntirePath(const std::string &s);
 
-std::string basenameFromEntirePathKeepDot(const std::string &s);
+std::string filenameFromEntirePath(const std::string &s);
 
 std::string basename(const std::string &s);
 
