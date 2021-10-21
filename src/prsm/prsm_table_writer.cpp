@@ -62,6 +62,7 @@ void PrsmTableWriter::write() {
       << "First residue" << delim
       << "Last residue" << delim
       << "Proteoform" << delim
+      << "Proteoform mass" << delim
       << "#unexpected modifications" << delim
       << "MIScore" << delim
       << "#variable PTMs" << delim
@@ -169,6 +170,7 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
       << (prsm_ptr->getProteoformPtr()->getStartPos() + 1) << delim
       << (prsm_ptr->getProteoformPtr()->getEndPos() + 1) << delim
       << prsm_ptr->getProteoformPtr()->getProteinMatchSeq() << delim
+      << prsm_ptr->getProteoformPtr()->getMass() << delim
       << ptm_num << delim
       << prsm_ptr->getProteoformPtr()->getMIScore() << delim
       << prsm_ptr->getProteoformPtr()->getVariablePtmNum() << delim
