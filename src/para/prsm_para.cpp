@@ -23,7 +23,7 @@
 namespace toppic {
 
 PrsmPara::PrsmPara(std::map<std::string, std::string> &arguments) {
-  search_db_file_name_ = file_util::basenameFromEntirePathKeepDot(arguments["databaseFileName"]);
+  search_db_file_name_ = file_util::filenameFromEntirePath(arguments["databaseFileName"]);
 
   ori_db_name_ = arguments["oriDatabaseFileName"];
 
