@@ -354,14 +354,14 @@ void deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   LOG_DEBUG("ms level " << header_ptr->getMsLevel() );
   // int scan_num_ = header_ptr->getFirstScanNum();
   double max_frag_mass = header_ptr->getPrecMonoMass();
+  if (max_frag_mass == 0.0) {
+    max_frag_mass = header_ptr->getPrecSpMass();
+  }
 
   count_lock.lock();
   DeconvProcess::ms2_spec_num_++;
   count_lock.unlock();
   
-  if (max_frag_mass == 0.0) {
-    max_frag_mass = header_ptr->getPrecSpMass();
-  }
   MatchEnvPtrVec result_envs;
 
   if (peak_list.size() > 0) {
