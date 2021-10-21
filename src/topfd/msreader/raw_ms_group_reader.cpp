@@ -159,14 +159,15 @@ RawMsGroupPtr RawMsGroupReader::getNextMsGroupPtrWithFaime() {
 
 // refine precursor charge and mz 
 MatchEnvPtr refinePrecChrg(RawMsPtr ms_one, RawMsPtr ms_two, 
-                           double prec_win_size, int max_charge) {
+                           int max_charge) {
   MsHeaderPtr header_two = ms_two->getMsHeaderPtr();
-  double prec_avg_mz = header_two->getPrecSpMz();
+  double prec_win_begin = header_two->getPrecWinBegin();
+  double prec_win_end = header_two->getPrecWinEnd();
   int prec_charge = header_two->getPrecCharge();
 
   PeakPtrVec peak_list = ms_one->getPeakPtrVec();
   LOG_DEBUG("start refine precursor " << " peak num " << peak_list.size());
-  MatchEnvPtr match_env_ptr = prec_env::deconv(prec_win_size, peak_list, prec_avg_mz, 
+  MatchEnvPtr match_env_ptr = prec_env::deconv(prec_win_begin, prec_win_end, peak_list,  
                                                prec_charge, max_charge);
   if (match_env_ptr != nullptr) {
     RealEnvPtr env_ptr = match_env_ptr->getRealEnvPtr();
@@ -185,13 +186,13 @@ MatchEnvPtr refinePrecChrg(RawMsPtr ms_one, RawMsPtr ms_two,
 
 void RawMsGroupReader::obtainPrecEnvs(RawMsGroupPtr ms_group_ptr, 
                                       MatchEnvPtrVec &env_ptr_vec,
-                                      double prec_win_size, int max_charge) {
+                                      int max_charge) {
   RawMsPtr ms_one_ptr = ms_group_ptr->getMsOnePtr();
   RawMsPtrVec ms_two_ptr_vec = ms_group_ptr->getMsTwoPtrVec();
 
   for (size_t i = 0; i < ms_two_ptr_vec.size(); i++) {
     RawMsPtr ms_two_ptr = ms_two_ptr_vec[i];
-    MatchEnvPtr match_env_ptr = refinePrecChrg(ms_one_ptr, ms_two_ptr, prec_win_size, max_charge);
+    MatchEnvPtr match_env_ptr = refinePrecChrg(ms_one_ptr, ms_two_ptr, max_charge);
     if (match_env_ptr != nullptr) {
       env_ptr_vec.push_back(match_env_ptr);
     }

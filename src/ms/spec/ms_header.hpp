@@ -69,9 +69,9 @@ class MsHeader {
 
   double getPrecTargetMz() {return prec_target_mz_;}
 
-  double getIsolationLeftBound() {return prec_target_mz_ - isolation_lower_offset_;}
+  double getPrecWinBegin() {return prec_target_mz_ - isolation_lower_offset_;}
 
-  double getIsolationRightBound() {return prec_target_mz_ + isolation_upper_offset_;}
+  double getPrecWinEnd() {return prec_target_mz_ + isolation_upper_offset_;}
 
   double getRetentionTime() {return retention_time_;}
 

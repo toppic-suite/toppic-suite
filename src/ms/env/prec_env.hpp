@@ -21,8 +21,8 @@ namespace toppic {
 
 namespace prec_env {
 
-MatchEnvPtr deconv(double prec_win_size, PeakPtrVec &peak_list, 
-                   double prec_mz, int prec_charge, int argu_max_charge);
+MatchEnvPtr deconv(double prec_win_begin, double prec_win_end, PeakPtrVec &peak_list, 
+                   int prec_charge, int argu_max_charge);
 
 }  // namespace prec_env
 

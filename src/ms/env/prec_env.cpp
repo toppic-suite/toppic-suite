@@ -32,7 +32,7 @@ struct PeakIntv {
 
 const int PRECURSOR_TOP_PEAK_NUM = 20;
 
-EnvParaPtr initMngPtr(double prec_win_size) {
+EnvParaPtr initMngPtr() {
   EnvParaPtr env_para_ptr = std::make_shared<EnvPara>();
   env_para_ptr->min_refer_inte_ = 0;
   env_para_ptr->min_inte_ = 0;
@@ -40,14 +40,12 @@ EnvParaPtr initMngPtr(double prec_win_size) {
   std::vector<int> num = {1, 1, 1};
   env_para_ptr->min_match_peak_num_ = num;
   env_para_ptr->min_consecutive_peak_num_ = num;
-  env_para_ptr->prec_deconv_interval_ = prec_win_size;
+  //env_para_ptr->prec_deconv_interval_ = prec_win_size;
   return env_para_ptr;
 }
 
-PeakIntv initPeakIntv(EnvParaPtr env_para_ptr, PeakPtrVec &peak_list, double prec_mz) {
-  double base_mz  = prec_mz;
-  double bgn_mz = base_mz - env_para_ptr->prec_deconv_interval_ / 2;
-  double end_mz = base_mz + env_para_ptr->prec_deconv_interval_ / 2;
+PeakIntv initPeakIntv(EnvParaPtr env_para_ptr, PeakPtrVec &peak_list, 
+                      double bgn_mz, double end_mz) {
   PeakIntv peak_intv;
   peak_intv.bgn = peak_list.size();
   peak_intv.end = -1;
@@ -158,13 +156,13 @@ MatchEnvPtr findBest(MatchEnvPtr2D &env_ptrs) {
   return best_env;
 }
 
-MatchEnvPtr deconv(double prec_win_size, PeakPtrVec &peak_list,
-                  double prec_mz, int prec_charge, int argu_max_charge) {
-  if (prec_mz <= 0) {
+MatchEnvPtr deconv(double prec_win_begin, double prec_win_end, PeakPtrVec &peak_list,
+                   int prec_charge, int argu_max_charge) {
+  if (prec_win_begin <= 0) {
     return nullptr;
   }
-  EnvParaPtr env_para_ptr = initMngPtr(prec_win_size);
-  PeakIntv peak_intv = initPeakIntv(env_para_ptr, peak_list, prec_mz);
+  EnvParaPtr env_para_ptr = initMngPtr();
+  PeakIntv peak_intv = initPeakIntv(env_para_ptr, peak_list, prec_win_begin, prec_win_end);
   int peak_num = initPeakNum(peak_intv);
   if (peak_num  == 0) {
     return nullptr;

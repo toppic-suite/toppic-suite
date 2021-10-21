@@ -34,7 +34,7 @@ class RawMsGroupReader {
 
   static void obtainPrecEnvs(RawMsGroupPtr ms_group_ptr, 
                              MatchEnvPtrVec &env_ptr_vec,
-                             double prec_win_size, int max_charge);
+                             int max_charge);
 
   int getInputSpNum() {return reader_ptr_->getInputSpNum();}
   PwMsReaderPtr getReaderPtr() {return reader_ptr_;}
