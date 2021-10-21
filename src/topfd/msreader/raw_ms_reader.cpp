@@ -20,12 +20,13 @@
 
 namespace toppic {
 
-RawMsReader::RawMsReader(const std::string & file_name) {
-  reader_ptr_ = std::make_shared<PwMsReader>(file_name);
+RawMsReader::RawMsReader(const std::string & file_name, double isolation_window) {
+  reader_ptr_ = std::make_shared<PwMsReader>(file_name, isolation_window);
 }
 
-RawMsReader::RawMsReader(const std::string & file_name, const std::string & activation) {
-  reader_ptr_ = std::make_shared<PwMsReader>(file_name, activation);
+RawMsReader::RawMsReader(const std::string & file_name, const std::string & activation,
+                         double isolation_window) {
+  reader_ptr_ = std::make_shared<PwMsReader>(file_name, activation, isolation_window);
 }
 
 RawMsPtr RawMsReader::getNextMs(double prec_win_size, int max_charge) {

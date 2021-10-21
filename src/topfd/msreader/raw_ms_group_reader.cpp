@@ -23,8 +23,10 @@ namespace toppic {
 RawMsGroupReader::RawMsGroupReader(const std::string & file_name, 
                                    bool missing_level_one,
                                    std::string activation,
+                                   double isolation_window,
                                    int fraction_id) {
-  reader_ptr_ = std::make_shared<PwMsReader>(file_name, activation);
+  reader_ptr_ = std::make_shared<PwMsReader>(file_name, activation, 
+                                             isolation_window);
   missing_level_one_ = missing_level_one;
   fraction_id_ = fraction_id;
   if (!missing_level_one_) {
@@ -75,23 +77,6 @@ RawMsGroupPtr RawMsGroupReader::getNextMsGroupPtrWithFaime() {
       ms_one_ptr_vec_.erase(ms_one_ptr_vec_.begin(), ms_one_ptr_vec_.begin() + 1);
       return ms_group_ptr;
     }
-    //when first_ms_one_scan == alpha_ms_one_scan, the ms1 in ms_one_ptr_vec is the ms1 scan for the next group. Shouldn't be written and removed from here.
-
-    /*else {
-      // first_ms_one_scan == alpha_ms_one_scan_
-      std::cout << "first_ms_one_scan: " << first_ms_one_scan << ", alpha_ms_one_scan_: " << alpha_ms_one_scan_ << std::endl;
-      if (beta_ms_two_ptr_vec_.size() > 0) {
-        //get ms group with first ms one spectra and all ms2 spectra in alpha_ms_two_ptr_vec_. 
-        RawMsGroupPtr ms_group_ptr = std::make_shared<RawMsGroup>(ms_one_ptr_vec_[0], alpha_ms_two_ptr_vec_);
-
-        alpha_ms_two_ptr_vec_ = beta_ms_two_ptr_vec_;
-        beta_ms_two_ptr_vec_.clear();
-        alpha_ms_one_scan_ = alpha_ms_two_ptr_vec_[0]->getMsHeaderPtr()->getMsOneScan(); 
-        ms_one_ptr_vec_.erase(ms_one_ptr_vec_.begin(), ms_one_ptr_vec_.begin() + 1);
-
-        return ms_group_ptr;
-      }
-    }*/
   }
 
   RawMsPtr ms_ptr = nullptr;
@@ -121,94 +106,56 @@ RawMsGroupPtr RawMsGroupReader::getNextMsGroupPtrWithFaime() {
   }
 
   if (ms_ptr == nullptr) {
-      if (alpha_ms_two_ptr_vec_.size() > 0) {
-        int first_ms_one_scan = ms_one_ptr_vec_[0]->getMsHeaderPtr()->getFirstScanNum();
-        if (first_ms_one_scan != alpha_ms_one_scan_) {
-          LOG_ERROR("Previous MS1 scan not added to a group.");
-          return nullptr;
-        }
-        RawMsGroupPtr ms_group_ptr = std::make_shared<RawMsGroup>(ms_one_ptr_vec_[0], alpha_ms_two_ptr_vec_);
-        ms_one_ptr_vec_.erase(ms_one_ptr_vec_.begin(), ms_one_ptr_vec_.begin() + 1);
-        alpha_ms_two_ptr_vec_.clear();
-        return ms_group_ptr;
-      }
-      if (ms_one_ptr_vec_.size() > 0) {
-        // generate an ms_group with only one MS1 spectrum using first in
-        // ms_one_ptr_vec_ and pop out the first one. 
-        RawMsGroupPtr ms_group_ptr = std::make_shared<RawMsGroup>(ms_one_ptr_vec_[0], RawMsPtrVec());
-        ms_one_ptr_vec_.erase(ms_one_ptr_vec_.begin(), ms_one_ptr_vec_.begin() + 1);
-
-        return ms_group_ptr;
-      }
-      else {
-        // generate an empty ms_group ptr
+    if (alpha_ms_two_ptr_vec_.size() > 0) {
+      int first_ms_one_scan = ms_one_ptr_vec_[0]->getMsHeaderPtr()->getFirstScanNum();
+      if (first_ms_one_scan != alpha_ms_one_scan_) {
+        LOG_ERROR("Previous MS1 scan not added to a group.");
         return nullptr;
       }
-  }
-  else {
-      int first_ms_one_scan = ms_one_ptr_vec_[0]->getMsHeaderPtr()->getFirstScanNum();
-      if (first_ms_one_scan < alpha_ms_one_scan_) {
+      RawMsGroupPtr ms_group_ptr = std::make_shared<RawMsGroup>(ms_one_ptr_vec_[0], alpha_ms_two_ptr_vec_);
+      ms_one_ptr_vec_.erase(ms_one_ptr_vec_.begin(), ms_one_ptr_vec_.begin() + 1);
+      alpha_ms_two_ptr_vec_.clear();
+      return ms_group_ptr;
+    }
+    if (ms_one_ptr_vec_.size() > 0) {
       // generate an ms_group with only one MS1 spectrum using first in
       // ms_one_ptr_vec_ and pop out the first one. 
-        RawMsGroupPtr ms_group_ptr = std::make_shared<RawMsGroup>(ms_one_ptr_vec_[0], RawMsPtrVec());
-        ms_one_ptr_vec_.erase(ms_one_ptr_vec_.begin(), ms_one_ptr_vec_.begin() + 1);
+      RawMsGroupPtr ms_group_ptr = std::make_shared<RawMsGroup>(ms_one_ptr_vec_[0], RawMsPtrVec());
+      ms_one_ptr_vec_.erase(ms_one_ptr_vec_.begin(), ms_one_ptr_vec_.begin() + 1);
 
-        return ms_group_ptr;
-      }
-      else {
-        // first ms one scan == alpha_ms_one_scan
-        //get ms group with first ms one spectra and all ms2 spectra in alpha_ms_two_ptr_vec_. 
-        //assign ms1Id to msHeaderPtr for ms2ptrs
-
-        RawMsGroupPtr ms_group_ptr = std::make_shared<RawMsGroup>(ms_one_ptr_vec_[0], alpha_ms_two_ptr_vec_);
-
-        alpha_ms_two_ptr_vec_ = beta_ms_two_ptr_vec_;
-        beta_ms_two_ptr_vec_.clear();
-        alpha_ms_one_scan_ = alpha_ms_two_ptr_vec_[0]->getMsHeaderPtr()->getMsOneScan();
-        ms_one_ptr_vec_.erase(ms_one_ptr_vec_.begin(), ms_one_ptr_vec_.begin() + 1);
-
-        return ms_group_ptr;
-      }
-  }
-}
-
-/*RawMsGroupPtr RawMsGroupReader::getNextMsGroupPtr() {
-  if (missing_level_one_) {
-    RawMsPtr null_ms_one_ptr(nullptr);
-    RawMsPtrVec ms_two_ptr_vec;
-    RawMsPtr ms_two_ptr = readNextRawMs();
-    if (ms_two_ptr == nullptr) {
-      return nullptr;
-    }
-    ms_two_ptr_vec.push_back(ms_two_ptr);
-    RawMsGroupPtr ms_group_ptr = std::make_shared<RawMsGroup>(null_ms_one_ptr, ms_two_ptr_vec);
-    return ms_group_ptr;
-  }
-
-  // if not missing level one
-  if (ms_one_ptr_ == nullptr) {
-    return nullptr;
-  }
-
-  RawMsPtrVec ms_two_ptr_vec;
-  RawMsPtr new_ms_one_ptr;
-  RawMsPtr ms_ptr;
-  while ((ms_ptr = readNextRawMs()) != nullptr) {
-    MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
-    if (header_ptr->getMsLevel() == 1) {
-      new_ms_one_ptr = ms_ptr;
-      break;
+      return ms_group_ptr;
     }
     else {
-      header_ptr->setMsOneId(ms_one_ptr_->getMsHeaderPtr()->getId());
-      header_ptr->setMsOneScan(ms_one_ptr_->getMsHeaderPtr()->getFirstScanNum());
-      ms_two_ptr_vec.push_back(ms_ptr);
+      // generate an empty ms_group ptr
+      return nullptr;
     }
   }
-  RawMsGroupPtr ms_group_ptr = std::make_shared<RawMsGroup>(ms_one_ptr_, ms_two_ptr_vec);
-  ms_one_ptr_ = new_ms_one_ptr;
-  return ms_group_ptr;
-}*/
+  else {
+    int first_ms_one_scan = ms_one_ptr_vec_[0]->getMsHeaderPtr()->getFirstScanNum();
+    if (first_ms_one_scan < alpha_ms_one_scan_) {
+      // generate an ms_group with only one MS1 spectrum using first in
+      // ms_one_ptr_vec_ and pop out the first one. 
+      RawMsGroupPtr ms_group_ptr = std::make_shared<RawMsGroup>(ms_one_ptr_vec_[0], RawMsPtrVec());
+      ms_one_ptr_vec_.erase(ms_one_ptr_vec_.begin(), ms_one_ptr_vec_.begin() + 1);
+
+      return ms_group_ptr;
+    }
+    else {
+      // first ms one scan == alpha_ms_one_scan
+      //get ms group with first ms one spectra and all ms2 spectra in alpha_ms_two_ptr_vec_. 
+      //assign ms1Id to msHeaderPtr for ms2ptrs
+
+      RawMsGroupPtr ms_group_ptr = std::make_shared<RawMsGroup>(ms_one_ptr_vec_[0], alpha_ms_two_ptr_vec_);
+
+      alpha_ms_two_ptr_vec_ = beta_ms_two_ptr_vec_;
+      beta_ms_two_ptr_vec_.clear();
+      alpha_ms_one_scan_ = alpha_ms_two_ptr_vec_[0]->getMsHeaderPtr()->getMsOneScan();
+      ms_one_ptr_vec_.erase(ms_one_ptr_vec_.begin(), ms_one_ptr_vec_.begin() + 1);
+
+      return ms_group_ptr;
+    }
+  }
+}
 
 // refine precursor charge and mz 
 MatchEnvPtr refinePrecChrg(RawMsPtr ms_one, RawMsPtr ms_two, 

@@ -567,7 +567,7 @@ void process(int frac_id, const std::string &sp_file_name,
   // read ms1 deconvoluted spectra
   if (!missing_level_one) {
     std::string file_num = "";
-    for (int i = 0; i < voltage_vec.size(); i++) {
+    for (size_t i = 0; i < voltage_vec.size(); i++) {
       if (isFaims) {file_num = str_util::toString(i) + "_";} // if FAIME Data
       DeconvMsPtrVec ms1_ptr_vec;
       FracFeaturePtrVec frac_features;
@@ -575,7 +575,8 @@ void process(int frac_id, const std::string &sp_file_name,
       SimpleMsAlignReader::readMsOneSpectra(ms1_file_name, ms1_ptr_vec);
       double cur_voltage = voltage_vec[i].first;//if this is -1, it is non-FAIME data
       PeakPtrVec2D raw_peaks; 
-      RawMsReaderPtr raw_reader_ptr = std::make_shared<RawMsReader>(sp_file_name, activation);
+      RawMsReaderPtr raw_reader_ptr = std::make_shared<RawMsReader>(sp_file_name, activation, 
+                                                                    env_para_ptr->prec_deconv_interval_);
       raw_reader_ptr->getMs1Peaks(raw_peaks, cur_voltage);
       raw_reader_ptr = nullptr;
       findMsOneFeatures(ms1_ptr_vec, raw_peaks, para_ptr, frac_features, env_para_ptr);

@@ -112,6 +112,7 @@ void DeconvProcess::process() {
       = std::make_shared<RawMsGroupReader>(spec_file_name_, 
                                            topfd_para_ptr_->missing_level_one_,
                                            topfd_para_ptr_->activation_,
+                                           env_para_ptr_->prec_deconv_interval_, 
                                            frac_id_);
   //check if it is centroid data
   std::vector<pwiz::msdata::DataProcessingPtr> dt_proc_ptr = reader_ptr->getReaderPtr()->getMsdPtr()->dataProcessingPtrs;
@@ -122,8 +123,8 @@ void DeconvProcess::process() {
     for (int i = 0; i < dt_proc_ptr.size(); i++) {
       for (int j = 0; j < dt_proc_ptr[i]->processingMethods.size(); j++) {
         pwiz::msdata::ProcessingMethod proc_method = dt_proc_ptr[i]->processingMethods[j];
-	pwiz::cv::CVID cvid_peak_picking;
-	cvid_peak_picking = pwiz::cv::MS_peak_picking;
+        pwiz::cv::CVID cvid_peak_picking;
+        cvid_peak_picking = pwiz::cv::MS_peak_picking;
         if (proc_method.hasCVParam(cvid_peak_picking)) {
           is_profile_data = false;
         }
@@ -131,7 +132,8 @@ void DeconvProcess::process() {
     }
   }
   if (is_profile_data) {
-    LOG_ERROR("You are not using a centroid data. TopFD supports centroid data only. Please try again with a different dataset.");
+    LOG_ERROR("You are not using a centroid data.");
+    LOG_ERROR("TopFD supports centroid data only. Please try again with a different dataset.");
     exit(EXIT_FAILURE);
   }
 
@@ -457,7 +459,9 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
     prepareFileFolder("0_");
     isFaims_ = true;
   }
-  voltage_vec_.push_back(std::make_pair(ms_group_ptr->getMsOnePtr()->getMsHeaderPtr()->getVoltage(), 0));//don't add voltage to vector if it is non-FAIME 
+
+  //don't add voltage to vector if it is non-FAIME 
+  voltage_vec_.push_back(std::make_pair(ms_group_ptr->getMsOnePtr()->getMsHeaderPtr()->getVoltage(), 0));
 
   std::vector<MsAlignWriterPtrVec> all_file_ms1_writer_ptr_vec;
   std::vector<MsAlignWriterPtrVec> all_file_ms2_writer_ptr_vec;
