@@ -44,7 +44,6 @@ int totalMemInGb = -1;
     LOG_ERROR("invalid memory size!");
     return 0;
   }
-  std::cout << "total memory: " << totalMemInGb << ", max thread: " << totalMemInGb / 4 << std::endl;
   return totalMemInGb / 4;
 }
 }
