@@ -56,11 +56,28 @@ class DeconvPeak : public Peak {
 
   static std::string getXmlElementName() {return "deconv_peak";}
 
+  static bool cmpPosSp(const DeconvPeakPtr &a, const DeconvPeakPtr &b) { return a->getSpId() > b->getSpId(); }
+
+  std::vector<double> getTheoEnvelope() { return theo_envelope_; }
+
+  std::vector<double> getTheoEnvelopeInte() { return theo_envelope_intensity_; }
+
+  bool getUsedStatus() { return used_status_; }
+
+  void setTheoEnvelope(std::vector<double> theoEnvelope) { theo_envelope_ = theoEnvelope; }
+
+  void setTheoEnvelopeInte(std::vector<double> theoEnvelopeInte) { theo_envelope_intensity_ = theoEnvelopeInte; }
+
+  void setUsedStatus(bool usedStatus) { used_status_ = usedStatus; }
+
  private:
   int sp_id_;
   int id_;
   int charge_;
   double score_ = 1.0;
+  bool used_status_ = false;
+  std::vector<double> theo_envelope_;
+  std::vector<double> theo_envelope_intensity_;
 };
 
 typedef std::vector<DeconvPeakPtr> DeconvPeakPtrVec;

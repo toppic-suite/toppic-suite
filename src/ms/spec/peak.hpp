@@ -55,9 +55,17 @@ class Peak {
   static bool cmpInteDec(const PeakPtr &a, const PeakPtr &b) { 
     return a->getIntensity() > b->getIntensity();}
 
+  static bool cmpMassDec(const PeakPtr &a, const PeakPtr &b) {
+    return a->getPosition() < b->getPosition();}
+
+  double getNeighbor() {return neighbor_;}
+
+  void setNeighbor(bool neighbor) {neighbor_ = neighbor;}
+
 private:
   double position_;
   double intensity_;
+  bool neighbor_ = false;
 };
 
 typedef std::vector<PeakPtrVec> PeakPtrVec2D;

@@ -3,6 +3,9 @@ cmake_minimum_required(VERSION 3.1)
 #Name your project here
 project(TopPIC)
 
+find_package(PythonLibs REQUIRED)
+include_directories(${PYTHON_INCLUDE_DIRS})
+
 SET(CMAKE_VERBOSE_MAKEFILE ON)
 
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../bin)
@@ -78,6 +81,10 @@ file(GLOB PRSM_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/prsm/*.cpp)
 
 # classes for topfd 
 file(GLOB_RECURSE TOPFD_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/topfd/*.cpp)
+
+# topFeatureExtraction console
+file(GLOB TOPFEATURE_CONSOLE_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd_argument.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/console/top_feature_extraction.cpp)
 
 # topfd console 
 file(GLOB TOPFD_CONSOLE_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd_argument.cpp
@@ -177,9 +184,13 @@ file(GLOB UNIT_TEST_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/*.cpp)
 #gui to run exe in command line
 file(GLOB GUI_UTIL_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/util/*.cpp)
 
-add_executable(topfd 
+add_executable(top_feature_extraction
+        ${TOPFEATURE_CONSOLE_SRCS} ${TOPFD_SRCS} ${COMMON_SRCS} ${PARA_SRCS}
+        ${SPEC_SRCS} ${ENV_SRCS} ${FEATURE_SRCS} ${PWIZ_SRCS} ${NOWIDE_SRCS} src/topfd/feature_extract/feature_extract.cpp src/topfd/feature_extract/feature_extract.h src/topfd/feature_extract/mzml_data_processor.cpp src/topfd/feature_extract/mzml_data_processor.h src/topfd/feature_extract/python_caller.cpp src/topfd/feature_extract/python_caller.h src/topfd/feature_extract/spectral_data_processor.cpp src/topfd/feature_extract/spectral_data_processor.h src/topfd/feature_extract/xic_generator.cpp src/topfd/feature_extract/xic_generator.h)
+
+add_executable(topfd
   ${TOPFD_CONSOLE_SRCS} ${TOPFD_SRCS} ${COMMON_SRCS} ${PARA_SRCS} 
-  ${SPEC_SRCS} ${ENV_SRCS} ${FEATURE_SRCS} ${PWIZ_SRCS} ${NOWIDE_SRCS})
+  ${SPEC_SRCS} ${ENV_SRCS} ${FEATURE_SRCS} ${PWIZ_SRCS} ${NOWIDE_SRCS} src/topfd/feature_extract/feature_extract.cpp src/topfd/feature_extract/feature_extract.h src/topfd/feature_extract/mzml_data_processor.cpp src/topfd/feature_extract/mzml_data_processor.h src/topfd/feature_extract/python_caller.cpp src/topfd/feature_extract/python_caller.h src/topfd/feature_extract/spectral_data_processor.cpp src/topfd/feature_extract/spectral_data_processor.h src/topfd/feature_extract/xic_generator.cpp src/topfd/feature_extract/xic_generator.h)
 
 #add_executable(topfd_single 
 #  ${TOPFD_SINGLE_CONSOLE_SRCS} ${TOPFD_SINGLE_PROC_SRCS} ${TOPFD_SRCS}
@@ -187,7 +198,7 @@ add_executable(topfd
 
 add_executable(topfd_gui 
   ${TOPFD_GUI_SRCS} ${TOPFD_SRCS} ${COMMON_SRCS} ${PARA_SRCS} 
-  ${SPEC_SRCS} ${ENV_SRCS} ${FEATURE_SRCS} ${PWIZ_SRCS} ${NOWIDE_SRCS} ${GUI_UTIL_SRCS})
+  ${SPEC_SRCS} ${ENV_SRCS} ${FEATURE_SRCS} ${PWIZ_SRCS} ${NOWIDE_SRCS} ${GUI_UTIL_SRCS} src/topfd/feature_extract/feature_extract.cpp src/topfd/feature_extract/feature_extract.h src/topfd/feature_extract/mzml_data_processor.cpp src/topfd/feature_extract/mzml_data_processor.h src/topfd/feature_extract/python_caller.cpp src/topfd/feature_extract/python_caller.h src/topfd/feature_extract/spectral_data_processor.cpp src/topfd/feature_extract/spectral_data_processor.h src/topfd/feature_extract/xic_generator.cpp src/topfd/feature_extract/xic_generator.h)
 
 add_executable(topindex 
   ${TOPINDEX_CONSOLE_SRCS} ${TOPINDEX_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS}
@@ -245,6 +256,11 @@ add_executable(topmerge_gui ${TOPMERGE_GUI_SRCS} ${TOPMERGE_GUI_QRC}
 #add_executable(topfd_train ${TOPFD_TRAIN_SRCS} ${TOPFD_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS} ${PWIZ_SRC})
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    target_link_libraries(top_feature_extraction xerces-c
+            boost_program_options-mt boost_filesystem-mt
+            boost_system-mt boost_thread-mt
+            boost_iostreams-mt boost_chrono-mt pthread z psapi Ws2_32)
+
     target_link_libraries(topfd xerces-c
         boost_program_options-mt boost_filesystem-mt
         boost_system-mt boost_thread-mt
@@ -304,6 +320,10 @@ ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 # xerces-c boost_system, boost_thread boost_iostreams boost_chrono pthread z are required by
 # ProteoWizard
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+    target_link_libraries(top_feature_extraction xerces-c boost_program_options
+            boost_filesystem boost_system boost_thread boost_iostreams boost_chrono
+            pthread z)
+
     target_link_libraries(topfd xerces-c boost_program_options
         boost_filesystem boost_system boost_thread boost_iostreams boost_chrono
         pthread z)
@@ -353,8 +373,11 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 #        boost_filesystem boost_system boost_thread boost_iostreams boost_chrono pthread z)
 
 #file(MAKE_DIRECTORY ${CMAKE_INSTALL_PREFIX}/usr/bin)
-install (TARGETS topfd toppic topmg topdiff topindex topmerge DESTINATION ${CMAKE_INSTALL_PREFIX}/usr/bin/)
+install (TARGETS top_feature_extraction topfd toppic topmg topdiff topindex topmerge DESTINATION ${CMAKE_INSTALL_PREFIX}/usr/bin/)
 install (DIRECTORY toppic_resources/ DESTINATION ${CMAKE_INSTALL_PREFIX}/etc/toppic)
 
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
 
+target_link_libraries(top_feature_extraction ${PYTHON_LIBRARIES})
+target_link_libraries(topfd ${PYTHON_LIBRARIES})
+target_link_libraries(topfd_gui ${PYTHON_LIBRARIES})
