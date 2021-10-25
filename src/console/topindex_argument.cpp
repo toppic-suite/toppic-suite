@@ -36,7 +36,7 @@ Argument::Argument() {
 void Argument::initArguments() {
   arguments_["oriDatabaseFileName"]="";
   arguments_["databaseFileName"] = "";
-  arguments_["databaseBlockSize"] = "400000000";
+  arguments_["databaseBlockSize"] = "250000000";
   arguments_["maxFragmentLength"] = "500";
   arguments_["searchType"] = "TARGET";
   arguments_["fixedMod"] = "";
@@ -183,7 +183,8 @@ bool Argument::parse(int argc, char* argv[]) {
     if (vm.count("thread-number")) {
       int max_thread = mem_check::getMaxThreads("topindex");
       if (max_thread < std::stoi(thread_number)) {
-        std::cout << "ALERT: Based on the memory size, up to " << max_thread << " threads can be used on this computer. Please reset the thread number to " << max_thread << " or less and run the program again." << std::endl;
+        std::cout << "WARNING: Based on the memory size, up to " << max_thread << " threads can be used on this computer." << std::endl;
+        std::cout << "Please set the thread number to " << max_thread << " or less and run the program again." << std::endl;
         return false;
       }
       arguments_["threadNumber"] = thread_number;

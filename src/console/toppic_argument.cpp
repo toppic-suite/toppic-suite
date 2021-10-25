@@ -38,7 +38,7 @@ Argument::Argument() {
 void Argument::initArguments() {
   arguments_["oriDatabaseFileName"]="";
   arguments_["databaseFileName"] = "";
-  arguments_["databaseBlockSize"] = "400000000";
+  arguments_["databaseBlockSize"] = "250000000";
   arguments_["maxFragmentLength"] = "500";
   arguments_["spectrumFileName"] = "";
   arguments_["combinedOutputName"] = "";
@@ -103,21 +103,6 @@ void Argument::outputArguments(std::ostream &output,
     }
   }
 
-  /*
-  if (arguments["fixedMod"] == "") {
-    output << std::setw(44) << std::left << "Fixed modifications: " << "\t" << "None" << std::endl;
-  } 
-  else if (arguments["fixedMod"] == "C57") {
-    output << std::setw(44) << std::left << "Fixed modifications: " << "\t" << "C57:carbamidomethylation on cysteine" << std::endl;
-  }
-  else if (arguments["fixedMod"] == "C58") {
-    output << std::setw(44) << std::left << "Fixed modifications: " << "\t" << "C58:carboxymethylation on cysteine" << std::endl;
-  }
-  else {
-    output << std::setw(44) << std::left << "Fixed modifications: " << "\t" << arguments["fixedMod"] << std::endl;
-  }
-  */
-
   if (arguments["useFeatureFile"] == "true") {
     output << std::setw(44) << std::left << "Use TopFD feature file: " << "\t" << "True" << std::endl;
   }
@@ -155,12 +140,6 @@ void Argument::outputArguments(std::ostream &output,
     output << std::setw(44) << std::left << "MIScore threshold: " << "\t" << arguments["localThreshold"] << std::endl;
   }
 
-  /*
-  if (arguments["residueModFileName"] != "") {
-    output << std::setw(44) << std::left << "Common modification file name: " << "\t" << arguments["residueModFileName"] << std::endl;
-    output << std::setw(44) << std::left << "MIScore threshold: " << "\t" << arguments["localThreshold"] << std::endl;
-  }
-  */
   output << std::setw(44) << std::left << "Executable file directory: " << "\t" << arguments["executiveDir"] << std::endl;
   output << std::setw(44) << std::left << "Start time: " << "\t" << arguments["startTime"] << std::endl;
   if (arguments["endTime"] != "") {
@@ -175,63 +154,6 @@ std::string Argument::outputTsvArguments(std::map<std::string, std::string> argu
   std::stringstream output;
   outputArguments(output, arguments); 
   return output.str();
-  /*
-  output << "********************** Parameters **********************" << std::endl;
-  output << "Protein database file:," << arguments["oriDatabaseFileName"] << std::endl;
-  output << "Spectrum file:," << arguments["spectrumFileName"] << std::endl;
-  output << "Number of combined spectra:," << arguments["groupSpectrumNumber"] << std::endl;
-  output << "Fragmentation method:," << arguments["activation"] << std::endl;
-  output << "Search type:," << arguments["searchType"] << std::endl;
-
-  if (arguments["fixedMod"] == "") {
-    output << "Fixed modifications:," << "None" << std::endl;
-  } 
-  else if (arguments["fixedMod"] == "C57") {
-    output << "Fixed modifications:," << "C57:carbamidomethylation on cysteine" << std::endl;
-  }
-  else if (arguments["fixedMod"] == "C58") {
-    output << "Fixed modifications:," << "C58:carboxymethylation on cysteine" << std::endl;
-  }
-  else {
-    output << "Fixed modifications:," << arguments["fixedMod"] << std::endl;
-  }
-
-  if (arguments["useFeatureFile"] == "true") {
-    output << "Use TopFD feature file:," << "True" << std::endl;
-  }
-  else {
-    output << "Use TopFD feature file:," << "False" << std::endl;
-  }
-
-  output << "Maximum number of unexpected modifications:," << arguments["ptmNumber"] << std::endl;
-  output << "Error tolerance for matching masses:," << arguments["massErrorTolerance"] << " ppm" << std::endl;
-  output << "Error tolerance for identifying PrSM clusters:," << arguments["proteoformErrorTolerance"] << " Da" << std::endl;
-  output << "Spectrum-level cutoff type:,"  << arguments["cutoffSpectralType"] << std::endl;
-  output << "Spectrum-level cutoff value:," << arguments["cutoffSpectralValue"] << std::endl;
-  output << "Proteoform-level cutoff type:," << arguments["cutoffProteoformType"] << std::endl;
-  output << "Proteoform-level cutoff value:," << arguments["cutoffProteoformValue"] << std::endl;
-  output << "Allowed N-terminal forms:," << "\"" << arguments["allowProtMod"] << "\"" << std::endl;
-  output << "Maximum mass shift of modifications:," << arguments["maxPtmMass"] << " Da" << std::endl;
-  output << "Minimum mass shift of modifications:," << arguments["minPtmMass"] << " Da" << std::endl;
-  output << "Thread number:,"  << arguments["threadNumber"] << std::endl;
-
-  if (arguments["useLookupTable"] == "true") {
-    output << "E-value computation:," << "Lookup table" << std::endl;
-  } else {
-    output << "E-value computation:," << "Generating function" << std::endl;
-  }
-
-  if (arguments["residueModFileName"] != "") {
-    output << "Common modification file name:," << arguments["residueModFileName"] << std::endl;
-    output << "MIScore threshold:," <<  arguments["localThreshold"] << std::endl;
-  }
-  output << "Executable file directory:," << arguments["executiveDir"] << std::endl;
-  output << "Start time:," << arguments["startTime"] << std::endl;
-  if (arguments["endTime"] != "") {
-    output << "End time:," << arguments["endTime"] << std::endl;
-  }
-  output << "********************** Parameters **********************" << std::endl;
-  */
 }
 
 void Argument::showUsage(boost::program_options::options_description &desc) {
@@ -460,7 +382,8 @@ bool Argument::parse(int argc, char* argv[]) {
     if (vm.count("thread-number")) {
       int max_thread = mem_check::getMaxThreads("toppic");
       if (max_thread < std::stoi(thread_number)) {
-        std::cout << "ALERT: Based on the memory size, up to " << max_thread << " threads can be used on this computer. Please reset the thread number to " << max_thread << " or less and run the program again." << std::endl;
+        std::cout << "WARNING: Based on the memory size, up to " << max_thread << " threads can be used on this computer." << std::endl;
+        std::cout << "Please set the thread number to " << max_thread << " or less and run the program again." << std::endl;
         return false;
       }
       arguments_["threadNumber"] = thread_number;
