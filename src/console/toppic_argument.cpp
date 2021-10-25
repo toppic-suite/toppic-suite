@@ -458,7 +458,7 @@ bool Argument::parse(int argc, char* argv[]) {
     }
 
     if (vm.count("thread-number")) {
-      int max_thread = mem_check::getMaxThreads();
+      int max_thread = mem_check::getMaxThreads("toppic");
       if (max_thread < std::stoi(thread_number)) {
         std::cout << "ALERT: Based on the memory size, up to " << max_thread << " threads can be used on this computer. Please reset the thread number to " << max_thread << " or less and run the program again." << std::endl;
         return false;
