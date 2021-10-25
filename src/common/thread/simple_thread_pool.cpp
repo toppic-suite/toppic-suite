@@ -18,7 +18,7 @@
 namespace toppic {
 
 SimpleThreadPool::SimpleThreadPool(int thread_num) :
-    terminate_(false), stopped_(false) {
+    terminate_(false), stopped_(false), idle_thread_num_(0) {
       for (int i = 0; i < thread_num; i++) {
         ThreadPtr thread_ptr = std::make_shared<boost::thread>(&SimpleThreadPool::Invoke, this);
         ToppicThreadPtr toppic_thread_ptr = std::make_shared<ToppicThread>(i, thread_ptr);
@@ -47,6 +47,7 @@ void SimpleThreadPool::Invoke() {
     {
       // Put unique lock on task mutex.
       boost::unique_lock<boost::mutex> lock(tasks_mutex_);
+      idle_thread_num_ ++;
 
       // Wait until queue is not empty or termination signal is sent.
       condition_.wait(lock, [this]{ return !tasks_.empty() || terminate_; });
@@ -61,6 +62,7 @@ void SimpleThreadPool::Invoke() {
 
       // Remove it from the queue.
       tasks_.pop();
+      idle_thread_num_ --;
     }
 
     // Execute the task.

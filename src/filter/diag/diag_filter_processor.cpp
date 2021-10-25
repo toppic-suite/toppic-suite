@@ -43,8 +43,8 @@ std::function<void()> geneTask(DiagFilterPtr filter_ptr,
 }
 
 void DiagFilterProcessor::process() {
-  //std::string db_file_name = mng_ptr_->prsm_para_ptr_->getSearchDbFileName();
-  std::string db_file_name = mng_ptr_->prsm_para_ptr_->getOriDbName() + "_idx" + file_util::getFileSeparator() + mng_ptr_->prsm_para_ptr_->getSearchDbFileName();
+  std::string db_file_name = mng_ptr_->prsm_para_ptr_->getOriDbName() + "_idx" 
+    + file_util::getFileSeparator() + mng_ptr_->prsm_para_ptr_->getSearchDbFileName();
   DbBlockPtrVec db_block_ptr_vec = DbBlock::readDbBlockIndex(db_file_name);
 
   std::vector<double> mod_mass_list;
@@ -80,8 +80,9 @@ void DiagFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
   //std::string db_block_file_name = prsm_para_ptr->getSearchDbFileName()
   //    + "_" + str_util::toString(block_ptr->getBlockIdx());
-  std::string db_block_file_name = prsm_para_ptr->getOriDbName() + "_idx" + file_util::getFileSeparator() + prsm_para_ptr->getSearchDbFileName()
-        + "_" + str_util::toString(block_idx);
+  std::string db_block_file_name = prsm_para_ptr->getOriDbName() + "_idx" 
+    + file_util::getFileSeparator() + prsm_para_ptr->getSearchDbFileName()
+    + "_" + str_util::toString(block_idx);
   ProteoformPtrVec raw_forms
       = proteoform_factory::readFastaToProteoformPtrVec(db_block_file_name,
                                                         prsm_para_ptr->getFixModPtrVec());

@@ -60,6 +60,8 @@ class SimpleThreadPool {
 
   int getThreadNum() {return thread_ptr_vec_.size();}
 
+  int getIdleThreadNum() {return idle_thread_num_;}
+
   int getId(boost::thread::id thread_id);
 
  private:
@@ -80,6 +82,9 @@ class SimpleThreadPool {
 
   // Indicates that pool has been terminated.
   bool stopped_;
+
+  // Idle thread number
+  int idle_thread_num_;
 
   // Function that will be invoked by our threads.
   void Invoke();

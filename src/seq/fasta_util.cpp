@@ -155,37 +155,47 @@ void dbSimplePreprocess(const std::string &ori_db_file_name,
 }
 
 void dbPreprocess(const std::string &ori_db_file_name,
-                  const std::string &db_file_name,
+                  const std::string &file_name,
                   bool decoy, int block_size, int max_frag_len) {
-  std::string standard_db_file_name = ori_db_file_name + "_idx" + file_util::getFileSeparator() + file_util::filenameFromEntirePath(ori_db_file_name) + "_standard";  
-  std::string db_file_path = ori_db_file_name + "_idx" + file_util::getFileSeparator() + file_util::filenameFromEntirePath(db_file_name);
-  
-  if (!file_util::exists(ori_db_file_name + "_idx")){//if _idx folder doesn't exist yet
+  //if _idx folder doesn't exist yet
+  if (!file_util::exists(ori_db_file_name + "_idx")){
     file_util::createFolder(ori_db_file_name + "_idx");
   }
-  if (file_util::exists(standard_db_file_name)) {
-    return;
+  // Generate a stardard fasta file in which empty lines are removed
+  std::string standard_db_file_name = ori_db_file_name + "_idx" 
+    + file_util::getFileSeparator() 
+    + file_util::filenameFromEntirePath(ori_db_file_name) + "_standard";  
+  if (!file_util::exists(standard_db_file_name)) {
+    generateStandardDb(ori_db_file_name, standard_db_file_name);
   }
-  generateStandardDb(ori_db_file_name, standard_db_file_name);
 
+  // Generate new database file
+  std::string new_db_file_name = ori_db_file_name + "_idx" 
+    + file_util::getFileSeparator() 
+    + file_util::filenameFromEntirePath(file_name);
+  
   if (decoy) {
-    if (file_util::exists(db_file_path)) {
-      return;
+    if (!file_util::exists(new_db_file_name)) {
+      generateShuffleDb(standard_db_file_name, new_db_file_name);
     }
-    generateShuffleDb(standard_db_file_name, db_file_path);
-  } else {
-    bool over_write = true;
-    file_util::copyFile(standard_db_file_name, db_file_path, over_write);
+  } 
+  else {
+    if (!file_util::exists(new_db_file_name)) {
+      bool overwrite = true;
+      file_util::copyFile(standard_db_file_name, new_db_file_name, overwrite); 
+    }
   }
-  if (file_util::exists(db_file_path + "_block_index") && file_util::exists(db_file_path + "_0")) {
-    return;
-  }
-  generateDbBlock(db_file_path, block_size, max_frag_len);
 
-  if (file_util::exists(db_file_path + ".fai")) {
-    return;
+  // Generate new database blocks
+  if (!file_util::exists(new_db_file_name + "_block_index") || 
+      !file_util::exists(new_db_file_name + "_0")) {
+    generateDbBlock(new_db_file_name, block_size, max_frag_len);
   }
-  fai_build(db_file_path.c_str());
+
+  // Generate new database file index
+  if (!file_util::exists(new_db_file_name + ".fai")) {
+    fai_build(new_db_file_name.c_str());
+  }
 }
 
 int countProteinNum(const std::string &fasta_file) {

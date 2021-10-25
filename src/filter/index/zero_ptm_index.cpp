@@ -92,10 +92,9 @@ void createIndexFiles(const ProteoformPtrVec & raw_forms,
 std::function<void()> geneIndexTask(int block_idx, ZeroPtmFilterMngPtr mng_ptr) {
   return[block_idx, mng_ptr] () {
     PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
-    //std::string db_block_file_name = prsm_para_ptr->getSearchDbFileName()
-    //    + "_" + str_util::toString(block_idx);
-    std::string db_block_file_name = prsm_para_ptr->getOriDbName() + "_idx" + file_util::getFileSeparator() + prsm_para_ptr->getSearchDbFileName()
-        + "_" + str_util::toString(block_idx);
+    std::string db_block_file_name = prsm_para_ptr->getOriDbName() + "_idx" 
+      + file_util::getFileSeparator() + prsm_para_ptr->getSearchDbFileName()
+      + "_" + str_util::toString(block_idx);
     ProteoformPtrVec raw_forms
         = proteoform_factory::readFastaToProteoformPtrVec(db_block_file_name,
                                                           prsm_para_ptr->getFixModPtrVec());
@@ -107,8 +106,8 @@ std::function<void()> geneIndexTask(int block_idx, ZeroPtmFilterMngPtr mng_ptr) 
 void process(ZeroPtmFilterMngPtr mng_ptr) {
   // Generate index files
   PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
-  //std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
-  std::string db_file_name = prsm_para_ptr->getOriDbName() + "_idx" + file_util::getFileSeparator() + prsm_para_ptr->getSearchDbFileName();
+  std::string db_file_name = prsm_para_ptr->getOriDbName() + "_idx" 
+    + file_util::getFileSeparator() + prsm_para_ptr->getSearchDbFileName();
   DbBlockPtrVec db_block_ptr_vec = DbBlock::readDbBlockIndex(db_file_name);
 
   SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(mng_ptr->thread_num_);
@@ -117,11 +116,11 @@ void process(ZeroPtmFilterMngPtr mng_ptr) {
 
   std::cout << "Generating Non PTM index files --- started" << std::endl;
   for (int i = 0; i < block_num; i++) {
-    while (pool_ptr->getQueueSize() >= mng_ptr->thread_num_ * 2) {
+    while (pool_ptr->getQueueSize() > 0 || pool_ptr->getIdleThreadNum() == 0) {
       boost::this_thread::sleep(boost::posix_time::milliseconds(100));
     }
     std::cout << "Non PTM index files - processing " << (i+1) 
-        << " of " << block_num << " files." << std::endl;
+      << " of " << block_num << " files." << std::endl;
     pool_ptr->Enqueue(geneIndexTask(db_block_ptr_vec[i]->getBlockIdx(), mng_ptr));
   }
   pool_ptr->ShutDown();

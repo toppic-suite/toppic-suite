@@ -88,10 +88,9 @@ std::function<void()> geneIndexTask(int block_idx,
                                     OnePtmFilterMngPtr mng_ptr) {
   return[block_idx, mng_ptr] () {
     PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
-    //std::string db_block_file_name = prsm_para_ptr->getSearchDbFileName()
-    //    + "_" + str_util::toString(block_idx);
-    std::string db_block_file_name = prsm_para_ptr->getOriDbName() + "_idx" + file_util::getFileSeparator() + prsm_para_ptr->getSearchDbFileName()
-        + "_" + str_util::toString(block_idx);
+    std::string db_block_file_name = prsm_para_ptr->getOriDbName() + "_idx" 
+      + file_util::getFileSeparator() + prsm_para_ptr->getSearchDbFileName()
+      + "_" + str_util::toString(block_idx);
     ProteoformPtrVec raw_forms
         = proteoform_factory::readFastaToProteoformPtrVec(db_block_file_name,
                                                           prsm_para_ptr->getFixModPtrVec());
@@ -101,8 +100,8 @@ std::function<void()> geneIndexTask(int block_idx,
 
 void process(OnePtmFilterMngPtr mng_ptr) {
   PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
-  //std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
-  std::string db_file_name = prsm_para_ptr->getOriDbName() + "_idx" + file_util::getFileSeparator() + prsm_para_ptr->getSearchDbFileName();
+  std::string db_file_name = prsm_para_ptr->getOriDbName() + "_idx" 
+    + file_util::getFileSeparator() + prsm_para_ptr->getSearchDbFileName();
   DbBlockPtrVec db_block_ptr_vec = DbBlock::readDbBlockIndex(db_file_name);
 
   std::cout << "Generating One PTM index files --- started" << std::endl;
@@ -111,7 +110,7 @@ void process(OnePtmFilterMngPtr mng_ptr) {
   int block_num = db_block_ptr_vec.size();
 
   for (int i = 0; i < block_num; i++) {
-    while (pool_ptr->getQueueSize() >= mng_ptr->thread_num_ * 2) {
+    while (pool_ptr->getQueueSize() > 0 || pool_ptr->getIdleThreadNum() == 0) {
       boost::this_thread::sleep(boost::posix_time::milliseconds(100));
     }
     std::cout << "One PTM index files - processing " << (i+1) 

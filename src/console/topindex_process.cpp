@@ -13,10 +13,7 @@
 //limitations under the License.
 
 #include <iostream>
-#include <iomanip>
 #include <map>
-#include <string>
-#include <vector>
 
 #include "console/topindex_argument.hpp"
 #include "console/topindex_process.hpp"
@@ -27,8 +24,6 @@
 
 #include "seq/fasta_util.hpp"
 #include "seq/db_block.hpp"
-#include "seq/proteoform.hpp"
-#include "seq/proteoform_factory.hpp"
 
 #include "filter/mng/zero_ptm_filter_mng.hpp"
 #include "filter/mng/one_ptm_filter_mng.hpp"
@@ -58,13 +53,12 @@ void TopIndexProcess(std::map<std::string, std::string> &arguments){
     if (!file_util::exists(ori_db_file_name + "_idx")){
       file_util::createFolder(ori_db_file_name + "_idx");
     }
-    //prsm_para_ptr->setIndexDir(ori_db_file_name + "_idx"); //this gives seg fault
 
     bool decoy = false;
     if (arguments["searchType"] == "TARGET+DECOY") {
       decoy = true;
     }
-    //create a folder for index files 
+    // create a folder for index files 
     // index file name
     IndexFileNamePtr file_name_ptr = std::make_shared<IndexFileName>();
     std::string index_file_para = file_name_ptr->geneFileName(arguments);
@@ -88,12 +82,6 @@ void TopIndexProcess(std::map<std::string, std::string> &arguments){
                                           "toppic_multi_filter");
     diag_index::process(diag_filter_mng_ptr);
 
-    /*(std::cout << "Deleting temporary files - started." << std::endl;
-    std::string fa_base = file_util::absoluteName(ori_db_file_name);
-    std::replace(fa_base.begin(), fa_base.end(), '\\', '/');
-    file_util::cleanPrefix(ori_db_file_name, fa_base + "_");
-    std::cout << "Deleting temporary files - finished." << std::endl; 
-*/
     std::cout << "TopIndex - finished." << std::endl;
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
