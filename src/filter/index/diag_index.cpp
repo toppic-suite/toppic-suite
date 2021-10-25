@@ -14,6 +14,8 @@
 
 #include <iostream>
 
+#include <boost/thread/mutex.hpp>
+
 #include "common/util/file_util.hpp"
 #include "common/thread/simple_thread_pool.hpp"
 
@@ -27,6 +29,9 @@ namespace toppic{
 
 namespace diag_index {
 
+// serialization mutex.
+boost::mutex serial_mutex;
+
 void geneDiagIndexFile(const ProteoformPtrVec &proteo_ptrs,
                        DiagFilterMngPtr mng_ptr, std::string block_str) {
 
@@ -38,7 +43,10 @@ void geneDiagIndexFile(const ProteoformPtrVec &proteo_ptrs,
   std::string parameters = mng_ptr->getIndexFilePara();
   std::string dir_name = mng_ptr->prsm_para_ptr_->getOriDbName() + "_idx";
   std::string file_name = mng_ptr->multi_ptm_file_vec_[0] + parameters + block_str;
-  index_ptr->serializeMassMatch(file_name, dir_name);
+  {
+    boost::unique_lock<boost::mutex> lock(serial_mutex);
+    index_ptr->serializeMassMatch(file_name, dir_name);
+  }
 }
 
 std::function<void()> geneIndexTask(int block_idx,

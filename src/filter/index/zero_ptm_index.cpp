@@ -14,6 +14,8 @@
 
 #include <iostream>
 
+#include <boost/thread/mutex.hpp>
+
 #include "common/util/logger.hpp"
 #include "common/thread/simple_thread_pool.hpp"
 #include "common/util/file_util.hpp"
@@ -28,6 +30,9 @@
 namespace toppic{
 
 namespace zero_ptm_index {
+
+// serialization mutex.
+boost::mutex serial_mutex;
 
 void geneZeroPtmIndexFile(const ProteoformPtrVec &proteo_ptrs,
                           ZeroPtmFilterMngPtr mng_ptr, 
@@ -45,7 +50,10 @@ void geneZeroPtmIndexFile(const ProteoformPtrVec &proteo_ptrs,
       = mass_match_factory::getPrmTermMassMatchPtr(proteo_ptrs, shift_2d,
                                                    mng_ptr->max_proteoform_mass_,
                                                    mng_ptr->filter_scale_);
-  term_index_ptr->serializeMassMatch(file_vec[0], dir_name);
+  {
+    boost::unique_lock<boost::mutex> lock(serial_mutex);
+    term_index_ptr->serializeMassMatch(file_vec[0], dir_name);
+  }
   term_index_ptr = nullptr;
 
   // Prm indexes
@@ -53,7 +61,10 @@ void geneZeroPtmIndexFile(const ProteoformPtrVec &proteo_ptrs,
       = mass_match_factory::getPrmDiagMassMatchPtr(proteo_ptrs,
                                                    mng_ptr->max_proteoform_mass_,
                                                    mng_ptr->filter_scale_);
-  diag_index_ptr->serializeMassMatch(file_vec[1], dir_name);
+  {
+    boost::unique_lock<boost::mutex> lock(serial_mutex);
+    diag_index_ptr->serializeMassMatch(file_vec[1], dir_name);
+  }
   diag_index_ptr = nullptr;
 
   LOG_DEBUG("diag index");
@@ -68,7 +79,10 @@ void geneZeroPtmIndexFile(const ProteoformPtrVec &proteo_ptrs,
                                                    n_term_acet_2d,
                                                    mng_ptr->max_proteoform_mass_,
                                                    mng_ptr->filter_scale_);
-  rev_term_index_ptr->serializeMassMatch(file_vec[2], dir_name);
+  {
+    boost::unique_lock<boost::mutex> lock(serial_mutex);
+    rev_term_index_ptr->serializeMassMatch(file_vec[2], dir_name);
+  }
   rev_term_index_ptr = nullptr;
 
   // To generate SRM indexes, n terminal acetylation shifts are added into the SRM list. 
@@ -76,7 +90,10 @@ void geneZeroPtmIndexFile(const ProteoformPtrVec &proteo_ptrs,
       = mass_match_factory::getSrmDiagMassMatchPtr(proteo_ptrs, n_term_acet_2d,
                                                    mng_ptr->max_proteoform_mass_,
                                                    mng_ptr->filter_scale_);
-  rev_diag_index_ptr->serializeMassMatch(file_vec[3], dir_name);     
+  {
+    boost::unique_lock<boost::mutex> lock(serial_mutex);
+    rev_diag_index_ptr->serializeMassMatch(file_vec[3], dir_name);     
+  }
   rev_diag_index_ptr = nullptr;
 }
 
