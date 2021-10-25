@@ -401,8 +401,8 @@ bool TopFDDialog::checkError() {
                          QMessageBox::Yes);
     return true;
   }
-  if (ui->threadNumberEdit->text().toInt() > toppic::mem_check::getMaxThreads()) {
-    int max_thread = toppic::mem_check::getMaxThreads();
+  if (ui->threadNumberEdit->text().toInt() > toppic::mem_check::getMaxThreads("topfd")) {
+    int max_thread = toppic::mem_check::getMaxThreads("topfd");
     QMessageBox::warning(this, tr("Warning"),
                          QString("Thread number is too large! Based on the memory size, up to %1 threads can run on this computer. Please update the value and run the program again.").arg(max_thread).arg(max_thread),
                          QMessageBox::Yes);
