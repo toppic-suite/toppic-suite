@@ -12,6 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include <boost/thread/mutex.hpp>
+
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 
@@ -24,6 +26,9 @@
 #include "filter/zeroptm/zero_ptm_filter.hpp"
 
 namespace toppic {
+
+// serialization mutex.
+boost::mutex zero_ptm_filter_mutex;
 
 ZeroPtmFilter::ZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
                              ZeroPtmFilterMngPtr mng_ptr, 
@@ -53,11 +58,14 @@ ZeroPtmFilter::ZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
     diag_index_ptr_ = std::make_shared<MassMatch>();
     rev_term_index_ptr_ = std::make_shared<MassMatch>();
     rev_diag_index_ptr_ = std::make_shared<MassMatch>();
-
-    term_index_ptr_->deserializeMassMatch(mng_ptr->zero_ptm_file_vec_[0] + suffix, index_dir);
-    diag_index_ptr_->deserializeMassMatch(mng_ptr->zero_ptm_file_vec_[1] + suffix, index_dir);
-    rev_term_index_ptr_->deserializeMassMatch(mng_ptr->zero_ptm_file_vec_[2] + suffix, index_dir);
-    rev_diag_index_ptr_->deserializeMassMatch(mng_ptr->zero_ptm_file_vec_[3] + suffix, index_dir);
+    {
+      LOG_DEBUG("Loading index files");
+      boost::unique_lock<boost::mutex> lock(zero_ptm_filter_mutex);
+      term_index_ptr_->deserializeMassMatch(mng_ptr->zero_ptm_file_vec_[0] + suffix, index_dir);
+      diag_index_ptr_->deserializeMassMatch(mng_ptr->zero_ptm_file_vec_[1] + suffix, index_dir);
+      rev_term_index_ptr_->deserializeMassMatch(mng_ptr->zero_ptm_file_vec_[2] + suffix, index_dir);
+      rev_diag_index_ptr_->deserializeMassMatch(mng_ptr->zero_ptm_file_vec_[3] + suffix, index_dir);
+    }
   }
   else{
     LOG_DEBUG("get shifts");

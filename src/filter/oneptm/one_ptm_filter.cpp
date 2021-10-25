@@ -14,6 +14,8 @@
 
 #include <iostream>
 
+#include <boost/thread/mutex.hpp>
+
 #include "common/util/file_util.hpp"
 #include "seq/proteoform_util.hpp"
 #include "ms/factory/prm_ms_util.hpp"
@@ -23,6 +25,9 @@
 #include "filter/oneptm/one_ptm_filter.hpp"
 
 namespace toppic {
+
+// serialization mutex.
+boost::mutex one_ptm_filter_mutex;
 
 OnePtmFilter::OnePtmFilter(const ProteoformPtrVec &proteo_ptrs,
                            OnePtmFilterMngPtr mng_ptr, std::string block_str) {
@@ -52,11 +57,14 @@ OnePtmFilter::OnePtmFilter(const ProteoformPtrVec &proteo_ptrs,
     rev_term_index_ptr_ = std::make_shared<MassMatch>();
     rev_diag_index_ptr_ = std::make_shared<MassMatch>();
     
-   //complete file name is a ptm type from topindexfile vector + parameters + db block id (block_str)
-    term_index_ptr_->deserializeMassMatch(mng_ptr->one_ptm_file_vec_[0] + suffix, index_dir);
-    diag_index_ptr_->deserializeMassMatch(mng_ptr->one_ptm_file_vec_[1] + suffix, index_dir);
-    rev_term_index_ptr_->deserializeMassMatch(mng_ptr->one_ptm_file_vec_[2] + suffix, index_dir);
-    rev_diag_index_ptr_->deserializeMassMatch(mng_ptr->one_ptm_file_vec_[3] + suffix, index_dir);
+    {
+      boost::unique_lock<boost::mutex> lock(one_ptm_filter_mutex);
+      //complete file name is a ptm type from topindexfile vector + parameters + db block id (block_str)
+      term_index_ptr_->deserializeMassMatch(mng_ptr->one_ptm_file_vec_[0] + suffix, index_dir);
+      diag_index_ptr_->deserializeMassMatch(mng_ptr->one_ptm_file_vec_[1] + suffix, index_dir);
+      rev_term_index_ptr_->deserializeMassMatch(mng_ptr->one_ptm_file_vec_[2] + suffix, index_dir);
+      rev_diag_index_ptr_->deserializeMassMatch(mng_ptr->one_ptm_file_vec_[3] + suffix, index_dir);
+    }
   }
   else{
     std::vector<std::vector<double>> shift_2d

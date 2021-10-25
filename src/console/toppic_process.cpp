@@ -21,6 +21,7 @@
 
 #include "common/base/base_data.hpp"
 #include "common/base/mod_util.hpp"
+#include "common/util/mem_check.hpp"
 #include "common/util/version.hpp"
 
 #include "seq/fasta_reader.hpp"
@@ -184,7 +185,11 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
 
     // Filter steps requires a large amount of memory. 
     // We use only one thread to reduce the memory requirement.
-    //int filter_thread_num = 1;
+    int filter_thread_num = mem_check::getMaxThreads("toppic_filter");
+    if (filter_thread_num > thread_num) {
+      filter_thread_num = thread_num;
+    }
+    LOG_DEBUG("Filter thread number " << filter_thread_num);
 
     bool use_gf = true;
     if (arguments["useLookupTable"] == "true") {
@@ -214,7 +219,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     std::cout << "Non PTM filtering - started." << std::endl;
     ZeroPtmFilterMngPtr zero_filter_mng_ptr
         = std::make_shared<ZeroPtmFilterMng>(prsm_para_ptr, index_file_para, 
-                                             thread_num, "toppic_zero_filter");
+                                             filter_thread_num, "toppic_zero_filter");
     zero_ptm_filter_processor::process(zero_filter_mng_ptr);
     std::cout << "Non PTM filtering - finished." << std::endl;
 
@@ -236,7 +241,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
       std::cout << "One PTM filtering - started." << std::endl;
       OnePtmFilterMngPtr one_ptm_filter_mng_ptr
           = std::make_shared<OnePtmFilterMng>(prsm_para_ptr, index_file_para, 
-                                              "toppic_one_filter", thread_num);
+                                              "toppic_one_filter", filter_thread_num);
       one_ptm_filter_processor::process(one_ptm_filter_mng_ptr);
       std::cout << "One PTM filtering - finished." << std::endl;
 

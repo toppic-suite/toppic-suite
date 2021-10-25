@@ -28,15 +28,16 @@ namespace toppic {
 namespace mem_check {
 
 int getMaxThreads(std::string app_name) {//return max thread number based on total memory size
-int totalMemInGb = -1;
-std::map<std::string, int> toppic_apps_memory_per_thread {
+  int totalMemInGb = -1;
+  std::map<std::string, int> toppic_apps_memory_per_thread {
     {"topfd", 2}, 
-    {"toppic", 4}, 
-    {"topmg", 4}, 
-    {"topmerge", 4}, 
-    {"topdiff", 4},
-    {"topindex", 4}  
-};
+      {"toppic", 2},
+      {"toppic_filter", 6},
+      {"topmg", 4}, 
+      {"topmerge", 4}, 
+      {"topdiff", 4},
+      {"topindex", 4}  
+  };
 #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
   MEMORYSTATUSEX memInfo;
   memInfo.dwLength = sizeof(MEMORYSTATUSEX);
@@ -56,7 +57,11 @@ std::map<std::string, int> toppic_apps_memory_per_thread {
     LOG_ERROR("invalid application name!");
     return 0;
   }
-  return totalMemInGb / toppic_apps_memory_per_thread[app_name];
+  int thread_num =  totalMemInGb / toppic_apps_memory_per_thread[app_name];
+  if (thread_num == 0) {
+    thread_num = 1;
+  }
+  return thread_num;
 }
 }
 }

@@ -14,6 +14,8 @@
 
 #include <algorithm>
 
+#include <boost/thread/mutex.hpp>
+
 #include "common/util/file_util.hpp"
 #include "ms/factory/prm_ms_util.hpp"
 #include "prsm/simple_prsm_util.hpp"
@@ -24,6 +26,9 @@
 #include "filter/diag/diag_filter.hpp"
 
 namespace toppic {
+
+// serialization mutex.
+boost::mutex diag_filter_mutex;
 
 DiagFilter::DiagFilter(const ProteoformPtrVec &proteo_ptrs,
                                DiagFilterMngPtr mng_ptr, std::string block_str) {
@@ -50,7 +55,11 @@ DiagFilter::DiagFilter(const ProteoformPtrVec &proteo_ptrs,
   if (index_files_exist){ 
     index_ptr_ = std::make_shared<MassMatch>();
     std::string file_name = mng_ptr->multi_ptm_file_vec_[0] + suffix;
-    index_ptr_->deserializeMassMatch(file_name, index_dir);
+
+    {
+      boost::unique_lock<boost::mutex> lock(diag_filter_mutex);
+      index_ptr_->deserializeMassMatch(file_name, index_dir);
+    }
   }
   else{
     index_ptr_ = mass_match_factory::getPrmDiagMassMatchPtr(proteo_ptrs,
