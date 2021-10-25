@@ -32,6 +32,7 @@ namespace one_ptm_index {
 void geneOnePtmIndexFile(const ProteoformPtrVec &proteo_ptrs,
                          OnePtmFilterMngPtr mng_ptr, std::vector<std::string> file_vec) {
 
+  std::string dir_name = mng_ptr->prsm_para_ptr_->getOriDbName() + "_idx";
   std::vector<std::vector<double>> shift_2d
       = proteoform_util::getNTermShift2D(proteo_ptrs, 
                                          mng_ptr->prsm_para_ptr_->getProtModPtrVec());
@@ -42,10 +43,16 @@ void geneOnePtmIndexFile(const ProteoformPtrVec &proteo_ptrs,
       = mass_match_factory::getPrmTermMassMatchPtr(proteo_ptrs, shift_2d,
                                                    mng_ptr->max_proteoform_mass_,
                                                    mng_ptr->filter_scale_);
+  term_index_ptr->serializeMassMatch(file_vec[0], dir_name);
+  term_index_ptr = nullptr;
+
   MassMatchPtr diag_index_ptr 
       = mass_match_factory::getPrmDiagMassMatchPtr(proteo_ptrs,
                                                    mng_ptr->max_proteoform_mass_,
                                                    mng_ptr->filter_scale_);
+  diag_index_ptr->serializeMassMatch(file_vec[1], dir_name);
+  diag_index_ptr = nullptr;
+
   std::vector<std::vector<double>> rev_shift_2d;
   std::vector<double> shift_1d(1, 0);
   for (size_t i = 0; i < proteo_ptrs.size(); i++) {
@@ -57,18 +64,16 @@ void geneOnePtmIndexFile(const ProteoformPtrVec &proteo_ptrs,
                                                    n_term_acet_2d,
                                                    mng_ptr->max_proteoform_mass_,
                                                    mng_ptr->filter_scale_);
+  rev_term_index_ptr->serializeMassMatch(file_vec[2], dir_name);
+  rev_term_index_ptr = nullptr;
+
   MassMatchPtr rev_diag_index_ptr 
       = mass_match_factory::getSrmDiagMassMatchPtr(proteo_ptrs, 
                                                    n_term_acet_2d,
                                                    mng_ptr->max_proteoform_mass_,
                                                    mng_ptr->filter_scale_);
-
-  std::string dir_name = mng_ptr->prsm_para_ptr_->getOriDbName() + "_idx";
-
-  term_index_ptr->serializeMassMatch(file_vec[0], dir_name);
-  diag_index_ptr->serializeMassMatch(file_vec[1], dir_name);
-  rev_term_index_ptr->serializeMassMatch(file_vec[2], dir_name);
   rev_diag_index_ptr->serializeMassMatch(file_vec[3], dir_name); 
+  rev_diag_index_ptr = nullptr;
 }
 
 void createIndexFiles(const ProteoformPtrVec & raw_forms,
