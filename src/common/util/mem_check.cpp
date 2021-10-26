@@ -14,6 +14,8 @@
 
 #include <math.h>
 #include <iostream>
+#include <fstream>
+#include <limits>
 #include "common/util/mem_check.hpp"
 #include "common/util/logger.hpp"
 
@@ -27,29 +29,51 @@ namespace toppic {
 
 namespace mem_check {
 
+#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
+#else
+double getAvailMemInGb () {
+  std::string token;
+  std::ifstream file("/proc/meminfo");
+  while(file >> token) {
+    if(token == "MemAvailable:") {
+      double mem;
+      if(file >> mem) {
+        return mem/1024/1024;
+      } else {
+        return -1;
+      }
+    }
+    // Ignore the rest of the line
+    file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+  }
+  return 0; // Nothing found
+}
+#endif
+
 int getMaxThreads(std::string app_name) {//return max thread number based on total memory size
-  int totalMemInGb = -1;
-  std::map<std::string, int> toppic_apps_memory_per_thread {
-    {"topfd", 2}, 
+  double freeMemInGb = -1;
+  std::map<std::string, double> toppic_apps_memory_per_thread {
+    {"topfd", 0.5}, 
       {"toppic", 2},
-      {"toppic_filter", 6},
+      {"toppic_filter", 4},
       {"topmg", 4}, 
       {"topmerge", 4}, 
       {"topdiff", 4},
-      {"topindex", 4}  
+      {"topindex", 1.5}  
   };
 #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
   MEMORYSTATUSEX memInfo;
   memInfo.dwLength = sizeof(MEMORYSTATUSEX);
   GlobalMemoryStatusEx(&memInfo);
   DWORDLONG totalMem = memInfo.ullTotalPhys;
-  totalMemInGb = (int)(roundl(totalMem / pow(10, 9)));
+  freeMemInGb = totalMem / pow(2, 30);
 #else
-  struct sysinfo si;
-  sysinfo(&si);
-  totalMemInGb = (int)(roundl(si.totalram / pow(10, 9)));
+  //struct sysinfo si;
+  //sysinfo(&si);
+  //freeMemInGb = (int)(roundl(si.freeram / pow(10, 9)));
+  freeMemInGb = getAvailMemInGb();
 #endif
-  if (totalMemInGb < 0) {
+  if (freeMemInGb < 0) {
     LOG_ERROR("invalid memory size!");
     return 0;
   }
@@ -57,7 +81,8 @@ int getMaxThreads(std::string app_name) {//return max thread number based on tot
     LOG_ERROR("invalid application name!");
     return 0;
   }
-  int thread_num =  totalMemInGb / toppic_apps_memory_per_thread[app_name];
+  LOG_DEBUG("Free ram " << freeMemInGb);
+  int thread_num =  static_cast<int>(freeMemInGb / toppic_apps_memory_per_thread[app_name]);
   if (thread_num == 0) {
     thread_num = 1;
   }
