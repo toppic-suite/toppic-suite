@@ -184,9 +184,8 @@ bool Argument::parse(int argc, char* argv[]) {
     if (vm.count("thread-number")) {
       int max_thread = mem_check::getMaxThreads("topfd");
       if (max_thread < std::stoi(thread_number)) {
-        std::cout << "WARNING: Based on the memory size, up to " << max_thread << " threads can be used on this computer." << std::endl;
-        std::cout << "Please reset the thread number to " << max_thread << " or less and run the program again." << std::endl;
-        return false;
+        std::cout << "WARNING: Based on the available memory size, up to " << max_thread << " threads can be used." << std::endl;
+        std::cout << "Please set the thread number to " << max_thread << " or the program may crash." << std::endl;
       }
       topfd_para_ptr_->thread_number_ = std::stoi(thread_number);
     }
