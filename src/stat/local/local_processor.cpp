@@ -397,7 +397,7 @@ ProteoformPtr LocalProcessor::processTwoKnownPtms(PrsmPtr prsm_ptr) {
   }
 
 
-  int ori_match_score = prsm_ptr->getMatchPeakNum();
+  int ori_match_score = prsm_ptr->getMatchFragNum();
   if (best_match_score <= 0 
       || best_match_score < ori_match_score - mng_ptr_->DESC_MATCH_LIMIT_
       || best_match_score < ori_match_score * mng_ptr_->desc_ratio_) {
