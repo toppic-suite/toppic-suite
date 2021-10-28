@@ -408,6 +408,12 @@ ProteoformPtr LocalProcessor::processTwoKnownPtms(PrsmPtr prsm_ptr) {
                                               best_ptm_pair.first, best_ptm_pair.second);
     // check if the PTM localization results are overlapping with the original
     // mass shifts
+    
+    //result_ptr can be null when the proteoform with ptm yields low score than filtering threshold
+    //in that case, running massShiftOverlap causes seg fault
+    if (result_ptr == nullptr) {
+      return nullptr;
+    }
     if (massShiftOverlap(ori_form_ptr, result_ptr)) {
       return result_ptr;
     }
