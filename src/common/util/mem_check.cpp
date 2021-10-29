@@ -65,7 +65,7 @@ int getMaxThreads(std::string app_name) {//return max thread number based on tot
   MEMORYSTATUSEX memInfo;
   memInfo.dwLength = sizeof(MEMORYSTATUSEX);
   GlobalMemoryStatusEx(&memInfo);
-  DWORDLONG totalMem = memInfo.ullTotalPhys;
+  DWORDLONG totalMem = memInfo.ullAvailPhys;
   freeMemInGb = totalMem / pow(2, 30);
 #else
   //struct sysinfo si;
