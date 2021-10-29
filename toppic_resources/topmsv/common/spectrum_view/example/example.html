@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Draw Spectrum View</title>
+
+    <script src="../../../node_modules/jquery/dist/jquery.js"></script>
+    <script src="../../../node_modules/d3/dist/d3.js"></script>
+
+    <script src="../spectrum_view.js"></script>
+    <script src="../spectrum_parameter.js"></script>
+    <script src="../draw_spectrum.js"></script>
+
+    <script src="sample_ion_data.js"></script>
+        
+    <script src="../../distribution_calc/amino_acid_distribution.js"></script>    
+
+    <script src="../../mass_spectrum/peak.js"></script>
+    <script src="../../mass_spectrum/envelope.js"></script>
+    <script src="../../mass_spectrum/spectrumFunction.js"></script>    
+    <script src="../../mass_spectrum/ion.js"></script>    
+    <script src="../../mass_spectrum/spectrum.js"></script>   
+
+    <script src="../../sequence/mod.js"></script>    
+    <script src="../../sequence/massShift.js"></script>    
+    <script src="../../sequence/proteoform.js"></script>    
+    <script src="../../sequence/theoMass.js"></script>    
+
+    <script src="../../parse_json/parse_prsm.js"></script>
+    <script src="../../parse_json/parse_util.js"></script>
+
+    <script src="../../proteoform/protein_constant.js"></script>
+
+    <script src="../../prsm/prsm.js"></script>
+    <script src="../../prsm/matchedPeakEnvelopePair.js"></script>
+
+    <script src="../../util/types.js"></script>    
+       
+    <script type="text/javascript" src="sample_env_data.js"></script>
+    <script type="text/javascript" src="sample_ion_data.js"></script>
+    <script type="text/javascript" src="sample_mono_peak_data.js"></script>
+    <script type="text/javascript" src="sample_peak_data.js"></script>
+
+    <script>
+      $(document).ready(function(){
+        //convert sample data in JSON to class objects
+        let matchedIonList = [];
+        let monoPeaks = [];
+        let peaks = [];
+        let envs = [];
+
+        sampleMatchedIon.forEach((ion) => {
+          let newIon = JSON.parse(JSON.stringify(ion));
+          let newEnv = Object.assign(new Envelope, ion.env);
+          newIon.env = newEnv;
+          let peaks = [];
+          ion.env.peaks_.forEach((peak) => {
+            peaks.push(Object.assign(new Peak, peak));
+          })
+          newIon.env.peaks_ = peaks;
+          matchedIonList.push(newIon);
+        });
+        sampleMonoPeaks.forEach((peak) => {
+          monoPeaks.push(Object.assign(new Peak, peak));
+        });
+        samplePeaks.forEach((peak) => {
+          peaks.push(Object.assign(new Peak, peak));
+        });
+        sampleEnvelopes.forEach((env) => {
+          let peaks = [];
+          env.peaks_.forEach((peak) => {
+            peaks.push(Object.assign(new Peak, peak));
+          })
+          env.peaks_ = peaks;
+          envs.push(Object.assign(new Envelope, env));
+        });
+        /*steps for drawing a spectrum view*/
+        //initialize class for drawing spectrum view
+        let spView = new SpectrumView("spectrum-view", peaks);
+        //add envelope annotations
+        spView.addRawSpectrumAnno(envs, matchedIonList);
+        //draw the view
+        spView.redraw();
+
+        /*steps for drawing a mono mass view*/
+        let seq = "MPRSLKKGPFIDLHLLKKVEKAVESGDKKPLRTWSRRSTIFPNMIGLTIAVHNGRQHVPVFVSDEMVGHKLGEFAPTRTYRGHAADKKAKKK";
+        let proteoform = new Proteoform("0", "", "", seq, "", 1, 91, 10278.6589, [], []);
+
+        let nIon = "B";
+        let cIon = "Y";
+        //same class as drawing spectrum view
+        let monoSpView = new SpectrumView("mono-mass-view", monoPeaks, proteoform.getSeq().length);
+        //add annotations for mono mass view
+        monoSpView.addMonoMassSpectrumAnno(matchedIonMassGraph, proteoform, nIon, cIon);
+        //set the view type to mono mass graph (without this step it will be a spectrum view)
+        monoSpView.getPara().setMonoMassGraph(true);
+        //draw the view
+        monoSpView.redraw();
+      })
+    </script>
+  </head>
+
+  <body>
+    <svg id = "spectrum-view" height="250" width = "1000" style="background-color:white;max-width:80%;max-height:50%"></svg>
+    <svg id = "mono-mass-view" height="250" width = "1000" style="background-color:white;max-width:80%;max-height:50%"></svg>
+  </body>
+</html>

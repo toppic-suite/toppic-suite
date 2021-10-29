@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Draw Amino Acid Squence</title>
+
+    <script src="../../../node_modules/jquery/dist/jquery.js"></script>
+    <script src="../../../node_modules/d3/dist/d3.js"></script>
+
+    <script src="../draw_prsm.js"></script>
+    <script src="../prsm_data.js"></script>
+    <script src="../prsm_view.js"></script>
+    <script src="../prsm_para.js"></script>
+
+    <script src="../../parse_json/parse_prsm.js"></script>
+    <script src="../../parse_json/parse_util.js"></script>
+
+    <script src="../../util/types.js"></script>
+
+    <script src="../../sequence/mod.js"></script>
+    <script src="../../sequence/massShift.js"></script>
+    <script src="../../sequence/proteoform.js"></script>
+    <script src="../../sequence/theoMass.js"></script>
+
+    <script src="../../prsm/prsm.js"></script>
+
+    <script src="../../distribution_calc/amino_acid_distribution.js"></script>
+
+    <script src="../../mass_spectrum/ion.js"></script>
+    
+    <script type="text/javascript" src="./prsm40.js"></script>
+    
+    <script>
+      $(document).ready(function(){
+        //initialize class for parsing JSON file to generate prsm object
+        let parsePrsm = new ParsePrsm(false, "", false, "");//false to all since not generating spectrum views
+        parsePrsm.geneDataObj(function(prsmObj) {
+          //initialize prsmView class with svg id and data object
+          let prsmView = new PrsmView("svg", prsmObj);
+          //draw the view
+          prsmView.redraw();
+
+          console.log("sequence:", prsmView.getData().getSequence());
+          console.log("massShifts:", prsmView.getData().getMassShifts());
+          console.log("proteoform:", prsmView.getData().getProteoform());
+          console.log("breakpoints:", prsmView.getData().getBreakPoints());
+          console.log("residues:", prsmView.getData().getResidues());
+        }, true);//set to false when using spectrum view as well
+      })  
+    </script>
+  </head>
+  <body>
+    <svg id = "svg"></svg>
+  </body>
+</html>

@@ -1,0 +1,110 @@
+{
+  "_from": "d3",
+  "_id": "d3@5.16.0",
+  "_inBundle": false,
+  "_integrity": "sha512-4PL5hHaHwX4m7Zr1UapXW23apo6pexCgdetdJ5kTmADpG/7T9Gkxw0M0tf/pjoB63ezCCm0u5UaFYy2aMt0Mcw==",
+  "_location": "/d3",
+  "_phantomChildren": {},
+  "_requested": {
+    "escapedName": "d3",
+    "fetchSpec": "latest",
+    "name": "d3",
+    "raw": "d3",
+    "rawSpec": "",
+    "registry": true,
+    "saveSpec": null,
+    "type": "tag"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/d3/-/d3-5.16.0.tgz",
+  "_shasum": "9c5e8d3b56403c79d4ed42fbd62f6113f199c877",
+  "_spec": "d3",
+  "_where": "/home/jiangtia/Work/Toppic_code_organize/proteomics_cpp/toppic_resources/topview",
+  "author": {
+    "name": "Mike Bostock",
+    "url": "https://bost.ocks.org/mike"
+  },
+  "bugs": {
+    "url": "https://github.com/d3/d3/issues"
+  },
+  "bundleDependencies": false,
+  "dependencies": {
+    "d3-array": "1",
+    "d3-axis": "1",
+    "d3-brush": "1",
+    "d3-chord": "1",
+    "d3-collection": "1",
+    "d3-color": "1",
+    "d3-contour": "1",
+    "d3-dispatch": "1",
+    "d3-drag": "1",
+    "d3-dsv": "1",
+    "d3-ease": "1",
+    "d3-fetch": "1",
+    "d3-force": "1",
+    "d3-format": "1",
+    "d3-geo": "1",
+    "d3-hierarchy": "1",
+    "d3-interpolate": "1",
+    "d3-path": "1",
+    "d3-polygon": "1",
+    "d3-quadtree": "1",
+    "d3-random": "1",
+    "d3-scale": "2",
+    "d3-scale-chromatic": "1",
+    "d3-selection": "1",
+    "d3-shape": "1",
+    "d3-time": "1",
+    "d3-time-format": "2",
+    "d3-timer": "1",
+    "d3-transition": "1",
+    "d3-voronoi": "1",
+    "d3-zoom": "1"
+  },
+  "deprecated": false,
+  "description": "Data-Driven Documents",
+  "devDependencies": {
+    "json2module": "0.0",
+    "rimraf": "2",
+    "rollup": "1",
+    "rollup-plugin-ascii": "0.0",
+    "rollup-plugin-node-resolve": "3",
+    "rollup-plugin-terser": "5",
+    "tape": "4"
+  },
+  "files": [
+    "dist/**/*.js",
+    "index.js"
+  ],
+  "homepage": "https://d3js.org",
+  "jsdelivr": "dist/d3.min.js",
+  "keywords": [
+    "animation",
+    "canvas",
+    "dom",
+    "svg",
+    "visualization"
+  ],
+  "license": "BSD-3-Clause",
+  "main": "dist/d3.node.js",
+  "module": "index.js",
+  "name": "d3",
+  "optionalDependencies": {},
+  "readme": "# D3: Data-Driven Documents\n\n<a href=\"https://d3js.org\"><img src=\"https://d3js.org/logo.svg\" align=\"left\" hspace=\"10\" vspace=\"6\"></a>\n\n**D3** (or **D3.js**) is a JavaScript library for visualizing data using web standards. D3 helps you bring data to life using SVG, Canvas and HTML. D3 combines powerful visualization and interaction techniques with a data-driven approach to DOM manipulation, giving you the full capabilities of modern browsers and the freedom to design the right visual interface for your data.\n\n## Resources\n\n* [Introduction](https://observablehq.com/@d3/learn-d3)\n* [API Reference](https://github.com/d3/d3/blob/master/API.md)\n* [Releases](https://github.com/d3/d3/releases)\n* [Examples](https://observablehq.com/@d3/gallery)\n* [Wiki](https://github.com/d3/d3/wiki)\n\n## Installing\n\nIf you use npm, `npm install d3`. Otherwise, download the [latest release](https://github.com/d3/d3/releases/latest). The released bundle supports anonymous AMD, CommonJS, and vanilla environments. You can load directly from [d3js.org](https://d3js.org), [CDNJS](https://cdnjs.com/libraries/d3), or [unpkg](https://unpkg.com/d3/). For example:\n\n```html\n<script src=\"https://d3js.org/d3.v5.js\"></script>\n```\n\nFor the minified version:\n\n```html\n<script src=\"https://d3js.org/d3.v5.min.js\"></script>\n```\n\nYou can also use the standalone D3 microlibraries. For example, [d3-selection](https://github.com/d3/d3-selection):\n\n```html\n<script src=\"https://d3js.org/d3-selection.v1.js\"></script>\n```\n\nD3 is written using [ES2015 modules](http://www.2ality.com/2014/09/es6-modules-final.html). Create a [custom bundle using Rollup](https://bl.ocks.org/mbostock/bb09af4c39c79cffcde4), Webpack, or your preferred bundler. To import D3 into an ES2015 application, either import specific symbols from specific D3 modules:\n\n```js\nimport {scaleLinear} from \"d3-scale\";\n```\n\nOr import everything into a namespace (here, `d3`):\n\n```js\nimport * as d3 from \"d3\";\n```\n\nIn Node:\n\n```js\nvar d3 = require(\"d3\");\n```\n\nYou can also require individual modules and combine them into a `d3` object using [Object.assign](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign):\n\n```js\nvar d3 = Object.assign({}, require(\"d3-format\"), require(\"d3-geo\"), require(\"d3-geo-projection\"));\n```\n",
+  "readmeFilename": "README.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/d3/d3.git"
+  },
+  "scripts": {
+    "postpublish": "git push && git push --tags && cd ../d3.github.com && git pull && cp ../d3/dist/d3.js d3.v5.js && cp ../d3/dist/d3.min.js d3.v5.min.js && git add d3.v5.js d3.v5.min.js && git commit -m \"d3 ${npm_package_version}\" && git push && cd - && cd ../d3-bower && git pull && cp ../d3/LICENSE ../d3/README.md ../d3/dist/d3.js ../d3/dist/d3.min.js . && git add -- LICENSE README.md d3.js d3.min.js && git commit -m \"${npm_package_version}\" && git tag -am \"${npm_package_version}\" v${npm_package_version} && git push && git push --tags && cd - && zip -j dist/d3.zip -- LICENSE README.md API.md CHANGES.md dist/d3.js dist/d3.min.js",
+    "prepublishOnly": "yarn test",
+    "pretest": "rimraf dist && mkdir dist && json2module package.json > dist/package.js && rollup -c",
+    "test": "tape 'test/**/*-test.js'"
+  },
+  "unpkg": "dist/d3.min.js",
+  "version": "5.16.0"
+}

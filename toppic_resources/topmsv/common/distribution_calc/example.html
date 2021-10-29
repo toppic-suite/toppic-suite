@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" 
+                    href="../../node_modules/@fortawesome/fontawesome-free/css/all.css">
+    <link rel="stylesheet" type="text/css" 
+                    href="../../node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Calculate theoretical envelopes</title>
+
+    <script src="../../node_modules/jquery/dist/jquery.js"></script>
+
+    <script src="../mass_spectrum/peak.js"></script>
+    <script src="../mass_spectrum/envelope.js"></script>
+
+    <script src="isotopes.js"></script>
+    <script src="molecular_formulae.js"></script>
+    
+    <script>
+      $(document).ready(function(){
+        //sample data
+        let expPeak = [new Peak("0", 606.9814, 606.9814, 2198.9), new Peak("1", 607.0426, 607.0426, 737.7), new Peak("2", 607.0745, 607.0745, 1228), new Peak("3", 607.3271, 607.3271, 3184.6), new Peak("4", 607.4625, 607.4625, 797.92),
+        new Peak("5", 607.5937, 607.5937, 740.15), new Peak("6", 607.7231, 607.7231, 29555), new Peak("7", 607.8482, 607.8482, 76613), new Peak("8", 607.9734, 607.9734, 105560), new Peak("9", 608.0096, 608.0096, 1948.8)];
+        let theoPeak = new Envelope(4853.7224, 8, 443089.42);
+        //initialize class for envelope distribution calculation
+        let molecularFormObj = new MolecularFormulae();
+        //calculate distribution
+        let envDistribution = molecularFormObj.emass(theoPeak.getMonoMass(), theoPeak.getCharge(), expPeak);
+        let result = "";
+        envDistribution.forEach((env) => {
+          result = result + JSON.stringify(env) + ", ";
+        })
+        $("#sequencedata").text(result);
+      })
+    </script>
+
+</head>
+<body>
+  <div class="container bodycontainer">
+    <div class="flex-rectangle">
+      <div class="row">
+        <div class="col-md-3 col-lg-3">
+          <h5>Peaks (m/z, intensity)</h5>
+          <textarea readonly id="peakData" class="form-control col-xs-12" rows="10" cols="50">606.9814 2198.9
+607.0426 737.7
+607.0745 1228
+607.3271 3184.6
+607.4625 797.92
+607.5937 740.15
+607.7231 29555
+607.8482 76613
+607.9734 105560</textarea>
+        </div>
+        <div class="col-md-5 col-lg-5">
+          <h5>Masses & intensities (mass, intensity, charge)</h5>
+          <textarea readonly id="massData" class="form-control col-xs-12" rows="10" >4853.7224 443089.42 8</textarea>
+        </div>
+        <div class="col-md-4 col-lg-4"></div>
+      </div>
+      <div class="row">
+        <h5>&nbsp;&nbsp;&nbsp;Result</h5>
+      </div>
+      <div class="row">
+        <textarea id="sequencedata" class="form-control col-xs-8" rows="10" style="min-width: 1000px"></textarea>
+      </div>
+  </div>
+</body>
+</html>

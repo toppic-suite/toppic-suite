@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+  <head>    
+    <link rel="stylesheet" type="text/css" 
+                    href="../../../node_modules/@fortawesome/fontawesome-free/css/all.css">
+    <link rel="stylesheet" type="text/css" 
+                    href="../../../node_modules/datatables.net-dt/css/jquery.dataTables.css">
+    <link rel="stylesheet" type="text/css" 
+                    href="../../../node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css"
+                    href="../../../common/shared/css/common.css"/>
+            
+    <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      
+    <title>Peak Data Table</title>
+
+    <script src="../../../node_modules/jquery/dist/jquery.js"></script>
+    <script src="../../../node_modules/d3/dist/d3.js"></script>
+    <script src="../../../node_modules/datatables.net/js/jquery.dataTables.js"></script>
+
+    <script src="../../spectrum_view/spectrum_view.js"></script>
+    <script src="../../spectrum_view/spectrum_parameter.js"></script>
+    <script src="../../spectrum_view/draw_spectrum.js"></script>
+
+    <script src="../../distribution_calc/amino_acid_distribution.js"></script>    
+
+    <script src="../../mass_spectrum/peak.js"></script>
+    <script src="../../mass_spectrum/envelope.js"></script>
+    <script src="../../mass_spectrum/spectrumFunction.js"></script>    
+    <script src="../../mass_spectrum/ion.js"></script>    
+    <script src="../../mass_spectrum/spectrum.js"></script>   
+
+    <script src="../../sequence/proteoform.js"></script>    
+    <script src="../../sequence/massShift.js"></script>
+    <script src="../../sequence/theoMass.js"></script>    
+
+    <script src="../../prsm/prsm.js"></script>
+    <script src="../../prsm/matchedPeakEnvelopePair.js"></script>
+
+    <script src="../draw_table.js"></script>
+
+    <script src="../../parse_json/parse_prsm.js"></script>
+    <script src="../../parse_json/parse_util.js"></script>
+
+    <script src="../../util/types.js"></script>    
+
+    <script src="sample_ion_data.js"></script>
+    <script src="prsm40.js"></script>
+    
+    <script>
+      $(document).ready(function(){
+        /*converting data in JSON format to the class objects*/
+        let matchedIonList = [];
+        sampleMatchedIons.forEach((ion) => {
+            let newIon = JSON.parse(JSON.stringify(ion));
+            let newEnv = Object.assign(new Envelope, ion.env);
+            newIon.env = newEnv;
+            let peaks = [];
+            ion.env.peaks_.forEach((peak) => {
+                peaks.push(Object.assign(new Peak, peak));
+            })
+            newIon.env.peaks_ = peaks;
+            matchedIonList.push(newIon);
+        });
+        let parsePrsm = new ParsePrsm(false, "", true, "");
+        parsePrsm.geneDataObj(function(prsmObj) {
+          //get spectrum data from the prsm object
+          let spectrum = prsmObj.getMs2Spectra()[0];
+          //initialize spectrum view
+          let spGraph = new SpectrumView("spectrum-view", spectrum.getPeaks());
+          //add theoretical envelope annotations
+          spGraph.addRawSpectrumAnno(spectrum.getEnvs(), matchedIonList);
+          //assign levels to peaks and envelopes to display some of them instead of all when m/z range of the view is large (for the case when the data is large)
+          let spectrumDataPeaks = new SpectrumFunction();
+          let spectrumDataEnvs = new SpectrumFunction();
+          spectrumDataPeaks.assignLevelPeaks(spectrum.getPeaks());
+          spectrumDataEnvs.assignLevelEnvs(spectrum.getEnvs());
+          //draw view
+          spGraph.redraw();
+          
+          //initialize data table
+          let dataTable = new DataTable(prsmObj, true, [spGraph]);
+          //provide spectrum view id to make it sync with the table
+          dataTable.setSpecSvgId("spectrum-view");
+          //draw table
+          dataTable.drawTable();
+        })
+      })
+    </script>
+
+  </head>
+  <body style="max-width: 80%">
+    <svg id = "spectrum-view" height="250" width = "1000" style="background-color:white;max-width:80%;max-height:50%"></svg>
+    <div>
+      <table>
+        <tr>
+          <td width = "55%">
+            <div class = "peaks" style="font-size:16px;">
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <a id = "all_peak_count" href="#spectrum">All peaks </a>
+              &nbsp;&nbsp;
+              <a id = "matched_peak_count" href="#spectrum">Matched peaks </a>
+              &nbsp;&nbsp;
+              <a id = "not_matched_peak_count" href="#spectrum">Not matched peaks </a>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div>
+      <table id="spectrum" class="display" >
+        <thead>
+          <tr role="row">
+            <th width="25">Scan</th>
+            <th width="25">Peak</th>
+            <th width="90">Mono mass</th>
+            <th width="90">Mono m/z</th>
+            <th width="80" style="vertical-align:middle">Intensity</th>
+            <th width="75" style="vertical-align:middle">Charge</th>
+            <th width="103">Theoretical mass</th>
+            <th width="50" style="vertical-align:middle">Ion</th>
+            <th width="70" style="vertical-align:middle">Pos</th>
+            <th width="95">Mass error</th>
+            <th width="80">PPM error</th>
+          </tr>
+        </thead>
+      </table>
+    </div>
+  </body>
+</html>
