@@ -19,12 +19,21 @@ class ParsePrsm {
         let prot = prsm_data.prsm.annotated_protein;
         let breakPoints = json2BreakPoints(prsm, parseInt(prot.annotation.first_residue_position));
         let [nIons, cIon] = this.parseIons();
-        this.geneMs1Spectrum(nIons, cIon, (ms1Spec) => {
+        /*this.geneMs1Spectrum(nIons, cIon, (ms1Spec) => {
             this.geneMs2Spectrum(nIons, cIon, (ms2Spec) => {
                 let machedPeakEnvPair = [];
                 ms2Spec.forEach((spectra) => {
                     machedPeakEnvPair = machedPeakEnvPair.concat(this.geneMatchedPeakEnvelopePairs(spectra.getSpectrumId(), spectra.getEnvs()));
                 });
+                callback(new Prsm(prsm.prsm_id, proteoformObj, ms1Spec, ms2Spec, breakPoints, machedPeakEnvPair, prsm.ms.ms_header.spectrum_file_name, prsm.e_value, prsm.fdr, undefined, undefined, prsm.matched_fragment_number));
+            });
+        });*/
+        this.geneMs2Spectrum(nIons, cIon, (ms2Spec, targetMz, maxMz, minMz) => {
+            let machedPeakEnvPair = [];
+            ms2Spec.forEach((spectra) => {
+                machedPeakEnvPair = machedPeakEnvPair.concat(this.geneMatchedPeakEnvelopePairs(spectra.getSpectrumId(), spectra.getEnvs()));
+            });
+            this.geneMs1Spectrum(nIons, cIon, targetMz, maxMz, minMz, (ms1Spec) => {
                 callback(new Prsm(prsm.prsm_id, proteoformObj, ms1Spec, ms2Spec, breakPoints, machedPeakEnvPair, prsm.ms.ms_header.spectrum_file_name, prsm.e_value, prsm.fdr, undefined, undefined, prsm.matched_fragment_number));
             });
         });
@@ -40,7 +49,7 @@ class ParsePrsm {
         let sequence = getAminoAcidSequence(0, prot.annotation.residue.length - 1, prot.annotation.residue);
         return new Proteoform(prot.proteoform_id, prot.sequence_name, prot.sequence_description, sequence, prot.sequence_id, parseInt(prot.annotation.first_residue_position), parseInt(prot.annotation.last_residue_position), parseFloat(prot.proteoform_mass), massShifts, fixedPtms, protVarPtms, variablePtms);
     }
-    geneMs1Spectrum(nIons, cIons, callback) {
+    geneMs1Spectrum(nIons, cIons, targetMz, minMz, maxMz, callback) {
         if (!this.drawMs1Spec_) {
             callback(null);
         }
@@ -71,7 +80,7 @@ class ParsePrsm {
                     }
                     envelopes.push(envObj);
                 }
-                callback(new Spectrum(ms1_data.id.toString(), ms1_data.scan.toString(), 1, peaks, null, envelopes, nIons, cIons, parseFloat(prsm.ms.ms_header.precursor_mono_mass), parseFloat(prsm.ms.ms_header.precursor_charge), parseFloat(prsm.ms.ms_header.precursor_mz)));
+                callback(new Spectrum(ms1_data.id.toString(), ms1_data.scan.toString(), 1, peaks, null, envelopes, nIons, cIons, parseFloat(prsm.ms.ms_header.precursor_mono_mass), parseFloat(prsm.ms.ms_header.precursor_charge), targetMz, minMz, maxMz));
             };
         }
     }
@@ -148,7 +157,10 @@ class ParsePrsm {
                             let ms2Spectrum = new Spectrum(specList[j].id.toString(), specList[j].scan.toString(), 1, peaks, deconvPeaks, envelopes, nIons, cIons, parseFloat(prsm.ms.ms_header.precursor_mono_mass), parseFloat(prsm.ms.ms_header.precursor_charge), parseFloat(prsm.ms.ms_header.precursor_mz));
                             specObjList.push(ms2Spectrum);
                         }
-                        callback(specObjList);
+                        let targetMz = parseFloat(specList[0].target_mz);
+                        let minMz = parseFloat(specList[0].min_mz);
+                        let maxMz = parseFloat(specList[0].max_mz);
+                        callback(specObjList, targetMz, minMz, maxMz);
                     }
                 };
             }

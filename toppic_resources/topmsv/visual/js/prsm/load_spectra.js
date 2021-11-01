@@ -17,7 +17,7 @@ function loadMsOne(ms1Spec, ms1SvgId) {
     spGraph.addRawSpectrumAnno(ms1Spec.getEnvs(), ions);
     let precMonoMz = ms1Spec.getPrecMz();
     spGraph.getPara().updateMzRange(precMonoMz);
-    spGraph.getPara().setHighlight(precMonoMz);
+    spGraph.getPara().setHighlight(ms1Spec);
     spGraph.redraw();
 }
 function loadMsTwo(prsmObj, ms2GraphList, divId, navId) {

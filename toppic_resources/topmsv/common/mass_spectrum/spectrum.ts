@@ -9,10 +9,12 @@ class Spectrum {
   private precMass_: number;
   private precCharge_: number;
   private precMz_: number;
+  private minMz_: number = -1;
+  private maxMz_: number = -1;
   private envList_: Envelope[] = [];
 
   constructor(id: string, scanNum: string, level: number, peakList: Peak[], decovPeakList: Peak[] | null, envList: Envelope[] = [], nIon: Ion[], cIon: Ion[],
-    mass: number, charge: number = -1, mz: number = -1) {
+    mass: number, charge: number = -1, mz: number = -1, minMz?: number, maxMz?: number) {
     this.id_ = id; 
     this.scanNum_ = scanNum;
     this.level_ = level;
@@ -24,6 +26,13 @@ class Spectrum {
     this.precMass_ = mass;
     this.precCharge_ = charge;
     this.precMz_ = mz;
+
+    if (minMz) {
+      this.minMz_ = minMz;// only used for ms1 spectrum. target mz - lower offset
+    }
+    if (maxMz) {
+      this.maxMz_ = maxMz;// only used for ms1 spectrum. target mz + higher offset
+    }
   }
   getSpectrumId(): string {
     return this.id_;
@@ -57,6 +66,12 @@ class Spectrum {
   }
   getPrecMz(): number {
     return this.precMz_;
+  }
+  getMaxMz(): number {
+    return this.maxMz_;
+  }
+  getMinMz(): number {
+    return this.minMz_;
   }
   setPeaks(peaks: Peak[]): void {
     this.peakList_ = peaks;

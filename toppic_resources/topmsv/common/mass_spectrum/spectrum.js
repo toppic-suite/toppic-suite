@@ -1,6 +1,8 @@
 "use strict";
 class Spectrum {
-    constructor(id, scanNum, level, peakList, decovPeakList, envList = [], nIon, cIon, mass, charge = -1, mz = -1) {
+    constructor(id, scanNum, level, peakList, decovPeakList, envList = [], nIon, cIon, mass, charge = -1, mz = -1, minMz, maxMz) {
+        this.minMz_ = -1;
+        this.maxMz_ = -1;
         this.envList_ = [];
         this.id_ = id;
         this.scanNum_ = scanNum;
@@ -13,6 +15,12 @@ class Spectrum {
         this.precMass_ = mass;
         this.precCharge_ = charge;
         this.precMz_ = mz;
+        if (minMz) {
+            this.minMz_ = minMz; // only used for ms1 spectrum. target mz - lower offset
+        }
+        if (maxMz) {
+            this.maxMz_ = maxMz; // only used for ms1 spectrum. target mz + higher offset
+        }
     }
     getSpectrumId() {
         return this.id_;
@@ -46,6 +54,12 @@ class Spectrum {
     }
     getPrecMz() {
         return this.precMz_;
+    }
+    getMaxMz() {
+        return this.maxMz_;
+    }
+    getMinMz() {
+        return this.minMz_;
     }
     setPeaks(peaks) {
         this.peakList_ = peaks;

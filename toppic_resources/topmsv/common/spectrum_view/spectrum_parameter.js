@@ -396,13 +396,10 @@ class SpectrumViewParameters {
      * @description
      * set highlight region for MS1 precursor envelope
      */
-    setHighlight(precMonoMz) {
+    setHighlight(ms1Spec) {
         this.showHighlight_ = true;
-        let monoMz = precMonoMz;
-        let centerMz = monoMz * this.avgToMonoRatio_;
-        let dist = centerMz - monoMz + 0.02;
-        this.hlMinMz_ = centerMz - dist;
-        this.hlMaxMz_ = centerMz + dist;
+        this.hlMinMz_ = ms1Spec.getMinMz();
+        this.hlMaxMz_ = ms1Spec.getMaxMz();
         //console.log(precMonoMz, this.hlMinMz, this.hlMaxMz);
     }
     setMonoMassGraph(isMonoMass) {

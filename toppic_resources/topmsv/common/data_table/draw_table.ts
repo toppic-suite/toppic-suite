@@ -324,7 +324,9 @@
             td.appendChild(a);
           }
           if (i == 4) {
-            td.innerHTML = peak.getIntensity().toString();
+            //td.innerHTML = peak.getIntensity().toString();
+            let intensity: string = (peak.getIntensity()).toExponential();
+            td.innerHTML = Number.parseFloat(intensity).toPrecision(3);
             td.setAttribute("class", "row_intensity");
           }
           if (i == 5) {
