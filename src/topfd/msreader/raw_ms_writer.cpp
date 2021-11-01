@@ -41,9 +41,16 @@ void write(std::string &file_name, RawMsPtr ms_ptr, MatchEnvPtrVec &envs) {
   int scan_id = header_ptr->getId();
   int scan_num = header_ptr->getFirstScanNum();
   double retention_time = header_ptr->getRetentionTime();
+  double target_mz = header_ptr->getPrecTargetMz();
+  double begin_mz = header_ptr->getPrecWinBegin();
+  double end_mz = header_ptr->getPrecWinEnd();
+
   doc.AddMember("id", scan_id, allocator);
   doc.AddMember("scan", scan_num, allocator);
   doc.AddMember("retention_time", retention_time, allocator);
+  doc.AddMember("target_mz", target_mz, allocator);
+  doc.AddMember("min_mz", begin_mz, allocator);
+  doc.AddMember("max_mz", end_mz, allocator);
 
   if (header_ptr->getMsLevel() == 2) {
     std::string n_ion_type = header_ptr->getActivationPtr()->getNIonTypePtr()->getName();
