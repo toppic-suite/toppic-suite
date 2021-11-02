@@ -17,8 +17,8 @@ function getPrecursorMass(): number | null {
 function setPrecursorMassEventHandler(): void {
     jqueryElements.precursorMassSubmit.click(function(){
         let precursorMass: string | null = domElements.precursorMass.getAttribute("value");
-        let totalMass: string = jqueryElements.totalMass.html();
-        if (precursorMass) {
+        let totalMass: string | number | string[] | undefined = jqueryElements.totalMass.val();
+        if (precursorMass && typeof(totalMass) == "string") {
             setMassDifference(parseFloat(precursorMass), parseFloat(totalMass));
         }
         else {

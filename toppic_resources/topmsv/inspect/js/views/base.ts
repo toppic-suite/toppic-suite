@@ -1,5 +1,5 @@
 const domElements = {
-    precursorMass : <HTMLElement>document.getElementById("precursormass"),
+    precursorMass : <HTMLInputElement>document.getElementById("precursormass"),
     customControlInput : <HTMLCollectionOf<HTMLInputElement>>document.getElementsByClassName("custom-control-input"),
     totalSeqMass : <HTMLElement>document.getElementById("totalseqmass_h6"),
     massVariation : <HTMLElement>document.getElementById("massvariation_h6"),

@@ -18,8 +18,8 @@ function getPrecursorMass() {
 function setPrecursorMassEventHandler() {
     jqueryElements.precursorMassSubmit.click(function () {
         let precursorMass = domElements.precursorMass.getAttribute("value");
-        let totalMass = jqueryElements.totalMass.html();
-        if (precursorMass) {
+        let totalMass = jqueryElements.totalMass.val();
+        if (precursorMass && typeof (totalMass) == "string") {
             setMassDifference(parseFloat(precursorMass), parseFloat(totalMass));
         }
         else {

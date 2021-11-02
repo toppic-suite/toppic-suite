@@ -43,6 +43,7 @@ topfd
 topmg
 *.ms1
 *.ms2
+*.gitignore 
 
 !src/gui/topfd*
 !src/gui/toppic*

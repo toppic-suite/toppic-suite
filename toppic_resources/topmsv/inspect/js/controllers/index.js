@@ -77,6 +77,12 @@ const onLoadOfHTML = function () {
         }
     });
     /**
+     * On Change Event handler. Updates precursor mass with the newly entered value
+     */
+    domElements.precursorMass.addEventListener("keyup", () => {
+        setPrecursorMass(parseFloat(domElements.precursorMass.value));
+    });
+    /**
      * On Click Event handler. Gets invoked on click of submit button
      * in HTML
      */

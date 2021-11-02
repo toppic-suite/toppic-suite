@@ -80,10 +80,16 @@ const onLoadOfHTML = function (): void {
         }
     });
     /**
+     * On Change Event handler. Updates precursor mass with the newly entered value
+     */
+     domElements.precursorMass.addEventListener("keyup", () => {
+        setPrecursorMass(parseFloat(domElements.precursorMass.value));
+    })
+    /**
      * On Click Event handler. Gets invoked on click of submit button
      * in HTML
      */
-    jqueryElements.submit.click(function () {
+     jqueryElements.submit.click(function () {
         let errorVal: number = 0;
         let errorType: string | number | string[] | undefined = jqueryElements.errorDropdown.val();
         let val:  string | number | string[] | undefined = jqueryElements.errorValue.val();
