@@ -19,6 +19,7 @@ class SpectrumView {
         this.cIon_ = "";
         this.nMassList_ = [];
         this.cMassList_ = [];
+        this.centerPos_ = -1; //center m/z or mono mass of the current view
         this.zoom = d3.zoom()
             .on("zoom", this.zoomed.bind(this));
         this.id_ = svgId;
@@ -57,6 +58,12 @@ class SpectrumView {
     getCIon() {
         return this.cIon_;
     }
+    getNMassList() {
+        return this.nMassList_;
+    }
+    getCMassList() {
+        return this.cMassList_;
+    }
     getPara() {
         return this.para_;
     }
@@ -69,11 +76,17 @@ class SpectrumView {
     getSvgId() {
         return this.id_;
     }
+    getCenterPos() {
+        return this.centerPos_;
+    }
     setTransformX(transformX) {
         this.transformX_ = transformX;
     }
     setTransformScale(transformScale) {
         this.transformScale_ = transformScale;
+    }
+    setCenterPos(newCenter) {
+        this.centerPos_ = newCenter;
     }
     addRawSpectrumAnno(envList, ionList) {
         this.envList_ = envList;
@@ -100,6 +113,7 @@ class SpectrumView {
         else if (monoMz) {
             this.para_.updateMzRange(monoMz);
         }
+        this.setCenterPos(this.para_.getWinCenterMz());
         drawBasicSpectrum(this.id_, this.para_, this.peakList_, this.ionList_);
         if (this.para_.getIsMonoMassGraph() && this.ionList_) {
             drawMonoMassSpectrum(this.id_, this.para_, this.proteoform_, this.nMassList_, this.cMassList_, this.ionList_);

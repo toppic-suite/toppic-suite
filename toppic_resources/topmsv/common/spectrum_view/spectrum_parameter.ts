@@ -134,6 +134,12 @@ class SpectrumViewParameters {
   getWinMinMz(): number{
     return this.winMinMz_;
   }
+  getWinMaxInte(): number {
+    return this.winMaxInte_;
+  }
+  getWinCenterMz(): number {
+    return this.winCenterMz_;
+  }
   getTickLength(): number{
     return this.tickLength_; 
   }

@@ -42,7 +42,6 @@ function onclickTopView(e: JQuery.ClickEvent<HTMLElement, null, HTMLElement, HTM
     //remove skipped residue
     sequence = sequence.slice(proteoform.getFirstPos());
     sequence = sequence.slice(0, proteoform.getLastPos() + 1 - proteoform.getFirstPos());
-    
     let fixedPtmList: MassShift[] = proteoform.getFixedPtm();
     //prsmGraph.data.proteoform.compMassShiftList();//recalculate mass shifts
     let unknownMassShiftList: MassShift[] = proteoform.getUnknownMassShift();
@@ -50,21 +49,6 @@ function onclickTopView(e: JQuery.ClickEvent<HTMLElement, null, HTMLElement, HTM
     let variablePtmsList: MassShift[] = proteoform.getVarPtm();
     let precursorMass: string = currentSpec.getPrecMass().toString();
 
-    //if some residues are going to be cut off in inspect page, adjust mod pos;
-    if (proteoform.getFirstPos() > 0) {
-        unknownMassShiftList.forEach((ptm) => {
-            ptm.setLeftPos(ptm.getLeftPos() - proteoform.getFirstPos());
-            ptm.setRightPos(ptm.getRightPos() - proteoform.getFirstPos());
-        })
-        protVarPtmsList.forEach((ptm) => {
-            ptm.setLeftPos(ptm.getLeftPos() - proteoform.getFirstPos());
-            ptm.setRightPos(ptm.getRightPos() - proteoform.getFirstPos());
-        })
-        variablePtmsList.forEach((ptm) => {
-            ptm.setLeftPos(ptm.getLeftPos() - proteoform.getFirstPos());
-            ptm.setRightPos(ptm.getRightPos() - proteoform.getFirstPos());
-        })
-    }
     // Stores all the data in the variables respectively
     window.localStorage.setItem('peakAndIntensityList', JSON.stringify(peakAndIntensityList));
     window.localStorage.setItem('massAndIntensityList', JSON.stringify(massAndIntensityList));
@@ -75,6 +59,38 @@ function onclickTopView(e: JQuery.ClickEvent<HTMLElement, null, HTMLElement, HTM
     window.localStorage.setItem('variablePtmsList', JSON.stringify(variablePtmsList));
     window.localStorage.setItem('unknownMassShiftList', JSON.stringify(unknownMassShiftList));
     window.localStorage.setItem('precursorMass', precursorMass);
+
+    //if some residues are going to be cut off in inspect page, adjust mod pos;
+    if (proteoform.getFirstPos() > 0) {
+        let newUnknownMassShifts: MassShift[] = [];
+        let newProtVarPtms: MassShift[] = [];
+        let newVarPtms: MassShift[] = [];
+
+        unknownMassShiftList.forEach((ptm) => {
+            let newL: number = ptm.getLeftPos() - proteoform.getFirstPos();
+            let newR: number = ptm.getRightPos() - proteoform.getFirstPos();
+            let newPtm = new MassShift(newL, newR, ptm.getShift(), "unknown", ptm.getAnnotation());
+            newPtm.setPtmList(ptm.getPtmList());
+            newUnknownMassShifts.push(newPtm);
+        })
+        protVarPtmsList.forEach((ptm) => {
+            let newL: number = ptm.getLeftPos() - proteoform.getFirstPos();
+            let newR: number = ptm.getRightPos() - proteoform.getFirstPos();
+            let newPtm = new MassShift(newL, newR, ptm.getShift(), "Protein variable", ptm.getAnnotation());
+            newPtm.setPtmList(ptm.getPtmList());
+            newProtVarPtms.push(newPtm);
+        })
+        variablePtmsList.forEach((ptm) => {
+            let newL: number = ptm.getLeftPos() - proteoform.getFirstPos();
+            let newR: number = ptm.getRightPos() - proteoform.getFirstPos();
+            let newPtm = new MassShift(newL, newR, ptm.getShift(), "Variable", ptm.getAnnotation());
+            newPtm.setPtmList(ptm.getPtmList());
+            newVarPtms.push(newPtm);
+        })
+        window.localStorage.setItem('protVarPtmsList', JSON.stringify(newProtVarPtms));
+        window.localStorage.setItem('variablePtmsList', JSON.stringify(newVarPtms));
+        window.localStorage.setItem('unknownMassShiftList', JSON.stringify(newUnknownMassShifts));    
+    }
     window.open("../inspect/spectrum.html");
 }
 /**

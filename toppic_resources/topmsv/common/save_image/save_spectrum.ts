@@ -79,12 +79,17 @@ class SaveSpectrum{
         currentSpectrum = this.spectrumGraphList_[ms2Index];
         this.graphModalObj_ = new SpectrumView(svgId,currentSpectrum.getPeakList());
         this.graphModalObj_.addRawSpectrumAnno(currentSpectrum.getEnvList(), currentSpectrum.getIonList());//ionList of currentSpectrum cannot be null
+        this.graphModalObj_.getPara().updateScale(currentSpectrum.getPara().getWinMinMz(), currentSpectrum.getPara().getWinMaxMz(), currentSpectrum.getPara().getWinMaxInte());
+        drawBasicSpectrum(this.graphModalObj_.getSvgId(), this.graphModalObj_.getPara(), this.graphModalObj_.getPeakList(), this.graphModalObj_.getIonList());
         $("#popup-env-btns").show();
       }else{
         currentSpectrum = this.massGraphList_[ms2Index];
         this.graphModalObj_ = new SpectrumView(svgId,currentSpectrum.getPeakList());
 		    this.graphModalObj_.addMonoMassSpectrumAnno(currentSpectrum.getIonList(), currentSpectrum.getProteoform()!, currentSpectrum.getNIon(), currentSpectrum.getCIon());
         this.graphModalObj_.getPara().setMonoMassGraph(true);
+        this.graphModalObj_.getPara().updateScale(currentSpectrum.getPara().getWinMinMz(), currentSpectrum.getPara().getWinMaxMz(), currentSpectrum.getPara().getWinMaxInte());
+        drawMonoMassSpectrum(this.graphModalObj_.getSvgId(), this.graphModalObj_.getPara(), this.graphModalObj_.getProteoform(), this.graphModalObj_.getNMassList(), 
+        this.graphModalObj_.getCMassList(), (this.graphModalObj_.getIonList()) ? this.graphModalObj_.getIonList()! : []) //this.graphModalObj_.getIonList() returns matchedIon[] or null
         $("#popup-env-btns").hide();
       }
   }

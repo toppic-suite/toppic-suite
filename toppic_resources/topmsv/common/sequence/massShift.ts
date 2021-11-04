@@ -60,4 +60,7 @@ class MassShift {
     }
     return modType;
   }
+  setPtmList(ptmList: Mod[]): void {
+    this.ptmList_ = ptmList;
+  }
 }

@@ -21,6 +21,7 @@ class SpectrumView {
   private cIon_: string = "";
   private nMassList_: TheoMass[] = []; 
   private cMassList_: TheoMass[] = [];
+  private centerPos_: number = -1;//center m/z or mono mass of the current view
 
   constructor(svgId: string, peakList: Peak[], sequenceLength: number = -1) {
     this.id_ = svgId;
@@ -59,6 +60,12 @@ class SpectrumView {
   getCIon(): string{
     return this.cIon_;
   }
+  getNMassList(): TheoMass[] {
+    return this.nMassList_;
+  }
+  getCMassList(): TheoMass[] {
+    return this.cMassList_;
+  }
   getPara(): SpectrumViewParameters{
     return this.para_;
   }
@@ -70,12 +77,18 @@ class SpectrumView {
   }
   getSvgId(): string{
     return this.id_;
-  } 
+  }
+  getCenterPos(): number {
+    return this.centerPos_;
+  }
   setTransformX(transformX: number): void{
     this.transformX_ = transformX;
   }
   setTransformScale(transformScale: number): void{
     this.transformScale_ = transformScale;
+  }
+  setCenterPos(newCenter: number): void {
+    this.centerPos_ = newCenter;
   }
   addRawSpectrumAnno(envList: Envelope[], ionList: MatchedIon[] | null): void{
     this.envList_ = envList;
@@ -104,6 +117,7 @@ class SpectrumView {
     } else if(monoMz) {
       this.para_.updateMzRange(monoMz);
     }
+    this.setCenterPos(this.para_.getWinCenterMz());
     drawBasicSpectrum(this.id_, this.para_, this.peakList_, this.ionList_);
     if (this.para_.getIsMonoMassGraph() && this.ionList_) {
       drawMonoMassSpectrum(this.id_, this.para_, this.proteoform_, this.nMassList_, this.cMassList_, this.ionList_);
