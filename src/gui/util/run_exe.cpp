@@ -224,9 +224,10 @@ void RunExe::run(std::string command) {
  
   //Create the child process. 
   bSuccess = CreateProcess(NULL, command.c_str(), NULL, NULL, TRUE, CREATE_NO_WINDOW, NULL, NULL, &siStartInfo, &piProcInfo);  // receives PROCESS_INFORMATION 
-  
+
   if (!bSuccess ) {
     std::cout << "error occured" << std::endl;
+    std::cout << "command: " << command << std::endl;
     return;
   }
   else {
