@@ -13,6 +13,14 @@ copy ..\bin\topmg.exe toppic-windows-%1
 copy ..\bin\topmerge_gui.exe toppic-windows-%1
 copy ..\bin\topmerge.exe toppic-windows-%1
 
+copy ..\bin\topdiff_gui.exe toppic-windows-%1
+copy ..\bin\topdiff.exe toppic-windows-%1
+
+copy ..\bin\topindex_gui.exe toppic-windows-%1
+copy ..\bin\topindex.exe toppic-windows-%1
+
+copy ..\bin\topconvert.exe toppic-windows-%1
+
 copy ..\LICENSE toppic-windows-%1
 xcopy /S ..\toppic_resources toppic-windows-%1\toppic_resources
 
