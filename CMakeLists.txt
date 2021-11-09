@@ -283,6 +283,9 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
   target_link_libraries(topmerge xerces-c boost_program_options-mt
     boost_serialization-mt boost_filesystem-mt boost_system-mt boost_thread-mt pthread z Ws2_32)
+	
+  target_link_libraries(topconvert xerces-c boost_program_options-mt
+    boost_filesystem-mt boost_system-mt boost_thread-mt pthread z Ws2_32)	
 
   # for Qt
   SET(QTOPTION -Wl,-subsystem,windows)
@@ -310,7 +313,6 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   target_link_libraries(topmerge_gui ${QTOPTION} Qt5Widgets Qt5Core Qt5Gui xerces-c
     boost_filesystem-mt boost_system-mt boost_serialization-mt 
     boost_program_options-mt boost_thread-mt pthread z Ws2_32)
-
 
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows") 
 
