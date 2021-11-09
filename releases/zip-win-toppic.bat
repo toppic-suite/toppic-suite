@@ -34,19 +34,21 @@ copy C:\msys64\mingw64\bin\libboost_system-mt.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libboost_filesystem-mt.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libboost_chrono-mt.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libboost_iostreams-mt.dll toppic-windows-%1
+copy C:\msys64\mingw64\bin\libboost_serialization-mt.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libboost_thread-mt.dll toppic-windows-%1
 
-copy C:\msys64\mingw64\bin\libxerces-c.dll toppic-windows-%1
+copy C:\msys64\mingw64\bin\libxerces-c-3-2.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libxalan-c.dll toppic-windows-%1
-copy C:\msys64\mingw64\bin\libicuuc58.dll toppic-windows-%1
+copy C:\msys64\mingw64\bin\libicuuc68.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libxalanMsg.dll toppic-windows-%1
-copy C:\msys64\mingw64\bin\libicudt58.dll toppic-windows-%1
-copy C:\msys64\mingw64\bin\libicudt65.dll toppic-windows-%1
+copy C:\msys64\mingw64\bin\libicudt68.dll toppic-windows-%1
 
 copy C:\msys64\mingw64\bin\libzstd.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libcurl-4.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\liblzma-5.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libdouble-conversion.dll toppic-windows-%1
+copy C:\msys64\mingw64\bin\libbrotlidec.dll toppic-windows-%1
+copy C:\msys64\mingw64\bin\libbrotlicommon.dll toppic-windows-%1
 
 copy C:\msys64\mingw64\bin\Qt5Core.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\Qt5Gui.dll toppic-windows-%1
@@ -54,7 +56,7 @@ copy C:\msys64\mingw64\bin\Qt5Widgets.dll toppic-windows-%1
 mkdir toppic-windows-%1\platforms
 copy C:\msys64\mingw64\share\qt5\plugins\platforms\qwindows.dll  toppic-windows-%1\platforms
 
-copy C:\msys64\mingw64\bin\libicuin58.dll toppic-windows-%1
+copy C:\msys64\mingw64\bin\libicuin68.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libpng16-16.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libharfbuzz-0.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libgraphite2.dll toppic-windows-%1
@@ -63,7 +65,7 @@ copy C:\msys64\mingw64\bin\libbz2-1.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libglib-2.0-0.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libintl-8.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libiconv-2.dll toppic-windows-%1
-copy C:\msys64\mingw64\bin\libpcre-1.dll toppic-windows-%1
+copy C:\msys64\mingw64\bin\libpcre2-16-0.dll toppic-windows-%1
 
 mkdir toppic-windows-%1\example_files
 copy ..\testcases\data\mzxml_test.msalign toppic-windows-%1\example_files
