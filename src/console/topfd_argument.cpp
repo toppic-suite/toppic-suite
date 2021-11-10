@@ -54,11 +54,11 @@ bool Argument::parse(int argc, char* argv[]) {
     display_desc.add_options()
         ("help,h", "Print this help message.")
         ("activation,a", po::value<std::string> (&activation),
-        "<CID|ETD|HCD|MPD|UVPD|FILE>. Fragmentation method of tandem mass spectra. When FILE is used, fragmentation methods of spectra are given in the input spectral data file. Default value: FILE.")
+        "<CID|ETD|HCD|MPD|UVPD|FILE>. Fragmentation method of MS/MS spectra. When FILE is used, the fragmentation methods of spectra are given in the input spectral data file. Default value: FILE.")
         ("max-charge,c", po::value<std::string> (&max_charge),
          "<a positive integer>. Set the maximum charge state of precursor and fragment ions. The default value is 30.")
         ("max-mass,m", po::value<std::string> (&max_mass),
-         "<a positive number>. Set the maximum monoisotopic mass of precursor and fragment ions. The default value is 100,000 Dalton.")
+         "<a positive number>. Set the maximum monoisotopic mass of precursor and fragment ions. The default value is 70,000 Dalton.")
         ("mz-error,t", po::value<std::string> (&mz_error),
          "<a positive number>. Set the error tolerance of m/z values of spectral peaks. The default value is 0.02 m/z.")
         ("ms-one-sn-ratio,r", po::value<std::string> (&ms_one_sn_ratio),
@@ -66,7 +66,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("ms-two-sn-ratio,s", po::value<std::string> (&ms_two_sn_ratio),
          "<a positive number>. Set the signal-to-noise ratio for MS/MS spectra. The default value is 1.")
         ("precursor-window,w", po::value<std::string> (&prec_window),
-         "<a positive number>. Set the precursor window size. The default value is 3.0 m/z.")
+         "<a positive number>. Set the precursor window size. The default value is 3.0 m/z. When the input file contains the information of precursor windows, the parameter will be ignored.")
         ("env-cnn,n", "Use EnvCNN as the scoring function of isotopic envelopes.")
         ("missing-level-one,o","MS1 spectra are missing in the input file.")
         ("thread-number,u", po::value<std::string> (&thread_number), "<a positive integer>. Number of threads used in spectral deconvolution. Default value: 1.")

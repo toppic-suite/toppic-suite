@@ -32,7 +32,7 @@ class TopfdPara {
   bool refine_prec_mass_ = true;
   bool missing_level_one_ = false;
   int max_charge_ = 30;
-  double max_mass_ = 100000;
+  double max_mass_ = 70000;
   double mz_error_ = 0.02;
   double ms_one_sn_ratio_ = 3.0;
   double ms_two_sn_ratio_ = 1.0;

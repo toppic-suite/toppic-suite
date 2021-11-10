@@ -107,7 +107,7 @@ void TopFDDialog::on_clearButton_clicked() {
 
 void TopFDDialog::on_defaultButton_clicked() {
   ui->maxChargeEdit->setText("30");
-  ui->maxMassEdit->setText("100000");
+  ui->maxMassEdit->setText("70000");
   ui->mzErrorEdit->setText("0.02");
   ui->ms1snRatioEdit->setText("3.0");
   ui->ms2snRatioEdit->setText("1.0");
