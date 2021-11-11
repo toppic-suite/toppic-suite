@@ -22,6 +22,8 @@
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_table_writer.hpp"
 
+#include "search/duplicatematch/additional_match.hpp"
+
 namespace toppic {
 
 PrsmTableWriter::PrsmTableWriter(PrsmParaPtr prsm_para_ptr, 
@@ -63,6 +65,8 @@ void PrsmTableWriter::write() {
       << "Last residue" << delim
       << "Proteoform" << delim
       << "Proteoform mass" << delim
+      << "#matched sequences" << delim
+      << "Was exact match" << delim
       << "#unexpected modifications" << delim
       << "MIScore" << delim
       << "#variable PTMs" << delim
@@ -88,20 +92,34 @@ void PrsmTableWriter::write() {
       = std::make_shared<SimpleMsAlignReader>(sp_file_name, 
                                               group_spec_num,
                                               sp_para_ptr->getActivationPtr());
+
+  std::vector<PrsmPtr> prsm_ptr_vec; //prsm from msalign + additional matches from fasta search
+  
+  AdditionalMatchPtr addtional_match = std::make_shared<AdditionalMatch>(prsm_para_ptr_->getOriDbName(), prsm_ptr_vec, sp_para_ptr);
+
+  while (prsm_ptr != nullptr) {
+    addtional_match->process(prsm_ptr);
+    prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
+  }
+  
   SpectrumSetPtr spec_set_ptr;
   while ((spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(ms_reader_ptr, sp_para_ptr)) 
          != nullptr) {
     if (spec_set_ptr->isValid()) {
       int spec_id = spec_set_ptr->getSpectrumId();
-      while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_id) {
-        DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
-        prsm_ptr->setDeconvMsPtrVec(deconv_ms_ptr_vec);
-        double new_prec_mass = prsm_ptr->getAdjustedPrecMass();
-        ExtendMsPtrVec extend_ms_ptr_vec
-            = extend_ms_factory::geneMsThreePtrVec(deconv_ms_ptr_vec, sp_para_ptr, new_prec_mass);
-        prsm_ptr->setRefineMsVec(extend_ms_ptr_vec);
-        writePrsm(file, prsm_ptr);
-        prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
+      for (size_t t = 0; t < prsm_ptr_vec.size(); t++) {
+        PrsmPtr prsm_ptr_tmp = prsm_ptr_vec[t];
+
+        if (prsm_ptr_tmp != nullptr && prsm_ptr_tmp->getSpectrumId() == spec_id) {
+          DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
+          prsm_ptr_tmp->setDeconvMsPtrVec(deconv_ms_ptr_vec);
+          double new_prec_mass = prsm_ptr_tmp->getAdjustedPrecMass();
+          ExtendMsPtrVec extend_ms_ptr_vec
+              = extend_ms_factory::geneMsThreePtrVec(deconv_ms_ptr_vec, sp_para_ptr, new_prec_mass);
+          prsm_ptr_tmp->setRefineMsVec(extend_ms_ptr_vec);
+
+          writePrsm(file, prsm_ptr_tmp);
+        }
       }
     }
   }
@@ -171,6 +189,8 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
       << (prsm_ptr->getProteoformPtr()->getEndPos() + 1) << delim
       << prsm_ptr->getProteoformPtr()->getProteinMatchSeq() << delim
       << prsm_ptr->getProteoformPtr()->getMass() << delim
+      << prsm_ptr->getHitCnt() << delim
+      << prsm_ptr->getIsExactMatch() << delim
       << ptm_num << delim
       << prsm_ptr->getProteoformPtr()->getMIScore() << delim
       << prsm_ptr->getProteoformPtr()->getVariablePtmNum() << delim
