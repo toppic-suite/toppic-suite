@@ -16,6 +16,7 @@
 #include <string>  
 #include <vector>  
 
+#include "common/util/logger.hpp"
 #include "seq/fasta_reader.hpp"
 #include "search/duplicatematch/additional_match.hpp"
 #include "prsm/prsm.hpp"
@@ -79,24 +80,42 @@ namespace toppic {
         isExactMatchFound = true;
         hit_cnt++;
 
-        PrsmPtr additional_match_prsm_ptr = std::make_shared<Prsm>(*prsm_ptr_);
-        additional_match_prsm_ptr->setPrsmId(prsm_cnt_);
-        additional_match_prsm_ptr->setIsExactMatch(true);
-        additional_match_prsm_ptr->setHitCnt(hit_cnt); // +1 is for the original match
-        additional_match_prsm_ptr->getProteoformPtr()->setStartPos(found + 1);
-        additional_match_prsm_ptr->getProteoformPtr()->setEndPos(found + prot_seq.size());
-        additional_match_prsm_ptr->getProteoformPtr()->setFastaSeqPtr(seq_ptr);
+        PrsmPtr new_prsm_ptr = std::make_shared<Prsm>(*prsm_ptr_);
+        new_prsm_ptr->setPrsmId(prsm_cnt_);
+        new_prsm_ptr->setIsExactMatch(true);
+        new_prsm_ptr->setHitCnt(hit_cnt);
+        new_prsm_ptr->getProteoformPtr()->setStartPos(found + 1);
+        new_prsm_ptr->getProteoformPtr()->setEndPos(found + prot_seq.size());
+        new_prsm_ptr->getProteoformPtr()->setFastaSeqPtr(seq_ptr);
 
-        additional_match_prsms.push_back(additional_match_prsm_ptr);
+        additional_match_prsms.push_back(new_prsm_ptr);
         prsm_cnt_++;
       }
       seq_ptr = reader.getNextSeq();
     }
-    if (!isExactMatchFound) {
-      //search for approximate matches
-      std::cout << prsm_ptr_->getProteoformPtr()->getProteinMatchSeq() << std::endl;
-    }
+    reader.close();
 
+    if (!isExactMatchFound) {
+      FastaReader reader_2(db_file_name_);
+      FastaSeqPtr seq_ptr_2 = reader_2.getNextSeq();
+      //search for approximate matches
+      std::string target_seq_name = prsm_ptr_->getProteoformPtr()->getSeqName();
+      while (seq_ptr_2 != nullptr) {
+        std::string fasta_seq_name = seq_ptr_2->getName();
+        if (target_seq_name == fasta_seq_name) {
+          PrsmPtr new_prsm_ptr = std::make_shared<Prsm>(*prsm_ptr_);
+          new_prsm_ptr->setPrsmId(prsm_cnt_);
+          new_prsm_ptr->getProteoformPtr()->setFastaSeqPtr(seq_ptr_2);
+          new_prsm_ptr->setIsExactMatch(false);
+          additional_match_prsms.push_back(new_prsm_ptr);
+          prsm_cnt_++;
+        }
+        else {
+          LOG_WARN("Protein " << target_seq_name << " not found in the fasta file!");
+        }
+        seq_ptr_2 = reader_2.getNextSeq();
+      }
+    }
     prsm_ptr_vec_.insert(prsm_ptr_vec_.end(), additional_match_prsms.begin(), additional_match_prsms.end());
   }
 }
