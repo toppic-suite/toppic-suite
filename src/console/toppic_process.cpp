@@ -69,6 +69,8 @@
 
 #include "console/toppic_argument.hpp"
 
+#include "search/duplicatematch/additional_match.hpp"
+
 namespace toppic {
 
 void copyTopMSV(std::map<std::string, std::string> &arguments) {
