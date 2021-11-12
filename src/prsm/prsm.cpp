@@ -44,6 +44,10 @@ Prsm::Prsm(XmlDOMElement* element, FastaIndexReaderPtr reader_ptr,
   XmlDOMElement* form_element
       = xml_dom_util::getChildElement(element, form_elem_name.c_str(), 0);
   proteoform_ptr_ = std::make_shared<Proteoform>(form_element, reader_ptr, fix_mod_list);
+
+  element_ = element;
+  reader_ptr_ = reader_ptr;
+  fix_mod_list_ = fix_mod_list;
 }
 
 void Prsm::setAdjustedPrecMass(double new_prec_mass) {

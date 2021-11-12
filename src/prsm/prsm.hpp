@@ -85,6 +85,16 @@ class Prsm {
 
   double getTimeApex() {return time_apex_;};
 
+  int getHitCnt() {return hit_cnt_;}
+
+  bool getIsExactMatch() {return is_exact_match_;}
+
+  XmlDOMElement* getElement() {return element_;}
+
+  FastaIndexReaderPtr getReaderPtr() {return reader_ptr_;}
+
+  const ModPtrVec& getFixModList() {return fix_mod_list_;}
+
   // setter
   void setFileName(const std::string & fname) {file_name_ = fname;}
 
@@ -116,6 +126,10 @@ class Prsm {
     refine_ms_three_vec_ = refine_ms_three_vec;}
 
   void setAdjustedPrecMass(double new_prec_mass);
+
+  void setHitCnt(int hit_cnt) {hit_cnt_ = hit_cnt;}
+
+  void setIsExactMatch(bool is_exact_match) {is_exact_match_ = is_exact_match;}
 
   // comparion
   static bool cmpEValueInc(const PrsmPtr &a, const PrsmPtr &b) {
@@ -186,6 +200,10 @@ class Prsm {
 
   double time_apex_ = -1;
 
+  int hit_cnt_ = 0;
+
+  bool is_exact_match_ = true; 
+
   /* The following are not saved in xml */
   DeconvMsPtrVec deconv_ms_ptr_vec_;
   /* adjusted extended msThree, used for matching ions and peaks */
@@ -193,6 +211,10 @@ class Prsm {
 
   double match_peak_num_ = 0;
   double match_fragment_num_ = 0;
+
+  XmlDOMElement* element_;
+  FastaIndexReaderPtr reader_ptr_;
+  ModPtrVec fix_mod_list_;
 
   // functions for initialization
   void init(SpParaPtr sp_para_ptr);

@@ -100,6 +100,12 @@ class Proteoform {
 
   std::string getMIScore();
 
+  void setStartPos(int start_pos) {start_pos_ = start_pos;}
+
+  void setEndPos(int end_pos) {end_pos_ = end_pos;}
+
+  void setFastaSeqPtr(FastaSeqPtr fasta_seq_ptr) {fasta_seq_ptr_ = fasta_seq_ptr;}
+
  private:
   FastaSeqPtr fasta_seq_ptr_;
 
