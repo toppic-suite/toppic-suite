@@ -118,7 +118,8 @@ file(GLOB TOPPIC_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/toppic/*.cpp
 # classes for topmg
 file(GLOB GRAPH_ALIGN_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/search/diag/*.cpp
                             ${CMAKE_CURRENT_SOURCE_DIR}/src/search/graph/*.cpp
-                            ${CMAKE_CURRENT_SOURCE_DIR}/src/search/graphalign/*.cpp)
+                            ${CMAKE_CURRENT_SOURCE_DIR}/src/search/graphalign/*.cpp
+                            ${CMAKE_CURRENT_SOURCE_DIR}/src/search/duplicatematch/*.cpp)
 
 file(GLOB MCMC_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/stat/count/*.cpp
                      ${CMAKE_CURRENT_SOURCE_DIR}/src/stat/mcmc/*.cpp)
@@ -136,6 +137,8 @@ file(GLOB TOPMG_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topmg/*.cpp
 
 # topdiff classes
 file(GLOB DIFF_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/merge/*.cpp)
+
+file(GLOB DIFF_SEARCH_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/search/duplicatematch/*.cpp)
 
 # topdiff console main
 file(GLOB TOPDIFF_PROC_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdiff_process.cpp
@@ -165,7 +168,9 @@ file(GLOB TOPINDEX_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topindex/*.cpp
 
 # topmerge console main
 file(GLOB TOPMERGE_PROC_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmerge_process.cpp
-                             ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmerge_argument.cpp)					 
+                             ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmerge_argument.cpp)		
+                             
+file(GLOB TOPMERGE_SEARCH_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/search/duplicatematch/*.cpp)			 
 
 file(GLOB TOPMERGE_CONSOLE_SRCS
         		     ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmerge.cpp)
@@ -177,6 +182,8 @@ file(GLOB TOPMERGE_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topmerge/*.cpp
 file(GLOB TOPCONVERT_SRCS     ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topconvert_process.cpp
 		                  	      ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_argument.cpp
                               ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topconvert.cpp)
+                              
+file(GLOB TOPCONVERT_SEARCH_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/search/duplicatematch/*.cpp)
 
 # unit test using catch
 file(GLOB UNIT_TEST_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/*.cpp)
@@ -227,22 +234,22 @@ add_executable(topmg_gui
 	${GRAPH_ALIGN_SRCS} ${MCMC_SRCS} ${VISUAL_SRCS} ${GUI_UTIL_SRCS})
 
 add_executable(topdiff 
-  ${TOPDIFF_CONSOLE_SRCS} ${TOPDIFF_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS}
+  ${TOPDIFF_CONSOLE_SRCS} ${TOPDIFF_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS} ${DIFF_SEARCH_SRCS}
   ${SEQ_SRCS} ${PARA_SRCS} ${SPEC_SRCS} ${PRSM_SRCS} ${DIFF_SRCS})
 
 add_executable(topdiff_gui ${TOPDIFF_GUI_SRCS} ${TOPDIFF_GUI_QRC}
-  ${TOPDIFF_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS} 
+  ${TOPDIFF_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS} ${DIFF_SEARCH_SRCS}
   ${SEQ_SRCS} ${PARA_SRCS} ${SPEC_SRCS} ${PRSM_SRCS} ${DIFF_SRCS} ${GUI_UTIL_SRCS})
 
 add_executable(topmerge ${TOPMERGE_CONSOLE_SRCS} ${TOPMERGE_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS} 
-  ${SEQ_SRCS} ${PARA_SRCS} ${SPEC_SRCS} ${LOCAL_SRCS} ${PRSM_SRCS} ${VISUAL_SRCS}) 
+  ${TOPMERGE_SEARCH_SRCS} ${SEQ_SRCS} ${PARA_SRCS} ${SPEC_SRCS} ${LOCAL_SRCS} ${PRSM_SRCS} ${VISUAL_SRCS}) 
   
 add_executable(topmerge_gui ${TOPMERGE_GUI_SRCS} ${TOPMERGE_GUI_QRC} 
-  ${TOPMERGE_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS} 
+  ${TOPMERGE_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS} ${TOPMERGE_SEARCH_SRCS}
   ${SEQ_SRCS} ${PARA_SRCS} ${SPEC_SRCS} ${LOCAL_SRCS} ${PRSM_SRCS} ${VISUAL_SRCS} ${GUI_UTIL_SRCS}) 
 
 add_executable(topconvert ${TOPCONVERT_SRCS} ${HTS_SRCS} ${COMMON_SRCS} 
-  ${SEQ_SRCS} ${PARA_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS} ${PRSM_SRCS})
+  ${SEQ_SRCS} ${PARA_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS} ${PRSM_SRCS} ${TOPCONVERT_SEARCH_SRCS})
 
 
 #add_executable(toppic_test 
