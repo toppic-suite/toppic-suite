@@ -99,20 +99,34 @@ void PrsmTableWriter::write() {
 
   while (prsm_ptr != nullptr) {
     addtional_match->process(prsm_ptr);
-
     prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
   }
-  for (size_t t = 0; t < prsm_ptr_vec.size(); t++) {
-        SpectrumSetPtr spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(ms_reader_ptr, sp_para_ptr);
-        PrsmPtr prsm_ptr_tmp = prsm_ptr_vec[t];
+  int prsm_idx = 0;
+  PrsmPtr prsm_ptr_tmp = prsm_ptr_vec[prsm_idx];
+
+  SpectrumSetPtr spec_set_ptr;
+  while ((spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(ms_reader_ptr, sp_para_ptr)) 
+         != nullptr) {
+    if (spec_set_ptr->isValid()) {
+      int spec_id = spec_set_ptr->getSpectrumId();
+      while (prsm_ptr_tmp != nullptr && prsm_ptr_tmp->getSpectrumId() == spec_id) {
         DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
         prsm_ptr_tmp->setDeconvMsPtrVec(deconv_ms_ptr_vec);
         double new_prec_mass = prsm_ptr_tmp->getAdjustedPrecMass();
-        ExtendMsPtrVec extend_ms_ptr_vec
-              = extend_ms_factory::geneMsThreePtrVec(deconv_ms_ptr_vec, sp_para_ptr, new_prec_mass);
+        ExtendMsPtrVec extend_ms_ptr_vec = extend_ms_factory::geneMsThreePtrVec(deconv_ms_ptr_vec, sp_para_ptr, new_prec_mass);
         prsm_ptr_tmp->setRefineMsVec(extend_ms_ptr_vec);
-
         writePrsm(file, prsm_ptr_tmp);
+
+        prsm_idx++;
+
+        if (prsm_idx >= prsm_ptr_vec.size()) {
+          prsm_ptr_tmp = nullptr;
+        }
+        else {
+          prsm_ptr_tmp = prsm_ptr_vec[prsm_idx];
+        }
+      }
+    }
   }
   prsm_reader.close();
   // write end;
