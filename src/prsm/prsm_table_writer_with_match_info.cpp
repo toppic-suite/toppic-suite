@@ -20,11 +20,13 @@
 #include "ms/factory/extend_ms_factory.hpp"
 #include "ms/factory/spectrum_set_factory.hpp"
 #include "prsm/prsm_reader.hpp"
-#include "prsm/prsm_table_writer.hpp"
+#include "prsm/prsm_table_writer_with_match_info.hpp"
+
+#include "search/duplicatematch/additional_match.hpp"
 
 namespace toppic {
 
-PrsmTableWriter::PrsmTableWriter(PrsmParaPtr prsm_para_ptr, 
+PrsmTableWriterWithMatchInfo::PrsmTableWriterWithMatchInfo(PrsmParaPtr prsm_para_ptr, 
                                  std::string argu_str,
                                  const std::string &input_file_ext, 
                                  const std::string &output_file_ext):
@@ -33,7 +35,7 @@ PrsmTableWriter::PrsmTableWriter(PrsmParaPtr prsm_para_ptr,
     argu_str_(argu_str),
     output_file_ext_(output_file_ext) {}
 
-void PrsmTableWriter::write() {
+void PrsmTableWriterWithMatchInfo::write() {
   std::string spectrum_file_name  = prsm_para_ptr_->getSpectrumFileName();
   std::string base_name = file_util::basename(spectrum_file_name);
   std::string output_file_name = base_name + output_file_ext_;
@@ -63,6 +65,8 @@ void PrsmTableWriter::write() {
       << "Last residue" << delim
       << "Proteoform" << delim
       << "Proteoform mass" << delim
+      << "#matched sequences" << delim
+      << "Was exact match" << delim
       << "#unexpected modifications" << delim
       << "MIScore" << delim
       << "#variable PTMs" << delim
@@ -88,20 +92,39 @@ void PrsmTableWriter::write() {
       = std::make_shared<SimpleMsAlignReader>(sp_file_name, 
                                               group_spec_num,
                                               sp_para_ptr->getActivationPtr());
+
+  std::vector<PrsmPtr> prsm_ptr_vec; //prsm from msalign + additional matches from fasta search
+
+  AdditionalMatchPtr addtional_match = std::make_shared<AdditionalMatch>(prsm_para_ptr_->getOriDbName(), prsm_ptr_vec, sp_para_ptr);
+
+  while (prsm_ptr != nullptr) {
+    addtional_match->process(prsm_ptr);
+    prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
+  }
+  int prsm_idx = 0;
+  PrsmPtr prsm_ptr_tmp = prsm_ptr_vec[prsm_idx];
+
   SpectrumSetPtr spec_set_ptr;
   while ((spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(ms_reader_ptr, sp_para_ptr)) 
          != nullptr) {
     if (spec_set_ptr->isValid()) {
       int spec_id = spec_set_ptr->getSpectrumId();
-      while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_id) {
+      while (prsm_ptr_tmp != nullptr && prsm_ptr_tmp->getSpectrumId() == spec_id) {
         DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
-        prsm_ptr->setDeconvMsPtrVec(deconv_ms_ptr_vec);
-        double new_prec_mass = prsm_ptr->getAdjustedPrecMass();
-        ExtendMsPtrVec extend_ms_ptr_vec
-            = extend_ms_factory::geneMsThreePtrVec(deconv_ms_ptr_vec, sp_para_ptr, new_prec_mass);
-        prsm_ptr->setRefineMsVec(extend_ms_ptr_vec);
-        writePrsm(file, prsm_ptr);
-        prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
+        prsm_ptr_tmp->setDeconvMsPtrVec(deconv_ms_ptr_vec);
+        double new_prec_mass = prsm_ptr_tmp->getAdjustedPrecMass();
+        ExtendMsPtrVec extend_ms_ptr_vec = extend_ms_factory::geneMsThreePtrVec(deconv_ms_ptr_vec, sp_para_ptr, new_prec_mass);
+        prsm_ptr_tmp->setRefineMsVec(extend_ms_ptr_vec);
+        writePrsm(file, prsm_ptr_tmp);
+
+        prsm_idx++;
+
+        if (prsm_idx >= prsm_ptr_vec.size()) {
+          prsm_ptr_tmp = nullptr;
+        }
+        else {
+          prsm_ptr_tmp = prsm_ptr_vec[prsm_idx];
+        }
       }
     }
   }
@@ -110,7 +133,7 @@ void PrsmTableWriter::write() {
   file.close();
 }
 
-void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
+void PrsmTableWriterWithMatchInfo::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   std::string spec_ids;
   std::string spec_activations;
   std::string spec_scans;
@@ -165,12 +188,16 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   file << prsm_ptr->getFracFeatureScore() << delim;
   file << prsm_ptr->getTimeApex() << delim;
 
+  std::string is_exact_match = (prsm_ptr->getIsExactMatch()) ? "true" : "false";
+
   file << prsm_ptr->getProteoformPtr()->getSeqName() << delim
       << prsm_ptr->getProteoformPtr()->getSeqDesc() << delim
       << (prsm_ptr->getProteoformPtr()->getStartPos() + 1) << delim
       << (prsm_ptr->getProteoformPtr()->getEndPos() + 1) << delim
       << prsm_ptr->getProteoformPtr()->getProteinMatchSeq() << delim
       << prsm_ptr->getProteoformPtr()->getMass() << delim
+      << prsm_ptr->getHitCnt() << delim
+      << is_exact_match << delim
       << ptm_num << delim
       << prsm_ptr->getProteoformPtr()->getMIScore() << delim
       << prsm_ptr->getProteoformPtr()->getVariablePtmNum() << delim
