@@ -38,7 +38,7 @@ int processOneFile(TopfdParaPtr para_ptr,
 int process(TopfdParaPtr para_ptr,  
             std::vector<std::string> spec_file_lst); 
 
-int getMs2ScanCount(std::string spectrum_file_name);
+void getMsScanCount(std::string spectrum_file_name, std::vector<int> &scan_cnt_vec);
 
 }
 }
