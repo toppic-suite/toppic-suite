@@ -101,7 +101,7 @@ void PrsmTableWriterWithMatchInfo::write() {
     addtional_match->process(prsm_ptr);
     prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
   }
-  int prsm_idx = 0;
+  unsigned int prsm_idx = 0;
   PrsmPtr prsm_ptr_tmp = prsm_ptr_vec[prsm_idx];
 
   SpectrumSetPtr spec_set_ptr;

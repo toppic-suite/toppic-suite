@@ -626,7 +626,7 @@ void toppicWindow::showArguments() {
                                         "\noriDatabaseFileName:" + arguments_["oriDatabaseFileName"] +
                                         "\ndatabaseFileName:" + arguments_["databaseFileName"] +
                                         "\ndatabaseBlockSize:" + arguments_["databaseBlockSize"] +
-                                        "\maxFragmentLength:" + arguments_["maxFragmentLength"] +
+                                        "\nmaxFragmentLength:" + arguments_["maxFragmentLength"] +
                                         "\ncombinedOutputName:" + arguments_["combinedOutputName"] +
                                         "\nactivation:" + arguments_["activation"] +
                                         "\nsearchType:" + arguments_["searchType"] +
