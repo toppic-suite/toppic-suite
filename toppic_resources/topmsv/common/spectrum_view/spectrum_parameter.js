@@ -22,6 +22,7 @@ class SpectrumViewParameters {
         //minimum possible m/z after zooming/dragging, to prevent dragging/zooming into negative m/z value
         //if new m/z is less than this value, it is reset to this value
         this.minPossibleMz_ = -100;
+        this.maxPossibleMzMargin_ = 300;
         // M/z range of peaks
         this.dataMinMz_ = 0;
         this.dataMaxMz_ = 2000;
@@ -317,6 +318,9 @@ class SpectrumViewParameters {
      */
     drag(distX) {
         let mzDist = distX / this.xScale_;
+        this.winMinMz_ = this.winMinMz_ - mzDist;
+        this.winMaxMz_ = this.winMaxMz_ - mzDist;
+        this.winCenterMz_ = this.winCenterMz_ - mzDist;
         //allow drag up to -50 m/z (this.minPossibleMz) to give some padding 
         if (this.winMinMz_ - mzDist < this.minPossibleMz_) {
             let minMaxDiff = this.winMaxMz_ - this.winMinMz_;
@@ -325,10 +329,12 @@ class SpectrumViewParameters {
             this.winMaxMz_ = this.winMinMz_ + minMaxDiff;
             this.winCenterMz_ = this.winMinMz_ + centerDiff;
         }
-        else {
-            this.winMinMz_ = this.winMinMz_ - mzDist;
-            this.winMaxMz_ = this.winMaxMz_ - mzDist;
-            this.winCenterMz_ = this.winCenterMz_ - mzDist;
+        if (this.winMaxMz_ > this.dataMaxMz_ + this.maxPossibleMzMargin_) {
+            let minMaxDiff = this.winMaxMz_ - this.winMinMz_;
+            this.winMaxMz_ = this.dataMaxMz_ + this.maxPossibleMzMargin_;
+            this.winMinMz_ = this.winMaxMz_ - minMaxDiff;
+            let centerDiff = this.winMaxMz_ - this.winCenterMz_;
+            this.winCenterMz_ = this.winMinMz_ + centerDiff;
         }
     }
     /**
@@ -337,6 +343,11 @@ class SpectrumViewParameters {
      * Function also calls setLimita which helps in drawing limited number of peaks and circles per eachbin/range of mz values.
      */
     xZoom(mouseSvgX, ratio) {
+        let oriValues = {}; //so that the view range can be restored when the view shouldn't be zoomed
+        oriValues.min = this.winMinMz_;
+        oriValues.max = this.winMaxMz_;
+        oriValues.center = this.winCenterMz_;
+        oriValues.xScale = this.xScale_;
         let mouseSpecX = mouseSvgX - this.padding_.left;
         this.winCenterMz_ = mouseSpecX / this.xScale_ + this.winMinMz_;
         /*self is a global variable of datasource object containing all the data needed to use when zoomed*/
@@ -345,6 +356,15 @@ class SpectrumViewParameters {
         this.winMaxMz_ = this.winCenterMz_ + (this.specWidth_ - mouseSpecX) / this.xScale_;
         if (this.winMinMz_ < this.minPossibleMz_) { //prevent zooming out into negative mass
             this.winMinMz_ = this.minPossibleMz_;
+        }
+        if (this.winMaxMz_ > this.dataMaxMz_ + this.maxPossibleMzMargin_) {
+            this.winMaxMz_ = this.dataMaxMz_ + this.maxPossibleMzMargin_;
+        }
+        if (this.winCenterMz_ > this.winMaxMz_) {
+            this.winMinMz_ = oriValues.min;
+            this.winMaxMz_ = oriValues.max;
+            this.winCenterMz_ = oriValues.center;
+            this.xScale_ = oriValues.xScale;
         }
     }
     /**
