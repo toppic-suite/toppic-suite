@@ -169,22 +169,27 @@ void mergeFiles(TopfdParaPtr para_ptr,
   }
 }
 
-int getMs2ScanCount(std::string spectrum_file_name) {
+void getMsScanCount(std::string spectrum_file_name, std::vector<int> &scan_cnt_vec) {
   typedef std::shared_ptr<pwiz::msdata::MSDataFile> MSDataFilePtr;
   pwiz::msdata::DefaultReaderList readers_;
   MSDataFilePtr msd_ptr_ = std::make_shared<pwiz::msdata::MSDataFile>(spectrum_file_name, &readers_);
   pwiz::msdata::SpectrumListPtr spec_list_ptr_ =  msd_ptr_->run.spectrumListPtr;
   
   int sp_size = spec_list_ptr_->size();
-  int cnt = 0;
+  int ms1_cnt = 0;
+  int ms2_cnt = 0;
 
   for(int i = 0; i < sp_size; i++){
       int scan_level = spec_list_ptr_->spectrum(i)->cvParam(pwiz::msdata::MS_ms_level).valueAs<int>(); // check scanLevel
       if (scan_level == 2) {
-        cnt++;
+        ms2_cnt++;
+      }
+      else if (scan_level == 1) {
+        ms1_cnt++;
       }
   }
-  return cnt;
+  scan_cnt_vec.push_back(ms1_cnt);
+  scan_cnt_vec.push_back(ms2_cnt);
 }
 
 int process(TopfdParaPtr para_ptr,  std::vector<std::string> spec_file_lst) {
@@ -192,7 +197,13 @@ int process(TopfdParaPtr para_ptr,  std::vector<std::string> spec_file_lst) {
 
   EnvBase::initBase(para_ptr->resource_dir_);
   for (size_t k = 0; k < spec_file_lst.size(); k++) {
-    para_ptr->setScanNumber(getMs2ScanCount(spec_file_lst[k]));
+    //get ms1 and ms2 scan number
+    std::vector<int> scan_cnt_vec;
+    getMsScanCount(spec_file_lst[k], scan_cnt_vec);
+
+    para_ptr->setMs1ScanNumber(scan_cnt_vec[0]);
+    para_ptr->setMs2ScanNumber(scan_cnt_vec[1]);
+
     std::string print_str = para_ptr->getParaStr("");//print parameter for each file
     std::cout << print_str;
 
