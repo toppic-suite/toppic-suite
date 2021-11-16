@@ -52,6 +52,7 @@ class PwMsReader {
 
   int ms1_cnt = 0;
   int ms2_cnt = 0;
+  int prev_ms1_scan_id = -1;
   PeakPtrVec peak_list_;
   MsHeaderPtr header_ptr_;
 

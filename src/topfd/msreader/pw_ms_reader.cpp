@@ -104,7 +104,12 @@ bool PwMsReader::readOneMs(int sp_id, PeakPtrVec &peak_list, MsHeaderPtr &header
       //get precursor scan ID from mzML
       std::string line = cur_spec_ptr->precursors[0].spectrumID;
       std::string delimiter = "=";
-      prec_scan_num = std::stoi(line.substr(line.find_last_of(delimiter) + 1)); 
+      if (line.substr(line.find_last_of(delimiter) + 1) == "") {
+        prec_scan_num = prev_ms1_scan_id;
+      }
+      else {
+        prec_scan_num = std::stoi(line.substr(line.find_last_of(delimiter) + 1)); 
+      }
     }
     // precursor mz in mzML data
     header_ptr->setPrecSpMz(prec_mz);
@@ -183,6 +188,7 @@ bool PwMsReader::readOneMs(int sp_id, PeakPtrVec &peak_list, MsHeaderPtr &header
     header_ptr->setFileName(file_name_);
     header_ptr->setTitle("Scan_" + str_util::toString(spec_info.scanNumber));
     header_ptr->setRetentionTime(spec_info.retentionTime);
+    prev_ms1_scan_id = spec_info.scanNumber;
   }
   //add voltage information if it exists
   std::vector<pwiz::data::CVParam> cv_list = (*cur_spec_ptr).cvParams;
