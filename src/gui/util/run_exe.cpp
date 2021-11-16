@@ -92,7 +92,7 @@ std::string RunExe::geneCommand(TopfdParaPtr para_ptr, std::vector<std::string> 
   if (!para_ptr->do_final_filtering_) {
     command = command + "-d ";
   }
-  for (int i = 0; i < spec_file_lst_.size(); i++) {
+  for (size_t i = 0; i < spec_file_lst_.size(); i++) {
     command = command + spec_file_lst_[i] + " ";
   }
   return command;
@@ -183,7 +183,7 @@ std::string RunExe::geneCommand(std::map<std::string, std::string> arguments_, s
   }  
   command = command + arguments_["oriDatabaseFileName"] + " ";
 
-  for (int i = 0; i < spec_file_lst_.size(); i++) {
+  for (size_t i = 0; i < spec_file_lst_.size(); i++) {
     command = command + spec_file_lst_[i] + " ";
   }
   return command;
