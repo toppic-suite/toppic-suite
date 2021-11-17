@@ -70,7 +70,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("env-cnn,n", "Use EnvCNN as the scoring function of isotopic envelopes.")
         ("missing-level-one,o","MS1 spectra are missing in the input file.")
         ("thread-number,u", po::value<std::string> (&thread_number), "<a positive integer>. Number of threads used in spectral deconvolution. Default value: 1.")
-        ("skip-html-folder,g","Skip the generation of html files for the visualization of spectra and identifications.")
+        ("skip-html-folder,g","Skip the generation of HTML files for visualization.")
         ("disable-final-filtering,d","Skip the final filtering of envelopes.")
         ;
 
