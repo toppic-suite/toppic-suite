@@ -41,13 +41,19 @@
      <rect>
       <x>40</x>
       <y>50</y>
-      <width>406</width>
+      <width>321</width>
       <height>39</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QLabel" name="label">
+       <property name="maximumSize">
+        <size>
+         <width>105</width>
+         <height>16777215</height>
+        </size>
+       </property>
        <property name="text">
         <string>Spectrum files: </string>
        </property>
@@ -98,7 +104,7 @@
      <rect>
       <x>40</x>
       <y>360</y>
-      <width>481</width>
+      <width>361</width>
       <height>36</height>
      </rect>
     </property>
@@ -240,13 +246,19 @@ p, li { white-space: pre-wrap; }
      <rect>
       <x>40</x>
       <y>10</y>
-      <width>851</width>
+      <width>861</width>
       <height>39</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
       <widget class="QLabel" name="label_2">
+       <property name="maximumSize">
+        <size>
+         <width>105</width>
+         <height>16777215</height>
+        </size>
+       </property>
        <property name="text">
         <string>Database file: </string>
        </property>
@@ -302,6 +314,12 @@ p, li { white-space: pre-wrap; }
      </item>
      <item>
       <widget class="QComboBox" name="fixedModComboBox">
+       <property name="maximumSize">
+        <size>
+         <width>268</width>
+         <height>16777215</height>
+        </size>
+       </property>
        <item>
         <property name="text">
          <string>NONE</string>
@@ -357,7 +375,7 @@ p, li { white-space: pre-wrap; }
      <rect>
       <x>40</x>
       <y>400</y>
-      <width>701</width>
+      <width>861</width>
       <height>36</height>
      </rect>
     </property>
@@ -383,7 +401,7 @@ p, li { white-space: pre-wrap; }
      <rect>
       <x>40</x>
       <y>320</y>
-      <width>451</width>
+      <width>321</width>
       <height>31</height>
      </rect>
     </property>

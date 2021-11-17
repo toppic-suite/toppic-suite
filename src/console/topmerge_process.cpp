@@ -282,7 +282,7 @@ void TopMergeProcess(std::map<std::string, std::string> & arguments,
     Argument::outputArguments(std::cout, arguments);
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
 
-    int thread_num = std::stoi(arguments["threadNumber"]);
+    //int thread_num = std::stoi(arguments["threadNumber"]);
     if (arguments["combinedOutputName"] != "") {
       std::string merged_file_name = arguments["combinedOutputName"]; 
       std::string para_str = "";
