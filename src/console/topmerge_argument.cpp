@@ -137,7 +137,7 @@ bool Argument::parse(int argc, char* argv[]) {
 
     display_desc.add_options() 
         ("help,h", "Print the help message.") 
-        ("decoy,d", "Use a decoy protein database to estimate false discovery rates.")
+        ("decoy,d", "Use a shuffled decoy protein database to estimate false discovery rates.")
         ("proteoform-error-tolerance,p", po::value<std::string> (&form_error_tole), "<a positive number>. Error tolerance for identifying PrSM clusters. Default value: 1.2 Dalton.")
         ("min-shift,m", po::value<std::string> (&min_ptm_mass), "Minimum value of the mass shift of an unexpected modification. Default value: -500 Dalton.")
         ("max-shift,M", po::value<std::string> (&max_ptm_mass), "Maximum value of the mass shift of an unexpected modification. Default value: 500 Dalton.")
@@ -151,9 +151,9 @@ bool Argument::parse(int argc, char* argv[]) {
         ("miscore-threshold,H", po::value<std::string> (&local_threshold), "<a positive number between 0 and 1>. Score threshold (modification identification score) for filtering results of PTM characterization. Default value: 0.15.")
         ("no-topfd-feature,x", "No TopFD feature file for proteoform identification.")
         ("combined-file-name,c", po::value<std::string>(&combined_output_name) , "Specify a file name for the combined spectrum data file and analysis results.")
-        ("keep-temp-files,k", "Keep temporary files.")        
+        ("keep-temp-files,k", "Keep intermediate files.")        
         ("keep-decoy-ids,K", "Keep decoy identifications.")       
-        ("skip-html-folder,g", "Skip generating an html folder containing TopView and spectrum data for visualization.");
+        ("skip-html-folder,g", "Skip the generation of HTML files for visualization.");
 
     po::options_description desc("Options");
 

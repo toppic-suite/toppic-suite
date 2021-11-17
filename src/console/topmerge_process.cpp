@@ -118,7 +118,8 @@ int TopMerge_post(std::map<std::string, std::string> & arguments) {
 
     std::string sp_file_name = arguments["spectrumFileName"];
     std::string ori_db_file_name = arguments["oriDatabaseFileName"];
-    std::string db_file_name = ori_db_file_name + "_idx" + file_util::getFileSeparator() + file_util::filenameFromEntirePath(arguments["databaseFileName"]);
+    std::string db_file_name = ori_db_file_name + "_idx" + file_util::getFileSeparator() 
+      + file_util::filenameFromEntirePath(arguments["databaseFileName"]);
     double max_ptm_mass = std::stod(arguments["maxPtmMass"]);
     double min_ptm_mass = std::stod(arguments["minPtmMass"]);
     bool localization = false;
@@ -282,7 +283,6 @@ void TopMergeProcess(std::map<std::string, std::string> & arguments,
     Argument::outputArguments(std::cout, arguments);
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
 
-    //int thread_num = std::stoi(arguments["threadNumber"]);
     if (arguments["combinedOutputName"] != "") {
       std::string merged_file_name = arguments["combinedOutputName"]; 
       std::string para_str = "";

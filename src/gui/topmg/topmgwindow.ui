@@ -584,7 +584,7 @@ p, li { white-space: pre-wrap; }
        <item>
         <widget class="QCheckBox" name="geneHTMLCheckBox">
          <property name="text">
-          <string>Create HTML folder</string>
+          <string>Generate HTML files</string>
          </property>
          <property name="checked">
           <bool>true</bool>
