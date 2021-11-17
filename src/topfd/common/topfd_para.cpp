@@ -30,7 +30,7 @@ std::string TopfdPara::getParaStr(const std::string &prefix) {
   output << prefix << std::setw(gap) << std::left 
       << "Activation type:       " << "\t"  << activation_ << std::endl;
   output << prefix << std::setw(gap) << std::left 
-      << "Number of LC/MS scans:       " << "\t"  << ms_1_scan_num_ << std::endl;
+      << "Number of MS1 scans:       " << "\t"  << ms_1_scan_num_ << std::endl;
   output << prefix << std::setw(gap) << std::left 
       << "Number of MS/MS scans:       " << "\t"  << ms_2_scan_num_ << std::endl;
   output << prefix << std::setw(gap) << std::left 
