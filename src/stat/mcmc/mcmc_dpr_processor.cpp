@@ -259,14 +259,14 @@ std::function<void()> geneTask(SpectrumSetPtr spec_set_ptr,
 
     ProteoformTypePtr type_ptr = prsm_ptr->getProteoformPtr()->getProteoformType();
 
-    int unexpect_shift_num = prsm_ptr->getProteoformPtr()->getMassShiftNum(AlterType::UNEXPECTED);
+    int unexpect_shift_num = prsm_ptr->getProteoformPtr()->getAlterNum(AlterType::UNEXPECTED);
 
-    if (prsm_ptr->getProteoformPtr()->getVariablePtmNum() == 0) {
+    if (prsm_ptr->getProteoformPtr()->getAlterNum(AlterType::VARIABLE) == 0) {
       cand_num = test_num_ptr->compCandNum(type_ptr, unexpect_shift_num,
                                            prsm_ptr->getAdjustedPrecMass() - mass_constant::getWaterMass(),
                                            tolerance);
     } else {
-      std::vector<double> mass_ptm_vec = ptm_mass_vec2d[prsm_ptr->getProteoformPtr()->getVariablePtmNum()];
+      std::vector<double> mass_ptm_vec = ptm_mass_vec2d[prsm_ptr->getProteoformPtr()->getAlterNum(AlterType::VARIABLE)];
 
       for (size_t k = 0; k < mass_ptm_vec.size(); k++) {
         cand_num += test_num_ptr->compCandNum(type_ptr, unexpect_shift_num,

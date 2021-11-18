@@ -203,9 +203,9 @@ double Prsm::getOneProtProb() {
 
 /* this function is tempory for testing mass graph alignment */
 double Prsm::getNormMatchFragNum() {
-  int var_change_num = proteoform_ptr_->getVariablePtmNum();
+  int var_change_num = proteoform_ptr_->getAlterNum(AlterType::VARIABLE);
 
-  int unexp_change_num = proteoform_ptr_->getMassShiftNum(AlterType::UNEXPECTED);
+  int unexp_change_num = proteoform_ptr_->getAlterNum(AlterType::UNEXPECTED);
 
   int start_pos = proteoform_ptr_->getStartPos();
 
@@ -293,7 +293,7 @@ bool Prsm::cmpSpectrumIdIncEvalueInc(const PrsmPtr &a, const PrsmPtr &b) {
 
 bool Prsm::cmpNormMatchFragmentDec(const PrsmPtr &a, const PrsmPtr &b) {
   if (a->getNormMatchFragNum() == b->getNormMatchFragNum()) {
-    return a->getProteoformPtr()->getVariablePtmNum() < b->getProteoformPtr()->getVariablePtmNum();
+    return a->getProteoformPtr()->getAlterNum(AlterType::VARIABLE) < b->getProteoformPtr()->getAlterNum(AlterType::VARIABLE);
   } else {
     return a->getNormMatchFragNum() > b->getNormMatchFragNum();
   }

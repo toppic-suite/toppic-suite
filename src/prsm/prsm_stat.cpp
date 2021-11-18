@@ -99,7 +99,7 @@ void writePrsm(std::ofstream &file, PrsmPtr prsm_ptr, PrsmParaPtr prsm_para_ptr)
       << prsm_ptr->getProteoformPtr()->getStartPos() << "\t"
       << prsm_ptr->getProteoformPtr()->getEndPos() << "\t"
       << prsm_ptr->getProteoformPtr()->getProteinMatchSeq() << "\t"
-      << prsm_ptr->getProteoformPtr()->getMassShiftNum(AlterType::UNEXPECTED) << "\t"
+      << prsm_ptr->getProteoformPtr()->getAlterNum(AlterType::UNEXPECTED) << "\t"
       << prsm_ptr->getMatchPeakNum() << "\t"
       << prsm_ptr->getMatchFragNum() << "\t"
       << prsm_ptr->getPValue() << "\t"

@@ -62,7 +62,7 @@ class Proteoform {
 
   int getMassShiftNum() {return static_cast<int>(mass_shift_list_.size());}
 
-  int getMassShiftNum(AlterTypePtr type_ptr);
+  int getAlterNum(AlterTypePtr type_ptr);
 
   MassShiftPtrVec getMassShiftPtrVec() {return mass_shift_list_;}
 
@@ -92,9 +92,9 @@ class Proteoform {
 
   static std::string getXmlElementName() {return "proteoform";}
 
-  void setVariablePtmNum(int n) {variable_ptm_num_ = n;}
+  //void setVariablePtmNum(int n) {variable_ptm_num_ = n;}
 
-  int getVariablePtmNum() {return variable_ptm_num_;}
+  //int getVariablePtmNum() {return variable_ptm_num_;}
   
   PtmPtrVec getPtmVec(AlterTypePtr type);
 
@@ -130,7 +130,7 @@ class Proteoform {
   MassShiftPtrVec mass_shift_list_;
 
   // Number of variable ptms is used for the test of the mass graph approach
-  int variable_ptm_num_ = 0;
+  // int variable_ptm_num_ = 0;
 };
 
 typedef std::vector<ProteoformPtr> ProteoformPtrVec;

@@ -44,6 +44,8 @@ class MassShift {
 
   AlterPtr getAlterPtr(size_t idx) {return alter_vec_[idx];}
 
+  int getAlterNum() {return alter_vec_.size();}
+
   void setAlterPtrVec(AlterPtrVec alter_vec) {alter_vec_ = alter_vec;}
 
   AlterTypePtr getTypePtr(); 

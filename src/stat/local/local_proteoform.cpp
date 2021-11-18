@@ -245,12 +245,13 @@ ProteoformPtr createProteoformPtr(ProteoformPtr base_form_ptr, int match_score,
 
   if (bgn == -1) return nullptr;
 
+  LOG_DEBUG("local start " << bgn << " end " << end);
   LocalAnnoPtr anno = std::make_shared<LocalAnno>(bgn, end, conf, scr_vec,
                                                   match_score, ptm_ptr);
 
   AlterPtr alter = std::make_shared<Alter>(anno->getLeftBpPos(),
                                            anno->getRightBpPos() + 1,
-                                           AlterType::UNEXPECTED, 
+                                           AlterType::VARIABLE, 
                                            ptm_ptr->getMonoMass(),  
                                            std::make_shared<Mod>(ResidueBase::getEmptyResiduePtr(),
                                                                  ResidueBase::getEmptyResiduePtr()));
@@ -300,7 +301,7 @@ ProteoformPtr createProteoformPtr(ProteoformPtr base_form_ptr,
 
   AlterPtr alter_1 = std::make_shared<Alter>(anno_1->getLeftBpPos(),
                                              break_pos + 1,
-                                             AlterType::UNEXPECTED, 
+                                             AlterType::VARIABLE, 
                                              ptm_ptr_1->getMonoMass(), 
                                              std::make_shared<Mod>(ResidueBase::getEmptyResiduePtr(),
                                                                    ResidueBase::getEmptyResiduePtr()));
@@ -312,7 +313,7 @@ ProteoformPtr createProteoformPtr(ProteoformPtr base_form_ptr,
 
   AlterPtr alter_2 = std::make_shared<Alter>(break_pos + 1, 
                                              anno_2->getRightBpPos() + 1,
-                                             AlterType::UNEXPECTED, 
+                                             AlterType::VARIABLE, 
                                              ptm_ptr_2->getMonoMass(),
                                              std::make_shared<Mod>(ResidueBase::getEmptyResiduePtr(),
                                                                    ResidueBase::getEmptyResiduePtr()));

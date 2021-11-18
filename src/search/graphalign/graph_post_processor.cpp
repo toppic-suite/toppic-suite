@@ -257,7 +257,7 @@ void GraphPostProcessor::process() {
                                            prsm_ptr->getProteoformPtr()->getResSeqPtr(),
                                            fix_shift_vec);
 
-        new_form->setVariablePtmNum(prsm_ptr->getProteoformPtr()->getVariablePtmNum());
+        //new_form->setVariablePtmNum(prsm_ptr->getProteoformPtr()->getVariablePtmNum());
 
         PrsmPtr new_prsm = std::make_shared<Prsm>(new_form, spec_set_ptr->getDeconvMsPtrVec(),
                                                   adjusted_prec_mass,

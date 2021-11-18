@@ -69,7 +69,7 @@ void Proteoform::parseXml(XmlDOMElement* element, ProteoformPtr form_ptr) {
   end_pos_ = xml_dom_util::getIntChildValue(element, "end_pos", 0);
   proteo_cluster_id_ = xml_dom_util::getIntChildValue(element, "proteo_cluster_id", 0);
   prot_id_ = xml_dom_util::getIntChildValue(element, "prot_id", 0);
-  variable_ptm_num_ = xml_dom_util::getIntChildValue(element, "variable_ptm_num", 0);
+  //variable_ptm_num_ = xml_dom_util::getIntChildValue(element, "variable_ptm_num", 0);
 
   // Get protein N-terminal modification
   std::string pm_element_name = ProtMod::getXmlElementName();
@@ -167,11 +167,11 @@ ProteoformTypePtr Proteoform::getProteoformType() {
   }
 }
 
-int Proteoform::getMassShiftNum(AlterTypePtr type_ptr) {
+int Proteoform::getAlterNum(AlterTypePtr type_ptr) {
   int n = 0;
   for (size_t i = 0; i < mass_shift_list_.size(); i++) {
     if (mass_shift_list_[i]->getTypePtr() == type_ptr) {
-      n++;
+      n = n + mass_shift_list_[i]->getAlterNum();
     }
   }
   return n;
@@ -293,9 +293,9 @@ void Proteoform::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
   xml_doc->addElement(element, "proteo_cluster_id", str.c_str());
   str = str_util::toString(prot_id_);
   xml_doc->addElement(element, "prot_id", str.c_str());
-  str = str_util::toString(variable_ptm_num_);
-  xml_doc->addElement(element, "variable_ptm_num", str.c_str());
-  str = str_util::toString(getMassShiftNum(AlterType::UNEXPECTED));
+  //str = str_util::toString(variable_ptm_num_);
+  //xml_doc->addElement(element, "variable_ptm_num", str.c_str());
+  str = str_util::toString(getAlterNum(AlterType::UNEXPECTED));
   xml_doc->addElement(element, "unexpected_ptm_num", str.c_str());
 
   element_name = MassShift::getXmlElementName() + "_list";
@@ -312,7 +312,7 @@ std::string Proteoform::getMIScore() {
 
   StringPairVec string_pairs = fasta_seq_ptr_->getAcidPtmPairVec();
 
-  MassShiftPtrVec mass_shift_vec = getMassShiftPtrVec(AlterType::UNEXPECTED);
+  MassShiftPtrVec mass_shift_vec = getMassShiftPtrVec(AlterType::VARIABLE);
   for (size_t i = 0; i < mass_shift_vec.size(); i++) {
     if (mass_shift_vec[i]->getAlterPtr(0)->getLocalAnno() == nullptr)
       continue;

@@ -46,7 +46,7 @@ void addSummary(XmlDOMDocument* xml_doc, xercesc::DOMElement *prot_element,
   str = str_util::toString(proteoform_ptr->getProtModPtr()->isAcetylation());
   xml_doc->addElement(prot_element, "n_acetylation", str.c_str());
 
-  int unexpected_change_number = proteoform_ptr->getMassShiftNum(AlterType::UNEXPECTED);
+  int unexpected_change_number = proteoform_ptr->getAlterNum(AlterType::UNEXPECTED);
   str = str_util::toString(unexpected_change_number);
   xml_doc->addElement(prot_element, "unexpected_shift_number", str.c_str());
 }

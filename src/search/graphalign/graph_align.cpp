@@ -582,7 +582,7 @@ PrsmPtr GraphAlign::geneResult(int s, int m) {
       = diag_header_util::getDiagonalMassChanges(refined_headers, first_pos, last_pos, shift_types);
 
   sub_proteo_ptr->addMassShiftPtrVec(shifts);
-  sub_proteo_ptr->setVariablePtmNum(m);
+  //sub_proteo_ptr->setVariablePtmNum(m);
 
   return std::make_shared<Prsm>(sub_proteo_ptr, deconv_ms_ptr_vec, refine_prec_mass,
                                 mng_ptr_->prsm_para_ptr_->getSpParaPtr());

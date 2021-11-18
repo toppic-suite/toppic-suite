@@ -174,8 +174,8 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
       << form_ptr->getProteinMatchSeq() << delim
       << form_ptr->getMass() << delim
       << form_ptr->getProtModPtr()->getType() << delim
-      << form_ptr->getMassShiftNum(AlterType::UNEXPECTED) << delim
-      << form_ptr->getVariablePtmNum() << delim
+      << form_ptr->getAlterNum(AlterType::UNEXPECTED) << delim
+      << form_ptr->getAlterNum(AlterType::VARIABLE) << delim
       << form_ptr->getMIScore() << delim
       << prsm_ptr->getMatchPeakNum() << delim
       << prsm_ptr->getMatchFragNum() << delim

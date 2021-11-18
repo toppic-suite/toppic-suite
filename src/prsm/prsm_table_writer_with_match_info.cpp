@@ -141,7 +141,7 @@ void PrsmTableWriterWithMatchInfo::writePrsm(std::ofstream &file, PrsmPtr prsm_p
   std::string delim = "\t";
   std::string empty_str = "-";
 
-  int ptm_num = prsm_ptr->getProteoformPtr()->getMassShiftNum(AlterType::UNEXPECTED);
+  int ptm_num = prsm_ptr->getProteoformPtr()->getAlterNum(AlterType::UNEXPECTED);
   int peak_num = 0;
   DeconvMsPtrVec deconv_ms_ptr_vec = prsm_ptr->getDeconvMsPtrVec();
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
@@ -200,7 +200,7 @@ void PrsmTableWriterWithMatchInfo::writePrsm(std::ofstream &file, PrsmPtr prsm_p
       << is_exact_match << delim
       << ptm_num << delim
       << prsm_ptr->getProteoformPtr()->getMIScore() << delim
-      << prsm_ptr->getProteoformPtr()->getVariablePtmNum() << delim
+      << prsm_ptr->getProteoformPtr()->getAlterNum(AlterType::VARIABLE) << delim
       << prsm_ptr->getMatchPeakNum() << delim
       << prsm_ptr->getMatchFragNum() << delim
       << prsm_ptr->getEValue() << delim;

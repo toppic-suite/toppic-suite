@@ -36,7 +36,7 @@ void process(const std::string &db_file_name,
   PrsmXmlWriter all_writer(file_util::basename(spec_file_name) + "." + output_file_ext);
 
   while (prsm_ptr != nullptr) {
-    int shift_num = prsm_ptr->getProteoformPtr()->getMassShiftNum(AlterType::UNEXPECTED);
+    int shift_num = prsm_ptr->getProteoformPtr()->getAlterNum(AlterType::UNEXPECTED);
     ProteoformTypePtr type_ptr = prsm_ptr->getProteoformPtr()->getProteoformType();
     ExpectedValuePtr prob_ptr = prsm_ptr->getExpectedValuePtr();
     if (shift_num == 1) {
