@@ -112,11 +112,11 @@ ProteoformPtrVec getCandidateForm(FastaSeqPtr seq_ptr, int ori_start_pos,
   // check possible N-terminal acetylation form
   ProtModPtrVec prot_mod_list = mng_ptr->prsm_para_ptr_->getProtModPtrVec();
   ProtModPtr m_actyl = ProtModBase::getProtModPtr_M_ACETYLATION();
-  LOG_DEBUG("form start " << form_start_pos);
+  //LOG_DEBUG("form start " << form_start_pos);
   if (form_start_pos == 0) {
     if (prot_mod_util::containMod(prot_mod_list, m_actyl) && 
         prot_mod_util::allowMod(m_actyl, db_res_seq_ptr->getResidues())) {
-      LOG_DEBUG("M aceylation modifiable!");
+      //LOG_DEBUG("M aceylation modifiable!");
       prot_mod_ptr = m_actyl;
       // apply mod
       ModPtr mod_ptr = prot_mod_ptr->getModPtr();
@@ -152,7 +152,7 @@ ProteoformPtrVec getCandidateForm(FastaSeqPtr seq_ptr, int ori_start_pos,
       }
     }
     if (found) {
-      LOG_DEBUG("NME aceylation modifiable!");
+      //LOG_DEBUG("NME aceylation modifiable!");
       // apply mod
       ModPtr mod_ptr = prot_mod_ptr->getModPtr();
       ResiduePtrVec res_vec = sub_res_seq_ptr->getResidues();
@@ -245,7 +245,7 @@ ProteoformPtr createProteoformPtr(ProteoformPtr base_form_ptr, int match_score,
 
   if (bgn == -1) return nullptr;
 
-  LOG_DEBUG("local start " << bgn << " end " << end);
+  //LOG_DEBUG("local start " << bgn << " end " << end);
   LocalAnnoPtr anno = std::make_shared<LocalAnno>(bgn, end, conf, scr_vec,
                                                   match_score, ptm_ptr);
 
