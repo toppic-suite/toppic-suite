@@ -56,16 +56,17 @@ void PrsmTableWriter::write() {
       << "Proteoform ID" << delim
       << "Feature intensity" << delim
       << "Feature score" << delim
-      << "Feature apex" << delim
+      << "Feature apex time" << delim
       << "Protein accession" << delim
       << "Protein description" << delim
       << "First residue" << delim
       << "Last residue" << delim
       << "Proteoform" << delim
       << "Proteoform mass" << delim
+      << "Protein N-terminal form" << delim
       << "#unexpected modifications" << delim
-      << "MIScore" << delim
       << "#variable PTMs" << delim
+      << "MIScore" << delim
       << "#matched peaks" << delim
       << "#matched fragment ions" << delim
       << "E-value" << delim
@@ -118,7 +119,6 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   std::string delim = "\t";
   std::string empty_str = "-";
 
-  int ptm_num = prsm_ptr->getProteoformPtr()->getMassShiftNum(AlterType::UNEXPECTED);
   int peak_num = 0;
   DeconvMsPtrVec deconv_ms_ptr_vec = prsm_ptr->getDeconvMsPtrVec();
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
@@ -164,16 +164,19 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
 
   file << prsm_ptr->getFracFeatureScore() << delim;
   file << prsm_ptr->getTimeApex() << delim;
+  
+  ProteoformPtr form_ptr = prsm_ptr->getProteoformPtr();
 
-  file << prsm_ptr->getProteoformPtr()->getSeqName() << delim
-      << prsm_ptr->getProteoformPtr()->getSeqDesc() << delim
-      << (prsm_ptr->getProteoformPtr()->getStartPos() + 1) << delim
-      << (prsm_ptr->getProteoformPtr()->getEndPos() + 1) << delim
-      << prsm_ptr->getProteoformPtr()->getProteinMatchSeq() << delim
-      << prsm_ptr->getProteoformPtr()->getMass() << delim
-      << ptm_num << delim
-      << prsm_ptr->getProteoformPtr()->getMIScore() << delim
-      << prsm_ptr->getProteoformPtr()->getVariablePtmNum() << delim
+  file << form_ptr->getSeqName() << delim
+      << form_ptr->getSeqDesc() << delim
+      << (form_ptr->getStartPos() + 1) << delim
+      << (form_ptr->getEndPos() + 1) << delim
+      << form_ptr->getProteinMatchSeq() << delim
+      << form_ptr->getMass() << delim
+      << form_ptr->getProtModPtr()->getType() << delim
+      << form_ptr->getMassShiftNum(AlterType::UNEXPECTED) << delim
+      << form_ptr->getVariablePtmNum() << delim
+      << form_ptr->getMIScore() << delim
       << prsm_ptr->getMatchPeakNum() << delim
       << prsm_ptr->getMatchFragNum() << delim
       << prsm_ptr->getEValue() << delim;
