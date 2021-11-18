@@ -42,6 +42,7 @@ void PrsmTableWriterWithMatchInfo::write() {
   std::ofstream file;
   file.open(output_file_name.c_str());
   file << argu_str_;
+  file << "\n";
   // write title
   std::string delim = "\t";
   

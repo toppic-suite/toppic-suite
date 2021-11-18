@@ -510,7 +510,8 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
     }
   }
 
-  if (spec_file_lst.size() > 1 && arguments["combinedOutputName"] != "") {
+  //if (spec_file_lst.size() > 1 && arguments["combinedOutputName"] != "") {
+  if (arguments["combinedOutputName"] != "") {
     std::string merged_file_name = arguments["combinedOutputName"]; 
     std::string para_str = "";
     std::cout << "Merging files started." << std::endl;
@@ -557,7 +558,8 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
     cleanToppicDir(ori_db_file_name, sp_file_name, keep_temp_files);
   }
 
-  if (spec_file_lst.size() > 1 && arguments["combinedOutputName"] != "") {
+  //if (spec_file_lst.size() > 1 && arguments["combinedOutputName"] != "") {
+  if (arguments["combinedOutputName"] != "") {
     std::string sp_file_name = full_combined_name + "_ms2.msalign";
     cleanToppicDir(ori_db_file_name, sp_file_name, keep_temp_files);
   }
