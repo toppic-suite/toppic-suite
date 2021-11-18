@@ -331,7 +331,7 @@ std::string Proteoform::getMIScore() {
       if (scr == 100) scr = 99.9;
       if (scr == 0) continue;
 
-      mi_score = mi_score + acid_letter + str_util::toString(j + 1) + ":";
+      mi_score = mi_score + acid_letter + str_util::toString(j - start_pos_ + 1) + ":";
       std::stringstream ss;
       ss << std::fixed << std::setprecision(1) << scr;
       mi_score = mi_score + ss.str() + "%";
