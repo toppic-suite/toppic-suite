@@ -110,10 +110,13 @@ ProteoformPtrVec getCandidateForm(FastaSeqPtr seq_ptr, int ori_start_pos,
   result_vec.push_back(form_ptr);
 
   // check possible N-terminal acetylation form
+  ProtModPtrVec prot_mod_list = mng_ptr->prsm_para_ptr_->getProtModPtrVec();
+  ProtModPtr m_actyl = ProtModBase::getProtModPtr_M_ACETYLATION();
+  LOG_DEBUG("form start " << form_start_pos);
   if (form_start_pos == 0) {
-    ProtModPtr m_actyl = ProtModBase::getProtModPtr_M_ACETYLATION();
-    if (prot_mod_util::containMod(mng_ptr->prsm_para_ptr_->getProtModPtrVec(), m_actyl) && 
+    if (prot_mod_util::containMod(prot_mod_list, m_actyl) && 
         prot_mod_util::allowMod(m_actyl, db_res_seq_ptr->getResidues())) {
+      LOG_DEBUG("M aceylation modifiable!");
       prot_mod_ptr = m_actyl;
       // apply mod
       ModPtr mod_ptr = prot_mod_ptr->getModPtr();
@@ -138,10 +141,18 @@ ProteoformPtrVec getCandidateForm(FastaSeqPtr seq_ptr, int ori_start_pos,
     }
   }
   else if (form_start_pos == 1) {
-    ProtModPtr nme_actyl = ProtModBase::getProtModPtr_NME_ACETYLATION();
-    if (prot_mod_util::containMod(mng_ptr->prsm_para_ptr_->getProtModPtrVec(), nme_actyl) && 
-        prot_mod_util::allowMod(nme_actyl, db_res_seq_ptr->getResidues())) {
-      prot_mod_ptr = nme_actyl;
+    bool found = false;
+    for (size_t t = 0; t < prot_mod_list.size(); t++) {
+      ProtModPtr cur_mod_ptr = prot_mod_list[t];
+      if (cur_mod_ptr->getType() == ProtModBase::getType_NME_ACETYLATION() 
+          && prot_mod_util::allowMod(cur_mod_ptr, db_res_seq_ptr->getResidues())) {
+        found = true;
+        prot_mod_ptr = cur_mod_ptr;
+        break;
+      }
+    }
+    if (found) {
+      LOG_DEBUG("NME aceylation modifiable!");
       // apply mod
       ModPtr mod_ptr = prot_mod_ptr->getModPtr();
       ResiduePtrVec res_vec = sub_res_seq_ptr->getResidues();

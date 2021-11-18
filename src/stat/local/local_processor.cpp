@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <cmath>
 #include <numeric>
+#include <iomanip>
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
@@ -250,10 +251,10 @@ ProteoformPtr LocalProcessor::processOneKnownPtm(PrsmPtr prsm_ptr) {
   for (size_t i = 0; i < cand_form_vec.size(); i++) {
     ProteoformPtr cand_form_ptr = cand_form_vec[i];
     double unexp_shift_mass = adjust_prec_mass - cand_form_ptr->getMass(); 
-    //LOG_DEBUG(std::setprecision(10) << "adjust prec mass " << adjust_prec_mass << " form mass " << cand_form_ptr->getMass());
+    LOG_DEBUG(std::setprecision(10) << "adjust prec mass " << adjust_prec_mass << " form mass " << cand_form_ptr->getMass());
     // Get candidate Ptms with similar mass shifts
     PtmPtrVec match_ptm_ptr_vec = local_util::getPtmPtrVecByMass(unexp_shift_mass, err_tole, ptm_ptr_vec_);
-    //LOG_DEBUG("ptm number " << match_ptm_ptr_vec.size() << " shift " << unexp_shift_mass);
+    LOG_DEBUG("ptm number " << match_ptm_ptr_vec.size() << " shift " << unexp_shift_mass);
 
     // if there is a match, find the best ptm and its best similarity score
     for (size_t j = 0; j < match_ptm_ptr_vec.size(); j++) {

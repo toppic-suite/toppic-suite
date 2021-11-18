@@ -47,9 +47,11 @@ bool allowMod(ProtModPtr prot_mod_ptr, const ResiduePtrVec &residues) {
 
   // Case 3. NME and NME acetylation
   // check truncation
+  LOG_DEBUG("start check truncation!");
   if (!trunc_util::isValidTrunc(prot_mod_ptr->getTruncPtr(), residues)) {
     return false;
   }
+  LOG_DEBUG("end check truncation!");
   ModPtr mod_ptr = prot_mod_ptr->getModPtr();
   if (mod_ptr != ModBase::getNoneModPtr()) {
     // if NME_acetylation
