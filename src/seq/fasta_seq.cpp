@@ -69,8 +69,14 @@ void FastaSeq::compAcidPtmPairVec() {
     }
     char c = acid_one_letter.at(0);
     if (residue_util::isValidResidue(c)) {
-      acid_one_letter = residue_util::replaceResidueLetter(c);
-      std::pair<std::string, std::string> pair(acid_one_letter, ptm_str);
+      std::string new_one_letter;
+      new_one_letter = residue_util::replaceResidueLetter(c);
+      std::pair<std::string, std::string> pair(new_one_letter, ptm_str);
+      if (new_one_letter.compare(acid_one_letter) != 0) {
+        AminoAcidReplacePtr acid_replace_ptr 
+          = std::make_shared<AminoAcidReplace>(acid_one_letter, new_one_letter, count); 
+        acid_replace_ptr_vec_.push_back(acid_replace_ptr);
+      }
       count++;
       acid_ptm_pair_vec_.push_back(pair);
     }
@@ -97,6 +103,19 @@ std::string FastaSeq::getNameFromXml(XmlDOMElement * element) {
 std::string FastaSeq::getDescFromXml(XmlDOMElement * element) {
   std::string desc = xml_dom_util::getChildValue(element, "seq_desc", 0);
   return desc;
+}
+
+std::string FastaSeq::getAcidReplaceStr(int bgn, int end) {
+  std::string result = "";
+  for (size_t i = 0; i < acid_replace_ptr_vec_.size(); i++) {
+    AminoAcidReplacePtr replace_ptr = acid_replace_ptr_vec_[i];
+    int pos = replace_ptr->getPos();
+    if (pos >= bgn && pos <= end) {
+      result = result + replace_ptr->getOriLetter() 
+        + std::to_string(pos - bgn + 1) + replace_ptr->getNewLetter() + " ";
+    }
+  }
+  return result;
 }
 
 }  // namespace toppic

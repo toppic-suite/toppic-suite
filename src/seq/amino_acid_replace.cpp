@@ -17,10 +17,10 @@
 namespace toppic {
 
 AminoAcidReplace::AminoAcidReplace(std::string ori_letter, 
-                                   AminoAcidPtr amino_acid_ptr,
+                                   std::string new_letter, 
                                    int pos): 
     ori_letter_(ori_letter),
-    amino_acid_ptr_(amino_acid_ptr),
+    new_letter_(new_letter),
     pos_(pos) {}
 
 }  // namespace toppic

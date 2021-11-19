@@ -62,6 +62,7 @@ void PrsmTableWriter::write() {
       << "Protein description" << delim
       << "First residue" << delim
       << "Last residue" << delim
+      << "Special amino acids" << delim
       << "Proteoform" << delim
       << "Proteoform mass" << delim
       << "Protein N-terminal form" << delim
@@ -172,6 +173,7 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
       << form_ptr->getSeqDesc() << delim
       << (form_ptr->getStartPos() + 1) << delim
       << (form_ptr->getEndPos() + 1) << delim
+      << form_ptr->getFastaSeqPtr()->getAcidReplaceStr(form_ptr->getStartPos(), form_ptr->getEndPos()) << delim
       << form_ptr->getProteinMatchSeq() << delim
       << form_ptr->getMass() << delim
       << form_ptr->getProtModPtr()->getType() << delim

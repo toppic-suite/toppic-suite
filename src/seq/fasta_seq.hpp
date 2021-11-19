@@ -19,6 +19,7 @@
 
 #include "common/util/str_util.hpp"
 #include "common/xml/xml_dom_element.hpp"
+#include "seq/amino_acid_replace.hpp"
 
 namespace toppic {
 
@@ -45,6 +46,8 @@ class FastaSeq {
 
   StringPairVec getAcidPtmPairVec() {return acid_ptm_pair_vec_;}
 
+  std::string getAcidReplaceStr(int bgn, int end);
+
   int getAcidPtmPairLen() {return acid_ptm_pair_vec_.size();}
 
   void appendNameDescToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
@@ -63,6 +66,8 @@ class FastaSeq {
   std::string seq_;
 
   StringPairVec acid_ptm_pair_vec_;
+
+  AminoAcidReplacePtrVec acid_replace_ptr_vec_;
 
   void compAcidPtmPairVec();
 };

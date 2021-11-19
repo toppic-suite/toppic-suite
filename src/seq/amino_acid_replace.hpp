@@ -15,23 +15,25 @@
 #ifndef TOPPIC_SEQ_AMINO_ACID_REPLACE_HPP_
 #define TOPPIC_SEQ_AMICO_ACID_REPLACE_HPP_
 
-#include "common/base/amino_acid.hpp"
+#include <memory>
+#include <string>
+#include <vector>
 
 namespace toppic {
 
 class AminoAcidReplace {
  public:
-  AminoAcidReplace(std::string ori_letter, AminoAcidPtr amino_acid_ptr, int pos); 
+  AminoAcidReplace(std::string ori_letter, std::string new_letter, int pos); 
 
   std::string getOriLetter() {return ori_letter_;}
 
-  AminoAcidPtr getAminoAcidPtr() {return amino_acid_ptr_;} 
+  std::string getNewLetter() {return new_letter_;} 
 
   int getPos() {return pos_;}
 
  private:
   std::string ori_letter_;
-  AminoAcidPtr amino_acid_ptr_;
+  std::string new_letter_;
   int pos_;
 };
 
