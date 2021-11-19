@@ -15,6 +15,7 @@
 #include <algorithm>
 
 #include "common/util/logger.hpp"
+#include "common/base/amino_acid_base.hpp"
 #include "common/base/residue_base.hpp"
 #include "common/base/prot_mod_util.hpp"
 #include "common/base/prot_mod_base.hpp"
@@ -248,20 +249,22 @@ ProteoformPtr createProteoformPtr(ProteoformPtr base_form_ptr, int match_score,
   //LOG_DEBUG("local start " << bgn << " end " << end);
   LocalAnnoPtr anno = std::make_shared<LocalAnno>(bgn, end, conf, scr_vec,
                                                   match_score, ptm_ptr);
+  AminoAcidPtr empty_aa_ptr = AminoAcidBase::getEmptyAminoAcidPtr();
+  ModPtr mod_ptr = std::make_shared<Mod>(ResidueBase::getEmptyResiduePtr(),
+                                         ResidueBase::getBaseResiduePtr(empty_aa_ptr, ptm_ptr));
 
   AlterPtr alter = std::make_shared<Alter>(anno->getLeftBpPos(),
                                            anno->getRightBpPos() + 1,
                                            AlterType::VARIABLE, 
                                            ptm_ptr->getMonoMass(),  
-                                           std::make_shared<Mod>(ResidueBase::getEmptyResiduePtr(),
-                                                                 ResidueBase::getEmptyResiduePtr()));
+                                           mod_ptr);
 
   alter->setLocalAnno(anno);
 
-  MassShiftPtr unexp_shift_ptr = std::make_shared<MassShift>(alter);
+  MassShiftPtr mass_shift_ptr = std::make_shared<MassShift>(alter);
 
   MassShiftPtrVec all_shift_ptr_vec = base_form_ptr->getMassShiftPtrVec(); 
-  all_shift_ptr_vec.push_back(unexp_shift_ptr);
+  all_shift_ptr_vec.push_back(mass_shift_ptr);
   std::sort(all_shift_ptr_vec.begin(), all_shift_ptr_vec.end(), MassShift::cmpPosInc);
 
   ProteoformPtr shift_form_ptr = std::make_shared<Proteoform>(base_form_ptr->getFastaSeqPtr(),
@@ -299,24 +302,28 @@ ProteoformPtr createProteoformPtr(ProteoformPtr base_form_ptr,
   LocalAnnoPtr anno_1 = std::make_shared<LocalAnno>(bgn_1, end_1, conf_1, scr_vec_1,
                                                     match_score, ptm_ptr_1);
 
+  AminoAcidPtr empty_aa_ptr = AminoAcidBase::getEmptyAminoAcidPtr();
+  ModPtr mod_ptr_1 = std::make_shared<Mod>(ResidueBase::getEmptyResiduePtr(),
+                                           ResidueBase::getBaseResiduePtr(empty_aa_ptr, ptm_ptr_1));
+
   AlterPtr alter_1 = std::make_shared<Alter>(anno_1->getLeftBpPos(),
                                              break_pos + 1,
                                              AlterType::VARIABLE, 
                                              ptm_ptr_1->getMonoMass(), 
-                                             std::make_shared<Mod>(ResidueBase::getEmptyResiduePtr(),
-                                                                   ResidueBase::getEmptyResiduePtr()));
+                                             mod_ptr_1);
 
   alter_1->setLocalAnno(anno_1);
 
   LocalAnnoPtr anno_2 = std::make_shared<LocalAnno>(bgn_2, end_2, conf_2, scr_vec_2,
                                                     match_score, ptm_ptr_2);
 
+  ModPtr mod_ptr_2 = std::make_shared<Mod>(ResidueBase::getEmptyResiduePtr(),
+                                           ResidueBase::getBaseResiduePtr(empty_aa_ptr, ptm_ptr_2));
   AlterPtr alter_2 = std::make_shared<Alter>(break_pos + 1, 
                                              anno_2->getRightBpPos() + 1,
                                              AlterType::VARIABLE, 
                                              ptm_ptr_2->getMonoMass(),
-                                             std::make_shared<Mod>(ResidueBase::getEmptyResiduePtr(),
-                                                                   ResidueBase::getEmptyResiduePtr()));
+                                             mod_ptr_2);
 
   alter_2->setLocalAnno(anno_2);
 
