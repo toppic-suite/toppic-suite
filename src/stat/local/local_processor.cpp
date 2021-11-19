@@ -94,7 +94,7 @@ void LocalProcessor::process() {
           = extend_ms_factory::geneMsThreePtrVec(deconv_ms_ptr_vec, sp_para_ptr, new_prec_mass);
         prsm_ptr->setRefineMsVec(extend_ms_ptr_vec);
 
-        if (prsm_ptr->getProteoformPtr()->getMassShiftNum(AlterType::UNEXPECTED) > 0) {
+        if (prsm_ptr->getProteoformPtr()->getAlterNum(AlterType::UNEXPECTED) > 0) {
           prsm_ptr = processOnePrsm(prsm_ptr);
         }
 
@@ -111,7 +111,7 @@ void LocalProcessor::process() {
 }
 
 PrsmPtr LocalProcessor::processOnePrsm(PrsmPtr prsm) {
-  int mass_shift_num = prsm->getProteoformPtr()->getMassShiftNum(AlterType::UNEXPECTED);
+  int mass_shift_num = prsm->getProteoformPtr()->getAlterNum(AlterType::UNEXPECTED);
   double err_tole = mng_ptr_->peak_tole_ptr_->compStrictErrorTole(prsm->getAdjustedPrecMass());
   if (mass_shift_num == 1) {
     double mass = prsm->getProteoformPtr()->getMassShiftPtrVec(AlterType::UNEXPECTED)[0]->getMassShift();
