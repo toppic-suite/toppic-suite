@@ -12,31 +12,26 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_SEARCH_DUPLICATEMATCH_ADDITIONAL_MATCH_HPP_
-#define TOPPIC_SEARCH_DUPLICATEMATCH_ADDITIONAL_MATCH_HPP_
+#ifndef TOPPIC_PRSM_SEARCH_FASTA_MATCH_HPP_
+#define TOPPIC_PRSM_SEARCH_FASTA_MATCH_HPP_
 
 #include "prsm/prsm.hpp"
 
 namespace toppic {
 
-class AdditionalMatch {
+class SearchFastaMatch {
  public:
-  AdditionalMatch(std::string db_file_name, std::vector<PrsmPtr> &prsm_ptr_vec, SpParaPtr sp_para_ptr):
-      db_file_name_(db_file_name),
-      prsm_ptr_vec_(prsm_ptr_vec),
-      sp_para_ptr_(sp_para_ptr) {}
+  SearchFastaMatch(std::string db_file_name);
 
-  std::string trimSequence(std::string raw_prot);
-  void process(PrsmPtr prsm_ptr_);
+  std::vector<std::pair<FastaSeqPtr, int>> process(PrsmPtr prsm_ptr_);
 
  private:
   std::string db_file_name_;
-  std::vector<PrsmPtr> &prsm_ptr_vec_;
-  SpParaPtr sp_para_ptr_;
-  int prsm_cnt_ = 0;
+  FastaSeqPtrVec fasta_seq_vec_;
+  std::vector<std::string> seq_vec_;
 };
 
-typedef std::shared_ptr<AdditionalMatch> AdditionalMatchPtr;
+typedef std::shared_ptr<SearchFastaMatch> SearchFastaMatchPtr;
 
 } //namespace toppic
 

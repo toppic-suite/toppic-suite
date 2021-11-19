@@ -20,22 +20,24 @@
 #include "ms/factory/extend_ms_factory.hpp"
 #include "ms/factory/spectrum_set_factory.hpp"
 #include "prsm/prsm_reader.hpp"
-#include "prsm/prsm_table_writer_with_match_info.hpp"
-
-#include "search/duplicatematch/additional_match.hpp"
+#include "prsm/prsm_match_table_writer.hpp"
 
 namespace toppic {
 
-PrsmTableWriterWithMatchInfo::PrsmTableWriterWithMatchInfo(PrsmParaPtr prsm_para_ptr, 
+PrsmMatchTableWriter::PrsmMatchTableWriter(PrsmParaPtr prsm_para_ptr, 
                                  std::string argu_str,
                                  const std::string &input_file_ext, 
                                  const std::string &output_file_ext):
     prsm_para_ptr_(prsm_para_ptr),
     input_file_ext_(input_file_ext),
     argu_str_(argu_str),
-    output_file_ext_(output_file_ext) {}
+    output_file_ext_(output_file_ext) {
+      std::string db_file_name = prsm_para_ptr_->getOriDbName() + "_idx" 
+        + file_util::getFileSeparator() + prsm_para_ptr_->getSearchDbFileName();
+      search_match_ptr_ = std::make_shared<SearchFastaMatch>(db_file_name);
+    }
 
-void PrsmTableWriterWithMatchInfo::write() {
+void PrsmMatchTableWriter::write() {
   std::string spectrum_file_name  = prsm_para_ptr_->getSpectrumFileName();
   std::string base_name = file_util::basename(spectrum_file_name);
   std::string output_file_name = base_name + output_file_ext_;
@@ -59,18 +61,19 @@ void PrsmTableWriterWithMatchInfo::write() {
       << "Proteoform ID" << delim
       << "Feature intensity" << delim
       << "Feature score" << delim
-      << "Feature apex" << delim
+      << "Feature apex time" << delim
+      << "#Protein hits" << delim
       << "Protein accession" << delim
       << "Protein description" << delim
       << "First residue" << delim
       << "Last residue" << delim
+      << "Special amino acids" << delim
       << "Proteoform" << delim
       << "Proteoform mass" << delim
-      << "#matched sequences" << delim
-      << "Was exact match" << delim
+      << "Protein N-terminal form" << delim
       << "#unexpected modifications" << delim
-      << "MIScore" << delim
       << "#variable PTMs" << delim
+      << "MIScore" << delim
       << "#matched peaks" << delim
       << "#matched fragment ions" << delim
       << "E-value" << delim
@@ -93,39 +96,20 @@ void PrsmTableWriterWithMatchInfo::write() {
       = std::make_shared<SimpleMsAlignReader>(sp_file_name, 
                                               group_spec_num,
                                               sp_para_ptr->getActivationPtr());
-
-  std::vector<PrsmPtr> prsm_ptr_vec; //prsm from msalign + additional matches from fasta search
-
-  AdditionalMatchPtr addtional_match = std::make_shared<AdditionalMatch>(prsm_para_ptr_->getOriDbName(), prsm_ptr_vec, sp_para_ptr);
-
-  while (prsm_ptr != nullptr) {
-    addtional_match->process(prsm_ptr);
-    prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
-  }
-  unsigned int prsm_idx = 0;
-  PrsmPtr prsm_ptr_tmp = prsm_ptr_vec[prsm_idx];
-
   SpectrumSetPtr spec_set_ptr;
   while ((spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(ms_reader_ptr, sp_para_ptr)) 
          != nullptr) {
     if (spec_set_ptr->isValid()) {
       int spec_id = spec_set_ptr->getSpectrumId();
-      while (prsm_ptr_tmp != nullptr && prsm_ptr_tmp->getSpectrumId() == spec_id) {
+      while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_id) {
         DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
-        prsm_ptr_tmp->setDeconvMsPtrVec(deconv_ms_ptr_vec);
-        double new_prec_mass = prsm_ptr_tmp->getAdjustedPrecMass();
-        ExtendMsPtrVec extend_ms_ptr_vec = extend_ms_factory::geneMsThreePtrVec(deconv_ms_ptr_vec, sp_para_ptr, new_prec_mass);
-        prsm_ptr_tmp->setRefineMsVec(extend_ms_ptr_vec);
-        writePrsm(file, prsm_ptr_tmp);
-
-        prsm_idx++;
-
-        if (prsm_idx >= prsm_ptr_vec.size()) {
-          prsm_ptr_tmp = nullptr;
-        }
-        else {
-          prsm_ptr_tmp = prsm_ptr_vec[prsm_idx];
-        }
+        prsm_ptr->setDeconvMsPtrVec(deconv_ms_ptr_vec);
+        double new_prec_mass = prsm_ptr->getAdjustedPrecMass();
+        ExtendMsPtrVec extend_ms_ptr_vec
+            = extend_ms_factory::geneMsThreePtrVec(deconv_ms_ptr_vec, sp_para_ptr, new_prec_mass);
+        prsm_ptr->setRefineMsVec(extend_ms_ptr_vec);
+        writePrsm(file, prsm_ptr);
+        prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
       }
     }
   }
@@ -134,15 +118,15 @@ void PrsmTableWriterWithMatchInfo::write() {
   file.close();
 }
 
-void PrsmTableWriterWithMatchInfo::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
+void PrsmMatchTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   std::string spec_ids;
   std::string spec_activations;
   std::string spec_scans;
   std::string retention_time;
   std::string delim = "\t";
   std::string empty_str = "-";
+  std::vector<std::pair<FastaSeqPtr,int>> matches;
 
-  int ptm_num = prsm_ptr->getProteoformPtr()->getAlterNum(AlterType::UNEXPECTED);
   int peak_num = 0;
   DeconvMsPtrVec deconv_ms_ptr_vec = prsm_ptr->getDeconvMsPtrVec();
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
@@ -163,6 +147,9 @@ void PrsmTableWriterWithMatchInfo::writePrsm(std::ofstream &file, PrsmPtr prsm_p
   if (deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getRetentionTime() <= 0.0) {
     retention_time = empty_str;
   }
+
+  matches = search_match_ptr_->process(prsm_ptr);
+
   file << std::setprecision(10);
   LOG_DEBUG("start output prsm ");
   file << prsm_ptr->getFileName() << delim
@@ -188,20 +175,21 @@ void PrsmTableWriterWithMatchInfo::writePrsm(std::ofstream &file, PrsmPtr prsm_p
 
   file << prsm_ptr->getFracFeatureScore() << delim;
   file << prsm_ptr->getTimeApex() << delim;
+  file << matches.size() << delim;
+  
+  ProteoformPtr form_ptr = prsm_ptr->getProteoformPtr();
 
-  std::string is_exact_match = (prsm_ptr->getIsExactMatch()) ? "true" : "false";
-
-  file << prsm_ptr->getProteoformPtr()->getSeqName() << delim
-      << prsm_ptr->getProteoformPtr()->getSeqDesc() << delim
-      << (prsm_ptr->getProteoformPtr()->getStartPos() + 1) << delim
-      << (prsm_ptr->getProteoformPtr()->getEndPos() + 1) << delim
-      << prsm_ptr->getProteoformPtr()->getProteinMatchSeq() << delim
-      << prsm_ptr->getProteoformPtr()->getMass() << delim
-      << prsm_ptr->getHitCnt() << delim
-      << is_exact_match << delim
-      << ptm_num << delim
-      << prsm_ptr->getProteoformPtr()->getMIScore() << delim
-      << prsm_ptr->getProteoformPtr()->getAlterNum(AlterType::VARIABLE) << delim
+  file << form_ptr->getSeqName() << delim
+      << form_ptr->getSeqDesc() << delim
+      << (form_ptr->getStartPos() + 1) << delim
+      << (form_ptr->getEndPos() + 1) << delim
+      << form_ptr->getFastaSeqPtr()->getAcidReplaceStr(form_ptr->getStartPos(), form_ptr->getEndPos()) << delim
+      << form_ptr->getProteinMatchSeq() << delim
+      << form_ptr->getMass() << delim
+      << form_ptr->getProtModPtr()->getType() << delim
+      << form_ptr->getAlterNum(AlterType::UNEXPECTED) << delim
+      << form_ptr->getAlterNum(AlterType::VARIABLE) << delim
+      << form_ptr->getMIScore() << delim
       << prsm_ptr->getMatchPeakNum() << delim
       << prsm_ptr->getMatchFragNum() << delim
       << prsm_ptr->getEValue() << delim;
@@ -218,6 +206,52 @@ void PrsmTableWriterWithMatchInfo::writePrsm(std::ofstream &file, PrsmPtr prsm_p
     file << proteoform_fdr << std::endl;
   } else {
     file << empty_str << std::endl;
+  }
+
+  // print out other matches
+  for (size_t i = 0; i < matches.size(); i++) {
+    FastaSeqPtr seq_ptr = matches[i].first;
+    int seq_pos = matches[i].second;
+    if (seq_ptr->getName() == form_ptr->getSeqName()) {
+      continue;
+    }
+
+  file << prsm_ptr->getFileName() << delim
+      << prsm_ptr->getPrsmId() << delim
+      << delim
+      << delim
+      << delim
+      << delim
+      << delim
+      << delim
+      << delim
+      << delim
+      << delim;
+
+    // feature
+    file << delim
+      << delim
+      << delim
+      << delim;
+
+    file << seq_ptr->getName() << delim
+      << seq_ptr->getDesc() << delim
+      << (seq_pos + 1) << delim
+      << (seq_pos + form_ptr->getLen()) << delim
+      << seq_ptr->getAcidReplaceStr(form_ptr->getStartPos(), form_ptr->getEndPos()) << delim
+      << delim
+      << delim
+      << delim
+      << delim
+      << delim
+      << delim
+      << delim
+      << delim
+      << delim;
+
+    // fdr
+    file << delim
+      << std::endl;
   }
 }
 

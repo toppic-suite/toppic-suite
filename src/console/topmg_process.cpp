@@ -40,7 +40,7 @@
 #include "prsm/prsm_feature_cluster.hpp"
 #include "prsm/prsm_fdr.hpp"
 #include "prsm/prsm_form_filter.hpp"
-#include "prsm/prsm_table_writer.hpp"
+#include "prsm/prsm_match_table_writer.hpp"
 #include "prsm/prsm_util.hpp"
 #include "prsm/simple_prsm_reader.hpp"
 #include "prsm/simple_prsm_xml_writer.hpp"
@@ -350,8 +350,8 @@ std::string db_file_name = ori_db_file_name + "_idx" + file_util::getFileSeparat
     std::string argu_str = Argument::outputTsvArguments(arguments);
 
     std::cout << "Outputting PrSM table - started." << std::endl;
-    PrsmTableWriterPtr table_out
-        = std::make_shared<PrsmTableWriter>(prsm_para_ptr, argu_str, "topmg_prsm_cutoff", "_topmg_prsm.tsv");
+    PrsmMatchTableWriterPtr table_out
+        = std::make_shared<PrsmMatchTableWriter>(prsm_para_ptr, argu_str, "topmg_prsm_cutoff", "_topmg_prsm.tsv");
     table_out->write();
     table_out = nullptr;
     std::cout << "Outputting PrSM table - finished." << std::endl;
@@ -385,8 +385,8 @@ std::string db_file_name = ori_db_file_name + "_idx" + file_util::getFileSeparat
     std::cout << "Selecting top PrSMs for proteoforms - finished." << std::endl;
 
     std::cout << "Outputting proteoform table - started." << std::endl;
-    PrsmTableWriterPtr form_out
-        = std::make_shared<PrsmTableWriter>(prsm_para_ptr, argu_str,
+    PrsmMatchTableWriterPtr form_out
+        = std::make_shared<PrsmMatchTableWriter>(prsm_para_ptr, argu_str,
                                             "topmg_form_cutoff_form", "_topmg_proteoform.tsv");
     form_out->write();
     form_out = nullptr;

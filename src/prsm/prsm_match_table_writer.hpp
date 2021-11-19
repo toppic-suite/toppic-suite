@@ -12,20 +12,21 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_PRSM_PRSM_TABLE_WRITER_WITH_MATCH_INFO_HPP_
-#define TOPPIC_PRSM_PRSM_TABLE_WRITER_WITH_MATCH_INFO_HPP_
+#ifndef TOPPIC_PRSM_PRSM_MATCH_TABLE_WRITER_HPP_
+#define TOPPIC_PRSM_PRSM_MATCH_TABLE_WRITER_HPP_
 
 #include "para/prsm_para.hpp"
 #include "prsm/prsm.hpp"
+#include "prsm/search_fasta_match.hpp"
 
 namespace toppic {
 
-class PrsmTableWriterWithMatchInfo {
+class PrsmMatchTableWriter {
  public:
-  PrsmTableWriterWithMatchInfo(PrsmParaPtr prsm_para_ptr,  
-                  std::string argu_str,
-                  const std::string &input_file_ext, 
-                  const std::string &output_file_ext);
+  PrsmMatchTableWriter(PrsmParaPtr prsm_para_ptr,  
+                       std::string argu_str,
+                       const std::string &input_file_ext, 
+                       const std::string &output_file_ext);
 
   void write();
 
@@ -39,10 +40,12 @@ class PrsmTableWriterWithMatchInfo {
   std::string argu_str_;
 
   std::string output_file_ext_;
+
+  SearchFastaMatchPtr search_match_ptr_;
 };
 
-typedef std::shared_ptr<PrsmTableWriterWithMatchInfo> PrsmTableWriterWithMatchInfoPtr;
+typedef std::shared_ptr<PrsmMatchTableWriter> PrsmMatchTableWriterPtr;
 
 } /* namespace toppic */
 
-#endif /* TABLE_WRITER_WITH_MATCH_INFO_HPP_ */
+#endif /* TABLE_WRITER_HPP_ */

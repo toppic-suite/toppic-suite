@@ -16,6 +16,7 @@
 #define TOPPIC_SEQ_FASTA_SEQ_HPP_
 
 #include <memory>
+#include <vector>
 
 #include "common/util/str_util.hpp"
 #include "common/xml/xml_dom_element.hpp"
@@ -71,6 +72,8 @@ class FastaSeq {
 
   void compAcidPtmPairVec();
 };
+
+typedef std::vector<FastaSeqPtr> FastaSeqPtrVec;
 
 }  // namespace toppic
 

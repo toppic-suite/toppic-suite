@@ -38,7 +38,7 @@
 #include "prsm/prsm_simple_cluster.hpp"
 #include "prsm/prsm_feature_cluster.hpp"
 #include "prsm/prsm_cutoff_selector.hpp"
-#include "prsm/prsm_table_writer_with_match_info.hpp"
+#include "prsm/prsm_match_table_writer.hpp"
 #include "prsm/prsm_fdr.hpp"
 #include "prsm/prsm_form_filter.hpp"
 #include "prsm/prsm_util.hpp"
@@ -410,8 +410,8 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     std::string argu_str = Argument::outputTsvArguments(arguments);
 
     std::cout << "Outputting PrSM table - started." << std::endl;
-    PrsmTableWriterWithMatchInfoPtr table_out
-        = std::make_shared<PrsmTableWriterWithMatchInfo>(prsm_para_ptr, argu_str, cur_suffix, "_toppic_prsm.tsv");
+    PrsmMatchTableWriterPtr table_out
+        = std::make_shared<PrsmMatchTableWriter>(prsm_para_ptr, argu_str, cur_suffix, "_toppic_prsm.tsv");
     table_out->write();
     table_out = nullptr;
     std::cout << "Outputting PrSM table - finished." << std::endl;
@@ -445,8 +445,8 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
                               "toppic_form_cutoff_form");
     std::cout << "Selecting top PrSMs for proteoforms - finished." << std::endl;
     std::cout << "Outputting proteoform table - started." << std::endl;
-    PrsmTableWriterWithMatchInfoPtr form_out
-        = std::make_shared<PrsmTableWriterWithMatchInfo>(prsm_para_ptr, argu_str,
+    PrsmMatchTableWriterPtr form_out
+        = std::make_shared<PrsmMatchTableWriter>(prsm_para_ptr, argu_str,
                                             "toppic_form_cutoff_form", "_toppic_proteoform.tsv");
     form_out->write();
     form_out = nullptr;
