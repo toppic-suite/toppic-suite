@@ -55,7 +55,7 @@ class PrsmStr {
 
   int getUnexpectedPtmNum() {return unexpected_ptm_num_;}
 
-  int getVariablePtmNum() {return variable_ptm_num_;}
+  //int getVariablePtmNum() {return variable_ptm_num_;}
 
   double getPrecFeatureInte() {return sample_feature_inte_;}
 
@@ -156,7 +156,7 @@ class PrsmStr {
 
   int unexpected_ptm_num_;
 
-  int variable_ptm_num_;
+  //int variable_ptm_num_;
 
   int proteoform_start_pos_;
 

@@ -99,7 +99,7 @@ void outputTable(PrsmStrPtrVec2D &clusters,
         << (prsm_ptr->getProteoformStartPos() + 1) << ","
         << (prsm_ptr->getProteoformEndPos() + 1) << ","
         << prsm_ptr->getProteinMatchSeq() << ","
-        << prsm_ptr->getVariablePtmNum() << ","
+        //<< prsm_ptr->getVariablePtmNum() << ","
         << prsm_ptr->getUnexpectedPtmNum() << ",";
     for (int j = 0; j < sample_num; j++) {
       PrsmStrPtr sample_prsm = table_prsms[i][j];
