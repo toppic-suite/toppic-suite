@@ -55,6 +55,8 @@ void Argument::initArguments() {
   arguments_["residueModFileName"] = "";
   arguments_["version"] = "";
   arguments_["geneHTMLFolder"] = "true";
+  arguments_["fixedMod"] = "";
+  arguments_["allowProtMod"] = "NONE,NME,NME_ACETYLATION,M_ACETYLATION";
   // the following arguments are used for the initializatio of prsm para
   arguments_["groupSpectrumNumber"] = "1";
   arguments_["activation"] = "FILE";
@@ -68,7 +70,28 @@ void Argument::outputArguments(std::ostream &output,
   output << std::setw(44) << std::left << "Protein database file: " << "\t" << arguments["oriDatabaseFileName"] << std::endl;
   output << std::setw(44) << std::left << "Spectrum file: " << "\t" << arguments["spectrumFileName"] << std::endl;
   output << std::setw(44) << std::left << "Search type: " << "\t" << arguments["searchType"] << std::endl;
-
+  if (arguments["fixedMod"] != "") {
+    //add fixed PTM information 
+    if (arguments["fixedMod"] == "C57") {
+      output << std::setw(44) << std::left << "Fixed PTMs BEGIN" << std::endl;
+      output << std::setw(44) << std::left << "Carbamidomethylation" << "\t" << 57.021464 << "\t" << "C" << std::endl;
+      output << std::setw(44) << std::left << "Fixed PTMs END" << std::endl;
+    }
+    else if (arguments["fixedMod"] == "C58") {
+      output << std::setw(44) << std::left << "Fixed PTMs BEGIN" << std::endl;
+      output << std::setw(44) << std::left << "Carboxymethylation" << "\t" << 58.005479 << "\t" << "C" << std::endl;
+      output << std::setw(44) << std::left << "Fixed PTMs END" << std::endl;
+    }
+    else {
+      output << std::setw(44) << std::left << "Fixed PTMs file name: " << "\t" << arguments["fixedMod"] << std::endl;
+      output << std::setw(44) << std::left << "Fixed PTMs BEGIN" << std::endl;
+      std::vector<std::vector<std::string>> mod_data = mod_util::readModTxtForTsv(arguments["fixedMod"]);
+      for (size_t i = 0; i < mod_data.size(); i++) {
+        output << std::setw(44) << std::left << mod_data[i][0] << "\t" << mod_data[i][1] << "\t" << mod_data[i][2] << std::endl;
+      }
+      output << std::setw(44) << std::left << "Fixed PTMs END" << std::endl;
+    }
+  }
   if (arguments["useFeatureFile"] == "true") {
     output << std::setw(44) << std::left << "Use TopFD feature file: " << "\t" << "True" << std::endl;
   }
@@ -81,6 +104,7 @@ void Argument::outputArguments(std::ostream &output,
   output << std::setw(44) << std::left << "Spectrum-level cutoff value: " << "\t" << arguments["cutoffSpectralValue"] << std::endl;
   output << std::setw(44) << std::left << "Proteoform-level cutoff type: " << "\t" << arguments["cutoffProteoformType"] << std::endl;
   output << std::setw(44) << std::left << "Proteoform-level cutoff value: " << "\t" << arguments["cutoffProteoformValue"] << std::endl;
+  output << std::setw(44) << std::left << "Allowed N-terminal forms: " << "\t" <<  arguments["allowProtMod"] << std::endl;
   output << std::setw(44) << std::left << "Maximum mass shift of modifications: " << "\t" << arguments["maxPtmMass"] << " Da" << std::endl;
   output << std::setw(44) << std::left << "Minimum mass shift of modifications: " << "\t" << arguments["minPtmMass"] << " Da" << std::endl;
   if (arguments["residueModFileName"] != "") {
@@ -118,6 +142,9 @@ void Argument::showUsage(boost::program_options::options_description &desc) {
 bool Argument::parse(int argc, char* argv[]) {
   std::string database_file_name = "";
   std::string argument_file_name = "";
+  std::string activation = "";
+  std::string fixed_mod = "";
+  std::string allow_mod = "";
   std::string mass_error_tole = "";
   std::string form_error_tole = "";
   std::string max_ptm_mass = "";
@@ -137,6 +164,12 @@ bool Argument::parse(int argc, char* argv[]) {
 
     display_desc.add_options() 
         ("help,h", "Print the help message.") 
+        ("activation,a", po::value<std::string>(&activation),
+         "<CID|ETD|HCD|MPD|UVPD|FILE>. Fragmentation method of MS/MS spectra. When FILE is used, fragmentation methods of spectra are given in the input spectral data file. Default value: FILE.")
+        ("fixed-mod,f", po::value<std::string> (&fixed_mod), 
+         "<C57|C58|a fixed modification file>. Fixed modifications. Three available options: C57, C58, or the name of a text file containing the information of fixed modifications. When C57 is selected, carbamidomethylation on cysteine is the only fixed modification. When C58 is selected, carboxymethylation on cysteine is the only fixed modification.")
+        ("n-terminal-form,n", po::value<std::string> (&allow_mod), 
+         "<a list of allowed N-terminal forms>. N-terminal forms of proteins. Four N-terminal forms can be selected: NONE, NME, NME_ACETYLATION, and M_ACETYLATION. NONE stands for no modifications, NME for N-terminal methionine excision, NME_ACETYLATION for N-terminal acetylation after the initiator methionine is removed, and M_ACETYLATION for N-terminal methionine acetylation. When multiple forms are allowed, they are separated by commas. Default value: NONE,NME,NME_ACETYLATION,M_ACETYLATION.")
         ("decoy,d", "Use a shuffled decoy protein database to estimate false discovery rates.")
         ("proteoform-error-tolerance,p", po::value<std::string> (&form_error_tole), "<a positive number>. Error tolerance for identifying PrSM clusters. Default value: 1.2 Dalton.")
         ("min-shift,m", po::value<std::string> (&min_ptm_mass), "Minimum value of the mass shift of an unexpected modification. Default value: -500 Dalton.")
@@ -159,6 +192,9 @@ bool Argument::parse(int argc, char* argv[]) {
 
     desc.add_options() 
         ("help,h", "") 
+        ("activation,a", po::value<std::string>(&activation), "")
+        ("fixed-mod,f", po::value<std::string> (&fixed_mod), "")
+        ("n-terminal-form,n", po::value<std::string> (&allow_mod), "")
         ("no-topfd-feature,x", "")
         ("decoy,d", "")
         ("mass-error-tolerance,e", po::value<std::string> (&mass_error_tole), "")
@@ -216,20 +252,37 @@ bool Argument::parse(int argc, char* argv[]) {
     if (vm.count("spectrum-file-name")) {
       spec_file_list_ = vm["spectrum-file-name"].as<std::vector<std::string> >(); 
     }
+    
     if (vm.count("combined-file-name")) {
       arguments_["combinedOutputName"] = combined_output_name; 
     }
+    
+    if (vm.count("activation")) {
+      arguments_["activation"] = activation;
+    }
+    
     if (vm.count("decoy")) {
       arguments_["searchType"] = "TARGET+DECOY";
     }
+    
     if (arguments_["searchType"] == "TARGET+DECOY") {
       arguments_["databaseFileName"]=arguments_["oriDatabaseFileName"] + "_target_decoy";
     } else {
       arguments_["databaseFileName"]=arguments_["oriDatabaseFileName"] + "_target";
     }
+    
     if (vm.count("proteoform-error-tolerance")) {
       arguments_["proteoformErrorTolerance"] = form_error_tole;
     }
+    
+    if (vm.count("fixed-mod")) {
+      arguments_["fixedMod"] = fixed_mod;
+    }
+
+    if (vm.count("n-terminal-form")) {
+      arguments_["allowProtMod"] = allow_mod;
+    }    
+
     if (vm.count("max-shift")) {
       arguments_["maxPtmMass"] = max_ptm_mass;
     }
@@ -316,11 +369,29 @@ bool Argument::validateArguments() {
       std::cerr << "Warning: Please make sure " << spec_file_list_[k] << " is the ms2 spectral file." << std::endl;
     }
   }
+
+  std::string activation = arguments_["activation"];
+  if(activation != "CID" && activation != "HCD" && activation != "MPD" 
+     && activation != "ETD" && activation != "FILE" && activation != "UVPD") {
+    LOG_ERROR("Activation type " << activation << " error! The value should be CID|ETD|HCD|MPD|UVPD|FILE!");
+    return false;
+  }
+
   std::string search_type = arguments_["searchType"];
   if(search_type != "TARGET" && search_type != "TARGET+DECOY"){
     LOG_ERROR("Search type " << search_type << " error! The value should be TARGET|TARGET+DECOY!");
     return false;
   }
+
+  std::string allow_mod = arguments_["allowProtMod"]; 
+  std::vector<std::string> strs = str_util::split(allow_mod, ",");
+  for (size_t i = 0; i < strs.size(); i++) {
+    if (strs[i] != "NONE" && strs[i] != "M_ACETYLATION" && strs[i] != "NME" && strs[i] != "NME_ACETYLATION") {
+      LOG_ERROR("N-Terminal Variable PTM can only be NONE, M_ACETYLATION, NME or NME_ACETYLATION.");
+      return false;
+    }
+  }
+  
   std::string cutoff_spectral_type = arguments_["cutoffSpectralType"];
   if (cutoff_spectral_type != "EVALUE" && cutoff_spectral_type != "FDR") {
     LOG_ERROR("Spectrum-level cutoff type " << cutoff_spectral_type << " error! The value should be EVALUE|FDR");
