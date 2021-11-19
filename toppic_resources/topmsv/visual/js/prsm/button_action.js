@@ -4,7 +4,7 @@
  */
 function addButtonActions() {
     //	MS1 graph popup window 
-    $("#precursor_mz").click(function () {
+    $("#Precursor_mz").click(function () {
         // @ts-ignore
         $("#ms1_graph_popup_window").draggable({
             appendTo: "body"

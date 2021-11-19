@@ -112,7 +112,7 @@ class PrsmViewData {
       anno.push(temp);
     }
     for (let i = 0; i < massShift.length; i++){
-      let temp: Annotation = {"annoText":massShift[i].getAnnotation(), "leftPos":massShift[i].getLeftPos(), "rightPos":massShift[i].getRightPos(), "type": ModType.Unexpected};
+      let temp: Annotation = {"annoText":FormatUtil.formatFloat(massShift[i].getAnnotation(), 3), "leftPos":massShift[i].getLeftPos(), "rightPos":massShift[i].getRightPos(), "type": ModType.Unexpected};
       anno.push(temp);
     }
     return anno;

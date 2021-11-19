@@ -319,13 +319,6 @@ function addAnnos(svg, para, data) {
     let firstPos = data.getDisplayFirstPos();
     let annos = data.getAnnotations();
     let isStartSkipped = data.getShowStartSkipped();
-    //truncate after 4th pos after decimal point
-    annos.forEach(anno => {
-        let decimal = (anno.annoText.toString()).indexOf(".");
-        if (decimal > -1) {
-            anno.annoText = parseFloat(anno.annoText).toFixed(4);
-        }
-    });
     annos.sort(function (a, b) {
         return a.leftPos - b.leftPos;
     });

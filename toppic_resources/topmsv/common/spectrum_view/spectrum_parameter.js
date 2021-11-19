@@ -67,11 +67,15 @@ class SpectrumViewParameters {
         this.ionXShift_ = -5;
         this.ionYShift_ = -15;
         // Mono mass graph
+        this.showError_ = true;
+        this.showLines_ = true;
         this.isMonoMassGraph_ = false;
         this.errorPlotPadding_ = { left: 70, right: 50, head: 10, bottom: 10 };
         this.errorPlotHeight_ = 40;
         this.errorThreshold_ = 0.2;
         this.errorYTickNum_ = 2;
+        //restrict x zoom
+        this.isXZoomAllowed_ = true;
         //sequence length
         //for determining max m/z window based on seq length in mass graph
         this.seqLength_ = -1;
@@ -149,8 +153,17 @@ class SpectrumViewParameters {
     getShowIons() {
         return this.showIons_;
     }
+    getShowError() {
+        return this.showError_;
+    }
+    getShowLines() {
+        return this.showLines_;
+    }
     getPadding() {
         return this.padding_;
+    }
+    getIsXZoomAllowed() {
+        return this.isXZoomAllowed_;
     }
     setSeqLength(seqLength) {
         this.seqLength_ = seqLength;
@@ -160,6 +173,15 @@ class SpectrumViewParameters {
     }
     setShowIons(showIons) {
         this.showIons_ = showIons;
+    }
+    setShowError(showError) {
+        this.showError_ = showError;
+    }
+    setShowLines(showLines) {
+        this.showLines_ = showLines;
+    }
+    setIsXZoomAllowed_(allowXZoom) {
+        this.isXZoomAllowed_ = allowXZoom;
     }
     /**
      * @function getTickWidth
@@ -343,6 +365,9 @@ class SpectrumViewParameters {
      * Function also calls setLimita which helps in drawing limited number of peaks and circles per eachbin/range of mz values.
      */
     xZoom(mouseSvgX, ratio) {
+        if (!this.isXZoomAllowed_) {
+            return;
+        }
         let oriValues = {}; //so that the view range can be restored when the view shouldn't be zoomed
         oriValues.min = this.winMinMz_;
         oriValues.max = this.winMaxMz_;
@@ -354,6 +379,7 @@ class SpectrumViewParameters {
         this.xScale_ = this.xScale_ * ratio;
         this.winMinMz_ = this.winCenterMz_ - mouseSpecX / this.xScale_;
         this.winMaxMz_ = this.winCenterMz_ + (this.specWidth_ - mouseSpecX) / this.xScale_;
+        //console.log(this.winMaxMz_, this.dataMaxMz_ + 500)
         if (this.winMinMz_ < this.minPossibleMz_) { //prevent zooming out into negative mass
             this.winMinMz_ = this.minPossibleMz_;
         }

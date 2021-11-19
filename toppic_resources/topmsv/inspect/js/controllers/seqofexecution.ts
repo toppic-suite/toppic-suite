@@ -49,46 +49,6 @@ class SeqOfExecution {
         $("#" + Constants.DIVTABLECONTAINER).hide();
         $("#" + Constants.PEAKCOUNTID).hide();
         $("#" + Constants.MONOMASSGRAPHID).hide();
-        /* create a nav bar and a tab for ms2 graph and mono mass graph */
-        clearMs2NavElement(Constants.GRAPHTABNAV);
-        createMs2NavElementInspect(0, Constants.GRAPHTABDIV, Constants.GRAPHTABNAV, "");
-        addEventNavBar();
-        /*add event handlers for spectrum graph buttons*/
-        $("#ms2_graph_show_btn").click(function () {
-            if ($.trim($(this).text()) === 'Show Spectrum') {
-                $("#ms2_graph_show_btn").text('Hide Spectrum');
-                let helpBtn: HTMLElement | null = document.getElementById("ms2_graph_help_btn");
-                let saveBtn: HTMLElement | null = document.getElementById("ms2_graph_save_btn");
-                let svgDiv: HTMLElement | null = document.getElementById("ms2_svg_div");
-                if (!helpBtn || !saveBtn || !svgDiv) {
-                    console.error("ERROR: invalid button ID or SVG div ID");
-                    return;
-                }
-                helpBtn.style.display = "block";
-                saveBtn.style.display = "block";
-                svgDiv.style.display = "block";
-            }
-            else {
-                $("#ms2_graph_show_btn").text('Show Spectrum');
-                let helpBtn: HTMLElement | null = document.getElementById("ms2_graph_help_btn");
-                let saveBtn: HTMLElement | null = document.getElementById("ms2_graph_save_btn");
-                let svgDiv: HTMLElement | null = document.getElementById("ms2_svg_div");
-                if (!helpBtn || !saveBtn || !svgDiv) {
-                    console.error("ERROR: invalid button ID or SVG div ID");
-                    return;
-                }
-                helpBtn.style.display = "none";
-                saveBtn.style.display = "none";
-                svgDiv.style.display = "none";
-            }
-        });
-        // MS2 graph help button 
-        $("#ms2_graph_help_btn").click(function () {
-            // @ts-ignore
-            $("#ms2_graph_help_popup_window").draggable({
-                appendTo: "body"
-            });
-        });
         /**
         * Get the parsed sequence after removing mass shift list from
         * the entered sequence.
@@ -359,6 +319,48 @@ class SeqOfExecution {
         dataTable.setSpecSvgId("ms2_svg_div_graph_");
         dataTable.setMonoMassSvgId("ms2_svg_div_mono_graph_");
         dataTable.drawTable();
+
+        /* create a nav bar and a tab for ms2 graph and mono mass graph */
+        clearMs2NavElement(Constants.GRAPHTABNAV);
+        createMs2NavElementInspect(0, Constants.GRAPHTABDIV, Constants.GRAPHTABNAV, "");
+        addCheckboxTabInspect(Constants.GRAPHTABNAV);
+        addEventNavBar(monoMassGraphObj);
+        /*add event handlers for spectrum graph buttons*/
+        $("#ms2_graph_show_btn").click(function () {
+            if ($.trim($(this).text()) === 'Show Spectrum') {
+                $("#ms2_graph_show_btn").text('Hide Spectrum');
+                let helpBtn: HTMLElement | null = document.getElementById("ms2_graph_help_btn");
+                let saveBtn: HTMLElement | null = document.getElementById("ms2_graph_save_btn");
+                let svgDiv: HTMLElement | null = document.getElementById("ms2_svg_div");
+                if (!helpBtn || !saveBtn || !svgDiv) {
+                    console.error("ERROR: invalid button ID or SVG div ID");
+                    return;
+                }
+                helpBtn.style.display = "block";
+                saveBtn.style.display = "block";
+                svgDiv.style.display = "block";
+            }
+            else {
+                $("#ms2_graph_show_btn").text('Show Spectrum');
+                let helpBtn: HTMLElement | null = document.getElementById("ms2_graph_help_btn");
+                let saveBtn: HTMLElement | null = document.getElementById("ms2_graph_save_btn");
+                let svgDiv: HTMLElement | null = document.getElementById("ms2_svg_div");
+                if (!helpBtn || !saveBtn || !svgDiv) {
+                    console.error("ERROR: invalid button ID or SVG div ID");
+                    return;
+                }
+                helpBtn.style.display = "none";
+                saveBtn.style.display = "none";
+                svgDiv.style.display = "none";
+            }
+        });
+        // MS2 graph help button 
+        $("#ms2_graph_help_btn").click(function () {
+            // @ts-ignore
+            $("#ms2_graph_help_popup_window").draggable({
+                appendTo: "body"
+            });
+        });
         /**
          * Disply the table of masses for all the fragmented ions
          */

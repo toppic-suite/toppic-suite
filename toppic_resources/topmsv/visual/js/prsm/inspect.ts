@@ -47,7 +47,7 @@ function onclickTopView(e: JQuery.ClickEvent<HTMLElement, null, HTMLElement, HTM
     let unknownMassShiftList: MassShift[] = proteoform.getUnknownMassShift();
     let protVarPtmsList: MassShift[] = proteoform.getProtVarPtm();
     let variablePtmsList: MassShift[] = proteoform.getVarPtm();
-    let precursorMass: string = currentSpec.getPrecMass().toString();
+    let precursorMass: string = FormatUtil.formatFloat(currentSpec.getPrecMass(), 3);
 
     // Stores all the data in the variables respectively
     window.localStorage.setItem('peakAndIntensityList', JSON.stringify(peakAndIntensityList));

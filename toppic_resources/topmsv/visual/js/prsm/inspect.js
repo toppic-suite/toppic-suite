@@ -42,7 +42,7 @@ function onclickTopView(e, prsmObj) {
     let unknownMassShiftList = proteoform.getUnknownMassShift();
     let protVarPtmsList = proteoform.getProtVarPtm();
     let variablePtmsList = proteoform.getVarPtm();
-    let precursorMass = currentSpec.getPrecMass().toString();
+    let precursorMass = FormatUtil.formatFloat(currentSpec.getPrecMass(), 3);
     // Stores all the data in the variables respectively
     window.localStorage.setItem('peakAndIntensityList', JSON.stringify(peakAndIntensityList));
     window.localStorage.setItem('massAndIntensityList', JSON.stringify(massAndIntensityList));

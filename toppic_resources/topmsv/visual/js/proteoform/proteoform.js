@@ -73,23 +73,29 @@ function createTableData(folderpath, prsm) {
                 td.setAttribute("align", "center");
                 if (i === 0) {
                     td.innerHTML = spectra[0].getScanNum();
+                    td.setAttribute("width", "5%");
                 }
                 if (i === 1) {
                     td.innerHTML = sequence_name;
+                    td.setAttribute("width", "25%");
                 }
                 if (i === 2) {
                     td.innerHTML = onePrsm.getEValue().toString();
+                    td.setAttribute("width", "15%");
                 }
                 if (i === 3) {
                     td.innerHTML = All_Peak_count.toString();
+                    td.setAttribute("width", "12%");
                 }
                 if (i === 4) {
                     td.innerHTML = onePrsm.getMatchedPeakCount().toString();
+                    td.setAttribute("width", "16%");
                 }
                 if (i === 5) {
                     let ionCnt = onePrsm.getFragIonCount();
                     if (ionCnt) {
                         td.innerHTML = ionCnt.toString();
+                        td.setAttribute("width", "22%");
                     }
                 }
                 if (i === 6) {
@@ -99,8 +105,10 @@ function createTableData(folderpath, prsm) {
                     let l_link = "link" + (count + 1);
                     a.setAttribute("href", l_href);
                     a.setAttribute("id", l_link);
-                    a.innerHTML = "See PrSM&gt;&gt;"; // Adding >> marks
+                    //a.innerHTML = "See PrSM&gt;&gt;"; // Adding >> marks
+                    a.innerHTML = "Click"; // Adding >> marks
                     td.appendChild(a);
+                    td.setAttribute("width", "5%");
                     count++;
                 }
                 tr.appendChild(td);

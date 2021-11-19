@@ -41,17 +41,17 @@ function addSearchBoxEvent(): void {
 
   let childDiv: HTMLDivElement = document.createElement('div');
   childDiv.style.display = "flex";
-  let ms1Spec: HTMLHeadingElement = document.createElement('h5');
+  let ms1Spec: HTMLHeadingElement = document.createElement('p');
   ms1Spec.innerHTML = "MS1 Scan #" + prsm.ms.ms_header.ms1_scans;
   ms1Spec.classList.add("scan-title");
   ms1Spec.id = "ms1_" + prsm.ms.ms_header.ms1_scans;
 
-  let ms2Spec: HTMLHeadingElement = document.createElement('h5');
+  let ms2Spec: HTMLHeadingElement = document.createElement('p');
   ms2Spec.innerHTML = "MS2 Scan #" + prsm.ms.ms_header.scans;
   ms2Spec.classList.add("scan-title");
   ms2Spec.id = "ms2_" + prsm.ms.ms_header.scans;
 
-  let protName: HTMLHeadingElement = document.createElement('h5');
+  let protName: HTMLHeadingElement = document.createElement('p');
   protName.innerHTML = protein.sequence_name;
   protName.classList.add("scan-title");
 

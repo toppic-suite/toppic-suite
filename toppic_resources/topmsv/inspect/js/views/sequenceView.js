@@ -169,12 +169,12 @@ function formSequence(sequence, massShiftList, protVarPtmsList, variablePtmsList
         if (massShiftList[i].getShift() !== 0) {
             if (i > 0) {
                 // this is the previous added mass
-                let tempString = "[" + massShiftList[i - 1].getShift() + "]";
+                let tempString = "[" + FormatUtil.formatFloat(massShiftList[i - 1].getShift(), 3) + "]";
                 count = count + tempString.length;
             }
             // add +1 as the position need to be added after the position of the acid.
             let tempPosition = massShiftList[i].getLeftPos() + 1 + count;
-            result = result.slice(0, tempPosition) + "[" + massShiftList[i].getShift() + "]" + result.slice(tempPosition);
+            result = result.slice(0, tempPosition) + "[" + FormatUtil.formatFloat(massShiftList[i].getShift(), 3) + "]" + result.slice(tempPosition);
         }
     }
     return result;

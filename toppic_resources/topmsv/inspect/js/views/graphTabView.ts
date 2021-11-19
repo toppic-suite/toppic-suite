@@ -8,6 +8,44 @@
  function clearMs2NavElement(navId: string){
     $("#"+navId).empty();
 }
+function addCheckboxTabInspect(navId: string): void {
+    let ul: HTMLElement | null = document.getElementById(navId);
+
+    if (!ul) {
+        console.error("ERROR: invalid navId");
+        return;
+    }
+
+    let li: HTMLLIElement = document.createElement("li");
+    //let li_id: string = "checkbox-tab";
+    //li.setAttribute("id", li_id);
+    li.setAttribute("class", "nav-item");
+
+    let div: HTMLDivElement = document.createElement("div");
+    div.setAttribute("class", "nav-link");
+    div.setAttribute("id", "checkbox-tab");
+    div.style.display = "none";
+
+    let checkbox: HTMLInputElement = document.createElement("input");
+    checkbox.setAttribute("type", "checkbox");
+    checkbox.setAttribute("id", "checkbox-anno-line");
+    checkbox.setAttribute("name", "checkbox-anno-line");
+    checkbox.setAttribute("checked", "true");
+    checkbox.setAttribute("value", "true");
+
+    let label: HTMLLabelElement = document.createElement("label");
+    label.setAttribute("for", "checkbox-anno-line");
+
+    let text: Text = document.createTextNode("Show annotation lines");
+
+    label.appendChild(text);
+
+    div.appendChild(checkbox);
+    div.appendChild(label);
+
+    li.appendChild(div);
+    ul.appendChild(li);
+}
 function createMs2NavElementInspect(i: number, divId: string, navId: string, specScan: string): void {
     let ul: HTMLElement = <HTMLElement>document.getElementById(navId);
     let li: HTMLLIElement = document.createElement("li");
@@ -37,7 +75,7 @@ function createMs2NavElementInspect(i: number, divId: string, navId: string, spe
     li.appendChild(a);
     ul.appendChild(li);
 }
-function addEventNavBar(): void{
+function addEventNavBar(monoMassGraphObj: SpectrumView): void{
     // add action for nav bar
     $(".ms2_graph_list").click((e: JQuery.ClickEvent) => {
         let Id: string = e.currentTarget.id;
@@ -50,17 +88,29 @@ function addEventNavBar(): void{
                 let type: string = svgIdSplit[3];
                 let spectrumTab = <HTMLElement>document.getElementById(Constants.SPECTRUMGRAPHID);
                 let monoMassTab = <HTMLElement>document.getElementById(Constants.MONOMASSGRAPHID);
+                let checkboxTab: HTMLElement | null = document.getElementById("checkbox-tab");
+
                 if (type == "graphlist"){
                     spectrumTab.style.display="";
                     monoMassTab.style.display="none";
+                    if (checkboxTab != null) {
+                        checkboxTab.style.display = "none";
+                    }
                 }else{
                     spectrumTab.style.display="none";
                     monoMassTab.style.display="";
+                    if (checkboxTab != null) {
+                        checkboxTab.style.display = "";
+                    }
                 }
             }else{
                 ms2GraphList[i].classList.remove("active");
             }
         }
+    })
+    //add an event listner for checkbox
+    $("#checkbox-anno-line").on("change", function() {
+        monoMassGraphObj.redraw();
     })
 }
 function switchTab(graphType: string): void{

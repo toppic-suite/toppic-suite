@@ -9,6 +9,35 @@
 function clearMs2NavElement(navId) {
     $("#" + navId).empty();
 }
+function addCheckboxTabInspect(navId) {
+    let ul = document.getElementById(navId);
+    if (!ul) {
+        console.error("ERROR: invalid navId");
+        return;
+    }
+    let li = document.createElement("li");
+    //let li_id: string = "checkbox-tab";
+    //li.setAttribute("id", li_id);
+    li.setAttribute("class", "nav-item");
+    let div = document.createElement("div");
+    div.setAttribute("class", "nav-link");
+    div.setAttribute("id", "checkbox-tab");
+    div.style.display = "none";
+    let checkbox = document.createElement("input");
+    checkbox.setAttribute("type", "checkbox");
+    checkbox.setAttribute("id", "checkbox-anno-line");
+    checkbox.setAttribute("name", "checkbox-anno-line");
+    checkbox.setAttribute("checked", "true");
+    checkbox.setAttribute("value", "true");
+    let label = document.createElement("label");
+    label.setAttribute("for", "checkbox-anno-line");
+    let text = document.createTextNode("Show annotation lines");
+    label.appendChild(text);
+    div.appendChild(checkbox);
+    div.appendChild(label);
+    li.appendChild(div);
+    ul.appendChild(li);
+}
 function createMs2NavElementInspect(i, divId, navId, specScan) {
     let ul = document.getElementById(navId);
     let li = document.createElement("li");
@@ -37,7 +66,7 @@ function createMs2NavElementInspect(i, divId, navId, specScan) {
     li.appendChild(a);
     ul.appendChild(li);
 }
-function addEventNavBar() {
+function addEventNavBar(monoMassGraphObj) {
     // add action for nav bar
     $(".ms2_graph_list").click((e) => {
         let Id = e.currentTarget.id;
@@ -50,19 +79,30 @@ function addEventNavBar() {
                 let type = svgIdSplit[3];
                 let spectrumTab = document.getElementById(Constants.SPECTRUMGRAPHID);
                 let monoMassTab = document.getElementById(Constants.MONOMASSGRAPHID);
+                let checkboxTab = document.getElementById("checkbox-tab");
                 if (type == "graphlist") {
                     spectrumTab.style.display = "";
                     monoMassTab.style.display = "none";
+                    if (checkboxTab != null) {
+                        checkboxTab.style.display = "none";
+                    }
                 }
                 else {
                     spectrumTab.style.display = "none";
                     monoMassTab.style.display = "";
+                    if (checkboxTab != null) {
+                        checkboxTab.style.display = "";
+                    }
                 }
             }
             else {
                 ms2GraphList[i].classList.remove("active");
             }
         }
+    });
+    //add an event listner for checkbox
+    $("#checkbox-anno-line").on("change", function () {
+        monoMassGraphObj.redraw();
     });
 }
 function switchTab(graphType) {

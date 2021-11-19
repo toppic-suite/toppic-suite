@@ -36,6 +36,10 @@ class SaveSpectrum{
                         <input type="radio" name="show_ions" class = "show_ions" checked>Yes
                         <input type="radio" name="show_ions" class = "show_ions">No
                       </td>
+                      <td class="td_popup_variables" id="show-error-plot-btns">Show error plot: &nbsp;&nbsp;&nbsp;
+                        <input type="radio" name="show_error" class = "show_error" checked>Yes
+                        <input type="radio" name="show_error" class = "show_error">No
+                      </td>
                       <td class="td_popup_button" style="text-align:right">
                         <button type = "button" class="btn btn-primary btn-sm "  id ="ms2_popup_redraw_btn" >Redraw</button>
                     </td>
@@ -82,6 +86,7 @@ class SaveSpectrum{
         this.graphModalObj_.getPara().updateScale(currentSpectrum.getPara().getWinMinMz(), currentSpectrum.getPara().getWinMaxMz(), currentSpectrum.getPara().getWinMaxInte());
         drawBasicSpectrum(this.graphModalObj_.getSvgId(), this.graphModalObj_.getPara(), this.graphModalObj_.getPeakList(), this.graphModalObj_.getIonList());
         $("#popup-env-btns").show();
+        $("#show-error-plot-btns").hide();
       }else{
         currentSpectrum = this.massGraphList_[ms2Index];
         this.graphModalObj_ = new SpectrumView(svgId,currentSpectrum.getPeakList());
@@ -91,6 +96,7 @@ class SaveSpectrum{
         drawMonoMassSpectrum(this.graphModalObj_.getSvgId(), this.graphModalObj_.getPara(), this.graphModalObj_.getProteoform(), this.graphModalObj_.getNMassList(), 
         this.graphModalObj_.getCMassList(), (this.graphModalObj_.getIonList()) ? this.graphModalObj_.getIonList()! : []) //this.graphModalObj_.getIonList() returns matchedIon[] or null
         $("#popup-env-btns").hide();
+        $("#show-error-plot-btns").show();
       }
   }
   initSpectrumModalEventHandler = () => {
@@ -113,6 +119,7 @@ class SaveSpectrum{
       let para = this.graphModalObj_.getPara(); 
       para.setShowEnvelopes_((<HTMLInputElement>document.getElementsByName("show_envelopes")[0]).checked);
       para.setShowIons((<HTMLInputElement>document.getElementsByName("show_ions")[0]).checked);
+      para.setShowError((<HTMLInputElement>document.getElementsByName("show_error")[0]).checked);
       this.drawModalGraph();
     })
 

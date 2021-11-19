@@ -42,7 +42,7 @@ function loadDatafromJson2Html(prsmObj) {
     let prsmId = document.getElementById("PrSM_ID");
     let scan = document.getElementById("Scan");
     let precCharge = document.getElementById("Precursor_charge");
-    let precMz = document.getElementById("precursor_mz");
+    let precMz = document.getElementById("Precursor_mz");
     let precMass = document.getElementById("Precursor_mass");
     let protMass = document.getElementById("Proteoform_mass");
     let matchedPeak = document.getElementById("matched_peaks");
@@ -71,9 +71,9 @@ function loadDatafromJson2Html(prsmObj) {
             scan.innerHTML = ms2Spectrum[0].getScanNum();
         }
         precCharge.innerHTML = ms2Spectrum[0].getPrecCharge().toString();
-        precMz.innerHTML = ms2Spectrum[0].getPrecMz().toString();
-        precMass.innerHTML = ms2Spectrum[0].getPrecMass().toString();
-        protMass.innerHTML = proteoformObj.getMass().toString();
+        precMz.innerHTML = FormatUtil.formatFloat(ms2Spectrum[0].getPrecMz(), 3);
+        precMass.innerHTML = FormatUtil.formatFloat(ms2Spectrum[0].getPrecMass(), 3);
+        protMass.innerHTML = FormatUtil.formatFloat(proteoformObj.getMass(), 3);
         matchedPeak.innerHTML = prsmObj.getMatchedPeakCount().toString();
         unexpected.innerHTML = prsmObj.getUnexpectedModCount().toString();
         eVal.innerHTML = prsmObj.getEValue().toString();
@@ -98,23 +98,20 @@ function occurence_ptm(prsmObj) {
             //if it is not the first ptm and it is not the only ptm
             fixed_ptm = fixed_ptm + ";";
         }
-        fixed_ptm = fixed_ptm + ptm.getAnnotation() + "[" + ptm.getLeftPos().toString() + "]";
+        fixed_ptm = fixed_ptm + ptm.getAnnotation() + "[" + (ptm.getLeftPos() + 1).toString() + "]";
         fixedPtmCount++;
     });
-    prsmObj.getProteoform().getVarPtm().forEach(ptm => {
-        if (varPtmCount > 0) {
-            //if it is not the first ptm and it is not the only ptm
-            variable_ptm = variable_ptm + ";";
-        }
-        variable_ptm = variable_ptm + ptm.getAnnotation() + "[" + ptm.getLeftPos().toString() + "]";
-        varPtmCount++;
+    let variablePtms = (prsmObj.getProteoform().getVarPtm()).concat(prsmObj.getProteoform().getProtVarPtm());
+    variablePtms.sort(function (x, y) {
+        return x.getLeftPos() - y.getLeftPos();
     });
-    prsmObj.getProteoform().getProtVarPtm().forEach(ptm => {
+    variablePtms.forEach(ptm => {
         if (varPtmCount > 0) {
             //if it is not the first ptm and it is not the only ptm
             variable_ptm = variable_ptm + ";";
         }
-        variable_ptm = variable_ptm + ptm.getAnnotation() + "[" + ptm.getLeftPos().toString() + "]";
+        variable_ptm = variable_ptm + ptm.getAnnotation() + "[" + (ptm.getLeftPos() + 1).toString() + "]";
+        varPtmCount++;
     });
     // Add the information of fixed ptms to html at id - ptm_abbreviation
     if (fixed_ptm != "") {
@@ -164,7 +161,7 @@ function getUnknownPtms(prsmObj) {
             unknownShift = unknownShift + ", ";
         }
         //unknownShift = unknownShift + "[" + shift.getAnnotation().toString() + "]";
-        unknownShift = unknownShift + shift.getAnnotation().toString();
+        unknownShift = unknownShift + FormatUtil.formatFloat(shift.getAnnotation(), 3);
         shiftCount++;
     });
     // If unexpected modifications exist add them to html at id - ptm_unexpectedmodifications

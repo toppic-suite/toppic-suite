@@ -359,13 +359,6 @@ function addAnnos(svg: any, para: PrsmPara, data: PrsmViewData): void {
   let firstPos: number = data.getDisplayFirstPos();
   let annos: Annotation[] = data.getAnnotations();
   let isStartSkipped: boolean = data.getShowStartSkipped();
-  //truncate after 4th pos after decimal point
-  annos.forEach(anno => {
-    let decimal: number = (anno.annoText.toString()).indexOf(".");
-    if (decimal > -1) {
-      anno.annoText = parseFloat(anno.annoText).toFixed(4);
-    } 
-  })
 
   annos.sort(function(a,b) {
     return a.leftPos - b.leftPos;

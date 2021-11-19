@@ -92,7 +92,7 @@ function createTableForSelectedFragmentIons(sequence, matchedUnMatchedPeaks, spe
             if (isNull) {
                 td1.setAttribute("class", "td_fragments");
                 td1.setAttribute("charge", "");
-                td1.innerHTML = "Null";
+                td1.innerHTML = "-";
             }
             else {
                 td1.setAttribute("class", "td_fragments");

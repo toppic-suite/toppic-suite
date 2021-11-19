@@ -77,8 +77,26 @@ function loadMsTwo(prsmObj: Prsm, ms2GraphList: SpectrumView[], divId: string, n
         monoSpGraph.redraw();
         monoGraphList.push(monoSpGraph);
     })
+    //add a tab for checkbox for mono graph
+    addCheckboxTab(navId);
+
+    //add an event listner for checkbox
+    $("#checkbox-anno-line").on("change", function() {
+        for (let i = 0; i < ms2GraphList.length; i++) {
+            let monoListId: string = "ms2_svg_div_monographlist_" + i;
+            let monoGraphId: string = "ms2_svg_div_mono_graph_" + i;
+            let monoListElement: HTMLElement | null = document.getElementById(monoListId);
+            let monoGraphElement: HTMLElement | null = document.getElementById(monoGraphId);
+            if (monoListElement) {
+                if (monoListElement.classList.contains("active")) {
+                    monoGraphList[i].redraw();
+                };
+            }
+        }
+    })
+
     // add action for nav bar
-    $(".ms2_graph_list").click(function () {
+    $(".ms2_graph_list").on("click", function() {
         let ms2Id: string = this.id;
         //console.log("ms2id", ms2Id);
         let ms2Split: string[] = ms2Id.split("_");
@@ -94,6 +112,7 @@ function loadMsTwo(prsmObj: Prsm, ms2GraphList: SpectrumView[], divId: string, n
             let monoListElement: HTMLElement | null = document.getElementById(monoListId);
             let graphElement: HTMLElement | null = document.getElementById(graphId);
             let monoGraphElement: HTMLElement | null = document.getElementById(monoGraphId);
+            let checkboxTab: HTMLElement | null = document.getElementById("checkbox-tab");
             if (i == ms2Index) {
                 if (type == "graphlist") {
                     if (listElement && monoListElement && graphElement && monoGraphElement) {
@@ -101,6 +120,9 @@ function loadMsTwo(prsmObj: Prsm, ms2GraphList: SpectrumView[], divId: string, n
                         monoListElement.classList.remove("active");
                         graphElement.style.display = "";
                         monoGraphElement.style.display = "none";
+                        if (checkboxTab != null) {
+                            checkboxTab.style.display = "none";
+                        }
                     }
                     else{
                         console.error("ERROR: graph ID is invalid");
@@ -112,6 +134,9 @@ function loadMsTwo(prsmObj: Prsm, ms2GraphList: SpectrumView[], divId: string, n
                         monoListElement.classList.add("active");
                         graphElement.style.display = "none";
                         monoGraphElement.style.display = "";
+                        if (checkboxTab != null) {
+                            checkboxTab.style.display = "";
+                        }
                     }
                     else{
                         console.error("ERROR: graph ID is invalid");
@@ -124,6 +149,10 @@ function loadMsTwo(prsmObj: Prsm, ms2GraphList: SpectrumView[], divId: string, n
                     monoListElement.classList.remove("active");
                     graphElement.style.display = "none";
                     monoGraphElement.style.display = "none";
+
+                    if (checkboxTab) {
+                        checkboxTab.style.display = "none";
+                    }
                 }
                 else{
                     console.error("ERROR: graph ID is invalid");
@@ -136,7 +165,44 @@ function loadMsTwo(prsmObj: Prsm, ms2GraphList: SpectrumView[], divId: string, n
     let saveSpectrumObj: SaveSpectrum = new SaveSpectrum(ms2GraphList, monoGraphList);
     saveSpectrumObj.main();
 }
+function addCheckboxTab(navId: string): void {
+    let ul: HTMLElement | null = document.getElementById(navId);
 
+    if (!ul) {
+        console.error("ERROR: invalid navId");
+        return;
+    }
+
+    let li: HTMLLIElement = document.createElement("li");
+    //let li_id: string = "checkbox-tab";
+    //li.setAttribute("id", li_id);
+    li.setAttribute("class", "nav-item");
+
+    let div: HTMLDivElement = document.createElement("div");
+    div.setAttribute("class", "nav-link");
+    div.setAttribute("id", "checkbox-tab");
+    div.style.display = "none";
+
+    let checkbox: HTMLInputElement = document.createElement("input");
+    checkbox.setAttribute("type", "checkbox");
+    checkbox.setAttribute("id", "checkbox-anno-line");
+    checkbox.setAttribute("name", "checkbox-anno-line");
+    checkbox.setAttribute("checked", "true");
+    checkbox.setAttribute("value", "true");
+
+    let label: HTMLLabelElement = document.createElement("label");
+    label.setAttribute("for", "checkbox-anno-line");
+
+    let text: Text = document.createTextNode("Show annotation lines");
+
+    label.appendChild(text);
+
+    div.appendChild(checkbox);
+    div.appendChild(label);
+
+    li.appendChild(div);
+    ul.appendChild(li);
+}
 /**
  * Function to Create Navigation buttons to navigate between spectrums
  * @param {Array} scanidList - Contains scan Id List
