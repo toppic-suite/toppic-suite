@@ -406,9 +406,9 @@ p, li { white-space: pre-wrap; }
        <widget class="QLabel" name="label_24">
         <property name="geometry">
          <rect>
-          <x>0</x>
+          <x>10</x>
           <y>0</y>
-          <width>391</width>
+          <width>381</width>
           <height>21</height>
          </rect>
         </property>
