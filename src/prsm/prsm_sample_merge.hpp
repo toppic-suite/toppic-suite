@@ -19,10 +19,9 @@ namespace toppic {
 
 namespace prsm_sample_merge {
 
-void process(const std::string &db_file_name,
-             const std::vector<std::string> &input_file_names,
+// This function is not used in the current version of toppic suite.
+void process(const std::vector<std::string> &input_file_names,
              const std::string &output_file_name,
-             const std::string &fix_mod,
              double error_tole);
 
 }

@@ -84,7 +84,7 @@ class Proteoform {
 
   SeqSegmentPtrVec getSeqSegmentPtrVec();
 
-  std::string getProteinMatchSeq();
+  std::string getProteoformMatchSeq();
 
   void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 

@@ -62,7 +62,7 @@ void addAnnoHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement *anno_element,
   str = str_util::toString(proteoform_ptr->getEndPos());
   xml_doc->addElement(anno_element, "last_residue_position", str.c_str());
 
-  str = proteoform_ptr->getProteinMatchSeq();
+  str = proteoform_ptr->getProteoformMatchSeq();
   xml_doc->addElement(anno_element, "annotated_seq", str.c_str());
 }
 

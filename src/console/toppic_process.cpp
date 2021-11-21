@@ -97,7 +97,7 @@ void cleanToppicDir(const std::string &fa_name,
   std::string abs_sp_name = file_util::absoluteName(sp_name);
   std::string sp_base = file_util::basename(abs_sp_name);
   std::replace(sp_base.begin(), sp_base.end(), '\\', '/');
-
+  file_util::delFile(sp_base + "_toppic_proteoform.xml");
   file_util::rename(sp_base + ".toppic_form_cutoff_form",
                     sp_base + "_toppic_proteoform.xml");
   if (!keep_temp_files) {
@@ -353,11 +353,9 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     if (arguments["useFeatureFile"] == "true") {
       // TopFD msalign file with feature ID
       ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();
-      prsm_feature_cluster::process(db_file_name,
-                                    sp_file_name,
+      prsm_feature_cluster::process(sp_file_name,
                                     "toppic_prsm",
                                     "toppic_cluster",
-                                    fix_mod_list,
                                     form_error_tole);
     } 
     else {

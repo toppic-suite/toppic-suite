@@ -174,7 +174,7 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
       << (form_ptr->getStartPos() + 1) << delim
       << (form_ptr->getEndPos() + 1) << delim
       << form_ptr->getFastaSeqPtr()->getAcidReplaceStr(form_ptr->getStartPos(), form_ptr->getEndPos()) << delim
-      << form_ptr->getProteinMatchSeq() << delim
+      << form_ptr->getProteoformMatchSeq() << delim
       << form_ptr->getMass() << delim
       << form_ptr->getProtModPtr()->getType() << delim
       << form_ptr->getAlterNum(AlterType::UNEXPECTED) << delim

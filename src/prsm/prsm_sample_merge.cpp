@@ -38,7 +38,7 @@ void getPrsmClusters(PrsmStrPtrVec& prsm_ptrs,
           is_found = true;
           break;
         }
-      } else if (cur_ptr->getProteinMatchSeq() == ref_ptr->getProteinMatchSeq()) {
+      } else if (cur_ptr->getProteoformMatchSeq() == ref_ptr->getProteoformMatchSeq()) {
         clusters[j].push_back(cur_ptr);
         is_found = true;
         break;
@@ -98,8 +98,8 @@ void outputTable(PrsmStrPtrVec2D &clusters,
         << prsm_ptr->getAdjustedPrecMass() << ","
         << (prsm_ptr->getProteoformStartPos() + 1) << ","
         << (prsm_ptr->getProteoformEndPos() + 1) << ","
-        << prsm_ptr->getProteinMatchSeq() << ","
-        //<< prsm_ptr->getVariablePtmNum() << ","
+        << prsm_ptr->getProteoformMatchSeq() << ","
+        << prsm_ptr->getVariablePtmNum() << ","
         << prsm_ptr->getUnexpectedPtmNum() << ",";
     for (int j = 0; j < sample_num; j++) {
       PrsmStrPtr sample_prsm = table_prsms[i][j];
@@ -120,20 +120,14 @@ void outputTable(PrsmStrPtrVec2D &clusters,
   file.close();
 }
 
-void process(const std::string &db_file_name,
-             const std::vector<std::string> &input_file_names,
+void process(const std::vector<std::string> &input_file_names,
              const std::string &output_file_name,
-             const std::string &fix_mod,
              double error_tole) {
-  FastaIndexReaderPtr seq_reader = std::make_shared<FastaIndexReader>(db_file_name);
-  ModPtrVec fix_mod_ptr_vec = mod_util::geneFixedModList(fix_mod);
   PrsmStrPtrVec all_prsms; 
   size_t sample_num = input_file_names.size();
   for (size_t k = 0; k < sample_num; k++) {
     std::string input_file_name = input_file_names[k];
-    PrsmStrPtrVec prsms = prsm_reader_util::readAllPrsmStrsMatchSeq(input_file_name, 
-                                                                    seq_reader,
-                                                                    fix_mod_ptr_vec);
+    PrsmStrPtrVec prsms = prsm_reader_util::readAllPrsmStrsMatchSeq(input_file_name);
     for (size_t i = 0; i < prsms.size(); i++) {
       prsms[i]->setSampleId(k);
     }

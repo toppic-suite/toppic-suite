@@ -137,11 +137,9 @@ int TopMerge_post(std::map<std::string, std::string> & arguments) {
     if (arguments["useFeatureFile"] == "true") {
       // TopFD msalign file with feature ID
       ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();
-      prsm_feature_cluster::process(db_file_name,
-                                    sp_file_name,
+      prsm_feature_cluster::process(sp_file_name,
                                     "toppic_prsm",
                                     "toppic_cluster",
-                                    fix_mod_list,
                                     form_error_tole);
     } 
     else {

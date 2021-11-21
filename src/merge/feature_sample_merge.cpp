@@ -30,14 +30,10 @@ namespace toppic {
 
 FeatureSampleMerge::FeatureSampleMerge(const std::vector<std::string> &input_file_names,
                                        const std::string &output_file_name,
-                                       const std::string &db_file_name,
-                                       const std::string &fix_mod_str, 
                                        const std::string &tool_name, 
                                        double error_tole):
   input_file_names_(input_file_names),
   output_file_name_(output_file_name),
-  db_file_name_(db_file_name),
-  fix_mod_str_(fix_mod_str),
   tool_name_(tool_name),
   error_tole_(error_tole) {}
 
@@ -433,11 +429,7 @@ void FeatureSampleMerge::process() {
     reader.close();
 
     std::string prsm_file_name = base_name + "_ms2_" + tool_name_ + "_proteoform.xml";
-    FastaIndexReaderPtr seq_reader = std::make_shared<FastaIndexReader>(db_file_name_);
-    ModPtrVec fix_mod_ptr_vec = mod_util::geneFixedModList(fix_mod_str_);
-    PrsmStrPtrVec prsms = prsm_reader_util::readAllPrsmStrsMatchSeq(prsm_file_name,
-                                                                    seq_reader,
-                                                                    fix_mod_ptr_vec);
+    PrsmStrPtrVec prsms = prsm_reader_util::readAllPrsmStrsMatchSeq(prsm_file_name);
     if (prsms.size() == 0) {
       LOG_WARN("The file " << prsm_file_name  << " does not contain any PrSM identifications!");
     }

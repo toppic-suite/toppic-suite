@@ -40,7 +40,7 @@ void FeaturePrsm::addPrsmInfo(PrsmStrPtr prsm) {
   prot_desc_ = prsm->getSeqDesc();
   first_residue_ = prsm->getProteoformStartPos();
   last_residue_ = prsm->getProteoformEndPos();
-  proteoform_ = prsm->getProteinMatchSeq();
+  proteoform_ = prsm->getProteoformMatchSeq();
   ms2_id_ = prsm->getSpectrumId();
   prec_mass_ = prsm->getOriPrecMass(); 
 }

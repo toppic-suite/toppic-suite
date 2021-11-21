@@ -388,7 +388,7 @@ ProteoformPtr LocalProcessor::processTwoKnownPtms(PrsmPtr prsm_ptr) {
 
   LOG_DEBUG("best_match_score " << best_match_score);
   if (best_form_ptr != nullptr) {
-    LOG_DEBUG(best_form_ptr->getProteinMatchSeq());
+    LOG_DEBUG(best_form_ptr->getProteoformMatchSeq());
   }
   if (best_ptm_pair.first != nullptr) {
     LOG_DEBUG(best_ptm_pair.first->getName());

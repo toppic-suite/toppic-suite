@@ -101,6 +101,7 @@ void cleanTopmgDir(const std::string &fa_name,
   std::string sp_base = file_util::basename(abs_sp_name); 
   std::replace(sp_base.begin(), sp_base.end(), '\\', '/');
 
+  file_util::delFile(sp_base + "_topmg_proteoform.xml");
   file_util::rename(sp_base + ".topmg_form_cutoff_form", 
                     sp_base + "_topmg_proteoform.xml");
 
@@ -309,11 +310,9 @@ std::string db_file_name = ori_db_file_name + "_idx" + file_util::getFileSeparat
     if (arguments["useFeatureFile"] == "true") {
       // TopFD msalign file with feature ID
       ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();
-      prsm_feature_cluster::process(db_file_name,
-                                    sp_file_name,
+      prsm_feature_cluster::process(sp_file_name,
                                     "topmg_top",
                                     "topmg_cluster",
-                                    fix_mod_list,
                                     form_error_tole);
     } 
     else {

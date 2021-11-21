@@ -32,22 +32,15 @@ PrsmStrPtrVec readAllPrsmStrs(const std::string &input_file_name) {
   return prsm_str_ptrs;
 }
 
-PrsmStrPtrVec readAllPrsmStrsMatchSeq(const std::string &input_file_name,
-                                      FastaIndexReaderPtr fasta_reader_ptr,
-                                      const ModPtrVec fix_mod_list) {
+PrsmStrPtrVec readAllPrsmStrsMatchSeq(const std::string &input_file_name) {
   PrsmReaderPtr str_reader = std::make_shared<PrsmReader>(input_file_name);
-  PrsmReaderPtr prsm_reader = std::make_shared<PrsmReader>(input_file_name);
   PrsmStrPtrVec prsm_str_ptrs;
   PrsmStrPtr prsm_str_ptr = str_reader->readOnePrsmStr();
-  PrsmPtr prsm_ptr = prsm_reader->readOnePrsm(fasta_reader_ptr, fix_mod_list);
   while (prsm_str_ptr != nullptr) {
-    prsm_str_ptr->setProteinMatchSeq(prsm_ptr->getProteoformPtr()->getProteinMatchSeq());
     prsm_str_ptrs.push_back(prsm_str_ptr);
     prsm_str_ptr = str_reader->readOnePrsmStr();
-    prsm_ptr = prsm_reader->readOnePrsm(fasta_reader_ptr, fix_mod_list);
   }
   str_reader->close();
-  prsm_reader->close();
   return prsm_str_ptrs;
 }
 

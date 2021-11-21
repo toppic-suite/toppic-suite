@@ -23,8 +23,6 @@ class FeatureSampleMerge {
  public:
   FeatureSampleMerge(const std::vector<std::string> &input_file_names,
                      const std::string &output_file_name,
-                     const std::string &db_file_name,
-                     const std::string &fix_mod_str, 
                      const std::string &tool_name,
                      double error_tole);
 
@@ -37,8 +35,6 @@ class FeatureSampleMerge {
  private:
   std::vector<std::string> input_file_names_;
   std::string output_file_name_;
-  std::string db_file_name_;
-  std::string fix_mod_str_;
   std::string tool_name_;
   double error_tole_;
 };

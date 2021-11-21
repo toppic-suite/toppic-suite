@@ -69,7 +69,6 @@ void Proteoform::parseXml(XmlDOMElement* element, ProteoformPtr form_ptr) {
   end_pos_ = xml_dom_util::getIntChildValue(element, "end_pos", 0);
   proteo_cluster_id_ = xml_dom_util::getIntChildValue(element, "proteo_cluster_id", 0);
   prot_id_ = xml_dom_util::getIntChildValue(element, "prot_id", 0);
-  //variable_ptm_num_ = xml_dom_util::getIntChildValue(element, "variable_ptm_num", 0);
 
   // Get protein N-terminal modification
   std::string pm_element_name = ProtMod::getXmlElementName();
@@ -238,7 +237,7 @@ void updateMatchSeq(const MassShiftPtrVec & shifts,
   }
 }
 
-std::string Proteoform::getProteinMatchSeq() {
+std::string Proteoform::getProteoformMatchSeq() {
   StringPairVec string_pairs = fasta_seq_ptr_->getAcidPtmPairVec();
   std::string mid_string = residue_seq_ptr_->toAcidString();
   std::sort(mass_shift_list_.begin(), mass_shift_list_.end(), MassShift::cmpPosInc);
@@ -293,10 +292,13 @@ void Proteoform::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
   xml_doc->addElement(element, "proteo_cluster_id", str.c_str());
   str = str_util::toString(prot_id_);
   xml_doc->addElement(element, "prot_id", str.c_str());
-  //str = str_util::toString(variable_ptm_num_);
-  //xml_doc->addElement(element, "variable_ptm_num", str.c_str());
+  //The following three elements are used in prsm_str
+  str = str_util::toString(getAlterNum(AlterType::VARIABLE));
+  xml_doc->addElement(element, "variable_ptm_num", str.c_str());
   str = str_util::toString(getAlterNum(AlterType::UNEXPECTED));
   xml_doc->addElement(element, "unexpected_ptm_num", str.c_str());
+  str = getProteoformMatchSeq();
+  xml_doc->addElement(element, "proteo_match_seq", str.c_str());
 
   element_name = MassShift::getXmlElementName() + "_list";
   XmlDOMElement* cl = xml_doc->createElement(element_name.c_str());

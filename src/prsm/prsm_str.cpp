@@ -72,8 +72,10 @@ PrsmStr::PrsmStr(const std::vector<std::string> &str_vec) {
   prot_id_ = std::stoi(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<unexpected_ptm_num>");
   unexpected_ptm_num_ = std::stoi(prsm_util::getValueStr(line));
-  //line = prsm_util::getXmlLine(str_vec_, "<variable_ptm_num>");
-  //variable_ptm_num_ = std::stoi(prsm_util::getValueStr(line));
+  line = prsm_util::getXmlLine(str_vec_, "<variable_ptm_num>");
+  variable_ptm_num_ = std::stoi(prsm_util::getValueStr(line));
+  line = prsm_util::getXmlLine(str_vec_, "<proteo_match_seq>");
+  proteoform_match_seq_ = prsm_util::getValueStr(line); 
 
   std::vector<std::string> mass_lines = prsm_util::getXmlLineVec(str_vec_, "<shift>");
   std::vector<std::string> left_pos_lines = prsm_util::getXmlLineVec(str_vec_, "<left_bp_pos>");

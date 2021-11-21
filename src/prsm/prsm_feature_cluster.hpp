@@ -21,11 +21,9 @@ namespace toppic {
 
 namespace prsm_feature_cluster {
 
-void process(const std::string &db_file_name,
-             const std::string &spec_file_name,
+void process(const std::string &spec_file_name,
              const std::string &input_file_ext,
              const std::string &output_file_ext,
-             const ModPtrVec &fix_mod_ptr_vec,
              double prec_error_tole); 
 
 }

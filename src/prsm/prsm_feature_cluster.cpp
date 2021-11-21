@@ -80,7 +80,7 @@ void setProteoClusterId(PrsmStrPtrVec& prsm_ptrs,
           break;
         }
       } 
-      else if (cur_ptr->getProteinMatchSeq() == ref_ptr->getProteinMatchSeq()) {
+      else if (cur_ptr->getProteoformMatchSeq() == ref_ptr->getProteoformMatchSeq()) {
         clusters[j].push_back(cur_ptr);
         //LOG_DEBUG("Proteoform merging by sequence!");
         is_found = true;
@@ -104,18 +104,13 @@ void setProteoClusterId(PrsmStrPtrVec& prsm_ptrs,
   }
 }
 
-void process(const std::string &db_file_name,
-             const std::string &spec_file_name,
+void process(const std::string &spec_file_name,
              const std::string &input_file_ext,
              const std::string &output_file_ext,
-             const ModPtrVec &fix_mod_ptr_vec,
              double prec_error_tole) {
   std::string base_name = file_util::basename(spec_file_name);
   std::string input_file_name = base_name + "." + input_file_ext;
-  FastaIndexReaderPtr seq_reader = std::make_shared<FastaIndexReader>(db_file_name);
-  PrsmStrPtrVec prsm_ptrs = prsm_reader_util::readAllPrsmStrsMatchSeq(input_file_name, 
-                                                                      seq_reader,
-                                                                      fix_mod_ptr_vec);
+  PrsmStrPtrVec prsm_ptrs = prsm_reader_util::readAllPrsmStrsMatchSeq(input_file_name);
 
   std::string feature_file_name = base_name + ".feature";
   prsm_util::addFeatureIDToPrsms(prsm_ptrs, feature_file_name);
