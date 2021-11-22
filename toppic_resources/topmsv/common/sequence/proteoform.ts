@@ -1,5 +1,5 @@
 class Proteoform {
-  private massShiftList_: MassShift[];
+  private massShiftList_: MassShift[] = [] as MassShift[];
   private prefixMasses_: TheoMass[];
   private suffixMasses_: TheoMass[];
   private id_: string;

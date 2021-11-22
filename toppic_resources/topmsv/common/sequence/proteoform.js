@@ -1,6 +1,7 @@
 "use strict";
 class Proteoform {
     constructor(id, protName, protDesc = "", seq, seqId = "", firstPos, lastPos, protMass, massShiftList, fixedPtm, protVarPtm = [], varPtm = []) {
+        this.massShiftList_ = [];
         this.id_ = id;
         this.protName_ = protName;
         this.protDesc_ = protDesc;

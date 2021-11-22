@@ -319,9 +319,6 @@ function addAnnos(svg, para, data) {
     let firstPos = data.getDisplayFirstPos();
     let annos = data.getAnnotations();
     let isStartSkipped = data.getShowStartSkipped();
-    annos.sort(function (a, b) {
-        return a.leftPos - b.leftPos;
-    });
     let annoGroup = svg.append("g")
         .attr("id", "mass_shift_anno")
         .attr("class", "prsm_svg_group");

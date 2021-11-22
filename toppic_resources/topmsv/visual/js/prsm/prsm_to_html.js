@@ -110,7 +110,12 @@ function occurence_ptm(prsmObj) {
             //if it is not the first ptm and it is not the only ptm
             variable_ptm = variable_ptm + ";";
         }
-        variable_ptm = variable_ptm + ptm.getAnnotation() + "[" + (ptm.getLeftPos() + 1).toString() + "]";
+        if (ptm.getLeftPos() + 1 == ptm.getRightPos()) {
+            variable_ptm = variable_ptm + ptm.getAnnotation() + "[" + (ptm.getLeftPos() + 1).toString() + "]";
+        }
+        else {
+            variable_ptm = variable_ptm + ptm.getAnnotation() + "[" + (ptm.getLeftPos() + 1).toString() + "-" + (ptm.getRightPos()).toString() + "]";
+        }
         varPtmCount++;
     });
     // Add the information of fixed ptms to html at id - ptm_abbreviation

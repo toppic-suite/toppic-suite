@@ -360,14 +360,11 @@ function addAnnos(svg: any, para: PrsmPara, data: PrsmViewData): void {
   let annos: Annotation[] = data.getAnnotations();
   let isStartSkipped: boolean = data.getShowStartSkipped();
 
-  annos.sort(function(a,b) {
-    return a.leftPos - b.leftPos;
-  })
-
   let annoGroup = svg.append("g")
     .attr("id", "mass_shift_anno")
     .attr("class","prsm_svg_group");
   let yShiftIdx: number = 0;
+
   for (let i = 0; i < annos.length; i++) {
     let leftPos: number = annos[i].leftPos;
     let [x1,y1]: number[] = para.getAACoordinates(leftPos, firstPos);
@@ -413,7 +410,7 @@ function addAnnos(svg: any, para: PrsmPara, data: PrsmViewData): void {
  * @param {Integer} width - Contains width to whuich backgroud color has to be added
  * @param {Object} para - Contains parameters of width, letter space etc., to draw SVG
  */
-function addAnnoBackground(svg: any, para: PrsmPara, data: PrsmViewData) {
+ function addAnnoBackground(svg: any, para: PrsmPara, data: PrsmViewData) {
   let firstPos: number = data.getDisplayFirstPos();
   let annos: Annotation[] = data.getAnnotations(); 
   let isStartSkipped: boolean = data.getShowStartSkipped();

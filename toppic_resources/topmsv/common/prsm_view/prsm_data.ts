@@ -97,25 +97,49 @@ class PrsmViewData {
     return residues;
   }
   generateAnnotation(protVarPtm: MassShift[], variablePtm: MassShift[], massShift: MassShift[]): Annotation[]{
-    let anno: Annotation[] = [];
+    let annos: Annotation[] = [];
     //annotation in prsm object contains only variable and unknown shifts
     for (let i = 0; i < protVarPtm.length; i++){
       let temp: Annotation = {"annoText":protVarPtm[i].getAnnotation(), "leftPos":0, "rightPos":0, "type": ModType.ProteinVariable};
       temp.leftPos = protVarPtm[i].getLeftPos();
-      temp.rightPos = temp.leftPos + 1;
-      anno.push(temp);
+      temp.rightPos = protVarPtm[i].getRightPos();
+      annos.push(temp);
     }
     for (let i = 0; i < variablePtm.length; i++){
       let temp: Annotation= {"annoText":variablePtm[i].getAnnotation(), "leftPos":0, "rightPos":0, "type": ModType.Variable};
       temp.leftPos = variablePtm[i].getLeftPos();
-      temp.rightPos = temp.leftPos + 1;
-      anno.push(temp);
+      temp.rightPos = variablePtm[i].getRightPos();
+      annos.push(temp);
     }
     for (let i = 0; i < massShift.length; i++){
       let temp: Annotation = {"annoText":FormatUtil.formatFloat(massShift[i].getAnnotation(), 3), "leftPos":massShift[i].getLeftPos(), "rightPos":massShift[i].getRightPos(), "type": ModType.Unexpected};
-      anno.push(temp);
+      annos.push(temp);
     }
-    return anno;
+    //merge variable ptms with same residue range
+    annos.sort(function(a,b) {
+      return a.leftPos - b.leftPos;
+    })
+    let prevAnno: Annotation = {} as Annotation;
+    let prevLeft: number = -1;
+    let prevRight: number = -1;
+    let newAnnos: Annotation[] = [];
+
+    annos.forEach((anno, i) => {
+      if (anno.leftPos != prevLeft || anno.rightPos != prevRight) {
+        if (prevLeft >= 0) {
+          newAnnos.push(prevAnno);
+        }
+        prevAnno = anno;
+      }
+      else {
+        prevAnno.annoText = prevAnno.annoText + ";" + anno.annoText;
+      }
+      prevLeft = anno.leftPos;
+      prevRight = anno.rightPos;
+    })
+    newAnnos.push(prevAnno);
+
+    return newAnnos;
   }
   parseData(prsm: Prsm) {
     let proteoformObj = prsm.getProteoform();
@@ -130,6 +154,7 @@ class PrsmViewData {
     this.sequence_ = proteoformObj.getSeq();
     this.proteoform_ = proteoformObj;
     this.annotations_ = this.generateAnnotation(this.protVariablePtms_, this.variablePtms_, this.massShifts_);
+    
   }
  
   updatePara(para: PrsmPara): void {
