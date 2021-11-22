@@ -61,37 +61,6 @@ TopDiffDialog::~TopDiffDialog() {
   delete ui;
 }
 
-void TopDiffDialog::on_databaseFileButton_clicked() {
-  QString s = QFileDialog::getOpenFileName(
-      this,
-      "Select a protein database file",
-      lastDir_,
-      "Database files(*.fasta *.fa)");
-  updatedir(s);
-  ui->databaseFileEdit->setText(s);
-}
-
-void TopDiffDialog::on_fixedModFileButton_clicked() {
-  QString s = QFileDialog::getOpenFileName(
-      this,
-      "Select a fixed modification file",
-      lastDir_,
-      "Modification files(*.txt);;All files(*.*)");
-  updatedir(s);
-  ui->fixedModFileEdit->setText(s);
-}
-
-void TopDiffDialog::on_fixedModComboBox_currentIndexChanged(int index) {
-  if (index == 3) {
-    ui->fixedModFileEdit->setEnabled(true);
-    ui->fixedModFileButton->setEnabled(true);
-  } else {
-    ui->fixedModFileEdit->setEnabled(false);
-    ui->fixedModFileButton->setEnabled(false);
-  }
-}
-
-
 void TopDiffDialog::closeEvent(QCloseEvent *event) {
   if (thread_->isRunning()) {
     if (!continueToClose()) {
@@ -117,16 +86,12 @@ void TopDiffDialog::initArguments() {
 }
 
 void TopDiffDialog::on_clearButton_clicked() {
-  ui->databaseFileEdit->clear();
   ui->listWidget->clear();
   ui->outputTextBrowser->setText("Click the Start button to process the data.");
   ui->outputButton->setEnabled(false);
 }
 
 void TopDiffDialog::on_defaultButton_clicked() {
-  ui->fixedModFileEdit->clear();
-  ui->fixedModComboBox->setCurrentIndex(0);
-  on_fixedModComboBox_currentIndexChanged(0);
   ui->toolComboBox->setCurrentIndex(0);
   ui->precErrorEdit->setText("1.2");
   ui->outputEdit->setText("sample_diff.tsv");
@@ -285,21 +250,6 @@ std::map<std::string, std::string> TopDiffDialog::getArguments() {
   std::string exe_dir = toppic::file_util::getExecutiveDir(path.toStdString());
   arguments_["executiveDir"] = exe_dir;
   arguments_["resourceDir"] = toppic::file_util::getResourceDir(exe_dir);
-  arguments_["oriDatabaseFileName"] = ui->databaseFileEdit->text().toStdString();
-
-  arguments_["fixedMod"] = ui->fixedModComboBox->currentText().toStdString();
-  if (arguments_["fixedMod"] == "NONE") {
-    arguments_["fixedMod"] = "";
-  }
-  else if (arguments_["fixedMod"] == "Carbamidomethylation on cysteine") {
-    arguments_["fixedMod"] = "C57";
-  }
-  else if (arguments_["fixedMod"] == "Carboxymethylation on cysteine") {
-    arguments_["fixedMod"] = "C58";
-  }
-  if (ui->fixedModComboBox->currentIndex() == 3) {
-    arguments_["fixedMod"] = ui->fixedModFileEdit->text().toStdString();
-  }
   arguments_["toolName"] = ui->toolComboBox->currentText().toStdString();
   arguments_["errorTolerance"] = ui->precErrorEdit->text().toStdString();
   arguments_["mergedOutputFileName"] = ui->outputEdit->text().trimmed().toStdString();
@@ -314,12 +264,7 @@ void TopDiffDialog::lockDialog() {
   ui->startButton->setEnabled(false);
   ui->outputButton->setEnabled(false);
   
-  ui->databaseFileButton->setEnabled(false);
-  ui->databaseFileEdit->setEnabled(false);
   ui->outputEdit->setEnabled(false);
-  ui->fixedModComboBox->setEnabled(false);
-  ui->fixedModFileEdit->setEnabled(false);
-  ui->fixedModFileButton->setEnabled(false);
   ui->toolComboBox->setEnabled(false);
   ui->precErrorEdit->setEnabled(false);
 }
@@ -333,24 +278,12 @@ void TopDiffDialog::unlockDialog() {
   ui->outputButton->setEnabled(true);
   ui->outputButton->setDefault(true);
 
-  ui->databaseFileButton->setEnabled(true);
-  ui->databaseFileEdit->setEnabled(true);
-  ui->fixedModFileEdit->setEnabled(true);
   ui->precErrorEdit->setEnabled(true);
   ui->outputEdit->setEnabled(true);
-  ui->fixedModComboBox->setEnabled(true);
-  on_fixedModComboBox_currentIndexChanged(ui->fixedModComboBox->currentIndex());
   ui->toolComboBox->setEnabled(true);
 }
 
 bool TopDiffDialog::checkError() {
-  if (ui->databaseFileEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Database file is empty!"),
-                         QMessageBox::Yes);
-    return true;
-  }
-
   if (ui->listWidget->count() == 0) {
     QMessageBox::warning(this, tr("Warning"),
                          tr("Spectrum files are not selected!"),
