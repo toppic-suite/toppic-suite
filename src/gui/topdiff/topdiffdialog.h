@@ -48,12 +48,6 @@ private slots:
 
   void on_delButton_clicked();
 
-  void on_databaseFileButton_clicked();
-
-  void on_fixedModFileButton_clicked();
-
-  void on_fixedModComboBox_currentIndexChanged(int index);
-
 private:
   QString lastDir_;
 
