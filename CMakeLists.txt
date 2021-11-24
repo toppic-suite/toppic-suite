@@ -1,4 +1,4 @@
-#Specify the version being used as well as the language
+#pecify the version being used as well as the language
 cmake_minimum_required(VERSION 3.1)
 #Name your project here
 project(TopPIC)
