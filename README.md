@@ -1,6 +1,6 @@
 # TopPIC: TOP-Down Mass Spectrometry Based Proteoform Identification and Characterization
 
-For manual and reference, please visit http://proteomics.informatics.iupui.edu/software/toppic/
+For manual and reference, please visit https://www.toppic.org/software/toppic/
 
 ## System requirements
 
