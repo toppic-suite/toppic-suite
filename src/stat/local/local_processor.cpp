@@ -16,6 +16,7 @@
 #include <cmath>
 #include <numeric>
 #include <iomanip>
+#include <limits>
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
