@@ -15,6 +15,7 @@
 #ifndef TOPPIC_PRSM_PRSM_ALGO_HPP_
 #define TOPPIC_PRSM_PRSM_ALGO_HPP_
 
+#include <cstddef>
 #include <vector>
 
 namespace toppic {
