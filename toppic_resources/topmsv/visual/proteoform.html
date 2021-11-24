@@ -1,0 +1,57 @@
+<html>
+<head>
+<title>Proteoform</title>
+<link rel="stylesheet" type="text/css" href="../node_modules/datatables.net-dt/css/jquery.dataTables.css">
+<link rel="stylesheet" type="text/css" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css"
+                       href="../common/topmsv_nav_bar/css/topmsv_nav_bar.css"/>
+<link rel="stylesheet" type="text/css" href="css/prsm.css">
+
+<script src="../node_modules/jquery/dist/jquery.js"></script>
+<script src="../node_modules/datatables.net/js/jquery.dataTables.js"></script>
+<script src="../common/topmsv_nav_bar/js/topmsv_nav_bar.js"></script>
+<script src="js/proteoform/proteoform.js"></script>
+<script src="js/proteoform/on_load_proteoform.js"></script>
+<script src="../common/parse_json/parse_proteoform.js"></script>
+
+<!--data classes-->
+<script src="../common/mass_spectrum/peak.js"></script>
+<script src="../common/sequence/massShift.js"></script>
+<script src="../common/sequence/mod.js"></script>
+<script src="../common/mass_spectrum/envelope.js"></script>
+<script src="../common/mass_spectrum/ion.js"></script>
+<script src="../common/mass_spectrum/spectrum.js"></script>
+<script src="../common/sequence/theoMass.js"></script>
+<script src="../common/prsm/matchedPeakEnvelopePair.js"></script>
+<script src="../common/sequence/proteoform.js"></script>
+<script src="../common/prsm/prsm.js"></script>
+
+<script src="../common/util/types.js"></script>
+
+</head>
+<body>
+<div id="nav-bar"></div>
+<div class="container bodycontainer">
+<p style="font-size:15px;">
+<a id="allprotein_url_start" href="proteins.html">All proteins</a> /
+	  <a id = "protein_url_start" href="#"></a>
+</p>
+<h2 id = "proteoform_header"></h2>
+<p id = "prsm_count" style="font-size:16px;"></p>
+<table id = "proteoform_data" class="table table-hover table-bordered table-striped table-nonfluid">
+	<tr>
+		<th>Scan</th><th>Protein</th><th>E-value</th><th># all peaks</th><th># matched peaks</th><th># matched fragment ions</th><th>Link</th>
+	</tr>
+</table>
+<p style="font-size:15px;">
+<a id="allprotein_url_end" href="proteins.html">All proteins</a> /
+		<a id = "protein_url_end" href="#"></a>
+</p>
+</div>
+<footer class="page-footer font-small blue">
+	<div class="footer-copyright text-center py-3">© 2019-2022 Copyright: The Trustees of 
+		<a href="https://www.iu.edu/" target="#">Indiana University</a>
+	</div>
+</footer>
+</body>
+</html>

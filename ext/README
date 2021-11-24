@@ -1,0 +1,9 @@
+/boost/         Some code from Boost used by pwiz/libraries/boost_aux/
+/htslib/        Library for creating fasta indexes and reading fasta files.
+                Version 2016. (http://www.htslib.org/download/) 
+/pwiz/          Some code from ProteoWizard version 3.0_21034 for reading mzML and mzXML
+                files (http://proteowizard.sourceforge.net/download.html).  
+/xml2json/      Xml2json header only library, version Sep 8, 2016. 
+                (https://github.com/Cheedoong/xml2json)
+/fdeep          version 0.15.1-p0
+/fplus          version 0.2.10-p0  The fdeep and fplus folders are included for EnvCNN models. 

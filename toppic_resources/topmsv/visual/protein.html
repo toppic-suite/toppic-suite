@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head>
+<title>Protein</title>
+<link rel="stylesheet" type="text/css" 
+                       href="../node_modules/datatables.net-dt/css/jquery.dataTables.css">
+<link rel="stylesheet" type="text/css" 
+                       href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css"
+                       href="../common/topmsv_nav_bar/css/topmsv_nav_bar.css"/>
+<link rel="stylesheet" type="text/css" href="css/prsm.css">
+
+<script src="../node_modules/jquery/dist/jquery.js"></script>
+<script src="../node_modules/datatables.net/js/jquery.dataTables.js"></script>
+<script src="../node_modules/d3/dist/d3.js"></script>
+<script src="../common/topmsv_nav_bar/js/topmsv_nav_bar.js"></script>
+
+<!--<script src="../common/proteoform/protein_constant.js"></script>-->
+<!--<script src="../common/proteoform/proteoform.js"></script>-->
+<script src="../common/distribution_calc/amino_acid_distribution.js"></script>
+
+<script src="../common/prsm_view/prsm_data.js"></script>
+<script src="../common/prsm_view/prsm_para.js"></script>
+<script src="../common/prsm_view/draw_prsm.js"></script>
+<script src="../common/prsm_view/prsm_view.js"></script>
+
+<script src="../common/util/types.js"></script>
+<script src="../common/util/format_util.js"></script>
+
+<!--data classes-->
+<script src="../common/sequence/massShift.js"></script>
+<script src="../common/sequence/mod.js"></script>
+<script src="../common/sequence/proteoform.js"></script>
+<script src="../common/prsm/prsm.js"></script>
+<script src="../common/sequence/theoMass.js"></script>
+
+<script src="js/prsm/prsm_to_html.js"></script>
+<script src="js/protein/protein.js"></script>
+<script src="js/protein/on_load_protein.js"></script>
+<script src="js/prsm/prsm_to_html.js"></script>
+
+<script src="../common/parse_json/parse_util.js"></script>
+<script src="../common/parse_json/parse_protein.js"></script>
+</head>
+<body>
+<div id="nav-bar"></div>
+<div class="container bodycontainer">
+	<div class="row">
+		<p style="font-size:16px;">
+		<a id="allproteinurl_1" href="proteins.html">All proteins</a>&nbsp;</p>
+		<p id = "sequence_description" style="font-size:16px;">#</p>
+	</div>
+	<div class="row">
+		<div class="proteoformcontainer">
+		</div>
+	</div>
+	<br>
+	<div class="row">
+		<p style="font-size:16px;">
+		<a id="allproteinurl_2" href="proteins.html">All proteins</a>&nbsp;
+		</p>
+	</div>
+</div>
+<footer class="page-footer font-small blue">
+	<div class="footer-copyright text-center py-3">© 2019-2022 Copyright: The Trustees of 
+		<a href="https://www.iu.edu/" target="#">Indiana University</a>
+	</div>
+</footer>
+</body>
+</html>

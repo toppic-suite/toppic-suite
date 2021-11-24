@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/icon">
+        <file>../toppic.ico</file>
+    </qresource>
+    <qresource prefix="/png">
+        <file>../help.png</file>
+    </qresource>
+</RCC>

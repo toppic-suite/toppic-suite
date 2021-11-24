@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Protein-Spectrum-Match for Spectrum</title>
+<link rel="stylesheet" type="text/css" 
+                       href="../node_modules/@fortawesome/fontawesome-free/css/all.css">
+<link rel="stylesheet" type="text/css" 
+                       href="../node_modules/datatables.net-dt/css/jquery.dataTables.css">
+<link rel="stylesheet" type="text/css" 
+                       href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css"
+                       href="../common/topmsv_nav_bar/css/topmsv_nav_bar.css"/>
+<link rel="stylesheet" type="text/css"
+                       href="../common/shared/css/common.css"/>
+<link rel="stylesheet" type="text/css" href="css/prsm.css">
+
+<script src="../node_modules/popper.js/dist/umd/popper.js"></script>
+<script src="../node_modules/jquery/dist/jquery.js"></script>
+<script src="../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="../node_modules/jquery-ui-dist/jquery-ui.min.js"></script>
+<script src="../node_modules/d3/dist/d3.js"></script>
+<script src="../node_modules/canvas-toBlob/canvas-toBlob.js"></script>
+<script src="../node_modules/datatables.net/js/jquery.dataTables.js"></script>
+<script src="../node_modules/file-saver/dist/FileSaver.js"></script>
+<!--save image-->
+<script src="../common/save_image/save_image.js"></script>
+<!--draw nav bar-->
+<script src="../common/topmsv_nav_bar/js/topmsv_nav_bar.js"></script>
+
+<script src="../common/spectrum_view/spectrum_parameter.js"></script>
+<script src="../common/spectrum_view/spectrum_view.js"></script>
+<script src="../common/spectrum_view/draw_spectrum.js"></script>
+<script src="../common/mass_spectrum/spectrumFunction.js"></script>
+
+<!--library for downloading graphs-->
+<script src="../common/save_image/save_spectrum.js"></script>
+<script src="../common/save_image/save_prsm.js"></script>
+<script src="../common/save_image/util.js"></script>
+
+<script src="../common/data_table/draw_table.js"></script>
+
+<script src="../common/proteoform/protein_constant.js"></script>
+<!--<script src="../common/proteoform/proteoform.js"></script>-->
+<script src="../common/distribution_calc/amino_acid_distribution.js"></script>
+
+<script src="../common/prsm_view/prsm_data.js"></script>
+<script src="../common/prsm_view/prsm_para.js"></script>
+<script src="../common/prsm_view/draw_prsm.js"></script>
+<script src="../common/prsm_view/prsm_view.js"></script>
+
+<script src="js/prsm/prsm_to_html.js"></script>
+<script src="js/prsm/load_spectra.js"></script>
+<script src="js/prsm/button_action.js"></script>
+<script src="js/prsm/inspect.js"></script>
+
+<script src="../common/parse_json/parse_prsm.js"></script>
+<script src="../common/parse_json/parse_util.js"></script>
+
+<!--data classes-->
+<script src="../common/mass_spectrum/peak.js"></script>
+<script src="../common/sequence/massShift.js"></script>
+<script src="../common/sequence/mod.js"></script>
+<script src="../common/mass_spectrum/envelope.js"></script>
+<script src="../common/mass_spectrum/ion.js"></script>
+<script src="../common/mass_spectrum/spectrum.js"></script>
+<script src="../common/sequence/theoMass.js"></script>
+<script src="../common/prsm/matchedPeakEnvelopePair.js"></script>
+<script src="../common/sequence/proteoform.js"></script>
+<script src="../common/prsm/prsm.js"></script>
+
+<script src="../common/util/types.js"></script>
+<script src="../common/util/format_util.js"></script>
+
+<script src="js/prsm/on_load_prsm.js"></script>
+</head>
+<body>
+  <div id="nav-bar"></div>
+  <div class="container bodycontainer">
+    <p style="font-size:15px;">
+    <a id = "allprotein_url" href="proteins.html">All proteins</a> /
+    <a id = "protien_url" href = "#"></a> / 
+    <a id = "proteoform_url" href="#"></a>
+    </p>
+    <div class="row">
+      <div class="col-10">
+        <h2 id = "Protein-Spectrum-Match-Id-SpecId" ></h2>
+      </div>
+      <div class="col-2" align = "right">
+        <div class="dropdown dropdownscanlist">
+          <button type="button" 
+                  class="btn btn-primary btn-sm dropdown-toggle" 
+                  data-toggle="dropdown" 
+                  id="scanList">
+            Inspect
+          </button>
+          <div class="dropdown-menu">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row filename">
+      <p>File name: <span id='File_name'></span></p>
+    </div>
+    <div class="row">
+      <table id = "_width_table" class="table table-borderless" style="font-size:15px">
+        <tr>
+          <td>PrSM ID:</td>
+          <td id = "PrSM_ID"></td>
+          <td>Scan(s):</td>
+          <td id = "Scan"></td>
+          <td>Precursor charge:</td>
+          <td id = "Precursor_charge"></td>
+        </tr>
+        <tr>
+          <td>Precursor m/z (mono):</td>
+          <td><a id = "Precursor_mz" data-toggle="modal"
+                                    data-target="#ms1_graph_popup_window"></a></td>
+          <td>Precursor mass (mono):</td>
+          <td id = "Precursor_mass"></td>
+          <td>Proteoform mass:</td>
+          <td id = "Proteoform_mass"></td>
+        </tr>
+        <tr>
+          <td># matched peaks:</td>
+          <td id = "matched_peaks">28</td>
+          <td># matched fragment ions:</td>
+          <td id = "matched_fragment_ions">25</td>
+          <td># unexpected modifications:</td>
+          <td id = "unexpected_modifications">#</td>
+        </tr>
+        <tr>
+          <td>E-value:</td>
+          <td id = "E_value">1.63e-021</td>
+          <td>Spectral Q-value:</td>
+          <td id = "Q_value">0</td>
+        </tr>
+      </table>
+    </div>
+    <div id="alignment">
+      <svg id = "prsm_svg" ></svg>
+      <table>
+        <tr>
+          <td width = "85%">
+            <div id="ptm_abbreviation" style="font-size:16px;">
+              <!-- Data will be retrieved form Fixed_PTM()   -->
+            </div>
+            <td>
+              <td width = "15%" align = "right">
+                <button id = "save_prsm_btn" class="btn btn-primary btn-sm"
+                                             data-toggle="modal"
+                                             data-target="#save_prsm_popup_window" 
+                                             style="width:80%" >
+                                             Save PrSM
+                </button>
+              </td>
+        </tr>
+        <tr> 
+          <td>
+            <div id="ptm_unexpectedmodification"  style="display: none; font-size:16px;">
+              <!-- Data will be retrieved form Fixed_PTM()   -->
+            </div>
+            <td>
+        </tr>
+      </table>
+    </div>
+    <div class="row" id="ms2_svg_div" style="display:none;">
+      <ul class="nav nav-tabs graph_nav" id="ms2_graph_nav"></ul>
+      <div class="text-center" id="dataLoading">
+        <!--<div class="spinner-border "  role="status">
+          <span class="sr-only">Loading...</span>
+        </div><h3>&nbsp; Loading...</h3>-->
+      </div>
+    </div>
+    <div>
+      <table>
+        <tr>
+          <td width = "55%">
+            <div class = "peaks" style="font-size:16px;">
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <a id = "all_peak_count" href="#spectrum">All peaks </a>
+              &nbsp;&nbsp;
+              <a id = "matched_peak_count" href="#spectrum">Matched peaks </a>
+              &nbsp;&nbsp;
+              <a id = "not_matched_peak_count" href="#spectrum">Not matched peaks </a>
+            </div>
+            <td>
+              <td width = "15%" align = "right">
+                <a id = "a_spectrum_help" href="#!">
+                  <button type ="button" id = "ms2_graph_help_btn" 
+                                          class="btn btn-primary btn-sm" 
+                                          style = "display:none;width:80%"
+                                          data-toggle="modal"
+                                          data-target="#ms2_graph_help_popup_window">
+                    Help</button>
+                </a>
+              </td>
+              <td width = "15%" align = "right">
+                <div class="prsmgraphdownload">
+                  <button type="button" class="btn btn-primary btn-sm" 
+                                        data-toggle="modal" 
+                                        data-target="#ms2_graph_popup_window" 
+                                        id="ms2_graph_save_btn" 
+                                        style="display:none"> 
+                    Save Spectrum 
+                  </button>
+                </div>
+              </td>
+              <td width = "15%" align = "right">
+                <a id = "a_show_spectrum" href="#!"><button type ="button" id =
+                "ms2_graph_show_btn" class="btn btn-primary btn-sm" style="width:80%">Show Spectrum</button></a>
+              </td>
+        </tr>
+      </table>
+    </div>
+    <div>
+      <table id="spectrum" class="display" >
+        <thead>
+          <tr role="row">
+            <th width="25">Scan</th>
+            <th width="25">Peak</th>
+            <th width="90">Mono mass</th>
+            <th width="90">Mono m/z</th>
+            <th width="80" style="vertical-align:middle">Intensity</th>
+            <th width="75" style="vertical-align:middle">Charge</th>
+            <th width="103">Theoretical mass</th>
+            <th width="50" style="vertical-align:middle">Ion</th>
+            <th width="70" style="vertical-align:middle">Pos</th>
+            <th width="95">Mass error</th>
+            <th width="80">PPM error</th>
+          </tr>
+        </thead>
+      </table>
+    </div>
+    <div class = "row">
+      <p style="font-size:15px;">
+      <a id = "allprotein_url_end" href="proteins.html">All proteins</a> /
+      <a id = "protien_url_end" href = ""></a> / 
+      <a id= "proteoform_url_end" href=""></a>
+      </p>
+    </div>
+  </div>
+
+  <div class="modal" id="ms1_graph_popup_window" role="dialog">
+    <div class="modal-dialog modal-sm" role="document">
+      <div class="modal-content">
+        <div class="modal-header ">
+          <h4 class="modal-title">MS1 Spectrum</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <svg id="ms1_svg" style="background-color:#F8F8F8" ></svg>
+        </div> 
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary btn-sm custom " id =
+          "download_ms1_png_btn" ><i class="fas fa-download"></i><span>&nbsp;&nbsp;PNG</span></button>
+          <button type="button" class="btn btn-primary btn-sm custom " id =
+          "download_ms1_svg_btn" ><i class="fas fa-download"></i><span>&nbsp;&nbsp;SVG</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="ms2_graph_help_popup_window" role="dialog">
+    <div class="modal-dialog modal-sm" role="document">
+      <div class="modal-content help-window">
+        <div class="modal-header ">
+          <h3>Help</h3>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <ul>
+            <li><b>Drag:</b> Press the left mouse button and drag.</li>
+            <li><b>Zoom in/out of the m/z value:</b> Place the mouse cursor below the
+              x-axis and use the mouse wheel to zoom in or out. </li>
+            <li><b>Zoom in/out of the intensity:</b> Place the mouse cursor above the
+              x-axis and use the mouse wheel to zoom in or out. </li>
+          </ul> 
+        </div> 
+      </div>
+    </div>
+  </div>
+
+  <footer class="page-footer font-small blue">
+    <div class="footer-copyright text-center py-3">© 2019 Copyright: The Trustees of 
+      <a href="https://www.iu.edu/" target="#">Indiana University</a>
+    </div>
+  </footer>
+</body>
+</html>

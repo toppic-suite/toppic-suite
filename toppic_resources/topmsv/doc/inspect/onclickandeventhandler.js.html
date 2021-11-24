@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: onclickandeventhandler.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: onclickandeventhandler.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @function onLoadOfHTML
+ * @description Gets invoked immediatley after loading html
+ * @param {Float} precursorMass - Contains precursorMass value
+ */
+onLoadOfHTML = function(precursorMass)
+{
+    let massErrorthVal = 0.1 ;
+    let ppmErrorthVal = 15 ;
+    /**
+     * set All the common fixed PTM's to Fixed Ptm dropdown menu
+     */
+    let commonFixedPtmsObj = new commonFixedPtms();
+    commonFixedPtmsObj.setFixedPtmListToUI();
+    /**
+     * Set Error Threshhold value to default {massErrorthVal}
+     */
+    let UIHelperObj = new UIHelper();
+    UIHelperObj.setMassErrorValue(massErrorthVal);
+    /**
+     * On Change Event handler. Changes the thresholds values from
+     * from {massErrorthVal} to {ppmErrorthVal}
+     */
+    $('#error_dropdown').change(function(){
+        let errorType = $("#error_dropdown").val();
+        if(errorType == "masserror")
+        {
+            $("#errorval").val(massErrorthVal);
+            $("#errorunit").html("Da&amp;nbsp;&amp;nbsp;");
+        }
+        else
+        {
+            $("#errorval").val(ppmErrorthVal);
+            $("#errorunit").html("ppm&amp;nbsp;&amp;nbsp;");
+        }
+    });
+    /**
+     * On Click Event handler. Gets invoked on click of submit button
+     * in HTML
+     */
+    $("#submit").click(function(){
+        let errorVal ;
+        let errorType = $("#error_dropdown").val();
+        if(errorType == "masserror") {
+            errorVal = parseFloat($("#errorval").val().trim());
+            massErrorthVal = errorVal ;
+        }
+        else {
+            errorVal = parseFloat($("#errorval").val().trim());
+            ppmErrorthVal = errorVal ;
+        }
+        let executionObj = new SeqOfExecution();
+        executionObj.sequenceOfExecution(errorType,errorVal,"");
+        document.getElementById("totalseqmass_h6").style.display = "block";
+        document.getElementById("massvariation_h6").style.display = "block";
+    })
+    /**
+     * On Click action to hide and show the table of calculate theoretical
+     * masses with matched and unmatched masses
+     */
+    $("#hide_table").click(function(){
+        let text_val = $("#hide_table").html().trim();
+        if( text_val == "Hide Table"){
+            $("#hide_table").html("Show Table");
+            $("#divtableContainer").hide();
+        }
+        if(text_val == "Show Table")
+        {
+            $("#hide_table").html("Hide Table");
+            $("#divtableContainer").show();
+        }
+    })
+}
+/**
+ * @function showAllPeaks
+ * @description Function to display all peaks of data in table. This handles on click action
+ * from html of show all peaks button.
+ */
+showAllPeaks = function()
+{
+	var elems = document.getElementsByClassName('matched_peak');
+	for(var i = 0; elems.length > i; i++) {
+		elems[i].style.display = '';
+	}
+	elems = document.getElementsByClassName('unmatched_peak');
+	for(var i = 0; elems.length > i; i++) {
+	elems[i].style.display = '';
+	}
+	$('div.dataTables_scrollBody').height(400);
+}
+/**
+ * @function showMatchedPeaks
+ * @description Function to display only matched peaks in table. This handles on click action 
+ * from html of show matched peaks button.
+ */
+showMatchedPeaks = function()
+{
+	var elems = document.getElementsByClassName("matched_peak");
+	for(var i = 0; elems.length > i; i++) {
+		elems[i].style.display = "";
+	}
+	elems = document.getElementsByClassName("unmatched_peak");
+	for(var i = 0; elems.length > i; i++) {
+		elems[i].style.display = "none";
+	}
+	$('div.dataTables_scrollBody').height(400);
+}
+/**
+ * @function showNonMatchedPeaks
+ * @description Function to display only un matched peaks in table. This handles on click action
+ * from html of show un matched peaks button.
+ */
+showNonMatchedPeaks = function() 
+{
+	var elems = document.getElementsByClassName("matched_peak");
+	for(var i = 0; elems.length > i; i++) {
+		elems[i].style.display = "none";
+	}
+	elems = document.getElementsByClassName("unmatched_peak");
+	for(var i = 0; elems.length > i; i++) {
+		elems[i].style.display = "";
+	}
+	$('div.dataTables_scrollBody').height(400);
+}
+/**
+ * Function to show only matched on unmatched peaks on click of matched or unmatched peak buttons
+ * @param {String} ids - Contains Ids of respective matched peaks or un matched peaks
+ */
+function showIonPeaks(ids) {
+	console.log("ids : ", ids);
+	  var elems = document.getElementsByClassName('matched_peak');
+	  for(var i = 0; elems.length > i; i++) {
+	    elems[i].style.display = 'none';
+	  }
+	  elems = document.getElementsByClassName('unmatched_peak');
+	  for(var i = 0; elems.length > i; i++) {
+	    elems[i].style.display = 'none';
+	  }
+
+	 elems = document.getElementsByName(ids);
+	    for(var j = 0; elems.length > j; j++) {
+	      elems[j].style.display  =  "";
+	      elems[j].style.background  =  "#BEECFF";
+	    }
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="CalculateEmassAndDistribution.html">CalculateEmassAndDistribution</a></li><li><a href="Constants.html">Constants</a></li><li><a href="GetMassTableOfSelectedIons.html">GetMassTableOfSelectedIons</a></li><li><a href="MatchedPeaks.html">MatchedPeaks</a></li><li><a href="MolecularFormulae.html">MolecularFormulae</a></li><li><a href="rectBGColor.html">rectBGColor</a></li><li><a href="SetValuesToHtml.html">SetValuesToHtml</a></li><li><a href="UIHelper.html">UIHelper</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addColorsToDropdown">addColorsToDropdown</a></li><li><a href="global.html#addMassShift">addMassShift</a></li><li><a href="global.html#addNewFixedPtmRow">addNewFixedPtmRow</a></li><li><a href="global.html#addWaterMass">addWaterMass</a></li><li><a href="global.html#annotations">annotations</a></li><li><a href="global.html#appendTooltip">appendTooltip</a></li><li><a href="global.html#buildSvg">buildSvg</a></li><li><a href="global.html#calculatePrefixAndSuffixMass">calculatePrefixAndSuffixMass</a></li><li><a href="global.html#calibrateLeftNum">calibrateLeftNum</a></li><li><a href="global.html#calibrateRightNum">calibrateRightNum</a></li><li><a href="global.html#calibrateSkipEnd">calibrateSkipEnd</a></li><li><a href="global.html#calibrateSkipStart">calibrateSkipStart</a></li><li><a href="global.html#drawAnnotation">drawAnnotation</a></li><li><a href="global.html#drawAnnotation_B">drawAnnotation_B</a></li><li><a href="global.html#drawAnnotation_Y">drawAnnotation_Y</a></li><li><a href="global.html#drawAnnotation_YB">drawAnnotation_YB</a></li><li><a href="global.html#drawRectagleWithColors">drawRectagleWithColors</a></li><li><a href="global.html#generateCorrespondingGraph">generateCorrespondingGraph</a></li><li><a href="global.html#generateMonoMassGraph">generateMonoMassGraph</a></li><li><a href="global.html#getAbsoluteMaxValfromList">getAbsoluteMaxValfromList</a></li><li><a href="global.html#getActualIdvalues">getActualIdvalues</a></li><li><a href="global.html#getAminoAcidDistribution">getAminoAcidDistribution</a></li><li><a href="global.html#getCTerminusMassShiftVal">getCTerminusMassShiftVal</a></li><li><a href="global.html#getIonCharge">getIonCharge</a></li><li><a href="global.html#getIsotopicMassOfAtom">getIsotopicMassOfAtom</a></li><li><a href="global.html#getIsotopicMassRef">getIsotopicMassRef</a></li><li><a href="global.html#getMassShift">getMassShift</a></li><li><a href="global.html#getNormalizedIntensity">getNormalizedIntensity</a></li><li><a href="global.html#getNTerminusMassShiftVal">getNTerminusMassShiftVal</a></li><li><a href="global.html#getNumValues">getNumValues</a></li><li><a href="global.html#getPrefixMassList">getPrefixMassList</a></li><li><a href="global.html#getSuffixMassList">getSuffixMassList</a></li><li><a href="global.html#getSvgSize">getSvgSize</a></li><li><a href="global.html#getTerminus">getTerminus</a></li><li><a href="global.html#getTotalSeqMass">getTotalSeqMass</a></li><li><a href="global.html#getX">getX</a></li><li><a href="global.html#getY">getY</a></li><li><a href="global.html#handleOnClick">handleOnClick</a></li><li><a href="global.html#MassShift">MassShift</a></li><li><a href="global.html#onClickofMatchedPeaks">onClickofMatchedPeaks</a></li><li><a href="global.html#onLoadOfHTML">onLoadOfHTML</a></li><li><a href="global.html#parameters">parameters</a></li><li><a href="global.html#parsePeakMass">parsePeakMass</a></li><li><a href="global.html#parsePrecursorMass">parsePrecursorMass</a></li><li><a href="global.html#parsePTM">parsePTM</a></li><li><a href="global.html#parseSeq">parseSeq</a></li><li><a href="global.html#parseUnknowmassList">parseUnknowmassList</a></li><li><a href="global.html#removeToolTip">removeToolTip</a></li><li><a href="global.html#setIonCheckbox">setIonCheckbox</a></li><li><a href="global.html#showAllPeaks">showAllPeaks</a></li><li><a href="global.html#showIonPeaks">showIonPeaks</a></li><li><a href="global.html#showMatchedPeaks">showMatchedPeaks</a></li><li><a href="global.html#showNonMatchedPeaks">showNonMatchedPeaks</a></li><li><a href="global.html#utilFunctions">utilFunctions</a></li><li><a href="global.html#%257BonClickSequenceOfExecution%257Dexecuteswhenuserentersmassshiftonanyaminoacidandclick%2522OK%2522button.">{onClickSequenceOfExecution} executes when user enters mass shift on any amino acid and click "OK" button.</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Fri May 29 2020 03:46:05 GMT-0400 (Eastern Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
