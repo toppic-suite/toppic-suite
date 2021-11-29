@@ -120,8 +120,8 @@ void DeconvProcess::process() {
   bool is_profile_data = true;
 
   if (dt_proc_ptr.size() > 0) {
-    for (int i = 0; i < dt_proc_ptr.size(); i++) {
-      for (int j = 0; j < dt_proc_ptr[i]->processingMethods.size(); j++) {
+    for (size_t i = 0; i < dt_proc_ptr.size(); i++) {
+      for (size_t j = 0; j < dt_proc_ptr[i]->processingMethods.size(); j++) {
         pwiz::msdata::ProcessingMethod proc_method = dt_proc_ptr[i]->processingMethods[j];
         pwiz::cv::CVID cvid_peak_picking;
         cvid_peak_picking = pwiz::cv::MS_peak_picking;
@@ -501,11 +501,11 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
     if (ms_group_ptr != nullptr) {
       //check if the voltage from this msgroup is new or not to determine whether to create a new set of writer vectors
       double cur_voltage = ms_group_ptr->getMsOnePtr()->getMsHeaderPtr()->getVoltage();
-      for (int i = 0; i < voltage_vec_.size(); i++) {
+      for (size_t i = 0; i < voltage_vec_.size(); i++) {
         if (voltage_vec_[i].first == ms_group_ptr->getMsOnePtr()->getMsHeaderPtr()->getVoltage()) {
           int spec_id = voltage_vec_[i].second;
           RawMsPtrVec ms_two_ptr_vec = ms_group_ptr->getMsTwoPtrVec();
-          for (int j = 0; j < ms_two_ptr_vec.size(); j++) {
+          for (size_t j = 0; j < ms_two_ptr_vec.size(); j++) {
             ms_two_ptr_vec[j]->getMsHeaderPtr()->setMsOneId(spec_id);
           }
           voltage_vec_[i].second++;
@@ -529,7 +529,7 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
 
         RawMsPtrVec ms_two_ptr_vec = ms_group_ptr->getMsTwoPtrVec();
 
-        for (int j = 0; j < ms_two_ptr_vec.size(); j++) {
+        for (size_t j = 0; j < ms_two_ptr_vec.size(); j++) {
           ms_two_ptr_vec[j]->getMsHeaderPtr()->setMsOneId(spec_id);
         }
         voltage_vec_.back().second++;
@@ -595,7 +595,7 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
     ms2_merge_ptr->process();
   }
   else {
-    for (int j = 0; j < voltage_vec_.size(); j++) {
+    for (size_t j = 0; j < voltage_vec_.size(); j++) {
       ms1_file_name = str_util::toString(j) + "_ms1.msalign";
       ms2_file_name = str_util::toString(j) + "_ms2.msalign";
 
