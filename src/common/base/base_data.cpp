@@ -13,6 +13,7 @@
 //limitations under the License.
 
 #include "common/util/logger.hpp"
+#include "common/xml/xml_dom_parser.hpp"
 
 #include "common/base/amino_acid_base.hpp"
 #include "common/base/ptm_base.hpp"
@@ -68,6 +69,8 @@ void init() {
   SPTypeBase::initBase();
   LOG_DEBUG("support peak type initialized ");
 
+  XmlDOMParserFactory::deleteParserInstance();
+  
   base_data_init_ = true;
 }
 
