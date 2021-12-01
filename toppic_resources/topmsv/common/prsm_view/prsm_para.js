@@ -70,7 +70,8 @@ class PrsmPara {
         return this.showSkippedLines_;
     }
     getIsModAllowed() {
-        return this.isModAllowed_;
+        //return this.isModAllowed_;
+        return false;
     }
     setRowLength(rowLength) {
         this.rowLength_ = rowLength;

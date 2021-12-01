@@ -80,7 +80,7 @@ void RawMsReader::refinePrecChrg(RawMsPtr ms_one, RawMsPtr ms_two,
   MsHeaderPtr header_two = ms_two->getMsHeaderPtr();
   double prec_win_begin = header_two->getPrecWinBegin();
   double prec_win_end = header_two->getPrecWinEnd();
-  int prec_charge = header_two->getPrecCharge();
+  //int prec_charge = header_two->getPrecCharge();
 
   PeakPtrVec peak_list = ms_one->getPeakPtrVec();
   LOG_DEBUG("start refine precursor " << " peak num " << peak_list.size());

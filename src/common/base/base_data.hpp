@@ -22,6 +22,8 @@ namespace base_data {
 
 void init();
 
+void release(); 
+
 extern bool base_data_init_;
 
 }  // namespace base_data

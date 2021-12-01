@@ -13,6 +13,7 @@
 //limitations under the License.
 
 #include "common/util/logger.hpp"
+#include "common/xml/xml_dom_parser.hpp"
 
 #include "common/base/amino_acid_base.hpp"
 #include "common/base/ptm_base.hpp"
@@ -69,6 +70,10 @@ void init() {
   LOG_DEBUG("support peak type initialized ");
 
   base_data_init_ = true;
+}
+
+void release() {
+  XmlDOMParserFactory::deleteParserInstance();
 }
 
 } // namespace base_data

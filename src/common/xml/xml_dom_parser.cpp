@@ -34,6 +34,7 @@ XmlDOMParser::XmlDOMParser() : parser_(nullptr), err_handler_(nullptr) {
 XmlDOMParser::~XmlDOMParser() {
   if (parser_ != nullptr) {
     delete parser_;
+    delete err_handler_;
     xercesc::XMLPlatformUtils::Terminate();
   }
 }
@@ -54,6 +55,12 @@ XmlDOMParser* XmlDOMParserFactory::getXmlDOMParserInstance() {
     dom_parser_ = new XmlDOMParser();
   }
   return dom_parser_;
+}
+
+void XmlDOMParserFactory::deleteParserInstance() {
+  if (dom_parser_ != nullptr) {
+    delete dom_parser_;
+  }
 }
 
 }

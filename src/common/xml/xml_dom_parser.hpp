@@ -44,6 +44,8 @@ class XmlDOMParserFactory {
   static XmlDOMParser* dom_parser_;
  public:
   static XmlDOMParser* getXmlDOMParserInstance();
+
+  static void deleteParserInstance(); 
 };
 
 }  // namespace toppic
