@@ -69,9 +69,11 @@ void init() {
   SPTypeBase::initBase();
   LOG_DEBUG("support peak type initialized ");
 
-  XmlDOMParserFactory::deleteParserInstance();
-  
   base_data_init_ = true;
+}
+
+void release() {
+  XmlDOMParserFactory::deleteParserInstance();
 }
 
 } // namespace base_data
