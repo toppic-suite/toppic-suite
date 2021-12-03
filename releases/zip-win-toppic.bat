@@ -10,9 +10,6 @@ copy ..\bin\topfd.exe toppic-windows-%1
 copy ..\bin\topmg_gui.exe toppic-windows-%1
 copy ..\bin\topmg.exe toppic-windows-%1
 
-copy ..\bin\topmerge_gui.exe toppic-windows-%1
-copy ..\bin\topmerge.exe toppic-windows-%1
-
 copy ..\bin\topdiff_gui.exe toppic-windows-%1
 copy ..\bin\topdiff.exe toppic-windows-%1
 
