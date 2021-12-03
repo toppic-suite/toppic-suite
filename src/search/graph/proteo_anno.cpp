@@ -75,6 +75,7 @@ void ProteoAnno::anno(const std::string &seq, bool is_complete) {
       continue;
     }
     LOG_DEBUG("i " << i << " mod " << mod_ptr);
+    /*
     if (is_complete && mod_ptr->getType() == ProtModBase::getType_NME()) {
       LOG_DEBUG("NME");
       // add empty residue to the first methinine residue
@@ -89,7 +90,9 @@ void ProteoAnno::anno(const std::string &seq, bool is_complete) {
       }
       res_vec_2d_[0].push_back(empty_residue_ptr);
       shift_vec_2d_[0].push_back(AlterType::PROTEIN_VARIABLE->getId());
-    } else if (is_complete && mod_ptr->getType() == ProtModBase::getType_M_ACETYLATION()) {
+    } 
+    */
+    if (is_complete && mod_ptr->getType() == ProtModBase::getType_M_ACETYLATION()) {
       ResiduePtr mut_residue_ptr = mod_ptr->getModPtr()->getModResiduePtr();
       res_vec_2d_[0].push_back(mut_residue_ptr);
       shift_vec_2d_[0].push_back(AlterType::PROTEIN_VARIABLE->getId());
