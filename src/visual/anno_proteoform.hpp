@@ -25,8 +25,9 @@ namespace anno_proteoform {
 
 xercesc::DOMElement* geneAnnoProteoform(XmlDOMDocument* xml_doc, PrsmPtr prsm_ptr,
                                         PrsmViewMngPtr mng_ptr);
+xercesc::DOMElement* geneAnnoProteoformBrief(XmlDOMDocument* xml_doc, PrsmPtr prsm_ptr,
+                                        PrsmViewMngPtr mng_ptr);
 }
-
 }
 
 #endif /* TOPPIC_VISUAL_ANNO_PROTEOFORM_HPP_ */

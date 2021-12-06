@@ -62,6 +62,12 @@ void addPrsmHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement* element,
   xml_doc->addElement(element, "matched_peak_number", str.c_str());
 }
 
+void addPrsmHeaderBrief(XmlDOMDocument* xml_doc, xercesc::DOMElement* element,
+                   PrsmPtr prsm_ptr, PrsmViewMngPtr mng_ptr) {
+  std::string str = str_util::toString(prsm_ptr->getPrsmId());
+  xml_doc->addElement(element, "prsm_id", str.c_str());
+}
+
 void addMsHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement* ms_element, 
                  PrsmPtr prsm_ptr, PrsmViewMngPtr mng_ptr) {
   xercesc::DOMElement* ms_header_element = xml_doc->createElement("ms_header");
@@ -106,6 +112,24 @@ void addMsHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement* ms_element,
       xml_doc->addElement(ms_header_element, "feature_inte", str.c_str());
     }
   }
+}
+
+void addMsHeaderBrief(XmlDOMDocument* xml_doc, xercesc::DOMElement* ms_element, 
+                 PrsmPtr prsm_ptr, PrsmViewMngPtr mng_ptr) {
+  xercesc::DOMElement* ms_header_element = xml_doc->createElement("ms_header");
+  ms_element->appendChild(ms_header_element);
+  DeconvMsPtrVec deconv_ms_ptr_vec = prsm_ptr->getDeconvMsPtrVec();
+  std::string ms1_ids, ms2_ids;
+  std::string ms1_scans, ms2_scans;
+  for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
+    MsHeaderPtr header_ptr = deconv_ms_ptr_vec[i]->getMsHeaderPtr();
+    ms1_scans = ms1_scans + str_util::toString(header_ptr->getMsOneScan()) + " ";
+    ms2_scans = ms2_scans + header_ptr->getScansString() + " ";
+  }
+  str_util::trim(ms1_scans);
+  str_util::trim(ms2_scans);
+  xml_doc->addElement(ms_header_element, "ms1_scans", ms1_scans.c_str());
+  xml_doc->addElement(ms_header_element, "scans", ms2_scans.c_str());
 }
 
 void addMsPeaks(XmlDOMDocument *xml_doc, xercesc::DOMElement* ms_element,
@@ -184,6 +208,27 @@ xercesc::DOMElement* geneAnnoPrsm(XmlDOMDocument* xml_doc, PrsmPtr prsm_ptr,
     // proteoform to view
     xercesc::DOMElement* prot_element 
         = anno_proteoform::geneAnnoProteoform(xml_doc, prsm_ptr, mng_ptr);
+    prsm_element->appendChild(prot_element);
+    LOG_DEBUG("proteoform view completed");
+  }
+  return prsm_element;
+}
+
+xercesc::DOMElement* geneAnnoPrsmBrief(XmlDOMDocument* xml_doc, PrsmPtr prsm_ptr,
+                                  PrsmViewMngPtr mng_ptr, bool detail, bool add_ms_peaks) {
+  //for prsms.js file in the html folder. Will only contain information needed by TopMSV spectrum id page
+  xercesc::DOMElement* prsm_element = xml_doc->createElement("prsm");
+  addPrsmHeaderBrief(xml_doc, prsm_element, prsm_ptr, mng_ptr);
+
+  if (detail) {
+    xercesc::DOMElement* ms2_element = xml_doc->createElement("ms");
+    addMsHeaderBrief(xml_doc, ms2_element, prsm_ptr, mng_ptr);
+
+    prsm_element->appendChild(ms2_element);
+
+    // proteoform to view
+    xercesc::DOMElement* prot_element 
+        = anno_proteoform::geneAnnoProteoformBrief(xml_doc, prsm_ptr, mng_ptr);
     prsm_element->appendChild(prot_element);
     LOG_DEBUG("proteoform view completed");
   }

@@ -27,7 +27,9 @@ namespace anno_prsm {
 xercesc::DOMElement* geneAnnoPrsm(XmlDOMDocument* xml_doc, PrsmPtr prsm_ptr,
                                   PrsmViewMngPtr mng_ptr, bool detail = true,
                                   bool add_ms_peaks = true);
+xercesc::DOMElement* geneAnnoPrsmBrief(XmlDOMDocument* xml_doc, PrsmPtr prsm_ptr,
+                                  PrsmViewMngPtr mng_ptr, bool detail = true,
+                                  bool add_ms_peaks = true);
 }
-
 }
 #endif /* TOPPIC_VISUAL_ANNO_PRSM_HPP_ */
