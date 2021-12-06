@@ -51,6 +51,15 @@ void addSummary(XmlDOMDocument* xml_doc, xercesc::DOMElement *prot_element,
   xml_doc->addElement(prot_element, "unexpected_shift_number", str.c_str());
 }
 
+void addSummaryBrief(XmlDOMDocument* xml_doc, xercesc::DOMElement *prot_element,
+                ProteoformPtr proteoform_ptr, PrsmViewMngPtr mng_ptr) {
+  std::string str = proteoform_ptr->getSeqName();
+  xml_doc->addElement(prot_element, "sequence_name", str.c_str());
+
+  str = proteoform_ptr->getSeqDesc();
+  xml_doc->addElement(prot_element, "sequence_description", str.c_str());
+}
+
 void addAnnoHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement *anno_element,
                    ProteoformPtr proteoform_ptr) {
   std::string str = str_util::toString(proteoform_ptr->getFastaSeqPtr()->getAcidPtmPairLen());
@@ -63,6 +72,12 @@ void addAnnoHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement *anno_element,
   xml_doc->addElement(anno_element, "last_residue_position", str.c_str());
 
   str = proteoform_ptr->getProteoformMatchSeq();
+  xml_doc->addElement(anno_element, "annotated_seq", str.c_str());
+}
+
+void addAnnoHeaderBrief(XmlDOMDocument* xml_doc, xercesc::DOMElement *anno_element,
+                   ProteoformPtr proteoform_ptr) {
+  std::string str = proteoform_ptr->getProteoformMatchSeq();
   xml_doc->addElement(anno_element, "annotated_seq", str.c_str());
 }
 
@@ -311,6 +326,19 @@ xercesc::DOMElement* geneAnnoProteoform(XmlDOMDocument* xml_doc,
   return prot_element;
 }
 
+xercesc::DOMElement* geneAnnoProteoformBrief(XmlDOMDocument* xml_doc,
+                                        PrsmPtr prsm_ptr,
+                                        PrsmViewMngPtr mng_ptr) {
+  ProteoformPtr proteoform_ptr = prsm_ptr->getProteoformPtr();
+  xercesc::DOMElement* prot_element = xml_doc->createElement("annotated_protein");
+  addSummaryBrief(xml_doc, prot_element, proteoform_ptr, mng_ptr);
+  xercesc::DOMElement* anno_element = xml_doc->createElement("annotation");
+  prot_element->appendChild(anno_element);
+  addAnnoHeaderBrief(xml_doc, anno_element, proteoform_ptr);
+  // LOG_DEBUG("summary completed");
+
+  return prot_element;
+}
 }
 
 }  // namespace toppic
