@@ -137,7 +137,7 @@ p, li { white-space: pre-wrap; }
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -839,7 +839,7 @@ p, li { white-space: pre-wrap; }
       <widget class="QLabel" name="label_13">
        <property name="geometry">
         <rect>
-         <x>360</x>
+         <x>350</x>
          <y>30</y>
          <width>171</width>
          <height>31</height>
