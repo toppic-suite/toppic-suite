@@ -137,7 +137,7 @@ p, li { white-space: pre-wrap; }
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -159,12 +159,24 @@ p, li { white-space: pre-wrap; }
         <x>10</x>
         <y>10</y>
         <width>931</width>
-        <height>33</height>
+        <height>22</height>
        </rect>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
         <widget class="QLabel" name="label">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>16777215</height>
+          </size>
+         </property>
          <property name="text">
           <string>Database file: </string>
          </property>
@@ -177,7 +189,7 @@ p, li { white-space: pre-wrap; }
          </property>
          <property name="maximumSize">
           <size>
-           <width>650</width>
+           <width>16777215</width>
            <height>16777215</height>
           </size>
          </property>
@@ -215,7 +227,7 @@ p, li { white-space: pre-wrap; }
         <widget class="QLabel" name="label_2">
          <property name="minimumSize">
           <size>
-           <width>185</width>
+           <width>0</width>
            <height>0</height>
           </size>
          </property>
@@ -359,9 +371,9 @@ p, li { white-space: pre-wrap; }
      <widget class="QGroupBox" name="groupBox_4">
       <property name="geometry">
        <rect>
-        <x>280</x>
-        <y>220</y>
-        <width>661</width>
+        <x>10</x>
+        <y>230</y>
+        <width>931</width>
         <height>101</height>
        </rect>
       </property>
@@ -373,7 +385,7 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>10</x>
          <y>30</y>
-         <width>641</width>
+         <width>901</width>
          <height>22</height>
         </rect>
        </property>
@@ -382,7 +394,7 @@ p, li { white-space: pre-wrap; }
          <widget class="QLabel" name="label_18">
           <property name="minimumSize">
            <size>
-            <width>190</width>
+            <width>140</width>
             <height>0</height>
            </size>
           </property>
@@ -422,10 +434,10 @@ p, li { white-space: pre-wrap; }
       <widget class="QWidget" name="horizontalLayoutWidget_10">
        <property name="geometry">
         <rect>
-         <x>210</x>
+         <x>310</x>
          <y>60</y>
-         <width>211</width>
-         <height>21</height>
+         <width>261</width>
+         <height>22</height>
         </rect>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_10">
@@ -446,13 +458,13 @@ p, li { white-space: pre-wrap; }
          <widget class="QLineEdit" name="maxModEdit">
           <property name="minimumSize">
            <size>
-            <width>55</width>
+            <width>60</width>
             <height>0</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>55</width>
+            <width>60</width>
             <height>16777215</height>
            </size>
           </property>
@@ -471,8 +483,8 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>10</x>
          <y>60</y>
-         <width>181</width>
-         <height>21</height>
+         <width>201</width>
+         <height>22</height>
         </rect>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_14">
@@ -487,13 +499,13 @@ p, li { white-space: pre-wrap; }
          <widget class="QLineEdit" name="miscoreThresholdEdit">
           <property name="minimumSize">
            <size>
-            <width>55</width>
+            <width>60</width>
             <height>0</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>55</width>
+            <width>60</width>
             <height>16777215</height>
            </size>
           </property>
@@ -510,10 +522,10 @@ p, li { white-space: pre-wrap; }
       <widget class="QWidget" name="horizontalLayoutWidget_12">
        <property name="geometry">
         <rect>
-         <x>440</x>
+         <x>660</x>
          <y>60</y>
-         <width>211</width>
-         <height>21</height>
+         <width>251</width>
+         <height>22</height>
         </rect>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_12">
@@ -540,13 +552,13 @@ p, li { white-space: pre-wrap; }
          <widget class="QLineEdit" name="minModEdit">
           <property name="minimumSize">
            <size>
-            <width>55</width>
+            <width>60</width>
             <height>0</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>55</width>
+            <width>60</width>
             <height>16777215</height>
            </size>
           </property>
@@ -602,9 +614,9 @@ p, li { white-space: pre-wrap; }
      <widget class="QCheckBox" name="topfdFeatureCheckBox">
       <property name="geometry">
        <rect>
-        <x>710</x>
+        <x>720</x>
         <y>40</y>
-        <width>278</width>
+        <width>230</width>
         <height>20</height>
        </rect>
       </property>
@@ -621,7 +633,7 @@ p, li { white-space: pre-wrap; }
      <widget class="QCheckBox" name="keepTempCheckBox">
       <property name="geometry">
        <rect>
-        <x>400</x>
+        <x>380</x>
         <y>60</y>
         <width>279</width>
         <height>20</height>
@@ -640,7 +652,7 @@ p, li { white-space: pre-wrap; }
      <widget class="QCheckBox" name="geneHTMLCheckBox">
       <property name="geometry">
        <rect>
-        <x>400</x>
+        <x>380</x>
         <y>40</y>
         <width>278</width>
         <height>20</height>
@@ -731,10 +743,10 @@ p, li { white-space: pre-wrap; }
      <widget class="QGroupBox" name="groupBox_2">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>220</y>
+        <x>690</x>
+        <y>90</y>
         <width>251</width>
-        <height>101</height>
+        <height>111</height>
        </rect>
       </property>
       <property name="title">
@@ -804,7 +816,7 @@ p, li { white-space: pre-wrap; }
        <rect>
         <x>10</x>
         <y>90</y>
-        <width>931</width>
+        <width>671</width>
         <height>111</height>
        </rect>
       </property>
@@ -814,7 +826,7 @@ p, li { white-space: pre-wrap; }
       <widget class="QLabel" name="label_11">
        <property name="geometry">
         <rect>
-         <x>110</x>
+         <x>20</x>
          <y>30</y>
          <width>151</width>
          <height>41</height>
@@ -827,7 +839,7 @@ p, li { white-space: pre-wrap; }
       <widget class="QLabel" name="label_13">
        <property name="geometry">
         <rect>
-         <x>540</x>
+         <x>360</x>
          <y>30</y>
          <width>171</width>
          <height>31</height>
@@ -840,7 +852,7 @@ p, li { white-space: pre-wrap; }
       <widget class="QWidget" name="verticalLayoutWidget">
        <property name="geometry">
         <rect>
-         <x>230</x>
+         <x>140</x>
          <y>30</y>
          <width>171</width>
          <height>71</height>
@@ -879,7 +891,7 @@ p, li { white-space: pre-wrap; }
       <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
-         <x>670</x>
+         <x>480</x>
          <y>30</y>
          <width>171</width>
          <height>71</height>
