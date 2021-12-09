@@ -137,7 +137,7 @@ p, li { white-space: pre-wrap; }
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -372,9 +372,9 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>20</y>
+         <y>30</y>
          <width>641</width>
-         <height>33</height>
+         <height>22</height>
         </rect>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_17">
@@ -382,13 +382,13 @@ p, li { white-space: pre-wrap; }
          <widget class="QLabel" name="label_18">
           <property name="minimumSize">
            <size>
-            <width>185</width>
+            <width>190</width>
             <height>0</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>185</width>
+            <width>16777215</width>
             <height>16777215</height>
            </size>
           </property>
@@ -422,10 +422,10 @@ p, li { white-space: pre-wrap; }
       <widget class="QWidget" name="horizontalLayoutWidget_10">
        <property name="geometry">
         <rect>
-         <x>200</x>
+         <x>210</x>
          <y>60</y>
          <width>211</width>
-         <height>33</height>
+         <height>21</height>
         </rect>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_10">
@@ -433,7 +433,7 @@ p, li { white-space: pre-wrap; }
          <widget class="QLabel" name="label_8">
           <property name="maximumSize">
            <size>
-            <width>160</width>
+            <width>16777215</width>
             <height>16777215</height>
            </size>
           </property>
@@ -472,7 +472,7 @@ p, li { white-space: pre-wrap; }
          <x>10</x>
          <y>60</y>
          <width>181</width>
-         <height>33</height>
+         <height>21</height>
         </rect>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_14">
@@ -513,7 +513,7 @@ p, li { white-space: pre-wrap; }
          <x>440</x>
          <y>60</y>
          <width>211</width>
-         <height>33</height>
+         <height>21</height>
         </rect>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_12">
@@ -527,7 +527,7 @@ p, li { white-space: pre-wrap; }
           </property>
           <property name="maximumSize">
            <size>
-            <width>140</width>
+            <width>16777215</width>
             <height>16777215</height>
            </size>
           </property>
