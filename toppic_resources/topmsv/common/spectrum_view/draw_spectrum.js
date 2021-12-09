@@ -47,7 +47,7 @@ function drawMonoMassSpectrum(svgId, para, proteoform, nMasses, cMasses, ions) {
             para.setShowLines(false);
         }
     }
-    updateViewBox(svgId, para.getSVGWidth(), para.getSVGHeight());
+    //updateViewBox(svgId, para.getSVGWidth(), para.getSVGHeight());
     drawSequence(svg, para, proteoform, nMasses, cMasses, ions);
     if (para.getShowError()) {
         addErrorPlot(svg, para);
@@ -552,14 +552,16 @@ function drawIons(svg, para, ions) {
                     yPos = yPos + 15;
                 }
             }
-            ionGroup.append("text")
-                .attr("id", "graph_matched_ions")
-                .attr("x", xPos)
-                .attr("y", yPos)
-                .style("fill", color)
-                .style("opacity", "0.8")
-                .style("stroke-width", "2")
-                .text(ion.text);
+            if (yPos >= para.getPadding().head) {
+                ionGroup.append("text")
+                    .attr("id", "graph_matched_ions")
+                    .attr("x", xPos)
+                    .attr("y", yPos)
+                    .style("fill", color)
+                    .style("opacity", "0.8")
+                    .style("stroke-width", "2")
+                    .text(ion.text);
+            }
         } /*else {
           ionGroup.append("text")
           .attr("id","graph_matched_ions")
@@ -679,14 +681,16 @@ function drawSequence(svg, para, proteoform, nMasses, cMasses, ions) {
         });
         if (ionData && para.getShowLines()) { //if matched peak exists, draw a dotted line
             let lineYPosEnd = para.getPeakYPos(ionData.intensity) + para.getIonYShift();
-            lineGroup.append("line")
-                .attr("x1", x)
-                .attr("y1", para.getPadding().head)
-                .attr("x2", x)
-                .attr("y2", lineYPosEnd - 8)
-                .attr("stroke", "black")
-                .attr("stroke-width", "1")
-                .style("stroke-dasharray", ("5, 6"));
+            if (lineYPosEnd - 8 >= para.getPadding().head) {
+                lineGroup.append("line")
+                    .attr("x1", x)
+                    .attr("y1", para.getPadding().head)
+                    .attr("x2", x)
+                    .attr("y2", lineYPosEnd - 8)
+                    .attr("stroke", "black")
+                    .attr("stroke-width", "1")
+                    .style("stroke-dasharray", ("5, 6"));
+            }
         }
     }
     function interAddAminoAcid(svg, x, y, text) {

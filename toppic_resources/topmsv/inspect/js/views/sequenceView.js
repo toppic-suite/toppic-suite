@@ -4,9 +4,9 @@
  */
 function setDataToSequence(sequence, massShiftList, protVarPtmsList, variablePtmsList) {
     let modifiedSequence = formSequence(sequence, massShiftList, protVarPtmsList, variablePtmsList);
-    /*if(protVarPtmsList || variablePtmsList){
+    if (protVarPtmsList || variablePtmsList) {
         modifiedSequence = addVariablePtm(modifiedSequence, protVarPtmsList, variablePtmsList);
-    }*/
+    }
     jqueryElements.sequenceData.val(modifiedSequence);
 }
 /**
@@ -54,13 +54,17 @@ function setDataToSequence(sequence, massShiftList, protVarPtmsList, variablePtm
 /**
  * Below function adds variable PTM annotation as texts
  */
-function addToSequence(sequence, variablePtms) {
+function addToSequence(sequence, ptmObj) {
     let tempSeq;
     let isResidue = true;
     let residuePos = 0;
     for (let i = 0; i < sequence.length; i++) {
-        if (residuePos == variablePtms.getLeftPos()) {
-            let tempString = "[" + variablePtms.getAnnotation() + "]";
+        if (residuePos == ptmObj.pos) {
+            let tempString = "[";
+            ptmObj.name.forEach((anno) => {
+                tempString = tempString + anno + ";";
+            });
+            tempString = tempString.slice(0, tempString.length - 1) + "]";
             let leftString = sequence.slice(0, i + 1);
             let rightString = sequence.slice(i + 1);
             tempSeq = leftString + tempString + rightString;
@@ -117,12 +121,25 @@ function addToSequence(sequence, variablePtms) {
     return sequence;
 }*/
 function addVariablePtm(sequence, protVarPtmsList, variablePtmsList) {
+    //merge protVarPtm and varPtm, and create a new array of objects based on left pos
+    let allVarPtmList = protVarPtmsList.concat(variablePtmsList);
+    let ptmObj = [];
     let newSeq = sequence;
-    for (let i = 0; i < protVarPtmsList.length; i++) {
-        newSeq = addToSequence(newSeq, protVarPtmsList[i]);
-    }
-    for (let j = 0; j < variablePtmsList.length; j++) {
-        newSeq = addToSequence(newSeq, variablePtmsList[j]);
+    allVarPtmList.forEach((ptm) => {
+        let isNewPtm = true;
+        for (let i = 0; i < ptmObj.length; i++) {
+            if (ptm.getLeftPos() == ptmObj[i].pos) {
+                ptmObj[i].name.push(ptm.getAnnotation());
+                isNewPtm = false;
+                break;
+            }
+        }
+        if (isNewPtm) {
+            ptmObj.push({ "name": [ptm.getAnnotation()], "pos": ptm.getLeftPos() });
+        }
+    });
+    for (let i = 0; i < ptmObj.length; i++) {
+        newSeq = addToSequence(newSeq, ptmObj[i]);
     }
     return newSeq;
 }
@@ -161,40 +178,20 @@ function formSequence(sequence, massShiftList, protVarPtmsList, variablePtmsList
     if (!massShiftList) {
         return result;
     }
-    let allShifts = massShiftList.concat(protVarPtmsList, variablePtmsList);
-    // sort mass shift list by position, ascending
-    allShifts.sort(function (x, y) {
+    massShiftList.sort(function (x, y) {
         return x.getLeftPos() - y.getLeftPos();
     });
-    for (let i = 0; i < allShifts.length; i++) {
-        if (allShifts[i].getShift() !== 0) {
+    for (let i = 0; i < massShiftList.length; i++) {
+        if (massShiftList[i].getShift() !== 0) {
             if (i > 0) {
                 // this is the previous added mass
-                let tempString = "[" + FormatUtil.formatFloat(allShifts[i - 1].getShift(), 3) + "]";
+                let tempString = "[" + FormatUtil.formatFloat(massShiftList[i - 1].getShift(), "massShift") + "]";
                 count = count + tempString.length;
             }
             // add +1 as the position need to be added after the position of the acid.
-            let tempPosition = allShifts[i].getLeftPos() + 1 + count;
-            result = result.slice(0, tempPosition) + "[" + FormatUtil.formatFloat(allShifts[i].getShift(), 3) + "]" + result.slice(tempPosition);
+            let tempPosition = massShiftList[i].getLeftPos() + 1 + count;
+            result = result.slice(0, tempPosition) + "[" + FormatUtil.formatFloat(massShiftList[i].getShift(), "massShift") + "]" + result.slice(tempPosition);
         }
     }
-    /*massShiftList.sort(function(x,y){
-        return x.getLeftPos() - y.getLeftPos();
-    })
-    for(let i=0; i<massShiftList.length; i++)
-    {
-        if(massShiftList[i].getShift() !== 0){
-            if(i > 0)
-            {
-                // this is the previous added mass
-                let tempString: string = "["+ FormatUtil.formatFloat(massShiftList[i-1].getShift(), 3)+"]";
-                count = count + tempString.length;
-            }
-            
-            // add +1 as the position need to be added after the position of the acid.
-            let tempPosition: number = massShiftList[i].getLeftPos() + 1 + count;
-            result = result.slice(0, tempPosition) + "["+ FormatUtil.formatFloat(massShiftList[i].getShift(), 3) + "]" + result.slice(tempPosition);
-        }
-    }*/
     return result;
 }

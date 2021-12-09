@@ -42,7 +42,7 @@ function onclickTopView(e, prsmObj) {
     let unknownMassShiftList = proteoform.getUnknownMassShift();
     let protVarPtmsList = proteoform.getProtVarPtm();
     let variablePtmsList = proteoform.getVarPtm();
-    let precursorMass = FormatUtil.formatFloat(currentSpec.getPrecMass(), 3);
+    let precursorMass = FormatUtil.formatFloat(currentSpec.getPrecMass(), "precMass");
     // Stores all the data in the variables respectively
     window.localStorage.setItem('peakAndIntensityList', JSON.stringify(peakAndIntensityList));
     window.localStorage.setItem('massAndIntensityList', JSON.stringify(massAndIntensityList));
@@ -61,21 +61,27 @@ function onclickTopView(e, prsmObj) {
         unknownMassShiftList.forEach((ptm) => {
             let newL = ptm.getLeftPos() - proteoform.getFirstPos();
             let newR = ptm.getRightPos() - proteoform.getFirstPos();
-            let newPtm = new MassShift(newL, newR, ptm.getShift(), "unknown", ptm.getAnnotation());
+            let newResidueL = ptm.getStartResiduePos() - proteoform.getFirstPos();
+            let newResidueR = ptm.getEndResiduePos() - proteoform.getFirstPos();
+            let newPtm = new MassShift(newL, newR, newResidueL, newResidueR, ptm.getShift(), "unknown", ptm.getAnnotation());
             newPtm.setPtmList(ptm.getPtmList());
             newUnknownMassShifts.push(newPtm);
         });
         protVarPtmsList.forEach((ptm) => {
             let newL = ptm.getLeftPos() - proteoform.getFirstPos();
             let newR = ptm.getRightPos() - proteoform.getFirstPos();
-            let newPtm = new MassShift(newL, newR, ptm.getShift(), "Protein variable", ptm.getAnnotation());
+            let newResidueL = ptm.getStartResiduePos() - proteoform.getFirstPos();
+            let newResidueR = ptm.getEndResiduePos() - proteoform.getFirstPos();
+            let newPtm = new MassShift(newL, newR, newResidueL, newResidueR, ptm.getShift(), "Protein variable", ptm.getAnnotation());
             newPtm.setPtmList(ptm.getPtmList());
             newProtVarPtms.push(newPtm);
         });
         variablePtmsList.forEach((ptm) => {
             let newL = ptm.getLeftPos() - proteoform.getFirstPos();
             let newR = ptm.getRightPos() - proteoform.getFirstPos();
-            let newPtm = new MassShift(newL, newR, ptm.getShift(), "Variable", ptm.getAnnotation());
+            let newResidueL = ptm.getStartResiduePos() - proteoform.getFirstPos();
+            let newResidueR = ptm.getEndResiduePos() - proteoform.getFirstPos();
+            let newPtm = new MassShift(newL, newR, newResidueL, newResidueR, ptm.getShift(), "Variable", ptm.getAnnotation());
             newPtm.setPtmList(ptm.getPtmList());
             newVarPtms.push(newPtm);
         });

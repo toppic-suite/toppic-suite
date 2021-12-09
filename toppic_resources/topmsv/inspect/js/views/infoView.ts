@@ -31,7 +31,7 @@ function setPrecursorMassEventHandler(): void {
  * @param {*} totalMass 
  */
 function setTotalSeqMass(mass: number): void{
-    let totalMass: string = mass.toFixed(4);
+    let totalMass: string = FormatUtil.formatFloat(mass, "protMass");
     jqueryElements.totalMass.html(totalMass);
     domElements.totalSeqMass.setAttribute("style", 'block');
 }
@@ -43,6 +43,6 @@ function setTotalSeqMass(mass: number): void{
  */
 function setMassDifference(precursorMass: number, proteinMass: number): void{
     let diff: number = precursorMass - proteinMass;
-    domElements.massDifference.innerHTML = diff.toFixed(4);
+    domElements.massDifference.innerHTML = FormatUtil.formatFloat(diff, "massDiff");
     domElements.massVariation.setAttribute("style", 'block');
 }

@@ -1,8 +1,10 @@
 "use strict";
 class MassShift {
-    constructor(leftPos, rightPos, massShift, type, annotation, ptm = null) {
-        this.leftPos_ = leftPos;
+    constructor(leftPos, rightPos, startResiduePos, endResiduePos, massShift, type, annotation, ptm = null) {
+        this.leftPos_ = leftPos; //for drawing annotation background
         this.rightPos_ = rightPos;
+        this.startResiduePos_ = startResiduePos; //for calculating mass
+        this.endResiduePos_ = endResiduePos;
         this.massShift_ = massShift;
         this.type_ = this.setModType(type);
         this.annotation_ = annotation;
@@ -16,6 +18,12 @@ class MassShift {
     }
     getLeftPos() {
         return this.leftPos_;
+    }
+    getStartResiduePos() {
+        return this.startResiduePos_;
+    }
+    getEndResiduePos() {
+        return this.endResiduePos_;
     }
     getRightPos() {
         return this.rightPos_;

@@ -2,11 +2,18 @@ class PrsmView {
   private id_: string;
   private para_: PrsmPara;
   private data_: PrsmViewData | null;
+  private addShift_: AddShift | null = null;
+  private drawPrsm_: DrawPrsm;
 
   constructor(svgId: string, prsmObj: Prsm | null, graphData: PrsmViewData | null = null, allowMod: boolean = false) {
     this.id_ = svgId;
     this.para_ = new PrsmPara(allowMod);
     this.data_ = graphData;
+    this.drawPrsm_ = new DrawPrsm();
+
+    if (allowMod) {
+      this.addShift_ = new AddShift();
+    }
 
     if (!this.data_) {
       this.data_ = new PrsmViewData();
@@ -29,6 +36,6 @@ class PrsmView {
       return;
     }
     this.data_.updatePara(this.para_);
-    drawPrsm(this.id_, this.para_, this.data_); 
+    this.drawPrsm_.drawPrsm(this.id_, this.para_, this.data_, this.addShift_); 
   }
 }

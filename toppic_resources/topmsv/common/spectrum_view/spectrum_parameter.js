@@ -159,6 +159,9 @@ class SpectrumViewParameters {
     getShowLines() {
         return this.showLines_;
     }
+    getSpecHeight() {
+        return this.specHeight_;
+    }
     getPadding() {
         return this.padding_;
     }
@@ -182,6 +185,18 @@ class SpectrumViewParameters {
     }
     setIsXZoomAllowed_(allowXZoom) {
         this.isXZoomAllowed_ = allowXZoom;
+    }
+    setSVGHeight(newHeight) {
+        this.svgHeight_ = newHeight;
+    }
+    setPadding(left, right, head, bottom) {
+        this.padding_.left = left;
+        this.padding_.right = right;
+        this.padding_.head = head;
+        this.padding_.bottom = bottom;
+    }
+    setSpecHeight(height) {
+        this.specHeight_ = height;
     }
     /**
      * @function getTickWidth
@@ -454,15 +469,21 @@ class SpectrumViewParameters {
         this.hlMaxMz_ = ms1Spec.getMaxMz();
         //console.log(precMonoMz, this.hlMinMz, this.hlMaxMz);
     }
+    setDefaultPadding() {
+        this.padding_.head = 20;
+        this.padding_.bottom = 50;
+    }
+    setMonoMassPaddding() {
+        this.padding_.head = 60;
+        this.padding_.bottom = 75;
+    }
     setMonoMassGraph(isMonoMass) {
         this.isMonoMassGraph_ = isMonoMass;
         if (isMonoMass) {
-            this.padding_.head = 60;
-            this.padding_.bottom = 75;
+            this.setMonoMassPaddding();
         }
         else {
-            this.padding_.head = 20;
-            this.padding_.bottom = 50;
+            this.setDefaultPadding();
         }
         this.specHeight_ = this.svgHeight_ - this.padding_.head - this.padding_.bottom;
         this.updateScale(this.winMinMz_, this.winMaxMz_, this.winMaxInte_);

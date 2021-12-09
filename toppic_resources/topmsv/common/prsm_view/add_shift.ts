@@ -56,7 +56,6 @@ class AddShift {
     if (!parseResult) {
       return;
     }
-    
     sequence = parseResult[0];
     unknownMassShiftList = parseResult[1];
     protVarPtmsList = parseResult[2];
@@ -96,22 +95,22 @@ class AddShift {
     //if None was selected, don't add it to ptm 
     if (mass != 0.0) {
       //add new variable ptm
-      unknownMassShiftList.push(new MassShift(AddShift.clickedPos, AddShift.clickedPos+1, mass, "Unknown", mass.toString()));
+      unknownMassShiftList.push(new MassShift(AddShift.clickedPos, AddShift.clickedPos+1, AddShift.clickedPos, AddShift.clickedPos, mass, "Unknown", mass.toString()));
     }
     this.updateInspectPage(sequence, unknownMassShiftList, protVarPtmsList, variablePtmsList);
   }
 
   addTabEventListener(): void {
     //switch between variable ptm and unknown shift tabs
-    $("#var-ptm-link").on("click", function() {
+    $("#var-ptm-link").one("click", function() {
       $("#var-ptm-tab").show();
       $("#unknown-mod-tab").hide();
     })
-    $("#unknown-mod-link").on("click", function() {
+    $("#unknown-mod-link").one("click", function() {
       $("#var-ptm-tab").hide();
       $("#unknown-mod-tab").show();
     })
-    $("#add-unknown-mod-btn").on("click", (e) => {
+    $("#add-unknown-mod-btn").one("click", (e) => {
       this.addUnknownShift(e);
     })
     //event listener for search bar
@@ -176,7 +175,7 @@ class AddShift {
     //if None was selected, don't add it to ptm 
     if (mass != 0) {
       //add new variable ptm
-      variablePtmsList.push(new MassShift(pos, pos+1, mass, "Variable", commonPtmList[ptmIdx].abbr, new Mod(letter, mass, commonPtmList[ptmIdx].name)));
+      variablePtmsList.push(new MassShift(pos, pos+1, pos, pos, mass, "Variable", commonPtmList[ptmIdx].abbr, new Mod(letter, mass, commonPtmList[ptmIdx].name)));
       
       if (!AddShift.appliedPtm.includes(ptmIdx)) {
         AddShift.appliedPtm.push(ptmIdx);

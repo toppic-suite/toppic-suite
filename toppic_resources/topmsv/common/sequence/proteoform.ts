@@ -95,7 +95,7 @@ class Proteoform {
     for (let i = 0; i < newSeq.length; i++) {
       let mass = variablePtmPrefixMasses[i] + unexpectedPrefixMasses[i];
       if (mass != 0.0) {
-        let massShift = new MassShift(i, i+1, mass, "unexpected", mass.toFixed(4));
+        let massShift = new MassShift(i, i+1, i, i, mass, "unexpected", mass.toFixed(4));
         massShiftList.push(massShift);
       }
     }
@@ -185,24 +185,22 @@ class Proteoform {
     let unexpectedSuffixMasses: number[] = new Array(newSeq.length).fill(0);
     this.massShiftList_.forEach(massShift => {
       if (massShift.getType() == ModType.Fixed) {
-        let pos: number = massShift.getLeftPos();
+        let pos: number = massShift.getStartResiduePos();
         fixedPtmMasses[pos-this.firstPos_] = massShift.getShift();
       }
       else if(massShift.getType() == ModType.ProteinVariable) {
-        let pos: number = massShift.getLeftPos();
+        let pos: number = massShift.getStartResiduePos();
         variablePtmPrefixMasses[pos-this.firstPos_] += massShift.getShift();
-        variablePtmSuffixMasses[pos-this.firstPos_] += massShift.getShift();
-  
+        variablePtmSuffixMasses[pos-this.firstPos_ - 1] += massShift.getShift();
       }
       else if(massShift.getType() == ModType.Variable) {
         let leftPos: number = massShift.getLeftPos(); 
-        let rightPos: number = massShift.getRightPos();
         variablePtmPrefixMasses[leftPos-this.firstPos_] += massShift.getShift();
-        variablePtmSuffixMasses[rightPos-this.firstPos_] += massShift.getShift();
+        variablePtmSuffixMasses[leftPos-this.firstPos_] += massShift.getShift();
       }
       else{
         unexpectedPrefixMasses[massShift.getLeftPos() - this.firstPos_] += massShift.getShift();
-        unexpectedSuffixMasses[massShift.getRightPos() - 1 - this.firstPos_] += massShift.getShift();  
+        unexpectedSuffixMasses[massShift.getLeftPos() - this.firstPos_] += massShift.getShift();  
       }
     })
     return [fixedPtmMasses, variablePtmPrefixMasses, variablePtmSuffixMasses, unexpectedPrefixMasses, unexpectedSuffixMasses];

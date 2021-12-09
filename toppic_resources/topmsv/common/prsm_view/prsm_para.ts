@@ -71,8 +71,7 @@ class PrsmPara {
     return this.showSkippedLines_;
   }
   getIsModAllowed(): boolean {
-    //return this.isModAllowed_;
-    return false;
+    return this.isModAllowed_;
   }
 
 

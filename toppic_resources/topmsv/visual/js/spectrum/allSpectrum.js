@@ -61,7 +61,6 @@ function prsmToHtml(prsm, folderName) {
     }*/
     let sequence = protein.annotation.annotated_seq;
     let p = document.createElement('p');
-    p.setAttribute("style", "font-size:16px;");
     let a = document.createElement('a');
     a.href = "prsm" + ".html" + "?folder=" + folderName + "&protein=" + prsm.prsm_id;
     //a.innerHTML = protein.sequence_name + " " + "first residue = " + protein.annotation.first_residue_position + " " + "last residue = " + protein.annotation.last_residue_position;
