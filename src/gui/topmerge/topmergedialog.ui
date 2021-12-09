@@ -356,7 +356,7 @@ p, li { white-space: pre-wrap; }
         <x>280</x>
         <y>220</y>
         <width>581</width>
-        <height>111</height>
+        <height>101</height>
        </rect>
       </property>
       <property name="title">
@@ -382,7 +382,7 @@ p, li { white-space: pre-wrap; }
           </property>
           <property name="maximumSize">
            <size>
-            <width>150</width>
+            <width>185</width>
             <height>16777215</height>
            </size>
           </property>
@@ -446,13 +446,13 @@ p, li { white-space: pre-wrap; }
          <widget class="QLineEdit" name="miscoreThresholdEdit">
           <property name="minimumSize">
            <size>
-            <width>60</width>
+            <width>55</width>
             <height>0</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>60</width>
+            <width>55</width>
             <height>16777215</height>
            </size>
           </property>
@@ -471,7 +471,7 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>200</x>
          <y>60</y>
-         <width>161</width>
+         <width>191</width>
          <height>33</height>
         </rect>
        </property>
@@ -487,13 +487,13 @@ p, li { white-space: pre-wrap; }
          <widget class="QLineEdit" name="maxModEdit">
           <property name="minimumSize">
            <size>
-            <width>60</width>
+            <width>55</width>
             <height>0</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>60</width>
+            <width>55</width>
             <height>16777215</height>
            </size>
           </property>
@@ -609,9 +609,9 @@ p, li { white-space: pre-wrap; }
      <widget class="QWidget" name="horizontalLayoutWidget_12">
       <property name="geometry">
        <rect>
-        <x>670</x>
+        <x>680</x>
         <y>280</y>
-        <width>181</width>
+        <width>171</width>
         <height>33</height>
        </rect>
       </property>
@@ -633,13 +633,13 @@ p, li { white-space: pre-wrap; }
         <widget class="QLineEdit" name="minModEdit">
          <property name="minimumSize">
           <size>
-           <width>60</width>
+           <width>55</width>
            <height>0</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>60</width>
+           <width>55</width>
            <height>16777215</height>
           </size>
          </property>
@@ -728,7 +728,7 @@ p, li { white-space: pre-wrap; }
         <x>10</x>
         <y>220</y>
         <width>251</width>
-        <height>111</height>
+        <height>101</height>
        </rect>
       </property>
       <property name="title">
