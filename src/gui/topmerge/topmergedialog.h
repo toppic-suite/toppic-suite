@@ -52,6 +52,18 @@ private slots:
 
   void on_databaseFileButton_clicked();
 
+  void on_NONECheckBox_clicked(bool checked);
+
+  void on_NMECheckBox_clicked(bool checked);
+
+  void on_NMEACCheckBox_clicked(bool checked);
+
+  void on_MACCheckBox_clicked(bool checked);
+
+  void on_fixedModFileButton_clicked();
+
+  void on_fixedModComboBox_currentIndexChanged(int index);
+
   //void on_errorToleranceEdit_textChanged(QString string);
 
 private:
@@ -90,6 +102,8 @@ private:
   void closeEvent(QCloseEvent *event);
 
   bool continueToClose();
+
+  bool nterminalerror();
 
   bool ableToAdd(QString spfile);
 };
