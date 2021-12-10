@@ -62,6 +62,7 @@ void Argument::initArguments() {
   arguments_["activation"] = "FILE";
   arguments_["massErrorTolerance"] = "0";
   arguments_["threadNumber"] = "1";
+  arguments_["toolName"] = "toppic";
 }
 
 void Argument::outputArguments(std::ostream &output, 
@@ -69,6 +70,7 @@ void Argument::outputArguments(std::ostream &output,
   output << "********************** Parameters **********************" << std::endl;
   output << std::setw(44) << std::left << "Protein database file: " << "\t" << arguments["oriDatabaseFileName"] << std::endl;
   output << std::setw(44) << std::left << "Spectrum file: " << "\t" << arguments["spectrumFileName"] << std::endl;
+  output << std::setw(44) << std::left << "Fragmentation method: " << "\t" << arguments["activation"] << std::endl;
   output << std::setw(44) << std::left << "Search type: " << "\t" << arguments["searchType"] << std::endl;
   if (arguments["fixedMod"] != "") {
     //add fixed PTM information 
@@ -117,6 +119,7 @@ void Argument::outputArguments(std::ostream &output,
     output << std::setw(44) << std::left <<  "PTMs for MIScore END" << std::endl;
     output << std::setw(44) << std::left << "MIScore threshold: " << "\t" << arguments["localThreshold"] << std::endl;
   }
+  output << std::setw(44) << std::left << "Database search tool name: " << "\t" << arguments["toolName"] << std::endl;
   output << std::setw(44) << std::left << "Executable file directory: " << "\t" << arguments["executiveDir"] << std::endl;
   output << std::setw(44) << std::left << "Start time: " << "\t" << arguments["startTime"] << std::endl;
   if (arguments["endTime"] != "") {

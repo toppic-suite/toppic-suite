@@ -105,6 +105,9 @@ void TopMergeDialog::initArguments() {
   arguments_["massErrorTolerance"] = "15";
   arguments_["executiveDir"] = ".";
   arguments_["resourceDir"] = "";
+  arguments_["activation"] = "FILE";
+  arguments_["allowProtMod"] = "NONE,NME,NME_ACETYLATION,M_ACETYLATION";
+  arguments_["fixedMod"] = "";
 }
 
 void TopMergeDialog::on_clearButton_clicked() {
@@ -117,6 +120,7 @@ void TopMergeDialog::on_clearButton_clicked() {
 
 void TopMergeDialog::on_defaultButton_clicked() {
   ui->combinedOutputEdit->setText("combined");
+  ui->fixedModFileEdit->clear();
   ui->outputTextBrowser->setText("Click the Start button to process the data.");
   ui->errorToleranceEdit->setText("15");
   ui->formErrorToleranceEdit->setText("1.2");
@@ -125,6 +129,9 @@ void TopMergeDialog::on_defaultButton_clicked() {
   ui->cutoffSpectralValueEdit->setText("0.01");
   ui->cutoffProteoformValueEdit->setText("0.01");
   ui->miscoreThresholdEdit->setText("0.15");
+  ui->fixedModComboBox->setCurrentIndex(0);
+  on_fixedModComboBox_currentIndexChanged(0);
+  ui->activationComboBox->setCurrentIndex(0);
   ui->cutoffSpectralTypeComboBox->setCurrentIndex(0);
   ui->cutoffProteoformTypeComboBox->setCurrentIndex(0);
   ui->topfdFeatureCheckBox->setChecked(false);
@@ -132,6 +139,10 @@ void TopMergeDialog::on_defaultButton_clicked() {
   ui->decoyCheckBox->setChecked(false);
   ui->keepDecoyCheckBox->setChecked(false);
   ui->keepTempCheckBox->setChecked(false);
+  ui->NONECheckBox->setChecked(true);
+  ui->NMECheckBox->setChecked(true);
+  ui->NMEACCheckBox->setChecked(true);
+  ui->MACCheckBox->setChecked(true);
 }
 
 void TopMergeDialog::updatedir(QString s) {
@@ -223,6 +234,61 @@ bool TopMergeDialog::continueToClose() {
     return false;
   }
 }
+
+void TopMergeDialog::on_fixedModFileButton_clicked() {
+  QString s = QFileDialog::getOpenFileName(
+      this,
+      "Select a fixed modification file",
+      lastDir_,
+      "Modification files(*.txt);;All files(*.*)");
+  updatedir(s);
+  ui->fixedModFileEdit->setText(s);
+}
+
+void TopMergeDialog::on_fixedModComboBox_currentIndexChanged(int index) {
+  if (index == 3) {
+    ui->fixedModFileEdit->setEnabled(true);
+    ui->fixedModFileButton->setEnabled(true);
+  } else {
+    ui->fixedModFileEdit->setEnabled(false);
+    ui->fixedModFileButton->setEnabled(false);
+  }
+}
+bool TopMergeDialog::nterminalerror() {
+  if (ui->NONECheckBox->isChecked() || ui->NMECheckBox->isChecked() || ui->NMEACCheckBox->isChecked() || ui->MACCheckBox->isChecked()) {
+    return false;
+  } else {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("At least one N-terminal form should be selected!"),
+                         QMessageBox::Yes);
+    return true;
+  }
+}
+
+void TopMergeDialog::on_NONECheckBox_clicked(bool checked) {
+  if (nterminalerror()) {
+    ui->NONECheckBox->setChecked(true);
+  }
+}
+
+void TopMergeDialog::on_NMECheckBox_clicked(bool checked) {
+  if (nterminalerror()) {
+    ui->NMECheckBox->setChecked(true);
+  }
+}
+
+void TopMergeDialog::on_NMEACCheckBox_clicked(bool checked) {
+  if (nterminalerror()) {
+    ui->NMEACCheckBox->setChecked(true);
+  }
+}
+
+void TopMergeDialog::on_MACCheckBox_clicked(bool checked) {
+  if (nterminalerror()) {
+    ui->MACCheckBox->setChecked(true);
+  }
+}
+
 void TopMergeDialog::on_modFileButton_clicked() {
   QString s = QFileDialog::getOpenFileName(
       this,
@@ -250,6 +316,7 @@ std::map<std::string, std::string> TopMergeDialog::getArguments() {
   arguments_["resourceDir"] = toppic::file_util::getResourceDir(exe_dir);
   arguments_["oriDatabaseFileName"] = ui->databaseFileEdit->text().toStdString();
   arguments_["combinedOutputName"] = ui->combinedOutputEdit->text().trimmed().toStdString();
+  arguments_["activation"] = ui->activationComboBox->currentText().toStdString();
 
   if (ui->decoyCheckBox->isChecked()) {
   arguments_["searchType"] = "TARGET+DECOY";
@@ -258,12 +325,41 @@ std::map<std::string, std::string> TopMergeDialog::getArguments() {
     arguments_["searchType"] = "TARGET";
     arguments_["databaseFileName"] = arguments_["oriDatabaseFileName"] + "_target";
   }
+  arguments_["fixedMod"] = ui->fixedModComboBox->currentText().toStdString();
+  if (arguments_["fixedMod"] == "NONE") {
+    arguments_["fixedMod"] = "";
+  }
+  else if (arguments_["fixedMod"] == "Carbamidomethylation on cysteine") {
+    arguments_["fixedMod"] = "C57";
+  }
+  else if (arguments_["fixedMod"] == "Carboxymethylation on cysteine") {
+    arguments_["fixedMod"] = "C58";
+  }
+  if (ui->fixedModComboBox->currentIndex() == 3) {
+    arguments_["fixedMod"] = ui->fixedModFileEdit->text().toStdString();
+  }
   arguments_["massErrorTolerance"] = ui->errorToleranceEdit->text().toStdString();
   arguments_["proteoformErrorTolerance"] = ui->formErrorToleranceEdit->text().toStdString();
   arguments_["cutoffSpectralType"] = ui->cutoffSpectralTypeComboBox->currentText().toStdString();
   arguments_["cutoffSpectralValue"] = ui->cutoffSpectralValueEdit->text().toStdString();
   arguments_["cutoffProteoformType"] = ui->cutoffProteoformTypeComboBox->currentText().toStdString();
   arguments_["cutoffProteoformValue"] = ui->cutoffProteoformValueEdit->text().toStdString();
+  arguments_["allowProtMod"] = "";
+  if (ui->NONECheckBox->isChecked()) {
+    arguments_["allowProtMod"] = arguments_["allowProtMod"] + ",NONE";
+  }
+  if (ui->NMECheckBox->isChecked()) {
+    arguments_["allowProtMod"] = arguments_["allowProtMod"] + ",NME";
+  }
+  if (ui->NMEACCheckBox->isChecked()) {
+    arguments_["allowProtMod"] = arguments_["allowProtMod"] + ",NME_ACETYLATION";
+  }
+  if (ui->MACCheckBox->isChecked()) {
+    arguments_["allowProtMod"] = arguments_["allowProtMod"] + ",M_ACETYLATION";
+  }
+  if (arguments_["allowProtMod"] != "") {
+    arguments_["allowProtMod"] = arguments_["allowProtMod"].substr(1);
+  }
   arguments_["maxPtmMass"] = ui->maxModEdit->text().toStdString();
   arguments_["minPtmMass"] = ui->minModEdit->text().toStdString();
   arguments_["keepTempFiles"] = "false";   // default
@@ -340,6 +436,9 @@ void TopMergeDialog::on_delButton_clicked() {
 }
 void TopMergeDialog::lockDialog() {
   ui->combinedOutputEdit->setEnabled(false);
+  ui->fixedModComboBox->setEnabled(false);
+  ui->fixedModFileEdit->setEnabled(false);
+  ui->fixedModFileButton->setEnabled(false);
   ui->clearButton->setEnabled(false);
   ui->defaultButton->setEnabled(false);
   ui->startButton->setEnabled(false);
@@ -360,6 +459,12 @@ void TopMergeDialog::lockDialog() {
   ui->geneHTMLCheckBox->setEnabled(false);
   ui->keepDecoyCheckBox->setEnabled(false);
   ui->keepTempCheckBox->setEnabled(false);
+  ui->fixedModComboBox->setEnabled(false);
+  ui->activationComboBox->setEnabled(false);
+  ui->NONECheckBox->setEnabled(false);
+  ui->NMECheckBox->setEnabled(false);
+  ui->NMEACCheckBox->setEnabled(false);
+  ui->MACCheckBox->setEnabled(false);
 }
 
 void TopMergeDialog::unlockDialog() {
@@ -372,15 +477,23 @@ void TopMergeDialog::unlockDialog() {
 
   ui->databaseFileButton->setEnabled(true);
   ui->databaseFileEdit->setEnabled(true);
+  ui->fixedModFileEdit->setEnabled(true);
   ui->errorToleranceEdit->setEnabled(true);  
   ui->formErrorToleranceEdit->setEnabled(true);  
   ui->maxModEdit->setEnabled(true);  
   ui->minModEdit->setEnabled(true);  
+  ui->fixedModComboBox->setEnabled(true);
+  on_fixedModComboBox_currentIndexChanged(ui->fixedModComboBox->currentIndex());
+  ui->activationComboBox->setEnabled(true);
   ui->cutoffSpectralValueEdit->setEnabled(true);  
   ui->cutoffProteoformValueEdit->setEnabled(true);  
   ui->miscoreThresholdEdit->setEnabled(true);  
   ui->cutoffSpectralTypeComboBox->setEnabled(true);  
   ui->cutoffProteoformTypeComboBox->setEnabled(true);  
+  ui->NONECheckBox->setEnabled(true);
+  ui->NMECheckBox->setEnabled(true);
+  ui->NMEACCheckBox->setEnabled(true);
+  ui->MACCheckBox->setEnabled(true);
   ui->decoyCheckBox->setEnabled(true);
   ui->topfdFeatureCheckBox->setEnabled(true);
   ui->geneHTMLCheckBox->setEnabled(true);
@@ -407,7 +520,12 @@ bool TopMergeDialog::checkError() {
                          QMessageBox::Yes);
     return true;
   }
-
+  if (ui->fixedModFileEdit->text().isEmpty() && ui->fixedModComboBox->currentIndex() == 3) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("Please select a fixed modification file!"),
+                         QMessageBox::Yes);
+    return true;
+  }
   if (ui->errorToleranceEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
                          tr("Mass error tolerance is empty!"),
