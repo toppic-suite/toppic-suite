@@ -21,7 +21,7 @@ namespace toppic {
 
 class Version {
  public:
-  static std::string getVersion() {return "1.5.0";}
+  static std::string getVersion() {return "1.5.1";}
 };
 
 }  // namespace toppic
