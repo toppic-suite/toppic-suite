@@ -45,43 +45,52 @@ inline PrsmStrPtrVec2D getGroups(PrsmStrPtrVec &prsm_ptrs) {
   return results;
 }
 
+double computeFdr(int n_decoy, int n_target) {
+  double fdr = static_cast<double>(n_decoy) / static_cast<double>(n_target);
+  if(fdr > 1){
+    fdr = 1.0;
+  }
+  return fdr;
+}
+
+
 void computeFdr(PrsmStrPtrVec &target_ptrs, PrsmStrPtrVec &decoy_ptrs){
+  int n_decoy = 0;
   for(size_t i = 0; i < target_ptrs.size(); i++){
     int n_target = i + 1;
     double target_evalue = target_ptrs[i]->getEValue();
-    int n_decoy = 0;
-    for(size_t j = 0; j < decoy_ptrs.size(); j++){
+    for(size_t j = n_decoy; j < decoy_ptrs.size(); j++){
       if(decoy_ptrs[j]->getEValue() <= target_evalue){
         n_decoy++;
+        double fdr = computeFdr(n_decoy, n_target);
+        decoy_ptrs[j]->setFdr(fdr);
       } else{
         break;
       }
     }
-    double fdr = static_cast<double>(n_decoy) / static_cast<double>(n_target);
-    if (fdr > 1) {
-      fdr = 1.0;
-    }
+    double fdr = computeFdr(n_decoy, n_target);
     target_ptrs[i]->setFdr(fdr);
   }
 }
 
 void computeProteoformFdr(PrsmStrPtrVec2D &target_proteoforms,
                           PrsmStrPtrVec2D &decoy_proteoforms) {
+  int n_decoy = 0;
   for(size_t i = 0; i < target_proteoforms.size(); i++) {
     int n_target= i + 1;
     double target_evalue = target_proteoforms[i][0]->getEValue();
-    int n_decoy = 0;
-    for (size_t j = 0; j < decoy_proteoforms.size(); j++) {
+    for (size_t j = n_decoy; j < decoy_proteoforms.size(); j++) {
       if (decoy_proteoforms[j][0]->getEValue() <= target_evalue) {
         n_decoy++;
+        double fdr = computeFdr(n_decoy, n_target);
+        for (size_t k = 0; k < decoy_proteoforms[j].size(); k++) {
+          decoy_proteoforms[j][k]->setProteoformFdr(fdr);
+        }
       } else {
         break;
       }
     }
-    double fdr = static_cast<double>(n_decoy) / static_cast<double>(n_target);
-    if(fdr > 1){
-      fdr = 1.0;
-    }
+    double fdr = computeFdr(n_decoy, n_target);
     for (size_t k = 0; k < target_proteoforms[i].size(); k++) {
       target_proteoforms[i][k]->setProteoformFdr(fdr);
     }
