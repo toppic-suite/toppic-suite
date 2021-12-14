@@ -45,11 +45,13 @@ std::vector<int> getMinMaxProtDist(DistVec2D dist_vec) {
 
 GraphAlign::GraphAlign(GraphAlignMngPtr mng_ptr,
                        ProteoGraphPtr proteo_graph_ptr,
-                       SpecGraphPtr spec_graph_ptr) {
+                       SpecGraphPtr spec_graph_ptr, 
+                       FastaSeqPtr fasta_seq_ptr) {
   LOG_DEBUG("Graph constructor start");
   mng_ptr_ = mng_ptr;
   proteo_graph_ptr_ = proteo_graph_ptr;
   spec_graph_ptr_ = spec_graph_ptr;
+  fasta_seq_ptr_ = fasta_seq_ptr;
 
   dist_vec_ = proteo_graph_ptr_->getDistVec2D();
   spec_dist_ = spec_graph_ptr_->getDistVec();
@@ -536,7 +538,8 @@ PrsmPtr GraphAlign::geneResult(int s, int m) {
   ProteoformPtr proteo_ptr = proteo_graph_ptr_->getProteoformPtr();
 
   ProteoformPtr sub_proteo_ptr
-      = toppic::proteoform_factory::geneSubProteoform(proteo_ptr, first_pos, last_pos);
+      = toppic::proteoform_factory::geneSubProteoform(proteo_ptr, fasta_seq_ptr_, 
+                                                      first_pos, last_pos);
 
   LOG_DEBUG("get sub proteo first pos " << first_pos << " last pos " << last_pos);
   SpParaPtr sp_para_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr();
