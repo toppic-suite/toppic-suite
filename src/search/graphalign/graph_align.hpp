@@ -16,6 +16,7 @@
 #ifndef TOPPIC_SEARCH_GRAPH_ALIGN_GRAPH_ALIGN_HPP_
 #define TOPPIC_SEARCH_GRAPH_ALIGN_GRAPH_ALIGN_HPP_
 
+#include "seq/fasta_seq.hpp"
 #include "prsm/prsm.hpp"
 #include "search/diag/diag_header.hpp"
 #include "search/graph/graph.hpp"
@@ -31,8 +32,10 @@ typedef std::vector<std::vector<std::vector<std::vector<std::pair<int, int>>>>> 
 
 class GraphAlign {
  public:
-  GraphAlign(GraphAlignMngPtr mng_ptr, ProteoGraphPtr proteo_graph_ptr,
-             SpecGraphPtr spec_graph_ptr);
+  GraphAlign(GraphAlignMngPtr mng_ptr, 
+             ProteoGraphPtr proteo_graph_ptr,
+             SpecGraphPtr spec_graph_ptr,
+             FastaSeqPtr fasta_seq_ptr);
 
   void process();
 
@@ -46,6 +49,8 @@ class GraphAlign {
   ProteoGraphPtr proteo_graph_ptr_;
 
   MassGraphPtr pg_;
+
+  FastaSeqPtr fasta_seq_ptr_;
 
   int proteo_ver_num_;
 
