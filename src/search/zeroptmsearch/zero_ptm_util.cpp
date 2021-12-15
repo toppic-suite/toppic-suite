@@ -21,9 +21,11 @@ namespace zero_ptm_util {
 
 PrsmPtr getPrsmPtr(const DeconvMsPtrVec &deconv_ms_ptr_vec, 
                    ZpFastMatchPtr fast_match_ptr, SpParaPtr sp_para_ptr) { 
-  ProteoformPtr proteoform_ptr = proteoform_factory::geneSubProteoform(fast_match_ptr->getProteoformPtr(), 
-                                                                       fast_match_ptr->getBegin(), 
-                                                                       fast_match_ptr->getEnd());
+  ProteoformPtr proteoform_ptr 
+    = proteoform_factory::geneSubProteoform(fast_match_ptr->getProteoformPtr(), 
+                                            fast_match_ptr->getProteoformPtr()->getFastaSeqPtr(),
+                                            fast_match_ptr->getBegin(), 
+                                            fast_match_ptr->getEnd());
   return getPrsmPtr(deconv_ms_ptr_vec, proteoform_ptr, sp_para_ptr);
 }
 
