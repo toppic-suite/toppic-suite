@@ -449,6 +449,7 @@ void TopMergeDialog::lockDialog() {
   ui->minModEdit->setEnabled(false);  
   ui->cutoffSpectralValueEdit->setEnabled(false);  
   ui->cutoffProteoformValueEdit->setEnabled(false);  
+  ui->modFileEdit->setEnabled(false);
   ui->miscoreThresholdEdit->setEnabled(false);  
   ui->cutoffSpectralTypeComboBox->setEnabled(false);  
   ui->cutoffProteoformTypeComboBox->setEnabled(false);  
@@ -456,6 +457,8 @@ void TopMergeDialog::lockDialog() {
   ui->databaseFileEdit->setEnabled(false);
   ui->decoyCheckBox->setEnabled(false);
   ui->topfdFeatureCheckBox->setEnabled(false);
+  ui->addButton->setEnabled(false);
+  ui->delButton->setEnabled(false);
   ui->geneHTMLCheckBox->setEnabled(false);
   ui->keepDecoyCheckBox->setEnabled(false);
   ui->keepTempCheckBox->setEnabled(false);
@@ -499,6 +502,8 @@ void TopMergeDialog::unlockDialog() {
   ui->geneHTMLCheckBox->setEnabled(true);
   ui->keepDecoyCheckBox->setEnabled(true);
   ui->keepTempCheckBox->setEnabled(true);
+  ui->addButton->setEnabled(true);
+  ui->delButton->setEnabled(true);
 }
 
 bool TopMergeDialog::checkError() {

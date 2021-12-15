@@ -155,6 +155,8 @@ void toppicWindow::on_defaultButton_clicked() {
   ui->lookupTableCheckBox->setChecked(false);
   ui->topfdFeatureCheckBox->setChecked(false);
   ui->geneHTMLCheckBox->setChecked(true);
+  ui->keepDecoyCheckBox->setChecked(false);
+  ui->keepTempCheckBox->setChecked(false);
 }
 
 void toppicWindow::updatedir(QString s) {
@@ -457,6 +459,8 @@ void toppicWindow::lockDialog() {
   ui->addButton->setEnabled(false);
   ui->delButton->setEnabled(false);
   ui->geneHTMLCheckBox->setEnabled(false);
+  ui->keepDecoyCheckBox->setEnabled(false);
+  ui->keepTempCheckBox->setEnabled(false);
 }
 
 void toppicWindow::unlockDialog() {
@@ -498,6 +502,8 @@ void toppicWindow::unlockDialog() {
   ui->addButton->setEnabled(true);
   ui->delButton->setEnabled(true);
   ui->geneHTMLCheckBox->setEnabled(true);
+  ui->keepDecoyCheckBox->setEnabled(true);
+  ui->keepTempCheckBox->setEnabled(true);
 }
 
 bool toppicWindow::checkError() {
