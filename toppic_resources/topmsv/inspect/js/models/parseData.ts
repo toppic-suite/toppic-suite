@@ -53,7 +53,7 @@ function parsePTM(dataName: string): MassShift[] {
 	if (massShiftData) {
 		let massShifts: any = JSON.parse(massShiftData);
         massShifts.forEach((d: any) => {
-        	let massShift = new MassShift(d.leftPos_, d.rightPos_, d.startResiduePos, d.endResiduePos, d.massShift_, d.type_, d.annotation_, d.ptmList_);
+        	let massShift = new MassShift(d.leftPos_, d.rightPos_, d.massShift_, d.type_, d.annotation_, d.ptmList_);
             massShiftList.push(massShift);
         });
 	}
@@ -143,7 +143,7 @@ function parseSequenceMassShift(seq: string): [string,MassShift[], MassShift[],M
 				for (let k = 0; k < listOfPtm.length; k++) {
 					for (let j: number = 0; j < commonPtmList.length; j++) {
 						if (listOfPtm[k] == commonPtmList[j].abbr.toUpperCase()) {
-							let varPtm: MassShift = new MassShift(tempPosition, tempPosition + 1, tempPosition, tempPosition, commonPtmList[j].mass, "Variable", commonPtmList[j].abbr, new Mod(seq[i], commonPtmList[j].mass, commonPtmList[j].name));
+							let varPtm: MassShift = new MassShift(tempPosition, tempPosition + 1, commonPtmList[j].mass, "Variable", commonPtmList[j].abbr, new Mod(seq[i], commonPtmList[j].mass, commonPtmList[j].name));
 							variablePtmsList.push(varPtm);
 							isVariablePtm = true;
 						}
@@ -162,7 +162,7 @@ function parseSequenceMassShift(seq: string): [string,MassShift[], MassShift[],M
 				 */
 				if(!isNaN(mass))
 				{
-					let unknownMassShift: MassShift = new MassShift(tempPosition, tempPosition + 1, tempPosition, tempPosition, mass, "unexpected", mass.toString());
+					let unknownMassShift: MassShift = new MassShift(tempPosition, tempPosition + 1, mass, "unexpected", mass.toString());
 					unknownMassShiftList.push(unknownMassShift);
 				}
 			}
@@ -276,7 +276,7 @@ function parseCheckedFixedPtm(seq: string) {
 	}
       for(let i: number = 0 ; i < seq.length; i++) {
         if(seq[i] === ptm.getResidue()) {
-          let massShift: MassShift = new MassShift(i, i + 1, i, i, fixedPtm.getShift(), "Fixed", fixedPtm.getName(), fixedPtm);
+          let massShift: MassShift = new MassShift(i, i + 1, fixedPtm.getShift(), "Fixed", fixedPtm.getName(), fixedPtm);
           fixedPtmList.push(massShift);
         }
       }

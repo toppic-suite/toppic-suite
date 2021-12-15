@@ -51,7 +51,7 @@ function parsePTM(dataName) {
     if (massShiftData) {
         let massShifts = JSON.parse(massShiftData);
         massShifts.forEach((d) => {
-            let massShift = new MassShift(d.leftPos_, d.rightPos_, d.startResiduePos, d.endResiduePos, d.massShift_, d.type_, d.annotation_, d.ptmList_);
+            let massShift = new MassShift(d.leftPos_, d.rightPos_, d.massShift_, d.type_, d.annotation_, d.ptmList_);
             massShiftList.push(massShift);
         });
     }
@@ -137,7 +137,7 @@ function parseSequenceMassShift(seq) {
                 for (let k = 0; k < listOfPtm.length; k++) {
                     for (let j = 0; j < commonPtmList.length; j++) {
                         if (listOfPtm[k] == commonPtmList[j].abbr.toUpperCase()) {
-                            let varPtm = new MassShift(tempPosition, tempPosition + 1, tempPosition, tempPosition, commonPtmList[j].mass, "Variable", commonPtmList[j].abbr, new Mod(seq[i], commonPtmList[j].mass, commonPtmList[j].name));
+                            let varPtm = new MassShift(tempPosition, tempPosition + 1, commonPtmList[j].mass, "Variable", commonPtmList[j].abbr, new Mod(seq[i], commonPtmList[j].mass, commonPtmList[j].name));
                             variablePtmsList.push(varPtm);
                             isVariablePtm = true;
                         }
@@ -155,7 +155,7 @@ function parseSequenceMassShift(seq) {
                  * the list. This is to check if the mass is numeric.
                  */
                 if (!isNaN(mass)) {
-                    let unknownMassShift = new MassShift(tempPosition, tempPosition + 1, tempPosition, tempPosition, mass, "unexpected", mass.toString());
+                    let unknownMassShift = new MassShift(tempPosition, tempPosition + 1, mass, "unexpected", mass.toString());
                     unknownMassShiftList.push(unknownMassShift);
                 }
             }
@@ -269,7 +269,7 @@ function parseCheckedFixedPtm(seq) {
         }
         for (let i = 0; i < seq.length; i++) {
             if (seq[i] === ptm.getResidue()) {
-                let massShift = new MassShift(i, i + 1, i, i, fixedPtm.getShift(), "Fixed", fixedPtm.getName(), fixedPtm);
+                let massShift = new MassShift(i, i + 1, fixedPtm.getShift(), "Fixed", fixedPtm.getName(), fixedPtm);
                 fixedPtmList.push(massShift);
             }
         }

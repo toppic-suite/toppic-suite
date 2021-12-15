@@ -54,17 +54,13 @@ function setDataToSequence(sequence, massShiftList, protVarPtmsList, variablePtm
 /**
  * Below function adds variable PTM annotation as texts
  */
-function addToSequence(sequence, ptmObj) {
+function addToSequence(sequence, variablePtms) {
     let tempSeq;
     let isResidue = true;
     let residuePos = 0;
     for (let i = 0; i < sequence.length; i++) {
-        if (residuePos == ptmObj.pos) {
-            let tempString = "[";
-            ptmObj.name.forEach((anno) => {
-                tempString = tempString + anno + ";";
-            });
-            tempString = tempString.slice(0, tempString.length - 1) + "]";
+        if (residuePos == variablePtms.getLeftPos()) {
+            let tempString = "[" + variablePtms.getAnnotation() + "]";
             let leftString = sequence.slice(0, i + 1);
             let rightString = sequence.slice(i + 1);
             tempSeq = leftString + tempString + rightString;
@@ -121,25 +117,12 @@ function addToSequence(sequence, ptmObj) {
     return sequence;
 }*/
 function addVariablePtm(sequence, protVarPtmsList, variablePtmsList) {
-    //merge protVarPtm and varPtm, and create a new array of objects based on left pos
-    let allVarPtmList = protVarPtmsList.concat(variablePtmsList);
-    let ptmObj = [];
     let newSeq = sequence;
-    allVarPtmList.forEach((ptm) => {
-        let isNewPtm = true;
-        for (let i = 0; i < ptmObj.length; i++) {
-            if (ptm.getLeftPos() == ptmObj[i].pos) {
-                ptmObj[i].name.push(ptm.getAnnotation());
-                isNewPtm = false;
-                break;
-            }
-        }
-        if (isNewPtm) {
-            ptmObj.push({ "name": [ptm.getAnnotation()], "pos": ptm.getLeftPos() });
-        }
-    });
-    for (let i = 0; i < ptmObj.length; i++) {
-        newSeq = addToSequence(newSeq, ptmObj[i]);
+    for (let i = 0; i < protVarPtmsList.length; i++) {
+        newSeq = addToSequence(newSeq, protVarPtmsList[i]);
+    }
+    for (let j = 0; j < variablePtmsList.length; j++) {
+        newSeq = addToSequence(newSeq, variablePtmsList[j]);
     }
     return newSeq;
 }

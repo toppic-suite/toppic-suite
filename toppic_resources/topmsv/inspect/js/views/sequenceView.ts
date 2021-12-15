@@ -53,20 +53,16 @@ function setDataToSequence(sequence: string, massShiftList: MassShift[], protVar
 /**
  * Below function adds variable PTM annotation as texts
  */
- function addToSequence(sequence: string, ptmObj: {"name": string[], "pos": number}){
-    let tempSeq: string;
-    let isResidue: boolean = true;
-    let residuePos: number= 0;
+ function addToSequence(sequence: string, variablePtms: MassShift){
+    let tempSeq;
+    let isResidue = true;
+    let residuePos = 0;
 
-    for (let i: number = 0; i < sequence.length; i++){
-        if (residuePos == ptmObj.pos){
-            let tempString: string = "[";
-            ptmObj.name.forEach((anno: string) => {
-                tempString = tempString + anno + ";";
-            })
-            tempString = tempString.slice(0, tempString.length - 1) + "]";
-            let leftString: string = sequence.slice(0, i + 1);
-            let rightString: string = sequence.slice(i + 1);
+    for (let i = 0; i < sequence.length; i++){
+        if (residuePos == variablePtms.getLeftPos()){
+            let tempString = "["+variablePtms.getAnnotation() +"]";
+            let leftString = sequence.slice(0, i + 1);
+            let rightString = sequence.slice(i + 1);
             tempSeq = leftString + tempString + rightString;
             return tempSeq;
         }
@@ -121,26 +117,12 @@ function setDataToSequence(sequence: string, massShiftList: MassShift[], protVar
     return sequence;
 }*/
 function addVariablePtm(sequence: string, protVarPtmsList: MassShift[], variablePtmsList: MassShift[]){
-    //merge protVarPtm and varPtm, and create a new array of objects based on left pos
-    let allVarPtmList: MassShift[] = protVarPtmsList.concat(variablePtmsList);
-    let ptmObj: {"name": string[], "pos": number}[] = [];
-    let newSeq: string = sequence;
-
-    allVarPtmList.forEach((ptm: MassShift) => {
-        let isNewPtm: boolean = true;
-        for (let i: number = 0; i < ptmObj.length; i++) {
-            if (ptm.getLeftPos() == ptmObj[i].pos) {
-                ptmObj[i].name.push(ptm.getAnnotation());
-                isNewPtm = false;
-                break;
-            }
-        }
-        if (isNewPtm) {
-            ptmObj.push({"name": [ptm.getAnnotation()], "pos": ptm.getLeftPos()});
-        }
-    })
-    for (let i: number = 0; i < ptmObj.length; i++){
-        newSeq = addToSequence(newSeq, ptmObj[i]);
+    let newSeq = sequence;
+    for (let i = 0; i < protVarPtmsList.length; i++){
+        newSeq = addToSequence(newSeq, protVarPtmsList[i]);
+    }
+    for (let j = 0; j < variablePtmsList.length; j++){
+        newSeq = addToSequence(newSeq, variablePtmsList[j]);
     }
     return newSeq;
 }

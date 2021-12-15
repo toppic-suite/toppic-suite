@@ -266,13 +266,13 @@ class DataTable {
                     }
                 }
                 tr.setAttribute("name", ionPos.toString());
-                /*let peakId: string = peak.getId();
+                let peakId = peak.getId();
                 if (recordedPeaks.indexOf(peakId) < 0) {
-                  recordedPeaks.push(peakId);
+                    recordedPeaks.push(peakId);
                 }
-                else{
-                  l_duc_peak_count++;
-                }*/
+                else {
+                    l_duc_peak_count++;
+                }
             }
             //	Set "id","class name" and "role" for each row
             tr.setAttribute("id", id);

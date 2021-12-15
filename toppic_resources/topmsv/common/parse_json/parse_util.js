@@ -87,7 +87,7 @@ function json2Ptms(prsm) {
                 for (let j = 0; j < occList.length; j++) {
                     let occurence = occList[j];
                     let ptm = new Mod(occurence.anno, parseFloat(dataPtm.ptm.mono_mass), dataPtm.ptm.abbreviation);
-                    let massShift = new MassShift(parseInt(occurence.left_pos), parseInt(occurence.right_pos), parseInt(occurence.left_pos), parseInt(occurence.right_pos) - 1, ptm.getShift(), dataPtm.ptm_type, ptm.getName(), ptm);
+                    let massShift = new MassShift(parseInt(occurence.left_pos), parseInt(occurence.right_pos), ptm.getShift(), dataPtm.ptm_type, ptm.getName(), ptm);
                     if (dataPtm.ptm_type == "Fixed") {
                         fixedPtmList.push(massShift);
                     }
@@ -116,11 +116,11 @@ function json2MassShifts(prsm) {
             if (dataShift.shift_type == "unexpected" && dataShift.right_position != "0") {
                 if (isNaN(parseFloat(dataShift.anno))) {
                     //then it is annotated with ptm name
-                    let massShift = new MassShift(parseInt(dataShift.left_position), parseInt(dataShift.right_position), parseInt(dataShift.left_position), parseInt(dataShift.right_position) - 1, parseFloat(dataShift.shift), dataShift.shift_type, dataShift.anno);
+                    let massShift = new MassShift(parseInt(dataShift.left_position), parseInt(dataShift.right_position), parseFloat(dataShift.shift), dataShift.shift_type, dataShift.anno);
                     massShifts.push(massShift);
                 }
                 else {
-                    let massShift = new MassShift(parseInt(dataShift.left_position), parseInt(dataShift.right_position), parseInt(dataShift.left_position), parseInt(dataShift.right_position) - 1, parseFloat(dataShift.shift), dataShift.shift_type, dataShift.anno);
+                    let massShift = new MassShift(parseInt(dataShift.left_position), parseInt(dataShift.right_position), parseFloat(dataShift.shift), dataShift.shift_type, dataShift.anno);
                     massShifts.push(massShift);
                 }
             }
