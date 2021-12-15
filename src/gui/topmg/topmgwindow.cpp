@@ -150,6 +150,8 @@ void topmgWindow::on_defaultButton_clicked() {
   ui->wholeProteinCheckBox->setChecked(false);
   ui->maxGapLength->setText("40");
   ui->maxVarPTMGap->setText("5");
+  ui->keepDecoyCheckBox->setChecked(false);
+  ui->keepTempCheckBox->setChecked(false);
 }
 
 void topmgWindow::updatedir(QString s) {
@@ -472,6 +474,9 @@ void topmgWindow::lockDialog() {
   ui->wholeProteinCheckBox->setEnabled(false);
   ui->maxGapLength->setEnabled(false);
   ui->maxVarPTMGap->setEnabled(false);
+  ui->keepDecoyCheckBox->setEnabled(false);
+  ui->keepTempCheckBox->setEnabled(false);
+  ui->asfDiagCheckBox->setEnabled(false);
 }
 
 void topmgWindow::unlockDialog() {
@@ -514,6 +519,9 @@ void topmgWindow::unlockDialog() {
   ui->wholeProteinCheckBox->setEnabled(true);
   ui->maxGapLength->setEnabled(true);
   ui->maxVarPTMGap->setEnabled(true);
+  ui->keepDecoyCheckBox->setEnabled(true);
+  ui->keepTempCheckBox->setEnabled(true);
+  ui->asfDiagCheckBox->setEnabled(true);
 }
 
 bool topmgWindow::checkError() {
