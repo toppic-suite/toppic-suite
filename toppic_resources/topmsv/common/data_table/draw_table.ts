@@ -273,13 +273,13 @@
               }
           }
           tr.setAttribute("name", ionPos.toString());
-          /*let peakId: string = peak.getId();
+          let peakId: string = peak.getId();
           if (recordedPeaks.indexOf(peakId) < 0) {
             recordedPeaks.push(peakId);
           }
           else{
             l_duc_peak_count++;
-          }*/
+          }
 
         }
         //	Set "id","class name" and "role" for each row

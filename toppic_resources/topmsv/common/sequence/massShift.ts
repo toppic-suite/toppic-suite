@@ -1,18 +1,14 @@
 class MassShift {
   private leftPos_: number;
   private rightPos_: number;
-  private startResiduePos_: number;
-  private endResiduePos_: number;
   private massShift_: number;
   private annotation_: string;
   private type_: ModType;
   private ptmList_: Mod[];
 
-  constructor(leftPos: number, rightPos: number, startResiduePos: number, endResiduePos: number, massShift: number, type: string, annotation: string, ptm: Mod | null = null) {
+  constructor(leftPos: number, rightPos: number, massShift: number, type: string, annotation: string, ptm: Mod | null = null) {
     this.leftPos_ = leftPos;//for drawing annotation background
     this.rightPos_ = rightPos;
-    this.startResiduePos_ = startResiduePos;//for calculating mass
-    this.endResiduePos_ = endResiduePos;
     this.massShift_ = massShift;
     this.type_ = this.setModType(type);
     this.annotation_ = annotation;
@@ -26,12 +22,6 @@ class MassShift {
   }
   getLeftPos(): number {
     return this.leftPos_;
-  }
-  getStartResiduePos(): number {
-    return this.startResiduePos_;
-  }
-  getEndResiduePos(): number {
-    return this.endResiduePos_;
   }
   getRightPos(): number {
     return this.rightPos_;

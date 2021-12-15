@@ -81,7 +81,7 @@ class Proteoform {
         for (let i = 0; i < newSeq.length; i++) {
             let mass = variablePtmPrefixMasses[i] + unexpectedPrefixMasses[i];
             if (mass != 0.0) {
-                let massShift = new MassShift(i, i + 1, i, i, mass, "unexpected", mass.toFixed(4));
+                let massShift = new MassShift(i, i + 1, mass, "unexpected", mass.toFixed(4));
                 massShiftList.push(massShift);
             }
         }
@@ -168,11 +168,11 @@ class Proteoform {
         let unexpectedSuffixMasses = new Array(newSeq.length).fill(0);
         this.massShiftList_.forEach(massShift => {
             if (massShift.getType() == ModType.Fixed) {
-                let pos = massShift.getStartResiduePos();
+                let pos = massShift.getLeftPos();
                 fixedPtmMasses[pos - this.firstPos_] = massShift.getShift();
             }
             else if (massShift.getType() == ModType.ProteinVariable) {
-                let pos = massShift.getStartResiduePos();
+                let pos = massShift.getLeftPos();
                 variablePtmPrefixMasses[pos - this.firstPos_] += massShift.getShift();
                 variablePtmSuffixMasses[pos - this.firstPos_ - 1] += massShift.getShift();
             }

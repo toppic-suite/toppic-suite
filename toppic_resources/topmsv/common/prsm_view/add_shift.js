@@ -81,7 +81,7 @@ class AddShift {
         //if None was selected, don't add it to ptm 
         if (mass != 0.0) {
             //add new variable ptm
-            unknownMassShiftList.push(new MassShift(AddShift.clickedPos, AddShift.clickedPos + 1, AddShift.clickedPos, AddShift.clickedPos, mass, "Unknown", mass.toString()));
+            unknownMassShiftList.push(new MassShift(AddShift.clickedPos, AddShift.clickedPos + 1, mass, "Unknown", mass.toString()));
         }
         this.updateInspectPage(sequence, unknownMassShiftList, protVarPtmsList, variablePtmsList);
     }
@@ -153,7 +153,7 @@ class AddShift {
         //if None was selected, don't add it to ptm 
         if (mass != 0) {
             //add new variable ptm
-            variablePtmsList.push(new MassShift(pos, pos + 1, pos, pos, mass, "Variable", commonPtmList[ptmIdx].abbr, new Mod(letter, mass, commonPtmList[ptmIdx].name)));
+            variablePtmsList.push(new MassShift(pos, pos + 1, mass, "Variable", commonPtmList[ptmIdx].abbr, new Mod(letter, mass, commonPtmList[ptmIdx].name)));
             if (!AddShift.appliedPtm.includes(ptmIdx)) {
                 AddShift.appliedPtm.push(ptmIdx);
             }
