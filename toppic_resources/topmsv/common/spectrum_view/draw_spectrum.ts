@@ -53,7 +53,7 @@ function drawMonoMassSpectrum(svgId: string, para: SpectrumViewParameters, prote
     }
   }
 
-  updateViewBox(svgId, para.getSVGWidth(), para.getSVGHeight());
+  //updateViewBox(svgId, para.getSVGWidth(), para.getSVGHeight());
   drawSequence(svg, para, proteoform, nMasses, cMasses, ions);
   if (para.getShowError()) {
     addErrorPlot(svg, para);
@@ -585,7 +585,8 @@ function drawIons(svg: any, para: SpectrumViewParameters,
           yPos = yPos + 15;
         }
       }
-      ionGroup.append("text")
+      if (yPos >= para.getPadding().head) {
+        ionGroup.append("text")
         .attr("id","graph_matched_ions")
         .attr("x", xPos)
         .attr("y", yPos) 
@@ -593,6 +594,7 @@ function drawIons(svg: any, para: SpectrumViewParameters,
         .style("opacity", "0.8")
         .style("stroke-width","2")
         .text(ion.text);
+      }
     } /*else {
       ionGroup.append("text")
       .attr("id","graph_matched_ions")
@@ -722,15 +724,16 @@ function drawSequence(svg: any, para: SpectrumViewParameters, proteoform: Proteo
       });
       if (ionData && para.getShowLines()){//if matched peak exists, draw a dotted line
         let lineYPosEnd: number = para.getPeakYPos(ionData.intensity) + para.getIonYShift();
-
-        lineGroup.append("line")
-        .attr("x1",x)
-        .attr("y1",para.getPadding().head)
-        .attr("x2",x)
-        .attr("y2",lineYPosEnd - 8)
-        .attr("stroke","black")
-        .attr("stroke-width","1")
-        .style("stroke-dasharray", ("5, 6"))
+        if (lineYPosEnd - 8 >= para.getPadding().head) {
+          lineGroup.append("line")
+          .attr("x1",x)
+          .attr("y1",para.getPadding().head)
+          .attr("x2",x)
+          .attr("y2",lineYPosEnd - 8)
+          .attr("stroke","black")
+          .attr("stroke-width","1")
+          .style("stroke-dasharray", ("5, 6"))
+        }
       }
   }
  

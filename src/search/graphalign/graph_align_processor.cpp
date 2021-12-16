@@ -51,7 +51,8 @@ std::function<void()> geneTask(GraphAlignMngPtr mng_ptr,
     PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
     SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
     //std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
-    std::string db_file_name = prsm_para_ptr->getOriDbName() + "_idx" + file_util::getFileSeparator() + prsm_para_ptr->getSearchDbFileName();
+    std::string db_file_name = prsm_para_ptr->getOriDbName() + "_idx" 
+      + file_util::getFileSeparator() + prsm_para_ptr->getSearchDbFileName();
 
     std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
 
@@ -115,7 +116,7 @@ std::function<void()> geneTask(GraphAlignMngPtr mng_ptr,
                                                                           mng_ptr->proteo_graph_gap_,
                                                                           mng_ptr->var_ptm_in_gap_);
                 GraphAlignPtr graph_align
-                    = std::make_shared<GraphAlign>(mng_ptr, proteo_ptr, spec_ptr_vec[k]);
+                    = std::make_shared<GraphAlign>(mng_ptr, proteo_ptr, spec_ptr_vec[k], seq_ptr);
                 graph_align->process();
                 for (int shift = 0; shift <= mng_ptr->n_unknown_shift_; shift++) {
                   PrsmPtr prsm_ptr = graph_align->geneResult(shift);
@@ -161,7 +162,8 @@ void GraphAlignProcessor::process() {
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
   //std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
-  std::string db_file_name = prsm_para_ptr->getOriDbName() + "_idx" + file_util::getFileSeparator() + prsm_para_ptr->getSearchDbFileName();
+  std::string db_file_name = prsm_para_ptr->getOriDbName() 
+    + "_idx" + file_util::getFileSeparator() + prsm_para_ptr->getSearchDbFileName();
 
   LOG_DEBUG("Search db file name " << db_file_name);
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();

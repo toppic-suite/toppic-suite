@@ -3,7 +3,14 @@
 class FormatUtil {
     constructor() { }
     ;
-    static formatFloat(number, digit) {
+    static formatFloat(number, type) {
+        let formatInfo = {
+            "protMass": 3,
+            "massDiff": 3,
+            "massShift": 3,
+            "precMz": 3,
+            "precMass": 3
+        };
         if (typeof (number) == "string") {
             number = parseFloat(number);
             if (isNaN(number)) {
@@ -11,6 +18,6 @@ class FormatUtil {
                 return "-1";
             }
         }
-        return number.toFixed(digit);
+        return number.toFixed(formatInfo[type]);
     }
 }

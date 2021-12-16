@@ -7,7 +7,7 @@ class MassShift {
   private ptmList_: Mod[];
 
   constructor(leftPos: number, rightPos: number, massShift: number, type: string, annotation: string, ptm: Mod | null = null) {
-    this.leftPos_ = leftPos;
+    this.leftPos_ = leftPos;//for drawing annotation background
     this.rightPos_ = rightPos;
     this.massShift_ = massShift;
     this.type_ = this.setModType(type);

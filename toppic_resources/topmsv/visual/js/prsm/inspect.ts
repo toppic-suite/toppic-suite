@@ -47,40 +47,88 @@ function onclickTopView(e: JQuery.ClickEvent<HTMLElement, null, HTMLElement, HTM
     let unknownMassShiftList: MassShift[] = proteoform.getUnknownMassShift();
     let protVarPtmsList: MassShift[] = proteoform.getProtVarPtm();
     let variablePtmsList: MassShift[] = proteoform.getVarPtm();
-    let precursorMass: string = FormatUtil.formatFloat(currentSpec.getPrecMass(), 3);
+    let precursorMass: string = FormatUtil.formatFloat(currentSpec.getPrecMass(), "precMass");
 
+    //if multiple variable ptm is in the same range, convert them to unknown mass shift to prevent incorrect annotation in the inspect page
+    let varPtmListTmp: MassShift[] = protVarPtmsList.concat(variablePtmsList);
+    let varPtmFiltered: MassShift[] = [];
+    let protVarPtmFiltered: MassShift[] = [];
+
+    if (varPtmListTmp.length > 1) {
+        varPtmListTmp.sort((x: MassShift, y: MassShift) => {
+            return x.getLeftPos() - y.getLeftPos();
+        })
+        let i: number = 0;
+        while (i < varPtmListTmp.length) {
+            let k: number = i + 1;
+            if (k >= varPtmListTmp.length) {//store data at [i] and finish since there is no more ptm to compare with
+                if (varPtmListTmp[i].getType() == ModType.Variable) {
+                    varPtmFiltered.push(varPtmListTmp[i]);
+                }
+                else if (varPtmListTmp[i].getType() == ModType.ProteinVariable) {
+                    protVarPtmFiltered.push(varPtmListTmp[i]);
+                }
+            }
+            else {//search for variable ptm with same range
+                let totalShift: number = varPtmListTmp[i].getShift();
+                while (varPtmListTmp[i].getLeftPos() == varPtmListTmp[k].getLeftPos() && varPtmListTmp[i].getRightPos() == varPtmListTmp[k].getRightPos()) {
+                    totalShift = totalShift + varPtmListTmp[k].getShift();
+                    k++;
+                    if (k >= varPtmListTmp.length) {
+                        break;
+                    }
+                }
+                if (k > i + 1) {//mulitple variable ptm in the same range
+                    unknownMassShiftList.push(new MassShift(varPtmListTmp[i].getLeftPos(), varPtmListTmp[i].getRightPos(), totalShift, "Unknown", totalShift.toString()));
+                }
+                else {
+                    if (varPtmListTmp[i].getType() == ModType.Variable) {
+                        varPtmFiltered.push(varPtmListTmp[i]);
+                    }
+                    else if (varPtmListTmp[i].getType() == ModType.ProteinVariable) {
+                        protVarPtmFiltered.push(varPtmListTmp[i]);
+                    }
+                }
+            }
+            i = k;
+        } 
+    }
+    else {
+        varPtmFiltered = variablePtmsList;
+        protVarPtmFiltered = protVarPtmsList;
+    }
     // Stores all the data in the variables respectively
     window.localStorage.setItem('peakAndIntensityList', JSON.stringify(peakAndIntensityList));
     window.localStorage.setItem('massAndIntensityList', JSON.stringify(massAndIntensityList));
     window.localStorage.setItem('ionType', ionList.toString());
     window.localStorage.setItem('sequence', JSON.stringify(sequence));
     window.localStorage.setItem('fixedPtmList', JSON.stringify(fixedPtmList));
-    window.localStorage.setItem('protVarPtmsList', JSON.stringify(protVarPtmsList));
-    window.localStorage.setItem('variablePtmsList', JSON.stringify(variablePtmsList));
+    window.localStorage.setItem('protVarPtmsList', JSON.stringify(protVarPtmFiltered));
+    window.localStorage.setItem('variablePtmsList', JSON.stringify(varPtmFiltered));
     window.localStorage.setItem('unknownMassShiftList', JSON.stringify(unknownMassShiftList));
     window.localStorage.setItem('precursorMass', precursorMass);
-
+    
     //if some residues are going to be cut off in inspect page, adjust mod pos;
     if (proteoform.getFirstPos() > 0) {
         let newUnknownMassShifts: MassShift[] = [];
         let newProtVarPtms: MassShift[] = [];
         let newVarPtms: MassShift[] = [];
 
-        unknownMassShiftList.forEach((ptm) => {
+        unknownMassShiftList.forEach((ptm: MassShift) => {
             let newL: number = ptm.getLeftPos() - proteoform.getFirstPos();
             let newR: number = ptm.getRightPos() - proteoform.getFirstPos();
             let newPtm = new MassShift(newL, newR, ptm.getShift(), "unknown", ptm.getAnnotation());
             newPtm.setPtmList(ptm.getPtmList());
             newUnknownMassShifts.push(newPtm);
         })
-        protVarPtmsList.forEach((ptm) => {
+        protVarPtmFiltered.forEach((ptm: MassShift) => {
             let newL: number = ptm.getLeftPos() - proteoform.getFirstPos();
             let newR: number = ptm.getRightPos() - proteoform.getFirstPos();
             let newPtm = new MassShift(newL, newR, ptm.getShift(), "Protein variable", ptm.getAnnotation());
             newPtm.setPtmList(ptm.getPtmList());
             newProtVarPtms.push(newPtm);
         })
-        variablePtmsList.forEach((ptm) => {
+        varPtmFiltered.forEach((ptm: MassShift) => {
             let newL: number = ptm.getLeftPos() - proteoform.getFirstPos();
             let newR: number = ptm.getRightPos() - proteoform.getFirstPos();
             let newPtm = new MassShift(newL, newR, ptm.getShift(), "Variable", ptm.getAnnotation());

@@ -38,6 +38,7 @@ ProteoformPtrVec2D gene2DProtModProteoform(const ProteoformPtrVec &db_form_ptrs,
 // Get subproteoform. local_start and local_end are relatively to
 // the start position in the original proteoform
 ProteoformPtr geneSubProteoform(ProteoformPtr proteoform_ptr,
+                                FastaSeqPtr fasta_seq_ptr,
                                 int local_start, int local_end);
 
 ProteoformPtr geneProteoform(ProteoformPtr proteoform, int start_pos, int end_pos,

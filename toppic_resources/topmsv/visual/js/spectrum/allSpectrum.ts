@@ -69,7 +69,6 @@ function addSearchBoxEvent(): void {
   let sequence: string = protein.annotation.annotated_seq;
 
   let p: HTMLParagraphElement = document.createElement('p');
-  p.setAttribute("style", "font-size:16px;");
   let a: HTMLAnchorElement = document.createElement('a');
   a.href = "prsm" + ".html" + "?folder=" + folderName + "&protein=" + prsm.prsm_id;
   //a.innerHTML = protein.sequence_name + " " + "first residue = " + protein.annotation.first_residue_position + " " + "last residue = " + protein.annotation.last_residue_position;

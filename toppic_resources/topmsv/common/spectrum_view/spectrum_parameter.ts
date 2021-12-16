@@ -176,6 +176,10 @@
   getShowLines(): boolean{
     return this.showLines_;
   }
+  getSpecHeight(): number {
+    return this.specHeight_;
+  }
+
   getPadding(): Padding {
     return this.padding_;
   }
@@ -199,6 +203,18 @@
   }
   setIsXZoomAllowed_(allowXZoom: boolean): void {
     this.isXZoomAllowed_ = allowXZoom;
+  }
+  setSVGHeight(newHeight: number): void {
+    this.svgHeight_ = newHeight;
+  }
+  setPadding(left: number, right: number, head: number, bottom: number): void {
+    this.padding_.left = left;
+    this.padding_.right = right;
+    this.padding_.head = head;
+    this.padding_.bottom = bottom;
+  }
+  setSpecHeight(height: number): void {
+    this.specHeight_ = height;
   }
 
   /**
@@ -497,15 +513,23 @@
     //console.log(precMonoMz, this.hlMinMz, this.hlMaxMz);
   }
 
+  setDefaultPadding(): void {
+    this.padding_.head = 20;
+    this.padding_.bottom = 50;
+  }
+
+  setMonoMassPaddding(): void {
+    this.padding_.head = 60;
+    this.padding_.bottom = 75;
+  }
+
   setMonoMassGraph(isMonoMass: boolean): void {
     this.isMonoMassGraph_ = isMonoMass;
     if (isMonoMass) {
-      this.padding_.head = 60;
-      this.padding_.bottom = 75;
+      this.setMonoMassPaddding();
     }
     else {
-      this.padding_.head = 20;
-      this.padding_.bottom = 50;
+      this.setDefaultPadding();
     }
     this.specHeight_ = this.svgHeight_ - this.padding_.head - this.padding_.bottom;
     this.updateScale(this.winMinMz_, this.winMaxMz_, this.winMaxInte_);

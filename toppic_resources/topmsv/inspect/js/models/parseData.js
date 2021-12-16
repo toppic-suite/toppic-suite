@@ -104,6 +104,11 @@ function parseSequenceMassShift(seq) {
         */
         let tempPosition = position - 1;
         if (seq[i] == "[") { //mass shift
+            //make sure it is annotating a residue
+            if (i > 0 && seq[i - 1].charCodeAt(0) < 65 || seq[i - 1].charCodeAt(0) > 90) {
+                alert("Invalid mass shift annotation!");
+                return null;
+            }
             if (isBracketClosed) {
                 isMassShift = true;
                 isBracketClosed = false;
@@ -128,11 +133,14 @@ function parseSequenceMassShift(seq) {
                 }
                 let isVariablePtm = false;
                 //check if this is variable ptm
-                for (let j = 0; j < commonPtmList.length; j++) {
-                    if (massShift == commonPtmList[j].abbr.toUpperCase()) {
-                        let varPtm = new MassShift(tempPosition, tempPosition + 1, commonPtmList[i].mass, "Variable", commonPtmList[j].abbr, new Mod(seq[i], commonPtmList[j].mass, commonPtmList[j].name));
-                        variablePtmsList.push(varPtm);
-                        isVariablePtm = true;
+                let listOfPtm = massShift.split(";");
+                for (let k = 0; k < listOfPtm.length; k++) {
+                    for (let j = 0; j < commonPtmList.length; j++) {
+                        if (listOfPtm[k] == commonPtmList[j].abbr.toUpperCase()) {
+                            let varPtm = new MassShift(tempPosition, tempPosition + 1, commonPtmList[j].mass, "Variable", commonPtmList[j].abbr, new Mod(seq[i], commonPtmList[j].mass, commonPtmList[j].name));
+                            variablePtmsList.push(varPtm);
+                            isVariablePtm = true;
+                        }
                     }
                 }
                 if (!isVariablePtm) {

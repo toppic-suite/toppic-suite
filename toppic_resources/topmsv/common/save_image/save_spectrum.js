@@ -108,6 +108,15 @@ class SaveSpectrum {
                 para.setShowEnvelopes_(document.getElementsByName("show_envelopes")[0].checked);
                 para.setShowIons(document.getElementsByName("show_ions")[0].checked);
                 para.setShowError(document.getElementsByName("show_error")[0].checked);
+                let svg = document.getElementById("popup_ms2_svg");
+                if (svg) {
+                    if (!para.getShowError() && para.getIsMonoMassGraph()) {
+                        svg.setAttribute("viewBox", '0 0 ' + para.getSVGWidth().toString() + ' ' + (para.getSVGHeight() - 40).toString());
+                    }
+                    else {
+                        svg.setAttribute("viewBox", '0 0 ' + para.getSVGWidth().toString() + ' ' + para.getSVGHeight().toString());
+                    }
+                }
                 this.drawModalGraph();
             });
             // Coordinates at which a pop window to be launched to give name for the image to be downloaded

@@ -151,7 +151,7 @@ void XmlGenerator::outputAllPrsms() {
       prot_elements->appendChild(
           anno_xml_util::geneXmlForPrsmList(writer.getDoc(), prsm_ptrs, prot_id, cluster, 
                                                mng_ptr_, true));        */
-    prot_elements->appendChild(anno_prsm::geneAnnoPrsm(writer.getDoc(), prsm_ptrs[i], mng_ptr_, true, false));                                                          
+    prot_elements->appendChild(anno_prsm::geneAnnoPrsmBrief(writer.getDoc(), prsm_ptrs[i], mng_ptr_, true, false));                                                      
   }
   std::cout << std::endl;
   writer.write(prot_elements);

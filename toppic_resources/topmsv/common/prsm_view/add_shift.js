@@ -87,15 +87,15 @@ class AddShift {
     }
     addTabEventListener() {
         //switch between variable ptm and unknown shift tabs
-        $("#var-ptm-link").on("click", function () {
+        $("#var-ptm-link").one("click", function () {
             $("#var-ptm-tab").show();
             $("#unknown-mod-tab").hide();
         });
-        $("#unknown-mod-link").on("click", function () {
+        $("#unknown-mod-link").one("click", function () {
             $("#var-ptm-tab").hide();
             $("#unknown-mod-tab").show();
         });
-        $("#add-unknown-mod-btn").on("click", (e) => {
+        $("#add-unknown-mod-btn").one("click", (e) => {
             this.addUnknownShift(e);
         });
         //event listener for search bar

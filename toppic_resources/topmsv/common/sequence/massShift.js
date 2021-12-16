@@ -1,7 +1,7 @@
 "use strict";
 class MassShift {
     constructor(leftPos, rightPos, massShift, type, annotation, ptm = null) {
-        this.leftPos_ = leftPos;
+        this.leftPos_ = leftPos; //for drawing annotation background
         this.rightPos_ = rightPos;
         this.massShift_ = massShift;
         this.type_ = this.setModType(type);

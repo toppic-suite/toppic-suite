@@ -124,6 +124,7 @@ ProteoformPtr geneProtModProteoform(ProteoformPtr db_form_ptr, ProtModPtr prot_m
 }
 
 ProteoformPtr geneSubProteoform(ProteoformPtr proteoform_ptr, 
+                                FastaSeqPtr fasta_seq_ptr,
                                 int residue_start, int residue_end) {
 
   ResiduePtrVec ori_residues = proteoform_ptr->getResSeqPtr()->getResidues();
@@ -143,8 +144,11 @@ ProteoformPtr geneSubProteoform(ProteoformPtr proteoform_ptr,
   }
 
   ProtModPtr prot_mod_ptr = proteoform_ptr->getProtModPtr();
+  if (residue_start + proteoform_ptr->getStartPos() > 1) {
+    prot_mod_ptr = ProtModBase::getProtModPtr_NONE();
+  }
 
-  return std::make_shared<Proteoform>(proteoform_ptr->getFastaSeqPtr(), prot_mod_ptr,
+  return std::make_shared<Proteoform>(fasta_seq_ptr, prot_mod_ptr,
                                       residue_start + proteoform_ptr->getStartPos(),
                                       residue_end + proteoform_ptr->getStartPos(),
                                       seq_ptr, shift_list);
