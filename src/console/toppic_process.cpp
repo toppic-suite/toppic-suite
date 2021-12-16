@@ -100,6 +100,8 @@ void cleanToppicDir(const std::string &fa_name,
   file_util::delFile(sp_base + "_toppic_proteoform.xml");
   file_util::rename(sp_base + ".toppic_form_cutoff_form",
                     sp_base + "_toppic_proteoform.xml");
+  file_util::rename(sp_base + ".toppic_prsm",
+                    sp_base + "_toppic_prsm.xml");
   if (!keep_temp_files) {
     file_util::cleanPrefix(sp_name, sp_base + ".msalign_");
     file_util::delFile(abs_sp_name + "_index");
