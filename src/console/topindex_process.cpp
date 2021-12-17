@@ -14,7 +14,6 @@
 
 #include <iostream>
 #include <map>
-
 #include "console/topindex_argument.hpp"
 #include "console/topindex_process.hpp"
 
@@ -34,7 +33,6 @@
 #include "filter/index/diag_index.hpp"
 
 namespace toppic{
-
 void TopIndexProcess(std::map<std::string, std::string> &arguments){
   try {
     std::cout << "TopIndex " << Version::getVersion() << std::endl;
@@ -81,6 +79,8 @@ void TopIndexProcess(std::map<std::string, std::string> &arguments){
                                           filter_result_num, thread_num, 
                                           "toppic_multi_filter");
     diag_index::process(diag_filter_mng_ptr);
+
+    base_data::release();
 
     std::cout << "TopIndex - finished." << std::endl;
   } catch (const char* e) {

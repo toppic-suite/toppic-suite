@@ -11,7 +11,6 @@
 //WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //See the License for the specific language governing permissions and
 //limitations under the License.
-
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/version.hpp"
@@ -22,7 +21,6 @@
 #include "console/topdiff_process.hpp"
 
 namespace toppic {
-
 int topDiffProcess(std::map<std::string, std::string> &arguments,
                     std::vector<std::string> &input_file_list) {
   try{
@@ -46,6 +44,8 @@ int topDiffProcess(std::map<std::string, std::string> &arguments,
                                                                            error_tole);
     merge_ptr->process();
     merge_ptr = nullptr;
+
+    base_data::release();
     
     std::cout << "TopDiff - finished." << std::endl;
   } catch (const char* e) {

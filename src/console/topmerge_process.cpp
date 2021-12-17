@@ -11,7 +11,6 @@
 //WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //See the License for the specific language governing permissions and
 //limitations under the License.
-
 #include <iostream>
 #include <iomanip>
 #include <map>
@@ -50,7 +49,6 @@
 #include "visual/json_transformer.hpp"
 
 namespace toppic{
-  
 void copyTopMSV(std::map<std::string, std::string> &arguments) {
   std::string spectrum_file_name = arguments["spectrumFileName"];
   std::string base_name = file_util::basename(spectrum_file_name);
@@ -395,6 +393,7 @@ void TopMergeProcess(std::map<std::string, std::string> & arguments,
         }
         std::cout << "Deleting temporary files - finished." << std::endl; 
       }
+      base_data::release();
 
       std::cout << "TopMerge - finished." << std::endl;
     } catch (const char* e) {
