@@ -11,7 +11,6 @@
 //WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //See the License for the specific language governing permissions and
 //limitations under the License.
-
 #include <map>
 #include <string>
 #include <algorithm>
@@ -69,9 +68,7 @@
 
 #include "console/topmg_argument.hpp"
 #include "console/topmg_process.hpp"
-
 namespace toppic {
-
 void copyTopMSV(std::map<std::string, std::string> &arguments) {
   std::string spectrum_file_name = arguments["spectrumFileName"];
   std::string base_name = file_util::basename(spectrum_file_name);
@@ -495,6 +492,8 @@ int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
     cleanTopmgDir(ori_db_file_name, sp_file_name, keep_temp_files);
   }
   std::cout << "Deleting temporary files - finished." << std::endl; 
+
+  base_data::release();
 
   std::cout << "TopMG finished." << std::endl << std::flush;
   return 0; 
