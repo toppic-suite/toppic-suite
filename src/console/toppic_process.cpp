@@ -22,6 +22,7 @@
 #include "common/base/mod_util.hpp"
 #include "common/util/mem_check.hpp"
 #include "common/util/version.hpp"
+#include "common/base/ptm_util.hpp"
 
 #include "seq/fasta_reader.hpp"
 #include "seq/fasta_util.hpp"
@@ -138,6 +139,7 @@ int TopPIC_testModFile(std::map<std::string, std::string> & arguments) {
 
     if (arguments["residueModFileName"] != "") {
       mod_util::readModTxt(arguments["residueModFileName"]);
+      ptm_util::readPtmTxt(arguments["residueModFileName"]);
     }
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
