@@ -55,7 +55,7 @@ int getMaxThreads(std::string app_name) {//return max thread number based on tot
   std::map<std::string, double> toppic_apps_memory_per_thread {
     {"topfd", 0.5}, 
       {"toppic", 2},
-      {"toppic_filter", 4},
+      {"toppic_filter", 2},
       {"topmg", 4}, 
       {"topmerge", 4}, 
       {"topdiff", 4},
