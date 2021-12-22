@@ -34,13 +34,19 @@ FastaSubSeqPtrVec breakSeq(FastaSeqPtr seq_ptr, int N) {
     for (int i = 0; i <= k; i++) {
       if (N * (i + 1) > seq_len) {
         int sub_seq_len = seq_len - N * i;
-        fasta_seq_vec.push_back(std::make_shared<FastaSubSeq>(seq_ptr, i*N, sub_seq_len));
+        if (i*N < i*N + sub_seq_len) {
+          fasta_seq_vec.push_back(std::make_shared<FastaSubSeq>(seq_ptr, i*N, sub_seq_len));
+        }
       } else {
-        fasta_seq_vec.push_back(std::make_shared<FastaSubSeq>(seq_ptr, i*N, N));
+        if (i*N < i*N + N) {
+          fasta_seq_vec.push_back(std::make_shared<FastaSubSeq>(seq_ptr, i*N, N));
+        }
       }
       if (i != k) {
         if (N * (i + 1.5) < seq_len) {
-          fasta_seq_vec.push_back(std::make_shared<FastaSubSeq>(seq_ptr, i*N + N/2, N));
+          if (i*N + N/2 < i*N + N/2 + N) {
+            fasta_seq_vec.push_back(std::make_shared<FastaSubSeq>(seq_ptr, i*N + N/2, N));
+          }
         }
       }
     }
