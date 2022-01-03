@@ -25,32 +25,21 @@ FastaSubSeqPtrVec breakSeq(FastaSeqPtr seq_ptr) {
 
 FastaSubSeqPtrVec breakSeq(FastaSeqPtr seq_ptr, int N) {
   std::vector<FastaSubSeqPtr> fasta_seq_vec;
-  int seq_len = seq_ptr->getAcidPtmPairLen();
-  if (seq_len < N) {
-    fasta_seq_vec.push_back(std::make_shared<FastaSubSeq>(seq_ptr, 0, seq_len));
-  } 
-  else {
-    int k = seq_len / N;
-    for (int i = 0; i <= k; i++) {
-      if (N * (i + 1) > seq_len) {
-        int sub_seq_len = seq_len - N * i;
-        if (i*N < i*N + sub_seq_len) {
-          fasta_seq_vec.push_back(std::make_shared<FastaSubSeq>(seq_ptr, i*N, sub_seq_len));
-        }
-      } else {
-        if (i*N < i*N + N) {
-          fasta_seq_vec.push_back(std::make_shared<FastaSubSeq>(seq_ptr, i*N, N));
-        }
-      }
-      if (i != k) {
-        if (N * (i + 1.5) < seq_len) {
-          if (i*N + N/2 < i*N + N/2 + N) {
-            fasta_seq_vec.push_back(std::make_shared<FastaSubSeq>(seq_ptr, i*N + N/2, N));
-          }
-        }
-      }
+  int seq_last_pos = seq_ptr->getAcidPtmPairLen() - 1;
+  int sub_bgn_pos = 0;
+  int sub_end_pos = N-1;
+  bool last = false;
+  do {
+    int sub_len = N;
+    if (seq_last_pos <= sub_end_pos) {
+      sub_len = seq_last_pos - sub_bgn_pos + 1;
+      last = true;
     }
+    fasta_seq_vec.push_back(std::make_shared<FastaSubSeq>(seq_ptr, sub_bgn_pos, sub_len));
+    sub_bgn_pos = sub_bgn_pos + N/2;
+    sub_end_pos = sub_end_pos + N/2;
   }
+  while (!last);
   return fasta_seq_vec;
 }
 
