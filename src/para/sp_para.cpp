@@ -21,10 +21,12 @@
 
 namespace toppic {
 
-SpPara::SpPara(std::string activation_name, double ppm) {
+SpPara::SpPara(std::string activation_name, double n_term_label_mass, 
+               double ppm) {
   if (activation_name != "FILE") {
     activation_ptr_ = ActivationBase::getActivationPtrByName(activation_name);
   }
+  n_term_label_mass_ = n_term_label_mass;
   double ppo = ppm * 0.000001;
   peak_tolerance_ptr_ = std::make_shared<PeakTolerance>(ppo); 
 
@@ -46,6 +48,7 @@ SpPara::SpPara(xercesc::DOMElement* element) {
     double offset = xml_dom_util::getDoubleChildValue(list_element, "extend_offset", i);
     ext_offsets_.push_back(offset);
   }
+  n_term_label_mass_ = xml_dom_util::getDoubleChildValue(element, "n_term_label_mass", 0);
   std::string element_name = PeakTolerance::getXmlElementName();
   xercesc::DOMElement* pt_element = xml_dom_util::getChildElement(element, element_name.c_str(), 0);
   peak_tolerance_ptr_ = std::make_shared<PeakTolerance>(pt_element);
@@ -71,6 +74,8 @@ void SpPara::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
     xml_doc->addElement(list_element, "extend_offset", str.c_str());
   }
   element->appendChild(list_element);
+  str = str_util::toString(n_term_label_mass_).c_str();
+  xml_doc->addElement(element, "n_term_label_mass", str.c_str());
   peak_tolerance_ptr_->appendXml(xml_doc, element);
   activation_ptr_->appendNameToXml(xml_doc, element);
   parent->appendChild(element);

@@ -30,7 +30,8 @@ class XmlDOMDocument;
 class SpPara {
  public:
 
-  SpPara(std::string activation_name, double ppm);
+  SpPara(std::string activation_name, double n_term_mod_mass, 
+         double ppm);
 
   explicit SpPara(xercesc::DOMElement* element);
 
@@ -48,6 +49,8 @@ class SpPara {
 
   int getMinPeakNum() {return min_peak_num_;}
 
+  double getNTermLabelMass() {return n_term_label_mass_;}
+
   void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 
   static std::string getXmlElementName() {return "sp_para";}
@@ -64,6 +67,9 @@ class SpPara {
   double extend_min_mass_ = 5000;
 
   std::vector<double> ext_offsets_;
+
+  // n_term_label_mass is for iTRAQ or TMT labeling
+  double n_term_label_mass_ = 0.0;
 
   ActivationPtr activation_ptr_;
 
