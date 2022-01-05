@@ -561,13 +561,13 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
 
   for (size_t k = 0; k < spec_file_lst.size(); k++) {
     std::string sp_file_name = spec_file_lst[k];
-    //cleanToppicDir(ori_db_file_name, sp_file_name, keep_temp_files);
+    cleanToppicDir(ori_db_file_name, sp_file_name, keep_temp_files);
   }
 
   //if (spec_file_lst.size() > 1 && arguments["combinedOutputName"] != "") {
   if (arguments["combinedOutputName"] != "") {
     std::string sp_file_name = full_combined_name + "_ms2.msalign";
-   // cleanToppicDir(ori_db_file_name, sp_file_name, keep_temp_files);
+    cleanToppicDir(ori_db_file_name, sp_file_name, keep_temp_files);
   }
   std::cout << "Deleting temporary files - finished." << std::endl;
   
