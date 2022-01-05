@@ -348,7 +348,11 @@ std::string db_file_name = ori_db_file_name + "_idx" + file_util::getFileSeparat
 
     std::cout << "Outputting PrSM table - started." << std::endl;
     PrsmMatchTableWriterPtr table_out
-        = std::make_shared<PrsmMatchTableWriter>(prsm_para_ptr, argu_str, "topmg_prsm_cutoff", "_topmg_prsm.tsv");
+        = std::make_shared<PrsmMatchTableWriter>(prsm_para_ptr, argu_str, "topmg_prsm_cutoff", "_topmg_prsm.tsv", false);
+    table_out->write();
+
+    table_out->setOutputName("_topmg_prsm_with_multiple_matches.tsv");
+    table_out->setWriteMultiMatches(true);
     table_out->write();
     table_out = nullptr;
     std::cout << "Outputting PrSM table - finished." << std::endl;
@@ -384,8 +388,13 @@ std::string db_file_name = ori_db_file_name + "_idx" + file_util::getFileSeparat
     std::cout << "Outputting proteoform table - started." << std::endl;
     PrsmMatchTableWriterPtr form_out
         = std::make_shared<PrsmMatchTableWriter>(prsm_para_ptr, argu_str,
-                                            "topmg_form_cutoff_form", "_topmg_proteoform.tsv");
+                                            "topmg_form_cutoff_form", "_topmg_proteoform.tsv", false);
     form_out->write();
+
+    form_out->setOutputName("_topmg_proteoform_with_multiple_matches.tsv");
+    form_out->setWriteMultiMatches(true);
+    form_out->write();
+
     form_out = nullptr;
     std::cout << "Outputting proteoform table - finished." << std::endl;
 
