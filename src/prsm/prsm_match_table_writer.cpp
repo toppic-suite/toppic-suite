@@ -32,7 +32,7 @@ PrsmMatchTableWriter::PrsmMatchTableWriter(PrsmParaPtr prsm_para_ptr,
     prsm_para_ptr_(prsm_para_ptr),
     input_file_ext_(input_file_ext),
     argu_str_(argu_str),
-    write_multiple_matches_(write_multiple_matches_),
+    write_multiple_matches_(write_multiple_matches),
     output_file_ext_(output_file_ext) {
       std::string db_file_name = prsm_para_ptr_->getOriDbName() + "_idx" 
         + file_util::getFileSeparator() + prsm_para_ptr_->getSearchDbFileName();
