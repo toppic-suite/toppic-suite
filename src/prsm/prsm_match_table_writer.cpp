@@ -27,10 +27,12 @@ namespace toppic {
 PrsmMatchTableWriter::PrsmMatchTableWriter(PrsmParaPtr prsm_para_ptr, 
                                  std::string argu_str,
                                  const std::string &input_file_ext, 
-                                 const std::string &output_file_ext):
+                                 const std::string &output_file_ext, 
+                                 bool write_multiple_matches):
     prsm_para_ptr_(prsm_para_ptr),
     input_file_ext_(input_file_ext),
     argu_str_(argu_str),
+    write_multiple_matches_(write_multiple_matches_),
     output_file_ext_(output_file_ext) {
       std::string db_file_name = prsm_para_ptr_->getOriDbName() + "_idx" 
         + file_util::getFileSeparator() + prsm_para_ptr_->getSearchDbFileName();
@@ -208,50 +210,52 @@ void PrsmMatchTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
     file << empty_str << std::endl;
   }
 
-  // print out other matches
-  for (size_t i = 0; i < matches.size(); i++) {
-    FastaSeqPtr seq_ptr = matches[i].first;
-    int seq_pos = matches[i].second;
-    if (seq_ptr->getName() == form_ptr->getSeqName()) {
-      continue;
+  if (write_multiple_matches_) {
+    // print out other matches
+    for (size_t i = 0; i < matches.size(); i++) {
+      FastaSeqPtr seq_ptr = matches[i].first;
+      int seq_pos = matches[i].second;
+      if (seq_ptr->getName() == form_ptr->getSeqName()) {
+        continue;
+      }
+
+    file << prsm_ptr->getFileName() << delim
+        << prsm_ptr->getPrsmId() << delim
+        << delim
+        << delim
+        << delim
+        << delim
+        << delim
+        << delim
+        << delim
+        << delim
+        << delim;
+
+      // feature
+      file << delim
+        << delim
+        << delim
+        << delim;
+
+      file << seq_ptr->getName() << delim
+        << seq_ptr->getDesc() << delim
+        << (seq_pos + 1) << delim
+        << (seq_pos + form_ptr->getLen()) << delim
+        << seq_ptr->getAcidReplaceStr(form_ptr->getStartPos(), form_ptr->getEndPos()) << delim
+        << delim
+        << delim
+        << delim
+        << delim
+        << delim
+        << delim
+        << delim
+        << delim
+        << delim;
+
+      // fdr
+      file << delim
+        << std::endl;
     }
-
-  file << prsm_ptr->getFileName() << delim
-      << prsm_ptr->getPrsmId() << delim
-      << delim
-      << delim
-      << delim
-      << delim
-      << delim
-      << delim
-      << delim
-      << delim
-      << delim;
-
-    // feature
-    file << delim
-      << delim
-      << delim
-      << delim;
-
-    file << seq_ptr->getName() << delim
-      << seq_ptr->getDesc() << delim
-      << (seq_pos + 1) << delim
-      << (seq_pos + form_ptr->getLen()) << delim
-      << seq_ptr->getAcidReplaceStr(form_ptr->getStartPos(), form_ptr->getEndPos()) << delim
-      << delim
-      << delim
-      << delim
-      << delim
-      << delim
-      << delim
-      << delim
-      << delim
-      << delim;
-
-    // fdr
-    file << delim
-      << std::endl;
   }
 }
 

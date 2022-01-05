@@ -26,11 +26,16 @@ class PrsmMatchTableWriter {
   PrsmMatchTableWriter(PrsmParaPtr prsm_para_ptr,  
                        std::string argu_str,
                        const std::string &input_file_ext, 
-                       const std::string &output_file_ext);
+                       const std::string &output_file_ext,
+                       bool write_multiple_matches);
 
   void write();
 
   void writePrsm(std::ofstream &file, PrsmPtr prsm_ptr);
+
+  void setOutputName(std::string output_file_ext) {output_file_ext_ = output_file_ext;}
+
+  void setWriteMultiMatches(bool write_multiple_matches) {write_multiple_matches_ = write_multiple_matches;}
 
  private:
   PrsmParaPtr prsm_para_ptr_;
@@ -42,6 +47,8 @@ class PrsmMatchTableWriter {
   std::string output_file_ext_;
 
   SearchFastaMatchPtr search_match_ptr_;
+
+  bool write_multiple_matches_;
 };
 
 typedef std::shared_ptr<PrsmMatchTableWriter> PrsmMatchTableWriterPtr;
