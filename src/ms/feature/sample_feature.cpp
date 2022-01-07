@@ -62,6 +62,8 @@ SampleFeature::SampleFeature(FracFeaturePtrVec &frac_features, int id) {
   max_charge_ = first_ft->getMaxCharge();
   min_frac_id_ = first_ft->getFracId();
   max_frac_id_ = first_ft->getFracId();
+  time_apex_ = first_ft->getTimeApex();
+
   for (size_t i = 1; i < frac_features.size(); i++) {
     FracFeaturePtr cur_ft = frac_features[i];
     intensity_ = intensity_+ cur_ft->getIntensity();
