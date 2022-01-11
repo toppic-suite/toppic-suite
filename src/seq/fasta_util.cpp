@@ -165,15 +165,20 @@ void dbPreprocess(const std::string &ori_db_file_name,
   std::string standard_db_file_name = ori_db_file_name + "_idx" 
     + file_util::getFileSeparator() 
     + file_util::filenameFromEntirePath(ori_db_file_name) + "_standard";  
-  if (!file_util::exists(standard_db_file_name)) {
-    generateStandardDb(ori_db_file_name, standard_db_file_name);
-  }
 
   // Generate new database file
   std::string new_db_file_name = ori_db_file_name + "_idx" 
     + file_util::getFileSeparator() 
     + file_util::filenameFromEntirePath(file_name);
   
+  if (standard_db_file_name.size() > 200 || new_db_file_name.size() > 200) {
+    LOG_ERROR("Database file name is too long. Please rename it and try running again.");
+    exit(1);
+  }
+  if (!file_util::exists(standard_db_file_name)) {
+    generateStandardDb(ori_db_file_name, standard_db_file_name);
+  }
+
   if (decoy) {
     if (!file_util::exists(new_db_file_name)) {
       generateShuffleDb(standard_db_file_name, new_db_file_name);
