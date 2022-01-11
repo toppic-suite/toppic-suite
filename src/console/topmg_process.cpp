@@ -441,6 +441,18 @@ int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
   xercesc::XMLPlatformUtils::Initialize(); 
   TopMG_testModFile(arguments);
 
+  //check if a combined file name given in -c parameter is the same as one of the input spectrum file. If so, throw error.
+  if (arguments["combinedOutputName"] != "") {
+    std::string merged_file_name = arguments["combinedOutputName"] + "_ms2.msalign"; 
+    for (size_t k = 0; k < spec_file_lst.size(); k++) {
+      if (merged_file_name == spec_file_lst[k]) {
+        std::string raw_file_name = spec_file_lst[k].substr(0, spec_file_lst[k].find("_ms2.msalign"));
+        LOG_ERROR("A combined file name cannot be the same as one of the input file names '" << raw_file_name << "'. Please choose a different name for a combined file and retry.");
+        return 1;
+      }
+    }
+  }
+
   for (size_t k = 0; k < spec_file_lst.size(); k++) {
     std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));
     std::string start_time = buf;
