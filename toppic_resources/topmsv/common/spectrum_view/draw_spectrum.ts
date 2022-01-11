@@ -299,10 +299,13 @@ function addDatatoAxis(svg: any, para: SpectrumViewParameters){
     // Get the default tick height and calculate the actual tick height position
     tickHeight = para.getTickHeight();
     let data: number = i*tickHeight ;
-    if(data <= 1 && data != 0) data = parseFloat(data.toFixed(1));
+
+    if (data <= 1 && data != 0) {
+      data = parseFloat(data.toFixed(3));
+    }
+
     let tickInt: number = i*tickHeight * para.getDataMaxInte() /100;
     let y: number = para.getPeakYPos(tickInt);
-
     if(!isNaN(y) && y >= para.getPadding().head)
     {
       yAxisData.append("text").attr("class","ytext").attr("x",para.getPadding().left - para.getTickLength())

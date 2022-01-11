@@ -40,22 +40,22 @@ class DataTable {
         });
         //mono mz click
         $(".row_mono_mz").click((e) => {
-            let parentId = $(e.currentTarget).parent().parent().prop('id');
             /*	get Mono M/z value till 3 decimal values	*/
             let monoMz = parseFloat(parseFloat(e.currentTarget.innerHTML).toFixed(3));
-            let parentDiv = document.getElementById(parentId);
-            if (!parentDiv) {
-                return;
-            }
-            let scanNumDiv = parentDiv.firstChild;
-            if (!scanNumDiv) {
-                return;
-            }
-            let scanNum = scanNumDiv.innerHTML;
-            if (scanNum === null) {
-                console.error("ERROR: scan number is null");
-            }
             if (typeof ms2ScanList != "undefined") {
+                let parentId = $(e.currentTarget).parent().parent().prop('id'); //ion type
+                let parentDiv = document.getElementById(parentId);
+                if (!parentDiv) {
+                    return;
+                }
+                let scanNumDiv = parentDiv.firstChild;
+                if (!scanNumDiv) {
+                    return;
+                }
+                let scanNum = scanNumDiv.innerHTML;
+                if (scanNum === null) {
+                    console.error("ERROR: scan number is null");
+                }
                 for (let i = 0; i < ms2ScanList.length; i++) {
                     let listId = "ms2_svg_div_graphlist_" + i;
                     let graphId = this.specSvgId_ + i;
@@ -109,18 +109,21 @@ class DataTable {
                 let graphElement = document.getElementById(graphId);
                 let monoListElement = document.getElementById(monolistId);
                 let monoGraphElement = document.getElementById(monoGraphId);
-                if (listElement) {
-                    listElement.classList.add("active");
-                }
-                if (graphElement) {
-                    graphElement.style.display = "";
-                }
-                if (monoListElement) {
-                    monoListElement.classList.remove("active");
-                }
-                if (monoGraphElement) {
-                    monoGraphElement.style.display = "none";
-                }
+                //console.log("graphId", graphId);
+                //console.log("monolistId", monolistId);
+                switchTab("graphlist");
+                /* if (listElement) {
+                   listElement.classList.add("active");
+                 }
+                 if (graphElement) {
+                   graphElement.style.display = "";
+                 }
+                 if (monoListElement) {
+                   monoListElement.classList.remove("active");
+                 }
+                 if (monoGraphElement) {
+                   monoGraphElement.style.display = "none";
+                 }*/
                 let spGraph = this.ms2GraphList_[0];
                 // set monoMz to do
                 spGraph.getPara().updateMzRange(monoMz);
@@ -304,7 +307,7 @@ class DataTable {
                         console.error("ERROR: mono peak does not have mono mass");
                         return;
                     }
-                    td.innerHTML = monoMass.toString();
+                    td.innerHTML = FormatUtil.formatFloat(monoMass.toString(), "dataTable");
                     td.setAttribute("class", "row_monoMass");
                 }
                 if (i == 3) {
@@ -312,7 +315,7 @@ class DataTable {
                     let a = document.createElement('a');
                     a.href = "#!";
                     a.className = "row_mono_mz";
-                    a.innerHTML = peak.getMonoMz().toString();
+                    a.innerHTML = FormatUtil.formatFloat(peak.getMonoMz().toString(), "dataTable");
                     td.appendChild(a);
                 }
                 if (i == 4) {
@@ -332,7 +335,7 @@ class DataTable {
                 }
                 if (matchedPeaks && matchedPeakPair) {
                     if (i == 6) {
-                        td.innerHTML = matchedPeakPair.getTheoMass().toString();
+                        td.innerHTML = FormatUtil.formatFloat(matchedPeakPair.getTheoMass().toString(), "dataTable");
                     }
                     if (i == 7) {
                         let ionPos = matchedPeakPair.getIon().getId();
@@ -360,7 +363,7 @@ class DataTable {
                             console.error("ERROR: massError is not provided");
                         }
                         else {
-                            td.innerHTML = massError.toString();
+                            td.innerHTML = FormatUtil.formatFloat(massError.toString(), "dataTable");
                         }
                     }
                     if (i == 10) {
@@ -370,7 +373,7 @@ class DataTable {
                             console.error("ERROR: ppmError is not provided");
                         }
                         else {
-                            td.innerHTML = ppmError.toString();
+                            td.innerHTML = FormatUtil.formatFloat(ppmError.toString(), "ppmError");
                         }
                     }
                 }

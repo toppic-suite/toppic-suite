@@ -27,10 +27,11 @@ class AddShift {
   }
 
   addUnknownShift(e: JQuery.ClickEvent<HTMLElement, undefined, HTMLElement, HTMLElement>): void {
-    let ptmDiv: HTMLElement | null = document.getElementById("tooltip-pop");
+    /*let ptmDiv: HTMLElement | null = document.getElementById("tooltip-pop");
     if (ptmDiv) {
       ptmDiv.style.display = "none";
-    }
+    }*/
+    $("#tooltip-pop").modal('hide');
     let val: string | number | string[] | undefined = $("#mass-value").val();
 
     if (typeof(val) != "string") {
@@ -117,10 +118,11 @@ class AddShift {
   }
 
   applyShift(ptmIdx: number, letter: string, pos: number): void {
-    let ptmDiv: HTMLElement | null = document.getElementById("tooltip-pop");
+    /*let ptmDiv: HTMLElement | null = document.getElementById("tooltip-pop");
     if (ptmDiv) {
       ptmDiv.style.display = "none";
-    }
+    }*/
+    $("#tooltip-pop").modal('hide');
     let mass: number = commonPtmList[ptmIdx].mass;
     let unknownMassShiftList: MassShift[] = [];
     let protVarPtmsList: MassShift[] = [];
@@ -209,10 +211,8 @@ class AddShift {
 
     let ptmDiv: HTMLElement | null = document.getElementById("tooltip-pop");
     if (ptmDiv != null) {
-      ptmDiv.style.display = "";
+      $("#tooltip-pop").modal('show');
       ptmDiv.style.opacity = "1";
-      ptmDiv.style.left = (d3.event.pageX - 30) + "px";
-      ptmDiv.style.top = (d3.event.pageY - 45) + "px";
 
       $('#ptm-list').empty();
       $('#applied-ptm-list').empty();
@@ -221,6 +221,8 @@ class AddShift {
         let entry: JQuery<HTMLLIElement> = $("<li></li>");
         entry.text(ptm.abbr + " (" + ptm.name + "); " + ptm.mass);
         entry.attr("id", "ptm" + idx);
+        entry.attr("class", "text-center");
+        entry.css("cursor", "pointer");
         entry.on("click", () => {this.applyShift(idx, letter, pos)});
         $("#ptm-list").append(entry);
       })
@@ -229,6 +231,8 @@ class AddShift {
         let entry: JQuery<HTMLLIElement> = $("<li></li>");
         entry.text(commonPtmList[ptmIdx].abbr + " (" + commonPtmList[ptmIdx].name + "); " + commonPtmList[ptmIdx].mass);
         entry.attr("id", "applied-ptm" + commonPtmList[ptmIdx].abbr);
+        entry.attr("class", "text-center");
+        entry.css("cursor", "pointer");
         entry.on("click", () => {this.applyShift(ptmIdx, letter, pos)});
         $("#applied-ptm-list").append(entry);
       })

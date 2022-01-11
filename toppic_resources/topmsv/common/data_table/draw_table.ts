@@ -44,65 +44,67 @@
         });
         //mono mz click
         $(".row_mono_mz").click((e) => {
-            let parentId: string = $(e.currentTarget).parent().parent().prop('id');
             /*	get Mono M/z value till 3 decimal values	*/
             let monoMz: number = parseFloat(parseFloat(e.currentTarget.innerHTML).toFixed(3));
-            let parentDiv = document.getElementById(parentId);
-            if (!parentDiv) {
-                return;
-            }
-            let scanNumDiv: HTMLElement | null = <HTMLElement>parentDiv.firstChild;
-            if (!scanNumDiv) {
-                return;
-            }
-            let scanNum: string = scanNumDiv.innerHTML;
-            if (scanNum === null) {
-                console.error("ERROR: scan number is null");
-            }
+
             if (typeof ms2ScanList != "undefined") {
-                for (let i = 0; i < ms2ScanList.length; i++) {
-                    let listId: string = "ms2_svg_div_graphlist_" + i;
-                    let graphId: string = this.specSvgId_ + i;
-                    let monolistId: string = "ms2_svg_div_monographlist_" + i;
-                    let monoGraphId: string = this.monoMassSvgId_ + i;
-                    let listElement: HTMLElement | null = document.getElementById(listId);
-                    let graphElement: HTMLElement | null = document.getElementById(graphId);
-                    let monoListElement: HTMLElement | null = document.getElementById(monolistId);
-                    let monoGraphElement: HTMLElement | null = document.getElementById(monoGraphId);
-                    if (scanNum == ms2ScanList[i]) {
-                      if (listElement) {
-                        listElement.classList.add("active");
-                      }
-                      if (graphElement) {
-                        graphElement.style.display = "";
-                      }
-                      if (monoListElement) {
-                        monoListElement.classList.remove("active");
-                      }
-                      if (monoGraphElement) {
-                        monoGraphElement.style.display = "none";
-                      }
-                      let spGraph = this.ms2GraphList_[i];
-                      // set monoMz to do
-                      spGraph.getPara().updateMzRange(monoMz);
-                      spGraph.redraw();
+              let parentId: string = $(e.currentTarget).parent().parent().prop('id');//ion type
+
+              let parentDiv = document.getElementById(parentId);
+              if (!parentDiv) {
+                  return;
+              }
+              let scanNumDiv: HTMLElement | null = <HTMLElement>parentDiv.firstChild;
+              if (!scanNumDiv) {
+                  return;
+              }
+              let scanNum: string = scanNumDiv.innerHTML;
+              if (scanNum === null) {
+                  console.error("ERROR: scan number is null");
+              }
+              for (let i = 0; i < ms2ScanList.length; i++) {
+                  let listId: string = "ms2_svg_div_graphlist_" + i;
+                  let graphId: string = this.specSvgId_ + i;
+                  let monolistId: string = "ms2_svg_div_monographlist_" + i;
+                  let monoGraphId: string = this.monoMassSvgId_ + i;
+                  let listElement: HTMLElement | null = document.getElementById(listId);
+                  let graphElement: HTMLElement | null = document.getElementById(graphId);
+                  let monoListElement: HTMLElement | null = document.getElementById(monolistId);
+                  let monoGraphElement: HTMLElement | null = document.getElementById(monoGraphId);
+                  if (scanNum == ms2ScanList[i]) {
+                    if (listElement) {
+                      listElement.classList.add("active");
                     }
-                    else {
-                      if (listElement) {
-                        listElement.classList.remove("active");
-                      }
-                      if (graphElement) {
-                        graphElement.style.display = "none";
-                      }
-                      if (monoListElement) {
-                        monoListElement.classList.remove("active");
-                      }
-                      if (monoGraphElement) {
-                        monoGraphElement.style.display = "none";
-                      }
+                    if (graphElement) {
+                      graphElement.style.display = "";
                     }
-                }
-                showMs2Graph();
+                    if (monoListElement) {
+                      monoListElement.classList.remove("active");
+                    }
+                    if (monoGraphElement) {
+                      monoGraphElement.style.display = "none";
+                    }
+                    let spGraph = this.ms2GraphList_[i];
+                    // set monoMz to do
+                    spGraph.getPara().updateMzRange(monoMz);
+                    spGraph.redraw();
+                  }
+                  else {
+                    if (listElement) {
+                      listElement.classList.remove("active");
+                    }
+                    if (graphElement) {
+                      graphElement.style.display = "none";
+                    }
+                    if (monoListElement) {
+                      monoListElement.classList.remove("active");
+                    }
+                    if (monoGraphElement) {
+                      monoGraphElement.style.display = "none";
+                    }
+                  }
+              }
+              showMs2Graph();
             }
             else {
               let listId = "ms2_svg_div_graphlist_0";
@@ -113,7 +115,11 @@
               let graphElement = document.getElementById(graphId);
               let monoListElement = document.getElementById(monolistId);
               let monoGraphElement = document.getElementById(monoGraphId);
-              if (listElement) {
+              //console.log("graphId", graphId);
+              //console.log("monolistId", monolistId);
+              switchTab("graphlist");
+
+             /* if (listElement) {
                 listElement.classList.add("active");
               }
               if (graphElement) {
@@ -124,7 +130,7 @@
               }
               if (monoGraphElement) {
                 monoGraphElement.style.display = "none";
-              }
+              }*/
               let spGraph = this.ms2GraphList_[0];
               // set monoMz to do
               spGraph.getPara().updateMzRange(monoMz);
@@ -312,7 +318,7 @@
               console.error("ERROR: mono peak does not have mono mass");
               return;
             }
-            td.innerHTML = monoMass.toString();
+            td.innerHTML = FormatUtil.formatFloat(monoMass.toString(), "dataTable");
             td.setAttribute("class", "row_monoMass");
           }
           if (i == 3) {
@@ -320,7 +326,7 @@
             let a: HTMLAnchorElement = document.createElement('a');
             a.href = "#!";
             a.className = "row_mono_mz";
-            a.innerHTML = peak.getMonoMz().toString();
+            a.innerHTML = FormatUtil.formatFloat(peak.getMonoMz().toString(), "dataTable");
             td.appendChild(a);
           }
           if (i == 4) {
@@ -340,7 +346,7 @@
           }
           if (matchedPeaks && matchedPeakPair) {
             if (i == 6) {
-              td.innerHTML = matchedPeakPair.getTheoMass().toString();
+              td.innerHTML = FormatUtil.formatFloat(matchedPeakPair.getTheoMass().toString(), "dataTable");
             }
             if (i == 7) {
               let ionPos: string = matchedPeakPair.getIon().getId();
@@ -368,7 +374,7 @@
                 console.error("ERROR: massError is not provided");
               }
               else {
-                  td.innerHTML = massError.toString();
+                  td.innerHTML = FormatUtil.formatFloat(massError.toString(), "dataTable");
               }
             }
             if (i == 10) {
@@ -378,7 +384,7 @@
                 console.error("ERROR: ppmError is not provided");
               }
               else {
-                  td.innerHTML = ppmError.toString();
+                  td.innerHTML = FormatUtil.formatFloat(ppmError.toString(), "ppmError");
               }
             }
           }

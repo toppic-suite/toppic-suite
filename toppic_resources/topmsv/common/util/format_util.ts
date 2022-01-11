@@ -7,13 +7,15 @@ class FormatUtil {
       "massDiff": 3,
       "massShift": 3,
       "precMz": 3,
-      "precMass": 3
+      "precMass": 3,
+      "ppmError": 2,
+      "dataTable":4
     };
 
     if (typeof(number) == "string") {
         number = parseFloat(number);
         if (isNaN(number)) {
-          console.error("ERROR: invalid number passed for formating");
+          console.error("ERROR: invalid number", number, " passed for formating");
           return "-1";
         }
     }
