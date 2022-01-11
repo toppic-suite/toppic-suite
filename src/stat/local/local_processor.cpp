@@ -332,7 +332,7 @@ ProteoformPtr LocalProcessor::onePtmLocalize(ProteoformPtr base_form_ptr,
 bool massShiftOverlap(ProteoformPtr form_ptr_1, ProteoformPtr form_ptr_2) {
   MassShiftPtrVec shift_ptr_vec_1 = form_ptr_1->getMassShiftPtrVec(AlterType::UNEXPECTED);
   std::sort(shift_ptr_vec_1.begin(), shift_ptr_vec_1.end(), MassShift::cmpPosInc);
-  MassShiftPtrVec shift_ptr_vec_2 = form_ptr_2->getMassShiftPtrVec(AlterType::UNEXPECTED);
+  MassShiftPtrVec shift_ptr_vec_2 = form_ptr_2->getMassShiftPtrVec(AlterType::VARIABLE);
   std::sort(shift_ptr_vec_2.begin(), shift_ptr_vec_2.end(), MassShift::cmpPosInc);
   if (shift_ptr_vec_1.size() != 2 || shift_ptr_vec_2.size() != 2) {
     LOG_ERROR("Mass shift number is incorrect!");
