@@ -282,8 +282,9 @@ function addDatatoAxis(svg, para) {
         // Get the default tick height and calculate the actual tick height position
         tickHeight = para.getTickHeight();
         let data = i * tickHeight;
-        if (data <= 1 && data != 0)
-            data = parseFloat(data.toFixed(1));
+        if (data <= 1 && data != 0) {
+            data = parseFloat(data.toFixed(3));
+        }
         let tickInt = i * tickHeight * para.getDataMaxInte() / 100;
         let y = para.getPeakYPos(tickInt);
         if (!isNaN(y) && y >= para.getPadding().head) {

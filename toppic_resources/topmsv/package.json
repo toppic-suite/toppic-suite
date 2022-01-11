@@ -4,6 +4,8 @@
   "description": "Provide external libraries for topmsv, files will be located in node_modules.",
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.14.0",
+    "@popperjs/core": "^2.11.2",
+    "@types/bootstrap": "^5.1.8",
     "@types/d3": "^5.16.0",
     "@types/jquery": "^3.5.6",
     "bootstrap": "^4.5.0",
