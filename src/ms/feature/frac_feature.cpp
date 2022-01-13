@@ -102,6 +102,7 @@ FracFeature::FracFeature(XmlDOMElement* element) {
   intensity_ = xml_dom_util::getDoubleChildValue(element, "intensity", 0);
   time_begin_ = xml_dom_util::getDoubleChildValue(element, "time_begin", 0);
   time_end_ = xml_dom_util::getDoubleChildValue(element, "time_end", 0);
+  time_apex_ = xml_dom_util::getDoubleChildValue(element, "time_apex", 0);
   scan_begin_ = xml_dom_util::getIntChildValue(element, "scan_begin", 0);
   scan_end_ = xml_dom_util::getIntChildValue(element, "scan_end", 0);
   min_charge_ = xml_dom_util::getIntChildValue(element, "min_charge", 0);
@@ -142,6 +143,8 @@ XmlDOMElement* FracFeature::toXmlElement(XmlDOMDocument* xml_doc) {
   xml_doc->addElement(element, "time_begin", str.c_str());
   str = str_util::toString(time_end_);
   xml_doc->addElement(element, "time_end", str.c_str());
+  str = str_util::toString(time_apex_);
+  xml_doc->addElement(element, "time_apex", str.c_str());
   str = str_util::toString(scan_begin_);
   xml_doc->addElement(element, "scan_begin", str.c_str());
   str = str_util::toString(scan_end_);

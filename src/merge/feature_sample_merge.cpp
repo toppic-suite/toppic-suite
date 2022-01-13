@@ -351,10 +351,13 @@ void FeatureSampleMerge::outputTable(FeaturePrsmPtrVec2D &table,
     << "Last residue" << delim
     << "Proteoform" << delim
     << "Precursor mass" << delim
-    << "Match " << delim;
+    << "# matched samples" << delim
+    << "# matched samples with MS/MS ID" << delim;
 
   for (int i = 0; i < sample_num; i++) {
-    file << input_file_names_[i] << " Abundance" << delim
+    file 
+      << input_file_names_[i] << " Match type" << delim
+      << input_file_names_[i] << " Abundance" << delim
       << input_file_names_[i] << " Spectrum id" << delim
       << input_file_names_[i] << " Retention time begin" << delim
       << input_file_names_[i] << " Retention time end" << delim
@@ -371,26 +374,32 @@ void FeatureSampleMerge::outputTable(FeaturePrsmPtrVec2D &table,
       << (feature_ptr->getLastResidue() + 1) << delim
       << feature_ptr->getProteoform() << delim
       << feature_ptr->getPrecMass() << delim;
-    bool match = true;
+    int sample_match_num = 0; 
+    int sample_id_match_num = 0;
     for (int j = 0; j < sample_num; j++) {
-      if (table[i][j] == nullptr) {
-        match = false;
-        break;
+      if (table[i][j] != nullptr) {
+        sample_match_num ++;
+        if (table[i][j]->getMs2Id() >= 0) {
+          sample_id_match_num ++;
+        }
       }
     }
-    if (match) {
-      file << "Match" << delim;
+    file << sample_match_num << delim << sample_id_match_num << delim;
+    if (sample_match_num == sample_num) {
       match_num = match_num + 1;
-    }
-    else {
-      file << "No match" << delim;
     }
     for (int j = 0; j < sample_num; j++) {
       FeaturePrsmPtr sample_feature = table[i][j];
       if (sample_feature == nullptr) {
-        file << delim << delim << delim << delim << delim;
+        file << "No match" << delim << delim << delim << delim << delim << delim;
       }
       else {
+        if (sample_feature->getMs2Id()>= 0) {
+          file << "Match with MS/MS ID" << delim;
+        }
+        else {
+          file << "Match without MS/MS ID" << delim; 
+        }
         file <<  std::setprecision(3) << std::scientific << sample_feature->getIntensity() << delim;
         if (sample_feature->getMs2Id()>= 0) {
           file << std::fixed << sample_feature->getMs2Id() << delim;

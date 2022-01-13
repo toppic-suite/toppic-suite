@@ -11,7 +11,6 @@
 //WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //See the License for the specific language governing permissions and
 //limitations under the License.
-
 #include "common/base/base_data.hpp"
 #include "common/util/version.hpp"
 
@@ -20,7 +19,6 @@
 #include "console/toppic_argument.hpp"
 
 namespace toppic {
-
 int topconvertProcess(std::map<std::string, std::string> & arguments) {
   try {
     std::string resource_dir = arguments["resourceDir"];
@@ -70,6 +68,7 @@ int topconvert(std::map<std::string, std::string> & arguments,
       return 1;
     }
   }
+  base_data::release();
 
   std::cout << "TopConvert finished." << std::endl << std::flush;
 

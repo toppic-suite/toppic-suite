@@ -11,7 +11,6 @@
 //WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //See the License for the specific language governing permissions and
 //limitations under the License.
-
 #include <map>
 #include <string>
 #include <algorithm>
@@ -69,9 +68,7 @@
 
 #include "console/topmg_argument.hpp"
 #include "console/topmg_process.hpp"
-
 namespace toppic {
-
 void copyTopMSV(std::map<std::string, std::string> &arguments) {
   std::string spectrum_file_name = arguments["spectrumFileName"];
   std::string base_name = file_util::basename(spectrum_file_name);
@@ -104,7 +101,8 @@ void cleanTopmgDir(const std::string &fa_name,
   file_util::delFile(sp_base + "_topmg_proteoform.xml");
   file_util::rename(sp_base + ".topmg_form_cutoff_form", 
                     sp_base + "_topmg_proteoform.xml");
-
+  file_util::rename(sp_base + ".topmg_prsm",
+                    sp_base + "_topmg_prsm.xml");
   if (!keep_temp_files) {
     //file_util::cleanPrefix(fa_name, fa_base + "_");
     file_util::cleanPrefix(sp_name, sp_base + ".msalign_");
@@ -282,7 +280,7 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
     int n_top = std::stoi(arguments["numOfTopPrsms"]);
 
     std::cout << "Top PrSM selecting - started" << std::endl;
-    prsm_top_selector::process(sp_file_name, "topmg_evalue", "topmg_top", n_top);
+    prsm_top_selector::process(sp_file_name, "topmg_evalue", "topmg_prsm", n_top);
     std::cout << "Top PrSM selecting - finished." << std::endl;
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
@@ -311,14 +309,14 @@ std::string db_file_name = ori_db_file_name + "_idx" + file_util::getFileSeparat
       // TopFD msalign file with feature ID
       ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();
       prsm_feature_cluster::process(sp_file_name,
-                                    "topmg_top",
+                                    "topmg_prsm",
                                     "topmg_cluster",
                                     form_error_tole);
     } 
     else {
       prsm_simple_cluster::process(db_file_name, 
                                    sp_file_name,
-                                   "topmg_top", 
+                                   "topmg_prsm", 
                                    prsm_para_ptr->getFixModPtrVec(),
                                    "topmg_cluster", 
                                    form_error_tole);
@@ -350,7 +348,11 @@ std::string db_file_name = ori_db_file_name + "_idx" + file_util::getFileSeparat
 
     std::cout << "Outputting PrSM table - started." << std::endl;
     PrsmMatchTableWriterPtr table_out
-        = std::make_shared<PrsmMatchTableWriter>(prsm_para_ptr, argu_str, "topmg_prsm_cutoff", "_topmg_prsm.tsv");
+        = std::make_shared<PrsmMatchTableWriter>(prsm_para_ptr, argu_str, "topmg_prsm_cutoff", "_topmg_prsm_single.tsv", false);
+    table_out->write();
+
+    table_out->setOutputName("_topmg_prsm.tsv");
+    table_out->setWriteMultiMatches(true);
     table_out->write();
     table_out = nullptr;
     std::cout << "Outputting PrSM table - finished." << std::endl;
@@ -386,8 +388,13 @@ std::string db_file_name = ori_db_file_name + "_idx" + file_util::getFileSeparat
     std::cout << "Outputting proteoform table - started." << std::endl;
     PrsmMatchTableWriterPtr form_out
         = std::make_shared<PrsmMatchTableWriter>(prsm_para_ptr, argu_str,
-                                            "topmg_form_cutoff_form", "_topmg_proteoform.tsv");
+                                            "topmg_form_cutoff_form", "_topmg_proteoform_single.tsv", false);
     form_out->write();
+
+    form_out->setOutputName("_topmg_proteoform.tsv");
+    form_out->setWriteMultiMatches(true);
+    form_out->write();
+
     form_out = nullptr;
     std::cout << "Outputting proteoform table - finished." << std::endl;
 
@@ -434,6 +441,18 @@ int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
   xercesc::XMLPlatformUtils::Initialize(); 
   TopMG_testModFile(arguments);
 
+  //check if a combined file name given in -c parameter is the same as one of the input spectrum file. If so, throw error.
+  if (arguments["combinedOutputName"] != "") {
+    std::string merged_file_name = arguments["combinedOutputName"] + "_ms2.msalign"; 
+    for (size_t k = 0; k < spec_file_lst.size(); k++) {
+      if (merged_file_name == spec_file_lst[k]) {
+        std::string raw_file_name = spec_file_lst[k].substr(0, spec_file_lst[k].find("_ms2.msalign"));
+        LOG_ERROR("A combined file name cannot be the same as one of the input file names '" << raw_file_name << "'. Please choose a different name for a combined file and retry.");
+        return 1;
+      }
+    }
+  }
+
   for (size_t k = 0; k < spec_file_lst.size(); k++) {
     std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));
     std::string start_time = buf;
@@ -467,10 +486,10 @@ int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
     std::cout << "Merging identification files started." << std::endl;
     std::vector<std::string> prsm_file_lst(spec_file_lst.size());
     for (size_t i = 0; i < spec_file_lst.size(); i++) {
-      prsm_file_lst[i] = file_util::basename(spec_file_lst[i]) + ".topmg_top"; 
+      prsm_file_lst[i] = file_util::basename(spec_file_lst[i]) + ".topmg_prsm"; 
     }
     int N = 1000000;
-    prsm_util::mergePrsmFiles(prsm_file_lst, N , full_combined_name + "_ms2.topmg_top");
+    prsm_util::mergePrsmFiles(prsm_file_lst, N , full_combined_name + "_ms2.topmg_prsm");
     std::cout << "Merging identification files finished." << std::endl;
     std::cout << "Merging files - finished." << std::endl;
 
@@ -494,6 +513,8 @@ int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
     cleanTopmgDir(ori_db_file_name, sp_file_name, keep_temp_files);
   }
   std::cout << "Deleting temporary files - finished." << std::endl; 
+
+  base_data::release();
 
   std::cout << "TopMG finished." << std::endl << std::flush;
   return 0; 

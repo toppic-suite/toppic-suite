@@ -11,7 +11,6 @@
 //WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //See the License for the specific language governing permissions and
 //limitations under the License.
-
 #include <iostream>
 #include <iomanip>
 #include <map>
@@ -50,7 +49,6 @@
 #include "visual/json_transformer.hpp"
 
 namespace toppic{
-  
 void copyTopMSV(std::map<std::string, std::string> &arguments) {
   std::string spectrum_file_name = arguments["spectrumFileName"];
   std::string base_name = file_util::basename(spectrum_file_name);
@@ -81,7 +79,8 @@ void cleanTopMergeDir(const std::string &fa_name,
   std::replace(sp_base.begin(), sp_base.end(), '\\', '/');
   file_util::rename(sp_base + "." + tool_name + "_form_cutoff_form",
                     sp_base + "_" + tool_name + "_proteoform.xml");
-  
+  file_util::rename(sp_base + "." + tool_name + "_prsm",
+                    sp_base + "_" + tool_name + "_prsm.xml");
   if (!keep_temp_files) {
     //file_util::cleanPrefix(fa_name, fa_base + "_");
     file_util::cleanPrefix(sp_name, sp_base + ".msalign_");
@@ -164,7 +163,7 @@ int TopMerge_post(std::map<std::string, std::string> & arguments) {
       id_file_name = "toppic_prsm";
     }
     else if (arguments["toolName"] == "topmg") {
-      id_file_name = "topmg_top";
+      id_file_name = "topmg_prsm";
     }
 
     if (arguments["useFeatureFile"] == "true") {
@@ -304,7 +303,8 @@ void TopMergeProcess(std::map<std::string, std::string> & arguments,
 
   for (auto it = std::begin(tool_vec); it != std::end(tool_vec); it++) {
     std::string tool_name = *it;
-    std::string id_file_name = "";
+    std::string input_prsm_name = "";
+    std::string output_prsm_name = "";
     try {
       std::cout << "TopMerge " << Version::getVersion() << std::endl;
       arguments["version"] = toppic::Version::getVersion();
@@ -325,10 +325,12 @@ void TopMergeProcess(std::map<std::string, std::string> & arguments,
       arguments["toolName"] = tool_name;
 
       if (arguments["toolName"] == "toppic") {
-        id_file_name = "toppic_prsm";
+        input_prsm_name = "toppic_prsm.xml";
+        output_prsm_name = "toppic_prsm";
       }
       else if (arguments["toolName"] == "topmg") {
-        id_file_name = "topmg_top";
+        input_prsm_name = "topmg_prsm.xml";
+        output_prsm_name = "topmg_prsm";
       }
 
       Argument::outputArguments(std::cout, arguments);
@@ -361,11 +363,11 @@ void TopMergeProcess(std::map<std::string, std::string> & arguments,
         std::cout << "Merging identification files started." << std::endl;
         std::vector<std::string> prsm_file_lst(spec_file_lst.size());
         for (size_t i = 0; i < spec_file_lst.size(); i++) {
-          prsm_file_lst[i] = file_util::basename(spec_file_lst[i]) + "." + id_file_name; 
+          prsm_file_lst[i] = file_util::basename(spec_file_lst[i]) + "_" + input_prsm_name; 
         }
         //toppic_prsm 
         int N = 1000000;
-        prsm_util::mergePrsmFiles(prsm_file_lst, N , full_combined_name + "_ms2." + id_file_name);
+        prsm_util::mergePrsmFiles(prsm_file_lst, N , full_combined_name + "_ms2." + output_prsm_name);
         std::cout << "Merging identification files finished." << std::endl;
         std::cout << "Merging files - finished." << std::endl;
 
@@ -391,6 +393,7 @@ void TopMergeProcess(std::map<std::string, std::string> & arguments,
         }
         std::cout << "Deleting temporary files - finished." << std::endl; 
       }
+      base_data::release();
 
       std::cout << "TopMerge - finished." << std::endl;
     } catch (const char* e) {

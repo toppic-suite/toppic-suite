@@ -11,7 +11,6 @@
 //WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //See the License for the specific language governing permissions and
 //limitations under the License.
-
 #include <iostream>
 #include <iomanip>
 #include <map>
@@ -23,6 +22,7 @@
 #include "common/base/mod_util.hpp"
 #include "common/util/mem_check.hpp"
 #include "common/util/version.hpp"
+#include "common/base/ptm_util.hpp"
 
 #include "seq/fasta_reader.hpp"
 #include "seq/fasta_util.hpp"
@@ -68,7 +68,6 @@
 #include "visual/json_transformer.hpp"
 
 #include "console/toppic_argument.hpp"
-
 namespace toppic {
 
 void copyTopMSV(std::map<std::string, std::string> &arguments) {
@@ -100,6 +99,8 @@ void cleanToppicDir(const std::string &fa_name,
   file_util::delFile(sp_base + "_toppic_proteoform.xml");
   file_util::rename(sp_base + ".toppic_form_cutoff_form",
                     sp_base + "_toppic_proteoform.xml");
+  file_util::rename(sp_base + ".toppic_prsm",
+                    sp_base + "_toppic_prsm.xml");
   if (!keep_temp_files) {
     file_util::cleanPrefix(sp_name, sp_base + ".msalign_");
     file_util::delFile(abs_sp_name + "_index");
@@ -138,6 +139,7 @@ int TopPIC_testModFile(std::map<std::string, std::string> & arguments) {
 
     if (arguments["residueModFileName"] != "") {
       mod_util::readModTxt(arguments["residueModFileName"]);
+      ptm_util::readPtmTxt(arguments["residueModFileName"]);
     }
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
@@ -399,7 +401,6 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
       cur_suffix = "toppic_prsm_cutoff_local";
     }
 
-
     std::time_t end = time(nullptr);
     char buf[50];
     std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&end));
@@ -409,8 +410,13 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
 
     std::cout << "Outputting PrSM table - started." << std::endl;
     PrsmMatchTableWriterPtr table_out
-        = std::make_shared<PrsmMatchTableWriter>(prsm_para_ptr, argu_str, cur_suffix, "_toppic_prsm.tsv");
+        = std::make_shared<PrsmMatchTableWriter>(prsm_para_ptr, argu_str, cur_suffix, "_toppic_prsm_single.tsv", false);
     table_out->write();
+
+    table_out->setOutputName("_toppic_prsm.tsv");
+    table_out->setWriteMultiMatches(true);
+    table_out->write();
+
     table_out = nullptr;
     std::cout << "Outputting PrSM table - finished." << std::endl;
 
@@ -445,7 +451,11 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     std::cout << "Outputting proteoform table - started." << std::endl;
     PrsmMatchTableWriterPtr form_out
         = std::make_shared<PrsmMatchTableWriter>(prsm_para_ptr, argu_str,
-                                            "toppic_form_cutoff_form", "_toppic_proteoform.tsv");
+                                            "toppic_form_cutoff_form", "_toppic_proteoform_single.tsv", false);
+    form_out->write();
+
+    form_out->setOutputName("_toppic_proteoform.tsv");
+    form_out->setWriteMultiMatches(true);
     form_out->write();
     form_out = nullptr;
     std::cout << "Outputting proteoform table - finished." << std::endl;
@@ -460,8 +470,6 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
       xml_gene->process();
       xml_gene = nullptr;
       std::cout << "Generating proteoform xml files - finished." << std::endl;
-
-    
       std::cout << "Converting proteoform xml files to html files - started." << std::endl;
       jsonTranslate(arguments, "toppic_proteoform_cutoff");
       std::cout << "Converting proteoform xml files to html files - finished." << std::endl;
@@ -498,6 +506,18 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
 
   TopPIC_testModFile(arguments);
 
+  //check if a combined file name given in -c parameter is the same as one of the input spectrum file. If so, throw error.
+  if (arguments["combinedOutputName"] != "") {
+    std::string merged_file_name = arguments["combinedOutputName"] + "_ms2.msalign"; 
+    for (size_t k = 0; k < spec_file_lst.size(); k++) {
+      if (merged_file_name == spec_file_lst[k]) {
+        std::string raw_file_name = spec_file_lst[k].substr(0, spec_file_lst[k].find("_ms2.msalign"));
+        LOG_ERROR("A combined file name cannot be the same as one of the input file names '" << raw_file_name << "'. Please choose a different name for a combined file and retry.");
+        return 1;
+      }
+    }
+  }
+  
   for (size_t k = 0; k < spec_file_lst.size(); k++) {
     std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));
     std::string start_time = buf;
@@ -562,6 +582,8 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
     cleanToppicDir(ori_db_file_name, sp_file_name, keep_temp_files);
   }
   std::cout << "Deleting temporary files - finished." << std::endl;
+  
+  base_data::release();
 
   std::cout << "TopPIC finished." << std::endl << std::flush;
 
