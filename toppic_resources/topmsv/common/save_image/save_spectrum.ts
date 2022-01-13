@@ -134,9 +134,9 @@ class SaveSpectrum{
         return;
       }
       let para = this.graphModalObj_.getPara(); 
-      para.setShowEnvelopes_($("show_envelopes_yes").prop("checked"));
-      para.setShowIons($("show_ions_yes").prop("checked"));
-      para.setShowError($("show_error_yes").prop("checked"));
+      para.setShowEnvelopes_($("#show_envelopes_yes").prop("checked"));
+      para.setShowIons($("#show_ions_yes").prop("checked"));
+      para.setShowError($("#show_error_yes").prop("checked"));
 
       let svg: HTMLElement | null = document.getElementById("popup_ms2_svg");
       if (svg) {
