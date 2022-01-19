@@ -25,20 +25,20 @@ class SaveSpectrum{
                   <tr>
                     <div>
                       <td class="td_popup_variables" id="popup-env-btns" style="text-align:left">Show envelopes: &nbsp;&nbsp;&nbsp;
-                        <input type="radio" name="show_envelopes" 
-                                            class = "show_envelopes"
+                        <input type="radio" name="show_envelopes" id="show_envelopes_yes"
+                                            class = "show_envelopes" id="show_envelopes_no"
                                             checked>Yes</input>
                         <input type="radio"
                               name="show_envelopes" 
                               class = "show_envelopes">No</input>
                       </td>
                       <td class="td_popup_variables" id="popup-ion-btns">Show ions: &nbsp;&nbsp;&nbsp;
-                        <input type="radio" name="show_ions" class = "show_ions" checked>Yes
-                        <input type="radio" name="show_ions" class = "show_ions">No
+                        <input type="radio" name="show_ions" class = "show_ions" id="show_ions_yes" checked>Yes
+                        <input type="radio" name="show_ions" class = "show_ions" id="show_ions_yes">No
                       </td>
                       <td class="td_popup_variables" id="show-error-plot-btns">Show error plot: &nbsp;&nbsp;&nbsp;
-                        <input type="radio" name="show_error" class = "show_error" checked>Yes
-                        <input type="radio" name="show_error" class = "show_error">No
+                        <input type="radio" name="show_error" class = "show_error" id="show_error_yes" checked>Yes
+                        <input type="radio" name="show_error" class = "show_error" id="show_error_yes">No
                       </td>
                       <td class="td_popup_button" style="text-align:right">
                         <button type = "button" class="btn btn-primary btn-sm "  id ="ms2_popup_redraw_btn" >Redraw</button>
@@ -87,6 +87,13 @@ class SaveSpectrum{
         drawBasicSpectrum(this.graphModalObj_.getSvgId(), this.graphModalObj_.getPara(), this.graphModalObj_.getPeakList(), this.graphModalObj_.getIonList());
         $("#popup-env-btns").show();
         $("#show-error-plot-btns").hide();
+
+        //set the buttons to default value
+        $("#show_envelopes_yes").prop("checked", true);
+        $("#show_envelopes_no").prop("checked", false);
+ 
+        $("#show_ions_yes").prop("checked", true);
+        $("#show_ions_no").prop("checked", false);
       }else{
         currentSpectrum = this.massGraphList_[ms2Index];
         this.graphModalObj_ = new SpectrumView(svgId,currentSpectrum.getPeakList());
@@ -97,6 +104,16 @@ class SaveSpectrum{
         this.graphModalObj_.getCMassList(), (this.graphModalObj_.getIonList()) ? this.graphModalObj_.getIonList()! : []) //this.graphModalObj_.getIonList() returns matchedIon[] or null
         $("#popup-env-btns").hide();
         $("#show-error-plot-btns").show();
+
+        //set the buttons to default value
+        $("#show_error_yes").prop("checked", true);
+        $("#show_error_no").prop("checked", false);
+
+        $("#show_ions_yes").prop("checked", true);
+        $("#show_ions_no").prop("checked", false);
+
+        $("#show_envelopes_yes").prop("checked", true);
+        $("#show_envelopes_no").prop("checked", false);
       }
   }
   initSpectrumModalEventHandler = () => {
@@ -117,9 +134,9 @@ class SaveSpectrum{
         return;
       }
       let para = this.graphModalObj_.getPara(); 
-      para.setShowEnvelopes_((<HTMLInputElement>document.getElementsByName("show_envelopes")[0]).checked);
-      para.setShowIons((<HTMLInputElement>document.getElementsByName("show_ions")[0]).checked);
-      para.setShowError((<HTMLInputElement>document.getElementsByName("show_error")[0]).checked);
+      para.setShowEnvelopes_($("#show_envelopes_yes").prop("checked"));
+      para.setShowIons($("#show_ions_yes").prop("checked"));
+      para.setShowError($("#show_error_yes").prop("checked"));
 
       let svg: HTMLElement | null = document.getElementById("popup_ms2_svg");
       if (svg) {

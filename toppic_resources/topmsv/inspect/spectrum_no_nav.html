@@ -532,25 +532,37 @@
       </div>
     </div>
   </div>
-  <div id="tooltip-pop" class="tooltip" style="display: none;">
-	<ul class="nav nav-tabs graph_nav" id="mod-type-nav">
-		<li class="active nav-item" id="var-ptm-nav-tab"><a class="nav-link" href="#" id="var-ptm-link">Variable PTM</a></li>
-		<li class="nav-item" id="unknown-mod-nav-tab"><a class="nav-link" href="#" id="unknown-mod-link">Unknown Mod</a></li>
-	</ul>
-	<div id="var-ptm-tab">
-		<h5>Applied variable ptms</h5>
-		<ul id="applied-ptm-list" class="list-group"></ul>
-		<hr>
-		<h5>Total list of variable ptms</h5>
-		<input type="text" id="search-input" placeholder="Search for PTM" class="list-group" onkeyup="AddShift.searchBar()">
-		<ul class="list-group" id="ptm-list"></ul>	
-	</div>
-	<div id="unknown-mod-tab" style="display: none;">
-		<label for="mass-value">Mass shift value: </label>
-		<input type="text" id="mass-value" name="mass-value"></input>
-		<button type="button" class="btn btn-default btn-sm" id="add-unknown-mod-btn">
-			<i class="fa fa-plus" ></i>
-		</button>
+  <div class="modal" id="tooltip-pop" class="tooltip" style="display: none;" role="dialog">
+	<div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+		<div class="modal-content">
+			<div class="modal-header d-flex justify-content-center">
+				<ul class="nav nav-tabs graph_nav text-center" id="mod-type-nav">
+					<li class="active nav-item text-center" id="var-ptm-nav-tab"><a class="nav-link" href="#" id="var-ptm-link">Variable PTM</a></li>
+					<li class="nav-item text-center" id="unknown-mod-nav-tab"><a class="nav-link" href="#" id="unknown-mod-link">Unknown Mod</a></li>
+				</ul>
+			</div>
+			<div class="modal-body" >
+				<div id="var-ptm-tab">
+					<h5 class="text-center">Applied variable ptms</h5>
+					<ul id="applied-ptm-list" class="list-group"></ul>
+					<hr>
+					<h5 class="text-center">Total list of variable ptms</h5>
+					<div class="d-flex justify-content-center">
+						<input type="text" id="search-input" placeholder="Search for PTM" class="list-group d-flex justify-content-center" onkeyup="AddShift.searchBar()">
+					</div>
+					<ul class="list-group" id="ptm-list"></ul>	
+				</div>
+				<div id="unknown-mod-tab" style="display: none;">
+					<div class="d-flex justify-content-center">
+						<label for="mass-value">Mass shift value: </label>
+						<input type="text" id="mass-value" name="mass-value"></input>
+						<button type="button" class="btn btn-default btn-sm" id="add-unknown-mod-btn">
+							<i class="fa fa-plus" ></i>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
 <script type="text/javascript" src="js/views/base.js"></script>

@@ -238,13 +238,13 @@ class SpectrumViewParameters {
         let tickheight = Math.floor(this.tickHeightList_[0]);
         let maxIntPercent = this.winMaxInte_ / this.dataMaxInte_ * 100;
         for (let i = 0; i < this.tickHeightList_.length; i++) {
-            if (maxIntPercent / this.yTickNum_ <= Math.floor(this.tickHeightList_[i])
-                && maxIntPercent / this.yTickNum_ > Math.floor(this.tickHeightList_[i + 1])) {
-                tickheight = Math.floor(this.tickHeightList_[i]);
-                break;
+            if (maxIntPercent / this.yTickNum_ <= this.tickHeightList_[i]
+                && maxIntPercent / this.yTickNum_ > this.tickHeightList_[i + 1]) {
+                tickheight = this.tickHeightList_[i];
+                return tickheight;
             }
         }
-        return tickheight;
+        return -1;
     }
     /**
      * @function getPeakXPos
@@ -418,8 +418,9 @@ class SpectrumViewParameters {
             ratio = 1.4;
         else if (ratio < 1)
             ratio = 0.9;
-        if ((ratio > 1.0 && this.winMaxInte_ >= this.dataMinInte_ * this.inteMargin_)
-            || (ratio < 1.0 && this.winMaxInte_ <= this.dataMaxInte_ * this.inteMargin_)) {
+        //restrict zooming in when current max intensity is smaller than 0.01% of the max intensity of entire data
+        if ((ratio > 1.0 && (this.winMaxInte_ >= this.dataMaxInte_ * 0.01 / 100))
+            || (ratio < 1.0 && (this.winMaxInte_ <= this.dataMaxInte_ * this.inteMargin_))) {
             this.yScale_ = this.yScale_ * ratio;
             this.winMaxInte_ = this.specHeight_ / this.yScale_;
         }

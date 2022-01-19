@@ -348,7 +348,11 @@ std::string db_file_name = ori_db_file_name + "_idx" + file_util::getFileSeparat
 
     std::cout << "Outputting PrSM table - started." << std::endl;
     PrsmMatchTableWriterPtr table_out
-        = std::make_shared<PrsmMatchTableWriter>(prsm_para_ptr, argu_str, "topmg_prsm_cutoff", "_topmg_prsm.tsv");
+        = std::make_shared<PrsmMatchTableWriter>(prsm_para_ptr, argu_str, "topmg_prsm_cutoff", "_topmg_prsm_single.tsv", false);
+    table_out->write();
+
+    table_out->setOutputName("_topmg_prsm.tsv");
+    table_out->setWriteMultiMatches(true);
     table_out->write();
     table_out = nullptr;
     std::cout << "Outputting PrSM table - finished." << std::endl;
@@ -384,8 +388,13 @@ std::string db_file_name = ori_db_file_name + "_idx" + file_util::getFileSeparat
     std::cout << "Outputting proteoform table - started." << std::endl;
     PrsmMatchTableWriterPtr form_out
         = std::make_shared<PrsmMatchTableWriter>(prsm_para_ptr, argu_str,
-                                            "topmg_form_cutoff_form", "_topmg_proteoform.tsv");
+                                            "topmg_form_cutoff_form", "_topmg_proteoform_single.tsv", false);
     form_out->write();
+
+    form_out->setOutputName("_topmg_proteoform.tsv");
+    form_out->setWriteMultiMatches(true);
+    form_out->write();
+
     form_out = nullptr;
     std::cout << "Outputting proteoform table - finished." << std::endl;
 
@@ -431,6 +440,18 @@ int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
 
   xercesc::XMLPlatformUtils::Initialize(); 
   TopMG_testModFile(arguments);
+
+  //check if a combined file name given in -c parameter is the same as one of the input spectrum file. If so, throw error.
+  if (arguments["combinedOutputName"] != "") {
+    std::string merged_file_name = arguments["combinedOutputName"] + "_ms2.msalign"; 
+    for (size_t k = 0; k < spec_file_lst.size(); k++) {
+      if (merged_file_name == spec_file_lst[k]) {
+        std::string raw_file_name = spec_file_lst[k].substr(0, spec_file_lst[k].find("_ms2.msalign"));
+        LOG_ERROR("A combined file name cannot be the same as one of the input file names '" << raw_file_name << "'. Please choose a different name for a combined file and retry.");
+        return 1;
+      }
+    }
+  }
 
   for (size_t k = 0; k < spec_file_lst.size(); k++) {
     std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));

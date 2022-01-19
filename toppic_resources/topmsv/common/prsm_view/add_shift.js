@@ -20,10 +20,11 @@ class AddShift {
         }
     }
     addUnknownShift(e) {
-        let ptmDiv = document.getElementById("tooltip-pop");
+        /*let ptmDiv: HTMLElement | null = document.getElementById("tooltip-pop");
         if (ptmDiv) {
-            ptmDiv.style.display = "none";
-        }
+          ptmDiv.style.display = "none";
+        }*/
+        $("#tooltip-pop").modal('hide');
         let val = $("#mass-value").val();
         if (typeof (val) != "string") {
             alert("Please enter a valid number for mass shift!");
@@ -87,24 +88,25 @@ class AddShift {
     }
     addTabEventListener() {
         //switch between variable ptm and unknown shift tabs
-        $("#var-ptm-link").one("click", function () {
+        $("#var-ptm-link").on("click", function () {
             $("#var-ptm-tab").show();
             $("#unknown-mod-tab").hide();
         });
-        $("#unknown-mod-link").one("click", function () {
+        $("#unknown-mod-link").on("click", function () {
             $("#var-ptm-tab").hide();
             $("#unknown-mod-tab").show();
         });
-        $("#add-unknown-mod-btn").one("click", (e) => {
+        $("#add-unknown-mod-btn").on("click", (e) => {
             this.addUnknownShift(e);
         });
         //event listener for search bar
     }
     applyShift(ptmIdx, letter, pos) {
-        let ptmDiv = document.getElementById("tooltip-pop");
+        /*let ptmDiv: HTMLElement | null = document.getElementById("tooltip-pop");
         if (ptmDiv) {
-            ptmDiv.style.display = "none";
-        }
+          ptmDiv.style.display = "none";
+        }*/
+        $("#tooltip-pop").modal('hide');
         let mass = commonPtmList[ptmIdx].mass;
         let unknownMassShiftList = [];
         let protVarPtmsList = [];
@@ -184,16 +186,16 @@ class AddShift {
         AddShift.clickedPos = pos;
         let ptmDiv = document.getElementById("tooltip-pop");
         if (ptmDiv != null) {
-            ptmDiv.style.display = "";
+            $("#tooltip-pop").modal('show');
             ptmDiv.style.opacity = "1";
-            ptmDiv.style.left = (d3.event.pageX - 30) + "px";
-            ptmDiv.style.top = (d3.event.pageY - 45) + "px";
             $('#ptm-list').empty();
             $('#applied-ptm-list').empty();
             commonPtmList.forEach((ptm, idx) => {
                 let entry = $("<li></li>");
                 entry.text(ptm.abbr + " (" + ptm.name + "); " + ptm.mass);
                 entry.attr("id", "ptm" + idx);
+                entry.attr("class", "text-center");
+                entry.css("cursor", "pointer");
                 entry.on("click", () => { this.applyShift(idx, letter, pos); });
                 $("#ptm-list").append(entry);
             });
@@ -201,6 +203,8 @@ class AddShift {
                 let entry = $("<li></li>");
                 entry.text(commonPtmList[ptmIdx].abbr + " (" + commonPtmList[ptmIdx].name + "); " + commonPtmList[ptmIdx].mass);
                 entry.attr("id", "applied-ptm" + commonPtmList[ptmIdx].abbr);
+                entry.attr("class", "text-center");
+                entry.css("cursor", "pointer");
                 entry.on("click", () => { this.applyShift(ptmIdx, letter, pos); });
                 $("#applied-ptm-list").append(entry);
             });
