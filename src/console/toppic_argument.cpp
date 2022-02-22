@@ -532,7 +532,7 @@ bool Argument::validateArguments() {
   std::string n_term_label_mass = arguments_["nTermLabelMass"];
   try {
     double mass = std::stod(n_term_label_mass.c_str());
-    if(mass <= 0.0){
+    if(mass < 0.0){
       LOG_ERROR("N-terminal label mass " << n_term_label_mass << " error! The value should be positive.");
       return false;
     }

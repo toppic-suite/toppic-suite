@@ -464,6 +464,11 @@ bool Argument::validateArguments() {
     }
   }
 
+  if (arguments_["varModFileName"] == "" ) {
+    LOG_ERROR("Modification file is not set. Please use the -i argument to specify the modification file!");
+    return false;
+  }
+
   if (!file_util::exists(arguments_["varModFileName"])) {
     LOG_ERROR("Modification file " << arguments_["varModFileName"] << " does not exist!");
     return false;

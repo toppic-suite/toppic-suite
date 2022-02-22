@@ -70,7 +70,7 @@ void cleanTempFiles(const std::string & ref_name,
 
 void moveFile(std::string &file_name, std::string &folder_name);
 
-inline std::string getToppicResourceDirName() {return "toppic_resources";}
+inline std::string getToppicResourceDirName() {return "resources";}
 
 inline std::string getEtcDirName() {return "../../etc/toppic";}
 
