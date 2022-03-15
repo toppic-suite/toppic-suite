@@ -89,7 +89,10 @@ int initMaxChrg(PeakPtrVec &peak_list, PeakIntv peak_intv, int argu_max_charge) 
       min_dist = dist;
     }
   }
+  if (min_dist < 0.01) {min_dist = 0.01;}
+  
   int max_charge = static_cast<int>(std::round(1.0 / min_dist));
+
   if (max_charge > argu_max_charge) {
     max_charge = argu_max_charge;
   }
