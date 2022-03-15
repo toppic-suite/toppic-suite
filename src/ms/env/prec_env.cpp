@@ -85,11 +85,12 @@ int initMaxChrg(PeakPtrVec &peak_list, PeakIntv peak_intv, int argu_max_charge) 
     }
     double next_mz = peak_list[i+1]->getPosition();
     double dist = next_mz - cur_mz;
-    if (dist < min_dist) {
+    if (dist < min_dist && dist > 0) {
       min_dist = dist;
     }
   }
   int max_charge = static_cast<int>(std::round(1.0 / min_dist));
+
   if (max_charge > argu_max_charge) {
     max_charge = argu_max_charge;
   }
