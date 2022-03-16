@@ -13,6 +13,7 @@
 //limitations under the License.
 
 #include <string>
+#include <algorithm>
 
 //Deprecated features in boost are excluded.
 #ifndef BOOST_SYSTEM_NO_DEPRECATED
