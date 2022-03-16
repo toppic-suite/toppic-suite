@@ -64,6 +64,7 @@ copy C:\msys64\mingw64\bin\libintl-8.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libiconv-2.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libpcre2-16-0.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libpcre-1.dll toppic-windows-%1
+copy C:\msys64\mingw64\bin\libmd4c.dll toppic-windows-%1
 
 mkdir toppic-windows-%1\example_files
 copy ..\testcases\data\mzxml_test.msalign toppic-windows-%1\example_files
