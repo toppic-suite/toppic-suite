@@ -32,6 +32,8 @@ class PrsmMatchTableWriter {
   void write();
 
   void writePrsm(std::ofstream &file, PrsmPtr prsm_ptr);
+  void writePrsmStandardFormat(std::ofstream &file, PrsmPtr prsm_ptr);
+  std::string formatSeq(std::string seq);
 
   void setOutputName(std::string output_file_ext) {output_file_ext_ = output_file_ext;}
 
