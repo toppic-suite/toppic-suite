@@ -425,7 +425,9 @@ bool Argument::validateArguments() {
   }
 
   if (!str_util::endsWith(arguments_["oriDatabaseFileName"], ".fasta") &&
-      !str_util::endsWith(arguments_["oriDatabaseFileName"], ".fa")) {
+      !str_util::endsWith(arguments_["oriDatabaseFileName"], ".fa") && 
+      !str_util::endsWith(arguments_["oriDatabaseFileName"], ".FASTA") &&
+      !str_util::endsWith(arguments_["oriDatabaseFileName"], ".FA")) {
     LOG_ERROR("Database file " << arguments_["oriDatabaseFileName"] << " is not a fasta file!");
     return false;
   }
