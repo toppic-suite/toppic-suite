@@ -22,7 +22,7 @@
 #include "ms/spec/msalign_writer.hpp"
 #include "ms/env/env_para.hpp"
 #include "topfd/common/topfd_para.hpp"
-#include "topfd/msreader/raw_ms_group_reader.hpp"
+#include "topfd/msreader/raw_ms_group_faime_reader.hpp"
 #include "topfd/deconv/deconv_one_sp.hpp"
 
 namespace toppic {
@@ -37,9 +37,9 @@ class DeconvProcess {
 
   void process();
 
-  void processSp(RawMsGroupReaderPtr reader_ptr);
+  void processSp(RawMsGroupFaimeReaderPtr reader_ptr);
 
-  void processSpMissingLevelOne(RawMsGroupReaderPtr reader_ptr);
+  void processSpMissingLevelOne(RawMsGroupFaimeReaderPtr reader_ptr);
 
   EnvParaPtr getEnvParaPtr() {return env_para_ptr_;}
 

@@ -22,6 +22,7 @@ namespace toppic {
 
 typedef std::shared_ptr<Ms<PeakPtr>> RawMsPtr;
 typedef std::vector<RawMsPtr> RawMsPtrVec;
+typedef std::vector<RawMsPtrVec> RawMsPtrVec2D;
 
 } /* namespace toppic */
 
