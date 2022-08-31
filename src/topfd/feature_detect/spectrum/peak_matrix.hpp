@@ -18,7 +18,7 @@ namespace toppic {
     public:
         PeakMatrix(PeakPtrVec2D raw_peaks, DeconvMsPtrVec ms1_ptr_vec);
         spec_list get_spec_list(DeconvMsPtrVec ms1_ptr_vec);
-        void init_matrix(PeakPtrVec2D raw_peaks);
+        void init_matrix(PeakPtrVec2D raw_peaks, double snr);
         int get_index(double mz);
         void find_all_neighbors(double mass_tol);
         void find_pair_neighbors(PeakRow first_row, PeakRow second_row, int search_bin_num, double mass_tol);
@@ -46,7 +46,7 @@ namespace toppic {
         double max_mz_;
         double min_inte_;
         int spec_df;
-        int bin_size_;
+        double bin_size_;
 
 
 

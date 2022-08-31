@@ -5,35 +5,37 @@
 #include <map>
 #include <algorithm>
 #include <iostream>
+#include <cmath>
 #include "peak_matrix.hpp"
 #include "ms/spec/peak.hpp"
 
 toppic::PeakMatrix::PeakMatrix(PeakPtrVec2D raw_peaks, DeconvMsPtrVec ms1_ptr_vec){
+  /// Input params
+  double bin_size = 0.1;
+  double snr = 3.0;
+
+
   /// get min mz value
   std::vector<double> intes;
-  std::vector<double> row_minimums(raw_peaks.size());
-  std::vector<double> row_maximums(raw_peaks.size());
-  for (int i = 0; i < raw_peaks.size(); i++){
-    std::vector<double> row_mz;
-    for (int j = 0; j < raw_peaks[i].size(); j++){
-      row_mz.push_back(raw_peaks[i][j]->getPosition());
-      intes.push_back(raw_peaks[i][j]->getIntensity());
+  std::vector<double> mz;
+  for (auto & raw_peak : raw_peaks){
+    for (auto & p : raw_peak) {
+      mz.push_back(p->getPosition());
+      intes.push_back(p->getIntensity());
     }
-    double min_mz = *std::min(row_mz.begin(), row_mz.end());
-    double max_mz = *std::max(row_mz.begin(), row_mz.end());
-    row_minimums.push_back(min_mz);
-    row_maximums.push_back(max_mz);
   }
-
   /// set values!
-  min_mz_ = *std::min(row_minimums.begin(), row_minimums.end());
-  max_mz_ = *std::max(row_maximums.begin(), row_maximums.end());
+  min_mz_ = *std::min_element(mz.begin(), mz.end());
+  max_mz_ = *std::max_element(mz.begin(), mz.end());
   min_inte_ = getDataLevelNoiseIntensities(intes);
+  std::cout << "Data Level Noise Intensity Level: " << min_inte_ << std::endl;
+  std::cout << "Min and Max m/z values: " << min_mz_ << " , " << max_mz_ << std::endl;
+
   specs_ = get_spec_list(ms1_ptr_vec);
   bin_size_ = 0.1;
   spec_num_ = raw_peaks.size();
   bin_num_ = int((max_mz_ - min_mz_)/bin_size_) + 1;
-  init_matrix(raw_peaks);
+  init_matrix(raw_peaks, snr);
 }
 
 toppic::spec_list toppic::PeakMatrix::get_spec_list(DeconvMsPtrVec ms1_ptr_vec){
@@ -45,13 +47,12 @@ toppic::spec_list toppic::PeakMatrix::get_spec_list(DeconvMsPtrVec ms1_ptr_vec){
   return spec_list;
 }
 
-void toppic::PeakMatrix::init_matrix(PeakPtrVec2D raw_peaks){
+void toppic::PeakMatrix::init_matrix(PeakPtrVec2D raw_peaks, double snr){
   std::map<int, PeakRow> peak_matrix;
   for (int spec_id = 0; spec_id < spec_num_; spec_id++){
     if (spec_id%100 == 0)
       std::cout << "Init matrix processing peaks in spectrum " << spec_id << " out of " << spec_num_ << std::endl;
     // Fill the peak matrix
-    // spec_peak_list = self.__peak_df.loc[(self.__peak_df['spec_id'] == spec_id)].to_numpy()
     std::vector<PeakPtr> spec_peak_list = raw_peaks[spec_id];
     peak_matrix[spec_id] = PeakRow(specs_[spec_id], bin_num_);
     std::vector<ExpPeak> exp_peak_list;
@@ -61,15 +62,17 @@ void toppic::PeakMatrix::init_matrix(PeakPtrVec2D raw_peaks){
       ExpPeak new_peak = ExpPeak(peak_id, spec_id, p);
       exp_peak_list.push_back(new_peak);
       peaks_.push_back(new_peak);
-
     }
     for (int p_idx = 0; p_idx < exp_peak_list.size(); p_idx++) {
       ExpPeak cur_peak = exp_peak_list[p_idx];
-      int bin_idx = get_index(cur_peak.getPos());
-      peak_matrix[spec_id].addPeak(bin_idx, cur_peak);
+      if (cur_peak.getInte() > snr * min_inte_) {
+        // Only keep peaks above data level noise intensity * SNR
+        int bin_idx = get_index(cur_peak.getPos());
+        peak_matrix[spec_id].addPeak(bin_idx, cur_peak);
+      }
     }
     matrix_ = peak_matrix;
-    std::cout << "peak matrix size " << matrix_.size() << " peak num " << peaks_.size() << std::endl;
+    //std::cout << "peak matrix size " << matrix_.size() << " peak num " << peaks_.size() << std::endl;
   }
 }
 
