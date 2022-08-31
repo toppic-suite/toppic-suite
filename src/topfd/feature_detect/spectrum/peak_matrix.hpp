@@ -16,7 +16,7 @@
 namespace toppic {
     class PeakMatrix {
     public:
-        PeakMatrix(PeakPtrVec2D raw_peaks, DeconvMsPtrVec ms1_ptr_vec);
+        PeakMatrix(const PeakPtrVec2D& raw_peaks, DeconvMsPtrVec ms1_ptr_vec, double bin_size, double snr);
         spec_list get_spec_list(DeconvMsPtrVec ms1_ptr_vec);
         void init_matrix(PeakPtrVec2D raw_peaks, double snr);
         int get_index(double mz);
@@ -34,22 +34,16 @@ namespace toppic {
         double get_min_inte(){ return min_inte_; }
         spec_list get_spectra_list(){ return specs_; }
 
-
     private:
         std::map<int, PeakRow> matrix_;
         std::vector<ExpPeak> peaks_;
         spec_list specs_;
-        int peak_df;
         int bin_num_;
         int spec_num_;
         double min_mz_;
         double max_mz_;
         double min_inte_;
-        int spec_df;
         double bin_size_;
-
-
-
     };
 }
 

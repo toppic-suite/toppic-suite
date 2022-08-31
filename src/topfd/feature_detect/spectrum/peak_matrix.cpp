@@ -9,12 +9,7 @@
 #include "peak_matrix.hpp"
 #include "ms/spec/peak.hpp"
 
-toppic::PeakMatrix::PeakMatrix(PeakPtrVec2D raw_peaks, DeconvMsPtrVec ms1_ptr_vec){
-  /// Input params
-  double bin_size = 0.1;
-  double snr = 3.0;
-
-
+toppic::PeakMatrix::PeakMatrix(const PeakPtrVec2D& raw_peaks, DeconvMsPtrVec ms1_ptr_vec, double bin_size, double snr){
   /// get min mz value
   std::vector<double> intes;
   std::vector<double> mz;
@@ -28,22 +23,19 @@ toppic::PeakMatrix::PeakMatrix(PeakPtrVec2D raw_peaks, DeconvMsPtrVec ms1_ptr_ve
   min_mz_ = *std::min_element(mz.begin(), mz.end());
   max_mz_ = *std::max_element(mz.begin(), mz.end());
   min_inte_ = getDataLevelNoiseIntensities(intes);
-  std::cout << "Data Level Noise Intensity Level: " << min_inte_ << std::endl;
-  std::cout << "Min and Max m/z values: " << min_mz_ << " , " << max_mz_ << std::endl;
-
   specs_ = get_spec_list(ms1_ptr_vec);
-  bin_size_ = 0.1;
+  bin_size_ = bin_size;
   spec_num_ = raw_peaks.size();
   bin_num_ = int((max_mz_ - min_mz_)/bin_size_) + 1;
+  std::cout << "Data Level Noise Intensity Level: " << min_inte_ << std::endl;
+  std::cout << "Min and Max m/z values: " << min_mz_ << " , " << max_mz_ << std::endl;
   init_matrix(raw_peaks, snr);
 }
 
 toppic::spec_list toppic::PeakMatrix::get_spec_list(DeconvMsPtrVec ms1_ptr_vec){
   std::vector<Spectrum> spec_list;
-  for (int i = 0; i < ms1_ptr_vec.size(); i++){
-    Spectrum spec = Spectrum(ms1_ptr_vec[i]->getMsHeaderPtr()->getMsOneId(), ms1_ptr_vec[i]->getMsHeaderPtr()->getMsOneScan(), ms1_ptr_vec[i]->getMsHeaderPtr()->getRetentionTime());
-    spec_list.push_back(spec);
-  }
+  for (auto & i : ms1_ptr_vec)
+    spec_list.emplace_back(i->getMsHeaderPtr()->getMsOneId(), i->getMsHeaderPtr()->getMsOneScan(), i->getMsHeaderPtr()->getRetentionTime());
   return spec_list;
 }
 
@@ -56,17 +48,15 @@ void toppic::PeakMatrix::init_matrix(PeakPtrVec2D raw_peaks, double snr){
     std::vector<PeakPtr> spec_peak_list = raw_peaks[spec_id];
     peak_matrix[spec_id] = PeakRow(specs_[spec_id], bin_num_);
     std::vector<ExpPeak> exp_peak_list;
-    for (int p_idx = 0; p_idx < spec_peak_list.size(); p_idx++){
-      PeakPtr p = spec_peak_list[p_idx];
+    for (auto p : spec_peak_list){
       int peak_id = peaks_.size();
       ExpPeak new_peak = ExpPeak(peak_id, spec_id, p);
       exp_peak_list.push_back(new_peak);
       peaks_.push_back(new_peak);
     }
-    for (int p_idx = 0; p_idx < exp_peak_list.size(); p_idx++) {
-      ExpPeak cur_peak = exp_peak_list[p_idx];
+    for (const auto& cur_peak : exp_peak_list) {
+      // Only keep peaks above data level noise intensity * SNR
       if (cur_peak.getInte() > snr * min_inte_) {
-        // Only keep peaks above data level noise intensity * SNR
         int bin_idx = get_index(cur_peak.getPos());
         peak_matrix[spec_id].addPeak(bin_idx, cur_peak);
       }
@@ -76,7 +66,7 @@ void toppic::PeakMatrix::init_matrix(PeakPtrVec2D raw_peaks, double snr){
   }
 }
 
-int toppic::PeakMatrix::get_index(double mz){
+int toppic::PeakMatrix::get_index(double mz) {
   double mz_diff = mz - min_mz_;
   int bin_idx = int(mz_diff /bin_size_);
   return bin_idx;
@@ -91,9 +81,8 @@ void toppic::PeakMatrix::find_pair_neighbors(PeakRow first_row, PeakRow second_r
     for (int first_peak_idx = 0; first_peak_idx < first_bin_list[bin_idx].size(); first_peak_idx++) {
       ExpPeak first_peak = first_bin_list[bin_idx][first_peak_idx];
       for (int second_idx = start; second_idx < end + 1; second_idx++) {
-        for (int second_peak_idx = 0; second_peak_idx < second_bin_list[bin_idx].size(); second_peak_idx++) {
-          ExpPeak second_peak = second_bin_list[bin_idx][second_peak_idx];
-          double mass_diff = abs(first_peak.getPos() - second_peak.getPos());
+        for (auto second_peak : second_bin_list[bin_idx]) {
+          double mass_diff = std::abs(first_peak.getPos() - second_peak.getPos());
           if (mass_diff <= mass_tol) {
             first_peak.setNeighbor(true);
             second_peak.setNeighbor(true);
@@ -106,10 +95,8 @@ void toppic::PeakMatrix::find_pair_neighbors(PeakRow first_row, PeakRow second_r
 
 void toppic::PeakMatrix::find_all_neighbors(double mass_tol){
   int search_bin_num = int(mass_tol/bin_size_) + 1;
-  for (int i = 0; i < peaks_.size(); i++){
-    ExpPeak peak = peaks_[i];
+  for (auto peak : peaks_)
     peak.setNeighbor(false);
-  }
   for (int spec_id = 0; spec_id < spec_num_ - 1; spec_id++){
     PeakRow cur_row = matrix_[spec_id];
     PeakRow next_row = matrix_[spec_id+1];
@@ -118,12 +105,11 @@ void toppic::PeakMatrix::find_all_neighbors(double mass_tol){
 }
 
 void toppic::PeakMatrix::remove_peak(ExpPeak peak){
-
   int spec_id = peak.getSpecId();
   int bin_idx = get_index(peak.getPos());
   std::vector<std::vector<ExpPeak>> peaks_row = matrix_[spec_id].getRow();
   std::vector<ExpPeak> bin_peaks = peaks_row[bin_idx];
-  for (std::vector<ExpPeak>::iterator bin_peak = bin_peaks.begin(); bin_peak < bin_peaks.end(); bin_peak++) {
+  for (auto bin_peak = bin_peaks.begin(); bin_peak < bin_peaks.end(); bin_peak++) {
     if (bin_peak->getPeakId() == peak.getPeakId()) {
       bin_peaks.erase(bin_peak);
       break;
@@ -137,7 +123,7 @@ void toppic::PeakMatrix::remove_peak_in_range(int spec_id, double min_pos, doubl
   for (int bin_idx = start_bin_idx; bin_idx < end_bin_idx + 1; bin_idx++) {
     std::vector<std::vector<ExpPeak>> peaks_row = matrix_[spec_id].getRow();
     std::vector<ExpPeak> bin_peaks = peaks_row[bin_idx];
-    for (std::vector<ExpPeak>::iterator bin_peak = bin_peaks.begin(); bin_peak < bin_peaks.end(); bin_peak++) {
+    for (auto bin_peak = bin_peaks.begin(); bin_peak < bin_peaks.end(); bin_peak++) {
       if (bin_peak->getPos() >= min_pos and bin_peak->getPos() <= max_pos)
         bin_peaks.erase(bin_peak);
     }
