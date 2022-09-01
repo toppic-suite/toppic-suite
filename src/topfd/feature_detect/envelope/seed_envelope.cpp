@@ -13,22 +13,16 @@ std::shared_ptr<toppic::Envelope> get_env_(double mono_mass, int charge, double 
   return theo_env_ptr;
 }
 
-toppic::SeedEnvelope::SeedEnvelope(DeconvMsPtr deconv_data){
-  MsHeaderPtr header = deconv_data->getMsHeaderPtr();
-  std::vector<DeconvPeakPtr> peaks =  deconv_data->getPeakPtrVec();
-  spec_id_ = header->getId();
-  mass_ = header->getPrecMonoMass();
-  for (auto & i : peaks){
-    env_id_ = i->getId();
-    pos_ = i->getMonoMz();
-    inte_ = i->getIntensity();
-    charge_ = i->getCharge();
-    std::shared_ptr<toppic::Envelope> theo_env =  get_env_(mass_, charge_, pos_);
-    for (int j = 0; j < theo_env->getPeakNum(); j++) {
-      SimplePeak peak = SimplePeak(theo_env->getMz(j), theo_env->getIntensity(j));
-      peak_list_.push_back(peak);
-    }
-  }
+toppic::SeedEnvelope::SeedEnvelope(DeconvPeakPtr p){
+  spec_id_ = p->getSpId();
+  env_id_ = p->getId();
+  mass_ = p->getMonoMass();
+  pos_ = p->getMonoMz();
+  inte_ = p->getIntensity();
+  charge_ = p->getCharge();
+  std::shared_ptr<toppic::Envelope> theo_env =  get_env_(mass_, charge_, pos_);
+  for (int j = 0; j < theo_env->getPeakNum(); j++)
+    peak_list_.push_back(SimplePeak(theo_env->getMz(j), theo_env->getIntensity(j)));
 }
 
 toppic::SeedEnvelope::SeedEnvelope() {

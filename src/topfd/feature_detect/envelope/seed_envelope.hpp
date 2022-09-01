@@ -16,7 +16,7 @@ namespace toppic {
     class SeedEnvelope {
     public:
         SeedEnvelope();
-        SeedEnvelope(DeconvMsPtr deconv_data);
+        SeedEnvelope(DeconvPeakPtr p);
         SeedEnvelope(int spec_id, int env_id, double pos, double mass, double inte, int charge, std::vector<double> pos_list, std::vector<double> inte_list);
         SeedEnvelope(const SeedEnvelope &env);
 
