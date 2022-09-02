@@ -13,12 +13,12 @@
 
 namespace toppic {
 namespace env_coll_util {
-  EnvCollection find_env_collection(PeakMatrix peak_matrix, SeedEnvelope seed_env, double mass_tole, int max_miss_env,
+  EnvCollection find_env_collection(PeakMatrix peak_matrix, const SeedEnvelope& seed_env, double mass_tole, int max_miss_env,
                                              int max_miss_charge, int max_miss_peak, int para_max_charge, double ratio_multi,
-                                             double match_peak_tole);
-  void get_charge_range(PeakMatrix peak_matrix, SeedEnvelope seed_env, double mass_tole, int max_miss_num,
+                                             double match_peak_tole, double snr);
+  void get_charge_range(const PeakMatrix& peak_matrix, SeedEnvelope seed_env, double mass_tole, int max_miss_num,
                         int para_max_charge, double match_peak_tole, int* return_min_charge, int* return_max_charge);
-  SeedEnvelope select_best_seed_envelope(PeakMatrix peak_matrix, SeedEnvelope seed_env, double mass_tole, EnvBase env_base);
+  SeedEnvelope select_best_seed_envelope(PeakMatrix peak_matrix, SeedEnvelope seed_env, double mass_tole, const EnvBase& env_base);
 
   void output_file();
 

@@ -11,12 +11,12 @@
 
 namespace toppic {
 namespace component_score {
-    double get_agg_odd_even_peak_ratio(EnvCollection env_coll);
-    double get_agg_env_corr(EnvCollection env_coll);
-    double get_3_scan_corr(EnvCollection env_coll);
-    double get_matched_peaks_percent(EnvCollection env_coll);
-    double get_consecutive_peaks_percent(EnvCollection env_coll);
-    double get_rt_range(EnvCollection env_coll);
+    double get_agg_odd_even_peak_ratio(const EnvCollection& env_coll);
+    double get_agg_env_corr(const EnvCollection& env_coll);
+    double get_3_scan_corr(const EnvCollection& env_coll);
+    double get_matched_peaks_percent(const EnvCollection& env_coll);
+    double get_consecutive_peaks_percent(const EnvCollection& env_coll);
+    double get_rt_range(const EnvCollection& env_coll);
     double get_charge_range(EnvCollection env_coll);
 }
 }

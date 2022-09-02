@@ -13,7 +13,7 @@ toppic::EnvSet::EnvSet() {
   xic_ = Xic();
 }
 
-toppic::EnvSet::EnvSet(SeedEnvelope envelope, std::vector<ExpEnvelope> env_list, int start, int end) {
+toppic::EnvSet::EnvSet(const SeedEnvelope& envelope, std::vector<ExpEnvelope> env_list, int start, int end) {
   seed_env_ = envelope;
   exp_env_list_ = env_list;
   start_spec_id_ = start;
@@ -23,7 +23,7 @@ toppic::EnvSet::EnvSet(SeedEnvelope envelope, std::vector<ExpEnvelope> env_list,
 
 toppic::EnvSet::EnvSet(const EnvSet & es){
   seed_env_ = es.seed_env_;
-  for (auto exp_env : es.exp_env_list_)
+  for (const auto& exp_env : es.exp_env_list_)
     exp_env_list_.push_back(exp_env);
   start_spec_id_ = es.start_spec_id_;
   end_spec_id_ = es.end_spec_id_;
@@ -62,7 +62,7 @@ double toppic::EnvSet::get_median_ratio(ExpEnvelope env){
   std::vector<SimplePeak> theo_peak_list = seed_env_.getPeakList();
   std::vector<double> ratio_list;
   for (int i = 0; i < theo_peak_list.size(); i++){
-    double ratio = 0;
+    double ratio;
     if (!exp_peak_list[i].isEmpty()) {
       ratio = exp_peak_list[i].getInte() / theo_peak_list[i].getInte();
       ratio_list.push_back(ratio);
@@ -77,7 +77,7 @@ double toppic::EnvSet::get_median_ratio(ExpEnvelope env){
 
 toppic::Xic toppic::EnvSet::init_median_xic(){
   std::vector<double> inte_list;
-  for (ExpEnvelope env : exp_env_list_){
+  for (const ExpEnvelope& env : exp_env_list_){
     double ratio = get_median_ratio(env);
     inte_list.push_back(ratio);
   }
@@ -108,6 +108,7 @@ void toppic::EnvSet::remove_non_consecutive_peaks(int i, int max_miss_peak){
   while (idx >= 0) {
     std::vector<ExpPeak> peaks = exp_env_list_[idx].getExpEnvList();
     peaks[i] = ExpPeak();
+    exp_env_list_[idx].setExpEnvList(peaks);
     idx = idx - 1;
   }
 
@@ -127,6 +128,7 @@ void toppic::EnvSet::remove_non_consecutive_peaks(int i, int max_miss_peak){
   while (idx < exp_env_list_.size()) {
     std::vector<ExpPeak> peaks = exp_env_list_[idx].getExpEnvList();
     peaks[i] = ExpPeak();
+    exp_env_list_[idx].setExpEnvList(peaks);
     idx = idx + 1;
   }
 }

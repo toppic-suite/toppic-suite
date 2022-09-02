@@ -34,8 +34,8 @@ namespace toppic {
         double get_proton_mass(){ return 1.007276466879; }
         double get_isotope_mass(){ return 1.00235; }
         SeedEnvelope get_new_charge_env(int new_charge);
-        void remove_low_inte_peaks(double ratio, double base_inte);
-        void shift(int shift_num);
+        void remove_low_inte_peaks(double ratio, double base_inte, double snr);
+        void shift(double shift_num);
         SeedEnvelope get_shifted_seed_envelope(EnvBase env_base, int shift_num);
 
         static bool cmpInteDec(const SeedEnvelope &a, const SeedEnvelope &b) {
@@ -61,10 +61,14 @@ namespace toppic {
         void setCharge(int charge) { charge_ = charge; }
 
         const std::vector<SimplePeak> &getPeakList() const { return peak_list_; }
-        void setPeakList(const std::vector<SimplePeak> &peakList) { peak_list_ = peakList; }
+        void setPeakList(const std::vector<SimplePeak> &peakList) {
+          peak_list_.clear();
+          for (const auto& peak: peakList)
+            peak_list_.push_back(peak);
+        }
 
         bool isEmpty(){
-          if (spec_id_ == -1 && env_id_ == -1 && pos_ == -1 && mass_ == -1 && inte_ == -1 && charge_ == -1 && peak_list_.size() == 0)
+          if (spec_id_ == -1 && env_id_ == -1 && pos_ == -1 && mass_ == -1 && inte_ == -1 && charge_ == -1 && peak_list_.empty())
             return true;
           return false;
         }

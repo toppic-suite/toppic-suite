@@ -15,7 +15,7 @@ namespace component_score {
     return theo_peak_intes;
   }
 
-  EnvSet get_seed_env_set(EnvCollection env_coll) {
+  EnvSet get_seed_env_set(const EnvCollection& env_coll) {
     SeedEnvelope seed_env = env_coll.getSeedEnv();
     std::vector<EnvSet> env_set_list = env_coll.getEnvSetList();
     /// Get Envset of seed envelope
@@ -43,7 +43,7 @@ namespace component_score {
     return max_consecutive_peak_num;
   }
 
-  double get_agg_odd_even_peak_ratio(EnvCollection env_coll) {
+  double get_agg_odd_even_peak_ratio(const EnvCollection& env_coll) {
     EnvSet env_set = get_seed_env_set(env_coll);
     std::vector<double> theo_inte = get_theo_envelope_peak_intens(env_set);
     std::vector<double> aggregate_inte = env_utils::get_aggregate_envelopes_inte(env_set);
@@ -68,7 +68,7 @@ namespace component_score {
     return std::log10(inte_ratio);
   }
 
-  double get_agg_env_corr(EnvCollection env_coll) {
+  double get_agg_env_corr(const EnvCollection& env_coll) {
     EnvSet env_set = get_seed_env_set(env_coll);
     std::vector<double> theo_inte = get_theo_envelope_peak_intens(env_set);
     std::vector<double> aggregate_inte = env_utils::get_aggregate_envelopes_inte(env_set);
@@ -80,7 +80,7 @@ namespace component_score {
     return corr;
   }
 
-  double get_consecutive_peaks_percent(EnvCollection env_coll) {
+  double get_consecutive_peaks_percent(const EnvCollection& env_coll) {
     EnvSet env_set = get_seed_env_set(env_coll);
     double total_peaks = 0, positive_peaks = 0;
     std::vector<ExpEnvelope> exp_envs = env_set.getExpEnvList();
@@ -95,7 +95,7 @@ namespace component_score {
     return percent_matched_peaks;
   }
 
-  double get_matched_peaks_percent(EnvCollection env_coll) {
+  double get_matched_peaks_percent(const EnvCollection& env_coll) {
     EnvSet env_set = get_seed_env_set(env_coll);
     double total_peaks = 0, positive_peaks = 0;
     std::vector<ExpEnvelope> exp_envs = env_set.getExpEnvList();
@@ -113,7 +113,7 @@ namespace component_score {
     return percent_matched_peaks;
   }
 
-  double get_3_scan_corr(EnvCollection env_coll) {
+  double get_3_scan_corr(const EnvCollection& env_coll) {
     double scan_3_corr = 0;
     EnvSet env_set = get_seed_env_set(env_coll);
     std::vector<ExpEnvelope> exp_envs = env_set.getExpEnvList();
@@ -153,7 +153,7 @@ namespace component_score {
     return scan_3_corr;
   }
 
-  double get_rt_range(EnvCollection env_coll){
+  double get_rt_range(const EnvCollection& env_coll){
     return (env_coll.getEndSpecId() - env_coll.getStartSpecId());
 //    return (env_coll. get_max_elution_time() - env_coll.get_min_elution_time());
   }

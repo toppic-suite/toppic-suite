@@ -41,10 +41,8 @@ toppic::SeedEnvelope::SeedEnvelope(int spec_id, int env_id, double pos, double m
   mass_ = mass;
   inte_ = inte;
   charge_ = charge;
-  for (int i = 0; i < pos_list.size(); i++){
-    SimplePeak peak = SimplePeak(pos_list[i], inte_list[i]);
-    peak_list_.push_back(peak);
-  }
+  for (int i = 0; i < pos_list.size(); i++)
+    peak_list_.push_back(SimplePeak(pos_list[i], inte_list[i]));
 }
 
 toppic::SeedEnvelope::SeedEnvelope(const toppic::SeedEnvelope &env) {
@@ -54,10 +52,8 @@ toppic::SeedEnvelope::SeedEnvelope(const toppic::SeedEnvelope &env) {
   mass_ = env.mass_;
   inte_ = env.inte_;
   charge_ = env.charge_;
-  for (const auto & i : env.peak_list_){
-    SimplePeak peak = SimplePeak(i.getPos(), i.getInte());
-    peak_list_.push_back(peak);
-  }
+  for (const auto & i : env.peak_list_)
+    peak_list_.push_back(SimplePeak(i.getPos(), i.getInte()));
 }
 
 std::vector<double> toppic::SeedEnvelope::get_pos_list() {
@@ -91,11 +87,12 @@ void toppic::SeedEnvelope::rm_peaks(double min_pos, double max_pos){
 }
 
 void toppic::SeedEnvelope::change_charge(int new_charge){
-  for (auto p : peak_list_) {
-    double new_pos = (p.getPos() - get_proton_mass()) * charge_/ new_charge + get_proton_mass();
+  for (auto &p : peak_list_) {
+    double new_pos = (((p.getPos() - get_proton_mass()) * charge_)/new_charge) + get_proton_mass();
     p.setPos(new_pos);
-    charge_ = new_charge;
   }
+  pos_ = (((pos_ - get_proton_mass()) * charge_)/new_charge) + get_proton_mass();
+  charge_ = new_charge;
 }
 
 toppic::SeedEnvelope toppic::SeedEnvelope::get_new_charge_env(int new_charge){
@@ -104,16 +101,16 @@ toppic::SeedEnvelope toppic::SeedEnvelope::get_new_charge_env(int new_charge){
   return new_env;
 }
 
-void toppic::SeedEnvelope::remove_low_inte_peaks(double ratio, double base_inte){
+void toppic::SeedEnvelope::remove_low_inte_peaks(double ratio, double base_inte, double snr) {
   std::vector<SimplePeak> peak_list;
-  for (auto p : peak_list_) {
-    if (p.getInte() * ratio >= base_inte)
+  for (auto &p : peak_list_) {
+    if (p.getInte() * ratio >= (base_inte * snr))
       peak_list.push_back(p);
     peak_list_ = peak_list;
   }
 }
 
-void toppic::SeedEnvelope::shift(int shift_num){
+void toppic::SeedEnvelope::shift(double shift_num){
   double shift_mass = shift_num * get_isotope_mass();
   double shift_mz = shift_mass/charge_;
   pos_ = pos_ + shift_mz;

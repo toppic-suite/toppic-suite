@@ -26,11 +26,13 @@ namespace toppic {
         int get_peak_num() { return peak_list_.size(); }
         ExpPeak get_peak(int idx) { return peak_list_[idx]; }
 
-        const int getSpecId() const { return spec_id_; }
+        int getSpecId() const { return spec_id_; }
         void setSpecId(int spec_id) { spec_id_ = spec_id; }
 
         std::vector<ExpPeak> getExpEnvList() { return peak_list_; }
-        void setExpEnvList(std::vector<ExpPeak> peak_list) { peak_list_ = peak_list; }
+        void setExpEnvList(const std::vector<ExpPeak>& peak_list) {
+          peak_list_.clear();
+          for (auto & peak: peak_list) peak_list_.push_back(peak); }
 
         bool isEmpty(){
           if (spec_id_ == -1 && peak_list_.empty())

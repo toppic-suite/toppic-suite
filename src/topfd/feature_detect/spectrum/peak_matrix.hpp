@@ -17,12 +17,13 @@ namespace toppic {
     class PeakMatrix {
     public:
         PeakMatrix(const PeakPtrVec2D& raw_peaks, DeconvMsPtrVec ms1_ptr_vec, double bin_size, double snr);
+        PeakMatrix() { bin_num_ = -1; spec_num_ = -1; min_mz_ = -1; max_mz_ = -1; min_inte_ = -1; bin_size_ = -1; };
         spec_list get_spec_list(DeconvMsPtrVec ms1_ptr_vec);
         void init_matrix(PeakPtrVec2D raw_peaks, double snr);
         int get_index(double mz);
-        void find_all_neighbors(double mass_tol);
-        void find_pair_neighbors(PeakRow first_row, PeakRow second_row, int search_bin_num, double mass_tol);
-        void remove_peak(ExpPeak peak);
+        void find_remove_non_neighbors(double mass_tol);
+        void find_pair_neighbors(int spec_id, int search_bin_num, double mass_tol);
+        void remove_peak(const ExpPeak& peak);
         void remove_peak_in_range(int spec_id, double min_pos, double max_pos);
         PeakRow get_row(int idx) { return matrix_[idx]; }
         double getDataLevelNoiseIntensities(std::vector<double> intes){ return baseline_util::getBaseLine(intes); }
@@ -44,6 +45,8 @@ namespace toppic {
         double max_mz_;
         double min_inte_;
         double bin_size_;
+
+        void find_pair_neighbors(PeakRow &first_row, PeakRow &second_row, int search_bin_num, double mass_tol);
     };
 }
 

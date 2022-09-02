@@ -4,14 +4,14 @@
 
 namespace toppic {
 namespace env_set_util {
-  ExpPeak pick_exp_peak(PeakRow row, SimplePeak seed_peak, double mass_tol) {
+  ExpPeak pick_exp_peak(const PeakRow& row, const SimplePeak& seed_peak, double mass_tol) {
     // get peaks within mass tolerance
     ExpPeak result_peak = ExpPeak();
     double max_inte = -1000000;
     double pos = seed_peak.getPos();
     for (int idx = seed_peak.getStartIdx(); idx < seed_peak.getEndIdx() + 1; idx++) {
       std::vector<std::vector<ExpPeak>> rows = row.getRow();
-      for (auto matrix_peak : rows[idx]) {
+      for (const auto& matrix_peak : rows[idx]) {
         if (std::abs(pos - matrix_peak.getPos()) < mass_tol && (matrix_peak.getInte() > max_inte)) {
           result_peak = ExpPeak(matrix_peak);
           max_inte = matrix_peak.getInte();
@@ -21,10 +21,10 @@ namespace env_set_util {
     return result_peak;
   }
 
-  ExpEnvelope get_match_exp_env(PeakRow peak_row, SeedEnvelope seed_env, double mass_tol) {
+  ExpEnvelope get_match_exp_env(const PeakRow& peak_row, const SeedEnvelope& seed_env, double mass_tol) {
     std::vector<ExpPeak> peak_list;
     std::vector<SimplePeak> peaks = seed_env.getPeakList();
-    for (auto seed_peak : peaks) {
+    for (const auto& seed_peak : peaks) {
       ExpPeak peak = pick_exp_peak(peak_row, seed_peak, mass_tol);
       peak_list.push_back(peak);
     }
@@ -32,7 +32,7 @@ namespace env_set_util {
     return exp_env;
   }
 
-  SeedEnvelope preprocess_env(PeakMatrix peak_matrix, SeedEnvelope seed_env, double mass_tol, bool *valid) {
+  SeedEnvelope preprocess_env(PeakMatrix peak_matrix, const SeedEnvelope& seed_env, double mass_tol, bool *valid) {
     SeedEnvelope env(seed_env);
     double min_mz = peak_matrix.get_min_mz() - mass_tol;
     double max_mz = peak_matrix.get_max_mz() + mass_tol;
@@ -48,16 +48,17 @@ namespace env_set_util {
     return env;
   }
 
-    bool check_valid_env_set(PeakMatrix peak_matrix, SeedEnvelope seed_env, double mass_tol, double match_peak_num_tole) {
+  bool check_valid_env_set(PeakMatrix peak_matrix, const SeedEnvelope& seed_env, double mass_tol, double match_peak_num_tole) {
     bool valid = false;
     SeedEnvelope env = env_set_util::preprocess_env(peak_matrix, seed_env, mass_tol, &valid);
     if (!valid)
       return false;
     env.keep_top_three();
-    env_set_util::comp_peak_start_end_idx(peak_matrix, env.getPeakList(), mass_tol);
+    env_set_util::comp_peak_start_end_idx(peak_matrix, env, mass_tol);
     int base_idx = env.getSpecId();
     int start_idx = std::max(base_idx - 1, 0);
     int end_idx = std::min(base_idx + 1, peak_matrix.get_spec_num() - 1);
+//    std::cout << start_idx << base_idx << end_idx << std::endl;
 
     valid = true;
     std::vector<ExpEnvelope> env_list;
@@ -83,8 +84,9 @@ namespace env_set_util {
     }
   }
 
-  void comp_peak_start_end_idx(PeakMatrix peak_matrix, std::vector<SimplePeak> peak_list, double error_tole) {
-    for (auto peak : peak_list) {
+  void comp_peak_start_end_idx(PeakMatrix peak_matrix, SeedEnvelope &seed_env, double error_tole) {
+    std::vector<SimplePeak> peak_list = seed_env.getPeakList();
+    for (auto &peak : peak_list) {
       double mz = peak.getPos();
       int start_idx = peak_matrix.get_index(mz - error_tole);
       if (start_idx < 0)
@@ -95,17 +97,16 @@ namespace env_set_util {
       peak.setStartIdx(start_idx);
       peak.setEndIdx(end_idx);
     }
+    seed_env.setPeakList(peak_list);
   }
 
-
-
-  EnvSet get_env_set_by_three_peaks(PeakMatrix peak_matrix, SeedEnvelope seed_env, double mass_tol, double max_miss_env) {
+  EnvSet get_env_set_by_three_peaks(PeakMatrix peak_matrix, const SeedEnvelope& seed_env, double mass_tol, double max_miss_env) {
     bool valid;
     SeedEnvelope env = env_set_util::preprocess_env(peak_matrix, seed_env, mass_tol, &valid);
     if (!valid)
       return EnvSet();
     env.keep_top_three();
-    comp_peak_start_end_idx(peak_matrix, env.getPeakList(), mass_tol);
+    comp_peak_start_end_idx(peak_matrix, env, mass_tol);
 
     // search backward
     std::vector<ExpEnvelope> back_env_list;
@@ -148,6 +149,7 @@ namespace env_set_util {
       return EnvSet();
     int start_spec_id = back_env_list[0].getSpecId();
     int end_spec_id = back_env_list[back_env_list.size() - 1].getSpecId();
+//    std::cout << start_spec_id << ", " << end_spec_id << std::endl;
     EnvSet env_set = EnvSet(env, back_env_list, start_spec_id, end_spec_id);
     return env_set;
   }
@@ -164,12 +166,12 @@ namespace env_set_util {
     std::cout << std::endl;
   }
 
-  EnvSet find_env_set(PeakMatrix peak_matrix, SeedEnvelope seed_env, double mass_tol, int start_spec_id, int end_spec_id) {
+  EnvSet find_env_set(PeakMatrix peak_matrix, const SeedEnvelope& seed_env, double mass_tol, int start_spec_id, int end_spec_id) {
     bool valid;
     SeedEnvelope env = env_set_util::preprocess_env(peak_matrix, seed_env, mass_tol, &valid);
     if (!valid)
       return EnvSet();
-    comp_peak_start_end_idx(peak_matrix, env.getPeakList(), mass_tol);
+    comp_peak_start_end_idx(peak_matrix, env, mass_tol);
     std::vector<ExpEnvelope> exp_env_list;
     for (int idx = start_spec_id; idx < end_spec_id + 1; idx++) {
       ExpEnvelope exp_env = env_set_util::get_match_exp_env(peak_matrix.get_row(idx), env, mass_tol);

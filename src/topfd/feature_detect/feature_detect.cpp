@@ -12,31 +12,16 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <cmath>
 #include <iostream>
 #include <algorithm>
 
-#include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
-#include "common/util/time_util.hpp"
-#include "common/base/mass_constant.hpp"
-#include "common/base/mod_util.hpp"
 #include "seq/fasta_util.hpp"
-#include "seq/fasta_index_reader.hpp"
 #include "ms/spec/peak.hpp"
 #include "ms/spec/deconv_ms.hpp"
 #include "ms/spec/simple_msalign_reader.hpp"
-#include "ms/env/env_base.hpp"
 #include "ms/env/env_para.hpp"
-#include "ms/env/match_env.hpp"
 #include "ms/feature/frac_feature.hpp"
-#include "ms/feature/single_charge_feature.hpp"
-#include "ms/feature/frac_feature_writer.hpp"
-#include "ms/feature/spec_feature.hpp"
-#include "ms/feature/spec_feature_writer.hpp"
-#include "ms/feature/peak_cluster.hpp"
-#include "ms/feature/sample_feature.hpp"
-#include "ms/feature/sample_feature_writer.hpp"
 #include "topfd/msreader/raw_ms_reader.hpp"
 #include "topfd/feature_detect/feature_para.hpp"
 #include "topfd/feature_detect/feature_detect.hpp"
@@ -51,13 +36,12 @@
 namespace toppic {
 
 namespace feature_detect {
-std::vector<double> getSpectrumNoiseIntensities(PeakPtrVec2D raw_peaks){
+std::vector<double> getSpectrumNoiseIntensities(const PeakPtrVec2D& raw_peaks){
   std::vector<double> spectrum_noise_levels;
-  for (size_t i = 0; i < raw_peaks.size(); i++) {
-    PeakPtrVec peaks = raw_peaks[i];
+  for (const auto& peaks : raw_peaks) {
     std::vector<double> intes;
-    for (size_t j = 0; j < peaks.size(); j++) {
-      intes.push_back(peaks[j]->getIntensity());
+    for (auto & peak : peaks) {
+      intes.push_back(peak->getIntensity());
     }
     double noise = baseline_util::getBaseLine(intes);
     spectrum_noise_levels.push_back(noise);
@@ -73,9 +57,21 @@ void process(int frac_id, const std::string &sp_file_name,
       = std::make_shared<FeaturePara>(frac_id, sp_file_name, resource_dir);
   EnvParaPtr env_para_ptr = std::make_shared<EnvPara>();
   std::string base_name = file_util::basename(sp_file_name);
+
+  ///// params
+  double bin_size = 0.1;
+  double neighbor_mass_tole = 0.01;
+  double mass_tole = 0.01;
+  int max_miss_env = 2;
+  int max_miss_charge = 2;
+  int max_miss_peak = 2;
+  int para_max_charge = 30;
+  double ratio_multi = 2.0;
+  int match_peak_tole = 3;
+
   // read ms1 deconvoluted spectra
   if (!missing_level_one) {
-    std::string file_num = "";
+    std::string file_num;
     //for (size_t i = 0; i < voltage_vec.size(); i++) {
     for (size_t i = 0; i <1; i++) {
       if (isFaims) {file_num = str_util::toString(i) + "_";} // if FAIME Data
@@ -99,25 +95,22 @@ void process(int frac_id, const std::string &sp_file_name,
 
       /// Prepare data
       std::vector<SeedEnvelope> seed_envs;
-      for (int ms1_id = 0; ms1_id < ms1_ptr_vec.size(); ms1_id++) {
-        DeconvMsPtr deconv_data = ms1_ptr_vec[ms1_id];
-        SeedEnvelope seed_env = SeedEnvelope(deconv_data);
-        seed_envs.push_back(seed_env);
+      for (auto & ms1_data : ms1_ptr_vec) {
+        std::vector<DeconvPeakPtr> peaks =  ms1_data->getPeakPtrVec();
+        for (const auto& peak : peaks)
+          seed_envs.push_back(SeedEnvelope(peak));
       }
       std::sort(seed_envs.begin(), seed_envs.end(), SeedEnvelope::cmpInteDec);
-      PeakMatrix peak_matrix = PeakMatrix(raw_peaks, ms1_ptr_vec);
+
+//      PeakMatrix peak_matrix = PeakMatrix();
+      PeakMatrix peak_matrix = PeakMatrix(raw_peaks, ms1_ptr_vec, bin_size, env_para_ptr->ms_one_sn_ratio_);
+      peak_matrix.find_remove_non_neighbors(neighbor_mass_tole);
 
       /// Noise Intensity level
+//      std::vector<double> spectrum_noise_levels;
       std::vector<double> spectrum_noise_levels = getSpectrumNoiseIntensities(raw_peaks);
+      std::cout << "Number of spectra and seed envelopes: " << spectrum_noise_levels.size() << " , " << seed_envs.size() << std::endl;
 
-      ///// params
-      double mass_tole = 0.01;
-      int max_miss_env = 2;
-      int max_miss_charge = 2;
-      int max_miss_peak = 2;
-      int para_max_charge = 30;
-      double ratio_multi = 2.0;
-      int match_peak_tole = 3;
 
       ///
       int seed_num = seed_envs.size();
@@ -129,12 +122,13 @@ void process(int frac_id, const std::string &sp_file_name,
         SeedEnvelope env = seed_envs[i];
         EnvCollection env_coll = env_coll_util::find_env_collection(peak_matrix, env, mass_tole, max_miss_env,
                                                                             max_miss_charge, max_miss_peak, para_max_charge,
-                                                                            ratio_multi, match_peak_tole);
+                                                                            ratio_multi, match_peak_tole, env_para_ptr->ms_one_sn_ratio_);
         if (!env_coll.isEmpty()) {
           features.push_back(Feature(env_coll, peak_matrix, env_coll_num));
           env_coll.remove_matrix_peaks(peak_matrix);
 //          env_coll_list.push_back(env_coll);
           env_coll_num = env_coll_num + 1;
+//          break;
         }
       }
       std::cout << "Number of Envelope Collections: " << features.size() << std::endl;

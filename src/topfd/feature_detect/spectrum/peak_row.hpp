@@ -24,7 +24,11 @@ namespace toppic {
         void setSpectrum(Spectrum spectrum) { spectrum_ = spectrum; }
 
         std::vector<std::vector<ExpPeak>> getRow() const { return row_; }
-        void setRow(std::vector<std::vector<ExpPeak>> row) { row_ = row; }
+        void setRow(std::vector<std::vector<ExpPeak>> row) {
+          row_.clear();
+          for (auto & r : row)
+            row_.push_back(r);
+        }
 
         int getSpecID() const { return spectrum_.getSpecId(); }
         int getScanNum() const { return spectrum_.getScanNum(); }

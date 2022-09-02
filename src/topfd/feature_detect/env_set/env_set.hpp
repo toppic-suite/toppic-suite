@@ -16,7 +16,7 @@ namespace toppic {
     class EnvSet {
     public:
         EnvSet();
-        EnvSet(SeedEnvelope envelope, std::vector<ExpEnvelope> env_list, int start, int end);
+        EnvSet(const SeedEnvelope& envelope, std::vector<ExpEnvelope> env_list, int start, int end);
         EnvSet(const EnvSet & es);
 
         void get_coordinates(spec_list spectra_list, std::vector<double> x, std::vector<double> y, std::vector<double> z);
