@@ -191,17 +191,25 @@ file(GLOB UNIT_TEST_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/*.cpp)
 #gui to run exe in command line
 file(GLOB GUI_UTIL_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/util/*.cpp)
 
-add_executable(topfd 
-  ${TOPFD_CONSOLE_SRCS} ${TOPFD_SRCS} ${COMMON_SRCS} ${PARA_SRCS} 
-  ${SPEC_SRCS} ${ENV_SRCS} ${FEATURE_SRCS} ${PWIZ_SRCS} ${NOWIDE_SRCS})
+#add_executable(topfd 
+#  ${TOPFD_CONSOLE_SRCS} ${TOPFD_SRCS} ${COMMON_SRCS} ${PARA_SRCS} 
+#  ${SPEC_SRCS} ${ENV_SRCS} ${FEATURE_SRCS} ${PWIZ_SRCS} ${NOWIDE_SRCS})
 
 #add_executable(topfd_single 
 #  ${TOPFD_SINGLE_CONSOLE_SRCS} ${TOPFD_SINGLE_PROC_SRCS} ${TOPFD_SRCS}
 #  ${SPEC_SRCS} ${ENV_SRCS} ${PWIZ_SRCS} ${COMMON_SRCS}) 
 
+#add_executable(topfd_gui 
+#  ${TOPFD_GUI_SRCS} ${TOPFD_SRCS} ${COMMON_SRCS} ${PARA_SRCS} 
+#  ${SPEC_SRCS} ${ENV_SRCS} ${FEATURE_SRCS} ${PWIZ_SRCS} ${NOWIDE_SRCS} ${GUI_UTIL_SRCS})
+
+add_executable(topfd 
+  ${TOPFD_CONSOLE_SRCS} ${TOPFD_SRCS} ${COMMON_SRCS} ${PARA_SRCS} 
+  ${SPEC_SRCS} ${ENV_SRCS} ${FEATURE_SRCS} ${PWIZ_SRCS} ${NOWIDE_SRCS} src/topfd/feature_detect/env_collection/env_collection.cpp src/topfd/feature_detect/env_collection/env_collection.hpp src/topfd/feature_detect/env_set/env_set.cpp src/topfd/feature_detect/env_set/env_set.hpp src/topfd/feature_detect/envelope/seed_envelope.cpp src/topfd/feature_detect/envelope/seed_envelope.hpp src/topfd/feature_detect/envelope/simple_peak.hpp src/topfd/feature_detect/spectrum/spectrum.hpp src/topfd/feature_detect/spectrum/peak_row.hpp src/topfd/feature_detect/spectrum/exp_peak.hpp src/topfd/feature_detect/spectrum/peak_matrix.cpp src/topfd/feature_detect/spectrum/peak_matrix.hpp src/topfd/feature_detect/env_set/exp_envelope.cpp src/topfd/feature_detect/env_set/exp_envelope.hpp src/topfd/feature_detect/env_set/env_set_util.cpp src/topfd/feature_detect/env_set/env_set_util.hpp src/topfd/feature_detect/env_set/xic.cpp src/topfd/feature_detect/env_set/xic.hpp src/topfd/feature_detect/env_collection/env_coll_util.cpp src/topfd/feature_detect/env_collection/env_coll_util.hpp src/topfd/feature_detect/util/utility_functions.cpp src/topfd/feature_detect/util/utility_functions.hpp src/topfd/feature_detect/envelope/simple_peak.cpp src/topfd/feature_detect/score/get_env_cnn_score.cpp src/topfd/feature_detect/score/get_env_cnn_score.hpp src/topfd/feature_detect/score/get_component_score.cpp src/topfd/feature_detect/score/get_component_score.hpp src/topfd/feature_detect/score/env_util.cpp src/topfd/feature_detect/score/env_util.hpp src/topfd/feature_detect/util/write_feature.cpp src/topfd/feature_detect/util/write_feature.hpp src/topfd/feature_detect/feature/feature.cpp src/topfd/feature_detect/feature/feature.hpp)
+
 add_executable(topfd_gui 
   ${TOPFD_GUI_SRCS} ${TOPFD_SRCS} ${COMMON_SRCS} ${PARA_SRCS} 
-  ${SPEC_SRCS} ${ENV_SRCS} ${FEATURE_SRCS} ${PWIZ_SRCS} ${NOWIDE_SRCS} ${GUI_UTIL_SRCS})
+  ${SPEC_SRCS} ${ENV_SRCS} ${FEATURE_SRCS} ${PWIZ_SRCS} ${NOWIDE_SRCS} ${GUI_UTIL_SRCS} src/topfd/feature_detect/env_collection/env_collection.cpp src/topfd/feature_detect/env_collection/env_collection.hpp src/topfd/feature_detect/env_set/env_set.cpp src/topfd/feature_detect/env_set/env_set.hpp src/topfd/feature_detect/envelope/seed_envelope.cpp src/topfd/feature_detect/envelope/seed_envelope.hpp src/topfd/feature_detect/envelope/simple_peak.hpp src/topfd/feature_detect/spectrum/spectrum.hpp src/topfd/feature_detect/spectrum/peak_row.hpp src/topfd/feature_detect/spectrum/exp_peak.hpp src/topfd/feature_detect/spectrum/peak_matrix.cpp src/topfd/feature_detect/spectrum/peak_matrix.hpp src/topfd/feature_detect/env_set/exp_envelope.cpp src/topfd/feature_detect/env_set/exp_envelope.hpp src/topfd/feature_detect/env_set/env_set_util.cpp src/topfd/feature_detect/env_set/env_set_util.hpp src/topfd/feature_detect/env_set/xic.cpp src/topfd/feature_detect/env_set/xic.hpp src/topfd/feature_detect/env_collection/env_coll_util.cpp src/topfd/feature_detect/env_collection/env_coll_util.hpp src/topfd/feature_detect/util/utility_functions.cpp src/topfd/feature_detect/util/utility_functions.hpp src/topfd/feature_detect/envelope/simple_peak.cpp src/topfd/feature_detect/score/get_env_cnn_score.cpp src/topfd/feature_detect/score/get_env_cnn_score.hpp src/topfd/feature_detect/score/get_component_score.cpp src/topfd/feature_detect/score/get_component_score.hpp src/topfd/feature_detect/score/env_util.cpp src/topfd/feature_detect/score/env_util.hpp src/topfd/feature_detect/util/write_feature.cpp src/topfd/feature_detect/util/write_feature.hpp src/topfd/feature_detect/feature/feature.cpp src/topfd/feature_detect/feature/feature.hpp)
 
 add_executable(topindex 
   ${TOPINDEX_CONSOLE_SRCS} ${TOPINDEX_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS}
