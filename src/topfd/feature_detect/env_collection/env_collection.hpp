@@ -22,16 +22,16 @@ class EnvCollection {
     EnvCollection(const EnvCollection & ec);
     EnvCollection(const SeedEnvelope& env, const std::vector<EnvSet>& env_set_list, int min_charge, int max_charge, int start_spec_id, int end_spec_id);
 
-
+    std::vector<std::vector<double>> get_seed_theo_map(PeakMatrix & peak_matrix, double snr);
     double comp_correlation();
     double comp_odd_even_log_ratio();
     void refine_mono_mass();
-    double get_intensity();
+    double get_intensity(double snr, double noise_inte);
     double get_min_elution_time(spec_list spectra_list);
     double get_max_elution_time(spec_list spectra_list);
     double get_apex_elution_time(spec_list spectra_list);
     double get_elution_length(const spec_list& spectra_list);
-    void remove_matrix_peaks(const PeakMatrix& peak_matrix);
+    void remove_matrix_peaks(PeakMatrix& peak_matrix);
     std::vector<double> comp_exp_inte_sum_list();
 
 
@@ -52,6 +52,8 @@ class EnvCollection {
 
     int getEndSpecId() const { return end_spec_id_; }
     void setEndSpecId(int endSpecId) { end_spec_id_ = endSpecId; }
+
+    int getBaseSpecID() const { return seed_env_.getSpecId(); }
 
     std::vector<double> getExpInteSumList() const { return exp_inte_sum_list_; }
     void setExpInteSumList(const std::vector<double>& expInteSumList) {

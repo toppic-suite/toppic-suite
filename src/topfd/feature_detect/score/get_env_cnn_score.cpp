@@ -19,7 +19,7 @@ namespace env_cnn_score {
     return floor(val + 0.5);
   }
 
-  std::vector<ExpPeak> get_intv_peak_list(PeakMatrix peak_matrix, EnvSet env_set, int spec_id){
+  std::vector<ExpPeak> get_intv_peak_list(PeakMatrix& peak_matrix, EnvSet& env_set, int spec_id){
     std::vector<SimplePeak> peak_list = env_set.get_peak_list();
     double min_theo_peak = round(peak_list[0].getPos() * 1000.0)/1000.0;
     double max_theo_peak = round(peak_list[peak_list.size()-1].getPos() * 1000.0)/1000.0;
@@ -36,7 +36,7 @@ namespace env_cnn_score {
     return intv_peak_list;
   }
 
-  double get_envcnn_score(fdeep::model model, PeakMatrix peak_matrix, EnvCollection env_coll, double noiseIntensityLevel) {
+  double get_envcnn_score(fdeep::model& model, PeakMatrix& peak_matrix, EnvCollection& env_coll, double noiseIntensityLevel) {
     std::vector<fdeep::tensors> tensorsL;
     std::vector<std::vector<double>> envcnn_data_matrix = get_data_matrix_EnvCNN_aggregate_sum(peak_matrix, env_coll, noiseIntensityLevel, 0.01);
     env_cnn::generateTensors(tensorsL, envcnn_data_matrix);
@@ -47,7 +47,7 @@ namespace env_cnn_score {
     return 0.0;
   }
 
-  std::vector<std::vector<double>> get_data_matrix_EnvCNN_aggregate_sum(PeakMatrix peak_matrix, EnvCollection env_coll,
+  std::vector<std::vector<double>> get_data_matrix_EnvCNN_aggregate_sum(PeakMatrix& peak_matrix, EnvCollection& env_coll,
                                                                         double noiseIntensityLevel, double bin_size) {
     double mass_tole;
     SeedEnvelope seed_env = env_coll.getSeedEnv();

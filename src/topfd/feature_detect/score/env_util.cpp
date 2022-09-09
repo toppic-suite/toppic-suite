@@ -3,6 +3,7 @@
 //
 
 #include "env_util.hpp"
+#include <iostream>
 
 namespace toppic {
 namespace env_utils {
@@ -29,14 +30,11 @@ namespace env_utils {
     return result;
   }
 
-  std::vector<double> get_aggregate_envelopes_inte(EnvSet env_set){
-    SeedEnvelope seed_env = env_set.getSeedEnv();
+  std::vector<double> get_aggregate_envelopes_inte(EnvSet& env_set){
     std::vector<ExpEnvelope> exp_env_list = env_set.getExpEnvList();
-    std::vector<SimplePeak> peak_list = seed_env.getPeakList();
-
-    std::vector<double> aggregate_inte (peak_list.size(), 0.0);
-    for (int peakIdx = 0; peakIdx < aggregate_inte.size(); peakIdx++) {
-      for (int spId = 0; spId < peak_list.size(); spId++) {
+    std::vector<double> aggregate_inte (exp_env_list[0].get_peak_num(), 0.0);
+    for (int spId = 0; spId < exp_env_list.size(); spId++) {
+      for (int peakIdx = 0; peakIdx < aggregate_inte.size(); peakIdx++) {
         ExpPeak peak = exp_env_list[spId].get_peak(peakIdx);
         if (!peak.isEmpty())
           aggregate_inte[peakIdx] = aggregate_inte[peakIdx] + peak.getInte();
@@ -45,15 +43,12 @@ namespace env_utils {
     return aggregate_inte;
   }
 
-  std::vector<double> get_aggregate_envelopes_mz(EnvSet env_set){
-    SeedEnvelope seed_env = env_set.getSeedEnv();
+  std::vector<double> get_aggregate_envelopes_mz(EnvSet& env_set){
     std::vector<ExpEnvelope> exp_env_list = env_set.getExpEnvList();
-    std::vector<SimplePeak> peak_list = seed_env.getPeakList();
-
-    std::vector<double> aggregate_mz (peak_list.size(), 0.0);
+    std::vector<double> aggregate_mz (exp_env_list[0].get_peak_num(), 0.0);
     for (int peakIdx = 0; peakIdx < aggregate_mz.size(); peakIdx++) {
       int counter = 0;
-      for (int spId = 0; spId < peak_list.size(); spId++) {
+      for (int spId = 0; spId < exp_env_list.size(); spId++) {
         ExpPeak peak = exp_env_list[spId].get_peak(peakIdx);
         if (!peak.isEmpty()) {
           aggregate_mz[peakIdx] = aggregate_mz[peakIdx] + peak.getPos();
@@ -78,12 +73,13 @@ namespace env_utils {
     }
     if (refer_idx + 1 < theo_envelope_inte.size()) {
       theo_sum = theo_sum + theo_envelope_inte[refer_idx + 1];
-      obs_sum = obs_sum + exp_envelope_inte[refer_idx - 1];
+      obs_sum = obs_sum + exp_envelope_inte[refer_idx + 1];
     }
+//    std::cout << "Final: " << theo_sum << ", " << obs_sum << ", " <<  obs_sum / theo_sum << std::endl;
     if (theo_sum == 0)
       return 1.0;
-    else if (obs_sum == 0)
-      return 1.0;
+//    else if (obs_sum == 0)
+//      return 1.0;
     else
       return obs_sum / theo_sum;
   }

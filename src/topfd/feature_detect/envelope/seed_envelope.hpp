@@ -16,7 +16,7 @@ namespace toppic {
     class SeedEnvelope {
     public:
         SeedEnvelope();
-        SeedEnvelope(DeconvPeakPtr p);
+        SeedEnvelope(DeconvPeakPtr& p);
         SeedEnvelope(int spec_id, int env_id, double pos, double mass, double inte, int charge, std::vector<double> pos_list, std::vector<double> inte_list);
         SeedEnvelope(const SeedEnvelope &env);
 
@@ -63,7 +63,7 @@ namespace toppic {
         const std::vector<SimplePeak> &getPeakList() const { return peak_list_; }
         void setPeakList(const std::vector<SimplePeak> &peakList) {
           peak_list_.clear();
-          for (const auto& peak: peakList)
+          for (auto& peak: peakList)
             peak_list_.push_back(peak);
         }
 
@@ -71,6 +71,20 @@ namespace toppic {
           if (spec_id_ == -1 && env_id_ == -1 && pos_ == -1 && mass_ == -1 && inte_ == -1 && charge_ == -1 && peak_list_.empty())
             return true;
           return false;
+        }
+
+        std::string getString() {
+          std::string header = "Spec ID: " + std::to_string(spec_id_) + " " +
+                               "Env ID: " + std::to_string(env_id_) + " " +
+                               "Pos: " + std::to_string(pos_) + " " +
+                               "Inte: " + std::to_string(inte_) + " " +
+                               "Mass: " + std::to_string(mass_) + " " +
+                               "Charge: " + std::to_string(charge_) + "\n";
+          std::string peaks = "(";
+          for (auto peak: peak_list_)
+            peaks = peaks + "(" + std::to_string(peak.getPos()) + ", " + std::to_string(peak.getInte()) + "), ";
+          peaks = peaks + ")\n";
+          return header + peaks;
         }
 
     private:

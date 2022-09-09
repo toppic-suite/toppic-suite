@@ -13,8 +13,8 @@
 
 namespace toppic {
 namespace env_cnn_score {
-    double get_envcnn_score(fdeep::model model, PeakMatrix peak_matrix, EnvCollection env_coll, double noiseIntensityLevel);
-    std::vector<std::vector<double>> get_data_matrix_EnvCNN_aggregate_sum(PeakMatrix peak_matrix, EnvCollection env_coll, double noiseIntensityLevel, double bin_size);
+    double get_envcnn_score(fdeep::model& model, PeakMatrix& peak_matrix, EnvCollection& env_coll, double noiseIntensityLevel);
+    std::vector<std::vector<double>> get_data_matrix_EnvCNN_aggregate_sum(PeakMatrix& peak_matrix, EnvCollection& env_coll, double noiseIntensityLevel, double bin_size);
 }
 }
 

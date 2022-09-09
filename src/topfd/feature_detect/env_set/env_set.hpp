@@ -19,6 +19,8 @@ namespace toppic {
         EnvSet(const SeedEnvelope& envelope, std::vector<ExpEnvelope> env_list, int start, int end);
         EnvSet(const EnvSet & es);
 
+        void refine_feature_boundary();
+
         void get_coordinates(spec_list spectra_list, std::vector<double> x, std::vector<double> y, std::vector<double> z);
         double get_median_ratio(ExpEnvelope env);
         Xic init_median_xic();
@@ -26,8 +28,10 @@ namespace toppic {
         void remove_non_consecutive_peaks(int i, int max_miss_peak);
         void remove_all_non_consecutive_peaks(int max_miss_peak);
         void simple_remove_matrix_peaks(PeakMatrix peak_matrix);
-        void remove_matrix_peaks(PeakMatrix peak_matrix);
-        double comp_intensity(){ return seed_env_.get_inte_sum() * xic_.get_inte_list_sum();}
+        void remove_matrix_peaks(PeakMatrix& peak_matrix);
+//        double comp_intensity(){ return seed_env_.get_inte_sum() * xic_.get_inte_list_sum();}
+        std::vector<std::vector<double>> get_map(double snr, double noise_inte);
+        double comp_intensity(double snr, double noise_inte);
         void get_weight_mz_error(double* cur_weight, double* cur_weight_mz_error);
         std::vector<double> comp_exp_inte_sum_list();
 
@@ -45,10 +49,18 @@ namespace toppic {
 
         const Xic getXic() const { return xic_; }
         void setXic(const Xic &xic) { xic_ = xic; }
+        std::vector<double> getXicEnvIntes() { return xic_.getInteList(); }
+
+        int getCharge() { return seed_env_.getCharge(); }
 
         std::vector<SimplePeak> get_peak_list() { return seed_env_.getPeakList(); }
         std::vector<double> get_theo_distribution_mz() {  return seed_env_.get_pos_list(); }
         std::vector<double> get_theo_distribution_inte() { return seed_env_.get_inte_list(); }
+
+
+        static bool cmpCharge(EnvSet a, EnvSet b) {
+          return a.getCharge() < b.getCharge();
+        }
 
         bool isEmpty(){
           if (seed_env_.isEmpty() && exp_env_list_.size() == 0 && start_spec_id_ == -1 && end_spec_id_ == -1 && xic_.isEmpty())

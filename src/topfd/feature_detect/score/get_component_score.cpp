@@ -15,7 +15,7 @@ namespace component_score {
     return theo_peak_intes;
   }
 
-  EnvSet get_seed_env_set(const EnvCollection& env_coll) {
+  EnvSet get_seed_env_set(EnvCollection& env_coll) {
     SeedEnvelope seed_env = env_coll.getSeedEnv();
     std::vector<EnvSet> env_set_list = env_coll.getEnvSetList();
     /// Get Envset of seed envelope
@@ -43,7 +43,7 @@ namespace component_score {
     return max_consecutive_peak_num;
   }
 
-  double get_agg_odd_even_peak_ratio(const EnvCollection& env_coll) {
+  double get_agg_odd_even_peak_ratio(EnvCollection& env_coll) {
     EnvSet env_set = get_seed_env_set(env_coll);
     std::vector<double> theo_inte = get_theo_envelope_peak_intens(env_set);
     std::vector<double> aggregate_inte = env_utils::get_aggregate_envelopes_inte(env_set);
@@ -68,7 +68,7 @@ namespace component_score {
     return std::log10(inte_ratio);
   }
 
-  double get_agg_env_corr(const EnvCollection& env_coll) {
+  double get_agg_env_corr(EnvCollection& env_coll) {
     EnvSet env_set = get_seed_env_set(env_coll);
     std::vector<double> theo_inte = get_theo_envelope_peak_intens(env_set);
     std::vector<double> aggregate_inte = env_utils::get_aggregate_envelopes_inte(env_set);
@@ -80,80 +80,172 @@ namespace component_score {
     return corr;
   }
 
-  double get_consecutive_peaks_percent(const EnvCollection& env_coll) {
+  double get_mz_errors(EnvCollection& env_coll) {
+    EnvSet env_set = get_seed_env_set(env_coll);
+    std::vector<double> theo_dis = env_set.get_theo_distribution_mz();
+    std::vector<ExpEnvelope> exp_envs = env_set.getExpEnvList();
+    double error_sum = 0;
+    for (auto & exp_env : exp_envs) {
+      std::vector<ExpPeak> peaks = exp_env.getExpEnvList();
+      for (int peak_idx = 0; peak_idx < peaks.size(); peak_idx++) {
+        ExpPeak peak = peaks[peak_idx];
+        if (!peak.isEmpty()) {
+          double cur_err = std::abs(peak.getPos() - theo_dis[peak_idx]);
+          error_sum = error_sum + cur_err;
+        }
+      }
+    }
+//    std::cout << "Error SUM: " << error_sum << std::endl;
+    return error_sum;
+  }
+
+  double count_max_consecutive_peak_num(std::vector<ExpPeak>& peaks) {
+    int n = 0;
+    int max_consecutive_peak_num = 0;
+    for (auto peak : peaks){
+      if (!peak.isEmpty()) {
+        n = n + 1;
+        if (n > max_consecutive_peak_num)
+          max_consecutive_peak_num = n;
+      }
+      else
+        n = 0;
+    }
+    return max_consecutive_peak_num;
+  }
+
+  double get_consecutive_peaks_percent(EnvCollection& env_coll) {
     EnvSet env_set = get_seed_env_set(env_coll);
     double total_peaks = 0, positive_peaks = 0;
     std::vector<ExpEnvelope> exp_envs = env_set.getExpEnvList();
-    for (auto exp_env : exp_envs) {
+    for (auto & exp_env : exp_envs) {
       std::vector<ExpPeak> peaks = exp_env.getExpEnvList();
-      for (auto p: peaks)
+      for (auto p : peaks)
         if (!p.isEmpty())
           total_peaks = total_peaks + 1;
-      positive_peaks = positive_peaks + count_max_consecutive_peak_num(exp_env);
+      positive_peaks  = positive_peaks + count_max_consecutive_peak_num(peaks);
     }
     double percent_matched_peaks = positive_peaks/total_peaks;
     return percent_matched_peaks;
   }
 
-  double get_matched_peaks_percent(const EnvCollection& env_coll) {
+  double get_matched_peaks_percent(EnvCollection& env_coll, std::vector<std::vector<double>> theo_map) {
     EnvSet env_set = get_seed_env_set(env_coll);
     double total_peaks = 0, positive_peaks = 0;
     std::vector<ExpEnvelope> exp_envs = env_set.getExpEnvList();
-    for (auto exp_env : exp_envs) {
-      std::vector<ExpPeak> peaks = exp_env.getExpEnvList();
-      int sum_val = 0;
-      for (auto p: peaks)
-        if (!p.isEmpty()) sum_val = sum_val + 1;
-      if (sum_val <= 2) continue;
-      total_peaks = total_peaks + peaks.size();
-      positive_peaks = positive_peaks + sum_val;
+    for (int i = 0; i < exp_envs.size(); i++) {
+      std::vector<ExpPeak> peaks = exp_envs[i].getExpEnvList();
+      std::vector<double> scalled_theo_env = theo_map[i];
+      for (double peak_inte : scalled_theo_env){
+        if (peak_inte > 0){
+          total_peaks = total_peaks + 1;
+          if (!peaks[i].isEmpty())
+            positive_peaks = positive_peaks + 1;
+        }
+      }
     }
     double percent_matched_peaks = -1;
     if (total_peaks > 0) percent_matched_peaks = positive_peaks/total_peaks;
     return percent_matched_peaks;
   }
 
-  double get_3_scan_corr(const EnvCollection& env_coll) {
-    double scan_3_corr = 0;
+  double get_num_theo_peaks(std::vector<std::vector<double>>& theo_map) {
+    double total_peaks = 0;
+    for (auto & scan_intes : theo_map)
+      for (double peak_inte : scan_intes)
+        if (peak_inte > 0)
+          total_peaks = total_peaks + 1;
+    return total_peaks;
+  }
+
+  double get_3_scan_corr(EnvCollection& env_coll) {
+    double scan_3_corr;
     EnvSet env_set = get_seed_env_set(env_coll);
     std::vector<ExpEnvelope> exp_envs = env_set.getExpEnvList();
-    std::vector<ExpEnvelope> shortlisted_spec;
-    for (const auto& exp_env : exp_envs){
-      SeedEnvelope seed_env = env_set.getSeedEnv();
-      if (seed_env.getSpecId() - 1 <= exp_env.getSpecId() <=  seed_env.getSpecId() + 1)
-        shortlisted_spec.push_back(exp_env);
-    }
-    std::vector<double> exp_peaks_base_spec_1;
-    std::vector<double> exp_peaks_base_spec_2;
-    std::vector<double> exp_peaks_base_spec_3;
-    if (shortlisted_spec.size() == 2) {
-      std::vector<ExpPeak> peaks = shortlisted_spec[0].getExpEnvList();
-      for (auto peak : peaks)
-        if(!peak.isEmpty()) exp_peaks_base_spec_1.push_back(peak.getInte());
-      peaks = shortlisted_spec[1].getExpEnvList();
-      for (auto peak : peaks)
-        if(!peak.isEmpty()) exp_peaks_base_spec_2.push_back(peak.getInte());
-      scan_3_corr = utility_functions::pearsonr(exp_peaks_base_spec_1, exp_peaks_base_spec_2);
-    }
-    if (shortlisted_spec.size() == 3) {
-      std::vector<ExpPeak> peaks = shortlisted_spec[0].getExpEnvList();
-      for (auto peak : peaks)
-        if(!peak.isEmpty()) exp_peaks_base_spec_1.push_back(peak.getInte());
-      peaks = shortlisted_spec[1].getExpEnvList();
-      for (auto peak : peaks)
-        if(!peak.isEmpty()) exp_peaks_base_spec_2.push_back(peak.getInte());
-      peaks = shortlisted_spec[2].getExpEnvList();
-      for (auto peak : peaks)
-        if(!peak.isEmpty()) exp_peaks_base_spec_3.push_back(peak.getInte());
-      double corr_sp_12 = utility_functions::pearsonr(exp_peaks_base_spec_1, exp_peaks_base_spec_2);
-      double corr_sp_13 = utility_functions::pearsonr(exp_peaks_base_spec_1, exp_peaks_base_spec_3);
-      double corr_sp_23 = utility_functions::pearsonr(exp_peaks_base_spec_2, exp_peaks_base_spec_3);
+
+    int base_spec = std::max(env_coll.getBaseSpecID() - env_coll.getStartSpecId(), 0);
+
+//    std::cout << base_spec << ", " << exp_envs.size() << ", " << env_coll.getBaseSpecID() << ", " <<  env_coll.getStartSpecId() << std::endl;
+    std::vector<double> data_sp = exp_envs[base_spec].get_inte_list();
+    std::vector<double> data_sp_minus_1 (data_sp.size(), 0.0);
+    std::vector<double> data_sp_plus_1  (data_sp.size(), 0.0);
+
+    if (base_spec - 1 > 0)
+      data_sp_minus_1 = exp_envs[base_spec-1].get_inte_list();
+    if (base_spec + 1 < exp_envs.size())
+      data_sp_plus_1 = exp_envs[base_spec+1].get_inte_list();
+
+//    for (int i = 0; i < data_sp.size(); i++)
+//      std::cout << i << ", " << data_sp_minus_1[i] << ", " << data_sp[i] << ", " << data_sp_plus_1[i] << std::endl;
+
+    double sp_sum = std::accumulate(data_sp.begin(), data_sp.end(), 0.0);
+    double sp_minus_1_sum = std::accumulate(data_sp_minus_1.begin(), data_sp_minus_1.end(), 0.0);
+    double sp_plus_1_sum = std::accumulate(data_sp_plus_1.begin(), data_sp_plus_1.end(), 0.0);
+//    std::cout << "SUM: " << sp_minus_1_sum << ", " << sp_sum << ", " << sp_plus_1_sum << std::endl;
+
+    if (sp_sum > 0 and sp_minus_1_sum > 0 and sp_plus_1_sum > 0){
+      double corr_sp_12 = utility_functions::pearsonr(data_sp, data_sp_minus_1);
+      double corr_sp_13 = utility_functions::pearsonr(data_sp, data_sp_plus_1);
+      double corr_sp_23 = utility_functions::pearsonr(data_sp_minus_1, data_sp_plus_1);
       scan_3_corr = (corr_sp_12 + corr_sp_13 + corr_sp_23)/3.0;
     }
+    else if (sp_sum > 0 and sp_minus_1_sum > 0 and sp_plus_1_sum == 0){
+      scan_3_corr = utility_functions::pearsonr(data_sp, data_sp_minus_1);
+    }
+    else if (sp_sum > 0 and sp_minus_1_sum == 0 and sp_plus_1_sum > 0){
+      scan_3_corr = utility_functions::pearsonr(data_sp, data_sp_plus_1);
+    }
+    else if (sp_sum == 0 and sp_minus_1_sum > 0 and sp_plus_1_sum > 0){
+      scan_3_corr = utility_functions::pearsonr(data_sp_minus_1, data_sp_plus_1);
+    }
+    else
+      scan_3_corr = 0;
+//    std::cout << "Top 3 scans correlation: " << scan_3_corr << std::endl;
     return scan_3_corr;
   }
 
-  double get_rt_range(const EnvCollection& env_coll){
+  //  double get_3_scan_corr(EnvCollection& env_coll) {
+//    double scan_3_corr = 0;
+//    EnvSet env_set = get_seed_env_set(env_coll);
+//    std::vector<ExpEnvelope> exp_envs = env_set.getExpEnvList();
+//
+//    std::vector<ExpEnvelope> shortlisted_spec;
+//    for (const auto& exp_env : exp_envs){
+//      SeedEnvelope seed_env = env_set.getSeedEnv();
+//      if (seed_env.getSpecId() - 1 <= exp_env.getSpecId() <=  seed_env.getSpecId() + 1)
+//        shortlisted_spec.push_back(exp_env);
+//    }
+//    std::vector<double> exp_peaks_base_spec_1;
+//    std::vector<double> exp_peaks_base_spec_2;
+//    std::vector<double> exp_peaks_base_spec_3;
+//    if (shortlisted_spec.size() == 2) {
+//      std::vector<ExpPeak> peaks = shortlisted_spec[0].getExpEnvList();
+//      for (auto peak : peaks)
+//        if(!peak.isEmpty()) exp_peaks_base_spec_1.push_back(peak.getInte());
+//      peaks = shortlisted_spec[1].getExpEnvList();
+//      for (auto peak : peaks)
+//        if(!peak.isEmpty()) exp_peaks_base_spec_2.push_back(peak.getInte());
+//      scan_3_corr = utility_functions::pearsonr(exp_peaks_base_spec_1, exp_peaks_base_spec_2);
+//    }
+//    if (shortlisted_spec.size() == 3) {
+//      std::vector<ExpPeak> peaks = shortlisted_spec[0].getExpEnvList();
+//      for (auto peak : peaks)
+//        if(!peak.isEmpty()) exp_peaks_base_spec_1.push_back(peak.getInte());
+//      peaks = shortlisted_spec[1].getExpEnvList();
+//      for (auto peak : peaks)
+//        if(!peak.isEmpty()) exp_peaks_base_spec_2.push_back(peak.getInte());
+//      peaks = shortlisted_spec[2].getExpEnvList();
+//      for (auto peak : peaks)
+//        if(!peak.isEmpty()) exp_peaks_base_spec_3.push_back(peak.getInte());
+//      double corr_sp_12 = utility_functions::pearsonr(exp_peaks_base_spec_1, exp_peaks_base_spec_2);
+//      double corr_sp_13 = utility_functions::pearsonr(exp_peaks_base_spec_1, exp_peaks_base_spec_3);
+//      double corr_sp_23 = utility_functions::pearsonr(exp_peaks_base_spec_2, exp_peaks_base_spec_3);
+//      scan_3_corr = (corr_sp_12 + corr_sp_13 + corr_sp_23)/3.0;
+//    }
+//    return scan_3_corr;
+//  }
+
+  double get_rt_range(EnvCollection& env_coll){
     return (env_coll.getEndSpecId() - env_coll.getStartSpecId());
 //    return (env_coll. get_max_elution_time() - env_coll.get_min_elution_time());
   }

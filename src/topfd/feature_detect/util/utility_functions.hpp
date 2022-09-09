@@ -9,6 +9,8 @@
 namespace toppic {
 namespace utility_functions {
   double pearsonr(std::vector<double> X, std::vector<double> Y);
+  std::vector<double> findLocalMinima(std::vector<double> arr);
+  std::vector<double> findLocalMaxima(std::vector<double> arr);
 }
 }
 

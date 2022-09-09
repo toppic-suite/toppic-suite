@@ -43,6 +43,15 @@ namespace toppic {
 
         bool getNeighbor() const { return neighbor_; }
         void setNeighbor(bool neighbor) { neighbor_ = neighbor; }
+
+        std::string getString() {
+          return "Peak ID: " + std::to_string(peak_id_) + " " +
+                 "Spec ID: " + std::to_string(spec_id_) + " " +
+                 "Pos: " + std::to_string(pos_) + " " +
+                 "Inte: " + std::to_string(inte_) + " " +
+                 "Neighbor: " + std::to_string(neighbor_) + "\n";
+        }
+
     private:
         int peak_id_;
         int spec_id_;

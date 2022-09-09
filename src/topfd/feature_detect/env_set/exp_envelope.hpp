@@ -19,8 +19,9 @@ namespace toppic {
           peak_list_ = peak_list;
         }
 
-        int get_match_peak_num();
+        int get_match_peak_num(int base_idx);
         std::vector<double> get_inte_list();
+        std::vector<double> get_pos_list();
         std::vector<double> get_non_empty_pos_list();
         void get_min_max_pos(double* min_pos, double* max_pos);
         int get_peak_num() { return peak_list_.size(); }
@@ -31,8 +32,11 @@ namespace toppic {
 
         std::vector<ExpPeak> getExpEnvList() { return peak_list_; }
         void setExpEnvList(const std::vector<ExpPeak>& peak_list) {
-          peak_list_.clear();
-          for (auto & peak: peak_list) peak_list_.push_back(peak); }
+          for (int i = 0; i < peak_list.size(); i++)
+            peak_list_[i] = peak_list[i];
+        }
+
+        void setExpEnvListPeak(ExpPeak peak, int idx) { peak_list_[idx] = peak; }
 
         bool isEmpty(){
           if (spec_id_ == -1 && peak_list_.empty())

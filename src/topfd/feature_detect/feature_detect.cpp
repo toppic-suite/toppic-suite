@@ -32,13 +32,15 @@
 #include "topfd/feature_detect/env_collection/env_coll_util.hpp"
 #include "topfd/feature_detect/feature/feature.hpp"
 #include "topfd/feature_detect/util/write_feature.hpp"
+#include "topfd/feature_detect/envelope/evaluate_envelope.hpp"
+#include "topfd/feature_detect/test_output_functions/write_out_files.hpp"
 
 namespace toppic {
 
 namespace feature_detect {
-std::vector<double> getSpectrumNoiseIntensities(const PeakPtrVec2D& raw_peaks){
+std::vector<double> getSpectrumNoiseIntensities(PeakPtrVec2D& raw_peaks){
   std::vector<double> spectrum_noise_levels;
-  for (const auto& peaks : raw_peaks) {
+  for (auto &peaks : raw_peaks) {
     std::vector<double> intes;
     for (auto & peak : peaks) {
       intes.push_back(peak->getIntensity());
@@ -62,6 +64,7 @@ void process(int frac_id, const std::string &sp_file_name,
   double bin_size = 0.1;
   double neighbor_mass_tole = 0.01;
   double mass_tole = 0.01;
+  double corr_tole = 0.05;
   int max_miss_env = 2;
   int max_miss_charge = 2;
   int max_miss_peak = 2;
@@ -77,6 +80,10 @@ void process(int frac_id, const std::string &sp_file_name,
       if (isFaims) {file_num = str_util::toString(i) + "_";} // if FAIME Data
 
       FracFeaturePtrVec frac_features;
+      std::string file_name = resource_dir
+                              + file_util::getFileSeparator() + "envcnn_models"
+                              + file_util::getFileSeparator() + "envcnn_2_block_model.json";
+      fdeep::model model = fdeep::load_model(file_name, true, fdeep::dev_null_logger);
 
       /// Read msalign file and get the seed envelopes.
       DeconvMsPtrVec ms1_ptr_vec;
@@ -93,51 +100,51 @@ void process(int frac_id, const std::string &sp_file_name,
       raw_reader_ptr = nullptr;
       std::cout << "Processed mzML file." << std::endl;
 
-      /// Prepare data
+      /// Prepare data -- seed envelopes
       std::vector<SeedEnvelope> seed_envs;
-      for (auto & ms1_data : ms1_ptr_vec) {
+      for (auto &ms1_data : ms1_ptr_vec) {
         std::vector<DeconvPeakPtr> peaks =  ms1_data->getPeakPtrVec();
-        for (const auto& peak : peaks)
+        for (auto &peak : peaks)
           seed_envs.push_back(SeedEnvelope(peak));
       }
       std::sort(seed_envs.begin(), seed_envs.end(), SeedEnvelope::cmpInteDec);
+//      write_out_files::write_seed_envelopes(seed_envs,  base_name + "_" + "envs.txt");
 
-//      PeakMatrix peak_matrix = PeakMatrix();
+      /// Prepare data -- Peak Matrix
       PeakMatrix peak_matrix = PeakMatrix(raw_peaks, ms1_ptr_vec, bin_size, env_para_ptr->ms_one_sn_ratio_);
+//      write_out_files::write_peak_matrix(peak_matrix, base_name + "_" + "matrix.txt");
       peak_matrix.find_remove_non_neighbors(neighbor_mass_tole);
+//      write_out_files::write_peak_matrix(peak_matrix, base_name + "_" + "matrix_labeled.txt");
 
-      /// Noise Intensity level
-//      std::vector<double> spectrum_noise_levels;
+      /// Prepare data -- Noise Intensity level
       std::vector<double> spectrum_noise_levels = getSpectrumNoiseIntensities(raw_peaks);
       std::cout << "Number of spectra and seed envelopes: " << spectrum_noise_levels.size() << " , " << seed_envs.size() << std::endl;
+//      write_out_files::write_noise_levels(peak_matrix, spectrum_noise_levels, base_name + "_" + "noise_level.txt");
 
-
-      ///
+      /// Extract Fetures
       int seed_num = seed_envs.size();
       int env_coll_num = 0;
-//      std::vector<EnvCollection> env_coll_list;
       std::vector<Feature> features;
-      std::vector<bool> used;
       for (int seed_env_idx = 0; seed_env_idx < seed_num; seed_env_idx++){
-        SeedEnvelope env = seed_envs[i];
-        EnvCollection env_coll = env_coll_util::find_env_collection(peak_matrix, env, mass_tole, max_miss_env,
-                                                                            max_miss_charge, max_miss_peak, para_max_charge,
-                                                                            ratio_multi, match_peak_tole, env_para_ptr->ms_one_sn_ratio_);
+        std::cout << "Processing peak " << seed_env_idx << " and Features found " << env_coll_num << std::endl;
+        SeedEnvelope env = seed_envs[seed_env_idx];
+        bool valid = evaluate_envelope::preprocess_env(peak_matrix, env, mass_tole, corr_tole, valid);
+        if (!valid) continue;
+        EnvCollection env_coll = env_coll_util::find_env_collection(peak_matrix, env, mass_tole, max_miss_env, max_miss_charge, max_miss_peak,
+                                                                    para_max_charge, ratio_multi, match_peak_tole, env_para_ptr->ms_one_sn_ratio_);
         if (!env_coll.isEmpty()) {
-          features.push_back(Feature(env_coll, peak_matrix, env_coll_num));
+          features.push_back(Feature(env_coll, peak_matrix, model, spectrum_noise_levels, env_coll_num, env_para_ptr->ms_one_sn_ratio_));
           env_coll.remove_matrix_peaks(peak_matrix);
-//          env_coll_list.push_back(env_coll);
           env_coll_num = env_coll_num + 1;
-//          break;
+          if (env_coll_num == 100)
+            break;
         }
       }
       std::cout << "Number of Envelope Collections: " << features.size() << std::endl;
-      std::string file_name = base_name + "_" + file_num + "ms1.feature";
+      file_name = base_name + "_" + file_num + "ms1.feature";
       write_feature::writeFeatures(file_name, features);
     }
   }
 }
-
 }  // namespace
-
 }  // namespace toppic

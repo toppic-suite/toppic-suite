@@ -3,6 +3,7 @@
 //
 
 #include "env_collection.hpp"
+#include "topfd/feature_detect/score/env_util.hpp"
 #include <iostream>
 #include <valarray>
 
@@ -106,12 +107,10 @@ void toppic::EnvCollection::refine_mono_mass(){
   }
 }
 
-double toppic::EnvCollection::get_intensity(){
+double toppic::EnvCollection::get_intensity(double snr, double noise_inte){
   double inte = 0;
-  for (auto env_set : env_set_list_) {
-    if (!env_set.isEmpty())
-      inte = inte + env_set.comp_intensity();
-  }
+  for (auto env_set : env_set_list_)
+    inte = inte + env_set.comp_intensity(snr, noise_inte);
   return inte;
 }
 
@@ -132,11 +131,25 @@ double toppic::EnvCollection::get_elution_length(const spec_list& spectra_list) 
   return get_max_elution_time(spectra_list) - get_min_elution_time(spectra_list);
 }
 
-void toppic::EnvCollection::remove_matrix_peaks(const PeakMatrix& peak_matrix) {
+void toppic::EnvCollection::remove_matrix_peaks(PeakMatrix& peak_matrix) {
   for (auto env_set: env_set_list_) {
     if (!env_set.isEmpty())
       env_set.remove_matrix_peaks(peak_matrix);
   }
+}
+
+std::vector<std::vector<double>> toppic::EnvCollection::get_seed_theo_map(PeakMatrix & peak_matrix, double snr) {
+  double noise_inte = peak_matrix.get_min_inte();
+  SeedEnvelope seed_env = this->seed_env_;
+  std::vector<EnvSet> env_set_list = this->env_set_list_;
+  EnvSet env_set = EnvSet();
+  for (auto &es: env_set_list) {
+    SeedEnvelope es_seed_env = es.getSeedEnv();
+    if (es_seed_env.getCharge() == seed_env.getCharge())
+      env_set = EnvSet(es);
+  }
+  std::vector<std::vector<double>> map = env_set.get_map(snr, noise_inte);
+  return map;
 }
 
 //void comp_pair_mz_error(){

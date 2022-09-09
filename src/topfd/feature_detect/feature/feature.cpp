@@ -4,9 +4,11 @@
 
 #include "feature.hpp"
 
-toppic::Feature::Feature(EnvCollection env_coll, PeakMatrix peak_matrix, int feature_id){
+toppic::Feature::Feature(EnvCollection& env_coll, PeakMatrix& peak_matrix, fdeep::model& model, std::vector<double> spectrum_noise_levels, int feature_id, double snr){
   SeedEnvelope seed_env = env_coll.getSeedEnv();
   spec_list spectra_list = peak_matrix.get_spectra_list();
+  std::vector<std::vector<double>> theo_map = env_coll.get_seed_theo_map(peak_matrix, snr);
+  double noiseIntensityLevel = std::accumulate(spectrum_noise_levels.begin() + env_coll.getStartSpecId(), spectrum_noise_levels.begin() + env_coll.getEndSpecId(), 0.0);
   feature_id_ = feature_id;
   min_scan_ = env_coll.getStartSpecId();
   max_scan_ = env_coll.getEndSpecId();
@@ -15,17 +17,17 @@ toppic::Feature::Feature(EnvCollection env_coll, PeakMatrix peak_matrix, int fea
   mono_mass_ = seed_env.getMass();
   rep_charge_ = seed_env.getCharge();
   rep_mz_ = seed_env.getPos();
-  abundance_ = env_coll.get_intensity();
-  min_elution_time_ = env_coll.get_min_elution_time(spectra_list);
-  max_elution_time_ = env_coll.get_max_elution_time(spectra_list);
-  apex_elution_time_ = env_coll.get_apex_elution_time(spectra_list);
-  elution_length_ = env_coll.get_elution_length(spectra_list);
-//  envcnn_score_ = get_envcnn_score(fdeep::model model, PeakMatrix peak_matrix, EnvCollection env_coll, double noiseIntensityLevel);
-  percent_matched_peaks_ = component_score::get_matched_peaks_percent(env_coll);
+  abundance_ = env_coll.get_intensity(snr, peak_matrix.get_min_inte());
+  min_elution_time_ = env_coll.get_min_elution_time(spectra_list)/60.0;
+  max_elution_time_ = env_coll.get_max_elution_time(spectra_list)/60.0;
+  apex_elution_time_ = env_coll.get_apex_elution_time(spectra_list)/60.0;
+  elution_length_ = env_coll.get_elution_length(spectra_list)/60.0;
+  percent_matched_peaks_ = component_score::get_matched_peaks_percent(env_coll, theo_map);
   intensity_correlation_ = component_score::get_agg_env_corr(env_coll);
   top3_correlation_ = component_score::get_3_scan_corr(env_coll);
   even_odd_peak_ratios_ = component_score::get_agg_odd_even_peak_ratio(env_coll);
   percent_consec_peaks_ = component_score::get_consecutive_peaks_percent(env_coll);
-  num_theo_peaks_;
-  mz_error_sum_;
+  num_theo_peaks_ = component_score::get_num_theo_peaks(theo_map);
+  mz_error_sum_ = component_score::get_mz_errors(env_coll);
+  envcnn_score_ = env_cnn_score::get_envcnn_score(model, peak_matrix, env_coll, noiseIntensityLevel);
 }

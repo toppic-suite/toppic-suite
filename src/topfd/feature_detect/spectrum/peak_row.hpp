@@ -25,16 +25,19 @@ namespace toppic {
 
         std::vector<std::vector<ExpPeak>> getRow() const { return row_; }
         void setRow(std::vector<std::vector<ExpPeak>> row) {
-          row_.clear();
-          for (auto & r : row)
-            row_.push_back(r);
+          for (int i = 0; i < row.size(); i++)
+            row_[i] = row[i];
+//          row_.clear();
+//          for (auto & r : row)
+//            row_.push_back(r);
         }
+        std::vector<ExpPeak> getRowPeak(int peak_id) const { return row_[peak_id]; }
 
         int getSpecID() const { return spectrum_.getSpecId(); }
         int getScanNum() const { return spectrum_.getScanNum(); }
         double getRT() const { return spectrum_.getRt(); }
 
-        void addPeak(int idx, ExpPeak peak) { row_[idx].push_back(peak); }
+        void addPeak(int idx, ExpPeak& peak) { row_[idx].push_back(peak); }
 
     private:
         Spectrum spectrum_;

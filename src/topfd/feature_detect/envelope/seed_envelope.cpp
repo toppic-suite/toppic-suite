@@ -13,7 +13,7 @@ std::shared_ptr<toppic::Envelope> get_env_(double mono_mass, int charge, double 
   return theo_env_ptr;
 }
 
-toppic::SeedEnvelope::SeedEnvelope(DeconvPeakPtr p){
+toppic::SeedEnvelope::SeedEnvelope(DeconvPeakPtr& p){
   spec_id_ = p->getSpId();
   env_id_ = p->getId();
   mass_ = p->getMonoMass();
