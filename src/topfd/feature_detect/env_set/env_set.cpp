@@ -251,6 +251,28 @@ double get_right_max(int pos, std::vector<double> y){
   return max_val;
 }
 
+void toppic::EnvSet::shortlistExpEnvs() {
+  std::vector<ExpEnvelope> tmp;
+  for (auto & env : exp_env_list_)
+    if (env.getSpecId() >= start_spec_id_ and env.getSpecId() <= end_spec_id_)
+      tmp.push_back(env);
+  exp_env_list_ = tmp;
+
+
+//  // remove discarded envelopes at end
+//  int refer_idx = seed_env_.getSpecId();
+//  int idx = exp_env_list_.size() - 1;
+//  while (idx >= 0) {
+//    ExpEnvelope env = exp_env_list_[idx];
+//    if (env.get_match_peak_num(refer_idx) < 2) ///////////////////////////////////////////////////////////////////////////
+//      exp_env_list_.erase(exp_env_list_.begin() + idx);
+//    else
+//      return;
+//    idx = idx - 1;
+//  }
+
+}
+
 void toppic::EnvSet::refine_feature_boundary(){
   double split_feature_intensity_ratio = 0.4;
   int base_spec = this->seed_env_.getSpecId() - this->start_spec_id_;
@@ -318,6 +340,7 @@ void toppic::EnvSet::refine_feature_boundary(){
   this->setStartSpecId(start);
   this->setEndSpecId(end);
   this->xic_.setStartSpecId(start);
+  this->shortlistExpEnvs();
 }
 
 std::vector<std::vector<double>> toppic::EnvSet::get_map(double snr, double noise_inte){

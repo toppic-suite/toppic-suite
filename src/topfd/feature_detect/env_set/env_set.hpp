@@ -52,11 +52,12 @@ namespace toppic {
         std::vector<double> getXicEnvIntes() { return xic_.getInteList(); }
 
         int getCharge() { return seed_env_.getCharge(); }
-
+        int getMass() { return seed_env_.getMass(); }
         std::vector<SimplePeak> get_peak_list() { return seed_env_.getPeakList(); }
         std::vector<double> get_theo_distribution_mz() {  return seed_env_.get_pos_list(); }
         std::vector<double> get_theo_distribution_inte() { return seed_env_.get_inte_list(); }
 
+        void shortlistExpEnvs();
 
         static bool cmpCharge(EnvSet a, EnvSet b) {
           return a.getCharge() < b.getCharge();

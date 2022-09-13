@@ -1,19 +1,18 @@
 //
 // Created by abbash on 7/29/22.
 //
+
+#ifndef TOPPIC_ENV_COLLECTION_HPP
+#define TOPPIC_ENV_COLLECTION_HPP
+
 #include <memory>
 #include <vector>
 #include <string>
-
 #include "topfd/feature_detect/env_set/env_set.hpp"
 #include "topfd/feature_detect/envelope/seed_envelope.hpp"
 #include "topfd/feature_detect/spectrum/spectrum.hpp"
 #include "topfd/feature_detect/util/utility_functions.hpp"
-
 #include "common/xml/xml_dom_element.hpp"
-
-#ifndef TOPPIC_ENV_COLLECTION_HPP
-#define TOPPIC_ENV_COLLECTION_HPP
 
 namespace toppic {
 class EnvCollection {
@@ -33,7 +32,7 @@ class EnvCollection {
     double get_elution_length(const spec_list& spectra_list);
     void remove_matrix_peaks(PeakMatrix& peak_matrix);
     std::vector<double> comp_exp_inte_sum_list();
-
+    EnvSet get_seed_env_set();
 
     SeedEnvelope getSeedEnv() const { return seed_env_; }
     void setSeedEnv(const SeedEnvelope& seedEnv) { seed_env_ = seedEnv; }
@@ -54,6 +53,13 @@ class EnvCollection {
     void setEndSpecId(int endSpecId) { end_spec_id_ = endSpecId; }
 
     int getBaseSpecID() const { return seed_env_.getSpecId(); }
+    double getMass() const { return seed_env_.getMass(); }
+    std::vector<int> getChargeList() {
+      std::vector<int> charge_list;
+      for (auto es : env_set_list_)
+        charge_list.push_back(es.getCharge());
+      return charge_list;
+    }
 
     std::vector<double> getExpInteSumList() const { return exp_inte_sum_list_; }
     void setExpInteSumList(const std::vector<double>& expInteSumList) {

@@ -63,7 +63,7 @@ void process(int frac_id, const std::string &sp_file_name,
   ///// params
   double bin_size = 0.1;
   double neighbor_mass_tole = 0.01;
-  double mass_tole = 0.01;
+  double mass_tole = 0.008;
   double corr_tole = 0.05;
   int max_miss_env = 2;
   int max_miss_charge = 2;
@@ -131,7 +131,8 @@ void process(int frac_id, const std::string &sp_file_name,
         bool valid = evaluate_envelope::preprocess_env(peak_matrix, env, mass_tole, corr_tole, valid);
         if (!valid) continue;
         EnvCollection env_coll = env_coll_util::find_env_collection(peak_matrix, env, mass_tole, max_miss_env, max_miss_charge, max_miss_peak,
-                                                                    para_max_charge, ratio_multi, match_peak_tole, env_para_ptr->ms_one_sn_ratio_);
+                                                                    para_max_charge, ratio_multi, match_peak_tole, env_para_ptr->ms_one_sn_ratio_,
+                                                                    base_name + "_" + str_util::toString(env_coll_num) +"_details.txt");
         if (!env_coll.isEmpty()) {
           features.push_back(Feature(env_coll, peak_matrix, model, spectrum_noise_levels, env_coll_num, env_para_ptr->ms_one_sn_ratio_));
           env_coll.remove_matrix_peaks(peak_matrix);

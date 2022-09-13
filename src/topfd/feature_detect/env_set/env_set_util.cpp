@@ -9,13 +9,10 @@ namespace env_set_util {
       ExpPeak result_peak = ExpPeak();
       double max_inte = -1000000;
       double pos = seed_peak.getPos();
-//      std::cout << sp_id << ", " << pos << std::endl;
-      //add check to see if the start and end are valid???? >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
       for (int idx = seed_peak.getStartIdx(); idx < seed_peak.getEndIdx() + 1; idx++) {
         std::vector<ExpPeak> bin_peaks = peak_matrix.get_bin_peak(sp_id, idx);
         for (const auto& matrix_peak : bin_peaks) {
           double mass_diff = std::abs(pos - matrix_peak.getPos());
-//          std::cout << "MD: " << mass_diff << ", " << matrix_peak.getPos() << ", " << bin_peaks.size() << std::endl;
           if ( mass_diff < mass_tol && matrix_peak.getInte() > max_inte) {
             result_peak = matrix_peak; ////////////////////// this is slow!!!!
             max_inte = matrix_peak.getInte();
@@ -38,48 +35,18 @@ namespace env_set_util {
       return exp_env;
     }
 
-//  ExpPeak pick_exp_peak(PeakRow& row, SimplePeak& seed_peak, double mass_tol) {
-//    // get peaks within mass tolerance
-//    ExpPeak result_peak = ExpPeak();
-//    double max_inte = -1000000;
-//    double pos = seed_peak.getPos();
-//    //add check to see if the start and end are valid???? >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-//    std::vector<std::vector<ExpPeak>> rows = row.getRow();
-//    for (int idx = seed_peak.getStartIdx(); idx < seed_peak.getEndIdx() + 1; idx++) {
-//      for (const auto& matrix_peak : rows[idx]) {
-//        double mass_diff = std::abs(pos - matrix_peak.getPos());
-//        if ( mass_diff < mass_tol && matrix_peak.getInte() > max_inte) {
-//          result_peak = matrix_peak; ////////////////////// this is slow!!!!
-//          max_inte = matrix_peak.getInte();
-//        }
-//      }
-//    }
-//    return result_peak;
-//  }
-//
-//  ExpEnvelope get_match_exp_env(PeakRow& peak_row, SeedEnvelope& seed_env, double mass_tol) {
-//    std::vector<ExpPeak> peak_list;
-//    std::vector<SimplePeak> peaks = seed_env.getPeakList();
-//    ExpPeak peak = ExpPeak();
-//    for (auto& seed_peak : peaks) {
-//      if (seed_peak.getStartIdx() > -1 && seed_peak.getEndIdx() > -1)
-//        peak = pick_exp_peak(peak_row, seed_peak, mass_tol);
-//      peak_list.push_back(peak);
-//    }
-//    ExpEnvelope exp_env = ExpEnvelope(peak_row.getSpecID(), peak_list);
-//    return exp_env;
-//  }
-
   bool check_valid_env_set(PeakMatrix& peak_matrix, EnvSet& env_set) {
     bool valid = true;
-    int start_spec_id = env_set.getStartSpecId();
-    int end_spec_id = env_set.getEndSpecId();
-    int start_idx = std::max(0, start_spec_id);
-    int end_idx = std::min(end_spec_id, peak_matrix.get_spec_num() - 1);
+//    int start_spec_id = env_set.getStartSpecId();
+//    int end_spec_id = env_set.getEndSpecId();
+//    int start_idx = std::max(0, start_spec_id);
+//    int end_idx = std::min(end_spec_id, peak_matrix.get_spec_num() - 1);
     int elems = 0;
     std::vector<double> env_xic = env_set.getXicEnvIntes();
-    for (int i = start_idx; i < end_idx; i++)
+    for (int i = 0; i < env_xic.size(); i++) {
+//      std::cout << i << ", " << env_xic[i] << std::endl;
       if (env_xic[i] > 0) elems++;
+    }
     if (elems < 2) valid = false;
     return valid;
   }
@@ -236,7 +203,7 @@ namespace env_set_util {
     env_set_util::remove_non_match_envs(back_env_list, refer_idx);
 
     std::vector<ExpEnvelope> forw_env_list;
-    for (int idx = base_idx; idx < end_spec_id; idx++) {
+    for (int idx = base_idx + 1; idx < end_spec_id; idx++) {
 //      PeakRow row =  peak_matrix.get_row(idx);
 //      ExpEnvelope exp_env = env_set_util::get_match_exp_env(row, env, mass_tol);
       ExpEnvelope exp_env = env_set_util::get_match_exp_env(peak_matrix, env, idx, mass_tol);
@@ -264,7 +231,7 @@ namespace env_set_util {
 
     start_spec_id = back_env_list[0].getSpecId();
     end_spec_id = back_env_list[back_env_list.size() - 1].getSpecId();
-    if ((end_spec_id - start_spec_id) < 2) return EnvSet();
+    if ((end_spec_id - start_spec_id + 1) < 2) return EnvSet();
 
     EnvSet env_set = EnvSet(env, back_env_list, start_spec_id, end_spec_id);
     return env_set;

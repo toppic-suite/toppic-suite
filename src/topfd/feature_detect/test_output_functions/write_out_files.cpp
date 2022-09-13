@@ -40,6 +40,9 @@ void toppic::write_out_files::write_noise_levels(PeakMatrix peak_matrix, std::ve
 }
 
 void toppic::write_out_files::write_env_set(PeakMatrix& peakMatrix, EnvSet& env_set, std::string file_name) {
+  double snr = 3.0;
+  double noise_inte = peakMatrix.get_min_inte();
+
   std::ofstream out_file;
   out_file.open(file_name, std::ios_base::app);
 
@@ -54,7 +57,9 @@ void toppic::write_out_files::write_env_set(PeakMatrix& peakMatrix, EnvSet& env_
   out_file << "Charge: " << seed_env.getCharge() << ", ";
   out_file << "Mass: " << seed_env.getMass() << ", ";
   out_file << "Pos: " << seed_env.getPos() << ", ";
-  out_file << "Inte: " << seed_env.getInte() << "\n";
+//  out_file << "Inte: " << seed_env.getInte() << "\n";
+  out_file << "Inte: " << env_set.comp_intensity(snr, noise_inte) << "\n";
+
 
   out_file << "Distribution: ";
   for (auto p: env_set.get_theo_distribution_mz())
@@ -88,9 +93,18 @@ void toppic::write_out_files::write_env_set(PeakMatrix& peakMatrix, EnvSet& env_
   out_file << "Exp Map\n";
   for (auto env: env_list) {
     for (auto p : env.getExpEnvList())
-      out_file << "(" << p.getPos() << ", " << p.getInte() << ") ";
+      out_file << p.getInte() << " ";
     out_file << "\n";
   }
   out_file << "\n\n";
+
+  out_file << "Exp Map - mz \n";
+  for (auto env: env_list) {
+    for (auto p : env.getExpEnvList())
+      out_file << p.getPos() << " ";
+    out_file << "\n";
+  }
+  out_file << "\n\n";
+
   out_file.close();
 }

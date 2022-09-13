@@ -90,7 +90,7 @@ void toppic::PeakMatrix::find_pair_neighbors(int spec_id, int search_bin_num, do
   //          std::cout << "inside loop 3 " << first_peak.getPos() << " " << second_peak.getPos() << " " << mass_diff << " " << (mass_diff <= mass_tol) << std::endl;
             first_peak.setNeighbor(true);
             second_peak.setNeighbor(true);
-            break;
+//            break;
           }
         }
       }

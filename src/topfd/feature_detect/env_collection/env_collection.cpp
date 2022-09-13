@@ -109,8 +109,11 @@ void toppic::EnvCollection::refine_mono_mass(){
 
 double toppic::EnvCollection::get_intensity(double snr, double noise_inte){
   double inte = 0;
-  for (auto env_set : env_set_list_)
-    inte = inte + env_set.comp_intensity(snr, noise_inte);
+  for (auto env_set : env_set_list_) {
+    double tmp_inte = env_set.comp_intensity(snr, noise_inte);
+//    std::cout << env_set.getCharge() << ", " << tmp_inte << std::endl;
+    inte = inte + tmp_inte;
+  }
   return inte;
 }
 
@@ -150,6 +153,16 @@ std::vector<std::vector<double>> toppic::EnvCollection::get_seed_theo_map(PeakMa
   }
   std::vector<std::vector<double>> map = env_set.get_map(snr, noise_inte);
   return map;
+}
+
+toppic::EnvSet toppic::EnvCollection::get_seed_env_set() {
+  EnvSet env_set = EnvSet();
+  for (const auto& es: env_set_list_) {
+    SeedEnvelope es_seed_env = es.getSeedEnv();
+    if (es_seed_env.getCharge() == seed_env_.getCharge())
+      env_set = EnvSet(es);
+  }
+  return env_set;
 }
 
 //void comp_pair_mz_error(){

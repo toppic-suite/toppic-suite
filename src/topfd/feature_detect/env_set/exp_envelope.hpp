@@ -12,7 +12,7 @@
 namespace toppic {
     class ExpEnvelope {
     public:
-        ExpEnvelope(){ spec_id_ = -1; }
+        ExpEnvelope(){ spec_id_ = -1; peak_list_.empty();}
 
         ExpEnvelope(int spec_id, std::vector<ExpPeak> peak_list){
           spec_id_ = spec_id;

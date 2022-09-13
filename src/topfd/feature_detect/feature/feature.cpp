@@ -9,6 +9,10 @@ toppic::Feature::Feature(EnvCollection& env_coll, PeakMatrix& peak_matrix, fdeep
   spec_list spectra_list = peak_matrix.get_spectra_list();
   std::vector<std::vector<double>> theo_map = env_coll.get_seed_theo_map(peak_matrix, snr);
   double noiseIntensityLevel = std::accumulate(spectrum_noise_levels.begin() + env_coll.getStartSpecId(), spectrum_noise_levels.begin() + env_coll.getEndSpecId(), 0.0);
+  int base_spec = env_coll.getBaseSpecID();
+  int start_spec = env_coll.getStartSpecId();
+  EnvSet env_set = env_coll.get_seed_env_set();
+
   feature_id_ = feature_id;
   min_scan_ = env_coll.getStartSpecId();
   max_scan_ = env_coll.getEndSpecId();
@@ -22,12 +26,13 @@ toppic::Feature::Feature(EnvCollection& env_coll, PeakMatrix& peak_matrix, fdeep
   max_elution_time_ = env_coll.get_max_elution_time(spectra_list)/60.0;
   apex_elution_time_ = env_coll.get_apex_elution_time(spectra_list)/60.0;
   elution_length_ = env_coll.get_elution_length(spectra_list)/60.0;
-  percent_matched_peaks_ = component_score::get_matched_peaks_percent(env_coll, theo_map);
-  intensity_correlation_ = component_score::get_agg_env_corr(env_coll);
-  top3_correlation_ = component_score::get_3_scan_corr(env_coll);
-  even_odd_peak_ratios_ = component_score::get_agg_odd_even_peak_ratio(env_coll);
-  percent_consec_peaks_ = component_score::get_consecutive_peaks_percent(env_coll);
+
+  percent_matched_peaks_ = component_score::get_matched_peaks_percent(env_set, theo_map);
+  intensity_correlation_ = component_score::get_agg_env_corr(env_set);
+  top3_correlation_ = component_score::get_3_scan_corr(env_set, base_spec, start_spec);
+  even_odd_peak_ratios_ = component_score::get_agg_odd_even_peak_ratio(env_set);
+  percent_consec_peaks_ = component_score::get_consecutive_peaks_percent(env_set);
   num_theo_peaks_ = component_score::get_num_theo_peaks(theo_map);
-  mz_error_sum_ = component_score::get_mz_errors(env_coll);
+  mz_error_sum_ = component_score::get_mz_errors(env_set);
   envcnn_score_ = env_cnn_score::get_envcnn_score(model, peak_matrix, env_coll, noiseIntensityLevel);
 }

@@ -69,6 +69,40 @@ namespace utility_functions{
     return maxima;
   }
 
+  toppic::SeedEnvelope get_half_charge_env(SeedEnvelope& env, double even_odd_peak_ratios) {
+    double mass = env.getMass();
+    int charge = env.getCharge();
+    double mz = env_utils::get_mz(mass, charge);
+    std::vector<double> distribution = env.get_pos_list();
+
+    if (even_odd_peak_ratios < 0)
+      mz = mz + (distribution[1] - distribution[0]);
+    int new_charge = int(charge / 2);
+    if (new_charge == 0)
+      new_charge = new_charge + 1;
+    double new_mass = env_utils::get_mass(mz, new_charge);
+
+    // get a reference distribution based on the base mass
+    EnvelopePtr ref_env_ptr = EnvBase::getStaticEnvByMonoMass(new_mass);
+    if (ref_env_ptr == nullptr) return SeedEnvelope();
+    EnvelopePtr theo_env_ptr = ref_env_ptr->distrToTheoMono(mz, new_charge);
+    std::vector<double> env_peaks_mz, env_peaks_inte;
+    for (int i = 0; i < theo_env_ptr->getPeakNum(); i++) {
+      env_peaks_mz.push_back(theo_env_ptr->getMz(i));
+      env_peaks_inte.push_back(theo_env_ptr->getIntensity(i));
+    }
+    SeedEnvelope sp_peak = SeedEnvelope(env.getSpecId(), env.getEnvId(), env.getPos(), new_mass, env.getInte(), new_charge, env_peaks_mz, env_peaks_inte);
+    return sp_peak;
+  }
+
+  toppic::SeedEnvelope test_half_charge_state(PeakMatrix& peak_matrix, SeedEnvelope& env, EnvSet& top_peak_env_set, double even_odd_peak_ratios, double mass_tole) {
+    SeedEnvelope half_charge_env = get_half_charge_env(env, even_odd_peak_ratios);
+    bool valid = evaluate_envelope::preprocess_env(peak_matrix, half_charge_env, mass_tole, 0.5, valid);
+    if (!valid) return SeedEnvelope();
+    return half_charge_env;
+  }
+
+
 
 }
 }
