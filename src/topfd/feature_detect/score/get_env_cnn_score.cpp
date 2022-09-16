@@ -25,12 +25,11 @@ namespace env_cnn_score {
     double max_theo_peak = round(peak_list[peak_list.size()-1].getPos() * 1000.0)/1000.0;
     int start_idx = peak_matrix.get_index(min_theo_peak - 0.1);
     int end_idx = peak_matrix.get_index(max_theo_peak + 0.1);
-    PeakRow spec_peaks = peak_matrix.get_row(spec_id);
+    std::vector<std::vector<ExpPeak>> row = peak_matrix.getRow(spec_id);
     std::vector<ExpPeak> intv_peak_list;
     for (int peak_idx = start_idx; peak_idx <= end_idx; peak_idx++){
-      std::vector<std::vector<ExpPeak>> row = spec_peaks.getRow();
       for (const auto& peak : row[peak_idx])
-        if (peak.getPos() >= (min_theo_peak - 0.1) && peak.getPos() <= (max_theo_peak + 0.1))
+        if (peak.getPos() >= (min_theo_peak - 0.1) && peak.getPos() <= (max_theo_peak + 0.1)) ////////////////////// ERRORRR 28722
           intv_peak_list.push_back(peak);
     }
     return intv_peak_list;
@@ -103,7 +102,7 @@ namespace env_cnn_score {
     std::vector<std::vector<double>> noise_distribution_list;
     std::vector<std::vector<double>> noise_inte_distribution_list;
     for (int spec_id = env_coll.getStartSpecId(); spec_id <= env_coll.getEndSpecId(); spec_id++){
-      std::vector<ExpPeak> intv_peak_list = get_intv_peak_list(peak_matrix, env_set, spec_id);
+      std::vector<ExpPeak> intv_peak_list = get_intv_peak_list(peak_matrix, env_set, spec_id); ////////////// ERRORRRRRR
       std::vector<double> t_noise_distribution_list;
       std::vector<double> t_noise_inte_distribution_list;
       for (const auto& elem : intv_peak_list) {
