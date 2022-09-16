@@ -11,7 +11,7 @@
 namespace toppic {
     class PeakRow {
     public:
-        PeakRow(){}
+        PeakRow()= default;
         PeakRow(Spectrum spectrum, int bin_num){
           spectrum_ = spectrum;
           for (int i = 0; i < bin_num; i++) {
@@ -32,6 +32,7 @@ namespace toppic {
 //            row_.push_back(r);
         }
         std::vector<ExpPeak> getRowPeak(int peak_id) const { return row_[peak_id]; }
+        void setRowPeak(int peak_id, std::vector<ExpPeak> &bin_peaks) { row_[peak_id] = bin_peaks; }
 
         int getSpecID() const { return spectrum_.getSpecId(); }
         int getScanNum() const { return spectrum_.getScanNum(); }

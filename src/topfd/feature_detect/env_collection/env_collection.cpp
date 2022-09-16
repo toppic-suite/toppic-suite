@@ -15,7 +15,7 @@ toppic::EnvCollection::EnvCollection() {
   end_spec_id_ = -1;
 }
 
-toppic::EnvCollection::EnvCollection(const EnvCollection & ec) {
+toppic::EnvCollection::EnvCollection(const EnvCollection &ec) {
   seed_env_ = ec.seed_env_;
   min_charge_ = ec.min_charge_;
   max_charge_ = ec.max_charge_;
@@ -27,7 +27,7 @@ toppic::EnvCollection::EnvCollection(const EnvCollection & ec) {
     exp_inte_sum_list_.push_back(i);
 }
 
-toppic::EnvCollection::EnvCollection(const SeedEnvelope& env, const std::vector<EnvSet>& env_set_list, int min_charge, int max_charge, int start_spec_id, int end_spec_id){
+toppic::EnvCollection::EnvCollection(const SeedEnvelope &env, const std::vector<EnvSet> &env_set_list, int min_charge, int max_charge, int start_spec_id, int end_spec_id){
   seed_env_ = env;
   for (auto & i : env_set_list) env_set_list_.push_back(i);
   min_charge_ = min_charge;
@@ -91,7 +91,7 @@ double toppic::EnvCollection::comp_odd_even_log_ratio(){
 void toppic::EnvCollection::refine_mono_mass(){
   double weight = 0;
   double weight_mz_error = 0;
-  for (auto env_set : env_set_list_) {
+  for (auto &env_set : env_set_list_) {
     double cur_weight = 0, cur_weight_mz_error = 0;
     env_set.get_weight_mz_error(&cur_weight, &cur_weight_mz_error);
     weight = weight + cur_weight;
@@ -99,7 +99,6 @@ void toppic::EnvCollection::refine_mono_mass(){
   }
   if (weight > 0) {
     double mz_error = weight_mz_error / weight;
-    std::cout << "mz error " << mz_error << std::endl;
     seed_env_.shift(mz_error * seed_env_.getCharge());
   }
   else{
@@ -117,31 +116,38 @@ double toppic::EnvCollection::get_intensity(double snr, double noise_inte){
   return inte;
 }
 
-double toppic::EnvCollection::get_min_elution_time(spec_list spectra_list){
+double toppic::EnvCollection::get_min_elution_time(spec_list &spectra_list){
   return spectra_list[start_spec_id_].getRt();
 }
 
-double toppic::EnvCollection::get_max_elution_time(spec_list spectra_list){
+double toppic::EnvCollection::get_max_elution_time(spec_list &spectra_list){
   return spectra_list[end_spec_id_].getRt();
 }
 
-double toppic::EnvCollection::get_apex_elution_time(spec_list spectra_list) {
+double toppic::EnvCollection::get_apex_elution_time(spec_list &spectra_list) {
   int ref_spec_id = seed_env_.getSpecId();
   return spectra_list[ref_spec_id].getRt();
 }
 
-double toppic::EnvCollection::get_elution_length(const spec_list& spectra_list) {
+double toppic::EnvCollection::get_elution_length(spec_list &spectra_list) {
   return get_max_elution_time(spectra_list) - get_min_elution_time(spectra_list);
 }
 
-void toppic::EnvCollection::remove_matrix_peaks(PeakMatrix& peak_matrix) {
+void toppic::EnvCollection::remove_matrix_peaks(PeakMatrix &peak_matrix) {
   for (auto env_set: env_set_list_) {
     if (!env_set.isEmpty())
       env_set.remove_matrix_peaks(peak_matrix);
   }
 }
 
-std::vector<std::vector<double>> toppic::EnvCollection::get_seed_theo_map(PeakMatrix & peak_matrix, double snr) {
+void toppic::EnvCollection::remove_peak_data(PeakMatrix &peak_matrix) {
+  for (auto env_set: env_set_list_) {
+    if (!env_set.isEmpty())
+      env_set.remove_peak_data(peak_matrix);
+  }
+}
+
+std::vector<std::vector<double>> toppic::EnvCollection::get_seed_theo_map(PeakMatrix &peak_matrix, double snr) {
   double noise_inte = peak_matrix.get_min_inte();
   SeedEnvelope seed_env = this->seed_env_;
   std::vector<EnvSet> env_set_list = this->env_set_list_;
@@ -157,19 +163,10 @@ std::vector<std::vector<double>> toppic::EnvCollection::get_seed_theo_map(PeakMa
 
 toppic::EnvSet toppic::EnvCollection::get_seed_env_set() {
   EnvSet env_set = EnvSet();
-  for (const auto& es: env_set_list_) {
+  for (const auto &es: env_set_list_) {
     SeedEnvelope es_seed_env = es.getSeedEnv();
     if (es_seed_env.getCharge() == seed_env_.getCharge())
       env_set = EnvSet(es);
   }
   return env_set;
 }
-
-//void comp_pair_mz_error(){
-//  return;
-//}
-//
-//void check_env_len(){
-//  return;
-//}
-

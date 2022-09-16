@@ -4,14 +4,21 @@
 
 #include "xic.hpp"
 
-toppic::Xic::Xic(int start_spec_id, int base_spec_id, std::vector<double> inte_list){
+toppic::Xic::Xic(int start_spec_id, int base_spec_id, std::vector<double> &inte_list){
   start_spec_id_ = start_spec_id;
   base_spec_id_ = base_spec_id;
   inte_list_ = inte_list;
   moving_avg(2);
 }
 
-toppic::Xic::Xic(const Xic & x) {
+toppic::Xic::Xic(int start_spec_id, int base_spec_id, std::vector<double> &inte_list, std::vector<double> &smoothed_inte_list) {
+  start_spec_id_ = start_spec_id;
+  base_spec_id_ = base_spec_id;
+  inte_list_ = inte_list;
+  smoothed_inte_list_ = smoothed_inte_list;
+}
+
+toppic::Xic::Xic(const Xic &x) {
   start_spec_id_ = x.start_spec_id_;
   base_spec_id_ = x.base_spec_id_;
   for (auto inte : x.inte_list_)
@@ -22,16 +29,8 @@ toppic::Xic::Xic(const Xic & x) {
 
 void toppic::Xic::moving_avg (int size) {
   std::vector<double> data = inte_list_;
-  int padding_len = (size -1) / 2;
   std::vector<double> left_padding (1, 0);
   data.insert(data.begin(), left_padding.begin(), left_padding.end());
-
-//  int padding_len = (size -1) / 2;
-//  std::vector<double> left_padding (padding_len, data[0]);
-//  data.insert(data.begin(), left_padding.begin(), left_padding.end());
-//  std::vector<double> right_padding (padding_len, data[data.size()-1]);
-//  data.insert(data.end(), right_padding.begin(), right_padding.end());
-
   double sum = 0.0;
   int cnt = 0;
   for (int i = 0; i < data.size(); i++) {

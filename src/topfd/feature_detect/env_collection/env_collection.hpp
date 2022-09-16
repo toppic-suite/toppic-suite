@@ -18,19 +18,20 @@ namespace toppic {
 class EnvCollection {
   public:
     EnvCollection();
-    EnvCollection(const EnvCollection & ec);
-    EnvCollection(const SeedEnvelope& env, const std::vector<EnvSet>& env_set_list, int min_charge, int max_charge, int start_spec_id, int end_spec_id);
+    EnvCollection(const EnvCollection &ec);
+    EnvCollection(const SeedEnvelope &env, const std::vector<EnvSet> &env_set_list, int min_charge, int max_charge, int start_spec_id, int end_spec_id);
 
-    std::vector<std::vector<double>> get_seed_theo_map(PeakMatrix & peak_matrix, double snr);
+    std::vector<std::vector<double>> get_seed_theo_map(PeakMatrix &peak_matrix, double snr);
     double comp_correlation();
     double comp_odd_even_log_ratio();
     void refine_mono_mass();
     double get_intensity(double snr, double noise_inte);
-    double get_min_elution_time(spec_list spectra_list);
-    double get_max_elution_time(spec_list spectra_list);
-    double get_apex_elution_time(spec_list spectra_list);
-    double get_elution_length(const spec_list& spectra_list);
-    void remove_matrix_peaks(PeakMatrix& peak_matrix);
+    double get_min_elution_time(spec_list &spectra_list);
+    double get_max_elution_time(spec_list &spectra_list);
+    double get_apex_elution_time(spec_list &spectra_list);
+    double get_elution_length(spec_list &spectra_list);
+    void remove_matrix_peaks(PeakMatrix &peak_matrix);
+    void remove_peak_data(PeakMatrix &peak_matrix);
     std::vector<double> comp_exp_inte_sum_list();
     EnvSet get_seed_env_set();
 
@@ -62,7 +63,7 @@ class EnvCollection {
     }
 
     std::vector<double> getExpInteSumList() const { return exp_inte_sum_list_; }
-    void setExpInteSumList(const std::vector<double>& expInteSumList) {
+    void setExpInteSumList(const std::vector<double> &expInteSumList) {
       exp_inte_sum_list_.clear();
       for (auto & p : expInteSumList) exp_inte_sum_list_.push_back(p); }
 

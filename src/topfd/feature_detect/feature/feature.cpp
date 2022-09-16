@@ -4,10 +4,11 @@
 
 #include "feature.hpp"
 
-toppic::Feature::Feature(EnvCollection& env_coll, PeakMatrix& peak_matrix, fdeep::model& model, std::vector<double> spectrum_noise_levels, int feature_id, double snr){
+toppic::Feature::Feature(EnvCollection &env_coll, PeakMatrix &peak_matrix, fdeep::model &model, int feature_id, double snr){
   SeedEnvelope seed_env = env_coll.getSeedEnv();
   spec_list spectra_list = peak_matrix.get_spectra_list();
   std::vector<std::vector<double>> theo_map = env_coll.get_seed_theo_map(peak_matrix, snr);
+  std::vector<double> spectrum_noise_levels = peak_matrix.get_spec_noise_inte();
   double noiseIntensityLevel = std::accumulate(spectrum_noise_levels.begin() + env_coll.getStartSpecId(), spectrum_noise_levels.begin() + env_coll.getEndSpecId(), 0.0);
   int base_spec = env_coll.getBaseSpecID();
   int start_spec = env_coll.getStartSpecId();
@@ -35,4 +36,5 @@ toppic::Feature::Feature(EnvCollection& env_coll, PeakMatrix& peak_matrix, fdeep
   num_theo_peaks_ = component_score::get_num_theo_peaks(theo_map);
   mz_error_sum_ = component_score::get_mz_errors(env_set);
   envcnn_score_ = env_cnn_score::get_envcnn_score(model, peak_matrix, env_coll, noiseIntensityLevel);
+  label_ = 0;
 }

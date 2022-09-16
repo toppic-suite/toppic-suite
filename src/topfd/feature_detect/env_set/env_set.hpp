@@ -16,19 +16,20 @@ namespace toppic {
     class EnvSet {
     public:
         EnvSet();
-        EnvSet(const SeedEnvelope& envelope, std::vector<ExpEnvelope> env_list, int start, int end);
-        EnvSet(const EnvSet & es);
+        EnvSet(const SeedEnvelope &envelope, std::vector<ExpEnvelope> &env_list, int start, int end);
+        EnvSet(const EnvSet &es);
 
         void refine_feature_boundary();
 
         void get_coordinates(spec_list spectra_list, std::vector<double> x, std::vector<double> y, std::vector<double> z);
-        double get_median_ratio(ExpEnvelope env);
+        double get_median_ratio(ExpEnvelope &env);
         Xic init_median_xic();
         double get_seed_inte_ratio();
         void remove_non_consecutive_peaks(int i, int max_miss_peak);
         void remove_all_non_consecutive_peaks(int max_miss_peak);
         void simple_remove_matrix_peaks(PeakMatrix peak_matrix);
         void remove_matrix_peaks(PeakMatrix& peak_matrix);
+        void remove_peak_data(PeakMatrix &peakMatrix);
 //        double comp_intensity(){ return seed_env_.get_inte_sum() * xic_.get_inte_list_sum();}
         std::vector<std::vector<double>> get_map(double snr, double noise_inte);
         double comp_intensity(double snr, double noise_inte);
@@ -43,9 +44,12 @@ namespace toppic {
 
         int getStartSpecId() const { return start_spec_id_; }
         void setStartSpecId(int startSpecId) { start_spec_id_ = startSpecId; }
+        void setSpecId(int startSpecId, int endSpecId) { start_spec_id_ = startSpecId; end_spec_id_ = endSpecId; }
 
         int getEndSpecId() const { return end_spec_id_; }
         void setEndSpecId(int endSpecId) { end_spec_id_ = endSpecId; }
+
+        int getBaseSpecId() { return xic_.getBaseSpecId(); }
 
         const Xic getXic() const { return xic_; }
         void setXic(const Xic &xic) { xic_ = xic; }
@@ -64,7 +68,7 @@ namespace toppic {
         }
 
         bool isEmpty(){
-          if (seed_env_.isEmpty() && exp_env_list_.size() == 0 && start_spec_id_ == -1 && end_spec_id_ == -1 && xic_.isEmpty())
+          if (exp_env_list_.empty() and start_spec_id_ == -1 and end_spec_id_ == -1)
             return true;
           return false;
         }
@@ -75,7 +79,6 @@ namespace toppic {
         int start_spec_id_;
         int end_spec_id_;
         Xic xic_;
-
     };
 }
 

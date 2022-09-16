@@ -16,7 +16,7 @@ namespace env_utils {
 
   std::vector<double> get_aggregate_envelopes_mz(EnvSet& env_set);
   std::vector<double> get_aggregate_envelopes_inte(EnvSet& env_set);
-  double calcInteRatio_scan(std::vector<double> theo_envelope_inte, std::vector<double> exp_envelope_inte);
+  double calcInteRatio_scan(std::vector<double> &theo_envelope_inte, std::vector<double> &exp_envelope_inte);
 }
 }
 #endif //TOPPIC_ENV_UTIL_HPP

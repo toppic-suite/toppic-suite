@@ -115,7 +115,7 @@ void toppic::SeedEnvelope::shift(double shift_num){
   double shift_mz = shift_mass/charge_;
   pos_ = pos_ + shift_mz;
   mass_ = mass_ + shift_mass;
-  for (auto p : peak_list_)
+  for (auto &p : peak_list_)
     p.setPos(p.getPos()+shift_mz);
 }
 

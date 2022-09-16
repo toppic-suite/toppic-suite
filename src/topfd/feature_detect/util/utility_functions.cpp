@@ -7,7 +7,7 @@
 
 namespace toppic{
 namespace utility_functions{
-  double pearsonr(std::vector<double> X, std::vector<double> Y){
+  double pearsonr(std::vector<double> & X, std::vector<double> & Y){
     int n = X.size();
     double sum_X = 0, sum_Y = 0, sum_XY = 0;
     double squareSum_X = 0, squareSum_Y = 0;
@@ -22,9 +22,9 @@ namespace utility_functions{
     return corr;
   }
 
-  std::vector<double> findLocalMinima(std::vector<double> arr) {
+  std::vector<int> findLocalMinima(std::vector<double> & arr) {
     int n = arr.size();
-    std::vector<double> minima;
+    std::vector<int> minima;
     for (int i = 1; i < n - 1; i++) {
       if ((arr[i - 1] > arr[i]) and (arr[i] < arr[i + 1])) {
         if (i - 2 > 0)
@@ -39,28 +39,9 @@ namespace utility_functions{
     return minima;
   }
 
-//    std::vector<double> findLocalMinima(std::vector<double> arr) {
-//      int n = arr.size();
-//      std::vector<double> minima;
-////    if (arr[0] < arr[1]) minima.push_back(0);
-//      for (int i = 1; i < n - 1; i++) {
-//        if ((arr[i - 1] > arr[i]) and (arr[i] < arr[i + 1])) {
-//          if (i - 2 > 0)
-//            if (arr[i - 2] <= arr[i])
-//              continue;
-//          if (i + 2 < n)
-//            if (arr[i + 2] <= arr[i])
-//              continue;
-//          minima.push_back(i);
-//        }
-//      }
-//      if (arr[n - 1] < arr[n - 2]) minima.push_back(n - 1);
-//      return minima;
-//    }
-
-  std::vector<double> findLocalMaxima(std::vector<double> arr) {
+  std::vector<int> findLocalMaxima(std::vector<double> & arr) {
     int n = arr.size();
-    std::vector<double> maxima;
+    std::vector<int> maxima;
 //    if (arr[0] > arr[1]) maxima.push_back(0);
     for (int i = 1; i < n - 1; i++)
       if ((arr[i - 1] < arr[i]) and (arr[i] > arr[i + 1]))
@@ -69,7 +50,7 @@ namespace utility_functions{
     return maxima;
   }
 
-  toppic::SeedEnvelope get_half_charge_env(SeedEnvelope& env, double even_odd_peak_ratios) {
+  toppic::SeedEnvelope get_half_charge_env(SeedEnvelope &env, double even_odd_peak_ratios) {
     double mass = env.getMass();
     int charge = env.getCharge();
     double mz = env_utils::get_mz(mass, charge);
@@ -95,7 +76,7 @@ namespace utility_functions{
     return sp_peak;
   }
 
-  toppic::SeedEnvelope test_half_charge_state(PeakMatrix& peak_matrix, SeedEnvelope& env, EnvSet& top_peak_env_set, double even_odd_peak_ratios, double mass_tole) {
+  toppic::SeedEnvelope test_half_charge_state(PeakMatrix &peak_matrix, SeedEnvelope &env, EnvSet &top_peak_env_set, double even_odd_peak_ratios, double mass_tole) {
     SeedEnvelope half_charge_env = get_half_charge_env(env, even_odd_peak_ratios);
     bool valid = evaluate_envelope::preprocess_env(peak_matrix, half_charge_env, mass_tole, 0.5, valid);
     if (!valid) return SeedEnvelope();

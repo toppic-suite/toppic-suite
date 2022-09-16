@@ -15,9 +15,9 @@
 
 namespace toppic {
 namespace utility_functions {
-  double pearsonr(std::vector<double> X, std::vector<double> Y);
-  std::vector<double> findLocalMinima(std::vector<double> arr);
-  std::vector<double> findLocalMaxima(std::vector<double> arr);
+  double pearsonr(std::vector<double> & X, std::vector<double> & Y);
+  std::vector<int> findLocalMinima(std::vector<double> & arr);
+  std::vector<int> findLocalMaxima(std::vector<double> & arr);
   SeedEnvelope test_half_charge_state(PeakMatrix& peak_matrix, SeedEnvelope& env, EnvSet& top_peak_env_set, double even_odd_peak_ratios, double mass_tole);
 //  bool check_in_existing_features(PeakMatrix& peakMatrix, EnvCollection& env_coll, std::vector<EnvCollection> env_coll_list, double match_envelope_tolerance, double time_tol);
 }

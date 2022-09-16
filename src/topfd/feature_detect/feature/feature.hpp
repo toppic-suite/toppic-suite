@@ -12,7 +12,7 @@
 namespace toppic {
 class Feature {
 public:
-    Feature(EnvCollection &env_coll, PeakMatrix &peak_matrix, fdeep::model& model, std::vector<double> spectrum_noise_levels, int feature_id, double snr);
+    Feature(EnvCollection &env_coll, PeakMatrix &peak_matrix, fdeep::model &model, int feature_id, double snr);
 
     int getFeatureId() const { return feature_id_; }
     void setFeatureId(int featureId) { feature_id_ = featureId; }

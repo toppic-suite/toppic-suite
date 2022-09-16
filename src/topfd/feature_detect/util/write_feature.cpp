@@ -30,13 +30,12 @@ namespace write_feature {
        << "PercentConsecPeaks" << "\t"
        << "NumTheoPeaks" << "\t"
        << "MzErrorSum" << "\t"
-       << "MzErrorSumBase" << "\t"
        << "Score" << "\t"
        << "Label"
        << std::endl;
   }
 
-  void writeOneFeature(std::ofstream &of, Feature feature) {
+  void writeOneFeature(std::ofstream &of, const Feature &feature) {
     of << feature.getFeatureId() << "\t"
        << feature.getMinScan() << "\t"
        << feature.getMaxScan() << "\t"
@@ -66,7 +65,7 @@ namespace write_feature {
   void writeFeatures(const std::string &output_file_name, const std::vector<Feature> &features) {
     std::ofstream of(output_file_name);
     writeHeader(of);
-    for (auto feature : features)
+    for (auto &feature: features)
       writeOneFeature(of, feature);
     of.close();
   }

@@ -7,7 +7,7 @@
 
 namespace toppic {
 namespace component_score {
-  std::vector<double> get_theo_envelope_peak_intens(EnvSet env_set){
+  std::vector<double> get_theo_envelope_peak_intens(EnvSet& env_set){
     std::vector<SimplePeak> peaks = env_set.get_peak_list();
     std::vector<double> theo_peak_intes;
     for (const auto& i: peaks)

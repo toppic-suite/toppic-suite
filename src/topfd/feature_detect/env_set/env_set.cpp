@@ -7,7 +7,6 @@
 #include "topfd/feature_detect/util/utility_functions.hpp"
 #include <numeric>
 #include <algorithm>
-#include <iostream>
 
 toppic::EnvSet::EnvSet() {
   seed_env_ = SeedEnvelope();
@@ -25,7 +24,7 @@ toppic::EnvSet::EnvSet(const EnvSet & es){
   xic_ = Xic(es.xic_);
 }
 
-toppic::EnvSet::EnvSet(const SeedEnvelope& envelope, std::vector<ExpEnvelope> env_list, int start, int end) {
+toppic::EnvSet::EnvSet(const SeedEnvelope &envelope, std::vector<ExpEnvelope> &env_list, int start, int end) {
   seed_env_ = envelope;
   exp_env_list_ = env_list;
   start_spec_id_ = start;
@@ -33,15 +32,6 @@ toppic::EnvSet::EnvSet(const SeedEnvelope& envelope, std::vector<ExpEnvelope> en
   xic_ = init_median_xic();
 }
 
-//toppic::Xic toppic::EnvSet::init_median_xic(){
-//  std::vector<double> inte_list;
-//  for (const ExpEnvelope& env : exp_env_list_){
-//    double ratio = get_median_ratio(env);
-//    inte_list.push_back(ratio);
-//  }
-//  Xic xic = Xic(start_spec_id_, seed_env_.getSpecId(), inte_list);
-//  return xic;
-//}
 
 toppic::Xic toppic::EnvSet::init_median_xic(){
   std::vector<double> theo_envelope_inte = seed_env_.get_inte_list();
@@ -53,7 +43,8 @@ toppic::Xic toppic::EnvSet::init_median_xic(){
       inte_list.push_back(0);
       continue;
     }
-    double ratio = env_utils::calcInteRatio_scan(theo_envelope_inte, env.get_inte_list());
+    std::vector<double> exp_envelope_inte = env.get_inte_list();
+    double ratio = env_utils::calcInteRatio_scan(theo_envelope_inte, exp_envelope_inte);
     double theoretical_peak_sum = 0;
     theoretical_peak_sum = theoretical_peak_sum + (theo_envelope_inte[refer_idx] * ratio);
     if (refer_idx - 1 >= 0)
@@ -66,7 +57,7 @@ toppic::Xic toppic::EnvSet::init_median_xic(){
   return xic;
 }
 
-double find_median(std::vector<double> in_data) {
+double find_median(std::vector<double> &in_data) {
   int n = in_data.size();
   if (n % 2 == 0) {
     std::nth_element(in_data.begin(), in_data.begin() + n / 2, in_data.end());
@@ -79,28 +70,11 @@ double find_median(std::vector<double> in_data) {
   }
 }
 
-double toppic::EnvSet::get_median_ratio(ExpEnvelope env){
-  return env_utils::calcInteRatio_scan(seed_env_.get_inte_list(), env.get_inte_list());
+double toppic::EnvSet::get_median_ratio(ExpEnvelope &env){
+  std::vector<double> theo_envelope_inte = seed_env_.get_inte_list();
+  std::vector<double> exp_envelope_inte = env.get_inte_list();
+  return env_utils::calcInteRatio_scan(theo_envelope_inte, exp_envelope_inte);
 }
-
-
-//double toppic::EnvSet::get_median_ratio(ExpEnvelope env){
-//  std::vector<ExpPeak> exp_peak_list = env.getExpEnvList();
-//  std::vector<SimplePeak> theo_peak_list = seed_env_.getPeakList();
-//  std::vector<double> ratio_list;
-//  for (int i = 0; i < theo_peak_list.size(); i++){
-//    double ratio;
-//    if (!exp_peak_list[i].isEmpty()) {
-//      ratio = exp_peak_list[i].getInte() / theo_peak_list[i].getInte();
-//      ratio_list.push_back(ratio);
-//    }
-//  }
-//  double ratio_sum = std::accumulate(ratio_list.begin(), ratio_list.end(), 0.0);
-//  if (ratio_sum == 0)
-//    return 0;
-//  else
-//    return find_median(ratio_list);
-//}
 
 void toppic::EnvSet::get_coordinates(spec_list spectra_list, std::vector<double> x, std::vector<double> y, std::vector<double> z){
   for (auto env : exp_env_list_) {
@@ -170,7 +144,7 @@ void toppic::EnvSet::remove_all_non_consecutive_peaks(int max_miss_peak){
 }
 
 void toppic::EnvSet::simple_remove_matrix_peaks(PeakMatrix peak_matrix){
-  for (auto env : exp_env_list_) {
+  for (auto &env : exp_env_list_) {
     for (int peak_id = 0; peak_id < env.get_peak_num(); peak_id++) {
       ExpPeak peak = env.get_peak(peak_id);
       if (!peak.isEmpty())
@@ -179,27 +153,9 @@ void toppic::EnvSet::simple_remove_matrix_peaks(PeakMatrix peak_matrix){
   }
 }
 
-void toppic::EnvSet::remove_matrix_peaks(PeakMatrix& peak_matrix){
-  for (auto env : exp_env_list_) {
-    int peak_num = 0;
-    for (int peak_id = 0; peak_id < env.get_peak_num(); peak_id++) {
-      ExpPeak peak = env.get_peak(peak_id);
-      if (!peak.isEmpty()){
-        peak_num = peak_num + 1;
-        peak_matrix.remove_peak(peak);
-      }
-    }
-    if (peak_num > 0) {
-      int spec_id = env.getSpecId();
-      double min_pos = 0, max_pos = 0;
-      env.get_min_max_pos(&min_pos, &max_pos);
-      peak_matrix.remove_peak_in_range(spec_id, min_pos, max_pos);
-    }
-  }
-}
-
 void toppic::EnvSet::get_weight_mz_error(double* weight_sum, double* error_sum){
   std::vector<SimplePeak> seed_peak_list = seed_env_.getPeakList();
+  std::vector<double> inte_list = xic_.getInteList();
   *weight_sum = 0;
   *error_sum = 0;
   for (int spec_idx = 0; spec_idx < exp_env_list_.size(); spec_idx++) {
@@ -207,10 +163,9 @@ void toppic::EnvSet::get_weight_mz_error(double* weight_sum, double* error_sum){
     if (expEnvelope.isEmpty())
       continue;
     std::vector<ExpPeak> exp_peak_list = expEnvelope.getExpEnvList();
-    for (int peak_idx = 0; peak_idx < seed_peak_list.size(); peak_idx++){
+    for (int peak_idx = 0; peak_idx < seed_peak_list.size(); peak_idx++) {
       ExpPeak peak = exp_peak_list[peak_idx];
       if (!peak.isEmpty()) {
-        std::vector<double> inte_list = xic_.getInteList();
         double cur_inte = seed_peak_list[peak_idx].getInte() * inte_list[spec_idx];
         double cur_err = peak.getPos() - seed_peak_list[peak_idx].getPos();
         *error_sum = *error_sum + (cur_inte * cur_err);
@@ -223,7 +178,7 @@ void toppic::EnvSet::get_weight_mz_error(double* weight_sum, double* error_sum){
 std::vector<double> toppic::EnvSet::comp_exp_inte_sum_list() {
   int peak_num = seed_env_.get_peak_num();
   std::vector<double> sum_list (peak_num, 0);
-  for (auto env: exp_env_list_){
+  for (auto &env: exp_env_list_){
     if (env.isEmpty())
       continue;
     std::vector<double> cur_sum_list = env.get_inte_list();
@@ -233,7 +188,7 @@ std::vector<double> toppic::EnvSet::comp_exp_inte_sum_list() {
   return sum_list;
 }
 
-double get_left_max(int pos, std::vector<double> y) {
+double get_left_max(int pos, std::vector<double> &y) {
   double max_val = -100000000;
   for (int i = 0; i < pos; i++) {
     if (y[i] > max_val)
@@ -242,7 +197,7 @@ double get_left_max(int pos, std::vector<double> y) {
   return max_val;
 }
 
-double get_right_max(int pos, std::vector<double> y){
+double get_right_max(int pos, std::vector<double> &y){
   double max_val = -100000000;
   for (int i = pos + 1; i < y.size(); i++) {
     if (y[i] > max_val)
@@ -252,25 +207,21 @@ double get_right_max(int pos, std::vector<double> y){
 }
 
 void toppic::EnvSet::shortlistExpEnvs() {
+  std::vector<double> inte_list = xic_.getInteList();
+  std::vector<double> smoothed_inte_list = xic_.getSmoothedInteList();
+
+  std::vector<double> shortlisted_inte_list;
+  std::vector<double> shortlisted_smoothed_inte_list;
   std::vector<ExpEnvelope> tmp;
-  for (auto & env : exp_env_list_)
-    if (env.getSpecId() >= start_spec_id_ and env.getSpecId() <= end_spec_id_)
-      tmp.push_back(env);
+  for (int i = 0; i < exp_env_list_.size(); i++) {
+    if (exp_env_list_[i].getSpecId() >= start_spec_id_ and exp_env_list_[i].getSpecId() <= end_spec_id_) {
+      tmp.push_back(exp_env_list_[i]);
+      shortlisted_inte_list.push_back(inte_list[i]);
+      shortlisted_smoothed_inte_list.push_back(smoothed_inte_list[i]);
+    }
+  }
   exp_env_list_ = tmp;
-
-
-//  // remove discarded envelopes at end
-//  int refer_idx = seed_env_.getSpecId();
-//  int idx = exp_env_list_.size() - 1;
-//  while (idx >= 0) {
-//    ExpEnvelope env = exp_env_list_[idx];
-//    if (env.get_match_peak_num(refer_idx) < 2) ///////////////////////////////////////////////////////////////////////////
-//      exp_env_list_.erase(exp_env_list_.begin() + idx);
-//    else
-//      return;
-//    idx = idx - 1;
-//  }
-
+  xic_ = Xic(exp_env_list_[0].getSpecId(), seed_env_.getSpecId(), shortlisted_inte_list, shortlisted_smoothed_inte_list);
 }
 
 void toppic::EnvSet::refine_feature_boundary(){
@@ -278,17 +229,14 @@ void toppic::EnvSet::refine_feature_boundary(){
   int base_spec = this->seed_env_.getSpecId() - this->start_spec_id_;
   std::vector<double> env_xic = this->xic_.getInteList();
   std::vector<double> smoothed_env_xic = this->xic_.getSmoothedInteList();
-//  for (int i = 0; i < env_xic.size(); i++)    std::cout << i << ", " << env_xic[i] << ", " << smoothed_env_xic[i] << std::endl;
 
   /// Left side
   std::vector<double> left_data(smoothed_env_xic.begin(), smoothed_env_xic.begin()+base_spec+1);
-//  for (auto l : left_data) std::cout << "Left: " << l << std::endl;
-  std::vector<double> minima_left = utility_functions::findLocalMinima(left_data);
+  std::vector<int> minima_left = utility_functions::findLocalMinima(left_data);
   std::vector<double> minima_vals_left;
   for (auto m: minima_left) minima_vals_left.push_back(left_data[m]);
-//  for (int i = 0; i < minima_left.size(); i++) std::cout << "left_min: " << minima_left[i] << ", " << minima_vals_left[i] << std::endl;
   int start_split_point = this->start_spec_id_;
-  while (minima_vals_left.size() > 0) {
+  while (!minima_vals_left.empty()) {
     int idx = std::min_element(minima_vals_left.begin(), minima_vals_left.end()) - minima_vals_left.begin();
     int pos = minima_left[idx];
     minima_vals_left.erase(minima_vals_left.begin() + idx);
@@ -306,22 +254,18 @@ void toppic::EnvSet::refine_feature_boundary(){
 
   /// Right side
   std::vector<double> right_data(smoothed_env_xic.begin()+base_spec, smoothed_env_xic.end());
-//  for (auto r : right_data) std::cout << "Right: " << r << std::endl;
-  std::vector<double> minima_right = utility_functions::findLocalMinima(right_data);
+  std::vector<int> minima_right = utility_functions::findLocalMinima(right_data);
   std::vector<double> minima_vals_right;
   for (auto m: minima_right) minima_vals_right.push_back(right_data[m]);
-//  for (int i = 0; i < minima_right.size(); i++) std::cout << "Right_min: " << minima_right[i] << ", " << minima_vals_right[i] << std::endl;
   int end_split_point = -1;
-  while (minima_vals_right.size() > 0) {
+  while (!minima_vals_right.empty()) {
     int idx = std::min_element(minima_vals_right.begin(), minima_vals_right.end()) - minima_vals_right.begin();
     int pos = minima_right[idx];
     minima_vals_right.erase(minima_vals_right.begin() + idx);
     double rightMax = get_right_max(pos, right_data);
     if (rightMax == 0) continue;
-//    std::cout << idx << ", " << pos << ", " << rightMax << ", " << right_data[pos] << ", " << right_data[pos]/rightMax << std::endl;
     if (right_data[pos] / rightMax <= split_feature_intensity_ratio) {
       end_split_point =  pos;
-//      std::cout << "SPLITTTTT: " <<  end_split_point << std::endl;
       std::vector<double> temp_right_data(right_data.begin(), right_data.begin() + pos - 1);
       right_data = temp_right_data;
       minima_right = utility_functions::findLocalMinima(right_data);
@@ -336,23 +280,19 @@ void toppic::EnvSet::refine_feature_boundary(){
   if (end_split_point > -1)
     end = seed_env_.getSpecId() + end_split_point;
 
-//  std::cout << "New Boundary: " << start << ", " << end << std::endl;
-  this->setStartSpecId(start);
-  this->setEndSpecId(end);
-  this->xic_.setStartSpecId(start);
+  this->setSpecId(start, end);
   this->shortlistExpEnvs();
 }
 
 std::vector<std::vector<double>> toppic::EnvSet::get_map(double snr, double noise_inte){
   std::vector<std::vector<double>> map;
-  std::vector<ExpEnvelope> exp_envs = this->exp_env_list_;
-  for (auto exp_env: exp_envs) {
+  for (auto &exp_env: exp_env_list_) {
     std::vector<double> exp_peaks = exp_env.get_inte_list();
-    std::vector<double> theo_peaks = this->get_theo_distribution_inte();
+    std::vector<double> theo_peaks = seed_env_.get_inte_list();
     double inte_ratio = env_utils::calcInteRatio_scan(theo_peaks, exp_peaks);
     std::vector<double> scalled_theo_env;
-    for (int i = 0; i < theo_peaks.size(); i++) {
-      double scaled_inte = theo_peaks[i] * inte_ratio;
+    for (double theo_peak : theo_peaks) {
+      double scaled_inte = theo_peak * inte_ratio;
       if (scaled_inte > snr * noise_inte)
         scalled_theo_env.push_back(scaled_inte);
       else
@@ -366,11 +306,78 @@ std::vector<std::vector<double>> toppic::EnvSet::get_map(double snr, double nois
 double toppic::EnvSet::comp_intensity(double snr, double noise_inte){
   std::vector<std::vector<double>> map = this->get_map(snr, noise_inte);
   std::vector<double> aggregate_inte (map[0].size(), 0.0);
-  for (int spId = 0; spId < map.size(); spId++)
+  for (auto &sp_map : map)
     for (int peakIdx = 0; peakIdx < aggregate_inte.size(); peakIdx++)
-        aggregate_inte[peakIdx] = aggregate_inte[peakIdx] + map[spId][peakIdx];
-//  for (auto i : aggregate_inte) std::cout << "Abundance - aggregate inte: " << i << std::endl;
+        aggregate_inte[peakIdx] = aggregate_inte[peakIdx] + sp_map[peakIdx];
   double abundance = std::accumulate(aggregate_inte.begin(), aggregate_inte.end(), 0.0);
-//  std::cout << "Abundance: " << abundance << std::endl;
   return abundance;
+}
+
+void toppic::EnvSet::remove_matrix_peaks(PeakMatrix &peak_matrix){
+  for (auto &env : exp_env_list_) {
+    int peak_num = 0;
+    for (int peak_id = 0; peak_id < env.get_peak_num(); peak_id++) {
+      ExpPeak peak = env.get_peak(peak_id);
+      if (!peak.isEmpty()){
+        peak_num = peak_num + 1;
+        peak_matrix.remove_peak(peak);
+      }
+    }
+    if (peak_num > 0) {
+      int spec_id = env.getSpecId();
+      double min_pos = 0, max_pos = 0;
+      env.get_min_max_pos(&min_pos, &max_pos);
+      peak_matrix.remove_peak_in_range(spec_id, min_pos, max_pos);
+    }
+  }
+}
+//
+//void toppic::PeakMatrix::remove_peak(ExpPeak& peak){
+//  int spec_id = peak.getSpecId();
+//  int bin_idx = get_index(peak.getPos());
+//
+//  std::vector<std::vector<ExpPeak>> peaks_row = matrix_[spec_id].getRow();
+//  std::vector<ExpPeak> bin_peaks = peaks_row[bin_idx];
+//  std::vector<ExpPeak> new_bin;
+//  for (auto bin_peak : bin_peaks) {
+//    if (bin_peak.getPeakId() == peak.getPeakId()) continue;
+//    new_bin.push_back(bin_peak);
+//  }
+//  peaks_row[bin_idx] = new_bin;
+//  matrix_[spec_id].setRow(peaks_row);
+//}
+
+void toppic::EnvSet::remove_peak_data(PeakMatrix &peakMatrix) {
+  std::vector<std::vector<double>> map = get_map(3.0, peakMatrix.get_min_inte());
+  for (int env_id = 0; env_id < exp_env_list_.size(); env_id++) {
+    ExpEnvelope exp_env = exp_env_list_[env_id];
+    int spec_id = exp_env.getSpecId();
+    if (spec_id < 0 or spec_id >= peakMatrix.get_spec_num())
+      continue;
+    std::vector<ExpPeak> exp_data = exp_env.getExpEnvList();
+    std::vector<double> theo_data = map[env_id];
+    for (int elem_idx = 0; elem_idx < exp_data.size(); elem_idx++) {
+      ExpPeak exp_peak = exp_data[elem_idx];
+      if (exp_peak.isEmpty())
+        continue;
+      int bin_idx = peakMatrix.get_index(exp_peak.getPos());
+      std::vector<ExpPeak> peaks = peakMatrix.get_bin_peak(spec_id, bin_idx);
+      double theo_peak = theo_data[elem_idx];
+      std::vector<ExpPeak> other_peaks;
+      for (auto peak: peaks) {
+        if (std::abs(peak.getInte() - exp_peak.getInte()) < 0.0001) {
+          if (peak.getInte() / theo_peak < 4)
+            continue;
+          else {
+            if (peak.getInte() - theo_peak > 0)
+              peak.setInte(peak.getInte() - theo_peak);
+            else
+              peak.setInte(0);
+          }
+        }
+        other_peaks.push_back(peak);
+      }
+      peakMatrix.set_bin_peak(spec_id, bin_idx, other_peaks);
+    }
+  }
 }

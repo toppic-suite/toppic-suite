@@ -14,6 +14,8 @@
 
 #include <iostream>
 #include <algorithm>
+#include <cstdio>
+#include <ctime>
 
 #include "common/util/file_util.hpp"
 #include "seq/fasta_util.hpp"
@@ -38,22 +40,15 @@
 namespace toppic {
 
 namespace feature_detect {
-std::vector<double> getSpectrumNoiseIntensities(PeakPtrVec2D& raw_peaks){
-  std::vector<double> spectrum_noise_levels;
-  for (auto &peaks : raw_peaks) {
-    std::vector<double> intes;
-    for (auto & peak : peaks) {
-      intes.push_back(peak->getIntensity());
-    }
-    double noise = baseline_util::getBaseLine(intes);
-    spectrum_noise_levels.push_back(noise);
-  }
-  return spectrum_noise_levels;
-}
 
 void process(int frac_id, const std::string &sp_file_name,
              bool missing_level_one, const std::string &resource_dir, const std::string &activation,
              bool isFaims, const std::vector<std::pair<double, int>> voltage_vec) {
+  std::clock_t start;
+  double duration;
+
+  start = std::clock();
+
   //logger::setLogLevel(2);
   FeatureParaPtr para_ptr
       = std::make_shared<FeaturePara>(frac_id, sp_file_name, resource_dir);
@@ -116,17 +111,15 @@ void process(int frac_id, const std::string &sp_file_name,
       peak_matrix.find_remove_non_neighbors(neighbor_mass_tole);
 //      write_out_files::write_peak_matrix(peak_matrix, base_name + "_" + "matrix_labeled.txt");
 
-      /// Prepare data -- Noise Intensity level
-      std::vector<double> spectrum_noise_levels = getSpectrumNoiseIntensities(raw_peaks);
-      std::cout << "Number of spectra and seed envelopes: " << spectrum_noise_levels.size() << " , " << seed_envs.size() << std::endl;
-//      write_out_files::write_noise_levels(peak_matrix, spectrum_noise_levels, base_name + "_" + "noise_level.txt");
 
       /// Extract Fetures
       int seed_num = seed_envs.size();
       int env_coll_num = 0;
+      std::vector<EnvCollection> env_coll_list;
       std::vector<Feature> features;
       for (int seed_env_idx = 0; seed_env_idx < seed_num; seed_env_idx++){
-        std::cout << "Processing peak " << seed_env_idx << " and Features found " << env_coll_num << std::endl;
+        if (seed_env_idx % 500 == 0)
+          std::cout << "Processing peak " << seed_env_idx << " and Features found " << env_coll_num << std::endl;
         SeedEnvelope env = seed_envs[seed_env_idx];
         bool valid = evaluate_envelope::preprocess_env(peak_matrix, env, mass_tole, corr_tole, valid);
         if (!valid) continue;
@@ -134,16 +127,22 @@ void process(int frac_id, const std::string &sp_file_name,
                                                                     para_max_charge, ratio_multi, match_peak_tole, env_para_ptr->ms_one_sn_ratio_,
                                                                     base_name + "_" + str_util::toString(env_coll_num) +"_details.txt");
         if (!env_coll.isEmpty()) {
-          features.push_back(Feature(env_coll, peak_matrix, model, spectrum_noise_levels, env_coll_num, env_para_ptr->ms_one_sn_ratio_));
-          env_coll.remove_matrix_peaks(peak_matrix);
+          if (env_coll_util::check_in_existing_features(peak_matrix, env_coll, env_coll_list, 10E-6, 0.8))
+            continue;
+          env_coll.refine_mono_mass();
+          env_coll_list.push_back(env_coll);
+          features.push_back(Feature(env_coll, peak_matrix, model, env_coll_num, env_para_ptr->ms_one_sn_ratio_));
+//          env_coll.remove_matrix_peaks(peak_matrix);
+          env_coll.remove_peak_data(peak_matrix);
           env_coll_num = env_coll_num + 1;
-          if (env_coll_num == 100)
-            break;
+//          if (env_coll_num == 1000) break;
         }
       }
       std::cout << "Number of Envelope Collections: " << features.size() << std::endl;
       file_name = base_name + "_" + file_num + "ms1.feature";
       write_feature::writeFeatures(file_name, features);
+      duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
+      std::cout<<"Duration (seconds): "<< duration <<'\n';
     }
   }
 }

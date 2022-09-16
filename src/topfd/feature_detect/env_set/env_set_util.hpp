@@ -16,6 +16,7 @@
 namespace toppic {
 namespace env_set_util {
   bool check_valid_env_set(PeakMatrix& peak_matrix, EnvSet& env_set);
+  bool check_valid_env_set_seed_env(PeakMatrix& peak_matrix, EnvSet& env_set);
   ExpPeak pick_exp_peak(PeakMatrix& peak_matrix, SimplePeak& seed_peak, int sp_id, double mass_tol);
   ExpEnvelope get_match_exp_env(PeakMatrix& peak_matrix, SeedEnvelope& seed_env, int sp_id, double mass_tol);
   //  ExpPeak pick_exp_peak(PeakRow& row, SimplePeak& seed_peak, double mass_tol);

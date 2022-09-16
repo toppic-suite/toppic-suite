@@ -61,7 +61,7 @@ namespace env_utils {
     return aggregate_mz;
   }
 
-  double calcInteRatio_scan(std::vector<double> theo_envelope_inte, std::vector<double> exp_envelope_inte) {
+  double calcInteRatio_scan(std::vector<double> &theo_envelope_inte, std::vector<double> &exp_envelope_inte) {
     double theo_sum = 0;
     double obs_sum = 0;
     int refer_idx = std::max_element(theo_envelope_inte.begin(), theo_envelope_inte.end()) - theo_envelope_inte.begin();
@@ -75,11 +75,8 @@ namespace env_utils {
       theo_sum = theo_sum + theo_envelope_inte[refer_idx + 1];
       obs_sum = obs_sum + exp_envelope_inte[refer_idx + 1];
     }
-//    std::cout << "Final: " << theo_sum << ", " << obs_sum << ", " <<  obs_sum / theo_sum << std::endl;
     if (theo_sum == 0)
       return 1.0;
-//    else if (obs_sum == 0)
-//      return 1.0;
     else
       return obs_sum / theo_sum;
   }
