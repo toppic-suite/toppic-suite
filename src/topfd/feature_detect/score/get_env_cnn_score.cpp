@@ -113,8 +113,8 @@ namespace env_cnn_score {
       noise_inte_distribution_list.push_back(t_noise_inte_distribution_list);
     }
 
-    for (int idx = 0; idx < noise_distribution_list.size(); idx++) {
-      for (int j_idx = 0; j_idx < noise_distribution_list[idx].size(); j_idx++){
+    for (size_t idx = 0; idx < noise_distribution_list.size(); idx++) {
+      for (size_t j_idx = 0; j_idx < noise_distribution_list[idx].size(); j_idx++){
         int p_idx = get_index(round(noise_distribution_list[idx][j_idx]*1000.0)/1000.0, theo_mz[0], bin_size) + 10;
         if (p_idx >= 300)
           break;
@@ -139,7 +139,7 @@ namespace env_cnn_score {
     }
     /// add noise to the data
     /// envcnn_data_matrix[:, 1] = np.add(envcnn_data_matrix[:, 1], noise_arr)
-    for (int idx = 0; idx < noise_arr.size(); idx++)
+    for (size_t idx = 0; idx < noise_arr.size(); idx++)
       envcnn_data_matrix[idx][1] = envcnn_data_matrix[idx][1] + noise_arr[idx];
     return envcnn_data_matrix;
   }

@@ -13,7 +13,7 @@ void toppic::write_out_files::write_peak_matrix(PeakMatrix peak_matrix, std::str
     int bin_arr_num = peak_row.size();
     for (int bin_arr_id = 0; bin_arr_id < bin_arr_num; bin_arr_id++) {
       std::vector<ExpPeak> bin_arr = peak_row[bin_arr_id];
-      for (int bin_id = 0; bin_id < bin_arr.size(); bin_id++)
+      for (size_t bin_id = 0; bin_id < bin_arr.size(); bin_id++)
         if (!bin_arr[bin_id].isEmpty())
           out_file << "ID: (" << spec_id << ", " << bin_arr_id << ", " << bin_id << ") " << bin_arr[bin_id].getString();
     }
@@ -34,7 +34,7 @@ void toppic::write_out_files::write_noise_levels(PeakMatrix peak_matrix, std::ve
   std::ofstream out_file;
   out_file.open(file_name);
   out_file << "Data Level Noise intensity: " << peak_matrix.get_min_inte() << "\n";
-  for (int id = 0; id < spec_noise_levels.size(); id++)
+  for (size_t id = 0; id < spec_noise_levels.size(); id++)
     out_file << "Spectrum " << id << ": " << spec_noise_levels[id] << "\n";
   out_file.close();
 }

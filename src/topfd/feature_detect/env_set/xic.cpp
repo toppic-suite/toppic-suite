@@ -33,7 +33,7 @@ void toppic::Xic::moving_avg (int size) {
   data.insert(data.begin(), left_padding.begin(), left_padding.end());
   double sum = 0.0;
   int cnt = 0;
-  for (int i = 0; i < data.size(); i++) {
+  for (size_t i = 0; i < data.size(); i++) {
     sum += data[i];
     cnt++;
     if (cnt >= size) {

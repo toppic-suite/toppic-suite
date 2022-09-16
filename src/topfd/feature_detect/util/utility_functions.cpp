@@ -78,7 +78,8 @@ namespace utility_functions{
 
   toppic::SeedEnvelope test_half_charge_state(PeakMatrix &peak_matrix, SeedEnvelope &env, EnvSet &top_peak_env_set, double even_odd_peak_ratios, double mass_tole) {
     SeedEnvelope half_charge_env = get_half_charge_env(env, even_odd_peak_ratios);
-    bool valid = evaluate_envelope::preprocess_env(peak_matrix, half_charge_env, mass_tole, 0.5, valid);
+    bool valid = false;
+    valid = evaluate_envelope::preprocess_env(peak_matrix, half_charge_env, mass_tole, 0.5, valid);
     if (!valid) return SeedEnvelope();
     return half_charge_env;
   }

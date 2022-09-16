@@ -38,7 +38,7 @@ namespace component_score {
     for (auto inte : aggregate_inte)
       normalized_aggregate_inte.push_back(inte/max_aggregate_inte);
     double sum_even_peaks = 0, sum_even_peaks_theo = 0, sum_odd_peaks = 0, sum_odd_peaks_theo = 0;
-    for (int peak_idx = 0; peak_idx < aggregate_inte.size(); peak_idx++) {
+    for (size_t peak_idx = 0; peak_idx < aggregate_inte.size(); peak_idx++) {
       if (peak_idx%2 == 0) {
         sum_even_peaks = sum_even_peaks + normalized_aggregate_inte[peak_idx];
         sum_even_peaks_theo = sum_even_peaks_theo + theo_inte[peak_idx];
@@ -71,7 +71,7 @@ namespace component_score {
     double error_sum = 0;
     for (auto & exp_env : exp_envs) {
       std::vector<ExpPeak> peaks = exp_env.getExpEnvList();
-      for (int peak_idx = 0; peak_idx < peaks.size(); peak_idx++) {
+      for (size_t peak_idx = 0; peak_idx < peaks.size(); peak_idx++) {
         ExpPeak peak = peaks[peak_idx];
         if (!peak.isEmpty()) {
           double cur_err = std::abs(peak.getPos() - theo_dis[peak_idx]);
@@ -115,10 +115,10 @@ namespace component_score {
   double get_matched_peaks_percent(EnvSet& env_set, std::vector<std::vector<double>> theo_map) {
     double total_peaks = 0, positive_peaks = 0;
     std::vector<ExpEnvelope> exp_envs = env_set.getExpEnvList();
-    for (int i = 0; i < exp_envs.size(); i++) {
+    for (size_t i = 0; i < exp_envs.size(); i++) {
       std::vector<ExpPeak> peaks = exp_envs[i].getExpEnvList();
       std::vector<double> scalled_theo_env = theo_map[i];
-      for (int peak_id = 0; peak_id < scalled_theo_env.size(); peak_id++){
+      for (size_t peak_id = 0; peak_id < scalled_theo_env.size(); peak_id++){
         double peak_inte = scalled_theo_env[peak_id];
         if (peak_inte > 0){
           total_peaks = total_peaks + 1;
@@ -154,7 +154,7 @@ namespace component_score {
 
     if (base_spec - 1 > 0)
       data_sp_minus_1 = exp_envs[base_spec-1].get_inte_list();
-    if (base_spec + 1 < exp_envs.size())
+    if (base_spec + 1 < static_cast<int>(exp_envs.size()))
       data_sp_plus_1 = exp_envs[base_spec+1].get_inte_list();
 
 //    for (int i = 0; i < data_sp.size(); i++)

@@ -121,7 +121,8 @@ void process(int frac_id, const std::string &sp_file_name,
         if (seed_env_idx % 500 == 0)
           std::cout << "Processing peak " << seed_env_idx << " and Features found " << env_coll_num << std::endl;
         SeedEnvelope env = seed_envs[seed_env_idx];
-        bool valid = evaluate_envelope::preprocess_env(peak_matrix, env, mass_tole, corr_tole, valid);
+        bool valid = false; 
+        valid = evaluate_envelope::preprocess_env(peak_matrix, env, mass_tole, corr_tole, valid);
         if (!valid) continue;
         EnvCollection env_coll = env_coll_util::find_env_collection(peak_matrix, env, mass_tole, max_miss_env, max_miss_charge, max_miss_peak,
                                                                     para_max_charge, ratio_multi, match_peak_tole, env_para_ptr->ms_one_sn_ratio_,
