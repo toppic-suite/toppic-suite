@@ -16,6 +16,7 @@
 #define TOPPIC_TOPFD_ENVCNN_ENV_CNN_HPP_
 
 #include <string>
+#include "fdeep/fdeep.hpp"
 #include "ms/env/match_env.hpp"
 
 namespace toppic {
@@ -23,7 +24,8 @@ namespace toppic {
 namespace env_cnn {
 
   void initModel(const std::string &dir_name, int thread_num);
-
+  std::vector<std::vector<double>> initializeMatrix(double &tolerance);
+  void generateTensors(std::vector<fdeep::tensors> &tensorsL, const std::vector<std::vector<double>> &matrix);
   void computeEnvScores(MatchEnvPtrVec &ori_env, PeakPtrVec &peak_list); 
 
 }
