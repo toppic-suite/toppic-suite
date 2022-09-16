@@ -32,7 +32,7 @@ namespace toppic {
 
         std::vector<ExpPeak> getExpEnvList() { return peak_list_; }
         void setExpEnvList(const std::vector<ExpPeak>& peak_list) {
-          for (int i = 0; i < peak_list.size(); i++)
+          for (size_t i = 0; i < peak_list.size(); i++)
             peak_list_[i] = peak_list[i];
         }
 

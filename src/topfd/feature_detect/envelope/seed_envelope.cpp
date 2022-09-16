@@ -41,7 +41,7 @@ toppic::SeedEnvelope::SeedEnvelope(int spec_id, int env_id, double pos, double m
   mass_ = mass;
   inte_ = inte;
   charge_ = charge;
-  for (int i = 0; i < pos_list.size(); i++)
+  for (size_t i = 0; i < pos_list.size(); i++)
     peak_list_.push_back(SimplePeak(pos_list[i], inte_list[i]));
 }
 

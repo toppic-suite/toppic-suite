@@ -44,7 +44,7 @@ std::vector<double> toppic::EnvCollection::comp_exp_inte_sum_list() {
     if (env_set.isEmpty())
       continue;
     std::vector<double> cur_sum_list = env_set.comp_exp_inte_sum_list();
-    if (peak_num != cur_sum_list.size())
+    if (peak_num != static_cast<int>(cur_sum_list.size()))
       std::cout << "peak number " << peak_num << " cur list len " << cur_sum_list.size();
     for (int i = 0; i < peak_num; i++)
       sum_list[i] = sum_list[i] + cur_sum_list[i];

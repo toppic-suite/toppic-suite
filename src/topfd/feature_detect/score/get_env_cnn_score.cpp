@@ -73,13 +73,13 @@ namespace env_cnn_score {
 
     std::vector<double> normalize_theo_inte;
     std::vector<double> normalize_exp_inte;
-    for (int i = 0; i < scaled_theo_inte.size(); i++){
+    for (size_t i = 0; i < scaled_theo_inte.size(); i++){
       normalize_theo_inte.push_back(scaled_theo_inte[i]/max_scalled_theo_inte);
       normalize_exp_inte.push_back(exp_dist_inte[i]/max_scalled_theo_inte);
     }
 
     /// populate matrix
-    for (int idx = 0; idx < theo_mz.size(); idx++){
+    for (size_t idx = 0; idx < theo_mz.size(); idx++){
       double exp_inte = normalize_exp_inte[idx];
       if (exp_inte == 0)
         continue;

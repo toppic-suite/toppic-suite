@@ -170,7 +170,7 @@ namespace env_coll_util{
 
     /// RT OVERLAPPPPP
     std::vector<int> selected_features;
-    for (int i = 0; i < env_coll_list.size(); i++) {
+    for (size_t i = 0; i < env_coll_list.size(); i++) {
       if (check_overlap(peakMatrix, env_coll_list[i], env_coll, time_tol)) {
         double min_mass_diff = 100000000;
         for (auto ext_mass : extended_masses) {

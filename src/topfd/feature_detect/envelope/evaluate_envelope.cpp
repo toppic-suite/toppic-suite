@@ -30,7 +30,7 @@ bool toppic::evaluate_envelope::evaluate_envelope(PeakMatrix &peak_matrix, SeedE
   std::vector<double> seed_envelope_inte = seed_envelope.get_inte_list();
   double inte_ratio = env_utils::calcInteRatio_scan(seed_envelope_inte, experimental_envelope_inte);
   std::vector<double> scaled_theo_inte;
-  int i;
+  size_t i;
   for (i = 0; i < seed_envelope_inte.size(); i++) {
     double scaled_inte = inte_ratio * seed_envelope_inte[i];
     if (scaled_inte < snr * noise_inte)
@@ -38,7 +38,7 @@ bool toppic::evaluate_envelope::evaluate_envelope(PeakMatrix &peak_matrix, SeedE
     scaled_theo_inte.push_back(scaled_inte);
   }
   std::vector<SimplePeak> seed_envelope_peaks = seed_envelope.getPeakList();
-  for (int j = seed_envelope_peaks.size()-1; j >= i; j--) {
+  for (size_t j = seed_envelope_peaks.size()-1; j >= i; j--) {
     seed_envelope_peaks.erase(seed_envelope_peaks.begin() + j);
     experimental_envelope_inte.erase(experimental_envelope_inte.begin() + j);
   }

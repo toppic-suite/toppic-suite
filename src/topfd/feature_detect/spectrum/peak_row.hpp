@@ -25,7 +25,7 @@ namespace toppic {
 
         std::vector<std::vector<ExpPeak>> getRow() const { return row_; }
         void setRow(std::vector<std::vector<ExpPeak>> row) {
-          for (int i = 0; i < row.size(); i++)
+          for (size_t i = 0; i < row.size(); i++)
             row_[i] = row[i];
 //          row_.clear();
 //          for (auto & r : row)
