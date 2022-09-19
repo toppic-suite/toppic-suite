@@ -13,11 +13,11 @@
 
 namespace toppic {
 namespace write_out_files {
-    void write_peak_matrix(PeakMatrix peak_matrix, std::string file_name);
-    void write_seed_envelopes(std::vector<SeedEnvelope> seed_envs, std::string file_name);
-    void write_noise_levels(PeakMatrix peak_matrix, std::vector<double> spec_noise_levels, std::string file_name);
+    void write_peak_matrix(PeakMatrix& peak_matrix, std::string file_name);
+    void write_seed_envelopes(std::vector<SeedEnvelope>& seed_envs, std::string file_name);
+    void write_noise_levels(PeakMatrix& peak_matrix, std::vector<double>& spec_noise_levels, std::string file_name);
     void write_env_set(PeakMatrix& peakMatrix, EnvSet& env_set, std::string file_name);
-
+    void write_env_cnn_matrix(std::vector<std::vector<double>>& envcnn_data_matrix);
 }
 }
 

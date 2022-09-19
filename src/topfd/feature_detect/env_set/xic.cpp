@@ -31,9 +31,10 @@ void toppic::Xic::moving_avg (int size) {
   std::vector<double> data = inte_list_;
   std::vector<double> left_padding (1, 0);
   data.insert(data.begin(), left_padding.begin(), left_padding.end());
+  int num_spec = data.size();
   double sum = 0.0;
   int cnt = 0;
-  for (size_t i = 0; i < data.size(); i++) {
+  for (int i = 0; i < num_spec; i++) {
     sum += data[i];
     cnt++;
     if (cnt >= size) {

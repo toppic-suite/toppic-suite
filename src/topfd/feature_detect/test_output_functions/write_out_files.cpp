@@ -4,7 +4,7 @@
 
 #include "write_out_files.hpp"
 
-void toppic::write_out_files::write_peak_matrix(PeakMatrix peak_matrix, std::string file_name) {
+void toppic::write_out_files::write_peak_matrix(PeakMatrix& peak_matrix, std::string file_name) {
   std::ofstream out_file;
   int spec_num = peak_matrix.get_spec_num();
   for (int spec_id = 0; spec_id < spec_num; spec_id++) {
@@ -13,7 +13,8 @@ void toppic::write_out_files::write_peak_matrix(PeakMatrix peak_matrix, std::str
     int bin_arr_num = peak_row.size();
     for (int bin_arr_id = 0; bin_arr_id < bin_arr_num; bin_arr_id++) {
       std::vector<ExpPeak> bin_arr = peak_row[bin_arr_id];
-      for (size_t bin_id = 0; bin_id < bin_arr.size(); bin_id++)
+      int num_bins = bin_arr.size();
+      for (int bin_id = 0; bin_id < num_bins; bin_id++)
         if (!bin_arr[bin_id].isEmpty())
           out_file << "ID: (" << spec_id << ", " << bin_arr_id << ", " << bin_id << ") " << bin_arr[bin_id].getString();
     }
@@ -21,20 +22,21 @@ void toppic::write_out_files::write_peak_matrix(PeakMatrix peak_matrix, std::str
   }
 }
 
-void toppic::write_out_files::write_seed_envelopes(std::vector<SeedEnvelope> seed_envs, std::string file_name) {
+void toppic::write_out_files::write_seed_envelopes(std::vector<SeedEnvelope>& seed_envs, std::string file_name) {
+  int num_seed_envs = seed_envs.size();
   std::ofstream out_file;
   out_file.open(file_name);
-  int seed_env_num = seed_envs.size();
-  for (int seed_env_id = 0; seed_env_id < seed_env_num; seed_env_id++)
+  for (int seed_env_id = 0; seed_env_id < num_seed_envs; seed_env_id++)
     out_file << "ID: " << seed_env_id << ", " << seed_envs[seed_env_id].getString();
   out_file.close();
 }
 
-void toppic::write_out_files::write_noise_levels(PeakMatrix peak_matrix, std::vector<double> spec_noise_levels, std::string file_name) {
+void toppic::write_out_files::write_noise_levels(PeakMatrix& peak_matrix, std::vector<double>& spec_noise_levels, std::string file_name) {
+  int num_spec = spec_noise_levels.size();
   std::ofstream out_file;
   out_file.open(file_name);
   out_file << "Data Level Noise intensity: " << peak_matrix.get_min_inte() << "\n";
-  for (size_t id = 0; id < spec_noise_levels.size(); id++)
+  for (int id = 0; id < num_spec; id++)
     out_file << "Spectrum " << id << ": " << spec_noise_levels[id] << "\n";
   out_file.close();
 }
@@ -106,5 +108,17 @@ void toppic::write_out_files::write_env_set(PeakMatrix& peakMatrix, EnvSet& env_
   }
   out_file << "\n\n";
 
+  out_file.close();
+}
+
+void toppic::write_out_files::write_env_cnn_matrix(std::vector<std::vector<double>>& envcnn_data_matrix) {
+  std::ofstream out_file;
+  out_file.open("envcnn.txt", std::ios_base::app);
+  for (auto &row : envcnn_data_matrix) {
+    for (auto &col: row)
+      out_file << col << ", ";
+    out_file << "\n";
+  }
+  out_file << "\n\n";
   out_file.close();
 }

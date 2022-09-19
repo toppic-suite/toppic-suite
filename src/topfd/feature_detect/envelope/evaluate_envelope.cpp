@@ -28,17 +28,19 @@ bool toppic::evaluate_envelope::evaluate_envelope(PeakMatrix &peak_matrix, SeedE
   std::vector<double> seed_envelope_mass = seed_envelope.get_pos_list();
   std::vector<double> experimental_envelope_inte = exp_env.get_inte_list();
   std::vector<double> seed_envelope_inte = seed_envelope.get_inte_list();
+  int num_env_peaks = seed_envelope_inte.size();
   double inte_ratio = env_utils::calcInteRatio_scan(seed_envelope_inte, experimental_envelope_inte);
   std::vector<double> scaled_theo_inte;
-  size_t i;
-  for (i = 0; i < seed_envelope_inte.size(); i++) {
+
+  int i;
+  for (i = 0; i < num_env_peaks; i++) {
     double scaled_inte = inte_ratio * seed_envelope_inte[i];
     if (scaled_inte < snr * noise_inte)
       break;
     scaled_theo_inte.push_back(scaled_inte);
   }
   std::vector<SimplePeak> seed_envelope_peaks = seed_envelope.getPeakList();
-  for (size_t j = seed_envelope_peaks.size()-1; j >= i; j--) {
+  for (int j = num_env_peaks-1; j >= i; j--) {
     seed_envelope_peaks.erase(seed_envelope_peaks.begin() + j);
     experimental_envelope_inte.erase(experimental_envelope_inte.begin() + j);
   }

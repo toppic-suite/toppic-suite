@@ -33,8 +33,10 @@ namespace env_utils {
   std::vector<double> get_aggregate_envelopes_inte(EnvSet& env_set){
     std::vector<ExpEnvelope> exp_env_list = env_set.getExpEnvList();
     std::vector<double> aggregate_inte (exp_env_list[0].get_peak_num(), 0.0);
-    for (size_t spId = 0; spId < exp_env_list.size(); spId++) {
-      for (size_t peakIdx = 0; peakIdx < aggregate_inte.size(); peakIdx++) {
+    int num_spec = exp_env_list.size();
+    int num_peaks = aggregate_inte.size();
+    for (int spId = 0; spId < num_spec; spId++) {
+      for (int peakIdx = 0; peakIdx < num_peaks; peakIdx++) {
         ExpPeak peak = exp_env_list[spId].get_peak(peakIdx);
         if (!peak.isEmpty())
           aggregate_inte[peakIdx] = aggregate_inte[peakIdx] + peak.getInte();
@@ -46,9 +48,11 @@ namespace env_utils {
   std::vector<double> get_aggregate_envelopes_mz(EnvSet& env_set){
     std::vector<ExpEnvelope> exp_env_list = env_set.getExpEnvList();
     std::vector<double> aggregate_mz (exp_env_list[0].get_peak_num(), 0.0);
-    for (size_t peakIdx = 0; peakIdx < aggregate_mz.size(); peakIdx++) {
+    int num_spec = exp_env_list.size();
+    int num_peaks = aggregate_mz.size();
+    for (int peakIdx = 0; peakIdx < num_peaks; peakIdx++) {
       int counter = 0;
-      for (size_t spId = 0; spId < exp_env_list.size(); spId++) {
+      for (int spId = 0; spId < num_spec; spId++) {
         ExpPeak peak = exp_env_list[spId].get_peak(peakIdx);
         if (!peak.isEmpty()) {
           aggregate_mz[peakIdx] = aggregate_mz[peakIdx] + peak.getPos();

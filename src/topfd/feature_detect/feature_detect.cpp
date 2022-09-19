@@ -111,6 +111,7 @@ void process(int frac_id, const std::string &sp_file_name,
       peak_matrix.find_remove_non_neighbors(neighbor_mass_tole);
 //      write_out_files::write_peak_matrix(peak_matrix, base_name + "_" + "matrix_labeled.txt");
 
+      std::cout << "Number of seed envelopes: " << seed_envs.size() << std::endl;
 
       /// Extract Fetures
       int seed_num = seed_envs.size();
@@ -121,7 +122,7 @@ void process(int frac_id, const std::string &sp_file_name,
         if (seed_env_idx % 500 == 0)
           std::cout << "Processing peak " << seed_env_idx << " and Features found " << env_coll_num << std::endl;
         SeedEnvelope env = seed_envs[seed_env_idx];
-        bool valid = false; 
+        bool valid = false;
         valid = evaluate_envelope::preprocess_env(peak_matrix, env, mass_tole, corr_tole, valid);
         if (!valid) continue;
         EnvCollection env_coll = env_coll_util::find_env_collection(peak_matrix, env, mass_tole, max_miss_env, max_miss_charge, max_miss_peak,
@@ -133,10 +134,8 @@ void process(int frac_id, const std::string &sp_file_name,
           env_coll.refine_mono_mass();
           env_coll_list.push_back(env_coll);
           features.push_back(Feature(env_coll, peak_matrix, model, env_coll_num, env_para_ptr->ms_one_sn_ratio_));
-//          env_coll.remove_matrix_peaks(peak_matrix);
           env_coll.remove_peak_data(peak_matrix);
           env_coll_num = env_coll_num + 1;
-//          if (env_coll_num == 1000) break;
         }
       }
       std::cout << "Number of Envelope Collections: " << features.size() << std::endl;

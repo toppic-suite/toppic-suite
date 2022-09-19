@@ -156,17 +156,19 @@ void toppic::EnvSet::simple_remove_matrix_peaks(PeakMatrix peak_matrix){
 void toppic::EnvSet::get_weight_mz_error(double* weight_sum, double* error_sum){
   std::vector<SimplePeak> seed_peak_list = seed_env_.getPeakList();
   std::vector<double> inte_list = xic_.getInteList();
+  int num_exp_env = exp_env_list_.size();
+  int num_peaks_theo_env = seed_peak_list.size();
   *weight_sum = 0;
   *error_sum = 0;
-  for (size_t spec_idx = 0; spec_idx < exp_env_list_.size(); spec_idx++) {
-    ExpEnvelope expEnvelope = exp_env_list_[spec_idx];
+  for (int exp_env_id = 0; exp_env_id < num_exp_env; exp_env_id++) {
+    ExpEnvelope expEnvelope = exp_env_list_[exp_env_id];
     if (expEnvelope.isEmpty())
       continue;
     std::vector<ExpPeak> exp_peak_list = expEnvelope.getExpEnvList();
-    for (size_t peak_idx = 0; peak_idx < seed_peak_list.size(); peak_idx++) {
+    for (int peak_idx = 0; peak_idx < num_peaks_theo_env; peak_idx++) {
       ExpPeak peak = exp_peak_list[peak_idx];
       if (!peak.isEmpty()) {
-        double cur_inte = seed_peak_list[peak_idx].getInte() * inte_list[spec_idx];
+        double cur_inte = seed_peak_list[peak_idx].getInte() * inte_list[exp_env_id];
         double cur_err = peak.getPos() - seed_peak_list[peak_idx].getPos();
         *error_sum = *error_sum + (cur_inte * cur_err);
         *weight_sum = *weight_sum + cur_inte;
@@ -199,7 +201,8 @@ double get_left_max(int pos, std::vector<double> &y) {
 
 double get_right_max(int pos, std::vector<double> &y){
   double max_val = -100000000;
-  for (size_t i = pos + 1; i < y.size(); i++) {
+  int vec_length = y.size();
+  for (int i = pos + 1; i < vec_length; i++) {
     if (y[i] > max_val)
       max_val = y[i];
   }
@@ -212,8 +215,9 @@ void toppic::EnvSet::shortlistExpEnvs() {
 
   std::vector<double> shortlisted_inte_list;
   std::vector<double> shortlisted_smoothed_inte_list;
+  int num_exp_env = exp_env_list_.size();
   std::vector<ExpEnvelope> tmp;
-  for (size_t i = 0; i < exp_env_list_.size(); i++) {
+  for (int i = 0; i < num_exp_env; i++) {
     if (exp_env_list_[i].getSpecId() >= start_spec_id_ and exp_env_list_[i].getSpecId() <= end_spec_id_) {
       tmp.push_back(exp_env_list_[i]);
       shortlisted_inte_list.push_back(inte_list[i]);
@@ -306,9 +310,10 @@ std::vector<std::vector<double>> toppic::EnvSet::get_map(double snr, double nois
 double toppic::EnvSet::comp_intensity(double snr, double noise_inte){
   std::vector<std::vector<double>> map = this->get_map(snr, noise_inte);
   std::vector<double> aggregate_inte (map[0].size(), 0.0);
+  int num_peaks = aggregate_inte.size();
   for (auto &sp_map : map)
-    for (size_t peakIdx = 0; peakIdx < aggregate_inte.size(); peakIdx++)
-        aggregate_inte[peakIdx] = aggregate_inte[peakIdx] + sp_map[peakIdx];
+    for (int peakIdx = 0; peakIdx < num_peaks; peakIdx++)
+      aggregate_inte[peakIdx] = aggregate_inte[peakIdx] + sp_map[peakIdx];
   double abundance = std::accumulate(aggregate_inte.begin(), aggregate_inte.end(), 0.0);
   return abundance;
 }
@@ -349,20 +354,22 @@ void toppic::EnvSet::remove_matrix_peaks(PeakMatrix &peak_matrix){
 
 void toppic::EnvSet::remove_peak_data(PeakMatrix &peakMatrix) {
   std::vector<std::vector<double>> map = get_map(3.0, peakMatrix.get_min_inte());
-  for (size_t env_id = 0; env_id < exp_env_list_.size(); env_id++) {
+  int num_exp_env = exp_env_list_.size();
+  for (int env_id = 0; env_id < num_exp_env; env_id++) {
     ExpEnvelope exp_env = exp_env_list_[env_id];
     int spec_id = exp_env.getSpecId();
     if (spec_id < 0 or spec_id >= peakMatrix.get_spec_num())
       continue;
     std::vector<ExpPeak> exp_data = exp_env.getExpEnvList();
     std::vector<double> theo_data = map[env_id];
-    for (size_t elem_idx = 0; elem_idx < exp_data.size(); elem_idx++) {
-      ExpPeak exp_peak = exp_data[elem_idx];
+    int num_peaks_exp_env = exp_data.size();
+    for (int peak_id = 0; peak_id < num_peaks_exp_env; peak_id++) {
+      ExpPeak exp_peak = exp_data[peak_id];
       if (exp_peak.isEmpty())
         continue;
       int bin_idx = peakMatrix.get_index(exp_peak.getPos());
       std::vector<ExpPeak> peaks = peakMatrix.get_bin_peak(spec_id, bin_idx);
-      double theo_peak = theo_data[elem_idx];
+      double theo_peak = theo_data[peak_id];
       std::vector<ExpPeak> other_peaks;
       for (auto peak: peaks) {
         if (std::abs(peak.getInte() - exp_peak.getInte()) < 0.0001) {

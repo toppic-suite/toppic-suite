@@ -167,10 +167,10 @@ namespace env_coll_util{
     double mass_tol = match_envelope_tolerance * env_coll.getMass();
     std::vector<int> neighborFeatureList_charge_states = env_coll.getChargeList();
     std::vector<double> extended_masses = {env_coll.getMass() - 1.00235, env_coll.getMass(), env_coll.getMass() + 1.00235};
-
+    int num_env_colls = env_coll_list.size();
     /// RT OVERLAPPPPP
     std::vector<int> selected_features;
-    for (size_t i = 0; i < env_coll_list.size(); i++) {
+    for (int i = 0; i < num_env_colls; i++) {
       if (check_overlap(peakMatrix, env_coll_list[i], env_coll, time_tol)) {
         double min_mass_diff = 100000000;
         for (auto ext_mass : extended_masses) {

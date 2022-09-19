@@ -3,7 +3,6 @@
 //
 
 #include "get_env_cnn_score.hpp"
-#include "env_util.hpp"
 
 namespace toppic {
 namespace env_cnn_score {
@@ -25,10 +24,10 @@ namespace env_cnn_score {
     double max_theo_peak = round(peak_list[peak_list.size()-1].getPos() * 1000.0)/1000.0;
     int start_idx = peak_matrix.get_index(min_theo_peak - 0.1);
     int end_idx = peak_matrix.get_index(max_theo_peak + 0.1);
-    std::vector<std::vector<ExpPeak>> row = peak_matrix.getRow(spec_id);
     std::vector<ExpPeak> intv_peak_list;
     for (int peak_idx = start_idx; peak_idx <= end_idx; peak_idx++){
-      for (const auto& peak : row[peak_idx])
+      std::vector<ExpPeak> bin_peaks = peak_matrix.get_bin_peak(spec_id, peak_idx);
+      for (const auto& peak : bin_peaks)
         if (peak.getPos() >= (min_theo_peak - 0.1) && peak.getPos() <= (max_theo_peak + 0.1)) ////////////////////// ERRORRR 28722
           intv_peak_list.push_back(peak);
     }
@@ -38,6 +37,7 @@ namespace env_cnn_score {
   double get_envcnn_score(fdeep::model& model, PeakMatrix& peak_matrix, EnvCollection& env_coll, double noiseIntensityLevel) {
     std::vector<fdeep::tensors> tensorsL;
     std::vector<std::vector<double>> envcnn_data_matrix = get_data_matrix_EnvCNN_aggregate_sum(peak_matrix, env_coll, noiseIntensityLevel, 0.01);
+//    write_out_files::write_env_cnn_matrix(envcnn_data_matrix);
     env_cnn::generateTensors(tensorsL, envcnn_data_matrix);
     if (!tensorsL.empty()) {
       std::vector<fdeep::tensors> pred_scores = model.predict_multi(tensorsL, false);
@@ -48,19 +48,12 @@ namespace env_cnn_score {
 
   std::vector<std::vector<double>> get_data_matrix_EnvCNN_aggregate_sum(PeakMatrix& peak_matrix, EnvCollection& env_coll,
                                                                         double noiseIntensityLevel, double bin_size) {
-    double mass_tole;
     SeedEnvelope seed_env = env_coll.getSeedEnv();
-    std::vector<EnvSet> env_set_list = env_coll.getEnvSetList();
-    /// Get Envset of seed envelope
-    EnvSet env_set = EnvSet();
-    for (const auto& es: env_set_list){
-      SeedEnvelope es_seed_env = es.getSeedEnv();
-      if (es_seed_env.getCharge() == seed_env.getCharge())
-        env_set = EnvSet(es);
-    }
+    EnvSet env_set = env_coll.get_seed_env_set();
     std::vector<double> theo_mz = env_set.get_theo_distribution_mz();
     std::vector<double> theo_inte = env_set.get_theo_distribution_inte();
 
+    double mass_tole;
     std::vector<std::vector<double>> envcnn_data_matrix = env_cnn::initializeMatrix(mass_tole);
     std::vector<double> exp_dist = env_utils::get_aggregate_envelopes_mz(env_set);
     std::vector<double> exp_dist_inte = env_utils::get_aggregate_envelopes_inte(env_set);
@@ -71,15 +64,17 @@ namespace env_cnn_score {
       scaled_theo_inte.push_back(inte_ratio * peak.getInte());
     double max_scalled_theo_inte = *std::max_element(scaled_theo_inte.begin(), scaled_theo_inte.end());
 
+    int num_peaks = scaled_theo_inte.size();
     std::vector<double> normalize_theo_inte;
     std::vector<double> normalize_exp_inte;
-    for (size_t i = 0; i < scaled_theo_inte.size(); i++){
+    for (int i = 0; i < num_peaks; i++){
       normalize_theo_inte.push_back(scaled_theo_inte[i]/max_scalled_theo_inte);
       normalize_exp_inte.push_back(exp_dist_inte[i]/max_scalled_theo_inte);
     }
 
     /// populate matrix
-    for (size_t idx = 0; idx < theo_mz.size(); idx++){
+    num_peaks = theo_mz.size();
+    for (int idx = 0; idx < num_peaks; idx++){
       double exp_inte = normalize_exp_inte[idx];
       if (exp_inte == 0)
         continue;
@@ -106,29 +101,30 @@ namespace env_cnn_score {
       std::vector<double> t_noise_distribution_list;
       std::vector<double> t_noise_inte_distribution_list;
       for (const auto& elem : intv_peak_list) {
-        t_noise_inte_distribution_list.push_back(elem.getPos());
+        t_noise_distribution_list.push_back(elem.getPos());
         t_noise_inte_distribution_list.push_back(elem.getInte());
       }
       noise_distribution_list.push_back(t_noise_distribution_list);
       noise_inte_distribution_list.push_back(t_noise_inte_distribution_list);
     }
 
-    for (size_t idx = 0; idx < noise_distribution_list.size(); idx++) {
-      for (size_t j_idx = 0; j_idx < noise_distribution_list[idx].size(); j_idx++){
+    int num_spec = noise_distribution_list.size();
+    for (int idx = 0; idx < num_spec; idx++) {
+      int num_peaks = noise_distribution_list[idx].size();
+      for (int j_idx = 0; j_idx < num_peaks; j_idx++){
         int p_idx = get_index(round(noise_distribution_list[idx][j_idx]*1000.0)/1000.0, theo_mz[0], bin_size) + 10;
         if (p_idx >= 300)
           break;
         /// check if peak has been used as the data peak.
         bool  peak_condition = false;
         for (int i = 0; i < 3; i++){
-          if (p_idx + i < 300 && p_idx - i > -1 && envcnn_data_matrix[p_idx][0] == 0) {
+          if ((p_idx + i < 300) && (p_idx - i >= 0) && (envcnn_data_matrix[p_idx][0] == 0)) {
             if (envcnn_data_matrix[p_idx - i][0] == 0 and envcnn_data_matrix[p_idx + i][0] == 0)
               peak_condition = true;
             else {
               peak_condition = false;
               break;
             }
-
           }
         }
         if (peak_condition){
@@ -139,7 +135,8 @@ namespace env_cnn_score {
     }
     /// add noise to the data
     /// envcnn_data_matrix[:, 1] = np.add(envcnn_data_matrix[:, 1], noise_arr)
-    for (size_t idx = 0; idx < noise_arr.size(); idx++)
+    num_peaks = noise_arr.size();
+    for (int idx = 0; idx < num_peaks; idx++)
       envcnn_data_matrix[idx][1] = envcnn_data_matrix[idx][1] + noise_arr[idx];
     return envcnn_data_matrix;
   }

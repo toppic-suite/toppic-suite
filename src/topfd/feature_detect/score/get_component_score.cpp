@@ -34,11 +34,12 @@ namespace component_score {
     std::vector<double> theo_inte = get_theo_envelope_peak_intens(env_set);
     std::vector<double> aggregate_inte = env_utils::get_aggregate_envelopes_inte(env_set);
     double max_aggregate_inte = *std::max_element(aggregate_inte.begin(), aggregate_inte.end());
+    int num_peaks = aggregate_inte.size();
     std::vector<double> normalized_aggregate_inte;
     for (auto inte : aggregate_inte)
       normalized_aggregate_inte.push_back(inte/max_aggregate_inte);
     double sum_even_peaks = 0, sum_even_peaks_theo = 0, sum_odd_peaks = 0, sum_odd_peaks_theo = 0;
-    for (size_t peak_idx = 0; peak_idx < aggregate_inte.size(); peak_idx++) {
+    for (int peak_idx = 0; peak_idx < num_peaks; peak_idx++) {
       if (peak_idx%2 == 0) {
         sum_even_peaks = sum_even_peaks + normalized_aggregate_inte[peak_idx];
         sum_even_peaks_theo = sum_even_peaks_theo + theo_inte[peak_idx];
@@ -71,7 +72,8 @@ namespace component_score {
     double error_sum = 0;
     for (auto & exp_env : exp_envs) {
       std::vector<ExpPeak> peaks = exp_env.getExpEnvList();
-      for (size_t peak_idx = 0; peak_idx < peaks.size(); peak_idx++) {
+      int num_peaks = peaks.size();
+      for (int peak_idx = 0; peak_idx < num_peaks; peak_idx++) {
         ExpPeak peak = peaks[peak_idx];
         if (!peak.isEmpty()) {
           double cur_err = std::abs(peak.getPos() - theo_dis[peak_idx]);
@@ -115,10 +117,12 @@ namespace component_score {
   double get_matched_peaks_percent(EnvSet& env_set, std::vector<std::vector<double>> theo_map) {
     double total_peaks = 0, positive_peaks = 0;
     std::vector<ExpEnvelope> exp_envs = env_set.getExpEnvList();
-    for (size_t i = 0; i < exp_envs.size(); i++) {
+    int num_exp_envs = exp_envs.size();
+    for (int i = 0; i < num_exp_envs; i++) {
       std::vector<ExpPeak> peaks = exp_envs[i].getExpEnvList();
       std::vector<double> scalled_theo_env = theo_map[i];
-      for (size_t peak_id = 0; peak_id < scalled_theo_env.size(); peak_id++){
+      int num_peaks = scalled_theo_env.size();
+      for (int peak_id = 0; peak_id < num_peaks; peak_id++){
         double peak_inte = scalled_theo_env[peak_id];
         if (peak_inte > 0){
           total_peaks = total_peaks + 1;

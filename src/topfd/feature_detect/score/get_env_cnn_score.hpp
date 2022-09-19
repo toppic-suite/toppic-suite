@@ -10,11 +10,13 @@
 #include "topfd/feature_detect/spectrum/peak_matrix.hpp"
 #include "topfd/feature_detect/env_collection/env_collection.hpp"
 #include "topfd/envcnn/env_cnn.hpp"
+#include "topfd/feature_detect/test_output_functions/write_out_files.hpp"
 
 namespace toppic {
 namespace env_cnn_score {
     double get_envcnn_score(fdeep::model& model, PeakMatrix& peak_matrix, EnvCollection& env_coll, double noiseIntensityLevel);
     std::vector<std::vector<double>> get_data_matrix_EnvCNN_aggregate_sum(PeakMatrix& peak_matrix, EnvCollection& env_coll, double noiseIntensityLevel, double bin_size);
+
 }
 }
 

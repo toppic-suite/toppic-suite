@@ -94,6 +94,7 @@ namespace env_set_util {
     double snr = 3.0;
     double noise_inte_level = peak_matrix.get_min_inte();
     std::vector<double> theo_envelope_inte = env.get_inte_list();
+    int num_theo_env_peaks = theo_envelope_inte.size();
     int refer_idx = std::max_element(theo_envelope_inte.begin(), theo_envelope_inte.end()) - theo_envelope_inte.begin();
 
     // search backward
@@ -104,7 +105,7 @@ namespace env_set_util {
       ExpEnvelope exp_env = env_set_util::get_match_exp_env(peak_matrix, env, idx, mass_tol);
       std::vector<double> experimental_envelope_inte = exp_env.get_inte_list();
       double inte_ratio = env_utils::calcInteRatio_scan(theo_envelope_inte, experimental_envelope_inte);
-      for (size_t i = 0; i < theo_envelope_inte.size(); i++) {
+      for (int i = 0; i < num_theo_env_peaks; i++) {
         double peak_inte = theo_envelope_inte[i];
         if ((inte_ratio * peak_inte) < (noise_inte_level * snr))
           exp_env.setExpEnvListPeak(ExpPeak(), i);
@@ -128,7 +129,7 @@ namespace env_set_util {
       ExpEnvelope exp_env = env_set_util::get_match_exp_env(peak_matrix, env, idx, mass_tol);
       std::vector<double> experimental_envelope_inte = exp_env.get_inte_list();
       double inte_ratio = env_utils::calcInteRatio_scan(theo_envelope_inte, experimental_envelope_inte);
-      for (size_t i = 0; i < theo_envelope_inte.size(); i++) {
+      for (int i = 0; i < num_theo_env_peaks; i++) {
         double peak_inte = theo_envelope_inte[i];
         if ((inte_ratio * peak_inte) < (noise_inte_level * snr))
           exp_env.setExpEnvListPeak(ExpPeak(), i);
@@ -171,6 +172,7 @@ namespace env_set_util {
     double snr = 3.0;
     ExpEnvelope empty_exp_env = ExpEnvelope();
     std::vector<double> theo_envelope_inte = env.get_inte_list();
+    int num_theo_env_peaks = theo_envelope_inte.size();
     int refer_idx = std::max_element(theo_envelope_inte.begin(), theo_envelope_inte.end()) - theo_envelope_inte.begin();
     int base_idx = env.getSpecId();
     int miss_num = 0;
@@ -181,7 +183,7 @@ namespace env_set_util {
       ExpEnvelope exp_env = env_set_util::get_match_exp_env(peak_matrix, env, idx, mass_tol);
       std::vector<double> experimental_envelope_inte = exp_env.get_inte_list();
       double inte_ratio = env_utils::calcInteRatio_scan(theo_envelope_inte, experimental_envelope_inte);
-      for (size_t i = 0; i < theo_envelope_inte.size(); i++) {
+      for (int i = 0; i < num_theo_env_peaks; i++) {
         double peak_inte = theo_envelope_inte[i];
         if ((inte_ratio * peak_inte) < (noise_inte_level * snr))
           exp_env.setExpEnvListPeak(ExpPeak(), i);
@@ -201,7 +203,7 @@ namespace env_set_util {
       ExpEnvelope exp_env = env_set_util::get_match_exp_env(peak_matrix, env, idx, mass_tol);
       std::vector<double> experimental_envelope_inte = exp_env.get_inte_list();
       double inte_ratio = env_utils::calcInteRatio_scan(theo_envelope_inte, experimental_envelope_inte);
-      for (size_t i = 0; i < theo_envelope_inte.size(); i++) {
+      for (int i = 0; i < num_theo_env_peaks; i++) {
         double peak_inte = theo_envelope_inte[i];
         if ((inte_ratio * peak_inte) < (noise_inte_level * snr))
           exp_env.setExpEnvListPeak(ExpPeak(), i);
