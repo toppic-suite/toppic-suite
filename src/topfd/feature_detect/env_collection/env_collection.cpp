@@ -149,14 +149,7 @@ void toppic::EnvCollection::remove_peak_data(PeakMatrix &peak_matrix) {
 
 std::vector<std::vector<double>> toppic::EnvCollection::get_seed_theo_map(PeakMatrix &peak_matrix, double snr) {
   double noise_inte = peak_matrix.get_min_inte();
-  SeedEnvelope seed_env = this->seed_env_;
-  std::vector<EnvSet> env_set_list = this->env_set_list_;
-  EnvSet env_set = EnvSet();
-  for (auto &es: env_set_list) {
-    SeedEnvelope es_seed_env = es.getSeedEnv();
-    if (es_seed_env.getCharge() == seed_env.getCharge())
-      env_set = EnvSet(es);
-  }
+  EnvSet env_set = get_seed_env_set();
   std::vector<std::vector<double>> map = env_set.get_map(snr, noise_inte);
   return map;
 }

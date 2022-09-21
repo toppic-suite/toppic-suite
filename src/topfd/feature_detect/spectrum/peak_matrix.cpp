@@ -24,8 +24,8 @@ toppic::PeakMatrix::PeakMatrix(PeakPtrVec2D& raw_peaks, DeconvMsPtrVec &ms1_ptr_
   min_mz_ = *std::min_element(mz.begin(), mz.end());
   max_mz_ = *std::max_element(mz.begin(), mz.end());
   min_inte_ = getDataLevelNoiseIntensities(intes);
-  spec_noise_inte_ = getSpectrumNoiseIntensities(raw_peaks);
 //  min_inte_ = 188.80874;
+  spec_noise_inte_ = getSpectrumNoiseIntensities(raw_peaks);
   specs_ = get_spec_list(ms1_ptr_vec);
   bin_size_ = bin_size;
   spec_num_ = raw_peaks.size();

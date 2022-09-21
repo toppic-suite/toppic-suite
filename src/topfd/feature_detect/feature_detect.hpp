@@ -16,6 +16,7 @@
 #define TOPPIC_TOPFD_FEATURE_DETECT_FEATURE_DETECT_HPP_
 
 #include <string>
+#include <vector>
 
 namespace toppic {
 

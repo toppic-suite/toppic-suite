@@ -7,12 +7,14 @@
 
 #include "topfd/feature_detect/env_collection/env_collection.hpp"
 #include "topfd/feature_detect/score/get_env_cnn_score.hpp"
+#include "topfd/feature_detect/score/get_env_coll_score.hpp"
 #include "topfd/feature_detect/score/get_component_score.hpp"
+
 
 namespace toppic {
 class Feature {
 public:
-    Feature(EnvCollection &env_coll, PeakMatrix &peak_matrix, fdeep::model &model, int feature_id, double snr);
+    Feature(EnvCollection &env_coll, PeakMatrix &peak_matrix, fdeep::model &model, fdeep::model &model_escore, int feature_id, double snr);
 
     int getFeatureId() const { return feature_id_; }
     void setFeatureId(int featureId) { feature_id_ = featureId; }

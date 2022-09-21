@@ -17,6 +17,8 @@
 #include <cstdio>
 #include <ctime>
 
+#include "topfd/feature_detect/feature_detect.hpp"
+#include "topfd/feature_detect/feature_detect_old.hpp"
 #include "common/util/file_util.hpp"
 #include "seq/fasta_util.hpp"
 #include "ms/spec/peak.hpp"
@@ -26,7 +28,6 @@
 #include "ms/feature/frac_feature.hpp"
 #include "topfd/msreader/raw_ms_reader.hpp"
 #include "topfd/feature_detect/feature_para.hpp"
-#include "topfd/feature_detect/feature_detect.hpp"
 #include "ms/spec/baseline_util.hpp"
 #include "topfd/feature_detect/envelope/seed_envelope.hpp"
 #include "topfd/feature_detect/spectrum/peak_matrix.hpp"
@@ -36,10 +37,64 @@
 #include "topfd/feature_detect/util/write_feature.hpp"
 #include "topfd/feature_detect/envelope/evaluate_envelope.hpp"
 #include "topfd/feature_detect/test_output_functions/write_out_files.hpp"
+#include "ms/feature/spec_feature.hpp"
 
 namespace toppic {
 
 namespace feature_detect {
+
+  FracFeaturePtr getFeature(int feat_id, DeconvMsPtrVec &ms1_ptr_vec, FeatureParaPtr para_ptr,
+                            EnvCollection& env_coll, PeakMatrix &peak_matrix) {
+    double snr = 3.0;
+    double noise_inte = peak_matrix.get_min_inte();
+    spec_list spectra_list = peak_matrix.get_spectra_list();
+    int ms1_id_begin = env_coll.getStartSpecId();
+    int ms1_id_end = env_coll.getEndSpecId();
+    double feat_inte = env_coll.get_intensity(snr, peak_matrix.get_min_inte());
+    double feat_mass = env_coll.getMass();
+    int min_charge = env_coll.getMinCharge();
+    int max_charge = env_coll.getMaxCharge();
+    double time_apex = env_coll.get_apex_elution_time(spectra_list);
+    double ms1_time_begin = env_coll.get_min_elution_time(spectra_list);
+    double ms1_time_end = env_coll.get_max_elution_time(spectra_list);
+    int ms1_scan_begin = ms1_ptr_vec[ms1_id_begin]->getMsHeaderPtr()->getFirstScanNum();
+    int ms1_scan_end = ms1_ptr_vec[ms1_id_end]->getMsHeaderPtr()->getFirstScanNum();
+    FracFeaturePtr feature_ptr = std::make_shared<FracFeature>(feat_id,
+                                                               para_ptr->frac_id_,
+                                                               para_ptr->file_name_,
+                                                               feat_mass,
+                                                               feat_inte,
+                                                               ms1_id_begin,
+                                                               ms1_id_end,
+                                                               ms1_time_begin,
+                                                               ms1_time_end,
+                                                               ms1_scan_begin,
+                                                               ms1_scan_end,
+                                                               min_charge,
+                                                               max_charge,
+                                                               0,
+                                                               time_apex);
+    SingleChargeFeaturePtrVec single_features;
+    for (EnvSet &es: env_coll.getEnvSetList()) {
+        int id_begin = es.getStartSpecId();
+        int id_end = es.getEndSpecId();
+        double time_begin = ms1_ptr_vec[id_begin]->getMsHeaderPtr()->getRetentionTime();
+        double time_end = ms1_ptr_vec[id_end]->getMsHeaderPtr()->getRetentionTime();
+        int scan_begin = ms1_ptr_vec[id_begin]->getMsHeaderPtr()->getFirstScanNum();
+        int scan_end = ms1_ptr_vec[id_end]->getMsHeaderPtr()->getFirstScanNum();
+        double inte = es.comp_intensity(snr, noise_inte);
+        int charge = es.getCharge();
+//        std::vector<std::vector<double>> map = es.get_map(snr, noise_inte);
+//        int peak_num = component_score::get_num_theo_peaks(map);
+        SingleChargeFeaturePtr single_feature = std::make_shared<SingleChargeFeature>(charge,
+                                                                                      time_begin, time_end,
+                                                                                      scan_begin, scan_end,
+                                                                                      inte, 0);
+        single_features.push_back(single_feature);
+    }
+    feature_ptr->setSingleFeatures(single_features);
+    return feature_ptr;
+  }
 
 void process(int frac_id, const std::string &sp_file_name,
              bool missing_level_one, const std::string &resource_dir, const std::string &activation,
@@ -79,6 +134,11 @@ void process(int frac_id, const std::string &sp_file_name,
                               + file_util::getFileSeparator() + "envcnn_models"
                               + file_util::getFileSeparator() + "envcnn_2_block_model.json";
       fdeep::model model = fdeep::load_model(file_name, true, fdeep::dev_null_logger);
+
+      file_name = resource_dir
+                              + file_util::getFileSeparator() + "envcnn_models"
+                              + file_util::getFileSeparator() + "escore.json";
+      fdeep::model model_escore = fdeep::load_model(file_name, true, fdeep::dev_null_logger);
 
       /// Read msalign file and get the seed envelopes.
       DeconvMsPtrVec ms1_ptr_vec;
@@ -133,14 +193,41 @@ void process(int frac_id, const std::string &sp_file_name,
             continue;
           env_coll.refine_mono_mass();
           env_coll_list.push_back(env_coll);
-          features.push_back(Feature(env_coll, peak_matrix, model, env_coll_num, env_para_ptr->ms_one_sn_ratio_));
+          Feature feature = Feature(env_coll, peak_matrix, model, model_escore, env_coll_num, env_para_ptr->ms_one_sn_ratio_);
+          if (feature.getScore() < 0.1)
+            continue;
+          features.push_back(feature);
+          FracFeaturePtr feature_ptr = getFeature(env_coll_num, ms1_ptr_vec, para_ptr, env_coll, peak_matrix);
+          feature_ptr->setPromexScore(feature.getScore());
+          frac_features.push_back(feature_ptr);
           env_coll.remove_peak_data(peak_matrix);
           env_coll_num = env_coll_num + 1;
         }
       }
+
+      std::string ms2_file_name = base_name + "_" + file_num + "ms2.msalign";
+      MsHeaderPtrVec header_ptr_vec;
+      SpecFeaturePtrVec ms2_features;
+      feature_detect_old::readHeaders(ms2_file_name, header_ptr_vec);
+      feature_detect_old::getMs2Features(ms1_ptr_vec, header_ptr_vec, frac_features, para_ptr, ms2_features);
+      SampleFeaturePtrVec sample_features;
+      feature_detect_old::getSampleFeatures(sample_features, frac_features, ms2_features);
+
       std::cout << "Number of Envelope Collections: " << features.size() << std::endl;
-      file_name = base_name + "_" + file_num + "ms1.feature";
+      file_name = base_name + "_" + file_num + "ms1.csv";
       write_feature::writeFeatures(file_name, features);
+
+
+      std::string output_file_name = base_name + "_" + file_num + "feature.xml";
+      frac_feature_writer::writeXmlFeatures(output_file_name, frac_features);
+      std::string batmass_file_name = base_name + "_" + file_num + "frac.mzrt.csv";
+      frac_feature_writer::writeBatMassFeatures(batmass_file_name, frac_features);
+      std::string sample_feature_file_name = base_name + "_" + file_num + "ms1.feature";
+      sample_feature_writer::writeFeatures(sample_feature_file_name, sample_features);
+
+      output_file_name = base_name + "_" + file_num + "ms2.feature";
+      spec_feature_writer::writeFeatures(output_file_name, ms2_features);
+
       duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
       std::cout<<"Duration (seconds): "<< duration <<'\n';
     }
