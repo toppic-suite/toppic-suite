@@ -192,15 +192,15 @@ void process(int frac_id, const std::string &sp_file_name,
           if (env_coll_util::check_in_existing_features(peak_matrix, env_coll, env_coll_list, 10E-6, 0.8))
             continue;
           env_coll.refine_mono_mass();
-          env_coll_list.push_back(env_coll);
           Feature feature = Feature(env_coll, peak_matrix, model, model_escore, env_coll_num, env_para_ptr->ms_one_sn_ratio_);
-          if (feature.getScore() < 0.1)
+		  env_coll.remove_peak_data(peak_matrix);
+          if (feature.getScore() < 0.5)
             continue;
           features.push_back(feature);
+		  env_coll_list.push_back(env_coll);
           FracFeaturePtr feature_ptr = getFeature(env_coll_num, ms1_ptr_vec, para_ptr, env_coll, peak_matrix);
           feature_ptr->setPromexScore(feature.getScore());
           frac_features.push_back(feature_ptr);
-          env_coll.remove_peak_data(peak_matrix);
           env_coll_num = env_coll_num + 1;
         }
       }
