@@ -52,7 +52,7 @@ namespace feature_detect_old {
     void readHeaders(const std::string & file_name, MsHeaderPtrVec &header_ptr_vec);
     void getMs2Features(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtrVec &header_ptr_vec, FracFeaturePtrVec &features, FeatureParaPtr para_ptr, SpecFeaturePtrVec &ms2_features);
     void process(int frac_id, const std::string &sp_file_name,
-                 bool miss_level_one, const std::string &resource_dir, const std::string &activation, bool isFaims, const std::vector<std::pair<double, int>> voltage_vec);
+                 bool miss_level_one, const std::string &resource_dir, const std::string &activation, bool isFaims, const std::vector<std::pair<double, int>> voltage_vec, double score_thr);
 };
 
 }

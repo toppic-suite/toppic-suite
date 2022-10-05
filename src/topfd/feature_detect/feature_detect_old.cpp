@@ -530,7 +530,7 @@ namespace toppic {
 
       void process(int frac_id, const std::string &sp_file_name,
                    bool missing_level_one, const std::string &resource_dir, const std::string &activation,
-                   bool isFaims, const std::vector<std::pair<double, int>> voltage_vec) {
+                   bool isFaims, const std::vector<std::pair<double, int>> voltage_vec, double score_thr) {
         //logger::setLogLevel(2);
         FeatureParaPtr para_ptr
                 = std::make_shared<FeaturePara>(frac_id, sp_file_name, resource_dir);

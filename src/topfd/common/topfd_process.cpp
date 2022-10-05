@@ -71,7 +71,8 @@ void processOneFile(TopfdParaPtr para_ptr,
                             para_ptr->resource_dir_,             
 			                      para_ptr->activation_, 
                             processor.isFaims_,
-                            processor.voltage_vec_);
+                            processor.voltage_vec_,
+                            para_ptr->ecscore_);
     std::cout << "Feature detection finished." << std::endl;
     
     std::cout << "Processing " << spec_file_name << " finished." << std::endl;

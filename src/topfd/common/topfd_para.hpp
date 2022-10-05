@@ -51,6 +51,7 @@ class TopfdPara {
   std::string merged_file_name_ = "";
   int ms_1_scan_num_ = -1;
   int ms_2_scan_num_ = -1;
+  double ecscore_ = 0.5;
 };
 
 typedef std::shared_ptr<TopfdPara> TopfdParaPtr;

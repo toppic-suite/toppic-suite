@@ -68,7 +68,7 @@ namespace toppic {
 
     void process(int frac_id, const std::string &sp_file_name,
                  bool missing_level_one, const std::string &resource_dir, const std::string &activation,
-                 bool isFaims, const std::vector <std::pair<double, int>> voltage_vec) {
+                 bool isFaims, const std::vector <std::pair<double, int>> voltage_vec, double score_cutoff) {
       std::clock_t start;
       start = std::clock();
       //logger::setLogLevel(2);
@@ -90,7 +90,7 @@ namespace toppic {
       int match_peak_tole = 3;
       double match_envelope_tolerance = 10E-6;
       double time_overlap_tol = 0.8;
-      double score_cutoff = 0.5;
+//      double score_cutoff = 0.5;
 
       // read ms1 deconvoluted spectra
       if (!missing_level_one) {

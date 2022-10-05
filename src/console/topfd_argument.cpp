@@ -45,6 +45,7 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string merged_file_name = "";
   std::string thread_number = "";
   std::string activation = "";
+  std::string ecscore = "";
 
   // Define and parse the program options
   try {
@@ -72,6 +73,8 @@ bool Argument::parse(int argc, char* argv[]) {
         ("thread-number,u", po::value<std::string> (&thread_number), "<a positive integer>. Number of threads used in spectral deconvolution. Default value: 1.")
         ("skip-html-folder,g","Skip the generation of HTML files for visualization.")
         ("disable-final-filtering,d","Skip the final filtering of envelopes.")
+        ("ec-score-cutoff,e", po::value<std::string> (&ecscore),
+            "ECScore cutoff used to filter the Proteoform features. The default value is 0.5.")
         ;
 
     po::options_description desc("Options");
@@ -94,6 +97,8 @@ bool Argument::parse(int argc, char* argv[]) {
         ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), 
          "Spectrum file name with its path.")
          ("disable-final-filtering,d", "")
+        ("ec-score-cutoff,e", po::value<std::string> (&ecscore),
+         "ECScore cutoff used to filter the Proteoform features. The default value is 0.5.")
         ;
 
     po::positional_options_description positional_options;
@@ -194,6 +199,9 @@ bool Argument::parse(int argc, char* argv[]) {
     }
     if (vm.count("disable-final-filtering")) {
       topfd_para_ptr_->do_final_filtering_ = false;
+    }
+    if (vm.count("ec-score-cutoff")) {
+      topfd_para_ptr_->ecscore_ = std::stod(ecscore);
     }
   }
   catch(std::exception& e) {

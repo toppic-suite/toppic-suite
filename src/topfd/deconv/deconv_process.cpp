@@ -419,7 +419,7 @@ std::function<void()> geneTask(RawMsGroupPtr ms_group_ptr,
 
     for (size_t i = 0; i < ms_two_ptr_vec.size(); i++) {
       RawMsPtr ms_two_ptr = ms_two_ptr_vec[i];
-      deconvMsTwo(ms_two_ptr, deconv_ptr, ms2_writer_ptr_vec, 
+      deconvMsTwo(ms_two_ptr, deconv_ptr, ms2_writer_ptr_vec,
                   pool_ptr, gene_html_dir, ms2_json_dir);
     }
 
