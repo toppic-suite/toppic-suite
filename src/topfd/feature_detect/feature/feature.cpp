@@ -13,7 +13,6 @@ toppic::Feature::Feature(EnvCollection &env_coll, PeakMatrix &peak_matrix, fdeep
   int base_spec = env_coll.getBaseSpecID();
   int start_spec = env_coll.getStartSpecId();
   EnvSet env_set = env_coll.get_seed_env_set();
-
   feature_id_ = feature_id;
   min_scan_ = env_coll.getStartSpecId();
   max_scan_ = env_coll.getEndSpecId();
@@ -36,6 +35,7 @@ toppic::Feature::Feature(EnvCollection &env_coll, PeakMatrix &peak_matrix, fdeep
   num_theo_peaks_ = component_score::get_num_theo_peaks(theo_map);
   mz_error_sum_ = component_score::get_mz_errors(env_set);
   envcnn_score_ = env_cnn_score::get_envcnn_score(model, peak_matrix, env_coll, noiseIntensityLevel);
+
   std::vector<double> data;
   data.push_back(envcnn_score_); //1
   data.push_back(elution_length_/60.0); //2
@@ -46,8 +46,5 @@ toppic::Feature::Feature(EnvCollection &env_coll, PeakMatrix &peak_matrix, fdeep
   data.push_back((max_charge_-min_charge_)/30.0); //7
   data.push_back(even_odd_peak_ratios_); //8
   score_ = env_coll_score::get_env_coll_score(model_escore, data);
-//  std::cout << feature_id << ", " << envcnn_score_ << ", " << elution_length_/60.0 << ", " << percent_matched_peaks_ ;
-//  std::cout << ", " << std::log(abundance_) <<  ", " << rep_charge_ << ", " << top3_correlation_ << ", " << (max_charge_-min_charge_)/30.0;
-//  std::cout << ", " << even_odd_peak_ratios_ << ", " << score_ << std::endl;
   label_ = 0;
 }
