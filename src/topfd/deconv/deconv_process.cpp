@@ -558,11 +558,10 @@ void DeconvProcess::processSp(RawMsGroupFaimeReaderPtr reader_ptr) {
                                ms2_writer_ptr_vec, pool_ptr, topfd_para_ptr_->gene_html_folder_, 
                                ms1_json_dir_, ms2_json_dir_));
 
-    std::string msg = updateMsg(ms_group_ptr->getMsOnePtr()->getMsHeaderPtr(), count + 2, total_scan_num);
-    std::cout << "\r" << msg << std::flush;
     //count is 1 scan from msalign1 + n scan from msalign2 vector
     int parsed_scan = 1 + static_cast<int>((ms_group_ptr->getMsTwoPtrVec()).size());
-
+    std::string msg = updateMsg(ms_group_ptr->getMsOnePtr()->getMsHeaderPtr(), count + parsed_scan, total_scan_num);
+    std::cout << "\r" << msg << std::flush;
     count += parsed_scan;
     ms_group_ptr = reader_ptr->getNextMsGroupPtrWithFaime();    
   }
