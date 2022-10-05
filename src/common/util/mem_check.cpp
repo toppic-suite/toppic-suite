@@ -29,16 +29,35 @@ namespace toppic {
 
 namespace mem_check {
 
-#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
-#else
+std::map<std::string, double> memory_per_thread_list {
+  {"topfd", 0.5}, 
+    {"toppic", 2},
+    {"toppic_filter", 2},
+    {"topmg", 4}, 
+    {"topmerge", 4}, 
+    {"topdiff", 4},
+    {"topindex", 1.5}  
+};
+
+
 double getAvailMemInGb () {
+#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
+  MEMORYSTATUSEX mem_info;
+  mem_info.dwLength = sizeof(MEMORYSTATUSEX);
+  GlobalMemoryStatusEx(&mem_info);
+  DWORDLONG total_mem = mem_info.ullAvailPhys;
+  free_mem_in_gb = total_mem / pow(2, 30);
+  return free_mem_in_gb;
+#else
   std::string token;
   std::ifstream file("/proc/meminfo");
   while(file >> token) {
-    if(token == "MemAvailable:") {
+    if(token == "MemTotal:") {
       double mem;
       if(file >> mem) {
-        return mem/1024/1024;
+        double total_mem_in_gb = mem/1024/1024;
+        // total memory - 1
+        return total_mem_in_gb - 1;
       } else {
         return -1;
       }
@@ -47,46 +66,28 @@ double getAvailMemInGb () {
     file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
   }
   return 0; // Nothing found
-}
 #endif
+}
 
 int getMaxThreads(std::string app_name) {//return max thread number based on total memory size
-  double freeMemInGb = -1;
-  std::map<std::string, double> toppic_apps_memory_per_thread {
-    {"topfd", 0.5}, 
-      {"toppic", 2},
-      {"toppic_filter", 2},
-      {"topmg", 4}, 
-      {"topmerge", 4}, 
-      {"topdiff", 4},
-      {"topindex", 1.5}  
-  };
-#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
-  MEMORYSTATUSEX memInfo;
-  memInfo.dwLength = sizeof(MEMORYSTATUSEX);
-  GlobalMemoryStatusEx(&memInfo);
-  DWORDLONG totalMem = memInfo.ullAvailPhys;
-  freeMemInGb = totalMem / pow(2, 30);
-#else
-  //struct sysinfo si;
-  //sysinfo(&si);
-  //freeMemInGb = (int)(roundl(si.freeram / pow(10, 9)));
-  freeMemInGb = getAvailMemInGb();
-#endif
-  if (freeMemInGb < 0) {
+  double avail_mem_in_gb = getAvailMemInGb(); 
+
+  if (avail_mem_in_gb < 0) {
     LOG_ERROR("invalid memory size!");
     return 0;
   }
-  if (toppic_apps_memory_per_thread.find(app_name) == toppic_apps_memory_per_thread.end()) {
+  if (memory_per_thread_list.find(app_name) == memory_per_thread_list.end()) {
     LOG_ERROR("invalid application name!");
     return 0;
   }
-  LOG_DEBUG("Free ram " << freeMemInGb);
-  int thread_num =  static_cast<int>(freeMemInGb / toppic_apps_memory_per_thread[app_name]);
-  if (thread_num == 0) {
-    thread_num = 1;
+  double mem_per_thread = memory_per_thread_list[app_name];
+  int max_thread_num =  static_cast<int>(avail_mem_in_gb / mem_per_thread);
+  //std::cout << "Available memory " << avail_mem_in_gb << " memory per thread " << mem_per_thread << " max_thread_num " << max_thread_num << std::endl;
+  if (max_thread_num == 0) {
+    max_thread_num = 1;
   }
-  return thread_num;
+  return max_thread_num;
 }
+
 }
 }

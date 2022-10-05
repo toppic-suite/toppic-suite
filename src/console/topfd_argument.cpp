@@ -225,7 +225,7 @@ bool Argument::validateArguments() {
     }
     int n = static_cast<int>(boost::thread::hardware_concurrency());
     if(thread_number > n){
-      LOG_ERROR("Thread number " << thread_number << " error! The value is too large. Only " << n << " threads are supported.");
+      LOG_ERROR("Thread number " << thread_number << " error! The value is too large. At most " << n << " threads are supported.");
       return false;
     }
   } catch (int e) {
