@@ -145,7 +145,7 @@ namespace toppic {
           std::vector <Feature> features;
           for (int seed_env_idx = 0; seed_env_idx < seed_num; seed_env_idx++) {
             if (seed_env_idx % 10000 == 0)
-              std::cout "\r" << "Processing peak " << seed_env_idx << " and Features found " << env_coll_num
+              std::cout << "\r" << "Processing peak " << seed_env_idx << " and Features found " << env_coll_num
                         << std::flush;
             SeedEnvelope env = seed_envs[seed_env_idx];
             bool valid = false;
