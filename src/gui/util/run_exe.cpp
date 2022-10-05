@@ -79,6 +79,7 @@ std::string RunExe::geneCommand(TopfdParaPtr para_ptr, std::vector<std::string> 
   command = command + "-w " + std::to_string(para_ptr->prec_window_) + " ";
   command = command + "-u " + std::to_string(para_ptr->thread_number_) + " ";
   command = command + "-a " + para_ptr->activation_ + " ";
+  command = command + "-e " + std::to_string(para_ptr->ecscore_) + " ";
   
   if (para_ptr->missing_level_one_) {
     command = command + "-o ";

@@ -122,6 +122,7 @@ void TopFDDialog::on_defaultButton_clicked() {
   ui->outputTextBrowser->clear();
   ui->outputTextBrowser->setText("Click the Start button to process the spectrum files.");
   ui->activationComboBox->setCurrentIndex(0);
+  ui->ecscoreEdit->setText("0.5");
 }
 
 std::vector<std::string> TopFDDialog::getSpecFileList() {
@@ -300,7 +301,7 @@ toppic::TopfdParaPtr TopFDDialog::getParaPtr() {
   para_ptr_->use_env_cnn_ = ui->envCNNCheckBox->isChecked();
   para_ptr_->activation_ = ui->activationComboBox->currentText().toStdString();
   para_ptr_->do_final_filtering_ = !(ui->finalFilteringCheckBox->isChecked());
-
+  para_ptr_->ecscore_ = std::stod(ui->ecscoreEdit->text().toStdString());
   return para_ptr_;
 }
 
@@ -325,6 +326,7 @@ void TopFDDialog::lockDialog() {
   ui->envCNNCheckBox->setEnabled(false);
   ui->activationComboBox->setEnabled(false);
   ui->finalFilteringCheckBox->setEnabled(false);
+  ui->ecscoreEdit->setEnabled(false);
 }
 
 void TopFDDialog::unlockDialog() {
@@ -351,6 +353,7 @@ void TopFDDialog::unlockDialog() {
   ui->envCNNCheckBox->setEnabled(true);
   ui->activationComboBox->setEnabled(true);
   ui->finalFilteringCheckBox->setEnabled(true);
+  ui->ecscoreEdit->setEnabled(true);
 }
 
 bool TopFDDialog::checkError() {
@@ -398,6 +401,12 @@ bool TopFDDialog::checkError() {
   if (ui->threadNumberEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
                          tr("Thread number is empty!"),
+                         QMessageBox::Yes);
+    return true;
+  }
+  if (ui->ecscoreEdit->text().isEmpty()) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("ECScore cutoff is empty!"),
                          QMessageBox::Yes);
     return true;
   }

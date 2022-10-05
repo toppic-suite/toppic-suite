@@ -145,8 +145,8 @@ namespace toppic {
           std::vector <Feature> features;
           for (int seed_env_idx = 0; seed_env_idx < seed_num; seed_env_idx++) {
             if (seed_env_idx % 10000 == 0)
-              std::cout << "Processing peak " << seed_env_idx << " and Features found " << env_coll_num
-                        << std::endl;
+              std::cout "\r" << "Processing peak " << seed_env_idx << " and Features found " << env_coll_num
+                        << std::flush;
             SeedEnvelope env = seed_envs[seed_env_idx];
             bool valid = false;
             valid = evaluate_envelope::preprocess_env(peak_matrix, env, mass_tole, corr_tole, valid);
@@ -177,7 +177,7 @@ namespace toppic {
               env_coll_num = env_coll_num + 1;
             }
           }
-          std::cout << "Number of Envelope Collections: " << features.size() << std::endl;
+          std::cout << std::endl << "Number of Envelope Collections: " << features.size() << std::endl;
           /// output files
           std::string ms2_file_name = base_name + "_" + file_num + "ms2.msalign";
           MsHeaderPtrVec header_ptr_vec;

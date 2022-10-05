@@ -58,8 +58,8 @@ std::vector<double> toppic::PeakMatrix::getSpectrumNoiseIntensities(PeakPtrVec2D
 void toppic::PeakMatrix::init_matrix(PeakPtrVec2D &raw_peaks, double snr){
 //  std::map<int, PeakRow> peak_matrix;
   for (int spec_id = 0; spec_id < spec_num_; spec_id++){
-    if (spec_id%100 == 0)
-      std::cout << "Init matrix -- Processing peaks in spectrum " << spec_id << " out of " << spec_num_ << std::endl;
+//    if (spec_id%100 == 0)
+//      std::cout << "Init matrix -- Processing peaks in spectrum " << spec_id << " out of " << spec_num_ << std::endl;
 
     matrix_[spec_id] = PeakRow(specs_[spec_id], bin_num_);
     std::vector<PeakPtr> spec_peak_list = raw_peaks[spec_id];
