@@ -16,6 +16,7 @@
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/str_util.hpp"
+#include "common/util/time_util.hpp"
 #include "common/base/base_data.hpp"
 #include "ms/spec/msalign_frac_merge.hpp"
 #include "ms/spec/deconv_json_merge.hpp"
@@ -211,6 +212,10 @@ int process(TopfdParaPtr para_ptr,  std::vector<std::string> spec_file_lst) {
       processOneFile(para_ptr, spec_file_lst[k], k);
       bool move_mzrt = true;
       moveFiles(spec_file_lst[k], move_mzrt); 
+      std::cout << "Timestamp: " << time_util::getTimeStr() << std::endl;
+    }
+    else {
+      std::cout << spec_file_lst[k] << " is not a valid mass spectral file!" << std::endl; 
     }
   }
 
