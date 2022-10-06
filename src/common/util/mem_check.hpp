@@ -24,6 +24,8 @@ int getMaxThreads(std::string app_name);
 
 double getTotalMemInGb (); 
 
+double getAvailMemInGb ();
+
 }
 }
 #endif

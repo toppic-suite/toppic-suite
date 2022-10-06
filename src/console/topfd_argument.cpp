@@ -220,16 +220,21 @@ bool Argument::validateArguments() {
     }
     int total_thread_num = static_cast<int>(boost::thread::hardware_concurrency());
     float total_mem_in_gb = mem_check::getTotalMemInGb(); 
-    std::cout << "Computer total thread number: " << total_thread_num << " total memory: " << std::setprecision(4) << total_mem_in_gb << " GB" << std::endl;
+    float avail_mem_in_gb = mem_check::getAvailMemInGb();
+    std::cout << "Computer total thread number: " << total_thread_num << std::endl;
+    std::cout << "Total memory: " << std::setprecision(4) << total_mem_in_gb << " GiB" << std::endl;
+    std::cout << "Available memory: " << avail_mem_in_gb << " GiB" << std::endl;
 
     if(thread_number > total_thread_num){
       LOG_ERROR("Thread number " << thread_number << " error! The value is too large. At most " << total_thread_num << " threads are supported.");
       return false;
     }
+    /*
     if(thread_number == total_thread_num){
       std::cout << "WARNING: Thread number " << thread_number << " is the total thread number of the computer!" << std::endl;
       std::cout << "WARNING: The computer may freeze during data processing!" << std::endl;  
     }
+    */
     int max_thread = mem_check::getMaxThreads("topfd");
     if (max_thread < thread_number) {
       std::cout << "WARNING: Based on the available memory size, up to " << max_thread << " threads can be used!" << std::endl;
