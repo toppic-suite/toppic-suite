@@ -40,7 +40,7 @@ std::map<std::string, double> memory_per_thread_list {
 };
 
 
-double getAvailMemInGb () {
+double getTotalMemInGb () {
 #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
   MEMORYSTATUSEX mem_info;
   mem_info.dwLength = sizeof(MEMORYSTATUSEX);
@@ -55,9 +55,8 @@ double getAvailMemInGb () {
     if(token == "MemTotal:") {
       double mem;
       if(file >> mem) {
-        double total_mem_in_gb = mem/1024/1024;
-        // total memory - 1
-        return total_mem_in_gb - 1;
+        double total_mem_in_gb = mem/1000/1000;
+        return total_mem_in_gb;
       } else {
         return -1;
       }
@@ -70,7 +69,8 @@ double getAvailMemInGb () {
 }
 
 int getMaxThreads(std::string app_name) {//return max thread number based on total memory size
-  double avail_mem_in_gb = getAvailMemInGb(); 
+  // total memory - 1
+  double avail_mem_in_gb = getTotalMemInGb() - 1; 
 
   if (avail_mem_in_gb < 0) {
     LOG_ERROR("invalid memory size!");
