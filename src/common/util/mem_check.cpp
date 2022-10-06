@@ -40,14 +40,41 @@ std::map<std::string, double> memory_per_thread_list {
 };
 
 
+#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
+bool isWindows11() {
+  DWORD dwVersion = 0; 
+  DWORD dwMajorVersion = 0;
+  DWORD dwBuild = 0;
+
+  dwVersion = GetVersion();
+
+  // Get the Windows version.
+  dwMajorVersion = (DWORD)(LOBYTE(LOWORD(dwVersion)));
+
+  // Get the build number.
+  if (dwVersion < 0x80000000)              
+    dwBuild = (DWORD)(HIWORD(dwVersion));
+
+  //std::cout << "Version is " << dwMajorVersion <<  " " << dwBuild << std::endl;
+  if (dwMajorVersion >= 10 && dwBuild >= 22000) {
+    return true;
+  }
+  else {
+    return false;
+  }  
+}
+
+#endif
+
+
 double getTotalMemInGb () {
 #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
   MEMORYSTATUSEX mem_info;
   mem_info.dwLength = sizeof(MEMORYSTATUSEX);
   GlobalMemoryStatusEx(&mem_info);
-  DWORDLONG total_mem = mem_info.ullAvailPhys;
-  free_mem_in_gb = total_mem / pow(2, 30);
-  return free_mem_in_gb;
+  DWORDLONG total_mem = mem_info.ullTotalPhys;
+  double total_mem_in_gb = total_mem / pow(2, 30);
+  return total_mem_in_gb;
 #else
   std::string token;
   std::ifstream file("/proc/meminfo");
@@ -55,7 +82,7 @@ double getTotalMemInGb () {
     if(token == "MemTotal:") {
       double mem;
       if(file >> mem) {
-        double total_mem_in_gb = mem/1000/1000;
+        double total_mem_in_gb = mem/1024/1024;
         return total_mem_in_gb;
       } else {
         return -1;
@@ -68,14 +95,29 @@ double getTotalMemInGb () {
 #endif
 }
 
-int getMaxThreads(std::string app_name) {//return max thread number based on total memory size
-  // total memory - 1
-  double avail_mem_in_gb = getTotalMemInGb() - 1; 
-
-  if (avail_mem_in_gb < 0) {
-    LOG_ERROR("invalid memory size!");
-    return 0;
+double getAvailMemInGb () {
+  double avail_mem_in_gb = getTotalMemInGb();
+#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
+  if (isWindows11()) {
+    // minus 3 for windows 11
+    avail_mem_in_gb = avail_mem_in_gb - 3;
   }
+  else {
+    // minus 1.5 for Windows 10
+    avail_mem_in_gb = avail_mem_in_gb - 1.5;
+  }
+#else
+  // minus 1 for linux
+  avail_mem_in_gb = avail_mem_in_gb - 1;
+#endif
+  if (avail_mem_in_gb < 0) {
+    avail_mem_in_gb = 0;
+  }
+  return avail_mem_in_gb;
+}
+
+int getMaxThreads(std::string app_name) {//return max thread number based on total memory size
+  double avail_mem_in_gb = getAvailMemInGb(); 
   if (memory_per_thread_list.find(app_name) == memory_per_thread_list.end()) {
     LOG_ERROR("invalid application name!");
     return 0;
