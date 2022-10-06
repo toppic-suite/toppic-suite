@@ -52,6 +52,13 @@ bool PwMsReader::readOneMs(int sp_id, PeakPtrVec &peak_list, MsHeaderPtr &header
   cur_spec_ptr = spec_list_ptr_->spectrum(sp_id, get_binary_data);
   if (cur_spec_ptr == nullptr) {return false;}
 
+  bool is_centroided = cur_spec_ptr->hasCVParam(pwiz::cv::MS_centroid_spectrum);
+  if (!is_centroided) {
+    std::cout << "Error: The data file contains profile data!" << std::endl;
+    std::cout << "TopFD can process only centroided, not profile, MS data!" << std::endl;  
+    exit(EXIT_FAILURE);
+  }
+
   // get m/z and intensity values from the spectra
   std::vector<pwiz::msdata::MZIntensityPair> pairs;
   cur_spec_ptr->getMZIntensityPairs(pairs);
