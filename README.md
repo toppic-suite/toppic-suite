@@ -39,7 +39,7 @@ cmake ..
 make -j$(nproc)
 
 cd ../bin
-ln -s ../toppic_resources .
+ln -s ../resources .
 ```
 
 On some Linux distributions, you might meet the problem "Could not loading a transcoding service".

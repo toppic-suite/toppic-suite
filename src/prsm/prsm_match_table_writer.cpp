@@ -110,7 +110,8 @@ void PrsmMatchTableWriter::write() {
         ExtendMsPtrVec extend_ms_ptr_vec
             = extend_ms_factory::geneMsThreePtrVec(deconv_ms_ptr_vec, sp_para_ptr, new_prec_mass);
         prsm_ptr->setRefineMsVec(extend_ms_ptr_vec);
-        writePrsm(file, prsm_ptr);
+        //writePrsm(file, prsm_ptr);
+        writePrsmStandardFormat(file, prsm_ptr);
         prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
       }
     }
@@ -119,6 +120,7 @@ void PrsmMatchTableWriter::write() {
   // write end;
   file.close();
 }
+
 
 void PrsmMatchTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   std::string spec_ids;
@@ -259,4 +261,203 @@ void PrsmMatchTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   }
 }
 
+void PrsmMatchTableWriter::writePrsmStandardFormat(std::ofstream &file, PrsmPtr prsm_ptr) {
+  std::string spec_ids;
+  std::string spec_activations;
+  std::string spec_scans;
+  std::string retention_time;
+  std::string delim = "\t";
+  std::string empty_str = "-";
+  std::vector<std::pair<FastaSeqPtr,int>> matches;
+
+  int peak_num = 0;
+  DeconvMsPtrVec deconv_ms_ptr_vec = prsm_ptr->getDeconvMsPtrVec();
+  for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
+    spec_ids = spec_ids + str_util::toString(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getId()) + " ";
+    spec_activations = spec_activations 
+        + deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getActivationPtr()->getName() + " ";
+    spec_scans = spec_scans + deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getScansString() + " ";
+    peak_num += deconv_ms_ptr_vec[i]->size();
+    retention_time = retention_time 
+        + str_util::fixedToString(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getRetentionTime(), 2) + " ";
+  }
+
+  str_util::trim(spec_ids);
+  str_util::trim(spec_activations);
+  str_util::trim(spec_scans);
+  str_util::trim(retention_time);
+
+  if (deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getRetentionTime() <= 0.0) {
+    retention_time = empty_str;
+  }
+
+  matches = search_match_ptr_->process(prsm_ptr);
+
+  file << std::setprecision(10);
+  LOG_DEBUG("start output prsm ");
+  file << prsm_ptr->getFileName() << delim
+      << prsm_ptr->getPrsmId() << delim
+      << spec_ids << delim
+      << spec_activations<< delim
+      << spec_scans << delim
+      << retention_time << delim
+      << peak_num << delim
+      << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecCharge() << delim
+      << prsm_ptr->getOriPrecMass()<< delim
+      << prsm_ptr->getAdjustedPrecMass() << delim
+      << prsm_ptr->getProteoformPtr()->getProteoClusterId() << delim;
+
+  if (prsm_ptr->getSampleFeatureInte() > 0) {
+    std::ostringstream str_stream;
+    str_stream << std::scientific << std::setprecision(3);
+    str_stream << prsm_ptr->getSampleFeatureInte();
+    file << str_stream.str() << delim;
+  } else {
+    file << empty_str << delim;
+  }
+
+  file << prsm_ptr->getFracFeatureScore() << delim;
+  file << prsm_ptr->getTimeApex() << delim;
+  file << matches.size() << delim;
+  
+  ProteoformPtr form_ptr = prsm_ptr->getProteoformPtr();
+
+  std::string seq = form_ptr->getProteoformMatchSeq();
+  seq = formatSeq(seq);
+
+  file << form_ptr->getSeqName() << delim
+      << form_ptr->getSeqDesc() << delim
+      << (form_ptr->getStartPos() + 1) << delim
+      << (form_ptr->getEndPos() + 1) << delim
+      << form_ptr->getFastaSeqPtr()->getAcidReplaceStr(form_ptr->getStartPos(), form_ptr->getEndPos()) << delim
+      << seq << delim
+      << form_ptr->getMass() << delim
+      << form_ptr->getProtModPtr()->getType() << delim
+      << form_ptr->getAlterNum(AlterType::UNEXPECTED) << delim
+      << form_ptr->getAlterNum(AlterType::VARIABLE) << delim
+      << form_ptr->getMIScore() << delim
+      << prsm_ptr->getMatchPeakNum() << delim
+      << prsm_ptr->getMatchFragNum() << delim
+      << prsm_ptr->getEValue() << delim;
+
+  double fdr = prsm_ptr->getFdr();
+  if (fdr >= 0) {
+    file << fdr << delim;
+  } else {
+    file << empty_str << delim;
+  }
+
+  double proteoform_fdr = prsm_ptr->getProteoformFdr();
+  if (proteoform_fdr >= 0) {
+    file << proteoform_fdr << std::endl;
+  } else {
+    file << empty_str << std::endl;
+  }
+
+  if (write_multiple_matches_) {
+    // print out other matches
+    for (size_t i = 0; i < matches.size(); i++) {
+      FastaSeqPtr seq_ptr = matches[i].first;
+      int seq_pos = matches[i].second;
+      if (seq_ptr->getName() == form_ptr->getSeqName()) {
+        continue;
+      }
+
+    file << prsm_ptr->getFileName() << delim
+        << prsm_ptr->getPrsmId() << delim
+        << delim
+        << delim
+        << delim
+        << delim
+        << delim
+        << delim
+        << delim
+        << delim
+        << delim;
+
+      // feature
+      file << delim
+        << delim
+        << delim
+        << delim;
+
+      file << seq_ptr->getName() << delim
+        << seq_ptr->getDesc() << delim
+        << (seq_pos + 1) << delim
+        << (seq_pos + form_ptr->getLen()) << delim
+        << seq_ptr->getAcidReplaceStr(form_ptr->getStartPos(), form_ptr->getEndPos()) << delim
+        << delim
+        << delim
+        << delim
+        << delim
+        << delim
+        << delim
+        << delim
+        << delim
+        << delim;
+
+      // fdr
+      file << delim
+        << std::endl;
+    }
+  }
+}
+
+
+std::string PrsmMatchTableWriter::formatSeq(std::string seq) {
+  std::string new_seq = "";
+  int idx = 0;
+
+  while (idx < seq.size()) {
+    bool is_single_residue = false;
+    bool is_c_term = false;
+    bool is_n_term = false;
+
+    std::string residue;
+    std::string mass_shift;
+
+    if (seq[idx] == '(') {
+      int close_p = seq.find(')', idx);
+      int open_b = seq.find('[', idx);
+      int close_b = seq.find(']', idx);
+
+      std::string raw_shift = seq.substr(open_b + 1, close_b - open_b - 1);
+
+      if (idx <= 1 && close_p - idx == 2) {is_n_term = true;}
+      if (close_p - idx == 2) {is_single_residue = true;}
+      if (close_b == seq.size() - 1) {is_c_term = true;}
+
+      try {
+        double shift = std::stod(raw_shift);
+        if (shift > 0) {
+          mass_shift = '+' + raw_shift;
+          mass_shift = '[' + mass_shift + ']';
+        } else {
+          mass_shift = '[' + raw_shift + ']';
+        }
+      } catch(const std::exception&) {
+        mass_shift = '[' + raw_shift + ']';
+      }
+
+      if (is_single_residue) {
+        residue = seq[idx + 1];
+      } else {
+        residue = seq.substr(idx, close_p - idx + 1);
+      }
+
+      if (is_n_term) {
+        new_seq = new_seq + mass_shift + '-' + residue;
+      } else if(is_c_term) {
+        new_seq = new_seq + residue + '-' + mass_shift;
+      } else {
+        new_seq = new_seq + residue + mass_shift;
+      }
+      idx = close_b;
+    } else {  
+      new_seq = new_seq + seq[idx];
+    }
+    idx++;
+  }
+  return new_seq;
+}
 }  // namespace toppic

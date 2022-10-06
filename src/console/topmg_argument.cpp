@@ -433,7 +433,9 @@ bool Argument::validateArguments() {
   }
 
   if (!str_util::endsWith(arguments_["oriDatabaseFileName"], ".fasta") &&
-      !str_util::endsWith(arguments_["oriDatabaseFileName"], ".fa")) {
+      !str_util::endsWith(arguments_["oriDatabaseFileName"], ".fa") && 
+      !str_util::endsWith(arguments_["oriDatabaseFileName"], ".FASTA") &&
+      !str_util::endsWith(arguments_["oriDatabaseFileName"], ".FA")) {
     LOG_ERROR("Database file " << arguments_["oriDatabaseFileName"] << " is not a fasta file!");
     return false;
   }
@@ -462,6 +464,11 @@ bool Argument::validateArguments() {
     if (str_util::endsWith(spec_file_list_[k], "_ms1.msalign")) {
       std::cerr << "Warning: Please make sure " << spec_file_list_[k] << " is the ms2 spectral file." << std::endl;
     }
+  }
+
+  if (arguments_["varModFileName"] == "" ) {
+    LOG_ERROR("Modification file is not set. Please use the -i argument to specify the modification file!");
+    return false;
   }
 
   if (!file_util::exists(arguments_["varModFileName"])) {

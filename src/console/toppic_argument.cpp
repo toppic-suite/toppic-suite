@@ -45,6 +45,7 @@ void Argument::initArguments() {
   arguments_["activation"] = "FILE";
   arguments_["searchType"] = "TARGET";
   arguments_["fixedMod"] = "";
+  arguments_["nTermLabelMass"]="0";
   arguments_["ptmNumber"] = "1";
   arguments_["massErrorTolerance"] = "15";
   arguments_["proteoformErrorTolerance"] = "1.2";
@@ -102,6 +103,8 @@ void Argument::outputArguments(std::ostream &output,
       output << std::setw(44) << std::left << "Fixed PTMs END" << std::endl;
     }
   }
+
+  output << std::setw(44) << std::left << "N-terminal label mass" << "\t" << arguments["nTermLabelMass"] << std::endl;
 
   if (arguments["useFeatureFile"] == "true") {
     output << std::setw(44) << std::left << "Use TopFD feature file: " << "\t" << "True" << std::endl;
@@ -167,6 +170,7 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string argument_file_name = "";
   std::string activation = "";
   std::string fixed_mod = "";
+  std::string n_term_label_mass = "";
   std::string allow_mod = "";
   std::string ptm_num = "";
   std::string mass_error_tole = "";
@@ -198,6 +202,7 @@ bool Argument::parse(int argc, char* argv[]) {
          "<C57|C58|a fixed modification file>. Fixed modifications. Three available options: C57, C58, or the name of a text file containing the information of fixed modifications. When C57 is selected, carbamidomethylation on cysteine is the only fixed modification. When C58 is selected, carboxymethylation on cysteine is the only fixed modification.")
         ("n-terminal-form,n", po::value<std::string> (&allow_mod), 
          "<a list of allowed N-terminal forms>. N-terminal forms of proteins. Four N-terminal forms can be selected: NONE, NME, NME_ACETYLATION, and M_ACETYLATION. NONE stands for no modifications, NME for N-terminal methionine excision, NME_ACETYLATION for N-terminal acetylation after the initiator methionine is removed, and M_ACETYLATION for N-terminal methionine acetylation. When multiple forms are allowed, they are separated by commas. Default value: NONE,NME,NME_ACETYLATION,M_ACETYLATION.")
+        ("n-terminal-label,N", po::value<std::string> (&n_term_label_mass), "N-terminal modification mass for iTRAQ or TMT labeling. Default value: 0")
         ("decoy,d", "Use a shuffled decoy protein database to estimate false discovery rates.")
         ("mass-error-tolerance,e", po::value<std::string> (&mass_error_tole), "<a positive integer>. Error tolerance for precursor and fragment masses in PPM. Default value: 15.")
         ("proteoform-error-tolerance,p", po::value<std::string> (&form_error_tole), "<a positive number>. Error tolerance for identifying PrSM clusters. Default value: 1.2 Dalton.")
@@ -227,6 +232,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("activation,a", po::value<std::string>(&activation), "")
         ("fixed-mod,f", po::value<std::string> (&fixed_mod), "")
         ("n-terminal-form,n", po::value<std::string> (&allow_mod), "")
+        ("n-terminal-label,N", po::value<std::string> (&n_term_label_mass), "")
         ("decoy,d", "")
         ("mass-error-tolerance,e", po::value<std::string> (&mass_error_tole), "")
         ("proteoform-error-tolerance,p", po::value<std::string> (&form_error_tole), "")
@@ -311,6 +317,10 @@ bool Argument::parse(int argc, char* argv[]) {
 
     if (vm.count("fixed-mod")) {
       arguments_["fixedMod"] = fixed_mod;
+    }
+
+    if (vm.count("n-term-label")) {
+      arguments_["nTermLabelMass"] = n_term_label_mass;
     }
 
     if (vm.count("n-terminal-form")) {
@@ -415,7 +425,9 @@ bool Argument::validateArguments() {
   }
 
   if (!str_util::endsWith(arguments_["oriDatabaseFileName"], ".fasta") &&
-      !str_util::endsWith(arguments_["oriDatabaseFileName"], ".fa")) {
+      !str_util::endsWith(arguments_["oriDatabaseFileName"], ".fa") && 
+      !str_util::endsWith(arguments_["oriDatabaseFileName"], ".FASTA") &&
+      !str_util::endsWith(arguments_["oriDatabaseFileName"], ".FA")) {
     LOG_ERROR("Database file " << arguments_["oriDatabaseFileName"] << " is not a fasta file!");
     return false;
   }
@@ -518,6 +530,20 @@ bool Argument::validateArguments() {
     LOG_ERROR("Maximum ptm mass " << max_ptm_mass << " should be a number.");
     return false;
   }
+
+  std::string n_term_label_mass = arguments_["nTermLabelMass"];
+  try {
+    double mass = std::stod(n_term_label_mass.c_str());
+    if(mass < 0.0){
+      LOG_ERROR("N-terminal label mass " << n_term_label_mass << " error! The value should be positive.");
+      return false;
+    }
+  }
+  catch (int e) {
+    LOG_ERROR("N-terminal label mass " << n_term_label_mass << " should be a number.");
+    return false;
+  }
+
 
   std::string mass_error_tole_value = arguments_["massErrorTolerance"];
   try {

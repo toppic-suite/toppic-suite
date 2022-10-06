@@ -45,7 +45,11 @@ PrsmPara::PrsmPara(std::map<std::string, std::string> &arguments) {
 
   std::string activation_name = arguments["activation"];
   int ppm = std::stoi(arguments["massErrorTolerance"]);
-  sp_para_ptr_ = std::make_shared<SpPara>(activation_name, ppm); 
+  double n_term_label_mass = 0;
+  if (arguments["nTermLabelMass"] != "") {
+    std::stod(arguments["nTermLabelMass"]);
+  }
+  sp_para_ptr_ = std::make_shared<SpPara>(activation_name, n_term_label_mass, ppm); 
 }
 
 } /* namespace toppic */

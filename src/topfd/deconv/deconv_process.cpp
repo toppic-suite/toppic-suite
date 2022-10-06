@@ -108,12 +108,12 @@ void DeconvProcess::prepareFileFolder(std::string file_num) {
 
 void DeconvProcess::process() {
   // reader
-  RawMsGroupReaderPtr reader_ptr 
-      = std::make_shared<RawMsGroupReader>(spec_file_name_, 
-                                           topfd_para_ptr_->missing_level_one_,
-                                           topfd_para_ptr_->activation_,
-                                           env_para_ptr_->prec_deconv_interval_, 
-                                           frac_id_);
+  RawMsGroupFaimeReaderPtr reader_ptr 
+    = std::make_shared<RawMsGroupFaimeReader>(spec_file_name_, 
+                                              topfd_para_ptr_->missing_level_one_,
+                                              topfd_para_ptr_->activation_,
+                                              env_para_ptr_->prec_deconv_interval_, 
+                                              frac_id_);
   //check if it is centroid data
   std::vector<pwiz::msdata::DataProcessingPtr> dt_proc_ptr = reader_ptr->getReaderPtr()->getMsdPtr()->dataProcessingPtrs;
   
@@ -212,7 +212,7 @@ std::function<void()> geneTaskMissingMsOne(RawMsGroupPtr ms_group_ptr,
   };
 }
 
-void DeconvProcess::processSpMissingLevelOne(RawMsGroupReaderPtr reader_ptr) {
+void DeconvProcess::processSpMissingLevelOne(RawMsGroupFaimeReaderPtr reader_ptr) {
   SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(thread_num_);  
 
   MsAlignWriterPtrVec ms_writer_ptr_vec;
@@ -410,9 +410,9 @@ std::function<void()> geneTask(RawMsGroupPtr ms_group_ptr,
     MatchEnvPtrVec prec_envs;
     EnvParaPtr env_para_ptr = deconv_ptr->getEnvParaPtr();
 
-    RawMsGroupReader::obtainPrecEnvs(ms_group_ptr, prec_envs, 
-                                     env_para_ptr->max_mass_,
-                                     env_para_ptr->max_charge_); 
+    RawMsGroupFaimeReader::obtainPrecEnvs(ms_group_ptr, prec_envs, 
+                                          env_para_ptr->max_mass_,
+                                          env_para_ptr->max_charge_); 
 
     deconvMsOne(ms_one_ptr, deconv_ptr, prec_envs, ms1_writer_ptr_vec, 
                 pool_ptr, gene_html_dir, ms1_json_dir);
@@ -426,7 +426,7 @@ std::function<void()> geneTask(RawMsGroupPtr ms_group_ptr,
   };
 }
 
-void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
+void DeconvProcess::processSp(RawMsGroupFaimeReaderPtr reader_ptr) {
   int total_scan_num = reader_ptr->getInputSpNum();//this is spectrum count, not same as scan ID count
 
   RawMsGroupPtr ms_group_ptr;
@@ -558,11 +558,10 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
                                ms2_writer_ptr_vec, pool_ptr, topfd_para_ptr_->gene_html_folder_, 
                                ms1_json_dir_, ms2_json_dir_));
 
-    std::string msg = updateMsg(ms_group_ptr->getMsOnePtr()->getMsHeaderPtr(), count + 2, total_scan_num);
-    std::cout << "\r" << msg << std::flush;
     //count is 1 scan from msalign1 + n scan from msalign2 vector
     int parsed_scan = 1 + static_cast<int>((ms_group_ptr->getMsTwoPtrVec()).size());
-
+    std::string msg = updateMsg(ms_group_ptr->getMsOnePtr()->getMsHeaderPtr(), count + parsed_scan, total_scan_num);
+    std::cout << "\r" << msg << std::flush;
     count += parsed_scan;
     ms_group_ptr = reader_ptr->getNextMsGroupPtrWithFaime();    
   }

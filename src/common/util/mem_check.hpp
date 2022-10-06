@@ -19,8 +19,13 @@
 
 namespace toppic {
 namespace mem_check {
-extern std::map<std::string, int> toppic_apps_memory_per_thread;
+
 int getMaxThreads(std::string app_name);
+
+double getTotalMemInGb (); 
+
+double getAvailMemInGb ();
+
 }
 }
 #endif

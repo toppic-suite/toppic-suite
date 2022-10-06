@@ -29,16 +29,61 @@ namespace toppic {
 
 namespace mem_check {
 
+std::map<std::string, double> memory_per_thread_list {
+  {"topfd", 0.5}, 
+    {"toppic", 2},
+    {"toppic_filter", 2},
+    {"topmg", 4}, 
+    {"topmerge", 4}, 
+    {"topdiff", 4},
+    {"topindex", 1.5}  
+};
+
+
 #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
+bool isWindows11() {
+  DWORD dwVersion = 0; 
+  DWORD dwMajorVersion = 0;
+  DWORD dwBuild = 0;
+
+  dwVersion = GetVersion();
+
+  // Get the Windows version.
+  dwMajorVersion = (DWORD)(LOBYTE(LOWORD(dwVersion)));
+
+  // Get the build number.
+  if (dwVersion < 0x80000000)              
+    dwBuild = (DWORD)(HIWORD(dwVersion));
+
+  //std::cout << "Version is " << dwMajorVersion <<  " " << dwBuild << std::endl;
+  if (dwMajorVersion >= 10 && dwBuild >= 22000) {
+    return true;
+  }
+  else {
+    return false;
+  }  
+}
+
+#endif
+
+
+double getTotalMemInGb () {
+#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
+  MEMORYSTATUSEX mem_info;
+  mem_info.dwLength = sizeof(MEMORYSTATUSEX);
+  GlobalMemoryStatusEx(&mem_info);
+  DWORDLONG total_mem = mem_info.ullTotalPhys;
+  double total_mem_in_gb = total_mem / pow(2, 30);
+  return total_mem_in_gb;
 #else
-double getAvailMemInGb () {
   std::string token;
   std::ifstream file("/proc/meminfo");
   while(file >> token) {
-    if(token == "MemAvailable:") {
+    if(token == "MemTotal:") {
       double mem;
       if(file >> mem) {
-        return mem/1024/1024;
+        double total_mem_in_gb = mem/1024/1024;
+        return total_mem_in_gb;
       } else {
         return -1;
       }
@@ -47,46 +92,44 @@ double getAvailMemInGb () {
     file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
   }
   return 0; // Nothing found
-}
 #endif
+}
+
+double getAvailMemInGb () {
+  double avail_mem_in_gb = getTotalMemInGb();
+#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
+  if (isWindows11()) {
+    // minus 3 for windows 11
+    avail_mem_in_gb = avail_mem_in_gb - 3;
+  }
+  else {
+    // minus 1.5 for Windows 10
+    avail_mem_in_gb = avail_mem_in_gb - 1.5;
+  }
+#else
+  // minus 1 for linux
+  avail_mem_in_gb = avail_mem_in_gb - 1;
+#endif
+  if (avail_mem_in_gb < 0) {
+    avail_mem_in_gb = 0;
+  }
+  return avail_mem_in_gb;
+}
 
 int getMaxThreads(std::string app_name) {//return max thread number based on total memory size
-  double freeMemInGb = -1;
-  std::map<std::string, double> toppic_apps_memory_per_thread {
-    {"topfd", 0.5}, 
-      {"toppic", 2},
-      {"toppic_filter", 2},
-      {"topmg", 4}, 
-      {"topmerge", 4}, 
-      {"topdiff", 4},
-      {"topindex", 1.5}  
-  };
-#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
-  MEMORYSTATUSEX memInfo;
-  memInfo.dwLength = sizeof(MEMORYSTATUSEX);
-  GlobalMemoryStatusEx(&memInfo);
-  DWORDLONG totalMem = memInfo.ullAvailPhys;
-  freeMemInGb = totalMem / pow(2, 30);
-#else
-  //struct sysinfo si;
-  //sysinfo(&si);
-  //freeMemInGb = (int)(roundl(si.freeram / pow(10, 9)));
-  freeMemInGb = getAvailMemInGb();
-#endif
-  if (freeMemInGb < 0) {
-    LOG_ERROR("invalid memory size!");
-    return 0;
-  }
-  if (toppic_apps_memory_per_thread.find(app_name) == toppic_apps_memory_per_thread.end()) {
+  double avail_mem_in_gb = getAvailMemInGb(); 
+  if (memory_per_thread_list.find(app_name) == memory_per_thread_list.end()) {
     LOG_ERROR("invalid application name!");
     return 0;
   }
-  LOG_DEBUG("Free ram " << freeMemInGb);
-  int thread_num =  static_cast<int>(freeMemInGb / toppic_apps_memory_per_thread[app_name]);
-  if (thread_num == 0) {
-    thread_num = 1;
+  double mem_per_thread = memory_per_thread_list[app_name];
+  int max_thread_num =  static_cast<int>(avail_mem_in_gb / mem_per_thread);
+  //std::cout << "Available memory " << avail_mem_in_gb << " memory per thread " << mem_per_thread << " max_thread_num " << max_thread_num << std::endl;
+  if (max_thread_num == 0) {
+    max_thread_num = 1;
   }
-  return thread_num;
+  return max_thread_num;
 }
+
 }
 }

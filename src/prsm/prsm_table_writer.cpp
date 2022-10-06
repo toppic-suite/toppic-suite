@@ -120,6 +120,7 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   std::string retention_time;
   std::string delim = "\t";
   std::string empty_str = "-";
+  double n_term_label_mass = prsm_para_ptr_->getSpParaPtr()->getNTermLabelMass();
 
   int peak_num = 0;
   DeconvMsPtrVec deconv_ms_ptr_vec = prsm_ptr->getDeconvMsPtrVec();
@@ -151,7 +152,7 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
       << retention_time << delim
       << peak_num << delim
       << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecCharge() << delim
-      << prsm_ptr->getOriPrecMass()<< delim
+      << (prsm_ptr->getOriPrecMass() + n_term_label_mass) << delim
       << prsm_ptr->getAdjustedPrecMass() << delim
       << prsm_ptr->getProteoformPtr()->getProteoClusterId() << delim;
 

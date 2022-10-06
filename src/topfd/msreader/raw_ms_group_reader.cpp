@@ -30,15 +30,19 @@ RawMsGroupReader::RawMsGroupReader(const std::string & file_name,
   missing_level_one_ = missing_level_one;
   fraction_id_ = fraction_id;
   if (!missing_level_one_) {
-    RawMsPtr ms_one_ptr_ = readNextRawMs();
-    if (ms_one_ptr_ == nullptr) {
-      LOG_ERROR("The file " << file_name << " does not contain spectra!");
-      exit(EXIT_FAILURE);
+    RawMsPtr ms_one_ptr_ = nullptr;
+    do {
+      ms_one_ptr_ = readNextRawMs();
+      if (ms_one_ptr_ == nullptr) {
+        LOG_ERROR("The file " << file_name << " does not contain spectra!");
+        exit(EXIT_FAILURE);
+      }
+      if (ms_one_ptr_->getMsHeaderPtr()->getMsLevel() != 1) {
+        LOG_ERROR("The first spectrum in " << file_name << " is not an MS1 spectrum!");
+        //exit(EXIT_FAILURE);
+      }
     }
-    if (ms_one_ptr_->getMsHeaderPtr()->getMsLevel() != 1) {
-      LOG_ERROR("The first spectrum in " << file_name << " is not an MS1 spectrum!");
-      exit(EXIT_FAILURE);
-    }
+    while (ms_one_ptr_->getMsHeaderPtr()->getMsLevel() != 1);
     ms_one_ptr_vec_.push_back(ms_one_ptr_);
   }
 }
