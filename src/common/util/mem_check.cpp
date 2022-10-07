@@ -39,7 +39,7 @@ std::map<std::string, double> memory_per_thread_list {
     {"topmg", 4}, 
     {"topmerge", 4}, 
     {"topdiff", 4},
-    {"topindex", 1.5}  
+    {"topindex", 2}  
 };
 
 
