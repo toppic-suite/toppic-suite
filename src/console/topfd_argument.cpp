@@ -182,7 +182,12 @@ bool Argument::parse(int argc, char* argv[]) {
       }
     }
     if (vm.count("thread-number")) {
-      topfd_para_ptr_->thread_number_ = std::stoi(thread_number);
+      try {
+        topfd_para_ptr_->thread_number_ = std::stoi(thread_number);
+      } catch (std::exception& e) {
+        LOG_ERROR("Thread number " << thread_number << " should be a number.");
+        return false;
+      }
     }
     if (vm.count("skip-html-folder")) {
       topfd_para_ptr_->gene_html_folder_ = false;
@@ -213,37 +218,11 @@ bool Argument::validateArguments() {
     }
   }
   int thread_number = topfd_para_ptr_->thread_number_;
-  try {
-    if (thread_number <= 0) {
-      LOG_ERROR("Thread number " << thread_number << " error! The value should be positive.");
-      return false;
-    }
-    int total_thread_num = static_cast<int>(boost::thread::hardware_concurrency());
-    float total_mem_in_gb = mem_check::getTotalMemInGb(); 
-    float avail_mem_in_gb = mem_check::getAvailMemInGb();
-    std::cout << "Computer total thread number: " << total_thread_num << std::endl;
-    std::cout << "Total memory: " << std::setprecision(4) << total_mem_in_gb << " GiB" << std::endl;
-    std::cout << "Available memory: " << avail_mem_in_gb << " GiB" << std::endl;
-
-    if(thread_number > total_thread_num){
-      LOG_ERROR("Thread number " << thread_number << " error! The value is too large. At most " << total_thread_num << " threads are supported.");
-      return false;
-    }
-    /*
-    if(thread_number == total_thread_num){
-      std::cout << "WARNING: Thread number " << thread_number << " is the total thread number of the computer!" << std::endl;
-      std::cout << "WARNING: The computer may freeze during data processing!" << std::endl;  
-    }
-    */
-    int max_thread = mem_check::getMaxThreads("topfd");
-    if (max_thread < thread_number) {
-      std::cout << "WARNING: Based on the available memory size, up to " << max_thread << " threads can be used!" << std::endl;
-      std::cout << "WARNING: Please set the thread number to " << max_thread << " or the program may crash!" << std::endl;
-    }
-  } catch (int e) {
-    LOG_ERROR("Thread number " << thread_number << " should be a number.");
+  int valid = mem_check::checkThreadNum(thread_number, "topfd");
+  if (!valid) {
     return false;
   }
+
   //validate activation method
   std::string activation = topfd_para_ptr_->activation_;
   if (activation != "FILE" && activation != "CID" && activation != "ETD" 

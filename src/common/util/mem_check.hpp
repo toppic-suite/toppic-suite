@@ -16,6 +16,7 @@
 #define TOPPIC_COMMON_UTIL_MEMCHECK_HPP_
 
 #include <map>
+#include <string>
 
 namespace toppic {
 namespace mem_check {
@@ -25,6 +26,8 @@ int getMaxThreads(std::string app_name);
 double getTotalMemInGb (); 
 
 double getAvailMemInGb ();
+
+bool checkThreadNum(int thread_num, std::string prog); 
 
 }
 }

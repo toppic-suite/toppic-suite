@@ -14,8 +14,11 @@
 
 #include <math.h>
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <limits>
+
+#include "boost/thread/thread.hpp"
 #include "common/util/mem_check.hpp"
 #include "common/util/logger.hpp"
 
@@ -129,6 +132,30 @@ int getMaxThreads(std::string app_name) {//return max thread number based on tot
     max_thread_num = 1;
   }
   return max_thread_num;
+}
+
+bool checkThreadNum(int thread_number, std::string prog) {
+  if (thread_number <= 0) {
+    LOG_ERROR("Thread number " << thread_number << " error! The value should be positive.");
+    return false;
+  }
+  int total_thread_num = static_cast<int>(boost::thread::hardware_concurrency());
+  float total_mem_in_gb = mem_check::getTotalMemInGb(); 
+  float avail_mem_in_gb = mem_check::getAvailMemInGb();
+  std::cout << "Computer total thread number: " << total_thread_num << std::endl;
+  std::cout << "Total memory: " << std::setprecision(4) << total_mem_in_gb << " GiB" << std::endl;
+  std::cout << "Available memory: " << avail_mem_in_gb << " GiB" << std::endl;
+
+  if(thread_number > total_thread_num){
+    LOG_ERROR("Thread number " << thread_number << " error! The value is too large. At most " << total_thread_num << " threads are supported.");
+    return false;
+  }
+  int max_thread = mem_check::getMaxThreads(prog);
+  if (max_thread < thread_number) {
+    std::cout << "WARNING: Based on the available memory size, up to " << max_thread << " threads can be used!" << std::endl;
+    std::cout << "WARNING: Please set the thread number to " << max_thread << " or the program may crash!" << std::endl;
+  }
+  return true;
 }
 
 }
