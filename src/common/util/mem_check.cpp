@@ -34,12 +34,12 @@ namespace mem_check {
 
 std::map<std::string, double> memory_per_thread_list {
   {"topfd", 0.5}, 
-    {"toppic", 2},
-    {"toppic_filter", 2},
+    {"toppic", 3.1},
+    {"toppic_filter", 3.1},
     {"topmg", 4}, 
     {"topmerge", 4}, 
     {"topdiff", 4},
-    {"topindex", 1.7}  
+    {"topindex", 1.6}  
 };
 
 
@@ -107,11 +107,11 @@ double getAvailMemInGb () {
   }
   else {
     // minus 1.5 for Windows 10
-    avail_mem_in_gb = avail_mem_in_gb - 1.5;
+    avail_mem_in_gb = avail_mem_in_gb - 2;
   }
 #else
   // minus 1 for linux
-  avail_mem_in_gb = avail_mem_in_gb - 1;
+  avail_mem_in_gb = avail_mem_in_gb - 2;
 #endif
   if (avail_mem_in_gb < 0) {
     avail_mem_in_gb = 0;
@@ -152,8 +152,11 @@ bool checkThreadNum(int thread_number, std::string prog) {
   }
   int max_thread = mem_check::getMaxThreads(prog);
   if (max_thread < thread_number) {
-    std::cout << "WARNING: Based on the available memory size, up to " << max_thread << " threads can be used!" << std::endl;
-    std::cout << "WARNING: Please set the thread number to " << max_thread << " or the program may crash!" << std::endl;
+    // in toppic, we automatically control thread numbers for filtering
+    if (prog != "toppic") {
+      std::cout << "WARNING: Based on the available memory size, up to " << max_thread << " threads can be used!" << std::endl;
+      std::cout << "WARNING: Please set the thread number to " << max_thread << " or the program may crash!" << std::endl;
+    }
   }
   return true;
 }
