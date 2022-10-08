@@ -39,7 +39,7 @@ std::map<std::string, double> memory_per_thread_list {
     {"topmg", 4}, 
     {"topmerge", 4}, 
     {"topdiff", 4},
-    {"topindex", 2}  
+    {"topindex", 1.7}  
 };
 
 
@@ -126,7 +126,7 @@ int getMaxThreads(std::string app_name) {//return max thread number based on tot
     return 0;
   }
   double mem_per_thread = memory_per_thread_list[app_name];
-  int max_thread_num =  static_cast<int>(avail_mem_in_gb / mem_per_thread);
+  int max_thread_num = std::floor(avail_mem_in_gb / mem_per_thread);
   //std::cout << "Available memory " << avail_mem_in_gb << " memory per thread " << mem_per_thread << " max_thread_num " << max_thread_num << std::endl;
   if (max_thread_num == 0) {
     max_thread_num = 1;
