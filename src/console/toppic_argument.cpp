@@ -390,11 +390,6 @@ bool Argument::parse(int argc, char* argv[]) {
     }
 
     if (vm.count("thread-number")) {
-      int max_thread = mem_check::getMaxThreads("toppic");
-      if (max_thread < std::stoi(thread_number)) {
-        std::cout << "WARNING: Based on the available memory size, up to " << max_thread << " threads can be used." << std::endl;
-        std::cout << "Please set the thread number to " << max_thread << " or the program may crash." << std::endl;
-      }
       arguments_["threadNumber"] = thread_number;
     }
 
@@ -597,13 +592,8 @@ bool Argument::validateArguments() {
   std::string thread_number = arguments_["threadNumber"];
   try {
     int num = std::stoi(thread_number.c_str());
-    if (num <= 0) {
-      LOG_ERROR("Thread number " << thread_number << " error! The value should be positive.");
-      return false;
-    }
-    int n = static_cast<int>(boost::thread::hardware_concurrency());
-    if(num > n){
-      LOG_ERROR("Thread number " << thread_number << " error! The value is too large. Only " << n << " threads are supported.");
+    bool valid = mem_check::checkThreadNum(num, "toppic");
+    if (!valid) {
       return false;
     }
   } catch (int e) {
