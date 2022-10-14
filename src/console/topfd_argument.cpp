@@ -89,8 +89,6 @@ bool Argument::parse(int argc, char* argv[]) {
         ("skip-html-folder,g","")
         ("keep,k", "Report monoisotopic masses extracted from low quality isotopic envelopes.")
         ("env-cnn,n", "")
-        ("merged-file-name,f", po::value<std::string> (&merged_file_name), 
-         "Merge deconvoluted files and specify the name of the merged file.")
         ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), 
          "Spectrum file name with its path.")
          ("disable-final-filtering,d", "")
@@ -125,75 +123,69 @@ bool Argument::parse(int argc, char* argv[]) {
     std::string argv_0(argv[0]);
     std::string exec_dir = file_util::getExecutiveDir(argv_0);
 
-    topfd_para_ptr_->resource_dir_ = file_util::getResourceDir(exec_dir);
+    topfd_para_ptr_->setResourceDir(file_util::getResourceDir(exec_dir));
 
     if (vm.count("activation")) {
-      topfd_para_ptr_->activation_ = activation;
+      topfd_para_ptr_->setActivation(activation);
     }
 
     if (vm.count("max-charge")) {
-      topfd_para_ptr_->max_charge_ = std::stoi(max_charge);
+      topfd_para_ptr_->setMaxCharge(std::stoi(max_charge));
     }
 
     if (vm.count("keep")) {
-      topfd_para_ptr_->keep_unused_peaks_ = true;
+      topfd_para_ptr_->setKeepUnusedPeaks(true);
     }
 
     if (vm.count("env-cnn")) {
-      topfd_para_ptr_->use_env_cnn_ = true;
+      topfd_para_ptr_->setUseEnvCnn(true);
     }
 
     if (vm.count("max-mass")) {
-      topfd_para_ptr_->max_mass_ = std::stod(max_mass);
+      topfd_para_ptr_->setMaxMass(std::stod(max_mass));
     }
 
     if (vm.count("mz-error")) {
-      topfd_para_ptr_->mz_error_ = std::stod(mz_error);
+      topfd_para_ptr_->setMzError(std::stod(mz_error));
     }
 
     if (vm.count("ms-two-sn-ratio")) {
-      topfd_para_ptr_->ms_two_sn_ratio_ = std::stod(ms_two_sn_ratio);
+      topfd_para_ptr_->setMsTwoSnRatio(std::stod(ms_two_sn_ratio));
     }
 
     if (vm.count("ms-one-sn-ratio")) {
-      topfd_para_ptr_->ms_one_sn_ratio_ = std::stod(ms_one_sn_ratio);
+      topfd_para_ptr_->setMsOneSnRatio(std::stod(ms_one_sn_ratio));
     }
 
     if (vm.count("missing-level-one")) {
-      topfd_para_ptr_->missing_level_one_ = true;
+      topfd_para_ptr_->setMissingLevelOne(true);
     }
 
     if (vm.count("multiple-mass")) {
-      topfd_para_ptr_->output_multiple_mass_ = true;
+      topfd_para_ptr_->setOutputMultipleMass(true);
     }
 
     if (vm.count("precursor-window")) {
-      topfd_para_ptr_->prec_window_ = std::stod(prec_window);
+      topfd_para_ptr_->setPrecWindow(std::stod(prec_window));
     }
 
     if (vm.count("spectrum-file-name")) {
       spec_file_list_ = vm["spectrum-file-name"].as<std::vector<std::string> >(); 
     }
 
-    if (vm.count("merged-file-name")) {
-      if (spec_file_list_.size() > 1) {
-        topfd_para_ptr_->merge_files_ = true;
-        topfd_para_ptr_->merged_file_name_ = merged_file_name;
-      }
-    }
     if (vm.count("thread-number")) {
       try {
-        topfd_para_ptr_->thread_number_ = std::stoi(thread_number);
+        topfd_para_ptr_->setThreadNum(std::stoi(thread_number));
       } catch (std::exception& e) {
         LOG_ERROR("Thread number " << thread_number << " should be a number.");
         return false;
       }
     }
     if (vm.count("skip-html-folder")) {
-      topfd_para_ptr_->gene_html_folder_ = false;
+      topfd_para_ptr_->setGeneHtmlFolder(false);
     }
     if (vm.count("disable-final-filtering")) {
-      topfd_para_ptr_->do_final_filtering_ = false;
+      topfd_para_ptr_->setDoFinalFiltering(false);
     }
   }
   catch(std::exception& e) {
@@ -206,8 +198,8 @@ bool Argument::parse(int argc, char* argv[]) {
 }
 
 bool Argument::validateArguments() {
-  if (!file_util::exists(topfd_para_ptr_->resource_dir_)) {
-    LOG_ERROR("Resource direcotry " << topfd_para_ptr_->resource_dir_ << " does not exist!");
+  if (!file_util::exists(topfd_para_ptr_->getResourceDir())) {
+    LOG_ERROR("Resource direcotry " << topfd_para_ptr_->getResourceDir() << " does not exist!");
     return false;
   }
 
@@ -217,14 +209,14 @@ bool Argument::validateArguments() {
       return false;
     }
   }
-  int thread_number = topfd_para_ptr_->thread_number_;
+  int thread_number = topfd_para_ptr_->getThreadNum();
   int valid = mem_check::checkThreadNum(thread_number, "topfd");
   if (!valid) {
     return false;
   }
 
   //validate activation method
-  std::string activation = topfd_para_ptr_->activation_;
+  std::string activation = topfd_para_ptr_->getActivation();
   if (activation != "FILE" && activation != "CID" && activation != "ETD" 
       && activation != "MPD" && activation != "HCD" && activation != "UVPD"){
     //throw InvalidActivation();

@@ -20,14 +20,201 @@
 #include <array>
 #endif
 
-#include "common/util/logger.hpp"
-#include "gui/util/run_exe.h"
 #include <algorithm>
 #include <iostream>
-#include <stdio.h> 
+
+#include "common/util/logger.hpp"
+#include "gui/util/run_exe.hpp"
+
 
 namespace toppic {
+
+namespace run_exe {
+
+/*function for topfd*/ 
+std::string geneTopFDCommand(TopfdParaPtr para_ptr, 
+    std::vector<std::string> spec_file_lst, 
+    std::string app_name) {
+
+#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
+  std::string exe_path = para_ptr->exe_dir_ + "\\" + app_name + ".exe ";
+#else
+  std::string exe_path = para_ptr->exe_dir_ + "/" + app_name + " ";
+#endif
+
+  std::string command = exe_path;
+  command = command + "-a " + para_ptr->activation_ + " ";
+  command = command + "-c " + std::to_string(para_ptr->max_charge_) + " ";
+  command = command + "-m " + std::to_string(para_ptr->max_mass_) + " ";
+  command = command + "-t " + std::to_string(para_ptr->mz_error_) + " ";
+  command = command + "-r " + std::to_string(para_ptr->ms_one_sn_ratio_) + " ";
+  command = command + "-s " + std::to_string(para_ptr->ms_two_sn_ratio_) + " ";
+  command = command + "-w " + std::to_string(para_ptr->prec_window_) + " ";
+  if (para_ptr->use_env_cnn_) {
+    command = command + "-n ";
+  }
+  if (para_ptr->missing_level_one_) {
+    command = command + "-o ";
+  }
+  command = command + "-u " + std::to_string(para_ptr->thread_number_) + " ";
+  if (!para_ptr->gene_html_folder_) {
+    command = command + "-g ";
+  }
+  if (!para_ptr->do_final_filtering_) {
+    command = command + "-d ";
+  }
+  for (size_t i = 0; i < spec_file_lst_.size(); i++) {
+    command = command + spec_file_lst_[i] + " ";
+  }
+  return command;
+}
+
+void RunExe::run(std::string command) {
+  LOG_DEBUG(command);
+  #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
+  HANDLE g_hChildStd_IN_Rd = NULL;
+  HANDLE g_hChildStd_IN_Wr = NULL;
+  HANDLE g_hChildStd_OUT_Rd = NULL;
+  HANDLE g_hChildStd_OUT_Wr = NULL;
+
+  SECURITY_ATTRIBUTES saAttr; 
+
+  //Set the bInheritHandle flag so pipe handles are inherited. 
+  saAttr.nLength = sizeof(SECURITY_ATTRIBUTES); 
+  saAttr.bInheritHandle = TRUE; 
+  saAttr.lpSecurityDescriptor = NULL; 
+
+  CreatePipe(&g_hChildStd_OUT_Rd, &g_hChildStd_OUT_Wr, &saAttr, 0);
+  CreatePipe(&g_hChildStd_IN_Rd, &g_hChildStd_IN_Wr, &saAttr, 0);
+
+  SetHandleInformation(g_hChildStd_OUT_Rd, HANDLE_FLAG_INHERIT, 0);
+  SetHandleInformation(g_hChildStd_IN_Wr, HANDLE_FLAG_INHERIT, 0);
+
+  PROCESS_INFORMATION piProcInfo; 
+  STARTUPINFO siStartInfo;
+  BOOL bSuccess = FALSE; 
+ 
+  ZeroMemory( &piProcInfo, sizeof(PROCESS_INFORMATION) );
+  ZeroMemory( &siStartInfo, sizeof(STARTUPINFO));
+
+  siStartInfo.cb = sizeof(STARTUPINFO); 
+  siStartInfo.hStdError = g_hChildStd_OUT_Wr;
+  siStartInfo.hStdOutput = g_hChildStd_OUT_Wr;
+  siStartInfo.hStdInput = g_hChildStd_IN_Rd;
+  siStartInfo.dwFlags |= STARTF_USESTDHANDLES;
+ 
+  //Create the child process. 
+  bSuccess = CreateProcess(NULL, command.c_str(), NULL, NULL, 
+                           TRUE, CREATE_NO_WINDOW, NULL, NULL, 
+                           &siStartInfo, &piProcInfo);  // receives PROCESS_INFORMATION 
+
+  if (!bSuccess ) {
+    std::cout << "error occured" << std::endl;
+    std::cout << "command: " << command << std::endl;
+    return;
+  }
+  else {
+    CloseHandle(piProcInfo.hProcess);
+    CloseHandle(piProcInfo.hThread);
+    CloseHandle(g_hChildStd_OUT_Wr);
+    CloseHandle(g_hChildStd_IN_Rd);
+  }   
+  DWORD dwRead, dwWritten; 
+  CHAR buf[4096]; 
+  BOOL readSuccess = FALSE;
+  HANDLE hParentStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
+  bSuccess = ReadFile( g_hChildStd_OUT_Rd, buf, 4096, &dwRead, NULL);
+  std::ios::sync_with_stdio(true);
+  while (bSuccess == TRUE) {
+    buf[dwRead] = '\0';
+    OutputDebugStringA(buf);
+    std::cout << buf;
+    bSuccess = ReadFile(g_hChildStd_OUT_Rd, buf, 1024, &dwRead, NULL);
+  }
+  #else
+    //std::array<char, 128> buffer;
+    char buf[4096]; 
+    FILE* pipe = popen(command.c_str(), "r");
+    if (!pipe) {
+      LOG_ERROR("Error occured when opening pipe");
+    }
+    while (fgets(buf, 4096, pipe) != NULL) {
+        std::cout << buf;
+    }
+    pclose(pipe);
+  #endif
+};
+
+}
+
+}
+
+/*
+std::map<std::string, std::string> common_para {
+  {"activation", "-a "},
+    {"fixedMod", "-f "},
+    {"allowProtMod", "-n "},
+    {"searchType", "-d "},
+    {"threadNumber", "-u "},
+    {"proteoformErrorTolerance", "-p "},
+    {"maxPtmMass", "-M "},
+    {"minPtmMass", "-m "},
+    {"cutoffSpectralType", "-t "},
+    {"cutoffSpectralValue", "-v "},
+    {"cutoffProteoformType", "-T "},
+    {"cutoffProteoformValue", "-V "},
+    {"ptmNumber", "-s "},
+    {"useFeatureFile", "-x "},
+    {"keepTempFiles", "-k "},
+    {"keepDecoyResults", "-K "},
+    {"geneHTMLFolder", "-g "},
+    {"combinedOutputName", "-c "}
+};
+
+std::vector<std::string> skip_para {//parameters to skip
+  "executiveDir", "resourceDir", "databaseBlockSize","filteringResultNumber",
+    "groupSpectrumNumber","maxFragmentLength","numOfTopPrsms","skipList",
+    "databaseFileName","oriDatabaseFileName","useGf"
+};
+
+std::map<std::string, std::string> topindex_para {
+  {"massErrorTolerance", "-e "}
+};
+
+std::map<std::string, std::string> toppic_para {
+  {"massErrorTolerance", "-e "},
+    {"useLookupTable", "-l "},
+    {"groupSpectrumNumber", "-r "},
+    {"residueModFileName", "-i "},
+    {"localThreshold", "-H "}
+};
+
+std::map<std::string, std::string> topmg_para {
+  {"massErrorTolerance", "-e "},
+    {"useAsfDiag", "-D "},
+    {"varModFileName", "-i "},
+    {"varPtmNumber", "-P "},
+    {"wholeProteinOnly", "-w "},
+    {"proteoGraphGap", "-j "},
+    {"varPtmNumInGap", "-G "}
+};
+
+std::map<std::string, std::string> topdiff_para {
+  {"errorTolerance", "-e "},
+    {"mergedOutputFileName", "-o "},
+    {"toolName", "-t "},
+};
+
+std::map<std::string, std::string> topmerge_para {
+  {"residueModFileName", "-i "},
+    {"localThreshold", "-H "},
+    {"massErrorTolerance", "-e "}
+};
+*/
+
+
 /*function for topindex*/
+/*
 std::string RunExe::geneCommand(std::map<std::string, std::string> arguments_, std::string app_name) {
   #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
   std::string exe_path = arguments_["executiveDir"] + "\\" + app_name + ".exe ";
@@ -62,43 +249,10 @@ std::string RunExe::geneCommand(std::map<std::string, std::string> arguments_, s
   command = command + arguments_["oriDatabaseFileName"] + " ";
   return command;
 };
-/*function for topfd*/ 
-std::string RunExe::geneCommand(TopfdParaPtr para_ptr, std::vector<std::string> spec_file_lst_, std::string app_name) {
-  #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
-  std::string exe_path = para_ptr->exe_dir_ + "\\" + app_name + ".exe ";
-  #else
-  std::string exe_path = para_ptr->exe_dir_ + "/" + app_name + " ";
-  #endif
-
-  std::string command = exe_path;
-  command = command + "-c " + std::to_string(para_ptr->max_charge_) + " ";
-  command = command + "-m " + std::to_string(para_ptr->max_mass_) + " ";
-  command = command + "-t " + std::to_string(para_ptr->mz_error_) + " ";
-  command = command + "-r " + std::to_string(para_ptr->ms_one_sn_ratio_) + " ";
-  command = command + "-s " + std::to_string(para_ptr->ms_two_sn_ratio_) + " ";
-  command = command + "-w " + std::to_string(para_ptr->prec_window_) + " ";
-  command = command + "-u " + std::to_string(para_ptr->thread_number_) + " ";
-  command = command + "-a " + para_ptr->activation_ + " ";
-  
-  if (para_ptr->missing_level_one_) {
-    command = command + "-o ";
-  }
-  if (!para_ptr->gene_html_folder_) {
-    command = command + "-g ";
-  }
-  if (para_ptr->use_env_cnn_) {
-    command = command + "-n ";
-  }
-  if (!para_ptr->do_final_filtering_) {
-    command = command + "-d ";
-  }
-  for (size_t i = 0; i < spec_file_lst_.size(); i++) {
-    command = command + spec_file_lst_[i] + " ";
-  }
-  return command;
-}
+*/
 
 /*function for toppic, topmg, topmerge, topdiff*/
+/*
 std::string RunExe::geneCommand(std::map<std::string, std::string> arguments_, std::vector<std::string> spec_file_lst_, std::string app_name) {
   #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
   std::string exe_path = arguments_["executiveDir"] + "\\" + app_name + ".exe ";
@@ -188,77 +342,4 @@ std::string RunExe::geneCommand(std::map<std::string, std::string> arguments_, s
   }
   return command;
 };
-void RunExe::run(std::string command) {
-  //std::cout << command << std::endl;
-  #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
-  HANDLE g_hChildStd_IN_Rd = NULL;
-  HANDLE g_hChildStd_IN_Wr = NULL;
-  HANDLE g_hChildStd_OUT_Rd = NULL;
-  HANDLE g_hChildStd_OUT_Wr = NULL;
-
-  SECURITY_ATTRIBUTES saAttr; 
-
-  //Set the bInheritHandle flag so pipe handles are inherited. 
-  saAttr.nLength = sizeof(SECURITY_ATTRIBUTES); 
-  saAttr.bInheritHandle = TRUE; 
-  saAttr.lpSecurityDescriptor = NULL; 
-
-  CreatePipe(&g_hChildStd_OUT_Rd, &g_hChildStd_OUT_Wr, &saAttr, 0);
-  CreatePipe(&g_hChildStd_IN_Rd, &g_hChildStd_IN_Wr, &saAttr, 0);
-
-  SetHandleInformation(g_hChildStd_OUT_Rd, HANDLE_FLAG_INHERIT, 0);
-  SetHandleInformation(g_hChildStd_IN_Wr, HANDLE_FLAG_INHERIT, 0);
-
-  PROCESS_INFORMATION piProcInfo; 
-  STARTUPINFO siStartInfo;
-  BOOL bSuccess = FALSE; 
- 
-  ZeroMemory( &piProcInfo, sizeof(PROCESS_INFORMATION) );
-  ZeroMemory( &siStartInfo, sizeof(STARTUPINFO));
-
-  siStartInfo.cb = sizeof(STARTUPINFO); 
-  siStartInfo.hStdError = g_hChildStd_OUT_Wr;
-  siStartInfo.hStdOutput = g_hChildStd_OUT_Wr;
-  siStartInfo.hStdInput = g_hChildStd_IN_Rd;
-  siStartInfo.dwFlags |= STARTF_USESTDHANDLES;
- 
-  //Create the child process. 
-  bSuccess = CreateProcess(NULL, command.c_str(), NULL, NULL, TRUE, CREATE_NO_WINDOW, NULL, NULL, &siStartInfo, &piProcInfo);  // receives PROCESS_INFORMATION 
-
-  if (!bSuccess ) {
-    std::cout << "error occured" << std::endl;
-    std::cout << "command: " << command << std::endl;
-    return;
-  }
-  else {
-    CloseHandle(piProcInfo.hProcess);
-    CloseHandle(piProcInfo.hThread);
-    CloseHandle(g_hChildStd_OUT_Wr);
-    CloseHandle(g_hChildStd_IN_Rd);
-  }   
-  DWORD dwRead, dwWritten; 
-  CHAR buf[4096]; 
-  BOOL readSuccess = FALSE;
-  HANDLE hParentStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
-  bSuccess = ReadFile( g_hChildStd_OUT_Rd, buf, 4096, &dwRead, NULL);
-  std::ios::sync_with_stdio(true);
-  while (bSuccess == TRUE) {
-    buf[dwRead] = '\0';
-    OutputDebugStringA(buf);
-    std::cout << buf;
-    bSuccess = ReadFile(g_hChildStd_OUT_Rd, buf, 1024, &dwRead, NULL);
-  }
-  #else
-    //std::array<char, 128> buffer;
-    char buf[4096]; 
-    FILE* pipe = popen(command.c_str(), "r");
-    if (!pipe) {
-      std::cout << "error occured when opening pipe" << std::endl;
-    }
-    while (fgets(buf, 4096, pipe) != NULL) {
-        std::cout << buf;
-    }
-    pclose(pipe);
-  #endif
-};
-}
+*/

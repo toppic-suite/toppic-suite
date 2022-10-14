@@ -91,21 +91,14 @@ void TopFDDialog::closeEvent(QCloseEvent *event) {
 }
 
 void TopFDDialog::on_clearButton_clicked() {
-  //ui->maxChargeEdit->clear();
-  //ui->maxMassEdit->clear();
-  //ui->mzErrorEdit->clear();
-  //ui->ms1snRatioEdit->clear();
-  //ui->ms2snRatioEdit->clear();
-  //ui->windowSizeEdit->clear();
-  //ui->missLevelOneCheckBox->setChecked(false);
   ui->listWidget->clear();
   ui->outputTextBrowser->clear();
   ui->outputTextBrowser->setText("Click the Start button to process the spectrum files.");
-  ui->activationComboBox->setCurrentIndex(0);
   lastDir_ = "/";
 }
 
 void TopFDDialog::on_defaultButton_clicked() {
+  /*
   ui->maxChargeEdit->setText("30");
   ui->maxMassEdit->setText("70000");
   ui->mzErrorEdit->setText("0.02");
@@ -117,8 +110,21 @@ void TopFDDialog::on_defaultButton_clicked() {
   ui->missLevelOneCheckBox->setChecked(false);
   ui->geneHTMLCheckBox->setChecked(true);
   ui->finalFilteringCheckBox->setChecked(false);
-  //ui->mergeCheckBox->setChecked(false);
-  //ui->mergedFilenameLineEdit->setText("sample1");
+  */
+  // default para_ptr
+  toppic::TopfdParaPtr para_ptr = std::make_shared<toppic::TopfdParaPtr>();
+  ui->maxChargeEdit->setText(std::to_string(para_ptr->getMaxCharge()));
+  ui->maxMassEdit->setText(std::to_string(para_ptr->getMaxMass());
+  ui->mzErrorEdit->setText(std::to_string(para_ptr->getMzError());
+  ui->ms1snRatioEdit->setText(std::to_string(para_ptr->getMs1SnRatio());
+  ui->ms2snRatioEdit->setText(std::to_string(para_ptr->getMs2SnRatio());
+  ui->windowSizeEdit->setText(std::to_string(para_ptr->getWindowSize());
+  ui->threadNumberEdit->setText(std::to_string(para_ptr->getThreadNum());
+  ui->envCNNCheckBox->setChecked(para_ptr->getUseEnvCNN());
+  ui->missLevelOneCheckBox->setChecked(para_ptr->getMissLevelOne());
+  ui->geneHTMLCheckBox->setChecked(para_ptr->getGeneHtml());
+  ui->finalFilteringCheckBox->setChecked(para_ptr->getFinalFiltering());
+
   ui->outputTextBrowser->clear();
   ui->outputTextBrowser->setText("Click the Start button to process the spectrum files.");
   ui->activationComboBox->setCurrentIndex(0);
@@ -143,10 +149,6 @@ void TopFDDialog::on_addButton_clicked() {
     updatedir(spfile);
     if (ableToAdd(spfile)) {
       ui->listWidget->addItem(new QListWidgetItem(spfile));
-      if (ui->listWidget->count() > 1) {
-        //ui->mergeCheckBox->setEnabled(true);
-        //ui->mergedFilenameLineEdit->setEnabled(true);
-      }
     }
   }
 }
@@ -181,11 +183,6 @@ void TopFDDialog::on_delButton_clicked() {
   QListWidgetItem *delItem = ui->listWidget->currentItem();
   ui->listWidget->removeItemWidget(delItem);
   delete delItem;
-  if (ui->listWidget->count() < 2) {
-    //ui->mergeCheckBox->setEnabled(false);
-    //ui->mergeCheckBox->setChecked(false);
-    //ui->mergedFilenameLineEdit->setEnabled(false);
-  }
 }
 
 void TopFDDialog::on_startButton_clicked() {
@@ -293,9 +290,6 @@ toppic::TopfdParaPtr TopFDDialog::getParaPtr() {
   para_ptr_->prec_window_ = std::stod(ui->windowSizeEdit->text().toStdString());
   para_ptr_->missing_level_one_ = ui->missLevelOneCheckBox->isChecked(); 
   para_ptr_->thread_number_ = std::stoi(ui->threadNumberEdit->text().toStdString());
-  para_ptr_->merge_files_ = false;
-  //para_ptr_->merge_files_ = ui->mergeCheckBox->isChecked();
-  //para_ptr_->merged_file_name_ = ui->mergedFilenameLineEdit->text().toStdString();
   para_ptr_->gene_html_folder_ = ui->geneHTMLCheckBox->isChecked();
   para_ptr_->use_env_cnn_ = ui->envCNNCheckBox->isChecked();
   para_ptr_->activation_ = ui->activationComboBox->currentText().toStdString();
@@ -319,8 +313,6 @@ void TopFDDialog::lockDialog() {
   ui->missLevelOneCheckBox->setEnabled(false);
   ui->windowSizeEdit->setEnabled(false);
   ui->outputButton->setEnabled(false);
-  //ui->mergeCheckBox->setEnabled(false);
-  //ui->mergedFilenameLineEdit->setEnabled(false);
   ui->geneHTMLCheckBox->setEnabled(false);
   ui->envCNNCheckBox->setEnabled(false);
   ui->activationComboBox->setEnabled(false);
@@ -343,10 +335,6 @@ void TopFDDialog::unlockDialog() {
   ui->windowSizeEdit->setEnabled(true);
   ui->outputButton->setEnabled(true);
   ui->outputButton->setDefault(true);
-  if (ui->listWidget->count() >= 2) {
-    //ui->mergeCheckBox->setEnabled(false);
-    //ui->mergedFilenameLineEdit->setEnabled(false);
-  }
   ui->geneHTMLCheckBox->setEnabled(true);
   ui->envCNNCheckBox->setEnabled(true);
   ui->activationComboBox->setEnabled(true);
@@ -410,15 +398,6 @@ bool TopFDDialog::checkError() {
       return true;
     }
   }
-  /*
-  if (ui->mergeCheckBox->isChecked() &&
-      ui->mergedFilenameLineEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Merged file name is empty!"),
-                         QMessageBox::Yes);
-    return true;
-  }
-  */
 
   return false;
 }
