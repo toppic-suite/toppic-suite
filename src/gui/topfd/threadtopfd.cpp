@@ -14,18 +14,17 @@
 
 #include "topfd/common/topfd_para.hpp"
 #include "topfd/common/topfd_process.hpp"
+#include "gui/util/run_exe.hpp"
 #include "gui/topfd/threadtopfd.hpp"
-#include "gui/util/run_exe.h"
 
 void ThreadTopFD::setPar(toppic::TopfdParaPtr para_ptr, 
-                         const std::vector<std::string> & spec_file_lst) {
+                         std::vector<std::string> spec_file_lst) {
   para_ptr_ = para_ptr;
   spec_file_lst_ = spec_file_lst;
 }
 
 void ThreadTopFD::run() {
   //toppic::topfd_process::process(para_ptr_, spec_file_lst_);
-  toppic::RunExe runExe;
-  std::string cmd = runExe.geneCommand(para_ptr_, spec_file_lst_, "topfd");
-  runExe.run(cmd);
+  std::string cmd = toppic::run_exe::geneTopfdCommand(para_ptr_, spec_file_lst_, "topfd");
+  toppic::run_exe::run(cmd);
 }

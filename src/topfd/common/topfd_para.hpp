@@ -26,6 +26,7 @@ class TopfdPara {
   
   std::string getParaStr(const std::string &prefix);
 
+  std::string getExeDir() {return exe_dir_;}
   std::string getResourceDir() {return resource_dir_;}
   bool isMissingLevelOne() {return missing_level_one_;}
   int getMaxCharge() {return max_charge_;}
@@ -42,6 +43,7 @@ class TopfdPara {
   bool isOutputMultipleMass() {return output_multiple_mass_;}
   int getThreadNum() {return thread_num_;}
 
+  void setExeDir(std::string dir) {exe_dir_ = dir;}
   void setResourceDir(std::string dir) {resource_dir_ = dir;}
   void setMissingLevelOne(bool missing) {missing_level_one_ = missing;}
   void setMaxCharge(int charge) {max_charge_ = charge;}

@@ -25,9 +25,9 @@ namespace toppic {
 
 namespace run_exe {
 
-std::string geneTopFDCommand(TopFDParaPtr para_ptr,
-    std::map<std::string, std::string> arguments, 
-    std::string app_name);
+std::string geneTopfdCommand(TopfdParaPtr para_ptr,
+                             std::vector<std::string> spec_file_lst,  
+                             std::string app_name);
 
 /*
    std::string geneCommand(TopfdParaPtr para_ptr, std::vector<std::string> spec_file_lst_, std::string app_name);

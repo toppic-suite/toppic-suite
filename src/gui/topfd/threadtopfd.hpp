@@ -39,7 +39,7 @@ class ThreadTopFD : public QThread {
   void run();
 
   void setPar(toppic::TopfdParaPtr para_ptr, 
-              const std::vector<std::string> & spec_file_lst); 
+              std::vector<std::string> spec_file_lst); 
 
  private:
   toppic::TopfdParaPtr para_ptr_;

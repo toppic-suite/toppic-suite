@@ -112,18 +112,18 @@ void TopFDDialog::on_defaultButton_clicked() {
   ui->finalFilteringCheckBox->setChecked(false);
   */
   // default para_ptr
-  toppic::TopfdParaPtr para_ptr = std::make_shared<toppic::TopfdParaPtr>();
-  ui->maxChargeEdit->setText(std::to_string(para_ptr->getMaxCharge()));
-  ui->maxMassEdit->setText(std::to_string(para_ptr->getMaxMass());
-  ui->mzErrorEdit->setText(std::to_string(para_ptr->getMzError());
-  ui->ms1snRatioEdit->setText(std::to_string(para_ptr->getMs1SnRatio());
-  ui->ms2snRatioEdit->setText(std::to_string(para_ptr->getMs2SnRatio());
-  ui->windowSizeEdit->setText(std::to_string(para_ptr->getWindowSize());
-  ui->threadNumberEdit->setText(std::to_string(para_ptr->getThreadNum());
-  ui->envCNNCheckBox->setChecked(para_ptr->getUseEnvCNN());
-  ui->missLevelOneCheckBox->setChecked(para_ptr->getMissLevelOne());
-  ui->geneHTMLCheckBox->setChecked(para_ptr->getGeneHtml());
-  ui->finalFilteringCheckBox->setChecked(para_ptr->getFinalFiltering());
+  toppic::TopfdParaPtr para_ptr = std::make_shared<toppic::TopfdPara>();
+  ui->maxChargeEdit->setText(QString::number(para_ptr->getMaxCharge()));
+  ui->maxMassEdit->setText(QString::number(para_ptr->getMaxMass()));
+  ui->mzErrorEdit->setText(QString::number(para_ptr->getMzError()));
+  ui->ms1snRatioEdit->setText(QString::number(para_ptr->getMsOneSnRatio()));
+  ui->ms2snRatioEdit->setText(QString::number(para_ptr->getMsTwoSnRatio()));
+  ui->windowSizeEdit->setText(QString::number(para_ptr->getPrecWindow()));
+  ui->threadNumberEdit->setText(QString::number(para_ptr->getThreadNum()));
+  ui->envCNNCheckBox->setChecked(para_ptr->isUseEnvCnn());
+  ui->missLevelOneCheckBox->setChecked(para_ptr->isMissingLevelOne());
+  ui->geneHTMLCheckBox->setChecked(para_ptr->isGeneHtmlFolder());
+  ui->disableFilteringCheckBox->setChecked(!para_ptr->isDoFinalFiltering());
 
   ui->outputTextBrowser->clear();
   ui->outputTextBrowser->setText("Click the Start button to process the spectrum files.");
@@ -280,20 +280,20 @@ void TopFDDialog::on_outputButton_clicked() {
 toppic::TopfdParaPtr TopFDDialog::getParaPtr() {
   QString path = QCoreApplication::applicationFilePath();
   std::string exe_dir = toppic::file_util::getExecutiveDir(path.toStdString());
-  para_ptr_->exe_dir_ = exe_dir;
-  para_ptr_->resource_dir_ = toppic::file_util::getResourceDir(exe_dir);
-  para_ptr_->max_charge_ = std::stoi(ui->maxChargeEdit->text().toStdString());
-  para_ptr_->max_mass_ = std::stod(ui->maxMassEdit->text().toStdString());
-  para_ptr_->mz_error_ = std::stod(ui->mzErrorEdit->text().toStdString());
-  para_ptr_->ms_one_sn_ratio_ = std::stod(ui->ms1snRatioEdit->text().toStdString());
-  para_ptr_->ms_two_sn_ratio_ = std::stod(ui->ms2snRatioEdit->text().toStdString());
-  para_ptr_->prec_window_ = std::stod(ui->windowSizeEdit->text().toStdString());
-  para_ptr_->missing_level_one_ = ui->missLevelOneCheckBox->isChecked(); 
-  para_ptr_->thread_number_ = std::stoi(ui->threadNumberEdit->text().toStdString());
-  para_ptr_->gene_html_folder_ = ui->geneHTMLCheckBox->isChecked();
-  para_ptr_->use_env_cnn_ = ui->envCNNCheckBox->isChecked();
-  para_ptr_->activation_ = ui->activationComboBox->currentText().toStdString();
-  para_ptr_->do_final_filtering_ = !(ui->finalFilteringCheckBox->isChecked());
+  para_ptr_->setExeDir(exe_dir);
+  para_ptr_->setResourceDir(toppic::file_util::getResourceDir(exe_dir));
+  para_ptr_->setMaxCharge(std::stoi(ui->maxChargeEdit->text().toStdString()));
+  para_ptr_->setMaxMass(std::stod(ui->maxMassEdit->text().toStdString()));
+  para_ptr_->setMzError(std::stod(ui->mzErrorEdit->text().toStdString()));
+  para_ptr_->setMsOneSnRatio(std::stod(ui->ms1snRatioEdit->text().toStdString()));
+  para_ptr_->setMsTwoSnRatio(std::stod(ui->ms2snRatioEdit->text().toStdString()));
+  para_ptr_->setPrecWindow(std::stod(ui->windowSizeEdit->text().toStdString()));
+  para_ptr_->setMissingLevelOne(ui->missLevelOneCheckBox->isChecked()); 
+  para_ptr_->setThreadNum(std::stoi(ui->threadNumberEdit->text().toStdString()));
+  para_ptr_->setGeneHtmlFolder(ui->geneHTMLCheckBox->isChecked());
+  para_ptr_->setUseEnvCnn(ui->envCNNCheckBox->isChecked());
+  para_ptr_->setActivation(ui->activationComboBox->currentText().toStdString());
+  para_ptr_->setDoFinalFiltering(!(ui->disableFilteringCheckBox->isChecked()));
 
   return para_ptr_;
 }
@@ -316,7 +316,7 @@ void TopFDDialog::lockDialog() {
   ui->geneHTMLCheckBox->setEnabled(false);
   ui->envCNNCheckBox->setEnabled(false);
   ui->activationComboBox->setEnabled(false);
-  ui->finalFilteringCheckBox->setEnabled(false);
+  ui->disableFilteringCheckBox->setEnabled(false);
 }
 
 void TopFDDialog::unlockDialog() {
@@ -338,7 +338,7 @@ void TopFDDialog::unlockDialog() {
   ui->geneHTMLCheckBox->setEnabled(true);
   ui->envCNNCheckBox->setEnabled(true);
   ui->activationComboBox->setEnabled(true);
-  ui->finalFilteringCheckBox->setEnabled(true);
+  ui->disableFilteringCheckBox->setEnabled(true);
 }
 
 bool TopFDDialog::checkError() {
