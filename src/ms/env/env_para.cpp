@@ -18,17 +18,17 @@
 namespace toppic {
 
 EnvPara::EnvPara(TopfdParaPtr topfd_para_ptr) { 
-  max_charge_ = topfd_para_ptr->max_charge_; 
-  max_mass_ = topfd_para_ptr->max_mass_; 
-  double tolerance = topfd_para_ptr->mz_error_;
+  max_charge_ = topfd_para_ptr->getMaxCharge(); 
+  max_mass_ = topfd_para_ptr->getMaxMass(); 
+  double tolerance = topfd_para_ptr->getMzError();
   setTolerance(tolerance);
-  ms_two_sn_ratio_ = topfd_para_ptr->ms_two_sn_ratio_;
-  ms_one_sn_ratio_ = topfd_para_ptr->ms_one_sn_ratio_;
-  keep_unused_peaks_ = topfd_para_ptr->keep_unused_peaks_;
-  output_multiple_mass_ = topfd_para_ptr->output_multiple_mass_;
-  prec_deconv_interval_ = topfd_para_ptr->prec_window_; 
-  do_final_filtering_ = topfd_para_ptr->do_final_filtering_;
-  use_env_cnn_ = topfd_para_ptr->use_env_cnn_;
+  ms_two_sn_ratio_ = topfd_para_ptr->getMsTwoSnRatio();
+  ms_one_sn_ratio_ = topfd_para_ptr->getMsOneSnRatio();
+  keep_unused_peaks_ = topfd_para_ptr->isKeepUnusedPeaks();
+  output_multiple_mass_ = topfd_para_ptr->isOutputMultipleMass();
+  prec_deconv_interval_ = topfd_para_ptr->getPrecWindow(); 
+  do_final_filtering_ = topfd_para_ptr->isDoFinalFiltering();
+  use_env_cnn_ = topfd_para_ptr->isUseEnvCnn();
 }
 
 void EnvPara::setMinInte(double min_inte, int ms_level) {
