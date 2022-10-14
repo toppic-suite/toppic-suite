@@ -32,44 +32,44 @@ namespace toppic {
 namespace run_exe {
 
 /*function for topfd*/ 
-std::string geneTopFDCommand(TopfdParaPtr para_ptr, 
-    std::vector<std::string> spec_file_lst, 
-    std::string app_name) {
+std::string geneTopfdCommand(TopfdParaPtr para_ptr, 
+                             const std::vector<std::string> spec_file_lst, 
+                             std::string app_name) {
 
 #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
-  std::string exe_path = para_ptr->exe_dir_ + "\\" + app_name + ".exe ";
+  std::string exe_path = para_ptr->getExeDir() + "\\" + app_name + ".exe ";
 #else
-  std::string exe_path = para_ptr->exe_dir_ + "/" + app_name + " ";
+  std::string exe_path = para_ptr->getExeDir() + "/" + app_name + " ";
 #endif
 
   std::string command = exe_path;
-  command = command + "-a " + para_ptr->activation_ + " ";
-  command = command + "-c " + std::to_string(para_ptr->max_charge_) + " ";
-  command = command + "-m " + std::to_string(para_ptr->max_mass_) + " ";
-  command = command + "-t " + std::to_string(para_ptr->mz_error_) + " ";
-  command = command + "-r " + std::to_string(para_ptr->ms_one_sn_ratio_) + " ";
-  command = command + "-s " + std::to_string(para_ptr->ms_two_sn_ratio_) + " ";
-  command = command + "-w " + std::to_string(para_ptr->prec_window_) + " ";
-  if (para_ptr->use_env_cnn_) {
+  command = command + "-a " + para_ptr->getActivation() + " ";
+  command = command + "-c " + std::to_string(para_ptr->getMaxCharge()) + " ";
+  command = command + "-m " + std::to_string(para_ptr->getMaxMass()) + " ";
+  command = command + "-t " + std::to_string(para_ptr->getMzError()) + " ";
+  command = command + "-r " + std::to_string(para_ptr->getMsOneSnRatio()) + " ";
+  command = command + "-s " + std::to_string(para_ptr->getMsTwoSnRatio()) + " ";
+  command = command + "-w " + std::to_string(para_ptr->getPrecWindow()) + " ";
+  if (para_ptr->isUseEnvCnn()) {
     command = command + "-n ";
   }
-  if (para_ptr->missing_level_one_) {
+  if (para_ptr->isMissingLevelOne()) {
     command = command + "-o ";
   }
-  command = command + "-u " + std::to_string(para_ptr->thread_number_) + " ";
-  if (!para_ptr->gene_html_folder_) {
+  command = command + "-u " + std::to_string(para_ptr->getThreadNum()) + " ";
+  if (!para_ptr->isGeneHtmlFolder()) {
     command = command + "-g ";
   }
-  if (!para_ptr->do_final_filtering_) {
+  if (!para_ptr->isDoFinalFiltering()) {
     command = command + "-d ";
   }
-  for (size_t i = 0; i < spec_file_lst_.size(); i++) {
-    command = command + spec_file_lst_[i] + " ";
+  for (size_t i = 0; i < spec_file_lst.size(); i++) {
+    command = command + spec_file_lst[i] + " ";
   }
   return command;
 }
 
-void RunExe::run(std::string command) {
+void run(std::string command) {
   LOG_DEBUG(command);
   #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
   HANDLE g_hChildStd_IN_Rd = NULL;
