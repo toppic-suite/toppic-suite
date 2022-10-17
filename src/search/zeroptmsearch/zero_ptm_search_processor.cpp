@@ -40,7 +40,8 @@ PrsmPtrVec ZeroPtmSearchProcessor::zeroPtmSearchOneSpec(SpectrumSetPtr spec_set_
   for (size_t i = 0; i < simple_prsm_ptr_vec.size(); i++) {
     if (std::abs(spec_set_ptr->getPrecMonoMass() - simple_prsm_ptr_vec[i]->getPrecMass()) 
         > std::pow(10, -4)) {
-      LOG_ERROR("Large precursor mass difference!" << spec_set_ptr->getPrecMonoMass() << " " << simple_prsm_ptr_vec[i]->getPrecMass());
+      //LOG_ERROR("Large precursor mass difference!" << spec_set_ptr->getPrecMonoMass() 
+      //<< " " << simple_prsm_ptr_vec[i]->getPrecMass());
       continue;
     }
     std::string seq_name = simple_prsm_ptr_vec[i]->getSeqName();
