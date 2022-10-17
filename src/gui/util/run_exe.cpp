@@ -69,8 +69,48 @@ std::string geneTopfdCommand(TopfdParaPtr para_ptr,
   return command;
 }
 
+std::map<std::string, std::string> topindex_para {
+  {"fixedMod", "-f"},
+    {"allowProtMod", "-n"},
+    {"searchType", "-d"},
+    {"threadNumber", "-u"},
+    {"massErrorTolerance", "-e"}
+};
+
+
+/*function for topindex*/
+std::string geneTopIndexCommand(std::map<std::string, std::string> arguments_, 
+                                std::string app_name) {
+  #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
+  std::string exe_path = arguments_["executiveDir"] + "\\" + app_name + ".exe ";
+  #else
+  std::string exe_path = arguments_["executiveDir"] + "/" + app_name + " ";
+  #endif
+
+  std::string command = exe_path;
+
+  for (std::map<std::string, std::string>::iterator it = arguments_.begin(); it != arguments_.end(); ++it) {
+    //if one of the topindex parameters
+    if (topindex_para.find(it->first) != topindex_para.end()) { 
+      //some parameters require extra processing
+      if (it->first == "fixedMod" && it->second == "") {
+        continue; //don't add -f
+      }
+      else if (it->first == "searchType") {
+        if (it->second != "TARGET") {
+          command = command + "-d ";
+        }
+        continue;
+      }
+      command = command + topindex_para[it->first] + " " + it->second + " ";
+    }
+  }
+  command = command + arguments_["oriDatabaseFileName"] + " ";
+  return command;
+};
+
 void run(std::string command) {
-  LOG_DEBUG(command);
+  std::cout << command << std::endl;
   #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
   HANDLE g_hChildStd_IN_Rd = NULL;
   HANDLE g_hChildStd_IN_Wr = NULL;
@@ -213,43 +253,6 @@ std::map<std::string, std::string> topmerge_para {
 */
 
 
-/*function for topindex*/
-/*
-std::string RunExe::geneCommand(std::map<std::string, std::string> arguments_, std::string app_name) {
-  #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
-  std::string exe_path = arguments_["executiveDir"] + "\\" + app_name + ".exe ";
-  #else
-  std::string exe_path = arguments_["executiveDir"] + "/" + app_name + " ";
-  #endif
-
-  std::string command = exe_path;
-
-  for (std::map<std::string, std::string>::iterator it = arguments_.begin(); it != arguments_.end(); ++it) {
-    if (std::count(skip_para.begin(), skip_para.end(), it->first)) continue;
-    else if (common_para.find(it->first) != common_para.end()) { //if one of the common parameters
-      //some parameters require extra processing
-      if (it->first == "fixedMod" && it->second == "") continue; //don't add -f
-      else if (it->first == "activation") continue; //for topindex, activation para should be skipped
-      else if (it->first == "searchType") {
-        if (it->second != "TARGET") {
-          command = command + "-d ";
-        }
-        continue;
-      }
-      command = command + common_para[it->first] + it->second + " ";
-    }
-    else if (app_name == "topindex" && topindex_para.find(it->first) != topindex_para.end()) {
-      command = command + topindex_para[it->first] + it->second + " ";
-    }
-    else {//parameter is not found anywhere
-      LOG_ERROR("Parameter " << it->first << " from " << app_name << " was not found in any apps!");
-      return "";
-    }
-  }
-  command = command + arguments_["oriDatabaseFileName"] + " ";
-  return command;
-};
-*/
 
 /*function for toppic, topmg, topmerge, topdiff*/
 /*

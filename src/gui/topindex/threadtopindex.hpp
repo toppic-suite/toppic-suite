@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_GUI_THREADTOPINDEX_H
-#define TOPPIC_GUI_THREADTOPINDEX_H
+#ifndef TOPPIC_GUI_THREADTOPINDEX_HPP
+#define TOPPIC_GUI_THREADTOPINDEX_HPP
 
 #include <map>
 #include <string>

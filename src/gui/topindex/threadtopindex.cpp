@@ -12,17 +12,11 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-//#include <algorithm>
-
-#include "console/topindex_process.hpp"
-#include "gui/topindex/threadtopindex.h"
-#include "gui/util/run_exe.h"
+#include "gui/util/run_exe.hpp"
+#include "gui/topindex/threadtopindex.hpp"
 
 void ThreadTopIndex::run() {
-  //std::sort(spec_file_lst_.begin(), spec_file_lst_.end());
-  //toppic::TopIndexProcess(arguments_);
-  toppic::RunExe runExe;
-  std::string cmd = runExe.geneCommand(arguments_, "topindex");
-  runExe.run(cmd);
+  std::string cmd = toppic::run_exe::geneTopIndexCommand(arguments_, "topindex");
+  toppic::run_exe::run(cmd);
 }
 

@@ -29,33 +29,37 @@
 
 namespace toppic {
 
-Argument::Argument() {
-  initArguments();
+TopIndexArgument::TopIndexArgument() {
+  arguments_ = initArguments();
 }
 
-void Argument::initArguments() {
-  arguments_["oriDatabaseFileName"]="";
-  arguments_["databaseFileName"] = "";
-  arguments_["databaseBlockSize"] = "250000000";
-  arguments_["maxFragmentLength"] = "500";
-  arguments_["searchType"] = "TARGET";
-  arguments_["fixedMod"] = "";
-  arguments_["massErrorTolerance"] = "15";
-  arguments_["allowProtMod"] = "NONE,NME,NME_ACETYLATION,M_ACETYLATION";
-  arguments_["executiveDir"] = ".";
-  arguments_["resourceDir"] = "";
-  arguments_["threadNumber"] = "1";
-  arguments_["version"] = "";
+std::map<std::string, std::string> TopIndexArgument::initArguments() {
+  std::map<std::string, std::string> arguments;
+  arguments["oriDatabaseFileName"]="";
+  arguments["databaseFileName"] = "";
+  arguments["databaseBlockSize"] = "250000000";
+  arguments["maxFragmentLength"] = "500";
+  arguments["searchType"] = "TARGET";
+  arguments["fixedMod"] = "";
+  arguments["massErrorTolerance"] = "15";
+  arguments["allowProtMod"] = "NONE,NME,NME_ACETYLATION,M_ACETYLATION";
+  arguments["executiveDir"] = ".";
+  arguments["resourceDir"] = "";
+  arguments["threadNumber"] = "1";
+  arguments["version"] = "";
+
   // filtering result number is for diagonal filter
-  arguments_["filteringResultNumber"] = "20";
-  
+  arguments["filteringResultNumber"] = "20";
+
   // the following two arguments are used for the initializatio of prsm para
-  arguments_["groupSpectrumNumber"] = "1";
-  arguments_["activation"] = "FILE";
+  arguments["groupSpectrumNumber"] = "1";
+  arguments["activation"] = "FILE";
+
+  return arguments;
 }
 
-void Argument::outputArguments(std::ostream &output, 
-                               std::map<std::string, std::string> arguments) {
+void TopIndexArgument::outputArguments(std::ostream &output, 
+                                       std::map<std::string, std::string> arguments) {
   output << "********************** Parameters **********************" << std::endl;
   output << std::setw(44) << std::left << "Protein database file: " << "\t" << arguments["oriDatabaseFileName"] << std::endl;
   output << std::setw(44) << std::left << "Search type: " << "\t" << arguments["searchType"] << std::endl;
@@ -82,13 +86,13 @@ void Argument::outputArguments(std::ostream &output,
 }
 
 
-void Argument::showUsage(boost::program_options::options_description &desc) {
+void TopIndexArgument::showUsage(boost::program_options::options_description &desc) {
   std::cout << "Usage: topindex [options] database-file-name" << std::endl; 
   std::cout << desc << std::endl; 
   std::cout << "Version: " << Version::getVersion() << std::endl;
 }
 
-bool Argument::parse(int argc, char* argv[]) {
+bool TopIndexArgument::parse(int argc, char* argv[]) {
   
   std::string database_file_name = "";
   std::string argument_file_name = "";
@@ -192,7 +196,7 @@ bool Argument::parse(int argc, char* argv[]) {
   return validateArguments();
 }
 
-bool Argument::validateArguments() {
+bool TopIndexArgument::validateArguments() {
   if (!file_util::exists(arguments_["resourceDir"])) {
     LOG_ERROR("Resource direcotry " << arguments_["resourceDir"] << " does not exist!");
     return false;

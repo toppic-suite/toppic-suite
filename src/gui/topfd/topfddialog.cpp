@@ -28,7 +28,7 @@
 #include "common/util/version.hpp"
 #include "common/util/mem_check.hpp"
 
-#include "ui_topfddialog.h"
+#include "gui/topfd/ui_topfddialog.h"
 #include "gui/topfd/threadtopfd.hpp"
 #include "gui/topfd/topfddialog.hpp"
 
@@ -67,8 +67,6 @@ TopFDDialog::TopFDDialog(QWidget *parent) :
       thread_ = new ThreadTopFD(this);
       showInfo = "";
       TopFDDialog::on_defaultButton_clicked();
-      //ui->mergeCheckBox->setEnabled(false);
-      //ui->mergedFilenameLineEdit->setEnabled(false);
     }
 
 TopFDDialog::~TopFDDialog() {

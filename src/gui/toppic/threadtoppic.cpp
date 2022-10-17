@@ -15,7 +15,7 @@
 #include <algorithm>
 
 #include "threadtoppic.h"
-#include "gui/util/run_exe.h"
+#include "gui/util/run_exe.hpp"
 
 void handle_eptr(std::exception_ptr eptr) {
   try {
