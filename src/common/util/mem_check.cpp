@@ -34,12 +34,12 @@ namespace mem_check {
 
 std::map<std::string, double> memory_per_thread_list {
   {"topfd", 0.5}, 
-    {"toppic", 3.1},
-    {"toppic_filter", 3.1},
+    {"toppic", 3.5},
+    {"toppic_filter", 3.5},
     {"topmg", 4}, 
     {"topmerge", 4}, 
     {"topdiff", 4},
-    {"topindex", 1.6}  
+    {"topindex", 1.8}  
 };
 
 
@@ -145,6 +145,8 @@ bool checkThreadNum(int thread_number, std::string prog) {
   std::cout << "Computer total thread number: " << total_thread_num << std::endl;
   std::cout << "Total memory: " << std::setprecision(4) << total_mem_in_gb << " GiB" << std::endl;
   std::cout << "Available memory: " << avail_mem_in_gb << " GiB" << std::endl;
+  // set precision to default
+  std::cout << std::setprecision(6);
 
   if(thread_number > total_thread_num){
     LOG_ERROR("Thread number " << thread_number << " error! The value is too large. At most " << total_thread_num << " threads are supported.");

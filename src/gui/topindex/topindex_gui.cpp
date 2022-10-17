@@ -18,7 +18,7 @@
 #include <QFontDatabase>
 #include <QDesktopWidget>
 
-#include "gui/topindex/topindexdialog.h"
+#include "gui/topindex/topindexdialog.hpp"
 
 int main(int argc, char *argv[]) {
   // make sure we are using the c locale

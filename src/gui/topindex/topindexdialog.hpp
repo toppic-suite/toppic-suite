@@ -12,15 +12,15 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_GUI_TOPINDEX_DIALOG_H
-#define TOPPIC_GUI_TOPINDEX_DIALOG_H
+#ifndef TOPPIC_GUI_TOPINDEX_DIALOG_HPP
+#define TOPPIC_GUI_TOPINDEX_DIALOG_HPP
 
 #include <map>
 #include <string>
 
 #include <QMainWindow>
 
-#include "threadtopindex.h"
+#include "threadtopindex.hpp"
 
 namespace Ui {
 class TopIndexDialog;
@@ -50,8 +50,6 @@ private slots:
 
   void on_fixedModComboBox_currentIndexChanged(int index);
 
-  //void on_errorToleranceEdit_textChanged(QString string);
-
    void on_NONECheckBox_clicked(bool checked);
 
   void on_NMECheckBox_clicked(bool checked);
@@ -61,6 +59,7 @@ private slots:
   void on_MACCheckBox_clicked(bool checked);
   
   bool nterminalerror();
+
 private:
   QString lastDir_;
 
@@ -72,7 +71,7 @@ private:
 
   Ui::TopIndexDialog *ui;
 
-  void initArguments();
+  //void initArguments();
 
   std::map<std::string, std::string> getArguments();
 

@@ -28,15 +28,17 @@
 #include "common/util/version.hpp"
 #include "common/util/mem_check.hpp"
 
-#include "gui/topindex/topindexdialog.h"
+#include "console/topindex_argument.hpp"
+
 #include "gui/topindex/ui_topindexdialog.h"
-#include "gui/topindex/threadtopindex.h"
+#include "gui/topindex/topindexdialog.hpp"
+#include "gui/topindex/threadtopindex.hpp"
 
 
 TopIndexDialog::TopIndexDialog(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::TopIndexDialog) {
-      initArguments();
+      arguments_ = toppic::TopIndexArgument::initArguments();
       ui->setupUi(this);
       std::string title = "TopIndex v." + toppic::Version::getVersion();
       QString qstr = QString::fromStdString(title);
@@ -94,6 +96,7 @@ void TopIndexDialog::closeEvent(QCloseEvent *event) {
   return;
 }
 
+/*
 void TopIndexDialog::initArguments() {
   arguments_["oriDatabaseFileName"]="";
   arguments_["databaseFileName"] = "";
@@ -109,6 +112,7 @@ void TopIndexDialog::initArguments() {
   arguments_["resourceDir"] = "";
   arguments_["threadNumber"] = "1";
 }
+*/
 
 void TopIndexDialog::on_clearButton_clicked() {
   ui->databaseFileEdit->clear();
@@ -117,9 +121,10 @@ void TopIndexDialog::on_clearButton_clicked() {
 }
 
 void TopIndexDialog::on_defaultButton_clicked() {
+  arguments_ = toppic::TopIndexArgument::initArguments();
   ui->fixedModComboBox->setCurrentIndex(0);
-  ui->outputTextBrowser->setText("Click the Start button to process the data.");
-  ui->errorToleranceEdit_2->setText("15");
+  ui->errorToleranceEdit_2->setText(QString::fromStdString(arguments_["massErrorTolerance"])); 
+  ui->threadNumberEdit->setText(QString::fromStdString(arguments_["threadNumber"]));
   ui->fixedModComboBox->setCurrentIndex(0);
   on_fixedModComboBox_currentIndexChanged(0);
   ui->NONECheckBox->setChecked(true);
@@ -127,6 +132,7 @@ void TopIndexDialog::on_defaultButton_clicked() {
   ui->NMEACCheckBox->setChecked(true);
   ui->MACCheckBox->setChecked(true);
   ui->decoyCheckBox->setChecked(false);
+  ui->outputTextBrowser->setText("Click the Start button to process the data.");
 }
 
 void TopIndexDialog::updatedir(QString s) {
@@ -198,7 +204,6 @@ void TopIndexDialog::on_startButton_clicked() {
   showInfo = "";
   thread_->exit();
   std::cout.rdbuf(oldbuf);
-  
 }
 
 void TopIndexDialog::on_exitButton_clicked() {
@@ -236,9 +241,10 @@ std::map<std::string, std::string> TopIndexDialog::getArguments() {
   arguments_["oriDatabaseFileName"] = ui->databaseFileEdit->text().toStdString();
 
   if (ui->decoyCheckBox->isChecked()) {
-  arguments_["searchType"] = "TARGET+DECOY";
-  arguments_["databaseFileName"] = arguments_["oriDatabaseFileName"] + "_target_decoy";
-  } else {
+    arguments_["searchType"] = "TARGET+DECOY";
+    arguments_["databaseFileName"] = arguments_["oriDatabaseFileName"] + "_target_decoy";
+  } 
+  else {
     arguments_["searchType"] = "TARGET";
     arguments_["databaseFileName"] = arguments_["oriDatabaseFileName"] + "_target";
   }
@@ -257,6 +263,7 @@ std::map<std::string, std::string> TopIndexDialog::getArguments() {
   }
   arguments_["massErrorTolerance"] = ui->errorToleranceEdit_2->text().toStdString();
 
+  arguments_["allowProtMod"] = "";
   if (ui->NONECheckBox->isChecked()) {
     arguments_["allowProtMod"] = arguments_["allowProtMod"] + "NONE";
   }
