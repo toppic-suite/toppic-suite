@@ -26,10 +26,11 @@
 
 #include "common/util/version.hpp"
 #include "common/util/mem_check.hpp"
+#include "console/toppic_argument.hpp"
 
-#include "toppicwindow.h"
 #include "ui_toppicwindow.h"
-#include "threadtoppic.h"
+#include "toppicwindow.hpp"
+#include "threadtoppic.hpp"
 
 toppicWindow::toppicWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -84,38 +85,7 @@ toppicWindow::~toppicWindow() {
 }
 
 void toppicWindow::initArguments() {
-  arguments_["oriDatabaseFileName"]="";
-  arguments_["databaseFileName"] = "";
-  arguments_["databaseBlockSize"] = "400000000";
-  arguments_["maxFragmentLength"] = "1000";
-  arguments_["combinedOutputName"] = "";
-  arguments_["activation"] = "FILE";
-  arguments_["searchType"] = "TARGET";
-  arguments_["fixedMod"] = "";
-  arguments_["ptmNumber"] = "1";
-  arguments_["massErrorTolerance"] = "15";
-  arguments_["proteoformErrorTolerance"] = "1.2";
-  arguments_["cutoffSpectralType"] = "EVALUE";
-  arguments_["cutoffSpectralValue"] = "0.01";
-  arguments_["cutoffProteoformType"] = "EVALUE";
-  arguments_["cutoffProteoformValue"] = "0.01";
-  arguments_["allowProtMod"] = "NONE,NME,NME_ACETYLATION,M_ACETYLATION";
-  arguments_["numOfTopPrsms"] = "1";
-  arguments_["maxPtmMass"] = "500";
-  arguments_["minPtmMass"] = "-500";
-  arguments_["useLookupTable"] = "false";
-  arguments_["executiveDir"] = ".";
-  arguments_["resourceDir"] = "";
-  arguments_["keepTempFiles"] = "false";
-  arguments_["keepDecoyResults"] = "false";
-  arguments_["localThreshold"] = "0.15";
-  arguments_["groupSpectrumNumber"] = "1";
-  arguments_["filteringResultNumber"] = "20";
-  arguments_["residueModFileName"] = "";
-  arguments_["threadNumber"] = "1";
-  arguments_["useFeatureFile"] = "true";
-  arguments_["skipList"] = "";
-  arguments_["geneHTMLFolder"] = "";
+  arguments_ = toppic::ToppicArgument::initArguments();
 }
 
 void toppicWindow::on_clearButton_clicked() {
@@ -128,6 +98,8 @@ void toppicWindow::on_clearButton_clicked() {
 }
 
 void toppicWindow::on_defaultButton_clicked() {
+  arguments_ = toppic::ToppicArguments::initArguments();
+  
   ui->combinedOutputEdit->setText("");
   ui->fixedModFileEdit->clear();
   ui->errorToleranceEdit->setText("15");
@@ -139,6 +111,7 @@ void toppicWindow::on_defaultButton_clicked() {
   ui->numCombinedEdit->setText("1");
   ui->miscoreThresholdEdit->setText("0.15");
   ui->threadNumberEdit->setText("1");
+
   ui->outputTextBrowser->setText("Click the Start button to process the spectrum files.");
   ui->fixedModComboBox->setCurrentIndex(0);
   on_fixedModComboBox_currentIndexChanged(0);
@@ -281,8 +254,6 @@ std::map<std::string, std::string> toppicWindow::getArguments() {
   arguments_["oriDatabaseFileName"] = ui->databaseFileEdit->text().toStdString();
   
   arguments_["combinedOutputName"] = ui->combinedOutputEdit->text().trimmed().toStdString();
-  arguments_["databaseBlockSize"] = "400000000";
-  arguments_["maxFragmentLength"] = "1000";
   arguments_["activation"] = ui->activationComboBox->currentText().toStdString();
   if (ui->decoyCheckBox->isChecked()) {
     arguments_["searchType"] = "TARGET+DECOY";
@@ -347,7 +318,6 @@ std::map<std::string, std::string> toppicWindow::getArguments() {
   }
   arguments_["localThreshold"] = ui->miscoreThresholdEdit->text().toStdString();
   arguments_["groupSpectrumNumber"] = ui->numCombinedEdit->text().toStdString();
-  arguments_["filteringResultNumber"] = "20";  // default
   arguments_["residueModFileName"] = ui->modFileEdit->text().toStdString();
   arguments_["threadNumber"] = ui->threadNumberEdit->text().toStdString();
   if (ui->topfdFeatureCheckBox->isChecked()) {
