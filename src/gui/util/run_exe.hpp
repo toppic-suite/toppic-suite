@@ -32,6 +32,10 @@ std::string geneTopfdCommand(TopfdParaPtr para_ptr,
 std::string geneTopIndexCommand(std::map<std::string, std::string> arguments_, 
                                 std::string app_name);
 
+std::string geneToppicCommand(std::map<std::string, std::string> arguments_, 
+                              std::vector<std::string> spec_file_lst_, 
+                              std::string app_name);
+
 /*
    std::string geneCommand(TopfdParaPtr para_ptr, std::vector<std::string> spec_file_lst_, std::string app_name);
    std::string geneCommand(std::map<std::string, std::string> arguments_, std::vector<std::string> spec_file_lst_, std::string app_name);

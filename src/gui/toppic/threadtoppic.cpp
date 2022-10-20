@@ -14,7 +14,7 @@
 
 #include <algorithm>
 
-#include "threadtoppic.h"
+#include "threadtoppic.hpp"
 #include "gui/util/run_exe.hpp"
 
 void handle_eptr(std::exception_ptr eptr) {
@@ -32,9 +32,8 @@ void threadtoppic::run() {
 
   try {
     //toppic::TopPICProgress_multi_file(arguments_, spec_file_lst_);
-    toppic::RunExe runExe;
-    std::string cmd = runExe.geneCommand(arguments_, spec_file_lst_, "toppic");
-    runExe.run(cmd);
+    std::string cmd = toppic::run_exe::geneToppicCommand(arguments_, spec_file_lst_, "toppic");
+    toppic::run_exe.run(cmd);
   }
   catch (...) {
     std::exception_ptr eptr = std::current_exception();
