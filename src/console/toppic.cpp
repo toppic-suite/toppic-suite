@@ -25,7 +25,7 @@ int main(int argc, char* argv[]) {
   toppic::logger::log_level = 5;
   std::cout << std::setprecision(10);
 
-  toppic::Argument argu_processor;
+  toppic::ToppicArgument argu_processor;
 
   bool success = argu_processor.parse(argc, argv);
 

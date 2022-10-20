@@ -157,7 +157,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));
 
     arguments["startTime"] = buf;
-    Argument::outputArguments(std::cout, arguments);
+    ToppicArgument::outputArguments(std::cout, arguments);
 
     base_data::init();
 
@@ -408,7 +408,7 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&end));
     arguments["endTime"] = buf;
 
-    std::string argu_str = Argument::outputTsvArguments(arguments);
+    std::string argu_str = ToppicArgument::outputTsvArguments(arguments);
 
     std::cout << "Outputting PrSM table - started." << std::endl;
     PrsmMatchTableWriterPtr table_out
