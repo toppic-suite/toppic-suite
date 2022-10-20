@@ -32,14 +32,16 @@
 
 namespace toppic {
 
-class Argument {
+class ToppicArgument {
  public:
-  Argument();
+  ToppicArgument();
 
   static void outputArguments(std::ostream &output, 
                               std::map<std::string, std::string> arguments);
 
   static std::string outputTsvArguments(std::map<std::string, std::string> arguments);
+
+  static std::map<std::string, std::string> initArguments();
 
   bool parse(int argc, char* argv[]);
 
@@ -48,7 +50,6 @@ class Argument {
   std::vector<std::string> getSpecFileList() { return spec_file_list_;}
 
  private:
-  void initArguments();
 
   bool validateArguments();
 

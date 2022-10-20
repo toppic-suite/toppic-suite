@@ -31,49 +31,50 @@
 
 namespace toppic {
 
-Argument::Argument() {
-  initArguments();
+ToppicArgument::ToppicArgument() {
+  arguments_ = initArguments();
 }
 
-void Argument::initArguments() {
-  arguments_["oriDatabaseFileName"]="";
-  arguments_["databaseFileName"] = "";
-  arguments_["databaseBlockSize"] = "250000000";
-  arguments_["maxFragmentLength"] = "500";
-  arguments_["spectrumFileName"] = "";
-  arguments_["combinedOutputName"] = "";
-  arguments_["activation"] = "FILE";
-  arguments_["searchType"] = "TARGET";
-  arguments_["fixedMod"] = "";
-  arguments_["nTermLabelMass"]="0";
-  arguments_["ptmNumber"] = "1";
-  arguments_["massErrorTolerance"] = "15";
-  arguments_["proteoformErrorTolerance"] = "1.2";
-  arguments_["cutoffSpectralType"] = "EVALUE";
-  arguments_["cutoffSpectralValue"] = "0.01";
-  arguments_["cutoffProteoformType"] = "EVALUE";
-  arguments_["cutoffProteoformValue"] = "0.01";
-  arguments_["allowProtMod"] = "NONE,NME,NME_ACETYLATION,M_ACETYLATION";
-  arguments_["numOfTopPrsms"] = "1";
-  arguments_["maxPtmMass"] = "500";
-  arguments_["minPtmMass"] = "-500";
-  arguments_["useLookupTable"] = "false";
-  arguments_["executiveDir"] = ".";
-  arguments_["resourceDir"] = "";
-  arguments_["keepTempFiles"] = "false";
-  arguments_["localThreshold"] = "0.15";
-  arguments_["groupSpectrumNumber"] = "1";
-  arguments_["filteringResultNumber"] = "20";
-  arguments_["residueModFileName"] = "";
-  arguments_["threadNumber"] = "1";
-  arguments_["useFeatureFile"] = "true";
-  arguments_["geneHTMLFolder"] = "true";
-  arguments_["keepDecoyResults"] = "false";
-  arguments_["version"] = "";
+std::map<std::string, std::string> ToppicArgument::initArguments() {
+  std::map<std::string, std::string> arguments;
+  arguments["oriDatabaseFileName"]="";
+  arguments["databaseFileName"] = "";
+  arguments["databaseBlockSize"] = "250000000";
+  arguments["maxFragmentLength"] = "500";
+  arguments["spectrumFileName"] = "";
+  arguments["combinedOutputName"] = "";
+  arguments["activation"] = "FILE";
+  arguments["searchType"] = "TARGET";
+  arguments["fixedMod"] = "";
+  arguments["ptmNumber"] = "1";
+  arguments["massErrorTolerance"] = "15";
+  arguments["proteoformErrorTolerance"] = "1.2";
+  arguments["cutoffSpectralType"] = "EVALUE";
+  arguments["cutoffSpectralValue"] = "0.01";
+  arguments["cutoffProteoformType"] = "EVALUE";
+  arguments["cutoffProteoformValue"] = "0.01";
+  arguments["allowProtMod"] = "NONE,NME,NME_ACETYLATION,M_ACETYLATION";
+  arguments["numOfTopPrsms"] = "1";
+  arguments["maxPtmMass"] = "500";
+  arguments["minPtmMass"] = "-500";
+  arguments["useLookupTable"] = "false";
+  arguments["executiveDir"] = ".";
+  arguments["resourceDir"] = "";
+  arguments["keepTempFiles"] = "false";
+  arguments["localThreshold"] = "0.15";
+  arguments["groupSpectrumNumber"] = "1";
+  arguments["filteringResultNumber"] = "20";
+  arguments["residueModFileName"] = "";
+  arguments["threadNumber"] = "1";
+  arguments["useFeatureFile"] = "true";
+  arguments["geneHTMLFolder"] = "true";
+  arguments["keepDecoyResults"] = "false";
+  arguments["version"] = "";
+  return arguments;
 }
 
-void Argument::outputArguments(std::ostream &output, 
-                               std::map<std::string, std::string> arguments) {
+void ToppicArgument::outputArguments(std::ostream &output, 
+                                     std::map<std::string, std::string> arguments) {
   output << "********************** Parameters **********************" << std::endl;
   output << std::setw(44) << std::left << "Protein database file: " << "\t" << arguments["oriDatabaseFileName"] << std::endl;
   output << std::setw(44) << std::left << "Spectrum file: " << "\t" << arguments["spectrumFileName"] << std::endl;
@@ -153,19 +154,20 @@ void Argument::outputArguments(std::ostream &output,
 
 }
 
-std::string Argument::outputTsvArguments(std::map<std::string, std::string> arguments) {
+std::string ToppicArgument::outputTsvArguments(std::map<std::string, 
+                                               std::string> arguments) {
   std::stringstream output;
   outputArguments(output, arguments); 
   return output.str();
 }
 
-void Argument::showUsage(boost::program_options::options_description &desc) {
+void ToppicArgument::showUsage(boost::program_options::options_description &desc) {
   std::cout << "Usage: toppic [options] database-file-name spectrum-file-name" << std::endl; 
   std::cout << desc << std::endl; 
   std::cout << "Version: " << Version::getVersion() << std::endl;
 }
 
-bool Argument::parse(int argc, char* argv[]) {
+bool ToppicArgument::parse(int argc, char* argv[]) {
   std::string database_file_name = "";
   std::string argument_file_name = "";
   std::string activation = "";
@@ -408,7 +410,7 @@ bool Argument::parse(int argc, char* argv[]) {
   return validateArguments();
 }
 
-bool Argument::validateArguments() {
+bool ToppicArgument::validateArguments() {
   if (!file_util::exists(arguments_["resourceDir"])) {
     LOG_ERROR("Resource direcotry " << arguments_["resourceDir"] << " does not exist!");
     return false;
