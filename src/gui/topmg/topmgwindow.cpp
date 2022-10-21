@@ -12,13 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <map>
-#include <string>
-#include <vector>
-
-#include "common/util/version.hpp"
-#include "common/util/mem_check.hpp"
-
 #include <QFileDialog>
 #include <QElapsedTimer>
 #include <QMessageBox>
@@ -27,9 +20,15 @@
 #include <QToolTip>
 #include <QDesktopServices>
 
-#include "topmgwindow.h"
-#include "ui_topmgwindow.h"
-#include "threadtopmg.h"
+#include "common/util/version.hpp"
+#include "common/util/mem_check.hpp"
+#include "common/util/file_util.hpp"
+
+#include "console/topmg_argument.hpp"
+
+#include "gui/topmg/ui_topmgwindow.h"
+#include "gui/topmg/threadtopmg.hpp"
+#include "gui/topmg/topmgwindow.hpp"
 
 topmgWindow::topmgWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -77,41 +76,7 @@ topmgWindow::~topmgWindow() {
 }
 
 void topmgWindow::initArguments() {
-  arguments_["oriDatabaseFileName"]="";
-  arguments_["databaseFileName"] = "";
-  arguments_["databaseBlockSize"] = "400000000";
-  arguments_["maxFragmentLength"] = "1000";
-  arguments_["spectrumFileName"] = "";
-  arguments_["combinedOutputName"] = "";
-  arguments_["activation"] = "FILE";
-  arguments_["searchType"] = "TARGET";
-  arguments_["fixedMod"] = "";
-  arguments_["ptmNumber"] = "0";
-  arguments_["massErrorTolerance"] = "15";
-  arguments_["proteoformErrorTolerance"] = "1.2";
-  arguments_["cutoffSpectralType"] = "EVALUE";
-  arguments_["cutoffSpectralValue"] = "0.01";
-  arguments_["cutoffProteoformType"] = "EVALUE";
-  arguments_["cutoffProteoformValue"] = "0.01";
-  arguments_["allowProtMod"] = "NONE,NME,NME_ACETYLATION,M_ACETYLATION";
-  arguments_["numOfTopPrsms"] = "1";
-  arguments_["maxPtmMass"] = "500";
-  arguments_["executiveDir"] = ".";
-  arguments_["resourceDir"] = "";
-  arguments_["keepTempFiles"] = "false";
-  arguments_["keepDecoyResults"] = "false";
-  arguments_["groupSpectrumNumber"] = "1";
-  arguments_["filteringResultNumber"] = "20";
-  arguments_["varModFileName"] = "";
-  arguments_["threadNumber"] = "1";
-  arguments_["useFeatureFile"] = "true";
-  arguments_["skipList"] = "";
-  arguments_["proteoGraphGap"] = "40";
-  arguments_["useAsfDiag"] = "false";
-  arguments_["varPtmNumber"] = "10";
-  arguments_["varPtmNumInGap"] = "5";
-  arguments_["geneHTMLFolder"] = "";
-  arguments_["wholeProteinOnly"] ="false";
+  arguments_ = toppic::TopmgArgument::initArguments();
 }
 
 void topmgWindow::on_clearButton_clicked() {
@@ -119,25 +84,33 @@ void topmgWindow::on_clearButton_clicked() {
   ui->listWidget->clear();
   ui->combinedOutputEdit->clear();
   ui->combinedOutputEdit->setEnabled(false);
-  //ui->skipListEdit->clear();
+  ui->modFileEdit->setText("");
   ui->outputTextBrowser->setText("Click the Start button to process the spectrum files.");
 }
 
 void topmgWindow::on_defaultButton_clicked() {
-  ui->fixedModFileEdit->clear();
-  ui->errorToleranceEdit->setText("15");
-  ui->formErrorToleranceEdit->setText("1.2");
-  ui->maxModEdit->setText("500");
-  ui->cutoffSpectralValueEdit->setText("0.01");
-  ui->cutoffProteoformValueEdit->setText("0.01");
-  ui->threadNumberEdit->setText("1");
+  arguments_ = toppic::TopmgArgument::initArguments();
+  
+  ui->combinedOutputEdit->setText("");
+  ui->modFileEdit->setText("");
+
+  ui->errorToleranceEdit->setText(QString::fromStdString(arguments_["massErrorTolerance"])); 
+  ui->formErrorToleranceEdit->setText(QString::fromStdString(arguments_["proteoformErrorTolerance"]));
+  ui->maxModEdit->setText(QString::fromStdString(arguments_["maxPtmMass"]));
+  ui->cutoffSpectralValueEdit->setText(QString::fromStdString(arguments_["cutoffSpectralValue"]));
+  ui->cutoffProteoformValueEdit->setText(QString::fromStdString(arguments_["cutoffProteoformValue"]));
+  ui->threadNumberEdit->setText(QString::fromStdString(arguments_["threadNumber"]));
+
   ui->fixedModComboBox->setCurrentIndex(0);
+  ui->fixedModFileEdit->clear();
   ui->fixedModFileEdit->setEnabled(false);
   ui->fixedModFileButton->setEnabled(false);
   ui->activationComboBox->setCurrentIndex(0);
   ui->cutoffSpectralTypeComboBox->setCurrentIndex(0);
   ui->cutoffProteoformTypeComboBox->setCurrentIndex(0);
+  // number of variable PTMs: 5
   ui->numModComboBox->setCurrentIndex(4);
+  // number of unknown mass shifts: 0
   ui->numUnknownShiftComboBox->setCurrentIndex(0);
   ui->NONECheckBox->setChecked(true);
   ui->NMECheckBox->setChecked(true);
@@ -148,8 +121,8 @@ void topmgWindow::on_defaultButton_clicked() {
   ui->asfDiagCheckBox->setChecked(false);
   ui->geneHTMLCheckBox->setChecked(true);
   ui->wholeProteinCheckBox->setChecked(false);
-  ui->maxGapLength->setText("40");
-  ui->maxVarPTMGap->setText("5");
+  ui->maxGapLength->setText(QString::fromStdString(arguments_["proteoGraphGap"]));
+  ui->maxVarPTMGap->setText(QString::fromStdString(arguments_["varPtmNumInGap"]));
   ui->keepDecoyCheckBox->setChecked(false);
   ui->keepTempCheckBox->setChecked(false);
 }
@@ -189,18 +162,6 @@ void topmgWindow::on_modFileButton_clicked() {
   updatedir(s);
   ui->modFileEdit->setText(s);
 }
-
-/*
-void topmgWindow::on_skipListButton_clicked() {
-  QString s = QFileDialog::getOpenFileName(
-      this,
-      "Select a modification file for skip list",
-      lastDir_,
-      "Text files(*.txt);;All files(*.*)");
-  updatedir(s);
-  ui->skipListEdit->setText(s);
-}
-*/
 
 void topmgWindow::on_startButton_clicked() {
   std::stringstream buffer;
@@ -284,8 +245,6 @@ std::map<std::string, std::string> topmgWindow::getArguments() {
   arguments_["resourceDir"] = toppic::file_util::getResourceDir(exe_dir);
   arguments_["oriDatabaseFileName"] = ui->databaseFileEdit->text().toStdString();
   arguments_["combinedOutputName"] = ui->combinedOutputEdit->text().trimmed().toStdString();
-  arguments_["databaseBlockSize"] = "400000000";
-  arguments_["maxFragmentLength"] = "1000";
   arguments_["activation"] = ui->activationComboBox->currentText().toStdString();
   if (ui->decoyCheckBox->isChecked()) {
     arguments_["searchType"] = "TARGET+DECOY";
@@ -331,15 +290,8 @@ std::map<std::string, std::string> topmgWindow::getArguments() {
   if (arguments_["allowProtMod"] != "") {
     arguments_["allowProtMod"] = arguments_["allowProtMod"].substr(1);
   }
-  arguments_["numOfTopPrsms"] = "1";
   arguments_["maxPtmMass"] = ui->maxModEdit->text().toStdString();
-  arguments_["keepTempFiles"] = "false";   // default
-  arguments_["filteringResultNumber"] = "20";  // default
-  arguments_["useGf"] = "false";  // default
-  arguments_["groupSpectrumNumber"] = "1";  // default
-  //arguments_["skipList"] = ui->skipListEdit->text().toStdString();
   arguments_["proteoGraphGap"] = ui->maxGapLength->text().toStdString();
-  arguments_["useAsfDiag"] = "false";  // default
   arguments_["varPtmNumber"] = ui->numModComboBox->currentText().toStdString();
   arguments_["ptmNumber"] = ui->numUnknownShiftComboBox->currentText().toStdString();
   arguments_["varPtmNumInGap"] = ui->maxVarPTMGap->text().toStdString();
@@ -451,7 +403,6 @@ void topmgWindow::lockDialog() {
   ui->cutoffProteoformValueEdit->setEnabled(false);
   ui->modFileEdit->setEnabled(false);
   ui->threadNumberEdit->setEnabled(false);
-  //ui->skipListEdit->setEnabled(false);
   ui->fixedModComboBox->setEnabled(false);
   ui->activationComboBox->setEnabled(false);
   ui->cutoffSpectralTypeComboBox->setEnabled(false);
@@ -494,7 +445,6 @@ void topmgWindow::unlockDialog() {
   ui->cutoffProteoformValueEdit->setEnabled(true);
   ui->modFileEdit->setEnabled(true);
   ui->threadNumberEdit->setEnabled(true);
-  //ui->skipListEdit->setEnabled(true);
   ui->fixedModComboBox->setEnabled(true);
   on_fixedModComboBox_currentIndexChanged(ui->fixedModComboBox->currentIndex());
   ui->activationComboBox->setEnabled(true);

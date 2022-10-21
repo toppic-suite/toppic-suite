@@ -12,14 +12,16 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_GUI_TOPMGWINDOW_H
-#define TOPPIC_GUI_TOPMGWINDOW_H
+#ifndef TOPPIC_GUI_TOPMGWINDOW_HPP
+#define TOPPIC_GUI_TOPMGWINDOW_HPP
 
 #include <QMainWindow>
 #include <QMouseEvent>
-#include "threadtopmg.h"
+
 #include <map>
 #include <string>
+
+#include "gui/topmg/threadtopmg.hpp"
 
 namespace Ui {
 class topmgWindow;
@@ -40,8 +42,6 @@ class topmgWindow : public QMainWindow {
   
   void on_modFileButton_clicked();
   
-  //void on_skipListButton_clicked();
-
   void on_clearButton_clicked();
 
   void on_defaultButton_clicked();

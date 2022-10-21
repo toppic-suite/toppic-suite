@@ -14,14 +14,13 @@
 
 #include <algorithm>
 
-#include "threadtopmg.h"
-#include "gui/util/run_exe.h"
+#include "gui/util/run_exe.hpp"
+#include "gui/topmg/threadtopmg.hpp"
 
 void threadtopmg::run() {
   std::sort(spec_file_lst_.begin(), spec_file_lst_.end());
 
   //toppic::TopMGProgress_multi_file(arguments_, spec_file_lst_);
-  toppic::RunExe runExe;
-  std::string cmd = runExe.geneCommand(arguments_, spec_file_lst_, "topmg");
-  runExe.run(cmd);
+  std::string cmd = toppic::run_exe::geneTopmgCommand(arguments_, spec_file_lst_, "topmg");
+  toppic::run_exe::run(cmd);
 }
