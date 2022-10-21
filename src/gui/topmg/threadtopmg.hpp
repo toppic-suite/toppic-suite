@@ -12,16 +12,19 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_GUI_THREADTOPMG_H
-#define TOPPIC_GUI_THREADTOPMG_H
+#ifndef TOPPIC_GUI_THREADTOPMG_HPP
+#define TOPPIC_GUI_THREADTOPMG_HPP
 
-#include <iostream>
-#include <iomanip>
 #include <map>
 #include <string>
 #include <vector>
+/*
+#include <iostream>
+#include <iomanip>
 #include <ctime>
+*/
 
+/*
 #include "common/util/version.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/str_util.hpp"
@@ -32,6 +35,7 @@
 
 #include "console/topmg_argument.hpp"
 #include "console/topmg_process.hpp"
+*/
 
 #include <QThread>
 

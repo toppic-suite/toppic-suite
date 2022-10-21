@@ -200,6 +200,95 @@ std::string geneToppicCommand(std::map<std::string, std::string> arguments_,
   return command;
 };
 
+std::map<std::string, std::string> topmg_para {
+  {"activation", "-a "},
+    {"fixedMod", "-f "},
+    {"allowProtMod", "-n "},
+    {"searchType", "-d "},
+    {"threadNumber", "-u "},
+    {"proteoformErrorTolerance", "-p "},
+    {"maxPtmMass", "-M "},
+    {"cutoffSpectralType", "-t "},
+    {"cutoffSpectralValue", "-v "},
+    {"cutoffProteoformType", "-T "},
+    {"cutoffProteoformValue", "-V "},
+    {"ptmNumber", "-s "},
+    {"useFeatureFile", "-x "},
+    {"keepTempFiles", "-k "},
+    {"keepDecoyResults", "-K "},
+    {"geneHTMLFolder", "-g "},
+    {"combinedOutputName", "-c "},
+    {"massErrorTolerance", "-e "},
+    {"useAsfDiag", "-D "},
+    {"varModFileName", "-i "},
+    {"varPtmNumber", "-P "},
+    {"wholeProteinOnly", "-w "},
+    {"proteoGraphGap", "-j "},
+    {"varPtmNumInGap", "-G "}
+};
+
+std::string geneTopmgCommand(std::map<std::string, std::string> arguments_, 
+                             std::vector<std::string> spec_file_lst_, 
+                             std::string app_name) {
+  #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
+  std::string exe_path = arguments_["executiveDir"] + "\\" + app_name + ".exe ";
+  #else
+  std::string exe_path = arguments_["executiveDir"] + "/" + app_name + " ";
+  #endif
+
+  std::string command = exe_path;
+
+  for (std::map<std::string, std::string>::iterator it = arguments_.begin(); it != arguments_.end(); ++it) {
+    if (topmg_para.find(it->first) != topmg_para.end()) { //if one of the common parameters
+      //skip some paramters based on parameter values
+      if (it->first == "fixedMod" && it->second == "") {
+        continue;
+      }
+      else if (it->first == "combinedOutputName" && it->second == "") {
+        continue;
+      }
+      else if (it->first == "useFeatureFile") {
+        if (it->second == "false") {
+          command = command + topmg_para[it->first] + " ";
+        }
+      }
+      else if (it->first == "searchType") {
+        if (it->second != "TARGET") {
+          command = command + topmg_para[it->first] + " ";
+        }
+      }
+      else if (it->first == "keepTempFiles" || it->first == "keepDecoyResults") {
+        if (it->second == "true") {
+          command = command + topmg_para[it->first] + " ";
+        }
+      }
+      else if (it->first == "geneHTMLFolder" ) {//for geneHTML folder, the argument should be added when the value is false
+        if (it->second != "true") {
+          command = command + topmg_para[it->first] + " ";
+        }
+      }
+      //some parameters require extra processing
+      else if (it->first == "useAsfDiag" || it->first == "wholeProteinOnly") {
+        if (it->second == "true") {
+          command = command + topmg_para[it->first] + " ";
+        }
+      }
+      else {
+        command = command + topmg_para[it->first] + it->second + " ";
+      }
+    }
+    else {//parameter is not found anywhere
+      LOG_DEBUG("Parameter " << it->first << " from " << app_name << " was not found in any apps!");
+    }
+  }  
+  command = command + arguments_["oriDatabaseFileName"] + " ";
+
+  for (size_t i = 0; i < spec_file_lst_.size(); i++) {
+    command = command + spec_file_lst_[i] + " ";
+  }
+  return command;
+};
+
 void run(std::string command) {
   std::cout << command << std::endl;
   #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)

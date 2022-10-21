@@ -155,7 +155,7 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
     std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));
 
     arguments["startTime"] = buf;
-    Argument::outputArguments(std::cout, arguments);
+    TopmgArgument::outputArguments(std::cout, arguments);
 
     base_data::init();
 
@@ -344,7 +344,7 @@ std::string db_file_name = ori_db_file_name + "_idx" + file_util::getFileSeparat
     std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&end));
     arguments["endTime"] = buf;
 
-    std::string argu_str = Argument::outputTsvArguments(arguments);
+    std::string argu_str = TopmgArgument::outputTsvArguments(arguments);
 
     std::cout << "Outputting PrSM table - started." << std::endl;
     PrsmMatchTableWriterPtr table_out

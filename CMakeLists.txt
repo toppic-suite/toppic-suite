@@ -1,4 +1,4 @@
-#pecify the version being used as well as the language
+#specify the version being used as well as the language
 cmake_minimum_required(VERSION 3.1)
 #Name your project here
 project(TopPIC)
@@ -82,9 +82,11 @@ file(GLOB_RECURSE TOPFD_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/topfd/*.cpp)
 # topfd console 
 file(GLOB TOPFD_CONSOLE_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd_argument.cpp
                              ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd.cpp)
+
 # topfd gui
 file(GLOB TOPFD_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topfd/*.cpp
-                           ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topfd/*.qrc)
+                           ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topfd/*.qrc
+                           ${CMAKE_CURRENT_SOURCE_DIR}/sir/console/toppic_argument.cpp)
 
 # topfd_single console main
 file(GLOB TOPFD_SINGLE_PROC_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd_single_process.cpp)
@@ -113,7 +115,8 @@ file(GLOB TOPPIC_CONSOLE_SRCS	${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic.cpp
 
 # toppic gui main
 file(GLOB TOPPIC_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/toppic/*.cpp
-	                  		    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/toppic/*.qrc)
+	                  		    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/toppic/*.qrc
+                            ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_argument.cpp)
 
 # classes for topmg
 file(GLOB GRAPH_ALIGN_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/search/diag/*.cpp
@@ -133,7 +136,8 @@ file(GLOB TOPMG_CONSOLE_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmg.cpp
 
 # topmg gui main
 file(GLOB TOPMG_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topmg/*.cpp
-	                  		   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topmg/*.qrc)
+	                  		   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topmg/*.qrc
+                           ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmg_argument.cpp)
 
 # topdiff classes
 file(GLOB DIFF_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/merge/*.cpp)
@@ -164,7 +168,8 @@ file(GLOB TOPINDEX_CONSOLE_SRCS
 
 # topindex gui main 
 file(GLOB TOPINDEX_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topindex/*.cpp
-			                        ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topindex/*.qrc)
+			                        ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topindex/*.qrc
+                              ${CMAKE_CURRENT_SOURCE_DIR}/console/topindex_argument.cpp)
 
 # topmerge console main
 file(GLOB TOPMERGE_PROC_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmerge_process.cpp
@@ -189,7 +194,10 @@ file(GLOB TOPCONVERT_SEARCH_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/search/duplicat
 file(GLOB UNIT_TEST_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/*.cpp)
 
 #gui to run exe in command line
-file(GLOB GUI_UTIL_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/util/*.cpp)
+file(GLOB GUI_UTIL_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/util/*.cpp
+                        ${CMAKE_CURRENT_SOURCE_DIR}/src/common/util/*.cpp
+                        ${CMAKE_CURRENT_SOURCE_DIR}/src/common/base/*.cpp
+                        ${CMAKE_CURRENT_SOURCE_DIR}/src/common/xml/*.cpp)
 
 add_executable(topfd 
   ${TOPFD_CONSOLE_SRCS} ${TOPFD_SRCS} ${COMMON_SRCS} ${PARA_SRCS} 
@@ -200,16 +208,14 @@ add_executable(topfd
 #  ${SPEC_SRCS} ${ENV_SRCS} ${PWIZ_SRCS} ${COMMON_SRCS}) 
 
 add_executable(topfd_gui 
-  ${TOPFD_GUI_SRCS} ${TOPFD_SRCS} ${COMMON_SRCS} ${PARA_SRCS} 
-  ${SPEC_SRCS} ${ENV_SRCS} ${FEATURE_SRCS} ${PWIZ_SRCS} ${NOWIDE_SRCS} ${GUI_UTIL_SRCS})
+  ${TOPFD_GUI_SRCS} ${GUI_UTIL_SRCS})
 
 add_executable(topindex 
   ${TOPINDEX_CONSOLE_SRCS} ${TOPINDEX_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS}
   ${SEQ_SRCS} ${PARA_SRCS} ${FILTER_INDEX_SRCS}) 
 
 add_executable(topindex_gui 
-  ${TOPINDEX_GUI_SRCS} ${TOPINDEX_PROC_SRCS} ${HTS_SRCS} 
-  ${COMMON_SRCS} ${SEQ_SRCS} ${PARA_SRCS} ${FILTER_INDEX_SRCS} ${GUI_UTIL_SRCS})
+  ${TOPINDEX_GUI_SRCS} ${GUI_UTIL_SRCS})
 
 add_executable(toppic 
 	${TOPPIC_CONSOLE_SRCS} ${TOPPIC_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS} 
@@ -218,20 +224,14 @@ add_executable(toppic
   ${TDGF_SRCS} ${LOCAL_SRCS} ${VISUAL_SRCS})
 
 add_executable(toppic_gui 
-	${TOPPIC_GUI_SRCS} ${TOPPIC_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS} 
-  ${SEQ_SRCS} ${PARA_SRCS} ${SPEC_SRCS}  
-  ${PRSM_SRCS} ${FILTER_SRCS} ${SEARCH_SRCS}  
-  ${TDGF_SRCS} ${LOCAL_SRCS} ${VISUAL_SRCS} ${GUI_UTIL_SRCS})
+	${TOPPIC_GUI_SRCS} ${GUI_UTIL_SRCS})
 
 add_executable(topmg 
 	${TOPMG_CONSOLE_SRCS} ${TOPMG_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS}
   ${SEQ_SRCS} ${PARA_SRCS} ${SPEC_SRCS} ${PRSM_SRCS} ${FILTER_SRCS} 
 	${GRAPH_ALIGN_SRCS} ${MCMC_SRCS} ${VISUAL_SRCS})
 
-add_executable(topmg_gui 
-	${TOPMG_GUI_SRCS} ${TOPMG_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS} 
-  ${SEQ_SRCS} ${PARA_SRCS} ${SPEC_SRCS} ${PRSM_SRCS} ${FILTER_SRCS}  
-	${GRAPH_ALIGN_SRCS} ${MCMC_SRCS} ${VISUAL_SRCS} ${GUI_UTIL_SRCS})
+add_executable(topmg_gui ${TOPMG_GUI_SRCS} ${GUI_UTIL_SRCS})
 
 add_executable(topdiff 
   ${TOPDIFF_CONSOLE_SRCS} ${TOPDIFF_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS} ${DIFF_SEARCH_SRCS}

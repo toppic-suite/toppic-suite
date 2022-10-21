@@ -17,7 +17,7 @@
 #include <QApplication>
 #include <QDesktopWidget>
 
-#include "topmgwindow.h"
+#include "gui/topmg/topmgwindow.hpp"
 
 int main(int argc, char *argv[]) {
   QLocale::setDefault(QLocale::c());

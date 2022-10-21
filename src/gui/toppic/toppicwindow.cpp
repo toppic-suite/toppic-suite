@@ -12,10 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <map>
-#include <string>
-#include <vector>
-
 #include <QFileDialog>
 #include <QElapsedTimer>
 #include <QMessageBox>
@@ -28,9 +24,9 @@
 #include "common/util/mem_check.hpp"
 #include "console/toppic_argument.hpp"
 
-#include "ui_toppicwindow.h"
-#include "toppicwindow.hpp"
-#include "threadtoppic.hpp"
+#include "gui/toppic/ui_toppicwindow.h"
+#include "gui/toppic/toppicwindow.hpp"
+#include "gui/toppic/threadtoppic.hpp"
 
 toppicWindow::toppicWindow(QWidget *parent) :
     QMainWindow(parent),
