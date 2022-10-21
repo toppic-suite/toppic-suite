@@ -32,8 +32,8 @@ void threadtoppic::run() {
 
   try {
     //toppic::TopPICProgress_multi_file(arguments_, spec_file_lst_);
-    std::string cmd = toppic::run_exe::geneToppicCommand(arguments_, spec_file_lst_, "toppic");
-    toppic::run_exe.run(cmd);
+    cmd_ = toppic::run_exe::geneToppicCommand(arguments_, spec_file_lst_, "toppic");
+    toppic::run_exe::run(cmd_);
   }
   catch (...) {
     std::exception_ptr eptr = std::current_exception();

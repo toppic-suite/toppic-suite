@@ -55,9 +55,12 @@ class threadtoppic : public QThread {
     spec_file_lst_ = spec_file_lst;
   }
 
+  std::string getCmd() {return cmd_;}
+
  private:
   std::map<std::string, std::string> arguments_;
   std::vector<std::string> spec_file_lst_;
+  std::string cmd_;
 };
 
 #endif  // TOPPIC_GUI_THREADTOPPIC_HPP

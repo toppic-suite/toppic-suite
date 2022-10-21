@@ -218,14 +218,12 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
 
     std::vector<std::string> input_exts;
 
-    /*
     std::cout << "Non PTM filtering - started." << std::endl;
     ZeroPtmFilterMngPtr zero_filter_mng_ptr
         = std::make_shared<ZeroPtmFilterMng>(prsm_para_ptr, index_file_para, 
                                              filter_thread_num, "toppic_zero_filter");
     zero_ptm_filter_processor::process(zero_filter_mng_ptr);
     std::cout << "Non PTM filtering - finished." << std::endl;
-    */
 
     std::cout << "Non PTM search - started." << std::endl;
     ZeroPtmSearchMngPtr zero_search_mng_ptr
