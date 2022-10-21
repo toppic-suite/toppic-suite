@@ -135,16 +135,9 @@ std::map<std::string, std::string> toppic_para {
     {"localThreshold", "-H "}
 };
 
-std::vector<std::string> skip_para {//parameters to skip
-  "executiveDir", "resourceDir", "databaseBlockSize","filteringResultNumber",
-    "groupSpectrumNumber","maxFragmentLength","numOfTopPrsms","skipList",
-    "databaseFileName","oriDatabaseFileName","useGf"
-};
-
-
-std::string run_exe::geneToppicCommand(std::map<std::string, std::string> arguments_, 
-                                       std::vector<std::string> spec_file_lst_, 
-                                       std::string app_name) {
+std::string geneToppicCommand(std::map<std::string, std::string> arguments_, 
+                              std::vector<std::string> spec_file_lst_, 
+                              std::string app_name) {
   #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
   std::string exe_path = arguments_["executiveDir"] + "\\" + app_name + ".exe ";
   #else
@@ -155,7 +148,7 @@ std::string run_exe::geneToppicCommand(std::map<std::string, std::string> argume
 
   for (std::map<std::string, std::string>::iterator it = arguments_.begin(); it != arguments_.end(); ++it) {
     //if one of the toppic parameters
-    if (common_para.find(it->first) != toppic_para.end()) { 
+    if (toppic_para.find(it->first) != toppic_para.end()) { 
       //skip some paramters based on parameter values
       if (it->first == "fixedMod" && it->second == "") {
         continue;
@@ -196,8 +189,7 @@ std::string run_exe::geneToppicCommand(std::map<std::string, std::string> argume
       }
     }
     else {//parameter is not found anywhere
-      LOG_LOG("Parameter " << it->first << " from " << app_name << " was not found in any apps!");
-      return "";
+      LOG_DEBUG("Parameter " << it->first << " from " << app_name << " was not found in any apps!");
     }
   }  
   command = command + arguments_["oriDatabaseFileName"] + " ";
@@ -271,7 +263,6 @@ void run(std::string command) {
     bSuccess = ReadFile(g_hChildStd_OUT_Rd, buf, 1024, &dwRead, NULL);
   }
   #else
-    //std::array<char, 128> buffer;
     char buf[4096]; 
     FILE* pipe = popen(command.c_str(), "r");
     if (!pipe) {

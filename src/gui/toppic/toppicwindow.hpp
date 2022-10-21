@@ -22,7 +22,7 @@
 #include <QMainWindow>
 #include <QMouseEvent>
 
-#include "threadtoppic.h"
+#include "threadtoppic.hpp"
 
 namespace Ui {
 class toppicWindow;

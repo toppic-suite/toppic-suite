@@ -98,19 +98,19 @@ void toppicWindow::on_clearButton_clicked() {
 }
 
 void toppicWindow::on_defaultButton_clicked() {
-  arguments_ = toppic::ToppicArguments::initArguments();
+  arguments_ = toppic::ToppicArgument::initArguments();
   
   ui->combinedOutputEdit->setText("");
   ui->fixedModFileEdit->clear();
-  ui->errorToleranceEdit->setText("15");
-  ui->formErrorToleranceEdit->setText("1.2");
-  ui->maxModEdit->setText("500");
-  ui->minModEdit->setText("-500");
-  ui->cutoffSpectralValueEdit->setText("0.01");
-  ui->cutoffProteoformValueEdit->setText("0.01");
-  ui->numCombinedEdit->setText("1");
-  ui->miscoreThresholdEdit->setText("0.15");
-  ui->threadNumberEdit->setText("1");
+  ui->errorToleranceEdit->setText(QString::fromStdString(arguments_["massErrorTolerance"])); 
+  ui->formErrorToleranceEdit->setText(QString::fromStdString(arguments_["proteoformErrorTolerance"]));
+  ui->maxModEdit->setText(QString::fromStdString(arguments_["maxPtmMass"]));
+  ui->minModEdit->setText(QString::fromStdString(arguments_["minPtmMass"]));
+  ui->cutoffSpectralValueEdit->setText(QString::fromStdString(arguments_["cutoffSpectralValue"]));
+  ui->cutoffProteoformValueEdit->setText(QString::fromStdString(arguments_["cutoffProteoformValue"]));
+  ui->numCombinedEdit->setText(QString::fromStdString(arguments_["groupSpectrumNumber"]));
+  ui->miscoreThresholdEdit->setText(QString::fromStdString(arguments_["localThreshold"]));
+  ui->threadNumberEdit->setText(QString::fromStdString(arguments_["threadNumber"]));
 
   ui->outputTextBrowser->setText("Click the Start button to process the spectrum files.");
   ui->fixedModComboBox->setCurrentIndex(0);

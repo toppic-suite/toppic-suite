@@ -17,7 +17,7 @@
 #include <QApplication>
 #include <QDesktopWidget>
 
-#include "toppicwindow.h"
+#include "toppicwindow.hpp"
 
 int main(int argc, char *argv[]) {
   QLocale::setDefault(QLocale::c());
