@@ -84,9 +84,9 @@ file(GLOB TOPFD_CONSOLE_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd_argum
                              ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd.cpp)
 
 # topfd gui
-file(GLOB TOPFD_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topfd/*.cpp
-                           ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topfd/*.qrc
-                           ${CMAKE_CURRENT_SOURCE_DIR}/sir/console/toppic_argument.cpp)
+file(GLOB TOPFD_GUI_SRCS    ${CMAKE_CURRENT_SOURCE_DIR}/src/topfd/common/topfd_para.cpp
+                            ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topfd/*.cpp
+                            ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topfd/*.qrc)
 
 # topfd_single console main
 file(GLOB TOPFD_SINGLE_PROC_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd_single_process.cpp)
@@ -169,7 +169,7 @@ file(GLOB TOPINDEX_CONSOLE_SRCS
 # topindex gui main 
 file(GLOB TOPINDEX_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topindex/*.cpp
 			                        ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topindex/*.qrc
-                              ${CMAKE_CURRENT_SOURCE_DIR}/console/topindex_argument.cpp)
+                              ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topindex_argument.cpp)
 
 # topmerge console main
 file(GLOB TOPMERGE_PROC_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmerge_process.cpp
