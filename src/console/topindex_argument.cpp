@@ -54,7 +54,6 @@ std::map<std::string, std::string> TopIndexArgument::initArguments() {
   // the following two arguments are used for the initializatio of prsm para
   arguments["groupSpectrumNumber"] = "1";
   arguments["activation"] = "FILE";
-
   return arguments;
 }
 
