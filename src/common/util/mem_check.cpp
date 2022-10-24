@@ -33,13 +33,13 @@ namespace toppic {
 namespace mem_check {
 
 std::map<std::string, double> memory_per_thread_list {
-  {"topfd", 0.5}, 
+  {"topfd", 0.3}, 
+    {"topindex", 1.75},  
     {"toppic", 3.5},
-    {"toppic_filter", 3.5},
     {"topmg", 4}, 
-    {"topmerge", 4}, 
     {"topdiff", 4},
-    {"topindex", 1.8}  
+    {"toppic_filter", 3.5},
+    {"topmerge", 4} 
 };
 
 
@@ -99,8 +99,9 @@ double getTotalMemInGb () {
 }
 
 double getAvailMemInGb () {
-  double avail_mem_in_gb = getTotalMemInGb();
+  double avail_mem_in_gb = 0;
 #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
+  avail_mem_in_gb = getTotalMemInGb();
   if (isWindows11()) {
     // minus 3 for windows 11
     avail_mem_in_gb = avail_mem_in_gb - 3;
@@ -110,8 +111,19 @@ double getAvailMemInGb () {
     avail_mem_in_gb = avail_mem_in_gb - 2;
   }
 #else
-  // minus 1 for linux
-  avail_mem_in_gb = avail_mem_in_gb - 2;
+  std::string token;
+  std::ifstream file("/proc/meminfo");
+  while(file >> token) {
+    if(token == "MemAvailable:") {
+      double mem;
+      if(file >> mem) {
+        avail_mem_in_gb = mem/1024/1024;
+      }
+      break;
+    }
+    // Ignore the rest of the line
+    file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+  }
 #endif
   if (avail_mem_in_gb < 0) {
     avail_mem_in_gb = 0;
@@ -158,6 +170,9 @@ bool checkThreadNum(int thread_number, std::string prog) {
     if (prog != "toppic") {
       std::cout << "WARNING: Based on the available memory size, up to " << max_thread << " threads can be used!" << std::endl;
       std::cout << "WARNING: Please set the thread number to " << max_thread << " or the program may crash!" << std::endl;
+    }
+    else {
+      std::cout << "WARNING: Based on the available memory size, " << max_thread << " threads will be used for sequence filtering and " << thread_number << " threads will be used for other steps in proteoform identification!"  << std::endl;
     }
   }
   return true;
