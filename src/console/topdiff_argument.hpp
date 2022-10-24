@@ -25,9 +25,9 @@
 
 namespace toppic {
 
-class Argument {
+class TopDiffArgument {
  public:
-  Argument();
+  TopDiffArgument();
 
   static void outputArguments(std::ostream &output,
                               std::map<std::string, std::string> arguments);
@@ -38,8 +38,9 @@ class Argument {
 
   std::vector<std::string> getSpectrumFileList() { return spectrum_file_list_;};
 
+  static std::map<std::string, std::string> initArguments();
+
  private:
-  void initArguments();
 
   bool validateArguments();
 

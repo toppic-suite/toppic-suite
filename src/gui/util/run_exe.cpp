@@ -289,6 +289,39 @@ std::string geneTopmgCommand(std::map<std::string, std::string> arguments_,
   return command;
 };
 
+std::map<std::string, std::string> topdiff_para {
+  {"errorTolerance", "-e "},
+    {"mergedOutputFileName", "-o "},
+    {"toolName", "-t "},
+};
+
+
+// function for topdiff
+std::string geneTopDiffCommand(std::map<std::string, std::string> arguments_, 
+                               std::vector<std::string> spec_file_lst_, 
+                               std::string app_name) {
+  #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
+  std::string exe_path = arguments_["executiveDir"] + "\\" + app_name + ".exe ";
+  #else
+  std::string exe_path = arguments_["executiveDir"] + "/" + app_name + " ";
+  #endif
+
+  std::string command = exe_path;
+
+  for (std::map<std::string, std::string>::iterator it = arguments_.begin(); it != arguments_.end(); ++it) {
+    if (app_name == "topdiff" && topdiff_para.find(it->first) != topdiff_para.end()) {
+      command = command + topdiff_para[it->first] + it->second + " ";
+    }
+    else {//parameter is not found anywhere
+      LOG_DEBUG("Parameter " << it->first << " from " << app_name << " was not found in any apps!");
+    }
+  }  
+  for (size_t i = 0; i < spec_file_lst_.size(); i++) {
+    command = command + spec_file_lst_[i] + " ";
+  }
+  return command;
+};
+
 void run(std::string command) {
   std::cout << command << std::endl;
   #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
@@ -367,161 +400,3 @@ void run(std::string command) {
 }
 
 }
-
-/*
-std::map<std::string, std::string> common_para {
-  {"activation", "-a "},
-    {"fixedMod", "-f "},
-    {"allowProtMod", "-n "},
-    {"searchType", "-d "},
-    {"threadNumber", "-u "},
-    {"proteoformErrorTolerance", "-p "},
-    {"maxPtmMass", "-M "},
-    {"minPtmMass", "-m "},
-    {"cutoffSpectralType", "-t "},
-    {"cutoffSpectralValue", "-v "},
-    {"cutoffProteoformType", "-T "},
-    {"cutoffProteoformValue", "-V "},
-    {"ptmNumber", "-s "},
-    {"useFeatureFile", "-x "},
-    {"keepTempFiles", "-k "},
-    {"keepDecoyResults", "-K "},
-    {"geneHTMLFolder", "-g "},
-    {"combinedOutputName", "-c "}
-};
-
-std::vector<std::string> skip_para {//parameters to skip
-  "executiveDir", "resourceDir", "databaseBlockSize","filteringResultNumber",
-    "groupSpectrumNumber","maxFragmentLength","numOfTopPrsms","skipList",
-    "databaseFileName","oriDatabaseFileName","useGf"
-};
-
-std::map<std::string, std::string> topindex_para {
-  {"massErrorTolerance", "-e "}
-};
-
-std::map<std::string, std::string> toppic_para {
-  {"massErrorTolerance", "-e "},
-    {"useLookupTable", "-l "},
-    {"groupSpectrumNumber", "-r "},
-    {"residueModFileName", "-i "},
-    {"localThreshold", "-H "}
-};
-
-std::map<std::string, std::string> topmg_para {
-  {"massErrorTolerance", "-e "},
-    {"useAsfDiag", "-D "},
-    {"varModFileName", "-i "},
-    {"varPtmNumber", "-P "},
-    {"wholeProteinOnly", "-w "},
-    {"proteoGraphGap", "-j "},
-    {"varPtmNumInGap", "-G "}
-};
-
-std::map<std::string, std::string> topdiff_para {
-  {"errorTolerance", "-e "},
-    {"mergedOutputFileName", "-o "},
-    {"toolName", "-t "},
-};
-
-std::map<std::string, std::string> topmerge_para {
-  {"residueModFileName", "-i "},
-    {"localThreshold", "-H "},
-    {"massErrorTolerance", "-e "}
-};
-*/
-
-
-
-/*function for toppic, topmg, topmerge, topdiff*/
-/*
-std::string RunExe::geneCommand(std::map<std::string, std::string> arguments_, std::vector<std::string> spec_file_lst_, std::string app_name) {
-  #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
-  std::string exe_path = arguments_["executiveDir"] + "\\" + app_name + ".exe ";
-  #else
-  std::string exe_path = arguments_["executiveDir"] + "/" + app_name + " ";
-  #endif
-
-  std::string command = exe_path;
-
-  for (std::map<std::string, std::string>::iterator it = arguments_.begin(); it != arguments_.end(); ++it) {
-    if (std::count(skip_para.begin(), skip_para.end(), it->first)) continue;
-    else if (common_para.find(it->first) != common_para.end()) { //if one of the common parameters
-      //skip some paramters based on parameter values
-      if (it->first == "fixedMod" && it->second == "") continue;
-      else if (it->first == "combinedOutputName" && it->second == "") continue;
-      else if (it->first == "useFeatureFile") {
-        if (it->second == "false") {
-          command = command + common_para[it->first] + " ";
-        }
-      }
-      else if (it->first == "searchType") {
-        if (it->second != "TARGET") {
-          command = command + common_para[it->first] + " ";
-        }
-      }
-      else if (it->first == "keepTempFiles" || it->first == "keepDecoyResults") {
-        if (it->second == "true") {
-          command = command + common_para[it->first] + " ";
-        }
-      }
-      else if (it->first == "geneHTMLFolder" ) {//for geneHTML folder, the argument should be added when the value is false
-        if (it->second != "true") {
-          command = command + common_para[it->first] + " ";
-        }
-      }
-      else{
-        command = command + common_para[it->first] + it->second + " ";
-      }
-    }
-    else if (app_name == "toppic" && toppic_para.find(it->first) != toppic_para.end()) {
-      //some parameters require extra processing
-      if (it->first == "residueModFileName" && it->second == "") continue; //don't add -i
-      else if (it->first == "useLookupTable") {
-        if (it->second == "true") {
-          command = command + toppic_para[it->first] + " ";
-        }
-      }
-      else {
-        command = command + toppic_para[it->first] + it->second + " ";
-      }
-    }
-    else if (app_name == "topmg" && topmg_para.find(it->first) != topmg_para.end()) {
-      //some parameters require extra processing
-      if (it->first == "useAsfDiag" || it->first == "wholeProteinOnly") {
-        if (it->second == "true") {
-          command = command + topmg_para[it->first] + " ";
-        }
-      }
-      else {
-        command = command + topmg_para[it->first] + it->second + " ";
-      }
-    }
-    else if (app_name == "topdiff" && topdiff_para.find(it->first) != topdiff_para.end()) {
-      command = command + topdiff_para[it->first] + it->second + " ";
-    }
-    else if (app_name == "topmerge") {
-      //some parameters require extra processing
-      if (it->first == "residueModFileName" && it->second == "") continue; //don't add -i
-      else if (it->first == "useLookupTable") {
-        if (it->second == "true") {
-          command = command + topmerge_para[it->first] + " ";
-        }
-      }
-      else {
-        command = command + topmerge_para[it->first] + it->second + " ";
-      }
-    }
-    else {//parameter is not found anywhere
-      LOG_ERROR("Parameter " << it->first << " from " << app_name << " was not found in any apps!");
-      return "";
-    }
-  }  
-  command = command + arguments_["oriDatabaseFileName"] + " ";
-
-  for (size_t i = 0; i < spec_file_lst_.size(); i++) {
-    command = command + spec_file_lst_[i] + " ";
-  }
-  return command;
-};
-*/

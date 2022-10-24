@@ -151,7 +151,8 @@ file(GLOB TOPDIFF_CONSOLE_SRCS
         ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdiff.cpp)
 
 # topdiff gui main 
-file(GLOB TOPDIFF_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topdiff/*.cpp
+file(GLOB TOPDIFF_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdiff_argument.cpp
+                             ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topdiff/*.cpp
 		                         ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topdiff/*.qrc)
 
 # topindex classes
@@ -207,15 +208,13 @@ add_executable(topfd
 #  ${TOPFD_SINGLE_CONSOLE_SRCS} ${TOPFD_SINGLE_PROC_SRCS} ${TOPFD_SRCS}
 #  ${SPEC_SRCS} ${ENV_SRCS} ${PWIZ_SRCS} ${COMMON_SRCS}) 
 
-add_executable(topfd_gui 
-  ${TOPFD_GUI_SRCS} ${GUI_UTIL_SRCS})
+add_executable(topfd_gui ${TOPFD_GUI_SRCS} ${GUI_UTIL_SRCS})
 
 add_executable(topindex 
   ${TOPINDEX_CONSOLE_SRCS} ${TOPINDEX_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS}
   ${SEQ_SRCS} ${PARA_SRCS} ${FILTER_INDEX_SRCS}) 
 
-add_executable(topindex_gui 
-  ${TOPINDEX_GUI_SRCS} ${GUI_UTIL_SRCS})
+add_executable(topindex_gui ${TOPINDEX_GUI_SRCS} ${GUI_UTIL_SRCS})
 
 add_executable(toppic 
 	${TOPPIC_CONSOLE_SRCS} ${TOPPIC_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS} 
@@ -223,8 +222,7 @@ add_executable(toppic
   ${PRSM_SRCS} ${FILTER_SRCS} ${SEARCH_SRCS}  
   ${TDGF_SRCS} ${LOCAL_SRCS} ${VISUAL_SRCS})
 
-add_executable(toppic_gui 
-	${TOPPIC_GUI_SRCS} ${GUI_UTIL_SRCS})
+add_executable(toppic_gui ${TOPPIC_GUI_SRCS} ${GUI_UTIL_SRCS})
 
 add_executable(topmg 
 	${TOPMG_CONSOLE_SRCS} ${TOPMG_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS}
@@ -237,9 +235,7 @@ add_executable(topdiff
   ${TOPDIFF_CONSOLE_SRCS} ${TOPDIFF_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS} ${DIFF_SEARCH_SRCS}
   ${SEQ_SRCS} ${PARA_SRCS} ${SPEC_SRCS} ${PRSM_SRCS} ${DIFF_SRCS})
 
-add_executable(topdiff_gui ${TOPDIFF_GUI_SRCS} ${TOPDIFF_GUI_QRC}
-  ${TOPDIFF_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS} ${DIFF_SEARCH_SRCS}
-  ${SEQ_SRCS} ${PARA_SRCS} ${SPEC_SRCS} ${PRSM_SRCS} ${DIFF_SRCS} ${GUI_UTIL_SRCS})
+add_executable(topdiff_gui ${TOPDIFF_GUI_SRCS} ${GUI_UTIL_SRCS})
 
 add_executable(topmerge ${TOPMERGE_CONSOLE_SRCS} ${TOPMERGE_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS} 
   ${TOPMERGE_SEARCH_SRCS} ${SEQ_SRCS} ${PARA_SRCS} ${SPEC_SRCS} ${LOCAL_SRCS} ${PRSM_SRCS} ${VISUAL_SRCS}) 
@@ -341,8 +337,8 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   target_link_libraries(toppic xerces-c boost_program_options
     boost_filesystem boost_system boost_serialization boost_thread pthread z)
 
-  target_link_libraries(toppic_gui Qt5Widgets Qt5Core Qt5Gui xerces-c boost_program_options
-    boost_filesystem boost_system boost_serialization boost_thread pthread z)
+  target_link_libraries(toppic_gui Qt5Widgets Qt5Core Qt5Gui 
+    xerces-c boost_program_options boost_filesystem boost_system boost_serialization boost_thread pthread z)
 
   target_link_libraries(topmg xerces-c boost_program_options
     boost_filesystem boost_system boost_serialization boost_thread pthread z)

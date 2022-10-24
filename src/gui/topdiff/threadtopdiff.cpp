@@ -12,16 +12,10 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-//#include <algorithm>
-
-#include "console/topdiff_process.hpp"
-#include "gui/topdiff/threadtopdiff.h"
-#include "gui/util/run_exe.h"
+#include "gui/topdiff/threadtopdiff.hpp"
+#include "gui/util/run_exe.hpp"
 
 void ThreadTopDiff::run() {
-  //std::sort(spec_file_lst_.begin(), spec_file_lst_.end());
-  //toppic::topDiffProcess(arguments_, spec_file_lst_);
-  toppic::RunExe runExe;
-  std::string cmd = runExe.geneCommand(arguments_, spec_file_lst_, "topdiff");
-  runExe.run(cmd);
+  std::string cmd = toppic::run_exe::geneTopDiffCommand(arguments_, spec_file_lst_, "topdiff");
+  toppic::run_exe::run(cmd);
 }

@@ -23,18 +23,20 @@
 
 namespace toppic {
 
-Argument::Argument() {
-  initArguments();
+TopDiffArgument::TopDiffArgument() {
+  arguments_ = initArguments();
 }
 
-void Argument::initArguments() {
-  arguments_["errorTolerance"] = "1.2";
-  arguments_["toolName"] = "toppic";
-  arguments_["mergedOutputFileName"] = "sample_diff.tsv";
-  arguments_["version"] = "";
+std::map<std::string, std::string> TopDiffArgument::initArguments() {
+  std::map<std::string, std::string> arguments;
+  arguments["errorTolerance"] = "1.2";
+  arguments["toolName"] = "toppic";
+  arguments["mergedOutputFileName"] = "sample_diff.tsv";
+  arguments["version"] = "";
+  return arguments;
 }
 
-void Argument::outputArguments(std::ostream &output, std::map<std::string, std::string> arguments) {
+void TopDiffArgument::outputArguments(std::ostream &output, std::map<std::string, std::string> arguments) {
   output << "******************** Parameters ********************" << std::endl;
   output << std::setw(44) << std::left << "Error tolerance: " << "\t" << arguments["errorTolerance"] << " Dalton " << std::endl;
   output << std::setw(44) << std::left << "Database search tool name: " << "\t" << arguments["toolName"] << std::endl;
@@ -43,13 +45,13 @@ void Argument::outputArguments(std::ostream &output, std::map<std::string, std::
   output << "******************** Parameters ********************" << std::endl;
 }
 
-void Argument::showUsage(boost::program_options::options_description &desc) {
+void TopDiffArgument::showUsage(boost::program_options::options_description &desc) {
   std::cout << "Usage: topdiff [options] spectrum-file-names" << std::endl; 
   std::cout << desc << std::endl; 
   std::cout << "Version: " << Version::getVersion() << std::endl;
 }
 
-bool Argument::parse(int argc, char* argv[]) {
+bool TopDiffArgument::parse(int argc, char* argv[]) {
   std::string error_tole = "1.2";
   std::string tool_name = "toppic";
   std::string merged_output_name = "sample_diff.tsv";
@@ -124,7 +126,7 @@ bool Argument::parse(int argc, char* argv[]) {
   return validateArguments();
 }
 
-bool Argument::validateArguments() {
+bool TopDiffArgument::validateArguments() {
   if (!file_util::exists(arguments_["resourceDir"])) {
     LOG_ERROR("Resource direcotry " << arguments_["resourceDir"] << " does not exist!");
     return false;
