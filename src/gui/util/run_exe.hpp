@@ -40,10 +40,10 @@ std::string geneTopmgCommand(std::map<std::string, std::string> arguments_,
                               std::vector<std::string> spec_file_lst_, 
                               std::string app_name);
 
-/*
-   std::string geneCommand(TopfdParaPtr para_ptr, std::vector<std::string> spec_file_lst_, std::string app_name);
-   std::string geneCommand(std::map<std::string, std::string> arguments_, std::vector<std::string> spec_file_lst_, std::string app_name);
-   */
+std::string geneTopDiffCommand(std::map<std::string, std::string> arguments_, 
+                               std::vector<std::string> spec_file_lst_, 
+                               std::string app_name);
+
 
 void run(std::string command); 
 

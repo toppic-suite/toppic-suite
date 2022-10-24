@@ -12,15 +12,16 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_GUI_TOPDIFF_DIALOG_H
-#define TOPPIC_GUI_TOPDIFF_DIALOG_H
+#ifndef TOPPIC_GUI_TOPDIFF_DIALOG_HPP
+#define TOPPIC_GUI_TOPDIFF_DIALOG_HPP
 
 #include <map>
+#include <vector>
 #include <string>
 
 #include <QMainWindow>
 
-#include "threadtopdiff.h"
+#include "threadtopdiff.hpp"
 
 namespace Ui {
 class TopDiffDialog;

@@ -12,13 +12,12 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include <QLocale>
 #include <QApplication>
 #include <QFontDatabase>
 #include <QDesktopWidget>
 
-#include "gui/topdiff/topdiffdialog.h"
+#include "gui/topdiff/topdiffdialog.hpp"
 
 int main(int argc, char *argv[]) {
   // make sure we are using the c locale

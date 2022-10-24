@@ -12,9 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <map>
-#include <string>
-#include <vector>
 #include <sstream>
 
 #include <QFileDialog>
@@ -27,9 +24,11 @@
 #include "common/base/base_data.hpp"
 #include "common/util/version.hpp"
 
-#include "gui/topdiff/topdiffdialog.h"
+#include "console/topdiff_argument.hpp"
+
 #include "gui/topdiff/ui_topdiffdialog.h"
-#include "gui/topdiff/threadtopdiff.h"
+#include "gui/topdiff/topdiffdialog.hpp"
+#include "gui/topdiff/threadtopdiff.hpp"
 
 
 TopDiffDialog::TopDiffDialog(QWidget *parent) :
@@ -75,14 +74,7 @@ void TopDiffDialog::closeEvent(QCloseEvent *event) {
 }
 
 void TopDiffDialog::initArguments() {
-  arguments_["executiveDir"] = "";
-  arguments_["resourceDir"] = "";
-  //arguments_["databaseFileName"] = "";
-  arguments_["oriDatabaseFileName"] = "";
-  arguments_["fixedMod"] = "";
-  arguments_["errorTolerance"] = "1.2";
-  arguments_["toolName"] = "toppic";
-  arguments_["mergedOutputFileName"] = "sample_diff.tsv";
+  arguments_ = toppic::TopDiffArgument::initArguments();
 }
 
 void TopDiffDialog::on_clearButton_clicked() {
@@ -92,9 +84,10 @@ void TopDiffDialog::on_clearButton_clicked() {
 }
 
 void TopDiffDialog::on_defaultButton_clicked() {
+  arguments_ = toppic::TopDiffArgument::initArguments();
   ui->toolComboBox->setCurrentIndex(0);
-  ui->precErrorEdit->setText("1.2");
-  ui->outputEdit->setText("sample_diff.tsv");
+  ui->precErrorEdit->setText(QString::fromStdString(arguments_["errorTolerance"]));
+  ui->outputEdit->setText(QString::fromStdString(arguments_["mergedOutputFileName"])); 
   ui->outputTextBrowser->setText("Click the Start button to process the data.");
 }
 

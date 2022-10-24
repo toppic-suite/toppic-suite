@@ -12,14 +12,11 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#ifndef TOPPIC_GUI_THREADTOPDIFF_H
-#define TOPPIC_GUI_THREADTOPDIFF_H
+#ifndef TOPPIC_GUI_THREADTOPDIFF_HPP
+#define TOPPIC_GUI_THREADTOPDIFF_HPP
 
 #include <map>
 #include <string>
-#include <iostream>
-#include <algorithm>
 #include <vector>
 
 #include <QThread>
