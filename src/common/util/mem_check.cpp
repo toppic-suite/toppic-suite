@@ -110,7 +110,7 @@ double getAvailMemInGb () {
     avail_mem_in_gb = avail_mem_in_gb - 3;
   }
   else {
-    // minus 1.5 for Windows 10
+    // minus 2 for Windows 10
     avail_mem_in_gb = avail_mem_in_gb - 2;
   }
 #else

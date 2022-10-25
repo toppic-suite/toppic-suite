@@ -17,6 +17,7 @@
 #include <QApplication>
 #include <QDesktopWidget>
 
+#include "gui/util/run_exe.hpp"
 #include "gui/topmg/topmgwindow.hpp"
 
 int main(int argc, char *argv[]) {
@@ -26,6 +27,7 @@ int main(int argc, char *argv[]) {
   font.setPointSize(12);
   QApplication::setFont(font);
   QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+  toppic::run_exe::startJob();
 #endif
   QApplication a(argc, argv);
 

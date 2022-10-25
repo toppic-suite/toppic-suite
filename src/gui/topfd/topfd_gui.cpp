@@ -17,7 +17,8 @@
 #include <QFontDatabase>
 #include <QDesktopWidget>
 
-#include "topfddialog.hpp"
+#include "gui/util/run_exe.hpp"
+#include "gui/topfd/topfddialog.hpp"
 
 int main(int argc, char *argv[]) {
   // make sure we are using the c locale
@@ -30,6 +31,8 @@ int main(int argc, char *argv[]) {
   font.setPointSize(12);
   QApplication::setFont(font);
   QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+  toppic::run_exe::startJob();
+
 #endif
   QApplication a(argc, argv);
 

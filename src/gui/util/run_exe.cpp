@@ -322,6 +322,29 @@ std::string geneTopDiffCommand(std::map<std::string, std::string> arguments_,
   return command;
 };
 
+void startJob() {
+  #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
+  HANDLE hJob = CreateJobObject( NULL, NULL );
+  if ( hJob == NULL ) {
+    std::cout << "CreateJobObject failed: error " << GetLastError() << std::endl;
+    return;
+  }
+
+  JOBOBJECT_EXTENDED_LIMIT_INFORMATION jeli = { 0 };
+  jeli.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
+  bool bSuccess = SetInformationJobObject( hJob, JobObjectExtendedLimitInformation, &jeli, sizeof( jeli ) );
+  if ( bSuccess == 0 ) {
+    std::cout << "SetInformationJobObject failed: error " << GetLastError() << std::endl;
+    return;
+  }
+  bSuccess = AssignProcessToJobObject(hJob, GetCurrentProcess());
+  if ( bSuccess == 0) {
+     std::cout << "AssignProcessToJobObject failed!" << std::endl;
+     return;
+  }
+  #endif
+}
+
 void run(std::string command) {
   std::cout << command << std::endl;
   #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
