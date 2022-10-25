@@ -17,7 +17,8 @@
 #include <QApplication>
 #include <QDesktopWidget>
 
-#include "toppicwindow.hpp"
+#include "gui/util/run_exe.hpp"
+#include "gui/toppic/toppicwindow.hpp"
 
 int main(int argc, char *argv[]) {
   QLocale::setDefault(QLocale::c());
@@ -26,6 +27,7 @@ int main(int argc, char *argv[]) {
   font.setPointSize(12);
   QApplication::setFont(font);
   QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+  toppic::run_exe::startJob();
 #endif
   QApplication a(argc, argv);
 
