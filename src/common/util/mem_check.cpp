@@ -168,6 +168,7 @@ bool checkThreadNum(int thread_number, std::string prog) {
     return false;
   }
   int max_thread = mem_check::getMaxThreads(prog);
+  // std::cout << "Maximum thread number: " << max_thread << std::endl;
   if (max_thread < thread_number) {
     // in toppic, we automatically control thread numbers for filtering
     if (prog != "toppic") {
