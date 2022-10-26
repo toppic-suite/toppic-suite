@@ -157,7 +157,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));
 
     arguments["startTime"] = buf;
-    ToppicArgument::outputArguments(std::cout, arguments);
+    ToppicArgument::outputArguments(std::cout, " ", arguments);
 
     base_data::init();
 
@@ -423,17 +423,17 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     XmlGeneratorPtr xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, resource_dir, 
                                                                 cur_suffix, "toppic_prsm_cutoff");
     if (arguments["geneHTMLFolder"] == "true"){
-      std::cout << "Generating PrSM xml files - started." << std::endl;
+      std::cout << "Generating PrSM XML files - started." << std::endl;
     
       xml_gene->process();
       xml_gene = nullptr;
-      std::cout << "Generating PrSM xml files - finished." << std::endl;
+      std::cout << "Generating PrSM XML files - finished." << std::endl;
 
       copyTopMSV(arguments);
   
-      std::cout << "Converting PrSM xml files to json files - started." << std::endl;
+      std::cout << "Converting PrSM XML files to JSON files - started." << std::endl;
       jsonTranslate(arguments, "toppic_prsm_cutoff");
-      std::cout << "Converting PrSM xml files to json files - finished." << std::endl;
+      std::cout << "Converting PrSM XML files to JSON files - finished." << std::endl;
     }
 
     cutoff_type = (arguments["cutoffProteoformType"] == "FDR") ? "FORMFDR": "EVALUE";
@@ -462,17 +462,17 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
 
     if (arguments["geneHTMLFolder"] == "true"){
 
-      std::cout << "Generating proteoform xml files - started." << std::endl;
+      std::cout << "Generating proteoform XML files - started." << std::endl;
       xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, resource_dir, 
                                               "toppic_form_cutoff", 
                                               "toppic_proteoform_cutoff");
     
       xml_gene->process();
       xml_gene = nullptr;
-      std::cout << "Generating proteoform xml files - finished." << std::endl;
-      std::cout << "Converting proteoform xml files to html files - started." << std::endl;
+      std::cout << "Generating proteoform XML files - finished." << std::endl;
+      std::cout << "Converting proteoform XML files to HTML files - started." << std::endl;
       jsonTranslate(arguments, "toppic_proteoform_cutoff");
-      std::cout << "Converting proteoform xml files to html files - finished." << std::endl;
+      std::cout << "Converting proteoform XML files to HTML files - finished." << std::endl;
     }
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;

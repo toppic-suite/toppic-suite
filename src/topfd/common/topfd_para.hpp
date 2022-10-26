@@ -24,7 +24,8 @@ class TopfdPara {
  public:
   TopfdPara() {};
   
-  std::string getParaStr(const std::string &prefix);
+  std::string getParaStr(const std::string &prefix,
+		         const std::string &sep);
 
   std::string getExeDir() {return exe_dir_;}
   std::string getResourceDir() {return resource_dir_;}

@@ -266,7 +266,7 @@ void DeconvProcess::processSpMissingLevelOne(RawMsGroupFaimeReaderPtr reader_ptr
   MsalignThreadMergePtr ms2_merge_ptr 
       = std::make_shared<MsalignThreadMerge>(file_util::basename(spec_file_name_), "ms2.msalign", 
                                              thread_num_, "ms2.msalign", 
-                                             topfd_para_ptr_-> getParaStr("#"));
+                                             topfd_para_ptr_-> getParaStr("#", "\t"));
 
   ms2_merge_ptr->process();
 
@@ -584,12 +584,12 @@ void DeconvProcess::processSp(RawMsGroupFaimeReaderPtr reader_ptr) {
     MsalignThreadMergePtr ms1_merge_ptr
             = std::make_shared<MsalignThreadMerge>(spec_file_name_, ms1_file_name, 
                                                   thread_num_, ms1_file_name, 
-                                                  topfd_para_ptr_-> getParaStr("#"));
+                                                  topfd_para_ptr_-> getParaStr("#", "\t"));
 
     MsalignThreadMergePtr ms2_merge_ptr 
           = std::make_shared<MsalignThreadMerge>(spec_file_name_, ms2_file_name, 
                                                 thread_num_, ms2_file_name, 
-                                                topfd_para_ptr_-> getParaStr("#"));
+                                                topfd_para_ptr_-> getParaStr("#", "\t"));
     ms1_merge_ptr->process();
     ms2_merge_ptr->process();
   }
@@ -601,12 +601,12 @@ void DeconvProcess::processSp(RawMsGroupFaimeReaderPtr reader_ptr) {
       MsalignThreadMergePtr ms1_merge_ptr
             = std::make_shared<MsalignThreadMerge>(spec_file_name_, ms1_file_name, 
                                                   thread_num_, ms1_file_name, 
-                                                  topfd_para_ptr_-> getParaStr("#"));
+                                                  topfd_para_ptr_-> getParaStr("#", "\t"));
 
       MsalignThreadMergePtr ms2_merge_ptr 
             = std::make_shared<MsalignThreadMerge>(spec_file_name_, ms2_file_name, 
                                                   thread_num_, ms2_file_name, 
-                                                  topfd_para_ptr_-> getParaStr("#"));
+                                                  topfd_para_ptr_-> getParaStr("#", "\t"));
       ms1_merge_ptr->process();
       ms2_merge_ptr->process();
 

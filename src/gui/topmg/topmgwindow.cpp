@@ -47,25 +47,30 @@ topmgWindow::topmgWindow(QWidget *parent) :
       ui->threadNumberEdit->setValidator(new QIntValidator(0, 2147483647, this));
       ui->errorToleranceEdit->setValidator(new QIntValidator(0, 2147483647, this));
       ui->formErrorToleranceEdit->setValidator(new QDoubleValidator(0, 2147483647, 4, this));
+
       QFont font;
-      QFont fontTable;
+      QFont outputFont;
+      QFont tableFont;
 #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
       font.setFamily(QStringLiteral("Calibri"));
-      fontTable.setFamily(QStringLiteral("Calibri"));
+      tableFont.setFamily(QStringLiteral("Calibri"));
+      outputFont.setFamily(QStringLiteral("Consolas"));
 #else
       font.setFamily(QStringLiteral("Monospace"));
-      fontTable.setFamily(QStringLiteral("Monospace"));
+      tableFont.setFamily(QStringLiteral("Monospace"));
+      outputFont.setFamily(QStringLiteral("Monospace"));
 #endif
       font.setPixelSize(12);
       QApplication::setFont(font);
-      ui->outputTextBrowser->setFont(font);
+      outputFont.setPixelSize(12);
+      ui->outputTextBrowser->setFont(outputFont);
+      tableFont.setPointSize(9);
+      ui->listWidget->setFont(tableFont);
+
       thread_ = new threadtopmg(this);
       showInfo = "";
       setToolTip("");
       setToolTipDuration(100);
-
-      fontTable.setPointSize(9);
-      ui->listWidget->setFont(fontTable);
 
       on_clearButton_clicked();
       on_defaultButton_clicked();

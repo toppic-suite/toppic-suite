@@ -58,29 +58,31 @@ std::map<std::string, std::string> TopIndexArgument::initArguments() {
 }
 
 void TopIndexArgument::outputArguments(std::ostream &output, 
+				       const std::string &sep, 
                                        std::map<std::string, std::string> arguments) {
+  int gap = 36;
   output << "********************** Parameters **********************" << std::endl;
-  output << std::setw(44) << std::left << "Protein database file: " << "\t" << arguments["oriDatabaseFileName"] << std::endl;
-  output << std::setw(44) << std::left << "Search type: " << "\t" << arguments["searchType"] << std::endl;
+  output << std::setw(gap) << std::left << "Protein database file:" << sep << arguments["oriDatabaseFileName"] << std::endl;
+  output << std::setw(gap) << std::left << "Search type: " << sep << arguments["searchType"] << std::endl;
 
   if (arguments["fixedMod"] == "") {
-    output << std::setw(44) << std::left << "Fixed modifications: " << "\t" << "None" << std::endl;
+    output << std::setw(gap) << std::left << "Fixed modifications:" << sep << "None" << std::endl;
   } 
   else if (arguments["fixedMod"] == "C57") {
-    output << std::setw(44) << std::left << "Fixed modifications: " << "\t" << "C57:carbamidomethylation on cysteine" << std::endl;
+    output << std::setw(gap) << std::left << "Fixed modifications:" << sep << "C57:carbamidomethylation on cysteine" << std::endl;
   }
   else if (arguments["fixedMod"] == "C58") {
-    output << std::setw(44) << std::left << "Fixed modifications: " << "\t" << "C58:carboxymethylation on cysteine" << std::endl;
+    output << std::setw(gap) << std::left << "Fixed modifications:" << sep << "C58:carboxymethylation on cysteine" << std::endl;
   }
   else {
-    output << std::setw(44) << std::left << "Fixed modifications:," << "\t" << arguments["fixedMod"] << std::endl;
+    output << std::setw(gap) << std::left << "Fixed modifications:" << sep << arguments["fixedMod"] << std::endl;
   }
 
-  output << std::setw(44) << std::left << "Error tolerance for matching masses: " << "\t" << arguments["massErrorTolerance"] << " ppm" << std::endl;
+  output << std::setw(gap) << std::left << "Error tolerance for matching masses:" << sep << arguments["massErrorTolerance"] << " ppm" << std::endl;
 
-  output << std::setw(44) << std::left << "Allowed N-terminal forms: " << "\t" <<  arguments["allowProtMod"] << std::endl;
-  output << std::setw(44) << std::left << "Thread number: " << "\t" << arguments["threadNumber"] << std::endl;
-  output << std::setw(44) << std::left << "Version: " << "\t" << arguments["version"] << std::endl;
+  output << std::setw(gap) << std::left << "Allowed N-terminal forms:" << sep <<  arguments["allowProtMod"] << std::endl;
+  output << std::setw(gap) << std::left << "Thread number:" << sep << arguments["threadNumber"] << std::endl;
+  output << std::setw(gap) << std::left << "Version:" << sep << arguments["version"] << std::endl;
   output << "********************** Parameters **********************" << std::endl;
 }
 

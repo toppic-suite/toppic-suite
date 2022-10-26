@@ -74,7 +74,7 @@ void jsonTranslate(std::map<std::string, std::string> &arguments,
   std::vector<std::vector<std::string>> anno_file_list = AnnoFileList::readFromXml(xml_file_list);
 
   for (size_t i = 0; i < anno_file_list.size(); i++) {
-    std::cout << "Converting xml files to html files - processing " 
+    std::cout << "Converting XML files to HTML files - processing " 
         << i + 1 << " of " << anno_file_list.size() << " files.\r";
     std::string xml_file_name = anno_file_list[i][0];
     std::string json_file_name = anno_file_list[i][1];

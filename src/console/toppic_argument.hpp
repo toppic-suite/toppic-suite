@@ -37,6 +37,7 @@ class ToppicArgument {
   ToppicArgument();
 
   static void outputArguments(std::ostream &output, 
+		  	      const std::string &sep,
                               std::map<std::string, std::string> arguments);
 
   static std::string outputTsvArguments(std::map<std::string, std::string> arguments);
