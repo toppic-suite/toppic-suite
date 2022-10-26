@@ -370,9 +370,13 @@ void TopIndexDialog::updateMsg(std::string msg) {
   showInfo = msg.c_str();
   QTextCursor cursor = ui->outputTextBrowser->textCursor();
   int vertical_bar_pos = ui->outputTextBrowser->verticalScrollBar()->value();
+  int max_bar_pos = ui->outputTextBrowser->verticalScrollBar()->maximum();
   ui->outputTextBrowser->setText(showInfo);
   cursor.movePosition(QTextCursor::End);
   ui->outputTextBrowser->setTextCursor(cursor);
+  if (max_bar_pos - vertical_bar_pos < 10) {
+    vertical_bar_pos = ui->outputTextBrowser->verticalScrollBar()->maximum();
+  }
   ui->outputTextBrowser->verticalScrollBar()->setValue(vertical_bar_pos);
 }
 
