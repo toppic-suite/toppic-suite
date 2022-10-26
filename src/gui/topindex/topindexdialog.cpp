@@ -22,6 +22,7 @@
 #include <QMessageBox>
 #include <QCloseEvent>
 #include <QDesktopServices>
+#include <QScrollBar>
 
 #include "common/util/file_util.hpp"
 #include "common/base/base_data.hpp"
@@ -367,10 +368,12 @@ bool TopIndexDialog::checkError() {
 
 void TopIndexDialog::updateMsg(std::string msg) {
   showInfo = msg.c_str();
-  ui->outputTextBrowser->setText(showInfo);
   QTextCursor cursor = ui->outputTextBrowser->textCursor();
+  int vertical_bar_pos = ui->outputTextBrowser->verticalScrollBar()->value();
+  ui->outputTextBrowser->setText(showInfo);
   cursor.movePosition(QTextCursor::End);
   ui->outputTextBrowser->setTextCursor(cursor);
+  ui->outputTextBrowser->verticalScrollBar()->setValue(vertical_bar_pos);
 }
 
 void TopIndexDialog::sleep(int wait) {
@@ -389,9 +392,7 @@ void TopIndexDialog::on_fixedModComboBox_currentIndexChanged(int index) {
     ui->fixedModFileButton->setEnabled(false);
   }
 }
-//void TopIndexDialog::on_errorToleranceEdit_textChanged(QString string) {
-  //QString currentText = ui->errorToleranceEdit_2->text();
-//}
+
 void TopIndexDialog::on_NONECheckBox_clicked(bool checked) {
   if (nterminalerror()) {
     ui->NONECheckBox->setChecked(true);

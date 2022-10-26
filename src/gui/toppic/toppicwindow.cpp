@@ -19,6 +19,7 @@
 #include <QCoreApplication>
 #include <QToolTip>
 #include <QDesktopServices>
+#include <QScrollBar>
 
 #include "common/util/version.hpp"
 #include "common/util/mem_check.hpp"
@@ -585,11 +586,12 @@ bool toppicWindow::checkError() {
 
 void toppicWindow::updateMsg(std::string msg) {
   showInfo = msg.c_str();
-  ui->outputTextBrowser->setText(showInfo);
   QTextCursor cursor = ui->outputTextBrowser->textCursor();
+  int vertical_bar_pos = ui->outputTextBrowser->verticalScrollBar()->value();
+  ui->outputTextBrowser->setText(showInfo);
   cursor.movePosition(QTextCursor::End);
   ui->outputTextBrowser->setTextCursor(cursor);
-  QString info = msg.c_str();
+  ui->outputTextBrowser->verticalScrollBar()->setValue(vertical_bar_pos);
 }
 
 void toppicWindow::showArguments() {
