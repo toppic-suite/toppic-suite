@@ -22,6 +22,7 @@
 #include <QMessageBox>
 #include <QCloseEvent>
 #include <QDesktopServices>
+#include <QScrollBar>
 
 #include "common/util/file_util.hpp"
 #include "common/base/base_data.hpp"
@@ -402,10 +403,12 @@ bool TopFDDialog::checkError() {
 
 void TopFDDialog::updateMsg(std::string msg) {
   showInfo = msg.c_str();
-  ui->outputTextBrowser->setText(showInfo);
   QTextCursor cursor = ui->outputTextBrowser->textCursor();
+  int vertical_bar_pos = ui->outputTextBrowser->verticalScrollBar()->value();
+  ui->outputTextBrowser->setText(showInfo);
   cursor.movePosition(QTextCursor::End);
   ui->outputTextBrowser->setTextCursor(cursor);
+  ui->outputTextBrowser->verticalScrollBar()->setValue(vertical_bar_pos);
 }
 
 void TopFDDialog::sleep(int wait) {
