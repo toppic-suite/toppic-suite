@@ -22,6 +22,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <sstream>
 
 #include "common/util/logger.hpp"
 #include "gui/util/run_exe.hpp"
@@ -43,13 +44,15 @@ std::string geneTopfdCommand(TopfdParaPtr para_ptr,
 #endif
 
   std::string command = exe_path;
-  command = command + "-a " + para_ptr->getActivation() + " ";
-  command = command + "-c " + std::to_string(para_ptr->getMaxCharge()) + " ";
-  command = command + "-m " + std::to_string(para_ptr->getMaxMass()) + " ";
-  command = command + "-t " + std::to_string(para_ptr->getMzError()) + " ";
-  command = command + "-r " + std::to_string(para_ptr->getMsOneSnRatio()) + " ";
-  command = command + "-s " + std::to_string(para_ptr->getMsTwoSnRatio()) + " ";
-  command = command + "-w " + std::to_string(para_ptr->getPrecWindow()) + " ";
+  std::stringstream oss;
+  oss << "-a " << para_ptr->getActivation() << " ";
+  oss << "-c " << para_ptr->getMaxCharge() << " ";
+  oss << "-m " << para_ptr->getMaxMass() << " ";
+  oss << "-t " << para_ptr->getMzError() << " ";
+  oss << "-r " << para_ptr->getMsOneSnRatio() << " ";
+  oss << "-s " << para_ptr->getMsTwoSnRatio() << " ";
+  oss <<  "-w " << para_ptr->getPrecWindow() << " ";
+  command = command + oss.str();
   if (para_ptr->isUseEnvCnn()) {
     command = command + "-n ";
   }

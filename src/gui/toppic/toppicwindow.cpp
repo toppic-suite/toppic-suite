@@ -52,25 +52,30 @@ toppicWindow::toppicWindow(QWidget *parent) :
       QRegExp rx3("^-?\\d{1,8}\\.\\d{0,2}$");
       QRegExpValidator *validator3 = new QRegExpValidator(rx3, this);
       ui->minModEdit->setValidator(validator3);
+
       QFont font;
-      QFont fontTable;
+      QFont outputFont;
+      QFont tableFont;
 #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
       font.setFamily(QStringLiteral("Calibri"));
-      fontTable.setFamily(QStringLiteral("Calibri"));
+      tableFont.setFamily(QStringLiteral("Calibri"));
+      outputFont.setFamily(QStringLiteral("Consolas"));
 #else
       font.setFamily(QStringLiteral("Monospace"));
-      fontTable.setFamily(QStringLiteral("Monospace"));
+      tableFont.setFamily(QStringLiteral("Monospace"));
+      outputFont.setFamily(QStringLiteral("Monospace"));
 #endif
       font.setPixelSize(12);
       QApplication::setFont(font);
-      ui->outputTextBrowser->setFont(font);
+      outputFont.setPixelSize(12);
+      ui->outputTextBrowser->setFont(outputFont);
+      tableFont.setPointSize(9);
+      ui->listWidget->setFont(tableFont);
+
       thread_ = new threadtoppic(this);
       showInfo = "";
       setToolTip("");
       setToolTipDuration(100);
-
-      fontTable.setPointSize(9);
-      ui->listWidget->setFont(fontTable);
 
       on_clearButton_clicked();
       on_defaultButton_clicked();
@@ -566,6 +571,7 @@ bool toppicWindow::checkError() {
                          QMessageBox::Yes);
     return true;
   }
+  /*
   if (ui->threadNumberEdit->text().toInt() > toppic::mem_check::getMaxThreads("toppic")) {
     int max_thread = toppic::mem_check::getMaxThreads("toppic");
     QMessageBox::StandardButton reply = QMessageBox::warning(this, tr("Warning"),
@@ -575,6 +581,7 @@ bool toppicWindow::checkError() {
       return true;
     }
   }
+  */
   if (ui->threadNumberEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
                          tr("Thread number is empty!"),

@@ -207,7 +207,7 @@ int process(TopfdParaPtr para_ptr,  std::vector<std::string> spec_file_lst) {
     para_ptr->setMs1ScanNumber(scan_cnt_vec[0]);
     para_ptr->setMs2ScanNumber(scan_cnt_vec[1]);
 
-    std::string print_str = para_ptr->getParaStr("");//print parameter for each file
+    std::string print_str = para_ptr->getParaStr("", " ");//print parameter for each file
     std::cout << print_str;
 
     if (isValidFile(spec_file_lst[k])) {

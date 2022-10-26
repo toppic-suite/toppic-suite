@@ -57,14 +57,18 @@ TopFDDialog::TopFDDialog(QWidget *parent) :
       QRegExpValidator *validator3 = new QRegExpValidator(rx3, this);
       ui->windowSizeEdit->setValidator(validator3);
       QFont font;
+      QFont outputFont;
 #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
       font.setFamily(QStringLiteral("Calibri"));
+      outputFont.setFamily(QStringLiteral("Consolas"));
 #else
       font.setFamily(QStringLiteral("Monospace"));
+      outputFont.setFamily(QStringLiteral("Monospace"));
 #endif
       font.setPixelSize(12);
+      outputFont.setPixelSize(12);
       QApplication::setFont(font);
-      ui->outputTextBrowser->setFont(font);
+      ui->outputTextBrowser->setFont(outputFont);
       thread_ = new ThreadTopFD(this);
       showInfo = "";
       TopFDDialog::on_defaultButton_clicked();
