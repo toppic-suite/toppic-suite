@@ -22,7 +22,7 @@
 #include "console/topmg_process.hpp"
 
 int main(int argc, char* argv[]) {
-  // toppic::log_level = 2;
+  toppic::logger::log_level = 5;
   std::cout << std::setprecision(10);
   toppic::TopmgArgument argu_processor;
   bool success = argu_processor.parse(argc, argv);

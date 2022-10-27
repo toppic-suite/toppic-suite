@@ -30,6 +30,7 @@ class TopDiffArgument {
   TopDiffArgument();
 
   static void outputArguments(std::ostream &output,
+                              const std::string &sep,
                               std::map<std::string, std::string> arguments);
 
   bool parse(int argc, char* argv[]);
