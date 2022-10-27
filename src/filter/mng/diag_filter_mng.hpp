@@ -15,6 +15,8 @@
 #ifndef TOPPIC_FILTER_MNG_DIAG_FILTER_MNG_HPP_
 #define TOPPIC_FILTER_MNG_DIAG_FILTER_MNG_HPP_
 
+#include <boost/thread.hpp>
+
 #include "para/prsm_para.hpp"
 
 namespace toppic {
@@ -48,6 +50,11 @@ class DiagFilterMng {
   std::string residue_mod_file_name_;
 
   int var_num_;
+
+  // for counting spectra
+  int n_spec_block_ = 0;
+  boost::mutex mutex_;
+  std::vector<int> cnts_;
 
   // file name vector
   std::vector<std::string> multi_ptm_file_vec_{"multi_ptm_index"};

@@ -31,7 +31,7 @@ namespace toppic {
 boost::mutex diag_filter_mutex;
 
 DiagFilter::DiagFilter(const ProteoformPtrVec &proteo_ptrs,
-                               DiagFilterMngPtr mng_ptr, std::string block_str) {
+                       DiagFilterMngPtr mng_ptr, std::string block_str) {
   mng_ptr_ = mng_ptr;
   proteo_ptrs_ = proteo_ptrs;
   PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;

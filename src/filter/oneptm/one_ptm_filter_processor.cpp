@@ -91,7 +91,7 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
       }
     }
 
-    mng_ptr->cnts_[block_idx] = mng_ptr->cnts_[block_idx] + 1;
+    mng_ptr->cnts_[block_idx] = mng_ptr->cnts_[block_idx] + group_spec_num;
     int cnt_sum = 0; 
     for (size_t i = 0; i < mng_ptr->cnts_.size(); i++) {
       cnt_sum = cnt_sum + mng_ptr->cnts_[i];
@@ -134,9 +134,6 @@ void process(OnePtmFilterMngPtr mng_ptr) {
     mod_mass_list = mod_util::getModMassVec(mod_util::readModTxt(mng_ptr->residueModFileName_)[2]);
   }
   int spec_num = msalign_util::getSpNum(prsm_para_ptr->getSpectrumFileName());
-  if (prsm_para_ptr->getGroupSpecNum() > 1){
-    spec_num = (int)(spec_num/2);
-  }
   mng_ptr->n_spec_block_ = spec_num * db_block_ptr_vec.size();
   SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(mng_ptr->thread_num_);
   int block_num = db_block_ptr_vec.size();
