@@ -155,7 +155,7 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
     std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));
 
     arguments["startTime"] = buf;
-    TopmgArgument::outputArguments(std::cout, arguments);
+    TopmgArgument::outputArguments(std::cout, " ", arguments);
 
     base_data::init();
 
