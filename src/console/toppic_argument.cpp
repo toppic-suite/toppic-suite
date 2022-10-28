@@ -69,6 +69,7 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["useFeatureFile"] = "true";
   arguments["geneHTMLFolder"] = "true";
   arguments["keepDecoyResults"] = "false";
+  arguments["nTermLabelMass"] = "0";
   arguments["version"] = "";
   return arguments;
 }
@@ -514,7 +515,7 @@ bool ToppicArgument::validateArguments() {
       return false;
     }
   }
-  catch (int e) {
+  catch (const std::exception& ex) {
     LOG_ERROR("Maximum ptm mass " << max_ptm_mass << " should be a number.");
     return false;
   }
@@ -526,7 +527,8 @@ bool ToppicArgument::validateArguments() {
       LOG_ERROR("Mass error tolerance: " << mass_error_tole_value << " error! The value should be positive.");
       return false;
     }
-  } catch (int e) {
+  } 
+  catch (const std::exception& ex) {
     LOG_ERROR("Mass error tolerance: " << mass_error_tole_value << " should be a number.");
     return false;
   }
@@ -538,7 +540,8 @@ bool ToppicArgument::validateArguments() {
       LOG_ERROR("PrSM clustering error tolerance: " << form_error_tole_value << " error! The value should be positive.");
       return false;
     }
-  } catch (int e) {
+  } 
+  catch (const std::exception& ex) {
     LOG_ERROR("PrSM clustering error tolerance: " << form_error_tole_value << " should be a number.");
     return false;
   }
@@ -551,7 +554,8 @@ bool ToppicArgument::validateArguments() {
       LOG_ERROR("Spectrum-level cutoff value " << cutoff_spectral_value << " error! The value should be positive.");
       return false;
     }
-  } catch (int e) {
+  } 
+  catch (const std::exception& ex) {
     LOG_ERROR("Spectrum-level cutoff value " << cutoff_spectral_value << " should be a number.");
     return false;
   }
@@ -563,7 +567,8 @@ bool ToppicArgument::validateArguments() {
       LOG_ERROR("Proteoform-level cutoff value " << cutoff_proteoform_value << " error! The value should be positive.");
       return false;
     }
-  } catch (int e) {
+  } 
+  catch (const std::exception& ex) {
     LOG_ERROR("Proteoform-level cutoff value " << cutoff_proteoform_value << " should be a number.");
     return false;
   }
@@ -575,7 +580,8 @@ bool ToppicArgument::validateArguments() {
     if (!valid) {
       return false;
     }
-  } catch (int e) {
+  } 
+  catch (const std::exception& ex) {
     LOG_ERROR("Thread number " << thread_number << " should be a number.");
     return false;
   }
