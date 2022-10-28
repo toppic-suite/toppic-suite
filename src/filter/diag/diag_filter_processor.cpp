@@ -94,7 +94,6 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
 
     spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(reader_ptr, sp_para_ptr);
   }
-  std::cout << std::endl;
   writer_ptr->close();
 }
 
