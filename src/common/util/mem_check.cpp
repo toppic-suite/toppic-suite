@@ -39,9 +39,12 @@ std::map<std::string, double> memory_per_thread_list {
     {"topindex", 1.75},  
   // toppic memory requirement per thread: about 3.0 gb
     {"toppic", 3.5},
+  // toppic filter memory requirement per thread: about 3.0 gb
+    {"toppic_filter", 3.5},
+  // diag filter memory requirement per thread: about 1.5 gb
+    {"diag_filter", 1.75},
     {"topmg", 4}, 
     {"topdiff", 4},
-    {"toppic_filter", 3.5},
     {"topmerge", 4} 
 };
 

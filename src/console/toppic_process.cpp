@@ -192,7 +192,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
       filter_thread_num = thread_num;
     }
     LOG_DEBUG("Filter thread number " << filter_thread_num);
-    int diag_filter_thread_num = filter_thread_num * 2;
+    int diag_filter_thread_num = mem_check::getMaxThreads("diag_filter");
     if (diag_filter_thread_num > thread_num) {
       diag_filter_thread_num = thread_num;
     }
