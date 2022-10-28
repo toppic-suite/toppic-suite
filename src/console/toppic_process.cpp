@@ -192,6 +192,10 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
       filter_thread_num = thread_num;
     }
     LOG_DEBUG("Filter thread number " << filter_thread_num);
+    int diag_filter_thread_num = filter_thread_num * 2;
+    if (diag_filter_thread_num > thread_num) {
+      diag_filter_thread_num = thread_num;
+    }
 
     bool use_gf = true;
     if (arguments["useLookupTable"] == "true") {
@@ -218,6 +222,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
 
     std::vector<std::string> input_exts;
 
+    /*
     std::cout << "Non PTM filtering - started." << std::endl;
     ZeroPtmFilterMngPtr zero_filter_mng_ptr
         = std::make_shared<ZeroPtmFilterMng>(prsm_para_ptr, index_file_para, 
@@ -263,13 +268,14 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
       input_exts.push_back("toppic_one_ptm_suffix");
       input_exts.push_back("toppic_one_ptm_internal");
     }
+    */
 
     if (ptm_num >= 2) {
       std::cout << "Multiple PTM filtering - started." << std::endl;
       // thread number is used because diagonal filter uses only one index
       DiagFilterMngPtr diag_filter_mng_ptr
           = std::make_shared<DiagFilterMng>(prsm_para_ptr, index_file_para,  
-                                            filter_result_num, thread_num, 
+                                            filter_result_num, diag_filter_thread_num, 
                                             "toppic_multi_filter");
       DiagFilterProcessorPtr diag_filter_processor
           = std::make_shared<DiagFilterProcessor>(diag_filter_mng_ptr);
