@@ -9,7 +9,7 @@ SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../bin)
 
 SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/../lib)
 
-SET(CMAKE_INSTALL_PREFIX ${HOME}/toppic)
+SET(CMAKE_INSTALL_PREFIX $ENV{HOME}/toppic)
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   # Linux specific code
@@ -237,15 +237,15 @@ add_executable(topdiff
 
 add_executable(topdiff_gui ${TOPDIFF_GUI_SRCS} ${GUI_UTIL_SRCS})
 
-add_executable(topmerge ${TOPMERGE_CONSOLE_SRCS} ${TOPMERGE_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS} 
-  ${TOPMERGE_SEARCH_SRCS} ${SEQ_SRCS} ${PARA_SRCS} ${SPEC_SRCS} ${LOCAL_SRCS} ${PRSM_SRCS} ${VISUAL_SRCS}) 
+#add_executable(topmerge ${TOPMERGE_CONSOLE_SRCS} ${TOPMERGE_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS} 
+#  ${TOPMERGE_SEARCH_SRCS} ${SEQ_SRCS} ${PARA_SRCS} ${SPEC_SRCS} ${LOCAL_SRCS} ${PRSM_SRCS} ${VISUAL_SRCS}) 
   
-add_executable(topmerge_gui ${TOPMERGE_GUI_SRCS} ${TOPMERGE_GUI_QRC} 
-  ${TOPMERGE_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS} ${TOPMERGE_SEARCH_SRCS}
-  ${SEQ_SRCS} ${PARA_SRCS} ${SPEC_SRCS} ${LOCAL_SRCS} ${PRSM_SRCS} ${VISUAL_SRCS} ${GUI_UTIL_SRCS}) 
+#add_executable(topmerge_gui ${TOPMERGE_GUI_SRCS} ${TOPMERGE_GUI_QRC} 
+#  ${TOPMERGE_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS} ${TOPMERGE_SEARCH_SRCS}
+#  ${SEQ_SRCS} ${PARA_SRCS} ${SPEC_SRCS} ${LOCAL_SRCS} ${PRSM_SRCS} ${VISUAL_SRCS} ${GUI_UTIL_SRCS}) 
 
-add_executable(topconvert ${TOPCONVERT_SRCS} ${HTS_SRCS} ${COMMON_SRCS} 
-  ${SEQ_SRCS} ${PARA_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS} ${PRSM_SRCS} ${TOPCONVERT_SEARCH_SRCS})
+#add_executable(topconvert ${TOPCONVERT_SRCS} ${HTS_SRCS} ${COMMON_SRCS} 
+#  ${SEQ_SRCS} ${PARA_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS} ${PRSM_SRCS} ${TOPCONVERT_SEARCH_SRCS})
 
 
 #add_executable(toppic_test 
@@ -357,14 +357,14 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
   target_link_libraries(topindex_gui Qt5Widgets Qt5Core Qt5Gui
     xerces-c boost_program_options boost_filesystem boost_serialization boost_system boost_thread boost_iostreams pthread z)
-  target_link_libraries(topmerge xerces-c boost_program_options
-    boost_filesystem boost_system boost_serialization boost_thread pthread z)
+  #target_link_libraries(topmerge xerces-c boost_program_options
+  #  boost_filesystem boost_system boost_serialization boost_thread pthread z)
 
-  target_link_libraries(topmerge_gui Qt5Widgets Qt5Core Qt5Gui
-    xerces-c boost_program_options boost_filesystem boost_serialization boost_system boost_thread boost_iostreams pthread z)  
+  #target_link_libraries(topmerge_gui Qt5Widgets Qt5Core Qt5Gui
+  #  xerces-c boost_program_options boost_filesystem boost_serialization boost_system boost_thread boost_iostreams pthread z)  
 
-  target_link_libraries(topconvert xerces-c boost_program_options
-    boost_filesystem boost_system boost_thread pthread z)
+  #target_link_libraries(topconvert xerces-c boost_program_options
+  #  boost_filesystem boost_system boost_thread pthread z)
 
 
   #    target_link_libraries(toppic_test xerces-c boost_program_options
@@ -377,7 +377,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   #        boost_filesystem boost_system boost_thread boost_iostreams boost_chrono pthread z)
 
   #file(MAKE_DIRECTORY ${CMAKE_INSTALL_PREFIX}/usr/bin)
-install (TARGETS topfd toppic topmg topdiff topindex topmerge DESTINATION ${CMAKE_INSTALL_PREFIX}/usr/bin/)
+install (TARGETS topfd toppic topmg topdiff topindex DESTINATION ${CMAKE_INSTALL_PREFIX}/usr/bin/)
 install (DIRECTORY toppic_resources/ DESTINATION ${CMAKE_INSTALL_PREFIX}/etc/toppic)
 
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
