@@ -4,7 +4,7 @@ For manual and reference, please visit https://www.toppic.org/software/toppic/
 
 ## System requirements
 
-* GCC version higher than 4.8.2 for C++11 support
+* GCC version higher than 5.5.0 for C++14 support
 * CMake (>= 3.1)
 
 ### Linux (Ubuntu):
@@ -14,16 +14,11 @@ For manual and reference, please visit https://www.toppic.org/software/toppic/
 sudo apt-get install build-essential cmake
 
 # install other dependencies
-sudo apt-get install zlib1g-dev \
-                     libxerces-c-dev \ 
-                     libboost-filesystem-dev \
-                     libboost-program-options-dev \
-                     libboost-system-dev \
-                     libboost-thread-dev \
-                     libboost-iostreams-dev \
-                     libboost-chrono-dev \
-                     libeigen3-dev \
-                     nlohmann-json3-dev
+sudo apt-get install zlib1g-dev 
+sudo apt-get install libxerces-c-dev  
+sudo apt-get install libboost-filesystem-dev libboost-program-options-dev libboost-system-dev libboost-thread-dev libboost-iostreams-dev libboost-chrono-dev 
+sudo apt-get install libeigen3-dev 
+sudo apt-get install nlohmann-json3-dev
 
 
 # install the catch unit test framework (https://github.com/philsquared/Catch)

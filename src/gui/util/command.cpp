@@ -12,35 +12,25 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
-#include <windows.h> 
-#include <tchar.h>
-#include <strsafe.h>
-#else
-#include <array>
-#endif
-
-#include <algorithm>
 #include <iostream>
 #include <sstream>
 
 #include "common/util/logger.hpp"
-#include "gui/util/run_exe.hpp"
+#include "gui/util/command.hpp"
 
 
 namespace toppic {
 
-namespace run_exe {
+namespace command {
 
 /*function for topfd*/ 
 std::string geneTopfdCommand(TopfdParaPtr para_ptr, 
-                             const std::vector<std::string> spec_file_lst, 
-                             std::string app_name) {
+                             const std::vector<std::string> spec_file_lst) { 
 
 #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
-  std::string exe_path = para_ptr->getExeDir() + "\\" + app_name + ".exe ";
+  std::string exe_path = para_ptr->getExeDir() + "\\" + "topfd.exe ";
 #else
-  std::string exe_path = para_ptr->getExeDir() + "/" + app_name + " ";
+  std::string exe_path = para_ptr->getExeDir() + "/" + "topfd ";
 #endif
 
   std::string command = exe_path;
@@ -82,12 +72,12 @@ std::map<std::string, std::string> topindex_para {
 
 
 /*function for topindex*/
-std::string geneTopIndexCommand(std::map<std::string, std::string> arguments_, 
-                                std::string app_name) {
+std::string geneTopIndexCommand(std::map<std::string, 
+                                std::string> arguments_) {
   #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
-  std::string exe_path = arguments_["executiveDir"] + "\\" + app_name + ".exe ";
+  std::string exe_path = arguments_["executiveDir"] + "\\" + "topindex.exe ";
   #else
-  std::string exe_path = arguments_["executiveDir"] + "/" + app_name + " ";
+  std::string exe_path = arguments_["executiveDir"] + "/" + "topindex ";
   #endif
 
   std::string command = exe_path;
@@ -139,12 +129,11 @@ std::map<std::string, std::string> toppic_para {
 };
 
 std::string geneToppicCommand(std::map<std::string, std::string> arguments_, 
-                              std::vector<std::string> spec_file_lst_, 
-                              std::string app_name) {
+                              std::vector<std::string> spec_file_lst_) { 
   #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
-  std::string exe_path = arguments_["executiveDir"] + "\\" + app_name + ".exe ";
+  std::string exe_path = arguments_["executiveDir"] + "\\" + "toppic.exe ";
   #else
-  std::string exe_path = arguments_["executiveDir"] + "/" + app_name + " ";
+  std::string exe_path = arguments_["executiveDir"] + "/" + "toppic ";
   #endif
 
   std::string command = exe_path;
@@ -192,7 +181,7 @@ std::string geneToppicCommand(std::map<std::string, std::string> arguments_,
       }
     }
     else {//parameter is not found anywhere
-      LOG_DEBUG("Parameter " << it->first << " from " << app_name << " was not found in any apps!");
+      LOG_DEBUG("Parameter " << it->first << " from toppic was not found in any apps!");
     }
   }  
   command = command + arguments_["oriDatabaseFileName"] + " ";
@@ -231,12 +220,11 @@ std::map<std::string, std::string> topmg_para {
 };
 
 std::string geneTopmgCommand(std::map<std::string, std::string> arguments_, 
-                             std::vector<std::string> spec_file_lst_, 
-                             std::string app_name) {
+                             std::vector<std::string> spec_file_lst_) { 
   #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
-  std::string exe_path = arguments_["executiveDir"] + "\\" + app_name + ".exe ";
+  std::string exe_path = arguments_["executiveDir"] + "\\" + "topmg.exe ";
   #else
-  std::string exe_path = arguments_["executiveDir"] + "/" + app_name + " ";
+  std::string exe_path = arguments_["executiveDir"] + "/" + "topmg ";
   #endif
 
   std::string command = exe_path;
@@ -281,7 +269,7 @@ std::string geneTopmgCommand(std::map<std::string, std::string> arguments_,
       }
     }
     else {//parameter is not found anywhere
-      LOG_DEBUG("Parameter " << it->first << " from " << app_name << " was not found in any apps!");
+      LOG_DEBUG("Parameter " << it->first << " from topmg was not found in any apps!");
     }
   }  
   command = command + arguments_["oriDatabaseFileName"] + " ";
@@ -301,126 +289,27 @@ std::map<std::string, std::string> topdiff_para {
 
 // function for topdiff
 std::string geneTopDiffCommand(std::map<std::string, std::string> arguments_, 
-                               std::vector<std::string> spec_file_lst_, 
-                               std::string app_name) {
+                               std::vector<std::string> spec_file_lst_) { 
   #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
-  std::string exe_path = arguments_["executiveDir"] + "\\" + app_name + ".exe ";
+  std::string exe_path = arguments_["executiveDir"] + "\\" + "topdiff.exe ";
   #else
-  std::string exe_path = arguments_["executiveDir"] + "/" + app_name + " ";
+  std::string exe_path = arguments_["executiveDir"] + "/" + "topdiff ";
   #endif
 
   std::string command = exe_path;
 
   for (std::map<std::string, std::string>::iterator it = arguments_.begin(); it != arguments_.end(); ++it) {
-    if (app_name == "topdiff" && topdiff_para.find(it->first) != topdiff_para.end()) {
+    if (topdiff_para.find(it->first) != topdiff_para.end()) {
       command = command + topdiff_para[it->first] + it->second + " ";
     }
     else {//parameter is not found anywhere
-      LOG_DEBUG("Parameter " << it->first << " from " << app_name << " was not found in any apps!");
+      LOG_DEBUG("Parameter " << it->first << " from topdiff was not found in any apps!");
     }
   }  
   for (size_t i = 0; i < spec_file_lst_.size(); i++) {
     command = command + spec_file_lst_[i] + " ";
   }
   return command;
-};
-
-void startJob() {
-  #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
-  HANDLE hJob = CreateJobObject( NULL, NULL );
-  if ( hJob == NULL ) {
-    std::cout << "CreateJobObject failed: error " << GetLastError() << std::endl;
-    return;
-  }
-
-  JOBOBJECT_EXTENDED_LIMIT_INFORMATION jeli = { 0 };
-  jeli.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
-  bool bSuccess = SetInformationJobObject( hJob, JobObjectExtendedLimitInformation, &jeli, sizeof( jeli ) );
-  if ( bSuccess == 0 ) {
-    std::cout << "SetInformationJobObject failed: error " << GetLastError() << std::endl;
-    return;
-  }
-  bSuccess = AssignProcessToJobObject(hJob, GetCurrentProcess());
-  if ( bSuccess == 0) {
-     std::cout << "AssignProcessToJobObject failed!" << std::endl;
-     return;
-  }
-  #endif
-}
-
-void run(std::string command) {
-  std::cout << command << std::endl;
-  #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
-  HANDLE g_hChildStd_IN_Rd = NULL;
-  HANDLE g_hChildStd_IN_Wr = NULL;
-  HANDLE g_hChildStd_OUT_Rd = NULL;
-  HANDLE g_hChildStd_OUT_Wr = NULL;
-
-  SECURITY_ATTRIBUTES saAttr; 
-
-  //Set the bInheritHandle flag so pipe handles are inherited. 
-  saAttr.nLength = sizeof(SECURITY_ATTRIBUTES); 
-  saAttr.bInheritHandle = TRUE; 
-  saAttr.lpSecurityDescriptor = NULL; 
-
-  CreatePipe(&g_hChildStd_OUT_Rd, &g_hChildStd_OUT_Wr, &saAttr, 0);
-  CreatePipe(&g_hChildStd_IN_Rd, &g_hChildStd_IN_Wr, &saAttr, 0);
-
-  SetHandleInformation(g_hChildStd_OUT_Rd, HANDLE_FLAG_INHERIT, 0);
-  SetHandleInformation(g_hChildStd_IN_Wr, HANDLE_FLAG_INHERIT, 0);
-
-  PROCESS_INFORMATION piProcInfo; 
-  STARTUPINFO siStartInfo;
-  BOOL bSuccess = FALSE; 
- 
-  ZeroMemory( &piProcInfo, sizeof(PROCESS_INFORMATION) );
-  ZeroMemory( &siStartInfo, sizeof(STARTUPINFO));
-
-  siStartInfo.cb = sizeof(STARTUPINFO); 
-  siStartInfo.hStdError = g_hChildStd_OUT_Wr;
-  siStartInfo.hStdOutput = g_hChildStd_OUT_Wr;
-  siStartInfo.hStdInput = g_hChildStd_IN_Rd;
-  siStartInfo.dwFlags |= STARTF_USESTDHANDLES;
- 
-  //Create the child process. 
-  bSuccess = CreateProcess(NULL, command.c_str(), NULL, NULL, 
-                           TRUE, CREATE_NO_WINDOW, NULL, NULL, 
-                           &siStartInfo, &piProcInfo);  // receives PROCESS_INFORMATION 
-
-  if (!bSuccess ) {
-    std::cout << "error occured" << std::endl;
-    std::cout << "command: " << command << std::endl;
-    return;
-  }
-  else {
-    CloseHandle(piProcInfo.hProcess);
-    CloseHandle(piProcInfo.hThread);
-    CloseHandle(g_hChildStd_OUT_Wr);
-    CloseHandle(g_hChildStd_IN_Rd);
-  }   
-  DWORD dwRead, dwWritten; 
-  CHAR buf[4096]; 
-  BOOL readSuccess = FALSE;
-  HANDLE hParentStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
-  bSuccess = ReadFile( g_hChildStd_OUT_Rd, buf, 4096, &dwRead, NULL);
-  std::ios::sync_with_stdio(true);
-  while (bSuccess == TRUE) {
-    buf[dwRead] = '\0';
-    OutputDebugStringA(buf);
-    std::cout << buf;
-    bSuccess = ReadFile(g_hChildStd_OUT_Rd, buf, 1024, &dwRead, NULL);
-  }
-  #else
-    char buf[4096]; 
-    FILE* pipe = popen(command.c_str(), "r");
-    if (!pipe) {
-      LOG_ERROR("Error occured when opening pipe");
-    }
-    while (fgets(buf, 4096, pipe) != NULL) {
-        std::cout << buf;
-    }
-    pclose(pipe);
-  #endif
 };
 
 }

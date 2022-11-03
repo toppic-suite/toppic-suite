@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef GUI_RUN_EXE_HPP
-#define GUI_RUN_EXE_HPP
+#ifndef GUI_UTIL_COMMAND_HPP
+#define GUI_UTIL_COMMAND_HPP
 
 #include <vector>
 #include <map>
@@ -23,30 +23,21 @@
 
 namespace toppic {
 
-namespace run_exe {
+namespace command {
 
 std::string geneTopfdCommand(TopfdParaPtr para_ptr,
-                             std::vector<std::string> spec_file_lst,  
-                             std::string app_name);
+                             std::vector<std::string> spec_file_lst);  
 
-std::string geneTopIndexCommand(std::map<std::string, std::string> arguments_, 
-                                std::string app_name);
+std::string geneTopIndexCommand(std::map<std::string, std::string> arguments_); 
 
 std::string geneToppicCommand(std::map<std::string, std::string> arguments_, 
-                              std::vector<std::string> spec_file_lst_, 
-                              std::string app_name);
+                              std::vector<std::string> spec_file_lst_); 
 
 std::string geneTopmgCommand(std::map<std::string, std::string> arguments_, 
-                              std::vector<std::string> spec_file_lst_, 
-                              std::string app_name);
+                              std::vector<std::string> spec_file_lst_); 
 
 std::string geneTopDiffCommand(std::map<std::string, std::string> arguments_, 
-                               std::vector<std::string> spec_file_lst_, 
-                               std::string app_name);
-
-void startJob();
-
-void run(std::string command); 
+                               std::vector<std::string> spec_file_lst_); 
 
 }
 }
