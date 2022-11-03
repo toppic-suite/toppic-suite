@@ -19,6 +19,7 @@
 #include <string>
 
 #include <QMainWindow>
+#include <QProcess>
 
 #include "topfd/common/topfd_para.hpp"
 #include "gui/topfd/threadtopfd.hpp"
@@ -52,18 +53,14 @@ private slots:
 private:
   QString lastDir_;
 
-  int percentage_;
-
-  //std::map<std::string, std::string> arguments_;
   toppic::TopfdParaPtr para_ptr_;
 
   std::vector<std::string> spec_file_lst_;
 
+  QProcess process_;
+
   Ui::TopFDDialog *ui;
 
-  //void initArguments();
-
-  //std::map<std::string, std::string> getArguments();
   toppic::TopfdParaPtr getParaPtr();
 
   std::vector<std::string> getSpecFileList();

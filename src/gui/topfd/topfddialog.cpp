@@ -23,12 +23,14 @@
 #include <QCloseEvent>
 #include <QDesktopServices>
 #include <QScrollBar>
+#include <QProcess>
 
 #include "common/util/file_util.hpp"
 #include "common/base/base_data.hpp"
 #include "common/util/version.hpp"
 #include "common/util/mem_check.hpp"
 
+#include "gui/util/run_exe.hpp"
 #include "gui/topfd/ui_topfddialog.h"
 #include "gui/topfd/threadtopfd.hpp"
 #include "gui/topfd/topfddialog.hpp"
@@ -42,7 +44,6 @@ TopFDDialog::TopFDDialog(QWidget *parent) :
       QString qstr = QString::fromStdString(title);
       this->setWindowTitle(qstr);
       lastDir_ = ".";
-      percentage_ = 0;
       ui->maxChargeEdit->setValidator(new QIntValidator(1, 100, this));
       ui->maxMassEdit->setValidator(new QIntValidator(1, 1000000, this));
       QRegExp rx1("^0\\.[0]\\d{0,2}[1-9]|0.1$");
@@ -81,14 +82,18 @@ TopFDDialog::~TopFDDialog() {
 }
 
 void TopFDDialog::closeEvent(QCloseEvent *event) {
-  if (thread_->isRunning()) {
+  if(process_.state()!=QProcess::NotRunning) {
+  //if (thread_->isRunning()) {
     if (!continueToClose()) {
       event->ignore();
       return;
     }
+    else {
+      process_.kill();
+    }
   }
-  thread_->terminate();
-  thread_->wait();
+  //thread_->terminate();
+  //thread_->wait();
   event->accept();
   return;
 }
@@ -189,24 +194,87 @@ void TopFDDialog::on_delButton_clicked() {
 }
 
 void TopFDDialog::on_startButton_clicked() {
-  std::stringstream buffer;
+  /*
   std::streambuf *oldbuf = std::cout.rdbuf(buffer.rdbuf());
   if (checkError()) {
     return;
   }
+  */
   lockDialog();
   ui->outputTextBrowser->setText(showInfo);
   toppic::TopfdParaPtr para_ptr = this->getParaPtr();
   std::vector<std::string> spec_file_lst = this->getSpecFileList();
-  thread_->setPar(para_ptr, spec_file_lst);
-  thread_->start();
+  std::string cmd = toppic::run_exe::geneTopfdCommand(para_ptr_, spec_file_lst_, "topfd");
 
+
+  
+  QString q_cmd = QString::fromStdString(cmd);
+  q_cmd = q_cmd.trimmed();
+  QStringList cmd_list = q_cmd.split(" ");
+  QString prog = cmd_list[0];
+  cmd_list.removeFirst();
+  //QStringList args;
+  process_.start(prog, cmd_list); 
+  process_.waitForStarted();
+
+  std::stringstream buffer;
   std::string info;
   int processed_len = 0;
   std::string processed_lines = ""; 
   std::string current_line = "";
   unsigned cursor_pos = 0;
   bool finish = false;
+  while (true) {
+    process_.waitForReadyRead();
+    QByteArray byteArray = process_.readAllStandardOutput();
+    QString str = QString(byteArray); 
+    buffer << str.toStdString();
+    //ui->outputTextBrowser->append(str);
+    if(process_.state()==QProcess::NotRunning) {
+      //ui->outputTextBrowser->append("not running");
+      finish = true;
+    }
+    // Here is the infomation been shown in the infoBox.
+    info = buffer.str();
+    std::string new_info = info.substr(processed_len);
+    processed_len = info.length();
+    
+    if (new_info.size() > 0) {
+      for (unsigned i = 0; i < new_info.size(); i++) {
+        // new line
+        if (new_info.at(i) == '\n') {
+          processed_lines = processed_lines + current_line + '\n';
+          current_line = "";
+          cursor_pos = 0;
+        }
+        // CF
+        if (new_info.at(i) == '\r') {
+          cursor_pos = 0;
+        }
+        // add a new charactor
+        if (new_info.at(i) != '\n' && new_info.at(i) != '\r') {
+          if (cursor_pos < current_line.length()) {
+            current_line[cursor_pos] = new_info.at(i);
+          }
+          else {
+            current_line = current_line + new_info.at(i);
+          }
+          cursor_pos++;
+        }
+      }
+      updateMsg(processed_lines + current_line);
+    }
+    if (finish) {
+      break;
+    }
+    sleep(100);
+  }
+  unlockDialog();
+  /*
+  
+  thread_->setPar(para_ptr, spec_file_lst);
+  thread_->start();
+
 
   while (true) {
     if (thread_->isFinished()) {
@@ -251,6 +319,7 @@ void TopFDDialog::on_startButton_clicked() {
   showInfo = "";
   thread_->exit();
   std::cout.rdbuf(oldbuf);
+  */
 }
 
 void TopFDDialog::on_exitButton_clicked() {
