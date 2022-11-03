@@ -16,6 +16,7 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <iostream>
 
 #include <QFileDialog>
 #include <QElapsedTimer>
@@ -24,15 +25,15 @@
 #include <QDesktopServices>
 #include <QScrollBar>
 #include <QProcess>
+#include <QDebug>
 
 #include "common/util/file_util.hpp"
-#include "common/base/base_data.hpp"
 #include "common/util/version.hpp"
 #include "common/util/mem_check.hpp"
 
-#include "gui/util/run_exe.hpp"
+#include "gui/util/command.hpp"
+#include "gui/util/gui_message.hpp"
 #include "gui/topfd/ui_topfddialog.h"
-#include "gui/topfd/threadtopfd.hpp"
 #include "gui/topfd/topfddialog.hpp"
 
 TopFDDialog::TopFDDialog(QWidget *parent) :
@@ -70,20 +71,18 @@ TopFDDialog::TopFDDialog(QWidget *parent) :
       outputFont.setPixelSize(12);
       QApplication::setFont(font);
       ui->outputTextBrowser->setFont(outputFont);
-      thread_ = new ThreadTopFD(this);
-      showInfo = "";
       TopFDDialog::on_defaultButton_clicked();
     }
 
 TopFDDialog::~TopFDDialog() {
-  thread_->terminate();
-  thread_->wait();
+  if(process_.state()!=QProcess::NotRunning) {
+    process_.kill();
+  }
   delete ui;
 }
 
 void TopFDDialog::closeEvent(QCloseEvent *event) {
   if(process_.state()!=QProcess::NotRunning) {
-  //if (thread_->isRunning()) {
     if (!continueToClose()) {
       event->ignore();
       return;
@@ -92,8 +91,6 @@ void TopFDDialog::closeEvent(QCloseEvent *event) {
       process_.kill();
     }
   }
-  //thread_->terminate();
-  //thread_->wait();
   event->accept();
   return;
 }
@@ -106,19 +103,6 @@ void TopFDDialog::on_clearButton_clicked() {
 }
 
 void TopFDDialog::on_defaultButton_clicked() {
-  /*
-  ui->maxChargeEdit->setText("30");
-  ui->maxMassEdit->setText("70000");
-  ui->mzErrorEdit->setText("0.02");
-  ui->ms1snRatioEdit->setText("3.0");
-  ui->ms2snRatioEdit->setText("1.0");
-  ui->windowSizeEdit->setText("3.0");
-  ui->threadNumberEdit->setText("1");
-  ui->envCNNCheckBox->setChecked(false);
-  ui->missLevelOneCheckBox->setChecked(false);
-  ui->geneHTMLCheckBox->setChecked(true);
-  ui->finalFilteringCheckBox->setChecked(false);
-  */
   // default para_ptr
   toppic::TopfdParaPtr para_ptr = std::make_shared<toppic::TopfdPara>();
   ui->maxChargeEdit->setText(QString::number(para_ptr->getMaxCharge()));
@@ -194,132 +178,41 @@ void TopFDDialog::on_delButton_clicked() {
 }
 
 void TopFDDialog::on_startButton_clicked() {
-  /*
-  std::streambuf *oldbuf = std::cout.rdbuf(buffer.rdbuf());
-  if (checkError()) {
-    return;
-  }
-  */
   lockDialog();
-  ui->outputTextBrowser->setText(showInfo);
-  toppic::TopfdParaPtr para_ptr = this->getParaPtr();
-  std::vector<std::string> spec_file_lst = this->getSpecFileList();
-  std::string cmd = toppic::run_exe::geneTopfdCommand(para_ptr_, spec_file_lst_, "topfd");
+  toppic::TopfdParaPtr paraPtr = this->getParaPtr();
+  std::vector<std::string> specFileList = this->getSpecFileList();
 
-
-  
+  std::string cmd = toppic::command::geneTopfdCommand(para_ptr_, spec_file_lst_);
   QString q_cmd = QString::fromStdString(cmd);
   q_cmd = q_cmd.trimmed();
   QStringList cmd_list = q_cmd.split(" ");
   QString prog = cmd_list[0];
   cmd_list.removeFirst();
-  //QStringList args;
-  process_.start(prog, cmd_list); 
+
+  //qDebug() << "start process ";
+  process_.start(prog, cmd_list);
   process_.waitForStarted();
+  //qDebug() << "start process finished";
 
-  std::stringstream buffer;
-  std::string info;
-  int processed_len = 0;
-  std::string processed_lines = ""; 
-  std::string current_line = "";
-  unsigned cursor_pos = 0;
+  toppic::GuiMessage guiMsg;
   bool finish = false;
-  while (true) {
-    process_.waitForReadyRead();
-    QByteArray byteArray = process_.readAllStandardOutput();
-    QString str = QString(byteArray); 
-    buffer << str.toStdString();
-    //ui->outputTextBrowser->append(str);
+  while (!finish) {
     if(process_.state()==QProcess::NotRunning) {
-      //ui->outputTextBrowser->append("not running");
       finish = true;
     }
-    // Here is the infomation been shown in the infoBox.
-    info = buffer.str();
-    std::string new_info = info.substr(processed_len);
-    processed_len = info.length();
-    
-    if (new_info.size() > 0) {
-      for (unsigned i = 0; i < new_info.size(); i++) {
-        // new line
-        if (new_info.at(i) == '\n') {
-          processed_lines = processed_lines + current_line + '\n';
-          current_line = "";
-          cursor_pos = 0;
-        }
-        // CF
-        if (new_info.at(i) == '\r') {
-          cursor_pos = 0;
-        }
-        // add a new charactor
-        if (new_info.at(i) != '\n' && new_info.at(i) != '\r') {
-          if (cursor_pos < current_line.length()) {
-            current_line[cursor_pos] = new_info.at(i);
-          }
-          else {
-            current_line = current_line + new_info.at(i);
-          }
-          cursor_pos++;
-        }
+    bool ready = process_.waitForReadyRead(100);
+    if (ready || finish) {
+      //qDebug() << "read finished";
+      QByteArray byteArray = process_.readAllStandardOutput();
+      QString str = QString(byteArray);
+      std::string msg = guiMsg.getMsg(str.toStdString());
+      if (msg != "") {
+        updateMsg(msg); 
       }
-      updateMsg(processed_lines + current_line);
-    }
-    if (finish) {
-      break;
     }
     sleep(100);
   }
   unlockDialog();
-  /*
-  
-  thread_->setPar(para_ptr, spec_file_lst);
-  thread_->start();
-
-
-  while (true) {
-    if (thread_->isFinished()) {
-      finish = true;
-    }
-    // Here is the infomation been shown in the infoBox.
-    info = buffer.str();
-    std::string new_info = info.substr(processed_len);
-    processed_len = info.length();
-    
-    if (new_info.size() > 0) {
-      for (unsigned i = 0; i < new_info.size(); i++) {
-        // new line
-        if (new_info.at(i) == '\n') {
-          processed_lines = processed_lines + current_line + '\n';
-          current_line = "";
-          cursor_pos = 0;
-        }
-        // CF
-        if (new_info.at(i) == '\r') {
-          cursor_pos = 0;
-        }
-        // add a new charactor
-        if (new_info.at(i) != '\n' && new_info.at(i) != '\r') {
-          if (cursor_pos < current_line.length()) {
-            current_line[cursor_pos] = new_info.at(i);
-          }
-          else {
-            current_line = current_line + new_info.at(i);
-          }
-          cursor_pos++;
-        }
-      }
-      updateMsg(processed_lines + current_line);
-    }
-    if (finish) {
-      break;
-    }
-    sleep(100);
-  }
-  unlockDialog();
-  showInfo = "";
-  thread_->exit();
-  std::cout.rdbuf(oldbuf);
-  */
 }
 
 void TopFDDialog::on_exitButton_clicked() {
@@ -475,10 +368,10 @@ bool TopFDDialog::checkError() {
 }
 
 void TopFDDialog::updateMsg(std::string msg) {
-  showInfo = msg.c_str();
   QTextCursor cursor = ui->outputTextBrowser->textCursor();
   int vertical_bar_pos = ui->outputTextBrowser->verticalScrollBar()->value();
   int max_bar_pos = ui->outputTextBrowser->verticalScrollBar()->maximum();
+  QString showInfo = msg.c_str();
   ui->outputTextBrowser->setText(showInfo);
   cursor.movePosition(QTextCursor::End);
   ui->outputTextBrowser->setTextCursor(cursor);

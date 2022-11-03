@@ -22,7 +22,6 @@
 #include <QProcess>
 
 #include "topfd/common/topfd_para.hpp"
-#include "gui/topfd/threadtopfd.hpp"
 
 namespace Ui {
 class TopFDDialog;
@@ -76,10 +75,6 @@ private:
   void updatedir(QString s);
 
   void sleep(int wait);
-
-  ThreadTopFD* thread_;
-
-  QString showInfo;
 
   void closeEvent(QCloseEvent *event);
 
