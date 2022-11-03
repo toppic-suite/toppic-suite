@@ -12,13 +12,13 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include <QLocale>
 #include <QApplication>
+#include <QGuiApplication>
+#include <QScreen>
 #include <QFontDatabase>
 #include <QDesktopWidget>
 
-#include "gui/util/run_exe.hpp"
 #include "gui/topindex/topindexdialog.hpp"
 
 int main(int argc, char *argv[]) {
@@ -33,17 +33,14 @@ int main(int argc, char *argv[]) {
   QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
   toppic::run_exe::startJob();
 #endif
-  QApplication a(argc, argv);
+  QApplication app(argc, argv);
+
+  QScreen *screen = QGuiApplication::primaryScreen();
+  QRect deskRect = screen->availableGeometry();
 
   TopIndexDialog td;
-
-  QDesktopWidget *desk = QApplication::desktop();
-
-  QRect deskRect = desk->availableGeometry();
-
   td.show();
-
   td.move((deskRect.width() - td.width()) / 2, (deskRect.height() - td.height()) / 2);
 
-  return a.exec();
+  return app.exec();
 }

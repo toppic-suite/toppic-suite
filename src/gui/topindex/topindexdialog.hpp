@@ -19,8 +19,7 @@
 #include <string>
 
 #include <QMainWindow>
-
-#include "threadtopindex.hpp"
+#include <QProcess>
 
 namespace Ui {
 class TopIndexDialog;
@@ -63,15 +62,13 @@ private slots:
 private:
   QString lastDir_;
 
-  int percentage_;
-
   std::map<std::string, std::string> arguments_;
 
   std::vector<std::string> spec_file_lst_;
 
-  Ui::TopIndexDialog *ui;
+  QProcess process_;
 
-  //void initArguments();
+  Ui::TopIndexDialog *ui;
 
   std::map<std::string, std::string> getArguments();
 
@@ -88,10 +85,6 @@ private:
   void updatedir(QString s);
 
   void sleep(int wait);
-
-  ThreadTopIndex* thread_;
-
-  QString showInfo;
 
   void closeEvent(QCloseEvent *event);
 
