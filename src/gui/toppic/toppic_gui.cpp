@@ -12,34 +12,26 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include <QLocale>
 #include <QApplication>
+#include <QGuiApplication>
+#include <QScreen>
 #include <QDesktopWidget>
 
-#include "gui/util/run_exe.hpp"
 #include "gui/toppic/toppicwindow.hpp"
 
 int main(int argc, char *argv[]) {
   QLocale::setDefault(QLocale::c());
-#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
-  QFont font("Calibri");
-  font.setPointSize(12);
-  QApplication::setFont(font);
   QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-  toppic::run_exe::startJob();
-#endif
-  QApplication a(argc, argv);
 
-  toppicWindow w;
+  QApplication app(argc, argv);
 
-  QDesktopWidget *desk = QApplication::desktop();
+  QScreen *screen = QGuiApplication::primaryScreen();
+  QRect deskRect = screen->availableGeometry();
 
-  QRect deskRect = desk->availableGeometry();
+  ToppicWindow win;
+  win.show();
+  win.move((deskRect.width() - win.width()) / 2, (deskRect.height() - win.height()) / 2);
 
-  w.show();
-
-  w.move((deskRect.width() - w.width()) / 2, (deskRect.height() - w.height()) / 2);
-
-  return a.exec();
+  return app.exec();
 }

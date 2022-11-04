@@ -27,14 +27,15 @@
 
 #include "console/topdiff_argument.hpp"
 
+#include "gui/util/command.hpp"
+#include "gui/util/gui_message.hpp"
+
 #include "gui/topdiff/ui_topdiffdialog.h"
 #include "gui/topdiff/topdiffdialog.hpp"
-#include "gui/topdiff/threadtopdiff.hpp"
 
 TopDiffDialog::TopDiffDialog(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::TopDiffDialog) {
-      initArguments();
       ui->setupUi(this);
       std::string title = "TopDiff v." + toppic::Version::getVersion();
       QString qstr = QString::fromStdString(title);
@@ -55,32 +56,28 @@ TopDiffDialog::TopDiffDialog(QWidget *parent) :
       QApplication::setFont(font);
       ui->outputTextBrowser->setFont(outputFont);
 
-      thread_ = new ThreadTopDiff(this);
-      showInfo = "";
       TopDiffDialog::on_defaultButton_clicked();
     }
 
 TopDiffDialog::~TopDiffDialog() {
-  thread_->terminate();
-  thread_->wait();
+  if(process_.state()!=QProcess::NotRunning) {
+    process_.kill();
+  }
   delete ui;
 }
 
 void TopDiffDialog::closeEvent(QCloseEvent *event) {
-  if (thread_->isRunning()) {
+  if(process_.state()!=QProcess::NotRunning) {
     if (!continueToClose()) {
       event->ignore();
       return;
     }
+    else {
+      process_.kill();
+    }
   }
-  thread_->terminate();
-  thread_->wait();
   event->accept();
   return;
-}
-
-void TopDiffDialog::initArguments() {
-  arguments_ = toppic::TopDiffArgument::initArguments();
 }
 
 void TopDiffDialog::on_clearButton_clicked() {
@@ -153,68 +150,38 @@ void TopDiffDialog::on_delButton_clicked() {
 }
 
 void TopDiffDialog::on_startButton_clicked() {
-  std::stringstream buffer;
-  std::streambuf *oldbuf = std::cout.rdbuf(buffer.rdbuf());
-  if (checkError()) {
-    return;
-  }
   lockDialog();
-  ui->outputTextBrowser->setText(showInfo);
   std::map<std::string, std::string> argument = this->getArguments();
   std::vector<std::string> spec_file_lst = this->getSpecFileList();
-  thread_->setPar(argument, spec_file_lst);
-  thread_->start();
 
-  std::string info;
-  int processed_len = 0;
-  std::string processed_lines = ""; 
-  std::string current_line = "";
-  unsigned cursor_pos = 0;
+  std::string cmd = toppic::command::geneTopDiffCommand(argument, spec_file_lst_);
+  QString q_cmd = QString::fromStdString(cmd);
+  q_cmd = q_cmd.trimmed();
+  QStringList cmd_list = q_cmd.split(" ");
+  QString prog = cmd_list[0];
+  cmd_list.removeFirst();
+
+  process_.start(prog, cmd_list);
+  process_.waitForStarted();
+
+  toppic::GuiMessage guiMsg;
   bool finish = false;
-
-  while (true) {
-    if (thread_->isFinished()) {
+  while (!finish) {
+    if(process_.state()==QProcess::NotRunning) {
       finish = true;
     }
-    // Here is the infomation been shown in the infoBox.
-    info = buffer.str();
-    std::string new_info = info.substr(processed_len);
-    processed_len = info.length();
-    
-    if (new_info.size() > 0) {
-      for (unsigned i = 0; i < new_info.size(); i++) {
-        // new line
-        if (new_info.at(i) == '\n') {
-          processed_lines = processed_lines + current_line + '\n';
-          current_line = "";
-          cursor_pos = 0;
-        }
-        // CF
-        if (new_info.at(i) == '\r') {
-          cursor_pos = 0;
-        }
-        // add a new charactor
-        if (new_info.at(i) != '\n' && new_info.at(i) != '\r') {
-          if (cursor_pos < current_line.length()) {
-            current_line[cursor_pos] = new_info.at(i);
-          }
-          else {
-            current_line = current_line + new_info.at(i);
-          }
-          cursor_pos++;
-        }
+    bool ready = process_.waitForReadyRead(100);
+    if (ready || finish) {
+      QByteArray byteArray = process_.readAllStandardOutput();
+      QString str = QString(byteArray);
+      std::string msg = guiMsg.getMsg(str.toStdString());
+      if (msg != "") {
+        updateMsg(msg); 
       }
-      updateMsg(processed_lines + current_line);
-    }
-    if (finish) {
-      break;
     }
     sleep(100);
   }
   unlockDialog();
-  showInfo = "";
-  thread_->exit();
-  std::cout.rdbuf(oldbuf);
 }
 
 void TopDiffDialog::on_exitButton_clicked() {
@@ -308,7 +275,7 @@ bool TopDiffDialog::checkError() {
 }
 
 void TopDiffDialog::updateMsg(std::string msg) {
-  showInfo = msg.c_str();
+  QString showInfo = msg.c_str();
   QTextCursor cursor = ui->outputTextBrowser->textCursor();
   int vertical_bar_pos = ui->outputTextBrowser->verticalScrollBar()->value();
   int max_bar_pos = ui->outputTextBrowser->verticalScrollBar()->maximum();
