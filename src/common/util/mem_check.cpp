@@ -160,9 +160,10 @@ bool checkThreadNum(int thread_number, std::string prog) {
   int total_thread_num = static_cast<int>(boost::thread::hardware_concurrency());
   float total_mem_in_gb = mem_check::getTotalMemInGb(); 
   float avail_mem_in_gb = mem_check::getAvailMemInGb();
-  std::cout << "Computer total thread number: " << total_thread_num << std::endl;
+  std::cout << "Total thread number: " << total_thread_num << std::endl;
   std::cout << "Total memory: " << std::setprecision(4) << total_mem_in_gb << " GiB" << std::endl;
   std::cout << "Available memory: " << avail_mem_in_gb << " GiB" << std::endl;
+  std::cout << std::endl;
   // set precision to default
   std::cout << std::setprecision(6);
 
@@ -174,7 +175,7 @@ bool checkThreadNum(int thread_number, std::string prog) {
   // std::cout << "Maximum thread number: " << max_thread << std::endl;
   if (max_thread < thread_number) {
     // in toppic, we automatically control thread numbers for filtering
-    if (prog != "toppic") {
+    if (prog != "toppic" && prog != "topmg") {
       std::cout << "WARNING: Based on the available memory size, up to " << max_thread << " threads can be used!" << std::endl;
       std::cout << "WARNING: Please set the thread number to " << max_thread << " or the program may crash!" << std::endl;
     }
