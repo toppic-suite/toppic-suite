@@ -16,7 +16,12 @@ sudo apt-get install build-essential cmake
 # install other dependencies
 sudo apt-get install zlib1g-dev 
 sudo apt-get install libxerces-c-dev  
-sudo apt-get install libboost-filesystem-dev libboost-program-options-dev libboost-system-dev libboost-thread-dev libboost-iostreams-dev libboost-chrono-dev 
+sudo apt-get install libboost-filesystem-dev 
+sudo apt-get install libboost-program-options-dev 
+sudo apt-get install libboost-system-dev 
+sudo apt-get install libboost-thread-dev 
+sudo apt-get install libboost-iostreams-dev 
+sudo apt-get install libboost-chrono-dev 
 sudo apt-get install libeigen3-dev 
 sudo apt-get install nlohmann-json3-dev
 

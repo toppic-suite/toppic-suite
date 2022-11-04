@@ -19,8 +19,9 @@
 #include "common/base/mod_util.hpp"
 #include "common/base/base_data.hpp"
 
-#include "common/util/version.hpp"
 #include "common/util/file_util.hpp"
+#include "common/util/mem_check.hpp"
+#include "common/util/version.hpp"
 
 #include "seq/fasta_reader.hpp"
 #include "seq/fasta_util.hpp"
@@ -68,7 +69,9 @@
 
 #include "console/topmg_argument.hpp"
 #include "console/topmg_process.hpp"
+
 namespace toppic {
+
 void copyTopMSV(std::map<std::string, std::string> &arguments) {
   std::string spectrum_file_name = arguments["spectrumFileName"];
   std::string base_name = file_util::basename(spectrum_file_name);
@@ -92,8 +95,6 @@ void copyTopMSV(std::map<std::string, std::string> &arguments) {
 void cleanTopmgDir(const std::string &fa_name, 
                    const std::string & sp_name,
                    bool keep_temp_files) {
-  //std::string fa_base = file_util::absoluteName(fa_name); 
-  //std::replace(fa_base.begin(), fa_base.end(), '\\', '/');
   std::string abs_sp_name = file_util::absoluteName(sp_name);
   std::string sp_base = file_util::basename(abs_sp_name); 
   std::replace(sp_base.begin(), sp_base.end(), '\\', '/');
@@ -104,7 +105,6 @@ void cleanTopmgDir(const std::string &fa_name,
   file_util::rename(sp_base + ".topmg_prsm",
                     sp_base + "_topmg_prsm.xml");
   if (!keep_temp_files) {
-    //file_util::cleanPrefix(fa_name, fa_base + "_");
     file_util::cleanPrefix(sp_name, sp_base + ".msalign_");
     file_util::delFile(abs_sp_name + "_index");
     file_util::delFile(sp_base + ".topmg_one_filter");
@@ -119,7 +119,6 @@ void cleanTopmgDir(const std::string &fa_name,
     file_util::delFile(sp_base + ".topmg_graph");
     file_util::delFile(sp_base + ".topmg_evalue");
     file_util::cleanPrefix(sp_name, sp_base + ".topmg_evalue_");
-    //file_util::delFile(sp_base + ".topmg_top");
     file_util::delFile(sp_base + ".topmg_cluster");
     file_util::delFile(sp_base + ".topmg_cluster_fdr");
     file_util::delFile(sp_base + ".topmg_prsm_cutoff");
@@ -177,9 +176,21 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
 
     int ptm_num = std::stoi(arguments["ptmNumber"]);
     LOG_DEBUG("num of unknown shfit " << ptm_num);
-    int thread_num = std::stoi(arguments["threadNumber"]);
     int filter_result_num = std::stoi(arguments["filteringResultNumber"]);
     double max_ptm_mass = std::stod(arguments["maxPtmMass"]);
+
+    int thread_num = std::stoi(arguments["threadNumber"]);
+    // Filter steps requires a large amount of memory. 
+    // We use only one thread to reduce the memory requirement.
+    int filter_thread_num = mem_check::getMaxThreads("toppic_filter");
+    if (filter_thread_num > thread_num) {
+      filter_thread_num = thread_num;
+    }
+    LOG_DEBUG("Filter thread number " << filter_thread_num);
+    int diag_filter_thread_num = mem_check::getMaxThreads("diag_filter");
+    if (diag_filter_thread_num > thread_num) {
+      diag_filter_thread_num = thread_num;
+    }
 
     bool decoy = false;
     if (arguments["searchType"] == "TARGET+DECOY") {
@@ -204,7 +215,7 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
     std::cout << "ASF-One PTM filtering - started." << std::endl;
     OnePtmFilterMngPtr one_ptm_filter_mng_ptr =
         std::make_shared<OnePtmFilterMng>(prsm_para_ptr, index_file_para, 
-                                          "topmg_one_filter", thread_num,
+                                          "topmg_one_filter", filter_thread_num,
                                           var_mod_file_name, 1);
     one_ptm_filter_mng_ptr->inte_num_ = 4;
     one_ptm_filter_mng_ptr->pref_suff_num_ = 4;
@@ -224,7 +235,8 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
       DiagFilterMngPtr diag_filter_mng_ptr
           = std::make_shared<DiagFilterMng>(prsm_para_ptr, index_file_para, 
                                             filter_result_num,
-                                            thread_num, "topmg_multi_filter",
+                                            diag_filter_thread_num, 
+                                            "topmg_multi_filter",
                                             var_mod_file_name, 1);
       DiagFilterProcessorPtr diag_filter_processor
           = std::make_shared<DiagFilterProcessor>(diag_filter_mng_ptr);
@@ -296,7 +308,7 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
     base_data::init();
     LOG_DEBUG("Initialization completed");
     std::string ori_db_file_name = arguments["oriDatabaseFileName"];
-std::string db_file_name = ori_db_file_name + "_idx" + file_util::getFileSeparator() + file_util::filenameFromEntirePath(arguments["databaseFileName"]);    //std::string db_file_name = arguments["databaseFileName"];
+    std::string db_file_name = ori_db_file_name + "_idx" + file_util::getFileSeparator() + file_util::filenameFromEntirePath(arguments["databaseFileName"]);    
     std::string sp_file_name = arguments["spectrumFileName"];
     std::string var_mod_file_name = arguments["varModFileName"];
 
