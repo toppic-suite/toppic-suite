@@ -83,7 +83,7 @@ void TopmgArgument::outputArguments(std::ostream &output,
                                     const std::string &sep,
                                     std::map<std::string, std::string> arguments) {
   int gap = 47;
-  output << "********************** Parameters **********************" << std::endl;
+  output << "********************** Parameters ***********************" << std::endl;
   output << std::setw(gap) << std::left << "Protein database file:" << sep << arguments["oriDatabaseFileName"] << std::endl;
   output << std::setw(gap) << std::left << "Spectrum file:" << sep << arguments["spectrumFileName"] << std::endl;
   output << std::setw(gap) << std::left << "Fragmentation method:" << sep << arguments["activation"] << std::endl;
@@ -136,13 +136,9 @@ void TopmgArgument::outputArguments(std::ostream &output,
     output << std::setw(gap) << std::left << "End time:" << sep << arguments["endTime"] << std::endl;
   }
   output << std::setw(gap) << std::left << "Version:" << sep << arguments["version"] << std::endl;
-  output << "********************** Parameters **********************" << std::endl;
-  if (arguments["fixedMod"] == "") {
-    return;
-  }
-  else{
+  if (arguments["fixedMod"] != "") {
     //add fixed PTM information 
-    output << "********************** Fixed PTM **********************" << std::endl;
+    output << "Fixed PTM Begin" << std::endl;
     if (arguments["fixedMod"] == "C57") {
       output << std::setw(gap) << std::left << "Carbamidomethylation" << sep << 57.021464 << std::endl;
     }
@@ -155,15 +151,15 @@ void TopmgArgument::outputArguments(std::ostream &output,
         output << std::setw(gap) << std::left << mod_data[i][0] << sep << mod_data[i][1] << std::endl;
       }
     }
-    output << "********************** Fixed PTM **********************" << std::endl;
+    output << "Fixed PTM End" << std::endl;
   }
-  output << "********************** Variable PTM **********************" << std::endl;
+  output << "Variable PTM Begin" << std::endl;
   std::vector<std::vector<std::string>> mod_data = mod_util::readModTxtForTsv(arguments["varModFileName"]);
   for (size_t i = 0; i < mod_data.size(); i++) {
     output << std::setw(gap) << std::left << mod_data[i][0] << sep << mod_data[i][1] << std::endl;
   }
-  output << "********************** Variable PTM **********************" << std::endl;
-    
+  output << "Variable PTM End" << std::endl;
+  output << "********************** Parameters ***********************" << std::endl;
 }
 
 std::string TopmgArgument::outputTsvArguments(std::map<std::string, std::string> arguments) {

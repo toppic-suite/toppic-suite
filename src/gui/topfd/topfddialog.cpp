@@ -135,7 +135,7 @@ void TopFDDialog::on_addButton_clicked() {
       this,
       "Select spectrum files",
       lastDir_,
-      "Spectra files(*.mzXML *.mzML *.mzxml *.mzml)");
+      "Spectra files (*.mzXML *.mzML *.mzxml *.mzml)");
   for (int i = 0; i < spfiles.size(); i++) {
     QString spfile = spfiles.at(i);
     updatedir(spfile);

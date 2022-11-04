@@ -20,6 +20,7 @@
 #include <QToolTip>
 #include <QDesktopServices>
 #include <QScrollBar>
+#include <QDebug>
 
 #include "common/util/version.hpp"
 #include "common/util/mem_check.hpp"
@@ -146,7 +147,7 @@ void ToppicWindow::ToppicWindow::on_databaseFileButton_clicked() {
       this,
       "Select a protein database file",
       lastDir_,
-      "Database files(*.fasta *.fa)");
+      "Database files (*.fasta *.fa)");
   updatedir(s);
   ui->databaseFileEdit->setText(s);
 }
@@ -156,7 +157,7 @@ void ToppicWindow::on_fixedModFileButton_clicked() {
       this,
       "Select a fixed modification file",
       lastDir_,
-      "Modification files(*.txt);;All files(*.*)");
+      "Modification files (*.txt);;All files (*.*)");
   updatedir(s);
   ui->fixedModFileEdit->setText(s);
 }
@@ -166,7 +167,7 @@ void ToppicWindow::on_modFileButton_clicked() {
       this,
       "Select a modification file for PTM localization",
       lastDir_,
-      "Modification files(*.txt);;All files(*.*)");
+      "Modification files (*.txt);;All files (*.*)");
   updatedir(s);
   ui->modFileEdit->setText(s);
 }
@@ -183,6 +184,7 @@ void ToppicWindow::on_startButton_clicked() {
   QStringList cmd_list = q_cmd.split(" ");
   QString prog = cmd_list[0];
   cmd_list.removeFirst();
+  //qDebug() << q_cmd;
 
   process_.start(prog, cmd_list);
   process_.waitForStarted();
@@ -313,11 +315,13 @@ std::vector<std::string> ToppicWindow::getSpecFileList() {
 }
 
 void ToppicWindow::on_addButton_clicked() {
+  QString filter = "Spectrum files (*ms2.msalign)";
   QStringList spfiles = QFileDialog::getOpenFileNames(
       this,
       "Select deconvoluted spectrum files",
       lastDir_,
-      "Spectrum files(*ms2.msalign)");
+      filter
+      );
 
   for (int i = 0; i < spfiles.size(); i++) {
     QString spfile = spfiles.at(i);

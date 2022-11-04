@@ -222,7 +222,6 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
 
     std::vector<std::string> input_exts;
 
-    /*
     std::cout << "Non PTM filtering - started." << std::endl;
     ZeroPtmFilterMngPtr zero_filter_mng_ptr
         = std::make_shared<ZeroPtmFilterMng>(prsm_para_ptr, index_file_para, 
@@ -268,7 +267,6 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
       input_exts.push_back("toppic_one_ptm_suffix");
       input_exts.push_back("toppic_one_ptm_internal");
     }
-    */
 
     if (ptm_num >= 2) {
       std::cout << "Multiple PTM filtering - started." << std::endl;

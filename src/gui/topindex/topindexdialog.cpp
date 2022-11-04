@@ -75,7 +75,7 @@ void TopIndexDialog::on_databaseFileButton_clicked() {
       this,
       "Select a protein database file",
       lastDir_,
-      "Database files(*.fasta *.fa)");
+      "Database files (*.fasta *.fa)");
   updatedir(s);
   ui->databaseFileEdit->setText(s);
 }
@@ -84,7 +84,7 @@ void TopIndexDialog::on_fixedModFileButton_clicked() {
       this,
       "Select a fixed modification file",
       lastDir_,
-      "Modification files(*.txt);;All files(*.*)");
+      "Modification files (*.txt);;All files (*.*)");
   updatedir(s);
   ui->fixedModFileEdit->setText(s);
 }

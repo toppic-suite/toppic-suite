@@ -39,12 +39,12 @@ std::map<std::string, std::string> TopDiffArgument::initArguments() {
 void TopDiffArgument::outputArguments(std::ostream &output, 
                                       const std::string &sep,
                                       std::map<std::string, std::string> arguments) {
-  int gap = 44;
+  int gap = 26;
   output << "******************** Parameters ********************" << std::endl;
-  output << std::setw(gap) << std::left << "Error tolerance: " << sep << arguments["errorTolerance"] << " Dalton " << std::endl;
-  output << std::setw(gap) << std::left << "Database search tool name: " << sep << arguments["toolName"] << std::endl;
-  output << std::setw(gap) << std::left << "Output file name: " << sep << arguments["mergedOutputFileName"] << std::endl;
-  output << std::setw(gap) << std::left << "Version: " << sep << arguments["version"] << std::endl;
+  output << std::setw(gap) << std::left << "Error tolerance:" << sep << arguments["errorTolerance"] << " Dalton " << std::endl;
+  output << std::setw(gap) << std::left << "Database search tool name:" << sep << arguments["toolName"] << std::endl;
+  output << std::setw(gap) << std::left << "Output file name:" << sep << arguments["mergedOutputFileName"] << std::endl;
+  output << std::setw(gap) << std::left << "Version:" << sep << arguments["version"] << std::endl;
   output << "******************** Parameters ********************" << std::endl;
 }
 

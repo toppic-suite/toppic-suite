@@ -143,7 +143,7 @@ void TopmgWindow::TopmgWindow::on_databaseFileButton_clicked() {
       this,
       "Select a protein database file",
       lastDir_,
-      "Database files(*.fasta *.fa)");
+      "Database files (*.fasta *.fa)");
   updatedir(s);
   ui->databaseFileEdit->setText(s);
 }
@@ -153,7 +153,7 @@ void TopmgWindow::on_fixedModFileButton_clicked() {
       this,
       "Select a fixed modification file",
       lastDir_,
-      "Modification files(*.txt);;All files(*.*)");
+      "Modification files (*.txt);;All files (*.*)");
   updatedir(s);
   ui->fixedModFileEdit->setText(s);
 }
@@ -163,7 +163,7 @@ void TopmgWindow::on_modFileButton_clicked() {
       this,
       "Select a modification file for variable PTMs",
       lastDir_,
-      "Modification files(*.txt);;All files(*.*)");
+      "Modification files (*.txt);;All files (*.*)");
   updatedir(s);
   ui->modFileEdit->setText(s);
 }
@@ -318,7 +318,7 @@ void TopmgWindow::on_addButton_clicked() {
       this,
       "Select deconvoluted spectrum files",
       lastDir_,
-      "Spectrum files(*ms2.msalign)");
+      "Spectrum files (*ms2.msalign)");
   for (int i = 0; i < spfiles.size(); i++) {
     QString spfile = spfiles.at(i);
     updatedir(spfile);
