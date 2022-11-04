@@ -126,7 +126,8 @@ void TopIndexDialog::on_defaultButton_clicked() {
 
 void TopIndexDialog::updatedir(QString s) {
   if (!s.isEmpty()) {
-    lastDir_ = s;
+    //lastDir_ = s;
+    lastDir_ = "";
   }
 }
 void TopIndexDialog::on_startButton_clicked() {

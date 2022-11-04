@@ -137,7 +137,8 @@ void ToppicWindow::on_defaultButton_clicked() {
 
 void ToppicWindow::updatedir(QString s) {
   if (!s.isEmpty()) {
-    lastDir_ = s;
+    //lastDir_ = s;
+    lastDir_ = "";
   }
 }
 
