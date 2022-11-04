@@ -20,8 +20,7 @@
 #include <string>
 
 #include <QMainWindow>
-
-#include "threadtopdiff.hpp"
+#include <QProcess>
 
 namespace Ui {
 class TopDiffDialog;
@@ -52,19 +51,17 @@ private slots:
 private:
   QString lastDir_;
 
-  int percentage_;
-
   std::map<std::string, std::string> arguments_;
 
   std::vector<std::string> spec_file_lst_;
 
   Ui::TopDiffDialog *ui;
 
-  void initArguments();
-
   std::map<std::string, std::string> getArguments();
 
   std::vector<std::string> getSpecFileList();
+  
+  QProcess process_;
 
   void lockDialog();
 
@@ -77,10 +74,6 @@ private:
   void updatedir(QString s);
 
   void sleep(int wait);
-
-  ThreadTopDiff* thread_;
-
-  QString showInfo;
 
   void closeEvent(QCloseEvent *event);
 

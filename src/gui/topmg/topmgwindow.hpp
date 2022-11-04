@@ -15,25 +15,25 @@
 #ifndef TOPPIC_GUI_TOPMGWINDOW_HPP
 #define TOPPIC_GUI_TOPMGWINDOW_HPP
 
-#include <QMainWindow>
-#include <QMouseEvent>
-
 #include <map>
 #include <string>
 
-#include "gui/topmg/threadtopmg.hpp"
+#include <QMainWindow>
+#include <QMouseEvent>
+#include <QProcess>
+
 
 namespace Ui {
-class topmgWindow;
+class TopmgWindow;
 }
 
-class topmgWindow : public QMainWindow {
+class TopmgWindow : public QMainWindow {
  Q_OBJECT
 
  public:
-  explicit topmgWindow(QWidget *parent = 0);
+  explicit TopmgWindow(QWidget *parent = 0);
 
-  ~topmgWindow();
+  ~TopmgWindow();
 
  private slots:
   void on_databaseFileButton_clicked();
@@ -73,20 +73,20 @@ class topmgWindow : public QMainWindow {
   void on_delButton_clicked();
 
  private:
-  Ui::topmgWindow *ui;
+  Ui::TopmgWindow *ui;
   
   QString lastDir_;
   
   std::map<std::string, std::string> arguments_;
   
   std::vector<std::string> spec_file_lst_;
-  
-  void initArguments();
+
+  QProcess process_;
   
   std::map<std::string, std::string> getArguments();
   
   std::vector<std::string> getSpecFileList();
-  
+
   void lockDialog();
   
   void unlockDialog();
@@ -100,10 +100,6 @@ class topmgWindow : public QMainWindow {
   void showArguments();
   
   void sleep(int wait);
-  
-  threadtopmg* thread_;
-  
-  QString showInfo;
   
   void closeEvent(QCloseEvent *event);
   

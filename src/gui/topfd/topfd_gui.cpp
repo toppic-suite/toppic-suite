@@ -23,16 +23,9 @@
 
 int main(int argc, char *argv[]) {
   // make sure we are using the c locale
-
   QLocale::setDefault(QLocale::c());
-
-#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
-  // the monospace font for Windows
-  QFont font("Calibri");
-  font.setPointSize(12);
-  QApplication::setFont(font);
   QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-#endif
+
   QApplication app(argc, argv);
 
   QScreen *screen = QGuiApplication::primaryScreen();

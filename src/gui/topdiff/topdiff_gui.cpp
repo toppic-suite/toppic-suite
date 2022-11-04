@@ -14,35 +14,26 @@
 
 #include <QLocale>
 #include <QApplication>
+#include <QGuiApplication>
+#include <QScreen>
 #include <QFontDatabase>
 #include <QDesktopWidget>
 
-#include "gui/util/run_exe.hpp"
 #include "gui/topdiff/topdiffdialog.hpp"
 
 int main(int argc, char *argv[]) {
   // make sure we are using the c locale
   QLocale::setDefault(QLocale::c());
-
-#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
-  // the monospace font for Windows
-  QFont font("Calibri");
-  font.setPointSize(12);
-  QApplication::setFont(font);
   QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-  toppic::run_exe::startJob();
-#endif
-  QApplication a(argc, argv);
+
+  QApplication app(argc, argv);
+
+  QScreen *screen = QGuiApplication::primaryScreen();
+  QRect deskRect = screen->availableGeometry();
 
   TopDiffDialog td;
-
-  QDesktopWidget *desk = QApplication::desktop();
-
-  QRect deskRect = desk->availableGeometry();
-
   td.show();
-
   td.move((deskRect.width() - td.width()) / 2, (deskRect.height() - td.height()) / 2);
 
-  return a.exec();
+  return app.exec();
 }

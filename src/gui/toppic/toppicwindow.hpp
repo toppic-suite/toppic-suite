@@ -21,19 +21,18 @@
 
 #include <QMainWindow>
 #include <QMouseEvent>
-
-#include "threadtoppic.hpp"
+#include <QProcess>
 
 namespace Ui {
-class toppicWindow;
+class ToppicWindow;
 }
 
-class toppicWindow : public QMainWindow {
+class ToppicWindow : public QMainWindow {
  Q_OBJECT
 
  public:
-  explicit toppicWindow(QWidget *parent = 0);
-  ~toppicWindow();
+  explicit ToppicWindow(QWidget *parent = 0);
+  ~ToppicWindow();
 
  private slots:
   void on_databaseFileButton_clicked();
@@ -79,7 +78,7 @@ class toppicWindow : public QMainWindow {
   void on_delButton_clicked();
 
  private:
-  Ui::toppicWindow *ui;
+  Ui::ToppicWindow *ui;
 
   QString lastDir_;
 
@@ -87,7 +86,7 @@ class toppicWindow : public QMainWindow {
 
   std::vector<std::string> spec_file_lst_;
 
-  void initArguments();
+  QProcess process_;
 
   std::map<std::string, std::string> getArguments();
 
@@ -106,10 +105,6 @@ class toppicWindow : public QMainWindow {
   void showArguments();
 
   void sleep(int wait);
-
-  threadtoppic* thread_;
-
-  QString showInfo;
 
   void closeEvent(QCloseEvent *event);
 
