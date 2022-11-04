@@ -150,22 +150,22 @@ std::string geneToppicCommand(std::map<std::string, std::string> arguments_,
       }
       else if (it->first == "useFeatureFile") {
         if (it->second == "false") {
-          command = command + toppic_para[it->first] + " ";
+          command = command + toppic_para[it->first];
         }
       }
       else if (it->first == "searchType") {
         if (it->second != "TARGET") {
-          command = command + toppic_para[it->first] + " ";
+          command = command + toppic_para[it->first];
         }
       }
       else if (it->first == "keepTempFiles" || it->first == "keepDecoyResults") {
         if (it->second == "true") {
-          command = command + toppic_para[it->first] + " ";
+          command = command + toppic_para[it->first];
         }
       }
       else if (it->first == "geneHTMLFolder" ) {//for geneHTML folder, the argument should be added when the value is false
         if (it->second != "true") {
-          command = command + toppic_para[it->first] + " ";
+          command = command + toppic_para[it->first];
         }
       }
       else if (it->first == "residueModFileName" && it->second == "") {
@@ -173,7 +173,7 @@ std::string geneToppicCommand(std::map<std::string, std::string> arguments_,
       }
       else if (it->first == "useLookupTable") {
         if (it->second == "true") {
-          command = command + toppic_para[it->first] + " ";
+          command = command + toppic_para[it->first];
         }
       }
       else{
@@ -240,28 +240,28 @@ std::string geneTopmgCommand(std::map<std::string, std::string> arguments_,
       }
       else if (it->first == "useFeatureFile") {
         if (it->second == "false") {
-          command = command + topmg_para[it->first] + " ";
+          command = command + topmg_para[it->first];
         }
       }
       else if (it->first == "searchType") {
         if (it->second != "TARGET") {
-          command = command + topmg_para[it->first] + " ";
+          command = command + topmg_para[it->first];
         }
       }
       else if (it->first == "keepTempFiles" || it->first == "keepDecoyResults") {
         if (it->second == "true") {
-          command = command + topmg_para[it->first] + " ";
+          command = command + topmg_para[it->first];
         }
       }
       else if (it->first == "geneHTMLFolder" ) {//for geneHTML folder, the argument should be added when the value is false
         if (it->second != "true") {
-          command = command + topmg_para[it->first] + " ";
+          command = command + topmg_para[it->first];
         }
       }
       //some parameters require extra processing
       else if (it->first == "useAsfDiag" || it->first == "wholeProteinOnly") {
         if (it->second == "true") {
-          command = command + topmg_para[it->first] + " ";
+          command = command + topmg_para[it->first];
         }
       }
       else {
