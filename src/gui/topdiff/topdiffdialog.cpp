@@ -119,7 +119,8 @@ void TopDiffDialog::on_addButton_clicked() {
 
 void TopDiffDialog::updatedir(QString s) {
   if (!s.isEmpty()) {
-    lastDir_ = s;
+    //lastDir_ = s;
+    lastDir_ = "";
   }
 }
 bool TopDiffDialog::ableToAdd(QString idfile) {

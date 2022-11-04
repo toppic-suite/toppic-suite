@@ -147,7 +147,8 @@ void TopFDDialog::on_addButton_clicked() {
 
 void TopFDDialog::updatedir(QString s) {
   if (!s.isEmpty()) {
-    lastDir_ = s;
+    //lastDir_ = s;
+    lastDir_ = "";
   }
 }
 bool TopFDDialog::ableToAdd(QString spfile) {
