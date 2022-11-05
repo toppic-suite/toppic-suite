@@ -7,30 +7,31 @@ For manual and reference, please visit https://www.toppic.org/software/toppic/
 * GCC version higher than 5.5.0 for C++14 support
 * CMake (>= 3.1)
 
-### Linux (Ubuntu):
+### Linux (Ubuntu 22.04):
 
 ```sh
 # install compiling tools
-sudo apt-get install build-essential cmake
+sudo apt install build-essential cmake
 
 # install other dependencies
-sudo apt-get install zlib1g-dev 
-sudo apt-get install libxerces-c-dev  
-sudo apt-get install libboost-filesystem-dev 
-sudo apt-get install libboost-program-options-dev 
-sudo apt-get install libboost-system-dev 
-sudo apt-get install libboost-thread-dev 
-sudo apt-get install libboost-iostreams-dev 
-sudo apt-get install libboost-chrono-dev 
-sudo apt-get install libeigen3-dev 
-sudo apt-get install nlohmann-json3-dev
+sudo apt install zlib1g-dev 
+sudo apt install libboost-filesystem-dev 
+sudo apt install libboost-program-options-dev 
+sudo apt install libboost-system-dev 
+sudo apt install libboost-thread-dev 
+sudo apt install libboost-iostreams-dev 
+sudo apt install libboost-chrono-dev 
+
+sudo apt install libxerces-c-dev  
+sudo apt install libeigen3-dev 
+sudo apt install nlohmann-json3-dev
 
 
 # install the catch unit test framework (https://github.com/philsquared/Catch)
-sudo apt-get install catch
+sudo apt install catch
 
 # Qt5 for GUI
-sudo apt-get install qtbase5-dev
+sudo apt install qtbase5-dev
 
 # building
 mkdir build
@@ -41,6 +42,41 @@ make -j$(nproc)
 cd ../bin
 ln -s ../toppic_resources .
 ```
+
+### Linux (CentOS Stream 8):
+
+```sh
+# install compiling tools
+sudo dnf install gcc gcc-c++ make cmake
+
+# install dependencies
+sudo dnf install zlib-devel
+sudo dnf install boost-devel 
+
+# install Extra Packages for Enterprise Linux (EPEL)
+sudo dnf install 'dnf-command(config-manager)'
+sudo dnf config-manager --set-enabled powertools
+sudo dnf install epel-release 
+
+# install dependencies from EPEL 8 
+sudo dnf install xerces-c-devel
+sudo dnf install eigen3-devel
+sudo dnf install json-devel
+
+# Qt5 for GUI
+sudo dnf install qt5-qtbase-devel
+
+# building
+mkdir build
+cd build
+cmake ..
+make -j$(nproc)
+
+cd ../bin
+ln -s ../resources .
+```
+
+### Language setting
 
 On some Linux distributions, you might meet the problem "Could not loading a transcoding service".
 To fix this, please add following lines into your `.bashrc`.
