@@ -180,6 +180,20 @@ void TopDiffDialog::on_startButton_clicked() {
         updateMsg(msg); 
       }
     }
+    if (finish) {
+      QByteArray byteArray = process_.readAllStandardError();
+      QString str = QString(byteArray);
+      if (process_.exitStatus() != QProcess::NormalExit) {
+        str = str + "\nERROR Quit status: Crashed. \n";
+        str = str + "ERROR Quit code: " + QString::number(process_.exitCode()) + ".\n";
+      }
+      std::string msg = guiMsg.getMsg(str.toStdString());
+      if (msg != "") {
+        updateMsg(msg); 
+      }
+      //qDebug() << "Status: " << process_.exitStatus();
+      //qDebug() << "Code: " << process_.exitCode();
+    }
     sleep(100);
   }
   unlockDialog();
