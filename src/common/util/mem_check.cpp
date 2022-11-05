@@ -178,9 +178,11 @@ bool checkThreadNum(int thread_number, std::string prog) {
     if (prog != "toppic" && prog != "topmg") {
       std::cout << "WARNING: Based on the available memory size, up to " << max_thread << " threads can be used!" << std::endl;
       std::cout << "WARNING: Please set the thread number to " << max_thread << " or the program may crash!" << std::endl;
+      std::cout << std::endl;
     }
     else {
       std::cout << "WARNING: Based on the available memory size, " << max_thread << " threads will be used for protein sequence filtering and " << thread_number << " threads will be used for other steps in proteoform identification!"  << std::endl;
+      std::cout << std::endl;
     }
   }
   return true;
