@@ -43,12 +43,12 @@ make install
 
 ### Linux (CentOS Stream 8):
 
+```sh
 # install Extra Packages for Enterprise Linux (EPEL)
 sudo dnf install 'dnf-command(config-manager)'
 sudo dnf config-manager --set-enabled powertools
 sudo dnf install epel-release 
 
-```sh
 # install compiling tools
 sudo dnf install gcc gcc-c++ make cmake
 
