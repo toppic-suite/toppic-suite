@@ -43,6 +43,11 @@ make install
 
 ### Linux (CentOS Stream 8):
 
+# install Extra Packages for Enterprise Linux (EPEL)
+sudo dnf install 'dnf-command(config-manager)'
+sudo dnf config-manager --set-enabled powertools
+sudo dnf install epel-release 
+
 ```sh
 # install compiling tools
 sudo dnf install gcc gcc-c++ make cmake
@@ -50,13 +55,6 @@ sudo dnf install gcc gcc-c++ make cmake
 # install dependencies
 sudo dnf install zlib-devel
 sudo dnf install boost-devel 
-
-# install Extra Packages for Enterprise Linux (EPEL)
-sudo dnf install 'dnf-command(config-manager)'
-sudo dnf config-manager --set-enabled powertools
-sudo dnf install epel-release 
-
-# install dependencies from EPEL 8 
 sudo dnf install xerces-c-devel
 sudo dnf install eigen3-devel
 sudo dnf install json-devel
