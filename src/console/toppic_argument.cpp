@@ -108,7 +108,7 @@ void ToppicArgument::outputArguments(std::ostream &output,
     }
   }
 
-  output << std::setw(44) << std::left << "N-terminal label mass" << "\t" << arguments["nTermLabelMass"] << std::endl;
+  output << std::setw(gap) << std::left << "N-terminal label mass" << sep << arguments["nTermLabelMass"] << std::endl;
 
   if (arguments["useFeatureFile"] == "true") {
     output << std::setw(gap) << std::left << "Use TopFD feature file:" << sep << "True" << std::endl;
