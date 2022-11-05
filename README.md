@@ -38,9 +38,7 @@ mkdir build
 cd build
 cmake ..
 make -j$(nproc)
-
-cd ../bin
-ln -s ../toppic_resources .
+make install
 ```
 
 ### Linux (CentOS Stream 8):
@@ -71,9 +69,7 @@ mkdir build
 cd build
 cmake ..
 make -j$(nproc)
-
-cd ../bin
-ln -s ../resources .
+make install
 ```
 
 ### Language setting
