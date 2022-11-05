@@ -46,5 +46,5 @@ mingw32-make
 **Move  the folder toppic_resources to the folder bin**
 ```sh
 cd ..\bin
-mv ..\toppic_resources .
+move ..\toppic_resources .
 ```
