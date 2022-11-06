@@ -66,6 +66,5 @@ copy C:\msys64\mingw64\bin\libpcre-1.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libmd4c.dll toppic-windows-%1
 
 mkdir toppic-windows-%1\example_files
-copy ..\testcases\data\mzxml_test.msalign toppic-windows-%1\example_files
 copy ..\testcases\data\mzxml_test.fasta toppic-windows-%1\example_files
 copy ..\testcases\data\mzxml_test.mzXML toppic-windows-%1\example_files
