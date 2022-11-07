@@ -11,6 +11,7 @@
 //WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //See the License for the specific language governing permissions and
 //limitations under the License.
+
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/version.hpp"
@@ -21,12 +22,13 @@
 #include "console/topdiff_process.hpp"
 
 namespace toppic {
+
 int topDiffProcess(std::map<std::string, std::string> &arguments,
                     std::vector<std::string> &input_file_list) {
   try{
     std::cout << "TopDiff " << Version::getVersion() << std::endl;
     arguments["version"] = toppic::Version::getVersion();
-    Argument::outputArguments(std::cout, arguments);
+    TopDiffArgument::outputArguments(std::cout, " ", arguments);
     base_data::init();
 
     std::string base_path = file_util::absoluteDir(input_file_list[0]);

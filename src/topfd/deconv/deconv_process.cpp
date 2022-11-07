@@ -84,7 +84,7 @@ void DeconvProcess::prepareFileFolder(std::string file_num) {
   }
   */
 
-  if (topfd_para_ptr_->gene_html_folder_){
+  if (topfd_para_ptr_->isGeneHtmlFolder()){
     //json file names
     html_dir_ =  base_name + "_" + file_num + "html";
     ms1_json_dir_ = html_dir_ 
@@ -110,8 +110,8 @@ void DeconvProcess::process() {
   // reader
   RawMsGroupFaimeReaderPtr reader_ptr 
     = std::make_shared<RawMsGroupFaimeReader>(spec_file_name_, 
-                                              topfd_para_ptr_->missing_level_one_,
-                                              topfd_para_ptr_->activation_,
+                                              topfd_para_ptr_->isMissingLevelOne(),
+                                              topfd_para_ptr_->getActivation(),
                                               env_para_ptr_->prec_deconv_interval_, 
                                               frac_id_);
   //check if it is centroid data
@@ -137,10 +137,10 @@ void DeconvProcess::process() {
     exit(EXIT_FAILURE);
   }
 
-  if (topfd_para_ptr_->use_env_cnn_) {
-    env_cnn::initModel(topfd_para_ptr_->resource_dir_, topfd_para_ptr_->thread_number_);
+  if (topfd_para_ptr_->isUseEnvCnn()) {
+    env_cnn::initModel(topfd_para_ptr_->getResourceDir(), topfd_para_ptr_->getThreadNum());
   }
-  if (topfd_para_ptr_->missing_level_one_) {
+  if (topfd_para_ptr_->isMissingLevelOne()) {
     processSpMissingLevelOne(reader_ptr);
   }
   else {
@@ -243,7 +243,7 @@ void DeconvProcess::processSpMissingLevelOne(RawMsGroupFaimeReaderPtr reader_ptr
 
     pool_ptr->Enqueue(geneTaskMissingMsOne(ms_group_ptr, deconv_ptr, 
                                            ms_writer_ptr_vec, pool_ptr, 
-                                           topfd_para_ptr_->gene_html_folder_, 
+                                           topfd_para_ptr_->isGeneHtmlFolder(), 
                                            ms2_json_dir_));
 
     RawMsPtrVec ms_two_ptr_vec = ms_group_ptr->getMsTwoPtrVec();
@@ -266,7 +266,7 @@ void DeconvProcess::processSpMissingLevelOne(RawMsGroupFaimeReaderPtr reader_ptr
   MsalignThreadMergePtr ms2_merge_ptr 
       = std::make_shared<MsalignThreadMerge>(file_util::basename(spec_file_name_), "ms2.msalign", 
                                              thread_num_, "ms2.msalign", 
-                                             topfd_para_ptr_-> getParaStr("#"));
+                                             topfd_para_ptr_-> getParaStr("#", "\t"));
 
   ms2_merge_ptr->process();
 
@@ -555,7 +555,7 @@ void DeconvProcess::processSp(RawMsGroupFaimeReaderPtr reader_ptr) {
     ms2_writer_ptr_vec = all_file_ms2_writer_ptr_vec[vec_idx];
 
     pool_ptr->Enqueue(geneTask(ms_group_ptr, deconv_ptr, ms1_writer_ptr_vec, 
-                               ms2_writer_ptr_vec, pool_ptr, topfd_para_ptr_->gene_html_folder_, 
+                               ms2_writer_ptr_vec, pool_ptr, topfd_para_ptr_->isGeneHtmlFolder(), 
                                ms1_json_dir_, ms2_json_dir_));
 
     //count is 1 scan from msalign1 + n scan from msalign2 vector
@@ -584,12 +584,12 @@ void DeconvProcess::processSp(RawMsGroupFaimeReaderPtr reader_ptr) {
     MsalignThreadMergePtr ms1_merge_ptr
             = std::make_shared<MsalignThreadMerge>(spec_file_name_, ms1_file_name, 
                                                   thread_num_, ms1_file_name, 
-                                                  topfd_para_ptr_-> getParaStr("#"));
+                                                  topfd_para_ptr_-> getParaStr("#", "\t"));
 
     MsalignThreadMergePtr ms2_merge_ptr 
           = std::make_shared<MsalignThreadMerge>(spec_file_name_, ms2_file_name, 
                                                 thread_num_, ms2_file_name, 
-                                                topfd_para_ptr_-> getParaStr("#"));
+                                                topfd_para_ptr_-> getParaStr("#", "\t"));
     ms1_merge_ptr->process();
     ms2_merge_ptr->process();
   }
@@ -601,12 +601,12 @@ void DeconvProcess::processSp(RawMsGroupFaimeReaderPtr reader_ptr) {
       MsalignThreadMergePtr ms1_merge_ptr
             = std::make_shared<MsalignThreadMerge>(spec_file_name_, ms1_file_name, 
                                                   thread_num_, ms1_file_name, 
-                                                  topfd_para_ptr_-> getParaStr("#"));
+                                                  topfd_para_ptr_-> getParaStr("#", "\t"));
 
       MsalignThreadMergePtr ms2_merge_ptr 
             = std::make_shared<MsalignThreadMerge>(spec_file_name_, ms2_file_name, 
                                                   thread_num_, ms2_file_name, 
-                                                  topfd_para_ptr_-> getParaStr("#"));
+                                                  topfd_para_ptr_-> getParaStr("#", "\t"));
       ms1_merge_ptr->process();
       ms2_merge_ptr->process();
 

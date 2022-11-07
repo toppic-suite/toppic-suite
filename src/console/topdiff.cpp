@@ -21,7 +21,7 @@ using namespace toppic;
 int main(int argc, char* argv[]) {
   toppic::logger::log_level = 4;
   LOG_DEBUG("Parsing start!");
-  Argument argu_processor;
+  TopDiffArgument argu_processor;
   bool success = argu_processor.parse(argc, argv);
   
   LOG_DEBUG("Parsing success!");

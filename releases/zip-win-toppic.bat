@@ -37,7 +37,6 @@ copy C:\msys64\mingw64\bin\libboost_thread-mt.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libxerces-c-3-2.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libxalan-c.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libicuuc69.dll toppic-windows-%1
-copy C:\msys64\mingw64\bin\libxalanMsg.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libicudt69.dll toppic-windows-%1
 
 copy C:\msys64\mingw64\bin\libzstd.dll toppic-windows-%1

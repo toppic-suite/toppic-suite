@@ -12,36 +12,27 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_GUI_TOPMGWINDOW_H
-#define TOPPIC_GUI_TOPMGWINDOW_H
+#ifndef TOPPIC_GUI_TOPINDEX_DIALOG_HPP
+#define TOPPIC_GUI_TOPINDEX_DIALOG_HPP
 
-#include <QMainWindow>
-#include <QMouseEvent>
-#include "threadtopmg.h"
 #include <map>
 #include <string>
 
+#include <QMainWindow>
+#include <QProcess>
+
 namespace Ui {
-class topmgWindow;
+class TopIndexDialog;
 }
 
-class topmgWindow : public QMainWindow {
- Q_OBJECT
+class TopIndexDialog : public QMainWindow {
+  Q_OBJECT
 
- public:
-  explicit topmgWindow(QWidget *parent = 0);
+public:
+  explicit TopIndexDialog(QWidget *parent = 0);
+  ~TopIndexDialog();
 
-  ~topmgWindow();
-
- private slots:
-  void on_databaseFileButton_clicked();
-
-  void on_fixedModFileButton_clicked();
-  
-  void on_modFileButton_clicked();
-  
-  //void on_skipListButton_clicked();
-
+private slots:
   void on_clearButton_clicked();
 
   void on_defaultButton_clicked();
@@ -52,66 +43,54 @@ class topmgWindow : public QMainWindow {
 
   void on_outputButton_clicked();
 
-  void on_fixedModComboBox_currentIndexChanged(int index);
-    
-  void on_NONECheckBox_clicked(bool checked);
-    
-  void on_NMECheckBox_clicked(bool checked);
-    
-  void on_NMEACCheckBox_clicked(bool checked);
-    
-  void on_MACCheckBox_clicked(bool checked);
-    
-  void on_cutoffSpectralTypeComboBox_currentIndexChanged(int index);
-    
-  void on_cutoffProteoformTypeComboBox_currentIndexChanged(int index);
-    
-  void on_decoyCheckBox_clicked(bool checked);
-    
-  void on_addButton_clicked();
-    
-  void on_delButton_clicked();
+  void on_databaseFileButton_clicked();
 
- private:
-  Ui::topmgWindow *ui;
-  
-  QString lastDir_;
-  
-  std::map<std::string, std::string> arguments_;
-  
-  std::vector<std::string> spec_file_lst_;
-  
-  void initArguments();
-  
-  std::map<std::string, std::string> getArguments();
-  
-  std::vector<std::string> getSpecFileList();
-  
-  void lockDialog();
-  
-  void unlockDialog();
-  
-  bool checkError();
-  
-  void updateMsg(std::string msg);
-  
-  void updatedir(QString s);
-  
-  void showArguments();
-  
-  void sleep(int wait);
-  
-  threadtopmg* thread_;
-  
-  QString showInfo;
-  
-  void closeEvent(QCloseEvent *event);
-  
-  bool continueToClose();
+  void on_fixedModFileButton_clicked();
+
+  void on_fixedModComboBox_currentIndexChanged(int index);
+
+   void on_NONECheckBox_clicked(bool checked);
+
+  void on_NMECheckBox_clicked(bool checked);
+
+  void on_NMEACCheckBox_clicked(bool checked);
+
+  void on_MACCheckBox_clicked(bool checked);
   
   bool nterminalerror();
-  
+
+private:
+  QString lastDir_;
+
+  std::map<std::string, std::string> arguments_;
+
+  std::vector<std::string> spec_file_lst_;
+
+  QProcess process_;
+
+  Ui::TopIndexDialog *ui;
+
+  std::map<std::string, std::string> getArguments();
+
+  std::vector<std::string> getSpecFileList();
+
+  void lockDialog();
+
+  void unlockDialog();
+
+  bool checkError();
+
+  void updateMsg(std::string msg);  
+
+  void updatedir(QString s);
+
+  void sleep(int wait);
+
+  void closeEvent(QCloseEvent *event);
+
+  bool continueToClose();
+
   bool ableToAdd(QString spfile);
 };
 
-#endif  // TOPPIC_GUI_TOPMGWINDOW_H
+#endif

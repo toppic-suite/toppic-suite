@@ -35,141 +35,146 @@
 
 namespace toppic {
 
-Argument::Argument() {
-  initArguments();
+TopmgArgument::TopmgArgument() {
+  arguments_ = initArguments();
 }
 
-void Argument::initArguments() {
-  arguments_["oriDatabaseFileName"]="";
-  arguments_["databaseFileName"] = "";
-  arguments_["databaseBlockSize"] = "250000000";
-  arguments_["maxFragmentLength"] = "500";
-  arguments_["spectrumFileName"] = "";
-  arguments_["combinedOutputName"] = "";
-  arguments_["activation"] = "FILE";
-  arguments_["searchType"] = "TARGET";
-  arguments_["fixedMod"] = "";
-  arguments_["ptmNumber"] = "0";
-  arguments_["massErrorTolerance"] = "15";
-  arguments_["proteoformErrorTolerance"] = "1.2";
-  arguments_["cutoffSpectralType"] = "EVALUE";
-  arguments_["cutoffSpectralValue"] = "0.01";
-  arguments_["cutoffProteoformType"] = "EVALUE";
-  arguments_["cutoffProteoformValue"] = "0.01";
-  arguments_["allowProtMod"] = "NONE,NME,NME_ACETYLATION,M_ACETYLATION";
-  arguments_["numOfTopPrsms"] = "1";
-  arguments_["maxPtmMass"] = "500";
-  arguments_["executiveDir"] = ".";
-  arguments_["resourceDir"] = "";
-  arguments_["keepTempFiles"] = "false";
-  arguments_["groupSpectrumNumber"] = "1";
-  arguments_["filteringResultNumber"] = "20";
-  arguments_["varModFileName"] = "";
-  arguments_["threadNumber"] = "1";
-  arguments_["useFeatureFile"] = "true";
-  arguments_["proteoGraphGap"] = "40";
-  arguments_["useAsfDiag"] = "false";
-  arguments_["varPtmNumber"] = "5";
-  arguments_["varPtmNumInGap"] = "5";
-  arguments_["geneHTMLFolder"] = "true";
-  arguments_["wholeProteinOnly"] = "false";
-  arguments_["keepDecoyResults"] = "false";
-  arguments_["version"] = "";
+std::map<std::string, std::string> TopmgArgument::initArguments() {
+  std::map<std::string, std::string> arguments;
+  arguments["oriDatabaseFileName"]="";
+  arguments["databaseFileName"] = "";
+  arguments["databaseBlockSize"] = "250000000";
+  arguments["maxFragmentLength"] = "500";
+  arguments["spectrumFileName"] = "";
+  arguments["combinedOutputName"] = "";
+  arguments["activation"] = "FILE";
+  arguments["searchType"] = "TARGET";
+  arguments["fixedMod"] = "";
+  arguments["ptmNumber"] = "0";
+  arguments["massErrorTolerance"] = "15";
+  arguments["proteoformErrorTolerance"] = "1.2";
+  arguments["cutoffSpectralType"] = "EVALUE";
+  arguments["cutoffSpectralValue"] = "0.01";
+  arguments["cutoffProteoformType"] = "EVALUE";
+  arguments["cutoffProteoformValue"] = "0.01";
+  arguments["allowProtMod"] = "NONE,NME,NME_ACETYLATION,M_ACETYLATION";
+  arguments["numOfTopPrsms"] = "1";
+  arguments["maxPtmMass"] = "500";
+  arguments["executiveDir"] = ".";
+  arguments["resourceDir"] = "";
+  arguments["keepTempFiles"] = "false";
+  arguments["groupSpectrumNumber"] = "1";
+  arguments["filteringResultNumber"] = "20";
+  arguments["varModFileName"] = "";
+  arguments["threadNumber"] = "1";
+  arguments["useFeatureFile"] = "true";
+  arguments["proteoGraphGap"] = "40";
+  arguments["useAsfDiag"] = "false";
+  arguments["varPtmNumber"] = "5";
+  arguments["varPtmNumInGap"] = "5";
+  arguments["geneHTMLFolder"] = "true";
+  arguments["wholeProteinOnly"] = "false";
+  arguments["keepDecoyResults"] = "false";
+  arguments["version"] = "";
+  return arguments;
 }
 
-void Argument::outputArguments(std::ostream &output, std::map<std::string, std::string> arguments) {
-  output << "********************** Parameters **********************" << std::endl;
-  output << std::setw(50) << std::left << "Protein database file: " << "\t" << arguments["oriDatabaseFileName"] << std::endl;
-  output << std::setw(50) << std::left << "Spectrum file: " << "\t" << arguments["spectrumFileName"] << std::endl;
-  output << std::setw(50) << std::left << "Fragmentation method: " << "\t" << arguments["activation"] << std::endl;
-  output << std::setw(50) << std::left << "Search type: " << "\t" << arguments["searchType"] << std::endl;
+void TopmgArgument::outputArguments(std::ostream &output, 
+                                    const std::string &sep,
+                                    std::map<std::string, std::string> arguments) {
+  int gap = 47;
+  output << "********************** Parameters ***********************" << std::endl;
+  output << std::setw(gap) << std::left << "Protein database file:" << sep << arguments["oriDatabaseFileName"] << std::endl;
+  output << std::setw(gap) << std::left << "Spectrum file:" << sep << arguments["spectrumFileName"] << std::endl;
+  output << std::setw(gap) << std::left << "Fragmentation method:" << sep << arguments["activation"] << std::endl;
+  output << std::setw(gap) << std::left << "Search type:" << sep << arguments["searchType"] << std::endl;
 
   if (arguments["fixedMod"] == "") {
-    output << std::setw(50) << std::left << "Fixed modifications: " << "\t" << "None" << std::endl;
+    output << std::setw(gap) << std::left << "Fixed modifications:" << sep << "None" << std::endl;
   } 
   else if (arguments["fixedMod"] == "C57") {
-    output << std::setw(50) << std::left << "Fixed modifications: " << "\t" << "C57:carbamidomethylation on cysteine" << std::endl;
+    output << std::setw(gap) << std::left << "Fixed modifications:" << sep << "C57:carbamidomethylation on cysteine" << std::endl;
   }
   else if (arguments["fixedMod"] == "C58") {
-    output << std::setw(50) << std::left << "Fixed modifications: " << "\t" << "C58:carboxymethylation on cysteine" << std::endl;
+    output << std::setw(gap) << std::left << "Fixed modifications:" << sep << "C58:carboxymethylation on cysteine" << std::endl;
   }
   else {
-    output << std::setw(50) << std::left << "Fixed modifications: " << "\t" << arguments["fixedMod"] << std::endl;
+    output << std::setw(gap) << std::left << "Fixed modifications:" << sep << arguments["fixedMod"] << std::endl;
   }
 
   if (arguments["useFeatureFile"] == "true") {
-    output << std::setw(50) << std::left << "Use TopFD feature file: " << "\t" << "True" << std::endl;
+    output << std::setw(gap) << std::left << "Use TopFD feature file:" << sep << "True" << std::endl;
   }
   else {
-    output << std::setw(50) << std::left << "Use TopFD feature file: " << "\t" << "False" << std::endl;
+    output << std::setw(gap) << std::left << "Use TopFD feature file:" << sep << "False" << std::endl;
   }
 
-  output << std::setw(50) << std::left << "Error tolerance for matching masses: " << "\t" << arguments["massErrorTolerance"] << " ppm" << std::endl;
-  output << std::setw(50) << std::left << "Error tolerance for identifying PrSM clusters: " << "\t" << arguments["proteoformErrorTolerance"]  
+  output << std::setw(gap) << std::left << "Error tolerance for matching masses:" << sep << arguments["massErrorTolerance"] << " ppm" << std::endl;
+  output << std::setw(gap) << std::left << "Error tolerance for identifying PrSM clusters:" << sep << arguments["proteoformErrorTolerance"]  
       << " Da" << std::endl;
-  output << std::setw(50) << std::left << "Spectrum-level cutoff type: " << "\t" << arguments["cutoffSpectralType"] << std::endl;
-  output << std::setw(50) << std::left << "Spectrum-level cutoff value: " << "\t" << arguments["cutoffSpectralValue"] << std::endl;
-  output << std::setw(50) << std::left << "Proteoform-level cutoff type: " << "\t" << arguments["cutoffProteoformType"] << std::endl;
-  output << std::setw(50) << std::left << "Proteoform-level cutoff value: " << "\t" << arguments["cutoffProteoformValue"] << std::endl;
-  output << std::setw(50) << std::left << "Allowed N-terminal forms: " << "\t" << arguments["allowProtMod"] << std::endl;
-  output << std::setw(50) << std::left << "Maximum mass shift of modifications: " << "\t" << arguments["maxPtmMass"] << " Da" << std::endl;
-  output << std::setw(50) << std::left << "Thread number: " << "\t" << arguments["threadNumber"] << std::endl;
-  output << std::setw(50) << std::left << "Modification file name: " << "\t" << arguments["varModFileName"] << std::endl;
-  output << std::setw(50) << std::left << "Gap in proteoform graph: " << "\t" << arguments["proteoGraphGap"] << std::endl;
-  output << std::setw(50) << std::left << "Maximum number of variable PTMs: " << "\t" << arguments["varPtmNumber"] << std::endl;
-  output << std::setw(50) << std::left << "Maximum number of variable PTMs in a graph gap: " << "\t" << arguments["varPtmNumInGap"] << std::endl;
-  output << std::setw(50) << std::left << "Maximum number of unexpected modifications: " << "\t" << arguments["ptmNumber"] << std::endl;
-  output << std::setw(50) << std::left << "Report only proteoforms from whole proteins: " << "\t" << arguments["wholeProteinOnly"] << std::endl;
-  output << std::setw(50) << std::left << "Executable file directory: " << "\t" << arguments["executiveDir"] << std::endl;
-  output << std::setw(50) << std::left << "Start time: " << "\t" << arguments["startTime"] << std::endl;
+  output << std::setw(gap) << std::left << "Spectrum-level cutoff type:" << sep << arguments["cutoffSpectralType"] << std::endl;
+  output << std::setw(gap) << std::left << "Spectrum-level cutoff value:" << sep << arguments["cutoffSpectralValue"] << std::endl;
+  output << std::setw(gap) << std::left << "Proteoform-level cutoff type:" << sep << arguments["cutoffProteoformType"] << std::endl;
+  output << std::setw(gap) << std::left << "Proteoform-level cutoff value:" << sep << arguments["cutoffProteoformValue"] << std::endl;
+  output << std::setw(gap) << std::left << "Allowed N-terminal forms:" << sep << arguments["allowProtMod"] << std::endl;
+  output << std::setw(gap) << std::left << "Maximum mass shift of modifications:" << sep << arguments["maxPtmMass"] << " Da" << std::endl;
+  output << std::setw(gap) << std::left << "Thread number:" << sep << arguments["threadNumber"] << std::endl;
+  output << std::setw(gap) << std::left << "Modification file name:" << sep << arguments["varModFileName"] << std::endl;
+  output << std::setw(gap) << std::left << "Gap in proteoform graph:" << sep << arguments["proteoGraphGap"] << std::endl;
+  output << std::setw(gap) << std::left << "Maximum number of variable PTMs:" << sep << arguments["varPtmNumber"] << std::endl;
+  output << std::setw(gap) << std::left << "Maximum number of variable PTMs in a graph gap:" << sep << arguments["varPtmNumInGap"] << std::endl;
+  output << std::setw(gap) << std::left << "Maximum number of unexpected modifications:" << sep << arguments["ptmNumber"] << std::endl;
+  if (arguments["wholeProteinOnly"] == "true") {
+    output << std::setw(gap) << std::left << "Report only proteoforms from whole proteins:"  << sep << "True" << std::endl;
+  }
+  else {
+    output << std::setw(gap) << std::left << "Report only proteoforms from whole proteins:"  << sep << "False" << std::endl;
+  }
+  output << std::setw(gap) << std::left << "Executable file directory:" << sep << arguments["executiveDir"] << std::endl;
+  output << std::setw(gap) << std::left << "Start time:" << sep << arguments["startTime"] << std::endl;
   if (arguments["endTime"] != "") {
-    output << std::setw(50) << std::left << "End time: " << "\t" << arguments["endTime"] << std::endl;
+    output << std::setw(gap) << std::left << "End time:" << sep << arguments["endTime"] << std::endl;
   }
-  output << std::setw(50) << std::left << "Version: " << "\t" << arguments["version"] << std::endl;
-
-  output << "********************** Parameters **********************" << std::endl;
-  if (arguments["fixedMod"] == "") {
-    return;
-  }
-  else{
+  output << std::setw(gap) << std::left << "Version:" << sep << arguments["version"] << std::endl;
+  if (arguments["fixedMod"] != "") {
     //add fixed PTM information 
-    output << "********************** Fixed PTM **********************" << std::endl;
+    output << "Fixed PTM Begin" << std::endl;
     if (arguments["fixedMod"] == "C57") {
-      output << std::setw(50) << std::left << "Carbamidomethylation" << "\t" << 57.021464 << std::endl;
+      output << std::setw(gap) << std::left << "Carbamidomethylation" << sep << 57.021464 << std::endl;
     }
     else if (arguments["fixedMod"] == "C58") {
-      output << std::setw(50) << std::left << "Carboxymethylation" << "\t" << 58.005479 << std::endl;
+      output << std::setw(gap) << std::left << "Carboxymethylation" << sep << 58.005479 << std::endl;
     }
     else {
       std::vector<std::vector<std::string>> mod_data = mod_util::readModTxtForTsv(arguments["fixedMod"]);
       for (size_t i = 0; i < mod_data.size(); i++) {
-        output << std::setw(50) << std::left << mod_data[i][0] << "\t" << mod_data[i][1] << std::endl;
+        output << std::setw(gap) << std::left << mod_data[i][0] << sep << mod_data[i][1] << std::endl;
       }
     }
-    output << "********************** Fixed PTM **********************" << std::endl;
+    output << "Fixed PTM End" << std::endl;
   }
-  output << "********************** Variable PTM **********************" << std::endl;
+  output << "Variable PTM Begin" << std::endl;
   std::vector<std::vector<std::string>> mod_data = mod_util::readModTxtForTsv(arguments["varModFileName"]);
   for (size_t i = 0; i < mod_data.size(); i++) {
-    output << std::setw(50) << std::left << mod_data[i][0] << "\t" << mod_data[i][1] << std::endl;
+    output << std::setw(gap) << std::left << mod_data[i][0] << sep << mod_data[i][1] << std::endl;
   }
-  output << "********************** Variable PTM **********************" << std::endl;
-    
+  output << "Variable PTM End" << std::endl;
+  output << "********************** Parameters ***********************" << std::endl;
 }
 
-std::string Argument::outputTsvArguments(std::map<std::string, std::string> arguments) {
+std::string TopmgArgument::outputTsvArguments(std::map<std::string, std::string> arguments) {
   std::stringstream output;
-  outputArguments(output, arguments);
+  outputArguments(output, "\t", arguments);
   return output.str();
 }
 
-void Argument::showUsage(boost::program_options::options_description &desc) {
+void TopmgArgument::showUsage(boost::program_options::options_description &desc) {
   std::cout << "Usage: topmg [options] database-file-name spectrum-file-name" << std::endl;
   std::cout << desc << std::endl;
   std::cout << "Version: " << Version::getVersion() << std::endl;
 }
 
-bool Argument::parse(int argc, char* argv[]) {
+bool TopmgArgument::parse(int argc, char* argv[]) {
   std::string database_file_name = "";
   std::string activation = "";
   std::string fixed_mod = "";
@@ -369,11 +374,6 @@ bool Argument::parse(int argc, char* argv[]) {
     }
 
     if (vm.count("thread-number")) {
-      int max_thread = mem_check::getMaxThreads("topmg");
-      if (max_thread < std::stoi(thread_number)) {
-        std::cout << "WARNING: Based on the available memory size, up to " << max_thread << " threads can be used." << std::endl;
-        std::cout << "Please set the thread number to " << max_thread << " or the program may crash." << std::endl;
-      }
       arguments_["threadNumber"] = thread_number;
     }
 
@@ -421,7 +421,7 @@ bool Argument::parse(int argc, char* argv[]) {
   return validateArguments();
 }
 
-bool Argument::validateArguments() {
+bool TopmgArgument::validateArguments() {
   if (!file_util::exists(arguments_["resourceDir"])) {
     LOG_ERROR("Resource direcotry " << arguments_["resourceDir"] << " does not exist!");
     return false;
@@ -565,17 +565,12 @@ bool Argument::validateArguments() {
   std::string thread_number = arguments_["threadNumber"];
   try {
     int num = std::stoi(thread_number.c_str());
-    if (num <= 0) {
-      LOG_ERROR("Thread number " << thread_number << " error! The value should be positive.");
+    bool valid = mem_check::checkThreadNum(num, "topmg");
+    if (!valid) {
       return false;
     }
-    int n = static_cast<int>(boost::thread::hardware_concurrency());
-    if (num > n) {
-      LOG_ERROR("Thread number " << thread_number << " error! The value is too large. Only " << n << " threads are supported.");
-      return false;
-    }
-  }
-  catch (int e) {
+  } 
+  catch (const std::exception& ex) {
     LOG_ERROR("Thread number " << thread_number << " should be a number.");
     return false;
   }

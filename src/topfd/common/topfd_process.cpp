@@ -34,7 +34,7 @@ void processOneFile(TopfdParaPtr para_ptr,
                     const std::string &spec_file_name, 
                     int frac_id) {
   try {
-    int thread_number = para_ptr->thread_number_;
+    int thread_number = para_ptr->getThreadNum();
 
     std::cout << "Processing " << spec_file_name << " started." << std::endl;
     std::cout << "Deconvolution started." << std::endl;
@@ -68,9 +68,9 @@ void processOneFile(TopfdParaPtr para_ptr,
     std::cout << "Feature detection started." << std::endl;
     feature_detect::process(frac_id, 
                             spec_file_name,
-                            para_ptr->missing_level_one_, 
-                            para_ptr->resource_dir_,             
-			                      para_ptr->activation_, 
+                            para_ptr->isMissingLevelOne(), 
+                            para_ptr->getResourceDir(),             
+			                      para_ptr->getActivation(), 
                             processor.isFaims_,
                             processor.voltage_vec_);
     std::cout << "Feature detection finished." << std::endl;
@@ -147,6 +147,7 @@ bool isValidFile(std::string &file_name) {
   }
 }
 
+/*
 void mergeFiles(TopfdParaPtr para_ptr, 
                 std::vector<std::string> &spec_file_lst) {
   try{
@@ -169,6 +170,7 @@ void mergeFiles(TopfdParaPtr para_ptr,
     exit(EXIT_FAILURE);
   }
 }
+*/
 
 void getMsScanCount(std::string spectrum_file_name, std::vector<int> &scan_cnt_vec) {
   typedef std::shared_ptr<pwiz::msdata::MSDataFile> MSDataFilePtr;
@@ -196,7 +198,7 @@ void getMsScanCount(std::string spectrum_file_name, std::vector<int> &scan_cnt_v
 int process(TopfdParaPtr para_ptr,  std::vector<std::string> spec_file_lst) {
   base_data::init();
 
-  EnvBase::initBase(para_ptr->resource_dir_);
+  EnvBase::initBase(para_ptr->getResourceDir());
   for (size_t k = 0; k < spec_file_lst.size(); k++) {
     //get ms1 and ms2 scan number
     std::vector<int> scan_cnt_vec;
@@ -205,7 +207,7 @@ int process(TopfdParaPtr para_ptr,  std::vector<std::string> spec_file_lst) {
     para_ptr->setMs1ScanNumber(scan_cnt_vec[0]);
     para_ptr->setMs2ScanNumber(scan_cnt_vec[1]);
 
-    std::string print_str = para_ptr->getParaStr("");//print parameter for each file
+    std::string print_str = para_ptr->getParaStr("", " ");//print parameter for each file
     std::cout << print_str;
 
     if (isValidFile(spec_file_lst[k])) {

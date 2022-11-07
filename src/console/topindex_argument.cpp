@@ -29,66 +29,71 @@
 
 namespace toppic {
 
-Argument::Argument() {
-  initArguments();
+TopIndexArgument::TopIndexArgument() {
+  arguments_ = initArguments();
 }
 
-void Argument::initArguments() {
-  arguments_["oriDatabaseFileName"]="";
-  arguments_["databaseFileName"] = "";
-  arguments_["databaseBlockSize"] = "250000000";
-  arguments_["maxFragmentLength"] = "500";
-  arguments_["searchType"] = "TARGET";
-  arguments_["fixedMod"] = "";
-  arguments_["massErrorTolerance"] = "15";
-  arguments_["allowProtMod"] = "NONE,NME,NME_ACETYLATION,M_ACETYLATION";
-  arguments_["executiveDir"] = ".";
-  arguments_["resourceDir"] = "";
-  arguments_["threadNumber"] = "1";
-  arguments_["version"] = "";
+std::map<std::string, std::string> TopIndexArgument::initArguments() {
+  std::map<std::string, std::string> arguments;
+  arguments["oriDatabaseFileName"]="";
+  arguments["databaseFileName"] = "";
+  arguments["databaseBlockSize"] = "250000000";
+  arguments["maxFragmentLength"] = "500";
+  arguments["searchType"] = "TARGET";
+  arguments["fixedMod"] = "";
+  arguments["massErrorTolerance"] = "15";
+  arguments["allowProtMod"] = "NONE,NME,NME_ACETYLATION,M_ACETYLATION";
+  arguments["executiveDir"] = ".";
+  arguments["resourceDir"] = "";
+  arguments["threadNumber"] = "1";
+  arguments["version"] = "";
+
   // filtering result number is for diagonal filter
-  arguments_["filteringResultNumber"] = "20";
-  
+  arguments["filteringResultNumber"] = "20";
+
   // the following two arguments are used for the initializatio of prsm para
-  arguments_["groupSpectrumNumber"] = "1";
-  arguments_["activation"] = "FILE";
+  arguments["groupSpectrumNumber"] = "1";
+  arguments["activation"] = "FILE";
+  return arguments;
 }
 
-void Argument::outputArguments(std::ostream &output, 
-                               std::map<std::string, std::string> arguments) {
+void TopIndexArgument::outputArguments(std::ostream &output, 
+				       const std::string &sep, 
+                                       std::map<std::string, std::string> arguments) {
+  int gap = 36;
   output << "********************** Parameters **********************" << std::endl;
-  output << std::setw(44) << std::left << "Protein database file: " << "\t" << arguments["oriDatabaseFileName"] << std::endl;
-  output << std::setw(44) << std::left << "Search type: " << "\t" << arguments["searchType"] << std::endl;
+  output << std::setw(gap) << std::left << "Protein database file:" << sep << arguments["oriDatabaseFileName"] << std::endl;
+  output << std::setw(gap) << std::left << "Search type: " << sep << arguments["searchType"] << std::endl;
 
   if (arguments["fixedMod"] == "") {
-    output << std::setw(44) << std::left << "Fixed modifications: " << "\t" << "None" << std::endl;
+    output << std::setw(gap) << std::left << "Fixed modifications:" << sep << "None" << std::endl;
   } 
   else if (arguments["fixedMod"] == "C57") {
-    output << std::setw(44) << std::left << "Fixed modifications: " << "\t" << "C57:carbamidomethylation on cysteine" << std::endl;
+    output << std::setw(gap) << std::left << "Fixed modifications:" << sep << "C57:carbamidomethylation on cysteine" << std::endl;
   }
   else if (arguments["fixedMod"] == "C58") {
-    output << std::setw(44) << std::left << "Fixed modifications: " << "\t" << "C58:carboxymethylation on cysteine" << std::endl;
+    output << std::setw(gap) << std::left << "Fixed modifications:" << sep << "C58:carboxymethylation on cysteine" << std::endl;
   }
   else {
-    output << std::setw(44) << std::left << "Fixed modifications:," << "\t" << arguments["fixedMod"] << std::endl;
+    output << std::setw(gap) << std::left << "Fixed modifications:" << sep << arguments["fixedMod"] << std::endl;
   }
 
-  output << std::setw(44) << std::left << "Error tolerance for matching masses: " << "\t" << arguments["massErrorTolerance"] << " ppm" << std::endl;
+  output << std::setw(gap) << std::left << "Error tolerance for matching masses:" << sep << arguments["massErrorTolerance"] << " ppm" << std::endl;
 
-  output << std::setw(44) << std::left << "Allowed N-terminal forms: " << "\t" <<  arguments["allowProtMod"] << std::endl;
-  output << std::setw(44) << std::left << "Thread number: " << "\t" << arguments["threadNumber"] << std::endl;
-  output << std::setw(44) << std::left << "Version: " << "\t" << arguments["version"] << std::endl;
+  output << std::setw(gap) << std::left << "Allowed N-terminal forms:" << sep <<  arguments["allowProtMod"] << std::endl;
+  output << std::setw(gap) << std::left << "Thread number:" << sep << arguments["threadNumber"] << std::endl;
+  output << std::setw(gap) << std::left << "Version:" << sep << arguments["version"] << std::endl;
   output << "********************** Parameters **********************" << std::endl;
 }
 
 
-void Argument::showUsage(boost::program_options::options_description &desc) {
+void TopIndexArgument::showUsage(boost::program_options::options_description &desc) {
   std::cout << "Usage: topindex [options] database-file-name" << std::endl; 
   std::cout << desc << std::endl; 
   std::cout << "Version: " << Version::getVersion() << std::endl;
 }
 
-bool Argument::parse(int argc, char* argv[]) {
+bool TopIndexArgument::parse(int argc, char* argv[]) {
   
   std::string database_file_name = "";
   std::string argument_file_name = "";
@@ -181,11 +186,6 @@ bool Argument::parse(int argc, char* argv[]) {
     }
 
     if (vm.count("thread-number")) {
-      int max_thread = mem_check::getMaxThreads("topindex");
-      if (max_thread < std::stoi(thread_number)) {
-        std::cout << "WARNING: Based on the available memory size, up to " << max_thread << " threads can be used." << std::endl;
-        std::cout << "Please set the thread number to " << max_thread << " or the program may crash." << std::endl;
-      }
       arguments_["threadNumber"] = thread_number;
     }
   }
@@ -197,7 +197,7 @@ bool Argument::parse(int argc, char* argv[]) {
   return validateArguments();
 }
 
-bool Argument::validateArguments() {
+bool TopIndexArgument::validateArguments() {
   if (!file_util::exists(arguments_["resourceDir"])) {
     LOG_ERROR("Resource direcotry " << arguments_["resourceDir"] << " does not exist!");
     return false;
@@ -248,20 +248,14 @@ bool Argument::validateArguments() {
     return false;
   }
 
-
   std::string thread_number = arguments_["threadNumber"];
   try {
     int num = std::stoi(thread_number.c_str());
-    if (num <= 0) {
-      LOG_ERROR("Thread number " << thread_number << " error! The value should be positive.");
+    bool valid = mem_check::checkThreadNum(num, "topindex");
+    if (!valid) {
       return false;
     }
-    int n = static_cast<int>(boost::thread::hardware_concurrency());
-    if(num > n){
-      LOG_ERROR("Thread number " << thread_number << " error! The value is too large. Only " << n << " threads are supported.");
-      return false;
-    }
-  } catch (int e) {
+  } catch (std::exception& e) {
     LOG_ERROR("Thread number " << thread_number << " should be a number.");
     return false;
   }

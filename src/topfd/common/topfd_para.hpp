@@ -23,11 +23,48 @@ namespace toppic {
 class TopfdPara {
  public:
   TopfdPara() {};
+  
+  std::string getParaStr(const std::string &prefix,
+		         const std::string &sep);
+
+  std::string getExeDir() {return exe_dir_;}
+  std::string getResourceDir() {return resource_dir_;}
+  bool isMissingLevelOne() {return missing_level_one_;}
+  int getMaxCharge() {return max_charge_;}
+  double getMaxMass() {return max_mass_;}
+  double getMzError() {return mz_error_;}
+  double getMsOneSnRatio() {return ms_one_sn_ratio_;}
+  double getMsTwoSnRatio() {return ms_two_sn_ratio_;}
+  double getPrecWindow() {return prec_window_;}
+  bool isUseEnvCnn() {return use_env_cnn_;}
+  bool isDoFinalFiltering() {return do_final_filtering_;}
+  std::string getActivation() {return activation_;}
+  bool isGeneHtmlFolder() {return gene_html_folder_;}
+  bool isKeepUnusedPeaks() {return keep_unused_peaks_;}
+  bool isOutputMultipleMass() {return output_multiple_mass_;}
+  int getThreadNum() {return thread_num_;}
+
+  void setExeDir(std::string dir) {exe_dir_ = dir;}
+  void setResourceDir(std::string dir) {resource_dir_ = dir;}
+  void setMissingLevelOne(bool missing) {missing_level_one_ = missing;}
+  void setMaxCharge(int charge) {max_charge_ = charge;}
+  void setMaxMass(double mass) {max_mass_ = mass;}
+  void setMzError(double error) {mz_error_ = error;}
+  void setMsOneSnRatio(double ratio) {ms_one_sn_ratio_ = ratio;}
+  void setMsTwoSnRatio(double ratio) {ms_two_sn_ratio_ = ratio;}
+  void setPrecWindow(double window) {prec_window_ = window;}
+  void setUseEnvCnn(bool use) {use_env_cnn_ = use;}
+  void setDoFinalFiltering(bool filtering) {do_final_filtering_ = filtering;}
+  void setActivation(std::string activation) {activation_ = activation;}
+  void setGeneHtmlFolder(bool gene) {gene_html_folder_ = gene;}
+  void setKeepUnusedPeaks(bool keep) {keep_unused_peaks_ = keep;}
+  void setOutputMultipleMass(bool output) {output_multiple_mass_ = output;}
+  void setThreadNum(int num) {thread_num_ = num;}
+
   void setMs1ScanNumber(int ms1_scan_num) {ms_1_scan_num_ = ms1_scan_num;}
   void setMs2ScanNumber(int ms2_scan_num) {ms_2_scan_num_ = ms2_scan_num;}
-  
-  std::string getParaStr(const std::string &prefix);
 
+ private:
   std::string exe_dir_;
   std::string resource_dir_;
   bool refine_prec_mass_ = true;
@@ -43,12 +80,9 @@ class TopfdPara {
   bool output_multiple_mass_ = false;
   bool do_final_filtering_ = true;
   bool output_match_env_ = false;
-  //bool output_json_files_ = true;
-  bool merge_files_ = false;
-  int  thread_number_ = 1;
+  int  thread_num_ = 1;
   std::string activation_ = "FILE";
   bool gene_html_folder_ = true;
-  std::string merged_file_name_ = "";
   int ms_1_scan_num_ = -1;
   int ms_2_scan_num_ = -1;
 };

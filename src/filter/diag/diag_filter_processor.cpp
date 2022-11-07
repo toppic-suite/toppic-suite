@@ -17,6 +17,7 @@
 #include "common/util/file_util.hpp"
 #include "common/base/mod_util.hpp"
 #include "common/thread/simple_thread_pool.hpp"
+#include "seq/db_block.hpp"
 #include "seq/proteoform_factory.hpp"
 #include "ms/spec/msalign_util.hpp"
 #include "ms/factory/prm_ms_factory.hpp"
@@ -30,15 +31,85 @@
 
 namespace toppic {
 
-std::function<void()> geneTask(DiagFilterPtr filter_ptr,
-                               const PrmMsPtrVec & ms_ptr_vec,
-                               SimpleThreadPoolPtr  pool_ptr, 
-                               SimplePrsmXmlWriterPtrVec &writer_ptr_vec) {
-  return [filter_ptr, ms_ptr_vec, pool_ptr, writer_ptr_vec]() {
-    SimplePrsmPtrVec match_ptrs = filter_ptr->getBestMatch(ms_ptr_vec);
-    boost::thread::id thread_id = boost::this_thread::get_id();
-    int writer_id = pool_ptr->getId(thread_id);
-    writer_ptr_vec[writer_id]->write(match_ptrs);
+inline void filterBlock(const ProteoformPtrVec & raw_forms,
+                        int block_idx, 
+                        DiagFilterMngPtr mng_ptr,
+                        const std::vector<double> & mod_mass_list) {
+  std::string block_str = str_util::toString(block_idx);
+
+  DiagFilterPtr filter_ptr = std::make_shared<DiagFilter>(raw_forms, mng_ptr, block_str);
+
+  PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
+  SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
+  std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
+  int group_spec_num = mng_ptr->prsm_para_ptr_->getGroupSpecNum();
+
+  SimpleMsAlignReaderPtr reader_ptr = std::make_shared<SimpleMsAlignReader>(sp_file_name,
+                                                                            group_spec_num,
+                                                                            sp_para_ptr->getActivationPtr());
+
+  // init writer 
+  std::string output_file_name = file_util::basename(prsm_para_ptr->getSpectrumFileName())
+      + "." + mng_ptr->output_file_ext_+"_"+ block_str; 
+
+  SimplePrsmXmlWriterPtr writer_ptr = std::make_shared<SimplePrsmXmlWriter>(output_file_name);
+
+  SpectrumSetPtr spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(reader_ptr, sp_para_ptr);
+
+  while (spec_set_ptr != nullptr) {
+    if (spec_set_ptr->isValid()) {
+      if (mng_ptr->var_num_ == 0) {
+        PrmMsPtrVec ms_ptr_vec = spec_set_ptr->getMsTwoPtrVec();
+        SimplePrsmPtrVec match_ptrs = filter_ptr->getBestMatch(ms_ptr_vec);
+        writer_ptr->write(match_ptrs);
+      } 
+      else {
+        DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
+        double prec_mono_mass = spec_set_ptr->getPrecMonoMass();
+        std::vector<double> mod_mass(3);
+        for (size_t i = 0; i < mod_mass_list.size(); i++) {
+          for (size_t k1 = 0; k1 < mod_mass.size(); k1++) {
+            std::fill(mod_mass.begin(), mod_mass.end(), 0.0);
+            mod_mass[k1] += mod_mass_list[i];
+            PrmMsPtrVec ms_ptr_vec = prm_ms_factory::geneMsTwoPtrVec(deconv_ms_ptr_vec,
+                                                                     sp_para_ptr,
+                                                                     prec_mono_mass, mod_mass);
+            SimplePrsmPtrVec match_ptrs = filter_ptr->getBestMatch(ms_ptr_vec);
+            writer_ptr->write(match_ptrs);
+          }
+        }
+      }
+    }
+    mng_ptr->cnts_[block_idx] = mng_ptr->cnts_[block_idx] + group_spec_num;
+    int cnt_sum = 0; 
+    for (size_t i = 0; i < mng_ptr->cnts_.size(); i++) {
+      cnt_sum = cnt_sum + mng_ptr->cnts_[i];
+    }
+    double perc = cnt_sum * 100.0 / mng_ptr->n_spec_block_;
+    std::stringstream msg;
+    msg << std::flush << "Multiple PTM filtering - processing " << std::setprecision(3) <<  perc << "%.     \r";
+    mng_ptr->mutex_.lock();
+    std::cout << msg.str();
+    mng_ptr->mutex_.unlock();
+
+    spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(reader_ptr, sp_para_ptr);
+  }
+  writer_ptr->close();
+}
+
+std::function<void()> geneTask(int block_idx, 
+                               const std::vector<double> &mod_mass_list, 
+                               DiagFilterMngPtr mng_ptr) {
+  return[block_idx, mod_mass_list, mng_ptr] () {
+    PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
+    std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
+    std::string db_block_file_name = prsm_para_ptr->getOriDbName() + "_idx" 
+      + file_util::getFileSeparator() + prsm_para_ptr->getSearchDbFileName()
+      + "_" + str_util::toString(block_idx);
+    ProteoformPtrVec raw_forms
+        = proteoform_factory::readFastaToProteoformPtrVec(db_block_file_name,
+                                                          prsm_para_ptr->getFixModPtrVec());
+    filterBlock(raw_forms, block_idx, mng_ptr, mod_mass_list);
   };
 }
 
@@ -53,16 +124,24 @@ void DiagFilterProcessor::process() {
         = mod_util::getModMassVec(mod_util::readModTxt(mng_ptr_->residue_mod_file_name_)[2]);
   }
 
+  int spec_num = msalign_util::getSpNum(mng_ptr_->prsm_para_ptr_->getSpectrumFileName());
+  mng_ptr_->n_spec_block_ = spec_num * db_block_ptr_vec.size();
+
+  SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(mng_ptr_->thread_num_);
+  int block_num = db_block_ptr_vec.size();
+  mng_ptr_->cnts_.resize(block_num, 0);
+
   for (size_t i = 0; i < db_block_ptr_vec.size(); i++) {
-    std::cout << "Multiple PTM filtering - block " << (i + 1) << " out of "
-        << db_block_ptr_vec.size() << " started." << std::endl;
-    processBlock(db_block_ptr_vec[i], db_block_ptr_vec.size(), mod_mass_list, i);
-    std::cout << "Multiple PTM filtering - block " << (i + 1) << " finished. " << std::endl;
+    while (pool_ptr->getQueueSize() > 0 || pool_ptr->getIdleThreadNum() == 0) {
+      boost::this_thread::sleep(boost::posix_time::milliseconds(10));
+    }
+    pool_ptr->Enqueue(geneTask(db_block_ptr_vec[i]->getBlockIdx(), mod_mass_list, mng_ptr_));
   }
+  pool_ptr->ShutDown();
+  std::cout << std::endl;
 
   std::cout << "Multiple PTM filtering - combining blocks started." << std::endl;
   std::string sp_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
-  int block_num = db_block_ptr_vec.size();
   SimplePrsmStrMergePtr merge_ptr
       = std::make_shared<SimplePrsmStrMerge>(sp_file_name, mng_ptr_->output_file_ext_,
                                              block_num, mng_ptr_->output_file_ext_,
@@ -74,97 +153,5 @@ void DiagFilterProcessor::process() {
   std::cout << "Multiple PTM filtering - combining blocks finished." << std::endl;
 }
 
-void DiagFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num,
-                                       const std::vector<double> & mod_mass_list, int block_idx) {
-  std::string block_number = str_util::toString(block_idx);
-  PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
-  //std::string db_block_file_name = prsm_para_ptr->getSearchDbFileName()
-  //    + "_" + str_util::toString(block_ptr->getBlockIdx());
-  std::string db_block_file_name = prsm_para_ptr->getOriDbName() + "_idx" 
-    + file_util::getFileSeparator() + prsm_para_ptr->getSearchDbFileName()
-    + "_" + str_util::toString(block_idx);
-  ProteoformPtrVec raw_forms
-      = proteoform_factory::readFastaToProteoformPtrVec(db_block_file_name,
-                                                        prsm_para_ptr->getFixModPtrVec());
-
-
-  DiagFilterPtr filter_ptr = std::make_shared<DiagFilter>(raw_forms, mng_ptr_, block_number);
-
-  int group_spec_num = mng_ptr_->prsm_para_ptr_->getGroupSpecNum();
-  SpParaPtr sp_para_ptr =  mng_ptr_->prsm_para_ptr_->getSpParaPtr();
-  std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
-  SimpleMsAlignReaderPtr reader_ptr = std::make_shared<SimpleMsAlignReader>(sp_file_name,
-                                                                            group_spec_num,
-                                                                            sp_para_ptr->getActivationPtr());
-
-  // init writer 
-  std::string output_file_name = file_util::basename(prsm_para_ptr->getSpectrumFileName())
-      + "." + mng_ptr_->output_file_ext_+"_"+ str_util::toString(block_ptr->getBlockIdx());
-  SimplePrsmXmlWriterPtrVec writer_ptr_vec 
-      = simple_prsm_xml_writer_util::geneWriterPtrVec(output_file_name, mng_ptr_->thread_num_);
-
-  SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(mng_ptr_->thread_num_);
-
-  SpectrumSetPtr spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(reader_ptr, sp_para_ptr);
-
-  int spectrum_num = msalign_util::getSpNum(prsm_para_ptr->getSpectrumFileName());
-
-  int cnt = 0;
-  while (spec_set_ptr != nullptr) {
-    cnt += group_spec_num;
-    if (spec_set_ptr->isValid()) {
-      if (mng_ptr_->var_num_ == 0) {
-        PrmMsPtrVec ms_ptr_vec = spec_set_ptr->getMsTwoPtrVec();
-        while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ * 2) {
-          boost::this_thread::sleep(boost::posix_time::milliseconds(100));
-        }
-        pool_ptr->Enqueue(geneTask(filter_ptr, ms_ptr_vec, pool_ptr, writer_ptr_vec));
-      } else {
-        DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
-        double prec_mono_mass = spec_set_ptr->getPrecMonoMass();
-        std::vector<double> mod_mass(3);
-        for (size_t i = 0; i < mod_mass_list.size(); i++) {
-          for (size_t k1 = 0; k1 < mod_mass.size(); k1++) {
-            std::fill(mod_mass.begin(), mod_mass.end(), 0.0);
-            mod_mass[k1] += mod_mass_list[i];
-            PrmMsPtrVec ms_ptr_vec = prm_ms_factory::geneMsTwoPtrVec(deconv_ms_ptr_vec,
-                                                                     sp_para_ptr,
-                                                                     prec_mono_mass, mod_mass);
-            while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ * 2) {
-              boost::this_thread::sleep(boost::posix_time::milliseconds(100));
-            }
-            pool_ptr->Enqueue(geneTask(filter_ptr, ms_ptr_vec, pool_ptr, writer_ptr_vec));
-          }
-        }
-      }
-    }
-    std::stringstream msg;
-    msg << std::flush << "Multiple PTM filtering - processing " << cnt
-        << " of " << spectrum_num << " spectra.\r";
-    std::cout << msg.str();
-    spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(reader_ptr, sp_para_ptr);
-  }
-  pool_ptr->ShutDown();
-  std::cout << std::endl;
-  simple_prsm_xml_writer_util::closeWriterPtrVec(writer_ptr_vec);
-
-  //combine files generated by multiple threads
-  std::string block_str = str_util::toString(block_ptr->getBlockIdx());
-  std::vector<std::string> input_exts;
-  std::string cur_output_ext = mng_ptr_->output_file_ext_ + "_" + block_str;
-  for (int i = 0; i < mng_ptr_->thread_num_; i++) {
-    std::string fname = cur_output_ext + "_" + str_util::toString(i);
-    input_exts.push_back(fname);
-  }
-
-  SimplePrsmStrMergePtr merge_ptr
-      = std::make_shared<SimplePrsmStrMerge>(mng_ptr_->prsm_para_ptr_->getSpectrumFileName(),
-                                             input_exts, cur_output_ext, INT_MAX);
-  merge_ptr->process();
-  merge_ptr = nullptr;
-  
-  //Remove temporary files
-  file_util::cleanTempFiles(sp_file_name, cur_output_ext + "_");
-}
 
 }  // namespace toppic

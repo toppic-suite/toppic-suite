@@ -15,7 +15,6 @@
 #ifndef TOPPIC_FILTER_DIAG_DIAG_FILTER_PROCESSOR_HPP_
 #define TOPPIC_FILTER_DIAG_DIAG_FILTER_PROCESSOR_HPP_
 
-#include "seq/db_block.hpp"
 #include "filter/mng/diag_filter_mng.hpp"
 
 namespace toppic {
@@ -28,9 +27,6 @@ class DiagFilterProcessor {
 
  private:
   DiagFilterMngPtr mng_ptr_;
-
-  void processBlock(DbBlockPtr block_ptr, int total_block_num,
-                    const std::vector<double> & mod_mass_list, int block_num);
 };
 
 typedef std::shared_ptr<DiagFilterProcessor> DiagFilterProcessorPtr;

@@ -12,36 +12,36 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_GUI_TOPPICWINDOW_H
-#define TOPPIC_GUI_TOPPICWINDOW_H
+#ifndef TOPPIC_GUI_TOPMGWINDOW_HPP
+#define TOPPIC_GUI_TOPMGWINDOW_HPP
 
-#include <vector>
 #include <map>
 #include <string>
 
 #include <QMainWindow>
 #include <QMouseEvent>
+#include <QProcess>
 
-#include "threadtoppic.h"
 
 namespace Ui {
-class toppicWindow;
+class TopmgWindow;
 }
 
-class toppicWindow : public QMainWindow {
+class TopmgWindow : public QMainWindow {
  Q_OBJECT
 
  public:
-  explicit toppicWindow(QWidget *parent = 0);
-  ~toppicWindow();
+  explicit TopmgWindow(QWidget *parent = 0);
+
+  ~TopmgWindow();
 
  private slots:
   void on_databaseFileButton_clicked();
 
   void on_fixedModFileButton_clicked();
-
+  
   void on_modFileButton_clicked();
-
+  
   void on_clearButton_clicked();
 
   void on_defaultButton_clicked();
@@ -53,73 +53,61 @@ class toppicWindow : public QMainWindow {
   void on_outputButton_clicked();
 
   void on_fixedModComboBox_currentIndexChanged(int index);
-
-  void on_errorToleranceEdit_textChanged(QString string);
-
-  void on_lookupTableCheckBox_clicked(bool checked);
-
+    
   void on_NONECheckBox_clicked(bool checked);
-
+    
   void on_NMECheckBox_clicked(bool checked);
-
+    
   void on_NMEACCheckBox_clicked(bool checked);
-
+    
   void on_MACCheckBox_clicked(bool checked);
-
-  void on_numModComboBox_currentIndexChanged(int index);
-
+    
   void on_cutoffSpectralTypeComboBox_currentIndexChanged(int index);
-
+    
   void on_cutoffProteoformTypeComboBox_currentIndexChanged(int index);
-
+    
   void on_decoyCheckBox_clicked(bool checked);
-
+    
   void on_addButton_clicked();
-
+    
   void on_delButton_clicked();
 
  private:
-  Ui::toppicWindow *ui;
-
+  Ui::TopmgWindow *ui;
+  
   QString lastDir_;
-
+  
   std::map<std::string, std::string> arguments_;
-
+  
   std::vector<std::string> spec_file_lst_;
 
-  void initArguments();
-
+  QProcess process_;
+  
   std::map<std::string, std::string> getArguments();
-
+  
   std::vector<std::string> getSpecFileList();
 
   void lockDialog();
-
+  
   void unlockDialog();
-
+  
   bool checkError();
-
+  
   void updateMsg(std::string msg);
-
+  
   void updatedir(QString s);
-
+  
   void showArguments();
-
+  
   void sleep(int wait);
-
-  threadtoppic* thread_;
-
-  QString showInfo;
-
+  
   void closeEvent(QCloseEvent *event);
-
+  
   bool continueToClose();
-
+  
   bool nterminalerror();
-
-  bool event(QEvent *event);
-
+  
   bool ableToAdd(QString spfile);
 };
 
-#endif  // TOPPIC_GUI_TOPPICWINDOW_H
+#endif  // TOPPIC_GUI_TOPMGWINDOW_H

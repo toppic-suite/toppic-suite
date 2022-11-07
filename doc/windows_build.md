@@ -42,3 +42,9 @@ cd build
 cmake -G "MinGW Makefiles" ..
 mingw32-make
 ```
+
+**Move  the folder toppic_resources to the folder bin**
+```sh
+cd ..\bin
+move ..\resources .
+```

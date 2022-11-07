@@ -33,7 +33,7 @@ int topconvertProcess(std::map<std::string, std::string> & arguments) {
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
     LOG_DEBUG("prsm para inited");
 
-    std::string argu_str = Argument::outputTsvArguments(arguments);
+    std::string argu_str = ToppicArgument::outputTsvArguments(arguments);
 
     std::cout << "Outputting PrSM table - started." << std::endl;
     PrsmTableWriterPtr table_out

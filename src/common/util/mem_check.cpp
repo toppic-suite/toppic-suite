@@ -14,8 +14,11 @@
 
 #include <math.h>
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <limits>
+
+#include "boost/thread/thread.hpp"
 #include "common/util/mem_check.hpp"
 #include "common/util/logger.hpp"
 
@@ -30,13 +33,19 @@ namespace toppic {
 namespace mem_check {
 
 std::map<std::string, double> memory_per_thread_list {
-  {"topfd", 0.5}, 
-    {"toppic", 2},
-    {"toppic_filter", 2},
+  // topfd memory requirement per thread: about 0.15 gb
+  {"topfd", 0.3}, 
+  // topindex memory requirement per thread: about 1.5 gb
+    {"topindex", 1.75},  
+  // toppic memory requirement per thread: about 3.0 gb
+    {"toppic", 3.5},
+  // toppic filter memory requirement per thread: about 3.0 gb
+    {"toppic_filter", 3.5},
+  // diag filter memory requirement per thread: about 1.5 gb
+    {"diag_filter", 1.75},
     {"topmg", 4}, 
-    {"topmerge", 4}, 
     {"topdiff", 4},
-    {"topindex", 1.5}  
+    {"topmerge", 4} 
 };
 
 
@@ -96,19 +105,31 @@ double getTotalMemInGb () {
 }
 
 double getAvailMemInGb () {
-  double avail_mem_in_gb = getTotalMemInGb();
+  double avail_mem_in_gb = 0;
 #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
+  avail_mem_in_gb = getTotalMemInGb();
   if (isWindows11()) {
     // minus 3 for windows 11
     avail_mem_in_gb = avail_mem_in_gb - 3;
   }
   else {
-    // minus 1.5 for Windows 10
-    avail_mem_in_gb = avail_mem_in_gb - 1.5;
+    // minus 2 for Windows 10
+    avail_mem_in_gb = avail_mem_in_gb - 2;
   }
 #else
-  // minus 1 for linux
-  avail_mem_in_gb = avail_mem_in_gb - 1;
+  std::string token;
+  std::ifstream file("/proc/meminfo");
+  while(file >> token) {
+    if(token == "MemAvailable:") {
+      double mem;
+      if(file >> mem) {
+        avail_mem_in_gb = mem/1024/1024;
+      }
+      break;
+    }
+    // Ignore the rest of the line
+    file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+  }
 #endif
   if (avail_mem_in_gb < 0) {
     avail_mem_in_gb = 0;
@@ -123,12 +144,46 @@ int getMaxThreads(std::string app_name) {//return max thread number based on tot
     return 0;
   }
   double mem_per_thread = memory_per_thread_list[app_name];
-  int max_thread_num =  static_cast<int>(avail_mem_in_gb / mem_per_thread);
+  int max_thread_num = std::floor(avail_mem_in_gb / mem_per_thread);
   //std::cout << "Available memory " << avail_mem_in_gb << " memory per thread " << mem_per_thread << " max_thread_num " << max_thread_num << std::endl;
   if (max_thread_num == 0) {
     max_thread_num = 1;
   }
   return max_thread_num;
+}
+
+bool checkThreadNum(int thread_number, std::string prog) {
+  if (thread_number <= 0) {
+    LOG_ERROR("Thread number " << thread_number << " error! The value should be positive.");
+    return false;
+  }
+  int total_thread_num = static_cast<int>(boost::thread::hardware_concurrency());
+  float total_mem_in_gb = mem_check::getTotalMemInGb(); 
+  float avail_mem_in_gb = mem_check::getAvailMemInGb();
+  std::cout << "Total thread number: " << total_thread_num << std::endl;
+  std::cout << "Total memory: " << std::setprecision(4) << total_mem_in_gb << " GiB" << std::endl;
+  std::cout << "Available memory: " << avail_mem_in_gb << " GiB" << std::endl;
+  std::cout << std::endl;
+  // set precision to default
+  std::cout << std::setprecision(6);
+
+  if(thread_number > total_thread_num){
+    LOG_ERROR("Thread number " << thread_number << " error! The value is too large. At most " << total_thread_num << " threads are supported.");
+    return false;
+  }
+  int max_thread = mem_check::getMaxThreads(prog);
+  // std::cout << "Maximum thread number: " << max_thread << std::endl;
+  if (max_thread < thread_number) {
+    // in toppic, we automatically control thread numbers for filtering
+    if (prog != "toppic" && prog != "topmg") {
+      std::cout << "WARNING: Based on the available memory size, up to " << max_thread << " threads can be used!" << std::endl;
+      std::cout << "WARNING: Please set the thread number to " << max_thread << " or the program may crash!" << std::endl;
+    }
+    else {
+      std::cout << "WARNING: Based on the available memory size, " << max_thread << " threads will be used for protein sequence filtering and " << thread_number << " threads will be used for other steps in proteoform identification!"  << std::endl;
+    }
+  }
+  return true;
 }
 
 }

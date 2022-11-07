@@ -157,7 +157,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));
 
     arguments["startTime"] = buf;
-    Argument::outputArguments(std::cout, arguments);
+    ToppicArgument::outputArguments(std::cout, " ", arguments);
 
     base_data::init();
 
@@ -192,6 +192,10 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
       filter_thread_num = thread_num;
     }
     LOG_DEBUG("Filter thread number " << filter_thread_num);
+    int diag_filter_thread_num = mem_check::getMaxThreads("diag_filter");
+    if (diag_filter_thread_num > thread_num) {
+      diag_filter_thread_num = thread_num;
+    }
 
     bool use_gf = true;
     if (arguments["useLookupTable"] == "true") {
@@ -269,7 +273,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
       // thread number is used because diagonal filter uses only one index
       DiagFilterMngPtr diag_filter_mng_ptr
           = std::make_shared<DiagFilterMng>(prsm_para_ptr, index_file_para,  
-                                            filter_result_num, thread_num, 
+                                            filter_result_num, diag_filter_thread_num, 
                                             "toppic_multi_filter");
       DiagFilterProcessorPtr diag_filter_processor
           = std::make_shared<DiagFilterProcessor>(diag_filter_mng_ptr);
@@ -406,7 +410,7 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&end));
     arguments["endTime"] = buf;
 
-    std::string argu_str = Argument::outputTsvArguments(arguments);
+    std::string argu_str = ToppicArgument::outputTsvArguments(arguments);
 
     std::cout << "Outputting PrSM table - started." << std::endl;
     PrsmMatchTableWriterPtr table_out
@@ -423,17 +427,17 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     XmlGeneratorPtr xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, resource_dir, 
                                                                 cur_suffix, "toppic_prsm_cutoff");
     if (arguments["geneHTMLFolder"] == "true"){
-      std::cout << "Generating PrSM xml files - started." << std::endl;
+      std::cout << "Generating PrSM XML files - started." << std::endl;
     
       xml_gene->process();
       xml_gene = nullptr;
-      std::cout << "Generating PrSM xml files - finished." << std::endl;
+      std::cout << "Generating PrSM XML files - finished." << std::endl;
 
       copyTopMSV(arguments);
   
-      std::cout << "Converting PrSM xml files to json files - started." << std::endl;
+      std::cout << "Converting PrSM XML files to JSON files - started." << std::endl;
       jsonTranslate(arguments, "toppic_prsm_cutoff");
-      std::cout << "Converting PrSM xml files to json files - finished." << std::endl;
+      std::cout << "Converting PrSM XML files to JSON files - finished." << std::endl;
     }
 
     cutoff_type = (arguments["cutoffProteoformType"] == "FDR") ? "FORMFDR": "EVALUE";
@@ -462,17 +466,17 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
 
     if (arguments["geneHTMLFolder"] == "true"){
 
-      std::cout << "Generating proteoform xml files - started." << std::endl;
+      std::cout << "Generating proteoform XML files - started." << std::endl;
       xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, resource_dir, 
                                               "toppic_form_cutoff", 
                                               "toppic_proteoform_cutoff");
     
       xml_gene->process();
       xml_gene = nullptr;
-      std::cout << "Generating proteoform xml files - finished." << std::endl;
-      std::cout << "Converting proteoform xml files to html files - started." << std::endl;
+      std::cout << "Generating proteoform XML files - finished." << std::endl;
+      std::cout << "Converting proteoform XML files to HTML files - started." << std::endl;
       jsonTranslate(arguments, "toppic_proteoform_cutoff");
-      std::cout << "Converting proteoform xml files to html files - finished." << std::endl;
+      std::cout << "Converting proteoform XML files to HTML files - finished." << std::endl;
     }
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;

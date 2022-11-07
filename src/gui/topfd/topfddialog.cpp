@@ -16,20 +16,24 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <iostream>
 
 #include <QFileDialog>
 #include <QElapsedTimer>
 #include <QMessageBox>
 #include <QCloseEvent>
 #include <QDesktopServices>
+#include <QScrollBar>
+#include <QProcess>
+#include <QDebug>
 
 #include "common/util/file_util.hpp"
-#include "common/base/base_data.hpp"
 #include "common/util/version.hpp"
 #include "common/util/mem_check.hpp"
 
-#include "ui_topfddialog.h"
-#include "gui/topfd/threadtopfd.hpp"
+#include "gui/util/command.hpp"
+#include "gui/util/gui_message.hpp"
+#include "gui/topfd/ui_topfddialog.h"
 #include "gui/topfd/topfddialog.hpp"
 
 TopFDDialog::TopFDDialog(QWidget *parent) :
@@ -41,7 +45,6 @@ TopFDDialog::TopFDDialog(QWidget *parent) :
       QString qstr = QString::fromStdString(title);
       this->setWindowTitle(qstr);
       lastDir_ = ".";
-      percentage_ = 0;
       ui->maxChargeEdit->setValidator(new QIntValidator(1, 100, this));
       ui->maxMassEdit->setValidator(new QIntValidator(1, 1000000, this));
       QRegExp rx1("^0\\.[0]\\d{0,2}[1-9]|0.1$");
@@ -56,69 +59,64 @@ TopFDDialog::TopFDDialog(QWidget *parent) :
       QRegExpValidator *validator3 = new QRegExpValidator(rx3, this);
       ui->windowSizeEdit->setValidator(validator3);
       QFont font;
+      QFont outputFont;
 #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
       font.setFamily(QStringLiteral("Calibri"));
+      outputFont.setFamily(QStringLiteral("Consolas"));
 #else
       font.setFamily(QStringLiteral("Monospace"));
+      outputFont.setFamily(QStringLiteral("Monospace"));
 #endif
       font.setPixelSize(12);
+      outputFont.setPixelSize(12);
       QApplication::setFont(font);
-      ui->outputTextBrowser->setFont(font);
-      thread_ = new ThreadTopFD(this);
-      showInfo = "";
+      ui->outputTextBrowser->setFont(outputFont);
       TopFDDialog::on_defaultButton_clicked();
-      //ui->mergeCheckBox->setEnabled(false);
-      //ui->mergedFilenameLineEdit->setEnabled(false);
     }
 
 TopFDDialog::~TopFDDialog() {
-  thread_->terminate();
-  thread_->wait();
+  if(process_.state()!=QProcess::NotRunning) {
+    process_.kill();
+  }
   delete ui;
 }
 
 void TopFDDialog::closeEvent(QCloseEvent *event) {
-  if (thread_->isRunning()) {
+  if(process_.state()!=QProcess::NotRunning) {
     if (!continueToClose()) {
       event->ignore();
       return;
     }
+    else {
+      process_.kill();
+    }
   }
-  thread_->terminate();
-  thread_->wait();
   event->accept();
   return;
 }
 
 void TopFDDialog::on_clearButton_clicked() {
-  //ui->maxChargeEdit->clear();
-  //ui->maxMassEdit->clear();
-  //ui->mzErrorEdit->clear();
-  //ui->ms1snRatioEdit->clear();
-  //ui->ms2snRatioEdit->clear();
-  //ui->windowSizeEdit->clear();
-  //ui->missLevelOneCheckBox->setChecked(false);
   ui->listWidget->clear();
   ui->outputTextBrowser->clear();
   ui->outputTextBrowser->setText("Click the Start button to process the spectrum files.");
-  ui->activationComboBox->setCurrentIndex(0);
   lastDir_ = "/";
 }
 
 void TopFDDialog::on_defaultButton_clicked() {
-  ui->maxChargeEdit->setText("30");
-  ui->maxMassEdit->setText("70000");
-  ui->mzErrorEdit->setText("0.02");
-  ui->ms1snRatioEdit->setText("3.0");
-  ui->ms2snRatioEdit->setText("1.0");
-  ui->windowSizeEdit->setText("3.0");
-  ui->threadNumberEdit->setText("1");
-  ui->envCNNCheckBox->setChecked(false);
-  ui->missLevelOneCheckBox->setChecked(false);
-  ui->geneHTMLCheckBox->setChecked(true);
-  ui->finalFilteringCheckBox->setChecked(false);
-  //ui->mergeCheckBox->setChecked(false);
-  //ui->mergedFilenameLineEdit->setText("sample1");
+  // default para_ptr
+  toppic::TopfdParaPtr para_ptr = std::make_shared<toppic::TopfdPara>();
+  ui->maxChargeEdit->setText(QString::number(para_ptr->getMaxCharge()));
+  ui->maxMassEdit->setText(QString::number(para_ptr->getMaxMass()));
+  ui->mzErrorEdit->setText(QString::number(para_ptr->getMzError()));
+  ui->ms1snRatioEdit->setText(QString::number(para_ptr->getMsOneSnRatio()));
+  ui->ms2snRatioEdit->setText(QString::number(para_ptr->getMsTwoSnRatio()));
+  ui->windowSizeEdit->setText(QString::number(para_ptr->getPrecWindow()));
+  ui->threadNumberEdit->setText(QString::number(para_ptr->getThreadNum()));
+  ui->envCNNCheckBox->setChecked(para_ptr->isUseEnvCnn());
+  ui->missLevelOneCheckBox->setChecked(para_ptr->isMissingLevelOne());
+  ui->geneHTMLCheckBox->setChecked(para_ptr->isGeneHtmlFolder());
+  ui->disableFilteringCheckBox->setChecked(!para_ptr->isDoFinalFiltering());
+
   ui->outputTextBrowser->clear();
   ui->outputTextBrowser->setText("Click the Start button to process the spectrum files.");
   ui->activationComboBox->setCurrentIndex(0);
@@ -137,23 +135,20 @@ void TopFDDialog::on_addButton_clicked() {
       this,
       "Select spectrum files",
       lastDir_,
-      "Spectra files(*.mzXML *.mzML *.mzxml *.mzml)");
+      "Spectra files (*.mzXML *.mzML *.mzxml *.mzml)");
   for (int i = 0; i < spfiles.size(); i++) {
     QString spfile = spfiles.at(i);
     updatedir(spfile);
     if (ableToAdd(spfile)) {
       ui->listWidget->addItem(new QListWidgetItem(spfile));
-      if (ui->listWidget->count() > 1) {
-        //ui->mergeCheckBox->setEnabled(true);
-        //ui->mergedFilenameLineEdit->setEnabled(true);
-      }
     }
   }
 }
 
 void TopFDDialog::updatedir(QString s) {
   if (!s.isEmpty()) {
-    lastDir_ = s;
+    //lastDir_ = s;
+    lastDir_ = "";
   }
 }
 bool TopFDDialog::ableToAdd(QString spfile) {
@@ -181,76 +176,44 @@ void TopFDDialog::on_delButton_clicked() {
   QListWidgetItem *delItem = ui->listWidget->currentItem();
   ui->listWidget->removeItemWidget(delItem);
   delete delItem;
-  if (ui->listWidget->count() < 2) {
-    //ui->mergeCheckBox->setEnabled(false);
-    //ui->mergeCheckBox->setChecked(false);
-    //ui->mergedFilenameLineEdit->setEnabled(false);
-  }
 }
 
 void TopFDDialog::on_startButton_clicked() {
-  std::stringstream buffer;
-  std::streambuf *oldbuf = std::cout.rdbuf(buffer.rdbuf());
-  if (checkError()) {
-    return;
-  }
   lockDialog();
-  ui->outputTextBrowser->setText(showInfo);
-  toppic::TopfdParaPtr para_ptr = this->getParaPtr();
-  std::vector<std::string> spec_file_lst = this->getSpecFileList();
-  thread_->setPar(para_ptr, spec_file_lst);
-  thread_->start();
+  toppic::TopfdParaPtr paraPtr = this->getParaPtr();
+  std::vector<std::string> specFileList = this->getSpecFileList();
 
-  std::string info;
-  int processed_len = 0;
-  std::string processed_lines = ""; 
-  std::string current_line = "";
-  unsigned cursor_pos = 0;
+  std::string cmd = toppic::command::geneTopfdCommand(para_ptr_, spec_file_lst_);
+  QString q_cmd = QString::fromStdString(cmd);
+  q_cmd = q_cmd.trimmed();
+  QStringList cmd_list = q_cmd.split(" ");
+  QString prog = cmd_list[0];
+  cmd_list.removeFirst();
+
+  //qDebug() << "start process ";
+  process_.start(prog, cmd_list);
+  process_.waitForStarted();
+  //qDebug() << "start process finished";
+
+  toppic::GuiMessage guiMsg;
   bool finish = false;
-
-  while (true) {
-    if (thread_->isFinished()) {
+  while (!finish) {
+    if(process_.state()==QProcess::NotRunning) {
       finish = true;
     }
-    // Here is the infomation been shown in the infoBox.
-    info = buffer.str();
-    std::string new_info = info.substr(processed_len);
-    processed_len = info.length();
-    
-    if (new_info.size() > 0) {
-      for (unsigned i = 0; i < new_info.size(); i++) {
-        // new line
-        if (new_info.at(i) == '\n') {
-          processed_lines = processed_lines + current_line + '\n';
-          current_line = "";
-          cursor_pos = 0;
-        }
-        // CF
-        if (new_info.at(i) == '\r') {
-          cursor_pos = 0;
-        }
-        // add a new charactor
-        if (new_info.at(i) != '\n' && new_info.at(i) != '\r') {
-          if (cursor_pos < current_line.length()) {
-            current_line[cursor_pos] = new_info.at(i);
-          }
-          else {
-            current_line = current_line + new_info.at(i);
-          }
-          cursor_pos++;
-        }
+    bool ready = process_.waitForReadyRead(100);
+    if (ready || finish) {
+      //qDebug() << "read finished";
+      QByteArray byteArray = process_.readAllStandardOutput();
+      QString str = QString(byteArray);
+      std::string msg = guiMsg.getMsg(str.toStdString());
+      if (msg != "") {
+        updateMsg(msg); 
       }
-      updateMsg(processed_lines + current_line);
-    }
-    if (finish) {
-      break;
     }
     sleep(100);
   }
   unlockDialog();
-  showInfo = "";
-  thread_->exit();
-  std::cout.rdbuf(oldbuf);
 }
 
 void TopFDDialog::on_exitButton_clicked() {
@@ -283,23 +246,20 @@ void TopFDDialog::on_outputButton_clicked() {
 toppic::TopfdParaPtr TopFDDialog::getParaPtr() {
   QString path = QCoreApplication::applicationFilePath();
   std::string exe_dir = toppic::file_util::getExecutiveDir(path.toStdString());
-  para_ptr_->exe_dir_ = exe_dir;
-  para_ptr_->resource_dir_ = toppic::file_util::getResourceDir(exe_dir);
-  para_ptr_->max_charge_ = std::stoi(ui->maxChargeEdit->text().toStdString());
-  para_ptr_->max_mass_ = std::stod(ui->maxMassEdit->text().toStdString());
-  para_ptr_->mz_error_ = std::stod(ui->mzErrorEdit->text().toStdString());
-  para_ptr_->ms_one_sn_ratio_ = std::stod(ui->ms1snRatioEdit->text().toStdString());
-  para_ptr_->ms_two_sn_ratio_ = std::stod(ui->ms2snRatioEdit->text().toStdString());
-  para_ptr_->prec_window_ = std::stod(ui->windowSizeEdit->text().toStdString());
-  para_ptr_->missing_level_one_ = ui->missLevelOneCheckBox->isChecked(); 
-  para_ptr_->thread_number_ = std::stoi(ui->threadNumberEdit->text().toStdString());
-  para_ptr_->merge_files_ = false;
-  //para_ptr_->merge_files_ = ui->mergeCheckBox->isChecked();
-  //para_ptr_->merged_file_name_ = ui->mergedFilenameLineEdit->text().toStdString();
-  para_ptr_->gene_html_folder_ = ui->geneHTMLCheckBox->isChecked();
-  para_ptr_->use_env_cnn_ = ui->envCNNCheckBox->isChecked();
-  para_ptr_->activation_ = ui->activationComboBox->currentText().toStdString();
-  para_ptr_->do_final_filtering_ = !(ui->finalFilteringCheckBox->isChecked());
+  para_ptr_->setExeDir(exe_dir);
+  para_ptr_->setResourceDir(toppic::file_util::getResourceDir(exe_dir));
+  para_ptr_->setMaxCharge(std::stoi(ui->maxChargeEdit->text().toStdString()));
+  para_ptr_->setMaxMass(std::stod(ui->maxMassEdit->text().toStdString()));
+  para_ptr_->setMzError(std::stod(ui->mzErrorEdit->text().toStdString()));
+  para_ptr_->setMsOneSnRatio(std::stod(ui->ms1snRatioEdit->text().toStdString()));
+  para_ptr_->setMsTwoSnRatio(std::stod(ui->ms2snRatioEdit->text().toStdString()));
+  para_ptr_->setPrecWindow(std::stod(ui->windowSizeEdit->text().toStdString()));
+  para_ptr_->setMissingLevelOne(ui->missLevelOneCheckBox->isChecked()); 
+  para_ptr_->setThreadNum(std::stoi(ui->threadNumberEdit->text().toStdString()));
+  para_ptr_->setGeneHtmlFolder(ui->geneHTMLCheckBox->isChecked());
+  para_ptr_->setUseEnvCnn(ui->envCNNCheckBox->isChecked());
+  para_ptr_->setActivation(ui->activationComboBox->currentText().toStdString());
+  para_ptr_->setDoFinalFiltering(!(ui->disableFilteringCheckBox->isChecked()));
 
   return para_ptr_;
 }
@@ -319,12 +279,10 @@ void TopFDDialog::lockDialog() {
   ui->missLevelOneCheckBox->setEnabled(false);
   ui->windowSizeEdit->setEnabled(false);
   ui->outputButton->setEnabled(false);
-  //ui->mergeCheckBox->setEnabled(false);
-  //ui->mergedFilenameLineEdit->setEnabled(false);
   ui->geneHTMLCheckBox->setEnabled(false);
   ui->envCNNCheckBox->setEnabled(false);
   ui->activationComboBox->setEnabled(false);
-  ui->finalFilteringCheckBox->setEnabled(false);
+  ui->disableFilteringCheckBox->setEnabled(false);
 }
 
 void TopFDDialog::unlockDialog() {
@@ -343,14 +301,10 @@ void TopFDDialog::unlockDialog() {
   ui->windowSizeEdit->setEnabled(true);
   ui->outputButton->setEnabled(true);
   ui->outputButton->setDefault(true);
-  if (ui->listWidget->count() >= 2) {
-    //ui->mergeCheckBox->setEnabled(false);
-    //ui->mergedFilenameLineEdit->setEnabled(false);
-  }
   ui->geneHTMLCheckBox->setEnabled(true);
   ui->envCNNCheckBox->setEnabled(true);
   ui->activationComboBox->setEnabled(true);
-  ui->finalFilteringCheckBox->setEnabled(true);
+  ui->disableFilteringCheckBox->setEnabled(true);
 }
 
 bool TopFDDialog::checkError() {
@@ -410,25 +364,22 @@ bool TopFDDialog::checkError() {
       return true;
     }
   }
-  /*
-  if (ui->mergeCheckBox->isChecked() &&
-      ui->mergedFilenameLineEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Merged file name is empty!"),
-                         QMessageBox::Yes);
-    return true;
-  }
-  */
 
   return false;
 }
 
 void TopFDDialog::updateMsg(std::string msg) {
-  showInfo = msg.c_str();
-  ui->outputTextBrowser->setText(showInfo);
   QTextCursor cursor = ui->outputTextBrowser->textCursor();
+  int vertical_bar_pos = ui->outputTextBrowser->verticalScrollBar()->value();
+  int max_bar_pos = ui->outputTextBrowser->verticalScrollBar()->maximum();
+  QString showInfo = msg.c_str();
+  ui->outputTextBrowser->setText(showInfo);
   cursor.movePosition(QTextCursor::End);
   ui->outputTextBrowser->setTextCursor(cursor);
+  if (max_bar_pos - vertical_bar_pos < 10) {
+    vertical_bar_pos = ui->outputTextBrowser->verticalScrollBar()->maximum();
+  }
+  ui->outputTextBrowser->verticalScrollBar()->setValue(vertical_bar_pos);
 }
 
 void TopFDDialog::sleep(int wait) {

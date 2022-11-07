@@ -12,26 +12,26 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_GUI_TOPINDEX_DIALOG_H
-#define TOPPIC_GUI_TOPINDEX_DIALOG_H
+#ifndef TOPPIC_GUI_TOPDIFF_DIALOG_HPP
+#define TOPPIC_GUI_TOPDIFF_DIALOG_HPP
 
 #include <map>
+#include <vector>
 #include <string>
 
 #include <QMainWindow>
-
-#include "threadtopindex.h"
+#include <QProcess>
 
 namespace Ui {
-class TopIndexDialog;
+class TopDiffDialog;
 }
 
-class TopIndexDialog : public QMainWindow {
+class TopDiffDialog : public QMainWindow {
   Q_OBJECT
 
 public:
-  explicit TopIndexDialog(QWidget *parent = 0);
-  ~TopIndexDialog();
+  explicit TopDiffDialog(QWidget *parent = 0);
+  ~TopDiffDialog();
 
 private slots:
   void on_clearButton_clicked();
@@ -44,39 +44,24 @@ private slots:
 
   void on_outputButton_clicked();
 
-  void on_databaseFileButton_clicked();
+  void on_addButton_clicked();
 
-  void on_fixedModFileButton_clicked();
+  void on_delButton_clicked();
 
-  void on_fixedModComboBox_currentIndexChanged(int index);
-
-  //void on_errorToleranceEdit_textChanged(QString string);
-
-   void on_NONECheckBox_clicked(bool checked);
-
-  void on_NMECheckBox_clicked(bool checked);
-
-  void on_NMEACCheckBox_clicked(bool checked);
-
-  void on_MACCheckBox_clicked(bool checked);
-  
-  bool nterminalerror();
 private:
   QString lastDir_;
-
-  int percentage_;
 
   std::map<std::string, std::string> arguments_;
 
   std::vector<std::string> spec_file_lst_;
 
-  Ui::TopIndexDialog *ui;
-
-  void initArguments();
+  Ui::TopDiffDialog *ui;
 
   std::map<std::string, std::string> getArguments();
 
   std::vector<std::string> getSpecFileList();
+  
+  QProcess process_;
 
   void lockDialog();
 
@@ -89,10 +74,6 @@ private:
   void updatedir(QString s);
 
   void sleep(int wait);
-
-  ThreadTopIndex* thread_;
-
-  QString showInfo;
 
   void closeEvent(QCloseEvent *event);
 

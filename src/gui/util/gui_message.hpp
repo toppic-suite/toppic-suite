@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2021, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -12,16 +12,31 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <algorithm>
+#ifndef GUI_UTIL_GUI_MESSAGE_HPP
+#define GUI_UTIL_GUI_MESSAGE_HPP
 
-#include "threadtopmg.h"
-#include "gui/util/run_exe.h"
+#include <string>
+#include <sstream>
 
-void threadtopmg::run() {
-  std::sort(spec_file_lst_.begin(), spec_file_lst_.end());
+#include <QProcess>
+#include <QTextBrowser>
 
-  //toppic::TopMGProgress_multi_file(arguments_, spec_file_lst_);
-  toppic::RunExe runExe;
-  std::string cmd = runExe.geneCommand(arguments_, spec_file_lst_, "topmg");
-  runExe.run(cmd);
+namespace toppic {
+
+class GuiMessage {
+ public:
+  GuiMessage();
+  std::string getMsg(std::string new_msg);
+
+ private:
+  std::stringstream buffer_;
+  std::string info_;
+  int processed_len_ = 0;
+  std::string processed_lines_ = ""; 
+  std::string current_line_ = "";
+  unsigned cursor_pos_ = 0;
+  bool finish_ = false;
+};
+
 }
+#endif

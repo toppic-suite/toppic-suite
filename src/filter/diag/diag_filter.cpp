@@ -31,7 +31,7 @@ namespace toppic {
 boost::mutex diag_filter_mutex;
 
 DiagFilter::DiagFilter(const ProteoformPtrVec &proteo_ptrs,
-                               DiagFilterMngPtr mng_ptr, std::string block_str) {
+                       DiagFilterMngPtr mng_ptr, std::string block_str) {
   mng_ptr_ = mng_ptr;
   proteo_ptrs_ = proteo_ptrs;
   PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
@@ -97,19 +97,27 @@ SimplePrsmPtrVec DiagFilter::compute(const PrmMsPtrVec &ms_ptr_vec) {
   std::vector<int> proteo_row_begins = index_ptr_->getProteoRowBegins();
   std::vector<int> proteo_row_ends = index_ptr_->getProteoRowEnds();
   int threshold = 4;
+  std::vector<short> scores(row_num, 0);
+  std::vector<short> max_scores(row_num, 0);
   for (size_t i = 0; i < mass_errors.size(); i++) {
-    std::vector<short> scores(row_num, 0);
+    std::fill(scores.begin(), scores.end(), 0);
     index_ptr_->compScores(mass_errors, i, -mass_errors[i].first, scores);
-    ProtCandidatePtrVec results
-        = mass_match_util::findTopProteins(scores, proteo_row_begins, proteo_row_ends, threshold,
-                                           mng_ptr_->filter_result_num_);
-    for (size_t j = 0; j < results.size(); j++) {
-      int id = results[j]->getProteinId();
-      int score = results[j]->getScore();
-      match_ptrs.push_back(std::make_shared<SimplePrsm>(ms_ptr_vec[0]->getMsHeaderPtr(),
-                                                        ms_ptr_vec.size(),
-                                                        proteo_ptrs_[id], score));
+    for (int j = 0; j < row_num; j++) {
+      if (scores[j] > max_scores[j]) {
+        max_scores[j] = scores[j];
+      }
     }
+  }
+ 
+  ProtCandidatePtrVec results
+    = mass_match_util::findTopProteins(max_scores, proteo_row_begins, proteo_row_ends, threshold,
+                                       mng_ptr_->filter_result_num_);
+  for (size_t j = 0; j < results.size(); j++) {
+    int id = results[j]->getProteinId();
+    int score = results[j]->getScore();
+    match_ptrs.push_back(std::make_shared<SimplePrsm>(ms_ptr_vec[0]->getMsHeaderPtr(),
+                                                      ms_ptr_vec.size(),
+                                                      proteo_ptrs_[id], score));
   }
   return match_ptrs;
 }
