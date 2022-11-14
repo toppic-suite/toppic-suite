@@ -97,7 +97,7 @@ std::vector<std::vector<std::string>> readModTxtForTsv(const std::string &file_n
   return mod_data;
 }
 
-std::vector<ModPtrVec> readModTxt(const std::string &file_name) {
+ModPtrVec2D readModTxt(const std::string &file_name) {
   LOG_DEBUG("mod txt file " << file_name);
   std::vector<ModPtrVec> mod_ptr_vec2d(3);
   std::ifstream infile(file_name.c_str());

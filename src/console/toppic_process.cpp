@@ -105,8 +105,8 @@ void cleanToppicDir(const std::string &fa_name,
     file_util::cleanPrefix(sp_name, sp_base + ".msalign_");
     file_util::delFile(abs_sp_name + "_index");
     file_util::cleanPrefix(sp_name, sp_base + ".toppic_zero_filter_");
-    file_util::delFile(sp_base + ".toppic_zero_ptm");
-    file_util::cleanPrefix(sp_name, sp_base + ".toppic_zero_ptm_");
+    file_util::delFile(sp_base + ".toppic_zero_shift");
+    file_util::cleanPrefix(sp_name, sp_base + ".toppic_zero_shift_");
     file_util::cleanPrefix(sp_name, sp_base + ".toppic_one_filter_");
     file_util::delFile(sp_base + ".toppic_one_ptm");
     file_util::cleanPrefix(sp_name, sp_base + ".toppic_one_ptm_");
@@ -117,7 +117,6 @@ void cleanToppicDir(const std::string &fa_name,
     file_util::delFile(sp_base + ".toppic_combined");
     file_util::delFile(sp_base + ".toppic_evalue");
     file_util::cleanPrefix(sp_name, sp_base + ".toppic_evalue_");
-    //file_util::delFile(sp_base + ".toppic_top");
     file_util::delFile(sp_base + ".toppic_cluster");
     file_util::delFile(sp_base + ".toppic_cluster_fdr");
     file_util::delFile(sp_base + ".toppic_prsm_cutoff");
@@ -177,7 +176,9 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     }
 
     int n_top = std::stoi(arguments["numOfTopPrsms"]);
+    int var_ptm_num = std::stoi(arguments["variablePtmNum"]);
     int ptm_num = std::stoi(arguments["ptmNumber"]);
+    std::string var_mod_file_name = arguments["residueModFileName"]; 
 
     double max_ptm_mass = std::stod(arguments["maxPtmMass"]);
     double min_ptm_mass = std::stod(arguments["minPtmMass"]);
@@ -222,26 +223,37 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
 
     std::vector<std::string> input_exts;
 
-    std::cout << "Non PTM filtering - started." << std::endl;
+    std::cout << "Zero unexpected shift filtering - started." << std::endl;
     ZeroPtmFilterMngPtr zero_filter_mng_ptr
         = std::make_shared<ZeroPtmFilterMng>(prsm_para_ptr, index_file_para, 
                                              filter_thread_num, "toppic_zero_filter");
     zero_ptm_filter_processor::process(zero_filter_mng_ptr);
-    std::cout << "Non PTM filtering - finished." << std::endl;
+    std::cout << "Zero unexpected shift filtering - finished." << std::endl;
 
-    std::cout << "Non PTM search - started." << std::endl;
+    std::cout << "Zero unexpected shift search - started." << std::endl;
     ZeroPtmSearchMngPtr zero_search_mng_ptr
-        = std::make_shared<ZeroPtmSearchMng>(prsm_para_ptr, "toppic_zero_filter", "toppic_zero_ptm");
+        = std::make_shared<ZeroPtmSearchMng>(prsm_para_ptr, "toppic_zero_filter", "toppic_zero_shift");
     ZeroPtmSearchProcessorPtr zero_search_processor
         = std::make_shared<ZeroPtmSearchProcessor>(zero_search_mng_ptr);
     zero_search_processor->process();
     zero_search_processor = nullptr;
-    std::cout << "Non PTM search - finished." << std::endl;
+    std::cout << "Zero unexpected shift search - finished." << std::endl;
 
-    input_exts.push_back("toppic_zero_ptm_complete");
-    input_exts.push_back("toppic_zero_ptm_prefix");
-    input_exts.push_back("toppic_zero_ptm_suffix");
-    input_exts.push_back("toppic_zero_ptm_internal");
+    input_exts.push_back("toppic_zero_shift_complete");
+    input_exts.push_back("toppic_zero_shift_prefix");
+    input_exts.push_back("toppic_zero_shift_suffix");
+    input_exts.push_back("toppic_zero_shift_internal");
+
+    if (var_ptm_num >= 1 && var_mod_file_name != "") {
+      std::cout << "Variable PTMs filtering - started." << std::endl;
+      /*
+      VarPtmFilterMngPtr var_filter_mng_ptr
+        = std::make_shared<VarPtmFilterMng>(prsm_para_ptr, index_file_para, 
+                                            filter_thread_num, "toppic_var_filter");
+      var_ptm_filter_processor::process(var_filter_mng_ptr);
+      */
+      std::cout << "Variable PTMs filtering - finished." << std::endl;
+    }
 
     if (ptm_num >= 1) {
       std::cout << "One PTM filtering - started." << std::endl;
@@ -344,7 +356,7 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     double min_ptm_mass = std::stod(arguments["minPtmMass"]);
 
     bool localization = false;
-    if (arguments["residueModFileName"] != "") {
+    if (arguments["doLocalization"] == "true") {
       localization = true;
     }
 

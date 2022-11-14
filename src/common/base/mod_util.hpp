@@ -25,7 +25,7 @@ ModPtrVec readModXml(const std::string &file_name);
 
 std::vector<std::vector<std::string>> readModTxtForTsv(const std::string &file_name);
 
-std::vector<ModPtrVec> readModTxt(const std::string &file_name);
+ModPtrVec2D readModTxt(const std::string &file_name);
 
 ModPtrVec geneFixedModList(const std::string &str);
 

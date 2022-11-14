@@ -407,8 +407,8 @@ void PrsmMatchTableWriter::writePrsmStandardFormat(std::ofstream &file, PrsmPtr 
 std::string PrsmMatchTableWriter::formatSeq(std::string seq) {
   std::string new_seq = "";
   int idx = 0;
-
-  while (idx < seq.size()) {
+  int seq_len = seq.size();
+  while (idx < seq_len) {
     bool is_single_residue = false;
     bool is_c_term = false;
     bool is_n_term = false;
@@ -425,7 +425,7 @@ std::string PrsmMatchTableWriter::formatSeq(std::string seq) {
 
       if (idx <= 1 && close_p - idx == 2) {is_n_term = true;}
       if (close_p - idx == 2) {is_single_residue = true;}
-      if (close_b == seq.size() - 1) {is_c_term = true;}
+      if (close_b == seq_len - 1) {is_c_term = true;}
 
       try {
         double shift = std::stod(raw_shift);
