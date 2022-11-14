@@ -27,6 +27,8 @@ std::vector<std::vector<std::string>> readModTxtForTsv(const std::string &file_n
 
 ModPtrVec2D readModTxt(const std::string &file_name);
 
+std::vector<double> readModTxtToShiftList(const std::string &file_name); 
+
 ModPtrVec geneFixedModList(const std::string &str);
 
 ResiduePtrVec geneResidueListWithMod(const ResiduePtrVec & residue_list,

@@ -35,8 +35,6 @@ PrsmPara::PrsmPara(std::map<std::string, std::string> &arguments) {
 
   fix_mod_list_ = mod_util::geneFixedModList(arguments["fixedMod"]);
 
-  var_mod_list_ = mod_util::
-
   std::string prot_mod_str = arguments["allowProtMod"];
   std::vector<std::string> strs = str_util::split(prot_mod_str, ",");
   for (size_t i = 0; i < strs.size(); i++) {

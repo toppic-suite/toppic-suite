@@ -57,12 +57,6 @@ class PrsmPara {
 
   ProtModPtrVec prot_mod_list_;
 
-  ModPtrVec n_term_var_mod_list_;
-  ModPtrVec any_pos_var_mod_list_;
-  ModPtrVec c_term_var_mod_list_;
-
-  int var_ptm_num_;
-
   int group_spec_num_;
 
   /** spectrum parameters */
