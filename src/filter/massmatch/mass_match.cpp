@@ -269,29 +269,48 @@ void MassMatch::compScores(const std::vector<std::pair<int, int>> &pref_mass_err
   }
 }
 
-void MassMatch::compMatchScores(const std::vector<std::pair<int, int>> &pref_mass_errors,
-                                const std::pair<int, int> &prec_minus_water_mass_error,
+void MassMatch::updatePrecScore(const std::pair<int, int> mass_error, 
                                 std::vector<short> &scores) {
-  compScores(pref_mass_errors, 0, 0.0, scores);
   // precursor mass
   int begin_index, end_index;
-  int m = prec_minus_water_mass_error.first;
+  int m = mass_error.first;
   // m - errors[i] performs better than m - errors[i] -  errors[bgn_pos]
-  int left = m - prec_minus_water_mass_error.second;
+  int left = m - mass_error.second;
   if (left < 0) {
     left = 0;
   }
 
-  int right = m + prec_minus_water_mass_error.second;
+  int right = m + mass_error.second;
 
   if (right >= 0 && right < col_num_) {
     // update scores
     begin_index = col_index_begins_[left];
     end_index   = col_index_ends_[right];
     for (int j = begin_index; j <= end_index; j++) {
-      scores[col_indexes_[j]] += getPrecursorMatchScore();
+      if (scores[col_indexes_[j]] < getPrecursorMatchScore()) {
+        scores[col_indexes_[j]] += getPrecursorMatchScore();
+      }
     }
   }
 }
+
+void MassMatch::compMatchScores(const std::vector<std::pair<int, int>> &pref_mass_errors,
+                                const std::pair<int, int> &prec_minus_water_mass_error,
+                                std::vector<short> &scores) {
+  compScores(pref_mass_errors, 0, 0.0, scores);
+  updatePrecScore(prec_minus_water_mass_error, scores);
+}
+
+void MassMatch::compMatchScores(const std::vector<std::pair<int, int>> &pref_mass_errors,
+                                const std::vector<std::pair<int, int>> &prec_minus_water_mass_errors,
+                                std::vector<short> &scores) {
+  compScores(pref_mass_errors, 0, 0.0, scores);
+  // precursor mass
+  for (size_t i = 0; i < prec_minus_water_mass_errors.size(); i++) {
+    std::pair<int, int> mass_error = prec_minus_water_mass_errors[i]; 
+    updatePrecScore(mass_error, scores);
+  }
+}
+
 
 } /* namespace toppic */

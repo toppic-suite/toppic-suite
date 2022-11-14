@@ -46,6 +46,11 @@ VarPtmFilterMng::VarPtmFilterMng(PrsmParaPtr prsm_para_ptr,
     LOG_DEBUG("Number of shifts:" << shift_list_.size());
     for (size_t i = 0; i < shift_list_.size(); i++) {
       LOG_DEBUG("Shifts:" << i << " " << shift_list_[i]);
+      int int_shift = std::round(shift_list_[i] * filter_scale_); 
+      if (std::find(int_shift_list_.begin(), int_shift_list_.end(), int_shift) 
+          != int_shift_list_.end()) {
+        int_shift_list_.push_back(int_shift);
+      }
     }
   }
 }

@@ -103,8 +103,7 @@ void PtmSearchProcessor::process(){
   SimplePrsmPtr prsm_ptr = simple_prsm_reader.readOnePrsm();
 
   // init variables
-  //std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
-  std::string db_file_name = prsm_para_ptr->getOriDbName() + "_idx" + file_util::getFileSeparator() + prsm_para_ptr->getSearchDbFileName();
+  std::string db_file_name = prsm_para_ptr->getSearchDbFileNameWithFolder();
   FastaIndexReaderPtr reader_ptr = std::make_shared<FastaIndexReader>(db_file_name);
   int spectrum_num = msalign_util::getSpNum (sp_file_name);
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();

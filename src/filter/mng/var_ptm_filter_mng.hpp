@@ -68,6 +68,7 @@ class VarPtmFilterMng {
 
   // shift list for single and multiple (up to var_ptm_num) variable PTMs  
   std::vector<double> shift_list_;
+  std::vector<int> int_shift_list_;
 };
 
 typedef std::shared_ptr<VarPtmFilterMng> VarPtmFilterMngPtr;

@@ -76,8 +76,7 @@ void PrsmTableWriter::write() {
       << "Proteoform-level Q-value" << std::endl;
 
   std::string input_file_name = file_util::basename(spectrum_file_name) + "." + input_file_ext_;  
-  //std::string db_file_name = prsm_para_ptr_->getSearchDbFileName();
-  std::string db_file_name = prsm_para_ptr_->getOriDbName() + "_idx" + file_util::getFileSeparator() + prsm_para_ptr_->getSearchDbFileName();
+  std::string db_file_name = prsm_para_ptr_->getSearchDbFileNameWithFolder();
   FastaIndexReaderPtr seq_reader = std::make_shared<FastaIndexReader>(db_file_name);
   ModPtrVec fix_mod_ptr_vec = prsm_para_ptr_->getFixModPtrVec();
   PrsmReader prsm_reader(input_file_name);

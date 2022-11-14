@@ -34,8 +34,7 @@ PrsmMatchTableWriter::PrsmMatchTableWriter(PrsmParaPtr prsm_para_ptr,
     argu_str_(argu_str),
     output_file_ext_(output_file_ext),
     write_multiple_matches_(write_multiple_matches) {
-      std::string db_file_name = prsm_para_ptr_->getOriDbName() + "_idx" 
-        + file_util::getFileSeparator() + prsm_para_ptr_->getSearchDbFileName();
+      std::string db_file_name = prsm_para_ptr_->getSearchDbFileNameWithFolder();
       search_match_ptr_ = std::make_shared<SearchFastaMatch>(db_file_name);
     }
 
@@ -83,8 +82,7 @@ void PrsmMatchTableWriter::write() {
       << "Proteoform-level Q-value" << std::endl;
 
   std::string input_file_name = file_util::basename(spectrum_file_name) + "." + input_file_ext_;  
-  //std::string db_file_name = prsm_para_ptr_->getSearchDbFileName();
-  std::string db_file_name = prsm_para_ptr_->getOriDbName() + "_idx" + file_util::getFileSeparator() + prsm_para_ptr_->getSearchDbFileName();
+  std::string db_file_name = prsm_para_ptr_->getSearchDbFileNameWithFolder();
   FastaIndexReaderPtr seq_reader = std::make_shared<FastaIndexReader>(db_file_name);
   ModPtrVec fix_mod_ptr_vec = prsm_para_ptr_->getFixModPtrVec();
   PrsmReader prsm_reader(input_file_name);

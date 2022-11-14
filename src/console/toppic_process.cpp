@@ -44,11 +44,13 @@
 #include "prsm/prsm_util.hpp"
 
 #include "filter/mng/zero_ptm_filter_mng.hpp"
-#include "filter/mng/var_ptm_filter_mng.hpp"
 #include "filter/mng/index_file_name.hpp"
 #include "filter/zeroptm/zero_ptm_filter_processor.hpp"
 #include "search/zeroptmsearch/zero_ptm_search_mng.hpp"
 #include "search/zeroptmsearch/zero_ptm_search_processor.hpp"
+
+#include "filter/mng/var_ptm_filter_mng.hpp"
+#include "filter/varptm/var_ptm_filter_processor.hpp"
 
 #include "filter/mng/one_ptm_filter_mng.hpp"
 #include "filter/oneptm/one_ptm_filter_processor.hpp"
@@ -251,9 +253,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
         = std::make_shared<VarPtmFilterMng>(prsm_para_ptr, index_file_para, 
                                             var_mod_file_name, var_ptm_num, 
                                             filter_thread_num, "toppic_var_filter");
-      /*
       var_ptm_filter_processor::process(var_filter_mng_ptr);
-      */
       std::cout << "Variable PTMs filtering - finished." << std::endl;
     }
 

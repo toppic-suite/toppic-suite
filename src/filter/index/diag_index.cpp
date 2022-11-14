@@ -54,8 +54,7 @@ std::function<void()> geneIndexTask(int block_idx,
   return [block_idx, mng_ptr] () {
 
     PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
-    std::string db_block_file_name = prsm_para_ptr->getOriDbName() + "_idx" 
-      + file_util::getFileSeparator() + prsm_para_ptr->getSearchDbFileName()
+    std::string db_block_file_name = prsm_para_ptr->getSearchDbFileNameWithFolder()
         + "_" + str_util::toString(block_idx);
     ProteoformPtrVec raw_forms
         = proteoform_factory::readFastaToProteoformPtrVec(db_block_file_name,
@@ -66,8 +65,7 @@ std::function<void()> geneIndexTask(int block_idx,
 }
 
 void process(DiagFilterMngPtr mng_ptr) {
-  std::string db_file_name = mng_ptr->prsm_para_ptr_->getOriDbName() + "_idx" 
-    + file_util::getFileSeparator() + mng_ptr->prsm_para_ptr_->getSearchDbFileName();
+  std::string db_file_name = mng_ptr->prsm_para_ptr_->getSearchDbFileNameWithFolder();
   DbBlockPtrVec db_block_ptr_vec = DbBlock::readDbBlockIndex(db_file_name);
 
   SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(mng_ptr->thread_num_);

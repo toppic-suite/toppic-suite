@@ -23,9 +23,12 @@
 namespace toppic {
 
 PrsmPara::PrsmPara(std::map<std::string, std::string> &arguments) {
+  ori_db_name_ = arguments["oriDatabaseFileName"];
+
   search_db_file_name_ = file_util::filenameFromEntirePath(arguments["databaseFileName"]);
 
-  ori_db_name_ = arguments["oriDatabaseFileName"];
+  search_db_file_name_with_folder_ = search_db_file_name_ + "_idx" 
+    + file_util::getFileSeparator() + search_db_file_name_;
 
   spec_file_name_ = arguments["spectrumFileName"];
 

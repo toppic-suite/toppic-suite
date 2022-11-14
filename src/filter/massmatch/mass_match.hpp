@@ -47,10 +47,14 @@ class MassMatch {
   void compScores(const std::vector<std::pair<int, int>> &pref_mass_errors,
                   int start, double shift, std::vector<short> &scores);
 
+
   void compMatchScores(const std::vector<std::pair<int, int>> &pref_mass_errors,
                        const std::pair<int, int> &prec_minus_water_mass_error,
                        std::vector<short> &scores);
 
+  void compMatchScores(const std::vector<std::pair<int, int>> &pref_mass_errors,
+                       const std::vector<std::pair<int, int>> &prec_minus_water_mass_errors,
+                       std::vector<short> &scores); 
 
   void serializeMassMatch(std::string file_name, std::string dir_name);
 
@@ -107,6 +111,9 @@ class MassMatch {
                        std::vector<std::vector<int>> &shift_2d,
                        std::vector<std::vector<int>> &pos_2d,
                        std::vector<int> &col_index_pnts);
+
+  void updatePrecScore(const std::pair<int, int> mass_error, 
+                       std::vector<short> &scores);
 };
 
 typedef std::shared_ptr<MassMatch> MassMatchPtr;
