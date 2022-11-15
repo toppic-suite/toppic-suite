@@ -58,14 +58,12 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
     for (size_t k = 0; k < spec_set_vec.size(); k++) {
       LOG_DEBUG("spec set ptr valid " << spec_set_vec[k]->isValid());
       if (spec_set_vec[k]->isValid()) {
-
         ExtendMsPtrVec ms_ptr_vec = spec_set_vec[k]->getMsThreePtrVec();
         filter_ptr->computeBestMatch(ms_ptr_vec);
         writers.getCompleteWriterPtr()->write(filter_ptr->getCompMatchPtrs());
         writers.getPrefixWriterPtr()->write(filter_ptr->getPrefMatchPtrs());
         writers.getSuffixWriterPtr()->write(filter_ptr->getSuffMatchPtrs());
         writers.getInternalWriterPtr()->write(filter_ptr->getInternalMatchPtrs());
-
       }
     }
 
@@ -76,7 +74,7 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
     }
     double perc = cnt_sum * 100.0 / mng_ptr->n_spec_block_;
     std::stringstream msg;
-    msg << std::flush << "Non PTM filtering - processing " << std::setprecision(3) <<  perc << "%.    \r";
+    msg << std::flush << "Zero unexpected shift filtering - processing " << std::setprecision(3) <<  perc << "%.    \r";
     mng_ptr->mutex_.lock();
     std::cout << msg.str();
     mng_ptr->mutex_.unlock();
@@ -121,12 +119,12 @@ void process(ZeroPtmFilterMngPtr mng_ptr) {
   }
   pool_ptr->ShutDown();
   std::cout << std::endl;
-  std::cout << "Non PTM filtering - combining blocks started." << std::endl;
+  std::cout << "Zero unexpected shift filtering - combining blocks started." << std::endl;
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
   std::string input_pref = mng_ptr->output_file_ext_;
   SimplePrsmStrMerge::mergeBlockResults(sp_file_name, input_pref, block_num,  
                                         mng_ptr->comp_num_, mng_ptr->pref_suff_num_, mng_ptr->inte_num_ );
-  std::cout << "Non PTM filtering - combining blocks finished." << std::endl;
+  std::cout << "Zero unexpected shift filtering - combining blocks finished." << std::endl;
 }
 
 }
