@@ -53,7 +53,6 @@ DeconvProcess::DeconvProcess(TopfdParaPtr topfd_para_ptr,
   spec_file_name_ = spec_file_name;
   frac_id_ = frac_id; 
   thread_num_ = t;
-  //prepareFileFolder();
 }
 
 std::string DeconvProcess::updateMsg(MsHeaderPtr header_ptr, int scan, 
@@ -72,7 +71,6 @@ std::string DeconvProcess::updateMsg(MsHeaderPtr header_ptr, int scan,
 
 void DeconvProcess::prepareFileFolder(std::string file_num) {
   std::string base_name = file_util::basename(spec_file_name_);
-  //envelope file names
   /*
   ms1_env_name_ = base_name_ + "_ms1.env"; 
   ms2_env_name_ = base_name_ + "_ms2.env"; 
@@ -94,7 +92,6 @@ void DeconvProcess::prepareFileFolder(std::string file_num) {
         + file_util::getFileSeparator() + "topfd" 
         + file_util::getFileSeparator() + "ms2_json";
     if (!file_util::exists(html_dir_)) {
-      //file_util::delDir(html_dir_);
       file_util::createFolder(html_dir_);
     }
     if (!file_util::exists(ms1_json_dir_)) {
@@ -228,6 +225,10 @@ void DeconvProcess::processSpMissingLevelOne(RawMsGroupFaimeReaderPtr reader_ptr
   RawMsGroupPtr ms_group_ptr;
   //ms_group_ptr = reader_ptr->getNextMsGroupPtr();
   ms_group_ptr = reader_ptr->getNextMsGroupPtrWithFaime();
+
+  if (topfd_para_ptr_->isGeneHtmlFolder()) {
+    prepareFileFolder("");
+  }
 
   int count = 0;
   while (ms_group_ptr != nullptr) {

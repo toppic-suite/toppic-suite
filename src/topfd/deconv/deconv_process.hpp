@@ -69,6 +69,7 @@ class DeconvProcess {
   std::string html_dir_;
   std::string ms1_json_dir_;
   std::string ms2_json_dir_; 
+
 };
 
 }
