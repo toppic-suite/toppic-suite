@@ -65,6 +65,8 @@ class MassMatch {
 
   const std::vector<int>& getProteoRowEnds() {return proteo_row_ends_;}
 
+  const std::vector<double>& getProteoMinusWaterMasses() {return proteo_minus_water_masses_;}
+
   const std::vector<double>& getTruncShifts() {return trunc_shifts_;}
 
  private:

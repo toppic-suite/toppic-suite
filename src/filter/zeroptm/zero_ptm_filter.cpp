@@ -129,13 +129,15 @@ void ZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec) {
   std::vector<short> rev_diag_scores(rev_diag_row_num, 0);
   rev_diag_index_ptr_->compMatchScores(suff_mass_errors, prec_minus_water_mass_error, rev_diag_scores);
 
+  double prec_minus_water_mass = 0;
+  double prec_error_tole = 0;
+
   int threshold = MassMatch::getPrecursorMatchScore() * 2 + 4;
-  bool add_shifts = false;
-  int shift_num = 0;
   ProtCandidatePtrVec comp_prots
-      = mass_match_util::findTopProteins(term_scores, rev_term_scores, 
-                                         term_index_ptr_, rev_term_index_ptr_,
-                                         threshold, mng_ptr_->comp_num_, add_shifts, shift_num);
+    = mass_match_util::findZeroShiftTopProteins(term_scores, rev_term_scores, 
+                                                term_index_ptr_, rev_term_index_ptr_,
+                                                prec_minus_water_mass, prec_error_tole,
+                                                threshold, mng_ptr_->comp_num_);
   comp_match_ptrs_.clear();
   int group_spec_num = ms_ptr_vec.size();
   for (size_t i = 0; i < comp_prots.size(); i++) {
@@ -145,6 +147,9 @@ void ZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec) {
                                                             group_spec_num,
                                                             proteo_ptrs_[id], score));
   }
+
+  bool add_shifts = false;
+  int shift_num = 0;
 
   ProtCandidatePtrVec pref_prots
       = mass_match_util::findTopProteins(term_scores, rev_diag_scores, 

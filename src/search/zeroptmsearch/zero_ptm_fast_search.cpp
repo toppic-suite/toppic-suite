@@ -77,7 +77,7 @@ double compScore(const ExtendMsPtrVec &ms_ptr_vec, ProteoformPtr proteo_ptr,
 ZpFastMatchPtr computeCompMatch(const ExtendMsPtrVec &ms_ptr_vec,
                                 ProteoformPtr proteo_ptr, double ppo) {
   MsHeaderPtr header_ptr = ms_ptr_vec[0]->getMsHeaderPtr();
-  double max_error = header_ptr->getErrorTolerance(ppo);
+  double max_error = header_ptr->getPrecErrorTolerance(ppo);
   double res_sum_mass = header_ptr->getPrecMonoMassMinusWater();
   double prot_mass = proteo_ptr->getResSeqPtr()->getResMassSum();
   double error = std::abs(res_sum_mass - prot_mass);
@@ -94,7 +94,7 @@ ZpFastMatchPtr computePrefixMatch(const ExtendMsPtrVec &ms_ptr_vec,
   /* check if there is a matched prefix */
   std::vector<double> prms = proteo_ptr->getBpSpecPtr()->getPrmMasses();
   MsHeaderPtr header_ptr = ms_ptr_vec[0]->getMsHeaderPtr();
-  double max_error = header_ptr->getErrorTolerance(ppo);
+  double max_error = header_ptr->getPrecErrorTolerance(ppo);
   double res_sum_mass = header_ptr->getPrecMonoMassMinusWater();
 
   bool is_prefix = false;
@@ -122,7 +122,7 @@ ZpFastMatchPtr computeSuffixMatch(const ExtendMsPtrVec &ms_ptr_vec,
                                   ProteoformPtr proteo_ptr, double ppo) {
   std::vector<double> prms = proteo_ptr->getBpSpecPtr()->getPrmMasses();
   MsHeaderPtr header_ptr = ms_ptr_vec[0]->getMsHeaderPtr();
-  double max_error = header_ptr->getErrorTolerance(ppo);
+  double max_error = header_ptr->getPrecErrorTolerance(ppo);
   double res_sum_mass = header_ptr->getPrecMonoMassMinusWater();
   double diff = prms[prms.size()-1] - res_sum_mass;
 
@@ -152,7 +152,7 @@ ZpFastMatchPtr computeInternalMatch(const ExtendMsPtrVec &ms_ptr_vec,
                                     ProteoformPtr proteo_ptr, double ppo) {
   std::vector<double> prms = proteo_ptr->getBpSpecPtr()->getPrmMasses();
   MsHeaderPtr header_ptr = ms_ptr_vec[0]->getMsHeaderPtr();
-  double max_error = header_ptr->getErrorTolerance(ppo);
+  double max_error = header_ptr->getPrecErrorTolerance(ppo);
   double res_sum_mass = header_ptr->getPrecMonoMassMinusWater();
 
   ActivationPtr activation = header_ptr->getActivationPtr();

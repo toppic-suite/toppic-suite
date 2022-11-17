@@ -88,7 +88,7 @@ double MsHeader::getPrecMonoMassMinusWater() {
 
 std::pair<int, int> MsHeader::getPrecMonoMassMinusWaterError(double ppo, double scale) {
   int mass = static_cast<int>(std::round(getPrecMonoMassMinusWater() * scale));
-  double error_tolerance = getErrorTolerance(ppo);
+  double error_tolerance = getPrecErrorTolerance(ppo);
   int error = static_cast<int>(std::ceil(error_tolerance*scale));
   std::pair<int, int> result(mass, error);
   return result;

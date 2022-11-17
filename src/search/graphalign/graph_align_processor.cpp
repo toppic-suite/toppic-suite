@@ -50,9 +50,7 @@ std::function<void()> geneTask(GraphAlignMngPtr mng_ptr,
   return [mng_ptr, var_mod_ptr_vec, spectrum_num, idx]() {
     PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
     SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
-    //std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
-    std::string db_file_name = prsm_para_ptr->getOriDbName() + "_idx" 
-      + file_util::getFileSeparator() + prsm_para_ptr->getSearchDbFileName();
+    std::string db_file_name = prsm_para_ptr->getSearchDbFileNameWithFolder();
 
     std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
 
@@ -161,9 +159,7 @@ void SimplePrsmFilter(SimplePrsmPtrVec & selected_prsm_ptrs) {
 void GraphAlignProcessor::process() {
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
-  //std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
-  std::string db_file_name = prsm_para_ptr->getOriDbName() 
-    + "_idx" + file_util::getFileSeparator() + prsm_para_ptr->getSearchDbFileName();
+  std::string db_file_name = prsm_para_ptr->getSearchDbFileNameWithFolder();
 
   LOG_DEBUG("Search db file name " << db_file_name);
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();

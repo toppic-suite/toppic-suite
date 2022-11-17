@@ -65,7 +65,7 @@ void CompPValueArray::compMultiExpectedValues(const PrmMsPtrVec &ms_six_ptr_vec,
   std::vector<double> pep_probs;
   comp_prob_value_array::compProbArray(comp_prob_ptr_, pep_n_term_residue_ptrs_,
                                prm_ptr_2d, prsm_ptrs, strict, prob_prec_mass, tole_ptr, pep_probs);
-  double tolerance = ms_six_ptr_vec[0]->getMsHeaderPtr()->getErrorTolerance(ppo);
+  double tolerance = ms_six_ptr_vec[0]->getMsHeaderPtr()->getPrecErrorTolerance(ppo);
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     double prec_mass = ms_six_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMassMinusWater();
     int unexpect_shift_num = prsm_ptrs[i]->getProteoformPtr()->getAlterNum(AlterType::UNEXPECTED);

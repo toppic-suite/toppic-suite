@@ -15,6 +15,7 @@
 #include <algorithm>
 
 #include "common/util/logger.hpp"
+#include "filter/massmatch/prot_score.hpp"
 #include "filter/massmatch/mass_match_util.hpp"
 
 namespace toppic {
@@ -119,6 +120,73 @@ ProtCandidatePtrVec findTopProteins(std::vector<short> &scores,
     n_term = false;
     addTruncShifts(proteins, rev_index_ptr, rev_scores, shift_num, n_term);
   }
+  return proteins;
+}
+
+ProtCandidatePtrVec findZeroShiftTopProteins(std::vector<short> &scores,
+                                             std::vector<short> &rev_scores,
+                                             MassMatchPtr index_ptr,
+                                             MassMatchPtr rev_index_ptr,
+                                             double prec_minus_water_mass,
+                                             double prec_error_tole, 
+                                             double threshold, int num) {
+
+  int prec_match_score = MassMatch::getPrecursorMatchScore();
+  double min_mass = prec_minus_water_mass - prec_error_tole;
+  double max_mass = prec_minus_water_mass + prec_error_tole;
+  std::vector<int> row_begins = index_ptr->getProteoRowBegins();
+  std::vector<int> row_ends = index_ptr->getProteoRowEnds();
+  std::vector<double> proteo_minus_water_masses = index_ptr->getProteoMinusWaterMasses();
+  std::vector<double> trunc_shifts = index_ptr->getTruncShifts();
+  std::vector<int> rev_row_begins = rev_index_ptr->getProteoRowBegins();
+  std::vector<int> rev_row_ends = rev_index_ptr->getProteoRowEnds();
+  std::vector<double> rev_trunc_shifts = rev_index_ptr->getTruncShifts();
+
+  ProtScorePtrVec proteo_scores;
+  for (size_t i = 0; i < row_begins.size(); i++) {
+    int bgn = row_begins[i];
+    int end = row_ends[i];
+    // get precursor match rows
+    std::vector<int> prec_match_rows;
+    for (int j = bgn; j <= end; j++) {
+      if (scores[j] > prec_match_score) {
+        prec_match_rows.push_back(j);
+      }
+    }
+
+    // get reverse precursor match rows
+    int rev_bgn = rev_row_begins[i];
+    int rev_end = rev_row_ends[i];
+    std::vector<int> rev_prec_match_rows;
+    for (int j = rev_bgn; j <= rev_end; j++) {
+      if (rev_scores[j] > prec_match_score) {
+        rev_prec_match_rows.push_back(j);
+      }
+    }
+
+    int best_score = 0;
+    double best_n_term_shift = 0;
+    double best_c_term_shift = 0;
+    for (size_t j = 0; j < prec_match_rows.size(); j++) {
+      for (size_t k = 0; k < rev_prec_match_rows.size(); k++) {
+        double n_term_shift = trunc_shifts[prec_match_rows[j]];
+        double c_term_shift = rev_trunc_shifts[rev_prec_match_rows[k]];
+        double mass = proteo_minus_water_masses[i] + n_term_shift + c_term_shift; 
+        double score = scores[prec_match_rows[j]] + rev_scores[rev_prec_match_rows[k]];
+        if (mass >= min_mass && mass <= max_mass && score > best_score) {
+          best_score = score;
+          best_n_term_shift = n_term_shift; 
+          best_c_term_shift = c_term_shift; 
+        }
+      }
+    }
+    ProtScorePtr proteo_score = std::make_shared<ProtScore>(i, best_score, 
+                                                            best_n_term_shift, 
+                                                            best_c_term_shift);
+    proteo_scores.push_back(proteo_score);
+  }
+
+  ProtCandidatePtrVec proteins = ProtCandidate::geneResults(proteo_scores, threshold, num);
   return proteins;
 }
 
