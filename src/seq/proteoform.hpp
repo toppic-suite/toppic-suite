@@ -78,6 +78,8 @@ class Proteoform {
 
   double getMass();
 
+  double getMinusWaterMass();
+
   ProteoformTypePtr getProteoformType();
 
   void addMassShiftPtrVec(const MassShiftPtrVec & shift_ptr_vec);

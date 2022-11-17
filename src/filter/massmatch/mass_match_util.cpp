@@ -21,6 +21,7 @@ namespace toppic {
 
 namespace mass_match_util {
 
+// Find top proteins for diagonal filtering
 ProtCandidatePtrVec findTopProteins(std::vector<short> &scores,
                                     std::vector<int> &proteo_row_begins,
                                     std::vector<int> &proteo_row_ends,

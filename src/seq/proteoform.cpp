@@ -22,6 +22,7 @@
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
 #include "common/xml/xml_dom_util.hpp"
+#include "common/base/mass_constant.hpp"
 #include "common/base/ptm_base.hpp"
 #include "common/base/mod_base.hpp"
 #include "common/base/prot_mod_base.hpp"
@@ -117,6 +118,11 @@ double Proteoform::getMass() {
     }
   }
   return mass;
+}
+
+double Proteoform::getMinusWaterMass() {
+  double mass = getMass();
+  return mass - mass_constant::getWaterMass(); 
 }
 
 PtmPtrVec Proteoform::getPtmVec(AlterTypePtr type) {

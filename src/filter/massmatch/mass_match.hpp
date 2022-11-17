@@ -26,20 +26,17 @@ class MassMatch {
  public:
   MassMatch(){};
 
-  /* mass_2d[i]: a vector containing prefix residue masses of the ith proteoform 
-   * real_shift_2d[i]: a vector containing all possible shifts of the ith proteoform
+  /* 
+   * proteo_minus_water_masses[i]: the mass (minus water) of the ith proteoform
+   * mass_2d[i]: a vector containing prefix residue masses of the ith proteoform 
+   * float_shift_2d[i]: a vector containing all possible shifts of the ith proteoform
    * pos_2d[i]: a vector containing the first residue position for each shift. 
    */
-  explicit MassMatch(std::vector<std::vector<int>> &mass_2d,
-                     std::vector<std::vector<double>> &real_shift_2d,
+  explicit MassMatch(std::vector<double> &proteo_minus_water_masses,
+                     std::vector<std::vector<int>> &mass_2d,
+                     std::vector<std::vector<double>> &float_shift_2d,
                      std::vector<std::vector<int>> &pos_2d,
                      double max_proteoform_mass, double scale);
-
-  explicit MassMatch(std::vector<std::vector<int>> &mass_2d,
-                     std::vector<std::vector<double>> &real_shift_2d,
-                     std::vector<std::vector<int>> &pos_2d,
-                     double max_proteoform_mass, double scale, bool prm);
-    
 
   void compScores(const std::vector<std::pair<int, int>> &pref_mass_errors,
                   std::vector<short> &scores);
@@ -81,12 +78,11 @@ class MassMatch {
   int col_num_;
   int row_num_;
 
-  // prefix residue masses or not
-  bool prm_;
-
   // the first row of each proteoform
   std::vector<int> proteo_row_begins_;
   std::vector<int> proteo_row_ends_;
+  // proteoform masses (minus water) 
+  std::vector<double> proteo_minus_water_masses_;
 
   // the proteoform id of each row
   std::vector<int> row_proteo_ids_;
@@ -99,7 +95,7 @@ class MassMatch {
   void initProteoformBeginEnds(std::vector<std::vector<double>> &shift_2d);
 
   void initIndexes(std::vector<std::vector<int>> &mass_2d,
-                   std::vector<std::vector<double>> &real_shift_2d,
+                   std::vector<std::vector<double>> &float_shift_2d,
                    std::vector<std::vector<int>> &pos_2d);
 
   void compColumnMatchNums(std::vector<std::vector<int>> &mass_2d,
