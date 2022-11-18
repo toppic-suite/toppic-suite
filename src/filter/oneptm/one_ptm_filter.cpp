@@ -145,7 +145,7 @@ void OnePtmFilter::computeBestMatch(const PrmMsPtrVec &prm_ms_ptr_vec,
                                                           group_spec_num,
                                                           proteo_ptrs_[id], score);
     std::vector<double> shifts = pref_prots[i]->getCTermShifts();
-    prsm_ptr->setCTruncShifts(pref_prots[i]->getCTermShifts());
+    prsm_ptr->setCTermShifts(pref_prots[i]->getCTermShifts());
     pref_match_ptrs_.push_back(prsm_ptr);
   }
 
@@ -160,7 +160,7 @@ void OnePtmFilter::computeBestMatch(const PrmMsPtrVec &prm_ms_ptr_vec,
     SimplePrsmPtr prsm_ptr = std::make_shared<SimplePrsm>(prm_ms_ptr_vec[0]->getMsHeaderPtr(),
                                                           group_spec_num,
                                                           proteo_ptrs_[id], score);
-    prsm_ptr->setNTruncShifts(suff_prots[i]->getNTermShifts());
+    prsm_ptr->setNTermShifts(suff_prots[i]->getNTermShifts());
     suff_match_ptrs_.push_back(prsm_ptr);
   }
 
@@ -176,8 +176,8 @@ void OnePtmFilter::computeBestMatch(const PrmMsPtrVec &prm_ms_ptr_vec,
     SimplePrsmPtr prsm_ptr = std::make_shared<SimplePrsm>(prm_ms_ptr_vec[0]->getMsHeaderPtr(),
                                                           group_spec_num,
                                                           proteo_ptrs_[id], score);
-    prsm_ptr->setNTruncShifts(internal_prots[i]->getNTermShifts());
-    prsm_ptr->setCTruncShifts(internal_prots[i]->getCTermShifts());
+    prsm_ptr->setNTermShifts(internal_prots[i]->getNTermShifts());
+    prsm_ptr->setCTermShifts(internal_prots[i]->getCTermShifts());
     internal_match_ptrs_.push_back(prsm_ptr);
   }
 }

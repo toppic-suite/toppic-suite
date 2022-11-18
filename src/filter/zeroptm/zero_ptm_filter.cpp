@@ -142,10 +142,10 @@ void ZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec) {
   int group_spec_num = ms_ptr_vec.size();
   for (size_t i = 0; i < comp_prots.size(); i++) {
     int id = comp_prots[i]->getProteinId();
-    int score = comp_prots[i]->getScore();
     comp_match_ptrs_.push_back(std::make_shared<SimplePrsm>(ms_ptr_vec[0]->getMsHeaderPtr(),
                                                             group_spec_num,
-                                                            proteo_ptrs_[id], score));
+                                                            proteo_ptrs_[id], 
+                                                            comp_prots[i]));
   }
 
   ProtCandidatePtrVec pref_prots
@@ -156,10 +156,10 @@ void ZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec) {
   pref_match_ptrs_.clear();
   for (size_t i = 0; i < pref_prots.size(); i++) {
     int id = pref_prots[i]->getProteinId();
-    int score = pref_prots[i]->getScore();
     pref_match_ptrs_.push_back(std::make_shared<SimplePrsm>(ms_ptr_vec[0]->getMsHeaderPtr(),
                                                             group_spec_num,
-                                                            proteo_ptrs_[id], score));
+                                                            proteo_ptrs_[id], 
+                                                            pref_prots[i]));
   }
 
   ProtCandidatePtrVec suff_prots
@@ -170,10 +170,10 @@ void ZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec) {
   suff_match_ptrs_.clear();
   for (size_t i = 0; i < suff_prots.size(); i++) {
     int id = suff_prots[i]->getProteinId();
-    int score = suff_prots[i]->getScore();
     suff_match_ptrs_.push_back(std::make_shared<SimplePrsm>(ms_ptr_vec[0]->getMsHeaderPtr(),
                                                             group_spec_num,
-                                                            proteo_ptrs_[id], score));
+                                                            proteo_ptrs_[id], 
+                                                            suff_prots[i]));
   }
 
   ProtCandidatePtrVec internal_prots
@@ -184,10 +184,10 @@ void ZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec) {
   internal_match_ptrs_.clear();
   for (size_t i = 0; i < internal_prots.size(); i++) {
     int id = internal_prots[i]->getProteinId();
-    int score = internal_prots[i]->getScore();
     internal_match_ptrs_.push_back(std::make_shared<SimplePrsm>(ms_ptr_vec[0]->getMsHeaderPtr(),
                                                                 group_spec_num,
-                                                                proteo_ptrs_[id], score));
+                                                                proteo_ptrs_[id], 
+                                                                internal_prots[i]));
   }
 }
 

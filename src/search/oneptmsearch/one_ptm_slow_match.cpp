@@ -36,7 +36,7 @@ OnePtmSlowMatch::OnePtmSlowMatch(ProteoformPtr proteo_ptr,
 }
 
 inline void OnePtmSlowMatch::addPrefixDiagonals(DiagHeaderPtrVec &n_extend_header_ptrs) {
-  std::vector<double> shifts = simple_prsm_ptr_->getNTruncShifts();
+  std::vector<double> shifts = simple_prsm_ptr_->getNTermShifts();
   for (size_t i = 0; i < shifts.size(); i++) {
     double new_shift = shifts[i] - proteo_ptr_->getProtModPtr()->getProtShift();
     if (!diag_header_util::isExistHeader(n_extend_header_ptrs, new_shift)) {
@@ -96,7 +96,7 @@ inline void OnePtmSlowMatch::addComplementDiagonals(DiagHeaderPtrVec &n_extend_h
 }
 
 inline void OnePtmSlowMatch::addSuffixDiagonals(DiagHeaderPtrVec &c_extend_header_ptrs) {
-  std::vector<double>shifts = simple_prsm_ptr_->getCTruncShifts();
+  std::vector<double>shifts = simple_prsm_ptr_->getNTermShiftsFromCTermShifts();
   for (size_t i = 0; i < shifts.size(); i++) {
     double new_shift = shifts[i] - proteo_ptr_->getProtModPtr()->getProtShift();
     if (!diag_header_util::isExistHeader(c_extend_header_ptrs, new_shift)) {
