@@ -21,10 +21,10 @@ namespace toppic {
 
 class PsAlignPara {
  public :
-  PsAlignPara(int shift_num, double align_max_shift, double align_min_shift): 
+  PsAlignPara(int shift_num, double align_min_shift, double align_max_shift): 
       n_unknown_shift_(shift_num),
-      align_max_shift_(align_max_shift),
-      align_min_shift_(align_min_shift) { }
+      align_min_shift_(align_min_shift),
+      align_max_shift_(align_max_shift) { }
 
   int getUnknownShiftNum() {return n_unknown_shift_;}
 
@@ -32,9 +32,9 @@ class PsAlignPara {
   int n_unknown_shift_ =2;
 
   // parameters for ps alignment 
+  double align_min_shift_ = -1000000;
   double align_max_shift_ = 1000000;
 
-  double align_min_shift_ = -1000000;
 
   // shift thresh for penalty
   double align_large_shift_thresh_ = 300;

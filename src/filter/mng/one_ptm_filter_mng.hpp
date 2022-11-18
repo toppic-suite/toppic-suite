@@ -26,6 +26,8 @@ class OnePtmFilterMng {
   OnePtmFilterMng(PrsmParaPtr prsm_para_ptr,
                   const std::string & index_file_para,
                   const std::string & output_file_ext,
+                  double min_shift,
+                  double max_shift,
                   int thread_num,
                   const std::string & residueModFileName = "",
                   int var_num = 0);
@@ -34,6 +36,7 @@ class OnePtmFilterMng {
 
   PrsmParaPtr prsm_para_ptr_;
 
+
   // parameters for fast filteration
   int max_proteoform_mass_ = 50000;
 
@@ -41,12 +44,15 @@ class OnePtmFilterMng {
   unsigned int comp_num_ = 10;
   unsigned int pref_suff_num_ = 5;
   unsigned int inte_num_ = 10;
-  unsigned int shift_num_ = 10;
+  unsigned int cand_shift_num_ = 10;
   int filter_scale_ = 100;
 
   std::string index_file_para_;
 
   std::string output_file_ext_;
+
+  double min_shift_= -500;
+  double max_shift_ = 500;
 
   int thread_num_;
 

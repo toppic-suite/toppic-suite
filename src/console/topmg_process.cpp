@@ -214,9 +214,11 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
 
     std::cout << "ASF-One PTM filtering - started." << std::endl;
     OnePtmFilterMngPtr one_ptm_filter_mng_ptr =
-        std::make_shared<OnePtmFilterMng>(prsm_para_ptr, index_file_para, 
-                                          "topmg_one_filter", filter_thread_num,
-                                          var_mod_file_name, 1);
+      std::make_shared<OnePtmFilterMng>(prsm_para_ptr, index_file_para, 
+                                        "topmg_one_filter", 
+                                        -max_ptm_mass, max_ptm_mass, 
+                                        filter_thread_num,
+                                        var_mod_file_name, 1);
     one_ptm_filter_mng_ptr->inte_num_ = 4;
     one_ptm_filter_mng_ptr->pref_suff_num_ = 4;
     one_ptm_filter_mng_ptr->comp_num_ = 4;

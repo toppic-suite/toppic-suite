@@ -42,6 +42,16 @@ ProtCandidatePtrVec findZeroShiftTopProteins(std::vector<short> &scores,
                                              double prec_error_tole, 
                                              double threshold, int num);
 
+ProtCandidatePtrVec findOneShiftTopProteins(std::vector<short> &scores,
+                                            std::vector<short> &rev_scores,
+                                            MassMatchPtr index_ptr,
+                                            MassMatchPtr rev_index_ptr,
+                                            double prec_minus_water_mass,
+                                            double prec_error_tole,
+                                            double min_shift, double max_shift,  
+                                            int term_shift_num, 
+                                            double threshold, int top_num); 
+
 }  // namespace mass_match_util
 
 }  // namespace toppic

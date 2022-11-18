@@ -185,6 +185,8 @@ std::vector<double> getNTermShift(ProteoformPtr db_form_ptr,
       shifts.push_back(prot_mod_ptrs[i]->getProtShift());
     }
   }
+  // sort shifts in the decreasing order
+  std::sort(shifts.begin(), shifts.end(), std::greater <>());
   return shifts;
 }
 

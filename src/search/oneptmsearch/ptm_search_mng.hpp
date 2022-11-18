@@ -26,8 +26,8 @@ namespace toppic {
 class PtmSearchMng {
  public :
   PtmSearchMng(PrsmParaPtr prsm_para_ptr, int n_report,
-               double align_max_shift,
                double align_min_shift,
+               double align_max_shift,
                int shift_num,
                int thread_num,
                const std::string &input_file_ext,

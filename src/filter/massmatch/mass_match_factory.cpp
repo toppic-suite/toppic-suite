@@ -41,7 +41,8 @@ inline std::vector<int> getScaledSrmMasses(ProteoformPtr proteo_ptr,
 
 inline MassMatchPtr getMassMatchPtr(const ProteoformPtrVec &proteo_ptrs,
                                     std::vector<std::vector<int>> &mass_2d,
-                                    double max_proteoform_mass, double scale, bool prm) {
+                                    double max_proteoform_mass, double scale, 
+                                    bool prm) {
   std::vector<double> proteo_minus_water_masses;
   std::vector<std::vector<double>> float_shift_2d;
   std::vector<std::vector<int>> pos_2d;

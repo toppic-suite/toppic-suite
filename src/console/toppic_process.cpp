@@ -281,14 +281,16 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
       std::cout << "One unexpected shift filtering - started." << std::endl;
       OnePtmFilterMngPtr one_ptm_filter_mng_ptr
           = std::make_shared<OnePtmFilterMng>(prsm_para_ptr, index_file_para, 
-                                              "toppic_one_filter", filter_thread_num);
+                                              "toppic_one_filter", 
+                                              min_ptm_mass, max_ptm_mass,
+                                              filter_thread_num);
       one_ptm_filter_processor::process(one_ptm_filter_mng_ptr);
       std::cout << "One unexpected shift filtering - finished." << std::endl;
 
       std::cout << "One unexpected shift search - started." << std::endl;
       int shift_num = 1;
       PtmSearchMngPtr one_search_mng_ptr
-          = std::make_shared<PtmSearchMng>(prsm_para_ptr, n_top, max_ptm_mass, min_ptm_mass,
+          = std::make_shared<PtmSearchMng>(prsm_para_ptr, n_top, min_ptm_mass, max_ptm_mass,
                                            shift_num, thread_num, "toppic_one_filter", "toppic_one_shift");
       OnePtmSearchProcessorPtr one_search_processor
           = std::make_shared<OnePtmSearchProcessor>(one_search_mng_ptr);
@@ -317,7 +319,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
 
       std::cout << "Multiple unexpected shifts search - started." << std::endl;
       PtmSearchMngPtr multi_search_mng_ptr
-          = std::make_shared<PtmSearchMng>(prsm_para_ptr, n_top, max_ptm_mass, min_ptm_mass,
+          = std::make_shared<PtmSearchMng>(prsm_para_ptr, n_top, min_ptm_mass, max_ptm_mass,
                                            ptm_num, thread_num, "toppic_multi_filter", "toppic_multi_shift");
       PtmSearchProcessorPtr processor = std::make_shared<PtmSearchProcessor>(multi_search_mng_ptr);
       processor->process();
