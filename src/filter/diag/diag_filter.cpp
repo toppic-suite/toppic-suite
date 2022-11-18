@@ -110,8 +110,8 @@ SimplePrsmPtrVec DiagFilter::compute(const PrmMsPtrVec &ms_ptr_vec) {
   }
  
   ProtCandidatePtrVec results
-    = mass_match_util::findTopProteins(max_scores, proteo_row_begins, proteo_row_ends, threshold,
-                                       mng_ptr_->filter_result_num_);
+    = mass_match_util::findDiagTopProteins(max_scores, proteo_row_begins, proteo_row_ends, threshold,
+                                           mng_ptr_->filter_result_num_);
   for (size_t j = 0; j < results.size(); j++) {
     int id = results[j]->getProteinId();
     int score = results[j]->getScore();

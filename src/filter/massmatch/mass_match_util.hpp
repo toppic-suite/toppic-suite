@@ -22,25 +22,13 @@ namespace toppic {
 
 namespace mass_match_util {
 
-ProtCandidatePtrVec findTopProteins(std::vector<short> &scores, 
-                                    std::vector<int> &proteo_row_begins,
-                                    std::vector<int> &proteo_row_ends,
-                                    int threshold, int num);
-
-ProtCandidatePtrVec findTopProteins(std::vector<short> &scores, 
-                                    std::vector<short> &rev_scores, 
-                                    MassMatchPtr index_ptr,
-                                    MassMatchPtr rev_index_ptr,
-                                    double threshold, int num,
-                                    bool add_shifts, int shift_num);
-
 ProtCandidatePtrVec findZeroShiftTopProteins(std::vector<short> &scores,
                                              std::vector<short> &rev_scores,
                                              MassMatchPtr index_ptr,
                                              MassMatchPtr rev_index_ptr,
                                              double prec_minus_water_mass,
                                              double prec_error_tole, 
-                                             double threshold, int num);
+                                             int threshold, int num);
 
 ProtCandidatePtrVec findOneShiftTopProteins(std::vector<short> &scores,
                                             std::vector<short> &rev_scores,
@@ -50,7 +38,21 @@ ProtCandidatePtrVec findOneShiftTopProteins(std::vector<short> &scores,
                                             double prec_error_tole,
                                             double min_shift, double max_shift,  
                                             int term_shift_num, 
-                                            double threshold, int top_num); 
+                                            int threshold, int top_num); 
+
+ProtCandidatePtrVec findVarPtmTopProteins(std::vector<short> &scores,
+                                          std::vector<short> &rev_scores,
+                                          MassMatchPtr index_ptr,
+                                          MassMatchPtr rev_index_ptr,
+                                          double prec_minus_water_mass,
+                                          double prec_error_tole, 
+                                          std::vector<double> &ptm_shifts,
+                                          int threshold, int top_num); 
+
+ProtCandidatePtrVec findDiagTopProteins(std::vector<short> &scores, 
+                                        std::vector<int> &proteo_row_begins,
+                                        std::vector<int> &proteo_row_ends,
+                                        int threshold, int top_num);
 
 }  // namespace mass_match_util
 
