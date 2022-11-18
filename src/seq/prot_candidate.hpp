@@ -12,13 +12,13 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_FILTER_MASS_MATCH_PROT_CANDIDATE_HPP_
-#define TOPPIC_FILTER_MASS_MATCH_PROT_CANDIDATE_HPP_
+#ifndef TOPPIC_SEQ_PROT_CANDIDATE_HPP_
+#define TOPPIC_SEQ_PROT_CANDIDATE_HPP_
 
 #include <memory>
 #include <vector>
 
-#include "filter/massmatch/prot_score.hpp"
+#include "seq/prot_score.hpp"
 
 namespace toppic {
 

@@ -15,7 +15,7 @@
 #include <algorithm>
 
 #include "common/util/logger.hpp"
-#include "filter/massmatch/prot_candidate.hpp"
+#include "seq/prot_candidate.hpp"
 
 namespace toppic {
 

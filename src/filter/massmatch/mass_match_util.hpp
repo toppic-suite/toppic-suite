@@ -15,7 +15,7 @@
 #ifndef TOPPIC_FILTER_MASS_MATCH_MASS_MATCH_UTIL_HPP_
 #define TOPPIC_FILTER_MASS_MATCH_MASS_MATCH_UTIL_HPP_
 
-#include "filter/massmatch/prot_candidate.hpp"
+#include "seq/prot_candidate.hpp"
 #include "filter/massmatch/mass_match.hpp"
 
 namespace toppic {

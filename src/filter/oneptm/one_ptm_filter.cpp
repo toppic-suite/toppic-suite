@@ -18,8 +18,9 @@
 
 #include "common/util/file_util.hpp"
 #include "seq/proteoform_util.hpp"
+#include "seq/prot_candidate.hpp"
 #include "ms/factory/prm_ms_util.hpp"
-#include "filter/massmatch/prot_candidate.hpp"
+
 #include "filter/massmatch/mass_match_factory.hpp"
 #include "filter/massmatch/mass_match_util.hpp"
 #include "filter/oneptm/one_ptm_filter.hpp"

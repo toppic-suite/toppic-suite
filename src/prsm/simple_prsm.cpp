@@ -22,17 +22,35 @@ namespace toppic {
 
 SimplePrsm::SimplePrsm(MsHeaderPtr header_ptr, int spectrum_num,
                        ProteoformPtr proteo_ptr, int score):
-    spectrum_num_(spectrum_num),
-    score_(score) {
-      spectrum_id_ = header_ptr->getId();
-      file_name_ = header_ptr->getFileName();
-      spectrum_scan_ = header_ptr->getScansString();
-      precursor_id_ = header_ptr->getPrecId();
-      prec_mass_ = header_ptr->getPrecMonoMass();
-      seq_name_ = proteo_ptr->getSeqName();
-      seq_desc_ = proteo_ptr->getSeqDesc();
-      prot_mass_ = proteo_ptr->getResSeqPtr()->getSeqMass();
-    }
+  spectrum_num_(spectrum_num),
+  score_(score) {
+    spectrum_id_ = header_ptr->getId();
+    file_name_ = header_ptr->getFileName();
+    spectrum_scan_ = header_ptr->getScansString();
+    precursor_id_ = header_ptr->getPrecId();
+    prec_mass_ = header_ptr->getPrecMonoMass();
+    seq_name_ = proteo_ptr->getSeqName();
+    seq_desc_ = proteo_ptr->getSeqDesc();
+    prot_mass_ = proteo_ptr->getResSeqPtr()->getSeqMass();
+  }
+
+SimplePrsm::SimplePrsm(MsHeaderPtr header_ptr, int spectrum_num,
+                       ProteoformPtr proteo_ptr, int score, 
+                       std::vector<double> &n_trunc_shifts,
+                       std::vector<double> &c_trunc_shifts): 
+  spectrum_num_(spectrum_num),
+  score_(score) {
+    spectrum_id_ = header_ptr->getId();
+    file_name_ = header_ptr->getFileName();
+    spectrum_scan_ = header_ptr->getScansString();
+    precursor_id_ = header_ptr->getPrecId();
+    prec_mass_ = header_ptr->getPrecMonoMass();
+    seq_name_ = proteo_ptr->getSeqName();
+    seq_desc_ = proteo_ptr->getSeqDesc();
+    prot_mass_ = proteo_ptr->getResSeqPtr()->getSeqMass();
+    n_trunc_shifts_ = n_trunc_shifts;
+    c_trunc_shifts_ = c_trunc_shifts;
+  }
 
 SimplePrsm::SimplePrsm(MsHeaderPtr header_ptr, int spectrum_num,
                        const std::string & seq_name,
