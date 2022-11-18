@@ -12,215 +12,175 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include <algorithm>
+
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
-#include "common/thread/simple_thread_pool.hpp"
+#include "seq/proteoform.hpp"
+#include "seq/proteoform_factory.hpp"
 #include "ms/spec/msalign_util.hpp"
+#include "ms/spec/simple_msalign_reader.hpp"
 #include "ms/factory/spectrum_set_factory.hpp"
-#include "prsm/prsm_str_merge.hpp"
-#include "prsm/prsm_xml_writer_set.hpp"
 #include "prsm/simple_prsm.hpp"
 #include "prsm/simple_prsm_reader.hpp"
-#include "prsm/simple_prsm_util.hpp"
-#include "prsm/prsm.hpp"
-#include "search/varptmsearch/var_ptm_search_slow_filter.hpp"
+#include "prsm/prsm_xml_writer.hpp"
+//#include "search/oneptmsearch/one_ptm_slow_match.hpp"
 #include "search/varptmsearch/var_ptm_search_processor.hpp"
 
 namespace toppic {
 
-void seleTopPrsms(const PrsmPtrVec &all_prsm_ptrs, 
-                  PrsmPtrVec &sele_prsm_ptrs, int n_report) {
-  int match_size = all_prsm_ptrs.size();
-  if(all_prsm_ptrs.size()!=0){
-    for(int r=0;r< n_report;r++){
-      if(r >= match_size){
-        break;
-      }
-      if(all_prsm_ptrs[r]->getMatchFragNum() > 0){
-        sele_prsm_ptrs.push_back(all_prsm_ptrs[r]);
-      }
+PrsmPtrVec VarPtmSearchProcessor::varPtmSearchOneSpec(SpectrumSetPtr spec_set_ptr,
+                                                      const SimplePrsmPtrVec &simple_prsm_ptr_vec,
+                                                      FastaIndexReaderPtr reader_ptr,
+                                                      PtmSearchMngPtr mng_ptr,
+                                                      ProteoformTypePtr type_ptr) {
+  ModPtrVec fix_mod_list = mng_ptr->prsm_para_ptr_->getFixModPtrVec();
+  ProtModPtrVec prot_mod_ptr_vec = mng_ptr->prsm_para_ptr_->getProtModPtrVec();
+  ProteoformPtrVec proteoform_ptr_vec;
+  SimplePrsmPtrVec prsm_vec;
+  for (size_t i = 0; i < simple_prsm_ptr_vec.size(); i++) {
+    std::string seq_name = simple_prsm_ptr_vec[i]->getSeqName();
+    std::string seq_desc = simple_prsm_ptr_vec[i]->getSeqDesc();
+    ProteoformPtr proteo_ptr
+        = proteoform_factory::readFastaToProteoformPtr(reader_ptr, seq_name, seq_desc, fix_mod_list);
+    if (type_ptr == ProteoformType::COMPLETE || type_ptr == ProteoformType::PREFIX) {
+      ProteoformPtrVec mod_form_ptr_vec = proteoform_factory::geneProtModProteoform(proteo_ptr, prot_mod_ptr_vec);
+      proteoform_ptr_vec.insert(proteoform_ptr_vec.end(), mod_form_ptr_vec.begin(),
+                                mod_form_ptr_vec.end());
+      prsm_vec.insert(prsm_vec.end(), mod_form_ptr_vec.size(), simple_prsm_ptr_vec[i]);
+    } else {
+      proteoform_ptr_vec.push_back(proteo_ptr);
+      prsm_vec.push_back(simple_prsm_ptr_vec[i]);
     }
   }
-  std::sort(sele_prsm_ptrs.begin(), sele_prsm_ptrs.end(), Prsm::cmpSpectrumIdIncPrecursorIdInc);
+  PrsmPtrVec prsms;
+  for (size_t i = 0; i < proteoform_ptr_vec.size(); i++) {
+    OnePtmSlowMatch slow_match(proteoform_ptr_vec[i], spec_set_ptr,
+                               prsm_vec[i], type_ptr, mng_ptr);
+    PrsmPtr tmp = slow_match.compute(1);
+
+    if (tmp != nullptr)
+      prsms.push_back(tmp);
+  }
+  std::sort(prsms.begin(), prsms.end(), Prsm::cmpMatchFragmentDecMatchPeakDec);
+  if (prsms.size() > 0) {
+    prsms.erase(prsms.begin() + 1, prsms.end());
+  }
+  return prsms;
 }
 
-std::function<void()> geneTask(SpectrumSetPtr spectrum_set_ptr, 
-                               SimplePrsmPtrVec ori_simple_prsm_ptrs,
-                               VarPtmSearchMngPtr mng_ptr,
-                               SimpleThreadPoolPtr pool_ptr, 
-                               PrsmXmlWriterSetPtrVec writer_ptr_vec) {
-
-  return [spectrum_set_ptr, ori_simple_prsm_ptrs, mng_ptr, pool_ptr, writer_ptr_vec]() {
-    SimplePrsmPtrVec simple_prsm_ptrs = 
-        simple_prsm_util::getUniqueMatches(ori_simple_prsm_ptrs);
-    VarPtmSearchSlowFilterPtr slow_filter_ptr = 
-      std::make_shared<VarPtmSearchSlowFilter>(spectrum_set_ptr, simple_prsm_ptrs, mng_ptr);
-    boost::thread::id thread_id = boost::this_thread::get_id();
-    int writer_id = pool_ptr->getId(thread_id);
-    PrsmXmlWriterSetPtr writer_ptr = writer_ptr_vec[writer_id];
-
-    PrsmPtrVec complete_prsm_ptrs = slow_filter_ptr->getPrsms(ProteoformType::COMPLETE);
-    std::sort(complete_prsm_ptrs.begin(), complete_prsm_ptrs.end(), 
-              Prsm::cmpMatchFragDecStartPosInc);
-    PrsmPtrVec sele_complete_prsm_ptrs;
-    seleTopPrsms(complete_prsm_ptrs, sele_complete_prsm_ptrs, mng_ptr->n_report_);
-    writer_ptr->getCompleteWriterPtr(s)->writeVector(sele_complete_prsm_ptrs);
-
-    PrsmPtrVec prefix_prsm_ptrs = slow_filter_ptr->getPrsms(ProteoformType::PREFIX);
-    std::sort(prefix_prsm_ptrs.begin(), prefix_prsm_ptrs.end(), 
-              Prsm::cmpMatchFragDecStartPosInc);
-    PrsmPtrVec sele_prefix_prsm_ptrs;
-    seleTopPrsms(prefix_prsm_ptrs, sele_prefix_prsm_ptrs, mng_ptr->n_report_);
-    writer_ptr->getPrefixWriterPtr(s)->writeVector(sele_prefix_prsm_ptrs);
-
-    PrsmPtrVec suffix_prsm_ptrs = slow_filter_ptr->getPrsms(ProteoformType::SUFFIX);
-    std::sort(suffix_prsm_ptrs.begin(), suffix_prsm_ptrs.end(), Prsm::cmpMatchFragmentDec);
-    PrsmPtrVec sele_suffix_prsm_ptrs;
-    seleTopPrsms(suffix_prsm_ptrs, sele_suffix_prsm_ptrs, mng_ptr->n_report_);
-    writer_ptr->getSuffixWriterPtr(s)->writeVector(sele_suffix_prsm_ptrs);
-
-    PrsmPtrVec internal_prsm_ptrs = slow_filter_ptr->getPrsms(ProteoformType::INTERNAL);
-    std::sort(internal_prsm_ptrs.begin(), internal_prsm_ptrs.end(), Prsm::cmpMatchFragmentDec);
-    PrsmPtrVec sele_internal_prsm_ptrs;
-    seleTopPrsms(internal_prsm_ptrs, sele_internal_prsm_ptrs, mng_ptr->n_report_);
-    writer_ptr->getInternalWriterPtr(s)->writeVector(sele_internal_prsm_ptrs);
-  };
-}
-
-VarPtmSearchProcessor::VarPtmSearchProcessor(VarPtmSearchMngPtr mng_ptr){
-  mng_ptr_ = mng_ptr;
-}
-
-
-// process ptm search
-void VarPtmSearchProcessor::process(){
+void VarPtmSearchProcessor::process() {
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
-  std::string input_file_name = file_util::basename(sp_file_name)+"."+mng_ptr_->input_file_ext_;
-  SimplePrsmReader simple_prsm_reader(input_file_name);
-  SimplePrsmPtr prsm_ptr = simple_prsm_reader.readOnePrsm();
+  std::string input_file_name = file_util::basename(sp_file_name) + "." + mng_ptr_->input_file_ext_;
+  SimplePrsmReader comp_prsm_reader(input_file_name + "_" + ProteoformType::COMPLETE->getName());
+  SimplePrsmReader pref_prsm_reader(input_file_name + "_" + ProteoformType::PREFIX->getName());
+  SimplePrsmReader suff_prsm_reader(input_file_name + "_" + ProteoformType::SUFFIX->getName());
+  SimplePrsmReader internal_prsm_reader(input_file_name + "_" + ProteoformType::INTERNAL->getName());
+  SimplePrsmPtr comp_prsm_ptr = comp_prsm_reader.readOnePrsm();
+  SimplePrsmPtr pref_prsm_ptr = pref_prsm_reader.readOnePrsm();
+  SimplePrsmPtr suff_prsm_ptr = suff_prsm_reader.readOnePrsm();
+  SimplePrsmPtr internal_prsm_ptr = internal_prsm_reader.readOnePrsm();
+
+  std::string output_file_name = file_util::basename(prsm_para_ptr->getSpectrumFileName())
+      + "." + mng_ptr_->output_file_ext_;
+  PrsmXmlWriter comp_writer(output_file_name + "_" + ProteoformType::COMPLETE->getName());
+  PrsmXmlWriter pref_writer(output_file_name + "_" + ProteoformType::PREFIX->getName());
+  PrsmXmlWriter suff_writer(output_file_name + "_" + ProteoformType::SUFFIX->getName());
+  PrsmXmlWriter internal_writer(output_file_name + "_" + ProteoformType::INTERNAL->getName());
 
   // init variables
   std::string db_file_name = prsm_para_ptr->getSearchDbFileNameWithFolder();
-  FastaIndexReaderPtr reader_ptr = std::make_shared<FastaIndexReader>(db_file_name);
-  int spectrum_num = msalign_util::getSpNum (sp_file_name);
-  SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
 
-  std::string output_file_name = file_util::basename(sp_file_name) + "." + mng_ptr_->output_file_ext_;
+  FastaIndexReaderPtr reader_ptr = std::make_shared<FastaIndexReader>(db_file_name);
+  int spectrum_num = msalign_util::getSpNum(sp_file_name);
+  SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
+  ModPtrVec fix_mod_ptr_vec = prsm_para_ptr->getFixModPtrVec();
 
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
-  SimpleMsAlignReaderPtr ms_reader_ptr = std::make_shared<SimpleMsAlignReader>(sp_file_name, 
-                                                                               group_spec_num,
-                                                                               sp_para_ptr->getActivationPtr());
-  PrsmXmlWriterSetPtrVec writer_set_ptr_vec;
-  for (int i = 0; i < mng_ptr_->thread_num_; i++) { 
-    std::string writer_file_name = output_file_name + "_" + str_util::toString(i);
-    PrsmXmlWriterSetPtr writer_set_ptr = std::make_shared<PrsmXmlWriterSet>(writer_file_name, n_unknown_shift);
-    writer_set_ptr_vec.push_back(writer_set_ptr);
-  }
-  SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(mng_ptr_->thread_num_);
-
+  SimpleMsAlignReaderPtr msalign_reader_ptr = std::make_shared<SimpleMsAlignReader>(sp_file_name, 
+                                                                                    group_spec_num,
+                                                                                    sp_para_ptr->getActivationPtr());
   int cnt = 0;
   SpectrumSetPtr spec_set_ptr;
-  //LOG_DEBUG("Start search");
-  while((spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(ms_reader_ptr,sp_para_ptr))!= nullptr){
+  // LOG_DEBUG("Start search");
+  while ((spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(msalign_reader_ptr,sp_para_ptr))!= nullptr) {
     cnt+= group_spec_num;
-    if(spec_set_ptr->isValid()){
+    if (spec_set_ptr->isValid()) {
       int spec_id = spec_set_ptr->getSpectrumId();
-      SimplePrsmPtrVec selected_prsm_ptrs;
-      while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_id) {
-        selected_prsm_ptrs.push_back(prsm_ptr);
-        prsm_ptr = simple_prsm_reader.readOnePrsm();
+      // complete
+      SimplePrsmPtrVec comp_selected_prsm_ptrs;
+      while (comp_prsm_ptr != nullptr && comp_prsm_ptr->getSpectrumId() == spec_id) {
+        comp_selected_prsm_ptrs.push_back(comp_prsm_ptr);
+        comp_prsm_ptr = comp_prsm_reader.readOnePrsm();
       }
-      if (selected_prsm_ptrs.size() > 0) {
-        while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ * 2) {
-          boost::this_thread::sleep(boost::posix_time::milliseconds(100));
-        }
-        pool_ptr->Enqueue(geneTask(spec_set_ptr, selected_prsm_ptrs,
-                                   mng_ptr_, pool_ptr, writer_set_ptr_vec));
+      if (comp_selected_prsm_ptrs.size() > 0) {
+        // LOG_DEBUG("start processing one spectrum.");
+        PrsmPtrVec prsms = onePtmSearchOneSpec(spec_set_ptr, comp_selected_prsm_ptrs,
+                                               reader_ptr, mng_ptr_, ProteoformType::COMPLETE);
+        comp_writer.writeVector(prsms);
+      }
+
+      // prefix
+      SimplePrsmPtrVec pref_selected_prsm_ptrs;
+      while (pref_prsm_ptr != nullptr && pref_prsm_ptr->getSpectrumId() == spec_id) {
+        pref_selected_prsm_ptrs.push_back(pref_prsm_ptr);
+        pref_prsm_ptr = pref_prsm_reader.readOnePrsm();
+      }
+      if (pref_selected_prsm_ptrs.size() > 0) {
+        // LOG_DEBUG("start processing one spectrum.");
+        PrsmPtrVec prsms = onePtmSearchOneSpec(spec_set_ptr, pref_selected_prsm_ptrs,
+                                               reader_ptr, mng_ptr_, ProteoformType::PREFIX);
+        pref_writer.writeVector(prsms);
+      }
+
+      // suffix
+      SimplePrsmPtrVec suff_selected_prsm_ptrs;
+      while (suff_prsm_ptr != nullptr && suff_prsm_ptr->getSpectrumId() == spec_id) {
+        suff_selected_prsm_ptrs.push_back(suff_prsm_ptr);
+        suff_prsm_ptr = suff_prsm_reader.readOnePrsm();
+      }
+      if (suff_selected_prsm_ptrs.size() > 0) {
+        // LOG_DEBUG("start processing one spectrum.");
+        PrsmPtrVec prsms = onePtmSearchOneSpec(spec_set_ptr, suff_selected_prsm_ptrs,
+                                               reader_ptr, mng_ptr_, ProteoformType::SUFFIX);
+        suff_writer.writeVector(prsms);
+      }
+
+      // internal
+      SimplePrsmPtrVec internal_selected_prsm_ptrs;
+      while (internal_prsm_ptr != nullptr && internal_prsm_ptr->getSpectrumId() == spec_id) {
+        internal_selected_prsm_ptrs.push_back(internal_prsm_ptr);
+        internal_prsm_ptr = internal_prsm_reader.readOnePrsm();
+      }
+      if (internal_selected_prsm_ptrs.size() > 0) {
+        // LOG_DEBUG("start processing one spectrum.");
+        PrsmPtrVec prsms = onePtmSearchOneSpec(spec_set_ptr, internal_selected_prsm_ptrs,
+                                               reader_ptr, mng_ptr_, ProteoformType::INTERNAL);
+        internal_writer.writeVector(prsms);
       }
     }
-    std::cout << std::flush <<  "Multiple PTM search - processing " << cnt 
+    std::cout << std::flush <<  "One PTM search - processing " << cnt
         << " of " << spectrum_num << " spectra.\r";
   }
-  pool_ptr->ShutDown();
-  simple_prsm_reader.close();
-  for (int i = 0; i < mng_ptr_->thread_num_; i++) { 
-    writer_set_ptr_vec[i]->close();
-  }
-  LOG_DEBUG("Search completed");
+  int remainder = spectrum_num - cnt;
+  if (prsm_para_ptr->getGroupSpecNum() > remainder && remainder > 0){
+      //if there are spectrum remaining because they were not combined due to not having enough pairs
+      //fix the message as the processing is completed.
+      //this code avoids error when no combined spectra is used but a scan is remaining unprocessed
+      //because then it will not satisfy the first condition
+      std::cout << std::flush <<  "One PTM search - processing " << spectrum_num
+        << " of " << spectrum_num << " spectra.\r";
+  } 
+  comp_prsm_reader.close();
+  pref_prsm_reader.close();
+  suff_prsm_reader.close();
+  internal_prsm_reader.close();
+  comp_writer.close();
+  pref_writer.close();
+  suff_writer.close();
+  internal_writer.close();
   std::cout << std::endl;
-
-  // Combine results
-  int prsm_top_num = mng_ptr_->thread_num_ * mng_ptr_->n_report_;
-  std::string end_str = "_" + str_util::toString(s);
-  // Complete prsms
-  std::string complete_output_ext = mng_ptr_->output_file_ext_ + "_" 
-    + ProteoformType::COMPLETE->getName() + end_str;
-  std::vector<std::string> complete_input_exts;
-  for (int t = 0; t < mng_ptr_->thread_num_; t++) {
-    std::string input_ext = mng_ptr_->output_file_ext_ + "_" 
-      + str_util::toString(t) + "_" + ProteoformType::COMPLETE->getName() + end_str;
-    complete_input_exts.push_back(input_ext);
-  }
-  PrsmStrMergePtr merge_ptr
-    = std::make_shared<PrsmStrMerge>(sp_file_name, complete_input_exts, 
-                                     complete_output_ext, prsm_top_num);
-  merge_ptr->process();
-  merge_ptr = nullptr;
-
-  // Prefix prsms
-  std::string prefix_output_ext = mng_ptr_->output_file_ext_ + "_" 
-    + ProteoformType::PREFIX->getName() + end_str;
-  std::vector<std::string> prefix_input_exts;
-  for (int t = 0; t < mng_ptr_->thread_num_; t++) {
-    std::string input_ext = mng_ptr_->output_file_ext_ + "_" 
-      + str_util::toString(t) + "_" + ProteoformType::PREFIX->getName() + end_str;
-    prefix_input_exts.push_back(input_ext);
-  }
-  merge_ptr
-    = std::make_shared<PrsmStrMerge>(sp_file_name, prefix_input_exts, 
-                                     prefix_output_ext, prsm_top_num);
-  merge_ptr->process();
-  merge_ptr = nullptr;
-
-  // Suffix prsms
-  std::string suffix_output_ext = mng_ptr_->output_file_ext_ + "_" 
-    + ProteoformType::SUFFIX->getName() + end_str;
-  std::vector<std::string> suffix_input_exts;
-  for (int t = 0; t < mng_ptr_->thread_num_; t++) {
-    std::string input_ext = mng_ptr_->output_file_ext_ + "_" 
-      + str_util::toString(t) + "_" + ProteoformType::SUFFIX->getName() + end_str;
-    suffix_input_exts.push_back(input_ext);
-  }
-  merge_ptr
-    = std::make_shared<PrsmStrMerge>(sp_file_name, suffix_input_exts, 
-                                     suffix_output_ext, prsm_top_num);
-  merge_ptr->process();
-  merge_ptr = nullptr;
-
-  // internal prsms
-  std::string internal_output_ext = mng_ptr_->output_file_ext_ + "_" 
-    + ProteoformType::INTERNAL->getName() + end_str;
-  std::vector<std::string> internal_input_exts;
-  for (int t = 0; t < mng_ptr_->thread_num_; t++) {
-    std::string input_ext = mng_ptr_->output_file_ext_ + "_" 
-      + str_util::toString(t) + "_" + ProteoformType::INTERNAL->getName() + end_str;
-    internal_input_exts.push_back(input_ext);
-  }
-  merge_ptr
-    = std::make_shared<PrsmStrMerge>(sp_file_name, internal_input_exts, 
-                                     internal_output_ext, prsm_top_num);
-  merge_ptr->process();
-  merge_ptr = nullptr;
-
-  //remove temporary files
-  for (int t = 0; t < mng_ptr_->thread_num_; t++) {
-    file_util::cleanTempFiles(sp_file_name, complete_input_exts[t]);
-    file_util::cleanTempFiles(sp_file_name, prefix_input_exts[t]);
-    file_util::cleanTempFiles(sp_file_name, suffix_input_exts[t]);
-    file_util::cleanTempFiles(sp_file_name, internal_input_exts[t]);
-  }
 }
 
-} /* namespace toppic */
+}  // namespace toppic

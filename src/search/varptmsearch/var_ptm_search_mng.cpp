@@ -12,23 +12,21 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include "search/oneptmsearch/ptm_search_mng.hpp"
+#include "search/varptmsearch/var_ptm_search_mng.hpp"
 
 namespace toppic {
 
-PtmSearchMng::PtmSearchMng(PrsmParaPtr prsm_para_ptr, int n_report,
-                           double align_max_shift,
-                           double align_min_shift,
-                           int shift_num,
-                           int thread_num,
-                           const std::string &input_file_ext,
-                           const std::string &output_file_ext):
+VarPtmSearchMng(PrsmParaPtr prsm_para_ptr, int n_report,
+                std::string var_ptm_file_name,
+                int var_ptm_num,
+                int thread_num,
+                const std::string &input_file_ext,
+                const std::string &output_file_ext):
   prsm_para_ptr_(prsm_para_ptr),
   n_report_(n_report),
+  var_ptm_num_(var_ptm_num), 
   thread_num_(thread_num),
   input_file_ext_(input_file_ext),
-  output_file_ext_(output_file_ext) {
-    align_para_ptr_ = std::make_shared<PsAlignPara>(shift_num, align_max_shift, align_min_shift);
-  }
+  output_file_ext_(output_file_ext) { }
 
 } /* namespace toppic */

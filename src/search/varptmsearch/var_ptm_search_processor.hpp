@@ -12,32 +12,32 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_VAR_PTM_SEARCH_VAR_PTM_SEARCH_PROCESSOR_HPP_
-#define TOPPIC_VAR_PTM_SEARCH_VAR_PTM_SEARCH_PROCESSOR_HPP_
+#ifndef TOPPIC_SEARCH_VAR_PTM_SEARCH_VAR_PTM_SEARCH_PROCESSOR_HPP_
+#define TOPPIC_SEARCH_VAR_PTM_SEARCH_VAR_PTM_SEARCH_PROCESSOR_HPP_
 
-#include "seq/proteoform.hpp"
-#include "prsm/simple_prsm.hpp"
+#include "ms/spec/spectrum_set.hpp"
+#include "prsm/prsm.hpp"
 #include "search/varptmsearch/var_ptm_search_mng.hpp"
 
 namespace toppic {
 
 class VarPtmSearchProcessor {
  public:
-  VarPtmSearchProcessor(VarPtmSearchMngPtr mng_ptr);
-
+  explicit VarPtmSearchProcessor(VarPtmSearchMngPtr mng_ptr): mng_ptr_(mng_ptr) {}
   void process();
 
  private:
+  PrsmPtrVec varPtmSearchOneSpec(SpectrumSetPtr spec_set_ptr,
+                                 const SimplePrsmPtrVec &simple_prsm_ptr_vec,
+                                 FastaIndexReaderPtr reader_ptr,
+                                 VarPtmSearchMngPtr mng_ptr,
+                                 ProteoformTypePtr type_ptr);
+
   VarPtmSearchMngPtr mng_ptr_;
-
-  ProteoformPtrVec proteo_ptrs_;
-  ProteoformPtrVec2D mod_proteo_2d_ptrs_;
-  SimplePrsmPtrVec simple_prsm_ptrs_;
-
 };
 
 typedef std::shared_ptr<VarPtmSearchProcessor> VarPtmSearchProcessorPtr;
 
-} /* namespace toppic */
+}  // namespace toppic
 
-#endif /* PTM_SEARCH_PROCESSOR_HPP_ */
+#endif
