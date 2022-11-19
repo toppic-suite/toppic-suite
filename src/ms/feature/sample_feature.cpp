@@ -27,24 +27,30 @@ SampleFeature::SampleFeature(const std::string &line) {
   intensity_ = std::stod(strs[3]);
   time_begin_ = std::stod(strs[4]);
   time_end_ = std::stod(strs[5]);
-  min_charge_ = std::stoi(strs[7]);
-  max_charge_ = std::stoi(strs[8]);
-  min_frac_id_ = std::stoi(strs[9]);
-  max_frac_id_ = std::stoi(strs[10]);
+  apex_time_ = std::stod(strs[6]);
+  apex_inte_ = std::stod(strs[7]);
+  min_charge_ = std::stoi(strs[8]);
+  max_charge_ = std::stoi(strs[9]);
+  min_frac_id_ = std::stoi(strs[10]);
+  max_frac_id_ = std::stoi(strs[11]);
 }
 
 SampleFeature::SampleFeature(FracFeaturePtr frac_feature, int id) {
   id_ = id;
-  FracFeaturePtr first_ft = frac_feature;
-  mono_mass_ = first_ft->getMonoMass();
-  intensity_ = first_ft->getIntensity();
-  time_begin_ = first_ft->getTimeBegin();
-  time_end_ = first_ft->getTimeEnd();
-  min_charge_ = first_ft->getMinCharge();
-  max_charge_ = first_ft->getMaxCharge();
-  min_frac_id_ = first_ft->getFracId();
-  max_frac_id_ = first_ft->getFracId();
-  time_apex_ = first_ft->getTimeApex();
+  init(frac_feature);
+}
+
+void SampleFeature::init(FracFeaturePtr frac_feature) {
+  mono_mass_ = frac_feature->getMonoMass();
+  intensity_ = frac_feature->getIntensity();
+  time_begin_ = frac_feature->getTimeBegin();
+  time_end_ = frac_feature->getTimeEnd();
+  min_charge_ = frac_feature->getMinCharge();
+  max_charge_ = frac_feature->getMaxCharge();
+  min_frac_id_ = frac_feature->getFracId();
+  max_frac_id_ = frac_feature->getFracId();
+  apex_time_ = frac_feature->getApexTime();
+  apex_inte_ = frac_feature->getApexInte();
 }
 
 SampleFeature::SampleFeature(FracFeaturePtrVec &frac_features, int id) {
@@ -53,16 +59,7 @@ SampleFeature::SampleFeature(FracFeaturePtrVec &frac_features, int id) {
     exit(EXIT_FAILURE);  
   }
   id_ = id;
-  FracFeaturePtr first_ft = frac_features[0];
-  mono_mass_ = first_ft->getMonoMass();
-  intensity_ = first_ft->getIntensity();
-  time_begin_ = first_ft->getTimeBegin();
-  time_end_ = first_ft->getTimeEnd();
-  min_charge_ = first_ft->getMinCharge();
-  max_charge_ = first_ft->getMaxCharge();
-  min_frac_id_ = first_ft->getFracId();
-  max_frac_id_ = first_ft->getFracId();
-  time_apex_ = first_ft->getTimeApex();
+  init(frac_features[0]);
 
   for (size_t i = 1; i < frac_features.size(); i++) {
     FracFeaturePtr cur_ft = frac_features[i];

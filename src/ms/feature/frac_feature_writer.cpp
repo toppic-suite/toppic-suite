@@ -43,6 +43,8 @@ void writeHeader(std::ofstream &of) {
       << "Minimum_charge_state" << "\t"
       << "Maximum_charge_state" << "\t"
       << "Envelope_num" << "\t"
+      << "Apex_time" << "\t"
+      << "Apex_intensity" << "\t"
       << "Sample_feature_Id" << "\t"
       << "Sample_feature_intensity"
       << std::endl;
@@ -61,6 +63,8 @@ void writeOneFeature(std::ofstream &of, FracFeaturePtr feature) {
       << feature->getMinCharge() << "\t"
       << feature->getMaxCharge() << "\t"
       << feature->getEnvNum() << "\t"
+      << feature->getApexTime() << "\t"
+      << feature->getApexInte() << "\t"
       << feature->getSampleFeatureId() << "\t"
       << feature->getSampleFeatureInte() 
       << std::endl;
