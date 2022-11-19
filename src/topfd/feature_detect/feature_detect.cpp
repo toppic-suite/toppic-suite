@@ -264,7 +264,8 @@ DeconvPeakPtrVec getPeaksWithCharge(DeconvPeakPtrVec &matched_peaks, int charge)
   }
   return peaks;
 }
-double getMaxInte(DeconvPeakPtrVec &matched_peaks) {
+
+double getMaxInteSpId(DeconvPeakPtrVec &matched_peaks) {
   std::vector<double> inte;
   for (size_t i = 0; i < matched_peaks.size(); i++) {
     inte.push_back(matched_peaks[i]->getIntensity());    
@@ -272,6 +273,17 @@ double getMaxInte(DeconvPeakPtrVec &matched_peaks) {
   int idx = std::distance(inte.begin(),std::max_element(inte.begin(), inte.end()));
   return matched_peaks[idx]->getSpId();
 }
+
+double getApexInte(DeconvPeakPtrVec &matched_peaks) {
+  double apex_inte = 0; 
+  for (size_t i = 0; i < matched_peaks.size(); i++) {
+    if (matched_peaks[i]->getIntensity() > apex_inte) {
+      apex_inte = matched_peaks[i]->getIntensity();
+    }
+  }
+  return apex_inte; 
+}
+
 
 FracFeaturePtr getFeature(int sp_id, double prec_mass, int feat_id, 
                           DeconvMsPtrVec &ms1_ptr_vec,
@@ -283,7 +295,8 @@ FracFeaturePtr getFeature(int sp_id, double prec_mass, int feat_id,
   if (matched_peaks.size() == 0) {
     return nullptr;
   }
-  double time_apex = ms1_ptr_vec[getMaxInte(matched_peaks)]->getMsHeaderPtr()->getRetentionTime();
+  double apex_time = ms1_ptr_vec[getMaxInteSpId(matched_peaks)]->getMsHeaderPtr()->getRetentionTime();
+  double apex_inte = getApexInte(matched_peaks); 
   double feat_inte = getFeatureInte(matched_peaks);
   double feat_mass = getFeatureMass(prec_mass, matched_peaks, para_ptr);
   int min_charge = getMinCharge(matched_peaks);
@@ -306,7 +319,8 @@ FracFeaturePtr getFeature(int sp_id, double prec_mass, int feat_id,
                                                              min_charge,
                                                              max_charge, 
                                                              matched_peaks.size(),
-                                                             time_apex);
+                                                             apex_time,
+                                                             apex_inte);
   SingleChargeFeaturePtrVec single_features;
   for (int charge = min_charge; charge <= max_charge; charge++) {
     DeconvPeakPtrVec peaks = getPeaksWithCharge(matched_peaks, charge);

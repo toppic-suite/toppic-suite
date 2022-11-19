@@ -36,6 +36,8 @@ class SampleFeature {
 
   SampleFeature(FracFeaturePtrVec &frac_features, int id);
 
+  void init(FracFeaturePtr frac_feature); 
+
   int getSampleId() {return sample_id_;}
 
   int getId() {return id_;}
@@ -50,7 +52,9 @@ class SampleFeature {
 
   double getTimeMiddle() {return (time_begin_ + time_end_)/2;}
 
-  double getTimeApex() {return time_apex_;}
+  double getApexTime() {return apex_time_;}
+
+  double getApexInte() {return apex_inte_;}
 
   int getMinCharge() {return min_charge_;}
 
@@ -81,7 +85,8 @@ class SampleFeature {
   double intensity_;
   double time_begin_;
   double time_end_;
-  double time_apex_;
+  double apex_time_;
+  double apex_inte_;
   int min_charge_;
   int max_charge_;
   int min_frac_id_;

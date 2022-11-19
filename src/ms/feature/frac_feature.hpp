@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_MS_FEATURE_FRAC_FEATURE_HPP_
 #define TOPPIC_MS_FEATURE_FRAC_FEATURE_HPP_
 
@@ -38,7 +37,8 @@ class FracFeature {
               double retent_begin, double retent_end,
               int scan_begin, int scan_end,
               int min_charge, int max_charge, 
-              int env_num, double time_apex);
+              int env_num, double apex_time, 
+              double apex_inte);
 
   FracFeature(std::string line);
 
@@ -76,7 +76,9 @@ class FracFeature {
 
   int getEnvNum() {return env_num_;}
 
-  double getTimeApex() {return time_apex_;}
+  double getApexTime() {return apex_time_;}
+
+  double getApexInte() {return apex_inte_;}
 
   int getSampleFeatureId() {return sample_feature_id_;}
 
@@ -135,7 +137,8 @@ class FracFeature {
   int min_charge_;
   int max_charge_;
   int env_num_ = 0;
-  double time_apex_;
+  double apex_time_;
+  double apex_inte_;
   int sample_feature_id_ = -1;
   double sample_feature_inte_ = 0;
   SingleChargeFeaturePtrVec single_features_;
