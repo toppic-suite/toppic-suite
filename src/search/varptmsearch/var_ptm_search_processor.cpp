@@ -32,7 +32,7 @@ namespace toppic {
 PrsmPtrVec VarPtmSearchProcessor::varPtmSearchOneSpec(SpectrumSetPtr spec_set_ptr,
                                                       const SimplePrsmPtrVec &simple_prsm_ptr_vec,
                                                       FastaIndexReaderPtr reader_ptr,
-                                                      PtmSearchMngPtr mng_ptr,
+                                                      VarPtmSearchMngPtr mng_ptr,
                                                       ProteoformTypePtr type_ptr) {
   ModPtrVec fix_mod_list = mng_ptr->prsm_para_ptr_->getFixModPtrVec();
   ProtModPtrVec prot_mod_ptr_vec = mng_ptr->prsm_para_ptr_->getProtModPtrVec();
@@ -55,16 +55,18 @@ PrsmPtrVec VarPtmSearchProcessor::varPtmSearchOneSpec(SpectrumSetPtr spec_set_pt
   }
   PrsmPtrVec prsms;
   for (size_t i = 0; i < proteoform_ptr_vec.size(); i++) {
+    /*
     OnePtmSlowMatch slow_match(proteoform_ptr_vec[i], spec_set_ptr,
                                prsm_vec[i], type_ptr, mng_ptr);
     PrsmPtr tmp = slow_match.compute(1);
 
     if (tmp != nullptr)
       prsms.push_back(tmp);
+    */
   }
   std::sort(prsms.begin(), prsms.end(), Prsm::cmpMatchFragmentDecMatchPeakDec);
   if (prsms.size() > 0) {
-    prsms.erase(prsms.begin() + 1, prsms.end());
+    prsms.erase(prsms.begin() + mng_ptr->n_report_, prsms.end());
   }
   return prsms;
 }
@@ -116,7 +118,7 @@ void VarPtmSearchProcessor::process() {
       }
       if (comp_selected_prsm_ptrs.size() > 0) {
         // LOG_DEBUG("start processing one spectrum.");
-        PrsmPtrVec prsms = onePtmSearchOneSpec(spec_set_ptr, comp_selected_prsm_ptrs,
+        PrsmPtrVec prsms = varPtmSearchOneSpec(spec_set_ptr, comp_selected_prsm_ptrs,
                                                reader_ptr, mng_ptr_, ProteoformType::COMPLETE);
         comp_writer.writeVector(prsms);
       }
@@ -129,7 +131,7 @@ void VarPtmSearchProcessor::process() {
       }
       if (pref_selected_prsm_ptrs.size() > 0) {
         // LOG_DEBUG("start processing one spectrum.");
-        PrsmPtrVec prsms = onePtmSearchOneSpec(spec_set_ptr, pref_selected_prsm_ptrs,
+        PrsmPtrVec prsms = varPtmSearchOneSpec(spec_set_ptr, pref_selected_prsm_ptrs,
                                                reader_ptr, mng_ptr_, ProteoformType::PREFIX);
         pref_writer.writeVector(prsms);
       }
@@ -142,7 +144,7 @@ void VarPtmSearchProcessor::process() {
       }
       if (suff_selected_prsm_ptrs.size() > 0) {
         // LOG_DEBUG("start processing one spectrum.");
-        PrsmPtrVec prsms = onePtmSearchOneSpec(spec_set_ptr, suff_selected_prsm_ptrs,
+        PrsmPtrVec prsms = varPtmSearchOneSpec(spec_set_ptr, suff_selected_prsm_ptrs,
                                                reader_ptr, mng_ptr_, ProteoformType::SUFFIX);
         suff_writer.writeVector(prsms);
       }
@@ -155,7 +157,7 @@ void VarPtmSearchProcessor::process() {
       }
       if (internal_selected_prsm_ptrs.size() > 0) {
         // LOG_DEBUG("start processing one spectrum.");
-        PrsmPtrVec prsms = onePtmSearchOneSpec(spec_set_ptr, internal_selected_prsm_ptrs,
+        PrsmPtrVec prsms = varPtmSearchOneSpec(spec_set_ptr, internal_selected_prsm_ptrs,
                                                reader_ptr, mng_ptr_, ProteoformType::INTERNAL);
         internal_writer.writeVector(prsms);
       }

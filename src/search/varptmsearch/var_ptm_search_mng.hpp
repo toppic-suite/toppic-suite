@@ -33,8 +33,10 @@ class VarPtmSearchMng {
 
   PrsmParaPtr prsm_para_ptr_;
 
-  // parameters for ptm search 
+  // parameters for variable ptm search 
   int n_report_ = 1;
+
+  int var_ptm_num_ = 3;
 
   int thread_num_ = 1;
 

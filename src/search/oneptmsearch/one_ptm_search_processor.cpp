@@ -54,17 +54,18 @@ PrsmPtrVec OnePtmSearchProcessor::onePtmSearchOneSpec(SpectrumSetPtr spec_set_pt
     }
   }
   PrsmPtrVec prsms;
+  int shift_num = 1;
   for (size_t i = 0; i < proteoform_ptr_vec.size(); i++) {
     OnePtmSlowMatch slow_match(proteoform_ptr_vec[i], spec_set_ptr,
                                prsm_vec[i], type_ptr, mng_ptr);
-    PrsmPtr tmp = slow_match.compute(1);
+    PrsmPtr tmp = slow_match.compute(shift_num);
 
     if (tmp != nullptr)
       prsms.push_back(tmp);
   }
   std::sort(prsms.begin(), prsms.end(), Prsm::cmpMatchFragmentDecMatchPeakDec);
   if (prsms.size() > 0) {
-    prsms.erase(prsms.begin() + 1, prsms.end());
+    prsms.erase(prsms.begin() + mng_ptr->n_report_, prsms.end());
   }
   return prsms;
 }

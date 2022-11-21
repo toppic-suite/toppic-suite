@@ -16,12 +16,12 @@
 
 namespace toppic {
 
-VarPtmSearchMng(PrsmParaPtr prsm_para_ptr, int n_report,
-                std::string var_ptm_file_name,
-                int var_ptm_num,
-                int thread_num,
-                const std::string &input_file_ext,
-                const std::string &output_file_ext):
+VarPtmSearchMng::VarPtmSearchMng(PrsmParaPtr prsm_para_ptr, int n_report,
+                                 std::string var_ptm_file_name,
+                                 int var_ptm_num,
+                                 int thread_num,
+                                 const std::string &input_file_ext,
+                                 const std::string &output_file_ext):
   prsm_para_ptr_(prsm_para_ptr),
   n_report_(n_report),
   var_ptm_num_(var_ptm_num), 
