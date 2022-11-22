@@ -30,19 +30,7 @@ VarPtmFilterMng::VarPtmFilterMng(PrsmParaPtr prsm_para_ptr,
   thread_num_(thread_num),
   output_file_ext_(output_file_ext) {
     single_shift_list_ = mod_util::readModTxtToShiftList(var_ptm_file_name);
-    shift_list_.push_back(0);
-    for (int i = 0; i <= var_ptm_num; i++) {
-      size_t cur_list_len = shift_list_.size();
-      for (size_t j = 0; j < cur_list_len; j++) {
-        for (size_t k = 0; k < single_shift_list_.size(); k++) {
-          double new_shift = shift_list_[j] + single_shift_list_[k];
-          // if the new shift is not in the list
-          if (std::find(shift_list_.begin(), shift_list_.end(), new_shift) != shift_list_.end()) {
-            shift_list_.push_back(new_shift);
-          }
-        }
-      }
-    }
+    shift_list_ = computeShifts(single_shift_list_, var_ptm_num_);
     LOG_DEBUG("Number of shifts:" << shift_list_.size());
     for (size_t i = 0; i < shift_list_.size(); i++) {
       LOG_DEBUG("Shifts:" << i << " " << shift_list_[i]);
@@ -53,4 +41,23 @@ VarPtmFilterMng::VarPtmFilterMng(PrsmParaPtr prsm_para_ptr,
       }
     }
   }
+
+std::vector<double> VarPtmFilterMng::computeShifts(std::vector<double> &single_shift_list,
+                                                   int var_ptm_num) {
+  std::vector<double> shift_list;
+  shift_list.push_back(0);
+  for (int i = 0; i <= var_ptm_num; i++) {
+    size_t cur_list_len = shift_list.size();
+    for (size_t j = 0; j < cur_list_len; j++) {
+      for (size_t k = 0; k < single_shift_list.size(); k++) {
+        double new_shift = shift_list[j] + single_shift_list[k];
+        // if the new shift is not in the list
+        if (std::find(shift_list.begin(), shift_list.end(), new_shift) != shift_list.end()) {
+          shift_list.push_back(new_shift);
+        }
+      }
+    }
+  }
+  return shift_list;
+}
 }

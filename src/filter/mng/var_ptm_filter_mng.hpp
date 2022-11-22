@@ -22,13 +22,16 @@
 namespace toppic {
 
 class VarPtmFilterMng {
- public:
- VarPtmFilterMng(PrsmParaPtr prsm_para_ptr,
-                 const std::string &index_file_para,
-                 const std::string &var_mod_file_name, 
-                 int var_ptm_num,
-                 int thread_num,
-                 const std::string &output_file_ext);
+  public:
+  VarPtmFilterMng(PrsmParaPtr prsm_para_ptr,
+                  const std::string &index_file_para,
+                  const std::string &var_mod_file_name, 
+                  int var_ptm_num,
+                  int thread_num,
+                  const std::string &output_file_ext);
+
+  static std::vector<double> computeShifts(std::vector<double> &single_shift_list,
+                                           int var_ptm_num); 
 
   PrsmParaPtr getPrsmPtr(){return prsm_para_ptr_;}
 

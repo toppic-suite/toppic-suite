@@ -30,7 +30,7 @@ DiagHeaderPtr getTopLeftCornerHeader() {
 }
 
 DiagHeaderPtr getBottomRightCornerHeader(double seq_mass,
-                                             double prec_mass) {
+                                         double prec_mass) {
   double shift = prec_mass - seq_mass;
   // n term nostrict, c_term strict, prot n_term no match ; prot c_term match
   // pep n_term no match, pep c_term no match

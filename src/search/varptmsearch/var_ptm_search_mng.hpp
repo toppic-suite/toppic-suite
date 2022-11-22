@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_SEARCH_VAR_PTM_SEARCH_VAR_PTM_SEARCH_MNG_HPP_
 #define TOPPIC_SEARCH_VAR_PTM_SEARCH_VAR_PTM_SEARCH_MNG_HPP_
 
@@ -25,7 +24,7 @@ namespace toppic {
 class VarPtmSearchMng {
  public :
   VarPtmSearchMng(PrsmParaPtr prsm_para_ptr, int n_report,
-                  std::string var_ptm_file_name,
+                  const std::string &var_ptm_file_name,
                   int var_ptm_num,
                   int thread_num,
                   const std::string &input_file_ext,
@@ -43,8 +42,14 @@ class VarPtmSearchMng {
   std::string input_file_ext_;
   std::string output_file_ext_;
 
+  // variable PTM mass shift list 
+  std::vector<double> single_shift_list_;
+
+  // shift list for single and multiple (up to var_ptm_num) variable PTMs  
+  std::vector<double> shift_list_;
+
   // parameters for compute shift low memory 
-  int ptm_fast_filter_scale_ = 100;
+  //int ptm_fast_filter_scale_ = 100;
 
   //int n_top_diagonals_ = 20;
 
@@ -54,7 +59,6 @@ class VarPtmSearchMng {
 
   // parameters for diagonal generation 
   //double extend_trunc_error_tolerance_ = 0.5;
-  //double align_prefix_suffix_shift_thresh_ = 300;
 
   //PsAlignParaPtr align_para_ptr_;
 };
