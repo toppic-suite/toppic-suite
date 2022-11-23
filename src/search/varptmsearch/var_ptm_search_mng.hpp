@@ -30,6 +30,8 @@ class VarPtmSearchMng {
                   const std::string &input_file_ext,
                   const std::string &output_file_ext);
 
+  void computeShifts();
+
   PrsmParaPtr prsm_para_ptr_;
 
   // parameters for variable ptm search 
@@ -44,23 +46,17 @@ class VarPtmSearchMng {
 
   // variable PTM mass shift list 
   std::vector<double> single_shift_list_;
+  // amino acid list that can be modified by the shift
+  ModPtrVec2D mod_ptr_vec_2d_;
+
+  ResiduePtrVec2D res_ptr_vec_2d_;
 
   // shift list for single and multiple (up to var_ptm_num) variable PTMs  
   std::vector<double> shift_list_;
 
-  // parameters for compute shift low memory 
-  //int ptm_fast_filter_scale_ = 100;
+  std::vector<std::vector<int>> diag_prev_idxes_;
 
-  //int n_top_diagonals_ = 20;
-
-  //double min_double_gap_ = 0.25;
-
-  //int min_diagonal_gap_ = static_cast<int>(ptm_fast_filter_scale_ * min_double_gap_);
-
-  // parameters for diagonal generation 
-  //double extend_trunc_error_tolerance_ = 0.5;
-
-  //PsAlignParaPtr align_para_ptr_;
+  std::vector<std::vector<int>> diag_prev_shift_idxes_;
 };
 
 typedef std::shared_ptr<VarPtmSearchMng> VarPtmSearchMngPtr;

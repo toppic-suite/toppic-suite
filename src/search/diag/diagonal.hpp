@@ -44,7 +44,7 @@ class Diagonal {
 
     DiagHeaderPtr getHeader() {return header_ptr_;}
 
-    const DiagPairPtrVec& getDiagPair() {return pair_ptr_list_;}
+    const DiagPairPtrVec& getDiagPairPtrVec() {return pair_ptr_list_;}
 
     DiagPairPtr getDiagPair(int i) {return pair_ptr_list_[i];}
 
