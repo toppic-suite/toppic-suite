@@ -109,12 +109,10 @@ PrsmPtrVec VarPtmSearchProcessor::varPtmSearchOneSpec(SpectrumSetPtr spec_set_pt
   PrsmPtrVec prsms;
   for (size_t i = 0; i < proteoform_ptr_vec.size(); i++) {
     VarPtmSlowMatch slow_match(proteoform_ptr_vec[i], spec_set_ptr, mng_ptr);
-    /*
     PrsmPtr tmp = slow_match.compute();
     if (tmp != nullptr) {
       prsms.push_back(tmp);
     }
-    */
   }
   std::sort(prsms.begin(), prsms.end(), Prsm::cmpMatchFragmentDecMatchPeakDec);
   if (prsms.size() > 0) {
@@ -214,7 +212,7 @@ void VarPtmSearchProcessor::process() {
         internal_writer.writeVector(prsms);
       }
     }
-    std::cout << std::flush <<  "One PTM search - processing " << cnt
+    std::cout << std::flush <<  "Variable PTM search - processing " << cnt
         << " of " << spectrum_num << " spectra.\r";
   }
   int remainder = spectrum_num - cnt;
@@ -223,7 +221,7 @@ void VarPtmSearchProcessor::process() {
       //fix the message as the processing is completed.
       //this code avoids error when no combined spectra is used but a scan is remaining unprocessed
       //because then it will not satisfy the first condition
-      std::cout << std::flush <<  "One PTM search - processing " << spectrum_num
+      std::cout << std::flush <<  "Variable PTM search - processing " << spectrum_num
         << " of " << spectrum_num << " spectra.\r";
   } 
   comp_prsm_reader.close();

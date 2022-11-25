@@ -45,7 +45,8 @@ inline DiagHeaderPtrVec VarPtmSlowMatch::geneVarPtmNTermShiftHeaders() {
     double n_shift = shifts[i]; 
     // n_term strict; c_term nostrict; prot n_term no_match; prot c_term no_match
     // pep n_term match; pep c_term no_match
-    DiagHeaderPtr header_ptr = std::make_shared<DiagHeader>(n_shift, true, false, false, false, true, false);
+    DiagHeaderPtr header_ptr 
+      = std::make_shared<DiagHeader>(n_shift, true, false, false, false, true, false);
     // find Protein N-terminal and C-terminal matches 
     if (n_shift == 0.0) {
       header_ptr->setProtNTermShift(true);
@@ -63,6 +64,7 @@ inline DiagHeaderPtrVec VarPtmSlowMatch::geneVarPtmNTermShiftHeaders() {
     else {
       header_ptr->setProtCTermShift(false);
     }
+    header_ptr->initHeader(c_shift, proteo_ptr_); 
     header_ptrs.push_back(header_ptr);
   }
   if (!exist_n_term || !exist_c_term) {
@@ -87,15 +89,20 @@ void VarPtmSlowMatch::init() {
   for (size_t i = 0; i < prm_peaks.size(); i++) {
     ms_masses[i] = prm_peaks[i]->getPosition();
   }
-  //ps_align_ptr_ = std::make_shared<PsAlign>(ms_masses, seq_masses, diagonal_ptrs, mng_ptr_->align_para_ptr_);
+  int bgn = proteo_ptr_->getStartPos();
+  int end = proteo_ptr_->getEndPos();
+  ResSeqPtr sub_res_seq_ptr = proteo_ptr_->getResSeqPtr()->getSubResidueSeq(bgn, end);
+  var_ptm_align_ptr_ = std::make_shared<VarPtmAlign>(ms_masses, seq_masses, 
+                                                     sub_res_seq_ptr,  
+                                                     diagonal_ptrs, mng_ptr_);
 }
 
-/*
-PrsmPtr OnePtmSlowMatch::compute() {
-  ps_align_ptr_->compute(align_type_ptr_);
-  return ps_align_ptr_->geneResult(shift_num, proteo_ptr_, deconv_ms_ptr_vec_,
-                                   ms_three_ptr_vec_, mng_ptr_->prsm_para_ptr_);
+
+PrsmPtr VarPtmSlowMatch::compute() {
+  var_ptm_align_ptr_->compute(); 
+  return var_ptm_align_ptr_->geneResult(proteo_ptr_, deconv_ms_ptr_vec_,
+                                        mng_ptr_->prsm_para_ptr_);
 }
-*/
+
 
 }  // namespace toppic

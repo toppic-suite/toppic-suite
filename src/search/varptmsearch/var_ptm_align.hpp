@@ -27,7 +27,7 @@ class VarPtmAlign {
  public:
   VarPtmAlign(const std::vector<double> &ms_masses,
               const std::vector<double> &seq_masses,
-              ResSeqPtr res_seq_ptr,
+              ResSeqPtr sub_res_seq_ptr,
               const DiagonalPtrVec &diagonal_ptrs,
               VarPtmSearchMngPtr mng_ptr);
 
@@ -41,26 +41,29 @@ class VarPtmAlign {
 
   void dp();
 
-  DiagHeaderPtrVec backtrack(); 
+  void backtrack();
 
-  // backtrack for diagonal d and variable ptm number s
-  DiagHeaderPtrVec backtrack(int d, int s); 
+  // backtrack for diagonal d and variable ptm number ptm
+  void backtrack(int d, int ptm); 
 
-  /*
-  double getAlignScr(int s) {return align_scores_[s];}
+  double getAlignScr() {return best_score_;}
 
-  DiagHeaderPtrVec getDiagHeaders(int s) {return backtrack_diagonal_ptrs_[s];}
+  DiagHeaderPtrVec getDiagHeaders() {return backtrack_diag_header_ptrs_;}
 
-  PrsmPtr geneResult(int shift_num, ProteoformPtr proteo_ptr, DeconvMsPtrVec &deconv_ms_ptr_vec,
-                     ExtendMsPtrVec &ms_three_ptr_vec, PrsmParaPtr prsm_para_ptr);
-                     */
+  MassShiftPtrVec geneShiftVec(ProteoformPtr sub_proteo_ptr,
+                               DiagHeaderPtrVec &ori_header_ptrs,
+                               DiagHeaderPtrVec &refined_header_ptrs); 
+
+  PrsmPtr geneResult(ProteoformPtr sub_proteo_ptr,
+                     DeconvMsPtrVec &deconv_ms_ptr_vec,
+                     PrsmParaPtr prsm_para_ptr);
 
  protected:
   std::vector<double> ms_masses_;
 
   std::vector<double> seq_masses_;
 
-  ResSeqPtr res_seq_ptr_;
+  ResSeqPtr sub_res_seq_ptr_;
 
   DiagonalPtrVec diagonal_ptrs_;
 
@@ -74,33 +77,13 @@ class VarPtmAlign {
 
   std::vector<std::vector<std::vector<int>>> prevs_3d_;
 
-  /*
-  std::vector<std::vector<int>> idxes_;
+  int best_d_;
+  int best_ptm_num_;
+  int best_score_;
 
-  std::vector<std::vector<bool>> penalties_;
+  DiagHeaderPtrVec backtrack_diag_header_ptrs_;
 
-  std::vector<DpPairPtrVec> dp_2d_pair_ptrs_;
-
-  DpPairPtr first_pair_ptr_;
-
-  DpPairPtr last_pair_ptr_;
-
-  DpPairPtrVec segment_bgn_pair_ptrs_;
-
-  DpPairPtrVec segment_end_pair_ptrs_;
-
-  DpPairPtrVec dp_pair_ptrs_;
-
-  DiagHeaderPtrVec2D backtrack_diagonal_ptrs_;
-
-  std::vector<double> align_scores_;
-
-  void dpPrep();
-
-  DpPairPtr getTruncPre(DpPairPtr cur_pair_ptr, int s, ProteoformTypePtr type_ptr);
-
-  DpPairPtr getShiftPre(int p, int s);
-  */
+  ModPtrVec backtrack_mod_ptrs_;
 };
 
 typedef std::shared_ptr<VarPtmAlign> VarPtmAlignPtr;

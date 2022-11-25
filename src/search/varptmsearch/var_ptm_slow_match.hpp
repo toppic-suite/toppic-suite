@@ -25,7 +25,7 @@
 #include "prsm/prsm.hpp"
 #include "search/diag/diag_header.hpp"
 #include "search/varptmsearch/var_ptm_search_mng.hpp"
-//#include "search/varptmsearch/var_ptm_align.hpp"
+#include "search/varptmsearch/var_ptm_align.hpp"
 
 namespace toppic {
 
@@ -48,7 +48,7 @@ class VarPtmSlowMatch {
   double prec_error_tole_;
   DeconvMsPtrVec deconv_ms_ptr_vec_;
   PrmMsPtrVec ms_six_ptr_vec_;
-  //PsAlignPtr ps_align_ptr_;
+  VarPtmAlignPtr var_ptm_align_ptr_;
 
   DiagHeaderPtrVec geneVarPtmNTermShiftHeaders();
 };

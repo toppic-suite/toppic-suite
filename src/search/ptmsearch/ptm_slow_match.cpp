@@ -151,7 +151,7 @@ DiagHeaderPtrVec PtmSlowMatch::geneNTermShiftHeaders() {
   for (size_t i = 0; i < header_ptrs.size(); i++) {
     double n_shift = header_ptrs[i]->getProtNTermShift();
     double c_shift = prec_mono_mass_ - proteo_ptr_->getResSeqPtr()->getSeqMass() - n_shift;
-    header_ptrs[i]->initHeader(c_shift, proteo_ptr_, mng_ptr_->align_prefix_suffix_shift_thresh_);
+    header_ptrs[i]->initHeader(c_shift, proteo_ptr_);
   }
   return header_ptrs;
 }

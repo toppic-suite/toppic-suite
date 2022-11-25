@@ -109,7 +109,8 @@ DiagonalPtr getDiagonalPtr(DiagHeaderPtr header_ptr,
   BpSpecPtr bp_spec_ptr = proteo_ptr->getBpSpecPtr();
 
   std::vector<double> prm_masses = bp_spec_ptr->getPrmMasses();
-  DiagPairPtrVec diag_pair_list = compDiagPair(prm_peaks, group_spec_num, prm_masses, header_ptr);
+  DiagPairPtrVec diag_pair_list = compDiagPair(prm_peaks, group_spec_num, 
+                                               prm_masses, header_ptr);
   if (diag_pair_list.size() > 0) {
     DiagonalPtr diagonal_ptr
       = std::make_shared<Diagonal>(header_ptr, diag_pair_list);

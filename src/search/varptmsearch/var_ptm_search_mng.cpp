@@ -95,6 +95,17 @@ void VarPtmSearchMng::computeShifts() {
       }
     }
   }
+
+  // generate diag_matrix_shift_idxes
+  for (size_t i = 0; i < diag_prev_idxes_.size(); i++) {
+    std::vector<int> matrix_row(diag_prev_idxes_.size(), -1);
+    for (size_t j = 0; j < diag_prev_idxes_[i].size(); j++) {
+      int prev = diag_prev_idxes_[i][j];
+      int shift_idx = diag_prev_shift_idxes_[i][j];
+      matrix_row[prev] = shift_idx;
+    }
+    diag_matrix_shift_idxes_.push_back(matrix_row);
+  }
 }
 
 } /* namespace toppic */

@@ -57,6 +57,8 @@ class VarPtmSearchMng {
   std::vector<std::vector<int>> diag_prev_idxes_;
 
   std::vector<std::vector<int>> diag_prev_shift_idxes_;
+
+  std::vector<std::vector<int>> diag_matrix_shift_idxes_;
 };
 
 typedef std::shared_ptr<VarPtmSearchMng> VarPtmSearchMngPtr;

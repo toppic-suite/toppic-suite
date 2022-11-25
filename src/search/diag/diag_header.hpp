@@ -35,8 +35,7 @@ class DiagHeader {
                bool prot_n_match, bool prot_c_match,
                bool pep_n_match, bool pep_c_match);
 
-    void initHeader(double c_shift, ProteoformPtr proteoform, 
-                    double align_pref_suff_shift_thresh);
+    void initHeader(double c_shift, ProteoformPtr proteoform); 
 
     void changeOnlyNTermShift(double s);
 
@@ -48,6 +47,8 @@ class DiagHeader {
 
     int getMatchLastBpPos() {return match_last_bp_pos_;}
 
+    int getTruncLastResPos() {return trunc_last_res_pos_;}
+
     double getPepCTermShift() {return pep_C_term_shift_;}
 
     double getPepNTermShift() { return pep_N_term_shift_;}
@@ -55,8 +56,6 @@ class DiagHeader {
     double getProtCTermShift() {return prot_C_term_shift_;}
 
     double getProtNTermShift() {return prot_N_term_shift_;}
-
-    int getTruncLastResPos() {return trunc_last_res_pos_;}
 
     void setPepCTermShift(double pepCTermShift) {
       pep_C_term_shift_ = pepCTermShift;
@@ -93,11 +92,6 @@ class DiagHeader {
     bool isNStrict() {return n_strict_;}
     bool isCStrict() {return c_strict_;}
 
-    void setAlignPrefix(bool is_prefix) {is_align_prefix_ = is_prefix;}
-    void setAlignSuffix(bool is_suffix) {is_align_suffix_ = is_suffix;}
-    bool isAlignPrefix() {return is_align_prefix_;}
-    bool isAlignSuffix() {return is_align_suffix_;}
-
     int getId() { return id_; }
     void setId(int id) { id_ = id; }
 
@@ -105,8 +99,6 @@ class DiagHeader {
     bool isProtCTermMatch() {return prot_C_term_match_;}
     bool isPepNTermMatch() {return pep_N_term_match_;}
     bool isPepCTermMatch() {return pep_C_term_match_;}
-
-    void setAlignPrefixSuffix(double error_tolerance);
 
   private:
     int id_ = 0;
@@ -129,18 +121,12 @@ class DiagHeader {
     double pep_N_term_shift_ = 0.0;
     bool pep_N_term_match_ = false;
 
-    // if protNTermShift is not large
-    bool is_align_prefix_ = false;
-
     int trunc_last_res_pos_ = 0;
     int match_last_bp_pos_ = 0;
     double prot_C_term_shift_ = 0.0;
 
     double pep_C_term_shift_ = 0.0;
     bool pep_C_term_match_ = false;
-
-    // if protCTermShift is not large
-    bool is_align_suffix_ = false;
 };
 
 } // namespace toppic 

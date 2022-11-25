@@ -72,11 +72,12 @@ bool isExistHeader(const DiagHeaderPtrVec &header_ptrs, double shift) {
 }
 
 
-DiagHeaderPtr geneDiagHeaderPtr(int bgn, int end,
-                                        DiagHeaderPtr header_ptr) {
+DiagHeaderPtr geneDiagHeaderPtr(int match_bgn, int match_end, 
+                                DiagHeaderPtr header_ptr) {
+
   DiagHeaderPtr new_header_ptr = std::make_shared<DiagHeader>(*header_ptr);
-  new_header_ptr->setMatchFirstBpPos(bgn);
-  new_header_ptr->setMatchLastBpPos(end);
+  new_header_ptr->setMatchFirstBpPos(match_bgn);
+  new_header_ptr->setMatchLastBpPos(match_end);
   return new_header_ptr;
 }
 

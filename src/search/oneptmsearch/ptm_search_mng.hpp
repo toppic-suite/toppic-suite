@@ -54,7 +54,6 @@ class PtmSearchMng {
 
   // parameters for diagonal generation 
   double extend_trunc_error_tolerance_ = 0.5;
-  double align_prefix_suffix_shift_thresh_ = 300;
 
   PsAlignParaPtr align_para_ptr_;
 };

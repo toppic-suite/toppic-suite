@@ -34,8 +34,9 @@ int findSimilarShiftPos(const std::vector<double> &shifts, double s);
 
 bool isExistHeader(const DiagHeaderPtrVec &header_ptrs, double shift);
 
-// generate (clone) a new diagonal header with new bgn and end
-DiagHeaderPtr geneDiagHeaderPtr(int bgn, int end, DiagHeaderPtr diag_ptr);
+// generate (clone) a new diagonal header with new match_bgn and match_end
+DiagHeaderPtr geneDiagHeaderPtr(int match_bgn, int match_end,
+                                DiagHeaderPtr diag_ptr);
 
 MassShiftPtrVec getDiagonalMassChanges(const DiagHeaderPtrVec &diag_ptrs,
                                        int first_res_pos, int last_res_pos,

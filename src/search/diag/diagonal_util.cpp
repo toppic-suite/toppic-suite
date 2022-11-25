@@ -160,9 +160,9 @@ double refinePrecursorAndHeaderShift(ProteoformPtr proteo_ptr,
 }
 
 DiagHeaderPtrVec refineHeadersBgnEnd(ProteoformPtr proteo_ptr,
-                                         const ExtendMsPtrVec &ms_three_ptr_vec,
-                                         const DiagHeaderPtrVec& header_ptrs,
-                                         double min_mass) {
+                                     const ExtendMsPtrVec &ms_three_ptr_vec,
+                                     const DiagHeaderPtrVec& header_ptrs,
+                                     double min_mass) {
   DiagHeaderPtrVec result_list;
   int first_res_pos = header_ptrs[0]->getTruncFirstResPos();
   int last_res_pos = header_ptrs[header_ptrs.size()-1]->getTruncLastResPos();
@@ -199,6 +199,12 @@ DiagHeaderPtrVec refineHeadersBgnEnd(ProteoformPtr proteo_ptr,
     } else {
       int new_bgn = first_res_pos + getNewBgn(pair_ptrs);
       int new_end = first_res_pos + getNewEnd(pair_ptrs);
+      if (i == 0) {
+        new_bgn = first_res_pos;
+      }
+      if (i == header_ptrs.size() -1 ) {
+        new_end = last_res_pos + 1;
+      }
       header_ptrs[i]->setMatchFirstBpPos(new_bgn);
       header_ptrs[i]->setMatchLastBpPos(new_end);
       result_list.push_back(header_ptrs[i]);
@@ -207,11 +213,73 @@ DiagHeaderPtrVec refineHeadersBgnEnd(ProteoformPtr proteo_ptr,
   return result_list;
 }
 
-DiagHeaderPtrVec2D refineHeadersBgnEnd(ProteoformPtr proteo_ptr,
+DiagHeaderPtrVec refineVarPtmHeadersBgnEnd(ProteoformPtr proteo_ptr,
                                            const ExtendMsPtrVec &ms_three_ptr_vec,
-                                           const DiagHeaderPtrVec2D& header_ptrs_2d,
-                                           const DiagHeaderPtrVec& header_ptrs_1d,
+                                           const DiagHeaderPtrVec& header_ptrs,
                                            double min_mass) {
+  DiagHeaderPtrVec result_list;
+  int first_res_pos = header_ptrs[0]->getTruncFirstResPos();
+  int last_res_pos = header_ptrs[header_ptrs.size()-1]->getTruncLastResPos();
+  for (size_t i = 0; i < header_ptrs.size(); i++) {
+    int bgn = header_ptrs[i]->getMatchFirstBpPos()-first_res_pos;
+    int end = header_ptrs[i]->getMatchLastBpPos()-first_res_pos;
+    PeakIonPairPtrVec pair_ptrs;
+    for (size_t j = 0; j < ms_three_ptr_vec.size(); j++) {
+      TheoPeakPtrVec theo_peak_ptrs = getDiagonalTheoPeak(
+          proteo_ptr,
+          ms_three_ptr_vec[j]->getMsHeaderPtr()->getActivationPtr(),
+          header_ptrs,
+          i, min_mass);
+      PeakIonPairPtrVec cur_pair_ptrs =
+          peak_ion_pair_util::findPairs(ms_three_ptr_vec[j], theo_peak_ptrs, bgn, end, 0);
+      pair_ptrs.insert(pair_ptrs.end(), cur_pair_ptrs.begin(), cur_pair_ptrs.end());
+    }
+    if (pair_ptrs.size() < 1) {
+      int pair_size = pair_ptrs.size();
+      LOG_DEBUG("Empty Segment is found "+ str_util::toString(pair_size));
+      if (i == 0) {
+        int new_bgn = first_res_pos;
+        int new_end = first_res_pos;
+        header_ptrs[i]->setMatchFirstBpPos(new_bgn);
+        header_ptrs[i]->setMatchLastBpPos(new_end);
+        result_list.push_back(header_ptrs[i]);
+      } 
+      else if (i == header_ptrs.size() - 1) {
+        int new_bgn = last_res_pos + 1;
+        int new_end = last_res_pos + 1;
+        header_ptrs[i]->setMatchFirstBpPos(new_bgn);
+        header_ptrs[i]->setMatchLastBpPos(new_end);
+        result_list.push_back(header_ptrs[i]);
+      }
+      else {
+        // add empty header_ptr;
+        result_list.push_back(nullptr);
+      }
+    } 
+    else {
+      int new_bgn = first_res_pos + getNewBgn(pair_ptrs);
+      int new_end = first_res_pos + getNewEnd(pair_ptrs);
+      if (i == 0) {
+        new_bgn = first_res_pos;
+      }
+      if (i == header_ptrs.size() -1 ) {
+        new_end = last_res_pos + 1;
+      }
+      header_ptrs[i]->setMatchFirstBpPos(new_bgn);
+      header_ptrs[i]->setMatchLastBpPos(new_end);
+      result_list.push_back(header_ptrs[i]);
+    }
+  }
+  return result_list;
+}
+
+// used in graph alignment, each vector contains a set of diagonals that can be
+// explained by variable PTMs. 
+DiagHeaderPtrVec2D refineHeadersBgnEnd(ProteoformPtr proteo_ptr,
+                                       const ExtendMsPtrVec &ms_three_ptr_vec,
+                                       const DiagHeaderPtrVec2D& header_ptrs_2d,
+                                       const DiagHeaderPtrVec& header_ptrs_1d,
+                                       double min_mass) {
   DiagHeaderPtrVec2D result_list;
   DiagHeaderPtr first_header = header_ptrs_1d[0];
   DiagHeaderPtr last_header = header_ptrs_1d[header_ptrs_1d.size()-1];
@@ -254,6 +322,12 @@ DiagHeaderPtrVec2D refineHeadersBgnEnd(ProteoformPtr proteo_ptr,
       } else {
         int new_bgn = first_res_pos + getNewBgn(pair_ptrs);
         int new_end = first_res_pos + getNewEnd(pair_ptrs);
+        if (header_ptrs_2d[i][j] == first_header) {
+          new_bgn = first_res_pos;
+        }
+        if (header_ptrs_2d[i][j] == last_header) {
+          new_end = last_res_pos + 1;
+        }
         header_ptrs_2d[i][j]->setMatchFirstBpPos(new_bgn);
         header_ptrs_2d[i][j]->setMatchLastBpPos(new_end);
         cur_vec.push_back(header_ptrs_2d[i][j]);

@@ -26,12 +26,12 @@ namespace toppic {
 
 VarPtmAlign::VarPtmAlign(const std::vector<double> &ms_masses,
                          const std::vector<double> &seq_masses,
-                         ResSeqPtr res_seq_ptr,
+                         ResSeqPtr sub_res_seq_ptr,
                          const DiagonalPtrVec &diagonal_ptrs,
                          VarPtmSearchMngPtr mng_ptr):
   ms_masses_(ms_masses),
   seq_masses_(seq_masses),
-  res_seq_ptr_(res_seq_ptr),
+  sub_res_seq_ptr_(sub_res_seq_ptr),
   diagonal_ptrs_(diagonal_ptrs),
   mng_ptr_(mng_ptr) {
     initMatchTable();
@@ -57,7 +57,7 @@ void VarPtmAlign::initAllowShiftTable() {
   for (size_t i = 0; i < seq_masses_.size(); i++) {
     std::vector<bool> allow_shifts(shift_num, false);
     if (i >= 1) {
-      ResiduePtr seq_res_ptr = res_seq_ptr_->getResiduePtr(i-1);
+      ResiduePtr seq_res_ptr = sub_res_seq_ptr_->getResiduePtr(i-1);
       for (size_t j = 0; j < shift_num; j++) {
         for (size_t k = 0; k < mng_ptr_->res_ptr_vec_2d_[j].size(); k++) {
           ResiduePtr mod_res_ptr = mng_ptr_->res_ptr_vec_2d_[j][k];
@@ -92,7 +92,7 @@ void VarPtmAlign::initScoreTable() {
 
 void VarPtmAlign::compute() {
   dp();
-  //backtrace();
+  backtrack();
 }
 
 void VarPtmAlign::dp() {
@@ -130,18 +130,43 @@ void VarPtmAlign::dp() {
   }
 }
 
-DiagHeaderPtrVec VarPtmAlign::backtrack(int d, int s) {
+void VarPtmAlign::backtrack() {
+  best_score_ = -1;
+  best_d_ = 0;
+  best_ptm_num_ = 0;
+  size_t var_ptm_num = mng_ptr_->var_ptm_num_;
+  int pos = seq_masses_.size() -1 ;
+  for (size_t i = 0; i < diagonal_ptrs_.size(); i++) {
+    // check if the diagonal is matched to the C-terminus
+    if (diagonal_ptrs_[i]->getHeader()->isProtCTermMatch()) {
+      for (size_t j = 0; j <= var_ptm_num; j++) {
+        int score = scores_3d_[i][pos][j];
+        if (score > best_score_) {
+          best_score_ = score;
+          best_d_ = i;
+          best_ptm_num_ = j;
+        }
+      }
+    }
+  }
+  if (best_score_ > 0) {
+    backtrack(best_d_, best_ptm_num_);
+  }
+}
+
+void VarPtmAlign::backtrack(int d, int ptm) {
+
   DiagHeaderPtrVec list;
   int cur_d = d;
-  int cur_pos = seq_masses_.size();
-  int cur_ptm = s
-  if (scores_3d_[cur_d][cur_pos][cur_s] <= 0) {
-    return list;
+  int cur_pos = seq_masses_.size() - 1;
+  int cur_ptm = ptm;
+  if (scores_3d_[cur_d][cur_pos][cur_ptm] <= 0) {
+    return; 
   }
 
-  DiagHeaderPtr cur_header;
   int cur_end = cur_pos;
   int cur_bgn = cur_pos;
+  DiagHeaderPtr cur_header;
 
   // LOG_DEBUG("backtrace start ");
   while (cur_pos != 0) {
@@ -151,139 +176,126 @@ DiagHeaderPtrVec VarPtmAlign::backtrack(int d, int s) {
     if (pre_d != cur_d) {
       pre_ptm = cur_ptm - 1;
     }
-    if (p == last_pair_ptr_) {
-      cur_header = pre->getDiagHeader();
-      cur_end = pre->getY();
-    } else if (pre == first_pair_ptr_) {
-      cur_bgn = p->getY();
+
+    if (pre_d != cur_d) {
+      cur_bgn = cur_pos;
+      cur_header = diagonal_ptrs_[cur_d]->getHeader();
       list.push_back(diag_header_util::geneDiagHeaderPtr(cur_bgn, cur_end, cur_header));
-    } else {
-      if (p->getType(s) == path_type::TYPE_SHIFT) {
-        cur_bgn = p->getY();
-        list.push_back(diag_header_util::geneDiagHeaderPtr(cur_bgn, cur_end, cur_header));
-        cur_header = pre->getDiagHeader();
-        cur_end = pre->getY();
+
+      // find mod
+      ModPtr cur_mod_ptr;
+      int res_pos = cur_bgn  - 1;
+      ResiduePtr seq_res_ptr = sub_res_seq_ptr_->getResiduePtr(res_pos);
+      int shift_idx = mng_ptr_->diag_matrix_shift_idxes_[cur_d][pre_d];
+
+      ModPtrVec cand_mod_ptrs = mng_ptr_->mod_ptr_vec_2d_[shift_idx];
+      for (size_t k = 0; k < cand_mod_ptrs.size(); k++) {
+        ResiduePtr mod_res_ptr = cand_mod_ptrs[k]->getOriResiduePtr();
+        if (seq_res_ptr->isSame(mod_res_ptr)) {
+          cur_mod_ptr = cand_mod_ptrs[k];
+          break;
+        }
       }
+      if (cur_mod_ptr == nullptr) {
+        LOG_ERROR("No matched modification is found!");
+        exit(EXIT_FAILURE);
+      }
+      backtrack_mod_ptrs_.push_back(cur_mod_ptr);
+
+      cur_end = pre_pos;
+      cur_bgn = pre_pos;
     }
-    if (p->getType(s) == path_type::TYPE_SHIFT) {
-      s--;
-    }
-    p = pre;
+    cur_d = pre_d;
+    cur_pos = pre_pos;
+    cur_ptm = pre_ptm;
   }
+  // first diagonal;
+  cur_bgn = cur_pos;
+  cur_header = diagonal_ptrs_[cur_d]->getHeader();
+  list.push_back(diag_header_util::geneDiagHeaderPtr(cur_bgn, cur_end, cur_header));
   std::reverse(list.begin(), list.end());
-  return list;
+  backtrack_diag_header_ptrs_ = list;
+  std::reverse(backtrack_mod_ptrs_.begin(), backtrack_mod_ptrs_.end());
 }
 
-/*
-inline DpPairPtr PsAlign::getTruncPre(DpPairPtr cur_pair_ptr, int s,
-                                      ProteoformTypePtr align_type_ptr) {
-  DpPairPtr trunc_prev_ptr;
-  if (cur_pair_ptr == last_pair_ptr_) {
-    double trunc_score = - std::numeric_limits<double>::max();
-    for (size_t i = 0; i < segment_end_pair_ptrs_.size(); i++) {
-      DpPairPtr prev_pair_ptr = segment_end_pair_ptrs_[i];
-      if (align_type_ptr == ProteoformType::COMPLETE || align_type_ptr == ProteoformType::SUFFIX) {
-        if (prev_pair_ptr->getDiagHeader()->isProtCTermMatch()) {
-          if (prev_pair_ptr->getScore(s) > trunc_score) {
-            trunc_prev_ptr = prev_pair_ptr;
-            trunc_score = prev_pair_ptr->getScore(s);
-          }
-        }
-      } else {
-        if (prev_pair_ptr->getDiagHeader()->isPepCTermMatch()) {
-          if (prev_pair_ptr->getScore(s) > trunc_score) {
-            trunc_prev_ptr = prev_pair_ptr;
-            trunc_score = prev_pair_ptr->getScore(s);
-          }
-        }
-      }
-    }
-  } else {
-    // if cur_pair_ptr is the first in a diagonal
-    if (cur_pair_ptr->getDiagOrder() == 0) {
-      if (align_type_ptr == ProteoformType::COMPLETE
-          || align_type_ptr == ProteoformType::PREFIX) {
-        if (cur_pair_ptr->getDiagHeader()->isProtNTermMatch()) {
-          trunc_prev_ptr = first_pair_ptr_;
-        }
-      } else {
-        if (cur_pair_ptr->getDiagHeader()->isPepNTermMatch()) {
-          trunc_prev_ptr = first_pair_ptr_;
-        }
-      }
+MassShiftPtrVec VarPtmAlign::geneShiftVec(ProteoformPtr sub_proteo_ptr,
+                                          DiagHeaderPtrVec &ori_header_ptrs,
+                                          DiagHeaderPtrVec &refined_header_ptrs) {
+  DiagHeaderPtrVec filtered_header_ptrs;
+  // get non-null headers
+  for (size_t i = 0; i < refined_header_ptrs.size(); i++) {
+    if (refined_header_ptrs[i] != nullptr) {
+      filtered_header_ptrs.push_back(refined_header_ptrs[i]);
     }
   }
-  return trunc_prev_ptr;
+  if (filtered_header_ptrs.size() == 0) {
+    LOG_ERROR("Empty diagonal header");
+    exit(EXIT_FAILURE);
+  }
+  int first_pos = filtered_header_ptrs[0]->getTruncFirstResPos();
+  int last_pos = filtered_header_ptrs[filtered_header_ptrs.size()-1]->getTruncLastResPos();
+  MassShiftPtrVec shift_ptrs = diag_header_util::getDiagonalMassChanges(filtered_header_ptrs, first_pos,
+                                                                        last_pos, AlterType::VARIABLE);
+  // add AlterPtr to shifts
+  int idx = 0;
+  AlterPtrVec alter_ptr_vec;
+  for (size_t i = 1; i < ori_header_ptrs.size(); i++) {
+    DiagHeaderPtr cur_ptr = ori_header_ptrs[i];
+    DiagHeaderPtr pre_ptr = ori_header_ptrs[i-1];
+    double shift = cur_ptr->getProtNTermShift() - pre_ptr->getProtNTermShift(); 
+    int right_bp_pos = cur_ptr->getMatchFirstBpPos();
+    int left_bp_pos = right_bp_pos - 1;
+    ModPtr mod_ptr = backtrack_mod_ptrs_[i-1];
+    AlterPtr a = std::make_shared<Alter>(left_bp_pos, 
+                                         right_bp_pos,
+                                         AlterType::VARIABLE,
+                                         shift, 
+                                         mod_ptr);
+    alter_ptr_vec.push_back(a);
+
+    if (filtered_header_ptrs[i] != nullptr) {
+      shift_ptrs[idx]->setAlterPtrVec(alter_ptr_vec);
+      alter_ptr_vec.clear();
+      idx ++;
+    }
+  }
+  return shift_ptrs;
 }
 
-DpPairPtr PsAlign::getShiftPre(int p, int s) {
-  if (s < 1) {
+
+
+PrsmPtr VarPtmAlign::geneResult(ProteoformPtr sub_proteo_ptr,
+                                DeconvMsPtrVec &deconv_ms_ptr_vec,
+                                PrsmParaPtr prsm_para_ptr) {
+  if (backtrack_diag_header_ptrs_.size() == 0) {
     return nullptr;
   }
-  // last pair can not shift, only trunc is allowed;
-  DpPairPtr shift_prev = nullptr;
-  double shift_score = -std::numeric_limits<double>::max();
 
-  // cur pair is not last pair
-  // first pair can not shift, so q starts from 1
-  for (size_t d = 0; d < idxes_[p].size(); d++) {
-    if (idxes_[p][d] >= 0) {
-      DpPairPtr prev_pair_ptr = dp_pair_ptrs_[idxes_[p][d]];
-      double prev_score = prev_pair_ptr->getScore(s - 1);
-      if (penalties_[p][d]) {
-        prev_score = prev_score - para_ptr_-> align_large_shift_panelty_;
-      }
-      if (prev_score > shift_score) {
-        shift_prev = prev_pair_ptr;
-        shift_score = prev_score;
-      }
-    }
-  }
-  return shift_prev;
-}
-
-PrsmPtr PsAlign::geneResult(int shift_num, ProteoformPtr proteo_ptr,
-                            DeconvMsPtrVec &deconv_ms_ptr_vec,
-                            ExtendMsPtrVec &ms_three_ptr_vec,
-                            PrsmParaPtr prsm_para_ptr) {
-  DiagHeaderPtrVec header_ptrs = getDiagHeaders(shift_num);
-  if (header_ptrs.size() == 0) {
-    return nullptr;
-  }
-  int first_pos = header_ptrs[0]->getTruncFirstResPos();
-  int last_pos = header_ptrs[header_ptrs.size()-1]->getTruncLastResPos();
-  ProteoformPtr sub_proteo_ptr = proteoform_factory::geneSubProteoform(proteo_ptr, 
-                                                                       proteo_ptr->getFastaSeqPtr(),
-                                                                       first_pos, last_pos);
-
-  double min_mass = prsm_para_ptr->getSpParaPtr()->getMinMass();
-  double ppo = prsm_para_ptr->getSpParaPtr()->getPeakTolerancePtr()->getPpo();
-
-  double refine_prec_mass 
-    = diagonal_util::refinePrecursorAndHeaderShift(proteo_ptr, ms_three_ptr_vec,
-                                                   header_ptrs, ppo, min_mass,
-                                                   para_ptr_->refine_prec_step_width_);
+  double refine_prec_mass = sub_proteo_ptr->getMass() + mng_ptr_->shift_list_[best_d_];
 
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
   ExtendMsPtrVec refine_ms_ptr_vec = extend_ms_factory::geneMsThreePtrVec(deconv_ms_ptr_vec,
-                                                                          sp_para_ptr, refine_prec_mass);
+                                                                          sp_para_ptr, 
+                                                                          refine_prec_mass);
 
-  DiagHeaderPtrVec refined_header_ptrs = diagonal_util::refineHeadersBgnEnd(proteo_ptr, 
-                                                                            refine_ms_ptr_vec,
-                                                                            header_ptrs, 
-                                                                            min_mass);
-
+  double min_mass = prsm_para_ptr->getSpParaPtr()->getMinMass();
+  DiagHeaderPtrVec refined_header_ptrs 
+    = diagonal_util::refineVarPtmHeadersBgnEnd(sub_proteo_ptr, 
+                                               refine_ms_ptr_vec,
+                                               backtrack_diag_header_ptrs_, 
+                                               min_mass);
   if (refined_header_ptrs.size() == 0) {
     return nullptr;
   }
 
-  MassShiftPtrVec shifts = diag_header_util::getDiagonalMassChanges(refined_header_ptrs, first_pos,
-                                                                    last_pos, AlterType::UNEXPECTED);
-  sub_proteo_ptr->addMassShiftPtrVec(shifts);
+  MassShiftPtrVec shift_vec = geneShiftVec(sub_proteo_ptr,
+                                           backtrack_diag_header_ptrs_, 
+                                           refined_header_ptrs);
+
+  sub_proteo_ptr->addMassShiftPtrVec(shift_vec);
 
   return std::make_shared<Prsm>(sub_proteo_ptr, deconv_ms_ptr_vec, refine_prec_mass,
                                 prsm_para_ptr->getSpParaPtr());
 }
-*/
 
 } /* namespace toppic */

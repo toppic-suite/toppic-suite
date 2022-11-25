@@ -499,10 +499,9 @@ void GraphAlign::geneHeaders() {
   for (size_t i = 0; i < diag_headers_.size(); i++) {
     double n_shift = diag_headers_[i]->getProtNTermShift();
     double prec_mono_mass = spec_graph_ptr_->getSpectrumSetPtr()->getPrecMonoMass();
-    double c_shift = prec_mono_mass - proteo_graph_ptr_->getProteoformPtr()->getResSeqPtr()->getSeqMass() - n_shift;
-    diag_headers_[i]->initHeader(c_shift,
-                                 proteo_graph_ptr_->getProteoformPtr(),
-                                 mng_ptr_->align_prefix_suffix_shift_thresh_);
+    double c_shift = prec_mono_mass 
+      - proteo_graph_ptr_->getProteoformPtr()->getResSeqPtr()->getSeqMass() - n_shift;
+    diag_headers_[i]->initHeader(c_shift, proteo_graph_ptr_->getProteoformPtr()); 
     LOG_DEBUG("header " << i << " n shift " << n_shift);
   }
 

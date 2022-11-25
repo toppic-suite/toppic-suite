@@ -145,9 +145,10 @@ void GraphPostProcessor::process() {
                                               mng_ptr_->prsm_para_ptr_->getFixModPtrVec());
 
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
-  SimpleMsAlignReaderPtr ms_reader_ptr = std::make_shared<SimpleMsAlignReader>(sp_file_name, 
-                                                                               group_spec_num,
-                                                                               sp_para_ptr->getActivationPtr());
+  SimpleMsAlignReaderPtr ms_reader_ptr 
+    = std::make_shared<SimpleMsAlignReader>(sp_file_name, 
+                                            group_spec_num,
+                                            sp_para_ptr->getActivationPtr());
 
   int cnt = 0;
 
