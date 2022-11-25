@@ -51,6 +51,8 @@
 
 #include "filter/mng/var_ptm_filter_mng.hpp"
 #include "filter/varptm/var_ptm_filter_processor.hpp"
+#include "search/varptmsearch/var_ptm_search_mng.hpp"
+#include "search/varptmsearch/var_ptm_search_processor.hpp"
 
 #include "filter/mng/one_ptm_filter_mng.hpp"
 #include "filter/oneptm/one_ptm_filter_processor.hpp"
@@ -251,17 +253,20 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     no_var_input_exts.push_back("toppic_zero_shift_suffix");
     no_var_input_exts.push_back("toppic_zero_shift_internal");
 
+    // var_ptm_type number is used for E-value computation
+    int var_ptm_type_num = 0;
+
     if (var_ptm_num >= 1 && var_mod_file_name != "") {
       std::cout << "Variable PTM filtering - started." << std::endl;
       VarPtmFilterMngPtr var_filter_mng_ptr
         = std::make_shared<VarPtmFilterMng>(prsm_para_ptr, index_file_para, 
                                             var_mod_file_name, var_ptm_num, 
                                             filter_thread_num, "toppic_var_filter");
+      var_ptm_type_num = var_filter_mng_ptr->getSingleShiftNum(); 
       var_ptm_filter_processor::process(var_filter_mng_ptr);
       std::cout << "Variable PTM filtering - finished." << std::endl;
 
       std::cout << "Var PTM search - started." << std::endl;
-      /*
       VarPtmSearchMngPtr var_ptm_search_mng_ptr
         = std::make_shared<VarPtmSearchMng>(prsm_para_ptr, n_top, var_mod_file_name, 
                                             var_ptm_num, thread_num, "toppic_var_filter", "toppic_var_ptm");
@@ -269,7 +274,6 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
           = std::make_shared<VarPtmSearchProcessor>(var_ptm_search_mng_ptr);
       var_ptm_search_processor->process();
       var_ptm_search_processor = nullptr;
-      */
       std::cout << "Var PTM search - finished." << std::endl;
       var_input_exts.push_back("toppic_var_ptm_complete");
       var_input_exts.push_back("toppic_var_ptm_prefix");
@@ -341,11 +345,11 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     std::cout << "Merging PrSMs - finished." << std::endl;
     
     std::cout << "E-value computation - started." << std::endl;
-    bool variable_ptm = false;
     TdgfMngPtr tdgf_mng_ptr
         = std::make_shared<TdgfMng>(prsm_para_ptr, ptm_num,
                                     std::max(std::abs(max_ptm_mass), std::abs(min_ptm_mass)),
-                                    use_gf, variable_ptm, thread_num, "toppic_combined", "toppic_evalue");
+                                    use_gf, var_ptm_type_num, thread_num, 
+                                    "toppic_combined", "toppic_evalue");
     EValueProcessorPtr processor = std::make_shared<EValueProcessor>(tdgf_mng_ptr);
     processor->init();
     // compute E-value for a set of prsms each run

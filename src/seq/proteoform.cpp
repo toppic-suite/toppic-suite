@@ -182,6 +182,11 @@ int Proteoform::getAlterNum(AlterTypePtr type_ptr) {
   return n;
 }
 
+int Proteoform::getVarPtmNum() {
+  return getAlterNum(AlterType::VARIABLE);
+}
+
+
 MassShiftPtrVec Proteoform::getMassShiftPtrVec(AlterTypePtr type_ptr) {
   MassShiftPtrVec shift_ptr_vec;
   for (size_t i = 0; i < mass_shift_list_.size(); i++) {

@@ -24,7 +24,7 @@ namespace toppic {
 class TdgfMng {
  public:
   TdgfMng(PrsmParaPtr prsm_para_ptr, int shift_num, double max_ptm_mass, bool use_gf, 
-          bool variable_ptm, int thread_num, const std::string &input_file_ext, 
+          int var_ptm_type_num, int thread_num, const std::string &input_file_ext, 
           const std::string & output_file_ext);
 
   std::string input_file_ext_;
@@ -36,9 +36,9 @@ class TdgfMng {
   // Prsm filter 
   double comp_evalue_min_match_frag_num_ = 4.0;
 
-  bool use_gf_ = false;
+  bool use_gf_ = true;
 
-  bool variable_ptm_ = false;
+  int var_ptm_type_num_ = 0;
 
   // Max ptm mass is used in the function for counting sequence numbers
   double max_ptm_mass_ = 1000000;

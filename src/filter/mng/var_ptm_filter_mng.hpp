@@ -37,6 +37,8 @@ class VarPtmFilterMng {
 
   std::string getIndexFilePara() {return index_file_para_;}
 
+  int getSingleShiftNum() {return single_shift_list_.size();}
+
   PrsmParaPtr prsm_para_ptr_;
 
   std::string index_file_para_;

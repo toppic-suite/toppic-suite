@@ -278,7 +278,7 @@ void CompProbValue::compPrecProbs() {
     - prob_peaks_[last_peak_index].mass_bgn_ + 1;
   // because in results[], all probabilities are calculated 
   // with an error tolerance and all proteins are counted 
-  // several times. In the prec_probability also needs to 
+  // several times. The prec_probability also needs to 
   // to be normalized by the error tolerance. 
   double one_ptm_prec_prob = shift_prob_ * peak_width;
   prec_probs_.push_back(one_ptm_prec_prob);
@@ -438,7 +438,8 @@ inline void CompProbValue::compOneLayer(std::vector<std::vector<double>> &prev_r
     // update peakPnt and get probs 
     while (peak_index < prob_peaks_.size()
            && prob_peaks_[peak_index].table_end_ <= win_table_end) {
-      for (int i = prob_peaks_[peak_index].mass_bgn_; i <= prob_peaks_[peak_index].mass_end_; i++) {
+      for (int i = prob_peaks_[peak_index].mass_bgn_; 
+           i <= prob_peaks_[peak_index].mass_end_; i++) {
         for (int j = 0; j < height_; j++) {
           int pos = (i * height_ + j) % page_table_size_;
           cur_results[peak_index][j] += page_table_[pos];

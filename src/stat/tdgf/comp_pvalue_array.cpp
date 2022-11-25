@@ -57,6 +57,7 @@ void CompPValueArray::compMultiExpectedValues(const PrmMsPtrVec &ms_six_ptr_vec,
   else {
     prob_prec_mass = ms_six_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMass();
   }
+
   PeakTolerancePtr tole_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
   std::vector<double> prot_probs;
   comp_prob_value_array::compProbArray(comp_prob_ptr_, prot_n_term_residue_ptrs_,
@@ -64,12 +65,15 @@ void CompPValueArray::compMultiExpectedValues(const PrmMsPtrVec &ms_six_ptr_vec,
                                       prob_prec_mass, tole_ptr, prot_probs);
   std::vector<double> pep_probs;
   comp_prob_value_array::compProbArray(comp_prob_ptr_, pep_n_term_residue_ptrs_,
-                               prm_ptr_2d, prsm_ptrs, strict, prob_prec_mass, tole_ptr, pep_probs);
+                                       prm_ptr_2d, prsm_ptrs, strict, prob_prec_mass, 
+                                       tole_ptr, pep_probs);
+
   double tolerance = ms_six_ptr_vec[0]->getMsHeaderPtr()->getPrecErrorTolerance(ppo);
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     double prec_mass = ms_six_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMassMinusWater();
-    int unexpect_shift_num = prsm_ptrs[i]->getProteoformPtr()->getAlterNum(AlterType::UNEXPECTED);
-    ProteoformTypePtr type_ptr = prsm_ptrs[i]->getProteoformPtr()->getProteoformType();
+    ProteoformPtr proteo_ptr = prsm_ptrs[i]->getProteoformPtr();
+    int unexpect_shift_num = proteo_ptr->getAlterNum(AlterType::UNEXPECTED);
+    ProteoformTypePtr type_ptr = proteo_ptr->getProteoformType();
 
     if (unexpect_shift_num == 0) {
       // in ZERO PTM searching, +/-1 Da was allowed.
@@ -86,33 +90,26 @@ void CompPValueArray::compMultiExpectedValues(const PrmMsPtrVec &ms_six_ptr_vec,
       }
     }
 
-    int index;
-    if (mng_ptr_->variable_ptm_) {
-      // need to be improved
-      if (unexpect_shift_num == 0) {
-        index = 1;
-      } 
-      else {
-        index = unexpect_shift_num;
-      }
-    } 
-    else {
-      index = unexpect_shift_num;
-    }
-
+    int index = unexpect_shift_num;
     double cand_num = test_num_ptr_->compCandNum(type_ptr, index, prec_mass, tolerance);
+
+    // multiple a factor for variable PTMs
+    int var_ptm_num = proteo_ptr->getVarPtmNum();
+    double var_ptm_factor = pow(mng_ptr_->var_ptm_type_num_ + 1, var_ptm_num);
+    cand_num = cand_num * var_ptm_factor;
 
     if (cand_num == 0.0) {
       LOG_WARN("Zero candidate number");
       cand_num = ExpectedValue::getMaxDouble();
     }
 
+    double adjust_factor = 1.0;
     if (type_ptr == ProteoformType::COMPLETE || type_ptr == ProteoformType::PREFIX) {
-      ExpectedValuePtr ev_ptr = std::make_shared<ExpectedValue>(prot_probs[i], cand_num, 1);
+      ExpectedValuePtr ev_ptr = std::make_shared<ExpectedValue>(prot_probs[i], cand_num, adjust_factor);
       prsm_ptrs[i]->setExpectedValuePtr(ev_ptr);
     } 
     else {
-      ExpectedValuePtr ev_ptr = std::make_shared<ExpectedValue>(pep_probs[i], cand_num, 1);
+      ExpectedValuePtr ev_ptr = std::make_shared<ExpectedValue>(pep_probs[i], cand_num, adjust_factor);
       prsm_ptrs[i]->setExpectedValuePtr(ev_ptr);
     }
   }
