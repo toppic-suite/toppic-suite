@@ -46,8 +46,14 @@ void VarPtmAlign::initMatchTable() {
     for (size_t j = 0; j < diag_pair_ptrs.size(); j++) {
       int pos = diag_pair_ptrs[j]->getY();
       LOG_DEBUG("pos" << pos);
-      matches[j] = 1;
+      matches[pos] = 1;
     }
+    /*
+    LOG_ERROR(i << "match number " << diag_pair_ptrs.size());
+    for (size_t j = 0; j < matches.size(); j++) {
+      LOG_ERROR(i << "match table " << j << " " <<  matches[j]);
+    }
+    */
     matches_2d_.push_back(matches);
   }
 }
@@ -59,6 +65,7 @@ void VarPtmAlign::initAllowShiftTable() {
     if (i >= 1) {
       ResiduePtr seq_res_ptr = sub_res_seq_ptr_->getResiduePtr(i-1);
       for (size_t j = 0; j < shift_num; j++) {
+        //LOG_DEBUG("shift " << j << " mod num " << mng_ptr_->res_ptr_vec_2d_[j].size());
         for (size_t k = 0; k < mng_ptr_->res_ptr_vec_2d_[j].size(); k++) {
           ResiduePtr mod_res_ptr = mng_ptr_->res_ptr_vec_2d_[j][k];
           if (seq_res_ptr->isSame(mod_res_ptr)) {
@@ -68,6 +75,7 @@ void VarPtmAlign::initAllowShiftTable() {
         }
       }
     }
+    //LOG_DEBUG("Allow shift " << i << " " << allow_shifts[0] << " " << allow_shifts[1]);
     allow_shift_2d_.push_back(allow_shifts); 
   }
 }
@@ -125,6 +133,11 @@ void VarPtmAlign::dp() {
         best_score +=  matches_2d_[d][pos];
         prevs_3d_[d][pos][ptm] = best_prev_d;
         scores_3d_[d][pos][ptm] = best_score;
+        /*
+        if (pos == seq_masses_.size() - 1 && best_score > 0) {
+          LOG_ERROR("d " << d << " ptm " << ptm << " best score " << best_score);
+        }
+        */
       }
     }
   }
@@ -137,6 +150,8 @@ void VarPtmAlign::backtrack() {
   size_t var_ptm_num = mng_ptr_->var_ptm_num_;
   int pos = seq_masses_.size() -1 ;
   for (size_t i = 0; i < diagonal_ptrs_.size(); i++) {
+    LOG_DEBUG("diag " << i << " shift " << diagonal_ptrs_[i]->getHeader()->getProtNTermShift()
+              << " c term match " << diagonal_ptrs_[i]->getHeader()->isProtCTermMatch())
     // check if the diagonal is matched to the C-terminus
     if (diagonal_ptrs_[i]->getHeader()->isProtCTermMatch()) {
       for (size_t j = 0; j <= var_ptm_num; j++) {
@@ -149,6 +164,7 @@ void VarPtmAlign::backtrack() {
       }
     }
   }
+  LOG_DEBUG("best d " << best_d_ << " best ptm num " << best_ptm_num_ << " best score " << best_score_);
   if (best_score_ > 0) {
     backtrack(best_d_, best_ptm_num_);
   }
@@ -224,6 +240,7 @@ MassShiftPtrVec VarPtmAlign::geneShiftVec(ProteoformPtr sub_proteo_ptr,
   DiagHeaderPtrVec filtered_header_ptrs;
   // get non-null headers
   for (size_t i = 0; i < refined_header_ptrs.size(); i++) {
+    LOG_DEBUG("refine header " << i << " null " << (refined_header_ptrs[i] == nullptr));
     if (refined_header_ptrs[i] != nullptr) {
       filtered_header_ptrs.push_back(refined_header_ptrs[i]);
     }
@@ -234,6 +251,7 @@ MassShiftPtrVec VarPtmAlign::geneShiftVec(ProteoformPtr sub_proteo_ptr,
   }
   int first_pos = filtered_header_ptrs[0]->getTruncFirstResPos();
   int last_pos = filtered_header_ptrs[filtered_header_ptrs.size()-1]->getTruncLastResPos();
+  LOG_DEBUG("first pos " << first_pos << " last pos " << last_pos); 
   MassShiftPtrVec shift_ptrs = diag_header_util::getDiagonalMassChanges(filtered_header_ptrs, first_pos,
                                                                         last_pos, AlterType::VARIABLE);
   // add AlterPtr to shifts
@@ -253,7 +271,7 @@ MassShiftPtrVec VarPtmAlign::geneShiftVec(ProteoformPtr sub_proteo_ptr,
                                          mod_ptr);
     alter_ptr_vec.push_back(a);
 
-    if (filtered_header_ptrs[i] != nullptr) {
+    if (refined_header_ptrs[i] != nullptr) {
       shift_ptrs[idx]->setAlterPtrVec(alter_ptr_vec);
       alter_ptr_vec.clear();
       idx ++;

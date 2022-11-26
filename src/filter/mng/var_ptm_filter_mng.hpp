@@ -70,7 +70,7 @@ class VarPtmFilterMng {
   
   // variable PTM mass shift list 
   // use integer to avoid errors in double addition
-  double round_scale = 10000;
+  double round_scale_ = 10000;
   std::vector<int> round_single_shift_list_;
   std::vector<double> single_shift_list_;
 

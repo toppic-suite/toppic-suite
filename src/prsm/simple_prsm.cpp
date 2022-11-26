@@ -85,6 +85,7 @@ SimplePrsm::SimplePrsm(XmlDOMElement* element) {
   // LOG_DEBUG("n shift _num " << n_shift_num);
   for (int i = 0; i < n_shift_num; i++) {
     double shift = xml_dom_util::getDoubleChildValue(n_shift_list_element, "shift", i);
+    //LOG_DEBUG("N term shift " << shift);
     n_term_shifts_.push_back(shift);
   }
   // c term shifts

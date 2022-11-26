@@ -12,6 +12,9 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include <cmath>
+
+#include "common/util/logger.hpp"
 #include "common/base/mod_util.hpp"
 #include "search/varptmsearch/var_ptm_search_mng.hpp"
 
@@ -29,19 +32,20 @@ VarPtmSearchMng::VarPtmSearchMng(PrsmParaPtr prsm_para_ptr, int n_report,
   thread_num_(thread_num),
   input_file_ext_(input_file_ext),
   output_file_ext_(output_file_ext) {
+
     ModPtrVec mod_ptr_list = mod_util::readAnywhereModTxt(var_ptm_file_name);
     for (size_t i = 0; i < mod_ptr_list.size(); i++) {
       double shift = mod_ptr_list[i]->getShift();
       int pos = -1;
-      for (size_t j = 0; j < shift_list_.size(); j++) {
-        if (shift_list_[j] == shift) {
+      for (size_t j = 0; j < single_shift_list_.size(); j++) {
+        if (single_shift_list_[j] == shift) {
           pos = j;
           break;
         }
       }
       // if the shift is not in the list
       if (pos == -1) {
-        shift_list_.push_back(shift);
+        single_shift_list_.push_back(shift);
         ModPtrVec cur_mod_ptr_vec;
         cur_mod_ptr_vec.push_back(mod_ptr_list[i]);
         mod_ptr_vec_2d_.push_back(cur_mod_ptr_vec);
@@ -55,32 +59,40 @@ VarPtmSearchMng::VarPtmSearchMng(PrsmParaPtr prsm_para_ptr, int n_report,
         res_ptr_vec_2d_[pos].push_back(mod_ptr_list[i]->getOriResiduePtr());
       }
     }
+    // get round single shifts
+    // round single shift list
+    for (size_t i = 0; i < single_shift_list_.size(); i++) {
+      int round_shift = std::lround(single_shift_list_[i] * round_scale_);
+      round_single_shift_list_.push_back(round_shift);
+    }
 
-    single_shift_list_ = mod_util::readModTxtToShiftList(var_ptm_file_name);
     computeShifts();
   }
 
 void VarPtmSearchMng::computeShifts() {
-  shift_list_.push_back(0);
-
+  round_shift_list_.push_back(0);
   // empty previous indexes for shift 0
-  std::vector<int> idxes; 
-  diag_prev_idxes_.push_back(idxes);
+  std::vector<int> empty_idxes;
+  diag_prev_idxes_.push_back(empty_idxes);
+  std::vector<int> empty_shift_idxes;
+  diag_prev_shift_idxes_.push_back(empty_shift_idxes);
 
-  for (int i = 0; i <= var_ptm_num_; i++) {
-    size_t cur_list_len = shift_list_.size();
+  for (int i = 0; i < var_ptm_num_; i++) {
+    size_t cur_list_len = round_shift_list_.size();
     for (size_t j = 0; j < cur_list_len; j++) {
-      for (size_t k = 0; k < single_shift_list_.size(); k++) {
-        double new_shift = shift_list_[j] + single_shift_list_[k];
+      for (size_t k = 0; k < round_single_shift_list_.size(); k++) {
+        int new_shift = round_shift_list_[j] + round_single_shift_list_[k];
+        LOG_DEBUG("new shift " << new_shift);
         int pos = -1;
-        for (size_t p = 0; p < shift_list_.size(); p++) {
-          if (shift_list_[p] == new_shift) {
+        for (size_t p = 0; p < round_shift_list_.size(); p++) {
+          if (round_shift_list_[p] == new_shift) {
             pos = p;
             break;
           }
         }
         // if the new shift is not in the list
         if (pos == -1) {
+          round_shift_list_.push_back(new_shift);
           std::vector<int> cur_idxes;
           cur_idxes.push_back(j);
           diag_prev_idxes_.push_back(cur_idxes);
@@ -95,6 +107,14 @@ void VarPtmSearchMng::computeShifts() {
       }
     }
   }
+  
+  // get double shifts
+  LOG_DEBUG("Number of shifts:" << round_shift_list_.size());
+  for (size_t i = 0; i < round_shift_list_.size(); i++) {
+    double shift = round_shift_list_[i] /round_scale_; 
+    shift_list_.push_back(shift);
+    LOG_DEBUG("Shifts:" << i << " " << shift_list_[i]);
+  }
 
   // generate diag_matrix_shift_idxes
   for (size_t i = 0; i < diag_prev_idxes_.size(); i++) {
@@ -106,6 +126,15 @@ void VarPtmSearchMng::computeShifts() {
     }
     diag_matrix_shift_idxes_.push_back(matrix_row);
   }
+
+  /*
+  for (size_t i = 0; i < diag_prev_idxes_.size(); i++) {
+    for (size_t j = 0; j < diag_prev_idxes_.size(); j++) {
+      std::cout << diag_matrix_shift_idxes_[i][j] << " ";
+    }
+    std::cout << std::endl;
+  }
+  */
 }
 
 } /* namespace toppic */

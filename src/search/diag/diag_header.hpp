@@ -100,6 +100,14 @@ class DiagHeader {
     bool isPepNTermMatch() {return pep_N_term_match_;}
     bool isPepCTermMatch() {return pep_C_term_match_;}
 
+    void setProtNTermMatch(bool match) {
+      prot_N_term_match_ = match;
+    }
+
+    void setProtCTermMatch(bool match) {
+      prot_C_term_match_ = match;
+    }
+
   private:
     int id_ = 0;
 

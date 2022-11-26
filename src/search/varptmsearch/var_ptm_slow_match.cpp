@@ -27,9 +27,11 @@ VarPtmSlowMatch::VarPtmSlowMatch(ProteoformPtr proteo_ptr,
   deconv_ms_ptr_vec_ = spectrum_set_ptr->getDeconvMsPtrVec();
   ms_six_ptr_vec_ = spectrum_set_ptr->getMsSixPtrVec();
   prec_mono_mass_ = spectrum_set_ptr->getPrecMonoMass();
+  LOG_DEBUG("prec mass " << prec_mono_mass_ << " protein mass " << proteo_ptr->getMass());
   mng_ptr_ = mng_ptr;
   PeakTolerancePtr tole_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
   prec_error_tole_ = deconv_ms_ptr_vec_[0]->getMsHeaderPtr()->getPrecErrorTolerance(tole_ptr->getPpo());
+  LOG_DEBUG("error tolerance " << prec_error_tole_);
   init();
 }
 
@@ -43,26 +45,28 @@ inline DiagHeaderPtrVec VarPtmSlowMatch::geneVarPtmNTermShiftHeaders() {
   std::vector<double> shifts = mng_ptr_->shift_list_;
   for (size_t i = 0; i < shifts.size(); i++) {
     double n_shift = shifts[i]; 
+    LOG_DEBUG("n shift " << n_shift);
     // n_term strict; c_term nostrict; prot n_term no_match; prot c_term no_match
     // pep n_term match; pep c_term no_match
     DiagHeaderPtr header_ptr 
       = std::make_shared<DiagHeader>(n_shift, true, false, false, false, true, false);
     // find Protein N-terminal and C-terminal matches 
     if (n_shift == 0.0) {
-      header_ptr->setProtNTermShift(true);
+      header_ptr->setProtNTermMatch(true);
       exist_n_term = true;
     }
     else {
-      header_ptr->setProtNTermShift(false);
+      header_ptr->setProtNTermMatch(false);
     }
 
     double c_shift = prec_mono_mass_ - seq_mass - n_shift;
+    LOG_DEBUG("c shift " << c_shift);
     if (std::abs(c_shift) <= prec_error_tole_) {
-      header_ptr->setProtCTermShift(true);
+      header_ptr->setProtCTermMatch(true);
       exist_c_term = true;
     } 
     else {
-      header_ptr->setProtCTermShift(false);
+      header_ptr->setProtCTermMatch(false);
     }
     header_ptr->initHeader(c_shift, proteo_ptr_); 
     header_ptrs.push_back(header_ptr);
@@ -76,6 +80,7 @@ inline DiagHeaderPtrVec VarPtmSlowMatch::geneVarPtmNTermShiftHeaders() {
 
 // initialize var_align
 void VarPtmSlowMatch::init() {
+  //LOG_ERROR("var ptm slow match init");
   DiagHeaderPtrVec n_term_shift_header_ptrs = geneVarPtmNTermShiftHeaders(); 
   PeakTolerancePtr tole_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
   PrmPeakPtrVec prm_peaks = prm_ms_util::getPrmPeakPtrs(ms_six_ptr_vec_, tole_ptr);
@@ -89,9 +94,8 @@ void VarPtmSlowMatch::init() {
   for (size_t i = 0; i < prm_peaks.size(); i++) {
     ms_masses[i] = prm_peaks[i]->getPosition();
   }
-  int bgn = proteo_ptr_->getStartPos();
-  int end = proteo_ptr_->getEndPos();
-  ResSeqPtr sub_res_seq_ptr = proteo_ptr_->getResSeqPtr()->getSubResidueSeq(bgn, end);
+  ResSeqPtr sub_res_seq_ptr = proteo_ptr_->getResSeqPtr(); 
+  LOG_DEBUG("Seq mass " << sub_res_seq_ptr->getSeqMass()); 
   var_ptm_align_ptr_ = std::make_shared<VarPtmAlign>(ms_masses, seq_masses, 
                                                      sub_res_seq_ptr,  
                                                      diagonal_ptrs, mng_ptr_);

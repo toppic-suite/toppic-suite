@@ -49,10 +49,10 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["allowProtMod"] = "NONE,NME,NME_ACETYLATION,M_ACETYLATION";
   arguments["nTermLabelMass"] = "0";
   arguments["variablePtmNum"] = "3";
-  arguments["residueModFileName"] = "";
-  arguments["ptmNumber"] = "1";
-  arguments["minPtmMass"] = "-500";
-  arguments["maxPtmMass"] = "500";
+  arguments["variablePtmFileName"] = "";
+  arguments["shiftNumber"] = "1";
+  arguments["minShiftMass"] = "-500";
+  arguments["maxShiftMass"] = "500";
 
   arguments["searchType"] = "TARGET";
   arguments["numOfTopPrsms"] = "1";
@@ -64,7 +64,7 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["cutoffProteoformType"] = "EVALUE";
   arguments["cutoffProteoformValue"] = "0.01";
   arguments["useLookupTable"] = "false";
-  arguments["doLocalization"] = "false";
+  arguments["localPtmFileName"] = "";
   arguments["localThreshold"] = "0.15";
 
   arguments["groupSpectrumNumber"] = "1";
@@ -116,20 +116,20 @@ void ToppicArgument::outputArguments(std::ostream &output,
 
   //output << std::setw(gap) << std::left << "N-terminal label mass" << sep << arguments["nTermLabelMass"] << std::endl;
   
-  if (arguments["residueModFileName"] != "" && arguments["variablePtmNum"]!="0") {
+  if (arguments["variablePtmFileName"] != "" && arguments["variablePtmNum"]!="0") {
     output << std::setw(gap) << std::left <<  "Maximum number of variable modifications:" << sep << arguments["variablePtmNum"] << std::endl;
-    output << std::setw(gap) << std::left << "Variable modifications file name:" << sep << arguments["residueModFileName"] << std::endl;
+    output << std::setw(gap) << std::left << "Variable modifications file name:" << sep << arguments["variablePtmFileName"] << std::endl;
     output << std::setw(gap) << std::left <<  "Variable modifications BEGIN" << std::endl;
-    std::vector<std::vector<std::string>> mod_data = mod_util::readModTxtForTsv(arguments["residueModFileName"]);
+    std::vector<std::vector<std::string>> mod_data = mod_util::readModTxtForTsv(arguments["variablePtmFileName"]);
     for (size_t i = 0; i < mod_data.size(); i++) {
       output << std::setw(gap) << std::left << mod_data[i][0] << sep << mod_data[i][1] << sep << mod_data[i][2] << std::endl;
     }
     output << std::setw(gap) << std::left <<  "Variable modifications END" << std::endl;
   }
 
-  output << std::setw(gap) << std::left << "Maximum number of unexpected modifications:" << sep << arguments["ptmNumber"] << std::endl;
-  output << std::setw(gap) << std::left << "Maximum mass shift of modifications:" << sep << arguments["maxPtmMass"] << " Da" << std::endl;
-  output << std::setw(gap) << std::left << "Minimum mass shift of modifications:" << sep << arguments["minPtmMass"] << " Da" << std::endl;
+  output << std::setw(gap) << std::left << "Maximum number of unexpected modifications:" << sep << arguments["shiftNumber"] << std::endl;
+  output << std::setw(gap) << std::left << "Maximum mass shift of modifications:" << sep << arguments["maxShiftMass"] << " Da" << std::endl;
+  output << std::setw(gap) << std::left << "Minimum mass shift of modifications:" << sep << arguments["minShiftMass"] << " Da" << std::endl;
   output << std::setw(gap) << std::left << "Spectrum-level cutoff type:" << sep << arguments["cutoffSpectralType"] << std::endl;
   output << std::setw(gap) << std::left << "Spectrum-level cutoff value:" << sep << arguments["cutoffSpectralValue"] << std::endl;
   output << std::setw(gap) << std::left << "Proteoform-level cutoff type:" << sep << arguments["cutoffProteoformType"] << std::endl;
@@ -152,9 +152,16 @@ void ToppicArgument::outputArguments(std::ostream &output,
     output << std::setw(gap) << std::left << "E-value computation:" << sep << "Generating function" << std::endl;
   }
 
-  if (arguments["doLocalization"] == "true") {
+  if (arguments["localPtmFileName"] != "") {
     output << std::setw(gap) << std::left << "Localization with MIScore:" << sep << "True" << std::endl;
     output << std::setw(gap) << std::left << "MIScore threshold:" << sep << arguments["localThreshold"] << std::endl;
+    output << std::setw(gap) << std::left << "Localization modification file name:" << sep << arguments["localPtmFileName"] << std::endl;
+    output << std::setw(gap) << std::left <<  "Localization modifications BEGIN" << std::endl;
+    std::vector<std::vector<std::string>> local_mod_data = mod_util::readModTxtForTsv(arguments["localPtmFileName"]);
+    for (size_t i = 0; i < local_mod_data.size(); i++) {
+      output << std::setw(gap) << std::left << local_mod_data[i][0] << sep << local_mod_data[i][1] << sep << local_mod_data[i][2] << std::endl;
+    }
+    output << std::setw(gap) << std::left <<  "Localization modifications END" << std::endl;
   }
   else {
     output << std::setw(gap) << std::left << "Localization with MIScore:" << sep << "False" << std::endl;
@@ -193,10 +200,10 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
   std::string allow_mod = "";
   std::string n_term_label_mass = "";
   std::string variable_ptm_num = "";
-  std::string residue_mod_file_name = "";
-  std::string ptm_num = "";
-  std::string min_ptm_mass = "";
-  std::string max_ptm_mass = "";
+  std::string variable_ptm_file_name = "";
+  std::string shift_num = "";
+  std::string min_shift_mass = "";
+  std::string max_shift_mass = "";
   std::string mass_error_tole = "";
   std::string form_error_tole = "";
   std::string cutoff_spectral_type = "";
@@ -204,6 +211,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
   std::string cutoff_proteoform_type = "";
   std::string cutoff_proteoform_value = "";
   std::string use_table = "";
+  std::string local_ptm_file_name = "";
   std::string local_threshold = "";
   std::string group_num = "";
   std::string combined_output_name = "";
@@ -224,11 +232,11 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         ("n-terminal-form,n", po::value<std::string> (&allow_mod), 
          "<a list of allowed N-terminal forms>. N-terminal forms of proteins. Four N-terminal forms can be selected: NONE, NME, NME_ACETYLATION, and M_ACETYLATION. NONE stands for no modifications, NME for N-terminal methionine excision, NME_ACETYLATION for N-terminal acetylation after the initiator methionine is removed, and M_ACETYLATION for N-terminal methionine acetylation. When multiple forms are allowed, they are separated by commas. Default value: NONE,NME,NME_ACETYLATION,M_ACETYLATION.")
         //("n-terminal-label,N", po::value<std::string> (&n_term_label_mass), "N-terminal modification mass for iTRAQ or TMT labeling. Default value: 0")
-        ("variable-ptm-num,v", po::value<std::string> (&variable_ptm_num), "Maximum number of variable modifications in a proteoform-spectrum-match. Default value: 3.")
-        ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "<a variable modification file>. Specify a text file containing the information of varaible modifications.")
-        ("num-shift,s", po::value<std::string> (&ptm_num), "<0|1|2>. Maximum number of unexpected modifications in a proteoform-spectrum-match. Default value: 1.")
-        ("min-shift,m", po::value<std::string> (&min_ptm_mass), "Minimum value of the mass shift of an unexpected modification. Default value: -500 Dalton.")
-        ("max-shift,M", po::value<std::string> (&max_ptm_mass), "Maximum value of the mass shift of an unexpected modification. Default value: 500 Dalton.")
+        ("variable-ptm-num,S", po::value<std::string> (&variable_ptm_num), "Maximum number of variable modifications in a proteoform-spectrum-match. Default value: 3.")
+        ("variable-ptm-file-name,b", po::value<std::string>(&variable_ptm_file_name), "<a variable modification file>. Specify a text file containing the information of varaible modifications.")
+        ("num-shift,s", po::value<std::string> (&shift_num), "<0|1|2>. Maximum number of unexpected modifications in a proteoform-spectrum-match. Default value: 1.")
+        ("min-shift,m", po::value<std::string> (&min_shift_mass), "Minimum value of the mass shift of an unexpected modification. Default value: -500 Dalton.")
+        ("max-shift,M", po::value<std::string> (&max_shift_mass), "Maximum value of the mass shift of an unexpected modification. Default value: 500 Dalton.")
         ("decoy,d", "Use a shuffled decoy protein database to estimate false discovery rates.")
         ("mass-error-tolerance,e", po::value<std::string> (&mass_error_tole), "<a positive integer>. Error tolerance for precursor and fragment masses in PPM. Default value: 15.")
         ("proteoform-error-tolerance,p", po::value<std::string> (&form_error_tole), "<a positive number>. Error tolerance for identifying PrSM clusters. Default value: 1.2 Dalton.")
@@ -237,7 +245,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         ("proteoform-cutoff-type,T", po::value<std::string> (&cutoff_proteoform_type), "<EVALUE|FDR>. Proteoform-level cutoff type for filtering identified proteoform-spectrum-matches. Default value: EVALUE.")
         ("proteoform-cutoff-value,V", po::value<std::string> (&cutoff_proteoform_value), "<a positive number>. Proteoform-level cutoff value for filtering identified proteoform-spectrum-matches. Default value: 0.01.")
         ("lookup-table,l", "Use a lookup table method for computing p-values and E-values.")
-        ("localization-with-miscore,L", "Use MIScore for modification localization.")
+        ("local-ptm-file-name,B", po::value<std::string>(&local_ptm_file_name), "<a common modification file>. Specify a text file containing the information of common modifications for the characterization of unexpected shifts.")
         ("miscore-threshold,H", po::value<std::string> (&local_threshold), "<a positive number between 0 and 1>. Score threshold (modification identification score) for filtering results of modification characterization. Default value: 0.15.")
         ("num-combined-spectra,r", po::value<std::string> (&group_num), 
          "<a positive integer>. Number of combined spectra. The parameter is set to 2 (or 3) for combining spectral pairs (or triplets) generated by the alternating fragmentation mode. Default value: 1")
@@ -256,11 +264,11 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         ("fixed-mod,f", po::value<std::string> (&fixed_mod), "")
         ("n-terminal-form,n", po::value<std::string> (&allow_mod), "")
         ("n-terminal-label,N", po::value<std::string> (&n_term_label_mass), "")
-        ("variable-ptm-num,v", po::value<std::string> (&variable_ptm_num), "")
-        ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "")
-        ("num-shift,s", po::value<std::string> (&ptm_num), "")
-        ("min-shift,m", po::value<std::string> (&min_ptm_mass), "")
-        ("max-shift,M", po::value<std::string> (&max_ptm_mass), "")
+        ("variable-ptm-num,S", po::value<std::string> (&variable_ptm_num), "")
+        ("variable-ptm-file-name,b", po::value<std::string>(&variable_ptm_file_name), "")
+        ("num-shift,s", po::value<std::string> (&shift_num), "")
+        ("min-shift,m", po::value<std::string> (&min_shift_mass), "")
+        ("max-shift,M", po::value<std::string> (&max_shift_mass), "")
         ("decoy,d", "")
         ("mass-error-tolerance,e", po::value<std::string> (&mass_error_tole), "")
         ("proteoform-error-tolerance,p", po::value<std::string> (&form_error_tole), "")
@@ -269,7 +277,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         ("proteoform-cutoff-type,T", po::value<std::string> (&cutoff_proteoform_type), "")
         ("proteoform-cutoff-value,V", po::value<std::string> (&cutoff_proteoform_value), "")
         ("lookup-table,l", "")
-        ("localization-with-miscore,L", "") 
+        ("local-ptm-file-name,b", po::value<std::string>(&local_ptm_file_name), "")
         ("miscore-threshold,H", po::value<std::string> (&local_threshold), "")
         ("num-combined-spectra,r", po::value<std::string> (&group_num), "")
         ("combined-file-name,c", po::value<std::string>(&combined_output_name) , "")
@@ -342,20 +350,20 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
       arguments_["variablePtmNum"] = variable_ptm_num;
     }
 
-    if (vm.count("mod-file-name")) {
-      arguments_["residueModFileName"] = residue_mod_file_name;
+    if (vm.count("variable-ptm-file-name")) {
+      arguments_["variablePtmFileName"] = variable_ptm_file_name;
     }
 
     if (vm.count("num-shift")) {
-      arguments_["ptmNumber"] = ptm_num;
+      arguments_["shiftNumber"] = shift_num;
     }
 
     if (vm.count("min-shift")) {
-      arguments_["minPtmMass"] = min_ptm_mass;
+      arguments_["minShiftMass"] = min_shift_mass;
     }
 
     if (vm.count("max-shift")) {
-      arguments_["maxPtmMass"] = max_ptm_mass;
+      arguments_["maxShiftMass"] = max_shift_mass;
     }
 
     if (vm.count("decoy")) {
@@ -396,8 +404,8 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
       arguments_["useLookupTable"] = "true";
     }
 
-    if (vm.count("localization-with-miscore")) {
-      arguments_["doLocalization"] = "true";
+    if (vm.count("local-ptm-file-name")) {
+      arguments_["localPtmFileName"] = local_ptm_file_name;
     }
 
     if (vm.count("miscore-threshold")) {
@@ -501,9 +509,9 @@ bool ToppicArgument::validateArguments() {
     return false;
   }
 
-  std::string ptm_number = arguments_["ptmNumber"];
-  if (ptm_number != "0" && ptm_number != "1" && ptm_number != "2") {
-    LOG_ERROR("Unexpected modification number "<< ptm_number <<" error! The value should be 0|1|2!");
+  std::string shift_number = arguments_["shiftNumber"];
+  if (shift_number != "0" && shift_number != "1" && shift_number != "2") {
+    LOG_ERROR("Unexpected modification number "<< shift_number <<" error! The value should be 0|1|2!");
     return false;
   }
 
@@ -563,22 +571,31 @@ bool ToppicArgument::validateArguments() {
     return false;
   }
 
-  std::string max_ptm_mass = arguments_["maxPtmMass"];
+  std::string min_shift_mass = arguments_["minShiftMass"];
   try {
-    double mass = std::stod(max_ptm_mass.c_str());
+    std::stod(min_shift_mass);
+  }
+  catch (const std::exception& ex) {
+    LOG_ERROR("Minimum modification mass " << min_shift_mass << " should be a number.");
+    return false;
+  }
+
+  std::string max_shift_mass = arguments_["maxShiftMass"];
+  try {
+    double mass = std::stod(max_shift_mass);
     if(mass <= 0.0){
-      LOG_ERROR("Maximum modification mass " << max_ptm_mass << " error! The value should be positive.");
+      LOG_ERROR("Maximum modification mass " << max_shift_mass << " error! The value should be positive.");
       return false;
     }
   }
   catch (const std::exception& ex) {
-    LOG_ERROR("Maximum modification mass " << max_ptm_mass << " should be a number.");
+    LOG_ERROR("Maximum modification mass " << max_shift_mass << " should be a number.");
     return false;
   }
 
   std::string n_term_label_mass = arguments_["nTermLabelMass"];
   try {
-    double mass = std::stod(n_term_label_mass.c_str());
+    double mass = std::stod(n_term_label_mass);
     if(mass < 0.0){
       LOG_ERROR("N-terminal label mass " << n_term_label_mass << " error! The value should be positive.");
       return false;
@@ -643,18 +660,9 @@ bool ToppicArgument::validateArguments() {
     return false;
   }
 
-  std::string mod_file_name = arguments_["residueModFileName"]; 
-  std::string do_localization = arguments_["doLocalization"];
-
-  if (do_localization == "true" && mod_file_name == ""){
-    LOG_ERROR("Localization by MIScore cannot be selected when no variable modification file is given! Please add argument '-i' in the command.");
-    return false;
-  }
-
-
   std::string thread_number = arguments_["threadNumber"];
   try {
-    int num = std::stoi(thread_number.c_str());
+    int num = std::stoi(thread_number);
     bool valid = mem_check::checkThreadNum(num, "toppic");
     if (!valid) {
       return false;

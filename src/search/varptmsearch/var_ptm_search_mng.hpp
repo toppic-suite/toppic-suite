@@ -46,6 +46,9 @@ class VarPtmSearchMng {
 
   // variable PTM mass shift list 
   std::vector<double> single_shift_list_;
+  std::vector<int> round_single_shift_list_;
+  double round_scale_ = 10000;
+
   // amino acid list that can be modified by the shift
   ModPtrVec2D mod_ptr_vec_2d_;
 
@@ -53,6 +56,7 @@ class VarPtmSearchMng {
 
   // shift list for single and multiple (up to var_ptm_num) variable PTMs  
   std::vector<double> shift_list_;
+  std::vector<int> round_shift_list_;
 
   std::vector<std::vector<int>> diag_prev_idxes_;
 

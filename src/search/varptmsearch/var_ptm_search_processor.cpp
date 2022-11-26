@@ -16,6 +16,7 @@
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
+#include "common/base/prot_mod_util.hpp"
 #include "seq/proteoform.hpp"
 #include "seq/proteoform_factory.hpp"
 #include "ms/spec/msalign_util.hpp"
@@ -29,25 +30,34 @@
 
 namespace toppic {
 
-ProtModPtr findMatchedProtModPtr(ProtModPtrVec &mod_ptr_vec, double n_term_shift) {
+ProtModPtr findMatchedProtModPtr(ProteoformPtr db_proteo_ptr, 
+                                 ProtModPtrVec &mod_ptr_vec, 
+                                 double n_term_shift) {
+  ResSeqPtr db_res_seq_ptr = db_proteo_ptr->getResSeqPtr();
+  ResiduePtrVec residues = db_res_seq_ptr->getResidues();
   for (size_t i = 0; i < mod_ptr_vec.size(); i++) {
     double mod_shift = mod_ptr_vec[i]->getProtShift();
-    if (mod_shift == n_term_shift) {
-      return mod_ptr_vec[i];
+    // allow small errors introduced in double addition
+    if (abs(mod_shift - n_term_shift) < 0.0001) {
+      bool valid_mod = prot_mod_util::allowMod(mod_ptr_vec[i], residues); 
+      if (valid_mod) {
+        return mod_ptr_vec[i];
+      }
     }
   }
   LOG_ERROR("Failed to find protein modification!" << n_term_shift);
   exit(EXIT_FAILURE);
 }
 
-int findMatchedPos(ProteoformPtr proteo_ptr, double n_term_shift) {
+int findMatchedPos(ProteoformPtr proteo_ptr, double n_term_trunc) {
   std::vector<double> prms = proteo_ptr->getBpSpecPtr()->getPrmMasses();
   for (size_t i = 0; i < prms.size(); i++) {
-    if (prms[i] == n_term_shift) {
+    // allow small errors introduced in double addition
+    if (abs(prms[i] - n_term_trunc) < 0.0001) {
       return i;
     }
   }
-  LOG_ERROR("Failed to find start posisiton!" << n_term_shift);
+  LOG_ERROR("Failed to find start posisiton!" << n_term_trunc);
   exit(EXIT_FAILURE);
 }
 
@@ -67,6 +77,7 @@ PrsmPtrVec VarPtmSearchProcessor::varPtmSearchOneSpec(SpectrumSetPtr spec_set_pt
         = proteoform_factory::readFastaToProteoformPtr(reader_ptr, seq_name, seq_desc, fix_mod_list);
     double n_term_shift = simple_prsm_ptr->getNTermShifts()[0];
     double c_term_shift = simple_prsm_ptr->getCTermShifts()[0];
+    LOG_DEBUG("type " << type_ptr->getName() << " n_term_shift " << n_term_shift << " c term shift " << c_term_shift);
     
     ProteoformPtr proteo_with_prot_mod_ptr = db_proteo_ptr;
     // start position is relative to the database sequence
@@ -74,24 +85,30 @@ PrsmPtrVec VarPtmSearchProcessor::varPtmSearchOneSpec(SpectrumSetPtr spec_set_pt
     if (type_ptr == ProteoformType::COMPLETE || type_ptr == ProteoformType::PREFIX) {
       if (n_term_shift != 0) {
         // Get the proteoform with N-terminal modificaiton
-        ProtModPtr prot_mod_ptr = findMatchedProtModPtr(prot_mod_ptr_vec, n_term_shift);
+        ProtModPtr prot_mod_ptr = findMatchedProtModPtr(db_proteo_ptr, prot_mod_ptr_vec, n_term_shift);
+        LOG_DEBUG("Db seq: " << db_proteo_ptr->getProteoformMatchSeq());
         proteo_with_prot_mod_ptr = proteoform_factory::geneProtModProteoform(db_proteo_ptr, prot_mod_ptr);
+        if (proteo_with_prot_mod_ptr == nullptr) {
+          LOG_ERROR("Null proteoform is reported!");
+          exit(EXIT_FAILURE);
+        }
         start_pos = proteo_with_prot_mod_ptr->getStartPos();
-        LOG_DEBUG("Start pos with N terminal mod" << start_pos);
+        LOG_DEBUG("Start pos with N terminal mod: " << start_pos);
       }
     }
     else {
-      //type_ptr == ProteoformType::SUFFIX || type_ptr == ProteoformType::INTERNAL
-      start_pos = findMatchedPos(db_proteo_ptr, n_term_shift);
+      double n_term_trunc = - n_term_shift;
+      start_pos = findMatchedPos(db_proteo_ptr, n_term_trunc);
     }
     int end_pos = db_proteo_ptr->getEndPos();
     if (type_ptr == ProteoformType::PREFIX || type_ptr == ProteoformType::INTERNAL) {
       double proteo_minus_water_mass = db_proteo_ptr->getMinusWaterMass();
-      double mass = proteo_minus_water_mass - c_term_shift;
+      double n_term_trunc = proteo_minus_water_mass + c_term_shift;
       // the reported position is the position of matched breakpoint
       // the sequence end position is breakpoint position - 1
-      end_pos = findMatchedPos(db_proteo_ptr, mass) - 1; 
+      end_pos = findMatchedPos(db_proteo_ptr, n_term_trunc) - 1; 
     }
+    LOG_DEBUG("Start pos " << start_pos << " end position " << end_pos); 
     
     // get the start and end positions relative to the proteoform with
     // N-terminal modification
@@ -102,7 +119,9 @@ PrsmPtrVec VarPtmSearchProcessor::varPtmSearchOneSpec(SpectrumSetPtr spec_set_pt
                                                                          fasta_seq_ptr,
                                                                          local_start_pos, 
                                                                          local_end_pos);
-
+    LOG_DEBUG("sub seq: " << sub_proteo_ptr->getProteoformMatchSeq());
+    LOG_DEBUG("protein mass " << sub_proteo_ptr->getMass() 
+              << "proteoform mass diff " << (simple_prsm_ptr->getPrecMass() - sub_proteo_ptr->getMass()));
     proteoform_ptr_vec.push_back(sub_proteo_ptr);
   }
 
@@ -110,6 +129,7 @@ PrsmPtrVec VarPtmSearchProcessor::varPtmSearchOneSpec(SpectrumSetPtr spec_set_pt
   for (size_t i = 0; i < proteoform_ptr_vec.size(); i++) {
     VarPtmSlowMatch slow_match(proteoform_ptr_vec[i], spec_set_ptr, mng_ptr);
     PrsmPtr tmp = slow_match.compute();
+    LOG_DEBUG("Slow match computation finish!");
     if (tmp != nullptr) {
       prsms.push_back(tmp);
     }
@@ -160,18 +180,21 @@ void VarPtmSearchProcessor::process() {
     cnt+= group_spec_num;
     if (spec_set_ptr->isValid()) {
       int spec_id = spec_set_ptr->getSpectrumId();
+      
       // complete
       SimplePrsmPtrVec comp_selected_prsm_ptrs;
       while (comp_prsm_ptr != nullptr && comp_prsm_ptr->getSpectrumId() == spec_id) {
         comp_selected_prsm_ptrs.push_back(comp_prsm_ptr);
         comp_prsm_ptr = comp_prsm_reader.readOnePrsm();
       }
+      LOG_DEBUG("complete list size " << comp_selected_prsm_ptrs.size());
       if (comp_selected_prsm_ptrs.size() > 0) {
         // LOG_DEBUG("start processing one spectrum.");
         PrsmPtrVec prsms = varPtmSearchOneSpec(spec_set_ptr, comp_selected_prsm_ptrs,
                                                reader_ptr, mng_ptr_, ProteoformType::COMPLETE);
         comp_writer.writeVector(prsms);
       }
+     
 
       // prefix
       SimplePrsmPtrVec pref_selected_prsm_ptrs;
@@ -179,6 +202,7 @@ void VarPtmSearchProcessor::process() {
         pref_selected_prsm_ptrs.push_back(pref_prsm_ptr);
         pref_prsm_ptr = pref_prsm_reader.readOnePrsm();
       }
+      LOG_DEBUG("prefix list size " << pref_selected_prsm_ptrs.size());
       if (pref_selected_prsm_ptrs.size() > 0) {
         // LOG_DEBUG("start processing one spectrum.");
         PrsmPtrVec prsms = varPtmSearchOneSpec(spec_set_ptr, pref_selected_prsm_ptrs,
@@ -192,6 +216,7 @@ void VarPtmSearchProcessor::process() {
         suff_selected_prsm_ptrs.push_back(suff_prsm_ptr);
         suff_prsm_ptr = suff_prsm_reader.readOnePrsm();
       }
+      LOG_DEBUG("suffix list size " << suff_selected_prsm_ptrs.size());
       if (suff_selected_prsm_ptrs.size() > 0) {
         // LOG_DEBUG("start processing one spectrum.");
         PrsmPtrVec prsms = varPtmSearchOneSpec(spec_set_ptr, suff_selected_prsm_ptrs,
@@ -205,6 +230,7 @@ void VarPtmSearchProcessor::process() {
         internal_selected_prsm_ptrs.push_back(internal_prsm_ptr);
         internal_prsm_ptr = internal_prsm_reader.readOnePrsm();
       }
+      LOG_DEBUG("internal list size " << internal_selected_prsm_ptrs.size());
       if (internal_selected_prsm_ptrs.size() > 0) {
         // LOG_DEBUG("start processing one spectrum.");
         PrsmPtrVec prsms = varPtmSearchOneSpec(spec_set_ptr, internal_selected_prsm_ptrs,
