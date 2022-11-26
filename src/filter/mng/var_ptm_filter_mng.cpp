@@ -30,34 +30,45 @@ VarPtmFilterMng::VarPtmFilterMng(PrsmParaPtr prsm_para_ptr,
   thread_num_(thread_num),
   output_file_ext_(output_file_ext) {
     single_shift_list_ = mod_util::readModTxtToShiftList(var_ptm_file_name);
-    shift_list_ = computeShifts(single_shift_list_, var_ptm_num_);
-    LOG_DEBUG("Number of shifts:" << shift_list_.size());
+    // round single shift list
+    for (size_t i = 0; i < single_shift_list_.size(); i++) {
+      int round_shift = std::lround(single_shift_list_[i] * round_scale);
+      round_single_shift_list_.push_back(round_shift);
+    }
+    LOG_ERROR("Number of single shifts:" << round_single_shift_list_.size());
+    // use integer to avoid errors in double addition
+    round_shift_list_ = computeShifts(round_single_shift_list_, var_ptm_num_);
+    for (size_t i = 0; i < round_shift_list_.size(); i++) {
+      double shift = round_shift_list_[i] /round_scale; 
+      shift_list_.push_back(shift);
+    }
+
+    // convert to integer again using filter scaling factor
+    LOG_ERROR("Number of shifts:" << shift_list_.size());
     for (size_t i = 0; i < shift_list_.size(); i++) {
-      LOG_DEBUG("Shifts:" << i << " " << shift_list_[i]);
+      LOG_ERROR("Shifts:" << i << " " << shift_list_[i]);
       int int_shift = std::round(shift_list_[i] * filter_scale_); 
-      if (std::find(int_shift_list_.begin(), int_shift_list_.end(), int_shift) 
-          != int_shift_list_.end()) {
-        int_shift_list_.push_back(int_shift);
-      }
+      int_shift_list_.push_back(int_shift);
     }
   }
 
-std::vector<double> VarPtmFilterMng::computeShifts(std::vector<double> &single_shift_list,
-                                                   int var_ptm_num) {
-  std::vector<double> shift_list;
-  shift_list.push_back(0);
-  for (int i = 0; i <= var_ptm_num; i++) {
-    size_t cur_list_len = shift_list.size();
+std::vector<int> VarPtmFilterMng::computeShifts(std::vector<int> &round_single_shift_list,
+                                                int var_ptm_num) {
+  std::vector<int> round_shift_list;
+  round_shift_list.push_back(0);
+  for (int i = 0; i < var_ptm_num; i++) {
+    size_t cur_list_len = round_shift_list.size();
     for (size_t j = 0; j < cur_list_len; j++) {
-      for (size_t k = 0; k < single_shift_list.size(); k++) {
-        double new_shift = shift_list[j] + single_shift_list[k];
+      for (size_t k = 0; k < round_single_shift_list.size(); k++) {
+        int new_shift = round_shift_list[j] + round_single_shift_list[k];
         // if the new shift is not in the list
-        if (std::find(shift_list.begin(), shift_list.end(), new_shift) != shift_list.end()) {
-          shift_list.push_back(new_shift);
+        if (std::find(round_shift_list.begin(), round_shift_list.end(), new_shift)
+            == round_shift_list.end()) {
+          round_shift_list.push_back(new_shift);
         }
       }
     }
   }
-  return shift_list;
+  return round_shift_list;
 }
 }

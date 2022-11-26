@@ -179,14 +179,16 @@ std::vector<double> readModTxtToShiftList(const std::string &file_name) {
   ModPtrVec2D mod_ptr_list_2d = readModTxt(file_name);
   // consider only modifications with the property anywhere
   ModPtrVec mod_ptr_list = mod_ptr_list_2d[2];
+  LOG_DEBUG("Mod list size " << mod_ptr_list.size());
   std::vector<double> shift_list; 
   for (size_t i = 0; i < mod_ptr_list.size(); i++) {
     double shift = mod_ptr_list[i]->getShift();
     // if the shift is not in the list
-    if (std::find(shift_list.begin(), shift_list.end(), shift) != shift_list.end()) {
+    if (std::find(shift_list.begin(), shift_list.end(), shift) == shift_list.end()) {
       shift_list.push_back(shift);
     }
   }
+  LOG_DEBUG("Shift list size " << shift_list.size());
   return shift_list;
 }
 

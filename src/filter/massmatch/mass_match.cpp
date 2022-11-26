@@ -265,8 +265,11 @@ void MassMatch::updatePrecScore(const std::pair<int, int> mass_error,
   }
 
   int right = m + mass_error.second;
+  if (right >= col_num_) {
+    right = col_num_ - 1;
+  }
 
-  if (right >= 0 && right < col_num_) {
+  if (left <= right) {
     // update scores
     begin_index = col_index_begins_[left];
     end_index   = col_index_ends_[right];

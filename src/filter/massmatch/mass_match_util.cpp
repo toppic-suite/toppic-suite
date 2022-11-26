@@ -269,10 +269,14 @@ ProtCandidatePtrVec findVarPtmTopProteins(std::vector<short> &scores,
         double n_trunc_shift = trunc_shifts[prec_match_rows[j]];
         double c_trunc_shift = rev_trunc_shifts[rev_prec_match_rows[k]];
         double mass = proteo_minus_water_masses[i] + n_trunc_shift + c_trunc_shift; 
+        if (mass < 0) {
+          continue;
+        }
         double score = scores[prec_match_rows[j]] + rev_scores[rev_prec_match_rows[k]];
         bool mass_match = false;
         for (size_t s = 0; s < ptm_shifts.size(); s++) {
           double shift_mass = mass + ptm_shifts[s];
+          //LOG_DEBUG("shift mass " << shift_mass << " min mass " << min_mass << " max mass " << max_mass);
           if (shift_mass >= min_mass && shift_mass <= max_mass) {
             mass_match = true;
             break;

@@ -27,7 +27,7 @@ PrsmPara::PrsmPara(std::map<std::string, std::string> &arguments) {
 
   search_db_file_name_ = file_util::filenameFromEntirePath(arguments["databaseFileName"]);
 
-  search_db_file_name_with_folder_ = search_db_file_name_ + "_idx" 
+  search_db_file_name_with_folder_ = ori_db_name_ + "_idx" 
     + file_util::getFileSeparator() + search_db_file_name_;
 
   spec_file_name_ = arguments["spectrumFileName"];

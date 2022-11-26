@@ -19,17 +19,41 @@ namespace toppic {
 OnePtmFilterMng::OnePtmFilterMng(PrsmParaPtr prsm_para_ptr,
                                  const std::string & index_file_para,
                                  const std::string & output_file_ext,
-                                 double min_shift,
-                                 double max_shift,
+                                 int thread_num): 
+    prsm_para_ptr_(prsm_para_ptr),
+    index_file_para_(index_file_para),
+    output_file_ext_(output_file_ext),
+    thread_num_(thread_num) {}
+
+  // for one shift filter in TopPIC
+OnePtmFilterMng::OnePtmFilterMng(PrsmParaPtr prsm_para_ptr,
+                                 const std::string & index_file_para,
+                                 const std::string & output_file_ext,
                                  int thread_num,
-                                 const std::string & residueModFileName,
+                                 double min_shift,
+                                 double max_shift):  
+  prsm_para_ptr_(prsm_para_ptr),
+  index_file_para_(index_file_para),
+  output_file_ext_(output_file_ext),
+  thread_num_(thread_num),
+  min_shift_(min_shift),
+  max_shift_(max_shift) {}
+
+  // for One shift filter in TopMG
+OnePtmFilterMng::OnePtmFilterMng(PrsmParaPtr prsm_para_ptr,
+                                 const std::string & index_file_para,
+                                 const std::string & output_file_ext,
+                                 int thread_num,
+                                 double min_shift,
+                                 double max_shift,  
+                                 const std::string & residueModFileName, 
                                  int var_num):
     prsm_para_ptr_(prsm_para_ptr),
     index_file_para_(index_file_para),
     output_file_ext_(output_file_ext),
+    thread_num_(thread_num),
     min_shift_(min_shift),
     max_shift_(max_shift),
-    thread_num_(thread_num),
     residueModFileName_(residueModFileName),
     var_num_(var_num) {}
 

@@ -30,8 +30,8 @@ class VarPtmFilterMng {
                   int thread_num,
                   const std::string &output_file_ext);
 
-  static std::vector<double> computeShifts(std::vector<double> &single_shift_list,
-                                           int var_ptm_num); 
+  static std::vector<int> computeShifts(std::vector<int> &round_single_shift_list,
+                                        int var_ptm_num); 
 
   PrsmParaPtr getPrsmPtr(){return prsm_para_ptr_;}
 
@@ -69,9 +69,13 @@ class VarPtmFilterMng {
     "zero_ptm_rev_term_index", "zero_ptm_rev_diag_index"};
   
   // variable PTM mass shift list 
+  // use integer to avoid errors in double addition
+  double round_scale = 10000;
+  std::vector<int> round_single_shift_list_;
   std::vector<double> single_shift_list_;
 
   // shift list for single and multiple (up to var_ptm_num) variable PTMs  
+  std::vector<int> round_shift_list_;
   std::vector<double> shift_list_;
   std::vector<int> int_shift_list_;
 };

@@ -30,8 +30,6 @@ class PrsmPara {
 
   std::string getOriDbName() {return ori_db_name_;}
 
-  //std::string getSearchDbFileName() {return search_db_file_name_;}
-
   std::string getSearchDbFileNameWithFolder() {return search_db_file_name_with_folder_;}
 
   std::string getDbIndexDir() {return ori_db_name_ + "_idx";}

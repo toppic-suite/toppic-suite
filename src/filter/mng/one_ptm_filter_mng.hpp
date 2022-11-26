@@ -23,14 +23,29 @@ namespace toppic {
 
 class OnePtmFilterMng {
  public:
+  // for index generation
   OnePtmFilterMng(PrsmParaPtr prsm_para_ptr,
                   const std::string & index_file_para,
                   const std::string & output_file_ext,
-                  double min_shift,
-                  double max_shift,
+                  int thread_num);
+
+  // for one shift filter in TopPIC
+  OnePtmFilterMng(PrsmParaPtr prsm_para_ptr,
+                  const std::string & index_file_para,
+                  const std::string & output_file_ext,
                   int thread_num,
-                  const std::string & residueModFileName = "",
-                  int var_num = 0);
+                  double min_shift,
+                  double max_shift); 
+
+  // for One shift filter in TopMG
+  OnePtmFilterMng(PrsmParaPtr prsm_para_ptr,
+                  const std::string & index_file_para,
+                  const std::string & output_file_ext,
+                  int thread_num,
+                  double min_shift,
+                  double max_shift,  
+                  const std::string & residueModFileName, 
+                  int var_num);
 
   std::string getIndexFilePara() {return index_file_para_;}
 
@@ -51,14 +66,14 @@ class OnePtmFilterMng {
 
   std::string output_file_ext_;
 
+  int thread_num_;
+
   double min_shift_= -500;
   double max_shift_ = 500;
 
-  int thread_num_;
+  std::string residueModFileName_ = "";
 
-  std::string residueModFileName_;
-
-  int var_num_;
+  int var_num_ = 0;
 
   int n_spec_block_ = 0;
 

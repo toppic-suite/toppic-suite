@@ -105,13 +105,15 @@ std::vector<std::pair<int, int>> getShiftedMassErrors(std::pair<int, int> mass_e
                                                       std::vector<int> shifts) {
   std::vector<std::pair<int,int>> result;
   for (size_t i = 0; i < shifts.size(); i++) {
-    std::pair<int, int> m_e (mass_error.first + shifts[i], mass_error.second);
+    // skip shift 0
+    if (shifts[i] == 0) {
+      continue;
+    }
+    std::pair<int, int> m_e (mass_error.first - shifts[i], mass_error.second);
     result.push_back(m_e);
   }
   return result;
 }
-
-
 
 void VarPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec) {
   PeakTolerancePtr tole_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
@@ -126,6 +128,10 @@ void VarPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec) {
                                                                         mng_ptr_->filter_scale_);
   std::vector<std::pair<int, int> > prec_minus_water_mass_errors 
     = getShiftedMassErrors(prec_minus_water_mass_error, mng_ptr_->int_shift_list_);
+  //LOG_ERROR("Shift list size " << mng_ptr_->int_shift_list_.size());
+  //for (size_t k = 0; k < prec_minus_water_mass_errors.size(); k++) {
+  //  LOG_ERROR("precursor mass " << prec_minus_water_mass_errors[k].first << " " << prec_minus_water_mass_errors[k].second);
+  //}
 
   int term_row_num = term_index_ptr_->getRowNum();
   std::vector<short> term_scores(term_row_num, 0);
@@ -199,6 +205,7 @@ void VarPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec) {
                                              prec_minus_water_mass, prec_error_tole,
                                              mng_ptr_->shift_list_,
                                              threshold, mng_ptr_->inte_num_);  
+  //LOG_ERROR("Internal match prot " << pref_prots.size());
   internal_match_ptrs_.clear();
   for (size_t i = 0; i < internal_prots.size(); i++) {
     int id = internal_prots[i]->getProteinId();

@@ -232,6 +232,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     std::vector<std::string> no_var_input_exts;
     std::vector<std::string> var_input_exts;
 
+    /*
     std::cout << "Zero unexpected shift filtering - started." << std::endl;
     ZeroPtmFilterMngPtr zero_filter_mng_ptr
         = std::make_shared<ZeroPtmFilterMng>(prsm_para_ptr, index_file_para, 
@@ -252,6 +253,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     no_var_input_exts.push_back("toppic_zero_shift_prefix");
     no_var_input_exts.push_back("toppic_zero_shift_suffix");
     no_var_input_exts.push_back("toppic_zero_shift_internal");
+    */
 
     // var_ptm_type number is used for E-value computation
     int var_ptm_type_num = 0;
@@ -286,8 +288,8 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
       OnePtmFilterMngPtr one_ptm_filter_mng_ptr
           = std::make_shared<OnePtmFilterMng>(prsm_para_ptr, index_file_para, 
                                               "toppic_one_filter", 
-                                              min_ptm_mass, max_ptm_mass,
-                                              filter_thread_num);
+                                              filter_thread_num, 
+                                              min_ptm_mass, max_ptm_mass); 
       one_ptm_filter_processor::process(one_ptm_filter_mng_ptr);
       std::cout << "One unexpected shift filtering - finished." << std::endl;
 
