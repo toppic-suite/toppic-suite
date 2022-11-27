@@ -161,7 +161,7 @@ void OnePtmSearchProcessor::process() {
         internal_writer.writeVector(prsms);
       }
     }
-    std::cout << std::flush <<  "One PTM search - processing " << cnt
+    std::cout << std::flush <<  "One unexpected shift search - processing " << cnt
         << " of " << spectrum_num << " spectra.\r";
   }
   int remainder = spectrum_num - cnt;
@@ -170,7 +170,7 @@ void OnePtmSearchProcessor::process() {
       //fix the message as the processing is completed.
       //this code avoids error when no combined spectra is used but a scan is remaining unprocessed
       //because then it will not satisfy the first condition
-      std::cout << std::flush <<  "One PTM search - processing " << spectrum_num
+      std::cout << std::flush <<  "One unexpected shift search - processing " << spectrum_num
         << " of " << spectrum_num << " spectra.\r";
   } 
   comp_prsm_reader.close();

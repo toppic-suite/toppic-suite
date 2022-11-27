@@ -212,6 +212,7 @@ ProtCandidatePtrVec findOneShiftTopProteins(std::vector<short> &scores,
 
   double min_mass = prec_minus_water_mass - max_shift - prec_error_tole;
   double max_mass = prec_minus_water_mass - min_shift + prec_error_tole;
+  //LOG_DEBUG("min mass " << min_mass << " max mass " << max_mass);
   std::vector<int> row_begins = index_ptr->getProteoRowBegins();
   std::vector<int> row_ends = index_ptr->getProteoRowEnds();
   std::vector<double> proteo_minus_water_masses = index_ptr->getProteoMinusWaterMasses();
@@ -221,36 +222,40 @@ ProtCandidatePtrVec findOneShiftTopProteins(std::vector<short> &scores,
   std::vector<double> rev_trunc_shifts = rev_index_ptr->getTruncShifts();
 
   ProtScorePtrVec proteo_scores;
+  int bgn, end, rev_bgn, rev_end;
+  int k_start, k_end;
+  int best_score;
+  double best_n_term_shift, best_c_term_shift;
   for (size_t i = 0; i < row_begins.size(); i++) {
-    int bgn = row_begins[i];
-    int end = row_ends[i];
-    int rev_bgn = rev_row_begins[i];
-    int rev_end = rev_row_ends[i];
+    bgn = row_begins[i];
+    end = row_ends[i];
+    rev_bgn = rev_row_begins[i];
+    rev_end = rev_row_ends[i];
 
-    int k_start = rev_bgn; 
-    int k_end = rev_bgn;
-    int best_score = 0;
-    double best_n_term_shift = 0;
-    double best_c_term_shift = 0;
+    k_start = rev_end; 
+    k_end = rev_end;
+    best_score = 0;
+    best_n_term_shift = 0;
+    best_c_term_shift = 0;
     for (int j = bgn; j <= end; j++) {
       double n_trunc_shift = trunc_shifts[j];
       double proteo_mass = proteo_minus_water_masses[i];
       // find k_start 
-      for (; k_start <= rev_end; k_start++) {
+      for (; k_start > rev_bgn; k_start--) {
         double mass = proteo_mass + n_trunc_shift + rev_trunc_shifts[k_start]; 
-        if (mass <= max_mass) {
+        if (mass >= min_mass) {
           break;
         }
       }
       // find k_end
-      for (; k_end <= rev_end; k_end++) {
+      for (; k_end > rev_bgn; k_end--) {
         double mass = proteo_mass + n_trunc_shift + rev_trunc_shifts[k_end]; 
-        if (mass < min_mass) {
+        if (mass > max_mass) {
           break;
         }
       }
 
-      for (int k = k_start; k <= k_end; k++) {
+      for (int k = k_start; k >= k_end; k--) {
         double c_trunc_shift = rev_trunc_shifts[k];
         double mass = proteo_mass + n_trunc_shift + c_trunc_shift; 
         double score = scores[j] + rev_scores[k];
