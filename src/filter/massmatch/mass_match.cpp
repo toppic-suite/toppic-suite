@@ -244,8 +244,10 @@ void MassMatch::compScores(const std::vector<std::pair<int, int>> &pref_mass_err
     if (right < 0 || right >= col_num_) {
       continue;
     }
+
     begin_index = col_index_begins_[left];
     end_index   = col_index_ends_[right];
+
 
     for (int j = begin_index; j <= end_index; j++) {
       scores[col_indexes_[j]]++;

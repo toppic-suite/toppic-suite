@@ -277,7 +277,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         ("proteoform-cutoff-type,T", po::value<std::string> (&cutoff_proteoform_type), "")
         ("proteoform-cutoff-value,V", po::value<std::string> (&cutoff_proteoform_value), "")
         ("lookup-table,l", "")
-        ("local-ptm-file-name,b", po::value<std::string>(&local_ptm_file_name), "")
+        ("local-ptm-file-name,B", po::value<std::string>(&local_ptm_file_name), "")
         ("miscore-threshold,H", po::value<std::string> (&local_threshold), "")
         ("num-combined-spectra,r", po::value<std::string> (&group_num), "")
         ("combined-file-name,c", po::value<std::string>(&combined_output_name) , "")

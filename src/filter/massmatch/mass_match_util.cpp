@@ -91,30 +91,36 @@ ProtCandidatePtrVec findZeroShiftTopProteins(std::vector<short> &scores,
   std::vector<double> rev_trunc_shifts = rev_index_ptr->getTruncShifts();
 
   ProtScorePtrVec proteo_scores;
+  int bgn, end, rev_bgn, rev_end;
+  std::vector<int> prec_match_rows;
+  std::vector<int> rev_prec_match_rows;
+  int best_score = 0;
+  double best_n_trunc_shift = 0;
+  double best_c_trunc_shift = 0;
   for (size_t i = 0; i < row_begins.size(); i++) {
-    int bgn = row_begins[i];
-    int end = row_ends[i];
+    bgn = row_begins[i];
+    end = row_ends[i];
     // get precursor match rows
-    std::vector<int> prec_match_rows;
+    prec_match_rows.clear();
     for (int j = bgn; j <= end; j++) {
-      if (scores[j] > prec_match_score) {
+      if (scores[j] >= prec_match_score) {
         prec_match_rows.push_back(j);
       }
     }
 
     // get reverse precursor match rows
-    int rev_bgn = rev_row_begins[i];
-    int rev_end = rev_row_ends[i];
-    std::vector<int> rev_prec_match_rows;
+    rev_bgn = rev_row_begins[i];
+    rev_end = rev_row_ends[i];
+    rev_prec_match_rows.clear();
     for (int j = rev_bgn; j <= rev_end; j++) {
-      if (rev_scores[j] > prec_match_score) {
+      if (rev_scores[j] >= prec_match_score) {
         rev_prec_match_rows.push_back(j);
       }
     }
 
-    int best_score = 0;
-    double best_n_trunc_shift = 0;
-    double best_c_trunc_shift = 0;
+    best_score = 0;
+    best_n_trunc_shift = 0;
+    best_c_trunc_shift = 0;
     for (size_t j = 0; j < prec_match_rows.size(); j++) {
       for (size_t k = 0; k < rev_prec_match_rows.size(); k++) {
         double n_trunc_shift = trunc_shifts[prec_match_rows[j]];
@@ -139,6 +145,60 @@ ProtCandidatePtrVec findZeroShiftTopProteins(std::vector<short> &scores,
   ProtCandidatePtrVec proteins = ProtCandidate::geneResults(proteo_scores, threshold, top_num);
   return proteins;
 }
+
+ProtCandidatePtrVec simpleFindZeroShiftTopProteins(std::vector<short> &scores,
+                                                   std::vector<short> &rev_scores,
+                                                   MassMatchPtr index_ptr,
+                                                   MassMatchPtr rev_index_ptr,
+                                                   double prec_minus_water_mass,
+                                                   double prec_error_tole, 
+                                                   int threshold, int top_num) {
+
+  std::vector<int> row_begins = index_ptr->getProteoRowBegins();
+  std::vector<int> row_ends = index_ptr->getProteoRowEnds();
+  std::vector<int> rev_row_begins = rev_index_ptr->getProteoRowBegins();
+  std::vector<int> rev_row_ends = rev_index_ptr->getProteoRowEnds();
+
+  ProtScorePtrVec proteo_scores;
+  int bgn, end, rev_bgn, rev_end;
+  int best_n_score, best_c_score, best_total_score;
+  // shift information is not used in simple filtering
+  double best_n_trunc_shift = 0.0;
+  double best_c_trunc_shift = 0.0;
+  for (size_t i = 0; i < row_begins.size(); i++) {
+    bgn = row_begins[i];
+    end = row_ends[i];
+    // get precursor match rows
+    best_n_score = 0;
+    for (int j = bgn; j <= end; j++) {
+      if (scores[j] > best_n_score)  {
+        best_n_score = scores[j];
+      }
+    }
+
+    // get reverse precursor match rows
+    rev_bgn = rev_row_begins[i];
+    rev_end = rev_row_ends[i];
+    best_c_score = 0;
+    for (int j = rev_bgn; j <= rev_end; j++) {
+      if (rev_scores[j] > best_c_score) {
+        best_c_score = rev_scores[j];
+      }
+    }
+
+    best_total_score = best_n_score + best_c_score;
+    if (best_total_score >= threshold) {
+      ProtScorePtr proteo_score = std::make_shared<ProtScore>(i, best_total_score, 
+                                                              best_n_trunc_shift, 
+                                                              best_c_trunc_shift);
+      proteo_scores.push_back(proteo_score);
+    }
+  }
+
+  ProtCandidatePtrVec proteins = ProtCandidate::geneResults(proteo_scores, threshold, top_num);
+  return proteins;
+}
+
 
 ProtCandidatePtrVec findOneShiftTopProteins(std::vector<short> &scores,
                                             std::vector<short> &rev_scores,
@@ -246,7 +306,7 @@ ProtCandidatePtrVec findVarPtmTopProteins(std::vector<short> &scores,
     // get precursor match rows
     std::vector<int> prec_match_rows;
     for (int j = bgn; j <= end; j++) {
-      if (scores[j] > prec_match_score) {
+      if (scores[j] >= prec_match_score) {
         prec_match_rows.push_back(j);
       }
     }
@@ -256,7 +316,7 @@ ProtCandidatePtrVec findVarPtmTopProteins(std::vector<short> &scores,
     int rev_end = rev_row_ends[i];
     std::vector<int> rev_prec_match_rows;
     for (int j = rev_bgn; j <= rev_end; j++) {
-      if (rev_scores[j] > prec_match_score) {
+      if (rev_scores[j] >= prec_match_score) {
         rev_prec_match_rows.push_back(j);
       }
     }

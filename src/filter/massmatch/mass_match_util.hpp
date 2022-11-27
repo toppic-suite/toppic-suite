@@ -30,6 +30,15 @@ ProtCandidatePtrVec findZeroShiftTopProteins(std::vector<short> &scores,
                                              double prec_error_tole, 
                                              int threshold, int num);
 
+// the simple version is faster, but less accurate
+ProtCandidatePtrVec simpleFindZeroShiftTopProteins(std::vector<short> &scores,
+                                                   std::vector<short> &rev_scores,
+                                                   MassMatchPtr index_ptr,
+                                                   MassMatchPtr rev_index_ptr,
+                                                   double prec_minus_water_mass,
+                                                   double prec_error_tole, 
+                                                   int threshold, int top_num);
+
 ProtCandidatePtrVec findOneShiftTopProteins(std::vector<short> &scores,
                                             std::vector<short> &rev_scores,
                                             MassMatchPtr index_ptr,

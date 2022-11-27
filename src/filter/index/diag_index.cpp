@@ -70,18 +70,18 @@ void process(DiagFilterMngPtr mng_ptr) {
 
   SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(mng_ptr->thread_num_);
   int block_num = db_block_ptr_vec.size();
-  std::cout << "Generating multiple PTM index files --- started" << std::endl;
+  std::cout << "Generating multiple shift index files --- started" << std::endl;
   for (size_t i = 0; i < db_block_ptr_vec.size(); i++) {
     while (pool_ptr->getQueueSize() > 0 || pool_ptr->getIdleThreadNum() == 0) {
       boost::this_thread::sleep(boost::posix_time::milliseconds(100));
     }
 
-    std::cout << "Multiple PTM index files - processing " << (i+1) 
+    std::cout << "Multiple shift index files - processing " << (i+1) 
         << " of " << block_num << " files." << std::endl;
     pool_ptr->Enqueue(geneIndexTask(db_block_ptr_vec[i]->getBlockIdx(), mng_ptr));
   }
   pool_ptr->ShutDown();
-  std::cout << "Generating multiple PTM index files --- finished" << std::endl;
+  std::cout << "Generating multiple shift index files --- finished" << std::endl;
 }
 
 }

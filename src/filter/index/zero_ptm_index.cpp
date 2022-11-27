@@ -134,17 +134,17 @@ void process(ZeroPtmFilterMngPtr mng_ptr) {
   
   int block_num = db_block_ptr_vec.size();
 
-  std::cout << "Generating Non PTM index files --- started" << std::endl;
+  std::cout << "Generating Non shift index files --- started" << std::endl;
   for (int i = 0; i < block_num; i++) {
     while (pool_ptr->getQueueSize() > 0 || pool_ptr->getIdleThreadNum() == 0) {
       boost::this_thread::sleep(boost::posix_time::milliseconds(100));
     }
-    std::cout << "Non PTM index files - processing " << (i+1) 
+    std::cout << "Non shift index files - processing " << (i+1) 
       << " of " << block_num << " files." << std::endl;
     pool_ptr->Enqueue(geneIndexTask(db_block_ptr_vec[i]->getBlockIdx(), mng_ptr));
   }
   pool_ptr->ShutDown();
-  std::cout << "Generating Non PTM index files --- finished" << std::endl;
+  std::cout << "Generating Non shift index files --- finished" << std::endl;
 }
 
 }
