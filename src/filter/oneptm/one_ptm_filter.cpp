@@ -16,6 +16,7 @@
 
 #include <boost/thread/mutex.hpp>
 
+#include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "seq/proteoform_util.hpp"
 #include "seq/prot_candidate.hpp"
@@ -101,7 +102,7 @@ void OnePtmFilter::computeBestMatch(const PrmMsPtrVec &prm_ms_ptr_vec,
       = prm_ms_util::getIntMassErrorList(prm_ms_ptr_vec, tole_ptr, mng_ptr_->filter_scale_, true, false);
   std::vector<std::pair<int, int>> suff_mass_errors
       = prm_ms_util::getIntMassErrorList(srm_ms_ptr_vec, tole_ptr, mng_ptr_->filter_scale_, false, true);
-
+  
   int term_row_num = term_index_ptr_->getRowNum();
   std::vector<short> term_scores(term_row_num, 0);
   term_index_ptr_->compScores(pref_mass_errors, term_scores);
@@ -156,6 +157,15 @@ void OnePtmFilter::computeBestMatch(const PrmMsPtrVec &prm_ms_ptr_vec,
     prsm_ptr->setCTermShifts(pref_prots[i]->getCTermShifts());
     pref_match_ptrs_.push_back(prsm_ptr);
   }
+
+  /*
+  for (size_t i = 0; i < diag_scores.size(); i++) {
+    LOG_ERROR(i << " diag score " << diag_scores[i]);
+  }
+  for (size_t i = 0; i < rev_term_scores.size(); i++) {
+    LOG_ERROR(i << " reverse term score " << rev_term_scores[i])
+  }
+  */
 
   ProtCandidatePtrVec suff_prots
     = mass_match_util::findOneShiftTopProteins(diag_scores, rev_term_scores, diag_index_ptr_, rev_term_index_ptr_, 

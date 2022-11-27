@@ -12,6 +12,7 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include <cmath>
 #include <algorithm>
 
 #include "common/util/logger.hpp"
@@ -37,8 +38,17 @@ PrsmPtrVec OnePtmSearchProcessor::onePtmSearchOneSpec(SpectrumSetPtr spec_set_pt
   ModPtrVec fix_mod_list = mng_ptr->prsm_para_ptr_->getFixModPtrVec();
   ProtModPtrVec prot_mod_ptr_vec = mng_ptr->prsm_para_ptr_->getProtModPtrVec();
   ProteoformPtrVec proteoform_ptr_vec;
-  SimplePrsmPtrVec prsm_vec;
+  SimplePrsmPtrVec expand_simple_prsm_vec;
   for (size_t i = 0; i < simple_prsm_ptr_vec.size(); i++) {
+    if (std::abs(spec_set_ptr->getPrecMonoMass() - simple_prsm_ptr_vec[i]->getPrecMass()) 
+        > std::pow(10, -4)) {
+      // When precursor error is allowed, if the adjusted precursor of the
+      // spectrum set does not match the adjusted precursor mass in the
+      // filtering result, the spectrum proteoform match is ignored. 
+      // A small error is allowed for errors introduced in writing real numbers
+      // to xml files. 
+      continue;
+    }
     std::string seq_name = simple_prsm_ptr_vec[i]->getSeqName();
     std::string seq_desc = simple_prsm_ptr_vec[i]->getSeqDesc();
     ProteoformPtr proteo_ptr
@@ -47,21 +57,22 @@ PrsmPtrVec OnePtmSearchProcessor::onePtmSearchOneSpec(SpectrumSetPtr spec_set_pt
       ProteoformPtrVec mod_form_ptr_vec = proteoform_factory::geneProtModProteoform(proteo_ptr, prot_mod_ptr_vec);
       proteoform_ptr_vec.insert(proteoform_ptr_vec.end(), mod_form_ptr_vec.begin(),
                                 mod_form_ptr_vec.end());
-      prsm_vec.insert(prsm_vec.end(), mod_form_ptr_vec.size(), simple_prsm_ptr_vec[i]);
+      expand_simple_prsm_vec.insert(expand_simple_prsm_vec.end(), mod_form_ptr_vec.size(), simple_prsm_ptr_vec[i]);
     } else {
       proteoform_ptr_vec.push_back(proteo_ptr);
-      prsm_vec.push_back(simple_prsm_ptr_vec[i]);
+      expand_simple_prsm_vec.push_back(simple_prsm_ptr_vec[i]);
     }
   }
   PrsmPtrVec prsms;
   int shift_num = 1;
   for (size_t i = 0; i < proteoform_ptr_vec.size(); i++) {
     OnePtmSlowMatch slow_match(proteoform_ptr_vec[i], spec_set_ptr,
-                               prsm_vec[i], type_ptr, mng_ptr);
+                               expand_simple_prsm_vec[i], type_ptr, mng_ptr);
     PrsmPtr tmp = slow_match.compute(shift_num);
 
-    if (tmp != nullptr)
+    if (tmp != nullptr) {
       prsms.push_back(tmp);
+    }
   }
   std::sort(prsms.begin(), prsms.end(), Prsm::cmpMatchFragmentDecMatchPeakDec);
   if (prsms.size() > 0) {
@@ -103,59 +114,72 @@ void OnePtmSearchProcessor::process() {
                                                                                     group_spec_num,
                                                                                     sp_para_ptr->getActivationPtr());
   int cnt = 0;
-  SpectrumSetPtr spec_set_ptr;
-  // LOG_DEBUG("Start search");
-  while ((spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(msalign_reader_ptr,sp_para_ptr))!= nullptr) {
+
+  DeconvMsPtrVec deconv_ms_ptr_vec = msalign_reader_ptr->getNextMsPtrVec(); 
+  while (deconv_ms_ptr_vec.size() > 0) {
     cnt+= group_spec_num;
-    if (spec_set_ptr->isValid()) {
-      int spec_id = spec_set_ptr->getSpectrumId();
-      // complete
-      SimplePrsmPtrVec comp_selected_prsm_ptrs;
-      while (comp_prsm_ptr != nullptr && comp_prsm_ptr->getSpectrumId() == spec_id) {
-        comp_selected_prsm_ptrs.push_back(comp_prsm_ptr);
-        comp_prsm_ptr = comp_prsm_reader.readOnePrsm();
-      }
-      if (comp_selected_prsm_ptrs.size() > 0) {
-        // LOG_DEBUG("start processing one spectrum.");
+    std::vector<SpectrumSetPtr> spec_set_vec 
+      = spectrum_set_factory::geneSpectrumSetPtrVecWithPrecError(deconv_ms_ptr_vec, sp_para_ptr);
+    int spec_id = spec_set_vec[0]->getSpectrumId();
+    // complete
+    SimplePrsmPtrVec comp_selected_prsm_ptrs;
+    while (comp_prsm_ptr != nullptr && comp_prsm_ptr->getSpectrumId() == spec_id) {
+      comp_selected_prsm_ptrs.push_back(comp_prsm_ptr);
+      comp_prsm_ptr = comp_prsm_reader.readOnePrsm();
+    }
+    if (comp_selected_prsm_ptrs.size() > 0) {
+      // LOG_DEBUG("start processing one spectrum.");
+      for (size_t i = 0; i < spec_set_vec.size(); i++) {
+        SpectrumSetPtr spec_set_ptr = spec_set_vec[i];
         PrsmPtrVec prsms = onePtmSearchOneSpec(spec_set_ptr, comp_selected_prsm_ptrs,
                                                reader_ptr, mng_ptr_, ProteoformType::COMPLETE);
         comp_writer.writeVector(prsms);
       }
+    }
 
-      // prefix
-      SimplePrsmPtrVec pref_selected_prsm_ptrs;
-      while (pref_prsm_ptr != nullptr && pref_prsm_ptr->getSpectrumId() == spec_id) {
-        pref_selected_prsm_ptrs.push_back(pref_prsm_ptr);
-        pref_prsm_ptr = pref_prsm_reader.readOnePrsm();
-      }
-      if (pref_selected_prsm_ptrs.size() > 0) {
-        // LOG_DEBUG("start processing one spectrum.");
+    // prefix
+    SimplePrsmPtrVec pref_selected_prsm_ptrs;
+    while (pref_prsm_ptr != nullptr && pref_prsm_ptr->getSpectrumId() == spec_id) {
+      pref_selected_prsm_ptrs.push_back(pref_prsm_ptr);
+      pref_prsm_ptr = pref_prsm_reader.readOnePrsm();
+    }
+    if (pref_selected_prsm_ptrs.size() > 0) {
+      // LOG_DEBUG("start processing one spectrum.");
+      for (size_t i = 0; i < spec_set_vec.size(); i++) {
+        SpectrumSetPtr spec_set_ptr = spec_set_vec[i];
         PrsmPtrVec prsms = onePtmSearchOneSpec(spec_set_ptr, pref_selected_prsm_ptrs,
                                                reader_ptr, mng_ptr_, ProteoformType::PREFIX);
+
         pref_writer.writeVector(prsms);
       }
+    }
 
-      // suffix
-      SimplePrsmPtrVec suff_selected_prsm_ptrs;
-      while (suff_prsm_ptr != nullptr && suff_prsm_ptr->getSpectrumId() == spec_id) {
-        suff_selected_prsm_ptrs.push_back(suff_prsm_ptr);
-        suff_prsm_ptr = suff_prsm_reader.readOnePrsm();
-      }
-      if (suff_selected_prsm_ptrs.size() > 0) {
-        // LOG_DEBUG("start processing one spectrum.");
+    // suffix
+    SimplePrsmPtrVec suff_selected_prsm_ptrs;
+    while (suff_prsm_ptr != nullptr && suff_prsm_ptr->getSpectrumId() == spec_id) {
+      suff_selected_prsm_ptrs.push_back(suff_prsm_ptr);
+      suff_prsm_ptr = suff_prsm_reader.readOnePrsm();
+    }
+    if (suff_selected_prsm_ptrs.size() > 0) {
+      // LOG_DEBUG("start processing one spectrum.");
+      for (size_t i = 0; i < spec_set_vec.size(); i++) {
+        SpectrumSetPtr spec_set_ptr = spec_set_vec[i];
         PrsmPtrVec prsms = onePtmSearchOneSpec(spec_set_ptr, suff_selected_prsm_ptrs,
                                                reader_ptr, mng_ptr_, ProteoformType::SUFFIX);
         suff_writer.writeVector(prsms);
       }
+    }
 
-      // internal
-      SimplePrsmPtrVec internal_selected_prsm_ptrs;
-      while (internal_prsm_ptr != nullptr && internal_prsm_ptr->getSpectrumId() == spec_id) {
-        internal_selected_prsm_ptrs.push_back(internal_prsm_ptr);
-        internal_prsm_ptr = internal_prsm_reader.readOnePrsm();
-      }
-      if (internal_selected_prsm_ptrs.size() > 0) {
-        // LOG_DEBUG("start processing one spectrum.");
+    // internal
+    SimplePrsmPtrVec internal_selected_prsm_ptrs;
+    while (internal_prsm_ptr != nullptr && internal_prsm_ptr->getSpectrumId() == spec_id) {
+      internal_selected_prsm_ptrs.push_back(internal_prsm_ptr);
+      internal_prsm_ptr = internal_prsm_reader.readOnePrsm();
+    }
+    if (internal_selected_prsm_ptrs.size() > 0) {
+      // LOG_DEBUG("start processing one spectrum.");
+      for (size_t i = 0; i < spec_set_vec.size(); i++) {
+        SpectrumSetPtr spec_set_ptr = spec_set_vec[i];
         PrsmPtrVec prsms = onePtmSearchOneSpec(spec_set_ptr, internal_selected_prsm_ptrs,
                                                reader_ptr, mng_ptr_, ProteoformType::INTERNAL);
         internal_writer.writeVector(prsms);
@@ -163,6 +187,7 @@ void OnePtmSearchProcessor::process() {
     }
     std::cout << std::flush <<  "One unexpected shift search - processing " << cnt
         << " of " << spectrum_num << " spectra.\r";
+    deconv_ms_ptr_vec = msalign_reader_ptr->getNextMsPtrVec(); 
   }
   int remainder = spectrum_num - cnt;
   if (prsm_para_ptr->getGroupSpecNum() > remainder && remainder > 0){

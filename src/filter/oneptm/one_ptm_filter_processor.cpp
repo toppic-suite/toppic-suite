@@ -55,37 +55,42 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
       + "." + mng_ptr->output_file_ext_ + "_" + block_str;
   SimplePrsmXmlWriterSet writers(output_file_name);
 
-  SpectrumSetPtr spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(reader_ptr, sp_para_ptr);
-
-  while (spec_set_ptr != nullptr) {
-    if (spec_set_ptr->isValid()) {
-      if (mng_ptr->var_num_ == 0) {
-        PrmMsPtrVec prm_ms_ptr_vec = spec_set_ptr->getMsTwoPtrVec();
-        PrmMsPtrVec srm_ms_ptr_vec = spec_set_ptr->getSuffixMsTwoPtrVec();
-        filter_ptr->computeBestMatch(prm_ms_ptr_vec, srm_ms_ptr_vec);
-        writers.getCompleteWriterPtr()->write(filter_ptr->getCompMatchPtrs());
-        writers.getPrefixWriterPtr()->write(filter_ptr->getPrefMatchPtrs());
-        writers.getSuffixWriterPtr()->write(filter_ptr->getSuffMatchPtrs());
-        writers.getInternalWriterPtr()->write(filter_ptr->getInternalMatchPtrs());
-      } else {
-        std::vector<double> mod_mass(3);
-        for (size_t i = 0; i < mod_mass_list.size(); i++) {
-          for (size_t k1 = 0; k1 < mod_mass.size(); k1++) {
-            std::fill(mod_mass.begin(), mod_mass.end(), 0.0);
-            mod_mass[k1] += mod_mass_list[i];
-            DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
-            double prec_mono_mass = spec_set_ptr->getPrecMonoMass();
-            PrmMsPtrVec prm_ms_ptr_vec = prm_ms_factory::geneMsTwoPtrVec(deconv_ms_ptr_vec,
-                                                                         sp_para_ptr,
-                                                                         prec_mono_mass, mod_mass);
-            PrmMsPtrVec srm_ms_ptr_vec 
+  DeconvMsPtrVec deconv_ms_ptr_vec = reader_ptr->getNextMsPtrVec();
+  while(deconv_ms_ptr_vec.size() != 0) { 
+    // allow one dalton error
+    SpectrumSetPtrVec spec_set_vec 
+        = spectrum_set_factory::geneSpectrumSetPtrVecWithPrecError(deconv_ms_ptr_vec, sp_para_ptr);
+    for (size_t k = 0; k < spec_set_vec.size(); k++) {
+      SpectrumSetPtr spec_set_ptr = spec_set_vec[k];
+      if (spec_set_ptr->isValid()) {
+        if (mng_ptr->var_num_ == 0) {
+          PrmMsPtrVec prm_ms_ptr_vec = spec_set_ptr->getMsTwoPtrVec();
+          PrmMsPtrVec srm_ms_ptr_vec = spec_set_ptr->getSuffixMsTwoPtrVec();
+          filter_ptr->computeBestMatch(prm_ms_ptr_vec, srm_ms_ptr_vec);
+          writers.getCompleteWriterPtr()->write(filter_ptr->getCompMatchPtrs());
+          writers.getPrefixWriterPtr()->write(filter_ptr->getPrefMatchPtrs());
+          writers.getSuffixWriterPtr()->write(filter_ptr->getSuffMatchPtrs());
+          writers.getInternalWriterPtr()->write(filter_ptr->getInternalMatchPtrs());
+        } else {
+          std::vector<double> mod_mass(3);
+          for (size_t i = 0; i < mod_mass_list.size(); i++) {
+            for (size_t k1 = 0; k1 < mod_mass.size(); k1++) {
+              std::fill(mod_mass.begin(), mod_mass.end(), 0.0);
+              mod_mass[k1] += mod_mass_list[i];
+              DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
+              double prec_mono_mass = spec_set_ptr->getPrecMonoMass();
+              PrmMsPtrVec prm_ms_ptr_vec = prm_ms_factory::geneMsTwoPtrVec(deconv_ms_ptr_vec,
+                                                                           sp_para_ptr,
+                                                                           prec_mono_mass, mod_mass);
+              PrmMsPtrVec srm_ms_ptr_vec 
                 = prm_ms_factory::geneSuffixMsTwoPtrVec(deconv_ms_ptr_vec, sp_para_ptr,
                                                         prec_mono_mass, mod_mass);
-            filter_ptr->computeBestMatch(prm_ms_ptr_vec, srm_ms_ptr_vec);
-            writers.getCompleteWriterPtr()->write(filter_ptr->getCompMatchPtrs());
-            writers.getPrefixWriterPtr()->write(filter_ptr->getPrefMatchPtrs());
-            writers.getSuffixWriterPtr()->write(filter_ptr->getSuffMatchPtrs());
-            writers.getInternalWriterPtr()->write(filter_ptr->getInternalMatchPtrs());
+              filter_ptr->computeBestMatch(prm_ms_ptr_vec, srm_ms_ptr_vec);
+              writers.getCompleteWriterPtr()->write(filter_ptr->getCompMatchPtrs());
+              writers.getPrefixWriterPtr()->write(filter_ptr->getPrefMatchPtrs());
+              writers.getSuffixWriterPtr()->write(filter_ptr->getSuffMatchPtrs());
+              writers.getInternalWriterPtr()->write(filter_ptr->getInternalMatchPtrs());
+            }
           }
         }
       }
@@ -102,7 +107,7 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
     mng_ptr->mutex_.lock();
     std::cout << msg.str();
     mng_ptr->mutex_.unlock();
-    spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(reader_ptr, sp_para_ptr);
+    deconv_ms_ptr_vec = reader_ptr->getNextMsPtrVec();
   }
   writers.close();
 }

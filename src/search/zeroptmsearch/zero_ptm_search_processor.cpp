@@ -40,8 +40,11 @@ PrsmPtrVec ZeroPtmSearchProcessor::zeroPtmSearchOneSpec(SpectrumSetPtr spec_set_
   for (size_t i = 0; i < simple_prsm_ptr_vec.size(); i++) {
     if (std::abs(spec_set_ptr->getPrecMonoMass() - simple_prsm_ptr_vec[i]->getPrecMass()) 
         > std::pow(10, -4)) {
-      //LOG_ERROR("Large precursor mass difference!" << spec_set_ptr->getPrecMonoMass() 
-      //<< " " << simple_prsm_ptr_vec[i]->getPrecMass());
+      // When precursor error is allowed, if the adjusted precursor of the
+      // spectrum set does not match the adjusted precursor mass in the
+      // filtering result, the spectrum proteoform match is ignored. 
+      // A small error is allowed for errors introduced in writing real numbers
+      // to xml files. 
       continue;
     }
     std::string seq_name = simple_prsm_ptr_vec[i]->getSeqName();
@@ -60,8 +63,8 @@ PrsmPtrVec ZeroPtmSearchProcessor::zeroPtmSearchOneSpec(SpectrumSetPtr spec_set_
   }
   double ppo = mng_ptr->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()->getPpo();
   ZpFastMatchPtrVec fast_matches
-      = zero_ptm_fast_search::filter(type_ptr, ms_three_vec, proteoform_ptr_vec,
-                                 mng_ptr->zero_ptm_filter_result_num_, ppo);
+    = zero_ptm_fast_search::filter(type_ptr, ms_three_vec, proteoform_ptr_vec,
+                                   mng_ptr->zero_ptm_filter_result_num_, ppo);
   DeconvMsPtrVec deconv_ms_vec = spec_set_ptr->getDeconvMsPtrVec();
   SpParaPtr sp_para_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr();
 
