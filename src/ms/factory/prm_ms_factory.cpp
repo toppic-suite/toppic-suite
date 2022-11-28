@@ -91,6 +91,33 @@ void addSixMasses(PrmPeakPtrVec &list, int spec_id, DeconvPeakPtr deconv_peak_pt
   }
 }
 
+void addSuffixSixMasses(PrmPeakPtrVec &list, int spec_id, DeconvPeakPtr deconv_peak_ptr,
+                        double prec_mono_mass, ActivationPtr active_type_ptr,
+                        PeakTolerancePtr tole_ptr, const std::vector<double> &offsets) {
+  double ori_mass = deconv_peak_ptr->getMonoMass();
+  double c_res_mass = ori_mass - (active_type_ptr->getC_BYShift() + mass_constant::getWaterMass());
+  for (size_t i = 0; i < offsets.size(); i++) {
+    double mass = c_res_mass + offsets[i];
+    PrmPeakPtr peak_ptr = std::make_shared<PrmPeak>(spec_id, deconv_peak_ptr,
+                                                    BasePeakType::ORIGINAL, mass, 1);
+    peak_ptr->setStrictTolerance(tole_ptr->compStrictErrorTole(ori_mass));
+    peak_ptr->setNStrictCRelacTolerance(tole_ptr->compRelaxErrorTole(ori_mass, prec_mono_mass));
+    peak_ptr->setNRelaxCStrictTolerance(tole_ptr->compStrictErrorTole(ori_mass));
+    list.push_back(peak_ptr);
+  }
+  double reverse_mass = prec_mono_mass - (ori_mass-active_type_ptr->getN_BYShift()) 
+    - mass_constant::getWaterMass();
+  for (size_t i = 0; i < offsets.size(); i++) {
+    double mass = reverse_mass + offsets[i];
+    PrmPeakPtr peak_ptr = std::make_shared<PrmPeak>(spec_id, deconv_peak_ptr,
+                                                    BasePeakType::REVERSED, mass, 1);
+    peak_ptr->setStrictTolerance(tole_ptr->compStrictErrorTole(ori_mass));
+    peak_ptr->setNRelaxCStrictTolerance(tole_ptr->compRelaxErrorTole(ori_mass, prec_mono_mass));
+    peak_ptr->setNStrictCRelacTolerance(tole_ptr->compStrictErrorTole(ori_mass));
+    list.push_back(peak_ptr);
+  }
+}
+
 void filterPeaks(const PrmPeakPtrVec &peak_list, PrmPeakPtrVec &filtered_list,
                  double prec_mono_mass, double min_mass) {
   for (size_t i = 0; i < peak_list.size(); i++) {
@@ -193,6 +220,31 @@ PrmMsPtr geneSuffixMsTwoPtr(DeconvMsPtr deconv_ms_ptr, int spec_id, SpParaPtr sp
   return std::make_shared<Ms<PrmPeakPtr> >(header_ptr, list_filtered);
 }
 
+PrmMsPtr geneSuffixMsSixPtr(DeconvMsPtr deconv_ms_ptr, int spec_id, SpParaPtr sp_para_ptr,
+                            double prec_mono_mass) {
+  MsHeaderPtr ori_header_ptr = deconv_ms_ptr->getMsHeaderPtr();
+  MsHeaderPtr header_ptr = MsHeader::geneMsHeaderPtr(ori_header_ptr, prec_mono_mass);
+  // getSpTwoPrmPeak
+  ActivationPtr active_type_ptr = header_ptr->getActivationPtr();
+  PeakTolerancePtr tole_ptr = sp_para_ptr->getPeakTolerancePtr();
+  double extend_min_mass = sp_para_ptr->getExtendMinMass();
+  PrmPeakPtrVec list;
+  for (size_t i = 0; i < deconv_ms_ptr->size(); i++) {
+    if (deconv_ms_ptr->getPeakPtr(i)->getMonoMass() <= extend_min_mass) {
+      addSuffixTwoMasses(list, spec_id, deconv_ms_ptr->getPeakPtr(i), prec_mono_mass,
+                         active_type_ptr, tole_ptr);
+    } else {
+      addSuffixSixMasses(list, spec_id, deconv_ms_ptr->getPeakPtr(i), prec_mono_mass,
+                         active_type_ptr, tole_ptr, sp_para_ptr->getExtendOffsets());
+    }
+  }
+  // filter low mass peaks
+  PrmPeakPtrVec list_filtered;
+  filterPeaks(list, list_filtered, prec_mono_mass, sp_para_ptr->getMinMass());
+  std::sort(list_filtered.begin(), list_filtered.end(), PrmPeak::cmpPosInc);
+  return std::make_shared<Ms<PrmPeakPtr> >(header_ptr, list_filtered);
+}
+
 PrmMsPtr geneMsSixPtr(DeconvMsPtr deconv_ms_ptr, int spec_id, SpParaPtr sp_para_ptr,
                       double prec_mono_mass) {
   MsHeaderPtr ori_header_ptr = deconv_ms_ptr->getMsHeaderPtr();
@@ -269,6 +321,17 @@ PrmMsPtrVec geneMsSixPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
   }
   return prm_ms_ptr_vec;
 }
+
+PrmMsPtrVec geneSuffixMsSixPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
+                                  SpParaPtr sp_para_ptr, double prec_mono_mass) {
+  PrmMsPtrVec prm_ms_ptr_vec;
+  for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
+    prm_ms_ptr_vec.push_back(geneSuffixMsSixPtr(deconv_ms_ptr_vec[i], i,
+                                                sp_para_ptr, prec_mono_mass));
+  }
+  return prm_ms_ptr_vec;
+}
+
 
 PrmMsPtrVec geneShiftMsSixPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
                                  SpParaPtr sp_para_ptr, double prec_mono_mass,
