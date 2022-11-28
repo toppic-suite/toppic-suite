@@ -71,6 +71,95 @@ void addTruncShifts(ProtCandidatePtrVec &prot_ptrs, MassMatchPtr index_ptr,
   }
 }
 
+class TruncScorePosition {
+  public:
+  TruncScorePosition(double score, int n_idx, int c_idx):
+    score_(score),
+    n_idx_(n_idx),
+    c_idx_(c_idx) {};
+                     
+  double score_;
+  int n_idx_;
+  int c_idx_;
+};
+
+inline bool cmpScoreIndex(const TruncScorePosition &a, const TruncScorePosition &b) {
+  return a.score_ > b.score_;
+}
+
+
+void addTruncShiftsWithRestriction(ProtCandidatePtrVec &prot_ptrs, 
+                                   MassMatchPtr index_ptr, MassMatchPtr rev_index_ptr,
+                                   std::vector<double> &proteo_minus_water_masses,
+                                   std::vector<short> &scores, std::vector<short> &rev_scores,
+                                   double min_mass, double max_mass, 
+                                   int term_group_num) {
+  std::vector<int> row_begins = index_ptr->getProteoRowBegins();
+  std::vector<int> row_ends = index_ptr->getProteoRowEnds();
+  std::vector<double> trunc_shifts = index_ptr->getTruncShifts();
+  std::vector<int> rev_row_begins = rev_index_ptr->getProteoRowBegins();
+  std::vector<int> rev_row_ends = rev_index_ptr->getProteoRowEnds();
+  std::vector<double> rev_trunc_shifts = rev_index_ptr->getTruncShifts();
+
+  int bgn, end, rev_bgn, rev_end;
+  int k_start, k_end; 
+  for (size_t i = 0; i < prot_ptrs.size(); i++) {
+    ProtCandidatePtr prot_ptr = prot_ptrs[i];
+    int prot_id = prot_ptr->getProteinId();
+    double proteo_mass = proteo_minus_water_masses[prot_id];
+    bgn = row_begins[prot_id];
+    end = row_ends[prot_id];
+    rev_bgn = rev_row_begins[prot_id];
+    rev_end = rev_row_ends[prot_id];
+
+    k_start = rev_end; 
+    k_end = rev_end;
+  
+    std::vector<TruncScorePosition> score_idxes;
+    for (int j = bgn; j <= end; j++) {
+      double n_trunc_shift = trunc_shifts[j];
+      // find k_start 
+      for (; k_start > rev_bgn; k_start--) {
+        double mass = proteo_mass + n_trunc_shift + rev_trunc_shifts[k_start]; 
+        if (mass >= min_mass) {
+          break;
+        }
+      }
+      // find k_end
+      for (; k_end > rev_bgn; k_end--) {
+        double mass = proteo_mass + n_trunc_shift + rev_trunc_shifts[k_end]; 
+        if (mass > max_mass) {
+          break;
+        }
+      }
+
+      for (int k = k_start; k >= k_end; k--) {
+        double c_trunc_shift = rev_trunc_shifts[k];
+        double mass = proteo_mass + n_trunc_shift + c_trunc_shift; 
+        double score = scores[j] + rev_scores[k];
+        if (mass >= min_mass && mass <= max_mass) {
+          TruncScorePosition score_pos(score, j, k);
+          score_idxes.push_back(score_pos);
+        }
+      }
+    }
+    std::sort(score_idxes.begin(), score_idxes.end(), cmpScoreIndex);
+    std::vector<double> n_shifts;
+    std::vector<double> c_shifts;
+    for (size_t j = 0; j < score_idxes.size(); j++) {
+      if (static_cast<int>(n_shifts.size()) >= term_group_num) {
+        break;
+      }
+      double n_shift = trunc_shifts[score_idxes[j].n_idx_];
+      n_shifts.push_back(n_shift); 
+      double c_shift = rev_trunc_shifts[score_idxes[j].c_idx_];
+      c_shifts.push_back(c_shift);
+    }
+    prot_ptr->setNTermShifts(n_shifts);
+    prot_ptr->setCTermShifts(c_shifts);
+  }
+}
+    
 ProtCandidatePtrVec findZeroShiftTopProteins(std::vector<short> &scores,
                                              std::vector<short> &rev_scores,
                                              MassMatchPtr index_ptr,
@@ -227,6 +316,7 @@ ProtCandidatePtrVec findOneShiftTopProteins(std::vector<short> &scores,
   int best_score;
   double best_n_term_shift, best_c_term_shift;
   for (size_t i = 0; i < row_begins.size(); i++) {
+    double proteo_mass = proteo_minus_water_masses[i];
     bgn = row_begins[i];
     end = row_ends[i];
     rev_bgn = rev_row_begins[i];
@@ -239,7 +329,6 @@ ProtCandidatePtrVec findOneShiftTopProteins(std::vector<short> &scores,
     best_c_term_shift = 0;
     for (int j = bgn; j <= end; j++) {
       double n_trunc_shift = trunc_shifts[j];
-      double proteo_mass = proteo_minus_water_masses[i];
       // find k_start 
       for (; k_start > rev_bgn; k_start--) {
         double mass = proteo_mass + n_trunc_shift + rev_trunc_shifts[k_start]; 
@@ -277,10 +366,18 @@ ProtCandidatePtrVec findOneShiftTopProteins(std::vector<short> &scores,
 
   ProtCandidatePtrVec proteins = ProtCandidate::geneResults(proteo_scores, threshold, top_num);
   // add trunc shifts
-  bool is_n_term = true;
+  addTruncShiftsWithRestriction(proteins, index_ptr, rev_index_ptr, 
+                                proteo_minus_water_masses, 
+                                scores, rev_scores, 
+                                min_mass, max_mass, 
+                                term_shift_num);
+  /*
+  bool n_term = true;
   addTruncShifts(proteins, index_ptr, scores, term_shift_num, is_n_term);
   is_n_term = false;
   addTruncShifts(proteins, rev_index_ptr, rev_scores, term_shift_num, is_n_term);
+  */
+
   return proteins;
 }
 
