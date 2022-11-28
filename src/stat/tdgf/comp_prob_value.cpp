@@ -287,9 +287,12 @@ void CompProbValue::compPrecProbs() {
   for (int i = 2; i <= shift_num_; i++) {
     // for i ptms, all random proteins with an error 
     // < i * avg_residue_len are counted.
-    double prec_prob = prob * i;
-    // also, we need to normalize by peak_width ^ i;
-    prec_prob = prec_prob * pow(peak_width, i);
+    double prec_prob = one_ptm_prec_prob * i;
+    // because in results[], all probabilities are calculated 
+    // with an error tolerance and all proteins are counted 
+    // several times. The prec_probability also needs to 
+    // to be normalized by the error tolerance. 
+    prec_prob = prec_prob * peak_width;
     prec_probs_.push_back(prec_prob);
   }
 }
