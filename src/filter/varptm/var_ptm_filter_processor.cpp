@@ -52,20 +52,23 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
   //writer
   SimplePrsmXmlWriterSet writers(output_file_name);
   DeconvMsPtrVec deconv_ms_ptr_vec = reader_ptr->getNextMsPtrVec();
+  std::vector<double> prec_error_vec = sp_para_ptr->getVarPtmSearchPrecErrorVec();
+
   while (deconv_ms_ptr_vec.size() != 0) {
-    // do not allow one dalton shift 
-    double prec_mono_mass = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMass();
-    SpectrumSetPtr spec_set_ptr 
-        = spectrum_set_factory::geneSpectrumSetPtr(deconv_ms_ptr_vec, 
-                                                   sp_para_ptr,
-                                                   prec_mono_mass);
-    if (spec_set_ptr->isValid()) {
-      ExtendMsPtrVec ms_ptr_vec = spec_set_ptr->getMsThreePtrVec();
-      filter_ptr->computeBestMatch(ms_ptr_vec);
-      writers.getCompleteWriterPtr()->write(filter_ptr->getCompMatchPtrs());
-      writers.getPrefixWriterPtr()->write(filter_ptr->getPrefMatchPtrs());
-      writers.getSuffixWriterPtr()->write(filter_ptr->getSuffMatchPtrs());
-      writers.getInternalWriterPtr()->write(filter_ptr->getInternalMatchPtrs());
+    SpectrumSetPtrVec spec_set_vec 
+        = spectrum_set_factory::geneSpectrumSetPtrVecWithPrecError(deconv_ms_ptr_vec, 
+                                                                   sp_para_ptr,
+                                                                   prec_error_vec);
+    for (size_t k = 0; k < spec_set_vec.size(); k++) {
+      SpectrumSetPtr spec_set_ptr = spec_set_vec[k]; 
+      if (spec_set_ptr->isValid()) {
+        ExtendMsPtrVec ms_ptr_vec = spec_set_ptr->getMsThreePtrVec();
+        filter_ptr->computeBestMatch(ms_ptr_vec);
+        writers.getCompleteWriterPtr()->write(filter_ptr->getCompMatchPtrs());
+        writers.getPrefixWriterPtr()->write(filter_ptr->getPrefMatchPtrs());
+        writers.getSuffixWriterPtr()->write(filter_ptr->getSuffMatchPtrs());
+        writers.getInternalWriterPtr()->write(filter_ptr->getInternalMatchPtrs());
+      }
     }
 
     mng_ptr->cnts_[block_idx] = mng_ptr->cnts_[block_idx] + group_spec_num;
