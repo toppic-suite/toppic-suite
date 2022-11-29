@@ -55,10 +55,13 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
   SimplePrsmXmlWriterPtr writer_ptr = std::make_shared<SimplePrsmXmlWriter>(output_file_name);
 
   DeconvMsPtrVec deconv_ms_ptr_vec = reader_ptr->getNextMsPtrVec();
+  std::vector<double> prec_error_vec = sp_para_ptr->getMultiShiftSearchPrecErrorVec();
   while (deconv_ms_ptr_vec.size() != 0) {
     // allow one dalton error
     SpectrumSetPtrVec spec_set_vec 
-        = spectrum_set_factory::geneSpectrumSetPtrVecWithPrecError(deconv_ms_ptr_vec, sp_para_ptr);
+        = spectrum_set_factory::geneSpectrumSetPtrVecWithPrecError(deconv_ms_ptr_vec, 
+                                                                   sp_para_ptr,
+                                                                   prec_error_vec);
     for (size_t k = 0; k < spec_set_vec.size(); k++) {
       SpectrumSetPtr spec_set_ptr = spec_set_vec[k];
       if (spec_set_ptr->isValid()) {

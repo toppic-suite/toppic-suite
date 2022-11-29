@@ -114,12 +114,14 @@ void OnePtmSearchProcessor::process() {
                                                                                     group_spec_num,
                                                                                     sp_para_ptr->getActivationPtr());
   int cnt = 0;
-
   DeconvMsPtrVec deconv_ms_ptr_vec = msalign_reader_ptr->getNextMsPtrVec(); 
+  std::vector<double> prec_error_vec = sp_para_ptr->getOneShiftSearchPrecErrorVec();
   while (deconv_ms_ptr_vec.size() > 0) {
     cnt+= group_spec_num;
     std::vector<SpectrumSetPtr> spec_set_vec 
-      = spectrum_set_factory::geneSpectrumSetPtrVecWithPrecError(deconv_ms_ptr_vec, sp_para_ptr);
+      = spectrum_set_factory::geneSpectrumSetPtrVecWithPrecError(deconv_ms_ptr_vec, 
+                                                                 sp_para_ptr,
+                                                                 prec_error_vec);
     int spec_id = spec_set_vec[0]->getSpectrumId();
     // complete
     SimplePrsmPtrVec comp_selected_prsm_ptrs;

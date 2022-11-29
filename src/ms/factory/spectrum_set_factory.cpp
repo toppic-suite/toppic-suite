@@ -113,14 +113,14 @@ SpectrumSetPtr readNextSpectrumSetPtr(SimpleMsAlignReaderPtr reader_ptr,
 
 
 SpectrumSetPtrVec geneSpectrumSetPtrVecWithPrecError(DeconvMsPtrVec deconv_ms_ptr_vec,  
-                                                     SpParaPtr sp_para_ptr) {
+                                                     SpParaPtr sp_para_ptr, 
+                                                     std::vector<double> &prec_error_vec) {
   SpectrumSetPtrVec spec_set_vec;
   if (deconv_ms_ptr_vec.size() == 0) {
     return spec_set_vec;
   }
   double prec_mono_mass = 
     deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMass() - sp_para_ptr->getNTermLabelMass();
-  std::vector<double> prec_error_vec = sp_para_ptr->getPrecErrorVec(); 
   for (size_t i = 0; i< prec_error_vec.size(); i++) {
     SpectrumSetPtr spec_set_ptr = geneSpectrumSetPtr(deconv_ms_ptr_vec,
                                                      sp_para_ptr, 

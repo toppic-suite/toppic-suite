@@ -138,9 +138,12 @@ void PtmSearchProcessor::process(){
   SpectrumSetPtr spec_set_ptr;
   //LOG_DEBUG("Start search");
   DeconvMsPtrVec deconv_ms_ptr_vec = ms_reader_ptr->getNextMsPtrVec(); 
+  std::vector<double> prec_error_vec = sp_para_ptr->getMultiShiftSearchPrecErrorVec();
   while (deconv_ms_ptr_vec.size() > 0) {
     std::vector<SpectrumSetPtr> spec_set_ptr_vec 
-        = spectrum_set_factory::geneSpectrumSetPtrVecWithPrecError(deconv_ms_ptr_vec, sp_para_ptr);
+        = spectrum_set_factory::geneSpectrumSetPtrVecWithPrecError(deconv_ms_ptr_vec, 
+                                                                   sp_para_ptr,
+                                                                   prec_error_vec);
     cnt+= group_spec_num;
     if(spec_set_ptr_vec[0]->isValid()){
       int spec_id = spec_set_ptr_vec[0]->getSpectrumId();

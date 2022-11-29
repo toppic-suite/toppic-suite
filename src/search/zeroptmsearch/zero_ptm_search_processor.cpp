@@ -115,9 +115,12 @@ void ZeroPtmSearchProcessor::process() {
                                               sp_para_ptr->getActivationPtr());
   int cnt = 0;
   DeconvMsPtrVec deconv_ms_ptr_vec = ms_reader_ptr->getNextMsPtrVec(); 
+  std::vector<double> prec_error_vec = sp_para_ptr->getZeroShiftSearchPrecErrorVec();
   while (deconv_ms_ptr_vec.size() > 0) {
     std::vector<SpectrumSetPtr> spec_set_vec 
-        = spectrum_set_factory::geneSpectrumSetPtrVecWithPrecError(deconv_ms_ptr_vec, sp_para_ptr);
+        = spectrum_set_factory::geneSpectrumSetPtrVecWithPrecError(deconv_ms_ptr_vec, 
+                                                                   sp_para_ptr,
+                                                                   prec_error_vec);
     if (spec_set_vec.size() == 0) {
       LOG_ERROR("Spectrum set size is 0!");
     }
