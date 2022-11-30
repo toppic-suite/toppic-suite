@@ -39,6 +39,8 @@ class VarPtmSlowMatch {
 
   void init();
 
+  bool isSuccessInit() {return success_init_;}
+
   PrsmPtr compute(); 
 
  private:
@@ -49,6 +51,7 @@ class VarPtmSlowMatch {
   DeconvMsPtrVec deconv_ms_ptr_vec_;
   PrmMsPtrVec ms_six_ptr_vec_;
   VarPtmAlignPtr var_ptm_align_ptr_;
+  bool success_init_;
 
   DiagHeaderPtrVec geneVarPtmNTermShiftHeaders();
 };

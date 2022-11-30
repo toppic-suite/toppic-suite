@@ -241,7 +241,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     ZeroPtmFilterMngPtr zero_filter_mng_ptr
         = std::make_shared<ZeroPtmFilterMng>(prsm_para_ptr, index_file_para, 
                                              filter_thread_num, "toppic_zero_filter");
-    //zero_ptm_filter_processor::process(zero_filter_mng_ptr);
+    zero_ptm_filter_processor::process(zero_filter_mng_ptr);
     std::cout << "Zero unexpected shift filtering - finished." << std::endl;
 
     std::cout << "Zero unexpected shift search - started." << std::endl;
@@ -249,7 +249,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
         = std::make_shared<ZeroPtmSearchMng>(prsm_para_ptr, "toppic_zero_filter", "toppic_zero_shift");
     ZeroPtmSearchProcessorPtr zero_search_processor
         = std::make_shared<ZeroPtmSearchProcessor>(zero_search_mng_ptr);
-    //zero_search_processor->process();
+    zero_search_processor->process();
     zero_search_processor = nullptr;
     std::cout << "Zero unexpected shift search - finished." << std::endl;
 
@@ -268,7 +268,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
                                             var_ptm_file_name, var_ptm_num, 
                                             filter_thread_num, "toppic_var_filter");
       var_ptm_type_num = var_filter_mng_ptr->getSingleShiftNum(); 
-      //var_ptm_filter_processor::process(var_filter_mng_ptr);
+      var_ptm_filter_processor::process(var_filter_mng_ptr);
       std::cout << "Variable PTM filtering - finished." << std::endl;
 
       std::cout << "Variable PTM search - started." << std::endl;
@@ -293,7 +293,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
                                               "toppic_one_filter", 
                                               filter_thread_num, 
                                               min_shift_mass, max_shift_mass); 
-      //one_ptm_filter_processor::process(one_ptm_filter_mng_ptr);
+      one_ptm_filter_processor::process(one_ptm_filter_mng_ptr);
       std::cout << "One unexpected shift filtering - finished." << std::endl;
 
       std::cout << "One unexpected shift search - started." << std::endl;
@@ -303,7 +303,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
                                            search_shift_num, thread_num, "toppic_one_filter", "toppic_one_shift");
       OnePtmSearchProcessorPtr one_search_processor
           = std::make_shared<OnePtmSearchProcessor>(one_search_mng_ptr);
-      //one_search_processor->process();
+      one_search_processor->process();
       one_search_processor = nullptr;
       std::cout << "One unexpected shift search - finished." << std::endl;
 

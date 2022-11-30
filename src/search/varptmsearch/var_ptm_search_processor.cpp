@@ -71,12 +71,6 @@ PrsmPtrVec VarPtmSearchProcessor::varPtmSearchOneSpec(SpectrumSetPtr spec_set_pt
   ProtModPtrVec prot_mod_ptr_vec = mng_ptr->prsm_para_ptr_->getProtModPtrVec();
   ProteoformPtrVec proteoform_ptr_vec;
   for (size_t i = 0; i < simple_prsm_ptr_vec.size(); i++) {
-    LOG_ERROR(simple_prsm_ptr_vec[i]->getSpectrumId() 
-              << " " << simple_prsm_ptr_vec[i]->getSeqName()
-              << " " << simple_prsm_ptr_vec[i]->getScore()
-              << " spec set mass " << spec_set_ptr->getPrecMonoMass() 
-              << " prsm mass " << simple_prsm_ptr_vec[i]->getPrecMass()
-              << " diff " << std::abs(spec_set_ptr->getPrecMonoMass() - simple_prsm_ptr_vec[i]->getPrecMass())); 
     if (std::abs(spec_set_ptr->getPrecMonoMass() - simple_prsm_ptr_vec[i]->getPrecMass()) 
         > std::pow(10, -4)) {
       // When precursor error is allowed, if the adjusted precursor of the
@@ -93,7 +87,8 @@ PrsmPtrVec VarPtmSearchProcessor::varPtmSearchOneSpec(SpectrumSetPtr spec_set_pt
         = proteoform_factory::readFastaToProteoformPtr(reader_ptr, seq_name, seq_desc, fix_mod_list);
     double n_term_shift = simple_prsm_ptr->getNTermShifts()[0];
     double c_term_shift = simple_prsm_ptr->getCTermShifts()[0];
-    LOG_DEBUG("type " << type_ptr->getName() << " n_term_shift " << n_term_shift << " c term shift " << c_term_shift);
+    LOG_DEBUG("type " << type_ptr->getName() << " proteoform mass " << db_proteo_ptr->getMass()
+              << " n_term_shift " << n_term_shift << " c term shift " << c_term_shift);
     
     ProteoformPtr proteo_with_prot_mod_ptr = db_proteo_ptr;
     // start position is relative to the database sequence
@@ -144,10 +139,12 @@ PrsmPtrVec VarPtmSearchProcessor::varPtmSearchOneSpec(SpectrumSetPtr spec_set_pt
   PrsmPtrVec prsms;
   for (size_t i = 0; i < proteoform_ptr_vec.size(); i++) {
     VarPtmSlowMatch slow_match(proteoform_ptr_vec[i], spec_set_ptr, mng_ptr);
-    PrsmPtr tmp = slow_match.compute();
-    LOG_DEBUG("Slow match computation finish!");
-    if (tmp != nullptr) {
-      prsms.push_back(tmp);
+    if (slow_match.isSuccessInit()) {
+      PrsmPtr tmp = slow_match.compute();
+      LOG_DEBUG("Slow match computation finish!");
+      if (tmp != nullptr) {
+        prsms.push_back(tmp);
+      }
     }
   }
   std::sort(prsms.begin(), prsms.end(), Prsm::cmpMatchFragmentDecMatchPeakDec);

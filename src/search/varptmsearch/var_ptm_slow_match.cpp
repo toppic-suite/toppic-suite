@@ -45,7 +45,7 @@ inline DiagHeaderPtrVec VarPtmSlowMatch::geneVarPtmNTermShiftHeaders() {
   std::vector<double> shifts = mng_ptr_->shift_list_;
   for (size_t i = 0; i < shifts.size(); i++) {
     double n_shift = shifts[i]; 
-    LOG_DEBUG("n shift " << n_shift);
+    LOG_DEBUG(i << " n shift " << n_shift);
     // n_term strict; c_term nostrict; prot n_term no_match; prot c_term no_match
     // pep n_term match; pep c_term no_match
     DiagHeaderPtr header_ptr 
@@ -60,7 +60,7 @@ inline DiagHeaderPtrVec VarPtmSlowMatch::geneVarPtmNTermShiftHeaders() {
     }
 
     double c_shift = prec_mono_mass_ - seq_mass - n_shift;
-    LOG_DEBUG("c shift " << c_shift);
+    LOG_DEBUG(i << " c shift " << c_shift << " error tolerance " << prec_error_tole_);
     if (std::abs(c_shift) <= prec_error_tole_) {
       header_ptr->setProtCTermMatch(true);
       exist_c_term = true;
@@ -72,8 +72,13 @@ inline DiagHeaderPtrVec VarPtmSlowMatch::geneVarPtmNTermShiftHeaders() {
     header_ptrs.push_back(header_ptr);
   }
   if (!exist_n_term || !exist_c_term) {
-    LOG_ERROR("Error: No terminal shifts are found!");
-    exit(EXIT_FAILURE);
+    // it is possible that the c term shift reported 
+    // var ptm filtering has a little larger than the 
+    // precursor error tolerance. In this case, we 
+    // return an empty header ptr
+    LOG_WARN("Error: No terminal shifts are found!");
+    DiagHeaderPtrVec empty_header_ptrs;
+    return empty_header_ptrs;
   }
   return header_ptrs;
 }
@@ -88,6 +93,10 @@ void VarPtmSlowMatch::init() {
   DiagonalPtrVec diagonal_ptrs = diag_pair_util::geneDiagonals(n_term_shift_header_ptrs,
                                                                prm_peaks, group_spec_num,
                                                                proteo_ptr_);
+  if (diagonal_ptrs.size() == 0) {
+    success_init_ = false;
+    return;
+  }
 
   std::vector<double> seq_masses = proteo_ptr_->getBpSpecPtr()->getPrmMasses();
   std::vector<double> ms_masses(prm_peaks.size());
@@ -99,6 +108,7 @@ void VarPtmSlowMatch::init() {
   var_ptm_align_ptr_ = std::make_shared<VarPtmAlign>(ms_masses, seq_masses, 
                                                      sub_res_seq_ptr,  
                                                      diagonal_ptrs, mng_ptr_);
+  success_init_ = true;
 }
 
 
