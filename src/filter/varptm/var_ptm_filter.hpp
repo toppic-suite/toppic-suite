@@ -15,7 +15,7 @@
 #ifndef TOPPIC_FILTER_VAR_PTM_VAR_PTM_FILTER_HPP_
 #define TOPPIC_FILTER_VAR_PTM_VAR_PTM_FILTER_HPP_
 
-#include "ms/spec/extend_ms.hpp"
+#include "ms/spec/prm_ms.hpp"
 #include "prsm/simple_prsm.hpp"
 #include "filter/massmatch/mass_match.hpp"
 #include "filter/mng/var_ptm_filter_mng.hpp"
@@ -27,7 +27,9 @@ class VarPtmFilter {
   VarPtmFilter(const ProteoformPtrVec &proteo_ptrs, 
                 VarPtmFilterMngPtr mng_ptr, 
                 std::string block_str);
-  void computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec);
+
+  void computeBestMatch(const PrmMsPtrVec &prm_ms_ptr_vec,
+                        const PrmMsPtrVec &srm_ms_ptr_vec); 
 
   SimplePrsmPtrVec getCompMatchPtrs() {return comp_match_ptrs_;}
   SimplePrsmPtrVec getPrefMatchPtrs() {return pref_match_ptrs_;}

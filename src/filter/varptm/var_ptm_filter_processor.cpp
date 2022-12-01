@@ -62,8 +62,9 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
     for (size_t k = 0; k < spec_set_vec.size(); k++) {
       SpectrumSetPtr spec_set_ptr = spec_set_vec[k]; 
       if (spec_set_ptr->isValid()) {
-        ExtendMsPtrVec ms_ptr_vec = spec_set_ptr->getMsThreePtrVec();
-        filter_ptr->computeBestMatch(ms_ptr_vec);
+        PrmMsPtrVec prm_ms_ptr_vec = spec_set_ptr->getMsTwoPtrVec();
+        PrmMsPtrVec srm_ms_ptr_vec = spec_set_ptr->getSuffixMsTwoPtrVec();
+        filter_ptr->computeBestMatch(prm_ms_ptr_vec, srm_ms_ptr_vec);
         writers.getCompleteWriterPtr()->write(filter_ptr->getCompMatchPtrs());
         writers.getPrefixWriterPtr()->write(filter_ptr->getPrefMatchPtrs());
         writers.getSuffixWriterPtr()->write(filter_ptr->getSuffMatchPtrs());

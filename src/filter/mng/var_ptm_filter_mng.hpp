@@ -19,6 +19,8 @@
 
 #include "para/prsm_para.hpp"
 
+#include "filter/massmatch/mass_match.hpp"
+
 namespace toppic {
 
 class VarPtmFilterMng {
@@ -47,10 +49,12 @@ class VarPtmFilterMng {
   int max_proteoform_mass_ = 100000;
 
   //Candidate protein number for each spectrum
-  unsigned int comp_num_ = 5;
-  unsigned int pref_suff_num_ = 20;
-  unsigned int inte_num_ = 20;
+  unsigned int comp_num_ = 10;
+  unsigned int pref_suff_num_ = 100;
+  unsigned int inte_num_ = 200;
   int filter_scale_ = 100;
+
+  int threshold_ = MassMatch::getPrecursorMatchScore() * 2 + 4;
 
   int var_ptm_num_ = 3;
 
@@ -65,8 +69,8 @@ class VarPtmFilterMng {
   // processed spectral counts for each database block
   std::vector<int> cnts_;
   
-  std::vector<std::string> var_ptm_file_vec_{"zero_ptm_term_index", "zero_ptm_diag_index", 
-    "zero_ptm_rev_term_index", "zero_ptm_rev_diag_index"};
+  std::vector<std::string> var_ptm_file_vec_{"zero_ptm_term_index", 
+    "zero_ptm_diag_index", "zero_ptm_rev_term_index", "zero_ptm_rev_diag_index"};
   
   // variable PTM mass shift list 
   // use integer to avoid errors in double addition

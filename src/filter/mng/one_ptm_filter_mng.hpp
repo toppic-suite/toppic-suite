@@ -59,8 +59,13 @@ class OnePtmFilterMng {
   unsigned int comp_num_ = 10;
   unsigned int pref_suff_num_ = 5;
   unsigned int inte_num_ = 10;
+  
+  // reported n term or c term shift number
+  unsigned int comp_cand_shift_num_ = 1;
   unsigned int cand_shift_num_ = 10;
   int filter_scale_ = 100;
+
+  int threshold_ = 4;
 
   std::string index_file_para_;
 
