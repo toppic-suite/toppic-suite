@@ -128,10 +128,6 @@ void VarPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec) {
                                                                         mng_ptr_->filter_scale_);
   std::vector<std::pair<int, int> > prec_minus_water_mass_errors 
     = getShiftedMassErrors(prec_minus_water_mass_error, mng_ptr_->int_shift_list_);
-  //LOG_ERROR("Shift list size " << mng_ptr_->int_shift_list_.size());
-  //for (size_t k = 0; k < prec_minus_water_mass_errors.size(); k++) {
-  //  LOG_ERROR("precursor mass " << prec_minus_water_mass_errors[k].first << " " << prec_minus_water_mass_errors[k].second);
-  //}
 
   int term_row_num = term_index_ptr_->getRowNum();
   std::vector<short> term_scores(term_row_num, 0);
@@ -152,7 +148,8 @@ void VarPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec) {
   int threshold = MassMatch::getPrecursorMatchScore() * 2 + 4;
   double prec_minus_water_mass = ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMassMinusWater();
   double prec_error_tole = ms_ptr_vec[0]->getMsHeaderPtr()->getPrecErrorTolerance(tole_ptr->getPpo());
-
+  int group_spec_num = ms_ptr_vec.size();
+  LOG_DEBUG("mass " << ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMass());
   ProtCandidatePtrVec comp_prots
     = mass_match_util::findVarPtmTopProteins(term_scores, rev_term_scores, 
                                              term_index_ptr_, rev_term_index_ptr_,
@@ -160,7 +157,6 @@ void VarPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec) {
                                              mng_ptr_->shift_list_, 
                                              threshold, mng_ptr_->comp_num_);
   comp_match_ptrs_.clear();
-  int group_spec_num = ms_ptr_vec.size();
   for (size_t i = 0; i < comp_prots.size(); i++) {
     int id = comp_prots[i]->getProteinId();
     comp_match_ptrs_.push_back(std::make_shared<SimplePrsm>(ms_ptr_vec[0]->getMsHeaderPtr(),
@@ -205,7 +201,6 @@ void VarPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec) {
                                              prec_minus_water_mass, prec_error_tole,
                                              mng_ptr_->shift_list_,
                                              threshold, mng_ptr_->inte_num_);  
-  //LOG_ERROR("Internal match prot " << pref_prots.size());
   internal_match_ptrs_.clear();
   for (size_t i = 0; i < internal_prots.size(); i++) {
     int id = internal_prots[i]->getProteinId();

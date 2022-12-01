@@ -51,9 +51,9 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
       + "." + mng_ptr->output_file_ext_ + "_" + block_str;
   //writer
   SimplePrsmXmlWriterSet writers(output_file_name);
-  DeconvMsPtrVec deconv_ms_ptr_vec = reader_ptr->getNextMsPtrVec();
   std::vector<double> prec_error_vec = sp_para_ptr->getVarPtmSearchPrecErrorVec();
 
+  DeconvMsPtrVec deconv_ms_ptr_vec = reader_ptr->getNextMsPtrVec();
   while (deconv_ms_ptr_vec.size() != 0) {
     SpectrumSetPtrVec spec_set_vec 
         = spectrum_set_factory::geneSpectrumSetPtrVecWithPrecError(deconv_ms_ptr_vec, 

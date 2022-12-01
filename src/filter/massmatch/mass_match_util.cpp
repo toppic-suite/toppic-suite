@@ -459,6 +459,7 @@ ProtCandidatePtrVec findVarPtmTopProteins(std::vector<short> &scores,
     }
   }
 
+
   ProtCandidatePtrVec proteins = ProtCandidate::geneResults(proteo_scores, threshold, top_num);
   return proteins;
 }

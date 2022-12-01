@@ -48,8 +48,8 @@ class VarPtmFilterMng {
 
   //Candidate protein number for each spectrum
   unsigned int comp_num_ = 5;
-  unsigned int pref_suff_num_ = 5;
-  unsigned int inte_num_ = 10;
+  unsigned int pref_suff_num_ = 20;
+  unsigned int inte_num_ = 20;
   int filter_scale_ = 100;
 
   int var_ptm_num_ = 3;
