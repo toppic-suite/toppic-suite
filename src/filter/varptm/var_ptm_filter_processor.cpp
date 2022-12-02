@@ -129,7 +129,8 @@ void process(VarPtmFilterMngPtr mng_ptr) {
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
   std::string input_pref = mng_ptr->output_file_ext_;
   SimplePrsmStrMerge::mergeBlockResults(sp_file_name, input_pref, block_num,  
-                                        mng_ptr->comp_num_, mng_ptr->pref_suff_num_, mng_ptr->inte_num_ );
+                                        mng_ptr->comp_num_, mng_ptr->pref_suff_num_, 
+                                        mng_ptr->internal_num_ );
   std::cout << "Variable PTM filtering - combining blocks finished." << std::endl;
 }
 

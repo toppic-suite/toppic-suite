@@ -49,14 +49,14 @@ class VarPtmFilterMng {
   int max_proteoform_mass_ = 100000;
 
   //Candidate protein number for each spectrum
-  unsigned int comp_num_ = 5;
-  unsigned int pref_suff_num_ = 20;
-  unsigned int inte_num_ = 20;
+  unsigned int comp_num_ = 20;
+  unsigned int pref_suff_num_ = 100;
+  unsigned int internal_num_ = 200;
   int filter_scale_ = 100;
 
-  int threshold_ = MassMatch::getPrecursorMatchScore() * 2 + 4;
-  
-  //int threshold_ = MassMatch::getPrecursorMatchScore() * 2;
+  int comp_threshold_ = MassMatch::getPrecursorMatchScore() * 2;
+  int pref_suff_threshold_ = MassMatch::getPrecursorMatchScore() * 2;
+  int internal_threshold_ = MassMatch::getPrecursorMatchScore() * 2 + 4;
 
   int var_ptm_num_ = 3;
 

@@ -153,7 +153,8 @@ void VarPtmFilter::computeBestMatch(const PrmMsPtrVec &prm_ms_ptr_vec,
                                              term_index_ptr_, rev_term_index_ptr_,
                                              prec_minus_water_mass, prec_error_tole,
                                              mng_ptr_->shift_list_, 
-                                             mng_ptr_->threshold_, mng_ptr_->comp_num_);
+                                             mng_ptr_->comp_threshold_, 
+                                             mng_ptr_->comp_num_);
   comp_match_ptrs_.clear();
   for (size_t i = 0; i < comp_prots.size(); i++) {
     int id = comp_prots[i]->getProteinId();
@@ -168,7 +169,8 @@ void VarPtmFilter::computeBestMatch(const PrmMsPtrVec &prm_ms_ptr_vec,
                                              term_index_ptr_, rev_diag_index_ptr_,
                                              prec_minus_water_mass, prec_error_tole,
                                              mng_ptr_->shift_list_,
-                                             mng_ptr_->threshold_, mng_ptr_->pref_suff_num_);
+                                             mng_ptr_->pref_suff_threshold_, 
+                                             mng_ptr_->pref_suff_num_);
   pref_match_ptrs_.clear();
   for (size_t i = 0; i < pref_prots.size(); i++) {
     int id = pref_prots[i]->getProteinId();
@@ -183,7 +185,7 @@ void VarPtmFilter::computeBestMatch(const PrmMsPtrVec &prm_ms_ptr_vec,
                                              diag_index_ptr_, rev_term_index_ptr_,
                                              prec_minus_water_mass, prec_error_tole,
                                              mng_ptr_->shift_list_,
-                                             mng_ptr_->threshold_, 
+                                             mng_ptr_->pref_suff_threshold_, 
                                              mng_ptr_->pref_suff_num_);
   suff_match_ptrs_.clear();
   for (size_t i = 0; i < suff_prots.size(); i++) {
@@ -199,7 +201,8 @@ void VarPtmFilter::computeBestMatch(const PrmMsPtrVec &prm_ms_ptr_vec,
                                              diag_index_ptr_, rev_diag_index_ptr_,
                                              prec_minus_water_mass, prec_error_tole,
                                              mng_ptr_->shift_list_,
-                                             mng_ptr_->threshold_, mng_ptr_->inte_num_);  
+                                             mng_ptr_->internal_threshold_, 
+                                             mng_ptr_->internal_num_);  
   internal_match_ptrs_.clear();
   for (size_t i = 0; i < internal_prots.size(); i++) {
     int id = internal_prots[i]->getProteinId();
