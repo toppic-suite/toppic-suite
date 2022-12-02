@@ -162,9 +162,9 @@ void PtmSlowMatch::init() {
   PeakTolerancePtr tole_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
   PrmPeakPtrVec prm_peaks = prm_ms_util::getPrmPeakPtrs(ms_six_ptr_vec_, tole_ptr);
   int group_spec_num = ms_six_ptr_vec_.size();
-  DiagonalPtrVec diagonal_ptrs = diag_pair_util::geneDiagonals(n_term_shift_header_ptrs,
-      prm_peaks, group_spec_num,
-      proteo_ptr_);
+  DiagonalPtrVec diagonal_ptrs = diag_pair_util::geneDiagonalsWithoutEmptyList(n_term_shift_header_ptrs,
+                                                                               prm_peaks, group_spec_num,
+                                                                               proteo_ptr_);
 
   std::vector<double> seq_masses = proteo_ptr_->getBpSpecPtr()->getPrmMasses();
   std::vector<double> ms_masses(prm_peaks.size());

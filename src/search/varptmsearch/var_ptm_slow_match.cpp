@@ -27,11 +27,11 @@ VarPtmSlowMatch::VarPtmSlowMatch(ProteoformPtr proteo_ptr,
   deconv_ms_ptr_vec_ = spectrum_set_ptr->getDeconvMsPtrVec();
   ms_six_ptr_vec_ = spectrum_set_ptr->getMsSixPtrVec();
   prec_mono_mass_ = spectrum_set_ptr->getPrecMonoMass();
-  LOG_DEBUG("prec mass " << prec_mono_mass_ << " protein mass " << proteo_ptr->getMass());
+  //LOG_ERROR("prec mass " << prec_mono_mass_ << " protein mass " << proteo_ptr->getMass());
   mng_ptr_ = mng_ptr;
   PeakTolerancePtr tole_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
   prec_error_tole_ = deconv_ms_ptr_vec_[0]->getMsHeaderPtr()->getPrecErrorTolerance(tole_ptr->getPpo());
-  LOG_DEBUG("error tolerance " << prec_error_tole_);
+  //LOG_ERROR("error tolerance " << prec_error_tole_);
   init();
 }
 
@@ -45,7 +45,7 @@ inline DiagHeaderPtrVec VarPtmSlowMatch::geneVarPtmNTermShiftHeaders() {
   std::vector<double> shifts = mng_ptr_->shift_list_;
   for (size_t i = 0; i < shifts.size(); i++) {
     double n_shift = shifts[i]; 
-    LOG_DEBUG(i << " n shift " << n_shift);
+    //LOG_ERROR(i << " n shift " << n_shift);
     // n_term strict; c_term nostrict; prot n_term no_match; prot c_term no_match
     // pep n_term match; pep c_term no_match
     DiagHeaderPtr header_ptr 
@@ -80,6 +80,7 @@ inline DiagHeaderPtrVec VarPtmSlowMatch::geneVarPtmNTermShiftHeaders() {
     DiagHeaderPtrVec empty_header_ptrs;
     return empty_header_ptrs;
   }
+  //LOG_ERROR("header ptrs size " << header_ptrs.size());
   return header_ptrs;
 }
 
@@ -90,9 +91,15 @@ void VarPtmSlowMatch::init() {
   PeakTolerancePtr tole_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
   PrmPeakPtrVec prm_peaks = prm_ms_util::getPrmPeakPtrs(ms_six_ptr_vec_, tole_ptr);
   int group_spec_num = ms_six_ptr_vec_.size();
-  DiagonalPtrVec diagonal_ptrs = diag_pair_util::geneDiagonals(n_term_shift_header_ptrs,
-                                                               prm_peaks, group_spec_num,
-                                                               proteo_ptr_);
+  DiagonalPtrVec diagonal_ptrs = diag_pair_util::geneDiagonalsWithEmptyList(n_term_shift_header_ptrs,
+                                                                            prm_peaks, group_spec_num,
+                                                                            proteo_ptr_);
+  /*
+  LOG_DEBUG("diagonal ptr size " << diagonal_ptrs.size());
+  for (size_t i = 0; i < diagonal_ptrs.size(); i++) {
+    LOG_DEBUG("shift " << diagonal_ptrs[i]->getHeader()->getProtNTermShift());
+  }
+  */
   if (diagonal_ptrs.size() == 0) {
     success_init_ = false;
     return;

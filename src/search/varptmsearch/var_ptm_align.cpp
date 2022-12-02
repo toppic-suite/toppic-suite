@@ -43,17 +43,12 @@ void VarPtmAlign::initMatchTable() {
   for (size_t i = 0; i < diagonal_ptrs_.size(); i++) {
     std::vector<int> matches(seq_masses_.size(), 0);
     DiagPairPtrVec diag_pair_ptrs = diagonal_ptrs_[i]->getDiagPairPtrVec();
+    //LOG_ERROR(i << " match number " << diag_pair_ptrs.size());
     for (size_t j = 0; j < diag_pair_ptrs.size(); j++) {
       int pos = diag_pair_ptrs[j]->getY();
-      LOG_DEBUG("pos" << pos);
+      //LOG_ERROR(i << " " << j << " pos " << pos);
       matches[pos] = 1;
     }
-    /*
-    LOG_ERROR(i << "match number " << diag_pair_ptrs.size());
-    for (size_t j = 0; j < matches.size(); j++) {
-      LOG_ERROR(i << "match table " << j << " " <<  matches[j]);
-    }
-    */
     matches_2d_.push_back(matches);
   }
 }
@@ -75,7 +70,7 @@ void VarPtmAlign::initAllowShiftTable() {
         }
       }
     }
-    //LOG_DEBUG("Allow shift " << i << " " << allow_shifts[0] << " " << allow_shifts[1]);
+    //LOG_ERROR("Allow shift " << i << " " << allow_shifts[0] << " " << allow_shifts[1]);
     allow_shift_2d_.push_back(allow_shifts); 
   }
 }

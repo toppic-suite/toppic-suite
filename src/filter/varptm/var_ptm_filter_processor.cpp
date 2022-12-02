@@ -62,6 +62,7 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
     for (size_t k = 0; k < spec_set_vec.size(); k++) {
       SpectrumSetPtr spec_set_ptr = spec_set_vec[k]; 
       if (spec_set_ptr->isValid()) {
+        //LOG_ERROR("precursor " << spec_set_ptr->getPrecMonoMass());
         PrmMsPtrVec prm_ms_ptr_vec = spec_set_ptr->getMsTwoPtrVec();
         PrmMsPtrVec srm_ms_ptr_vec = spec_set_ptr->getSuffixMsTwoPtrVec();
         filter_ptr->computeBestMatch(prm_ms_ptr_vec, srm_ms_ptr_vec);
