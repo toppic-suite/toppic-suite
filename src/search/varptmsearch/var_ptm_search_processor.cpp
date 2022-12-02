@@ -189,6 +189,7 @@ void VarPtmSearchProcessor::process() {
   int cnt = 0;
   DeconvMsPtrVec deconv_ms_ptr_vec = msalign_reader_ptr->getNextMsPtrVec(); 
   std::vector<double> prec_error_vec = sp_para_ptr->getVarPtmSearchPrecErrorVec();
+  //LOG_ERROR("start ");
   while (deconv_ms_ptr_vec.size() > 0) {
     std::vector<SpectrumSetPtr> spec_set_vec 
         = spectrum_set_factory::geneSpectrumSetPtrVecWithPrecError(deconv_ms_ptr_vec, 
@@ -198,7 +199,7 @@ void VarPtmSearchProcessor::process() {
       LOG_ERROR("Spectrum set size is 0!");
     }
 
-    // LOG_DEBUG("Start search");
+    //LOG_ERROR("Start search");
     cnt+= group_spec_num;
     if (spec_set_vec[0]->isValid()) {
       int spec_id = spec_set_vec[0]->getSpectrumId();
@@ -208,7 +209,7 @@ void VarPtmSearchProcessor::process() {
         comp_selected_prsm_ptrs.push_back(comp_prsm_ptr);
         comp_prsm_ptr = comp_prsm_reader.readOnePrsm();
       }
-      LOG_DEBUG("complete list size " << comp_selected_prsm_ptrs.size());
+      //LOG_ERROR("complete list size " << comp_selected_prsm_ptrs.size());
       if (comp_selected_prsm_ptrs.size() > 0) {
         // LOG_DEBUG("start processing one spectrum.");
         for (size_t k = 0; k < spec_set_vec.size(); k++) {

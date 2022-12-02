@@ -131,8 +131,9 @@ void filterPeaks(const PrmPeakPtrVec &peak_list, PrmPeakPtrVec &filtered_list,
 PrmMsPtr geneMsTwoPtr(DeconvMsPtr deconv_ms_ptr, int spec_id, SpParaPtr sp_para_ptr,
                       double prec_mono_mass, const std::vector<double> & mod_mass) {
   MsHeaderPtr ori_header_ptr = deconv_ms_ptr->getMsHeaderPtr();
-  double new_prec_mono_mass = prec_mono_mass - std::accumulate(mod_mass.begin(), mod_mass.end(), 0.0);
-  MsHeaderPtr header_ptr = MsHeader::geneMsHeaderPtr(ori_header_ptr, new_prec_mono_mass);
+  // we need to keep the original precursor mass 
+  //double new_prec_mono_mass = prec_mono_mass - std::accumulate(mod_mass.begin(), mod_mass.end(), 0.0);
+  MsHeaderPtr header_ptr = MsHeader::geneMsHeaderPtr(ori_header_ptr, prec_mono_mass);
   // getSpTwoPrmPeak
   ActivationPtr active_type_ptr = header_ptr->getActivationPtr();
   PeakTolerancePtr tole_ptr = sp_para_ptr->getPeakTolerancePtr();
@@ -149,7 +150,7 @@ PrmMsPtr geneMsTwoPtr(DeconvMsPtr deconv_ms_ptr, int spec_id, SpParaPtr sp_para_
     for (size_t i = 0; i < list_filtered.size(); i++) {
       double mass = list_filtered[i]->getMonoMass();
 
-      if (list_filtered[i]->getMonoMass() > prec_mono_mass / 1) {
+      if (list_filtered[i]->getMonoMass() > prec_mono_mass * 1 / 6) {
         mass -= mod_mass[0];
       }
 
@@ -177,14 +178,14 @@ PrmMsPtr geneMsTwoPtr(DeconvMsPtr deconv_ms_ptr, int spec_id, SpParaPtr sp_para_
 PrmMsPtr geneSuffixMsTwoPtr(DeconvMsPtr deconv_ms_ptr, int spec_id, SpParaPtr sp_para_ptr,
                             double prec_mono_mass, const std::vector<double> & mod_mass) {
   MsHeaderPtr ori_header_ptr = deconv_ms_ptr->getMsHeaderPtr();
-  double new_prec_mono_mass = prec_mono_mass - std::accumulate(mod_mass.begin(), mod_mass.end(), 0.0);
-  MsHeaderPtr header_ptr = MsHeader::geneMsHeaderPtr(ori_header_ptr, new_prec_mono_mass);
+  //double new_prec_mono_mass = prec_mono_mass - std::accumulate(mod_mass.begin(), mod_mass.end(), 0.0);
+  MsHeaderPtr header_ptr = MsHeader::geneMsHeaderPtr(ori_header_ptr, prec_mono_mass);
   // getSpTwoPrmPeak
   ActivationPtr active_type_ptr = header_ptr->getActivationPtr();
   PeakTolerancePtr tole_ptr = sp_para_ptr->getPeakTolerancePtr();
   PrmPeakPtrVec list;
   for (size_t i = 0; i < deconv_ms_ptr->size(); i++) {
-    addSuffixTwoMasses(list, spec_id, deconv_ms_ptr->getPeakPtr(i), new_prec_mono_mass,
+    addSuffixTwoMasses(list, spec_id, deconv_ms_ptr->getPeakPtr(i), prec_mono_mass,
                        active_type_ptr, tole_ptr);
   }
   // filter low mass peaks

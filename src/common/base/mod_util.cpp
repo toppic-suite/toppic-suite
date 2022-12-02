@@ -55,7 +55,7 @@ std::vector<std::vector<std::string>> readModTxtForTsv(const std::string &file_n
   std::vector<std::vector<std::string>> mod_data;
   std::ifstream infile(file_name.c_str());
   if (!infile.is_open()) {
-    LOG_ERROR("PTM file " << file_name <<  "cannot be opened!");
+    LOG_ERROR("PTM file " << file_name <<  " cannot be opened!");
     exit(EXIT_FAILURE);
   }
   std::string line;
@@ -102,7 +102,7 @@ ModPtrVec2D readModTxt(const std::string &file_name) {
   std::vector<ModPtrVec> mod_ptr_vec2d(3);
   std::ifstream infile(file_name.c_str());
   if (!infile.is_open()) {
-    LOG_ERROR("Variable PTM file " << file_name <<  "cannot be opened!");
+    LOG_ERROR("Variable PTM file " << file_name <<  " cannot be opened!");
     exit(EXIT_FAILURE);
   }
   std::string line;
