@@ -60,6 +60,8 @@ class VarPtmFilterMng {
 
   int var_ptm_num_ = 3;
 
+  bool use_approx_spec_= false;
+
   int thread_num_ = 1;
 
   int n_spec_block_ = 0;

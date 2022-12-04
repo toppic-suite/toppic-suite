@@ -37,7 +37,7 @@ SpPara::SpPara(std::string activation_name, double n_term_label_mass,
 
   zero_shift_search_prec_error_vec_ = {0, -IM, IM};
 
-  var_ptm_search_prec_error_vec_ = {0, -IM, IM};
+  var_ptm_search_prec_error_vec_ = {0};
 
   one_shift_search_prec_error_vec_ = {0, -IM, IM};
 
