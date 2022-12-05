@@ -44,11 +44,12 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["spectrumFileName"] = "";
   arguments["databaseBlockSize"] = "60000000";
   arguments["maxFragmentLength"] = "500";
-  arguments["minBlockNum"] = "18";
+  arguments["minBlockNum"] = "10";
   arguments["activation"] = "FILE";
   arguments["fixedMod"] = "";
   arguments["allowProtMod"] = "NONE,NME,NME_ACETYLATION,M_ACETYLATION";
   arguments["nTermLabelMass"] = "0";
+  arguments["useApproxSpectra"]="false";
   arguments["variablePtmNum"] = "3";
   arguments["variablePtmFileName"] = "";
   arguments["shiftNumber"] = "1";
@@ -58,7 +59,7 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["searchType"] = "TARGET";
   arguments["numOfTopPrsms"] = "1";
   arguments["filteringResultNumber"] = "20";
-  arguments["massErrorTolerance"] = "15";
+  arguments["massErrorTolerance"] = "10";
   arguments["proteoformErrorTolerance"] = "1.2";
   arguments["cutoffSpectralType"] = "EVALUE";
   arguments["cutoffSpectralValue"] = "0.01";
@@ -119,6 +120,7 @@ void ToppicArgument::outputArguments(std::ostream &output,
   
   if (arguments["variablePtmFileName"] != "" && arguments["variablePtmNum"]!="0") {
     output << std::setw(gap) << std::left <<  "Maximum number of variable modifications:" << sep << arguments["variablePtmNum"] << std::endl;
+    output << std::setw(gap) << std::left <<  "Use approximate spectra in protein filtering:" << sep << arguments["useApproxSpectra"] << std::endl;
     output << std::setw(gap) << std::left << "Variable modifications file name:" << sep << arguments["variablePtmFileName"] << std::endl;
     output << std::setw(gap) << std::left <<  "Variable modifications BEGIN" << std::endl;
     std::vector<std::vector<std::string>> mod_data = mod_util::readModTxtForTsv(arguments["variablePtmFileName"]);
@@ -211,7 +213,6 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
   std::string cutoff_spectral_value = "";
   std::string cutoff_proteoform_type = "";
   std::string cutoff_proteoform_value = "";
-  std::string use_table = "";
   std::string local_ptm_file_name = "";
   std::string local_threshold = "";
   std::string group_num = "";
@@ -235,11 +236,12 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         //("n-terminal-label,N", po::value<std::string> (&n_term_label_mass), "N-terminal modification mass for iTRAQ or TMT labeling. Default value: 0")
         ("variable-ptm-num,S", po::value<std::string> (&variable_ptm_num), "Maximum number of variable modifications in a proteoform-spectrum-match. Default value: 3.")
         ("variable-ptm-file-name,b", po::value<std::string>(&variable_ptm_file_name), "<a variable modification file>. Specify a text file containing the information of varaible modifications.")
+        ("approximate-spectra, A", "Use approximate spectra to increase the sensitivity in protein filtering. Default value: false.")
         ("num-shift,s", po::value<std::string> (&shift_num), "<0|1|2>. Maximum number of unexpected modifications in a proteoform-spectrum-match. Default value: 1.")
         ("min-shift,m", po::value<std::string> (&min_shift_mass), "Minimum value of the mass shift of an unexpected modification. Default value: -500 Dalton.")
         ("max-shift,M", po::value<std::string> (&max_shift_mass), "Maximum value of the mass shift of an unexpected modification. Default value: 500 Dalton.")
         ("decoy,d", "Use a shuffled decoy protein database to estimate false discovery rates.")
-        ("mass-error-tolerance,e", po::value<std::string> (&mass_error_tole), "<a positive integer>. Error tolerance for precursor and fragment masses in PPM. Default value: 15.")
+        ("mass-error-tolerance,e", po::value<std::string> (&mass_error_tole), "<a positive integer>. Error tolerance for precursor and fragment masses in PPM. Default value: 10.")
         ("proteoform-error-tolerance,p", po::value<std::string> (&form_error_tole), "<a positive number>. Error tolerance for identifying PrSM clusters. Default value: 1.2 Dalton.")
         ("spectrum-cutoff-type,t", po::value<std::string> (&cutoff_spectral_type), "<EVALUE|FDR>. Spectrum-level cutoff type for filtering identified proteoform-spectrum-matches. Default value: EVALUE.")
         ("spectrum-cutoff-value,v", po::value<std::string> (&cutoff_spectral_value), "<a positive number>. Spectrum-level cutoff value for filtering identified proteoform-spectrum-matches. Default value: 0.01.")
@@ -267,6 +269,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         ("n-terminal-label,N", po::value<std::string> (&n_term_label_mass), "")
         ("variable-ptm-num,S", po::value<std::string> (&variable_ptm_num), "")
         ("variable-ptm-file-name,b", po::value<std::string>(&variable_ptm_file_name), "")
+        ("approximate-spectra, A", "")
         ("num-shift,s", po::value<std::string> (&shift_num), "")
         ("min-shift,m", po::value<std::string> (&min_shift_mass), "")
         ("max-shift,M", po::value<std::string> (&max_shift_mass), "")
@@ -353,6 +356,10 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
 
     if (vm.count("variable-ptm-file-name")) {
       arguments_["variablePtmFileName"] = variable_ptm_file_name;
+    }
+
+    if (vm.count("approximate-spectrum")) {
+      arguments_["useApproxSpectra"] = "true";
     }
 
     if (vm.count("num-shift")) {

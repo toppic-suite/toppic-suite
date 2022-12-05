@@ -45,14 +45,14 @@ std::map<std::string, std::string> TopmgArgument::initArguments() {
   arguments["databaseFileName"] = "";
   arguments["databaseBlockSize"] = "60000000";
   arguments["maxFragmentLength"] = "500";
-  arguments["minBlockNum"] = "18";
+  arguments["minBlockNum"] = "10";
   arguments["spectrumFileName"] = "";
   arguments["combinedOutputName"] = "";
   arguments["activation"] = "FILE";
   arguments["searchType"] = "TARGET";
   arguments["fixedMod"] = "";
   arguments["ptmNumber"] = "0";
-  arguments["massErrorTolerance"] = "15";
+  arguments["massErrorTolerance"] = "10";
   arguments["proteoformErrorTolerance"] = "1.2";
   arguments["cutoffSpectralType"] = "EVALUE";
   arguments["cutoffSpectralValue"] = "0.01";
@@ -212,7 +212,7 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
         ("n-terminal-form,n", po::value<std::string> (&allow_mod),
          "<a list of allowed N-terminal forms>. N-terminal forms of proteins. Four N-terminal forms can be selected: NONE, NME, NME_ACETYLATION, and M_ACETYLATION. NONE stands for no modifications, NME for N-terminal methionine excision, NME_ACETYLATION for N-terminal acetylation after the initiator methionine is removed, and M_ACETYLATION for N-terminal methionine acetylation. When multiple forms are allowed, they are separated by commas. Default value: NONE,NME,NME_ACETYLATION,M_ACETYLATION.")
         ("decoy,d", "Use a shuffled decoy protein database to estimate false discovery rates.")
-        ("mass-error-tolerance,e", po::value<std::string> (&mass_error_tole), "<a positive integer>. Error tolerance for precursor and fragment masses in PPM. Default value: 15.")
+        ("mass-error-tolerance,e", po::value<std::string> (&mass_error_tole), "<a positive integer>. Error tolerance for precursor and fragment masses in PPM. Default value: 10.")
         ("proteoform-error-tolerance,p", po::value<std::string> (&form_error_tole), "<a positive number>. Error tolerance for identifying PrSM clusters (in Dalton). Default value: 1.2 Dalton.")
         ("max-shift,M", po::value<std::string> (&max_ptm_mass), "<a positive number>. Maximum absolute value of the mass shift (in Dalton). Default value: 500.")
         ("spectrum-cutoff-type,t", po::value<std::string> (&cutoff_spectral_type), "<EVALUE|FDR>. Spectrum-level cutoff type for filtering identified proteoform spectrum-matches. Default value: EVALUE.")

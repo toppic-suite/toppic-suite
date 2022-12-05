@@ -30,6 +30,7 @@ class VarPtmFilterMng {
                   const std::string &var_mod_file_name, 
                   int var_ptm_num,
                   int thread_num,
+                  bool use_approx_spec,
                   const std::string &output_file_ext);
 
   static std::vector<int> computeShifts(std::vector<int> &round_single_shift_list,
@@ -60,9 +61,9 @@ class VarPtmFilterMng {
 
   int var_ptm_num_ = 3;
 
-  bool use_approx_spec_= false;
-
   int thread_num_ = 1;
+
+  bool use_approx_spec_= false;
 
   int n_spec_block_ = 0;
 

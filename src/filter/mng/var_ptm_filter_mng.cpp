@@ -23,11 +23,13 @@ VarPtmFilterMng::VarPtmFilterMng(PrsmParaPtr prsm_para_ptr,
                                  const std::string &var_ptm_file_name, 
                                  int var_ptm_num,
                                  int thread_num,
+                                 bool use_approx_spec,
                                  const std::string &output_file_ext): 
   prsm_para_ptr_(prsm_para_ptr),
   index_file_para_(index_file_para),
   var_ptm_num_(var_ptm_num),
   thread_num_(thread_num),
+  use_approx_spec_(use_approx_spec),
   output_file_ext_(output_file_ext) {
     single_shift_list_ = mod_util::readModTxtToShiftList(var_ptm_file_name);
     // round single shift list

@@ -264,10 +264,15 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
 
     if (var_ptm_num >= 1 && var_ptm_file_name != "") {
       std::cout << "Variable PTM filtering - started." << std::endl;
+      bool use_approx_spec = false;
+      if (arguments["useApproxSpectra"] =="true") {
+        use_approx_spec = true;
+      }
       VarPtmFilterMngPtr var_filter_mng_ptr
         = std::make_shared<VarPtmFilterMng>(prsm_para_ptr, index_file_para, 
                                             var_ptm_file_name, var_ptm_num, 
-                                            filter_thread_num, "toppic_var_filter");
+                                            filter_thread_num, use_approx_spec, 
+                                            "toppic_var_filter");
       var_ptm_type_num = var_filter_mng_ptr->getSingleShiftNum(); 
       var_ptm_filter_processor::process(var_filter_mng_ptr);
       std::cout << "Variable PTM filtering - finished." << std::endl;
