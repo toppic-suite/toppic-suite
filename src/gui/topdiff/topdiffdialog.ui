@@ -254,7 +254,7 @@ p, li { white-space: pre-wrap; }
      <item>
       <widget class="QLabel" name="label_3">
        <property name="text">
-        <string>Output filename:</string>
+        <string>Output file:</string>
        </property>
       </widget>
      </item>
