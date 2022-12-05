@@ -37,8 +37,9 @@ std::map<std::string, std::string> TopIndexArgument::initArguments() {
   std::map<std::string, std::string> arguments;
   arguments["oriDatabaseFileName"]="";
   arguments["databaseFileName"] = "";
-  arguments["databaseBlockSize"] = "250000000";
+  arguments["databaseBlockSize"] = "60000000";
   arguments["maxFragmentLength"] = "500";
+  arguments["minBlockNum"] = "18";
   arguments["searchType"] = "TARGET";
   arguments["fixedMod"] = "";
   arguments["massErrorTolerance"] = "15";

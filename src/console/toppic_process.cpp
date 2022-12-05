@@ -202,7 +202,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
 
     // Filter steps requires a large amount of memory. 
     // We use only one thread to reduce the memory requirement.
-    int filter_thread_num = mem_check::getMaxThreads("toppic_filter");
+    int filter_thread_num = mem_check::getMaxThreads("zero_one_shift_filter");
     if (filter_thread_num > thread_num) {
       filter_thread_num = thread_num;
     }
@@ -231,8 +231,9 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     LOG_DEBUG("block size " << arguments["databaseBlockSize"]);
     int db_block_size = std::stoi(arguments["databaseBlockSize"]);
     int max_frag_len = std::stoi(arguments["maxFragmentLength"]);
-
-    fasta_util::dbPreprocess(ori_db_file_name, db_file_name, decoy, db_block_size, max_frag_len);
+    int min_block_num = std::stoi(arguments["minBlockNum"]);
+    fasta_util::dbPreprocess(ori_db_file_name, db_file_name, decoy, 
+                             db_block_size, max_frag_len, min_block_num);
     msalign_util::geneSpIndex(sp_file_name);
 
     std::vector<std::string> input_exts;
