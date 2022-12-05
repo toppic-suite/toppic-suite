@@ -49,6 +49,11 @@
 #include "search/zeroptmsearch/zero_ptm_search_mng.hpp"
 #include "search/zeroptmsearch/zero_ptm_search_processor.hpp"
 
+#include "filter/mng/var_ptm_filter_mng.hpp"
+#include "filter/varptm/var_ptm_filter_processor.hpp"
+#include "search/varptmsearch/var_ptm_search_mng.hpp"
+#include "search/varptmsearch/var_ptm_search_processor.hpp"
+
 #include "filter/mng/one_ptm_filter_mng.hpp"
 #include "filter/oneptm/one_ptm_filter_processor.hpp"
 #include "search/oneptmsearch/ptm_search_mng.hpp"
@@ -105,19 +110,22 @@ void cleanToppicDir(const std::string &fa_name,
     file_util::cleanPrefix(sp_name, sp_base + ".msalign_");
     file_util::delFile(abs_sp_name + "_index");
     file_util::cleanPrefix(sp_name, sp_base + ".toppic_zero_filter_");
-    file_util::delFile(sp_base + ".toppic_zero_ptm");
-    file_util::cleanPrefix(sp_name, sp_base + ".toppic_zero_ptm_");
+    file_util::delFile(sp_base + ".toppic_zero_shift");
+    file_util::cleanPrefix(sp_name, sp_base + ".toppic_zero_shift_");
+
+    file_util::cleanPrefix(sp_name, sp_base + ".toppic_var_filter_");
+    file_util::delFile(sp_base + ".toppic_var_ptm");
+    file_util::cleanPrefix(sp_name, sp_base + ".toppic_var_ptm_");
     file_util::cleanPrefix(sp_name, sp_base + ".toppic_one_filter_");
-    file_util::delFile(sp_base + ".toppic_one_ptm");
-    file_util::cleanPrefix(sp_name, sp_base + ".toppic_one_ptm_");
+    file_util::delFile(sp_base + ".toppic_one_shift");
+    file_util::cleanPrefix(sp_name, sp_base + ".toppic_one_shift_");
     file_util::delFile(sp_base + ".toppic_multi_filter");
     file_util::cleanPrefix(sp_name, sp_base + ".toppic_multi_filter_");
-    file_util::delFile(sp_base + ".toppic_multi_ptm");
-    file_util::cleanPrefix(sp_name, sp_base + ".toppic_multi_ptm_");
+    file_util::delFile(sp_base + ".toppic_multi_shift");
+    file_util::cleanPrefix(sp_name, sp_base + ".toppic_multi_shift_");
     file_util::delFile(sp_base + ".toppic_combined");
     file_util::delFile(sp_base + ".toppic_evalue");
     file_util::cleanPrefix(sp_name, sp_base + ".toppic_evalue_");
-    //file_util::delFile(sp_base + ".toppic_top");
     file_util::delFile(sp_base + ".toppic_cluster");
     file_util::delFile(sp_base + ".toppic_cluster_fdr");
     file_util::delFile(sp_base + ".toppic_prsm_cutoff");
@@ -137,9 +145,14 @@ int TopPIC_testModFile(std::map<std::string, std::string> & arguments) {
     // Test arguments
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
 
-    if (arguments["residueModFileName"] != "") {
-      mod_util::readModTxt(arguments["residueModFileName"]);
-      ptm_util::readPtmTxt(arguments["residueModFileName"]);
+    if (arguments["variablePtmFileName"] != "") {
+      mod_util::readModTxt(arguments["variablePtmFileName"]);
+      ptm_util::readPtmTxt(arguments["variablePtmFileName"]);
+    }
+
+    if (arguments["localPtmFileName"] != "") {
+      mod_util::readModTxt(arguments["localPtmFileName"]);
+      ptm_util::readPtmTxt(arguments["localPtmFileName"]);
     }
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
@@ -177,17 +190,19 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     }
 
     int n_top = std::stoi(arguments["numOfTopPrsms"]);
-    int ptm_num = std::stoi(arguments["ptmNumber"]);
+    int var_ptm_num = std::stoi(arguments["variablePtmNum"]);
+    int shift_num = std::stoi(arguments["shiftNumber"]);
+    std::string var_ptm_file_name = arguments["variablePtmFileName"]; 
 
-    double max_ptm_mass = std::stod(arguments["maxPtmMass"]);
-    double min_ptm_mass = std::stod(arguments["minPtmMass"]);
+    double max_shift_mass = std::stod(arguments["maxShiftMass"]);
+    double min_shift_mass = std::stod(arguments["minShiftMass"]);
 
     int filter_result_num = std::stoi(arguments["filteringResultNumber"]);
     int thread_num = std::stoi(arguments["threadNumber"]);
 
     // Filter steps requires a large amount of memory. 
     // We use only one thread to reduce the memory requirement.
-    int filter_thread_num = mem_check::getMaxThreads("toppic_filter");
+    int filter_thread_num = mem_check::getMaxThreads("zero_one_shift_filter");
     if (filter_thread_num > thread_num) {
       filter_thread_num = thread_num;
     }
@@ -216,60 +231,96 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     LOG_DEBUG("block size " << arguments["databaseBlockSize"]);
     int db_block_size = std::stoi(arguments["databaseBlockSize"]);
     int max_frag_len = std::stoi(arguments["maxFragmentLength"]);
-
-    fasta_util::dbPreprocess(ori_db_file_name, db_file_name, decoy, db_block_size, max_frag_len);
+    int min_block_num = std::stoi(arguments["minBlockNum"]);
+    fasta_util::dbPreprocess(ori_db_file_name, db_file_name, decoy, 
+                             db_block_size, max_frag_len, min_block_num);
     msalign_util::geneSpIndex(sp_file_name);
 
     std::vector<std::string> input_exts;
 
-    std::cout << "Non PTM filtering - started." << std::endl;
+    std::cout << "Zero unexpected shift filtering - started." << std::endl;
     ZeroPtmFilterMngPtr zero_filter_mng_ptr
         = std::make_shared<ZeroPtmFilterMng>(prsm_para_ptr, index_file_para, 
                                              filter_thread_num, "toppic_zero_filter");
     zero_ptm_filter_processor::process(zero_filter_mng_ptr);
-    std::cout << "Non PTM filtering - finished." << std::endl;
+    std::cout << "Zero unexpected shift filtering - finished." << std::endl;
 
-    std::cout << "Non PTM search - started." << std::endl;
+    std::cout << "Zero unexpected shift search - started." << std::endl;
     ZeroPtmSearchMngPtr zero_search_mng_ptr
-        = std::make_shared<ZeroPtmSearchMng>(prsm_para_ptr, "toppic_zero_filter", "toppic_zero_ptm");
+        = std::make_shared<ZeroPtmSearchMng>(prsm_para_ptr, "toppic_zero_filter", "toppic_zero_shift");
     ZeroPtmSearchProcessorPtr zero_search_processor
         = std::make_shared<ZeroPtmSearchProcessor>(zero_search_mng_ptr);
     zero_search_processor->process();
     zero_search_processor = nullptr;
-    std::cout << "Non PTM search - finished." << std::endl;
+    std::cout << "Zero unexpected shift search - finished." << std::endl;
 
-    input_exts.push_back("toppic_zero_ptm_complete");
-    input_exts.push_back("toppic_zero_ptm_prefix");
-    input_exts.push_back("toppic_zero_ptm_suffix");
-    input_exts.push_back("toppic_zero_ptm_internal");
+    input_exts.push_back("toppic_zero_shift_complete");
+    input_exts.push_back("toppic_zero_shift_prefix");
+    input_exts.push_back("toppic_zero_shift_suffix");
+    input_exts.push_back("toppic_zero_shift_internal");
 
-    if (ptm_num >= 1) {
-      std::cout << "One PTM filtering - started." << std::endl;
+    // var_ptm_type number is used for E-value computation
+    int var_ptm_type_num = 0;
+
+    if (var_ptm_num >= 1 && var_ptm_file_name != "") {
+      std::cout << "Variable PTM filtering - started." << std::endl;
+      bool use_approx_spec = false;
+      if (arguments["useApproxSpectra"] =="true") {
+        use_approx_spec = true;
+      }
+      VarPtmFilterMngPtr var_filter_mng_ptr
+        = std::make_shared<VarPtmFilterMng>(prsm_para_ptr, index_file_para, 
+                                            var_ptm_file_name, var_ptm_num, 
+                                            filter_thread_num, use_approx_spec, 
+                                            "toppic_var_filter");
+      var_ptm_type_num = var_filter_mng_ptr->getSingleShiftNum(); 
+      var_ptm_filter_processor::process(var_filter_mng_ptr);
+      std::cout << "Variable PTM filtering - finished." << std::endl;
+
+      std::cout << "Variable PTM search - started." << std::endl;
+      VarPtmSearchMngPtr var_ptm_search_mng_ptr
+        = std::make_shared<VarPtmSearchMng>(prsm_para_ptr, n_top, var_ptm_file_name, 
+                                            var_ptm_num, thread_num, "toppic_var_filter", "toppic_var_ptm");
+      VarPtmSearchProcessorPtr var_ptm_search_processor
+          = std::make_shared<VarPtmSearchProcessor>(var_ptm_search_mng_ptr);
+      var_ptm_search_processor->process();
+      var_ptm_search_processor = nullptr;
+      std::cout << "Variable PTM search - finished." << std::endl;
+      input_exts.push_back("toppic_var_ptm_complete");
+      input_exts.push_back("toppic_var_ptm_prefix");
+      input_exts.push_back("toppic_var_ptm_suffix");
+      input_exts.push_back("toppic_var_ptm_internal");
+    }
+
+    if (shift_num >= 1) {
+      std::cout << "One unexpected shift filtering - started." << std::endl;
       OnePtmFilterMngPtr one_ptm_filter_mng_ptr
           = std::make_shared<OnePtmFilterMng>(prsm_para_ptr, index_file_para, 
-                                              "toppic_one_filter", filter_thread_num);
+                                              "toppic_one_filter", 
+                                              filter_thread_num, 
+                                              min_shift_mass, max_shift_mass); 
       one_ptm_filter_processor::process(one_ptm_filter_mng_ptr);
-      std::cout << "One PTM filtering - finished." << std::endl;
+      std::cout << "One unexpected shift filtering - finished." << std::endl;
 
-      std::cout << "One PTM search - started." << std::endl;
-      int shift_num = 1;
+      std::cout << "One unexpected shift search - started." << std::endl;
+      int search_shift_num = 1;
       PtmSearchMngPtr one_search_mng_ptr
-          = std::make_shared<PtmSearchMng>(prsm_para_ptr, n_top, max_ptm_mass, min_ptm_mass,
-                                           shift_num, thread_num, "toppic_one_filter", "toppic_one_ptm");
+          = std::make_shared<PtmSearchMng>(prsm_para_ptr, n_top, min_shift_mass, max_shift_mass,
+                                           search_shift_num, thread_num, "toppic_one_filter", "toppic_one_shift");
       OnePtmSearchProcessorPtr one_search_processor
           = std::make_shared<OnePtmSearchProcessor>(one_search_mng_ptr);
       one_search_processor->process();
       one_search_processor = nullptr;
-      std::cout << "One PTM search - finished." << std::endl;
+      std::cout << "One unexpected shift search - finished." << std::endl;
 
-      input_exts.push_back("toppic_one_ptm_complete");
-      input_exts.push_back("toppic_one_ptm_prefix");
-      input_exts.push_back("toppic_one_ptm_suffix");
-      input_exts.push_back("toppic_one_ptm_internal");
+      input_exts.push_back("toppic_one_shift_complete");
+      input_exts.push_back("toppic_one_shift_prefix");
+      input_exts.push_back("toppic_one_shift_suffix");
+      input_exts.push_back("toppic_one_shift_internal");
     }
 
-    if (ptm_num >= 2) {
-      std::cout << "Multiple PTM filtering - started." << std::endl;
+    if (shift_num >= 2) {
+      std::cout << "Multiple unexpected shifts filtering - started." << std::endl;
       // thread number is used because diagonal filter uses only one index
       DiagFilterMngPtr diag_filter_mng_ptr
           = std::make_shared<DiagFilterMng>(prsm_para_ptr, index_file_para,  
@@ -279,25 +330,25 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
           = std::make_shared<DiagFilterProcessor>(diag_filter_mng_ptr);
       diag_filter_processor->process();
       diag_filter_processor = nullptr;
-      std::cout << "Multiple PTM filtering - finished." << std::endl;
+      std::cout << "Multiple unexpected shifts filtering - finished." << std::endl;
 
-      std::cout << "Multiple PTM search - started." << std::endl;
+      std::cout << "Multiple unexpected shifts search - started." << std::endl;
       PtmSearchMngPtr multi_search_mng_ptr
-          = std::make_shared<PtmSearchMng>(prsm_para_ptr, n_top, max_ptm_mass, min_ptm_mass,
-                                           ptm_num, thread_num, "toppic_multi_filter", "toppic_multi_ptm");
+          = std::make_shared<PtmSearchMng>(prsm_para_ptr, n_top, min_shift_mass, max_shift_mass,
+                                           shift_num, thread_num, "toppic_multi_filter", "toppic_multi_shift");
       PtmSearchProcessorPtr processor = std::make_shared<PtmSearchProcessor>(multi_search_mng_ptr);
       processor->process();
       processor = nullptr;
-      std::cout << "Multiple PTM search - finished." << std::endl;
+      std::cout << "Multiple unexpected shifts search - finished." << std::endl;
 
-      input_exts.push_back("toppic_multi_ptm_complete_2");
-      input_exts.push_back("toppic_multi_ptm_prefix_2");
-      input_exts.push_back("toppic_multi_ptm_suffix_2");
-      input_exts.push_back("toppic_multi_ptm_internal_2");
+      input_exts.push_back("toppic_multi_shift_complete_2");
+      input_exts.push_back("toppic_multi_shift_prefix_2");
+      input_exts.push_back("toppic_multi_shift_suffix_2");
+      input_exts.push_back("toppic_multi_shift_internal_2");
     }
 
     std::cout << "Merging PrSMs - started." << std::endl;
-    int prsm_top_num = (ptm_num + 1) * 4;
+    int prsm_top_num = (shift_num + 1) * 4;
     PrsmStrMergePtr merge_ptr
         = std::make_shared<PrsmStrMerge>(sp_file_name, input_exts, "toppic_combined", prsm_top_num);
     merge_ptr->process();
@@ -305,11 +356,11 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     std::cout << "Merging PrSMs - finished." << std::endl;
     
     std::cout << "E-value computation - started." << std::endl;
-    bool variable_ptm = false;
     TdgfMngPtr tdgf_mng_ptr
-        = std::make_shared<TdgfMng>(prsm_para_ptr, ptm_num,
-                                    std::max(std::abs(max_ptm_mass), std::abs(min_ptm_mass)),
-                                    use_gf, variable_ptm, thread_num, "toppic_combined", "toppic_evalue");
+        = std::make_shared<TdgfMng>(prsm_para_ptr, shift_num,
+                                    std::max(std::abs(max_shift_mass), std::abs(min_shift_mass)),
+                                    use_gf, var_ptm_type_num, thread_num, 
+                                    "toppic_combined", "toppic_evalue");
     EValueProcessorPtr processor = std::make_shared<EValueProcessor>(tdgf_mng_ptr);
     processor->init();
     // compute E-value for a set of prsms each run
@@ -340,11 +391,11 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     std::string ori_db_file_name = arguments["oriDatabaseFileName"];
     std::string db_file_name = ori_db_file_name + "_idx" + file_util::getFileSeparator() 
       + file_util::filenameFromEntirePath(arguments["databaseFileName"]);    
-    double max_ptm_mass = std::stod(arguments["maxPtmMass"]);
-    double min_ptm_mass = std::stod(arguments["minPtmMass"]);
+    double max_shift_mass = std::stod(arguments["maxShiftMass"]);
+    double min_shift_mass = std::stod(arguments["minShiftMass"]);
 
     bool localization = false;
-    if (arguments["residueModFileName"] != "") {
+    if (arguments["localPtmFileName"] != "") {
       localization = true;
     }
 
@@ -393,9 +444,9 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
       LocalMngPtr local_mng
           = std::make_shared<LocalMng>(prsm_para_ptr,
                                        std::stod(arguments["localThreshold"]),
-                                       arguments["residueModFileName"],
-                                       max_ptm_mass,
-                                       min_ptm_mass,
+                                       arguments["localPtmFileName"],
+                                       min_shift_mass,
+                                       max_shift_mass,
                                        "toppic_prsm_cutoff", 
                                        "toppic_prsm_cutoff_local");
       LocalProcessorPtr local_ptr = std::make_shared<LocalProcessor>(local_mng);
@@ -516,7 +567,8 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
     for (size_t k = 0; k < spec_file_lst.size(); k++) {
       if (merged_file_name == spec_file_lst[k]) {
         std::string raw_file_name = spec_file_lst[k].substr(0, spec_file_lst[k].find("_ms2.msalign"));
-        LOG_ERROR("A combined file name cannot be the same as one of the input file names '" << raw_file_name << "'. Please choose a different name for a combined file and retry.");
+        LOG_ERROR("A combined file name cannot be the same as one of the input file names '" 
+                  << raw_file_name << "'. Please choose a different name for a combined file and retry.");
         return 1;
       }
     }

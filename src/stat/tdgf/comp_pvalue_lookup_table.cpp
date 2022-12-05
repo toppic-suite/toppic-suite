@@ -265,7 +265,7 @@ void CompPValueLookupTable::process(const DeconvMsPtrVec &deconv_ms_ptr_vec, Prs
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
     peak_num += deconv_ms_ptr_vec[i]->size();
   }
-  double tolerance = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getErrorTolerance(ppo);
+  double tolerance = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecErrorTolerance(ppo);
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     double refine_prec_mass = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMassMinusWater();
     int match_frag_num = prsm_ptrs[i]->getMatchFragNum();

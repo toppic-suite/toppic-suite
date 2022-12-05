@@ -55,37 +55,45 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
       + "." + mng_ptr->output_file_ext_ + "_" + block_str;
   SimplePrsmXmlWriterSet writers(output_file_name);
 
-  SpectrumSetPtr spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(reader_ptr, sp_para_ptr);
-
-  while (spec_set_ptr != nullptr) {
-    if (spec_set_ptr->isValid()) {
-      if (mng_ptr->var_num_ == 0) {
-        PrmMsPtrVec prm_ms_ptr_vec = spec_set_ptr->getMsTwoPtrVec();
-        PrmMsPtrVec srm_ms_ptr_vec = spec_set_ptr->getSuffixMsTwoPtrVec();
-        filter_ptr->computeBestMatch(prm_ms_ptr_vec, srm_ms_ptr_vec);
-        writers.getCompleteWriterPtr()->write(filter_ptr->getCompMatchPtrs());
-        writers.getPrefixWriterPtr()->write(filter_ptr->getPrefMatchPtrs());
-        writers.getSuffixWriterPtr()->write(filter_ptr->getSuffMatchPtrs());
-        writers.getInternalWriterPtr()->write(filter_ptr->getInternalMatchPtrs());
-      } else {
-        std::vector<double> mod_mass(3);
-        for (size_t i = 0; i < mod_mass_list.size(); i++) {
-          for (size_t k1 = 0; k1 < mod_mass.size(); k1++) {
-            std::fill(mod_mass.begin(), mod_mass.end(), 0.0);
-            mod_mass[k1] += mod_mass_list[i];
-            DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
-            double prec_mono_mass = spec_set_ptr->getPrecMonoMass();
-            PrmMsPtrVec prm_ms_ptr_vec = prm_ms_factory::geneMsTwoPtrVec(deconv_ms_ptr_vec,
-                                                                         sp_para_ptr,
-                                                                         prec_mono_mass, mod_mass);
-            PrmMsPtrVec srm_ms_ptr_vec 
+  DeconvMsPtrVec deconv_ms_ptr_vec = reader_ptr->getNextMsPtrVec();
+  std::vector<double> prec_error_vec = sp_para_ptr->getOneShiftSearchPrecErrorVec(); 
+  while(deconv_ms_ptr_vec.size() != 0) { 
+    // allow one dalton error
+    SpectrumSetPtrVec spec_set_vec 
+        = spectrum_set_factory::geneSpectrumSetPtrVecWithPrecError(deconv_ms_ptr_vec, 
+                                                                   sp_para_ptr,
+                                                                   prec_error_vec);
+    for (size_t k = 0; k < spec_set_vec.size(); k++) {
+      SpectrumSetPtr spec_set_ptr = spec_set_vec[k];
+      if (spec_set_ptr->isValid()) {
+        if (mng_ptr->var_num_ == 0) {
+          PrmMsPtrVec prm_ms_ptr_vec = spec_set_ptr->getMsTwoPtrVec();
+          PrmMsPtrVec srm_ms_ptr_vec = spec_set_ptr->getSuffixMsTwoPtrVec();
+          filter_ptr->computeBestMatch(prm_ms_ptr_vec, srm_ms_ptr_vec);
+          writers.getCompleteWriterPtr()->write(filter_ptr->getCompMatchPtrs());
+          writers.getPrefixWriterPtr()->write(filter_ptr->getPrefMatchPtrs());
+          writers.getSuffixWriterPtr()->write(filter_ptr->getSuffMatchPtrs());
+          writers.getInternalWriterPtr()->write(filter_ptr->getInternalMatchPtrs());
+        } else {
+          std::vector<double> mod_mass(3);
+          for (size_t i = 0; i < mod_mass_list.size(); i++) {
+            for (size_t k1 = 0; k1 < mod_mass.size(); k1++) {
+              std::fill(mod_mass.begin(), mod_mass.end(), 0.0);
+              mod_mass[k1] += mod_mass_list[i];
+              DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
+              double prec_mono_mass = spec_set_ptr->getPrecMonoMass();
+              PrmMsPtrVec prm_ms_ptr_vec = prm_ms_factory::geneMsTwoPtrVec(deconv_ms_ptr_vec,
+                                                                           sp_para_ptr,
+                                                                           prec_mono_mass, mod_mass);
+              PrmMsPtrVec srm_ms_ptr_vec 
                 = prm_ms_factory::geneSuffixMsTwoPtrVec(deconv_ms_ptr_vec, sp_para_ptr,
                                                         prec_mono_mass, mod_mass);
-            filter_ptr->computeBestMatch(prm_ms_ptr_vec, srm_ms_ptr_vec);
-            writers.getCompleteWriterPtr()->write(filter_ptr->getCompMatchPtrs());
-            writers.getPrefixWriterPtr()->write(filter_ptr->getPrefMatchPtrs());
-            writers.getSuffixWriterPtr()->write(filter_ptr->getSuffMatchPtrs());
-            writers.getInternalWriterPtr()->write(filter_ptr->getInternalMatchPtrs());
+              filter_ptr->computeBestMatch(prm_ms_ptr_vec, srm_ms_ptr_vec);
+              writers.getCompleteWriterPtr()->write(filter_ptr->getCompMatchPtrs());
+              writers.getPrefixWriterPtr()->write(filter_ptr->getPrefMatchPtrs());
+              writers.getSuffixWriterPtr()->write(filter_ptr->getSuffMatchPtrs());
+              writers.getInternalWriterPtr()->write(filter_ptr->getInternalMatchPtrs());
+            }
           }
         }
       }
@@ -98,11 +106,11 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
     }
     double perc = cnt_sum * 100.0 / mng_ptr->n_spec_block_;
     std::stringstream msg;
-    msg << std::flush << "One PTM filtering - processing " << std::setprecision(3) <<  perc << "%.     \r";
+    msg << std::flush << "One unexpected shift filtering - processing " << std::setprecision(3) <<  perc << "%.     \r";
     mng_ptr->mutex_.lock();
     std::cout << msg.str();
     mng_ptr->mutex_.unlock();
-    spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(reader_ptr, sp_para_ptr);
+    deconv_ms_ptr_vec = reader_ptr->getNextMsPtrVec();
   }
   writers.close();
 }
@@ -113,8 +121,7 @@ std::function<void()> geneTask(int block_idx,
   return[block_idx, mod_mass_list, mng_ptr] () {
     PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
     std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
-    std::string db_block_file_name = prsm_para_ptr->getOriDbName() + "_idx" 
-      + file_util::getFileSeparator() + prsm_para_ptr->getSearchDbFileName()
+    std::string db_block_file_name = prsm_para_ptr->getSearchDbFileNameWithFolder()
       + "_" + str_util::toString(block_idx);
     ProteoformPtrVec raw_forms
         = proteoform_factory::readFastaToProteoformPtrVec(db_block_file_name,
@@ -125,8 +132,7 @@ std::function<void()> geneTask(int block_idx,
 
 void process(OnePtmFilterMngPtr mng_ptr) {
   PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
-  std::string db_file_name = prsm_para_ptr->getOriDbName() + "_idx" 
-    + file_util::getFileSeparator() + prsm_para_ptr->getSearchDbFileName();
+  std::string db_file_name = prsm_para_ptr->getSearchDbFileNameWithFolder();
   DbBlockPtrVec db_block_ptr_vec = DbBlock::readDbBlockIndex(db_file_name);
 
   std::vector<double> mod_mass_list;
@@ -147,13 +153,13 @@ void process(OnePtmFilterMngPtr mng_ptr) {
   pool_ptr->ShutDown();
   std::cout << std::endl;
 
-  std::cout << "One PTM filtering - combining blocks started." << std::endl;
+  std::cout << "One unexpected shift filtering - combining blocks started." << std::endl;
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
   std::string input_pref = mng_ptr->output_file_ext_;
   SimplePrsmStrMerge::mergeBlockResults(sp_file_name, input_pref, block_num,  
                                         mng_ptr->comp_num_, mng_ptr->pref_suff_num_, 
                                         mng_ptr->inte_num_);
-  std::cout << "One PTM filtering - combining blocks finished." << std::endl;
+  std::cout << "One unexpected shift filtering - combining blocks finished." << std::endl;
 }
 
 }

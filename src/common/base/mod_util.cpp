@@ -55,7 +55,7 @@ std::vector<std::vector<std::string>> readModTxtForTsv(const std::string &file_n
   std::vector<std::vector<std::string>> mod_data;
   std::ifstream infile(file_name.c_str());
   if (!infile.is_open()) {
-    LOG_ERROR("PTM file " << file_name <<  "cannot be opened!");
+    LOG_ERROR("PTM file " << file_name <<  " cannot be opened!");
     exit(EXIT_FAILURE);
   }
   std::string line;
@@ -97,12 +97,12 @@ std::vector<std::vector<std::string>> readModTxtForTsv(const std::string &file_n
   return mod_data;
 }
 
-std::vector<ModPtrVec> readModTxt(const std::string &file_name) {
+ModPtrVec2D readModTxt(const std::string &file_name) {
   LOG_DEBUG("mod txt file " << file_name);
   std::vector<ModPtrVec> mod_ptr_vec2d(3);
   std::ifstream infile(file_name.c_str());
   if (!infile.is_open()) {
-    LOG_ERROR("Variable PTM file " << file_name <<  "cannot be opened!");
+    LOG_ERROR("Variable PTM file " << file_name <<  " cannot be opened!");
     exit(EXIT_FAILURE);
   }
   std::string line;
@@ -167,6 +167,29 @@ std::vector<ModPtrVec> readModTxt(const std::string &file_name) {
   }
   infile.close();
   return mod_ptr_vec2d;
+}
+
+ModPtrVec readAnywhereModTxt (const std::string &file_name) {
+  ModPtrVec2D mod_vec_2d = readModTxt(file_name);
+  // the vector at index 2 is the anywhere modifications
+  return mod_vec_2d[2];
+}
+
+std::vector<double> readModTxtToShiftList(const std::string &file_name) {
+  ModPtrVec2D mod_ptr_list_2d = readModTxt(file_name);
+  // consider only modifications with the property anywhere
+  ModPtrVec mod_ptr_list = mod_ptr_list_2d[2];
+  LOG_DEBUG("Mod list size " << mod_ptr_list.size());
+  std::vector<double> shift_list; 
+  for (size_t i = 0; i < mod_ptr_list.size(); i++) {
+    double shift = mod_ptr_list[i]->getShift();
+    // if the shift is not in the list
+    if (std::find(shift_list.begin(), shift_list.end(), shift) == shift_list.end()) {
+      shift_list.push_back(shift);
+    }
+  }
+  LOG_DEBUG("Shift list size " << shift_list.size());
+  return shift_list;
 }
 
 ModPtrVec geneFixedModList(const std::string &str) {

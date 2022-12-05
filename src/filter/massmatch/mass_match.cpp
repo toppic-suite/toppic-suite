@@ -28,50 +28,32 @@
 
 namespace toppic {
 
-/* mass_2d[i]: a vector containing prefix residue masses of the ith proteoform 
- * real_shift_2d[i]: a vector containing all possible shifts of the ith proteoform
+/* proteo_minus_water_masses[i]: the mass (minus water) of the ith proteoform
+ * mass_2d[i]: a vector containing prefix residue masses of the ith proteoform 
+ * float_shift_2d[i]: a vector containing all possible shifts of the ith proteoform
  * pos_2d[i]: a vector containing the first residue position for each shift. 
  */
-MassMatch::MassMatch(std::vector<std::vector<int>> &mass_2d,
-                     std::vector<std::vector<double>> &real_shift_2d,
+MassMatch::MassMatch(std::vector<double> &proteo_minus_water_masses,
+                     std::vector<std::vector<int>> &mass_2d,
+                     std::vector<std::vector<double>> &float_shift_2d,
                      std::vector<std::vector<int>> &pos_2d,
-                     double max_proteoform_mass, double scale) {
+                     double max_proteoform_mass, double scale) { 
   scale_ = scale;
   LOG_DEBUG("Scale: " << scale_);
-  LOG_DEBUG("Proteoform number: " << mass_2d.size());
+
+  proteo_num_ = proteo_minus_water_masses.size();
+  LOG_DEBUG("Proteoform number: " << proteo_minus_water_masses.size());
+  proteo_minus_water_masses_ = proteo_minus_water_masses;
 
   col_num_ = max_proteoform_mass * scale_;
-  proteo_num_ = real_shift_2d.size();
   LOG_DEBUG("column number: " << col_num_);
 
   LOG_DEBUG("start init");
-  initProteoformBeginEnds(real_shift_2d);
+  initProteoformBeginEnds(float_shift_2d);
   LOG_DEBUG("row number: " << row_num_);
 
   LOG_DEBUG("init indexes");
-  initIndexes(mass_2d, real_shift_2d, pos_2d);
-
-}
-
-MassMatch::MassMatch(std::vector<std::vector<int>> &mass_2d,
-                     std::vector<std::vector<double>> &real_shift_2d,
-                     std::vector<std::vector<int>> &pos_2d,
-                     double max_proteoform_mass, double scale, bool prm) {
-  scale_ = scale;
-  LOG_DEBUG("Scale: " << scale_);
-  LOG_DEBUG("Proteoform number: " << mass_2d.size());
-
-  col_num_ = max_proteoform_mass * scale_;
-  proteo_num_ = real_shift_2d.size();
-  LOG_DEBUG("column number: " << col_num_);
-
-  LOG_DEBUG("start init");
-  initProteoformBeginEnds(real_shift_2d);
-  LOG_DEBUG("row number: " << row_num_);
-
-  LOG_DEBUG("init indexes");
-  initIndexes(mass_2d, real_shift_2d, pos_2d);
-  prm_ = prm;
+  initIndexes(mass_2d, float_shift_2d, pos_2d);
 }
 
 void MassMatch::serializeMassMatch(std::string file_name, std::string dir_name){
@@ -87,6 +69,7 @@ void MassMatch::serializeMassMatch(std::string file_name, std::string dir_name){
     
     oa << proteo_row_begins_;
     oa << proteo_row_ends_;
+    oa << proteo_minus_water_masses_;
     oa << row_proteo_ids_;
     oa << trunc_shifts_;
 
@@ -117,6 +100,7 @@ void MassMatch::deserializeMassMatch(std::string new_file, std::string dir_name)
 
     ia >> proteo_row_begins_;
     ia >> proteo_row_ends_;
+    ia >> proteo_minus_water_masses_;
     ia >> row_proteo_ids_;
     ia >> trunc_shifts_;
 
@@ -212,9 +196,9 @@ void MassMatch::fillColumnIndex(std::vector<std::vector<int>> &mass_2d,
 }
 
 void MassMatch::initIndexes(std::vector<std::vector<int>> &mass_2d,
-                            std::vector<std::vector<double>> &real_shift_2d,
+                            std::vector<std::vector<double>> &float_shift_2d,
                             std::vector<std::vector<int>> &pos_2d) {
-  std::vector<std::vector<int>> shift_2d = convertToInt(real_shift_2d, scale_);
+  std::vector<std::vector<int>> shift_2d = convertToInt(float_shift_2d, scale_);
   LOG_DEBUG("column num " << col_num_);
   std::vector<int> col_match_nums(col_num_, 0);
   // no need to initialize
@@ -260,11 +244,41 @@ void MassMatch::compScores(const std::vector<std::pair<int, int>> &pref_mass_err
     if (right < 0 || right >= col_num_) {
       continue;
     }
+
     begin_index = col_index_begins_[left];
     end_index   = col_index_ends_[right];
 
+
     for (int j = begin_index; j <= end_index; j++) {
       scores[col_indexes_[j]]++;
+    }
+  }
+}
+
+void MassMatch::updatePrecScore(const std::pair<int, int> mass_error, 
+                                std::vector<short> &scores) {
+  // precursor mass
+  int begin_index, end_index;
+  int m = mass_error.first;
+  // m - errors[i] performs better than m - errors[i] -  errors[bgn_pos]
+  int left = m - mass_error.second;
+  if (left < 0) {
+    left = 0;
+  }
+
+  int right = m + mass_error.second;
+  if (right >= col_num_) {
+    right = col_num_ - 1;
+  }
+
+  if (left <= right) {
+    // update scores
+    begin_index = col_index_begins_[left];
+    end_index   = col_index_ends_[right];
+    for (int j = begin_index; j <= end_index; j++) {
+      if (scores[col_indexes_[j]] < getPrecursorMatchScore()) {
+        scores[col_indexes_[j]] += getPrecursorMatchScore();
+      }
     }
   }
 }
@@ -273,24 +287,17 @@ void MassMatch::compMatchScores(const std::vector<std::pair<int, int>> &pref_mas
                                 const std::pair<int, int> &prec_minus_water_mass_error,
                                 std::vector<short> &scores) {
   compScores(pref_mass_errors, 0, 0.0, scores);
+  updatePrecScore(prec_minus_water_mass_error, scores);
+}
+
+void MassMatch::compMatchScores(const std::vector<std::pair<int, int>> &pref_mass_errors,
+                                const std::vector<std::pair<int, int>> &prec_minus_water_mass_errors,
+                                std::vector<short> &scores) {
+  compScores(pref_mass_errors, 0, 0.0, scores);
   // precursor mass
-  int begin_index, end_index;
-  int m = prec_minus_water_mass_error.first;
-  // m - errors[i] performs better than m - errors[i] -  errors[bgn_pos]
-  int left = m - prec_minus_water_mass_error.second;
-  if (left < 0) {
-    left = 0;
-  }
-
-  int right = m + prec_minus_water_mass_error.second;
-
-  if (right >= 0 && right < col_num_) {
-    // update scores
-    begin_index = col_index_begins_[left];
-    end_index   = col_index_ends_[right];
-    for (int j = begin_index; j <= end_index; j++) {
-      scores[col_indexes_[j]] += getPrecursorMatchScore();
-    }
+  for (size_t i = 0; i < prec_minus_water_mass_errors.size(); i++) {
+    std::pair<int, int> mass_error = prec_minus_water_mass_errors[i]; 
+    updatePrecScore(mass_error, scores);
   }
 }
 

@@ -23,9 +23,12 @@
 namespace toppic {
 
 PrsmPara::PrsmPara(std::map<std::string, std::string> &arguments) {
+  ori_db_name_ = arguments["oriDatabaseFileName"];
+
   search_db_file_name_ = file_util::filenameFromEntirePath(arguments["databaseFileName"]);
 
-  ori_db_name_ = arguments["oriDatabaseFileName"];
+  search_db_file_name_with_folder_ = ori_db_name_ + "_idx" 
+    + file_util::getFileSeparator() + search_db_file_name_;
 
   spec_file_name_ = arguments["spectrumFileName"];
 
@@ -47,7 +50,7 @@ PrsmPara::PrsmPara(std::map<std::string, std::string> &arguments) {
   int ppm = std::stoi(arguments["massErrorTolerance"]);
   double n_term_label_mass = 0;
   if (arguments["nTermLabelMass"] != "") {
-    std::stod(arguments["nTermLabelMass"]);
+    n_term_label_mass = std::stod(arguments["nTermLabelMass"]);
   }
   sp_para_ptr_ = std::make_shared<SpPara>(activation_name, n_term_label_mass, ppm); 
 }

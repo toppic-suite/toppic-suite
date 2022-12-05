@@ -15,6 +15,7 @@
 #include <string>
 #include <algorithm>
 #include <random>
+#include <cmath>
 
 #include "htslib/faidx.h"
 
@@ -93,18 +94,46 @@ void generateStandardDb(const std::string &ori_file_name,
   standard_db.close();
 }
 
-void generateDbBlock(const std::string &db_file_name, int block_size, int max_frag_len) {
+void generateDbBlock(const std::string &db_file_name, int block_size, 
+                     int max_frag_len, int min_block_num) {
   int block_idx = 0;
   int seq_idx = 0;
   std::string index_file_name = db_file_name + "_block_index";
   std::string block_file_name = db_file_name + "_" + str_util::toString(block_idx);
 
+
+  // get total_size;
+  FastaReader size_reader(db_file_name);
+  FastaSeqPtr seq_info = size_reader.getNextSeq();
+  int total_seq_size = 0;
+  while (seq_info != nullptr) {
+    std::string seq = seq_info->getRawSeq();
+    int seq_len = seq.length();
+    if (seq_len <= max_frag_len) {
+      total_seq_size = total_seq_size + (seq_len * (seq_len + 1)/2);
+    }
+    else {
+      total_seq_size = total_seq_size + (seq_len - max_frag_len) * max_frag_len 
+	      + (max_frag_len * (max_frag_len + 1) /2);
+    }
+    seq_info = size_reader.getNextSeq();
+  }
+  size_reader.close();
+  // adjust block size if the database is too small 
+  int block_num = static_cast<int>(std::ceil(total_seq_size/block_size));
+  if (block_num < min_block_num) {
+    block_num = min_block_num;
+    // add +1 to make sure there is no error introduced in division.
+    block_size = total_seq_size/block_num + 1;
+  }
+
   std::ofstream index_output;
   index_output.open(index_file_name.c_str(), std::ios::out);
   std::ofstream block_output;
   block_output.open(block_file_name.c_str(), std::ios::out);
+
   FastaReader reader(db_file_name);
-  FastaSeqPtr seq_info = reader.getNextSeq();
+  seq_info = reader.getNextSeq();
   index_output << block_idx << "\t" << seq_idx << std::endl;
   int seq_size = 0;
   while (seq_info != nullptr) {
@@ -156,7 +185,8 @@ void dbSimplePreprocess(const std::string &ori_db_file_name,
 
 void dbPreprocess(const std::string &ori_db_file_name,
                   const std::string &file_name,
-                  bool decoy, int block_size, int max_frag_len) {
+                  bool decoy, int block_size, 
+                  int max_frag_len, int min_block_num) {
   //if _idx folder doesn't exist yet
   if (!file_util::exists(ori_db_file_name + "_idx")){
     file_util::createFolder(ori_db_file_name + "_idx");
@@ -194,7 +224,7 @@ void dbPreprocess(const std::string &ori_db_file_name,
   // Generate new database blocks
   if (!file_util::exists(new_db_file_name + "_block_index") || 
       !file_util::exists(new_db_file_name + "_0")) {
-    generateDbBlock(new_db_file_name, block_size, max_frag_len);
+    generateDbBlock(new_db_file_name, block_size, max_frag_len, min_block_num);
   }
 
   // Generate new database file index

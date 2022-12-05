@@ -41,7 +41,17 @@ class SpPara {
 
   const std::vector<double>& getExtendOffsets() {return ext_offsets_;}
 
-  const std::vector<double>& getPrecErrorVec() {return prec_error_vec_;}
+  const std::vector<double>& getZeroShiftSearchPrecErrorVec() {
+    return zero_shift_search_prec_error_vec_;}
+
+  const std::vector<double>& getVarPtmSearchPrecErrorVec() {
+    return var_ptm_search_prec_error_vec_;}
+
+  const std::vector<double>& getOneShiftSearchPrecErrorVec() {
+    return one_shift_search_prec_error_vec_;}
+
+  const std::vector<double>& getMultiShiftSearchPrecErrorVec() {
+    return multi_shift_search_prec_error_vec_;}
 
   PeakTolerancePtr getPeakTolerancePtr() {return peak_tolerance_ptr_;}
 
@@ -74,7 +84,13 @@ class SpPara {
   ActivationPtr activation_ptr_;
 
   // the 1 Da error in precursor mass used in zeroptm filtering
-  std::vector<double> prec_error_vec_;
+  std::vector<double> zero_shift_search_prec_error_vec_;
+
+  std::vector<double> one_shift_search_prec_error_vec_;
+
+  std::vector<double> multi_shift_search_prec_error_vec_;
+
+  std::vector<double> var_ptm_search_prec_error_vec_;
 
   PeakTolerancePtr peak_tolerance_ptr_;
 };

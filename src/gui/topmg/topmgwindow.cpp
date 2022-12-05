@@ -101,7 +101,7 @@ void TopmgWindow::on_defaultButton_clicked() {
 
   ui->errorToleranceEdit->setText(QString::fromStdString(arguments_["massErrorTolerance"])); 
   ui->formErrorToleranceEdit->setText(QString::fromStdString(arguments_["proteoformErrorTolerance"]));
-  ui->maxModEdit->setText(QString::fromStdString(arguments_["maxPtmMass"]));
+  ui->maxModEdit->setText(QString::fromStdString(arguments_["maxShiftMass"]));
   ui->cutoffSpectralValueEdit->setText(QString::fromStdString(arguments_["cutoffSpectralValue"]));
   ui->cutoffProteoformValueEdit->setText(QString::fromStdString(arguments_["cutoffProteoformValue"]));
   ui->threadNumberEdit->setText(QString::fromStdString(arguments_["threadNumber"]));
@@ -256,7 +256,7 @@ std::map<std::string, std::string> TopmgWindow::getArguments() {
     arguments_["fixedMod"] = ui->fixedModFileEdit->text().toStdString();
   }
   arguments_["varPtmNumber"] = ui->numModComboBox->currentText().toStdString();
-  arguments_["ptmNumber"] = ui->numUnknownShiftComboBox->currentText().toStdString();
+  arguments_["shiftNumber"] = ui->numUnknownShiftComboBox->currentText().toStdString();
   arguments_["massErrorTolerance"] = ui->errorToleranceEdit->text().toStdString();
   arguments_["proteoformErrorTolerance"] = ui->formErrorToleranceEdit->text().toStdString();
   arguments_["cutoffSpectralType"] = ui->cutoffSpectralTypeComboBox->currentText().toStdString();
@@ -279,10 +279,10 @@ std::map<std::string, std::string> TopmgWindow::getArguments() {
   if (arguments_["allowProtMod"] != "") {
     arguments_["allowProtMod"] = arguments_["allowProtMod"].substr(1);
   }
-  arguments_["maxPtmMass"] = ui->maxModEdit->text().toStdString();
+  arguments_["maxShiftMass"] = ui->maxModEdit->text().toStdString();
   arguments_["proteoGraphGap"] = ui->maxGapLength->text().toStdString();
   arguments_["varPtmNumber"] = ui->numModComboBox->currentText().toStdString();
-  arguments_["ptmNumber"] = ui->numUnknownShiftComboBox->currentText().toStdString();
+  arguments_["shiftNumber"] = ui->numUnknownShiftComboBox->currentText().toStdString();
   arguments_["varPtmNumInGap"] = ui->maxVarPTMGap->text().toStdString();
   arguments_["varModFileName"] = ui->modFileEdit->text().toStdString();
   arguments_["threadNumber"] = ui->threadNumberEdit->text().toStdString();
@@ -594,7 +594,7 @@ void TopmgWindow::showArguments() {
                                         "\nactivation:" + arguments_["activation"] +
                                         "\nsearchType:" + arguments_["searchType"] +
                                         "\nfixedMod:" + arguments_["fixedMod"] +
-                                        "\nptmNumber:" + arguments_["ptmNumber"] +
+                                        "\nshiftNumber:" + arguments_["shiftNumber"] +
                                         "\nerrorTolerance:" + arguments_["massErrorTolerance"] +
                                         "\nformErrorTolerance:" + arguments_["proteoformErrorTolerance"] +
                                         "\ncutoffSpectralType:" + arguments_["cutoffSpectralType"] +
@@ -603,7 +603,7 @@ void TopmgWindow::showArguments() {
                                         "\ncutoffProteoformValue:" + arguments_["cutoffProteoformValue"] +
                                         "\nallowProtMod:" + arguments_["allowProtMod"] +
                                         "\nnumOfTopPrsms:" + arguments_["numOfTopPrsms"] +
-                                        "\nmaxPtmMass:" + arguments_["maxPtmMass"] +
+                                        "\nmaxShiftMass:" + arguments_["maxShiftMass"] +
                                         "\nkeepTempFiles:" + arguments_["keepTempFiles"] +
                                         "\ngroupSpectrumNumber:" + arguments_["groupSpectrumNumber"] +
                                         "\nfilteringResultNumber:" + arguments_["filteringResultNumber"] +

@@ -62,7 +62,9 @@ void TopIndexProcess(std::map<std::string, std::string> &arguments){
     std::string index_file_para = file_name_ptr->geneFileName(arguments);
     int db_block_size = std::stoi(arguments["databaseBlockSize"]);
     int max_frag_len = std::stoi(arguments["maxFragmentLength"]);
-    fasta_util::dbPreprocess(ori_db_file_name, db_file_name, decoy, db_block_size, max_frag_len);
+    int min_block_num = std::stoi(arguments["minBlockNum"]);
+    fasta_util::dbPreprocess(ori_db_file_name, db_file_name, decoy, 
+                             db_block_size, max_frag_len, min_block_num);
 
     ZeroPtmFilterMngPtr zero_filter_mng_ptr
         = std::make_shared<ZeroPtmFilterMng>(prsm_para_ptr, index_file_para, 

@@ -17,6 +17,7 @@
 
 #include "common/xml/xml_dom_element.hpp"
 #include "seq/proteoform.hpp"
+#include "seq/prot_candidate.hpp"
 #include "ms/spec/ms_header.hpp"
 
 namespace toppic {
@@ -32,6 +33,10 @@ class SimplePrsm {
  public:
   SimplePrsm(MsHeaderPtr header_ptr, int spectrum_num,
              ProteoformPtr proteo_ptr, int score);
+
+  SimplePrsm(MsHeaderPtr header_ptr, int spectrum_num,
+             ProteoformPtr proteo_ptr,
+             ProtCandidatePtr prot_ptr); 
 
   SimplePrsm(MsHeaderPtr header_ptr, int spectrum_num,
              const std::string & seq_name,
@@ -64,13 +69,15 @@ class SimplePrsm {
 
   double getProteoformMass() {return prot_mass_;}
 
-  std::vector<double>& getNTruncShifts() {return n_trunc_shifts_;}
+  std::vector<double>& getNTermShifts() {return n_term_shifts_;}
 
-  std::vector<double>& getCTruncShifts() {return c_trunc_shifts_;}
+  std::vector<double>& getCTermShifts() {return c_term_shifts_;}
 
-  void setNTruncShifts(const std::vector<double> &shifts) {n_trunc_shifts_ = shifts;}
+  std::vector<double> getNTermShiftsFromCTermShifts(); 
 
-  void setCTruncShifts(const std::vector<double> &c_term_shifts);
+  void setNTermShifts(const std::vector<double> &shifts) {n_term_shifts_ = shifts;}
+
+  void setCTermShifts(const std::vector<double> &c_term_shifts) {c_term_shifts_ = c_term_shifts;}
 
   XmlDOMElement* toXml(XmlDOMDocument* xml_doc);
 
@@ -100,8 +107,8 @@ class SimplePrsm {
 
   double score_;
 
-  std::vector<double> n_trunc_shifts_;
-  std::vector<double> c_trunc_shifts_;
+  std::vector<double> n_term_shifts_;
+  std::vector<double> c_term_shifts_;
 };
 
 } /* namespace toppic */

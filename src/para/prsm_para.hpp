@@ -28,9 +28,11 @@ class PrsmPara {
  public:
   PrsmPara(std::map<std::string,std::string> &arguments);
 
-  std::string getSearchDbFileName() {return search_db_file_name_;}
+  std::string getOriDbName() {return ori_db_name_;}
 
-  std::string getOriDbName(){return ori_db_name_;}
+  std::string getSearchDbFileNameWithFolder() {return search_db_file_name_with_folder_;}
+
+  std::string getDbIndexDir() {return ori_db_name_ + "_idx";}
   
   std::string getSpectrumFileName() {return spec_file_name_;}
 
@@ -45,9 +47,11 @@ class PrsmPara {
   SpParaPtr getSpParaPtr() {return sp_para_ptr_;}
 
  private:
+  std::string ori_db_name_;
+
   std::string search_db_file_name_;
 
-  std::string ori_db_name_;
+  std::string search_db_file_name_with_folder_;
 
   std::string spec_file_name_;
 

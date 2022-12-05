@@ -50,6 +50,8 @@ class Mod {
 
 typedef std::vector<ModPtr> ModPtrVec;
 
+typedef std::vector<ModPtrVec> ModPtrVec2D;
+
 }  // namespace toppic
 
 #endif

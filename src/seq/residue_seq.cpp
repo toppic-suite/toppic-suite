@@ -15,6 +15,7 @@
 #include <sstream>
 #include <string>
 
+#include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
 #include "seq/residue_seq.hpp"
 
@@ -31,14 +32,20 @@ ResidueSeq::ResidueSeq(const ResiduePtrVec &residues):
 
 ResSeqPtr ResidueSeq::getSubResidueSeq(int bgn, int end) {
   if (end - bgn < 0) {
+    LOG_WARN("Empty sub residue sequence!");
     return getEmptyResidueSeq();
-  } else {
-    ResiduePtrVec sub_residues;
-    // from bgn to end,the sum of residues shoule be end - bgn + 1
-    std::copy(residues_.begin() + bgn, residues_.begin() + end + 1,
-              std::back_inserter(sub_residues) );
-    return std::make_shared<ResidueSeq>(sub_residues);
+  } 
+  if (end >= getLen()) {
+    LOG_ERROR("The end posisiton is too large: " << end);
+    exit(EXIT_FAILURE);
   }
+
+  ResiduePtrVec sub_residues;
+  // from bgn to end,the sum of residues shoule be end - bgn + 1
+  std::copy(residues_.begin() + bgn, residues_.begin() + end + 1,
+            std::back_inserter(sub_residues) );
+  return std::make_shared<ResidueSeq>(sub_residues);
+  
 }
 
 std::string ResidueSeq::toString() {

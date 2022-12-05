@@ -81,7 +81,7 @@ ProteoformPtr geneProtModProteoform(ProteoformPtr db_form_ptr, ProtModPtr prot_m
   ResSeqPtr db_res_seq_ptr = db_form_ptr->getResSeqPtr();
   bool valid_mod = prot_mod_util::allowMod(prot_mod_ptr, db_res_seq_ptr->getResidues());
   if (!valid_mod) {
-    // LOG_DEBUG("NO valid mod");
+    //LOG_DEBUG("NO valid mod");
     return ProteoformPtr(nullptr);
   }
 

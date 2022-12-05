@@ -26,8 +26,8 @@ class LocalMng {
   LocalMng(PrsmParaPtr prsm_para_ptr,
            double local_threshold,
            const std::string& residueModFileName,
-           double max_ptm_mass,
            double min_ptm_mass,
+           double max_ptm_mass,
            const std::string &input_file_ext,
            const std::string &output_file_ext);
 
@@ -42,9 +42,9 @@ class LocalMng {
 
   double min_mass_;
 
-  double max_ptm_mass_;
-
   double min_ptm_mass_;
+
+  double max_ptm_mass_;
 
   // prob ratio between a matched fragment and an unmatched fragment
   double prob_ratio_ = 23.1434;

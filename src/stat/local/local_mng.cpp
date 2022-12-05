@@ -19,8 +19,8 @@ namespace toppic {
 LocalMng::LocalMng(PrsmParaPtr prsm_para_ptr,
                    double local_threshold,
                    const std::string& residueModFileName,
-                   double max_ptm_mass,
                    double min_ptm_mass,
+                   double max_ptm_mass,
                    const std::string &input_file_ext,
                    const std::string &output_file_ext):
   prsm_para_ptr_(prsm_para_ptr),
@@ -29,8 +29,8 @@ LocalMng::LocalMng(PrsmParaPtr prsm_para_ptr,
   residueModFileName_(residueModFileName),
   threshold_(local_threshold),
   min_mass_(prsm_para_ptr->getSpParaPtr()->getMinMass()),
-  max_ptm_mass_(max_ptm_mass),
-  min_ptm_mass_(min_ptm_mass) {
+  min_ptm_mass_(min_ptm_mass),
+  max_ptm_mass_(max_ptm_mass) {
     peak_tole_ptr_= prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
   }
 }  // namespace toppic

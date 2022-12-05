@@ -54,28 +54,36 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
 
   SimplePrsmXmlWriterPtr writer_ptr = std::make_shared<SimplePrsmXmlWriter>(output_file_name);
 
-  SpectrumSetPtr spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(reader_ptr, sp_para_ptr);
-
-  while (spec_set_ptr != nullptr) {
-    if (spec_set_ptr->isValid()) {
-      if (mng_ptr->var_num_ == 0) {
-        PrmMsPtrVec ms_ptr_vec = spec_set_ptr->getMsTwoPtrVec();
-        SimplePrsmPtrVec match_ptrs = filter_ptr->getBestMatch(ms_ptr_vec);
-        writer_ptr->write(match_ptrs);
-      } 
-      else {
-        DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
-        double prec_mono_mass = spec_set_ptr->getPrecMonoMass();
-        std::vector<double> mod_mass(3);
-        for (size_t i = 0; i < mod_mass_list.size(); i++) {
-          for (size_t k1 = 0; k1 < mod_mass.size(); k1++) {
-            std::fill(mod_mass.begin(), mod_mass.end(), 0.0);
-            mod_mass[k1] += mod_mass_list[i];
-            PrmMsPtrVec ms_ptr_vec = prm_ms_factory::geneMsTwoPtrVec(deconv_ms_ptr_vec,
-                                                                     sp_para_ptr,
-                                                                     prec_mono_mass, mod_mass);
-            SimplePrsmPtrVec match_ptrs = filter_ptr->getBestMatch(ms_ptr_vec);
-            writer_ptr->write(match_ptrs);
+  DeconvMsPtrVec deconv_ms_ptr_vec = reader_ptr->getNextMsPtrVec();
+  std::vector<double> prec_error_vec = sp_para_ptr->getMultiShiftSearchPrecErrorVec();
+  while (deconv_ms_ptr_vec.size() != 0) {
+    // allow one dalton error
+    SpectrumSetPtrVec spec_set_vec 
+        = spectrum_set_factory::geneSpectrumSetPtrVecWithPrecError(deconv_ms_ptr_vec, 
+                                                                   sp_para_ptr,
+                                                                   prec_error_vec);
+    for (size_t k = 0; k < spec_set_vec.size(); k++) {
+      SpectrumSetPtr spec_set_ptr = spec_set_vec[k];
+      if (spec_set_ptr->isValid()) {
+        if (mng_ptr->var_num_ == 0) {
+          PrmMsPtrVec ms_ptr_vec = spec_set_ptr->getMsTwoPtrVec();
+          SimplePrsmPtrVec match_ptrs = filter_ptr->getBestMatch(ms_ptr_vec);
+          writer_ptr->write(match_ptrs);
+        } 
+        else {
+          DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
+          double prec_mono_mass = spec_set_ptr->getPrecMonoMass();
+          std::vector<double> mod_mass(3);
+          for (size_t i = 0; i < mod_mass_list.size(); i++) {
+            for (size_t k1 = 0; k1 < mod_mass.size(); k1++) {
+              std::fill(mod_mass.begin(), mod_mass.end(), 0.0);
+              mod_mass[k1] += mod_mass_list[i];
+              PrmMsPtrVec ms_ptr_vec = prm_ms_factory::geneMsTwoPtrVec(deconv_ms_ptr_vec,
+                                                                       sp_para_ptr,
+                                                                       prec_mono_mass, mod_mass);
+              SimplePrsmPtrVec match_ptrs = filter_ptr->getBestMatch(ms_ptr_vec);
+              writer_ptr->write(match_ptrs);
+            }
           }
         }
       }
@@ -92,7 +100,7 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
     std::cout << msg.str();
     mng_ptr->mutex_.unlock();
 
-    spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(reader_ptr, sp_para_ptr);
+    deconv_ms_ptr_vec = reader_ptr->getNextMsPtrVec();
   }
   writer_ptr->close();
 }
@@ -103,8 +111,7 @@ std::function<void()> geneTask(int block_idx,
   return[block_idx, mod_mass_list, mng_ptr] () {
     PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
     std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
-    std::string db_block_file_name = prsm_para_ptr->getOriDbName() + "_idx" 
-      + file_util::getFileSeparator() + prsm_para_ptr->getSearchDbFileName()
+    std::string db_block_file_name = prsm_para_ptr->getSearchDbFileNameWithFolder()
       + "_" + str_util::toString(block_idx);
     ProteoformPtrVec raw_forms
         = proteoform_factory::readFastaToProteoformPtrVec(db_block_file_name,
@@ -114,8 +121,7 @@ std::function<void()> geneTask(int block_idx,
 }
 
 void DiagFilterProcessor::process() {
-  std::string db_file_name = mng_ptr_->prsm_para_ptr_->getOriDbName() + "_idx" 
-    + file_util::getFileSeparator() + mng_ptr_->prsm_para_ptr_->getSearchDbFileName();
+  std::string db_file_name = mng_ptr_->prsm_para_ptr_->getSearchDbFileNameWithFolder();
   DbBlockPtrVec db_block_ptr_vec = DbBlock::readDbBlockIndex(db_file_name);
 
   std::vector<double> mod_mass_list;

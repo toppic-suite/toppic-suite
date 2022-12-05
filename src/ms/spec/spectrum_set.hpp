@@ -51,6 +51,8 @@ class SpectrumSet {
 
   PrmMsPtrVec getMsSixPtrVec() {return prm_ms_six_ptr_vec_;}
 
+  //PrmMsPtrVec getSuffixMsSixPtrVec() {return srm_ms_six_ptr_vec_;}
+
  private:
   DeconvMsPtrVec deconv_ms_ptr_vec_;
 
@@ -65,6 +67,9 @@ class SpectrumSet {
   PrmMsPtrVec srm_ms_two_ptr_vec_;
 
   PrmMsPtrVec prm_ms_six_ptr_vec_;
+
+  //suffix ms six is not used
+  //PrmMsPtrVec srm_ms_six_ptr_vec_;
 
 };
 

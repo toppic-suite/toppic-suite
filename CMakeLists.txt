@@ -99,6 +99,7 @@ file(GLOB_RECURSE FILTER_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/*.cpp)
 file(GLOB SEARCH_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/search/diag/*.cpp 
                        ${CMAKE_CURRENT_SOURCE_DIR}/src/search/zeroptmsearch/*.cpp
                        ${CMAKE_CURRENT_SOURCE_DIR}/src/search/oneptmsearch/*.cpp
+                       ${CMAKE_CURRENT_SOURCE_DIR}/src/search/varptmsearch/*.cpp
                        ${CMAKE_CURRENT_SOURCE_DIR}/src/search/ptmsearch/*.cpp
                        ${CMAKE_CURRENT_SOURCE_DIR}/src/search/duplicatematch/*.cpp)
 

@@ -17,8 +17,8 @@
 namespace toppic {
 
 PtmSearchMng::PtmSearchMng(PrsmParaPtr prsm_para_ptr, int n_report,
-                           double align_max_shift,
                            double align_min_shift,
+                           double align_max_shift,
                            int shift_num,
                            int thread_num,
                            const std::string &input_file_ext,
@@ -28,7 +28,7 @@ PtmSearchMng::PtmSearchMng(PrsmParaPtr prsm_para_ptr, int n_report,
   thread_num_(thread_num),
   input_file_ext_(input_file_ext),
   output_file_ext_(output_file_ext) {
-    align_para_ptr_ = std::make_shared<PsAlignPara>(shift_num, align_max_shift, align_min_shift);
+    align_para_ptr_ = std::make_shared<PsAlignPara>(shift_num, align_min_shift, align_max_shift);
   }
 
 } /* namespace toppic */

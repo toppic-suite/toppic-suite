@@ -137,7 +137,7 @@ p, li { white-space: pre-wrap; }
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="tab_4">
      <attribute name="title">
@@ -259,7 +259,7 @@ p, li { white-space: pre-wrap; }
        <item>
         <widget class="QLabel" name="label_5">
          <property name="text">
-          <string>Combined output filename: </string>
+          <string>Combined output file: </string>
          </property>
         </widget>
        </item>
@@ -419,7 +419,7 @@ p, li { white-space: pre-wrap; }
        <rect>
         <x>10</x>
         <y>290</y>
-        <width>341</width>
+        <width>251</width>
         <height>33</height>
        </rect>
       </property>
@@ -434,7 +434,7 @@ p, li { white-space: pre-wrap; }
        <item>
         <widget class="QLineEdit" name="errorToleranceEdit">
          <property name="text">
-          <string>15</string>
+          <string>10</string>
          </property>
         </widget>
        </item>
@@ -560,9 +560,9 @@ p, li { white-space: pre-wrap; }
      <widget class="QWidget" name="horizontalLayoutWidget_13">
       <property name="geometry">
        <rect>
-        <x>490</x>
+        <x>280</x>
         <y>290</y>
-        <width>361</width>
+        <width>301</width>
         <height>33</height>
        </rect>
       </property>
@@ -614,6 +614,41 @@ p, li { white-space: pre-wrap; }
         <widget class="QCheckBox" name="keepTempCheckBox">
          <property name="text">
           <string>Keep intermediate files</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="horizontalLayoutWidget_22">
+      <property name="geometry">
+       <rect>
+        <x>600</x>
+        <y>290</y>
+        <width>271</width>
+        <height>33</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_22">
+       <item>
+        <widget class="QLabel" name="label_23">
+         <property name="text">
+          <string>Thread number:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="threadNumberEdit">
+         <property name="maximumSize">
+          <size>
+           <width>110</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>1</string>
+         </property>
+         <property name="readOnly">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -682,41 +717,6 @@ p, li { white-space: pre-wrap; }
            <string>UVPD</string>
           </property>
          </item>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="horizontalLayoutWidget_22">
-      <property name="geometry">
-       <rect>
-        <x>480</x>
-        <y>130</y>
-        <width>361</width>
-        <height>33</height>
-       </rect>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_22">
-       <item>
-        <widget class="QLabel" name="label_23">
-         <property name="text">
-          <string>Thread number:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="threadNumberEdit">
-         <property name="maximumSize">
-          <size>
-           <width>110</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>1</string>
-         </property>
-         <property name="readOnly">
-          <bool>false</bool>
-         </property>
         </widget>
        </item>
       </layout>
@@ -954,7 +954,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>480</x>
-        <y>170</y>
+        <y>130</y>
         <width>361</width>
         <height>33</height>
        </rect>

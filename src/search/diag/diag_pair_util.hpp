@@ -24,9 +24,13 @@ namespace toppic {
 
 namespace diag_pair_util {
 
-DiagonalPtrVec geneDiagonals(const DiagHeaderPtrVec& header_ptr_vec,
-                             const PrmPeakPtrVec &prm_peaks,
-                             int group_spec_num, ProteoformPtr proteo_ptr);
+DiagonalPtrVec geneDiagonalsWithEmptyList(const DiagHeaderPtrVec& header_ptr_vec,
+                                          const PrmPeakPtrVec &prm_peaks,
+                                          int group_spec_num, ProteoformPtr proteo_ptr);
+
+DiagonalPtrVec geneDiagonalsWithoutEmptyList(const DiagHeaderPtrVec& header_ptr_vec,
+                                             const PrmPeakPtrVec &prm_peaks,
+                                             int group_spec_num, ProteoformPtr proteo_ptr);
 }
 
 } /* namespace toppic */

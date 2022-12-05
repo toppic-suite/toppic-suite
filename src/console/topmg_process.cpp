@@ -174,15 +174,15 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
       }
     }
 
-    int ptm_num = std::stoi(arguments["ptmNumber"]);
-    LOG_DEBUG("num of unknown shfit " << ptm_num);
+    int shift_num = std::stoi(arguments["shiftNumber"]);
+    LOG_DEBUG("num of unknown shfit " << shift_num);
     int filter_result_num = std::stoi(arguments["filteringResultNumber"]);
-    double max_ptm_mass = std::stod(arguments["maxPtmMass"]);
+    double max_shift_mass = std::stod(arguments["maxShiftMass"]);
 
     int thread_num = std::stoi(arguments["threadNumber"]);
     // Filter steps requires a large amount of memory. 
     // We use only one thread to reduce the memory requirement.
-    int filter_thread_num = mem_check::getMaxThreads("toppic_filter");
+    int filter_thread_num = mem_check::getMaxThreads("zero_one_shift_filter");
     if (filter_thread_num > thread_num) {
       filter_thread_num = thread_num;
     }
@@ -200,6 +200,10 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
     LOG_DEBUG("block size " << arguments["databaseBlockSize"]);
     int db_block_size = std::stoi(arguments["databaseBlockSize"]);
     int max_frag_len = std::stoi(arguments["maxFragmentLength"]);
+    int min_block_num = std::stoi(arguments["minBlockNum"]);
+    fasta_util::dbPreprocess(ori_db_file_name, db_file_name, decoy, 
+                             db_block_size, max_frag_len, min_block_num);
+    msalign_util::geneSpIndex(sp_file_name);
 
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
 
@@ -207,16 +211,16 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
     IndexFileNamePtr file_name_ptr = std::make_shared<IndexFileName>();
     std::string index_file_para = file_name_ptr->geneFileName(arguments);
 
-    fasta_util::dbPreprocess(ori_db_file_name, db_file_name, decoy, db_block_size, max_frag_len);
-    msalign_util::geneSpIndex(sp_file_name);
 
     std::vector<std::string> input_exts;
 
     std::cout << "ASF-One PTM filtering - started." << std::endl;
     OnePtmFilterMngPtr one_ptm_filter_mng_ptr =
-        std::make_shared<OnePtmFilterMng>(prsm_para_ptr, index_file_para, 
-                                          "topmg_one_filter", filter_thread_num,
-                                          var_mod_file_name, 1);
+      std::make_shared<OnePtmFilterMng>(prsm_para_ptr, index_file_para, 
+                                        "topmg_one_filter", 
+                                        -max_shift_mass, max_shift_mass, 
+                                        filter_thread_num,
+                                        var_mod_file_name, 1);
     one_ptm_filter_mng_ptr->inte_num_ = 4;
     one_ptm_filter_mng_ptr->pref_suff_num_ = 4;
     one_ptm_filter_mng_ptr->comp_num_ = 4;
@@ -263,8 +267,8 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
     GraphAlignMngPtr ga_mng_ptr
         = std::make_shared<GraphAlignMng>(prsm_para_ptr,
                                           var_mod_file_name,
-                                          ptm_num, max_mod_num,
-                                          gap, var_ptm_in_gap, max_ptm_mass,
+                                          shift_num, max_mod_num,
+                                          gap, var_ptm_in_gap, max_shift_mass,
                                           thread_num, whole_protein_only, 
                                           "topmg_graph_filter", "topmg_graph_align");
     std::cout << "Graph alignment - started." << std::endl;

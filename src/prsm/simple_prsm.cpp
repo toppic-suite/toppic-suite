@@ -22,17 +22,35 @@ namespace toppic {
 
 SimplePrsm::SimplePrsm(MsHeaderPtr header_ptr, int spectrum_num,
                        ProteoformPtr proteo_ptr, int score):
-    spectrum_num_(spectrum_num),
-    score_(score) {
-      spectrum_id_ = header_ptr->getId();
-      file_name_ = header_ptr->getFileName();
-      spectrum_scan_ = header_ptr->getScansString();
-      precursor_id_ = header_ptr->getPrecId();
-      prec_mass_ = header_ptr->getPrecMonoMass();
-      seq_name_ = proteo_ptr->getSeqName();
-      seq_desc_ = proteo_ptr->getSeqDesc();
-      prot_mass_ = proteo_ptr->getResSeqPtr()->getSeqMass();
-    }
+  spectrum_num_(spectrum_num),
+  score_(score) {
+    spectrum_id_ = header_ptr->getId();
+    file_name_ = header_ptr->getFileName();
+    spectrum_scan_ = header_ptr->getScansString();
+    precursor_id_ = header_ptr->getPrecId();
+    prec_mass_ = header_ptr->getPrecMonoMass();
+    seq_name_ = proteo_ptr->getSeqName();
+    seq_desc_ = proteo_ptr->getSeqDesc();
+    prot_mass_ = proteo_ptr->getResSeqPtr()->getSeqMass();
+  }
+
+SimplePrsm::SimplePrsm(MsHeaderPtr header_ptr, 
+                       int spectrum_num,
+                       ProteoformPtr proteo_ptr, 
+                       ProtCandidatePtr cand_ptr):  
+  spectrum_num_(spectrum_num) {
+    spectrum_id_ = header_ptr->getId();
+    file_name_ = header_ptr->getFileName();
+    spectrum_scan_ = header_ptr->getScansString();
+    precursor_id_ = header_ptr->getPrecId();
+    prec_mass_ = header_ptr->getPrecMonoMass();
+    seq_name_ = proteo_ptr->getSeqName();
+    seq_desc_ = proteo_ptr->getSeqDesc();
+    prot_mass_ = proteo_ptr->getResSeqPtr()->getSeqMass();
+    score_ = cand_ptr->getScore();
+    n_term_shifts_ = cand_ptr->getNTermShifts(); 
+    c_term_shifts_ = cand_ptr->getCTermShifts(); 
+  }
 
 SimplePrsm::SimplePrsm(MsHeaderPtr header_ptr, int spectrum_num,
                        const std::string & seq_name,
@@ -60,23 +78,24 @@ SimplePrsm::SimplePrsm(XmlDOMElement* element) {
   seq_desc_ = xml_dom_util::getChildValue(element, "sequence_desc", 0);
   prot_mass_ = xml_dom_util::getDoubleChildValue(element, "proteoform_mass", 0);
   score_ = xml_dom_util::getDoubleChildValue(element, "score", 0);
-  // n trunc shifts
+  // n term shifts
   XmlDOMElement* n_shift_list_element
-      = xml_dom_util::getChildElement(element, "n_trunc_shift_list", 0);
+      = xml_dom_util::getChildElement(element, "n_term_shift_list", 0);
   int n_shift_num = xml_dom_util::getChildCount(n_shift_list_element, "shift");
   // LOG_DEBUG("n shift _num " << n_shift_num);
   for (int i = 0; i < n_shift_num; i++) {
     double shift = xml_dom_util::getDoubleChildValue(n_shift_list_element, "shift", i);
-    n_trunc_shifts_.push_back(shift);
+    //LOG_DEBUG("N term shift " << shift);
+    n_term_shifts_.push_back(shift);
   }
-  // c trunc shifts
+  // c term shifts
   XmlDOMElement* c_shift_list_element
-      = xml_dom_util::getChildElement(element, "c_trunc_shift_list", 0);
+      = xml_dom_util::getChildElement(element, "c_term_shift_list", 0);
   int c_shift_num = xml_dom_util::getChildCount(c_shift_list_element, "shift");
   // LOG_DEBUG("c shift _num " << c_shift_num);
   for (int i = 0; i < c_shift_num; i++) {
     double shift = xml_dom_util::getDoubleChildValue(c_shift_list_element, "shift", i);
-    c_trunc_shifts_.push_back(shift);
+    c_term_shifts_.push_back(shift);
   }
 }
 
@@ -100,16 +119,16 @@ XmlDOMElement* SimplePrsm::toXml(XmlDOMDocument* xml_doc) {
   str = str_util::toString(score_);
   xml_doc->addElement(element, "score", str.c_str());
 
-  XmlDOMElement* n_shift_list = xml_doc->createElement("n_trunc_shift_list");
-  for (size_t i = 0; i < n_trunc_shifts_.size(); i++) {
-    str = str_util::toString(n_trunc_shifts_[i]);
+  XmlDOMElement* n_shift_list = xml_doc->createElement("n_term_shift_list");
+  for (size_t i = 0; i < n_term_shifts_.size(); i++) {
+    str = str_util::toString(n_term_shifts_[i]);
     xml_doc->addElement(n_shift_list, "shift", str.c_str());
   }
   element->appendChild(n_shift_list);
 
-  XmlDOMElement* c_shift_list = xml_doc->createElement("c_trunc_shift_list");
-  for (size_t i = 0; i < c_trunc_shifts_.size(); i++) {
-    str = str_util::toString(c_trunc_shifts_[i]);
+  XmlDOMElement* c_shift_list = xml_doc->createElement("c_term_shift_list");
+  for (size_t i = 0; i < c_term_shifts_.size(); i++) {
+    str = str_util::toString(c_term_shifts_[i]);
     xml_doc->addElement(c_shift_list, "shift", str.c_str());
   }
   element->appendChild(c_shift_list);
@@ -130,35 +149,40 @@ std::vector<std::string> SimplePrsm::toStrVec() {
   str_vec.push_back("<proteoform_mass>" + str_util::toString(getProteoformMass()) + "</proteoform_mass>");
   str_vec.push_back("<score>" + str_util::toString(getScore()) + "</score>");
 
-  if (n_trunc_shifts_.size() == 0) {
-    str_vec.push_back("<n_trunc_shift_list/>");
-  } else {
-    str_vec.push_back("<n_trunc_shift_list>");
-    for (size_t i = 0; i < n_trunc_shifts_.size(); i++) {
-      str_vec.push_back("<shift>" + str_util::toString(n_trunc_shifts_[i]) + "</shift>");
+  if (n_term_shifts_.size() == 0) {
+    str_vec.push_back("<n_term_shift_list/>");
+  } 
+  else {
+    str_vec.push_back("<n_term_shift_list>");
+    for (size_t i = 0; i < n_term_shifts_.size(); i++) {
+      str_vec.push_back("<shift>" + str_util::toString(n_term_shifts_[i]) + "</shift>");
     }
-    str_vec.push_back("</n_trunc_shift_list>");
+    str_vec.push_back("</n_term_shift_list>");
   }
 
-  if (c_trunc_shifts_.size() == 0) {
-    str_vec.push_back("<c_trunc_shift_list/>");
-  } else {
-    str_vec.push_back("<c_trunc_shift_list>");
-    for (size_t j = 0; j < c_trunc_shifts_.size(); j++) {
-      str_vec.push_back("<shift>" + str_util::toString(c_trunc_shifts_[j]) + "</shift>");
+  if (c_term_shifts_.size() == 0) {
+    str_vec.push_back("<c_term_shift_list/>");
+  } 
+  else {
+    str_vec.push_back("<c_term_shift_list>");
+    for (size_t j = 0; j < c_term_shifts_.size(); j++) {
+      str_vec.push_back("<shift>" + str_util::toString(c_term_shifts_[j]) + "</shift>");
     }
-    str_vec.push_back("</c_trunc_shift_list>");
+    str_vec.push_back("</c_term_shift_list>");
   }
 
   str_vec.push_back("</simple_prsm>");
   return str_vec;
 }
 
-void SimplePrsm::setCTruncShifts(const std::vector<double> &c_term_shifts) {
-  for (size_t i = 0; i < c_term_shifts.size(); i++) {
-    double shift = prec_mass_ - (prot_mass_ + c_term_shifts[i]);
-    c_trunc_shifts_.push_back(shift);
+
+std::vector<double> SimplePrsm::getNTermShiftsFromCTermShifts() {
+  std::vector<double> shifts;
+  for (size_t i = 0; i < c_term_shifts_.size(); i++) {
+    double shift = prec_mass_ - (prot_mass_ + c_term_shifts_[i]);
+    shifts.push_back(shift);
   }
+  return shifts;
 }
 
 bool SimplePrsm::cmpScoreDec(const SimplePrsmPtr a, const SimplePrsmPtr b) {

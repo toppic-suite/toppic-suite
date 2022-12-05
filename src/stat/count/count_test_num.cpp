@@ -61,8 +61,7 @@ inline int CountTestNum::convertMass(double m) {
 }
 
 void CountTestNum::init(PrsmParaPtr para_ptr) {
-  //std::string db_file_name = para_ptr->getSearchDbFileName();
-  std::string db_file_name = para_ptr->getOriDbName() + "_idx" + file_util::getFileSeparator() + para_ptr->getSearchDbFileName();
+  std::string db_file_name = para_ptr->getSearchDbFileNameWithFolder();
   comp_mass_cnts_ = new double[max_sp_len_](); 
   pref_mass_cnts_ = new double[max_sp_len_]();
   suff_mass_cnts_ = new double[max_sp_len_]();
