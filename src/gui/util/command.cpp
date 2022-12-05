@@ -145,6 +145,7 @@ std::string geneToppicCommand(std::map<std::string, std::string> arguments_,
     //if one of the toppic parameters
     if (toppic_para.find(it->first) != toppic_para.end()) { 
       //skip some paramters based on parameter values
+      LOG_DEBUG(it->first << " " << it->second);
       if (it->first == "fixedMod" && it->second == "") {
         continue;
       }
@@ -172,7 +173,7 @@ std::string geneToppicCommand(std::map<std::string, std::string> arguments_,
         }
       }
       else if (it->first == "useApproxSpectra") {
-        if (it->second != "true") {
+        if (it->second == "true") {
           command = command + toppic_para[it->first];
         }
       }
@@ -200,6 +201,7 @@ std::string geneToppicCommand(std::map<std::string, std::string> arguments_,
   for (size_t i = 0; i < spec_file_lst_.size(); i++) {
     command = command + spec_file_lst_[i] + " ";
   }
+  LOG_DEBUG(command);
   return command;
 };
 
