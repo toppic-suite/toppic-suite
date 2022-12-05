@@ -174,10 +174,10 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
       }
     }
 
-    int ptm_num = std::stoi(arguments["ptmNumber"]);
-    LOG_DEBUG("num of unknown shfit " << ptm_num);
+    int shift_num = std::stoi(arguments["shiftNumber"]);
+    LOG_DEBUG("num of unknown shfit " << shift_num);
     int filter_result_num = std::stoi(arguments["filteringResultNumber"]);
-    double max_ptm_mass = std::stod(arguments["maxPtmMass"]);
+    double max_shift_mass = std::stod(arguments["maxShiftMass"]);
 
     int thread_num = std::stoi(arguments["threadNumber"]);
     // Filter steps requires a large amount of memory. 
@@ -218,7 +218,7 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
     OnePtmFilterMngPtr one_ptm_filter_mng_ptr =
       std::make_shared<OnePtmFilterMng>(prsm_para_ptr, index_file_para, 
                                         "topmg_one_filter", 
-                                        -max_ptm_mass, max_ptm_mass, 
+                                        -max_shift_mass, max_shift_mass, 
                                         filter_thread_num,
                                         var_mod_file_name, 1);
     one_ptm_filter_mng_ptr->inte_num_ = 4;
@@ -267,8 +267,8 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
     GraphAlignMngPtr ga_mng_ptr
         = std::make_shared<GraphAlignMng>(prsm_para_ptr,
                                           var_mod_file_name,
-                                          ptm_num, max_mod_num,
-                                          gap, var_ptm_in_gap, max_ptm_mass,
+                                          shift_num, max_mod_num,
+                                          gap, var_ptm_in_gap, max_shift_mass,
                                           thread_num, whole_protein_only, 
                                           "topmg_graph_filter", "topmg_graph_align");
     std::cout << "Graph alignment - started." << std::endl;

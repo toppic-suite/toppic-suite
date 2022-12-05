@@ -51,7 +51,7 @@ std::map<std::string, std::string> TopmgArgument::initArguments() {
   arguments["activation"] = "FILE";
   arguments["searchType"] = "TARGET";
   arguments["fixedMod"] = "";
-  arguments["ptmNumber"] = "0";
+  arguments["shiftNumber"] = "0";
   arguments["massErrorTolerance"] = "10";
   arguments["proteoformErrorTolerance"] = "1.2";
   arguments["cutoffSpectralType"] = "EVALUE";
@@ -60,7 +60,7 @@ std::map<std::string, std::string> TopmgArgument::initArguments() {
   arguments["cutoffProteoformValue"] = "0.01";
   arguments["allowProtMod"] = "NONE,NME,NME_ACETYLATION,M_ACETYLATION";
   arguments["numOfTopPrsms"] = "1";
-  arguments["maxPtmMass"] = "500";
+  arguments["maxShiftMass"] = "500";
   arguments["executiveDir"] = ".";
   arguments["resourceDir"] = "";
   arguments["keepTempFiles"] = "false";
@@ -118,13 +118,13 @@ void TopmgArgument::outputArguments(std::ostream &output,
   output << std::setw(gap) << std::left << "Proteoform-level cutoff type:" << sep << arguments["cutoffProteoformType"] << std::endl;
   output << std::setw(gap) << std::left << "Proteoform-level cutoff value:" << sep << arguments["cutoffProteoformValue"] << std::endl;
   output << std::setw(gap) << std::left << "Allowed N-terminal forms:" << sep << arguments["allowProtMod"] << std::endl;
-  output << std::setw(gap) << std::left << "Maximum mass shift of modifications:" << sep << arguments["maxPtmMass"] << " Da" << std::endl;
+  output << std::setw(gap) << std::left << "Maximum mass shift of modifications:" << sep << arguments["maxShiftMass"] << " Da" << std::endl;
   output << std::setw(gap) << std::left << "Thread number:" << sep << arguments["threadNumber"] << std::endl;
   output << std::setw(gap) << std::left << "Modification file name:" << sep << arguments["varModFileName"] << std::endl;
   output << std::setw(gap) << std::left << "Gap in proteoform graph:" << sep << arguments["proteoGraphGap"] << std::endl;
   output << std::setw(gap) << std::left << "Maximum number of variable PTMs:" << sep << arguments["varPtmNumber"] << std::endl;
   output << std::setw(gap) << std::left << "Maximum number of variable PTMs in a graph gap:" << sep << arguments["varPtmNumInGap"] << std::endl;
-  output << std::setw(gap) << std::left << "Maximum number of unexpected modifications:" << sep << arguments["ptmNumber"] << std::endl;
+  output << std::setw(gap) << std::left << "Maximum number of unexpected modifications:" << sep << arguments["shiftNumber"] << std::endl;
   if (arguments["wholeProteinOnly"] == "true") {
     output << std::setw(gap) << std::left << "Report only proteoforms from whole proteins:"  << sep << "True" << std::endl;
   }
@@ -180,10 +180,10 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
   std::string activation = "";
   std::string fixed_mod = "";
   std::string allow_mod = "";
-  std::string ptm_num = "";
+  std::string shift_num = "";
   std::string mass_error_tole = "";
   std::string form_error_tole = "";
-  std::string max_ptm_mass = "";
+  std::string max_shift_mass = "";
   std::string cutoff_spectral_type = "";
   std::string cutoff_spectral_value = "";
   std::string cutoff_proteoform_type = "";
@@ -214,7 +214,7 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
         ("decoy,d", "Use a shuffled decoy protein database to estimate false discovery rates.")
         ("mass-error-tolerance,e", po::value<std::string> (&mass_error_tole), "<a positive integer>. Error tolerance for precursor and fragment masses in PPM. Default value: 10.")
         ("proteoform-error-tolerance,p", po::value<std::string> (&form_error_tole), "<a positive number>. Error tolerance for identifying PrSM clusters (in Dalton). Default value: 1.2 Dalton.")
-        ("max-shift,M", po::value<std::string> (&max_ptm_mass), "<a positive number>. Maximum absolute value of the mass shift (in Dalton). Default value: 500.")
+        ("max-shift,M", po::value<std::string> (&max_shift_mass), "<a positive number>. Maximum absolute value of the mass shift (in Dalton). Default value: 500.")
         ("spectrum-cutoff-type,t", po::value<std::string> (&cutoff_spectral_type), "<EVALUE|FDR>. Spectrum-level cutoff type for filtering identified proteoform spectrum-matches. Default value: EVALUE.")
         ("spectrum-cutoff-value,v", po::value<std::string> (&cutoff_spectral_value), "<a positive number>. Spectrum-level cutoff value for filtering identified proteoform spectrum-matches. Default value: 0.01.")
         ("proteoform-cutoff-type,T", po::value<std::string> (&cutoff_proteoform_type), "<EVALUE|FDR>. Proteoform-level cutoff type for filtering identified proteoform spectrum-matches. Default value: EVALUE.")
@@ -226,7 +226,7 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
         ("var-ptm-in-gap,G", po::value<std::string>(&var_ptm_in_gap) , "<a positive number>. Maximum number of variable PTMs in a proteform graph gap. Default value: 5.")
         ("use-asf-diagonal,D", "Use the ASF-DIAGONAL method for protein sequence filtering.")
         ("var-ptm,P", po::value<std::string>(&var_ptm_num) , "<a positive number>. Maximum number of variable PTMs. Default value: 5.")
-        ("num-shift,s", po::value<std::string> (&ptm_num), "<0|1|2>. Maximum number of unexpected modifications in a proteoform spectrum-match. Default value: 0.")
+        ("num-shift,s", po::value<std::string> (&shift_num), "<0|1|2>. Maximum number of unexpected modifications in a proteoform spectrum-match. Default value: 0.")
         ("whole-protein-only,w", "Report only proteoforms from whole proteins.")
         ("combined-file-name,c", po::value<std::string>(&combined_output_name) , "Specify a file name for the combined spectrum data file and analysis results.")
         ("keep-temp-files,k", "Keep intermediate files.")
@@ -243,7 +243,7 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
         ("decoy,d", "")
         ("mass-error-tolerance,e", po::value<std::string> (&mass_error_tole), "")
         ("proteoform-error-tolerance,p", po::value<std::string> (&form_error_tole), "")
-        ("max-shift,M", po::value<std::string> (&max_ptm_mass), "")
+        ("max-shift,M", po::value<std::string> (&max_shift_mass), "")
         ("spectrum-cutoff-type,t", po::value<std::string> (&cutoff_spectral_type), "")
         ("spectrum-cutoff-value,v", po::value<std::string> (&cutoff_spectral_value), "")
         ("proteoform-cutoff-type,T", po::value<std::string> (&cutoff_proteoform_type), "")
@@ -258,7 +258,7 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
         ("var-ptm-in-gap,G", po::value<std::string>(&var_ptm_in_gap) , "")
         ("use-asf-diagonal,D", "")
         ("var-ptm,P", po::value<std::string>(&var_ptm_num) , "")
-        ("num-shift,s", po::value<std::string> (&ptm_num), "")
+        ("num-shift,s", po::value<std::string> (&shift_num), "")
         ("whole-protein-only,w", "")
         ("keep-temp-files,k", "")
         ("keep-decoy-ids,K", "")
@@ -342,7 +342,7 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
     }
 
     if (vm.count("max-shift")) {
-      arguments_["maxPtmMass"] = max_ptm_mass;
+      arguments_["maxShiftMass"] = max_shift_mass;
     }
 
     if (vm.count("spectrum-cutoff-type")) {
@@ -391,7 +391,7 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
     }
 
     if (vm.count("num-shift")) {
-      arguments_["ptmNumber"] = ptm_num;
+      arguments_["shiftNumber"] = shift_num;
     }
 
     if (vm.count("var-ptm-in-gap")) {
@@ -489,9 +489,9 @@ bool TopmgArgument::validateArguments() {
     LOG_ERROR("Search type " << search_type << " error! The value should be TARGET|TARGET+DECOY!");
     return false;
   }
-  std::string ptm_number = arguments_["ptmNumber"];
-  if (ptm_number != "0" && ptm_number != "1" && ptm_number != "2") {
-    LOG_ERROR("PTM number "<< ptm_number <<" error! The value should be 0|1|2!");
+  std::string shift_number = arguments_["shiftNumber"];
+  if (shift_number != "0" && shift_number != "1" && shift_number != "2") {
+    LOG_ERROR("Shift number "<< shift_number <<" error! The value should be 0|1|2!");
     return false;
   }
 
@@ -526,16 +526,16 @@ bool TopmgArgument::validateArguments() {
     return false;
   }
 
-  std::string max_ptm_mass = arguments_["maxPtmMass"];
+  std::string max_shift_mass = arguments_["maxShiftMass"];
   try {
-    double mass = std::stod(max_ptm_mass.c_str());
+    double mass = std::stod(max_shift_mass.c_str());
     if (mass <= 0.0) {
-      LOG_ERROR("Maximum PTM mass " << max_ptm_mass << " error! The value should be positive.");
+      LOG_ERROR("Maximum shift mass " << max_shift_mass << " error! The value should be positive.");
       return false;
     }
   }
   catch (int e) {
-    LOG_ERROR("Maximum ptm mass " << max_ptm_mass << " should be a number.");
+    LOG_ERROR("Maximum shift mass " << max_shift_mass << " should be a number.");
     return false;
   }
 
@@ -600,16 +600,16 @@ bool TopmgArgument::validateArguments() {
     return false;
   }
   
-  std::string ptm_num = arguments_["varPtmNumber"];
+  std::string var_ptm_num = arguments_["varPtmNumber"];
   try {
-    double ptm_n = std::stod(ptm_num);
+    double ptm_n = std::stod(var_ptm_num);
     if (ptm_n <= 0.0) {
-      LOG_ERROR("Maximum PTM sites " << ptm_num << " error! The value should be positive.");
+      LOG_ERROR("Maximum PTM sites " << var_ptm_num << " error! The value should be positive.");
       return false;
     }
   }
   catch (int e) {
-    LOG_ERROR("Maximum ptm sites " << ptm_num << " should be a number.");
+    LOG_ERROR("Maximum ptm sites " << var_ptm_num << " should be a number.");
     return false;
   }
   return true;

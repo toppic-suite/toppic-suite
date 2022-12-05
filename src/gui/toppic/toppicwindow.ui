@@ -40,9 +40,9 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>360</y>
+      <y>400</y>
       <width>881</width>
-      <height>291</height>
+      <height>251</height>
      </rect>
     </property>
     <property name="html">
@@ -133,11 +133,11 @@ p, li { white-space: pre-wrap; }
       <x>20</x>
       <y>10</y>
       <width>881</width>
-      <height>341</height>
+      <height>381</height>
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab_4">
      <attribute name="title">
@@ -365,7 +365,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>50</y>
+        <y>130</y>
         <width>861</width>
         <height>33</height>
        </rect>
@@ -403,8 +403,8 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>280</y>
-        <width>301</width>
+        <y>270</y>
+        <width>261</width>
         <height>31</height>
        </rect>
       </property>
@@ -419,7 +419,7 @@ p, li { white-space: pre-wrap; }
        <item>
         <widget class="QLineEdit" name="errorToleranceEdit">
          <property name="text">
-          <string>15</string>
+          <string>10</string>
          </property>
         </widget>
        </item>
@@ -431,7 +431,7 @@ p, li { white-space: pre-wrap; }
         <x>10</x>
         <y>160</y>
         <width>861</width>
-        <height>111</height>
+        <height>101</height>
        </rect>
       </property>
       <property name="title">
@@ -545,9 +545,9 @@ p, li { white-space: pre-wrap; }
      <widget class="QWidget" name="horizontalLayoutWidget_13">
       <property name="geometry">
        <rect>
-        <x>450</x>
-        <y>280</y>
-        <width>331</width>
+        <x>440</x>
+        <y>270</y>
+        <width>431</width>
         <height>31</height>
        </rect>
       </property>
@@ -568,68 +568,126 @@ p, li { white-space: pre-wrap; }
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="horizontalLayoutWidget_23">
+     <widget class="QWidget" name="horizontalLayoutWidget_22">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>80</y>
-        <width>861</width>
+        <y>310</y>
+        <width>261</width>
         <height>33</height>
        </rect>
       </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_23">
+      <layout class="QHBoxLayout" name="horizontalLayout_22">
        <item>
-        <widget class="QCheckBox" name="geneHTMLCheckBox">
-         <property name="minimumSize">
-          <size>
-           <width>120</width>
-           <height>0</height>
-          </size>
-         </property>
+        <widget class="QLabel" name="label_23">
          <property name="text">
-          <string>Generate HTML files</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
+          <string>Thread number:</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="lookupTableCheckBox">
+        <widget class="QLineEdit" name="threadNumberEdit">
+         <property name="maximumSize">
+          <size>
+           <width>110</width>
+           <height>16777215</height>
+          </size>
+         </property>
          <property name="text">
-          <string>Lookup table for E-value computation</string>
+          <string>1</string>
+         </property>
+         <property name="readOnly">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="horizontalLayoutWidget_24">
+     <widget class="QWidget" name="horizontalLayoutWidget_14">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>110</y>
-        <width>861</width>
-        <height>33</height>
+        <y>50</y>
+        <width>261</width>
+        <height>31</height>
        </rect>
       </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_24">
+      <layout class="QHBoxLayout" name="horizontalLayout_14">
        <item>
-        <widget class="QCheckBox" name="keepDecoyCheckBox">
-         <property name="minimumSize">
-          <size>
-           <width>120</width>
-           <height>0</height>
-          </size>
-         </property>
+        <widget class="QLabel" name="label_15">
          <property name="text">
-          <string>Keep decoy identifications</string>
+          <string>Max variable PTM number: </string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="keepTempCheckBox">
+        <widget class="QLineEdit" name="varPtmNumEdit">
          <property name="text">
-          <string>Keep intermediate files</string>
+          <string>3</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="horizontalLayoutWidget_19">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>90</y>
+        <width>861</width>
+        <height>33</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_19">
+       <item>
+        <widget class="QLabel" name="label_20">
+         <property name="text">
+          <string>Variable PTM file name:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="varPtmFileEdit">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="varPtmFileButton">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="text">
+          <string>File</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="horizontalLayoutWidget_25">
+      <property name="geometry">
+       <rect>
+        <x>440</x>
+        <y>50</y>
+        <width>431</width>
+        <height>33</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_25">
+       <item>
+        <widget class="QCheckBox" name="approxSpectraCheckBox">
+         <property name="minimumSize">
+          <size>
+           <width>230</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Use approximate spectra in protein filtering</string>
          </property>
         </widget>
        </item>
@@ -698,41 +756,6 @@ p, li { white-space: pre-wrap; }
            <string>UVPD</string>
           </property>
          </item>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="horizontalLayoutWidget_22">
-      <property name="geometry">
-       <rect>
-        <x>500</x>
-        <y>140</y>
-        <width>341</width>
-        <height>33</height>
-       </rect>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_22">
-       <item>
-        <widget class="QLabel" name="label_23">
-         <property name="text">
-          <string>Thread number:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="threadNumberEdit">
-         <property name="maximumSize">
-          <size>
-           <width>110</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>1</string>
-         </property>
-         <property name="readOnly">
-          <bool>false</bool>
-         </property>
         </widget>
        </item>
       </layout>
@@ -932,7 +955,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>190</y>
+        <y>250</y>
         <width>851</width>
         <height>91</height>
        </rect>
@@ -1039,6 +1062,73 @@ p, li { white-space: pre-wrap; }
          </property>
          <property name="readOnly">
           <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="horizontalLayoutWidget_24">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>210</y>
+        <width>861</width>
+        <height>33</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_24">
+       <item>
+        <widget class="QCheckBox" name="keepDecoyCheckBox">
+         <property name="minimumSize">
+          <size>
+           <width>120</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Keep decoy identifications</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="keepTempCheckBox">
+         <property name="text">
+          <string>Keep intermediate files</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="horizontalLayoutWidget_23">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>180</y>
+        <width>861</width>
+        <height>33</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_23">
+       <item>
+        <widget class="QCheckBox" name="geneHTMLCheckBox">
+         <property name="minimumSize">
+          <size>
+           <width>120</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Generate HTML files</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="lookupTableCheckBox">
+         <property name="text">
+          <string>Lookup table for E-value computation</string>
          </property>
         </widget>
        </item>

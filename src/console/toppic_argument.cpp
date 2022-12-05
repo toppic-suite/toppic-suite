@@ -236,7 +236,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         //("n-terminal-label,N", po::value<std::string> (&n_term_label_mass), "N-terminal modification mass for iTRAQ or TMT labeling. Default value: 0")
         ("variable-ptm-num,S", po::value<std::string> (&variable_ptm_num), "Maximum number of variable modifications in a proteoform-spectrum-match. Default value: 3.")
         ("variable-ptm-file-name,b", po::value<std::string>(&variable_ptm_file_name), "<a variable modification file>. Specify a text file containing the information of varaible modifications.")
-        ("approximate-spectra, A", "Use approximate spectra to increase the sensitivity in protein filtering. Default value: false.")
+        ("approximate-spectra,A", "Use approximate spectra to increase the sensitivity in protein filtering. Default value: false.")
         ("num-shift,s", po::value<std::string> (&shift_num), "<0|1|2>. Maximum number of unexpected modifications in a proteoform-spectrum-match. Default value: 1.")
         ("min-shift,m", po::value<std::string> (&min_shift_mass), "Minimum value of the mass shift of an unexpected modification. Default value: -500 Dalton.")
         ("max-shift,M", po::value<std::string> (&max_shift_mass), "Maximum value of the mass shift of an unexpected modification. Default value: 500 Dalton.")
@@ -269,7 +269,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         ("n-terminal-label,N", po::value<std::string> (&n_term_label_mass), "")
         ("variable-ptm-num,S", po::value<std::string> (&variable_ptm_num), "")
         ("variable-ptm-file-name,b", po::value<std::string>(&variable_ptm_file_name), "")
-        ("approximate-spectra, A", "")
+        ("approximate-spectra,A", "")
         ("num-shift,s", po::value<std::string> (&shift_num), "")
         ("min-shift,m", po::value<std::string> (&min_shift_mass), "")
         ("max-shift,M", po::value<std::string> (&max_shift_mass), "")
@@ -358,7 +358,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
       arguments_["variablePtmFileName"] = variable_ptm_file_name;
     }
 
-    if (vm.count("approximate-spectrum")) {
+    if (vm.count("approximate-spectra")) {
       arguments_["useApproxSpectra"] = "true";
     }
 

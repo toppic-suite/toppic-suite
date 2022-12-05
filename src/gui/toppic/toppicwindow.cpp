@@ -107,8 +107,11 @@ void ToppicWindow::on_defaultButton_clicked() {
   ui->fixedModFileEdit->clear();
   ui->errorToleranceEdit->setText(QString::fromStdString(arguments_["massErrorTolerance"])); 
   ui->formErrorToleranceEdit->setText(QString::fromStdString(arguments_["proteoformErrorTolerance"]));
-  ui->maxModEdit->setText(QString::fromStdString(arguments_["maxPtmMass"]));
-  ui->minModEdit->setText(QString::fromStdString(arguments_["minPtmMass"]));
+  ui->varPtmNumEdit->setText(QString::fromStdString(arguments_["variablePtmNum"])); 
+  ui->varPtmFileEdit->clear();
+  ui->approxSpectraCheckBox->setChecked(false);
+  ui->minModEdit->setText(QString::fromStdString(arguments_["minShiftMass"]));
+  ui->maxModEdit->setText(QString::fromStdString(arguments_["maxShiftMass"]));
   ui->cutoffSpectralValueEdit->setText(QString::fromStdString(arguments_["cutoffSpectralValue"]));
   ui->cutoffProteoformValueEdit->setText(QString::fromStdString(arguments_["cutoffProteoformValue"]));
   ui->numCombinedEdit->setText(QString::fromStdString(arguments_["groupSpectrumNumber"]));
@@ -171,6 +174,16 @@ void ToppicWindow::on_modFileButton_clicked() {
       "Modification files (*.txt);;All files (*.*)");
   updatedir(s);
   ui->modFileEdit->setText(s);
+}
+
+void ToppicWindow::on_varPtmFileButton_clicked() {
+  QString s = QFileDialog::getOpenFileName(
+      this,
+      "Select a modification file for variable PTMs",
+      lastDir_,
+      "Modification files (*.txt);;All files (*.*)");
+  updatedir(s);
+  ui->varPtmFileEdit->setText(s);
 }
 
 void ToppicWindow::on_startButton_clicked() {
@@ -262,7 +275,7 @@ std::map<std::string, std::string> ToppicWindow::getArguments() {
   if (ui->fixedModComboBox->currentIndex() == 3) {
     arguments_["fixedMod"] = ui->fixedModFileEdit->text().toStdString();
   }
-  arguments_["ptmNumber"] = ui->numModComboBox->currentText().toStdString();
+  arguments_["shiftNumber"] = ui->numModComboBox->currentText().toStdString();
   arguments_["massErrorTolerance"] = ui->errorToleranceEdit->text().toStdString();
   arguments_["proteoformErrorTolerance"] = ui->formErrorToleranceEdit->text().toStdString();
   arguments_["cutoffSpectralType"] = ui->cutoffSpectralTypeComboBox->currentText().toStdString();
@@ -285,9 +298,18 @@ std::map<std::string, std::string> ToppicWindow::getArguments() {
   if (arguments_["allowProtMod"] != "") {
     arguments_["allowProtMod"] = arguments_["allowProtMod"].substr(1);
   }
-  arguments_["numOfTopPrsms"] = "1";
-  arguments_["maxPtmMass"] = ui->maxModEdit->text().toStdString();
-  arguments_["minPtmMass"] = ui->minModEdit->text().toStdString();
+
+  arguments_["minShiftMass"] = ui->minModEdit->text().toStdString();
+  arguments_["maxShiftMass"] = ui->maxModEdit->text().toStdString();
+
+  if (ui->approxSpectraCheckBox->isChecked()) {
+    arguments_["useApproxSpectra"] = "true";
+  } else {
+    arguments_["useApproxSpectra"] = "false";
+  }
+  arguments_["variablePtmNum"] = ui->varPtmNumEdit->text().toStdString();
+  arguments_["variablePtmFileName"] = ui->varPtmFileEdit->text().trimmed().toStdString();
+
   if (ui->lookupTableCheckBox->isChecked()) {
     arguments_["useLookupTable"] = "true";
   } else {
@@ -305,7 +327,7 @@ std::map<std::string, std::string> ToppicWindow::getArguments() {
   }
   arguments_["localThreshold"] = ui->miscoreThresholdEdit->text().toStdString();
   arguments_["groupSpectrumNumber"] = ui->numCombinedEdit->text().toStdString();
-  arguments_["residueModFileName"] = ui->modFileEdit->text().toStdString();
+  arguments_["localPtmFileName"] = ui->modFileEdit->text().toStdString();
   arguments_["threadNumber"] = ui->threadNumberEdit->text().toStdString();
   if (ui->topfdFeatureCheckBox->isChecked()) {
     arguments_["useFeatureFile"] = "false";
@@ -600,14 +622,14 @@ void ToppicWindow::showArguments() {
                                         "\ncutoffProteoformValue:" + arguments_["cutoffProteoformValue"] +
                                         "\nallowProtMod:" + arguments_["allowProtMod"] +
                                         "\nnumOfTopPrsms:" + arguments_["numOfTopPrsms"] +
-                                        "\nmaxPtmMass:" + arguments_["maxPtmMass"] +
-                                        "\nminPtmMass:" + arguments_["minPtmMass"] +
+                                        "\nminShiftMass:" + arguments_["minShiftMass"] +
+                                        "\nmaxShiftMass:" + arguments_["maxShiftMass"] +
                                         "\nuseLookupTable:" + arguments_["useLookupTable"] +
                                         "\nkeepTempFiles:" + arguments_["keepTempFiles"] +
                                         "\nlocalThreshold:" + arguments_["localThreshold"] +
                                         "\ngroupSpectrumNumber:" + arguments_["groupSpectrumNumber"] +
                                         "\nfilteringResultNumber:" + arguments_["filteringResultNumber"] +
-                                        "\nresidueModFileName:" + arguments_["residueModFileName"] +
+                                        "\nlocalPtmFileName:" + arguments_["localPtmFileName"] +
                                         "\nthreadNumber:" + arguments_["threadNumber"] +
                                         "\nuseFeatureFile:" + arguments_["useFeatureFile"] +
                                         "\nskipList:" + arguments_["skipList"]).c_str(), QMessageBox::Yes);
