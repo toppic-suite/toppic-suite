@@ -15,6 +15,7 @@
 #include <iomanip>
 #include <iostream>
 
+#include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "common/thread/simple_thread_pool.hpp"
 #include "common/base/mod_util.hpp"
@@ -42,7 +43,6 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
   std::string block_str = str_util::toString(block_idx);
 
   OnePtmFilterPtr filter_ptr = std::make_shared<OnePtmFilter>(raw_forms, mng_ptr, block_str);
-
   PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
