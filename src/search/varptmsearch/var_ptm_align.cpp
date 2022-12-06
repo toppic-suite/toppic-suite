@@ -256,9 +256,26 @@ MassShiftPtrVec VarPtmAlign::geneShiftVec(ProteoformPtr sub_proteo_ptr,
     DiagHeaderPtr cur_ptr = ori_header_ptrs[i];
     DiagHeaderPtr pre_ptr = ori_header_ptrs[i-1];
     double shift = cur_ptr->getProtNTermShift() - pre_ptr->getProtNTermShift(); 
-    int right_bp_pos = cur_ptr->getMatchFirstBpPos();
-    int left_bp_pos = right_bp_pos - 1;
+    int left_bp_pos = shift_ptrs[idx]->getLeftBpPos();
+    int right_bp_pos = shift_ptrs[idx]->getRightBpPos(); 
     ModPtr mod_ptr = backtrack_mod_ptrs_[i-1];
+    ResiduePtr mod_res_ptr = mod_ptr->getOriResiduePtr();
+    // find modifiable residues
+    while (left_bp_pos < right_bp_pos) {
+      ResiduePtr seq_res_ptr = sub_res_seq_ptr_->getResiduePtr(left_bp_pos);
+      if (seq_res_ptr->isSame(mod_res_ptr)) {
+        break;
+      }
+      left_bp_pos ++;
+    }
+    while (right_bp_pos > left_bp_pos) {
+      ResiduePtr seq_res_ptr = sub_res_seq_ptr_->getResiduePtr(right_bp_pos - 1);
+      if (seq_res_ptr->isSame(mod_res_ptr)) {
+        break;
+      }
+      right_bp_pos --;
+    }
+
     AlterPtr a = std::make_shared<Alter>(left_bp_pos, 
                                          right_bp_pos,
                                          AlterType::VARIABLE,
