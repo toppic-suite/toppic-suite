@@ -19,7 +19,7 @@ copy ..\bin\topindex.exe toppic-windows-%1
 copy ..\bin\topconvert.exe toppic-windows-%1
 
 copy ..\LICENSE toppic-windows-%1
-xcopy /S ..\toppic_resources toppic-windows-%1\toppic_resources
+xcopy /S ..\resources toppic-windows-%1\resources
 
 copy C:\msys64\mingw64\bin\libwinpthread-1.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libgcc_s_seh-1.dll toppic-windows-%1
@@ -35,7 +35,6 @@ copy C:\msys64\mingw64\bin\libboost_serialization-mt.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libboost_thread-mt.dll toppic-windows-%1
 
 copy C:\msys64\mingw64\bin\libxerces-c-3-2.dll toppic-windows-%1
-copy C:\msys64\mingw64\bin\libxalan-c.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libicuuc69.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libicudt69.dll toppic-windows-%1
 
@@ -65,6 +64,3 @@ copy C:\msys64\mingw64\bin\libpcre2-16-0.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libpcre-1.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libmd4c.dll toppic-windows-%1
 
-mkdir toppic-windows-%1\example_files
-copy ..\testcases\data\mzxml_test.fasta toppic-windows-%1\example_files
-copy ..\testcases\data\mzxml_test.mzXML toppic-windows-%1\example_files
