@@ -23,16 +23,34 @@ namespace toppic {
 
 class OnePtmFilterMng {
  public:
+  // for index generation
+  OnePtmFilterMng(PrsmParaPtr prsm_para_ptr,
+                  const std::string & index_file_para,
+                  const std::string & output_file_ext,
+                  int thread_num);
+
+  // for one shift filter in TopPIC
   OnePtmFilterMng(PrsmParaPtr prsm_para_ptr,
                   const std::string & index_file_para,
                   const std::string & output_file_ext,
                   int thread_num,
-                  const std::string & residueModFileName = "",
-                  int var_num = 0);
+                  double min_shift,
+                  double max_shift); 
+
+  // for One shift filter in TopMG
+  OnePtmFilterMng(PrsmParaPtr prsm_para_ptr,
+                  const std::string & index_file_para,
+                  const std::string & output_file_ext,
+                  int thread_num,
+                  double min_shift,
+                  double max_shift,  
+                  const std::string & residueModFileName, 
+                  int var_num);
 
   std::string getIndexFilePara() {return index_file_para_;}
 
   PrsmParaPtr prsm_para_ptr_;
+
 
   // parameters for fast filteration
   int max_proteoform_mass_ = 50000;
@@ -41,8 +59,13 @@ class OnePtmFilterMng {
   unsigned int comp_num_ = 10;
   unsigned int pref_suff_num_ = 5;
   unsigned int inte_num_ = 10;
-  unsigned int shift_num_ = 10;
+  
+  // reported n term or c term shift number
+  unsigned int comp_cand_shift_num_ = 1;
+  unsigned int cand_shift_num_ = 10;
   int filter_scale_ = 100;
+
+  int threshold_ = 4;
 
   std::string index_file_para_;
 
@@ -50,9 +73,12 @@ class OnePtmFilterMng {
 
   int thread_num_;
 
-  std::string residueModFileName_;
+  double min_shift_= -500;
+  double max_shift_ = 500;
 
-  int var_num_;
+  std::string residueModFileName_ = "";
+
+  int var_num_ = 0;
 
   int n_spec_block_ = 0;
 

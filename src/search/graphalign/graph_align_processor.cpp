@@ -50,21 +50,21 @@ std::function<void()> geneTask(GraphAlignMngPtr mng_ptr,
   return [mng_ptr, var_mod_ptr_vec, spectrum_num, idx]() {
     PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
     SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
-    //std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
-    std::string db_file_name = prsm_para_ptr->getOriDbName() + "_idx" 
-      + file_util::getFileSeparator() + prsm_para_ptr->getSearchDbFileName();
+    std::string db_file_name = prsm_para_ptr->getSearchDbFileNameWithFolder();
 
     std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
 
     std::string input_file_name
-        = file_util::basename(sp_file_name) + "." + mng_ptr->input_file_ext_ + "_" + str_util::toString(idx);
+        = file_util::basename(sp_file_name) + "." + mng_ptr->input_file_ext_ 
+        + "_" + str_util::toString(idx);
     FastaIndexReaderPtr reader_ptr = std::make_shared<FastaIndexReader>(db_file_name);
     SimplePrsmReader simple_prsm_reader(input_file_name);
     SimplePrsmStrPtr prsm_ptr = simple_prsm_reader.readOnePrsmStr();
     int group_spec_num = prsm_para_ptr->getGroupSpecNum();
-    SimpleMsAlignReaderPtr ms_reader_ptr = std::make_shared<SimpleMsAlignReader>(sp_file_name, 
-                                                                                 group_spec_num,
-                                                                                 sp_para_ptr->getActivationPtr());
+    SimpleMsAlignReaderPtr ms_reader_ptr 
+      = std::make_shared<SimpleMsAlignReader>(sp_file_name, 
+                                              group_spec_num,
+                                              sp_para_ptr->getActivationPtr());
 
     SpecGraphReader spec_reader(sp_file_name,
                                 prsm_para_ptr->getGroupSpecNum(),
@@ -161,9 +161,7 @@ void SimplePrsmFilter(SimplePrsmPtrVec & selected_prsm_ptrs) {
 void GraphAlignProcessor::process() {
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
-  //std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
-  std::string db_file_name = prsm_para_ptr->getOriDbName() 
-    + "_idx" + file_util::getFileSeparator() + prsm_para_ptr->getSearchDbFileName();
+  std::string db_file_name = prsm_para_ptr->getSearchDbFileNameWithFolder();
 
   LOG_DEBUG("Search db file name " << db_file_name);
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
@@ -219,7 +217,8 @@ void GraphAlignProcessor::process() {
 //#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
   std::vector<ThreadPtr> thread_vec;
   for (int i = 0; i < mng_ptr_->thread_num_; i++) {
-    ThreadPtr thread_ptr = std::make_shared<boost::thread>(geneTask(mng_ptr_, var_mod_ptr_vec, spectrum_num, i));
+    ThreadPtr thread_ptr 
+      = std::make_shared<boost::thread>(geneTask(mng_ptr_, var_mod_ptr_vec, spectrum_num, i));
     thread_vec.push_back(thread_ptr);
   }
 

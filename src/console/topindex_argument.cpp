@@ -37,11 +37,12 @@ std::map<std::string, std::string> TopIndexArgument::initArguments() {
   std::map<std::string, std::string> arguments;
   arguments["oriDatabaseFileName"]="";
   arguments["databaseFileName"] = "";
-  arguments["databaseBlockSize"] = "250000000";
+  arguments["databaseBlockSize"] = "60000000";
   arguments["maxFragmentLength"] = "500";
+  arguments["minBlockNum"] = "10";
   arguments["searchType"] = "TARGET";
   arguments["fixedMod"] = "";
-  arguments["massErrorTolerance"] = "15";
+  arguments["massErrorTolerance"] = "10";
   arguments["allowProtMod"] = "NONE,NME,NME_ACETYLATION,M_ACETYLATION";
   arguments["executiveDir"] = ".";
   arguments["resourceDir"] = "";
@@ -114,7 +115,7 @@ bool TopIndexArgument::parse(int argc, char* argv[]) {
         ("n-terminal-form,n", po::value<std::string> (&allow_mod), 
          "<a list of allowed N-terminal forms>. N-terminal forms of proteins. Four N-terminal forms can be selected: NONE, NME, NME_ACETYLATION, and M_ACETYLATION. NONE stands for no modifications, NME for N-terminal methionine excision, NME_ACETYLATION for N-terminal acetylation after the initiator methionine is removed, and M_ACETYLATION for N-terminal methionine acetylation. When multiple forms are allowed, they are separated by commas. Default value: NONE,NME,NME_ACETYLATION,M_ACETYLATION.")
         ("decoy,d", "Use a shuffled decoy protein database to estimate false discovery rates.")
-        ("mass-error-tolerance,e", po::value<std::string> (&mass_error_tole), "<a positive integer>. Error tolerance for precursor and fragment masses in PPM. Default value: 15.")
+        ("mass-error-tolerance,e", po::value<std::string> (&mass_error_tole), "<a positive integer>. Error tolerance for precursor and fragment masses in PPM. Default value: 10.")
         ("thread-number,u", po::value<std::string> (&thread_number), "<a positive integer>. Number of threads used in the computation. Default value: 1.");
 
     po::options_description desc("Options");

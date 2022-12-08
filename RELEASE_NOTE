@@ -1,5 +1,9 @@
+Version 1.6.0 (December, 2022)
+    * TopPIC: Added support for variable PTMs
+    * TopPIC: Rewrote protein sequence filtering methods
+
 Version 1.5.0 (November 30, 2021)
-    * TopFD: Add support for FAIMS data
+    * TopFD: Added support for FAIMS data
     * TopPIC: Rewrote the localization function
 
 Version 1.4.0 (December 30, 2020)

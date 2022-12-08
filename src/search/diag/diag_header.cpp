@@ -40,8 +40,7 @@ void DiagHeader::changeOnlyCTermShift(double s) {
   pep_C_term_shift_  += s;
 }
 
-void DiagHeader::initHeader(double c_shift, ProteoformPtr proteo_ptr,
-                            double align_pref_suff_shift_thresh) {
+void DiagHeader::initHeader(double c_shift, ProteoformPtr proteo_ptr) {
   // set protein c term shift
   prot_C_term_shift_ = c_shift;
   std::vector<double> prm_masses = proteo_ptr->getBpSpecPtr()->getPrmMasses();
@@ -53,18 +52,6 @@ void DiagHeader::initHeader(double c_shift, ProteoformPtr proteo_ptr,
   pep_N_term_shift_ = prot_N_term_shift_ + prm_masses[trunc_first_res_pos_];
   pep_C_term_shift_ = prot_C_term_shift_ + prm_masses[prm_masses.size() - 1]
     - prm_masses[trunc_last_res_pos_ + 1];
-
-  if (std::abs(prot_N_term_shift_) <= align_pref_suff_shift_thresh) {
-    is_align_prefix_ = true;
-  } else {
-    is_align_prefix_ = false;
-  }
-
-  if (std::abs(prot_C_term_shift_) <= align_pref_suff_shift_thresh) {
-    is_align_suffix_ = true;
-  } else {
-    is_align_suffix_ = false;
-  }
 }
 
 }  // namespace toppic

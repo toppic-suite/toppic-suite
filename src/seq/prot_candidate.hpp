@@ -12,11 +12,13 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_FILTER_MASS_MATCH_PROT_CANDIDATE_HPP_
-#define TOPPIC_FILTER_MASS_MATCH_PROT_CANDIDATE_HPP_
+#ifndef TOPPIC_SEQ_PROT_CANDIDATE_HPP_
+#define TOPPIC_SEQ_PROT_CANDIDATE_HPP_
 
 #include <memory>
 #include <vector>
+
+#include "seq/prot_score.hpp"
 
 namespace toppic {
 
@@ -27,6 +29,9 @@ typedef std::vector<ProtCandidatePtr> ProtCandidatePtrVec;
 class ProtCandidate {
  public:
   ProtCandidate(int protein_id, int score);
+
+  ProtCandidate(ProtScorePtr prot_score_ptr);
+
   int getProteinId() {return protein_id_;}
   int getScore() {return score_;}
   std::vector<double> getNTermShifts() {return n_term_shifts_;}
@@ -36,6 +41,9 @@ class ProtCandidate {
   void setCTermShifts(std::vector<double> shifts) {c_term_shifts_ = shifts;}
 
   static ProtCandidatePtrVec geneResults(std::vector<std::pair<int,int>> &single_type_results, 
+                                         int threshold, int single_type_num);
+
+  static ProtCandidatePtrVec geneResults(ProtScorePtrVec &prot_scores, 
                                          int threshold, int single_type_num);
 
  private:

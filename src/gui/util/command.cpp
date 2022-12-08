@@ -109,13 +109,16 @@ std::map<std::string, std::string> toppic_para {
     {"searchType", "-d "},
     {"threadNumber", "-u "},
     {"proteoformErrorTolerance", "-p "},
-    {"maxPtmMass", "-M "},
-    {"minPtmMass", "-m "},
+    {"maxShiftMass", "-M "},
+    {"minShiftMass", "-m "},
+    {"variablePtmNum", "-S "},
+    {"variablePtmFileName", "-b "},
+    {"useApproxSpectra", "-A "},
     {"cutoffSpectralType", "-t "},
     {"cutoffSpectralValue", "-v "},
     {"cutoffProteoformType", "-T "},
     {"cutoffProteoformValue", "-V "},
-    {"ptmNumber", "-s "},
+    {"shiftNumber", "-s "},
     {"useFeatureFile", "-x "},
     {"keepTempFiles", "-k "},
     {"keepDecoyResults", "-K "},
@@ -124,7 +127,7 @@ std::map<std::string, std::string> toppic_para {
     {"massErrorTolerance", "-e "},
     {"useLookupTable", "-l "},
     {"groupSpectrumNumber", "-r "},
-    {"residueModFileName", "-i "},
+    {"localPtmFileName", "-B "},
     {"localThreshold", "-H "}
 };
 
@@ -142,6 +145,7 @@ std::string geneToppicCommand(std::map<std::string, std::string> arguments_,
     //if one of the toppic parameters
     if (toppic_para.find(it->first) != toppic_para.end()) { 
       //skip some paramters based on parameter values
+      LOG_DEBUG(it->first << " " << it->second);
       if (it->first == "fixedMod" && it->second == "") {
         continue;
       }
@@ -168,8 +172,16 @@ std::string geneToppicCommand(std::map<std::string, std::string> arguments_,
           command = command + toppic_para[it->first];
         }
       }
-      else if (it->first == "residueModFileName" && it->second == "") {
-        continue; //don't add -i
+      else if (it->first == "useApproxSpectra") {
+        if (it->second == "true") {
+          command = command + toppic_para[it->first];
+        }
+      }
+      else if (it->first == "variablePtmFileName" && it->second == "") {
+        continue; //don't add -b
+      }
+      else if (it->first == "localPtmFileName" && it->second == "") {
+        continue; //don't add -B
       }
       else if (it->first == "useLookupTable") {
         if (it->second == "true") {
@@ -189,6 +201,7 @@ std::string geneToppicCommand(std::map<std::string, std::string> arguments_,
   for (size_t i = 0; i < spec_file_lst_.size(); i++) {
     command = command + spec_file_lst_[i] + " ";
   }
+  LOG_DEBUG(command);
   return command;
 };
 
@@ -199,12 +212,12 @@ std::map<std::string, std::string> topmg_para {
     {"searchType", "-d "},
     {"threadNumber", "-u "},
     {"proteoformErrorTolerance", "-p "},
-    {"maxPtmMass", "-M "},
+    {"maxShiftMass", "-M "},
     {"cutoffSpectralType", "-t "},
     {"cutoffSpectralValue", "-v "},
     {"cutoffProteoformType", "-T "},
     {"cutoffProteoformValue", "-V "},
-    {"ptmNumber", "-s "},
+    {"shiftNumber", "-s "},
     {"useFeatureFile", "-x "},
     {"keepTempFiles", "-k "},
     {"keepDecoyResults", "-K "},

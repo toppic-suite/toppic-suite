@@ -40,8 +40,11 @@ PrsmPtrVec ZeroPtmSearchProcessor::zeroPtmSearchOneSpec(SpectrumSetPtr spec_set_
   for (size_t i = 0; i < simple_prsm_ptr_vec.size(); i++) {
     if (std::abs(spec_set_ptr->getPrecMonoMass() - simple_prsm_ptr_vec[i]->getPrecMass()) 
         > std::pow(10, -4)) {
-      //LOG_ERROR("Large precursor mass difference!" << spec_set_ptr->getPrecMonoMass() 
-      //<< " " << simple_prsm_ptr_vec[i]->getPrecMass());
+      // When precursor error is allowed, if the adjusted precursor of the
+      // spectrum set does not match the adjusted precursor mass in the
+      // filtering result, the spectrum proteoform match is ignored. 
+      // A small error is allowed for errors introduced in writing real numbers
+      // to xml files. 
       continue;
     }
     std::string seq_name = simple_prsm_ptr_vec[i]->getSeqName();
@@ -60,8 +63,8 @@ PrsmPtrVec ZeroPtmSearchProcessor::zeroPtmSearchOneSpec(SpectrumSetPtr spec_set_
   }
   double ppo = mng_ptr->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()->getPpo();
   ZpFastMatchPtrVec fast_matches
-      = zero_ptm_fast_search::filter(type_ptr, ms_three_vec, proteoform_ptr_vec,
-                                 mng_ptr->zero_ptm_filter_result_num_, ppo);
+    = zero_ptm_fast_search::filter(type_ptr, ms_three_vec, proteoform_ptr_vec,
+                                   mng_ptr->zero_ptm_filter_result_num_, ppo);
   DeconvMsPtrVec deconv_ms_vec = spec_set_ptr->getDeconvMsPtrVec();
   SpParaPtr sp_para_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr();
 
@@ -99,8 +102,7 @@ void ZeroPtmSearchProcessor::process() {
   PrsmXmlWriter internal_writer(output_file_name + "_" + ProteoformType::INTERNAL->getName());
 
   // init variables
-  //std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
-  std::string db_file_name = prsm_para_ptr->getOriDbName() + "_idx" + file_util::getFileSeparator() + prsm_para_ptr->getSearchDbFileName();
+  std::string db_file_name = prsm_para_ptr->getSearchDbFileNameWithFolder();
   FastaIndexReaderPtr reader_ptr = std::make_shared<FastaIndexReader>(db_file_name);
   int spectrum_num = msalign_util::getSpNum(sp_file_name);
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
@@ -113,9 +115,12 @@ void ZeroPtmSearchProcessor::process() {
                                               sp_para_ptr->getActivationPtr());
   int cnt = 0;
   DeconvMsPtrVec deconv_ms_ptr_vec = ms_reader_ptr->getNextMsPtrVec(); 
+  std::vector<double> prec_error_vec = sp_para_ptr->getZeroShiftSearchPrecErrorVec();
   while (deconv_ms_ptr_vec.size() > 0) {
     std::vector<SpectrumSetPtr> spec_set_vec 
-        = spectrum_set_factory::geneSpectrumSetPtrVecWithPrecError(deconv_ms_ptr_vec, sp_para_ptr);
+        = spectrum_set_factory::geneSpectrumSetPtrVecWithPrecError(deconv_ms_ptr_vec, 
+                                                                   sp_para_ptr,
+                                                                   prec_error_vec);
     if (spec_set_vec.size() == 0) {
       LOG_ERROR("Spectrum set size is 0!");
     }
@@ -189,7 +194,7 @@ void ZeroPtmSearchProcessor::process() {
       }
     }
     deconv_ms_ptr_vec = ms_reader_ptr->getNextMsPtrVec(); 
-    std::cout << std::flush <<  "Non PTM search - processing " << cnt
+    std::cout << std::flush <<  "Zero unexpected shift search - processing " << cnt
         << " of " << spectrum_num << " spectra.\r";
   }
   int remainder = spectrum_num - cnt;
@@ -200,7 +205,7 @@ void ZeroPtmSearchProcessor::process() {
     //this code avoids error when no combined spectra 
     //is used but a scan is remaining unprocessed
     //because then it will not satisfy the first condition
-    std::cout << std::flush <<  "Non PTM search - processing " << spectrum_num
+    std::cout << std::flush <<  "Zero unexpected shift search - processing " << spectrum_num
         << " of " << spectrum_num << " spectra.\r";
   } 
 

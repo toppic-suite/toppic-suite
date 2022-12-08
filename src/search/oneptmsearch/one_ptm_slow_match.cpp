@@ -36,7 +36,7 @@ OnePtmSlowMatch::OnePtmSlowMatch(ProteoformPtr proteo_ptr,
 }
 
 inline void OnePtmSlowMatch::addPrefixDiagonals(DiagHeaderPtrVec &n_extend_header_ptrs) {
-  std::vector<double> shifts = simple_prsm_ptr_->getNTruncShifts();
+  std::vector<double> shifts = simple_prsm_ptr_->getNTermShifts();
   for (size_t i = 0; i < shifts.size(); i++) {
     double new_shift = shifts[i] - proteo_ptr_->getProtModPtr()->getProtShift();
     if (!diag_header_util::isExistHeader(n_extend_header_ptrs, new_shift)) {
@@ -66,7 +66,8 @@ inline void OnePtmSlowMatch::addComplementDiagonals(DiagHeaderPtrVec &n_extend_h
       if (!diag_header_util::isExistHeader(n_extend_header_ptrs, new_shift)) {
         // n_term strict; c_term nostrict; prot n_term no_match; prot c_term no_match
         // pep n_term match; pep c_term no_match
-        DiagHeaderPtr header_ptr = std::make_shared<DiagHeader>(new_shift, true, false, false, false, true, false);
+        DiagHeaderPtr header_ptr 
+          = std::make_shared<DiagHeader>(new_shift, true, false, false, false, true, false);
         n_extend_header_ptrs.push_back(header_ptr);
       }
     }
@@ -88,7 +89,8 @@ inline void OnePtmSlowMatch::addComplementDiagonals(DiagHeaderPtrVec &n_extend_h
       if (!diag_header_util::isExistHeader(c_extend_header_ptrs, new_shift)) {
         // n term nostrict, c_term strict, prot n_term no match ; prot c_term no match
         // pep n_term no match, pep c_term match
-        DiagHeaderPtr header_ptr = std::make_shared<DiagHeader>(new_shift, false, true, false, false, false, true);
+        DiagHeaderPtr header_ptr 
+          = std::make_shared<DiagHeader>(new_shift, false, true, false, false, false, true);
         c_extend_header_ptrs.push_back(header_ptr);
       }
     }
@@ -96,13 +98,14 @@ inline void OnePtmSlowMatch::addComplementDiagonals(DiagHeaderPtrVec &n_extend_h
 }
 
 inline void OnePtmSlowMatch::addSuffixDiagonals(DiagHeaderPtrVec &c_extend_header_ptrs) {
-  std::vector<double>shifts = simple_prsm_ptr_->getCTruncShifts();
+  std::vector<double>shifts = simple_prsm_ptr_->getNTermShiftsFromCTermShifts();
   for (size_t i = 0; i < shifts.size(); i++) {
     double new_shift = shifts[i] - proteo_ptr_->getProtModPtr()->getProtShift();
     if (!diag_header_util::isExistHeader(c_extend_header_ptrs, new_shift)) {
       // n term nostrict, c_term strict, prot n_term no match ; prot c_term no match
       // pep n_term no match, pep c_term match
-      DiagHeaderPtr header_ptr = std::make_shared<DiagHeader>(new_shift, false, true, false, false, false, true);
+      DiagHeaderPtr header_ptr 
+        = std::make_shared<DiagHeader>(new_shift, false, true, false, false, false, true);
       c_extend_header_ptrs.push_back(header_ptr);
     }
   }
@@ -114,7 +117,8 @@ inline DiagHeaderPtrVec OnePtmSlowMatch::geneOnePtmNTermShiftHeaders() {
 
   // add corner diagonals for all types of alignments
   double seq_mass = proteo_ptr_->getResSeqPtr()->getSeqMass();
-  diag_header_util::addCornerDiagonals(n_extend_header_ptrs, c_extend_header_ptrs, seq_mass, prec_mono_mass_);
+  diag_header_util::addCornerDiagonals(n_extend_header_ptrs, c_extend_header_ptrs, 
+                                       seq_mass, prec_mono_mass_);
 
   // if not complete alignment, find best shifts
   if (align_type_ptr_ != ProteoformType::COMPLETE) {
@@ -133,7 +137,7 @@ inline DiagHeaderPtrVec OnePtmSlowMatch::geneOnePtmNTermShiftHeaders() {
   for (size_t i = 0; i < header_ptrs.size(); i++) {
     double n_shift = header_ptrs[i]->getProtNTermShift();
     double c_shift = prec_mono_mass_ - proteo_ptr_->getResSeqPtr()->getSeqMass() - n_shift;
-    header_ptrs[i]->initHeader(c_shift, proteo_ptr_, mng_ptr_->align_prefix_suffix_shift_thresh_);
+    header_ptrs[i]->initHeader(c_shift, proteo_ptr_);
   }
   return header_ptrs;
 }
@@ -144,9 +148,9 @@ void OnePtmSlowMatch::init() {
   PeakTolerancePtr tole_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
   PrmPeakPtrVec prm_peaks = prm_ms_util::getPrmPeakPtrs(ms_six_ptr_vec_, tole_ptr);
   int group_spec_num = ms_six_ptr_vec_.size();
-  DiagonalPtrVec diagonal_ptrs = diag_pair_util::geneDiagonals(n_term_shift_header_ptrs,
-                                                               prm_peaks, group_spec_num,
-                                                               proteo_ptr_);
+  DiagonalPtrVec diagonal_ptrs = diag_pair_util::geneDiagonalsWithoutEmptyList(n_term_shift_header_ptrs,
+                                                                               prm_peaks, group_spec_num,
+                                                                               proteo_ptr_);
 
   std::vector<double> seq_masses = proteo_ptr_->getBpSpecPtr()->getPrmMasses();
   std::vector<double> ms_masses(prm_peaks.size());

@@ -37,6 +37,9 @@ PrmMsPtrVec geneMsSixPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
                             SpParaPtr sp_para_ptr,
                             double prec_mono_mass);
 
+PrmMsPtrVec geneSuffixMsSixPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
+                                  SpParaPtr sp_para_ptr, double prec_mono_mass); 
+
 PrmMsPtrVec geneShiftMsSixPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
                                  SpParaPtr sp_para_ptr,
                                  double prec_mono_mass, double shift);

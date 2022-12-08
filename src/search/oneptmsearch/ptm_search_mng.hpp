@@ -26,8 +26,8 @@ namespace toppic {
 class PtmSearchMng {
  public :
   PtmSearchMng(PrsmParaPtr prsm_para_ptr, int n_report,
-               double align_max_shift,
                double align_min_shift,
+               double align_max_shift,
                int shift_num,
                int thread_num,
                const std::string &input_file_ext,
@@ -54,7 +54,6 @@ class PtmSearchMng {
 
   // parameters for diagonal generation 
   double extend_trunc_error_tolerance_ = 0.5;
-  double align_prefix_suffix_shift_thresh_ = 300;
 
   PsAlignParaPtr align_para_ptr_;
 };

@@ -57,6 +57,9 @@ SpectrumSetPtr geneSpectrumSetPtr(DeconvMsPtrVec deconv_ms_ptr_vec,
 
   PrmMsPtrVec prm_ms_six_ptr_vec;
 
+  //srm_ms_six is not used
+  //PrmMsPtrVec srm_ms_six_ptr_vec;
+
   if (valid) {
     extend_ms_three_ptr_vec
         = extend_ms_factory::geneMsThreePtrVec(deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass);
@@ -66,6 +69,8 @@ SpectrumSetPtr geneSpectrumSetPtr(DeconvMsPtrVec deconv_ms_ptr_vec,
         = prm_ms_factory::geneSuffixMsTwoPtrVec(deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass);
     prm_ms_six_ptr_vec
         = prm_ms_factory::geneMsSixPtrVec(deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass);
+    //srm_ms_six_ptr_vec
+    //    = prm_ms_factory::geneSuffixMsSixPtrVec(deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass);
   }
   SpectrumSetPtr spec_set_ptr = std::make_shared<SpectrumSet>(deconv_ms_ptr_vec, 
                                                               prec_mono_mass, 
@@ -108,14 +113,14 @@ SpectrumSetPtr readNextSpectrumSetPtr(SimpleMsAlignReaderPtr reader_ptr,
 
 
 SpectrumSetPtrVec geneSpectrumSetPtrVecWithPrecError(DeconvMsPtrVec deconv_ms_ptr_vec,  
-                                                     SpParaPtr sp_para_ptr) {
+                                                     SpParaPtr sp_para_ptr, 
+                                                     std::vector<double> &prec_error_vec) {
   SpectrumSetPtrVec spec_set_vec;
   if (deconv_ms_ptr_vec.size() == 0) {
     return spec_set_vec;
   }
   double prec_mono_mass = 
     deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMass() - sp_para_ptr->getNTermLabelMass();
-  std::vector<double> prec_error_vec = sp_para_ptr->getPrecErrorVec(); 
   for (size_t i = 0; i< prec_error_vec.size(); i++) {
     SpectrumSetPtr spec_set_ptr = geneSpectrumSetPtr(deconv_ms_ptr_vec,
                                                      sp_para_ptr, 

@@ -27,12 +27,17 @@ double refinePrecursorAndHeaderShift(ProteoformPtr proteo_ptr,
                                      DiagHeaderPtrVec &header_ptrs,
                                      double ppo, double min_mass,
                                      double refine_prec_step_width);
-
+// for ps align
 DiagHeaderPtrVec refineHeadersBgnEnd(ProteoformPtr proteo_ptr,
                                      const ExtendMsPtrVec &ms_three_ptr_vec,
                                      const DiagHeaderPtrVec& heade_ptrs,
                                      double min_mass);
-
+// for ptm align
+DiagHeaderPtrVec refineVarPtmHeadersBgnEnd(ProteoformPtr proteo_ptr,
+                                           const ExtendMsPtrVec &ms_three_ptr_vec,
+                                           const DiagHeaderPtrVec& header_ptrs,
+                                           double min_mass); 
+// for graph alignment
 DiagHeaderPtrVec2D refineHeadersBgnEnd(ProteoformPtr proteo_ptr,
                                        const ExtendMsPtrVec &ms_three_ptr_vec,
                                        const DiagHeaderPtrVec2D& header_ptrs_2d,

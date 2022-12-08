@@ -51,8 +51,16 @@ std::function<void()> geneTask(SpectrumSetPtr spectrum_set_ptr,
                                PrsmXmlWriterSetPtrVec writer_ptr_vec) {
 
   return [spectrum_set_ptr, ori_simple_prsm_ptrs, mng_ptr, pool_ptr, writer_ptr_vec]() {
+    SimplePrsmPtrVec match_prsm_ptrs; 
+    for (size_t i = 0; i < ori_simple_prsm_ptrs.size(); i++) {
+      // check if the simple_prsm has the same precursor +/- 1 Dalton shift
+      if (std::abs(spectrum_set_ptr->getPrecMonoMass() - ori_simple_prsm_ptrs[i]->getPrecMass()) 
+          < std::pow(10, -4)) {
+        match_prsm_ptrs.push_back(ori_simple_prsm_ptrs[i]);
+      }
+    }
     SimplePrsmPtrVec simple_prsm_ptrs = 
-        simple_prsm_util::getUniqueMatches(ori_simple_prsm_ptrs);
+        simple_prsm_util::getUniqueMatches(match_prsm_ptrs);
     PtmSearchSlowFilterPtr slow_filter_ptr = 
         std::make_shared<PtmSearchSlowFilter>(spectrum_set_ptr, simple_prsm_ptrs, mng_ptr);
     boost::thread::id thread_id = boost::this_thread::get_id();
@@ -103,8 +111,7 @@ void PtmSearchProcessor::process(){
   SimplePrsmPtr prsm_ptr = simple_prsm_reader.readOnePrsm();
 
   // init variables
-  //std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
-  std::string db_file_name = prsm_para_ptr->getOriDbName() + "_idx" + file_util::getFileSeparator() + prsm_para_ptr->getSearchDbFileName();
+  std::string db_file_name = prsm_para_ptr->getSearchDbFileNameWithFolder();
   FastaIndexReaderPtr reader_ptr = std::make_shared<FastaIndexReader>(db_file_name);
   int spectrum_num = msalign_util::getSpNum (sp_file_name);
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
@@ -130,25 +137,34 @@ void PtmSearchProcessor::process(){
   int cnt = 0;
   SpectrumSetPtr spec_set_ptr;
   //LOG_DEBUG("Start search");
-  while((spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(ms_reader_ptr,sp_para_ptr))!= nullptr){
+  DeconvMsPtrVec deconv_ms_ptr_vec = ms_reader_ptr->getNextMsPtrVec(); 
+  std::vector<double> prec_error_vec = sp_para_ptr->getMultiShiftSearchPrecErrorVec();
+  while (deconv_ms_ptr_vec.size() > 0) {
+    std::vector<SpectrumSetPtr> spec_set_ptr_vec 
+        = spectrum_set_factory::geneSpectrumSetPtrVecWithPrecError(deconv_ms_ptr_vec, 
+                                                                   sp_para_ptr,
+                                                                   prec_error_vec);
     cnt+= group_spec_num;
-    if(spec_set_ptr->isValid()){
-      int spec_id = spec_set_ptr->getSpectrumId();
+    if(spec_set_ptr_vec[0]->isValid()){
+      int spec_id = spec_set_ptr_vec[0]->getSpectrumId();
       SimplePrsmPtrVec selected_prsm_ptrs;
       while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_id) {
         selected_prsm_ptrs.push_back(prsm_ptr);
         prsm_ptr = simple_prsm_reader.readOnePrsm();
       }
       if (selected_prsm_ptrs.size() > 0) {
-        while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ * 2) {
-          boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+        for (size_t i = 0; i < spec_set_ptr_vec.size(); i++) {
+          while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ * 2) {
+            boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+          }
+          pool_ptr->Enqueue(geneTask(spec_set_ptr_vec[i], selected_prsm_ptrs,
+                                     mng_ptr_, pool_ptr, writer_set_ptr_vec));
         }
-        pool_ptr->Enqueue(geneTask(spec_set_ptr, selected_prsm_ptrs,
-                                   mng_ptr_, pool_ptr, writer_set_ptr_vec));
       }
     }
     std::cout << std::flush <<  "Multiple PTM search - processing " << cnt 
         << " of " << spectrum_num << " spectra.\r";
+    deconv_ms_ptr_vec = ms_reader_ptr->getNextMsPtrVec(); 
   }
   pool_ptr->ShutDown();
   simple_prsm_reader.close();

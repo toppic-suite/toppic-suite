@@ -18,6 +18,7 @@
 #include "common/util/logger.hpp"
 #include "common/xml/xml_dom_document.hpp"
 #include "common/xml/xml_dom_util.hpp"
+#include "common/base/ptm_base.hpp"
 #include "common/base/mod.hpp"
 #include "common/base/residue_base.hpp"
 
@@ -42,7 +43,12 @@ bool Mod::isSame(ModPtr mod_ptr) {
 }
 
 double Mod::getShift() {
-  return mod_residue_ptr_->getMass() - ori_residue_ptr_->getMass();
+  if (PtmBase::isEmptyPtmPtr(ori_residue_ptr_->getPtmPtr())) {
+    return mod_residue_ptr_->getPtmPtr()->getMonoMass();
+  }
+  else {
+    return mod_residue_ptr_->getMass() - ori_residue_ptr_->getMass();
+  }
 }
 
 void Mod::appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {

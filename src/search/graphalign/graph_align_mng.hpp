@@ -75,8 +75,6 @@ class GraphAlignMng {
 
   int getIntMinConsistentDist() {return std::ceil(min_consistent_dist_ * convert_ratio_);}
 
-  double align_prefix_suffix_shift_thresh_ = 300;
-
   double refine_prec_step_width_ = 0.005;
 
   int prec_error_ = 0;

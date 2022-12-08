@@ -204,8 +204,8 @@ int TopMerge_post(std::map<std::string, std::string> & arguments) {
           = std::make_shared<LocalMng>(prsm_para_ptr,
                                        std::stod(arguments["localThreshold"]),
                                        arguments["residueModFileName"],
-                                       max_ptm_mass,
                                        min_ptm_mass,
+                                       max_ptm_mass,
                                        arguments["toolName"] + "_prsm_cutoff", 
                                        arguments["toolName"] + "_prsm_cutoff_local");
       LocalProcessorPtr local_ptr = std::make_shared<LocalProcessor>(local_mng);

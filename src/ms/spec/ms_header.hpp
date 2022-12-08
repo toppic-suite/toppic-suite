@@ -77,7 +77,7 @@ class MsHeader {
 
   int getPrecId() {return prec_id_;}
 
-  double getErrorTolerance(double ppo) {return getPrecMonoMass() * ppo;}
+  double getPrecErrorTolerance(double ppo) {return getPrecMonoMass() * ppo;}
 
   double getPrecInte() {return prec_inte_;}
 

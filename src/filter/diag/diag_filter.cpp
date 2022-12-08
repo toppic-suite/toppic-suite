@@ -17,10 +17,10 @@
 #include <boost/thread/mutex.hpp>
 
 #include "common/util/file_util.hpp"
+#include "seq/prot_candidate.hpp"
 #include "ms/factory/prm_ms_util.hpp"
 #include "prsm/simple_prsm_util.hpp"
 
-#include "filter/massmatch/prot_candidate.hpp"
 #include "filter/massmatch/mass_match_factory.hpp"
 #include "filter/massmatch/mass_match_util.hpp"
 #include "filter/diag/diag_filter.hpp"
@@ -110,8 +110,8 @@ SimplePrsmPtrVec DiagFilter::compute(const PrmMsPtrVec &ms_ptr_vec) {
   }
  
   ProtCandidatePtrVec results
-    = mass_match_util::findTopProteins(max_scores, proteo_row_begins, proteo_row_ends, threshold,
-                                       mng_ptr_->filter_result_num_);
+    = mass_match_util::findDiagTopProteins(max_scores, proteo_row_begins, proteo_row_ends, threshold,
+                                           mng_ptr_->filter_result_num_);
   for (size_t j = 0; j < results.size(); j++) {
     int id = results[j]->getProteinId();
     int score = results[j]->getScore();

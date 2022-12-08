@@ -35,17 +35,16 @@ namespace mem_check {
 std::map<std::string, double> memory_per_thread_list {
   // topfd memory requirement per thread: about 0.15 gb
   {"topfd", 0.3}, 
-  // topindex memory requirement per thread: about 1.5 gb
-    {"topindex", 1.75},  
-  // toppic memory requirement per thread: about 3.0 gb
-    {"toppic", 3.5},
-  // toppic filter memory requirement per thread: about 3.0 gb
-    {"toppic_filter", 3.5},
-  // diag filter memory requirement per thread: about 1.5 gb
-    {"diag_filter", 1.75},
-    {"topmg", 4}, 
-    {"topdiff", 4},
-    {"topmerge", 4} 
+    // topindex memory requirement per thread: about 0.4 gb
+    {"topindex", 0.5},  
+    // toppic memory requirement per thread: about 0.75 gb
+    {"toppic", 1.0},
+    // topmg memory requirement per thread: about 0.75 gb
+    {"topmg", 1.0}, 
+    // zero or one shift filter memory requirement per thread: about 0.75 gb
+    {"zero_one_shift_filter", 1.0},
+    // diag filter memory requirement per thread: about 0.4 gb
+    {"diag_filter", 0.5}
 };
 
 
@@ -178,9 +177,11 @@ bool checkThreadNum(int thread_number, std::string prog) {
     if (prog != "toppic" && prog != "topmg") {
       std::cout << "WARNING: Based on the available memory size, up to " << max_thread << " threads can be used!" << std::endl;
       std::cout << "WARNING: Please set the thread number to " << max_thread << " or the program may crash!" << std::endl;
+      std::cout << std::endl;
     }
     else {
       std::cout << "WARNING: Based on the available memory size, " << max_thread << " threads will be used for protein sequence filtering and " << thread_number << " threads will be used for other steps in proteoform identification!"  << std::endl;
+      std::cout << std::endl;
     }
   }
   return true;

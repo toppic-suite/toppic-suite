@@ -35,7 +35,13 @@ SpPara::SpPara(std::string activation_name, double n_term_label_mass,
   // the set of offsets used to expand the monoisotopic mass list 
   ext_offsets_ = {0, -IM, IM};
 
-  prec_error_vec_ = {0, -IM, IM};
+  zero_shift_search_prec_error_vec_ = {0, -IM, IM};
+
+  var_ptm_search_prec_error_vec_ = {0};
+
+  one_shift_search_prec_error_vec_ = {0, -IM, IM};
+
+  multi_shift_search_prec_error_vec_ = {0};
 }
 
 SpPara::SpPara(xercesc::DOMElement* element) {

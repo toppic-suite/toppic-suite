@@ -306,12 +306,10 @@ void process(PrsmParaPtr prsm_para_ptr,
     file << "Combined spectra " << acid << " right C term" << "\t";
     file << "Combined spectra " << acid << " right both term" << "\t";
   }
-
   file << std::endl;
 
   std::string input_file_name = file_util::basename(spectrum_file_name) + "." + input_file_ext;
-  //std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
-  std::string db_file_name = prsm_para_ptr->getOriDbName() + "_idx" + file_util::getFileSeparator() + prsm_para_ptr->getSearchDbFileName();
+  std::string db_file_name = prsm_para_ptr->getSearchDbFileNameWithFolder();
 
   ModPtrVec fix_mod_ptr_vec = prsm_para_ptr->getFixModPtrVec();
 

@@ -17,14 +17,14 @@
 namespace toppic {
 
 TdgfMng::TdgfMng(PrsmParaPtr prsm_para_ptr, int shift_num, double max_ptm_mass, 
-                 bool use_gf, bool variable_ptm, int thread_num, 
+                 bool use_gf, int var_ptm_type_num, int thread_num, 
                  const std::string &input_file_ext, 
                  const std::string & output_file_ext):
   input_file_ext_(input_file_ext),
   output_file_ext_(output_file_ext),
   prsm_para_ptr_(prsm_para_ptr),
   use_gf_(use_gf),
-  variable_ptm_(variable_ptm),
+  var_ptm_type_num_(var_ptm_type_num),
   max_ptm_mass_(max_ptm_mass),
   unexpected_shift_num_(shift_num),
   thread_num_(thread_num) {}

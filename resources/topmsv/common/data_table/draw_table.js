@@ -347,7 +347,7 @@ class DataTable {
                         let ionPos = parseInt((matchedPeakPair.getIon().getId()).slice(1));
                         if (ion.indexOf("X") >= 0 || ion.indexOf("Y") >= 0 || ion.indexOf("Z") >= 0) {
                             if (seqLen) {
-                                td.innerHTML = (seqLen - (ionPos) + 1).toString();
+                                td.innerHTML = (seqLen - ionPos).toString();
                             }
                             else {
                                 console.error("ERROR: seqLen is not provided");

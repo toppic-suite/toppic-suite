@@ -39,6 +39,8 @@ class ToppicWindow : public QMainWindow {
 
   void on_fixedModFileButton_clicked();
 
+  void on_varPtmFileButton_clicked();
+
   void on_modFileButton_clicked();
 
   void on_clearButton_clicked();

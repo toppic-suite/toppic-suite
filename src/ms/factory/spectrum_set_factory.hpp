@@ -35,7 +35,8 @@ SpectrumSetPtr readNextSpectrumSetPtr(SimpleMsAlignReaderPtr reader_ptr,
                                       int peak_num_limit);
 
 SpectrumSetPtrVec geneSpectrumSetPtrVecWithPrecError(DeconvMsPtrVec deconv_ms_ptr_vec,  
-                                                     SpParaPtr sp_para_ptr);
+                                                     SpParaPtr sp_para_ptr, 
+                                                     std::vector<double> &prec_error_vec);
 }
 
 } /* namespace toppic */
