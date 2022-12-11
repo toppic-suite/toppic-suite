@@ -312,7 +312,7 @@ p, li { white-space: pre-wrap; }
         <widget class="QLabel" name="label_4">
          <property name="minimumSize">
           <size>
-           <width>190</width>
+           <width>160</width>
            <height>0</height>
           </size>
          </property>
@@ -418,7 +418,7 @@ p, li { white-space: pre-wrap; }
         <widget class="QLabel" name="label_9">
          <property name="minimumSize">
           <size>
-           <width>190</width>
+           <width>160</width>
            <height>0</height>
           </size>
          </property>
@@ -441,7 +441,7 @@ p, li { white-space: pre-wrap; }
        <rect>
         <x>480</x>
         <y>170</y>
-        <width>301</width>
+        <width>270</width>
         <height>31</height>
        </rect>
       </property>
@@ -476,7 +476,7 @@ p, li { white-space: pre-wrap; }
         <widget class="QLabel" name="label_23">
          <property name="minimumSize">
           <size>
-           <width>190</width>
+           <width>160</width>
            <height>0</height>
           </size>
          </property>
@@ -517,7 +517,7 @@ p, li { white-space: pre-wrap; }
         <widget class="QLabel" name="label_15">
          <property name="minimumSize">
           <size>
-           <width>190</width>
+           <width>160</width>
            <height>0</height>
           </size>
          </property>
@@ -549,7 +549,7 @@ p, li { white-space: pre-wrap; }
         <widget class="QLabel" name="label_20">
          <property name="minimumSize">
           <size>
-           <width>190</width>
+           <width>160</width>
            <height>0</height>
           </size>
          </property>
@@ -648,7 +648,7 @@ p, li { white-space: pre-wrap; }
          <x>20</x>
          <y>30</y>
          <width>151</width>
-         <height>41</height>
+         <height>31</height>
         </rect>
        </property>
        <property name="text">
