@@ -159,9 +159,10 @@ void deconvMissingMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   header_ptr->setPrecSpMz(prec_mz);
   MatchEnvPtrVec result_envs; 
 
+  EnvParaPtr env_para_ptr = deconv_ptr->getEnvParaPtr();
   if (peak_list.size() > 0) {
-    deconv_ptr->setData(peak_list, EnvPara::getDefaultMaxMass(),
-                        EnvPara::getDefaultMaxCharge());
+    deconv_ptr->setData(peak_list, env_para_ptr->getMaxMass(), 
+                        env_para_ptr->getMaxCharge());
     deconv_ptr->run();
     result_envs = deconv_ptr->getResult();
   }
