@@ -461,8 +461,8 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
 
 bool ToppicArgument::validateArguments() {
   if (!file_util::exists(arguments_["resourceDir"])) {
-    LOG_ERROR("Resource direcotry " << arguments_["resourceDir"] << " does not exist!\nPlease check if file directory contains unproper "
-    << "characters such as spaces/quotation makrks");
+    LOG_ERROR("Resource direcotry " << arguments_["resourceDir"] << " does not exist!\nPlease check if file directory contains unproper"
+    << " characters such as spaces/quotation makrks");
     return false;
   }
 
