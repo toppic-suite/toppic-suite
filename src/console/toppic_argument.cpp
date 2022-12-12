@@ -461,12 +461,14 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
 
 bool ToppicArgument::validateArguments() {
   if (!file_util::exists(arguments_["resourceDir"])) {
-    LOG_ERROR("Resource direcotry " << arguments_["resourceDir"] << " does not exist!");
+    LOG_ERROR("Resource direcotry " << arguments_["resourceDir"] << " does not exist!\nPlease check if file directory contains unproper "
+    << "characters such as spaces/quotation makrks");
     return false;
   }
 
   if (!file_util::exists(arguments_["oriDatabaseFileName"])) {
-    LOG_ERROR("Database file " << arguments_["oriDatabaseFileName"] << " does not exist!");
+    LOG_ERROR("Database file " << arguments_["oriDatabaseFileName"] << " does not exist!\nPlease check if file directory contains "
+    << "unproper characters such as spaces/quotation makrks");
     return false;
   }
 
@@ -485,7 +487,7 @@ bool ToppicArgument::validateArguments() {
 
   for (size_t k = 0; k < spec_file_list_.size(); k++) {
     if (!file_util::exists(spec_file_list_[k])) {
-      LOG_ERROR(spec_file_list_[k] << " does not exist!");
+      LOG_ERROR(spec_file_list_[k] << " does not exist!\nPlease check if file directory contains unproper characters such as spaces/quotation makrks");
       return false;
     }
 
