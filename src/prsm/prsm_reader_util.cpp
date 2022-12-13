@@ -60,6 +60,21 @@ PrsmPtrVec readAllPrsms(const std::string &prsm_file_name,
   return prsm_ptrs;
 }
 
+PrsmPtrVec readAllPrsms(const std::string &prsm_file_name,
+                        FastaIndexReaderPtr fasta_reader_ptr, 
+                        const ModPtrVec  &fix_mod_list) {
+  PrsmReader reader(prsm_file_name);
+  PrsmPtrVec prsm_ptrs;
+  PrsmPtr prsm_ptr = reader.readOnePrsm(fasta_reader_ptr, fix_mod_list);
+  while (prsm_ptr != nullptr) {
+    prsm_ptrs.push_back(prsm_ptr);
+    prsm_ptr = reader.readOnePrsm(fasta_reader_ptr, fix_mod_list);
+  }
+  reader.close();
+  return prsm_ptrs;
+}
+
+
 }
 
 }  // namespace toppic

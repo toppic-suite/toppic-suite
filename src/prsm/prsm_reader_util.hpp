@@ -31,7 +31,7 @@ PrsmStrPtrVec readAllPrsmStrs(const std::string &input_file_name);
 PrsmStrPtrVec readAllPrsmStrsMatchSeq(const std::string &input_file_name);
 
 PrsmPtrVec readAllPrsms(const std::string &prsm_file_name,
-                        const std::string &db_file_name,
+                        FastaIndexReaderPtr fasta_reader_ptr, 
                         const ModPtrVec  &fix_mod_list);
 
 }

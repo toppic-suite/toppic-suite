@@ -16,6 +16,7 @@
 #include <iostream>
 
 #include "common/util/file_util.hpp"
+#include "seq/fasta_index_reader.hpp"
 #include "prsm/prsm.hpp"
 #include "prsm/prsm_reader_util.hpp"
 #include "prsm/prsm_xml_writer.hpp"
@@ -36,8 +37,10 @@ void process(const std::string &db_file_name,
   std::string input_file_name = base_name + "." + input_file_ext;
   
   ModPtrVec fix_mod_list;
+  FastaIndexReaderPtr fasta_reader_ptr 
+      = std::make_shared<FastaIndexReader>(db_file_name);
   PrsmPtrVec prsms = prsm_reader_util::readAllPrsms(input_file_name, 
-                                                    db_file_name, 
+                                                    fasta_reader_ptr,  
                                                     fix_mod_list );
 
   std::sort(prsms.begin(), prsms.end(), Prsm::cmpSpectrumIdIncPrecursorIdInc);
