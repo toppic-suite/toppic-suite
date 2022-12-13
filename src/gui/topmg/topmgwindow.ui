@@ -137,7 +137,7 @@ p, li { white-space: pre-wrap; }
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_4">
      <attribute name="title">
@@ -258,6 +258,12 @@ p, li { white-space: pre-wrap; }
       <layout class="QHBoxLayout" name="horizontalLayout_5">
        <item>
         <widget class="QLabel" name="label_5">
+         <property name="minimumSize">
+          <size>
+           <width>160</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="text">
           <string>Combined output file: </string>
          </property>
@@ -280,6 +286,12 @@ p, li { white-space: pre-wrap; }
       <layout class="QHBoxLayout" name="horizontalLayout_17">
        <item>
         <widget class="QLabel" name="label_18">
+         <property name="minimumSize">
+          <size>
+           <width>160</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="text">
           <string>Variable PTM file:</string>
          </property>
@@ -418,14 +430,20 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>290</y>
-        <width>251</width>
+        <y>160</y>
+        <width>277</width>
         <height>33</height>
        </rect>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_11">
        <item>
         <widget class="QLabel" name="label_9">
+         <property name="minimumSize">
+          <size>
+           <width>210</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="text">
           <string>Mass error tolerance (PPM):</string>
          </property>
@@ -444,7 +462,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>160</y>
+        <y>230</y>
         <width>861</width>
         <height>121</height>
        </rect>
@@ -456,9 +474,9 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>30</y>
+         <y>25</y>
          <width>151</width>
-         <height>41</height>
+         <height>31</height>
         </rect>
        </property>
        <property name="text">
@@ -469,9 +487,9 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>480</x>
-         <y>30</y>
+         <y>25</y>
          <width>171</width>
-         <height>41</height>
+         <height>31</height>
         </rect>
        </property>
        <property name="text">
@@ -482,7 +500,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>150</x>
-         <y>30</y>
+         <y>20</y>
          <width>171</width>
          <height>80</height>
         </rect>
@@ -521,7 +539,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>620</x>
-         <y>30</y>
+         <y>20</y>
          <width>171</width>
          <height>81</height>
         </rect>
@@ -560,15 +578,21 @@ p, li { white-space: pre-wrap; }
      <widget class="QWidget" name="horizontalLayoutWidget_13">
       <property name="geometry">
        <rect>
-        <x>280</x>
-        <y>290</y>
-        <width>301</width>
+        <x>490</x>
+        <y>160</y>
+        <width>230</width>
         <height>33</height>
        </rect>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_13">
        <item>
         <widget class="QLabel" name="label_10">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="text">
           <string>PrSM cluster error tolerance (Da):</string>
          </property>
@@ -622,15 +646,21 @@ p, li { white-space: pre-wrap; }
      <widget class="QWidget" name="horizontalLayoutWidget_22">
       <property name="geometry">
        <rect>
-        <x>600</x>
-        <y>290</y>
-        <width>271</width>
+        <x>10</x>
+        <y>190</y>
+        <width>277</width>
         <height>33</height>
        </rect>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_22">
        <item>
         <widget class="QLabel" name="label_23">
+         <property name="minimumSize">
+          <size>
+           <width>210</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="text">
           <string>Thread number:</string>
          </property>
@@ -674,6 +704,12 @@ p, li { white-space: pre-wrap; }
        </property>
        <item>
         <widget class="QLabel" name="label_3">
+         <property name="minimumSize">
+          <size>
+           <width>250</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="text">
           <string>Fragmentation:</string>
          </property>
@@ -733,6 +769,12 @@ p, li { white-space: pre-wrap; }
       <layout class="QHBoxLayout" name="horizontalLayout_10">
        <item>
         <widget class="QLabel" name="label_8">
+         <property name="minimumSize">
+          <size>
+           <width>250</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="text">
           <string>Maximum mass shift (Da):</string>
          </property>
@@ -918,6 +960,12 @@ p, li { white-space: pre-wrap; }
       <layout class="QHBoxLayout" name="horizontalLayout_12">
        <item>
         <widget class="QLabel" name="label_14">
+         <property name="minimumSize">
+          <size>
+           <width>250</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="text">
           <string>Maximum number of unknown mass shifts:</string>
          </property>

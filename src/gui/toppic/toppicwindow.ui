@@ -137,7 +137,7 @@ p, li { white-space: pre-wrap; }
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_4">
      <attribute name="title">
@@ -149,7 +149,7 @@ p, li { white-space: pre-wrap; }
         <x>10</x>
         <y>90</y>
         <width>851</width>
-        <height>151</height>
+        <height>221</height>
        </rect>
       </property>
      </widget>
@@ -250,9 +250,9 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>250</y>
+        <y>320</y>
         <width>851</width>
-        <height>33</height>
+        <height>31</height>
        </rect>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_6">
@@ -262,7 +262,7 @@ p, li { white-space: pre-wrap; }
        <item>
         <widget class="QLabel" name="label_7">
          <property name="text">
-          <string>Combined output file: </string>
+          <string>Combined output file:</string>
          </property>
         </widget>
        </item>
@@ -271,10 +271,16 @@ p, li { white-space: pre-wrap; }
          <property name="enabled">
           <bool>true</bool>
          </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="maximumSize">
           <size>
-           <width>400000</width>
-           <height>300</height>
+           <width>4000000</width>
+           <height>25</height>
           </size>
          </property>
          <property name="text">
@@ -304,6 +310,12 @@ p, li { white-space: pre-wrap; }
       <layout class="QHBoxLayout" name="horizontalLayout_4">
        <item>
         <widget class="QLabel" name="label_4">
+         <property name="minimumSize">
+          <size>
+           <width>160</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="text">
           <string>Fixed modifications:</string>
          </property>
@@ -311,6 +323,12 @@ p, li { white-space: pre-wrap; }
        </item>
        <item>
         <widget class="QComboBox" name="fixedModComboBox">
+         <property name="minimumSize">
+          <size>
+           <width>270</width>
+           <height>0</height>
+          </size>
+         </property>
          <item>
           <property name="text">
            <string>NONE</string>
@@ -366,8 +384,8 @@ p, li { white-space: pre-wrap; }
        <rect>
         <x>10</x>
         <y>130</y>
-        <width>861</width>
-        <height>33</height>
+        <width>261</width>
+        <height>31</height>
        </rect>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_21">
@@ -384,6 +402,219 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="horizontalLayoutWidget_11">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>170</y>
+        <width>261</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_11">
+       <item>
+        <widget class="QLabel" name="label_9">
+         <property name="minimumSize">
+          <size>
+           <width>160</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Mass error tolerance (PPM):</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="errorToleranceEdit">
+         <property name="text">
+          <string>10</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="horizontalLayoutWidget_13">
+      <property name="geometry">
+       <rect>
+        <x>480</x>
+        <y>170</y>
+        <width>270</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_13">
+       <item>
+        <widget class="QLabel" name="label_14">
+         <property name="text">
+          <string>PrSM cluster error tolerance (Da):</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="formErrorToleranceEdit">
+         <property name="text">
+          <string>1.2</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="horizontalLayoutWidget_22">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>210</y>
+        <width>261</width>
+        <height>33</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_22">
+       <item>
+        <widget class="QLabel" name="label_23">
+         <property name="minimumSize">
+          <size>
+           <width>160</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Thread number:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="threadNumberEdit">
+         <property name="maximumSize">
+          <size>
+           <width>110</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>1</string>
+         </property>
+         <property name="readOnly">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="horizontalLayoutWidget_14">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>90</y>
+        <width>261</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_14">
+       <item>
+        <widget class="QLabel" name="label_15">
+         <property name="minimumSize">
+          <size>
+           <width>160</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Max variable PTM number: </string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="varPtmNumEdit">
+         <property name="text">
+          <string>3</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="horizontalLayoutWidget_19">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>50</y>
+        <width>861</width>
+        <height>33</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_19">
+       <item>
+        <widget class="QLabel" name="label_20">
+         <property name="minimumSize">
+          <size>
+           <width>160</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Variable PTM file:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="varPtmFileEdit">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="varPtmFileButton">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="text">
+          <string>File</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="horizontalLayoutWidget_25">
+      <property name="geometry">
+       <rect>
+        <x>480</x>
+        <y>90</y>
+        <width>391</width>
+        <height>33</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_25">
+       <item>
+        <widget class="QCheckBox" name="approxSpectraCheckBox">
+         <property name="minimumSize">
+          <size>
+           <width>230</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Use approximate spectra in protein filtering</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="horizontalLayoutWidget_26">
+      <property name="geometry">
+       <rect>
+        <x>480</x>
+        <y>130</y>
+        <width>391</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_26">
        <item>
         <widget class="QCheckBox" name="topfdFeatureCheckBox">
          <property name="minimumSize">
@@ -399,39 +630,13 @@ p, li { white-space: pre-wrap; }
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="horizontalLayoutWidget_11">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>280</y>
-        <width>261</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_11">
-       <item>
-        <widget class="QLabel" name="label_9">
-         <property name="text">
-          <string>Mass error tolerance (PPM):</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="errorToleranceEdit">
-         <property name="text">
-          <string>10</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
      <widget class="QGroupBox" name="groupBox_3">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>170</y>
+        <y>250</y>
         <width>861</width>
-        <height>101</height>
+        <height>111</height>
        </rect>
       </property>
       <property name="title">
@@ -443,7 +648,7 @@ p, li { white-space: pre-wrap; }
          <x>20</x>
          <y>30</y>
          <width>151</width>
-         <height>41</height>
+         <height>31</height>
         </rect>
        </property>
        <property name="text">
@@ -453,7 +658,7 @@ p, li { white-space: pre-wrap; }
       <widget class="QLabel" name="label_13">
        <property name="geometry">
         <rect>
-         <x>440</x>
+         <x>470</x>
          <y>30</y>
          <width>171</width>
          <height>31</height>
@@ -505,7 +710,7 @@ p, li { white-space: pre-wrap; }
       <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
-         <x>570</x>
+         <x>610</x>
          <y>30</y>
          <width>171</width>
          <height>71</height>
@@ -541,157 +746,6 @@ p, li { white-space: pre-wrap; }
         </item>
        </layout>
       </widget>
-     </widget>
-     <widget class="QWidget" name="horizontalLayoutWidget_13">
-      <property name="geometry">
-       <rect>
-        <x>440</x>
-        <y>280</y>
-        <width>431</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_13">
-       <item>
-        <widget class="QLabel" name="label_14">
-         <property name="text">
-          <string>PrSM cluster error tolerance (Da):</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="formErrorToleranceEdit">
-         <property name="text">
-          <string>1.2</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="horizontalLayoutWidget_22">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>320</y>
-        <width>261</width>
-        <height>33</height>
-       </rect>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_22">
-       <item>
-        <widget class="QLabel" name="label_23">
-         <property name="text">
-          <string>Thread number:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="threadNumberEdit">
-         <property name="maximumSize">
-          <size>
-           <width>110</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>1</string>
-         </property>
-         <property name="readOnly">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="horizontalLayoutWidget_14">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>50</y>
-        <width>261</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_14">
-       <item>
-        <widget class="QLabel" name="label_15">
-         <property name="text">
-          <string>Max variable PTM number: </string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="varPtmNumEdit">
-         <property name="text">
-          <string>3</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="horizontalLayoutWidget_19">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>90</y>
-        <width>861</width>
-        <height>33</height>
-       </rect>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_19">
-       <item>
-        <widget class="QLabel" name="label_20">
-         <property name="text">
-          <string>Variable PTM file:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="varPtmFileEdit">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="varPtmFileButton">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="text">
-          <string>File</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="horizontalLayoutWidget_25">
-      <property name="geometry">
-       <rect>
-        <x>440</x>
-        <y>50</y>
-        <width>431</width>
-        <height>33</height>
-       </rect>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_25">
-       <item>
-        <widget class="QCheckBox" name="approxSpectraCheckBox">
-         <property name="minimumSize">
-          <size>
-           <width>230</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>Use approximate spectra in protein filtering</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
      </widget>
     </widget>
     <widget class="QWidget" name="tab_2">
@@ -974,9 +1028,15 @@ p, li { white-space: pre-wrap; }
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_17">
         <item>
-         <widget class="QLabel" name="label_18">
+         <widget class="QLabel" name="label_5">
+          <property name="minimumSize">
+           <size>
+            <width>200</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="text">
-           <string>Modification file for localization:</string>
+           <string>PTM file for localization:</string>
           </property>
          </widget>
         </item>
@@ -1007,13 +1067,19 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>10</x>
          <y>60</y>
-         <width>341</width>
+         <width>331</width>
          <height>33</height>
         </rect>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_18">
         <item>
-         <widget class="QLabel" name="label_19">
+         <widget class="QLabel" name="label_6">
+          <property name="minimumSize">
+           <size>
+            <width>200</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="text">
            <string>MIScore threshold:</string>
           </property>
@@ -1072,7 +1138,7 @@ p, li { white-space: pre-wrap; }
        <rect>
         <x>10</x>
         <y>210</y>
-        <width>851</width>
+        <width>341</width>
         <height>33</height>
        </rect>
       </property>
@@ -1090,13 +1156,6 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item>
-        <widget class="QCheckBox" name="keepTempCheckBox">
-         <property name="text">
-          <string>Keep intermediate files</string>
-         </property>
-        </widget>
-       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="horizontalLayoutWidget_23">
@@ -1104,8 +1163,8 @@ p, li { white-space: pre-wrap; }
        <rect>
         <x>10</x>
         <y>180</y>
-        <width>851</width>
-        <height>33</height>
+        <width>341</width>
+        <height>31</height>
        </rect>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_23">
@@ -1125,10 +1184,41 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="horizontalLayoutWidget_27">
+      <property name="geometry">
+       <rect>
+        <x>500</x>
+        <y>180</y>
+        <width>361</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_28">
        <item>
         <widget class="QCheckBox" name="lookupTableCheckBox">
          <property name="text">
           <string>Lookup table for E-value computation</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="horizontalLayoutWidget_28">
+      <property name="geometry">
+       <rect>
+        <x>500</x>
+        <y>210</y>
+        <width>361</width>
+        <height>33</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_29">
+       <item>
+        <widget class="QCheckBox" name="keepTempCheckBox">
+         <property name="text">
+          <string>Keep intermediate files</string>
          </property>
         </widget>
        </item>

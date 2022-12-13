@@ -127,20 +127,13 @@ p, li { white-space: pre-wrap; }
    <widget class="QWidget" name="horizontalLayoutWidget_2">
     <property name="geometry">
      <rect>
-      <x>30</x>
+      <x>180</x>
       <y>20</y>
-      <width>861</width>
+      <width>711</width>
       <height>39</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_3">
-     <item>
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>Database file: </string>
-       </property>
-      </widget>
-     </item>
      <item>
       <widget class="QLineEdit" name="databaseFileEdit">
        <property name="enabled">
@@ -175,20 +168,13 @@ p, li { white-space: pre-wrap; }
    <widget class="QWidget" name="horizontalLayoutWidget_5">
     <property name="geometry">
      <rect>
-      <x>30</x>
+      <x>180</x>
       <y>70</y>
-      <width>861</width>
+      <width>711</width>
       <height>32</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_5">
-     <item>
-      <widget class="QLabel" name="label_5">
-       <property name="text">
-        <string>Fixed modifications:</string>
-       </property>
-      </widget>
-     </item>
      <item>
       <widget class="QComboBox" name="fixedModComboBox">
        <item>
@@ -412,6 +398,44 @@ p, li { white-space: pre-wrap; }
       </item>
      </layout>
     </widget>
+   </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget_3">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>20</y>
+      <width>151</width>
+      <height>39</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <item>
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>Database file: </string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget_8">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>70</y>
+      <width>151</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_8">
+     <item>
+      <widget class="QLabel" name="label_7">
+       <property name="text">
+        <string>Fixed modifications:</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
   </widget>
  </widget>
