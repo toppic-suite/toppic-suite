@@ -1,0 +1,444 @@
+//Copyright (c) 2014 - 2022, The Trustees of Indiana University.
+//
+//Licensed under the Apache License, Version 2.0 (the "License");
+//you may not use this file except in compliance with the License.
+//You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+//Unless required by applicable law or agreed to in writing, software
+//distributed under the License is distributed on an "AS IS" BASIS,
+//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//See the License for the specific language governing permissions and
+//limitations under the License.
+
+#include "feature.hpp"
+
+namespace toppic {
+  Feature::Feature(EnvCollection &env_coll, PeakMatrix &peak_matrix, int feature_id, double inte) {
+    SeedEnvelope seed_env = env_coll.getSeedEnv();
+    spec_list spectra_list = peak_matrix.get_spectra_list();
+    EnvSet env_set = env_coll.get_seed_env_set();
+    feature_id_ = feature_id;
+    min_scan_ = env_coll.getStartSpecId();
+    max_scan_ = env_coll.getEndSpecId();
+    min_charge_ = env_coll.getMinCharge();
+    max_charge_ = env_coll.getMaxCharge();
+    mono_mass_ = seed_env.getMass();
+    rep_charge_ = seed_env.getCharge();
+    rep_mz_ = seed_env.getPos();
+    abundance_ = inte;
+    min_elution_time_ = env_coll.get_min_elution_time(spectra_list) / 60.0;
+    max_elution_time_ = env_coll.get_max_elution_time(spectra_list) / 60.0;
+    apex_elution_time_ = env_coll.get_apex_elution_time(spectra_list) / 60.0;
+    elution_length_ = env_coll.get_elution_length(spectra_list) / 60.0;
+
+    percent_matched_peaks_ = 0;
+    intensity_correlation_ = 0;
+    top3_correlation_ = 0;
+    even_odd_peak_ratios_ = 0;
+    percent_consec_peaks_ = 0;
+    num_theo_peaks_ = 0;
+    mz_error_sum_ = 0;
+    envcnn_score_ = 0;
+    score_ = 0;
+    label_ = 0;
+  }
+
+  Feature::Feature(EnvCollection &env_coll, PeakMatrix &peak_matrix, fdeep::model &model,
+                   fdeep::model &model_escore, int feature_id, double snr) {
+    SeedEnvelope seed_env = env_coll.getSeedEnv();
+    spec_list spectra_list = peak_matrix.get_spectra_list();
+    std::vector<std::vector<double>> theo_map = env_coll.get_seed_theo_map(peak_matrix, snr);
+    std::vector<double> spectrum_noise_levels = peak_matrix.get_spec_noise_inte();
+    double noiseIntensityLevel = std::accumulate(spectrum_noise_levels.begin() + env_coll.getStartSpecId(),
+                                                 spectrum_noise_levels.begin() + env_coll.getEndSpecId(), 0.0);
+    int base_spec = env_coll.getBaseSpecID();
+    int start_spec = env_coll.getStartSpecId();
+    EnvSet env_set = env_coll.get_seed_env_set();
+    feature_id_ = feature_id;
+    min_scan_ = env_coll.getStartSpecId();
+    max_scan_ = env_coll.getEndSpecId();
+    min_charge_ = env_coll.getMinCharge();
+    max_charge_ = env_coll.getMaxCharge();
+    mono_mass_ = seed_env.getMass();
+    rep_charge_ = seed_env.getCharge();
+    rep_mz_ = seed_env.getPos();
+    abundance_ = env_coll.get_intensity(snr, peak_matrix.get_min_inte());
+    min_elution_time_ = env_coll.get_min_elution_time(spectra_list) / 60.0;
+    max_elution_time_ = env_coll.get_max_elution_time(spectra_list) / 60.0;
+    apex_elution_time_ = env_coll.get_apex_elution_time(spectra_list) / 60.0;
+    elution_length_ = env_coll.get_elution_length(spectra_list) / 60.0;
+
+    percent_matched_peaks_ = component_score::get_matched_peaks_percent(env_set, theo_map);
+    intensity_correlation_ = component_score::get_agg_env_corr(env_set);
+    top3_correlation_ = component_score::get_3_scan_corr(env_set, base_spec, start_spec);
+    even_odd_peak_ratios_ = component_score::get_agg_odd_even_peak_ratio(env_set);
+    percent_consec_peaks_ = component_score::get_consecutive_peaks_percent(env_set);
+    num_theo_peaks_ = component_score::get_num_theo_peaks(theo_map);
+    mz_error_sum_ = component_score::get_mz_errors(env_set);
+    envcnn_score_ = env_cnn_score::get_envcnn_score(model, peak_matrix, env_coll, noiseIntensityLevel);
+
+    std::vector<double> data;
+    data.push_back(envcnn_score_); //1
+    data.push_back(elution_length_ / 60.0); //2
+    data.push_back(percent_matched_peaks_); //3
+    data.push_back(std::log(abundance_)); //4
+    data.push_back(rep_charge_); //5
+    data.push_back(top3_correlation_); //6
+    data.push_back((max_charge_ - min_charge_) / 30.0); //7
+    data.push_back(even_odd_peak_ratios_); //8
+    score_ = env_coll_score::get_env_coll_score(model_escore, data);
+    label_ = 0;
+  }
+
+  DeconvMsPtrVec Feature::readData(const std::string &file_name) {
+    SimpleMsAlignReader sp_reader(file_name);
+    DeconvMsPtrVec ms_ptr_vec;
+    DeconvMsPtr ms_ptr;
+    while ((ms_ptr = sp_reader.getNextMsPtr()) != nullptr) {
+      ms_ptr_vec.push_back(ms_ptr);
+    }
+    return ms_ptr_vec;
+  }
+
+  FracFeaturePtr Feature::getFeature(int feat_id, DeconvMsPtrVec &ms1_ptr_vec, int frac_id, std::string file_name,
+                                     EnvCollection &env_coll, PeakMatrix &peak_matrix, double snr) {
+    double noise_inte = peak_matrix.get_min_inte();
+    spec_list spectra_list = peak_matrix.get_spectra_list();
+    int ms1_id_begin = env_coll.getStartSpecId();
+    int ms1_id_end = env_coll.getEndSpecId();
+    double feat_inte = env_coll.get_intensity(snr, peak_matrix.get_min_inte());
+    double feat_mass = env_coll.getMass();
+    int min_charge = env_coll.getMinCharge();
+    int max_charge = env_coll.getMaxCharge();
+    double ms1_time_begin = env_coll.get_min_elution_time(spectra_list);
+    double ms1_time_end = env_coll.get_max_elution_time(spectra_list);
+    int ms1_scan_begin = ms1_ptr_vec[ms1_id_begin]->getMsHeaderPtr()->getFirstScanNum();
+    int ms1_scan_end = ms1_ptr_vec[ms1_id_end]->getMsHeaderPtr()->getFirstScanNum();
+
+    // get apex inte
+    double time_apex = env_coll.get_apex_elution_time(spectra_list);
+    EnvSet es = env_coll.get_seed_env_set();
+    std::vector<double> env_intes = es.getEnvIntes();
+    double apex_inte = 0;
+    if (env_intes.size() > 0) {
+      int inte_idx = env_coll.getBaseSpecID() - env_coll.getStartSpecId();
+      apex_inte = env_intes[inte_idx];
+    }
+
+    FracFeaturePtr feature_ptr = std::make_shared<FracFeature>(feat_id, frac_id, file_name, feat_mass, feat_inte,
+                                                               ms1_id_begin, ms1_id_end, ms1_time_begin, ms1_time_end,
+                                                               ms1_scan_begin, ms1_scan_end, min_charge, max_charge,
+                                                               0, time_apex, apex_inte);
+    SingleChargeFeaturePtrVec single_features;
+    for (EnvSet &es: env_coll.getEnvSetList()) {
+      int id_begin = es.getStartSpecId();
+      int id_end = es.getEndSpecId();
+      double time_begin = ms1_ptr_vec[id_begin]->getMsHeaderPtr()->getRetentionTime();
+      double time_end = ms1_ptr_vec[id_end]->getMsHeaderPtr()->getRetentionTime();
+      int scan_begin = ms1_ptr_vec[id_begin]->getMsHeaderPtr()->getFirstScanNum();
+      int scan_end = ms1_ptr_vec[id_end]->getMsHeaderPtr()->getFirstScanNum();
+      double inte = es.comp_intensity(snr, noise_inte);
+      int charge = es.getCharge();
+      std::vector<double> xic = es.getXicEnvIntes();
+      SingleChargeFeaturePtr single_feature = std::make_shared<SingleChargeFeature>(charge, time_begin, time_end,
+                                                                                    scan_begin, scan_end,
+                                                                                    inte, 0, id_begin, id_end,
+                                                                                    feat_mass, xic);
+      single_features.push_back(single_feature);
+    }
+    feature_ptr->setSingleFeatures(single_features);
+    return feature_ptr;
+  }
+
+  double Feature::isMatch(double prec_mass, double feature_mass, const FeatureParaPtr& para_ptr, bool &shift) {
+    std::vector<double> search_masses = para_ptr->getSearchMasses(prec_mass);
+    double min_diff = std::numeric_limits<double>::max();
+    for (size_t j = 0; j < search_masses.size(); j++) {
+      double mass_diff = std::abs(search_masses[j] - feature_mass);
+      if (mass_diff < min_diff) {
+        if (j > 0)
+          shift = true;
+        min_diff = mass_diff;
+      }
+    }
+    return min_diff;
+  }
+
+  void Feature::assign_features(DeconvMsPtrVec &ms1_ptr_vec, const std::string &ms2_file_name,
+                                FracFeaturePtrVec &frac_features, std::vector<EnvCollection> &env_coll_list,
+                                std::vector<Feature> &features, SpecFeaturePtrVec &ms2_features,
+                                std::vector<double> &precMzs, PeakMatrix &peak_matrix, fdeep::model model,
+                                const fdeep::model& model_escore, FeatureParaPtr para_ptr, EnvParaPtr env_para_ptr,
+                                double score_thr) {
+
+    int isolation_windows_mz = env_para_ptr->prec_deconv_interval_;
+    DeconvMsPtrVec ms_ptr_vec = Feature::readData(ms2_file_name);
+    std::cout << "\r" << "Mapping Proteoforms Features on MS2 Scans" << std::flush;
+//    int isolation_windows_num = int(ms_ptr_vec.size() / ms1_ptr_vec.size()) + 1;
+//    std::cout << "# of MS1 scans: " << ms1_ptr_vec.size() << ", # of MS2 scans: " << ms_ptr_vec.size()
+//              << " and num of isolation windows: " << isolation_windows_num << std::endl;
+    for (size_t spec_id = 0; spec_id < ms_ptr_vec.size(); spec_id++) {
+      MsHeaderPtr hh = ms_ptr_vec[spec_id]->getMsHeaderPtr();
+      if (hh->getPrecCharge() == 0) continue;
+
+      double base_mz = precMzs[spec_id];
+      bool assigned_status = get_mass_shifted_feature_map(frac_features, env_coll_list, para_ptr, hh, score_thr,
+                                                          base_mz, isolation_windows_mz, ms2_features);
+      if (assigned_status) continue;
+
+      assigned_status = get_charge_shifted_feature_map(frac_features, env_coll_list, para_ptr, hh, score_thr, base_mz,
+                                                       isolation_windows_mz, ms2_features);
+      if (assigned_status) continue;
+
+      assigned_status = get_highest_inte_feature_map(frac_features, env_coll_list, para_ptr, hh, score_thr, base_mz,
+                                                     isolation_windows_mz, ms2_features);
+      if (assigned_status) continue;
+
+      assigned_status = get_new_feature_map(ms1_ptr_vec, frac_features, env_coll_list, features, para_ptr, env_para_ptr,
+                                            hh, ms2_features, peak_matrix, model, model_escore);
+      if (assigned_status) continue;
+
+      get_empty_feature_map(ms1_ptr_vec, frac_features, env_coll_list, features, para_ptr, env_para_ptr, hh,
+                            ms2_features, peak_matrix, model, model_escore);
+    }
+    std::sort(ms2_features.begin(), ms2_features.end(), SpecFeature::cmpSpecIdInc);
+    MsAlignWriterPtr ms2_ptr = std::make_shared<MsAlignWriter>(ms2_file_name);
+    for (const auto &ms_ptr: ms_ptr_vec)
+      ms2_ptr->write(ms_ptr);
+  }
+
+  void Feature::get_empty_feature_map(DeconvMsPtrVec &ms1_ptr_vec, FracFeaturePtrVec &frac_features,
+                                      std::vector<EnvCollection> &env_coll_list, std::vector<Feature> &features,
+                                      const FeatureParaPtr& para_ptr, EnvParaPtr env_para_ptr, MsHeaderPtr hh,
+                                      SpecFeaturePtrVec &ms2_features, PeakMatrix &peak_matrix, fdeep::model model,
+                                      fdeep::model model_escore) {
+    int env_coll_num = env_coll_list.size();
+    SeedEnvelope env = SeedEnvelope(hh);
+    std::vector<ExpEnvelope> env_list;
+    std::vector<EnvSet> env_set_list;
+    int min_charge = env.getCharge();
+    int max_charge = env.getCharge();
+    int start_spec_id = env.getSpecId();
+    int end_spec_id = env.getSpecId();
+    EnvSet es = EnvSet(env, env_list, start_spec_id, end_spec_id, peak_matrix.get_min_inte(),
+                       env_para_ptr->ms_one_sn_ratio_);
+    env_set_list.push_back(es);
+
+    EnvCollection env_coll = EnvCollection(env, env_set_list, min_charge, max_charge, start_spec_id, end_spec_id);
+    Feature feature = Feature(env_coll, peak_matrix, env_coll_num, env.getInte());
+
+    features.push_back(feature);
+    env_coll.setEcscore(feature.getScore());
+    env_coll.remove_peak_data(peak_matrix);
+    env_coll_list.push_back(env_coll);
+    FracFeaturePtr feature_ptr = getFeature(env_coll_num, ms1_ptr_vec, para_ptr->frac_id_, para_ptr->file_name_,
+                                            env_coll, peak_matrix, env_para_ptr->ms_one_sn_ratio_);
+    feature_ptr->setPromexScore(feature.getScore());
+    frac_features.push_back(feature_ptr);
+    SpecFeaturePtr ms2_feature = std::make_shared<SpecFeature>(hh, feature_ptr);
+    ms2_features.push_back(ms2_feature);
+    feature_ptr->setHasMs2Spec(true);
+  }
+
+  bool Feature::get_new_feature_map(DeconvMsPtrVec &ms1_ptr_vec, FracFeaturePtrVec &frac_features,
+                                    std::vector<EnvCollection> &env_coll_list, std::vector<Feature> &features,
+                                    FeatureParaPtr para_ptr, EnvParaPtr env_para_ptr, MsHeaderPtr hh,
+                                    SpecFeaturePtrVec &ms2_features, PeakMatrix &peak_matrix, fdeep::model model,
+                                    fdeep::model model_escore) {
+    bool assigned_status = false;
+    para_ptr->match_peak_tole_ = 0; // Set to 0 to include single scan features
+
+    SeedEnvelope env = SeedEnvelope(hh);
+    double min_mz = peak_matrix.get_min_mz() - para_ptr->mass_tole_;
+    double max_mz = peak_matrix.get_max_mz() + para_ptr->mass_tole_;
+    env.rm_peaks(min_mz, max_mz);
+    env_set_util::comp_peak_start_end_idx(peak_matrix, env, para_ptr->mass_tole_);
+    EnvCollection env_coll = env_coll_util::find_env_collection(peak_matrix, env, para_ptr,
+                                                                env_para_ptr->ms_one_sn_ratio_);
+    if (!env_coll.isEmpty()) {
+      int env_coll_num = env_coll_list.size();
+      env_coll.refine_mono_mass();
+      Feature feature = Feature(env_coll, peak_matrix, model, model_escore, env_coll_num,
+                                env_para_ptr->ms_one_sn_ratio_);
+      features.push_back(feature);
+      env_coll.setEcscore(feature.getScore());
+      env_coll.remove_peak_data(peak_matrix);
+      env_coll_list.push_back(env_coll);
+      FracFeaturePtr feature_ptr = getFeature(env_coll_num, ms1_ptr_vec, para_ptr->frac_id_, para_ptr->file_name_,
+                                              env_coll, peak_matrix, env_para_ptr->ms_one_sn_ratio_);
+      feature_ptr->setPromexScore(feature.getScore());
+      frac_features.push_back(feature_ptr);
+      SpecFeaturePtr ms2_feature = std::make_shared<SpecFeature>(hh, feature_ptr);
+      ms2_features.push_back(ms2_feature);
+      feature_ptr->setHasMs2Spec(true);
+      assigned_status = true;
+    }
+    return assigned_status;
+  }
+
+  bool
+  Feature::get_highest_inte_feature_map(FracFeaturePtrVec &frac_features, std::vector<EnvCollection> &env_coll_list,
+                                        FeatureParaPtr para_ptr, MsHeaderPtr hh, double score_thr, double base_mz,
+                                        int isolation_windows_mz, SpecFeaturePtrVec &ms2_features) {
+    bool assigned_status = false;
+    double env_inte = -1;
+    size_t selected_index = -1;
+    size_t selected_sub_index = -1;
+    int ms1_id = hh->getMsOneId();
+    for (size_t feat_id = 0; feat_id < env_coll_list.size(); feat_id++) {
+      if (frac_features[feat_id]->getPromexScore() < score_thr)
+        continue;
+      double feature_mass = env_coll_list[feat_id].getMass();
+      if (ms1_id >= env_coll_list[feat_id].getStartSpecId() and ms1_id <= env_coll_list[feat_id].getEndSpecId()) {
+        std::vector<EnvSet> sfs = env_coll_list[feat_id].getEnvSetList();
+        for (size_t sf_id = 0; sf_id < sfs.size(); sf_id++) {
+          EnvSet sf = sfs[sf_id];
+          double mz = get_mz(feature_mass, sf.getCharge());
+          if ((mz >= base_mz - (isolation_windows_mz / 2)) and mz < (base_mz + (isolation_windows_mz / 2))) {
+            if (ms1_id >= sf.getStartSpecId() and ms1_id <= sf.getEndSpecId()) {
+              int inte_idx = ms1_id - sf.getStartSpecId();
+              std::vector<double> env_intes = sf.getEnvIntes();
+              double sf_env_inte = env_intes[inte_idx];
+              if (env_inte < sf_env_inte) {
+                env_inte = sf_env_inte;
+                selected_index = feat_id;
+                selected_sub_index = sf_id;
+              }
+            }
+          }
+        }
+      }
+    }
+    if (env_inte > -1) {
+      FracFeaturePtr feature_ptr = frac_features[selected_index];
+      std::vector<EnvSet> sfs = env_coll_list[selected_index].getEnvSetList();
+      EnvSet shortlisted_single_Charge_feature = sfs[selected_sub_index];
+      hh->setPrecMonoMz(get_mz(feature_ptr->getMonoMass(), shortlisted_single_Charge_feature.getCharge()));
+      hh->setPrecCharge(shortlisted_single_Charge_feature.getCharge());
+      if (env_inte > 0)
+        hh->setPrecInte(env_inte);
+      SpecFeaturePtr ms2_feature = std::make_shared<SpecFeature>(hh, feature_ptr);
+      ms2_features.push_back(ms2_feature);
+      feature_ptr->setHasMs2Spec(true);
+      assigned_status = true;
+    }
+    return assigned_status;
+  }
+
+  bool
+  Feature::get_charge_shifted_feature_map(FracFeaturePtrVec &frac_features, std::vector<EnvCollection> &env_coll_list,
+                                          FeatureParaPtr para_ptr, MsHeaderPtr hh, double score_thr, double base_mz,
+                                          int isolation_windows_mz, SpecFeaturePtrVec &ms2_features) {
+    bool assigned_status = false;
+    double env_inte = -1;
+    size_t selected_index = -1;
+    size_t selected_sub_index = -1;
+    int ms1_id = hh->getMsOneId();
+    for (size_t feat_id = 0; feat_id < env_coll_list.size(); feat_id++) {
+      if (frac_features[feat_id]->getPromexScore() < score_thr)
+        continue;
+      bool shift = false;
+      double feature_mass = env_coll_list[feat_id].getMass();
+      double prec_mz = hh->getPrecMonoMz();
+      double error_tole = para_ptr->peak_tolerance_ptr_->compStrictErrorTole(prec_mz);
+      if (ms1_id >= env_coll_list[feat_id].getStartSpecId() and ms1_id <= env_coll_list[feat_id].getEndSpecId()) {
+        std::vector<EnvSet> sfs = env_coll_list[feat_id].getEnvSetList();
+        for (size_t sf_id = 0; sf_id < sfs.size(); sf_id++) {
+          EnvSet sf = sfs[sf_id];
+          double mz = get_mz(feature_mass, sf.getCharge());
+          if ((mz >= base_mz - (isolation_windows_mz / 2)) and mz < (base_mz + (isolation_windows_mz / 2))) {
+            if (ms1_id >= sf.getStartSpecId() and ms1_id <= sf.getEndSpecId()) {
+              int inte_idx = ms1_id - sf.getStartSpecId();
+              std::vector<double> env_intes = sf.getEnvIntes();
+              double sf_env_inte = env_intes[inte_idx];
+              double diff = isMatch(prec_mz, mz, para_ptr, shift);
+              if (diff > error_tole)
+                continue;
+              if (env_inte < sf_env_inte) {
+                env_inte = sf_env_inte;
+                selected_index = feat_id;
+                selected_sub_index = sf_id;
+              }
+            }
+          }
+        }
+      }
+    }
+    if (env_inte > -1) {
+      FracFeaturePtr feature_ptr = frac_features[selected_index];
+      std::vector<EnvSet> sfs = env_coll_list[selected_index].getEnvSetList();
+      EnvSet shortlisted_single_Charge_feature = sfs[selected_sub_index];
+      hh->setPrecMonoMz(get_mz(feature_ptr->getMonoMass(), shortlisted_single_Charge_feature.getCharge()));
+      hh->setPrecCharge(shortlisted_single_Charge_feature.getCharge());
+      if (env_inte > 0)
+        hh->setPrecInte(env_inte);
+      SpecFeaturePtr ms2_feature = std::make_shared<SpecFeature>(hh, feature_ptr);
+      ms2_features.push_back(ms2_feature);
+      feature_ptr->setHasMs2Spec(true);
+      assigned_status = true;
+    }
+    return assigned_status;
+  }
+
+  bool
+  Feature::get_mass_shifted_feature_map(FracFeaturePtrVec &frac_features, std::vector<EnvCollection> &env_coll_list,
+                                        FeatureParaPtr para_ptr, MsHeaderPtr hh, double score_thr, double base_mz,
+                                        int isolation_windows_mz, SpecFeaturePtrVec &ms2_features) {
+    bool assigned_status = false;
+    double mass_diff = std::numeric_limits<double>::max();
+    double env_inte = -1;
+    size_t selected_index = -1;
+    size_t selected_sub_index = -1;
+    bool selected_shift = false;
+    int ms1_id = hh->getMsOneId();
+    for (size_t feat_id = 0; feat_id < env_coll_list.size(); feat_id++) {
+      if (frac_features[feat_id]->getPromexScore() < score_thr)
+        continue;
+      bool shift = false;
+      double feature_mass = env_coll_list[feat_id].getMass();
+      double prec_mass = hh->getPrecMonoMass();
+      double error_tole = para_ptr->peak_tolerance_ptr_->compStrictErrorTole(prec_mass);
+      double diff = isMatch(prec_mass, feature_mass, para_ptr, shift);
+      if (diff > error_tole)
+        continue;
+      if (ms1_id >= env_coll_list[feat_id].getStartSpecId() and ms1_id <= env_coll_list[feat_id].getEndSpecId()) {
+        std::vector<EnvSet> sfs = env_coll_list[feat_id].getEnvSetList();
+        for (size_t sf_id = 0; sf_id < sfs.size(); sf_id++) {
+          EnvSet sf = sfs[sf_id];
+          double mz = get_mz(feature_mass, sf.getCharge());
+          if ((mz >= base_mz - (isolation_windows_mz / 2)) and mz < (base_mz + (isolation_windows_mz / 2))) {
+            if (ms1_id >= sf.getStartSpecId() and ms1_id <= sf.getEndSpecId()) {
+              int inte_idx = ms1_id - sf.getStartSpecId();
+              std::vector<double> env_intes = sf.getEnvIntes();
+              double sf_env_inte = env_intes[inte_idx];
+              if (mass_diff > diff) {
+                mass_diff = diff;
+                env_inte = sf_env_inte;
+                selected_index = feat_id;
+                selected_sub_index = sf_id;
+                selected_shift = shift;
+              }
+            }
+          }
+        }
+      }
+    }
+    if (env_inte > -1) {
+      FracFeaturePtr feature_ptr = frac_features[selected_index];
+      std::vector<EnvSet> sfs = env_coll_list[selected_index].getEnvSetList();
+      EnvSet shortlisted_single_Charge_feature = sfs[selected_sub_index];
+      if (selected_shift) {
+        hh->setPrecMonoMz(get_mz(feature_ptr->getMonoMass(), shortlisted_single_Charge_feature.getCharge()));
+        hh->setPrecCharge(shortlisted_single_Charge_feature.getCharge());
+      }
+      hh->setPrecInte(env_inte);
+      SpecFeaturePtr ms2_feature = std::make_shared<SpecFeature>(hh, feature_ptr);
+      ms2_features.push_back(ms2_feature);
+      feature_ptr->setHasMs2Spec(true);
+      assigned_status = true;
+    }
+    return assigned_status;
+  }
+}

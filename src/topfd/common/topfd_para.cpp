@@ -50,6 +50,8 @@ std::string TopfdPara::getParaStr(const std::string &prefix,
       << "Thread number:            " << sep << thread_num_ << std::endl;
   output << prefix << std::setw(gap) << std::left 
       << "Precursor window size:    " << sep << prec_window_ << " m/z" << std::endl;
+  output << prefix << std::setw(gap) << std::left
+      << "ECScore cutoff: " << "\t" << ecscore_ << std::endl;
   if (use_env_cnn_) {
     output << prefix << std::setw(gap) << std::left 
       << "Use Env CNN model:        " << sep << "Yes" << std::endl;

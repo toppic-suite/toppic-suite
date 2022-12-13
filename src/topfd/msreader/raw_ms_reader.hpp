@@ -29,6 +29,7 @@ class RawMsReader {
   RawMsPtr getNextMs(double max_mass, int max_charge);
 
   void getMs1Peaks(PeakPtrVec2D &raw_peaks, double cur_voltage);
+  void getMsData(PeakPtrVec2D &raw_peaks, std::vector<double> &precSpectrumBaseMonoMZ, double cur_voltage);
 
   void refinePrecChrg(RawMsPtr ms_one, RawMsPtr ms_two, 
                       double max_mass, int max_charge);

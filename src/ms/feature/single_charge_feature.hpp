@@ -24,48 +24,74 @@
 
 namespace toppic {
 
-class SingleChargeFeature {
- public:
+  class SingleChargeFeature {
+  public:
+    SingleChargeFeature();
 
-  SingleChargeFeature(int charge,
-                      double time_begin, double time_end,
-                      int scan_begin, int scan_end,
-                      double intensity, int env_num);
+    SingleChargeFeature(int charge,
+                        double time_begin, double time_end,
+                        int scan_begin, int scan_end,
+                        double intensity, int env_num,
+                        int spec_id_begin, int spec_id_end,
+                        double mass, std::vector<double> xic_inte);
 
-  SingleChargeFeature(XmlDOMElement* element);
+    SingleChargeFeature(int charge,
+                        double time_begin, double time_end,
+                        int scan_begin, int scan_end,
+                        double intensity, int env_num);
 
-  int getCharge() {return charge_;}
+    SingleChargeFeature(XmlDOMElement *element);
 
-  double getIntensity() {return intensity_;}
+    SingleChargeFeature(std::shared_ptr<SingleChargeFeature> f);
 
-  double getTimeBegin() {return time_begin_;}
+    int getCharge() { return charge_; }
 
-  double getTimeEnd() {return time_end_;}
+    double getIntensity() { return intensity_; }
 
-  double getTimeMiddle() {return (time_begin_ + time_end_)/2;}
+    double getTimeBegin() { return time_begin_; }
 
-  int getScanBegin() {return scan_begin_;}
+    double getTimeEnd() { return time_end_; }
 
-  int getScanEnd() {return scan_end_;}
+    double getTimeMiddle() { return (time_begin_ + time_end_) / 2; }
 
-  int getEnvNum() {return env_num_;}
+    int getScanBegin() { return scan_begin_; }
 
-  static std::string getXmlElementName() {return "single_charge_feature";}
+    int getScanEnd() { return scan_end_; }
 
-  void appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement *parent);
+    int getSpecIDBegin() { return spec_id_begin_; }
 
- protected:
-  int charge_;
-  double time_begin_;
-  double time_end_;
-  int scan_begin_;
-  int scan_end_;
-  double intensity_;
-  int env_num_ = 0;
-};
+    int getSpecIDEnd() { return spec_id_end_; }
 
-typedef std::shared_ptr<SingleChargeFeature> SingleChargeFeaturePtr;
-typedef std::vector<SingleChargeFeaturePtr> SingleChargeFeaturePtrVec;
+    int getEnvNum() { return env_num_; }
+
+    double getMass() { return mass_; }
+
+    std::vector<double> getXicInte() { return xic_inte_; }
+
+    void setSpecIDBegin(int spec_id_begin) { spec_id_begin_ = spec_id_begin; }
+
+    void setSpecIDEnd(int spec_id_end) { spec_id_end_ = spec_id_end; }
+
+    static std::string getXmlElementName() { return "single_charge_feature"; }
+
+    void appendToXml(XmlDOMDocument *xml_doc, XmlDOMElement *parent);
+
+  protected:
+    int charge_;
+    double time_begin_;
+    double time_end_;
+    int scan_begin_;
+    int scan_end_;
+    int spec_id_begin_;
+    int spec_id_end_;
+    double intensity_;
+    int env_num_ = 0;
+    double mass_;
+    std::vector<double> xic_inte_;
+  };
+
+  typedef std::shared_ptr<SingleChargeFeature> SingleChargeFeaturePtr;
+  typedef std::vector<SingleChargeFeaturePtr> SingleChargeFeaturePtrVec;
 
 }
 #endif

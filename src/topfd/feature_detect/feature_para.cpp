@@ -57,14 +57,9 @@ std::vector<double> FeaturePara::getExtendMasses(double mass) {
 
 std::vector<double> FeaturePara::getSearchMasses(double mass) {
   std::vector<double> result;
-  if (mass < extend_min_mass_) {
-    result.push_back(mass);
-  }
-  else {
-    for (size_t i = 0; i < search_offsets_.size(); i++) {
-      double new_mass = mass + search_offsets_[i];
-      result.push_back(new_mass);
-    }
+  for (size_t i = 0; i < search_offsets_.size(); i++) {
+    double new_mass = mass + search_offsets_[i];
+    result.push_back(new_mass);
   }
   return result;
 }

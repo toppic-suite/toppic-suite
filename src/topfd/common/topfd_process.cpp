@@ -66,13 +66,15 @@ void processOneFile(TopfdParaPtr para_ptr,
     std::cout << "Deleting temporary files - finished." << std::endl; 
 
     std::cout << "Feature detection started." << std::endl;
-    feature_detect::process(frac_id, 
-                            spec_file_name,
-                            para_ptr->isMissingLevelOne(), 
-                            para_ptr->getResourceDir(),             
-			                      para_ptr->getActivation(), 
-                            processor.isFaims_,
-                            processor.voltage_vec_);
+
+    feature_detect::process(frac_id,
+                              spec_file_name,
+                              para_ptr->isMissingLevelOne(),
+                              para_ptr->getResourceDir(),
+                              para_ptr->getActivation(),
+                              processor.isFaims_,
+                              processor.voltage_vec_,
+                              para_ptr->getECScore());
     std::cout << "Feature detection finished." << std::endl;
     
     std::cout << "Processing " << spec_file_name << " finished." << std::endl;

@@ -56,6 +56,27 @@ RawMsPtr RawMsReader::getNextMs(double max_mass, int max_charge) {
   return ms_ptr;
 }
 
+  void
+  RawMsReader::getMsData(PeakPtrVec2D &raw_peaks, std::vector<double> &precSpectrumBaseMonoMZ, double cur_voltage) {
+    while (true) {
+      reader_ptr_->readNext();
+      MsHeaderPtr header_ptr = reader_ptr_->getHeaderPtr();
+      if (header_ptr == nullptr) {
+        break;
+      }
+      if (header_ptr->getMsLevel() == 1 && header_ptr->getVoltage() == -1) {//if not a FAIME data
+        PeakPtrVec peak_list = reader_ptr_->getPeakList();
+        raw_peaks.push_back(peak_list);
+      } else if (header_ptr->getMsLevel() == 1 && header_ptr->getVoltage() == cur_voltage) {//FAIME data
+        PeakPtrVec peak_list = reader_ptr_->getPeakList();
+        raw_peaks.push_back(peak_list);
+      } else if (header_ptr->getMsLevel() == 2) {
+        precSpectrumBaseMonoMZ.push_back(header_ptr->getPrecSpMz());
+      }
+    }
+  }
+
+
 void RawMsReader::getMs1Peaks(PeakPtrVec2D &raw_peaks, double cur_voltage) {
   while (true) {
     reader_ptr_->readNext();

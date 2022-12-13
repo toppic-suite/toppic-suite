@@ -43,6 +43,7 @@ class TopfdPara {
   bool isKeepUnusedPeaks() {return keep_unused_peaks_;}
   bool isOutputMultipleMass() {return output_multiple_mass_;}
   int getThreadNum() {return thread_num_;}
+  double getECScore() {return ecscore_;}
 
   void setExeDir(std::string dir) {exe_dir_ = dir;}
   void setResourceDir(std::string dir) {resource_dir_ = dir;}
@@ -60,6 +61,7 @@ class TopfdPara {
   void setKeepUnusedPeaks(bool keep) {keep_unused_peaks_ = keep;}
   void setOutputMultipleMass(bool output) {output_multiple_mass_ = output;}
   void setThreadNum(int num) {thread_num_ = num;}
+  void setECScore(double score_cutoff) {ecscore_ = score_cutoff;}
 
   void setMs1ScanNumber(int ms1_scan_num) {ms_1_scan_num_ = ms1_scan_num;}
   void setMs2ScanNumber(int ms2_scan_num) {ms_2_scan_num_ = ms2_scan_num;}
@@ -85,6 +87,7 @@ class TopfdPara {
   bool gene_html_folder_ = true;
   int ms_1_scan_num_ = -1;
   int ms_2_scan_num_ = -1;
+  double ecscore_ = 0.5;
 };
 
 typedef std::shared_ptr<TopfdPara> TopfdParaPtr;
