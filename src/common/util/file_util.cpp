@@ -14,6 +14,7 @@
 
 #include <string>
 #include <algorithm>
+#include <iostream>
 
 //Deprecated features in boost are excluded.
 #ifndef BOOST_SYSTEM_NO_DEPRECATED
@@ -40,6 +41,15 @@ namespace fs = boost::filesystem;
 namespace toppic {
 
 namespace file_util {
+bool checkSpace(const std::string &dir){
+  int length = dir.length();
+  for (int i = 0; i < length; i++) {
+    if (std::isspace(dir[i])) {
+      return true;
+    }
+  }
+  return false;
+}
 
 std::string getFileSeparator() {
 #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
@@ -65,6 +75,10 @@ std::string getExecutiveDir(const std::string &argv_0) {
 #endif
   fs::path full_path(file_name);
   std::string exe_dir = full_path.remove_filename().string();
+  if (checkSpace(exe_dir)) {
+    LOG_ERROR("Current directory " << exe_dir << " contains space and will cause errors in the program!")
+    exit(EXIT_FAILURE);
+  }
   return exe_dir;
 }
 
