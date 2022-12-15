@@ -87,6 +87,20 @@ void FastaSeq::compAcidPtmPairVec() {
   }
 }
 
+std::string FastaSeq::getSubSeq(int start, int end) {
+  std::string result;
+  std::string empty_ptm = PtmBase::getEmptyPtmPtr()->getAbbrName();
+  for (int i = start; i <= end; i++) {
+    std::string acid = acid_ptm_pair_vec_[i].first;
+    std::string ptm = acid_ptm_pair_vec_[i].second;
+    result = result + acid;
+    if (ptm != empty_ptm) {
+      result = result + "[" + ptm + "]";
+    }
+  }
+  return result;
+}
+
 void FastaSeq::appendNameDescToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
   std::string element_name = FastaSeq::getXmlElementName();
   XmlDOMElement* element = xml_doc->createElement(element_name.c_str());

@@ -90,6 +90,8 @@ class Proteoform {
 
   std::string getProteoformMatchSeq();
 
+  std::string getAlterStr(AlterTypePtr type_ptr);
+
   void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 
   void parseXml(XmlDOMElement* element, ProteoformPtr db_proteoform);

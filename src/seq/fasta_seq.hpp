@@ -45,6 +45,8 @@ class FastaSeq {
 
   std::string getRawSeq() {return seq_;}
 
+  std::string getSubSeq(int start, int end);
+
   StringPairVec getAcidPtmPairVec() {return acid_ptm_pair_vec_;}
 
   std::string getAcidReplaceStr(int bgn, int end);
