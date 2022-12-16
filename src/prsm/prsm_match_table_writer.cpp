@@ -73,6 +73,7 @@ void PrsmMatchTableWriter::write() {
       << "Proteoform" << delim
       << "Proteoform mass" << delim
       << "Protein N-terminal form" << delim
+      << "Fixed PTMs" << delim
       << "#unexpected modifications" << delim
       << "unexpected modifications" << delim
       << "#variable PTMs" << delim
@@ -195,6 +196,7 @@ void PrsmMatchTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
       << form_ptr->getProteoformMatchSeq() << delim
       << form_ptr->getMass() << delim
       << form_ptr->getProtModPtr()->getType() << delim
+      << form_ptr->getAlterStr(AlterType::FIXED) << delim
       << form_ptr->getAlterNum(AlterType::UNEXPECTED) << delim
       << form_ptr->getAlterStr(AlterType::UNEXPECTED) << delim
       << form_ptr->getAlterNum(AlterType::VARIABLE) << delim
@@ -341,6 +343,7 @@ void PrsmMatchTableWriter::writePrsmStandardFormat(std::ofstream &file, PrsmPtr 
       << form_ptr->getProteoformMatchSeq() << delim
       << form_ptr->getMass() << delim
       << form_ptr->getProtModPtr()->getType() << delim
+      << form_ptr->getAlterStr(AlterType::FIXED) << delim
       << form_ptr->getAlterNum(AlterType::UNEXPECTED) << delim
       << form_ptr->getAlterStr(AlterType::UNEXPECTED) << delim
       << form_ptr->getAlterNum(AlterType::VARIABLE) << delim
