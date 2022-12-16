@@ -76,6 +76,8 @@ inline std::string getEtcDirName() {return "../../etc/toppic";}
 
 std::string getResourceDir(const std::string &exec_dir);
 
+bool checkSpace(const std::string &dir);
+
 }  // namespace file_util
 
 }  // namespace toppic

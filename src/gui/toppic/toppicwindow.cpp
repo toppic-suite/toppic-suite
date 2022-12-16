@@ -248,9 +248,11 @@ void ToppicWindow::on_outputButton_clicked() {
 
 std::map<std::string, std::string> ToppicWindow::getArguments() {
   QString path = QCoreApplication::applicationFilePath();
-  std::string exe_dir = toppic::file_util::getExecutiveDir(path.toStdString());
-  arguments_["executiveDir"] = exe_dir;
-  arguments_["resourceDir"] = toppic::file_util::getResourceDir(exe_dir);
+  arguments_["executiveDir"] = toppic::file_util::getExecutiveDir(path.toStdString());
+  if (toppic::file_util::checkSpace(arguments_["executiveDir"])) {
+    ui->outputTextBrowser->setText("Current directory " + QString::fromStdString(arguments_["executiveDir"]) + " contains space and will cause errors in the program!");
+  }
+  arguments_["resourceDir"] = toppic::file_util::getResourceDir(arguments_["executiveDir"]);
   arguments_["oriDatabaseFileName"] = ui->databaseFileEdit->text().toStdString();
   
   arguments_["combinedOutputName"] = ui->combinedOutputEdit->text().trimmed().toStdString();

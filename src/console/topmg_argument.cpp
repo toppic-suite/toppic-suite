@@ -296,6 +296,10 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
       arguments_["executiveDir"] = argv[0];
     } else {
       arguments_["executiveDir"] = file_util::getExecutiveDir(argv_0);
+      if (file_util::checkSpace(arguments_["executiveDir"])) {
+        LOG_ERROR("Current directory " << arguments_["executiveDir"] << " contains space and will cause errors in the program!")
+        exit(EXIT_FAILURE);
+      }
     }
     LOG_DEBUG("Executive Dir " << arguments_["executiveDir"]);
 
