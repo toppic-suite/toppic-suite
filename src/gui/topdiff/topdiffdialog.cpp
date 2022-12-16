@@ -230,6 +230,9 @@ std::map<std::string, std::string> TopDiffDialog::getArguments() {
   QString path = QCoreApplication::applicationFilePath();
   std::string exe_dir = toppic::file_util::getExecutiveDir(path.toStdString());
   arguments_["executiveDir"] = exe_dir;
+  if (toppic::file_util::checkSpace(exe_dir)) {
+    ui->outputTextBrowser->setText("Current directory " + QString::fromStdString(exe_dir) + " contains space and will cause errors in the program!");
+  }
   arguments_["resourceDir"] = toppic::file_util::getResourceDir(exe_dir);
   arguments_["toolName"] = ui->toolComboBox->currentText().toStdString();
   arguments_["errorTolerance"] = ui->precErrorEdit->text().toStdString();

@@ -122,6 +122,10 @@ bool Argument::parse(int argc, char* argv[]) {
     // get the execution directory
     std::string argv_0(argv[0]);
     std::string exec_dir = file_util::getExecutiveDir(argv_0);
+    if (file_util::checkSpace(exec_dir)) {
+      LOG_ERROR("Current directory " << exec_dir << " contains space and will cause errors in the program!")
+      exit(EXIT_FAILURE);
+    }
 
     topfd_para_ptr_->setResourceDir(file_util::getResourceDir(exec_dir));
 
