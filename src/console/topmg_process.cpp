@@ -104,7 +104,7 @@ void cleanTopmgDir(const std::string &fa_name,
                     sp_base + "_topmg_proteoform.xml");
 
   file_util::delFile(sp_base + "_topmg_prsm_cutoff.xml");
-  file_util::rename(sp_base + ".topmg_prsm",
+  file_util::rename(sp_base + ".topmg_prsm_cutoff",
                     sp_base + "_topmg_prsm.xml");
   if (!keep_temp_files) {
     file_util::cleanPrefix(sp_name, sp_base + ".msalign_");
@@ -123,6 +123,7 @@ void cleanTopmgDir(const std::string &fa_name,
     file_util::cleanPrefix(sp_name, sp_base + ".topmg_evalue_");
     file_util::delFile(sp_base + ".topmg_cluster");
     file_util::delFile(sp_base + ".topmg_cluster_fdr");
+    file_util::delFile(sp_base + ".topmg_prsm");
     file_util::delFile(sp_base + ".topmg_form_cutoff");
     file_util::delDir(sp_base + "_topmg_proteoform_cutoff_xml");
     file_util::delDir(sp_base + "_topmg_prsm_cutoff_xml");
