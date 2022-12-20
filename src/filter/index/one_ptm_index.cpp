@@ -124,7 +124,7 @@ void process(OnePtmFilterMngPtr mng_ptr) {
   std::string db_file_name = prsm_para_ptr->getSearchDbFileNameWithFolder();
   DbBlockPtrVec db_block_ptr_vec = DbBlock::readDbBlockIndex(db_file_name);
 
-  std::cout << "Generating One shift index files --- started" << std::endl;
+  std::cout << "Generating one shift index files --- started" << std::endl;
 
   SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(mng_ptr->thread_num_);
   int block_num = db_block_ptr_vec.size();
@@ -138,7 +138,7 @@ void process(OnePtmFilterMngPtr mng_ptr) {
     pool_ptr->Enqueue(geneIndexTask(db_block_ptr_vec[i]->getBlockIdx(), mng_ptr));
   }
   pool_ptr->ShutDown();
-  std::cout << "Generating One shift index files --- finished" << std::endl;
+  std::cout << "Generating one shift index files --- finished" << std::endl;
 }
 
 }
