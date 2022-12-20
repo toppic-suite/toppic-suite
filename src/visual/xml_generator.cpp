@@ -127,9 +127,10 @@ void XmlGenerator::outputAllPrsms() {
   ModPtrVec fix_mod_ptr_vec = mng_ptr_->prsm_para_ptr_->getFixModPtrVec();
 
   size_t cnt = 0;
-
+  FastaIndexReaderPtr fasta_reader_ptr 
+      = std::make_shared<FastaIndexReader>(db_file_name);
   PrsmPtrVec prsm_ptrs 
-      = prsm_reader_util::readAllPrsms(input_file_name, db_file_name, fix_mod_ptr_vec);
+      = prsm_reader_util::readAllPrsms(input_file_name, fasta_reader_ptr, fix_mod_ptr_vec);
   for (size_t k = 0; k < prsm_ptrs.size(); k++) {
     prsm_ptrs[k]->setDeconvMsPtrVec(
         deconv_ms_vec2d_[spec_id_extend_ms_map_[prsm_ptrs[k]->getSpectrumId()]]);
@@ -211,7 +212,8 @@ void XmlGenerator::outputProteoforms(){
   std::string spectrum_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
   std::string db_file_name = mng_ptr_->prsm_para_ptr_->getSearchDbFileNameWithFolder();
   ModPtrVec fix_mod_ptr_vec = mng_ptr_->prsm_para_ptr_->getFixModPtrVec();
-
+  FastaIndexReaderPtr fasta_reader_ptr 
+      = std::make_shared<FastaIndexReader>(db_file_name);
   size_t cnt = 0;
   for (size_t i = 0; i < cluster_ids_.size(); i++) {
     cnt++;
@@ -219,7 +221,7 @@ void XmlGenerator::outputProteoforms(){
     std::string input_file_name = file_util::basename(spectrum_file_name) 
         + ".proteoform_" + str_util::toString(cluster_ids_[i]);
     PrsmPtrVec select_prsm_ptrs 
-        = prsm_reader_util::readAllPrsms(input_file_name, db_file_name, fix_mod_ptr_vec);
+        = prsm_reader_util::readAllPrsms(input_file_name, fasta_reader_ptr, fix_mod_ptr_vec);
     for (size_t k = 0; k < select_prsm_ptrs.size(); k++) {
       select_prsm_ptrs[k]->setDeconvMsPtrVec(
           deconv_ms_vec2d_[spec_id_extend_ms_map_[select_prsm_ptrs[k]->getSpectrumId()]]);
@@ -305,6 +307,8 @@ void XmlGenerator::outputProteins() {
   std::string spectrum_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
   std::string db_file_name = mng_ptr_->prsm_para_ptr_->getSearchDbFileNameWithFolder();
   ModPtrVec fix_mod_ptr_vec = mng_ptr_->prsm_para_ptr_->getFixModPtrVec();
+  FastaIndexReaderPtr fasta_reader_ptr 
+      = std::make_shared<FastaIndexReader>(db_file_name);
   size_t cnt = 0;
   for (size_t i = 0; i < prot_ids_.size(); i++) {
     cnt++;
@@ -314,7 +318,7 @@ void XmlGenerator::outputProteins() {
     std::string input_file_name = file_util::basename(spectrum_file_name) 
         + ".prot_" + str_util::toString(prot_id);
     PrsmPtrVec prsm_ptrs 
-        = prsm_reader_util::readAllPrsms(input_file_name, db_file_name, fix_mod_ptr_vec);
+        = prsm_reader_util::readAllPrsms(input_file_name, fasta_reader_ptr, fix_mod_ptr_vec);
     for (size_t k = 0; k < prsm_ptrs.size(); k++) {
       prsm_ptrs[k]->setDeconvMsPtrVec(
           deconv_ms_vec2d_[spec_id_extend_ms_map_[prsm_ptrs[k]->getSpectrumId()]]);
@@ -345,6 +349,8 @@ void XmlGenerator::outputAllProteins() {
   std::string spectrum_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
   std::string db_file_name = mng_ptr_->prsm_para_ptr_->getSearchDbFileNameWithFolder();
   ModPtrVec fix_mod_ptr_vec = mng_ptr_->prsm_para_ptr_->getFixModPtrVec();
+  FastaIndexReaderPtr fasta_reader_ptr 
+      = std::make_shared<FastaIndexReader>(db_file_name);
 
   PrsmPtrVec best_prsm_vec(prot_ids_.size());
   size_t cnt = 0; 
@@ -355,7 +361,7 @@ void XmlGenerator::outputAllProteins() {
     std::string input_file_name = file_util::basename(spectrum_file_name) 
         + ".prot_" + str_util::toString(prot_ids_[i]);
     PrsmPtrVec prsm_ptrs 
-        = prsm_reader_util::readAllPrsms(input_file_name, db_file_name, fix_mod_ptr_vec);
+        = prsm_reader_util::readAllPrsms(input_file_name, fasta_reader_ptr, fix_mod_ptr_vec);
     for (size_t k = 0; k < prsm_ptrs.size(); k++) {
       prsm_ptrs[k]->setDeconvMsPtrVec(
           deconv_ms_vec2d_[spec_id_extend_ms_map_[prsm_ptrs[k]->getSpectrumId()]]);
@@ -379,7 +385,7 @@ void XmlGenerator::outputAllProteins() {
     std::string input_file_name = file_util::basename(spectrum_file_name) 
         + ".prot_" + str_util::toString(prot_id);
     PrsmPtrVec prsm_ptrs 
-        = prsm_reader_util::readAllPrsms(input_file_name, db_file_name, fix_mod_ptr_vec);
+        = prsm_reader_util::readAllPrsms(input_file_name, fasta_reader_ptr, fix_mod_ptr_vec);
     std::vector<int> cluster = prsm_util::getClusterIds(prsm_ptrs);
     if (!cluster.empty()) {
       prot_elements->appendChild(

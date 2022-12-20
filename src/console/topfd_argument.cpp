@@ -122,6 +122,10 @@ bool Argument::parse(int argc, char* argv[]) {
     // get the execution directory
     std::string argv_0(argv[0]);
     std::string exec_dir = file_util::getExecutiveDir(argv_0);
+    if (file_util::checkSpace(exec_dir)) {
+      LOG_ERROR("Current directory " << exec_dir << " contains space and will cause errors in the program!")
+      exit(EXIT_FAILURE);
+    }
 
     topfd_para_ptr_->setResourceDir(file_util::getResourceDir(exec_dir));
 
@@ -199,13 +203,15 @@ bool Argument::parse(int argc, char* argv[]) {
 
 bool Argument::validateArguments() {
   if (!file_util::exists(topfd_para_ptr_->getResourceDir())) {
-    LOG_ERROR("Resource direcotry " << topfd_para_ptr_->getResourceDir() << " does not exist!");
+    LOG_ERROR("The directory " << topfd_para_ptr_->getResourceDir() << " does not exist!\n"
+              << "Please check if the file directory or name contains special characters such as spaces or quotation marks.");
     return false;
   }
 
   for (size_t k = 0; k < spec_file_list_.size(); k++) {
     if (!file_util::exists(spec_file_list_[k])) {
-      LOG_ERROR(spec_file_list_[k] << " does not exist!");
+      LOG_ERROR(spec_file_list_[k] << " does not exist!\n" 
+                << " Please check if file directory or name contains special characters such as spaces or quotation marks.");
       return false;
     }
   }

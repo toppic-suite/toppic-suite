@@ -69,11 +69,15 @@ void PrsmMatchTableWriter::write() {
       << "First residue" << delim
       << "Last residue" << delim
       << "Special amino acids" << delim
+      << "Database protein sequence" << delim
       << "Proteoform" << delim
       << "Proteoform mass" << delim
       << "Protein N-terminal form" << delim
+      << "Fixed PTMs" << delim
       << "#unexpected modifications" << delim
+      << "unexpected modifications" << delim
       << "#variable PTMs" << delim
+      << "variable PTMs" << delim
       << "MIScore" << delim
       << "#matched peaks" << delim
       << "#matched fragment ions" << delim
@@ -181,16 +185,22 @@ void PrsmMatchTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   
   ProteoformPtr form_ptr = prsm_ptr->getProteoformPtr();
 
+  int start_pos = form_ptr->getStartPos();
+  int end_pos = form_ptr->getEndPos();
   file << form_ptr->getSeqName() << delim
       << form_ptr->getSeqDesc() << delim
-      << (form_ptr->getStartPos() + 1) << delim
-      << (form_ptr->getEndPos() + 1) << delim
-      << form_ptr->getFastaSeqPtr()->getAcidReplaceStr(form_ptr->getStartPos(), form_ptr->getEndPos()) << delim
+      << (start_pos + 1) << delim
+      << (end_pos + 1) << delim
+      << form_ptr->getFastaSeqPtr()->getAcidReplaceStr(start_pos, end_pos) << delim
+      << form_ptr->getFastaSeqPtr()->getSubSeq(start_pos, end_pos) << delim
       << form_ptr->getProteoformMatchSeq() << delim
       << form_ptr->getMass() << delim
       << form_ptr->getProtModPtr()->getType() << delim
+      << form_ptr->getAlterStr(AlterType::FIXED) << delim
       << form_ptr->getAlterNum(AlterType::UNEXPECTED) << delim
+      << form_ptr->getAlterStr(AlterType::UNEXPECTED) << delim
       << form_ptr->getAlterNum(AlterType::VARIABLE) << delim
+      << form_ptr->getAlterStr(AlterType::VARIABLE) << delim
       << form_ptr->getMIScore() << delim
       << prsm_ptr->getMatchPeakNum() << delim
       << prsm_ptr->getMatchFragNum() << delim
@@ -321,18 +331,23 @@ void PrsmMatchTableWriter::writePrsmStandardFormat(std::ofstream &file, PrsmPtr 
   ProteoformPtr form_ptr = prsm_ptr->getProteoformPtr();
 
   std::string seq = form_ptr->getProteoformMatchSeq();
-  seq = formatSeq(seq);
 
+  int start_pos = form_ptr->getStartPos();
+  int end_pos = form_ptr->getEndPos();
   file << form_ptr->getSeqName() << delim
       << form_ptr->getSeqDesc() << delim
-      << (form_ptr->getStartPos() + 1) << delim
-      << (form_ptr->getEndPos() + 1) << delim
-      << form_ptr->getFastaSeqPtr()->getAcidReplaceStr(form_ptr->getStartPos(), form_ptr->getEndPos()) << delim
-      << seq << delim
+      << (start_pos + 1) << delim
+      << (end_pos + 1) << delim
+      << form_ptr->getFastaSeqPtr()->getAcidReplaceStr(start_pos, end_pos) << delim
+      << form_ptr->getFastaSeqPtr()->getSubSeq(start_pos, end_pos) << delim
+      << form_ptr->getProteoformMatchSeq() << delim
       << form_ptr->getMass() << delim
       << form_ptr->getProtModPtr()->getType() << delim
+      << form_ptr->getAlterStr(AlterType::FIXED) << delim
       << form_ptr->getAlterNum(AlterType::UNEXPECTED) << delim
+      << form_ptr->getAlterStr(AlterType::UNEXPECTED) << delim
       << form_ptr->getAlterNum(AlterType::VARIABLE) << delim
+      << form_ptr->getAlterStr(AlterType::VARIABLE) << delim
       << form_ptr->getMIScore() << delim
       << prsm_ptr->getMatchPeakNum() << delim
       << prsm_ptr->getMatchFragNum() << delim
@@ -401,61 +416,4 @@ void PrsmMatchTableWriter::writePrsmStandardFormat(std::ofstream &file, PrsmPtr 
   }
 }
 
-
-std::string PrsmMatchTableWriter::formatSeq(std::string seq) {
-  std::string new_seq = "";
-  int idx = 0;
-  int seq_len = seq.size();
-  while (idx < seq_len) {
-    bool is_single_residue = false;
-    bool is_c_term = false;
-    bool is_n_term = false;
-
-    std::string residue;
-    std::string mass_shift;
-
-    if (seq[idx] == '(') {
-      int close_p = seq.find(')', idx);
-      int open_b = seq.find('[', idx);
-      int close_b = seq.find(']', idx);
-
-      std::string raw_shift = seq.substr(open_b + 1, close_b - open_b - 1);
-
-      if (idx <= 1 && close_p - idx == 2) {is_n_term = true;}
-      if (close_p - idx == 2) {is_single_residue = true;}
-      if (close_b == seq_len - 1) {is_c_term = true;}
-
-      try {
-        double shift = std::stod(raw_shift);
-        if (shift > 0) {
-          mass_shift = '+' + raw_shift;
-          mass_shift = '[' + mass_shift + ']';
-        } else {
-          mass_shift = '[' + raw_shift + ']';
-        }
-      } catch(const std::exception&) {
-        mass_shift = '[' + raw_shift + ']';
-      }
-
-      if (is_single_residue) {
-        residue = seq[idx + 1];
-      } else {
-        residue = seq.substr(idx, close_p - idx + 1);
-      }
-
-      if (is_n_term) {
-        new_seq = new_seq + mass_shift + '-' + residue;
-      } else if(is_c_term) {
-        new_seq = new_seq + residue + '-' + mass_shift;
-      } else {
-        new_seq = new_seq + residue + mass_shift;
-      }
-      idx = close_b;
-    } else {  
-      new_seq = new_seq + seq[idx];
-    }
-    idx++;
-  }
-  return new_seq;
-}
 }  // namespace toppic

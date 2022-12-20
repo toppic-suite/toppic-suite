@@ -46,13 +46,17 @@ class EnvPara {
 
   double getPercentBound(int mass_group) {return percentage_bound_[mass_group];}
 
+  double getMaxCharge() {return max_charge_;}
+
+  double getMaxMass() {return max_mass_;} 
+
   static int getDefaultMaxCharge() {return 30;}
 
-  static double getDefaultMaxMass() {return 100000;}
+  static double getDefaultMaxMass() {return 70000;}
 
   // using input parameters to assign: max_chrg, max_mass 
   int max_charge_ = 30;
-  double max_mass_ = 100000;
+  double max_mass_ = 70000;
   // window size 1 m/z
   double window_size_ = 1.0;
 

@@ -102,6 +102,10 @@ bool TopDiffArgument::parse(int argc, char* argv[]) {
     }
     std::string argv_0 (argv[0]);
     arguments_["executiveDir"] = file_util::getExecutiveDir(argv_0);
+    if (file_util::checkSpace(arguments_["executiveDir"])) {
+      LOG_ERROR("Current directory " << arguments_["executiveDir"] << " contains space and will cause errors in the program!")
+      exit(EXIT_FAILURE);
+    }
     LOG_DEBUG("Executive Dir " << arguments_["executiveDir"]);
     arguments_["resourceDir"] = file_util::getResourceDir(arguments_["executiveDir"]);
 
@@ -131,13 +135,15 @@ bool TopDiffArgument::parse(int argc, char* argv[]) {
 
 bool TopDiffArgument::validateArguments() {
   if (!file_util::exists(arguments_["resourceDir"])) {
-    LOG_ERROR("Resource direcotry " << arguments_["resourceDir"] << " does not exist!");
+    LOG_ERROR("Resource direcotry " << arguments_["resourceDir"] << " does not exist!\n" 
+              << "Please check if the file directory or name contains special characters such as spaces or quotation marks.");
     return false;
   }
 
   for (size_t k = 0; k < spectrum_file_list_.size(); k++) {
     if (!file_util::exists(spectrum_file_list_[k])) {
-      LOG_ERROR(spectrum_file_list_[k] << " does not exist!");
+      LOG_ERROR(spectrum_file_list_[k] << " does not exist!\n"
+                << "Please check if the file directory or name contains special characters such as spaces or quotation marks.");
       return false;
     }
   }

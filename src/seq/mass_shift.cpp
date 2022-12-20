@@ -80,6 +80,10 @@ std::string MassShift::getAnnoStr() {
       seq_str = alter_vec_[0]->getLocalAnno()->getPtmPtr()->getAbbrName();
     } else {
       seq_str = str_util::fixedToString(shift_, 4);
+      // add "+" sign for positive shifts
+      if (shift_ > 0) {
+        seq_str = "+" + seq_str;
+      }
     }
   } else {
     for (size_t i = 0; i < alter_vec_.size(); i++) {

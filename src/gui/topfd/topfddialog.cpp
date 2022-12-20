@@ -261,6 +261,9 @@ toppic::TopfdParaPtr TopFDDialog::getParaPtr() {
   QString path = QCoreApplication::applicationFilePath();
   std::string exe_dir = toppic::file_util::getExecutiveDir(path.toStdString());
   para_ptr_->setExeDir(exe_dir);
+  if (toppic::file_util::checkSpace(exe_dir)) {
+    ui->outputTextBrowser->setText("Current directory " + QString::fromStdString(exe_dir) + " contains space and will cause errors in the program!");
+  }
   para_ptr_->setResourceDir(toppic::file_util::getResourceDir(exe_dir));
   para_ptr_->setMaxCharge(std::stoi(ui->maxChargeEdit->text().toStdString()));
   para_ptr_->setMaxMass(std::stod(ui->maxMassEdit->text().toStdString()));

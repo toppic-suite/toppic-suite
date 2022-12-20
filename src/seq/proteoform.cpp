@@ -238,14 +238,45 @@ void updateMatchSeq(const MassShiftPtrVec & shifts,
                     std::vector<std::string> &left_strings,
                     std::vector<std::string> &right_strings) {
   for (size_t i = 0; i < shifts.size(); i++) {
-    int left_pos = shifts[i]->getLeftBpPos();
-    left_strings[left_pos] = "(" + left_strings[left_pos];
+    MassShiftPtr shift = shifts[i];
+    int left_pos = shift->getLeftBpPos();
+    int right_pos = shift->getRightBpPos();
 
-    int right_pos = shifts[i]->getRightBpPos();
-    right_strings[right_pos] +=  ")";
-    right_strings[right_pos] = right_strings[right_pos] 
-        + "[" + shifts[i]->getAnnoStr() + "]";
+    //if it is N-terminimal acetylation
+    if (left_pos == 0 && right_pos == 1 
+        && shift->getTypePtr() != AlterType::UNEXPECTED  
+        && shift->getAlterPtr(0)->getModPtr()->getModResiduePtr()->getPtmPtr() 
+        == PtmBase::getPtmPtr_Acetylation()) {
+      left_strings[left_pos] = "[Acetyl]-" + left_strings[left_pos]; 
+    }
+    else {
+      left_strings[left_pos] = "(" + left_strings[left_pos];
+      right_strings[right_pos] +=  ")";
+      right_strings[right_pos] = right_strings[right_pos] 
+        + "[" + shift->getAnnoStr() + "]";
+    }
   }
+}
+
+std::string Proteoform::getAlterStr(AlterTypePtr type_ptr) {
+  MassShiftPtrVec shifts = getMassShiftPtrVec(type_ptr);
+  std::string result;
+  for (size_t i = 0; i < shifts.size(); i++) {
+    MassShiftPtr shift = shifts[i];
+    int left_pos = shift->getLeftBpPos();
+    int right_pos = shift->getRightBpPos();
+    if ((left_pos + 1) == right_pos) {
+      result = result + shift->getAnnoStr() + ":[" + std::to_string(left_pos+1) + "]";
+    }
+    else {
+      result = result + shift->getAnnoStr() + ":[" + std::to_string(left_pos+1) 
+        + "-" + std::to_string(right_pos) + "]";
+    }
+    if (i < shifts.size()-1) {
+      result = result + ";";
+    }
+  }
+  return result;
 }
 
 std::string Proteoform::getProteoformMatchSeq() {

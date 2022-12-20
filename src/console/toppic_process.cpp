@@ -96,7 +96,7 @@ void copyTopMSV(std::map<std::string, std::string> &arguments) {
 }
 
 void cleanToppicDir(const std::string &fa_name, 
-                    const std::string & sp_name,
+                    const std::string &sp_name,
                     bool keep_temp_files) {
   std::string abs_sp_name = file_util::absoluteName(sp_name);
   std::string sp_base = file_util::basename(abs_sp_name);
@@ -104,7 +104,12 @@ void cleanToppicDir(const std::string &fa_name,
   file_util::delFile(sp_base + "_toppic_proteoform.xml");
   file_util::rename(sp_base + ".toppic_form_cutoff_form",
                     sp_base + "_toppic_proteoform.xml");
-  file_util::rename(sp_base + ".toppic_prsm",
+  file_util::delFile(sp_base + "_toppic_prsm.xml");
+  std::string toppic_prsm_suffix = "toppic_prsm_cutoff";
+  if (file_util::exists(sp_base + ".toppic_prsm_cutoff_local")) {
+    toppic_prsm_suffix = "toppic_prsm_cutoff_local";
+  }
+  file_util::rename(sp_base + "." + toppic_prsm_suffix,
                     sp_base + "_toppic_prsm.xml");
   if (!keep_temp_files) {
     file_util::cleanPrefix(sp_name, sp_base + ".msalign_");
@@ -128,6 +133,7 @@ void cleanToppicDir(const std::string &fa_name,
     file_util::cleanPrefix(sp_name, sp_base + ".toppic_evalue_");
     file_util::delFile(sp_base + ".toppic_cluster");
     file_util::delFile(sp_base + ".toppic_cluster_fdr");
+    file_util::delFile(sp_base + ".toppic_prsm");
     file_util::delFile(sp_base + ".toppic_prsm_cutoff");
     file_util::delFile(sp_base + ".toppic_prsm_cutoff_local");
     file_util::delFile(sp_base + ".toppic_form_cutoff");
@@ -465,7 +471,8 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
 
     std::cout << "Outputting PrSM table - started." << std::endl;
     PrsmMatchTableWriterPtr table_out
-        = std::make_shared<PrsmMatchTableWriter>(prsm_para_ptr, argu_str, cur_suffix, "_toppic_prsm_single.tsv", false);
+        = std::make_shared<PrsmMatchTableWriter>(prsm_para_ptr, argu_str, 
+                                                 cur_suffix, "_toppic_prsm_single.tsv", false);
     table_out->write();
 
     table_out->setOutputName("_toppic_prsm.tsv");
@@ -476,7 +483,7 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     std::cout << "Outputting PrSM table - finished." << std::endl;
 
     XmlGeneratorPtr xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, resource_dir, 
-                                                                cur_suffix, "toppic_prsm_cutoff");
+                                                              cur_suffix, "toppic_prsm_cutoff");
     if (arguments["geneHTMLFolder"] == "true"){
       std::cout << "Generating PrSM XML files - started." << std::endl;
     
@@ -505,8 +512,9 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     std::cout << "Selecting top PrSMs for proteoforms - finished." << std::endl;
     std::cout << "Outputting proteoform table - started." << std::endl;
     PrsmMatchTableWriterPtr form_out
-        = std::make_shared<PrsmMatchTableWriter>(prsm_para_ptr, argu_str,
-                                            "toppic_form_cutoff_form", "_toppic_proteoform_single.tsv", false);
+      = std::make_shared<PrsmMatchTableWriter>(prsm_para_ptr, argu_str,
+                                               "toppic_form_cutoff_form", 
+                                               "_toppic_proteoform_single.tsv", false);
     form_out->write();
 
     form_out->setOutputName("_toppic_proteoform.tsv");

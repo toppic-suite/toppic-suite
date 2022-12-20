@@ -14,6 +14,7 @@
 
 #include <string>
 #include <algorithm>
+#include <iostream>
 
 //Deprecated features in boost are excluded.
 #ifndef BOOST_SYSTEM_NO_DEPRECATED
@@ -40,7 +41,6 @@ namespace fs = boost::filesystem;
 namespace toppic {
 
 namespace file_util {
-
 std::string getFileSeparator() {
 #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
   return "\\";
@@ -311,6 +311,16 @@ void cleanTempFiles(const std::string & ref_name,
   std::string ref_base = basename(absolute(ref_path).string());
   std::replace(ref_base.begin(), ref_base.end(), '\\', '/');
   cleanPrefix(ref_name, ref_base + "." + ext_prefix);
+}
+
+bool checkSpace(const std::string &dir){
+  int length = dir.length();
+  for (int i = 0; i < length; i++) {
+    if (std::isspace(dir[i])) {
+      return true;
+    }
+  }
+  return false;
 }
 
 }  // namespace file_util

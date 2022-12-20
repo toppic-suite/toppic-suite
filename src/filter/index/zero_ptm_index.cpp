@@ -134,7 +134,7 @@ void process(ZeroPtmFilterMngPtr mng_ptr) {
   
   int block_num = db_block_ptr_vec.size();
 
-  std::cout << "Generating Non shift index files --- started" << std::endl;
+  std::cout << "Generating non shift index files --- started" << std::endl;
   for (int i = 0; i < block_num; i++) {
     while (pool_ptr->getQueueSize() > 0 || pool_ptr->getIdleThreadNum() == 0) {
       boost::this_thread::sleep(boost::posix_time::milliseconds(100));
@@ -144,7 +144,7 @@ void process(ZeroPtmFilterMngPtr mng_ptr) {
     pool_ptr->Enqueue(geneIndexTask(db_block_ptr_vec[i]->getBlockIdx(), mng_ptr));
   }
   pool_ptr->ShutDown();
-  std::cout << "Generating Non shift index files --- finished" << std::endl;
+  std::cout << "Generating non shift index files --- finished" << std::endl;
 }
 
 }
