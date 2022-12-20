@@ -102,6 +102,8 @@ void cleanTopmgDir(const std::string &fa_name,
   file_util::delFile(sp_base + "_topmg_proteoform.xml");
   file_util::rename(sp_base + ".topmg_form_cutoff_form", 
                     sp_base + "_topmg_proteoform.xml");
+
+  file_util::delFile(sp_base + "_topmg_prsm_cutoff.xml");
   file_util::rename(sp_base + ".topmg_prsm",
                     sp_base + "_topmg_prsm.xml");
   if (!keep_temp_files) {
@@ -121,7 +123,6 @@ void cleanTopmgDir(const std::string &fa_name,
     file_util::cleanPrefix(sp_name, sp_base + ".topmg_evalue_");
     file_util::delFile(sp_base + ".topmg_cluster");
     file_util::delFile(sp_base + ".topmg_cluster_fdr");
-    file_util::delFile(sp_base + ".topmg_prsm_cutoff");
     file_util::delFile(sp_base + ".topmg_form_cutoff");
     file_util::delDir(sp_base + "_topmg_proteoform_cutoff_xml");
     file_util::delDir(sp_base + "_topmg_prsm_cutoff_xml");
@@ -406,7 +407,8 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
     std::cout << "Outputting proteoform table - started." << std::endl;
     PrsmMatchTableWriterPtr form_out
         = std::make_shared<PrsmMatchTableWriter>(prsm_para_ptr, argu_str,
-                                            "topmg_form_cutoff_form", "_topmg_proteoform_single.tsv", false);
+                                            "topmg_form_cutoff_form", 
+                                            "_topmg_proteoform_single.tsv", false);
     form_out->write();
 
     form_out->setOutputName("_topmg_proteoform.tsv");
