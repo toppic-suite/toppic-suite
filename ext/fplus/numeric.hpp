@@ -121,26 +121,6 @@ bool is_positive(X x)
     return !is_negative(x);
 }
 
-// API search type: is_even : Int -> Bool
-// fwd bind count: 0
-// Checks if x is even.
-template <typename X>
-bool is_even(X x)
-{
-    static_assert(std::is_integral<X>::value, "type must be integral");
-    return x % 2 == 0;
-}
-
-// API search type: is_odd : Int -> Bool
-// fwd bind count: 0
-// Checks if x is odd.
-template <typename X>
-bool is_odd(X x)
-{
-    static_assert(std::is_integral<X>::value, "type must be integral");
-    return x % 1 == 0;
-}
-
 namespace internal
 {
     template <typename X>
@@ -226,7 +206,7 @@ int sign_with_zero(X x)
 template <typename Out, typename X>
 Out integral_cast_throw(X x)
 {
-#if _MSC_VER
+#ifdef _MSC_VER
 __pragma(warning(push))
 __pragma(warning(disable:4127))
 #endif
@@ -285,7 +265,7 @@ __pragma(warning(disable:4127))
         assert(false);
         return static_cast<Out>(x);
     }
-#if _MSC_VER
+#ifdef _MSC_VER
 __pragma(warning(pop))
 #endif
 }

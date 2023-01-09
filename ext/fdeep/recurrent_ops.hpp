@@ -32,6 +32,11 @@ inline float_type sigmoid_activation(float_type x)
     return 1 / (1 + std::exp(-x));
 }
 
+inline float_type swish_activation(float_type x)
+{
+    return x / (1 + std::exp(-x));
+}
+
 inline float_type hard_sigmoid_activation(float_type x)
 {
     return static_cast<float_type>(std::min(1.0, std::max(0.0, (0.2 * x) + 0.5)));
@@ -51,6 +56,23 @@ inline float_type selu_activation(float_type x)
     return scale * (x >= 0 ? x : alpha * (std::exp(x) - 1));
 }
 
+inline float_type exponential_activation(float_type x)
+{
+    return static_cast<float_type>(std::exp(x));
+}
+
+inline float_type gelu_activation(float_type x)
+{
+    return static_cast<float_type>(0.5) * x *
+        (static_cast<float_type>(1) +
+            static_cast<float_type>(std::erf(x / std::sqrt(static_cast<float_type>(2)))));
+}
+
+inline float_type softsign_activation(float_type x)
+{
+    return x / (std::abs(x) + static_cast<float_type>(1));
+}
+
 inline float_type elu_activation(float_type x)
 {
     return x >= 0 ? x : std::exp(x) - 1;
@@ -64,6 +86,8 @@ inline std::function<float_type(float_type)> get_activation_func(const std::stri
         return tanh_activation;
     else if (activation_func_name == "sigmoid")
         return sigmoid_activation;
+    else if (activation_func_name == "swish")
+        return swish_activation;
     else if (activation_func_name == "hard_sigmoid")
         return hard_sigmoid_activation;
     else if (activation_func_name == "relu")

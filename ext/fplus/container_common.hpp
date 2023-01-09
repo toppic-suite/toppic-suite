@@ -82,6 +82,7 @@ namespace internal
     void prepare_container(std::array<T, N>&, std::size_t size)
     {
         assert(size == N);
+        unused(size);
     }
 
     template <typename Y>
@@ -137,13 +138,20 @@ namespace internal
         return std::back_inserter(ys);
     }
 
+    // Avoid self-assignment.
+    template <typename T>
+    void assign(T& x, T&& y) {
+        if (&x != &y)
+            x = std::move(y);
+    }
+
     template <typename T, std::size_t N>
     struct array_back_insert_iterator : public std::back_insert_iterator<std::array<T, N>>
     {
         typedef std::back_insert_iterator<std::array<T, N>> base_type;
         explicit array_back_insert_iterator(std::array<T, N>& arr) :
             base_type(arr), arr_ptr_(&arr), pos_(0) {}
-        array_back_insert_iterator<T, N>(const array_back_insert_iterator<T, N>& other) :
+        array_back_insert_iterator(const array_back_insert_iterator<T, N>& other) :
             base_type(*other.arr_ptr_), arr_ptr_(other.arr_ptr_), pos_(other.pos_) {}
         array_back_insert_iterator<T, N>& operator=(const array_back_insert_iterator<T, N>& other)
         {
@@ -165,7 +173,7 @@ namespace internal
         array_back_insert_iterator<T, N>& operator=(T&& x)
         {
             assert(pos_ < N);
-            (*arr_ptr_)[pos_] = std::move(x);
+            assign((*arr_ptr_)[pos_], std::move(x));
             ++pos_;
             return *this;
         }
@@ -177,7 +185,7 @@ namespace internal
         std::size_t pos_;
     };
 
-#if _MSC_VER >= 1900
+#if defined(_MSC_VER) && _MSC_VER >= 1900
     template <typename T, std::size_t N>
     struct std::_Is_checked_helper<array_back_insert_iterator<T, N>>
         : public true_type
@@ -216,7 +224,34 @@ namespace internal
         return std::next(it,
             static_cast<typename Iterator::difference_type>(distance));
     }
+
+    // GCC 4.9 does not support std::rbegin, std::rend and std::make_reverse_iterator
+    template <typename Iterator>
+    std::reverse_iterator<Iterator> make_reverse_iterator(Iterator it)
+    {
+        return std::reverse_iterator<Iterator>(it);
+    }
 } // namespace internal
+
+// API search type: is_even : Int -> Bool
+// fwd bind count: 0
+// Checks if x is even.
+template <typename X>
+bool is_even(X x)
+{
+    static_assert(std::is_integral<X>::value, "type must be integral");
+    return x % 2 == 0;
+}
+
+// API search type: is_odd : Int -> Bool
+// fwd bind count: 0
+// Checks if x is odd.
+template <typename X>
+bool is_odd(X x)
+{
+    static_assert(std::is_integral<X>::value, "type must be integral");
+    return x % 2 != 0;
+}
 
 // API search type: is_empty : [a] -> Bool
 // fwd bind count: 0
@@ -823,6 +858,25 @@ Container take_while(UnaryPredicate pred, const Container& xs)
     return Container(std::begin(xs), itFirst);
 }
 
+// API search type: take_last_while : ((a -> Bool), [a]) -> [a]
+// fwd bind count: 1
+// Take elements from the beginning of a sequence
+// as long as they are fulfilling a predicate.
+// take_last_while(is_even, [0,2,7,5,6,4,8]) == [6,4,8]
+template <typename Container, typename UnaryPredicate>
+Container take_last_while(UnaryPredicate pred, const Container& xs)
+{
+    internal::check_unary_predicate_for_container<UnaryPredicate, Container>();
+    const auto r_begin = internal::make_reverse_iterator(std::end(xs));
+    const auto r_end = internal::make_reverse_iterator(std::begin(xs));
+    const auto itFirstReverse = std::find_if(r_begin, r_end, logical_not(pred));
+    if (itFirstReverse == r_begin)
+        return Container();
+    if (itFirstReverse == r_end)
+        return xs;
+    return Container(itFirstReverse.base(), std::end(xs));
+}
+
 // API search type: drop_while : ((a -> Bool), [a]) -> [a]
 // fwd bind count: 1
 // Remove elements from the beginning of a sequence
@@ -837,6 +891,25 @@ Container drop_while(UnaryPredicate pred, const Container& xs)
     if (itFirstNot == std::end(xs))
         return Container();
     return Container(itFirstNot, std::end(xs));
+}
+
+// API search type: drop_last_while : ((a -> Bool), [a]) -> [a]
+// fwd bind count: 1
+// Remove elements from the beginning of a sequence
+// as long as they are fulfilling a predicate.
+// drop_last_while(is_even, [0,2,7,5,6,4,8]) == [0,2,7,5]
+template <typename Container, typename UnaryPredicate>
+Container drop_last_while(UnaryPredicate pred, const Container& xs)
+{
+    internal::check_unary_predicate_for_container<UnaryPredicate, Container>();
+    const auto r_begin = internal::make_reverse_iterator(std::end(xs));
+    const auto r_end = internal::make_reverse_iterator(std::begin(xs));
+    const auto itFirstNotReverse = std::find_if_not(r_begin, r_end, pred);
+    if (itFirstNotReverse == r_begin)
+        return xs;
+    if (itFirstNotReverse == r_end)
+        return Container();
+    return Container(std::begin(xs), itFirstNotReverse.base());
 }
 
 // API search type: fold_left : (((a, b) -> a), a, [b]) -> a
@@ -1212,7 +1285,7 @@ template <typename Container>
 std::pair<Container, Container> unweave(const Container& xs)
 {
     std::pair<Container, Container> result;
-    if (size_of_cont(xs) % 2 == 0)
+    if (is_even(size_of_cont(xs)))
         internal::prepare_container(result.first, size_of_cont(xs) / 2);
     else
         internal::prepare_container(result.first, size_of_cont(xs) / 2 + 1);

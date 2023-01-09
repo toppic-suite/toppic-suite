@@ -42,7 +42,7 @@ protected:
         tensors result_time_step = {};
         std::size_t len_series = 0;
         tensors slices = {};
-        std::int32_t concat_axis;
+        std::int32_t concat_axis = 0;
 
         if (td_input_len_ == 2)
         {
@@ -66,6 +66,11 @@ protected:
         }
         else
             raise_error("invalid input dim for TimeDistributed");
+
+        for (auto& slice: slices)
+        {
+            slice.shrink_rank();
+        }
 
         if (td_output_len_ == 2)
             concat_axis = 2;

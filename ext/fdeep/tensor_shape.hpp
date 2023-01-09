@@ -122,6 +122,34 @@ public:
         return rank_;
     }
 
+    std::size_t minimal_rank() const
+    {
+        if (size_dim_5_ > 1)
+            return 5;
+        if (size_dim_4_ > 1)
+            return 4;
+        if (height_ > 1)
+            return 3;
+        if (width_ > 1)
+            return 2;
+        return 1;
+    }
+
+    void shrink_rank()
+    {
+        rank_ = minimal_rank();
+    }
+
+    void shrink_rank_with_min(std::size_t min_rank_to_keep)
+    {
+        rank_ = fplus::max(minimal_rank(), min_rank_to_keep);
+    }
+    
+    void maximize_rank()
+    {
+        rank_ = 5;
+    }
+
     std::vector<std::size_t> dimensions() const
     {
         if (rank() == 5)
@@ -204,6 +232,15 @@ inline tensor_shape make_tensor_shape_with(
             fplus::just_with_default(default_shape.height_, shape.height_),
             fplus::just_with_default(default_shape.width_, shape.width_),
             fplus::just_with_default(default_shape.depth_, shape.depth_));
+}
+
+inline tensor_shape derive_fixed_tensor_shape(
+    std::size_t values,
+    const tensor_shape_variable shape)
+{
+    const auto inferred = values / shape.minimal_volume();
+    return make_tensor_shape_with(
+        tensor_shape(inferred, inferred, inferred, inferred, inferred), shape);
 }
 
 inline bool tensor_shape_equals_tensor_shape_variable(
@@ -353,6 +390,26 @@ inline std::string show_tensor_shapes(
     const std::vector<tensor_shape>& shapes)
 {
     return fplus::show_cont(fplus::transform(show_tensor_shape, shapes));
+}
+
+template <typename F>
+void loop_over_all_dims(const tensor_shape& shape, F f) {
+    for (std::size_t dim5 = 0; dim5 < shape.size_dim_5_; ++dim5)
+    {
+        for (std::size_t dim4 = 0; dim4 < shape.size_dim_4_; ++dim4)
+        {
+            for (std::size_t y = 0; y < shape.height_; ++y)
+            {
+                for (std::size_t x = 0; x < shape.width_; ++x)
+                {
+                    for (std::size_t z = 0; z < shape.depth_; ++z)
+                    {
+                        f(dim5, dim4, y, x, z);
+                    }
+                }
+            }
+        }
+    }
 }
 
 } // namespace fdeep

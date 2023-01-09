@@ -26,6 +26,7 @@
 #endif
 
 #include "fdeep/common.hpp"
+
 #include "fdeep/layers/add_layer.hpp"
 #include "fdeep/layers/average_layer.hpp"
 #include "fdeep/layers/average_pooling_2d_layer.hpp"
@@ -37,7 +38,9 @@
 #include "fdeep/layers/dense_layer.hpp"
 #include "fdeep/layers/depthwise_conv_2d_layer.hpp"
 #include "fdeep/layers/elu_layer.hpp"
+#include "fdeep/layers/exponential_layer.hpp"
 #include "fdeep/layers/flatten_layer.hpp"
+#include "fdeep/layers/gelu_layer.hpp"
 #include "fdeep/layers/global_average_pooling_1d_layer.hpp"
 #include "fdeep/layers/global_max_pooling_1d_layer.hpp"
 #include "fdeep/layers/global_average_pooling_2d_layer.hpp"
@@ -54,17 +57,23 @@
 #include "fdeep/layers/linear_layer.hpp"
 #include "fdeep/layers/max_pooling_2d_layer.hpp"
 #include "fdeep/layers/maximum_layer.hpp"
+#include "fdeep/layers/minimum_layer.hpp"
 #include "fdeep/layers/model_layer.hpp"
 #include "fdeep/layers/multiply_layer.hpp"
+#include "fdeep/layers/normalization_layer.hpp"
 #include "fdeep/layers/pooling_2d_layer.hpp"
 #include "fdeep/layers/relu_layer.hpp"
+#include "fdeep/layers/repeat_vector_layer.hpp"
+#include "fdeep/layers/rescaling_layer.hpp"
 #include "fdeep/layers/reshape_layer.hpp"
 #include "fdeep/layers/separable_conv_2d_layer.hpp"
 #include "fdeep/layers/selu_layer.hpp"
 #include "fdeep/layers/sigmoid_layer.hpp"
 #include "fdeep/layers/softmax_layer.hpp"
 #include "fdeep/layers/softplus_layer.hpp"
+#include "fdeep/layers/softsign_layer.hpp"
 #include "fdeep/layers/subtract_layer.hpp"
+#include "fdeep/layers/swish_layer.hpp"
 #include "fdeep/layers/tanh_layer.hpp"
 #include "fdeep/layers/time_distributed_layer.hpp"
 #include "fdeep/layers/upsampling_1d_layer.hpp"
@@ -108,6 +117,11 @@ inline bool json_obj_has_member(const nlohmann::json& data,
 inline fplus::maybe<std::size_t> create_maybe_size_t(const nlohmann::json& data)
 {
     if (data.is_null())
+    {
+        return fplus::nothing<std::size_t>();
+    }
+    const int signed_result = data;
+    if (signed_result < 0)
     {
         return fplus::nothing<std::size_t>();
     }
@@ -459,14 +473,13 @@ inline layer_ptr create_depthwise_conv_2D_layer(const get_param_f& get_param,
         "invalid number of weights");
     const std::size_t input_depth = slice_weights.size() / kernel_size.area();
     const tensor_shape filter_shape(kernel_size.height_, kernel_size.width_, 1);
-    const std::size_t filter_count = input_depth;
-    float_vec bias(filter_count, 0);
+    float_vec bias(input_depth, 0);
     const bool use_bias = data["config"]["use_bias"];
     if (use_bias)
         bias = decode_floats(get_param(name, "bias"));
-    assertion(bias.size() == filter_count, "size of bias does not match");
+    assertion(bias.size() == input_depth, "size of bias does not match");
     return std::make_shared<depthwise_conv_2d_layer>(name, input_depth,
-        filter_shape, filter_count, strides, pad_type,
+        filter_shape, strides, pad_type,
         dilation_rate, slice_weights, bias);
 }
 
@@ -629,6 +642,13 @@ inline layer_ptr create_maximum_layer(
     return std::make_shared<maximum_layer>(name);
 }
 
+inline layer_ptr create_minimum_layer(
+    const get_param_f&, const nlohmann::json&,
+    const std::string& name)
+{
+    return std::make_shared<minimum_layer>(name);
+}
+
 inline layer_ptr create_multiply_layer(
     const get_param_f&, const nlohmann::json&,
     const std::string& name)
@@ -721,11 +741,28 @@ inline layer_ptr create_cropping_2d_layer(
     }
 }
 
+inline layer_ptr create_repeat_vector_layer(
+    const get_param_f&, const nlohmann::json& data,
+    const std::string& name)
+{
+    const std::size_t n = data["config"]["n"];
+    return std::make_shared<repeat_vector_layer>(name, n);
+}
+
+inline layer_ptr create_rescaling_layer(
+    const get_param_f&, const nlohmann::json& data,
+    const std::string& name)
+{
+    const float_type scale = data["config"]["scale"];
+    const float_type offset = data["config"]["offset"];
+    return std::make_shared<rescaling_layer>(name, scale, offset);
+}
+
 inline layer_ptr create_reshape_layer(
     const get_param_f&, const nlohmann::json& data,
     const std::string& name)
 {
-    const auto target_shape = create_tensor_shape(data["config"]["target_shape"]);
+    const auto target_shape = create_tensor_shape_variable(data["config"]["target_shape"]);
     return std::make_shared<reshape_layer>(name, target_shape);
 }
 
@@ -764,6 +801,13 @@ inline activation_layer_ptr create_sigmoid_layer(
     return std::make_shared<sigmoid_layer>(name);
 }
 
+inline activation_layer_ptr create_swish_layer(
+        const get_param_f&, const nlohmann::json&,
+        const std::string& name)
+{
+    return std::make_shared<swish_layer>(name);
+}
+
 inline activation_layer_ptr create_hard_sigmoid_layer(
     const get_param_f&, const nlohmann::json&,
     const std::string& name)
@@ -776,13 +820,28 @@ inline activation_layer_ptr create_relu_layer(
     const std::string& name)
 {
     float_type max_value = std::numeric_limits<float_type>::max();
+    float_type negative_slope = static_cast<float_type>(0);
+    float_type threshold = static_cast<float_type>(0);
     if (json_obj_has_member(data, "config") &&
         json_obj_has_member(data["config"], "max_value") &&
         !data["config"]["max_value"].is_null())
     {
         max_value = data["config"]["max_value"];
+        negative_slope = data["config"]["negative_slope"];
+        threshold = data["config"]["threshold"];
     }
-    return std::make_shared<relu_layer>(name, max_value);
+    return std::make_shared<relu_layer>(name, max_value, negative_slope, threshold);
+}
+
+inline activation_layer_ptr create_relu6_layer(
+    const get_param_f&, const nlohmann::json&,
+    const std::string& name)
+{
+    return std::make_shared<relu_layer>(name,
+        static_cast<float_type>(6),
+        static_cast<float_type>(0),
+        static_cast<float_type>(0)
+    );
 }
 
 inline activation_layer_ptr create_selu_layer(
@@ -790,6 +849,27 @@ inline activation_layer_ptr create_selu_layer(
     const std::string& name)
 {
     return std::make_shared<selu_layer>(name);
+}
+
+inline activation_layer_ptr create_exponential_layer(
+    const get_param_f&, const nlohmann::json&,
+    const std::string& name)
+{
+    return std::make_shared<exponential_layer>(name);
+}
+
+inline activation_layer_ptr create_gelu_layer(
+    const get_param_f&, const nlohmann::json&,
+    const std::string& name)
+{
+    return std::make_shared<gelu_layer>(name);
+}
+
+inline activation_layer_ptr create_softsign_layer(
+    const get_param_f&, const nlohmann::json&,
+    const std::string& name)
+{
+    return std::make_shared<softsign_layer>(name);
 }
 
 inline activation_layer_ptr create_leaky_relu_layer(
@@ -855,6 +935,32 @@ inline layer_ptr create_relu_layer_isolated(
     return create_relu_layer(get_param, data, name);
 }
 
+inline layer_ptr create_normalization_layer(
+    const get_param_f& get_param,
+    const nlohmann::json& data, const std::string& name)
+{
+    const auto axex = create_vector<int>(create_int, data["config"]["axis"]);
+    const float_vec mean = decode_floats(get_param(name, "mean"));
+    const float_vec variance = decode_floats(get_param(name, "variance"));
+    return std::make_shared<normalization_layer>(name, axex, mean, variance);
+}
+
+inline std::string get_activation_type(const nlohmann::json& data)
+{
+    assertion(data.is_string(), "Layer activation must be a string.");
+    return data;
+}
+
+inline std::string json_object_get_activation_with_default(const nlohmann::json& config,
+    const std::string& default_activation)
+{
+    if (json_obj_has_member(config, "activation"))
+    {
+        return get_activation_type(config["activation"]);
+    }
+    return default_activation;
+}
+
 inline activation_layer_ptr create_activation_layer_type_name(
     const get_param_f& get_param,
     const nlohmann::json& data,
@@ -870,10 +976,15 @@ inline activation_layer_ptr create_activation_layer_type_name(
         {"softplus", create_softplus_layer},
         {"tanh", create_tanh_layer},
         {"sigmoid", create_sigmoid_layer},
+        {"swish", create_swish_layer},
         {"hard_sigmoid", create_hard_sigmoid_layer},
         {"relu", create_relu_layer},
+        {"relu6", create_relu6_layer},
         {"selu", create_selu_layer},
-        {"elu", create_elu_layer}
+        {"elu", create_elu_layer},
+        {"exponential", create_exponential_layer},
+        {"gelu", create_gelu_layer},
+        {"softsign", create_softsign_layer}
     };
 
     return fplus::throw_on_nothing(
@@ -886,7 +997,7 @@ inline layer_ptr create_activation_layer(
     const get_param_f& get_param,
     const nlohmann::json& data, const std::string& name)
 {
-    const std::string type = data["config"]["activation"];
+    const std::string type = get_activation_type(data["config"]["activation"]);
     return create_activation_layer_type_name(get_param,
         data, type, name);
 }
@@ -932,7 +1043,7 @@ inline layer_ptr create_lstm_layer(const get_param_f &get_param,
 {
     auto&& config = data["config"];
     const std::size_t units = config["units"];
-    const std::string unit_activation = json_object_get(config, "activation", std::string("tanh"));
+    const std::string unit_activation = json_object_get_activation_with_default(config, "tanh");
     const std::string recurrent_activation = json_object_get(config,
         "recurrent_activation",
         data["class_name"] == "CuDNNLSTM"
@@ -963,7 +1074,7 @@ inline layer_ptr create_gru_layer(const get_param_f &get_param,
 {
     auto&& config = data["config"];
     const std::size_t units = config["units"];
-    const std::string unit_activation = json_object_get(config, "activation", std::string("tanh"));
+    const std::string unit_activation = json_object_get_activation_with_default(config, "tanh");
     const std::string recurrent_activation = json_object_get(config,
         "recurrent_activation",
         data["class_name"] == "CuDNNGRU"
@@ -1003,7 +1114,7 @@ inline layer_ptr create_bidirectional_layer(const get_param_f& get_param,
     auto&& layer_config = layer["config"];
     const std::string wrapped_layer_type = layer["class_name"];
     const std::size_t units = layer_config["units"];
-    const std::string unit_activation = json_object_get(layer_config, "activation", std::string("tanh"));
+    const std::string unit_activation = json_object_get_activation_with_default(layer_config, "tanh");
     const std::string recurrent_activation = json_object_get(layer_config,
         "recurrent_activation",
         wrapped_layer_type == "CuDNNGRU" || wrapped_layer_type == "CuDNNLSTM"
@@ -1062,7 +1173,7 @@ inline layer_ptr create_time_distributed_layer(const get_param_f& get_param,
 inline layer_ptr create_layer(const get_param_f& get_param,
     const nlohmann::json& data,
     const layer_creators& custom_layer_creators,
-    const std::string& prefix)
+    const std::string&)
 {
     const std::string name = data["name"];
 
@@ -1076,11 +1187,19 @@ inline layer_ptr create_layer(const get_param_f& get_param,
             {"BatchNormalization", create_batch_normalization_layer},
             {"Dropout", create_identity_layer},
             {"AlphaDropout", create_identity_layer},
+            {"FixedDropout", create_identity_layer},
             {"GaussianDropout", create_identity_layer},
             {"GaussianNoise", create_identity_layer},
             {"SpatialDropout1D", create_identity_layer},
             {"SpatialDropout2D", create_identity_layer},
             {"SpatialDropout3D", create_identity_layer},
+            {"RandomContrast", create_identity_layer},
+            {"RandomFlip", create_identity_layer},
+            {"RandomHeight", create_identity_layer},
+            {"RandomRotation", create_identity_layer},
+            {"RandomTranslation", create_identity_layer},
+            {"RandomWidth", create_identity_layer},
+            {"RandomZoom", create_identity_layer},
             {"LeakyReLU", create_leaky_relu_layer_isolated},
             {"Permute", create_permute_layer },
             {"PReLU", create_prelu_layer },
@@ -1099,6 +1218,7 @@ inline layer_ptr create_layer(const get_param_f& get_param,
             {"Dense", create_dense_layer},
             {"Add", create_add_layer},
             {"Maximum", create_maximum_layer},
+            {"Minimum", create_minimum_layer},
             {"Concatenate", create_concatenate_layer},
             {"Multiply", create_multiply_layer},
             {"Average", create_average_layer},
@@ -1109,6 +1229,8 @@ inline layer_ptr create_layer(const get_param_f& get_param,
             {"Cropping1D", create_cropping_2d_layer},
             {"Cropping2D", create_cropping_2d_layer},
             {"Activation", create_activation_layer},
+            {"RepeatVector", create_repeat_vector_layer},
+            {"Rescaling", create_rescaling_layer},
             {"Reshape", create_reshape_layer},
             {"Embedding", create_embedding_layer},
             {"LSTM", create_lstm_layer},
@@ -1117,6 +1239,7 @@ inline layer_ptr create_layer(const get_param_f& get_param,
             {"CuDNNGRU", create_gru_layer},
             {"Bidirectional", create_bidirectional_layer},
             {"Softmax", create_softmax_layer},
+            {"Normalization", create_normalization_layer},
         };
 
     const wrapper_layer_creators wrapper_creators = {
@@ -1130,7 +1253,7 @@ inline layer_ptr create_layer(const get_param_f& get_param,
     if (fplus::map_contains(wrapper_creators, type))
     {
         auto result = fplus::get_from_map_unsafe(wrapper_creators, type)(
-            get_param, data, name, custom_layer_creators, prefix + name + "_");
+            get_param, data, name, custom_layer_creators, name + "_");
         result->set_nodes(create_nodes(data));
         return result;
     }
@@ -1150,9 +1273,10 @@ inline layer_ptr create_layer(const get_param_f& get_param,
             && type != "LSTM"
             && type != "Bidirectional")
         {
+            const std::string activation = get_activation_type(data["config"]["activation"]);
             result->set_activation(
                 create_activation_layer_type_name(get_param, data,
-                    data["config"]["activation"], ""));
+                    activation, ""));
         }
         result->set_nodes(create_nodes(data));
         return result;

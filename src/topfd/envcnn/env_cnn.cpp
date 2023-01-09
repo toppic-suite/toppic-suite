@@ -29,7 +29,7 @@ std::mutex avail_lock;
 void initModel(const std::string &dir_name, int thread_num) {
   std::string file_name = dir_name 
       + file_util::getFileSeparator() + "envcnn_models"
-      + file_util::getFileSeparator() + "envcnn_2_block_model.json";
+      + file_util::getFileSeparator() + "envcnn_4_features_2_block_model.json";
 
   for (int i = 0; i < thread_num; i++) {
     fdeep::model model = fdeep::load_model(file_name, true, fdeep::dev_null_logger);
@@ -191,14 +191,12 @@ void addNoisePeaksInMatrix(const std::vector<double> &peak_mass,
 
 void generateTensors(std::vector<fdeep::tensors> &tensorsL,
                      const std::vector<std::vector<double>> &matrix) {
-  fdeep::tensor_shape tensor_shape(300, 5);
-  fdeep::tensor t(tensor_shape, 0.0f);
+  fdeep::tensor t (fdeep::tensor_shape(300, 4), 0.0f);
   for (int y = 0; y < 300; ++y)
-    for (int x = 0; x < 5; ++x)
-      t.set(0, 0, 0, y, x, matrix[y][x]);
+    for (int x = 0; x < 4; ++x)
+      t.set(fdeep::tensor_pos(y, x), matrix[y][x]);
 
-  std::vector<fdeep::tensor> tensors;
-  tensors.push_back(t);
+  std::vector<fdeep::tensor> tensors{t};
   tensorsL.push_back(tensors);
 }
 

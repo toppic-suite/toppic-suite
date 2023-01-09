@@ -461,8 +461,7 @@ T mean_obj_div_double(const Container& xs)
 template <typename Result, typename Container>
 Result mean_using_doubles(const Container& xs)
 {
-    auto size = size_of_cont(xs);
-    assert(size != 0);
+    assert(size_of_cont(xs) != 0);
     auto xs_as_doubles = convert_elems<double>(xs);
     auto result_as_double = mean<double>(xs_as_doubles);
     if (!std::is_integral<Result>::value)
@@ -488,7 +487,7 @@ Result median(const Container& xs)
     // would be faster for random-access containers
     // but not work at all on other containers like std::list.
     auto xsSorted = sort(xs);
-    if (size_of_cont(xsSorted) % 2 == 1)
+    if (is_odd(size_of_cont(xsSorted)))
     {
         auto it = std::begin(xsSorted);
         internal::advance_iterator(it, size_of_cont(xsSorted) / 2);
