@@ -132,7 +132,7 @@ void process(const std::string &spec_file_name,
       //LOG_DEBUG("seq name " << seq_name);
       if(seq_name.find("DECOY_")==0){
           //0 mass shift
-          if(prsm_str_ptrs[i]->getMassShiftVec().empty()) {
+          if(prsm_str_ptrs[i]->getUnexpectedPtmNum() == 0) {
               //0 variable PTMs
               if (prsm_str_ptrs[i]->getVariablePtmNum() == 0) {
                   decoy_ptrs1.push_back(prsm_str_ptrs[i]);
@@ -143,7 +143,7 @@ void process(const std::string &spec_file_name,
               }
           }
           //1 mass shift
-          else if (prsm_str_ptrs[i]->getMassShiftVec().size() == 1) {
+          else if (prsm_str_ptrs[i]->getUnexpectedPtmNum() == 1) {
               decoy_ptrs3.push_back(prsm_str_ptrs[i]);
           }
           //2 mass shift
@@ -152,7 +152,7 @@ void process(const std::string &spec_file_name,
           }
       } else{
           //0 mass shift
-          if(prsm_str_ptrs[i]->getMassShiftVec().empty()) {
+          if(prsm_str_ptrs[i]->getUnexpectedPtmNum() == 0) {
               //0 variable PTMs
               if (prsm_str_ptrs[i]->getVariablePtmNum() == 0) {
                   target_ptrs1.push_back(prsm_str_ptrs[i]);
@@ -163,7 +163,7 @@ void process(const std::string &spec_file_name,
               }
           }
           //1 mass shift
-          else if (prsm_str_ptrs[i]->getMassShiftVec().size() == 1) {
+          else if (prsm_str_ptrs[i]->getUnexpectedPtmNum() == 1) {
               target_ptrs3.push_back(prsm_str_ptrs[i]);
           }
           //2 mass shift
@@ -229,7 +229,7 @@ void process(const std::string &spec_file_name,
     all_ptrs4.insert(all_ptrs4.begin(), target_ptrs4.begin(), target_ptrs4.end());
     all_ptrs4.insert(all_ptrs4.end(), decoy_ptrs4.begin(), decoy_ptrs4.end());
     std::sort(all_ptrs4.begin(), all_ptrs4.end(), PrsmStr::cmpSpectrumIdInc);
-    std::cout << "Goup 3 target_ptrs: " << target_ptrs4.size() << ", Group 3 decoy_ptrs: " << decoy_ptrs4.size() << std::endl;
+    std::cout << "Goup 4 target_ptrs: " << target_ptrs4.size() << ", Group 4 decoy_ptrs: " << decoy_ptrs4.size() << std::endl;
     writer.writeVector(all_ptrs4);
   }
   else {
