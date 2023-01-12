@@ -438,8 +438,6 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
       cur_suffix = "toppic_cluster_fdr";
     }
 
-    exit(0);
-
     std::string cutoff_type = arguments["cutoffSpectralType"];
     std::cout << "PrSM filtering by " << cutoff_type << " - started." << std::endl;
     double cutoff_value;
