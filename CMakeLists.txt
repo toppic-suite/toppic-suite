@@ -380,8 +380,8 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
   #file(MAKE_DIRECTORY ${CMAKE_INSTALL_PREFIX}/usr/bin)
 install (TARGETS topfd topindex toppic topmg topdiff topfd_gui topindex_gui
-  toppic_gui topmg_gui topdiff_gui DESTINATION ${CMAKE_INSTALL_PREFIX}/usr/bin/)
-install (DIRECTORY resources/ DESTINATION ${CMAKE_INSTALL_PREFIX}/etc/toppic)
+  toppic_gui topmg_gui topdiff_gui DESTINATION bin/)
+install (DIRECTORY resources/ DESTINATION etc/toppic)
 
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
 
