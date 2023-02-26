@@ -105,7 +105,8 @@ void generateDbBlock(const std::string &db_file_name, int block_size,
   // get total_size;
   FastaReader size_reader(db_file_name);
   FastaSeqPtr seq_info = size_reader.getNextSeq();
-  int total_seq_size = 0;
+  long total_seq_size = 0;
+  int seq_num = 0;
   while (seq_info != nullptr) {
     std::string seq = seq_info->getRawSeq();
     int seq_len = seq.length();
@@ -116,12 +117,14 @@ void generateDbBlock(const std::string &db_file_name, int block_size,
       total_seq_size = total_seq_size + (seq_len - max_frag_len) * max_frag_len 
 	      + (max_frag_len * (max_frag_len + 1) /2);
     }
+    seq_num++;
     seq_info = size_reader.getNextSeq();
   }
   size_reader.close();
-  // adjust block size if the database is too small 
+  // adjust block size if the database is too small and the sequence number 
+  // is large enough > 50 * min_block_num
   int block_num = static_cast<int>(std::ceil(total_seq_size/block_size));
-  if (block_num < min_block_num) {
+  if (block_num < min_block_num && seq_num > (min_block_num * 50)) {
     block_num = min_block_num;
     // add +1 to make sure there is no error introduced in division.
     block_size = total_seq_size/block_num + 1;
@@ -135,7 +138,7 @@ void generateDbBlock(const std::string &db_file_name, int block_size,
   FastaReader reader(db_file_name);
   seq_info = reader.getNextSeq();
   index_output << block_idx << "\t" << seq_idx << std::endl;
-  int seq_size = 0;
+  long seq_size = 0;
   while (seq_info != nullptr) {
     std::string name = seq_info->getName();
     std::string desc = seq_info->getDesc();
@@ -148,7 +151,6 @@ void generateDbBlock(const std::string &db_file_name, int block_size,
       seq_size = seq_size + (seq_len - max_frag_len) * max_frag_len 
 	      + (max_frag_len * (max_frag_len + 1) /2);
     }
-    //seq_size += seq.length();
     if (seq_size > block_size) {
       block_output.close();
       block_idx++;
