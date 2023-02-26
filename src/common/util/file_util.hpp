@@ -72,7 +72,7 @@ void moveFile(std::string &file_name, std::string &folder_name);
 
 inline std::string getToppicResourceDirName() {return "resources";}
 
-inline std::string getEtcDirName() {return "../../etc/toppic";}
+inline std::string getEtcDirName() {return "../etc/toppic";}
 
 std::string getResourceDir(const std::string &exec_dir);
 

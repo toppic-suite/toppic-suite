@@ -9,8 +9,6 @@ SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../bin)
 
 SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/../lib)
 
-SET(CMAKE_INSTALL_PREFIX $ENV{HOME}/toppic)
-
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   # Linux specific code
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unknown-pragmas -std=c++14 -Wl,-rpath=$ORIGIN,--disable-new-dtags -O3 -DWITHOUT_MZ5 -fPIC")
@@ -382,8 +380,8 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
   #file(MAKE_DIRECTORY ${CMAKE_INSTALL_PREFIX}/usr/bin)
 install (TARGETS topfd topindex toppic topmg topdiff topfd_gui topindex_gui
-  toppic_gui topmg_gui topdiff_gui DESTINATION ${CMAKE_INSTALL_PREFIX}/usr/bin/)
-install (DIRECTORY resources/ DESTINATION ${CMAKE_INSTALL_PREFIX}/etc/toppic)
+  toppic_gui topmg_gui topdiff_gui DESTINATION bin/)
+install (DIRECTORY resources/ DESTINATION etc/toppic)
 
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
 
