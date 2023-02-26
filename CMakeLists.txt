@@ -9,8 +9,6 @@ SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../bin)
 
 SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/../lib)
 
-SET(CMAKE_INSTALL_PREFIX $ENV{HOME}/toppic)
-
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   # Linux specific code
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unknown-pragmas -std=c++14 -Wl,-rpath=$ORIGIN,--disable-new-dtags -O3 -DWITHOUT_MZ5 -fPIC")
