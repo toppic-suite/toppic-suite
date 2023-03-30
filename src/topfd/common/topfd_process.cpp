@@ -40,7 +40,6 @@ void processOneFile(TopfdParaPtr para_ptr,
     std::cout << "Deconvolution started." << std::endl;
 
     DeconvProcess processor(para_ptr, spec_file_name, frac_id, thread_number);
-    
     processor.process();
     std::cout << "Deconvolution finished." << std::endl;
 
@@ -69,12 +68,9 @@ void processOneFile(TopfdParaPtr para_ptr,
 
     feature_detect::process(frac_id,
                               spec_file_name,
-                              para_ptr->isMissingLevelOne(),
-                              para_ptr->getResourceDir(),
-                              para_ptr->getActivation(),
+                              para_ptr,
                               processor.isFaims_,
-                              processor.voltage_vec_,
-                              para_ptr->getECScore());
+                              processor.voltage_vec_);
     std::cout << "Feature detection finished." << std::endl;
     
     std::cout << "Processing " << spec_file_name << " finished." << std::endl;

@@ -52,7 +52,7 @@ namespace toppic {
     std::vector<std::vector<double>> theo_map = env_coll.get_seed_theo_map(peak_matrix, snr);
     std::vector<double> spectrum_noise_levels = peak_matrix.get_spec_noise_inte();
     double noiseIntensityLevel = std::accumulate(spectrum_noise_levels.begin() + env_coll.getStartSpecId(),
-                                                 spectrum_noise_levels.begin() + env_coll.getEndSpecId(), 0.0);
+                                                 spectrum_noise_levels.begin() + env_coll.getEndSpecId()+1, 0.0); /////////////////////////// ERROR - Last idx
     int base_spec = env_coll.getBaseSpecID();
     int start_spec = env_coll.getStartSpecId();
     EnvSet env_set = env_coll.get_seed_env_set();
@@ -152,7 +152,7 @@ namespace toppic {
     return feature_ptr;
   }
 
-  double Feature::isMatch(double prec_mass, double feature_mass, const FeatureParaPtr& para_ptr, bool &shift) {
+  double Feature::isMatch(double prec_mass, double feature_mass, const FeatureParaPtr &para_ptr, bool &shift) {
     std::vector<double> search_masses = para_ptr->getSearchMasses(prec_mass);
     double min_diff = std::numeric_limits<double>::max();
     for (size_t j = 0; j < search_masses.size(); j++) {
@@ -170,38 +170,36 @@ namespace toppic {
                                 FracFeaturePtrVec &frac_features, std::vector<EnvCollection> &env_coll_list,
                                 std::vector<Feature> &features, SpecFeaturePtrVec &ms2_features,
                                 std::vector<double> &precMzs, PeakMatrix &peak_matrix, fdeep::model model,
-                                const fdeep::model& model_escore, FeatureParaPtr para_ptr, EnvParaPtr env_para_ptr,
-                                double score_thr) {
+                                const fdeep::model &model_escore, FeatureParaPtr para_ptr, TopfdParaPtr topfd_para_ptr) {
 
-    int isolation_windows_mz = env_para_ptr->prec_deconv_interval_;
+    int isolation_windows_mz = topfd_para_ptr->getPrecWindow();
     DeconvMsPtrVec ms_ptr_vec = Feature::readData(ms2_file_name);
     std::cout << "\r" << "Mapping Proteoforms Features on MS2 Scans" << std::flush;
-//    int isolation_windows_num = int(ms_ptr_vec.size() / ms1_ptr_vec.size()) + 1;
-//    std::cout << "# of MS1 scans: " << ms1_ptr_vec.size() << ", # of MS2 scans: " << ms_ptr_vec.size()
-//              << " and num of isolation windows: " << isolation_windows_num << std::endl;
     for (size_t spec_id = 0; spec_id < ms_ptr_vec.size(); spec_id++) {
       MsHeaderPtr hh = ms_ptr_vec[spec_id]->getMsHeaderPtr();
       if (hh->getPrecCharge() == 0) continue;
 
       double base_mz = precMzs[spec_id];
-      bool assigned_status = get_mass_shifted_feature_map(frac_features, env_coll_list, para_ptr, hh, score_thr,
+      bool assigned_status = get_mass_shifted_feature_map(frac_features, env_coll_list, para_ptr, hh, topfd_para_ptr->getECScore(),
                                                           base_mz, isolation_windows_mz, ms2_features);
       if (assigned_status) continue;
 
-      assigned_status = get_charge_shifted_feature_map(frac_features, env_coll_list, para_ptr, hh, score_thr, base_mz,
+      assigned_status = get_charge_shifted_feature_map(frac_features, env_coll_list, para_ptr, hh, topfd_para_ptr->getECScore(), base_mz,
                                                        isolation_windows_mz, ms2_features);
       if (assigned_status) continue;
 
-      assigned_status = get_highest_inte_feature_map(frac_features, env_coll_list, para_ptr, hh, score_thr, base_mz,
+      assigned_status = get_highest_inte_feature_map(frac_features, env_coll_list, para_ptr, hh, topfd_para_ptr->getECScore(), base_mz,
                                                      isolation_windows_mz, ms2_features);
       if (assigned_status) continue;
 
-      assigned_status = get_new_feature_map(ms1_ptr_vec, frac_features, env_coll_list, features, para_ptr, env_para_ptr,
-                                            hh, ms2_features, peak_matrix, model, model_escore);
+      assigned_status = get_new_feature_map(ms1_ptr_vec, frac_features, env_coll_list, features, para_ptr, hh, topfd_para_ptr,
+                                            ms2_features, peak_matrix, model, model_escore);
       if (assigned_status) continue;
 
-      get_empty_feature_map(ms1_ptr_vec, frac_features, env_coll_list, features, para_ptr, env_para_ptr, hh,
+      get_empty_feature_map(ms1_ptr_vec, frac_features, env_coll_list, features, para_ptr, hh, topfd_para_ptr,
                             ms2_features, peak_matrix, model, model_escore);
+      if (assigned_status) continue;
+
     }
     std::sort(ms2_features.begin(), ms2_features.end(), SpecFeature::cmpSpecIdInc);
     MsAlignWriterPtr ms2_ptr = std::make_shared<MsAlignWriter>(ms2_file_name);
@@ -211,7 +209,7 @@ namespace toppic {
 
   void Feature::get_empty_feature_map(DeconvMsPtrVec &ms1_ptr_vec, FracFeaturePtrVec &frac_features,
                                       std::vector<EnvCollection> &env_coll_list, std::vector<Feature> &features,
-                                      const FeatureParaPtr& para_ptr, EnvParaPtr env_para_ptr, MsHeaderPtr hh,
+                                      const FeatureParaPtr &para_ptr, MsHeaderPtr hh, TopfdParaPtr topfd_para_ptr,
                                       SpecFeaturePtrVec &ms2_features, PeakMatrix &peak_matrix, fdeep::model model,
                                       fdeep::model model_escore) {
     int env_coll_num = env_coll_list.size();
@@ -223,7 +221,7 @@ namespace toppic {
     int start_spec_id = env.getSpecId();
     int end_spec_id = env.getSpecId();
     EnvSet es = EnvSet(env, env_list, start_spec_id, end_spec_id, peak_matrix.get_min_inte(),
-                       env_para_ptr->ms_one_sn_ratio_);
+                       topfd_para_ptr->getMsOneSnRatio());
     env_set_list.push_back(es);
 
     EnvCollection env_coll = EnvCollection(env, env_set_list, min_charge, max_charge, start_spec_id, end_spec_id);
@@ -234,7 +232,7 @@ namespace toppic {
     env_coll.remove_peak_data(peak_matrix);
     env_coll_list.push_back(env_coll);
     FracFeaturePtr feature_ptr = getFeature(env_coll_num, ms1_ptr_vec, para_ptr->frac_id_, para_ptr->file_name_,
-                                            env_coll, peak_matrix, env_para_ptr->ms_one_sn_ratio_);
+                                            env_coll, peak_matrix, topfd_para_ptr->getMsOneSnRatio());
     feature_ptr->setPromexScore(feature.getScore());
     frac_features.push_back(feature_ptr);
     SpecFeaturePtr ms2_feature = std::make_shared<SpecFeature>(hh, feature_ptr);
@@ -244,7 +242,7 @@ namespace toppic {
 
   bool Feature::get_new_feature_map(DeconvMsPtrVec &ms1_ptr_vec, FracFeaturePtrVec &frac_features,
                                     std::vector<EnvCollection> &env_coll_list, std::vector<Feature> &features,
-                                    FeatureParaPtr para_ptr, EnvParaPtr env_para_ptr, MsHeaderPtr hh,
+                                    FeatureParaPtr para_ptr, MsHeaderPtr hh, TopfdParaPtr topfd_para_ptr,
                                     SpecFeaturePtrVec &ms2_features, PeakMatrix &peak_matrix, fdeep::model model,
                                     fdeep::model model_escore) {
     bool assigned_status = false;
@@ -256,18 +254,18 @@ namespace toppic {
     env.rm_peaks(min_mz, max_mz);
     env_set_util::comp_peak_start_end_idx(peak_matrix, env, para_ptr->mass_tole_);
     EnvCollection env_coll = env_coll_util::find_env_collection(peak_matrix, env, para_ptr,
-                                                                env_para_ptr->ms_one_sn_ratio_);
+                                                                topfd_para_ptr->getMsOneSnRatio());
     if (!env_coll.isEmpty()) {
       int env_coll_num = env_coll_list.size();
       env_coll.refine_mono_mass();
       Feature feature = Feature(env_coll, peak_matrix, model, model_escore, env_coll_num,
-                                env_para_ptr->ms_one_sn_ratio_);
+                                topfd_para_ptr->getMsOneSnRatio());
       features.push_back(feature);
       env_coll.setEcscore(feature.getScore());
       env_coll.remove_peak_data(peak_matrix);
       env_coll_list.push_back(env_coll);
       FracFeaturePtr feature_ptr = getFeature(env_coll_num, ms1_ptr_vec, para_ptr->frac_id_, para_ptr->file_name_,
-                                              env_coll, peak_matrix, env_para_ptr->ms_one_sn_ratio_);
+                                              env_coll, peak_matrix, topfd_para_ptr->getMsOneSnRatio());
       feature_ptr->setPromexScore(feature.getScore());
       frac_features.push_back(feature_ptr);
       SpecFeaturePtr ms2_feature = std::make_shared<SpecFeature>(hh, feature_ptr);
@@ -300,6 +298,9 @@ namespace toppic {
             if (ms1_id >= sf.getStartSpecId() and ms1_id <= sf.getEndSpecId()) {
               int inte_idx = ms1_id - sf.getStartSpecId();
               std::vector<double> env_intes = sf.getEnvIntes();
+              if (env_intes.size() ==
+                  0) //////////////////////////////////////////////////////////////////////////////////////// ERRORRRR
+                continue; //////////////////////////////////////////////////////////////////////////////////////// ERRORRRR
               double sf_env_inte = env_intes[inte_idx];
               if (env_inte < sf_env_inte) {
                 env_inte = sf_env_inte;
@@ -352,6 +353,9 @@ namespace toppic {
             if (ms1_id >= sf.getStartSpecId() and ms1_id <= sf.getEndSpecId()) {
               int inte_idx = ms1_id - sf.getStartSpecId();
               std::vector<double> env_intes = sf.getEnvIntes();
+              if (env_intes.size() ==
+                  0) //////////////////////////////////////////////////////////////////////////////////////// ERRORRRR
+                continue; //////////////////////////////////////////////////////////////////////////////////////// ERRORRRR
               double sf_env_inte = env_intes[inte_idx];
               double diff = isMatch(prec_mz, mz, para_ptr, shift);
               if (diff > error_tole)
@@ -412,6 +416,9 @@ namespace toppic {
             if (ms1_id >= sf.getStartSpecId() and ms1_id <= sf.getEndSpecId()) {
               int inte_idx = ms1_id - sf.getStartSpecId();
               std::vector<double> env_intes = sf.getEnvIntes();
+              if (env_intes.size() ==
+                  0) //////////////////////////////////////////////////////////////////////////////////////// ERRORRRR
+                continue; //////////////////////////////////////////////////////////////////////////////////////// ERRORRRR
               double sf_env_inte = env_intes[inte_idx];
               if (mass_diff > diff) {
                 mass_diff = diff;

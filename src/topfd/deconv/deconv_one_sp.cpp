@@ -90,7 +90,9 @@ void DeconvOneSp::preprocess() {
     for (size_t i = 0; i < peak_list.size(); i++) {
       intes.push_back(peak_list[i]->getIntensity());
     }
-    double min_inte = baseline_util::getBaseLine(intes);
+    double min_inte = 0.0;
+    if (std::accumulate(intes.begin(), intes.end(), 0.0) > 0)
+      min_inte = baseline_util::getBaseLine(intes);
     env_para_ptr_->setMinInte(min_inte, ms_level_);
   }
 }
