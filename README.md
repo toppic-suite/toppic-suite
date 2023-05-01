@@ -26,6 +26,7 @@ sudo apt install libxerces-c-dev
 sudo apt install libeigen3-dev 
 sudo apt install nlohmann-json3-dev
 
+sudo apt install libtorch
 
 # install the catch unit test framework (https://github.com/philsquared/Catch)
 sudo apt install catch
