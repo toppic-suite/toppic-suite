@@ -12,8 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include "onnx/onnxruntime_cxx_api.h"
-
 #include "topfd/common/topfd_para.hpp"
 #include "topfd/common/topfd_process.hpp"
 #include "console/topfd_argument.hpp"

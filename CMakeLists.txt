@@ -198,6 +198,8 @@ file(GLOB GUI_UTIL_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/util/*.cpp
                               
 #file(GLOB TOPCONVERT_SEARCH_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/search/duplicatematch/*.cpp)
 
+file(GLOB TOPTEST_CONSOLE_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toptest.cpp)
+
 add_executable(topfd 
   ${TOPFD_CONSOLE_SRCS} ${TOPFD_SRCS} ${COMMON_SRCS} ${PARA_SRCS} 
   ${SPEC_SRCS} ${ENV_SRCS} ${FEATURE_SRCS} ${PWIZ_SRCS} ${NOWIDE_SRCS})
@@ -220,6 +222,8 @@ add_executable(topmg
 add_executable(topdiff 
   ${TOPDIFF_CONSOLE_SRCS} ${TOPDIFF_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS} ${DIFF_SEARCH_SRCS}
   ${SEQ_SRCS} ${PARA_SRCS} ${SPEC_SRCS} ${PRSM_SRCS} ${DIFF_SRCS})
+
+add_executable(toptest ${TOPTEST_CONSOLE_SRCS})
 
 add_executable(topfd_gui ${TOPFD_GUI_SRCS} ${GUI_UTIL_SRCS})
 
@@ -324,6 +328,8 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     boost_filesystem boost_system boost_thread boost_iostreams boost_chrono
     pthread z onnxruntime)
 
+  target_link_libraries(toptest onnxruntime)
+
   target_link_libraries(topindex xerces-c boost_program_options
     boost_filesystem boost_system boost_serialization boost_thread pthread z)
 
@@ -375,7 +381,6 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   #    target_link_libraries(topfd_train xerces-c boost_program_options
   #        boost_filesystem boost_system boost_thread boost_iostreams boost_chrono pthread z)
 
-  #file(MAKE_DIRECTORY ${CMAKE_INSTALL_PREFIX}/usr/bin)
 install (TARGETS topfd topindex toppic topmg topdiff topfd_gui topindex_gui
   toppic_gui topmg_gui topdiff_gui DESTINATION bin/)
 install (DIRECTORY resources/ DESTINATION etc/toppic)
