@@ -13,6 +13,9 @@
 //limitations under the License.
 
 #include <assert.h>
+#include <algorithm>
+#include <iterator>
+
 #include "onnx/onnxruntime_cxx_api.h"
 
 #include "common/util/file_util.hpp"
@@ -26,6 +29,7 @@ namespace onnx_env_cnn {
 Ort::Env *env;
 Ort::SessionOptions *session_options;
 Ort::Session *session;
+int batch_size = 1024;
 
 void initModel(const std::string &dir_name, int thread_num) {
   std::string file_name = dir_name 
@@ -45,19 +49,47 @@ void initModel(const std::string &dir_name, int thread_num) {
   session = new Ort::Session(*env, model_path, *session_options);
 }
 
-void computeEnvScores(MatchEnvPtrVec &ori_env, PeakPtrVec &peak_list) {
-  std::vector<fdeep::tensors> tensorsL = getTensor(ori_envs, peak_list);
-  std::vector<fdeep::tensors> pred_scores = model_vec[index].predict_multi(tensorsL, false);
-  for (size_t i = 0; i < ori_envs.size(); i++) {
-      ori_envs[i]->setScore(pred_scores[i][0].get(0, 0, 0, 0, 0));
+MatchEnvPtr2D getBatchEnv(MatchEnvPtrVec &ori_envs) {
+  MatchEnvPtr2D result;
+  size_t start = 0;
+  while (start < ori_envs.size()) {
+    size_t end = start + batch_size;
+    MatchEnvPtrVec one_batch;
+    size_t idx = start;
+    while (idx < end && idx < ori_envs.size()) {
+      one_batch.push_back(ori_envs[idx]);
+      idx++;
     }
+    result.push_back(one_batch);
+    start = start + batch_size;
   }
-}
+  return result;
 }
 
-/**
+void extractTheoPeakData(EnvelopePtr &theo_env, 
+                         std::vector<double> &theo_mass,
+                         std::vector<double> &theo_intes) {
+  for (int i = 0; i < theo_env->getPeakNum(); i++) {
+    theo_mass.push_back(theo_env->getMz(i));
+    theo_intes.push_back(theo_env->getIntensity(i));
+  }
+}
+
+void getTheoEnvData(MatchEnvPtr &ori_env, std::vector<double> &theo_mass, 
+                    std::vector<double> &theo_intes,
+                    double &max_inte, double &theo_mono_mz) {
+  EnvelopePtr theo_env = ori_env->getTheoEnvPtr();
+  theo_mono_mz= theo_env->getMonoMz();
+  extractTheoPeakData(theo_env, theo_mass, theo_intes);
+  max_inte= *std::max_element(std::begin(theo_intes), std::end(theo_intes));
+  for (double & theo_inte : theo_intes) {
+    theo_inte = theo_inte / max_inte;
+  }
+}
+
 void getExpIntervaledPeakData(const PeakPtrVec &peak_list, double real_mono_mz,
-                              std::vector<double> &theo_mass, std::vector<double> &peak_mass,
+                              std::vector<double> &theo_mass, 
+                              std::vector<double> &peak_mass,
                               std::vector<double> &peak_intes) {
   double max_theo_mass = *std::max_element(std::begin(theo_mass), std::end(theo_mass));
   double min_theo_mass = *std::min_element(std::begin(theo_mass), std::end(theo_mass));
@@ -72,14 +104,92 @@ void getExpIntervaledPeakData(const PeakPtrVec &peak_list, double real_mono_mz,
   }
 }
 
-
-
-void getExpEnvData(const PeakPtrVec &peak_list, MatchEnvPtr &ori_env, std::vector<double> &theo_mass,
-                   std::vector<double> &peak_mass, std::vector<double> &peak_intes) {
+void getExpEnvData(const PeakPtrVec &peak_list, MatchEnvPtr &ori_env, 
+                   std::vector<double> &theo_mass,
+                   std::vector<double> &peak_mass, 
+                   std::vector<double> &peak_intes) {
   RealEnvPtr real_env = ori_env->getRealEnvPtr();
   double real_mono_mz = real_env->getMonoMz();
   getExpIntervaledPeakData(peak_list, real_mono_mz, theo_mass, peak_mass, peak_intes);
 }
+
+
+std::vector<float> getTensor(const PeakPtrVec &peak_list, MatchEnvPtr env) {
+  std::vector<float> result;
+  // extract theoretical mass and intensities into separate vectors
+  std::vector<double> theo_mass;
+  std::vector<double> theoIntes;
+  double max_inte;
+  double theo_mono_mz;
+  getTheoEnvData(env, theo_mass, theoIntes, max_inte, theo_mono_mz);
+
+  // extract intervaled experimental mass and intensities into separate vectors
+  std::vector<double> peak_mass;
+  std::vector<double> peak_intes;
+  getExpEnvData(peak_list, env, theo_mass, peak_mass, peak_intes);
+
+  return result;
+
+  /**
+
+    // Normalize Inte
+    // Compute max theo inte
+    double tolerance;
+
+    std::vector<std::vector<double>> matrix  = initializeMatrix(tolerance);
+
+    double min_mz = theo_mono_mz - 0.1;
+    for (size_t k = 0; k < theo_mass.size(); k++) {
+      double t_peak_mass;
+      double t_peak_inte;
+      double exp_inte;
+      double inte_diff;
+      double md;
+      extractFeature(theo_mass, theoIntes, peak_mass, peak_intes, max_inte, tolerance, k, t_peak_mass,
+                     t_peak_inte, exp_inte, inte_diff, md);
+      populateMatrix(baseline_intensity, max_inte, matrix, min_mz, t_peak_mass, t_peak_inte,
+                     exp_inte, inte_diff, md);
+    }
+
+    /// Note: Case where we have already added an experimental peak with the noise!
+    addNoisePeaksInMatrix(peak_mass, peak_intes, max_inte, matrix, min_mz);
+    generateTensors(tensorsL, matrix);
+    **/
+}
+
+
+std::vector<float> getTensorData(MatchEnvPtrVec &envs) {
+  std::vector<float> result;
+  for (size_t i = 0; i < envs.size(); i++) {
+    std::vector<float> env_result; 
+    result.insert(std::end(result), std::begin(env_result), std::end(env_result));
+  }
+  return result;
+}
+
+void computeEnvScores(MatchEnvPtrVec &ori_envs) {
+  std::sort(ori_envs.begin(), ori_envs.end(), MatchEnv::cmpScoreDec);
+  MatchEnvPtr2D batch_envs = getBatchEnv(ori_envs);
+
+  for (size_t i = 0; i < batch_envs.size(); i++) {
+    MatchEnvPtrVec envs = batch_envs[i];
+    std::vector<float> tensor_data = getTensorData(envs);
+  }
+
+  /**
+  std::vector<fdeep::tensors> tensorsL = getTensor(ori_envs, peak_list);
+  std::vector<fdeep::tensors> pred_scores = model_vec[index].predict_multi(tensorsL, false);
+  for (size_t i = 0; i < ori_envs.size(); i++) {
+      ori_envs[i]->setScore(pred_scores[i][0].get(0, 0, 0, 0, 0));
+    }
+  }
+  **/
+}
+
+/**
+
+
+
 
 void extractFeature(const std::vector<double> &theo_mass, const std::vector<double> &theo_intes,
                     const std::vector<double> &peak_mass, const std::vector<double> &peak_intes,
@@ -120,29 +230,6 @@ void extractFeature(const std::vector<double> &theo_mass, const std::vector<doub
     md = (0.02 - mass_diff)/0.02;
 }
 
-void extractTheoPeakData(EnvelopePtr &theo_env, std::vector<double> &theo_mass,
-                         std::vector<double> &theo_intes) {
-  for (int i = 0; i < theo_env->getPeakNum(); i++) {
-    theo_mass.push_back(theo_env->getMz(i));
-    theo_intes.push_back(theo_env->getIntensity(i));
-  }
-}
-
-void normalizeTheoIntens(std::vector<double> &theo_intes, double &max_inte) {
-  max_inte= *std::max_element(std::begin(theo_intes), std::end(theo_intes));
-  for (double & theo_inte : theo_intes) {
-    theo_inte = theo_inte / max_inte;
-  }
-}
-
-
-void getTheoEnvData(MatchEnvPtr &ori_env, std::vector<double> &theo_mass, std::vector<double> &theoIntes,
-                    double &max_inte, double &theo_mono_mz) {
-  EnvelopePtr theo_env = ori_env->getTheoEnvPtr();
-  theo_mono_mz= theo_env->getMonoMz();
-  extractTheoPeakData(theo_env, theo_mass, theoIntes);
-  normalizeTheoIntens(theoIntes, max_inte);
-}
 
 
 
@@ -173,15 +260,6 @@ std::vector<std::vector<double>> initializeMatrix(double &tolerance) {
   }
   return matrix;
 }
-
-void getBaseLineUsingPeaklist(PeakPtrVec &peak_list, double &baseline_intensity) {
-  std::vector<double> intes;
-  for (auto & i : peak_list) {
-    intes.push_back(i->getIntensity());
-  }
-  baseline_intensity= baseline_util::getBaseLine(intes);
-}
-
 
 void addNoisePeaksInMatrix(const std::vector<double> &peak_mass,
                            const std::vector<double> &peak_intes, double max_inte,
@@ -221,49 +299,6 @@ void generateTensors(std::vector<fdeep::tensors> &tensorsL,
 }
 
 
-std::vector<fdeep::tensors> getTensor(MatchEnvPtrVec &ori_envs, PeakPtrVec &peak_list) {
-  std::vector<fdeep::tensors> tensorsL;
-  double baseline_intensity;
-  getBaseLineUsingPeaklist(peak_list, baseline_intensity);
-  std::sort(ori_envs.begin(), ori_envs.end(), MatchEnv::cmpScoreDec);
-  for (auto & ori_env : ori_envs) {
-    // extract theoretical mass and intensities into separate vectors
-    std::vector<double> theo_mass;
-    std::vector<double> theoIntes;
-    double max_inte;
-    double theo_mono_mz;
-    getTheoEnvData(ori_env, theo_mass, theoIntes, max_inte, theo_mono_mz);
-
-    // extract intervaled experimental mass and intensities into separate vectors
-    std::vector<double> peak_mass;
-    std::vector<double> peak_intes;
-    getExpEnvData(peak_list, ori_env, theo_mass, peak_mass, peak_intes);
-
-    // Normalize Inte
-    // Compute max theo inte
-    double tolerance;
-
-    std::vector<std::vector<double>> matrix  = initializeMatrix(tolerance);
-
-    double min_mz = theo_mono_mz - 0.1;
-    for (size_t k = 0; k < theo_mass.size(); k++) {
-      double t_peak_mass;
-      double t_peak_inte;
-      double exp_inte;
-      double inte_diff;
-      double md;
-      extractFeature(theo_mass, theoIntes, peak_mass, peak_intes, max_inte, tolerance, k, t_peak_mass,
-                     t_peak_inte, exp_inte, inte_diff, md);
-      populateMatrix(baseline_intensity, max_inte, matrix, min_mz, t_peak_mass, t_peak_inte,
-                     exp_inte, inte_diff, md);
-    }
-
-    /// Note: Case where we have already added an experimental peak with the noise!
-    addNoisePeaksInMatrix(peak_mass, peak_intes, max_inte, matrix, min_mz);
-    generateTensors(tensorsL, matrix);
-  }
-  return tensorsL;
-}
 
 **/
 
