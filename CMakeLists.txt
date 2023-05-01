@@ -11,12 +11,12 @@ SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/../lib)
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   # Linux specific code
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unknown-pragmas -std=c++14 -Wl,-rpath=$ORIGIN,--disable-new-dtags -O3 -DWITHOUT_MZ5 -fPIC -DPWIZ_CONFIG_NO_CONTAINER_OUTPUT_OPERATORS")
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unknown-pragmas -std=c++14 -Wl,-rpath=$ORIGIN,--disable-new-dtags -O3 -DWITHOUT_MZ5 -fPIC")
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   # Windows specific code
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unknown-pragmas -std=c++14 -O3 -DWITHOUT_MZ5 -fPIC -fpermissive -DPWIZ_CONFIG_NO_CONTAINER_OUTPUT_OPERATORS")
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unknown-pragmas -std=c++14 -O3 -DWITHOUT_MZ5 -fPIC -fpermissive")
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
 # The options c++14 and mavx are set for the frugally-deep library
@@ -34,24 +34,19 @@ find_package(Qt5Gui)
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   # Linux specific code
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTOPPIC_LINUX")
-  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src
-                      ${CMAKE_CURRENT_SOURCE_DIR}/ext
-                      ${Qt5Widgets_INCLUDE_DIRS}
-                      ${Qt5Core_INCLUDE_DIRS}
-                      ${Qt5Gui_INCLUDE_DIRS}
-                      /usr/include/torch/csrc/api/include/
-                      )
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   # Windows specific code
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTOPPIC_WINDOWS -DWIN32")
-  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src
-                      ${CMAKE_CURRENT_SOURCE_DIR}/ext
-                      ${Qt5Widgets_INCLUDE_DIRS}
-                      ${Qt5Core_INCLUDE_DIRS}
-                      ${Qt5Gui_INCLUDE_DIRS})
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src
+                    ${CMAKE_CURRENT_SOURCE_DIR}/ext
+                    ${Qt5Widgets_INCLUDE_DIRS}
+                    ${Qt5Core_INCLUDE_DIRS}
+                    ${Qt5Gui_INCLUDE_DIRS})
+link_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib)
 
 message(STATUS "cmake cxx flags " ${CMAKE_CXX_FLAGS})
 
@@ -327,7 +322,7 @@ ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   target_link_libraries(topfd xerces-c boost_program_options
     boost_filesystem boost_system boost_thread boost_iostreams boost_chrono
-    pthread z)
+    pthread z onnxruntime)
 
   target_link_libraries(topindex xerces-c boost_program_options
     boost_filesystem boost_system boost_serialization boost_thread pthread z)
