@@ -25,7 +25,7 @@
 #include "topfd/spec/deconv_data_util.hpp"
 #include "topfd/dp/co_table.hpp"
 #include "topfd/dp/dp_a.hpp"
-#include "topfd/envcnn/env_cnn.hpp" 
+//#include "topfd/envcnn/env_cnn.hpp" 
 #include "topfd/envcnn/onnx_env_cnn.hpp" 
 #include "topfd/deconv/deconv_one_sp.hpp"
 
