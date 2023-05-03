@@ -7,11 +7,9 @@ SET(CMAKE_VERBOSE_MAKEFILE ON)
 
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../bin)
 
-SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/../lib)
-
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   # Linux specific code
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unknown-pragmas -std=c++14 -Wl,-rpath=$ORIGIN,--disable-new-dtags -O3 -DWITHOUT_MZ5 -fPIC")
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unknown-pragmas -std=c++14 -Wl,-rpath=$ORIGIN/../lib/toppic,--disable-new-dtags -O3 -DWITHOUT_MZ5 -fPIC")
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
@@ -46,7 +44,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src
                     ${Qt5Widgets_INCLUDE_DIRS}
                     ${Qt5Core_INCLUDE_DIRS}
                     ${Qt5Gui_INCLUDE_DIRS})
-link_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib)
+link_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/toppic)
 
 message(STATUS "cmake cxx flags " ${CMAKE_CXX_FLAGS})
 
@@ -198,8 +196,6 @@ file(GLOB GUI_UTIL_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/util/*.cpp
                               
 #file(GLOB TOPCONVERT_SEARCH_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/search/duplicatematch/*.cpp)
 
-file(GLOB TOPTEST_CONSOLE_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toptest.cpp)
-
 add_executable(topfd 
   ${TOPFD_CONSOLE_SRCS} ${TOPFD_SRCS} ${COMMON_SRCS} ${PARA_SRCS} 
   ${SPEC_SRCS} ${ENV_SRCS} ${FEATURE_SRCS} ${PWIZ_SRCS} ${NOWIDE_SRCS})
@@ -328,8 +324,6 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     boost_filesystem boost_system boost_thread boost_iostreams boost_chrono
     pthread z onnxruntime)
 
-  target_link_libraries(toptest onnxruntime)
-
   target_link_libraries(topindex xerces-c boost_program_options
     boost_filesystem boost_system boost_serialization boost_thread pthread z)
 
@@ -384,6 +378,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 install (TARGETS topfd topindex toppic topmg topdiff topfd_gui topindex_gui
   toppic_gui topmg_gui topdiff_gui DESTINATION bin/)
 install (DIRECTORY resources/ DESTINATION etc/toppic)
+install (DIRECTORY lib/toppic DESTINATION lib/toppic)
 
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
 

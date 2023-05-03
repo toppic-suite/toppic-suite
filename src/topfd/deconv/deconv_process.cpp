@@ -34,6 +34,7 @@
 #include "topfd/common/topfd_para.hpp"
 #include "topfd/msreader/raw_ms_writer.hpp"
 #include "topfd/envcnn/env_cnn.hpp" 
+#include "topfd/envcnn/onnx_env_cnn.hpp" 
 #include "topfd/deconv/deconv_process.hpp"
 
 namespace toppic {
@@ -135,7 +136,8 @@ void DeconvProcess::process() {
   }
 
   if (topfd_para_ptr_->isUseEnvCnn()) {
-    env_cnn::initModel(topfd_para_ptr_->getResourceDir(), topfd_para_ptr_->getThreadNum());
+    //env_cnn::initModel(topfd_para_ptr_->getResourceDir(), topfd_para_ptr_->getThreadNum());
+    onnx_env_cnn::initModel(topfd_para_ptr_->getResourceDir(), topfd_para_ptr_->getThreadNum());
   }
   if (topfd_para_ptr_->isMissingLevelOne()) {
     processSpMissingLevelOne(reader_ptr);

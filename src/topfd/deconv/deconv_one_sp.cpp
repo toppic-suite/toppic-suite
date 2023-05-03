@@ -26,6 +26,7 @@
 #include "topfd/dp/co_table.hpp"
 #include "topfd/dp/dp_a.hpp"
 #include "topfd/envcnn/env_cnn.hpp" 
+#include "topfd/envcnn/onnx_env_cnn.hpp" 
 #include "topfd/deconv/deconv_one_sp.hpp"
 
 //#include "ms/env/env_rescore.hpp"
@@ -106,7 +107,8 @@ MatchEnvPtrVec DeconvOneSp::postprocess(MatchEnvPtrVec &dp_envs) {
 
   // Obtain EnvCNN Prediction Score for MS/MS envelopes
   if (env_para_ptr_->use_env_cnn_ && ms_level_ != 1){
-    env_cnn::computeEnvScores(dp_envs, peak_list);
+    //env_cnn::computeEnvScores(dp_envs, peak_list);
+    onnx_env_cnn::computeEnvScores(peak_list, dp_envs); 
     std::sort(dp_envs.begin(), dp_envs.end(), MatchEnv::cmpScoreDec);
   }
 

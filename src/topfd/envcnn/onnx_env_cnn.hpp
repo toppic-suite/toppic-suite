@@ -24,7 +24,7 @@ namespace onnx_env_cnn {
 
   void initModel(const std::string &dir_name, int thread_num);
 
-  void computeEnvScores(MatchEnvPtrVec &ori_env, PeakPtrVec &peak_list); 
+  void computeEnvScores(PeakPtrVec &peak_list, MatchEnvPtrVec &ori_env); 
 
 }
 

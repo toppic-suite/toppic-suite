@@ -13,11 +13,17 @@
 //limitations under the License.
 
 #include <assert.h>
+
+#include <cstdlib>
 #include <algorithm>
 #include <iterator>
+#include <limits>
+#include <iostream>
+#include <cmath>
 
 #include "onnx/onnxruntime_cxx_api.h"
 
+#include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "ms/spec/baseline_util.hpp"
 #include "topfd/envcnn/onnx_env_cnn.hpp"
@@ -30,11 +36,13 @@ Ort::Env *env;
 Ort::SessionOptions *session_options;
 Ort::Session *session;
 int batch_size = 1024;
+std::vector<const char*> input_node_names = {"input"};
+std::vector<const char*> output_node_names = {"output"};
 
 void initModel(const std::string &dir_name, int thread_num) {
   std::string file_name = dir_name 
     + file_util::getFileSeparator() + "envcnn_models"
-    + file_util::getFileSeparator() + "envcnn_2_block_model.onnx";
+    + file_util::getFileSeparator() + "envcnn_two_block.onnx";
 
   env = new Ort::Env(ORT_LOGGING_LEVEL_WARNING, "env_cnn");
   session_options = new Ort::SessionOptions();
@@ -113,89 +121,21 @@ void getExpEnvData(const PeakPtrVec &peak_list, MatchEnvPtr &ori_env,
   getExpIntervaledPeakData(peak_list, real_mono_mz, theo_mass, peak_mass, peak_intes);
 }
 
-
-std::vector<float> getTensor(const PeakPtrVec &peak_list, MatchEnvPtr env) {
-  std::vector<float> result;
-  // extract theoretical mass and intensities into separate vectors
-  std::vector<double> theo_mass;
-  std::vector<double> theoIntes;
-  double max_inte;
-  double theo_mono_mz;
-  getTheoEnvData(env, theo_mass, theoIntes, max_inte, theo_mono_mz);
-
-  // extract intervaled experimental mass and intensities into separate vectors
-  std::vector<double> peak_mass;
-  std::vector<double> peak_intes;
-  getExpEnvData(peak_list, env, theo_mass, peak_mass, peak_intes);
-
-  return result;
-
-  /**
-
-    // Normalize Inte
-    // Compute max theo inte
-    double tolerance;
-
-    std::vector<std::vector<double>> matrix  = initializeMatrix(tolerance);
-
-    double min_mz = theo_mono_mz - 0.1;
-    for (size_t k = 0; k < theo_mass.size(); k++) {
-      double t_peak_mass;
-      double t_peak_inte;
-      double exp_inte;
-      double inte_diff;
-      double md;
-      extractFeature(theo_mass, theoIntes, peak_mass, peak_intes, max_inte, tolerance, k, t_peak_mass,
-                     t_peak_inte, exp_inte, inte_diff, md);
-      populateMatrix(baseline_intensity, max_inte, matrix, min_mz, t_peak_mass, t_peak_inte,
-                     exp_inte, inte_diff, md);
-    }
-
-    /// Note: Case where we have already added an experimental peak with the noise!
-    addNoisePeaksInMatrix(peak_mass, peak_intes, max_inte, matrix, min_mz);
-    generateTensors(tensorsL, matrix);
-    **/
+std::vector<std::vector<float>> initializeMatrix(int row, int col) {
+  std::vector<std::vector<float>> matrix(row);
+  for (int i = 0; i < row; i++) {
+    matrix[i] = std::vector<float>(col);
+    for (int j = 0; j < col; j++)
+      matrix[i][j] = 0;
+  }
+  return matrix;
 }
 
-
-std::vector<float> getTensorData(MatchEnvPtrVec &envs) {
-  std::vector<float> result;
-  for (size_t i = 0; i < envs.size(); i++) {
-    std::vector<float> env_result; 
-    result.insert(std::end(result), std::begin(env_result), std::end(env_result));
-  }
-  return result;
-}
-
-void computeEnvScores(MatchEnvPtrVec &ori_envs) {
-  std::sort(ori_envs.begin(), ori_envs.end(), MatchEnv::cmpScoreDec);
-  MatchEnvPtr2D batch_envs = getBatchEnv(ori_envs);
-
-  for (size_t i = 0; i < batch_envs.size(); i++) {
-    MatchEnvPtrVec envs = batch_envs[i];
-    std::vector<float> tensor_data = getTensorData(envs);
-  }
-
-  /**
-  std::vector<fdeep::tensors> tensorsL = getTensor(ori_envs, peak_list);
-  std::vector<fdeep::tensors> pred_scores = model_vec[index].predict_multi(tensorsL, false);
-  for (size_t i = 0; i < ori_envs.size(); i++) {
-      ori_envs[i]->setScore(pred_scores[i][0].get(0, 0, 0, 0, 0));
-    }
-  }
-  **/
-}
-
-/**
-
-
-
-
-void extractFeature(const std::vector<double> &theo_mass, const std::vector<double> &theo_intes,
-                    const std::vector<double> &peak_mass, const std::vector<double> &peak_intes,
+void extractFeature(const std::vector<double> &theo_masses, const std::vector<double> &theo_intes,
+                    const std::vector<double> &peak_masses, const std::vector<double> &peak_intes,
                     double max_inte, double tolerance, size_t k, double &t_peak_mass,
-                    double &t_peak_inte, double &exp_inte, double &inte_diff, double &md) {
-  t_peak_mass= theo_mass[k];
+                    double &t_peak_inte, double &exp_inte, double &md, double inte_diff) {
+  t_peak_mass= theo_masses[k];
   t_peak_inte= theo_intes[k];
   exp_inte= 0;
   inte_diff= t_peak_inte;
@@ -203,8 +143,8 @@ void extractFeature(const std::vector<double> &theo_mass, const std::vector<doub
   int exp_peak_idx = -1;
   double mass_diff;
   double old_mass_diff = std::numeric_limits<double>::max();
-  for (size_t exp_id = 0; exp_id < peak_mass.size(); exp_id++) {
-    double exp_peak = peak_mass[exp_id];
+  for (size_t exp_id = 0; exp_id < peak_masses.size(); exp_id++) {
+    double exp_peak = peak_masses[exp_id];
     mass_diff = t_peak_mass - exp_peak;
     if (mass_diff <= tolerance && mass_diff >= -tolerance) {
       if (abs(mass_diff) < abs(old_mass_diff)){
@@ -215,92 +155,153 @@ void extractFeature(const std::vector<double> &theo_mass, const std::vector<doub
   }
   mass_diff = -t_peak_mass;
   if (exp_peak_idx > -1) {
-    double exp_peak = peak_mass[exp_peak_idx];
+    double exp_peak = peak_masses[exp_peak_idx];
     exp_inte = peak_intes[exp_peak_idx] / max_inte;
     mass_diff = t_peak_mass - exp_peak;
     inte_diff = t_peak_inte - exp_inte;
   }
-
-  mass_diff = abs(mass_diff);
-  if (mass_diff == 0)
-    md = 1;
-  else if (mass_diff > 0.02)
-    md = 0;
-  else
-    md = (0.02 - mass_diff)/0.02;
+  // if mass difference is larger than 0.02, set it to
+  // 0.02 or -0.02
+  md = mass_diff;
+  if (abs(md) > 0.02) {
+    int r = std::rand() % 2;
+    if (r == 0) {
+      md = - 0.02;
+    }
+    else {
+      md = 0.02;
+    }
+  }
 }
 
-
-
-
-void populateMatrix(double baseline_intensity, double max_inte,
-                    std::vector<std::vector<double>> &matrix, double min_mz,
-                    double t_peak_mass, double t_peak_inte, double exp_inte,
-                    double inte_diff, double md) {
+void fillMatrix(std::vector<std::vector<float>> &matrix, double min_mz,
+                double t_peak_mass, double t_peak_inte, double exp_inte,
+                double mass_diff, double inte_diff) {
   int bin_index = int((t_peak_mass - min_mz) * 100);
   if (bin_index < 300 && bin_index >= 0 ){
-    matrix[bin_index][0] = t_peak_inte;
-    matrix[bin_index][1] = exp_inte;
-    matrix[bin_index][2] = md;
-    matrix[bin_index][3] = inte_diff;
-    matrix[bin_index][4] = log10(max_inte/baseline_intensity);
+    matrix[0][bin_index] = t_peak_inte;
+    matrix[1][bin_index] = exp_inte;
+    matrix[2][bin_index] = mass_diff;
+    matrix[3][bin_index] = inte_diff;
   }
 }
 
-
-std::vector<std::vector<double>> initializeMatrix(double &tolerance) {
-  tolerance= 0.02;
-  int row = 300;
-  int col = 5;
-  std::vector<std::vector<double>> matrix(row);
-  for (int i = 0; i < row; i++) {
-    matrix[i] = std::vector<double>(col);
-    for (int j = 0; j < col; j++)
-      matrix[i][j] = 0;
-  }
-  return matrix;
-}
-
-void addNoisePeaksInMatrix(const std::vector<double> &peak_mass,
-                           const std::vector<double> &peak_intes, double max_inte,
-                           std::vector<std::vector<double>> &matrix, double min_mz) {
-  for (size_t exp_id = 0; exp_id < peak_mass.size(); exp_id++) {
-    double exp_peak = peak_mass[exp_id];
+void addNoisePeaksToMatrix(std::vector<std::vector<float>> &matrix,
+                           double min_mz, double max_inte,
+                           const std::vector<double> &peak_masses,
+                           const std::vector<double> &peak_intes) {
+  for (size_t exp_id = 0; exp_id < peak_masses.size(); exp_id++) {
+    double exp_peak = peak_masses[exp_id];
     int bin_index = int((exp_peak - min_mz) * 100);
     // Evaluate Peak Condition
-    bool peak_condition = false;
-    for (int i = 0; i < 3; i++) {
-      // to accomodate +2 and -2 bins - reason tolerance of 0.02
-      if ((bin_index + i < 300) && (bin_index - i > -1) && (matrix[bin_index][1] == 0)) {
-        if (matrix[bin_index - i][0] == 0 && matrix[bin_index + i][0] == 0)
-          peak_condition = true;
-        else {
-          peak_condition = false;
-          break;
-        }
+    bool matched_peak = false;
+    // to accomodate +2 and -2 bins - reason tolerance of 0.02
+    for (int shift = -2; shift <= 2; shift++) {
+      int shifted_idx = bin_index + shift;
+      if ((shifted_idx < 300) && (shifted_idx >= 0) && (matrix[0][bin_index] != 0)) {
+        matched_peak = true;
       }
     }
-    if (peak_condition == 1)
-      matrix[bin_index][1] = (peak_intes[exp_id] / max_inte);
+    if (!matched_peak && bin_index >= 0 && bin_index < 300) {
+      matrix[1][bin_index] = (peak_intes[exp_id] / max_inte);
+    }
   }
 }
 
-void generateTensors(std::vector<fdeep::tensors> &tensorsL,
-                     const std::vector<std::vector<double>> &matrix) {
-  fdeep::tensor_shape tensor_shape(300, 5);
-  fdeep::tensor t(tensor_shape, 0.0f);
-  for (int y = 0; y < 300; ++y)
-    for (int x = 0; x < 5; ++x)
-      t.set(0, 0, 0, y, x, matrix[y][x]);
+std::vector<float> getTensor(const PeakPtrVec &peak_list, MatchEnvPtr env) {
+  std::vector<float> result;
+  // extract theoretical mass and intensities into separate vectors
+  std::vector<double> theo_masses;
+  std::vector<double> theo_intes;
+  double max_inte;
+  double theo_mono_mz;
+  getTheoEnvData(env, theo_masses, theo_intes, max_inte, theo_mono_mz);
 
-  std::vector<fdeep::tensor> tensors;
-  tensors.push_back(t);
-  tensorsL.push_back(tensors);
+  // extract intervaled experimental mass and intensities into separate vectors
+  std::vector<double> peak_masses;
+  std::vector<double> peak_intes;
+  getExpEnvData(peak_list, env, theo_masses, peak_masses, peak_intes);
+
+  // init matrix
+  size_t row = 4; 
+  size_t col = 300; 
+  std::vector<std::vector<float>> matrix  = initializeMatrix(row, col);
+
+  double tolerance = 0.02;
+
+  double min_mz = theo_mono_mz - 0.1;
+  for (size_t k = 0; k < theo_masses.size(); k++) {
+    double t_peak_mass = 0;
+    double t_peak_inte = 0;
+    double exp_inte = 0;
+    double inte_diff = 0;
+    double mass_diff = 0;
+    extractFeature(theo_masses, theo_intes, peak_masses, peak_intes, max_inte, tolerance, k, t_peak_mass,
+                   t_peak_inte, exp_inte, mass_diff, inte_diff);
+    fillMatrix(matrix, min_mz, t_peak_mass, t_peak_inte, exp_inte, mass_diff, inte_diff);
+  }
+
+  addNoisePeaksToMatrix(matrix, min_mz, max_inte, peak_masses, peak_intes);
+
+  for (size_t i = 0; i < row; i++) {
+    result.insert(std::end(result), std::begin(matrix[i]), std::end(matrix[i]));
+  }
+  return result;
 }
 
+std::vector<float> getBatchTensor(const PeakPtrVec &peak_list, MatchEnvPtrVec &envs){
+  std::vector<float> result;
+  for (size_t i = 0; i < envs.size(); i++) {
+    std::vector<float> env_result = getTensor(peak_list, envs[i]); 
+    result.insert(std::end(result), std::begin(env_result), std::end(env_result));
+  }
+  return result;
+}
 
+void predict(MatchEnvPtrVec &envs, std::vector<float> &input_tensor_values) {
+  int env_num = envs.size();
+  std::vector<int64_t> input_node_dims {env_num, 4, 300};  
+  size_t input_tensor_size; 
+  input_tensor_size = env_num * 4 * 300;  
 
-**/
+  // create input tensor object from data values
+  auto memory_info = Ort::MemoryInfo::CreateCpu(OrtArenaAllocator, OrtMemTypeDefault);
+  auto input_tensor = Ort::Value::CreateTensor<float>(memory_info,
+                                                      input_tensor_values.data(),
+                                                      input_tensor_size,
+                                                      input_node_dims.data(), 3);
+  assert(input_tensor.IsTensor());
+
+  // score model & input tensor, get back output tensor
+  auto output_tensors =
+    session->Run(Ort::RunOptions{nullptr}, input_node_names.data(),
+                 &input_tensor, 1, output_node_names.data(), 1);
+
+  // Get pointer to output tensor float values
+  float* float_arr = output_tensors.front().GetTensorMutableData<float>();
+
+  std::vector<double> pred_results;
+  for (int i = 0; i < env_num; i++) {
+    double zero = float_arr[2*i];
+    double one = float_arr[2*i+1];
+    //softmax
+    double score = std::exp(one)/ (std::exp(zero) + std::exp(one)); 
+    //LOG_DEBUG("Zero " << zero << " One " << one << " msdeconv " 
+    //  << envs[i]->getScore() << " predict " << score);  
+    envs[i]->setScore(score); 
+  }
+}
+
+void computeEnvScores(PeakPtrVec &peak_list, MatchEnvPtrVec &ori_envs) {
+  std::sort(ori_envs.begin(), ori_envs.end(), MatchEnv::cmpScoreDec);
+  MatchEnvPtr2D batch_envs = getBatchEnv(ori_envs);
+
+  for (size_t i = 0; i < batch_envs.size(); i++) {
+    MatchEnvPtrVec envs = batch_envs[i];
+    std::vector<float> tensor_data = getBatchTensor(peak_list, envs);
+    predict(envs, tensor_data);
+  }
+}
 
 }
 
