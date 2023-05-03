@@ -31,7 +31,7 @@ void write_env(std::ofstream &file, MsHeaderPtr header, MatchEnvPtr match_env) {
   file << "MS_LEVEL=" << header->getMsLevel() << std::endl;
   file << "REF_IDX=" << theo_env->getReferIdx() << std::endl;
   file << "CHARGE=" << theo_env->getCharge() << std::endl;
-  file << "SCORE=" << match_env->getScore() << std::endl;
+  file << "SCORE=" << match_env->getMsdeconvScore() << std::endl;
   file << "THEO_PEAK_NUM=" << theo_env->getPeakNum() << std::endl;
   file << "REAL_PEAK_NUM=" << (real_env->getPeakNum() - real_env->getMissPeakNum()) << std::endl;
   file << "THEO_MONO_MZ=" << theo_env->getMonoMz() << std::endl;

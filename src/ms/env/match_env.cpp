@@ -35,7 +35,7 @@ double calcNormInteScr(double intensity) {
 
 // Scoring function
 // compute matching score_ 
-void MatchEnv::compScr(EnvParaPtr env_para_ptr) {
+void MatchEnv::compMsdeconvScr(EnvParaPtr env_para_ptr) {
   if (env_para_ptr->do_mz_shift_) {
     double best_shift = findBestShift(env_para_ptr);
     theo_env_ptr_->changeMz(best_shift);
@@ -45,7 +45,7 @@ void MatchEnv::compScr(EnvParaPtr env_para_ptr) {
     double best_ratio = findBestRatio(env_para_ptr);
     theo_env_ptr_->changeIntensity(best_ratio);
   }
-  score_ = calcScrWithSftRatio(0, 1, env_para_ptr->score_error_tolerance_);
+  msdeconv_score_ = calcScrWithSftRatio(0, 1, env_para_ptr->score_error_tolerance_);
 }
 
 // search for best m/z shift 
@@ -173,8 +173,10 @@ void MatchEnv::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   xml_doc->addElement(element, "id", str.c_str());
   str = str_util::toString(mass_group_);
   xml_doc->addElement(element, "mass_group", str.c_str());
-  str = str_util::toString(score_);
-  xml_doc->addElement(element, "score", str.c_str());
+  str = str_util::toString(msdeconv_score_);
+  xml_doc->addElement(element, "msdeconv_score", str.c_str());
+  str = str_util::toString(envcnn_score_);
+  xml_doc->addElement(element, "envcnn_score", str.c_str());
   theo_env_ptr_->appendXml(xml_doc, element);
   real_env_ptr_->appendXml(xml_doc, element);
   parent->appendChild(element);

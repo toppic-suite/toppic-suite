@@ -75,7 +75,7 @@ void MsAlignWriter::write(DeconvMsPtr ms_ptr) {
     output_ << std::fixed << std::setprecision(5) << peak_ptr->getPosition();
     output_ << "\t" << std::fixed << std::setprecision(2) << peak_ptr->getIntensity();
     output_ << "\t" << peak_ptr->getCharge();
-    //output_ << "\t" << std::fixed << std::setprecision(2) << peak_ptr->getScore();
+    output_ << "\t" << std::fixed << std::setprecision(2) << peak_ptr->getScore();
     output_ << std::endl;
   }
   output_ << "END IONS" << std::endl;

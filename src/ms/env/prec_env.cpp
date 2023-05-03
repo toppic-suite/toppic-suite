@@ -134,7 +134,7 @@ MatchEnvPtr2D initMatchEnv(EnvParaPtr env_para_ptr, PeakPtrVec &peak_list,
           if (!env_filter::testRealEnvValid(env_ptr, env_para_ptr)) {
             env_ptr = nullptr;
           } else {
-            env_ptr->compScr(env_para_ptr);
+            env_ptr->compMsdeconvScr(env_para_ptr);
           }
         }
         env_ptrs[charge-1] = env_ptr;
@@ -152,8 +152,8 @@ MatchEnvPtr findBest(MatchEnvPtr2D &env_ptrs, double max_mass) {
     for (size_t j = 0; j < env_ptrs[i].size(); j++)  {
       if (env_ptrs[i][j] != nullptr && 
           env_ptrs[i][j]->getTheoEnvPtr()->getMonoNeutralMass() <= max_mass &&
-          env_ptrs[i][j]->getScore() > best_score) {
-        best_score = env_ptrs[i][j]->getScore();
+          env_ptrs[i][j]->getMsdeconvScore() > best_score) {
+        best_score = env_ptrs[i][j]->getMsdeconvScore();
         best_env = env_ptrs[i][j];
       }
     }

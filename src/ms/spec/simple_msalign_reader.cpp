@@ -187,8 +187,13 @@ void SimpleMsAlignReader::readNext() {
       strs = str_util::split(spectrum_str_vec_[i], "\t ");
       double mass = std::stod(strs[0]);
       double inte = std::stod(strs[1]);
-      int charge = std::stoi(strs[2]);
-      DeconvPeakPtr peak_ptr = std::make_shared<DeconvPeak>(id, idx, mass, inte, charge);
+      double charge = std::stoi(strs[2]);
+      double score = 1.0;
+      if (strs.size() > 3) {
+        score = std::stod(strs[3]);
+      }
+      DeconvPeakPtr peak_ptr = std::make_shared<DeconvPeak>(id, idx, mass, inte,
+                                                            charge, score);
       peak_ptr_list.push_back(peak_ptr);
       idx++;
     }

@@ -173,7 +173,8 @@ void deconvMissingMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   DeconvProcess::ms2_spec_num_++;
   count_lock.unlock();
 
-  DeconvMsPtr deconv_ms_ptr = match_env_util::getDeconvMsPtr(header_ptr, result_envs);
+  DeconvMsPtr deconv_ms_ptr = match_env_util::getDeconvMsPtr(header_ptr, result_envs,
+                                                             env_para_ptr->use_env_cnn_);
 
   boost::thread::id thread_id = boost::this_thread::get_id();
   int writer_id = pool_ptr->getId(thread_id);
@@ -320,7 +321,10 @@ void deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   prec_envs.insert(prec_envs.end(), result_envs.begin(), result_envs.end());
   LOG_DEBUG("result num " << prec_envs.size());
 
-  DeconvMsPtr deconv_ms_ptr = match_env_util::getDeconvMsPtr(header_ptr, prec_envs);
+  EnvParaPtr env_para_ptr = deconv_ptr->getEnvParaPtr();
+  DeconvMsPtr deconv_ms_ptr = match_env_util::getDeconvMsPtr(header_ptr,
+                                                             prec_envs,
+                                                             env_para_ptr->use_env_cnn_);
 
   boost::thread::id thread_id = boost::this_thread::get_id();
   int writer_id = pool_ptr->getId(thread_id);
@@ -374,7 +378,10 @@ void deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
     deconv_ptr->run();
     result_envs = deconv_ptr->getResult();
   }
-  DeconvMsPtr deconv_ms_ptr = match_env_util::getDeconvMsPtr(header_ptr, result_envs);
+
+  EnvParaPtr env_para_ptr = deconv_ptr->getEnvParaPtr();
+  DeconvMsPtr deconv_ms_ptr = match_env_util::getDeconvMsPtr(header_ptr, result_envs,
+                                                             env_para_ptr->use_env_cnn_);
 
   boost::thread::id thread_id = boost::this_thread::get_id();
   int writer_id = pool_ptr->getId(thread_id);

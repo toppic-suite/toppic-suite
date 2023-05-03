@@ -286,14 +286,12 @@ void predict(MatchEnvPtrVec &envs, std::vector<float> &input_tensor_values) {
     double one = float_arr[2*i+1];
     //softmax
     double score = std::exp(one)/ (std::exp(zero) + std::exp(one)); 
-    //LOG_DEBUG("Zero " << zero << " One " << one << " msdeconv " 
-    //  << envs[i]->getScore() << " predict " << score);  
-    envs[i]->setScore(score); 
+    envs[i]->setEnvcnnScore(score); 
+    LOG_DEBUG("Zero " << zero << " One " << one << " msdeconv " << envs[i]->getMsdeconvScore() << " predict " << score);  
   }
 }
 
 void computeEnvScores(PeakPtrVec &peak_list, MatchEnvPtrVec &ori_envs) {
-  std::sort(ori_envs.begin(), ori_envs.end(), MatchEnv::cmpScoreDec);
   MatchEnvPtr2D batch_envs = getBatchEnv(ori_envs);
 
   for (size_t i = 0; i < batch_envs.size(); i++) {

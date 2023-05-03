@@ -120,7 +120,7 @@ MatchEnvPtrVec addUnusedMasses(MatchEnvPtrVec &envs, PeakPtrVec &ms, double tole
   MatchEnvPtrVec result;
   result.insert(std::end(result), std::begin(unused_mass_envs), std::end(unused_mass_envs));
   result.insert(std::end(result), std::begin(envs), std::end(envs));
-  std::sort(result.begin(), result.end(), MatchEnv::cmpScoreDec);
+  std::sort(result.begin(), result.end(), MatchEnv::cmpMsdeconvScoreDec);
   return result;
 }
 
@@ -149,17 +149,17 @@ MatchEnvPtrVec addMultipleMass(MatchEnvPtrVec &envs, MatchEnvPtr2D &candidates,
     // we use non-overlapping envelopes here
     // Current charge stored in [ref_peak][charge-1]
     charge_envs[0] = candidates[refer_peak][charge-1];
-    double min_score = charge_envs[0]->getScore() * min_ratio;
+    double min_score = charge_envs[0]->getMsdeconvScore() * min_ratio;
     if (charge >= multi_min_charge) {
       double score_minus_one  = 0;
       // Envelope for charge - 1
       if (charge > 1 && candidates[refer_peak][charge-2] != nullptr) {
-        score_minus_one = candidates[refer_peak][charge-2]->getScore();
+        score_minus_one = candidates[refer_peak][charge-2]->getMsdeconvScore();
       }
       double score_plus_one = 0;
       // Envelope for charge + 1
       if (charge < static_cast<int>(candidates[0].size()) && candidates[refer_peak][charge] != nullptr) {
-        score_plus_one = candidates[refer_peak][charge]->getScore();
+        score_plus_one = candidates[refer_peak][charge]->getMsdeconvScore();
       }
       if (score_minus_one > score_plus_one && score_minus_one >= min_score) {
         charge_envs[1] = candidates[refer_peak][charge-2];
@@ -180,7 +180,7 @@ MatchEnvPtrVec addMultipleMass(MatchEnvPtrVec &envs, MatchEnvPtr2D &candidates,
         if (refer_idx > 0) {
           int p = real_env_ptr->getPeakIdx(refer_idx-1);
           if (p >=0 && candidates[p][charge-1] != nullptr &&
-              candidates[p][charge-1]->getScore() >= min_score) {
+              candidates[p][charge-1]->getMsdeconvScore() >= min_score) {
             mass_envs.push_back(candidates[p][charge-1]);
           }
         }
@@ -188,7 +188,7 @@ MatchEnvPtrVec addMultipleMass(MatchEnvPtrVec &envs, MatchEnvPtr2D &candidates,
         if (refer_idx < real_env_ptr->getPeakNum() - 1) {
           int p = real_env_ptr->getPeakIdx(refer_idx+1);
           if (p >=0 && candidates[p][charge-1] != nullptr &&
-              candidates[p][charge-1]->getScore() >= min_score) {
+              candidates[p][charge-1]->getMsdeconvScore() >= min_score) {
             mass_envs.push_back(candidates[p][charge-1]);
           }
         }
@@ -198,7 +198,7 @@ MatchEnvPtrVec addMultipleMass(MatchEnvPtrVec &envs, MatchEnvPtr2D &candidates,
   return mass_envs;
 }
 
-DeconvMsPtr getDeconvMsPtr(MsHeaderPtr header_ptr, MatchEnvPtrVec &envs) {
+DeconvMsPtr getDeconvMsPtr(MsHeaderPtr header_ptr, MatchEnvPtrVec &envs, bool use_env_cnn) {
   DeconvPeakPtrVec peak_list;
   int sp_id = header_ptr->getId();
   for (size_t i = 0; i < envs.size(); i++) {
@@ -207,8 +207,10 @@ DeconvMsPtr getDeconvMsPtr(MsHeaderPtr header_ptr, MatchEnvPtrVec &envs) {
     double pos = real_env->getMonoNeutralMass();
     double inte = theo_env->compIntensitySum();
     int charge = theo_env->getCharge();
-    double score = envs[i]->getScore();
-
+    double score = envs[i]->getMsdeconvScore();
+    if (use_env_cnn) {
+      score = envs[i]->getEnvcnnScore();
+    }
     DeconvPeakPtr peak_ptr = std::make_shared<DeconvPeak>(sp_id, i, pos, inte, charge, score);
     peak_list.push_back(peak_ptr);
   }

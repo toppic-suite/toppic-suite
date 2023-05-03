@@ -76,8 +76,8 @@ void filterEnvByScr(MatchEnvPtr2D &match_envs, EnvParaPtr env_para_ptr) {
   for (size_t i = 0; i < match_envs.size(); i++) {
     for (size_t j = 0; j < match_envs[i].size(); j++) {
       if (match_envs[i][j] != nullptr) {
-        match_envs[i][j]->compScr(env_para_ptr);
-        if (match_envs[i][j]->getScore() < env_para_ptr->min_match_env_score_) {
+        match_envs[i][j]->compMsdeconvScr(env_para_ptr);
+        if (match_envs[i][j]->getMsdeconvScore() < env_para_ptr->min_match_env_score_) {
           match_envs[i][j] = nullptr;
         }
       }
@@ -94,7 +94,7 @@ void filterEnvByChrg(MatchEnvPtr2D &match_envs) {
       for (int k = 2 * charge - 1; k < (int)match_envs[i].size(); k += charge) {
         if (match_envs[i][k] != nullptr
             && match_envs[i][j] != nullptr
-            && match_envs[i][k]->getScore() > match_envs[i][j]->getScore()) {
+            && match_envs[i][k]->getMsdeconvScore() > match_envs[i][j]->getMsdeconvScore()) {
           match_envs[i][j] = nullptr;
         }
       }
@@ -132,7 +132,7 @@ int compRank(int idx, int charge, MatchEnvPtr2D &match_envs,
   if (peak_idx < 0) {
     return rank;
   }
-  double score = match_envs[idx][charge - 1]->getScore();
+  double score = match_envs[idx][charge - 1]->getMsdeconvScore();
   // check left 
   int p = peak_idx - 1;
   for (p = peak_idx - 1; p >= 0; p--) {
@@ -141,7 +141,7 @@ int compRank(int idx, int charge, MatchEnvPtr2D &match_envs,
       break;
     }
     if (match_envs[p][charge - 1] != nullptr
-        && match_envs[p][charge - 1]->getScore() > score) {
+        && match_envs[p][charge - 1]->getMsdeconvScore() > score) {
       rank++;
     }
   }
@@ -152,7 +152,7 @@ int compRank(int idx, int charge, MatchEnvPtr2D &match_envs,
       break;
     }
     if (match_envs[p][charge - 1] != nullptr
-        && match_envs[p][charge - 1]->getScore() > score) {
+        && match_envs[p][charge - 1]->getMsdeconvScore() > score) {
       rank++;
     }
   }

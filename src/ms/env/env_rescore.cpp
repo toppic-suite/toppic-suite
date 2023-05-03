@@ -132,17 +132,17 @@ void rescore(MatchEnvPtr2D &match_envs, const std::vector<std::vector<double> > 
     for (size_t j = 0; j < match_envs[i].size(); j++) {
       if (match_envs[i][j] != nullptr) {
         if (match_envs[i][j]->getTheoEnvPtr()->getPeakNum() == 2) {
-          match_envs[i][j]->setScore(rankScore(match_envs[i][j],
-                                               match_envs, para[0])); 
+          match_envs[i][j]->setMsdeconvScore(rankScore(match_envs[i][j],
+                                                       match_envs, para[0])); 
         } else if (match_envs[i][j]->getTheoEnvPtr()->getPeakNum() == 3) {
-          match_envs[i][j]->setScore(rankScore(match_envs[i][j],
-                                               match_envs, para[1])); 
+          match_envs[i][j]->setMsdeconvScore(rankScore(match_envs[i][j],
+                                                       match_envs, para[1])); 
         } else if (match_envs[i][j]->getTheoEnvPtr()->getPeakNum() == 4) {
-          match_envs[i][j]->setScore(rankScore(match_envs[i][j],
-                                               match_envs, para[2])); 
+          match_envs[i][j]->setMsdeconvScore(rankScore(match_envs[i][j],
+                                                       match_envs, para[2])); 
         } else {
-          match_envs[i][j]->setScore(rankScore(match_envs[i][j],
-                                               match_envs, para[3])); 
+          match_envs[i][j]->setMsdeconvScore(rankScore(match_envs[i][j],
+                                                       match_envs, para[3])); 
         }
       } 
     }

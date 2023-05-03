@@ -207,7 +207,6 @@ std::vector<fdeep::tensors> getTensor(MatchEnvPtrVec &ori_envs, PeakPtrVec &peak
   std::vector<fdeep::tensors> tensorsL;
   double baseline_intensity;
   getBaseLineUsingPeaklist(peak_list, baseline_intensity);
-  std::sort(ori_envs.begin(), ori_envs.end(), MatchEnv::cmpScoreDec);
   for (auto & ori_env : ori_envs) {
     // extract theoretical mass and intensities into separate vectors
     std::vector<double> theo_mass;
@@ -252,7 +251,7 @@ void compute(MatchEnvPtrVec &ori_envs, PeakPtrVec &peak_list, int index) {
   if (!tensorsL.empty()) {
     std::vector<fdeep::tensors> pred_scores = model_vec[index].predict_multi(tensorsL, false);
     for (size_t i = 0; i < ori_envs.size(); i++) {
-      ori_envs[i]->setScore(pred_scores[i][0].get(0, 0, 0, 0, 0));
+      ori_envs[i]->setEnvcnnScore(pred_scores[i][0].get(0, 0, 0, 0, 0));
     }
   }
 }

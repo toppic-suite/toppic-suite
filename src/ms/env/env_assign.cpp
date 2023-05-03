@@ -35,7 +35,7 @@ MatchEnvPtr2D assignWinEnv(MatchEnvPtr2D &match_envs, int win_num,
   }
   // sort the matched envelopes and keep the best 
   for (int i = 0; i < win_num; i++) {
-    std::sort(env_list[i].begin(), env_list[i].end(), MatchEnv::cmpScoreDec); 
+    std::sort(env_list[i].begin(), env_list[i].end(), MatchEnv::cmpMsdeconvScoreDec); 
     if ((int)env_list[i].size() > env_num_per_win) {
       env_list[i].resize(env_num_per_win);
     }

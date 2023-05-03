@@ -30,10 +30,13 @@ class MatchEnv {
   MatchEnv(int mass_group, EnvelopePtr theo_env_ptr, 
            RealEnvPtr real_env_ptr);
 
-  void compScr(EnvParaPtr env_para_ptr);
+  void compMsdeconvScr(EnvParaPtr env_para_ptr);
 
-  static bool cmpScoreDec(const MatchEnvPtr &a, const MatchEnvPtr &b) { 
-    return a->getScore() > b->getScore();}
+  static bool cmpEnvcnnScoreDec(const MatchEnvPtr &a, const MatchEnvPtr &b) { 
+    return a->getEnvcnnScore() > b->getEnvcnnScore();}
+
+  static bool cmpMsdeconvScoreDec(const MatchEnvPtr &a, const MatchEnvPtr &b) { 
+    return a->getMsdeconvScore() > b->getMsdeconvScore();}
 
   double calcPeakScr(int id_x, double inte_sum, double tolerance);
 
@@ -45,9 +48,13 @@ class MatchEnv {
 
   EnvelopePtr getTheoEnvPtr() {return theo_env_ptr_;}
 
-  double getScore() {return score_;}
+  double getEnvcnnScore() {return envcnn_score_;}
 
-  void setScore(double score) {score_ = score;}
+  void setEnvcnnScore(double score) {envcnn_score_ = score;}
+
+  double getMsdeconvScore() {return msdeconv_score_;}
+
+  void setMsdeconvScore(double score) {msdeconv_score_ = score;}
 
   void setId(int id) {id_ = id;}
 
@@ -61,7 +68,8 @@ class MatchEnv {
   int id_;
   // we divide envelopes into several groups based on monoisotopic masses  
   int mass_group_;
-  double score_;
+  double msdeconv_score_;
+  double envcnn_score_;
   EnvelopePtr theo_env_ptr_;
   RealEnvPtr real_env_ptr_;
 

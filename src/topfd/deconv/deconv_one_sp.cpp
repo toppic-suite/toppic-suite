@@ -109,7 +109,7 @@ MatchEnvPtrVec DeconvOneSp::postprocess(MatchEnvPtrVec &dp_envs) {
   if (env_para_ptr_->use_env_cnn_ && ms_level_ != 1){
     //env_cnn::computeEnvScores(dp_envs, peak_list);
     onnx_env_cnn::computeEnvScores(peak_list, dp_envs); 
-    std::sort(dp_envs.begin(), dp_envs.end(), MatchEnv::cmpScoreDec);
+    std::sort(dp_envs.begin(), dp_envs.end(), MatchEnv::cmpEnvcnnScoreDec);
   }
 
   // filtering
