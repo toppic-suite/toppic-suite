@@ -9,6 +9,5 @@
 /fplus          version 0.2.10-p0  The fdeep and fplus folders are included for EnvCNN models. 
 
 /onnx           version 1.14.1
-                compilation: ./build.sh --config Release --minimal_build --build_shared_lib --parallel --cmake_extra_defines CMAKE_OSX_ARCHITECTURES=x86_64
 
 
