@@ -63,7 +63,7 @@ void RawMsReader::getMs1Peaks(PeakPtrVec2D &raw_peaks, double cur_voltage) {
     if (header_ptr == nullptr) {
       break;
     }
-    if (header_ptr->getMsLevel() == 1 && header_ptr->getVoltage() == -1) {//if not a FAIME data
+    if (header_ptr->getMsLevel() == 1 && header_ptr->getVoltage() < 0) {//if not a FAIME data
       PeakPtrVec peak_list = reader_ptr_->getPeakList();
       raw_peaks.push_back(peak_list);
     }
