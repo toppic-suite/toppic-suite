@@ -100,4 +100,29 @@ void RawMsReader::refinePrecChrg(RawMsPtr ms_one, RawMsPtr ms_two,
   }
 }
 
+void RawMsReader::getMs1Map(DeconvMsPtrVec &ms1_ptr_vec, DeconvMsPtrVec &ms2_ptr_vec, 
+                            PeakPtrVec2D &ms1_raw_peaks, std::vector<double> &ms2_prec_mzs) {
+  size_t ms1_idx = 0;
+  size_t ms2_idx = 0;
+  /*
+  while (true) {
+    reader_ptr_->readNext();
+    MsHeaderPtr header_ptr = reader_ptr_->getHeaderPtr();
+    if (header_ptr == nullptr) {
+      break;
+    }
+    if (header_ptr->getMsLevel() == 1) {
+      int scan_num
+      PeakPtrVec peak_list = reader_ptr_->getPeakList();
+      raw_peaks.push_back(peak_list);
+    } else if (header_ptr->getMsLevel() == 1 && header_ptr->getVoltage() == cur_voltage) {//FAIME data
+      PeakPtrVec peak_list = reader_ptr_->getPeakList();
+      raw_peaks.push_back(peak_list);
+    } else if (header_ptr->getMsLevel() == 2) {
+      prec_base_mz_list.push_back(header_ptr->getPrecSpMz());
+    }
+  }
+  */
+}
+
 }

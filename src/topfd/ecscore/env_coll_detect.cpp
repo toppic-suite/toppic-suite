@@ -20,6 +20,8 @@
 #include "common/util/str_util.hpp"
 #include "ms/spec/deconv_ms.hpp"
 #include "ms/spec/simple_msalign_reader.hpp"
+#include "topfd/common/topfd_para.hpp"
+#include "topfd/msreader/raw_ms_reader.hpp"
 #include "topfd/ecscore/ecscore_para.hpp"
 #include "topfd/ecscore/env_coll_detect.hpp"
 
@@ -27,23 +29,28 @@ namespace toppic {
 
 namespace env_coll_detect {
 
-void process_single_file(std::string &ms1_file_name, std::string &ms2_file_name, 
-                         double voltage) {
+void process_single_file(std::string &ms1_file_name, 
+                         std::string &ms2_file_name, 
+                         const std::string &mzml_file_name, 
+                         TopfdParaPtr para_ptr) {
+
   /// Read msalign file and get the seed envelopes.
   DeconvMsPtrVec ms1_ptr_vec;
   SimpleMsAlignReader::readMsOneSpectra(ms1_file_name, ms1_ptr_vec);
+  DeconvMsPtrVec ms2_ptr_vec;
+  SimpleMsAlignReader::readMsTwoSpectra(ms2_file_name, ms2_ptr_vec);
   LOG_DEBUG("Processed msalign file."); 
 
-  /*
   /// Read mzml data
-  RawMsReaderPtr raw_reader_ptr = std::make_shared<RawMsReader>(sp_file_name, para_ptr->getActivation(),
+  RawMsReaderPtr raw_reader_ptr = std::make_shared<RawMsReader>(mzml_file_name, para_ptr->getActivation(),
                                                                 para_ptr->getPrecWindow());
-  PeakPtrVec2D raw_peaks;
-  std::vector<double> prec_spectrum_Base_mono_mz;
-  raw_reader_ptr->getMsData(raw_peaks, prec_spectrum_Base_mono_mz, voltage);
+  PeakPtrVec2D ms1_raw_peaks;
+  std::vector<double> ms2_prec_mzs;
+  /*
+  raw_reader_ptr->getMs1MapData(ms1_ptr_vec, ms2_ptr_vec, ms1_raw_peaks, ms2_prec_mzs); 
   raw_reader_ptr = nullptr;
-  LOG_DEBUG("Processed mzML file."); 
   */
+  LOG_DEBUG("Processed mzML file."); 
 
   /**
   /// Prepare data -- seed envelopes
@@ -130,7 +137,8 @@ void process(int frac_id, const std::string &sp_file_name, TopfdParaPtr para_ptr
   std::clock_t start;
   start = std::clock();
 
-  EcscoreParaPtr ecscore_para_ptr = std::make_shared<EcscorePara>(frac_id, sp_file_name, para_ptr->getResourceDir(), para_ptr);
+  EcscoreParaPtr ecscore_para_ptr 
+    = std::make_shared<EcscorePara>(frac_id, sp_file_name, para_ptr->getResourceDir(), para_ptr);
   std::string base_name = file_util::basename(sp_file_name);
   // if FAIME Data
   if (is_faims) { 
@@ -138,15 +146,13 @@ void process(int frac_id, const std::string &sp_file_name, TopfdParaPtr para_ptr
       std::string file_num = str_util::toString(i) + "_"; 
       std::string ms1_file_name = base_name + "_" + file_num + "ms1.msalign";
       std::string ms2_file_name = base_name + "_" + file_num + "ms2.msalign";
-      double voltage = voltage_vec[i].first;
-      process_single_file(ms1_file_name, ms2_file_name, voltage);
+      process_single_file(ms1_file_name, ms2_file_name, sp_file_name, para_ptr);
     }
   }
   else {
     std::string ms1_file_name = base_name + "_" + "ms1.msalign";
     std::string ms2_file_name = base_name + "_" + "ms2.msalign";
-    double voltage = -1;
-    process_single_file(ms1_file_name, ms2_file_name, voltage);
+    process_single_file(ms1_file_name, ms2_file_name, sp_file_name, para_ptr);
   }
 
   double duration = (std::clock() - start) / (double) CLOCKS_PER_SEC;

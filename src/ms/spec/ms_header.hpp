@@ -163,7 +163,6 @@ class MsHeader {
   // retention time 
   double retention_time_ = -1;
   // precursor m/z value in the mzML file. 
-  // In Thermo data, they are monoisotpic precursor m/z value  
   double prec_sp_mz_ = -1;
   // computed monoisotopic precursor m/z value 
   double prec_mono_mz_ = -1;

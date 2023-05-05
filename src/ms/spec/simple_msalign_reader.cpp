@@ -248,4 +248,15 @@ void SimpleMsAlignReader::readMsOneSpectra(const std::string &file_name,
   }
 }
 
+void SimpleMsAlignReader::readMsTwoSpectra(const std::string &file_name, 
+                                           DeconvMsPtrVec &ms_ptr_vec) {
+  SimpleMsAlignReader sp_reader(file_name); 
+
+  DeconvMsPtr ms_ptr;
+  while ((ms_ptr = sp_reader.getNextMsPtr())!= nullptr) {
+    ms_ptr->getMsHeaderPtr()->setMsLevel(2);
+    ms_ptr_vec.push_back(ms_ptr);
+  }
+}
+
 }  // namespace toppic
