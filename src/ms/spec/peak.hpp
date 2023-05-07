@@ -36,9 +36,9 @@ class Peak {
  public:
   Peak(double position, double intensity);
 
-  double getIntensity() {return intensity_;}
+  double getIntensity() const {return intensity_;}
 
-  double getPosition() {return position_;}
+  double getPosition() const {return position_;}
 
   void setIntensity(double intensity) {intensity_ = intensity;}
 
@@ -56,8 +56,8 @@ class Peak {
     return a->getIntensity() > b->getIntensity();}
 
 private:
-  double position_;
-  double intensity_;
+  double position_ = -1;
+  double intensity_ = -1;
 };
 
 typedef std::vector<PeakPtrVec> PeakPtrVec2D;

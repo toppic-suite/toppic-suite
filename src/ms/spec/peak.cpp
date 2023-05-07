@@ -18,7 +18,7 @@
 
 namespace toppic {
 
-Peak::Peak(double position, double intensity): 
+Peak::Peak(const double position, const double intensity): 
       position_(position), 
       intensity_(intensity) {}
 

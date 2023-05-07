@@ -22,6 +22,8 @@
 #include "ms/spec/simple_msalign_reader.hpp"
 #include "topfd/common/topfd_para.hpp"
 #include "topfd/msreader/raw_ms_reader.hpp"
+#include "topfd/ecscore/spectrum/peak_matrix.hpp"
+#include "topfd/ecscore/envelope/seed_envelope.hpp"
 #include "topfd/ecscore/ecscore_para.hpp"
 #include "topfd/ecscore/env_coll_detect.hpp"
 
@@ -32,7 +34,8 @@ namespace env_coll_detect {
 void process_single_file(std::string &ms1_file_name, 
                          std::string &ms2_file_name, 
                          const std::string &mzml_file_name, 
-                         TopfdParaPtr para_ptr) {
+                         TopfdParaPtr topfd_para_ptr,
+                         EcscoreParaPtr score_para_ptr) {
 
   /// Read msalign file and get the seed envelopes.
   DeconvMsPtrVec ms1_ptr_vec;
@@ -42,30 +45,31 @@ void process_single_file(std::string &ms1_file_name,
   LOG_DEBUG("Processed msalign file."); 
 
   /// Read mzml data
-  RawMsReaderPtr raw_reader_ptr = std::make_shared<RawMsReader>(mzml_file_name, para_ptr->getActivation(),
-                                                                para_ptr->getPrecWindow());
+  RawMsReaderPtr raw_reader_ptr = std::make_shared<RawMsReader>(mzml_file_name, 
+                                                                topfd_para_ptr->getActivation(),
+                                                                topfd_para_ptr->getPrecWindow());
   PeakPtrVec2D ms1_raw_peaks;
   std::vector<double> ms2_prec_mzs;
-  /*
-  raw_reader_ptr->getMs1MapData(ms1_ptr_vec, ms2_ptr_vec, ms1_raw_peaks, ms2_prec_mzs); 
+  raw_reader_ptr->getMs1Map(ms1_ptr_vec, ms2_ptr_vec, ms1_raw_peaks, ms2_prec_mzs); 
   raw_reader_ptr = nullptr;
-  */
   LOG_DEBUG("Processed mzML file."); 
 
-  /**
   /// Prepare data -- seed envelopes
-  std::vector<SeedEnvelope> seed_envs;
+  SeedEnvelopePtrVec seed_ptrs;
   for (auto &ms1_data: ms1_ptr_vec) {
-    std::vector<DeconvPeakPtr> peaks = ms1_data->getPeakPtrVec();
-    for (auto &peak: peaks)
-      seed_envs.push_back(SeedEnvelope(peak));
+    DeconvPeakPtrVec peaks = ms1_data->getPeakPtrVec();
+    for (auto &peak: peaks) {
+      SeedEnvelopePtr seed_ptr = std::make_shared<SeedEnvelope>(peak);
+      seed_ptrs.push_back(seed_ptr);
+    }
   }
-  std::sort(seed_envs.begin(), seed_envs.end(), SeedEnvelope::cmpInteDec);
+  std::sort(seed_ptrs.begin(), seed_ptrs.end(), SeedEnvelope::cmpInteDec);
   // write_out_files::write_seed_envelopes(seed_envs, "envs.csv");
 
   /// Prepare data -- Peak Matrix
-  PeakMatrix peak_matrix = PeakMatrix(raw_peaks, ms1_ptr_vec, feature_para_ptr->bin_size_,
-                                      para_ptr->getMsOneSnRatio());
+  PeakMatrix peak_matrix = PeakMatrix(ms1_raw_peaks, ms1_ptr_vec, score_para_ptr->bin_size_,
+                                      topfd_para_ptr->getMsOneSnRatio());
+  /**
   if (feature_para_ptr->filter_neighboring_peaks_)
     peak_matrix.find_remove_non_neighbors(feature_para_ptr->neighbor_mass_tole_);
 
@@ -146,13 +150,13 @@ void process(int frac_id, const std::string &sp_file_name, TopfdParaPtr para_ptr
       std::string file_num = str_util::toString(i) + "_"; 
       std::string ms1_file_name = base_name + "_" + file_num + "ms1.msalign";
       std::string ms2_file_name = base_name + "_" + file_num + "ms2.msalign";
-      process_single_file(ms1_file_name, ms2_file_name, sp_file_name, para_ptr);
+      process_single_file(ms1_file_name, ms2_file_name, sp_file_name, para_ptr, ecscore_para_ptr);
     }
   }
   else {
     std::string ms1_file_name = base_name + "_" + "ms1.msalign";
     std::string ms2_file_name = base_name + "_" + "ms2.msalign";
-    process_single_file(ms1_file_name, ms2_file_name, sp_file_name, para_ptr);
+    process_single_file(ms1_file_name, ms2_file_name, sp_file_name, para_ptr, ecscore_para_ptr);
   }
 
   double duration = (std::clock() - start) / (double) CLOCKS_PER_SEC;
