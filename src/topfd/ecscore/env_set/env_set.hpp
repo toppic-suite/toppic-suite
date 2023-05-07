@@ -35,6 +35,10 @@ class EnvSet {
 
   int getBaseSpecId() { return xic_ptr_->getBaseSpecId(); }
 
+  ExpEnvelopePtrVec getExpEnvList() { return exp_env_list_; }
+
+  void setExpEnvList(ExpEnvelopePtrVec exp_env_list) { exp_env_list_ = exp_env_list; }
+
   XicPtr getXicPtr() { return xic_ptr_; }
 
   void setXicPtr(XicPtr xic_ptr) { xic_ptr_ = xic_ptr; }
@@ -63,9 +67,6 @@ class EnvSet {
 
   void setSeedEnv(const toppic::SeedEnvelope &seedEnv) { seed_env_ = seedEnv; }
 
-  const std::vector<ExpEnvelope> getExpEnvList() const { return exp_env_list_; }
-
-  void setExpEnvList(const std::vector<ExpEnvelope> &expEnvList) { exp_env_list_ = expEnvList; }
 
 
   std::vector<double> getXicEnvIntes() { return xic_.getInteList(); }

@@ -12,18 +12,24 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include "topfd/ecscore/spectrum/xic_peak.hpp"
+#ifndef TOPPIC_TOPFD_ECSCORE_ENV_SET_ENV_SET_UTIL_HPP
+#define TOPPIC_TOPFD_ECSCORE_ENV_SET_ENV_SET_UTIL_HPP
+
+#include <vector>
+
+#include "topfd/ecscore/env_set/env_set.hpp"
 
 namespace toppic {
 
-EnvPeak::EnvPeak(double pos, double inte):
-  Peak(pos, inte) {}
+namespace env_set_util {
 
+std::vector<double> getAggregateEnvelopeMz(EnvSetPtr env_set_ptr);
 
-EnvPeak::EnvPeak(const EnvPeakPtr p): 
-  Peak(p->getPosition(), p->getIntensity()) { 
-    start_idx_ = p->getStartIdx();
-    end_idx_ = p->getEndIdx();
-  }
+std::vector<double> getAggregateEnvelopeInte(EnvSetPtr env_set_ptr);
+
+double calcInteRatio(std::vector<double> &theo_envelope_inte, std::vector<double> &exp_envelope_inte);
 
 }
+
+}
+#endif //TOPPIC_ENV_UTIL_HPP

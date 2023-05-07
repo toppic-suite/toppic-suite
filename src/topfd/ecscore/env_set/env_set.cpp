@@ -12,6 +12,9 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include <numeric>
+
+#include "topfd/ecscore/env_set/env_set_util.hpp"
 #include "topfd/ecscore/env_set/env_set.hpp"
 
 namespace toppic {
@@ -25,7 +28,7 @@ EnvSet::EnvSet(const SeedEnvelopePtr seed_ptr, ExpEnvelopePtrVec env_list,
   initMedianXic(noise_inte, sn_ratio);
 }
 
-void EnvSet::initMedianXic(double noise_inte, double snr) {
+void EnvSet::initMedianXic(double noise_inte, double sn_ratio) {
   std::vector<double> theo_envelope_inte = seed_ptr_->getInteList();
   int refer_idx = std::max_element(theo_envelope_inte.begin(), theo_envelope_inte.end()) 
                   - theo_envelope_inte.begin();
@@ -38,30 +41,25 @@ void EnvSet::initMedianXic(double noise_inte, double snr) {
       continue;
     }
     std::vector<double> exp_envelope_inte = env->getInteList();
-    /*
-    double ratio = env_utils::calcInteRatio_scan(theo_envelope_inte, exp_envelope_inte);
-    double theoretical_peak_sum = 0;
-    theoretical_peak_sum = theoretical_peak_sum + (theo_envelope_inte[refer_idx] * ratio);
+    double ratio = env_set_util::calcInteRatio(theo_envelope_inte, exp_envelope_inte);
+    double top_three_inte = theo_envelope_inte[refer_idx] * ratio;
     if (refer_idx - 1 >= 0)
-      theoretical_peak_sum = theoretical_peak_sum + (theo_envelope_inte[refer_idx - 1] * ratio);
+      top_three_inte += theo_envelope_inte[refer_idx - 1] * ratio;
     if (refer_idx + 1 < static_cast<int>(theo_envelope_inte.size()))
-      theoretical_peak_sum = theoretical_peak_sum + (theo_envelope_inte[refer_idx + 1] * ratio);
-    inte_list.push_back(theoretical_peak_sum);
+      top_three_inte += theo_envelope_inte[refer_idx + 1] * ratio;
+    inte_list.push_back(top_three_inte);
 
     std::vector<double> scaled_theo_inte;
     for (auto inte: theo_envelope_inte) {
       double scaled_inte = inte * ratio;
-      if (scaled_inte >= (noise_inte_level * snr))
+      if (scaled_inte >= (noise_inte * sn_ratio))
         scaled_theo_inte.push_back(scaled_inte);
       else
         scaled_theo_inte.push_back(0);
     }
     env_inte_list.push_back(std::accumulate(scaled_theo_inte.begin(), scaled_theo_inte.end(), 0));
-    */
   }
-  /*
-  Xic xic = Xic(start_spec_id_, seed_env_.getSpecId(), inte_list, env_inte_list);
-  */
+  xic_ptr_ = std::make_shared<Xic>(start_spec_id_, seed_ptr_->getSpecId(), inte_list, env_inte_list);
 }
 
 void EnvSet::setSpecId(int start_spec_id, int end_spec_id) {
