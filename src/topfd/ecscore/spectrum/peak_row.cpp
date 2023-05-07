@@ -12,18 +12,16 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include "ms/spec/ms_one_map_peak.hpp"
+#include "topfd/ecscore/spectrum/peak_row.hpp"
 
 namespace toppic {
 
-MsOneMapPeak::MsOneMapPeak(double pos, double inte):
-  Peak(pos, inte) {}
-
-
-MsOneMapPeak::MsOneMapPeak(const MsOneMapPeakPtr p): 
-  Peak(p->getPosition(), p->getIntensity()) { 
-    start_idx_ = p->getStartIdx();
-    end_idx_ = p->getEndIdx();
+PeakRow::PeakRow(MatrixSpectrumPtr spec_ptr, int bin_num) {
+  spectrum_ptr_ = spec_ptr;
+  for (int i = 0; i < bin_num; i++) {
+    MatrixPeakPtrVec vec;
+    peak_ptrs_.push_back(vec);
   }
+}
 
 }

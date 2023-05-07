@@ -12,24 +12,24 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_MS_SPEC_MS_ONE_MAP_PEAK_HPP
-#define TOPPIC_MS_SPEC_MS_ONE_MAP_PEAK_HPP
+#ifndef TOPPIC_TOPFD_ECSCORE_SPECTRUM_XIC_PEAK_HPP
+#define TOPPIC_TOPFD_ECSCORE_SPECTRUM_XIC_PEAK_HPP
 
 #include "ms/spec/peak.hpp"
 
 namespace toppic {
 
-class MsOneMapPeak;
+class XicPeak;
 
-typedef std::shared_ptr<MsOneMapPeak> MsOneMapPeakPtr;
+typedef std::shared_ptr<XicPeak> XicPeakPtr;
 
-class MsOneMapPeak : public Peak {
+class XicPeak : public Peak {
  public:
-  MsOneMapPeak();
+  XicPeak();
 
-  MsOneMapPeak(double pos, double inte);
+  XicPeak(double pos, double inte);
 
-  MsOneMapPeak(const MsOneMapPeakPtr p);
+  XicPeak(const XicPeakPtr p);
 
   int getStartIdx() const { return start_idx_; }
 
@@ -39,10 +39,10 @@ class MsOneMapPeak : public Peak {
 
   void setEndIdx(int endIdx) { end_idx_ = endIdx; }
 
-  static bool cmpInteDec(MsOneMapPeakPtr a, MsOneMapPeakPtr b) {
+  static bool cmpInteDec(XicPeakPtr a, XicPeakPtr b) {
     return a->getIntensity() > b->getIntensity(); }
 
-  static bool cmpPosInc(MsOneMapPeakPtr a, MsOneMapPeakPtr b) {
+  static bool cmpPosInc(XicPeakPtr a, XicPeakPtr b) {
     return a->getPosition() < b->getPosition(); }
 
  private:
@@ -50,7 +50,7 @@ class MsOneMapPeak : public Peak {
   int end_idx_ = -1;
 };
 
-typedef std::vector<MsOneMapPeakPtr> MsOneMapPeakPtrVec;
+typedef std::vector<XicPeakPtr> XicPeakPtrVec;
 
 }
 

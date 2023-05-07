@@ -17,6 +17,7 @@
 #define TOPPIC_TOPFD_MSREADER_RAW_MS_READER_HPP_
 
 #include "ms/spec/raw_ms.hpp"
+#include "ms/spec/deconv_ms.hpp"
 #include "topfd/msreader/pw_ms_reader.hpp"
 
 namespace toppic {
@@ -34,6 +35,9 @@ class RawMsReader {
                       double max_mass, int max_charge);
 
   int getInputSpNum() {return reader_ptr_->getInputSpNum();}
+
+  void getMs1Map(DeconvMsPtrVec &ms1_ptr_vec, DeconvMsPtrVec &ms2_ptr_vec, 
+                 PeakPtrVec2D &ms1_raw_peaks, std::vector<double> &ms2_prec_mzs); 
 
  private:
   PwMsReaderPtr reader_ptr_;

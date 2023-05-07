@@ -69,14 +69,16 @@ void process_single_file(std::string &ms1_file_name,
   /// Prepare data -- Peak Matrix
   PeakMatrix peak_matrix = PeakMatrix(ms1_raw_peaks, ms1_ptr_vec, score_para_ptr->bin_size_,
                                       topfd_para_ptr->getMsOneSnRatio());
-  /**
-  if (feature_para_ptr->filter_neighboring_peaks_)
-    peak_matrix.find_remove_non_neighbors(feature_para_ptr->neighbor_mass_tole_);
+
+  if (score_para_ptr->filter_neighboring_peaks_) {
+    peak_matrix.removeNonNeighbors(score_para_ptr->neighbor_mass_tole_);
+  }
 
   /// Extract Fetures
-  std::cout << "Number of seed envelopes: " << seed_envs.size() << std::endl;
-  int seed_num = seed_envs.size();
-  int env_coll_num = 0;
+  LOG_DEBUG("Number of seed envelopes: " << seed_ptrs.size());
+  //int seed_num = seed_ptrs.size();
+  //int env_coll_num = 0;
+  /*
   std::vector<EnvCollection> env_coll_list;
   std::vector<Feature> features;
   for (int seed_env_idx = 0; seed_env_idx < seed_num; seed_env_idx++) {
@@ -107,6 +109,8 @@ void process_single_file(std::string &ms1_file_name,
       env_coll_num = env_coll_num + 1;
     }
   }
+  */
+  /**
   // map MS2 features
   SpecFeaturePtrVec ms2_features;
   Feature::assign_features(ms1_ptr_vec, ms2_file_name, frac_features, env_coll_list, features, ms2_features,

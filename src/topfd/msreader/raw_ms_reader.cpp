@@ -104,25 +104,29 @@ void RawMsReader::getMs1Map(DeconvMsPtrVec &ms1_ptr_vec, DeconvMsPtrVec &ms2_ptr
                             PeakPtrVec2D &ms1_raw_peaks, std::vector<double> &ms2_prec_mzs) {
   size_t ms1_idx = 0;
   size_t ms2_idx = 0;
-  /*
   while (true) {
     reader_ptr_->readNext();
     MsHeaderPtr header_ptr = reader_ptr_->getHeaderPtr();
     if (header_ptr == nullptr) {
       break;
     }
-    if (header_ptr->getMsLevel() == 1) {
-      int scan_num
-      PeakPtrVec peak_list = reader_ptr_->getPeakList();
-      raw_peaks.push_back(peak_list);
-    } else if (header_ptr->getMsLevel() == 1 && header_ptr->getVoltage() == cur_voltage) {//FAIME data
-      PeakPtrVec peak_list = reader_ptr_->getPeakList();
-      raw_peaks.push_back(peak_list);
-    } else if (header_ptr->getMsLevel() == 2) {
-      prec_base_mz_list.push_back(header_ptr->getPrecSpMz());
+    if (ms1_idx < ms1_ptr_vec.size() && header_ptr->getMsLevel() == 1) {
+      // read only scans in the ms1_ptr_vec
+      int scan_num = header_ptr->getFirstScanNum();
+      if (scan_num == ms1_ptr_vec[ms1_idx]->getMsHeaderPtr()->getFirstScanNum()) {
+        PeakPtrVec peak_list = reader_ptr_->getPeakList();
+        ms1_raw_peaks.push_back(peak_list);
+        ms1_idx++;
+      }
+    }   
+    if (ms2_idx < ms2_ptr_vec.size() && header_ptr->getMsLevel() == 2) {
+      int scan_num = header_ptr->getFirstScanNum();
+      if (scan_num == ms2_ptr_vec[ms2_idx]->getMsHeaderPtr()->getFirstScanNum()) {
+        ms2_prec_mzs.push_back(header_ptr->getPrecTargetMz());
+        ms2_idx++;
+      }
     }
   }
-  */
 }
 
 }
