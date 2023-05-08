@@ -46,14 +46,17 @@ class PeakMatrix {
 
   void removeNonNeighbors(double mass_tol);
 
+  int getBinIndex(double mz);
+
+  MatrixPeakPtrVec getBinPeakList(int sp_id, int bin_idx) {
+    return matrix_[sp_id]->getPeakPtrVec(bin_idx);}
+
  private:
   void initSpectrumNoiseIntensities(PeakPtrVec2D &raw_peaks);
 
   void initSpecList(DeconvMsPtrVec &ms1_ptr_vec);
 
   void initMatrix(PeakPtrVec2D &raw_peaks, double sn_ratio);
-
-  int getBinIndex(double mz);
 
   void findNeighbors(int spec_id, int search_bin_num, double mass_tol);
 
@@ -68,7 +71,9 @@ class PeakMatrix {
 
   MatrixPeakPtrVec all_peaks_;
 };
-}
 
+typedef std::shared_ptr<PeakMatrix> PeakMatrixPtr;
+
+}
 
 #endif //TOPPIC_PEAK_MATRIX_HPP

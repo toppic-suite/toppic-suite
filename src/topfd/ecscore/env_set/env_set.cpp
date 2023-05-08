@@ -67,46 +67,85 @@ void EnvSet::setSpecId(int start_spec_id, int end_spec_id) {
   end_spec_id_ = end_spec_id;
 }
 
-}
-
-/**
-
-void EnvSet::get_weight_mz_error(double *weight_sum, double *error_sum) {
-  std::vector<SimplePeak> seed_peak_list = seed_env_.getPeakList();
-  std::vector<double> inte_list = xic_.getInteList();
-  int num_exp_env = exp_env_list_.size();
-  int num_peaks_theo_env = seed_peak_list.size();
-  *weight_sum = 0;
-  *error_sum = 0;
-  for (int exp_env_id = 0; exp_env_id < num_exp_env; exp_env_id++) {
-    ExpEnvelope expEnvelope = exp_env_list_[exp_env_id];
-    if (expEnvelope.isEmpty())
-      continue;
-    std::vector<ExpPeak> exp_peak_list = expEnvelope.getExpEnvList();
-    for (int peak_idx = 0; peak_idx < num_peaks_theo_env; peak_idx++) {
-      ExpPeak peak = exp_peak_list[peak_idx];
-      if (!peak.isEmpty()) {
-        double cur_inte = seed_peak_list[peak_idx].getInte() * inte_list[exp_env_id];
-        double cur_err = peak.getPos() - seed_peak_list[peak_idx].getPos();
-        *error_sum = *error_sum + (cur_inte * cur_err);
-        *weight_sum = *weight_sum + cur_inte;
-      }
-    }
-  }
-}
-
-std::vector<double> EnvSet::comp_exp_inte_sum_list() {
-  int peak_num = seed_env_.get_peak_num();
+std::vector<double> EnvSet::compExpInteSumList() {
+  int peak_num = seed_ptr_->getPeakNum();
   std::vector<double> sum_list(peak_num, 0);
   for (auto &env: exp_env_list_) {
-    if (env.isEmpty())
+    if (env == nullptr) {
       continue;
-    std::vector<double> cur_sum_list = env.get_inte_list();
+    }
+    std::vector<double> cur_sum_list = env->getInteList();
     for (int p_i = 0; p_i < peak_num; p_i++)
       sum_list[p_i] = sum_list[p_i] + cur_sum_list[p_i];
   }
   return sum_list;
 }
+
+void EnvSet::getWeightMzError(double &weight_sum, double &error_sum) {
+  EnvSimplePeakPtrVec seed_peak_list = seed_ptr_->getPeakList();
+  std::vector<double> inte_list = xic_ptr_->getInteList();
+  int num_exp_env = exp_env_list_.size();
+  int num_peaks_theo_env = seed_peak_list.size();
+  weight_sum = 0;
+  error_sum = 0;
+  for (int exp_env_id = 0; exp_env_id < num_exp_env; exp_env_id++) {
+    ExpEnvelopePtr env_ptr = exp_env_list_[exp_env_id];
+    if (env_ptr == nullptr) {
+      continue;
+    }
+    MatrixPeakPtrVec exp_peak_list = env_ptr->getExpPeakList();
+    for (int peak_idx = 0; peak_idx < num_peaks_theo_env; peak_idx++) {
+      MatrixPeakPtr peak = exp_peak_list[peak_idx];
+      if (peak != nullptr) {
+        double cur_inte = seed_peak_list[peak_idx]->getIntensity() * inte_list[exp_env_id];
+        double cur_err = peak->getPosition() - seed_peak_list[peak_idx]->getPosition();
+        error_sum = error_sum + (cur_inte * cur_err);
+        weight_sum = weight_sum + cur_inte;
+      }
+    }
+  }
+}
+
+std::vector<std::vector<double>> EnvSet::getScaledTheoIntes(double sn_ratio, 
+                                                            double noise_inte) {
+  std::vector<std::vector<double>> intes;
+  for (auto exp_env: exp_env_list_) {
+    std::vector<double> exp_intes = exp_env->getInteList();
+    std::vector<double> theo_intes = seed_ptr_->getInteList();
+    double inte_ratio = env_set_util::calcInteRatio(theo_intes, exp_intes);
+    std::vector<double> scalled_theo_intes;
+    for (double theo_inte: theo_intes) {
+      double scaled_inte = theo_inte * inte_ratio;
+      if (scaled_inte > sn_ratio * noise_inte)
+        scalled_theo_intes.push_back(scaled_inte);
+      else
+        scalled_theo_intes.push_back(0);
+    }
+    intes.push_back(scalled_theo_intes);
+  }
+  return intes;
+}
+
+
+double EnvSet::compIntensity(double sn_ratio, double noise_inte) {
+  std::vector<std::vector<double>> intes = getScaledTheoIntes(sn_ratio, noise_inte);
+  if (intes.size() == 0)
+    return 0;
+  int peak_num = intes[0].size();
+  std::vector<double> aggregate_inte(peak_num, 0.0);
+  for (auto &sp_intes: intes)
+    for (int peak_idx = 0; peak_idx < peak_num; peak_idx++)
+      aggregate_inte[peak_idx] = aggregate_inte[peak_idx] + sp_intes[peak_idx];
+  double abundance = std::accumulate(aggregate_inte.begin(), aggregate_inte.end(), 0.0);
+  return abundance;
+}
+
+
+}
+
+/**
+
+
 
 void EnvSet::shortlistExpEnvs() {
   std::vector<double> inte_list = xic_.getInteList();
@@ -208,38 +247,6 @@ void EnvSet::refine_feature_boundary() {
 
   this->setSpecId(start, end);
   this->shortlistExpEnvs();
-}
-
-std::vector<std::vector<double>> EnvSet::get_map(double snr, double noise_inte) {
-  std::vector<std::vector<double>> map;
-  for (auto &exp_env: exp_env_list_) {
-    std::vector<double> exp_peaks = exp_env.get_inte_list();
-    std::vector<double> theo_peaks = seed_env_.get_inte_list();
-    double inte_ratio = env_utils::calcInteRatio_scan(theo_peaks, exp_peaks);
-    std::vector<double> scalled_theo_env;
-    for (double theo_peak: theo_peaks) {
-      double scaled_inte = theo_peak * inte_ratio;
-      if (scaled_inte > snr * noise_inte)
-        scalled_theo_env.push_back(scaled_inte);
-      else
-        scalled_theo_env.push_back(0);
-    }
-    map.push_back(scalled_theo_env);
-  }
-  return map;
-}
-
-double EnvSet::comp_intensity(double snr, double noise_inte) {
-  std::vector<std::vector<double>> map = this->get_map(snr, noise_inte);
-  if (map.size() == 0)
-    return 0;
-  std::vector<double> aggregate_inte(map[0].size(), 0.0);
-  int num_peaks = aggregate_inte.size();
-  for (auto &sp_map: map)
-    for (int peakIdx = 0; peakIdx < num_peaks; peakIdx++)
-      aggregate_inte[peakIdx] = aggregate_inte[peakIdx] + sp_map[peakIdx];
-  double abundance = std::accumulate(aggregate_inte.begin(), aggregate_inte.end(), 0.0);
-  return abundance;
 }
 
 void EnvSet::remove_peak_data(PeakMatrix &peakMatrix) {

@@ -24,6 +24,7 @@
 #include "topfd/msreader/raw_ms_reader.hpp"
 #include "topfd/ecscore/spectrum/peak_matrix.hpp"
 #include "topfd/ecscore/envelope/seed_envelope.hpp"
+#include "topfd/ecscore/env_coll/env_coll.hpp"
 #include "topfd/ecscore/ecscore_para.hpp"
 #include "topfd/ecscore/env_coll_detect.hpp"
 
@@ -67,25 +68,28 @@ void process_single_file(std::string &ms1_file_name,
   // write_out_files::write_seed_envelopes(seed_envs, "envs.csv");
 
   /// Prepare data -- Peak Matrix
-  PeakMatrix peak_matrix = PeakMatrix(ms1_raw_peaks, ms1_ptr_vec, score_para_ptr->bin_size_,
-                                      topfd_para_ptr->getMsOneSnRatio());
+  PeakMatrixPtr matrix_ptr = std::make_shared<PeakMatrix>(ms1_raw_peaks, ms1_ptr_vec, 
+                                                          score_para_ptr->bin_size_,
+                                                          topfd_para_ptr->getMsOneSnRatio());
 
   if (score_para_ptr->filter_neighboring_peaks_) {
-    peak_matrix.removeNonNeighbors(score_para_ptr->neighbor_mass_tole_);
+    matrix_ptr->removeNonNeighbors(score_para_ptr->neighbor_mass_tole_);
   }
 
   /// Extract Fetures
   LOG_DEBUG("Number of seed envelopes: " << seed_ptrs.size());
-  //int seed_num = seed_ptrs.size();
-  //int env_coll_num = 0;
-  /*
-  std::vector<EnvCollection> env_coll_list;
-  std::vector<Feature> features;
+  int seed_num = seed_ptrs.size();
+  int env_coll_num = 0;
+  EnvCollPtrVec env_coll_list;
+  //std::vector<Feature> features;
   for (int seed_env_idx = 0; seed_env_idx < seed_num; seed_env_idx++) {
-    if (seed_env_idx % 10000 == 0)
+    if (seed_env_idx % 10000 == 0) {
       std::cout << "\r" << "Processing peak " << seed_env_idx << " and Features found " << env_coll_num << std::flush;
-    SeedEnvelope env = seed_envs[seed_env_idx];
+    }
+    SeedEnvelopePtr seed_ptr = seed_ptrs[seed_env_idx];
     bool valid = false;
+  }
+    /*
     valid = evaluate_envelope::preprocess_env(peak_matrix, env, feature_para_ptr, para_ptr->getMsOneSnRatio());
     if (!valid) continue;
     EnvCollection env_coll = env_coll_util::find_env_collection(peak_matrix, env, feature_para_ptr, para_ptr->getMsOneSnRatio());
@@ -108,7 +112,6 @@ void process_single_file(std::string &ms1_file_name,
       frac_features.push_back(feature_ptr);
       env_coll_num = env_coll_num + 1;
     }
-  }
   */
   /**
   // map MS2 features

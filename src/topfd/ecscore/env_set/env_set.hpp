@@ -39,9 +39,20 @@ class EnvSet {
 
   void setExpEnvList(ExpEnvelopePtrVec exp_env_list) { exp_env_list_ = exp_env_list; }
 
+  SeedEnvelopePtr getSeedPtr() { return seed_ptr_; }
+
   XicPtr getXicPtr() { return xic_ptr_; }
 
   void setXicPtr(XicPtr xic_ptr) { xic_ptr_ = xic_ptr; }
+
+  std::vector<double> compExpInteSumList();
+
+  void getWeightMzError(double &cur_weight, double &cur_weight_mz_error);
+
+  std::vector<std::vector<double>> getScaledTheoIntes(double sn_ratio, 
+                                                      double noise_inte);
+
+  double compIntensity(double sn_ratio, double noise_inte);
 
   static bool cmpCharge(EnvSetPtr a, EnvSetPtr b) { return a->getCharge() < b->getCharge(); }
 
@@ -49,21 +60,17 @@ class EnvSet {
   void initMedianXic(double noise_inte_level, double sn_ratio);
 
   /*
-  void get_weight_mz_error(double *cur_weight, double *cur_weight_mz_error);
 
-  std::vector<double> comp_exp_inte_sum_list();
 
   void refine_feature_boundary();
 
   std::vector<std::vector<double>> get_map(double snr, double noise_inte);
 
-  double comp_intensity(double snr, double noise_inte);
 
   void remove_peak_data(PeakMatrix &peakMatrix);
 
   void shortlistExpEnvs();
 
-  const toppic::SeedEnvelope getSeedEnv() const { return seed_env_; }
 
   void setSeedEnv(const toppic::SeedEnvelope &seedEnv) { seed_env_ = seedEnv; }
 
@@ -90,6 +97,9 @@ class EnvSet {
   int start_spec_id_;
   int end_spec_id_;
 };
+
+typedef std::vector<EnvSetPtr> EnvSetPtrVec;
+
 }
 
 #endif //TOPPIC_ENV_SET_HPP
