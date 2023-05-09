@@ -45,12 +45,16 @@ class EnvSet {
 
   void setXicPtr(XicPtr xic_ptr) { xic_ptr_ = xic_ptr; }
 
+  std::vector<double> getTheoInteList() {return seed_ptr_->getInteList(); }
+
   std::vector<double> compExpInteSumList();
 
   void getWeightMzError(double &cur_weight, double &cur_weight_mz_error);
 
   std::vector<std::vector<double>> getScaledTheoIntes(double sn_ratio, 
                                                       double noise_inte);
+
+  void refineFeatureBoundary();
 
   double compIntensity(double sn_ratio, double noise_inte);
 
@@ -59,17 +63,17 @@ class EnvSet {
  private:
   void initMedianXic(double noise_inte_level, double sn_ratio);
 
+  void shortlistExpEnvs();
+
   /*
 
 
-  void refine_feature_boundary();
 
   std::vector<std::vector<double>> get_map(double snr, double noise_inte);
 
 
   void remove_peak_data(PeakMatrix &peakMatrix);
 
-  void shortlistExpEnvs();
 
 
   void setSeedEnv(const toppic::SeedEnvelope &seedEnv) { seed_env_ = seedEnv; }
@@ -85,7 +89,6 @@ class EnvSet {
 
   std::vector<double> get_theo_distribution_mz() { return seed_env_.get_pos_list(); }
 
-  std::vector<double> get_theo_distribution_inte() { return seed_env_.get_inte_list(); }
   */
 
 

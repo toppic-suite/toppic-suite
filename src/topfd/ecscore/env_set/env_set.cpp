@@ -14,6 +14,7 @@
 
 #include <numeric>
 
+#include "topfd/ecscore/envelope/env_util.hpp"
 #include "topfd/ecscore/env_set/env_set_util.hpp"
 #include "topfd/ecscore/env_set/env_set.hpp"
 
@@ -140,37 +141,7 @@ double EnvSet::compIntensity(double sn_ratio, double noise_inte) {
   return abundance;
 }
 
-
-}
-
-/**
-
-
-
-void EnvSet::shortlistExpEnvs() {
-  std::vector<double> inte_list = xic_.getInteList();
-  std::vector<double> smoothed_inte_list = xic_.getSmoothedInteList();
-  std::vector<double> env_inte_list = xic_.getEnvInteList();
-
-  std::vector<double> shortlisted_inte_list;
-  std::vector<double> shortlisted_smoothed_inte_list;
-  std::vector<double> shortlisted_env_inte_list;
-  int num_exp_env = exp_env_list_.size();
-  std::vector<ExpEnvelope> tmp;
-  for (int i = 0; i < num_exp_env; i++) {
-    if (exp_env_list_[i].getSpecId() >= start_spec_id_ and exp_env_list_[i].getSpecId() <= end_spec_id_) {
-      tmp.push_back(exp_env_list_[i]);
-      shortlisted_inte_list.push_back(inte_list[i]);
-      shortlisted_smoothed_inte_list.push_back(smoothed_inte_list[i]);
-      shortlisted_env_inte_list.push_back(env_inte_list[i]);
-    }
-  }
-  exp_env_list_ = tmp;
-  xic_ = Xic(exp_env_list_[0].getSpecId(), seed_env_.getSpecId(), shortlisted_inte_list,
-             shortlisted_smoothed_inte_list, shortlisted_env_inte_list);
-}
-
-double _get_left_max(int pos, std::vector<double> &y) {
+double getLeftMax(int pos, std::vector<double> &y) {
   double max_val = -100000000;
   for (int i = 0; i < pos; i++) {
     if (y[i] > max_val)
@@ -179,7 +150,7 @@ double _get_left_max(int pos, std::vector<double> &y) {
   return max_val;
 }
 
-double _get_right_max(int pos, std::vector<double> &y) {
+double getRightMax(int pos, std::vector<double> &y) {
   double max_val = -100000000;
   int vec_length = y.size();
   for (int i = pos + 1; i < vec_length; i++) {
@@ -189,29 +160,54 @@ double _get_right_max(int pos, std::vector<double> &y) {
   return max_val;
 }
 
-void EnvSet::refine_feature_boundary() {
+void EnvSet::shortlistExpEnvs() {
+  std::vector<double> inte_list = xic_ptr_->getInteList();
+  std::vector<double> smoothed_inte_list = xic_ptr_->getSmoothedInteList();
+  std::vector<double> env_inte_list = xic_ptr_->getEnvInteList();
+
+  std::vector<double> shortlisted_inte_list;
+  std::vector<double> shortlisted_smoothed_inte_list;
+  std::vector<double> shortlisted_env_inte_list;
+  int num_exp_env = exp_env_list_.size();
+  ExpEnvelopePtrVec tmp;
+  for (int i = 0; i < num_exp_env; i++) {
+    if (exp_env_list_[i]->getSpecId() >= start_spec_id_ && 
+        exp_env_list_[i]->getSpecId() <= end_spec_id_) {
+      tmp.push_back(exp_env_list_[i]);
+      shortlisted_inte_list.push_back(inte_list[i]);
+      shortlisted_smoothed_inte_list.push_back(smoothed_inte_list[i]);
+      shortlisted_env_inte_list.push_back(env_inte_list[i]);
+    }
+  }
+  exp_env_list_ = tmp;
+  xic_ptr_ = std::make_shared<Xic>(exp_env_list_[0]->getSpecId(), seed_ptr_->getSpecId(), 
+                                   shortlisted_inte_list, shortlisted_smoothed_inte_list, 
+                                   shortlisted_env_inte_list);
+}
+
+void EnvSet::refineFeatureBoundary() {
   double split_feature_intensity_ratio = 0.4;
-  int base_spec = this->seed_env_.getSpecId() - this->start_spec_id_;
-  std::vector<double> env_xic = this->xic_.getInteList();
-  std::vector<double> smoothed_env_xic = this->xic_.getSmoothedInteList();
+  int base_spec = seed_ptr_->getSpecId() - start_spec_id_;
+  std::vector<double> env_xic = xic_ptr_->getInteList();
+  std::vector<double> smoothed_env_xic = xic_ptr_->getSmoothedInteList();
 
   /// Left side
   std::vector<double> left_data(smoothed_env_xic.begin(), smoothed_env_xic.begin() + base_spec + 1);
-  std::vector<int> minima_left = utility_functions::findLocalMinima(left_data);
+  std::vector<int> minima_left = env_util::findLocalMinima(left_data);
   std::vector<double> minima_vals_left;
   for (auto m: minima_left) minima_vals_left.push_back(left_data[m]);
-  int start_split_point = this->start_spec_id_;
+  int start_split_point = start_spec_id_;
   while (!minima_vals_left.empty()) {
     int idx = std::min_element(minima_vals_left.begin(), minima_vals_left.end()) - minima_vals_left.begin();
     int pos = minima_left[idx];
     minima_vals_left.erase(minima_vals_left.begin() + idx);
-    double leftMax = _get_left_max(pos, left_data);
-    if (leftMax == 0) continue;
-    if (left_data[pos] / leftMax <= split_feature_intensity_ratio) {
+    double left_max = getLeftMax(pos, left_data);
+    if (left_max == 0) continue;
+    if (left_data[pos] / left_max <= split_feature_intensity_ratio) {
       start_split_point = start_split_point + pos;
       std::vector<double> temp_left_data(left_data.begin() + pos, left_data.end());
       left_data = temp_left_data;
-      minima_left = utility_functions::findLocalMinima(left_data);
+      minima_left = env_util::findLocalMinima(left_data);
       minima_vals_left.clear();
       for (auto m: minima_left) minima_vals_left.push_back(left_data[m]);
     }
@@ -219,7 +215,7 @@ void EnvSet::refine_feature_boundary() {
 
   /// Right side
   std::vector<double> right_data(smoothed_env_xic.begin() + base_spec, smoothed_env_xic.end());
-  std::vector<int> minima_right = utility_functions::findLocalMinima(right_data);
+  std::vector<int> minima_right = env_util::findLocalMinima(right_data);
   std::vector<double> minima_vals_right;
   for (auto m: minima_right) minima_vals_right.push_back(right_data[m]);
   int end_split_point = -1;
@@ -227,13 +223,13 @@ void EnvSet::refine_feature_boundary() {
     int idx = std::min_element(minima_vals_right.begin(), minima_vals_right.end()) - minima_vals_right.begin();
     int pos = minima_right[idx];
     minima_vals_right.erase(minima_vals_right.begin() + idx);
-    double rightMax = _get_right_max(pos, right_data);
-    if (rightMax == 0) continue;
-    if (right_data[pos] / rightMax <= split_feature_intensity_ratio) {
+    double right_max = getRightMax(pos, right_data);
+    if (right_max == 0) continue;
+    if (right_data[pos] / right_max <= split_feature_intensity_ratio) {
       end_split_point = pos;
       std::vector<double> temp_right_data(right_data.begin(), right_data.begin() + pos - 1);
       right_data = temp_right_data;
-      minima_right = utility_functions::findLocalMinima(right_data);
+      minima_right = env_util::findLocalMinima(right_data);
       minima_vals_right.clear();
       for (auto m: minima_right) minima_vals_right.push_back(right_data[m]);
     }
@@ -243,11 +239,17 @@ void EnvSet::refine_feature_boundary() {
     start = start_split_point;
   int end = this->end_spec_id_;
   if (end_split_point > -1)
-    end = seed_env_.getSpecId() + end_split_point;
+    end = seed_ptr_->getSpecId() + end_split_point;
 
-  this->setSpecId(start, end);
-  this->shortlistExpEnvs();
+  setSpecId(start, end);
+  shortlistExpEnvs();
 }
+
+}
+
+/**
+
+
 
 void EnvSet::remove_peak_data(PeakMatrix &peakMatrix) {
   std::vector<std::vector<double>> map = get_map(3.0, peakMatrix.get_min_inte());
