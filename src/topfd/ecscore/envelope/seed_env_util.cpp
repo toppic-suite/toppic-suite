@@ -15,6 +15,7 @@
 
 #include "common/util/logger.hpp"
 #include "topfd/ecscore/env_set/env_set_util.hpp"
+#include "topfd/ecscore/envelope/env_util.hpp"
 #include "topfd/ecscore/envelope/seed_env_util.hpp"
 
 namespace toppic {
@@ -31,27 +32,24 @@ bool preprocessEnv(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
   double max_mz = matrix_ptr->getMaxMz() + mass_tol;
   seed_ptr->rmPeaks(min_mz, max_mz);
   env_set_util::compPeakStartEndIdx(matrix_ptr, seed_ptr, mass_tol);
-  bool valid;
-  /*
-  bool valid = evaluate_envelope(matrix_ptr, env, mass_tol, corr_tol, sn_ratio);
-  if (env.getSpecId() >= matrix_ptr.get_spec_num()) {
-    LOG_ERROR("spec id " + std::to_string(env.getSpecId()) + " is out of range!");
+  bool valid = evalEnv(matrix_ptr, seed_ptr, mass_tol, corr_tol, sn_ratio);
+  if (seed_ptr->getSpecId() >= matrix_ptr->getSpecNum()) {
+    LOG_ERROR("spec id " + std::to_string(seed_ptr->getSpecId()) + " is out of range!");
     valid = false;
   }
-  */
   return valid;
 }
 
 bool evalEnv(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr, 
              double mass_tol, double corr_tol, double sn_ratio){
   double noise_inte = matrix_ptr->getBaseInte();
-  ExpEnvelopePtr exp_env 
+  ExpEnvelopePtr exp_env_ptr 
     = env_set_util::getMatchExpEnv(matrix_ptr, seed_ptr, seed_ptr->getSpecId(), mass_tol);
-  std::vector<double> exp_env_mass = exp_env->getPosList();
+  std::vector<double> exp_env_mass = exp_env_ptr->getPosList();
   std::vector<double> seed_env_mass = seed_ptr->getPosList();
-  std::vector<double> exp_env_inte = exp_env->getInteList();
-  std::vector<double> seed_env_inte = seed_env->getInteList();
-  int num_peaks =seed_env_inte.size();
+  std::vector<double> exp_env_inte = exp_env_ptr->getInteList();
+  std::vector<double> seed_env_inte = seed_ptr->getInteList();
+  int num_peaks = seed_env_inte.size();
   double inte_ratio = env_set_util::calcInteRatio(seed_env_inte, exp_env_inte);
   std::vector<double> scaled_theo_inte;
   for (int i = 0; i < num_peaks; i++) {
@@ -60,7 +58,7 @@ bool evalEnv(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
       scaled_inte = 0;
     scaled_theo_inte.push_back(scaled_inte);
   }
-  EnvSimplePtrVec seed_env_peaks = seed_ptr->getPeakList();
+  EnvSimplePeakPtrVec seed_env_peaks = seed_ptr->getPeakList();
   for (int j = num_peaks-1; j >= 0; j--) {
     if (scaled_theo_inte[j] == 0) {
       scaled_theo_inte.erase(scaled_theo_inte.begin() + j);
@@ -75,24 +73,31 @@ bool evalEnv(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
   return evalEnvPair(exp_env_inte, scaled_theo_inte, corr_tol);
 }
 
-/**
-
-bool toppic::evaluate_envelope::test_charge_state(int charge, std::vector<double> &seed_envelope_inte) {
-  if ((charge == 1 || charge == 2) && seed_envelope_inte.size() < 2) return false;
-  if (charge > 2 && charge < 15 && seed_envelope_inte.size() < 3) return false;
-  if (charge >= 15 && seed_envelope_inte.size() < 5) return false;
+bool testChargeState(int charge, std::vector<double> &seed_env_inte) {
+  if ((charge == 1 || charge == 2) && seed_env_inte.size() < 2) return false;
+  if (charge > 2 && charge < 15 && seed_env_inte.size() < 3) return false;
+  if (charge >= 15 && seed_env_inte.size() < 5) return false;
   return true;
 }
 
-bool toppic::evaluate_envelope::evaluate_envelope_pair(std::vector<double> &experimental_envelope_inte, std::vector<double> &theo_inte, double tol) {
+
+bool evalEnvPair(std::vector<double> &exp_env_inte, 
+                 std::vector<double> &theo_inte, double tol) {
   int num_theo_peak = 0;
-  for (auto i : theo_inte) if (i > 0) num_theo_peak++;
+  for (auto i : theo_inte) { 
+    if (i > 0) {
+      num_theo_peak++;
+    }
+  }
   if (num_theo_peak == 0) return false;
-  double corr = toppic::utility_functions::pearsonr(experimental_envelope_inte, theo_inte);
-  if (corr < tol) return false;
-  return true;
+  double corr = env_util::pearsonr(exp_env_inte, theo_inte);
+  if (corr < tol) { 
+    return false;
+  }
+  else {
+    return true;
+  }
 }
-*/
 
 }
 

@@ -24,6 +24,7 @@
 #include "topfd/msreader/raw_ms_reader.hpp"
 #include "topfd/ecscore/spectrum/peak_matrix.hpp"
 #include "topfd/ecscore/envelope/seed_envelope.hpp"
+#include "topfd/ecscore/envelope/seed_env_util.hpp"
 #include "topfd/ecscore/env_coll/env_coll.hpp"
 #include "topfd/ecscore/ecscore_para.hpp"
 #include "topfd/ecscore/env_coll_detect.hpp"
@@ -87,11 +88,11 @@ void process_single_file(std::string &ms1_file_name,
       std::cout << "\r" << "Processing peak " << seed_env_idx << " and Features found " << env_coll_num << std::flush;
     }
     SeedEnvelopePtr seed_ptr = seed_ptrs[seed_env_idx];
-    bool valid = false;
+    bool valid = seed_env_util::preprocessEnv(matrix_ptr, seed_ptr, 
+                                              score_para_ptr, topfd_para_ptr->getMsOneSnRatio());
+    if (!valid) continue;
   }
     /*
-    valid = evaluate_envelope::preprocess_env(peak_matrix, env, feature_para_ptr, para_ptr->getMsOneSnRatio());
-    if (!valid) continue;
     EnvCollection env_coll = env_coll_util::find_env_collection(peak_matrix, env, feature_para_ptr, para_ptr->getMsOneSnRatio());
     if (!env_coll.isEmpty()) {
       if (env_coll_util::check_in_existing_features(peak_matrix, env_coll, env_coll_list, feature_para_ptr))
