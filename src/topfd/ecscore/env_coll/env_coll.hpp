@@ -49,9 +49,9 @@ class EnvColl {
 
   EnvSetPtr getSeedEnvSet();
 
-  SeedEnvelopePtr getSeedEnv() { return seed_ptr_; }
+  SeedEnvelopePtr getSeedPtr() { return seed_ptr_; }
 
-  void setSeedEnv(SeedEnvelopePtr seed_ptr) { seed_ptr_ = seed_ptr; }
+  void setSeedPtr(SeedEnvelopePtr seed_ptr) { seed_ptr_ = seed_ptr; }
 
   EnvSetPtrVec getEnvSetList() { return env_set_list_; }
 

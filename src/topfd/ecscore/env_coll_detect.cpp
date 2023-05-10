@@ -26,6 +26,7 @@
 #include "topfd/ecscore/envelope/seed_envelope.hpp"
 #include "topfd/ecscore/envelope/seed_env_util.hpp"
 #include "topfd/ecscore/env_coll/env_coll.hpp"
+#include "topfd/ecscore/env_coll/env_coll_util.hpp"
 #include "topfd/ecscore/ecscore_para.hpp"
 #include "topfd/ecscore/env_coll_detect.hpp"
 
@@ -91,14 +92,15 @@ void process_single_file(std::string &ms1_file_name,
     bool valid = seed_env_util::preprocessEnv(matrix_ptr, seed_ptr, 
                                               score_para_ptr, topfd_para_ptr->getMsOneSnRatio());
     if (!valid) continue;
-  }
-    /*
-    EnvCollection env_coll = env_coll_util::find_env_collection(peak_matrix, env, feature_para_ptr, para_ptr->getMsOneSnRatio());
-    if (!env_coll.isEmpty()) {
-      if (env_coll_util::check_in_existing_features(peak_matrix, env_coll, env_coll_list, feature_para_ptr))
+    EnvCollPtr env_coll_ptr = env_coll_util::findEnvColl(matrix_ptr, seed_ptr,
+                                                         score_para_ptr, topfd_para_ptr->getMsOneSnRatio());
+    if (env_coll_ptr != nullptr) {
+      if (env_coll_util::checkExistingFeatures(matrix_ptr, env_coll_ptr,
+                                               env_coll_list, score_para_ptr))
         continue;
-      env_coll.refine_mono_mass();
+      env_coll_ptr->refineMonoMass();
 
+      /*
       Feature feature = Feature(env_coll, peak_matrix, model, model_escore, env_coll_num,
                                 para_ptr->getMsOneSnRatio());
       if (feature.getScore() < para_ptr->getECScore()) continue;
@@ -112,8 +114,9 @@ void process_single_file(std::string &ms1_file_name,
       feature_ptr->setPromexScore(feature.getScore());
       frac_features.push_back(feature_ptr);
       env_coll_num = env_coll_num + 1;
+      */
     }
-  */
+  }
   /**
   // map MS2 features
   SpecFeaturePtrVec ms2_features;

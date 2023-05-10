@@ -25,15 +25,15 @@ namespace toppic {
 
 namespace env_coll_util {
 
-EnvCollPtr fineEnvColl(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
+EnvCollPtr findEnvColl(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
                        EcscoreParaPtr para_ptr, double sn_ratio);
 
 EnvSetPtrVec getChargeEnvList(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr env_ptr, 
                               EnvSetPtr env_set_ptr, EcscoreParaPtr para_ptr, 
                               double sn_ratio);
 
-bool checkExistingFeature(PeakMatrixPtr matrix_ptr, EnvCollPtr coll_ptr, 
-                          EnvCollPtrVec &env_coll_list, EcscoreParaPtr para_ptr);
+bool checkExistingFeatures(PeakMatrixPtr matrix_ptr, EnvCollPtr coll_ptr, 
+                           EnvCollPtrVec &env_coll_list, EcscoreParaPtr para_ptr);
 
 }
 }

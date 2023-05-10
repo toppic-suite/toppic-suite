@@ -13,17 +13,19 @@
 //limitations under the License.
 
 #include "common/base/mass_constant.hpp"
+#include "ms/spec/peak_util.hpp"
 #include "topfd/ecscore/spectrum/env_simple_peak.hpp"
 #include "topfd/ecscore/envelope/seed_envelope.hpp"
 
 namespace toppic {
 
-EnvelopePtr get_theo_env(double mono_mass, int charge, double mono_mz) {
+EnvelopePtr getTheoEnv(double mono_mass, int charge) {
   EnvelopePtr ref_env_ptr = toppic::EnvBase::getStaticEnvByMonoMass(mono_mass);
   if (ref_env_ptr == nullptr) {
     return nullptr;
   }
-  toppic::EnvelopePtr theo_env_ptr = ref_env_ptr->distrToTheoMono(mono_mz, charge);
+  double mono_mz = peak_util::compMz(mono_mass, charge);
+  EnvelopePtr theo_env_ptr = ref_env_ptr->distrToTheoMono(mono_mz, charge);
   return theo_env_ptr;
 }
 
@@ -34,7 +36,7 @@ SeedEnvelope::SeedEnvelope(DeconvPeakPtr peak_ptr) {
   pos_ = peak_ptr->getMonoMz();
   inte_ = peak_ptr->getIntensity();
   charge_ = peak_ptr->getCharge();
-  EnvelopePtr theo_env_ptr = get_theo_env(mass_, charge_, pos_);
+  EnvelopePtr theo_env_ptr = getTheoEnv(mass_, charge_);
   for (int j = 0; j < theo_env_ptr->getPeakNum(); j++) {
     EnvSimplePeakPtr p_ptr = std::make_shared<EnvSimplePeak>(theo_env_ptr->getMz(j), 
                                                            theo_env_ptr->getIntensity(j));
@@ -44,15 +46,15 @@ SeedEnvelope::SeedEnvelope(DeconvPeakPtr peak_ptr) {
 
 SeedEnvelope::SeedEnvelope(MsHeaderPtr header_ptr) {
   spec_id_ = header_ptr->getMsOneId();
-  env_id_ = 0;
+  env_id_ = -1;
   mass_ = header_ptr->getPrecMonoMass();
   pos_ = header_ptr->getPrecMonoMz();
   inte_ = header_ptr->getPrecInte();
   charge_ = header_ptr->getPrecCharge();
-  EnvelopePtr theo_env_ptr = get_theo_env(mass_, charge_, pos_);
+  EnvelopePtr theo_env_ptr = getTheoEnv(mass_, charge_);
   for (int j = 0; j < theo_env_ptr->getPeakNum(); j++) {
     EnvSimplePeakPtr p_ptr = std::make_shared<EnvSimplePeak>(theo_env_ptr->getMz(j), 
-                                                           theo_env_ptr->getIntensity(j));
+                                                             theo_env_ptr->getIntensity(j));
     peak_ptr_list_.push_back(p_ptr);
   }
 }
@@ -79,12 +81,28 @@ SeedEnvelope::SeedEnvelope(SeedEnvelopePtr env_ptr) {
   mass_ = env_ptr->mass_;
   inte_ = env_ptr->inte_;
   charge_ = env_ptr->charge_;
-  for (auto &i: env_ptr->peak_ptr_list_) {
-    EnvSimplePeakPtr p_ptr = std::make_shared<EnvSimplePeak>(i->getPosition(), 
-                                                           i->getIntensity()); 
+  EnvelopePtr theo_env_ptr = getTheoEnv(mass_, charge_);
+  for (int j = 0; j < theo_env_ptr->getPeakNum(); j++) {
+    EnvSimplePeakPtr p_ptr = std::make_shared<EnvSimplePeak>(theo_env_ptr->getMz(j), 
+                                                           theo_env_ptr->getIntensity(j));
     peak_ptr_list_.push_back(p_ptr);
   }
 }
+
+SeedEnvelope::SeedEnvelope(SeedEnvelopePtr env_ptr, int new_charge) {
+  spec_id_ = env_ptr->spec_id_;
+  env_id_ = -1; 
+  mass_ = env_ptr->mass_;
+  inte_ = env_ptr->inte_;
+  charge_ = new_charge;
+  pos_ = peak_util::compMz(mass_, charge_);
+  for (auto &i: env_ptr->peak_ptr_list_) {
+    EnvSimplePeakPtr p_ptr = std::make_shared<EnvSimplePeak>(i->getPosition(), 
+                                                             i->getIntensity()); 
+    peak_ptr_list_.push_back(p_ptr);
+  }
+}
+
 
 std::vector<double> SeedEnvelope::getPosList() {
   std::vector<double> pos_list;

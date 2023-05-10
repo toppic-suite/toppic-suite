@@ -12,6 +12,7 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include "topfd/ecscore/env_set/env_set.hpp"
 #include "topfd/ecscore/env_set/env_set_util.hpp"
 
 namespace toppic {
@@ -260,88 +261,85 @@ bool checkValidEnvSetSeedEnvSparse(PeakMatrixPtr matrix_ptr, EnvSetPtr env_set_p
 }
 
 
-}
-
-}
 
 
-/*
 EnvSetPtr findEnvSet(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr, 
                      int start_spec_id, int end_spec_id, 
                      EcscoreParaPtr para_ptr, double sn_ratio) {
 
   double noise_inte_level = matrix_ptr->getBaseInte();
-  ExpEnvelope empty_exp_env = ExpEnvelope();
-  std::vector<double> theo_envelope_inte = env.get_inte_list();
+  std::vector<double> theo_envelope_inte = seed_ptr->getInteList();
   int num_theo_env_peaks = theo_envelope_inte.size();
   int refer_idx = std::max_element(theo_envelope_inte.begin(), theo_envelope_inte.end()) - theo_envelope_inte.begin();
-  int base_idx = env.getSpecId();
+  int base_idx = seed_ptr->getSpecId();
   int miss_num = 0;
 
-  std::vector<ExpEnvelope> back_env_list;
+  ExpEnvelopePtrVec back_env_list;
   for (int idx = base_idx; idx >= start_spec_id; idx--) {
-    ExpEnvelope exp_env = env_set_ptr_util::get_match_exp_env(matrix_ptr, env, idx, para_ptr->mass_tole_);
-    std::vector<double> experimental_envelope_inte = exp_env.get_inte_list();
-    double inte_ratio = env_utils::calcInteRatio_scan(theo_envelope_inte, experimental_envelope_inte);
+    ExpEnvelopePtr exp_env = env_set_util::getMatchExpEnv(matrix_ptr, seed_ptr, 
+                                                          idx, para_ptr->mass_tole_);
+    std::vector<double> experimental_envelope_inte = exp_env->getInteList();
+    double inte_ratio = calcInteRatio(theo_envelope_inte, experimental_envelope_inte);
     for (int i = 0; i < num_theo_env_peaks; i++) {
       double peak_inte = theo_envelope_inte[i];
       if ((inte_ratio * peak_inte) < (noise_inte_level * sn_ratio))
-        exp_env.setExpEnvListPeak(ExpPeak(), i);
+        exp_env->setPeakPtr(i, nullptr); 
     }
     back_env_list.push_back(exp_env);
-    if (exp_env.get_match_peak_num(refer_idx) < para_ptr->max_miss_peak_)
+    if (exp_env->getMatchPeakNum(refer_idx) < para_ptr->max_miss_peak_)
       miss_num = miss_num + 1;
     else
       miss_num = 0;
     if (miss_num >=  para_ptr->max_miss_env_)
       break;
   }
-  env_set_ptr_util::remove_non_match_envs(back_env_list, refer_idx);
+  removeNonMatchEnvs(back_env_list, refer_idx);
 
-  std::vector<ExpEnvelope> forw_env_list;
+  ExpEnvelopePtrVec forw_env_list;
   for (int idx = base_idx + 1; idx <= end_spec_id; idx++) {
-    ExpEnvelope exp_env = env_set_ptr_util::get_match_exp_env(matrix_ptr, env, idx,  para_ptr->mass_tole_);
-    std::vector<double> experimental_envelope_inte = exp_env.get_inte_list();
-    double inte_ratio = env_utils::calcInteRatio_scan(theo_envelope_inte, experimental_envelope_inte);
+    ExpEnvelopePtr exp_env = env_set_util::getMatchExpEnv(matrix_ptr, seed_ptr, idx,  para_ptr->mass_tole_);
+    std::vector<double> experimental_envelope_inte = exp_env->getInteList();
+    double inte_ratio = calcInteRatio(theo_envelope_inte, experimental_envelope_inte);
     for (int i = 0; i < num_theo_env_peaks; i++) {
       double peak_inte = theo_envelope_inte[i];
       if ((inte_ratio * peak_inte) < (noise_inte_level * sn_ratio))
-        exp_env.setExpEnvListPeak(ExpPeak(), i);
+        exp_env->setPeakPtr(i, nullptr); 
     }
     forw_env_list.push_back(exp_env);
-    if (exp_env.get_match_peak_num(refer_idx) <  para_ptr->max_miss_peak_)
+    if (exp_env->getMatchPeakNum(refer_idx) <  para_ptr->max_miss_peak_)
       miss_num = miss_num + 1;
     else
       miss_num = 0;
     if (miss_num >= para_ptr->max_miss_env_)
       break;
   }
-  env_set_ptr_util::remove_non_match_envs(forw_env_list, refer_idx);
+  removeNonMatchEnvs(forw_env_list, refer_idx);
   // merge
   std::reverse(back_env_list.begin(), back_env_list.end());
   back_env_list.insert(back_env_list.end(), forw_env_list.begin(), forw_env_list.end());
-  if (back_env_list.empty()) return EnvSet();
-  start_spec_id = back_env_list[0].getSpecId();
-  end_spec_id = back_env_list[back_env_list.size() - 1].getSpecId();
-  if ((end_spec_id - start_spec_id + 1) < 2) return EnvSet();
-  EnvSet env_set_ptr = EnvSet(env, back_env_list, start_spec_id, end_spec_id, noise_inte_level, sn_ratio);
+  if (back_env_list.empty()) return nullptr;
+  start_spec_id = back_env_list[0]->getSpecId();
+  end_spec_id = back_env_list[back_env_list.size() - 1]->getSpecId();
+  if ((end_spec_id - start_spec_id + 1) < 2) return nullptr;
+  EnvSetPtr env_set_ptr = std::make_shared<EnvSet>(seed_ptr, back_env_list, 
+                                                   start_spec_id, end_spec_id, 
+                                                   noise_inte_level, sn_ratio);
   return env_set_ptr;
 }
-*/
 
-
-
-/*
-
-bool check_valid_env_set_ptr(PeakMatrix& matrix_ptr, EnvSet& env_set_ptr) {
+bool checkValidEnvSet(PeakMatrixPtr matrix_ptr, EnvSetPtr env_set_ptr) {
   bool valid = true;
   int elems = 0;
-  std::vector<double> env_xic = env_set_ptr.getXicEnvIntes();
+  std::vector<double> env_xic = env_set_ptr->getXicEnvInteList();
   for (double inte : env_xic)
     if (inte > 0) elems++;
   if (elems < 2) valid = false;
   return valid;
 }
 
+}
 
-*/
+}
+
+
+

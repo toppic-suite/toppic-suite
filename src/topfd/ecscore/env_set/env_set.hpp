@@ -45,6 +45,8 @@ class EnvSet {
 
   void setXicPtr(XicPtr xic_ptr) { xic_ptr_ = xic_ptr; }
 
+  std::vector<double> getXicEnvInteList() { return xic_ptr_->getInteList(); }
+
   std::vector<double> getSeedInteList() {return seed_ptr_->getInteList(); }
 
   std::vector<double> getSeedMzList() {return seed_ptr_->getPosList(); }

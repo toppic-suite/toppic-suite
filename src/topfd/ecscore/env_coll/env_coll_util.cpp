@@ -23,8 +23,18 @@
 namespace toppic {
 namespace env_coll_util {
 
-/*
-bool checkChargeStateDist(const std::vector<int> &parent_charge_states, int charge_state) {
+void mergeOverlappingChargeFeatures(EnvCollPtr f, EnvCollPtr env_coll) {
+  std::vector<int> parent_charge_states = f->getChargeList();
+  EnvSetPtrVec esl = f->getEnvSetList();
+  for (auto &feature: env_coll->getEnvSetList())
+    if (std::count(parent_charge_states.begin(), parent_charge_states.end(),
+                   feature->getCharge()))
+      esl.push_back(feature);
+  f->setEnvSetList(esl);
+}
+
+bool checkChargeStateDist(const std::vector<int> &parent_charge_states, 
+                          int charge_state) {
   int min_charge_diff = std::numeric_limits<int>::max();
   for (auto parent_charge_state: parent_charge_states) {
     int charge_diff = std::abs(charge_state - parent_charge_state);
@@ -39,17 +49,8 @@ bool checkChargeStateDist(const std::vector<int> &parent_charge_states, int char
   }
 }
 
-void mergeOverlappingChargeFeatures(EnvCollPtr f, EnvCollPtr env_coll) {
-  std::vector<int> parent_charge_states = f->getChargeList();
-  EnvSetPtrVec esl = f->getEnvSetList();
-  for (auto &feature: env_coll->getEnvSetList())
-    if (std::count(parent_charge_states.begin(), parent_charge_states.end(),
-                   feature->getCharge()))
-      esl.push_back(feature);
-  f->setEnvSetList(esl);
-}
 
-bool checkOverlap(MatrixSpecPtrVec &spectrum_list, EnvCollPtr f, 
+bool checkOverlap(MatrixSpectrumPtrVec &spectrum_list, EnvCollPtr f, 
                   double feature_start_rt, 
                   double feature_end_rt, double time_tol) {
   int start_spec_id = f->getStartSpecId();
@@ -89,7 +90,7 @@ bool checkExistingFeatures(PeakMatrixPtr matrix_ptr, EnvCollPtr env_coll_ptr,
   double isotope_mass = mass_constant::getIsotopeMass();
   std::vector<double> extended_masses = {env_mass - isotope_mass, env_mass, env_mass + isotope_mass};
   int num_env_colls = env_coll_list.size();
-  MatrixSpectrumPtrVec spectrum_list = matrix_ptr->getSpectraList();
+  MatrixSpectrumPtrVec spectrum_list = matrix_ptr->getSpecList();
   int start_spec_id = env_coll_ptr->getStartSpecId();
   int end_spec_id = env_coll_ptr->getEndSpecId();
   double feature_start_rt = spectrum_list[start_spec_id]->getRt();
@@ -98,7 +99,7 @@ bool checkExistingFeatures(PeakMatrixPtr matrix_ptr, EnvCollPtr env_coll_ptr,
   std::vector<int> selected_features;
   for (int i = 0; i < num_env_colls; i++) {
     bool overlap = checkOverlap(spectrum_list, env_coll_list[i], feature_start_rt, feature_end_rt, 
-                     para_ptr->time_overlap_tole_); 
+                                para_ptr->time_overlap_tole_); 
     if (overlap) {
       double min_mass_diff = std::numeric_limits<double>::max();
       for (auto ext_mass: extended_masses) {
@@ -115,7 +116,7 @@ bool checkExistingFeatures(PeakMatrixPtr matrix_ptr, EnvCollPtr env_coll_ptr,
   for (auto f_idx: selected_features) {
     EnvCollPtr f = env_coll_list[f_idx];
     std::vector<int> parent_charge_states = f->getChargeList();
-    for (auto charge_state: neighborFeatureList_charge_states) {
+    for (auto charge_state: charge_states) {
       status = checkChargeStateDist(parent_charge_states, charge_state);
       if (std::count(parent_charge_states.begin(), parent_charge_states.end(), charge_state))
         overlap_charge = true;
@@ -135,7 +136,6 @@ bool checkExistingFeatures(PeakMatrixPtr matrix_ptr, EnvCollPtr env_coll_ptr,
   }
   return false;
 }
-*/
 
 EnvSetPtrVec getChargeEnvList(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
                               EnvSetPtr env_set_ptr, EcscoreParaPtr para_ptr, 
@@ -146,8 +146,7 @@ EnvSetPtrVec getChargeEnvList(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr
   int charge = seed_ptr->getCharge() - 1;
   int miss_num = 0;
   while (charge >= para_ptr->para_min_charge_) {
-    /*
-    SeedEnvelopePtr cur_seed_ptr = seed_ptr->getNewChargeEnv(charge);
+    SeedEnvelopePtr cur_seed_ptr = std::make_shared<SeedEnvelope>(seed_ptr, charge); 
     env_set_util::compPeakStartEndIdx(matrix_ptr, cur_seed_ptr, 
                                       para_ptr->mass_tole_);
     EnvSetPtr env_set_ptr = env_set_util::findEnvSet(matrix_ptr, cur_seed_ptr, 
@@ -167,14 +166,12 @@ EnvSetPtrVec getChargeEnvList(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr
     }
     if (miss_num >= para_ptr->max_miss_charge_)
       break;
-      */
   }
 
-  /*
   miss_num = 0;
   charge = seed_ptr->getCharge() + 1;
   while (charge <= para_ptr->para_max_charge_) {
-    SeedEnvelopePtr cur_seed_ptr = env.getNewChargeEnv(charge);
+    SeedEnvelopePtr cur_seed_ptr = std::make_shared<SeedEnvelope>(seed_ptr, charge); 
     env_set_util::compPeakStartEndIdx(matrix_ptr, cur_seed_ptr, para_ptr->mass_tole_);
     EnvSetPtr env_set_ptr = env_set_util::findEnvSet(matrix_ptr, cur_seed_ptr, 
                                                      start_spec_id, end_spec_id, 
@@ -194,7 +191,6 @@ EnvSetPtrVec getChargeEnvList(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr
     if (miss_num >= para_ptr->max_miss_charge_)
       break;
   }
-  */
   std::sort(env_set_list.begin(), env_set_list.end(), EnvSet::cmpCharge);
   return env_set_list;
 }
@@ -238,19 +234,19 @@ EnvCollPtr findEnvColl(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
   }
   EnvSetPtrVec env_set_list = getChargeEnvList(matrix_ptr, seed_ptr,
                                                env_set_ptr, para_ptr, sn_ratio);
-  /*
-  env_set_list.push_back(top_peak_env_set);
+  env_set_list.push_back(env_set_ptr);
   std::sort(env_set_list.begin(), env_set_list.end(), EnvSet::cmpCharge);
-  int min_charge = env_set_list[0].getCharge();
-  int max_charge = env_set_list[env_set_list.size() - 1].getCharge();
-  if (env_set_list.empty())
-    return EnvCollection();
+  int min_charge = env_set_list[0]->getCharge();
+  int max_charge = env_set_list[env_set_list.size() - 1]->getCharge();
+  if (env_set_list.empty()) {
+    return nullptr;
+  }
   int start_spec_id = env_set_ptr->getStartSpecId();
   int end_spec_id = env_set_ptr->getEndSpecId();
-  EnvCollection env_coll = EnvCollection(env, env_set_list, min_charge, max_charge, start_spec_id, end_spec_id);
-  return env_coll;
-  */
-  return nullptr;
+  EnvCollPtr env_coll_ptr = std::make_shared<EnvColl>(seed_ptr, env_set_list, 
+                                                      min_charge, max_charge, 
+                                                      start_spec_id, end_spec_id);
+  return env_coll_ptr;
 }
 
 }

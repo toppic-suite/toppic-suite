@@ -40,6 +40,8 @@ class SeedEnvelope {
 
   SeedEnvelope(SeedEnvelopePtr env_ptr);
 
+  SeedEnvelope(SeedEnvelopePtr env_ptr, int new_charge);
+
   SeedEnvelope(MsHeaderPtr header_ptr);
 
   std::vector<double> getPosList();
