@@ -224,7 +224,7 @@ EnvSetPtr getEnvSet(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
 
 bool checkValidEnvSetSeedEnv(PeakMatrixPtr matrix_ptr, EnvSetPtr env_set_ptr, 
                              int max_miss_peak) {
-  std::vector<double> theo_env_inte = env_set_ptr->getTheoInteList();
+  std::vector<double> theo_env_inte = env_set_ptr->getSeedInteList();
   int refer_idx = std::max_element(theo_env_inte.begin(), theo_env_inte.end()) - theo_env_inte.begin();
   int base_idx = env_set_ptr->getBaseSpecId();
   int start_idx = std::max(base_idx-1, 0);
@@ -241,7 +241,7 @@ bool checkValidEnvSetSeedEnv(PeakMatrixPtr matrix_ptr, EnvSetPtr env_set_ptr,
 
 bool checkValidEnvSetSeedEnvSparse(PeakMatrixPtr matrix_ptr, EnvSetPtr env_set_ptr, 
                                    int max_miss_peak) {
-  std::vector<double> theo_env_inte = env_set_ptr->getTheoInteList();
+  std::vector<double> theo_env_inte = env_set_ptr->getSeedInteList();
   int refer_idx = std::max_element(theo_env_inte.begin(), theo_env_inte.end()) - theo_env_inte.begin();
   int base_idx = env_set_ptr->getBaseSpecId();
   int start_idx = std::max(base_idx-2, 0);

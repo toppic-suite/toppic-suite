@@ -44,7 +44,7 @@ class ExpEnvelope {
 
   MatrixPeakPtrVec getExpPeakList() { return peak_list_; }
 
-  void setExpEnvList(const MatrixPeakPtrVec &peak_list) {peak_list_ = peak_list; }
+  void setExpPeakList(const MatrixPeakPtrVec &peak_list) {peak_list_ = peak_list; }
 
   void setPeakPtr(int idx, MatrixPeakPtr peak_ptr) { peak_list_[idx] = peak_ptr; }
 

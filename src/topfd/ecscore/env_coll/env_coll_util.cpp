@@ -15,7 +15,9 @@
 #include <numeric>
 
 #include "common/base/mass_constant.hpp"
+#include "topfd/ecscore/envelope/env_util.hpp"
 #include "topfd/ecscore/env_set/env_set_util.hpp"
+#include "topfd/ecscore/score/component_score.hpp"
 #include "topfd/ecscore/env_coll/env_coll_util.hpp"
 
 namespace toppic {
@@ -133,16 +135,18 @@ bool checkExistingFeatures(PeakMatrixPtr matrix_ptr, EnvCollPtr env_coll_ptr,
   }
   return false;
 }
+*/
 
-EnvSetPtrVec getChargeEnvList(MatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
+EnvSetPtrVec getChargeEnvList(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
                               EnvSetPtr env_set_ptr, EcscoreParaPtr para_ptr, 
                               double sn_ratio) {
   int start_spec_id = env_set_ptr->getStartSpecId();
   int end_spec_id = env_set_ptr->getEndSpecId();
   EnvSetPtrVec env_set_list;
-  int charge = env.getCharge() - 1;
+  int charge = seed_ptr->getCharge() - 1;
   int miss_num = 0;
   while (charge >= para_ptr->para_min_charge_) {
+    /*
     SeedEnvelopePtr cur_seed_ptr = seed_ptr->getNewChargeEnv(charge);
     env_set_util::compPeakStartEndIdx(matrix_ptr, cur_seed_ptr, 
                                       para_ptr->mass_tole_);
@@ -163,8 +167,10 @@ EnvSetPtrVec getChargeEnvList(MatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
     }
     if (miss_num >= para_ptr->max_miss_charge_)
       break;
+      */
   }
 
+  /*
   miss_num = 0;
   charge = seed_ptr->getCharge() + 1;
   while (charge <= para_ptr->para_max_charge_) {
@@ -188,10 +194,10 @@ EnvSetPtrVec getChargeEnvList(MatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
     if (miss_num >= para_ptr->max_miss_charge_)
       break;
   }
+  */
   std::sort(env_set_list.begin(), env_set_list.end(), EnvSet::cmpCharge);
   return env_set_list;
 }
-*/
 
 EnvCollPtr findEnvColl(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
                        EcscoreParaPtr para_ptr, double sn_ratio) {
@@ -210,30 +216,37 @@ EnvCollPtr findEnvColl(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
                                                        para_ptr->max_miss_peak_))
         return nullptr;
   }
-  /*
-  double even_odd_peak_ratios = component_score::get_agg_odd_even_peak_ratio(top_peak_env_set);
-  if (std::abs(even_odd_peak_ratios) > para_ptr->even_odd_ratio_cutoff_) {
-    env = utility_functions::test_half_charge_state(peak_matrix, env, top_peak_env_set, even_odd_peak_ratios, para_ptr, sn_ratio);
-    if (env.isEmpty())
-      return EnvCollection();
-    EnvSet tmp_peak_env_set = env_set_util::get_env_set(peak_matrix, env, para_ptr, sn_ratio);
-    if (!tmp_peak_env_set.isEmpty()) {
-      top_peak_env_set = tmp_peak_env_set;
-      top_peak_env_set.refine_feature_boundary();
-      if (!env_set_util::check_valid_env_set_seed_env(peak_matrix, top_peak_env_set, para_ptr->max_miss_peak_))
-        return EnvCollection();
-    } else
-      return EnvCollection();
+  double even_odd_peak_ratio = component_score::getAggOddEvenPeakRatio(env_set_ptr);
+  if (std::abs(even_odd_peak_ratio) > para_ptr->even_odd_ratio_cutoff_) {
+    SeedEnvelopePtr new_seed_ptr = env_util::testHalfChargeState(matrix_ptr, seed_ptr,
+                                                                 env_set_ptr, even_odd_peak_ratio, 
+                                                                 para_ptr, sn_ratio);
+    if (new_seed_ptr == nullptr) {
+      return nullptr;
+    }
+    EnvSetPtr tmp_env_set_ptr = env_set_util::getEnvSet(matrix_ptr, new_seed_ptr, 
+                                                        para_ptr, sn_ratio);
+    if (tmp_env_set_ptr == nullptr) {
+      return nullptr;
+    }
+    env_set_ptr = tmp_env_set_ptr; 
+    env_set_ptr->refineFeatureBoundary();
+    if (!env_set_util::checkValidEnvSetSeedEnv(matrix_ptr, env_set_ptr,
+                                               para_ptr->max_miss_peak_)) {
+      return nullptr; 
+    }
   }
-  int start_spec_id = top_peak_env_set.getStartSpecId();
-  int end_spec_id = top_peak_env_set.getEndSpecId();
-  std::vector<EnvSet> env_set_list = get_charge_env_list(peak_matrix, env, top_peak_env_set, para_ptr, sn_ratio);
+  EnvSetPtrVec env_set_list = getChargeEnvList(matrix_ptr, seed_ptr,
+                                               env_set_ptr, para_ptr, sn_ratio);
+  /*
   env_set_list.push_back(top_peak_env_set);
   std::sort(env_set_list.begin(), env_set_list.end(), EnvSet::cmpCharge);
   int min_charge = env_set_list[0].getCharge();
   int max_charge = env_set_list[env_set_list.size() - 1].getCharge();
   if (env_set_list.empty())
     return EnvCollection();
+  int start_spec_id = env_set_ptr->getStartSpecId();
+  int end_spec_id = env_set_ptr->getEndSpecId();
   EnvCollection env_coll = EnvCollection(env, env_set_list, min_charge, max_charge, start_spec_id, end_spec_id);
   return env_coll;
   */

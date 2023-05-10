@@ -12,6 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include "ms/spec/peak_util.hpp"
+#include "topfd/ecscore/envelope/seed_env_util.hpp"
 #include "topfd/ecscore/envelope/env_util.hpp"
 
 namespace toppic {
@@ -61,42 +63,44 @@ std::vector<int> findLocalMaxima(std::vector<double> &arr) {
   return maxima;
 }
 
-/*
-toppic::SeedEnvelope get_half_charge_env(SeedEnvelope &env, double even_odd_peak_ratios) {
-  double mass = env.getMass();
-  int charge = env.getCharge();
-  double mz = env_utils::get_mz(mass, charge);
-  std::vector<double> distribution = env.get_pos_list();
-  if (even_odd_peak_ratios < 0)
+SeedEnvelopePtr getHalfChargeEnv(SeedEnvelopePtr seed_ptr, 
+                                 double even_odd_peak_ratio) {
+  double mass = seed_ptr->getMass();
+  int charge = seed_ptr->getCharge();
+  double mz = peak_util::compMz(mass, charge);
+  std::vector<double> distribution = seed_ptr->getPosList();
+  if (even_odd_peak_ratio < 0)
     mz = mz + (distribution[1] - distribution[0]);
   int new_charge = int(charge / 2);
   if (new_charge == 0)
     new_charge = new_charge + 1;
-  double new_mass = env_utils::get_mass(mz, new_charge);
+  double new_mass = peak_util::compPeakNeutralMass(mz, new_charge);
   // get a reference distribution based on the base mass
   EnvelopePtr ref_env_ptr = EnvBase::getStaticEnvByMonoMass(new_mass);
-  if (ref_env_ptr == nullptr) return SeedEnvelope();
+  if (ref_env_ptr == nullptr) return nullptr; 
   EnvelopePtr theo_env_ptr = ref_env_ptr->distrToTheoMono(mz, new_charge);
   std::vector<double> env_peaks_mz, env_peaks_inte;
   for (int i = 0; i < theo_env_ptr->getPeakNum(); i++) {
     env_peaks_mz.push_back(theo_env_ptr->getMz(i));
     env_peaks_inte.push_back(theo_env_ptr->getIntensity(i));
   }
-  SeedEnvelope sp_peak = SeedEnvelope(env.getSpecId(), env.getEnvId(), env.getPos(), new_mass, env.getInte(),
+  SeedEnvelopePtr sp_peak =
+    std::make_shared<SeedEnvelope>(seed_ptr->getSpecId(), seed_ptr->getEnvId(), 
+                                   seed_ptr->getPos(), new_mass, seed_ptr->getInte(),
                                       new_charge, env_peaks_mz, env_peaks_inte);
   return sp_peak;
 }
 
-toppic::SeedEnvelope test_half_charge_state(PeakMatrix &peak_matrix, SeedEnvelope &env, EnvSet &top_peak_env_set,
-                                            double even_odd_peak_ratios, FeatureParaPtr para_ptr, double sn_ratio) {
-  SeedEnvelope half_charge_env = get_half_charge_env(env, even_odd_peak_ratios);
+SeedEnvelopePtr testHalfChargeState(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr, 
+                                    EnvSetPtr env_set_ptr, double even_odd_peak_ratio, 
+                                    EcscoreParaPtr para_ptr, double sn_ratio) {
+  SeedEnvelopePtr half_charge_seed = getHalfChargeEnv(seed_ptr, even_odd_peak_ratio);
   bool valid = false;
-  valid = evaluate_envelope::preprocess_env(peak_matrix, half_charge_env, para_ptr, sn_ratio);
+  valid = seed_env_util::preprocessEnv(matrix_ptr, half_charge_seed, para_ptr, sn_ratio);
   if (!valid)
-    return SeedEnvelope();
-  return half_charge_env;
+    return nullptr;
+  return half_charge_seed;
 }
-*/
 
 }
 }
