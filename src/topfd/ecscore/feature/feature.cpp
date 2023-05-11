@@ -17,7 +17,8 @@
 
 namespace toppic {
 
-Feature::Feature(EnvCollPtr env_coll_ptr, PeakMatrixPtr matrix_ptr, int feature_id, double inte) {
+Feature::Feature(EnvCollPtr env_coll_ptr, PeakMatrixPtr matrix_ptr, 
+                 int feature_id, double inte) {
   SeedEnvelopePtr seed_ptr = env_coll_ptr->getSeedPtr();
   MatrixSpectrumPtrVec spec_list = matrix_ptr->getSpecList();
   EnvSetPtr env_set_ptr = env_coll_ptr->getSeedEnvSet();
@@ -30,12 +31,14 @@ Feature::Feature(EnvCollPtr env_coll_ptr, PeakMatrixPtr matrix_ptr, int feature_
   rep_charge_ = seed_ptr->getCharge();
   rep_mz_ = seed_ptr->getPos();
   abundance_ = inte;
-  /*
-  min_elution_time_ = spec_list[start_spec_id]->getRT() / 60.0;
-  max_elution_time_ = env_coll.get_max_elution_time(spectra_list) / 60.0;
-  apex_elution_time_ = env_coll.get_apex_elution_time(spectra_list) / 60.0;
-  elution_length_ = env_coll.get_elution_length(spectra_list) / 60.0;
-  */
+
+  double scan_max_rt = spec_list[spec_list.size()-1]->getRt();
+
+  min_elution_time_ = spec_list[min_scan_]->getRt() / scan_max_rt;
+  max_elution_time_ = spec_list[max_scan_]->getRt() / scan_max_rt; 
+  int seed_scan = seed_ptr->getSpecId();
+  apex_elution_time_ = spec_list[seed_scan]->getRt() / scan_max_rt;
+  elution_length_ = (max_elution_time_ - min_elution_time_) /scan_max_rt; 
 
   percent_matched_peaks_ = 0;
   intensity_correlation_ = 0;

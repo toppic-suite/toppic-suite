@@ -86,14 +86,16 @@ void process_single_file(std::string &ms1_file_name,
   //std::vector<Feature> features;
   for (int seed_env_idx = 0; seed_env_idx < seed_num; seed_env_idx++) {
     if (seed_env_idx % 10000 == 0) {
-      std::cout << "\r" << "Processing peak " << seed_env_idx << " and Features found " << env_coll_num << std::flush;
+      std::cout << "\r" << "Processing peak " 
+        << seed_env_idx << " and Features found " << env_coll_num << std::flush;
     }
     SeedEnvelopePtr seed_ptr = seed_ptrs[seed_env_idx];
     bool valid = seed_env_util::preprocessEnv(matrix_ptr, seed_ptr, 
                                               score_para_ptr, topfd_para_ptr->getMsOneSnRatio());
     if (!valid) continue;
     EnvCollPtr env_coll_ptr = env_coll_util::findEnvColl(matrix_ptr, seed_ptr,
-                                                         score_para_ptr, topfd_para_ptr->getMsOneSnRatio());
+                                                         score_para_ptr, 
+                                                         topfd_para_ptr->getMsOneSnRatio());
     if (env_coll_ptr != nullptr) {
       if (env_coll_util::checkExistingFeatures(matrix_ptr, env_coll_ptr,
                                                env_coll_list, score_para_ptr))
@@ -103,7 +105,7 @@ void process_single_file(std::string &ms1_file_name,
       /*
       Feature feature = Feature(env_coll, peak_matrix, model, model_escore, env_coll_num,
                                 para_ptr->getMsOneSnRatio());
-      if (feature.getScore() < para_ptr->getECScore()) continue;
+      if (feature.getScore() < top_para_ptr->getEcscoreCutoff()) continue;
       features.push_back(feature);
       env_coll.setEcscore(feature.getScore());
       env_coll.remove_peak_data(peak_matrix);
