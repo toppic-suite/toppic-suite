@@ -73,7 +73,6 @@ class EnvSet {
 
 
 
-  std::vector<std::vector<double>> get_map(double snr, double noise_inte);
 
 
   void remove_peak_data(PeakMatrix &peakMatrix);

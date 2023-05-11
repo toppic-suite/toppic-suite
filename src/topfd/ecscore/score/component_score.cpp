@@ -134,7 +134,7 @@ double getMatchedPeakPercent(EnvSetPtr env_set_ptr,
   return percent_matched_peaks;
 }
 
-int getNumTheoPeaks(std::vector<std::vector<double>> &theo_map) {
+int getTheoPeakNum(std::vector<std::vector<double>> &theo_map) {
   int total_peaks = 0;
   for (auto &scan_intes: theo_map)
     for (double peak_inte: scan_intes)

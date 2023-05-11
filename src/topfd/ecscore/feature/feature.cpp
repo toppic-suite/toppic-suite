@@ -12,6 +12,9 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include <numeric>
+
+#include "topfd/ecscore/score/component_score.hpp"
 #include "topfd/ecscore/spectrum/matrix_spectrum.hpp"
 #include "topfd/ecscore/feature/feature.hpp"
 
@@ -52,41 +55,55 @@ Feature::Feature(EnvCollPtr env_coll_ptr, PeakMatrixPtr matrix_ptr,
   label_ = 0;
 }
 
-/*
-Feature::Feature(EnvCollection &env_coll, PeakMatrix &peak_matrix, fdeep::model &model,
-                 fdeep::model &model_escore, int feature_id, double snr) {
-  SeedEnvelope seed_env = env_coll.getSeedEnv();
-  spec_list spectra_list = peak_matrix.get_spectra_list();
-  std::vector<std::vector<double>> theo_map = env_coll.get_seed_theo_map(peak_matrix, snr);
-  std::vector<double> spectrum_noise_levels = peak_matrix.get_spec_noise_inte();
-  double noiseIntensityLevel = std::accumulate(spectrum_noise_levels.begin() + env_coll.getStartSpecId(),
-                                               spectrum_noise_levels.begin() + env_coll.getEndSpecId()+1, 0.0); /////////////////////////// ERROR - Last idx
-  int base_spec = env_coll.getBaseSpecID();
-  int start_spec = env_coll.getStartSpecId();
-  EnvSet env_set = env_coll.get_seed_env_set();
+Feature::Feature(EnvCollPtr env_coll_ptr, PeakMatrixPtr matrix_ptr, 
+                 int feature_id, double sn_ratio, double envcnn_score) {
+  SeedEnvelopePtr seed_ptr = env_coll_ptr->getSeedPtr();
+  MatrixSpectrumPtrVec spec_list = matrix_ptr->getSpecList();
+
+  EnvSetPtr env_set_ptr = env_coll_ptr->getSeedEnvSet();
   feature_id_ = feature_id;
-  min_scan_ = env_coll.getStartSpecId();
-  max_scan_ = env_coll.getEndSpecId();
-  min_charge_ = env_coll.getMinCharge();
-  max_charge_ = env_coll.getMaxCharge();
-  mono_mass_ = seed_env.getMass();
-  rep_charge_ = seed_env.getCharge();
-  rep_mz_ = seed_env.getPos();
-  abundance_ = env_coll.get_intensity(snr, peak_matrix.get_min_inte());
-  min_elution_time_ = env_coll.get_min_elution_time(spectra_list) / 60.0;
-  max_elution_time_ = env_coll.get_max_elution_time(spectra_list) / 60.0;
-  apex_elution_time_ = env_coll.get_apex_elution_time(spectra_list) / 60.0;
-  elution_length_ = env_coll.get_elution_length(spectra_list) / 60.0;
 
-  percent_matched_peaks_ = component_score::get_matched_peaks_percent(env_set, theo_map);
-  intensity_correlation_ = component_score::get_agg_env_corr(env_set);
-  top3_correlation_ = component_score::get_3_scan_corr(env_set, base_spec, start_spec);
-  even_odd_peak_ratios_ = component_score::get_agg_odd_even_peak_ratio(env_set);
-  percent_consec_peaks_ = component_score::get_consecutive_peaks_percent(env_set);
-  num_theo_peaks_ = component_score::get_num_theo_peaks(theo_map);
-  mz_error_sum_ = component_score::get_mz_errors(env_set);
+  min_scan_ = env_coll_ptr->getStartSpecId();
+  max_scan_ = env_coll_ptr->getEndSpecId();
+  min_charge_ = env_coll_ptr->getMinCharge();
+  max_charge_ = env_coll_ptr->getMaxCharge();
+  mono_mass_ = seed_ptr->getMass();
+  rep_charge_ = seed_ptr->getCharge();
+  rep_mz_ = seed_ptr->getPos();
+
+  abundance_ = env_coll_ptr->getIntensity(sn_ratio, matrix_ptr->getBaseInte());
+
+  double scan_max_rt = spec_list[spec_list.size()-1]->getRt();
+  min_elution_time_ = spec_list[min_scan_]->getRt() / scan_max_rt;
+  max_elution_time_ = spec_list[max_scan_]->getRt() / scan_max_rt; 
+  int seed_spec_id = seed_ptr->getSpecId();
+  apex_elution_time_ = spec_list[seed_spec_id]->getRt() / scan_max_rt;
+  elution_length_ = (max_elution_time_ - min_elution_time_) /scan_max_rt; 
+
+  double noise_inte = matrix_ptr->getBaseInte();
+  EnvSetPtr seed_set_ptr = env_coll_ptr->getSeedEnvSet();
+  std::vector<std::vector<double>> theo_map 
+    = seed_set_ptr->getScaledTheoIntes(sn_ratio, noise_inte);
+
+  std::vector<double> spectrum_noise_levels = matrix_ptr->getSpecNoiseInte();
+
+  double noise_inte_level = std::accumulate(spectrum_noise_levels.begin() +
+                                            env_coll_ptr->getStartSpecId(),
+                                            spectrum_noise_levels.begin() +
+                                            env_coll_ptr->getEndSpecId()+1, 0.0); /////////////////////////// ERROR - Last idx
+
+  percent_matched_peaks_ = component_score::getMatchedPeakPercent(env_set_ptr, theo_map);
+  intensity_correlation_ = component_score::getAggEnvCorr(env_set_ptr);
+  top3_correlation_ = component_score::get3ScanCorr(env_set_ptr, seed_spec_id, min_scan_);
+  even_odd_peak_ratio_ = component_score::getAggOddEvenPeakRatio(env_set_ptr);
+  percent_consec_peaks_ = component_score::getConsecutivePeakPercent(env_set_ptr);
+  num_theo_peaks_ = component_score::getTheoPeakNum(theo_map);
+  mz_error_sum_ = component_score::getMzErrors(env_set_ptr);
+  /*
   envcnn_score_ = env_cnn_score::get_envcnn_score(model, peak_matrix, env_coll, noiseIntensityLevel);
+  */
 
+  /*
   std::vector<double> data;
   data.push_back(envcnn_score_); //1
   data.push_back(elution_length_ / 60.0); //2
@@ -97,9 +114,11 @@ Feature::Feature(EnvCollection &env_coll, PeakMatrix &peak_matrix, fdeep::model 
   data.push_back((max_charge_ - min_charge_) / 30.0); //7
   data.push_back(even_odd_peak_ratios_); //8
   score_ = env_coll_score::get_env_coll_score(model_escore, data);
+  */
   label_ = 0;
 }
 
+/*
 DeconvMsPtrVec Feature::readData(const std::string &file_name) {
   SimpleMsAlignReader sp_reader(file_name);
   DeconvMsPtrVec ms_ptr_vec;

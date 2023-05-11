@@ -37,6 +37,9 @@ class Feature {
  public:
   Feature(EnvCollPtr env_coll_ptr, PeakMatrixPtr matrix_ptr, int feature_id, double inte);
 
+  Feature(EnvCollPtr env_coll_ptr, PeakMatrixPtr matrix_ptr, int feature_id,
+          double inte, double envcnn_score);
+
   /*
   Feature(EnvCollection &env_coll, PeakMatrix &peak_matrix, fdeep::model &model, fdeep::model &model_escore,
           int feature_id, double snr);
