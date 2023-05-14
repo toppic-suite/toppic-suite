@@ -15,6 +15,7 @@
 #include <numeric>
 
 #include "topfd/ecscore/score/component_score.hpp"
+#include "topfd/ecscore/score/comp_env_cnn_score.hpp"
 #include "topfd/ecscore/spectrum/matrix_spectrum.hpp"
 #include "topfd/ecscore/feature/feature.hpp"
 
@@ -85,13 +86,6 @@ Feature::Feature(EnvCollPtr env_coll_ptr, PeakMatrixPtr matrix_ptr,
   std::vector<std::vector<double>> theo_map 
     = seed_set_ptr->getScaledTheoIntes(sn_ratio, noise_inte);
 
-  std::vector<double> spectrum_noise_levels = matrix_ptr->getSpecNoiseInte();
-
-  double noise_inte_level = std::accumulate(spectrum_noise_levels.begin() +
-                                            env_coll_ptr->getStartSpecId(),
-                                            spectrum_noise_levels.begin() +
-                                            env_coll_ptr->getEndSpecId()+1, 0.0); /////////////////////////// ERROR - Last idx
-
   percent_matched_peaks_ = component_score::getMatchedPeakPercent(env_set_ptr, theo_map);
   intensity_correlation_ = component_score::getAggEnvCorr(env_set_ptr);
   top3_correlation_ = component_score::get3ScanCorr(env_set_ptr, seed_spec_id, min_scan_);
@@ -99,9 +93,9 @@ Feature::Feature(EnvCollPtr env_coll_ptr, PeakMatrixPtr matrix_ptr,
   percent_consec_peaks_ = component_score::getConsecutivePeakPercent(env_set_ptr);
   num_theo_peaks_ = component_score::getTheoPeakNum(theo_map);
   mz_error_sum_ = component_score::getMzErrors(env_set_ptr);
-  /*
-  envcnn_score_ = env_cnn_score::get_envcnn_score(model, peak_matrix, env_coll, noiseIntensityLevel);
-  */
+  
+  envcnn_score_ = comp_env_cnn_score::compEnvcnnScore(matrix_ptr, env_coll_ptr); 
+  label_ = 0;
 
   /*
   std::vector<double> data;
@@ -115,7 +109,6 @@ Feature::Feature(EnvCollPtr env_coll_ptr, PeakMatrixPtr matrix_ptr,
   data.push_back(even_odd_peak_ratios_); //8
   score_ = env_coll_score::get_env_coll_score(model_escore, data);
   */
-  label_ = 0;
 }
 
 /*

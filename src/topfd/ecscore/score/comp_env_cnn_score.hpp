@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2022, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -12,27 +12,19 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_TOPFD_ONNX_ENVCNN_ENV_CNN_HPP_
-#define TOPPIC_TOPFD_ONNX_ENVCNN_ENV_CNN_HPP_
+#ifndef TOPPIC_TOPFD_ECSCORE_SCORE_COMP_ENV_CNN_SCORE_HPP
+#define TOPPIC_TOPFD_ECSCORE_SCORE_COMP_ENV_CNN_SCORE_HPP
 
-#include <string>
-#include <vector>
-
-#include "ms/env/match_env.hpp"
+#include "topfd/ecscore/env_coll/env_coll.hpp"
+#include "topfd/ecscore/spectrum/peak_matrix.hpp"
 
 namespace toppic {
 
-namespace onnx_env_cnn {
+namespace comp_env_cnn_score {
 
-  void initModel(const std::string &dir_name, int thread_num);
-
-  void computeEnvScores(PeakPtrVec &peak_list, MatchEnvPtrVec &ori_env); 
-
-  std::vector<std::vector<float>> initInputMatrix();
-
-  std::vector<double> predict(int env_num, std::vector<float> &input_tensor_values); 
-}
+double compEnvcnnScore(PeakMatrixPtr matrix_ptr, EnvCollPtr env_coll_ptr); 
 
 }
+}
 
-#endif
+#endif 

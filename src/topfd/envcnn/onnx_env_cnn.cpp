@@ -131,6 +131,19 @@ std::vector<std::vector<float>> initializeMatrix(int row, int col) {
   return matrix;
 }
 
+std::vector<std::vector<float>> initInputMatrix() {
+  int row = 4;
+  int col = 300;
+  std::vector<std::vector<float>> matrix(row);
+  for (int i = 0; i < row; i++) {
+    matrix[i] = std::vector<float>(col);
+    for (int j = 0; j < col; j++)
+      matrix[i][j] = 0;
+  }
+  return matrix;
+}
+
+
 void extractFeature(const std::vector<double> &theo_masses, const std::vector<double> &theo_intes,
                     const std::vector<double> &peak_masses, const std::vector<double> &peak_intes,
                     double max_inte, double tolerance, size_t k, double &t_peak_mass,
@@ -198,7 +211,7 @@ void addNoisePeaksToMatrix(std::vector<std::vector<float>> &matrix,
     // to accomodate +2 and -2 bins - reason tolerance of 0.02
     for (int shift = -2; shift <= 2; shift++) {
       int shifted_idx = bin_index + shift;
-      if ((shifted_idx < 300) && (shifted_idx >= 0) && (matrix[0][bin_index] != 0)) {
+      if ((shifted_idx < 300) && (shifted_idx >= 0) && (matrix[0][shifted_idx] != 0)) {
         matched_peak = true;
       }
     }
@@ -260,6 +273,15 @@ std::vector<float> getBatchTensor(const PeakPtrVec &peak_list, MatchEnvPtrVec &e
 
 void predict(MatchEnvPtrVec &envs, std::vector<float> &input_tensor_values) {
   int env_num = envs.size();
+  std::vector<double> pred_results = predict(env_num, input_tensor_values);
+
+  for (int i = 0; i < env_num; i++) {
+    envs[i]->setEnvcnnScore(pred_results[i]); 
+    LOG_DEBUG(" msdeconv " << envs[i]->getMsdeconvScore() << " predict " << pred_results[i]);  
+  }
+}
+
+std::vector<double> predict(int env_num, std::vector<float> &input_tensor_values) {
   std::vector<int64_t> input_node_dims {env_num, 4, 300};  
   size_t input_tensor_size; 
   input_tensor_size = env_num * 4 * 300;  
@@ -286,9 +308,9 @@ void predict(MatchEnvPtrVec &envs, std::vector<float> &input_tensor_values) {
     double one = float_arr[2*i+1];
     //softmax
     double score = std::exp(one)/ (std::exp(zero) + std::exp(one)); 
-    envs[i]->setEnvcnnScore(score); 
-    LOG_DEBUG("Zero " << zero << " One " << one << " msdeconv " << envs[i]->getMsdeconvScore() << " predict " << score);  
+    pred_results.push_back(score);
   }
+  return pred_results;
 }
 
 void computeEnvScores(PeakPtrVec &peak_list, MatchEnvPtrVec &ori_envs) {

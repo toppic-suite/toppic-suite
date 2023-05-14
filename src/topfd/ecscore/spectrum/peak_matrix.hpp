@@ -34,6 +34,8 @@ class PeakMatrix {
 
   int getSpecNum() { return spec_list_.size(); }
 
+  double getBinSize() { return bin_size_;}
+
   double getMinMz() { return min_mz_; }
 
   double getMaxMz() { return max_mz_; }
