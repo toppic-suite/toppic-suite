@@ -27,6 +27,8 @@
 #include "topfd/ecscore/envelope/seed_env_util.hpp"
 #include "topfd/ecscore/env_coll/env_coll.hpp"
 #include "topfd/ecscore/env_coll/env_coll_util.hpp"
+#include "topfd/ecscore/feature/feature.hpp"
+#include "topfd/ecscore/feature/ecscore_write_feature.hpp"
 #include "topfd/ecscore/ecscore_para.hpp"
 #include "topfd/ecscore/env_coll_detect.hpp"
 
@@ -34,7 +36,8 @@ namespace toppic {
 
 namespace env_coll_detect {
 
-void process_single_file(std::string &ms1_file_name, 
+void process_single_file(std::string &base_file_name,
+                         std::string &ms1_file_name, 
                          std::string &ms2_file_name, 
                          const std::string &mzml_file_name, 
                          TopfdParaPtr topfd_para_ptr,
@@ -81,13 +84,14 @@ void process_single_file(std::string &ms1_file_name,
   /// Extract Fetures
   LOG_DEBUG("Number of seed envelopes: " << seed_ptrs.size());
   int seed_num = seed_ptrs.size();
-  int env_coll_num = 0;
   EnvCollPtrVec env_coll_list;
-  //std::vector<Feature> features;
+
+  int feat_id = 0;
+  FeaturePtrVec features;
   for (int seed_env_idx = 0; seed_env_idx < seed_num; seed_env_idx++) {
     if (seed_env_idx % 10000 == 0) {
       std::cout << "\r" << "Processing peak " 
-        << seed_env_idx << " and Features found " << env_coll_num << std::flush;
+        << seed_env_idx << " and Features found " << feat_id << std::flush;
     }
     SeedEnvelopePtr seed_ptr = seed_ptrs[seed_env_idx];
     bool valid = seed_env_util::preprocessEnv(matrix_ptr, seed_ptr, 
@@ -102,20 +106,20 @@ void process_single_file(std::string &ms1_file_name,
         continue;
       env_coll_ptr->refineMonoMass();
 
+      FeaturePtr feat_ptr = std::make_shared<Feature>(env_coll_ptr, matrix_ptr,
+                                                      feat_id, topfd_para_ptr->getMsOneSnRatio());
+      feat_id++;
+      features.push_back(feat_ptr);
+      env_coll_ptr->removePeakData(matrix_ptr);
       /*
-      Feature feature = Feature(env_coll, peak_matrix, model, model_escore, env_coll_num,
-                                para_ptr->getMsOneSnRatio());
       if (feature.getScore() < top_para_ptr->getEcscoreCutoff()) continue;
-      features.push_back(feature);
       env_coll.setEcscore(feature.getScore());
-      env_coll.remove_peak_data(peak_matrix);
       env_coll_list.push_back(env_coll);
       FracFeaturePtr feature_ptr = Feature::getFeature(env_coll_num, ms1_ptr_vec, feature_para_ptr->frac_id_,
                                                        feature_para_ptr->file_name_, env_coll, peak_matrix,
                                                        para_ptr->getMsOneSnRatio());
       feature_ptr->setPromexScore(feature.getScore());
       frac_features.push_back(feature_ptr);
-      env_coll_num = env_coll_num + 1;
       */
     }
   }
@@ -125,11 +129,13 @@ void process_single_file(std::string &ms1_file_name,
   Feature::assign_features(ms1_ptr_vec, ms2_file_name, frac_features, env_coll_list, features, ms2_features,
                            prec_spectrum_Base_mono_mz, peak_matrix, model, model_escore, feature_para_ptr, para_ptr);
   std::cout << std::endl << "Number of Envelope Collections: " << features.size() << std::endl;
+  */
 
   /// output files
-  file_name = base_name + "_" + file_num + "ms1.csv";
-  write_feature::writeFeatures(file_name, features);
+  std::string feat_file_name = base_file_name + "_ms1.csv";
+  ecscore_write_feature::writeFeatures(feat_file_name, features);
 
+  /*
   std::string output_file_name = base_name + "_" + file_num + "feature.xml";
   frac_feature_writer::writeXmlFeatures(output_file_name, frac_features);
 
@@ -161,15 +167,16 @@ void process(int frac_id, const std::string &sp_file_name, TopfdParaPtr para_ptr
   if (is_faims) { 
     for (size_t i = 0; i < voltage_vec.size(); i++) {
       std::string file_num = str_util::toString(i) + "_"; 
-      std::string ms1_file_name = base_name + "_" + file_num + "ms1.msalign";
-      std::string ms2_file_name = base_name + "_" + file_num + "ms2.msalign";
-      process_single_file(ms1_file_name, ms2_file_name, sp_file_name, para_ptr, ecscore_para_ptr);
+      std::string cur_base_name = base_name + "_" + file_num;
+      std::string ms1_file_name = cur_base_name + "_ms1.msalign";
+      std::string ms2_file_name = cur_base_name + "_ms2.msalign";
+      process_single_file(cur_base_name, ms1_file_name, ms2_file_name, sp_file_name, para_ptr, ecscore_para_ptr);
     }
   }
   else {
-    std::string ms1_file_name = base_name + "_" + "ms1.msalign";
-    std::string ms2_file_name = base_name + "_" + "ms2.msalign";
-    process_single_file(ms1_file_name, ms2_file_name, sp_file_name, para_ptr, ecscore_para_ptr);
+    std::string ms1_file_name = base_name + "_ms1.msalign";
+    std::string ms2_file_name = base_name + "_ms2.msalign";
+    process_single_file(base_name, ms1_file_name, ms2_file_name, sp_file_name, para_ptr, ecscore_para_ptr);
   }
 
   double duration = (std::clock() - start) / (double) CLOCKS_PER_SEC;

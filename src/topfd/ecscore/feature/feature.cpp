@@ -22,42 +22,7 @@
 namespace toppic {
 
 Feature::Feature(EnvCollPtr env_coll_ptr, PeakMatrixPtr matrix_ptr, 
-                 int feature_id, double inte) {
-  SeedEnvelopePtr seed_ptr = env_coll_ptr->getSeedPtr();
-  MatrixSpectrumPtrVec spec_list = matrix_ptr->getSpecList();
-  EnvSetPtr env_set_ptr = env_coll_ptr->getSeedEnvSet();
-  feature_id_ = feature_id;
-  min_scan_ = env_coll_ptr->getStartSpecId();
-  max_scan_ = env_coll_ptr->getEndSpecId();
-  min_charge_ = env_coll_ptr->getMinCharge();
-  max_charge_ = env_coll_ptr->getMaxCharge();
-  mono_mass_ = seed_ptr->getMass();
-  rep_charge_ = seed_ptr->getCharge();
-  rep_mz_ = seed_ptr->getPos();
-  abundance_ = inte;
-
-  double scan_max_rt = spec_list[spec_list.size()-1]->getRt();
-
-  min_elution_time_ = spec_list[min_scan_]->getRt() / scan_max_rt;
-  max_elution_time_ = spec_list[max_scan_]->getRt() / scan_max_rt; 
-  int seed_scan = seed_ptr->getSpecId();
-  apex_elution_time_ = spec_list[seed_scan]->getRt() / scan_max_rt;
-  elution_length_ = (max_elution_time_ - min_elution_time_) /scan_max_rt; 
-
-  percent_matched_peaks_ = 0;
-  intensity_correlation_ = 0;
-  top3_correlation_ = 0;
-  even_odd_peak_ratio_ = 0;
-  percent_consec_peaks_ = 0;
-  num_theo_peaks_ = 0;
-  mz_error_sum_ = 0;
-  envcnn_score_ = 0;
-  score_ = 0;
-  label_ = 0;
-}
-
-Feature::Feature(EnvCollPtr env_coll_ptr, PeakMatrixPtr matrix_ptr, 
-                 int feature_id, double sn_ratio, double envcnn_score) {
+                 int feature_id, double sn_ratio) {
   SeedEnvelopePtr seed_ptr = env_coll_ptr->getSeedPtr();
   MatrixSpectrumPtrVec spec_list = matrix_ptr->getSpecList();
 
@@ -110,6 +75,43 @@ Feature::Feature(EnvCollPtr env_coll_ptr, PeakMatrixPtr matrix_ptr,
   score_ = env_coll_score::get_env_coll_score(model_escore, data);
   */
 }
+
+/*
+Feature::Feature(EnvCollPtr env_coll_ptr, PeakMatrixPtr matrix_ptr, 
+                 int feature_id, double inte) {
+  SeedEnvelopePtr seed_ptr = env_coll_ptr->getSeedPtr();
+  MatrixSpectrumPtrVec spec_list = matrix_ptr->getSpecList();
+  EnvSetPtr env_set_ptr = env_coll_ptr->getSeedEnvSet();
+  feature_id_ = feature_id;
+  min_scan_ = env_coll_ptr->getStartSpecId();
+  max_scan_ = env_coll_ptr->getEndSpecId();
+  min_charge_ = env_coll_ptr->getMinCharge();
+  max_charge_ = env_coll_ptr->getMaxCharge();
+  mono_mass_ = seed_ptr->getMass();
+  rep_charge_ = seed_ptr->getCharge();
+  rep_mz_ = seed_ptr->getPos();
+  abundance_ = inte;
+
+  double scan_max_rt = spec_list[spec_list.size()-1]->getRt();
+
+  min_elution_time_ = spec_list[min_scan_]->getRt() / scan_max_rt;
+  max_elution_time_ = spec_list[max_scan_]->getRt() / scan_max_rt; 
+  int seed_scan = seed_ptr->getSpecId();
+  apex_elution_time_ = spec_list[seed_scan]->getRt() / scan_max_rt;
+  elution_length_ = (max_elution_time_ - min_elution_time_) /scan_max_rt; 
+
+  percent_matched_peaks_ = 0;
+  intensity_correlation_ = 0;
+  top3_correlation_ = 0;
+  even_odd_peak_ratio_ = 0;
+  percent_consec_peaks_ = 0;
+  num_theo_peaks_ = 0;
+  mz_error_sum_ = 0;
+  envcnn_score_ = 0;
+  score_ = 0;
+  label_ = 0;
+}
+*/
 
 /*
 DeconvMsPtrVec Feature::readData(const std::string &file_name) {

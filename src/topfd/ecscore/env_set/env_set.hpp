@@ -7,6 +7,7 @@
 
 #include "topfd/ecscore/envelope/seed_envelope.hpp"
 #include "topfd/ecscore/envelope/exp_envelope.hpp"
+#include "topfd/ecscore/spectrum/peak_matrix.hpp"
 #include "topfd/ecscore/env_set/xic.hpp"
 
 namespace toppic {
@@ -60,6 +61,8 @@ class EnvSet {
 
   void refineFeatureBoundary();
 
+  void removePeakData(PeakMatrixPtr matrix_ptr); 
+
   double compIntensity(double sn_ratio, double noise_inte);
 
   static bool cmpCharge(EnvSetPtr a, EnvSetPtr b) { return a->getCharge() < b->getCharge(); }
@@ -70,18 +73,7 @@ class EnvSet {
   void shortlistExpEnvs();
 
   /*
-
-
-
-
-
-  void remove_peak_data(PeakMatrix &peakMatrix);
-
-
-
   void setSeedEnv(const toppic::SeedEnvelope &seedEnv) { seed_env_ = seedEnv; }
-
-
 
   std::vector<double> getXicEnvIntes() { return xic_.getInteList(); }
 

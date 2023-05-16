@@ -90,4 +90,12 @@ EnvSetPtr EnvColl::getSeedEnvSet() {
   return nullptr;
 }
 
+void EnvColl::removePeakData(PeakMatrixPtr matrix_ptr) {
+  for (auto env_set_ptr: env_set_list_) {
+    if (env_set_ptr != nullptr) {
+      env_set_ptr->removePeakData(matrix_ptr); 
+    }
+  }
+}
+
 }

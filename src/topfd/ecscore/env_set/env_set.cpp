@@ -245,48 +245,46 @@ void EnvSet::refineFeatureBoundary() {
   shortlistExpEnvs();
 }
 
-}
-
-/**
-
-
-
-void EnvSet::remove_peak_data(PeakMatrix &peakMatrix) {
-  std::vector<std::vector<double>> map = get_map(3.0, peakMatrix.get_min_inte());
+void EnvSet::removePeakData(PeakMatrixPtr matrix_ptr) {
+  double sn_ratio = 3.0;
+  std::vector<std::vector<double>> theo_intes = getScaledTheoIntes(sn_ratio, 
+                                                                   matrix_ptr->getBaseInte());
   int num_exp_env = exp_env_list_.size();
   for (int env_id = 0; env_id < num_exp_env; env_id++) {
-    ExpEnvelope exp_env = exp_env_list_[env_id];
-    int spec_id = exp_env.getSpecId();
-    if (spec_id < 0 or spec_id >= peakMatrix.get_spec_num())
+    ExpEnvelopePtr exp_env = exp_env_list_[env_id];
+    int spec_id = exp_env->getSpecId();
+    if (spec_id < 0 or spec_id >= matrix_ptr->getSpecNum()) {
       continue;
-    std::vector<ExpPeak> exp_data = exp_env.getExpEnvList();
-    std::vector<double> theo_data = map[env_id];
-    int num_peaks_exp_env = exp_data.size();
-    for (int peak_id = 0; peak_id < num_peaks_exp_env; peak_id++) {
-      ExpPeak exp_peak = exp_data[peak_id];
-      if (exp_peak.isEmpty())
+    }
+    MatrixPeakPtrVec exp_peaks = exp_env->getExpPeakList(); 
+    std::vector<double> theo_env_peak_intes = theo_intes[env_id];
+
+    int peak_num = exp_peaks.size(); 
+    for (int peak_id = 0; peak_id < peak_num; peak_id++) {
+      MatrixPeakPtr exp_peak = exp_peaks[peak_id];
+      if (exp_peak != nullptr) {
         continue;
-      int bin_idx = peakMatrix.get_index(exp_peak.getPos());
-      std::vector<ExpPeak> peaks = peakMatrix.get_bin_peak(spec_id, bin_idx);
-      double theo_peak = theo_data[peak_id];
-      std::vector<ExpPeak> other_peaks;
-      for (auto peak: peaks) {
-        if (std::abs(peak.getInte() - exp_peak.getInte()) < 0.0001) {
-          if (peak.getInte() / theo_peak < 4)
+      }
+      int bin_idx = matrix_ptr->getBinIndex(exp_peak->getPosition()); 
+      MatrixPeakPtrVec bin_peaks = matrix_ptr->getBinPeakList(spec_id, bin_idx);
+      double theo_peak_inte = theo_env_peak_intes[peak_id];
+      MatrixPeakPtrVec remain_peaks;
+      for (auto peak: bin_peaks) {
+        // check if peak is the same as exp_peak
+        if (std::abs(peak->getIntensity() - exp_peak->getIntensity()) < 0.0001) {
+          if (peak->getIntensity() / theo_peak_inte < 4) {
             continue;
+          }
           else {
-            if (peak.getInte() - theo_peak > 0)
-              peak.setInte(peak.getInte() - theo_peak);
-            else
-              peak.setInte(0);
+            peak->setIntensity(peak->getIntensity() - theo_peak_inte);
           }
         }
-        other_peaks.push_back(peak);
+        remain_peaks.push_back(peak);
       }
-      peakMatrix.set_bin_peak(spec_id, bin_idx, other_peaks);
+      matrix_ptr->setBinPeakList(spec_id, bin_idx, remain_peaks);
     }
   }
 }
-**/
 
+}
 

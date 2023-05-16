@@ -18,18 +18,9 @@
 #include <memory>
 #include <vector>
 
+#include "topfd/ecscore/spectrum/peak_matrix.hpp"
 #include "topfd/ecscore/envelope/seed_envelope.hpp"
 #include "topfd/ecscore/env_set/env_set.hpp"
-/*
-#include <string>
-#include <iostream>
-#include <valarray>
-#include "topfd/feature_detect/env_set/env_set.hpp"
-#include "topfd/feature_detect/envelope/seed_envelope.hpp"
-#include "topfd/feature_detect/spectrum/spectrum.hpp"
-#include "topfd/feature_detect/util/utility_functions.hpp"
-#include "common/xml/xml_dom_element.hpp"
-*/
 
 namespace toppic {
 
@@ -85,6 +76,8 @@ class EnvColl {
 
   void setExpInteSumList(const std::vector<double> &exp_inte_sum_list) {
     exp_inte_sum_list_ = exp_inte_sum_list;}
+
+  void removePeakData(PeakMatrixPtr matrix_ptr); 
 
  private:
   SeedEnvelopePtr seed_ptr_;

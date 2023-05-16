@@ -39,7 +39,7 @@ class PeakRow {
 
   MatrixPeakPtrVec getPeakPtrVec(int i) {return peak_ptrs_[i];}
 
-  void setPeakPtrVec(int i, MatrixPeakPtrVec peak_ptr_vec) {peak_ptrs_[i] = peak_ptr_vec;}
+  void setPeakPtrVec(int i, MatrixPeakPtrVec &peak_ptr_vec) {peak_ptrs_[i] = peak_ptr_vec;}
 
  private:
   MatrixSpectrumPtr spectrum_ptr_;
