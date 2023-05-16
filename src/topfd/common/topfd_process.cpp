@@ -24,6 +24,7 @@
 #include "ms/env/env_base.hpp"
 #include "topfd/deconv/deconv_process.hpp"
 #include "topfd/feature_detect/feature_detect.hpp"
+#include "topfd/ecscore/env_coll_detect.hpp"
 #include "topfd/common/topfd_para.hpp"
 
 namespace toppic {
@@ -66,6 +67,7 @@ void processOneFile(TopfdParaPtr para_ptr,
     std::cout << "Deleting temporary files - finished." << std::endl; 
 
     std::cout << "Feature detection started." << std::endl;
+    /*
     feature_detect::process(frac_id, 
                             spec_file_name,
                             para_ptr->isMissingLevelOne(), 
@@ -73,6 +75,12 @@ void processOneFile(TopfdParaPtr para_ptr,
 			                      para_ptr->getActivation(), 
                             processor.isFaims_,
                             processor.voltage_vec_);
+                            */
+    env_coll_detect::process(frac_id, 
+                             spec_file_name,
+                             para_ptr,
+                             processor.isFaims_,
+                             processor.voltage_vec_);
     std::cout << "Feature detection finished." << std::endl;
     
     std::cout << "Processing " << spec_file_name << " finished." << std::endl;
