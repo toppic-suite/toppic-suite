@@ -22,6 +22,7 @@
 #include "ms/spec/deconv_json_merge.hpp"
 #include "ms/feature/feature_merge.hpp"
 #include "ms/env/env_base.hpp"
+#include "topfd/envcnn/onnx_env_cnn.hpp" 
 #include "topfd/deconv/deconv_process.hpp"
 #include "topfd/feature_detect/feature_detect.hpp"
 #include "topfd/ecscore/env_coll_detect.hpp"
@@ -42,6 +43,7 @@ void processOneFile(TopfdParaPtr para_ptr,
 
     DeconvProcess processor(para_ptr, spec_file_name, frac_id, thread_number);
     
+    /*
     processor.process();
     std::cout << "Deconvolution finished." << std::endl;
 
@@ -65,6 +67,7 @@ void processOneFile(TopfdParaPtr para_ptr,
       file_util::cleanPrefix(base_name_ms2 + "_", fa_base_ms2 + "_");
     }
     std::cout << "Deleting temporary files - finished." << std::endl; 
+    */
 
     std::cout << "Feature detection started." << std::endl;
     /*
@@ -205,8 +208,13 @@ void getMsScanCount(std::string spectrum_file_name, std::vector<int> &scan_cnt_v
 
 int process(TopfdParaPtr para_ptr,  std::vector<std::string> spec_file_lst) {
   base_data::init();
-
   EnvBase::initBase(para_ptr->getResourceDir());
+
+  if (para_ptr->isUseEnvCnn()) {
+    //env_cnn::initModel(topfd_para_ptr_->getResourceDir(), topfd_para_ptr_->getThreadNum());
+    onnx_env_cnn::initModel(para_ptr->getResourceDir(), para_ptr->getThreadNum());
+  }
+  
   for (size_t k = 0; k < spec_file_lst.size(); k++) {
     //get ms1 and ms2 scan number
     std::vector<int> scan_cnt_vec;

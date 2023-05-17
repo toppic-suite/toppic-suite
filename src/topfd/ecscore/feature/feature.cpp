@@ -14,6 +14,8 @@
 
 #include <numeric>
 
+#include "common/util/logger.hpp"
+
 #include "topfd/ecscore/score/component_score.hpp"
 #include "topfd/ecscore/score/comp_env_cnn_score.hpp"
 #include "topfd/ecscore/spectrum/matrix_spectrum.hpp"
@@ -58,7 +60,7 @@ Feature::Feature(EnvCollPtr env_coll_ptr, PeakMatrixPtr matrix_ptr,
   percent_consec_peaks_ = component_score::getConsecutivePeakPercent(env_set_ptr);
   num_theo_peaks_ = component_score::getTheoPeakNum(theo_map);
   mz_error_sum_ = component_score::getMzErrors(env_set_ptr);
-  
+
   envcnn_score_ = comp_env_cnn_score::compEnvcnnScore(matrix_ptr, env_coll_ptr); 
   label_ = 0;
 

@@ -43,6 +43,7 @@ void process_single_file(std::string &base_file_name,
                          TopfdParaPtr topfd_para_ptr,
                          EcscoreParaPtr score_para_ptr) {
 
+  //logger::setLogLevel(LOG_LEVEL_DEBUG);  
   /// Read msalign file and get the seed envelopes.
   DeconvMsPtrVec ms1_ptr_vec;
   SimpleMsAlignReader::readMsOneSpectra(ms1_file_name, ms1_ptr_vec);
@@ -89,6 +90,7 @@ void process_single_file(std::string &base_file_name,
   int feat_id = 0;
   FeaturePtrVec features;
   for (int seed_env_idx = 0; seed_env_idx < seed_num; seed_env_idx++) {
+    LOG_DEBUG("Processing seed env " << seed_env_idx); 
     if (seed_env_idx % 10000 == 0) {
       std::cout << "\r" << "Processing peak " 
         << seed_env_idx << " and Features found " << feat_id << std::flush;
@@ -96,21 +98,28 @@ void process_single_file(std::string &base_file_name,
     SeedEnvelopePtr seed_ptr = seed_ptrs[seed_env_idx];
     bool valid = seed_env_util::preprocessEnv(matrix_ptr, seed_ptr, 
                                               score_para_ptr, topfd_para_ptr->getMsOneSnRatio());
+    LOG_DEBUG("Preprocessing finished!"); 
     if (!valid) continue;
     EnvCollPtr env_coll_ptr = env_coll_util::findEnvColl(matrix_ptr, seed_ptr,
                                                          score_para_ptr, 
                                                          topfd_para_ptr->getMsOneSnRatio());
+    LOG_DEBUG("Found envelope collection!"); 
     if (env_coll_ptr != nullptr) {
       if (env_coll_util::checkExistingFeatures(matrix_ptr, env_coll_ptr,
-                                               env_coll_list, score_para_ptr))
+                                               env_coll_list, score_para_ptr)) {
         continue;
+      }
+      LOG_DEBUG("Checked existing features!"); 
       env_coll_ptr->refineMonoMass();
 
+      LOG_DEBUG("Refined feature!"); 
       FeaturePtr feat_ptr = std::make_shared<Feature>(env_coll_ptr, matrix_ptr,
                                                       feat_id, topfd_para_ptr->getMsOneSnRatio());
+      LOG_DEBUG("Generate feature!"); 
       feat_id++;
       features.push_back(feat_ptr);
       env_coll_ptr->removePeakData(matrix_ptr);
+      LOG_DEBUG("Removed peaks!"); 
       /*
       if (feature.getScore() < top_para_ptr->getEcscoreCutoff()) continue;
       env_coll.setEcscore(feature.getScore());

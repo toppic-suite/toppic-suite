@@ -14,6 +14,8 @@
 
 #include <numeric>
 
+#include "common/util/logger.hpp"
+
 #include "topfd/ecscore/envelope/env_util.hpp"
 #include "topfd/ecscore/env_set/env_set_util.hpp"
 #include "topfd/ecscore/env_set/env_set.hpp"
@@ -251,7 +253,11 @@ void EnvSet::removePeakData(PeakMatrixPtr matrix_ptr) {
                                                                    matrix_ptr->getBaseInte());
   int num_exp_env = exp_env_list_.size();
   for (int env_id = 0; env_id < num_exp_env; env_id++) {
+    LOG_DEBUG("Env id " << env_id << " " << num_exp_env);
     ExpEnvelopePtr exp_env = exp_env_list_[env_id];
+    if (exp_env == nullptr) {
+      continue;
+    }
     int spec_id = exp_env->getSpecId();
     if (spec_id < 0 or spec_id >= matrix_ptr->getSpecNum()) {
       continue;
@@ -262,7 +268,8 @@ void EnvSet::removePeakData(PeakMatrixPtr matrix_ptr) {
     int peak_num = exp_peaks.size(); 
     for (int peak_id = 0; peak_id < peak_num; peak_id++) {
       MatrixPeakPtr exp_peak = exp_peaks[peak_id];
-      if (exp_peak != nullptr) {
+      LOG_DEBUG("Peak id " << peak_id << " " << peak_num);
+      if (exp_peak == nullptr) {
         continue;
       }
       int bin_idx = matrix_ptr->getBinIndex(exp_peak->getPosition()); 
@@ -271,6 +278,9 @@ void EnvSet::removePeakData(PeakMatrixPtr matrix_ptr) {
       MatrixPeakPtrVec remain_peaks;
       for (auto peak: bin_peaks) {
         // check if peak is the same as exp_peak
+        if (peak == nullptr) {
+          continue;
+        }
         if (std::abs(peak->getIntensity() - exp_peak->getIntensity()) < 0.0001) {
           if (peak->getIntensity() / theo_peak_inte < 4) {
             continue;

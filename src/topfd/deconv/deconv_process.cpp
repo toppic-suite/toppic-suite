@@ -135,10 +135,6 @@ void DeconvProcess::process() {
     exit(EXIT_FAILURE);
   }
 
-  if (topfd_para_ptr_->isUseEnvCnn()) {
-    //env_cnn::initModel(topfd_para_ptr_->getResourceDir(), topfd_para_ptr_->getThreadNum());
-    onnx_env_cnn::initModel(topfd_para_ptr_->getResourceDir(), topfd_para_ptr_->getThreadNum());
-  }
   if (topfd_para_ptr_->isMissingLevelOne()) {
     processSpMissingLevelOne(reader_ptr);
   }

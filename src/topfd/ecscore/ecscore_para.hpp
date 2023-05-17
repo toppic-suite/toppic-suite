@@ -68,7 +68,10 @@ class EcscorePara {
   int max_miss_env_ = 2;
   int max_miss_charge_ = 2;
   int max_miss_peak_ = 2;
-  int match_peak_tole_ = 2;
+
+  int min_match_peak_ = 2;
+  int min_match_env_ = 2;
+
   double match_envelope_tolerance_ = 10E-6;
   double time_overlap_tole_ = 0.8;
   double even_odd_ratio_cutoff_ = 0.4;

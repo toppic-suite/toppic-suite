@@ -14,6 +14,7 @@
 
 #include <numeric>
 
+#include "common/util/logger.hpp"
 #include "common/base/mass_constant.hpp"
 #include "topfd/ecscore/envelope/env_util.hpp"
 #include "topfd/ecscore/env_set/env_set_util.hpp"
@@ -152,10 +153,10 @@ EnvSetPtrVec getChargeEnvList(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr
     EnvSetPtr env_set_ptr = env_set_util::findEnvSet(matrix_ptr, cur_seed_ptr, 
                                                      start_spec_id, end_spec_id, 
                                                      para_ptr, sn_ratio);
-    charge = charge - 1;
     if (env_set_ptr == nullptr) {
       miss_num = miss_num + 1;
-    } else {
+    } 
+    else {
       env_set_ptr->refineFeatureBoundary();
       if (!env_set_util::checkValidEnvSet(matrix_ptr, env_set_ptr))
         miss_num = miss_num + 1;
@@ -166,6 +167,7 @@ EnvSetPtrVec getChargeEnvList(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr
     }
     if (miss_num >= para_ptr->max_miss_charge_)
       break;
+    charge = charge - 1;
   }
 
   miss_num = 0;
@@ -213,10 +215,11 @@ EnvCollPtr findEnvColl(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
         return nullptr;
   }
   double even_odd_peak_ratio = component_score::getAggOddEvenPeakRatio(env_set_ptr);
+  SeedEnvelopePtr new_seed_ptr = seed_ptr;
   if (std::abs(even_odd_peak_ratio) > para_ptr->even_odd_ratio_cutoff_) {
-    SeedEnvelopePtr new_seed_ptr = env_util::testHalfChargeState(matrix_ptr, seed_ptr,
-                                                                 env_set_ptr, even_odd_peak_ratio, 
-                                                                 para_ptr, sn_ratio);
+    new_seed_ptr = env_util::testHalfChargeState(matrix_ptr, seed_ptr,
+                                                 env_set_ptr, even_odd_peak_ratio, 
+                                                 para_ptr, sn_ratio);
     if (new_seed_ptr == nullptr) {
       return nullptr;
     }
@@ -232,7 +235,8 @@ EnvCollPtr findEnvColl(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
       return nullptr; 
     }
   }
-  EnvSetPtrVec env_set_list = getChargeEnvList(matrix_ptr, seed_ptr,
+  
+  EnvSetPtrVec env_set_list = getChargeEnvList(matrix_ptr, new_seed_ptr,
                                                env_set_ptr, para_ptr, sn_ratio);
   env_set_list.push_back(env_set_ptr);
   std::sort(env_set_list.begin(), env_set_list.end(), EnvSet::cmpCharge);
@@ -243,7 +247,7 @@ EnvCollPtr findEnvColl(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
   }
   int start_spec_id = env_set_ptr->getStartSpecId();
   int end_spec_id = env_set_ptr->getEndSpecId();
-  EnvCollPtr env_coll_ptr = std::make_shared<EnvColl>(seed_ptr, env_set_list, 
+  EnvCollPtr env_coll_ptr = std::make_shared<EnvColl>(new_seed_ptr, env_set_list, 
                                                       min_charge, max_charge, 
                                                       start_spec_id, end_spec_id);
   return env_coll_ptr;

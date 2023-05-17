@@ -40,6 +40,8 @@ std::vector<double> EnvColl::compExpInteSumList() {
     if (peak_num != static_cast<int>(cur_sum_list.size())) {
       LOG_ERROR("peak number " << peak_num << " cur list len " << cur_sum_list.size());
     }
+    LOG_DEBUG("seed env peak number " << env_set->getSeedPtr()->getPeakNum() <<
+              "exp env peak num " << cur_sum_list.size());
     for (int i = 0; i < peak_num; i++)
       sum_list[i] = sum_list[i] + cur_sum_list[i];
   }

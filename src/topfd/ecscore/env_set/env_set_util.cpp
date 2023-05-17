@@ -12,6 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include "common/util/logger.hpp"
+
 #include "topfd/ecscore/env_set/env_set.hpp"
 #include "topfd/ecscore/env_set/env_set_util.hpp"
 
@@ -166,7 +168,7 @@ EnvSetPtr getEnvSet(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
         exp_env_ptr->setPeakPtr(i, nullptr);
     }
     back_env_list.push_back(exp_env_ptr);
-    if (exp_env_ptr->getMatchPeakNum(refer_idx) < para_ptr->max_miss_peak_) {
+    if (exp_env_ptr->getMatchPeakNum(refer_idx) < para_ptr->min_match_peak_) {
       miss_num = miss_num + 1;
     }
     else {
@@ -194,7 +196,7 @@ EnvSetPtr getEnvSet(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
         exp_env_ptr->setPeakPtr(i, nullptr);
     }
     forw_env_list.push_back(exp_env_ptr);
-    if (exp_env_ptr->getMatchPeakNum(refer_idx) < para_ptr->max_miss_peak_) {
+    if (exp_env_ptr->getMatchPeakNum(refer_idx) < para_ptr->min_match_peak_) {
       miss_num = miss_num + 1;
     }
     else {
@@ -214,7 +216,7 @@ EnvSetPtr getEnvSet(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
   }
   int start_spec_id = back_env_list[0]->getSpecId();
   int end_spec_id = back_env_list[back_env_list.size() - 1]->getSpecId();
-  if ((end_spec_id - start_spec_id) < para_ptr->match_peak_tole_) {
+  if ((end_spec_id - start_spec_id + 1) < para_ptr->min_match_env_) {
     return nullptr;
   }
   EnvSetPtr env_set_ptr = std::make_shared<EnvSet>(seed_ptr, back_env_list, 
@@ -224,7 +226,7 @@ EnvSetPtr getEnvSet(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
 }
 
 bool checkValidEnvSetSeedEnv(PeakMatrixPtr matrix_ptr, EnvSetPtr env_set_ptr, 
-                             int max_miss_peak) {
+                             int min_match_peak) {
   std::vector<double> theo_env_inte = env_set_ptr->getSeedInteList();
   int refer_idx = std::max_element(theo_env_inte.begin(), theo_env_inte.end()) - theo_env_inte.begin();
   int base_idx = env_set_ptr->getBaseSpecId();
@@ -234,14 +236,14 @@ bool checkValidEnvSetSeedEnv(PeakMatrixPtr matrix_ptr, EnvSetPtr env_set_ptr,
   bool valid = true;
   for (auto &exp_env : env_list) {
     if (exp_env->getSpecId() >= start_idx and exp_env->getSpecId() <= end_idx)
-      if (exp_env->getMatchPeakNum(refer_idx) < max_miss_peak)
+      if (exp_env->getMatchPeakNum(refer_idx) < min_match_peak)
         valid = false;
   }
   return valid;
 }
 
 bool checkValidEnvSetSeedEnvSparse(PeakMatrixPtr matrix_ptr, EnvSetPtr env_set_ptr, 
-                                   int max_miss_peak) {
+                                   int min_match_peak) {
   std::vector<double> theo_env_inte = env_set_ptr->getSeedInteList();
   int refer_idx = std::max_element(theo_env_inte.begin(), theo_env_inte.end()) - theo_env_inte.begin();
   int base_idx = env_set_ptr->getBaseSpecId();
@@ -252,7 +254,7 @@ bool checkValidEnvSetSeedEnvSparse(PeakMatrixPtr matrix_ptr, EnvSetPtr env_set_p
   int false_counter = 0;
   for (auto &exp_env : env_list) {
     if (exp_env->getSpecId() >= start_idx and exp_env->getSpecId() <= end_idx)
-      if (exp_env->getMatchPeakNum(refer_idx) < max_miss_peak)
+      if (exp_env->getMatchPeakNum(refer_idx) < min_match_peak)
         false_counter++;
   }
   if (false_counter > 2)

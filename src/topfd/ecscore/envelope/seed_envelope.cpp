@@ -96,8 +96,13 @@ SeedEnvelope::SeedEnvelope(SeedEnvelopePtr env_ptr, int new_charge) {
   inte_ = env_ptr->inte_;
   charge_ = new_charge;
   pos_ = peak_util::compMz(mass_, charge_);
+
+  int old_charge = env_ptr->getCharge();
   for (auto &i: env_ptr->peak_ptr_list_) {
-    EnvSimplePeakPtr p_ptr = std::make_shared<EnvSimplePeak>(i->getPosition(), 
+    double old_pos = i->getPosition();
+    double neutral_mass = peak_util::compPeakNeutralMass(old_pos, old_charge);
+    double new_pos = peak_util::compMz(neutral_mass, new_charge); 
+    EnvSimplePeakPtr p_ptr = std::make_shared<EnvSimplePeak>(new_pos,  
                                                              i->getIntensity()); 
     peak_ptr_list_.push_back(p_ptr);
   }
