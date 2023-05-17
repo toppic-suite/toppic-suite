@@ -43,7 +43,6 @@ void processOneFile(TopfdParaPtr para_ptr,
 
     DeconvProcess processor(para_ptr, spec_file_name, frac_id, thread_number);
     
-    /*
     processor.process();
     std::cout << "Deconvolution finished." << std::endl;
 
@@ -67,7 +66,6 @@ void processOneFile(TopfdParaPtr para_ptr,
       file_util::cleanPrefix(base_name_ms2 + "_", fa_base_ms2 + "_");
     }
     std::cout << "Deleting temporary files - finished." << std::endl; 
-    */
 
     std::cout << "Feature detection started." << std::endl;
     /*
