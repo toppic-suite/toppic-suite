@@ -88,38 +88,33 @@ void process_single_file(std::string &base_file_name,
   EnvCollPtrVec env_coll_list;
 
   int feat_id = 0;
+  double perc = 0;
   FeaturePtrVec features;
   for (int seed_env_idx = 0; seed_env_idx < seed_num; seed_env_idx++) {
-    LOG_DEBUG("Processing seed env " << seed_env_idx); 
-    if (seed_env_idx % 10000 == 0) {
-      std::cout << "\r" << "Processing peak " 
-        << seed_env_idx << " and Features found " << feat_id << std::flush;
+    if (seed_env_idx % 1000 == 0) {
+      perc = static_cast<int>(seed_env_idx * 100 / seed_num);
+      std::cout << "\r" << "Processing seed " << seed_env_idx << " ...       " << perc << "\% finished." << std::flush;
+        //and Features found " << feat_id << std::flush;
     }
     SeedEnvelopePtr seed_ptr = seed_ptrs[seed_env_idx];
     bool valid = seed_env_util::preprocessEnv(matrix_ptr, seed_ptr, 
                                               score_para_ptr, topfd_para_ptr->getMsOneSnRatio());
-    LOG_DEBUG("Preprocessing finished!"); 
     if (!valid) continue;
     EnvCollPtr env_coll_ptr = env_coll_util::findEnvColl(matrix_ptr, seed_ptr,
                                                          score_para_ptr, 
                                                          topfd_para_ptr->getMsOneSnRatio());
-    LOG_DEBUG("Found envelope collection!"); 
     if (env_coll_ptr != nullptr) {
       if (env_coll_util::checkExistingFeatures(matrix_ptr, env_coll_ptr,
                                                env_coll_list, score_para_ptr)) {
         continue;
       }
-      LOG_DEBUG("Checked existing features!"); 
       env_coll_ptr->refineMonoMass();
 
-      LOG_DEBUG("Refined feature!"); 
       FeaturePtr feat_ptr = std::make_shared<Feature>(env_coll_ptr, matrix_ptr,
                                                       feat_id, topfd_para_ptr->getMsOneSnRatio());
-      LOG_DEBUG("Generate feature!"); 
       feat_id++;
       features.push_back(feat_ptr);
       env_coll_ptr->removePeakData(matrix_ptr);
-      LOG_DEBUG("Removed peaks!"); 
       /*
       if (feature.getScore() < top_para_ptr->getEcscoreCutoff()) continue;
       env_coll.setEcscore(feature.getScore());
@@ -137,8 +132,8 @@ void process_single_file(std::string &base_file_name,
   SpecFeaturePtrVec ms2_features;
   Feature::assign_features(ms1_ptr_vec, ms2_file_name, frac_features, env_coll_list, features, ms2_features,
                            prec_spectrum_Base_mono_mz, peak_matrix, model, model_escore, feature_para_ptr, para_ptr);
-  std::cout << std::endl << "Number of Envelope Collections: " << features.size() << std::endl;
-  */
+                           */
+  std::cout << std::endl << "Number of proteoform features: " << features.size() << std::endl;
 
   /// output files
   std::string feat_file_name = base_file_name + "_ms1.csv";

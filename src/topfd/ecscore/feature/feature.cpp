@@ -42,11 +42,11 @@ Feature::Feature(EnvCollPtr env_coll_ptr, PeakMatrixPtr matrix_ptr,
   abundance_ = env_coll_ptr->getIntensity(sn_ratio, matrix_ptr->getBaseInte());
 
   double scan_max_rt = spec_list[spec_list.size()-1]->getRt();
-  min_elution_time_ = spec_list[min_scan_]->getRt() / scan_max_rt;
-  max_elution_time_ = spec_list[max_scan_]->getRt() / scan_max_rt; 
+  min_elution_time_ = spec_list[min_scan_]->getRt()/scan_max_rt;
+  max_elution_time_ = spec_list[max_scan_]->getRt()/scan_max_rt; 
   int seed_spec_id = seed_ptr->getSpecId();
-  apex_elution_time_ = spec_list[seed_spec_id]->getRt() / scan_max_rt;
-  elution_length_ = (max_elution_time_ - min_elution_time_) /scan_max_rt; 
+  apex_elution_time_ = spec_list[seed_spec_id]->getRt()/scan_max_rt;
+  elution_length_ = max_elution_time_ - min_elution_time_; 
 
   double noise_inte = matrix_ptr->getBaseInte();
   EnvSetPtr seed_set_ptr = env_coll_ptr->getSeedEnvSet();
