@@ -14,6 +14,7 @@
 
 #include <numeric>
 
+#include "common/util/logger.hpp"
 #include "topfd/ecscore/envelope/env_util.hpp"
 #include "topfd/ecscore/env_set/env_set_util.hpp"
 #include "topfd/ecscore/score/component_score.hpp"
@@ -48,9 +49,16 @@ double getAggOddEvenPeakRatio(EnvSetPtr env_set_ptr) {
       sum_odd_peaks_theo = sum_odd_peaks_theo + theo_inte[peak_idx];
     }
   }
-  double inte_ratio = (sum_even_peaks / sum_even_peaks_theo) / (sum_odd_peaks / sum_odd_peaks_theo);
-  if (inte_ratio <= 0)
-    inte_ratio = 1;
+  double inte_ratio = 1.0; 
+  if (sum_even_peaks == 0.0) {
+    inte_ratio = 0.01;
+  }
+  else if (sum_odd_peaks == 0.0) {
+    inte_ratio = 100;
+  }
+  else {
+    inte_ratio = (sum_even_peaks / sum_even_peaks_theo) / (sum_odd_peaks / sum_odd_peaks_theo);
+  }
   return std::log10(inte_ratio);
 }
 
