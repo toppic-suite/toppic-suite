@@ -41,17 +41,19 @@ Feature::Feature(EnvCollPtr env_coll_ptr, PeakMatrixPtr matrix_ptr,
 
   abundance_ = env_coll_ptr->getIntensity(sn_ratio, matrix_ptr->getBaseInte());
 
-  double scan_max_rt = spec_list[spec_list.size()-1]->getRt();
-  min_elution_time_ = spec_list[min_scan_]->getRt()/scan_max_rt;
-  max_elution_time_ = spec_list[max_scan_]->getRt()/scan_max_rt; 
+  // convert seconds to minutes
+  min_elution_time_ = spec_list[min_scan_]->getRt()/60;
+  max_elution_time_ = spec_list[max_scan_]->getRt()/60; 
   int seed_spec_id = seed_ptr->getSpecId();
-  apex_elution_time_ = spec_list[seed_spec_id]->getRt()/scan_max_rt;
+  apex_elution_time_ = spec_list[seed_spec_id]->getRt()/60;
   elution_length_ = max_elution_time_ - min_elution_time_; 
 
   double noise_inte = matrix_ptr->getBaseInte();
   EnvSetPtr seed_set_ptr = env_coll_ptr->getSeedEnvSet();
   std::vector<std::vector<double>> theo_map 
     = seed_set_ptr->getScaledTheoIntes(sn_ratio, noise_inte);
+
+  map_max_elution_time_ = spec_list[spec_list.size()-1]->getRt()/60;
 
   percent_matched_peaks_ = component_score::getMatchedPeakPercent(env_set_ptr, theo_map);
   intensity_correlation_ = component_score::getAggEnvCorr(env_set_ptr);

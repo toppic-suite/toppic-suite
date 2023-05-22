@@ -91,9 +91,10 @@ void process_single_file(std::string &base_file_name,
   double perc = 0;
   FeaturePtrVec features;
   for (int seed_env_idx = 0; seed_env_idx < seed_num; seed_env_idx++) {
-    if (seed_env_idx % 1000 == 0) {
-      perc = static_cast<int>(seed_env_idx * 100 / seed_num);
-      std::cout << "\r" << "Processing seed " << seed_env_idx << " ...       " << perc << "\% finished." << std::flush;
+    int count = seed_env_idx + 1;
+    if (count % 1000 == 0 || count == seed_num) {
+      perc = static_cast<int>(count * 100 / seed_num);
+      std::cout << "\r" << "Processing seed " << count << " ...       " << perc << "\% finished." << std::flush;
         //and Features found " << feat_id << std::flush;
     }
     SeedEnvelopePtr seed_ptr = seed_ptrs[seed_env_idx];

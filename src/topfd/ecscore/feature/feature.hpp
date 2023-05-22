@@ -139,6 +139,10 @@ class Feature {
 
   void setElutionLength(double elution_length) { elution_length_ = elution_length; }
 
+  double getMapMaxElutionTime() const { return map_max_elution_time_; }
+
+  void setMapMaxElutionTime(double map_max_elution_time) { map_max_elution_time_ = map_max_elution_time; }
+
   double getEnvcnnScore() const { return envcnn_score_; }
 
   void setEnvcnnScore(double envcnn_score) { envcnn_score_ = envcnn_score; }
@@ -193,6 +197,7 @@ class Feature {
   double max_elution_time_ = 0;
   double apex_elution_time_ = 0;
   double elution_length_ = 0;
+  double map_max_elution_time_ = 0;
   double envcnn_score_ = 0;
   double percent_matched_peaks_ = 0;
   double intensity_correlation_ = 0;
