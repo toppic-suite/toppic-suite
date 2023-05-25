@@ -95,7 +95,6 @@ void process_single_file(std::string &base_file_name,
     if (count % 1000 == 0 || count == seed_num) {
       perc = static_cast<int>(count * 100 / seed_num);
       std::cout << "\r" << "Processing seed " << count << " ...       " << perc << "\% finished." << std::flush;
-        //and Features found " << feat_id << std::flush;
     }
     SeedEnvelopePtr seed_ptr = seed_ptrs[seed_env_idx];
     bool valid = seed_env_util::preprocessEnv(matrix_ptr, seed_ptr, 
@@ -116,10 +115,12 @@ void process_single_file(std::string &base_file_name,
       feat_id++;
       features.push_back(feat_ptr);
       env_coll_ptr->removePeakData(matrix_ptr);
+      if (feat_ptr->getScore() < topfd_para_ptr->getEcscoreCutoff()) {
+        continue;
+      }
+      env_coll_ptr->setEcscore(feat_ptr->getScore());
+      env_coll_list.push_back(env_coll_ptr);
       /*
-      if (feature.getScore() < top_para_ptr->getEcscoreCutoff()) continue;
-      env_coll.setEcscore(feature.getScore());
-      env_coll_list.push_back(env_coll);
       FracFeaturePtr feature_ptr = Feature::getFeature(env_coll_num, ms1_ptr_vec, feature_para_ptr->frac_id_,
                                                        feature_para_ptr->file_name_, env_coll, peak_matrix,
                                                        para_ptr->getMsOneSnRatio());
