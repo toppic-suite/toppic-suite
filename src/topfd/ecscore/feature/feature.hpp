@@ -36,6 +36,8 @@ namespace toppic {
 class Feature {
  public:
   Feature(EnvCollPtr env_coll_ptr, PeakMatrixPtr matrix_ptr, int feature_id, double sn_ratio);
+
+  std::vector<float> getEcscoreInput(double max_retention_time);
   
   /*
   Feature(EnvCollPtr env_coll_ptr, PeakMatrixPtr matrix_ptr, int feature_id, double inte);

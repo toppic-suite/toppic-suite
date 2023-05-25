@@ -18,6 +18,7 @@
 
 #include "topfd/ecscore/score/component_score.hpp"
 #include "topfd/ecscore/score/comp_env_cnn_score.hpp"
+#include "topfd/ecscore/score/onnx_ecscore.hpp"
 #include "topfd/ecscore/spectrum/matrix_spectrum.hpp"
 #include "topfd/ecscore/feature/feature.hpp"
 
@@ -66,18 +67,20 @@ Feature::Feature(EnvCollPtr env_coll_ptr, PeakMatrixPtr matrix_ptr,
   envcnn_score_ = comp_env_cnn_score::compEnvcnnScore(matrix_ptr, env_coll_ptr); 
   label_ = 0;
 
-  /*
-  std::vector<double> data;
+  std::vector<float> ecscore_input = getEcscoreInput(map_max_elution_time_);
+  score_ = onnx_ecscore::predict(ecscore_input); 
+}
+
+std::vector<float> Feature::getEcscoreInput(double max_elution_time) {
+  std::vector<float> data;
   data.push_back(envcnn_score_); //1
-  data.push_back(elution_length_ / 60.0); //2
+  data.push_back(elution_length_ / max_elution_time * 2); //2
   data.push_back(percent_matched_peaks_); //3
-  data.push_back(std::log(abundance_)); //4
-  data.push_back(rep_charge_); //5
-  data.push_back(top3_correlation_); //6
-  data.push_back((max_charge_ - min_charge_) / 30.0); //7
-  data.push_back(even_odd_peak_ratios_); //8
-  score_ = env_coll_score::get_env_coll_score(model_escore, data);
-  */
+  data.push_back(rep_charge_); //4
+  data.push_back(top3_correlation_); //5
+  data.push_back((max_charge_ - min_charge_) / 30.0); //6
+  data.push_back(even_odd_peak_ratio_); //7
+  return data;
 }
 
 /*
