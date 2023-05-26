@@ -15,6 +15,9 @@
 #ifndef TOPPIC_ECSCORE_ENV_COLL_ENV_COLL_UTIL_HPP
 #define TOPPIC_ECSCORE_ENV_COLL_ENV_COLL_UTIL_HPP
 
+#include "ms/spec/deconv_ms.hpp"
+#include "ms/feature/frac_feature.hpp"
+
 #include "topfd/ecscore/ecscore_para.hpp"
 #include "topfd/ecscore/spectrum/peak_matrix.hpp"
 #include "topfd/ecscore/envelope/seed_envelope.hpp"
@@ -34,6 +37,10 @@ EnvSetPtrVec getChargeEnvList(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr env_ptr,
 
 bool checkExistingFeatures(PeakMatrixPtr matrix_ptr, EnvCollPtr coll_ptr, 
                            EnvCollPtrVec &env_coll_list, EcscoreParaPtr para_ptr);
+
+FracFeaturePtr getFracFeature(int feat_id, DeconvMsPtrVec &ms1_ptr_vec, int
+                              frac_id, std::string &file_name,
+                              EnvCollPtr coll_ptr, PeakMatrixPtr matrix_ptr, double snr);
 
 }
 }

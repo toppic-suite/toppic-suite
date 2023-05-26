@@ -38,7 +38,7 @@ class Feature {
   Feature(EnvCollPtr env_coll_ptr, PeakMatrixPtr matrix_ptr, int feature_id, double sn_ratio);
 
   std::vector<float> getEcscoreInput(double max_retention_time);
-  
+
   /*
   Feature(EnvCollPtr env_coll_ptr, PeakMatrixPtr matrix_ptr, int feature_id, double inte);
 
@@ -46,8 +46,6 @@ class Feature {
   Feature(EnvCollection &env_coll, PeakMatrix &peak_matrix, fdeep::model &model, fdeep::model &model_escore,
           int feature_id, double snr);
 
-  FracFeaturePtr static getFeature(int feat_id, DeconvMsPtrVec &ms1_ptr_vec, int frac_id, std::string file_name,
-                                   EnvCollection &env_coll, PeakMatrix &peak_matrix, double snr);
 
   void static
     assign_features(DeconvMsPtrVec &ms1_ptr_vec, const std::string &ms2_file_name,

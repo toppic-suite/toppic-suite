@@ -25,6 +25,7 @@
 #include "topfd/envcnn/onnx_env_cnn.hpp" 
 #include "topfd/deconv/deconv_process.hpp"
 #include "topfd/feature_detect/feature_detect.hpp"
+#include "topfd/ecscore/score/onnx_ecscore.hpp"
 #include "topfd/ecscore/env_coll_detect.hpp"
 #include "topfd/common/topfd_para.hpp"
 
@@ -205,13 +206,11 @@ void getMsScanCount(std::string spectrum_file_name, std::vector<int> &scan_cnt_v
 }
 
 int process(TopfdParaPtr para_ptr,  std::vector<std::string> spec_file_lst) {
+  // init data, envelope base, envcnn model, and ecscore model
   base_data::init();
   EnvBase::initBase(para_ptr->getResourceDir());
-
-  if (para_ptr->isUseEnvCnn()) {
-    //env_cnn::initModel(topfd_para_ptr_->getResourceDir(), topfd_para_ptr_->getThreadNum());
-    onnx_env_cnn::initModel(para_ptr->getResourceDir(), para_ptr->getThreadNum());
-  }
+  onnx_env_cnn::initModel(para_ptr->getResourceDir(), para_ptr->getThreadNum());
+  onnx_ecscore::initModel(para_ptr->getResourceDir(), para_ptr->getThreadNum());
   
   for (size_t k = 0; k < spec_file_lst.size(); k++) {
     //get ms1 and ms2 scan number
@@ -221,7 +220,8 @@ int process(TopfdParaPtr para_ptr,  std::vector<std::string> spec_file_lst) {
     para_ptr->setMs1ScanNumber(scan_cnt_vec[0]);
     para_ptr->setMs2ScanNumber(scan_cnt_vec[1]);
 
-    std::string print_str = para_ptr->getParaStr("", " ");//print parameter for each file
+    //print parameter for each file
+    std::string print_str = para_ptr->getParaStr("", " ");
     std::cout << print_str;
 
     if (isValidFile(spec_file_lst[k])) {
@@ -237,7 +237,6 @@ int process(TopfdParaPtr para_ptr,  std::vector<std::string> spec_file_lst) {
 
   base_data::release();
   std::cout << "TopFD finished." << std::endl << std::flush;
-
   return 0;
 }
 

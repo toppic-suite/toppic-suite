@@ -332,7 +332,7 @@ EnvSetPtr findEnvSet(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
 bool checkValidEnvSet(PeakMatrixPtr matrix_ptr, EnvSetPtr env_set_ptr) {
   bool valid = true;
   int elems = 0;
-  std::vector<double> env_xic = env_set_ptr->getXicEnvInteList();
+  std::vector<double> env_xic = env_set_ptr->getXicTopThreeInteList();
   for (double inte : env_xic)
     if (inte > 0) elems++;
   if (elems < 2) valid = false;

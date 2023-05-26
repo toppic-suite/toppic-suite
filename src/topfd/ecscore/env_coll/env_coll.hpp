@@ -68,7 +68,7 @@ class EnvColl {
 
   void setEcscore(double ecscore) { ecscore_ = ecscore; }
 
-  int getBaseSpecID() const { return seed_ptr_->getSpecId(); }
+  int getBaseSpecId() const { return seed_ptr_->getSpecId(); }
 
   double getMass() const { return seed_ptr_->getMass(); }
 

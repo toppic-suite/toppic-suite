@@ -38,15 +38,21 @@ class EnvSet {
 
   ExpEnvelopePtrVec getExpEnvList() { return exp_env_list_; }
 
+  int countEnvNum();
+
   void setExpEnvList(ExpEnvelopePtrVec exp_env_list) { exp_env_list_ = exp_env_list; }
 
   SeedEnvelopePtr getSeedPtr() { return seed_ptr_; }
 
   XicPtr getXicPtr() { return xic_ptr_; }
 
+  double getXicSeedInte();
+
   void setXicPtr(XicPtr xic_ptr) { xic_ptr_ = xic_ptr; }
 
-  std::vector<double> getXicEnvInteList() { return xic_ptr_->getInteList(); }
+  std::vector<double> getXicTopThreeInteList() { return xic_ptr_->getTopThreeInteList(); }
+
+  std::vector<double> getXicAllPeakInteList() { return xic_ptr_->getAllPeakInteList(); }
 
   std::vector<double> getSeedInteList() {return seed_ptr_->getInteList(); }
 

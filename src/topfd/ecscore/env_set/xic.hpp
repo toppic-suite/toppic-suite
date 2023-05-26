@@ -25,13 +25,13 @@ class Xic {
   Xic();
 
   Xic(int start_spec_id, int base_spec_id, 
-      std::vector<double> &inte_list, 
-      std::vector<double> &env_inte_list);
+      std::vector<double> &top_three_inte_list, 
+      std::vector<double> &all_peak_inte_list);
 
   Xic(int start_spec_id, int base_spec_id, 
-      std::vector<double> &inte_list, 
+      std::vector<double> &top_three_inte_list, 
       std::vector<double> &smooth_inte_list,
-      std::vector<double> &env_inte_list);
+      std::vector<double> &all_peak_inte_list);
 
   void moving_avg(int n);
 
@@ -43,27 +43,31 @@ class Xic {
 
   void setBaseSpecId(int baseSpecId) { base_spec_id_ = baseSpecId; }
 
-  std::vector<double> getInteList() { return inte_list_; }
+  std::vector<double> getTopThreeInteList() { return top_three_inte_list_; }
 
-  void setInteList(std::vector<double> inteList); 
+  void setTopThreeInteList(std::vector<double> top_three_inte_list); 
 
-  double get_inte_list_sum() {return inte_sum_; }
+  double getTopThreeInteSum() {return top_three_inte_sum_; }
 
   std::vector<double> getSmoothedInteList() { return smoothed_inte_list_; }
 
-  void setSmoothedInteList(std::vector<double> smoothedInteList) { smoothed_inte_list_ = smoothedInteList; }
+  void setSmoothedInteList(std::vector<double> smoothed_inte_list) {
+    smoothed_inte_list_ = smoothed_inte_list; }
 
-  std::vector<double> getEnvInteList() { return env_inte_list_; }
+  std::vector<double> getAllPeakInteList() {return all_peak_inte_list_; }
 
-  void setEnvInteList(std::vector<double> envInteList) { env_inte_list_ = envInteList; }
+  void setAllPeakInteList(std::vector<double> all_peak_inte_list) {
+    all_peak_inte_list_ = all_peak_inte_list; }
 
  private:
   int start_spec_id_;
   int base_spec_id_;
-  std::vector<double> inte_list_;
+  // the intensities are based on scaled theoretical envelopes
+  std::vector<double> top_three_inte_list_;
+  std::vector<double> all_peak_inte_list_;
+  // smoothed top three intensity list
   std::vector<double> smoothed_inte_list_;
-  std::vector<double> env_inte_list_;
-  double inte_sum_;
+  double top_three_inte_sum_;
 };
 
 typedef std::shared_ptr<Xic> XicPtr;

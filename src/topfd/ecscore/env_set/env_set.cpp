@@ -35,12 +35,12 @@ void EnvSet::initMedianXic(double noise_inte, double sn_ratio) {
   std::vector<double> theo_envelope_inte = seed_ptr_->getInteList();
   int refer_idx = std::max_element(theo_envelope_inte.begin(), theo_envelope_inte.end()) 
                   - theo_envelope_inte.begin();
-  std::vector<double> inte_list;
-  std::vector<double> env_inte_list;
+  std::vector<double> top_three_inte_list;
+  std::vector<double> all_peak_inte_list;
   for (ExpEnvelopePtr env: exp_env_list_) {
     if (env->getMatchPeakNum(refer_idx) < 2) {
-      inte_list.push_back(0);
-      env_inte_list.push_back(0);
+      top_three_inte_list.push_back(0);
+      all_peak_inte_list.push_back(0);
       continue;
     }
     std::vector<double> exp_envelope_inte = env->getInteList();
@@ -50,7 +50,7 @@ void EnvSet::initMedianXic(double noise_inte, double sn_ratio) {
       top_three_inte += theo_envelope_inte[refer_idx - 1] * ratio;
     if (refer_idx + 1 < static_cast<int>(theo_envelope_inte.size()))
       top_three_inte += theo_envelope_inte[refer_idx + 1] * ratio;
-    inte_list.push_back(top_three_inte);
+    top_three_inte_list.push_back(top_three_inte);
 
     std::vector<double> scaled_theo_inte;
     for (auto inte: theo_envelope_inte) {
@@ -60,14 +60,35 @@ void EnvSet::initMedianXic(double noise_inte, double sn_ratio) {
       else
         scaled_theo_inte.push_back(0);
     }
-    env_inte_list.push_back(std::accumulate(scaled_theo_inte.begin(), scaled_theo_inte.end(), 0));
+    all_peak_inte_list.push_back(std::accumulate(scaled_theo_inte.begin(), scaled_theo_inte.end(), 0));
   }
-  xic_ptr_ = std::make_shared<Xic>(start_spec_id_, seed_ptr_->getSpecId(), inte_list, env_inte_list);
+  xic_ptr_ = std::make_shared<Xic>(start_spec_id_, seed_ptr_->getSpecId(),
+                                   top_three_inte_list, all_peak_inte_list);
 }
 
 void EnvSet::setSpecId(int start_spec_id, int end_spec_id) {
   start_spec_id_ = start_spec_id;
   end_spec_id_ = end_spec_id;
+}
+
+double EnvSet::getXicSeedInte() {
+  std::vector<double> xic_intes = xic_ptr_->getAllPeakInteList();  
+  double seed_inte = 0;
+  if (xic_intes.size() > 0) {
+    int inte_idx = getBaseSpecId() - start_spec_id_;
+    seed_inte = xic_intes[inte_idx];
+  }
+  return seed_inte;
+}
+
+int EnvSet::countEnvNum() {
+  int count = 0;
+  for (size_t i = 0; i < exp_env_list_.size(); i++) {
+    if (exp_env_list_[i] != nullptr) {
+      count++;
+    }
+  }
+  return count;
 }
 
 std::vector<double> EnvSet::compExpInteSumList() {
@@ -86,7 +107,7 @@ std::vector<double> EnvSet::compExpInteSumList() {
 
 void EnvSet::getWeightMzError(double &weight_sum, double &error_sum) {
   EnvSimplePeakPtrVec seed_peak_list = seed_ptr_->getPeakList();
-  std::vector<double> inte_list = xic_ptr_->getInteList();
+  std::vector<double> inte_list = xic_ptr_->getTopThreeInteList();
   int num_exp_env = exp_env_list_.size();
   int num_peaks_theo_env = seed_peak_list.size();
   weight_sum = 0;
@@ -163,34 +184,34 @@ double getRightMax(int pos, std::vector<double> &y) {
 }
 
 void EnvSet::shortlistExpEnvs() {
-  std::vector<double> inte_list = xic_ptr_->getInteList();
+  std::vector<double> top_three_inte_list = xic_ptr_->getTopThreeInteList();
   std::vector<double> smoothed_inte_list = xic_ptr_->getSmoothedInteList();
-  std::vector<double> env_inte_list = xic_ptr_->getEnvInteList();
+  std::vector<double> all_peak_inte_list = xic_ptr_->getAllPeakInteList();
 
-  std::vector<double> shortlisted_inte_list;
+  std::vector<double> shortlisted_top_three_inte_list;
   std::vector<double> shortlisted_smoothed_inte_list;
-  std::vector<double> shortlisted_env_inte_list;
+  std::vector<double> shortlisted_all_peak_inte_list;
   int num_exp_env = exp_env_list_.size();
   ExpEnvelopePtrVec tmp;
   for (int i = 0; i < num_exp_env; i++) {
     if (exp_env_list_[i]->getSpecId() >= start_spec_id_ && 
         exp_env_list_[i]->getSpecId() <= end_spec_id_) {
       tmp.push_back(exp_env_list_[i]);
-      shortlisted_inte_list.push_back(inte_list[i]);
+      shortlisted_top_three_inte_list.push_back(top_three_inte_list[i]);
       shortlisted_smoothed_inte_list.push_back(smoothed_inte_list[i]);
-      shortlisted_env_inte_list.push_back(env_inte_list[i]);
+      shortlisted_all_peak_inte_list.push_back(all_peak_inte_list[i]);
     }
   }
   exp_env_list_ = tmp;
   xic_ptr_ = std::make_shared<Xic>(exp_env_list_[0]->getSpecId(), seed_ptr_->getSpecId(), 
-                                   shortlisted_inte_list, shortlisted_smoothed_inte_list, 
-                                   shortlisted_env_inte_list);
+                                   shortlisted_top_three_inte_list, shortlisted_smoothed_inte_list, 
+                                   shortlisted_all_peak_inte_list);
 }
 
 void EnvSet::refineFeatureBoundary() {
   double split_feature_intensity_ratio = 0.4;
   int base_spec = seed_ptr_->getSpecId() - start_spec_id_;
-  std::vector<double> env_xic = xic_ptr_->getInteList();
+  std::vector<double> env_xic = xic_ptr_->getTopThreeInteList();
   std::vector<double> smoothed_env_xic = xic_ptr_->getSmoothedInteList();
 
   /// Left side

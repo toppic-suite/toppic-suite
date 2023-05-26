@@ -18,33 +18,33 @@
 namespace toppic {
 
 Xic::Xic(int start_spec_id, int base_spec_id, 
-         std::vector<double> &inte_list,
-         std::vector<double> &env_inte_list) {
+         std::vector<double> &top_three_inte_list,
+         std::vector<double> &all_peak_inte_list) {
   start_spec_id_ = start_spec_id;
   base_spec_id_ = base_spec_id;
-  inte_list_ = inte_list;
-  env_inte_list_ = env_inte_list;
+  top_three_inte_list_ = top_three_inte_list;
+  all_peak_inte_list_ = all_peak_inte_list;
   moving_avg(2);
 }
 
 Xic::Xic(int start_spec_id, int base_spec_id, 
-         std::vector<double> &inte_list,
+         std::vector<double> &top_three_inte_list,
          std::vector<double> &smoothed_inte_list, 
-         std::vector<double> &env_inte_list) {
+         std::vector<double> &all_peak_inte_list) {
   start_spec_id_ = start_spec_id;
   base_spec_id_ = base_spec_id;
-  inte_list_ = inte_list;
+  top_three_inte_list_ = top_three_inte_list;
   smoothed_inte_list_ = smoothed_inte_list;
-  env_inte_list_ = env_inte_list;
+  all_peak_inte_list_ = all_peak_inte_list;
 }
 
-void Xic::setInteList(std::vector<double> inteList)  { 
-  inte_list_ = inteList; 
-  inte_sum_ = std::accumulate(inte_list_.begin(), inte_list_.end(), 0.0); 
+void Xic::setTopThreeInteList(std::vector<double> top_three_inte_list)  { 
+  top_three_inte_list_ = top_three_inte_list; 
+  top_three_inte_sum_ = std::accumulate(top_three_inte_list_.begin(), top_three_inte_list_.end(), 0.0); 
 }
 
 void Xic::moving_avg(int size) {
-  std::vector<double> data = inte_list_;
+  std::vector<double> data = top_three_inte_list_;
   std::vector<double> left_padding(1, 0);
   data.insert(data.begin(), left_padding.begin(), left_padding.end());
   int num_spec = data.size();

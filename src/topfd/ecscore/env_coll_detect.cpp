@@ -92,7 +92,7 @@ void process_single_file(std::string &base_file_name,
   FeaturePtrVec features;
   for (int seed_env_idx = 0; seed_env_idx < seed_num; seed_env_idx++) {
     int count = seed_env_idx + 1;
-    if (count % 1000 == 0 || count == seed_num) {
+    if (count % 100 == 0 || count == seed_num) {
       perc = static_cast<int>(count * 100 / seed_num);
       std::cout << "\r" << "Processing seed " << count << " ...       " << perc << "\% finished." << std::flush;
     }
@@ -120,10 +120,12 @@ void process_single_file(std::string &base_file_name,
       }
       env_coll_ptr->setEcscore(feat_ptr->getScore());
       env_coll_list.push_back(env_coll_ptr);
+      
+      FracFeaturePtr feature_ptr = env_coll_util::getFracFeature(feat_id, ms1_ptr_vec, score_para_ptr->frac_id_,
+                                                                 score_para_ptr->file_name_,
+                                                                 env_coll_ptr, matrix_ptr,
+                                                                 topfd_para_ptr->getMsOneSnRatio());
       /*
-      FracFeaturePtr feature_ptr = Feature::getFeature(env_coll_num, ms1_ptr_vec, feature_para_ptr->frac_id_,
-                                                       feature_para_ptr->file_name_, env_coll, peak_matrix,
-                                                       para_ptr->getMsOneSnRatio());
       feature_ptr->setPromexScore(feature.getScore());
       frac_features.push_back(feature_ptr);
       */

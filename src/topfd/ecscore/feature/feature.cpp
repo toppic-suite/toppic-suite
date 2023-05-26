@@ -131,55 +131,6 @@ DeconvMsPtrVec Feature::readData(const std::string &file_name) {
   return ms_ptr_vec;
 }
 
-FracFeaturePtr Feature::getFeature(int feat_id, DeconvMsPtrVec &ms1_ptr_vec, int frac_id, std::string file_name,
-                                   EnvCollection &env_coll, PeakMatrix &peak_matrix, double snr) {
-  double noise_inte = peak_matrix.get_min_inte();
-  spec_list spectra_list = peak_matrix.get_spectra_list();
-  int ms1_id_begin = env_coll.getStartSpecId();
-  int ms1_id_end = env_coll.getEndSpecId();
-  double feat_inte = env_coll.get_intensity(snr, peak_matrix.get_min_inte());
-  double feat_mass = env_coll.getMass();
-  int min_charge = env_coll.getMinCharge();
-  int max_charge = env_coll.getMaxCharge();
-  double ms1_time_begin = env_coll.get_min_elution_time(spectra_list);
-  double ms1_time_end = env_coll.get_max_elution_time(spectra_list);
-  int ms1_scan_begin = ms1_ptr_vec[ms1_id_begin]->getMsHeaderPtr()->getFirstScanNum();
-  int ms1_scan_end = ms1_ptr_vec[ms1_id_end]->getMsHeaderPtr()->getFirstScanNum();
-
-  // get apex inte
-  double time_apex = env_coll.get_apex_elution_time(spectra_list);
-  EnvSet es = env_coll.get_seed_env_set();
-  std::vector<double> env_intes = es.getEnvIntes();
-  double apex_inte = 0;
-  if (env_intes.size() > 0) {
-    int inte_idx = env_coll.getBaseSpecID() - env_coll.getStartSpecId();
-    apex_inte = env_intes[inte_idx];
-  }
-
-  FracFeaturePtr feature_ptr = std::make_shared<FracFeature>(feat_id, frac_id, file_name, feat_mass, feat_inte,
-                                                             ms1_id_begin, ms1_id_end, ms1_time_begin, ms1_time_end,
-                                                             ms1_scan_begin, ms1_scan_end, min_charge, max_charge,
-                                                             0, time_apex, apex_inte);
-  SingleChargeFeaturePtrVec single_features;
-  for (EnvSet &es: env_coll.getEnvSetList()) {
-    int id_begin = es.getStartSpecId();
-    int id_end = es.getEndSpecId();
-    double time_begin = ms1_ptr_vec[id_begin]->getMsHeaderPtr()->getRetentionTime();
-    double time_end = ms1_ptr_vec[id_end]->getMsHeaderPtr()->getRetentionTime();
-    int scan_begin = ms1_ptr_vec[id_begin]->getMsHeaderPtr()->getFirstScanNum();
-    int scan_end = ms1_ptr_vec[id_end]->getMsHeaderPtr()->getFirstScanNum();
-    double inte = es.comp_intensity(snr, noise_inte);
-    int charge = es.getCharge();
-    std::vector<double> xic = es.getXicEnvIntes();
-    SingleChargeFeaturePtr single_feature = std::make_shared<SingleChargeFeature>(charge, time_begin, time_end,
-                                                                                  scan_begin, scan_end,
-                                                                                  inte, 0, id_begin, id_end,
-                                                                                  feat_mass, xic);
-    single_features.push_back(single_feature);
-  }
-  feature_ptr->setSingleFeatures(single_features);
-  return feature_ptr;
-}
 
 double Feature::isMatch(double prec_mass, double feature_mass, const FeatureParaPtr &para_ptr, bool &shift) {
   std::vector<double> search_masses = para_ptr->getSearchMasses(prec_mass);
