@@ -98,7 +98,7 @@ FracFeature::FracFeature(XmlDOMElement* element) {
   env_num_ = xml_dom_util::getIntChildValue(element, "envelope_num", 0);
   apex_time_ = xml_dom_util::getDoubleChildValue(element, "apex_time", 0);
   apex_inte_ = xml_dom_util::getDoubleChildValue(element, "apex_inte", 0);
-  promex_score_ = xml_dom_util::getDoubleChildValue(element, "promex_score", 0);
+  ecscore_ = xml_dom_util::getDoubleChildValue(element, "ecscore", 0);
   sample_feature_id_ = xml_dom_util::getIntChildValue(element, "sample_feature_id", 0);
   sample_feature_inte_ = xml_dom_util::getDoubleChildValue(element, "sample_feature_inte", 0);
 
@@ -147,8 +147,8 @@ XmlDOMElement* FracFeature::toXmlElement(XmlDOMDocument* xml_doc) {
   xml_doc->addElement(element, "apex_time", str.c_str());
   str = str_util::toString(apex_inte_);
   xml_doc->addElement(element, "apex_inte", str.c_str());
-  str = str_util::toString(promex_score_);
-  xml_doc->addElement(element, "promex_score", str.c_str());
+  str = str_util::toString(ecscore_);
+  xml_doc->addElement(element, "ecscore", str.c_str());
   str = str_util::toString(sample_feature_id_);
   xml_doc->addElement(element, "sample_feature_id", str.c_str());
   str = str_util::toString(sample_feature_inte_);

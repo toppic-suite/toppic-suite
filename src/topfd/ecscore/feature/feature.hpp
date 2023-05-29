@@ -15,6 +15,12 @@
 #ifndef TOPPIC_TOPFD_ECSCORE_FEATURE_FEATURE_HPP
 #define TOPPIC_TOPFD_ECSCORE_FEATURE_FEATURE_HPP
 
+#include "ms/feature/frac_feature.hpp"
+#include "ms/feature/spec_feature.hpp"
+
+#include "topfd/common/topfd_para.hpp"
+#include "topfd/ecscore/ecscore_para.hpp"
+
 #include "topfd/ecscore/spectrum/peak_matrix.hpp"
 #include "topfd/ecscore/env_coll/env_coll.hpp"
 
@@ -23,8 +29,6 @@
 #include "topfd/feature_detect/score/get_env_cnn_score.hpp"
 #include "topfd/feature_detect/score/get_env_coll_score.hpp"
 #include "topfd/feature_detect/score/get_component_score.hpp"
-#include "ms/feature/frac_feature.hpp"
-#include "ms/feature/spec_feature.hpp"
 #include "ms/spec/simple_msalign_reader.hpp"
 #include "topfd/feature_detect/feature_para.hpp"
 #include "ms/spec/msalign_writer.hpp"
@@ -33,11 +37,21 @@
 
 namespace toppic {
 
+class Feature;
+typedef std::shared_ptr<Feature> FeaturePtr;
+typedef std::vector<FeaturePtr> FeaturePtrVec; 
+
 class Feature {
  public:
   Feature(EnvCollPtr env_coll_ptr, PeakMatrixPtr matrix_ptr, int feature_id, double sn_ratio);
 
   std::vector<float> getEcscoreInput(double max_retention_time);
+
+  static void assignFeatures(DeconvMsPtrVec &ms1_ptr_vec, const std::string &ms2_file_name,
+                             FracFeaturePtrVec &frac_features, EnvCollPtrVec &env_coll_list,
+                             FeaturePtrVec &features, SpecFeaturePtrVec &ms2_features,
+                             std::vector<double> &prec_mzs, PeakMatrixPtr matrix_ptr, 
+                             TopfdParaPtr topfd_para_ptr, EcscoreParaPtr score_para_ptr); 
 
   /*
   Feature(EnvCollPtr env_coll_ptr, PeakMatrixPtr matrix_ptr, int feature_id, double inte);
@@ -46,14 +60,6 @@ class Feature {
   Feature(EnvCollection &env_coll, PeakMatrix &peak_matrix, fdeep::model &model, fdeep::model &model_escore,
           int feature_id, double snr);
 
-
-  void static
-    assign_features(DeconvMsPtrVec &ms1_ptr_vec, const std::string &ms2_file_name,
-                    FracFeaturePtrVec &frac_features, std::vector<EnvCollection> &env_coll_list,
-                    std::vector<Feature> &features, SpecFeaturePtrVec &ms2_features,
-                    std::vector<double> &precMzs, PeakMatrix &peak_matrix, fdeep::model model,
-                    const fdeep::model &model_escore, FeatureParaPtr para_ptr, //EnvParaPtr env_para_ptr,
-                    TopfdParaPtr topfd_para_ptr);
 
   bool static
     get_mass_shifted_feature_map(FracFeaturePtrVec &frac_features, std::vector<EnvCollection> &env_coll_list,
@@ -210,8 +216,6 @@ class Feature {
   int label_ = 0;
 };
 
-typedef std::shared_ptr<Feature> FeaturePtr;
-typedef std::vector<FeaturePtr> FeaturePtrVec; 
 
 }
 

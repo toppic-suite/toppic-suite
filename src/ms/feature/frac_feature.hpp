@@ -84,7 +84,7 @@ class FracFeature {
 
   double getSampleFeatureInte() {return sample_feature_inte_;}
 
-  double getPromexScore() {return promex_score_;}
+  double getEcscore() {return ecscore_;}
 
   bool hasMs2Spec() {return has_ms2_spec_;}
 
@@ -92,7 +92,7 @@ class FracFeature {
 
   void setId(int id) {id_ = id;}
 
-  void setPromexScore(double score) {promex_score_ = score;}
+  void setEcscore(double score) {ecscore_ = score;}
 
   void setHasMs2Spec(bool has_ms2_spec) {has_ms2_spec_ = has_ms2_spec;}
 
@@ -126,7 +126,8 @@ class FracFeature {
   std::string file_name_;
   double mono_mass_;
   double intensity_;
-  // ms1 ids are used for promex score
+
+  // used for ecscore_score
   int min_ms1_id_;
   int max_ms1_id_;
 
@@ -143,8 +144,7 @@ class FracFeature {
   double sample_feature_inte_ = 0;
   SingleChargeFeaturePtrVec single_features_;
 
-  // used for promex_score
-  double promex_score_;
+  double ecscore_;
   bool has_ms2_spec_ = false;
 };
 

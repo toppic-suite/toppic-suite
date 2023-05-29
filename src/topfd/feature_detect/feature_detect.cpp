@@ -444,7 +444,8 @@ void findMsOneFeatures(DeconvMsPtrVec &ms1_ptr_vec, PeakPtrVec2D & raw_peaks,
           LOG_DEBUG("update score done");
           double promex_score = para_ptr->peak_cluster_score_ptr_->getScore(peak_cluster);
           LOG_DEBUG("get promex score done");
-          feature_ptr->setPromexScore(promex_score);
+          // promex score will not be used, we will use ecscore instead.
+          feature_ptr->setEcscore(promex_score);
           features.push_back(feature_ptr);
         //}
         removePeaks(ms1_ptr_vec, matched_peaks);
@@ -529,7 +530,7 @@ void getMs2Features(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtrVec &header_ptr_vec,
         // it is possible that some ms headers do not have matched features. 
         if (feature_ptr != nullptr) {
           feature_ptr->setHasMs2Spec(true);
-          feature_ptr->setPromexScore(-1000);
+          feature_ptr->setEcscore(-1000);
           features.push_back(feature_ptr);
           removePeaks(ms1_ptr_vec, matched_peaks);
 

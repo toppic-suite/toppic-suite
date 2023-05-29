@@ -83,6 +83,49 @@ std::vector<float> Feature::getEcscoreInput(double max_elution_time) {
   return data;
 }
 
+void Feature::assignFeatures(DeconvMsPtrVec &ms1_ptr_vec, const std::string &ms2_file_name,
+                             FracFeaturePtrVec &frac_features, EnvCollPtrVec &env_coll_list,
+                             FeaturePtrVec &features, SpecFeaturePtrVec &ms2_features,
+                             std::vector<double> &prec_mzs, PeakMatrixPtr matrix_ptr, 
+                             TopfdParaPtr topfd_para_ptr, EcscoreParaPtr score_para_ptr) { 
+
+  /*
+  int isolation_windows_mz = topfd_para_ptr->getPrecWindow();
+  DeconvMsPtrVec ms_ptr_vec = Feature::readData(ms2_file_name);
+  std::cout << "\r" << "Mapping Proteoforms Features on MS2 Scans" << std::flush;
+  for (size_t spec_id = 0; spec_id < ms_ptr_vec.size(); spec_id++) {
+    MsHeaderPtr hh = ms_ptr_vec[spec_id]->getMsHeaderPtr();
+    if (hh->getPrecCharge() == 0) continue;
+
+    double base_mz = precMzs[spec_id];
+    bool assigned_status = get_mass_shifted_feature_map(frac_features, env_coll_list, para_ptr, hh, topfd_para_ptr->getECScore(),
+                                                        base_mz, isolation_windows_mz, ms2_features);
+    if (assigned_status) continue;
+
+    assigned_status = get_charge_shifted_feature_map(frac_features, env_coll_list, para_ptr, hh, topfd_para_ptr->getECScore(), base_mz,
+                                                     isolation_windows_mz, ms2_features);
+    if (assigned_status) continue;
+
+    assigned_status = get_highest_inte_feature_map(frac_features, env_coll_list, para_ptr, hh, topfd_para_ptr->getECScore(), base_mz,
+                                                   isolation_windows_mz, ms2_features);
+    if (assigned_status) continue;
+
+    assigned_status = get_new_feature_map(ms1_ptr_vec, frac_features, env_coll_list, features, para_ptr, hh, topfd_para_ptr,
+                                          ms2_features, peak_matrix, model, model_escore);
+    if (assigned_status) continue;
+
+    get_empty_feature_map(ms1_ptr_vec, frac_features, env_coll_list, features, para_ptr, hh, topfd_para_ptr,
+                          ms2_features, peak_matrix, model, model_escore);
+    if (assigned_status) continue;
+
+  }
+  std::sort(ms2_features.begin(), ms2_features.end(), SpecFeature::cmpSpecIdInc);
+  MsAlignWriterPtr ms2_ptr = std::make_shared<MsAlignWriter>(ms2_file_name);
+  for (const auto &ms_ptr: ms_ptr_vec)
+    ms2_ptr->write(ms_ptr);
+    */
+}
+
 /*
 Feature::Feature(EnvCollPtr env_coll_ptr, PeakMatrixPtr matrix_ptr, 
                  int feature_id, double inte) {
@@ -146,46 +189,6 @@ double Feature::isMatch(double prec_mass, double feature_mass, const FeaturePara
   return min_diff;
 }
 
-void Feature::assign_features(DeconvMsPtrVec &ms1_ptr_vec, const std::string &ms2_file_name,
-                              FracFeaturePtrVec &frac_features, std::vector<EnvCollection> &env_coll_list,
-                              std::vector<Feature> &features, SpecFeaturePtrVec &ms2_features,
-                              std::vector<double> &precMzs, PeakMatrix &peak_matrix, fdeep::model model,
-                              const fdeep::model &model_escore, FeatureParaPtr para_ptr, TopfdParaPtr topfd_para_ptr) {
-
-  int isolation_windows_mz = topfd_para_ptr->getPrecWindow();
-  DeconvMsPtrVec ms_ptr_vec = Feature::readData(ms2_file_name);
-  std::cout << "\r" << "Mapping Proteoforms Features on MS2 Scans" << std::flush;
-  for (size_t spec_id = 0; spec_id < ms_ptr_vec.size(); spec_id++) {
-    MsHeaderPtr hh = ms_ptr_vec[spec_id]->getMsHeaderPtr();
-    if (hh->getPrecCharge() == 0) continue;
-
-    double base_mz = precMzs[spec_id];
-    bool assigned_status = get_mass_shifted_feature_map(frac_features, env_coll_list, para_ptr, hh, topfd_para_ptr->getECScore(),
-                                                        base_mz, isolation_windows_mz, ms2_features);
-    if (assigned_status) continue;
-
-    assigned_status = get_charge_shifted_feature_map(frac_features, env_coll_list, para_ptr, hh, topfd_para_ptr->getECScore(), base_mz,
-                                                     isolation_windows_mz, ms2_features);
-    if (assigned_status) continue;
-
-    assigned_status = get_highest_inte_feature_map(frac_features, env_coll_list, para_ptr, hh, topfd_para_ptr->getECScore(), base_mz,
-                                                   isolation_windows_mz, ms2_features);
-    if (assigned_status) continue;
-
-    assigned_status = get_new_feature_map(ms1_ptr_vec, frac_features, env_coll_list, features, para_ptr, hh, topfd_para_ptr,
-                                          ms2_features, peak_matrix, model, model_escore);
-    if (assigned_status) continue;
-
-    get_empty_feature_map(ms1_ptr_vec, frac_features, env_coll_list, features, para_ptr, hh, topfd_para_ptr,
-                          ms2_features, peak_matrix, model, model_escore);
-    if (assigned_status) continue;
-
-  }
-  std::sort(ms2_features.begin(), ms2_features.end(), SpecFeature::cmpSpecIdInc);
-  MsAlignWriterPtr ms2_ptr = std::make_shared<MsAlignWriter>(ms2_file_name);
-  for (const auto &ms_ptr: ms_ptr_vec)
-    ms2_ptr->write(ms_ptr);
-}
 
 void Feature::get_empty_feature_map(DeconvMsPtrVec &ms1_ptr_vec, FracFeaturePtrVec &frac_features,
                                     std::vector<EnvCollection> &env_coll_list, std::vector<Feature> &features,

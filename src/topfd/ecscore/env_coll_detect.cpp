@@ -20,6 +20,7 @@
 #include "common/util/str_util.hpp"
 #include "ms/spec/deconv_ms.hpp"
 #include "ms/spec/simple_msalign_reader.hpp"
+#include "ms/feature/spec_feature.hpp"
 #include "topfd/common/topfd_para.hpp"
 #include "topfd/msreader/raw_ms_reader.hpp"
 #include "topfd/ecscore/spectrum/peak_matrix.hpp"
@@ -90,6 +91,7 @@ void process_single_file(std::string &base_file_name,
   int feat_id = 0;
   double perc = 0;
   FeaturePtrVec features;
+  FracFeaturePtrVec frac_features;
   for (int seed_env_idx = 0; seed_env_idx < seed_num; seed_env_idx++) {
     int count = seed_env_idx + 1;
     if (count % 100 == 0 || count == seed_num) {
@@ -121,29 +123,25 @@ void process_single_file(std::string &base_file_name,
       env_coll_ptr->setEcscore(feat_ptr->getScore());
       env_coll_list.push_back(env_coll_ptr);
       
-      FracFeaturePtr feature_ptr = env_coll_util::getFracFeature(feat_id, ms1_ptr_vec, score_para_ptr->frac_id_,
-                                                                 score_para_ptr->file_name_,
-                                                                 env_coll_ptr, matrix_ptr,
-                                                                 topfd_para_ptr->getMsOneSnRatio());
-      /*
-      feature_ptr->setPromexScore(feature.getScore());
-      frac_features.push_back(feature_ptr);
-      */
+      FracFeaturePtr frac_feat_ptr = env_coll_util::getFracFeature(feat_id, ms1_ptr_vec, score_para_ptr->frac_id_,
+                                                                   score_para_ptr->file_name_,
+                                                                   env_coll_ptr, matrix_ptr,
+                                                                   topfd_para_ptr->getMsOneSnRatio());
+      frac_feat_ptr->setEcscore(feat_ptr->getScore());
+      frac_features.push_back(frac_feat_ptr);
     }
   }
-  /**
-  // map MS2 features
-  SpecFeaturePtrVec ms2_features;
-  Feature::assign_features(ms1_ptr_vec, ms2_file_name, frac_features, env_coll_list, features, ms2_features,
-                           prec_spectrum_Base_mono_mz, peak_matrix, model, model_escore, feature_para_ptr, para_ptr);
-                           */
   std::cout << std::endl << "Number of proteoform features: " << features.size() << std::endl;
-
   /// output files
   std::string feat_file_name = base_file_name + "_ms1.csv";
   ecscore_write_feature::writeFeatures(feat_file_name, features);
 
+  // map MS2 features
+  SpecFeaturePtrVec ms2_features;
   /*
+  Feature::assign_features(ms1_ptr_vec, ms2_file_name, frac_features, env_coll_list, features, ms2_features,
+                           prec_spectrum_Base_mono_mz, peak_matrix, model, model_escore, feature_para_ptr, para_ptr);
+
   std::string output_file_name = base_name + "_" + file_num + "feature.xml";
   frac_feature_writer::writeXmlFeatures(output_file_name, frac_features);
 
