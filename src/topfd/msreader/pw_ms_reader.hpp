@@ -21,6 +21,7 @@
 
 #include "pwiz/data/msdata/DefaultReaderList.hpp"
 #include "pwiz/data/msdata/MSDataFile.hpp"
+#include "pwiz/data/msdata/SpectrumInfo.hpp"
 #include "pwiz/utility/misc/Std.hpp"
 #include "pwiz/utility/misc/Filesystem.hpp"
 
@@ -50,9 +51,9 @@ class PwMsReader {
   int input_sp_id_;
   int output_sp_id_;
 
-  int ms1_cnt = 0;
-  int ms2_cnt = 0;
-  int prev_ms1_scan_id = -1;
+  int ms1_cnt_ = 0;
+  int ms2_cnt_ = 0;
+  int prev_ms1_scan_id_ = -1;
   PeakPtrVec peak_list_;
   MsHeaderPtr header_ptr_;
 
@@ -60,6 +61,24 @@ class PwMsReader {
   pwiz::msdata::DefaultReaderList readers_;
   MSDataFilePtr msd_ptr_;
   pwiz::msdata::SpectrumListPtr spec_list_ptr_;
+
+  PeakPtrVec parsePeaks(pwiz::msdata::SpectrumPtr cur_spec_ptr); 
+
+  int parseNum(std::string &id, int default_scan); 
+
+  void parseScanNum(MsHeaderPtr header_ptr, 
+                    pwiz::msdata::SpectrumInfo &spec_info); 
+
+  void parsePrecursor(MsHeaderPtr header_ptr, 
+                      pwiz::msdata::SpectrumInfo &spec_info,
+                      pwiz::msdata::SpectrumPtr cur_spec_ptr);
+
+  void parseActivation(MsHeaderPtr header_ptr, 
+                       pwiz::msdata::SpectrumInfo &spec_info,
+                       pwiz::msdata::SpectrumPtr cur_spec_ptr); 
+
+  void parseFaims(MsHeaderPtr header_ptr, 
+                  pwiz::msdata::SpectrumPtr cur_spec_ptr);
 };
 
 typedef std::shared_ptr<PwMsReader> PwMsReaderPtr;
