@@ -32,11 +32,13 @@ class EnvBase {
 
   std::vector<std::vector<double> > env_rescore_para_;
 
+  static void initBase(const std::string &resouce_dir);
+
   static EnvelopePtr getStaticEnvByMonoMass(double mass);
 
   static EnvelopePtr getStaticEnvByBaseMass(double mass);
 
-  static void initBase(const std::string &resouce_dir);
+  static double convertMonoMassToAvgMass(double mass);
 
  private:
   // number of distribution entries 

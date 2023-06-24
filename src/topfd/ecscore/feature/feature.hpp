@@ -24,17 +24,6 @@
 #include "topfd/ecscore/spectrum/peak_matrix.hpp"
 #include "topfd/ecscore/env_coll/env_coll.hpp"
 
-/*
-#include "topfd/feature_detect/env_collection/env_collection.hpp"
-#include "topfd/feature_detect/score/get_env_cnn_score.hpp"
-#include "topfd/feature_detect/score/get_env_coll_score.hpp"
-#include "topfd/feature_detect/score/get_component_score.hpp"
-#include "ms/spec/simple_msalign_reader.hpp"
-#include "topfd/feature_detect/feature_para.hpp"
-#include "ms/spec/msalign_writer.hpp"
-#include "topfd/feature_detect/env_collection/env_coll_util.hpp"
-*/
-
 namespace toppic {
 
 class Feature;
@@ -47,51 +36,10 @@ class Feature {
 
   std::vector<float> getEcscoreInput(double max_retention_time);
 
-  static void assignFeatures(DeconvMsPtrVec &ms1_ptr_vec, const std::string &ms2_file_name,
-                             FracFeaturePtrVec &frac_features, EnvCollPtrVec &env_coll_list,
-                             FeaturePtrVec &features, SpecFeaturePtrVec &ms2_features,
-                             std::vector<double> &prec_mzs, PeakMatrixPtr matrix_ptr, 
-                             TopfdParaPtr topfd_para_ptr, EcscoreParaPtr score_para_ptr); 
-
-  /*
-  Feature(EnvCollPtr env_coll_ptr, PeakMatrixPtr matrix_ptr, int feature_id, double inte);
-
-
-  Feature(EnvCollection &env_coll, PeakMatrix &peak_matrix, fdeep::model &model, fdeep::model &model_escore,
-          int feature_id, double snr);
-
-
-  bool static
-    get_mass_shifted_feature_map(FracFeaturePtrVec &frac_features, std::vector<EnvCollection> &env_coll_list,
-                                 FeatureParaPtr para_ptr, MsHeaderPtr hh, double score_thr, double base_mz,
-                                 int isolation_windows_mz, SpecFeaturePtrVec &ms2_features);
-
-  bool static
-    get_charge_shifted_feature_map(FracFeaturePtrVec &frac_features, std::vector<EnvCollection> &env_coll_list,
-                                   FeatureParaPtr para_ptr, MsHeaderPtr hh, double score_thr, double base_mz,
-                                   int isolation_windows_mz, SpecFeaturePtrVec &ms2_features);
-
-  bool static
-    get_highest_inte_feature_map(FracFeaturePtrVec &frac_features, std::vector<EnvCollection> &env_coll_list,
-                                 FeatureParaPtr para_ptr, MsHeaderPtr hh, double score_thr, double base_mz,
-                                 int isolation_windows_mz, SpecFeaturePtrVec &ms2_features);
-
-  bool static get_new_feature_map(DeconvMsPtrVec &ms1_ptr_vec, FracFeaturePtrVec &frac_features,
-                                  std::vector<EnvCollection> &env_coll_list, std::vector<Feature> &features,
-                                  FeatureParaPtr para_ptr, MsHeaderPtr hh, TopfdParaPtr topfd_para_ptr,
-                                  SpecFeaturePtrVec &ms2_features, PeakMatrix &peak_matrix, fdeep::model model,
-                                  fdeep::model model_escore);
-
-  void static get_empty_feature_map(DeconvMsPtrVec &ms1_ptr_vec, FracFeaturePtrVec &frac_features,
-                                    std::vector<EnvCollection> &env_coll_list, std::vector<Feature> &features,
-                                    const FeatureParaPtr &para_ptr, MsHeaderPtr hh, TopfdParaPtr topfd_para_ptr,
-                                    SpecFeaturePtrVec &ms2_features, PeakMatrix &peak_matrix, fdeep::model model,
-                                    fdeep::model model_escore);
-
-  DeconvMsPtrVec static readData(const std::string &file_name);
-
-  double static isMatch(double prec_mass, double feature_mass, const FeatureParaPtr& para_ptr, bool &shift);
-  */
+  static void assignFeatures(const std::string &ms2_file_name, FracFeaturePtrVec &frac_features, 
+                             EnvCollPtrVec &env_coll_list, SpecFeaturePtrVec &ms2_features, 
+                             std::vector<double> prec_mzs, 
+                             TopfdParaPtr topfd_para_ptr, EcscoreParaPtr score_para_ptr);  
 
   int getFeatureId() const { return feature_id_; }
 
@@ -189,7 +137,13 @@ class Feature {
 
   void setLabel(int label) { label_ = label; }
 
-  private:
+ private:
+
+  static DeconvMsPtrVec readData(const std::string &file_name);
+
+  static bool getHighestInteFeature(FracFeaturePtrVec &frac_features, EnvCollPtrVec &env_coll_list,
+                                    EcscoreParaPtr para_ptr, MsHeaderPtr header, double score_thr, double base_mz,
+                                    double isolation_window_mz, SpecFeaturePtrVec &ms2_features); 
   int feature_id_ = 0;
   int min_scan_ = 0;
   int max_scan_ = 0;

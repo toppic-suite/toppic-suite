@@ -111,4 +111,13 @@ EnvelopePtr EnvBase::getEnvByBaseMass(double mass) {
   return envs_[base_mass_idxes_[idx]];
 }
 
+double EnvBase::convertMonoMassToAvgMass(double mass) {
+  EnvelopePtr env_ptr = env_base_ptr_->getEnvByMonoMass(mass);
+  if (env_ptr == nullptr) {
+    LOG_ERROR("Invalid mass!");
+    exit(EXIT_FAILURE);
+  }
+  return env_ptr->getAvgMass();
+}
+
 }  // namespace toppic
