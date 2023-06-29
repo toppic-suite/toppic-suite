@@ -117,7 +117,8 @@ double EnvBase::convertMonoMassToAvgMass(double mass) {
     LOG_ERROR("Invalid mass!");
     exit(EXIT_FAILURE);
   }
-  return env_ptr->getAvgMass();
+  double diff = env_ptr->getAvgNeutralMass() - env_ptr->getMonoNeutralMass();
+  return mass + diff;
 }
 
 }  // namespace toppic

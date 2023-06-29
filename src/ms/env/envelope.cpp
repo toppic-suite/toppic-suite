@@ -251,7 +251,7 @@ double Envelope::getAvgMz() {
   return sum / compIntensitySum();
 }
 
-double Envelope::getAvgMass() {
+double Envelope::getAvgNeutralMass() {
   return getAvgMz() * charge_ - charge_ * mass_constant::getProtonMass();
 }
 

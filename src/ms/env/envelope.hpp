@@ -65,7 +65,7 @@ class Envelope {
 
   double getAvgMz();
 
-  double getAvgMass();
+  double getAvgNeutralMass();
 
   double getMinMz() {return peaks_[0]->getPosition();}
 
