@@ -49,7 +49,7 @@ PwMsReader::PwMsReader(const std::string & file_name,
 int PwMsReader::parseNum(std::string &id, int default_scan) {
   std::string delimiter = "=";
   if (id.substr(id.find_last_of(delimiter) + 1) == "") {
-    LOG_WARN("Scan number information is missing!");
+    LOG_INFO("Scan number information is missing!");
     return default_scan;
   }
   else {
