@@ -77,6 +77,8 @@ void calculateSourceFilePtrSHA1(const SourceFilePtr& sourceFilePtr)
 PWIZ_API_DECL MSDataFile::MSDataFile(const string& filename, const Reader* reader,
                                      bool calculateSourceFileChecksum)
 {
+    check_path_length(filename);
+
     // peek at head of file 
     string head = read_file_header(filename, 512);
 
@@ -160,7 +162,7 @@ void writeStream(ostream& os, const MSData& msd, const MSDataFile::WriteConfig& 
             serializerConfig.binaryDataEncoderConfig = config.binaryDataEncoderConfig;
             serializerConfig.indexed = config.indexed;
             Serializer_mzML serializer(serializerConfig);
-            serializer.write(os, msd, iterationListenerRegistry, config.useWorkerThreads);
+            serializer.write(os, msd, iterationListenerRegistry, config.useWorkerThreads, config.continueOnError);
             break;
         }
         case MSDataFile::Format_mzXML:
@@ -169,37 +171,37 @@ void writeStream(ostream& os, const MSData& msd, const MSDataFile::WriteConfig& 
             serializerConfig.binaryDataEncoderConfig = config.binaryDataEncoderConfig;
             serializerConfig.indexed = config.indexed;
             Serializer_mzXML serializer(serializerConfig);
-            serializer.write(os, msd, iterationListenerRegistry, config.useWorkerThreads);
+            serializer.write(os, msd, iterationListenerRegistry, config.useWorkerThreads, config.continueOnError);
             break;
         }
         case MSDataFile::Format_MGF:
         {
             Serializer_MGF serializer;
-            serializer.write(os, msd, iterationListenerRegistry, config.useWorkerThreads);
+            serializer.write(os, msd, iterationListenerRegistry, config.useWorkerThreads, config.continueOnError);
             break;
         }
         case MSDataFile::Format_MS1:
         {
             Serializer_MSn serializer(MSn_Type_MS1);
-            serializer.write(os, msd, iterationListenerRegistry, config.useWorkerThreads);
+            serializer.write(os, msd, iterationListenerRegistry, config.useWorkerThreads, config.continueOnError);
             break;
         }
         case MSDataFile::Format_CMS1:
         {
             Serializer_MSn serializer(MSn_Type_CMS1);
-            serializer.write(os, msd, iterationListenerRegistry, config.useWorkerThreads);
+            serializer.write(os, msd, iterationListenerRegistry, config.useWorkerThreads, config.continueOnError);
             break;
         }
         case MSDataFile::Format_MS2:
         {
             Serializer_MSn serializer(MSn_Type_MS2);
-            serializer.write(os, msd, iterationListenerRegistry, config.useWorkerThreads);
+            serializer.write(os, msd, iterationListenerRegistry, config.useWorkerThreads, config.continueOnError);
             break;
         }
         case MSDataFile::Format_CMS2:
         {
             Serializer_MSn serializer(MSn_Type_CMS2);
-            serializer.write(os, msd, iterationListenerRegistry, config.useWorkerThreads);
+            serializer.write(os, msd, iterationListenerRegistry, config.useWorkerThreads, config.continueOnError);
             break;
         }
         case MSDataFile::Format_MZ5:
@@ -219,6 +221,8 @@ void MSDataFile::write(const MSData& msd,
                        const WriteConfig& config,
                        const IterationListenerRegistry* iterationListenerRegistry)
 {
+    check_path_length(filename);
+
     switch (config.format)
     {
         case MSDataFile::Format_MZ5:
@@ -256,6 +260,7 @@ PWIZ_API_DECL void calculateSourceFileSHA1(SourceFile& sourceFile)
 {
     if (sourceFile.hasCVParam(MS_SHA_1)) return;
 
+
     const string uriPrefix = "file://";
     if (!bal::istarts_with(sourceFile.location, uriPrefix)) return;
     string location = sourceFile.location.substr(uriPrefix.size());
@@ -263,20 +268,25 @@ PWIZ_API_DECL void calculateSourceFileSHA1(SourceFile& sourceFile)
     bfs::path p(location);
     p /= sourceFile.name;
 
-    try
+    static map<string, string> cachedHashBySourcePath;
+    auto& sha1 = cachedHashBySourcePath[p.string()];
+    if (sha1.empty())
     {
-        bfs::file_status status = bfs::status(p);
-        if (!bfs::exists(status) || bfs::is_directory(status))
-            // TODO: log warning about source file not available
+        try
+        {
+            bfs::file_status status = bfs::status(p);
+            if (!bfs::exists(status) || bfs::is_directory(status))
+                // TODO: log warning about source file not available
+                return;
+        }
+        catch (exception&)
+        {
+            // TODO: log warning about filesystem error
             return;
-    }
-    catch (exception&)
-    {
-        // TODO: log warning about filesystem error
-        return;
-    }
+        }
 
-    string sha1 = SHA1Calculator::hashFile(p.string());
+        sha1 = SHA1Calculator::hashFile(p.string());
+    }
     sourceFile.set(MS_SHA_1, sha1); 
 }
 
