@@ -44,7 +44,6 @@ const int sizeDoubleMSn    = 8;
 const int sizeChargeMSn    = 12; // struct Charge{ int z; double mass; }
 const int sizePeakMSn      = 12; // struct Peak{ double mz; float intensity; }
 
-using namespace std;
 using boost::shared_ptr;
 using boost::iostreams::stream_offset;
 using namespace pwiz::util;
@@ -58,7 +57,7 @@ class Serializer_MSn::Impl
         
         void write(ostream& os, const MSData& msd, 
                    const pwiz::util::IterationListenerRegistry* iterationListenerRegistry,
-                   bool useWorkerThreads = true) const;
+                   bool useWorkerThreads = true, bool continueOnError = false) const;
         
         void read(shared_ptr<istream> is, MSData& msd) const;
 
@@ -109,7 +108,7 @@ namespace
     {
         int startingChargesCount = charges.size();
         CVParam chargeParam = si.cvParam(MS_charge_state);
-        CVParam massParam = si.cvParam(MS_accurate_mass_OBSOLETE);
+        UserParam massParam = si.userParam("accurate mass");
         double mz = si.cvParam(MS_selected_ion_m_z).valueAs<double>();
         if (!chargeParam.empty())
         {
@@ -150,7 +149,20 @@ namespace
         return scanNum;
     }
 
-    void writeSpectrumText(const SpectrumPtr& s, ostream& os, CVID nativeIdFormat)
+    double getPrecursorScanTimeInMinutes(const SpectrumList& sl, const Precursor& p)
+    {
+        if (p.spectrumID.empty())
+            return 0;
+        size_t precursorScanIndex = sl.find(p.spectrumID);
+        if (precursorScanIndex == sl.size())
+            return 0;
+        auto precursorSpectrum = sl.spectrum(precursorScanIndex, DetailLevel_FastMetadata);
+        if (precursorSpectrum->scanList.scans.empty())
+            return 0;
+        return precursorSpectrum->scanList.scans[0].cvParam(MS_scan_start_time).timeInSeconds() / 60;
+    }
+
+    void writeSpectrumText(const SpectrumList& sl, const SpectrumPtr& s, ostream& os, CVID nativeIdFormat)
     {
         os << std::setprecision(7); // 123.4567
         bool ms1File = s->cvParam(MS_ms_level).valueAs<int>() == 1;
@@ -216,10 +228,11 @@ namespace
             }
 
             // Write EZ lines if accurate masses are available
-            CVParam massParam = si.cvParam(MS_accurate_mass_OBSOLETE);
+            UserParam massParam = si.userParam("accurate mass");
             if( !massParam.empty() ){
-              for(int i=0; i < numChargeStates; i++){
-                os << "I\tEZ\t" << charges[i] << "\t" << masses[i] << "\t0\t0" << endl; // pad last two fields with 0
+                string precursorIntensity = precur.cvParam(MS_peak_intensity).value;
+                for(int i=0; i < numChargeStates; i++){
+                os << "I\tEZ\t" << charges[i] << "\t" << masses[i] << "\t" << getPrecursorScanTimeInMinutes(sl, precur) << "\t" << precursorIntensity << endl;
               }
             }
 
@@ -365,7 +378,7 @@ namespace
         if (version == 3)
         {
           int numEzStates = 0;
-          CVParam massParam = si.cvParam(MS_accurate_mass_OBSOLETE);
+          UserParam massParam = si.userParam("accurate mass");
           if (!massParam.empty())
           {
             numEzStates = numChargeStates;
@@ -423,7 +436,7 @@ namespace
 
 void Serializer_MSn::Impl::write(ostream& os, const MSData& msd,
     const pwiz::util::IterationListenerRegistry* iterationListenerRegistry,
-    bool useWorkerThreads) const
+    bool useWorkerThreads, bool continueOnError) const
 {
     CVID nativeIdFormat = id::getDefaultNativeIDFormat(msd);
 
@@ -444,11 +457,26 @@ void Serializer_MSn::Impl::write(ostream& os, const MSData& msd,
     // Go through the spectrum list and write each spectrum
     bool ms1File = MSn_Type_MS1 == _filetype || MSn_Type_BMS1 == _filetype || MSn_Type_CMS1 == _filetype;
     SpectrumList& sl = *msd.run.spectrumListPtr;
-    SpectrumWorkerThreads spectrumWorkers(sl, useWorkerThreads);
+    SpectrumWorkerThreads spectrumWorkers(sl, useWorkerThreads, continueOnError);
     for (size_t i=0, end=sl.size(); i < end; ++i)
     {
-        //SpectrumPtr s = sl.spectrum(i, true);
-        SpectrumPtr s = spectrumWorkers.processBatch(i);
+        SpectrumPtr s;
+        try
+        {
+            // s = sl->spectrum(i, true);
+            s = spectrumWorkers.processBatch(i);
+        }
+        catch (std::exception& e)
+        {
+            if (continueOnError)
+            {
+                cerr << "Skipping spectrum " << i << " \"" << (s ? s->id : sl.spectrumIdentity(i).id) << "\": " << e.what() << endl;
+                continue;
+            }
+            else
+                throw;
+        }
+
         int msLevel = s->cvParam(MS_ms_level).valueAs<int>();
         if ((ms1File && msLevel == 1) ||
             (!ms1File && msLevel == 2 && !s->precursors.empty() && !s->precursors[0].selectedIons.empty()))
@@ -456,7 +484,7 @@ void Serializer_MSn::Impl::write(ostream& os, const MSData& msd,
             switch (_filetype)
             {
             case MSn_Type_MS1:
-                writeSpectrumText(s, os, nativeIdFormat);
+                writeSpectrumText(sl, s, os, nativeIdFormat);
                 break;
             case MSn_Type_CMS1:
                 writeSpectrumBinary(s, 3 /* version */, true, os, nativeIdFormat);
@@ -465,7 +493,7 @@ void Serializer_MSn::Impl::write(ostream& os, const MSData& msd,
                 writeSpectrumBinary(s, 3 /* version */, false, os, nativeIdFormat);
                 break;
             case MSn_Type_MS2:
-                writeSpectrumText(s, os, nativeIdFormat);
+                writeSpectrumText(sl, s, os, nativeIdFormat);
                 break;
             case MSn_Type_CMS2:
                 writeSpectrumBinary(s, 3 /* version */, true, os, nativeIdFormat);
@@ -521,7 +549,7 @@ PWIZ_API_DECL Serializer_MSn::Serializer_MSn(MSn_Type filetype)
 
 PWIZ_API_DECL void Serializer_MSn::write(ostream& os, const MSData& msd,
     const pwiz::util::IterationListenerRegistry* iterationListenerRegistry,
-    bool useWorkerThreads) const
+    bool useWorkerThreads, bool continueOnError) const
   
 {
     return impl_->write(os, msd, iterationListenerRegistry);

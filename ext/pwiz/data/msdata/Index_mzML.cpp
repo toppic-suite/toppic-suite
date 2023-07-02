@@ -403,8 +403,6 @@ void Index_mzML::Impl::createIndex() const
                                     spectrumCount_, spectrumIndex_, legacyIdRefToNativeId_,
                                     chromatogramCount_, chromatogramIndex_);
         SAXParser::parse(*is_, handler);
-        is_->clear();
-        is_->seekg(0);
     }
 
     createMaps();
