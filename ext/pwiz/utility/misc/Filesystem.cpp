@@ -25,13 +25,9 @@
 
 #include "Filesystem.hpp"
 
-#ifdef _MSC_VER
-    #ifdef _WIN32_WINNT
-        #undef _WIN32_WINNT
-    #endif
+#ifdef WIN32
     #define _WIN32_WINNT 0x0600
     #define WIN32_LEAN_AND_MEAN
-    #define NOMINMAX
     #define NOGDI
     #include <windows.h>
     #include <direct.h>
@@ -57,7 +53,6 @@
 #include "pwiz/utility/misc/random_access_compressed_ifstream.hpp"
 #include <boost/filesystem/detail/utf8_codecvt_facet.hpp>
 #include <boost/locale/conversion.hpp>
-#include <boost/locale/encoding_utf.hpp>
 #include <boost/spirit/include/karma.hpp>
 //#include <boost/xpressive/xpressive.hpp>
 #include <iostream>
@@ -106,7 +101,7 @@ extern "C"
         ACCESS_MASK GrantedAccess;
     };
 
-    struct SYSTEM_HANDLE_INFORMATION {
+    struct PWIZ_SYSTEM_HANDLE_INFORMATION {
         ULONG HandleCount;
         SYSTEM_HANDLE Handles[1];
     };
@@ -159,7 +154,7 @@ extern "C"
     }
 }
 
-    int GetFileHandleTypeNumber(SYSTEM_HANDLE_INFORMATION* handleInfos)
+    int GetFileHandleTypeNumber(PWIZ_SYSTEM_HANDLE_INFORMATION* handleInfos)
     {
         DWORD currentProcessId = GetCurrentProcessId();
         wstring fileType = L"File";
@@ -286,7 +281,7 @@ PWIZ_API_DECL void force_close_handles_to_filepath(const std::string& filepath, 
     }
 
     NTSTATUS status = 0;
-    DWORD dwSize = sizeof(SYSTEM_HANDLE_INFORMATION);
+    DWORD dwSize = sizeof(PWIZ_SYSTEM_HANDLE_INFORMATION);
     vector<BYTE> pInfoBytes(dwSize);
 
     do
@@ -314,7 +309,7 @@ PWIZ_API_DECL void force_close_handles_to_filepath(const std::string& filepath, 
         return;
     }
 
-    auto pInfo = reinterpret_cast<SYSTEM_HANDLE_INFORMATION*>(pInfoBytes.data());
+    auto pInfo = reinterpret_cast<PWIZ_SYSTEM_HANDLE_INFORMATION*>(pInfoBytes.data());
     int fileHandleType = GetFileHandleTypeNumber(pInfo);
     if (fileHandleType == 0)
     {
@@ -652,7 +647,7 @@ PWIZ_API_DECL bool isHTTP(const string& s)
     //sregex uriRegex = sregex::compile("^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?");
     //return regex_match(s, uriRegex);
 
-    return bal::istarts_with(s, "http:") || bal::istarts_with(s, "https:");
+    return bal::istarts_with(s, "http://") || bal::istarts_with(s, "https://");
 }
 
 
@@ -715,7 +710,6 @@ PWIZ_API_DECL string read_file_header(const string& filepath, size_t length)
     return head;
 }
 
-
 PWIZ_API_DECL void check_path_length(const string& path)
 {
 #ifdef WIN32
@@ -737,7 +731,6 @@ PWIZ_API_DECL TemporaryFile::~TemporaryFile()
     if (bfs::exists(filepath))
         bfs::remove(filepath);
 }
-
 
 PWIZ_API_DECL std::pair<int, int> get_console_bounds(const std::pair<int, int>& defaultBounds)
 {
