@@ -29,6 +29,7 @@ RawMsGroupReader::RawMsGroupReader(const std::string & file_name,
                                              isolation_window);
   missing_level_one_ = missing_level_one;
   fraction_id_ = fraction_id;
+
   if (!missing_level_one_) {
     RawMsPtr ms_one_ptr_ = nullptr;
     do {
@@ -76,7 +77,6 @@ RawMsGroupPtr RawMsGroupReader::getNextMsGroupPtrWithFaime() {
     if (first_ms_one_scan < alpha_ms_one_scan_) {
       // generate an ms_group with only one MS1 spectrum using first in 
       // ms_one_ptr_vec_ and pop out the first one. 
-
       RawMsGroupPtr ms_group_ptr = std::make_shared<RawMsGroup>(ms_one_ptr_vec_[0], RawMsPtrVec());
       ms_one_ptr_vec_.erase(ms_one_ptr_vec_.begin(), ms_one_ptr_vec_.begin() + 1);
       return ms_group_ptr;
@@ -150,7 +150,6 @@ RawMsGroupPtr RawMsGroupReader::getNextMsGroupPtrWithFaime() {
       //assign ms1Id to msHeaderPtr for ms2ptrs
 
       RawMsGroupPtr ms_group_ptr = std::make_shared<RawMsGroup>(ms_one_ptr_vec_[0], alpha_ms_two_ptr_vec_);
-
       alpha_ms_two_ptr_vec_ = beta_ms_two_ptr_vec_;
       beta_ms_two_ptr_vec_.clear();
       alpha_ms_one_scan_ = alpha_ms_two_ptr_vec_[0]->getMsHeaderPtr()->getMsOneScan();

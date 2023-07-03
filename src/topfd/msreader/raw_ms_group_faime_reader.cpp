@@ -25,7 +25,6 @@ RawMsGroupFaimeReader::RawMsGroupFaimeReader(const std::string & file_name,
                                              std::string activation,
                                              double isolation_window,
                                              int fraction_id) {
-
   reader_ptr_ = std::make_shared<PwMsReader>(file_name, activation, 
                                              isolation_window);
   missing_level_one_ = missing_level_one;
@@ -106,7 +105,10 @@ RawMsGroupPtr RawMsGroupFaimeReader::getNextMsGroupPtrWithFaime() {
           return ms_group_ptr;
         }
         else {
-          RawMsGroupPtr ms_group_ptr = std::make_shared<RawMsGroup>(ms_one_ptr_map_[ms1_scan], ms_two_ptr_vec_map_[ms1_scan]);
+          RawMsPtrVec ms2_vec = ms_two_ptr_vec_map_[ms1_scan];
+          // add ms one spec id for ms two later in deconv_process
+          RawMsGroupPtr ms_group_ptr 
+            = std::make_shared<RawMsGroup>(ms_one_ptr_map_[ms1_scan], ms_two_ptr_vec_map_[ms1_scan]);
           ms_one_ptr_map_[ms1_scan] = nullptr;
           ms_two_ptr_vec_map_[ms1_scan].clear();
           cur_ms_one_idx_ = cur_ms_one_idx_ + 1;

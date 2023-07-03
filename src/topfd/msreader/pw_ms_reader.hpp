@@ -50,6 +50,8 @@ class PwMsReader {
   int input_sp_num_;
   int input_sp_id_;
   int output_sp_id_;
+  //functions for waters instrument is different from others 
+  bool is_waters_instrument_ = false;
 
   int ms1_cnt_ = 0;
   int ms2_cnt_ = 0;
@@ -61,6 +63,8 @@ class PwMsReader {
   pwiz::msdata::DefaultReaderList readers_;
   MSDataFilePtr msd_ptr_;
   pwiz::msdata::SpectrumListPtr spec_list_ptr_;
+
+  void checkWatersInstrument(); 
 
   PeakPtrVec parsePeaks(pwiz::msdata::SpectrumPtr cur_spec_ptr); 
 
