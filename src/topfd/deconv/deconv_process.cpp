@@ -507,6 +507,7 @@ void DeconvProcess::processSp(RawMsGroupFaimeReaderPtr reader_ptr) {
         if (voltage_vec_[i].first == ms_group_ptr->getMsOnePtr()->getMsHeaderPtr()->getVoltage()) {
           int spec_id = voltage_vec_[i].second;
           RawMsPtrVec ms_two_ptr_vec = ms_group_ptr->getMsTwoPtrVec();
+          // add ms one spec id for ms two
           for (size_t j = 0; j < ms_two_ptr_vec.size(); j++) {
             ms_two_ptr_vec[j]->getMsHeaderPtr()->setMsOneId(spec_id);
           }

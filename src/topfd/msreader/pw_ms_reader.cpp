@@ -31,6 +31,7 @@ PwMsReader::PwMsReader(const std::string & file_name,
       msd_ptr_ = std::make_shared<pwiz::msdata::MSDataFile>(file_name, &readers_);
       spec_list_ptr_ =  msd_ptr_->run.spectrumListPtr;
       input_sp_num_ = spec_list_ptr_->size();
+      checkWatersInstrument();
     }
 
 PwMsReader::PwMsReader(const std::string & file_name, 
@@ -44,10 +45,23 @@ PwMsReader::PwMsReader(const std::string & file_name,
       msd_ptr_ = std::make_shared<pwiz::msdata::MSDataFile>(file_name, &readers_);
       spec_list_ptr_ =  msd_ptr_->run.spectrumListPtr;
       input_sp_num_ = spec_list_ptr_->size();
+      checkWatersInstrument();
     }
+
+void PwMsReader::checkWatersInstrument() {
+  for (size_t i = 0; i < msd_ptr_->instrumentConfigurationPtrs.size(); i++) {
+    pwiz::msdata::InstrumentConfigurationPtr conf_ptr = msd_ptr_->instrumentConfigurationPtrs[i];
+    pwiz::msdata::CVParam param = conf_ptr->cvParam(pwiz::msdata::CVID::MS_Waters_instrument_model);
+    if (! param.empty()) {
+      LOG_DEBUG("Found waters model"); 
+      is_waters_instrument_ = true;
+    }
+  }
+}
 
 int PwMsReader::parseNum(std::string &id, int default_scan) {
   std::string delimiter = "=";
+  // 
   if (id.substr(id.find_last_of(delimiter) + 1) == "") {
     LOG_INFO("Scan number information is missing!");
     return default_scan;
@@ -59,10 +73,15 @@ int PwMsReader::parseNum(std::string &id, int default_scan) {
 
 void PwMsReader::parseScanNum(MsHeaderPtr header_ptr, 
                               pwiz::msdata::SpectrumInfo &spec_info) {
-  // For agilent data, scan numbers are missing.
+  // For Agilent data, scan numbers are missing.
   if (spec_info.scanNumber == 0) {
-    // default is index + 1
-    spec_info.scanNumber = parseNum(spec_info.id, spec_info.index + 1);
+    // default is index 
+    spec_info.scanNumber = parseNum(spec_info.id, spec_info.index);
+  }
+
+  // For Waters data, use spec_info.index as the scan number
+  if (is_waters_instrument_) {
+    spec_info.scanNumber = spec_info.index;
   }
   LOG_DEBUG(" scan number " << spec_info.scanNumber);
   header_ptr->setScan(spec_info.scanNumber);
