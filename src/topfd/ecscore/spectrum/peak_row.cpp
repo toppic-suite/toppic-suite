@@ -12,6 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include <iostream>
+
 #include "topfd/ecscore/spectrum/peak_row.hpp"
 
 namespace toppic {
@@ -24,4 +26,11 @@ PeakRow::PeakRow(MatrixSpectrumPtr spec_ptr, int bin_num) {
   }
 }
 
+void PeakRow::print() {
+  for (size_t i = 0; i < peak_ptrs_.size(); i++) {
+    for (size_t j = 0; j < peak_ptrs_[i].size(); j++) {
+      std::cout << "bin " << i << " j " << j << " m/z " << peak_ptrs_[i][j]->getPosition() << std::endl;
+    }
+  }
+}
 }

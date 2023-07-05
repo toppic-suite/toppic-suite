@@ -56,6 +56,8 @@ class PeakMatrix {
   void setBinPeakList(int sp_id, int bin_idx, MatrixPeakPtrVec &peaks) {
     return matrix_[sp_id]->setPeakPtrVec(bin_idx, peaks);}
 
+  PeakRowPtr getRowPtr(int i) {return matrix_[i];}
+
  private:
   void initSpectrumNoiseIntensities(PeakPtrVec2D &raw_peaks);
 

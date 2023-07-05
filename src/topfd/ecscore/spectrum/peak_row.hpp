@@ -41,6 +41,8 @@ class PeakRow {
 
   void setPeakPtrVec(int i, MatrixPeakPtrVec &peak_ptr_vec) {peak_ptrs_[i] = peak_ptr_vec;}
 
+  void print();
+
  private:
   MatrixSpectrumPtr spectrum_ptr_;
   MatrixPeakPtr2D peak_ptrs_;

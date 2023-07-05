@@ -139,10 +139,10 @@ bool checkExistingFeatures(PeakMatrixPtr matrix_ptr, EnvCollPtr env_coll_ptr,
 }
 
 EnvSetPtrVec getChargeEnvList(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
-                              EnvSetPtr env_set_ptr, EcscoreParaPtr para_ptr, 
+                              EnvSetPtr seed_env_set_ptr, EcscoreParaPtr para_ptr, 
                               double sn_ratio) {
-  int start_spec_id = env_set_ptr->getStartSpecId();
-  int end_spec_id = env_set_ptr->getEndSpecId();
+  int start_spec_id = seed_env_set_ptr->getStartSpecId();
+  int end_spec_id = seed_env_set_ptr->getEndSpecId();
   EnvSetPtrVec env_set_list;
   int charge = seed_ptr->getCharge() - 1;
   int miss_num = 0;
@@ -197,6 +197,30 @@ EnvSetPtrVec getChargeEnvList(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr
   return env_set_list;
 }
 
+EnvCollPtr findEnvCollWithSingleEnv(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
+                                    EcscoreParaPtr para_ptr, double sn_ratio) {
+  EnvSetPtr env_set_ptr = env_set_util::getEnvSet(matrix_ptr, seed_ptr, para_ptr, sn_ratio);
+  if (env_set_ptr == nullptr) {
+    LOG_ERROR("env set is null");
+    return nullptr; 
+  }
+  env_set_ptr->refineFeatureBoundary();
+
+  EnvSetPtrVec env_set_list = getChargeEnvList(matrix_ptr, seed_ptr,
+                                               env_set_ptr, para_ptr, sn_ratio);
+  env_set_list.push_back(env_set_ptr);
+  std::sort(env_set_list.begin(), env_set_list.end(), EnvSet::cmpCharge);
+
+  int min_charge = env_set_list[0]->getCharge();
+  int max_charge = env_set_list[env_set_list.size() - 1]->getCharge();
+  int start_spec_id = env_set_ptr->getStartSpecId();
+  int end_spec_id = env_set_ptr->getEndSpecId();
+  EnvCollPtr env_coll_ptr = std::make_shared<EnvColl>(seed_ptr, env_set_list, 
+                                                      min_charge, max_charge, 
+                                                      start_spec_id, end_spec_id);
+  return env_coll_ptr;
+}
+
 EnvCollPtr findEnvColl(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
                        EcscoreParaPtr para_ptr, double sn_ratio) {
   EnvSetPtr env_set_ptr = env_set_util::getEnvSet(matrix_ptr, seed_ptr, para_ptr, sn_ratio);
@@ -242,9 +266,6 @@ EnvCollPtr findEnvColl(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
   std::sort(env_set_list.begin(), env_set_list.end(), EnvSet::cmpCharge);
   int min_charge = env_set_list[0]->getCharge();
   int max_charge = env_set_list[env_set_list.size() - 1]->getCharge();
-  if (env_set_list.empty()) {
-    return nullptr;
-  }
   int start_spec_id = env_set_ptr->getStartSpecId();
   int end_spec_id = env_set_ptr->getEndSpecId();
   EnvCollPtr env_coll_ptr = std::make_shared<EnvColl>(new_seed_ptr, env_set_list, 

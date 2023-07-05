@@ -134,15 +134,22 @@ void process_single_file(std::string &base_file_name,
       frac_features.push_back(frac_feat_ptr);
     }
   }
+  
+
+  // map MS2 features
+  double zero_sn_ratio = 0;
+  PeakMatrixPtr raw_matrix_ptr = std::make_shared<PeakMatrix>(ms1_raw_peaks, ms1_ptr_vec, 
+                                                              score_para_ptr->bin_size_,
+                                                              zero_sn_ratio); 
+  SpecFeaturePtrVec ms2_features;
+  Feature::assignFeatures(ms2_file_name, frac_features, env_coll_list, ms2_features,
+                          ms2_prec_mzs, topfd_para_ptr, score_para_ptr, 
+                          raw_matrix_ptr,features, ms1_ptr_vec); 
+
   std::cout << std::endl << "Number of proteoform features: " << features.size() << std::endl;
   /// output files
   std::string feat_file_name = base_file_name + "_ms1.csv";
   ecscore_write_feature::writeFeatures(feat_file_name, features);
-
-  // map MS2 features
-  SpecFeaturePtrVec ms2_features;
-  Feature::assignFeatures(ms2_file_name, frac_features, env_coll_list, ms2_features,
-                          ms2_prec_mzs, topfd_para_ptr, score_para_ptr); 
 
   std::string output_file_name = base_file_name + "_" + "feature.xml";
   frac_feature_writer::writeXmlFeatures(output_file_name, frac_features);

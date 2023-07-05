@@ -69,7 +69,7 @@ void EnvColl::refineMonoMass() {
     seed_ptr_->shift(mz_error * seed_ptr_->getCharge());
   }
   else {
-    LOG_ERROR("ERROR 0 weight in refine_mono_mass");
+    LOG_INFO("ERROR 0 weight in refine_mono_mass");
   }
 }
 

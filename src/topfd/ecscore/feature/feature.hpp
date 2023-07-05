@@ -39,7 +39,9 @@ class Feature {
   static void assignFeatures(const std::string &ms2_file_name, FracFeaturePtrVec &frac_features, 
                              EnvCollPtrVec &env_coll_list, SpecFeaturePtrVec &ms2_features, 
                              std::vector<double> prec_mzs, 
-                             TopfdParaPtr topfd_para_ptr, EcscoreParaPtr score_para_ptr);  
+                             TopfdParaPtr topfd_para_ptr, EcscoreParaPtr score_para_ptr, 
+                             PeakMatrixPtr matrix_ptr, FeaturePtrVec &feature_list, 
+                             DeconvMsPtrVec &ms1_ptr_vec);  
 
   int getFeatureId() const { return feature_id_; }
 
@@ -144,6 +146,14 @@ class Feature {
   static bool getHighestInteFeature(FracFeaturePtrVec &frac_features, EnvCollPtrVec &env_coll_list,
                                     EcscoreParaPtr para_ptr, MsHeaderPtr header, double score_thr, double base_mz,
                                     double isolation_window_mz, SpecFeaturePtrVec &ms2_features); 
+
+  static bool getNewFeature(MsHeaderPtr header_ptr, PeakMatrixPtr matrix_ptr, 
+                            EcscoreParaPtr para_ptr, FeaturePtrVec &feature_list, 
+                            EnvCollPtrVec &env_coll_list, DeconvMsPtrVec &ms1_ptr_vec, 
+                            FracFeaturePtrVec &frac_feature_list,
+                            SpecFeaturePtrVec &ms2_feature_list); 
+
+
   int feature_id_ = 0;
   int min_scan_ = 0;
   int max_scan_ = 0;

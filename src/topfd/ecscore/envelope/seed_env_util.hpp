@@ -29,6 +29,9 @@ bool preprocessEnv(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
 bool evalEnv(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,  
              double mass_tol, double corr_tol, double snr);
 
+bool simplePreprocessEnv(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr, 
+                         EcscoreParaPtr para_ptr, double sn_ratio); 
+
 bool testChargeState(int charge, std::vector<double> &seed_env_inte);
 
 bool evalEnvPair(std::vector<double> &exp_env_inte, std::vector<double> &theo_inte, double corr_tol);

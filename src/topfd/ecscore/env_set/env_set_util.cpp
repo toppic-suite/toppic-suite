@@ -134,11 +134,12 @@ ExpEnvelopePtr getMatchExpEnv(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr
   return exp_env_ptr;
 }
 
-void removeNonMatchEnvs(ExpEnvelopePtrVec &env_list, int refer_idx) {
+void removeNonMatchEnvs(ExpEnvelopePtrVec &env_list, int refer_idx, 
+                        int min_match_peak_num) {
   int idx = env_list.size() - 1;
   while (idx >= 0) {
     ExpEnvelopePtr env = env_list[idx];
-    if (env->getMatchPeakNum(refer_idx) < 2)
+    if (env->getMatchPeakNum(refer_idx) < min_match_peak_num)
       env_list.erase(env_list.begin() + idx);
     else
       return;
@@ -179,8 +180,7 @@ EnvSetPtr getEnvSet(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
     }
     idx = idx - 1;
   }
-  removeNonMatchEnvs(back_env_list, refer_idx);
-
+  removeNonMatchEnvs(back_env_list, refer_idx, para_ptr->min_match_peak_);
   // search forward
   ExpEnvelopePtrVec forw_env_list;
   idx = seed_ptr->getSpecId() + 1;
@@ -207,7 +207,7 @@ EnvSetPtr getEnvSet(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
     }
     idx = idx + 1;
   }
-  removeNonMatchEnvs(forw_env_list, refer_idx);
+  removeNonMatchEnvs(forw_env_list, refer_idx, para_ptr->min_match_peak_);
   // merge results
   std::reverse(back_env_list.begin(), back_env_list.end());
   back_env_list.insert(back_env_list.end(), forw_env_list.begin(), forw_env_list.end());
@@ -295,7 +295,7 @@ EnvSetPtr findEnvSet(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
     if (miss_num >=  para_ptr->max_miss_env_)
       break;
   }
-  removeNonMatchEnvs(back_env_list, refer_idx);
+  removeNonMatchEnvs(back_env_list, refer_idx, para_ptr->min_match_peak_);
 
   ExpEnvelopePtrVec forw_env_list;
   for (int idx = base_idx + 1; idx <= end_spec_id; idx++) {
@@ -315,7 +315,7 @@ EnvSetPtr findEnvSet(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
     if (miss_num >= para_ptr->max_miss_env_)
       break;
   }
-  removeNonMatchEnvs(forw_env_list, refer_idx);
+  removeNonMatchEnvs(forw_env_list, refer_idx, para_ptr->min_match_peak_);
   // merge
   std::reverse(back_env_list.begin(), back_env_list.end());
   back_env_list.insert(back_env_list.end(), forw_env_list.begin(), forw_env_list.end());

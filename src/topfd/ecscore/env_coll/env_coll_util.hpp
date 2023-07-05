@@ -31,8 +31,11 @@ namespace env_coll_util {
 EnvCollPtr findEnvColl(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
                        EcscoreParaPtr para_ptr, double sn_ratio);
 
-EnvSetPtrVec getChargeEnvList(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr env_ptr, 
-                              EnvSetPtr env_set_ptr, EcscoreParaPtr para_ptr, 
+EnvCollPtr findEnvCollWithSingleEnv(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
+                                    EcscoreParaPtr para_ptr, double sn_ratio); 
+
+EnvSetPtrVec getChargeEnvList(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr, 
+                              EnvSetPtr seed_env_set_ptr, EcscoreParaPtr para_ptr, 
                               double sn_ratio);
 
 bool checkExistingFeatures(PeakMatrixPtr matrix_ptr, EnvCollPtr coll_ptr, 
