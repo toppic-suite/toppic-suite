@@ -199,8 +199,6 @@ add_executable(topdiff
   ${TOPDIFF_CONSOLE_SRCS} ${TOPDIFF_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS} ${DIFF_SEARCH_SRCS}
   ${SEQ_SRCS} ${PARA_SRCS} ${SPEC_SRCS} ${PRSM_SRCS} ${DIFF_SRCS})
 
-add_executable(toptest ${TOPTEST_CONSOLE_SRCS})
-
 add_executable(topfd_gui ${TOPFD_GUI_SRCS} ${GUI_UTIL_SRCS})
 
 add_executable(topindex_gui ${TOPINDEX_GUI_SRCS} ${GUI_UTIL_SRCS})

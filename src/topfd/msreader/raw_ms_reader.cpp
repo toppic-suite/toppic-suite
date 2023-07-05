@@ -16,6 +16,7 @@
 #include "common/util/logger.hpp"
 #include "ms/env/real_env.hpp"
 #include "ms/env/prec_env.hpp"
+#include "ms/env/env_base.hpp"
 #include "topfd/msreader/raw_ms_reader.hpp" 
 
 namespace toppic {
@@ -48,9 +49,15 @@ RawMsPtr RawMsReader::getNextMs(double max_mass, int max_charge) {
   }
   if (do_refine_prec_mass_ && header_ptr->getMsLevel() == 2 && ms_one_ != nullptr) {
     refinePrecChrg(ms_one_, ms_ptr, max_mass, max_charge);
-  } else {
-    if (header_ptr->getPrecSpMz() != 0.0) {
-      header_ptr->setPrecMonoMz(header_ptr->getPrecSpMz());
+  } 
+  else {
+    double target_mz = header_ptr->getPrecTargetMz();
+    if (target_mz != 0.0) {
+      int charge = header_ptr->getPrecCharge();
+      double target_mass = peak_util::compPeakNeutralMass(target_mz, charge);
+      double mono_mass = EnvBase::convertBaseMassToMonoMass(target_mass);
+      double mono_mz = peak_util::compMz(mono_mass, charge);
+      header_ptr->setPrecMonoMz(mono_mz); 
     }
   }
   return ms_ptr;

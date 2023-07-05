@@ -121,4 +121,19 @@ double EnvBase::convertMonoMassToAvgMass(double mass) {
   return mass + diff;
 }
 
+double EnvBase::convertBaseMassToMonoMass(double mass) {
+  EnvelopePtr env_ptr = env_base_ptr_->getEnvByBaseMass(mass);
+  if (env_ptr == nullptr) {
+    LOG_ERROR("Invalid mass!");
+    exit(EXIT_FAILURE);
+  }
+  double diff = env_ptr->getAvgNeutralMass() - env_ptr->getMonoNeutralMass();
+  double mono_mass = mass - diff;
+  if (mono_mass < 0) {
+    mono_mass = 0;
+  }
+  return mono_mass; 
+}
+
+
 }  // namespace toppic

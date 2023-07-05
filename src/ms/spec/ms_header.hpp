@@ -30,8 +30,6 @@ class MsHeader {
 
   double getPrecMonoMass();
 
-  double getPrecSpMass();
-
   double getPrecMonoMassMinusWater();
 
   std::pair<int,int> getPrecMonoMassMinusWaterError(double ppo, double scale);
@@ -60,8 +58,6 @@ class MsHeader {
   int getMsOneId() {return ms_one_id_;}
 
   int getMsOneScan() {return ms_one_scan_;}
-
-  double getPrecSpMz() {return prec_sp_mz_;}
 
   int getPrecCharge() {return prec_charge_;}
 
@@ -99,8 +95,6 @@ class MsHeader {
   void setMsOneId(int ms_one_id) {ms_one_id_ = ms_one_id;}
 
   void setMsOneScan(int ms_one_scan) {ms_one_scan_ = ms_one_scan;}
-
-  void setPrecSpMz(double prec_sp_mz) {prec_sp_mz_ = prec_sp_mz;}
 
   void setPrecCharge(int prec_charge) {prec_charge_ = prec_charge;}
 
@@ -162,8 +156,6 @@ class MsHeader {
   int ms_one_scan_ = -1;
   // retention time 
   double retention_time_ = -1;
-  // precursor m/z value in the mzML file. 
-  double prec_sp_mz_ = -1;
   // computed monoisotopic precursor m/z value 
   double prec_mono_mz_ = -1;
   // isolation window targeted m/z

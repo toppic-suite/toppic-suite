@@ -40,7 +40,7 @@ MsHeader::MsHeader(XmlDOMElement* element) {
     scans_.push_back(xml_dom_util::getIntChildValue(scan_element, "scan", i));
   }
   retention_time_ = xml_dom_util::getDoubleChildValue(element, "retention_time", 0);
-  prec_sp_mz_ = xml_dom_util::getDoubleChildValue(element, "prec_sp_mz", 0);
+  prec_target_mz_ = xml_dom_util::getDoubleChildValue(element, "prec_target_mz", 0);
   prec_mono_mz_ = xml_dom_util::getDoubleChildValue(element, "prec_mono_mz", 0);
   prec_charge_ = xml_dom_util::getIntChildValue(element, "prec_charge", 0);
   std::string element_name = Activation::getXmlElementName();
@@ -55,15 +55,6 @@ double MsHeader::getPrecMonoMass() {
     return 0.0;
   } else {
     return peak_util::compPeakNeutralMass(prec_mono_mz_, prec_charge_);
-  }
-}
-
-double MsHeader::getPrecSpMass() {
-  if (prec_sp_mz_ < 0) {
-    LOG_WARN("id " << id_ << " precursor spectrum mass is not initialized");
-    return 0.0;
-  } else {
-    return peak_util::compPeakNeutralMass(prec_sp_mz_, prec_charge_);
   }
 }
 
@@ -102,7 +93,7 @@ std::string MsHeader::toString() {
   tmp << "Scan Number = " << scans_[0] << "\n";
   tmp << "MS Level = " << level_ << "\n";
   tmp << "Activation type = " << activation_ptr_ << "\n";
-  tmp << "Precursor Sp Mz = " << prec_sp_mz_ << "\n";
+  tmp << "Precursor Target Mz = " << prec_target_mz_ << "\n";
   tmp << "Precursor Charge = " << prec_charge_ << "\n";
   tmp << "Precursro Mono Mz = " << prec_mono_mz_ << "\n";
   return tmp.str();
@@ -151,8 +142,8 @@ XmlDOMElement* MsHeader::getHeaderXml(XmlDOMDocument* xml_doc) {
   element->appendChild(scans);
   str = str_util::toString(retention_time_);
   xml_doc->addElement(element, "retention_time", str.c_str());
-  str = str_util::toString(prec_sp_mz_);
-  xml_doc->addElement(element, "prec_sp_mz", str.c_str());
+  str = str_util::toString(prec_target_mz_);
+  xml_doc->addElement(element, "prec_target_mz", str.c_str());
   str = str_util::fixedToString(prec_mono_mz_, precison);
   xml_doc->addElement(element, "prec_mono_mz", str.c_str());
   str = str_util::toString(prec_charge_);

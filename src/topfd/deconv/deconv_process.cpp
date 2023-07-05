@@ -154,7 +154,7 @@ void deconvMissingMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   header_ptr->setPrecCharge(EnvPara::getDefaultMaxCharge());
   double prec_mz = EnvPara::getDefaultMaxMass()/EnvPara::getDefaultMaxCharge();
   header_ptr->setPrecMonoMz(prec_mz);
-  header_ptr->setPrecSpMz(prec_mz);
+  //header_ptr->setPrecSpMz(prec_mz);
   MatchEnvPtrVec result_envs; 
 
   EnvParaPtr env_para_ptr = deconv_ptr->getEnvParaPtr();
@@ -359,7 +359,8 @@ void deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   // int scan_num_ = header_ptr->getFirstScanNum();
   double max_frag_mass = header_ptr->getPrecMonoMass();
   if (max_frag_mass == 0.0) {
-    max_frag_mass = header_ptr->getPrecSpMass();
+    LOG_WARN("The precursor mass of scan " << header_ptr->getFirstScanNum() << " is 0.")
+    //max_frag_mass = header_ptr->getPrecSpMass();
   }
 
   count_lock.lock();

@@ -127,7 +127,7 @@ void PwMsReader::parsePrecursor(MsHeaderPtr header_ptr,
     prec_scan_num = parseNum(cur_spec_ptr->precursors[0].spectrumID, prev_ms1_scan_id_);
   }
   // precursor mz in mzML data
-  header_ptr->setPrecSpMz(prec_mz);
+  //header_ptr->setPrecSpMz(prec_mz);
   header_ptr->setPrecCharge(prec_charge);
   header_ptr->setPrecInte(prec_inte);
   header_ptr->setMsOneScan(prec_scan_num);

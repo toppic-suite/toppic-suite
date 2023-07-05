@@ -40,6 +40,8 @@ class EnvBase {
 
   static double convertMonoMassToAvgMass(double mass);
 
+  static double convertBaseMassToMonoMass(double mass); 
+
  private:
   // number of distribution entries 
   int entry_num_;
