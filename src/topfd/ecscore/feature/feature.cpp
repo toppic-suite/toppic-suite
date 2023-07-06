@@ -186,12 +186,18 @@ bool Feature::getHighestInteFeature(FracFeaturePtrVec &frac_features, EnvCollPtr
     FracFeaturePtr feature_ptr = frac_features[selected_index];
     EnvSetPtrVec env_sets = env_coll_list[selected_index]->getEnvSetList();
     EnvSetPtr env_set_ptr = env_sets[selected_sub_index];
+    int prec_id = 0;
     double prec_mono_mz = peak_util::compMz(feature_ptr->getMonoMass(), env_set_ptr->getCharge());
-    header_ptr->setPrecMonoMz(prec_mono_mz);
-    header_ptr->setPrecCharge(env_set_ptr->getCharge()); 
-    if (env_inte > 0) {
-      header_ptr->setPrecInte(env_inte);
+    int prec_charge = env_set_ptr->getCharge();
+    double prec_inte = env_inte;
+    if (prec_inte < 0) {
+      prec_inte = 0;
     }
+    double apex_time = feature_ptr->getApexTime();
+    PrecursorPtr prec_ptr = std::make_shared<Precursor>(prec_id, prec_mono_mz,
+                                                        prec_charge, prec_inte,
+                                                        apex_time);
+    header_ptr->setSinglePrecPtr(prec_ptr);
     SpecFeaturePtr ms2_feature = std::make_shared<SpecFeature>(header_ptr, feature_ptr);
     ms2_features.push_back(ms2_feature);
     feature_ptr->setHasMs2Spec(true);

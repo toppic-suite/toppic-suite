@@ -151,16 +151,17 @@ MatchEnvPtr refinePrecChrgFaime(RawMsPtr ms_one, RawMsPtr ms_two,
   LOG_DEBUG("start refine precursor " << " peak num " << peak_list.size());
   MatchEnvPtr match_env_ptr = prec_env::deconv(prec_win_begin, prec_win_end, peak_list,  
                                                max_mass, max_charge);
+  PrecursorPtr prec_ptr = header_two->getSinglePrecPtr();
   if (match_env_ptr != nullptr) {
     RealEnvPtr env_ptr = match_env_ptr->getRealEnvPtr();
-    header_two->setPrecMonoMz(env_ptr->getMonoMz());
-    header_two->setPrecCharge(env_ptr->getCharge());
-    header_two->setPrecInte(env_ptr->compIntensitySum());
+    prec_ptr->setMonoMz(env_ptr->getMonoMz());
+    prec_ptr->setCharge(env_ptr->getCharge());
+    prec_ptr->setInte(env_ptr->compIntensitySum());
     LOG_DEBUG("prec mz " << env_ptr->getMonoMz() << " prec charge " << env_ptr->getCharge());
   } else {
-    header_two->setPrecMonoMz(0);
-    header_two->setPrecCharge(0);
-    header_two->setPrecInte(0);
+    prec_ptr->setMonoMz(0);
+    prec_ptr->setCharge(0);
+    prec_ptr->setInte(0);
     LOG_INFO("EMPTY ENVELOPE POINTER");
   }
   return match_env_ptr;

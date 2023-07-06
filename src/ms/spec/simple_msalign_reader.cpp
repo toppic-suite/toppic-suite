@@ -141,43 +141,39 @@ void SimpleMsAlignReader::readNext() {
   }
 
   MsHeaderPtr header_ptr = std::make_shared<MsHeader>();
-  header_ptr->setFractionId(fraction_id);
   header_ptr->setFileName(ms_file_name);
+  header_ptr->setFractionId(fraction_id);
   header_ptr->setId(id);
-  header_ptr->setPrecId(prec_id);
-
   if (scans != "") {
     header_ptr->setScans(scans);
   } else {
     header_ptr->setScans("");
   }
-  header_ptr->setRetentionTime(retention_time);
-  // LOG_DEBUG("retention time " << retention_time);
-
   if (title != "") {
     std::string sp_str = "sp_" + str_util::toString(id);
     header_ptr->setTitle(sp_str);
   } else {
     header_ptr->setTitle(title);
   }
-
-  if (activation_ptr_ != nullptr) {
-    header_ptr->setActivationPtr(activation_ptr_);
-  } else if (activation != "") {
-    ActivationPtr activation_ptr = ActivationBase::getActivationPtrByName(activation);
-    header_ptr->setActivationPtr(activation_ptr);
-  }
+  header_ptr->setRetentionTime(retention_time);
   header_ptr->setMsLevel(level);
 
-  header_ptr->setMsOneId(ms_one_id);
-
-  header_ptr->setMsOneScan(ms_one_scan);
-
-  header_ptr->setPrecMonoMz(prec_mass /prec_charge + mass_constant::getProtonMass());
-
-  header_ptr->setPrecCharge(prec_charge);
-
-  header_ptr->setPrecInte(prec_inte);
+  if (level > 1) {
+    header_ptr->setMsOneId(ms_one_id);
+    header_ptr->setMsOneScan(ms_one_scan);
+    double prec_mz = prec_mass /prec_charge + mass_constant::getProtonMass();
+    double apex_time = -1;
+    PrecursorPtr prec_ptr = std::make_shared<Precursor>(prec_id, prec_mz,
+                                                        prec_charge, prec_inte,
+                                                        apex_time);
+    header_ptr->setSinglePrecPtr(prec_ptr);
+    if (activation_ptr_ != nullptr) {
+      header_ptr->setActivationPtr(activation_ptr_);
+    } else if (activation != "") {
+      ActivationPtr activation_ptr = ActivationBase::getActivationPtrByName(activation);
+      header_ptr->setActivationPtr(activation_ptr);
+    }
+  }
 
   std::vector<DeconvPeakPtr> peak_ptr_list;
   int idx = 0;
@@ -232,7 +228,7 @@ DeconvMsPtrVec SimpleMsAlignReader::getNextMsPtrVec() {
 
   double prec_mono_mz = peak_util::compMz(prec_mono_mass, charge);
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
-    deconv_ms_ptr_vec[i]->getMsHeaderPtr()->setPrecMonoMz(prec_mono_mz);
+    deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getSinglePrecPtr()->setMonoMz(prec_mono_mz);
   }
   return deconv_ms_ptr_vec;
 }

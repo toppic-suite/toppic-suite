@@ -78,22 +78,6 @@ class EnvSet {
 
   void shortlistExpEnvs();
 
-  /*
-  void setSeedEnv(const toppic::SeedEnvelope &seedEnv) { seed_env_ = seedEnv; }
-
-  std::vector<double> getXicEnvIntes() { return xic_.getInteList(); }
-
-  std::vector<double> getEnvIntes() { return xic_.getEnvInteList(); }
-
-
-  std::vector<SimplePeak> get_peak_list() { return seed_env_.getPeakList(); }
-
-  std::vector<double> get_theo_distribution_mz() { return seed_env_.get_pos_list(); }
-
-  */
-
-
-
  private:
   SeedEnvelopePtr seed_ptr_;
   ExpEnvelopePtrVec exp_env_list_;

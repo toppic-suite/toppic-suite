@@ -151,12 +151,17 @@ void deconvMissingMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   PeakPtrVec peak_list = ms_ptr->getPeakPtrVec();
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
 
-  header_ptr->setPrecCharge(EnvPara::getDefaultMaxCharge());
+  int prec_id = 0;
   double prec_mz = EnvPara::getDefaultMaxMass()/EnvPara::getDefaultMaxCharge();
-  header_ptr->setPrecMonoMz(prec_mz);
-  //header_ptr->setPrecSpMz(prec_mz);
-  MatchEnvPtrVec result_envs; 
+  int prec_charge = EnvPara::getDefaultMaxCharge();
+  double prec_inte = 0;
+  double apex_time = ms_ptr->getMsHeaderPtr()->getRetentionTime();
 
+  PrecursorPtr prec_ptr = std::make_shared<Precursor>(prec_id, prec_mz,
+                                                      prec_charge, prec_inte,
+                                                      apex_time);
+  header_ptr->setSinglePrecPtr(prec_ptr);
+  MatchEnvPtrVec result_envs; 
   EnvParaPtr env_para_ptr = deconv_ptr->getEnvParaPtr();
   if (peak_list.size() > 0) {
     deconv_ptr->setData(peak_list, env_para_ptr->getMaxMass(), 
@@ -285,7 +290,6 @@ void deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   LOG_DEBUG("peak list size " << peak_list.size());
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
   LOG_DEBUG("ms level " << header_ptr->getMsLevel() );
-  // int scan_num_ = header_ptr->getFirstScanNum();
 
   count_lock.lock();
   DeconvProcess::ms1_spec_num_++;
@@ -356,11 +360,10 @@ void deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   LOG_DEBUG("peak list size " << peak_list.size());
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
   LOG_DEBUG("ms level " << header_ptr->getMsLevel() );
-  // int scan_num_ = header_ptr->getFirstScanNum();
   double max_frag_mass = header_ptr->getPrecMonoMass();
   if (max_frag_mass == 0.0) {
-    LOG_WARN("The precursor mass of scan " << header_ptr->getFirstScanNum() << " is 0.")
-    //max_frag_mass = header_ptr->getPrecSpMass();
+    LOG_INFO("The precursor mass of scan " << header_ptr->getFirstScanNum() << " is 0.")
+    max_frag_mass = header_ptr->getPrecTargetMz();
   }
 
   count_lock.lock();

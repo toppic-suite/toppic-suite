@@ -55,7 +55,7 @@ void Prsm::setAdjustedPrecMass(double new_prec_mass) {
   for (size_t i = 0; i < refine_ms_three_vec_.size(); i++) {
     MsHeaderPtr ms_header_ptr = refine_ms_three_vec_[i]->getMsHeaderPtr();
     double mono_mz = peak_util::compMz(new_prec_mass, ms_header_ptr->getPrecCharge());
-    ms_header_ptr->setPrecMonoMz(mono_mz);
+    ms_header_ptr->getSinglePrecPtr()->setAdjustedMonoMz(mono_mz);
   }
 }
 

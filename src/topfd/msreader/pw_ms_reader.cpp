@@ -84,7 +84,7 @@ void PwMsReader::parseScanNum(MsHeaderPtr header_ptr,
     spec_info.scanNumber = spec_info.index;
   }
   LOG_DEBUG(" scan number " << spec_info.scanNumber);
-  header_ptr->setScan(spec_info.scanNumber);
+  header_ptr->setSingleScan(spec_info.scanNumber);
 }
 
 PeakPtrVec PwMsReader::parsePeaks(pwiz::msdata::SpectrumPtr cur_spec_ptr) {
@@ -112,10 +112,12 @@ void PwMsReader::parsePrecursor(MsHeaderPtr header_ptr,
                                 pwiz::msdata::SpectrumInfo &spec_info,
                                 pwiz::msdata::SpectrumPtr cur_spec_ptr) {
   // precursor information
+  int prec_id = 0;
   double prec_mz = 0;
   int prec_charge = 1;
   double prec_inte = 0.0;
   double prec_scan_num = -1;
+  double apex_time = spec_info.retentionTime;
   if (spec_info.precursors.size() > 0) {
     prec_mz = spec_info.precursors[0].mz;
     prec_charge = static_cast<int>(spec_info.precursors[0].charge);
@@ -127,13 +129,14 @@ void PwMsReader::parsePrecursor(MsHeaderPtr header_ptr,
     prec_scan_num = parseNum(cur_spec_ptr->precursors[0].spectrumID, prev_ms1_scan_id_);
   }
   // precursor mz in mzML data
-  //header_ptr->setPrecSpMz(prec_mz);
-  header_ptr->setPrecCharge(prec_charge);
-  header_ptr->setPrecInte(prec_inte);
+  PrecursorPtr prec_ptr = std::make_shared<Precursor>(prec_id, prec_mz,
+                                                      prec_charge, prec_inte,
+                                                      apex_time);
+  header_ptr->setSinglePrecPtr(prec_ptr);
   header_ptr->setMsOneScan(prec_scan_num);
   LOG_DEBUG("Precursor m/z " << prec_mz);
 
-  // isolation window
+  // isolation window default values
   double prec_target_mz = prec_mz;
   double isolation_lower_offset = isolation_window_ / 2;
   double isolation_upper_offset = isolation_window_/ 2;
@@ -155,8 +158,8 @@ void PwMsReader::parsePrecursor(MsHeaderPtr header_ptr,
   LOG_DEBUG("Precursor target mz " << prec_target_mz << " lower offset " << isolation_lower_offset 
             << " upper offset " << isolation_upper_offset); 
   header_ptr->setPrecTargetMz(prec_target_mz);
-  header_ptr->setIsolationLowerOffset(isolation_lower_offset);
-  header_ptr->setIsolationUpperOffset(isolation_upper_offset);
+  header_ptr->setPrecWinBegin(prec_target_mz - isolation_lower_offset);
+  header_ptr->setPrecWinEnd(prec_target_mz + isolation_upper_offset);
 }
 
 void PwMsReader::parseActivation(MsHeaderPtr header_ptr, 
@@ -239,7 +242,6 @@ bool PwMsReader::readOneMs(int sp_id, PeakPtrVec &peak_list, MsHeaderPtr &header
   header_ptr->setMsLevel(ms_level);
   if (ms_level == 1) {
     header_ptr->setId(ms1_cnt_);
-    header_ptr->setPrecCharge(0);
     prev_ms1_scan_id_ = spec_info.scanNumber;
     ms1_cnt_++;
   }
