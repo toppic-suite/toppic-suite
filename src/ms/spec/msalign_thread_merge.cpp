@@ -62,7 +62,6 @@ void MsalignThreadMerge::process() {
     std::string input_file_name = base_name + "_" + input_file_exts_[i];
     SimpleMsAlignReaderPtr reader_ptr
         = std::make_shared<SimpleMsAlignReader>(input_file_name); 
-    LOG_DEBUG("input file name " << input_file_name);
     DeconvMsPtr ms_ptr = reader_ptr->getNextMsPtr();
     reader_ptrs.push_back(reader_ptr);
     ms_ptrs.push_back(ms_ptr);

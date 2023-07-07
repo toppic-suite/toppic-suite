@@ -39,9 +39,12 @@ class SimpleMsAlignReader {
 
   DeconvMsPtrVec getNextMsPtrVec(); 
 
-  static void readMsOneSpectra(const std::string &file_name, DeconvMsPtrVec &ms_ptr_vec); 
+  // the two static functions are used in LC-MS1 feature detection
+  static void readAllMsOneSpectra(const std::string &file_name, 
+                                  DeconvMsPtrVec &ms_ptr_vec); 
 
-  static void readMsTwoSpectra(const std::string &file_name, DeconvMsPtrVec &ms_ptr_vec); 
+  static void readAllMsTwoSpectra(const std::string &file_name, 
+                                  DeconvMsPtrVec &ms_ptr_vec); 
 
  private:
   std::string file_name_;

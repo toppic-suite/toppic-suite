@@ -47,20 +47,23 @@ void MsAlignWriter::write(DeconvMsPtr ms_ptr) {
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
   output_ << std::fixed;
   output_ << "BEGIN IONS" << std::endl;
-  output_ << "ID=" << header_ptr->getId() << std::endl;
-  output_ << "FRACTION_ID=" << header_ptr->getFractionId() << std::endl;
   output_ << "FILE_NAME=" << header_ptr->getFileName() << std::endl;
+  output_ << "FRACTION_ID=" << header_ptr->getFractionId() << std::endl;
+  output_ << "ID=" << header_ptr->getId() << std::endl;
+  output_ << "TITLE=" << header_ptr->getTitle() << std::endl;
   output_ << "SCANS=" << header_ptr->getScansString() << std::endl;
   output_ << "RETENTION_TIME=" << std::fixed << std::setprecision(2)
       << header_ptr->getRetentionTime() << std::endl;
   output_ << "LEVEL=" << header_ptr->getMsLevel() << std::endl;
 
   if (header_ptr->getMsLevel() > 1) {
+    output_ << "MS_ONE_ID=" << header_ptr->getMsOneId() << std::endl;
+    output_ << "MS_ONE_SCAN=" << header_ptr->getMsOneScan() << std::endl;
+    output_ << "PRECURSOR_WINDOW_BEGIN=" << header_ptr->getPrecWinBegin() << std::endl;
+    output_ << "PRECURSOR_WINDOW_END=" << header_ptr->getPrecWinEnd() << std::endl;
     if (header_ptr->getActivationPtr() != nullptr) {
       output_ << "ACTIVATION=" << header_ptr->getActivationPtr()->getName() << std::endl;
     }
-    output_ << "MS_ONE_ID=" << header_ptr->getMsOneId() << std::endl;
-    output_ << "MS_ONE_SCAN=" << header_ptr->getMsOneScan() << std::endl;
     output_ << "PRECURSOR_MZ=" << std::fixed << std::setprecision(5) 
         << header_ptr->getPrecMonoMz() << std::endl;
     output_ << "PRECURSOR_CHARGE=" << header_ptr->getPrecCharge() << std::endl;

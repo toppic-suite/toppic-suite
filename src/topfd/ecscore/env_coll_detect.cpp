@@ -50,9 +50,9 @@ void process_single_file(std::string &base_file_name,
   //logger::setLogLevel(LOG_LEVEL_DEBUG);  
   /// Read msalign file and get the seed envelopes.
   DeconvMsPtrVec ms1_ptr_vec;
-  SimpleMsAlignReader::readMsOneSpectra(ms1_file_name, ms1_ptr_vec);
+  SimpleMsAlignReader::readAllMsOneSpectra(ms1_file_name, ms1_ptr_vec);
   DeconvMsPtrVec ms2_ptr_vec;
-  SimpleMsAlignReader::readMsTwoSpectra(ms2_file_name, ms2_ptr_vec);
+  SimpleMsAlignReader::readAllMsTwoSpectra(ms2_file_name, ms2_ptr_vec);
   LOG_DEBUG("Processed msalign file."); 
 
   /// Read mzml data

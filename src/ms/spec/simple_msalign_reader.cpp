@@ -81,49 +81,52 @@ void SimpleMsAlignReader::readNext() {
     return;
   }
   std::string ms_file_name = "";
-  int id = -1;
   int fraction_id = -1;
-  int prec_id = 0;
+  int id = -1;
+  
+  std::string title;
   std::string scans;
   double retention_time = -1;
-  std::string activation;
-  std::string title;
-  int level = 2;
+  int level = -1;
+
   int ms_one_id = -1;
   int ms_one_scan = -1;
+  double prec_win_begin = -1;
+  double prec_win_end = -1;
+  std::string activation;
   double prec_mass = -1;
   int prec_charge = -1;
   double prec_inte = -1;
-  //int feature_id = -1;
-  //double feature_inte = -1;
-  std::vector<std::string> strs;
 
+  std::vector<std::string> strs;
   for (size_t i = 1; i < spectrum_str_vec_.size() - 1; i++) {
     std::string letter = spectrum_str_vec_[i].substr(0, 1);
     if (letter >= "A" && letter <= "Z") {
       strs = str_util::split(spectrum_str_vec_[i], "=");
-      if (strs[0] == "ID") {
-        id = std::stoi(strs[1]);
+      if (strs[0] == "FILE_NAME") {
+        ms_file_name = strs[1];
       } else if (strs[0] == "FRACTION_ID") {
         fraction_id = std::stoi(strs[1]);
-      } else if (strs[0] == "FILE_NAME") {
-        ms_file_name = strs[1];
-      } else if (strs[0] == "PRECURSOR_ID") {
-        prec_id = std::stoi(strs[1]);
+      } else if (strs[0] == "ID") {
+        id = std::stoi(strs[1]);
+      } else if (strs[0] == "TITLE") {
+        title = strs[1];
       } else if (strs[0] == "SCANS") {
         scans = strs[1];
       } else if (strs[0] == "RETENTION_TIME") {
         retention_time = std::stod(strs[1]);
-      } else if (strs[0] == "ACTIVATION") {
-        activation = strs[1];
-      } else if (strs[0] == "TITLE") {
-        title = strs[1];
       } else if (strs[0] == "LEVEL") {
         level = std::stoi(strs[1]);
       } else if (strs[0] == "MS_ONE_ID") {
-        ms_one_id = std::stod(strs[1]);
+        ms_one_id = std::stoi(strs[1]);
       } else if (strs[0] == "MS_ONE_SCAN") {
         ms_one_scan = std::stod(strs[1]);
+      } else if (strs[0] == "PRECURSOR_WINDOW_BEGIN") {
+        prec_win_begin = std::stod(strs[1]);
+      } else if (strs[0] == "PRECURSOR_WINDOW_END") {
+        prec_win_end = std::stod(strs[1]);
+      } else if (strs[0] == "ACTIVATION") {
+        activation = strs[1];
       } else if (strs[0] == "PRECURSOR_MASS") {
         prec_mass = std::stod(strs[1]);
       } else if (strs[0] == "PRECURSOR_CHARGE") {
@@ -133,46 +136,64 @@ void SimpleMsAlignReader::readNext() {
       } 
     }
   }
-  if (id < 0 || prec_charge < 0 || prec_mass < 0) {
-    if (level == 2) {
-      LOG_WARN("Input file format error: sp id " << id << " prec_chrg "
-               << prec_charge << " prec mass " << prec_mass);
-    }
-  }
-
   MsHeaderPtr header_ptr = std::make_shared<MsHeader>();
   header_ptr->setFileName(ms_file_name);
   header_ptr->setFractionId(fraction_id);
+  //set id
+  if (id < 0) {
+    LOG_ERROR("Spectrum id is missing!");
+    exit(EXIT_FAILURE);
+  }
   header_ptr->setId(id);
+  // set title
+  if (title == "") {
+    title = "sp_" + str_util::toString(id);
+  }
+  header_ptr->setTitle(title);
+  // set scans
   if (scans != "") {
     header_ptr->setScans(scans);
   } else {
     header_ptr->setScans("");
   }
-  if (title != "") {
-    std::string sp_str = "sp_" + str_util::toString(id);
-    header_ptr->setTitle(sp_str);
-  } else {
-    header_ptr->setTitle(title);
-  }
   header_ptr->setRetentionTime(retention_time);
+  // set ms level
+  if (level <= 0) {
+    LOG_ERROR("MS level information is missing in MSALIGN file!");
+    exit(EXIT_FAILURE);
+  }
   header_ptr->setMsLevel(level);
 
   if (level > 1) {
     header_ptr->setMsOneId(ms_one_id);
     header_ptr->setMsOneScan(ms_one_scan);
-    double prec_mz = prec_mass /prec_charge + mass_constant::getProtonMass();
-    double apex_time = -1;
-    PrecursorPtr prec_ptr = std::make_shared<Precursor>(prec_id, prec_mz,
-                                                        prec_charge, prec_inte,
-                                                        apex_time);
-    header_ptr->setSinglePrecPtr(prec_ptr);
+    //set prec window 
+    if (prec_win_begin < 0 || prec_win_end < 0) {
+      LOG_ERROR("Precursor window information is missing in MSALIGN file!");
+      exit(EXIT_FAILURE);
+    }
+    header_ptr->setPrecWinBegin(prec_win_begin);
+    header_ptr->setPrecWinEnd(prec_win_end);
+    // set activation type
     if (activation_ptr_ != nullptr) {
+      // use the default activation if the information is missing
       header_ptr->setActivationPtr(activation_ptr_);
     } else if (activation != "") {
       ActivationPtr activation_ptr = ActivationBase::getActivationPtrByName(activation);
       header_ptr->setActivationPtr(activation_ptr);
     }
+    // set precursor information
+    if (prec_charge < 0 || prec_mass < 0) {
+      LOG_ERROR("Precursor information is missing in MSALIGN file!");
+      exit(EXIT_FAILURE);
+    }
+    int prec_id = 0;
+    double prec_mono_mz = peak_util::compMz(prec_mass, prec_charge); 
+    double apex_time = retention_time;
+    PrecursorPtr prec_ptr = std::make_shared<Precursor>(prec_id, prec_mono_mz,
+                                                        prec_charge, prec_inte,
+                                                        apex_time);
+    header_ptr->setSinglePrecPtr(prec_ptr);
   }
 
   std::vector<DeconvPeakPtr> peak_ptr_list;
@@ -233,8 +254,8 @@ DeconvMsPtrVec SimpleMsAlignReader::getNextMsPtrVec() {
   return deconv_ms_ptr_vec;
 }
 
-void SimpleMsAlignReader::readMsOneSpectra(const std::string &file_name, 
-                                           DeconvMsPtrVec &ms_ptr_vec) {
+void SimpleMsAlignReader::readAllMsOneSpectra(const std::string &file_name, 
+                                              DeconvMsPtrVec &ms_ptr_vec) {
   SimpleMsAlignReader sp_reader(file_name); 
 
   DeconvMsPtr ms_ptr;
@@ -244,8 +265,8 @@ void SimpleMsAlignReader::readMsOneSpectra(const std::string &file_name,
   }
 }
 
-void SimpleMsAlignReader::readMsTwoSpectra(const std::string &file_name, 
-                                           DeconvMsPtrVec &ms_ptr_vec) {
+void SimpleMsAlignReader::readAllMsTwoSpectra(const std::string &file_name, 
+                                              DeconvMsPtrVec &ms_ptr_vec) {
   SimpleMsAlignReader sp_reader(file_name); 
 
   DeconvMsPtr ms_ptr;

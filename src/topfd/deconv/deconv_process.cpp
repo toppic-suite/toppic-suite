@@ -611,14 +611,14 @@ void DeconvProcess::processSp(RawMsGroupFaimeReaderPtr reader_ptr) {
       ms2_file_name = str_util::toString(j) + "_ms2.msalign";
 
       MsalignThreadMergePtr ms1_merge_ptr
-            = std::make_shared<MsalignThreadMerge>(spec_file_name_, ms1_file_name, 
-                                                  thread_num_, ms1_file_name, 
-                                                  topfd_para_ptr_-> getParaStr("#", "\t"));
+        = std::make_shared<MsalignThreadMerge>(spec_file_name_, ms1_file_name, 
+                                               thread_num_, ms1_file_name, 
+                                               topfd_para_ptr_-> getParaStr("#", "\t"));
 
       MsalignThreadMergePtr ms2_merge_ptr 
-            = std::make_shared<MsalignThreadMerge>(spec_file_name_, ms2_file_name, 
-                                                  thread_num_, ms2_file_name, 
-                                                  topfd_para_ptr_-> getParaStr("#", "\t"));
+        = std::make_shared<MsalignThreadMerge>(spec_file_name_, ms2_file_name, 
+                                               thread_num_, ms2_file_name, 
+                                               topfd_para_ptr_-> getParaStr("#", "\t"));
       ms1_merge_ptr->process();
       ms2_merge_ptr->process();
 

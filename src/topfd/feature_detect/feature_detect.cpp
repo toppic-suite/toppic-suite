@@ -587,7 +587,7 @@ void process(int frac_id, const std::string &sp_file_name,
       DeconvMsPtrVec ms1_ptr_vec;
       FracFeaturePtrVec frac_features;
       std::string ms1_file_name = base_name + "_" + file_num + "ms1.msalign";
-      SimpleMsAlignReader::readMsOneSpectra(ms1_file_name, ms1_ptr_vec);
+      SimpleMsAlignReader::readAllMsOneSpectra(ms1_file_name, ms1_ptr_vec);
       double cur_voltage = voltage_vec[i].first;//if this is -1, it is non-FAIME data
       PeakPtrVec2D raw_peaks; 
       RawMsReaderPtr raw_reader_ptr = std::make_shared<RawMsReader>(sp_file_name, activation, 
