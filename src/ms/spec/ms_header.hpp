@@ -64,7 +64,7 @@ class MsHeader {
   //get functions for precursor 
   PrecursorPtr getSinglePrecPtr(); 
 
-  int getPrecId() {return getSinglePrecPtr()->getId();}
+  int getPrecId() {return getSinglePrecPtr()->getPrecId();}
 
   double getPrecMonoMz() {return getSinglePrecPtr()->getMonoMz();}
 

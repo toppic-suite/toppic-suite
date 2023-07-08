@@ -32,7 +32,7 @@ class Precursor {
 
   Precursor(XmlDOMElement* element);
 
-  int getId() {return id_;}
+  int getPrecId() {return prec_id_;}
 
   double getMonoMz();
 
@@ -52,7 +52,7 @@ class Precursor {
 
   std::pair<int,int> getMonoMassMinusWaterError(double ppo, double scale);
 
-  void setId(int id) {id_ = id;}
+  void setSpecId(int prec_id) {prec_id_ = prec_id;}
 
   void setMonoMz(double mono_mz) {mono_mz_ = mono_mz;}
 
@@ -71,7 +71,7 @@ class Precursor {
   static bool cmpInteDec(const PrecursorPtr &a, const PrecursorPtr &b);
 
  private:
-  int id_ = -1;
+  int prec_id_ = -1;
   // computed monoisotopic precursor m/z value 
   double mono_mz_ = -1;
   // adjusted mono_mz after proteoform identification

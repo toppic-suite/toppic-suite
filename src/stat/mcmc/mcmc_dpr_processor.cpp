@@ -26,7 +26,7 @@
 #include "common/base/neutral_loss.hpp"
 #include "common/thread/simple_thread_pool.hpp"
 
-#include "ms/spec/simple_msalign_reader.hpp"
+#include "ms/spec/msalign_reader.hpp"
 #include "ms/spec/msalign_util.hpp"
 #include "ms/spec/theo_peak.hpp"
 #include "ms/factory/extend_ms_util.hpp"
@@ -154,7 +154,7 @@ void DprProcessor::process() {
   PrsmPtr prsm_ptr = prsm_reader->readOnePrsm(fasta_reader_ptr, prsm_para_ptr->getFixModPtrVec());
 
   // no multi-spec support now
-  SimpleMsAlignReaderPtr sp_reader_ptr = std::make_shared<SimpleMsAlignReader>(
+  MsAlignReaderPtr sp_reader_ptr = std::make_shared<MsAlignReader>(
       sp_file_name,
       1,  // prsm_para_ptr->getGroupSpecNum()
       sp_para_ptr_->getActivationPtr()); 

@@ -25,7 +25,7 @@
 #include "seq/fasta_index_reader.hpp"
 #include "ms/spec/peak.hpp"
 #include "ms/spec/deconv_ms.hpp"
-#include "ms/spec/simple_msalign_reader.hpp"
+#include "ms/spec/msalign_reader_util.hpp"
 #include "ms/env/env_base.hpp"
 #include "ms/env/env_para.hpp"
 #include "ms/env/match_env.hpp"
@@ -458,7 +458,7 @@ void findMsOneFeatures(DeconvMsPtrVec &ms1_ptr_vec, PeakPtrVec2D & raw_peaks,
 }
 
 void readHeaders(const std::string & file_name, MsHeaderPtrVec &header_ptr_vec) {
-  SimpleMsAlignReader sp_reader(file_name); 
+  MsAlignReader sp_reader(file_name); 
   DeconvMsPtr ms_ptr;
   LOG_DEBUG("Start search");
   while ((ms_ptr = sp_reader.getNextMsPtr()) != nullptr) {
@@ -587,7 +587,7 @@ void process(int frac_id, const std::string &sp_file_name,
       DeconvMsPtrVec ms1_ptr_vec;
       FracFeaturePtrVec frac_features;
       std::string ms1_file_name = base_name + "_" + file_num + "ms1.msalign";
-      SimpleMsAlignReader::readAllMsOneSpectra(ms1_file_name, ms1_ptr_vec);
+      msalign_reader_util::readAllMsOneSpectra(ms1_file_name, ms1_ptr_vec);
       double cur_voltage = voltage_vec[i].first;//if this is -1, it is non-FAIME data
       PeakPtrVec2D raw_peaks; 
       RawMsReaderPtr raw_reader_ptr = std::make_shared<RawMsReader>(sp_file_name, activation, 

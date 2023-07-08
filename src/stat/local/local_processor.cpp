@@ -71,9 +71,9 @@ void LocalProcessor::process() {
   int group_spec_num = mng_ptr_->prsm_para_ptr_->getGroupSpecNum();
   SpParaPtr sp_para_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr();
 
-  SimpleMsAlignReaderPtr reader_ptr = std::make_shared<SimpleMsAlignReader>(spec_file_name, 
-                                                                            group_spec_num,
-                                                                            sp_para_ptr->getActivationPtr());
+  MsAlignReaderPtr reader_ptr = std::make_shared<MsAlignReader>(spec_file_name, 
+                                                                group_spec_num,
+                                                                sp_para_ptr->getActivationPtr());
 
   SpectrumSetPtr spec_set_ptr;
 

@@ -14,7 +14,7 @@
 
 #include "common/util/file_util.hpp"
 #include "para/sp_para.hpp"
-#include "ms/spec/simple_msalign_reader.hpp"
+#include "ms/spec/msalign_reader.hpp"
 #include "ms/spec/msalign_frac_merge.hpp"
 
 namespace toppic {
@@ -29,7 +29,7 @@ void mergeMsalignFiles(const std::vector<std::string> &msalign_file_names,
   outfile << para_str;
 
   for (size_t i = 0; i < msalign_file_names.size(); i++) {
-    SimpleMsAlignReader sp_reader(msalign_file_names[i]); 
+    MsAlignReader sp_reader(msalign_file_names[i]); 
     std::vector<std::string> ms_lines = sp_reader.readOneStrSpectrum();
     while (ms_lines.size() > 0) {
       for (size_t k = 0; k< ms_lines.size(); k++) {

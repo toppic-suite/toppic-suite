@@ -61,10 +61,9 @@ std::function<void()> geneTask(GraphAlignMngPtr mng_ptr,
     SimplePrsmReader simple_prsm_reader(input_file_name);
     SimplePrsmStrPtr prsm_ptr = simple_prsm_reader.readOnePrsmStr();
     int group_spec_num = prsm_para_ptr->getGroupSpecNum();
-    SimpleMsAlignReaderPtr ms_reader_ptr 
-      = std::make_shared<SimpleMsAlignReader>(sp_file_name, 
-                                              group_spec_num,
-                                              sp_para_ptr->getActivationPtr());
+    MsAlignReaderPtr ms_reader_ptr = std::make_shared<MsAlignReader>(sp_file_name, 
+                                                                     group_spec_num,
+                                                                     sp_para_ptr->getActivationPtr());
 
     SpecGraphReader spec_reader(sp_file_name,
                                 prsm_para_ptr->getGroupSpecNum(),

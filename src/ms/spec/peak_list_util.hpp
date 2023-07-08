@@ -34,6 +34,7 @@ PeakPtrVec getPeaksInWindow(const PeakPtrVec &ptr_list, double center,
 
 double getHighestPeakInte(const PeakPtrVec &ptr_list); 
 
+// do not use ptr vec reference because the list will be sorted in the function.
 double getMedianPeakInte(PeakPtrVec ptr_list);
 
 }  // namespace peak_list_util

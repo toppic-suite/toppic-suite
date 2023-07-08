@@ -19,7 +19,7 @@
 #include "common/util/file_util.hpp"
 #include "common/util/str_util.hpp"
 #include "ms/spec/deconv_ms.hpp"
-#include "ms/spec/simple_msalign_reader.hpp"
+#include "ms/spec/msalign_reader_util.hpp"
 #include "ms/feature/spec_feature_writer.hpp"
 #include "ms/feature/frac_feature_writer.hpp"
 #include "ms/feature/sample_feature_writer.hpp"
@@ -50,9 +50,9 @@ void process_single_file(std::string &base_file_name,
   //logger::setLogLevel(LOG_LEVEL_DEBUG);  
   /// Read msalign file and get the seed envelopes.
   DeconvMsPtrVec ms1_ptr_vec;
-  SimpleMsAlignReader::readAllMsOneSpectra(ms1_file_name, ms1_ptr_vec);
+  msalign_reader_util::readAllMsOneSpectra(ms1_file_name, ms1_ptr_vec);
   DeconvMsPtrVec ms2_ptr_vec;
-  SimpleMsAlignReader::readAllMsTwoSpectra(ms2_file_name, ms2_ptr_vec);
+  msalign_reader_util::readAllMsTwoSpectra(ms2_file_name, ms2_ptr_vec);
   LOG_DEBUG("Processed msalign file."); 
 
   /// Read mzml data

@@ -120,9 +120,9 @@ void PtmSearchProcessor::process(){
   std::string output_file_name = file_util::basename(sp_file_name) + "." + mng_ptr_->output_file_ext_;
 
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
-  SimpleMsAlignReaderPtr ms_reader_ptr = std::make_shared<SimpleMsAlignReader>(sp_file_name, 
-                                                                               group_spec_num,
-                                                                               sp_para_ptr->getActivationPtr());
+  MsAlignReaderPtr ms_reader_ptr = std::make_shared<MsAlignReader>(sp_file_name, 
+                                                                   group_spec_num,
+                                                                   sp_para_ptr->getActivationPtr());
 
   const int n_unknown_shift = 2;
 

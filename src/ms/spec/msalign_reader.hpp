@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TOPPIC_MS_SPEC_SIMPLE_MSALIGN_READER_HPP_
-#define TOPPIC_MS_SPEC_SIMPLE_MSALIGN_READER_HPP_
+#ifndef TOPPIC_MS_SPEC_MSALIGN_READER_HPP_
+#define TOPPIC_MS_SPEC_MSALIGN_READER_HPP_
 
 #include <fstream>
 #include <string>
@@ -23,28 +23,21 @@
 
 namespace toppic {
 
-class SimpleMsAlignReader {
+class MsAlignReader {
  public:
-  SimpleMsAlignReader(const std::string &file_name);
+  MsAlignReader(const std::string &file_name);
 
-  SimpleMsAlignReader(const std::string &file_name, 
+  MsAlignReader(const std::string &file_name, 
                       int group_spec_num,
                       ActivationPtr activation_ptr);
 
-  ~SimpleMsAlignReader();
+  ~MsAlignReader();
 
   std::vector<std::string> readOneStrSpectrum();
 
   DeconvMsPtr getNextMsPtr();
 
   DeconvMsPtrVec getNextMsPtrVec(); 
-
-  // the two static functions are used in LC-MS1 feature detection
-  static void readAllMsOneSpectra(const std::string &file_name, 
-                                  DeconvMsPtrVec &ms_ptr_vec); 
-
-  static void readAllMsTwoSpectra(const std::string &file_name, 
-                                  DeconvMsPtrVec &ms_ptr_vec); 
 
  private:
   std::string file_name_;
@@ -64,8 +57,8 @@ class SimpleMsAlignReader {
   void readNext();
 };
 
-typedef std::shared_ptr<SimpleMsAlignReader> SimpleMsAlignReaderPtr;
-typedef std::vector<SimpleMsAlignReaderPtr>  SimpleMsAlignReaderPtrVec;
+typedef std::shared_ptr<MsAlignReader> MsAlignReaderPtr;
+typedef std::vector<MsAlignReaderPtr>  MsAlignReaderPtrVec;
 
 }  // namespace toppic
 #endif

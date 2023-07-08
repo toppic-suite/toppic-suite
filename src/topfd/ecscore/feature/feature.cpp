@@ -17,7 +17,7 @@
 #include "common/util/logger.hpp"
 
 #include "ms/spec/peak_util.hpp"
-#include "ms/spec/simple_msalign_reader.hpp"
+#include "ms/spec/msalign_reader.hpp"
 #include "ms/spec/msalign_writer.hpp"
 #include "ms/env/env_base.hpp"
 
@@ -132,7 +132,7 @@ void Feature::assignFeatures(const std::string &ms2_file_name, FracFeaturePtrVec
 }
 
 DeconvMsPtrVec Feature::readData(const std::string &file_name) {
-  SimpleMsAlignReader sp_reader(file_name);
+  MsAlignReader sp_reader(file_name);
   DeconvMsPtrVec ms_ptr_vec;
   DeconvMsPtr ms_ptr;
   while ((ms_ptr = sp_reader.getNextMsPtr()) != nullptr) {

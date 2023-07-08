@@ -78,9 +78,9 @@ class PrmPeak : public Peak {
 
  private:
   int spec_id_;
+  int peak_id_;
   DeconvPeakPtr base_peak_ptr_;
   BasePeakTypePtr base_type_;
-  int peak_id_;
   double mono_mass_;
   double score_;
   double strict_tolerance_;

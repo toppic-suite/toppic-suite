@@ -17,40 +17,40 @@
 #include "common/base/mass_constant.hpp"
 #include "common/base/activation_base.hpp"
 #include "ms/spec/peak_util.hpp"
-#include "ms/spec/simple_msalign_reader.hpp"
+#include "ms/spec/msalign_reader.hpp"
 
 namespace toppic {
 
-SimpleMsAlignReader::SimpleMsAlignReader(const std::string &file_name):
-    file_name_(file_name) {
-      input_.open(file_name.c_str(), std::ios::in);
-      if (!input_.is_open()) {
-        LOG_ERROR("msalign file  " << file_name << " does not exist.");
-        exit(EXIT_FAILURE);
-      }
-      group_spec_num_ = 1;
+MsAlignReader::MsAlignReader(const std::string &file_name):
+  file_name_(file_name) {
+    input_.open(file_name.c_str(), std::ios::in);
+    if (!input_.is_open()) {
+      LOG_ERROR("msalign file  " << file_name << " does not exist.");
+      exit(EXIT_FAILURE);
     }
+    group_spec_num_ = 1;
+  }
 
-SimpleMsAlignReader::SimpleMsAlignReader(const std::string &file_name, 
-                                         int group_spec_num,
-                                         ActivationPtr activation_ptr):
-    file_name_(file_name),
-    group_spec_num_(group_spec_num),
-    activation_ptr_(activation_ptr) {
-      input_.open(file_name.c_str(), std::ios::in);
-      if (!input_.is_open()) {
-        LOG_ERROR("msalign file  " << file_name << " does not exist.");
-        exit(EXIT_FAILURE);
-      }
+MsAlignReader::MsAlignReader(const std::string &file_name, 
+                             int group_spec_num,
+                             ActivationPtr activation_ptr):
+  file_name_(file_name),
+  group_spec_num_(group_spec_num),
+  activation_ptr_(activation_ptr) {
+    input_.open(file_name.c_str(), std::ios::in);
+    if (!input_.is_open()) {
+      LOG_ERROR("msalign file  " << file_name << " does not exist.");
+      exit(EXIT_FAILURE);
     }
+  }
 
-SimpleMsAlignReader::~SimpleMsAlignReader() {
+MsAlignReader::~MsAlignReader() {
   if (input_.is_open()) {
     input_.close();
   }
 }
-      
-std::vector<std::string> SimpleMsAlignReader::readOneStrSpectrum() {
+
+std::vector<std::string> MsAlignReader::readOneStrSpectrum() {
   std::string line;
   std::vector<std::string> line_list;
   while (std::getline(input_, line)) {
@@ -73,7 +73,7 @@ std::vector<std::string> SimpleMsAlignReader::readOneStrSpectrum() {
   return line_list;
 }
 
-void SimpleMsAlignReader::readNext() {
+void MsAlignReader::readNext() {
   deconv_ms_ptr_ = nullptr;
   spectrum_str_vec_ = readOneStrSpectrum();
   if (spectrum_str_vec_.size() == 0) {
@@ -82,8 +82,8 @@ void SimpleMsAlignReader::readNext() {
   }
   std::string ms_file_name = "";
   int fraction_id = -1;
-  int id = -1;
-  
+  int spec_id = -1;
+
   std::string title;
   std::string scans;
   double retention_time = -1;
@@ -108,7 +108,7 @@ void SimpleMsAlignReader::readNext() {
       } else if (strs[0] == "FRACTION_ID") {
         fraction_id = std::stoi(strs[1]);
       } else if (strs[0] == "SPECTRUM_ID") {
-        id = std::stoi(strs[1]);
+        spec_id = std::stoi(strs[1]);
       } else if (strs[0] == "TITLE") {
         title = strs[1];
       } else if (strs[0] == "SCANS") {
@@ -139,15 +139,15 @@ void SimpleMsAlignReader::readNext() {
   MsHeaderPtr header_ptr = std::make_shared<MsHeader>();
   header_ptr->setFileName(ms_file_name);
   header_ptr->setFractionId(fraction_id);
-  //set id
-  if (id < 0) {
+  //set spec_id
+  if (spec_id < 0) {
     LOG_ERROR("Spectrum id is missing!");
     exit(EXIT_FAILURE);
   }
-  header_ptr->setSpecId(id);
+  header_ptr->setSpecId(spec_id);
   // set title
   if (title == "") {
-    title = "sp_" + str_util::toString(id);
+    title = "sp_" + str_util::toString(spec_id);
   }
   header_ptr->setTitle(title);
   // set scans
@@ -197,7 +197,7 @@ void SimpleMsAlignReader::readNext() {
   }
 
   std::vector<DeconvPeakPtr> peak_ptr_list;
-  int idx = 0;
+  int peak_id = 0;
   for (size_t i = 1; i < spectrum_str_vec_.size() - 1; i++) {
     std::string letter = spectrum_str_vec_[i].substr(0, 1);
     if (letter >= "0" && letter <= "9") {
@@ -209,10 +209,10 @@ void SimpleMsAlignReader::readNext() {
       if (strs.size() > 3) {
         score = std::stod(strs[3]);
       }
-      DeconvPeakPtr peak_ptr = std::make_shared<DeconvPeak>(id, idx, mass, inte,
+      DeconvPeakPtr peak_ptr = std::make_shared<DeconvPeak>(spec_id, peak_id, mass, inte,
                                                             charge, score);
       peak_ptr_list.push_back(peak_ptr);
-      idx++;
+      peak_id++;
     }
   }
 
@@ -220,12 +220,12 @@ void SimpleMsAlignReader::readNext() {
   current_++;
 }
 
-DeconvMsPtr SimpleMsAlignReader::getNextMsPtr() {
+DeconvMsPtr MsAlignReader::getNextMsPtr() {
   readNext();
   return deconv_ms_ptr_;
 }
 
-DeconvMsPtrVec SimpleMsAlignReader::getNextMsPtrVec() {
+DeconvMsPtrVec MsAlignReader::getNextMsPtrVec() {
   DeconvMsPtrVec deconv_ms_ptr_vec;
   for (int i = 0; i < group_spec_num_; i++) {
     readNext();
@@ -252,28 +252,6 @@ DeconvMsPtrVec SimpleMsAlignReader::getNextMsPtrVec() {
     deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getSinglePrecPtr()->setMonoMz(prec_mono_mz);
   }
   return deconv_ms_ptr_vec;
-}
-
-void SimpleMsAlignReader::readAllMsOneSpectra(const std::string &file_name, 
-                                              DeconvMsPtrVec &ms_ptr_vec) {
-  SimpleMsAlignReader sp_reader(file_name); 
-
-  DeconvMsPtr ms_ptr;
-  while ((ms_ptr = sp_reader.getNextMsPtr())!= nullptr) {
-    ms_ptr->getMsHeaderPtr()->setMsLevel(1);
-    ms_ptr_vec.push_back(ms_ptr);
-  }
-}
-
-void SimpleMsAlignReader::readAllMsTwoSpectra(const std::string &file_name, 
-                                              DeconvMsPtrVec &ms_ptr_vec) {
-  SimpleMsAlignReader sp_reader(file_name); 
-
-  DeconvMsPtr ms_ptr;
-  while ((ms_ptr = sp_reader.getNextMsPtr())!= nullptr) {
-    ms_ptr->getMsHeaderPtr()->setMsLevel(2);
-    ms_ptr_vec.push_back(ms_ptr);
-  }
 }
 
 }  // namespace toppic

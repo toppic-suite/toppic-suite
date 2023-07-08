@@ -23,16 +23,21 @@
 
 namespace toppic {
 
-Precursor::Precursor(int id, double mono_mz, int charge, 
+Precursor::Precursor(int prec_id, double mono_mz, int charge, 
                      double inte, double apex_time):
-    id_(id),
-    mono_mz_(mono_mz),
-    charge_(charge),
-    inte_ (inte),
-    apex_time_(apex_time) {}
+  prec_id_(prec_id),
+  mono_mz_(mono_mz),
+  charge_(charge),
+  inte_ (inte),
+  apex_time_(apex_time) {
+    if (mono_mz_ < 0 || std::isnan(mono_mz_)) {
+      LOG_WARN("id " << prec_id_ << " monoisotopic mass is not initialized!");
+      mono_mz_ = 0.0;
+    }
+  }
 
 Precursor::Precursor(XmlDOMElement* element) {
-  id_ = xml_dom_util::getIntChildValue(element, "id", 0);
+  prec_id_ = xml_dom_util::getIntChildValue(element, "prec_id", 0);
   mono_mz_ = xml_dom_util::getDoubleChildValue(element, "mono_mz", 0);
   charge_ = xml_dom_util::getIntChildValue(element, "charge", 0);
   inte_ = xml_dom_util::getDoubleChildValue(element, "intensity", 0);
@@ -41,7 +46,7 @@ Precursor::Precursor(XmlDOMElement* element) {
 
 double Precursor::getMonoMz() {
   if (std::isnan(mono_mz_)) {
-    LOG_INFO("id " << id_ << " monoisotopic mz is not initialized!");
+    LOG_INFO("id " << prec_id_ << " monoisotopic mz is not initialized!");
     return 0.0; 
   } else {
     return mono_mz_;
@@ -50,7 +55,7 @@ double Precursor::getMonoMz() {
 
 double Precursor::getMonoMass() {
   if (mono_mz_ < 0 || std::isnan(mono_mz_)) {
-    LOG_INFO("id " << id_ << " monoisotopic mass is not initialized!");
+    LOG_INFO("id " << prec_id_ << " monoisotopic mass is not initialized!");
     return 0.0;
   } else {
     return peak_util::compPeakNeutralMass(mono_mz_, charge_);
@@ -80,8 +85,8 @@ XmlDOMElement* Precursor::getPrecursorXml(XmlDOMDocument* xml_doc) {
   int precison = 4;
   std::string precursor_str = Precursor::getXmlElementName();
   XmlDOMElement* element = xml_doc->createElement(precursor_str.c_str()); 
-  std::string str = str_util::toString(id_);
-  xml_doc->addElement(element, "id", str.c_str());
+  std::string str = str_util::toString(prec_id_);
+  xml_doc->addElement(element, "prec_id", str.c_str());
   str = str_util::fixedToString(mono_mz_, precison);
   xml_doc->addElement(element, "mono_mz", str.c_str());
   str = str_util::toString(charge_);

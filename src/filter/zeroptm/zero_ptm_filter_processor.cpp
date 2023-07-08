@@ -43,10 +43,9 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
   PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
-  SimpleMsAlignReaderPtr reader_ptr 
-      = std::make_shared<SimpleMsAlignReader>(prsm_para_ptr->getSpectrumFileName(), 
-                                              group_spec_num,
-                                              sp_para_ptr->getActivationPtr());
+  MsAlignReaderPtr reader_ptr = std::make_shared<MsAlignReader>(prsm_para_ptr->getSpectrumFileName(), 
+                                                                group_spec_num,
+                                                                sp_para_ptr->getActivationPtr());
   std::string output_file_name = file_util::basename(prsm_para_ptr->getSpectrumFileName())
       + "." + mng_ptr->output_file_ext_ + "_" + block_str;
   //writer

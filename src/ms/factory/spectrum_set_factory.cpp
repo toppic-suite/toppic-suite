@@ -82,7 +82,7 @@ SpectrumSetPtr geneSpectrumSetPtr(DeconvMsPtrVec deconv_ms_ptr_vec,
   return spec_set_ptr;
 }
 
-SpectrumSetPtr readNextSpectrumSetPtr(SimpleMsAlignReaderPtr reader_ptr, 
+SpectrumSetPtr readNextSpectrumSetPtr(MsAlignReaderPtr reader_ptr, 
                                       SpParaPtr sp_para_ptr) {
   DeconvMsPtrVec deconv_ms_ptr_vec = reader_ptr->getNextMsPtrVec();
   if (deconv_ms_ptr_vec.size() == 0) {
@@ -95,7 +95,7 @@ SpectrumSetPtr readNextSpectrumSetPtr(SimpleMsAlignReaderPtr reader_ptr,
   return spec_set_ptr;
 }
 
-SpectrumSetPtr readNextSpectrumSetPtr(SimpleMsAlignReaderPtr reader_ptr, 
+SpectrumSetPtr readNextSpectrumSetPtr(MsAlignReaderPtr reader_ptr, 
                                       SpParaPtr sp_para_ptr, 
                                       int peak_num_limit) {
   DeconvMsPtrVec deconv_ms_ptr_vec = reader_ptr->getNextMsPtrVec();

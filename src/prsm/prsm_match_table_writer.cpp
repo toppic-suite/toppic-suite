@@ -96,10 +96,9 @@ void PrsmMatchTableWriter::write() {
   std::string sp_file_name = prsm_para_ptr_->getSpectrumFileName();
   int group_spec_num = prsm_para_ptr_->getGroupSpecNum();
   SpParaPtr sp_para_ptr = prsm_para_ptr_->getSpParaPtr();
-  SimpleMsAlignReaderPtr ms_reader_ptr 
-      = std::make_shared<SimpleMsAlignReader>(sp_file_name, 
-                                              group_spec_num,
-                                              sp_para_ptr->getActivationPtr());
+  MsAlignReaderPtr ms_reader_ptr = std::make_shared<MsAlignReader>(sp_file_name, 
+                                                                   group_spec_num,
+                                                                   sp_para_ptr->getActivationPtr());
   SpectrumSetPtr spec_set_ptr;
   while ((spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(ms_reader_ptr, sp_para_ptr)) 
          != nullptr) {

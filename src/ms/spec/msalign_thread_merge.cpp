@@ -17,7 +17,7 @@
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/str_util.hpp"
-#include "ms/spec/simple_msalign_reader.hpp"
+#include "ms/spec/msalign_reader.hpp"
 #include "ms/spec/msalign_writer.hpp"
 #include "ms/spec/msalign_thread_merge.hpp"
 
@@ -56,12 +56,12 @@ void MsalignThreadMerge::process() {
   std::string base_name = file_util::basename(spec_file_name_);
   
   // open files
-  SimpleMsAlignReaderPtrVec reader_ptrs; 
+  MsAlignReaderPtrVec reader_ptrs; 
   DeconvMsPtrVec ms_ptrs;
   for (size_t i = 0; i < input_num; i++) {
     std::string input_file_name = base_name + "_" + input_file_exts_[i];
-    SimpleMsAlignReaderPtr reader_ptr
-        = std::make_shared<SimpleMsAlignReader>(input_file_name); 
+    MsAlignReaderPtr reader_ptr
+        = std::make_shared<MsAlignReader>(input_file_name); 
     DeconvMsPtr ms_ptr = reader_ptr->getNextMsPtr();
     reader_ptrs.push_back(reader_ptr);
     ms_ptrs.push_back(ms_ptr);

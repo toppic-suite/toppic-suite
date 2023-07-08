@@ -16,7 +16,7 @@
 #include "common/util/file_util.hpp"
 #include "seq/proteoform.hpp"
 #include "ms/spec/rm_break_type.hpp"
-#include "ms/spec/simple_msalign_reader.hpp"
+#include "ms/spec/msalign_reader.hpp"
 #include "ms/spec/msalign_util.hpp"
 #include "ms/factory/extend_ms_factory.hpp"
 #include "ms/factory/spectrum_set_factory.hpp"
@@ -45,7 +45,7 @@ void PrsmCoverage::processSingleCoverage() {
   // init variables
   int spectrum_num = msalign_util::getSpNum(sp_file_name);
   int group_spec_num = prsm_para_ptr_->getGroupSpecNum();
-  SimpleMsAlignReaderPtr ms_reader_ptr = std::make_shared<SimpleMsAlignReader>(sp_file_name, group_spec_num,
+  MsAlignReaderPtr ms_reader_ptr = std::make_shared<MsAlignReader>(sp_file_name, group_spec_num,
                                                                                prsm_para_ptr_->getSpParaPtr()->getActivationPtr());
   int cnt = 0;
   SpectrumSetPtr spec_set_ptr;
