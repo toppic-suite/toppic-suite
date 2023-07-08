@@ -31,7 +31,7 @@ PwMsReader::PwMsReader(const std::string & file_name,
       msd_ptr_ = std::make_shared<pwiz::msdata::MSDataFile>(file_name, &readers_);
       spec_list_ptr_ =  msd_ptr_->run.spectrumListPtr;
       input_sp_num_ = spec_list_ptr_->size();
-      checkWatersInstrument();
+      is_waters_instrument_ = checkWatersInstrument();
     }
 
 PwMsReader::PwMsReader(const std::string & file_name, 
@@ -45,18 +45,34 @@ PwMsReader::PwMsReader(const std::string & file_name,
       msd_ptr_ = std::make_shared<pwiz::msdata::MSDataFile>(file_name, &readers_);
       spec_list_ptr_ =  msd_ptr_->run.spectrumListPtr;
       input_sp_num_ = spec_list_ptr_->size();
-      checkWatersInstrument();
+      is_waters_instrument_ = checkWatersInstrument();
     }
 
-void PwMsReader::checkWatersInstrument() {
+bool PwMsReader::checkWatersInstrument() {
   for (size_t i = 0; i < msd_ptr_->instrumentConfigurationPtrs.size(); i++) {
     pwiz::msdata::InstrumentConfigurationPtr conf_ptr = msd_ptr_->instrumentConfigurationPtrs[i];
     pwiz::msdata::CVParam param = conf_ptr->cvParam(pwiz::msdata::CVID::MS_Waters_instrument_model);
     if (! param.empty()) {
       LOG_DEBUG("Found waters model"); 
-      is_waters_instrument_ = true;
+      return true; 
     }
   }
+  return false;
+}
+
+bool PwMsReader::checkCentroidData() {
+  std::vector<pwiz::msdata::DataProcessingPtr> proc_ptr_vec = msd_ptr_->dataProcessingPtrs;
+  for (size_t i = 0; i < proc_ptr_vec.size(); i++) {
+    for (size_t j = 0; j < proc_ptr_vec[i]->processingMethods.size(); j++) {
+      pwiz::msdata::ProcessingMethod proc_method = proc_ptr_vec[i]->processingMethods[j];
+      pwiz::cv::CVID cvid_peak_picking;
+      cvid_peak_picking = pwiz::cv::MS_peak_picking;
+      if (proc_method.hasCVParam(cvid_peak_picking)) {
+        return true;
+      }
+    }
+  }
+  return false;
 }
 
 int PwMsReader::parseNum(std::string &id, int default_scan) {

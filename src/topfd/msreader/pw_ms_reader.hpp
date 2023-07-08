@@ -40,8 +40,8 @@ class PwMsReader {
   PeakPtrVec getPeakList() {return peak_list_;}
   MsHeaderPtr getHeaderPtr() {return header_ptr_;}
   int getInputSpNum() {return input_sp_num_;}
-  bool readOneMs(int sp_id, PeakPtrVec &peak_list, MsHeaderPtr &header_ptr);
-  MSDataFilePtr getMsdPtr() {return msd_ptr_;}
+
+  bool checkCentroidData(); 
   
  private:
   std::string file_name_;
@@ -64,7 +64,9 @@ class PwMsReader {
   MSDataFilePtr msd_ptr_;
   pwiz::msdata::SpectrumListPtr spec_list_ptr_;
 
-  void checkWatersInstrument(); 
+  bool readOneMs(int sp_id, PeakPtrVec &peak_list, MsHeaderPtr &header_ptr);
+
+  bool checkWatersInstrument(); 
 
   PeakPtrVec parsePeaks(pwiz::msdata::SpectrumPtr cur_spec_ptr); 
 

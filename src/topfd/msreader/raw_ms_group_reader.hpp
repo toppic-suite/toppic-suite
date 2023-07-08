@@ -37,8 +37,8 @@ class RawMsGroupReader {
                              double max_mass,
                              int max_charge);
 
-  int getInputSpNum() {return reader_ptr_->getInputSpNum();}
   PwMsReaderPtr getReaderPtr() {return reader_ptr_;}
+  int getInputSpNum() {return reader_ptr_->getInputSpNum();}
   
  private:
   PwMsReaderPtr reader_ptr_;

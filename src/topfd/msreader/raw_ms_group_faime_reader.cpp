@@ -27,6 +27,14 @@ RawMsGroupFaimeReader::RawMsGroupFaimeReader(const std::string & file_name,
                                              int fraction_id) {
   reader_ptr_ = std::make_shared<PwMsReader>(file_name, activation, 
                                              isolation_window);
+  //check if it is centroid data
+  bool is_centroid_data = reader_ptr_->checkCentroidData(); 
+  if (!is_centroid_data) {
+    LOG_ERROR("The mass spectrum file contains profile data.");
+    LOG_ERROR("TopFD supports centroided data only!");
+    exit(EXIT_FAILURE);
+  }
+  
   missing_level_one_ = missing_level_one;
   fraction_id_ = fraction_id;
   if (!missing_level_one_) {
