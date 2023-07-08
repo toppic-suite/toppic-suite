@@ -12,16 +12,15 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#ifndef TOPPIC_MS_MZML_MZML_MS_JSON_WRITER_HPP_
+#define TOPPIC_MS_MZML_MZML_MS_JSON_WRITER_HPP_
 
-#ifndef TOPPIC_TOPFD_MSREADER_RAW_MS_WRITER_HPP_
-#define TOPPIC_TOPFD_MSREADER_RAW_MS_WRITER_HPP_
-
-#include "ms/mzml/mzml_ms.hpp"
 #include "ms/env/match_env.hpp"
+#include "ms/mzml/mzml_ms.hpp"
 
 namespace toppic {
 
-namespace raw_ms_writer {
+namespace mzml_ms_json_writer {
 
   void write(std::string &file_name, MzmlMsPtr ms_ptr, MatchEnvPtrVec &env);
 }

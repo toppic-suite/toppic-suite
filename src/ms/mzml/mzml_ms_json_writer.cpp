@@ -20,11 +20,11 @@
 
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
-#include "topfd/msreader/raw_ms_writer.hpp" 
+#include "ms/mzml/mzml_ms_json_writer.hpp" 
 
 namespace toppic {
 
-namespace raw_ms_writer {
+namespace mzml_ms_json_writer {
 
 void write(std::string &file_name, MzmlMsPtr ms_ptr, MatchEnvPtrVec &envs) {
 

@@ -13,8 +13,6 @@
 //limitations under the License.
 //
 #include <mutex>
-#include <vector>
-#include <boost/filesystem.hpp>
 
 #include "common/util/logger.hpp"
 #include "common/util/version.hpp"
@@ -31,9 +29,9 @@
 #include "ms/env/match_env_util.hpp"
 #include "ms/env/match_env_writer.hpp"
 
+#include "ms/mzml/mzml_ms_json_writer.hpp"
+
 #include "topfd/common/topfd_para.hpp"
-#include "topfd/msreader/raw_ms_writer.hpp"
-//#include "topfd/envcnn/env_cnn.hpp" 
 #include "topfd/envcnn/onnx_env_cnn.hpp" 
 #include "topfd/deconv/deconv_process.hpp"
 
@@ -192,7 +190,7 @@ void deconvMissingMsOne(MzmlMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
     std::string json_file_name = ms2_json_dir 
         + file_util::getFileSeparator() 
         + "spectrum" + std::to_string(header_ptr->getId()) + ".js";
-    raw_ms_writer::write(json_file_name, ms_ptr, result_envs);    
+    mzml_ms_json_writer::write(json_file_name, ms_ptr, result_envs);    
   }
 }
 
@@ -346,7 +344,7 @@ void deconvMsOne(MzmlMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
     std::string json_file_name = ms1_json_dir 
         + file_util::getFileSeparator() 
         + "spectrum" + std::to_string(header_ptr->getId()) + ".js";
-    raw_ms_writer::write(json_file_name, ms_ptr, prec_envs);    
+    mzml_ms_json_writer::write(json_file_name, ms_ptr, prec_envs);    
   }
 }
 
@@ -398,7 +396,7 @@ void deconvMsTwo(MzmlMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
     std::string json_file_name = ms2_json_dir 
         + file_util::getFileSeparator() 
         + "spectrum" + std::to_string(ms_ptr->getMsHeaderPtr()->getId()) + ".js";
-    raw_ms_writer::write(json_file_name, ms_ptr, result_envs);    
+    mzml_ms_json_writer::write(json_file_name, ms_ptr, result_envs);    
   }
 
 }
