@@ -22,7 +22,7 @@ namespace toppic {
 
 ExtendPeak::ExtendPeak(DeconvPeakPtr base_peak_ptr, 
                        double mono_mass, double score):
-    Peak(mono_mass, 1.0),
+    Peak(mono_mass, base_peak_ptr->getIntensity()),
     base_peak_ptr_(base_peak_ptr),
     mono_mass_(mono_mass),
     score_(score),

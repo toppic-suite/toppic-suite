@@ -23,8 +23,10 @@ namespace msalign_util {
 
 int countSpNum(const std::string &spectrum_file);
 
+// Store spectrum number information to an index file
 void geneSpIndex(const std::string &spectrum_file_name);
 
+// Get spectrum number information from the index file
 int getSpNum(const std::string &spectrum_file_name);
 
 }  // namespace msalign_util

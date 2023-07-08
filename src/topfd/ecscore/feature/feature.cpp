@@ -126,7 +126,7 @@ void Feature::assignFeatures(const std::string &ms2_file_name, FracFeaturePtrVec
   std::sort(ms2_feature_list.begin(), ms2_feature_list.end(), SpecFeature::cmpSpecIdInc);
   MsAlignWriterPtr ms2_ptr = std::make_shared<MsAlignWriter>(ms2_file_name);
   for (const auto &ms_ptr: ms_ptr_vec) {
-    ms2_ptr->write(ms_ptr);
+    ms2_ptr->writeMs(ms_ptr);
   }
   //std::cout << "Mapping proteoform features to MS/MS scans finished" << std::endl; 
 }

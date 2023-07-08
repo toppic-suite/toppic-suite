@@ -27,11 +27,9 @@ class MsAlignWriter {
 
   ~MsAlignWriter();
 
-  void write(DeconvMsPtr ms_ptr);
-
   void writePara(const std::string &para_str);
 
-  void close();
+  void writeMs(DeconvMsPtr ms_ptr);
 
  private:
   std::string file_name_;

@@ -155,7 +155,7 @@ void deconvMissingMsOne(MzmlMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   boost::thread::id thread_id = boost::this_thread::get_id();
   int writer_id = pool_ptr->getId(thread_id);
 
-  ms_writer_ptr_vec[writer_id]->write(deconv_ms_ptr);
+  ms_writer_ptr_vec[writer_id]->writeMs(deconv_ms_ptr);
 
   /*
   if (topfd_para_ptr_->output_match_env_) {
@@ -304,7 +304,7 @@ void deconvMsOne(MzmlMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   boost::thread::id thread_id = boost::this_thread::get_id();
   int writer_id = pool_ptr->getId(thread_id);
 
-  ms1_writer_ptr_vec[writer_id]->write(deconv_ms_ptr);
+  ms1_writer_ptr_vec[writer_id]->writeMs(deconv_ms_ptr);
 
   /*
   if (topfd_para_ptr_->output_match_env_) {
@@ -361,7 +361,7 @@ void deconvMsTwo(MzmlMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   boost::thread::id thread_id = boost::this_thread::get_id();
   int writer_id = pool_ptr->getId(thread_id);
 
-  ms2_writer_ptr_vec[writer_id]->write(deconv_ms_ptr);
+  ms2_writer_ptr_vec[writer_id]->writeMs(deconv_ms_ptr);
   
   /*
   if (topfd_para_ptr_->output_match_env_) {

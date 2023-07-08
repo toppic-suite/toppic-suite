@@ -84,13 +84,10 @@ void MsalignThreadMerge::process() {
       DeconvMsPtr cur_ms_ptr = ms_ptrs[cur_ms_idx];
       cur_ms_ptr->getMsHeaderPtr()->setId(spec_id);
       spec_id++;
-      writer->write(cur_ms_ptr);
+      writer->writeMs(cur_ms_ptr);
       ms_ptrs[cur_ms_idx] = reader_ptrs[cur_ms_idx]->getNextMsPtr();
     }
   }
-
-  // close files
-  writer->close();
 }
 
 } /* namespace toppic */

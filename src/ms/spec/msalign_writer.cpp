@@ -33,17 +33,11 @@ MsAlignWriter::~MsAlignWriter() {
   }
 }
 
-void MsAlignWriter::close() {
-  if (output_.is_open()) {
-    output_.close();
-  }
-}
-
 void MsAlignWriter::writePara(const std::string &para_str) {
   output_ << para_str << "\n";
 }
 
-void MsAlignWriter::write(DeconvMsPtr ms_ptr) {
+void MsAlignWriter::writeMs(DeconvMsPtr ms_ptr) {
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
   output_ << std::fixed;
   output_ << "BEGIN IONS" << std::endl;

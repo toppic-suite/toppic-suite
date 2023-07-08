@@ -28,13 +28,14 @@ class MsAlignFracMerge {
 
   void process(std::string &para_str);
 
-  static void mergeFiles(const std::vector<std::string> &spec_file_lst,
-                         const std::string &output_file, 
-                         const std::string &para_str);
 
  private:
   std::vector<std::string> spec_file_names_;
   std::string output_file_name_;
+
+  static void mergeFiles(const std::vector<std::string> &spec_file_lst,
+                         const std::string &output_file, 
+                         const std::string &para_str);
 };
 
 typedef std::shared_ptr<MsAlignFracMerge> MsAlignFracMergePtr;
