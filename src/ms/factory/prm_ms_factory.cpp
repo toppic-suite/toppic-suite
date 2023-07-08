@@ -28,9 +28,10 @@ void addTwoMasses(PrmPeakPtrVec &list, int spec_id, DeconvPeakPtr deconv_peak_pt
                   double prec_mono_mass, ActivationPtr active_type_ptr, PeakTolerancePtr tole_ptr) {
   double ori_mass = deconv_peak_ptr->getMonoMass();
   double n_term_mass = ori_mass - active_type_ptr->getN_BYShift();
+  double default_score = 1.0;
   PrmPeakPtr new_peak_ptr
       = std::make_shared<PrmPeak>(spec_id, deconv_peak_ptr,
-                                  BasePeakType::ORIGINAL, n_term_mass, 1);
+                                  BasePeakType::ORIGINAL, n_term_mass, default_score);
   new_peak_ptr->setStrictTolerance(tole_ptr->compStrictErrorTole(ori_mass));
   new_peak_ptr->setNStrictCRelacTolerance(tole_ptr->compStrictErrorTole(ori_mass));
   new_peak_ptr->setNRelaxCStrictTolerance(tole_ptr->compRelaxErrorTole(ori_mass, prec_mono_mass));
@@ -38,7 +39,7 @@ void addTwoMasses(PrmPeakPtrVec &list, int spec_id, DeconvPeakPtr deconv_peak_pt
   double reverse_mass = prec_mono_mass - (deconv_peak_ptr->getMonoMass()-active_type_ptr->getC_BYShift());
   PrmPeakPtr reverse_peak_ptr
       = std::make_shared<PrmPeak>(spec_id, deconv_peak_ptr,
-                                  BasePeakType::REVERSED, reverse_mass, 1);
+                                  BasePeakType::REVERSED, reverse_mass, default_score);
   reverse_peak_ptr->setStrictTolerance(tole_ptr->compStrictErrorTole(ori_mass));
   reverse_peak_ptr->setNRelaxCStrictTolerance(tole_ptr->compStrictErrorTole(ori_mass));
   reverse_peak_ptr->setNStrictCRelacTolerance(tole_ptr->compRelaxErrorTole(ori_mass, prec_mono_mass));
@@ -48,10 +49,11 @@ void addTwoMasses(PrmPeakPtrVec &list, int spec_id, DeconvPeakPtr deconv_peak_pt
 void addSuffixTwoMasses(PrmPeakPtrVec &list, int spec_id, DeconvPeakPtr deconv_peak_ptr,
                         double prec_mono_mass, ActivationPtr active_type_ptr,
                         PeakTolerancePtr tole_ptr) {
+  double default_score = 1.0;
   double ori_mass = deconv_peak_ptr->getMonoMass();
   double c_res_mass = ori_mass - (active_type_ptr->getC_BYShift() + mass_constant::getWaterMass());
   PrmPeakPtr new_peak_ptr
-      = std::make_shared<PrmPeak>(spec_id, deconv_peak_ptr, BasePeakType::ORIGINAL, c_res_mass, 1);
+      = std::make_shared<PrmPeak>(spec_id, deconv_peak_ptr, BasePeakType::ORIGINAL, c_res_mass, default_score);
   new_peak_ptr->setStrictTolerance(tole_ptr->compStrictErrorTole(ori_mass));
   new_peak_ptr->setNStrictCRelacTolerance(tole_ptr->compRelaxErrorTole(ori_mass, prec_mono_mass));
   new_peak_ptr->setNRelaxCStrictTolerance(tole_ptr->compStrictErrorTole(ori_mass));
@@ -60,7 +62,7 @@ void addSuffixTwoMasses(PrmPeakPtrVec &list, int spec_id, DeconvPeakPtr deconv_p
       - mass_constant::getWaterMass();
   PrmPeakPtr reverse_peak_ptr
       = std::make_shared<PrmPeak>(spec_id, deconv_peak_ptr,
-                                  BasePeakType::REVERSED, reverse_mass, 1);
+                                  BasePeakType::REVERSED, reverse_mass, default_score);
   reverse_peak_ptr->setStrictTolerance(tole_ptr->compStrictErrorTole(ori_mass));
   reverse_peak_ptr->setNStrictCRelacTolerance(tole_ptr->compStrictErrorTole(ori_mass));
   reverse_peak_ptr->setNRelaxCStrictTolerance(tole_ptr->compRelaxErrorTole(ori_mass, prec_mono_mass));
@@ -70,11 +72,12 @@ void addSuffixTwoMasses(PrmPeakPtrVec &list, int spec_id, DeconvPeakPtr deconv_p
 void addSixMasses(PrmPeakPtrVec &list, int spec_id, DeconvPeakPtr deconv_peak_ptr,
                   double prec_mono_mass, ActivationPtr active_type_ptr,
                   PeakTolerancePtr tole_ptr, const std::vector<double> &offsets) {
+  double default_score = 1.0;
   double ori_mass = deconv_peak_ptr->getMonoMass();
   for (size_t i = 0; i < offsets.size(); i++) {
     double mass = ori_mass - active_type_ptr->getN_BYShift() + offsets[i];
     PrmPeakPtr peak_ptr = std::make_shared<PrmPeak>(spec_id, deconv_peak_ptr,
-                                                    BasePeakType::ORIGINAL, mass, 1);
+                                                    BasePeakType::ORIGINAL, mass, default_score);
     peak_ptr->setStrictTolerance(tole_ptr->compStrictErrorTole(ori_mass));
     peak_ptr->setNStrictCRelacTolerance(tole_ptr->compStrictErrorTole(ori_mass));
     peak_ptr->setNRelaxCStrictTolerance(tole_ptr->compRelaxErrorTole(ori_mass, prec_mono_mass));
@@ -83,7 +86,7 @@ void addSixMasses(PrmPeakPtrVec &list, int spec_id, DeconvPeakPtr deconv_peak_pt
   for (size_t i = 0; i < offsets.size(); i++) {
     double mass = prec_mono_mass-(ori_mass-active_type_ptr->getC_BYShift()+offsets[i]);
     PrmPeakPtr peak_ptr = std::make_shared<PrmPeak>(spec_id, deconv_peak_ptr,
-                                                    BasePeakType::REVERSED, mass, 1);
+                                                    BasePeakType::REVERSED, mass, default_score);
     peak_ptr->setStrictTolerance(tole_ptr->compStrictErrorTole(ori_mass));
     peak_ptr->setNRelaxCStrictTolerance(tole_ptr->compStrictErrorTole(ori_mass));
     peak_ptr->setNStrictCRelacTolerance(tole_ptr->compRelaxErrorTole(ori_mass, prec_mono_mass));
@@ -94,12 +97,13 @@ void addSixMasses(PrmPeakPtrVec &list, int spec_id, DeconvPeakPtr deconv_peak_pt
 void addSuffixSixMasses(PrmPeakPtrVec &list, int spec_id, DeconvPeakPtr deconv_peak_ptr,
                         double prec_mono_mass, ActivationPtr active_type_ptr,
                         PeakTolerancePtr tole_ptr, const std::vector<double> &offsets) {
+  double default_score = 1.0;
   double ori_mass = deconv_peak_ptr->getMonoMass();
   double c_res_mass = ori_mass - (active_type_ptr->getC_BYShift() + mass_constant::getWaterMass());
   for (size_t i = 0; i < offsets.size(); i++) {
     double mass = c_res_mass + offsets[i];
     PrmPeakPtr peak_ptr = std::make_shared<PrmPeak>(spec_id, deconv_peak_ptr,
-                                                    BasePeakType::ORIGINAL, mass, 1);
+                                                    BasePeakType::ORIGINAL, mass, default_score);
     peak_ptr->setStrictTolerance(tole_ptr->compStrictErrorTole(ori_mass));
     peak_ptr->setNStrictCRelacTolerance(tole_ptr->compRelaxErrorTole(ori_mass, prec_mono_mass));
     peak_ptr->setNRelaxCStrictTolerance(tole_ptr->compStrictErrorTole(ori_mass));
@@ -110,7 +114,7 @@ void addSuffixSixMasses(PrmPeakPtrVec &list, int spec_id, DeconvPeakPtr deconv_p
   for (size_t i = 0; i < offsets.size(); i++) {
     double mass = reverse_mass + offsets[i];
     PrmPeakPtr peak_ptr = std::make_shared<PrmPeak>(spec_id, deconv_peak_ptr,
-                                                    BasePeakType::REVERSED, mass, 1);
+                                                    BasePeakType::REVERSED, mass, default_score);
     peak_ptr->setStrictTolerance(tole_ptr->compStrictErrorTole(ori_mass));
     peak_ptr->setNRelaxCStrictTolerance(tole_ptr->compRelaxErrorTole(ori_mass, prec_mono_mass));
     peak_ptr->setNStrictCRelacTolerance(tole_ptr->compStrictErrorTole(ori_mass));
@@ -128,13 +132,35 @@ void filterPeaks(const PrmPeakPtrVec &peak_list, PrmPeakPtrVec &filtered_list,
   }
 }
 
+void geneApproxSpecPeaks(PrmPeakPtrVec &peak_list, double prec_mono_mass, 
+                         const std::vector<double> &mod_mass) {
+  for (size_t i = 0; i < peak_list.size(); i++) {
+    double mass = peak_list[i]->getMonoMass();
+    if (peak_list[i]->getMonoMass() > prec_mono_mass * 1 / 6) {
+      mass -= mod_mass[0];
+    }
+    if (peak_list[i]->getMonoMass() > prec_mono_mass * 3 / 6) {
+      mass -= mod_mass[1];
+    }
+    if (peak_list[i]->getMonoMass() > prec_mono_mass * 5 / 6) {
+      mass -= mod_mass[2];
+    }
+    peak_list[i] = std::make_shared<PrmPeak>(peak_list[i]->getSpectrumId(),
+                                             peak_list[i]->getBasePeakPtr(),
+                                             peak_list[i]->getBaseTypePtr(),
+                                             mass,
+                                             peak_list[i]->getScore(),
+                                             peak_list[i]->getStrictTolerance(),
+                                             peak_list[i]->getNStrictCRelaxTolerance(),
+                                             peak_list[i]->getNRelaxCStrictTolerance());
+  }
+}
+
 PrmMsPtr geneMsTwoPtr(DeconvMsPtr deconv_ms_ptr, int spec_id, SpParaPtr sp_para_ptr,
                       double prec_mono_mass, const std::vector<double> & mod_mass) {
   MsHeaderPtr ori_header_ptr = deconv_ms_ptr->getMsHeaderPtr();
-  // we need to keep the original precursor mass 
-  //double new_prec_mono_mass = prec_mono_mass - std::accumulate(mod_mass.begin(), mod_mass.end(), 0.0);
   MsHeaderPtr header_ptr = MsHeader::geneMsHeaderPtr(ori_header_ptr, prec_mono_mass);
-  // getSpTwoPrmPeak
+  // get two prm peaks 
   ActivationPtr active_type_ptr = header_ptr->getActivationPtr();
   PeakTolerancePtr tole_ptr = sp_para_ptr->getPeakTolerancePtr();
   PrmPeakPtrVec list;
@@ -147,30 +173,8 @@ PrmMsPtr geneMsTwoPtr(DeconvMsPtr deconv_ms_ptr, int spec_id, SpParaPtr sp_para_
   filterPeaks(list, list_filtered, prec_mono_mass, sp_para_ptr->getMinMass());
   std::sort(list_filtered.begin(), list_filtered.end(), PrmPeak::cmpPosInc);
   if (mod_mass.size() > 0) {
-    for (size_t i = 0; i < list_filtered.size(); i++) {
-      double mass = list_filtered[i]->getMonoMass();
-
-      if (list_filtered[i]->getMonoMass() > prec_mono_mass * 1 / 6) {
-        mass -= mod_mass[0];
-      }
-
-      if (list_filtered[i]->getMonoMass() > prec_mono_mass * 3 / 6) {
-        mass -= mod_mass[1];
-      }
-
-      if (list_filtered[i]->getMonoMass() > prec_mono_mass * 5 / 6) {
-        mass -= mod_mass[2];
-      }
-
-      list_filtered[i] = std::make_shared<PrmPeak>(list_filtered[i]->getSpectrumId(),
-                                                   list_filtered[i]->getBasePeakPtr(),
-                                                   list_filtered[i]->getBaseTypePtr(),
-                                                   mass,
-                                                   list_filtered[i]->getScore(),
-                                                   list_filtered[i]->getStrictTolerance(),
-                                                   list_filtered[i]->getNStrictCRelaxTolerance(),
-                                                   list_filtered[i]->getNRelaxCStrictTolerance());
-    }
+    // generate approximate spectrum
+    geneApproxSpecPeaks(list_filtered, prec_mono_mass, mod_mass);
   }
   return std::make_shared<Ms<PrmPeakPtr> >(header_ptr, list_filtered);
 }
@@ -178,9 +182,8 @@ PrmMsPtr geneMsTwoPtr(DeconvMsPtr deconv_ms_ptr, int spec_id, SpParaPtr sp_para_
 PrmMsPtr geneSuffixMsTwoPtr(DeconvMsPtr deconv_ms_ptr, int spec_id, SpParaPtr sp_para_ptr,
                             double prec_mono_mass, const std::vector<double> & mod_mass) {
   MsHeaderPtr ori_header_ptr = deconv_ms_ptr->getMsHeaderPtr();
-  //double new_prec_mono_mass = prec_mono_mass - std::accumulate(mod_mass.begin(), mod_mass.end(), 0.0);
   MsHeaderPtr header_ptr = MsHeader::geneMsHeaderPtr(ori_header_ptr, prec_mono_mass);
-  // getSpTwoPrmPeak
+  // get two prm peaks 
   ActivationPtr active_type_ptr = header_ptr->getActivationPtr();
   PeakTolerancePtr tole_ptr = sp_para_ptr->getPeakTolerancePtr();
   PrmPeakPtrVec list;
@@ -193,30 +196,10 @@ PrmMsPtr geneSuffixMsTwoPtr(DeconvMsPtr deconv_ms_ptr, int spec_id, SpParaPtr sp
   filterPeaks(list, list_filtered, prec_mono_mass, sp_para_ptr->getMinMass());
   std::sort(list_filtered.begin(), list_filtered.end(), PrmPeak::cmpPosInc);
   if (mod_mass.size() > 0) {
-    for (size_t i = 0; i < list_filtered.size(); i++) {
-      double mass = list_filtered[i]->getMonoMass();
-
-      if (list_filtered[i]->getMonoMass() > prec_mono_mass * 1 / 6) {
-        mass -= mod_mass[2];
-      }
-
-      if (list_filtered[i]->getMonoMass() > prec_mono_mass * 3 / 6) {
-        mass -= mod_mass[1];
-      }
-
-      if (list_filtered[i]->getMonoMass() > prec_mono_mass * 5 / 6) {
-        mass -= mod_mass[0];
-      }
-
-      list_filtered[i] = std::make_shared<PrmPeak>(list_filtered[i]->getSpectrumId(),
-                                                   list_filtered[i]->getBasePeakPtr(),
-                                                   list_filtered[i]->getBaseTypePtr(),
-                                                   mass,
-                                                   list_filtered[i]->getScore(),
-                                                   list_filtered[i]->getStrictTolerance(),
-                                                   list_filtered[i]->getNStrictCRelaxTolerance(),
-                                                   list_filtered[i]->getNRelaxCStrictTolerance());
-    }
+    // generate approximate spectrum using mod masses in the reversed order
+    std::vector<double> rev_mod_mass = mod_mass;
+    std::reverse(rev_mod_mass.begin(), rev_mod_mass.end()); 
+    geneApproxSpecPeaks(list_filtered, prec_mono_mass, rev_mod_mass);
   }
   return std::make_shared<Ms<PrmPeakPtr> >(header_ptr, list_filtered);
 }
@@ -225,7 +208,7 @@ PrmMsPtr geneSuffixMsSixPtr(DeconvMsPtr deconv_ms_ptr, int spec_id, SpParaPtr sp
                             double prec_mono_mass) {
   MsHeaderPtr ori_header_ptr = deconv_ms_ptr->getMsHeaderPtr();
   MsHeaderPtr header_ptr = MsHeader::geneMsHeaderPtr(ori_header_ptr, prec_mono_mass);
-  // getSpTwoPrmPeak
+  // get two prm peaks 
   ActivationPtr active_type_ptr = header_ptr->getActivationPtr();
   PeakTolerancePtr tole_ptr = sp_para_ptr->getPeakTolerancePtr();
   double extend_min_mass = sp_para_ptr->getExtendMinMass();
@@ -250,7 +233,7 @@ PrmMsPtr geneMsSixPtr(DeconvMsPtr deconv_ms_ptr, int spec_id, SpParaPtr sp_para_
                       double prec_mono_mass) {
   MsHeaderPtr ori_header_ptr = deconv_ms_ptr->getMsHeaderPtr();
   MsHeaderPtr header_ptr = MsHeader::geneMsHeaderPtr(ori_header_ptr, prec_mono_mass);
-  // getSpSixPrmPeak
+  // get six prm peaks 
   ActivationPtr active_type_ptr = header_ptr->getActivationPtr();
   PeakTolerancePtr tole_ptr = sp_para_ptr->getPeakTolerancePtr();
   double extend_min_mass = sp_para_ptr->getExtendMinMass();
@@ -265,7 +248,7 @@ PrmMsPtr geneMsSixPtr(DeconvMsPtr deconv_ms_ptr, int spec_id, SpParaPtr sp_para_
     }
   }
 
-  // filterPrmPeak
+  // filter peaks 
   PrmPeakPtrVec list_filtered;
   filterPeaks(list, list_filtered, prec_mono_mass, sp_para_ptr->getMinMass());
   std::sort(list_filtered.begin(), list_filtered.end(), PrmPeak::cmpPosInc);

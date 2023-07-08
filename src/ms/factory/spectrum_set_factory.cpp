@@ -32,7 +32,6 @@ bool checkValid(DeconvMsPtrVec &deconv_ms_ptr_vec, SpParaPtr sp_para_ptr,
     peak_num += deconv_ms_ptr_vec[i]->size();
   }
 
-  LOG_DEBUG("peak_num " << peak_num);
   if (peak_num < sp_para_ptr->getMinPeakNum()) {
     return false;
   }
@@ -57,9 +56,6 @@ SpectrumSetPtr geneSpectrumSetPtr(DeconvMsPtrVec deconv_ms_ptr_vec,
 
   PrmMsPtrVec prm_ms_six_ptr_vec;
 
-  //srm_ms_six is not used
-  //PrmMsPtrVec srm_ms_six_ptr_vec;
-
   if (valid) {
     extend_ms_three_ptr_vec
         = extend_ms_factory::geneMsThreePtrVec(deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass);
@@ -69,8 +65,6 @@ SpectrumSetPtr geneSpectrumSetPtr(DeconvMsPtrVec deconv_ms_ptr_vec,
         = prm_ms_factory::geneSuffixMsTwoPtrVec(deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass);
     prm_ms_six_ptr_vec
         = prm_ms_factory::geneMsSixPtrVec(deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass);
-    //srm_ms_six_ptr_vec
-    //    = prm_ms_factory::geneSuffixMsSixPtrVec(deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass);
   }
   SpectrumSetPtr spec_set_ptr = std::make_shared<SpectrumSet>(deconv_ms_ptr_vec, 
                                                               prec_mono_mass, 
