@@ -143,7 +143,7 @@ void DeconvProcess::process() {
   }
 }
 
-void deconvMissingMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
+void deconvMissingMsOne(MzmlMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
                         MsAlignWriterPtrVec ms_writer_ptr_vec, 
                         SimpleThreadPoolPtr pool_ptr, 
                         bool gene_html_folder, 
@@ -196,7 +196,7 @@ void deconvMissingMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   }
 }
 
-std::function<void()> geneTaskMissingMsOne(RawMsGroupPtr ms_group_ptr, 
+std::function<void()> geneTaskMissingMsOne(MzmlMsGroupPtr ms_group_ptr, 
                                            DeconvOneSpPtr deconv_ptr,
                                            MsAlignWriterPtrVec ms_writer_ptr_vec, 
                                            SimpleThreadPoolPtr pool_ptr, 
@@ -205,9 +205,9 @@ std::function<void()> geneTaskMissingMsOne(RawMsGroupPtr ms_group_ptr,
   return [ms_group_ptr, deconv_ptr, ms_writer_ptr_vec, pool_ptr, 
   gene_html_dir, ms2_json_dir]() {
 
-    RawMsPtrVec ms_two_ptr_vec = ms_group_ptr->getMsTwoPtrVec();                           
+    MzmlMsPtrVec ms_two_ptr_vec = ms_group_ptr->getMsTwoPtrVec();                           
     for (size_t i = 0; i < ms_two_ptr_vec.size(); i++) {
-      RawMsPtr ms_two_ptr = ms_two_ptr_vec[i];
+      MzmlMsPtr ms_two_ptr = ms_two_ptr_vec[i];
       deconvMissingMsOne(ms_two_ptr, deconv_ptr, ms_writer_ptr_vec, 
                          pool_ptr, gene_html_dir, ms2_json_dir);
     }
@@ -227,7 +227,7 @@ void DeconvProcess::processSpMissingLevelOne(RawMsGroupFaimeReaderPtr reader_ptr
 
   // reader_ptr
   int total_scan_num = reader_ptr->getInputSpNum();
-  RawMsGroupPtr ms_group_ptr;
+  MzmlMsGroupPtr ms_group_ptr;
   //ms_group_ptr = reader_ptr->getNextMsGroupPtr();
   ms_group_ptr = reader_ptr->getNextMsGroupPtrWithFaime();
 
@@ -252,9 +252,9 @@ void DeconvProcess::processSpMissingLevelOne(RawMsGroupFaimeReaderPtr reader_ptr
                                            topfd_para_ptr_->isGeneHtmlFolder(), 
                                            ms2_json_dir_));
 
-    RawMsPtrVec ms_two_ptr_vec = ms_group_ptr->getMsTwoPtrVec();
+    MzmlMsPtrVec ms_two_ptr_vec = ms_group_ptr->getMsTwoPtrVec();
     for (size_t t = 0; t < ms_two_ptr_vec.size(); t++){
-      RawMsPtr ms_two_ptr = ms_two_ptr_vec[t];
+      MzmlMsPtr ms_two_ptr = ms_two_ptr_vec[t];
       std::string msg = updateMsg(ms_two_ptr->getMsHeaderPtr(), count + 1, total_scan_num);
       std::cout << "\r" << msg << std::flush;
       count += 1;
@@ -279,7 +279,7 @@ void DeconvProcess::processSpMissingLevelOne(RawMsGroupFaimeReaderPtr reader_ptr
   std::cout << std::endl;
 }
 
-void deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
+void deconvMsOne(MzmlMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
                  MatchEnvPtrVec prec_envs, 
                  MsAlignWriterPtrVec ms1_writer_ptr_vec, 
                  SimpleThreadPoolPtr pool_ptr, 
@@ -350,7 +350,7 @@ void deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   }
 }
 
-void deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
+void deconvMsTwo(MzmlMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
                  MsAlignWriterPtrVec ms2_writer_ptr_vec, 
                  SimpleThreadPoolPtr pool_ptr, 
                  bool gene_html_dir, 
@@ -404,7 +404,7 @@ void deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
 }
 
 //DecovOne & Two
-std::function<void()> geneTask(RawMsGroupPtr ms_group_ptr, 
+std::function<void()> geneTask(MzmlMsGroupPtr ms_group_ptr, 
                                DeconvOneSpPtr deconv_ptr, 
                                MsAlignWriterPtrVec ms1_writer_ptr_vec, 
                                MsAlignWriterPtrVec ms2_writer_ptr_vec, 
@@ -415,8 +415,8 @@ std::function<void()> geneTask(RawMsGroupPtr ms_group_ptr,
   return [ms_group_ptr, deconv_ptr, ms1_writer_ptr_vec, 
   ms2_writer_ptr_vec, pool_ptr, gene_html_dir, ms1_json_dir, ms2_json_dir]() {
 
-    RawMsPtr ms_one_ptr = ms_group_ptr->getMsOnePtr();                            
-    RawMsPtrVec ms_two_ptr_vec = ms_group_ptr->getMsTwoPtrVec();
+    MzmlMsPtr ms_one_ptr = ms_group_ptr->getMsOnePtr();                            
+    MzmlMsPtrVec ms_two_ptr_vec = ms_group_ptr->getMsTwoPtrVec();
 
     MatchEnvPtrVec prec_envs;
     EnvParaPtr env_para_ptr = deconv_ptr->getEnvParaPtr();
@@ -429,7 +429,7 @@ std::function<void()> geneTask(RawMsGroupPtr ms_group_ptr,
                 pool_ptr, gene_html_dir, ms1_json_dir);
 
     for (size_t i = 0; i < ms_two_ptr_vec.size(); i++) {
-      RawMsPtr ms_two_ptr = ms_two_ptr_vec[i];
+      MzmlMsPtr ms_two_ptr = ms_two_ptr_vec[i];
       deconvMsTwo(ms_two_ptr, deconv_ptr, ms2_writer_ptr_vec, 
                   pool_ptr, gene_html_dir, ms2_json_dir);
     }
@@ -440,7 +440,7 @@ std::function<void()> geneTask(RawMsGroupPtr ms_group_ptr,
 void DeconvProcess::processSp(RawMsGroupFaimeReaderPtr reader_ptr) {
   int total_scan_num = reader_ptr->getInputSpNum();//this is spectrum count, not same as scan ID count
 
-  RawMsGroupPtr ms_group_ptr;
+  MzmlMsGroupPtr ms_group_ptr;
 
   ms_group_ptr = reader_ptr->getNextMsGroupPtrWithFaime();
 
@@ -515,7 +515,7 @@ void DeconvProcess::processSp(RawMsGroupFaimeReaderPtr reader_ptr) {
       for (size_t i = 0; i < voltage_vec_.size(); i++) {
         if (voltage_vec_[i].first == ms_group_ptr->getMsOnePtr()->getMsHeaderPtr()->getVoltage()) {
           int spec_id = voltage_vec_[i].second;
-          RawMsPtrVec ms_two_ptr_vec = ms_group_ptr->getMsTwoPtrVec();
+          MzmlMsPtrVec ms_two_ptr_vec = ms_group_ptr->getMsTwoPtrVec();
           // add ms one spec id for ms two
           for (size_t j = 0; j < ms_two_ptr_vec.size(); j++) {
             ms_two_ptr_vec[j]->getMsHeaderPtr()->setMsOneId(spec_id);
@@ -539,7 +539,7 @@ void DeconvProcess::processSp(RawMsGroupFaimeReaderPtr reader_ptr) {
 
         int spec_id = 0;
 
-        RawMsPtrVec ms_two_ptr_vec = ms_group_ptr->getMsTwoPtrVec();
+        MzmlMsPtrVec ms_two_ptr_vec = ms_group_ptr->getMsTwoPtrVec();
 
         for (size_t j = 0; j < ms_two_ptr_vec.size(); j++) {
           ms_two_ptr_vec[j]->getMsHeaderPtr()->setMsOneId(spec_id);

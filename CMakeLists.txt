@@ -67,6 +67,7 @@ file(GLOB SPEC_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/ms/spec/*.cpp
                      ${CMAKE_CURRENT_SOURCE_DIR}/src/ms/factory/*.cpp
                      ${CMAKE_CURRENT_SOURCE_DIR}/src/ms/env/*.cpp
                      ${CMAKE_CURRENT_SOURCE_DIR}/src/ms/feature/*.cpp)
+file(GLOB MZML_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/ms/mzml/*.cpp)
 file(GLOB PRSM_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/prsm/*.cpp)
 
 # classes for topfd 
@@ -178,7 +179,7 @@ file(GLOB GUI_UTIL_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/util/*.cpp
 
 add_executable(topfd 
   ${TOPFD_CONSOLE_SRCS} ${TOPFD_SRCS} ${COMMON_SRCS} ${PARA_SRCS} 
-  ${SPEC_SRCS} ${ENV_SRCS} ${FEATURE_SRCS} ${PWIZ_SRCS} ${NOWIDE_SRCS})
+  ${SPEC_SRCS} ${MZML_SRCS} ${PWIZ_SRCS} ${NOWIDE_SRCS})
 
 add_executable(topindex 
   ${TOPINDEX_CONSOLE_SRCS} ${TOPINDEX_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS}

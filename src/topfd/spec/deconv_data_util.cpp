@@ -14,7 +14,7 @@
 
 
 #include "common/util/logger.hpp"
-#include "ms/spec/raw_ms_util.hpp"
+#include "ms/spec/peak_list_util.hpp"
 #include "topfd/spec/deconv_data_util.hpp"
 
 namespace toppic {
@@ -24,7 +24,7 @@ namespace deconv_data_util {
 DeconvDataPtr getDataPtr(const PeakPtrVec &peak_list, double max_mass, 
                          int max_charge, double window_size) {
   if (peak_list.size() == 0) return nullptr;
-  double max_mz = raw_ms_util::findMaxPos(peak_list);
+  double max_mz = peak_list_util::findMaxPos(peak_list);
   if (max_mz > max_mass) {
     LOG_WARN("Max mz is too large: " << max_mz);
     return nullptr;
@@ -51,7 +51,7 @@ DeconvDataPtr getDataPtr(const PeakPtrVec &peak_list, double spec_max_mass,
     LOG_WARN("Max mass is greater than default max mass " << spec_max_mass);
     spec_max_mass = para_max_mass;
   }
-  double max_mz = raw_ms_util::findMaxPos(peak_list);
+  double max_mz = peak_list_util::findMaxPos(peak_list);
   if (max_mz > para_max_mass) {
     LOG_WARN("Max mz is too large: " << max_mz);
     return nullptr;

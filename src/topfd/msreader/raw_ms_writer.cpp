@@ -26,7 +26,7 @@ namespace toppic {
 
 namespace raw_ms_writer {
 
-void write(std::string &file_name, RawMsPtr ms_ptr, MatchEnvPtrVec &envs) {
+void write(std::string &file_name, MzmlMsPtr ms_ptr, MatchEnvPtrVec &envs) {
 
   rapidjson::Document doc;
 

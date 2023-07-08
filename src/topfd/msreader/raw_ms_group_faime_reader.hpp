@@ -15,7 +15,7 @@
 #ifndef TOPPIC_TOPFD_MSREADER_RAW_MS_GROUP_FAIME_READER_HPP_
 #define TOPPIC_TOPFD_MSREADER_RAW_MS_GROUP_FAIME_READER_HPP_
 
-#include "ms/spec/raw_ms_group.hpp"
+#include "ms/mzml/mzml_ms_group.hpp"
 #include "topfd/msreader/pw_ms_reader.hpp"
 #include "ms/env/match_env.hpp"
 
@@ -27,11 +27,11 @@ class RawMsGroupFaimeReader {
                         std::string activation, double isolation_window,
                         int fraction_id);
 
-  RawMsPtr readNextRawMs();
+  MzmlMsPtr readNextRawMs();
 
-  RawMsGroupPtr getNextMsGroupPtrWithFaime();
+  MzmlMsGroupPtr getNextMsGroupPtrWithFaime();
 
-  static void obtainPrecEnvs(RawMsGroupPtr ms_group_ptr, 
+  static void obtainPrecEnvs(MzmlMsGroupPtr ms_group_ptr, 
                              MatchEnvPtrVec &env_ptr_vec,
                              double max_mass,
                              int max_charge);
@@ -42,9 +42,9 @@ class RawMsGroupFaimeReader {
  private:
   PwMsReaderPtr reader_ptr_;
 
-  std::map<int, RawMsPtr> ms_one_ptr_map_;
+  std::map<int, MzmlMsPtr> ms_one_ptr_map_;
   std::map<int, int> ms_one_scan_idx_map_;
-  std::map<int, RawMsPtrVec> ms_two_ptr_vec_map_;
+  std::map<int, MzmlMsPtrVec> ms_two_ptr_vec_map_;
   std::map<int, int> last_ms_two_scan_map_;
   std::vector<int> ms_one_scans_;
 

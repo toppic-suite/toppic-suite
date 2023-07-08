@@ -19,7 +19,6 @@
 #include <memory>
 #include <vector>
 
-#include "ms/spec/raw_ms.hpp"
 #include "ms/env/envelope.hpp"
 #include "ms/env/real_env.hpp"
 

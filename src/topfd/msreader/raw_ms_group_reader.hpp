@@ -15,7 +15,7 @@
 #ifndef TOPPIC_TOPFD_MSREADER_RAW_MS_GROUP_READER_HPP_
 #define TOPPIC_TOPFD_MSREADER_RAW_MS_GROUP_READER_HPP_
 
-#include "ms/spec/raw_ms_group.hpp"
+#include "ms/mzml/mzml_ms_group.hpp"
 #include "topfd/msreader/pw_ms_reader.hpp"
 #include "ms/env/match_env.hpp"
 
@@ -27,12 +27,12 @@ class RawMsGroupReader {
                    std::string activation, double isolation_window,
                    int fraction_id);
 
-  RawMsPtr readNextRawMs();
+  MzmlMsPtr readNextRawMs();
 
-  RawMsGroupPtr getNextMsGroupPtrWithFaime();
-  RawMsGroupPtr getNextMsGroupPtr();
+  MzmlMsGroupPtr getNextMsGroupPtrWithFaime();
+  MzmlMsGroupPtr getNextMsGroupPtr();
 
-  static void obtainPrecEnvs(RawMsGroupPtr ms_group_ptr, 
+  static void obtainPrecEnvs(MzmlMsGroupPtr ms_group_ptr, 
                              MatchEnvPtrVec &env_ptr_vec,
                              double max_mass,
                              int max_charge);
@@ -42,12 +42,12 @@ class RawMsGroupReader {
   
  private:
   PwMsReaderPtr reader_ptr_;
-  //RawMsPtr ms_one_ptr_; 
-  //RawMsPtr not_written_ms_one_ptr_;
+  //MzmlMsPtr ms_one_ptr_; 
+  //MzmlMsPtr not_written_ms_one_ptr_;
 
-  RawMsPtrVec ms_one_ptr_vec_;
-  RawMsPtrVec alpha_ms_two_ptr_vec_;
-  RawMsPtrVec beta_ms_two_ptr_vec_;
+  MzmlMsPtrVec ms_one_ptr_vec_;
+  MzmlMsPtrVec alpha_ms_two_ptr_vec_;
+  MzmlMsPtrVec beta_ms_two_ptr_vec_;
   int alpha_ms_one_scan_ = -1;
 
   int fraction_id_;

@@ -14,7 +14,7 @@
 
 #include "common/util/logger.hpp"
 #include "common/base/mass_constant.hpp"
-#include "ms/spec/raw_ms_util.hpp"
+#include "ms/spec/peak_list_util.hpp"
 #include "ms/env/env_base.hpp"
 #include "ms/env/env_detect.hpp"
 
@@ -79,7 +79,7 @@ MatchEnvPtr detectEnv(const PeakPtrVec &peak_list, int base_peak,
   // convert the reference distribution to a theoretical distribution
   // based on the base mz and charge state
   EnvelopePtr theo_env_ptr = ref_env_ptr->distrToTheoBase(base_mz, charge);
-  int peak_idx = raw_ms_util::getNearPeakIdx(peak_list, theo_env_ptr->getReferMz(), 
+  int peak_idx = peak_list_util::getNearPeakIdx(peak_list, theo_env_ptr->getReferMz(), 
                                              env_para_ptr->getMzTolerance());
   if (peak_idx < 0 || peak_list[peak_idx]->getIntensity() < env_para_ptr->min_refer_inte_) {
     return nullptr; 
@@ -119,7 +119,7 @@ double calcInteRatio(const PeakPtrVec &peak_list, EnvelopePtr theo_env_ptr,
   double obs_sum = 0;
   int refer_idx = theo_env_ptr->getReferIdx();
   double mz = theo_env_ptr->getMz(refer_idx);
-  int peak_idx = raw_ms_util::getNearPeakIdx(peak_list, mz, tolerance);
+  int peak_idx = peak_list_util::getNearPeakIdx(peak_list, mz, tolerance);
   if (peak_idx >= 0) {
     theo_sum += theo_env_ptr->getIntensity(refer_idx);
     obs_sum += peak_list[peak_idx]->getIntensity();
@@ -127,7 +127,7 @@ double calcInteRatio(const PeakPtrVec &peak_list, EnvelopePtr theo_env_ptr,
   if (refer_idx - 1 >= 0) {
     theo_sum += theo_env_ptr->getIntensity(refer_idx - 1);
     mz = theo_env_ptr->getMz(refer_idx-1);
-    peak_idx = raw_ms_util::getNearPeakIdx(peak_list, mz, tolerance);
+    peak_idx = peak_list_util::getNearPeakIdx(peak_list, mz, tolerance);
     if (peak_idx >= 0) {
       obs_sum += peak_list[peak_idx]->getIntensity();
     }
@@ -135,7 +135,7 @@ double calcInteRatio(const PeakPtrVec &peak_list, EnvelopePtr theo_env_ptr,
   if (refer_idx + 1 < theo_env_ptr->getPeakNum()) {
     theo_sum += theo_env_ptr->getIntensity(refer_idx + 1);
     mz = theo_env_ptr->getMz(refer_idx + 1);
-    peak_idx = raw_ms_util::getNearPeakIdx(peak_list, mz, tolerance);
+    peak_idx = peak_list_util::getNearPeakIdx(peak_list, mz, tolerance);
     if (peak_idx >= 0) {
       obs_sum += peak_list[peak_idx]->getIntensity();
     }

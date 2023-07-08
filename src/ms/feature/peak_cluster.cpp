@@ -20,7 +20,7 @@
 #include "common/util/logger.hpp"
 #include "ms/spec/peak_util.hpp"
 #include "ms/spec/env_peak.hpp"
-#include "ms/spec/raw_ms_util.hpp"
+#include "ms/spec/peak_list_util.hpp"
 #include "ms/feature/peak_cluster.hpp"
 
 namespace toppic {
@@ -97,7 +97,7 @@ double getPearsonCorr(std::vector<double> &v1, std::vector<double> &v2) {
 
 double getPoissonPValue(PeakPtrVec &win_peaks, double win_size, 
                         std::vector<double> &env_peak_intensities) {
-  double win_high_inte = raw_ms_util::getHighestPeakInte(win_peaks);
+  double win_high_inte = peak_list_util::getHighestPeakInte(win_peaks);
   double inte_thresh = win_high_inte  * 0.1;
   int match_peak_num = 0;
   for (size_t i = 0; i < env_peak_intensities.size(); i++) {
@@ -285,9 +285,9 @@ void PeakCluster::updateScore(PeakPtrVec2D &raw_peaks, bool check_pvalue) {
 
       int ms1_id = min_ms1_id_ + j;
       PeakPtrVec all_peaks = raw_peaks[ms1_id];
-      PeakPtrVec win_peaks = raw_ms_util::getPeaksInWindow(all_peaks, ref_mz, win_size_);
-      double win_high_inte = raw_ms_util::getHighestPeakInte(win_peaks);
-      double win_median_inte = raw_ms_util::getMedianPeakInte(win_peaks);
+      PeakPtrVec win_peaks = peak_list_util::getPeaksInWindow(all_peaks, ref_mz, win_size_);
+      double win_high_inte = peak_list_util::getHighestPeakInte(win_peaks);
+      double win_median_inte = peak_list_util::getMedianPeakInte(win_peaks);
        
       if (env->isExist(ref_idx)) {
         summed_iso_high_inte += env->getIntensity(ref_idx);

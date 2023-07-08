@@ -16,14 +16,14 @@
 #ifndef TOPPIC_TOPFD_MSREADER_RAW_MS_WRITER_HPP_
 #define TOPPIC_TOPFD_MSREADER_RAW_MS_WRITER_HPP_
 
-#include "ms/spec/raw_ms.hpp"
+#include "ms/mzml/mzml_ms.hpp"
 #include "ms/env/match_env.hpp"
 
 namespace toppic {
 
 namespace raw_ms_writer {
 
-  void write(std::string &file_name, RawMsPtr ms_ptr, MatchEnvPtrVec &env);
+  void write(std::string &file_name, MzmlMsPtr ms_ptr, MatchEnvPtrVec &env);
 }
 
 }

@@ -16,7 +16,7 @@
 
 #include "common/util/logger.hpp"
 #include "common/base/mass_constant.hpp"
-#include "ms/spec/raw_ms_util.hpp"
+#include "ms/spec/peak_list_util.hpp"
 #include "ms/env/match_env_util.hpp"
 
 namespace toppic {
@@ -94,7 +94,7 @@ PeakPtrVec  rmAnnoPeak(PeakPtrVec &ms, MatchEnvPtrVec &envs) {
       }
     }
   }
-  raw_ms_util::rmPeaks(new_list, is_keeps);
+  peak_list_util::rmPeaks(new_list, is_keeps);
   return new_list;
 }
 

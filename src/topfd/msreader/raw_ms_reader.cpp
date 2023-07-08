@@ -30,14 +30,14 @@ RawMsReader::RawMsReader(const std::string & file_name, const std::string & acti
   reader_ptr_ = std::make_shared<PwMsReader>(file_name, activation, isolation_window);
 }
 
-RawMsPtr RawMsReader::getNextMs(double max_mass, int max_charge) {
+MzmlMsPtr RawMsReader::getNextMs(double max_mass, int max_charge) {
   reader_ptr_->readNext();
   PeakPtrVec peak_list = reader_ptr_->getPeakList();
   MsHeaderPtr header_ptr = reader_ptr_->getHeaderPtr();
   if (header_ptr == nullptr) {
     return nullptr;
   }
-  RawMsPtr ms_ptr = std::make_shared<Ms<PeakPtr> >(header_ptr, peak_list);
+  MzmlMsPtr ms_ptr = std::make_shared<Ms<PeakPtr> >(header_ptr, peak_list);
 
   // update ms_1 
   if (header_ptr->getMsLevel() == 1) {
@@ -82,7 +82,7 @@ void RawMsReader::getMs1Peaks(PeakPtrVec2D &raw_peaks, double cur_voltage) {
 }
 
 // refine precursor charge and mz 
-void RawMsReader::refinePrecChrg(RawMsPtr ms_one, RawMsPtr ms_two, 
+void RawMsReader::refinePrecChrg(MzmlMsPtr ms_one, MzmlMsPtr ms_two, 
                                  double max_mass, int max_charge) {
   MsHeaderPtr header_two = ms_two->getMsHeaderPtr();
   double prec_win_begin = header_two->getPrecWinBegin();

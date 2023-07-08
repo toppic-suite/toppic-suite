@@ -17,7 +17,7 @@
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
 #include "common/xml/xml_dom_document.hpp"
-#include "ms/spec/raw_ms_util.hpp"
+#include "ms/spec/peak_list_util.hpp"
 #include "ms/env/real_env.hpp" 
 
 namespace toppic {
@@ -46,7 +46,7 @@ void RealEnv::mapPeakList(const PeakPtrVec &peak_list, EnvelopePtr theo_env,
   peaks_.clear();
   for (int i = 0; i < peak_num; i++) {
     //PeakPtr peak_ptr(new Peak(theo_env->getMz(i), 0));
-    int idx = raw_ms_util::getNearPeakIdx(peak_list, theo_env->getMz(i), tolerance);
+    int idx = peak_list_util::getNearPeakIdx(peak_list, theo_env->getMz(i), tolerance);
     if (idx >= 0 && peak_list[idx]->getIntensity() >= min_inte) {
       double mz = peak_list[idx]->getPosition();
       double inte = peak_list[idx]->getIntensity();

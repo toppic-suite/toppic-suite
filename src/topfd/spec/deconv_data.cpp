@@ -15,7 +15,7 @@
 
 #include <cmath>
 
-#include "ms/spec/raw_ms_util.hpp" 
+#include "ms/spec/peak_list_util.hpp" 
 #include "topfd/spec/deconv_data.hpp" 
 
 namespace toppic {
@@ -26,7 +26,7 @@ DeconvData::DeconvData(PeakPtrVec peak_list, double max_mass, int max_charge,
     max_mass_(max_mass),
     max_charge_(max_charge),
     win_size_(win_size) {
-      win_num_ = (int) std::ceil(raw_ms_util::findMaxPos(peak_list_) / win_size_) + 2;
+      win_num_ = (int) std::ceil(peak_list_util::findMaxPos(peak_list_) / win_size_) + 2;
       initWinId();
       initWinBgnEnd();
     }

@@ -16,11 +16,11 @@
 #include <algorithm>
 
 #include "common/util/logger.hpp"
-#include "ms/spec/raw_ms_util.hpp"
+#include "ms/spec/peak_list_util.hpp"
 
 namespace toppic {
 
-namespace raw_ms_util {
+namespace peak_list_util {
 
 double findMaxPos(const PeakPtrVec &ptr_list) {
   if (ptr_list.size() == 0) {

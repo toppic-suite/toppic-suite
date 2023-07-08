@@ -16,7 +16,7 @@
 #ifndef TOPPIC_TOPFD_MSREADER_RAW_MS_READER_HPP_
 #define TOPPIC_TOPFD_MSREADER_RAW_MS_READER_HPP_
 
-#include "ms/spec/raw_ms.hpp"
+#include "ms/mzml/mzml_ms.hpp"
 #include "ms/spec/deconv_ms.hpp"
 #include "topfd/msreader/pw_ms_reader.hpp"
 
@@ -27,11 +27,11 @@ class RawMsReader {
   RawMsReader(const std::string & file_name, double isolation_window);
   RawMsReader(const std::string & file_name, const std::string & activation,
               double isolation_window);
-  RawMsPtr getNextMs(double max_mass, int max_charge);
+  MzmlMsPtr getNextMs(double max_mass, int max_charge);
 
   void getMs1Peaks(PeakPtrVec2D &raw_peaks, double cur_voltage);
 
-  void refinePrecChrg(RawMsPtr ms_one, RawMsPtr ms_two, 
+  void refinePrecChrg(MzmlMsPtr ms_one, MzmlMsPtr ms_two, 
                       double max_mass, int max_charge);
 
   int getInputSpNum() {return reader_ptr_->getInputSpNum();}
@@ -41,7 +41,7 @@ class RawMsReader {
 
  private:
   PwMsReaderPtr reader_ptr_;
-  RawMsPtr ms_one_; 
+  MzmlMsPtr ms_one_; 
 
   bool do_refine_prec_mass_ = true;
 

@@ -30,7 +30,7 @@ RawMsGroupFaimeReader::RawMsGroupFaimeReader(const std::string & file_name,
   missing_level_one_ = missing_level_one;
   fraction_id_ = fraction_id;
   if (!missing_level_one_) {
-    RawMsPtr ms_ptr = readNextRawMs(); 
+    MzmlMsPtr ms_ptr = readNextRawMs(); 
     if (ms_ptr == nullptr) {
       LOG_ERROR("The file " << file_name << " does not contain spectra!");
       exit(EXIT_FAILURE);
@@ -60,7 +60,7 @@ RawMsGroupFaimeReader::RawMsGroupFaimeReader(const std::string & file_name,
   }
 }
 
-RawMsPtr RawMsGroupFaimeReader::readNextRawMs() {
+MzmlMsPtr RawMsGroupFaimeReader::readNextRawMs() {
   reader_ptr_->readNext();
   PeakPtrVec peak_list = reader_ptr_->getPeakList();
   MsHeaderPtr header_ptr = reader_ptr_->getHeaderPtr();
@@ -68,20 +68,20 @@ RawMsPtr RawMsGroupFaimeReader::readNextRawMs() {
     return nullptr;
   }
   header_ptr->setFractionId(fraction_id_);
-  RawMsPtr ms_ptr = std::make_shared<Ms<PeakPtr> >(header_ptr, peak_list);
+  MzmlMsPtr ms_ptr = std::make_shared<Ms<PeakPtr> >(header_ptr, peak_list);
   return ms_ptr;
 }
 
-RawMsGroupPtr RawMsGroupFaimeReader::getNextMsGroupPtrWithFaime() {
+MzmlMsGroupPtr RawMsGroupFaimeReader::getNextMsGroupPtrWithFaime() {
   if (missing_level_one_) {
-    RawMsPtr null_ms_one_ptr(nullptr);
-    RawMsPtr ms_two_ptr = readNextRawMs();
+    MzmlMsPtr null_ms_one_ptr(nullptr);
+    MzmlMsPtr ms_two_ptr = readNextRawMs();
     if (ms_two_ptr == nullptr) {
       return nullptr;
     }
-    RawMsPtrVec ms_two_ptr_vec;
+    MzmlMsPtrVec ms_two_ptr_vec;
     ms_two_ptr_vec.push_back(ms_two_ptr);
-    RawMsGroupPtr ms_group_ptr = std::make_shared<RawMsGroup>(null_ms_one_ptr, ms_two_ptr_vec);
+    MzmlMsGroupPtr ms_group_ptr = std::make_shared<MzmlMsGroup>(null_ms_one_ptr, ms_two_ptr_vec);
     return ms_group_ptr;
   }
   while (true) {
@@ -99,16 +99,16 @@ RawMsGroupPtr RawMsGroupFaimeReader::getNextMsGroupPtrWithFaime() {
         if (last_ms_two_scan_map_[ms1_scan] == -1) {
           // if the ms1 scan does not have ms2, return a ms group with the ms1
           // scan only 
-          RawMsGroupPtr ms_group_ptr = std::make_shared<RawMsGroup>(ms_one_ptr_map_[ms1_scan], RawMsPtrVec());
+          MzmlMsGroupPtr ms_group_ptr = std::make_shared<MzmlMsGroup>(ms_one_ptr_map_[ms1_scan], MzmlMsPtrVec());
           ms_one_ptr_map_[ms1_scan] = nullptr;
           cur_ms_one_idx_ = cur_ms_one_idx_ + 1;
           return ms_group_ptr;
         }
         else {
-          RawMsPtrVec ms2_vec = ms_two_ptr_vec_map_[ms1_scan];
+          MzmlMsPtrVec ms2_vec = ms_two_ptr_vec_map_[ms1_scan];
           // add ms one spec id for ms two later in deconv_process
-          RawMsGroupPtr ms_group_ptr 
-            = std::make_shared<RawMsGroup>(ms_one_ptr_map_[ms1_scan], ms_two_ptr_vec_map_[ms1_scan]);
+          MzmlMsGroupPtr ms_group_ptr 
+            = std::make_shared<MzmlMsGroup>(ms_one_ptr_map_[ms1_scan], ms_two_ptr_vec_map_[ms1_scan]);
           ms_one_ptr_map_[ms1_scan] = nullptr;
           ms_two_ptr_vec_map_[ms1_scan].clear();
           cur_ms_one_idx_ = cur_ms_one_idx_ + 1;
@@ -117,7 +117,7 @@ RawMsGroupPtr RawMsGroupFaimeReader::getNextMsGroupPtrWithFaime() {
       }
     }
 
-    RawMsPtr ms_ptr = readNextRawMs();
+    MzmlMsPtr ms_ptr = readNextRawMs();
     if (ms_ptr == nullptr) {
       break;
     }
@@ -131,7 +131,7 @@ RawMsGroupPtr RawMsGroupFaimeReader::getNextMsGroupPtrWithFaime() {
       int ms2_scan = header_ptr->getFirstScanNum();
       int ms1_scan = header_ptr->getMsOneScan();
       if (ms_two_ptr_vec_map_.count(ms1_scan) == 0) {
-        ms_two_ptr_vec_map_[ms1_scan] = RawMsPtrVec();
+        ms_two_ptr_vec_map_[ms1_scan] = MzmlMsPtrVec();
       }
       ms_two_ptr_vec_map_[ms1_scan].push_back(ms_ptr);
       cur_last_ms_two_scan_map_[ms1_scan] = ms2_scan;
@@ -141,7 +141,7 @@ RawMsGroupPtr RawMsGroupFaimeReader::getNextMsGroupPtrWithFaime() {
 }
 
 // refine precursor charge and mz 
-MatchEnvPtr refinePrecChrgFaime(RawMsPtr ms_one, RawMsPtr ms_two, 
+MatchEnvPtr refinePrecChrgFaime(MzmlMsPtr ms_one, MzmlMsPtr ms_two, 
                                 double max_mass, int max_charge) {
   MsHeaderPtr header_two = ms_two->getMsHeaderPtr();
   double prec_win_begin = header_two->getPrecWinBegin();
@@ -167,14 +167,14 @@ MatchEnvPtr refinePrecChrgFaime(RawMsPtr ms_one, RawMsPtr ms_two,
   return match_env_ptr;
 }
 
-void RawMsGroupFaimeReader::obtainPrecEnvs(RawMsGroupPtr ms_group_ptr, 
+void RawMsGroupFaimeReader::obtainPrecEnvs(MzmlMsGroupPtr ms_group_ptr, 
                                            MatchEnvPtrVec &env_ptr_vec,
                                            double max_mass, int max_charge) {
-  RawMsPtr ms_one_ptr = ms_group_ptr->getMsOnePtr();
-  RawMsPtrVec ms_two_ptr_vec = ms_group_ptr->getMsTwoPtrVec();
+  MzmlMsPtr ms_one_ptr = ms_group_ptr->getMsOnePtr();
+  MzmlMsPtrVec ms_two_ptr_vec = ms_group_ptr->getMsTwoPtrVec();
 
   for (size_t i = 0; i < ms_two_ptr_vec.size(); i++) {
-    RawMsPtr ms_two_ptr = ms_two_ptr_vec[i];
+    MzmlMsPtr ms_two_ptr = ms_two_ptr_vec[i];
     MatchEnvPtr match_env_ptr = refinePrecChrgFaime(ms_one_ptr, ms_two_ptr, 
                                                     max_mass, max_charge);
     if (match_env_ptr != nullptr) {

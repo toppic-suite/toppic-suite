@@ -12,11 +12,12 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include "ms/spec/raw_ms_group.hpp"
+#include "ms/mzml/mzml_ms_group.hpp"
 
 namespace toppic {
 
-RawMsGroup::RawMsGroup(RawMsPtr ms1_ptr, RawMsPtrVec ms2_ptr_vec):
+MzmlMsGroup::MzmlMsGroup(MzmlMsPtr ms1_ptr, 
+                         MzmlMsPtrVec ms2_ptr_vec):
     ms1_ptr_(ms1_ptr),
     ms2_ptr_vec_(ms2_ptr_vec) {}
 
