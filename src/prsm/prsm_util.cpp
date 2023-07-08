@@ -117,7 +117,7 @@ std::vector<int> getClusterIds(const PrsmPtrVec &prsm_ptrs) {
 }
 
 bool isMatchMs(PrsmPtr prsm_ptr, MsHeaderPtr header_ptr) {
-  int id = header_ptr->getId();
+  int id = header_ptr->getSpecId();
   std::string scan = header_ptr->getScansString();
   int prec_id = header_ptr->getPrecId();
   if (prsm_ptr->getSpectrumId() == id && prsm_ptr->getPrecursorId() == prec_id) {
@@ -143,7 +143,7 @@ void addSpectrumPtrsToPrsms(PrsmPtrVec &prsm_ptrs, PrsmParaPtr prsm_para_ptr) {
   while (spec_set_ptr != nullptr) {
     if (spec_set_ptr->isValid()) {
       DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
-      int spectrum_id = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getId();
+      int spectrum_id = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getSpecId();
       int prec_id = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecId();
       LOG_DEBUG("spectrum id " << spectrum_id);
       for (size_t i = start_prsm; i < prsm_ptrs.size(); i++) {

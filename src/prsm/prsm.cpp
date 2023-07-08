@@ -29,7 +29,7 @@ Prsm::Prsm(ProteoformPtr proteoform_ptr, const DeconvMsPtrVec &deconv_ms_ptr_vec
     proteoform_ptr_(proteoform_ptr),
     deconv_ms_ptr_vec_(deconv_ms_ptr_vec) {
       MsHeaderPtr header_ptr = deconv_ms_ptr_vec[0]->getMsHeaderPtr();
-      spectrum_id_ = header_ptr->getId();
+      spectrum_id_ = header_ptr->getSpecId();
       spectrum_scan_ = header_ptr->getScansString();
       precursor_id_ = header_ptr->getPrecId();
       spectrum_num_ = deconv_ms_ptr_vec.size();

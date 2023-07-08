@@ -26,7 +26,7 @@ void write_env(std::ofstream &file, MsHeaderPtr header, MatchEnvPtr match_env) {
   RealEnvPtr real_env = match_env->getRealEnvPtr();
   file << std::endl;
   file << "BEGIN ENVELOPE" << std::endl;
-  file << "SPEC_ID=" << header->getId() << std::endl;
+  file << "SPEC_ID=" << header->getSpecId() << std::endl;
   file << "SPEC_SCAN=" << header->getScansString() << std::endl;
   file << "MS_LEVEL=" << header->getMsLevel() << std::endl;
   file << "REF_IDX=" << theo_env->getReferIdx() << std::endl;

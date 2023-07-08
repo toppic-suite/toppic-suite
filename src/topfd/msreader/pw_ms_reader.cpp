@@ -257,12 +257,12 @@ bool PwMsReader::readOneMs(int sp_id, PeakPtrVec &peak_list, MsHeaderPtr &header
   LOG_DEBUG("ms_level " << ms_level);
   header_ptr->setMsLevel(ms_level);
   if (ms_level == 1) {
-    header_ptr->setId(ms1_cnt_);
+    header_ptr->setSpecId(ms1_cnt_);
     prev_ms1_scan_id_ = spec_info.scanNumber;
     ms1_cnt_++;
   }
   else {
-    header_ptr->setId(ms2_cnt_);
+    header_ptr->setSpecId(ms2_cnt_);
     parsePrecursor(header_ptr, spec_info, cur_spec_ptr);
     parseActivation(header_ptr, spec_info, cur_spec_ptr);
     ms2_cnt_++;

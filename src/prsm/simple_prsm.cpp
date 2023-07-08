@@ -24,7 +24,7 @@ SimplePrsm::SimplePrsm(MsHeaderPtr header_ptr, int spectrum_num,
                        ProteoformPtr proteo_ptr, int score):
   spectrum_num_(spectrum_num),
   score_(score) {
-    spectrum_id_ = header_ptr->getId();
+    spectrum_id_ = header_ptr->getSpecId();
     file_name_ = header_ptr->getFileName();
     spectrum_scan_ = header_ptr->getScansString();
     precursor_id_ = header_ptr->getPrecId();
@@ -39,7 +39,7 @@ SimplePrsm::SimplePrsm(MsHeaderPtr header_ptr,
                        ProteoformPtr proteo_ptr, 
                        ProtCandidatePtr cand_ptr):  
   spectrum_num_(spectrum_num) {
-    spectrum_id_ = header_ptr->getId();
+    spectrum_id_ = header_ptr->getSpecId();
     file_name_ = header_ptr->getFileName();
     spectrum_scan_ = header_ptr->getScansString();
     precursor_id_ = header_ptr->getPrecId();
@@ -58,7 +58,7 @@ SimplePrsm::SimplePrsm(MsHeaderPtr header_ptr, int spectrum_num,
                        int score):
     spectrum_num_(spectrum_num),
     score_(score) {
-      spectrum_id_ = header_ptr->getId();
+      spectrum_id_ = header_ptr->getSpecId();
       spectrum_scan_ = header_ptr->getScansString();
       precursor_id_ = header_ptr->getPrecId();
       prec_mass_ = header_ptr->getPrecMonoMass();

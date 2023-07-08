@@ -44,7 +44,7 @@ MzmlMsPtr RawMsReader::getNextMs(double max_mass, int max_charge) {
     ms_one_ = ms_ptr;
   }
   if (header_ptr->getMsLevel() == 2 && ms_one_ != nullptr) {
-    header_ptr->setMsOneId(ms_one_->getMsHeaderPtr()->getId());
+    header_ptr->setMsOneId(ms_one_->getMsHeaderPtr()->getSpecId());
     header_ptr->setMsOneScan(ms_one_->getMsHeaderPtr()->getFirstScanNum());
   }
   if (do_refine_prec_mass_ && header_ptr->getMsLevel() == 2 && ms_one_ != nullptr) {

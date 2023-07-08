@@ -200,7 +200,7 @@ MatchEnvPtrVec addMultipleMass(MatchEnvPtrVec &envs, MatchEnvPtr2D &candidates,
 
 DeconvMsPtr getDeconvMsPtr(MsHeaderPtr header_ptr, MatchEnvPtrVec &envs, bool use_env_cnn) {
   DeconvPeakPtrVec peak_list;
-  int sp_id = header_ptr->getId();
+  int sp_id = header_ptr->getSpecId();
   for (size_t i = 0; i < envs.size(); i++) {
     EnvelopePtr theo_env = envs[i]->getTheoEnvPtr();
     RealEnvPtr real_env = envs[i]->getRealEnvPtr();

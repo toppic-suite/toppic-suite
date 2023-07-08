@@ -166,7 +166,7 @@ void deconvMissingMsOne(MzmlMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   if (gene_html_folder) {
     std::string json_file_name = ms2_json_dir 
         + file_util::getFileSeparator() 
-        + "spectrum" + std::to_string(header_ptr->getId()) + ".js";
+        + "spectrum" + std::to_string(header_ptr->getSpecId()) + ".js";
     mzml_ms_json_writer::write(json_file_name, ms_ptr, result_envs);    
   }
 }
@@ -320,7 +320,7 @@ void deconvMsOne(MzmlMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   if (gene_html_dir) {
     std::string json_file_name = ms1_json_dir 
         + file_util::getFileSeparator() 
-        + "spectrum" + std::to_string(header_ptr->getId()) + ".js";
+        + "spectrum" + std::to_string(header_ptr->getSpecId()) + ".js";
     mzml_ms_json_writer::write(json_file_name, ms_ptr, prec_envs);    
   }
 }
@@ -372,7 +372,7 @@ void deconvMsTwo(MzmlMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   if (gene_html_dir) {
     std::string json_file_name = ms2_json_dir 
         + file_util::getFileSeparator() 
-        + "spectrum" + std::to_string(ms_ptr->getMsHeaderPtr()->getId()) + ".js";
+        + "spectrum" + std::to_string(ms_ptr->getMsHeaderPtr()->getSpecId()) + ".js";
     mzml_ms_json_writer::write(json_file_name, ms_ptr, result_envs);    
   }
 

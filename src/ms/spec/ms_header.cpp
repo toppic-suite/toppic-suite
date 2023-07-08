@@ -27,7 +27,7 @@ namespace toppic {
 
 MsHeader::MsHeader(XmlDOMElement* element) {
   file_name_ = xml_dom_util::getChildValue(element, "file_name", 0);
-  id_ = xml_dom_util::getIntChildValue(element, "id", 0);
+  spec_id_ = xml_dom_util::getIntChildValue(element, "spec_id", 0);
   title_ = xml_dom_util::getChildValue(element, "title", 0);
   level_ = xml_dom_util::getIntChildValue(element, "level", 0);
 
@@ -102,8 +102,8 @@ void MsHeader::setSinglePrecPtr(PrecursorPtr prec_ptr) {
 XmlDOMElement* MsHeader::getHeaderXml(XmlDOMDocument* xml_doc) {
   XmlDOMElement* element = xml_doc->createElement("ms_header");
   xml_doc->addElement(element, "file_name", file_name_.c_str());
-  std::string str = str_util::toString(id_);
-  xml_doc->addElement(element, "id", str.c_str());
+  std::string str = str_util::toString(spec_id_);
+  xml_doc->addElement(element, "spec_id", str.c_str());
   xml_doc->addElement(element, "title", title_.c_str());
   str = str_util::toString(level_);
   xml_doc->addElement(element, "level", str.c_str());

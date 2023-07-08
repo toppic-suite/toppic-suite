@@ -34,7 +34,7 @@ class MsHeader {
 
   int getFractionId() {return fraction_id_;}
 
-  int getId() {return id_;}
+  int getSpecId() {return spec_id_;}
 
   std::string getScansString();
 
@@ -87,7 +87,7 @@ class MsHeader {
 
   void setFractionId(int fraction_id) {fraction_id_ = fraction_id;}
 
-  void setId(int id) {id_ = id;}
+  void setSpecId(int spec_id) {spec_id_ = spec_id;}
 
   void setTitle(const std::string &title) {title_ = title;}
 
@@ -139,7 +139,7 @@ class MsHeader {
   // a data set may have multiple fractions
   int fraction_id_ = -1;
   // spec id
-  int id_ = -1;
+  int spec_id_ = -1;
   // mass spec title
   std::string title_;
   // a list of scans for merged spectra 

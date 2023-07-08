@@ -39,7 +39,7 @@ class SpectrumSet {
 
   bool isValid() {return valid_;}
 
-  int getSpectrumId() {return deconv_ms_ptr_vec_[0]->getMsHeaderPtr()->getId();}
+  int getSpectrumId() {return deconv_ms_ptr_vec_[0]->getMsHeaderPtr()->getSpecId();}
 
   ExtendMsPtrVec getMsThreePtrVec() {return extend_ms_three_ptr_vec_;}
 

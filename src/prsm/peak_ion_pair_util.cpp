@@ -90,7 +90,7 @@ PeakIonPairPtrVec findPairs(ExtendMsPtr ms_three_ptr,
     if (ion_ptr->getPos() >= bgn && ion_ptr->getPos() <= end) {
       if (std::abs(deviation) <= err) {
         PeakIonPairPtr pair_ptr
-            = std::make_shared<PeakIonPair>(ms_three_ptr->getMsHeaderPtr()->getId(),
+            = std::make_shared<PeakIonPair>(ms_three_ptr->getMsHeaderPtr()->getSpecId(),
                                             ms_three_ptr->getPeakPtr(i),
                                             theo_peak_ptrs[j]);
         pair_ptrs.push_back(pair_ptr);

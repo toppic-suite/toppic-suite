@@ -82,7 +82,7 @@ void MsalignThreadMerge::process() {
     }
     else { 
       DeconvMsPtr cur_ms_ptr = ms_ptrs[cur_ms_idx];
-      cur_ms_ptr->getMsHeaderPtr()->setId(spec_id);
+      cur_ms_ptr->getMsHeaderPtr()->setSpecId(spec_id);
       spec_id++;
       writer->writeMs(cur_ms_ptr);
       ms_ptrs[cur_ms_idx] = reader_ptrs[cur_ms_idx]->getNextMsPtr();

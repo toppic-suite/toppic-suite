@@ -38,14 +38,14 @@ void write(std::string &file_name, MzmlMsPtr ms_ptr, MatchEnvPtrVec &envs) {
 
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
   int ms_level = header_ptr->getMsLevel();
-  int scan_id = header_ptr->getId();
+  int spec_id = header_ptr->getSpecId();
   int scan_num = header_ptr->getFirstScanNum();
   double retention_time = header_ptr->getRetentionTime();
   double target_mz = header_ptr->getPrecTargetMz();
   double begin_mz = header_ptr->getPrecWinBegin();
   double end_mz = header_ptr->getPrecWinEnd();
 
-  doc.AddMember("id", scan_id, allocator);
+  doc.AddMember("id", spec_id, allocator);
   doc.AddMember("scan", scan_num, allocator);
   doc.AddMember("retention_time", retention_time, allocator);
   doc.AddMember("target_mz", target_mz, allocator);

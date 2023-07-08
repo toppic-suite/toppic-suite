@@ -80,7 +80,7 @@ void addMsHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement* ms_element,
     MsHeaderPtr header_ptr = deconv_ms_ptr_vec[i]->getMsHeaderPtr();
     ms1_ids = ms1_ids + str_util::toString(header_ptr->getMsOneId()) + " ";
     ms1_scans = ms1_scans + str_util::toString(header_ptr->getMsOneScan()) + " ";
-    ms2_ids = ms2_ids + str_util::toString(header_ptr->getId()) + " ";
+    ms2_ids = ms2_ids + str_util::toString(header_ptr->getSpecId()) + " ";
     ms2_scans = ms2_scans + header_ptr->getScansString() + " ";
   }
   str_util::trim(ms1_ids);
@@ -149,7 +149,7 @@ void addMsPeaks(XmlDOMDocument *xml_doc, xercesc::DOMElement* ms_element,
     for (size_t i = 0; i < deconv_ms_ptr_vec[s]->size(); i++) {
       xercesc::DOMElement* peak_element = xml_doc->createElement("peak");
       peaks->appendChild(peak_element);
-      std::string str = str_util::toString(deconv_ms_ptr_vec[s]->getMsHeaderPtr()->getId());
+      std::string str = str_util::toString(deconv_ms_ptr_vec[s]->getMsHeaderPtr()->getSpecId());
       xml_doc->addElement(peak_element, "spec_id", str.c_str());
 
       DeconvPeakPtr peak_ptr = deconv_ms_ptr_vec[s]->getPeakPtr(i);
@@ -171,7 +171,7 @@ void addMsPeaks(XmlDOMDocument *xml_doc, xercesc::DOMElement* ms_element,
       str = str_util::toString(charge);
       xml_doc->addElement(peak_element, "charge", str.c_str());
 
-      int spec_id = deconv_ms_ptr_vec[s]->getMsHeaderPtr()->getId();
+      int spec_id = deconv_ms_ptr_vec[s]->getMsHeaderPtr()->getSpecId();
       PeakIonPairPtrVec selected_pair_ptrs
           = peak_ion_pair_util::getMatchedPairs(pair_ptrs, spec_id, peak_ptr->getPeakId());
       if (selected_pair_ptrs.size() > 0) {

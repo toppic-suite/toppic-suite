@@ -107,7 +107,7 @@ void SimpleMsAlignReader::readNext() {
         ms_file_name = strs[1];
       } else if (strs[0] == "FRACTION_ID") {
         fraction_id = std::stoi(strs[1]);
-      } else if (strs[0] == "ID") {
+      } else if (strs[0] == "SPECTRUM_ID") {
         id = std::stoi(strs[1]);
       } else if (strs[0] == "TITLE") {
         title = strs[1];
@@ -144,7 +144,7 @@ void SimpleMsAlignReader::readNext() {
     LOG_ERROR("Spectrum id is missing!");
     exit(EXIT_FAILURE);
   }
-  header_ptr->setId(id);
+  header_ptr->setSpecId(id);
   // set title
   if (title == "") {
     title = "sp_" + str_util::toString(id);
