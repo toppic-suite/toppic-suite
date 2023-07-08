@@ -25,10 +25,10 @@ typedef std::shared_ptr<DeconvPeak> DeconvPeakPtr;
 
 class DeconvPeak : public Peak {
  public:
-  DeconvPeak(int sp_id, int id, double mono_mass, 
+  DeconvPeak(int sp_id, int peak_id, double mono_mass, 
              double intensity, int charge);
 
-  DeconvPeak(int sp_id, int id, double mono_mass, 
+  DeconvPeak(int sp_id, int peak_id, double mono_mass, 
              double intensity, int charge, double score);
 
   explicit DeconvPeak(XmlDOMElement* element);
@@ -37,7 +37,7 @@ class DeconvPeak : public Peak {
 
   int getSpId() {return sp_id_;}
 
-  int getId() {return id_;}
+  int getPeakId() {return peak_id_;}
 
   double getMonoMass() {return getPosition();}
 
@@ -45,9 +45,9 @@ class DeconvPeak : public Peak {
 
   double getScore() {return score_;}
 
-  void setId(int id) {id_ = id;}
-
   void setSpId(int sp_id) {sp_id_ = sp_id;}
+
+  void setPeakId(int peak_id) {peak_id_ = peak_id;}
 
   void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 
@@ -58,7 +58,7 @@ class DeconvPeak : public Peak {
 
  private:
   int sp_id_;
-  int id_;
+  int peak_id_;
   int charge_;
   double score_ = 1.0;
 };

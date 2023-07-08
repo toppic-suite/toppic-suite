@@ -29,7 +29,7 @@ PeakIonPairPtrVec getMatchedPairs(const PeakIonPairPtrVec &pair_ptrs,
   PeakIonPairPtrVec selected_pair_ptrs;
   for (size_t i = 0; i < pair_ptrs.size(); i++) {
     if (pair_ptrs[i]->getSpecId() == spec_id &&
-        pair_ptrs[i]->getRealPeakPtr()->getBasePeakPtr()->getId() == peak_id) {
+        pair_ptrs[i]->getRealPeakPtr()->getBasePeakPtr()->getPeakId() == peak_id) {
       selected_pair_ptrs.push_back(pair_ptrs[i]);
     }
   }

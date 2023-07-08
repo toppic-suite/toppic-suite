@@ -153,7 +153,7 @@ void addMsPeaks(XmlDOMDocument *xml_doc, xercesc::DOMElement* ms_element,
       xml_doc->addElement(peak_element, "spec_id", str.c_str());
 
       DeconvPeakPtr peak_ptr = deconv_ms_ptr_vec[s]->getPeakPtr(i);
-      str = str_util::toString(peak_ptr->getId());
+      str = str_util::toString(peak_ptr->getPeakId());
       xml_doc->addElement(peak_element, "peak_id", str.c_str());
 
       double mass = peak_ptr->getPosition();
@@ -173,7 +173,7 @@ void addMsPeaks(XmlDOMDocument *xml_doc, xercesc::DOMElement* ms_element,
 
       int spec_id = deconv_ms_ptr_vec[s]->getMsHeaderPtr()->getId();
       PeakIonPairPtrVec selected_pair_ptrs
-          = peak_ion_pair_util::getMatchedPairs(pair_ptrs, spec_id, peak_ptr->getId());
+          = peak_ion_pair_util::getMatchedPairs(pair_ptrs, spec_id, peak_ptr->getPeakId());
       if (selected_pair_ptrs.size() > 0) {
         int match_ions_number = selected_pair_ptrs.size();
         str = str_util::toString(match_ions_number);

@@ -31,7 +31,7 @@ EnvelopePtr getTheoEnv(double mono_mass, int charge) {
 
 SeedEnvelope::SeedEnvelope(DeconvPeakPtr peak_ptr) {
   spec_id_ = peak_ptr->getSpId();
-  env_id_ = peak_ptr->getId();
+  env_id_ = peak_ptr->getPeakId();
   mass_ = peak_ptr->getMonoMass();
   pos_ = peak_ptr->getMonoMz();
   inte_ = peak_ptr->getIntensity();

@@ -47,7 +47,7 @@ namespace feature_detect {
 
 bool peakExists (DeconvMsPtrVec &ms1_ptr_vec, DeconvPeakPtr peak) {
   int sp_id = peak->getSpId();
-  int peak_id = peak->getId();
+  int peak_id = peak->getPeakId();
   DeconvPeakPtr remain_peak = ms1_ptr_vec[sp_id]->getPeakPtr(peak_id);
   if (remain_peak == nullptr) {
     return false;
@@ -351,7 +351,7 @@ void removePeaks (DeconvMsPtrVec &ms1_ptr_vec, DeconvPeakPtrVec &matched_peaks) 
   for (size_t i = 0; i < matched_peaks.size(); i++) {
     DeconvPeakPtr peak = matched_peaks[i];
     int sp_id = peak->getSpId();
-    int peak_id = peak->getId();
+    int peak_id = peak->getPeakId();
     ms1_ptr_vec[sp_id]->setPeakPtrNull(peak_id);
   }
 }
