@@ -25,8 +25,9 @@ RawMsGroupReader::RawMsGroupReader(const std::string & file_name,
                                    std::string activation,
                                    double isolation_window,
                                    int fraction_id) {
-  reader_ptr_ = std::make_shared<PwMsReader>(file_name, activation, 
-                                             isolation_window);
+  reader_ptr_ = std::make_shared<PwMsReader>(file_name, 
+                                             isolation_window, 
+                                             activation);
   missing_level_one_ = missing_level_one;
   fraction_id_ = fraction_id;
 

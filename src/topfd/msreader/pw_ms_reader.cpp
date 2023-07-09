@@ -12,6 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include <set>
+
 #include "pwiz/data/msdata/SpectrumInfo.hpp"
 #include "pwiz/data/common/cv.hpp"
 #include "pwiz/data/common/ParamTypes.hpp"
@@ -22,31 +24,30 @@
 #include "topfd/msreader/pw_ms_reader.hpp"
 
 namespace toppic {
+
 PwMsReader::PwMsReader(const std::string & file_name,
-                       double isolation_window):
-    file_name_(file_name),
-    isolation_window_(isolation_window),
-    input_sp_id_(0),
-    output_sp_id_(0) {
-      msd_ptr_ = std::make_shared<pwiz::msdata::MSDataFile>(file_name, &readers_);
-      spec_list_ptr_ =  msd_ptr_->run.spectrumListPtr;
-      input_sp_num_ = spec_list_ptr_->size();
-      is_waters_instrument_ = checkWatersInstrument();
-    }
+                       double isolation_window) {
+  init(file_name);
+  isolation_window_ = isolation_window;
+}
 
 PwMsReader::PwMsReader(const std::string & file_name, 
-                       std::string activation,
-                       double isolation_window):
-    file_name_(file_name),
-    activation_(activation),
-    isolation_window_(isolation_window),
-    input_sp_id_(0),
-    output_sp_id_(0) {
-      msd_ptr_ = std::make_shared<pwiz::msdata::MSDataFile>(file_name, &readers_);
-      spec_list_ptr_ =  msd_ptr_->run.spectrumListPtr;
-      input_sp_num_ = spec_list_ptr_->size();
-      is_waters_instrument_ = checkWatersInstrument();
-    }
+                       double isolation_window, 
+                       std::string activation) {
+  init(file_name);
+  isolation_window_ = isolation_window;
+  activation_ = activation;
+}
+
+void PwMsReader::init(const std::string & file_name) {
+  file_name_ = file_name;
+  input_sp_id_ = 0;
+  output_sp_id_ = 0;
+  msd_ptr_ = std::make_shared<pwiz::msdata::MSDataFile>(file_name, &readers_);
+  spec_list_ptr_ =  msd_ptr_->run.spectrumListPtr;
+  input_sp_num_ = spec_list_ptr_->size();
+  is_waters_instrument_ = checkWatersInstrument();
+}
 
 bool PwMsReader::checkWatersInstrument() {
   for (size_t i = 0; i < msd_ptr_->instrumentConfigurationPtrs.size(); i++) {
@@ -207,7 +208,7 @@ void PwMsReader::parseActivation(MsHeaderPtr header_ptr,
   if (ac_name == "") {
     LOG_WARN("No activation information is available in reading the spectrum with scan " << spec_info.scanNumber);
     std::cout << "\nERROR: Unable to read the activation method from the file.";
-    std::cout << "\nPlease select an activation method out of CID|HCD|ETD|UVPD and provide it as a parameter.";
+    std::cout << "\nPlease select an activation method in database search.";
     std::cout << "\nExample: -a CID" << std::endl;
     exit(EXIT_FAILURE);
   }
@@ -216,17 +217,18 @@ void PwMsReader::parseActivation(MsHeaderPtr header_ptr,
   header_ptr->setActivationPtr(activation_ptr);
 }
 
-void PwMsReader::parseFaims(MsHeaderPtr header_ptr, 
-                            pwiz::msdata::SpectrumPtr cur_spec_ptr) {
+double PwMsReader::parseFaims(pwiz::msdata::SpectrumPtr cur_spec_ptr) {
   //add voltage information if it exists
   std::vector<pwiz::data::CVParam> cv_list = (*cur_spec_ptr).cvParams;
   for (size_t i = 0; i < cv_list.size(); i++) {
     if (cv_list[i].cvid == pwiz::cv::MS_FAIMS_compensation_voltage) {
-      header_ptr->setVoltage(std::stod(cv_list[i].value));
+      return std::stod(cv_list[i].value);
       break;
     }
   }
+  return -1;
 }
+
 
 bool PwMsReader::readOneMs(int sp_id, PeakPtrVec &peak_list, MsHeaderPtr &header_ptr) {
   bool get_binary_data = true;
@@ -251,7 +253,8 @@ bool PwMsReader::readOneMs(int sp_id, PeakPtrVec &peak_list, MsHeaderPtr &header
   parseScanNum(header_ptr, spec_info);
   header_ptr->setTitle("Scan_" + str_util::toString(spec_info.scanNumber));
   header_ptr->setRetentionTime(spec_info.retentionTime);
-  parseFaims(header_ptr, cur_spec_ptr);
+  double voltage = parseFaims(cur_spec_ptr);
+  header_ptr->setVoltage(voltage); 
 
   int ms_level = spec_info.msLevel;
   LOG_DEBUG("ms_level " << ms_level);
@@ -284,6 +287,43 @@ int PwMsReader::readNext() {
     input_sp_id_++;
   }
   return 1;
+}
+
+int PwMsReader::readNextWithVoltage(double voltage) {
+  peak_list_.clear();
+  header_ptr_ = nullptr;
+
+  int found = false;
+  while (!found) {
+    if (input_sp_id_ >= input_sp_num_) {
+      LOG_DEBUG("Only " << input_sp_num_  << " spectra in the input data!");
+      return -1;
+    }
+    bool valid = readOneMs(input_sp_id_, peak_list_, header_ptr_); 
+    if (valid && header_ptr_->getVoltage() == voltage) {
+      found = true;
+    }
+    input_sp_id_++;
+  }
+  return 1;
+}
+
+
+std::vector<double> PwMsReader::readFaimsVoltageList() {
+  std::set<double> volt_set;
+  bool get_binary_data = false;
+  for (int sp_id = 0; sp_id < input_sp_num_; sp_id++) {
+    pwiz::msdata::SpectrumPtr cur_spec_ptr = spec_list_ptr_->spectrum(sp_id, get_binary_data);
+    if (cur_spec_ptr == nullptr) {continue;}
+    double voltage = parseFaims(cur_spec_ptr);
+    if (voltage > 0) {
+      volt_set.insert(voltage);
+    }
+  }
+  std::vector<double> volt_vec(volt_set.begin(), volt_set.end());
+  // sort in the increasing order
+  std::sort(volt_vec.begin(),volt_vec.end());
+  return volt_vec;
 }
 
 }  // namespace toppic

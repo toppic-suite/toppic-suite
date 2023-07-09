@@ -25,8 +25,9 @@ RawMsGroupFaimeReader::RawMsGroupFaimeReader(const std::string & file_name,
                                              std::string activation,
                                              double isolation_window,
                                              int fraction_id) {
-  reader_ptr_ = std::make_shared<PwMsReader>(file_name, activation, 
-                                             isolation_window);
+  reader_ptr_ = std::make_shared<PwMsReader>(file_name, 
+                                             isolation_window, 
+                                             activation);
   //check if it is centroid data
   bool is_centroid_data = reader_ptr_->checkCentroidData(); 
   if (!is_centroid_data) {
@@ -61,8 +62,9 @@ RawMsGroupFaimeReader::RawMsGroupFaimeReader(const std::string & file_name,
       }
       ms_ptr = readNextRawMs();
     }
-    reader_ptr_ = std::make_shared<PwMsReader>(file_name, activation, 
-                                               isolation_window);
+    reader_ptr_ = std::make_shared<PwMsReader>(file_name,  
+                                               isolation_window,
+                                               activation);
     total_ms_one_num_ = idx;
     cur_ms_one_idx_ = 0;
   }

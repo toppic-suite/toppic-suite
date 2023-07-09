@@ -34,14 +34,17 @@ typedef std::shared_ptr<pwiz::msdata::MSDataFile> MSDataFilePtr;
 class PwMsReader {
  public:
   explicit PwMsReader(const std::string & file_name, double isolation_window);
-  explicit PwMsReader(const std::string & file_name, std::string activation,
-                      double isolation_window);
+  
+  explicit PwMsReader(const std::string & file_name, double isolation_window,
+                      std::string activation);
   int readNext();
-  PeakPtrVec getPeakList() {return peak_list_;}
+  int readNextWithVoltage(double voltage); 
   MsHeaderPtr getHeaderPtr() {return header_ptr_;}
+  PeakPtrVec getPeakList() {return peak_list_;}
   int getInputSpNum() {return input_sp_num_;}
-
   bool checkCentroidData(); 
+
+  std::vector<double> readFaimsVoltageList();
   
  private:
   std::string file_name_;
@@ -64,6 +67,8 @@ class PwMsReader {
   MSDataFilePtr msd_ptr_;
   pwiz::msdata::SpectrumListPtr spec_list_ptr_;
 
+  void init(const std::string &file_name);
+
   bool readOneMs(int sp_id, PeakPtrVec &peak_list, MsHeaderPtr &header_ptr);
 
   bool checkWatersInstrument(); 
@@ -83,8 +88,7 @@ class PwMsReader {
                        pwiz::msdata::SpectrumInfo &spec_info,
                        pwiz::msdata::SpectrumPtr cur_spec_ptr); 
 
-  void parseFaims(MsHeaderPtr header_ptr, 
-                  pwiz::msdata::SpectrumPtr cur_spec_ptr);
+  double parseFaims(pwiz::msdata::SpectrumPtr cur_spec_ptr);
 };
 
 typedef std::shared_ptr<PwMsReader> PwMsReaderPtr;

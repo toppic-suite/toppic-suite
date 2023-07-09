@@ -27,7 +27,7 @@ RawMsReader::RawMsReader(const std::string & file_name, double isolation_window)
 
 RawMsReader::RawMsReader(const std::string & file_name, const std::string & activation,
                          double isolation_window) {
-  reader_ptr_ = std::make_shared<PwMsReader>(file_name, activation, isolation_window);
+  reader_ptr_ = std::make_shared<PwMsReader>(file_name, isolation_window, activation);
 }
 
 MzmlMsPtr RawMsReader::getNextMs(double max_mass, int max_charge) {
