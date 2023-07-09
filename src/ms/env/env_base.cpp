@@ -123,7 +123,7 @@ double EnvBase::convertMonoMassToAvgMass(double mass) {
   return mass + diff;
 }
 
-//Base mass is the monoisotopic mass of the highest peak in the envelope
+//Ref mass is the monoisotopic mass of the highest peak in the envelope
 double EnvBase::convertRefMassToMonoMass(double mass) {
   EnvelopePtr env_ptr = env_base_ptr_->getBaseEnvByRefMass(mass);
   if (env_ptr == nullptr) {

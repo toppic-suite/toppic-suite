@@ -71,13 +71,9 @@ void RealEnv::remvDuplMatch(EnvelopePtr theo_env) {
       if (std::abs(theo_env->getMz(i) - peaks_[i]->getPosition()) 
           < std::abs(theo_env->getMz(i + 1) - peaks_[i + 1]->getPosition())) {
         peaks_[i+1]->setIdx(EnvPeak::getNonExistPeakIdx());
-        //peaks_[i+1]->setPosition(EnvPeak::getNonExistPeakIdx());
-        //mzs_[i + 1] = getNonExistPeakIdx();
         peaks_[i+1]->setIntensity(0.0);
       } else {
         peaks_[i]->setIdx(EnvPeak::getNonExistPeakIdx());
-        //peaks_[i]->setPosition(EnvPeak::getNonExistPeakIdx());
-        //mzs_[i] = getNonExistPeakIdx();
         peaks_[i]->setIntensity(0.0);
       }
     }

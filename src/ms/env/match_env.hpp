@@ -30,16 +30,6 @@ class MatchEnv {
   MatchEnv(int mass_group, EnvelopePtr theo_env_ptr, 
            RealEnvPtr real_env_ptr);
 
-  void compMsdeconvScr(EnvParaPtr env_para_ptr);
-
-  static bool cmpEnvcnnScoreDec(const MatchEnvPtr &a, const MatchEnvPtr &b) { 
-    return a->getEnvcnnScore() > b->getEnvcnnScore();}
-
-  static bool cmpMsdeconvScoreDec(const MatchEnvPtr &a, const MatchEnvPtr &b) { 
-    return a->getMsdeconvScore() > b->getMsdeconvScore();}
-
-  double calcPeakScr(int id_x, double inte_sum, double tolerance);
-
   int getId() {return id_;}
 
   int getMassGroup() {return mass_group_;}
@@ -59,6 +49,16 @@ class MatchEnv {
   void setId(int id) {id_ = id;}
 
   void setTheoEnvPtr(EnvelopePtr theo_env_ptr) {theo_env_ptr_ = theo_env_ptr;}
+
+  void compMsdeconvScr(EnvParaPtr env_para_ptr);
+
+  static bool cmpEnvcnnScoreDec(const MatchEnvPtr &a, const MatchEnvPtr &b) { 
+    return a->getEnvcnnScore() > b->getEnvcnnScore();}
+
+  static bool cmpMsdeconvScoreDec(const MatchEnvPtr &a, const MatchEnvPtr &b) { 
+    return a->getMsdeconvScore() > b->getMsdeconvScore();}
+
+  double calcPeakScr(int id_x, double inte_sum, double tolerance);
 
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 

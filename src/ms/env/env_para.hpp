@@ -17,7 +17,6 @@
 
 #include <memory>
 #include <vector>
-#include <string>
 #include <limits>
 
 #include "topfd/common/topfd_para.hpp"
@@ -120,6 +119,8 @@ class EnvPara {
   double low_high_dividor_ = 1500;
   double aa_avg_mass_ = 120;
   double peak_density_ = 2;
+  int compLowMassNum();
+  int compHighMassNum(double prec_mass);
 
   // **** Fixed parameters in match_env_util::addMultiMass
   // For one envelope, if we cannot determine its

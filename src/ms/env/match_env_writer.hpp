@@ -25,6 +25,6 @@ void write_env_vec(std::ofstream &file, MsHeaderPtr header, const MatchEnvPtrVec
 
 void write(const std::string & file, MsHeaderPtr header, const MatchEnvPtrVec & envs); 
 
-}  // namespace msalign_writer
+}  // namespace match_env_writer
 
 }  // namespace toppic

@@ -43,4 +43,17 @@ int EnvPara::compMinConsPeakNum(int peak_num, int mass_group) {
   return min_cons_peak_num;
 }
 
+int EnvPara::compLowMassNum() {
+  int low_mass_num = static_cast<int>(low_high_dividor_ / aa_avg_mass_ * peak_density_);
+  return low_mass_num;
+}
+
+int EnvPara::compHighMassNum(double prec_mass) {
+  int high_mass_num = static_cast<int> ((prec_mass - low_high_dividor_) / aa_avg_mass_ * peak_density_);
+  if (high_mass_num < 0) {
+    high_mass_num = 0;
+  }
+  return high_mass_num;
+}
+
 }

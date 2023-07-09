@@ -207,9 +207,12 @@ DeconvMsPtr getDeconvMsPtr(MsHeaderPtr header_ptr, MatchEnvPtrVec &envs, bool us
     double pos = real_env->getMonoNeutralMass();
     double inte = theo_env->compIntensitySum();
     int charge = theo_env->getCharge();
-    double score = envs[i]->getMsdeconvScore();
+    double score; 
     if (use_env_cnn) {
       score = envs[i]->getEnvcnnScore();
+    }
+    else {
+      score = envs[i]->getMsdeconvScore();
     }
     DeconvPeakPtr peak_ptr = std::make_shared<DeconvPeak>(sp_id, i, pos, inte, charge, score);
     peak_list.push_back(peak_ptr);
