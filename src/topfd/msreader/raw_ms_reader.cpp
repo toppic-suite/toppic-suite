@@ -55,7 +55,7 @@ MzmlMsPtr RawMsReader::getNextMs(double max_mass, int max_charge) {
     if (target_mz != 0.0) {
       int charge = header_ptr->getPrecCharge();
       double target_mass = peak_util::compPeakNeutralMass(target_mz, charge);
-      double mono_mass = EnvBase::convertBaseMassToMonoMass(target_mass);
+      double mono_mass = EnvBase::convertRefMassToMonoMass(target_mass);
       double mono_mz = peak_util::compMz(mono_mass, charge);
       header_ptr->getSinglePrecPtr()->setMonoMz(mono_mz); 
     }

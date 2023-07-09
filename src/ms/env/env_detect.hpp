@@ -23,17 +23,14 @@ namespace toppic {
 
 namespace env_detect {
 
-double calcInteRatio(const PeakPtrVec &peak_list, EnvelopePtr theo_env, 
-                     double tolerance);
+MatchEnvPtr detectEnvByRefPeak(const PeakPtrVec &peak_list, int ref_peak, int charge, double max_mass, 
+                               double min_inte, double min_ref_inte, EnvParaPtr env_para_ptr);
 
-MatchEnvPtr detectEnv(const PeakPtrVec &peak_list, int base_peak,
-                      int charge, double max_mass, EnvParaPtr env_para_ptr);
+MatchEnvPtr detectEnvByMonoMass(const PeakPtrVec &peak_list, double mono_mass,
+                                int charge, double min_inte, EnvParaPtr env_para_ptr); 
 
-MatchEnvPtr detectEnv(const PeakPtrVec &peak_list, double mono_mass, 
-                      int charge, EnvParaPtr env_para_ptr);
-
-MatchEnvPtr2D getCandidate(const PeakPtrVec &peak_list, int max_charge, 
-                           double max_mass, EnvParaPtr env_para_ptr);
+MatchEnvPtr2D getCandidateEnv(const PeakPtrVec &peak_list, int max_charge, double max_mass, 
+                              double min_inte, double min_ref_inte, EnvParaPtr env_para_ptr);
 }
 
 }

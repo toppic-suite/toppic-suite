@@ -37,7 +37,7 @@ class Envelope {
 
   EnvelopePtr convertToTheo(double mass_diff, int new_charge);
 
-  EnvelopePtr distrToTheoBase(double new_base_mz, int new_charge);
+  EnvelopePtr distrToTheoRef(double new_ref_mz, int new_charge);
 
   EnvelopePtr distrToTheoMono(double new_mono_mz, int new_charge);
 
@@ -61,48 +61,42 @@ class Envelope {
 
   void shift(int shift);
 
-  double compIntensitySum();
-
-  double getAvgMz();
-
-  double getAvgNeutralMass();
-
   double getMinMz() {return peaks_[0]->getPosition();}
 
   double getMaxMz() {return peaks_[peaks_.size()-1]->getPosition();}
 
-  int getHighestPeakIdx();
-
-  std::vector<double> getIntensities();
-
-  int getCharge() {return charge_;}
-
-  int getLabel(int i);
-
-  double getIntensity(int i) {return peaks_[i]->getIntensity();}
-
-  double getIntensitySum();
+  double getMonoMz() {return mono_mz_;}
 
   double getMonoNeutralMass() {return peak_util::compPeakNeutralMass(mono_mz_, charge_);}
-
-  double getMonoMz() {return mono_mz_;}
 
   // get the m/z difference between mono_mz and reference peak 
   double getMonoReferDistance() {return peaks_[refer_idx_]->getPosition() - mono_mz_;}
 
+  double getAvgMz();
+
+  double getAvgNeutralMass() {return peak_util::compPeakNeutralMass(getAvgMz(), charge_);}
+
+  double getReferMz() {return peaks_[refer_idx_]->getPosition();}
+
+  double getReferNeutralMass() {return peak_util::compPeakNeutralMass(getReferMz(), charge_);}
+
   double getMz(int i) {return peaks_[i]->getPosition();}
+
+  int getReferIdx() {return refer_idx_;}
+
+  double getIntensity(int i) {return peaks_[i]->getIntensity();}
+
+  double getReferIntensity() {return peaks_[refer_idx_]->getIntensity();}
+
+  std::vector<double> getIntensities();
+
+  double compIntensitySum();
+
+  int getCharge() {return charge_;}
 
   int getPeakNum() {return peaks_.size();}
 
   EnvPeakPtr getPeakPtr(int i) {return peaks_[i];}
-
-  int getReferIdx() {return refer_idx_;}
-
-  double getReferIntensity() {return peaks_[refer_idx_]->getIntensity();}
-
-  double getReferMz() {return peaks_[refer_idx_]->getPosition();}
-
-  double getRefNeutralMass() {return peak_util::compPeakNeutralMass(getReferMz(), charge_);}
 
   void setIntensity(int i, double intensity) {peaks_[i]->setIntensity(intensity);}
 
@@ -111,7 +105,7 @@ class Envelope {
   static std::string getXmlElementName() {return "envelope";}
 
  protected:
-
+  // the peak index with the highest intensity
   int refer_idx_;
   // Charge of the envolope 
   int charge_;
@@ -119,6 +113,9 @@ class Envelope {
   double mono_mz_;
   // peak list
   EnvPeakPtrVec peaks_;
+
+  //used in finding the reference index
+  int getHighestPeakIdx();
 };
 
 typedef std::vector<EnvelopePtr> EnvelopePtrVec;

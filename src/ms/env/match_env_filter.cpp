@@ -22,10 +22,10 @@ namespace toppic {
 namespace match_env_filter {
 
 MatchEnvPtrVec filter(MatchEnvPtrVec &ori_envs, double prec_mass,
-                      EnvParaPtr env_para_ptr) {
+                      bool use_env_cnn, EnvParaPtr env_para_ptr) {
   MatchEnvPtrVec low_mass_envs;
   MatchEnvPtrVec high_mass_envs;
-  if (env_para_ptr->use_env_cnn_) {
+  if (use_env_cnn) {
     std::sort(ori_envs.begin(), ori_envs.end(), MatchEnv::cmpEnvcnnScoreDec);
   }
   else {
@@ -48,7 +48,7 @@ MatchEnvPtrVec filter(MatchEnvPtrVec &ori_envs, double prec_mass,
   MatchEnvPtrVec result;
   result.insert(std::end(result), std::begin(low_mass_envs), std::end(low_mass_envs));
   result.insert(std::end(result), std::begin(high_mass_envs), std::end(high_mass_envs));
-  if (env_para_ptr->use_env_cnn_) {
+  if (use_env_cnn) {
     std::sort(result.begin(), result.end(), MatchEnv::cmpEnvcnnScoreDec);
   }
   else {

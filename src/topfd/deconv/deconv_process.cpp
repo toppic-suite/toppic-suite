@@ -46,7 +46,7 @@ DeconvProcess::DeconvProcess(TopfdParaPtr topfd_para_ptr,
                              const std::string &spec_file_name, 
                              int frac_id, int t) {
   topfd_para_ptr_ = topfd_para_ptr;
-  env_para_ptr_ = std::make_shared<EnvPara>(topfd_para_ptr);
+  env_para_ptr_ = std::make_shared<EnvPara>(topfd_para_ptr->getMzError());
   dp_para_ptr_ = std::make_shared<DpPara>();
 
   spec_file_name_ = spec_file_name;
@@ -108,7 +108,7 @@ void DeconvProcess::process() {
     = std::make_shared<RawMsGroupFaimeReader>(spec_file_name_, 
                                               topfd_para_ptr_->isMissingLevelOne(),
                                               topfd_para_ptr_->getActivation(),
-                                              env_para_ptr_->prec_deconv_interval_, 
+                                              topfd_para_ptr_->getPrecWindow(),  
                                               frac_id_);
   if (topfd_para_ptr_->isMissingLevelOne()) {
     processSpMissingLevelOne(reader_ptr);
@@ -127,8 +127,9 @@ void deconvMissingMsOne(MzmlMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
 
   int prec_id = 0;
-  double prec_mz = EnvPara::getDefaultMaxMass()/EnvPara::getDefaultMaxCharge();
-  int prec_charge = EnvPara::getDefaultMaxCharge();
+  TopfdParaPtr topfd_para_ptr = deconv_ptr->getTopfdParaPtr();
+  double prec_mz = topfd_para_ptr->getMaxMass()/topfd_para_ptr->getMaxCharge(); 
+  int prec_charge = topfd_para_ptr->getMaxCharge(); 
   double prec_inte = 0;
   double apex_time = ms_ptr->getMsHeaderPtr()->getRetentionTime();
 
@@ -137,10 +138,9 @@ void deconvMissingMsOne(MzmlMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
                                                       apex_time);
   header_ptr->setSinglePrecPtr(prec_ptr);
   MatchEnvPtrVec result_envs; 
-  EnvParaPtr env_para_ptr = deconv_ptr->getEnvParaPtr();
   if (peak_list.size() > 0) {
-    deconv_ptr->setData(peak_list, env_para_ptr->getMaxMass(), 
-                        env_para_ptr->getMaxCharge());
+    deconv_ptr->setData(peak_list, topfd_para_ptr->getMaxMass(), 
+                        topfd_para_ptr->getMaxCharge());
     deconv_ptr->run();
     result_envs = deconv_ptr->getResult();
   }
@@ -150,7 +150,7 @@ void deconvMissingMsOne(MzmlMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   count_lock.unlock();
 
   DeconvMsPtr deconv_ms_ptr = match_env_util::getDeconvMsPtr(header_ptr, result_envs,
-                                                             env_para_ptr->use_env_cnn_);
+                                                             topfd_para_ptr->isUseEnvCnn());
 
   boost::thread::id thread_id = boost::this_thread::get_id();
   int writer_id = pool_ptr->getId(thread_id);
@@ -220,7 +220,8 @@ void DeconvProcess::processSpMissingLevelOne(RawMsGroupFaimeReaderPtr reader_ptr
     //to make sure that multiple threads do not share these parameter instances. 
     EnvParaPtr env_ptr_new = std::make_shared<EnvPara>(*env_para_ptr_.get());
     DpParaPtr dp_ptr_new = std::make_shared<DpPara>(dp_para_ptr_);
-    DeconvOneSpPtr deconv_ptr = std::make_shared<DeconvOneSp>(env_ptr_new, dp_ptr_new);
+    TopfdParaPtr topfd_ptr_new = std::make_shared<TopfdPara>(*topfd_para_ptr_.get());
+    DeconvOneSpPtr deconv_ptr = std::make_shared<DeconvOneSp>(env_ptr_new, dp_ptr_new, topfd_ptr_new);
 
     pool_ptr->Enqueue(geneTaskMissingMsOne(ms_group_ptr, deconv_ptr, 
                                            ms_writer_ptr_vec, pool_ptr, 
@@ -296,10 +297,10 @@ void deconvMsOne(MzmlMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   prec_envs.insert(prec_envs.end(), result_envs.begin(), result_envs.end());
   LOG_DEBUG("result num " << prec_envs.size());
 
-  EnvParaPtr env_para_ptr = deconv_ptr->getEnvParaPtr();
+  TopfdParaPtr topfd_para_ptr = deconv_ptr->getTopfdParaPtr();
   DeconvMsPtr deconv_ms_ptr = match_env_util::getDeconvMsPtr(header_ptr,
                                                              prec_envs,
-                                                             env_para_ptr->use_env_cnn_);
+                                                             topfd_para_ptr->isUseEnvCnn());
 
   boost::thread::id thread_id = boost::this_thread::get_id();
   int writer_id = pool_ptr->getId(thread_id);
@@ -354,9 +355,9 @@ void deconvMsTwo(MzmlMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
     result_envs = deconv_ptr->getResult();
   }
 
-  EnvParaPtr env_para_ptr = deconv_ptr->getEnvParaPtr();
+  TopfdParaPtr topfd_para_ptr = deconv_ptr->getTopfdParaPtr();
   DeconvMsPtr deconv_ms_ptr = match_env_util::getDeconvMsPtr(header_ptr, result_envs,
-                                                             env_para_ptr->use_env_cnn_);
+                                                             topfd_para_ptr->isUseEnvCnn());
 
   boost::thread::id thread_id = boost::this_thread::get_id();
   int writer_id = pool_ptr->getId(thread_id);
@@ -394,11 +395,11 @@ std::function<void()> geneTask(MzmlMsGroupPtr ms_group_ptr,
     MzmlMsPtrVec ms_two_ptr_vec = ms_group_ptr->getMsTwoPtrVec();
 
     MatchEnvPtrVec prec_envs;
-    EnvParaPtr env_para_ptr = deconv_ptr->getEnvParaPtr();
+    TopfdParaPtr topfd_para_ptr = deconv_ptr->getTopfdParaPtr();
 
     RawMsGroupFaimeReader::obtainPrecEnvs(ms_group_ptr, prec_envs, 
-                                          env_para_ptr->max_mass_,
-                                          env_para_ptr->max_charge_); 
+                                          topfd_para_ptr->getMaxMass(),
+                                          topfd_para_ptr->getMaxCharge()); 
 
     deconvMsOne(ms_one_ptr, deconv_ptr, prec_envs, ms1_writer_ptr_vec, 
                 pool_ptr, gene_html_dir, ms1_json_dir);
@@ -478,11 +479,11 @@ void DeconvProcess::processSp(RawMsGroupFaimeReaderPtr reader_ptr) {
     //multiple threads do not share the same parameter instances. 
     EnvParaPtr env_ptr_new = std::make_shared<EnvPara>(*env_para_ptr_.get());
     DpParaPtr dp_ptr_new = std::make_shared<DpPara>(dp_para_ptr_);
-
+    TopfdParaPtr topfd_ptr_new = std::make_shared<TopfdPara>(*topfd_para_ptr_.get());
     //deconv_process_ptr_ (DecovProcess instance) is needed because 
     //it has the information on the folder names, envelope file names
     //pool_ptr needed for getting each thread id    
-    DeconvOneSpPtr deconv_ptr = std::make_shared<DeconvOneSp>(env_ptr_new, dp_ptr_new);
+    DeconvOneSpPtr deconv_ptr = std::make_shared<DeconvOneSp>(env_ptr_new, dp_ptr_new, topfd_ptr_new);
 
     if (ms_group_ptr != nullptr) {
       //check if the voltage from this msgroup is new or not to determine whether to create a new set of writer vectors

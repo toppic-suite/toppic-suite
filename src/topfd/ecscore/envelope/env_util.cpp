@@ -76,7 +76,7 @@ SeedEnvelopePtr getHalfChargeEnv(SeedEnvelopePtr seed_ptr,
     new_charge = new_charge + 1;
   double new_mass = peak_util::compPeakNeutralMass(mz, new_charge);
   // get a reference distribution based on the base mass
-  EnvelopePtr ref_env_ptr = EnvBase::getStaticEnvByMonoMass(new_mass);
+  EnvelopePtr ref_env_ptr = EnvBase::getEnvByMonoMass(new_mass);
   if (ref_env_ptr == nullptr) return nullptr; 
   EnvelopePtr theo_env_ptr = ref_env_ptr->distrToTheoMono(mz, new_charge);
   std::vector<double> env_peaks_mz, env_peaks_inte;

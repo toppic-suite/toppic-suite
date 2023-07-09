@@ -20,7 +20,7 @@
 namespace toppic {
 
 EnvelopePtr getTheoEnv(double mono_mass, int charge) {
-  EnvelopePtr ref_env_ptr = toppic::EnvBase::getStaticEnvByMonoMass(mono_mass);
+  EnvelopePtr ref_env_ptr = toppic::EnvBase::getEnvByMonoMass(mono_mass);
   if (ref_env_ptr == nullptr) {
     return nullptr;
   }

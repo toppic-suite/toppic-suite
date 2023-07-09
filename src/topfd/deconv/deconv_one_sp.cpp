@@ -25,23 +25,20 @@
 #include "topfd/spec/deconv_data_util.hpp"
 #include "topfd/dp/co_table.hpp"
 #include "topfd/dp/dp_a.hpp"
-//#include "topfd/envcnn/env_cnn.hpp" 
 #include "topfd/envcnn/onnx_env_cnn.hpp" 
 #include "topfd/deconv/deconv_one_sp.hpp"
-
-//#include "ms/env/env_rescore.hpp"
 
 namespace toppic {
 
 void DeconvOneSp::setData(PeakPtrVec &peak_list) {
-  data_ptr_ = deconv_data_util::getDataPtr(peak_list, env_para_ptr_->max_mass_,
-                                           env_para_ptr_->max_charge_, env_para_ptr_->window_size_);
+  data_ptr_ = deconv_data_util::getDataPtr(peak_list, topfd_para_ptr_->getMaxMass(),
+                                           topfd_para_ptr_->getMaxCharge(), topfd_para_ptr_->getPrecWindow());
 }
 
 void DeconvOneSp::setData(PeakPtrVec &peak_list, double spec_max_mass, int spec_max_charge) {
   data_ptr_ = deconv_data_util::getDataPtr(peak_list, spec_max_mass, spec_max_charge, 
-                                           env_para_ptr_->max_mass_, env_para_ptr_->max_charge_,
-                                           env_para_ptr_->window_size_);
+                                           topfd_para_ptr_->getMaxMass(), topfd_para_ptr_->getMaxCharge(),
+                                           topfd_para_ptr_->getDpWindowSize());
 }
 
 void DeconvOneSp::run() {
@@ -54,10 +51,12 @@ void DeconvOneSp::run() {
   LOG_DEBUG("preprocess complete");
   // envelope detection
   PeakPtrVec peak_list = data_ptr_->getPeakList();
-  MatchEnvPtr2D cand_envs = env_detect::getCandidate(peak_list, 
-                                                     data_ptr_->getMaxCharge(),
-                                                     data_ptr_->getMaxMass(),
-                                                     env_para_ptr_);
+  MatchEnvPtr2D cand_envs = env_detect::getCandidateEnv(peak_list, 
+                                                        data_ptr_->getMaxCharge(),
+                                                        data_ptr_->getMaxMass(),
+                                                        data_ptr_->getMinInte(), 
+                                                        data_ptr_->getMinRefInte(),
+                                                        env_para_ptr_);
   LOG_DEBUG("candidate complete");
   // envelope filter
   env_filter::filter(cand_envs, peak_list, env_para_ptr_);
@@ -67,8 +66,8 @@ void DeconvOneSp::run() {
   //}
   // assign envelopes to 1 Da windows
   MatchEnvPtr2D win_envs = env_assign::assignWinEnv(cand_envs, data_ptr_->getWinNum(),
-                                                   data_ptr_->getWinIdVec(),
-                                                   env_para_ptr_->env_num_per_window_);
+                                                    data_ptr_->getWinIdVec(),
+                                                    topfd_para_ptr_->getEnvNumPerWin());
 
   // prepare table for dp
   if (dp_para_ptr_->check_double_increase_) {
@@ -78,22 +77,31 @@ void DeconvOneSp::run() {
   }
   // dp
   LOG_DEBUG("Generating Graph and DP...");
-  DpA dp(data_ptr_, win_envs, dp_para_ptr_, env_para_ptr_->score_error_tolerance_);
+  DpA dp(data_ptr_, win_envs, dp_para_ptr_, env_para_ptr_->getScoreErrorTolerance());
   MatchEnvPtrVec dp_envs = dp.getResult();
 
   result_envs_ = postprocess(dp_envs);
 }
 
 void DeconvOneSp::preprocess() {
-  if (env_para_ptr_->estimate_min_inte_) {
+  double min_inte = 0;
+  double min_ref_inte = 0;
+  if (topfd_para_ptr_->isEstimateMinInte()) {
     PeakPtrVec peak_list = data_ptr_->getPeakList();
     std::vector<double> intes;
     for (size_t i = 0; i < peak_list.size(); i++) {
       intes.push_back(peak_list[i]->getIntensity());
     }
-    double min_inte = baseline_util::getBaseLine(intes);
-    env_para_ptr_->setMinInte(min_inte, ms_level_);
+    min_inte = baseline_util::getBaseLine(intes);
+    if (ms_level_ == 1) {
+      min_ref_inte = min_inte * topfd_para_ptr_->getMsOneSnRatio();
+    }
+    else {
+      min_ref_inte = min_inte * topfd_para_ptr_->getMsTwoSnRatio();
+    }
   }
+  data_ptr_->setMinInte(min_inte); 
+  data_ptr_->setMinRefInte(min_ref_inte);
 }
 
 MatchEnvPtrVec DeconvOneSp::postprocess(MatchEnvPtrVec &dp_envs) {
@@ -101,42 +109,42 @@ MatchEnvPtrVec DeconvOneSp::postprocess(MatchEnvPtrVec &dp_envs) {
   PeakPtrVec peak_list = data_ptr_->getPeakList();
   match_env_util::assignIntensity(peak_list, dp_envs);
   // refinement
-  if (!env_para_ptr_->output_multiple_mass_) {
+  if (!topfd_para_ptr_->isOutputMultipleMass()) {
     match_env_refine::mzRefine(dp_envs);
   }
 
   // Obtain EnvCNN Prediction Score for MS/MS envelopes
-  if (env_para_ptr_->use_env_cnn_ && ms_level_ != 1){
+  if (topfd_para_ptr_->isUseEnvCnn() && ms_level_ != 1){
     //env_cnn::computeEnvScores(dp_envs, peak_list);
     onnx_env_cnn::computeEnvScores(peak_list, dp_envs); 
     std::sort(dp_envs.begin(), dp_envs.end(), MatchEnv::cmpEnvcnnScoreDec);
   }
 
   // filtering
-  if (env_para_ptr_->do_final_filtering_) {
+  if (topfd_para_ptr_->isDoFinalFiltering()) {
     result_envs_ = match_env_filter::filter(dp_envs, data_ptr_->getMaxMass(),
-                                            env_para_ptr_);
+                                            topfd_para_ptr_->isUseEnvCnn(), env_para_ptr_);
   }
   else {
     result_envs_ = dp_envs;
   }
-  if (env_para_ptr_->keep_unused_peaks_) {
+  if (topfd_para_ptr_->isKeepUnusedPeaks()) {
     match_env_util::addUnusedMasses(result_envs_, peak_list, env_para_ptr_->getMzTolerance());
   }
   // reassign intensity
   match_env_util::assignIntensity(peak_list, result_envs_);
 
-  if (env_para_ptr_->output_multiple_mass_) {
+  if (topfd_para_ptr_->isOutputMultipleMass()) {
     // envelope detection
     PeakPtrVec peak_list = data_ptr_->getPeakList();
-    MatchEnvPtr2D cand_envs = env_detect::getCandidate(peak_list, data_ptr_->getMaxCharge(), 
-                                                       data_ptr_->getMaxMass(), env_para_ptr_);
+    MatchEnvPtr2D cand_envs = env_detect::getCandidateEnv(peak_list, data_ptr_->getMaxCharge(), 
+                                                          data_ptr_->getMaxMass(), 
+                                                          data_ptr_->getMinInte(), 
+                                                          data_ptr_->getMinRefInte(),
+                                                          env_para_ptr_);
     // envelope filter
     env_filter::multipleMassFilter(cand_envs, env_para_ptr_);
-    result_envs_ = match_env_util::addMultipleMass(result_envs_, cand_envs,
-                                                   env_para_ptr_->multiple_min_mass_,
-                                                   env_para_ptr_->multiple_min_charge_,
-                                                   env_para_ptr_->multiple_min_ratio_);
+    result_envs_ = match_env_util::addMultipleMass(result_envs_, cand_envs, env_para_ptr_);
   }
 
   return result_envs_;

@@ -37,9 +37,9 @@ void mzRefine(MatchEnvPtr env) {
   double prev_mz = cur_mz - 1.0 / charge;
   double next_mz = cur_mz + 1.0 / charge;
   // check if the mass is greater than the precursor mass
-  double bass_mass = cur_mz * charge - charge * mass_constant::getProtonMass();
-  // get a reference distribution based on the base mass
-  EnvelopePtr refer_env = EnvBase::getStaticEnvByBaseMass(bass_mass);
+  double ref_mass = cur_mz * charge - charge * mass_constant::getProtonMass();
+  // get a reference distribution based on the reference mass
+  EnvelopePtr refer_env = EnvBase::getEnvByRefMass(ref_mass);
   /* add one zeros at both sides of the envelope */
   EnvelopePtr ext_refer_env = refer_env->addZero(1);
 
@@ -47,13 +47,13 @@ void mzRefine(MatchEnvPtr env) {
   // based on the base mz and charge state
   int max_back_peak_num = real_env->getReferIdx();
   int max_forw_peak_num = real_env->getPeakNum() - real_env->getReferIdx() - 1;
-  EnvelopePtr theo_env = ext_refer_env->distrToTheoBase(cur_mz, charge);
+  EnvelopePtr theo_env = ext_refer_env->distrToTheoRef(cur_mz, charge);
   double max_inte = theo_env->getReferIntensity();
   theo_env->changeIntensity(1.0 / max_inte);
 
   EnvelopePtr cur_env = theo_env->getSubEnv(max_back_peak_num, max_forw_peak_num);
 
-  theo_env = ext_refer_env->distrToTheoBase(prev_mz, charge);
+  theo_env = ext_refer_env->distrToTheoRef(prev_mz, charge);
   max_inte = theo_env->getReferIntensity();
   theo_env->changeIntensity(1.0 / max_inte);
   EnvelopePtr prev_env;
@@ -63,7 +63,7 @@ void mzRefine(MatchEnvPtr env) {
     prev_env = nullptr;
   }
 
-  theo_env = ext_refer_env->distrToTheoBase(next_mz, charge);
+  theo_env = ext_refer_env->distrToTheoRef(next_mz, charge);
   max_inte = theo_env->getReferIntensity();
   theo_env->changeIntensity(1.0 / max_inte);
 

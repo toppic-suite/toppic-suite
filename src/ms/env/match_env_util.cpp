@@ -139,7 +139,7 @@ MatchEnvPtr getNewMatchEnv(PeakPtrVec &ms, int idx, double tolerance) {
 }
 
 MatchEnvPtrVec addMultipleMass(MatchEnvPtrVec &envs, MatchEnvPtr2D &candidates,
-                               double multi_min_mass, int multi_min_charge, double min_ratio) {
+                               EnvParaPtr env_para_ptr) {
   MatchEnvPtrVec mass_envs;
   for (size_t i = 0; i < envs.size(); i++) {
     // check if we can use another charge state
@@ -149,8 +149,8 @@ MatchEnvPtrVec addMultipleMass(MatchEnvPtrVec &envs, MatchEnvPtr2D &candidates,
     // we use non-overlapping envelopes here
     // Current charge stored in [ref_peak][charge-1]
     charge_envs[0] = candidates[refer_peak][charge-1];
-    double min_score = charge_envs[0]->getMsdeconvScore() * min_ratio;
-    if (charge >= multi_min_charge) {
+    double min_score = charge_envs[0]->getMsdeconvScore() * env_para_ptr->multiple_min_ratio_;
+    if (charge >= env_para_ptr->multiple_min_charge_) {
       double score_minus_one  = 0;
       // Envelope for charge - 1
       if (charge > 1 && candidates[refer_peak][charge-2] != nullptr) {
@@ -175,7 +175,7 @@ MatchEnvPtrVec addMultipleMass(MatchEnvPtrVec &envs, MatchEnvPtr2D &candidates,
       double mono_mass = charge_envs[j]->getRealEnvPtr()->getMonoNeutralMass();
       RealEnvPtr real_env_ptr = charge_envs[j]->getRealEnvPtr();
       int refer_idx = real_env_ptr->getReferIdx();
-      if (mono_mass >= multi_min_mass) {
+      if (mono_mass >= env_para_ptr->multiple_min_mass_) {
         // check left -1 Dalton
         if (refer_idx > 0) {
           int p = real_env_ptr->getPeakIdx(refer_idx-1);

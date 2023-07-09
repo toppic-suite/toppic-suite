@@ -59,10 +59,6 @@ Envelope::Envelope(int refer_idx, int charge, double mono_mz,
       }
     }
 
-int Envelope::getLabel(int i) {
-  return (int)std::round((peaks_[i]->getPosition() - mono_mz_) * charge_);
-}
-
 EnvelopePtr Envelope::convertToTheo(double mass_diff, int new_charge) {
   int ori_charge = 1;
   double new_mono_mz = (mono_mz_ * ori_charge + mass_diff) / new_charge;
@@ -76,9 +72,9 @@ EnvelopePtr Envelope::convertToTheo(double mass_diff, int new_charge) {
 }
 
 // Convert a theoretical distribution to a theoretical envelope
-EnvelopePtr Envelope::distrToTheoBase(double new_base_mz, int new_charge) {
+EnvelopePtr Envelope::distrToTheoRef(double new_ref_mz, int new_charge) {
   int ori_charge = 1;
-  double mass_diff = new_base_mz * new_charge - peaks_[refer_idx_]->getPosition() * ori_charge;
+  double mass_diff = new_ref_mz * new_charge - peaks_[refer_idx_]->getPosition() * ori_charge;
   return convertToTheo(mass_diff, new_charge);
 }
 
@@ -251,10 +247,6 @@ double Envelope::getAvgMz() {
   return sum / compIntensitySum();
 }
 
-double Envelope::getAvgNeutralMass() {
-  return getAvgMz() * charge_ - charge_ * mass_constant::getProtonMass();
-}
-
 int Envelope::getHighestPeakIdx() {
   return std::distance(peaks_.begin(), 
                        std::max_element(peaks_.begin(), peaks_.end(), EnvPeak::cmpInteInc)); 
@@ -266,14 +258,6 @@ std::vector<double> Envelope::getIntensities() {
     intensities.push_back(peaks_[i]->getIntensity());
   }
   return intensities;
-}
-
-double Envelope::getIntensitySum() {
-  double sum = 0.0;
-  for (size_t i = 0; i < peaks_.size(); i++) {
-    sum += peaks_[i]->getIntensity();
-  }
-  return sum;
 }
 
 void Envelope::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {

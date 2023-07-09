@@ -28,19 +28,16 @@ class EnvBase {
  public:
   EnvBase(std::string file_name_, int entry_num_, double mass_interval_);
 
-  void initBaseMassIdx();
-
-  std::vector<std::vector<double> > env_rescore_para_;
-
   static void initBase(const std::string &resouce_dir);
 
-  static EnvelopePtr getStaticEnvByMonoMass(double mass);
+  // All public functions are static 
+  static EnvelopePtr getEnvByMonoMass(double mass);
 
-  static EnvelopePtr getStaticEnvByBaseMass(double mass);
+  static EnvelopePtr getEnvByRefMass(double mass);
 
   static double convertMonoMassToAvgMass(double mass);
 
-  static double convertBaseMassToMonoMass(double mass); 
+  static double convertRefMassToMonoMass(double mass); 
 
  private:
   // number of distribution entries 
@@ -49,12 +46,8 @@ class EnvBase {
   double mass_interval_;
   // the list of distribution envelopes 
   EnvelopePtrVec envs_;
-  // mapping distribution envelopes to the mass value of base peak 
-  std::vector<int> base_mass_idxes_;
-
-  EnvelopePtr getEnvByMonoMass(double mass);
-
-  EnvelopePtr getEnvByBaseMass(double mass);
+  // mapping distribution envelopes to the mass value of reference peak (highest intensity peak) 
+  std::vector<int> ref_mass_idxes_;
 
   static EnvBasePtr env_base_ptr_;
 
@@ -65,6 +58,14 @@ class EnvBase {
   static std::string getBaseDirName() {return "base_data";}
 
   static std::string getBaseFileName() {return "theo_patt.txt";}
+
+  void initRefMassIdx();
+  
+  // this is a private class method
+  EnvelopePtr getBaseEnvByMonoMass(double mass);
+
+  // get a envelope using the mass of the highest peak
+  EnvelopePtr getBaseEnvByRefMass(double mass);
 };
 
 }

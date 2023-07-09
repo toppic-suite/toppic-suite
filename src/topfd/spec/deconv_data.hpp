@@ -36,6 +36,10 @@ class DeconvData {
 
 	int getMaxCharge() {return max_charge_;}
 
+  double getMinInte() {return min_inte_;}
+
+  double getMinRefInte() {return min_ref_inte_;}
+
 	PeakPtrVec& getPeakList() {return peak_list_;}
 
   std::vector<int>& getWinIdVec() {return win_ids_;}
@@ -48,10 +52,17 @@ class DeconvData {
 
 	void setMaxMass(double mass) {max_mass_ = mass;}
 
+  void setMinInte(double min_inte) {min_inte_ = min_inte;}
+
+  void setMinRefInte(double min_ref_inte) {min_ref_inte_ = min_ref_inte;}
+
  private:
 	PeakPtrVec peak_list_;
   double max_mass_;
 	int max_charge_;
+
+  double min_inte_;
+  double min_ref_inte_;
 
 	// the number of windows 
   int win_num_;

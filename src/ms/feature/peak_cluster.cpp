@@ -262,7 +262,7 @@ void PeakCluster::updateScore(PeakPtrVec2D &raw_peaks, bool check_pvalue) {
 
   for (int i = 0; i < row_num; i++) {
     int charge = i + min_charge_;
-    double ref_neutral_mass = theo_env_->getRefNeutralMass();
+    double ref_neutral_mass = theo_env_->getReferNeutralMass();
     double ref_mz = peak_util::compMz(ref_neutral_mass, charge); 
     std::fill(summed_intensities.begin(), summed_intensities.end(), 0.0);
 
@@ -293,7 +293,7 @@ void PeakCluster::updateScore(PeakPtrVec2D &raw_peaks, bool check_pvalue) {
         summed_iso_high_inte += env->getIntensity(ref_idx);
         summed_win_high_inte += win_high_inte;
       }
-      double env_inte_sum = env->getIntensitySum();
+      double env_inte_sum = env->compIntensitySum();
       inte_distr_[charge_idx] += env_inte_sum; 
 
       std::vector<double> real_intensities = env->getIntensities();

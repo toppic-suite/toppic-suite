@@ -21,11 +21,12 @@ namespace toppic {
 namespace env_assign {
 
 MatchEnvPtr2D assignWinEnv(MatchEnvPtr2D &match_envs, int win_num, 
-                           const std::vector<int> &win_ids, int env_num_per_win) {
+                           const std::vector<int> &win_ids, 
+                           int env_num_per_win) {
   MatchEnvPtr2D env_list(win_num);
-  // add matchenv to the list */
+  // add matchenv to the list 
   for (size_t i = 0; i < match_envs.size(); i++) {
-    // i is peak idx 
+    // i is peak index
     int win_id = win_ids[i];
     for (size_t j = 0; j < match_envs[i].size(); j++) {
       if (match_envs[i][j] != nullptr) {

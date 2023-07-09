@@ -22,7 +22,7 @@ namespace toppic {
 
 namespace match_env_filter {
   MatchEnvPtrVec filter(MatchEnvPtrVec &ori_envs, double prec_mass, 
-                        EnvParaPtr env_para_ptr);
+                        bool use_env_enn, EnvParaPtr env_para_ptr);
 }
 
 }

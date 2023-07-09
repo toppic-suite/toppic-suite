@@ -24,8 +24,10 @@ namespace toppic {
 
 class DeconvOneSp {
  public:
-  explicit DeconvOneSp(EnvParaPtr env_para_ptr, DpParaPtr dp_para_ptr):
-            env_para_ptr_(env_para_ptr), dp_para_ptr_(dp_para_ptr) {}
+  explicit DeconvOneSp(EnvParaPtr env_para_ptr, DpParaPtr dp_para_ptr,
+                       TopfdParaPtr topfd_para_ptr):
+            env_para_ptr_(env_para_ptr), dp_para_ptr_(dp_para_ptr),
+            topfd_para_ptr_(topfd_para_ptr) {}
   
   void setData(PeakPtrVec &peak_list);
 
@@ -43,10 +45,12 @@ class DeconvOneSp {
 
   EnvParaPtr getEnvParaPtr(){return env_para_ptr_;}
   DpParaPtr getDpParaPtr(){return dp_para_ptr_;}
+  TopfdParaPtr getTopfdParaPtr() {return topfd_para_ptr_;}
 
  private:
   EnvParaPtr env_para_ptr_;
   DpParaPtr dp_para_ptr_;
+  TopfdParaPtr topfd_para_ptr_;
   DeconvDataPtr data_ptr_;
   MatchEnvPtrVec result_envs_;
   int ms_level_;

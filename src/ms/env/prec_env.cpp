@@ -34,13 +34,10 @@ const int PRECURSOR_TOP_PEAK_NUM = 20;
 
 EnvParaPtr initMngPtr() {
   EnvParaPtr env_para_ptr = std::make_shared<EnvPara>();
-  env_para_ptr->min_refer_inte_ = 0;
-  env_para_ptr->min_inte_ = 0;
   env_para_ptr->max_miss_peak_num_ = 3;
   std::vector<int> num = {1, 1, 1};
   env_para_ptr->min_match_peak_num_ = num;
   env_para_ptr->min_consecutive_peak_num_ = num;
-  //env_para_ptr->prec_deconv_interval_ = prec_win_size;
   return env_para_ptr;
 }
 
@@ -117,7 +114,8 @@ double initMinInte(PeakPtrVec &peak_list,
 
 MatchEnvPtr2D initMatchEnv(EnvParaPtr env_para_ptr, PeakPtrVec &peak_list,
                            PeakIntv peak_intv, int peak_num, 
-                           int max_charge, double min_inte) {
+                           double argu_max_mass, int max_charge, 
+                           double min_inte, double min_ref_inte) {
   MatchEnvPtr2D result;
   for (int idx = peak_intv.bgn; idx <= peak_intv.end; idx++) {
     MatchEnvPtrVec env_ptrs(max_charge);
@@ -125,13 +123,15 @@ MatchEnvPtr2D initMatchEnv(EnvParaPtr env_para_ptr, PeakPtrVec &peak_list,
       for (int charge = 1; charge <= max_charge; charge++) {
         double max_mass = peak_list[idx]->getPosition() * charge + 1;
         MatchEnvPtr env_ptr;
-        if (max_mass > env_para_ptr->max_mass_) {
-          max_mass = env_para_ptr->max_mass_;
+        if (max_mass > argu_max_mass) {
+          max_mass = argu_max_mass;
         } else {
-          env_ptr  = env_detect::detectEnv(peak_list, idx, charge, max_mass, env_para_ptr);
+          env_ptr  = env_detect::detectEnvByRefPeak(peak_list, idx, charge, 
+                                                    max_mass, min_inte, min_ref_inte, 
+                                                    env_para_ptr);
         }
         if (env_ptr != nullptr) {
-          if (!env_filter::testRealEnvValid(env_ptr, env_para_ptr)) {
+          if (!env_filter::checkRealEnvValid(env_ptr, env_para_ptr)) {
             env_ptr = nullptr;
           } else {
             env_ptr->compMsdeconvScr(env_para_ptr);
@@ -162,7 +162,7 @@ MatchEnvPtr findBest(MatchEnvPtr2D &env_ptrs, double max_mass) {
 }
 
 MatchEnvPtr deconv(double prec_win_begin, double prec_win_end, PeakPtrVec &peak_list,
-                   double max_mass, int argu_max_charge) {
+                   double argu_max_mass, int argu_max_charge) {
   if (prec_win_begin <= 0) {
     return nullptr;
   }
@@ -173,13 +173,14 @@ MatchEnvPtr deconv(double prec_win_begin, double prec_win_end, PeakPtrVec &peak_
     return nullptr;
   }
   int max_charge = initMaxChrg(peak_list, peak_intv, argu_max_charge);
-  //double min_inte = initMinInte(peak_list, peak_intv);
   double min_inte = 0;
+  double min_ref_inte = 0;
   LOG_DEBUG("Calcate match envelopes...");
   MatchEnvPtr2D match_envs = initMatchEnv(env_para_ptr, peak_list, peak_intv,
-                                          peak_num, max_charge, min_inte);
+                                          peak_num, argu_max_mass, max_charge, min_inte, 
+                                          min_ref_inte);
   LOG_DEBUG("Do filtering...");
-  MatchEnvPtr env_ptr = findBest(match_envs, max_mass);
+  MatchEnvPtr env_ptr = findBest(match_envs, argu_max_mass);
   return env_ptr;
 }
 

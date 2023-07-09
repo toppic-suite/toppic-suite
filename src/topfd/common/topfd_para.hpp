@@ -33,6 +33,9 @@ class TopfdPara {
   int getMaxCharge() {return max_charge_;}
   double getMaxMass() {return max_mass_;}
   double getMzError() {return mz_error_;}
+  double getDpWindowSize() {return dp_window_size_;}
+  double getEnvNumPerWin() {return env_num_per_win_;}
+  bool isEstimateMinInte() {return estimate_min_inte_;}
   double getMsOneSnRatio() {return ms_one_sn_ratio_;}
   double getMsTwoSnRatio() {return ms_two_sn_ratio_;}
   double getPrecWindow() {return prec_window_;}
@@ -65,17 +68,28 @@ class TopfdPara {
   void setMs1ScanNumber(int ms1_scan_num) {ms_1_scan_num_ = ms1_scan_num;}
   void setMs2ScanNumber(int ms2_scan_num) {ms_2_scan_num_ = ms2_scan_num;}
 
+
  private:
   std::string exe_dir_;
   std::string resource_dir_;
-  bool refine_prec_mass_ = true;
-  bool missing_level_one_ = false;
   int max_charge_ = 30;
   double max_mass_ = 70000;
+  //dynamic programming window size
+  double dp_window_size_ = 1.0;
+  // Envelope assigned to 1 m/z intervals
+  // number of envelopes per window 
+  // use a small number of envelopes to speed up computation
+  int env_num_per_win_ = 5;
+  // estimate min intensity using thrash method. 
+  bool estimate_min_inte_ = true;
+
+  double prec_window_ = 3.0;
+
+  bool refine_prec_mass_ = true;
+  bool missing_level_one_ = false;
   double mz_error_ = 0.02;
   double ms_one_sn_ratio_ = 3.0;
   double ms_two_sn_ratio_ = 1.0;
-  double prec_window_ = 3.0;
   bool keep_unused_peaks_ = false;
   bool use_env_cnn_ = false;
   bool output_multiple_mass_ = false;

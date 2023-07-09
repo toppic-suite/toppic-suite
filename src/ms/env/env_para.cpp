@@ -17,28 +17,9 @@
 
 namespace toppic {
 
-EnvPara::EnvPara(TopfdParaPtr topfd_para_ptr) { 
-  max_charge_ = topfd_para_ptr->getMaxCharge(); 
-  max_mass_ = topfd_para_ptr->getMaxMass(); 
-  double tolerance = topfd_para_ptr->getMzError();
-  setTolerance(tolerance);
-  ms_two_sn_ratio_ = topfd_para_ptr->getMsTwoSnRatio();
-  ms_one_sn_ratio_ = topfd_para_ptr->getMsOneSnRatio();
-  keep_unused_peaks_ = topfd_para_ptr->isKeepUnusedPeaks();
-  output_multiple_mass_ = topfd_para_ptr->isOutputMultipleMass();
-  prec_deconv_interval_ = topfd_para_ptr->getPrecWindow(); 
-  do_final_filtering_ = topfd_para_ptr->isDoFinalFiltering();
-  use_env_cnn_ = topfd_para_ptr->isUseEnvCnn();
-}
-
-void EnvPara::setMinInte(double min_inte, int ms_level) {
-  min_inte_ = min_inte;
-  if (ms_level == 1) {
-    min_refer_inte_ = min_inte * ms_one_sn_ratio_;
-  }
-  else {
-    min_refer_inte_ = min_inte * ms_two_sn_ratio_;
-  }
+EnvPara::EnvPara(double mz_tolerance) {
+  mz_tolerance_ = mz_tolerance; 
+  score_error_tolerance_ = mz_tolerance; 
 }
 
 // get the mass group based on mass value 
@@ -61,26 +42,5 @@ int EnvPara::compMinConsPeakNum(int peak_num, int mass_group) {
   }
   return min_cons_peak_num;
 }
-
-void EnvPara::setTolerance(double tolerance) {
-  mz_tolerance_ = tolerance;
-  score_error_tolerance_ = tolerance; 
-}
-
-  /*  
-  env_rescore_para_file_name_ = resource_dir + env_rescore_para_file_name_;
-  std::ifstream infile(env_rescore_para_file_name_);
-  std::string line;
-  while (std::getline(infile, line)) {
-    //boost::split(strs, line, boost::is_any_of("\t"));
-    std::vector<std::string> strs = str_util::split(line, "\t");
-    std::vector<double> scr;
-    for (size_t i = 0; i < strs.size(); i++) {
-      scr.push_back(std::stod(strs[i]));
-    }
-    env_rescore_para_.push_back(scr);
-  }
-  infile.close();
-  */
 
 }

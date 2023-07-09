@@ -359,7 +359,7 @@ void removePeaks (DeconvMsPtrVec &ms1_ptr_vec, DeconvPeakPtrVec &matched_peaks) 
 MatchEnvPtr getMatchEnv(const PeakPtrVec &peak_list, int sp_id, double mono_neutral_mass, int charge,
                         EnvParaPtr env_para_ptr) {
 
-  EnvelopePtr ref_env = EnvBase::getStaticEnvByMonoMass(mono_neutral_mass);
+  EnvelopePtr ref_env = EnvBase::getEnvByMonoMass(mono_neutral_mass);
   if (ref_env == nullptr) {
     LOG_ERROR("reference envelope is null");
     exit(EXIT_FAILURE);
@@ -577,6 +577,7 @@ void process(int frac_id, const std::string &sp_file_name,
   //logger::setLogLevel(2);
   FeatureParaPtr para_ptr 
       = std::make_shared<FeaturePara>(frac_id, sp_file_name, resource_dir);
+  TopfdParaPtr topfd_para_ptr = std::make_shared<TopfdPara>();
   EnvParaPtr env_para_ptr = std::make_shared<EnvPara>();
   std::string base_name = file_util::basename(sp_file_name);
   // read ms1 deconvoluted spectra
@@ -591,7 +592,7 @@ void process(int frac_id, const std::string &sp_file_name,
       double cur_voltage = voltage_vec[i].first;//if this is -1, it is non-FAIME data
       PeakPtrVec2D raw_peaks; 
       RawMsReaderPtr raw_reader_ptr = std::make_shared<RawMsReader>(sp_file_name, activation, 
-                                                                    env_para_ptr->prec_deconv_interval_);
+                                                                    topfd_para_ptr->getPrecWindow());
       raw_reader_ptr->getMs1Peaks(raw_peaks, cur_voltage);
       raw_reader_ptr = nullptr;
       findMsOneFeatures(ms1_ptr_vec, raw_peaks, para_ptr, frac_features, env_para_ptr);

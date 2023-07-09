@@ -22,7 +22,8 @@ namespace toppic {
 namespace env_assign {
 
 MatchEnvPtr2D assignWinEnv(MatchEnvPtr2D &match_envs, int win_num, 
-                           const std::vector<int> &win_ids, int env_num_per_win);
+                           const std::vector<int> &win_ids, 
+                           int env_num_per_win);
 };
 
 }

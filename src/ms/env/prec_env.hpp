@@ -22,7 +22,7 @@ namespace toppic {
 namespace prec_env {
 
 MatchEnvPtr deconv(double prec_win_begin, double prec_win_end, PeakPtrVec &peak_list, 
-                   double max_mass, int argu_max_charge);
+                   double argu_max_mass, int argu_max_charge);
 
 }  // namespace prec_env
 
