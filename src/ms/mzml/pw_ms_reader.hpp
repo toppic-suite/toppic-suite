@@ -12,9 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#ifndef TOPPIC_TOPFD_MSREADER_PW_MS_READER_HPP_
-#define TOPPIC_TOPFD_MSREADER_PW_MS_READER_HPP_
+#ifndef TOPPIC_MS_MZML_PW_MS_READER_HPP_
+#define TOPPIC_MZ_MZML_PW_MS_READER_HPP_
 
 #include <memory>
 #include <string>

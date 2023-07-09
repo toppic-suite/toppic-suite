@@ -16,9 +16,9 @@
 #ifndef TOPPIC_TOPFD_MSREADER_RAW_MS_READER_HPP_
 #define TOPPIC_TOPFD_MSREADER_RAW_MS_READER_HPP_
 
-#include "ms/mzml/mzml_ms.hpp"
 #include "ms/spec/deconv_ms.hpp"
-#include "topfd/msreader/pw_ms_reader.hpp"
+#include "ms/mzml/mzml_ms.hpp"
+#include "ms/mzml/pw_ms_reader.hpp"
 
 namespace toppic {
 
