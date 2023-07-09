@@ -42,7 +42,6 @@ PwMsReader::PwMsReader(const std::string & file_name,
 void PwMsReader::init(const std::string & file_name) {
   file_name_ = file_name;
   input_sp_id_ = 0;
-  output_sp_id_ = 0;
   msd_ptr_ = std::make_shared<pwiz::msdata::MSDataFile>(file_name, &readers_);
   spec_list_ptr_ =  msd_ptr_->run.spectrumListPtr;
   input_sp_num_ = spec_list_ptr_->size();
@@ -74,6 +73,13 @@ bool PwMsReader::checkCentroidData() {
     }
   }
   return false;
+}
+
+void PwMsReader::resetIndexes() {
+  input_sp_id_ = 0;
+  ms1_cnt_ = 0;
+  ms2_cnt_ = 0;
+  prev_ms1_scan_id_ = -1;
 }
 
 int PwMsReader::parseNum(std::string &id, int default_scan) {
@@ -128,33 +134,8 @@ PeakPtrVec PwMsReader::parsePeaks(pwiz::msdata::SpectrumPtr cur_spec_ptr) {
 void PwMsReader::parsePrecursor(MsHeaderPtr header_ptr, 
                                 pwiz::msdata::SpectrumInfo &spec_info,
                                 pwiz::msdata::SpectrumPtr cur_spec_ptr) {
-  // precursor information
-  int prec_id = 0;
-  double prec_mz = 0;
-  int prec_charge = 1;
-  double prec_inte = 0.0;
-  double prec_scan_num = -1;
-  double apex_time = spec_info.retentionTime;
-  if (spec_info.precursors.size() > 0) {
-    prec_mz = spec_info.precursors[0].mz;
-    prec_charge = static_cast<int>(spec_info.precursors[0].charge);
-    prec_inte = spec_info.precursors[0].intensity;
-    if (prec_mz < 0) {prec_mz = 0;}
-    if (prec_charge  < 0) {prec_charge = 1;}
-    if (prec_inte < 0) {prec_inte = 0.0;}
-    //get precursor scan ID from mzML
-    prec_scan_num = parseNum(cur_spec_ptr->precursors[0].spectrumID, prev_ms1_scan_id_);
-  }
-  // precursor mz in mzML data
-  PrecursorPtr prec_ptr = std::make_shared<Precursor>(prec_id, prec_mz,
-                                                      prec_charge, prec_inte,
-                                                      apex_time);
-  header_ptr->setSinglePrecPtr(prec_ptr);
-  header_ptr->setMsOneScan(prec_scan_num);
-  LOG_DEBUG("Precursor m/z " << prec_mz);
-
   // isolation window default values
-  double prec_target_mz = prec_mz;
+  double prec_target_mz = 0;
   double isolation_lower_offset = isolation_window_ / 2;
   double isolation_upper_offset = isolation_window_/ 2;
   if (cur_spec_ptr->precursors.size() > 0) {
@@ -177,6 +158,32 @@ void PwMsReader::parsePrecursor(MsHeaderPtr header_ptr,
   header_ptr->setPrecTargetMz(prec_target_mz);
   header_ptr->setPrecWinBegin(prec_target_mz - isolation_lower_offset);
   header_ptr->setPrecWinEnd(prec_target_mz + isolation_upper_offset);
+
+  // precursor information
+  int prec_id = 0;
+  double prec_mz = prec_target_mz;
+  int prec_charge = 1;
+  double prec_inte = 0.0;
+  double prec_scan_num = -1;
+  double apex_time = spec_info.retentionTime;
+  if (spec_info.precursors.size() > 0) {
+    prec_mz = spec_info.precursors[0].mz;
+    prec_charge = static_cast<int>(spec_info.precursors[0].charge);
+    prec_inte = spec_info.precursors[0].intensity;
+    if (prec_mz < 0) {prec_mz = 0;}
+    if (prec_charge  < 0) {prec_charge = 1;}
+    if (prec_inte < 0) {prec_inte = 0.0;}
+    //get precursor scan ID from mzML
+    prec_scan_num = parseNum(cur_spec_ptr->precursors[0].spectrumID, prev_ms1_scan_id_);
+  }
+  // precursor mz in mzML data
+  PrecursorPtr prec_ptr = std::make_shared<Precursor>(prec_id, prec_mz,
+                                                      prec_charge, prec_inte,
+                                                      apex_time);
+  header_ptr->setSinglePrecPtr(prec_ptr);
+  header_ptr->setMsOneScan(prec_scan_num);
+  LOG_DEBUG("Precursor m/z " << prec_mz);
+
 }
 
 void PwMsReader::parseActivation(MsHeaderPtr header_ptr, 
@@ -325,5 +332,21 @@ std::vector<double> PwMsReader::readFaimsVoltageList() {
   std::sort(volt_vec.begin(),volt_vec.end());
   return volt_vec;
 }
+
+int PwMsReader::cntMsOneSpectra() {
+  int cnt = 0;
+  bool get_binary_data = false;
+  for (int sp_id = 0; sp_id < input_sp_num_; sp_id++) {
+    pwiz::msdata::SpectrumPtr cur_spec_ptr = spec_list_ptr_->spectrum(sp_id, get_binary_data);
+    if (cur_spec_ptr == nullptr) {continue;}
+    pwiz::msdata::SpectrumInfo spec_info(*cur_spec_ptr);
+    int ms_level = spec_info.msLevel;
+    if (ms_level == 1) {
+      cnt++;
+    }
+  }
+  return cnt;
+}
+
 
 }  // namespace toppic

@@ -25,25 +25,28 @@ namespace toppic {
 class RawMsReader {
  public:
   RawMsReader(const std::string & file_name, double isolation_window);
-  RawMsReader(const std::string & file_name, const std::string & activation,
+
+  RawMsReader(const std::string & file_name, 
+              const std::string & activation, 
               double isolation_window);
+
   MzmlMsPtr getNextMs(double max_mass, int max_charge);
-
-  void getMs1Peaks(PeakPtrVec2D &raw_peaks, double cur_voltage);
-
-  void refinePrecChrg(MzmlMsPtr ms_one, MzmlMsPtr ms_two, 
-                      double max_mass, int max_charge);
 
   int getInputSpNum() {return reader_ptr_->getInputSpNum();}
 
+  void getMs1Peaks(PeakPtrVec2D &raw_peaks, double voltage);
+
   void getMs1Map(DeconvMsPtrVec &ms1_ptr_vec, DeconvMsPtrVec &ms2_ptr_vec, 
                  PeakPtrVec2D &ms1_raw_peaks, std::vector<double> &ms2_prec_mzs); 
+
+  //void refinePrecChrg(MzmlMsPtr ms_one, MzmlMsPtr ms_two, 
+  //                    double max_mass, int max_charge);
 
  private:
   PwMsReaderPtr reader_ptr_;
   MzmlMsPtr ms_one_; 
 
-  bool do_refine_prec_mass_ = true;
+  //bool do_refine_prec_mass_ = true;
 
 };
 

@@ -44,17 +44,20 @@ class PwMsReader {
   bool checkCentroidData(); 
 
   std::vector<double> readFaimsVoltageList();
-  
+  int cntMsOneSpectra(); 
+
+  // reset indexes
+  void resetIndexes(); 
+
  private:
   std::string file_name_;
   std::string activation_;
   double isolation_window_;
-  int input_sp_num_;
-  int input_sp_id_;
-  int output_sp_id_;
   //functions for waters instrument is different from others 
   bool is_waters_instrument_ = false;
 
+  int input_sp_num_;
+  int input_sp_id_ = 0;
   int ms1_cnt_ = 0;
   int ms2_cnt_ = 0;
   int prev_ms1_scan_id_ = -1;

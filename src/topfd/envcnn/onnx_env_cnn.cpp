@@ -13,7 +13,6 @@
 //limitations under the License.
 
 #include <assert.h>
-
 #include <cstdlib>
 #include <algorithm>
 #include <iterator>

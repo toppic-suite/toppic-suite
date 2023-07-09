@@ -25,18 +25,19 @@ RawMsReader::RawMsReader(const std::string & file_name, double isolation_window)
   reader_ptr_ = std::make_shared<PwMsReader>(file_name, isolation_window);
 }
 
-RawMsReader::RawMsReader(const std::string & file_name, const std::string & activation,
+RawMsReader::RawMsReader(const std::string & file_name, 
+                         const std::string & activation, 
                          double isolation_window) {
   reader_ptr_ = std::make_shared<PwMsReader>(file_name, isolation_window, activation);
 }
 
 MzmlMsPtr RawMsReader::getNextMs(double max_mass, int max_charge) {
   reader_ptr_->readNext();
-  PeakPtrVec peak_list = reader_ptr_->getPeakList();
   MsHeaderPtr header_ptr = reader_ptr_->getHeaderPtr();
   if (header_ptr == nullptr) {
     return nullptr;
   }
+  PeakPtrVec peak_list = reader_ptr_->getPeakList();
   MzmlMsPtr ms_ptr = std::make_shared<Ms<PeakPtr> >(header_ptr, peak_list);
 
   // update ms_1 
@@ -47,19 +48,21 @@ MzmlMsPtr RawMsReader::getNextMs(double max_mass, int max_charge) {
     header_ptr->setMsOneId(ms_one_->getMsHeaderPtr()->getSpecId());
     header_ptr->setMsOneScan(ms_one_->getMsHeaderPtr()->getFirstScanNum());
   }
+  /*
   if (do_refine_prec_mass_ && header_ptr->getMsLevel() == 2 && ms_one_ != nullptr) {
     refinePrecChrg(ms_one_, ms_ptr, max_mass, max_charge);
   } 
-  else {
-    double target_mz = header_ptr->getPrecTargetMz();
-    if (target_mz != 0.0) {
-      int charge = header_ptr->getPrecCharge();
-      double target_mass = peak_util::compPeakNeutralMass(target_mz, charge);
-      double mono_mass = EnvBase::convertRefMassToMonoMass(target_mass);
-      double mono_mz = peak_util::compMz(mono_mass, charge);
-      header_ptr->getSinglePrecPtr()->setMonoMz(mono_mz); 
-    }
+  */
+  //else {
+  double target_mz = header_ptr->getPrecTargetMz();
+  if (target_mz != 0.0) {
+    int charge = header_ptr->getPrecCharge();
+    double target_mass = peak_util::compPeakNeutralMass(target_mz, charge);
+    double mono_mass = EnvBase::convertRefMassToMonoMass(target_mass);
+    double mono_mz = peak_util::compMz(mono_mass, charge);
+    header_ptr->getSinglePrecPtr()->setMonoMz(mono_mz); 
   }
+  //}
   return ms_ptr;
 }
 
@@ -78,33 +81,6 @@ void RawMsReader::getMs1Peaks(PeakPtrVec2D &raw_peaks, double cur_voltage) {
       PeakPtrVec peak_list = reader_ptr_->getPeakList();
       raw_peaks.push_back(peak_list);
     }
-  }
-}
-
-// refine precursor charge and mz 
-void RawMsReader::refinePrecChrg(MzmlMsPtr ms_one, MzmlMsPtr ms_two, 
-                                 double max_mass, int max_charge) {
-  MsHeaderPtr header_two = ms_two->getMsHeaderPtr();
-  double prec_win_begin = header_two->getPrecWinBegin();
-  double prec_win_end = header_two->getPrecWinEnd();
-  //int prec_charge = header_two->getPrecCharge();
-
-  PeakPtrVec peak_list = ms_one->getPeakPtrVec();
-  LOG_DEBUG("start refine precursor " << " peak num " << peak_list.size());
-  MatchEnvPtr match_env_ptr = prec_env::deconv(prec_win_begin, prec_win_end, peak_list, 
-                                               max_mass, max_charge);
-  PrecursorPtr prec_ptr = header_two->getSinglePrecPtr();
-  if (match_env_ptr != nullptr) {
-    RealEnvPtr env_ptr = match_env_ptr->getRealEnvPtr(); 
-    prec_ptr->setMonoMz(env_ptr->getMonoMz());
-    prec_ptr->setCharge(env_ptr->getCharge());
-    prec_ptr->setInte(env_ptr->compIntensitySum());
-    LOG_DEBUG("prec mz " << env_ptr->getMonoMz() << " prec charge " << env_ptr->getCharge());
-  } else {
-    prec_ptr->setMonoMz(0);
-    prec_ptr->setCharge(0);
-    prec_ptr->setInte(0);
-    LOG_DEBUG("EMPTY ENVELOPE POINTER");
   }
 }
 
@@ -136,5 +112,35 @@ void RawMsReader::getMs1Map(DeconvMsPtrVec &ms1_ptr_vec, DeconvMsPtrVec &ms2_ptr
     }
   }
 }
+
+/*
+// refine precursor charge and mz 
+void RawMsReader::refinePrecChrg(MzmlMsPtr ms_one, MzmlMsPtr ms_two, 
+                                 double max_mass, int max_charge) {
+  MsHeaderPtr header_two = ms_two->getMsHeaderPtr();
+  double prec_win_begin = header_two->getPrecWinBegin();
+  double prec_win_end = header_two->getPrecWinEnd();
+  //int prec_charge = header_two->getPrecCharge();
+
+  PeakPtrVec peak_list = ms_one->getPeakPtrVec();
+  LOG_DEBUG("start refine precursor " << " peak num " << peak_list.size());
+  MatchEnvPtr match_env_ptr = prec_env::deconv(prec_win_begin, prec_win_end, peak_list, 
+                                               max_mass, max_charge);
+  PrecursorPtr prec_ptr = header_two->getSinglePrecPtr();
+  if (match_env_ptr != nullptr) {
+    RealEnvPtr env_ptr = match_env_ptr->getRealEnvPtr(); 
+    prec_ptr->setMonoMz(env_ptr->getMonoMz());
+    prec_ptr->setCharge(env_ptr->getCharge());
+    prec_ptr->setInte(env_ptr->compIntensitySum());
+    LOG_DEBUG("prec mz " << env_ptr->getMonoMz() << " prec charge " << env_ptr->getCharge());
+  } else {
+    prec_ptr->setMonoMz(0);
+    prec_ptr->setCharge(0);
+    prec_ptr->setInte(0);
+    LOG_DEBUG("EMPTY ENVELOPE POINTER");
+  }
+}
+*/
+
 
 }
