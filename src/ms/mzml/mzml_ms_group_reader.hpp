@@ -27,6 +27,7 @@ class MzmlMsGroupReader {
                     double isolation_window, 
                     std::string activation, 
                     int fraction_id,
+                    bool is_faims,
                     double faims_voltage,
                     bool missing_level_one); 
 
@@ -39,6 +40,7 @@ class MzmlMsGroupReader {
  private:
   PwMsReaderPtr reader_ptr_;
   int fraction_id_ = 0;
+  bool is_faims_ = false;
   double faims_voltage_ = -1;
   bool missing_level_one_ = false;
 

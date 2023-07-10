@@ -29,7 +29,18 @@ std::string TopfdPara::getParaStr(const std::string &prefix,
   output << prefix << "Timestamp: " << time_util::getTimeStr() << std::endl;
   output << prefix << "###################### Parameters ######################" << std::endl;
   output << prefix << std::setw(gap) << std::left 
-      << "Activation type:          " << sep  << activation_ << std::endl;
+      << "File name:                " << sep  << file_name_ << std::endl;
+  if (is_faims_) {
+    output << prefix << std::setw(gap) << std::left 
+      << "Faims data:               " << sep << "Yes" << std::endl;
+    output << prefix << std::setw(gap) << std::left 
+      << "Faims voltage:            " << sep << faims_volt_ << std::endl;
+  }
+  else {
+    output << prefix << std::setw(gap) << std::left 
+      << "Faims data:               " << sep << "No" << std::endl;
+    output << prefix << std::endl; 
+  }
   output << prefix << std::setw(gap) << std::left 
       << "Number of MS1 scans:      " << sep  << ms_1_scan_num_ << std::endl;
   output << prefix << std::setw(gap) << std::left 
@@ -50,6 +61,8 @@ std::string TopfdPara::getParaStr(const std::string &prefix,
       << "Thread number:            " << sep << thread_num_ << std::endl;
   output << prefix << std::setw(gap) << std::left 
       << "Precursor window size:    " << sep << prec_window_ << " m/z" << std::endl;
+  output << prefix << std::setw(gap) << std::left 
+      << "Activation type:          " << sep  << activation_ << std::endl;
   if (use_env_cnn_) {
     output << prefix << std::setw(gap) << std::left 
       << "Use Env CNN model:        " << sep << "Yes" << std::endl;

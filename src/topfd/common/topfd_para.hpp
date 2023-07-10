@@ -48,6 +48,13 @@ class TopfdPara {
   int getThreadNum() {return thread_num_;}
   double getEcscoreCutoff() {return ecscore_cutoff_;}
 
+  std::string getFileName() {return file_name_;}
+  int getFracId() {return frac_id_;}
+  bool isFaims() {return is_faims_;}
+  double getFaimsVoltage() {return faims_volt_;}
+  int getMs1ScanNum() {return ms_1_scan_num_;}
+  int getMs2ScanNum() {return ms_2_scan_num_;}
+
   void setExeDir(std::string dir) {exe_dir_ = dir;}
   void setResourceDir(std::string dir) {resource_dir_ = dir;}
   void setMissingLevelOne(bool missing) {missing_level_one_ = missing;}
@@ -65,15 +72,33 @@ class TopfdPara {
   void setOutputMultipleMass(bool output) {output_multiple_mass_ = output;}
   void setThreadNum(int num) {thread_num_ = num;}
 
+  void setFileName(std::string &file_name) {file_name_ = file_name;}
+  void setFracId(int frac_id) {frac_id_ = frac_id;}
+  void setIsFaims(bool is_faims) {is_faims_ = is_faims;}
+  void setFaimsVoltage(double volt) {faims_volt_ = volt;}
   void setMs1ScanNumber(int ms1_scan_num) {ms_1_scan_num_ = ms1_scan_num;}
   void setMs2ScanNumber(int ms2_scan_num) {ms_2_scan_num_ = ms2_scan_num;}
-
 
  private:
   std::string exe_dir_;
   std::string resource_dir_;
   int max_charge_ = 30;
   double max_mass_ = 70000;
+  double prec_window_ = 3.0;
+  bool missing_level_one_ = false;
+  double mz_error_ = 0.02;
+  double ms_one_sn_ratio_ = 3.0;
+  double ms_two_sn_ratio_ = 1.0;
+  bool keep_unused_peaks_ = false;
+  bool use_env_cnn_ = false;
+  bool do_final_filtering_ = true;
+  int  thread_num_ = 1;
+  std::string activation_ = "FILE";
+  bool gene_html_folder_ = true;
+  double ecscore_cutoff_ = 0.5;
+
+
+  //** Fixed parameter setting **
   //dynamic programming window size
   double dp_window_size_ = 1.0;
   // Env assigned to 1 m/z intervals
@@ -82,25 +107,17 @@ class TopfdPara {
   int env_num_per_win_ = 5;
   // estimate min intensity using thrash method. 
   bool estimate_min_inte_ = true;
-
-  double prec_window_ = 3.0;
-
   bool refine_prec_mass_ = true;
-  bool missing_level_one_ = false;
-  double mz_error_ = 0.02;
-  double ms_one_sn_ratio_ = 3.0;
-  double ms_two_sn_ratio_ = 1.0;
-  bool keep_unused_peaks_ = false;
-  bool use_env_cnn_ = false;
   bool output_multiple_mass_ = false;
-  bool do_final_filtering_ = true;
   bool output_match_env_ = false;
-  int  thread_num_ = 1;
-  std::string activation_ = "FILE";
-  bool gene_html_folder_ = true;
+
+  //** information for each run **
+  std::string file_name_ = "";
+  int frac_id_ = -1;
+  bool is_faims_ = false;
+  double faims_volt_ = -1;
   int ms_1_scan_num_ = -1;
   int ms_2_scan_num_ = -1;
-  double ecscore_cutoff_ = 0.5;
 };
 
 typedef std::shared_ptr<TopfdPara> TopfdParaPtr;

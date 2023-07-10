@@ -31,32 +31,26 @@ namespace toppic {
 
 class DeconvMs1Process {
  public:
-  DeconvMs1Process(){};
-  DeconvMs1Process(TopfdParaPtr topfd_para_ptr, 
-                   const std::string &spec_file_name, 
-                   int frac_id, int thread_num);
-
-  std::string updateMsg(MsHeaderPtr header_ptr, int scan, int total_scan_num);
-
-  void prepareFileFolder(std::string file_num);
+  DeconvMs1Process(TopfdParaPtr topfd_para_ptr);
 
   void process();
 
-  static int ms1_spec_num_;
-
  private:
-
+  TopfdParaPtr topfd_para_ptr_;
   EnvParaPtr env_para_ptr_;
   DpParaPtr dp_para_ptr_;
-  TopfdParaPtr topfd_para_ptr_;
   
   std::string mzml_file_name_;
-  std::string output_file_name_;
-  int frac_id_;
-  int thread_num_;
+  std::string output_base_name_;
 
   std::string html_dir_;
   std::string ms1_json_dir_;
+
+  static int ms1_spec_num_;
+
+  std::string updateMsg(MsHeaderPtr header_ptr, int scan, int total_scan_num);
+
+  void prepareFileFolder();
 };
 
 }

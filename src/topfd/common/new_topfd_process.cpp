@@ -39,50 +39,50 @@ namespace toppic {
 
 namespace new_topfd_process {
 
-void processOneFileWithVoltage(TopfdParaPtr para_ptr,
-                               const std::string &spec_file_name,
-                               int frac_id,
-                               double voltage) {
+void processOneFileWithFaims(TopfdParaPtr para_ptr) {
   //print parameter for each file
   std::cout << para_ptr->getParaStr("", " ");
-  int thread_number = para_ptr->getThreadNum();
   if (!para_ptr->isMissingLevelOne()) {
     std::cout << "MS1 deconvolution started." << std::endl;
-    //DeconvProcess processor(para_ptr, spec_file_name, frac_id, thread_number);
+    //DeconvProcess processor(para_ptr);
     //processor.process();
     std::cout << "MS1 deconvolution finished." << std::endl;
   }
 }
 
 int processOneFile(TopfdParaPtr para_ptr,  
-                   const std::string &spec_file_name, 
+                   std::string &spec_file_name, 
                    int frac_id) { 
   try {
     // Get mzml file profile
     PwMsReaderPtr reader_ptr = std::make_shared<PwMsReader>(spec_file_name);
     MzmlProfilePtr profile_ptr = reader_ptr->readProfile();
 
+    para_ptr->setFileName(spec_file_name);
     // check if it is faims or not
     if (profile_ptr->isFaims()) {
+      para_ptr->setIsFaims(true);
       std::map<double, std::pair<int,int>> volt_map = profile_ptr->getVoltageMap();
       std::cout << spec_file_name << " is FAIMS data with " << volt_map.size() << " voltage levels." << std::endl;
-      int cnt = 0;
       for (auto v : volt_map) {
         double volt = v.first;
         std::cout << "Processing " << spec_file_name << " with voltage " << volt << " started." << std::endl;
+        para_ptr->setFracId(frac_id);
+        para_ptr->setFaimsVoltage(volt);
         para_ptr->setMs1ScanNumber(v.second.first); 
         para_ptr->setMs2ScanNumber(v.second.second);
-        processOneFileWithVoltage(para_ptr, spec_file_name, frac_id + cnt, volt);
-        cnt++;
+        processOneFileWithFaims(para_ptr);
+        frac_id++;
         std::cout << "Processing " << spec_file_name << " with voltage " << volt << " finished." << std::endl;
       }
       return volt_map.size();
     }
     else {
-      double volt = -1;
+      para_ptr->setIsFaims(false);
+      para_ptr->setFracId(frac_id);
       para_ptr->setMs1ScanNumber(profile_ptr->getMs1Cnt()); 
       para_ptr->setMs2ScanNumber(profile_ptr->getMs2Cnt()); 
-      processOneFileWithVoltage(para_ptr, spec_file_name, frac_id, volt);
+      processOneFileWithFaims(para_ptr);
       return 1;
     }
   } catch (const char* e) {

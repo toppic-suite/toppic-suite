@@ -25,9 +25,11 @@ MzmlMsGroupReader::MzmlMsGroupReader(const std::string & file_name,
                                      double isolation_window, 
                                      std::string activation, 
                                      int fraction_id,
+                                     bool is_faims,
                                      double faims_voltage,
                                      bool missing_level_one) {
   fraction_id_ = fraction_id_;
+  is_faims_ = is_faims;
   faims_voltage_ = faims_voltage;
   missing_level_one_ = missing_level_one;
   reader_ptr_ = std::make_shared<PwMsReader>(file_name, 
@@ -49,7 +51,7 @@ MzmlMsGroupReader::MzmlMsGroupReader(const std::string & file_name,
 
 MzmlMsPtr MzmlMsGroupReader::readNextMzmlMs() {
   //Read ms with a specific voltage
-  if (faims_voltage_ < 0) {
+  if (!is_faims_) {
     reader_ptr_->readNext();
   }
   else {

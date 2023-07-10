@@ -15,18 +15,20 @@
 
 #include <mutex>
 
+#include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
 #include "common/util/file_util.hpp"
+#include "common/thread/simple_thread_pool.hpp"
+
+#include "ms/spec/msalign_writer.hpp"
+#include "ms/mzml/mzml_ms_group_reader.hpp"
 
 #include "topfd/deconv/deconv_ms1_process.hpp"
 
 /*
-#include "common/util/logger.hpp"
 #include "common/util/version.hpp"
 #include "common/util/time_util.hpp"
-#include "common/thread/simple_thread_pool.hpp"
 
-#include "ms/spec/msalign_writer.hpp"
 #include "ms/spec/baseline_util.hpp"
 #include "ms/spec/msalign_thread_merge.hpp"
 
@@ -45,23 +47,25 @@ namespace toppic {
 std::mutex ms1_count_lock;
 int DeconvMs1Process::ms1_spec_num_ = 0;
 
-DeconvMs1Process::DeconvMs1Process(TopfdParaPtr topfd_para_ptr,
-                                   const std::string &spec_file_name,
-                                   int frac_id, int thread_num) {
+DeconvMs1Process::DeconvMs1Process(TopfdParaPtr topfd_para_ptr) {
   topfd_para_ptr_ = topfd_para_ptr;
   env_para_ptr_ = std::make_shared<EnvPara>(topfd_para_ptr->getMzError());
   dp_para_ptr_ = std::make_shared<DpPara>();
 
-  mzml_file_name_ = spec_file_name;
-  frac_id_ = frac_id; 
-  thread_num_ = thread_num;
+  mzml_file_name_ = topfd_para_ptr->getFileName(); 
+  output_base_name_ = file_util::basename(mzml_file_name_);
+  // if it is faims data, then add integer voltage to output_file_name
+  if (topfd_para_ptr_->isFaims()) {
+    output_base_name_ = output_base_name_ + "_" 
+      + str_util::toString(static_cast<int>(topfd_para_ptr_->getFaimsVoltage()));
+  }
 }
 
-std::string DeconvMs1Process::updateMsg(MsHeaderPtr header_ptr, int scan, 
-                                     int total_scan_num) {
-  std::string percentage = str_util::toString(scan * 100 / total_scan_num);
+std::string DeconvMs1Process::updateMsg(MsHeaderPtr header_ptr, int scan_cnt, 
+                                        int total_scan_num) {
+  std::string percentage = str_util::toString(scan_cnt * 100 / total_scan_num);
   std::string msg = "Processing spectrum scan " 
-      + std::to_string(header_ptr->getFirstScanNum()) + " ...";
+    + std::to_string(header_ptr->getFirstScanNum()) + " ...";
   while (msg.length() < 40) {
     msg += " ";
   }
@@ -69,12 +73,10 @@ std::string DeconvMs1Process::updateMsg(MsHeaderPtr header_ptr, int scan,
   return msg;
 }
 
-/*
-void DeconvMs1Process::prepareFileFolder(std::string file_num) {
-  std::string base_name = file_util::basename(spec_file_name_);
-  if (topfd_para_ptr_->isGeneHtmlFolder()){
+void DeconvMs1Process::prepareFileFolder() {
+  if (topfd_para_ptr_->isGeneHtmlFolder()) {
     //json file names
-    html_dir_ =  base_name + "_" + file_num + "html";
+    html_dir_ =  output_base_name_ + "_" + "html";
     if (!file_util::exists(html_dir_)) {
       file_util::createFolder(html_dir_);
     }
@@ -86,73 +88,42 @@ void DeconvMs1Process::prepareFileFolder(std::string file_num) {
     }
   }
 }
-*/
 
 void DeconvMs1Process::process() {
+  prepareFileFolder();
+  MzmlMsGroupReaderPtr reader_ptr = 
+    std::make_shared<MzmlMsGroupReader>(mzml_file_name_, 
+                                        topfd_para_ptr_->getPrecWindow(),  
+                                        topfd_para_ptr_->getActivation(),
+                                        topfd_para_ptr_->getFracId(),
+                                        topfd_para_ptr_->isFaims(), 
+                                        topfd_para_ptr_->getFaimsVoltage(), 
+                                        topfd_para_ptr_->isMissingLevelOne());
 
-  /*
-  RawMsGroupFaimeReaderPtr reader_ptr 
-    = std::make_shared<RawMsGroupFaimeReader>(spec_file_name_, 
-                                              topfd_para_ptr_->isMissingLevelOne(),
-                                              topfd_para_ptr_->getActivation(),
-                                              topfd_para_ptr_->getPrecWindow(),  
-                                              frac_id_);
-  int total_scan_num = reader_ptr->getInputSpNum();//this is spectrum count, not same as scan ID count
-
-  MzmlMsGroupPtr ms_group_ptr;
-
-  ms_group_ptr = reader_ptr->getNextMsGroupPtrWithFaime();
-
-  int count = 0;
-  int vec_idx = 0; //index of the vector containing MsAlignWriterPtr for current msgroup
-  
-  std::string ms1_msalign_name, ms2_msalign_name;
-  
-  ms1_msalign_name = file_util::basename(spec_file_name_) + "_0_ms1.msalign";
-  ms2_msalign_name = file_util::basename(spec_file_name_) + "_0_ms2.msalign";
-
-  SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(thread_num_);  
-  
+  MzmlMsGroupPtr ms_group_ptr = reader_ptr->getNextMsGroupPtr();
   if (ms_group_ptr == nullptr) {
     LOG_ERROR("No spectrum to read in mzML file!");
     return;
   }
-  //if it is not a FAIME data, don't add a number to a file name
-  if (ms_group_ptr->getMsOnePtr()->getMsHeaderPtr()->getVoltage() == -1) {
-    ms1_msalign_name = file_util::basename(spec_file_name_) + "_ms1.msalign";
-    ms2_msalign_name = file_util::basename(spec_file_name_) + "_ms2.msalign";
-    prepareFileFolder("");
-  }
-  else {
-    ms1_msalign_name = file_util::basename(spec_file_name_) + "_0_ms1.msalign";
-    ms2_msalign_name = file_util::basename(spec_file_name_) + "_0_ms2.msalign";
-    prepareFileFolder("0_");
-    isFaims_ = true;
-  }
-
-  //don't add voltage to vector if it is non-FAIME 
-  voltage_vec_.push_back(std::make_pair(ms_group_ptr->getMsOnePtr()->getMsHeaderPtr()->getVoltage(), 0));
-
-  std::vector<MsAlignWriterPtrVec> all_file_ms1_writer_ptr_vec;
-  std::vector<MsAlignWriterPtrVec> all_file_ms2_writer_ptr_vec;
-
-  MsAlignWriterPtrVec single_file_ms1_writer_ptr_vec;
-  MsAlignWriterPtrVec single_file_ms2_writer_ptr_vec;
-  
-  //generate vector that contains msalign writing information
+  int thread_num = topfd_para_ptr_->getThreadNum();
+  // init msalign writer vector for multiple threads
+  std::string ms1_msalign_name = output_base_name_ + "_ms1.msalign";
   MsAlignWriterPtrVec ms1_writer_ptr_vec;
-  MsAlignWriterPtrVec ms2_writer_ptr_vec;
-
-  for (int i = 0; i < thread_num_; i++) { 
+  for (int i = 0; i < thread_num; i++) { 
     MsAlignWriterPtr ms1_ptr 
         = std::make_shared<MsAlignWriter>(ms1_msalign_name + "_" + str_util::toString(i));
-    MsAlignWriterPtr ms2_ptr 
-        = std::make_shared<MsAlignWriter>(ms2_msalign_name + "_" + str_util::toString(i));
-    single_file_ms1_writer_ptr_vec.push_back(ms1_ptr);
-    single_file_ms2_writer_ptr_vec.push_back(ms2_ptr);
+    ms1_writer_ptr_vec.push_back(ms1_ptr);
   }
-  all_file_ms1_writer_ptr_vec.push_back(single_file_ms1_writer_ptr_vec);
-  all_file_ms2_writer_ptr_vec.push_back(single_file_ms2_writer_ptr_vec);
+  // init thread pool
+  SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(thread_num);  
+  // counter for processed spectra
+  int spec_cnt = 0;
+  //index of the vector containing MsAlignWriterPtr for current msgroup
+  int thread_idx = 0; 
+  // total spectrum number
+  int total_spec_num = topfd_para_ptr_->getMs1ScanNum(); 
+  
+  /*
   while (ms_group_ptr != nullptr) {
     while(pool_ptr->getQueueSize() >= thread_num_ * 2){
         boost::this_thread::sleep(boost::posix_time::milliseconds(100));
@@ -238,17 +209,9 @@ void DeconvMs1Process::process() {
   }
   pool_ptr->ShutDown();
 
-  //auto proc_end = std::chrono::high_resolution_clock::now();
-  ///auto proc_duration = std::chrono::duration_cast<std::chrono::microseconds>(proc_end-proc_start);
-  //std::cout << std::endl << "Process " << proc_duration.count() << std::endl;
-
-  //auto start = std::chrono::high_resolution_clock::now();
-
-  //auto end = std::chrono::high_resolution_clock::now();
-  //auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end-start);
-  //std::cout << std::endl << "Read file " << duration.count() << std::endl;
   std::string ms1_file_name = "ms1.msalign";
   std::string ms2_file_name = "ms2.msalign";
+
 
   if (voltage_vec_[0].first == -1) {
     //non-FAIME dataset
