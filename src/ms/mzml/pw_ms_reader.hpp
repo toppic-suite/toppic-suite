@@ -25,6 +25,7 @@
 #include "pwiz/utility/misc/Filesystem.hpp"
 
 #include "ms/mzml/mzml_ms.hpp"
+#include "ms/mzml/mzml_profile.hpp"
 
 namespace toppic {
 
@@ -32,6 +33,8 @@ typedef std::shared_ptr<pwiz::msdata::MSDataFile> MSDataFilePtr;
 
 class PwMsReader {
  public:
+  explicit PwMsReader(const std::string & file_name); 
+
   explicit PwMsReader(const std::string & file_name, double isolation_window);
   
   explicit PwMsReader(const std::string & file_name, double isolation_window,
@@ -43,8 +46,7 @@ class PwMsReader {
   int getInputSpNum() {return input_sp_num_;}
   bool checkCentroidData(); 
 
-  std::vector<double> readFaimsVoltageList();
-  int cntMsOneSpectra(); 
+  MzmlProfilePtr readProfile();
 
   // reset indexes
   void resetIndexes(); 

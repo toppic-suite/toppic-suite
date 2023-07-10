@@ -25,6 +25,10 @@
 
 namespace toppic {
 
+PwMsReader::PwMsReader(const std::string & file_name) {
+  init(file_name);
+}
+
 PwMsReader::PwMsReader(const std::string & file_name,
                        double isolation_window) {
   init(file_name);
@@ -315,38 +319,51 @@ int PwMsReader::readNextWithVoltage(double voltage) {
   return 1;
 }
 
-
-std::vector<double> PwMsReader::readFaimsVoltageList() {
-  std::set<double> volt_set;
-  bool get_binary_data = false;
-  for (int sp_id = 0; sp_id < input_sp_num_; sp_id++) {
-    pwiz::msdata::SpectrumPtr cur_spec_ptr = spec_list_ptr_->spectrum(sp_id, get_binary_data);
-    if (cur_spec_ptr == nullptr) {continue;}
-    double voltage = parseFaims(cur_spec_ptr);
-    if (voltage > 0) {
-      volt_set.insert(voltage);
-    }
-  }
-  std::vector<double> volt_vec(volt_set.begin(), volt_set.end());
-  // sort in the increasing order
-  std::sort(volt_vec.begin(),volt_vec.end());
-  return volt_vec;
-}
-
-int PwMsReader::cntMsOneSpectra() {
-  int cnt = 0;
+MzmlProfilePtr PwMsReader::readProfile() {
+  int ms_1_cnt = 0;
+  int ms_2_cnt = 0;
+  std::map<double, std::pair<int,int>> volt_map;
   bool get_binary_data = false;
   for (int sp_id = 0; sp_id < input_sp_num_; sp_id++) {
     pwiz::msdata::SpectrumPtr cur_spec_ptr = spec_list_ptr_->spectrum(sp_id, get_binary_data);
     if (cur_spec_ptr == nullptr) {continue;}
     pwiz::msdata::SpectrumInfo spec_info(*cur_spec_ptr);
     int ms_level = spec_info.msLevel;
+    double voltage = parseFaims(cur_spec_ptr);
     if (ms_level == 1) {
-      cnt++;
+      ms_1_cnt++;
+    }
+    else if (ms_level == 2) {
+      ms_2_cnt++;
+    }
+    if (voltage > 0) {
+      auto search = volt_map.find(voltage);
+      // if not found
+      if (search == volt_map.end()) {
+        if (ms_level == 1) {
+          std::pair<int,int> cnt(1,0);
+          std::pair<double, std::pair<int,int>> new_volt(voltage, cnt);
+          volt_map.insert(new_volt);
+        }
+        else if (ms_level == 2) {
+          std::pair<int,int> cnt(0,1);
+          std::pair<double, std::pair<int,int>> new_volt(voltage, cnt);
+          volt_map.insert(new_volt);
+        }
+      }
+      // if found
+      else {
+        if (ms_level == 1) {
+          volt_map[voltage].first++;
+        }
+        else if (ms_level == 2) {
+          volt_map[voltage].second++;
+        }
+      }
     }
   }
-  return cnt;
+  MzmlProfilePtr profile_ptr = std::make_shared<MzmlProfile>(ms_1_cnt, ms_2_cnt, volt_map);
+  return profile_ptr;
 }
-
 
 }  // namespace toppic
