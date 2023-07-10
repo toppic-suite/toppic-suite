@@ -12,22 +12,22 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_TOPFD_ENV_REAL_ENVELOPE_HPP_
-#define TOPPIC_TOPFD_ENV_REAL_ENVELOPE_HPP_
+#ifndef TOPPIC_TOPFD_ENV_EXP_ENV_HPP_
+#define TOPPIC_TOPFD_ENV_EXP_ENV_HPP_
 
 #include "ms/spec/peak.hpp"
-#include "ms/env/envelope.hpp" 
+#include "ms/env/env.hpp"
 
 namespace toppic {
 
-class RealEnv;
+class ExpEnv;
 
-typedef std::shared_ptr<RealEnv> RealEnvPtr;
+typedef std::shared_ptr<ExpEnv> RealEnvPtr;
 
-class RealEnv : public Envelope {
+class ExpEnv : public Env {
  public:
-  RealEnv(const PeakPtrVec &peak_list, EnvelopePtr theo_env, 
-          double tolerance, double min_inte);
+  ExpEnv(const PeakPtrVec &peak_list, EnvelopePtr theo_env,
+         double tolerance, double min_inte);
 
   int getSpId() {return sp_id_;}
 

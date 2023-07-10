@@ -29,7 +29,7 @@ EnvBase::EnvBase(std::string file_name, int entry_num,
     std::ifstream input;
     input.open(file_name.c_str(), std::ios::in);
     if (!input.is_open()) {
-      LOG_ERROR("Envelope file  " << file_name << " does not exist.");
+      LOG_ERROR("Env file  " << file_name << " does not exist.");
       exit(EXIT_FAILURE); 
     }
     for (int i = 0; i < entry_num_; i++) {
@@ -43,7 +43,7 @@ EnvBase::EnvBase(std::string file_name, int entry_num,
         peak_num++;
         line_list.push_back(line);
       }
-      envs_.push_back(std::make_shared<Envelope>(peak_num - 1, line_list));
+      envs_.push_back(std::make_shared<Env>(peak_num - 1, line_list));
     }
     input.close();
     initRefMassIdx();

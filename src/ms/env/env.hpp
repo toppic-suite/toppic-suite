@@ -12,28 +12,28 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_TOPFD_ENV_ENVELOPE_HPP_
-#define TOPPIC_TOPFD_ENV_ENVELOPE_HPP_
+#ifndef TOPPIC_TOPFD_ENV_ENV_HPP_
+#define TOPPIC_TOPFD_ENV_ENV_HPP_
 
 #include "ms/spec/peak_util.hpp"
 #include "ms/spec/env_peak.hpp"
 
 namespace toppic {
 
-class Envelope;
+class Env;
 
-typedef std::shared_ptr<Envelope> EnvelopePtr;
+typedef std::shared_ptr<Env> EnvelopePtr;
 
-class Envelope {
+class Env {
  public:
-  Envelope() {}
+  Env() {}
 
-  Envelope(Envelope &env); 
+  Env(Env &env);
 
   //used by env_base to create envelopes
-  Envelope(int num, std::vector<std::string> &line_List);
+  Env(int num, std::vector<std::string> &line_List);
 
-  Envelope(int refer_idx, int charge, double mono_mz, EnvPeakPtrVec &peaks);
+  Env(int refer_idx, int charge, double mono_mz, EnvPeakPtrVec &peaks);
 
   EnvelopePtr convertToTheo(double mass_diff, int new_charge);
 

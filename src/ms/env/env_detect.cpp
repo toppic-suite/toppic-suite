@@ -69,9 +69,9 @@ MatchEnvPtr compEnv(const PeakPtrVec &peak_list, EnvelopePtr theo_env_ptr,
                                          env_para_ptr->max_back_peak_num_, 
                                          env_para_ptr->max_forw_peak_num_);
   // get real envelope
-  RealEnvPtr real_env_ptr = std::make_shared<RealEnv>(peak_list, theo_env_ptr, 
-                                                      env_para_ptr->getMzTolerance(),
-                                                      min_inte);
+  RealEnvPtr real_env_ptr = std::make_shared<ExpEnv>(peak_list, theo_env_ptr,
+                                                     env_para_ptr->getMzTolerance(),
+                                                     min_inte);
   MatchEnvPtr match_env_ptr = std::make_shared<MatchEnv>(mass_group, theo_env_ptr, real_env_ptr);
   return match_env_ptr;
 }

@@ -76,7 +76,7 @@ class TopfdPara {
   double max_mass_ = 70000;
   //dynamic programming window size
   double dp_window_size_ = 1.0;
-  // Envelope assigned to 1 m/z intervals
+  // Env assigned to 1 m/z intervals
   // number of envelopes per window 
   // use a small number of envelopes to speed up computation
   int env_num_per_win_ = 5;

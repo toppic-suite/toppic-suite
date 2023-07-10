@@ -132,8 +132,8 @@ MatchEnvPtr getNewMatchEnv(PeakPtrVec &ms, int idx, double tolerance) {
   peaks.push_back(peak_ptr);
   int ref_idx = 0;
   int charge = 1;
-  EnvelopePtr theo_env = std::make_shared<Envelope>(ref_idx, charge, mz, peaks);
-  RealEnvPtr real_env = std::make_shared<RealEnv>(ms, theo_env, tolerance, 0);
+  EnvelopePtr theo_env = std::make_shared<Env>(ref_idx, charge, mz, peaks);
+  RealEnvPtr real_env = std::make_shared<ExpEnv>(ms, theo_env, tolerance, 0);
   int mass_group = 0;
   return std::make_shared<MatchEnv>(mass_group, theo_env, real_env);
 }
@@ -152,12 +152,12 @@ MatchEnvPtrVec addMultipleMass(MatchEnvPtrVec &envs, MatchEnvPtr2D &candidates,
     double min_score = charge_envs[0]->getMsdeconvScore() * env_para_ptr->multiple_min_ratio_;
     if (charge >= env_para_ptr->multiple_min_charge_) {
       double score_minus_one  = 0;
-      // Envelope for charge - 1
+      // Env for charge - 1
       if (charge > 1 && candidates[refer_peak][charge-2] != nullptr) {
         score_minus_one = candidates[refer_peak][charge-2]->getMsdeconvScore();
       }
       double score_plus_one = 0;
-      // Envelope for charge + 1
+      // Env for charge + 1
       if (charge < static_cast<int>(candidates[0].size()) && candidates[refer_peak][charge] != nullptr) {
         score_plus_one = candidates[refer_peak][charge]->getMsdeconvScore();
       }

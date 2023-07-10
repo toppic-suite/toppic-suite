@@ -18,12 +18,12 @@
 #include "common/util/str_util.hpp"
 #include "common/xml/xml_dom_document.hpp"
 #include "ms/spec/peak_list_util.hpp"
-#include "ms/env/real_env.hpp" 
+#include "ms/env/exp_env.hpp"
 
 namespace toppic {
 
-RealEnv::RealEnv(const PeakPtrVec &peak_list, EnvelopePtr theo_env, 
-                 double tolerance, double min_inte) {
+ExpEnv::ExpEnv(const PeakPtrVec &peak_list, EnvelopePtr theo_env,
+               double tolerance, double min_inte) {
   // copy 
   refer_idx_ = theo_env->getReferIdx();
   charge_ = theo_env->getCharge();
@@ -40,8 +40,8 @@ RealEnv::RealEnv(const PeakPtrVec &peak_list, EnvelopePtr theo_env,
 }
 
 // map peaks in theo_env to the peaks in sp 
-void RealEnv::mapPeakList(const PeakPtrVec &peak_list, EnvelopePtr theo_env, 
-                          double tolerance, double min_inte) {
+void ExpEnv::mapPeakList(const PeakPtrVec &peak_list, EnvelopePtr theo_env,
+                         double tolerance, double min_inte) {
   int peak_num = theo_env->getPeakNum();
   peaks_.clear();
   for (int i = 0; i < peak_num; i++) {
@@ -65,7 +65,7 @@ void RealEnv::mapPeakList(const PeakPtrVec &peak_list, EnvelopePtr theo_env,
 
 // Remove duplicated matches. If two theoretical peaks are matched to the
 // same real peak, only the one with less mz error is kept.
-void RealEnv::remvDuplMatch(EnvelopePtr theo_env) {
+void ExpEnv::remvDuplMatch(EnvelopePtr theo_env) {
   for (int i = 0; i < getPeakNum() - 1; i++) {
     if (isExist(i) && peaks_[i]->getIdx() == peaks_[i + 1]->getIdx()) {
       if (std::abs(theo_env->getMz(i) - peaks_[i]->getPosition()) 
@@ -81,7 +81,7 @@ void RealEnv::remvDuplMatch(EnvelopePtr theo_env) {
 }
 
 // Count missing peak number 
-void RealEnv::cntMissPeakNum() {
+void ExpEnv::cntMissPeakNum() {
   miss_peak_num_ = 0;
   for (int i = 0; i < getPeakNum(); i++) {
     if (!isExist(i)) {
@@ -91,7 +91,7 @@ void RealEnv::cntMissPeakNum() {
 }
 
 // Compute maximum number of consecutive matched peaks 
-void RealEnv::cntMaxConsPeakNum() {
+void ExpEnv::cntMaxConsPeakNum() {
   max_consecutive_peak_num_ = 0;
   int n = 0;
   for (int i = 0; i < getPeakNum(); i++) {
@@ -106,11 +106,11 @@ void RealEnv::cntMaxConsPeakNum() {
   }
 }
 
-bool RealEnv::isExist(int i) {
+bool ExpEnv::isExist(int i) {
   return peaks_[i]->isExist();
 }
 
-bool RealEnv::testPeakShare(RealEnvPtr a, RealEnvPtr  b) {
+bool ExpEnv::testPeakShare(RealEnvPtr a, RealEnvPtr  b) {
   for (int i = 0; i < a->getPeakNum(); i++) {
     int a_idx = a->getPeakIdx(i);
     for (int j = 0; j < b->getPeakNum(); j++) {
@@ -123,8 +123,8 @@ bool RealEnv::testPeakShare(RealEnvPtr a, RealEnvPtr  b) {
   return false;
 }
 
-void RealEnv::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
-  std::string element_name = RealEnv::getXmlElementName();
+void ExpEnv::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
+  std::string element_name = ExpEnv::getXmlElementName();
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
   std::string str = str_util::toString(refer_idx_);
   xml_doc->addElement(element, "refer_idx", str.c_str());

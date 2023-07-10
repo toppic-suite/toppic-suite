@@ -19,11 +19,11 @@
 #include "common/util/str_util.hpp"
 #include "common/xml/xml_dom_document.hpp"
 #include "common/base/mass_constant.hpp"
-#include "ms/env/envelope.hpp"
+#include "ms/env/env.hpp"
 
 namespace toppic {
 
-Envelope::Envelope(Envelope &env): 
+Env::Env(Env &env):
     refer_idx_(env.refer_idx_),
     charge_(env.charge_),
     mono_mz_(env.mono_mz_) {
@@ -33,7 +33,7 @@ Envelope::Envelope(Envelope &env):
       }
     }
 
-Envelope::Envelope(int num, std::vector<std::string> &line_list) {
+Env::Env(int num, std::vector<std::string> &line_list) {
   charge_ = 1;
   std::vector<std::string> words = str_util::split(line_list[0], " ");
   peaks_.resize(num);
@@ -48,8 +48,8 @@ Envelope::Envelope(int num, std::vector<std::string> &line_list) {
   mono_mz_ = peaks_[0]->getPosition();
 }
 
-Envelope::Envelope(int refer_idx, int charge, double mono_mz,
-                   EnvPeakPtrVec &peaks):
+Env::Env(int refer_idx, int charge, double mono_mz,
+         EnvPeakPtrVec &peaks):
     refer_idx_(refer_idx),
     charge_(charge),
     mono_mz_(mono_mz) {
@@ -59,7 +59,7 @@ Envelope::Envelope(int refer_idx, int charge, double mono_mz,
       }
     }
 
-EnvelopePtr Envelope::convertToTheo(double mass_diff, int new_charge) {
+EnvelopePtr Env::convertToTheo(double mass_diff, int new_charge) {
   int ori_charge = 1;
   double new_mono_mz = (mono_mz_ * ori_charge + mass_diff) / new_charge;
   EnvPeakPtrVec new_peaks(peaks_.size());
@@ -67,54 +67,54 @@ EnvelopePtr Envelope::convertToTheo(double mass_diff, int new_charge) {
     double new_mz = (peaks_[i]->getPosition() + mass_diff) / new_charge;
     new_peaks[i] = std::make_shared<EnvPeak>(new_mz, peaks_[i]->getIntensity());
   }
-  return std::make_shared<Envelope>(refer_idx_, new_charge, new_mono_mz,
-                                    new_peaks);
+  return std::make_shared<Env>(refer_idx_, new_charge, new_mono_mz,
+                               new_peaks);
 }
 
 // Convert a theoretical distribution to a theoretical envelope
-EnvelopePtr Envelope::distrToTheoRef(double new_ref_mz, int new_charge) {
+EnvelopePtr Env::distrToTheoRef(double new_ref_mz, int new_charge) {
   int ori_charge = 1;
   double mass_diff = new_ref_mz * new_charge - peaks_[refer_idx_]->getPosition() * ori_charge;
   return convertToTheo(mass_diff, new_charge);
 }
 
 // Convert a theoretical distribution to a theoretical envelope based on the
-EnvelopePtr Envelope::distrToTheoMono(double new_mono_mz, int new_charge) {
+EnvelopePtr Env::distrToTheoMono(double new_mono_mz, int new_charge) {
   int ori_charge = 1;
   double mass_diff = new_mono_mz * new_charge - mono_mz_ * ori_charge;
   return convertToTheo(mass_diff, new_charge);
 }
 
-void Envelope::changeIntensity(double ratio) {
+void Env::changeIntensity(double ratio) {
   for (size_t i = 0; i < peaks_.size(); i++) {
     peaks_[i]->changeIntensity(ratio);
   }
 }
 
-void Envelope::changeToAbsInte(double absolute_intensity) {
+void Env::changeToAbsInte(double absolute_intensity) {
   double ratio = absolute_intensity / getReferIntensity();
   changeIntensity(ratio);
 }
 
-void Envelope::changeMz(double shift) {
+void Env::changeMz(double shift) {
   for (size_t i = 0; i < peaks_.size(); i++) {
     peaks_[i]->shiftPosition(shift);
   }
   mono_mz_ += shift;
 }
 
-EnvelopePtr Envelope::getSubEnv(int n_back, int n_forw) {
+EnvelopePtr Env::getSubEnv(int n_back, int n_forw) {
   int new_refer_idx = n_back;
   EnvPeakPtrVec new_peaks;
   for (int i = refer_idx_ - n_back; i <= refer_idx_ + n_forw; i++) {
     new_peaks.push_back(peaks_[i]);
   }
-  EnvelopePtr env_ptr = std::make_shared<Envelope>(new_refer_idx, charge_, mono_mz_,
-                                                   new_peaks);
+  EnvelopePtr env_ptr = std::make_shared<Env>(new_refer_idx, charge_, mono_mz_,
+                                              new_peaks);
   return env_ptr;
 }
 
-EnvelopePtr Envelope::addZero(int num) {
+EnvelopePtr Env::addZero(int num) {
   int n_peak = peaks_.size();
   EnvPeakPtrVec new_peaks; 
   for (int i = 0; i < n_peak + 2 * num; i++) {
@@ -136,19 +136,19 @@ EnvelopePtr Envelope::addZero(int num) {
     new_peaks[i]->setPosition(pos);
   }
   int new_refer_idx = refer_idx_ + num;
-  EnvelopePtr env_ptr = std::make_shared<Envelope>(new_refer_idx, charge_, mono_mz_,
-                                                   new_peaks);
+  EnvelopePtr env_ptr = std::make_shared<Env>(new_refer_idx, charge_, mono_mz_,
+                                              new_peaks);
   return env_ptr;
 }
 
-EnvelopePtr Envelope::getSubEnv(double percent_bound, double absolute_min_inte,
-                                int max_back_peak_num, int max_forw_peak_num) {
+EnvelopePtr Env::getSubEnv(double percent_bound, double absolute_min_inte,
+                           int max_back_peak_num, int max_forw_peak_num) {
   std::vector<int> bounds = calcBound(percent_bound, absolute_min_inte,
                                       max_back_peak_num, max_forw_peak_num);
   return getSubEnv(bounds[0], bounds[1]);
 }
 
-EnvelopePtr Envelope::getSubEnv(double min_inte) {
+EnvelopePtr Env::getSubEnv(double min_inte) {
   size_t left = refer_idx_;
   size_t right = refer_idx_;
   for (size_t i = 0; i < peaks_.size(); i++) {
@@ -166,8 +166,8 @@ EnvelopePtr Envelope::getSubEnv(double min_inte) {
 
 
 // Compute the bound of highest peaks with intensity 85%.
-std::vector<int> Envelope::calcBound(double percent_bound, double absolute_min_inte,
-                                     int max_back_peak_num, int max_forw_peak_num) {
+std::vector<int> Env::calcBound(double percent_bound, double absolute_min_inte,
+                                int max_back_peak_num, int max_forw_peak_num) {
   double forw_inte;
   double back_inte;
   int forw_idx;  // forward index
@@ -224,12 +224,12 @@ std::vector<int> Envelope::calcBound(double percent_bound, double absolute_min_i
   return result;
 }
 
-void Envelope::shift(int shift) {
+void Env::shift(int shift) {
   refer_idx_ += shift;
   mono_mz_ += shift * mass_constant::getIsotopeMass() / charge_;
 }
 
-double Envelope::compIntensitySum() {
+double Env::compIntensitySum() {
   double sum = 0;
   for (size_t i = 0; i < peaks_.size(); i++) {
     sum = sum + peaks_[i]->getIntensity();
@@ -237,7 +237,7 @@ double Envelope::compIntensitySum() {
   return sum;
 }
 
-double Envelope::getAvgMz() {
+double Env::getAvgMz() {
   double sum = 0;
   for (size_t i = 0; i < peaks_.size(); i++) {
     if (peaks_[i]->getPosition() >= 0) {
@@ -247,12 +247,12 @@ double Envelope::getAvgMz() {
   return sum / compIntensitySum();
 }
 
-int Envelope::getHighestPeakIdx() {
+int Env::getHighestPeakIdx() {
   return std::distance(peaks_.begin(), 
                        std::max_element(peaks_.begin(), peaks_.end(), EnvPeak::cmpInteInc)); 
 }
 
-std::vector<double> Envelope::getIntensities() {
+std::vector<double> Env::getIntensities() {
   std::vector<double> intensities;
   for (size_t i = 0; i < peaks_.size(); i++) {
     intensities.push_back(peaks_[i]->getIntensity());
@@ -260,8 +260,8 @@ std::vector<double> Envelope::getIntensities() {
   return intensities;
 }
 
-void Envelope::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
-  std::string element_name = Envelope::getXmlElementName();
+void Env::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
+  std::string element_name = Env::getXmlElementName();
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
   std::string str = str_util::toString(refer_idx_);
   xml_doc->addElement(element, "refer_idx", str.c_str());

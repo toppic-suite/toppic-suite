@@ -19,8 +19,8 @@
 #include <memory>
 #include <vector>
 
-#include "ms/env/envelope.hpp"
-#include "ms/env/real_env.hpp"
+#include "ms/env/env.hpp"
+#include "ms/env/exp_env.hpp"
 
 #include "ms/feature/frac_feature.hpp"
 #include "ms/feature/savitzky_golay.hpp"

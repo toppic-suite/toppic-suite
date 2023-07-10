@@ -45,9 +45,9 @@ namespace toppic {
 std::mutex ms1_count_lock;
 int DeconvMs1Process::ms1_spec_num_ = 0;
 
-DeconvMs1Process::DeconvMs1Process(TopfdParaPtr topfd_para_ptr, 
-                             const std::string &spec_file_name, 
-                             int frac_id, int thread_num) {
+DeconvMs1Process::DeconvMs1Process(TopfdParaPtr topfd_para_ptr,
+                                   const std::string &spec_file_name,
+                                   int frac_id, int thread_num) {
   topfd_para_ptr_ = topfd_para_ptr;
   env_para_ptr_ = std::make_shared<EnvPara>(topfd_para_ptr->getMzError());
   dp_para_ptr_ = std::make_shared<DpPara>();

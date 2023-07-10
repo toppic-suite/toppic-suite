@@ -21,7 +21,7 @@
 #include "common/xml/xml_dom_impl.hpp"
 #include "common/xml/xml_dom_util.hpp"
 #include "ms/spec/peak_util.hpp"
-#include "ms/env/envelope.hpp"
+#include "ms/env/env.hpp"
 #include "ms/env/env_base.hpp"
 #include "ms/feature/frac_feature_writer.hpp"
 

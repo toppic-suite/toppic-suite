@@ -381,8 +381,8 @@ MatchEnvPtr getMatchEnv(const PeakPtrVec &peak_list, int sp_id, double mono_neut
   int max_forw_peak_num = 1000;
   theo_env = theo_env->getSubEnv(percentage, min_inte, max_back_peak_num, max_forw_peak_num); 
 
-  RealEnvPtr real_env = std::make_shared<RealEnv>(peak_list, theo_env, env_para_ptr->getMzTolerance(),
-                                                  min_inte);
+  RealEnvPtr real_env = std::make_shared<ExpEnv>(peak_list, theo_env, env_para_ptr->getMzTolerance(),
+                                                 min_inte);
   if (real_env == nullptr) {
     LOG_ERROR("real env is null");
   }
