@@ -58,17 +58,16 @@ int processOneFile(TopfdParaPtr para_ptr,
     PwMsReaderPtr reader_ptr = std::make_shared<PwMsReader>(spec_file_name);
     MzmlProfilePtr profile_ptr = reader_ptr->readProfile();
 
-    para_ptr->setFileName(spec_file_name);
     // check if it is faims or not
     if (profile_ptr->isFaims()) {
-      para_ptr->setIsFaims(true);
+      bool is_faims = true;
       std::map<double, std::pair<int,int>> volt_map = profile_ptr->getVoltageMap();
       std::cout << spec_file_name << " is FAIMS data with " << volt_map.size() << " voltage levels." << std::endl;
       for (auto v : volt_map) {
         double volt = v.first;
+        para_ptr->setMzmlFileNameAndFaims(spec_file_name, is_faims, volt);
         std::cout << "Processing " << spec_file_name << " with voltage " << volt << " started." << std::endl;
         para_ptr->setFracId(frac_id);
-        para_ptr->setFaimsVoltage(volt);
         para_ptr->setMs1ScanNumber(v.second.first); 
         para_ptr->setMs2ScanNumber(v.second.second);
         processOneFileWithFaims(para_ptr);
@@ -78,7 +77,9 @@ int processOneFile(TopfdParaPtr para_ptr,
       return volt_map.size();
     }
     else {
-      para_ptr->setIsFaims(false);
+      bool is_faims = false;
+      double volt = -1;
+      para_ptr->setMzmlFileNameAndFaims(spec_file_name, is_faims, volt);
       para_ptr->setFracId(frac_id);
       para_ptr->setMs1ScanNumber(profile_ptr->getMs1Cnt()); 
       para_ptr->setMs2ScanNumber(profile_ptr->getMs2Cnt()); 

@@ -48,10 +48,13 @@ class TopfdPara {
   int getThreadNum() {return thread_num_;}
   double getEcscoreCutoff() {return ecscore_cutoff_;}
 
-  std::string getFileName() {return file_name_;}
+  std::string getMzmlFileName() {return mzml_file_name_;}
   int getFracId() {return frac_id_;}
   bool isFaims() {return is_faims_;}
   double getFaimsVoltage() {return faims_volt_;}
+  std::string getHtmlDir() {return html_dir_;}
+  std::string getMs1JsonDir() {return ms1_json_dir_;}
+  std::string getMs2JsonDir() {return ms2_json_dir_;}
   int getMs1ScanNum() {return ms_1_scan_num_;}
   int getMs2ScanNum() {return ms_2_scan_num_;}
 
@@ -72,10 +75,10 @@ class TopfdPara {
   void setOutputMultipleMass(bool output) {output_multiple_mass_ = output;}
   void setThreadNum(int num) {thread_num_ = num;}
 
-  void setFileName(std::string &file_name) {file_name_ = file_name;}
   void setFracId(int frac_id) {frac_id_ = frac_id;}
-  void setIsFaims(bool is_faims) {is_faims_ = is_faims;}
-  void setFaimsVoltage(double volt) {faims_volt_ = volt;}
+  // set mzml_file_name, is_faims_, faims_voltage_, output_base_name, 
+  // ms1_json_dir_, ms2_json_dir_
+  void setMzmlFileNameAndFaims(std::string &mzml_file_name, bool is_faims, double voltage);
   void setMs1ScanNumber(int ms1_scan_num) {ms_1_scan_num_ = ms1_scan_num;}
   void setMs2ScanNumber(int ms2_scan_num) {ms_2_scan_num_ = ms2_scan_num;}
 
@@ -112,10 +115,15 @@ class TopfdPara {
   bool output_match_env_ = false;
 
   //** information for each run **
-  std::string file_name_ = "";
   int frac_id_ = -1;
+  std::string mzml_file_name_ = "";
   bool is_faims_ = false;
   double faims_volt_ = -1;
+  std::string output_base_name_ = "";
+  std::string html_dir_ = "";
+  std::string ms1_json_dir_ = "";
+  std::string ms2_json_dir_ = "";
+
   int ms_1_scan_num_ = -1;
   int ms_2_scan_num_ = -1;
 };

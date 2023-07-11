@@ -13,8 +13,6 @@
 //limitations under the License.
 //
 
-#include <mutex>
-
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
 #include "common/util/file_util.hpp"
@@ -23,6 +21,7 @@
 #include "ms/spec/msalign_writer.hpp"
 #include "ms/mzml/mzml_ms_group_reader.hpp"
 
+#include "topfd/deconv/deconv_one_sp.hpp"
 #include "topfd/deconv/deconv_ms1_process.hpp"
 
 /*
@@ -44,21 +43,8 @@
 
 namespace toppic {
 
-std::mutex ms1_count_lock;
-int DeconvMs1Process::ms1_spec_num_ = 0;
-
 DeconvMs1Process::DeconvMs1Process(TopfdParaPtr topfd_para_ptr) {
   topfd_para_ptr_ = topfd_para_ptr;
-  env_para_ptr_ = std::make_shared<EnvPara>(topfd_para_ptr->getMzError());
-  dp_para_ptr_ = std::make_shared<DpPara>();
-
-  mzml_file_name_ = topfd_para_ptr->getFileName(); 
-  output_base_name_ = file_util::basename(mzml_file_name_);
-  // if it is faims data, then add integer voltage to output_file_name
-  if (topfd_para_ptr_->isFaims()) {
-    output_base_name_ = output_base_name_ + "_" 
-      + str_util::toString(static_cast<int>(topfd_para_ptr_->getFaimsVoltage()));
-  }
 }
 
 std::string DeconvMs1Process::updateMsg(MsHeaderPtr header_ptr, int scan_cnt, 
@@ -76,21 +62,30 @@ std::string DeconvMs1Process::updateMsg(MsHeaderPtr header_ptr, int scan_cnt,
 void DeconvMs1Process::prepareFileFolder() {
   if (topfd_para_ptr_->isGeneHtmlFolder()) {
     //json file names
-    html_dir_ =  output_base_name_ + "_" + "html";
-    if (!file_util::exists(html_dir_)) {
-      file_util::createFolder(html_dir_);
+    std::string html_dir = topfd_para_ptr_->getHtmlDir();
+    if (!file_util::exists(html_dir)) {
+      file_util::createFolder(html_dir);
     }
-    ms1_json_dir_ = html_dir_ 
-      + file_util::getFileSeparator() + "topfd" 
-      + file_util::getFileSeparator() + "ms1_json";
-    if (!file_util::exists(ms1_json_dir_)) {
-      file_util::createFolder(ms1_json_dir_);
+    std::string ms1_json_dir = topfd_para_ptr_->getMs1JsonDir();
+    if (!file_util::exists(ms1_json_dir)) {
+      file_util::createFolder(ms1_json_dir);
     }
   }
 }
 
+std::function<void()> geneTask(MzmlMsGroupPtr ms_group_ptr, 
+                               TopfdParaPtr topfd_para_ptr, 
+                               MsAlignWriterPtrVec ms1_writer_ptr_vec, 
+                               SimpleThreadPoolPtr pool_ptr) { 
+  return [ms_group_ptr, topfd_para_ptr, ms1_writer_ptr_vec, pool_ptr]() {
+
+    //deconvMsOne(ms_group_ptr, topfd_para_ptr, ms1_writer_ptr_vec, pool_ptr);
+
+  };
+}
+
+
 void DeconvMs1Process::process() {
-  prepareFileFolder();
   MzmlMsGroupReaderPtr reader_ptr = 
     std::make_shared<MzmlMsGroupReader>(mzml_file_name_, 
                                         topfd_para_ptr_->getPrecWindow(),  
@@ -105,7 +100,10 @@ void DeconvMs1Process::process() {
     LOG_ERROR("No spectrum to read in mzML file!");
     return;
   }
+  prepareFileFolder();
+  // init thread pool
   int thread_num = topfd_para_ptr_->getThreadNum();
+  SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(thread_num);  
   // init msalign writer vector for multiple threads
   std::string ms1_msalign_name = output_base_name_ + "_ms1.msalign";
   MsAlignWriterPtrVec ms1_writer_ptr_vec;
@@ -114,182 +112,56 @@ void DeconvMs1Process::process() {
         = std::make_shared<MsAlignWriter>(ms1_msalign_name + "_" + str_util::toString(i));
     ms1_writer_ptr_vec.push_back(ms1_ptr);
   }
-  // init thread pool
-  SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(thread_num);  
   // counter for processed spectra
   int spec_cnt = 0;
-  //index of the vector containing MsAlignWriterPtr for current msgroup
-  int thread_idx = 0; 
   // total spectrum number
   int total_spec_num = topfd_para_ptr_->getMs1ScanNum(); 
-  
-  /*
   while (ms_group_ptr != nullptr) {
-    while(pool_ptr->getQueueSize() >= thread_num_ * 2){
-        boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+    while(pool_ptr->getQueueSize() >= thread_num * 2){
+      boost::this_thread::sleep(boost::posix_time::milliseconds(100));
     }
-    bool is_new_voltage = true;
-    //Here we create new Env Para and Dp Para instances to make sure that
-    //multiple threads do not share the same parameter instances. 
-    EnvParaPtr env_ptr_new = std::make_shared<EnvPara>(*env_para_ptr_.get());
-    DpParaPtr dp_ptr_new = std::make_shared<DpPara>(dp_para_ptr_);
-    TopfdParaPtr topfd_ptr_new = std::make_shared<TopfdPara>(*topfd_para_ptr_.get());
-    //deconv_process_ptr_ (DecovProcess instance) is needed because 
-    //it has the information on the folder names, envelope file names
-    //pool_ptr needed for getting each thread id    
-    DeconvOneSpPtr deconv_ptr = std::make_shared<DeconvOneSp>(env_ptr_new, dp_ptr_new, topfd_ptr_new);
-
-    if (ms_group_ptr != nullptr) {
-      //check if the voltage from this msgroup is new or not to determine whether to create a new set of writer vectors
-      double cur_voltage = ms_group_ptr->getMsOnePtr()->getMsHeaderPtr()->getVoltage();
-      for (size_t i = 0; i < voltage_vec_.size(); i++) {
-        if (voltage_vec_[i].first == ms_group_ptr->getMsOnePtr()->getMsHeaderPtr()->getVoltage()) {
-          int spec_id = voltage_vec_[i].second;
-          MzmlMsPtrVec ms_two_ptr_vec = ms_group_ptr->getMsTwoPtrVec();
-          // add ms one spec id for ms two
-          for (size_t j = 0; j < ms_two_ptr_vec.size(); j++) {
-            ms_two_ptr_vec[j]->getMsHeaderPtr()->setMsOneId(spec_id);
-          }
-          voltage_vec_[i].second++;
-          is_new_voltage = false;
-          vec_idx = i;
-          break;
-        }
-      }
-      if (is_new_voltage) {
-        //new file needs to be created
-        std::string ms1_name, ms2_name;
-        std::string file_num = str_util::toString(voltage_vec_.size());
-    
-        ms1_name = file_util::basename(spec_file_name_) + "_" + file_num + "_ms1.msalign";
-        ms2_name = file_util::basename(spec_file_name_) + "_" + file_num + "_ms2.msalign";
-        prepareFileFolder(file_num + "_");
-
-        voltage_vec_.push_back(std::make_pair(cur_voltage, 0));
-
-        int spec_id = 0;
-
-        MzmlMsPtrVec ms_two_ptr_vec = ms_group_ptr->getMsTwoPtrVec();
-
-        for (size_t j = 0; j < ms_two_ptr_vec.size(); j++) {
-          ms_two_ptr_vec[j]->getMsHeaderPtr()->setMsOneId(spec_id);
-        }
-        voltage_vec_.back().second++;
-
-        single_file_ms1_writer_ptr_vec.clear();
-        single_file_ms2_writer_ptr_vec.clear();
-
-        for (int i = 0; i < thread_num_; i++) { 
-          MsAlignWriterPtr ms1_ptr 
-              = std::make_shared<MsAlignWriter>(ms1_name + "_" + str_util::toString(i));
-          MsAlignWriterPtr ms2_ptr 
-              = std::make_shared<MsAlignWriter>(ms2_name + "_" + str_util::toString(i));
-          single_file_ms1_writer_ptr_vec.push_back(ms1_ptr);
-          single_file_ms2_writer_ptr_vec.push_back(ms2_ptr);
-        }
-        all_file_ms1_writer_ptr_vec.push_back(single_file_ms1_writer_ptr_vec);
-        all_file_ms2_writer_ptr_vec.push_back(single_file_ms2_writer_ptr_vec);
-
-        vec_idx = all_file_ms1_writer_ptr_vec.size() -1;
-      }
-    }
-    ms1_writer_ptr_vec = all_file_ms1_writer_ptr_vec[vec_idx];
-    ms2_writer_ptr_vec = all_file_ms2_writer_ptr_vec[vec_idx];
-
-    pool_ptr->Enqueue(geneTask(ms_group_ptr, deconv_ptr, ms1_writer_ptr_vec, 
-                               ms2_writer_ptr_vec, pool_ptr, topfd_para_ptr_->isGeneHtmlFolder(), 
-                               ms1_json_dir_, ms2_json_dir_));
-
-    //count is 1 scan from msalign1 + n scan from msalign2 vector
-    int parsed_scan = 1 + static_cast<int>((ms_group_ptr->getMsTwoPtrVec()).size());
-    std::string msg = updateMsg(ms_group_ptr->getMsOnePtr()->getMsHeaderPtr(), count + parsed_scan, total_scan_num);
+    pool_ptr->Enqueue(geneTask(ms_group_ptr, topfd_para_ptr_, ms1_writer_ptr_vec, pool_ptr)); 
+    spec_cnt++; 
+    std::string msg = updateMsg(ms_group_ptr->getMsOnePtr()->getMsHeaderPtr(), 
+                                spec_cnt, total_spec_num);
     std::cout << "\r" << msg << std::flush;
-    count += parsed_scan;
-    ms_group_ptr = reader_ptr->getNextMsGroupPtrWithFaime();    
+    ms_group_ptr = reader_ptr->getNextMsGroupPtr();    
   }
   pool_ptr->ShutDown();
-
+  /*
+  // Merge files
   std::string ms1_file_name = "ms1.msalign";
-  std::string ms2_file_name = "ms2.msalign";
-
-
-  if (voltage_vec_[0].first == -1) {
-    //non-FAIME dataset
-    MsalignThreadMergePtr ms1_merge_ptr
+  MsalignThreadMergePtr ms1_merge_ptr
             = std::make_shared<MsalignThreadMerge>(spec_file_name_, ms1_file_name, 
                                                   thread_num_, ms1_file_name, 
                                                   topfd_para_ptr_-> getParaStr("#", "\t"));
+  ms1_merge_ptr->process();
+  // Remove temporary files to add
+  //
 
-    MsalignThreadMergePtr ms2_merge_ptr 
-          = std::make_shared<MsalignThreadMerge>(spec_file_name_, ms2_file_name, 
-                                                thread_num_, ms2_file_name, 
-                                                topfd_para_ptr_-> getParaStr("#", "\t"));
-    ms1_merge_ptr->process();
-    ms2_merge_ptr->process();
-  }
-  else {
-    for (size_t j = 0; j < voltage_vec_.size(); j++) {
-      ms1_file_name = str_util::toString(j) + "_ms1.msalign";
-      ms2_file_name = str_util::toString(j) + "_ms2.msalign";
-
-      MsalignThreadMergePtr ms1_merge_ptr
-        = std::make_shared<MsalignThreadMerge>(spec_file_name_, ms1_file_name, 
-                                               thread_num_, ms1_file_name, 
-                                               topfd_para_ptr_-> getParaStr("#", "\t"));
-
-      MsalignThreadMergePtr ms2_merge_ptr 
-        = std::make_shared<MsalignThreadMerge>(spec_file_name_, ms2_file_name, 
-                                               thread_num_, ms2_file_name, 
-                                               topfd_para_ptr_-> getParaStr("#", "\t"));
-      ms1_merge_ptr->process();
-      ms2_merge_ptr->process();
-
-      msalign_num_ = voltage_vec_.size();
-    }
-  }
-  
-  std::cout << std::endl;
   */
+
+  std::cout << std::endl;
 }
+
 
 /*
-void DeconvMs1Process::process() {
-  // reader
-  RawMsGroupFaimeReaderPtr reader_ptr 
-    = std::make_shared<RawMsGroupFaimeReader>(spec_file_name_, 
-                                              topfd_para_ptr_->isMissingLevelOne(),
-                                              topfd_para_ptr_->getActivation(),
-                                              topfd_para_ptr_->getPrecWindow(),  
-                                              frac_id_);
-  if (topfd_para_ptr_->isMissingLevelOne()) {
-    processSpMissingLevelOne(reader_ptr);
-  }
-  else {
-    processSp(reader_ptr);
-  }
-}
 
-void deconvMsOne(MzmlMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
-                 MatchEnvPtrVec prec_envs, 
+void deconvMsOne(MzmlMsGroupPtr ms_group_ptr, 
+                 TopfdParaPtr topfd_para_ptr,  
                  MsAlignWriterPtrVec ms1_writer_ptr_vec, 
-                 SimpleThreadPoolPtr pool_ptr, 
-                 bool gene_html_dir,
-                 std::string ms1_json_dir) { 
-  
+                 SimpleThreadPoolPtr pool_ptr) { 
+  // 1. Store peak intensity 
   PeakPtrVec peak_list = ms_ptr->getPeakPtrVec();
-  LOG_DEBUG("peak list size " << peak_list.size());
-  MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
-  LOG_DEBUG("ms level " << header_ptr->getMsLevel() );
-
-  count_lock.lock();
-  DeconvMs1Process::ms1_spec_num_++;
-  count_lock.unlock();
-  
-  //remove precursor peaks
   std::vector<double> intensities;
   for (size_t i = 0; i < peak_list.size(); i++) {
     intensities.push_back(peak_list[i]->getIntensity());
   }
+  // 2. Deconv envelopes in precursor windows and remove them
+  MatchEnvPtrVec prec_envs = RawMsGroupFaimeReader::obtainPrecEnvs(ms_group_ptr, 
+                                                                   topfd_para_ptr->getMaxMass(),
+                                                                   topfd_para_ptr->getMaxCharge()); 
+  //remove precursor peaks
   for (size_t i = 0; i < prec_envs.size(); i++) {
     RealEnvPtr env_ptr = prec_envs[i]->getRealEnvPtr();
     for (int p = 0; p < env_ptr->getPeakNum(); p++) {
@@ -299,75 +171,45 @@ void deconvMsOne(MzmlMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
       }
     }
   }
-  MatchEnvPtrVec result_envs;
-
+  // 3. Deconv the whole spectrum 
+  MatchEnvPtrVec deconv_envs;
   if (peak_list.size() > 0) {
     LOG_DEBUG("set data....");
-    deconv_ptr->setMsLevel(header_ptr->getMsLevel());
-    deconv_ptr->setData(peak_list);
+    MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
+    DeconvSingleSpPtr deconv_ptr = std::make_shared<DeconvSingleSp>(topfd_para_ptr_, peak_list, ms_level);
     deconv_ptr->run();
-    result_envs = deconv_ptr->getResult();
+    deconv_envs = deconv_ptr->getResult();
   }
-  prec_envs.insert(prec_envs.end(), result_envs.begin(), result_envs.end());
+  // 4. Filter only deconvolution envelopes, precursor envelopes are not
+  // filtered.
+  
+  // 5. Merge precursor envelopes and deconvolution envelopes
+  MatchEnvPtrVec result_envs;
+  result_envs.insert(result_envs.end(), prec_envs.begin(), prec_envs.end());
+  result_envs.insert(result_envs.end(), deconv_envs.begin(), deconv_envs.end());
   LOG_DEBUG("result num " << prec_envs.size());
-
-  TopfdParaPtr topfd_para_ptr = deconv_ptr->getTopfdParaPtr();
+  
+  // 6. Write to msalign file
   DeconvMsPtr deconv_ms_ptr = match_env_util::getDeconvMsPtr(header_ptr,
-                                                             prec_envs,
+                                                             result_envs,
                                                              topfd_para_ptr->isUseEnvCnn());
 
   boost::thread::id thread_id = boost::this_thread::get_id();
   int writer_id = pool_ptr->getId(thread_id);
-
   ms1_writer_ptr_vec[writer_id]->writeMs(deconv_ms_ptr);
-
-  // add back precursor peaks
-  for (size_t i = 0; i < peak_list.size(); i++) {
-    peak_list[i]->setIntensity(intensities[i]);
-  }
-  //write only when html folder argument is true
+  
+  //7. write json file 
   if (gene_html_dir) {
+    // add back precursor peaks
+    for (size_t i = 0; i < peak_list.size(); i++) {
+      peak_list[i]->setIntensity(intensities[i]);
+    }
     std::string json_file_name = ms1_json_dir 
         + file_util::getFileSeparator() 
         + "spectrum" + std::to_string(header_ptr->getSpecId()) + ".js";
     mzml_ms_json_writer::write(json_file_name, ms_ptr, prec_envs);    
   }
 }
-
-//DecovOne & Two
-std::function<void()> geneTask(MzmlMsGroupPtr ms_group_ptr, 
-                               DeconvOneSpPtr deconv_ptr, 
-                               MsAlignWriterPtrVec ms1_writer_ptr_vec, 
-                               MsAlignWriterPtrVec ms2_writer_ptr_vec, 
-                               SimpleThreadPoolPtr pool_ptr, 
-                               bool gene_html_dir, 
-                               std::string ms1_json_dir, 
-                               std::string ms2_json_dir){
-  return [ms_group_ptr, deconv_ptr, ms1_writer_ptr_vec, 
-  ms2_writer_ptr_vec, pool_ptr, gene_html_dir, ms1_json_dir, ms2_json_dir]() {
-
-    MzmlMsPtr ms_one_ptr = ms_group_ptr->getMsOnePtr();                            
-    MzmlMsPtrVec ms_two_ptr_vec = ms_group_ptr->getMsTwoPtrVec();
-
-    MatchEnvPtrVec prec_envs;
-    TopfdParaPtr topfd_para_ptr = deconv_ptr->getTopfdParaPtr();
-
-    RawMsGroupFaimeReader::obtainPrecEnvs(ms_group_ptr, prec_envs, 
-                                          topfd_para_ptr->getMaxMass(),
-                                          topfd_para_ptr->getMaxCharge()); 
-
-    deconvMsOne(ms_one_ptr, deconv_ptr, prec_envs, ms1_writer_ptr_vec, 
-                pool_ptr, gene_html_dir, ms1_json_dir);
-
-    for (size_t i = 0; i < ms_two_ptr_vec.size(); i++) {
-      MzmlMsPtr ms_two_ptr = ms_two_ptr_vec[i];
-      deconvMsTwo(ms_two_ptr, deconv_ptr, ms2_writer_ptr_vec, 
-                  pool_ptr, gene_html_dir, ms2_json_dir);
-    }
-
-  };
-}
-
 */
 
 }; // namespace toppic

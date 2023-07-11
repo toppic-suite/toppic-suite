@@ -17,10 +17,33 @@
 #include <iomanip>
 #include "common/util/version.hpp"
 #include "common/util/time_util.hpp"
+#include "common/util/file_util.hpp"
+#include "common/util/str_util.hpp"
 #include "topfd/common/topfd_para.hpp"
 #include "common/util/version.hpp"
 
 namespace toppic {
+
+void TopfdPara::setMzmlFileNameAndFaims(std::string &mzml_file_name, 
+                                        bool is_faims, double voltage) {
+  mzml_file_name_ = mzml_file_name;
+  is_faims_ = is_faims;
+  faims_volt_ = voltage;
+  output_base_name_ = file_util::basename(mzml_file_name_);
+  // if it is faims data, then add integer voltage to output_file_name
+  if (is_faims_) {
+    output_base_name_ = output_base_name_ + "_" 
+      + str_util::toString(static_cast<int>(faims_volt_)); 
+  }
+  html_dir_ =  output_base_name_ + "_" + "html";
+  ms1_json_dir_ = html_dir_ 
+    + file_util::getFileSeparator() + "topfd" 
+    + file_util::getFileSeparator() + "ms1_json";
+  ms2_json_dir_ = html_dir_ 
+    + file_util::getFileSeparator() + "topfd" 
+    + file_util::getFileSeparator() + "ms2_json";
+}
+
 std::string TopfdPara::getParaStr(const std::string &prefix, 
 		                  const std::string &sep) {
   std::stringstream output;
@@ -29,7 +52,7 @@ std::string TopfdPara::getParaStr(const std::string &prefix,
   output << prefix << "Timestamp: " << time_util::getTimeStr() << std::endl;
   output << prefix << "###################### Parameters ######################" << std::endl;
   output << prefix << std::setw(gap) << std::left 
-      << "File name:                " << sep  << file_name_ << std::endl;
+      << "File name:                " << sep  << mzml_file_name_ << std::endl;
   if (is_faims_) {
     output << prefix << std::setw(gap) << std::left 
       << "Faims data:               " << sep << "Yes" << std::endl;
