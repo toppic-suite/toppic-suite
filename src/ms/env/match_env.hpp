@@ -27,16 +27,16 @@ typedef std::shared_ptr<MatchEnv> MatchEnvPtr;
 
 class MatchEnv {
  public:
-  MatchEnv(int mass_group, EnvelopePtr theo_env_ptr, 
-           RealEnvPtr real_env_ptr);
+  MatchEnv(int mass_group, EnvPtr theo_env_ptr,
+           ExpEnvPtr real_env_ptr);
 
   int getId() {return id_;}
 
   int getMassGroup() {return mass_group_;}
 
-  RealEnvPtr getRealEnvPtr() {return real_env_ptr_;}
+  ExpEnvPtr getRealEnvPtr() {return real_env_ptr_;}
 
-  EnvelopePtr getTheoEnvPtr() {return theo_env_ptr_;}
+  EnvPtr getTheoEnvPtr() {return theo_env_ptr_;}
 
   double getEnvcnnScore() {return envcnn_score_;}
 
@@ -48,7 +48,7 @@ class MatchEnv {
 
   void setId(int id) {id_ = id;}
 
-  void setTheoEnvPtr(EnvelopePtr theo_env_ptr) {theo_env_ptr_ = theo_env_ptr;}
+  void setTheoEnvPtr(EnvPtr theo_env_ptr) { theo_env_ptr_ = theo_env_ptr;}
 
   void compMsdeconvScr(EnvParaPtr env_para_ptr);
 
@@ -70,8 +70,8 @@ class MatchEnv {
   int mass_group_;
   double msdeconv_score_;
   double envcnn_score_;
-  EnvelopePtr theo_env_ptr_;
-  RealEnvPtr real_env_ptr_;
+  EnvPtr theo_env_ptr_;
+  ExpEnvPtr real_env_ptr_;
 
   double calcShareInteAccu(int id_x, double inte_sum);
 

@@ -174,7 +174,7 @@ MatchEnvPtr refinePrecChrg(MzmlMsPtr ms_one, MzmlMsPtr ms_two,
                                                max_mass, max_charge);
   PrecursorPtr prec_ptr = header_two->getSinglePrecPtr();
   if (match_env_ptr != nullptr) {
-    RealEnvPtr env_ptr = match_env_ptr->getRealEnvPtr();
+    ExpEnvPtr env_ptr = match_env_ptr->getRealEnvPtr();
     prec_ptr->setMonoMz(env_ptr->getMonoMz());
     prec_ptr->setCharge(env_ptr->getCharge());
     prec_ptr->setInte(env_ptr->compIntensitySum());

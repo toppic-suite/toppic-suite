@@ -73,7 +73,7 @@ MatchEnvPtr2D getBatchEnv(MatchEnvPtrVec &ori_envs) {
   return result;
 }
 
-void extractTheoPeakData(EnvelopePtr &theo_env, 
+void extractTheoPeakData(EnvPtr &theo_env,
                          std::vector<double> &theo_mass,
                          std::vector<double> &theo_intes) {
   for (int i = 0; i < theo_env->getPeakNum(); i++) {
@@ -85,7 +85,7 @@ void extractTheoPeakData(EnvelopePtr &theo_env,
 void getTheoEnvData(MatchEnvPtr &ori_env, std::vector<double> &theo_mass, 
                     std::vector<double> &theo_intes,
                     double &max_inte, double &theo_mono_mz) {
-  EnvelopePtr theo_env = ori_env->getTheoEnvPtr();
+  EnvPtr theo_env = ori_env->getTheoEnvPtr();
   theo_mono_mz= theo_env->getMonoMz();
   extractTheoPeakData(theo_env, theo_mass, theo_intes);
   max_inte= *std::max_element(std::begin(theo_intes), std::end(theo_intes));
@@ -115,7 +115,7 @@ void getExpEnvData(const PeakPtrVec &peak_list, MatchEnvPtr &ori_env,
                    std::vector<double> &theo_mass,
                    std::vector<double> &peak_mass, 
                    std::vector<double> &peak_intes) {
-  RealEnvPtr real_env = ori_env->getRealEnvPtr();
+  ExpEnvPtr real_env = ori_env->getRealEnvPtr();
   double real_mono_mz = real_env->getMonoMz();
   getExpIntervaledPeakData(peak_list, real_mono_mz, theo_mass, peak_mass, peak_intes);
 }

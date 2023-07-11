@@ -29,10 +29,10 @@ namespace toppic {
 
 class PeakCluster:public FracFeature {
  public:
-  PeakCluster(EnvelopePtr theo_env);
+  PeakCluster(EnvPtr theo_env);
 
-  void addEnvelopes(FracFeaturePtr feature_ptr, 
-                    RealEnvPtrVec envs);
+  void addEnvelopes(FracFeaturePtr feature_ptr,
+                    ExpEnvPtrVec envs);
 
   void clearScores();
 
@@ -65,8 +65,8 @@ class PeakCluster:public FracFeature {
   double apex_intensity_;
   double boundary_intensity_;
 
-  RealEnvPtrVec2D real_envs_;  
-  EnvelopePtr theo_env_;
+  ExpEnvPtrVec2D real_envs_;
+  EnvPtr theo_env_;
 
   std::vector<double> rep_summed_intensities_;
 

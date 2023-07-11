@@ -22,7 +22,7 @@ namespace toppic {
 
 class Env;
 
-typedef std::shared_ptr<Env> EnvelopePtr;
+typedef std::shared_ptr<Env> EnvPtr;
 
 class Env {
  public:
@@ -35,11 +35,11 @@ class Env {
 
   Env(int refer_idx, int charge, double mono_mz, EnvPeakPtrVec &peaks);
 
-  EnvelopePtr convertToTheo(double mass_diff, int new_charge);
+  EnvPtr convertToTheo(double mass_diff, int new_charge);
 
-  EnvelopePtr distrToTheoRef(double new_ref_mz, int new_charge);
+  EnvPtr distrToTheoRef(double new_ref_mz, int new_charge);
 
-  EnvelopePtr distrToTheoMono(double new_mono_mz, int new_charge);
+  EnvPtr distrToTheoMono(double new_mono_mz, int new_charge);
 
   void changeIntensity(double ratio);
 
@@ -47,14 +47,14 @@ class Env {
 
   void changeMz(double shift);
 
-  EnvelopePtr getSubEnv(int n_back, int n_forw);
+  EnvPtr getSubEnv(int n_back, int n_forw);
 
-  EnvelopePtr getSubEnv(double min_inte);
+  EnvPtr getSubEnv(double min_inte);
 
-  EnvelopePtr addZero(int num);
+  EnvPtr addZero(int num);
 
-  EnvelopePtr getSubEnv(double percent_bound, double absolute_min_inte,
-                        int max_back_peak_num, int max_forw_peak_num);
+  EnvPtr getSubEnv(double percent_bound, double absolute_min_inte,
+                   int max_back_peak_num, int max_forw_peak_num);
 
   std::vector<int> calcBound(double percent_bound, double absolute_min_inte,
                              int max_back_peak_num, int max_forw_peak_num);
@@ -118,7 +118,7 @@ class Env {
   int getHighestPeakIdx();
 };
 
-typedef std::vector<EnvelopePtr> EnvelopePtrVec;
+typedef std::vector<EnvPtr> EnvPtrVec;
 
 }
 

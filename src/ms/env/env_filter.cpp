@@ -35,7 +35,7 @@ int cntValid(MatchEnvPtr2D &match_envs) {
 
 // Test match envelope has a valid real envelope 
 bool checkRealEnvValid(MatchEnvPtr env, EnvParaPtr env_para_ptr) {
-  RealEnvPtr real_env = env->getRealEnvPtr();
+  ExpEnvPtr real_env = env->getRealEnvPtr();
   int mass_group = env->getMassGroup();
   // 1. test if the number of matched peaks >= min_match_peak_num
   if (real_env->getMatchPeakNum() < env_para_ptr->min_match_peak_num_[mass_group]) {

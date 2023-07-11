@@ -72,7 +72,7 @@ void assignIntensity(PeakPtrVec &ms, MatchEnvPtrVec &envs) {
     for (int j = 0; j < env->getRealEnvPtr()->getPeakNum(); j++) {
       int peak = env->getRealEnvPtr()->getPeakIdx(j);
       if (peak >= 0) {
-        EnvelopePtr real_env = env->getRealEnvPtr();
+        EnvPtr real_env = env->getRealEnvPtr();
         double intensity = real_env->getIntensity(j) * env->getTheoEnvPtr()->getIntensity(j)
             / intensity_sums_[peak];
         real_env->setIntensity(j, intensity);
@@ -86,7 +86,7 @@ PeakPtrVec  rmAnnoPeak(PeakPtrVec &ms, MatchEnvPtrVec &envs) {
   int peak_num = new_list.size();
   std::vector<bool> is_keeps(peak_num, true);
   for (size_t i = 0; i < envs.size(); i++) {
-    RealEnvPtr real_env_ptr = envs[i]->getRealEnvPtr();
+    ExpEnvPtr real_env_ptr = envs[i]->getRealEnvPtr();
     for (int j = 0; j < real_env_ptr->getPeakNum(); j++) {
       int peak_idx = real_env_ptr->getPeakIdx(j);
       if (peak_idx >= 0) {
@@ -132,8 +132,8 @@ MatchEnvPtr getNewMatchEnv(PeakPtrVec &ms, int idx, double tolerance) {
   peaks.push_back(peak_ptr);
   int ref_idx = 0;
   int charge = 1;
-  EnvelopePtr theo_env = std::make_shared<Env>(ref_idx, charge, mz, peaks);
-  RealEnvPtr real_env = std::make_shared<ExpEnv>(ms, theo_env, tolerance, 0);
+  EnvPtr theo_env = std::make_shared<Env>(ref_idx, charge, mz, peaks);
+  ExpEnvPtr real_env = std::make_shared<ExpEnv>(ms, theo_env, tolerance, 0);
   int mass_group = 0;
   return std::make_shared<MatchEnv>(mass_group, theo_env, real_env);
 }
@@ -173,7 +173,7 @@ MatchEnvPtrVec addMultipleMass(MatchEnvPtrVec &envs, MatchEnvPtr2D &candidates,
       }
       mass_envs.push_back(charge_envs[j]);
       double mono_mass = charge_envs[j]->getRealEnvPtr()->getMonoNeutralMass();
-      RealEnvPtr real_env_ptr = charge_envs[j]->getRealEnvPtr();
+      ExpEnvPtr real_env_ptr = charge_envs[j]->getRealEnvPtr();
       int refer_idx = real_env_ptr->getReferIdx();
       if (mono_mass >= env_para_ptr->multiple_min_mass_) {
         // check left -1 Dalton
@@ -202,8 +202,8 @@ DeconvMsPtr getDeconvMsPtr(MsHeaderPtr header_ptr, MatchEnvPtrVec &envs, bool us
   DeconvPeakPtrVec peak_list;
   int sp_id = header_ptr->getSpecId();
   for (size_t i = 0; i < envs.size(); i++) {
-    EnvelopePtr theo_env = envs[i]->getTheoEnvPtr();
-    RealEnvPtr real_env = envs[i]->getRealEnvPtr();
+    EnvPtr theo_env = envs[i]->getTheoEnvPtr();
+    ExpEnvPtr real_env = envs[i]->getRealEnvPtr();
     double pos = real_env->getMonoNeutralMass();
     double inte = theo_env->compIntensitySum();
     int charge = theo_env->getCharge();

@@ -77,7 +77,7 @@ void EnvBase::initRefMassIdx() {
 
 // Private class methods
 // Get a distribution envelope based on its monoisotopic mass.
-EnvelopePtr EnvBase::getBaseEnvByMonoMass(double mass) {
+EnvPtr EnvBase::getBaseEnvByMonoMass(double mass) {
   int idx = static_cast<int>(mass / mass_interval_);
   if (idx < 0) {
     LOG_ERROR("Invalid mass!");
@@ -91,7 +91,7 @@ EnvelopePtr EnvBase::getBaseEnvByMonoMass(double mass) {
 
 // Get a distribution envelope based on its mass of reference (highest
 // intensity) peak.
-EnvelopePtr EnvBase::getBaseEnvByRefMass(double mass) {
+EnvPtr EnvBase::getBaseEnvByRefMass(double mass) {
   int idx = static_cast<int>(mass / mass_interval_);
   if (idx < 0) {
     LOG_ERROR("Invalid mass");
@@ -105,16 +105,16 @@ EnvelopePtr EnvBase::getBaseEnvByRefMass(double mass) {
 
 
 // public static methods
-EnvelopePtr EnvBase::getEnvByMonoMass(double mass) {
+EnvPtr EnvBase::getEnvByMonoMass(double mass) {
   return env_base_ptr_->getBaseEnvByMonoMass(mass);
 }
 
-EnvelopePtr EnvBase::getEnvByRefMass(double mass) {
+EnvPtr EnvBase::getEnvByRefMass(double mass) {
   return env_base_ptr_->getBaseEnvByRefMass(mass);
 }
 
 double EnvBase::convertMonoMassToAvgMass(double mass) {
-  EnvelopePtr env_ptr = env_base_ptr_->getBaseEnvByMonoMass(mass);
+  EnvPtr env_ptr = env_base_ptr_->getBaseEnvByMonoMass(mass);
   if (env_ptr == nullptr) {
     LOG_ERROR("Invalid mass!");
     exit(EXIT_FAILURE);
@@ -125,7 +125,7 @@ double EnvBase::convertMonoMassToAvgMass(double mass) {
 
 //Ref mass is the monoisotopic mass of the highest peak in the envelope
 double EnvBase::convertRefMassToMonoMass(double mass) {
-  EnvelopePtr env_ptr = env_base_ptr_->getBaseEnvByRefMass(mass);
+  EnvPtr env_ptr = env_base_ptr_->getBaseEnvByRefMass(mass);
   if (env_ptr == nullptr) {
     LOG_ERROR("Invalid mass!");
     exit(EXIT_FAILURE);

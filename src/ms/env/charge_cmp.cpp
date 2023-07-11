@@ -21,7 +21,7 @@ namespace toppic {
 namespace charge_cmp {
 
 // get shared peaks in two peak lists 
-std::vector<int> getSharedPeaks(RealEnvPtr env_a, RealEnvPtr env_b) {
+std::vector<int> getSharedPeaks(ExpEnvPtr env_a, ExpEnvPtr env_b) {
   int len = env_a->getPeakNum();
   std::vector<int> shared_peaks(len, -1);
   for (int i = 0; i < len; i++) {

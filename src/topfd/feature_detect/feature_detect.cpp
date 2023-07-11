@@ -359,7 +359,7 @@ void removePeaks (DeconvMsPtrVec &ms1_ptr_vec, DeconvPeakPtrVec &matched_peaks) 
 MatchEnvPtr getMatchEnv(const PeakPtrVec &peak_list, int sp_id, double mono_neutral_mass, int charge,
                         EnvParaPtr env_para_ptr) {
 
-  EnvelopePtr ref_env = EnvBase::getEnvByMonoMass(mono_neutral_mass);
+  EnvPtr ref_env = EnvBase::getEnvByMonoMass(mono_neutral_mass);
   if (ref_env == nullptr) {
     LOG_ERROR("reference envelope is null");
     exit(EXIT_FAILURE);
@@ -368,7 +368,7 @@ MatchEnvPtr getMatchEnv(const PeakPtrVec &peak_list, int sp_id, double mono_neut
   // original envelope has charge 1
   double ori_mono_charge_mass = ref_env->getMonoNeutralMass() + mass_constant::getIsotopeMass();
   double mass_diff = new_mono_charge_mass - ori_mono_charge_mass;
-  EnvelopePtr theo_env = ref_env->convertToTheo(mass_diff, charge); 
+  EnvPtr theo_env = ref_env->convertToTheo(mass_diff, charge);
 
   int mass_group = env_para_ptr->getMassGroup(mono_neutral_mass);
   // LOG_DEBUG("theo env raw complete");
@@ -381,8 +381,8 @@ MatchEnvPtr getMatchEnv(const PeakPtrVec &peak_list, int sp_id, double mono_neut
   int max_forw_peak_num = 1000;
   theo_env = theo_env->getSubEnv(percentage, min_inte, max_back_peak_num, max_forw_peak_num); 
 
-  RealEnvPtr real_env = std::make_shared<ExpEnv>(peak_list, theo_env, env_para_ptr->getMzTolerance(),
-                                                 min_inte);
+  ExpEnvPtr real_env = std::make_shared<ExpEnv>(peak_list, theo_env, env_para_ptr->getMzTolerance(),
+                                                min_inte);
   if (real_env == nullptr) {
     LOG_ERROR("real env is null");
   }
@@ -429,7 +429,7 @@ void findMsOneFeatures(DeconvMsPtrVec &ms1_ptr_vec, PeakPtrVec2D & raw_peaks,
             LOG_ERROR("matche env is null");
           }
           PeakClusterPtr peak_cluster = std::make_shared<PeakCluster>(match_env->getTheoEnvPtr());
-          RealEnvPtrVec real_envs; 
+          ExpEnvPtrVec real_envs;
           for (size_t i = 0; i < matched_peaks.size(); i++) {
             ref_charge = matched_peaks[i]->getCharge();
             sp_id = matched_peaks[i]->getSpId();

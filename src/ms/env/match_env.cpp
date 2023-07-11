@@ -21,8 +21,8 @@
 
 namespace toppic {
 
-MatchEnv::MatchEnv(int mass_group, EnvelopePtr theo_env_ptr, 
-                   RealEnvPtr real_env_ptr):
+MatchEnv::MatchEnv(int mass_group, EnvPtr theo_env_ptr,
+                   ExpEnvPtr real_env_ptr):
     mass_group_(mass_group),
     theo_env_ptr_(theo_env_ptr), 
     real_env_ptr_(real_env_ptr) {

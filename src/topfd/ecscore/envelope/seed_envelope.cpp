@@ -19,13 +19,13 @@
 
 namespace toppic {
 
-EnvelopePtr getTheoEnv(double mono_mass, int charge) {
-  EnvelopePtr ref_env_ptr = toppic::EnvBase::getEnvByMonoMass(mono_mass);
+EnvPtr getTheoEnv(double mono_mass, int charge) {
+  EnvPtr ref_env_ptr = toppic::EnvBase::getEnvByMonoMass(mono_mass);
   if (ref_env_ptr == nullptr) {
     return nullptr;
   }
   double mono_mz = peak_util::compMz(mono_mass, charge);
-  EnvelopePtr theo_env_ptr = ref_env_ptr->distrToTheoMono(mono_mz, charge);
+  EnvPtr theo_env_ptr = ref_env_ptr->distrToTheoMono(mono_mz, charge);
   return theo_env_ptr;
 }
 
@@ -36,7 +36,7 @@ SeedEnvelope::SeedEnvelope(DeconvPeakPtr peak_ptr) {
   pos_ = peak_ptr->getMonoMz();
   inte_ = peak_ptr->getIntensity();
   charge_ = peak_ptr->getCharge();
-  EnvelopePtr theo_env_ptr = getTheoEnv(mass_, charge_);
+  EnvPtr theo_env_ptr = getTheoEnv(mass_, charge_);
   for (int j = 0; j < theo_env_ptr->getPeakNum(); j++) {
     EnvSimplePeakPtr p_ptr = std::make_shared<EnvSimplePeak>(theo_env_ptr->getMz(j), 
                                                            theo_env_ptr->getIntensity(j));
@@ -51,7 +51,7 @@ SeedEnvelope::SeedEnvelope(MsHeaderPtr header_ptr) {
   pos_ = header_ptr->getPrecMonoMz();
   inte_ = header_ptr->getPrecInte();
   charge_ = header_ptr->getPrecCharge();
-  EnvelopePtr theo_env_ptr = getTheoEnv(mass_, charge_);
+  EnvPtr theo_env_ptr = getTheoEnv(mass_, charge_);
   for (int j = 0; j < theo_env_ptr->getPeakNum(); j++) {
     EnvSimplePeakPtr p_ptr = std::make_shared<EnvSimplePeak>(theo_env_ptr->getMz(j), 
                                                              theo_env_ptr->getIntensity(j));
@@ -81,7 +81,7 @@ SeedEnvelope::SeedEnvelope(SeedEnvelopePtr env_ptr) {
   mass_ = env_ptr->mass_;
   inte_ = env_ptr->inte_;
   charge_ = env_ptr->charge_;
-  EnvelopePtr theo_env_ptr = getTheoEnv(mass_, charge_);
+  EnvPtr theo_env_ptr = getTheoEnv(mass_, charge_);
   for (int j = 0; j < theo_env_ptr->getPeakNum(); j++) {
     EnvSimplePeakPtr p_ptr = std::make_shared<EnvSimplePeak>(theo_env_ptr->getMz(j), 
                                                            theo_env_ptr->getIntensity(j));

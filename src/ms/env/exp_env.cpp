@@ -22,7 +22,7 @@
 
 namespace toppic {
 
-ExpEnv::ExpEnv(const PeakPtrVec &peak_list, EnvelopePtr theo_env,
+ExpEnv::ExpEnv(const PeakPtrVec &peak_list, EnvPtr theo_env,
                double tolerance, double min_inte) {
   // copy 
   refer_idx_ = theo_env->getReferIdx();
@@ -40,7 +40,7 @@ ExpEnv::ExpEnv(const PeakPtrVec &peak_list, EnvelopePtr theo_env,
 }
 
 // map peaks in theo_env to the peaks in sp 
-void ExpEnv::mapPeakList(const PeakPtrVec &peak_list, EnvelopePtr theo_env,
+void ExpEnv::mapPeakList(const PeakPtrVec &peak_list, EnvPtr theo_env,
                          double tolerance, double min_inte) {
   int peak_num = theo_env->getPeakNum();
   peaks_.clear();
@@ -65,7 +65,7 @@ void ExpEnv::mapPeakList(const PeakPtrVec &peak_list, EnvelopePtr theo_env,
 
 // Remove duplicated matches. If two theoretical peaks are matched to the
 // same real peak, only the one with less mz error is kept.
-void ExpEnv::remvDuplMatch(EnvelopePtr theo_env) {
+void ExpEnv::remvDuplMatch(EnvPtr theo_env) {
   for (int i = 0; i < getPeakNum() - 1; i++) {
     if (isExist(i) && peaks_[i]->getIdx() == peaks_[i + 1]->getIdx()) {
       if (std::abs(theo_env->getMz(i) - peaks_[i]->getPosition()) 
@@ -110,7 +110,7 @@ bool ExpEnv::isExist(int i) {
   return peaks_[i]->isExist();
 }
 
-bool ExpEnv::testPeakShare(RealEnvPtr a, RealEnvPtr  b) {
+bool ExpEnv::testPeakShare(ExpEnvPtr a, ExpEnvPtr  b) {
   for (int i = 0; i < a->getPeakNum(); i++) {
     int a_idx = a->getPeakIdx(i);
     for (int j = 0; j < b->getPeakNum(); j++) {

@@ -58,7 +58,7 @@ void getExpIntervaledPeakData(const PeakPtrVec &peak_list, double real_mono_mz,
 
 void getExpEnvData(const PeakPtrVec &peak_list, MatchEnvPtr &ori_env, std::vector<double> &theo_mass,
                    std::vector<double> &peak_mass, std::vector<double> &peak_intes) {
-  RealEnvPtr real_env = ori_env->getRealEnvPtr();
+  ExpEnvPtr real_env = ori_env->getRealEnvPtr();
   double real_mono_mz = real_env->getMonoMz();
   getExpIntervaledPeakData(peak_list, real_mono_mz, theo_mass, peak_mass, peak_intes);
 }
@@ -102,7 +102,7 @@ void extractFeature(const std::vector<double> &theo_mass, const std::vector<doub
     md = (0.02 - mass_diff)/0.02;
 }
 
-void extractTheoPeakData(EnvelopePtr &theo_env, std::vector<double> &theo_mass,
+void extractTheoPeakData(EnvPtr &theo_env, std::vector<double> &theo_mass,
                          std::vector<double> &theo_intes) {
   for (int i = 0; i < theo_env->getPeakNum(); i++) {
     theo_mass.push_back(theo_env->getMz(i));
@@ -120,7 +120,7 @@ void normalizeTheoIntens(std::vector<double> &theo_intes, double &max_inte) {
 
 void getTheoEnvData(MatchEnvPtr &ori_env, std::vector<double> &theo_mass, std::vector<double> &theoIntes,
                     double &max_inte, double &theo_mono_mz) {
-  EnvelopePtr theo_env = ori_env->getTheoEnvPtr();
+  EnvPtr theo_env = ori_env->getTheoEnvPtr();
   theo_mono_mz= theo_env->getMonoMz();
   extractTheoPeakData(theo_env, theo_mass, theoIntes);
   normalizeTheoIntens(theoIntes, max_inte);

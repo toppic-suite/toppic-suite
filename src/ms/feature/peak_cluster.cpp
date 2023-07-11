@@ -167,7 +167,7 @@ double getRankSumPValue(PeakPtrVec win_peaks, std::vector<double> &env_peak_inte
   return pvalue;
 }
 
-PeakCluster::PeakCluster(EnvelopePtr theo_env) {
+PeakCluster::PeakCluster(EnvPtr theo_env) {
   theo_env_ = theo_env;
   rep_mass_ = theo_env_->getMonoNeutralMass();
   rep_charge_ = theo_env_->getCharge();
@@ -182,8 +182,8 @@ PeakCluster::PeakCluster(EnvelopePtr theo_env) {
   smoother_ = std::make_shared<SavitzkyGolay>(9, 2);
 }
 
-void PeakCluster::addEnvelopes(FracFeaturePtr feature_ptr, 
-                               RealEnvPtrVec envs) {
+void PeakCluster::addEnvelopes(FracFeaturePtr feature_ptr,
+                               ExpEnvPtrVec envs) {
 
   int row_num = feature_ptr->getMaxCharge() - feature_ptr->getMinCharge() + 1;
   int col_num = feature_ptr->getMaxMs1Id() - feature_ptr->getMinMs1Id() + 1;
@@ -251,10 +251,10 @@ void PeakCluster::updateScore(PeakPtrVec2D &raw_peaks, bool check_pvalue) {
 
   double tmp_best_bc_dist = 10.0;
   double rep_env_bc_dist = 10.0;
-  RealEnvPtr rep_env(nullptr);
+  ExpEnvPtr rep_env(nullptr);
 
   double rep_env_bc_dist_2 = 10.0;
-  RealEnvPtr rep_env_2(nullptr);
+  ExpEnvPtr rep_env_2(nullptr);
 
   std::vector<double> tmp_best_dist_scores{10.0, 10.0};
   std::vector<double> tmp_best_inte_scores(2, 0.0);
@@ -275,7 +275,7 @@ void PeakCluster::updateScore(PeakPtrVec2D &raw_peaks, bool check_pvalue) {
     double summed_win_high_inte = 0.0;
 
     for (int j = 0; j < col_num; j++) {
-      RealEnvPtr env = real_envs_[i][j];
+      ExpEnvPtr env = real_envs_[i][j];
       if (env == nullptr) continue;
       
       // sum peak inte

@@ -25,7 +25,7 @@ void mzRefine(MatchEnvPtrVec &envs);
 
 void mzRefine(MatchEnvPtr env);
 
-void compEnvDist(EnvelopePtr real_env, EnvelopePtr theo_env,
+void compEnvDist(EnvPtr real_env, EnvPtr theo_env,
                  double &best_dist, double &best_ratio);
 
 void compDistWithNorm(const std::vector<double>& real,

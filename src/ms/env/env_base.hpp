@@ -31,9 +31,9 @@ class EnvBase {
   static void initBase(const std::string &resouce_dir);
 
   // All public functions are static 
-  static EnvelopePtr getEnvByMonoMass(double mass);
+  static EnvPtr getEnvByMonoMass(double mass);
 
-  static EnvelopePtr getEnvByRefMass(double mass);
+  static EnvPtr getEnvByRefMass(double mass);
 
   static double convertMonoMassToAvgMass(double mass);
 
@@ -45,7 +45,7 @@ class EnvBase {
   // the mass interval between two neighboring entries 
   double mass_interval_;
   // the list of distribution envelopes 
-  EnvelopePtrVec envs_;
+  EnvPtrVec envs_;
   // mapping distribution envelopes to the mass value of reference peak (highest intensity peak) 
   std::vector<int> ref_mass_idxes_;
 
@@ -62,10 +62,10 @@ class EnvBase {
   void initRefMassIdx();
   
   // this is a private class method
-  EnvelopePtr getBaseEnvByMonoMass(double mass);
+  EnvPtr getBaseEnvByMonoMass(double mass);
 
   // get a envelope using the mass of the highest peak
-  EnvelopePtr getBaseEnvByRefMass(double mass);
+  EnvPtr getBaseEnvByRefMass(double mass);
 };
 
 }

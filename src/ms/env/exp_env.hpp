@@ -22,11 +22,11 @@ namespace toppic {
 
 class ExpEnv;
 
-typedef std::shared_ptr<ExpEnv> RealEnvPtr;
+typedef std::shared_ptr<ExpEnv> ExpEnvPtr;
 
 class ExpEnv : public Env {
  public:
-  ExpEnv(const PeakPtrVec &peak_list, EnvelopePtr theo_env,
+  ExpEnv(const PeakPtrVec &peak_list, EnvPtr theo_env,
          double tolerance, double min_inte);
 
   int getSpId() {return sp_id_;}
@@ -43,7 +43,7 @@ class ExpEnv : public Env {
 
   void setSpId(int sp_id) {sp_id_ = sp_id;}
 
-  static bool testPeakShare(RealEnvPtr a, RealEnvPtr b);
+  static bool testPeakShare(ExpEnvPtr a, ExpEnvPtr b);
 
   bool isExist(int i);
 
@@ -58,18 +58,18 @@ class ExpEnv : public Env {
   // maximum number of consecutive peaks 
   int max_consecutive_peak_num_;
 
-  void mapPeakList(const PeakPtrVec &peak_list, EnvelopePtr theo_env, 
+  void mapPeakList(const PeakPtrVec &peak_list, EnvPtr theo_env,
                    double tolerance, double min_min);
 
-  void remvDuplMatch(EnvelopePtr theo_env);
+  void remvDuplMatch(EnvPtr theo_env);
 
   void cntMissPeakNum();
 
   void cntMaxConsPeakNum();
 };
 
-typedef std::vector<RealEnvPtr> RealEnvPtrVec;
-typedef std::vector<RealEnvPtrVec> RealEnvPtrVec2D;
+typedef std::vector<ExpEnvPtr> ExpEnvPtrVec;
+typedef std::vector<ExpEnvPtrVec> ExpEnvPtrVec2D;
 
 }
 

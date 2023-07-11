@@ -59,7 +59,7 @@ Env::Env(int refer_idx, int charge, double mono_mz,
       }
     }
 
-EnvelopePtr Env::convertToTheo(double mass_diff, int new_charge) {
+EnvPtr Env::convertToTheo(double mass_diff, int new_charge) {
   int ori_charge = 1;
   double new_mono_mz = (mono_mz_ * ori_charge + mass_diff) / new_charge;
   EnvPeakPtrVec new_peaks(peaks_.size());
@@ -72,14 +72,14 @@ EnvelopePtr Env::convertToTheo(double mass_diff, int new_charge) {
 }
 
 // Convert a theoretical distribution to a theoretical envelope
-EnvelopePtr Env::distrToTheoRef(double new_ref_mz, int new_charge) {
+EnvPtr Env::distrToTheoRef(double new_ref_mz, int new_charge) {
   int ori_charge = 1;
   double mass_diff = new_ref_mz * new_charge - peaks_[refer_idx_]->getPosition() * ori_charge;
   return convertToTheo(mass_diff, new_charge);
 }
 
 // Convert a theoretical distribution to a theoretical envelope based on the
-EnvelopePtr Env::distrToTheoMono(double new_mono_mz, int new_charge) {
+EnvPtr Env::distrToTheoMono(double new_mono_mz, int new_charge) {
   int ori_charge = 1;
   double mass_diff = new_mono_mz * new_charge - mono_mz_ * ori_charge;
   return convertToTheo(mass_diff, new_charge);
@@ -103,18 +103,18 @@ void Env::changeMz(double shift) {
   mono_mz_ += shift;
 }
 
-EnvelopePtr Env::getSubEnv(int n_back, int n_forw) {
+EnvPtr Env::getSubEnv(int n_back, int n_forw) {
   int new_refer_idx = n_back;
   EnvPeakPtrVec new_peaks;
   for (int i = refer_idx_ - n_back; i <= refer_idx_ + n_forw; i++) {
     new_peaks.push_back(peaks_[i]);
   }
-  EnvelopePtr env_ptr = std::make_shared<Env>(new_refer_idx, charge_, mono_mz_,
-                                              new_peaks);
+  EnvPtr env_ptr = std::make_shared<Env>(new_refer_idx, charge_, mono_mz_,
+                                         new_peaks);
   return env_ptr;
 }
 
-EnvelopePtr Env::addZero(int num) {
+EnvPtr Env::addZero(int num) {
   int n_peak = peaks_.size();
   EnvPeakPtrVec new_peaks; 
   for (int i = 0; i < n_peak + 2 * num; i++) {
@@ -136,19 +136,19 @@ EnvelopePtr Env::addZero(int num) {
     new_peaks[i]->setPosition(pos);
   }
   int new_refer_idx = refer_idx_ + num;
-  EnvelopePtr env_ptr = std::make_shared<Env>(new_refer_idx, charge_, mono_mz_,
-                                              new_peaks);
+  EnvPtr env_ptr = std::make_shared<Env>(new_refer_idx, charge_, mono_mz_,
+                                         new_peaks);
   return env_ptr;
 }
 
-EnvelopePtr Env::getSubEnv(double percent_bound, double absolute_min_inte,
-                           int max_back_peak_num, int max_forw_peak_num) {
+EnvPtr Env::getSubEnv(double percent_bound, double absolute_min_inte,
+                      int max_back_peak_num, int max_forw_peak_num) {
   std::vector<int> bounds = calcBound(percent_bound, absolute_min_inte,
                                       max_back_peak_num, max_forw_peak_num);
   return getSubEnv(bounds[0], bounds[1]);
 }
 
-EnvelopePtr Env::getSubEnv(double min_inte) {
+EnvPtr Env::getSubEnv(double min_inte) {
   size_t left = refer_idx_;
   size_t right = refer_idx_;
   for (size_t i = 0; i < peaks_.size(); i++) {

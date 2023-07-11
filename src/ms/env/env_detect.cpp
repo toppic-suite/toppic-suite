@@ -23,7 +23,7 @@ namespace toppic {
 namespace env_detect {
 
 // compute the intensity ratio based on the top three peaks
-double calcInteRatio(const PeakPtrVec &peak_list, EnvelopePtr theo_env_ptr,
+double calcInteRatio(const PeakPtrVec &peak_list, EnvPtr theo_env_ptr,
                      double tolerance) {
   double theo_sum = 0;
   double obs_sum = 0;
@@ -57,7 +57,7 @@ double calcInteRatio(const PeakPtrVec &peak_list, EnvelopePtr theo_env_ptr,
   }
 }
 
-MatchEnvPtr compEnv(const PeakPtrVec &peak_list, EnvelopePtr theo_env_ptr, 
+MatchEnvPtr compEnv(const PeakPtrVec &peak_list, EnvPtr theo_env_ptr,
                     EnvParaPtr env_para_ptr, int mass_group, int min_inte) {
   // scale theoretical distribution
   double ratio = calcInteRatio(peak_list, theo_env_ptr, env_para_ptr->getMzTolerance());
@@ -69,9 +69,9 @@ MatchEnvPtr compEnv(const PeakPtrVec &peak_list, EnvelopePtr theo_env_ptr,
                                          env_para_ptr->max_back_peak_num_, 
                                          env_para_ptr->max_forw_peak_num_);
   // get real envelope
-  RealEnvPtr real_env_ptr = std::make_shared<ExpEnv>(peak_list, theo_env_ptr,
-                                                     env_para_ptr->getMzTolerance(),
-                                                     min_inte);
+  ExpEnvPtr real_env_ptr = std::make_shared<ExpEnv>(peak_list, theo_env_ptr,
+                                                    env_para_ptr->getMzTolerance(),
+                                                    min_inte);
   MatchEnvPtr match_env_ptr = std::make_shared<MatchEnv>(mass_group, theo_env_ptr, real_env_ptr);
   return match_env_ptr;
 }
@@ -89,7 +89,7 @@ MatchEnvPtr detectEnvByRefPeak(const PeakPtrVec &peak_list, int ref_peak, int ch
   }
 
   // get a reference distribution based on the reference (highest intensity) mass
-  EnvelopePtr ref_env_ptr = EnvBase::getEnvByRefMass(ref_mass);
+  EnvPtr ref_env_ptr = EnvBase::getEnvByRefMass(ref_mass);
   if (ref_env_ptr == nullptr) {
     LOG_WARN("reference envelope is null");
     return nullptr;
@@ -100,7 +100,7 @@ MatchEnvPtr detectEnvByRefPeak(const PeakPtrVec &peak_list, int ref_peak, int ch
   }
   // convert the distribution to a theoretical distribution
   // based on the refer mz and charge state
-  EnvelopePtr theo_env_ptr = ref_env_ptr->distrToTheoRef(refer_mz, charge);
+  EnvPtr theo_env_ptr = ref_env_ptr->distrToTheoRef(refer_mz, charge);
   int peak_idx = peak_list_util::getNearPeakIdx(peak_list, theo_env_ptr->getReferMz(), 
                                                 env_para_ptr->getMzTolerance());
   if (peak_idx < 0 || peak_list[peak_idx]->getIntensity() < min_ref_inte) {
@@ -118,7 +118,7 @@ MatchEnvPtr detectEnvByMonoMass(const PeakPtrVec &peak_list, double mono_mass,
   }
 
   // get a reference distribution based on the base mass
-  EnvelopePtr ref_env_ptr = EnvBase::getEnvByMonoMass(mono_mass);
+  EnvPtr ref_env_ptr = EnvBase::getEnvByMonoMass(mono_mass);
   if (ref_env_ptr == nullptr) {
     LOG_WARN("Reference envelope is null!");
     return nullptr;
@@ -127,7 +127,7 @@ MatchEnvPtr detectEnvByMonoMass(const PeakPtrVec &peak_list, double mono_mass,
   // convert the reference distribution to a theoretical distribution
   // based on the mono mz and charge state
   double mono_mz = mono_mass /charge + mass_constant::getProtonMass();
-  EnvelopePtr theo_env_ptr = ref_env_ptr->distrToTheoMono(mono_mz, charge);
+  EnvPtr theo_env_ptr = ref_env_ptr->distrToTheoMono(mono_mz, charge);
 
   int mass_group = env_para_ptr->getMassGroup(mono_mass);
 

@@ -277,7 +277,7 @@ void deconvMsOne(MzmlMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
     intensities.push_back(peak_list[i]->getIntensity());
   }
   for (size_t i = 0; i < prec_envs.size(); i++) {
-    RealEnvPtr env_ptr = prec_envs[i]->getRealEnvPtr();
+    ExpEnvPtr env_ptr = prec_envs[i]->getRealEnvPtr();
     for (int p = 0; p < env_ptr->getPeakNum(); p++) {
       if (env_ptr->isExist(p)) {
         int idx = env_ptr->getPeakIdx(p);

@@ -31,7 +31,7 @@ void mzRefine(MatchEnvPtrVec &envs) {
 }
 
 void mzRefine(MatchEnvPtr env) {
-  RealEnvPtr real_env = env->getRealEnvPtr();
+  ExpEnvPtr real_env = env->getRealEnvPtr();
   double cur_mz = real_env->getReferMz();
   int charge = real_env->getCharge();
   double prev_mz = cur_mz - 1.0 / charge;
@@ -39,24 +39,24 @@ void mzRefine(MatchEnvPtr env) {
   // check if the mass is greater than the precursor mass
   double ref_mass = cur_mz * charge - charge * mass_constant::getProtonMass();
   // get a reference distribution based on the reference mass
-  EnvelopePtr refer_env = EnvBase::getEnvByRefMass(ref_mass);
+  EnvPtr refer_env = EnvBase::getEnvByRefMass(ref_mass);
   /* add one zeros at both sides of the envelope */
-  EnvelopePtr ext_refer_env = refer_env->addZero(1);
+  EnvPtr ext_refer_env = refer_env->addZero(1);
 
   // convert the reference distribution to a theoretical distribution
   // based on the base mz and charge state
   int max_back_peak_num = real_env->getReferIdx();
   int max_forw_peak_num = real_env->getPeakNum() - real_env->getReferIdx() - 1;
-  EnvelopePtr theo_env = ext_refer_env->distrToTheoRef(cur_mz, charge);
+  EnvPtr theo_env = ext_refer_env->distrToTheoRef(cur_mz, charge);
   double max_inte = theo_env->getReferIntensity();
   theo_env->changeIntensity(1.0 / max_inte);
 
-  EnvelopePtr cur_env = theo_env->getSubEnv(max_back_peak_num, max_forw_peak_num);
+  EnvPtr cur_env = theo_env->getSubEnv(max_back_peak_num, max_forw_peak_num);
 
   theo_env = ext_refer_env->distrToTheoRef(prev_mz, charge);
   max_inte = theo_env->getReferIntensity();
   theo_env->changeIntensity(1.0 / max_inte);
-  EnvelopePtr prev_env;
+  EnvPtr prev_env;
   if (max_back_peak_num >= 1 && real_env->isExist(real_env->getReferIdx() - 1)) {
     prev_env = theo_env->getSubEnv(max_back_peak_num - 1, max_forw_peak_num + 1);
   } else {
@@ -67,7 +67,7 @@ void mzRefine(MatchEnvPtr env) {
   max_inte = theo_env->getReferIntensity();
   theo_env->changeIntensity(1.0 / max_inte);
 
-  EnvelopePtr next_env;
+  EnvPtr next_env;
   if (max_forw_peak_num >= 1 && real_env->isExist(real_env->getReferIdx() + 1)) {
     next_env = theo_env->getSubEnv(max_back_peak_num + 1, max_forw_peak_num - 1);
   } else {
@@ -97,7 +97,7 @@ void mzRefine(MatchEnvPtr env) {
   }
 }
 
-void compEnvDist(EnvelopePtr real_env, EnvelopePtr theo_env, 
+void compEnvDist(EnvPtr real_env, EnvPtr theo_env,
                  double &dist, double &ratio) {
   if (theo_env == nullptr) {
     dist = std::numeric_limits<double>::infinity();
