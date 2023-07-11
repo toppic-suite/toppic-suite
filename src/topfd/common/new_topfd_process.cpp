@@ -23,16 +23,11 @@
 #include "ms/mzml/mzml_profile.hpp"
 #include "topfd/envcnn/onnx_env_cnn.hpp" 
 #include "topfd/ecscore/score/onnx_ecscore.hpp"
+#include "topfd/deconv/deconv_ms1_process.hpp"
 
 /*
 #include "common/util/file_util.hpp"
-#include "ms/spec/msalign_frac_merge.hpp"
-#include "ms/spec/deconv_json_merge.hpp"
-#include "ms/feature/feature_merge.hpp"
-#include "topfd/deconv/deconv_process.hpp"
-#include "topfd/feature_detect/feature_detect.hpp"
 #include "topfd/ecscore/env_coll_detect.hpp"
-#include "topfd/common/topfd_para.hpp"
 */
 
 namespace toppic {
@@ -44,8 +39,10 @@ void processOneFileWithFaims(TopfdParaPtr para_ptr) {
   std::cout << para_ptr->getParaStr("", " ");
   if (!para_ptr->isMissingLevelOne()) {
     std::cout << "MS1 deconvolution started." << std::endl;
-    //DeconvProcess processor(para_ptr);
-    //processor.process();
+    DeconvMs1ProcessPtr ms1_proc_ptr =
+      std::make_shared<DeconvMs1Process>(para_ptr);
+    ms1_proc_ptr->process();
+    ms1_proc_ptr = nullptr;
     std::cout << "MS1 deconvolution finished." << std::endl;
   }
 }

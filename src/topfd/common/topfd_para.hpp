@@ -48,12 +48,14 @@ class TopfdPara {
   double getEcscoreCutoff() {return ecscore_cutoff_;}
 
   std::string getMzmlFileName() {return mzml_file_name_;}
-  int getFracId() {return frac_id_;}
-  bool isFaims() {return is_faims_;}
-  double getFaimsVoltage() {return faims_volt_;}
+  std::string getOutputBaseName() {return output_base_name_;}
   std::string getHtmlDir() {return html_dir_;}
   std::string getMs1JsonDir() {return ms1_json_dir_;}
   std::string getMs2JsonDir() {return ms2_json_dir_;}
+
+  int getFracId() {return frac_id_;}
+  bool isFaims() {return is_faims_;}
+  double getFaimsVoltage() {return faims_volt_;}
   int getMs1ScanNum() {return ms_1_scan_num_;}
   int getMs2ScanNum() {return ms_2_scan_num_;}
 

@@ -15,17 +15,9 @@
 #ifndef TOPPIC_TOPFD_DECONV_MS1_PROCESS_HPP_
 #define TOPPIC_TOPFD_DECONV_MS1_PROCESS_HPP_
 
-#include "ms/spec/ms_header.hpp"
 #include "ms/env/env_para.hpp"
 #include "topfd/common/topfd_para.hpp"
 #include "topfd/dp/dp_para.hpp"
-
-/*
-#include "common/thread/simple_thread_pool.hpp"
-#include "ms/spec/msalign_writer.hpp"
-#include "topfd/msreader/raw_ms_group_faime_reader.hpp"
-#include "topfd/deconv/deconv_one_sp.hpp"
-*/
 
 namespace toppic {
 
@@ -40,18 +32,10 @@ class DeconvMs1Process {
   EnvParaPtr env_para_ptr_;
   DpParaPtr dp_para_ptr_;
   
-  std::string mzml_file_name_;
-  std::string output_base_name_;
-
-  std::string html_dir_;
-  std::string ms1_json_dir_;
-
-  static int ms1_spec_num_;
-
-  std::string updateMsg(MsHeaderPtr header_ptr, int scan, int total_scan_num);
-
   void prepareFileFolder();
 };
+
+typedef std::shared_ptr<DeconvMs1Process> DeconvMs1ProcessPtr;
 
 }
 

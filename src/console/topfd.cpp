@@ -13,7 +13,7 @@
 //limitations under the License.
 
 #include "topfd/common/topfd_para.hpp"
-#include "topfd/common/topfd_process.hpp"
+#include "topfd/common/new_topfd_process.hpp"
 #include "console/topfd_argument.hpp"
 
 int main(int argc, char* argv[]) {
@@ -29,7 +29,7 @@ int main(int argc, char* argv[]) {
 
   std::vector<std::string> spec_file_lst = argu_processor.getSpecFileList();
 
-  int result = toppic::topfd_process::process(topfd_para_ptr, spec_file_lst);
+  int result = toppic::new_topfd_process::process(topfd_para_ptr, spec_file_lst);
 
   return result;
 }

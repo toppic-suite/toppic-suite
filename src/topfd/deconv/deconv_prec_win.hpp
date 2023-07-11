@@ -16,6 +16,7 @@
 #define TOPPIC_TOPFD_DECONV_DECONV_PREC_WIN_HPP_
 
 #include "ms/env/match_env.hpp"
+#include "ms/mzml/mzml_ms_group.hpp"
 
 namespace toppic {
 
@@ -23,6 +24,9 @@ namespace deconv_prec_win {
 
 MatchEnvPtr deconv(double prec_win_begin, double prec_win_end, PeakPtrVec &peak_list, 
                    double argu_max_mass, int argu_max_charge);
+
+MatchEnvPtrVec deconvPrecWinForMsGroup(MzmlMsGroupPtr ms_group_ptr, 
+                                       double max_mass, int max_charge); 
 
 }  // namespace prec_env
 

@@ -24,22 +24,10 @@
 #include "ms/mzml/mzml_ms_group_reader.hpp"
 #include "ms/mzml/mzml_ms_json_writer.hpp"
 
+#include "topfd/envcnn/onnx_env_cnn.hpp" 
+#include "topfd/deconv/deconv_prec_win.hpp"
 #include "topfd/deconv/deconv_single_sp.hpp"
 #include "topfd/deconv/deconv_ms1_process.hpp"
-
-/*
-#include "common/util/version.hpp"
-#include "common/util/time_util.hpp"
-
-#include "ms/spec/baseline_util.hpp"
-
-#include "ms/env/env_base.hpp"
-#include "ms/env/match_env_writer.hpp"
-
-
-#include "topfd/common/topfd_para.hpp"
-#include "topfd/envcnn/onnx_env_cnn.hpp" 
-*/
 
 namespace toppic {
 
@@ -47,8 +35,7 @@ DeconvMs1Process::DeconvMs1Process(TopfdParaPtr topfd_para_ptr) {
   topfd_para_ptr_ = topfd_para_ptr;
 }
 
-std::string DeconvMs1Process::updateMsg(MsHeaderPtr header_ptr, int scan_cnt, 
-                                        int total_scan_num) {
+std::string updateMsg(MsHeaderPtr header_ptr, int scan_cnt, int total_scan_num) {
   std::string percentage = str_util::toString(scan_cnt * 100 / total_scan_num);
   std::string msg = "Processing spectrum scan " 
     + std::to_string(header_ptr->getFirstScanNum()) + " ...";
@@ -85,13 +72,15 @@ void deconvMsOne(MzmlMsGroupPtr ms_group_ptr,
   for (size_t i = 0; i < peak_list.size(); i++) {
     intensities.push_back(peak_list[i]->getIntensity());
   }
-  MatchEnvPtrVec prec_envs;
-  /*
   // 2. Deconv envelopes in precursor windows and remove them
-  MatchEnvPtrVec prec_envs = RawMsGroupFaimeReader::obtainPrecEnvs(ms_group_ptr, 
-                                                                   topfd_para_ptr->getMaxMass(),
-                                                                   topfd_para_ptr->getMaxCharge()); 
-                                                                   */
+  MatchEnvPtrVec prec_envs = deconv_prec_win::deconvPrecWinForMsGroup(ms_group_ptr, 
+                                                                      topfd_para_ptr->getMaxMass(),
+                                                                      topfd_para_ptr->getMaxCharge()); 
+
+  // Obtain EnvCNN Score for envelopes
+  if (topfd_para_ptr->isUseEnvCnn()) {
+    onnx_env_cnn::computeEnvScores(peak_list, prec_envs); 
+  }
   //remove precursor peaks
   for (size_t i = 0; i < prec_envs.size(); i++) {
     ExpEnvPtr env_ptr = prec_envs[i]->getRealEnvPtr();
@@ -156,7 +145,7 @@ std::function<void()> geneTask(MzmlMsGroupPtr ms_group_ptr,
 
 void DeconvMs1Process::process() {
   MzmlMsGroupReaderPtr reader_ptr = 
-    std::make_shared<MzmlMsGroupReader>(mzml_file_name_,
+    std::make_shared<MzmlMsGroupReader>(topfd_para_ptr_->getMzmlFileName(), 
                                         topfd_para_ptr_->getPrecWindowWidth(),
                                         topfd_para_ptr_->getActivation(),
                                         topfd_para_ptr_->getFracId(),
@@ -174,7 +163,8 @@ void DeconvMs1Process::process() {
   int thread_num = topfd_para_ptr_->getThreadNum();
   SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(thread_num);  
   // init msalign writer vector for multiple threads
-  std::string ms1_msalign_name = output_base_name_ + "_ms1.msalign";
+  std::string output_base_name = topfd_para_ptr_->getOutputBaseName();
+  std::string ms1_msalign_name = output_base_name + "_ms1.msalign";
   MsAlignWriterPtrVec ms1_writer_ptr_vec;
   for (int i = 0; i < thread_num; i++) { 
     MsAlignWriterPtr ms1_ptr 
@@ -203,12 +193,14 @@ void DeconvMs1Process::process() {
   MsalignThreadMergePtr ms1_merge_ptr
     = std::make_shared<MsalignThreadMerge>(file_name_ext,
                                            topfd_para_ptr_->getThreadNum(), 
-                                           file_name_ext, output_base_name_,  
+                                           file_name_ext, output_base_name,  
                                            para_str);
   ms1_merge_ptr->process();
 
   // remove tempory files
-  // we need to check if there are tempory files to be removed  
+  std::string ms1_prefix = file_util::absoluteName(output_base_name) + "_ms1.msalign_";
+  std::replace(output_base_name.begin(), output_base_name.end(), '\\', '/');
+  file_util::cleanPrefix(output_base_name, ms1_prefix);
   std::cout << std::endl;
 }
 

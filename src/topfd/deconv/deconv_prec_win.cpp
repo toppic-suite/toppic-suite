@@ -184,6 +184,36 @@ MatchEnvPtr deconv(double prec_win_begin, double prec_win_end, PeakPtrVec &peak_
   return env_ptr;
 }
 
+MatchEnvPtr deconvPrecWinForOneMs(MzmlMsPtr ms_one, MzmlMsPtr ms_two, 
+                                  double max_mass, int max_charge) {
+  MsHeaderPtr header_two = ms_two->getMsHeaderPtr();
+  double prec_win_begin = header_two->getPrecWinBegin();
+  double prec_win_end = header_two->getPrecWinEnd();
+
+  PeakPtrVec peak_list = ms_one->getPeakPtrVec();
+  LOG_DEBUG("start refine precursor " << " peak num " << peak_list.size());
+  MatchEnvPtr match_env_ptr = deconv_prec_win::deconv(prec_win_begin, prec_win_end, peak_list,  
+                                                      max_mass, max_charge);
+  return match_env_ptr;
+}
+
+MatchEnvPtrVec deconvPrecWinForMsGroup(MzmlMsGroupPtr ms_group_ptr, 
+                                       double max_mass, int max_charge) {
+  MzmlMsPtr ms_one_ptr = ms_group_ptr->getMsOnePtr();
+  MzmlMsPtrVec ms_two_ptr_vec = ms_group_ptr->getMsTwoPtrVec();
+  MatchEnvPtrVec result_envs;
+
+  for (size_t i = 0; i < ms_two_ptr_vec.size(); i++) {
+    MzmlMsPtr ms_two_ptr = ms_two_ptr_vec[i];
+    MatchEnvPtr match_env_ptr = deconvPrecWinForOneMs(ms_one_ptr, ms_two_ptr, 
+                                                      max_mass, max_charge);
+    if (match_env_ptr != nullptr) {
+      result_envs.push_back(match_env_ptr);
+    }
+  }
+  return result_envs;
+}
+
 }
 
 }  // namespace toppic
