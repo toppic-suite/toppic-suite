@@ -110,7 +110,7 @@ void TopFDDialog::on_defaultButton_clicked() {
   ui->mzErrorEdit->setText(QString::number(para_ptr->getMzError()));
   ui->ms1snRatioEdit->setText(QString::number(para_ptr->getMsOneSnRatio()));
   ui->ms2snRatioEdit->setText(QString::number(para_ptr->getMsTwoSnRatio()));
-  ui->windowSizeEdit->setText(QString::number(para_ptr->getPrecWindow()));
+  ui->windowSizeEdit->setText(QString::number(para_ptr->getPrecWindowWidth()));
   ui->threadNumberEdit->setText(QString::number(para_ptr->getThreadNum()));
   ui->envCNNCheckBox->setChecked(para_ptr->isUseEnvCnn());
   ui->missLevelOneCheckBox->setChecked(para_ptr->isMissingLevelOne());
@@ -270,7 +270,7 @@ toppic::TopfdParaPtr TopFDDialog::getParaPtr() {
   para_ptr_->setMzError(std::stod(ui->mzErrorEdit->text().toStdString()));
   para_ptr_->setMsOneSnRatio(std::stod(ui->ms1snRatioEdit->text().toStdString()));
   para_ptr_->setMsTwoSnRatio(std::stod(ui->ms2snRatioEdit->text().toStdString()));
-  para_ptr_->setPrecWindow(std::stod(ui->windowSizeEdit->text().toStdString()));
+    para_ptr_->setPrecWindowWidth(std::stod(ui->windowSizeEdit->text().toStdString()));
   para_ptr_->setMissingLevelOne(ui->missLevelOneCheckBox->isChecked()); 
   para_ptr_->setThreadNum(std::stoi(ui->threadNumberEdit->text().toStdString()));
   para_ptr_->setGeneHtmlFolder(ui->geneHTMLCheckBox->isChecked());

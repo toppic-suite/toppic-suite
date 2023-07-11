@@ -97,7 +97,7 @@ void Feature::assignFeatures(const std::string &ms2_file_name, FracFeaturePtrVec
                              PeakMatrixPtr matrix_ptr, FeaturePtrVec &feature_list, 
                              DeconvMsPtrVec &ms1_ptr_vec) { 
 
-  double isolation_window_mz = topfd_para_ptr->getPrecWindow();
+  double isolation_window_mz = topfd_para_ptr->getPrecWindowWidth();
   double score_cutoff = topfd_para_ptr->getEcscoreCutoff();
   DeconvMsPtrVec ms_ptr_vec = Feature::readData(ms2_file_name);
   //std::cout << "Mapping proteoform features to MS/MS scans started" << std::endl; 

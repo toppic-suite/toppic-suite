@@ -15,6 +15,7 @@
 
 #include <cmath>
 
+#include "ms/spec/baseline_util.hpp" 
 #include "ms/spec/peak_list_util.hpp" 
 #include "topfd/spec/deconv_data.hpp" 
 
@@ -29,6 +30,18 @@ DeconvData::DeconvData(PeakPtrVec peak_list, double max_mass, int max_charge,
       win_num_ = (int) std::ceil(peak_list_util::findMaxPos(peak_list_) / win_size_) + 2;
       initWinId();
       initWinBgnEnd();
+    }
+
+DeconvData::DeconvData(PeakPtrVec peak_list, double max_mass, int max_charge,
+                       double win_size, bool estimate_min_inte, double sn_ratio): 
+    peak_list_(peak_list),
+    max_mass_(max_mass),
+    max_charge_(max_charge),
+    win_size_(win_size) {
+      win_num_ = (int) std::ceil(peak_list_util::findMaxPos(peak_list_) / win_size_) + 2;
+      initWinId();
+      initWinBgnEnd();
+      initMinInte(estimate_min_inte, sn_ratio);
     }
 
 // initialize the window id 
@@ -70,6 +83,20 @@ void DeconvData::initWinBgnEnd() {
     } else {
       end = win_end_peaks_[i];
     }
+  }
+}
+
+void DeconvData::initMinInte(bool estimate_min_inte, 
+                             double sn_ratio) {
+  min_inte_ = 0;
+  min_ref_inte_ = 0;
+  if (estimate_min_inte) {
+    std::vector<double> intes;
+    for (size_t i = 0; i < peak_list_.size(); i++) {
+      intes.push_back(peak_list_[i]->getIntensity());
+    }
+    min_inte_ = baseline_util::getBaseLine(intes);
+    min_ref_inte_ = min_inte_ * sn_ratio;
   }
 }
 

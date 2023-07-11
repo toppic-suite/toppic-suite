@@ -21,8 +21,8 @@
 #include "ms/env/match_env_filter.hpp"
 #include "ms/env/env_detect.hpp"
 #include "ms/env/env_filter.hpp"
-#include "ms/env/env_assign.hpp"
 #include "topfd/spec/deconv_data_util.hpp"
+#include "topfd/dp/dp_assign.hpp"
 #include "topfd/dp/co_table.hpp"
 #include "topfd/dp/dp_a.hpp"
 #include "topfd/envcnn/onnx_env_cnn.hpp" 
@@ -32,13 +32,14 @@ namespace toppic {
 
 void DeconvOneSp::setData(PeakPtrVec &peak_list) {
   data_ptr_ = deconv_data_util::getDataPtr(peak_list, topfd_para_ptr_->getMaxMass(),
-                                           topfd_para_ptr_->getMaxCharge(), topfd_para_ptr_->getPrecWindow());
+                                           topfd_para_ptr_->getMaxCharge(),
+                                           dp_para_ptr_->dp_window_size_);
 }
 
 void DeconvOneSp::setData(PeakPtrVec &peak_list, double spec_max_mass, int spec_max_charge) {
   data_ptr_ = deconv_data_util::getDataPtr(peak_list, spec_max_mass, spec_max_charge, 
                                            topfd_para_ptr_->getMaxMass(), topfd_para_ptr_->getMaxCharge(),
-                                           topfd_para_ptr_->getDpWindowSize());
+                                           dp_para_ptr_->dp_window_size_);
 }
 
 void DeconvOneSp::run() {
@@ -65,9 +66,9 @@ void DeconvOneSp::run() {
     //EnvRescore::rescore(cand_envs, env_para_ptr_->env_rescore_para_);
   //}
   // assign envelopes to 1 Da windows
-  MatchEnvPtr2D win_envs = env_assign::assignWinEnv(cand_envs, data_ptr_->getWinNum(),
-                                                    data_ptr_->getWinIdVec(),
-                                                    topfd_para_ptr_->getEnvNumPerWin());
+  MatchEnvPtr2D win_envs = dp_assign::assignWinEnv(cand_envs, data_ptr_->getWinNum(),
+                                                   data_ptr_->getWinIdVec(),
+                                                   dp_para_ptr_->env_num_per_win_);
 
   // prepare table for dp
   if (dp_para_ptr_->check_double_increase_) {

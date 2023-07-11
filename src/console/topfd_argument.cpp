@@ -170,7 +170,7 @@ bool Argument::parse(int argc, char* argv[]) {
     }
 
     if (vm.count("precursor-window")) {
-      topfd_para_ptr_->setPrecWindow(std::stod(prec_window));
+        topfd_para_ptr_->setPrecWindowWidth(std::stod(prec_window));
     }
 
     if (vm.count("spectrum-file-name")) {

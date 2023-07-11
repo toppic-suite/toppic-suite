@@ -33,12 +33,11 @@ class TopfdPara {
   int getMaxCharge() {return max_charge_;}
   double getMaxMass() {return max_mass_;}
   double getMzError() {return mz_error_;}
-  double getDpWindowSize() {return dp_window_size_;}
-  double getEnvNumPerWin() {return env_num_per_win_;}
+
   bool isEstimateMinInte() {return estimate_min_inte_;}
   double getMsOneSnRatio() {return ms_one_sn_ratio_;}
   double getMsTwoSnRatio() {return ms_two_sn_ratio_;}
-  double getPrecWindow() {return prec_window_;}
+  double getPrecWindowWidth() {return prec_window_;}
   bool isUseEnvCnn() {return use_env_cnn_;}
   bool isDoFinalFiltering() {return do_final_filtering_;}
   std::string getActivation() {return activation_;}
@@ -66,7 +65,7 @@ class TopfdPara {
   void setMzError(double error) {mz_error_ = error;}
   void setMsOneSnRatio(double ratio) {ms_one_sn_ratio_ = ratio;}
   void setMsTwoSnRatio(double ratio) {ms_two_sn_ratio_ = ratio;}
-  void setPrecWindow(double window) {prec_window_ = window;}
+  void setPrecWindowWidth(double window) { prec_window_ = window;}
   void setUseEnvCnn(bool use) {use_env_cnn_ = use;}
   void setDoFinalFiltering(bool filtering) {do_final_filtering_ = filtering;}
   void setActivation(std::string activation) {activation_ = activation;}
@@ -102,12 +101,6 @@ class TopfdPara {
 
 
   //** Fixed parameter setting **
-  //dynamic programming window size
-  double dp_window_size_ = 1.0;
-  // Env assigned to 1 m/z intervals
-  // number of envelopes per window 
-  // use a small number of envelopes to speed up computation
-  int env_num_per_win_ = 5;
   // estimate min intensity using thrash method. 
   bool estimate_min_inte_ = true;
   bool refine_prec_mass_ = true;

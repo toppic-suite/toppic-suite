@@ -26,6 +26,9 @@ class DeconvData {
  public:
   DeconvData(PeakPtrVec peak_list, double max_mass, int max_charge, double win_size); 
 
+  DeconvData(PeakPtrVec peak_list, double max_mass, int max_charge, 
+             double win_size, bool estimate_min_inte, double sn_ratio); 
+
 	int getBgnPeak(int i) {return win_bgn_peaks_[i];}
 
 	int getEndPeak(int i) {return win_end_peaks_[i];}
@@ -79,6 +82,8 @@ class DeconvData {
   void initWinId();
 
   void initWinBgnEnd();
+
+  void initMinInte(bool estimate_min_inte, double sn_ratio);
 };
 
 typedef std::shared_ptr<DeconvData> DeconvDataPtr;

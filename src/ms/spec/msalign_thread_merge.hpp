@@ -29,13 +29,19 @@ class MsalignThreadMerge {
                      const std::string &out_file_ext, 
                      const std::string &para_str);
 
+  MsalignThreadMerge(const std::string &in_file_ext,
+                     int in_num,
+                     const std::string &out_file_ext, 
+                     const std::string &spec_base_name,
+                     const std::string &para_str);
+
   void process();
 
  private:
-  std::string spec_file_name_;
-  std::vector<std::string> input_file_exts_;
   std::string output_file_ext_;
   std::string para_str_;
+  std::vector<std::string> input_file_exts_;
+  std::string spec_base_name_;
 };
 
 typedef std::shared_ptr<MsalignThreadMerge> MsalignThreadMergePtr;

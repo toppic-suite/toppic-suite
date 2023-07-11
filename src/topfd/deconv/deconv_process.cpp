@@ -108,7 +108,7 @@ void DeconvProcess::process() {
     = std::make_shared<RawMsGroupFaimeReader>(spec_file_name_, 
                                               topfd_para_ptr_->isMissingLevelOne(),
                                               topfd_para_ptr_->getActivation(),
-                                              topfd_para_ptr_->getPrecWindow(),  
+                                              topfd_para_ptr_->getPrecWindowWidth(),
                                               frac_id_);
   if (topfd_para_ptr_->isMissingLevelOne()) {
     processSpMissingLevelOne(reader_ptr);

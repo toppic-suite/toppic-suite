@@ -41,7 +41,7 @@ std::string geneTopfdCommand(TopfdParaPtr para_ptr,
   oss << "-t " << para_ptr->getMzError() << " ";
   oss << "-r " << para_ptr->getMsOneSnRatio() << " ";
   oss << "-s " << para_ptr->getMsTwoSnRatio() << " ";
-  oss <<  "-w " << para_ptr->getPrecWindow() << " ";
+  oss << "-w " << para_ptr->getPrecWindowWidth() << " ";
   command = command + oss.str();
   if (para_ptr->isUseEnvCnn()) {
     command = command + "-n ";

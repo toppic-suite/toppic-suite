@@ -591,8 +591,8 @@ void process(int frac_id, const std::string &sp_file_name,
       msalign_reader_util::readAllMsOneSpectra(ms1_file_name, ms1_ptr_vec);
       double cur_voltage = voltage_vec[i].first;//if this is -1, it is non-FAIME data
       PeakPtrVec2D raw_peaks; 
-      RawMsReaderPtr raw_reader_ptr = std::make_shared<RawMsReader>(sp_file_name, activation, 
-                                                                    topfd_para_ptr->getPrecWindow());
+      RawMsReaderPtr raw_reader_ptr = std::make_shared<RawMsReader>(sp_file_name, activation,
+                                                                    topfd_para_ptr->getPrecWindowWidth());
       raw_reader_ptr->getMs1Peaks(raw_peaks, cur_voltage);
       raw_reader_ptr = nullptr;
       findMsOneFeatures(ms1_ptr_vec, raw_peaks, para_ptr, frac_features, env_para_ptr);

@@ -34,6 +34,23 @@ DeconvDataPtr getDataPtr(const PeakPtrVec &peak_list, double max_mass,
                                       max_charge, window_size);
 }
 
+DeconvDataPtr getDataPtr(const PeakPtrVec &peak_list, 
+                         double max_mass, int max_charge, 
+                         double dp_window_size,
+                         bool estimate_min_inte, 
+                         double sn_ratio) {
+  if (peak_list.size() == 0) return nullptr;
+  double max_mz = peak_list_util::findMaxPos(peak_list);
+  if (max_mz > max_mass) {
+    LOG_WARN("Max mz is too large: " << max_mz);
+    return nullptr;
+  }
+
+  return std::make_shared<DeconvData>(peak_list, max_mass, 
+                                      max_charge, dp_window_size, 
+                                      estimate_min_inte, sn_ratio);
+}
+
 
 // generate deconvolution data using given max mass, max charge
 DeconvDataPtr getDataPtr(const PeakPtrVec &peak_list, double spec_max_mass,

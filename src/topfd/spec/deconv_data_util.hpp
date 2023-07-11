@@ -26,6 +26,9 @@ namespace deconv_data_util {
 DeconvDataPtr getDataPtr(const PeakPtrVec &peak_list, double max_mass, 
                          int max_charge, double window_size);
 
+DeconvDataPtr getDataPtr(const PeakPtrVec &peak_list, double max_mass, 
+                         int max_charge, double dp_window_size, 
+                         bool estimate_min_inte, double sn_ratio);
 
 DeconvDataPtr getDataPtr(const PeakPtrVec &peak_list, double spec_max_mass,
                          int spec_max_charge, double para_max_mass, 

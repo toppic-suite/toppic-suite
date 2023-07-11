@@ -58,7 +58,7 @@ void process_single_file(std::string &base_file_name,
   /// Read mzml data
   RawMsReaderPtr raw_reader_ptr = std::make_shared<RawMsReader>(mzml_file_name, 
                                                                 topfd_para_ptr->getActivation(),
-                                                                topfd_para_ptr->getPrecWindow());
+                                                                topfd_para_ptr->getPrecWindowWidth());
   PeakPtrVec2D ms1_raw_peaks;
   std::vector<double> ms2_prec_mzs;
   raw_reader_ptr->getMs1Map(ms1_ptr_vec, ms2_ptr_vec, ms1_raw_peaks, ms2_prec_mzs); 

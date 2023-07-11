@@ -12,38 +12,20 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <algorithm>
+#ifndef TOPPIC_TOPFD_ENV_ENV_ASSIGN_HPP_
+#define TOPPIC_TOPFD_ENV_ENV_ASSIGN_HPP_
 
-#include "ms/env/env_assign.hpp" 
+#include "ms/env/match_env.hpp"
 
 namespace toppic {
 
-namespace env_assign {
+namespace dp_assign {
 
 MatchEnvPtr2D assignWinEnv(MatchEnvPtr2D &match_envs, int win_num, 
                            const std::vector<int> &win_ids, 
-                           int env_num_per_win) {
-  MatchEnvPtr2D env_list(win_num);
-  // add matchenv to the list 
-  for (size_t i = 0; i < match_envs.size(); i++) {
-    // i is peak index
-    int win_id = win_ids[i];
-    for (size_t j = 0; j < match_envs[i].size(); j++) {
-      if (match_envs[i][j] != nullptr) {
-        env_list[win_id].push_back(match_envs[i][j]);
-      }
-    }
-  }
-  // sort the matched envelopes and keep the best 
-  for (int i = 0; i < win_num; i++) {
-    std::sort(env_list[i].begin(), env_list[i].end(), MatchEnv::cmpMsdeconvScoreDec); 
-    if ((int)env_list[i].size() > env_num_per_win) {
-      env_list[i].resize(env_num_per_win);
-    }
-  }
-  return env_list;
-}
+                           int env_num_per_win);
+};
 
 }
 
-}
+#endif
