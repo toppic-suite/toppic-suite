@@ -12,14 +12,14 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_TOPFD_DECONV_PREC_ENV_HPP_
-#define TOPPIC_TOPFD_DECONV_PREC_ENV_HPP_
+#ifndef TOPPIC_TOPFD_DECONV_DECONV_PREC_WIN_HPP_
+#define TOPPIC_TOPFD_DECONV_DECONV_PREC_WIN_HPP_
 
 #include "ms/env/match_env.hpp"
 
 namespace toppic {
 
-namespace prec_env {
+namespace deconv_prec_win {
 
 MatchEnvPtr deconv(double prec_win_begin, double prec_win_end, PeakPtrVec &peak_list, 
                    double argu_max_mass, int argu_max_charge);

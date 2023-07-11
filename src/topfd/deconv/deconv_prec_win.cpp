@@ -19,11 +19,11 @@
 #include "ms/env/match_env.hpp"
 #include "ms/env/env_detect.hpp"
 #include "ms/env/env_filter.hpp"
-#include "topfd/deconv/prec_env.hpp"
+#include "topfd/deconv/deconv_prec_win.hpp"
 
 namespace toppic {
 
-namespace prec_env {
+namespace deconv_prec_win {
 
 struct PeakIntv {
   int bgn;

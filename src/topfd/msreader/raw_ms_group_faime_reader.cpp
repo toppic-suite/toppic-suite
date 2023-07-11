@@ -15,7 +15,7 @@
 
 #include "common/util/logger.hpp"
 #include "ms/env/exp_env.hpp"
-#include "topfd/deconv/prec_env.hpp"
+#include "topfd/deconv/deconv_prec_win.hpp"
 #include "topfd/msreader/raw_ms_group_faime_reader.hpp" 
 
 namespace toppic {
@@ -159,8 +159,8 @@ MatchEnvPtr refinePrecChrgFaime(MzmlMsPtr ms_one, MzmlMsPtr ms_two,
 
   PeakPtrVec peak_list = ms_one->getPeakPtrVec();
   LOG_DEBUG("start refine precursor " << " peak num " << peak_list.size());
-  MatchEnvPtr match_env_ptr = prec_env::deconv(prec_win_begin, prec_win_end, peak_list,  
-                                               max_mass, max_charge);
+  MatchEnvPtr match_env_ptr = deconv_prec_win::deconv(prec_win_begin, prec_win_end, peak_list,  
+                                                      max_mass, max_charge);
   PrecursorPtr prec_ptr = header_two->getSinglePrecPtr();
   if (match_env_ptr != nullptr) {
     ExpEnvPtr env_ptr = match_env_ptr->getRealEnvPtr();
