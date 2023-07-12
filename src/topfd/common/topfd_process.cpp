@@ -78,11 +78,13 @@ void processOneFile(TopfdParaPtr para_ptr,
                             processor.isFaims_,
                             processor.voltage_vec_);
                             */
+    /*
     env_coll_detect::process(frac_id, 
                              spec_file_name,
                              para_ptr,
                              processor.isFaims_,
                              processor.voltage_vec_);
+                             */
     std::cout << "Feature detection finished." << std::endl;
     
     std::cout << "Processing " << spec_file_name << " finished." << std::endl;

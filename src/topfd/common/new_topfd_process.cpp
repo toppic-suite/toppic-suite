@@ -24,11 +24,7 @@
 #include "topfd/envcnn/onnx_env_cnn.hpp" 
 #include "topfd/ecscore/score/onnx_ecscore.hpp"
 #include "topfd/deconv/deconv_ms1_process.hpp"
-
-/*
-#include "common/util/file_util.hpp"
 #include "topfd/ecscore/env_coll_detect.hpp"
-*/
 
 namespace toppic {
 
@@ -44,6 +40,10 @@ void processOneFileWithFaims(TopfdParaPtr para_ptr) {
     ms1_proc_ptr->process();
     ms1_proc_ptr = nullptr;
     std::cout << "MS1 deconvolution finished." << std::endl;
+
+    std::cout << "Feature detection started." << std::endl;
+    env_coll_detect::process(para_ptr);
+    std::cout << "Feature detection finished." << std::endl;
   }
 }
 

@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include "common/util/logger.hpp"
 #include "ms/env/exp_env.hpp"
 #include "ms/mzml/mzml_ms_group_reader.hpp" 
@@ -39,8 +38,8 @@ MzmlMsGroupReader::MzmlMsGroupReader(const std::string & file_name,
     exit(EXIT_FAILURE);
   }
 
+  reader_ptr_->resetIndexes();
   if (!missing_level_one_) {
-    reader_ptr_->resetIndexes();
     initMs2Ms1Map();
     reader_ptr_->resetIndexes();
     cur_ms_one_idx_ = 0;
@@ -175,6 +174,24 @@ MzmlMsGroupPtr MzmlMsGroupReader::getNextMsGroupPtr() {
   }
   else {
     return getMs1Ms2MsGroupPtr();
+  }
+}
+
+void MzmlMsGroupReader::getMs1Map(PeakPtrVec2D &ms1_mzml_peaks, 
+                                  MsHeaderPtr2D &ms2_header_ptr_2d) {
+  while (true) {
+    MzmlMsGroupPtr group_ptr = getMs1Ms2MsGroupPtr(); 
+    if (group_ptr == nullptr) {
+      break;
+    }
+    PeakPtrVec peak_list = group_ptr->getMsOnePtr()->getPeakPtrVec();
+    ms1_mzml_peaks.push_back(peak_list);
+    MzmlMsPtrVec ms2_ptr_vec = group_ptr->getMsTwoPtrVec(); 
+    MsHeaderPtrVec header_vec;
+    for (size_t i = 0; i < ms2_ptr_vec.size(); i++) {
+      header_vec.push_back(ms2_ptr_vec[i]->getMsHeaderPtr());
+    }
+    ms2_header_ptr_2d.push_back(header_vec);
   }
 }
 

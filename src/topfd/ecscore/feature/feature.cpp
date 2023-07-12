@@ -17,8 +17,6 @@
 #include "common/util/logger.hpp"
 
 #include "ms/spec/peak_util.hpp"
-#include "ms/spec/msalign_reader.hpp"
-#include "ms/spec/msalign_writer.hpp"
 #include "ms/env/env_base.hpp"
 
 #include "topfd/ecscore/score/component_score.hpp"
@@ -90,106 +88,100 @@ std::vector<float> Feature::getEcscoreInput(double max_elution_time) {
   return data;
 }
 
-void Feature::assignFeatures(const std::string &ms2_file_name, FracFeaturePtrVec &frac_feature_list, 
-                             EnvCollPtrVec &env_coll_list, SpecFeaturePtrVec &ms2_feature_list, 
-                             std::vector<double> prec_mzs, 
-                             TopfdParaPtr topfd_para_ptr, EcscoreParaPtr score_para_ptr, 
-                             PeakMatrixPtr matrix_ptr, FeaturePtrVec &feature_list, 
-                             DeconvMsPtrVec &ms1_ptr_vec) { 
-
-  double isolation_window_mz = topfd_para_ptr->getPrecWindowWidth();
+void Feature::assignFeatures(FracFeaturePtrVec &frac_feature_list, 
+                             EnvCollPtrVec &env_coll_list, 
+                             FeaturePtrVec &feature_list, 
+                             PeakMatrixPtr matrix_ptr, 
+                             DeconvMsPtrVec &ms1_ptr_vec,
+                             MsHeaderPtr2D &ms2_header_ptr_2d,
+                             SpecFeaturePtrVec &ms2_feature_list, 
+                             TopfdParaPtr topfd_para_ptr, 
+                             EcscoreParaPtr score_para_ptr) {
   double score_cutoff = topfd_para_ptr->getEcscoreCutoff();
-  DeconvMsPtrVec ms_ptr_vec = Feature::readData(ms2_file_name);
-  //std::cout << "Mapping proteoform features to MS/MS scans started" << std::endl; 
-  for (size_t spec_id = 0; spec_id < ms_ptr_vec.size(); spec_id++) {
-    MsHeaderPtr header_ptr = ms_ptr_vec[spec_id]->getMsHeaderPtr();
-    if (header_ptr->getPrecCharge() == 0) continue;
-    double base_mz = prec_mzs[spec_id];
-    bool assigned = getHighestInteFeature(frac_feature_list, env_coll_list, score_para_ptr, 
-                                          header_ptr, score_cutoff, base_mz, 
-                                          isolation_window_mz, ms2_feature_list);
-    if (!assigned) {
-      // lower the cutoff to 0
-      score_cutoff = 0;
-      assigned = getHighestInteFeature(frac_feature_list, env_coll_list, score_para_ptr, 
-                                       header_ptr, score_cutoff, base_mz, 
-                                       isolation_window_mz, ms2_feature_list);
-    }
-    if (!assigned) {
-      assigned = getNewFeature(header_ptr, matrix_ptr, score_para_ptr, feature_list, 
-                               env_coll_list, ms1_ptr_vec, frac_feature_list, ms2_feature_list); 
-    }
-    if (!assigned) {
-      LOG_WARN("Scan " << header_ptr->getFirstScanNum() << " does not have MS1 feature!");
-    }
-  }
-  std::sort(ms2_feature_list.begin(), ms2_feature_list.end(), SpecFeature::cmpSpecIdInc);
-  MsAlignWriterPtr ms2_ptr = std::make_shared<MsAlignWriter>(ms2_file_name);
-  for (const auto &ms_ptr: ms_ptr_vec) {
-    ms2_ptr->writeMs(ms_ptr);
-  }
-  //std::cout << "Mapping proteoform features to MS/MS scans finished" << std::endl; 
-}
-
-DeconvMsPtrVec Feature::readData(const std::string &file_name) {
-  MsAlignReader sp_reader(file_name);
-  DeconvMsPtrVec ms_ptr_vec;
-  DeconvMsPtr ms_ptr;
-  while ((ms_ptr = sp_reader.getNextMsPtr()) != nullptr) {
-    ms_ptr_vec.push_back(ms_ptr);
-  }
-  return ms_ptr_vec;
-}
-
-bool Feature::getHighestInteFeature(FracFeaturePtrVec &frac_features, EnvCollPtrVec &env_coll_list,
-                                    EcscoreParaPtr para_ptr, MsHeaderPtr header_ptr, 
-                                    double score_thr, double base_mz,
-                                    double isolation_window_mz, SpecFeaturePtrVec &ms2_features) {
-  bool assigned = false;
-  double env_inte = -1;
-  size_t selected_index = -1;
-  size_t selected_sub_index = -1;
-  int ms1_id = header_ptr->getMsOneId();
-  for (size_t feat_id = 0; feat_id < env_coll_list.size(); feat_id++) {
-    if (frac_features[feat_id]->getEcscore() < score_thr) {
-      continue;
-    }
-    double feature_mono_mass = env_coll_list[feat_id]->getMass();
-    double feature_avg_mass = EnvBase::convertMonoMassToAvgMass(feature_mono_mass); 
-    if (ms1_id >= env_coll_list[feat_id]->getStartSpecId() 
-        && ms1_id <= env_coll_list[feat_id]->getEndSpecId()) {
-      EnvSetPtrVec env_sets = env_coll_list[feat_id]->getEnvSetList();
-      for (size_t env_set_id = 0; env_set_id < env_sets.size(); env_set_id++) {
-        EnvSetPtr env_set_ptr = env_sets[env_set_id];
-        double mz = peak_util::compMz(feature_avg_mass, env_set_ptr->getCharge());
-        // this part needs to be improved to consider only peaks in the window
-        if ((mz >= base_mz - (isolation_window_mz / 2)) && mz < (base_mz + (isolation_window_mz / 2))) {
-          if (ms1_id >= env_set_ptr->getStartSpecId() && env_set_ptr->getEndSpecId()) {
-            int inte_idx = ms1_id - env_set_ptr->getStartSpecId();
-            std::vector<double> env_intes = env_set_ptr->getXicAllPeakInteList();
-            if (env_intes.size() == 0) {
-              LOG_WARN("Empty envelope intensity list!");
-              continue; 
-            }
-            double cur_env_inte = env_intes[inte_idx];
-            if (env_inte < cur_env_inte) {
-              env_inte = cur_env_inte;
-              selected_index = feat_id;
-              selected_sub_index = env_set_id;
-            }
-          }
-        }
+  for (size_t ms1_id = 0; ms1_id < ms1_ptr_vec.size(); ms1_id++) {
+    for (size_t i = 0; i < ms2_header_ptr_2d[ms1_id].size(); i++) {
+      MsHeaderPtr header_ptr = ms2_header_ptr_2d[ms1_id][i];
+      bool assigned = getHighestInteFeature(frac_feature_list, env_coll_list,  
+                                            header_ptr, score_cutoff, ms2_feature_list);
+      if (!assigned) {
+        // lower the cutoff to 0
+        score_cutoff = 0;
+        assigned = getHighestInteFeature(frac_feature_list, env_coll_list,  
+                                         header_ptr, score_cutoff, ms2_feature_list);
+      }
+      if (!assigned) {
+        assigned = getNewFeature(header_ptr, matrix_ptr, score_para_ptr, feature_list, 
+                                 env_coll_list, ms1_ptr_vec, frac_feature_list, ms2_feature_list); 
+      }
+      if (!assigned) {
+        LOG_WARN("Scan " << header_ptr->getFirstScanNum() << " does not have MS1 feature!");
       }
     }
   }
-  if (env_inte > -1) {
-    FracFeaturePtr feature_ptr = frac_features[selected_index];
-    EnvSetPtrVec env_sets = env_coll_list[selected_index]->getEnvSetList();
-    EnvSetPtr env_set_ptr = env_sets[selected_sub_index];
+  std::sort(ms2_feature_list.begin(), ms2_feature_list.end(), SpecFeature::cmpSpecIdInc);
+}
+
+bool Feature::getHighestInteFeature(FracFeaturePtrVec &frac_features, EnvCollPtrVec &env_coll_list,
+                                    MsHeaderPtr header_ptr, double score_thresh, 
+                                    SpecFeaturePtrVec &ms2_features) {
+  int ms1_id = header_ptr->getMsOneId();
+  double prec_win_bgn = header_ptr->getPrecWinBegin();
+  double prec_win_end = header_ptr->getPrecWinEnd();
+
+  // top env set indexes
+  double top_env_inte = -1;
+  int top_coll_id = -1;
+  int top_env_set_id = -1;
+  for (size_t coll_id = 0; coll_id < env_coll_list.size(); coll_id++) {
+    // check threshold
+    if (frac_features[coll_id]->getEcscore() < score_thresh) {
+      continue;
+    }
+    // check retention time range
+    if (ms1_id < env_coll_list[coll_id]->getStartSpecId() 
+        || ms1_id > env_coll_list[coll_id]->getEndSpecId()) {
+      continue;
+    }
+    EnvSetPtrVec env_sets = env_coll_list[coll_id]->getEnvSetList();
+    double feature_mono_mass = env_coll_list[coll_id]->getMass();
+    double feature_avg_mass = EnvBase::convertMonoMassToAvgMass(feature_mono_mass); 
+    for (size_t env_set_id = 0; env_set_id < env_sets.size(); env_set_id++) {
+      EnvSetPtr env_set_ptr = env_sets[env_set_id];
+      double mz = peak_util::compMz(feature_avg_mass, env_set_ptr->getCharge());
+      // check precsor window
+      // this part needs to be improved to consider only peaks in the window
+      if (mz < prec_win_bgn || mz > prec_win_end) {
+        continue;
+      }
+      // check retentime time range
+      if (ms1_id < env_set_ptr->getStartSpecId() 
+          || ms1_id > env_set_ptr->getEndSpecId()) {
+        continue;
+      }
+      // get intensity information
+      int inte_idx = ms1_id - env_set_ptr->getStartSpecId();
+      std::vector<double> env_intes = env_set_ptr->getXicAllPeakInteList();
+      if (env_intes.size() == 0) {
+        LOG_WARN("Empty envelope intensity list!");
+        continue; 
+      }
+      double cur_env_inte = env_intes[inte_idx];
+      // keep the highest intensity one
+      if (top_env_inte < cur_env_inte) {
+        top_env_inte = cur_env_inte;
+        top_coll_id = coll_id;
+        top_env_set_id = env_set_id;
+      }
+    }
+  }
+  if (top_coll_id >= 0) {
+    FracFeaturePtr feature_ptr = frac_features[top_coll_id];
+    EnvSetPtrVec env_sets = env_coll_list[top_coll_id]->getEnvSetList();
+    EnvSetPtr env_set_ptr = env_sets[top_env_set_id];
     int prec_id = 0;
     double prec_mono_mz = peak_util::compMz(feature_ptr->getMonoMass(), env_set_ptr->getCharge());
     int prec_charge = env_set_ptr->getCharge();
-    double prec_inte = env_inte;
+    double prec_inte = top_env_inte;
     if (prec_inte < 0) {
       prec_inte = 0;
     }
@@ -201,16 +193,16 @@ bool Feature::getHighestInteFeature(FracFeaturePtrVec &frac_features, EnvCollPtr
     SpecFeaturePtr ms2_feature = std::make_shared<SpecFeature>(header_ptr, feature_ptr);
     ms2_features.push_back(ms2_feature);
     feature_ptr->setHasMs2Spec(true);
-    assigned = true;
+    return true;
   }
-  return assigned;
+  return false;
+    
 }
 
 bool Feature::getNewFeature(MsHeaderPtr header_ptr, PeakMatrixPtr matrix_ptr, 
                             EcscoreParaPtr score_para_ptr, FeaturePtrVec &feature_list, 
                             EnvCollPtrVec &env_coll_list, DeconvMsPtrVec &ms1_ptr_vec, 
                             FracFeaturePtrVec &frac_feature_list, SpecFeaturePtrVec &ms2_feature_list) {
-  bool assigned = false;
   // set min match envelope to 1 to accept single scan features
   score_para_ptr->min_match_env_ = 1;
   score_para_ptr->min_match_peak_ = 1;
@@ -234,8 +226,6 @@ bool Feature::getNewFeature(MsHeaderPtr header_ptr, PeakMatrixPtr matrix_ptr,
     feature_list.push_back(feature_ptr);
     env_coll_ptr->setEcscore(feature_ptr->getScore());
 
-    //env_coll.remove_peak_data(peak_matrix); removing peaks is not necessaryhere
-
     env_coll_list.push_back(env_coll_ptr);
     FracFeaturePtr frac_feature_ptr 
       = env_coll_util::getFracFeature(feature_id, ms1_ptr_vec, score_para_ptr->frac_id_, 
@@ -246,12 +236,12 @@ bool Feature::getNewFeature(MsHeaderPtr header_ptr, PeakMatrixPtr matrix_ptr,
     frac_feature_list.push_back(frac_feature_ptr);
     SpecFeaturePtr ms2_feature_ptr = std::make_shared<SpecFeature>(header_ptr, frac_feature_ptr);
     ms2_feature_list.push_back(ms2_feature_ptr);
-    assigned = true;
+    return true;
   }
   else {
     LOG_ERROR("env coll empty"); 
+    return false;
   }
-  return assigned;
 }
 
 }

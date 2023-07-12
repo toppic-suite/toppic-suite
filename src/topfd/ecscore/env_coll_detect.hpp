@@ -15,17 +15,14 @@
 #ifndef TOPPIC_TOPFD_ECSCORE_ENV_COLL_DETECT_HPP_
 #define TOPPIC_TOPFD_ECSCORE_ENV_COLL_DETECT_HPP_
 
-#include <string>
-#include <vector>
-
 #include "topfd/common/topfd_para.hpp"
 
 namespace toppic {
 
 namespace env_coll_detect {
 
-void process(int frac_id, const std::string &sp_file_name, TopfdParaPtr para_ptr,
-             bool is_faims, const std::vector<std::pair<double, int>> voltage_vec);
+void process(TopfdParaPtr para_ptr);
+
 }
 
 }
