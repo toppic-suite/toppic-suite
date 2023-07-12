@@ -37,6 +37,8 @@ class EnvBase {
 
   static double convertMonoMassToAvgMass(double mass);
 
+  static double convertMonoMassToRefMass(double mass);
+
   static double convertRefMassToMonoMass(double mass); 
 
  private:

@@ -70,6 +70,7 @@ class EcscorePara {
   int max_miss_peak_ = 2;
 
   int min_match_peak_ = 2;
+  int min_seed_match_peak_ = 2;
   int min_match_env_ = 2;
 
   double match_envelope_tolerance_ = 10E-6;

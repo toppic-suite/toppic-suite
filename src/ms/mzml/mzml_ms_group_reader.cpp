@@ -123,7 +123,7 @@ MzmlMsGroupPtr MzmlMsGroupReader::getMs1Ms2MsGroupPtr() {
     if (cur_last_ms_two_scan_map_.count(ms1_scan) > 0 &&
         cur_last_ms_two_scan_map_[ms1_scan] >= last_ms_two_scan_map_[ms1_scan]) {
       if (last_ms_two_scan_map_[ms1_scan] == -1) {
-        // if the ms1 scan does not have ms2, return a ms group with the ms1
+        // if the ms1 scan does not have ms2, return an ms group with the ms1
         // scan only 
         MzmlMsGroupPtr ms_group_ptr = std::make_shared<MzmlMsGroup>(ms_one_ptr_map_[ms1_scan], MzmlMsPtrVec());
         ms_one_ptr_map_[ms1_scan] = nullptr;

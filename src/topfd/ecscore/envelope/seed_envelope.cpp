@@ -14,6 +14,7 @@
 
 #include "common/base/mass_constant.hpp"
 #include "ms/spec/peak_util.hpp"
+#include "ms/env/env_base.hpp"
 #include "topfd/ecscore/spectrum/env_simple_peak.hpp"
 #include "topfd/ecscore/envelope/seed_envelope.hpp"
 
@@ -44,23 +45,9 @@ SeedEnvelope::SeedEnvelope(DeconvPeakPtr peak_ptr) {
   }
 }
 
-SeedEnvelope::SeedEnvelope(MsHeaderPtr header_ptr) {
-  spec_id_ = header_ptr->getMsOneId();
-  env_id_ = -1;
-  mass_ = header_ptr->getPrecMonoMass();
-  pos_ = header_ptr->getPrecMonoMz();
-  inte_ = header_ptr->getPrecInte();
-  charge_ = header_ptr->getPrecCharge();
-  EnvPtr theo_env_ptr = getTheoEnv(mass_, charge_);
-  for (int j = 0; j < theo_env_ptr->getPeakNum(); j++) {
-    EnvSimplePeakPtr p_ptr = std::make_shared<EnvSimplePeak>(theo_env_ptr->getMz(j), 
-                                                             theo_env_ptr->getIntensity(j));
-    peak_ptr_list_.push_back(p_ptr);
-  }
-}
-
-SeedEnvelope::SeedEnvelope(int spec_id, int env_id, double pos, double mass, double inte, int charge,
-                           std::vector<double> pos_list, std::vector<double> inte_list) {
+SeedEnvelope::SeedEnvelope(int spec_id, int env_id, double pos, double mass,
+                           double inte, int charge, std::vector<double> pos_list, 
+                           std::vector<double> inte_list) {
   spec_id_ = spec_id;
   env_id_ = env_id;
   pos_ = pos;
@@ -108,6 +95,11 @@ SeedEnvelope::SeedEnvelope(SeedEnvelopePtr env_ptr, int new_charge) {
   }
 }
 
+double SeedEnvelope::getReferMz() {
+  double ref_mass = EnvBase::convertMonoMassToRefMass(mass_);
+  double ref_mz = peak_util::compMz(ref_mass, charge_);
+  return ref_mz;
+}
 
 std::vector<double> SeedEnvelope::getPosList() {
   std::vector<double> pos_list;

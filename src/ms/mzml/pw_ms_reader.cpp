@@ -162,6 +162,12 @@ void PwMsReader::parsePrecursor(MsHeaderPtr header_ptr,
   header_ptr->setPrecTargetMz(prec_target_mz);
   header_ptr->setPrecWinBegin(prec_target_mz - isolation_lower_offset);
   header_ptr->setPrecWinEnd(prec_target_mz + isolation_upper_offset);
+  double prec_scan_num = -1;
+  if (spec_info.precursors.size() > 0) {
+    //get precursor scan ID from mzML
+    prec_scan_num = parseNum(cur_spec_ptr->precursors[0].spectrumID, prev_ms1_scan_id_);
+  }
+  header_ptr->setMsOneScan(prec_scan_num);
 
   /*
   // We decided not to use precursor ion informaton stored in 
@@ -172,7 +178,6 @@ void PwMsReader::parsePrecursor(MsHeaderPtr header_ptr,
   double prec_mz = prec_target_mz;
   int prec_charge = 1;
   double prec_inte = 0.0;
-  double prec_scan_num = -1;
   double apex_time = spec_info.retentionTime;
   if (spec_info.precursors.size() > 0) {
     prec_mz = spec_info.precursors[0].mz;
@@ -189,8 +194,8 @@ void PwMsReader::parsePrecursor(MsHeaderPtr header_ptr,
                                                       prec_charge, prec_inte,
                                                       apex_time);
   header_ptr->setSinglePrecPtr(prec_ptr);
-  header_ptr->setMsOneScan(prec_scan_num);
   LOG_DEBUG("Precursor m/z " << prec_mz);
+  header_ptr->setMsOneScan(prec_scan_num);
   */
 
 }

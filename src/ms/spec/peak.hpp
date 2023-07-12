@@ -55,6 +55,9 @@ class Peak {
   static bool cmpInteDec(const PeakPtr &a, const PeakPtr &b) { 
     return a->getIntensity() > b->getIntensity();}
 
+  static bool cmpPosInc(const PeakPtr &a, const PeakPtr &b) { 
+    return a->getPosition() < b->getPosition();}
+
 private:
   double position_ = -1;
   double intensity_ = -1;

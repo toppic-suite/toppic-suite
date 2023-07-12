@@ -62,14 +62,14 @@ SpecFeature::SpecFeature(std::string line) {
 }
 
 SpecFeature::SpecFeature(MsHeaderPtr header, FracFeaturePtr feature) {
-  spec_id_ = header->getSpecId();
   frac_id_ = header->getFractionId();
   file_name_ = header->getFileName();
+  spec_id_ = header->getSpecId();
   scans_ = header->getScansString();
   ms_one_id_ = header->getMsOneId();
   ms_one_scan_ = header->getMsOneScan();
-  prec_mass_ = header->getPrecMonoMass();
-  prec_inte_ = header->getPrecInte();
+  prec_mass_ = feature->getMonoMass(); 
+  prec_inte_ = feature->getIntensity(); 
   frac_feature_id_ = feature->getId();
   frac_feature_inte_ = feature->getIntensity();
   frac_feature_score_ = feature->getEcscore();

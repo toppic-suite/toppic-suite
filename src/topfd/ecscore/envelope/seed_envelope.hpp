@@ -42,8 +42,6 @@ class SeedEnvelope {
 
   SeedEnvelope(SeedEnvelopePtr env_ptr, int new_charge);
 
-  SeedEnvelope(MsHeaderPtr header_ptr);
-
   std::vector<double> getPosList();
 
   std::vector<double> getInteList();
@@ -69,6 +67,8 @@ class SeedEnvelope {
   void setEnvId(int env_id) { env_id_ = env_id; }
 
   double getPos() const { return pos_; }
+
+  double getReferMz();
 
   void setPos(double pos) { pos_ = pos; }
 
@@ -104,6 +104,7 @@ class SeedEnvelope {
 };
 
 typedef std::vector<SeedEnvelopePtr> SeedEnvelopePtrVec;
+typedef std::vector<SeedEnvelopePtrVec> SeedEnvelopePtr2D;
 
 }
 

@@ -71,12 +71,17 @@ void process(TopfdParaPtr topfd_para_ptr) {
 
   //Prepare seed envelopes
   SeedEnvelopePtrVec seed_ptrs;
+  SeedEnvelopePtr2D seed_ptr_2d;
   for (auto &ms1_data: deconv_ms1_ptr_vec) {
     DeconvPeakPtrVec peaks = ms1_data->getPeakPtrVec();
+    SeedEnvelopePtrVec one_spec_seed_ptrs;
     for (auto &peak: peaks) {
-      SeedEnvelopePtr seed_ptr = std::make_shared<SeedEnvelope>(peak);
-      seed_ptrs.push_back(seed_ptr);
+      SeedEnvelopePtr seed_ptr_1 = std::make_shared<SeedEnvelope>(peak);
+      seed_ptrs.push_back(seed_ptr_1);
+      SeedEnvelopePtr seed_ptr_2 = std::make_shared<SeedEnvelope>(peak);
+      one_spec_seed_ptrs.push_back(seed_ptr_2);
     }
+    seed_ptr_2d.push_back(one_spec_seed_ptrs);
   }
   std::sort(seed_ptrs.begin(), seed_ptrs.end(), SeedEnvelope::cmpInteDec);
   // write_out_files::write_seed_envelopes(seed_envs, "envs.csv");
@@ -147,7 +152,7 @@ void process(TopfdParaPtr topfd_para_ptr) {
 
   Feature::assignFeatures(frac_features, env_coll_list, features, 
                           raw_matrix_ptr, deconv_ms1_ptr_vec, ms2_header_ptr_2d,
-                          ms2_features, topfd_para_ptr, score_para_ptr); 
+                          seed_ptr_2d, ms2_features, topfd_para_ptr, score_para_ptr); 
 
   std::cout << std::endl << "Number of proteoform features: " << features.size() << std::endl;
   /// output files

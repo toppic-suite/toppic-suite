@@ -111,25 +111,28 @@ bool simpleEvalEnv(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
     }
   }
   if (num_theo_peak == 0) return false;
-
   return true;
 }
 
 bool simplePreprocessEnv(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr, 
                          EcscoreParaPtr para_ptr, double sn_ratio) {
-  if (seed_ptr->getCharge() < para_ptr->para_min_charge_)
+  if (seed_ptr->getSpecId() >= matrix_ptr->getSpecNum()) {
+    LOG_ERROR("spec id " + std::to_string(seed_ptr->getSpecId()) + " is out of range!");
+    return false; 
+  }
+  if (seed_ptr->getCharge() < para_ptr->para_min_charge_) {
     return false;
+  }
   double mass_tol = para_ptr->mass_tole_;
   double corr_tol = para_ptr->corr_tole_;
   double min_mz = matrix_ptr->getMinMz() - mass_tol;
   double max_mz = matrix_ptr->getMaxMz() + mass_tol;
+  std::vector<double> seed_env_inte = seed_ptr->getInteList();
   seed_ptr->rmPeaks(min_mz, max_mz);
+  seed_env_inte = seed_ptr->getInteList();
   env_set_util::compPeakStartEndIdx(matrix_ptr, seed_ptr, mass_tol);
+  seed_env_inte = seed_ptr->getInteList();
   bool valid = simpleEvalEnv(matrix_ptr, seed_ptr, mass_tol, corr_tol, sn_ratio);
-  if (seed_ptr->getSpecId() >= matrix_ptr->getSpecNum()) {
-    LOG_ERROR("spec id " + std::to_string(seed_ptr->getSpecId()) + " is out of range!");
-    valid = false;
-  }
   return valid;
 }
 

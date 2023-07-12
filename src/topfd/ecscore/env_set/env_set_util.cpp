@@ -60,6 +60,9 @@ std::vector<double> getAggregateEnvelopeMz(EnvSetPtr env_set_ptr) {
 
 double calcInteRatio(std::vector<double> &theo_envelope_inte, 
                      std::vector<double> &exp_envelope_inte) {
+  if (theo_envelope_inte.size() == 0) {
+    LOG_WARN("Empty peak list!");
+  }
   double theo_sum = 0;
   double obs_sum = 0;
   int refer_idx =
@@ -153,10 +156,9 @@ EnvSetPtr getEnvSet(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
   std::vector<double> theo_env_inte = seed_ptr->getInteList();
   int num_theo_env_peaks = theo_env_inte.size();
   int refer_idx = std::max_element(theo_env_inte.begin(), theo_env_inte.end()) - theo_env_inte.begin();
-
+  int idx = seed_ptr->getSpecId();
   // search backward
   ExpEnvelopePtrVec back_env_list;
-  int idx = seed_ptr->getSpecId();
   int miss_num = 0;
   while (idx >= 0) {
     ExpEnvelopePtr exp_env_ptr = env_set_util::getMatchExpEnv(matrix_ptr, seed_ptr, 
