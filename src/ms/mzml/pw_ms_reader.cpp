@@ -163,6 +163,10 @@ void PwMsReader::parsePrecursor(MsHeaderPtr header_ptr,
   header_ptr->setPrecWinBegin(prec_target_mz - isolation_lower_offset);
   header_ptr->setPrecWinEnd(prec_target_mz + isolation_upper_offset);
 
+  /*
+  // We decided not to use precursor ion informaton stored in 
+  // mzml files. The precursor information will be obtained by 
+  // the feature detection method in topfd
   // precursor information
   int prec_id = 0;
   double prec_mz = prec_target_mz;
@@ -187,6 +191,7 @@ void PwMsReader::parsePrecursor(MsHeaderPtr header_ptr,
   header_ptr->setSinglePrecPtr(prec_ptr);
   header_ptr->setMsOneScan(prec_scan_num);
   LOG_DEBUG("Precursor m/z " << prec_mz);
+  */
 
 }
 

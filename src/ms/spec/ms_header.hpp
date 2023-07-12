@@ -62,6 +62,8 @@ class MsHeader {
   ActivationPtr getActivationPtr() {return activation_ptr_;}
 
   //get functions for precursor 
+  int getPrecNum() {return prec_ptr_vec_.size();}
+
   PrecursorPtr getSinglePrecPtr(); 
 
   int getPrecId() {return getSinglePrecPtr()->getPrecId();}
