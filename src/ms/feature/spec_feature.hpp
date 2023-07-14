@@ -35,9 +35,6 @@ class SpecFeature {
   SpecFeature(MsHeaderPtr header, FracFeaturePtr feature,
               double prec_mono_mz, int prec_charge, double prec_inte);
 
-  // for the compatibility of feature_detect
-  SpecFeature(MsHeaderPtr header, FracFeaturePtr feature);
-
   int getSpecId() {return spec_id_;}
 
   int getFracId() {return frac_id_;}

@@ -95,6 +95,7 @@ void MsAlignReader::readNext() {
   double prec_win_end = -1;
   std::string activation;
   double prec_mass = -1;
+  int prec_feat_id = -1;
   int prec_charge = -1;
   double prec_inte = -1;
 
@@ -133,6 +134,8 @@ void MsAlignReader::readNext() {
         prec_charge = std::stoi(strs[1]);
       } else if (strs[0] == "PRECURSOR_INTENSITY") {
         prec_inte = std::stod(strs[1]);
+      } else if (strs[0] == "PRECURSOR_FEATURE_ID") {
+        prec_feat_id = std::stoi(strs[1]);
       } 
     }
   }
@@ -189,10 +192,8 @@ void MsAlignReader::readNext() {
     }
     int prec_id = 0;
     double prec_mono_mz = peak_util::compMz(prec_mass, prec_charge); 
-    double apex_time = retention_time;
-    PrecursorPtr prec_ptr = std::make_shared<Precursor>(prec_id, prec_mono_mz,
-                                                        prec_charge, prec_inte,
-                                                        apex_time);
+    PrecursorPtr prec_ptr = std::make_shared<Precursor>(prec_id, prec_feat_id, 
+                                                        prec_mono_mz, prec_charge, prec_inte);
     header_ptr->setSinglePrecPtr(prec_ptr);
   }
 

@@ -26,7 +26,6 @@
 #include "ms/feature/frac_feature_writer.hpp"
 #include "ms/feature/sample_feature_writer.hpp"
 #include "topfd/common/topfd_para.hpp"
-#include "topfd/feature_detect/feature_detect.hpp"
 #include "topfd/ecscore/spectrum/peak_matrix.hpp"
 #include "topfd/ecscore/envelope/seed_envelope.hpp"
 #include "topfd/ecscore/envelope/seed_env_util.hpp"
@@ -165,9 +164,9 @@ void process(TopfdParaPtr topfd_para_ptr) {
   frac_feature_writer::writeBatMassFeatures(batmass_file_name, frac_features);
 
   SampleFeaturePtrVec sample_features;
-  feature_detect::getSampleFeatures(sample_features, frac_features, ms2_features);
-  std::string sample_feature_file_name = output_base_name + "_"  + "ms1.feature";
-  sample_feature_writer::writeFeatures(sample_feature_file_name, sample_features);
+  //feature_detect::getSampleFeatures(sample_features, frac_features, ms2_features);
+  //std::string sample_feature_file_name = output_base_name + "_"  + "ms1.feature";
+  //sample_feature_writer::writeFeatures(sample_feature_file_name, sample_features);
   output_file_name = output_base_name + "_"  + "ms2.feature";
   spec_feature_writer::writeFeatures(output_file_name, ms2_features);
 }

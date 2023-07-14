@@ -66,6 +66,8 @@ void MsAlignWriter::writeMs(DeconvMsPtr ms_ptr) {
         << header_ptr->getPrecMonoMass() << std::endl;
     output_ << "PRECURSOR_INTENSITY=" << std::fixed << std::setprecision(2) 
         <<  header_ptr->getPrecInte() << std::endl;
+    output_ << "PRECURSOR_FEATURE_ID=" << std::fixed << std::setprecision(2) 
+        <<  header_ptr->getPrecFeatureId() << std::endl;
   }
   for (size_t i = 0; i < ms_ptr->size(); i++) {
     DeconvPeakPtr peak_ptr = ms_ptr->getPeakPtr(i);
