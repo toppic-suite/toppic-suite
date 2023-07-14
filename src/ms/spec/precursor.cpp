@@ -23,13 +23,13 @@
 
 namespace toppic {
 
-Precursor::Precursor(int prec_id, double mono_mz, int charge, 
-                     double inte, double apex_time):
+Precursor::Precursor(int prec_id, int feat_id, 
+                     double mono_mz, int charge, double inte):
   prec_id_(prec_id),
+  feat_id_(feat_id),
   mono_mz_(mono_mz),
   charge_(charge),
-  inte_ (inte),
-  apex_time_(apex_time) {
+  inte_ (inte) {
     if (mono_mz_ < 0 || std::isnan(mono_mz_)) {
       LOG_WARN("id " << prec_id_ << " monoisotopic mass is not initialized!");
       mono_mz_ = 0.0;
@@ -38,10 +38,10 @@ Precursor::Precursor(int prec_id, double mono_mz, int charge,
 
 Precursor::Precursor(XmlDOMElement* element) {
   prec_id_ = xml_dom_util::getIntChildValue(element, "prec_id", 0);
+  feat_id_ = xml_dom_util::getDoubleChildValue(element, "feat_id", 0);
   mono_mz_ = xml_dom_util::getDoubleChildValue(element, "mono_mz", 0);
   charge_ = xml_dom_util::getIntChildValue(element, "charge", 0);
   inte_ = xml_dom_util::getDoubleChildValue(element, "intensity", 0);
-  apex_time_ = xml_dom_util::getDoubleChildValue(element, "apex_time", 0);
 }
 
 double Precursor::getMonoMz() {
@@ -87,14 +87,14 @@ XmlDOMElement* Precursor::getPrecursorXml(XmlDOMDocument* xml_doc) {
   XmlDOMElement* element = xml_doc->createElement(precursor_str.c_str()); 
   std::string str = str_util::toString(prec_id_);
   xml_doc->addElement(element, "prec_id", str.c_str());
+  str = str_util::toString(feat_id_);
+  xml_doc->addElement(element, "feat_id", str.c_str());
   str = str_util::fixedToString(mono_mz_, precison);
   xml_doc->addElement(element, "mono_mz", str.c_str());
   str = str_util::toString(charge_);
   xml_doc->addElement(element, "charge", str.c_str());
   str = str_util::toString(inte_);
   xml_doc->addElement(element, "intensity", str.c_str());
-  str = str_util::toString(apex_time_);
-  xml_doc->addElement(element, "apex_time", str.c_str());
   return element;
 }
 

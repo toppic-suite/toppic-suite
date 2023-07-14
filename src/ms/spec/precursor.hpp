@@ -27,12 +27,14 @@ typedef std::shared_ptr<Precursor> PrecursorPtr;
 
 class Precursor {
  public:
-  Precursor(int id, double mono_mz, int charge, 
-            double inte, double apex_time);
+  Precursor(int id, int feat_id, 
+            double mono_mz, int charge, double inte);
 
   Precursor(XmlDOMElement* element);
 
   int getPrecId() {return prec_id_;}
+
+  int getFeatureId() {return feat_id_;}
 
   double getMonoMz();
 
@@ -42,8 +44,6 @@ class Precursor {
 
   double getInte() {return inte_;}
 
-  double getApexTime() {return apex_time_;}
-
   double getMonoMass();
 
   double getMonoMassMinusWater();
@@ -52,7 +52,7 @@ class Precursor {
 
   std::pair<int,int> getMonoMassMinusWaterError(double ppo, double scale);
 
-  void setSpecId(int prec_id) {prec_id_ = prec_id;}
+  void setPrecId(int prec_id) {prec_id_ = prec_id;}
 
   void setMonoMz(double mono_mz) {mono_mz_ = mono_mz;}
 
@@ -72,6 +72,8 @@ class Precursor {
 
  private:
   int prec_id_ = -1;
+  // fraction feature id
+  int feat_id_ = -1;
   // computed monoisotopic precursor m/z value 
   double mono_mz_ = -1;
   // adjusted mono_mz after proteoform identification
@@ -80,8 +82,6 @@ class Precursor {
   int charge_ = -1;
   // precursor intensity 
   double inte_ = 0;
-  //rt with the highest intensity in this feature
-  double apex_time_ = -1;
 };
 
 typedef std::vector<PrecursorPtr> PrecursorPtrVec;
