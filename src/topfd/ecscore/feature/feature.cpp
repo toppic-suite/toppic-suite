@@ -180,19 +180,15 @@ bool Feature::getHighestInteFeature(FracFeaturePtrVec &frac_features, EnvCollPtr
     FracFeaturePtr feature_ptr = frac_features[top_coll_id];
     EnvSetPtrVec env_sets = env_coll_list[top_coll_id]->getEnvSetList();
     EnvSetPtr env_set_ptr = env_sets[top_env_set_id];
-    int prec_id = 0;
     double prec_mono_mz = peak_util::compMz(feature_ptr->getMonoMass(), env_set_ptr->getCharge());
     int prec_charge = env_set_ptr->getCharge();
     double prec_inte = top_env_inte;
     if (prec_inte < 0) {
       prec_inte = 0;
     }
-    double apex_time = feature_ptr->getApexTime();
-    PrecursorPtr prec_ptr = std::make_shared<Precursor>(prec_id, prec_mono_mz,
-                                                        prec_charge, prec_inte,
-                                                        apex_time);
-    header_ptr->setSinglePrecPtr(prec_ptr);
-    SpecFeaturePtr ms2_feature = std::make_shared<SpecFeature>(header_ptr, feature_ptr);
+    SpecFeaturePtr ms2_feature = std::make_shared<SpecFeature>(header_ptr, feature_ptr, 
+                                                               prec_mono_mz, prec_charge,
+                                                               prec_inte);
     ms2_features.push_back(ms2_feature);
     feature_ptr->setHasMs2Spec(true);
     return true;
@@ -269,7 +265,12 @@ bool Feature::getNewFeature(MsHeaderPtr header_ptr, PeakMatrixPtr matrix_ptr,
     frac_feature_ptr->setEcscore(feature_ptr->getScore());
     frac_feature_ptr->setHasMs2Spec(true);
     frac_feature_list.push_back(frac_feature_ptr);
-    SpecFeaturePtr ms2_feature_ptr = std::make_shared<SpecFeature>(header_ptr, frac_feature_ptr);
+    double prec_mono_mass = seed_ptr->getMass();
+    int prec_charge = seed_ptr->getCharge();
+    double prec_mono_mz = peak_util::compMz(prec_mono_mass, prec_charge);
+    double prec_inte = seed_ptr->getInte();
+    SpecFeaturePtr ms2_feature_ptr = std::make_shared<SpecFeature>(header_ptr, frac_feature_ptr,
+                                                                   prec_mono_mz, prec_charge, prec_inte);
     ms2_feature_list.push_back(ms2_feature_ptr);
     return true;
   }

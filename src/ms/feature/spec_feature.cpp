@@ -19,29 +19,6 @@
 
 namespace toppic {
 
-/*
-SpecFeature::SpecFeature(int spec_id, int frac_id, 
-                         const std::string &file_name,
-                         std::string &scans,
-                         int ms_one_id, int ms_one_scan, 
-                         double prec_mass, double prec_inte,
-                         int frac_feature_id, double frac_feature_inte,
-                         int sample_feature_id, double sample_feature_inte): 
-    spec_id_(spec_id),
-    frac_id_(frac_id),
-    file_name_(file_name),
-    scans_(scans),
-    ms_one_id_(ms_one_id),
-    ms_one_scan_(ms_one_scan),
-    prec_mass_(prec_mass),
-    prec_inte_(prec_inte),
-    frac_feature_id_(frac_feature_id),
-    frac_feature_inte_(frac_feature_inte),
-    sample_feature_id_(sample_feature_id),
-    sample_feature_inte_(sample_feature_inte) {
-    }
-    */
-
 SpecFeature::SpecFeature(std::string line) {
   std::vector<std::string> strs;
   strs = str_util::split(line, "\t");
@@ -51,16 +28,18 @@ SpecFeature::SpecFeature(std::string line) {
   scans_ = strs[3];
   ms_one_id_ = std::stoi(strs[4]);
   ms_one_scan_ = std::stoi(strs[5]);
-  prec_mass_ = std::stod(strs[6]);
-  prec_inte_ = std::stod(strs[7]);
-  frac_feature_id_ = std::stoi(strs[8]);
-  frac_feature_inte_ = std::stod(strs[9]);
-  frac_feature_score_ = std::stod(strs[10]);
-  frac_feature_time_apex_ = std::stod(strs[11]);
-  sample_feature_inte_ = std::stod(strs[13]);
-  sample_feature_id_ = std::stoi(strs[12]);
+  frac_feature_id_ = std::stoi(strs[6]);
+  frac_feature_inte_ = std::stod(strs[7]);
+  frac_feature_score_ = std::stod(strs[8]);
+  frac_feature_time_apex_ = std::stod(strs[9]);
+  sample_feature_id_ = std::stoi(strs[10]);
+  sample_feature_inte_ = std::stod(strs[11]);
+  prec_mono_mz_ = std::stod(strs[12]);
+  prec_charge_ = std::stoi(strs[13]);
+  prec_inte_ = std::stod(strs[14]);
 }
 
+// for the compatibility of feature_detect
 SpecFeature::SpecFeature(MsHeaderPtr header, FracFeaturePtr feature) {
   frac_id_ = header->getFractionId();
   file_name_ = header->getFileName();
@@ -68,14 +47,32 @@ SpecFeature::SpecFeature(MsHeaderPtr header, FracFeaturePtr feature) {
   scans_ = header->getScansString();
   ms_one_id_ = header->getMsOneId();
   ms_one_scan_ = header->getMsOneScan();
-  prec_mass_ = feature->getMonoMass(); 
-  prec_inte_ = feature->getIntensity(); 
   frac_feature_id_ = feature->getId();
   frac_feature_inte_ = feature->getIntensity();
   frac_feature_score_ = feature->getEcscore();
   frac_feature_time_apex_ = feature->getApexTime();
   sample_feature_id_ = feature->getSampleFeatureId();
   sample_feature_inte_ = feature->getSampleFeatureInte();
+}
+
+
+SpecFeature::SpecFeature(MsHeaderPtr header, FracFeaturePtr feature,
+                         double prec_mono_mz, int prec_charge, double prec_inte) {
+  frac_id_ = header->getFractionId();
+  file_name_ = header->getFileName();
+  spec_id_ = header->getSpecId();
+  scans_ = header->getScansString();
+  ms_one_id_ = header->getMsOneId();
+  ms_one_scan_ = header->getMsOneScan();
+  frac_feature_id_ = feature->getId();
+  frac_feature_inte_ = feature->getIntensity();
+  frac_feature_score_ = feature->getEcscore();
+  frac_feature_time_apex_ = feature->getApexTime();
+  sample_feature_id_ = feature->getSampleFeatureId();
+  sample_feature_inte_ = feature->getSampleFeatureInte();
+  prec_mono_mz_ = prec_mono_mz;
+  prec_charge = prec_charge; 
+  prec_inte_ = prec_inte; 
 }
 
 /*

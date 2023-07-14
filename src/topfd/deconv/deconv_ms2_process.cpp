@@ -86,16 +86,18 @@ void deconvMsTwo(MzmlMsPtr ms_ptr,
   // 1. Find max_mass and max_charge
   double max_mass = 0; 
   int max_charge = 1;
+  /*
   for (size_t i = 0; i < sp_feat_ptr_vec.size(); i++) {
-    double mass = sp_feat_ptr_vec[i]->getMonoMass();
+    double mass = sp_feat_ptr_vec[i]->getPrecMass();
     if (mass > max_mass) {max_mass = mass;}
-    int charge = sp_feat_ptr_vec[i]->getCharge();
+    int charge = sp_feat_ptr_vec[i]->getPrecCharge();
     if (charge > max_charge) {max_charge = charge;}
   }
   double arg_max_mass = topfd_para_ptr->getMaxMass();
   if (arg_max_mass < max_mass) {max_mass = arg_max_mass;}
   int arg_max_charge = topfd_para_ptr->getMaxCharge();
   if (arg_max_charge < max_charge) {max_charge = arg_max_charge;}
+  */
   // 2. Deconv the whole spectrum with filtering 
   PeakPtrVec peak_list = ms_ptr->getPeakPtrVec();
   MatchEnvPtrVec deconv_envs;
@@ -108,6 +110,22 @@ void deconvMsTwo(MzmlMsPtr ms_ptr,
   }
   // 3. Add precuror information
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
+  std::sort(sp_feat_ptr_vec.begin(), sp_feat_ptr_vec.end(), SpecFeature::cmpPrecInteDec);
+  PrecursorPtrVec prec_ptr_vec;
+  for (size_t i = 0; i < sp_feat_ptr_vec.size(); i++) {
+    /*
+    int prec_id = i;
+    double mono_mz = ;
+    int charge = ;
+    double inte = ;
+    double apex_time = ;
+    PrecursorPtr prec_ptr = std::make_shared<Precursor>(prec_id, mono_mz, charge,
+                                                        inte, apex_time);
+    prec_ptr_vec.push_back(prec_ptr);
+    */
+  }
+  header_ptr->setPrecPtrVec(prec_ptr_vec);
+
   // TO DO
   // 4. Write to msalign file
   DeconvMsPtr deconv_ms_ptr = match_env_util::getDeconvMsPtr(header_ptr,

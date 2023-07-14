@@ -24,19 +24,6 @@ namespace toppic {
 
 namespace spec_feature_writer {
 
-  int id_;
-  int frac_id_;
-  std::string file_name_;
-  std::string scans_;
-  int ms_one_id_;
-  std::string ms_one_scans_;
-  double prec_mass_;
-  double prec_inte_;
-  int frac_feature_id_;
-  double frac_feature_inte_;
-  int sample_feature_id_;
-  double sample_feature_inte_;
-
 void writeHeader(std::ofstream &of) {
   of.precision(16);
   of << "Spec_ID" << "\t"
@@ -45,14 +32,15 @@ void writeHeader(std::ofstream &of) {
       << "Scans" << "\t"
       << "MS_one_ID" << "\t"
       << "MS_one_scans" << "\t"
-      << "Precursor_mass" << "\t"
-      << "Precursor_intensity" << "\t"
       << "Fraction_feature_ID" << "\t"
       << "Fraction_feature_intensity" << "\t"
       << "Fraction_feature_score" << "\t"
       << "Fraction_feature_time_apex" << "\t"
       << "Sample_feature_ID" << "\t"
       << "Sample_feature_intensity"
+      << "Precursor_mono_mz" << "\t"
+      << "Precursor_charge" << "\t"
+      << "Precursor_intensity"
       << std::endl;
 }
 
@@ -63,14 +51,15 @@ void writeOneFeature(std::ofstream &of, SpecFeaturePtr feature) {
       << feature->getScans() << "\t"
       << feature->getMsOneId() << "\t"
       << feature->getMsOneScan() << "\t"
-      << feature->getPrecMass() << "\t"
-      << feature->getPrecInte() << "\t"
       << feature->getFracFeatureId() << "\t"
       << feature->getFracFeatureInte() << "\t"
       << feature->getFracFeatureScore() << "\t"
       << feature->getFracFeatureTimeApex() << "\t"
       << feature->getSampleFeatureId() << "\t"
       << feature->getSampleFeatureInte() 
+      << feature->getPrecMonoMz() << "\t"
+      << feature->getPrecCharge() << "\t"
+      << feature->getPrecInte() 
       << std::endl;
 }
 

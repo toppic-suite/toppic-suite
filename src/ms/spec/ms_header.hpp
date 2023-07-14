@@ -121,6 +121,8 @@ class MsHeader {
   // set function for precursor 
   void setSinglePrecPtr(PrecursorPtr prec_ptr); 
 
+  void setPrecPtrVec(PrecursorPtrVec prec_ptr_vec) {prec_ptr_vec_ = prec_ptr_vec;}
+
   std::string toString();
 
   XmlDOMElement* getHeaderXml(XmlDOMDocument* xml_doc);
