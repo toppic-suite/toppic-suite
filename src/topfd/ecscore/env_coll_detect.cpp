@@ -32,6 +32,7 @@
 #include "topfd/ecscore/env_coll/env_coll.hpp"
 #include "topfd/ecscore/env_coll/env_coll_util.hpp"
 #include "topfd/ecscore/feature/feature.hpp"
+#include "topfd/ecscore/feature/feature_detect.hpp"
 #include "topfd/ecscore/feature/ecscore_write_feature.hpp"
 #include "topfd/ecscore/ecscore_para.hpp"
 #include "topfd/ecscore/env_coll_detect.hpp"
@@ -164,9 +165,9 @@ void process(TopfdParaPtr topfd_para_ptr) {
   frac_feature_writer::writeBatMassFeatures(batmass_file_name, frac_features);
 
   SampleFeaturePtrVec sample_features;
-  //feature_detect::getSampleFeatures(sample_features, frac_features, ms2_features);
-  //std::string sample_feature_file_name = output_base_name + "_"  + "ms1.feature";
-  //sample_feature_writer::writeFeatures(sample_feature_file_name, sample_features);
+  feature_detect::getSampleFeatures(sample_features, frac_features, ms2_features);
+  std::string sample_feature_file_name = output_base_name + "_"  + "ms1.feature";
+  sample_feature_writer::writeFeatures(sample_feature_file_name, sample_features);
   output_file_name = output_base_name + "_"  + "ms2.feature";
   spec_feature_writer::writeFeatures(output_file_name, ms2_features);
 }
