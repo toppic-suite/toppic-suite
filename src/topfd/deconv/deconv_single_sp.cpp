@@ -23,12 +23,12 @@
 #include "ms/env/match_env_refine.hpp"
 #include "ms/env/match_env_filter.hpp"
 
-#include "topfd/spec/deconv_data_util.hpp"
 #include "topfd/dp/dp_para.hpp"
 #include "topfd/dp/dp_assign.hpp"
 #include "topfd/dp/co_table.hpp"
 #include "topfd/dp/dp_a.hpp"
 #include "topfd/envcnn/onnx_env_cnn.hpp" 
+#include "topfd/deconv/deconv_data_util.hpp"
 #include "topfd/deconv/deconv_single_sp.hpp"
 
 namespace toppic {

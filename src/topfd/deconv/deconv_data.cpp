@@ -17,7 +17,7 @@
 
 #include "ms/spec/baseline_util.hpp" 
 #include "ms/spec/peak_list_util.hpp" 
-#include "topfd/spec/deconv_data.hpp" 
+#include "topfd/deconv/deconv_data.hpp" 
 
 namespace toppic {
 

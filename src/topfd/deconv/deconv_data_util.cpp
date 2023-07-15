@@ -15,7 +15,7 @@
 
 #include "common/util/logger.hpp"
 #include "ms/spec/peak_list_util.hpp"
-#include "topfd/spec/deconv_data_util.hpp"
+#include "topfd/deconv/deconv_data_util.hpp"
 
 namespace toppic {
 

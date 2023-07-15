@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_TOPFD_SPEC_DECONV_DATA_HPP_
-#define TOPPIC_TOPFD_SPEC_DECONV_DATA_HPP_
+#ifndef TOPPIC_TOPFD_DECONV_DECONV_DATA_HPP_
+#define TOPPIC_TOPFD_DECONV_DECONV_DATA_HPP_
 
 #include <memory>
 #include <vector>

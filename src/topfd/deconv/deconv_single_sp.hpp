@@ -16,9 +16,9 @@
 #define TOPPIC_TOPFD_DECONV_DECONV_SINGLE_SP_HPP_
 
 #include "ms/env/env_para.hpp"
-#include "topfd/dp/dp_para.hpp"
 #include "ms/env/match_env.hpp"
-#include "topfd/spec/deconv_data.hpp"
+#include "topfd/dp/dp_para.hpp"
+#include "topfd/deconv/deconv_data.hpp"
 
 namespace toppic {
 

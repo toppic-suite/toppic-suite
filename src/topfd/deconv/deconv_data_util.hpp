@@ -12,12 +12,11 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#ifndef TOPPIC_TOPFD_SPEC_DECONV_DATA_UTIL_HPP_
-#define TOPPIC_TOPFD_SPEC_DECONV_DATA_UTIL_HPP_
+#ifndef TOPPIC_TOPFD_DECONV_DECONV_DATA_UTIL_HPP_
+#define TOPPIC_TOPFD_DECONV_DECONV_DATA_UTIL_HPP_
 
 #include "ms/spec/peak.hpp"
-#include "topfd/spec/deconv_data.hpp"
+#include "topfd/deconv/deconv_data.hpp"
 
 namespace toppic {
 
