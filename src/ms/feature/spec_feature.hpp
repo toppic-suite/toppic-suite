@@ -19,6 +19,7 @@
 #include <memory>
 #include <vector>
 
+#include "ms/spec/peak_util.hpp"
 #include "ms/spec/ms_header.hpp"
 #include "ms/feature/frac_feature.hpp"
 
@@ -50,6 +51,9 @@ class SpecFeature {
   double getPrecMonoMz() {return prec_mono_mz_;}
 
   double getPrecCharge() {return prec_charge_;}
+
+  double getPrecMass() {return peak_util::compPeakNeutralMass(prec_mono_mz_, 
+                                                              prec_charge_);}
 
   double getPrecInte() {return prec_inte_;}
 

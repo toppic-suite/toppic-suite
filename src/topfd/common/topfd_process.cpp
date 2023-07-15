@@ -23,8 +23,9 @@
 #include "ms/mzml/mzml_profile.hpp"
 #include "topfd/envcnn/onnx_env_cnn.hpp" 
 #include "topfd/ecscore/score/onnx_ecscore.hpp"
-#include "topfd/deconv/deconv_ms1_process.hpp"
 #include "topfd/ecscore/env_coll_detect.hpp"
+#include "topfd/deconv/deconv_ms1_process.hpp"
+#include "topfd/deconv/deconv_ms2_process.hpp"
 
 namespace toppic {
 
@@ -46,12 +47,10 @@ void processOneFileWithFaims(TopfdParaPtr para_ptr) {
     std::cout << "MS1 feature detection finished." << std::endl;
   }
   std::cout << "MS/MS deconvolution started." << std::endl;
-  /*
   DeconvMs2ProcessPtr ms2_proc_ptr =
     std::make_shared<DeconvMs2Process>(para_ptr);
   ms2_proc_ptr->process();
   ms2_proc_ptr = nullptr;
-  */
   std::cout << "MS/MS deconvolution finished." << std::endl;
 }
 

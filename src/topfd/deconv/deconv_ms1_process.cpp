@@ -35,9 +35,9 @@ DeconvMs1Process::DeconvMs1Process(TopfdParaPtr topfd_para_ptr) {
   topfd_para_ptr_ = topfd_para_ptr;
 }
 
-std::string updateMsg(MsHeaderPtr header_ptr, int scan_cnt, int total_scan_num) {
+std::string updateMsOneMsg(MsHeaderPtr header_ptr, int scan_cnt, int total_scan_num) {
   std::string percentage = str_util::toString(scan_cnt * 100 / total_scan_num);
-  std::string msg = "Processing spectrum scan " 
+  std::string msg = "Processing MS1 spectrum scan " 
     + std::to_string(header_ptr->getFirstScanNum()) + " ...";
   while (msg.length() < 40) {
     msg += " ";
@@ -181,8 +181,8 @@ void DeconvMs1Process::process() {
     }
     pool_ptr->Enqueue(geneTask(ms_group_ptr, topfd_para_ptr_, ms1_writer_ptr_vec, pool_ptr)); 
     spec_cnt++; 
-    std::string msg = updateMsg(ms_group_ptr->getMsOnePtr()->getMsHeaderPtr(), 
-                                spec_cnt, total_spec_num);
+    std::string msg = updateMsOneMsg(ms_group_ptr->getMsOnePtr()->getMsHeaderPtr(), 
+                                     spec_cnt, total_spec_num);
     std::cout << "\r" << msg << std::flush;
     ms_group_ptr = reader_ptr->getNextMsGroupPtr();    
   }

@@ -11,7 +11,6 @@
 //WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //See the License for the specific language governing permissions and
 //limitations under the License.
-//
 
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
@@ -69,7 +68,7 @@ void DeconvMs2Process::readSpecFeature(std::string feat_file_name,
 
 std::string updateMsTwoMsg(MsHeaderPtr header_ptr, int scan_cnt, int total_scan_num) {
   std::string percentage = str_util::toString(scan_cnt * 100 / total_scan_num);
-  std::string msg = "Processing spectrum scan " 
+  std::string msg = "Processing MS/MS spectrum scan " 
     + std::to_string(header_ptr->getFirstScanNum()) + " ...";
   while (msg.length() < 40) {
     msg += " ";
@@ -86,7 +85,6 @@ void deconvMsTwo(MzmlMsPtr ms_ptr,
   // 1. Find max_mass and max_charge
   double max_mass = 0; 
   int max_charge = 1;
-  /*
   for (size_t i = 0; i < sp_feat_ptr_vec.size(); i++) {
     double mass = sp_feat_ptr_vec[i]->getPrecMass();
     if (mass > max_mass) {max_mass = mass;}
@@ -97,7 +95,6 @@ void deconvMsTwo(MzmlMsPtr ms_ptr,
   if (arg_max_mass < max_mass) {max_mass = arg_max_mass;}
   int arg_max_charge = topfd_para_ptr->getMaxCharge();
   if (arg_max_charge < max_charge) {max_charge = arg_max_charge;}
-  */
   // 2. Deconv the whole spectrum with filtering 
   PeakPtrVec peak_list = ms_ptr->getPeakPtrVec();
   MatchEnvPtrVec deconv_envs;
@@ -113,20 +110,17 @@ void deconvMsTwo(MzmlMsPtr ms_ptr,
   std::sort(sp_feat_ptr_vec.begin(), sp_feat_ptr_vec.end(), SpecFeature::cmpPrecInteDec);
   PrecursorPtrVec prec_ptr_vec;
   for (size_t i = 0; i < sp_feat_ptr_vec.size(); i++) {
-    /*
     int prec_id = i;
-    double mono_mz = ;
-    int charge = ;
-    double inte = ;
-    double apex_time = ;
-    PrecursorPtr prec_ptr = std::make_shared<Precursor>(prec_id, mono_mz, charge,
-                                                        inte, apex_time);
+    int feat_id = sp_feat_ptr_vec[i]->getFracFeatureId();
+    double mono_mz = sp_feat_ptr_vec[i]->getPrecMonoMz();
+    int charge = sp_feat_ptr_vec[i]->getPrecCharge();
+    double inte = sp_feat_ptr_vec[i]->getPrecInte();
+    PrecursorPtr prec_ptr = std::make_shared<Precursor>(prec_id, feat_id, 
+                                                        mono_mz, charge, inte);
     prec_ptr_vec.push_back(prec_ptr);
-    */
   }
   header_ptr->setPrecPtrVec(prec_ptr_vec);
 
-  // TO DO
   // 4. Write to msalign file
   DeconvMsPtr deconv_ms_ptr = match_env_util::getDeconvMsPtr(header_ptr,
                                                              deconv_envs,
