@@ -17,17 +17,14 @@
 
 #include <memory>
 #include <vector>
+#include <map>
 
 namespace toppic {
 
 class MzmlProfile {
  public:
   MzmlProfile(int ms1_cnt, int ms2_cnt, 
-              std::map<double, std::pair<int,int>> volt_map) {
-    total_ms1_cnt_ = ms1_cnt;
-    total_ms2_cnt_ = ms2_cnt;
-    volt_map_ = volt_map;
-  };
+              std::map<double, std::pair<int,int>> volt_map);
   int getMs1Cnt() {return total_ms1_cnt_;}
   int getMs2Cnt() {return total_ms2_cnt_;}
   bool isFaims() {return volt_map_.size() > 0;}

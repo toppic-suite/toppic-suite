@@ -168,36 +168,6 @@ void PwMsReader::parsePrecursor(MsHeaderPtr header_ptr,
     prec_scan_num = parseNum(cur_spec_ptr->precursors[0].spectrumID, prev_ms1_scan_id_);
   }
   header_ptr->setMsOneScan(prec_scan_num);
-
-  /*
-  // We decided not to use precursor ion informaton stored in 
-  // mzml files. The precursor information will be obtained by 
-  // the feature detection method in topfd
-  // precursor information
-  int prec_id = 0;
-  double prec_mz = prec_target_mz;
-  int prec_charge = 1;
-  double prec_inte = 0.0;
-  double apex_time = spec_info.retentionTime;
-  if (spec_info.precursors.size() > 0) {
-    prec_mz = spec_info.precursors[0].mz;
-    prec_charge = static_cast<int>(spec_info.precursors[0].charge);
-    prec_inte = spec_info.precursors[0].intensity;
-    if (prec_mz < 0) {prec_mz = 0;}
-    if (prec_charge  < 0) {prec_charge = 1;}
-    if (prec_inte < 0) {prec_inte = 0.0;}
-    //get precursor scan ID from mzML
-    prec_scan_num = parseNum(cur_spec_ptr->precursors[0].spectrumID, prev_ms1_scan_id_);
-  }
-  // precursor mz in mzML data
-  PrecursorPtr prec_ptr = std::make_shared<Precursor>(prec_id, prec_mz,
-                                                      prec_charge, prec_inte,
-                                                      apex_time);
-  header_ptr->setSinglePrecPtr(prec_ptr);
-  LOG_DEBUG("Precursor m/z " << prec_mz);
-  header_ptr->setMsOneScan(prec_scan_num);
-  */
-
 }
 
 void PwMsReader::parseActivation(MsHeaderPtr header_ptr, 

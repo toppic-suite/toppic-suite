@@ -12,20 +12,15 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_MS_MZML_MZML_MS_JSON_WRITER_HPP_
-#define TOPPIC_MS_MZML_MZML_MS_JSON_WRITER_HPP_
-
-#include "ms/env/match_env.hpp"
-#include "ms/mzml/mzml_ms.hpp"
+#include "ms/mzml/mzml_profile.hpp"
 
 namespace toppic {
 
-namespace mzml_ms_json_writer {
-
-void write(std::string &file_name, MzmlMsPtr ms_ptr, MatchEnvPtrVec &env);
+MzmlProfile::MzmlProfile(int ms1_cnt, int ms2_cnt, 
+                         std::map<double, std::pair<int,int>> volt_map) {
+  total_ms1_cnt_ = ms1_cnt;
+  total_ms2_cnt_ = ms2_cnt;
+  volt_map_ = volt_map;
+};
 
 }
-
-}
-
-#endif
