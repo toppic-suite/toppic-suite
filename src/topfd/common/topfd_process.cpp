@@ -41,7 +41,6 @@ void processOneFileWithFaims(TopfdParaPtr para_ptr) {
     ms1_proc_ptr->process();
     ms1_proc_ptr = nullptr;
     std::cout << "MS1 deconvolution finished." << std::endl;
-
     std::cout << "MS1 feature detection started." << std::endl;
     env_coll_detect::process(para_ptr);
     std::cout << "MS1 feature detection finished." << std::endl;

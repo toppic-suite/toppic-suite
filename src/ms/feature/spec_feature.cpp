@@ -22,9 +22,9 @@ namespace toppic {
 SpecFeature::SpecFeature(std::string line) {
   std::vector<std::string> strs;
   strs = str_util::split(line, "\t");
-  spec_id_ = std::stoi(strs[0]);
-  frac_id_ = std::stoi(strs[1]);
-  file_name_ = strs[2];
+  frac_id_ = std::stoi(strs[0]);
+  file_name_ = strs[1];
+  spec_id_ = std::stoi(strs[2]);
   scans_ = strs[3];
   ms_one_id_ = std::stoi(strs[4]);
   ms_one_scan_ = std::stoi(strs[5]);
@@ -54,26 +54,8 @@ SpecFeature::SpecFeature(MsHeaderPtr header, FracFeaturePtr feature,
   sample_feature_id_ = feature->getSampleFeatureId();
   sample_feature_inte_ = feature->getSampleFeatureInte();
   prec_mono_mz_ = prec_mono_mz;
-  prec_charge = prec_charge; 
+  prec_charge_ = prec_charge; 
   prec_inte_ = prec_inte; 
 }
-
-/*
-bool FracFeature::cmpFracIncInteDec(const FracFeaturePtr &a, 
-                                    const FracFeaturePtr &b) { 
-  if (a->getFracId() < b->getFracId()) {
-    return true;
-  }
-  else if (a->getFracId() > b->getFracId()) {
-    return false;
-  }
-  else if (a->getIntensity() > b->getIntensity()) {
-    return true;
-  }
-  else {
-    return false;
-  }
-}
-*/
 
 }

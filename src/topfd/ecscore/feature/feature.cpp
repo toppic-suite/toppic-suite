@@ -116,7 +116,7 @@ void Feature::assignFeatures(FracFeaturePtrVec &frac_feature_list,
                                  frac_feature_list, ms2_feature_list); 
       }
       if (!assigned) {
-        LOG_WARN("Scan " << header_ptr->getFirstScanNum() << " does not have MS1 feature!");
+        LOG_INFO("Scan " << header_ptr->getFirstScanNum() << " does not have MS1 feature!");
       }
     }
   }

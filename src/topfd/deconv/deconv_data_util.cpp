@@ -26,8 +26,7 @@ DeconvDataPtr getDataPtr(const PeakPtrVec &peak_list, double max_mass,
   if (peak_list.size() == 0) return nullptr;
   double max_mz = peak_list_util::findMaxPos(peak_list);
   if (max_mz > max_mass) {
-    LOG_WARN("Max mz is too large: " << max_mz);
-    return nullptr;
+    LOG_INFO("Max mz is too large: " << max_mz);
   }
 
   return std::make_shared<DeconvData>(peak_list, max_mass, 
@@ -42,8 +41,7 @@ DeconvDataPtr getDataPtr(const PeakPtrVec &peak_list,
   if (peak_list.size() == 0) return nullptr;
   double max_mz = peak_list_util::findMaxPos(peak_list);
   if (max_mz > max_mass) {
-    LOG_WARN("Max mz is too large: " << max_mz);
-    return nullptr;
+    LOG_INFO("Max mz is too large: " << max_mz);
   }
 
   return std::make_shared<DeconvData>(peak_list, max_mass, 

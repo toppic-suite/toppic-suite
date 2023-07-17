@@ -76,7 +76,7 @@ class MsHeader {
 
   double getPrecMonoMass() {return getSinglePrecPtr()->getMonoMass();}
 
-  double getPrecFeatureId() {return getSinglePrecPtr()->getFeatureId();}
+  int getPrecFeatureId() {return getSinglePrecPtr()->getFeatureId();}
 
   double getPrecMonoMassMinusWater() {return getSinglePrecPtr()->getMonoMassMinusWater();}
 
