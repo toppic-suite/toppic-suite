@@ -30,9 +30,10 @@ namespace toppic {
 
 namespace matrix_inverse {
 
+// Used in savitzky_golay.cpp
 
-/* Matrix inversion routine.
-Uses lu_factorize and lu_substitute in uBLAS to invert a matrix */
+// Matrix inversion routine.
+// Uses lu_factorize and lu_substitute in uBLAS to invert a matrix 
 bool InvertMatrix(const boost::numeric::ublas::matrix<double>& input, 
                   boost::numeric::ublas::matrix<double>& inverse)
 {
