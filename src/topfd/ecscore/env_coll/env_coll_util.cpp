@@ -13,6 +13,7 @@
 //limitations under the License.
 
 #include <numeric>
+#include <limits>
 
 #include "common/util/logger.hpp"
 #include "common/base/mass_constant.hpp"

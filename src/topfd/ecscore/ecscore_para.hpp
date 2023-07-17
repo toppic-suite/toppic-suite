@@ -18,7 +18,6 @@
 #include <vector>
 
 #include "para/peak_tolerance.hpp"
-#include "ms/feature/peak_cluster_score.hpp"
 #include "topfd/common/topfd_para.hpp"
 
 namespace toppic {
@@ -48,8 +47,6 @@ class EcscorePara {
   // search offset is  -3, -2, -1, 0, 1, 2, 3. We use it to search the precursor 
   // mass of an MS/MS spectrum to find a matched feature.
   std::vector<double> search_offsets_;
-
-  PeakClusterScorePtr peak_cluster_score_ptr_;
 
   double extend_min_mass_ = 5000;
   int intv_width_ = 500;

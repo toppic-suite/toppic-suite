@@ -12,6 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include <cmath>
+
 #include "ms/spec/peak_util.hpp"
 #include "topfd/ecscore/envelope/seed_env_util.hpp"
 #include "topfd/ecscore/envelope/env_util.hpp"
