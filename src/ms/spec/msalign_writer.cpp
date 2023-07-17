@@ -58,16 +58,43 @@ void MsAlignWriter::writeMs(DeconvMsPtr ms_ptr) {
     if (header_ptr->getActivationPtr() != nullptr) {
       output_ << "ACTIVATION=" << header_ptr->getActivationPtr()->getName() << std::endl;
     }
-    output_ << "PRECURSOR_MZ=" << std::fixed << std::setprecision(5) 
-        << header_ptr->getPrecMonoMz() << std::endl;
-    output_ << "PRECURSOR_CHARGE=" << header_ptr->getPrecCharge() << std::endl;
+    PrecursorPtrVec prec_ptrs = header_ptr->getPrecPtrVec();
+    output_ << "PRECURSOR_MZ=" << std::fixed << std::setprecision(5);
+    for (size_t i = 0; i < prec_ptrs.size(); i++) {
+      output_ << prec_ptrs[i]->getMonoMz();
+      // use : for separating multiple precursors
+      if (i < prec_ptrs.size() - 1) {output_ << ":";}
+    }
+    output_ << std::endl;
+    output_ << "PRECURSOR_CHARGE=";
+    for (size_t i = 0; i < prec_ptrs.size(); i++) {
+      output_ << prec_ptrs[i]->getCharge();
+      // use : for separating multiple precursors
+      if (i < prec_ptrs.size() - 1) {output_ << ":";}
+    }
+    output_ << std::endl;
     // The precision for mass is 5
-    output_ << "PRECURSOR_MASS=" << std::fixed << std::setprecision(5) 
-        << header_ptr->getPrecMonoMass() << std::endl;
-    output_ << "PRECURSOR_INTENSITY=" << std::fixed << std::setprecision(2) 
-        <<  header_ptr->getPrecInte() << std::endl;
-    output_ << "PRECURSOR_FEATURE_ID=" << std::fixed << std::setprecision(2) 
-        <<  header_ptr->getPrecFeatureId() << std::endl;
+    output_ << "PRECURSOR_MASS=" << std::fixed << std::setprecision(5);
+    for (size_t i = 0; i < prec_ptrs.size(); i++) {
+      output_ << prec_ptrs[i]->getMonoMass();
+      // use : for separating multiple precursors
+      if (i < prec_ptrs.size() - 1) {output_ << ":";}
+    }
+    output_ << std::endl;
+    output_ << "PRECURSOR_INTENSITY=" << std::fixed << std::setprecision(2);
+    for (size_t i = 0; i < prec_ptrs.size(); i++) {
+      output_ << prec_ptrs[i]->getInte();
+      // use : for separating multiple precursors
+      if (i < prec_ptrs.size() - 1) {output_ << ":";}
+    }
+    output_ << std::endl;
+    output_ << "PRECURSOR_FEATURE_ID=";
+    for (size_t i = 0; i < prec_ptrs.size(); i++) {
+      output_ << prec_ptrs[i]->getFeatureId();
+      // use : for separating multiple precursors
+      if (i < prec_ptrs.size() - 1) {output_ << ":";}
+    }
+    output_ << std::endl;
   }
   for (size_t i = 0; i < ms_ptr->size(); i++) {
     DeconvPeakPtr peak_ptr = ms_ptr->getPeakPtr(i);

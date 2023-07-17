@@ -130,13 +130,11 @@ bool Feature::getHighestInteFeature(FracFeaturePtrVec &frac_features, EnvCollPtr
   double prec_win_bgn = header_ptr->getPrecWinBegin();
   double prec_win_end = header_ptr->getPrecWinEnd();
 
-  // top env set indexes
-  double top_env_inte = -1;
-  int top_coll_id = -1;
-  int top_env_set_id = -1;
+  SpecFeaturePtrVec new_spec_feats;
   for (size_t coll_id = 0; coll_id < env_coll_list.size(); coll_id++) {
+    FracFeaturePtr frac_feature_ptr = frac_features[coll_id];
     // check threshold
-    if (frac_features[coll_id]->getEcscore() < score_thresh) {
+    if (frac_feature_ptr->getEcscore() < score_thresh) {
       continue;
     }
     // check retention time range
@@ -167,34 +165,34 @@ bool Feature::getHighestInteFeature(FracFeaturePtrVec &frac_features, EnvCollPtr
         LOG_WARN("Empty envelope intensity list!");
         continue; 
       }
-      double cur_env_inte = env_intes[inte_idx];
-      // keep the highest intensity one
-      if (top_env_inte < cur_env_inte) {
-        top_env_inte = cur_env_inte;
-        top_coll_id = coll_id;
-        top_env_set_id = env_set_id;
+
+      double prec_mono_mz = peak_util::compMz(frac_feature_ptr->getMonoMass(), 
+                                              env_set_ptr->getCharge());
+      int prec_charge = env_set_ptr->getCharge();
+      double prec_inte = env_intes[inte_idx];
+      if (prec_inte < 0) {
+        prec_inte = 0;
       }
+      SpecFeaturePtr ms2_feature = std::make_shared<SpecFeature>(header_ptr,
+                                                                 frac_feature_ptr, 
+                                                                 prec_mono_mz, 
+                                                                 prec_charge,
+                                                                 prec_inte);
+      new_spec_feats.push_back(ms2_feature);
+      frac_feature_ptr->setHasMs2Spec(true);
     }
   }
-  if (top_coll_id >= 0) {
-    FracFeaturePtr feature_ptr = frac_features[top_coll_id];
-    EnvSetPtrVec env_sets = env_coll_list[top_coll_id]->getEnvSetList();
-    EnvSetPtr env_set_ptr = env_sets[top_env_set_id];
-    double prec_mono_mz = peak_util::compMz(feature_ptr->getMonoMass(), env_set_ptr->getCharge());
-    int prec_charge = env_set_ptr->getCharge();
-    double prec_inte = top_env_inte;
-    if (prec_inte < 0) {
-      prec_inte = 0;
-    }
-    SpecFeaturePtr ms2_feature = std::make_shared<SpecFeature>(header_ptr, feature_ptr, 
-                                                               prec_mono_mz, prec_charge,
-                                                               prec_inte);
-    ms2_features.push_back(ms2_feature);
-    feature_ptr->setHasMs2Spec(true);
+  if (new_spec_feats.size() > 0) {
+    // sort by intensity
+    std::sort(new_spec_feats.begin(), new_spec_feats.end(),
+              SpecFeature::cmpPrecInteDec);
+    ms2_features.insert(std::end(ms2_features), std::begin(new_spec_feats), 
+                        std::end(new_spec_feats)); 
     return true;
   }
-  return false;
-    
+  else {
+    return false;
+  }
 }
 
 bool Feature::getNewFeature(MsHeaderPtr header_ptr, PeakMatrixPtr matrix_ptr, 

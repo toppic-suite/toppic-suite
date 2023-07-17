@@ -116,83 +116,86 @@ void ZeroPtmSearchProcessor::process() {
   DeconvMsPtrVec deconv_ms_ptr_vec = ms_reader_ptr->getNextMsPtrVec(); 
   std::vector<double> prec_error_vec = sp_para_ptr->getZeroShiftSearchPrecErrorVec();
   while (deconv_ms_ptr_vec.size() > 0) {
-    std::vector<SpectrumSetPtr> spec_set_vec 
+    if (deconv_ms_ptr_vec[0]->getMsHeaderPtr()->containsPrec()) {
+      std::vector<SpectrumSetPtr> spec_set_vec 
         = spectrum_set_factory::geneSpectrumSetPtrVecWithPrecError(deconv_ms_ptr_vec, 
                                                                    sp_para_ptr,
                                                                    prec_error_vec);
-    if (spec_set_vec.size() == 0) {
-      LOG_ERROR("Spectrum set size is 0!");
+      if (spec_set_vec.size() == 0) {
+        LOG_ERROR("Spectrum set size is 0!");
+      }
+      if (spec_set_vec[0]->isValid()) {
+        int spec_id = spec_set_vec[0]->getSpectrumId();
+        // complete
+        SimplePrsmPtrVec comp_selected_prsm_ptrs;
+        while (comp_prsm_ptr != nullptr && comp_prsm_ptr->getSpectrumId() == spec_id) {
+          comp_selected_prsm_ptrs.push_back(comp_prsm_ptr);
+          comp_prsm_ptr = comp_prsm_reader.readOnePrsm();
+        }
+        if (comp_selected_prsm_ptrs.size() > 0) {
+          for (size_t k = 0; k < spec_set_vec.size(); k++) {
+            PrsmPtrVec prsms = zeroPtmSearchOneSpec(spec_set_vec[k], 
+                                                    comp_selected_prsm_ptrs, 
+                                                    reader_ptr,
+                                                    mng_ptr_, 
+                                                    ProteoformType::COMPLETE);
+            comp_writer.writeVector(prsms);
+          }
+        }
+
+        // prefix
+        SimplePrsmPtrVec pref_selected_prsm_ptrs;
+        while (pref_prsm_ptr != nullptr && pref_prsm_ptr->getSpectrumId() == spec_id) {
+          pref_selected_prsm_ptrs.push_back(pref_prsm_ptr);
+          pref_prsm_ptr = pref_prsm_reader.readOnePrsm();
+        }
+        if (pref_selected_prsm_ptrs.size() > 0) {
+          for (size_t k = 0; k < spec_set_vec.size(); k++) {
+            PrsmPtrVec prsms = zeroPtmSearchOneSpec(spec_set_vec[k], 
+                                                    pref_selected_prsm_ptrs, 
+                                                    reader_ptr,
+                                                    mng_ptr_, ProteoformType::PREFIX);
+            pref_writer.writeVector(prsms);
+          }
+        }
+
+        // suffix
+        SimplePrsmPtrVec suff_selected_prsm_ptrs;
+        while (suff_prsm_ptr != nullptr && suff_prsm_ptr->getSpectrumId() == spec_id) {
+          suff_selected_prsm_ptrs.push_back(suff_prsm_ptr);
+          suff_prsm_ptr = suff_prsm_reader.readOnePrsm();
+        }
+        if (suff_selected_prsm_ptrs.size() > 0) {
+          for (size_t k = 0; k < spec_set_vec.size(); k++) {
+            PrsmPtrVec prsms = zeroPtmSearchOneSpec(spec_set_vec[k], 
+                                                    suff_selected_prsm_ptrs, 
+                                                    reader_ptr,
+                                                    mng_ptr_, ProteoformType::SUFFIX);
+            suff_writer.writeVector(prsms);
+          }
+        }
+
+        // internal
+        SimplePrsmPtrVec internal_selected_prsm_ptrs;
+        while (internal_prsm_ptr != nullptr 
+               && internal_prsm_ptr->getSpectrumId() == spec_id) {
+          internal_selected_prsm_ptrs.push_back(internal_prsm_ptr);
+          internal_prsm_ptr = internal_prsm_reader.readOnePrsm();
+        }
+        if (internal_selected_prsm_ptrs.size() > 0) {
+          for (size_t k = 0; k < spec_set_vec.size(); k++) {
+            PrsmPtrVec prsms = zeroPtmSearchOneSpec(spec_set_vec[k], 
+                                                    internal_selected_prsm_ptrs, 
+                                                    reader_ptr,
+                                                    mng_ptr_, ProteoformType::INTERNAL);
+            internal_writer.writeVector(prsms);
+          }
+        }
+      }
     }
-    cnt+= group_spec_num;
-    if (spec_set_vec[0]->isValid()) {
-      int spec_id = spec_set_vec[0]->getSpectrumId();
-      // complete
-      SimplePrsmPtrVec comp_selected_prsm_ptrs;
-      while (comp_prsm_ptr != nullptr && comp_prsm_ptr->getSpectrumId() == spec_id) {
-        comp_selected_prsm_ptrs.push_back(comp_prsm_ptr);
-        comp_prsm_ptr = comp_prsm_reader.readOnePrsm();
-      }
-      if (comp_selected_prsm_ptrs.size() > 0) {
-        for (size_t k = 0; k < spec_set_vec.size(); k++) {
-          PrsmPtrVec prsms = zeroPtmSearchOneSpec(spec_set_vec[k], 
-                                                  comp_selected_prsm_ptrs, 
-                                                  reader_ptr,
-                                                  mng_ptr_, 
-                                                  ProteoformType::COMPLETE);
-          comp_writer.writeVector(prsms);
-        }
-      }
-
-      // prefix
-      SimplePrsmPtrVec pref_selected_prsm_ptrs;
-      while (pref_prsm_ptr != nullptr && pref_prsm_ptr->getSpectrumId() == spec_id) {
-        pref_selected_prsm_ptrs.push_back(pref_prsm_ptr);
-        pref_prsm_ptr = pref_prsm_reader.readOnePrsm();
-      }
-      if (pref_selected_prsm_ptrs.size() > 0) {
-        for (size_t k = 0; k < spec_set_vec.size(); k++) {
-          PrsmPtrVec prsms = zeroPtmSearchOneSpec(spec_set_vec[k], 
-                                                  pref_selected_prsm_ptrs, 
-                                                  reader_ptr,
-                                                  mng_ptr_, ProteoformType::PREFIX);
-          pref_writer.writeVector(prsms);
-        }
-      }
-
-      // suffix
-      SimplePrsmPtrVec suff_selected_prsm_ptrs;
-      while (suff_prsm_ptr != nullptr && suff_prsm_ptr->getSpectrumId() == spec_id) {
-        suff_selected_prsm_ptrs.push_back(suff_prsm_ptr);
-        suff_prsm_ptr = suff_prsm_reader.readOnePrsm();
-      }
-      if (suff_selected_prsm_ptrs.size() > 0) {
-        for (size_t k = 0; k < spec_set_vec.size(); k++) {
-          PrsmPtrVec prsms = zeroPtmSearchOneSpec(spec_set_vec[k], 
-                                                  suff_selected_prsm_ptrs, 
-                                                  reader_ptr,
-                                                  mng_ptr_, ProteoformType::SUFFIX);
-          suff_writer.writeVector(prsms);
-        }
-      }
-
-      // internal
-      SimplePrsmPtrVec internal_selected_prsm_ptrs;
-      while (internal_prsm_ptr != nullptr 
-             && internal_prsm_ptr->getSpectrumId() == spec_id) {
-        internal_selected_prsm_ptrs.push_back(internal_prsm_ptr);
-        internal_prsm_ptr = internal_prsm_reader.readOnePrsm();
-      }
-      if (internal_selected_prsm_ptrs.size() > 0) {
-        for (size_t k = 0; k < spec_set_vec.size(); k++) {
-          PrsmPtrVec prsms = zeroPtmSearchOneSpec(spec_set_vec[k], 
-                                                  internal_selected_prsm_ptrs, 
-                                                  reader_ptr,
-                                                  mng_ptr_, ProteoformType::INTERNAL);
-          internal_writer.writeVector(prsms);
-        }
-      }
-    }
+    // process ends
     deconv_ms_ptr_vec = ms_reader_ptr->getNextMsPtrVec(); 
+    cnt+= group_spec_num;
     std::cout << std::flush <<  "Zero unexpected shift search - processing " << cnt
         << " of " << spectrum_num << " spectra.\r";
   }

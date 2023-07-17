@@ -141,4 +141,93 @@ bool MsHeader::cmpPrecInteDec(const MsHeaderPtr &a, const MsHeaderPtr &b) {
   return a->getPrecInte() > b->getPrecInte();
 }
 
+int MsHeader::getPrecId() {
+  if (prec_ptr_vec_.size() == 0) { 
+    LOG_WARN("The MS/MS scan does not have precursor feature!");
+    return 0; 
+  }
+  else {
+    return getSinglePrecPtr()->getPrecId();
+  }
+}
+
+double MsHeader::getPrecMonoMz() {
+  if (prec_ptr_vec_.size() == 0) {
+    LOG_WARN("The MS/MS scan does not have precursor feature!");
+    return 0;
+  }
+  else {
+    return getSinglePrecPtr()->getMonoMz();
+  }
+}
+
+int MsHeader::getPrecCharge() {
+  if (prec_ptr_vec_.size() == 0) {
+    LOG_WARN("The MS/MS scan does not have precursor feature!");
+    return 1;
+  }
+  else {
+    return getSinglePrecPtr()->getCharge();
+  }
+}
+
+double MsHeader::getPrecInte() {
+  if (prec_ptr_vec_.size() == 0) {
+    LOG_WARN("The MS/MS scan does not have precursor feature!");
+    return 0;
+  }
+  else {
+    return getSinglePrecPtr()->getInte();
+  }
+}
+double MsHeader::getPrecMonoMass() {
+  if (prec_ptr_vec_.size() == 0) {
+    LOG_WARN("The MS/MS scan does not have precursor feature!");
+    return 0;
+  }
+  else {
+    return getSinglePrecPtr()->getMonoMass();
+  }
+}
+
+int MsHeader::getPrecFeatureId() {
+  if (prec_ptr_vec_.size() == 0) {
+    LOG_WARN("The MS/MS scan does not have precursor feature!");
+    return -1;
+  }
+  else {
+    return getSinglePrecPtr()->getFeatureId();
+  }
+}
+double MsHeader::getPrecMonoMassMinusWater() {
+  if (prec_ptr_vec_.size() == 0) {
+    LOG_WARN("The MS/MS scan does not have precursor feature!");
+    return 0;
+  }
+  else {
+    return getSinglePrecPtr()->getMonoMassMinusWater();
+  }
+}
+
+double MsHeader::getPrecErrorTolerance(double ppo) {
+  if (prec_ptr_vec_.size() == 0) {
+    LOG_WARN("The MS/MS scan does not have precursor feature!");
+    return ppo;
+  }
+  else {
+    return getSinglePrecPtr()->getErrorTolerance(ppo);
+  }
+}
+
+std::pair<int,int> MsHeader::getPrecMonoMassMinusWaterError(double ppo, double scale) {
+  if (prec_ptr_vec_.size() == 0) {
+    LOG_WARN("The MS/MS scan does not have precursor feature!");
+    std::pair<int, int> result(0,0);
+    return result;
+  }
+  else {
+    return getSinglePrecPtr()->getMonoMassMinusWaterError(ppo, scale);
+  }
+}
+
 }  // namespace toppic

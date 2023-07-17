@@ -64,27 +64,29 @@ class MsHeader {
   //get functions for precursor 
   int getPrecNum() {return prec_ptr_vec_.size();}
 
+  bool containsPrec() {return prec_ptr_vec_.size() > 0;}
+
   PrecursorPtr getSinglePrecPtr(); 
 
-  int getPrecId() {return getSinglePrecPtr()->getPrecId();}
+  PrecursorPtrVec getPrecPtrVec() {return prec_ptr_vec_;}
 
-  double getPrecMonoMz() {return getSinglePrecPtr()->getMonoMz();}
+  int getPrecId();  
 
-  int getPrecCharge() {return getSinglePrecPtr()->getCharge();}
+  double getPrecMonoMz(); 
 
-  double getPrecInte() {return getSinglePrecPtr()->getInte();}
+  int getPrecCharge(); 
 
-  double getPrecMonoMass() {return getSinglePrecPtr()->getMonoMass();}
+  double getPrecInte(); 
 
-  int getPrecFeatureId() {return getSinglePrecPtr()->getFeatureId();}
+  double getPrecMonoMass(); 
 
-  double getPrecMonoMassMinusWater() {return getSinglePrecPtr()->getMonoMassMinusWater();}
+  int getPrecFeatureId(); 
 
-  double getPrecErrorTolerance(double ppo) {return getSinglePrecPtr()->getErrorTolerance(ppo);}
+  double getPrecMonoMassMinusWater(); 
 
-  std::pair<int,int> getPrecMonoMassMinusWaterError(double ppo, double scale) {
-    return getSinglePrecPtr()->getMonoMassMinusWaterError(ppo, scale);
-  }
+  double getPrecErrorTolerance(double ppo); 
+
+  std::pair<int,int> getPrecMonoMassMinusWaterError(double ppo, double scale);
 
   // set functions for all spectra 
   void setFileName(const std::string &file_name) {file_name_ = file_name;}

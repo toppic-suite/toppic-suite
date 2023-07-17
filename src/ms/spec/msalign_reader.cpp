@@ -94,10 +94,11 @@ void MsAlignReader::readNext() {
   double prec_win_begin = -1;
   double prec_win_end = -1;
   std::string activation;
-  double prec_mass = -1;
-  int prec_feat_id = -1;
-  int prec_charge = -1;
-  double prec_inte = -1;
+
+  std::string prec_mass_list = "";
+  std::string prec_feat_id_list = "";
+  std::string prec_charge_list = "";
+  std::string prec_inte_list = "";
 
   std::vector<std::string> strs;
   for (size_t i = 1; i < spectrum_str_vec_.size() - 1; i++) {
@@ -129,13 +130,13 @@ void MsAlignReader::readNext() {
       } else if (strs[0] == "ACTIVATION") {
         activation = strs[1];
       } else if (strs[0] == "PRECURSOR_MASS") {
-        prec_mass = std::stod(strs[1]);
+        prec_mass_list = strs[1];
       } else if (strs[0] == "PRECURSOR_CHARGE") {
-        prec_charge = std::stoi(strs[1]);
+        prec_charge_list = strs[1];
       } else if (strs[0] == "PRECURSOR_INTENSITY") {
-        prec_inte = std::stod(strs[1]);
+        prec_inte_list = strs[1];
       } else if (strs[0] == "PRECURSOR_FEATURE_ID") {
-        prec_feat_id = std::stoi(strs[1]);
+        prec_feat_id_list = strs[1];
       } 
     }
   }
@@ -186,15 +187,26 @@ void MsAlignReader::readNext() {
       header_ptr->setActivationPtr(activation_ptr);
     }
     // set precursor information
-    if (prec_charge < 0 || prec_mass < 0) {
+    if (prec_mass_list == "") {
       LOG_ERROR("Precursor information is missing in MSALIGN file!");
       exit(EXIT_FAILURE);
     }
-    int prec_id = 0;
-    double prec_mono_mz = peak_util::compMz(prec_mass, prec_charge); 
-    PrecursorPtr prec_ptr = std::make_shared<Precursor>(prec_id, prec_feat_id, 
-                                                        prec_mono_mz, prec_charge, prec_inte);
-    header_ptr->setSinglePrecPtr(prec_ptr);
+    PrecursorPtrVec prec_ptr_vec;
+    std::vector<std::string> mass_strs = str_util::split(prec_mass_list, ":");
+    std::vector<std::string> feat_id_strs = str_util::split(prec_feat_id_list, ":");
+    std::vector<std::string> charge_strs = str_util::split(prec_charge_list, ":");
+    std::vector<std::string> inte_strs = str_util::split(prec_inte_list, ":");
+    for (size_t id = 0; id < mass_strs.size(); id++) {    
+      double prec_mass = std::stod(mass_strs[id]);
+      int prec_feat_id = std::stoi(feat_id_strs[id]);
+      int prec_charge = std::stoi(charge_strs[id]);
+      double prec_inte = std::stod(inte_strs[id]);
+      double prec_mono_mz = peak_util::compMz(prec_mass, prec_charge); 
+      PrecursorPtr prec_ptr = std::make_shared<Precursor>(id, prec_feat_id, 
+                                                          prec_mono_mz, prec_charge, prec_inte);
+      prec_ptr_vec.push_back(prec_ptr);
+    }
+    header_ptr->setPrecPtrVec(prec_ptr_vec);
   }
 
   std::vector<DeconvPeakPtr> peak_ptr_list;

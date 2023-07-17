@@ -53,20 +53,22 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
   DeconvMsPtrVec deconv_ms_ptr_vec = reader_ptr->getNextMsPtrVec();
   std::vector<double> prec_error_vec = sp_para_ptr->getZeroShiftSearchPrecErrorVec(); 
   while (deconv_ms_ptr_vec.size() != 0) {
-    // allow one dalton error
-    SpectrumSetPtrVec spec_set_vec 
+    if (deconv_ms_ptr_vec[0]->getMsHeaderPtr()->containsPrec()) {
+      // allow one dalton error
+      SpectrumSetPtrVec spec_set_vec 
         = spectrum_set_factory::geneSpectrumSetPtrVecWithPrecError(deconv_ms_ptr_vec, 
                                                                    sp_para_ptr,
                                                                    prec_error_vec);
-    for (size_t k = 0; k < spec_set_vec.size(); k++) {
-      LOG_DEBUG("spec set ptr valid " << spec_set_vec[k]->isValid());
-      if (spec_set_vec[k]->isValid()) {
-        ExtendMsPtrVec ms_ptr_vec = spec_set_vec[k]->getMsThreePtrVec();
-        filter_ptr->computeBestMatch(ms_ptr_vec);
-        writers.getCompleteWriterPtr()->write(filter_ptr->getCompMatchPtrs());
-        writers.getPrefixWriterPtr()->write(filter_ptr->getPrefMatchPtrs());
-        writers.getSuffixWriterPtr()->write(filter_ptr->getSuffMatchPtrs());
-        writers.getInternalWriterPtr()->write(filter_ptr->getInternalMatchPtrs());
+      for (size_t k = 0; k < spec_set_vec.size(); k++) {
+        LOG_DEBUG("spec set ptr valid " << spec_set_vec[k]->isValid());
+        if (spec_set_vec[k]->isValid()) {
+          ExtendMsPtrVec ms_ptr_vec = spec_set_vec[k]->getMsThreePtrVec();
+          filter_ptr->computeBestMatch(ms_ptr_vec);
+          writers.getCompleteWriterPtr()->write(filter_ptr->getCompMatchPtrs());
+          writers.getPrefixWriterPtr()->write(filter_ptr->getPrefMatchPtrs());
+          writers.getSuffixWriterPtr()->write(filter_ptr->getSuffMatchPtrs());
+          writers.getInternalWriterPtr()->write(filter_ptr->getInternalMatchPtrs());
+        }
       }
     }
 
