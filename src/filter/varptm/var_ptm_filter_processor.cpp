@@ -68,7 +68,7 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
       for (size_t k = 0; k < spec_set_vec.size(); k++) {
         SpectrumSetPtr spec_set_ptr = spec_set_vec[k]; 
         if (spec_set_ptr->isValid()) {
-          //LOG_ERROR("precursor " << spec_set_ptr->getPrecMonoMass());
+          //LOG_ERROR("precursor " << spec_set_ptr->getFirstPrecMonoMass());
           DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
           double prec_mono_mass = spec_set_ptr->getPrecMonoMass();
           if (mng_ptr->use_approx_spec_) {

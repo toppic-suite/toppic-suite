@@ -66,7 +66,7 @@ std::string MsHeader::getScansString() {
   return scan_list.str();
 }
 
-PrecursorPtr MsHeader::getSinglePrecPtr() {
+PrecursorPtr MsHeader::getFirstPrecPtr() {
   if (prec_ptr_vec_.size() > 0)  {
     return prec_ptr_vec_[0];
   }
@@ -127,7 +127,7 @@ void MsHeader::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
 }
 
 MsHeaderPtr MsHeader::geneMsHeaderPtr(MsHeaderPtr ori_header_ptr, double new_prec_mass) {
-  PrecursorPtr ori_prec_ptr = ori_header_ptr->getSinglePrecPtr();
+  PrecursorPtr ori_prec_ptr = ori_header_ptr->getFirstPrecPtr();
   PrecursorPtr new_prec_ptr = std::make_shared<Precursor>(*ori_prec_ptr.get());
   double mono_mz = peak_util::compMz(new_prec_mass, ori_prec_ptr->getCharge());
   new_prec_ptr->setMonoMz(mono_mz);
@@ -137,43 +137,43 @@ MsHeaderPtr MsHeader::geneMsHeaderPtr(MsHeaderPtr ori_header_ptr, double new_pre
 }
 
 bool MsHeader::cmpPrecInteDec(const MsHeaderPtr &a, const MsHeaderPtr &b) {
-  return a->getPrecInte() > b->getPrecInte();
+  return a->getFirstPrecInte() > b->getFirstPrecInte();
 }
 
-int MsHeader::getPrecId() {
-  return getSinglePrecPtr()->getPrecId();
+int MsHeader::getFirstPrecId() {
+  return getFirstPrecPtr()->getPrecId();
 }
 
-double MsHeader::getPrecMonoMz() {
-  return getSinglePrecPtr()->getMonoMz();
+double MsHeader::getFirstPrecMonoMz() {
+  return getFirstPrecPtr()->getMonoMz();
 }
 
-int MsHeader::getPrecCharge() {
-  return getSinglePrecPtr()->getCharge();
+int MsHeader::getFirstPrecCharge() {
+  return getFirstPrecPtr()->getCharge();
 }
 
-double MsHeader::getPrecInte() {
-  return getSinglePrecPtr()->getInte();
+double MsHeader::getFirstPrecInte() {
+  return getFirstPrecPtr()->getInte();
 }
 
-double MsHeader::getPrecMonoMass() {
-  return getSinglePrecPtr()->getMonoMass();
+double MsHeader::getFirstPrecMonoMass() {
+  return getFirstPrecPtr()->getMonoMass();
 }
 
-int MsHeader::getPrecFeatureId() {
-  return getSinglePrecPtr()->getFeatureId();
+int MsHeader::getFirstPrecFeatureId() {
+  return getFirstPrecPtr()->getFeatureId();
 }
 
-double MsHeader::getPrecMonoMassMinusWater() {
-  return getSinglePrecPtr()->getMonoMassMinusWater();
+double MsHeader::getFirstPrecMonoMassMinusWater() {
+  return getFirstPrecPtr()->getMonoMassMinusWater();
 }
 
-double MsHeader::getPrecErrorTolerance(double ppo) {
-  return getSinglePrecPtr()->getErrorTolerance(ppo);
+double MsHeader::getFirstPrecErrorTolerance(double ppo) {
+  return getFirstPrecPtr()->getErrorTolerance(ppo);
 }
 
-std::pair<int,int> MsHeader::getPrecMonoMassMinusWaterError(double ppo, double scale) {
-  return getSinglePrecPtr()->getMonoMassMinusWaterError(ppo, scale);
+std::pair<int,int> MsHeader::getFirstPrecMonoMassMinusWaterError(double ppo, double scale) {
+  return getFirstPrecPtr()->getMonoMassMinusWaterError(ppo, scale);
 }
 
 }  // namespace toppic

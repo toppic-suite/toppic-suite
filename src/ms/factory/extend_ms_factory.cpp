@@ -48,7 +48,7 @@ ExtendMsPtr geneMsThreePtr(DeconvMsPtr deconv_ms_ptr, SpParaPtr sp_para_ptr,
   // filter extend_peak
   ExtendPeakPtrVec list_filtered;
   double min_mass = sp_para_ptr->getMinMass();
-  double prec_mono_mass = header_ptr->getPrecMonoMass();
+  double prec_mono_mass = header_ptr->getFirstPrecMonoMass();
   for (size_t i = 0; i < list.size(); i++) {
     double mass = list[i]->getPosition();
     if (mass >= min_mass && mass <= prec_mono_mass - min_mass) {

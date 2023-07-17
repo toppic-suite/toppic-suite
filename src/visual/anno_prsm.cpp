@@ -98,7 +98,7 @@ void addMsHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement* ms_element,
     std::string str = str_util::fixedToString(precursor_mass, pos);
     xml_doc->addElement(ms_header_element, "precursor_mono_mass", str.c_str());
 
-    int precursor_charge = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecCharge();
+    int precursor_charge = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecCharge();
     str = str_util::toString(precursor_charge);
     xml_doc->addElement(ms_header_element, "precursor_charge", str.c_str());
 

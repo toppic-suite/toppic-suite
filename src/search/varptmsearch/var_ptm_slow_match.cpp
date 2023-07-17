@@ -30,7 +30,7 @@ VarPtmSlowMatch::VarPtmSlowMatch(ProteoformPtr proteo_ptr,
   //LOG_ERROR("prec mass " << prec_mono_mass_ << " protein mass " << proteo_ptr->getMass());
   mng_ptr_ = mng_ptr;
   PeakTolerancePtr tole_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
-  prec_error_tole_ = deconv_ms_ptr_vec_[0]->getMsHeaderPtr()->getPrecErrorTolerance(tole_ptr->getPpo());
+  prec_error_tole_ = deconv_ms_ptr_vec_[0]->getMsHeaderPtr()->getFirstPrecErrorTolerance(tole_ptr->getPpo());
   //LOG_ERROR("error tolerance " << prec_error_tole_);
   init();
 }

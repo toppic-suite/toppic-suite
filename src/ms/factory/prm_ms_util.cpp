@@ -65,7 +65,7 @@ std::vector<std::pair<int, int> > getIntMassErrorList(const PrmMsPtrVec &prm_ms_
       }
     }
     // add zero mass for each spectrum to increase the score for zero mass
-    double prec_mass = prm_ms_ptr_vec[i]->getMsHeaderPtr()->getPrecMonoMass();
+    double prec_mass = prm_ms_ptr_vec[i]->getMsHeaderPtr()->getFirstPrecMonoMass();
     PrmPeakPtr zero_prm_ptr = prm_peak_factory::getZeroPeakPtr(i, prec_mass, tole_ptr, default_score);
     mass_errors.push_back(getMassError(zero_prm_ptr, scale, n_strict, c_strict));
     // add prec mass for each spectrum
@@ -86,7 +86,7 @@ PrmPeakPtrVec getPrmPeakPtrs(const PrmMsPtrVec &prm_ms_ptr_vec,
     }
   }
   // add zero
-  double prec_mass = prm_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMass();
+  double prec_mass = prm_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMass();
   // use spec_id = 0 and score = group_spec_num (size of prm_ms_ptr_vec)
   PrmPeakPtr zero_prm_ptr = prm_peak_factory::getZeroPeakPtr(0, prec_mass, tole_ptr, prm_ms_ptr_vec.size());
   peak_list.push_back(zero_prm_ptr);

@@ -76,7 +76,7 @@ SpecGraphPtrVec SpecGraphReader::getNextSpecGraphPtrVec(SpectrumSetPtr spec_set_
 
   DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
   //LOG_DEBUG("deconv ms size " << deconv_ms_ptr_vec.size());
-  double prec_mono_mass = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMass();
+  double prec_mono_mass = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMass();
   LOG_DEBUG("prec_mono_mass  " << prec_mono_mass);
   if (spec_set_ptr->isValid()) {
     LOG_DEBUG("valid");

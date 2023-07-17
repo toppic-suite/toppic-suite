@@ -85,12 +85,12 @@ void writePrsm(std::ofstream &file, PrsmPtr prsm_ptr, PrsmParaPtr prsm_para_ptr)
   str_util::trim(spec_activations);
   str_util::trim(spec_scans);
   file << prsm_para_ptr->getSpectrumFileName() << "\t"
-      << prsm_ptr->getPrsmId() << "\t"
-      << spec_ids << "\t"
-      << spec_activations<< "\t"
-      << spec_scans << "\t"
-      << peak_num << "\t"
-      << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecCharge() << "\t"
+       << prsm_ptr->getPrsmId() << "\t"
+       << spec_ids << "\t"
+       << spec_activations << "\t"
+       << spec_scans << "\t"
+       << peak_num << "\t"
+       << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecCharge() << "\t"
       << prsm_ptr->getOriPrecMass()<< "\t"  // "Precursor_mass"
       << prsm_ptr->getAdjustedPrecMass() << "\t"
       << prsm_ptr->getProteoformPtr()->getProteoClusterId() << "\t"

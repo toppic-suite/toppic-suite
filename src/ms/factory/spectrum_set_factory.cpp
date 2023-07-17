@@ -82,8 +82,8 @@ SpectrumSetPtr readNextSpectrumSetPtr(MsAlignReaderPtr reader_ptr,
   if (deconv_ms_ptr_vec.size() == 0) {
     return nullptr;
   }
-  double prec_mono_mass = 
-    deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMass() - sp_para_ptr->getNTermLabelMass();
+  double prec_mono_mass =
+          deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMass() - sp_para_ptr->getNTermLabelMass();
   SpectrumSetPtr spec_set_ptr = geneSpectrumSetPtr(deconv_ms_ptr_vec,
                                                    sp_para_ptr, prec_mono_mass);
   return spec_set_ptr;
@@ -98,8 +98,8 @@ SpectrumSetPtr readNextSpectrumSetPtr(MsAlignReaderPtr reader_ptr,
   }
   // keep only top peaks
   deconv_ms_util::keepTopPeaks(deconv_ms_ptr_vec, peak_num_limit);
-  double prec_mono_mass = 
-    deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMass() - sp_para_ptr->getNTermLabelMass();
+  double prec_mono_mass =
+          deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMass() - sp_para_ptr->getNTermLabelMass();
   SpectrumSetPtr spec_set_ptr = geneSpectrumSetPtr(deconv_ms_ptr_vec,
                                                    sp_para_ptr, prec_mono_mass);
   return spec_set_ptr;
@@ -113,8 +113,8 @@ SpectrumSetPtrVec geneSpectrumSetPtrVecWithPrecError(DeconvMsPtrVec deconv_ms_pt
   if (deconv_ms_ptr_vec.size() == 0) {
     return spec_set_vec;
   }
-  double prec_mono_mass = 
-    deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMass() - sp_para_ptr->getNTermLabelMass();
+  double prec_mono_mass =
+          deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMass() - sp_para_ptr->getNTermLabelMass();
   for (size_t i = 0; i< prec_error_vec.size(); i++) {
     SpectrumSetPtr spec_set_ptr = geneSpectrumSetPtr(deconv_ms_ptr_vec,
                                                      sp_para_ptr, 

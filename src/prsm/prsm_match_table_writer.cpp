@@ -158,13 +158,13 @@ void PrsmMatchTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   file << std::setprecision(10);
   LOG_DEBUG("start output prsm ");
   file << prsm_ptr->getFileName() << delim
-      << prsm_ptr->getPrsmId() << delim
-      << spec_ids << delim
-      << spec_activations<< delim
-      << spec_scans << delim
-      << retention_time << delim
-      << peak_num << delim
-      << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecCharge() << delim
+       << prsm_ptr->getPrsmId() << delim
+       << spec_ids << delim
+       << spec_activations << delim
+       << spec_scans << delim
+       << retention_time << delim
+       << peak_num << delim
+       << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecCharge() << delim
       << prsm_ptr->getOriPrecMass()<< delim
       << prsm_ptr->getAdjustedPrecMass() << delim
       << prsm_ptr->getProteoformPtr()->getProteoClusterId() << delim;
@@ -303,13 +303,13 @@ void PrsmMatchTableWriter::writePrsmStandardFormat(std::ofstream &file, PrsmPtr 
   file << std::setprecision(10);
   LOG_DEBUG("start output prsm ");
   file << prsm_ptr->getFileName() << delim
-      << prsm_ptr->getPrsmId() << delim
-      << spec_ids << delim
-      << spec_activations<< delim
-      << spec_scans << delim
-      << retention_time << delim
-      << peak_num << delim
-      << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecCharge() << delim
+       << prsm_ptr->getPrsmId() << delim
+       << spec_ids << delim
+       << spec_activations << delim
+       << spec_scans << delim
+       << retention_time << delim
+       << peak_num << delim
+       << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecCharge() << delim
       << prsm_ptr->getOriPrecMass()<< delim
       << prsm_ptr->getAdjustedPrecMass() << delim
       << prsm_ptr->getProteoformPtr()->getProteoClusterId() << delim;

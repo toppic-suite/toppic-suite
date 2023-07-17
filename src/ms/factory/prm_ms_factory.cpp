@@ -261,8 +261,8 @@ PrmMsPtr geneShiftMsSixPtr(DeconvMsPtr deconv_ms_ptr, int spec_id, SpParaPtr sp_
   PrmMsPtr prm_ms_ptr = geneMsSixPtr(deconv_ms_ptr, spec_id, sp_para_ptr, prec_mono_mass);
   MsHeaderPtr ori_header_ptr = prm_ms_ptr->getMsHeaderPtr();
   MsHeaderPtr header_ptr = std::make_shared<MsHeader>(*ori_header_ptr.get());
-  double mono_mz = (header_ptr->getPrecMonoMass()+shift) /header_ptr->getPrecCharge();
-  PrecursorPtr prec_ptr = header_ptr->getSinglePrecPtr();
+  double mono_mz = (header_ptr->getFirstPrecMonoMass() + shift) / header_ptr->getFirstPrecCharge();
+  PrecursorPtr prec_ptr = header_ptr->getFirstPrecPtr();
   prec_ptr->setMonoMz(mono_mz);
   PrmPeakPtrVec prm_peak_list;
   for (size_t i = 0; i < prm_ms_ptr->size(); i++) {

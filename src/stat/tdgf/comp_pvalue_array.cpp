@@ -55,7 +55,7 @@ void CompPValueArray::compMultiExpectedValues(const PrmMsPtrVec &ms_six_ptr_vec,
     prob_prec_mass = prsm_ptrs[0]->getProteoformPtr()->getMass();
   }
   else {
-    prob_prec_mass = ms_six_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMass();
+    prob_prec_mass = ms_six_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMass();
   }
 
   PeakTolerancePtr tole_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
@@ -68,9 +68,9 @@ void CompPValueArray::compMultiExpectedValues(const PrmMsPtrVec &ms_six_ptr_vec,
                                        prm_ptr_2d, prsm_ptrs, strict, prob_prec_mass, 
                                        tole_ptr, pep_probs);
 
-  double tolerance = ms_six_ptr_vec[0]->getMsHeaderPtr()->getPrecErrorTolerance(ppo);
+  double tolerance = ms_six_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecErrorTolerance(ppo);
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
-    double prec_mass = ms_six_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMassMinusWater();
+    double prec_mass = ms_six_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMassMinusWater();
     ProteoformPtr proteo_ptr = prsm_ptrs[i]->getProteoformPtr();
     int unexpect_shift_num = proteo_ptr->getAlterNum(AlterType::UNEXPECTED);
     ProteoformTypePtr type_ptr = proteo_ptr->getProteoformType();

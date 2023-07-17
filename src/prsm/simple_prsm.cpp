@@ -27,8 +27,8 @@ SimplePrsm::SimplePrsm(MsHeaderPtr header_ptr, int spectrum_num,
     spectrum_id_ = header_ptr->getSpecId();
     file_name_ = header_ptr->getFileName();
     spectrum_scan_ = header_ptr->getScansString();
-    precursor_id_ = header_ptr->getPrecId();
-    prec_mass_ = header_ptr->getPrecMonoMass();
+    precursor_id_ = header_ptr->getFirstPrecId();
+    prec_mass_ = header_ptr->getFirstPrecMonoMass();
     seq_name_ = proteo_ptr->getSeqName();
     seq_desc_ = proteo_ptr->getSeqDesc();
     prot_mass_ = proteo_ptr->getResSeqPtr()->getSeqMass();
@@ -42,8 +42,8 @@ SimplePrsm::SimplePrsm(MsHeaderPtr header_ptr,
     spectrum_id_ = header_ptr->getSpecId();
     file_name_ = header_ptr->getFileName();
     spectrum_scan_ = header_ptr->getScansString();
-    precursor_id_ = header_ptr->getPrecId();
-    prec_mass_ = header_ptr->getPrecMonoMass();
+    precursor_id_ = header_ptr->getFirstPrecId();
+    prec_mass_ = header_ptr->getFirstPrecMonoMass();
     seq_name_ = proteo_ptr->getSeqName();
     seq_desc_ = proteo_ptr->getSeqDesc();
     prot_mass_ = proteo_ptr->getResSeqPtr()->getSeqMass();
@@ -60,11 +60,11 @@ SimplePrsm::SimplePrsm(MsHeaderPtr header_ptr, int spectrum_num,
     score_(score) {
       spectrum_id_ = header_ptr->getSpecId();
       spectrum_scan_ = header_ptr->getScansString();
-      precursor_id_ = header_ptr->getPrecId();
-      prec_mass_ = header_ptr->getPrecMonoMass();
+      precursor_id_ = header_ptr->getFirstPrecId();
+      prec_mass_ = header_ptr->getFirstPrecMonoMass();
       seq_name_ = seq_name;
       seq_desc_ = seq_desc;
-      prot_mass_ = header_ptr->getPrecMonoMass();
+      prot_mass_ = header_ptr->getFirstPrecMonoMass();
     }
 
 SimplePrsm::SimplePrsm(XmlDOMElement* element) {

@@ -66,27 +66,27 @@ class MsHeader {
 
   bool containsPrec() {return prec_ptr_vec_.size() > 0;}
 
-  PrecursorPtr getSinglePrecPtr(); 
+  PrecursorPtr getFirstPrecPtr();
 
   PrecursorPtrVec getPrecPtrVec() {return prec_ptr_vec_;}
 
-  int getPrecId();  
+  int getFirstPrecId();
 
-  double getPrecMonoMz(); 
+  double getFirstPrecMonoMz();
 
-  int getPrecCharge(); 
+  int getFirstPrecCharge();
 
-  double getPrecInte(); 
+  double getFirstPrecInte();
 
-  double getPrecMonoMass(); 
+  double getFirstPrecMonoMass();
 
-  int getPrecFeatureId(); 
+  int getFirstPrecFeatureId();
 
-  double getPrecMonoMassMinusWater(); 
+  double getFirstPrecMonoMassMinusWater();
 
-  double getPrecErrorTolerance(double ppo); 
+  double getFirstPrecErrorTolerance(double ppo);
 
-  std::pair<int,int> getPrecMonoMassMinusWaterError(double ppo, double scale);
+  std::pair<int,int> getFirstPrecMonoMassMinusWaterError(double ppo, double scale);
 
   // set functions for all spectra 
   void setFractionId(int fraction_id) {fraction_id_ = fraction_id;}

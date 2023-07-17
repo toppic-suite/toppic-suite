@@ -31,9 +31,9 @@ Prsm::Prsm(ProteoformPtr proteoform_ptr, const DeconvMsPtrVec &deconv_ms_ptr_vec
       MsHeaderPtr header_ptr = deconv_ms_ptr_vec[0]->getMsHeaderPtr();
       spectrum_id_ = header_ptr->getSpecId();
       spectrum_scan_ = header_ptr->getScansString();
-      precursor_id_ = header_ptr->getPrecId();
+      precursor_id_ = header_ptr->getFirstPrecId();
       spectrum_num_ = deconv_ms_ptr_vec.size();
-      ori_prec_mass_ = header_ptr->getPrecMonoMass();
+      ori_prec_mass_ = header_ptr->getFirstPrecMonoMass();
       init(sp_para_ptr);
     }
 
@@ -54,8 +54,8 @@ void Prsm::setAdjustedPrecMass(double new_prec_mass) {
   adjusted_prec_mass_ = new_prec_mass;
   for (size_t i = 0; i < refine_ms_three_vec_.size(); i++) {
     MsHeaderPtr ms_header_ptr = refine_ms_three_vec_[i]->getMsHeaderPtr();
-    double mono_mz = peak_util::compMz(new_prec_mass, ms_header_ptr->getPrecCharge());
-    ms_header_ptr->getSinglePrecPtr()->setAdjustedMonoMz(mono_mz);
+    double mono_mz = peak_util::compMz(new_prec_mass, ms_header_ptr->getFirstPrecCharge());
+      ms_header_ptr->getFirstPrecPtr()->setAdjustedMonoMz(mono_mz);
   }
 }
 

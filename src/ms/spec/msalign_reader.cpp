@@ -248,12 +248,12 @@ DeconvMsPtrVec MsAlignReader::getNextMsPtrVec() {
     }
     deconv_ms_ptr_vec.push_back(deconv_ms_ptr_);
   }
-  double prec_mono_mass = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMass();
-  int charge = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecCharge();
+  double prec_mono_mass = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMass();
+  int charge = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecCharge();
   // Get average precursor mass
   int count = 1;
   for (int i = 1; i < group_spec_num_; i++) {
-    double new_mass = deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getPrecMonoMass();
+    double new_mass = deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getFirstPrecMonoMass();
     if (std::abs(prec_mono_mass - new_mass) < 0.5) {
       prec_mono_mass = (prec_mono_mass * count + new_mass)/ (count+1);
       count++;
@@ -262,7 +262,7 @@ DeconvMsPtrVec MsAlignReader::getNextMsPtrVec() {
 
   double prec_mono_mz = peak_util::compMz(prec_mono_mass, charge);
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
-    deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getSinglePrecPtr()->setMonoMz(prec_mono_mz);
+      deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getFirstPrecPtr()->setMonoMz(prec_mono_mz);
   }
   return deconv_ms_ptr_vec;
 }

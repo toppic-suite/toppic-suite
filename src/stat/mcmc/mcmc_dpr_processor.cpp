@@ -236,7 +236,7 @@ std::function<void()> geneTask(SpectrumSetPtr spec_set_ptr,
 
     double ppo = mng_ptr->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()->getPpo();
 
-    double tolerance = refine_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecErrorTolerance(ppo);
+    double tolerance = refine_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecErrorTolerance(ppo);
 
     std::vector<double> ms_masses = extend_ms_util::getExtendMassVec(refine_ms_ptr_vec[0]);
 

@@ -84,7 +84,7 @@ std::function<void()> geneTask(GraphAlignMngPtr mng_ptr,
     while (deconv_ms_ptr_vec.size() > 0) {
       if (deconv_ms_ptr_vec[0]->getMsHeaderPtr()->containsPrec()) {
         double prec_mono_mass =
-          deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMass();
+                deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMass();
         spec_set_ptr  
           = spectrum_set_factory::geneSpectrumSetPtr(deconv_ms_ptr_vec,
                                                      sp_para_ptr, prec_mono_mass);
