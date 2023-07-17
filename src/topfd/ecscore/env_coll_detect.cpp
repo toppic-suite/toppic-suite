@@ -53,7 +53,7 @@ void process(TopfdParaPtr topfd_para_ptr) {
   std::string output_base_name = topfd_para_ptr->getOutputBaseName();
   std::string ms1_file_name = output_base_name + "_ms1.msalign";
   DeconvMsPtrVec deconv_ms1_ptr_vec;
-  msalign_reader_util::readAllMsOneSpectra(ms1_file_name, deconv_ms1_ptr_vec);
+  msalign_reader_util::readAllSpectra(ms1_file_name, deconv_ms1_ptr_vec);
 
   // read ms1 raw peaks and ms2_headers
   PeakPtrVec2D ms1_mzml_peaks;

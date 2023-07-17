@@ -18,24 +18,12 @@ namespace toppic {
 
 namespace msalign_reader_util {
 
-void readAllMsOneSpectra(const std::string &file_name, 
-                         DeconvMsPtrVec &ms_ptr_vec) {
-  MsAlignReader sp_reader(file_name); 
+void readAllSpectra(const std::string &msalign_file_name, 
+                    DeconvMsPtrVec &ms_ptr_vec) {
+  MsAlignReader sp_reader(msalign_file_name); 
 
   DeconvMsPtr ms_ptr;
   while ((ms_ptr = sp_reader.getNextMsPtr())!= nullptr) {
-    ms_ptr->getMsHeaderPtr()->setMsLevel(1);
-    ms_ptr_vec.push_back(ms_ptr);
-  }
-}
-
-void readAllMsTwoSpectra(const std::string &file_name, 
-                         DeconvMsPtrVec &ms_ptr_vec) {
-  MsAlignReader sp_reader(file_name); 
-
-  DeconvMsPtr ms_ptr;
-  while ((ms_ptr = sp_reader.getNextMsPtr())!= nullptr) {
-    ms_ptr->getMsHeaderPtr()->setMsLevel(2);
     ms_ptr_vec.push_back(ms_ptr);
   }
 }

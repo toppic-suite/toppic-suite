@@ -22,11 +22,9 @@ namespace toppic {
 namespace msalign_reader_util {
 
 // the two functions are used in LC-MS1 feature detection
-void readAllMsOneSpectra(const std::string &file_name, 
-                         DeconvMsPtrVec &ms_ptr_vec); 
+void readAllSpectra(const std::string &msalign_file_name, 
+                    DeconvMsPtrVec &ms_ptr_vec); 
 
-void readAllMsTwoSpectra(const std::string &file_name, 
-                         DeconvMsPtrVec &ms_ptr_vec); 
 
 }
 
