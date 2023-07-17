@@ -14,11 +14,11 @@
 
 #include <map>
 
-#include "topfd/ecscore/feature/feature_detect.hpp"
+#include "topfd/ecscore/feature/feature_util.hpp"
 
 namespace toppic {
 
-namespace feature_detect {
+namespace feature_util {
 
 void getSampleFeatures(SampleFeaturePtrVec &sample_features, FracFeaturePtrVec &frac_features,
                        SpecFeaturePtrVec &spec_features) {
