@@ -30,9 +30,9 @@ class MsHeader {
   MsHeader(XmlDOMElement* element);
 
   // get functions for all spectra
-  std::string getFileName() {return file_name_;}
-
   int getFractionId() {return fraction_id_;}
+
+  std::string getFileName() {return file_name_;}
 
   int getSpecId() {return spec_id_;}
 
@@ -89,9 +89,9 @@ class MsHeader {
   std::pair<int,int> getPrecMonoMassMinusWaterError(double ppo, double scale);
 
   // set functions for all spectra 
-  void setFileName(const std::string &file_name) {file_name_ = file_name;}
-
   void setFractionId(int fraction_id) {fraction_id_ = fraction_id;}
+
+  void setFileName(const std::string &file_name) {file_name_ = file_name;}
 
   void setSpecId(int spec_id) {spec_id_ = spec_id;}
 
@@ -175,8 +175,6 @@ class MsHeader {
 
   // Precursor information
   PrecursorPtrVec prec_ptr_vec_;
-  // Active precursor id
-  size_t active_prec_id_ = 0;
 };
 
 typedef std::vector<MsHeaderPtr> MsHeaderPtrVec;

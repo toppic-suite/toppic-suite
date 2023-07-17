@@ -67,11 +67,11 @@ std::string MsHeader::getScansString() {
 }
 
 PrecursorPtr MsHeader::getSinglePrecPtr() {
-  if (active_prec_id_ < prec_ptr_vec_.size()) {
-    return prec_ptr_vec_[active_prec_id_];
+  if (prec_ptr_vec_.size() > 0)  {
+    return prec_ptr_vec_[0];
   }
   else {
-    LOG_ERROR("Active precuror id is out of range!");
+    LOG_ERROR("The MS/MS scan does not contain precursor information!");
     exit(EXIT_FAILURE);
   }
 }
@@ -96,7 +96,6 @@ void MsHeader::setSingleScan(int scan_num) {
 void MsHeader::setSinglePrecPtr(PrecursorPtr prec_ptr) {
   prec_ptr_vec_.clear(); 
   prec_ptr_vec_.push_back(prec_ptr); 
-  active_prec_id_ = 0;
 }
 
 XmlDOMElement* MsHeader::getHeaderXml(XmlDOMDocument* xml_doc) {
@@ -142,92 +141,39 @@ bool MsHeader::cmpPrecInteDec(const MsHeaderPtr &a, const MsHeaderPtr &b) {
 }
 
 int MsHeader::getPrecId() {
-  if (prec_ptr_vec_.size() == 0) { 
-    LOG_WARN("The MS/MS scan does not have precursor feature!");
-    return 0; 
-  }
-  else {
-    return getSinglePrecPtr()->getPrecId();
-  }
+  return getSinglePrecPtr()->getPrecId();
 }
 
 double MsHeader::getPrecMonoMz() {
-  if (prec_ptr_vec_.size() == 0) {
-    LOG_WARN("The MS/MS scan does not have precursor feature!");
-    return 0;
-  }
-  else {
-    return getSinglePrecPtr()->getMonoMz();
-  }
+  return getSinglePrecPtr()->getMonoMz();
 }
 
 int MsHeader::getPrecCharge() {
-  if (prec_ptr_vec_.size() == 0) {
-    LOG_WARN("The MS/MS scan does not have precursor feature!");
-    return 1;
-  }
-  else {
-    return getSinglePrecPtr()->getCharge();
-  }
+  return getSinglePrecPtr()->getCharge();
 }
 
 double MsHeader::getPrecInte() {
-  if (prec_ptr_vec_.size() == 0) {
-    LOG_WARN("The MS/MS scan does not have precursor feature!");
-    return 0;
-  }
-  else {
-    return getSinglePrecPtr()->getInte();
-  }
+  return getSinglePrecPtr()->getInte();
 }
+
 double MsHeader::getPrecMonoMass() {
-  if (prec_ptr_vec_.size() == 0) {
-    LOG_WARN("The MS/MS scan does not have precursor feature!");
-    return 0;
-  }
-  else {
-    return getSinglePrecPtr()->getMonoMass();
-  }
+  return getSinglePrecPtr()->getMonoMass();
 }
 
 int MsHeader::getPrecFeatureId() {
-  if (prec_ptr_vec_.size() == 0) {
-    LOG_WARN("The MS/MS scan does not have precursor feature!");
-    return -1;
-  }
-  else {
-    return getSinglePrecPtr()->getFeatureId();
-  }
+  return getSinglePrecPtr()->getFeatureId();
 }
+
 double MsHeader::getPrecMonoMassMinusWater() {
-  if (prec_ptr_vec_.size() == 0) {
-    LOG_WARN("The MS/MS scan does not have precursor feature!");
-    return 0;
-  }
-  else {
-    return getSinglePrecPtr()->getMonoMassMinusWater();
-  }
+  return getSinglePrecPtr()->getMonoMassMinusWater();
 }
 
 double MsHeader::getPrecErrorTolerance(double ppo) {
-  if (prec_ptr_vec_.size() == 0) {
-    LOG_WARN("The MS/MS scan does not have precursor feature!");
-    return ppo;
-  }
-  else {
-    return getSinglePrecPtr()->getErrorTolerance(ppo);
-  }
+  return getSinglePrecPtr()->getErrorTolerance(ppo);
 }
 
 std::pair<int,int> MsHeader::getPrecMonoMassMinusWaterError(double ppo, double scale) {
-  if (prec_ptr_vec_.size() == 0) {
-    LOG_WARN("The MS/MS scan does not have precursor feature!");
-    std::pair<int, int> result(0,0);
-    return result;
-  }
-  else {
-    return getSinglePrecPtr()->getMonoMassMinusWaterError(ppo, scale);
-  }
+  return getSinglePrecPtr()->getMonoMassMinusWaterError(ppo, scale);
 }
 
 }  // namespace toppic
