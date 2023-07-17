@@ -79,8 +79,8 @@ bool Vertex::addPreEnv(MatchEnvPtr env, int max_overlap) {
   if (dp_para_ptr_->check_double_increase_ && !passDblIncrCheck(env)) {
     return false;
   }
-  ExpEnvPtr real_env_ptr = env->getRealEnvPtr();
-  //std::vector<int> idx_list = env->getRealEnvPtr()->getPeakIdxList();
+  ExpEnvPtr real_env_ptr = env->getExpEnvPtr();
+  //std::vector<int> idx_list = env->getExpEnvPtr()->getPeakIdxList();
   for (int i = 0; i < real_env_ptr->getPeakNum(); i++) {
     int peak_idx = real_env_ptr->getPeakIdx(i);
     if (real_env_ptr->isExist(i) && peak_idx >= bgn_peak_
@@ -103,7 +103,7 @@ bool Vertex::addCurEnv(MatchEnvPtr env, int max_overlap) {
   if (dp_para_ptr_->check_double_increase_ && !passDblIncrCheck(env)) {
     return false;
   }
-  ExpEnvPtr real_env_ptr = env->getRealEnvPtr();
+  ExpEnvPtr real_env_ptr = env->getExpEnvPtr();
   for (int i = 0; i < real_env_ptr->getPeakNum(); i++) {
     int peak_idx = real_env_ptr->getPeakIdx(i);
     if (real_env_ptr->isExist(i) && peak_idx >= bgn_peak_

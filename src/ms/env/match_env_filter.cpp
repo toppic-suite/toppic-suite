@@ -34,7 +34,7 @@ MatchEnvPtrVec filter(MatchEnvPtrVec &ori_envs, double prec_mass,
   int low_mass_num = env_para_ptr->compLowMassNum(); 
   int high_mass_num = env_para_ptr->compHighMassNum(prec_mass);
   for (size_t i = 0; i < ori_envs.size(); i++) {
-    if (ori_envs[i]->getRealEnvPtr()->getMonoNeutralMass() <= env_para_ptr->low_high_dividor_) {
+    if (ori_envs[i]->getExpEnvPtr()->getMonoNeutralMass() <= env_para_ptr->low_high_dividor_) {
       if ((int)low_mass_envs.size() < low_mass_num) {
         low_mass_envs.push_back(ori_envs[i]);
       }

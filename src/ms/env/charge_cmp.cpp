@@ -51,8 +51,8 @@ int cntSharedPeaks(std::vector<int> &list_a) {
 bool isSecondBetter(const PeakPtrVec &peak_list, MatchEnvPtr a,
                     MatchEnvPtr  b, double tolerance) {
   // get shared peak 
-  std::vector<int> s_peaks = getSharedPeaks(a->getRealEnvPtr(), 
-                                                 b->getRealEnvPtr());
+  std::vector<int> s_peaks = getSharedPeaks(a->getExpEnvPtr(),
+                                            b->getExpEnvPtr());
   int s_num = cntSharedPeaks(s_peaks);
   if (s_num <= 6) {
     return false;

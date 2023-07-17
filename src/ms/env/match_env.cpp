@@ -23,9 +23,9 @@ namespace toppic {
 
 MatchEnv::MatchEnv(int mass_group, EnvPtr theo_env_ptr,
                    ExpEnvPtr real_env_ptr):
-    mass_group_(mass_group),
-    theo_env_ptr_(theo_env_ptr), 
-    real_env_ptr_(real_env_ptr) {
+        mass_group_(mass_group),
+        theo_env_ptr_(theo_env_ptr),
+        exp_env_ptr_(real_env_ptr) {
     }
 
 // intensity normalization method 
@@ -89,7 +89,7 @@ double MatchEnv::findBestRatio(EnvParaPtr env_para_ptr) {
 // Calculating the score_ with shift. 
 double MatchEnv::calcScrWithSftRatio(double shift, double ratio, double tolerance) {
   double s = 0;
-  for (int i = 0; i < real_env_ptr_->getPeakNum(); i++) {
+  for (int i = 0; i < exp_env_ptr_->getPeakNum(); i++) {
     // here mz_accu >= 0 and inte_scr >= 0 
     double mz_factor = calcMzFactor(i, shift, tolerance);
     double intensity_factor = calcIntensityFactor(i, ratio);
@@ -103,8 +103,8 @@ double MatchEnv::calcScrWithSftRatio(double shift, double ratio, double toleranc
 // function of mz accuracy 
 double MatchEnv::calcMzFactor(int id_x, double shift, double tolerance) {
   double mz_factor;
-  if (real_env_ptr_->isExist(id_x)) {
-    double dist = std::abs(theo_env_ptr_->getMz(id_x) + shift - real_env_ptr_->getMz(id_x));
+  if (exp_env_ptr_->isExist(id_x)) {
+    double dist = std::abs(theo_env_ptr_->getMz(id_x) + shift - exp_env_ptr_->getMz(id_x));
     mz_factor = (tolerance - dist) / tolerance;
     if (mz_factor < 0) {
       mz_factor = 0;
@@ -135,9 +135,9 @@ double MatchEnv::calcIntensityFactor(double theo_inte, double real_inte) {
 // function of intensity accuracy 
 double MatchEnv::calcIntensityFactor(int id_x, double ratio) {
   double factor;
-  if (real_env_ptr_->isExist(id_x)) {
+  if (exp_env_ptr_->isExist(id_x)) {
     factor = calcIntensityFactor(theo_env_ptr_->getIntensity(id_x) * ratio,
-                                 real_env_ptr_->getIntensity(id_x));
+                                 exp_env_ptr_->getIntensity(id_x));
   } else {
     factor = 0;
   }
@@ -155,8 +155,8 @@ double MatchEnv::calcPeakScr(int id_x, double inte_sum, double tolerance) {
 double MatchEnv::calcShareInteAccu(int id_x, double inte_sum) {
   double intensity_factor;
   double theo_intensity = theo_env_ptr_->getIntensity(id_x);
-  if (real_env_ptr_->isExist(id_x)) {
-    double real_intensity = real_env_ptr_->getIntensity(id_x);
+  if (exp_env_ptr_->isExist(id_x)) {
+    double real_intensity = exp_env_ptr_->getIntensity(id_x);
     double share_ratio = theo_intensity / inte_sum;
     double share_intensity = real_intensity * share_ratio;
     intensity_factor = calcIntensityFactor(theo_intensity, share_intensity);
@@ -178,7 +178,7 @@ void MatchEnv::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   str = str_util::toString(envcnn_score_);
   xml_doc->addElement(element, "envcnn_score", str.c_str());
   theo_env_ptr_->appendXml(xml_doc, element);
-  real_env_ptr_->appendXml(xml_doc, element);
+  exp_env_ptr_->appendXml(xml_doc, element);
   parent->appendChild(element);
 }
 

@@ -52,8 +52,8 @@ bool CoTable::checkCoexist(MatchEnvPtr env_a, MatchEnvPtr env_b,
                            double tolerance) {
   int cnt_share = 0;
   int cnt_coexist = 0;
-  ExpEnvPtr real_env_a = env_a->getRealEnvPtr();
-  ExpEnvPtr real_env_b = env_b->getRealEnvPtr();
+  ExpEnvPtr real_env_a = env_a->getExpEnvPtr();
+  ExpEnvPtr real_env_b = env_b->getExpEnvPtr();
   for (int i = 0; i < real_env_a->getPeakNum(); i++) {
     int a_idx = real_env_a->getPeakIdx(i);
     for (int j = 0; j < real_env_b->getPeakNum(); j++) {

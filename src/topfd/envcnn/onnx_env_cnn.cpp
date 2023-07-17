@@ -115,7 +115,7 @@ void getExpEnvData(const PeakPtrVec &peak_list, MatchEnvPtr &ori_env,
                    std::vector<double> &theo_mass,
                    std::vector<double> &peak_mass, 
                    std::vector<double> &peak_intes) {
-  ExpEnvPtr real_env = ori_env->getRealEnvPtr();
+  ExpEnvPtr real_env = ori_env->getExpEnvPtr();
   double real_mono_mz = real_env->getMonoMz();
   getExpIntervaledPeakData(peak_list, real_mono_mz, theo_mass, peak_mass, peak_intes);
 }

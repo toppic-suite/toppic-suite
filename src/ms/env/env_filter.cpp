@@ -35,7 +35,7 @@ int cntValid(MatchEnvPtr2D &match_envs) {
 
 // Test match envelope has a valid real envelope 
 bool checkRealEnvValid(MatchEnvPtr env, EnvParaPtr env_para_ptr) {
-  ExpEnvPtr real_env = env->getRealEnvPtr();
+  ExpEnvPtr real_env = env->getExpEnvPtr();
   int mass_group = env->getMassGroup();
   // 1. test if the number of matched peaks >= min_match_peak_num
   if (real_env->getMatchPeakNum() < env_para_ptr->min_match_peak_num_[mass_group]) {
@@ -128,7 +128,7 @@ void filterEnvByChrgComp(MatchEnvPtr2D &match_envs,
 int compRank(int idx, int charge, MatchEnvPtr2D &match_envs,
              const PeakPtrVec &peak_list, EnvParaPtr env_para_ptr)  {
   int rank = 0;
-  int peak_idx = match_envs[idx][charge - 1]->getRealEnvPtr()->getReferPeakIdx();
+  int peak_idx = match_envs[idx][charge - 1]->getExpEnvPtr()->getReferPeakIdx();
   if (peak_idx < 0) {
     return rank;
   }

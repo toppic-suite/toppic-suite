@@ -31,13 +31,13 @@ void mzRefine(MatchEnvPtrVec &envs) {
 }
 
 void mzRefine(MatchEnvPtr env) {
-  ExpEnvPtr real_env = env->getRealEnvPtr();
+  ExpEnvPtr real_env = env->getExpEnvPtr();
   double cur_mz = real_env->getReferMz();
   int charge = real_env->getCharge();
-  double prev_mz = cur_mz - 1.0 / charge;
-  double next_mz = cur_mz + 1.0 / charge;
+  double prev_mz = cur_mz - mass_constant::getIsotopeMass()/ charge;
+  double next_mz = cur_mz + mass_constant::getIsotopeMass() / charge;
   // check if the mass is greater than the precursor mass
-  double ref_mass = cur_mz * charge - charge * mass_constant::getProtonMass();
+  double ref_mass = peak_util::compPeakNeutralMass(cur_mz, charge); 
   // get a reference distribution based on the reference mass
   EnvPtr refer_env = EnvBase::getEnvByRefMass(ref_mass);
   /* add one zeros at both sides of the envelope */

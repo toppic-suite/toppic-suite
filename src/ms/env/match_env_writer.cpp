@@ -23,7 +23,7 @@ namespace match_env_writer {
 
 void write_env(std::ofstream &file, MsHeaderPtr header, MatchEnvPtr match_env) {
   EnvPtr theo_env = match_env->getTheoEnvPtr();
-  ExpEnvPtr real_env = match_env->getRealEnvPtr();
+  ExpEnvPtr real_env = match_env->getExpEnvPtr();
   file << std::endl;
   file << "BEGIN ENVELOPE" << std::endl;
   file << "SPEC_ID=" << header->getSpecId() << std::endl;

@@ -83,7 +83,7 @@ void deconvMsOne(MzmlMsGroupPtr ms_group_ptr,
   }
   //remove precursor peaks
   for (size_t i = 0; i < prec_envs.size(); i++) {
-    ExpEnvPtr env_ptr = prec_envs[i]->getRealEnvPtr();
+    ExpEnvPtr env_ptr = prec_envs[i]->getExpEnvPtr();
     for (int p = 0; p < env_ptr->getPeakNum(); p++) {
       if (env_ptr->isExist(p)) {
         int idx = env_ptr->getPeakIdx(p);

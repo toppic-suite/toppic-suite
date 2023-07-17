@@ -34,7 +34,7 @@ class MatchEnv {
 
   int getMassGroup() {return mass_group_;}
 
-  ExpEnvPtr getRealEnvPtr() {return real_env_ptr_;}
+  ExpEnvPtr getExpEnvPtr() {return exp_env_ptr_;}
 
   EnvPtr getTheoEnvPtr() {return theo_env_ptr_;}
 
@@ -71,7 +71,7 @@ class MatchEnv {
   double msdeconv_score_;
   double envcnn_score_;
   EnvPtr theo_env_ptr_;
-  ExpEnvPtr real_env_ptr_;
+  ExpEnvPtr exp_env_ptr_;
 
   double calcShareInteAccu(int id_x, double inte_sum);
 
