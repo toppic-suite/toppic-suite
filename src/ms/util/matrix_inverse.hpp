@@ -9,8 +9,8 @@
 // http://www.crystalclearsoftware.com/cgi-bin/boost_wiki/wiki.pl?Effective_UBLAS/Matrix_Inversion
 //
 
-#ifndef _MATRIXINVERSE_HPP_
-#define _MATRIXINVERSE_HPP_
+#ifndef _MS_UTIL_MATRIXINVERSE_HPP_
+#define _MS_UTIL_MATRIXINVERSE_HPP_
 
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/matrix_proxy.hpp>

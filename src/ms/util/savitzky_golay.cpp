@@ -13,8 +13,8 @@
 //limitations under the License.
 
 #include "common/util/logger.hpp"
-#include "ms/feature/matrix_inverse.hpp"
-#include "ms/feature/savitzky_golay.hpp"
+#include "ms/util/matrix_inverse.hpp"
+#include "ms/util/savitzky_golay.hpp"
 
 namespace toppic {
 

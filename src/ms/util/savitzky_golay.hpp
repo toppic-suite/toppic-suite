@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_MS_FEATURE_SAVITZKY_GOLAY_HPP_
-#define TOPPIC_MS_FEATURE_SAVITZKY_GOLAY_HPP_
+#ifndef TOPPIC_MS_UTIL_SAVITZKY_GOLAY_HPP_
+#define TOPPIC_MS_UTIL_SAVITZKY_GOLAY_HPP_
 
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>
