@@ -173,6 +173,16 @@ bool Feature::getHighestInteFeature(FracFeaturePtrVec &frac_features, EnvCollPtr
       if (prec_inte < 0) {
         prec_inte = 0;
       }
+      /*
+      if (header_ptr->getFirstScanNum() == 1024) {
+        LOG_ERROR("env set id " << env_set_id << "prec mono mz " << prec_mono_mz << " prec charge " <<
+                  prec_charge);
+        for (size_t z = 0; z < env_sets.size(); z++) {
+          LOG_ERROR("z " << z << " env set charge " <<
+                    env_sets[z]->getCharge());
+        }
+      }
+      */
       SpecFeaturePtr ms2_feature = std::make_shared<SpecFeature>(header_ptr,
                                                                  frac_feature_ptr, 
                                                                  prec_mono_mz, 

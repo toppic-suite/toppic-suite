@@ -187,24 +187,22 @@ void MsAlignReader::readNext() {
       header_ptr->setActivationPtr(activation_ptr);
     }
     // set precursor information
-    if (prec_mass_list == "") {
-      LOG_ERROR("Precursor information is missing in MSALIGN file!");
-      exit(EXIT_FAILURE);
-    }
     PrecursorPtrVec prec_ptr_vec;
-    std::vector<std::string> mass_strs = str_util::split(prec_mass_list, ":");
-    std::vector<std::string> feat_id_strs = str_util::split(prec_feat_id_list, ":");
-    std::vector<std::string> charge_strs = str_util::split(prec_charge_list, ":");
-    std::vector<std::string> inte_strs = str_util::split(prec_inte_list, ":");
-    for (size_t id = 0; id < mass_strs.size(); id++) {    
-      double prec_mass = std::stod(mass_strs[id]);
-      int prec_feat_id = std::stoi(feat_id_strs[id]);
-      int prec_charge = std::stoi(charge_strs[id]);
-      double prec_inte = std::stod(inte_strs[id]);
-      double prec_mono_mz = peak_util::compMz(prec_mass, prec_charge); 
-      PrecursorPtr prec_ptr = std::make_shared<Precursor>(id, prec_feat_id, 
-                                                          prec_mono_mz, prec_charge, prec_inte);
-      prec_ptr_vec.push_back(prec_ptr);
+    if (prec_mass_list != "") {
+      std::vector<std::string> mass_strs = str_util::split(prec_mass_list, ":");
+      std::vector<std::string> feat_id_strs = str_util::split(prec_feat_id_list, ":");
+      std::vector<std::string> charge_strs = str_util::split(prec_charge_list, ":");
+      std::vector<std::string> inte_strs = str_util::split(prec_inte_list, ":");
+      for (size_t id = 0; id < mass_strs.size(); id++) {    
+        double prec_mass = std::stod(mass_strs[id]);
+        int prec_feat_id = std::stoi(feat_id_strs[id]);
+        int prec_charge = std::stoi(charge_strs[id]);
+        double prec_inte = std::stod(inte_strs[id]);
+        double prec_mono_mz = peak_util::compMz(prec_mass, prec_charge); 
+        PrecursorPtr prec_ptr = std::make_shared<Precursor>(id, prec_feat_id, 
+                                                            prec_mono_mz, prec_charge, prec_inte);
+        prec_ptr_vec.push_back(prec_ptr);
+      }
     }
     header_ptr->setPrecPtrVec(prec_ptr_vec);
   }

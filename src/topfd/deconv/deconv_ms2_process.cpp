@@ -197,9 +197,10 @@ void DeconvMs2Process::process() {
       spec_cnt++; 
       MzmlMsPtr ms_ptr = ms_ptr_vec[i];
       feat_it = feat_map.find(ms_ptr->getMsHeaderPtr()->getSpecId());
-      // if no feature, skip the spectrum
-      if (feat_it == feat_map.end()) { continue; }
-      SpecFeaturePtrVec sp_feat_ptr_vec = feat_it->second;
+      SpecFeaturePtrVec sp_feat_ptr_vec;
+      if (feat_it != feat_map.end()) { 
+        sp_feat_ptr_vec = feat_it->second;
+      }
       pool_ptr->Enqueue(geneMsTwoTask(ms_ptr, sp_feat_ptr_vec,
                                       topfd_para_ptr_, ms2_writer_ptr_vec, pool_ptr)); 
       std::string msg = updateMsTwoMsg(ms_ptr->getMsHeaderPtr(), spec_cnt, total_spec_num);

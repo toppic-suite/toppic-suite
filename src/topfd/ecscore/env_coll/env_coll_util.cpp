@@ -120,9 +120,15 @@ bool checkExistingFeatures(PeakMatrixPtr matrix_ptr, EnvCollPtr env_coll_ptr,
     std::vector<int> parent_charge_states = f->getChargeList();
     for (auto charge_state: charge_states) {
       status = checkChargeStateDist(parent_charge_states, charge_state);
-      if (std::count(parent_charge_states.begin(), parent_charge_states.end(), charge_state))
+      if (std::count(parent_charge_states.begin(), parent_charge_states.end(),
+                     charge_state)) {
         overlap_charge = true;
+      }
     }
+    if (status) {
+      return true;
+    }
+    /** This part is problematic and needs to be rewritten
     if (status and !overlap_charge) {
       EnvSetPtrVec esl = f->getEnvSetList();
       for (const auto &feature: env_coll_ptr->getEnvSetList()) {
@@ -132,9 +138,9 @@ bool checkExistingFeatures(PeakMatrixPtr matrix_ptr, EnvCollPtr env_coll_ptr,
       f->setEnvSetList(esl);
     }
     if (status and overlap_charge) {
-      mergeOverlappingChargeFeatures(f, env_coll_ptr);
       return true;
     }
+    **/
   }
   return false;
 }
@@ -269,6 +275,11 @@ EnvCollPtr findEnvColl(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
   int max_charge = env_set_list[env_set_list.size() - 1]->getCharge();
   int start_spec_id = env_set_ptr->getStartSpecId();
   int end_spec_id = env_set_ptr->getEndSpecId();
+  if (new_seed_ptr->getMass() > 10059.3 && new_seed_ptr->getMass() < 10059.4) {
+    LOG_ERROR("Mass " << new_seed_ptr->getMass() << " env set list length " <<
+              env_set_list.size());
+  }
+
   EnvCollPtr env_coll_ptr = std::make_shared<EnvColl>(new_seed_ptr, env_set_list, 
                                                       min_charge, max_charge, 
                                                       start_spec_id, end_spec_id);

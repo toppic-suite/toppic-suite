@@ -192,35 +192,12 @@ MatchEnvPtr deconvPrecWinForOneMs(MzmlMsPtr ms_one, MzmlMsPtr ms_two,
   double prec_win_end = ms_two_header->getPrecWinEnd();
 
   PeakPtrVec peak_list = ms_one->getPeakPtrVec();
-  LOG_DEBUG("start refine precursor " << " peak num " << peak_list.size());
   MatchEnvPtr match_env_ptr = deconv_prec_win::deconv(prec_win_begin, prec_win_end, peak_list,  
                                                       max_mass, max_charge);
-  // it is possible that the isolation window doest not contain any peaks
-  // in this case add an peak at the target precursor mz to get match_env_ptr
   if (match_env_ptr == nullptr) {
-    double inte = 1;
-    PeakPtr new_peak_ptr = std::make_shared<Peak>(ms_two_header->getPrecTargetMz(), inte);
-    peak_list.push_back(new_peak_ptr);
-    std::sort(peak_list.begin(), peak_list.end(), Peak::cmpPosInc);
-    int max_charge = 1;
-    match_env_ptr = deconv_prec_win::deconv(prec_win_begin, prec_win_end, peak_list,  
-                                            max_mass, max_charge);
-  }
-  if (match_env_ptr == nullptr) {
-    LOG_WARN("No precursor isotopic envelope is found for scan " << ms_two_header->getFirstScanNum());
+    LOG_INFO("No precursor isotopic envelope is found for scan " << ms_two_header->getFirstScanNum());
   }
   return match_env_ptr;
-  /*
-  // for debugging
-  else {
-    std::ofstream outfile;
-    outfile.open("precursor.txt", std::ios_base::app); 
-    outfile << "scan " << ms_two_header->getFirstScanNum() << " precursor ref mz " <<
-      match_env_ptr->getTheoEnvPtr()->getReferMz() << " precursor charge " << 
-      match_env_ptr->getTheoEnvPtr()->getCharge() << std::endl;
-    outfile.close();
-  }
-  */
 }
 
 MatchEnvPtrVec deconvPrecWinForMsGroup(MzmlMsGroupPtr ms_group_ptr, 
