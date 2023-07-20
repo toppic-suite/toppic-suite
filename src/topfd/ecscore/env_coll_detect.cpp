@@ -116,7 +116,6 @@ void process(TopfdParaPtr topfd_para_ptr) {
     EnvCollPtr env_coll_ptr = env_coll_util::findEnvColl(matrix_ptr, seed_ptr,
                                                          score_para_ptr, sn_ratio); 
     if (env_coll_ptr != nullptr) {
-      double mass = env_coll_ptr->getMass();
       if (env_coll_util::checkExistingFeatures(matrix_ptr, env_coll_ptr,
                                                env_coll_list, score_para_ptr)) {
         continue;
@@ -132,24 +131,16 @@ void process(TopfdParaPtr topfd_para_ptr) {
       }
       env_coll_ptr->setEcscore(feat_ptr->getScore());
       env_coll_list.push_back(env_coll_ptr);
-      if (mass > 10059.3 && mass < 10059.4) {
-        LOG_ERROR("step 2.3 Mass " << mass << " env set list length " <<
-                  env_coll_ptr->getEnvSetList().size()); 
-      }
-      
       FracFeaturePtr frac_feat_ptr = env_coll_util::getFracFeature(feat_id, deconv_ms1_ptr_vec, 
                                                                    score_para_ptr->frac_id_,
                                                                    score_para_ptr->file_name_,
                                                                    env_coll_ptr, matrix_ptr, sn_ratio);
       frac_feat_ptr->setEcscore(feat_ptr->getScore());
       frac_features.push_back(frac_feat_ptr);
-      if (mass > 10059.3 && mass < 10059.4) {
-        LOG_ERROR("step 2.4 Mass " << mass << " env set list length " <<
-                  env_coll_ptr->getEnvSetList().size()); 
-      }
     }
   }
   
+  /*
   for (size_t z = 0; z < env_coll_list.size(); z++) {
     double mass = env_coll_list[z]->getMass();
     if (mass > 10059.3 && mass < 10059.4) {
@@ -157,6 +148,7 @@ void process(TopfdParaPtr topfd_para_ptr) {
                 env_coll_list[z]->getEnvSetList().size()); 
     }
   }
+  */
 
   // map MS2 features
   double zero_sn_ratio = 0;

@@ -71,7 +71,7 @@ class EnvSet {
 
   double compIntensity(double sn_ratio, double noise_inte);
 
-  static bool cmpCharge(EnvSetPtr a, EnvSetPtr b) { return a->getCharge() < b->getCharge(); }
+  static bool cmpChargeInc(EnvSetPtr a, EnvSetPtr b) { return a->getCharge() < b->getCharge(); }
 
  private:
   void initMedianXic(double noise_inte_level, double sn_ratio);

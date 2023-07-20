@@ -48,6 +48,14 @@ std::vector<double> EnvColl::compExpInteSumList() {
   return sum_list;
 }
 
+// this function is problematic and needs to be rewritten
+void EnvColl::setEnvSetList(EnvSetPtrVec &env_set_list) {
+  env_set_list_ = env_set_list;
+  std::sort(env_set_list_.begin(), env_set_list_.end(), EnvSet::cmpChargeInc);
+  min_charge_ = env_set_list_[0]->getCharge();
+  max_charge_ = env_set_list_[env_set_list.size()-1]->getCharge();
+}
+
 std::vector<int> EnvColl::getChargeList() {
   std::vector<int> charge_list;
   for (auto es: env_set_list_)

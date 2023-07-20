@@ -46,7 +46,7 @@ class EnvColl {
 
   EnvSetPtrVec getEnvSetList() { return env_set_list_; }
 
-  void setEnvSetList(EnvSetPtrVec &env_set_list) {env_set_list_ = env_set_list;}
+  void setEnvSetList(EnvSetPtrVec &env_set_list);  
 
   int getMinCharge() const { return min_charge_; }
 

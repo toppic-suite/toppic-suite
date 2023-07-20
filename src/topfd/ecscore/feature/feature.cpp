@@ -190,6 +190,7 @@ bool Feature::getHighestInteFeature(FracFeaturePtrVec &frac_features, EnvCollPtr
                                                                  prec_inte);
       new_spec_feats.push_back(ms2_feature);
       frac_feature_ptr->setHasMs2Spec(true);
+      break;
     }
   }
   if (new_spec_feats.size() > 0) {
