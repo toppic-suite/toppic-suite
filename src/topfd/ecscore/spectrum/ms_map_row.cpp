@@ -21,7 +21,7 @@ namespace toppic {
 MsMapRow::MsMapRow(MsMapRowHeaderPtr spec_ptr, int bin_num) {
     header_ptr_ = spec_ptr;
   for (int i = 0; i < bin_num; i++) {
-    MatrixPeakPtrVec vec;
+    MsMapPeakPtrVec vec;
     peak_ptr_2d_.push_back(vec);
   }
 }

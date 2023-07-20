@@ -12,11 +12,11 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include "topfd/ecscore/spectrum/matrix_peak.hpp"
+#include "topfd/ecscore/spectrum/ms_map_peak.hpp"
 
 namespace toppic {
 
-MatrixPeak::MatrixPeak(int peak_id, int spec_id, PeakPtr peak): 
+MsMapPeak::MsMapPeak(int peak_id, int spec_id, PeakPtr peak):
   Peak(peak->getPosition(), peak->getIntensity()) {
     peak_id_ = peak_id;
     spec_id_ = spec_id;
@@ -26,7 +26,7 @@ MatrixPeak::MatrixPeak(int peak_id, int spec_id, PeakPtr peak):
     neighbor_ = false;
   }
 
-std::string MatrixPeak::getString() {
+std::string MsMapPeak::getString() {
   return "Peak ID: " + std::to_string(peak_id_) + " " +
     "Spec ID: " + std::to_string(spec_id_) + " " +
     "Pos: " + std::to_string(getPosition()) + " " +

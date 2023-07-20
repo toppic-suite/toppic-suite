@@ -15,7 +15,7 @@
 #include <cmath>
 
 #include "topfd/envcnn/onnx_env_cnn.hpp"
-#include "topfd/ecscore/spectrum/matrix_peak.hpp"
+#include "topfd/ecscore/spectrum/ms_map_peak.hpp"
 #include "topfd/ecscore/envelope/env_simple_peak.hpp"
 #include "topfd/ecscore/envelope/seed_envelope.hpp"
 #include "topfd/ecscore/env_set/env_set.hpp"
@@ -32,16 +32,16 @@ int getIndex(double mz, double min_mz, double bin_size) {
   return bin_idx;
 }
 
-MatrixPeakPtrVec  getIntvPeakList(PeakMatrixPtr matrix_ptr, EnvSetPtr env_set_ptr, 
-                                  int spec_id) {
+MsMapPeakPtrVec  getIntvPeakList(PeakMatrixPtr matrix_ptr, EnvSetPtr env_set_ptr,
+                                 int spec_id) {
   EnvSimplePeakPtrVec peak_list = env_set_ptr->getSeedPtr()->getPeakList(); 
   double min_theo_peak = std::round(peak_list[0]->getPosition() * 1000.0) / 1000.0;
   double max_theo_peak = std::round(peak_list[peak_list.size() - 1]->getPosition() * 1000.0) / 1000.0;
   int start_idx = matrix_ptr->getBinIndex(min_theo_peak - 0.1);
   int end_idx = matrix_ptr->getBinIndex(max_theo_peak + 0.1);
-  MatrixPeakPtrVec intv_peak_list;
+  MsMapPeakPtrVec intv_peak_list;
   for (int peak_idx = start_idx; peak_idx <= end_idx; peak_idx++) {
-    MatrixPeakPtrVec bin_peaks = matrix_ptr->getBinPeakList(spec_id, peak_idx);
+    MsMapPeakPtrVec bin_peaks = matrix_ptr->getBinPeakList(spec_id, peak_idx);
     for (const auto &peak: bin_peaks)
       if (peak->getPosition() >= (min_theo_peak - 0.1) 
           && peak->getPosition() <= (max_theo_peak + 0.1))
@@ -104,7 +104,7 @@ std::vector<std::vector<float>> getEnvcnnInputMatrix(PeakMatrixPtr matrix_ptr,
   std::vector<std::vector<double>> noise_distribution_list;
   std::vector<std::vector<double>> noise_inte_distribution_list;
   for (int spec_id = coll_ptr->getStartSpecId(); spec_id <= coll_ptr->getEndSpecId(); spec_id++) {
-    MatrixPeakPtrVec intv_peak_list = getIntvPeakList(matrix_ptr, env_set_ptr, spec_id);
+    MsMapPeakPtrVec intv_peak_list = getIntvPeakList(matrix_ptr, env_set_ptr, spec_id);
     std::vector<double> t_noise_distribution_list;
     std::vector<double> t_noise_inte_distribution_list;
     for (const auto &elem: intv_peak_list) {

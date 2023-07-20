@@ -86,7 +86,7 @@ void PeakMatrix::initMatrix(PeakPtrVec2D &raw_peaks, double sn_ratio) {
   for (size_t i = 0; i < raw_peaks.size(); i++) {
     for (size_t j = 0; j < raw_peaks[i].size(); j++) {
       PeakPtr p_ptr = raw_peaks[i][j];
-      MatrixPeakPtr new_peak_ptr = std::make_shared<MatrixPeak>(peak_id, i, p_ptr);
+      MsMapPeakPtr new_peak_ptr = std::make_shared<MsMapPeak>(peak_id, i, p_ptr);
       all_peaks_.push_back(new_peak_ptr);
       // filter low intensity peak
       if (new_peak_ptr->getIntensity() > sn_ratio * base_inte_) {
@@ -104,10 +104,10 @@ void PeakMatrix::findNeighbors(int spec_id, int search_bin_num, double mass_tol)
   for (int bin_idx = 0; bin_idx < bin_num_; bin_idx++) {
     int start = std::max(0, bin_idx - search_bin_num);
     int end = std::min(bin_idx + search_bin_num, bin_num_ - 1);
-    MatrixPeakPtrVec first_row_peaks = first_row->getPeakPtrVec(bin_idx);
+    MsMapPeakPtrVec first_row_peaks = first_row->getPeakPtrVec(bin_idx);
     for (auto &first_peak: first_row_peaks) {
       for (int second_idx = start; second_idx < end + 1; second_idx++) {
-        MatrixPeakPtrVec second_row_peaks = first_row->getPeakPtrVec(second_idx);
+        MsMapPeakPtrVec second_row_peaks = first_row->getPeakPtrVec(second_idx);
         for (auto &second_peak: second_row_peaks) {
           double mass_diff = std::abs(first_peak->getPosition() - second_peak->getPosition());
           if (mass_diff <= mass_tol) {
@@ -132,8 +132,8 @@ void PeakMatrix::removeNonNeighbors(double mass_tol) {
   for (size_t spec_id = 0; spec_id < spec_num; spec_id++) {
     MsMapRowPtr peak_row_ptr = matrix_[spec_id];
     for (int bin_idx = 0; bin_idx < bin_num_; bin_idx++) {
-      MatrixPeakPtrVec peak_ptrs = peak_row_ptr->getPeakPtrVec(bin_idx);
-      MatrixPeakPtrVec new_peak_ptrs; 
+      MsMapPeakPtrVec peak_ptrs = peak_row_ptr->getPeakPtrVec(bin_idx);
+      MsMapPeakPtrVec new_peak_ptrs;
       for (auto peak: peak_ptrs) {
         if (peak->getNeighbor()) {
           new_peak_ptrs.push_back(peak);

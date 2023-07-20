@@ -117,9 +117,9 @@ void EnvSet::getWeightMzError(double &weight_sum, double &error_sum) {
     if (env_ptr == nullptr) {
       continue;
     }
-    MatrixPeakPtrVec exp_peak_list = env_ptr->getExpPeakList();
+    MsMapPeakPtrVec exp_peak_list = env_ptr->getExpPeakList();
     for (int peak_idx = 0; peak_idx < num_peaks_theo_env; peak_idx++) {
-      MatrixPeakPtr peak = exp_peak_list[peak_idx];
+      MsMapPeakPtr peak = exp_peak_list[peak_idx];
       if (peak != nullptr) {
         double cur_inte = seed_peak_list[peak_idx]->getIntensity() * inte_list[exp_env_id];
         double cur_err = peak->getPosition() - seed_peak_list[peak_idx]->getPosition();
@@ -283,20 +283,20 @@ void EnvSet::removePeakData(PeakMatrixPtr matrix_ptr) {
     if (spec_id < 0 or spec_id >= matrix_ptr->getSpecNum()) {
       continue;
     }
-    MatrixPeakPtrVec exp_peaks = exp_env->getExpPeakList(); 
+    MsMapPeakPtrVec exp_peaks = exp_env->getExpPeakList();
     std::vector<double> theo_env_peak_intes = theo_intes[env_id];
 
     int peak_num = exp_peaks.size(); 
     for (int peak_id = 0; peak_id < peak_num; peak_id++) {
-      MatrixPeakPtr exp_peak = exp_peaks[peak_id];
+      MsMapPeakPtr exp_peak = exp_peaks[peak_id];
       LOG_DEBUG("Peak id " << peak_id << " " << peak_num);
       if (exp_peak == nullptr) {
         continue;
       }
       int bin_idx = matrix_ptr->getBinIndex(exp_peak->getPosition()); 
-      MatrixPeakPtrVec bin_peaks = matrix_ptr->getBinPeakList(spec_id, bin_idx);
+      MsMapPeakPtrVec bin_peaks = matrix_ptr->getBinPeakList(spec_id, bin_idx);
       double theo_peak_inte = theo_env_peak_intes[peak_id];
-      MatrixPeakPtrVec remain_peaks;
+      MsMapPeakPtrVec remain_peaks;
       for (auto peak: bin_peaks) {
         // check if peak is the same as exp_peak
         if (peak == nullptr) {

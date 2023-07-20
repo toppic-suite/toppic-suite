@@ -15,7 +15,7 @@
 #ifndef TOPPIC_TOPFD_ECSCORE_MS_MAP_MS_MAP_ROW_HPP
 #define TOPPIC_TOPFD_ECSCORE_MS_MAP_MS_MAP_ROW_HPP
 
-#include "topfd/ecscore/spectrum/matrix_peak.hpp"
+#include "topfd/ecscore/spectrum/ms_map_peak.hpp"
 #include "topfd/ecscore/spectrum/ms_map_row_header.hpp"
 
 namespace toppic {
@@ -34,17 +34,17 @@ class MsMapRow {
 
   double getRT() const { return header_ptr_->getRt(); }
 
-  void addPeak(int idx, MatrixPeakPtr peak_ptr) { peak_ptr_2d_[idx].push_back(peak_ptr);}
+  void addPeak(int idx, MsMapPeakPtr peak_ptr) { peak_ptr_2d_[idx].push_back(peak_ptr);}
 
-  MatrixPeakPtrVec getPeakPtrVec(int i) {return peak_ptr_2d_[i];}
+  MsMapPeakPtrVec getPeakPtrVec(int i) {return peak_ptr_2d_[i];}
 
-  void setPeakPtrVec(int i, MatrixPeakPtrVec &peak_ptr_vec) { peak_ptr_2d_[i] = peak_ptr_vec;}
+  void setPeakPtrVec(int i, MsMapPeakPtrVec &peak_ptr_vec) { peak_ptr_2d_[i] = peak_ptr_vec;}
 
   void print();
 
  private:
   MsMapRowHeaderPtr header_ptr_;
-  MatrixPeakPtr2D peak_ptr_2d_;
+  MsMapPeakPtr2D peak_ptr_2d_;
 };
 
 typedef std::shared_ptr<MsMapRow> MsMapRowPtr;

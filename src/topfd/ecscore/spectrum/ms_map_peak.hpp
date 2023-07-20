@@ -12,16 +12,16 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_TOPFD_ECSCORE_SPECTRUM_MATRIX_PEAK_HPP
-#define TOPPIC_TOPFD_ECSCORE_SPECTRUM_MATRIX_PEAK_HPP
+#ifndef TOPPIC_TOPFD_ECSCORE_MS_MAP_MS_MAP_PEAK_HPP
+#define TOPPIC_TOPFD_ECSCORE_MS_MAP_MS_MAP_PEAK_HPP
 
 #include "ms/spec/peak.hpp"
 
 namespace toppic {
 
-class MatrixPeak : public Peak {
+class MsMapPeak : public Peak {
  public:
-  MatrixPeak(int peak_id, int spec_id, PeakPtr peak);
+  MsMapPeak(int peak_id, int spec_id, PeakPtr peak);
 
   std::string getString();
 
@@ -58,9 +58,9 @@ class MatrixPeak : public Peak {
   bool neighbor_;
 };
 
-typedef std::shared_ptr<MatrixPeak> MatrixPeakPtr;
-typedef std::vector<MatrixPeakPtr> MatrixPeakPtrVec;
-typedef std::vector<MatrixPeakPtrVec> MatrixPeakPtr2D;
+typedef std::shared_ptr<MsMapPeak> MsMapPeakPtr;
+typedef std::vector<MsMapPeakPtr> MsMapPeakPtrVec;
+typedef std::vector<MsMapPeakPtrVec> MsMapPeakPtr2D;
 
 }
-#endif //TOPPIC_EXP_PEAK_HPP
+#endif

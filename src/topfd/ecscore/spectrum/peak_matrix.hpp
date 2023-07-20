@@ -50,10 +50,10 @@ class PeakMatrix {
 
   int getBinIndex(double mz);
 
-  MatrixPeakPtrVec getBinPeakList(int sp_id, int bin_idx) {
+  MsMapPeakPtrVec getBinPeakList(int sp_id, int bin_idx) {
     return matrix_[sp_id]->getPeakPtrVec(bin_idx);}
 
-  void setBinPeakList(int sp_id, int bin_idx, MatrixPeakPtrVec &peaks) {
+  void setBinPeakList(int sp_id, int bin_idx, MsMapPeakPtrVec &peaks) {
     return matrix_[sp_id]->setPeakPtrVec(bin_idx, peaks);}
 
   MsMapRowPtr getRowPtr(int i) {return matrix_[i];}
@@ -76,7 +76,7 @@ class PeakMatrix {
   double max_mz_;
   double base_inte_;
 
-  MatrixPeakPtrVec all_peaks_;
+  MsMapPeakPtrVec all_peaks_;
 };
 
 typedef std::shared_ptr<PeakMatrix> PeakMatrixPtr;

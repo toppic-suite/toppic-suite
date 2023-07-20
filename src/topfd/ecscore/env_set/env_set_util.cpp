@@ -30,7 +30,7 @@ std::vector<double> getAggregateEnvelopeInte(EnvSetPtr env_set_ptr) {
   int num_peaks = aggregate_inte.size();
   for (int sp_idx = 0; sp_idx < num_spec; sp_idx++) {
     for (int peak_idx = 0; peak_idx < num_peaks; peak_idx++) {
-      MatrixPeakPtr peak_ptr = exp_env_list[sp_idx]->getPeakPtr(peak_idx);
+      MsMapPeakPtr peak_ptr = exp_env_list[sp_idx]->getPeakPtr(peak_idx);
       if (peak_ptr != nullptr) {
         aggregate_inte[peak_idx] = aggregate_inte[peak_idx] + peak_ptr->getIntensity();
       }
@@ -47,7 +47,7 @@ std::vector<double> getAggregateEnvelopeMz(EnvSetPtr env_set_ptr) {
   for (int peak_idx = 0; peak_idx < num_peaks; peak_idx++) {
     int counter = 0;
     for (int sp_idx = 0; sp_idx < num_spec; sp_idx++) {
-      MatrixPeakPtr peak_ptr = exp_env_list[sp_idx]->getPeakPtr(peak_idx);
+      MsMapPeakPtr peak_ptr = exp_env_list[sp_idx]->getPeakPtr(peak_idx);
       if (peak_ptr != nullptr) {
         aggregate_mz[peak_idx] = aggregate_mz[peak_idx] + peak_ptr->getPosition();
         counter = counter + 1;
@@ -103,14 +103,14 @@ void compPeakStartEndIdx(PeakMatrixPtr matrix_ptr,SeedEnvelopePtr seed_ptr,
   }
 }
 
-MatrixPeakPtr pickExpPeak(PeakMatrixPtr matrix_ptr, EnvSimplePeakPtr seed_peak_ptr, 
-                          int sp_id, double mass_tol) {
+MsMapPeakPtr pickExpPeak(PeakMatrixPtr matrix_ptr, EnvSimplePeakPtr seed_peak_ptr,
+                         int sp_id, double mass_tol) {
   // get peaks within mass tolerance
   double max_inte = std::numeric_limits<double>::min();
   double pos = seed_peak_ptr->getPosition();
-  MatrixPeakPtr result_peak = nullptr;
+  MsMapPeakPtr result_peak = nullptr;
   for (int idx = seed_peak_ptr->getStartIdx(); idx < seed_peak_ptr->getEndIdx() + 1; idx++) {
-    MatrixPeakPtrVec bin_peaks = matrix_ptr->getBinPeakList(sp_id, idx);
+    MsMapPeakPtrVec bin_peaks = matrix_ptr->getBinPeakList(sp_id, idx);
     for (const auto& matrix_peak : bin_peaks) {
       double mass_diff = std::abs(pos - matrix_peak->getPosition());
       if ( mass_diff < mass_tol && matrix_peak->getIntensity() > max_inte) {
@@ -124,11 +124,11 @@ MatrixPeakPtr pickExpPeak(PeakMatrixPtr matrix_ptr, EnvSimplePeakPtr seed_peak_p
 
 ExpEnvelopePtr getMatchExpEnv(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr, 
                               int sp_id, double mass_tol) {
-  MatrixPeakPtrVec peak_list;
+  MsMapPeakPtrVec peak_list;
   EnvSimplePeakPtrVec peaks = seed_ptr->getPeakList();
   for (auto& seed_peak : peaks) {
     if (seed_peak != nullptr) {
-      MatrixPeakPtr peak = pickExpPeak(matrix_ptr, seed_peak, sp_id, mass_tol);
+      MsMapPeakPtr peak = pickExpPeak(matrix_ptr, seed_peak, sp_id, mass_tol);
       peak_list.push_back(peak);
     }
     else {

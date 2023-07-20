@@ -17,13 +17,13 @@
 
 #include <vector>
 
-#include "topfd/ecscore/spectrum/matrix_peak.hpp"
+#include "topfd/ecscore/spectrum/ms_map_peak.hpp"
 
 namespace toppic {
 
 class ExpEnvelope {
  public:
-  ExpEnvelope(int spec_id, MatrixPeakPtrVec peak_list);
+  ExpEnvelope(int spec_id, MsMapPeakPtrVec peak_list);
 
   int getMatchPeakNum(int base_idx);
 
@@ -35,21 +35,21 @@ class ExpEnvelope {
 
   int getPeakNum() { return peak_list_.size(); }
 
-  MatrixPeakPtr getPeakPtr(int idx) { return peak_list_[idx]; }
+  MsMapPeakPtr getPeakPtr(int idx) { return peak_list_[idx]; }
 
   int getSpecId() const { return spec_id_; }
 
   void setSpecId(int spec_id) { spec_id_ = spec_id; }
 
-  MatrixPeakPtrVec getExpPeakList() { return peak_list_; }
+  MsMapPeakPtrVec getExpPeakList() { return peak_list_; }
 
-  void setExpPeakList(const MatrixPeakPtrVec &peak_list) {peak_list_ = peak_list; }
+  void setExpPeakList(const MsMapPeakPtrVec &peak_list) { peak_list_ = peak_list; }
 
-  void setPeakPtr(int idx, MatrixPeakPtr peak_ptr) { peak_list_[idx] = peak_ptr; }
+  void setPeakPtr(int idx, MsMapPeakPtr peak_ptr) { peak_list_[idx] = peak_ptr; }
 
  private:
   int spec_id_;
-  MatrixPeakPtrVec peak_list_;
+  MsMapPeakPtrVec peak_list_;
 };
 
 typedef std::shared_ptr<ExpEnvelope> ExpEnvelopePtr;

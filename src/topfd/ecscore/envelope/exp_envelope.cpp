@@ -19,7 +19,7 @@
 
 namespace toppic {
 
-ExpEnvelope::ExpEnvelope(int spec_id, MatrixPeakPtrVec peak_list) {
+ExpEnvelope::ExpEnvelope(int spec_id, MsMapPeakPtrVec peak_list) {
   spec_id_ = spec_id;
   peak_list_ = peak_list;
 }
@@ -30,7 +30,7 @@ int ExpEnvelope::getMatchPeakNum(int base_idx) {
   int end_idx = std::min(base_idx + 1, total_peaks - 1);
   int num = 0;
   for (int i = start_idx; i < end_idx + 1; i++) {
-    MatrixPeakPtr p = peak_list_[i];
+    MsMapPeakPtr p = peak_list_[i];
     if (p != nullptr) {
       num = num + 1;
     }

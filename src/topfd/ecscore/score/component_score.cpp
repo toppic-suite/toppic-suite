@@ -79,10 +79,10 @@ double getMzErrors(EnvSetPtr env_set_ptr) {
   ExpEnvelopePtrVec exp_envs = env_set_ptr->getExpEnvList();
   double error_sum = 0;
   for (auto &exp_env: exp_envs) {
-    MatrixPeakPtrVec peaks = exp_env->getExpPeakList();
+    MsMapPeakPtrVec peaks = exp_env->getExpPeakList();
     int num_peaks = peaks.size();
     for (int peak_idx = 0; peak_idx < num_peaks; peak_idx++) {
-      MatrixPeakPtr peak = peaks[peak_idx];
+      MsMapPeakPtr peak = peaks[peak_idx];
       if (peak != nullptr) {
         double cur_err = std::abs(peak->getPosition() - theo_dis[peak_idx]);
         error_sum = error_sum + cur_err;
@@ -92,7 +92,7 @@ double getMzErrors(EnvSetPtr env_set_ptr) {
   return error_sum;
 }
 
-double countMaxConsecutivePeakNum(MatrixPeakPtrVec &peaks) {
+double countMaxConsecutivePeakNum(MsMapPeakPtrVec &peaks) {
   int n = 0;
   int max_consecutive_peak_num = 0;
   for (auto peak: peaks) {
@@ -110,7 +110,7 @@ double getConsecutivePeakPercent(EnvSetPtr env_set_ptr) {
   double total_peaks = 0, positive_peaks = 0;
   ExpEnvelopePtrVec exp_envs = env_set_ptr->getExpEnvList();
   for (auto &exp_env: exp_envs) {
-    MatrixPeakPtrVec peaks = exp_env->getExpPeakList();
+    MsMapPeakPtrVec peaks = exp_env->getExpPeakList();
     for (auto p: peaks)
       if (p != nullptr)
         total_peaks = total_peaks + 1;
@@ -126,7 +126,7 @@ double getMatchedPeakPercent(EnvSetPtr env_set_ptr,
   ExpEnvelopePtrVec exp_envs = env_set_ptr->getExpEnvList();
   int num_exp_envs = exp_envs.size();
   for (int i = 0; i < num_exp_envs; i++) {
-    MatrixPeakPtrVec peaks = exp_envs[i]->getExpPeakList();
+    MsMapPeakPtrVec peaks = exp_envs[i]->getExpPeakList();
     std::vector<double> scalled_theo_env = theo_map[i];
     int num_peaks = scalled_theo_env.size();
     for (int peak_id = 0; peak_id < num_peaks; peak_id++) {
