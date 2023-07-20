@@ -70,7 +70,7 @@ class EnvColl {
 
   int getBaseSpecId() const { return seed_ptr_->getSpecId(); }
 
-  double getMass() const { return seed_ptr_->getMass(); }
+  double getMass() const { return seed_ptr_->getMonoNeutralMass(); }
 
   std::vector<double> getExpInteSumList() const { return exp_inte_sum_list_; }
 

@@ -29,10 +29,23 @@ class SeedEnvelope;
 
 typedef std::shared_ptr<SeedEnvelope> SeedEnvelopePtr;
 
-class SeedEnvelope {
+class SeedEnvelope : public Env {
  public:
-  SeedEnvelope();
 
+  int getSpecId() const { return spec_id_; }
+
+  void setSpecId(int spec_id) { spec_id_ = spec_id; }
+
+  int getEnvId() const { return env_id_; }
+
+  double getSeedInte() const {return seed_inte_;}
+
+  static bool cmpSeedInteDec(const SeedEnvelopePtr a, const SeedEnvelopePtr b) {
+    return a->getSeedInte() > b->getSeedInte(); }
+
+  std::string getString();
+
+  // to review
   SeedEnvelope(DeconvPeakPtr peak_ptr);
 
   SeedEnvelope(int spec_id, int env_id, double pos, double mass, double inte, int charge,
@@ -42,65 +55,16 @@ class SeedEnvelope {
 
   SeedEnvelope(SeedEnvelopePtr env_ptr, int new_charge);
 
-  std::vector<double> getPosList();
+  void seedRmPeaks(double min_pos, double max_pos);
 
-  std::vector<double> getInteList();
-
-  void rmPeaks(double min_pos, double max_pos);
-
-  void changeCharge(int new_charge);
-
-  void shift(double shift_num);
-
-  double getMaxPos() { return peak_ptr_list_[peak_ptr_list_.size() - 1]->getPosition(); }
-
-  int getPeakNum() { return peak_ptr_list_.size(); }
-
-  EnvPeakPtr get_peak_ptr(int idx) { return peak_ptr_list_[idx]; }
-
-  int getSpecId() const { return spec_id_; }
-
-  void setSpecId(int spec_id) { spec_id_ = spec_id; }
-
-  int getEnvId() const { return env_id_; }
-
-  void setEnvId(int env_id) { env_id_ = env_id; }
-
-  double getPos() const { return pos_; }
+  void seedShiftIsotope(double shift_num);
 
   double getReferMz();
-
-  void setPos(double pos) { pos_ = pos; }
-
-  double getMass() const { return mass_; }
-
-  void setMass(double mass) { mass_ = mass; }
-
-  double getInte() const { return inte_; }
-
-  void setInte(double inte) { inte_ = inte; }
-
-  int getCharge() const { return charge_; }
-
-  void setCharge(int charge) { charge_ = charge; }
-
-  const EnvPeakPtrVec &getPeakList() const { return peak_ptr_list_; }
-
-  void setPeakList(EnvPeakPtrVec peak_ptr_list);
-
-  std::string getString();
-
-  static bool cmpInteDec(const SeedEnvelopePtr a, const SeedEnvelopePtr b) { 
-    return a->getInte() > b->getInte(); }
 
  private:
   int spec_id_;
   int env_id_;
-  double pos_;
-  double mass_;
-  double inte_;
-  int charge_;
-  EnvPeakPtrVec peak_ptr_list_;
+  double seed_inte_;
 };
 
 typedef std::vector<SeedEnvelopePtr> SeedEnvelopePtrVec;

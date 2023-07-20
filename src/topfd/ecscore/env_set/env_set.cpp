@@ -106,7 +106,7 @@ std::vector<double> EnvSet::compExpInteSumList() {
 }
 
 void EnvSet::getWeightMzError(double &weight_sum, double &error_sum) {
-  EnvPeakPtrVec seed_peak_list = seed_ptr_->getPeakList();
+  EnvPeakPtrVec seed_peak_list = seed_ptr_->getPeakPtrList();
   std::vector<double> inte_list = xic_ptr_->getTopThreeInteList();
   int num_exp_env = exp_env_list_.size();
   int num_peaks_theo_env = seed_peak_list.size();

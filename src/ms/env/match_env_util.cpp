@@ -50,7 +50,7 @@ std::vector<double> getChargeOneMassList(const MatchEnvPtrVec &envs) {
 std::vector<double> getIntensitySums(const MatchEnvPtrVec &envs) {
   std::vector<double> intensity_sums(envs.size());
   for (size_t i = 0; i < envs.size(); i++) {
-    intensity_sums[i] = envs[i]->getTheoEnvPtr()->compIntensitySum();
+    intensity_sums[i] = envs[i]->getTheoEnvPtr()->compInteSum();
   }
   return intensity_sums;
 }
@@ -63,7 +63,7 @@ void assignIntensity(PeakPtrVec &ms, MatchEnvPtrVec &envs) {
     for (int j = 0; j < env->getExpEnvPtr()->getPeakNum(); j++) {
       int peak = env->getExpEnvPtr()->getPeakIdx(j);
       if (peak >= 0) {
-        intensity_sums_[peak] += env->getTheoEnvPtr()->getIntensity(j);
+        intensity_sums_[peak] += env->getTheoEnvPtr()->getInte(j);
       }
     }
   }
@@ -73,9 +73,9 @@ void assignIntensity(PeakPtrVec &ms, MatchEnvPtrVec &envs) {
       int peak = env->getExpEnvPtr()->getPeakIdx(j);
       if (peak >= 0) {
         EnvPtr real_env = env->getExpEnvPtr();
-        double intensity = real_env->getIntensity(j) * env->getTheoEnvPtr()->getIntensity(j)
-            / intensity_sums_[peak];
-        real_env->setIntensity(j, intensity);
+        double intensity = real_env->getInte(j) * env->getTheoEnvPtr()->getInte(j)
+                           / intensity_sums_[peak];
+          real_env->setInte(j, intensity);
       }
     }
   }
@@ -205,7 +205,7 @@ DeconvMsPtr getDeconvMsPtr(MsHeaderPtr header_ptr, MatchEnvPtrVec &envs, bool us
     EnvPtr theo_env = envs[i]->getTheoEnvPtr();
     ExpEnvPtr real_env = envs[i]->getExpEnvPtr();
     double pos = real_env->getMonoNeutralMass();
-    double inte = theo_env->compIntensitySum();
+    double inte = theo_env->compInteSum();
     int charge = theo_env->getCharge();
     double score; 
     if (use_env_cnn) {

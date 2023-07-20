@@ -30,7 +30,7 @@ bool preprocessEnv(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
   double corr_tol = para_ptr->corr_tole_;
   double min_mz = matrix_ptr->getMinMz() - mass_tol;
   double max_mz = matrix_ptr->getMaxMz() + mass_tol;
-  seed_ptr->rmPeaks(min_mz, max_mz);
+    seed_ptr->seedRmPeaks(min_mz, max_mz);
   //env_set_util::compPeakStartEndIdx(matrix_ptr, seed_ptr, mass_tol);
   bool valid = evalEnv(matrix_ptr, seed_ptr, mass_tol, corr_tol, sn_ratio);
   if (seed_ptr->getSpecId() >= matrix_ptr->getRowNum()) {
@@ -46,7 +46,7 @@ bool evalEnv(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
   ExpEnvelopePtr exp_env_ptr 
     = env_set_util::getMatchExpEnv(matrix_ptr, seed_ptr, seed_ptr->getSpecId(), mass_tol);
   std::vector<double> exp_env_mass = exp_env_ptr->getPosList();
-  std::vector<double> seed_env_mass = seed_ptr->getPosList();
+  std::vector<double> seed_env_mass = seed_ptr->getMzList();
   std::vector<double> exp_env_inte = exp_env_ptr->getInteList();
   std::vector<double> seed_env_inte = seed_ptr->getInteList();
   int num_peaks = seed_env_inte.size();
@@ -58,7 +58,7 @@ bool evalEnv(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
       scaled_inte = 0;
     scaled_theo_inte.push_back(scaled_inte);
   }
-  EnvPeakPtrVec seed_env_peaks = seed_ptr->getPeakList();
+  EnvPeakPtrVec seed_env_peaks = seed_ptr->getPeakPtrList();
   for (int j = num_peaks-1; j >= 0; j--) {
     if (scaled_theo_inte[j] == 0) {
       scaled_theo_inte.erase(scaled_theo_inte.begin() + j);
@@ -66,7 +66,7 @@ bool evalEnv(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
       exp_env_inte.erase(exp_env_inte.begin() + j);
     }
   }
-  seed_ptr->setPeakList(seed_env_peaks);
+  seed_ptr->setPeakPtrList(seed_env_peaks);
   if (!testChargeState(seed_ptr->getCharge(), scaled_theo_inte)) {
     return false;
   }
@@ -79,7 +79,7 @@ bool simpleEvalEnv(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
   ExpEnvelopePtr exp_env_ptr 
     = env_set_util::getMatchExpEnv(matrix_ptr, seed_ptr, spec_id, mass_tol);
   std::vector<double> exp_env_mass = exp_env_ptr->getPosList();
-  std::vector<double> seed_env_mass = seed_ptr->getPosList();
+  std::vector<double> seed_env_mass = seed_ptr->getMzList();
   std::vector<double> exp_env_inte = exp_env_ptr->getInteList();
   std::vector<double> seed_env_inte = seed_ptr->getInteList();
   int num_peaks = seed_env_inte.size();
@@ -92,7 +92,7 @@ bool simpleEvalEnv(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
       scaled_inte = 0;
     scaled_theo_inte.push_back(scaled_inte);
   }
-  EnvPeakPtrVec seed_env_peaks = seed_ptr->getPeakList();
+  EnvPeakPtrVec seed_env_peaks = seed_ptr->getPeakPtrList();
   for (int j = num_peaks-1; j >= 0; j--) {
     if (scaled_theo_inte[j] == 0) {
       scaled_theo_inte.erase(scaled_theo_inte.begin() + j);
@@ -100,7 +100,7 @@ bool simpleEvalEnv(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
       exp_env_inte.erase(exp_env_inte.begin() + j);
     }
   }
-  seed_ptr->setPeakList(seed_env_peaks);
+  seed_ptr->setPeakPtrList(seed_env_peaks);
   if (seed_env_inte.size() < 1) {
     return false;
   }
@@ -128,7 +128,7 @@ bool simplePreprocessEnv(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
   double min_mz = matrix_ptr->getMinMz() - mass_tol;
   double max_mz = matrix_ptr->getMaxMz() + mass_tol;
   std::vector<double> seed_env_inte = seed_ptr->getInteList();
-  seed_ptr->rmPeaks(min_mz, max_mz);
+    seed_ptr->seedRmPeaks(min_mz, max_mz);
   seed_env_inte = seed_ptr->getInteList();
   //env_set_util::compPeakStartEndIdx(matrix_ptr, seed_ptr, mass_tol);
   seed_env_inte = seed_ptr->getInteList();

@@ -61,44 +61,50 @@ class Env {
 
   void shift(int shift);
 
-  double getMinMz() {return peaks_[0]->getPosition();}
+  double getMinMz() {return peak_ptr_list_[0]->getPosition();}
 
-  double getMaxMz() {return peaks_[peaks_.size()-1]->getPosition();}
+  double getMaxMz() {return peak_ptr_list_[peak_ptr_list_.size() - 1]->getPosition();}
 
   double getMonoMz() {return mono_mz_;}
 
   double getMonoNeutralMass() {return peak_util::compPeakNeutralMass(mono_mz_, charge_);}
 
   // get the m/z difference between mono_mz and reference peak 
-  double getMonoReferDistance() {return peaks_[refer_idx_]->getPosition() - mono_mz_;}
+  double getMonoReferDistance() {return peak_ptr_list_[refer_idx_]->getPosition() - mono_mz_;}
 
   double getAvgMz();
 
   double getAvgNeutralMass() {return peak_util::compPeakNeutralMass(getAvgMz(), charge_);}
 
-  double getReferMz() {return peaks_[refer_idx_]->getPosition();}
+  double getReferMz() {return peak_ptr_list_[refer_idx_]->getPosition();}
 
   double getReferNeutralMass() {return peak_util::compPeakNeutralMass(getReferMz(), charge_);}
 
-  double getMz(int i) {return peaks_[i]->getPosition();}
+  double getMz(int i) {return peak_ptr_list_[i]->getPosition();}
+
+  std::vector<double> getMzList();
 
   int getReferIdx() {return refer_idx_;}
 
-  double getIntensity(int i) {return peaks_[i]->getIntensity();}
+  double getInte(int i) {return peak_ptr_list_[i]->getIntensity();}
 
-  double getReferIntensity() {return peaks_[refer_idx_]->getIntensity();}
+  double getReferInte() {return peak_ptr_list_[refer_idx_]->getIntensity();}
 
-  std::vector<double> getIntensities();
+  std::vector<double> getInteList();
 
-  double compIntensitySum();
+  double compInteSum();
 
   int getCharge() {return charge_;}
 
-  int getPeakNum() {return peaks_.size();}
+  int getPeakNum() {return peak_ptr_list_.size();}
 
-  EnvPeakPtr getPeakPtr(int i) {return peaks_[i];}
+  EnvPeakPtr getPeakPtr(int i) {return peak_ptr_list_[i];}
 
-  void setIntensity(int i, double intensity) {peaks_[i]->setIntensity(intensity);}
+  EnvPeakPtrVec getPeakPtrList() {return peak_ptr_list_;}
+
+  void setPeakPtrList(EnvPeakPtrVec peak_ptr_list) { peak_ptr_list_ = peak_ptr_list;}
+
+  void setInte(int i, double intensity) {peak_ptr_list_[i]->setIntensity(intensity);}
 
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
@@ -112,7 +118,7 @@ class Env {
   // Theoretical m/z value of monoisotopic ion 
   double mono_mz_;
   // peak list
-  EnvPeakPtrVec peaks_;
+  EnvPeakPtrVec peak_ptr_list_;
 
   //used in finding the reference index
   int getHighestPeakIdx();

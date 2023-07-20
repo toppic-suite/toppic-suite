@@ -83,7 +83,7 @@ void process(TopfdParaPtr topfd_para_ptr) {
     }
     seed_ptr_2d.push_back(one_spec_seed_ptrs);
   }
-  std::sort(seed_ptrs.begin(), seed_ptrs.end(), SeedEnvelope::cmpInteDec);
+    std::sort(seed_ptrs.begin(), seed_ptrs.end(), SeedEnvelope::cmpSeedInteDec);
   // write_out_files::write_seed_envelopes(seed_envs, "envs.csv");
 
   double sn_ratio = topfd_para_ptr->getMsOneSnRatio();
@@ -142,7 +142,7 @@ void process(TopfdParaPtr topfd_para_ptr) {
   
   /*
   for (size_t z = 0; z < env_coll_list.size(); z++) {
-    double mass = env_coll_list[z]->getMass();
+    double mass = env_coll_list[z]->getMonoNeutralMass();
     if (mass > 10059.3 && mass < 10059.4) {
       LOG_ERROR("Step 3 Mass " << mass << " env set list length " <<
                 env_coll_list[z]->getEnvSetList().size()); 

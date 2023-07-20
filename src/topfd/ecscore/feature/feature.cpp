@@ -41,9 +41,9 @@ Feature::Feature(EnvCollPtr env_coll_ptr, MsMapPtr matrix_ptr,
   max_scan_ = env_coll_ptr->getEndSpecId();
   min_charge_ = env_coll_ptr->getMinCharge();
   max_charge_ = env_coll_ptr->getMaxCharge();
-  mono_mass_ = seed_ptr->getMass();
+  mono_mass_ = seed_ptr->getMonoNeutralMass();
   rep_charge_ = seed_ptr->getCharge();
-  rep_mz_ = seed_ptr->getPos();
+  rep_mz_ = seed_ptr->getMonoMz();
 
   abundance_ = env_coll_ptr->getIntensity(sn_ratio, matrix_ptr->getBaseInte());
 
@@ -223,8 +223,8 @@ bool Feature::getNewFeature(MsHeaderPtr header_ptr, MsMapPtr matrix_ptr,
   bool valid = false;
   if (selected_seed_list.size() > 0) {
     // choose the highest intensity one
-    std::sort(selected_seed_list.begin(), selected_seed_list.end(),
-              SeedEnvelope::cmpInteDec); 
+      std::sort(selected_seed_list.begin(), selected_seed_list.end(),
+                SeedEnvelope::cmpSeedInteDec);
     seed_ptr = selected_seed_list[0];  
     valid = seed_env_util::simplePreprocessEnv(matrix_ptr, seed_ptr, 
                                                score_para_ptr, sn_ratio); 
@@ -268,10 +268,10 @@ bool Feature::getNewFeature(MsHeaderPtr header_ptr, MsMapPtr matrix_ptr,
     frac_feature_ptr->setEcscore(feature_ptr->getScore());
     frac_feature_ptr->setHasMs2Spec(true);
     frac_feature_list.push_back(frac_feature_ptr);
-    double prec_mono_mass = seed_ptr->getMass();
+    double prec_mono_mass = seed_ptr->getMonoNeutralMass();
     int prec_charge = seed_ptr->getCharge();
     double prec_mono_mz = peak_util::compMz(prec_mono_mass, prec_charge);
-    double prec_inte = seed_ptr->getInte();
+    double prec_inte = seed_ptr->getSeedInte();
     SpecFeaturePtr ms2_feature_ptr = std::make_shared<SpecFeature>(header_ptr, frac_feature_ptr,
                                                                    prec_mono_mz, prec_charge, prec_inte);
     ms2_feature_list.push_back(ms2_feature_ptr);

@@ -32,7 +32,7 @@ class EnvSet {
 
   int getCharge() { return seed_ptr_->getCharge(); }
 
-  double getMass() { return seed_ptr_->getMass(); }
+  double getMass() { return seed_ptr_->getMonoNeutralMass(); }
 
   int getBaseSpecId() { return xic_ptr_->getBaseSpecId(); }
 
@@ -56,7 +56,7 @@ class EnvSet {
 
   std::vector<double> getSeedInteList() {return seed_ptr_->getInteList(); }
 
-  std::vector<double> getSeedMzList() {return seed_ptr_->getPosList(); }
+  std::vector<double> getSeedMzList() {return seed_ptr_->getMzList(); }
 
   std::vector<double> compExpInteSumList();
 

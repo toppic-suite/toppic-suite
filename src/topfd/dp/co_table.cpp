@@ -32,8 +32,8 @@ int CoTable::cntTableSize(MatchEnvPtr2D &win_envs, int win, int pnt) {
 // check if splitting the peak intensity can increase the peak similarity score.
 bool CoTable::checkCoexist(MatchEnvPtr env_a, MatchEnvPtr env_b, int pos_a,
                            int pos_b, double tolerance) {
-  double inte_a = env_a->getTheoEnvPtr()->getIntensity(pos_a);
-  double inte_b = env_b->getTheoEnvPtr()->getIntensity(pos_b);
+  double inte_a = env_a->getTheoEnvPtr()->getInte(pos_a);
+  double inte_b = env_b->getTheoEnvPtr()->getInte(pos_b);
   double inte_sum = inte_a + inte_b;
   double score_a = env_a->calcPeakScr(pos_a, inte_a, tolerance);
   double new_score_a = env_a->calcPeakScr(pos_a, inte_sum, tolerance);

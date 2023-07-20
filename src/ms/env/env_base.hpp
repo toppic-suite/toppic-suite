@@ -33,6 +33,8 @@ class EnvBase {
   // All public functions are static 
   static EnvPtr getEnvByMonoMass(double mass);
 
+  static EnvPtr getEnvByMonoMass(double mass, int charge);
+
   static EnvPtr getEnvByRefMass(double mass);
 
   static double convertMonoMassToAvgMass(double mass);

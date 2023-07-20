@@ -15,34 +15,26 @@
 #include "common/base/mass_constant.hpp"
 #include "ms/spec/peak_util.hpp"
 #include "ms/env/env_base.hpp"
-#include "topfd/ecscore/envelope/env_simple_peak.hpp"
 #include "topfd/ecscore/envelope/seed_envelope.hpp"
 
 namespace toppic {
 
-EnvPtr getTheoEnv(double mono_mass, int charge) {
-  EnvPtr ref_env_ptr = toppic::EnvBase::getEnvByMonoMass(mono_mass);
-  if (ref_env_ptr == nullptr) {
-    return nullptr;
-  }
-  double mono_mz = peak_util::compMz(mono_mass, charge);
-  EnvPtr theo_env_ptr = ref_env_ptr->distrToTheoMono(mono_mz, charge);
-  return theo_env_ptr;
-}
-
 SeedEnvelope::SeedEnvelope(DeconvPeakPtr peak_ptr) {
-  spec_id_ = peak_ptr->getSpId();
-  env_id_ = peak_ptr->getPeakId();
-  mass_ = peak_ptr->getMonoMass();
-  pos_ = peak_ptr->getMonoMz();
-  inte_ = peak_ptr->getIntensity();
+  //init for parent class
+  mono_mz_ = peak_ptr->getMonoMz();
   charge_ = peak_ptr->getCharge();
-  EnvPtr theo_env_ptr = getTheoEnv(mass_, charge_);
-  for (int j = 0; j < theo_env_ptr->getPeakNum(); j++) {
-    EnvPeakPtr p_ptr = std::make_shared<EnvPeak>(theo_env_ptr->getMz(j),
-                                                 theo_env_ptr->getIntensity(j));
+  double mass = peak_ptr->getMonoMass();
+  EnvPtr theo_env_ptr = EnvBase::getEnvByMonoMass(mass, charge_);
+  refer_idx_ = theo_env_ptr->getReferIdx();
+  for (int i = 0; i < theo_env_ptr->getPeakNum(); i++) {
+    EnvPeakPtr p_ptr = std::make_shared<EnvPeak>(theo_env_ptr->getMz(i),
+                                                 theo_env_ptr->getInte(i));
     peak_ptr_list_.push_back(p_ptr);
   }
+  // init for seed envelope
+  spec_id_ = peak_ptr->getSpId();
+  env_id_ = peak_ptr->getPeakId();
+  seed_inte_ = peak_ptr->getIntensity();
 }
 
 SeedEnvelope::SeedEnvelope(int spec_id, int env_id, double pos, double mass,
@@ -50,9 +42,8 @@ SeedEnvelope::SeedEnvelope(int spec_id, int env_id, double pos, double mass,
                            std::vector<double> inte_list) {
   spec_id_ = spec_id;
   env_id_ = env_id;
-  pos_ = pos;
-  mass_ = mass;
-  inte_ = inte;
+  mono_mz_ = pos;
+    seed_inte_ = inte;
   charge_ = charge;
   int num_peaks = pos_list.size();
   for (int i = 0; i < num_peaks; i++) {
@@ -64,25 +55,26 @@ SeedEnvelope::SeedEnvelope(int spec_id, int env_id, double pos, double mass,
 SeedEnvelope::SeedEnvelope(SeedEnvelopePtr env_ptr) {
   spec_id_ = env_ptr->spec_id_;
   env_id_ = env_ptr->env_id_;
-  pos_ = env_ptr->pos_;
-  mass_ = env_ptr->mass_;
-  inte_ = env_ptr->inte_;
+  mono_mz_ = env_ptr->mono_mz_;
+  seed_inte_ = env_ptr->seed_inte_;
   charge_ = env_ptr->charge_;
-  EnvPtr theo_env_ptr = getTheoEnv(mass_, charge_);
+  double mass = env_ptr->getMonoNeutralMass();
+  EnvPtr theo_env_ptr = EnvBase::getEnvByMonoMass(mass, charge_);
+  refer_idx_ = theo_env_ptr->getReferIdx();
   for (int j = 0; j < theo_env_ptr->getPeakNum(); j++) {
     EnvPeakPtr p_ptr = std::make_shared<EnvPeak>(theo_env_ptr->getMz(j),
-                                                 theo_env_ptr->getIntensity(j));
+                                                 theo_env_ptr->getInte(j));
     peak_ptr_list_.push_back(p_ptr);
   }
 }
 
 SeedEnvelope::SeedEnvelope(SeedEnvelopePtr env_ptr, int new_charge) {
+  double mass = env_ptr->getMonoNeutralMass(); 
   spec_id_ = env_ptr->spec_id_;
-  env_id_ = -1; 
-  mass_ = env_ptr->mass_;
-  inte_ = env_ptr->inte_;
+  env_id_ = -1;
+    seed_inte_ = env_ptr->seed_inte_;
   charge_ = new_charge;
-  pos_ = peak_util::compMz(mass_, charge_);
+  mono_mz_ = peak_util::compMz(mass, charge_);
 
   int old_charge = env_ptr->getCharge();
   for (auto &i: env_ptr->peak_ptr_list_) {
@@ -96,65 +88,36 @@ SeedEnvelope::SeedEnvelope(SeedEnvelopePtr env_ptr, int new_charge) {
 }
 
 double SeedEnvelope::getReferMz() {
-  double ref_mass = EnvBase::convertMonoMassToRefMass(mass_);
+  double mono_mass = getMonoNeutralMass();
+  double ref_mass = EnvBase::convertMonoMassToRefMass(mono_mass);
   double ref_mz = peak_util::compMz(ref_mass, charge_);
   return ref_mz;
 }
 
-std::vector<double> SeedEnvelope::getPosList() {
-  std::vector<double> pos_list;
-  for (auto p: peak_ptr_list_)
-    pos_list.push_back(p->getPosition());
-  return pos_list;
-}
-
-std::vector<double> SeedEnvelope::getInteList() {
-  std::vector<double> inte_list;
-  for (auto p: peak_ptr_list_)
-    inte_list.push_back(p->getIntensity());
-  return inte_list;
-}
-
-void SeedEnvelope::rmPeaks(double min_pos, double max_pos) {
+void SeedEnvelope::seedRmPeaks(double min_pos, double max_pos) {
   EnvPeakPtrVec new_ptr_list;
   for (auto p: peak_ptr_list_) {
     if (p->getPosition() >= min_pos && p->getPosition() <= max_pos)
       new_ptr_list.push_back(p);
   }
-  peak_ptr_list_ = new_ptr_list;
+    peak_ptr_list_ = new_ptr_list;
 }
 
-void SeedEnvelope::changeCharge(int new_charge) {
-  for (auto &p: peak_ptr_list_) {
-    double new_pos = (((p->getPosition() - mass_constant::getProtonMass()) * charge_) / new_charge) 
-      + mass_constant::getProtonMass();
-    p->setPosition(new_pos);
-  }
-  pos_ = (((pos_ - mass_constant::getProtonMass()) * charge_) / new_charge) 
-    + mass_constant::getProtonMass();
-  charge_ = new_charge;
-}
 
-void SeedEnvelope::shift(double shift_num) {
+void SeedEnvelope::seedShiftIsotope(double shift_num) {
   double shift_mass = shift_num * mass_constant::getIsotopeMass();
   double shift_mz = shift_mass / charge_;
-  pos_ = pos_ + shift_mz;
-  mass_ = mass_ + shift_mass;
+  mono_mz_ = mono_mz_ + shift_mz;
   for (auto &p: peak_ptr_list_)
     p->setPosition(p->getPosition() + shift_mz);
 }
 
-void SeedEnvelope::setPeakList(EnvPeakPtrVec new_peak_list) {
-  peak_ptr_list_ = new_peak_list;
-}
-
 std::string SeedEnvelope::getString() {
   std::string header = "Spec ID: " + std::to_string(spec_id_) + " " +
-    "Env ID: " + std::to_string(env_id_) + " " +
-    "Pos: " + std::to_string(pos_) + " " +
-    "Inte: " + std::to_string(inte_) + " " +
-    "Mass: " + std::to_string(mass_) + " " +
-    "Charge: " + std::to_string(charge_) + "\n";
+                       "Env ID: " + std::to_string(env_id_) + " " +
+                       "Pos: " + std::to_string(mono_mz_) + " " +
+                       "Inte: " + std::to_string(seed_inte_) + " " +
+                       "Charge: " + std::to_string(charge_) + "\n";
   std::string peaks = "(";
   for (auto peak: peak_ptr_list_)
     peaks = peaks + "(" + std::to_string(peak->getPosition()) + ", " 

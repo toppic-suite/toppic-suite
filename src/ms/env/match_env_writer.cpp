@@ -38,13 +38,13 @@ void write_env(std::ofstream &file, MsHeaderPtr header, MatchEnvPtr match_env) {
   file << "REAL_MONO_MZ=" << real_env->getMonoMz() << std::endl;
   file << "THEO_MONO_MASS=" << theo_env->getMonoNeutralMass() << std::endl;
   file << "REAL_MONO_MASS=" << real_env->getMonoNeutralMass() << std::endl;
-  file << "THEO_INTE_SUM=" << theo_env->compIntensitySum() << std::endl;
-  file << "REAL_INTE_SUM=" << real_env->compIntensitySum() << std::endl;
+  file << "THEO_INTE_SUM=" << theo_env->compInteSum() << std::endl;
+  file << "REAL_INTE_SUM=" << real_env->compInteSum() << std::endl;
 
   for (int i = 0; i < theo_env->getPeakNum(); i++) {
-    file << theo_env->getMz(i) << " " << theo_env->getIntensity(i) << " "
-        << (real_env->isExist(i) ? "True" : "False") << " " << real_env->getPeakIdx(i) << " "
-        << real_env->getMz(i) << " " << real_env->getIntensity(i) << std::endl;
+    file << theo_env->getMz(i) << " " << theo_env->getInte(i) << " "
+         << (real_env->isExist(i) ? "True" : "False") << " " << real_env->getPeakIdx(i) << " "
+         << real_env->getMz(i) << " " << real_env->getInte(i) << std::endl;
   }
 
   file << "END ENVELOPE" << std::endl;

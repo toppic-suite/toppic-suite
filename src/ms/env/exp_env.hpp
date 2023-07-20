@@ -37,9 +37,9 @@ class ExpEnv : public Env {
 
   int getMaxConsPeakNum() {return max_consecutive_peak_num_;}
 
-  int getPeakIdx(int i) {return peaks_[i]->getIdx();}
+  int getPeakIdx(int i) {return peak_ptr_list_[i]->getIdx();}
 
-  int getReferPeakIdx() {return peaks_[refer_idx_]->getIdx();}
+  int getReferPeakIdx() {return peak_ptr_list_[refer_idx_]->getIdx();}
 
   void setSpId(int sp_id) {sp_id_ = sp_id;}
 

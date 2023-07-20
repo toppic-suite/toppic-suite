@@ -43,7 +43,7 @@ ExpEnv::ExpEnv(const PeakPtrVec &peak_list, EnvPtr theo_env,
 void ExpEnv::mapPeakList(const PeakPtrVec &peak_list, EnvPtr theo_env,
                          double tolerance, double min_inte) {
   int peak_num = theo_env->getPeakNum();
-  peaks_.clear();
+  peak_ptr_list_.clear();
   for (int i = 0; i < peak_num; i++) {
     //PeakPtr peak_ptr(new Peak(theo_env->getMz(i), 0));
     int idx = peak_list_util::getNearPeakIdx(peak_list, theo_env->getMz(i), tolerance);
@@ -51,14 +51,14 @@ void ExpEnv::mapPeakList(const PeakPtrVec &peak_list, EnvPtr theo_env,
       double mz = peak_list[idx]->getPosition();
       double inte = peak_list[idx]->getIntensity();
       EnvPeakPtr peak_ptr = std::make_shared<EnvPeak>(mz, inte, idx); 
-      peaks_.push_back(peak_ptr);
+      peak_ptr_list_.push_back(peak_ptr);
     }
     else {
       idx = EnvPeak::getNonExistPeakIdx();
       double mz = theo_env->getMz(i);
       double inte = 0.0;
       EnvPeakPtr peak_ptr = std::make_shared<EnvPeak>(mz, inte, idx); 
-      peaks_.push_back(peak_ptr);
+      peak_ptr_list_.push_back(peak_ptr);
     }
   }
 }
@@ -67,14 +67,14 @@ void ExpEnv::mapPeakList(const PeakPtrVec &peak_list, EnvPtr theo_env,
 // same real peak, only the one with less mz error is kept.
 void ExpEnv::remvDuplMatch(EnvPtr theo_env) {
   for (int i = 0; i < getPeakNum() - 1; i++) {
-    if (isExist(i) && peaks_[i]->getIdx() == peaks_[i + 1]->getIdx()) {
-      if (std::abs(theo_env->getMz(i) - peaks_[i]->getPosition()) 
-          < std::abs(theo_env->getMz(i + 1) - peaks_[i + 1]->getPosition())) {
-        peaks_[i+1]->setIdx(EnvPeak::getNonExistPeakIdx());
-        peaks_[i+1]->setIntensity(0.0);
+    if (isExist(i) && peak_ptr_list_[i]->getIdx() == peak_ptr_list_[i + 1]->getIdx()) {
+      if (std::abs(theo_env->getMz(i) - peak_ptr_list_[i]->getPosition())
+          < std::abs(theo_env->getMz(i + 1) - peak_ptr_list_[i + 1]->getPosition())) {
+        peak_ptr_list_[i + 1]->setIdx(EnvPeak::getNonExistPeakIdx());
+        peak_ptr_list_[i + 1]->setIntensity(0.0);
       } else {
-        peaks_[i]->setIdx(EnvPeak::getNonExistPeakIdx());
-        peaks_[i]->setIntensity(0.0);
+        peak_ptr_list_[i]->setIdx(EnvPeak::getNonExistPeakIdx());
+        peak_ptr_list_[i]->setIntensity(0.0);
       }
     }
   }
@@ -107,7 +107,7 @@ void ExpEnv::cntMaxConsPeakNum() {
 }
 
 bool ExpEnv::isExist(int i) {
-  return peaks_[i]->isExist();
+  return peak_ptr_list_[i]->isExist();
 }
 
 bool ExpEnv::testPeakShare(ExpEnvPtr a, ExpEnvPtr  b) {
@@ -136,8 +136,8 @@ void ExpEnv::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   xml_doc->addElement(element, "miss_peak_num", str.c_str());
   str = str_util::toString(max_consecutive_peak_num_);
   xml_doc->addElement(element, "max_consecutive_peak_num", str.c_str());
-  for (size_t i = 0; i < peaks_.size(); i++) {
-    peaks_[i]->appendXml(xml_doc, element);
+  for (size_t i = 0; i < peak_ptr_list_.size(); i++) {
+    peak_ptr_list_[i]->appendXml(xml_doc, element);
   }
   parent->appendChild(element);
 }

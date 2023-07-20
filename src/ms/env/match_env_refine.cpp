@@ -48,13 +48,13 @@ void mzRefine(MatchEnvPtr env) {
   int max_back_peak_num = real_env->getReferIdx();
   int max_forw_peak_num = real_env->getPeakNum() - real_env->getReferIdx() - 1;
   EnvPtr theo_env = ext_refer_env->distrToTheoRef(cur_mz, charge);
-  double max_inte = theo_env->getReferIntensity();
+  double max_inte = theo_env->getReferInte();
   theo_env->changeIntensity(1.0 / max_inte);
 
   EnvPtr cur_env = theo_env->getSubEnv(max_back_peak_num, max_forw_peak_num);
 
   theo_env = ext_refer_env->distrToTheoRef(prev_mz, charge);
-  max_inte = theo_env->getReferIntensity();
+  max_inte = theo_env->getReferInte();
   theo_env->changeIntensity(1.0 / max_inte);
   EnvPtr prev_env;
   if (max_back_peak_num >= 1 && real_env->isExist(real_env->getReferIdx() - 1)) {
@@ -64,7 +64,7 @@ void mzRefine(MatchEnvPtr env) {
   }
 
   theo_env = ext_refer_env->distrToTheoRef(next_mz, charge);
-  max_inte = theo_env->getReferIntensity();
+  max_inte = theo_env->getReferInte();
   theo_env->changeIntensity(1.0 / max_inte);
 
   EnvPtr next_env;
@@ -102,7 +102,7 @@ void compEnvDist(EnvPtr real_env, EnvPtr theo_env,
   if (theo_env == nullptr) {
     dist = std::numeric_limits<double>::infinity();
   } else {
-    compDistWithNorm(real_env->getIntensities(), theo_env->getIntensities(),
+    compDistWithNorm(real_env->getInteList(), theo_env->getInteList(),
                      dist, ratio);
   }
 }

@@ -27,7 +27,7 @@ EnvPeakPair::EnvPeakPair(EnvPeakPairPtr pair_ptr) {
 }
 
 double EnvPeakPair::getTheoIntensity() {
-  return env_ptr_->getTheoEnvPtr()->getIntensity(pos_idx_);
+  return env_ptr_->getTheoEnvPtr()->getInte(pos_idx_);
 }
 
 double EnvPeakPair::getPeakScore(double intensity_sum, double tolerance) {

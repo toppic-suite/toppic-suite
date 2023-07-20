@@ -94,7 +94,7 @@ double MatchEnv::calcScrWithSftRatio(double shift, double ratio, double toleranc
     double mz_factor = calcMzFactor(i, shift, tolerance);
     double intensity_factor = calcIntensityFactor(i, ratio);
     double peak_score = mz_factor * intensity_factor
-        * calcNormInteScr(theo_env_ptr_->getIntensity(i) * ratio);
+        * calcNormInteScr(theo_env_ptr_->getInte(i) * ratio);
     s += peak_score;
   }
   return s;
@@ -136,8 +136,8 @@ double MatchEnv::calcIntensityFactor(double theo_inte, double real_inte) {
 double MatchEnv::calcIntensityFactor(int id_x, double ratio) {
   double factor;
   if (exp_env_ptr_->isExist(id_x)) {
-    factor = calcIntensityFactor(theo_env_ptr_->getIntensity(id_x) * ratio,
-                                 exp_env_ptr_->getIntensity(id_x));
+    factor = calcIntensityFactor(theo_env_ptr_->getInte(id_x) * ratio,
+                                 exp_env_ptr_->getInte(id_x));
   } else {
     factor = 0;
   }
@@ -148,15 +148,15 @@ double MatchEnv::calcPeakScr(int id_x, double inte_sum, double tolerance) {
   double mz_factor = calcMzFactor(id_x, 0, tolerance);
   double intensity_factor = calcShareInteAccu(id_x, inte_sum);
   double peak_score = mz_factor * intensity_factor
-      * calcNormInteScr(theo_env_ptr_->getIntensity(id_x));
+      * calcNormInteScr(theo_env_ptr_->getInte(id_x));
   return peak_score;
 }
 
 double MatchEnv::calcShareInteAccu(int id_x, double inte_sum) {
   double intensity_factor;
-  double theo_intensity = theo_env_ptr_->getIntensity(id_x);
+  double theo_intensity = theo_env_ptr_->getInte(id_x);
   if (exp_env_ptr_->isExist(id_x)) {
-    double real_intensity = exp_env_ptr_->getIntensity(id_x);
+    double real_intensity = exp_env_ptr_->getInte(id_x);
     double share_ratio = theo_intensity / inte_sum;
     double share_intensity = real_intensity * share_ratio;
     intensity_factor = calcIntensityFactor(theo_intensity, share_intensity);

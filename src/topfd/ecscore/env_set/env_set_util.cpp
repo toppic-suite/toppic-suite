@@ -135,7 +135,7 @@ MsMapPeakPtr pickExpPeak(MsMapPtr matrix_ptr, EnvPeakPtr seed_peak_ptr,
 ExpEnvelopePtr getMatchExpEnv(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
                               int sp_id, double mass_tol) {
   MsMapPeakPtrVec peak_list;
-  EnvPeakPtrVec peaks = seed_ptr->getPeakList();
+  EnvPeakPtrVec peaks = seed_ptr->getPeakPtrList();
   for (auto& seed_peak : peaks) {
     if (seed_peak != nullptr) {
       MsMapPeakPtr peak = pickExpPeak(matrix_ptr, seed_peak, sp_id, mass_tol);

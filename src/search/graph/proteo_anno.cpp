@@ -83,7 +83,7 @@ void ProteoAnno::anno(const std::string &seq, bool is_complete) {
       ResiduePtr empty_residue_ptr = ResidueBase::getEmptyResiduePtr();
       // LOG_DEBUG("empty acid mass " << acid_ptr->getMonoMass());
       // LOG_DEBUG("empty ptm mass " << ptm_ptr->getMonoMass());
-      LOG_DEBUG("empty residue mass " << empty_residue_ptr->getMass());
+      LOG_DEBUG("empty residue mass " << empty_residue_ptr->getMonoNeutralMass());
       if (empty_residue_ptr == nullptr) {
         LOG_ERROR("Proteoform:: residue not found");
         throw("Residue not found");

@@ -27,7 +27,7 @@ VarPtmSlowMatch::VarPtmSlowMatch(ProteoformPtr proteo_ptr,
   deconv_ms_ptr_vec_ = spectrum_set_ptr->getDeconvMsPtrVec();
   ms_six_ptr_vec_ = spectrum_set_ptr->getMsSixPtrVec();
   prec_mono_mass_ = spectrum_set_ptr->getPrecMonoMass();
-  //LOG_ERROR("prec mass " << prec_mono_mass_ << " protein mass " << proteo_ptr->getMass());
+  //LOG_ERROR("prec mass " << prec_mono_mass_ << " protein mass " << proteo_ptr->getMonoNeutralMass());
   mng_ptr_ = mng_ptr;
   PeakTolerancePtr tole_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
   prec_error_tole_ = deconv_ms_ptr_vec_[0]->getMsHeaderPtr()->getFirstPrecErrorTolerance(tole_ptr->getPpo());

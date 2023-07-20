@@ -113,6 +113,17 @@ EnvPtr EnvBase::getEnvByRefMass(double mass) {
   return env_base_ptr_->getBaseEnvByRefMass(mass);
 }
 
+EnvPtr EnvBase::getEnvByMonoMass(double mono_mass, int charge) {
+  EnvPtr ref_env_ptr = getEnvByMonoMass(mono_mass);
+  if (ref_env_ptr == nullptr) {
+    return nullptr;
+  }
+  double mono_mz = peak_util::compMz(mono_mass, charge);
+  EnvPtr theo_env_ptr = ref_env_ptr->distrToTheoMono(mono_mz, charge);
+  return theo_env_ptr;
+}
+
+
 double EnvBase::convertMonoMassToAvgMass(double mass) {
   EnvPtr env_ptr = env_base_ptr_->getBaseEnvByMonoMass(mass);
   if (env_ptr == nullptr) {

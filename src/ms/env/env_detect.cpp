@@ -31,11 +31,11 @@ double calcInteRatio(const PeakPtrVec &peak_list, EnvPtr theo_env_ptr,
   double mz = theo_env_ptr->getMz(refer_idx);
   int peak_idx = peak_list_util::getNearPeakIdx(peak_list, mz, tolerance);
   if (peak_idx >= 0) {
-    theo_sum += theo_env_ptr->getIntensity(refer_idx);
+    theo_sum += theo_env_ptr->getInte(refer_idx);
     obs_sum += peak_list[peak_idx]->getIntensity();
   }
   if (refer_idx - 1 >= 0) {
-    theo_sum += theo_env_ptr->getIntensity(refer_idx - 1);
+    theo_sum += theo_env_ptr->getInte(refer_idx - 1);
     mz = theo_env_ptr->getMz(refer_idx-1);
     peak_idx = peak_list_util::getNearPeakIdx(peak_list, mz, tolerance);
     if (peak_idx >= 0) {
@@ -43,7 +43,7 @@ double calcInteRatio(const PeakPtrVec &peak_list, EnvPtr theo_env_ptr,
     }
   }
   if (refer_idx + 1 < theo_env_ptr->getPeakNum()) {
-    theo_sum += theo_env_ptr->getIntensity(refer_idx + 1);
+    theo_sum += theo_env_ptr->getInte(refer_idx + 1);
     mz = theo_env_ptr->getMz(refer_idx + 1);
     peak_idx = peak_list_util::getNearPeakIdx(peak_list, mz, tolerance);
     if (peak_idx >= 0) {

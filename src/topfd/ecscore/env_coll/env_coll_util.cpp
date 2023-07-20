@@ -251,7 +251,7 @@ EnvCollPtr findEnvColl(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
   int end_spec_id = env_set_ptr->getEndSpecId();
   /*
   if (new_seed_ptr->getMass() > 10059.3 && new_seed_ptr->getMass() < 10059.4) {
-    LOG_ERROR("Mass " << new_seed_ptr->getMass() << " env set list length " <<
+    LOG_ERROR("Mass " << new_seed_ptr->getMonoNeutralMass() << " env set list length " <<
               env_set_list.size());
   }
   */

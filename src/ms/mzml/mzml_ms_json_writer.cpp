@@ -91,7 +91,7 @@ void write(std::string &file_name, MzmlMsPtr ms_ptr, MatchEnvPtrVec &envs) {
     for (int k = 0; k < theo_env->getPeakNum(); k++) {
       rapidjson::Value peak(rapidjson::kObjectType);
       peak.AddMember("mz", theo_env->getMz(k), allocator);
-      peak.AddMember("intensity", theo_env->getIntensity(k), allocator);
+      peak.AddMember("intensity", theo_env->getInte(k), allocator);
       env_peaks.PushBack(peak, allocator);
     }
     env.AddMember("env_peaks", env_peaks, allocator);

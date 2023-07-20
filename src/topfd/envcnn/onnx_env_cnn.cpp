@@ -78,7 +78,7 @@ void extractTheoPeakData(EnvPtr &theo_env,
                          std::vector<double> &theo_intes) {
   for (int i = 0; i < theo_env->getPeakNum(); i++) {
     theo_mass.push_back(theo_env->getMz(i));
-    theo_intes.push_back(theo_env->getIntensity(i));
+    theo_intes.push_back(theo_env->getInte(i));
   }
 }
 

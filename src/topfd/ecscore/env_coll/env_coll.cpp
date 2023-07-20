@@ -74,7 +74,7 @@ void EnvColl::refineMonoMass() {
   }
   if (weight > 0) {
     double mz_error = weight_mz_error / weight;
-    seed_ptr_->shift(mz_error * seed_ptr_->getCharge());
+    seed_ptr_->seedShiftIsotope(mz_error * seed_ptr_->getCharge());
   }
   else {
     LOG_INFO("ERROR 0 weight in refine_mono_mass");

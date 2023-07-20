@@ -67,10 +67,10 @@ std::vector<int> findLocalMaxima(std::vector<double> &arr) {
 
 SeedEnvelopePtr getHalfChargeEnv(SeedEnvelopePtr seed_ptr, 
                                  double even_odd_peak_ratio) {
-  double mass = seed_ptr->getMass();
+  double mass = seed_ptr->getMonoNeutralMass();
   int charge = seed_ptr->getCharge();
   double mz = peak_util::compMz(mass, charge);
-  std::vector<double> distribution = seed_ptr->getPosList();
+  std::vector<double> distribution = seed_ptr->getMzList();
   if (even_odd_peak_ratio < 0)
     mz = mz + (distribution[1] - distribution[0]);
   int new_charge = int(charge / 2);
@@ -84,12 +84,12 @@ SeedEnvelopePtr getHalfChargeEnv(SeedEnvelopePtr seed_ptr,
   std::vector<double> env_peaks_mz, env_peaks_inte;
   for (int i = 0; i < theo_env_ptr->getPeakNum(); i++) {
     env_peaks_mz.push_back(theo_env_ptr->getMz(i));
-    env_peaks_inte.push_back(theo_env_ptr->getIntensity(i));
+    env_peaks_inte.push_back(theo_env_ptr->getInte(i));
   }
   SeedEnvelopePtr sp_peak =
-    std::make_shared<SeedEnvelope>(seed_ptr->getSpecId(), seed_ptr->getEnvId(), 
-                                   seed_ptr->getPos(), new_mass, seed_ptr->getInte(),
-                                      new_charge, env_peaks_mz, env_peaks_inte);
+    std::make_shared<SeedEnvelope>(seed_ptr->getSpecId(), seed_ptr->getEnvId(),
+                                   seed_ptr->getMonoMz(), new_mass, seed_ptr->getSeedInte(),
+                                   new_charge, env_peaks_mz, env_peaks_inte);
   return sp_peak;
 }
 
