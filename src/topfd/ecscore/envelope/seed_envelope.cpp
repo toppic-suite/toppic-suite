@@ -39,8 +39,8 @@ SeedEnvelope::SeedEnvelope(DeconvPeakPtr peak_ptr) {
   charge_ = peak_ptr->getCharge();
   EnvPtr theo_env_ptr = getTheoEnv(mass_, charge_);
   for (int j = 0; j < theo_env_ptr->getPeakNum(); j++) {
-    EnvSimplePeakPtr p_ptr = std::make_shared<EnvSimplePeak>(theo_env_ptr->getMz(j), 
-                                                           theo_env_ptr->getIntensity(j));
+    EnvPeakPtr p_ptr = std::make_shared<EnvPeak>(theo_env_ptr->getMz(j),
+                                                 theo_env_ptr->getIntensity(j));
     peak_ptr_list_.push_back(p_ptr);
   }
 }
@@ -56,7 +56,7 @@ SeedEnvelope::SeedEnvelope(int spec_id, int env_id, double pos, double mass,
   charge_ = charge;
   int num_peaks = pos_list.size();
   for (int i = 0; i < num_peaks; i++) {
-    EnvSimplePeakPtr p_ptr = std::make_shared<EnvSimplePeak>(pos_list[i], inte_list[i]); 
+    EnvPeakPtr p_ptr = std::make_shared<EnvPeak>(pos_list[i], inte_list[i]);
     peak_ptr_list_.push_back(p_ptr);
   }
 }
@@ -70,8 +70,8 @@ SeedEnvelope::SeedEnvelope(SeedEnvelopePtr env_ptr) {
   charge_ = env_ptr->charge_;
   EnvPtr theo_env_ptr = getTheoEnv(mass_, charge_);
   for (int j = 0; j < theo_env_ptr->getPeakNum(); j++) {
-    EnvSimplePeakPtr p_ptr = std::make_shared<EnvSimplePeak>(theo_env_ptr->getMz(j), 
-                                                           theo_env_ptr->getIntensity(j));
+    EnvPeakPtr p_ptr = std::make_shared<EnvPeak>(theo_env_ptr->getMz(j),
+                                                 theo_env_ptr->getIntensity(j));
     peak_ptr_list_.push_back(p_ptr);
   }
 }
@@ -89,8 +89,8 @@ SeedEnvelope::SeedEnvelope(SeedEnvelopePtr env_ptr, int new_charge) {
     double old_pos = i->getPosition();
     double neutral_mass = peak_util::compPeakNeutralMass(old_pos, old_charge);
     double new_pos = peak_util::compMz(neutral_mass, new_charge); 
-    EnvSimplePeakPtr p_ptr = std::make_shared<EnvSimplePeak>(new_pos,  
-                                                             i->getIntensity()); 
+    EnvPeakPtr p_ptr = std::make_shared<EnvPeak>(new_pos,
+                                                 i->getIntensity());
     peak_ptr_list_.push_back(p_ptr);
   }
 }
@@ -116,7 +116,7 @@ std::vector<double> SeedEnvelope::getInteList() {
 }
 
 void SeedEnvelope::rmPeaks(double min_pos, double max_pos) {
-  EnvSimplePeakPtrVec new_ptr_list;
+  EnvPeakPtrVec new_ptr_list;
   for (auto p: peak_ptr_list_) {
     if (p->getPosition() >= min_pos && p->getPosition() <= max_pos)
       new_ptr_list.push_back(p);
@@ -144,7 +144,7 @@ void SeedEnvelope::shift(double shift_num) {
     p->setPosition(p->getPosition() + shift_mz);
 }
 
-void SeedEnvelope::setPeakList(EnvSimplePeakPtrVec new_peak_list) {
+void SeedEnvelope::setPeakList(EnvPeakPtrVec new_peak_list) {
   peak_ptr_list_ = new_peak_list;
 }
 

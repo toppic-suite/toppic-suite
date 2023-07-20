@@ -31,7 +31,7 @@ bool preprocessEnv(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
   double min_mz = matrix_ptr->getMinMz() - mass_tol;
   double max_mz = matrix_ptr->getMaxMz() + mass_tol;
   seed_ptr->rmPeaks(min_mz, max_mz);
-  env_set_util::compPeakStartEndIdx(matrix_ptr, seed_ptr, mass_tol);
+  //env_set_util::compPeakStartEndIdx(matrix_ptr, seed_ptr, mass_tol);
   bool valid = evalEnv(matrix_ptr, seed_ptr, mass_tol, corr_tol, sn_ratio);
   if (seed_ptr->getSpecId() >= matrix_ptr->getRowNum()) {
     LOG_ERROR("spec id " + std::to_string(seed_ptr->getSpecId()) + " is out of range!");
@@ -58,7 +58,7 @@ bool evalEnv(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
       scaled_inte = 0;
     scaled_theo_inte.push_back(scaled_inte);
   }
-  EnvSimplePeakPtrVec seed_env_peaks = seed_ptr->getPeakList();
+  EnvPeakPtrVec seed_env_peaks = seed_ptr->getPeakList();
   for (int j = num_peaks-1; j >= 0; j--) {
     if (scaled_theo_inte[j] == 0) {
       scaled_theo_inte.erase(scaled_theo_inte.begin() + j);
@@ -92,7 +92,7 @@ bool simpleEvalEnv(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
       scaled_inte = 0;
     scaled_theo_inte.push_back(scaled_inte);
   }
-  EnvSimplePeakPtrVec seed_env_peaks = seed_ptr->getPeakList();
+  EnvPeakPtrVec seed_env_peaks = seed_ptr->getPeakList();
   for (int j = num_peaks-1; j >= 0; j--) {
     if (scaled_theo_inte[j] == 0) {
       scaled_theo_inte.erase(scaled_theo_inte.begin() + j);
@@ -130,7 +130,7 @@ bool simplePreprocessEnv(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
   std::vector<double> seed_env_inte = seed_ptr->getInteList();
   seed_ptr->rmPeaks(min_mz, max_mz);
   seed_env_inte = seed_ptr->getInteList();
-  env_set_util::compPeakStartEndIdx(matrix_ptr, seed_ptr, mass_tol);
+  //env_set_util::compPeakStartEndIdx(matrix_ptr, seed_ptr, mass_tol);
   seed_env_inte = seed_ptr->getInteList();
   bool valid = simpleEvalEnv(matrix_ptr, seed_ptr, mass_tol, corr_tol, sn_ratio);
   return valid;

@@ -25,7 +25,7 @@ namespace toppic {
 namespace component_score {
 
 std::vector<double> getTheoEnvPeakInte(EnvSetPtr env_set_ptr) {
-  EnvSimplePeakPtrVec peaks = env_set_ptr->getSeedPtr()->getPeakList();
+  EnvPeakPtrVec peaks = env_set_ptr->getSeedPtr()->getPeakList();
   std::vector<double> theo_peak_intes;
   for (const auto &i: peaks)
     theo_peak_intes.push_back(i->getIntensity());

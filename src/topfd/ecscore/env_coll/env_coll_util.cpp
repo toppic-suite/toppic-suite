@@ -129,8 +129,8 @@ EnvSetPtrVec getChargeEnvList(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
   int miss_num = 0;
   while (charge >= para_ptr->para_min_charge_) {
     SeedEnvelopePtr cur_seed_ptr = std::make_shared<SeedEnvelope>(seed_ptr, charge); 
-    env_set_util::compPeakStartEndIdx(matrix_ptr, cur_seed_ptr, 
-                                      para_ptr->mass_tole_);
+    //env_set_util::compPeakStartEndIdx(matrix_ptr, cur_seed_ptr, 
+    //                                  para_ptr->mass_tole_);
     EnvSetPtr env_set_ptr = env_set_util::findEnvSet(matrix_ptr, cur_seed_ptr, 
                                                      start_spec_id, end_spec_id, 
                                                      para_ptr, sn_ratio);
@@ -155,7 +155,7 @@ EnvSetPtrVec getChargeEnvList(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
   charge = seed_ptr->getCharge() + 1;
   while (charge <= para_ptr->para_max_charge_) {
     SeedEnvelopePtr cur_seed_ptr = std::make_shared<SeedEnvelope>(seed_ptr, charge); 
-    env_set_util::compPeakStartEndIdx(matrix_ptr, cur_seed_ptr, para_ptr->mass_tole_);
+    //env_set_util::compPeakStartEndIdx(matrix_ptr, cur_seed_ptr, para_ptr->mass_tole_);
     EnvSetPtr env_set_ptr = env_set_util::findEnvSet(matrix_ptr, cur_seed_ptr, 
                                                      start_spec_id, end_spec_id, 
                                                      para_ptr, sn_ratio);

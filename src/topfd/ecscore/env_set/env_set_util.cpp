@@ -87,9 +87,10 @@ double calcInteRatio(std::vector<double> &theo_envelope_inte,
   }
 }
 
+/*
 void compPeakStartEndIdx(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
                          double error_tole) {
-  EnvSimplePeakPtrVec peak_list = seed_ptr->getPeakList();
+  SeedEnvPeakPtrVec peak_list = seed_ptr->getPeakList();
   for (auto &peak : peak_list) {
     double mz = peak->getPosition();
     int start_idx = matrix_ptr->getColIndex(mz - error_tole);
@@ -102,17 +103,26 @@ void compPeakStartEndIdx(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
     peak->setEndIdx(end_idx);
   }
 }
+*/
 
-MsMapPeakPtr pickExpPeak(MsMapPtr matrix_ptr, EnvSimplePeakPtr seed_peak_ptr,
+MsMapPeakPtr pickExpPeak(MsMapPtr matrix_ptr, EnvPeakPtr seed_peak_ptr,
                          int sp_id, double mass_tol) {
   // get peaks within mass tolerance
   double max_inte = std::numeric_limits<double>::min();
-  double pos = seed_peak_ptr->getPosition();
+  double mz = seed_peak_ptr->getPosition();
+  int start_idx = matrix_ptr->getColIndex(mz - mass_tol);
+  if (start_idx < 0) {
+      start_idx = 0;
+  }
+  int end_idx = matrix_ptr->getColIndex(mz + mass_tol);
+  if (end_idx >= matrix_ptr->getColNum()) {
+      end_idx = matrix_ptr->getColNum() - 1;
+  }
   MsMapPeakPtr result_peak = nullptr;
-  for (int idx = seed_peak_ptr->getStartIdx(); idx < seed_peak_ptr->getEndIdx() + 1; idx++) {
+  for (int idx = start_idx; idx <= end_idx; idx++) {
     MsMapPeakPtrVec bin_peaks = matrix_ptr->getBinPeakList(sp_id, idx);
     for (const auto& matrix_peak : bin_peaks) {
-      double mass_diff = std::abs(pos - matrix_peak->getPosition());
+      double mass_diff = std::abs(mz - matrix_peak->getPosition());
       if ( mass_diff < mass_tol && matrix_peak->getIntensity() > max_inte) {
         result_peak = matrix_peak; 
         max_inte = matrix_peak->getIntensity();
@@ -125,7 +135,7 @@ MsMapPeakPtr pickExpPeak(MsMapPtr matrix_ptr, EnvSimplePeakPtr seed_peak_ptr,
 ExpEnvelopePtr getMatchExpEnv(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
                               int sp_id, double mass_tol) {
   MsMapPeakPtrVec peak_list;
-  EnvSimplePeakPtrVec peaks = seed_ptr->getPeakList();
+  EnvPeakPtrVec peaks = seed_ptr->getPeakList();
   for (auto& seed_peak : peaks) {
     if (seed_peak != nullptr) {
       MsMapPeakPtr peak = pickExpPeak(matrix_ptr, seed_peak, sp_id, mass_tol);

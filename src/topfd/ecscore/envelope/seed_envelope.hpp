@@ -21,7 +21,7 @@
 #include "ms/spec/deconv_ms.hpp"
 #include "ms/env/env_base.hpp"
 #include "ms/env/env_base.hpp"
-#include "topfd/ecscore/envelope/env_simple_peak.hpp"
+//#include "topfd/ecscore/envelope/env_simple_peak.hpp"
 
 namespace toppic {
 
@@ -56,7 +56,7 @@ class SeedEnvelope {
 
   int getPeakNum() { return peak_ptr_list_.size(); }
 
-  EnvSimplePeakPtr get_peak_ptr(int idx) { return peak_ptr_list_[idx]; }
+  EnvPeakPtr get_peak_ptr(int idx) { return peak_ptr_list_[idx]; }
 
   int getSpecId() const { return spec_id_; }
 
@@ -84,9 +84,9 @@ class SeedEnvelope {
 
   void setCharge(int charge) { charge_ = charge; }
 
-  const EnvSimplePeakPtrVec &getPeakList() const { return peak_ptr_list_; }
+  const EnvPeakPtrVec &getPeakList() const { return peak_ptr_list_; }
 
-  void setPeakList(EnvSimplePeakPtrVec peak_ptr_list); 
+  void setPeakList(EnvPeakPtrVec peak_ptr_list);
 
   std::string getString();
 
@@ -100,7 +100,7 @@ class SeedEnvelope {
   double mass_;
   double inte_;
   int charge_;
-  EnvSimplePeakPtrVec peak_ptr_list_;
+  EnvPeakPtrVec peak_ptr_list_;
 };
 
 typedef std::vector<SeedEnvelopePtr> SeedEnvelopePtrVec;
