@@ -106,29 +106,35 @@ void EValueProcessor::process(bool is_separate) {
   SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(mng_ptr_->thread_num_);
 
   int cnt = 0;
-  SpectrumSetPtr spec_set_ptr;
-
-  while((spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(reader_ptr, sp_para_ptr))!= nullptr){
+  DeconvMsPtrVec deconv_ms_ptr_vec = reader_ptr->getNextMsPtrVec();
+  while (deconv_ms_ptr_vec.size() != 0) {
     cnt += group_spec_num;
-    if(spec_set_ptr->isValid()){
-      PrsmPtrVec selected_prsm_ptrs;
-      while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_set_ptr->getSpectrumId()) {
-        selected_prsm_ptrs.push_back(prsm_ptr);
-        prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
-      }
-      if (!mng_ptr_->use_gf_) {
-        processOneSpectrum(spec_set_ptr, selected_prsm_ptrs, ppo, is_separate, writer);
-      } else if (checkPrsms(selected_prsm_ptrs)) {
-        while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ + 2) {
-          boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+    MsHeaderPtr header_ptr = deconv_ms_ptr_vec[0]->getMsHeaderPtr();
+    if (header_ptr->containsPrec()) {
+      double prec_mono_mass = header_ptr->getFirstPrecMonoMass() - sp_para_ptr->getNTermLabelMass();
+      SpectrumSetPtr spec_set_ptr  
+        = spectrum_set_factory::geneSpectrumSetPtr(deconv_ms_ptr_vec,
+                                                   sp_para_ptr, prec_mono_mass);
+      if(spec_set_ptr->isValid()){
+        PrsmPtrVec selected_prsm_ptrs;
+        while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_set_ptr->getSpectrumId()) {
+          selected_prsm_ptrs.push_back(prsm_ptr);
+          prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
         }
-        pool_ptr->Enqueue(geneTask(spec_set_ptr, selected_prsm_ptrs, ppo, is_separate,
-                                   mng_ptr_, test_num_ptr_, pool_ptr, writer_ptr_vec));
+        if (!mng_ptr_->use_gf_) {
+          processOneSpectrum(spec_set_ptr, selected_prsm_ptrs, ppo, is_separate, writer);
+        } else if (checkPrsms(selected_prsm_ptrs)) {
+          while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ + 2) {
+            boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+          }
+          pool_ptr->Enqueue(geneTask(spec_set_ptr, selected_prsm_ptrs, ppo, is_separate,
+                                     mng_ptr_, test_num_ptr_, pool_ptr, writer_ptr_vec));
+        }
       }
     }
-
     std::cout << std::flush << "E-value computation - processing " << cnt << " of " 
         << spectrum_num << " spectra.\r";
+    deconv_ms_ptr_vec = reader_ptr->getNextMsPtrVec();
   }
   int remainder = spectrum_num - cnt;
   if (prsm_para_ptr->getGroupSpecNum() > remainder && remainder > 0){

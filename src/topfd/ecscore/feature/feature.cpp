@@ -173,16 +173,6 @@ bool Feature::getHighestInteFeature(FracFeaturePtrVec &frac_features, EnvCollPtr
       if (prec_inte < 0) {
         prec_inte = 0;
       }
-      /*
-      if (header_ptr->getFirstScanNum() == 1024) {
-        LOG_ERROR("env set id " << env_set_id << "prec mono mz " << prec_mono_mz << " prec charge " <<
-                  prec_charge);
-        for (size_t z = 0; z < env_sets.size(); z++) {
-          LOG_ERROR("z " << z << " env set charge " <<
-                    env_sets[z]->getCharge());
-        }
-      }
-      */
       SpecFeaturePtr ms2_feature = std::make_shared<SpecFeature>(header_ptr,
                                                                  frac_feature_ptr, 
                                                                  prec_mono_mz, 
@@ -230,12 +220,16 @@ bool Feature::getNewFeature(MsHeaderPtr header_ptr, PeakMatrixPtr matrix_ptr,
     }
   }
   SeedEnvelopePtr seed_ptr;
+  bool valid = false;
   if (selected_seed_list.size() > 0) {
     // choose the highest intensity one
     std::sort(selected_seed_list.begin(), selected_seed_list.end(),
               SeedEnvelope::cmpInteDec); 
     seed_ptr = selected_seed_list[0];  
+    valid = seed_env_util::simplePreprocessEnv(matrix_ptr, seed_ptr, 
+                                               score_para_ptr, sn_ratio); 
   }
+  /* Let us rethink how to handle cases in which precursor peaks are missing
   else {
     // Sometimes the seed envelope reference mz is slightly out of the precursor
     // window. In this case, we use default precursor target mz to generate a
@@ -249,9 +243,9 @@ bool Feature::getNewFeature(MsHeaderPtr header_ptr, PeakMatrixPtr matrix_ptr,
                                                           mono_mass, inte, charge);
     seed_ptr = std::make_shared<SeedEnvelope>(peak_ptr);  
   }
-
   bool valid = seed_env_util::simplePreprocessEnv(matrix_ptr, seed_ptr, 
                                                   score_para_ptr, sn_ratio); 
+                                                  */
   if (!valid) {
     return false;
   }

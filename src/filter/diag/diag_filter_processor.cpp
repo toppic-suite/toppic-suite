@@ -97,7 +97,7 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
     }
     double perc = cnt_sum * 100.0 / mng_ptr->n_spec_block_;
     std::stringstream msg;
-    msg << std::flush << "Multiple PTM filtering - processing " << std::setprecision(3) <<  perc << "%.     \r";
+    msg << std::flush << "Multiple unexpected shifts filtering - processing " << std::setprecision(3) <<  perc << "%.     \r";
     mng_ptr->mutex_.lock();
     std::cout << msg.str();
     mng_ptr->mutex_.unlock();
@@ -148,7 +148,7 @@ void DiagFilterProcessor::process() {
   pool_ptr->ShutDown();
   std::cout << std::endl;
 
-  std::cout << "Multiple PTM filtering - combining blocks started." << std::endl;
+  std::cout << "Multiple unexpected shifts filtering - combining blocks started." << std::endl;
   std::string sp_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
   SimplePrsmStrMergePtr merge_ptr
       = std::make_shared<SimplePrsmStrMerge>(sp_file_name, mng_ptr_->output_file_ext_,
@@ -158,7 +158,7 @@ void DiagFilterProcessor::process() {
   merge_ptr = nullptr;
   //Remove temporary files
   file_util::cleanTempFiles(sp_file_name, mng_ptr_->output_file_ext_ + "_");
-  std::cout << "Multiple PTM filtering - combining blocks finished." << std::endl;
+  std::cout << "Multiple unexpected shifts filtering - combining blocks finished." << std::endl;
 }
 
 

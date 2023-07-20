@@ -80,29 +80,38 @@ void LocalProcessor::process() {
   int spectrum_num = msalign_util::getSpNum(mng_ptr_->prsm_para_ptr_->getSpectrumFileName());
 
   int cnt = 0;
-
-  while ((spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(reader_ptr, sp_para_ptr))!= nullptr) {
+  DeconvMsPtrVec deconv_ms_ptr_vec = reader_ptr->getNextMsPtrVec();
+  while (deconv_ms_ptr_vec.size() != 0) {
     cnt += group_spec_num;
-    if (spec_set_ptr->isValid()) {
-      int spec_id = spec_set_ptr->getSpectrumId();
-      while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_id) {
-        DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
-        prsm_ptr->setDeconvMsPtrVec(deconv_ms_ptr_vec);
-        double new_prec_mass = prsm_ptr->getAdjustedPrecMass();
-        ExtendMsPtrVec extend_ms_ptr_vec
-          = extend_ms_factory::geneMsThreePtrVec(deconv_ms_ptr_vec, sp_para_ptr, new_prec_mass);
-        prsm_ptr->setRefineMsVec(extend_ms_ptr_vec);
+    MsHeaderPtr header_ptr = deconv_ms_ptr_vec[0]->getMsHeaderPtr();
+    if (header_ptr->containsPrec()) {
+      double prec_mono_mass = header_ptr->getFirstPrecMonoMass() - sp_para_ptr->getNTermLabelMass();
+      SpectrumSetPtr spec_set_ptr  
+        = spectrum_set_factory::geneSpectrumSetPtr(deconv_ms_ptr_vec,
+                                                   sp_para_ptr, prec_mono_mass);
 
-        if (prsm_ptr->getProteoformPtr()->getAlterNum(AlterType::UNEXPECTED) > 0) {
-          prsm_ptr = processOnePrsm(prsm_ptr);
+      if (spec_set_ptr->isValid()) {
+        int spec_id = spec_set_ptr->getSpectrumId();
+        while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_id) {
+          DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
+          prsm_ptr->setDeconvMsPtrVec(deconv_ms_ptr_vec);
+          double new_prec_mass = prsm_ptr->getAdjustedPrecMass();
+          ExtendMsPtrVec extend_ms_ptr_vec
+            = extend_ms_factory::geneMsThreePtrVec(deconv_ms_ptr_vec, sp_para_ptr, new_prec_mass);
+          prsm_ptr->setRefineMsVec(extend_ms_ptr_vec);
+
+          if (prsm_ptr->getProteoformPtr()->getAlterNum(AlterType::UNEXPECTED) > 0) {
+            prsm_ptr = processOnePrsm(prsm_ptr);
+          }
+
+          prsm_writer->write(prsm_ptr);
+          prsm_ptr = prsm_reader->readOnePrsm(seq_reader, fix_mod_list);
         }
-
-        prsm_writer->write(prsm_ptr);
-        prsm_ptr = prsm_reader->readOnePrsm(seq_reader, fix_mod_list);
       }
+      std::cout << std::flush << "PTM characterization is processing " << cnt
+        << " of " << spectrum_num << " spectra.\r";
     }
-    std::cout << std::flush << "PTM characterization is processing " << cnt
-      << " of " << spectrum_num << " spectra.\r";
+    deconv_ms_ptr_vec = reader_ptr->getNextMsPtrVec();
   }
   prsm_reader->close();
   prsm_writer->close();

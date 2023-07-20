@@ -17,12 +17,6 @@
 #include <string>
 #include <vector>
 
-//#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
-//#include "common/thread/simple_thread_pool.hpp"
-//#else
-//#include <sys/wait.h>
-//#endif
-
 #include "common/thread/simple_thread_pool.hpp"
 
 #include "common/util/file_util.hpp"
@@ -77,7 +71,6 @@ std::function<void()> geneTask(GraphAlignMngPtr mng_ptr,
         = std::make_shared<ProteoAnno>(prsm_para_ptr->getFixModPtrVec(),
                                        prsm_para_ptr->getProtModPtrVec(),
                                        var_mod_ptr_vec);
-    SpectrumSetPtr spec_set_ptr;
     DeconvMsPtrVec deconv_ms_ptr_vec = ms_reader_ptr->getNextMsPtrVec(); 
 
     int cnt = 0;
@@ -85,7 +78,7 @@ std::function<void()> geneTask(GraphAlignMngPtr mng_ptr,
       if (deconv_ms_ptr_vec[0]->getMsHeaderPtr()->containsPrec()) {
         double prec_mono_mass =
                 deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMass();
-        spec_set_ptr  
+        SpectrumSetPtr spec_set_ptr
           = spectrum_set_factory::geneSpectrumSetPtr(deconv_ms_ptr_vec,
                                                      sp_para_ptr, prec_mono_mass);
         if (spec_set_ptr->isValid()) {

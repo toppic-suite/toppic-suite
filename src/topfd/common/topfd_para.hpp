@@ -94,18 +94,16 @@ class TopfdPara {
   double ms_one_sn_ratio_ = 3.0;
   double ms_two_sn_ratio_ = 1.0;
   bool keep_unused_peaks_ = false;
-  bool use_env_cnn_ = false;
+  bool use_env_cnn_ = true;
   bool do_final_filtering_ = true;
   int  thread_num_ = 1;
   std::string activation_ = "FILE";
   bool gene_html_folder_ = true;
   double ecscore_cutoff_ = 0.5;
 
-
   //** Fixed parameter setting **
   // estimate min intensity using thrash method. 
   bool estimate_min_inte_ = true;
-  bool refine_prec_mass_ = true;
   bool output_multiple_mass_ = false;
   bool output_match_env_ = false;
 

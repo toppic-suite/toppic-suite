@@ -87,24 +87,31 @@ void PrsmTableWriter::write() {
   int group_spec_num = prsm_para_ptr_->getGroupSpecNum();
   SpParaPtr sp_para_ptr = prsm_para_ptr_->getSpParaPtr();
   MsAlignReaderPtr ms_reader_ptr = std::make_shared<MsAlignReader>(sp_file_name, 
-                                                                   group_spec_num,
-                                                                   sp_para_ptr->getActivationPtr());
-  SpectrumSetPtr spec_set_ptr;
-  while ((spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(ms_reader_ptr, sp_para_ptr)) 
-         != nullptr) {
-    if (spec_set_ptr->isValid()) {
-      int spec_id = spec_set_ptr->getSpectrumId();
-      while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_id) {
-        DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
-        prsm_ptr->setDeconvMsPtrVec(deconv_ms_ptr_vec);
-        double new_prec_mass = prsm_ptr->getAdjustedPrecMass();
-        ExtendMsPtrVec extend_ms_ptr_vec
+                                                                group_spec_num,
+                                                                sp_para_ptr->getActivationPtr());
+  DeconvMsPtrVec deconv_ms_ptr_vec = ms_reader_ptr->getNextMsPtrVec();
+  while (deconv_ms_ptr_vec.size() != 0) {
+    MsHeaderPtr header_ptr = deconv_ms_ptr_vec[0]->getMsHeaderPtr();
+    if (header_ptr->containsPrec()) {
+      double prec_mono_mass = header_ptr->getFirstPrecMonoMass() - sp_para_ptr->getNTermLabelMass();
+      SpectrumSetPtr spec_set_ptr  
+        = spectrum_set_factory::geneSpectrumSetPtr(deconv_ms_ptr_vec,
+                                                   sp_para_ptr, prec_mono_mass);
+      if (spec_set_ptr->isValid()) {
+        int spec_id = spec_set_ptr->getSpectrumId();
+        while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_id) {
+          DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
+          prsm_ptr->setDeconvMsPtrVec(deconv_ms_ptr_vec);
+          double new_prec_mass = prsm_ptr->getAdjustedPrecMass();
+          ExtendMsPtrVec extend_ms_ptr_vec
             = extend_ms_factory::geneMsThreePtrVec(deconv_ms_ptr_vec, sp_para_ptr, new_prec_mass);
-        prsm_ptr->setRefineMsVec(extend_ms_ptr_vec);
-        writePrsm(file, prsm_ptr);
-        prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
+          prsm_ptr->setRefineMsVec(extend_ms_ptr_vec);
+          writePrsm(file, prsm_ptr);
+          prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
+        }
       }
     }
+    deconv_ms_ptr_vec = ms_reader_ptr->getNextMsPtrVec();
   }
   prsm_reader.close();
   // write end;

@@ -164,7 +164,7 @@ void PtmSearchProcessor::process(){
       }
     }
     cnt+= group_spec_num;
-    std::cout << std::flush <<  "Multiple PTM search - processing " << cnt 
+    std::cout << std::flush <<  "Multiple unexpected shifts search - processing " << cnt 
         << " of " << spectrum_num << " spectra.\r";
     deconv_ms_ptr_vec = ms_reader_ptr->getNextMsPtrVec(); 
   }
