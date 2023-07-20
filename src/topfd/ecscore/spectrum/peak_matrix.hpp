@@ -20,7 +20,7 @@
 #include "ms/spec/deconv_ms.hpp"
 
 #include "topfd/ecscore/spectrum/ms_map_row_header.hpp"
-#include "topfd/ecscore/spectrum/peak_row.hpp"
+#include "topfd/ecscore/spectrum/ms_map_row.hpp"
 
 namespace toppic {
 
@@ -56,7 +56,7 @@ class PeakMatrix {
   void setBinPeakList(int sp_id, int bin_idx, MatrixPeakPtrVec &peaks) {
     return matrix_[sp_id]->setPeakPtrVec(bin_idx, peaks);}
 
-  PeakRowPtr getRowPtr(int i) {return matrix_[i];}
+  MsMapRowPtr getRowPtr(int i) {return matrix_[i];}
 
  private:
   void initSpectrumNoiseIntensities(PeakPtrVec2D &raw_peaks);
@@ -67,7 +67,7 @@ class PeakMatrix {
 
   void findNeighbors(int spec_id, int search_bin_num, double mass_tol);
 
-  PeakRowPtrVec matrix_;
+  MsMapRowPtrVec matrix_;
   MsMapRowHeaderPtrVec spec_list_;
   std::vector<double> spec_noise_intes_;
   double bin_size_;

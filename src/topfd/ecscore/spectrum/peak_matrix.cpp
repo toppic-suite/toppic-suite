@@ -79,7 +79,7 @@ int PeakMatrix::getBinIndex(double mz) {
 
 void PeakMatrix::initMatrix(PeakPtrVec2D &raw_peaks, double sn_ratio) {
   for (size_t spec_id = 0; spec_id < raw_peaks.size(); spec_id++) {
-    PeakRowPtr row_ptr = std::make_shared<PeakRow>(spec_list_[spec_id], bin_num_);
+    MsMapRowPtr row_ptr = std::make_shared<MsMapRow>(spec_list_[spec_id], bin_num_);
     matrix_.push_back(row_ptr);
   }
   int peak_id = 0;
@@ -99,8 +99,8 @@ void PeakMatrix::initMatrix(PeakPtrVec2D &raw_peaks, double sn_ratio) {
 }
 
 void PeakMatrix::findNeighbors(int spec_id, int search_bin_num, double mass_tol) {
-  PeakRowPtr first_row = matrix_[spec_id];
-  PeakRowPtr second_row = matrix_[spec_id+1];
+  MsMapRowPtr first_row = matrix_[spec_id];
+  MsMapRowPtr second_row = matrix_[spec_id + 1];
   for (int bin_idx = 0; bin_idx < bin_num_; bin_idx++) {
     int start = std::max(0, bin_idx - search_bin_num);
     int end = std::min(bin_idx + search_bin_num, bin_num_ - 1);
@@ -130,7 +130,7 @@ void PeakMatrix::removeNonNeighbors(double mass_tol) {
     findNeighbors(spec_id, search_bin_num, mass_tol);
   }
   for (size_t spec_id = 0; spec_id < spec_num; spec_id++) {
-    PeakRowPtr peak_row_ptr = matrix_[spec_id];
+    MsMapRowPtr peak_row_ptr = matrix_[spec_id];
     for (int bin_idx = 0; bin_idx < bin_num_; bin_idx++) {
       MatrixPeakPtrVec peak_ptrs = peak_row_ptr->getPeakPtrVec(bin_idx);
       MatrixPeakPtrVec new_peak_ptrs; 

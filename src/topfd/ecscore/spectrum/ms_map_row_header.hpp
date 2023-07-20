@@ -35,4 +35,4 @@ typedef std::vector<MsMapRowHeaderPtr> MsMapRowHeaderPtrVec;
 
 }
 
-#endif //TOPPIC_SPECTRUM_HPP
+#endif 
