@@ -21,7 +21,7 @@
 #include "ms/spec/deconv_ms.hpp"
 #include "ms/env/env_base.hpp"
 #include "ms/env/env_base.hpp"
-#include "topfd/ecscore/spectrum/env_simple_peak.hpp"
+#include "topfd/ecscore/envelope/env_simple_peak.hpp"
 
 namespace toppic {
 

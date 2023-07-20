@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_TOPFD_ECSCORE_SPECTRUM_ENV_SIMPLE_PEAK_HPP
-#define TOPPIC_TOPFD_ECSCORE_SPECTRUM_ENV_SIMPLE_PEAK_HPP
+#ifndef TOPPIC_TOPFD_ECSCORE_ENVELOPE_ENV_SIMPLE_PEAK_HPP
+#define TOPPIC_TOPFD_ECSCORE_ENVELOPE_ENV_SIMPLE_PEAK_HPP
 
 #include "ms/spec/peak.hpp"
 

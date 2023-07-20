@@ -15,8 +15,8 @@
 #include <cmath>
 
 #include "topfd/envcnn/onnx_env_cnn.hpp"
-#include "topfd/ecscore/spectrum/env_simple_peak.hpp"
 #include "topfd/ecscore/spectrum/matrix_peak.hpp"
+#include "topfd/ecscore/envelope/env_simple_peak.hpp"
 #include "topfd/ecscore/envelope/seed_envelope.hpp"
 #include "topfd/ecscore/env_set/env_set.hpp"
 #include "topfd/ecscore/env_set/env_set_util.hpp"

@@ -12,7 +12,7 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include "topfd/ecscore/spectrum/env_simple_peak.hpp"
+#include "topfd/ecscore/envelope/env_simple_peak.hpp"
 
 namespace toppic {
 

@@ -17,7 +17,6 @@
 
 #include <vector>
 
-#include "topfd/ecscore/spectrum/xic_peak.hpp"
 #include "topfd/ecscore/spectrum/matrix_peak.hpp"
 
 namespace toppic {
