@@ -12,11 +12,11 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_TOPFD_ECSCORE_MS_MAP_MS_MAP_HPP
-#define TOPPIC_TOPFD_ECSCORE_MS_MAP_MS_MAP_HPP
+#ifndef TOPPIC_MS_MS_MAP_MS_MAP_HPP
+#define TOPPIC_MS_MS_MAP_MS_MAP_HPP
 
 #include "ms/spec/deconv_ms.hpp"
-#include "topfd/ecscore/spectrum/ms_map_row.hpp"
+#include "ms/msmap/ms_map_row.hpp"
 
 namespace toppic {
 

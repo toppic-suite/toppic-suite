@@ -18,7 +18,7 @@
 #include <memory>
 #include <vector>
 
-#include "topfd/ecscore/spectrum/ms_map.hpp"
+#include "ms/msmap/ms_map.hpp"
 #include "topfd/ecscore/envelope/seed_envelope.hpp"
 #include "topfd/ecscore/env_set/env_set.hpp"
 

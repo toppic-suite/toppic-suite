@@ -17,7 +17,7 @@
 
 #include "common/util/logger.hpp"
 #include "ms/spec/baseline_util.hpp"
-#include "topfd/ecscore/spectrum/ms_map.hpp"
+#include "ms/msmap/ms_map.hpp"
 
 namespace toppic {
 

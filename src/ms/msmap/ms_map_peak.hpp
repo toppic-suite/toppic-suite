@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_TOPFD_ECSCORE_MS_MAP_MS_MAP_PEAK_HPP
-#define TOPPIC_TOPFD_ECSCORE_MS_MAP_MS_MAP_PEAK_HPP
+#ifndef TOPPIC_MS_MS_MAP_MS_MAP_PEAK_HPP
+#define TOPPIC_MS_MS_MAP_MS_MAP_PEAK_HPP
 
 #include "ms/spec/peak.hpp"
 

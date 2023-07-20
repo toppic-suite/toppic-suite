@@ -14,7 +14,7 @@
 
 #include <iostream>
 
-#include "topfd/ecscore/spectrum/ms_map_row.hpp"
+#include "ms/msmap/ms_map_row.hpp"
 
 namespace toppic {
 

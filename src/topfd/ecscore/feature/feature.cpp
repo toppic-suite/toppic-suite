@@ -18,13 +18,13 @@
 
 #include "ms/spec/peak_util.hpp"
 #include "ms/env/env_base.hpp"
+#include "ms/msmap/ms_map_row_header.hpp"
 
 #include "topfd/ecscore/score/component_score.hpp"
 #include "topfd/ecscore/score/comp_env_cnn_score.hpp"
 #include "topfd/ecscore/score/onnx_ecscore.hpp"
 #include "topfd/ecscore/envelope/seed_env_util.hpp"
 #include "topfd/ecscore/env_coll/env_coll_util.hpp"
-#include "topfd/ecscore/spectrum/ms_map_row_header.hpp"
 #include "topfd/ecscore/feature/feature.hpp"
 
 namespace toppic {

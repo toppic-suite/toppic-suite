@@ -17,7 +17,7 @@
 
 #include <vector>
 
-#include "topfd/ecscore/spectrum/ms_map_peak.hpp"
+#include "ms/msmap/ms_map_peak.hpp"
 
 namespace toppic {
 

@@ -15,9 +15,9 @@
 #ifndef TOPPIC_TOPFD_ECSCORE_ENVELOPE_SEED_ENV_UTIL_HPP
 #define TOPPIC_TOPFD_ECSCORE_ENVELOPE_SEED_ENV_UTIL_HPP
 
+#include "ms/msmap/ms_map.hpp"
 #include "topfd/ecscore/ecscore_para.hpp"
 #include "topfd/ecscore/envelope/seed_envelope.hpp"
-#include "topfd/ecscore/spectrum/ms_map.hpp"
 
 namespace toppic {
 

@@ -18,8 +18,8 @@
 #include "ms/spec/deconv_ms.hpp"
 #include "ms/feature/frac_feature.hpp"
 
+#include "ms/msmap/ms_map.hpp"
 #include "topfd/ecscore/ecscore_para.hpp"
-#include "topfd/ecscore/spectrum/ms_map.hpp"
 #include "topfd/ecscore/envelope/seed_envelope.hpp"
 #include "topfd/ecscore/env_set/env_set.hpp"
 #include "topfd/ecscore/env_coll/env_coll.hpp"

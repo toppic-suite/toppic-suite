@@ -17,11 +17,11 @@
 
 #include "ms/feature/frac_feature.hpp"
 #include "ms/feature/spec_feature.hpp"
+#include "ms/msmap/ms_map.hpp"
 
 #include "topfd/common/topfd_para.hpp"
 #include "topfd/ecscore/ecscore_para.hpp"
 
-#include "topfd/ecscore/spectrum/ms_map.hpp"
 #include "topfd/ecscore/env_coll/env_coll.hpp"
 
 namespace toppic {

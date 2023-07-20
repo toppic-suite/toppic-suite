@@ -15,8 +15,8 @@
 #ifndef TOPPIC_TOPFD_ECSCORE_SCORE_COMP_ENV_CNN_SCORE_HPP
 #define TOPPIC_TOPFD_ECSCORE_SCORE_COMP_ENV_CNN_SCORE_HPP
 
+#include "ms/msmap/ms_map.hpp"
 #include "topfd/ecscore/env_coll/env_coll.hpp"
-#include "topfd/ecscore/spectrum/ms_map.hpp"
 
 namespace toppic {
 
