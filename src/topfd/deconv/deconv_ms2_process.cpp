@@ -29,42 +29,8 @@
 
 namespace toppic {
 
-DeconvMs2Process::DeconvMs2Process(TopfdParaPtr topfd_para_ptr) {
-  topfd_para_ptr_ = topfd_para_ptr;
-}
-
-void DeconvMs2Process::prepareFileFolder() {
-  if (topfd_para_ptr_->isGeneHtmlFolder()) {
-    //json file names
-    std::string html_dir = topfd_para_ptr_->getHtmlDir();
-    if (!file_util::exists(html_dir)) {
-      file_util::createFolder(html_dir);
-    }
-    std::string ms2_json_dir = topfd_para_ptr_->getMs2JsonDir();
-    if (!file_util::exists(ms2_json_dir)) {
-      file_util::createFolder(ms2_json_dir);
-    }
-  }
-}
-
-void DeconvMs2Process::readSpecFeature(std::string feat_file_name, 
-                                       std::map<int, SpecFeaturePtrVec> &feat_map) {
-  SpecFeatureReaderPtr sp_feat_reader = std::make_shared<SpecFeatureReader>(feat_file_name);
-  SpecFeaturePtrVec sp_feat_ptr_vec = sp_feat_reader->readAllFeatures();
-  sp_feat_reader = nullptr;
-  std::map<int, SpecFeaturePtrVec>::iterator feat_it;
-  SpecFeaturePtrVec empty_vec;
-  for (size_t i = 0; i < sp_feat_ptr_vec.size(); i++) {
-    SpecFeaturePtr feat_ptr = sp_feat_ptr_vec[i];
-    int sp_id = feat_ptr->getSpecId();
-    feat_it = feat_map.find(sp_id);
-    if (feat_it == feat_map.end()) {
-      //if not found, insert
-      feat_it = feat_map.insert(feat_map.end(), std::pair<int, SpecFeaturePtrVec>(sp_id, empty_vec)); 
-    }
-    feat_it->second.push_back(feat_ptr);
-  }
-}
+// add a namespace to avoid duplicated method names
+namespace deconv_ms2_process {
 
 std::string updateMsTwoMsg(MsHeaderPtr header_ptr, int scan_cnt, int total_scan_num) {
   std::string percentage = str_util::toString(scan_cnt * 100 / total_scan_num);
@@ -151,6 +117,45 @@ std::function<void()> geneMsTwoTask(MzmlMsPtr ms_ptr,
   };
 }
 
+} // namespace deconv_ms2_process end
+
+DeconvMs2Process::DeconvMs2Process(TopfdParaPtr topfd_para_ptr) {
+  topfd_para_ptr_ = topfd_para_ptr;
+}
+
+void DeconvMs2Process::prepareFileFolder() {
+  if (topfd_para_ptr_->isGeneHtmlFolder()) {
+    //json file names
+    std::string html_dir = topfd_para_ptr_->getHtmlDir();
+    if (!file_util::exists(html_dir)) {
+      file_util::createFolder(html_dir);
+    }
+    std::string ms2_json_dir = topfd_para_ptr_->getMs2JsonDir();
+    if (!file_util::exists(ms2_json_dir)) {
+      file_util::createFolder(ms2_json_dir);
+    }
+  }
+}
+
+void DeconvMs2Process::readSpecFeature(std::string feat_file_name, 
+                                       std::map<int, SpecFeaturePtrVec> &feat_map) {
+  SpecFeatureReaderPtr sp_feat_reader = std::make_shared<SpecFeatureReader>(feat_file_name);
+  SpecFeaturePtrVec sp_feat_ptr_vec = sp_feat_reader->readAllFeatures();
+  sp_feat_reader = nullptr;
+  std::map<int, SpecFeaturePtrVec>::iterator feat_it;
+  SpecFeaturePtrVec empty_vec;
+  for (size_t i = 0; i < sp_feat_ptr_vec.size(); i++) {
+    SpecFeaturePtr feat_ptr = sp_feat_ptr_vec[i];
+    int sp_id = feat_ptr->getSpecId();
+    feat_it = feat_map.find(sp_id);
+    if (feat_it == feat_map.end()) {
+      //if not found, insert
+      feat_it = feat_map.insert(feat_map.end(), std::pair<int, SpecFeaturePtrVec>(sp_id, empty_vec)); 
+    }
+    feat_it->second.push_back(feat_ptr);
+  }
+}
+
 void DeconvMs2Process::process() {
   MzmlMsGroupReaderPtr reader_ptr = 
     std::make_shared<MzmlMsGroupReader>(topfd_para_ptr_->getMzmlFileName(), 
@@ -201,9 +206,9 @@ void DeconvMs2Process::process() {
       if (feat_it != feat_map.end()) { 
         sp_feat_ptr_vec = feat_it->second;
       }
-      pool_ptr->Enqueue(geneMsTwoTask(ms_ptr, sp_feat_ptr_vec,
-                                      topfd_para_ptr_, ms2_writer_ptr_vec, pool_ptr)); 
-      std::string msg = updateMsTwoMsg(ms_ptr->getMsHeaderPtr(), spec_cnt, total_spec_num);
+      pool_ptr->Enqueue(deconv_ms2_process::geneMsTwoTask(ms_ptr, sp_feat_ptr_vec,
+                                                          topfd_para_ptr_, ms2_writer_ptr_vec, pool_ptr)); 
+      std::string msg = deconv_ms2_process::updateMsTwoMsg(ms_ptr->getMsHeaderPtr(), spec_cnt, total_spec_num);
       std::cout << "\r" << msg << std::flush;
     }
     ms_group_ptr = reader_ptr->getNextMsGroupPtr();    

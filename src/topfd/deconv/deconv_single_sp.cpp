@@ -60,7 +60,7 @@ void DeconvSingleSp::postprocess(MatchEnvPtrVec &dp_envs) {
     match_env_refine::mzRefine(dp_envs);
   }
 
-  // Obtain EnvCNN Score for envelopes
+  // Obtain EnvCNN Scores for envelopes
   if (topfd_para_ptr_->isUseEnvCnn()) {
     onnx_env_cnn::computeEnvScores(peak_list, dp_envs); 
     std::sort(dp_envs.begin(), dp_envs.end(), MatchEnv::cmpEnvcnnScoreDec);

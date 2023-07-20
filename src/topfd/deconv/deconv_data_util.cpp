@@ -21,18 +21,6 @@ namespace toppic {
 
 namespace deconv_data_util {
 
-DeconvDataPtr getDataPtr(const PeakPtrVec &peak_list, double max_mass, 
-                         int max_charge, double window_size) {
-  if (peak_list.size() == 0) return nullptr;
-  double max_mz = peak_list_util::findMaxPos(peak_list);
-  if (max_mz > max_mass) {
-    LOG_INFO("Max mz is too large: " << max_mz);
-  }
-
-  return std::make_shared<DeconvData>(peak_list, max_mass, 
-                                      max_charge, window_size);
-}
-
 DeconvDataPtr getDataPtr(const PeakPtrVec &peak_list, 
                          double max_mass, int max_charge, 
                          double dp_window_size,
@@ -49,37 +37,6 @@ DeconvDataPtr getDataPtr(const PeakPtrVec &peak_list,
                                       estimate_min_inte, sn_ratio);
 }
 
-
-// generate deconvolution data using given max mass, max charge
-DeconvDataPtr getDataPtr(const PeakPtrVec &peak_list, double spec_max_mass,
-                         int spec_max_charge, double para_max_mass, 
-                         int para_max_charge, double window_size) {
-  if (spec_max_charge < 1) {
-    LOG_INFO("Max charge < 1");
-    spec_max_charge = para_max_charge;
-  }
-  if (spec_max_mass <= 0) {
-    LOG_INFO("Max mass <= 0");
-    spec_max_mass = para_max_mass;
-  }
-  if (spec_max_mass > para_max_mass) {
-    LOG_WARN("Max mass is greater than default max mass " << spec_max_mass);
-    spec_max_mass = para_max_mass;
-  }
-  double max_mz = peak_list_util::findMaxPos(peak_list);
-  if (max_mz > para_max_mass) {
-    LOG_WARN("Max mz is too large: " << max_mz);
-    return nullptr;
-  }
-  for (size_t i = 0; i < peak_list.size(); i++) {
-    if (peak_list[i]->getPosition() < 0 || peak_list[i]->getIntensity() < 0) {
-      LOG_WARN("mz intensity are negative values");
-      return nullptr;
-    }
-  }
-  return std::make_shared<DeconvData>(peak_list, spec_max_mass,
-                                      spec_max_charge, window_size);
-}
 
 }
 
