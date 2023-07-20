@@ -24,7 +24,7 @@
 #include "topfd/ecscore/score/onnx_ecscore.hpp"
 #include "topfd/ecscore/envelope/seed_env_util.hpp"
 #include "topfd/ecscore/env_coll/env_coll_util.hpp"
-#include "topfd/ecscore/spectrum/matrix_spectrum.hpp"
+#include "topfd/ecscore/spectrum/ms_map_row_header.hpp"
 #include "topfd/ecscore/feature/feature.hpp"
 
 namespace toppic {
@@ -32,7 +32,7 @@ namespace toppic {
 Feature::Feature(EnvCollPtr env_coll_ptr, PeakMatrixPtr matrix_ptr, 
                  int feature_id, double sn_ratio) {
   SeedEnvelopePtr seed_ptr = env_coll_ptr->getSeedPtr();
-  MatrixSpectrumPtrVec spec_list = matrix_ptr->getSpecList();
+  MsMapRowHeaderPtrVec spec_list = matrix_ptr->getSpecList();
 
   EnvSetPtr env_set_ptr = env_coll_ptr->getSeedEnvSet();
   feature_id_ = feature_id;

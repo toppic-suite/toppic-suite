@@ -17,17 +17,17 @@
 
 #include "ms/spec/baseline_util.hpp"
 #include "topfd/ecscore/spectrum/matrix_peak.hpp"
-#include "topfd/ecscore/spectrum/matrix_spectrum.hpp"
+#include "topfd/ecscore/spectrum/ms_map_row_header.hpp"
 
 namespace toppic {
 
 class PeakRow {
  public:
-  PeakRow(MatrixSpectrumPtr spec_ptr, int bin_num);
+  PeakRow(MsMapRowHeaderPtr spec_ptr, int bin_num);
 
-  MatrixSpectrumPtr getSpectrumPtr() { return spectrum_ptr_; }
+  MsMapRowHeaderPtr getSpectrumPtr() { return spectrum_ptr_; }
 
-  void setSpectrumPtr(MatrixSpectrumPtr spectrum_ptr) { spectrum_ptr = spectrum_ptr; }
+  void setSpectrumPtr(MsMapRowHeaderPtr spectrum_ptr) { spectrum_ptr = spectrum_ptr; }
 
   int getSpecID() const { return spectrum_ptr_->getSpecId(); }
 
@@ -44,7 +44,7 @@ class PeakRow {
   void print();
 
  private:
-  MatrixSpectrumPtr spectrum_ptr_;
+  MsMapRowHeaderPtr spectrum_ptr_;
   MatrixPeakPtr2D peak_ptrs_;
 };
 

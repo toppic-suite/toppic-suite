@@ -42,8 +42,8 @@ bool checkChargeStateDist(const std::vector<int> &parent_charge_states,
 }
 
 
-bool checkOverlap(MatrixSpectrumPtrVec &spectrum_list, EnvCollPtr f, 
-                  double feature_start_rt, 
+bool checkOverlap(MsMapRowHeaderPtrVec &spectrum_list, EnvCollPtr f,
+                  double feature_start_rt,
                   double feature_end_rt, double time_tol) {
   int start_spec_id = f->getStartSpecId();
   int end_spec_id = f->getEndSpecId();
@@ -82,7 +82,7 @@ bool checkExistingFeatures(PeakMatrixPtr matrix_ptr, EnvCollPtr env_coll_ptr,
   double isotope_mass = mass_constant::getIsotopeMass();
   std::vector<double> extended_masses = {env_mass - isotope_mass, env_mass, env_mass + isotope_mass};
   int num_env_colls = env_coll_list.size();
-  MatrixSpectrumPtrVec spectrum_list = matrix_ptr->getSpecList();
+  MsMapRowHeaderPtrVec spectrum_list = matrix_ptr->getSpecList();
   int start_spec_id = env_coll_ptr->getStartSpecId();
   int end_spec_id = env_coll_ptr->getEndSpecId();
   double feature_start_rt = spectrum_list[start_spec_id]->getRt();
@@ -266,7 +266,7 @@ FracFeaturePtr getFracFeature(int feat_id, DeconvMsPtrVec &ms1_ptr_vec, int frac
                               PeakMatrixPtr matrix_ptr, double sn_ratio) {
 
   double noise_inte = matrix_ptr->getBaseInte(); 
-  MatrixSpectrumPtrVec spec_list = matrix_ptr->getSpecList(); 
+  MsMapRowHeaderPtrVec spec_list = matrix_ptr->getSpecList();
   int ms1_id_begin = coll_ptr->getStartSpecId();
   int ms1_id_end = coll_ptr->getEndSpecId();
   double feat_inte = coll_ptr->getIntensity(sn_ratio, noise_inte); 

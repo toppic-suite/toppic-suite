@@ -2,17 +2,17 @@
 // Created by abbash on 8/22/22.
 //
 
-#ifndef TOPPIC_TOPFD_ECSCORE_MATRIX_SPECTRUM_HPP
-#define TOPPIC_TOPFD_ECSCORE_MATRIX_SPECTRUM_HPP
+#ifndef TOPPIC_TOPFD_ECSCORE_MS_MAP_MS_MAP_ROW_HEADER_HPP
+#define TOPPIC_TOPFD_ECSCORE_MS_MAP_MS_MAP_ROW_HEADER_HPP
 
 #include <memory>
 #include <vector>
 
 namespace toppic {
 
-class MatrixSpectrum {
+class MsMapRowHeader {
  public:
-  MatrixSpectrum(int spec_id, int scan_num, double rt); 
+  MsMapRowHeader(int spec_id, int scan_num, double rt);
 
   int getSpecId() const { return spec_id_; }
   void setSpecId(int specId) { spec_id_ = specId; }
@@ -30,8 +30,8 @@ class MatrixSpectrum {
 
 };
 
-typedef std::shared_ptr<MatrixSpectrum> MatrixSpectrumPtr;
-typedef std::vector<MatrixSpectrumPtr> MatrixSpectrumPtrVec;
+typedef std::shared_ptr<MsMapRowHeader> MsMapRowHeaderPtr;
+typedef std::vector<MsMapRowHeaderPtr> MsMapRowHeaderPtrVec;
 
 }
 

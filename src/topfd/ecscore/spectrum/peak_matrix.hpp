@@ -19,7 +19,7 @@
 #include "ms/spec/peak.hpp"
 #include "ms/spec/deconv_ms.hpp"
 
-#include "topfd/ecscore/spectrum/matrix_spectrum.hpp"
+#include "topfd/ecscore/spectrum/ms_map_row_header.hpp"
 #include "topfd/ecscore/spectrum/peak_row.hpp"
 
 namespace toppic {
@@ -42,7 +42,7 @@ class PeakMatrix {
 
   double getBaseInte() { return base_inte_; }
 
-  MatrixSpectrumPtrVec getSpecList() { return spec_list_; }
+  MsMapRowHeaderPtrVec getSpecList() { return spec_list_; }
 
   std::vector<double> getSpecNoiseInte() { return spec_noise_intes_; }
 
@@ -68,7 +68,7 @@ class PeakMatrix {
   void findNeighbors(int spec_id, int search_bin_num, double mass_tol);
 
   PeakRowPtrVec matrix_;
-  MatrixSpectrumPtrVec spec_list_;
+  MsMapRowHeaderPtrVec spec_list_;
   std::vector<double> spec_noise_intes_;
   double bin_size_;
   int bin_num_;

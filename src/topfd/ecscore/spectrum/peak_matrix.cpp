@@ -61,7 +61,7 @@ void PeakMatrix::initSpectrumNoiseIntensities(PeakPtrVec2D &raw_peaks) {
 void PeakMatrix::initSpecList(DeconvMsPtrVec &ms1_ptr_vec) {
   for (auto &ms1: ms1_ptr_vec) {
     MsHeaderPtr header_ptr = ms1->getMsHeaderPtr();
-    MatrixSpectrumPtr spec_ptr = std::make_shared<MatrixSpectrum>(header_ptr->getSpecId(), 
+    MsMapRowHeaderPtr spec_ptr = std::make_shared<MsMapRowHeader>(header_ptr->getSpecId(),
                                                                   header_ptr->getFirstScanNum(),
                                                                   header_ptr->getRetentionTime());
     spec_list_.push_back(spec_ptr);

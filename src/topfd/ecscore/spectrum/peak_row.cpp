@@ -18,7 +18,7 @@
 
 namespace toppic {
 
-PeakRow::PeakRow(MatrixSpectrumPtr spec_ptr, int bin_num) {
+PeakRow::PeakRow(MsMapRowHeaderPtr spec_ptr, int bin_num) {
   spectrum_ptr_ = spec_ptr;
   for (int i = 0; i < bin_num; i++) {
     MatrixPeakPtrVec vec;
