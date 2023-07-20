@@ -23,11 +23,14 @@ class MsMapRowHeader {
   double getRt() const { return rt_; }
   void setRt(double rt) { rt_ = rt; }
 
+  double getBaseInte() const { return base_inte_;}
+  void setBaseInte(double base_inte) {base_inte_ = base_inte;}
+
  private:
   int spec_id_;
   int scan_num_;
   double rt_;
-
+  double base_inte_;
 };
 
 typedef std::shared_ptr<MsMapRowHeader> MsMapRowHeaderPtr;

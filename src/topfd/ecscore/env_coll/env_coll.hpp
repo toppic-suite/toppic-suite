@@ -18,7 +18,7 @@
 #include <memory>
 #include <vector>
 
-#include "topfd/ecscore/spectrum/peak_matrix.hpp"
+#include "topfd/ecscore/spectrum/ms_map.hpp"
 #include "topfd/ecscore/envelope/seed_envelope.hpp"
 #include "topfd/ecscore/env_set/env_set.hpp"
 
@@ -77,7 +77,7 @@ class EnvColl {
   void setExpInteSumList(const std::vector<double> &exp_inte_sum_list) {
     exp_inte_sum_list_ = exp_inte_sum_list;}
 
-  void removePeakData(PeakMatrixPtr matrix_ptr); 
+  void removePeakData(MsMapPtr matrix_ptr);
 
  private:
   SeedEnvelopePtr seed_ptr_;

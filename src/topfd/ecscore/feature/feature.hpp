@@ -21,7 +21,7 @@
 #include "topfd/common/topfd_para.hpp"
 #include "topfd/ecscore/ecscore_para.hpp"
 
-#include "topfd/ecscore/spectrum/peak_matrix.hpp"
+#include "topfd/ecscore/spectrum/ms_map.hpp"
 #include "topfd/ecscore/env_coll/env_coll.hpp"
 
 namespace toppic {
@@ -32,19 +32,19 @@ typedef std::vector<FeaturePtr> FeaturePtrVec;
 
 class Feature {
  public:
-  Feature(EnvCollPtr env_coll_ptr, PeakMatrixPtr matrix_ptr, int feature_id, double sn_ratio);
+  Feature(EnvCollPtr env_coll_ptr, MsMapPtr matrix_ptr, int feature_id, double sn_ratio);
 
   std::vector<float> getEcscoreInput(double max_retention_time);
 
-  static void assignFeatures(FracFeaturePtrVec &frac_features, 
-                             EnvCollPtrVec &env_coll_list, 
-                             FeaturePtrVec &feature_list, 
-                             PeakMatrixPtr matrix_ptr, 
+  static void assignFeatures(FracFeaturePtrVec &frac_features,
+                             EnvCollPtrVec &env_coll_list,
+                             FeaturePtrVec &feature_list,
+                             MsMapPtr matrix_ptr,
                              DeconvMsPtrVec &ms1_ptr_vec,
                              MsHeaderPtr2D &ms2_header_ptr_2d,
                              SeedEnvelopePtr2D &seed_ptr_2d,
-                             SpecFeaturePtrVec &ms2_features, 
-                             TopfdParaPtr topfd_para_ptr, 
+                             SpecFeaturePtrVec &ms2_features,
+                             TopfdParaPtr topfd_para_ptr,
                              EcscoreParaPtr score_para_ptr); 
 
   int getFeatureId() const { return feature_id_; }
@@ -149,10 +149,10 @@ class Feature {
                                     MsHeaderPtr header_ptr, double score_thresh, 
                                     SpecFeaturePtrVec &ms2_features); 
 
-  static bool getNewFeature(MsHeaderPtr header_ptr, PeakMatrixPtr matrix_ptr, 
-                            EcscoreParaPtr para_ptr, FeaturePtrVec &feature_list, 
-                            EnvCollPtrVec &env_coll_list, DeconvMsPtrVec &ms1_ptr_vec, 
-                            SeedEnvelopePtr2D &seed_ptr_2d,  
+  static bool getNewFeature(MsHeaderPtr header_ptr, MsMapPtr matrix_ptr,
+                            EcscoreParaPtr para_ptr, FeaturePtrVec &feature_list,
+                            EnvCollPtrVec &env_coll_list, DeconvMsPtrVec &ms1_ptr_vec,
+                            SeedEnvelopePtr2D &seed_ptr_2d,
                             FracFeaturePtrVec &frac_feature_list,
                             SpecFeaturePtrVec &ms2_feature_list); 
 

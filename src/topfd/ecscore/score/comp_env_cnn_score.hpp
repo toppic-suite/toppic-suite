@@ -16,13 +16,13 @@
 #define TOPPIC_TOPFD_ECSCORE_SCORE_COMP_ENV_CNN_SCORE_HPP
 
 #include "topfd/ecscore/env_coll/env_coll.hpp"
-#include "topfd/ecscore/spectrum/peak_matrix.hpp"
+#include "topfd/ecscore/spectrum/ms_map.hpp"
 
 namespace toppic {
 
 namespace comp_env_cnn_score {
 
-double compEnvcnnScore(PeakMatrixPtr matrix_ptr, EnvCollPtr env_coll_ptr); 
+double compEnvcnnScore(MsMapPtr matrix_ptr, EnvCollPtr env_coll_ptr);
 
 }
 }

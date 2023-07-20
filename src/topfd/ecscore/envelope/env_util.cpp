@@ -93,8 +93,8 @@ SeedEnvelopePtr getHalfChargeEnv(SeedEnvelopePtr seed_ptr,
   return sp_peak;
 }
 
-SeedEnvelopePtr testHalfChargeState(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr, 
-                                    EnvSetPtr env_set_ptr, double even_odd_peak_ratio, 
+SeedEnvelopePtr testHalfChargeState(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
+                                    EnvSetPtr env_set_ptr, double even_odd_peak_ratio,
                                     EcscoreParaPtr para_ptr, double sn_ratio) {
   SeedEnvelopePtr half_charge_seed = getHalfChargeEnv(seed_ptr, even_odd_peak_ratio);
   bool valid = false;

@@ -26,7 +26,7 @@
 #include "ms/feature/frac_feature_writer.hpp"
 #include "ms/feature/sample_feature_writer.hpp"
 #include "topfd/common/topfd_para.hpp"
-#include "topfd/ecscore/spectrum/peak_matrix.hpp"
+#include "topfd/ecscore/spectrum/ms_map.hpp"
 #include "topfd/ecscore/envelope/seed_envelope.hpp"
 #include "topfd/ecscore/envelope/seed_env_util.hpp"
 #include "topfd/ecscore/env_coll/env_coll.hpp"
@@ -88,8 +88,8 @@ void process(TopfdParaPtr topfd_para_ptr) {
 
   double sn_ratio = topfd_para_ptr->getMsOneSnRatio();
   /// Prepare data -- Peak Matrix
-  PeakMatrixPtr matrix_ptr = std::make_shared<PeakMatrix>(ms1_mzml_peaks, deconv_ms1_ptr_vec, 
-                                                          score_para_ptr->bin_size_, sn_ratio); 
+  MsMapPtr matrix_ptr = std::make_shared<MsMap>(ms1_mzml_peaks, deconv_ms1_ptr_vec,
+                                                score_para_ptr->bin_size_, sn_ratio);
 
   if (score_para_ptr->filter_neighboring_peaks_) {
     matrix_ptr->removeNonNeighbors(score_para_ptr->neighbor_mass_tole_);
@@ -152,9 +152,9 @@ void process(TopfdParaPtr topfd_para_ptr) {
 
   // map MS2 features
   double zero_sn_ratio = 0;
-  PeakMatrixPtr raw_matrix_ptr = std::make_shared<PeakMatrix>(ms1_mzml_peaks, deconv_ms1_ptr_vec, 
-                                                              score_para_ptr->bin_size_,
-                                                              zero_sn_ratio); 
+  MsMapPtr raw_matrix_ptr = std::make_shared<MsMap>(ms1_mzml_peaks, deconv_ms1_ptr_vec,
+                                                    score_para_ptr->bin_size_,
+                                                    zero_sn_ratio);
   SpecFeaturePtrVec ms2_features;
 
   Feature::assignFeatures(frac_features, env_coll_list, features, 

@@ -268,7 +268,7 @@ void EnvSet::refineFeatureBoundary() {
   shortlistExpEnvs();
 }
 
-void EnvSet::removePeakData(PeakMatrixPtr matrix_ptr) {
+void EnvSet::removePeakData(MsMapPtr matrix_ptr) {
   double sn_ratio = 3.0;
   std::vector<std::vector<double>> theo_intes = getScaledTheoIntes(sn_ratio, 
                                                                    matrix_ptr->getBaseInte());
@@ -280,7 +280,7 @@ void EnvSet::removePeakData(PeakMatrixPtr matrix_ptr) {
       continue;
     }
     int spec_id = exp_env->getSpecId();
-    if (spec_id < 0 or spec_id >= matrix_ptr->getSpecNum()) {
+    if (spec_id < 0 or spec_id >= matrix_ptr->getRowNum()) {
       continue;
     }
     MsMapPeakPtrVec exp_peaks = exp_env->getExpPeakList();

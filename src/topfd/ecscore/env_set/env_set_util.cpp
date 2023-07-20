@@ -87,7 +87,7 @@ double calcInteRatio(std::vector<double> &theo_envelope_inte,
   }
 }
 
-void compPeakStartEndIdx(PeakMatrixPtr matrix_ptr,SeedEnvelopePtr seed_ptr,  
+void compPeakStartEndIdx(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
                          double error_tole) {
   EnvSimplePeakPtrVec peak_list = seed_ptr->getPeakList();
   for (auto &peak : peak_list) {
@@ -96,14 +96,14 @@ void compPeakStartEndIdx(PeakMatrixPtr matrix_ptr,SeedEnvelopePtr seed_ptr,
     if (start_idx < 0)
       start_idx = 0;
     int end_idx = matrix_ptr->getBinIndex(mz + error_tole);
-    if (end_idx >= matrix_ptr->getBinNum())
-      end_idx = matrix_ptr->getBinNum() - 1;
+    if (end_idx >= matrix_ptr->getColNum())
+      end_idx = matrix_ptr->getColNum() - 1;
     peak->setStartIdx(start_idx);
     peak->setEndIdx(end_idx);
   }
 }
 
-MsMapPeakPtr pickExpPeak(PeakMatrixPtr matrix_ptr, EnvSimplePeakPtr seed_peak_ptr,
+MsMapPeakPtr pickExpPeak(MsMapPtr matrix_ptr, EnvSimplePeakPtr seed_peak_ptr,
                          int sp_id, double mass_tol) {
   // get peaks within mass tolerance
   double max_inte = std::numeric_limits<double>::min();
@@ -122,7 +122,7 @@ MsMapPeakPtr pickExpPeak(PeakMatrixPtr matrix_ptr, EnvSimplePeakPtr seed_peak_pt
   return result_peak;
 }
 
-ExpEnvelopePtr getMatchExpEnv(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr, 
+ExpEnvelopePtr getMatchExpEnv(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
                               int sp_id, double mass_tol) {
   MsMapPeakPtrVec peak_list;
   EnvSimplePeakPtrVec peaks = seed_ptr->getPeakList();
@@ -152,7 +152,7 @@ void removeNonMatchEnvs(ExpEnvelopePtrVec &env_list, int refer_idx,
   }
 }
 
-EnvSetPtr getEnvSet(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr, 
+EnvSetPtr getEnvSet(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
                     EcscoreParaPtr para_ptr, double sn_ratio) {
   double noise_inte_level = matrix_ptr->getBaseInte();
   std::vector<double> theo_env_inte = seed_ptr->getInteList();
@@ -189,7 +189,7 @@ EnvSetPtr getEnvSet(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
   ExpEnvelopePtrVec forw_env_list;
   idx = seed_ptr->getSpecId() + 1;
   miss_num = 0;
-  while (idx < matrix_ptr->getSpecNum()) {
+  while (idx < matrix_ptr->getRowNum()) {
     ExpEnvelopePtr exp_env_ptr = env_set_util::getMatchExpEnv(matrix_ptr, seed_ptr, 
                                                               idx, para_ptr->mass_tole_);
     std::vector<double> exp_env_inte = exp_env_ptr->getInteList();
@@ -229,13 +229,13 @@ EnvSetPtr getEnvSet(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
   return env_set_ptr;
 }
 
-bool checkValidEnvSetSeedEnv(PeakMatrixPtr matrix_ptr, EnvSetPtr env_set_ptr, 
+bool checkValidEnvSetSeedEnv(MsMapPtr matrix_ptr, EnvSetPtr env_set_ptr,
                              int min_match_peak) {
   std::vector<double> theo_env_inte = env_set_ptr->getSeedInteList();
   int refer_idx = std::max_element(theo_env_inte.begin(), theo_env_inte.end()) - theo_env_inte.begin();
   int base_idx = env_set_ptr->getBaseSpecId();
   int start_idx = std::max(base_idx-1, 0);
-  int end_idx = std::min(base_idx+1, matrix_ptr->getSpecNum() -1);
+  int end_idx = std::min(base_idx+1, matrix_ptr->getRowNum() - 1);
   ExpEnvelopePtrVec env_list = env_set_ptr->getExpEnvList();
   bool valid = true;
   for (auto &exp_env : env_list) {
@@ -246,13 +246,13 @@ bool checkValidEnvSetSeedEnv(PeakMatrixPtr matrix_ptr, EnvSetPtr env_set_ptr,
   return valid;
 }
 
-bool checkValidEnvSetSeedEnvSparse(PeakMatrixPtr matrix_ptr, EnvSetPtr env_set_ptr, 
+bool checkValidEnvSetSeedEnvSparse(MsMapPtr matrix_ptr, EnvSetPtr env_set_ptr,
                                    int min_match_peak) {
   std::vector<double> theo_env_inte = env_set_ptr->getSeedInteList();
   int refer_idx = std::max_element(theo_env_inte.begin(), theo_env_inte.end()) - theo_env_inte.begin();
   int base_idx = env_set_ptr->getBaseSpecId();
   int start_idx = std::max(base_idx-2, 0);
-  int end_idx = std::min(base_idx+2, matrix_ptr->getSpecNum() -1);
+  int end_idx = std::min(base_idx+2, matrix_ptr->getRowNum() - 1);
   ExpEnvelopePtrVec env_list = env_set_ptr->getExpEnvList();
   bool valid = true;
   int false_counter = 0;
@@ -269,8 +269,8 @@ bool checkValidEnvSetSeedEnvSparse(PeakMatrixPtr matrix_ptr, EnvSetPtr env_set_p
 
 
 
-EnvSetPtr findEnvSet(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr, 
-                     int start_spec_id, int end_spec_id, 
+EnvSetPtr findEnvSet(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
+                     int start_spec_id, int end_spec_id,
                      EcscoreParaPtr para_ptr, double sn_ratio) {
 
   double noise_inte_level = matrix_ptr->getBaseInte();
@@ -333,7 +333,7 @@ EnvSetPtr findEnvSet(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
   return env_set_ptr;
 }
 
-bool checkValidEnvSet(PeakMatrixPtr matrix_ptr, EnvSetPtr env_set_ptr) {
+bool checkValidEnvSet(MsMapPtr matrix_ptr, EnvSetPtr env_set_ptr) {
   bool valid = true;
   int elems = 0;
   std::vector<double> env_xic = env_set_ptr->getXicTopThreeInteList();

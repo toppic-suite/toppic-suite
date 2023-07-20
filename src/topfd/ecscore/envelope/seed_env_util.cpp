@@ -22,7 +22,7 @@ namespace toppic {
 
 namespace seed_env_util {
 
-bool preprocessEnv(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr, 
+bool preprocessEnv(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
                    EcscoreParaPtr para_ptr, double sn_ratio) {
   if (seed_ptr->getCharge() < para_ptr->para_min_charge_)
     return false;
@@ -33,14 +33,14 @@ bool preprocessEnv(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
   seed_ptr->rmPeaks(min_mz, max_mz);
   env_set_util::compPeakStartEndIdx(matrix_ptr, seed_ptr, mass_tol);
   bool valid = evalEnv(matrix_ptr, seed_ptr, mass_tol, corr_tol, sn_ratio);
-  if (seed_ptr->getSpecId() >= matrix_ptr->getSpecNum()) {
+  if (seed_ptr->getSpecId() >= matrix_ptr->getRowNum()) {
     LOG_ERROR("spec id " + std::to_string(seed_ptr->getSpecId()) + " is out of range!");
     valid = false;
   }
   return valid;
 }
 
-bool evalEnv(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr, 
+bool evalEnv(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
              double mass_tol, double corr_tol, double sn_ratio){
   double noise_inte = matrix_ptr->getBaseInte();
   ExpEnvelopePtr exp_env_ptr 
@@ -73,7 +73,7 @@ bool evalEnv(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
   return evalEnvPair(exp_env_inte, scaled_theo_inte, corr_tol);
 }
 
-bool simpleEvalEnv(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr, 
+bool simpleEvalEnv(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
                    double mass_tol, double corr_tol, double sn_ratio){
   int spec_id = seed_ptr->getSpecId();
   ExpEnvelopePtr exp_env_ptr 
@@ -114,9 +114,9 @@ bool simpleEvalEnv(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
   return true;
 }
 
-bool simplePreprocessEnv(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr, 
+bool simplePreprocessEnv(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
                          EcscoreParaPtr para_ptr, double sn_ratio) {
-  if (seed_ptr->getSpecId() >= matrix_ptr->getSpecNum()) {
+  if (seed_ptr->getSpecId() >= matrix_ptr->getRowNum()) {
     LOG_ERROR("spec id " + std::to_string(seed_ptr->getSpecId()) + " is out of range!");
     return false; 
   }

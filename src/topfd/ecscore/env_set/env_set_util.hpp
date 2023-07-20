@@ -18,7 +18,7 @@
 #include <vector>
 
 #include "topfd/ecscore/ecscore_para.hpp"
-#include "topfd/ecscore/spectrum/peak_matrix.hpp"
+#include "topfd/ecscore/spectrum/ms_map.hpp"
 #include "topfd/ecscore/env_set/env_set.hpp"
 
 namespace toppic {
@@ -31,22 +31,22 @@ std::vector<double> getAggregateEnvelopeInte(EnvSetPtr env_set_ptr);
 
 double calcInteRatio(std::vector<double> &theo_envelope_inte, std::vector<double> &exp_envelope_inte);
 
-EnvSetPtr getEnvSet(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr, 
+EnvSetPtr getEnvSet(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
                     EcscoreParaPtr para_ptr, double sn_ratio);
 
-EnvSetPtr findEnvSet(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr, 
-                     int start_spec_id, int end_spec_id, 
+EnvSetPtr findEnvSet(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
+                     int start_spec_id, int end_spec_id,
                      EcscoreParaPtr para_ptr, double sn_ratio);
 
-void compPeakStartEndIdx(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr, double error_tole);
+void compPeakStartEndIdx(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr, double error_tole);
 
-bool checkValidEnvSet(PeakMatrixPtr matrix_ptr, EnvSetPtr env_set_ptr);
+bool checkValidEnvSet(MsMapPtr matrix_ptr, EnvSetPtr env_set_ptr);
 
-bool checkValidEnvSetSeedEnv(PeakMatrixPtr matrix_ptr, EnvSetPtr env_set_ptr, int max_miss_peak);
+bool checkValidEnvSetSeedEnv(MsMapPtr matrix_ptr, EnvSetPtr env_set_ptr, int max_miss_peak);
 
-bool checkValidEnvSetSeedEnvSparse(PeakMatrixPtr matrix_ptr, EnvSetPtr env_set_ptr, int max_miss_peak);
+bool checkValidEnvSetSeedEnvSparse(MsMapPtr matrix_ptr, EnvSetPtr env_set_ptr, int max_miss_peak);
 
-ExpEnvelopePtr getMatchExpEnv(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr, int sp_id, double mass_tol);
+ExpEnvelopePtr getMatchExpEnv(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr, int sp_id, double mass_tol);
 
 }
 

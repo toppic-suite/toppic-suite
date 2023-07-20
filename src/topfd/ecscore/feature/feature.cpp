@@ -29,10 +29,10 @@
 
 namespace toppic {
 
-Feature::Feature(EnvCollPtr env_coll_ptr, PeakMatrixPtr matrix_ptr, 
+Feature::Feature(EnvCollPtr env_coll_ptr, MsMapPtr matrix_ptr,
                  int feature_id, double sn_ratio) {
   SeedEnvelopePtr seed_ptr = env_coll_ptr->getSeedPtr();
-  MsMapRowHeaderPtrVec spec_list = matrix_ptr->getSpecList();
+  MsMapRowHeaderPtrVec spec_list = matrix_ptr->getHeaderPtrList();
 
   EnvSetPtr env_set_ptr = env_coll_ptr->getSeedEnvSet();
   feature_id_ = feature_id;
@@ -88,15 +88,15 @@ std::vector<float> Feature::getEcscoreInput(double max_elution_time) {
   return data;
 }
 
-void Feature::assignFeatures(FracFeaturePtrVec &frac_feature_list, 
-                             EnvCollPtrVec &env_coll_list, 
-                             FeaturePtrVec &feature_list, 
-                             PeakMatrixPtr matrix_ptr, 
+void Feature::assignFeatures(FracFeaturePtrVec &frac_feature_list,
+                             EnvCollPtrVec &env_coll_list,
+                             FeaturePtrVec &feature_list,
+                             MsMapPtr matrix_ptr,
                              DeconvMsPtrVec &ms1_ptr_vec,
                              MsHeaderPtr2D &ms2_header_ptr_2d,
                              SeedEnvelopePtr2D &seed_ptr_2d,
-                             SpecFeaturePtrVec &ms2_feature_list, 
-                             TopfdParaPtr topfd_para_ptr, 
+                             SpecFeaturePtrVec &ms2_feature_list,
+                             TopfdParaPtr topfd_para_ptr,
                              EcscoreParaPtr score_para_ptr) {
   double score_cutoff = topfd_para_ptr->getEcscoreCutoff();
   for (size_t ms1_id = 0; ms1_id < ms1_ptr_vec.size(); ms1_id++) {
@@ -196,10 +196,10 @@ bool Feature::getHighestInteFeature(FracFeaturePtrVec &frac_features, EnvCollPtr
   }
 }
 
-bool Feature::getNewFeature(MsHeaderPtr header_ptr, PeakMatrixPtr matrix_ptr, 
-                            EcscoreParaPtr score_para_ptr, FeaturePtrVec &feature_list, 
-                            EnvCollPtrVec &env_coll_list, DeconvMsPtrVec &ms1_ptr_vec, 
-                            SeedEnvelopePtr2D &seed_ptr_2d, FracFeaturePtrVec &frac_feature_list, 
+bool Feature::getNewFeature(MsHeaderPtr header_ptr, MsMapPtr matrix_ptr,
+                            EcscoreParaPtr score_para_ptr, FeaturePtrVec &feature_list,
+                            EnvCollPtrVec &env_coll_list, DeconvMsPtrVec &ms1_ptr_vec,
+                            SeedEnvelopePtr2D &seed_ptr_2d, FracFeaturePtrVec &frac_feature_list,
                             SpecFeaturePtrVec &ms2_feature_list) {
   // set min match envelope to 1 to accept single scan features
   score_para_ptr->min_match_env_ = 1;

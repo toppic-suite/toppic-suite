@@ -74,7 +74,7 @@ bool checkOverlap(MsMapRowHeaderPtrVec &spectrum_list, EnvCollPtr f,
   return status;
 }
 
-bool checkExistingFeatures(PeakMatrixPtr matrix_ptr, EnvCollPtr env_coll_ptr, 
+bool checkExistingFeatures(MsMapPtr matrix_ptr, EnvCollPtr env_coll_ptr,
                            EnvCollPtrVec &env_coll_list, EcscoreParaPtr para_ptr) {
   double env_mass = env_coll_ptr->getMass();
   double mass_tol = para_ptr->match_envelope_tolerance_ * env_mass;
@@ -82,7 +82,7 @@ bool checkExistingFeatures(PeakMatrixPtr matrix_ptr, EnvCollPtr env_coll_ptr,
   double isotope_mass = mass_constant::getIsotopeMass();
   std::vector<double> extended_masses = {env_mass - isotope_mass, env_mass, env_mass + isotope_mass};
   int num_env_colls = env_coll_list.size();
-  MsMapRowHeaderPtrVec spectrum_list = matrix_ptr->getSpecList();
+  MsMapRowHeaderPtrVec spectrum_list = matrix_ptr->getHeaderPtrList();
   int start_spec_id = env_coll_ptr->getStartSpecId();
   int end_spec_id = env_coll_ptr->getEndSpecId();
   double feature_start_rt = spectrum_list[start_spec_id]->getRt();
@@ -119,8 +119,8 @@ bool checkExistingFeatures(PeakMatrixPtr matrix_ptr, EnvCollPtr env_coll_ptr,
   }
 }
 
-EnvSetPtrVec getChargeEnvList(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
-                              EnvSetPtr seed_env_set_ptr, EcscoreParaPtr para_ptr, 
+EnvSetPtrVec getChargeEnvList(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
+                              EnvSetPtr seed_env_set_ptr, EcscoreParaPtr para_ptr,
                               double sn_ratio) {
   int start_spec_id = seed_env_set_ptr->getStartSpecId();
   int end_spec_id = seed_env_set_ptr->getEndSpecId();
@@ -178,7 +178,7 @@ EnvSetPtrVec getChargeEnvList(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr
   return env_set_list;
 }
 
-EnvCollPtr findEnvCollWithSingleEnv(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
+EnvCollPtr findEnvCollWithSingleEnv(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
                                     EcscoreParaPtr para_ptr, double sn_ratio) {
   EnvSetPtr env_set_ptr = env_set_util::getEnvSet(matrix_ptr, seed_ptr, para_ptr, sn_ratio);
   if (env_set_ptr == nullptr) {
@@ -202,7 +202,7 @@ EnvCollPtr findEnvCollWithSingleEnv(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr se
   return env_coll_ptr;
 }
 
-EnvCollPtr findEnvColl(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
+EnvCollPtr findEnvColl(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
                        EcscoreParaPtr para_ptr, double sn_ratio) {
   EnvSetPtr env_set_ptr = env_set_util::getEnvSet(matrix_ptr, seed_ptr, para_ptr, sn_ratio);
 
@@ -261,12 +261,12 @@ EnvCollPtr findEnvColl(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
   return env_coll_ptr;
 }
 
-FracFeaturePtr getFracFeature(int feat_id, DeconvMsPtrVec &ms1_ptr_vec, int frac_id, 
-                              std::string &file_name, EnvCollPtr coll_ptr, 
-                              PeakMatrixPtr matrix_ptr, double sn_ratio) {
+FracFeaturePtr getFracFeature(int feat_id, DeconvMsPtrVec &ms1_ptr_vec, int frac_id,
+                              std::string &file_name, EnvCollPtr coll_ptr,
+                              MsMapPtr matrix_ptr, double sn_ratio) {
 
   double noise_inte = matrix_ptr->getBaseInte(); 
-  MsMapRowHeaderPtrVec spec_list = matrix_ptr->getSpecList();
+  MsMapRowHeaderPtrVec spec_list = matrix_ptr->getHeaderPtrList();
   int ms1_id_begin = coll_ptr->getStartSpecId();
   int ms1_id_end = coll_ptr->getEndSpecId();
   double feat_inte = coll_ptr->getIntensity(sn_ratio, noise_inte); 

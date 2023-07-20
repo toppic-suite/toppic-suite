@@ -32,7 +32,7 @@ int getIndex(double mz, double min_mz, double bin_size) {
   return bin_idx;
 }
 
-MsMapPeakPtrVec  getIntvPeakList(PeakMatrixPtr matrix_ptr, EnvSetPtr env_set_ptr,
+MsMapPeakPtrVec  getIntvPeakList(MsMapPtr matrix_ptr, EnvSetPtr env_set_ptr,
                                  int spec_id) {
   EnvSimplePeakPtrVec peak_list = env_set_ptr->getSeedPtr()->getPeakList(); 
   double min_theo_peak = std::round(peak_list[0]->getPosition() * 1000.0) / 1000.0;
@@ -50,7 +50,7 @@ MsMapPeakPtrVec  getIntvPeakList(PeakMatrixPtr matrix_ptr, EnvSetPtr env_set_ptr
   return intv_peak_list;
 }
 
-std::vector<std::vector<float>> getEnvcnnInputMatrix(PeakMatrixPtr matrix_ptr, 
+std::vector<std::vector<float>> getEnvcnnInputMatrix(MsMapPtr matrix_ptr,
                                                      EnvCollPtr coll_ptr) {
   std::vector<std::vector<float>> data_matrix = onnx_env_cnn::initInputMatrix(); 
   SeedEnvelopePtr seed_ptr = coll_ptr->getSeedPtr();
@@ -146,7 +146,7 @@ std::vector<std::vector<float>> getEnvcnnInputMatrix(PeakMatrixPtr matrix_ptr,
 }
 
 
-double compEnvcnnScore(PeakMatrixPtr matrix_ptr, EnvCollPtr coll_ptr) {
+double compEnvcnnScore(MsMapPtr matrix_ptr, EnvCollPtr coll_ptr) {
   std::vector<std::vector<float>> matrix = getEnvcnnInputMatrix(matrix_ptr, coll_ptr); 
   std::vector<float> tensor;
   for (size_t i = 0; i < matrix.size(); i++) {

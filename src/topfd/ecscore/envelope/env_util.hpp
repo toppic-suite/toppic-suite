@@ -18,7 +18,7 @@
 #include <vector>
 
 #include "topfd/ecscore/ecscore_para.hpp"
-#include "topfd/ecscore/spectrum/peak_matrix.hpp"
+#include "topfd/ecscore/spectrum/ms_map.hpp"
 #include "topfd/ecscore/envelope/seed_envelope.hpp"
 #include "topfd/ecscore/env_set/env_set.hpp"
 
@@ -32,8 +32,8 @@ std::vector<int> findLocalMinima(std::vector<double> &arr);
 
 std::vector<int> findLocalMaxima(std::vector<double> &arr);
 
-SeedEnvelopePtr testHalfChargeState(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr, 
-                                    EnvSetPtr env_set_ptr, double even_odd_peak_ratios, 
+SeedEnvelopePtr testHalfChargeState(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
+                                    EnvSetPtr env_set_ptr, double even_odd_peak_ratios,
                                     EcscoreParaPtr para_ptr, double sn_ratio);
 
 }

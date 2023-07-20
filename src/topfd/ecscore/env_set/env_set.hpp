@@ -7,7 +7,7 @@
 
 #include "topfd/ecscore/envelope/seed_envelope.hpp"
 #include "topfd/ecscore/envelope/exp_envelope.hpp"
-#include "topfd/ecscore/spectrum/peak_matrix.hpp"
+#include "topfd/ecscore/spectrum/ms_map.hpp"
 #include "topfd/ecscore/env_set/xic.hpp"
 
 namespace toppic {
@@ -67,7 +67,7 @@ class EnvSet {
 
   void refineFeatureBoundary();
 
-  void removePeakData(PeakMatrixPtr matrix_ptr); 
+  void removePeakData(MsMapPtr matrix_ptr);
 
   double compIntensity(double sn_ratio, double noise_inte);
 

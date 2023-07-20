@@ -19,7 +19,7 @@
 #include "ms/feature/frac_feature.hpp"
 
 #include "topfd/ecscore/ecscore_para.hpp"
-#include "topfd/ecscore/spectrum/peak_matrix.hpp"
+#include "topfd/ecscore/spectrum/ms_map.hpp"
 #include "topfd/ecscore/envelope/seed_envelope.hpp"
 #include "topfd/ecscore/env_set/env_set.hpp"
 #include "topfd/ecscore/env_coll/env_coll.hpp"
@@ -28,22 +28,22 @@ namespace toppic {
 
 namespace env_coll_util {
 
-EnvCollPtr findEnvColl(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
+EnvCollPtr findEnvColl(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
                        EcscoreParaPtr para_ptr, double sn_ratio);
 
-EnvCollPtr findEnvCollWithSingleEnv(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
+EnvCollPtr findEnvCollWithSingleEnv(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
                                     EcscoreParaPtr para_ptr, double sn_ratio); 
 
-EnvSetPtrVec getChargeEnvList(PeakMatrixPtr matrix_ptr, SeedEnvelopePtr seed_ptr, 
-                              EnvSetPtr seed_env_set_ptr, EcscoreParaPtr para_ptr, 
+EnvSetPtrVec getChargeEnvList(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
+                              EnvSetPtr seed_env_set_ptr, EcscoreParaPtr para_ptr,
                               double sn_ratio);
 
-bool checkExistingFeatures(PeakMatrixPtr matrix_ptr, EnvCollPtr coll_ptr, 
+bool checkExistingFeatures(MsMapPtr matrix_ptr, EnvCollPtr coll_ptr,
                            EnvCollPtrVec &env_coll_list, EcscoreParaPtr para_ptr);
 
 FracFeaturePtr getFracFeature(int feat_id, DeconvMsPtrVec &ms1_ptr_vec, int
                               frac_id, std::string &file_name,
-                              EnvCollPtr coll_ptr, PeakMatrixPtr matrix_ptr, double snr);
+                              EnvCollPtr coll_ptr, MsMapPtr matrix_ptr, double snr);
 
 }
 }
