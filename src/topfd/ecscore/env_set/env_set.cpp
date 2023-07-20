@@ -293,7 +293,7 @@ void EnvSet::removePeakData(MsMapPtr matrix_ptr) {
       if (exp_peak == nullptr) {
         continue;
       }
-      int bin_idx = matrix_ptr->getBinIndex(exp_peak->getPosition()); 
+      int bin_idx = matrix_ptr->getColIndex(exp_peak->getPosition());
       MsMapPeakPtrVec bin_peaks = matrix_ptr->getBinPeakList(spec_id, bin_idx);
       double theo_peak_inte = theo_env_peak_intes[peak_id];
       MsMapPeakPtrVec remain_peaks;

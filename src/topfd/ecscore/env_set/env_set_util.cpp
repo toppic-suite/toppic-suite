@@ -92,10 +92,10 @@ void compPeakStartEndIdx(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
   EnvSimplePeakPtrVec peak_list = seed_ptr->getPeakList();
   for (auto &peak : peak_list) {
     double mz = peak->getPosition();
-    int start_idx = matrix_ptr->getBinIndex(mz - error_tole);
+    int start_idx = matrix_ptr->getColIndex(mz - error_tole);
     if (start_idx < 0)
       start_idx = 0;
-    int end_idx = matrix_ptr->getBinIndex(mz + error_tole);
+    int end_idx = matrix_ptr->getColIndex(mz + error_tole);
     if (end_idx >= matrix_ptr->getColNum())
       end_idx = matrix_ptr->getColNum() - 1;
     peak->setStartIdx(start_idx);

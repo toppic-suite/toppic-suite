@@ -16,20 +16,14 @@
 
 namespace toppic {
 
-MsMapPeak::MsMapPeak(int peak_id, int spec_id, PeakPtr peak):
+MsMapPeak::MsMapPeak(PeakPtr peak):
   Peak(peak->getPosition(), peak->getIntensity()) {
-    peak_id_ = peak_id;
-    spec_id_ = spec_id;
     ori_inte_ = peak->getIntensity();
-    start_idx_ = -1;
-    end_idx_ = -1;
     neighbor_ = false;
   }
 
 std::string MsMapPeak::getString() {
-  return "Peak ID: " + std::to_string(peak_id_) + " " +
-    "Spec ID: " + std::to_string(spec_id_) + " " +
-    "Pos: " + std::to_string(getPosition()) + " " +
+  return "Pos: " + std::to_string(getPosition()) + " " +
     "Inte: " + std::to_string(getIntensity()) + " " +
     "Neighbor: " + std::to_string(neighbor_) + "\n";
 }

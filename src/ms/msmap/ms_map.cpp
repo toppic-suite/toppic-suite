@@ -45,7 +45,6 @@ MsMap::MsMap(PeakPtrVec2D &raw_peaks, DeconvMsPtrVec &ms1_ptr_vec,
 }
 
 void MsMap::initMap(DeconvMsPtrVec &ms1_ptr_vec, double sn_ratio) {
-  int peak_id = 0;
   for (size_t row_id = 0; row_id < ms1_ptr_vec.size(); row_id++) {
     MsHeaderPtr ms_header_ptr = ms1_ptr_vec[row_id]->getMsHeaderPtr();
     MsMapRowHeaderPtr row_header_ptr = std::make_shared<MsMapRowHeader>(ms_header_ptr->getSpecId(),
@@ -65,14 +64,13 @@ void MsMap::initMap(DeconvMsPtrVec &ms1_ptr_vec, double sn_ratio) {
     // init indexes
     for (size_t j = 0; j < row_peaks.size(); j++) {
       DeconvPeakPtr p_ptr = row_peaks[j];
-      MsMapPeakPtr new_peak_ptr = std::make_shared<MsMapPeak>(peak_id, row_id, p_ptr);
+      MsMapPeakPtr new_peak_ptr = std::make_shared<MsMapPeak>(p_ptr);
       peaks_.push_back(new_peak_ptr);
       // filter low intensity peak
       if (new_peak_ptr->getIntensity() > sn_ratio * base_inte_) {
-        int bin_idx = getBinIndex(new_peak_ptr->getPosition());
+        int bin_idx = getColIndex(new_peak_ptr->getPosition());
         row_ptr_list_[row_id]->addPeak(bin_idx, new_peak_ptr);
       }
-      peak_id++;
     }
   }
 }
@@ -85,7 +83,7 @@ MsMapRowHeaderPtrVec MsMap::getHeaderPtrList() {
   return header_list;
 }
 
-int MsMap::getBinIndex(double mz) {
+int MsMap::getColIndex(double mz) {
   double mz_diff = mz - min_mz_;
   int bin_idx = int(mz_diff / bin_size_);
   if (bin_idx < 0) bin_idx = 0;

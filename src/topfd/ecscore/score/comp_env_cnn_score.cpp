@@ -37,8 +37,8 @@ MsMapPeakPtrVec  getIntvPeakList(MsMapPtr matrix_ptr, EnvSetPtr env_set_ptr,
   EnvSimplePeakPtrVec peak_list = env_set_ptr->getSeedPtr()->getPeakList(); 
   double min_theo_peak = std::round(peak_list[0]->getPosition() * 1000.0) / 1000.0;
   double max_theo_peak = std::round(peak_list[peak_list.size() - 1]->getPosition() * 1000.0) / 1000.0;
-  int start_idx = matrix_ptr->getBinIndex(min_theo_peak - 0.1);
-  int end_idx = matrix_ptr->getBinIndex(max_theo_peak + 0.1);
+  int start_idx = matrix_ptr->getColIndex(min_theo_peak - 0.1);
+  int end_idx = matrix_ptr->getColIndex(max_theo_peak + 0.1);
   MsMapPeakPtrVec intv_peak_list;
   for (int peak_idx = start_idx; peak_idx <= end_idx; peak_idx++) {
     MsMapPeakPtrVec bin_peaks = matrix_ptr->getBinPeakList(spec_id, peak_idx);

@@ -21,40 +21,20 @@ namespace toppic {
 
 class MsMapPeak : public Peak {
  public:
-  MsMapPeak(int peak_id, int spec_id, PeakPtr peak);
+  MsMapPeak(PeakPtr peak);
 
   std::string getString();
-
-  int getPeakId() const { return peak_id_; }
-
-  void setPeakId(int peak_id) { peak_id_ = peak_id; }
-
-  int getSpecId() const { return spec_id_; }
-
-  void setSpecId(int spec_id) { spec_id_ = spec_id; }
 
   double getOriInte() const { return ori_inte_; }
 
   void setOriInte(double ori_inte) { ori_inte_ = ori_inte; }
-
-  int getStartIdx() const { return start_idx_; }
-
-  void setStartIdx(int start_idx) { start_idx_ = start_idx; }
-
-  int getEndIdx() const { return end_idx_; }
-
-  void setEndIdx(int end_idx) { end_idx_ = end_idx; }
 
   bool getNeighbor() const { return neighbor_; }
 
   void setNeighbor(bool neighbor) { neighbor_ = neighbor; }
 
  private:
-  int peak_id_;
-  int spec_id_;
   double ori_inte_;
-  int start_idx_;
-  int end_idx_;
   bool neighbor_;
 };
 

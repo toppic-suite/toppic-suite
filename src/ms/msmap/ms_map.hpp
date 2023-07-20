@@ -44,7 +44,7 @@ class MsMap {
 
   void removeNonNeighbors(double mass_tol);
 
-  int getBinIndex(double mz);
+  int getColIndex(double mz);
 
   MsMapPeakPtrVec getBinPeakList(int row_idx, int bin_idx) {
     return row_ptr_list_[row_idx]->getPeakPtrVec(bin_idx);}
