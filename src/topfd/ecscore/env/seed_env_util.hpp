@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_TOPFD_ECSCORE_ENVELOPE_SEED_ENV_UTIL_HPP
-#define TOPPIC_TOPFD_ECSCORE_ENVELOPE_SEED_ENV_UTIL_HPP
+#ifndef TOPPIC_TOPFD_ECSCORE_ENV_SEED_ENV_UTIL_HPP
+#define TOPPIC_TOPFD_ECSCORE_ENV_SEED_ENV_UTIL_HPP
 
 #include "ms/msmap/ms_map.hpp"
 #include "topfd/ecscore/ecscore_para.hpp"
@@ -23,18 +23,11 @@ namespace toppic {
 
 namespace seed_env_util {
 
-bool preprocessEnv(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
+bool preprocessEnv(MsMapPtr map_ptr, SeedEnvPtr seed_ptr,
                    EcscoreParaPtr para_ptr, double sn_ratio);
 
-bool evalEnv(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
-             double mass_tol, double corr_tol, double snr);
-
-bool simplePreprocessEnv(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
+bool simplePreprocessEnv(MsMapPtr map_ptr, SeedEnvPtr seed_ptr,
                          EcscoreParaPtr para_ptr, double sn_ratio); 
-
-bool testChargeState(int charge, std::vector<double> &seed_env_inte);
-
-bool evalEnvPair(std::vector<double> &exp_env_inte, std::vector<double> &theo_inte, double corr_tol);
 
 }
 
