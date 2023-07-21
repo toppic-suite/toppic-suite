@@ -15,7 +15,7 @@
 
 #include "common/util/logger.hpp"
 
-#include "topfd/ecscore/envelope/exp_envelope.hpp"
+#include "topfd/ecscore/env/exp_envelope.hpp"
 
 namespace toppic {
 

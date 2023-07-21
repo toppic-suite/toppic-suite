@@ -17,7 +17,7 @@
 #include <algorithm>
 
 #include "common/util/logger.hpp"
-#include "topfd/ecscore/envelope/env_util.hpp"
+#include "topfd/ecscore/env/env_util.hpp"
 #include "topfd/ecscore/env_set/env_set_util.hpp"
 #include "topfd/ecscore/score/component_score.hpp"
 

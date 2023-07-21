@@ -20,7 +20,7 @@
 
 #include "ms/msmap/ms_map.hpp"
 #include "topfd/ecscore/ecscore_para.hpp"
-#include "topfd/ecscore/envelope/seed_env.hpp"
+#include "topfd/ecscore/env/seed_env.hpp"
 #include "topfd/ecscore/env_set/env_set.hpp"
 #include "topfd/ecscore/env_coll/env_coll.hpp"
 

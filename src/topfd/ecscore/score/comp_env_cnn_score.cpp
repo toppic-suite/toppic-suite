@@ -17,7 +17,7 @@
 
 #include "ms/msmap/ms_map_peak.hpp"
 #include "topfd/envcnn/onnx_env_cnn.hpp"
-#include "topfd/ecscore/envelope/seed_env.hpp"
+#include "topfd/ecscore/env/seed_env.hpp"
 #include "topfd/ecscore/env_set/env_set.hpp"
 #include "topfd/ecscore/env_set/env_set_util.hpp"
 #include "topfd/ecscore/score/comp_env_cnn_score.hpp"

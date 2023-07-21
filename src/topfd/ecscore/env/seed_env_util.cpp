@@ -14,9 +14,9 @@
 
 
 #include "common/util/logger.hpp"
+#include "topfd/ecscore/env/env_util.hpp"
+#include "topfd/ecscore/env/seed_env_util.hpp"
 #include "topfd/ecscore/env_set/env_set_util.hpp"
-#include "topfd/ecscore/envelope/env_util.hpp"
-#include "topfd/ecscore/envelope/seed_env_util.hpp"
 
 namespace toppic {
 

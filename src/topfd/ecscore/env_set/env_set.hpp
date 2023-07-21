@@ -6,8 +6,8 @@
 #define TOPPIC_TOPFD_ECSCORE_ENV_SET_ENV_SET_HPP
 
 #include "ms/msmap/ms_map.hpp"
-#include "topfd/ecscore/envelope/seed_env.hpp"
-#include "topfd/ecscore/envelope/exp_envelope.hpp"
+#include "topfd/ecscore/env/seed_env.hpp"
+#include "topfd/ecscore/env/exp_envelope.hpp"
 #include "topfd/ecscore/env_set/xic.hpp"
 
 namespace toppic {

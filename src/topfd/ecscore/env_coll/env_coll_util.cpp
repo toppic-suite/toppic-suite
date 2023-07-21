@@ -18,7 +18,7 @@
 
 #include "common/util/logger.hpp"
 #include "common/base/mass_constant.hpp"
-#include "topfd/ecscore/envelope/env_util.hpp"
+#include "topfd/ecscore/env/env_util.hpp"
 #include "topfd/ecscore/env_set/env_set_util.hpp"
 #include "topfd/ecscore/score/component_score.hpp"
 #include "topfd/ecscore/env_coll/env_coll_util.hpp"

@@ -15,8 +15,8 @@
 #include <cmath>
 
 #include "ms/spec/peak_util.hpp"
-#include "topfd/ecscore/envelope/seed_env_util.hpp"
-#include "topfd/ecscore/envelope/env_util.hpp"
+#include "topfd/ecscore/env/seed_env_util.hpp"
+#include "topfd/ecscore/env/env_util.hpp"
 
 namespace toppic {
 

@@ -12,10 +12,9 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include "common/base/mass_constant.hpp"
 #include "ms/spec/peak_util.hpp"
 #include "ms/env/env_base.hpp"
-#include "topfd/ecscore/envelope/seed_env.hpp"
+#include "topfd/ecscore/env/seed_env.hpp"
 
 namespace toppic {
 
