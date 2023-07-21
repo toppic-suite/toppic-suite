@@ -42,7 +42,7 @@ class Feature {
                              MsMapPtr matrix_ptr,
                              DeconvMsPtrVec &ms1_ptr_vec,
                              MsHeaderPtr2D &ms2_header_ptr_2d,
-                             SeedEnvelopePtr2D &seed_ptr_2d,
+                             SeedEnvPtr2D &seed_ptr_2d,
                              SpecFeaturePtrVec &ms2_features,
                              TopfdParaPtr topfd_para_ptr,
                              EcscoreParaPtr score_para_ptr); 
@@ -152,7 +152,7 @@ class Feature {
   static bool getNewFeature(MsHeaderPtr header_ptr, MsMapPtr matrix_ptr,
                             EcscoreParaPtr para_ptr, FeaturePtrVec &feature_list,
                             EnvCollPtrVec &env_coll_list, DeconvMsPtrVec &ms1_ptr_vec,
-                            SeedEnvelopePtr2D &seed_ptr_2d,
+                            SeedEnvPtr2D &seed_ptr_2d,
                             FracFeaturePtrVec &frac_feature_list,
                             SpecFeaturePtrVec &ms2_feature_list); 
 

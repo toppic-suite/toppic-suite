@@ -47,6 +47,8 @@ class Env {
 
   void changeMz(double shift);
 
+  void changeMzByIsotope(double shift_num);
+
   EnvPtr getSubEnv(int n_back, int n_forw);
 
   EnvPtr getSubEnv(double min_inte);
@@ -59,7 +61,7 @@ class Env {
   std::vector<int> calcBound(double percent_bound, double absolute_min_inte,
                              int max_back_peak_num, int max_forw_peak_num);
 
-  void shift(int shift);
+  void changeReferIdx(int shift);
 
   double getMinMz() {return peak_ptr_list_[0]->getPosition();}
 

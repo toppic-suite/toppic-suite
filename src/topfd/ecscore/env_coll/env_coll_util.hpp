@@ -20,7 +20,7 @@
 
 #include "ms/msmap/ms_map.hpp"
 #include "topfd/ecscore/ecscore_para.hpp"
-#include "topfd/ecscore/envelope/seed_envelope.hpp"
+#include "topfd/ecscore/envelope/seed_env.hpp"
 #include "topfd/ecscore/env_set/env_set.hpp"
 #include "topfd/ecscore/env_coll/env_coll.hpp"
 
@@ -28,13 +28,13 @@ namespace toppic {
 
 namespace env_coll_util {
 
-EnvCollPtr findEnvColl(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
+EnvCollPtr findEnvColl(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
                        EcscoreParaPtr para_ptr, double sn_ratio);
 
-EnvCollPtr findEnvCollWithSingleEnv(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
+EnvCollPtr findEnvCollWithSingleEnv(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
                                     EcscoreParaPtr para_ptr, double sn_ratio); 
 
-EnvSetPtrVec getChargeEnvList(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
+EnvSetPtrVec getChargeEnvList(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
                               EnvSetPtr seed_env_set_ptr, EcscoreParaPtr para_ptr,
                               double sn_ratio);
 

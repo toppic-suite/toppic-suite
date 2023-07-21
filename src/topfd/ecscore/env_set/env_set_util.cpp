@@ -13,6 +13,7 @@
 //limitations under the License.
 
 #include <limits>
+#include <algorithm>
 
 #include "common/util/logger.hpp"
 
@@ -88,7 +89,7 @@ double calcInteRatio(std::vector<double> &theo_envelope_inte,
 }
 
 /*
-void compPeakStartEndIdx(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
+void compPeakStartEndIdx(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
                          double error_tole) {
   SeedEnvPeakPtrVec peak_list = seed_ptr->getPeakList();
   for (auto &peak : peak_list) {
@@ -132,7 +133,7 @@ MsMapPeakPtr pickExpPeak(MsMapPtr matrix_ptr, EnvPeakPtr seed_peak_ptr,
   return result_peak;
 }
 
-ExpEnvelopePtr getMatchExpEnv(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
+ExpEnvelopePtr getMatchExpEnv(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
                               int sp_id, double mass_tol) {
   MsMapPeakPtrVec peak_list;
   EnvPeakPtrVec peaks = seed_ptr->getPeakPtrList();
@@ -162,7 +163,7 @@ void removeNonMatchEnvs(ExpEnvelopePtrVec &env_list, int refer_idx,
   }
 }
 
-EnvSetPtr getEnvSet(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
+EnvSetPtr getEnvSet(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
                     EcscoreParaPtr para_ptr, double sn_ratio) {
   double noise_inte_level = matrix_ptr->getBaseInte();
   std::vector<double> theo_env_inte = seed_ptr->getInteList();
@@ -279,7 +280,7 @@ bool checkValidEnvSetSeedEnvSparse(MsMapPtr matrix_ptr, EnvSetPtr env_set_ptr,
 
 
 
-EnvSetPtr findEnvSet(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
+EnvSetPtr findEnvSet(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
                      int start_spec_id, int end_spec_id,
                      EcscoreParaPtr para_ptr, double sn_ratio) {
 

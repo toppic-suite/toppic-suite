@@ -13,10 +13,11 @@
 //limitations under the License.
 
 #include <cmath>
+#include <algorithm>
 
 #include "ms/msmap/ms_map_peak.hpp"
 #include "topfd/envcnn/onnx_env_cnn.hpp"
-#include "topfd/ecscore/envelope/seed_envelope.hpp"
+#include "topfd/ecscore/envelope/seed_env.hpp"
 #include "topfd/ecscore/env_set/env_set.hpp"
 #include "topfd/ecscore/env_set/env_set_util.hpp"
 #include "topfd/ecscore/score/comp_env_cnn_score.hpp"
@@ -52,7 +53,7 @@ MsMapPeakPtrVec  getIntvPeakList(MsMapPtr matrix_ptr, EnvSetPtr env_set_ptr,
 std::vector<std::vector<float>> getEnvcnnInputMatrix(MsMapPtr matrix_ptr,
                                                      EnvCollPtr coll_ptr) {
   std::vector<std::vector<float>> data_matrix = onnx_env_cnn::initInputMatrix(); 
-  SeedEnvelopePtr seed_ptr = coll_ptr->getSeedPtr();
+  SeedEnvPtr seed_ptr = coll_ptr->getSeedPtr();
   EnvSetPtr env_set_ptr = coll_ptr->getSeedEnvSet();
   std::vector<double> theo_mz = env_set_ptr->getSeedMzList();
   std::vector<double> theo_inte = env_set_ptr->getSeedInteList();

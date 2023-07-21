@@ -12,63 +12,44 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_TOPFD_ECSCORE_ENVELOPE_SEED_ENVELOPE_HPP
-#define TOPPIC_TOPFD_ECSCORE_ENVELOPE_SEED_ENVELOPE_HPP
+#ifndef TOPPIC_TOPFD_ECSCORE_ENV_SEED_ENV_HPP
+#define TOPPIC_TOPFD_ECSCORE_ENV_SEED_ENV_HPP
 
 #include <vector>
-#include <algorithm>
 
 #include "ms/spec/deconv_ms.hpp"
 #include "ms/env/env_base.hpp"
-#include "ms/env/env_base.hpp"
-//#include "topfd/ecscore/envelope/env_simple_peak.hpp"
 
 namespace toppic {
 
-class SeedEnvelope;
+class SeedEnv;
 
-typedef std::shared_ptr<SeedEnvelope> SeedEnvelopePtr;
+typedef std::shared_ptr<SeedEnv> SeedEnvPtr;
 
-class SeedEnvelope : public Env {
+class SeedEnv : public Env {
  public:
+  SeedEnv(DeconvPeakPtr peak_ptr);
+
+  SeedEnv(SeedEnvPtr env_ptr, int new_charge);
 
   int getSpecId() const { return spec_id_; }
 
   void setSpecId(int spec_id) { spec_id_ = spec_id; }
 
-  int getEnvId() const { return env_id_; }
-
   double getSeedInte() const {return seed_inte_;}
 
-  static bool cmpSeedInteDec(const SeedEnvelopePtr a, const SeedEnvelopePtr b) {
+  static bool cmpSeedInteDec(const SeedEnvPtr a, const SeedEnvPtr b) {
     return a->getSeedInte() > b->getSeedInte(); }
 
   std::string getString();
 
-  // to review
-  SeedEnvelope(DeconvPeakPtr peak_ptr);
-
-  SeedEnvelope(int spec_id, int env_id, double pos, double mass, double inte, int charge,
-               std::vector<double> pos_list, std::vector<double> inte_list);
-
-  SeedEnvelope(SeedEnvelopePtr env_ptr);
-
-  SeedEnvelope(SeedEnvelopePtr env_ptr, int new_charge);
-
-  void seedRmPeaks(double min_pos, double max_pos);
-
-  void seedShiftIsotope(double shift_num);
-
-  double getReferMz();
-
  private:
   int spec_id_;
-  int env_id_;
   double seed_inte_;
 };
 
-typedef std::vector<SeedEnvelopePtr> SeedEnvelopePtrVec;
-typedef std::vector<SeedEnvelopePtrVec> SeedEnvelopePtr2D;
+typedef std::vector<SeedEnvPtr> SeedEnvPtrVec;
+typedef std::vector<SeedEnvPtrVec> SeedEnvPtr2D;
 
 }
 

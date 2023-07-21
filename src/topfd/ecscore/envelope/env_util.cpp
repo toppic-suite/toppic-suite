@@ -65,38 +65,30 @@ std::vector<int> findLocalMaxima(std::vector<double> &arr) {
   return maxima;
 }
 
-SeedEnvelopePtr getHalfChargeEnv(SeedEnvelopePtr seed_ptr, 
-                                 double even_odd_peak_ratio) {
-  double mass = seed_ptr->getMonoNeutralMass();
-  int charge = seed_ptr->getCharge();
-  double mz = peak_util::compMz(mass, charge);
-  std::vector<double> distribution = seed_ptr->getMzList();
-  if (even_odd_peak_ratio < 0)
-    mz = mz + (distribution[1] - distribution[0]);
-  int new_charge = int(charge / 2);
-  if (new_charge == 0)
-    new_charge = new_charge + 1;
-  double new_mass = peak_util::compPeakNeutralMass(mz, new_charge);
-  // get a reference distribution based on the base mass
-  EnvPtr ref_env_ptr = EnvBase::getEnvByMonoMass(new_mass);
-  if (ref_env_ptr == nullptr) return nullptr; 
-  EnvPtr theo_env_ptr = ref_env_ptr->distrToTheoMono(mz, new_charge);
-  std::vector<double> env_peaks_mz, env_peaks_inte;
-  for (int i = 0; i < theo_env_ptr->getPeakNum(); i++) {
-    env_peaks_mz.push_back(theo_env_ptr->getMz(i));
-    env_peaks_inte.push_back(theo_env_ptr->getInte(i));
+SeedEnvPtr getHalfChargeEnv(SeedEnvPtr seed_ptr,
+                            double even_odd_peak_ratio) {
+  double old_charge = seed_ptr->getCharge();
+  if (old_charge < 2) {
+    return nullptr;
   }
-  SeedEnvelopePtr sp_peak =
-    std::make_shared<SeedEnvelope>(seed_ptr->getSpecId(), seed_ptr->getEnvId(),
-                                   seed_ptr->getMonoMz(), new_mass, seed_ptr->getSeedInte(),
-                                   new_charge, env_peaks_mz, env_peaks_inte);
-  return sp_peak;
+  int new_charge = int(old_charge / 2);
+  double ref_mz = seed_ptr->getReferMz();
+  double ref_mass = peak_util::compPeakNeutralMass(ref_mz, new_charge);
+  double mono_mass = EnvBase::convertRefMassToMonoMass(ref_mass);
+  int sp_id = seed_ptr->getSpecId();
+  int env_id = -1;
+  double inte = seed_ptr->getSeedInte()/2;
+  DeconvPeakPtr peak_ptr = std::make_shared<DeconvPeak>(sp_id, env_id,
+                                                        mono_mass, inte,
+                                                        new_charge);
+  SeedEnvPtr new_seed_ptr = std::make_shared<SeedEnv>(peak_ptr);
+  return new_seed_ptr;
 }
 
-SeedEnvelopePtr testHalfChargeState(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
-                                    EnvSetPtr env_set_ptr, double even_odd_peak_ratio,
-                                    EcscoreParaPtr para_ptr, double sn_ratio) {
-  SeedEnvelopePtr half_charge_seed = getHalfChargeEnv(seed_ptr, even_odd_peak_ratio);
+SeedEnvPtr testHalfChargeState(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
+                               EnvSetPtr env_set_ptr, double even_odd_peak_ratio,
+                               EcscoreParaPtr para_ptr, double sn_ratio) {
+  SeedEnvPtr half_charge_seed = getHalfChargeEnv(seed_ptr, even_odd_peak_ratio);
   bool valid = false;
   valid = seed_env_util::preprocessEnv(matrix_ptr, half_charge_seed, para_ptr, sn_ratio);
   if (!valid)

@@ -103,6 +103,12 @@ void Env::changeMz(double shift) {
   mono_mz_ += shift;
 }
 
+void Env::changeMzByIsotope(double shift_num) {
+  double shift_mass = shift_num * mass_constant::getIsotopeMass();
+  double shift_mz = shift_mass / charge_;
+  changeMz(shift_mz);
+}
+
 EnvPtr Env::getSubEnv(int n_back, int n_forw) {
   int new_refer_idx = n_back;
   EnvPeakPtrVec new_peaks;
@@ -224,7 +230,7 @@ std::vector<int> Env::calcBound(double percent_bound, double absolute_min_inte,
   return result;
 }
 
-void Env::shift(int shift) {
+void Env::changeReferIdx(int shift) {
   refer_idx_ += shift;
   mono_mz_ += shift * mass_constant::getIsotopeMass() / charge_;
 }

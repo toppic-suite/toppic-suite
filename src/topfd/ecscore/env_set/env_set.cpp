@@ -13,6 +13,7 @@
 //limitations under the License.
 
 #include <numeric>
+#include <algorithm>
 
 #include "common/util/logger.hpp"
 
@@ -22,7 +23,7 @@
 
 namespace toppic {
 
-EnvSet::EnvSet(const SeedEnvelopePtr seed_ptr, ExpEnvelopePtrVec env_list, 
+EnvSet::EnvSet(const SeedEnvPtr seed_ptr, ExpEnvelopePtrVec env_list,
                int start, int end, double noise_inte, double sn_ratio) {
   seed_ptr_ = seed_ptr;
   exp_env_list_ = env_list;

@@ -12,13 +12,15 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include <algorithm>
+
 #include "common/util/logger.hpp"
 #include "topfd/ecscore/env_coll/env_coll.hpp"
 
 namespace toppic {
 
-EnvColl::EnvColl(SeedEnvelopePtr seed_ptr, EnvSetPtrVec &env_set_list,
-                 int min_charge, int max_charge, 
+EnvColl::EnvColl(SeedEnvPtr seed_ptr, EnvSetPtrVec &env_set_list,
+                 int min_charge, int max_charge,
                  int start_spec_id, int end_spec_id) {
   seed_ptr_ = seed_ptr;
   env_set_list_ = env_set_list;
@@ -74,7 +76,7 @@ void EnvColl::refineMonoMass() {
   }
   if (weight > 0) {
     double mz_error = weight_mz_error / weight;
-    seed_ptr_->seedShiftIsotope(mz_error * seed_ptr_->getCharge());
+      seed_ptr_->changeMzByIsotope(mz_error * seed_ptr_->getCharge());
   }
   else {
     LOG_INFO("ERROR 0 weight in refine_mono_mass");
@@ -92,7 +94,7 @@ double EnvColl::getIntensity(double sn_ratio, double noise_inte) {
 
 EnvSetPtr EnvColl::getSeedEnvSet() {
   for (const auto &es: env_set_list_) {
-    SeedEnvelopePtr es_seed_env = es->getSeedPtr();
+    SeedEnvPtr es_seed_env = es->getSeedPtr();
     if (es_seed_env->getCharge() == seed_ptr_->getCharge()) {
       return es;
     }

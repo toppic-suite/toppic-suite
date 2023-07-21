@@ -19,7 +19,7 @@
 
 #include "ms/msmap/ms_map.hpp"
 #include "topfd/ecscore/ecscore_para.hpp"
-#include "topfd/ecscore/envelope/seed_envelope.hpp"
+#include "topfd/ecscore/envelope/seed_env.hpp"
 #include "topfd/ecscore/env_set/env_set.hpp"
 
 namespace toppic {
@@ -32,9 +32,9 @@ std::vector<int> findLocalMinima(std::vector<double> &arr);
 
 std::vector<int> findLocalMaxima(std::vector<double> &arr);
 
-SeedEnvelopePtr testHalfChargeState(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
-                                    EnvSetPtr env_set_ptr, double even_odd_peak_ratios,
-                                    EcscoreParaPtr para_ptr, double sn_ratio);
+SeedEnvPtr testHalfChargeState(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
+                               EnvSetPtr env_set_ptr, double even_odd_peak_ratios,
+                               EcscoreParaPtr para_ptr, double sn_ratio);
 
 }
 

@@ -89,11 +89,11 @@ void mzRefine(MatchEnvPtr env) {
   } else if (prev_dist <= next_dist) {
     prev_env->changeIntensity(prev_ratio);
     env->setTheoEnvPtr(prev_env);
-    real_env->shift(-1);
+      real_env->changeReferIdx(-1);
   } else {
     next_env->changeIntensity(next_ratio);
     env->setTheoEnvPtr(next_env);
-    real_env->shift(1);
+      real_env->changeReferIdx(1);
   }
 }
 

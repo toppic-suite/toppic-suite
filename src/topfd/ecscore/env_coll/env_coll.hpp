@@ -19,15 +19,15 @@
 #include <vector>
 
 #include "ms/msmap/ms_map.hpp"
-#include "topfd/ecscore/envelope/seed_envelope.hpp"
+#include "topfd/ecscore/envelope/seed_env.hpp"
 #include "topfd/ecscore/env_set/env_set.hpp"
 
 namespace toppic {
 
 class EnvColl {
  public:
-  EnvColl(SeedEnvelopePtr send_ptr, EnvSetPtrVec &env_set_list, 
-          int min_charge, int max_charge, 
+  EnvColl(SeedEnvPtr send_ptr, EnvSetPtrVec &env_set_list,
+          int min_charge, int max_charge,
           int start_spec_id, int end_spec_id);
 
   std::vector<double> compExpInteSumList(); 
@@ -40,9 +40,9 @@ class EnvColl {
 
   EnvSetPtr getSeedEnvSet();
 
-  SeedEnvelopePtr getSeedPtr() { return seed_ptr_; }
+  SeedEnvPtr getSeedPtr() { return seed_ptr_; }
 
-  void setSeedPtr(SeedEnvelopePtr seed_ptr) { seed_ptr_ = seed_ptr; }
+  void setSeedPtr(SeedEnvPtr seed_ptr) { seed_ptr_ = seed_ptr; }
 
   EnvSetPtrVec getEnvSetList() { return env_set_list_; }
 
@@ -80,7 +80,7 @@ class EnvColl {
   void removePeakData(MsMapPtr matrix_ptr);
 
  private:
-  SeedEnvelopePtr seed_ptr_;
+  SeedEnvPtr seed_ptr_;
   EnvSetPtrVec env_set_list_;
   int min_charge_;
   int max_charge_;

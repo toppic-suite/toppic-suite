@@ -6,7 +6,7 @@
 #define TOPPIC_TOPFD_ECSCORE_ENV_SET_ENV_SET_HPP
 
 #include "ms/msmap/ms_map.hpp"
-#include "topfd/ecscore/envelope/seed_envelope.hpp"
+#include "topfd/ecscore/envelope/seed_env.hpp"
 #include "topfd/ecscore/envelope/exp_envelope.hpp"
 #include "topfd/ecscore/env_set/xic.hpp"
 
@@ -17,7 +17,7 @@ typedef std::shared_ptr<EnvSet> EnvSetPtr;
 
 class EnvSet {
  public:
-  EnvSet(const SeedEnvelopePtr seed_ptr, ExpEnvelopePtrVec env_list, 
+  EnvSet(const SeedEnvPtr seed_ptr, ExpEnvelopePtrVec env_list,
          int start, int end, double noise_inte_level, double sn_ratio);
 
   int getStartSpecId() const { return start_spec_id_; }
@@ -42,7 +42,7 @@ class EnvSet {
 
   void setExpEnvList(ExpEnvelopePtrVec exp_env_list) { exp_env_list_ = exp_env_list; }
 
-  SeedEnvelopePtr getSeedPtr() { return seed_ptr_; }
+  SeedEnvPtr getSeedPtr() { return seed_ptr_; }
 
   XicPtr getXicPtr() { return xic_ptr_; }
 
@@ -79,7 +79,7 @@ class EnvSet {
   void shortlistExpEnvs();
 
  private:
-  SeedEnvelopePtr seed_ptr_;
+  SeedEnvPtr seed_ptr_;
   ExpEnvelopePtrVec exp_env_list_;
   XicPtr xic_ptr_;
   int start_spec_id_;

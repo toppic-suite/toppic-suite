@@ -14,6 +14,7 @@
 
 #include <cmath>
 #include <numeric>
+#include <algorithm>
 
 #include "common/util/logger.hpp"
 #include "topfd/ecscore/envelope/env_util.hpp"

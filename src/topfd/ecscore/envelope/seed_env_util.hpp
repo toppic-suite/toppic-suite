@@ -17,19 +17,19 @@
 
 #include "ms/msmap/ms_map.hpp"
 #include "topfd/ecscore/ecscore_para.hpp"
-#include "topfd/ecscore/envelope/seed_envelope.hpp"
+#include "topfd/ecscore/envelope/seed_env.hpp"
 
 namespace toppic {
 
 namespace seed_env_util {
 
-bool preprocessEnv(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
+bool preprocessEnv(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
                    EcscoreParaPtr para_ptr, double sn_ratio);
 
-bool evalEnv(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
+bool evalEnv(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
              double mass_tol, double corr_tol, double snr);
 
-bool simplePreprocessEnv(MsMapPtr matrix_ptr, SeedEnvelopePtr seed_ptr,
+bool simplePreprocessEnv(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
                          EcscoreParaPtr para_ptr, double sn_ratio); 
 
 bool testChargeState(int charge, std::vector<double> &seed_env_inte);

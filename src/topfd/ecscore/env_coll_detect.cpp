@@ -27,7 +27,7 @@
 #include "ms/feature/sample_feature_writer.hpp"
 #include "ms/msmap/ms_map.hpp"
 #include "topfd/common/topfd_para.hpp"
-#include "topfd/ecscore/envelope/seed_envelope.hpp"
+#include "topfd/ecscore/envelope/seed_env.hpp"
 #include "topfd/ecscore/envelope/seed_env_util.hpp"
 #include "topfd/ecscore/env_coll/env_coll.hpp"
 #include "topfd/ecscore/env_coll/env_coll_util.hpp"
@@ -70,20 +70,20 @@ void process(TopfdParaPtr topfd_para_ptr) {
   mzml_reader_ptr = nullptr;
 
   //Prepare seed envelopes
-  SeedEnvelopePtrVec seed_ptrs;
-  SeedEnvelopePtr2D seed_ptr_2d;
+  SeedEnvPtrVec seed_ptrs;
+  SeedEnvPtr2D seed_ptr_2d;
   for (auto &ms1_data: deconv_ms1_ptr_vec) {
     DeconvPeakPtrVec peaks = ms1_data->getPeakPtrVec();
-    SeedEnvelopePtrVec one_spec_seed_ptrs;
+    SeedEnvPtrVec one_spec_seed_ptrs;
     for (auto &peak: peaks) {
-      SeedEnvelopePtr seed_ptr_1 = std::make_shared<SeedEnvelope>(peak);
+      SeedEnvPtr seed_ptr_1 = std::make_shared<SeedEnv>(peak);
       seed_ptrs.push_back(seed_ptr_1);
-      SeedEnvelopePtr seed_ptr_2 = std::make_shared<SeedEnvelope>(peak);
+      SeedEnvPtr seed_ptr_2 = std::make_shared<SeedEnv>(peak);
       one_spec_seed_ptrs.push_back(seed_ptr_2);
     }
     seed_ptr_2d.push_back(one_spec_seed_ptrs);
   }
-    std::sort(seed_ptrs.begin(), seed_ptrs.end(), SeedEnvelope::cmpSeedInteDec);
+    std::sort(seed_ptrs.begin(), seed_ptrs.end(), SeedEnv::cmpSeedInteDec);
   // write_out_files::write_seed_envelopes(seed_envs, "envs.csv");
 
   double sn_ratio = topfd_para_ptr->getMsOneSnRatio();
@@ -109,7 +109,7 @@ void process(TopfdParaPtr topfd_para_ptr) {
       perc = static_cast<int>(count * 100 / seed_num);
       std::cout << "\r" << "Processing seed " << count << " ...       " << perc << "\% finished." << std::flush;
     }
-    SeedEnvelopePtr seed_ptr = seed_ptrs[seed_env_idx];
+    SeedEnvPtr seed_ptr = seed_ptrs[seed_env_idx];
     bool valid = seed_env_util::preprocessEnv(matrix_ptr, seed_ptr, 
                                               score_para_ptr, sn_ratio); 
     if (!valid) continue;
