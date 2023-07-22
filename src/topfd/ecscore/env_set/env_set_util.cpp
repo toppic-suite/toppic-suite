@@ -26,7 +26,7 @@ namespace toppic {
 namespace env_set_util {
 
 std::vector<double> getAggregateEnvelopeInte(EnvSetPtr env_set_ptr) {
-  MsMapEnvPtrVec exp_env_list = env_set_ptr->getExpEnvList();
+  MsMapEnvPtrVec exp_env_list = env_set_ptr->getMsMapEnvList();
   std::vector<double> aggregate_inte(exp_env_list[0]->getPeakNum(), 0.0);
   int num_spec = exp_env_list.size();
   int num_peaks = aggregate_inte.size();
@@ -42,7 +42,7 @@ std::vector<double> getAggregateEnvelopeInte(EnvSetPtr env_set_ptr) {
 }
 
 std::vector<double> getAggregateEnvelopeMz(EnvSetPtr env_set_ptr) {
-  MsMapEnvPtrVec exp_env_list = env_set_ptr->getExpEnvList();
+  MsMapEnvPtrVec exp_env_list = env_set_ptr->getMsMapEnvList();
   std::vector<double> aggregate_mz(exp_env_list[0]->getPeakNum(), 0.0);
   int num_spec = exp_env_list.size();
   int num_peaks = aggregate_mz.size();
@@ -62,10 +62,12 @@ std::vector<double> getAggregateEnvelopeMz(EnvSetPtr env_set_ptr) {
   return aggregate_mz;
 }
 
+
 double calcInteRatio(std::vector<double> &theo_envelope_inte, 
                      std::vector<double> &exp_envelope_inte) {
   if (theo_envelope_inte.size() == 0) {
     LOG_WARN("Empty peak list!");
+    return 0;
   }
   double theo_sum = 0;
   double obs_sum = 0;
@@ -88,24 +90,6 @@ double calcInteRatio(std::vector<double> &theo_envelope_inte,
     return obs_sum / theo_sum;
   }
 }
-
-/*
-void compPeakStartEndIdx(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
-                         double error_tole) {
-  SeedEnvPeakPtrVec peak_list = seed_ptr->getPeakList();
-  for (auto &peak : peak_list) {
-    double mz = peak->getPosition();
-    int start_idx = matrix_ptr->getColIndex(mz - error_tole);
-    if (start_idx < 0)
-      start_idx = 0;
-    int end_idx = matrix_ptr->getColIndex(mz + error_tole);
-    if (end_idx >= matrix_ptr->getColNum())
-      end_idx = matrix_ptr->getColNum() - 1;
-    peak->setStartIdx(start_idx);
-    peak->setEndIdx(end_idx);
-  }
-}
-*/
 
 MsMapPeakPtr pickExpPeak(MsMapPtr matrix_ptr, EnvPeakPtr seed_peak_ptr,
                          int sp_id, double mass_tol) {
@@ -243,12 +227,13 @@ EnvSetPtr getEnvSet(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
 
 bool checkValidEnvSetSeedEnv(MsMapPtr matrix_ptr, EnvSetPtr env_set_ptr,
                              int min_match_peak) {
-  std::vector<double> theo_env_inte = env_set_ptr->getSeedInteList();
+  SeedEnvPtr seed_ptr = env_set_ptr->getSeedPtr();
+  std::vector<double> theo_env_inte = seed_ptr->getInteList();
   int refer_idx = std::max_element(theo_env_inte.begin(), theo_env_inte.end()) - theo_env_inte.begin();
-  int base_idx = env_set_ptr->getBaseSpecId();
+  int base_idx = env_set_ptr->getSeedSpecId();
   int start_idx = std::max(base_idx-1, 0);
   int end_idx = std::min(base_idx+1, matrix_ptr->getRowNum() - 1);
-  MsMapEnvPtrVec env_list = env_set_ptr->getExpEnvList();
+  MsMapEnvPtrVec env_list = env_set_ptr->getMsMapEnvList();
   bool valid = true;
   for (auto &exp_env : env_list) {
     if (exp_env->getSpecId() >= start_idx and exp_env->getSpecId() <= end_idx)
@@ -260,12 +245,13 @@ bool checkValidEnvSetSeedEnv(MsMapPtr matrix_ptr, EnvSetPtr env_set_ptr,
 
 bool checkValidEnvSetSeedEnvSparse(MsMapPtr matrix_ptr, EnvSetPtr env_set_ptr,
                                    int min_match_peak) {
-  std::vector<double> theo_env_inte = env_set_ptr->getSeedInteList();
+  SeedEnvPtr seed_ptr = env_set_ptr->getSeedPtr();
+  std::vector<double> theo_env_inte = seed_ptr->getInteList();
   int refer_idx = std::max_element(theo_env_inte.begin(), theo_env_inte.end()) - theo_env_inte.begin();
-  int base_idx = env_set_ptr->getBaseSpecId();
+  int base_idx = env_set_ptr->getSeedSpecId();
   int start_idx = std::max(base_idx-2, 0);
   int end_idx = std::min(base_idx+2, matrix_ptr->getRowNum() - 1);
-  MsMapEnvPtrVec env_list = env_set_ptr->getExpEnvList();
+  MsMapEnvPtrVec env_list = env_set_ptr->getMsMapEnvList();
   bool valid = true;
   int false_counter = 0;
   for (auto &exp_env : env_list) {
@@ -348,7 +334,7 @@ EnvSetPtr findEnvSet(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
 bool checkValidEnvSet(MsMapPtr matrix_ptr, EnvSetPtr env_set_ptr) {
   bool valid = true;
   int elems = 0;
-  std::vector<double> env_xic = env_set_ptr->getXicTopThreeInteList();
+  std::vector<double> env_xic = env_set_ptr->getXicPtr()->getTopThreeInteList();
   for (double inte : env_xic)
     if (inte > 0) elems++;
   if (elems < 2) valid = false;

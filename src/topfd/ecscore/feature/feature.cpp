@@ -55,10 +55,10 @@ Feature::Feature(EnvCollPtr env_coll_ptr, MsMapPtr matrix_ptr,
   apex_elution_time_ = spec_list[seed_spec_id]->getRt()/60;
   elution_length_ = max_elution_time_ - min_elution_time_; 
 
-  double noise_inte = matrix_ptr->getBaseInte();
   EnvSetPtr seed_set_ptr = env_coll_ptr->getSeedEnvSet();
+  double min_inte = matrix_ptr->getBaseInte() * sn_ratio;
   std::vector<std::vector<double>> theo_map 
-    = seed_set_ptr->getScaledTheoIntes(sn_ratio, noise_inte);
+    = seed_set_ptr->getScaledTheoIntes(min_inte);
 
   map_max_elution_time_ = spec_list[spec_list.size()-1]->getRt()/60;
 
@@ -161,7 +161,7 @@ bool Feature::getHighestInteFeature(FracFeaturePtrVec &frac_features, EnvCollPtr
       }
       // get intensity information
       int inte_idx = ms1_id - env_set_ptr->getStartSpecId();
-      std::vector<double> env_intes = env_set_ptr->getXicAllPeakInteList();
+      std::vector<double> env_intes = env_set_ptr->getXicPtr()->getAllPeakInteList();
       if (env_intes.size() == 0) {
         LOG_WARN("Empty envelope intensity list!");
         continue; 

@@ -94,9 +94,11 @@ class Env {
 
   std::vector<double> getInteList();
 
+  std::vector<double> getScaledInteList(double scale_factor, double min_inte); 
+
   double compInteSum();
 
-  double compInteSum(double scale_factor, double min_inte);
+  double compScaledInteSum(double scale_factor, double min_inte);
 
   double compTopThreeInteSum();
 

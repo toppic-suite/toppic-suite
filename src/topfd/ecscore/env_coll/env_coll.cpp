@@ -38,7 +38,7 @@ std::vector<double> EnvColl::compExpInteSumList() {
     if (env_set == nullptr) {
       continue;
     }
-    std::vector<double> cur_sum_list = env_set->compExpInteSumList(); 
+    std::vector<double> cur_sum_list = env_set->compAggrEnvInteList();
     if (peak_num != static_cast<int>(cur_sum_list.size())) {
       LOG_ERROR("peak number " << peak_num << " cur list len " << cur_sum_list.size());
     }
@@ -69,10 +69,9 @@ void EnvColl::refineMonoMass() {
   double weight = 0;
   double weight_mz_error = 0;
   for (auto &env_set: env_set_list_) {
-    double cur_weight = 0, cur_weight_mz_error = 0;
-    env_set->getWeightMzError(cur_weight, cur_weight_mz_error);
-    weight = weight + cur_weight;
-    weight_mz_error = weight_mz_error + cur_weight_mz_error;
+    std::pair<double, double> error_weight = env_set->getMzErrorAndWeight();
+    weight_mz_error = weight_mz_error + error_weight.first;
+    weight = weight + error_weight.second;
   }
   if (weight > 0) {
     double mz_error = weight_mz_error / weight;
@@ -86,7 +85,7 @@ void EnvColl::refineMonoMass() {
 double EnvColl::getIntensity(double sn_ratio, double noise_inte) {
   double inte = 0;
   for (auto env_set: env_set_list_) {
-    double tmp_inte = env_set->compIntensity(sn_ratio, noise_inte);
+    double tmp_inte = env_set->getInte();
     inte = inte + tmp_inte;
   }
   return inte;

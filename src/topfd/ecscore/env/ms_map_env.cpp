@@ -60,4 +60,21 @@ std::vector<double> MsMapEnv::getMzList() {
   return pos_list;
 }
 
+double MsMapEnv::compTopThreeInteSum(int ref_idx) {
+  double sum = 0;
+  if (peak_list_[ref_idx] != nullptr) {
+    sum += peak_list_[ref_idx]->getIntensity();
+  }
+  int left_idx = ref_idx - 1;
+  if (left_idx >= 0 && peak_list_[left_idx] != nullptr) {
+    sum += peak_list_[left_idx]->getIntensity();
+  }
+  size_t right_idx = ref_idx + 1;
+  if (right_idx < peak_list_.size() && peak_list_[right_idx] != nullptr) {
+    sum += peak_list_[right_idx]->getIntensity();
+  }
+  return sum;
 }
+
+}
+

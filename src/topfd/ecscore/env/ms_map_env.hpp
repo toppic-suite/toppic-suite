@@ -43,6 +43,8 @@ class MsMapEnv {
 
   int getTopThreeMatchNum(int ref_idx);
 
+  double compTopThreeInteSum(int ref_idx);
+
  private:
   int spec_id_;
   MsMapPeakPtrVec peak_list_;

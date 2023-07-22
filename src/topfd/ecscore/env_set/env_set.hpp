@@ -24,52 +24,44 @@ class EnvSet {
 
   void setStartSpecId(int start_spec_id) { start_spec_id_ = start_spec_id; }
 
-  void setSpecId(int start_spec_id, int end_spec_id);
-
   int getEndSpecId() const { return end_spec_id_; }
 
   void setEndSpecId(int end_spec_id) { end_spec_id_ = end_spec_id; }
 
   int getCharge() { return seed_ptr_->getCharge(); }
 
-  double getMass() { return seed_ptr_->getMonoNeutralMass(); }
+  double getMonoMass() { return seed_ptr_->getMonoNeutralMass(); }
 
-  int getBaseSpecId() { return seed_ptr_->getSpecId(); }
+  int getSeedSpecId() { return seed_ptr_->getSpecId(); }
 
-  MsMapEnvPtrVec getExpEnvList() { return exp_env_list_; }
+  MsMapEnvPtrVec getMsMapEnvList() { return ms_map_env_list_; }
 
   int countEnvNum();
 
-  void setExpEnvList(MsMapEnvPtrVec exp_env_list) { exp_env_list_ = exp_env_list; }
+  void setMsMapEnvList(MsMapEnvPtrVec ms_map_env_list) { ms_map_env_list_ = ms_map_env_list; }
 
   SeedEnvPtr getSeedPtr() { return seed_ptr_; }
 
   XicPtr getXicPtr() { return xic_ptr_; }
 
-  double getXicSeedInte();
-
   void setXicPtr(XicPtr xic_ptr) { xic_ptr_ = xic_ptr; }
 
-  std::vector<double> getXicTopThreeInteList() { return xic_ptr_->getTopThreeInteList(); }
+  // get the all peak intensity in xic for the seed spectrum
+  double getXicSeedAllPeakInte();
 
-  std::vector<double> getXicAllPeakInteList() { return xic_ptr_->getAllPeakInteList(); }
+  // compute aggregate envelope peak intensities
+  std::vector<double> compAggrEnvInteList();
 
-  std::vector<double> getSeedInteList() {return seed_ptr_->getInteList(); }
+  // seed peak intensity list x spectrum intensity ratio list
+  std::vector<std::vector<double>> getScaledTheoIntes(int min_inte);
 
-  std::vector<double> getSeedMzList() {return seed_ptr_->getMzList(); }
-
-  std::vector<double> compExpInteSumList();
-
-  void getWeightMzError(double &cur_weight, double &cur_weight_mz_error);
-
-  std::vector<std::vector<double>> getScaledTheoIntes(double sn_ratio, 
-                                                      double noise_inte);
-
-  void refineFeatureBoundary();
+  double getInte() {return xic_ptr_->getAllPeakInteSum(); }
 
   void removePeakData(MsMapPtr matrix_ptr);
 
-  double compIntensity(double sn_ratio, double noise_inte);
+  std::pair<double, double> getMzErrorAndWeight();
+
+  void refineXicBoundary();
 
   static bool cmpChargeInc(EnvSetPtr a, EnvSetPtr b) { return a->getCharge() < b->getCharge(); }
 
@@ -80,7 +72,7 @@ class EnvSet {
 
  private:
   SeedEnvPtr seed_ptr_;
-  MsMapEnvPtrVec exp_env_list_;
+  MsMapEnvPtrVec ms_map_env_list_;
   XicPtr xic_ptr_;
   int start_spec_id_;
   int end_spec_id_;

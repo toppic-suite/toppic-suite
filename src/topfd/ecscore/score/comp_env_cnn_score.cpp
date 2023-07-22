@@ -55,8 +55,8 @@ std::vector<std::vector<float>> getEnvcnnInputMatrix(MsMapPtr matrix_ptr,
   std::vector<std::vector<float>> data_matrix = onnx_env_cnn::initInputMatrix(); 
   SeedEnvPtr seed_ptr = coll_ptr->getSeedPtr();
   EnvSetPtr env_set_ptr = coll_ptr->getSeedEnvSet();
-  std::vector<double> theo_mz = env_set_ptr->getSeedMzList();
-  std::vector<double> theo_inte = env_set_ptr->getSeedInteList();
+    std::vector<double> theo_mz = seed_ptr->getMzList();
+  std::vector<double> theo_inte = seed_ptr->getInteList();
   std::vector<double> exp_dist = env_set_util::getAggregateEnvelopeMz(env_set_ptr);
   std::vector<double> exp_dist_inte = env_set_util::getAggregateEnvelopeInte(env_set_ptr);
   double inte_ratio = env_set_util::calcInteRatio(theo_inte, exp_dist_inte);

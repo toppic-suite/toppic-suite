@@ -17,7 +17,7 @@
 #include <algorithm>
 
 #include "common/util/logger.hpp"
-#include "topfd/ecscore/env/env_util.hpp"
+#include "topfd/ecscore/env/ms_map_env_util.hpp"
 #include "topfd/ecscore/env_set/env_set_util.hpp"
 #include "topfd/ecscore/score/component_score.hpp"
 
@@ -71,13 +71,14 @@ double getAggEnvCorr(EnvSetPtr env_set_ptr) {
   std::vector<double> normalized_aggregate_inte;
   for (auto inte: aggregate_inte)
     normalized_aggregate_inte.push_back(inte / max_aggregate_inte);
-  double corr = env_util::pearsonr(theo_inte, normalized_aggregate_inte);
+  double corr = ms_map_env_util::pearsonr(theo_inte, normalized_aggregate_inte);
   return corr;
 }
 
 double getMzErrors(EnvSetPtr env_set_ptr) {
-  std::vector<double> theo_dis = env_set_ptr->getSeedMzList();
-  MsMapEnvPtrVec exp_envs = env_set_ptr->getExpEnvList();
+  SeedEnvPtr seed_ptr = env_set_ptr->getSeedPtr();
+  std::vector<double> theo_dis = seed_ptr->getMzList();
+  MsMapEnvPtrVec exp_envs = env_set_ptr->getMsMapEnvList();
   double error_sum = 0;
   for (auto &exp_env: exp_envs) {
     MsMapPeakPtrVec peaks = exp_env->getMsMapPeakList();
@@ -109,7 +110,7 @@ double countMaxConsecutivePeakNum(MsMapPeakPtrVec &peaks) {
 
 double getConsecutivePeakPercent(EnvSetPtr env_set_ptr) {
   double total_peaks = 0, positive_peaks = 0;
-  MsMapEnvPtrVec exp_envs = env_set_ptr->getExpEnvList();
+  MsMapEnvPtrVec exp_envs = env_set_ptr->getMsMapEnvList();
   for (auto &exp_env: exp_envs) {
     MsMapPeakPtrVec peaks = exp_env->getMsMapPeakList();
     for (auto p: peaks)
@@ -124,7 +125,7 @@ double getConsecutivePeakPercent(EnvSetPtr env_set_ptr) {
 double getMatchedPeakPercent(EnvSetPtr env_set_ptr, 
                              std::vector<std::vector<double>> &theo_map) {
   double total_peaks = 0, positive_peaks = 0;
-  MsMapEnvPtrVec exp_envs = env_set_ptr->getExpEnvList();
+  MsMapEnvPtrVec exp_envs = env_set_ptr->getMsMapEnvList();
   int num_exp_envs = exp_envs.size();
   for (int i = 0; i < num_exp_envs; i++) {
     MsMapPeakPtrVec peaks = exp_envs[i]->getMsMapPeakList();
@@ -155,7 +156,7 @@ int getTheoPeakNum(std::vector<std::vector<double>> &theo_map) {
 
 double get3ScanCorr(EnvSetPtr env_set_ptr, int base_spec, int start_spec) {
   double scan_3_corr;
-  MsMapEnvPtrVec exp_envs = env_set_ptr->getExpEnvList();
+  MsMapEnvPtrVec exp_envs = env_set_ptr->getMsMapEnvList();
   base_spec = std::max(base_spec - start_spec, 0);
   std::vector<double> data_sp = exp_envs[base_spec]->getInteList();
   std::vector<double> data_sp_minus_1(data_sp.size(), 0.0);
@@ -169,16 +170,16 @@ double get3ScanCorr(EnvSetPtr env_set_ptr, int base_spec, int start_spec) {
   double sp_minus_1_sum = std::accumulate(data_sp_minus_1.begin(), data_sp_minus_1.end(), 0.0);
   double sp_plus_1_sum = std::accumulate(data_sp_plus_1.begin(), data_sp_plus_1.end(), 0.0);
   if (sp_sum > 0 and sp_minus_1_sum > 0 and sp_plus_1_sum > 0) {
-    double corr_sp_12 = env_util::pearsonr(data_sp, data_sp_minus_1);
-    double corr_sp_13 = env_util::pearsonr(data_sp, data_sp_plus_1);
-    double corr_sp_23 = env_util::pearsonr(data_sp_minus_1, data_sp_plus_1);
+    double corr_sp_12 = ms_map_env_util::pearsonr(data_sp, data_sp_minus_1);
+    double corr_sp_13 = ms_map_env_util::pearsonr(data_sp, data_sp_plus_1);
+    double corr_sp_23 = ms_map_env_util::pearsonr(data_sp_minus_1, data_sp_plus_1);
     scan_3_corr = (corr_sp_12 + corr_sp_13 + corr_sp_23) / 3.0;
   } else if (sp_sum > 0 and sp_minus_1_sum > 0 and sp_plus_1_sum == 0) {
-    scan_3_corr = env_util::pearsonr(data_sp, data_sp_minus_1);
+    scan_3_corr = ms_map_env_util::pearsonr(data_sp, data_sp_minus_1);
   } else if (sp_sum > 0 and sp_minus_1_sum == 0 and sp_plus_1_sum > 0) {
-    scan_3_corr = env_util::pearsonr(data_sp, data_sp_plus_1);
+    scan_3_corr = ms_map_env_util::pearsonr(data_sp, data_sp_plus_1);
   } else if (sp_sum == 0 and sp_minus_1_sum > 0 and sp_plus_1_sum > 0) {
-    scan_3_corr = env_util::pearsonr(data_sp_minus_1, data_sp_plus_1);
+    scan_3_corr = ms_map_env_util::pearsonr(data_sp_minus_1, data_sp_plus_1);
   } else
     scan_3_corr = 0;
   return scan_3_corr;

@@ -18,7 +18,7 @@
 
 #include "common/util/logger.hpp"
 #include "common/base/mass_constant.hpp"
-#include "topfd/ecscore/env/env_util.hpp"
+#include "topfd/ecscore/env/ms_map_env_util.hpp"
 #include "topfd/ecscore/env_set/env_set_util.hpp"
 #include "topfd/ecscore/score/component_score.hpp"
 #include "topfd/ecscore/env_coll/env_coll_util.hpp"
@@ -139,7 +139,7 @@ EnvSetPtrVec getChargeEnvList(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
       miss_num = miss_num + 1;
     } 
     else {
-      env_set_ptr->refineFeatureBoundary();
+      env_set_ptr->refineXicBoundary();
       if (!env_set_util::checkValidEnvSet(matrix_ptr, env_set_ptr))
         miss_num = miss_num + 1;
       else {
@@ -164,7 +164,7 @@ EnvSetPtrVec getChargeEnvList(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
     if (env_set_ptr == nullptr) {
       miss_num = miss_num + 1;
     } else {
-      env_set_ptr->refineFeatureBoundary();
+      env_set_ptr->refineXicBoundary();
       if (!env_set_util::checkValidEnvSet(matrix_ptr, env_set_ptr))
         miss_num = miss_num + 1;
       else {
@@ -186,7 +186,7 @@ EnvCollPtr findEnvCollWithSingleEnv(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
     LOG_ERROR("env set is null");
     return nullptr; 
   }
-  env_set_ptr->refineFeatureBoundary();
+  env_set_ptr->refineXicBoundary();
 
   EnvSetPtrVec env_set_list = getChargeEnvList(matrix_ptr, seed_ptr,
                                                env_set_ptr, para_ptr, sn_ratio);
@@ -210,7 +210,7 @@ EnvCollPtr findEnvColl(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
   if (env_set_ptr == nullptr) {
     return nullptr; 
   }
-  env_set_ptr->refineFeatureBoundary();
+  env_set_ptr->refineXicBoundary();
   if (para_ptr->filter_neighboring_peaks_) {
     if (!env_set_util::checkValidEnvSetSeedEnv(matrix_ptr, env_set_ptr, 
                                                para_ptr->max_miss_peak_))
@@ -234,8 +234,8 @@ EnvCollPtr findEnvColl(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
     if (tmp_env_set_ptr == nullptr) {
       return nullptr;
     }
-    env_set_ptr = tmp_env_set_ptr; 
-    env_set_ptr->refineFeatureBoundary();
+    env_set_ptr = tmp_env_set_ptr;
+    env_set_ptr->refineXicBoundary();
     if (!env_set_util::checkValidEnvSetSeedEnv(matrix_ptr, env_set_ptr,
                                                para_ptr->max_miss_peak_)) {
       return nullptr; 
@@ -251,7 +251,7 @@ EnvCollPtr findEnvColl(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
   int start_spec_id = env_set_ptr->getStartSpecId();
   int end_spec_id = env_set_ptr->getEndSpecId();
   /*
-  if (new_seed_ptr->getMass() > 10059.3 && new_seed_ptr->getMass() < 10059.4) {
+  if (new_seed_ptr->getMass() > 10059.3 && new_seed_ptr->getMonoMass() < 10059.4) {
     LOG_ERROR("Mass " << new_seed_ptr->getMonoNeutralMass() << " env set list length " <<
               env_set_list.size());
   }
@@ -282,7 +282,7 @@ FracFeaturePtr getFracFeature(int feat_id, DeconvMsPtrVec &ms1_ptr_vec, int frac
   int ms1_apex_id = coll_ptr->getBaseSpecId();
   double time_apex = spec_list[ms1_apex_id]->getRt(); 
 
-  double apex_inte = coll_ptr->getSeedEnvSet()->getXicSeedInte(); 
+  double apex_inte = coll_ptr->getSeedEnvSet()->getXicSeedAllPeakInte();
   FracFeaturePtr feature_ptr = std::make_shared<FracFeature>(feat_id, frac_id, file_name, feat_mass, feat_inte,
                                                              ms1_id_begin, ms1_id_end, ms1_time_begin, ms1_time_end,
                                                              ms1_scan_begin, ms1_scan_end, min_charge, max_charge,
@@ -295,7 +295,7 @@ FracFeaturePtr getFracFeature(int feat_id, DeconvMsPtrVec &ms1_ptr_vec, int frac
     double time_end = ms1_ptr_vec[id_end]->getMsHeaderPtr()->getRetentionTime();
     int scan_begin = ms1_ptr_vec[id_begin]->getMsHeaderPtr()->getFirstScanNum();
     int scan_end = ms1_ptr_vec[id_end]->getMsHeaderPtr()->getFirstScanNum();
-    double inte = es->compIntensity(sn_ratio, noise_inte);
+    double inte = es->getInte();
     int env_num = es->countEnvNum();
     int charge = es->getCharge();
     //std::vector<double> xic = es->getXicTopThreeInteList();

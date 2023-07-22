@@ -13,7 +13,7 @@
 //limitations under the License.
 
 #include "common/util/logger.hpp"
-#include "topfd/ecscore/env/env_util.hpp"
+#include "topfd/ecscore/env/ms_map_env_util.hpp"
 #include "topfd/ecscore/env/seed_env_util.hpp"
 #include "topfd/ecscore/env_set/env_set_util.hpp"
 
@@ -38,7 +38,7 @@ bool evalEnvPair(std::vector<double> &exp_env_inte,
     }
   }
   if (num_theo_peak == 0) return false;
-  double corr = env_util::pearsonr(exp_env_inte, theo_inte);
+  double corr = ms_map_env_util::pearsonr(exp_env_inte, theo_inte);
   if (corr < tol) { 
     return false;
   }

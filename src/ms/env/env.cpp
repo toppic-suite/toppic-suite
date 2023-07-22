@@ -243,7 +243,7 @@ double Env::compInteSum() {
   return sum;
 }
 
-double Env::compInteSum(double scale_factor, double min_inte) {
+double Env::compScaledInteSum(double scale_factor, double min_inte) {
   double sum = 0;
   for (size_t i = 0; i < peak_ptr_list_.size(); i++) {
     double scale_inte = peak_ptr_list_[i]->getIntensity() * scale_factor;
@@ -252,6 +252,21 @@ double Env::compInteSum(double scale_factor, double min_inte) {
     }
   }
   return sum;
+}
+
+std::vector<double> Env::getScaledInteList(double scale_factor, 
+                                           double min_inte) {
+  std::vector<double> results; 
+  for (size_t i = 0; i < peak_ptr_list_.size(); i++) {
+    double scale_inte = peak_ptr_list_[i]->getIntensity() * scale_factor;
+    if (scale_inte >= min_inte) {
+      results.push_back(scale_inte);
+    }
+    else {
+      results.push_back(0);
+    }
+  }
+  return results;
 }
 
 double Env::compTopThreeInteSum() {
