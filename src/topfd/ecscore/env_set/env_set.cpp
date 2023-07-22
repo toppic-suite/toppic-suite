@@ -29,13 +29,13 @@ EnvSet::EnvSet(const SeedEnvPtr seed_ptr, MsMapEnvPtrVec env_list,
   exp_env_list_ = env_list;
   start_spec_id_ = start;
   end_spec_id_ = end;
-  initMedianXic(noise_inte, sn_ratio);
+  min_inte_ = noise_inte * sn_ratio;
+  initMedianXic();
 }
 
-void EnvSet::initMedianXic(double noise_inte, double sn_ratio) {
+void EnvSet::initMedianXic() {
   std::vector<double> theo_envelope_inte = seed_ptr_->getInteList();
-  int refer_idx = std::max_element(theo_envelope_inte.begin(), theo_envelope_inte.end()) 
-                  - theo_envelope_inte.begin();
+  int refer_idx = seed_ptr_->getReferIdx(); 
   std::vector<double> top_three_inte_list;
   std::vector<double> all_peak_inte_list;
   for (MsMapEnvPtr env: exp_env_list_) {
@@ -46,25 +46,12 @@ void EnvSet::initMedianXic(double noise_inte, double sn_ratio) {
     }
     std::vector<double> exp_envelope_inte = env->getInteList();
     double ratio = env_set_util::calcInteRatio(theo_envelope_inte, exp_envelope_inte);
-    double top_three_inte = theo_envelope_inte[refer_idx] * ratio;
-    if (refer_idx - 1 >= 0)
-      top_three_inte += theo_envelope_inte[refer_idx - 1] * ratio;
-    if (refer_idx + 1 < static_cast<int>(theo_envelope_inte.size()))
-      top_three_inte += theo_envelope_inte[refer_idx + 1] * ratio;
+    double top_three_inte = seed_ptr_->compTopThreeInteSum() * ratio;
     top_three_inte_list.push_back(top_three_inte);
-
-    std::vector<double> scaled_theo_inte;
-    for (auto inte: theo_envelope_inte) {
-      double scaled_inte = inte * ratio;
-      if (scaled_inte >= (noise_inte * sn_ratio))
-        scaled_theo_inte.push_back(scaled_inte);
-      else
-        scaled_theo_inte.push_back(0);
-    }
-    all_peak_inte_list.push_back(std::accumulate(scaled_theo_inte.begin(), scaled_theo_inte.end(), 0));
+    double all_peak_inte = seed_ptr_->compInteSum(ratio, min_inte_);
+    all_peak_inte_list.push_back(all_peak_inte); 
   }
-  xic_ptr_ = std::make_shared<Xic>(start_spec_id_, seed_ptr_->getSpecId(),
-                                   top_three_inte_list, all_peak_inte_list);
+  xic_ptr_ = std::make_shared<Xic>(top_three_inte_list, all_peak_inte_list);
 }
 
 void EnvSet::setSpecId(int start_spec_id, int end_spec_id) {
@@ -185,28 +172,15 @@ double getRightMax(int pos, std::vector<double> &y) {
 }
 
 void EnvSet::shortlistExpEnvs() {
-  std::vector<double> top_three_inte_list = xic_ptr_->getTopThreeInteList();
-  std::vector<double> smoothed_inte_list = xic_ptr_->getSmoothedInteList();
-  std::vector<double> all_peak_inte_list = xic_ptr_->getAllPeakInteList();
-
-  std::vector<double> shortlisted_top_three_inte_list;
-  std::vector<double> shortlisted_smoothed_inte_list;
-  std::vector<double> shortlisted_all_peak_inte_list;
-  int num_exp_env = exp_env_list_.size();
+  int env_num = exp_env_list_.size();
   MsMapEnvPtrVec tmp;
-  for (int i = 0; i < num_exp_env; i++) {
+  for (int i = 0; i < env_num; i++) {
     if (exp_env_list_[i]->getSpecId() >= start_spec_id_ && 
         exp_env_list_[i]->getSpecId() <= end_spec_id_) {
       tmp.push_back(exp_env_list_[i]);
-      shortlisted_top_three_inte_list.push_back(top_three_inte_list[i]);
-      shortlisted_smoothed_inte_list.push_back(smoothed_inte_list[i]);
-      shortlisted_all_peak_inte_list.push_back(all_peak_inte_list[i]);
     }
   }
   exp_env_list_ = tmp;
-  xic_ptr_ = std::make_shared<Xic>(exp_env_list_[0]->getSpecId(), seed_ptr_->getSpecId(), 
-                                   shortlisted_top_three_inte_list, shortlisted_smoothed_inte_list, 
-                                   shortlisted_all_peak_inte_list);
 }
 
 void EnvSet::refineFeatureBoundary() {
@@ -266,7 +240,9 @@ void EnvSet::refineFeatureBoundary() {
     end = seed_ptr_->getSpecId() + end_split_point;
 
   setSpecId(start, end);
+
   shortlistExpEnvs();
+  initMedianXic();
 }
 
 void EnvSet::removePeakData(MsMapPtr matrix_ptr) {

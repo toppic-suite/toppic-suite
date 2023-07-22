@@ -96,6 +96,10 @@ class Env {
 
   double compInteSum();
 
+  double compInteSum(double scale_factor, double min_inte);
+
+  double compTopThreeInteSum();
+
   int getCharge() {return charge_;}
 
   int getPeakNum() {return peak_ptr_list_.size();}

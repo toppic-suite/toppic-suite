@@ -34,7 +34,7 @@ class EnvSet {
 
   double getMass() { return seed_ptr_->getMonoNeutralMass(); }
 
-  int getBaseSpecId() { return xic_ptr_->getBaseSpecId(); }
+  int getBaseSpecId() { return seed_ptr_->getSpecId(); }
 
   MsMapEnvPtrVec getExpEnvList() { return exp_env_list_; }
 
@@ -74,7 +74,7 @@ class EnvSet {
   static bool cmpChargeInc(EnvSetPtr a, EnvSetPtr b) { return a->getCharge() < b->getCharge(); }
 
  private:
-  void initMedianXic(double noise_inte_level, double sn_ratio);
+  void initMedianXic();
 
   void shortlistExpEnvs();
 
@@ -84,6 +84,7 @@ class EnvSet {
   XicPtr xic_ptr_;
   int start_spec_id_;
   int end_spec_id_;
+  double min_inte_;
 };
 
 typedef std::vector<EnvSetPtr> EnvSetPtrVec;

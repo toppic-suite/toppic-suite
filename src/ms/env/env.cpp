@@ -24,14 +24,14 @@
 namespace toppic {
 
 Env::Env(Env &env):
-    refer_idx_(env.refer_idx_),
-    charge_(env.charge_),
-    mono_mz_(env.mono_mz_) {
-      for (int i = 0; i < env.getPeakNum(); i++) {
-        EnvPeakPtr peak_ptr = std::make_shared<EnvPeak>(env.getPeakPtr(i));
-        peak_ptr_list_.push_back(peak_ptr);
-      }
+  refer_idx_(env.refer_idx_),
+  charge_(env.charge_),
+  mono_mz_(env.mono_mz_) {
+    for (int i = 0; i < env.getPeakNum(); i++) {
+      EnvPeakPtr peak_ptr = std::make_shared<EnvPeak>(env.getPeakPtr(i));
+      peak_ptr_list_.push_back(peak_ptr);
     }
+  }
 
 Env::Env(int num, std::vector<std::string> &line_list) {
   charge_ = 1;
@@ -50,14 +50,14 @@ Env::Env(int num, std::vector<std::string> &line_list) {
 
 Env::Env(int refer_idx, int charge, double mono_mz,
          EnvPeakPtrVec &peaks):
-    refer_idx_(refer_idx),
-    charge_(charge),
-    mono_mz_(mono_mz) {
-      for (size_t i = 0; i < peaks.size(); i++) {
-        EnvPeakPtr peak_ptr = std::make_shared<EnvPeak>(peaks[i]);
-        peak_ptr_list_.push_back(peak_ptr);
-      }
+  refer_idx_(refer_idx),
+  charge_(charge),
+  mono_mz_(mono_mz) {
+    for (size_t i = 0; i < peaks.size(); i++) {
+      EnvPeakPtr peak_ptr = std::make_shared<EnvPeak>(peaks[i]);
+      peak_ptr_list_.push_back(peak_ptr);
     }
+  }
 
 EnvPtr Env::convertToTheo(double mass_diff, int new_charge) {
   int ori_charge = 1;
@@ -239,6 +239,30 @@ double Env::compInteSum() {
   double sum = 0;
   for (size_t i = 0; i < peak_ptr_list_.size(); i++) {
     sum = sum + peak_ptr_list_[i]->getIntensity();
+  }
+  return sum;
+}
+
+double Env::compInteSum(double scale_factor, double min_inte) {
+  double sum = 0;
+  for (size_t i = 0; i < peak_ptr_list_.size(); i++) {
+    double scale_inte = peak_ptr_list_[i]->getIntensity() * scale_factor;
+    if (scale_inte >= min_inte) {
+      sum += scale_inte;
+    }
+  }
+  return sum;
+}
+
+double Env::compTopThreeInteSum() {
+  double sum = peak_ptr_list_[refer_idx_]->getIntensity();
+  int left_idx = refer_idx_ - 1;
+  if (left_idx >= 0) {
+    sum += peak_ptr_list_[left_idx]->getIntensity();
+  }
+  size_t right_idx = refer_idx_ + 1;
+  if (right_idx < peak_ptr_list_.size()) {
+    sum += peak_ptr_list_[right_idx]->getIntensity();
   }
   return sum;
 }

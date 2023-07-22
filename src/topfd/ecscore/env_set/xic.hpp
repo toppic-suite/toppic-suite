@@ -22,26 +22,8 @@ namespace toppic {
 
 class Xic {
  public:
-  Xic();
-
-  Xic(int start_spec_id, int base_spec_id, 
-      std::vector<double> &top_three_inte_list, 
+  Xic(std::vector<double> &top_three_inte_list, 
       std::vector<double> &all_peak_inte_list);
-
-  Xic(int start_spec_id, int base_spec_id, 
-      std::vector<double> &top_three_inte_list, 
-      std::vector<double> &smooth_inte_list,
-      std::vector<double> &all_peak_inte_list);
-
-  void moving_avg(int n);
-
-  int getStartSpecId() { return start_spec_id_; }
-
-  void setStartSpecId(int startSpecId) { start_spec_id_ = startSpecId; }
-
-  int getBaseSpecId() { return base_spec_id_; }
-
-  void setBaseSpecId(int baseSpecId) { base_spec_id_ = baseSpecId; }
 
   std::vector<double> getTopThreeInteList() { return top_three_inte_list_; }
 
@@ -60,14 +42,17 @@ class Xic {
     all_peak_inte_list_ = all_peak_inte_list; }
 
  private:
-  int start_spec_id_;
-  int base_spec_id_;
   // the intensities are based on scaled theoretical envelopes
   std::vector<double> top_three_inte_list_;
   std::vector<double> all_peak_inte_list_;
   // smoothed top three intensity list
   std::vector<double> smoothed_inte_list_;
   double top_three_inte_sum_;
+
+  void moving_avg(int n);
+
+  int moving_avg_win_ = 2;
+
 };
 
 typedef std::shared_ptr<Xic> XicPtr;
