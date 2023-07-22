@@ -38,8 +38,6 @@ EnvSetPtr findEnvSet(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
                      int start_spec_id, int end_spec_id,
                      EcscoreParaPtr para_ptr, double sn_ratio);
 
-//void compPeakStartEndIdx(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr, double error_tole);
-
 bool checkValidEnvSet(MsMapPtr matrix_ptr, EnvSetPtr env_set_ptr);
 
 bool checkValidEnvSetSeedEnv(MsMapPtr matrix_ptr, EnvSetPtr env_set_ptr, int max_miss_peak);

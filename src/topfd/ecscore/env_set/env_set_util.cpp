@@ -18,6 +18,7 @@
 #include "common/util/logger.hpp"
 
 #include "topfd/ecscore/env/seed_env_util.hpp"
+#include "topfd/ecscore/env/ms_map_env_util.hpp"
 #include "topfd/ecscore/env_set/env_set.hpp"
 #include "topfd/ecscore/env_set/env_set_util.hpp"
 
@@ -162,7 +163,7 @@ EnvSetPtr getEnvSet(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
     MsMapEnvPtr exp_env_ptr = env_set_util::getMatchExpEnv(matrix_ptr, seed_ptr,
                                                            idx, para_ptr->mass_tole_);
     std::vector<double> exp_env_inte = exp_env_ptr->getInteList();
-    double inte_ratio = calcInteRatio(theo_env_inte, exp_env_inte);
+    double inte_ratio = ms_map_env_util::compTopThreeInteRatio(seed_ptr,exp_env_ptr);
     for (int i = 0; i < num_theo_env_peaks; i++) {
       double peak_inte = theo_env_inte[i];
       if ((inte_ratio * peak_inte) < (noise_inte_level * sn_ratio))
@@ -189,7 +190,7 @@ EnvSetPtr getEnvSet(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
     MsMapEnvPtr exp_env_ptr = env_set_util::getMatchExpEnv(matrix_ptr, seed_ptr,
                                                            idx, para_ptr->mass_tole_);
     std::vector<double> exp_env_inte = exp_env_ptr->getInteList();
-    double inte_ratio = calcInteRatio(theo_env_inte, exp_env_inte);
+    double inte_ratio = ms_map_env_util::compTopThreeInteRatio(seed_ptr,exp_env_ptr);
     for (int i = 0; i < num_theo_env_peaks; i++) {
       double peak_inte = theo_env_inte[i];
       if ((inte_ratio * peak_inte) < (noise_inte_level * sn_ratio))
@@ -283,7 +284,7 @@ EnvSetPtr findEnvSet(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
     MsMapEnvPtr exp_env = env_set_util::getMatchExpEnv(matrix_ptr, seed_ptr,
                                                        idx, para_ptr->mass_tole_);
     std::vector<double> experimental_envelope_inte = exp_env->getInteList();
-    double inte_ratio = calcInteRatio(theo_envelope_inte, experimental_envelope_inte);
+    double inte_ratio = ms_map_env_util::compTopThreeInteRatio(seed_ptr, exp_env);
     for (int i = 0; i < num_theo_env_peaks; i++) {
       double peak_inte = theo_envelope_inte[i];
       if ((inte_ratio * peak_inte) < (noise_inte_level * sn_ratio))
@@ -303,7 +304,7 @@ EnvSetPtr findEnvSet(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
   for (int idx = base_idx + 1; idx <= end_spec_id; idx++) {
     MsMapEnvPtr exp_env = env_set_util::getMatchExpEnv(matrix_ptr, seed_ptr, idx, para_ptr->mass_tole_);
     std::vector<double> experimental_envelope_inte = exp_env->getInteList();
-    double inte_ratio = calcInteRatio(theo_envelope_inte, experimental_envelope_inte);
+    double inte_ratio = ms_map_env_util::compTopThreeInteRatio(seed_ptr, exp_env);
     for (int i = 0; i < num_theo_env_peaks; i++) {
       double peak_inte = theo_envelope_inte[i];
       if ((inte_ratio * peak_inte) < (noise_inte_level * sn_ratio))

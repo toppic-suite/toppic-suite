@@ -57,8 +57,8 @@ bool evalEnv(MsMapPtr map_ptr, SeedEnvPtr seed_ptr,
   std::vector<double> exp_env_inte = exp_env_ptr->getInteList();
   std::vector<double> seed_env_inte = seed_ptr->getInteList();
   int num_peaks = seed_env_inte.size();
-  double inte_ratio = env_set_util::calcInteRatio(seed_env_inte, exp_env_inte);
-  std::vector<double> scaled_theo_inte;
+  double inte_ratio =  ms_map_env_util::compTopThreeInteRatio(seed_ptr, exp_env_ptr);
+    std::vector<double> scaled_theo_inte;
   for (int i = 0; i < num_peaks; i++) {
     double scaled_inte = inte_ratio * seed_env_inte[i];
     if (scaled_inte < sn_ratio * noise_inte)
@@ -105,7 +105,7 @@ bool simpleEvalEnv(MsMapPtr map_ptr, SeedEnvPtr seed_ptr,
   std::vector<double> exp_env_inte = exp_env_ptr->getInteList();
   std::vector<double> seed_env_inte = seed_ptr->getInteList();
   int num_peaks = seed_env_inte.size();
-  double inte_ratio = env_set_util::calcInteRatio(seed_env_inte, exp_env_inte);
+  double inte_ratio = ms_map_env_util::compTopThreeInteRatio(seed_ptr, exp_env_ptr);
   double noise_inte = map_ptr->getBaseInte();
   std::vector<double> scaled_theo_inte;
   for (int i = 0; i < num_peaks; i++) {
