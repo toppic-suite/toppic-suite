@@ -77,10 +77,10 @@ double getAggEnvCorr(EnvSetPtr env_set_ptr) {
 
 double getMzErrors(EnvSetPtr env_set_ptr) {
   std::vector<double> theo_dis = env_set_ptr->getSeedMzList();
-  ExpEnvelopePtrVec exp_envs = env_set_ptr->getExpEnvList();
+  MsMapEnvPtrVec exp_envs = env_set_ptr->getExpEnvList();
   double error_sum = 0;
   for (auto &exp_env: exp_envs) {
-    MsMapPeakPtrVec peaks = exp_env->getExpPeakList();
+    MsMapPeakPtrVec peaks = exp_env->getMsMapPeakList();
     int num_peaks = peaks.size();
     for (int peak_idx = 0; peak_idx < num_peaks; peak_idx++) {
       MsMapPeakPtr peak = peaks[peak_idx];
@@ -109,9 +109,9 @@ double countMaxConsecutivePeakNum(MsMapPeakPtrVec &peaks) {
 
 double getConsecutivePeakPercent(EnvSetPtr env_set_ptr) {
   double total_peaks = 0, positive_peaks = 0;
-  ExpEnvelopePtrVec exp_envs = env_set_ptr->getExpEnvList();
+  MsMapEnvPtrVec exp_envs = env_set_ptr->getExpEnvList();
   for (auto &exp_env: exp_envs) {
-    MsMapPeakPtrVec peaks = exp_env->getExpPeakList();
+    MsMapPeakPtrVec peaks = exp_env->getMsMapPeakList();
     for (auto p: peaks)
       if (p != nullptr)
         total_peaks = total_peaks + 1;
@@ -124,10 +124,10 @@ double getConsecutivePeakPercent(EnvSetPtr env_set_ptr) {
 double getMatchedPeakPercent(EnvSetPtr env_set_ptr, 
                              std::vector<std::vector<double>> &theo_map) {
   double total_peaks = 0, positive_peaks = 0;
-  ExpEnvelopePtrVec exp_envs = env_set_ptr->getExpEnvList();
+  MsMapEnvPtrVec exp_envs = env_set_ptr->getExpEnvList();
   int num_exp_envs = exp_envs.size();
   for (int i = 0; i < num_exp_envs; i++) {
-    MsMapPeakPtrVec peaks = exp_envs[i]->getExpPeakList();
+    MsMapPeakPtrVec peaks = exp_envs[i]->getMsMapPeakList();
     std::vector<double> scalled_theo_env = theo_map[i];
     int num_peaks = scalled_theo_env.size();
     for (int peak_id = 0; peak_id < num_peaks; peak_id++) {
@@ -155,7 +155,7 @@ int getTheoPeakNum(std::vector<std::vector<double>> &theo_map) {
 
 double get3ScanCorr(EnvSetPtr env_set_ptr, int base_spec, int start_spec) {
   double scan_3_corr;
-  ExpEnvelopePtrVec exp_envs = env_set_ptr->getExpEnvList();
+  MsMapEnvPtrVec exp_envs = env_set_ptr->getExpEnvList();
   base_spec = std::max(base_spec - start_spec, 0);
   std::vector<double> data_sp = exp_envs[base_spec]->getInteList();
   std::vector<double> data_sp_minus_1(data_sp.size(), 0.0);

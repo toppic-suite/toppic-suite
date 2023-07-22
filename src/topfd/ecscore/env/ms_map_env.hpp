@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_ECSCORE_ENVELOPE_EXP_ENVELOPE_HPP
-#define TOPPIC_ECSCORE_ENVELOPE_EXP_ENVELOPE_HPP
+#ifndef TOPPIC_ECSCORE_ENV_MS_MAP_ENV_HPP
+#define TOPPIC_ECSCORE_ENV_MS_MAP_ENV_HPP
 
 #include <vector>
 
@@ -21,17 +21,13 @@
 
 namespace toppic {
 
-class ExpEnvelope {
+class MsMapEnv {
  public:
-  ExpEnvelope(int spec_id, MsMapPeakPtrVec peak_list);
-
-  int getMatchPeakNum(int base_idx);
+  MsMapEnv(int spec_id, MsMapPeakPtrVec peak_list);
 
   std::vector<double> getInteList();
 
-  std::vector<double> getPosList();
-
-  std::vector<double> getNonEmptyPosList();
+  std::vector<double> getMzList();
 
   int getPeakNum() { return peak_list_.size(); }
 
@@ -41,20 +37,20 @@ class ExpEnvelope {
 
   void setSpecId(int spec_id) { spec_id_ = spec_id; }
 
-  MsMapPeakPtrVec getExpPeakList() { return peak_list_; }
-
-  void setExpPeakList(const MsMapPeakPtrVec &peak_list) { peak_list_ = peak_list; }
+  MsMapPeakPtrVec getMsMapPeakList() { return peak_list_; }
 
   void setPeakPtr(int idx, MsMapPeakPtr peak_ptr) { peak_list_[idx] = peak_ptr; }
+
+  int getTopThreeMatchNum(int ref_idx);
 
  private:
   int spec_id_;
   MsMapPeakPtrVec peak_list_;
 };
 
-typedef std::shared_ptr<ExpEnvelope> ExpEnvelopePtr;
-typedef std::vector<ExpEnvelopePtr> ExpEnvelopePtrVec;
+typedef std::shared_ptr<MsMapEnv> MsMapEnvPtr;
+typedef std::vector<MsMapEnvPtr> MsMapEnvPtrVec;
 
 }
 
-#endif //TOPPIC_EXP_ENVELOPE_HPP
+#endif

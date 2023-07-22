@@ -23,7 +23,7 @@
 
 namespace toppic {
 
-EnvSet::EnvSet(const SeedEnvPtr seed_ptr, ExpEnvelopePtrVec env_list,
+EnvSet::EnvSet(const SeedEnvPtr seed_ptr, MsMapEnvPtrVec env_list,
                int start, int end, double noise_inte, double sn_ratio) {
   seed_ptr_ = seed_ptr;
   exp_env_list_ = env_list;
@@ -38,8 +38,8 @@ void EnvSet::initMedianXic(double noise_inte, double sn_ratio) {
                   - theo_envelope_inte.begin();
   std::vector<double> top_three_inte_list;
   std::vector<double> all_peak_inte_list;
-  for (ExpEnvelopePtr env: exp_env_list_) {
-    if (env->getMatchPeakNum(refer_idx) < 2) {
+  for (MsMapEnvPtr env: exp_env_list_) {
+    if (env->getTopThreeMatchNum(refer_idx) < 2) {
       top_three_inte_list.push_back(0);
       all_peak_inte_list.push_back(0);
       continue;
@@ -114,11 +114,11 @@ void EnvSet::getWeightMzError(double &weight_sum, double &error_sum) {
   weight_sum = 0;
   error_sum = 0;
   for (int exp_env_id = 0; exp_env_id < num_exp_env; exp_env_id++) {
-    ExpEnvelopePtr env_ptr = exp_env_list_[exp_env_id];
+    MsMapEnvPtr env_ptr = exp_env_list_[exp_env_id];
     if (env_ptr == nullptr) {
       continue;
     }
-    MsMapPeakPtrVec exp_peak_list = env_ptr->getExpPeakList();
+    MsMapPeakPtrVec exp_peak_list = env_ptr->getMsMapPeakList();
     for (int peak_idx = 0; peak_idx < num_peaks_theo_env; peak_idx++) {
       MsMapPeakPtr peak = exp_peak_list[peak_idx];
       if (peak != nullptr) {
@@ -193,7 +193,7 @@ void EnvSet::shortlistExpEnvs() {
   std::vector<double> shortlisted_smoothed_inte_list;
   std::vector<double> shortlisted_all_peak_inte_list;
   int num_exp_env = exp_env_list_.size();
-  ExpEnvelopePtrVec tmp;
+  MsMapEnvPtrVec tmp;
   for (int i = 0; i < num_exp_env; i++) {
     if (exp_env_list_[i]->getSpecId() >= start_spec_id_ && 
         exp_env_list_[i]->getSpecId() <= end_spec_id_) {
@@ -217,7 +217,7 @@ void EnvSet::refineFeatureBoundary() {
 
   /// Left side
   std::vector<double> left_data(smoothed_env_xic.begin(), smoothed_env_xic.begin() + base_spec + 1);
-  std::vector<int> minima_left = env_util::findLocalMinima(left_data);
+  std::vector<int> minima_left = env_set_util::findLocalMinima(left_data);
   std::vector<double> minima_vals_left;
   for (auto m: minima_left) minima_vals_left.push_back(left_data[m]);
   int start_split_point = start_spec_id_;
@@ -231,7 +231,7 @@ void EnvSet::refineFeatureBoundary() {
       start_split_point = start_split_point + pos;
       std::vector<double> temp_left_data(left_data.begin() + pos, left_data.end());
       left_data = temp_left_data;
-      minima_left = env_util::findLocalMinima(left_data);
+      minima_left = env_set_util::findLocalMinima(left_data);
       minima_vals_left.clear();
       for (auto m: minima_left) minima_vals_left.push_back(left_data[m]);
     }
@@ -239,7 +239,7 @@ void EnvSet::refineFeatureBoundary() {
 
   /// Right side
   std::vector<double> right_data(smoothed_env_xic.begin() + base_spec, smoothed_env_xic.end());
-  std::vector<int> minima_right = env_util::findLocalMinima(right_data);
+  std::vector<int> minima_right = env_set_util::findLocalMinima(right_data);
   std::vector<double> minima_vals_right;
   for (auto m: minima_right) minima_vals_right.push_back(right_data[m]);
   int end_split_point = -1;
@@ -253,7 +253,7 @@ void EnvSet::refineFeatureBoundary() {
       end_split_point = pos;
       std::vector<double> temp_right_data(right_data.begin(), right_data.begin() + pos - 1);
       right_data = temp_right_data;
-      minima_right = env_util::findLocalMinima(right_data);
+      minima_right = env_set_util::findLocalMinima(right_data);
       minima_vals_right.clear();
       for (auto m: minima_right) minima_vals_right.push_back(right_data[m]);
     }
@@ -276,7 +276,7 @@ void EnvSet::removePeakData(MsMapPtr matrix_ptr) {
   int num_exp_env = exp_env_list_.size();
   for (int env_id = 0; env_id < num_exp_env; env_id++) {
     LOG_DEBUG("Env id " << env_id << " " << num_exp_env);
-    ExpEnvelopePtr exp_env = exp_env_list_[env_id];
+    MsMapEnvPtr exp_env = exp_env_list_[env_id];
     if (exp_env == nullptr) {
       continue;
     }
@@ -284,7 +284,7 @@ void EnvSet::removePeakData(MsMapPtr matrix_ptr) {
     if (spec_id < 0 or spec_id >= matrix_ptr->getRowNum()) {
       continue;
     }
-    MsMapPeakPtrVec exp_peaks = exp_env->getExpPeakList();
+    MsMapPeakPtrVec exp_peaks = exp_env->getMsMapPeakList();
     std::vector<double> theo_env_peak_intes = theo_intes[env_id];
 
     int peak_num = exp_peaks.size(); 

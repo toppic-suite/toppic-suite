@@ -223,9 +223,9 @@ EnvCollPtr findEnvColl(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
   double even_odd_peak_ratio = component_score::getAggOddEvenPeakRatio(env_set_ptr);
   SeedEnvPtr new_seed_ptr = seed_ptr;
   if (std::abs(even_odd_peak_ratio) > para_ptr->even_odd_ratio_cutoff_) {
-    new_seed_ptr = env_util::testHalfChargeState(matrix_ptr, seed_ptr,
-                                                 env_set_ptr, even_odd_peak_ratio, 
-                                                 para_ptr, sn_ratio);
+    new_seed_ptr = env_set_util::testHalfChargeState(matrix_ptr, seed_ptr,
+                                                     env_set_ptr, even_odd_peak_ratio, 
+                                                     para_ptr, sn_ratio);
     if (new_seed_ptr == nullptr) {
       return nullptr;
     }

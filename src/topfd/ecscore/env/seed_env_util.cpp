@@ -50,9 +50,9 @@ bool evalEnvPair(std::vector<double> &exp_env_inte,
 bool evalEnv(MsMapPtr map_ptr, SeedEnvPtr seed_ptr,
              double mass_tol, double corr_tol, double sn_ratio){
   double noise_inte = map_ptr->getBaseInte();
-  ExpEnvelopePtr exp_env_ptr 
+  MsMapEnvPtr exp_env_ptr
     = env_set_util::getMatchExpEnv(map_ptr, seed_ptr, seed_ptr->getSpecId(), mass_tol);
-  std::vector<double> exp_env_mass = exp_env_ptr->getPosList();
+  std::vector<double> exp_env_mass = exp_env_ptr->getMzList();
   std::vector<double> seed_env_mass = seed_ptr->getMzList();
   std::vector<double> exp_env_inte = exp_env_ptr->getInteList();
   std::vector<double> seed_env_inte = seed_ptr->getInteList();
@@ -98,9 +98,9 @@ bool preprocessEnv(MsMapPtr map_ptr, SeedEnvPtr seed_ptr,
 bool simpleEvalEnv(MsMapPtr map_ptr, SeedEnvPtr seed_ptr,
                    double mass_tol, double corr_tol, double sn_ratio){
   int spec_id = seed_ptr->getSpecId();
-  ExpEnvelopePtr exp_env_ptr 
+  MsMapEnvPtr exp_env_ptr
     = env_set_util::getMatchExpEnv(map_ptr, seed_ptr, spec_id, mass_tol);
-  std::vector<double> exp_env_mass = exp_env_ptr->getPosList();
+  std::vector<double> exp_env_mass = exp_env_ptr->getMzList();
   std::vector<double> seed_env_mass = seed_ptr->getMzList();
   std::vector<double> exp_env_inte = exp_env_ptr->getInteList();
   std::vector<double> seed_env_inte = seed_ptr->getInteList();

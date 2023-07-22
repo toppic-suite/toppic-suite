@@ -17,24 +17,11 @@
 
 #include <vector>
 
-#include "ms/msmap/ms_map.hpp"
-#include "topfd/ecscore/ecscore_para.hpp"
-#include "topfd/ecscore/env/seed_env.hpp"
-#include "topfd/ecscore/env_set/env_set.hpp"
-
 namespace toppic {
 
 namespace env_util {
 
 double pearsonr(std::vector<double> &X, std::vector<double> &Y);
-
-std::vector<int> findLocalMinima(std::vector<double> &arr);
-
-std::vector<int> findLocalMaxima(std::vector<double> &arr);
-
-SeedEnvPtr testHalfChargeState(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
-                               EnvSetPtr env_set_ptr, double even_odd_peak_ratios,
-                               EcscoreParaPtr para_ptr, double sn_ratio);
 
 }
 

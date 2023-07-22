@@ -15,19 +15,19 @@
 
 #include "common/util/logger.hpp"
 
-#include "topfd/ecscore/env/exp_envelope.hpp"
+#include "topfd/ecscore/env/ms_map_env.hpp"
 
 namespace toppic {
 
-ExpEnvelope::ExpEnvelope(int spec_id, MsMapPeakPtrVec peak_list) {
+MsMapEnv::MsMapEnv(int spec_id, MsMapPeakPtrVec peak_list) {
   spec_id_ = spec_id;
   peak_list_ = peak_list;
 }
 
-int ExpEnvelope::getMatchPeakNum(int base_idx) {
+int MsMapEnv::getTopThreeMatchNum(int ref_idx) {
   int total_peaks = peak_list_.size();
-  int start_idx = std::max(base_idx - 1, 0);
-  int end_idx = std::min(base_idx + 1, total_peaks - 1);
+  int start_idx = std::max(ref_idx - 1, 0);
+  int end_idx = std::min(ref_idx + 1, total_peaks - 1);
   int num = 0;
   for (int i = start_idx; i < end_idx + 1; i++) {
     MsMapPeakPtr p = peak_list_[i];
@@ -38,7 +38,7 @@ int ExpEnvelope::getMatchPeakNum(int base_idx) {
   return num;
 }
 
-std::vector<double> ExpEnvelope::getInteList() {
+std::vector<double> MsMapEnv::getInteList() {
   std::vector<double> inte_list;
   for (auto p: peak_list_) {
     if (p != nullptr)
@@ -49,23 +49,13 @@ std::vector<double> ExpEnvelope::getInteList() {
   return inte_list;
 }
 
-std::vector<double> ExpEnvelope::getPosList() {
+std::vector<double> MsMapEnv::getMzList() {
   std::vector<double> pos_list;
   for (auto p: peak_list_) {
     if (p != nullptr)
       pos_list.push_back(p->getPosition());
     else
       pos_list.push_back(0);
-  }
-  return pos_list;
-}
-
-std::vector<double> ExpEnvelope::getNonEmptyPosList() {
-  std::vector<double> pos_list;
-  for (auto p: peak_list_) {
-    if (p != nullptr) {
-      pos_list.push_back(p->getPosition());
-    }
   }
   return pos_list;
 }

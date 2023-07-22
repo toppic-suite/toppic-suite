@@ -46,7 +46,15 @@ bool checkValidEnvSetSeedEnv(MsMapPtr matrix_ptr, EnvSetPtr env_set_ptr, int max
 
 bool checkValidEnvSetSeedEnvSparse(MsMapPtr matrix_ptr, EnvSetPtr env_set_ptr, int max_miss_peak);
 
-ExpEnvelopePtr getMatchExpEnv(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr, int sp_id, double mass_tol);
+MsMapEnvPtr getMatchExpEnv(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr, int sp_id, double mass_tol);
+
+SeedEnvPtr testHalfChargeState(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
+                               EnvSetPtr env_set_ptr, double even_odd_peak_ratios,
+                               EcscoreParaPtr para_ptr, double sn_ratio);
+
+std::vector<int> findLocalMinima(std::vector<double> &arr);
+
+std::vector<int> findLocalMaxima(std::vector<double> &arr);
 
 }
 

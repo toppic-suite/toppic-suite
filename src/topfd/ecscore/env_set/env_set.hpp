@@ -7,7 +7,7 @@
 
 #include "ms/msmap/ms_map.hpp"
 #include "topfd/ecscore/env/seed_env.hpp"
-#include "topfd/ecscore/env/exp_envelope.hpp"
+#include "topfd/ecscore/env/ms_map_env.hpp"
 #include "topfd/ecscore/env_set/xic.hpp"
 
 namespace toppic {
@@ -17,7 +17,7 @@ typedef std::shared_ptr<EnvSet> EnvSetPtr;
 
 class EnvSet {
  public:
-  EnvSet(const SeedEnvPtr seed_ptr, ExpEnvelopePtrVec env_list,
+  EnvSet(const SeedEnvPtr seed_ptr, MsMapEnvPtrVec env_list,
          int start, int end, double noise_inte_level, double sn_ratio);
 
   int getStartSpecId() const { return start_spec_id_; }
@@ -36,11 +36,11 @@ class EnvSet {
 
   int getBaseSpecId() { return xic_ptr_->getBaseSpecId(); }
 
-  ExpEnvelopePtrVec getExpEnvList() { return exp_env_list_; }
+  MsMapEnvPtrVec getExpEnvList() { return exp_env_list_; }
 
   int countEnvNum();
 
-  void setExpEnvList(ExpEnvelopePtrVec exp_env_list) { exp_env_list_ = exp_env_list; }
+  void setExpEnvList(MsMapEnvPtrVec exp_env_list) { exp_env_list_ = exp_env_list; }
 
   SeedEnvPtr getSeedPtr() { return seed_ptr_; }
 
@@ -80,7 +80,7 @@ class EnvSet {
 
  private:
   SeedEnvPtr seed_ptr_;
-  ExpEnvelopePtrVec exp_env_list_;
+  MsMapEnvPtrVec exp_env_list_;
   XicPtr xic_ptr_;
   int start_spec_id_;
   int end_spec_id_;
