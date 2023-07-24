@@ -18,6 +18,7 @@
 #include <vector>
 
 #include "ms/msmap/ms_map_peak.hpp"
+#include "topfd/ecscore/env/seed_env.hpp"
 
 namespace toppic {
 
@@ -44,6 +45,9 @@ class MsMapEnv {
   int getTopThreeMatchNum(int ref_idx);
 
   double compTopThreeInteSum(int ref_idx);
+
+  void removeLowIntePeaks(std::vector<double> &inte_list, double ratio,
+                          double min_inte);
 
  private:
   int spec_id_;

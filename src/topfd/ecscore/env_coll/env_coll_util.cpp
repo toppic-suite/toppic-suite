@@ -132,9 +132,9 @@ EnvSetPtrVec getChargeEnvList(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
     SeedEnvPtr cur_seed_ptr = std::make_shared<SeedEnv>(seed_ptr, charge);
     //env_set_util::compPeakStartEndIdx(matrix_ptr, cur_seed_ptr, 
     //                                  para_ptr->mass_tole_);
-    EnvSetPtr env_set_ptr = env_set_util::findEnvSet(matrix_ptr, cur_seed_ptr, 
-                                                     start_spec_id, end_spec_id, 
-                                                     para_ptr, sn_ratio);
+    EnvSetPtr env_set_ptr = env_set_util::searchEnvSet(matrix_ptr, cur_seed_ptr,
+                                                       start_spec_id, end_spec_id,
+                                                       para_ptr, sn_ratio);
     if (env_set_ptr == nullptr) {
       miss_num = miss_num + 1;
     } 
@@ -157,9 +157,9 @@ EnvSetPtrVec getChargeEnvList(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
   while (charge <= para_ptr->para_max_charge_) {
     SeedEnvPtr cur_seed_ptr = std::make_shared<SeedEnv>(seed_ptr, charge);
     //env_set_util::compPeakStartEndIdx(matrix_ptr, cur_seed_ptr, para_ptr->mass_tole_);
-    EnvSetPtr env_set_ptr = env_set_util::findEnvSet(matrix_ptr, cur_seed_ptr, 
-                                                     start_spec_id, end_spec_id, 
-                                                     para_ptr, sn_ratio);
+    EnvSetPtr env_set_ptr = env_set_util::searchEnvSet(matrix_ptr, cur_seed_ptr,
+                                                      start_spec_id, end_spec_id,
+                                                      para_ptr, sn_ratio);
     charge = charge + 1;
     if (env_set_ptr == nullptr) {
       miss_num = miss_num + 1;
@@ -181,7 +181,7 @@ EnvSetPtrVec getChargeEnvList(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
 
 EnvCollPtr findEnvCollWithSingleEnv(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
                                     EcscoreParaPtr para_ptr, double sn_ratio) {
-  EnvSetPtr env_set_ptr = env_set_util::getEnvSet(matrix_ptr, seed_ptr, para_ptr, sn_ratio);
+  EnvSetPtr env_set_ptr = env_set_util::searchEnvSet(matrix_ptr, seed_ptr, para_ptr, sn_ratio);
   if (env_set_ptr == nullptr) {
     LOG_ERROR("env set is null");
     return nullptr; 
@@ -205,7 +205,7 @@ EnvCollPtr findEnvCollWithSingleEnv(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
 
 EnvCollPtr findEnvColl(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
                        EcscoreParaPtr para_ptr, double sn_ratio) {
-  EnvSetPtr env_set_ptr = env_set_util::getEnvSet(matrix_ptr, seed_ptr, para_ptr, sn_ratio);
+  EnvSetPtr env_set_ptr = env_set_util::searchEnvSet(matrix_ptr, seed_ptr, para_ptr, sn_ratio);
 
   if (env_set_ptr == nullptr) {
     return nullptr; 
@@ -229,8 +229,8 @@ EnvCollPtr findEnvColl(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
     if (new_seed_ptr == nullptr) {
       return nullptr;
     }
-    EnvSetPtr tmp_env_set_ptr = env_set_util::getEnvSet(matrix_ptr, new_seed_ptr, 
-                                                        para_ptr, sn_ratio);
+    EnvSetPtr tmp_env_set_ptr = env_set_util::searchEnvSet(matrix_ptr, new_seed_ptr,
+                                                           para_ptr, sn_ratio);
     if (tmp_env_set_ptr == nullptr) {
       return nullptr;
     }

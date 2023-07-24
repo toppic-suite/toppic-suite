@@ -18,6 +18,7 @@
 #include "ms/msmap/ms_map_peak.hpp"
 #include "topfd/envcnn/onnx_env_cnn.hpp"
 #include "topfd/ecscore/env/seed_env.hpp"
+#include "topfd/ecscore/env/ms_map_env_util.hpp"
 #include "topfd/ecscore/env_set/env_set.hpp"
 #include "topfd/ecscore/env_set/env_set_util.hpp"
 #include "topfd/ecscore/score/comp_env_cnn_score.hpp"
@@ -55,11 +56,11 @@ std::vector<std::vector<float>> getEnvcnnInputMatrix(MsMapPtr matrix_ptr,
   std::vector<std::vector<float>> data_matrix = onnx_env_cnn::initInputMatrix(); 
   SeedEnvPtr seed_ptr = coll_ptr->getSeedPtr();
   EnvSetPtr env_set_ptr = coll_ptr->getSeedEnvSet();
-    std::vector<double> theo_mz = seed_ptr->getMzList();
+  std::vector<double> theo_mz = seed_ptr->getMzList();
   std::vector<double> theo_inte = seed_ptr->getInteList();
-  std::vector<double> exp_dist = env_set_util::getAggregateEnvelopeMz(env_set_ptr);
-  std::vector<double> exp_dist_inte = env_set_util::getAggregateEnvelopeInte(env_set_ptr);
-  double inte_ratio = env_set_util::calcInteRatio(theo_inte, exp_dist_inte);
+  std::vector<double> exp_dist = env_set_ptr->compAggrEnvMzList();
+  std::vector<double> exp_dist_inte = env_set_ptr->compAggrEnvInteList();
+  double inte_ratio = ms_map_env_util::compTopThreeInteRatio(seed_ptr, exp_dist_inte);
   std::vector<double> scaled_theo_inte;
   EnvPeakPtrVec peak_list = env_set_ptr->getSeedPtr()->getPeakPtrList();
   for (const auto &peak: peak_list)

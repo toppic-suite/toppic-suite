@@ -12,24 +12,20 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_TOPFD_ECSCORE_ENV_MS_MAP_ENV_UTIL_HPP
-#define TOPPIC_TOPFD_ECSCORE_ENV_MS_MAP_ENV_UTIL_HPP
+#ifndef TOPPIC_TOPFD_ECSCORE_ENV_SET_XIC_UTIL_HPP
+#define TOPPIC_TOPFD_ECSCORE_ENV_SET_XIC_UTIL_HPP
 
-#include "topfd/ecscore/env/seed_env.hpp"
-#include "topfd/ecscore/env/ms_map_env.hpp"
+#include <vector>
 
 namespace toppic {
 
-namespace ms_map_env_util {
+namespace xic_util {
 
-double pearsonr(std::vector<double> &X, std::vector<double> &Y);
+std::vector<int> findLocalMinima(std::vector<double> &arr);
 
-double compTopThreeInteRatio(SeedEnvPtr seed_ptr, MsMapEnvPtr env_ptr);
-
-double compTopThreeInteRatio(SeedEnvPtr seed_ptr, 
-                             std::vector<double> &inte_list);
-}
+std::vector<int> findLocalMaxima(std::vector<double> &arr);
 
 }
 
-#endif //TOPPIC_UTILITY_FUNCTIONS_HPP
+}
+#endif 

@@ -20,6 +20,9 @@ class EnvSet {
   EnvSet(const SeedEnvPtr seed_ptr, MsMapEnvPtrVec env_list,
          int start, int end, double noise_inte_level, double sn_ratio);
 
+  EnvSet(const SeedEnvPtr seed_ptr, MsMapEnvPtrVec env_list,
+         int start, int end, double min_inte);
+
   int getStartSpecId() const { return start_spec_id_; }
 
   void setStartSpecId(int start_spec_id) { start_spec_id_ = start_spec_id; }
@@ -51,6 +54,8 @@ class EnvSet {
 
   // compute aggregate envelope peak intensities
   std::vector<double> compAggrEnvInteList();
+
+  std::vector<double> compAggrEnvMzList(); 
 
   // seed peak intensity list x spectrum intensity ratio list
   std::vector<std::vector<double>> getScaledTheoIntes(int min_inte);

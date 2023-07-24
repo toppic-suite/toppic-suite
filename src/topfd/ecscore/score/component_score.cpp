@@ -35,7 +35,7 @@ std::vector<double> getTheoEnvPeakInte(EnvSetPtr env_set_ptr) {
 
 double getAggOddEvenPeakRatio(EnvSetPtr env_set_ptr) {
   std::vector<double> theo_inte = getTheoEnvPeakInte(env_set_ptr);
-  std::vector<double> aggregate_inte = env_set_util::getAggregateEnvelopeInte(env_set_ptr);
+  std::vector<double> aggregate_inte = env_set_ptr->compAggrEnvInteList();
   double max_aggregate_inte = *std::max_element(aggregate_inte.begin(), aggregate_inte.end());
   int num_peaks = aggregate_inte.size();
   std::vector<double> normalized_aggregate_inte;
@@ -66,7 +66,7 @@ double getAggOddEvenPeakRatio(EnvSetPtr env_set_ptr) {
 
 double getAggEnvCorr(EnvSetPtr env_set_ptr) {
   std::vector<double> theo_inte = getTheoEnvPeakInte(env_set_ptr);
-  std::vector<double> aggregate_inte = env_set_util::getAggregateEnvelopeInte(env_set_ptr);
+  std::vector<double> aggregate_inte = env_set_ptr->compAggrEnvInteList();
   double max_aggregate_inte = *std::max_element(aggregate_inte.begin(), aggregate_inte.end());
   std::vector<double> normalized_aggregate_inte;
   for (auto inte: aggregate_inte)

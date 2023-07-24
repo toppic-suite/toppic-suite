@@ -25,34 +25,26 @@ namespace toppic {
 
 namespace env_set_util {
 
-std::vector<double> getAggregateEnvelopeMz(EnvSetPtr env_set_ptr);
+MsMapEnvPtr getMatchMsMapEnv(MsMapPtr ms_map_ptr, SeedEnvPtr seed_ptr, int sp_id, double mass_tol);
 
-std::vector<double> getAggregateEnvelopeInte(EnvSetPtr env_set_ptr);
+EnvSetPtr searchEnvSet(MsMapPtr ms_map_ptr, SeedEnvPtr seed_ptr,
+                       EcscoreParaPtr para_ptr, double sn_ratio);
 
-double calcInteRatio(std::vector<double> &theo_envelope_inte, std::vector<double> &exp_envelope_inte);
+EnvSetPtr searchEnvSet(MsMapPtr ms_map_ptr, SeedEnvPtr seed_ptr,
+                       int start_spec_id, int end_spec_id,
+                       EcscoreParaPtr para_ptr, double sn_ratio);
 
-EnvSetPtr getEnvSet(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
-                    EcscoreParaPtr para_ptr, double sn_ratio);
+bool checkValidEnvSet(MsMapPtr ms_map_ptr, EnvSetPtr env_set_ptr);
 
-EnvSetPtr findEnvSet(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
-                     int start_spec_id, int end_spec_id,
-                     EcscoreParaPtr para_ptr, double sn_ratio);
+bool checkValidEnvSetSeedEnv(MsMapPtr ms_map_ptr, EnvSetPtr env_set_ptr, int max_miss_peak);
 
-bool checkValidEnvSet(MsMapPtr matrix_ptr, EnvSetPtr env_set_ptr);
+bool checkValidEnvSetSeedEnvSparse(MsMapPtr ms_map_ptr, EnvSetPtr env_set_ptr, int max_miss_peak);
 
-bool checkValidEnvSetSeedEnv(MsMapPtr matrix_ptr, EnvSetPtr env_set_ptr, int max_miss_peak);
 
-bool checkValidEnvSetSeedEnvSparse(MsMapPtr matrix_ptr, EnvSetPtr env_set_ptr, int max_miss_peak);
 
-MsMapEnvPtr getMatchExpEnv(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr, int sp_id, double mass_tol);
-
-SeedEnvPtr testHalfChargeState(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
+SeedEnvPtr testHalfChargeState(MsMapPtr ms_map_ptr, SeedEnvPtr seed_ptr,
                                EnvSetPtr env_set_ptr, double even_odd_peak_ratios,
                                EcscoreParaPtr para_ptr, double sn_ratio);
-
-std::vector<int> findLocalMinima(std::vector<double> &arr);
-
-std::vector<int> findLocalMaxima(std::vector<double> &arr);
 
 }
 

@@ -19,7 +19,7 @@
 #include "common/util/logger.hpp"
 
 #include "topfd/ecscore/env/ms_map_env_util.hpp"
-#include "topfd/ecscore/env_set/env_set_util.hpp"
+#include "topfd/ecscore/env_set/xic_util.hpp"
 #include "topfd/ecscore/env_set/env_set.hpp"
 
 namespace toppic {
@@ -31,6 +31,16 @@ EnvSet::EnvSet(const SeedEnvPtr seed_ptr, MsMapEnvPtrVec env_list,
   start_spec_id_ = start;
   end_spec_id_ = end;
   min_inte_ = noise_inte * sn_ratio;
+  initMedianXic();
+}
+
+EnvSet::EnvSet(const SeedEnvPtr seed_ptr, MsMapEnvPtrVec env_list,
+               int start, int end, double min_inte) {
+  seed_ptr_ = seed_ptr;
+  ms_map_env_list_ = env_list;
+  start_spec_id_ = start;
+  end_spec_id_ = end;
+  min_inte_ = min_inte;
   initMedianXic();
 }
 
@@ -67,17 +77,38 @@ int EnvSet::countEnvNum() {
 
 std::vector<double> EnvSet::compAggrEnvInteList() {
   int peak_num = seed_ptr_->getPeakNum();
-  std::vector<double> sum_list(peak_num, 0);
+  std::vector<double> inte_list(peak_num, 0);
   for (auto &env: ms_map_env_list_) {
     if (env == nullptr) {
       continue;
     }
     std::vector<double> cur_sum_list = env->getInteList();
     for (int p_i = 0; p_i < peak_num; p_i++)
-      sum_list[p_i] = sum_list[p_i] + cur_sum_list[p_i];
+      inte_list[p_i] = inte_list[p_i] + cur_sum_list[p_i];
   }
-  return sum_list;
+  return inte_list;
 }
+
+std::vector<double> EnvSet::compAggrEnvMzList() {
+  int peak_num = seed_ptr_->getPeakNum();
+  std::vector<double> mz_list(peak_num, 0.0);
+  for (int peak_idx = 0; peak_idx < peak_num; peak_idx++) {
+    int weight = 0;
+    for (size_t env_idx = 0; env_idx < ms_map_env_list_.size(); env_idx++) {
+      MsMapPeakPtr peak_ptr = ms_map_env_list_[env_idx]->getPeakPtr(peak_idx);
+      if (peak_ptr != nullptr) {
+        mz_list[peak_idx] = mz_list[peak_idx]
+          + (peak_ptr->getPosition() * peak_ptr->getIntensity());
+        weight += peak_ptr->getIntensity();
+      }
+    }
+    if (weight > 0) {
+      mz_list[peak_idx] = mz_list[peak_idx] / weight;
+    }
+  }
+  return mz_list; 
+}
+
 
 std::vector<std::vector<double>> EnvSet::getScaledTheoIntes(int min_inte) {
   std::vector<std::vector<double>> results;
@@ -201,7 +232,7 @@ void EnvSet::refineXicBoundary() {
 
   /// Left side
   std::vector<double> left_data(smoothed_env_xic.begin(), smoothed_env_xic.begin() + seed_idx + 1);
-  std::vector<int> minima_left = env_set_util::findLocalMinima(left_data);
+  std::vector<int> minima_left = xic_util::findLocalMinima(left_data);
   std::vector<double> minima_vals_left;
   for (auto m: minima_left) minima_vals_left.push_back(left_data[m]);
   int start_split_point = start_spec_id_;
@@ -216,7 +247,7 @@ void EnvSet::refineXicBoundary() {
       start_split_point = start_split_point + pos;
       std::vector<double> temp_left_data(left_data.begin() + pos, left_data.end());
       left_data = temp_left_data;
-      minima_left = env_set_util::findLocalMinima(left_data);
+      minima_left = xic_util::findLocalMinima(left_data);
       minima_vals_left.clear();
       for (auto m: minima_left) minima_vals_left.push_back(left_data[m]);
     }
@@ -224,7 +255,7 @@ void EnvSet::refineXicBoundary() {
 
   /// Right side
   std::vector<double> right_data(smoothed_env_xic.begin() + seed_idx, smoothed_env_xic.end());
-  std::vector<int> minima_right = env_set_util::findLocalMinima(right_data);
+  std::vector<int> minima_right = xic_util::findLocalMinima(right_data);
   std::vector<double> minima_vals_right;
   for (auto m: minima_right) minima_vals_right.push_back(right_data[m]);
   int end_split_point = -1;
@@ -239,7 +270,7 @@ void EnvSet::refineXicBoundary() {
       end_split_point = pos;
       std::vector<double> temp_right_data(right_data.begin(), right_data.begin() + pos - 1);
       right_data = temp_right_data;
-      minima_right = env_set_util::findLocalMinima(right_data);
+      minima_right = xic_util::findLocalMinima(right_data);
       minima_vals_right.clear();
       for (auto m: minima_right) minima_vals_right.push_back(right_data[m]);
     }

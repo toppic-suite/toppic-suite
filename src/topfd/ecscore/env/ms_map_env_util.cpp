@@ -49,6 +49,23 @@ double compTopThreeInteRatio(SeedEnvPtr seed_ptr, MsMapEnvPtr env_ptr) {
   return env_inte/seed_inte;
 }
 
+double compTopThreeInteRatio(SeedEnvPtr seed_ptr, std::vector<double> &inte_list) {
+  double seed_inte = seed_ptr->compTopThreeInteSum();
+  if (seed_inte == 0) {
+    LOG_WARN("Empty peak list!");
+    return 0;
+  }
+  size_t ref_idx = seed_ptr->getReferIdx();
+  double env_inte = inte_list[ref_idx];
+  if (ref_idx - 1 >= 0) {
+    env_inte += inte_list[ref_idx-1];
+  }
+  if (ref_idx + 1 < inte_list.size()) {
+    env_inte += inte_list[ref_idx+1];
+  }
+  return env_inte/seed_inte;
+}
+
 }
 
 }

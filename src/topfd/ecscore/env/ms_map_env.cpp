@@ -76,5 +76,15 @@ double MsMapEnv::compTopThreeInteSum(int ref_idx) {
   return sum;
 }
 
+void MsMapEnv::removeLowIntePeaks(std::vector<double> &inte_list, double ratio,
+                                  double min_inte) {
+  for (size_t i = 0; i < inte_list.size(); i++) {
+    double inte = inte_list[i] * ratio;
+    if (inte < min_inte) {
+      peak_list_[i] = nullptr;
+    }
+  }
+}
+
 }
 

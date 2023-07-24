@@ -40,6 +40,8 @@ class EcscorePara {
 
   PeakTolerancePtr peak_tolerance_ptr_;
 
+  double getMassTole() {return mass_tole_;}
+
   // extend_offset is -2, -1, 0, 1, 2. We use it to search matched masses 
   // when a reference mass is given to find a feature. 
   std::vector<double> extend_offsets_;
