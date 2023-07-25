@@ -78,7 +78,7 @@ bool checkOverlap(MsMapRowHeaderPtrVec &spectrum_list, EnvCollPtr f,
 
 bool checkExistingFeatures(MsMapPtr matrix_ptr, EnvCollPtr env_coll_ptr,
                            EnvCollPtrVec &env_coll_list, EcscoreParaPtr para_ptr) {
-  double env_mass = env_coll_ptr->getMass();
+  double env_mass = env_coll_ptr->getMonoNeutralMass();
   double mass_tol = para_ptr->match_envelope_tolerance_ * env_mass;
   std::vector<int> charge_states = env_coll_ptr->getChargeList();
   double isotope_mass = mass_constant::getIsotopeMass();
@@ -97,7 +97,7 @@ bool checkExistingFeatures(MsMapPtr matrix_ptr, EnvCollPtr env_coll_ptr,
     if (overlap) {
       double min_mass_diff = std::numeric_limits<double>::max();
       for (auto ext_mass: extended_masses) {
-        double mass_diff = std::abs(ext_mass - env_coll_list[i]->getMass());
+        double mass_diff = std::abs(ext_mass - env_coll_list[i]->getMonoNeutralMass());
         if (mass_diff < min_mass_diff)
           min_mass_diff = mass_diff;
       }
@@ -253,7 +253,7 @@ EnvCollPtr findEnvColl(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
   int start_spec_id = env_set_ptr->getStartSpecId();
   int end_spec_id = env_set_ptr->getEndSpecId();
   /*
-  if (new_seed_ptr->getMass() > 10059.3 && new_seed_ptr->getMonoMass() < 10059.4) {
+  if (new_seed_ptr->getMonoNeutralMass() > 10059.3 && new_seed_ptr->getMonoMass() < 10059.4) {
     LOG_ERROR("Mass " << new_seed_ptr->getMonoNeutralMass() << " env set list length " <<
               env_set_list.size());
   }
@@ -268,12 +268,11 @@ FracFeaturePtr getFracFeature(int feat_id, DeconvMsPtrVec &ms1_ptr_vec, int frac
                               std::string &file_name, EnvCollPtr coll_ptr,
                               MsMapPtr matrix_ptr, double sn_ratio) {
 
-  double noise_inte = matrix_ptr->getBaseInte(); 
   MsMapRowHeaderPtrVec spec_list = matrix_ptr->getHeaderPtrList();
   int ms1_id_begin = coll_ptr->getStartSpecId();
   int ms1_id_end = coll_ptr->getEndSpecId();
-  double feat_inte = coll_ptr->getIntensity(sn_ratio, noise_inte); 
-  double feat_mass = coll_ptr->getMass();
+  double feat_inte = coll_ptr->getIntensity();
+  double feat_mass = coll_ptr->getMonoNeutralMass();
   int min_charge = coll_ptr->getMinCharge();
   int max_charge = coll_ptr->getMaxCharge();
   double ms1_time_begin = spec_list[ms1_id_begin]->getRt(); 
@@ -281,7 +280,7 @@ FracFeaturePtr getFracFeature(int feat_id, DeconvMsPtrVec &ms1_ptr_vec, int frac
   int ms1_scan_begin = ms1_ptr_vec[ms1_id_begin]->getMsHeaderPtr()->getFirstScanNum();
   int ms1_scan_end = ms1_ptr_vec[ms1_id_end]->getMsHeaderPtr()->getFirstScanNum();
   // get apex inte
-  int ms1_apex_id = coll_ptr->getBaseSpecId();
+  int ms1_apex_id = coll_ptr->getSeedSpecId();
   double time_apex = spec_list[ms1_apex_id]->getRt(); 
 
   double apex_inte = coll_ptr->getSeedEnvSet()->getXicSeedAllPeakInte();

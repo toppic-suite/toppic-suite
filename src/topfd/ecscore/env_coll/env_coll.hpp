@@ -30,54 +30,38 @@ class EnvColl {
           int min_charge, int max_charge,
           int start_spec_id, int end_spec_id);
 
-  std::vector<double> compExpInteSumList(); 
-
-  std::vector<int> getChargeList();
-
-  void refineMonoMass();
-
-  double getIntensity(double sn_ratio, double noise_inte);
-
-  EnvSetPtr getSeedEnvSet();
-
   SeedEnvPtr getSeedPtr() { return seed_ptr_; }
-
-  void setSeedPtr(SeedEnvPtr seed_ptr) { seed_ptr_ = seed_ptr; }
 
   EnvSetPtrVec getEnvSetList() { return env_set_list_; }
 
-  void setEnvSetList(EnvSetPtrVec &env_set_list);  
-
   int getMinCharge() const { return min_charge_; }
-
-  void setMinCharge(int min_charge) { min_charge_ = min_charge; }
 
   int getMaxCharge() const { return max_charge_; }
 
-  void setMaxCharge(int max_charge) { max_charge_ = max_charge; }
-
   int getStartSpecId() const { return start_spec_id_; }
 
-  void setStartSpecId(int start_spec_id) { start_spec_id_ = start_spec_id; }
-
   int getEndSpecId() const { return end_spec_id_; }
-
-  void setEndSpecId(int end_spec_id) { end_spec_id_ = end_spec_id; }
 
   double getEcscore() const { return ecscore_; }
 
   void setEcscore(double ecscore) { ecscore_ = ecscore; }
 
-  int getBaseSpecId() const { return seed_ptr_->getSpecId(); }
+  int getSeedSpecId() const { return seed_ptr_->getSpecId(); }
 
-  double getMass() const { return seed_ptr_->getMonoNeutralMass(); }
+  double getMonoNeutralMass() const { return seed_ptr_->getMonoNeutralMass(); }
 
-  std::vector<double> getExpInteSumList() const { return exp_inte_sum_list_; }
+  double getIntensity();
 
-  void setExpInteSumList(const std::vector<double> &exp_inte_sum_list) {
-    exp_inte_sum_list_ = exp_inte_sum_list;}
+  EnvSetPtr getSeedEnvSet();
+  
+  std::vector<int> getChargeList();
+
+  void refineMonoMass();
 
   void removePeakData(MsMapPtr matrix_ptr);
+
+  // this function needs to be replaced by env_coll merging function
+  void setEnvSetList(EnvSetPtrVec &env_set_list);
 
  private:
   SeedEnvPtr seed_ptr_;
@@ -87,7 +71,6 @@ class EnvColl {
   int start_spec_id_;
   int end_spec_id_;
   double ecscore_ = -1;
-  std::vector<double> exp_inte_sum_list_;
 };
 
 typedef std::shared_ptr<EnvColl> EnvCollPtr;

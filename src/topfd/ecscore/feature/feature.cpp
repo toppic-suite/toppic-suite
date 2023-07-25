@@ -46,7 +46,7 @@ Feature::Feature(EnvCollPtr env_coll_ptr, MsMapPtr matrix_ptr,
   rep_charge_ = seed_ptr->getCharge();
   rep_mz_ = seed_ptr->getMonoMz();
 
-  abundance_ = env_coll_ptr->getIntensity(sn_ratio, matrix_ptr->getBaseInte());
+  abundance_ = env_coll_ptr->getIntensity();
 
   // convert seconds to minutes
   min_elution_time_ = spec_list[min_scan_]->getRt()/60;
@@ -144,7 +144,7 @@ bool Feature::getHighestInteFeature(FracFeaturePtrVec &frac_features, EnvCollPtr
       continue;
     }
     EnvSetPtrVec env_sets = env_coll_list[coll_id]->getEnvSetList();
-    double feature_mono_mass = env_coll_list[coll_id]->getMass();
+    double feature_mono_mass = env_coll_list[coll_id]->getMonoNeutralMass();
     double feature_avg_mass = EnvBase::convertMonoMassToAvgMass(feature_mono_mass); 
     for (size_t env_set_id = 0; env_set_id < env_sets.size(); env_set_id++) {
       EnvSetPtr env_set_ptr = env_sets[env_set_id];

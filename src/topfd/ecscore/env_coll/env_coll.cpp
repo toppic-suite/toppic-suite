@@ -28,9 +28,10 @@ EnvColl::EnvColl(SeedEnvPtr seed_ptr, EnvSetPtrVec &env_set_list,
   max_charge_ = max_charge;
   start_spec_id_ = start_spec_id;
   end_spec_id_ = end_spec_id;
-  exp_inte_sum_list_ = compExpInteSumList();
+  //exp_inte_sum_list_ = compExpInteSumList();
 }
 
+/*
 std::vector<double> EnvColl::compExpInteSumList() {
   int peak_num = seed_ptr_->getPeakNum();
   std::vector<double> sum_list(peak_num, 0);
@@ -49,6 +50,7 @@ std::vector<double> EnvColl::compExpInteSumList() {
   }
   return sum_list;
 }
+*/
 
 // this function is problematic and needs to be rewritten
 void EnvColl::setEnvSetList(EnvSetPtrVec &env_set_list) {
@@ -75,14 +77,14 @@ void EnvColl::refineMonoMass() {
   }
   if (weight > 0) {
     double mz_error = weight_mz_error / weight;
-      seed_ptr_->changeMzByIsotope(mz_error * seed_ptr_->getCharge());
+    seed_ptr_->changeMz(mz_error); 
   }
   else {
     LOG_INFO("ERROR 0 weight in refine_mono_mass");
   }
 }
 
-double EnvColl::getIntensity(double sn_ratio, double noise_inte) {
+double EnvColl::getIntensity() {
   double inte = 0;
   for (auto env_set: env_set_list_) {
     double tmp_inte = env_set->getInte();
