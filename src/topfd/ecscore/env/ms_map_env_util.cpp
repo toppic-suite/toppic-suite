@@ -13,6 +13,7 @@
 //limitations under the License.
 
 #include <cmath>
+#include <limits>
 
 #include "common/util/logger.hpp"
 
@@ -65,6 +66,61 @@ double compTopThreeInteRatio(SeedEnvPtr seed_ptr, std::vector<double> &inte_list
   }
   return env_inte/seed_inte;
 }
+
+MsMapPeakPtr pickMsMapPeak(MsMapPtr ms_map_ptr, EnvPeakPtr seed_peak_ptr,
+                           int sp_id, double mass_tol) {
+  // get peaks within mass tolerance
+  double max_inte = std::numeric_limits<double>::min();
+  double mz = seed_peak_ptr->getPosition();
+  int start_idx = ms_map_ptr->getColIndex(mz - mass_tol);
+  if (start_idx < 0) {
+      start_idx = 0;
+  }
+  int end_idx = ms_map_ptr->getColIndex(mz + mass_tol);
+  if (end_idx >= ms_map_ptr->getColNum()) {
+      end_idx = ms_map_ptr->getColNum() - 1;
+  }
+  MsMapPeakPtr result_peak = nullptr;
+  for (int idx = start_idx; idx <= end_idx; idx++) {
+    MsMapPeakPtrVec bin_peaks = ms_map_ptr->getBinPeakList(sp_id, idx);
+    for (const auto& peak_ptr : bin_peaks) {
+      double mass_diff = std::abs(mz - peak_ptr->getPosition());
+      if ( mass_diff < mass_tol && peak_ptr->getIntensity() > max_inte) {
+        result_peak = peak_ptr;
+        max_inte = peak_ptr->getIntensity();
+      }
+    }
+  }
+  return result_peak;
+}
+
+MsMapEnvPtr getMatchMsMapEnv(MsMapPtr ms_map_ptr, SeedEnvPtr seed_ptr,
+                             int sp_id, double mass_tol) {
+  MsMapPeakPtrVec peak_list;
+  EnvPeakPtrVec peaks = seed_ptr->getPeakPtrList();
+  for (auto& seed_peak : peaks) {
+    if (seed_peak != nullptr) {
+      MsMapPeakPtr peak = pickMsMapPeak(ms_map_ptr, seed_peak, sp_id, mass_tol);
+      peak_list.push_back(peak);
+    }
+    else {
+      peak_list.push_back(nullptr);
+    }
+  }
+  MsMapEnvPtr ms_map_env_ptr = std::make_shared<MsMapEnv>(sp_id, peak_list);
+  return ms_map_env_ptr;
+}
+
+MsMapEnvPtr getMatchMsMapEnv(MsMapPtr ms_map_ptr, SeedEnvPtr seed_ptr,
+                             int sp_id, double mass_tole,
+                             double min_inte) {
+  MsMapEnvPtr ms_map_env_ptr = getMatchMsMapEnv(ms_map_ptr, seed_ptr,
+                                                sp_id, mass_tole);
+  double inte_ratio = ms_map_env_util::compTopThreeInteRatio(seed_ptr, ms_map_env_ptr);
+  ms_map_env_ptr->removeLowIntePeaks(seed_ptr, inte_ratio, min_inte);
+  return ms_map_env_ptr;
+}
+
 
 }
 

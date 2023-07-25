@@ -15,22 +15,13 @@
 #include "common/util/logger.hpp"
 #include "topfd/ecscore/env/ms_map_env_util.hpp"
 #include "topfd/ecscore/env/seed_env_util.hpp"
-#include "topfd/ecscore/env_set/env_set_util.hpp"
 
 namespace toppic {
 
 namespace seed_env_util {
 
-bool testChargeState(int charge, std::vector<double> &seed_env_inte) {
-  if ((charge == 1 || charge == 2) && seed_env_inte.size() < 2) return false;
-  if (charge > 2 && charge < 15 && seed_env_inte.size() < 3) return false;
-  if (charge >= 15 && seed_env_inte.size() < 5) return false;
-  return true;
-}
-
-
-bool evalEnvPair(std::vector<double> &exp_env_inte, 
-                 std::vector<double> &theo_inte, double tol) {
+bool evalPearsonR(std::vector<double> &exp_env_inte,
+                  std::vector<double> &theo_inte, double tol) {
   int num_theo_peak = 0;
   for (auto i : theo_inte) { 
     if (i > 0) {
@@ -47,26 +38,27 @@ bool evalEnvPair(std::vector<double> &exp_env_inte,
   }
 }
 
-bool evalEnv(MsMapPtr map_ptr, SeedEnvPtr seed_ptr,
-             double mass_tol, double corr_tol, double sn_ratio){
-  double noise_inte = map_ptr->getBaseInte();
-  MsMapEnvPtr exp_env_ptr
-    = env_set_util::getMatchMsMapEnv(map_ptr, seed_ptr, seed_ptr->getSpecId(), mass_tol);
-  std::vector<double> exp_env_mass = exp_env_ptr->getMzList();
-  std::vector<double> seed_env_mass = seed_ptr->getMzList();
-  std::vector<double> exp_env_inte = exp_env_ptr->getInteList();
+bool evalSeedMsMapEnvPair(MsMapPtr map_ptr, SeedEnvPtr seed_ptr,
+                          double mass_tol, double corr_tol, double sn_ratio){
+  MsMapEnvPtr ms_map_env_ptr
+    = ms_map_env_util::getMatchMsMapEnv(map_ptr, seed_ptr, seed_ptr->getSpecId(), mass_tol);
+  double inte_ratio =  ms_map_env_util::compTopThreeInteRatio(seed_ptr, ms_map_env_ptr);
+  int peak_num = seed_ptr->getPeakNum();
+  double min_inte = map_ptr->getBaseInte() * sn_ratio;
   std::vector<double> seed_env_inte = seed_ptr->getInteList();
-  int num_peaks = seed_env_inte.size();
-  double inte_ratio =  ms_map_env_util::compTopThreeInteRatio(seed_ptr, exp_env_ptr);
-    std::vector<double> scaled_theo_inte;
-  for (int i = 0; i < num_peaks; i++) {
+  std::vector<double> scaled_theo_inte;
+  for (int i = 0; i < peak_num; i++) {
     double scaled_inte = inte_ratio * seed_env_inte[i];
-    if (scaled_inte < sn_ratio * noise_inte)
+    if (scaled_inte < min_inte)
       scaled_inte = 0;
     scaled_theo_inte.push_back(scaled_inte);
   }
+  
+  std::vector<double> exp_env_mass = ms_map_env_ptr->getMzList();
+  std::vector<double> seed_env_mass = seed_ptr->getMzList();
+  std::vector<double> exp_env_inte = ms_map_env_ptr->getInteList();
   EnvPeakPtrVec seed_env_peaks = seed_ptr->getPeakPtrList();
-  for (int j = num_peaks-1; j >= 0; j--) {
+  for (int j = peak_num -1; j >= 0; j--) {
     if (scaled_theo_inte[j] == 0) {
       scaled_theo_inte.erase(scaled_theo_inte.begin() + j);
       seed_env_peaks.erase(seed_env_peaks.begin() + j);
@@ -74,10 +66,10 @@ bool evalEnv(MsMapPtr map_ptr, SeedEnvPtr seed_ptr,
     }
   }
   seed_ptr->setPeakPtrList(seed_env_peaks);
-  if (!testChargeState(seed_ptr->getCharge(), scaled_theo_inte)) {
+  if (!seed_ptr->containEnoughPeaks()) {
     return false;
   }
-  return evalEnvPair(exp_env_inte, scaled_theo_inte, corr_tol);
+  return evalPearsonR(exp_env_inte, scaled_theo_inte, corr_tol);
 }
 
 bool preprocessEnv(MsMapPtr map_ptr, SeedEnvPtr seed_ptr,
@@ -86,7 +78,7 @@ bool preprocessEnv(MsMapPtr map_ptr, SeedEnvPtr seed_ptr,
     return false;
   double mass_tol = para_ptr->mass_tole_;
   double corr_tol = para_ptr->corr_tole_;
-  bool valid = evalEnv(map_ptr, seed_ptr, mass_tol, corr_tol, sn_ratio);
+  bool valid = evalSeedMsMapEnvPair(map_ptr, seed_ptr, mass_tol, corr_tol, sn_ratio);
   if (seed_ptr->getSpecId() >= map_ptr->getRowNum()) {
     LOG_ERROR("spec id " + std::to_string(seed_ptr->getSpecId()) + " is out of range!");
     valid = false;
@@ -99,7 +91,7 @@ bool simpleEvalEnv(MsMapPtr map_ptr, SeedEnvPtr seed_ptr,
                    double mass_tol, double corr_tol, double sn_ratio){
   int spec_id = seed_ptr->getSpecId();
   MsMapEnvPtr exp_env_ptr
-    = env_set_util::getMatchMsMapEnv(map_ptr, seed_ptr, spec_id, mass_tol);
+    = ms_map_env_util::getMatchMsMapEnv(map_ptr, seed_ptr, spec_id, mass_tol);
   std::vector<double> exp_env_mass = exp_env_ptr->getMzList();
   std::vector<double> seed_env_mass = seed_ptr->getMzList();
   std::vector<double> exp_env_inte = exp_env_ptr->getInteList();
@@ -153,9 +145,6 @@ bool simplePreprocessEnv(MsMapPtr map_ptr, SeedEnvPtr seed_ptr,
   bool valid = simpleEvalEnv(map_ptr, seed_ptr, mass_tol, corr_tol, sn_ratio);
   return valid;
 }
-
-
-
 
 }
 

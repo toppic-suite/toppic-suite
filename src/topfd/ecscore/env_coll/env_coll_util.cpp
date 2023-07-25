@@ -128,6 +128,7 @@ EnvSetPtrVec getChargeEnvList(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
   EnvSetPtrVec env_set_list;
   int charge = seed_ptr->getCharge() - 1;
   int miss_num = 0;
+  int min_match_peak_num_in_top_three = para_ptr->getMinMatchPeakNumInTopThree();
   while (charge >= para_ptr->para_min_charge_) {
     SeedEnvPtr cur_seed_ptr = std::make_shared<SeedEnv>(seed_ptr, charge);
     //env_set_util::compPeakStartEndIdx(matrix_ptr, cur_seed_ptr, 
@@ -140,8 +141,9 @@ EnvSetPtrVec getChargeEnvList(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
     } 
     else {
       env_set_ptr->refineXicBoundary();
-      if (!env_set_util::checkValidEnvSet(matrix_ptr, env_set_ptr))
+      if (!env_set_ptr->containTwoValidEnvs(min_match_peak_num_in_top_three)) {
         miss_num = miss_num + 1;
+      }
       else {
         miss_num = 0;
         env_set_list.push_back(env_set_ptr);
@@ -165,8 +167,9 @@ EnvSetPtrVec getChargeEnvList(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
       miss_num = miss_num + 1;
     } else {
       env_set_ptr->refineXicBoundary();
-      if (!env_set_util::checkValidEnvSet(matrix_ptr, env_set_ptr))
+      if (!env_set_ptr->containTwoValidEnvs(min_match_peak_num_in_top_three)) {
         miss_num = miss_num + 1;
+      }
       else {
         miss_num = 0;
         env_set_list.push_back(env_set_ptr);
@@ -211,20 +214,19 @@ EnvCollPtr findEnvColl(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
     return nullptr; 
   }
   env_set_ptr->refineXicBoundary();
+  int min_match_peak_num_in_top_three = para_ptr->getMinMatchPeakNumInTopThree();
   if (para_ptr->filter_neighboring_peaks_) {
-    if (!env_set_util::checkValidEnvSetSeedEnv(matrix_ptr, env_set_ptr, 
-                                               para_ptr->max_miss_peak_))
+    if (!env_set_ptr->containValidNeighborEnvsForSeed(min_match_peak_num_in_top_three))
       return nullptr; 
     else
-      if (!env_set_util::checkValidEnvSetSeedEnvSparse(matrix_ptr, env_set_ptr,
-                                                       para_ptr->max_miss_peak_))
+      if (!env_set_ptr->containThreeValidOutOfFiveEnvs(min_match_peak_num_in_top_three))
         return nullptr;
   }
   double even_odd_peak_ratio = component_score::getAggOddEvenPeakRatio(env_set_ptr);
   SeedEnvPtr new_seed_ptr = seed_ptr;
   if (std::abs(even_odd_peak_ratio) > para_ptr->even_odd_ratio_cutoff_) {
     new_seed_ptr = env_set_util::testHalfChargeState(matrix_ptr, seed_ptr,
-                                                     env_set_ptr, even_odd_peak_ratio, 
+                                                     even_odd_peak_ratio, 
                                                      para_ptr, sn_ratio);
     if (new_seed_ptr == nullptr) {
       return nullptr;
@@ -236,8 +238,7 @@ EnvCollPtr findEnvColl(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
     }
     env_set_ptr = tmp_env_set_ptr;
     env_set_ptr->refineXicBoundary();
-    if (!env_set_util::checkValidEnvSetSeedEnv(matrix_ptr, env_set_ptr,
-                                               para_ptr->max_miss_peak_)) {
+    if (!env_set_ptr->containValidNeighborEnvsForSeed(min_match_peak_num_in_top_three)) {                                             
       return nullptr; 
     }
   }

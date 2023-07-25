@@ -15,6 +15,7 @@
 #ifndef TOPPIC_TOPFD_ECSCORE_ENV_MS_MAP_ENV_UTIL_HPP
 #define TOPPIC_TOPFD_ECSCORE_ENV_MS_MAP_ENV_UTIL_HPP
 
+#include "ms/msmap/ms_map.hpp"
 #include "topfd/ecscore/env/seed_env.hpp"
 #include "topfd/ecscore/env/ms_map_env.hpp"
 
@@ -28,6 +29,13 @@ double compTopThreeInteRatio(SeedEnvPtr seed_ptr, MsMapEnvPtr env_ptr);
 
 double compTopThreeInteRatio(SeedEnvPtr seed_ptr, 
                              std::vector<double> &inte_list);
+
+MsMapEnvPtr getMatchMsMapEnv(MsMapPtr ms_map_ptr, SeedEnvPtr seed_ptr,
+                             int sp_id, double mass_tol);
+
+MsMapEnvPtr getMatchMsMapEnv(MsMapPtr ms_map_ptr, SeedEnvPtr seed_ptr,
+                             int sp_id, double mass_tole,
+                             double min_inte);
 }
 
 }

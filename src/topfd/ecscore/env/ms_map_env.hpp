@@ -46,8 +46,7 @@ class MsMapEnv {
 
   double compTopThreeInteSum(int ref_idx);
 
-  void removeLowIntePeaks(std::vector<double> &inte_list, double ratio,
-                          double min_inte);
+  void removeLowIntePeaks(SeedEnvPtr seed_ptr, double ratio, double min_inte);
 
  private:
   int spec_id_;

@@ -16,6 +16,7 @@
 #include <algorithm>
 
 #include "common/util/logger.hpp"
+#include "common/base/mass_constant.hpp"
 
 #include "topfd/ecscore/env/seed_env_util.hpp"
 #include "topfd/ecscore/env/ms_map_env_util.hpp"
@@ -25,61 +26,6 @@
 namespace toppic {
 
 namespace env_set_util {
-
-MsMapPeakPtr pickMsMapPeak(MsMapPtr ms_map_ptr, EnvPeakPtr seed_peak_ptr,
-                           int sp_id, double mass_tol) {
-  // get peaks within mass tolerance
-  double max_inte = std::numeric_limits<double>::min();
-  double mz = seed_peak_ptr->getPosition();
-  int start_idx = ms_map_ptr->getColIndex(mz - mass_tol);
-  if (start_idx < 0) {
-      start_idx = 0;
-  }
-  int end_idx = ms_map_ptr->getColIndex(mz + mass_tol);
-  if (end_idx >= ms_map_ptr->getColNum()) {
-      end_idx = ms_map_ptr->getColNum() - 1;
-  }
-  MsMapPeakPtr result_peak = nullptr;
-  for (int idx = start_idx; idx <= end_idx; idx++) {
-    MsMapPeakPtrVec bin_peaks = ms_map_ptr->getBinPeakList(sp_id, idx);
-    for (const auto& peak_ptr : bin_peaks) {
-      double mass_diff = std::abs(mz - peak_ptr->getPosition());
-      if ( mass_diff < mass_tol && peak_ptr->getIntensity() > max_inte) {
-        result_peak = peak_ptr;
-        max_inte = peak_ptr->getIntensity();
-      }
-    }
-  }
-  return result_peak;
-}
-
-MsMapEnvPtr getMatchMsMapEnv(MsMapPtr ms_map_ptr, SeedEnvPtr seed_ptr,
-                             int sp_id, double mass_tol) {
-  MsMapPeakPtrVec peak_list;
-  EnvPeakPtrVec peaks = seed_ptr->getPeakPtrList();
-  for (auto& seed_peak : peaks) {
-    if (seed_peak != nullptr) {
-      MsMapPeakPtr peak = pickMsMapPeak(ms_map_ptr, seed_peak, sp_id, mass_tol);
-      peak_list.push_back(peak);
-    }
-    else {
-      peak_list.push_back(nullptr);
-    }
-  }
-  MsMapEnvPtr ms_map_env_ptr = std::make_shared<MsMapEnv>(sp_id, peak_list);
-  return ms_map_env_ptr;
-}
-
-MsMapEnvPtr getMatchMsMapEnv(MsMapPtr ms_map_ptr, SeedEnvPtr seed_ptr,
-                             int sp_id, double mass_tole,
-                             std::vector<double> &seed_inte_list,
-                             double min_inte) {
-  MsMapEnvPtr ms_map_env_ptr = getMatchMsMapEnv(ms_map_ptr, seed_ptr,
-                                                sp_id, mass_tole);
-  double inte_ratio = ms_map_env_util::compTopThreeInteRatio(seed_ptr, ms_map_env_ptr);
-  ms_map_env_ptr->removeLowIntePeaks(seed_inte_list, inte_ratio, min_inte);
-  return ms_map_env_ptr;
-}
 
 void removeNonMatchEnvs(MsMapEnvPtrVec &env_list, int refer_idx,
                         int min_match_peak_num) {
@@ -109,15 +55,13 @@ EnvSetPtr searchEnvSet(MsMapPtr ms_map_ptr, SeedEnvPtr seed_ptr,
   double mass_tole = para_ptr->getMassTole();
   int refer_peak_idx = seed_ptr->getReferIdx();
   double min_inte = ms_map_ptr->getBaseInte() * sn_ratio;
-  std::vector<double> seed_inte_list = seed_ptr->getInteList();
    // search backward
   MsMapEnvPtrVec back_env_list;
   int miss_num = 0;
   int spec_id = seed_ptr->getSpecId();
   while (spec_id >= start_spec_id) {
-    MsMapEnvPtr ms_map_env_ptr = getMatchMsMapEnv(ms_map_ptr, seed_ptr,
-                                                  spec_id, mass_tole,
-                                                  seed_inte_list, min_inte);
+    MsMapEnvPtr ms_map_env_ptr = ms_map_env_util::getMatchMsMapEnv(ms_map_ptr, seed_ptr,
+                                                                   spec_id, mass_tole, min_inte);
     back_env_list.push_back(ms_map_env_ptr);
     if (ms_map_env_ptr->getTopThreeMatchNum(refer_peak_idx)
        < para_ptr->min_match_peak_) {
@@ -138,9 +82,8 @@ EnvSetPtr searchEnvSet(MsMapPtr ms_map_ptr, SeedEnvPtr seed_ptr,
   spec_id = seed_ptr->getSpecId() + 1;
   miss_num = 0;
   while (spec_id <= end_spec_id) {
-    MsMapEnvPtr ms_map_env_ptr = getMatchMsMapEnv(ms_map_ptr, seed_ptr,
-                                                  spec_id, mass_tole,
-                                                  seed_inte_list, min_inte);
+    MsMapEnvPtr ms_map_env_ptr = ms_map_env_util::getMatchMsMapEnv(ms_map_ptr, seed_ptr,
+                                                                   spec_id, mass_tole, min_inte);
     forw_env_list.push_back(ms_map_env_ptr);
     if (ms_map_env_ptr->getTopThreeMatchNum(refer_peak_idx) < para_ptr->min_match_peak_) {
       miss_num = miss_num + 1;
@@ -171,57 +114,8 @@ EnvSetPtr searchEnvSet(MsMapPtr ms_map_ptr, SeedEnvPtr seed_ptr,
   return env_set_ptr;
 }
 
-bool checkValidEnvSetSeedEnv(MsMapPtr ms_map_ptr, EnvSetPtr env_set_ptr,
-                             int min_match_peak) {
-  SeedEnvPtr seed_ptr = env_set_ptr->getSeedPtr();
-  std::vector<double> theo_env_inte = seed_ptr->getInteList();
-  int refer_idx = std::max_element(theo_env_inte.begin(), theo_env_inte.end()) - theo_env_inte.begin();
-  int base_idx = env_set_ptr->getSeedSpecId();
-  int start_idx = std::max(base_idx-1, 0);
-  int end_idx = std::min(base_idx+1, ms_map_ptr->getRowNum() - 1);
-  MsMapEnvPtrVec env_list = env_set_ptr->getMsMapEnvList();
-  bool valid = true;
-  for (auto &exp_env : env_list) {
-    if (exp_env->getSpecId() >= start_idx and exp_env->getSpecId() <= end_idx)
-      if (exp_env->getTopThreeMatchNum(refer_idx) < min_match_peak)
-        valid = false;
-  }
-  return valid;
-}
-
-bool checkValidEnvSetSeedEnvSparse(MsMapPtr ms_map_ptr, EnvSetPtr env_set_ptr,
-                                   int min_match_peak) {
-  SeedEnvPtr seed_ptr = env_set_ptr->getSeedPtr();
-  std::vector<double> theo_env_inte = seed_ptr->getInteList();
-  int refer_idx = std::max_element(theo_env_inte.begin(), theo_env_inte.end()) - theo_env_inte.begin();
-  int base_idx = env_set_ptr->getSeedSpecId();
-  int start_idx = std::max(base_idx-2, 0);
-  int end_idx = std::min(base_idx+2, ms_map_ptr->getRowNum() - 1);
-  MsMapEnvPtrVec env_list = env_set_ptr->getMsMapEnvList();
-  bool valid = true;
-  int false_counter = 0;
-  for (auto &exp_env : env_list) {
-    if (exp_env->getSpecId() >= start_idx and exp_env->getSpecId() <= end_idx)
-      if (exp_env->getTopThreeMatchNum(refer_idx) < min_match_peak)
-        false_counter++;
-  }
-  if (false_counter > 2)
-    valid = false;
-  return valid;
-}
-
-bool checkValidEnvSet(MsMapPtr ms_map_ptr, EnvSetPtr env_set_ptr) {
-  bool valid = true;
-  int elems = 0;
-  std::vector<double> env_xic = env_set_ptr->getXicPtr()->getTopThreeInteList();
-  for (double inte : env_xic)
-    if (inte > 0) elems++;
-  if (elems < 2) valid = false;
-  return valid;
-}
-
 SeedEnvPtr getHalfChargeEnv(SeedEnvPtr seed_ptr,
-                            double even_odd_peak_ratio) {
+                            double even_odd_log_ratio) {
   double old_charge = seed_ptr->getCharge();
   if (old_charge < 2) {
     return nullptr;
@@ -230,10 +124,18 @@ SeedEnvPtr getHalfChargeEnv(SeedEnvPtr seed_ptr,
   double ref_mz = seed_ptr->getReferMz();
   double ref_mass = peak_util::compPeakNeutralMass(ref_mz, new_charge);
   double mono_mass = EnvBase::convertRefMassToMonoMass(ref_mass);
+  int refer_idx = seed_ptr->getReferIdx();
+  // if refer_idx + 1 is even and env_odd_log_ratio < 0 
+  // or refer_idx  + 1is odd and env_odd_log_ratio > 1
+  // then increase mass by about 1 Dalton
+  if (((refer_idx +1)%2 == 0 && even_odd_log_ratio < 0) 
+      || ((refer_idx + 1)%2 == 1 && even_odd_log_ratio >0)) {
+    mono_mass += mass_constant::getIsotopeMass();
+  }
   int sp_id = seed_ptr->getSpecId();
-  int env_id = -1;
+  int peak_id = -1;
   double inte = seed_ptr->getSeedInte()/2;
-  DeconvPeakPtr peak_ptr = std::make_shared<DeconvPeak>(sp_id, env_id,
+  DeconvPeakPtr peak_ptr = std::make_shared<DeconvPeak>(sp_id, peak_id,
                                                         mono_mass, inte,
                                                         new_charge);
   SeedEnvPtr new_seed_ptr = std::make_shared<SeedEnv>(peak_ptr);
@@ -241,9 +143,9 @@ SeedEnvPtr getHalfChargeEnv(SeedEnvPtr seed_ptr,
 }
 
 SeedEnvPtr testHalfChargeState(MsMapPtr ms_map_ptr, SeedEnvPtr seed_ptr,
-                               EnvSetPtr env_set_ptr, double even_odd_peak_ratio,
-                               EcscoreParaPtr para_ptr, double sn_ratio) {
-  SeedEnvPtr half_charge_seed = getHalfChargeEnv(seed_ptr, even_odd_peak_ratio);
+                               double even_odd_log_ratio, EcscoreParaPtr para_ptr, 
+                               double sn_ratio) {
+  SeedEnvPtr half_charge_seed = getHalfChargeEnv(seed_ptr, even_odd_log_ratio);
   bool valid = false;
   valid = seed_env_util::preprocessEnv(ms_map_ptr, half_charge_seed, para_ptr, sn_ratio);
   if (!valid)

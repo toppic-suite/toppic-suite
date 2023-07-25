@@ -43,6 +43,8 @@ class SeedEnv : public Env {
 
   std::string getString();
 
+  bool containEnoughPeaks();
+
  private:
   int spec_id_;
   double seed_inte_;

@@ -25,8 +25,6 @@ namespace toppic {
 
 namespace env_set_util {
 
-MsMapEnvPtr getMatchMsMapEnv(MsMapPtr ms_map_ptr, SeedEnvPtr seed_ptr, int sp_id, double mass_tol);
-
 EnvSetPtr searchEnvSet(MsMapPtr ms_map_ptr, SeedEnvPtr seed_ptr,
                        EcscoreParaPtr para_ptr, double sn_ratio);
 
@@ -34,17 +32,9 @@ EnvSetPtr searchEnvSet(MsMapPtr ms_map_ptr, SeedEnvPtr seed_ptr,
                        int start_spec_id, int end_spec_id,
                        EcscoreParaPtr para_ptr, double sn_ratio);
 
-bool checkValidEnvSet(MsMapPtr ms_map_ptr, EnvSetPtr env_set_ptr);
-
-bool checkValidEnvSetSeedEnv(MsMapPtr ms_map_ptr, EnvSetPtr env_set_ptr, int max_miss_peak);
-
-bool checkValidEnvSetSeedEnvSparse(MsMapPtr ms_map_ptr, EnvSetPtr env_set_ptr, int max_miss_peak);
-
-
-
 SeedEnvPtr testHalfChargeState(MsMapPtr ms_map_ptr, SeedEnvPtr seed_ptr,
-                               EnvSetPtr env_set_ptr, double even_odd_peak_ratios,
-                               EcscoreParaPtr para_ptr, double sn_ratio);
+                               double even_odd_peak_ratios, EcscoreParaPtr para_ptr, 
+                               double sn_ratio);
 
 }
 

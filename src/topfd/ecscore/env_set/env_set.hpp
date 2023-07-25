@@ -68,6 +68,12 @@ class EnvSet {
 
   void refineXicBoundary();
 
+  bool containTwoValidEnvs(int min_match_peak_num); 
+
+  bool containValidNeighborEnvsForSeed(int min_match_peak_num);
+
+  bool containThreeValidOutOfFiveEnvs(int min_match_peak_num); 
+
   static bool cmpChargeInc(EnvSetPtr a, EnvSetPtr b) { return a->getCharge() < b->getCharge(); }
 
  private:

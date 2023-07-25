@@ -55,6 +55,14 @@ SeedEnv::SeedEnv(SeedEnvPtr env_ptr, int new_charge) {
   seed_inte_ = env_ptr->seed_inte_;
 }
 
+bool SeedEnv::containEnoughPeaks() {
+  int peak_num = getPeakNum();
+  if ((charge_ == 1 || charge_ == 2) && peak_num < 2) return false;
+  if (charge_ > 2 && charge_ < 15 && peak_num < 3) return false;
+  if (charge_ >= 15 && peak_num < 5) return false;
+  return true;
+}
+
 std::string SeedEnv::getString() {
   std::string header = "Spec ID: " + std::to_string(spec_id_) + " " +
                        "Pos: " + std::to_string(mono_mz_) + " " +
