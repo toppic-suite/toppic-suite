@@ -23,8 +23,6 @@ namespace toppic {
 
 namespace ms_map_env_util {
 
-double pearsonr(std::vector<double> &X, std::vector<double> &Y);
-
 double compTopThreeInteRatio(SeedEnvPtr seed_ptr, MsMapEnvPtr env_ptr);
 
 double compTopThreeInteRatio(SeedEnvPtr seed_ptr, 

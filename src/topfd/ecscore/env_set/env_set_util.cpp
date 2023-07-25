@@ -114,45 +114,6 @@ EnvSetPtr searchEnvSet(MsMapPtr ms_map_ptr, SeedEnvPtr seed_ptr,
   return env_set_ptr;
 }
 
-SeedEnvPtr getHalfChargeEnv(SeedEnvPtr seed_ptr,
-                            double even_odd_log_ratio) {
-  double old_charge = seed_ptr->getCharge();
-  if (old_charge < 2) {
-    return nullptr;
-  }
-  int new_charge = int(old_charge / 2);
-  double ref_mz = seed_ptr->getReferMz();
-  double ref_mass = peak_util::compPeakNeutralMass(ref_mz, new_charge);
-  double mono_mass = EnvBase::convertRefMassToMonoMass(ref_mass);
-  int refer_idx = seed_ptr->getReferIdx();
-  // if refer_idx + 1 is even and env_odd_log_ratio < 0 
-  // or refer_idx  + 1is odd and env_odd_log_ratio > 1
-  // then increase mass by about 1 Dalton
-  if (((refer_idx +1)%2 == 0 && even_odd_log_ratio < 0) 
-      || ((refer_idx + 1)%2 == 1 && even_odd_log_ratio >0)) {
-    mono_mass += mass_constant::getIsotopeMass();
-  }
-  int sp_id = seed_ptr->getSpecId();
-  int peak_id = -1;
-  double inte = seed_ptr->getSeedInte()/2;
-  DeconvPeakPtr peak_ptr = std::make_shared<DeconvPeak>(sp_id, peak_id,
-                                                        mono_mass, inte,
-                                                        new_charge);
-  SeedEnvPtr new_seed_ptr = std::make_shared<SeedEnv>(peak_ptr);
-  return new_seed_ptr;
-}
-
-SeedEnvPtr testHalfChargeState(MsMapPtr ms_map_ptr, SeedEnvPtr seed_ptr,
-                               double even_odd_log_ratio, EcscoreParaPtr para_ptr, 
-                               double sn_ratio) {
-  SeedEnvPtr half_charge_seed = getHalfChargeEnv(seed_ptr, even_odd_log_ratio);
-  bool valid = false;
-  valid = seed_env_util::preprocessEnv(ms_map_ptr, half_charge_seed, para_ptr, sn_ratio);
-  if (!valid)
-    return nullptr;
-  return half_charge_seed;
-}
-
 }
 
 }

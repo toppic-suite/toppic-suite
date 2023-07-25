@@ -32,6 +32,8 @@ class SeedEnv : public Env {
 
   SeedEnv(SeedEnvPtr env_ptr, int new_charge);
 
+  SeedEnv(SeedEnvPtr env_ptr, EnvPeakPtrVec &peak_ptr_list);
+
   int getSpecId() const { return spec_id_; }
 
   void setSpecId(int spec_id) { spec_id_ = spec_id; }
@@ -43,7 +45,7 @@ class SeedEnv : public Env {
 
   std::string getString();
 
-  bool containEnoughPeaks();
+  EnvPeakPtrVec getScaledPeakPtrList(double ratio, double min_inte);
 
  private:
   int spec_id_;

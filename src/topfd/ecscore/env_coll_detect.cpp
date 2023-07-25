@@ -110,9 +110,9 @@ void process(TopfdParaPtr topfd_para_ptr) {
       std::cout << "\r" << "Processing seed " << count << " ...       " << perc << "\% finished." << std::flush;
     }
     SeedEnvPtr seed_ptr = seed_ptrs[seed_env_idx];
-    bool valid = seed_env_util::preprocessEnv(matrix_ptr, seed_ptr, 
-                                              score_para_ptr, sn_ratio); 
-    if (!valid) continue;
+    seed_ptr = seed_env_util::preprocessSeedEnvPtr(seed_ptr, matrix_ptr,  
+                                                   score_para_ptr, sn_ratio); 
+    if (seed_ptr == nullptr) continue;
     EnvCollPtr env_coll_ptr = env_coll_util::findEnvColl(matrix_ptr, seed_ptr,
                                                          score_para_ptr, sn_ratio); 
     if (env_coll_ptr != nullptr) {

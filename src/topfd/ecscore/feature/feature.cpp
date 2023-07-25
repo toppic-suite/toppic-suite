@@ -221,14 +221,13 @@ bool Feature::getNewFeature(MsHeaderPtr header_ptr, MsMapPtr matrix_ptr,
     }
   }
   SeedEnvPtr seed_ptr;
-  bool valid = false;
   if (selected_seed_list.size() > 0) {
     // choose the highest intensity one
-      std::sort(selected_seed_list.begin(), selected_seed_list.end(),
-                SeedEnv::cmpSeedInteDec);
+    std::sort(selected_seed_list.begin(), selected_seed_list.end(),
+              SeedEnv::cmpSeedInteDec);
     seed_ptr = selected_seed_list[0];  
-    valid = seed_env_util::simplePreprocessEnv(matrix_ptr, seed_ptr, 
-                                               score_para_ptr, sn_ratio); 
+    seed_ptr = seed_env_util::relaxProcessSeedEnvPtr(seed_ptr, matrix_ptr,  
+                                                     score_para_ptr, sn_ratio); 
   }
   /* Let us rethink how to handle cases in which precursor peaks are missing
   else {
@@ -247,7 +246,7 @@ bool Feature::getNewFeature(MsHeaderPtr header_ptr, MsMapPtr matrix_ptr,
   bool valid = seed_env_util::simplePreprocessEnv(matrix_ptr, seed_ptr, 
                                                   score_para_ptr, sn_ratio); 
                                                   */
-  if (!valid) {
+  if (seed_ptr == nullptr) {
     return false;
   }
 

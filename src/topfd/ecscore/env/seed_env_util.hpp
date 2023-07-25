@@ -23,15 +23,20 @@ namespace toppic {
 
 namespace seed_env_util {
 
-bool preprocessEnv(MsMapPtr map_ptr, SeedEnvPtr seed_ptr,
-                   EcscoreParaPtr para_ptr, double sn_ratio);
+double pearsonr(std::vector<double> &X, std::vector<double> &Y); 
 
-bool simplePreprocessEnv(MsMapPtr map_ptr, SeedEnvPtr seed_ptr,
-                         EcscoreParaPtr para_ptr, double sn_ratio); 
+SeedEnvPtr preprocessSeedEnvPtr(SeedEnvPtr seed_ptr, MsMapPtr ms_map_ptr,
+                                EcscoreParaPtr para_ptr, double sn_ratio);
+
+SeedEnvPtr relaxProcessSeedEnvPtr(SeedEnvPtr seed_ptr, MsMapPtr ms_map_ptr,
+                                  EcscoreParaPtr para_ptr, double sn_ratio);
+
+SeedEnvPtr testHalfChargeEnv(SeedEnvPtr seed_ptr, MsMapPtr ms_map_ptr, 
+                             double even_odd_log_ratio, EcscoreParaPtr para_ptr, 
+                             double sn_ratio); 
 
 }
 
 }
 
-
-#endif //TOPPIC_EVALUATE_ENVELOPE_HPP
+#endif 

@@ -55,12 +55,51 @@ SeedEnv::SeedEnv(SeedEnvPtr env_ptr, int new_charge) {
   seed_inte_ = env_ptr->seed_inte_;
 }
 
-bool SeedEnv::containEnoughPeaks() {
-  int peak_num = getPeakNum();
-  if ((charge_ == 1 || charge_ == 2) && peak_num < 2) return false;
-  if (charge_ > 2 && charge_ < 15 && peak_num < 3) return false;
-  if (charge_ >= 15 && peak_num < 5) return false;
-  return true;
+SeedEnv::SeedEnv(SeedEnvPtr env_ptr, EnvPeakPtrVec &peak_ptr_list) {
+  //init for parent class
+  mono_mz_ = env_ptr->getMonoMz(); 
+  charge_ = env_ptr->getCharge();
+  int left_side_non_exist_num = 0;
+  for (size_t i = 0; i < peak_ptr_list.size(); i++) {
+    if (peak_ptr_list[i]->isExist()) {
+      break;
+    }
+    else {
+      left_side_non_exist_num++;
+    }
+  }
+  refer_idx_ = env_ptr->getReferIdx() - left_side_non_exist_num;
+  for (size_t i = 0; i < peak_ptr_list.size(); i++) {
+    if (peak_ptr_list[i]->isExist()) {
+      peak_ptr_list_.push_back(peak_ptr_list[i]);
+    }
+  }
+  // init for seed envelope
+  spec_id_ = env_ptr->spec_id_;
+  seed_inte_ = env_ptr->seed_inte_;
+}
+
+EnvPeakPtrVec SeedEnv::getScaledPeakPtrList(double ratio, double min_inte) {
+  EnvPeakPtrVec new_peak_list; 
+  int non_exist_idx = EnvPeak::getNonExistPeakIdx();
+  double non_exist_mz = -1; 
+  double non_exist_inte = 0;
+  for (size_t i = 0; i < peak_ptr_list_.size(); i++) {
+    EnvPeakPtr peak_ptr = peak_ptr_list_[i];
+    double scaled_inte = peak_ptr->getIntensity() * ratio;
+    if (scaled_inte < min_inte) {
+      EnvPeakPtr new_peak_ptr = std::make_shared<EnvPeak>(non_exist_mz,
+                                                          non_exist_inte,
+                                                          non_exist_idx);
+      new_peak_list.push_back(new_peak_ptr);
+    }
+    else {
+      EnvPeakPtr new_peak_ptr = std::make_shared<EnvPeak>(peak_ptr->getPosition(), 
+                                                          scaled_inte, i);
+      new_peak_list.push_back(new_peak_ptr);
+    }
+  }
+  return new_peak_list;
 }
 
 std::string SeedEnv::getString() {

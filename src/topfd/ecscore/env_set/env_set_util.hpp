@@ -32,10 +32,6 @@ EnvSetPtr searchEnvSet(MsMapPtr ms_map_ptr, SeedEnvPtr seed_ptr,
                        int start_spec_id, int end_spec_id,
                        EcscoreParaPtr para_ptr, double sn_ratio);
 
-SeedEnvPtr testHalfChargeState(MsMapPtr ms_map_ptr, SeedEnvPtr seed_ptr,
-                               double even_odd_peak_ratios, EcscoreParaPtr para_ptr, 
-                               double sn_ratio);
-
 }
 
 }
