@@ -28,29 +28,7 @@ EnvColl::EnvColl(SeedEnvPtr seed_ptr, EnvSetPtrVec &env_set_list,
   max_charge_ = max_charge;
   start_spec_id_ = start_spec_id;
   end_spec_id_ = end_spec_id;
-  //exp_inte_sum_list_ = compExpInteSumList();
 }
-
-/*
-std::vector<double> EnvColl::compExpInteSumList() {
-  int peak_num = seed_ptr_->getPeakNum();
-  std::vector<double> sum_list(peak_num, 0);
-  for (auto &env_set: env_set_list_) {
-    if (env_set == nullptr) {
-      continue;
-    }
-    std::vector<double> cur_sum_list = env_set->compAggrEnvInteList();
-    if (peak_num != static_cast<int>(cur_sum_list.size())) {
-      LOG_ERROR("peak number " << peak_num << " cur list len " << cur_sum_list.size());
-    }
-    LOG_DEBUG("seed env peak number " << env_set->getSeedPtr()->getPeakNum() <<
-              "exp env peak num " << cur_sum_list.size());
-    for (int i = 0; i < peak_num; i++)
-      sum_list[i] = sum_list[i] + cur_sum_list[i];
-  }
-  return sum_list;
-}
-*/
 
 // this function is problematic and needs to be rewritten
 void EnvColl::setEnvSetList(EnvSetPtrVec &env_set_list) {

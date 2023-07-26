@@ -61,7 +61,11 @@ void EnvSet::initMedianXic() {
 }
 
 double EnvSet::getXicSeedAllPeakInte() {
-  int seed_idx = seed_ptr_->getSpecId() - start_spec_id_;
+  int seed_spec_id = seed_ptr_->getSpecId();
+  if (seed_spec_id < start_spec_id_ || seed_spec_id > end_spec_id_) {
+    return 0;
+  }
+  int seed_idx = seed_spec_id - start_spec_id_;
   return xic_ptr_->getAllPeakInte(seed_idx);
 }
 
