@@ -60,8 +60,7 @@ class EnvColl {
 
   void removePeakData(MsMapPtr matrix_ptr);
 
-  // this function needs to be replaced by env_coll merging function
-  void setEnvSetList(EnvSetPtrVec &env_set_list);
+  void mergeEnvSet(EnvSetPtr env_set_ptr);
 
  private:
   SeedEnvPtr seed_ptr_;

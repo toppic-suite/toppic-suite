@@ -359,5 +359,30 @@ bool EnvSet::containThreeValidOutOfFiveEnvs(int min_match_peak_num) {
   }
 }
 
+void EnvSet::mergeEnvSet(EnvSetPtr new_set_ptr) {
+  int new_start_id = new_set_ptr->getStartSpecId();
+  int merge_start_id = std::min(start_spec_id_, new_start_id);
+  int new_end_id = new_set_ptr->getEndSpecId();
+  int merge_end_id = std::max(end_spec_id_, new_end_id);
+  // merge 
+  MsMapEnvPtrVec merge_env_list (merge_end_id - merge_start_id + 1, nullptr);
+  for (size_t i = 0; i < ms_map_env_list_.size(); i++) {
+    int idx = start_spec_id_ + i - merge_start_id;
+    merge_env_list[idx] = ms_map_env_list_[i];
+  }
+  MsMapEnvPtrVec new_env_list = new_set_ptr->getMsMapEnvList();
+  for (size_t i = 0; i < new_env_list.size(); i++) {
+    int idx = new_start_id + i - merge_start_id;
+    if (merge_env_list[idx] == nullptr) {
+      merge_env_list[idx] = new_env_list[i];
+    }
+  }
+  // assignment
+  start_spec_id_ = merge_start_id;
+  end_spec_id_ = merge_end_id;
+  ms_map_env_list_ = merge_env_list;
+  initMedianXic();
+}
+
 }
 

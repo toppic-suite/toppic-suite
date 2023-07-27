@@ -30,14 +30,6 @@ EnvColl::EnvColl(SeedEnvPtr seed_ptr, EnvSetPtrVec &env_set_list,
   end_spec_id_ = end_spec_id;
 }
 
-// this function is problematic and needs to be rewritten
-void EnvColl::setEnvSetList(EnvSetPtrVec &env_set_list) {
-  env_set_list_ = env_set_list;
-  std::sort(env_set_list_.begin(), env_set_list_.end(), EnvSet::cmpChargeInc);
-  min_charge_ = env_set_list_[0]->getCharge();
-  max_charge_ = env_set_list_[env_set_list.size()-1]->getCharge();
-}
-
 std::vector<int> EnvColl::getChargeList() {
   std::vector<int> charge_list;
   for (auto es: env_set_list_)
@@ -89,5 +81,30 @@ void EnvColl::removePeakData(MsMapPtr matrix_ptr) {
   }
 }
 
+void EnvColl::mergeEnvSet(EnvSetPtr new_set_ptr) {
+  new_set_ptr->setSeedPtr(seed_ptr_);
+  if (new_set_ptr->getStartSpecId() < start_spec_id_) {
+    start_spec_id_ = new_set_ptr->getStartSpecId();
+  }
+  if (new_set_ptr->getEndSpecId() > end_spec_id_) {
+    end_spec_id_ = new_set_ptr->getEndSpecId();
+  }
+  int charge = new_set_ptr->getCharge();
+  for (size_t i = 0; i < env_set_list_.size(); i++) {
+    if (env_set_list_[i]->getCharge() == charge) {
+      env_set_list_[i]->mergeEnvSet(new_set_ptr);
+      return;
+    }
+  }
+  // if no matched charge is found, add it to the env_set_list;
+  if (charge < min_charge_) {
+    min_charge_ = charge;
+  }
+  if (charge > max_charge_) {
+    max_charge_ = charge;
+  }
+  env_set_list_.push_back(new_set_ptr);
+  std::sort(env_set_list_.begin(), env_set_list_.end(),EnvSet::cmpChargeInc); 
+}
 
 }

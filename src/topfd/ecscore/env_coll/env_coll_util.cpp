@@ -109,11 +109,13 @@ bool checkExistingFeatures(MsMapPtr matrix_ptr, EnvCollPtr env_coll_ptr,
   }
 
   if (overlap_env_coll_ptr != nullptr) {
-    std::vector<int> existing_charges = overlap_env_coll_ptr->getChargeList();
-    EnvSetPtrVec merge_set_ptrs = overlap_env_coll_ptr->getEnvSetList();
+    //EnvSetPtrVec merge_set_ptrs = overlap_env_coll_ptr->getEnvSetList();
     EnvSetPtrVec new_set_ptrs = env_coll_ptr->getEnvSetList();
-    merge_set_ptrs.insert(merge_set_ptrs.end(), new_set_ptrs.begin(), new_set_ptrs.end());
-    overlap_env_coll_ptr->setEnvSetList(merge_set_ptrs);
+    //merge_set_ptrs.insert(merge_set_ptrs.end(), new_set_ptrs.begin(), new_set_ptrs.end());
+    //overlap_env_coll_ptr->setEnvSetList(merge_set_ptrs);
+    for (size_t i = 0; i < new_set_ptrs.size(); i++) {
+      overlap_env_coll_ptr->mergeEnvSet(new_set_ptrs[i]);
+    }
     return true;
   }
   else {

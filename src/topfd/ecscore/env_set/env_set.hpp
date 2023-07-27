@@ -45,6 +45,8 @@ class EnvSet {
 
   SeedEnvPtr getSeedPtr() { return seed_ptr_; }
 
+  void setSeedPtr(SeedEnvPtr seed_ptr) {seed_ptr_ = seed_ptr;}
+
   XicPtr getXicPtr() { return xic_ptr_; }
 
   void setXicPtr(XicPtr xic_ptr) { xic_ptr_ = xic_ptr; }
@@ -73,6 +75,8 @@ class EnvSet {
   bool containValidNeighborEnvsForSeed(int min_match_peak_num);
 
   bool containThreeValidOutOfFiveEnvs(int min_match_peak_num); 
+
+  void mergeEnvSet(EnvSetPtr new_set_ptr); 
 
   static bool cmpChargeInc(EnvSetPtr a, EnvSetPtr b) { return a->getCharge() < b->getCharge(); }
 
