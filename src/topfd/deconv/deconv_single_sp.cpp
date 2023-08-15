@@ -43,7 +43,7 @@ DeconvSingleSp::DeconvSingleSp(TopfdParaPtr topfd_para_ptr, PeakPtrVec &peak_lis
     sn_ratio = topfd_para_ptr_->getMsOneSnRatio();
   }
   else {
-    sn_ratio = topfd_para_ptr_->getMsOneSnRatio();
+    sn_ratio = topfd_para_ptr_->getMsTwoSnRatio();
   }
   data_ptr_ = deconv_data_util::getDataPtr(peak_list, max_mass, max_charge, 
                                            dp_para_ptr_->dp_window_size_,  
