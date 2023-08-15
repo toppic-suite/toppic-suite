@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_TOPFD_ECSCORE_FEATURE_FEATURE_HPP
-#define TOPPIC_TOPFD_ECSCORE_FEATURE_FEATURE_HPP
+#ifndef TOPPIC_TOPFD_ECSCORE_SCORE_ECSCORE_HPP
+#define TOPPIC_TOPFD_ECSCORE_SCORE_ECSCORE_HPP
 
 #include "ms/feature/frac_feature.hpp"
 #include "ms/feature/spec_feature.hpp"
@@ -26,19 +26,19 @@
 
 namespace toppic {
 
-class Feature;
-typedef std::shared_ptr<Feature> FeaturePtr;
-typedef std::vector<FeaturePtr> FeaturePtrVec; 
+class ECScore;
+typedef std::shared_ptr<ECScore> ECScorePtr;
+typedef std::vector<ECScorePtr> ECScorePtrVec; 
 
-class Feature {
+class ECScore {
  public:
-  Feature(EnvCollPtr env_coll_ptr, MsMapPtr matrix_ptr, int feature_id, double sn_ratio);
+  ECScore(EnvCollPtr env_coll_ptr, MsMapPtr matrix_ptr, int score_id, double sn_ratio);
 
   std::vector<float> getEcscoreInput(double max_retention_time);
 
-  static void assignFeatures(FracFeaturePtrVec &frac_features,
+  static void assignEnvColls(FracFeaturePtrVec &frac_features,
                              EnvCollPtrVec &env_coll_list,
-                             FeaturePtrVec &feature_list,
+                             ECScorePtrVec &ecscore_list,
                              MsMapPtr matrix_ptr,
                              DeconvMsPtrVec &ms1_ptr_vec,
                              MsHeaderPtr2D &ms2_header_ptr_2d,
@@ -47,9 +47,9 @@ class Feature {
                              TopfdParaPtr topfd_para_ptr,
                              EcscoreParaPtr score_para_ptr); 
 
-  int getFeatureId() const { return feature_id_; }
+  int getEcscoreId() const { return score_id_; }
 
-  void setFeatureId(int feature_id) { feature_id_ = feature_id; }
+  void setEcscoreId(int score_id) { score_id_ = score_id; }
 
   int getMinScan() const { return min_scan_; }
 
@@ -145,19 +145,19 @@ class Feature {
 
  private:
 
-  static bool getHighestInteFeature(FracFeaturePtrVec &frac_features, EnvCollPtrVec &env_coll_list,
+  static bool getHighestInteEnvColl(FracFeaturePtrVec &frac_features, EnvCollPtrVec &env_coll_list,
                                     MsHeaderPtr header_ptr, double score_thresh, 
                                     SpecFeaturePtrVec &ms2_features); 
 
-  static bool getNewFeature(MsHeaderPtr header_ptr, MsMapPtr matrix_ptr,
-                            EcscoreParaPtr para_ptr, FeaturePtrVec &feature_list,
+  static bool getNewEnvColl(MsHeaderPtr header_ptr, MsMapPtr matrix_ptr,
+                            EcscoreParaPtr para_ptr, ECScorePtrVec &ecscore_list,
                             EnvCollPtrVec &env_coll_list, DeconvMsPtrVec &ms1_ptr_vec,
                             SeedEnvPtr2D &seed_ptr_2d,
                             FracFeaturePtrVec &frac_feature_list,
                             SpecFeaturePtrVec &ms2_feature_list); 
 
 
-  int feature_id_ = 0;
+  int score_id_ = 0;
   int min_scan_ = 0;
   int max_scan_ = 0;
   int min_charge_ = 0;
@@ -182,7 +182,6 @@ class Feature {
   double score_ = 0;
   int label_ = 0;
 };
-
 
 }
 

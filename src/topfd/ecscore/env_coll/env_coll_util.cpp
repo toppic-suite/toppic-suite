@@ -25,30 +25,136 @@
 #include "topfd/ecscore/env_coll/env_coll_util.hpp"
 
 namespace toppic {
+
 namespace env_coll_util {
 
-bool checkChargeStateDist(const std::vector<int> &parent_charge_states, 
-                          int charge_state) {
-  int min_charge_diff = std::numeric_limits<int>::max();
-  for (auto parent_charge_state: parent_charge_states) {
-    int charge_diff = std::abs(charge_state - parent_charge_state);
-    if (charge_diff < min_charge_diff)
-      min_charge_diff = charge_diff;
+EnvCollPtr getEnvCollPtr(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
+                         EnvSetPtr seed_env_set_ptr, EcscoreParaPtr para_ptr,
+                         double sn_ratio) {
+  int start_spec_id = seed_env_set_ptr->getStartSpecId();
+  int end_spec_id = seed_env_set_ptr->getEndSpecId();
+  EnvSetPtrVec env_set_list;
+  int charge = seed_ptr->getCharge() - 1;
+  int miss_num = 0;
+  int min_match_peak_num_in_top_three = para_ptr->getMinMatchPeakNumInTopThree();
+  while (charge >= para_ptr->para_min_charge_) {
+    SeedEnvPtr cur_seed_ptr = std::make_shared<SeedEnv>(seed_ptr, charge);
+    EnvSetPtr env_set_ptr = env_set_util::searchEnvSet(matrix_ptr, cur_seed_ptr,
+                                                       start_spec_id, end_spec_id,
+                                                       para_ptr, sn_ratio);
+    if (env_set_ptr == nullptr) {
+      miss_num = miss_num + 1;
+    } 
+    else {
+      env_set_ptr->refineXicBoundary();
+      if (!env_set_ptr->containTwoValidEnvs(min_match_peak_num_in_top_three)) {
+        miss_num = miss_num + 1;
+      }
+      else {
+        miss_num = 0;
+        env_set_list.push_back(env_set_ptr);
+      }
+    }
+    if (miss_num >= para_ptr->max_miss_charge_)
+      break;
+    charge = charge - 1;
   }
-  if (min_charge_diff > 2) {
-    return false;
+
+  miss_num = 0;
+  charge = seed_ptr->getCharge() + 1;
+  while (charge <= para_ptr->para_max_charge_) {
+    SeedEnvPtr cur_seed_ptr = std::make_shared<SeedEnv>(seed_ptr, charge);
+    EnvSetPtr env_set_ptr = env_set_util::searchEnvSet(matrix_ptr, cur_seed_ptr,
+                                                      start_spec_id, end_spec_id,
+                                                      para_ptr, sn_ratio);
+    charge = charge + 1;
+    if (env_set_ptr == nullptr) {
+      miss_num = miss_num + 1;
+    } else {
+      env_set_ptr->refineXicBoundary();
+      if (!env_set_ptr->containTwoValidEnvs(min_match_peak_num_in_top_three)) {
+        miss_num = miss_num + 1;
+      }
+      else {
+        miss_num = 0;
+        env_set_list.push_back(env_set_ptr);
+      }
+    }
+    if (miss_num >= para_ptr->max_miss_charge_)
+      break;
   }
-  else {
-    return true;
-  }
+  env_set_list.push_back(seed_env_set_ptr);
+  std::sort(env_set_list.begin(), env_set_list.end(), EnvSet::cmpChargeInc);
+  int min_charge = env_set_list[0]->getCharge();
+  int max_charge = env_set_list[env_set_list.size() - 1]->getCharge();
+  EnvCollPtr env_coll_ptr = std::make_shared<EnvColl>(seed_ptr, env_set_list, 
+                                                      min_charge, max_charge, 
+                                                      start_spec_id, end_spec_id);
+
+  return env_coll_ptr;
 }
 
+EnvCollPtr findEnvColl(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
+                       EcscoreParaPtr para_ptr, double sn_ratio) {
+  EnvSetPtr env_set_ptr = env_set_util::searchEnvSet(matrix_ptr, seed_ptr, para_ptr, sn_ratio);
+  if (env_set_ptr == nullptr) {
+    return nullptr; 
+  }
+  env_set_ptr->refineXicBoundary();
+  int min_match_peak_num_in_top_three = para_ptr->getMinMatchPeakNumInTopThree();
+  if (para_ptr->filter_neighboring_peaks_) {
+    if (!env_set_ptr->containValidNeighborEnvsForSeed(min_match_peak_num_in_top_three))
+      return nullptr; 
+    else
+      if (!env_set_ptr->containThreeValidOutOfFiveEnvs(min_match_peak_num_in_top_three))
+        return nullptr;
+  }
+  double even_odd_peak_ratio = component_score::getAggOddEvenPeakRatio(env_set_ptr);
+  SeedEnvPtr new_seed_ptr = seed_ptr;
+  if (std::abs(even_odd_peak_ratio) > para_ptr->even_odd_ratio_cutoff_) {
+    new_seed_ptr = seed_env_util::testHalfChargeEnv(seed_ptr, matrix_ptr, 
+                                                    even_odd_peak_ratio, 
+                                                    para_ptr, sn_ratio);
+    if (new_seed_ptr == nullptr) {
+      return nullptr;
+    }
+    EnvSetPtr tmp_env_set_ptr = env_set_util::searchEnvSet(matrix_ptr, new_seed_ptr,
+                                                           para_ptr, sn_ratio);
+    if (tmp_env_set_ptr == nullptr) {
+      return nullptr;
+    }
+    env_set_ptr = tmp_env_set_ptr;
+    env_set_ptr->refineXicBoundary();
+    if (!env_set_ptr->containValidNeighborEnvsForSeed(min_match_peak_num_in_top_three)) {                                             
+      return nullptr; 
+    }
+  }
+  
+  EnvCollPtr env_coll_ptr = getEnvCollPtr(matrix_ptr, new_seed_ptr, 
+                                          env_set_ptr, para_ptr, sn_ratio);
+  
+  return env_coll_ptr;
+}
 
-bool checkOverlap(MsMapRowHeaderPtrVec &spectrum_list, EnvCollPtr f,
+EnvCollPtr findEnvCollWithSingleEnv(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
+                                    EcscoreParaPtr para_ptr, double sn_ratio) {
+  EnvSetPtr env_set_ptr = env_set_util::searchEnvSet(matrix_ptr, seed_ptr, para_ptr, sn_ratio);
+  if (env_set_ptr == nullptr) {
+    LOG_ERROR("env set is null");
+    return nullptr; 
+  }
+  env_set_ptr->refineXicBoundary();
+
+  EnvCollPtr env_coll_ptr = getEnvCollPtr(matrix_ptr, seed_ptr, 
+                                          env_set_ptr, para_ptr, sn_ratio);
+  return env_coll_ptr;
+}
+
+bool checkOverlap(MsMapRowHeaderPtrVec &spectrum_list, EnvCollPtr coll_ptr,
                   double feature_start_rt,
                   double feature_end_rt, double time_tol) {
-  int start_spec_id = f->getStartSpecId();
-  int end_spec_id = f->getEndSpecId();
+  int start_spec_id = coll_ptr->getStartSpecId();
+  int end_spec_id = coll_ptr->getEndSpecId();
   double start_rt = spectrum_list[start_spec_id]->getRt();
   double end_rt = spectrum_list[end_spec_id]->getRt();
   double start = -1;
@@ -63,17 +169,18 @@ bool checkOverlap(MsMapRowHeaderPtrVec &spectrum_list, EnvCollPtr f,
     else
       end = feature_end_rt;
   }
-  bool status = false;
   if (end > -1) {
     double overlapping_rt_range = end - start;
     if (overlapping_rt_range > 0) {
       double feature_rt_range = feature_end_rt - feature_start_rt;
       double feature_coverage = overlapping_rt_range / feature_rt_range;
-      if (feature_coverage > time_tol)
-        status = true;
+      // return overlap
+      if (feature_coverage > time_tol) {
+        return true;
+      }
     }
   }
-  return status;
+  return false;
 }
 
 bool checkExistingFeatures(MsMapPtr matrix_ptr, EnvCollPtr env_coll_ptr,
@@ -123,149 +230,6 @@ bool checkExistingFeatures(MsMapPtr matrix_ptr, EnvCollPtr env_coll_ptr,
   }
 }
 
-EnvSetPtrVec getChargeEnvList(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
-                              EnvSetPtr seed_env_set_ptr, EcscoreParaPtr para_ptr,
-                              double sn_ratio) {
-  int start_spec_id = seed_env_set_ptr->getStartSpecId();
-  int end_spec_id = seed_env_set_ptr->getEndSpecId();
-  EnvSetPtrVec env_set_list;
-  int charge = seed_ptr->getCharge() - 1;
-  int miss_num = 0;
-  int min_match_peak_num_in_top_three = para_ptr->getMinMatchPeakNumInTopThree();
-  while (charge >= para_ptr->para_min_charge_) {
-    SeedEnvPtr cur_seed_ptr = std::make_shared<SeedEnv>(seed_ptr, charge);
-    //env_set_util::compPeakStartEndIdx(matrix_ptr, cur_seed_ptr, 
-    //                                  para_ptr->mass_tole_);
-    EnvSetPtr env_set_ptr = env_set_util::searchEnvSet(matrix_ptr, cur_seed_ptr,
-                                                       start_spec_id, end_spec_id,
-                                                       para_ptr, sn_ratio);
-    if (env_set_ptr == nullptr) {
-      miss_num = miss_num + 1;
-    } 
-    else {
-      env_set_ptr->refineXicBoundary();
-      if (!env_set_ptr->containTwoValidEnvs(min_match_peak_num_in_top_three)) {
-        miss_num = miss_num + 1;
-      }
-      else {
-        miss_num = 0;
-        env_set_list.push_back(env_set_ptr);
-      }
-    }
-    if (miss_num >= para_ptr->max_miss_charge_)
-      break;
-    charge = charge - 1;
-  }
-
-  miss_num = 0;
-  charge = seed_ptr->getCharge() + 1;
-  while (charge <= para_ptr->para_max_charge_) {
-    SeedEnvPtr cur_seed_ptr = std::make_shared<SeedEnv>(seed_ptr, charge);
-    //env_set_util::compPeakStartEndIdx(matrix_ptr, cur_seed_ptr, para_ptr->mass_tole_);
-    EnvSetPtr env_set_ptr = env_set_util::searchEnvSet(matrix_ptr, cur_seed_ptr,
-                                                      start_spec_id, end_spec_id,
-                                                      para_ptr, sn_ratio);
-    charge = charge + 1;
-    if (env_set_ptr == nullptr) {
-      miss_num = miss_num + 1;
-    } else {
-      env_set_ptr->refineXicBoundary();
-      if (!env_set_ptr->containTwoValidEnvs(min_match_peak_num_in_top_three)) {
-        miss_num = miss_num + 1;
-      }
-      else {
-        miss_num = 0;
-        env_set_list.push_back(env_set_ptr);
-      }
-    }
-    if (miss_num >= para_ptr->max_miss_charge_)
-      break;
-  }
-  std::sort(env_set_list.begin(), env_set_list.end(), EnvSet::cmpChargeInc);
-  return env_set_list;
-}
-
-EnvCollPtr findEnvCollWithSingleEnv(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
-                                    EcscoreParaPtr para_ptr, double sn_ratio) {
-  EnvSetPtr env_set_ptr = env_set_util::searchEnvSet(matrix_ptr, seed_ptr, para_ptr, sn_ratio);
-  if (env_set_ptr == nullptr) {
-    LOG_ERROR("env set is null");
-    return nullptr; 
-  }
-  env_set_ptr->refineXicBoundary();
-
-  EnvSetPtrVec env_set_list = getChargeEnvList(matrix_ptr, seed_ptr,
-                                               env_set_ptr, para_ptr, sn_ratio);
-  env_set_list.push_back(env_set_ptr);
-  std::sort(env_set_list.begin(), env_set_list.end(), EnvSet::cmpChargeInc);
-
-  int min_charge = env_set_list[0]->getCharge();
-  int max_charge = env_set_list[env_set_list.size() - 1]->getCharge();
-  int start_spec_id = env_set_ptr->getStartSpecId();
-  int end_spec_id = env_set_ptr->getEndSpecId();
-  EnvCollPtr env_coll_ptr = std::make_shared<EnvColl>(seed_ptr, env_set_list, 
-                                                      min_charge, max_charge, 
-                                                      start_spec_id, end_spec_id);
-  return env_coll_ptr;
-}
-
-EnvCollPtr findEnvColl(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
-                       EcscoreParaPtr para_ptr, double sn_ratio) {
-  EnvSetPtr env_set_ptr = env_set_util::searchEnvSet(matrix_ptr, seed_ptr, para_ptr, sn_ratio);
-
-  if (env_set_ptr == nullptr) {
-    return nullptr; 
-  }
-  env_set_ptr->refineXicBoundary();
-  int min_match_peak_num_in_top_three = para_ptr->getMinMatchPeakNumInTopThree();
-  if (para_ptr->filter_neighboring_peaks_) {
-    if (!env_set_ptr->containValidNeighborEnvsForSeed(min_match_peak_num_in_top_three))
-      return nullptr; 
-    else
-      if (!env_set_ptr->containThreeValidOutOfFiveEnvs(min_match_peak_num_in_top_three))
-        return nullptr;
-  }
-  double even_odd_peak_ratio = component_score::getAggOddEvenPeakRatio(env_set_ptr);
-  SeedEnvPtr new_seed_ptr = seed_ptr;
-  if (std::abs(even_odd_peak_ratio) > para_ptr->even_odd_ratio_cutoff_) {
-    new_seed_ptr = seed_env_util::testHalfChargeEnv(seed_ptr, matrix_ptr, 
-                                                    even_odd_peak_ratio, 
-                                                    para_ptr, sn_ratio);
-    if (new_seed_ptr == nullptr) {
-      return nullptr;
-    }
-    EnvSetPtr tmp_env_set_ptr = env_set_util::searchEnvSet(matrix_ptr, new_seed_ptr,
-                                                           para_ptr, sn_ratio);
-    if (tmp_env_set_ptr == nullptr) {
-      return nullptr;
-    }
-    env_set_ptr = tmp_env_set_ptr;
-    env_set_ptr->refineXicBoundary();
-    if (!env_set_ptr->containValidNeighborEnvsForSeed(min_match_peak_num_in_top_three)) {                                             
-      return nullptr; 
-    }
-  }
-  
-  EnvSetPtrVec env_set_list = getChargeEnvList(matrix_ptr, new_seed_ptr,
-                                               env_set_ptr, para_ptr, sn_ratio);
-  env_set_list.push_back(env_set_ptr);
-  std::sort(env_set_list.begin(), env_set_list.end(), EnvSet::cmpChargeInc);
-  int min_charge = env_set_list[0]->getCharge();
-  int max_charge = env_set_list[env_set_list.size() - 1]->getCharge();
-  int start_spec_id = env_set_ptr->getStartSpecId();
-  int end_spec_id = env_set_ptr->getEndSpecId();
-  /*
-  if (new_seed_ptr->getMonoNeutralMass() > 10059.3 && new_seed_ptr->getMonoMass() < 10059.4) {
-    LOG_ERROR("Mass " << new_seed_ptr->getMonoNeutralMass() << " env set list length " <<
-              env_set_list.size());
-  }
-  */
-  EnvCollPtr env_coll_ptr = std::make_shared<EnvColl>(new_seed_ptr, env_set_list, 
-                                                      min_charge, max_charge, 
-                                                      start_spec_id, end_spec_id);
-  return env_coll_ptr;
-}
-
 FracFeaturePtr getFracFeature(int feat_id, DeconvMsPtrVec &ms1_ptr_vec, int frac_id,
                               std::string &file_name, EnvCollPtr coll_ptr,
                               MsMapPtr matrix_ptr, double sn_ratio) {
@@ -286,10 +250,11 @@ FracFeaturePtr getFracFeature(int feat_id, DeconvMsPtrVec &ms1_ptr_vec, int frac
   double time_apex = spec_list[ms1_apex_id]->getRt(); 
 
   double apex_inte = coll_ptr->getSeedEnvSet()->getXicSeedAllPeakInte();
+  int env_num = coll_ptr->countEnvNum();
   FracFeaturePtr feature_ptr = std::make_shared<FracFeature>(feat_id, frac_id, file_name, feat_mass, feat_inte,
                                                              ms1_id_begin, ms1_id_end, ms1_time_begin, ms1_time_end,
                                                              ms1_scan_begin, ms1_scan_end, min_charge, max_charge,
-                                                             0, time_apex, apex_inte);
+                                                             env_num, time_apex, apex_inte);
   SingleChargeFeaturePtrVec single_features;
   for (EnvSetPtr es: coll_ptr->getEnvSetList()) {
     int id_begin = es->getStartSpecId();
@@ -301,7 +266,6 @@ FracFeaturePtr getFracFeature(int feat_id, DeconvMsPtrVec &ms1_ptr_vec, int frac
     double inte = es->getInte();
     int env_num = es->countEnvNum();
     int charge = es->getCharge();
-    //std::vector<double> xic = es->getXicTopThreeInteList();
     SingleChargeFeaturePtr single_feature = std::make_shared<SingleChargeFeature>(charge, time_begin, time_end,
                                                                                   scan_begin, scan_end,
                                                                                   inte, env_num);

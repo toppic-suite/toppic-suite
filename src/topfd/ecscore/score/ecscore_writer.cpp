@@ -14,11 +14,11 @@
 
 #include <fstream>
 
-#include "topfd/ecscore/feature/ecscore_write_feature.hpp"
+#include "topfd/ecscore/score/ecscore_writer.hpp"
 
 namespace toppic {
 
-namespace ecscore_write_feature {
+namespace ecscore_writer {
 
 void writeHeader(std::ofstream &of) {
   of.precision(16);
@@ -49,41 +49,41 @@ void writeHeader(std::ofstream &of) {
     << std::endl;
 }
 
-void writeOneFeature(std::ofstream &of, FeaturePtr feature) {
-  of << feature->getFeatureId() << "\t"
-    << feature->getMinScan() << "\t"
-    << feature->getMaxScan() << "\t"
-    << feature->getMinCharge() << "\t"
-    << feature->getMaxCharge() << "\t"
-    << feature->getMonoMass() << "\t"
-    << feature->getRepCharge() << "\t"
-    << feature->getRepMz() << "\t"
-    << feature->getAbundance() << "\t"
-    << feature->getMinElutionTime() << "\t"
-    << feature->getMaxElutionTime() << "\t"
-    << feature->getApexElutionTime() << "\t"
-    << feature->getElutionLength() << "\t"
-    << feature->getMapMaxElutionTime() << "\t"
-    << feature->getEnvcnnScore() << "\t"
-    << feature->getPercentMatchedPeaks() << "\t"
-    << feature->getIntensityCorrelation() << "\t"
-    << feature->getTop3Correlation() << "\t"
-    << feature->getEvenOddPeakRatio() << "\t"
-    << feature->getPercentConsecPeaks() << "\t"
-    << feature->getNumTheoPeaks() << "\t"
-    << feature->getMzErrorSum() << "\t"
-    << feature->getScore() << "\t"
-    << feature->getLabel()
+void writeOneScore(std::ofstream &of, ECScorePtr score) {
+  of << score->getEcscoreId() << "\t"
+    << score->getMinScan() << "\t"
+    << score->getMaxScan() << "\t"
+    << score->getMinCharge() << "\t"
+    << score->getMaxCharge() << "\t"
+    << score->getMonoMass() << "\t"
+    << score->getRepCharge() << "\t"
+    << score->getRepMz() << "\t"
+    << score->getAbundance() << "\t"
+    << score->getMinElutionTime() << "\t"
+    << score->getMaxElutionTime() << "\t"
+    << score->getApexElutionTime() << "\t"
+    << score->getElutionLength() << "\t"
+    << score->getMapMaxElutionTime() << "\t"
+    << score->getEnvcnnScore() << "\t"
+    << score->getPercentMatchedPeaks() << "\t"
+    << score->getIntensityCorrelation() << "\t"
+    << score->getTop3Correlation() << "\t"
+    << score->getEvenOddPeakRatio() << "\t"
+    << score->getPercentConsecPeaks() << "\t"
+    << score->getNumTheoPeaks() << "\t"
+    << score->getMzErrorSum() << "\t"
+    << score->getScore() << "\t"
+    << score->getLabel()
     << std::endl;
 }
 
-void writeFeatures(const std::string &output_file_name, 
-                   FeaturePtrVec features) {
+void writeScores(const std::string &output_file_name, 
+                 ECScorePtrVec scores) {
   std::ofstream of(output_file_name);
   writeHeader(of);
-  for (auto feature: features) {
-    if (feature->getElutionLength() > 0)
-      writeOneFeature(of, feature);
+  for (auto score: scores) {
+    if (score->getElutionLength() > 0)
+      writeOneScore(of, score);
   }
   of.close();
 }

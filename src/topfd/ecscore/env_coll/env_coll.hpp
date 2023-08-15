@@ -51,6 +51,8 @@ class EnvColl {
   double getMonoNeutralMass() const { return seed_ptr_->getMonoNeutralMass(); }
 
   double getIntensity();
+  
+  int countEnvNum();
 
   EnvSetPtr getSeedEnvSet();
   

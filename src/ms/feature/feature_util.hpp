@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_TOPFD_ECSCORE_FEATURE_FEATURE_UTIL_HPP_
-#define TOPPIC_TOPFD_ECSCORE_FEATURE_FEATURE_UTIL_HPP_
+#ifndef TOPPIC_MS_FEATURE_FEATURE_UTIL_HPP_
+#define TOPPIC_MS_FEATURE_FEATURE_UTIL_HPP_
 
 #include "ms/feature/spec_feature.hpp"
 #include "ms/feature/frac_feature.hpp"

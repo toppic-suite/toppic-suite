@@ -17,13 +17,13 @@
 
 #include <string>
 
-#include "topfd/ecscore/feature/feature.hpp"
+#include "topfd/ecscore/score/ecscore.hpp"
 
 namespace toppic {
 
-namespace ecscore_write_feature {
+namespace ecscore_writer {
 
-void writeFeatures(const std::string &output_file_name, FeaturePtrVec features);
+void writeScores(const std::string &output_file_name, ECScorePtrVec ecscore);
 
 }
 

@@ -25,15 +25,15 @@
 #include "ms/feature/spec_feature_writer.hpp"
 #include "ms/feature/frac_feature_writer.hpp"
 #include "ms/feature/sample_feature_writer.hpp"
+#include "ms/feature/feature_util.hpp"
 #include "ms/msmap/ms_map.hpp"
 #include "topfd/common/topfd_para.hpp"
 #include "topfd/ecscore/env/seed_env.hpp"
 #include "topfd/ecscore/env/seed_env_util.hpp"
 #include "topfd/ecscore/env_coll/env_coll.hpp"
 #include "topfd/ecscore/env_coll/env_coll_util.hpp"
-#include "topfd/ecscore/feature/feature.hpp"
-#include "topfd/ecscore/feature/feature_util.hpp"
-#include "topfd/ecscore/feature/ecscore_write_feature.hpp"
+#include "topfd/ecscore/score/ecscore.hpp"
+#include "topfd/ecscore/score/ecscore_writer.hpp"
 #include "topfd/ecscore/ecscore_para.hpp"
 #include "topfd/ecscore/env_coll_detect.hpp"
 
@@ -83,7 +83,8 @@ void process(TopfdParaPtr topfd_para_ptr) {
     }
     seed_ptr_2d.push_back(one_spec_seed_ptrs);
   }
-    std::sort(seed_ptrs.begin(), seed_ptrs.end(), SeedEnv::cmpSeedInteDec);
+
+  std::sort(seed_ptrs.begin(), seed_ptrs.end(), SeedEnv::cmpSeedInteDec);
   // write_out_files::write_seed_envelopes(seed_envs, "envs.csv");
 
   double sn_ratio = topfd_para_ptr->getMsOneSnRatio();
@@ -101,7 +102,7 @@ void process(TopfdParaPtr topfd_para_ptr) {
   EnvCollPtrVec env_coll_list;
   int feat_id = 0;
   double perc = 0;
-  FeaturePtrVec features;
+  ECScorePtrVec ecscore_list;
   FracFeaturePtrVec frac_features;
   for (int seed_env_idx = 0; seed_env_idx < seed_num; seed_env_idx++) {
     int count = seed_env_idx + 1;
@@ -121,35 +122,25 @@ void process(TopfdParaPtr topfd_para_ptr) {
         continue;
       }
       env_coll_ptr->refineMonoMass();
-      FeaturePtr feat_ptr = std::make_shared<Feature>(env_coll_ptr, matrix_ptr,
-                                                      feat_id, sn_ratio); 
+      ECScorePtr ecscore_ptr = std::make_shared<ECScore>(env_coll_ptr, matrix_ptr,
+                                                         feat_id, sn_ratio); 
       feat_id++;
-      features.push_back(feat_ptr);
+      ecscore_list.push_back(ecscore_ptr);
       env_coll_ptr->removePeakData(matrix_ptr);
-      if (feat_ptr->getScore() < topfd_para_ptr->getEcscoreCutoff()) {
+      if (ecscore_ptr->getScore() < topfd_para_ptr->getEcscoreCutoff()) {
         continue;
       }
-      env_coll_ptr->setEcscore(feat_ptr->getScore());
+      env_coll_ptr->setEcscore(ecscore_ptr->getScore());
       env_coll_list.push_back(env_coll_ptr);
       FracFeaturePtr frac_feat_ptr = env_coll_util::getFracFeature(feat_id, deconv_ms1_ptr_vec, 
                                                                    score_para_ptr->frac_id_,
                                                                    score_para_ptr->file_name_,
                                                                    env_coll_ptr, matrix_ptr, sn_ratio);
-      frac_feat_ptr->setEcscore(feat_ptr->getScore());
+      frac_feat_ptr->setEcscore(ecscore_ptr->getScore());
       frac_features.push_back(frac_feat_ptr);
     }
   }
   
-  /*
-  for (size_t z = 0; z < env_coll_list.size(); z++) {
-    double mass = env_coll_list[z]->getMonoNeutralMass();
-    if (mass > 10059.3 && mass < 10059.4) {
-      LOG_ERROR("Step 3 Mass " << mass << " env set list length " <<
-                env_coll_list[z]->getEnvSetList().size()); 
-    }
-  }
-  */
-
   // map MS2 features
   double zero_sn_ratio = 0;
   MsMapPtr raw_matrix_ptr = std::make_shared<MsMap>(ms1_mzml_peaks, deconv_ms1_ptr_vec,
@@ -157,14 +148,14 @@ void process(TopfdParaPtr topfd_para_ptr) {
                                                     zero_sn_ratio);
   SpecFeaturePtrVec ms2_features;
 
-  Feature::assignFeatures(frac_features, env_coll_list, features, 
+  ECScore::assignEnvColls(frac_features, env_coll_list, ecscore_list, 
                           raw_matrix_ptr, deconv_ms1_ptr_vec, ms2_header_ptr_2d,
                           seed_ptr_2d, ms2_features, topfd_para_ptr, score_para_ptr); 
 
-  std::cout << std::endl << "Number of proteoform features: " << features.size() << std::endl;
+  std::cout << std::endl << "Number of proteoform features: " << ecscore_list.size() << std::endl;
   /// output files
   std::string feat_file_name = output_base_name + "_ms1.csv";
-  ecscore_write_feature::writeFeatures(feat_file_name, features);
+  ecscore_writer::writeScores(feat_file_name, ecscore_list);
 
   std::string output_file_name = output_base_name + "_" + "feature.xml";
   frac_feature_writer::writeXmlFeatures(output_file_name, frac_features);

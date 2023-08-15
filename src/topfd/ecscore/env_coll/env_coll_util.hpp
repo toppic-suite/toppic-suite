@@ -34,10 +34,6 @@ EnvCollPtr findEnvColl(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
 EnvCollPtr findEnvCollWithSingleEnv(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
                                     EcscoreParaPtr para_ptr, double sn_ratio); 
 
-EnvSetPtrVec getChargeEnvList(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
-                              EnvSetPtr seed_env_set_ptr, EcscoreParaPtr para_ptr,
-                              double sn_ratio);
-
 bool checkExistingFeatures(MsMapPtr matrix_ptr, EnvCollPtr coll_ptr,
                            EnvCollPtrVec &env_coll_list, EcscoreParaPtr para_ptr);
 

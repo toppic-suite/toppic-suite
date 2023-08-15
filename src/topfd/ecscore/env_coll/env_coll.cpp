@@ -107,4 +107,12 @@ void EnvColl::mergeEnvSet(EnvSetPtr new_set_ptr) {
   std::sort(env_set_list_.begin(), env_set_list_.end(),EnvSet::cmpChargeInc); 
 }
 
+int EnvColl::countEnvNum() {
+  int env_num = 0;
+  for (size_t i = 0; i < env_set_list_.size(); i++) {
+    env_num = env_num + env_set_list_[i]->countEnvNum();
+  }
+  return env_num;
+}
+
 }
