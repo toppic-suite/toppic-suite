@@ -28,14 +28,15 @@
 #include "ms/feature/feature_util.hpp"
 #include "ms/msmap/ms_map.hpp"
 #include "topfd/common/topfd_para.hpp"
+#include "topfd/ecscore/para/ecscore_para.hpp"
 #include "topfd/ecscore/env/seed_env.hpp"
 #include "topfd/ecscore/env/seed_env_util.hpp"
 #include "topfd/ecscore/env_coll/env_coll.hpp"
 #include "topfd/ecscore/env_coll/env_coll_util.hpp"
 #include "topfd/ecscore/score/ecscore.hpp"
 #include "topfd/ecscore/score/ecscore_writer.hpp"
-#include "topfd/ecscore/ecscore_para.hpp"
-#include "topfd/ecscore/env_coll_detect.hpp"
+#include "topfd/ecscore/env_coll/env_coll_assign.hpp"
+#include "topfd/ecscore/env_coll/env_coll_detect.hpp"
 
 namespace toppic {
 
@@ -148,9 +149,9 @@ void process(TopfdParaPtr topfd_para_ptr) {
                                                     zero_sn_ratio);
   SpecFeaturePtrVec ms2_features;
 
-  ECScore::assignEnvColls(frac_features, env_coll_list, ecscore_list, 
-                          raw_matrix_ptr, deconv_ms1_ptr_vec, ms2_header_ptr_2d,
-                          seed_ptr_2d, ms2_features, topfd_para_ptr, score_para_ptr); 
+  env_coll_assign::assignEnvColls(frac_features, env_coll_list, ecscore_list, 
+                                  raw_matrix_ptr, deconv_ms1_ptr_vec, ms2_header_ptr_2d,
+                                  seed_ptr_2d, ms2_features, topfd_para_ptr, score_para_ptr); 
 
   std::cout << std::endl << "Number of proteoform features: " << ecscore_list.size() << std::endl;
   /// output files

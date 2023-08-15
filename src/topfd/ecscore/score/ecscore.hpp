@@ -20,8 +20,8 @@
 #include "ms/msmap/ms_map.hpp"
 
 #include "topfd/common/topfd_para.hpp"
-#include "topfd/ecscore/ecscore_para.hpp"
 
+#include "topfd/ecscore/para/ecscore_para.hpp"
 #include "topfd/ecscore/env_coll/env_coll.hpp"
 
 namespace toppic {
@@ -35,17 +35,6 @@ class ECScore {
   ECScore(EnvCollPtr env_coll_ptr, MsMapPtr matrix_ptr, int score_id, double sn_ratio);
 
   std::vector<float> getEcscoreInput(double max_retention_time);
-
-  static void assignEnvColls(FracFeaturePtrVec &frac_features,
-                             EnvCollPtrVec &env_coll_list,
-                             ECScorePtrVec &ecscore_list,
-                             MsMapPtr matrix_ptr,
-                             DeconvMsPtrVec &ms1_ptr_vec,
-                             MsHeaderPtr2D &ms2_header_ptr_2d,
-                             SeedEnvPtr2D &seed_ptr_2d,
-                             SpecFeaturePtrVec &ms2_features,
-                             TopfdParaPtr topfd_para_ptr,
-                             EcscoreParaPtr score_para_ptr); 
 
   int getEcscoreId() const { return score_id_; }
 
@@ -144,19 +133,6 @@ class ECScore {
   void setLabel(int label) { label_ = label; }
 
  private:
-
-  static bool getHighestInteEnvColl(FracFeaturePtrVec &frac_features, EnvCollPtrVec &env_coll_list,
-                                    MsHeaderPtr header_ptr, double score_thresh, 
-                                    SpecFeaturePtrVec &ms2_features); 
-
-  static bool getNewEnvColl(MsHeaderPtr header_ptr, MsMapPtr matrix_ptr,
-                            EcscoreParaPtr para_ptr, ECScorePtrVec &ecscore_list,
-                            EnvCollPtrVec &env_coll_list, DeconvMsPtrVec &ms1_ptr_vec,
-                            SeedEnvPtr2D &seed_ptr_2d,
-                            FracFeaturePtrVec &frac_feature_list,
-                            SpecFeaturePtrVec &ms2_feature_list); 
-
-
   int score_id_ = 0;
   int min_scan_ = 0;
   int max_scan_ = 0;

@@ -16,7 +16,7 @@
 #define TOPPIC_TOPFD_ECSCORE_ENV_SEED_ENV_UTIL_HPP
 
 #include "ms/msmap/ms_map.hpp"
-#include "topfd/ecscore/ecscore_para.hpp"
+#include "topfd/ecscore/para/ecscore_para.hpp"
 #include "topfd/ecscore/env/seed_env.hpp"
 
 namespace toppic {

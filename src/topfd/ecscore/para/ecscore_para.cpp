@@ -14,7 +14,7 @@
 
 #include "common/util/file_util.hpp"
 #include "common/base/mass_constant.hpp"
-#include "topfd/ecscore/ecscore_para.hpp"
+#include "topfd/ecscore/para/ecscore_para.hpp"
 
 namespace toppic {
 

@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_TOPFD_ECSCORE_ENV_COLL_DETECT_HPP_
-#define TOPPIC_TOPFD_ECSCORE_ENV_COLL_DETECT_HPP_
+#ifndef TOPPIC_TOPFD_ECSCORE_ENV_COLL_ENV_COLL_DETECT_HPP_
+#define TOPPIC_TOPFD_ECSCORE_ENV_COLL_ENV_COLL_DETECT_HPP_
 
 #include "topfd/common/topfd_para.hpp"
 
