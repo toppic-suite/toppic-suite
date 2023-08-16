@@ -23,7 +23,7 @@ namespace toppic {
 class MsMap {
  public:
 
-  MsMap(PeakPtrVec2D &raw_peaks, DeconvMsPtrVec &ms1_ptr_vec,
+  MsMap(PeakPtrVec2D &raw_peak_2d, DeconvMsPtrVec &ms1_ptr_vec,
         double bin_size, double sn_ratio);
 
   int getColNum() { return col_num_; }
@@ -53,7 +53,7 @@ class MsMap {
     return row_ptr_list_[row_idx]->setPeakPtrVec(bin_idx, peaks);}
 
  private:
-  void initMap(DeconvMsPtrVec &ms1_ptr_vec, double sn_ratio);
+  void initMap(PeakPtrVec2D &raw_peak_2d, DeconvMsPtrVec &ms1_ptr_vec, double sn_ratio);
 
   void findNeighbors(int spec_id, int search_bin_num, double mass_tol);
 

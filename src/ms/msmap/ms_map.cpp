@@ -21,13 +21,13 @@
 
 namespace toppic {
 
-MsMap::MsMap(PeakPtrVec2D &raw_peaks, DeconvMsPtrVec &ms1_ptr_vec,
+MsMap::MsMap(PeakPtrVec2D &raw_peak_2d, DeconvMsPtrVec &ms1_ptr_vec,
              double bin_size, double sn_ratio) {
   bin_size_ = bin_size;
   /// get min mz value
   std::vector<double> intes;
   std::vector<double> mz;
-  for (auto &row_peaks: raw_peaks) {
+  for (auto &row_peaks: raw_peak_2d) {
     for (auto &p: row_peaks) {
       mz.push_back(p->getPosition());
       intes.push_back(p->getIntensity());
@@ -41,16 +41,16 @@ MsMap::MsMap(PeakPtrVec2D &raw_peaks, DeconvMsPtrVec &ms1_ptr_vec,
   LOG_DEBUG("Data Level Noise Intensity Level: " << base_inte_);
   LOG_DEBUG("Min and Max m/z values: " << min_mz_ << " , " << max_mz_);
 
-  initMap(ms1_ptr_vec, sn_ratio);
+  initMap(raw_peak_2d, ms1_ptr_vec, sn_ratio);
 }
 
-void MsMap::initMap(DeconvMsPtrVec &ms1_ptr_vec, double sn_ratio) {
+void MsMap::initMap(PeakPtrVec2D &raw_peak_2d, DeconvMsPtrVec &ms1_ptr_vec, double sn_ratio) {
   for (size_t row_id = 0; row_id < ms1_ptr_vec.size(); row_id++) {
     MsHeaderPtr ms_header_ptr = ms1_ptr_vec[row_id]->getMsHeaderPtr();
     MsMapRowHeaderPtr row_header_ptr = std::make_shared<MsMapRowHeader>(ms_header_ptr->getSpecId(),
                                                                         ms_header_ptr->getFirstScanNum(),
                                                                         ms_header_ptr->getRetentionTime());
-    DeconvPeakPtrVec row_peaks = ms1_ptr_vec[row_id]->getPeakPtrVec();
+    PeakPtrVec row_peaks = raw_peak_2d[row_id]; 
     // get base peak intensity for each row
     std::vector<double> intes;
     for (auto &peak: row_peaks) { intes.push_back(peak->getIntensity()); }
@@ -63,7 +63,7 @@ void MsMap::initMap(DeconvMsPtrVec &ms1_ptr_vec, double sn_ratio) {
     row_ptr_list_.push_back(row_ptr);
     // init indexes
     for (size_t j = 0; j < row_peaks.size(); j++) {
-      DeconvPeakPtr p_ptr = row_peaks[j];
+      PeakPtr p_ptr = row_peaks[j];
       MsMapPeakPtr new_peak_ptr = std::make_shared<MsMapPeak>(p_ptr);
       peaks_.push_back(new_peak_ptr);
       // filter low intensity peak
