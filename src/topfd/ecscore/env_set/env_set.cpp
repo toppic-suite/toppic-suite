@@ -314,7 +314,7 @@ bool EnvSet::containTwoValidEnvs(int min_match_peak) {
 
 // check if the seed envelope and its two neighboring ones are valid
 bool EnvSet::containValidNeighborEnvsForSeed(int min_match_peak_num) {
-  int seed_spec_idx = seed_ptr_->getSpecId(); 
+  int seed_spec_idx = seed_ptr_->getSpecId() - start_spec_id_; 
   size_t first_idx = seed_spec_idx - 1;
   if (first_idx < 0) {
     first_idx = 0;
@@ -334,7 +334,7 @@ bool EnvSet::containValidNeighborEnvsForSeed(int min_match_peak_num) {
 }
 
 bool EnvSet::containThreeValidOutOfFiveEnvs(int min_match_peak_num) {
-  int seed_spec_idx = seed_ptr_->getSpecId(); 
+  int seed_spec_idx = seed_ptr_->getSpecId() - start_spec_id_; 
   size_t first_idx = seed_spec_idx - 2;
   if (first_idx < 0) {
     first_idx = 0;
