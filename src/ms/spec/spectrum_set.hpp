@@ -29,6 +29,7 @@ class SpectrumSet {
  public:
   SpectrumSet(DeconvMsPtrVec deconv_ms_ptr_vec, 
               double prec_mono_mass,
+              double n_term_label_mass,
               bool valid, 
               ExtendMsPtrVec extend_ms_three_ptr_vec,
               PrmMsPtrVec prm_ms_two_ptr_vec,
@@ -36,6 +37,8 @@ class SpectrumSet {
               PrmMsPtrVec prm_ms_six_ptr_vec);
 
   double getPrecMonoMass() {return prec_mono_mass_;}
+
+  double getNTermLabelMass() {return n_term_label_mass_;}
 
   bool isValid() {return valid_;}
 
@@ -55,6 +58,8 @@ class SpectrumSet {
   DeconvMsPtrVec deconv_ms_ptr_vec_;
 
   double prec_mono_mass_;
+
+  double n_term_label_mass_ = 0;
 
   bool valid_ = true;
 

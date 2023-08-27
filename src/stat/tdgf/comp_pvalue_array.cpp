@@ -122,13 +122,15 @@ void CompPValueArray::compMultiExpectedValues(const PrmMsPtrVec &ms_six_ptr_vec,
 }
 
 void CompPValueArray::compSingleExpectedValue(const DeconvMsPtrVec &ms_ptr_vec,
-                                             PrsmPtr prsm_ptr, double ppo) {
+                                             PrsmPtr prsm_ptr, double ppo, 
+                                             double n_term_label_mass) {
   double refine_prec_mass = prsm_ptr->getAdjustedPrecMass();
   DeconvMsPtrVec refine_ms_ptr_vec = deconv_ms_util::getRefineMsPtrVec(ms_ptr_vec, refine_prec_mass);
 
   PrmMsPtrVec prm_ms_ptr_vec = prm_ms_factory::geneMsSixPtrVec(refine_ms_ptr_vec,
                                                                mng_ptr_->prsm_para_ptr_->getSpParaPtr(),
-                                                               refine_prec_mass);
+                                                               refine_prec_mass, 
+                                                               n_term_label_mass);
 
   PrsmPtrVec prsm_ptrs;
   prsm_ptrs.push_back(prsm_ptr);
@@ -138,8 +140,9 @@ void CompPValueArray::compSingleExpectedValue(const DeconvMsPtrVec &ms_ptr_vec,
 void CompPValueArray::process(SpectrumSetPtr spec_set_ptr, PrsmPtrVec &prsm_ptrs,
                               double ppo, bool is_separate) {
   if (is_separate) {
+    double n_term_label_mass = spec_set_ptr->getNTermLabelMass();
     for (unsigned i = 0; i < prsm_ptrs.size(); i++) {
-      compSingleExpectedValue(spec_set_ptr->getDeconvMsPtrVec(), prsm_ptrs[i], ppo);
+      compSingleExpectedValue(spec_set_ptr->getDeconvMsPtrVec(), prsm_ptrs[i], ppo, n_term_label_mass);
     }
   } 
   else {

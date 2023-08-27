@@ -23,30 +23,22 @@ namespace toppic {
 
 namespace prm_ms_factory {
 
-PrmMsPtrVec geneMsTwoPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
-                            SpParaPtr sp_para_ptr,
-                            double prec_mono_mass,
+PrmMsPtrVec geneMsTwoPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, SpParaPtr sp_para_ptr,
+                            double prec_mono_mass, double n_term_label_mass, 
                             const std::vector<double> & mod_mass = std::vector<double>());
 
-PrmMsPtrVec geneSuffixMsTwoPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
-                                  SpParaPtr sp_para_ptr,
-                                  double prec_mono_mass,
+PrmMsPtrVec geneSuffixMsTwoPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, SpParaPtr sp_para_ptr,
+                                  double prec_mono_mass, double n_term_label_mass,
                                   const std::vector<double> & mod_mass = std::vector<double>());
 
 PrmMsPtrVec geneMsSixPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
-                            SpParaPtr sp_para_ptr,
-                            double prec_mono_mass);
+                            SpParaPtr sp_para_ptr, double prec_mono_mass, double n_term_label_mass);
 
-PrmMsPtrVec geneSuffixMsSixPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
-                                  SpParaPtr sp_para_ptr, double prec_mono_mass); 
-
-PrmMsPtrVec geneShiftMsSixPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
-                                 SpParaPtr sp_para_ptr,
-                                 double prec_mono_mass, double shift);
-
+PrmMsPtrVec geneSuffixMsSixPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, SpParaPtr sp_para_ptr, 
+                                  double prec_mono_mass, double n_term_label_mass); 
 
 }  // namespace prm_ms_factory
 
 }  // namespace toppic
 
-#endif /* PRM_PEAK_HPP_ */
+#endif 

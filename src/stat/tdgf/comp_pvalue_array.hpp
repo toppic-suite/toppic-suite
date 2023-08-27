@@ -30,7 +30,8 @@ class CompPValueArray {
   void compMultiExpectedValues(const PrmMsPtrVec &ms_six_ptr_vec, PrsmPtrVec &prsm_ptrs,
                                double ppo, bool strict);
 
-  void compSingleExpectedValue(const DeconvMsPtrVec &ms_ptr_vec, PrsmPtr prsm_ptr, double ppo);
+  void compSingleExpectedValue(const DeconvMsPtrVec &ms_ptr_vec, PrsmPtr prsm_ptr, double ppo, 
+                               double n_term_label_mass);
 
   void process(SpectrumSetPtr spec_set_ptr, PrsmPtrVec &prsm_ptrs, double ppo, bool is_separate);
 

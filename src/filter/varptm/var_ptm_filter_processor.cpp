@@ -71,6 +71,7 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
           //LOG_ERROR("precursor " << spec_set_ptr->getFirstPrecMonoMass());
           DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
           double prec_mono_mass = spec_set_ptr->getPrecMonoMass();
+          double n_term_label_mass = spec_set_ptr->getNTermLabelMass();
           if (mng_ptr->use_approx_spec_) {
             for (size_t m = 0; m < mod_mass_list.size(); m++) {
               for (size_t p = 0; p < mod_mass.size(); p++) {
@@ -78,10 +79,12 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
                 mod_mass[p] += mod_mass_list[m];
                 PrmMsPtrVec prm_ms_ptr_vec = prm_ms_factory::geneMsTwoPtrVec(deconv_ms_ptr_vec,
                                                                              sp_para_ptr,
-                                                                             prec_mono_mass, mod_mass);
+                                                                             prec_mono_mass, 
+                                                                             n_term_label_mass,
+                                                                             mod_mass);
                 PrmMsPtrVec srm_ms_ptr_vec 
                   = prm_ms_factory::geneSuffixMsTwoPtrVec(deconv_ms_ptr_vec, sp_para_ptr,
-                                                          prec_mono_mass, mod_mass);
+                                                          prec_mono_mass, n_term_label_mass, mod_mass);
                 filter_ptr->computeBestMatch(prm_ms_ptr_vec, srm_ms_ptr_vec);
                 writers.getCompleteWriterPtr()->write(filter_ptr->getCompMatchPtrs());
                 writers.getPrefixWriterPtr()->write(filter_ptr->getPrefMatchPtrs());
@@ -93,10 +96,13 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
           else {
             PrmMsPtrVec prm_ms_ptr_vec = prm_ms_factory::geneMsTwoPtrVec(deconv_ms_ptr_vec,
                                                                          sp_para_ptr,
-                                                                         prec_mono_mass, mod_mass);
+                                                                         prec_mono_mass, 
+                                                                         n_term_label_mass,
+                                                                         mod_mass);
             PrmMsPtrVec srm_ms_ptr_vec 
               = prm_ms_factory::geneSuffixMsTwoPtrVec(deconv_ms_ptr_vec, sp_para_ptr,
-                                                      prec_mono_mass, mod_mass);
+                                                      prec_mono_mass, n_term_label_mass, 
+                                                      mod_mass);
             filter_ptr->computeBestMatch(prm_ms_ptr_vec, srm_ms_ptr_vec);
             writers.getCompleteWriterPtr()->write(filter_ptr->getCompMatchPtrs());
             writers.getPrefixWriterPtr()->write(filter_ptr->getPrefMatchPtrs());

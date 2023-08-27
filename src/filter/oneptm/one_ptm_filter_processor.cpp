@@ -83,12 +83,15 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
                 mod_mass[k1] += mod_mass_list[i];
                 DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
                 double prec_mono_mass = spec_set_ptr->getPrecMonoMass();
+                double n_term_label_mass = spec_set_ptr->getNTermLabelMass();
                 PrmMsPtrVec prm_ms_ptr_vec = prm_ms_factory::geneMsTwoPtrVec(deconv_ms_ptr_vec,
                                                                              sp_para_ptr,
-                                                                             prec_mono_mass, mod_mass);
+                                                                             prec_mono_mass, 
+                                                                             n_term_label_mass,
+                                                                             mod_mass);
                 PrmMsPtrVec srm_ms_ptr_vec 
                   = prm_ms_factory::geneSuffixMsTwoPtrVec(deconv_ms_ptr_vec, sp_para_ptr,
-                                                          prec_mono_mass, mod_mass);
+                                                          prec_mono_mass, n_term_label_mass, mod_mass);
                 filter_ptr->computeBestMatch(prm_ms_ptr_vec, srm_ms_ptr_vec);
                 writers.getCompleteWriterPtr()->write(filter_ptr->getCompMatchPtrs());
                 writers.getPrefixWriterPtr()->write(filter_ptr->getPrefMatchPtrs());
