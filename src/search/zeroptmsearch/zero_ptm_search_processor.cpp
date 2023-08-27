@@ -38,13 +38,11 @@ PrsmPtrVec ZeroPtmSearchProcessor::zeroPtmSearchOneSpec(SpectrumSetPtr spec_set_
   ExtendMsPtrVec ms_three_vec = spec_set_ptr->getMsThreePtrVec();
   ProteoformPtrVec proteoform_ptr_vec;
   for (size_t i = 0; i < simple_prsm_ptr_vec.size(); i++) {
-    if (std::abs(spec_set_ptr->getPrecMonoMass() - simple_prsm_ptr_vec[i]->getPrecMass()) 
-        > std::pow(10, -4)) {
-      // When precursor error is allowed, if the adjusted precursor of the
-      // spectrum set does not match the adjusted precursor mass in the
-      // filtering result, the spectrum proteoform match is ignored. 
-      // A small error is allowed for errors introduced in writing real numbers
-      // to xml files. 
+    // When +/-1 Dalton error is allowed, if the adjusted precursor of the
+    // spectrum set does not match the adjusted precursor mass in the
+    // filtering result, the spectrum proteoform match is ignored. 
+    double shift = spec_set_ptr->getPrecMonoMass() - simple_prsm_ptr_vec[i]->getPrecMass();
+    if (std::lround(shift) != 0) { 
       continue;
     }
     std::string seq_name = simple_prsm_ptr_vec[i]->getSeqName();
