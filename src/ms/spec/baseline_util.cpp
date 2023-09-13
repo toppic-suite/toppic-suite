@@ -103,6 +103,11 @@ double getMaxInte(const std::vector<double> &inte) {
 
 double getBaseLine(const std::vector<double> &inte) {
   double max_inte = getMaxInte(inte);
+  if (max_inte <= 0.0) {
+    LOG_WARNING("The highest peak intensity is 0.");
+    // when there are no peaks, return default 1.0
+    return 1.0;
+  }
   int max_pos;
   IntvDensPtrVec dens;
   do {    
