@@ -185,6 +185,9 @@ SeedEnvPtr testHalfChargeEnv(SeedEnvPtr seed_ptr, MsMapPtr ms_map_ptr,
                              double even_odd_log_ratio, EcscoreParaPtr para_ptr, 
                              double sn_ratio) {
   SeedEnvPtr half_charge_seed = getHalfChargeEnv(seed_ptr, even_odd_log_ratio);
+  if (half_charge_seed == nullptr) {
+      return nullptr;
+  }
   SeedEnvPtr processed_seed_ptr = preprocessSeedEnvPtr(half_charge_seed, 
                                                        ms_map_ptr, para_ptr, sn_ratio);
   return processed_seed_ptr;
