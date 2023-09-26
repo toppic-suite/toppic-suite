@@ -153,8 +153,35 @@ SeedEnvPtr relaxProcessSeedEnvPtr(SeedEnvPtr seed_ptr, MsMapPtr ms_map_ptr,
   return result_seed_env_ptr;
 }
 
-SeedEnvPtr getHalfChargeEnv(SeedEnvPtr seed_ptr,
-                            double even_odd_log_ratio) {
+SeedEnvPtr getHalfChargeEnvV1(SeedEnvPtr seed_ptr,
+                              double even_odd_peak_ratio) {
+  double mass = seed_ptr->getMonoNeutralMass();
+  int charge = seed_ptr->getCharge();
+  double mz = peak_util::compMz(mass, charge);
+  std::vector<double> distribution = seed_ptr->getMzList();
+  if (even_odd_peak_ratio < 0) {
+    mz = mz + (distribution[1] - distribution[0]);
+  }
+  int new_charge = int(charge / 2);
+  if (new_charge == 0) {
+    new_charge = new_charge + 1;
+  }
+  double mono_mass = peak_util::compPeakNeutralMass(mz, new_charge);
+
+  int sp_id = seed_ptr->getSpecId();
+  int peak_id = -1;
+  double inte = seed_ptr->getSeedInte()/2;
+
+  DeconvPeakPtr peak_ptr = std::make_shared<DeconvPeak>(sp_id, peak_id,
+                                                        mono_mass, inte,
+                                                        new_charge);
+  SeedEnvPtr new_seed_ptr = std::make_shared<SeedEnv>(peak_ptr);
+
+  return new_seed_ptr;
+}
+
+SeedEnvPtr getHalfChargeEnvV2(SeedEnvPtr seed_ptr,
+                              double even_odd_log_ratio) {
   double old_charge = seed_ptr->getCharge();
   if (old_charge < 2) {
     return nullptr;
@@ -164,11 +191,11 @@ SeedEnvPtr getHalfChargeEnv(SeedEnvPtr seed_ptr,
   double ref_mass = peak_util::compPeakNeutralMass(ref_mz, new_charge);
   double mono_mass = EnvBase::convertRefMassToMonoMass(ref_mass);
   int refer_idx = seed_ptr->getReferIdx();
-  // if refer_idx + 1 is even and env_odd_log_ratio < 0 
-  // or refer_idx  + 1is odd and env_odd_log_ratio > 1
+  // if refer_idx is even and env_odd_log_ratio < 0 
+  // or refer_idx is odd  and env_odd_log_ratio > 1
   // then increase mass by about 1 Dalton
-  if (((refer_idx +1)%2 == 0 && even_odd_log_ratio < 0) 
-      || ((refer_idx + 1)%2 == 1 && even_odd_log_ratio >0)) {
+  if (((refer_idx)%2 == 0 && even_odd_log_ratio < 0) 
+      || ((refer_idx)%2 == 1 && even_odd_log_ratio >0)) {
     mono_mass += mass_constant::getIsotopeMass();
   }
   int sp_id = seed_ptr->getSpecId();
@@ -184,7 +211,7 @@ SeedEnvPtr getHalfChargeEnv(SeedEnvPtr seed_ptr,
 SeedEnvPtr testHalfChargeEnv(SeedEnvPtr seed_ptr, MsMapPtr ms_map_ptr, 
                              double even_odd_log_ratio, EcscoreParaPtr para_ptr, 
                              double sn_ratio) {
-  SeedEnvPtr half_charge_seed = getHalfChargeEnv(seed_ptr, even_odd_log_ratio);
+  SeedEnvPtr half_charge_seed = getHalfChargeEnvV1(seed_ptr, even_odd_log_ratio);
   if (half_charge_seed == nullptr) {
       return nullptr;
   }
