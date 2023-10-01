@@ -106,10 +106,9 @@ void PrsmStrMerge::process(bool norm) {
         std::sort(cur_str_ptrs.begin(), cur_str_ptrs.end(), PrsmStr::cmpMatchFragmentDec);
       } else {
         std::sort(cur_str_ptrs.begin(), cur_str_ptrs.end(), PrsmStr::cmpNormMatchFragmentDec);
+        // Remove duplicated PrSMs from the same sequence.  
+        cur_str_ptrs = removeDuplicates(cur_str_ptrs);
       }
-      // Remove duplicated PrSMs from the same sequence.  
-      cur_str_ptrs = removeDuplicates(cur_str_ptrs);
-
       for (size_t i = 0; i < top_num_; i++) {
         if (i >= cur_str_ptrs.size()) {
           break;

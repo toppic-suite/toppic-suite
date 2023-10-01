@@ -94,7 +94,7 @@ class TopfdPara {
   double ms_one_sn_ratio_ = 3.0;
   double ms_two_sn_ratio_ = 1.0;
   bool keep_unused_peaks_ = false;
-  bool use_env_cnn_ = true;
+  bool use_env_cnn_ = false;
   bool do_final_filtering_ = true;
   int  thread_num_ = 1;
   std::string activation_ = "FILE";
