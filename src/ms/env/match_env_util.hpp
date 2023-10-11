@@ -47,7 +47,7 @@ MatchEnvPtr getNewMatchEnv(PeakPtrVec &ms, int idx, double tolerance);
 MatchEnvPtrVec addMultipleMass(MatchEnvPtrVec &envs, MatchEnvPtr2D &candidates, 
                                EnvParaPtr env_para_ptr);
 
-DeconvMsPtr getDeconvMsPtr(MsHeaderPtr header_ptr, MatchEnvPtrVec &envs, bool use_env_cnn);
+DeconvMsPtr getDeconvMsPtr(MsHeaderPtr header_ptr, MatchEnvPtrVec &envs); 
 
 }  // namespace match_env_util
 

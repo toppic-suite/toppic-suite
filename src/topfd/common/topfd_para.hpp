@@ -38,7 +38,7 @@ class TopfdPara {
   double getMsOneSnRatio() {return ms_one_sn_ratio_;}
   double getMsTwoSnRatio() {return ms_two_sn_ratio_;}
   double getPrecWindowWidth() {return prec_window_;}
-  bool isUseEnvCnn() {return use_env_cnn_;}
+  bool isUseMsDeconv() {return use_msdeconv_;}
   bool isDoFinalFiltering() {return do_final_filtering_;}
   std::string getActivation() {return activation_;}
   bool isGeneHtmlFolder() {return gene_html_folder_;}
@@ -68,7 +68,7 @@ class TopfdPara {
   void setMsOneSnRatio(double ratio) {ms_one_sn_ratio_ = ratio;}
   void setMsTwoSnRatio(double ratio) {ms_two_sn_ratio_ = ratio;}
   void setPrecWindowWidth(double window) { prec_window_ = window;}
-  void setUseEnvCnn(bool use) {use_env_cnn_ = use;}
+  void setUseMsdeconv(bool use) {use_msdeconv_ = use;}
   void setDoFinalFiltering(bool filtering) {do_final_filtering_ = filtering;}
   void setActivation(std::string activation) {activation_ = activation;}
   void setGeneHtmlFolder(bool gene) {gene_html_folder_ = gene;}
@@ -94,7 +94,7 @@ class TopfdPara {
   double ms_one_sn_ratio_ = 3.0;
   double ms_two_sn_ratio_ = 1.0;
   bool keep_unused_peaks_ = false;
-  bool use_env_cnn_ = false;
+  bool use_msdeconv_ = false;
   bool do_final_filtering_ = true;
   int  thread_num_ = 1;
   std::string activation_ = "FILE";

@@ -86,13 +86,13 @@ std::string TopfdPara::getParaStr(const std::string &prefix,
       << "Precursor window size:    " << sep << prec_window_ << " m/z" << std::endl;
   output << prefix << std::setw(gap) << std::left 
       << "Activation type:          " << sep  << activation_ << std::endl;
-  if (use_env_cnn_) {
+  if (use_msdeconv_) {
     output << prefix << std::setw(gap) << std::left 
-      << "Use Env CNN model:        " << sep << "Yes" << std::endl;
+      << "Use MS-Deconv score:      " << sep << "Yes" << std::endl;
   }
   else {
     output << prefix << std::setw(gap) << std::left 
-      << "Use Env CNN model:        " << sep << "No" << std::endl;
+      << "Use MS-Deconv score:      " << sep << "No" << std::endl;
   }
   if (missing_level_one_) {
     output << prefix << std::setw(gap) << std::left 

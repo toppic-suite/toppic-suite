@@ -61,15 +61,18 @@ void DeconvSingleSp::postprocess(MatchEnvPtrVec &dp_envs) {
   }
 
   // Obtain EnvCNN Scores for envelopes
-  if (topfd_para_ptr_->isUseEnvCnn()) {
-    onnx_env_cnn::computeEnvScores(peak_list, dp_envs); 
+  onnx_env_cnn::computeEnvScores(peak_list, dp_envs); 
+  if (topfd_para_ptr_->isUseMsDeconv()) {
+    std::sort(dp_envs.begin(), dp_envs.end(), MatchEnv::cmpMsdeconvScoreDec);
+  }
+  else {
     std::sort(dp_envs.begin(), dp_envs.end(), MatchEnv::cmpEnvcnnScoreDec);
   }
 
   // filtering
   if (topfd_para_ptr_->isDoFinalFiltering()) {
     result_envs_ = match_env_filter::filter(dp_envs, data_ptr_->getMaxMass(), 
-                                            topfd_para_ptr_->isUseEnvCnn(), 
+                                            topfd_para_ptr_->isUseMsDeconv(), 
                                             env_para_ptr_);
   }
   else {

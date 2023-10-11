@@ -22,14 +22,14 @@ namespace toppic {
 namespace match_env_filter {
 
 MatchEnvPtrVec filter(MatchEnvPtrVec &ori_envs, double prec_mass,
-                      bool use_env_cnn, EnvParaPtr env_para_ptr) {
+                      bool use_msdeconv, EnvParaPtr env_para_ptr) {
   MatchEnvPtrVec low_mass_envs;
   MatchEnvPtrVec high_mass_envs;
-  if (use_env_cnn) {
-    std::sort(ori_envs.begin(), ori_envs.end(), MatchEnv::cmpEnvcnnScoreDec);
+  if (use_msdeconv) {
+    std::sort(ori_envs.begin(), ori_envs.end(), MatchEnv::cmpMsdeconvScoreDec);
   }
   else {
-    std::sort(ori_envs.begin(), ori_envs.end(), MatchEnv::cmpMsdeconvScoreDec);
+    std::sort(ori_envs.begin(), ori_envs.end(), MatchEnv::cmpEnvcnnScoreDec);
   }
   int low_mass_num = env_para_ptr->compLowMassNum(); 
   int high_mass_num = env_para_ptr->compHighMassNum(prec_mass);
@@ -47,11 +47,11 @@ MatchEnvPtrVec filter(MatchEnvPtrVec &ori_envs, double prec_mass,
   MatchEnvPtrVec result;
   result.insert(std::end(result), std::begin(low_mass_envs), std::end(low_mass_envs));
   result.insert(std::end(result), std::begin(high_mass_envs), std::end(high_mass_envs));
-  if (use_env_cnn) {
-    std::sort(result.begin(), result.end(), MatchEnv::cmpEnvcnnScoreDec);
+  if (use_msdeconv) {
+    std::sort(result.begin(), result.end(), MatchEnv::cmpMsdeconvScoreDec);
   }
   else {
-    std::sort(result.begin(), result.end(), MatchEnv::cmpMsdeconvScoreDec);
+    std::sort(result.begin(), result.end(), MatchEnv::cmpEnvcnnScoreDec);
   }
   return result;
 }

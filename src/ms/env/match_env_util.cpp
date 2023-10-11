@@ -198,7 +198,8 @@ MatchEnvPtrVec addMultipleMass(MatchEnvPtrVec &envs, MatchEnvPtr2D &candidates,
   return mass_envs;
 }
 
-DeconvMsPtr getDeconvMsPtr(MsHeaderPtr header_ptr, MatchEnvPtrVec &envs, bool use_env_cnn) {
+DeconvMsPtr getDeconvMsPtr(MsHeaderPtr header_ptr, MatchEnvPtrVec &envs) {
+  std::sort(envs.begin(), envs.end(), MatchEnv::cmpEnvcnnScoreDec);
   DeconvPeakPtrVec peak_list;
   int sp_id = header_ptr->getSpecId();
   for (size_t i = 0; i < envs.size(); i++) {
@@ -207,13 +208,7 @@ DeconvMsPtr getDeconvMsPtr(MsHeaderPtr header_ptr, MatchEnvPtrVec &envs, bool us
     double pos = real_env->getMonoNeutralMass();
     double inte = theo_env->compInteSum();
     int charge = theo_env->getCharge();
-    double score; 
-    if (use_env_cnn) {
-      score = envs[i]->getEnvcnnScore();
-    }
-    else {
-      score = envs[i]->getMsdeconvScore();
-    }
+    double score = envs[i]->getEnvcnnScore();
     DeconvPeakPtr peak_ptr = std::make_shared<DeconvPeak>(sp_id, i, pos, inte, charge, score);
     peak_list.push_back(peak_ptr);
   }
