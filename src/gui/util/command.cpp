@@ -38,12 +38,12 @@ std::string geneTopfdCommand(TopfdParaPtr para_ptr,
   oss << "-a " << para_ptr->getActivation() << " ";
   oss << "-c " << para_ptr->getMaxCharge() << " ";
   oss << "-m " << para_ptr->getMaxMass() << " ";
-  oss << "-t " << para_ptr->getMzError() << " ";
+  oss << "-e " << para_ptr->getMzError() << " ";
   oss << "-r " << para_ptr->getMsOneSnRatio() << " ";
   oss << "-s " << para_ptr->getMsTwoSnRatio() << " ";
   oss << "-w " << para_ptr->getPrecWindowWidth() << " ";
   command = command + oss.str();
-  if (para_ptr->isUseEnvCnn()) {
+  if (para_ptr->isUseMsDeconv()) {
     command = command + "-n ";
   }
   if (para_ptr->isMissingLevelOne()) {

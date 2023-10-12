@@ -44,6 +44,7 @@ class TopfdPara {
   bool isGeneHtmlFolder() {return gene_html_folder_;}
   bool isKeepUnusedPeaks() {return keep_unused_peaks_;}
   bool isOutputMultipleMass() {return output_multiple_mass_;}
+  bool isOutputCsvFeatureFile() {return output_csv_feature_file_;}
   int getThreadNum() {return thread_num_;}
   double getEcscoreCutoff() {return ecscore_cutoff_;}
 
@@ -68,7 +69,7 @@ class TopfdPara {
   void setMsOneSnRatio(double ratio) {ms_one_sn_ratio_ = ratio;}
   void setMsTwoSnRatio(double ratio) {ms_two_sn_ratio_ = ratio;}
   void setPrecWindowWidth(double window) { prec_window_ = window;}
-  void setUseMsdeconv(bool use) {use_msdeconv_ = use;}
+  void setUseMsDeconv(bool use) {use_msdeconv_ = use;}
   void setDoFinalFiltering(bool filtering) {do_final_filtering_ = filtering;}
   void setActivation(std::string activation) {activation_ = activation;}
   void setGeneHtmlFolder(bool gene) {gene_html_folder_ = gene;}
@@ -77,8 +78,6 @@ class TopfdPara {
   void setThreadNum(int num) {thread_num_ = num;}
 
   void setFracId(int frac_id) {frac_id_ = frac_id;}
-  // set mzml_file_name, is_faims_, faims_voltage_, output_base_name, 
-  // ms1_json_dir_, ms2_json_dir_
   void setMzmlFileNameAndFaims(std::string &mzml_file_name, bool is_faims, double voltage);
   void setMs1ScanNumber(int ms1_scan_num) {ms_1_scan_num_ = ms1_scan_num;}
   void setMs2ScanNumber(int ms2_scan_num) {ms_2_scan_num_ = ms2_scan_num;}
@@ -106,6 +105,7 @@ class TopfdPara {
   bool estimate_min_inte_ = true;
   bool output_multiple_mass_ = false;
   bool output_match_env_ = false;
+  bool output_csv_feature_file_ = false;
 
   //** information for each run **
   int frac_id_ = -1;

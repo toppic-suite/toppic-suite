@@ -155,13 +155,15 @@ void process(TopfdParaPtr topfd_para_ptr) {
 
   std::cout << std::endl << "Number of proteoform features: " << ecscore_list.size() << std::endl;
   /// output files
-  std::string feat_file_name = output_base_name + "_ms1.csv";
-  ecscore_writer::writeScores(feat_file_name, ecscore_list);
+  if (topfd_para_ptr->isOutputCsvFeatureFile()) {
+    std::string feat_file_name = output_base_name + "_ms1.csv";
+    ecscore_writer::writeScores(feat_file_name, ecscore_list);
+    std::string batmass_file_name = output_base_name + "_" + "frac.mzrt.csv";
+    frac_feature_writer::writeBatMassFeatures(batmass_file_name, frac_features);
+  }
 
   std::string output_file_name = output_base_name + "_" + "feature.xml";
   frac_feature_writer::writeXmlFeatures(output_file_name, frac_features);
-  std::string batmass_file_name = output_base_name + "_" + "frac.mzrt.csv";
-  frac_feature_writer::writeBatMassFeatures(batmass_file_name, frac_features);
 
   SampleFeaturePtrVec sample_features;
   feature_util::getSampleFeatures(sample_features, frac_features, ms2_features);

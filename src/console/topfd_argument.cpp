@@ -66,7 +66,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("ms-two-sn-ratio,s", po::value<std::string> (&ms_two_sn_ratio),
          "<a positive number>. Set the signal-to-noise ratio for MS/MS spectra. The default value is 1.")
         ("precursor-window,w", po::value<std::string> (&prec_window),
-         "<a positive number>. Set the precursor window size. The default value is 3.0 m/z. When the input file contains the information of precursor windows, the parameter will be ignored.")
+         "<a positive number>. Set the default precursor window size. The default value is 3.0 m/z. When the input file contains the information of precursor windows, the parameter will be ignored.")
         ("msdeconv,n", "Use the MS-Deconv score to rank isotopic envelopes.")
         ("missing-level-one,o","MS1 spectra are missing in the input file.")
         ("thread-number,u", po::value<std::string> (&thread_number), "<a positive integer>. Number of threads used in spectral deconvolution. Default value: 1.")
@@ -142,7 +142,7 @@ bool Argument::parse(int argc, char* argv[]) {
     }
 
     if (vm.count("msdeconv")) {
-      topfd_para_ptr_->setUseMsdeconv(true);
+      topfd_para_ptr_->setUseMsDeconv(true);
     }
 
     if (vm.count("max-mass")) {
