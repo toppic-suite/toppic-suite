@@ -63,9 +63,8 @@ void deconvMsOne(MzmlMsGroupPtr ms_group_ptr,
                                                                       topfd_para_ptr->getMaxCharge()); 
 
   // Obtain EnvCNN Score for envelopes
-  if (topfd_para_ptr->isUseEnvCnn()) {
-    onnx_env_cnn::computeEnvScores(peak_list, prec_envs); 
-  }
+  onnx_env_cnn::computeEnvScores(peak_list, prec_envs); 
+
   //remove precursor peaks
   for (size_t i = 0; i < prec_envs.size(); i++) {
     ExpEnvPtr env_ptr = prec_envs[i]->getExpEnvPtr();
@@ -96,8 +95,7 @@ void deconvMsOne(MzmlMsGroupPtr ms_group_ptr,
   // 5. Write to msalign file
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
   DeconvMsPtr deconv_ms_ptr = match_env_util::getDeconvMsPtr(header_ptr,
-                                                             result_envs,
-                                                             topfd_para_ptr->isUseEnvCnn());
+                                                             result_envs);
 
   boost::thread::id thread_id = boost::this_thread::get_id();
   int writer_id = pool_ptr->getId(thread_id);

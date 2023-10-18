@@ -89,8 +89,7 @@ void deconvMsTwo(MzmlMsPtr ms_ptr,
 
   // 4. Write to msalign file
   DeconvMsPtr deconv_ms_ptr = match_env_util::getDeconvMsPtr(header_ptr,
-                                                             deconv_envs,
-                                                             topfd_para_ptr->isUseEnvCnn());
+                                                             deconv_envs);
 
   boost::thread::id thread_id = boost::this_thread::get_id();
   int writer_id = pool_ptr->getId(thread_id);
