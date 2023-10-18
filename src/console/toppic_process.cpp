@@ -40,6 +40,7 @@
 #include "prsm/prsm_cutoff_selector.hpp"
 #include "prsm/prsm_match_table_writer.hpp"
 #include "prsm/prsm_fdr.hpp"
+#include "prsm/prsm_fdr_groups.hpp"
 #include "prsm/prsm_form_filter.hpp"
 #include "prsm/prsm_util.hpp"
 
@@ -432,6 +433,7 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     if (arguments["searchType"] == "TARGET+DECOY") {
       std::cout << "FDR computation - started. " << std::endl;
       prsm_fdr::process(sp_file_name, "toppic_cluster", "toppic_cluster_fdr", arguments["keepDecoyResults"]);
+      //prsm_fdr_groups::process(sp_file_name, "toppic_cluster", "toppic_cluster_fdr", arguments["keepDecoyResults"]);
       std::cout << "FDR computation - finished." << std::endl;
       cur_suffix = "toppic_cluster_fdr";
     }

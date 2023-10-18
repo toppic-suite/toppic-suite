@@ -39,6 +39,7 @@
 #include "prsm/prsm_simple_cluster.hpp"
 #include "prsm/prsm_feature_cluster.hpp"
 #include "prsm/prsm_fdr.hpp"
+#include "prsm/prsm_fdr_groups.hpp"
 #include "prsm/prsm_form_filter.hpp"
 #include "prsm/prsm_match_table_writer.hpp"
 #include "prsm/prsm_util.hpp"
@@ -348,6 +349,7 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
     if (arguments["searchType"] == "TARGET+DECOY") {
       std::cout << "FDR computation - started. " << std::endl;
       prsm_fdr::process(sp_file_name, "topmg_cluster", "topmg_cluster_fdr", arguments["keepDecoyResults"]);
+      prsm_fdr_groups::process(sp_file_name, "topmg_cluster", "topmg_cluster_fdr", arguments["keepDecoyResults"]);
       std::cout << "FDR computation - finished." << std::endl;
       cur_suffix = "topmg_cluster_fdr";
     }
