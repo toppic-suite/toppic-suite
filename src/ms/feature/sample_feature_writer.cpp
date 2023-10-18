@@ -14,6 +14,7 @@
 
 #include <set>
 #include <algorithm>
+#include <iomanip>
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
@@ -52,8 +53,10 @@ void writeHeader(std::ofstream &of) {
 void writeOneFeature(std::ofstream &of, SampleFeaturePtr feature) {
   of << feature->getSampleId() << "\t"
       << feature->getId() << "\t"
+      << std::fixed << std::setprecision(6) 
       << feature->getMonoMass() << "\t"
       << feature->getIntensity() << "\t"
+      << std::setprecision(2) 
       << feature->getTimeBegin()/60 << "\t"
       << feature->getTimeEnd()/60 << "\t"
       << feature->getMinScan() << "\t"
@@ -62,6 +65,7 @@ void writeOneFeature(std::ofstream &of, SampleFeaturePtr feature) {
       << feature->getMaxCharge() << "\t"
       << feature->getApexTime()/60 << "\t"
       << feature->getApexScan() << "\t"
+      << std::setprecision(6)
       << feature->getApexInte() << "\t"
       << feature->getRepCharge() << "\t"
       << feature->getRepAvgMz() << "\t"
@@ -69,7 +73,9 @@ void writeOneFeature(std::ofstream &of, SampleFeaturePtr feature) {
       << feature->getEcScore() << "\t"
       << feature->getMinFracId() << "\t"
       << feature->getMaxFracId() << "\t" 
-      << feature->getElutionLen()
+      << std::setprecision(2) 
+      << feature->getElutionLen() 
+      << std::setprecision(6) 
       << std::endl;
 }
 
