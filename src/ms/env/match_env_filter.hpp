@@ -21,8 +21,10 @@
 namespace toppic {
 
 namespace match_env_filter {
+  // filter envelopes in MS/MS spectra using precursor mass 
+  // and estimated number of fragment ions
   MatchEnvPtrVec filter(MatchEnvPtrVec &ori_envs, double prec_mass, 
-                        EnvParaPtr env_para_ptr);
+                        bool use_msdeconv, EnvParaPtr env_para_ptr);
 }
 
 }

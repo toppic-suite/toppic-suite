@@ -62,8 +62,8 @@ void delFile(const std::string &path);
 void rename(const std::string &ori_name, 
             const std::string &new_name);
 
-void cleanPrefix(const std::string & ref_name, 
-                 const std::string & prefix);
+void cleanPrefix(std::string ref_name, 
+                 std::string prefix);
 
 void cleanTempFiles(const std::string & ref_name, 
                     const std::string & ext_prefix);

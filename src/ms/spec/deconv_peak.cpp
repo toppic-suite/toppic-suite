@@ -21,19 +21,19 @@
 
 namespace toppic {
 
-DeconvPeak::DeconvPeak(int sp_id, int id, double mono_mass, 
+DeconvPeak::DeconvPeak(int sp_id, int peak_id, double mono_mass, 
                        double intensity, int charge):
     Peak(mono_mass, intensity),
     sp_id_(sp_id),
-    id_(id),
+    peak_id_(peak_id),
     charge_(charge),
     score_(1.0) {}
 
-DeconvPeak::DeconvPeak(int sp_id, int id, double mono_mass, 
+DeconvPeak::DeconvPeak(int sp_id, int peak_id, double mono_mass, 
                        double intensity, int charge, double score):
     Peak(mono_mass, intensity),
     sp_id_(sp_id),
-    id_(id),
+    peak_id_(peak_id),
     charge_(charge),
     score_(score) {}
 
@@ -41,7 +41,7 @@ DeconvPeak::DeconvPeak(XmlDOMElement* element):
     Peak(xml_dom_util::getDoubleChildValue(element, "position", 0),
          xml_dom_util::getDoubleChildValue(element, "intensity", 0)) {
       sp_id_ = xml_dom_util::getIntChildValue(element, "sp_id", 0);
-      id_ = xml_dom_util::getIntChildValue(element, "id", 0);
+      peak_id_ = xml_dom_util::getIntChildValue(element, "peak_id", 0);
       charge_ = xml_dom_util::getIntChildValue(element, "charge", 0);
       score_ = xml_dom_util::getDoubleChildValue(element, "score", 0);
     }
@@ -55,8 +55,8 @@ void DeconvPeak::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
   xml_doc->addElement(element, "intensity", str.c_str());
   str = str_util::toString(sp_id_);
   xml_doc->addElement(element, "sp_id", str.c_str());
-  str = str_util::toString(id_);
-  xml_doc->addElement(element, "id", str.c_str());
+  str = str_util::toString(peak_id_);
+  xml_doc->addElement(element, "peak_id", str.c_str());
   str = str_util::toString(charge_);
   xml_doc->addElement(element, "charge", str.c_str());
   str = str_util::toString(score_);

@@ -710,6 +710,27 @@ PWIZ_API_DECL string read_file_header(const string& filepath, size_t length)
     return head;
 }
 
+PWIZ_API_DECL void check_path_length(const string& path)
+{
+#ifdef WIN32
+    if (isHTTP(path)) return;
+    std::wstring wide_path = boost::locale::conv::utf_to_utf<wchar_t>(bfs::absolute(path).string());
+    if (wide_path.length() > 250)
+        throw std::invalid_argument("path is too long (must be 250 characters or less): " + bfs::absolute(path).string());
+#endif
+}
+
+
+PWIZ_API_DECL TemporaryFile::TemporaryFile(const string& extension)
+{
+    filepath = bfs::temp_directory_path() / bfs::unique_path("%%%%%%%%%%%%%%%%" + extension);
+}
+
+PWIZ_API_DECL TemporaryFile::~TemporaryFile()
+{
+    if (bfs::exists(filepath))
+        bfs::remove(filepath);
+}
 
 PWIZ_API_DECL std::pair<int, int> get_console_bounds(const std::pair<int, int>& defaultBounds)
 {

@@ -26,9 +26,10 @@
 #include "common/base/neutral_loss.hpp"
 #include "common/thread/simple_thread_pool.hpp"
 
-#include "ms/spec/simple_msalign_reader.hpp"
+#include "ms/spec/msalign_reader.hpp"
 #include "ms/spec/msalign_util.hpp"
 #include "ms/spec/theo_peak.hpp"
+#include "ms/spec/deconv_ms_util.hpp"
 #include "ms/factory/extend_ms_util.hpp"
 #include "ms/factory/extend_ms_factory.hpp"
 #include "ms/factory/spectrum_set_factory.hpp"
@@ -154,7 +155,7 @@ void DprProcessor::process() {
   PrsmPtr prsm_ptr = prsm_reader->readOnePrsm(fasta_reader_ptr, prsm_para_ptr->getFixModPtrVec());
 
   // no multi-spec support now
-  SimpleMsAlignReaderPtr sp_reader_ptr = std::make_shared<SimpleMsAlignReader>(
+  MsAlignReaderPtr ms_reader_ptr = std::make_shared<MsAlignReader>(
       sp_file_name,
       1,  // prsm_para_ptr->getGroupSpecNum()
       sp_para_ptr_->getActivationPtr()); 
@@ -164,35 +165,36 @@ void DprProcessor::process() {
   int spectrum_num = msalign_util::getSpNum(sp_file_name);
 
   int cnt = 0;
-
-  //SpectrumSetPtr spec_set_ptr = sp_reader_ptr->getNextSpectrumSet(sp_para_ptr_)[0];
-  SpectrumSetPtr spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(sp_reader_ptr,
-                                                                             sp_para_ptr_,
-                                                                             peak_num_limit);
-  while (spec_set_ptr != nullptr) {
+  DeconvMsPtrVec deconv_ms_ptr_vec = ms_reader_ptr->getNextMsPtrVec();
+  while (deconv_ms_ptr_vec.size() != 0) {
     cnt += prsm_para_ptr->getGroupSpecNum();
-    if (spec_set_ptr->isValid()) {
-      int spec_id = spec_set_ptr->getSpectrumId();
-      while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_id) {
-        DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
+    MsHeaderPtr header_ptr = deconv_ms_ptr_vec[0]->getMsHeaderPtr();
+    if (header_ptr->containsPrec()) {
+      deconv_ms_util::keepTopPeaks(deconv_ms_ptr_vec, peak_num_limit);
+      double prec_mono_mass = header_ptr->getFirstPrecMonoMass() - sp_para_ptr_->getNTermLabelMass();
+      SpectrumSetPtr spec_set_ptr  
+        = spectrum_set_factory::geneSpectrumSetPtr(deconv_ms_ptr_vec,
+                                                   sp_para_ptr_, prec_mono_mass);
 
-        ExtendMsPtrVec refine_ms_ptr_vec
+      if (spec_set_ptr->isValid()) {
+        int spec_id = spec_set_ptr->getSpectrumId();
+        while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_id) {
+          DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
+
+          ExtendMsPtrVec refine_ms_ptr_vec
             = extend_ms_factory::geneMsThreePtrVec(deconv_ms_ptr_vec,
                                                    sp_para_ptr_,
                                                    prsm_ptr->getAdjustedPrecMass());
 
-        processOnePrsm(prsm_ptr, spec_set_ptr, prsm_writer);
+          processOnePrsm(prsm_ptr, spec_set_ptr, prsm_writer);
 
-        prsm_ptr = prsm_reader->readOnePrsm(fasta_reader_ptr, prsm_para_ptr->getFixModPtrVec());
+          prsm_ptr = prsm_reader->readOnePrsm(fasta_reader_ptr, prsm_para_ptr->getFixModPtrVec());
+        }
       }
     }
-    //spec_set_ptr = sp_reader_ptr->getNextSpectrumSet(sp_para_ptr_)[0];
-    spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(sp_reader_ptr,
-                                                                sp_para_ptr_,
-                                                                peak_num_limit);
-
     std::cout << std::flush << "E-value computation - processing " << cnt << " of "
         << spectrum_num << " spectra.\r";
+    deconv_ms_ptr_vec = ms_reader_ptr->getNextMsPtrVec();
   }
   pool_ptr_->ShutDown();
   std::cout << std::endl;
@@ -236,7 +238,7 @@ std::function<void()> geneTask(SpectrumSetPtr spec_set_ptr,
 
     double ppo = mng_ptr->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()->getPpo();
 
-    double tolerance = refine_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecErrorTolerance(ppo);
+    double tolerance = refine_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecErrorTolerance(ppo);
 
     std::vector<double> ms_masses = extend_ms_util::getExtendMassVec(refine_ms_ptr_vec[0]);
 

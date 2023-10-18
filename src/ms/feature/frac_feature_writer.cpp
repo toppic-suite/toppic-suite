@@ -21,7 +21,7 @@
 #include "common/xml/xml_dom_impl.hpp"
 #include "common/xml/xml_dom_util.hpp"
 #include "ms/spec/peak_util.hpp"
-#include "ms/env/envelope.hpp"
+#include "ms/env/env.hpp"
 #include "ms/env/env_base.hpp"
 #include "ms/feature/frac_feature_writer.hpp"
 
@@ -99,7 +99,7 @@ void writeBatMassFeatures(const std::string &output_file_name,
       << "rtHi" << delimit
       << "color" << delimit
       << "opacity" << delimit
-      << "promex_score"
+      << "ecscore"
       << std::endl;
   for (size_t i = 0; i < features.size(); i++) {
     FracFeaturePtr feature = features[i];
@@ -110,10 +110,10 @@ void writeBatMassFeatures(const std::string &output_file_name,
       SingleChargeFeaturePtr single_feature = single_features[j];
       int charge = single_feature->getCharge();
       double mono_mz = peak_util::compMz(mono_mass, charge);
-      EnvelopePtr ref_env = EnvBase::getStaticEnvByMonoMass(mono_mass);
-      EnvelopePtr theo_env = ref_env->distrToTheoMono(mono_mz, charge);
+      EnvPtr ref_env = EnvBase::getEnvByMonoMass(mono_mass);
+      EnvPtr theo_env = ref_env->distrToTheoMono(mono_mz, charge);
       double min_inte = 0.03;
-      EnvelopePtr filtered_env = theo_env->getSubEnv(min_inte); 
+      EnvPtr filtered_env = theo_env->getSubEnv(min_inte);
       //margin for envelopes
       double margin = 0.1; 
       double min_mz = filtered_env->getMinMz() - margin;
@@ -134,7 +134,7 @@ void writeBatMassFeatures(const std::string &output_file_name,
           << (single_feature->getTimeEnd()/60) << delimit
           << "#FF0000" << delimit
           << "0.1" << delimit
-          << feature->getPromexScore()
+          << feature->getEcscore()
           << std::endl;
     }
   }

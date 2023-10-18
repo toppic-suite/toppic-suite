@@ -16,6 +16,7 @@
 #define TOPPIC_MS_SPEC_MS_HEADER_HPP_
 
 #include "common/base/activation.hpp"
+#include "ms/spec/precursor.hpp"
 
 namespace toppic {
 
@@ -28,103 +29,105 @@ class MsHeader {
 
   MsHeader(XmlDOMElement* element);
 
-  double getPrecMonoMass();
+  // get functions for all spectra
+  int getFractionId() {return fraction_id_;}
 
-  double getPrecSpMass();
+  std::string getFileName() {return file_name_;}
 
-  double getPrecMonoMassMinusWater();
-
-  std::pair<int,int> getPrecMonoMassMinusWaterError(double ppo, double scale);
+  int getSpecId() {return spec_id_;}
 
   std::string getScansString();
 
   int getFirstScanNum() {return scans_[0];}
 
-  void setScans(const std::string &s);
-
-  std::string toString();
-
-  // get functions 
-  ActivationPtr getActivationPtr() {return activation_ptr_;}
-
-  int getId() {return id_;}
-
-  int getFractionId() {return fraction_id_;}
-
-  std::string getFileName() {return file_name_;}
+  std::string getTitle() {return title_;}
 
   int getMsLevel() {return level_;}
 
-  std::string getTitle() {return title_;}
+  double getRetentionTime() {return retention_time_;}
 
+  double getVoltage() {return voltage_;}
+
+  // get functions for MS/MS  
   int getMsOneId() {return ms_one_id_;}
 
   int getMsOneScan() {return ms_one_scan_;}
 
-  double getPrecSpMz() {return prec_sp_mz_;}
-
-  int getPrecCharge() {return prec_charge_;}
-
-  double getPrecMonoMz();
-
   double getPrecTargetMz() {return prec_target_mz_;}
 
-  double getPrecWinBegin() {return prec_target_mz_ - isolation_lower_offset_;}
+  double getPrecWinBegin() {return prec_win_begin_;}
 
-  double getPrecWinEnd() {return prec_target_mz_ + isolation_upper_offset_;}
+  double getPrecWinEnd() {return prec_win_end_;}
 
-  double getRetentionTime() {return retention_time_;}
+  ActivationPtr getActivationPtr() {return activation_ptr_;}
 
-  int getPrecId() {return prec_id_;}
+  //get functions for precursor 
+  int getPrecNum() {return prec_ptr_vec_.size();}
 
-  double getPrecErrorTolerance(double ppo) {return getPrecMonoMass() * ppo;}
+  bool containsPrec() {return prec_ptr_vec_.size() > 0;}
 
-  double getPrecInte() {return prec_inte_;}
+  PrecursorPtr getFirstPrecPtr();
 
-  double getTimeApex() {return time_apex_;}
+  PrecursorPtrVec getPrecPtrVec() {return prec_ptr_vec_;}
 
-  double getVoltage() {return voltage_;}
+  int getFirstPrecId();
 
-  // set function 
-  void setActivationPtr(ActivationPtr acti_ptr) {activation_ptr_ = acti_ptr;}
+  double getFirstPrecMonoMz();
+
+  int getFirstPrecCharge();
+
+  double getFirstPrecInte();
+
+  double getFirstPrecMonoMass();
+
+  int getFirstPrecFeatureId();
+
+  double getFirstPrecMonoMassMinusWater();
+
+  double getFirstPrecErrorTolerance(double ppo);
+
+  std::pair<int,int> getFirstPrecMonoMassMinusWaterError(double ppo, double scale);
+
+  // set functions for all spectra 
+  void setFractionId(int fraction_id) {fraction_id_ = fraction_id;}
 
   void setFileName(const std::string &file_name) {file_name_ = file_name;}
 
-  void setId(int id) {id_ = id;}
-
-  void setFractionId(int fraction_id) {fraction_id_ = fraction_id;}
+  void setSpecId(int spec_id) {spec_id_ = spec_id;}
 
   void setTitle(const std::string &title) {title_ = title;}
 
+  void setScans(const std::vector<int> &scans) {scans_ = scans;}
+
+  void setScans(const std::string &s);
+
+  void setSingleScan(int scan_num); 
+
+  void setRetentionTime(double retention_time) {retention_time_ = retention_time;}
+
+  void setMsLevel(int level) {level_ = level;}
+
+  void setVoltage(double voltage) {voltage_ = voltage;}
+
+  // set functions for MS/MS spectra
   void setMsOneId(int ms_one_id) {ms_one_id_ = ms_one_id;}
 
   void setMsOneScan(int ms_one_scan) {ms_one_scan_ = ms_one_scan;}
 
-  void setPrecSpMz(double prec_sp_mz) {prec_sp_mz_ = prec_sp_mz;}
-
-  void setPrecCharge(int prec_charge) {prec_charge_ = prec_charge;}
-
-  void setPrecMonoMz(double prec_mono_mz) {prec_mono_mz_ = prec_mono_mz;}
-
   void setPrecTargetMz(double prec_target_mz) {prec_target_mz_ = prec_target_mz;}
 
-  void setIsolationLowerOffset(double offset) {isolation_lower_offset_ = offset;}
+  void setPrecWinBegin(double prec_win_begin) {prec_win_begin_ = prec_win_begin;}
 
-  void setIsolationUpperOffset(double offset) {isolation_upper_offset_ = offset;}
+  void setPrecWinEnd(double prec_win_end) {prec_win_end_ = prec_win_end;}
+  
+  void setActivationPtr(ActivationPtr acti_ptr) {activation_ptr_ = acti_ptr;}
 
-  void setRetentionTime(double retention_time) {retention_time_ = retention_time;}
+  // set function for precursor 
+  void setSinglePrecPtr(PrecursorPtr prec_ptr); 
 
-  void setScan(int scan_num) {scans_.push_back(scan_num);}
+  void setPrecPtrVec(PrecursorPtrVec prec_ptr_vec) {prec_ptr_vec_ = prec_ptr_vec;}
 
-  void setScans(const std::vector<int> &scans) {scans_ = scans;}
-
-  void setMsLevel(int level) {level_ = level;}
-
-  void setPrecId(int prec_id) {prec_id_ = prec_id;}
-
-  void setPrecInte(double inte) {prec_inte_ = inte;}
-
-  void setVoltage(double voltage) {voltage_ = voltage;}
+  std::string toString();
 
   XmlDOMElement* getHeaderXml(XmlDOMDocument* xml_doc);
 
@@ -132,55 +135,46 @@ class MsHeader {
 
   static std::string getXmlElementName() {return "ms_header";}
 
+  // The sorting function is used in ms2 feature assignment
+  static bool cmpPrecInteDec(const MsHeaderPtr &a, const MsHeaderPtr &b);
+  
+  // Used in generating MS/MS spectra with adjusted precursor mass 
   static MsHeaderPtr geneMsHeaderPtr(MsHeaderPtr ori_ptr, double new_prec_mass);
 
-  static bool cmpPrecInteDec(const MsHeaderPtr &a, const MsHeaderPtr &b);
-
  private:
-  int id_ = -1;
-
-  // a data set may have multiple fractions
-  int fraction_id_ = -1;
-
   // mass spec data file name 
   std::string file_name_;
-
-  // one spectrum may have several possible precursor mass */
-  // precursor id 
-  int prec_id_ = -1;
-
+  // a data set may have multiple fractions
+  int fraction_id_ = -1;
+  // spec id
+  int spec_id_ = -1;
+  // mass spec title
   std::string title_;
   // a list of scans for merged spectra 
   std::vector<int> scans_;
   // ms level 
   int level_ = 0;
-  // activation type 
-  ActivationPtr activation_ptr_;
+  // retention time 
+  double retention_time_ = -1;
+  //compensation voltage for FAIME data
+  double voltage_ = -1;
+
+  // information for ms/ms spectra
   // ms1 id 
   int ms_one_id_ = -1;
   // ms1 scan number
   int ms_one_scan_ = -1;
-  // retention time 
-  double retention_time_ = -1;
-  // precursor m/z value in the mzML file. 
-  // In Thermo data, they are monoisotpic precursor m/z value  
-  double prec_sp_mz_ = -1;
-  // computed monoisotopic precursor m/z value 
-  double prec_mono_mz_ = -1;
-  // isolation window targeted m/z
+  // precursor isolation window begin
+  double prec_win_begin_ = -1;
+  // precusor isolation window end
+  double prec_win_end_ = -1;
+  // precursor isolation window targeted m/z
   double prec_target_mz_ = -1;
-  // isolation window lower offset
-  double isolation_lower_offset_ = -1;
-  // isolation window upper offset
-  double isolation_upper_offset_ = -1;
-  // precursor charge state  
-  int prec_charge_ = -1;
-  // precursor intensity 
-  double prec_inte_ = 0;
-  //rt with the highest intensity in this feature
-  double time_apex_ = -1;
-  //compensation voltage for FAIME data
-  double voltage_ = -1;
+  // activation type 
+  ActivationPtr activation_ptr_;
+
+  // Precursor information
+  PrecursorPtrVec prec_ptr_vec_;
 };
 
 typedef std::vector<MsHeaderPtr> MsHeaderPtrVec;

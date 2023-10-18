@@ -21,23 +21,17 @@
 
 namespace toppic {
 
-class MsAlignFracMerge {
- public:
-  MsAlignFracMerge(const std::vector<std::string> &spec_file_names,
-                   const std::string &output_file_name);
+namespace msalign_frac_merge {
 
-  void process(std::string &para_str);
+void mergeMsalignFiles(const std::vector<std::string> &spec_file_lst,
+                              const std::string &output_file, 
+                              const std::string &para_str);
 
-  static void mergeFiles(const std::vector<std::string> &spec_file_lst,
-                         const std::string &output_file, 
-                         const std::string &para_str);
+void mergeFractions(const std::vector<std::string> &spec_file_names,
+                    const std::string &output_file_name, 
+                    std::string &para_str);
 
- private:
-  std::vector<std::string> spec_file_names_;
-  std::string output_file_name_;
-};
-
-typedef std::shared_ptr<MsAlignFracMerge> MsAlignFracMergePtr;
+}
 
 } // namespace toppic 
 

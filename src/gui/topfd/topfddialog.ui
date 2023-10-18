@@ -97,9 +97,9 @@
     <property name="geometry">
      <rect>
       <x>620</x>
-      <y>290</y>
+      <y>200</y>
       <width>311</width>
-      <height>41</height>
+      <height>42</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_13">
@@ -180,9 +180,9 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>170</y>
+      <y>160</y>
       <width>241</width>
-      <height>44</height>
+      <height>42</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_6">
@@ -236,9 +236,9 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>210</y>
+      <y>200</y>
       <width>241</width>
-      <height>41</height>
+      <height>42</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -285,10 +285,10 @@
    <widget class="QWidget" name="horizontalLayoutWidget_4">
     <property name="geometry">
      <rect>
-      <x>620</x>
-      <y>210</y>
-      <width>311</width>
-      <height>41</height>
+      <x>30</x>
+      <y>240</y>
+      <width>241</width>
+      <height>42</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_4">
@@ -315,7 +315,7 @@
        </property>
        <property name="maximumSize">
         <size>
-         <width>75</width>
+         <width>70</width>
          <height>16777215</height>
         </size>
        </property>
@@ -330,9 +330,9 @@
     <property name="geometry">
      <rect>
       <x>300</x>
-      <y>170</y>
+      <y>160</y>
       <width>271</width>
-      <height>44</height>
+      <height>42</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_5">
@@ -445,9 +445,9 @@
     <property name="geometry">
      <rect>
       <x>620</x>
-      <y>170</y>
+      <y>160</y>
       <width>311</width>
-      <height>44</height>
+      <height>42</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0">
@@ -460,7 +460,7 @@
         </size>
        </property>
        <property name="text">
-        <string>Precursor window size (m/z): </string>
+        <string>Default precursor window (m/z): </string>
        </property>
       </widget>
      </item>
@@ -468,7 +468,7 @@
       <widget class="QLineEdit" name="windowSizeEdit">
        <property name="minimumSize">
         <size>
-         <width>0</width>
+         <width>75</width>
          <height>0</height>
         </size>
        </property>
@@ -489,9 +489,9 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>360</y>
+      <y>350</y>
       <width>901</width>
-      <height>181</height>
+      <height>191</height>
      </rect>
     </property>
     <property name="html">
@@ -506,9 +506,9 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>300</x>
-      <y>210</y>
+      <y>200</y>
       <width>271</width>
-      <height>41</height>
+      <height>42</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_8">
@@ -540,17 +540,17 @@ p, li { white-space: pre-wrap; }
       <x>30</x>
       <y>60</y>
       <width>901</width>
-      <height>111</height>
+      <height>101</height>
      </rect>
     </property>
    </widget>
    <widget class="QWidget" name="horizontalLayoutWidget_10">
     <property name="geometry">
      <rect>
-      <x>620</x>
-      <y>250</y>
-      <width>311</width>
-      <height>41</height>
+      <x>300</x>
+      <y>240</y>
+      <width>271</width>
+      <height>42</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_9">
@@ -571,13 +571,13 @@ p, li { white-space: pre-wrap; }
       <widget class="QLineEdit" name="threadNumberEdit">
        <property name="minimumSize">
         <size>
-         <width>0</width>
+         <width>70</width>
          <height>0</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>75</width>
+         <width>70</width>
          <height>16777215</height>
         </size>
        </property>
@@ -592,9 +592,9 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>270</y>
-      <width>541</width>
-      <height>81</height>
+      <y>290</y>
+      <width>901</width>
+      <height>61</height>
      </rect>
     </property>
     <property name="title">
@@ -603,7 +603,7 @@ p, li { white-space: pre-wrap; }
     <widget class="QWidget" name="horizontalLayoutWidget_11">
      <property name="geometry">
       <rect>
-       <x>270</x>
+       <x>240</x>
        <y>20</y>
        <width>201</width>
        <height>25</height>
@@ -631,8 +631,8 @@ p, li { white-space: pre-wrap; }
     <widget class="QWidget" name="horizontalLayoutWidget_12">
      <property name="geometry">
       <rect>
-       <x>270</x>
-       <y>50</y>
+       <x>700</x>
+       <y>20</y>
        <width>201</width>
        <height>25</height>
       </rect>
@@ -687,15 +687,15 @@ p, li { white-space: pre-wrap; }
     <widget class="QWidget" name="horizontalLayoutWidget_15">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>50</y>
+       <x>470</x>
+       <y>20</y>
        <width>201</width>
        <height>25</height>
       </rect>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_14">
       <item>
-       <widget class="QCheckBox" name="envCNNCheckBox">
+       <widget class="QCheckBox" name="msDeconvCheckBox">
         <property name="minimumSize">
          <size>
           <width>150</width>
@@ -706,7 +706,7 @@ p, li { white-space: pre-wrap; }
          <bool>false</bool>
         </property>
         <property name="text">
-         <string>Use EnvCNN for scoring</string>
+         <string>Use MS-Deconv score</string>
         </property>
         <property name="checkable">
          <bool>true</bool>

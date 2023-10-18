@@ -20,24 +20,24 @@ namespace toppic {
 
 namespace charge_cmp {
 
-// get common peaks in two peak lists 
-std::vector<int> getCommonPeak(RealEnvPtr env_a, RealEnvPtr env_b) {
+// get shared peaks in two peak lists 
+std::vector<int> getSharedPeaks(ExpEnvPtr env_a, ExpEnvPtr env_b) {
   int len = env_a->getPeakNum();
-  std::vector<int> common_peaks(len, -1);
+  std::vector<int> shared_peaks(len, -1);
   for (int i = 0; i < len; i++) {
     int a_idx = env_a->getPeakIdx(i);
     for (int j = 0; j < env_b->getPeakNum(); j++) {
       int b_idx = env_b->getPeakIdx(j);
       if (env_a->isExist(i) && a_idx == b_idx) {
-        common_peaks[i] = a_idx;
+        shared_peaks[i] = a_idx;
       }
     }
   }
-  return common_peaks;
+  return shared_peaks;
 }
 
-// count the number of common peaks. 
-int cntCommonPeak(std::vector<int> &list_a) {
+// count the number of shared peaks. 
+int cntSharedPeaks(std::vector<int> &list_a) {
   int cnt = 0;
   for (size_t i = 0; i < list_a.size(); i++) {
     if (list_a[i] >= 0) {
@@ -50,19 +50,21 @@ int cntCommonPeak(std::vector<int> &list_a) {
 // check if the second charge state is better 
 bool isSecondBetter(const PeakPtrVec &peak_list, MatchEnvPtr a,
                     MatchEnvPtr  b, double tolerance) {
-  // get common peak 
-  std::vector<int> common_peaks = getCommonPeak(a->getRealEnvPtr(), b->getRealEnvPtr());
-  int common_num = cntCommonPeak(common_peaks);
-  if (common_num <= 6) {
+  // get shared peak 
+  std::vector<int> s_peaks = getSharedPeaks(a->getExpEnvPtr(),
+                                            b->getExpEnvPtr());
+  int s_num = cntSharedPeaks(s_peaks);
+  if (s_num <= 6) {
     return false;
   }
   /* get distance list */
   std::vector<double> dist;
-  for (size_t i = 0; i < common_peaks.size(); i++) {
-    for (size_t j = i + 1; j < common_peaks.size(); j++) {
-      if (common_peaks[i] >= 0 && common_peaks[j] >= 0) {
-        dist.push_back(
-            (peak_list[common_peaks[j]]->getPosition() - peak_list[common_peaks[i]]->getPosition()) / (j - i));
+  double d; 
+  for (size_t i = 0; i < s_peaks.size(); i++) {
+    for (size_t j = i + 1; j < s_peaks.size(); j++) {
+      if (s_peaks[i] >= 0 && s_peaks[j] >= 0) {
+        d = (peak_list[s_peaks[j]]->getPosition() - peak_list[s_peaks[i]]->getPosition()) / (j - i);
+        dist.push_back(d);
       }
     }
   }

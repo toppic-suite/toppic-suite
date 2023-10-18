@@ -15,9 +15,9 @@
 #ifndef TOPPIC_TOPFD_ENV_MATCH_ENV_UTIL_HPP_
 #define TOPPIC_TOPFD_ENV_MATCH_ENV_UTIL_HPP_
 
-#include "ms/spec/peak.hpp"
 #include "ms/spec/ms_header.hpp"
 #include "ms/spec/deconv_ms.hpp"
+#include "ms/env/env_para.hpp"
 #include "ms/env/match_env.hpp"
 
 namespace toppic {
@@ -44,10 +44,10 @@ MatchEnvPtr getNewMatchEnv(PeakPtrVec &ms, int idx, double tolerance);
 // charge state and monoisotopic mass, we will 
 // add several envelopes with two consecutive charges
 // and envelopes with -1 and +1 Dalton shift
-MatchEnvPtrVec addMultipleMass(MatchEnvPtrVec &envs, MatchEnvPtr2D &candidates,
-                               double multi_min_mass, int multi_min_charge, double min_ratio);
+MatchEnvPtrVec addMultipleMass(MatchEnvPtrVec &envs, MatchEnvPtr2D &candidates, 
+                               EnvParaPtr env_para_ptr);
 
-DeconvMsPtr getDeconvMsPtr(MsHeaderPtr header_ptr, MatchEnvPtrVec &envs);
+DeconvMsPtr getDeconvMsPtr(MsHeaderPtr header_ptr, MatchEnvPtrVec &envs); 
 
 }  // namespace match_env_util
 

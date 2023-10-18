@@ -29,6 +29,7 @@ class SpectrumSet {
  public:
   SpectrumSet(DeconvMsPtrVec deconv_ms_ptr_vec, 
               double prec_mono_mass,
+              double n_term_label_mass,
               bool valid, 
               ExtendMsPtrVec extend_ms_three_ptr_vec,
               PrmMsPtrVec prm_ms_two_ptr_vec,
@@ -37,9 +38,11 @@ class SpectrumSet {
 
   double getPrecMonoMass() {return prec_mono_mass_;}
 
+  double getNTermLabelMass() {return n_term_label_mass_;}
+
   bool isValid() {return valid_;}
 
-  int getSpectrumId() {return deconv_ms_ptr_vec_[0]->getMsHeaderPtr()->getId();}
+  int getSpectrumId() {return deconv_ms_ptr_vec_[0]->getMsHeaderPtr()->getSpecId();}
 
   ExtendMsPtrVec getMsThreePtrVec() {return extend_ms_three_ptr_vec_;}
 
@@ -51,12 +54,12 @@ class SpectrumSet {
 
   PrmMsPtrVec getMsSixPtrVec() {return prm_ms_six_ptr_vec_;}
 
-  //PrmMsPtrVec getSuffixMsSixPtrVec() {return srm_ms_six_ptr_vec_;}
-
  private:
   DeconvMsPtrVec deconv_ms_ptr_vec_;
 
   double prec_mono_mass_;
+
+  double n_term_label_mass_ = 0;
 
   bool valid_ = true;
 
@@ -67,9 +70,6 @@ class SpectrumSet {
   PrmMsPtrVec srm_ms_two_ptr_vec_;
 
   PrmMsPtrVec prm_ms_six_ptr_vec_;
-
-  //suffix ms six is not used
-  //PrmMsPtrVec srm_ms_six_ptr_vec_;
 
 };
 

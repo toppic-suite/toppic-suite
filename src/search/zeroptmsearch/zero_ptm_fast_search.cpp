@@ -77,8 +77,8 @@ double compScore(const ExtendMsPtrVec &ms_ptr_vec, ProteoformPtr proteo_ptr,
 ZpFastMatchPtr computeCompMatch(const ExtendMsPtrVec &ms_ptr_vec,
                                 ProteoformPtr proteo_ptr, double ppo) {
   MsHeaderPtr header_ptr = ms_ptr_vec[0]->getMsHeaderPtr();
-  double max_error = header_ptr->getPrecErrorTolerance(ppo);
-  double res_sum_mass = header_ptr->getPrecMonoMassMinusWater();
+  double max_error = header_ptr->getFirstPrecErrorTolerance(ppo);
+  double res_sum_mass = header_ptr->getFirstPrecMonoMassMinusWater();
   double prot_mass = proteo_ptr->getResSeqPtr()->getResMassSum();
   double error = std::abs(res_sum_mass - prot_mass);
   double score = 0;
@@ -94,8 +94,8 @@ ZpFastMatchPtr computePrefixMatch(const ExtendMsPtrVec &ms_ptr_vec,
   /* check if there is a matched prefix */
   std::vector<double> prms = proteo_ptr->getBpSpecPtr()->getPrmMasses();
   MsHeaderPtr header_ptr = ms_ptr_vec[0]->getMsHeaderPtr();
-  double max_error = header_ptr->getPrecErrorTolerance(ppo);
-  double res_sum_mass = header_ptr->getPrecMonoMassMinusWater();
+  double max_error = header_ptr->getFirstPrecErrorTolerance(ppo);
+  double res_sum_mass = header_ptr->getFirstPrecMonoMassMinusWater();
 
   bool is_prefix = false;
   int seq_end = 0;
@@ -122,8 +122,8 @@ ZpFastMatchPtr computeSuffixMatch(const ExtendMsPtrVec &ms_ptr_vec,
                                   ProteoformPtr proteo_ptr, double ppo) {
   std::vector<double> prms = proteo_ptr->getBpSpecPtr()->getPrmMasses();
   MsHeaderPtr header_ptr = ms_ptr_vec[0]->getMsHeaderPtr();
-  double max_error = header_ptr->getPrecErrorTolerance(ppo);
-  double res_sum_mass = header_ptr->getPrecMonoMassMinusWater();
+  double max_error = header_ptr->getFirstPrecErrorTolerance(ppo);
+  double res_sum_mass = header_ptr->getFirstPrecMonoMassMinusWater();
   double diff = prms[prms.size()-1] - res_sum_mass;
 
   bool is_suffix = false;
@@ -152,8 +152,8 @@ ZpFastMatchPtr computeInternalMatch(const ExtendMsPtrVec &ms_ptr_vec,
                                     ProteoformPtr proteo_ptr, double ppo) {
   std::vector<double> prms = proteo_ptr->getBpSpecPtr()->getPrmMasses();
   MsHeaderPtr header_ptr = ms_ptr_vec[0]->getMsHeaderPtr();
-  double max_error = header_ptr->getPrecErrorTolerance(ppo);
-  double res_sum_mass = header_ptr->getPrecMonoMassMinusWater();
+  double max_error = header_ptr->getFirstPrecErrorTolerance(ppo);
+  double res_sum_mass = header_ptr->getFirstPrecMonoMassMinusWater();
 
   ActivationPtr activation = header_ptr->getActivationPtr();
   IonTypePtr n_ion_type_ptr = activation->getNIonTypePtr();

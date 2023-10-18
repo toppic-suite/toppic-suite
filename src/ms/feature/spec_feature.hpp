@@ -19,6 +19,7 @@
 #include <memory>
 #include <vector>
 
+#include "ms/spec/peak_util.hpp"
 #include "ms/spec/ms_header.hpp"
 #include "ms/feature/frac_feature.hpp"
 
@@ -30,19 +31,10 @@ typedef std::vector<SpecFeaturePtr> SpecFeaturePtrVec;
 
 class SpecFeature {
  public:
-  /*
-  SpecFeature(int spec_id, int frac_id, 
-              const std::string &file_name,
-              std::string &scans,
-              int ms_one_id, int ms_one_scan, 
-              double prec_mass, double prec_inte,
-              int frac_feature_id, double frac_feature_inte,
-              int sample_feature_id, double sample_feature_inte);
-              */
-
   SpecFeature(std::string line);
 
-  SpecFeature(MsHeaderPtr header, FracFeaturePtr feature);
+  SpecFeature(MsHeaderPtr header, FracFeaturePtr feature,
+              double prec_mono_mz, int prec_charge, double prec_inte);
 
   int getSpecId() {return spec_id_;}
 
@@ -56,7 +48,12 @@ class SpecFeature {
 
   int getMsOneScan() {return ms_one_scan_;}
 
-  double getPrecMass() {return prec_mass_;}
+  double getPrecMonoMz() {return prec_mono_mz_;}
+
+  double getPrecCharge() {return prec_charge_;}
+
+  double getPrecMass() {return peak_util::compPeakNeutralMass(prec_mono_mz_, 
+                                                              prec_charge_);}
 
   double getPrecInte() {return prec_inte_;}
 
@@ -86,21 +83,26 @@ class SpecFeature {
     return a->getSpecId() < b->getSpecId();
   }
 
+  static bool cmpPrecInteDec(const SpecFeaturePtr &a, const SpecFeaturePtr &b) { 
+    return a->getPrecInte() > b->getPrecInte();
+  }
+
  protected:
-  int spec_id_;
   int frac_id_;
   std::string file_name_;
+  int spec_id_;
   std::string scans_;
   int ms_one_id_;
   int ms_one_scan_;
-  double prec_mass_;
-  double prec_inte_;
   int frac_feature_id_;
   double frac_feature_inte_;
   double frac_feature_score_;
   double frac_feature_time_apex_;
   int sample_feature_id_;
   double sample_feature_inte_;
+  double prec_mono_mz_;
+  int prec_charge_;
+  double prec_inte_;
 };
 
 }

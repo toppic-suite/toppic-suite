@@ -17,6 +17,7 @@
 #include "console/topfd_argument.hpp"
 
 int main(int argc, char* argv[]) {
+
   toppic::Argument argu_processor;
   bool success = argu_processor.parse(argc, argv);
 

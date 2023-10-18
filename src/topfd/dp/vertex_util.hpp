@@ -16,7 +16,7 @@
 #ifndef TOPPIC_TOPFD_DP_VERTEX_UTIL_HPP_
 #define TOPPIC_TOPFD_DP_VERTEX_UTIL_HPP_
 
-#include "topfd/spec/deconv_data.hpp"
+#include "topfd/deconv/deconv_data.hpp"
 #include "topfd/dp/vertex_a.hpp"
 #include "topfd/dp/vertex_b.hpp"
 

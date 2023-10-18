@@ -96,27 +96,33 @@ void PrsmMatchTableWriter::write() {
   std::string sp_file_name = prsm_para_ptr_->getSpectrumFileName();
   int group_spec_num = prsm_para_ptr_->getGroupSpecNum();
   SpParaPtr sp_para_ptr = prsm_para_ptr_->getSpParaPtr();
-  SimpleMsAlignReaderPtr ms_reader_ptr 
-      = std::make_shared<SimpleMsAlignReader>(sp_file_name, 
-                                              group_spec_num,
-                                              sp_para_ptr->getActivationPtr());
-  SpectrumSetPtr spec_set_ptr;
-  while ((spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(ms_reader_ptr, sp_para_ptr)) 
-         != nullptr) {
-    if (spec_set_ptr->isValid()) {
-      int spec_id = spec_set_ptr->getSpectrumId();
-      while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_id) {
-        DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
-        prsm_ptr->setDeconvMsPtrVec(deconv_ms_ptr_vec);
-        double new_prec_mass = prsm_ptr->getAdjustedPrecMass();
-        ExtendMsPtrVec extend_ms_ptr_vec
+  MsAlignReaderPtr ms_reader_ptr = std::make_shared<MsAlignReader>(sp_file_name, 
+                                                                   group_spec_num,
+                                                                   sp_para_ptr->getActivationPtr());
+  DeconvMsPtrVec deconv_ms_ptr_vec = ms_reader_ptr->getNextMsPtrVec();
+  while (deconv_ms_ptr_vec.size() != 0) {
+    MsHeaderPtr header_ptr = deconv_ms_ptr_vec[0]->getMsHeaderPtr();
+    if (header_ptr->containsPrec()) {
+      double prec_mono_mass = header_ptr->getFirstPrecMonoMass() - sp_para_ptr->getNTermLabelMass();
+      SpectrumSetPtr spec_set_ptr  
+        = spectrum_set_factory::geneSpectrumSetPtr(deconv_ms_ptr_vec,
+                                                   sp_para_ptr, prec_mono_mass);
+      if (spec_set_ptr->isValid()) {
+        int spec_id = spec_set_ptr->getSpectrumId();
+        while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_id) {
+          DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
+          prsm_ptr->setDeconvMsPtrVec(deconv_ms_ptr_vec);
+          double new_prec_mass = prsm_ptr->getAdjustedPrecMass();
+          ExtendMsPtrVec extend_ms_ptr_vec
             = extend_ms_factory::geneMsThreePtrVec(deconv_ms_ptr_vec, sp_para_ptr, new_prec_mass);
-        prsm_ptr->setRefineMsVec(extend_ms_ptr_vec);
-        //writePrsm(file, prsm_ptr);
-        writePrsmStandardFormat(file, prsm_ptr);
-        prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
+          prsm_ptr->setRefineMsVec(extend_ms_ptr_vec);
+          //writePrsm(file, prsm_ptr);
+          writePrsmStandardFormat(file, prsm_ptr);
+          prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
+        }
       }
     }
+    deconv_ms_ptr_vec = ms_reader_ptr->getNextMsPtrVec();
   }
   prsm_reader.close();
   // write end;
@@ -136,7 +142,7 @@ void PrsmMatchTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   int peak_num = 0;
   DeconvMsPtrVec deconv_ms_ptr_vec = prsm_ptr->getDeconvMsPtrVec();
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
-    spec_ids = spec_ids + str_util::toString(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getId()) + " ";
+    spec_ids = spec_ids + str_util::toString(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getSpecId()) + " ";
     spec_activations = spec_activations 
         + deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getActivationPtr()->getName() + " ";
     spec_scans = spec_scans + deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getScansString() + " ";
@@ -159,13 +165,13 @@ void PrsmMatchTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   file << std::setprecision(10);
   LOG_DEBUG("start output prsm ");
   file << prsm_ptr->getFileName() << delim
-      << prsm_ptr->getPrsmId() << delim
-      << spec_ids << delim
-      << spec_activations<< delim
-      << spec_scans << delim
-      << retention_time << delim
-      << peak_num << delim
-      << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecCharge() << delim
+       << prsm_ptr->getPrsmId() << delim
+       << spec_ids << delim
+       << spec_activations << delim
+       << spec_scans << delim
+       << retention_time << delim
+       << peak_num << delim
+       << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecCharge() << delim
       << prsm_ptr->getOriPrecMass()<< delim
       << prsm_ptr->getAdjustedPrecMass() << delim
       << prsm_ptr->getProteoformPtr()->getProteoClusterId() << delim;
@@ -281,7 +287,7 @@ void PrsmMatchTableWriter::writePrsmStandardFormat(std::ofstream &file, PrsmPtr 
   int peak_num = 0;
   DeconvMsPtrVec deconv_ms_ptr_vec = prsm_ptr->getDeconvMsPtrVec();
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
-    spec_ids = spec_ids + str_util::toString(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getId()) + " ";
+    spec_ids = spec_ids + str_util::toString(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getSpecId()) + " ";
     spec_activations = spec_activations 
         + deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getActivationPtr()->getName() + " ";
     spec_scans = spec_scans + deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getScansString() + " ";
@@ -304,13 +310,13 @@ void PrsmMatchTableWriter::writePrsmStandardFormat(std::ofstream &file, PrsmPtr 
   file << std::setprecision(10);
   LOG_DEBUG("start output prsm ");
   file << prsm_ptr->getFileName() << delim
-      << prsm_ptr->getPrsmId() << delim
-      << spec_ids << delim
-      << spec_activations<< delim
-      << spec_scans << delim
-      << retention_time << delim
-      << peak_num << delim
-      << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecCharge() << delim
+       << prsm_ptr->getPrsmId() << delim
+       << spec_ids << delim
+       << spec_activations << delim
+       << spec_scans << delim
+       << retention_time << delim
+       << peak_num << delim
+       << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecCharge() << delim
       << prsm_ptr->getOriPrecMass()<< delim
       << prsm_ptr->getAdjustedPrecMass() << delim
       << prsm_ptr->getProteoformPtr()->getProteoClusterId() << delim;

@@ -286,8 +286,8 @@ void moveFile(std::string &path_name, std::string &folder_name) {
   delFile(path_name);
 }
 
-void cleanPrefix(const std::string & ref_name, 
-                 const std::string & prefix) {
+void cleanPrefix(std::string ref_name, std::string prefix) {
+  std::replace(ref_name.begin(), ref_name.end(), '\\', '/');
   fs::path ref_path(ref_name);
   fs::path ref_dir = absolute(ref_path).parent_path(); 
   fs::directory_iterator end_iter;

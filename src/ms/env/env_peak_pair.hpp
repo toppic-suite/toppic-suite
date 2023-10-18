@@ -34,6 +34,7 @@ class EnvPeakPair {
   double getPeakScore(double intensity_sum, double tolerance);
 
   MatchEnvPtr getMatchEnvPtr() {return env_ptr_;}
+
   int getPosIdx() { return pos_idx_;}
 
  private:

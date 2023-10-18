@@ -22,9 +22,9 @@ namespace toppic {
 namespace extend_ms_factory {
 
 ExtendMsPtr geneMsThreePtr(DeconvMsPtr deconv_ms_ptr, SpParaPtr sp_para_ptr,
-                           double new_prec_mass) {
+                           double prec_mass) {
   MsHeaderPtr ori_header_ptr = deconv_ms_ptr->getMsHeaderPtr();
-  MsHeaderPtr header_ptr = MsHeader::geneMsHeaderPtr(ori_header_ptr, new_prec_mass);
+  MsHeaderPtr header_ptr = MsHeader::geneMsHeaderPtr(ori_header_ptr, prec_mass);
   ExtendPeakPtrVec list;
   double ext_min_mass = sp_para_ptr->getExtendMinMass();
   std::vector<double> ext_offsets = sp_para_ptr->getExtendOffsets();
@@ -48,7 +48,7 @@ ExtendMsPtr geneMsThreePtr(DeconvMsPtr deconv_ms_ptr, SpParaPtr sp_para_ptr,
   // filter extend_peak
   ExtendPeakPtrVec list_filtered;
   double min_mass = sp_para_ptr->getMinMass();
-  double prec_mono_mass = header_ptr->getPrecMonoMass();
+  double prec_mono_mass = header_ptr->getFirstPrecMonoMass();
   for (size_t i = 0; i < list.size(); i++) {
     double mass = list[i]->getPosition();
     if (mass >= min_mass && mass <= prec_mono_mass - min_mass) {
@@ -70,11 +70,11 @@ ExtendMsPtr geneMsThreePtr(DeconvMsPtr deconv_ms_ptr, SpParaPtr sp_para_ptr,
 }
 
 ExtendMsPtrVec geneMsThreePtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
-                                 SpParaPtr sp_para_ptr, double new_prec_mass) {
+                                 SpParaPtr sp_para_ptr, double prec_mass) {
   ExtendMsPtrVec extend_ms_ptr_vec;
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
     extend_ms_ptr_vec.push_back(
-        geneMsThreePtr(deconv_ms_ptr_vec[i], sp_para_ptr, new_prec_mass));
+        geneMsThreePtr(deconv_ms_ptr_vec[i], sp_para_ptr, prec_mass));
   }
   return extend_ms_ptr_vec;
 }

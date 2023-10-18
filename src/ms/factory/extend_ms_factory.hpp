@@ -23,11 +23,9 @@ namespace toppic {
 
 namespace extend_ms_factory {
 
-ExtendMsPtr geneMsThreePtr(DeconvMsPtr deconv_ms_ptr, SpParaPtr sp_para_ptr,
-                           double new_prec_mass);
-
+// N-terminal PTM is not considered in generating ms three spectra
 ExtendMsPtrVec geneMsThreePtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, 
-                                 SpParaPtr sp_para_ptr, double new_prec_mass);
+                                 SpParaPtr sp_para_ptr, double prec_mass);
 
 }  // namespace extend_ms_factory
 

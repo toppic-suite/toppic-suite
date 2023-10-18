@@ -44,10 +44,9 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
   PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
-  SimpleMsAlignReaderPtr reader_ptr 
-      = std::make_shared<SimpleMsAlignReader>(prsm_para_ptr->getSpectrumFileName(), 
-                                              group_spec_num,
-                                              sp_para_ptr->getActivationPtr());
+  MsAlignReaderPtr reader_ptr = std::make_shared<MsAlignReader>(prsm_para_ptr->getSpectrumFileName(), 
+                                                                group_spec_num,
+                                                                sp_para_ptr->getActivationPtr());
   std::string output_file_name = file_util::basename(prsm_para_ptr->getSpectrumFileName())
       + "." + mng_ptr->output_file_ext_ + "_" + block_str;
   //writer
@@ -61,51 +60,58 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
   std::vector<double> mod_mass(3);
   DeconvMsPtrVec deconv_ms_ptr_vec = reader_ptr->getNextMsPtrVec();
   while (deconv_ms_ptr_vec.size() != 0) {
-    SpectrumSetPtrVec spec_set_vec 
+    if (deconv_ms_ptr_vec[0]->getMsHeaderPtr()->containsPrec()) {
+      SpectrumSetPtrVec spec_set_vec 
         = spectrum_set_factory::geneSpectrumSetPtrVecWithPrecError(deconv_ms_ptr_vec, 
                                                                    sp_para_ptr,
                                                                    prec_error_vec);
-    for (size_t k = 0; k < spec_set_vec.size(); k++) {
-      SpectrumSetPtr spec_set_ptr = spec_set_vec[k]; 
-      if (spec_set_ptr->isValid()) {
-        //LOG_ERROR("precursor " << spec_set_ptr->getPrecMonoMass());
-        DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
-        double prec_mono_mass = spec_set_ptr->getPrecMonoMass();
-        if (mng_ptr->use_approx_spec_) {
-          for (size_t m = 0; m < mod_mass_list.size(); m++) {
-            for (size_t p = 0; p < mod_mass.size(); p++) {
-              std::fill(mod_mass.begin(), mod_mass.end(), 0.0);
-              mod_mass[p] += mod_mass_list[m];
-              PrmMsPtrVec prm_ms_ptr_vec = prm_ms_factory::geneMsTwoPtrVec(deconv_ms_ptr_vec,
-                                                                           sp_para_ptr,
-                                                                           prec_mono_mass, mod_mass);
-              PrmMsPtrVec srm_ms_ptr_vec 
-                = prm_ms_factory::geneSuffixMsTwoPtrVec(deconv_ms_ptr_vec, sp_para_ptr,
-                                                        prec_mono_mass, mod_mass);
-              filter_ptr->computeBestMatch(prm_ms_ptr_vec, srm_ms_ptr_vec);
-              writers.getCompleteWriterPtr()->write(filter_ptr->getCompMatchPtrs());
-              writers.getPrefixWriterPtr()->write(filter_ptr->getPrefMatchPtrs());
-              writers.getSuffixWriterPtr()->write(filter_ptr->getSuffMatchPtrs());
-              writers.getInternalWriterPtr()->write(filter_ptr->getInternalMatchPtrs());
+      for (size_t k = 0; k < spec_set_vec.size(); k++) {
+        SpectrumSetPtr spec_set_ptr = spec_set_vec[k]; 
+        if (spec_set_ptr->isValid()) {
+          //LOG_ERROR("precursor " << spec_set_ptr->getFirstPrecMonoMass());
+          DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
+          double prec_mono_mass = spec_set_ptr->getPrecMonoMass();
+          double n_term_label_mass = spec_set_ptr->getNTermLabelMass();
+          if (mng_ptr->use_approx_spec_) {
+            for (size_t m = 0; m < mod_mass_list.size(); m++) {
+              for (size_t p = 0; p < mod_mass.size(); p++) {
+                std::fill(mod_mass.begin(), mod_mass.end(), 0.0);
+                mod_mass[p] += mod_mass_list[m];
+                PrmMsPtrVec prm_ms_ptr_vec = prm_ms_factory::geneMsTwoPtrVec(deconv_ms_ptr_vec,
+                                                                             sp_para_ptr,
+                                                                             prec_mono_mass, 
+                                                                             n_term_label_mass,
+                                                                             mod_mass);
+                PrmMsPtrVec srm_ms_ptr_vec 
+                  = prm_ms_factory::geneSuffixMsTwoPtrVec(deconv_ms_ptr_vec, sp_para_ptr,
+                                                          prec_mono_mass, n_term_label_mass, mod_mass);
+                filter_ptr->computeBestMatch(prm_ms_ptr_vec, srm_ms_ptr_vec);
+                writers.getCompleteWriterPtr()->write(filter_ptr->getCompMatchPtrs());
+                writers.getPrefixWriterPtr()->write(filter_ptr->getPrefMatchPtrs());
+                writers.getSuffixWriterPtr()->write(filter_ptr->getSuffMatchPtrs());
+                writers.getInternalWriterPtr()->write(filter_ptr->getInternalMatchPtrs());
+              }
             }
           }
-        }
-        else {
-          PrmMsPtrVec prm_ms_ptr_vec = prm_ms_factory::geneMsTwoPtrVec(deconv_ms_ptr_vec,
-                                                                       sp_para_ptr,
-                                                                       prec_mono_mass, mod_mass);
-          PrmMsPtrVec srm_ms_ptr_vec 
-            = prm_ms_factory::geneSuffixMsTwoPtrVec(deconv_ms_ptr_vec, sp_para_ptr,
-                                                    prec_mono_mass, mod_mass);
-          filter_ptr->computeBestMatch(prm_ms_ptr_vec, srm_ms_ptr_vec);
-          writers.getCompleteWriterPtr()->write(filter_ptr->getCompMatchPtrs());
-          writers.getPrefixWriterPtr()->write(filter_ptr->getPrefMatchPtrs());
-          writers.getSuffixWriterPtr()->write(filter_ptr->getSuffMatchPtrs());
-          writers.getInternalWriterPtr()->write(filter_ptr->getInternalMatchPtrs());
+          else {
+            PrmMsPtrVec prm_ms_ptr_vec = prm_ms_factory::geneMsTwoPtrVec(deconv_ms_ptr_vec,
+                                                                         sp_para_ptr,
+                                                                         prec_mono_mass, 
+                                                                         n_term_label_mass,
+                                                                         mod_mass);
+            PrmMsPtrVec srm_ms_ptr_vec 
+              = prm_ms_factory::geneSuffixMsTwoPtrVec(deconv_ms_ptr_vec, sp_para_ptr,
+                                                      prec_mono_mass, n_term_label_mass, 
+                                                      mod_mass);
+            filter_ptr->computeBestMatch(prm_ms_ptr_vec, srm_ms_ptr_vec);
+            writers.getCompleteWriterPtr()->write(filter_ptr->getCompMatchPtrs());
+            writers.getPrefixWriterPtr()->write(filter_ptr->getPrefMatchPtrs());
+            writers.getSuffixWriterPtr()->write(filter_ptr->getSuffMatchPtrs());
+            writers.getInternalWriterPtr()->write(filter_ptr->getInternalMatchPtrs());
+          }
         }
       }
     }
-
     mng_ptr->cnts_[block_idx] = mng_ptr->cnts_[block_idx] + group_spec_num;
     int cnt_sum = 0;
     for (size_t i = 0; i < mng_ptr->cnts_.size(); i++) {

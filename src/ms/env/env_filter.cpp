@@ -34,8 +34,8 @@ int cntValid(MatchEnvPtr2D &match_envs) {
 }
 
 // Test match envelope has a valid real envelope 
-bool testRealEnvValid(MatchEnvPtr env, EnvParaPtr env_para_ptr) {
-  RealEnvPtr real_env = env->getRealEnvPtr();
+bool checkRealEnvValid(MatchEnvPtr env, EnvParaPtr env_para_ptr) {
+  ExpEnvPtr real_env = env->getExpEnvPtr();
   int mass_group = env->getMassGroup();
   // 1. test if the number of matched peaks >= min_match_peak_num
   if (real_env->getMatchPeakNum() < env_para_ptr->min_match_peak_num_[mass_group]) {
@@ -61,7 +61,7 @@ void filterEnvByRealEnv(MatchEnvPtr2D &match_envs, EnvParaPtr env_para_ptr) {
   for (size_t i = 0; i < match_envs.size(); i++) {
     for (size_t j = 0; j < match_envs[i].size(); j++) {
       if (match_envs[i][j] != nullptr) {
-        if (!testRealEnvValid(match_envs[i][j], env_para_ptr)) {
+        if (!checkRealEnvValid(match_envs[i][j], env_para_ptr)) {
           match_envs[i][j] = nullptr;
         }
       }
@@ -76,8 +76,8 @@ void filterEnvByScr(MatchEnvPtr2D &match_envs, EnvParaPtr env_para_ptr) {
   for (size_t i = 0; i < match_envs.size(); i++) {
     for (size_t j = 0; j < match_envs[i].size(); j++) {
       if (match_envs[i][j] != nullptr) {
-        match_envs[i][j]->compScr(env_para_ptr);
-        if (match_envs[i][j]->getScore() < env_para_ptr->min_match_env_score_) {
+        match_envs[i][j]->compMsdeconvScr(env_para_ptr);
+        if (match_envs[i][j]->getMsdeconvScore() < env_para_ptr->min_match_env_score_) {
           match_envs[i][j] = nullptr;
         }
       }
@@ -94,7 +94,7 @@ void filterEnvByChrg(MatchEnvPtr2D &match_envs) {
       for (int k = 2 * charge - 1; k < (int)match_envs[i].size(); k += charge) {
         if (match_envs[i][k] != nullptr
             && match_envs[i][j] != nullptr
-            && match_envs[i][k]->getScore() > match_envs[i][j]->getScore()) {
+            && match_envs[i][k]->getMsdeconvScore() > match_envs[i][j]->getMsdeconvScore()) {
           match_envs[i][j] = nullptr;
         }
       }
@@ -128,11 +128,11 @@ void filterEnvByChrgComp(MatchEnvPtr2D &match_envs,
 int compRank(int idx, int charge, MatchEnvPtr2D &match_envs,
              const PeakPtrVec &peak_list, EnvParaPtr env_para_ptr)  {
   int rank = 0;
-  int peak_idx = match_envs[idx][charge - 1]->getRealEnvPtr()->getReferPeakIdx();
+  int peak_idx = match_envs[idx][charge - 1]->getExpEnvPtr()->getReferPeakIdx();
   if (peak_idx < 0) {
     return rank;
   }
-  double score = match_envs[idx][charge - 1]->getScore();
+  double score = match_envs[idx][charge - 1]->getMsdeconvScore();
   // check left 
   int p = peak_idx - 1;
   for (p = peak_idx - 1; p >= 0; p--) {
@@ -141,7 +141,7 @@ int compRank(int idx, int charge, MatchEnvPtr2D &match_envs,
       break;
     }
     if (match_envs[p][charge - 1] != nullptr
-        && match_envs[p][charge - 1]->getScore() > score) {
+        && match_envs[p][charge - 1]->getMsdeconvScore() > score) {
       rank++;
     }
   }
@@ -152,7 +152,7 @@ int compRank(int idx, int charge, MatchEnvPtr2D &match_envs,
       break;
     }
     if (match_envs[p][charge - 1] != nullptr
-        && match_envs[p][charge - 1]->getScore() > score) {
+        && match_envs[p][charge - 1]->getMsdeconvScore() > score) {
       rank++;
     }
   }
@@ -186,7 +186,7 @@ void filter(MatchEnvPtr2D &match_envs, const PeakPtrVec &peak_list,
 
   LOG_DEBUG("Valid match envelope number " << cntValid(match_envs));
   LOG_DEBUG("Filtering by score...");
-  // compute scores of matching envelopes here to peak_listeed up 
+  // compute scores of matching envelopes here  
   filterEnvByScr(match_envs, env_para_ptr);
 
   LOG_DEBUG("Valid match envelope number " << cntValid(match_envs));
@@ -213,7 +213,7 @@ void multipleMassFilter(MatchEnvPtr2D &match_envs, EnvParaPtr env_para_ptr) {
 
   LOG_DEBUG("Valid match envelope number " << cntValid(match_envs));
   LOG_DEBUG("Filtering by score...");
-  /* compute scores of matching envelopes here to peak_listeed up */
+  // compute scores of matching envelopes here to peak_listeed up 
   filterEnvByScr(match_envs, env_para_ptr);
 
   LOG_DEBUG("Valid match envelope number " << cntValid(match_envs));

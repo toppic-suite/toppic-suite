@@ -600,7 +600,7 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
     std::string para_str = "";
     std::cout << "Merging files started." << std::endl;
     std::cout << "Merging msalign files started." << std::endl;
-    MsAlignFracMerge::mergeFiles(spec_file_lst, full_combined_name + "_ms2.msalign", para_str);
+    msalign_frac_merge::mergeMsalignFiles(spec_file_lst, full_combined_name + "_ms2.msalign", para_str);
     std::cout << "Merging msalign files finished." << std::endl;
     if (arguments["geneHTMLFolder"] == "true"){
       std::cout << "Merging json files started." << std::endl;

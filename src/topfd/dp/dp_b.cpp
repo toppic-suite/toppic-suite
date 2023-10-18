@@ -90,7 +90,7 @@ void DpB::backtrace() {
       break;
     }
   }
-  std::sort(results_.begin(), results_.end(), MatchEnv::cmpScoreDec);
+  std::sort(results_.begin(), results_.end(), MatchEnv::cmpMsdeconvScoreDec);
 }
 
 }

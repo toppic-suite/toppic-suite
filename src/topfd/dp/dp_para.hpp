@@ -24,6 +24,7 @@ namespace toppic {
 
   class DpPara {
   public:
+    // DpPara() and DpPara(DpParaPtr) will be removed in version 1.7
     DpPara(){};
     DpPara(DpParaPtr dp_para_ptr){
       check_double_increase_ = dp_para_ptr->check_double_increase_;
@@ -31,8 +32,23 @@ namespace toppic {
       max_env_num_per_peak_ = dp_para_ptr->max_env_num_per_peak_;
       dp_env_num_ = dp_para_ptr->dp_env_num_;
       max_env_num_per_vertex_ = dp_para_ptr->max_env_num_per_vertex_;
+      mz_tolerance_ = dp_para_ptr->mz_tolerance_;
+      dp_window_size_ = dp_para_ptr->dp_window_size_;
+      env_num_per_win_ = dp_para_ptr->env_num_per_win_;
     };
-    // DP algorithm
+
+    DpPara(double mz_tolerance){mz_tolerance_ = mz_tolerance;};
+  
+    //mz tolerance used in computing msalign score
+    double mz_tolerance_ = 0.02;
+
+    //dynamic programming window size
+    double dp_window_size_ = 1.0;
+    // Env assigned to 1 m/z intervals
+    // number of envelopes per window 
+    // use a small number of envelopes to speed up computation
+    int env_num_per_win_ = 5;
+
     // Check double increasing when two envelopes overlap 
     bool check_double_increase_ = true;
     std::vector<std::vector<bool>> coexist_table_;

@@ -2,14 +2,14 @@
 /common/util/   String utilities, file utilities, and etc
 /common/xml/    Functions for handling xml files   
 /console/       Main functions for topfd, toppic, topmg, and topmerge
-/filter/        Various protein sequence filtering methods
+/filter/        Protein sequence filtering methods
 /gui/           GUI for topfd, toppic, topmg, and topmerge
 /merge/         Merging proteoform identifications from several samples
-/ms/            Mass spectra, envelops, and features
+/ms/            Mass spectra, envelops, LC-MS maps, and features
 /prsm/          Proteoform spectrum matches and related functions
 /search/        Various database search algorithms
 /seq/           Fasta sequences and proteoforms
-/spec/          Various peaks and spectrum classes
+/spec/          Peak and spectrum classes
 /stat/local/    Charaterization and localization of mass shifts
 /stat/mcmc/     An Markov chain Monte Carlo method for E-value estimation
 /stat/tdgf/     A generation function method for E-value estimation

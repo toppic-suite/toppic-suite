@@ -123,8 +123,8 @@ void VarPtmFilter::computeBestMatch(const PrmMsPtrVec &prm_ms_ptr_vec,
   std::vector<std::pair<int, int>> suff_mass_errors
       = prm_ms_util::getIntMassErrorList(srm_ms_ptr_vec, tole_ptr, mng_ptr_->filter_scale_, false, true);
   std::pair<int, int> prec_minus_water_mass_error
-    = prm_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMassMinusWaterError(tole_ptr->getPpo(),
-                                                                          mng_ptr_->filter_scale_);
+    = prm_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMassMinusWaterError(tole_ptr->getPpo(),
+                                                                               mng_ptr_->filter_scale_);
   std::vector<std::pair<int, int> > prec_minus_water_mass_errors 
     = getShiftedMassErrors(prec_minus_water_mass_error, mng_ptr_->int_shift_list_);
   
@@ -145,8 +145,8 @@ void VarPtmFilter::computeBestMatch(const PrmMsPtrVec &prm_ms_ptr_vec,
   rev_diag_index_ptr_->compMatchScores(suff_mass_errors, prec_minus_water_mass_errors, rev_diag_scores);
 
   int group_spec_num = prm_ms_ptr_vec.size();
-  double prec_minus_water_mass = prm_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMassMinusWater();
-  double prec_error_tole = prm_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecErrorTolerance(tole_ptr->getPpo());
+  double prec_minus_water_mass = prm_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMassMinusWater();
+  double prec_error_tole = prm_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecErrorTolerance(tole_ptr->getPpo());
 
   ProtCandidatePtrVec comp_prots
     = mass_match_util::findVarPtmTopProteins(term_scores, rev_term_scores, 
@@ -225,7 +225,7 @@ void VarPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec) {
   std::vector<std::pair<int, int> > suff_mass_errors
       = extend_ms_util::getExtendIntMassErrorList(ms_ptr_vec, pref, mng_ptr_->filter_scale_);
   std::pair<int, int> prec_minus_water_mass_error
-      = ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMassMinusWaterError(tole_ptr->getPpo(),
+      = ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMassMinusWaterError(tole_ptr->getPpo(),
                                                                         mng_ptr_->filter_scale_);
   std::vector<std::pair<int, int> > prec_minus_water_mass_errors 
     = getShiftedMassErrors(prec_minus_water_mass_error, mng_ptr_->int_shift_list_);
@@ -247,10 +247,10 @@ void VarPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec) {
   rev_diag_index_ptr_->compMatchScores(suff_mass_errors, prec_minus_water_mass_errors, rev_diag_scores);
 
   int threshold = MassMatch::getPrecursorMatchScore() * 2 + 4;
-  double prec_minus_water_mass = ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMassMinusWater();
-  double prec_error_tole = ms_ptr_vec[0]->getMsHeaderPtr()->getPrecErrorTolerance(tole_ptr->getPpo());
+  double prec_minus_water_mass = ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMassMinusWater();
+  double prec_error_tole = ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecErrorTolerance(tole_ptr->getPpo());
   int group_spec_num = ms_ptr_vec.size();
-  LOG_DEBUG("mass " << ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMass());
+  LOG_DEBUG("mass " << ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMass());
   ProtCandidatePtrVec comp_prots
     = mass_match_util::findVarPtmTopProteins(term_scores, rev_term_scores, 
                                              term_index_ptr_, rev_term_index_ptr_,

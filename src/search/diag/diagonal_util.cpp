@@ -77,11 +77,11 @@ double refinePrecursorAndHeaderShift(ProteoformPtr proteo_ptr,
                                      DiagHeaderPtrVec &header_ptrs,
                                      double ppo, double min_mass,
                                      double refine_prec_step_width) {
-  double prec_mass = ms_three_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMass();
+  double prec_mass = ms_three_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMass();
   if (header_ptrs.size() == 0) {
     return prec_mass;
   }
-  double tole = ms_three_ptr_vec[0]->getMsHeaderPtr()->getPrecErrorTolerance(ppo);
+  double tole = ms_three_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecErrorTolerance(ppo);
 
   int one_side_step_num = 0;
   if (tole > 0) {

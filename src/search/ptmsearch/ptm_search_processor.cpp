@@ -120,9 +120,9 @@ void PtmSearchProcessor::process(){
   std::string output_file_name = file_util::basename(sp_file_name) + "." + mng_ptr_->output_file_ext_;
 
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
-  SimpleMsAlignReaderPtr ms_reader_ptr = std::make_shared<SimpleMsAlignReader>(sp_file_name, 
-                                                                               group_spec_num,
-                                                                               sp_para_ptr->getActivationPtr());
+  MsAlignReaderPtr ms_reader_ptr = std::make_shared<MsAlignReader>(sp_file_name, 
+                                                                   group_spec_num,
+                                                                   sp_para_ptr->getActivationPtr());
 
   const int n_unknown_shift = 2;
 
@@ -140,29 +140,31 @@ void PtmSearchProcessor::process(){
   DeconvMsPtrVec deconv_ms_ptr_vec = ms_reader_ptr->getNextMsPtrVec(); 
   std::vector<double> prec_error_vec = sp_para_ptr->getMultiShiftSearchPrecErrorVec();
   while (deconv_ms_ptr_vec.size() > 0) {
-    std::vector<SpectrumSetPtr> spec_set_ptr_vec 
+    if (deconv_ms_ptr_vec[0]->getMsHeaderPtr()->containsPrec()) {
+      std::vector<SpectrumSetPtr> spec_set_ptr_vec 
         = spectrum_set_factory::geneSpectrumSetPtrVecWithPrecError(deconv_ms_ptr_vec, 
                                                                    sp_para_ptr,
                                                                    prec_error_vec);
-    cnt+= group_spec_num;
-    if(spec_set_ptr_vec[0]->isValid()){
-      int spec_id = spec_set_ptr_vec[0]->getSpectrumId();
-      SimplePrsmPtrVec selected_prsm_ptrs;
-      while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_id) {
-        selected_prsm_ptrs.push_back(prsm_ptr);
-        prsm_ptr = simple_prsm_reader.readOnePrsm();
-      }
-      if (selected_prsm_ptrs.size() > 0) {
-        for (size_t i = 0; i < spec_set_ptr_vec.size(); i++) {
-          while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ * 2) {
-            boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+      if(spec_set_ptr_vec[0]->isValid()){
+        int spec_id = spec_set_ptr_vec[0]->getSpectrumId();
+        SimplePrsmPtrVec selected_prsm_ptrs;
+        while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_id) {
+          selected_prsm_ptrs.push_back(prsm_ptr);
+          prsm_ptr = simple_prsm_reader.readOnePrsm();
+        }
+        if (selected_prsm_ptrs.size() > 0) {
+          for (size_t i = 0; i < spec_set_ptr_vec.size(); i++) {
+            while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ * 2) {
+              boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+            }
+            pool_ptr->Enqueue(geneTask(spec_set_ptr_vec[i], selected_prsm_ptrs,
+                                       mng_ptr_, pool_ptr, writer_set_ptr_vec));
           }
-          pool_ptr->Enqueue(geneTask(spec_set_ptr_vec[i], selected_prsm_ptrs,
-                                     mng_ptr_, pool_ptr, writer_set_ptr_vec));
         }
       }
     }
-    std::cout << std::flush <<  "Multiple PTM search - processing " << cnt 
+    cnt+= group_spec_num;
+    std::cout << std::flush <<  "Multiple unexpected shifts search - processing " << cnt 
         << " of " << spectrum_num << " spectra.\r";
     deconv_ms_ptr_vec = ms_reader_ptr->getNextMsPtrVec(); 
   }

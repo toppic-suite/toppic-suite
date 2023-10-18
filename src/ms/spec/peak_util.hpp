@@ -19,12 +19,11 @@ namespace toppic {
 
 namespace peak_util {
 
-  double compPeakNeutralMass(double mono_mz, int charge);
+double compPeakNeutralMass(double mono_mz, int charge);
 
-  double compMz(double neutral_mass, int charge);
+double compMz(double neutral_mass, int charge);
 
 }
-
 
 }  // namespace toppic
 

@@ -100,7 +100,7 @@ void DpA::backtrace() {
     }
   }
   // LOG_DEBUG("backtrace 2");
-  std::sort(results_.begin(), results_.end(), MatchEnv::cmpScoreDec);
+  std::sort(results_.begin(), results_.end(), MatchEnv::cmpMsdeconvScoreDec);
 }
 
 }  // namespace toppic

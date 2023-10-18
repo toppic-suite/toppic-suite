@@ -34,7 +34,7 @@ VertexA::VertexA(VertexAPtr ptr):
 
 bool VertexA::addPreEnv(MatchEnvPtr env, int max_overlap) {
   bool result = Vertex::addPreEnv(env, max_overlap);
-  this_score_ += env->getScore();
+  this_score_ += env->getMsdeconvScore();
   return result;
 }
 

@@ -25,12 +25,14 @@ namespace env_filter {
 void filter(MatchEnvPtr2D &match_envs, const PeakPtrVec &peak_list,
             EnvParaPtr env_para_ptr);
 
-// Filtering envelopes without removing envelopes with different 
-// candidate charge states and monoisotopic masses. For example,
-// The same envelope with -1/+1 Dalton shift or -1/+1 charge difference
+// When determine the charge or monoisotopic mass of an envelope 
+// cannot be confidently determined, we will report multiple monositopic 
+// masses for one envelope. For example, several monoisotopic masses 
+// from the same envelope with -1/+1 Dalton shift or -1/+1 charge difference
 void multipleMassFilter(MatchEnvPtr2D &match_env, EnvParaPtr env_para_ptr);
 
-bool testRealEnvValid(MatchEnvPtr env, EnvParaPtr env_para_ptr);
+bool checkRealEnvValid(MatchEnvPtr env, EnvParaPtr env_para_ptr);
+
 }
 
 }
