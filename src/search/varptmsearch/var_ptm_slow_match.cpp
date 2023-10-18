@@ -94,12 +94,6 @@ void VarPtmSlowMatch::init() {
   DiagonalPtrVec diagonal_ptrs = diag_pair_util::geneDiagonalsWithEmptyList(n_term_shift_header_ptrs,
                                                                             prm_peaks, group_spec_num,
                                                                             proteo_ptr_);
-  /*
-  LOG_DEBUG("diagonal ptr size " << diagonal_ptrs.size());
-  for (size_t i = 0; i < diagonal_ptrs.size(); i++) {
-    LOG_DEBUG("shift " << diagonal_ptrs[i]->getHeader()->getProtNTermShift());
-  }
-  */
   if (diagonal_ptrs.size() == 0) {
     success_init_ = false;
     return;
@@ -111,6 +105,10 @@ void VarPtmSlowMatch::init() {
     ms_masses[i] = prm_peaks[i]->getPosition();
   }
   ResSeqPtr sub_res_seq_ptr = proteo_ptr_->getResSeqPtr(); 
+  if (sub_res_seq_ptr->getLen() == 0) {
+    success_init_ = false;
+    return;
+  }
   LOG_DEBUG("Seq mass " << sub_res_seq_ptr->getSeqMass()); 
   var_ptm_align_ptr_ = std::make_shared<VarPtmAlign>(ms_masses, seq_masses, 
                                                      sub_res_seq_ptr,  
