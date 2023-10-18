@@ -36,15 +36,19 @@ void writeHeader(std::ofstream &of) {
       << "File_name" << "\t"
       << "Mass" << "\t"
       << "Intensity" << "\t"
-      << "Time_begin" << "\t"
-      << "Time_end" << "\t"
-      << "First_scan" << "\t"
-      << "Last_scan" << "\t"
-      << "Minimum_charge_state" << "\t"
-      << "Maximum_charge_state" << "\t"
-      << "Envelope_num" << "\t"
+      << "Min_time" << "\t"
+      << "Max_time" << "\t"
+      << "Min_scan" << "\t"
+      << "Max_scan" << "\t"
+      << "Min_charge" << "\t"
+      << "Max_charge" << "\t"
       << "Apex_time" << "\t"
+      << "Apex_scan" << "\t"
       << "Apex_intensity" << "\t"
+      << "Rep_charge" << "\t"
+      << "Rep_average_mz" << "\t"
+      << "Envelope_num" << "\t"
+      << "EC_score" << "\t"
       << "Sample_feature_Id" << "\t"
       << "Sample_feature_intensity"
       << std::endl;
@@ -62,9 +66,13 @@ void writeOneFeature(std::ofstream &of, FracFeaturePtr feature) {
       << feature->getScanEnd() << "\t"
       << feature->getMinCharge() << "\t"
       << feature->getMaxCharge() << "\t"
-      << feature->getEnvNum() << "\t"
       << feature->getApexTime() << "\t"
+      << feature->getApexScan() << "\t"
       << feature->getApexInte() << "\t"
+      << feature->getRepCharge() << "\t"
+      << feature->getRepAvgMz() << "\t"
+      << feature->getEnvNum() << "\t"
+      << feature->getEcScore() << "\t"
       << feature->getSampleFeatureId() << "\t"
       << feature->getSampleFeatureInte() 
       << std::endl;
@@ -134,7 +142,7 @@ void writeBatMassFeatures(const std::string &output_file_name,
           << (single_feature->getTimeEnd()/60) << delimit
           << "#FF0000" << delimit
           << "0.1" << delimit
-          << feature->getEcscore()
+          << feature->getEcScore()
           << std::endl;
     }
   }

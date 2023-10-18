@@ -137,7 +137,6 @@ void process(TopfdParaPtr topfd_para_ptr) {
                                                                    score_para_ptr->frac_id_,
                                                                    score_para_ptr->file_name_,
                                                                    env_coll_ptr, matrix_ptr, sn_ratio);
-      frac_feat_ptr->setEcscore(ecscore_ptr->getScore());
       frac_features.push_back(frac_feat_ptr);
     }
   }

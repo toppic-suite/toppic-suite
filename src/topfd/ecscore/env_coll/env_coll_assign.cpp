@@ -40,7 +40,7 @@ bool getHighestInteEnvColl(FracFeaturePtrVec &frac_features, EnvCollPtrVec &env_
   for (size_t coll_id = 0; coll_id < env_coll_list.size(); coll_id++) {
     FracFeaturePtr frac_feature_ptr = frac_features[coll_id];
     // check threshold
-    if (frac_feature_ptr->getEcscore() < score_thresh) {
+    if (frac_feature_ptr->getEcScore() < score_thresh) {
       continue;
     }
     // check retention time range
@@ -170,7 +170,7 @@ bool getNewEnvColl(MsHeaderPtr header_ptr, MsMapPtr matrix_ptr,
       = env_coll_util::getFracFeature(score_id, ms1_ptr_vec, score_para_ptr->frac_id_, 
                                       score_para_ptr->file_name_, env_coll_ptr, matrix_ptr, 
                                       sn_ratio); 
-    frac_feature_ptr->setEcscore(ecscore_ptr->getScore());
+    frac_feature_ptr->setEcScore(ecscore_ptr->getScore());
     frac_feature_ptr->setHasMs2Spec(true);
     frac_feature_list.push_back(frac_feature_ptr);
     double prec_mono_mass = seed_ptr->getMonoNeutralMass();

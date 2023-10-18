@@ -247,14 +247,20 @@ FracFeaturePtr getFracFeature(int feat_id, DeconvMsPtrVec &ms1_ptr_vec, int frac
   int ms1_scan_end = ms1_ptr_vec[ms1_id_end]->getMsHeaderPtr()->getFirstScanNum();
   // get apex inte
   int ms1_apex_id = coll_ptr->getSeedSpecId();
-  double time_apex = spec_list[ms1_apex_id]->getRt(); 
-
+  double apex_time = spec_list[ms1_apex_id]->getRt(); 
+  int apex_scan = spec_list[ms1_apex_id]->getScanNum(); 
   double apex_inte = coll_ptr->getSeedEnvSet()->getXicSeedAllPeakInte();
+
+  int rep_charge = coll_ptr->getSeedPtr()->getCharge(); 
+  double rep_avg_mz = coll_ptr->getSeedPtr()->getAvgMz(); 
   int env_num = coll_ptr->countEnvNum();
+  double ec_score = coll_ptr->getEcscore();
+
   FracFeaturePtr feature_ptr = std::make_shared<FracFeature>(feat_id, frac_id, file_name, feat_mass, feat_inte,
                                                              ms1_id_begin, ms1_id_end, ms1_time_begin, ms1_time_end,
                                                              ms1_scan_begin, ms1_scan_end, min_charge, max_charge,
-                                                             env_num, time_apex, apex_inte);
+                                                             apex_time, apex_scan, apex_inte, rep_charge, rep_avg_mz, 
+                                                             env_num, ec_score);
   SingleChargeFeaturePtrVec single_features;
   for (EnvSetPtr es: coll_ptr->getEnvSetList()) {
     int id_begin = es->getStartSpecId();

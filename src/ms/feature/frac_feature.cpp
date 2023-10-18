@@ -26,8 +26,10 @@ FracFeature::FracFeature(int id, int frac_id,
                          double time_begin, double time_end,
                          int scan_begin, int scan_end,
                          int min_charge, int max_charge, 
-                         int env_num, double apex_time, 
-                         double apex_inte): 
+                         double apex_time, int apex_scan, 
+                         double apex_inte, int rep_charge, 
+                         double rep_avg_mz, int env_num,
+                         double ec_score): 
     id_(id),
     frac_id_(frac_id),
     file_name_(file_name),
@@ -41,9 +43,13 @@ FracFeature::FracFeature(int id, int frac_id,
     scan_end_(scan_end),
     min_charge_(min_charge),
     max_charge_(max_charge),
-    env_num_(env_num),
     apex_time_(apex_time), 
-    apex_inte_(apex_inte) {
+    apex_scan_(apex_scan), 
+    apex_inte_(apex_inte),
+    rep_charge_(rep_charge),
+    rep_avg_mz_(rep_avg_mz), 
+    env_num_(env_num),
+    ec_score_(ec_score) {
     }
 
 FracFeature::FracFeature(std::string line) {
@@ -60,11 +66,15 @@ FracFeature::FracFeature(std::string line) {
   scan_end_ = std::stoi(strs[8]);
   min_charge_ = std::stoi(strs[9]);
   max_charge_ = std::stoi(strs[10]);
-  env_num_ = std::stoi(strs[11]);
-  apex_time_ = std::stod(strs[12]);
+  apex_time_ = std::stod(strs[11]);
+  apex_scan_ = std::stoi(strs[12]);
   apex_inte_ = std::stod(strs[13]);
-  sample_feature_id_ = std::stoi(strs[14]);
-  sample_feature_inte_ = std::stod(strs[15]);
+  rep_charge_ = std::stoi(strs[14]);
+  rep_avg_mz_ = std::stod(strs[15]);
+  env_num_ = std::stoi(strs[16]);
+  ec_score_ = std::stod(strs[17]);
+  sample_feature_id_ = std::stoi(strs[18]);
+  sample_feature_inte_ = std::stod(strs[19]);
 }
 
 bool FracFeature::cmpFracIncInteDec(const FracFeaturePtr &a, 
@@ -95,10 +105,13 @@ FracFeature::FracFeature(XmlDOMElement* element) {
   scan_end_ = xml_dom_util::getIntChildValue(element, "scan_end", 0);
   min_charge_ = xml_dom_util::getIntChildValue(element, "min_charge", 0);
   max_charge_ = xml_dom_util::getIntChildValue(element, "max_charge", 0);
-  env_num_ = xml_dom_util::getIntChildValue(element, "envelope_num", 0);
   apex_time_ = xml_dom_util::getDoubleChildValue(element, "apex_time", 0);
+  apex_scan_ = xml_dom_util::getIntChildValue(element, "apex_scan", 0);
   apex_inte_ = xml_dom_util::getDoubleChildValue(element, "apex_inte", 0);
-  ecscore_ = xml_dom_util::getDoubleChildValue(element, "ecscore", 0);
+  rep_charge_ = xml_dom_util::getIntChildValue(element, "rep_charge", 0);
+  rep_avg_mz_ = xml_dom_util::getDoubleChildValue(element, "rep_avg_mz", 0);
+  env_num_ = xml_dom_util::getIntChildValue(element, "envelope_num", 0);
+  ec_score_ = xml_dom_util::getDoubleChildValue(element, "ec_score", 0);
   sample_feature_id_ = xml_dom_util::getIntChildValue(element, "sample_feature_id", 0);
   sample_feature_inte_ = xml_dom_util::getDoubleChildValue(element, "sample_feature_inte", 0);
 
@@ -141,14 +154,20 @@ XmlDOMElement* FracFeature::toXmlElement(XmlDOMDocument* xml_doc) {
   xml_doc->addElement(element, "min_charge", str.c_str());
   str = str_util::toString(max_charge_);
   xml_doc->addElement(element, "max_charge", str.c_str());
-  str = str_util::toString(env_num_);
-  xml_doc->addElement(element, "envelope_num", str.c_str());
   str = str_util::toString(apex_time_);
   xml_doc->addElement(element, "apex_time", str.c_str());
+  str = str_util::toString(apex_scan_);
+  xml_doc->addElement(element, "apex_scan", str.c_str());
   str = str_util::toString(apex_inte_);
   xml_doc->addElement(element, "apex_inte", str.c_str());
-  str = str_util::toString(ecscore_);
-  xml_doc->addElement(element, "ecscore", str.c_str());
+  str = str_util::toString(rep_charge_);
+  xml_doc->addElement(element, "rep_charge", str.c_str());
+  str = str_util::toString(rep_avg_mz_);
+  xml_doc->addElement(element, "rep_avg_mz", str.c_str());
+  str = str_util::toString(env_num_);
+  xml_doc->addElement(element, "envelope_num", str.c_str());
+  str = str_util::toString(ec_score_);
+  xml_doc->addElement(element, "ec_score", str.c_str());
   str = str_util::toString(sample_feature_id_);
   xml_doc->addElement(element, "sample_feature_id", str.c_str());
   str = str_util::toString(sample_feature_inte_);

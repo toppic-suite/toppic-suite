@@ -49,7 +49,7 @@ SpecFeature::SpecFeature(MsHeaderPtr header, FracFeaturePtr feature,
   ms_one_scan_ = header->getMsOneScan();
   frac_feature_id_ = feature->getId();
   frac_feature_inte_ = feature->getIntensity();
-  frac_feature_score_ = feature->getEcscore();
+  frac_feature_score_ = feature->getEcScore();
   frac_feature_time_apex_ = feature->getApexTime();
   sample_feature_id_ = feature->getSampleFeatureId();
   sample_feature_inte_ = feature->getSampleFeatureInte();
