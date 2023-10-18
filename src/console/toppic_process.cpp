@@ -294,8 +294,8 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
       std::cout << "Variable PTM search - finished." << std::endl;
       input_exts.push_back("toppic_var_ptm_complete");
       input_exts.push_back("toppic_var_ptm_prefix");
-      input_exts.push_back("toppic_var_ptm_suffix");
-      input_exts.push_back("toppic_var_ptm_internal");
+      //input_exts.push_back("toppic_var_ptm_suffix");
+      //input_exts.push_back("toppic_var_ptm_internal");
     }
 
     if (shift_num >= 1) {
@@ -321,8 +321,8 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
 
       input_exts.push_back("toppic_one_shift_complete");
       input_exts.push_back("toppic_one_shift_prefix");
-      input_exts.push_back("toppic_one_shift_suffix");
-      input_exts.push_back("toppic_one_shift_internal");
+      //input_exts.push_back("toppic_one_shift_suffix");
+      //input_exts.push_back("toppic_one_shift_internal");
     }
 
     if (shift_num >= 2) {
