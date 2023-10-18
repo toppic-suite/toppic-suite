@@ -60,7 +60,6 @@ void VarPtmAlign::initAllowShiftTable() {
     if (i >= 1) {
       ResiduePtr seq_res_ptr = sub_res_seq_ptr_->getResiduePtr(i-1);
       for (size_t j = 0; j < shift_num; j++) {
-        //LOG_DEBUG("shift " << j << " mod num " << mng_ptr_->res_ptr_vec_2d_[j].size());
         for (size_t k = 0; k < mng_ptr_->res_ptr_vec_2d_[j].size(); k++) {
           ResiduePtr mod_res_ptr = mng_ptr_->res_ptr_vec_2d_[j][k];
           if (seq_res_ptr->isSame(mod_res_ptr)) {
@@ -70,7 +69,6 @@ void VarPtmAlign::initAllowShiftTable() {
         }
       }
     }
-    //LOG_ERROR("Allow shift " << i << " " << allow_shifts[0] << " " << allow_shifts[1]);
     allow_shift_2d_.push_back(allow_shifts); 
   }
 }
