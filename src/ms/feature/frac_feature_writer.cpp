@@ -14,6 +14,7 @@
 
 #include <set>
 #include <algorithm>
+#include <sstream>
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
@@ -83,7 +84,7 @@ void writeFeatures(const std::string &output_file_name,
 }
 
 void writeBatMassFeatures(const std::string &output_file_name,
-                          const FracFeaturePtrVec &features) {
+                          const FracFeaturePtrVec &features, int vals) {
   std::ofstream of(output_file_name);
   std::string delimit = ",";
   of << "ID" << delimit
@@ -99,7 +100,10 @@ void writeBatMassFeatures(const std::string &output_file_name,
       << "rtHi" << delimit
       << "color" << delimit
       << "opacity" << delimit
-      << "promex_score"
+      << "rtApex" << delimit
+      << "Score" << delimit
+      << "XIC" << delimit
+      << "Envelope"
       << std::endl;
   for (size_t i = 0; i < features.size(); i++) {
     FracFeaturePtr feature = features[i];
@@ -108,12 +112,41 @@ void writeBatMassFeatures(const std::string &output_file_name,
 
     for (size_t j = 0; j < single_features.size(); j++) {
       SingleChargeFeaturePtr single_feature = single_features[j];
+
       int charge = single_feature->getCharge();
       double mono_mz = peak_util::compMz(mono_mass, charge);
       EnvelopePtr ref_env = EnvBase::getStaticEnvByMonoMass(mono_mass);
       EnvelopePtr theo_env = ref_env->distrToTheoMono(mono_mz, charge);
       double min_inte = 0.03;
-      EnvelopePtr filtered_env = theo_env->getSubEnv(min_inte); 
+      EnvelopePtr filtered_env = theo_env->getSubEnv(min_inte);
+
+      std::vector<double> xic = single_feature->getXicInte();
+      std::stringstream ss;
+      int k = 0;
+      for (size_t i = 0; i < vals; i++) {
+        if (i != 0)
+          ss << ";";
+        if (i >= single_feature->getSpecIDBegin() and i <= single_feature->getSpecIDEnd()) {
+//        if (i >= feature->getMinMs1Id() and i <= feature->getMaxMs1Id()) {
+          ss << xic[k];
+          k++;
+        }
+        else
+          ss << 0;
+      }
+
+      std::vector<double> envelopeMass = single_feature->getEnvelopeMass();
+      std::vector<double> aggregateEnvelopeInte = single_feature->getAggregateEnvelopeInte();
+      std::stringstream env;
+      for (size_t i = 0; i < envelopeMass.size(); i++) {
+        if (i != 0)
+          env << ";";
+
+        env << envelopeMass[i];
+        env << '&';
+        env << aggregateEnvelopeInte[i];
+      }
+
       //margin for envelopes
       double margin = 0.1; 
       double min_mz = filtered_env->getMinMz() - margin;
@@ -134,7 +167,10 @@ void writeBatMassFeatures(const std::string &output_file_name,
           << (single_feature->getTimeEnd()/60) << delimit
           << "#FF0000" << delimit
           << "0.1" << delimit
-          << feature->getPromexScore()
+          << feature->getApexTime()/60 << delimit
+          << feature->getPromexScore() << delimit
+          << ss.str() << delimit
+          << env.str()
           << std::endl;
     }
   }

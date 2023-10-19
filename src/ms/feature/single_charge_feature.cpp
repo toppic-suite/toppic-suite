@@ -37,7 +37,8 @@ namespace toppic {
                                            int scan_begin, int scan_end,
                                            double intensity, int env_num,
                                            int spec_id_begin, int spec_id_end,
-                                           double mass, std::vector<double> xic_inte) :
+                                           double mass, std::vector<double> xic_inte,
+                                           std::vector<double> envelopeMass, std::vector<double> aggregateEnvelopeInte) :
       charge_(charge),
       time_begin_(time_begin),
       time_end_(time_end),
@@ -50,6 +51,12 @@ namespace toppic {
       mass_(mass) {
     for (auto inte: xic_inte)
       xic_inte_.push_back(inte);
+
+    for (auto inte: envelopeMass)
+      envelopeMass_.push_back(inte);
+
+    for (auto inte: aggregateEnvelopeInte)
+      aggregateEnvelopeInte_.push_back(inte);
   }
 
   SingleChargeFeature::SingleChargeFeature(int charge,
@@ -78,6 +85,12 @@ namespace toppic {
     env_num_ = f->getEnvNum();
     for (auto inte: f->getXicInte())
       xic_inte_.push_back(inte);
+
+    for (auto inte: f->getAggregateEnvelopeInte())
+      aggregateEnvelopeInte_.push_back(inte);
+
+    for (auto inte: f->getEnvelopeMass())
+      envelopeMass_.push_back(inte);
   }
 
   SingleChargeFeature::SingleChargeFeature(XmlDOMElement *element) {

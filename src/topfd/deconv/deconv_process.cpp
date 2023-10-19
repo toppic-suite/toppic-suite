@@ -152,16 +152,28 @@ void deconvMissingMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
                         std::string ms2_json_dir){
   PeakPtrVec peak_list = ms_ptr->getPeakPtrVec();
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
+//  header_ptr->setPrecCharge(EnvPara::getDefaultMaxCharge());
+//  double prec_mz = EnvPara::getDefaultMaxMass()/EnvPara::getDefaultMaxCharge();
+//  header_ptr->setPrecMonoMz(prec_mz);
+//  header_ptr->setPrecSpMz(prec_mz);
+  MatchEnvPtrVec result_envs;
 
-  header_ptr->setPrecCharge(EnvPara::getDefaultMaxCharge());
-  double prec_mz = EnvPara::getDefaultMaxMass()/EnvPara::getDefaultMaxCharge();
-  header_ptr->setPrecMonoMz(prec_mz);
-  header_ptr->setPrecSpMz(prec_mz);
-  MatchEnvPtrVec result_envs; 
+
+  ///////////////////////////////////////////////////////
+  double base_mz = header_ptr->getPrecSpMz();
+  int charge = header_ptr->getPrecCharge();
+  double base_mass = base_mz * charge - charge * 1.00727;
+
+  EnvelopePtr ref_env_ptr = EnvBase::getStaticEnvByBaseMass(base_mass);
+  EnvelopePtr theo_env_ptr = ref_env_ptr->distrToTheoBase(base_mz, charge);
+  double mono_mz = theo_env_ptr->getMonoMz();
+  double max_frag_mass = mono_mz * charge - charge * 1.00727;
+  header_ptr->setPrecMonoMz(mono_mz);
+  ///////////////////////////////////////////////////////
+
 
   if (peak_list.size() > 0) {
-    deconv_ptr->setData(peak_list, EnvPara::getDefaultMaxMass(),
-                        EnvPara::getDefaultMaxCharge());
+    deconv_ptr->setData(peak_list, max_frag_mass, header_ptr->getPrecCharge());
     deconv_ptr->run();
     result_envs = deconv_ptr->getResult();
   }
@@ -191,19 +203,19 @@ void deconvMissingMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   }
 }
 
-std::function<void()> geneTaskMissingMsOne(RawMsGroupPtr ms_group_ptr, 
+std::function<void()> geneTaskMissingMsOne(RawMsGroupPtr ms_group_ptr,
                                            DeconvOneSpPtr deconv_ptr,
-                                           MsAlignWriterPtrVec ms_writer_ptr_vec, 
-                                           SimpleThreadPoolPtr pool_ptr, 
+                                           MsAlignWriterPtrVec ms_writer_ptr_vec,
+                                           SimpleThreadPoolPtr pool_ptr,
                                            bool gene_html_dir,
                                            std::string ms2_json_dir){
-  return [ms_group_ptr, deconv_ptr, ms_writer_ptr_vec, pool_ptr, 
+  return [ms_group_ptr, deconv_ptr, ms_writer_ptr_vec, pool_ptr,
   gene_html_dir, ms2_json_dir]() {
 
-    RawMsPtrVec ms_two_ptr_vec = ms_group_ptr->getMsTwoPtrVec();                           
+    RawMsPtrVec ms_two_ptr_vec = ms_group_ptr->getMsTwoPtrVec();
     for (size_t i = 0; i < ms_two_ptr_vec.size(); i++) {
       RawMsPtr ms_two_ptr = ms_two_ptr_vec[i];
-      deconvMissingMsOne(ms_two_ptr, deconv_ptr, ms_writer_ptr_vec, 
+      deconvMissingMsOne(ms_two_ptr, deconv_ptr, ms_writer_ptr_vec,
                          pool_ptr, gene_html_dir, ms2_json_dir);
     }
   };

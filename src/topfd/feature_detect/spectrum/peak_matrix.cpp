@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <numeric>
 #include "peak_matrix.hpp"
+#include "topfd/feature_detect/test_output_functions/write_out_files.hpp"
 
 namespace toppic {
   PeakMatrix::PeakMatrix() {
@@ -64,9 +64,7 @@ namespace toppic {
       for (auto &peak: peaks) {
         intes.push_back(peak->getIntensity());
       }
-      double noise = 0.0;
-      if (std::accumulate(intes.begin(), intes.end(), 0.0) > 0)
-        noise = baseline_util::getBaseLine(intes);
+      double noise = baseline_util::getBaseLine(intes);
       spectrum_noise_levels.push_back(noise);
     }
     return spectrum_noise_levels;

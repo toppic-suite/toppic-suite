@@ -27,6 +27,7 @@
 #include "ms/spec/peak.hpp"
 #include "ms/spec/deconv_ms.hpp"
 #include "ms/spec/simple_msalign_reader.hpp"
+#include "ms/env/env_para.hpp"
 #include "ms/feature/frac_feature.hpp"
 #include "ms/spec/baseline_util.hpp"
 #include "ms/feature/spec_feature.hpp"
@@ -41,13 +42,12 @@
 #include "topfd/feature_detect/util/write_feature.hpp"
 #include "topfd/feature_detect/envelope/evaluate_envelope.hpp"
 #include "topfd/feature_detect/test_output_functions/write_out_files.hpp"
-//#include "topfd/feature_detect/feature/feature_map.hpp"
 
 namespace toppic {
-    namespace feature_detect {
-      void process(int frac_id, const std::string &sp_file_name, TopfdParaPtr para_ptr,
-              bool isFaims, const std::vector<std::pair<double, int>> voltage_vec);
-    }
+  namespace feature_detect {
+    void
+    process_ms2(int frac_id, const std::string &sp_file_name, const std::string &resource_dir, const std::string &activation, double score_cutoff);
+  }
 }
 
 #endif

@@ -37,9 +37,10 @@ class SimpleMsAlignReader {
 
   DeconvMsPtr getNextMsPtr();
 
-  DeconvMsPtrVec getNextMsPtrVec(); 
+  DeconvMsPtrVec getNextMsPtrVec();
 
-  static void readMsOneSpectra(const std::string &file_name, DeconvMsPtrVec &ms_ptr_vec); 
+  static void readMsOneSpectra(const std::string &file_name, DeconvMsPtrVec &ms_ptr_vec);
+  static void readMsTwoSpectra(const std::string &file_name, DeconvMsPtrVec &ms_ptr_vec);
 
  private:
   std::string file_name_;

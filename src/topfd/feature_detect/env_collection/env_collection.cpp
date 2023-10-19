@@ -89,8 +89,7 @@ namespace toppic {
     if (weight > 0) {
       double mz_error = weight_mz_error / weight;
       seed_env_.shift(mz_error * seed_env_.getCharge());
-    }
-    else {
+    } else {
       std::cout << "ERROR 0 weight in refine_mono_mass" << std::endl;
     }
   }

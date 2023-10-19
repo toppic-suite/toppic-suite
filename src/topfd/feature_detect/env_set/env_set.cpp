@@ -32,6 +32,8 @@ namespace toppic {
     start_spec_id_ = es.start_spec_id_;
     end_spec_id_ = es.end_spec_id_;
     xic_ = Xic(es.xic_);
+    for (const auto &env_inte: es.aggregate_envelope_inte_)
+      aggregate_envelope_inte_.push_back(env_inte);
   }
 
   EnvSet::EnvSet(const SeedEnvelope &envelope, std::vector<ExpEnvelope> &env_list, int start, int end,
@@ -41,6 +43,7 @@ namespace toppic {
     start_spec_id_ = start;
     end_spec_id_ = end;
     xic_ = init_median_xic(noise_inte_level, snr);
+    setAggregateEnvelopeInte();
   }
 
   Xic EnvSet::init_median_xic(double noise_inte_level, double snr) {
@@ -76,6 +79,20 @@ namespace toppic {
     }
     Xic xic = Xic(start_spec_id_, seed_env_.getSpecId(), inte_list, env_inte_list);
     return xic;
+  }
+
+  void EnvSet::setAggregateEnvelopeInte(){
+    std::vector<double> aggregate_inte(exp_env_list_[0].get_peak_num(), 0.0);
+    int num_spec = exp_env_list_.size();
+    int num_peaks = aggregate_inte.size();
+    for (int spId = 0; spId < num_spec; spId++) {
+      for (int peakIdx = 0; peakIdx < num_peaks; peakIdx++) {
+        ExpPeak peak = exp_env_list_[spId].get_peak(peakIdx);
+        if (!peak.isEmpty())
+          aggregate_inte[peakIdx] = aggregate_inte[peakIdx] + peak.getInte();
+      }
+    }
+    aggregate_envelope_inte_ = aggregate_inte;
   }
 
   void EnvSet::get_weight_mz_error(double *weight_sum, double *error_sum) {

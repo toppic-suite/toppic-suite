@@ -33,7 +33,8 @@ namespace toppic {
                         int scan_begin, int scan_end,
                         double intensity, int env_num,
                         int spec_id_begin, int spec_id_end,
-                        double mass, std::vector<double> xic_inte);
+                        double mass, std::vector<double> xic_inte,
+                        std::vector<double>envelopeMass, std::vector<double> aggregateEnvelopeInte);
 
     SingleChargeFeature(int charge,
                         double time_begin, double time_end,
@@ -68,6 +69,10 @@ namespace toppic {
 
     std::vector<double> getXicInte() { return xic_inte_; }
 
+    std::vector<double> getAggregateEnvelopeInte() { return aggregateEnvelopeInte_; }
+
+    std::vector<double> getEnvelopeMass() { return envelopeMass_; }
+
     void setSpecIDBegin(int spec_id_begin) { spec_id_begin_ = spec_id_begin; }
 
     void setSpecIDEnd(int spec_id_end) { spec_id_end_ = spec_id_end; }
@@ -88,6 +93,8 @@ namespace toppic {
     int env_num_ = 0;
     double mass_;
     std::vector<double> xic_inte_;
+    std::vector<double> envelopeMass_;
+    std::vector<double> aggregateEnvelopeInte_;
   };
 
   typedef std::shared_ptr<SingleChargeFeature> SingleChargeFeaturePtr;

@@ -121,7 +121,7 @@ namespace toppic {
       std::vector<EnvSet> env_set_list;
       int charge = env.getCharge() - 1;
       int miss_num = 0;
-      while (charge >= para_ptr->para_min_charge_) {
+      while (charge >= 1) {
         SeedEnvelope cur_env = env.get_new_charge_env(charge);
         env_set_util::comp_peak_start_end_idx(peak_matrix, cur_env, para_ptr->mass_tole_);
         EnvSet env_set = env_set_util::find_env_set(peak_matrix, cur_env, start_spec_id, end_spec_id, para_ptr, sn_ratio);
@@ -171,12 +171,8 @@ namespace toppic {
       if (top_peak_env_set.isEmpty())
         return EnvCollection();
       top_peak_env_set.refine_feature_boundary();
-      if (para_ptr->filter_neighboring_peaks_)
-        if (!env_set_util::check_valid_env_set_seed_env(peak_matrix, top_peak_env_set, para_ptr->max_miss_peak_))
-          return EnvCollection();
-      else
-        if (!env_set_util::check_valid_env_set_seed_env_sparse(peak_matrix, top_peak_env_set, para_ptr->max_miss_peak_))
-          return EnvCollection();
+      if (!env_set_util::check_valid_env_set_seed_env(peak_matrix, top_peak_env_set, para_ptr->max_miss_peak_))
+        return EnvCollection();
       double even_odd_peak_ratios = component_score::get_agg_odd_even_peak_ratio(top_peak_env_set);
       if (std::abs(even_odd_peak_ratios) > para_ptr->even_odd_ratio_cutoff_) {
         env = utility_functions::test_half_charge_state(peak_matrix, env, top_peak_env_set, even_odd_peak_ratios, para_ptr, sn_ratio);

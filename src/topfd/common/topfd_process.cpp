@@ -18,9 +18,6 @@
 #include "common/util/str_util.hpp"
 #include "common/util/time_util.hpp"
 #include "common/base/base_data.hpp"
-#include "ms/spec/msalign_frac_merge.hpp"
-#include "ms/spec/deconv_json_merge.hpp"
-#include "ms/feature/feature_merge.hpp"
 #include "ms/env/env_base.hpp"
 #include "topfd/deconv/deconv_process.hpp"
 #include "topfd/feature_detect/feature_detect.hpp"
@@ -40,9 +37,9 @@ void processOneFile(TopfdParaPtr para_ptr,
     std::cout << "Deconvolution started." << std::endl;
 
     DeconvProcess processor(para_ptr, spec_file_name, frac_id, thread_number);
+    
     processor.process();
     std::cout << "Deconvolution finished." << std::endl;
-
     std::cout << "Deleting temporary files - started." << std::endl;
     
     std::string file_num = "";
@@ -65,14 +62,12 @@ void processOneFile(TopfdParaPtr para_ptr,
     std::cout << "Deleting temporary files - finished." << std::endl; 
 
     std::cout << "Feature detection started." << std::endl;
-
-    feature_detect::process(frac_id,
-                              spec_file_name,
-                              para_ptr,
-                              processor.isFaims_,
-                              processor.voltage_vec_);
+    feature_detect::process_ms2(frac_id, spec_file_name,
+                                  para_ptr->getResourceDir(),
+                                  para_ptr->getActivation(),
+                                  para_ptr->getECScore());
     std::cout << "Feature detection finished." << std::endl;
-    
+
     std::cout << "Processing " << spec_file_name << " finished." << std::endl;
   } catch (const char* e) {
     LOG_ERROR("[Exception] " << e);
@@ -210,8 +205,8 @@ int process(TopfdParaPtr para_ptr,  std::vector<std::string> spec_file_lst) {
 
     if (isValidFile(spec_file_lst[k])) {
       processOneFile(para_ptr, spec_file_lst[k], k);
-      bool move_mzrt = true;
-      moveFiles(spec_file_lst[k], move_mzrt); 
+      bool move_mzrt = false;
+//      moveFiles(spec_file_lst[k], move_mzrt);
       std::cout << "Timestamp: " << time_util::getTimeStr() << std::endl;
     }
     else {

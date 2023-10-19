@@ -32,7 +32,6 @@ namespace env_set_util {
   void remove_non_match_envs(std::vector<ExpEnvelope>& env_list, int refer_idx);
   bool check_valid_env_set(PeakMatrix& peak_matrix, EnvSet& env_set);
   bool check_valid_env_set_seed_env(PeakMatrix& peak_matrix, EnvSet& env_set, int max_miss_peak);
-  bool check_valid_env_set_seed_env_sparse(PeakMatrix& peak_matrix, EnvSet& env_set, int max_miss_peak);
   ExpEnvelope get_match_exp_env(PeakMatrix& peak_matrix, SeedEnvelope& seed_env, int sp_id, double mass_tol);
 }
 }

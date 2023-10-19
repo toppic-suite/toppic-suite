@@ -18,17 +18,13 @@
 #include <vector>
 #include "para/peak_tolerance.hpp"
 #include "ms/feature/peak_cluster_score.hpp"
-#include "topfd/common/topfd_para.hpp"
 
 namespace toppic {
 
 class FeaturePara {
  public:
   FeaturePara(int frac_id, const std::string &file_name, 
-              const std::string &resource_dir);
-
-  FeaturePara(int frac_id, const std::string &file_name,
-              const std::string &resource_dir, TopfdParaPtr para_ptr);
+              const std::string &resource_dir); 
 
   std::vector<double> getExtendMasses(double mass);
 
@@ -56,20 +52,19 @@ class FeaturePara {
   int frac_id_;
 
   ///// params
-  int para_max_charge_;
-  int para_min_charge_;
-  bool filter_neighboring_peaks_;
-  double corr_tole_;
-
   double bin_size_ = 0.1;
   double neighbor_mass_tole_ = 0.01;
   double mass_tole_ = 0.008;
+  double corr_tole_ = 0.5;
   int max_miss_env_ = 2;
   int max_miss_charge_ = 2;
   int max_miss_peak_ = 2;
+  int para_max_charge_ = 30;
+  double ratio_multi_ = 2.0;
   int match_peak_tole_ = 2;
   double match_envelope_tolerance_ = 10E-6;
   double time_overlap_tole_ = 0.8;
+  double score_cutoff_ = 0.5;
   double even_odd_ratio_cutoff_ = 0.4;
 
   std::string file_name_;

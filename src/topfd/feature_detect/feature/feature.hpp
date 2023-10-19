@@ -15,16 +15,16 @@
 #ifndef TOPPIC_FEATURE_HPP
 #define TOPPIC_FEATURE_HPP
 
+#include "ms/feature/frac_feature.hpp"
+#include "ms/feature/spec_feature.hpp"
+#include "ms/spec/simple_msalign_reader.hpp"
+#include "ms/spec/msalign_writer.hpp"
+#include "topfd/feature_detect/feature_para.hpp"
+#include "topfd/feature_detect/env_collection/env_coll_util.hpp"
 #include "topfd/feature_detect/env_collection/env_collection.hpp"
 #include "topfd/feature_detect/score/get_env_cnn_score.hpp"
 #include "topfd/feature_detect/score/get_env_coll_score.hpp"
 #include "topfd/feature_detect/score/get_component_score.hpp"
-#include "ms/feature/frac_feature.hpp"
-#include "ms/feature/spec_feature.hpp"
-#include "ms/spec/simple_msalign_reader.hpp"
-#include "topfd/feature_detect/feature_para.hpp"
-#include "ms/spec/msalign_writer.hpp"
-#include "topfd/feature_detect/env_collection/env_coll_util.hpp"
 
 namespace toppic {
   class Feature {
@@ -38,12 +38,11 @@ namespace toppic {
                                      EnvCollection &env_coll, PeakMatrix &peak_matrix, double snr);
 
     void static
-    assign_features(DeconvMsPtrVec &ms1_ptr_vec, const std::string &ms2_file_name,
-                    FracFeaturePtrVec &frac_features, std::vector<EnvCollection> &env_coll_list,
-                    std::vector<Feature> &features, SpecFeaturePtrVec &ms2_features,
-                    std::vector<double> &precMzs, PeakMatrix &peak_matrix, fdeep::model model,
-                    const fdeep::model &model_escore, FeatureParaPtr para_ptr, //EnvParaPtr env_para_ptr,
-                    TopfdParaPtr topfd_para_ptr);
+    assign_features(DeconvMsPtrVec &ms1_ptr_vec, const std::string &ms2_file_name, FracFeaturePtrVec &frac_features,
+                    std::vector<EnvCollection> &env_coll_list, std::vector<Feature> &features,
+                    SpecFeaturePtrVec &ms2_features, std::vector<double> &precMzs, PeakMatrix &peak_matrix,
+                    fdeep::model model, const fdeep::model& model_escore, FeatureParaPtr para_ptr, EnvParaPtr env_para_ptr,
+                    double score_thr);
 
     bool static
     get_mass_shifted_feature_map(FracFeaturePtrVec &frac_features, std::vector<EnvCollection> &env_coll_list,
@@ -62,15 +61,15 @@ namespace toppic {
 
     bool static get_new_feature_map(DeconvMsPtrVec &ms1_ptr_vec, FracFeaturePtrVec &frac_features,
                                     std::vector<EnvCollection> &env_coll_list, std::vector<Feature> &features,
-                                    FeatureParaPtr para_ptr, MsHeaderPtr hh, TopfdParaPtr topfd_para_ptr,
+                                    FeatureParaPtr para_ptr, EnvParaPtr env_para_ptr, MsHeaderPtr hh,
                                     SpecFeaturePtrVec &ms2_features, PeakMatrix &peak_matrix, fdeep::model model,
                                     fdeep::model model_escore);
 
     void static get_empty_feature_map(DeconvMsPtrVec &ms1_ptr_vec, FracFeaturePtrVec &frac_features,
-                                               std::vector<EnvCollection> &env_coll_list, std::vector<Feature> &features,
-                                               const FeatureParaPtr &para_ptr, MsHeaderPtr hh, TopfdParaPtr topfd_para_ptr,
-                                               SpecFeaturePtrVec &ms2_features, PeakMatrix &peak_matrix, fdeep::model model,
-                                               fdeep::model model_escore);
+                                      std::vector<EnvCollection> &env_coll_list, std::vector<Feature> &features,
+                                      const FeatureParaPtr& para_ptr, EnvParaPtr env_para_ptr, MsHeaderPtr hh,
+                                      SpecFeaturePtrVec &ms2_features, PeakMatrix &peak_matrix, fdeep::model model,
+                                      fdeep::model model_escore);
 
     DeconvMsPtrVec static readData(const std::string &file_name);
 

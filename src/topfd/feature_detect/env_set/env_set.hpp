@@ -45,6 +45,8 @@ namespace toppic {
 
     void shortlistExpEnvs();
 
+    void setAggregateEnvelopeInte();
+
     const toppic::SeedEnvelope getSeedEnv() const { return seed_env_; }
 
     void setSeedEnv(const toppic::SeedEnvelope &seedEnv) { seed_env_ = seedEnv; }
@@ -68,6 +70,8 @@ namespace toppic {
     const Xic getXic() const { return xic_; }
 
     void setXic(const Xic &xic) { xic_ = xic; }
+
+    std::vector<double> getAggregateEnvelopeInte() { return aggregate_envelope_inte_; }
 
     std::vector<double> getXicEnvIntes() { return xic_.getInteList(); }
 
@@ -93,6 +97,7 @@ namespace toppic {
     int start_spec_id_;
     int end_spec_id_;
     Xic xic_;
+    std::vector<double> aggregate_envelope_inte_;
   };
 }
 

@@ -12,6 +12,7 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+
 #include "common/util/file_util.hpp"
 #include "common/base/mass_constant.hpp"
 #include "topfd/feature_detect/feature_para.hpp"
@@ -38,34 +39,6 @@ FeaturePara::FeaturePara(int frac_id, const std::string &file_name,
   double threshold = 0;
   std::string dir = resource_dir + file_util::getFileSeparator() + "promex"; 
   peak_cluster_score_ptr_ = std::make_shared<PeakClusterScore>(dir, threshold);
-}
-
-FeaturePara::FeaturePara(int frac_id, const std::string &file_name,
-                         const std::string &resource_dir, TopfdParaPtr para_ptr):
-    frac_id_(frac_id),
-    file_name_(file_name) {
-
-  double ppo = 0.000015;
-  peak_tolerance_ptr_ = std::make_shared<PeakTolerance>(ppo);
-
-  // extend sp parameter
-  double IM = mass_constant::getIsotopeMass();
-  // the set of offsets used to expand the monoisotopic mass list
-  std::vector<double> offsets_1 {{0, -IM, IM, -2 * IM, 2 * IM, -3*IM, 3*IM}};
-  search_offsets_ = offsets_1;
-  std::vector<double> offsets_2 {{0, -IM, IM, -2 * IM, 2 * IM}};
-  extend_offsets_ = offsets_2;
-
-  //peak_cluster_score
-  double threshold = 0;
-  std::string dir = resource_dir + file_util::getFileSeparator() + "promex";
-  peak_cluster_score_ptr_ = std::make_shared<PeakClusterScore>(dir, threshold);
-
-  /// additional parameters
-  para_max_charge_ = para_ptr->getMaxCharge();
-  para_min_charge_ = 1;
-  filter_neighboring_peaks_ = true;
-  corr_tole_ = 0.5;
 }
 
 std::vector<double> FeaturePara::getExtendMasses(double mass) {
