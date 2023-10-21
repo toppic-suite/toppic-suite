@@ -236,6 +236,7 @@ void VarPtmSearchProcessor::process() {
         }
       }
 
+      /*
       // suffix
       SimplePrsmPtrVec suff_selected_prsm_ptrs;
       while (suff_prsm_ptr != nullptr && suff_prsm_ptr->getSpectrumId() == spec_id) {
@@ -267,6 +268,7 @@ void VarPtmSearchProcessor::process() {
           internal_writer.writeVector(prsms);
         }
       }
+      */
     }
     std::cout << std::flush <<  "Variable PTM search - processing " << cnt
         << " of " << spectrum_num << " spectra.\r";
