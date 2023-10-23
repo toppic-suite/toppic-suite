@@ -14,11 +14,14 @@
 
 #include <string>
 #include <vector>
+#include <mutex>
 
 #include "common/util/logger.hpp"
 #include "seq/fasta_index_reader.hpp"
 
 namespace toppic {
+
+std::mutex fasta_index_reader_mtx;          
 
 FastaIndexReader::FastaIndexReader(const std::string &file_name) {
   fai_ = fai_load(file_name.c_str());
@@ -31,11 +34,14 @@ FastaIndexReader::~FastaIndexReader() {
 FastaSeqPtr FastaIndexReader::readFastaSeq(const std::string &name,
                                            const std::string &desc) {
   int seq_len;
+  // fai_fetch is not multi thread safe
+  fasta_index_reader_mtx.lock();          
   char *seq = fai_fetch(fai_, name.c_str(), &seq_len);
   if (seq_len < 0) {
     LOG_WARN("Failed to fetch protein sequence " << name);
   }
   std::string ori_seq(seq);
+  fasta_index_reader_mtx.unlock();          
 
   free(seq);
 
