@@ -101,7 +101,6 @@ void generateDbBlock(const std::string &db_file_name, int block_size,
   std::string index_file_name = db_file_name + "_block_index";
   std::string block_file_name = db_file_name + "_" + str_util::toString(block_idx);
 
-  LOG_ERROR("start db block");
   // get total_size;
   FastaReader size_reader(db_file_name);
   FastaSeqPtr seq_info = size_reader.getNextSeq();
@@ -155,7 +154,7 @@ void generateDbBlock(const std::string &db_file_name, int block_size,
     if (seq_size > block_size) {
       block_output.close();
       block_idx++;
-      LOG_ERROR("Database block " << block_idx << " size " << seq_size);
+      LOG_DEBUG("Database block " << block_idx << " size " << seq_size);
       index_output << block_idx << "\t" << seq_idx << std::endl;
       seq_size = 0;
       block_file_name = db_file_name + "_" + str_util::toString(block_idx);
