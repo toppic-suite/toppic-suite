@@ -44,7 +44,7 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["spectrumFileName"] = "";
   arguments["databaseBlockSize"] = "60000000";
   arguments["maxFragmentLength"] = "500";
-  arguments["minBlockNum"] = "10";
+  arguments["minBlockNum"] = "20";
   arguments["activation"] = "FILE";
   arguments["fixedMod"] = "";
   arguments["allowProtMod"] = "NONE,NME,NME_ACETYLATION,M_ACETYLATION";

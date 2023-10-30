@@ -45,7 +45,7 @@ std::map<std::string, std::string> TopmgArgument::initArguments() {
   arguments["databaseFileName"] = "";
   arguments["databaseBlockSize"] = "60000000";
   arguments["maxFragmentLength"] = "500";
-  arguments["minBlockNum"] = "10";
+  arguments["minBlockNum"] = "20";
   arguments["spectrumFileName"] = "";
   arguments["combinedOutputName"] = "";
   arguments["activation"] = "FILE";
