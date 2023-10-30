@@ -92,29 +92,33 @@ void TopmgArgument::outputArguments(std::ostream &output,
 
   if (arguments["fixedMod"] != "") {
     //add fixed PTM information 
-    output << "Fixed PTM Begin" << std::endl;
     if (arguments["fixedMod"] == "C57") {
-      output << std::setw(gap) << std::left << "Carbamidomethylation" << sep << 57.021464 << std::endl;
+      output << std::setw(gap) << std::left << "Fixed modifications BEGIN" << std::endl;
+      output << std::setw(gap) << std::left << "Carbamidomethylation" << sep << 57.021464 << sep << "C" << std::endl;
+      output << std::setw(gap) << std::left << "Fixed modifications END" << std::endl;
     }
     else if (arguments["fixedMod"] == "C58") {
-      output << std::setw(gap) << std::left << "Carboxymethylation" << sep << 58.005479 << std::endl;
+      output << std::setw(gap) << std::left << "Fixed modifications BEGIN" << std::endl;
+      output << std::setw(gap) << std::left << "Carboxymethylation" << sep << 58.005479 << sep << "C" << std::endl;
+      output << std::setw(gap) << std::left << "Fixed modifications END" << std::endl;
     }
     else {
+      output << std::setw(gap) << std::left << "Fixed modifications file name:" << sep << arguments["fixedMod"] << std::endl;
+      output << std::setw(gap) << std::left << "Fixed modifications BEGIN" << std::endl;
       std::vector<std::vector<std::string>> mod_data = mod_util::readModTxtForTsv(arguments["fixedMod"]);
       for (size_t i = 0; i < mod_data.size(); i++) {
-        output << std::setw(gap) << std::left << mod_data[i][0] << sep << mod_data[i][1] << std::endl;
+        output << std::setw(gap) << std::left << mod_data[i][0] << sep << mod_data[i][1] << sep << mod_data[i][2] << std::endl;
       }
     }
-    output << "Fixed PTM End" << std::endl;
   }
   output << std::setw(gap) << std::left << "Allowed N-terminal forms:" << sep << arguments["allowProtMod"] << std::endl;
 
   output << std::setw(gap) << std::left << "Maximum number of variable PTMs:" << sep << arguments["varPtmNumber"] << std::endl;
-  output << std::setw(gap) << std::left << "Modification file name:" << sep << arguments["varModFileName"] << std::endl;
+  output << std::setw(gap) << std::left << "Variable modification file name:" << sep << arguments["varModFileName"] << std::endl;
   output << std::setw(gap) << std::left <<  "Variable modifications BEGIN" << std::endl;
   std::vector<std::vector<std::string>> mod_data = mod_util::readModTxtForTsv(arguments["varModFileName"]);
   for (size_t i = 0; i < mod_data.size(); i++) {
-    output << std::setw(gap) << std::left << mod_data[i][0] << sep << mod_data[i][1] << std::endl;
+    output << std::setw(gap) << std::left << mod_data[i][0] << sep << mod_data[i][1] << sep << mod_data[i][2] << std::endl;
   }
   output << std::setw(gap) << std::left <<  "Variable modifications END" << std::endl;
 
