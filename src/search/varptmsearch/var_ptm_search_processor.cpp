@@ -227,9 +227,6 @@ void VarPtmSearchProcessor::process() {
   std::vector<double> prec_error_vec = sp_para_ptr->getVarPtmSearchPrecErrorVec();
   //LOG_ERROR("start ");
   while (deconv_ms_ptr_vec.size() > 0) {
-    if (cnt > 60) {
-      break;
-    }
     std::vector<SpectrumSetPtr> spec_set_vec 
         = spectrum_set_factory::geneSpectrumSetPtrVecWithPrecError(deconv_ms_ptr_vec, 
                                                                    sp_para_ptr,
