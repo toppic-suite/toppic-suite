@@ -35,10 +35,13 @@ void writeHeader(std::ofstream &of) {
      << "Fraction_feature_ID" << "\t"
      << "Fraction_feature_intensity" << "\t"
      << "Fraction_feature_score" << "\t"
-     << "Fraction_feature_time_apex" << "\t"
+     << "Fraction_feature_min_time" << "\t"
+     << "Fraction_feature_max_time" << "\t"
+     << "Fraction_feature_apex_time" << "\t"
      << "Sample_feature_ID" << "\t"
      << "Sample_feature_intensity" << "\t"
-     << "Precursor_mono_mz" << "\t"
+     << "Precursor_monoisotopic_mz" << "\t"
+     << "Precursor_average_mz" << "\t"
      << "Precursor_charge" << "\t"
      << "Precursor_intensity"
      << std::endl;
@@ -55,11 +58,14 @@ void writeOneFeature(std::ofstream &of, SpecFeaturePtr feature) {
      << feature->getFracFeatureId() << "\t"
      << feature->getFracFeatureInte() << "\t"
      << feature->getFracFeatureScore() << "\t"
-     << feature->getFracFeatureTimeApex() << "\t"
+     << feature->getFracFeatureMinTime() << "\t"
+     << feature->getFracFeatureMaxTime() << "\t"
+     << feature->getFracFeatureApexTime() << "\t"
      << feature->getSampleFeatureId() << "\t"
      << feature->getSampleFeatureInte() << "\t" 
      << std::setprecision(9) 
      << feature->getPrecMonoMz() << "\t"
+     << feature->getPrecAvgMz() << "\t"
      << std::setprecision(5) 
      << feature->getPrecCharge() << "\t"
      << feature->getPrecInte() 

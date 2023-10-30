@@ -125,7 +125,6 @@ void process(TopfdParaPtr topfd_para_ptr) {
       env_coll_ptr->refineMonoMass();
       ECScorePtr ecscore_ptr = std::make_shared<ECScore>(env_coll_ptr, matrix_ptr,
                                                          feat_id, sn_ratio); 
-      feat_id++;
       ecscore_list.push_back(ecscore_ptr);
       env_coll_ptr->removePeakData(matrix_ptr);
       if (ecscore_ptr->getScore() < topfd_para_ptr->getEcscoreCutoff()) {
@@ -138,6 +137,7 @@ void process(TopfdParaPtr topfd_para_ptr) {
                                                                    score_para_ptr->file_name_,
                                                                    env_coll_ptr, matrix_ptr, sn_ratio);
       frac_features.push_back(frac_feat_ptr);
+      feat_id++;
     }
   }
   

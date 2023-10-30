@@ -72,9 +72,9 @@ bool getHighestInteEnvColl(FracFeaturePtrVec &frac_features, EnvCollPtrVec &env_
         continue; 
       }
 
-      double prec_mono_mz = peak_util::compMz(frac_feature_ptr->getMonoMass(), 
-                                              env_set_ptr->getCharge());
       int prec_charge = env_set_ptr->getCharge();
+      double prec_mono_mz = peak_util::compMz(feature_mono_mass, prec_charge);
+      double prec_avg_mz = peak_util::compMz(feature_avg_mass, prec_charge); 
       double prec_inte = env_intes[inte_idx];
       if (prec_inte < 0) {
         prec_inte = 0;
@@ -82,6 +82,7 @@ bool getHighestInteEnvColl(FracFeaturePtrVec &frac_features, EnvCollPtrVec &env_
       SpecFeaturePtr ms2_feature = std::make_shared<SpecFeature>(header_ptr,
                                                                  frac_feature_ptr, 
                                                                  prec_mono_mz, 
+                                                                 prec_avg_mz, 
                                                                  prec_charge,
                                                                  prec_inte);
       new_spec_feats.push_back(ms2_feature);
@@ -174,11 +175,14 @@ bool getNewEnvColl(MsHeaderPtr header_ptr, MsMapPtr matrix_ptr,
     frac_feature_ptr->setHasMs2Spec(true);
     frac_feature_list.push_back(frac_feature_ptr);
     double prec_mono_mass = seed_ptr->getMonoNeutralMass();
+    double prec_avg_mass = seed_ptr->getAvgNeutralMass();
     int prec_charge = seed_ptr->getCharge();
     double prec_mono_mz = peak_util::compMz(prec_mono_mass, prec_charge);
+    double prec_avg_mz = peak_util::compMz(prec_avg_mass, prec_charge); 
     double prec_inte = seed_ptr->getSeedInte();
     SpecFeaturePtr ms2_feature_ptr = std::make_shared<SpecFeature>(header_ptr, frac_feature_ptr,
-                                                                   prec_mono_mz, prec_charge, prec_inte);
+                                                                   prec_mono_mz, prec_avg_mz, 
+                                                                   prec_charge, prec_inte);
     ms2_feature_list.push_back(ms2_feature_ptr);
     return true;
   }

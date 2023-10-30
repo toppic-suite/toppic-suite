@@ -34,7 +34,8 @@ class SpecFeature {
   SpecFeature(std::string line);
 
   SpecFeature(MsHeaderPtr header, FracFeaturePtr feature,
-              double prec_mono_mz, int prec_charge, double prec_inte);
+              double prec_mono_mz, double prec_avg_mz, 
+              int prec_charge, double prec_inte);
 
   int getSpecId() {return spec_id_;}
 
@@ -50,6 +51,8 @@ class SpecFeature {
 
   double getPrecMonoMz() {return prec_mono_mz_;}
 
+  double getPrecAvgMz() {return prec_avg_mz_;}
+
   double getPrecCharge() {return prec_charge_;}
 
   double getPrecMass() {return peak_util::compPeakNeutralMass(prec_mono_mz_, 
@@ -63,7 +66,11 @@ class SpecFeature {
 
   double getFracFeatureScore() {return frac_feature_score_;}
 
-  double getFracFeatureTimeApex() {return frac_feature_time_apex_;}
+  double getFracFeatureMinTime() {return frac_feature_min_time_;}
+
+  double getFracFeatureMaxTime() {return frac_feature_max_time_;}
+
+  double getFracFeatureApexTime() {return frac_feature_apex_time_;}
 
   int getSampleFeatureId() {return sample_feature_id_;}
 
@@ -97,10 +104,13 @@ class SpecFeature {
   int frac_feature_id_;
   double frac_feature_inte_;
   double frac_feature_score_;
-  double frac_feature_time_apex_;
+  double frac_feature_min_time_;
+  double frac_feature_max_time_;
+  double frac_feature_apex_time_;
   int sample_feature_id_;
   double sample_feature_inte_;
   double prec_mono_mz_;
+  double prec_avg_mz_;
   int prec_charge_;
   double prec_inte_;
 };
