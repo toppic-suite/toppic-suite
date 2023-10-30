@@ -188,7 +188,7 @@ void addFeatureIDToPrsms(PrsmStrPtrVec &prsm_ptrs, const std::string & feature_f
         prsm_ptrs[i]->setPrecFeatureId(feature->getSampleFeatureId());
         prsm_ptrs[i]->setPrecFeatureInte(feature->getSampleFeatureInte());
         prsm_ptrs[i]->setFracFeatureScore(feature->getFracFeatureScore());
-        prsm_ptrs[i]->setTimeApex(feature->getFracFeatureTimeApex());
+        prsm_ptrs[i]->setTimeApex(feature->getFracFeatureApexTime());
       }
       else {
         LOG_ERROR("Spectrum " << spec_id << " does not have a feature!");

@@ -331,6 +331,7 @@ void VarPtmSearchProcessor::process() {
         }
       }
     }
+    cnt = cnt + group_spec_num; 
     std::cout << std::flush <<  "Variable PTM search - processing " << cnt
         << " of " << spectrum_num << " spectra.\r";
     deconv_ms_ptr_vec = msalign_reader_ptr->getNextMsPtrVec(); 
