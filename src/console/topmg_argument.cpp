@@ -90,53 +90,6 @@ void TopmgArgument::outputArguments(std::ostream &output,
   output << std::setw(gap) << std::left << "Fragmentation method:" << sep << arguments["activation"] << std::endl;
   output << std::setw(gap) << std::left << "Search type:" << sep << arguments["searchType"] << std::endl;
 
-  if (arguments["fixedMod"] == "") {
-    output << std::setw(gap) << std::left << "Fixed modifications:" << sep << "None" << std::endl;
-  } 
-  else if (arguments["fixedMod"] == "C57") {
-    output << std::setw(gap) << std::left << "Fixed modifications:" << sep << "C57:carbamidomethylation on cysteine" << std::endl;
-  }
-  else if (arguments["fixedMod"] == "C58") {
-    output << std::setw(gap) << std::left << "Fixed modifications:" << sep << "C58:carboxymethylation on cysteine" << std::endl;
-  }
-  else {
-    output << std::setw(gap) << std::left << "Fixed modifications:" << sep << arguments["fixedMod"] << std::endl;
-  }
-
-  if (arguments["useFeatureFile"] == "true") {
-    output << std::setw(gap) << std::left << "Use TopFD feature file:" << sep << "True" << std::endl;
-  }
-  else {
-    output << std::setw(gap) << std::left << "Use TopFD feature file:" << sep << "False" << std::endl;
-  }
-
-  output << std::setw(gap) << std::left << "Error tolerance for matching masses:" << sep << arguments["massErrorTolerance"] << " ppm" << std::endl;
-  output << std::setw(gap) << std::left << "Error tolerance for identifying PrSM clusters:" << sep << arguments["proteoformErrorTolerance"]  
-      << " Da" << std::endl;
-  output << std::setw(gap) << std::left << "Spectrum-level cutoff type:" << sep << arguments["cutoffSpectralType"] << std::endl;
-  output << std::setw(gap) << std::left << "Spectrum-level cutoff value:" << sep << arguments["cutoffSpectralValue"] << std::endl;
-  output << std::setw(gap) << std::left << "Proteoform-level cutoff type:" << sep << arguments["cutoffProteoformType"] << std::endl;
-  output << std::setw(gap) << std::left << "Proteoform-level cutoff value:" << sep << arguments["cutoffProteoformValue"] << std::endl;
-  output << std::setw(gap) << std::left << "Allowed N-terminal forms:" << sep << arguments["allowProtMod"] << std::endl;
-  output << std::setw(gap) << std::left << "Maximum mass shift of modifications:" << sep << arguments["maxShiftMass"] << " Da" << std::endl;
-  output << std::setw(gap) << std::left << "Thread number:" << sep << arguments["threadNumber"] << std::endl;
-  output << std::setw(gap) << std::left << "Modification file name:" << sep << arguments["varModFileName"] << std::endl;
-  output << std::setw(gap) << std::left << "Gap in proteoform graph:" << sep << arguments["proteoGraphGap"] << std::endl;
-  output << std::setw(gap) << std::left << "Maximum number of variable PTMs:" << sep << arguments["varPtmNumber"] << std::endl;
-  output << std::setw(gap) << std::left << "Maximum number of variable PTMs in a graph gap:" << sep << arguments["varPtmNumInGap"] << std::endl;
-  output << std::setw(gap) << std::left << "Maximum number of unexpected modifications:" << sep << arguments["shiftNumber"] << std::endl;
-  if (arguments["wholeProteinOnly"] == "true") {
-    output << std::setw(gap) << std::left << "Report only proteoforms from whole proteins:"  << sep << "True" << std::endl;
-  }
-  else {
-    output << std::setw(gap) << std::left << "Report only proteoforms from whole proteins:"  << sep << "False" << std::endl;
-  }
-  output << std::setw(gap) << std::left << "Executable file directory:" << sep << arguments["executiveDir"] << std::endl;
-  output << std::setw(gap) << std::left << "Start time:" << sep << arguments["startTime"] << std::endl;
-  if (arguments["endTime"] != "") {
-    output << std::setw(gap) << std::left << "End time:" << sep << arguments["endTime"] << std::endl;
-  }
-  output << std::setw(gap) << std::left << "Version:" << sep << arguments["version"] << std::endl;
   if (arguments["fixedMod"] != "") {
     //add fixed PTM information 
     output << "Fixed PTM Begin" << std::endl;
@@ -154,12 +107,52 @@ void TopmgArgument::outputArguments(std::ostream &output,
     }
     output << "Fixed PTM End" << std::endl;
   }
-  output << "Variable PTM Begin" << std::endl;
+  output << std::setw(gap) << std::left << "Allowed N-terminal forms:" << sep << arguments["allowProtMod"] << std::endl;
+
+  output << std::setw(gap) << std::left << "Maximum number of variable PTMs:" << sep << arguments["varPtmNumber"] << std::endl;
+  output << std::setw(gap) << std::left << "Modification file name:" << sep << arguments["varModFileName"] << std::endl;
+  output << std::setw(gap) << std::left <<  "Variable modifications BEGIN" << std::endl;
   std::vector<std::vector<std::string>> mod_data = mod_util::readModTxtForTsv(arguments["varModFileName"]);
   for (size_t i = 0; i < mod_data.size(); i++) {
     output << std::setw(gap) << std::left << mod_data[i][0] << sep << mod_data[i][1] << std::endl;
   }
-  output << "Variable PTM End" << std::endl;
+  output << std::setw(gap) << std::left <<  "Variable modifications END" << std::endl;
+
+  output << std::setw(gap) << std::left << "Maximum number of unexpected modifications:" << sep << arguments["shiftNumber"] << std::endl;
+  output << std::setw(gap) << std::left << "Maximum mass shift of modifications:" << sep << arguments["maxShiftMass"] << " Da" << std::endl;
+  output << std::setw(gap) << std::left << "Gap in proteoform graph:" << sep << arguments["proteoGraphGap"] << std::endl;
+  output << std::setw(gap) << std::left << "Maximum number of variable PTMs in a graph gap:" << sep << arguments["varPtmNumInGap"] << std::endl;
+
+  if (arguments["wholeProteinOnly"] == "true") {
+    output << std::setw(gap) << std::left << "Report only proteoforms from whole proteins:"  << sep << "True" << std::endl;
+  }
+  else {
+    output << std::setw(gap) << std::left << "Report only proteoforms from whole proteins:"  << sep << "False" << std::endl;
+  }
+
+  output << std::setw(gap) << std::left << "Spectrum-level cutoff type:" << sep << arguments["cutoffSpectralType"] << std::endl;
+  output << std::setw(gap) << std::left << "Spectrum-level cutoff value:" << sep << arguments["cutoffSpectralValue"] << std::endl;
+  output << std::setw(gap) << std::left << "Proteoform-level cutoff type:" << sep << arguments["cutoffProteoformType"] << std::endl;
+  output << std::setw(gap) << std::left << "Proteoform-level cutoff value:" << sep << arguments["cutoffProteoformValue"] << std::endl;
+
+  output << std::setw(gap) << std::left << "Error tolerance for matching masses:" << sep << arguments["massErrorTolerance"] << " ppm" << std::endl;
+  output << std::setw(gap) << std::left << "Error tolerance for identifying PrSM clusters:" << sep << arguments["proteoformErrorTolerance"]  
+      << " Da" << std::endl;
+
+  if (arguments["useFeatureFile"] == "true") {
+    output << std::setw(gap) << std::left << "Use TopFD feature file:" << sep << "True" << std::endl;
+  }
+  else {
+    output << std::setw(gap) << std::left << "Use TopFD feature file:" << sep << "False" << std::endl;
+  }
+
+  output << std::setw(gap) << std::left << "Thread number:" << sep << arguments["threadNumber"] << std::endl;
+  output << std::setw(gap) << std::left << "Executable file directory:" << sep << arguments["executiveDir"] << std::endl;
+  output << std::setw(gap) << std::left << "Start time:" << sep << arguments["startTime"] << std::endl;
+  if (arguments["endTime"] != "") {
+    output << std::setw(gap) << std::left << "End time:" << sep << arguments["endTime"] << std::endl;
+  }
+  output << std::setw(gap) << std::left << "Version:" << sep << arguments["version"] << std::endl;
   output << "********************** Parameters ***********************" << std::endl;
 }
 

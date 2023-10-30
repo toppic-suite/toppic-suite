@@ -116,8 +116,6 @@ void ToppicArgument::outputArguments(std::ostream &output,
 
   output << std::setw(gap) << std::left << "Allowed N-terminal forms:" << sep <<  arguments["allowProtMod"] << std::endl;
 
-  //output << std::setw(gap) << std::left << "N-terminal label mass" << sep << arguments["nTermLabelMass"] << std::endl;
-  
   if (arguments["variablePtmFileName"] != "" && arguments["variablePtmNum"]!="0") {
     output << std::setw(gap) << std::left <<  "Maximum number of variable modifications:" << sep << arguments["variablePtmNum"] << std::endl;
     output << std::setw(gap) << std::left <<  "Use approximate spectra in protein filtering:" << sep << arguments["useApproxSpectra"] << std::endl;
