@@ -214,7 +214,7 @@ void TopFDDialog::on_startButton_clicked() {
     if (finish) {
       QByteArray byteArray = process_.readAllStandardError();
       QString str = QString(byteArray);
-      if (process_.exitStatus() != QProcess::NormalExit) {
+      if (process_.exitCode() != 0) {
         str = str + "\nERROR Quit status: Crashed. \n";
         str = str + "ERROR Quit code: " + QString::number(process_.exitCode()) + ".\n";
       }
@@ -222,8 +222,6 @@ void TopFDDialog::on_startButton_clicked() {
       if (msg != "") {
         updateMsg(msg); 
       }
-      //qDebug() << "Status: " << process_.exitStatus();
-      //qDebug() << "Code: " << process_.exitCode();
     }
     sleep(100);
   }

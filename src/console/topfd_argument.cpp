@@ -211,7 +211,7 @@ bool Argument::validateArguments() {
   for (size_t k = 0; k < spec_file_list_.size(); k++) {
     if (!file_util::exists(spec_file_list_[k])) {
       LOG_ERROR(spec_file_list_[k] << " does not exist!\n" 
-                << " Please check if file directory or name contains special characters such as spaces or quotation marks.");
+                << "Please check if file directory or name contains special characters such as spaces or quotation marks, or the file has been deleted.");
       return false;
     }
   }
