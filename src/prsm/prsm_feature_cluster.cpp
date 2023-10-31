@@ -80,11 +80,18 @@ void setProteoClusterId(PrsmStrPtrVec& prsm_ptrs,
           break;
         }
       } 
-      else if (cur_ptr->getProteoformMatchSeq() == ref_ptr->getProteoformMatchSeq()) {
-        clusters[j].push_back(cur_ptr);
-        //LOG_DEBUG("Proteoform merging by sequence!");
-        is_found = true;
-        break;
+      else {
+        // if protein identifications are different, but the protein sequences
+        // are the same and the proteoform masses are similar, the two
+        // proteoforms are treated as one. 
+        if (cur_ptr->getProteoformDbSeq() == ref_ptr->getProteoformDbSeq()
+            && std::abs(cur_ptr->getAdjustedPrecMass() - ref_ptr->getAdjustedPrecMass()) 
+            <= prec_error_tole) {
+          clusters[j].push_back(cur_ptr);
+          //LOG_DEBUG("Proteoform merging by sequence!");
+          is_found = true;
+          break;
+        }
       }
     }
     if (!is_found) {

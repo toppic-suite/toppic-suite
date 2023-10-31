@@ -59,6 +59,8 @@ class PrsmStr {
 
   std::string getProteoformMatchSeq() {return proteoform_match_seq_;}
 
+  std::string getProteoformDbSeq() {return proteoform_db_seq_;}
+
   double getPrecFeatureInte() {return sample_feature_inte_;}
 
   double getMatchFragNum() {return match_frag_num_;}
@@ -161,6 +163,8 @@ class PrsmStr {
   int variable_ptm_num_;
 
   std::string proteoform_match_seq_;
+
+  std::string proteoform_db_seq_;
 
   int proteoform_start_pos_;
 
