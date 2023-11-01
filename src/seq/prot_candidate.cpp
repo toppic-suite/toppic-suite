@@ -31,18 +31,43 @@ ProtCandidate::ProtCandidate(ProtScorePtr prot_score_ptr) {
   c_term_shifts_.push_back(prot_score_ptr->getCTermShift());
 }
 
-inline bool cmpScore(const std::pair<int, int> &a, const std::pair<int, int> &b) {
-  return a.second > b.second;
+inline bool protScoreScoreDecProtIdInc(const std::pair<int, int> &a, 
+                                       const std::pair<int, int> &b) {
+  if (a.second > b.second) {
+    return true;
+  }
+  else if (a.second < b.second) {
+    return false;
+  }
+  else if (a.first < b.first) {
+    return true;
+  }
+  else {
+    return false;
+  }
 }
 
-inline bool cmpPtrScore(const ProtScorePtr &a, const ProtScorePtr &b) {
-  return a->getScore() > b->getScore();
+inline bool protScorePtrScoreDecProtIdInc(const ProtScorePtr &a, 
+                                          const ProtScorePtr &b) {
+  if (a->getScore() > b->getScore()) {
+    return true;
+  }
+  else if (a->getScore() < b->getScore()) {
+    return false;
+  }
+  else if (a->getId() < b->getId()) {
+    return true;
+  }
+  else {
+    return false;
+  }
 }
 
 ProtCandidatePtrVec ProtCandidate::geneResults(std::vector<std::pair<int, int>> &single_type_results,
                                                int threshold, int single_type_num) {
   ProtCandidatePtrVec prot_results;
-  std::sort(single_type_results.begin(), single_type_results.end(), cmpScore);
+  std::sort(single_type_results.begin(), single_type_results.end(),
+            protScoreScoreDecProtIdInc);
   int output_num = 0;
   for (int i = 0; i < single_type_num; i++) {
     if (i >= static_cast<int>(single_type_results.size())) {
@@ -67,7 +92,8 @@ ProtCandidatePtrVec ProtCandidate::geneResults(std::vector<std::pair<int, int>> 
 ProtCandidatePtrVec ProtCandidate::geneResults(ProtScorePtrVec &prot_scores,
                                                int threshold, int single_type_num) {
   ProtCandidatePtrVec prot_results;
-  std::sort(prot_scores.begin(), prot_scores.end(), cmpPtrScore);
+  std::sort(prot_scores.begin(), prot_scores.end(),
+            protScorePtrScoreDecProtIdInc);
   int output_num = 0;
   for (int i = 0; i < single_type_num; i++) {
     if (i >= static_cast<int>(prot_scores.size())) {
