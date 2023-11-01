@@ -111,31 +111,57 @@ void process(TopfdParaPtr topfd_para_ptr) {
       perc = static_cast<int>(count * 100 / seed_num);
       std::cout << "\r" << "Processing seed " << count << " ...       " << perc << "\% finished." << std::flush;
     }
-    SeedEnvPtr seed_ptr = seed_ptrs[seed_env_idx];
-    seed_ptr = seed_env_util::preprocessSeedEnvPtr(seed_ptr, matrix_ptr,  
-                                                   score_para_ptr, sn_ratio); 
-    if (seed_ptr == nullptr) continue;
-    EnvCollPtr env_coll_ptr = env_coll_util::findEnvColl(matrix_ptr, seed_ptr,
-                                                         score_para_ptr, sn_ratio); 
-    if (env_coll_ptr != nullptr) {
-      if (env_coll_util::checkExistingFeatures(matrix_ptr, env_coll_ptr,
-                                               env_coll_list, score_para_ptr)) {
-        continue;
+    // Generate three candidate seeds and choose the best one based on ecsore
+    SeedEnvPtrVec seed_ptr_list;
+    SeedEnvPtr ori_seed_ptr = seed_ptrs[seed_env_idx];
+    seed_ptr_list.push_back(ori_seed_ptr);
+    SeedEnvPtr shift_left_seed_ptr = std::make_shared<SeedEnv>(ori_seed_ptr);
+    shift_left_seed_ptr->changeMzByIsotope(-1); 
+    seed_ptr_list.push_back(shift_left_seed_ptr);
+    SeedEnvPtr shift_right_seed_ptr = std::make_shared<SeedEnv>(ori_seed_ptr);
+    shift_right_seed_ptr->changeMzByIsotope(1);
+    seed_ptr_list.push_back(shift_right_seed_ptr);
+    
+    EnvCollPtr best_env_coll_ptr;
+    for (size_t seed_idx = 0; seed_idx < seed_ptr_list.size(); seed_idx++) {
+      SeedEnvPtr seed_ptr = seed_ptr_list[seed_idx];
+      seed_ptr = seed_env_util::preprocessSeedEnvPtr(seed_ptr, matrix_ptr,  
+                                                     score_para_ptr, sn_ratio); 
+      if (seed_ptr == nullptr) continue;
+      EnvCollPtr env_coll_ptr = env_coll_util::findEnvColl(matrix_ptr, seed_ptr,
+                                                           score_para_ptr, sn_ratio); 
+      if (env_coll_ptr != nullptr) {
+        if (env_coll_util::checkExistingFeatures(matrix_ptr, env_coll_ptr,
+                                                 env_coll_list, score_para_ptr)) {
+          continue;
+        }
+        env_coll_ptr->refineMonoMass();
+        ECScorePtr ecscore_ptr = std::make_shared<ECScore>(env_coll_ptr, matrix_ptr,
+                                                           feat_id, sn_ratio); 
+        ecscore_list.push_back(ecscore_ptr);
+        env_coll_ptr->removePeakData(matrix_ptr);
+        if (ecscore_ptr->getScore() < topfd_para_ptr->getEcscoreCutoff()) {
+          continue;
+        }
+        env_coll_ptr->setEcscore(ecscore_ptr->getScore());
+        if (best_env_coll_ptr == nullptr ||
+            env_coll_ptr->getEcscore() > best_env_coll_ptr->getEcscore()) {
+          best_env_coll_ptr = env_coll_ptr;
+        }
       }
-      env_coll_ptr->refineMonoMass();
-      ECScorePtr ecscore_ptr = std::make_shared<ECScore>(env_coll_ptr, matrix_ptr,
-                                                         feat_id, sn_ratio); 
-      ecscore_list.push_back(ecscore_ptr);
-      env_coll_ptr->removePeakData(matrix_ptr);
-      if (ecscore_ptr->getScore() < topfd_para_ptr->getEcscoreCutoff()) {
-        continue;
+    }
+    if (best_env_coll_ptr != nullptr) {
+      double ori_mass = ori_seed_ptr->getMonoNeutralMass();
+      double rep_mass = best_env_coll_ptr->getSeedPtr()->getMonoNeutralMass();
+      if (std::abs(rep_mass - ori_mass) > 0.5) {
+        LOG_ERROR("Find shift " << rep_mass << " " << ori_mass); 
       }
-      env_coll_ptr->setEcscore(ecscore_ptr->getScore());
-      env_coll_list.push_back(env_coll_ptr);
+      env_coll_list.push_back(best_env_coll_ptr);
       FracFeaturePtr frac_feat_ptr = env_coll_util::getFracFeature(feat_id, deconv_ms1_ptr_vec, 
                                                                    score_para_ptr->frac_id_,
                                                                    score_para_ptr->file_name_,
-                                                                   env_coll_ptr, matrix_ptr, sn_ratio);
+                                                                   best_env_coll_ptr, matrix_ptr, 
+                                                                   sn_ratio);
       frac_features.push_back(frac_feat_ptr);
       feat_id++;
     }
