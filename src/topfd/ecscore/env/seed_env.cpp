@@ -79,6 +79,22 @@ SeedEnv::SeedEnv(SeedEnvPtr env_ptr, EnvPeakPtrVec &peak_ptr_list) {
   seed_inte_ = env_ptr->seed_inte_;
 }
 
+SeedEnv::SeedEnv(SeedEnvPtr env_ptr) {
+  //init for parent class
+  mono_mz_ = env_ptr->getMonoMz(); 
+  refer_idx_ = env_ptr->getReferIdx();
+  charge_ = env_ptr->getCharge();
+  for (auto &i: env_ptr->peak_ptr_list_) {
+    EnvPeakPtr p_ptr = std::make_shared<EnvPeak>(i->getPosition(), 
+                                                 i->getIntensity());
+    peak_ptr_list_.push_back(p_ptr);
+  }
+  // init for seed envelope
+  spec_id_ = env_ptr->spec_id_;
+  seed_inte_ = env_ptr->seed_inte_;
+}
+
+
 EnvPeakPtrVec SeedEnv::getScaledPeakPtrList(double ratio, double min_inte) {
   EnvPeakPtrVec new_peak_list; 
   int non_exist_idx = EnvPeak::getNonExistPeakIdx();

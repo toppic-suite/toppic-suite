@@ -29,6 +29,9 @@ typedef std::shared_ptr<SeedEnv> SeedEnvPtr;
 class SeedEnv : public Env {
  public:
   SeedEnv(DeconvPeakPtr peak_ptr);
+  
+  // deep copy
+  SeedEnv(SeedEnvPtr env_ptr);
 
   SeedEnv(SeedEnvPtr env_ptr, int new_charge);
 
