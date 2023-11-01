@@ -143,7 +143,7 @@ class Prsm {
 
   static bool cmpNormMatchFragmentDec(const PrsmPtr &a, const PrsmPtr &b);
 
-  static bool cmpMatchFragmentDecMatchPeakDec(const PrsmPtr &a, const PrsmPtr &b);
+  static bool cmpMatchFragmentDecMatchPeakDecProtInc(const PrsmPtr &a, const PrsmPtr &b);
 
   // sort by number of matched fragment ions, then start position
   static bool cmpMatchFragDecStartPosInc(const PrsmPtr &a, const PrsmPtr &b);

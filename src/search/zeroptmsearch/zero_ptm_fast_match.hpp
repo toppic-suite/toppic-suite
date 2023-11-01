@@ -37,9 +37,8 @@ class ZeroPtmFastMatch {
 
   int getEnd() {return end_;}
 
-  static bool cmpScoreDec(const ZpFastMatchPtr &a, const ZpFastMatchPtr &b) {
-    return a->getScore() > b->getScore();
-  }
+  static bool cmpScoreDecProtNameInc(const ZpFastMatchPtr &a, 
+                                     const ZpFastMatchPtr &b);
 
  private:
   ProteoformPtr proteo_ptr_;

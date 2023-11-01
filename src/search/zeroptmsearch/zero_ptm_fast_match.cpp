@@ -24,4 +24,21 @@ ZeroPtmFastMatch::ZeroPtmFastMatch(ProteoformPtr proteo_ptr,
       begin_(begin),
       end_(end) {}
 
+bool ZeroPtmFastMatch::cmpScoreDecProtNameInc(const ZpFastMatchPtr &a, 
+                                              const ZpFastMatchPtr &b) {
+  if (a->getScore() > b->getScore()) {
+    return true;
+  }
+  else if (a->getScore() < b->getScore()) {
+    return false;
+  }
+  else if (a->getProteoformPtr()->getSeqName() <
+           b->getProteoformPtr()->getSeqName()) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
 }  // namespace toppic

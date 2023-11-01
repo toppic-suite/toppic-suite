@@ -211,7 +211,8 @@ ZpFastMatchPtrVec filter(ProteoformTypePtr align_type_ptr,
   }
 
   // sort
-  std::sort(match_vec.begin(), match_vec.end(), ZeroPtmFastMatch::cmpScoreDec);
+  std::sort(match_vec.begin(), match_vec.end(),
+            ZeroPtmFastMatch::cmpScoreDecProtNameInc);
 
   size_t num = report_num;
   if (num > proteo_ptrs.size()) {

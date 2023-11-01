@@ -154,7 +154,8 @@ std::function<void()> geneTask(SpectrumSetPtr spec_set_ptr,
         }
       }
     }
-    std::sort(prsms.begin(), prsms.end(), Prsm::cmpMatchFragmentDecMatchPeakDec);
+    std::sort(prsms.begin(), prsms.end(),
+              Prsm::cmpMatchFragmentDecMatchPeakDecProtInc);
     if (prsms.size() > 0) {
       prsms.erase(prsms.begin() + mng_ptr->n_report_, prsms.end());
     }

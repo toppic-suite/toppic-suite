@@ -229,13 +229,27 @@ double Prsm::getNormMatchFragNum() {
 }
 
 // sort by the number of matched fragments, then the number of matched peaks
-bool Prsm::cmpMatchFragmentDecMatchPeakDec(const PrsmPtr &a, const PrsmPtr &b) {
+// then protein name in the increasing order
+bool Prsm::cmpMatchFragmentDecMatchPeakDecProtInc(const PrsmPtr &a, const PrsmPtr &b) {
   if (a->getMatchFragNum() > b->getMatchFragNum()) {
     return true;
-  } else if (a->getMatchFragNum() < b->getMatchFragNum()) {
+  } 
+  else if (a->getMatchFragNum() < b->getMatchFragNum()) {
     return false;
   }
-  return a->getMatchPeakNum() > b->getMatchPeakNum();
+  else if (a->getMatchPeakNum() > b->getMatchPeakNum()) {
+    return true;
+  }
+  else if (a->getMatchPeakNum() < b->getMatchPeakNum()) {
+    return false;
+  }
+  else if (a->getProteoformPtr()->getSeqName() <
+           b->getProteoformPtr()->getSeqName()) {
+    return true;
+  }
+  else {
+    return false;
+  }
 }
 
 // sort by number of matched fragment ions, then start position
