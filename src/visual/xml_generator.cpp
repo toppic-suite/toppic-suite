@@ -239,7 +239,8 @@ void XmlGenerator::outputProteoforms(){
           + "proteoforms" + file_util::getFileSeparator() 
           + "proteoform" + str_util::toString(cluster_ids_[i]) + ".xml";
       XmlWriter writer(file_name, "");
-      std::sort(select_prsm_ptrs.begin(), select_prsm_ptrs.end(), Prsm::cmpEValueInc);
+      std::sort(select_prsm_ptrs.begin(), select_prsm_ptrs.end(),
+                Prsm::cmpEValueIncProtInc);
       bool detail = true; 
       bool add_ms = true;
       writer.write(anno_xml_util::geneXmlForProteoform(writer.getDoc(), select_prsm_ptrs, 
@@ -374,10 +375,11 @@ void XmlGenerator::outputAllProteins() {
       prsm_ptrs[k]->setRefineMsVec(
           extend_ms_vec2d_[spec_id_extend_ms_map_[prsm_ptrs[k]->getSpectrumId()]]);
     }
-    std::sort(prsm_ptrs.begin(), prsm_ptrs.end(), Prsm::cmpEValueInc);
+    std::sort(prsm_ptrs.begin(), prsm_ptrs.end(), Prsm::cmpEValueIncProtInc);
     best_prsm_vec[i] = prsm_ptrs[0];
   }
-  std::sort(best_prsm_vec.begin(), best_prsm_vec.end(), Prsm::cmpEValueInc);
+  std::sort(best_prsm_vec.begin(), best_prsm_vec.end(),
+            Prsm::cmpEValueIncProtInc);
   std::string file_name = mng_ptr_->xml_path_+ file_util::getFileSeparator() + "proteins.xml";
   XmlWriter writer(file_name, "protein_list");
 

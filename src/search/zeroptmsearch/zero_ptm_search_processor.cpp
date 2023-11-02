@@ -73,7 +73,7 @@ PrsmPtrVec ZeroPtmSearchProcessor::zeroPtmSearchOneSpec(SpectrumSetPtr spec_set_
   }
 
   std::sort(prsms.begin(), prsms.end(),
-            Prsm::cmpMatchFragmentDecMatchPeakDecProtInc);
+            Prsm::cmpMatchFragDecMatchPeakDecProtInc);
   if (prsms.size() > 0) {
     prsms.erase(prsms.begin() + 1, prsms.end());
   }

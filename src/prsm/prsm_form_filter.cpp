@@ -38,7 +38,7 @@ void process(const std::string &db_file_name,
                                                     fasta_reader_ptr,  
                                                     fix_mod_list);
 
-  std::sort(prsms.begin(), prsms.end(), Prsm::cmpEValueInc);
+  std::sort(prsms.begin(), prsms.end(), Prsm::cmpEValueIncProtInc);
 
   PrsmPtrVec selected_forms;
 

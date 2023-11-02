@@ -229,4 +229,40 @@ bool PrsmStr::isStrictCompatiablePtmSpecies(const PrsmStrPtr & a, const PrsmStrP
   return true;
 }
 
+bool PrsmStr::cmpEValueIncProtInc(const PrsmStrPtr &a, const PrsmStrPtr &b) {
+  if (a->getEValue() < b->getEValue()) {
+    return true;
+  }
+  else if (a->getEValue() > b->getEValue()) {
+    return false;
+  }
+  else {
+    return a->getSeqName() < b->getSeqName();
+  }
+}
+
+bool PrsmStr::cmpMatchFragDecProtInc(const PrsmStrPtr &a, const PrsmStrPtr &b) {
+  if (a->getMatchFragNum() > b->getMatchFragNum()) {
+    return true;
+  }
+  else if (a->getMatchFragNum() < b->getMatchFragNum()) {
+    return false;
+  }
+  else {
+    return a->getSeqName() < b->getSeqName();
+  }
+}
+
+bool PrsmStr::cmpNormMatchFragDecProtInc(const PrsmStrPtr &a, const PrsmStrPtr &b) { 
+  if (a->getNormMatchFragNum() > b->getNormMatchFragNum()) {
+    return true;
+  }
+  else if (a->getNormMatchFragNum() < b->getNormMatchFragNum()) {
+    return false;
+  }
+  else {
+    return a->getSeqName() < b->getSeqName();
+  }
+}
+
 }  // namespace toppic

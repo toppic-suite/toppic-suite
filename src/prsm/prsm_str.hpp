@@ -111,14 +111,11 @@ class PrsmStr {
 
   void setTimeApex(double time_apex) {time_apex_ = time_apex;}
 
-  static bool cmpEValueInc(const PrsmStrPtr &a, const PrsmStrPtr &b) {
-    return a->getEValue() < b->getEValue();}
+  static bool cmpEValueIncProtInc(const PrsmStrPtr &a, const PrsmStrPtr &b);
 
-  static bool cmpMatchFragmentDec(const PrsmStrPtr &a, const PrsmStrPtr &b) {
-    return a->getMatchFragNum() > b->getMatchFragNum();}
+  static bool cmpMatchFragDecProtInc(const PrsmStrPtr &a, const PrsmStrPtr &b);
 
-  static bool cmpNormMatchFragmentDec(const PrsmStrPtr &a, const PrsmStrPtr &b) {
-    return a->getNormMatchFragNum() > b->getNormMatchFragNum();}
+  static bool cmpNormMatchFragDecProtInc(const PrsmStrPtr &a, const PrsmStrPtr &b); 
 
   static bool cmpSpectrumIdInc(const PrsmStrPtr &a, const PrsmStrPtr &b) {
     return a->getSpectrumId() < b->getSpectrumId();}

@@ -221,7 +221,8 @@ void EValueProcessor::processOneSpectrum(SpectrumSetPtr spec_set_ptr,
       compEvalues(spec_set_ptr, sele_prsm_ptrs, ppo, is_separate);
     }
 
-    std::sort(sele_prsm_ptrs.begin(), sele_prsm_ptrs.end(), Prsm::cmpEValueInc);
+    std::sort(sele_prsm_ptrs.begin(), sele_prsm_ptrs.end(),
+              Prsm::cmpEValueIncProtInc);
     writer.writeVector(sele_prsm_ptrs);
   }
 }

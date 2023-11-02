@@ -204,15 +204,10 @@ double Prsm::getOneProtProb() {
 /* this function is tempory for testing mass graph alignment */
 double Prsm::getNormMatchFragNum() {
   int var_change_num = proteoform_ptr_->getAlterNum(AlterType::VARIABLE);
-
   int unexp_change_num = proteoform_ptr_->getAlterNum(AlterType::UNEXPECTED);
-
   int start_pos = proteoform_ptr_->getStartPos();
-
   int end_pos = proteoform_ptr_->getEndPos();
-
   double score = match_fragment_num_ - 2 * var_change_num - 6 * unexp_change_num;
-
   int trunc_len = getProteoformPtr()->getProtModPtr()->getTruncPtr()->getTruncLen();
 
   if (start_pos == trunc_len) {
@@ -230,7 +225,7 @@ double Prsm::getNormMatchFragNum() {
 
 // sort by the number of matched fragments, then the number of matched peaks
 // then protein name in the increasing order
-bool Prsm::cmpMatchFragmentDecMatchPeakDecProtInc(const PrsmPtr &a, const PrsmPtr &b) {
+bool Prsm::cmpMatchFragDecMatchPeakDecProtInc(const PrsmPtr &a, const PrsmPtr &b) {
   if (a->getMatchFragNum() > b->getMatchFragNum()) {
     return true;
   } 
@@ -252,14 +247,49 @@ bool Prsm::cmpMatchFragmentDecMatchPeakDecProtInc(const PrsmPtr &a, const PrsmPt
   }
 }
 
-// sort by number of matched fragment ions, then start position
-bool Prsm::cmpMatchFragDecStartPosInc(const PrsmPtr &a, const PrsmPtr &b) {
+// sort by number of matched fragment ions, then matched peaks, 
+// then protein name, then start position
+bool Prsm::cmpMatchFragDecMatchPeakDecProtIncStartPosInc(const PrsmPtr &a, 
+                                                         const PrsmPtr &b) {
   if (a->getMatchFragNum() > b->getMatchFragNum()) {
     return true;
-  } else if (a->getMatchFragNum() == b->getMatchFragNum()) {
-    return a->getProteoformPtr()->getStartPos() < b->getProteoformPtr()->getStartPos();
   }
-  return false;
+  else if (a->getMatchFragNum() < b->getMatchFragNum()) {
+    return false;
+  }
+  else if (a->getMatchPeakNum() > b->getMatchPeakNum()) {
+    return true;
+  }
+  else if (a->getMatchPeakNum() < b->getMatchPeakNum()) {
+    return false;
+  }
+  else if (a->getProteoformPtr()->getSeqName() <
+           b->getProteoformPtr()->getSeqName()) {
+    return true;
+  }
+  else if (a->getProteoformPtr()->getSeqName() >
+           b->getProteoformPtr()->getSeqName()) {
+    return false;
+  } 
+  else if (a->getProteoformPtr()->getStartPos() <
+           b->getProteoformPtr()->getStartPos()) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
+bool Prsm::cmpEValueIncProtInc(const PrsmPtr &a, const PrsmPtr &b) {
+  if (a->getEValue() < b->getEValue()) {
+    return true;
+  }
+  else if (a->getEValue() > b->getEValue()) {
+    return false;
+  }
+  else {
+    return a->getProteoformPtr()->getSeqName() < b->getProteoformPtr()->getSeqName(); 
+  }
 }
 
 // sort by the order of spectrum id, the precursor id

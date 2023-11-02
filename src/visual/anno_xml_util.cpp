@@ -63,7 +63,8 @@ void writeProteinToXml(XmlWriterPtr xml_writer,
                         + "</compatible_proteoform_number>");
   for (size_t i = 0; i < species_ids.size(); i++) {
     PrsmPtrVec select_prsm_ptrs = prsm_util::selectClusterPrsms(prsm_ptrs, species_ids[i]);
-    std::sort(select_prsm_ptrs.begin(), select_prsm_ptrs.end(), Prsm::cmpEValueInc);
+    std::sort(select_prsm_ptrs.begin(), select_prsm_ptrs.end(),
+              Prsm::cmpEValueIncProtInc);
     xml_writer->write(geneXmlForProteoform(xml_writer->getDoc(), select_prsm_ptrs, mng_ptr, 
                                            detail, add_ms));
   }
@@ -88,7 +89,8 @@ xercesc::DOMElement* geneXmlForProteinList(XmlDOMDocument* xml_doc,
   xml_doc->addElement(prot_element, "compatible_proteoform_number", str.c_str());
   for (size_t i = 0; i < cluster_ids.size(); i++) {
     PrsmPtrVec select_prsm_ptrs = prsm_util::selectClusterPrsms(prsm_ptrs, cluster_ids[i]);
-    std::sort(select_prsm_ptrs.begin(), select_prsm_ptrs.end(), Prsm::cmpEValueInc);
+    std::sort(select_prsm_ptrs.begin(), select_prsm_ptrs.end(),
+              Prsm::cmpEValueIncProtInc);
     prot_element->appendChild(geneXmlForProteoform(xml_doc, select_prsm_ptrs, 
                                                    mng_ptr, detail, add_ms));
   }
@@ -112,7 +114,8 @@ xercesc::DOMElement* geneXmlForPrsmList(XmlDOMDocument* xml_doc,
   xml_doc->addElement(prot_element, "compatible_proteoform_number", str.c_str());
   for (size_t i = 0; i < cluster_ids.size(); i++) {
     PrsmPtrVec select_prsm_ptrs = prsm_util::selectClusterPrsms(prsm_ptrs, cluster_ids[i]);
-    std::sort(select_prsm_ptrs.begin(), select_prsm_ptrs.end(), Prsm::cmpEValueInc);
+    std::sort(select_prsm_ptrs.begin(), select_prsm_ptrs.end(),
+              Prsm::cmpEValueIncProtInc);
     prot_element->appendChild(geneXmlForProteoform(xml_doc, select_prsm_ptrs, 
                                                    mng_ptr, detail, add_ms));
   }

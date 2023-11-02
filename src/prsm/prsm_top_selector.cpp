@@ -34,7 +34,8 @@ bool containsSameFastaSeq(const PrsmStrPtrVec prsm_ptrs,
 }
 
 PrsmStrPtrVec getTopPrsms(PrsmStrPtrVec &prsm_str_ptrs, int n_top) {
-  std::sort(prsm_str_ptrs.begin(), prsm_str_ptrs.end(), PrsmStr::cmpEValueInc);
+  std::sort(prsm_str_ptrs.begin(), prsm_str_ptrs.end(),
+            PrsmStr::cmpEValueIncProtInc);
   int size = prsm_str_ptrs.size();
   int max = size > n_top? n_top:size;
   PrsmStrPtrVec result_ptrs;

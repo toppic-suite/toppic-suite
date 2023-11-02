@@ -70,26 +70,28 @@ std::function<void()> geneTask(SpectrumSetPtr spectrum_set_ptr,
     for (int s = 2; s <= mng_ptr->align_para_ptr_->n_unknown_shift_; s++) {
       PrsmPtrVec complete_prsm_ptrs = slow_filter_ptr->getPrsms(s-2, ProteoformType::COMPLETE);
       std::sort(complete_prsm_ptrs.begin(), complete_prsm_ptrs.end(), 
-                Prsm::cmpMatchFragDecStartPosInc);
+                Prsm::cmpMatchFragDecMatchPeakDecProtIncStartPosInc);
       PrsmPtrVec sele_complete_prsm_ptrs;
       seleTopPrsms(complete_prsm_ptrs, sele_complete_prsm_ptrs, mng_ptr->n_report_);
       writer_ptr->getCompleteWriterPtr(s)->writeVector(sele_complete_prsm_ptrs);
 
       PrsmPtrVec prefix_prsm_ptrs = slow_filter_ptr->getPrsms(s-2, ProteoformType::PREFIX);
       std::sort(prefix_prsm_ptrs.begin(), prefix_prsm_ptrs.end(), 
-                Prsm::cmpMatchFragDecStartPosInc);
+                Prsm::cmpMatchFragDecMatchPeakDecProtIncStartPosInc);
       PrsmPtrVec sele_prefix_prsm_ptrs;
       seleTopPrsms(prefix_prsm_ptrs, sele_prefix_prsm_ptrs, mng_ptr->n_report_);
       writer_ptr->getPrefixWriterPtr(s)->writeVector(sele_prefix_prsm_ptrs);
 
       PrsmPtrVec suffix_prsm_ptrs = slow_filter_ptr->getPrsms(s-2, ProteoformType::SUFFIX);
-      std::sort(suffix_prsm_ptrs.begin(), suffix_prsm_ptrs.end(), Prsm::cmpMatchFragmentDec);
+      std::sort(suffix_prsm_ptrs.begin(), suffix_prsm_ptrs.end(), 
+                Prsm::cmpMatchFragDecMatchPeakDecProtInc);
       PrsmPtrVec sele_suffix_prsm_ptrs;
       seleTopPrsms(suffix_prsm_ptrs, sele_suffix_prsm_ptrs, mng_ptr->n_report_);
       writer_ptr->getSuffixWriterPtr(s)->writeVector(sele_suffix_prsm_ptrs);
 
       PrsmPtrVec internal_prsm_ptrs = slow_filter_ptr->getPrsms(s-2, ProteoformType::INTERNAL);
-      std::sort(internal_prsm_ptrs.begin(), internal_prsm_ptrs.end(), Prsm::cmpMatchFragmentDec);
+      std::sort(internal_prsm_ptrs.begin(), internal_prsm_ptrs.end(), 
+                Prsm::cmpMatchFragDecMatchPeakDecProtInc);
       PrsmPtrVec sele_internal_prsm_ptrs;
       seleTopPrsms(internal_prsm_ptrs, sele_internal_prsm_ptrs, mng_ptr->n_report_);
       writer_ptr->getInternalWriterPtr(s)->writeVector(sele_internal_prsm_ptrs);

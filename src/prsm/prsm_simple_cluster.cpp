@@ -95,7 +95,7 @@ void process(const std::string &db_file_name,
   LOG_DEBUG("Reading prsm strings started");
   PrsmStrPtrVec prsm_ptrs = prsm_reader_util::readAllPrsmStrs(input_file_name);
   LOG_DEBUG("Reading prsm strings finished");
-  sort(prsm_ptrs.begin(), prsm_ptrs.end(), PrsmStr::cmpEValueInc);
+  sort(prsm_ptrs.begin(), prsm_ptrs.end(), PrsmStr::cmpEValueIncProtInc);
   PrsmStrPtrVec2D protein_prsms = setProtId(prsm_ptrs);
   setClusterId(protein_prsms, error_tole);
   sort(prsm_ptrs.begin(), prsm_ptrs.end(), PrsmStr::cmpSpectrumIdIncPrecursorIdInc);

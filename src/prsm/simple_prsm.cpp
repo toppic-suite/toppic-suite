@@ -185,11 +185,15 @@ std::vector<double> SimplePrsm::getNTermShiftsFromCTermShifts() {
   return shifts;
 }
 
-bool SimplePrsm::cmpScoreDec(const SimplePrsmPtr a, const SimplePrsmPtr b) {
-  if (a->getScore() == b->getScore()) {
+bool SimplePrsm::cmpScoreDecNameInc(const SimplePrsmPtr a, const SimplePrsmPtr b) {
+  if (a->getScore() > b->getScore()) {
+    return true;
+  }
+  else if (a->getScore() < b->getScore()) {
+    return false;
+  }
+  else {
     return a->getSeqName() < b->getSeqName();
-  } else {
-    return a->getScore() > b->getScore();
   }
 }
 

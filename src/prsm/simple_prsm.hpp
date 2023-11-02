@@ -85,7 +85,7 @@ class SimplePrsm {
 
   static std::string getXmlElementName() {return "simple_prsm";}
 
-  static bool cmpScoreDec(const SimplePrsmPtr a, const SimplePrsmPtr b);
+  static bool cmpScoreDecNameInc(const SimplePrsmPtr a, const SimplePrsmPtr b);
 
   static bool cmpIdInc(const SimplePrsmPtr a, const SimplePrsmPtr b);
 

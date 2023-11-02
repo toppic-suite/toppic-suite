@@ -173,14 +173,14 @@ void process(const std::string &spec_file_name,
       }
     }
   }
-  std::sort(target_ptrs1.begin(),target_ptrs1.end(),PrsmStr::cmpEValueInc);
-  std::sort(decoy_ptrs1.begin(),decoy_ptrs1.end(),PrsmStr::cmpEValueInc);
-  std::sort(target_ptrs2.begin(),target_ptrs2.end(),PrsmStr::cmpEValueInc);
-  std::sort(decoy_ptrs2.begin(),decoy_ptrs2.end(),PrsmStr::cmpEValueInc);
-  std::sort(target_ptrs3.begin(),target_ptrs3.end(),PrsmStr::cmpEValueInc);
-  std::sort(decoy_ptrs3.begin(),decoy_ptrs3.end(),PrsmStr::cmpEValueInc);
-  std::sort(target_ptrs4.begin(),target_ptrs4.end(),PrsmStr::cmpEValueInc);
-  std::sort(decoy_ptrs4.begin(),decoy_ptrs4.end(),PrsmStr::cmpEValueInc);
+  std::sort(target_ptrs1.begin(),target_ptrs1.end(),PrsmStr::cmpEValueIncProtInc);
+  std::sort(decoy_ptrs1.begin(),decoy_ptrs1.end(),PrsmStr::cmpEValueIncProtInc);
+  std::sort(target_ptrs2.begin(),target_ptrs2.end(),PrsmStr::cmpEValueIncProtInc);
+  std::sort(decoy_ptrs2.begin(),decoy_ptrs2.end(),PrsmStr::cmpEValueIncProtInc);
+  std::sort(target_ptrs3.begin(),target_ptrs3.end(),PrsmStr::cmpEValueIncProtInc);
+  std::sort(decoy_ptrs3.begin(),decoy_ptrs3.end(),PrsmStr::cmpEValueIncProtInc);
+  std::sort(target_ptrs4.begin(),target_ptrs4.end(),PrsmStr::cmpEValueIncProtInc);
+  std::sort(decoy_ptrs4.begin(),decoy_ptrs4.end(),PrsmStr::cmpEValueIncProtInc);
 
   computeFdr(target_ptrs1,decoy_ptrs1);
   computeFdr(target_ptrs2,decoy_ptrs2);

@@ -132,21 +132,20 @@ class Prsm {
   void setIsExactMatch(bool is_exact_match) {is_exact_match_ = is_exact_match;}
 
   // comparion
-  static bool cmpEValueInc(const PrsmPtr &a, const PrsmPtr &b) {
-    return a->getEValue() < b->getEValue();}
+  static bool cmpMatchFragDecMatchPeakDecProtInc(const PrsmPtr &a, const PrsmPtr &b);
 
-  static bool cmpEValueDec(const PrsmPtr &a, const PrsmPtr &b) {
-    return a->getEValue() > b->getEValue();}
+  // sort by number of matched fragment ions, then start position
+  static bool cmpMatchFragDecMatchPeakDecProtIncStartPosInc(const PrsmPtr &a, const PrsmPtr &b);
+
+  static bool cmpEValueIncProtInc(const PrsmPtr &a, const PrsmPtr &b); 
 
   static bool cmpMatchFragmentDec(const PrsmPtr &a, const PrsmPtr &b) {
     return a->getMatchFragNum() > b->getMatchFragNum();}
 
+  static bool cmpEValueDec(const PrsmPtr &a, const PrsmPtr &b) {
+    return a->getEValue() > b->getEValue();}
+
   static bool cmpNormMatchFragmentDec(const PrsmPtr &a, const PrsmPtr &b);
-
-  static bool cmpMatchFragmentDecMatchPeakDecProtInc(const PrsmPtr &a, const PrsmPtr &b);
-
-  // sort by number of matched fragment ions, then start position
-  static bool cmpMatchFragDecStartPosInc(const PrsmPtr &a, const PrsmPtr &b);
 
   // sort by the order of spectrum id, the precursor id
   static bool cmpSpectrumIdIncPrecursorIdInc(const PrsmPtr &a, const PrsmPtr &b);

@@ -124,7 +124,8 @@ void process(const std::string &spec_file_name,
   // remove prsms without feature
   PrsmStrPtrVec filtered_prsm_ptrs;
   prsm_util::removePrsmsWithoutFeature(prsm_ptrs, filtered_prsm_ptrs);
-  std::sort(filtered_prsm_ptrs.begin(), filtered_prsm_ptrs.end(), PrsmStr::cmpEValueInc);
+  std::sort(filtered_prsm_ptrs.begin(), filtered_prsm_ptrs.end(),
+            PrsmStr::cmpEValueIncProtInc);
 
   setProtId(filtered_prsm_ptrs);
   setProteoClusterId(filtered_prsm_ptrs, prec_error_tole);

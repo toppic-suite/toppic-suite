@@ -122,8 +122,8 @@ void process(const std::string &spec_file_name,
       }
     }
   }
-  std::sort(target_ptrs.begin(),target_ptrs.end(),PrsmStr::cmpEValueInc);
-  std::sort(decoy_ptrs.begin(),decoy_ptrs.end(),PrsmStr::cmpEValueInc);
+  std::sort(target_ptrs.begin(),target_ptrs.end(),PrsmStr::cmpEValueIncProtInc);
+  std::sort(decoy_ptrs.begin(),decoy_ptrs.end(),PrsmStr::cmpEValueIncProtInc);
 
   computeFdr(target_ptrs,decoy_ptrs);
 

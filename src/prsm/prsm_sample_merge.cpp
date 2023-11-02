@@ -133,7 +133,7 @@ void process(const std::vector<std::string> &input_file_names,
     }
     all_prsms.insert(all_prsms.end(), prsms.begin(), prsms.end());
   }
-  std::sort(all_prsms.begin(), all_prsms.end(), PrsmStr::cmpEValueInc);
+  std::sort(all_prsms.begin(), all_prsms.end(), PrsmStr::cmpEValueIncProtInc);
   PrsmStrPtrVec2D clusters; 
   getPrsmClusters(all_prsms, clusters, error_tole);
   
