@@ -43,6 +43,8 @@ PrsmStr::PrsmStr(const std::vector<std::string> &str_vec) {
   seq_name_ = prsm_util::getValueStr(line);
   line = prsm_util::getXmlLine(str_vec_, "<seq_desc>");
   seq_desc_ = prsm_util::getValueStr(line);
+  line = prsm_util::getXmlLine(str_vec_, "<match_peak_num>");
+  match_peak_num_ = std::stod(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<match_fragment_num>");
   match_frag_num_ = std::stod(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<norm_match_fragment_num>");
@@ -99,19 +101,6 @@ int getXmlLineIndex(const std::vector<std::string> &str_vec,
     }
   }
   return -1;
-}
-
-bool PrsmStr::cmpSpectrumIdIncPrecursorIdInc(const PrsmStrPtr &a, const PrsmStrPtr &b) {
-  if (a->getSpectrumId() < b->getSpectrumId()) {
-    return true;
-  } else if (a->getSpectrumId() > b->getSpectrumId()) {
-    return false;
-  } else {
-    if (a->getPrecursorId() < b->getPrecursorId()) {
-      return true;
-    }
-    return false;
-  }
 }
 
 void PrsmStr::setFdr(double fdr) {
@@ -241,11 +230,17 @@ bool PrsmStr::cmpEValueIncProtInc(const PrsmStrPtr &a, const PrsmStrPtr &b) {
   }
 }
 
-bool PrsmStr::cmpMatchFragDecProtInc(const PrsmStrPtr &a, const PrsmStrPtr &b) {
+bool PrsmStr::cmpMatchFragDecMatchPeakDecProtInc(const PrsmStrPtr &a, const PrsmStrPtr &b) {
   if (a->getMatchFragNum() > b->getMatchFragNum()) {
     return true;
   }
   else if (a->getMatchFragNum() < b->getMatchFragNum()) {
+    return false;
+  }
+  else if (a->getMatchPeakNum() > b->getMatchPeakNum()) {
+    return true;
+  }
+  else if (a->getMatchPeakNum() < b->getMatchPeakNum()) {
     return false;
   }
   else {
@@ -260,6 +255,30 @@ bool PrsmStr::cmpNormMatchFragDecProtInc(const PrsmStrPtr &a, const PrsmStrPtr &
   else if (a->getNormMatchFragNum() < b->getNormMatchFragNum()) {
     return false;
   }
+  else {
+    return a->getSeqName() < b->getSeqName();
+  }
+}
+
+bool PrsmStr::cmpSpecIncPrecIncEvalueIncProtInc(const PrsmStrPtr &a, const PrsmStrPtr &b) {
+  if (a->getSpectrumId() < b->getSpectrumId()) {
+    return true;
+  } 
+  else if (a->getSpectrumId() > b->getSpectrumId()) {
+    return false;
+  } 
+  else if (a->getPrecursorId() < b->getPrecursorId()) {
+    return true;
+  }
+  else if (a->getPrecursorId() > b->getPrecursorId()) {
+    return false;
+  }
+  else if (a->getEValue() < b->getEValue()) {
+    return true;
+  } 
+  else if (a->getEValue() > b->getEValue()) {
+    return false;
+  } 
   else {
     return a->getSeqName() < b->getSeqName();
   }

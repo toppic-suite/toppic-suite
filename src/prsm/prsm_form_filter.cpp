@@ -60,7 +60,8 @@ void process(const std::string &db_file_name,
   // output
   std::string output_file_name = base_name + "." + output_file_ext;
   PrsmXmlWriter writer(output_file_name);
-  std::sort(selected_forms.begin(), selected_forms.end(), Prsm::cmpSpectrumIdIncPrecursorIdInc);
+  std::sort(selected_forms.begin(), selected_forms.end(),
+            Prsm::cmpSpecIncPrecIncEvalueIncProtInc);
   writer.writeVector(selected_forms);
   writer.close();
 }

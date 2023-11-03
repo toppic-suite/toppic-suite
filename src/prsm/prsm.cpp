@@ -223,6 +223,12 @@ double Prsm::getNormMatchFragNum() {
   return score;
 }
 
+void Prsm::setProteoformPtr(ProteoformPtr proteoform, SpParaPtr sp_para_ptr) {
+  proteoform_ptr_ = proteoform;
+  init(sp_para_ptr);
+}
+
+
 // sort by the number of matched fragments, then the number of matched peaks
 // then protein name in the increasing order
 bool Prsm::cmpMatchFragDecMatchPeakDecProtInc(const PrsmPtr &a, const PrsmPtr &b) {
@@ -292,60 +298,29 @@ bool Prsm::cmpEValueIncProtInc(const PrsmPtr &a, const PrsmPtr &b) {
   }
 }
 
-// sort by the order of spectrum id, the precursor id
-bool Prsm::cmpSpectrumIdIncPrecursorIdInc(const PrsmPtr &a, const PrsmPtr &b) {
-  if (a->getSpectrumId() < b->getSpectrumId()) {
-    return true;
-  } else if (a->getSpectrumId() > b->getSpectrumId()) {
-    return false;
-  } else {
-    if (a->getPrecursorId() < b->getPrecursorId()) {
-      return true;
-    }
-    return false;
-  }
-}
-
-// sort by spectrum id then match ions
-bool Prsm::cmpSpectrumIdIncMatchFragDec(const PrsmPtr &a, const PrsmPtr &b) {
-  if (a->getSpectrumId() < b->getSpectrumId()) {
-    return true;
-  } else if (a->getSpectrumId() > b->getSpectrumId()) {
-    return false;
-  } else {
-    if (a->getMatchFragNum() > b->getMatchFragNum()) {
-      return true;
-    }
-    return false;
-  }
-}
-
 // sort by spectrum id then evalue
-bool Prsm::cmpSpectrumIdIncEvalueInc(const PrsmPtr &a, const PrsmPtr &b) {
+bool Prsm::cmpSpecIncPrecIncEvalueIncProtInc(const PrsmPtr &a, const PrsmPtr &b) {
   if (a->getSpectrumId() < b->getSpectrumId()) {
     return true;
-  } else if (a->getSpectrumId() > b->getSpectrumId()) {
+  } 
+  else if (a->getSpectrumId() > b->getSpectrumId()) {
     return false;
-  } else if (a->getEValue() < b->getEValue()) {
+  }
+  else if (a->getPrecursorId() < b->getPrecursorId()) {
     return true;
-  } else if (a->getEValue() > b->getEValue()) {
+  }
+  else if (a->getPrecursorId() > b->getPrecursorId()) {
     return false;
-  } else {
+  }
+  else if (a->getEValue() < b->getEValue()) {
+    return true;
+  } 
+  else if (a->getEValue() > b->getEValue()) {
+    return false;
+  } 
+  else {
     return a->getProteoformPtr()->getSeqName() < b->getProteoformPtr()->getSeqName();
   }
-}
-
-bool Prsm::cmpNormMatchFragmentDec(const PrsmPtr &a, const PrsmPtr &b) {
-  if (a->getNormMatchFragNum() == b->getNormMatchFragNum()) {
-    return a->getProteoformPtr()->getAlterNum(AlterType::VARIABLE) < b->getProteoformPtr()->getAlterNum(AlterType::VARIABLE);
-  } else {
-    return a->getNormMatchFragNum() > b->getNormMatchFragNum();
-  }
-}
-
-void Prsm::setProteoformPtr(ProteoformPtr proteoform, SpParaPtr sp_para_ptr) {
-  proteoform_ptr_ = proteoform;
-  init(sp_para_ptr);
 }
 
 }  // namespace toppic

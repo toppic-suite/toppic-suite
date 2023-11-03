@@ -136,7 +136,8 @@ void process(const std::string &spec_file_name,
   sort(prsm_ptrs.begin(), prsm_ptrs.end(), PrsmStr::cmpEValueIncProtInc);
   setProtId(prsm_ptrs);
   setClusterId(prsm_ptrs, ppo);
-  sort(prsm_ptrs.begin(), prsm_ptrs.end(), PrsmStr::cmpSpectrumIdIncPrecursorIdInc);
+  sort(prsm_ptrs.begin(), prsm_ptrs.end(),
+       PrsmStr::cmpSpecIncPrecIncEvalueIncProtInc);
   // output
   std::string output_file_name = base_name + "." + output_file_ext;
   PrsmXmlWriter writer(output_file_name);

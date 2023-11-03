@@ -139,22 +139,8 @@ class Prsm {
 
   static bool cmpEValueIncProtInc(const PrsmPtr &a, const PrsmPtr &b); 
 
-  static bool cmpMatchFragmentDec(const PrsmPtr &a, const PrsmPtr &b) {
-    return a->getMatchFragNum() > b->getMatchFragNum();}
-
-  static bool cmpEValueDec(const PrsmPtr &a, const PrsmPtr &b) {
-    return a->getEValue() > b->getEValue();}
-
-  static bool cmpNormMatchFragmentDec(const PrsmPtr &a, const PrsmPtr &b);
-
-  // sort by the order of spectrum id, the precursor id
-  static bool cmpSpectrumIdIncPrecursorIdInc(const PrsmPtr &a, const PrsmPtr &b);
-
-  // sort by spectrum id then match ions
-  static bool cmpSpectrumIdIncMatchFragDec(const PrsmPtr &a, const PrsmPtr &b);
-
   // sort by spectrum id then evalue
-  static bool cmpSpectrumIdIncEvalueInc(const PrsmPtr &a, const PrsmPtr &b);
+  static bool cmpSpecIncPrecIncEvalueIncProtInc(const PrsmPtr &a, const PrsmPtr &b);
 
   // other functions
   XmlDOMElement* toXmlElement(XmlDOMDocument* xml_doc);

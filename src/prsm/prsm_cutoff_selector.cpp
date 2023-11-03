@@ -43,7 +43,7 @@ void process(const std::string &db_file_name,
                                                     fasta_reader_ptr,  
                                                     fix_mod_list );
 
-  std::sort(prsms.begin(), prsms.end(), Prsm::cmpSpectrumIdIncPrecursorIdInc);
+  std::sort(prsms.begin(), prsms.end(), Prsm::cmpSpecIncPrecIncEvalueIncProtInc);
   bool evalue_cutoff = (cutoff_type == "EVALUE");
   bool fdr_cutoff = (cutoff_type == "FDR");
   bool form_fdr_cutoff = (cutoff_type == "FORMFDR");

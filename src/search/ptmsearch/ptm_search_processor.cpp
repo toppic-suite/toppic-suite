@@ -41,7 +41,8 @@ void seleTopPrsms(const PrsmPtrVec &all_prsm_ptrs,
       }
     }
   }
-  std::sort(sele_prsm_ptrs.begin(), sele_prsm_ptrs.end(), Prsm::cmpSpectrumIdIncPrecursorIdInc);
+  std::sort(sele_prsm_ptrs.begin(), sele_prsm_ptrs.end(), 
+            Prsm::cmpSpecIncPrecIncEvalueIncProtInc);
 }
 
 std::function<void()> geneTask(SpectrumSetPtr spectrum_set_ptr, 

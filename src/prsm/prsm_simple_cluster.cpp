@@ -98,7 +98,8 @@ void process(const std::string &db_file_name,
   sort(prsm_ptrs.begin(), prsm_ptrs.end(), PrsmStr::cmpEValueIncProtInc);
   PrsmStrPtrVec2D protein_prsms = setProtId(prsm_ptrs);
   setClusterId(protein_prsms, error_tole);
-  sort(prsm_ptrs.begin(), prsm_ptrs.end(), PrsmStr::cmpSpectrumIdIncPrecursorIdInc);
+  sort(prsm_ptrs.begin(), prsm_ptrs.end(),
+       PrsmStr::cmpSpecIncPrecIncEvalueIncProtInc);
   // output
   std::string output_file_name = base_name + "." + output_file_ext;
   PrsmXmlWriter writer(output_file_name);

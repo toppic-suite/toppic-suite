@@ -130,7 +130,7 @@ void process(const std::string &spec_file_name,
   setProtId(filtered_prsm_ptrs);
   setProteoClusterId(filtered_prsm_ptrs, prec_error_tole);
   std::sort(filtered_prsm_ptrs.begin(), filtered_prsm_ptrs.end(), 
-            PrsmStr::cmpSpectrumIdIncPrecursorIdInc);
+            PrsmStr::cmpSpecIncPrecIncEvalueIncProtInc);
   // output
   std::string output_file_name = base_name + "." + output_file_ext;
   PrsmXmlWriter writer(output_file_name);
