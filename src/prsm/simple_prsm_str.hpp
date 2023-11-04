@@ -41,7 +41,8 @@ class SimplePrsmStr {
 
   double getScore() {return score_;}
 
-  static bool cmpScoreDec(const SimplePrsmStrPtr &a, const SimplePrsmStrPtr &b);
+  static bool cmpScoreDecSeqInc(const SimplePrsmStrPtr &a, 
+                                const SimplePrsmStrPtr &b);
 
  private:
   std::vector<std::string> str_vec_;

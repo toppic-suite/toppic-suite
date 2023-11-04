@@ -85,13 +85,13 @@ class SimplePrsm {
 
   static std::string getXmlElementName() {return "simple_prsm";}
 
-  static bool cmpScoreDecNameInc(const SimplePrsmPtr a, const SimplePrsmPtr b);
+  static bool cmpScoreDecSeqInc(const SimplePrsmPtr a, const SimplePrsmPtr b);
 
-  static bool cmpIdInc(const SimplePrsmPtr a, const SimplePrsmPtr b);
+  static bool cmpSeqIncScoreDec(const SimplePrsmPtr a, const SimplePrsmPtr b);
 
-  static bool cmpIdIncScoreDec(const SimplePrsmPtr a, const SimplePrsmPtr b);
+  //static bool cmpSpecIncScoreDecSeqInc(const SimplePrsmPtr a, const SimplePrsmPtr b);
 
-  static bool cmpNameIncScoreDec(const SimplePrsmPtr a, const SimplePrsmPtr b);
+  //static bool cmpIdInc(const SimplePrsmPtr a, const SimplePrsmPtr b);
 
  private:
   std::string file_name_;

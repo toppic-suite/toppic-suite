@@ -210,39 +210,39 @@ void process(const std::string &spec_file_name,
     //concat target_ptrs and decoy_ptrs;
     all_ptrs1.insert(all_ptrs1.begin(), target_ptrs1.begin(), target_ptrs1.end());
     all_ptrs1.insert(all_ptrs1.end(), decoy_ptrs1.begin(), decoy_ptrs1.end());
-    std::sort(all_ptrs1.begin(), all_ptrs1.end(), PrsmStr::cmpSpectrumIdInc);
+    std::sort(all_ptrs1.begin(), all_ptrs1.end(), PrsmStr::cmpSpecIncPrecIncEvalueIncProtInc);
     std::cout << "Group 1 target_ptrs: " << target_ptrs1.size() << ", Group 1 decoy_ptrs: " << decoy_ptrs1.size() << std::endl;
     writer.writeVector(all_ptrs1);
 
     all_ptrs2.insert(all_ptrs2.begin(), target_ptrs2.begin(), target_ptrs2.end());
     all_ptrs2.insert(all_ptrs2.end(), decoy_ptrs2.begin(), decoy_ptrs2.end());
-    std::sort(all_ptrs2.begin(), all_ptrs2.end(), PrsmStr::cmpSpectrumIdInc);
+    std::sort(all_ptrs2.begin(), all_ptrs2.end(), PrsmStr::cmpSpecIncPrecIncEvalueIncProtInc);
     std::cout << "Group 2 target_ptrs: " << target_ptrs2.size() << ", Group 2 decoy_ptrs: " << decoy_ptrs2.size() << std::endl;
     writer.writeVector(all_ptrs2);
 
     all_ptrs3.insert(all_ptrs3.begin(), target_ptrs3.begin(), target_ptrs3.end());
     all_ptrs3.insert(all_ptrs3.end(), decoy_ptrs3.begin(), decoy_ptrs3.end());
-    std::sort(all_ptrs3.begin(), all_ptrs3.end(), PrsmStr::cmpSpectrumIdInc);
+    std::sort(all_ptrs3.begin(), all_ptrs3.end(), PrsmStr::cmpSpecIncPrecIncEvalueIncProtInc);
     std::cout << "Goup 3 target_ptrs: " << target_ptrs3.size() << ", Group 3 decoy_ptrs: " << decoy_ptrs3.size() << std::endl;
     writer.writeVector(all_ptrs3);
 
     all_ptrs4.insert(all_ptrs4.begin(), target_ptrs4.begin(), target_ptrs4.end());
     all_ptrs4.insert(all_ptrs4.end(), decoy_ptrs4.begin(), decoy_ptrs4.end());
-    std::sort(all_ptrs4.begin(), all_ptrs4.end(), PrsmStr::cmpSpectrumIdInc);
+    std::sort(all_ptrs4.begin(), all_ptrs4.end(), PrsmStr::cmpSpecIncPrecIncEvalueIncProtInc);
     std::cout << "Goup 4 target_ptrs: " << target_ptrs4.size() << ", Group 4 decoy_ptrs: " << decoy_ptrs4.size() << std::endl;
     writer.writeVector(all_ptrs4);
   }
   else {
-    std::sort(target_ptrs1.begin(), target_ptrs1.end(), PrsmStr::cmpSpectrumIdInc);
+    std::sort(target_ptrs1.begin(), target_ptrs1.end(), PrsmStr::cmpSpecIncPrecIncEvalueIncProtInc);
     writer.writeVector(target_ptrs1);
 
-    std::sort(target_ptrs2.begin(), target_ptrs2.end(), PrsmStr::cmpSpectrumIdInc);
+    std::sort(target_ptrs2.begin(), target_ptrs2.end(), PrsmStr::cmpSpecIncPrecIncEvalueIncProtInc);
     writer.writeVector(target_ptrs2);
 
-    std::sort(target_ptrs3.begin(), target_ptrs3.end(), PrsmStr::cmpSpectrumIdInc);
+    std::sort(target_ptrs3.begin(), target_ptrs3.end(), PrsmStr::cmpSpecIncPrecIncEvalueIncProtInc);
     writer.writeVector(target_ptrs3);
 
-    std::sort(target_ptrs4.begin(), target_ptrs4.end(), PrsmStr::cmpSpectrumIdInc);
+    std::sort(target_ptrs4.begin(), target_ptrs4.end(), PrsmStr::cmpSpecIncPrecIncEvalueIncProtInc);
     writer.writeVector(target_ptrs4);
   }
   writer.close();

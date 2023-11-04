@@ -96,7 +96,7 @@ void SimplePrsmStrMerge::process() {
     }
 
     if (cur_str_ptrs.size() > 0) {
-      std::sort(cur_str_ptrs.begin(), cur_str_ptrs.end(), SimplePrsmStr::cmpScoreDec);
+      std::sort(cur_str_ptrs.begin(), cur_str_ptrs.end(), SimplePrsmStr::cmpScoreDecSeqInc);
       int count = 0;
       //std::set<std::string> name_set;
       for (size_t i = 0; i < cur_str_ptrs.size(); i++) {

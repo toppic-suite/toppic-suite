@@ -138,12 +138,14 @@ void process(const std::string &spec_file_name,
     //concat target_ptrs and decoy_ptrs;
     all_ptrs.insert(all_ptrs.begin(), target_ptrs.begin(), target_ptrs.end());
     all_ptrs.insert(all_ptrs.end(), decoy_ptrs.begin(), decoy_ptrs.end());
-    std::sort(all_ptrs.begin(), all_ptrs.end(), PrsmStr::cmpSpectrumIdInc);
+    std::sort(all_ptrs.begin(), all_ptrs.end(), 
+              PrsmStr::cmpSpecIncPrecIncEvalueIncProtInc);
     std::cout << "target_ptrs: " << target_ptrs.size() << ", decoy_ptrs: " << decoy_ptrs.size() << std::endl;
     writer.writeVector(all_ptrs);
   }
   else {
-    std::sort(target_ptrs.begin(), target_ptrs.end(), PrsmStr::cmpSpectrumIdInc);
+    std::sort(target_ptrs.begin(), target_ptrs.end(), 
+              PrsmStr::cmpSpecIncPrecIncEvalueIncProtInc);
     writer.writeVector(target_ptrs);
   }
   writer.close();

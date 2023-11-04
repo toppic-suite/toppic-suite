@@ -185,8 +185,37 @@ std::vector<double> SimplePrsm::getNTermShiftsFromCTermShifts() {
   return shifts;
 }
 
-bool SimplePrsm::cmpScoreDecNameInc(const SimplePrsmPtr a, const SimplePrsmPtr b) {
+bool SimplePrsm::cmpScoreDecSeqInc(const SimplePrsmPtr a, const SimplePrsmPtr b) {
   if (a->getScore() > b->getScore()) {
+    return true;
+  }
+  else if (a->getScore() < b->getScore()) {
+    return false;
+  }
+  else {
+    return a->getSeqName() < b->getSeqName();
+  }
+}
+
+bool SimplePrsm::cmpSeqIncScoreDec(const SimplePrsmPtr a, const SimplePrsmPtr b) {
+  if (a->getSeqName() < b->getSeqName()) {
+    return true;
+  } else if (a->getSeqName() > b->getSeqName()) {
+    return false;
+  } else {
+    return a->getScore() > b->getScore();
+  }
+}
+
+/*
+bool SimplePrsm::cmpSpecIncScoreDecSeqInc(const SimplePrsmPtr a, const SimplePrsmPtr b) {
+  if (a->getSpectrumId() < b->getSpectrumId()) {
+    return true;
+  } 
+  else if (a->getSpectrumId() > b->getSpectrumId()) {
+    return false;
+  } 
+  else if (a->getScore() > b->getScore()) {
     return true;
   }
   else if (a->getScore() < b->getScore()) {
@@ -204,29 +233,5 @@ bool SimplePrsm::cmpIdInc(const SimplePrsmPtr a, const SimplePrsmPtr b) {
     return a->getSpectrumId() < b->getSpectrumId();
   }
 }
-
-bool SimplePrsm::cmpIdIncScoreDec(const SimplePrsmPtr a, const SimplePrsmPtr b) {
-  if (a->getSpectrumId() < b->getSpectrumId()) {
-    return true;
-  } else if (a->getSpectrumId() > b->getSpectrumId()) {
-    return false;
-  } else {
-    if (a->getScore() == b->getScore()) {
-      return a->getSeqName() < b->getSeqName();
-    } else {
-      return a->getScore() > b->getScore();
-    }
-  }
-}
-
-bool SimplePrsm::cmpNameIncScoreDec(const SimplePrsmPtr a, const SimplePrsmPtr b) {
-  if (a->getSeqName() < b->getSeqName()) {
-    return true;
-  } else if (a->getSeqName() > b->getSeqName()) {
-    return false;
-  } else {
-    return a->getScore() > b->getScore();
-  }
-}
-
+*/
 } /* namespace toppic */

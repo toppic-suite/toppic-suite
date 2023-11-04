@@ -72,7 +72,7 @@ SimplePrsmPtrVec DiagFilter::getBestMatch(const PrmMsPtrVec &ms_ptr_vec) {
   SimplePrsmPtrVec match_ptrs = compute(ms_ptr_vec);
   SimplePrsmPtrVec unique_match_ptrs = simple_prsm_util::getUniqueMatches(match_ptrs);
   std::sort(unique_match_ptrs.begin(), unique_match_ptrs.end(),
-            SimplePrsm::cmpScoreDecNameInc);
+            SimplePrsm::cmpScoreDecSeqInc);
   size_t num = mng_ptr_->filter_result_num_;
   if (num > unique_match_ptrs.size()) {
     num = unique_match_ptrs.size();

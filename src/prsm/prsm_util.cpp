@@ -178,7 +178,7 @@ void addFeatureIDToPrsms(PrsmStrPtrVec &prsm_ptrs, const std::string & feature_f
   }
 
   // make sure prsms sorted by spectrum id
-  std::sort(prsm_ptrs.begin(), prsm_ptrs.end(), PrsmStr::cmpSpectrumIdInc);
+  std::sort(prsm_ptrs.begin(), prsm_ptrs.end(), PrsmStr::cmpSpecIncPrecIncEvalueIncProtInc);
 
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     int spec_id = prsm_ptrs[i]->getSpectrumId();

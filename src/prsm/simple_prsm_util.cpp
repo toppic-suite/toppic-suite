@@ -22,7 +22,7 @@ namespace toppic {
 namespace simple_prsm_util {
 
 SimplePrsmPtrVec getUniqueMatches(SimplePrsmPtrVec match_ptrs) {
-  std::sort(match_ptrs.begin(), match_ptrs.end(), SimplePrsm::cmpNameIncScoreDec);
+  std::sort(match_ptrs.begin(), match_ptrs.end(), SimplePrsm::cmpSeqIncScoreDec);
   SimplePrsmPtrVec unique_match_ptrs;
   std::string prev_name = "";
   int prev_id = -1;

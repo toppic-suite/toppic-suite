@@ -31,12 +31,16 @@ SimplePrsmStr::SimplePrsmStr(const std::vector<std::string> &str_vec) {
   seq_desc_ = prsm_util::getValueStr(line);
 }
 
-bool SimplePrsmStr::cmpScoreDec(const SimplePrsmStrPtr &a, 
-                                const SimplePrsmStrPtr &b) {
-  if (a->getScore() == b->getScore()) {
+bool SimplePrsmStr::cmpScoreDecSeqInc(const SimplePrsmStrPtr &a, 
+                                      const SimplePrsmStrPtr &b) {
+  if (a->getScore() > b->getScore()) {
+    return true;
+  }
+  else if (a->getScore() < b->getScore()) {
+    return false;
+  }
+  else {
     return a->getSeqName() < b->getSeqName();
-  } else {
-    return a->getScore() > b->getScore();
   }
 }
 

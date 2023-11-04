@@ -284,4 +284,29 @@ bool PrsmStr::cmpSpecIncPrecIncEvalueIncProtInc(const PrsmStrPtr &a, const PrsmS
   }
 }
 
-}  // namespace toppic
+bool cmpSpecIncPrecIncEvalueIncProtInc(const PrsmStrPtr &a, const PrsmStrPtr &b) {
+  if (a->getSpectrumId() < b->getSpectrumId()) {
+    return true;
+  } 
+  else if (a->getSpectrumId() > b->getSpectrumId()) {
+    return false;
+  }
+  else if (a->getPrecursorId() < b->getPrecursorId()) {
+    return true;
+  }
+  else if (a->getPrecursorId() > b->getPrecursorId()) {
+    return false;
+  }
+  else if (a->getEValue() < b->getEValue()) {
+    return true;
+  } 
+  else if (a->getEValue() > b->getEValue()) {
+    return false;
+  } 
+  else {
+    return a->getSeqName() < b->getSeqName();
+  }
+}  
+
+}
+// namespace toppic

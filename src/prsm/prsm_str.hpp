@@ -117,9 +117,6 @@ class PrsmStr {
 
   static bool cmpSpecIncPrecIncEvalueIncProtInc(const PrsmStrPtr &a, const PrsmStrPtr &b);
 
-  static bool cmpSpectrumIdInc(const PrsmStrPtr &a, const PrsmStrPtr &b) {
-    return a->getSpectrumId() < b->getSpectrumId();}
-
   static bool isSameSeq(const PrsmStrPtr &a, const PrsmStrPtr &b) {
     return a->getSeqName() == b->getSeqName();
   }
