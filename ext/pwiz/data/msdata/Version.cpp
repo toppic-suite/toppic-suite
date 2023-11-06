@@ -28,7 +28,7 @@ namespace msdata {
 
 int Version::Major()                {return 3;}
 int Version::Minor()                {return 0;}
-int Version::Revision()             {return 23182;}
+int Version::Revision()             {return 23307;}
 std::string Version::LastModified()   {return "";}
 std::string Version::Branch()   {return "master";}
 std::string Version::str()
