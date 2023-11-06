@@ -22,7 +22,12 @@ MzmlMsGroup::MzmlMsGroup(MzmlMsPtr ms1_ptr,
     ms2_ptr_vec_(ms2_ptr_vec) {
       //init ms one id
       for (size_t i = 0; i < ms2_ptr_vec.size(); i++) {
-        ms2_ptr_vec[i]->getMsHeaderPtr()->setMsOneId(ms1_ptr->getMsHeaderPtr()->getSpecId());
+        if (ms1_ptr_ == nullptr) {
+          ms2_ptr_vec[i]->getMsHeaderPtr()->setMsOneId(-1); 
+        }
+        else {
+          ms2_ptr_vec[i]->getMsHeaderPtr()->setMsOneId(ms1_ptr->getMsHeaderPtr()->getSpecId());
+        }
       }
     }
 } /* namespace toppic */
