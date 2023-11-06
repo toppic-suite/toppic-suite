@@ -187,7 +187,7 @@ bool getNewEnvColl(MsHeaderPtr header_ptr, MsMapPtr matrix_ptr,
     return true;
   }
   else {
-    LOG_ERROR("env coll empty"); 
+    LOG_WARN("Envelope collection is empty!"); 
     return false;
   }
 }
