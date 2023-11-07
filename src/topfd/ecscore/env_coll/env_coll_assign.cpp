@@ -103,7 +103,7 @@ bool getHighestInteEnvColl(FracFeaturePtrVec &frac_features, EnvCollPtrVec &env_
   }
 }
 
-bool getNewEnvColl(MsHeaderPtr header_ptr, MsMapPtr matrix_ptr,
+bool getNewEnvColl(MsHeaderPtr header_ptr, int ms1_idx, MsMapPtr matrix_ptr,
                    EcscoreParaPtr score_para_ptr, ECScorePtrVec &ecscore_list,
                    EnvCollPtrVec &env_coll_list, DeconvMsPtrVec &ms1_ptr_vec,
                    SeedEnvPtr2D &seed_ptr_2d, FracFeaturePtrVec &frac_feature_list,
@@ -114,12 +114,11 @@ bool getNewEnvColl(MsHeaderPtr header_ptr, MsMapPtr matrix_ptr,
   score_para_ptr->min_seed_match_peak_ = 0;
   double sn_ratio = 0;
   
-  int ms1_id = header_ptr->getMsOneId();
   double prec_win_begin = header_ptr->getPrecWinBegin();
   double prec_win_end = header_ptr->getPrecWinEnd();
-  SeedEnvPtrVec seed_ptr_list = seed_ptr_2d[ms1_id];
+  SeedEnvPtrVec seed_ptr_list = seed_ptr_2d[ms1_idx];
   SeedEnvPtrVec selected_seed_list;
-  LOG_DEBUG("ms1 id  " << ms1_id << " seed number " << seed_ptr_list.size());
+  LOG_DEBUG("ms1 id  " << ms1_idx << " seed number " << seed_ptr_list.size());
   for (size_t i = 0; i < seed_ptr_list.size(); i++) {
     double ref_mz = seed_ptr_list[i]->getReferMz();
     if (ref_mz > prec_win_begin && ref_mz < prec_win_end) {
@@ -203,9 +202,9 @@ void assignEnvColls(FracFeaturePtrVec &frac_feature_list,
                     TopfdParaPtr topfd_para_ptr,
                     EcscoreParaPtr score_para_ptr) {
   double score_cutoff = topfd_para_ptr->getEcscoreCutoff();
-  for (size_t ms1_id = 0; ms1_id < ms1_ptr_vec.size(); ms1_id++) {
-    for (size_t i = 0; i < ms2_header_ptr_2d[ms1_id].size(); i++) {
-      MsHeaderPtr header_ptr = ms2_header_ptr_2d[ms1_id][i];
+  for (size_t ms1_idx = 0; ms1_idx < ms1_ptr_vec.size(); ms1_idx++) {
+    for (size_t i = 0; i < ms2_header_ptr_2d[ms1_idx].size(); i++) {
+      MsHeaderPtr header_ptr = ms2_header_ptr_2d[ms1_idx][i];
       bool assigned = getHighestInteEnvColl(frac_feature_list, env_coll_list,  
                                             header_ptr, score_cutoff, ms2_feature_list);
       if (!assigned) {
@@ -215,7 +214,7 @@ void assignEnvColls(FracFeaturePtrVec &frac_feature_list,
                                          header_ptr, score_cutoff, ms2_feature_list);
       }
       if (!assigned) {
-        assigned = getNewEnvColl(header_ptr, matrix_ptr, score_para_ptr, ecscore_list, 
+        assigned = getNewEnvColl(header_ptr, ms1_idx, matrix_ptr, score_para_ptr, ecscore_list, 
                                  env_coll_list, ms1_ptr_vec, seed_ptr_2d, 
                                  frac_feature_list, ms2_feature_list); 
       }

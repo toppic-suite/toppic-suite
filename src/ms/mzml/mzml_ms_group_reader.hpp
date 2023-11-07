@@ -57,6 +57,9 @@ class MzmlMsGroupReader {
   int cur_ms_one_idx_;
   std::map<int, int> cur_last_ms_two_scan_map_;
 
+  int ms_one_cnt_ = 0;
+  int ms_two_cnt_ = 0;
+
   MzmlMsPtr readNextMzmlMs();
 
   void initMs2Ms1Map();

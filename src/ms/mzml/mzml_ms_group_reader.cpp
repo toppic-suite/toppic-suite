@@ -42,8 +42,10 @@ MzmlMsGroupReader::MzmlMsGroupReader(const std::string & file_name,
   if (!missing_level_one_) {
     initMs2Ms1Map();
     reader_ptr_->resetIndexes();
-    cur_ms_one_idx_ = 0;
   }
+  cur_ms_one_idx_ = 0;
+  ms_one_cnt_ = 0;
+  ms_two_cnt_ = 0;
 }
 
 MzmlMsPtr MzmlMsGroupReader::readNextMzmlMs() {
@@ -57,6 +59,15 @@ MzmlMsPtr MzmlMsGroupReader::readNextMzmlMs() {
   MsHeaderPtr header_ptr = reader_ptr_->getHeaderPtr();
   if (header_ptr == nullptr) {
     return nullptr;
+  }
+  if (header_ptr->getMsLevel() == 1) {
+    //LOG_ERROR("set spec id " << ms_one_cnt_);
+    header_ptr->setSpecId(ms_one_cnt_);
+    ms_one_cnt_++;
+  }
+  else {
+    header_ptr->setSpecId(ms_two_cnt_);
+    ms_two_cnt_++;
   }
   header_ptr->setFractionId(fraction_id_);
   PeakPtrVec peak_list = reader_ptr_->getPeakList();
