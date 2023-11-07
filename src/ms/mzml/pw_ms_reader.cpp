@@ -217,7 +217,7 @@ double PwMsReader::parseFaims(pwiz::msdata::SpectrumPtr cur_spec_ptr) {
       break;
     }
   }
-  return -1;
+  return std::numeric_limits<double>::max();
 }
 
 
@@ -316,7 +316,7 @@ MzmlProfilePtr PwMsReader::readProfile() {
     else if (ms_level == 2) {
       ms_2_cnt++;
     }
-    if (voltage > 0) {
+    if (voltage != std::numeric_limits<double>::max()) {
       auto search = volt_map.find(voltage);
       // if not found
       if (search == volt_map.end()) {
