@@ -65,4 +65,13 @@ SpecFeature::SpecFeature(MsHeaderPtr header, FracFeaturePtr feature,
   prec_inte_ = prec_inte; 
 }
 
+SpecFeature::SpecFeature(double prec_mono_mz, 
+                         double prec_charge) {
+  frac_id_ = 0;
+  frac_feature_id_ = -1;
+  prec_mono_mz_ = prec_mono_mz;
+  prec_charge_ = prec_charge; 
+  prec_inte_ = 0; 
+}
+
 }

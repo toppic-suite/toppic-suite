@@ -37,6 +37,8 @@ class SpecFeature {
               double prec_mono_mz, double prec_avg_mz, 
               int prec_charge, double prec_inte);
 
+  SpecFeature(double prec_mono_mz, double prec_charge); 
+
   int getSpecId() {return spec_id_;}
 
   int getFracId() {return frac_id_;}

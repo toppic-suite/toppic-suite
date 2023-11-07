@@ -111,7 +111,7 @@ std::function<void()> geneMsTwoTask(MzmlMsPtr ms_ptr,
                                     SimpleThreadPoolPtr pool_ptr) { 
   return [ms_ptr, feat_ptr_vec, topfd_para_ptr, ms2_writer_ptr_vec, pool_ptr]() {
 
-    deconvMsTwo(ms_ptr, feat_ptr_vec,topfd_para_ptr, ms2_writer_ptr_vec, pool_ptr);
+    deconvMsTwo(ms_ptr, feat_ptr_vec, topfd_para_ptr, ms2_writer_ptr_vec, pool_ptr);
 
   };
 }
@@ -184,9 +184,19 @@ void DeconvMs2Process::process() {
     ms2_writer_ptr_vec.push_back(ms2_ptr);
   }
   // reader spectrum features
-  std::string feat_file_name = output_base_name + "_ms2.feature";
   std::map<int, SpecFeaturePtrVec> feat_map;
-  readSpecFeature(feat_file_name, feat_map); 
+  SpecFeaturePtrVec missing_one_feat_list;
+  if (topfd_para_ptr_->isMissingLevelOne()) {
+    double max_mass = topfd_para_ptr_->getMaxMass();
+    int max_charge = topfd_para_ptr_->getMaxCharge();
+    double mono_mz = peak_util::compMz(max_mass, max_charge);
+    SpecFeaturePtr feat_ptr = std::make_shared<SpecFeature>(mono_mz, max_charge);
+    missing_one_feat_list.push_back(feat_ptr);
+  }
+  else {
+    std::string feat_file_name = output_base_name + "_ms2.feature";
+    readSpecFeature(feat_file_name, feat_map); 
+  }
   // counter for processed spectra
   int spec_cnt = 0;
   // total spectrum number
@@ -200,10 +210,15 @@ void DeconvMs2Process::process() {
       }
       spec_cnt++; 
       MzmlMsPtr ms_ptr = ms_ptr_vec[i];
-      feat_it = feat_map.find(ms_ptr->getMsHeaderPtr()->getSpecId());
       SpecFeaturePtrVec sp_feat_ptr_vec;
-      if (feat_it != feat_map.end()) { 
-        sp_feat_ptr_vec = feat_it->second;
+      if (topfd_para_ptr_->isMissingLevelOne()) {
+        sp_feat_ptr_vec = missing_one_feat_list;
+      }
+      else {
+        feat_it = feat_map.find(ms_ptr->getMsHeaderPtr()->getSpecId());
+        if (feat_it != feat_map.end()) { 
+          sp_feat_ptr_vec = feat_it->second;
+        }
       }
       pool_ptr->Enqueue(deconv_ms2_process::geneMsTwoTask(ms_ptr, sp_feat_ptr_vec,
                                                           topfd_para_ptr_, ms2_writer_ptr_vec, pool_ptr)); 
