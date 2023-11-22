@@ -174,7 +174,7 @@ void addFeatureIDToPrsms(PrsmStrPtrVec &prsm_ptrs, const std::string & feature_f
 
   std::map<int,SpecFeaturePtr> feature_map;
   for (size_t i = 0; i < ms2_features.size(); i++) {
-    feature_map[ms2_features[i]->getSpecId()] =  ms2_features[i];
+    feature_map[ms2_features[i]->getSampleFeatureId()] =  ms2_features[i];
   }
 
   // make sure prsms sorted by spectrum id
@@ -182,10 +182,10 @@ void addFeatureIDToPrsms(PrsmStrPtrVec &prsm_ptrs, const std::string & feature_f
 
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     int spec_id = prsm_ptrs[i]->getSpectrumId();
-    if (feature_map.find(spec_id) != feature_map.end()) { 
+    int sample_feature_id = prsm_ptrs[i]->getSampleFeatureId();
+    if (feature_map.find(sample_feature_id) != feature_map.end()) { 
       SpecFeaturePtr feature = feature_map.find(spec_id)->second;
       if (feature != nullptr) {
-        prsm_ptrs[i]->setPrecFeatureId(feature->getSampleFeatureId());
         prsm_ptrs[i]->setPrecFeatureInte(feature->getSampleFeatureInte());
         prsm_ptrs[i]->setFracFeatureScore(feature->getFracFeatureScore());
         prsm_ptrs[i]->setTimeApex(feature->getFracFeatureApexTime());

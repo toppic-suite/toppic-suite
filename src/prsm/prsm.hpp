@@ -106,6 +106,7 @@ class Prsm {
 
   void setPrecurorId(int precursor_id) {precursor_id_ = precursor_id;}
 
+
   void setFracFeatureScore(double score) {frac_feature_score_ = score;}
 
   void setOriPrecMass(double prec_mass) {ori_prec_mass_ = prec_mass;}
@@ -155,7 +156,7 @@ class Prsm {
   std::string file_name_;
 
   int prsm_id_ = -1;
-  /* spectrum information */
+  // spectrum information 
   int spectrum_id_;
 
   std::string spectrum_scan_;
@@ -164,6 +165,9 @@ class Prsm {
 
   int spectrum_num_;
 
+  // Sample feature id is stored in both deconv_ms_ptr_vec 
+  // and the member variable. When a prsm is constructed from an xml file, 
+  // only the member variable will be initialized.  
   int sample_feature_id_ = -1;
 
   double sample_feature_inte_ = -1;
