@@ -109,7 +109,7 @@ void process(TopfdParaPtr topfd_para_ptr) {
     int count = seed_env_idx + 1;
     if (count % 100 == 0 || count == seed_num) {
       perc = static_cast<int>(count * 100 / seed_num);
-      std::cout << "\r" << "Processing seed " << count << " ...       " << perc << "\% finished." << std::flush;
+      std::cout << "\r" << "Processing feature " << count << " ...       " << perc << "\% finished." << std::flush;
     }
     SeedEnvPtr seed_ptr = seed_ptrs[seed_env_idx];
     seed_ptr = seed_env_util::preprocessSeedEnvPtr(seed_ptr, matrix_ptr,  
