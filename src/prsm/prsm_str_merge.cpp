@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -46,6 +46,24 @@ PrsmStrMerge::PrsmStrMerge(const std::string &spec_file_name,
   }
 }
 
+PrsmStrPtrVec removeDuplicates(PrsmStrPtrVec ori_list) {
+  PrsmStrPtrVec result_list;
+  for (size_t i = 0; i < ori_list.size(); i++) {
+    bool dup = false;
+    PrsmStrPtr prsm_ptr = ori_list[i];
+    for (size_t j = 0; j < result_list.size(); j++) {
+      if (PrsmStr::isSameSeq(result_list[j], prsm_ptr)) {
+        dup = true;
+        break;
+      }
+    }
+    if (!dup) {
+      result_list.push_back(prsm_ptr);
+    }
+  }
+  return result_list;
+}
+
 void PrsmStrMerge::process(bool norm) {
   size_t input_num = input_file_exts_.size();
   std::string base_name = file_util::basename(spec_file_name_);
@@ -85,12 +103,13 @@ void PrsmStrMerge::process(bool norm) {
 
     if (cur_str_ptrs.size() > 0) {
       if (!norm) {
-        std::sort(cur_str_ptrs.begin(), cur_str_ptrs.end(), PrsmStr::cmpMatchFragmentDec);
+        std::sort(cur_str_ptrs.begin(), cur_str_ptrs.end(),
+                  PrsmStr::cmpMatchFragDecMatchPeakDecProtInc);
       } else {
-        std::sort(cur_str_ptrs.begin(), cur_str_ptrs.end(), PrsmStr::cmpNormMatchFragmentDec);
+        std::sort(cur_str_ptrs.begin(), cur_str_ptrs.end(),
+                  PrsmStr::cmpNormMatchFragDecProtInc);
         // Remove duplicated PrSMs from the same sequence.  
-        auto it = std::unique(cur_str_ptrs.begin(), cur_str_ptrs.end(), PrsmStr::isSameSeq);
-        cur_str_ptrs.erase(it, cur_str_ptrs.end());
+        cur_str_ptrs = removeDuplicates(cur_str_ptrs);
       }
       for (size_t i = 0; i < top_num_; i++) {
         if (i >= cur_str_ptrs.size()) {

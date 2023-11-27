@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -341,6 +341,8 @@ void Proteoform::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
   xml_doc->addElement(element, "unexpected_ptm_num", str.c_str());
   str = getProteoformMatchSeq();
   xml_doc->addElement(element, "proteo_match_seq", str.c_str());
+  str = residue_seq_ptr_->toAcidString();
+  xml_doc->addElement(element, "proteo_db_seq", str.c_str());
 
   element_name = MassShift::getXmlElementName() + "_list";
   XmlDOMElement* cl = xml_doc->createElement(element_name.c_str());

@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ void PeakIonPair::appendRealPeakToXml(XmlDOMDocument* xml_doc,
   xml_doc->addElement(element, "ion_display_position", str.c_str());
   str = str_util::toString(spec_id_);
   xml_doc->addElement(element, "spec_id", str.c_str());
-  str = str_util::toString(real_peak_ptr_->getBasePeakPtr()->getId());
+  str = str_util::toString(real_peak_ptr_->getBasePeakPtr()->getPeakId());
   xml_doc->addElement(element, "peak_id", str.c_str());
   str = str_util::toString(real_peak_ptr_->getBasePeakPtr()->getCharge());
   xml_doc->addElement(element, "peak_charge", str.c_str());

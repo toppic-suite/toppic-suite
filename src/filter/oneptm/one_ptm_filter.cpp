@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -119,8 +119,8 @@ void OnePtmFilter::computeBestMatch(const PrmMsPtrVec &prm_ms_ptr_vec,
   std::vector<short> rev_diag_scores(rev_diag_row_num, 0);
   rev_diag_index_ptr_->compScores(suff_mass_errors, rev_diag_scores);
 
-  double prec_minus_water_mass = prm_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMassMinusWater();
-  double prec_error_tole = prm_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecErrorTolerance(tole_ptr->getPpo());
+  double prec_minus_water_mass = prm_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMassMinusWater();
+  double prec_error_tole = prm_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecErrorTolerance(tole_ptr->getPpo());
 
   ProtCandidatePtrVec comp_prots
     = mass_match_util::findOneShiftTopProteins(term_scores, rev_term_scores, term_index_ptr_, rev_term_index_ptr_,

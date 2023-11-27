@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ PeakIonPairPtrVec getMatchedPairs(const PeakIonPairPtrVec &pair_ptrs,
   PeakIonPairPtrVec selected_pair_ptrs;
   for (size_t i = 0; i < pair_ptrs.size(); i++) {
     if (pair_ptrs[i]->getSpecId() == spec_id &&
-        pair_ptrs[i]->getRealPeakPtr()->getBasePeakPtr()->getId() == peak_id) {
+        pair_ptrs[i]->getRealPeakPtr()->getBasePeakPtr()->getPeakId() == peak_id) {
       selected_pair_ptrs.push_back(pair_ptrs[i]);
     }
   }
@@ -90,7 +90,7 @@ PeakIonPairPtrVec findPairs(ExtendMsPtr ms_three_ptr,
     if (ion_ptr->getPos() >= bgn && ion_ptr->getPos() <= end) {
       if (std::abs(deviation) <= err) {
         PeakIonPairPtr pair_ptr
-            = std::make_shared<PeakIonPair>(ms_three_ptr->getMsHeaderPtr()->getId(),
+            = std::make_shared<PeakIonPair>(ms_three_ptr->getMsHeaderPtr()->getSpecId(),
                                             ms_three_ptr->getPeakPtr(i),
                                             theo_peak_ptrs[j]);
         pair_ptrs.push_back(pair_ptr);

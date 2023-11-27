@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -76,7 +76,7 @@ void writePrsm(std::ofstream &file, PrsmPtr prsm_ptr, PrsmParaPtr prsm_para_ptr)
   int peak_num = 0;
   DeconvMsPtrVec deconv_ms_ptr_vec = prsm_ptr->getDeconvMsPtrVec();
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
-    spec_ids = spec_ids + str_util::toString(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getId()) + " ";
+    spec_ids = spec_ids + str_util::toString(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getSpecId()) + " ";
     spec_activations = spec_activations + deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getActivationPtr()->getName() + " ";
     spec_scans = spec_scans + deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getScansString() + " ";
     peak_num += deconv_ms_ptr_vec[i]->size();
@@ -85,12 +85,12 @@ void writePrsm(std::ofstream &file, PrsmPtr prsm_ptr, PrsmParaPtr prsm_para_ptr)
   str_util::trim(spec_activations);
   str_util::trim(spec_scans);
   file << prsm_para_ptr->getSpectrumFileName() << "\t"
-      << prsm_ptr->getPrsmId() << "\t"
-      << spec_ids << "\t"
-      << spec_activations<< "\t"
-      << spec_scans << "\t"
-      << peak_num << "\t"
-      << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecCharge() << "\t"
+       << prsm_ptr->getPrsmId() << "\t"
+       << spec_ids << "\t"
+       << spec_activations << "\t"
+       << spec_scans << "\t"
+       << peak_num << "\t"
+       << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecCharge() << "\t"
       << prsm_ptr->getOriPrecMass()<< "\t"  // "Precursor_mass"
       << prsm_ptr->getAdjustedPrecMass() << "\t"
       << prsm_ptr->getProteoformPtr()->getProteoClusterId() << "\t"
@@ -320,9 +320,9 @@ void process(PrsmParaPtr prsm_para_ptr,
 
   // init variables
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
-  SimpleMsAlignReaderPtr ms_reader_ptr = std::make_shared<SimpleMsAlignReader>(sp_file_name, 
-                                                                               group_spec_num,
-                                                                               sp_para_ptr->getActivationPtr());
+  MsAlignReaderPtr ms_reader_ptr = std::make_shared<MsAlignReader>(sp_file_name, 
+                                                                   group_spec_num,
+                                                                   sp_para_ptr->getActivationPtr());
 
   SpectrumSetPtr spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(ms_reader_ptr, sp_para_ptr);
 

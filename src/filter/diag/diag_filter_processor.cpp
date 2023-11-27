@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -44,9 +44,9 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
   int group_spec_num = mng_ptr->prsm_para_ptr_->getGroupSpecNum();
 
-  SimpleMsAlignReaderPtr reader_ptr = std::make_shared<SimpleMsAlignReader>(sp_file_name,
-                                                                            group_spec_num,
-                                                                            sp_para_ptr->getActivationPtr());
+  MsAlignReaderPtr reader_ptr = std::make_shared<MsAlignReader>(sp_file_name,
+                                                                group_spec_num,
+                                                                sp_para_ptr->getActivationPtr());
 
   // init writer 
   std::string output_file_name = file_util::basename(prsm_para_ptr->getSpectrumFileName())
@@ -57,32 +57,37 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
   DeconvMsPtrVec deconv_ms_ptr_vec = reader_ptr->getNextMsPtrVec();
   std::vector<double> prec_error_vec = sp_para_ptr->getMultiShiftSearchPrecErrorVec();
   while (deconv_ms_ptr_vec.size() != 0) {
-    // allow one dalton error
-    SpectrumSetPtrVec spec_set_vec 
+    if (deconv_ms_ptr_vec[0]->getMsHeaderPtr()->containsPrec()) {
+      // allow one dalton error
+      SpectrumSetPtrVec spec_set_vec 
         = spectrum_set_factory::geneSpectrumSetPtrVecWithPrecError(deconv_ms_ptr_vec, 
                                                                    sp_para_ptr,
                                                                    prec_error_vec);
-    for (size_t k = 0; k < spec_set_vec.size(); k++) {
-      SpectrumSetPtr spec_set_ptr = spec_set_vec[k];
-      if (spec_set_ptr->isValid()) {
-        if (mng_ptr->var_num_ == 0) {
-          PrmMsPtrVec ms_ptr_vec = spec_set_ptr->getMsTwoPtrVec();
-          SimplePrsmPtrVec match_ptrs = filter_ptr->getBestMatch(ms_ptr_vec);
-          writer_ptr->write(match_ptrs);
-        } 
-        else {
-          DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
-          double prec_mono_mass = spec_set_ptr->getPrecMonoMass();
-          std::vector<double> mod_mass(3);
-          for (size_t i = 0; i < mod_mass_list.size(); i++) {
-            for (size_t k1 = 0; k1 < mod_mass.size(); k1++) {
-              std::fill(mod_mass.begin(), mod_mass.end(), 0.0);
-              mod_mass[k1] += mod_mass_list[i];
-              PrmMsPtrVec ms_ptr_vec = prm_ms_factory::geneMsTwoPtrVec(deconv_ms_ptr_vec,
-                                                                       sp_para_ptr,
-                                                                       prec_mono_mass, mod_mass);
-              SimplePrsmPtrVec match_ptrs = filter_ptr->getBestMatch(ms_ptr_vec);
-              writer_ptr->write(match_ptrs);
+      for (size_t k = 0; k < spec_set_vec.size(); k++) {
+        SpectrumSetPtr spec_set_ptr = spec_set_vec[k];
+        if (spec_set_ptr->isValid()) {
+          if (mng_ptr->var_num_ == 0) {
+            PrmMsPtrVec ms_ptr_vec = spec_set_ptr->getMsTwoPtrVec();
+            SimplePrsmPtrVec match_ptrs = filter_ptr->getBestMatch(ms_ptr_vec);
+            writer_ptr->write(match_ptrs);
+          } 
+          else {
+            DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
+            double prec_mono_mass = spec_set_ptr->getPrecMonoMass();
+            double n_term_label_mass = spec_set_ptr->getNTermLabelMass();
+            std::vector<double> mod_mass(3);
+            for (size_t i = 0; i < mod_mass_list.size(); i++) {
+              for (size_t k1 = 0; k1 < mod_mass.size(); k1++) {
+                std::fill(mod_mass.begin(), mod_mass.end(), 0.0);
+                mod_mass[k1] += mod_mass_list[i];
+                PrmMsPtrVec ms_ptr_vec = prm_ms_factory::geneMsTwoPtrVec(deconv_ms_ptr_vec,
+                                                                         sp_para_ptr,
+                                                                         prec_mono_mass, 
+                                                                         n_term_label_mass,
+                                                                         mod_mass);
+                SimplePrsmPtrVec match_ptrs = filter_ptr->getBestMatch(ms_ptr_vec);
+                writer_ptr->write(match_ptrs);
+              }
             }
           }
         }
@@ -95,7 +100,7 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
     }
     double perc = cnt_sum * 100.0 / mng_ptr->n_spec_block_;
     std::stringstream msg;
-    msg << std::flush << "Multiple PTM filtering - processing " << std::setprecision(3) <<  perc << "%.     \r";
+    msg << std::flush << "Multiple unexpected shifts filtering - processing " << std::setprecision(3) <<  perc << "%.     \r";
     mng_ptr->mutex_.lock();
     std::cout << msg.str();
     mng_ptr->mutex_.unlock();
@@ -146,7 +151,7 @@ void DiagFilterProcessor::process() {
   pool_ptr->ShutDown();
   std::cout << std::endl;
 
-  std::cout << "Multiple PTM filtering - combining blocks started." << std::endl;
+  std::cout << "Multiple unexpected shifts filtering - combining blocks started." << std::endl;
   std::string sp_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
   SimplePrsmStrMergePtr merge_ptr
       = std::make_shared<SimplePrsmStrMerge>(sp_file_name, mng_ptr_->output_file_ext_,
@@ -156,7 +161,7 @@ void DiagFilterProcessor::process() {
   merge_ptr = nullptr;
   //Remove temporary files
   file_util::cleanTempFiles(sp_file_name, mng_ptr_->output_file_ext_ + "_");
-  std::cout << "Multiple PTM filtering - combining blocks finished." << std::endl;
+  std::cout << "Multiple unexpected shifts filtering - combining blocks finished." << std::endl;
 }
 
 

@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ void mzRefine(MatchEnvPtrVec &envs);
 
 void mzRefine(MatchEnvPtr env);
 
-void compEnvDist(EnvelopePtr real_env, EnvelopePtr theo_env,
+void compEnvDist(EnvPtr real_env, EnvPtr theo_env,
                  double &best_dist, double &best_ratio);
 
 void compDistWithNorm(const std::vector<double>& real,

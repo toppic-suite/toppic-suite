@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 //limitations under the License.
 
 #include "common/util/logger.hpp"
-#include "ms/spec/simple_msalign_reader.hpp"
+#include "ms/spec/msalign_reader.hpp"
 #include "ms/spec/msalign_util.hpp"
 
 namespace toppic {
@@ -21,7 +21,7 @@ namespace toppic {
 namespace msalign_util {
 
 int countSpNum(const std::string &spectrum_file_name) {
-  SimpleMsAlignReader reader(spectrum_file_name);
+  MsAlignReader reader(spectrum_file_name);
   int cnt = 0;
   DeconvMsPtr deconv_ms_ptr;
   while ((deconv_ms_ptr = reader.getNextMsPtr()) != nullptr) {

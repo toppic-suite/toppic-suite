@@ -48,7 +48,12 @@ PWIZ_API_DECL IntegerSet::Interval::Interval(int a, int b)
 
 PWIZ_API_DECL ostream& operator<<(ostream& os, const IntegerSet::Interval& interval)
 {
-    os << "[" << interval.begin << "," << interval.end << "]";
+    if (interval.end == numeric_limits<int>::max())
+        os << interval.begin << "-";
+    else if (interval.begin == numeric_limits<int>::min())
+        os << "-" << interval.end;
+    else
+        os << "[" << interval.begin << "," << interval.end << "]";
     return os;
 }
 
@@ -81,14 +86,17 @@ PWIZ_API_DECL istream& operator>>(istream& is, IntegerSet::Interval& interval)
     char dash = 0;
     a = 0; b = 0;
 
+    if (!bal::all(buffer, bal::is_any_of("0123456789-")))
+        throw runtime_error("invalid syntax \"" + buffer + "\" for IntegerSet interval; should be [Start,End], Start-End, Start- or just Start, where Start and End are integers");
+
     istringstream iss2(buffer);
     iss2 >> a;
     if (iss2) interval.begin = interval.end = a;
     iss2 >> dash;
-    if (dash=='-') interval.end = numeric_limits<int>::max();
+    if (dash == '-') interval.end = numeric_limits<int>::max();
     iss2 >> b;
     if (iss2) interval.end = b;
-    
+
     return is;
 }
 
@@ -230,8 +238,13 @@ PWIZ_API_DECL size_t IntegerSet::size() const
 
 PWIZ_API_DECL ostream& operator<<(ostream& os, const IntegerSet& integerSet)
 {
-    copy(integerSet.intervals_.begin(), integerSet.intervals_.end(), 
-         ostream_iterator<IntegerSet::Interval>(os," "));
+    if (!integerSet.intervals_.empty())
+    {
+        auto itr = integerSet.intervals_.begin();
+        os << *itr;
+        for (++itr; itr != integerSet.intervals_.end(); ++itr)
+            os << " " << *itr;
+    }
     return os;
 }
 

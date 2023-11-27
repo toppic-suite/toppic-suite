@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -71,7 +71,8 @@ DiagFilter::DiagFilter(const ProteoformPtrVec &proteo_ptrs,
 SimplePrsmPtrVec DiagFilter::getBestMatch(const PrmMsPtrVec &ms_ptr_vec) {
   SimplePrsmPtrVec match_ptrs = compute(ms_ptr_vec);
   SimplePrsmPtrVec unique_match_ptrs = simple_prsm_util::getUniqueMatches(match_ptrs);
-  std::sort(unique_match_ptrs.begin(), unique_match_ptrs.end(), SimplePrsm::cmpScoreDec);
+  std::sort(unique_match_ptrs.begin(), unique_match_ptrs.end(),
+            SimplePrsm::cmpScoreDecSeqInc);
   size_t num = mng_ptr_->filter_result_num_;
   if (num > unique_match_ptrs.size()) {
     num = unique_match_ptrs.size();

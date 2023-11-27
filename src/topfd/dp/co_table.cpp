@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -32,8 +32,8 @@ int CoTable::cntTableSize(MatchEnvPtr2D &win_envs, int win, int pnt) {
 // check if splitting the peak intensity can increase the peak similarity score.
 bool CoTable::checkCoexist(MatchEnvPtr env_a, MatchEnvPtr env_b, int pos_a,
                            int pos_b, double tolerance) {
-  double inte_a = env_a->getTheoEnvPtr()->getIntensity(pos_a);
-  double inte_b = env_b->getTheoEnvPtr()->getIntensity(pos_b);
+  double inte_a = env_a->getTheoEnvPtr()->getInte(pos_a);
+  double inte_b = env_b->getTheoEnvPtr()->getInte(pos_b);
   double inte_sum = inte_a + inte_b;
   double score_a = env_a->calcPeakScr(pos_a, inte_a, tolerance);
   double new_score_a = env_a->calcPeakScr(pos_a, inte_sum, tolerance);
@@ -52,8 +52,8 @@ bool CoTable::checkCoexist(MatchEnvPtr env_a, MatchEnvPtr env_b,
                            double tolerance) {
   int cnt_share = 0;
   int cnt_coexist = 0;
-  RealEnvPtr real_env_a = env_a->getRealEnvPtr();
-  RealEnvPtr real_env_b = env_b->getRealEnvPtr();
+  ExpEnvPtr real_env_a = env_a->getExpEnvPtr();
+  ExpEnvPtr real_env_b = env_b->getExpEnvPtr();
   for (int i = 0; i < real_env_a->getPeakNum(); i++) {
     int a_idx = real_env_a->getPeakIdx(i);
     for (int j = 0; j < real_env_b->getPeakNum(); j++) {

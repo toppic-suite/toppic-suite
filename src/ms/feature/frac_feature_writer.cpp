@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 #include "common/xml/xml_dom_impl.hpp"
 #include "common/xml/xml_dom_util.hpp"
 #include "ms/spec/peak_util.hpp"
-#include "ms/env/envelope.hpp"
+#include "ms/env/env.hpp"
 #include "ms/env/env_base.hpp"
 #include "ms/feature/frac_feature_writer.hpp"
 
@@ -36,15 +36,19 @@ void writeHeader(std::ofstream &of) {
       << "File_name" << "\t"
       << "Mass" << "\t"
       << "Intensity" << "\t"
-      << "Time_begin" << "\t"
-      << "Time_end" << "\t"
-      << "First_scan" << "\t"
-      << "Last_scan" << "\t"
-      << "Minimum_charge_state" << "\t"
-      << "Maximum_charge_state" << "\t"
-      << "Envelope_num" << "\t"
+      << "Min_time" << "\t"
+      << "Max_time" << "\t"
+      << "Min_scan" << "\t"
+      << "Max_scan" << "\t"
+      << "Min_charge" << "\t"
+      << "Max_charge" << "\t"
       << "Apex_time" << "\t"
+      << "Apex_scan" << "\t"
       << "Apex_intensity" << "\t"
+      << "Rep_charge" << "\t"
+      << "Rep_average_mz" << "\t"
+      << "Envelope_num" << "\t"
+      << "EC_score" << "\t"
       << "Sample_feature_Id" << "\t"
       << "Sample_feature_intensity"
       << std::endl;
@@ -62,9 +66,13 @@ void writeOneFeature(std::ofstream &of, FracFeaturePtr feature) {
       << feature->getScanEnd() << "\t"
       << feature->getMinCharge() << "\t"
       << feature->getMaxCharge() << "\t"
-      << feature->getEnvNum() << "\t"
       << feature->getApexTime() << "\t"
+      << feature->getApexScan() << "\t"
       << feature->getApexInte() << "\t"
+      << feature->getRepCharge() << "\t"
+      << feature->getRepAvgMz() << "\t"
+      << feature->getEnvNum() << "\t"
+      << feature->getEcScore() << "\t"
       << feature->getSampleFeatureId() << "\t"
       << feature->getSampleFeatureInte() 
       << std::endl;
@@ -99,7 +107,7 @@ void writeBatMassFeatures(const std::string &output_file_name,
       << "rtHi" << delimit
       << "color" << delimit
       << "opacity" << delimit
-      << "promex_score"
+      << "ecscore"
       << std::endl;
   for (size_t i = 0; i < features.size(); i++) {
     FracFeaturePtr feature = features[i];
@@ -110,10 +118,10 @@ void writeBatMassFeatures(const std::string &output_file_name,
       SingleChargeFeaturePtr single_feature = single_features[j];
       int charge = single_feature->getCharge();
       double mono_mz = peak_util::compMz(mono_mass, charge);
-      EnvelopePtr ref_env = EnvBase::getStaticEnvByMonoMass(mono_mass);
-      EnvelopePtr theo_env = ref_env->distrToTheoMono(mono_mz, charge);
+      EnvPtr ref_env = EnvBase::getEnvByMonoMass(mono_mass);
+      EnvPtr theo_env = ref_env->distrToTheoMono(mono_mz, charge);
       double min_inte = 0.03;
-      EnvelopePtr filtered_env = theo_env->getSubEnv(min_inte); 
+      EnvPtr filtered_env = theo_env->getSubEnv(min_inte);
       //margin for envelopes
       double margin = 0.1; 
       double min_mz = filtered_env->getMinMz() - margin;
@@ -134,7 +142,7 @@ void writeBatMassFeatures(const std::string &output_file_name,
           << (single_feature->getTimeEnd()/60) << delimit
           << "#FF0000" << delimit
           << "0.1" << delimit
-          << feature->getPromexScore()
+          << feature->getEcScore()
           << std::endl;
     }
   }

@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ namespace toppic {
 
 ExtendPeak::ExtendPeak(DeconvPeakPtr base_peak_ptr, 
                        double mono_mass, double score):
-    Peak(mono_mass, 1.0),
+    Peak(mono_mass, base_peak_ptr->getIntensity()),
     base_peak_ptr_(base_peak_ptr),
     mono_mass_(mono_mass),
     score_(score),

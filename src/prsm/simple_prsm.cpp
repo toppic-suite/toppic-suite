@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -24,11 +24,11 @@ SimplePrsm::SimplePrsm(MsHeaderPtr header_ptr, int spectrum_num,
                        ProteoformPtr proteo_ptr, int score):
   spectrum_num_(spectrum_num),
   score_(score) {
-    spectrum_id_ = header_ptr->getId();
+    spectrum_id_ = header_ptr->getSpecId();
     file_name_ = header_ptr->getFileName();
     spectrum_scan_ = header_ptr->getScansString();
-    precursor_id_ = header_ptr->getPrecId();
-    prec_mass_ = header_ptr->getPrecMonoMass();
+    precursor_id_ = header_ptr->getFirstPrecId();
+    prec_mass_ = header_ptr->getFirstPrecMonoMass();
     seq_name_ = proteo_ptr->getSeqName();
     seq_desc_ = proteo_ptr->getSeqDesc();
     prot_mass_ = proteo_ptr->getResSeqPtr()->getSeqMass();
@@ -39,11 +39,11 @@ SimplePrsm::SimplePrsm(MsHeaderPtr header_ptr,
                        ProteoformPtr proteo_ptr, 
                        ProtCandidatePtr cand_ptr):  
   spectrum_num_(spectrum_num) {
-    spectrum_id_ = header_ptr->getId();
+    spectrum_id_ = header_ptr->getSpecId();
     file_name_ = header_ptr->getFileName();
     spectrum_scan_ = header_ptr->getScansString();
-    precursor_id_ = header_ptr->getPrecId();
-    prec_mass_ = header_ptr->getPrecMonoMass();
+    precursor_id_ = header_ptr->getFirstPrecId();
+    prec_mass_ = header_ptr->getFirstPrecMonoMass();
     seq_name_ = proteo_ptr->getSeqName();
     seq_desc_ = proteo_ptr->getSeqDesc();
     prot_mass_ = proteo_ptr->getResSeqPtr()->getSeqMass();
@@ -58,13 +58,13 @@ SimplePrsm::SimplePrsm(MsHeaderPtr header_ptr, int spectrum_num,
                        int score):
     spectrum_num_(spectrum_num),
     score_(score) {
-      spectrum_id_ = header_ptr->getId();
+      spectrum_id_ = header_ptr->getSpecId();
       spectrum_scan_ = header_ptr->getScansString();
-      precursor_id_ = header_ptr->getPrecId();
-      prec_mass_ = header_ptr->getPrecMonoMass();
+      precursor_id_ = header_ptr->getFirstPrecId();
+      prec_mass_ = header_ptr->getFirstPrecMonoMass();
       seq_name_ = seq_name;
       seq_desc_ = seq_desc;
-      prot_mass_ = header_ptr->getPrecMonoMass();
+      prot_mass_ = header_ptr->getFirstPrecMonoMass();
     }
 
 SimplePrsm::SimplePrsm(XmlDOMElement* element) {
@@ -185,11 +185,44 @@ std::vector<double> SimplePrsm::getNTermShiftsFromCTermShifts() {
   return shifts;
 }
 
-bool SimplePrsm::cmpScoreDec(const SimplePrsmPtr a, const SimplePrsmPtr b) {
-  if (a->getScore() == b->getScore()) {
+bool SimplePrsm::cmpScoreDecSeqInc(const SimplePrsmPtr a, const SimplePrsmPtr b) {
+  if (a->getScore() > b->getScore()) {
+    return true;
+  }
+  else if (a->getScore() < b->getScore()) {
+    return false;
+  }
+  else {
     return a->getSeqName() < b->getSeqName();
+  }
+}
+
+bool SimplePrsm::cmpSeqIncScoreDec(const SimplePrsmPtr a, const SimplePrsmPtr b) {
+  if (a->getSeqName() < b->getSeqName()) {
+    return true;
+  } else if (a->getSeqName() > b->getSeqName()) {
+    return false;
   } else {
     return a->getScore() > b->getScore();
+  }
+}
+
+/*
+bool SimplePrsm::cmpSpecIncScoreDecSeqInc(const SimplePrsmPtr a, const SimplePrsmPtr b) {
+  if (a->getSpectrumId() < b->getSpectrumId()) {
+    return true;
+  } 
+  else if (a->getSpectrumId() > b->getSpectrumId()) {
+    return false;
+  } 
+  else if (a->getScore() > b->getScore()) {
+    return true;
+  }
+  else if (a->getScore() < b->getScore()) {
+    return false;
+  }
+  else {
+    return a->getSeqName() < b->getSeqName();
   }
 }
 
@@ -200,29 +233,5 @@ bool SimplePrsm::cmpIdInc(const SimplePrsmPtr a, const SimplePrsmPtr b) {
     return a->getSpectrumId() < b->getSpectrumId();
   }
 }
-
-bool SimplePrsm::cmpIdIncScoreDec(const SimplePrsmPtr a, const SimplePrsmPtr b) {
-  if (a->getSpectrumId() < b->getSpectrumId()) {
-    return true;
-  } else if (a->getSpectrumId() > b->getSpectrumId()) {
-    return false;
-  } else {
-    if (a->getScore() == b->getScore()) {
-      return a->getSeqName() < b->getSeqName();
-    } else {
-      return a->getScore() > b->getScore();
-    }
-  }
-}
-
-bool SimplePrsm::cmpNameIncScoreDec(const SimplePrsmPtr a, const SimplePrsmPtr b) {
-  if (a->getSeqName() < b->getSeqName()) {
-    return true;
-  } else if (a->getSeqName() > b->getSeqName()) {
-    return false;
-  } else {
-    return a->getScore() > b->getScore();
-  }
-}
-
+*/
 } /* namespace toppic */

@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 #define TOPPIC_MS_FACTORY_SPECTRUM_SET_FACTORY_HPP_
 
 #include "para/sp_para.hpp"
-#include "ms/spec/simple_msalign_reader.hpp"
+#include "ms/spec/msalign_reader.hpp"
 #include "ms/spec/spectrum_set.hpp"
 
 namespace toppic {
@@ -27,10 +27,10 @@ SpectrumSetPtr geneSpectrumSetPtr(DeconvMsPtrVec deconv_ms_ptr_vec,
                                   SpParaPtr sp_para_ptr,
                                   double prec_mono_mass);
 
-SpectrumSetPtr readNextSpectrumSetPtr(SimpleMsAlignReaderPtr reader_ptr, 
+SpectrumSetPtr readNextSpectrumSetPtr(MsAlignReaderPtr reader_ptr, 
                                       SpParaPtr sp_para_ptr);
 
-SpectrumSetPtr readNextSpectrumSetPtr(SimpleMsAlignReaderPtr reader_ptr, 
+SpectrumSetPtr readNextSpectrumSetPtr(MsAlignReaderPtr reader_ptr, 
                                       SpParaPtr sp_para_ptr, 
                                       int peak_num_limit);
 

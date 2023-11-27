@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 
 #include <memory>
 #include <vector>
-#include <string>
+#include <limits>
 
 #include "topfd/common/topfd_para.hpp"
 
@@ -28,72 +28,41 @@ typedef std::shared_ptr<EnvPara> EnvParaPtr;
 
 class EnvPara {
  public:
+  //EnvPara() to be removed
   EnvPara(){};
-
-  EnvPara(TopfdParaPtr topfd_para_ptr); 
-
-  int getMassGroup(double base_mass);
-
-  void setMinInte(double min_inte, int ms_level);
-
-  int compMinConsPeakNum(int peak_num, int mass_group);
-
-  void setTolerance(double tolerance); 
+  // set mz tolerance 
+  EnvPara(double mz_tolerance);  
 
   double getMzTolerance() {return mz_tolerance_;}
 
   double getScoreErrorTolerance() {return score_error_tolerance_;}
 
-  double getPercentBound(int mass_group) {return percentage_bound_[mass_group];}
-
-  double getMaxCharge() {return max_charge_;}
-
-  double getMaxMass() {return max_mass_;} 
-
-  static int getDefaultMaxCharge() {return 30;}
-
-  static double getDefaultMaxMass() {return 70000;}
-
-  // using input parameters to assign: max_chrg, max_mass 
-  int max_charge_ = 30;
-  double max_mass_ = 70000;
-  // window size 1 m/z
-  double window_size_ = 1.0;
-
-  // preprocessing
-  // estimate min intensity using thrash method. 
-  bool estimate_min_inte_ = true;
-  // signal noise ratio 
-  double ms_two_sn_ratio_ = 1;
-  // ms one signal noise ratio
-  double ms_one_sn_ratio_ = 3;
-  // minimum peak intensity 
-  double min_inte_ = 0;
-  // minimum base peak intensity 
-  // min_refer_inte_ = min_inte * sn_ratio_ 
-  double min_refer_inte_ = 0;
-
-  // Envelope detection
-  // min_inte and min_ref_inte are used in envelope detection
-
+  // *** mz_tolerance and score_error_tolerance,
+  // *** are initialized and fixed for envelope detection, filtering, scoring
   // error tolerance for matching real peaks to theoretical peaks 
   double mz_tolerance_ = 0.02;
+
+  //***fixed parameters used in env_detect***
+  double getPercentBound(int mass_group) {return percentage_bound_[mass_group];}
+
+  int getMassGroup(double base_mass);
 
   // the minimum monoisotopic envelope for an envelope 
   double min_mass_ = 50;
 
   // Several parameters are related with the mass of envelopes. We classify
-  // envelopes into 3 groups based on its base mass. See getMassGroup().
-  std::vector<double> mass_group_boundary_ = {min_mass_, min_mass_, 1500, max_mass_};
-
-  // perc bound is used for remove low intensities in theoretical envelopes
-  std::vector<double> percentage_bound_ = {0.95, 0.95, 0.85};
+  // envelopes into 3 groups based on its base mass. See getMassGroup()
+  std::vector<double> mass_group_boundary_ = {min_mass_, min_mass_, 1500, std::numeric_limits<double>::max()};
 
   //  maximum number of peaks left and right to the base peak in theoretical envelopes
   int max_back_peak_num_ = 8;
   int max_forw_peak_num_ = 8;
 
-  // Envelope filtering
+  // perc bound is used for remove low intensities in theoretical envelopes
+  std::vector<double> percentage_bound_ = {0.95, 0.95, 0.85};
+
+  // ***Fixed parameters for envelope filtering ***
+  int compMinConsPeakNum(int peak_num, int mass_group);
 
   // 1. filtering based on real envelop an real envelope is valid if 1) peak
   // number >= 3 2) at most 1 missing peak 3) consecutive peak number >=
@@ -107,24 +76,23 @@ class EnvPara {
   std::vector<int> min_consecutive_peak_num_ = { 1, 2, 3 };
 
   // 2. filtering using score
-
   // parameters for computing scores of matching envelopes 
   // Optimize the score using small shifts of theoretical m/z values 
   bool do_mz_shift_ = false;
-
   // when mz shift is used, the minimum shift is 0.001, shift_fold = 1/0.001
   int shift_scale_ = 1000;
+
   // Optimize the score using a scale ratio of theoretical peak intensities 
   bool do_inte_ratio_ = false;
-
   // when intensity ratio is used, the minimum shift is 0.01, ratio_fold =
   // 1/0.01. We enumerate all possible intensity ratios from bgn_ratio to
   // end_ratio
   int inte_ratio_scale_ = 100;
   double bgn_ratio_ = 0.8;
   double end_ratio_ = 1.2;
-  // maximum error in computing m/z accuracy 
-  double score_error_tolerance_ = mz_tolerance_; 
+
+  // maximum m/z error used in msdeconv score computation of match envelopes.  
+  double score_error_tolerance_ = 0.02; 
   // minimum score for matching envelopes 
   double min_match_env_score_ = 0;
 
@@ -145,39 +113,24 @@ class EnvPara {
   // Only keep the top envelope
   int max_similar_mz_env_rank_ = 0;
 
-  // Envelope assigned to 1 m/z intervals
-  // number of envelopes per window 
-  // use a small number of envelopes to speed up computation
-  int env_num_per_window_ = 5;
-
-  // envelope final filtering
-  // use filtering to keep only highest peaks. 
-  bool do_final_filtering_ = true;
+  // ***** Fixed parameters for match env filter ***
   // Monoisotopic masses are divided into two groups 
   // < 1500 and > 1500 in filtering
   double low_high_dividor_ = 1500;
   double aa_avg_mass_ = 120;
   double peak_density_ = 2;
+  int compLowMassNum();
+  int compHighMassNum(double prec_mass);
 
-  //  unused peaks
-  bool keep_unused_peaks_ = false;
-
-  // Output multiple masses 
+  // **** Fixed parameters in match_env_util::addMultiMass
   // For one envelope, if we cannot determine its
   // charge state and monoisotopic mass, we will 
   // add several envelopes with two consecutive charges
   // and envelopes with -1 and +1 Dalton shift
   // See match_env_util::addMultipleMass
-  bool output_multiple_mass_ = false;
   double multiple_min_mass_ = 5000;
   int multiple_min_charge_ = 20;
   double multiple_min_ratio_ = 0.9;
-
-  // precursor ion window size
-  double prec_deconv_interval_ = 3.0;
-
-  // Use EnvCNN
-  bool use_env_cnn_ = false;
 };
 
 } /* namespace */

@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 #ifndef TOPPIC_TOPFD_ENV_ENVELOPE_BASE_HPP_
 #define TOPPIC_TOPFD_ENV_ENVELOPE_BASE_HPP_
 
-#include "ms/env/envelope.hpp"
+#include "ms/env/env.hpp"
 
 namespace toppic {
 
@@ -28,15 +28,20 @@ class EnvBase {
  public:
   EnvBase(std::string file_name_, int entry_num_, double mass_interval_);
 
-  void initBaseMassIdx();
-
-  std::vector<std::vector<double> > env_rescore_para_;
-
-  static EnvelopePtr getStaticEnvByMonoMass(double mass);
-
-  static EnvelopePtr getStaticEnvByBaseMass(double mass);
-
   static void initBase(const std::string &resouce_dir);
+
+  // All public functions are static 
+  static EnvPtr getEnvByMonoMass(double mass);
+
+  static EnvPtr getEnvByMonoMass(double mass, int charge);
+
+  static EnvPtr getEnvByRefMass(double mass);
+
+  static double convertMonoMassToAvgMass(double mass);
+
+  static double convertMonoMassToRefMass(double mass);
+
+  static double convertRefMassToMonoMass(double mass); 
 
  private:
   // number of distribution entries 
@@ -44,13 +49,9 @@ class EnvBase {
   // the mass interval between two neighboring entries 
   double mass_interval_;
   // the list of distribution envelopes 
-  EnvelopePtrVec envs_;
-  // mapping distribution envelopes to the mass value of base peak 
-  std::vector<int> base_mass_idxes_;
-
-  EnvelopePtr getEnvByMonoMass(double mass);
-
-  EnvelopePtr getEnvByBaseMass(double mass);
+  EnvPtrVec envs_;
+  // mapping distribution envelopes to the mass value of reference peak (highest intensity peak) 
+  std::vector<int> ref_mass_idxes_;
 
   static EnvBasePtr env_base_ptr_;
 
@@ -61,6 +62,14 @@ class EnvBase {
   static std::string getBaseDirName() {return "base_data";}
 
   static std::string getBaseFileName() {return "theo_patt.txt";}
+
+  void initRefMassIdx();
+  
+  // this is a private class method
+  EnvPtr getBaseEnvByMonoMass(double mass);
+
+  // get a envelope using the mass of the highest peak
+  EnvPtr getBaseEnvByRefMass(double mass);
 };
 
 }

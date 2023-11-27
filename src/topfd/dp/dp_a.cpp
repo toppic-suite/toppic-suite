@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -100,7 +100,7 @@ void DpA::backtrace() {
     }
   }
   // LOG_DEBUG("backtrace 2");
-  std::sort(results_.begin(), results_.end(), MatchEnv::cmpScoreDec);
+  std::sort(results_.begin(), results_.end(), MatchEnv::cmpMsdeconvScoreDec);
 }
 
 }  // namespace toppic

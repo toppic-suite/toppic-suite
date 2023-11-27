@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -62,8 +62,8 @@ void delFile(const std::string &path);
 void rename(const std::string &ori_name, 
             const std::string &new_name);
 
-void cleanPrefix(const std::string & ref_name, 
-                 const std::string & prefix);
+void cleanPrefix(std::string ref_name, 
+                 std::string prefix);
 
 void cleanTempFiles(const std::string & ref_name, 
                     const std::string & ext_prefix);

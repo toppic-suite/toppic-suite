@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this output_ except in compliance with the License.
@@ -33,49 +33,75 @@ MsAlignWriter::~MsAlignWriter() {
   }
 }
 
-void MsAlignWriter::close() {
-  if (output_.is_open()) {
-    output_.close();
-  }
-}
-
 void MsAlignWriter::writePara(const std::string &para_str) {
   output_ << para_str << "\n";
 }
 
-void MsAlignWriter::write(DeconvMsPtr ms_ptr) {
+void MsAlignWriter::writeMs(DeconvMsPtr ms_ptr) {
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
   output_ << std::fixed;
   output_ << "BEGIN IONS" << std::endl;
-  output_ << "ID=" << header_ptr->getId() << std::endl;
   output_ << "FRACTION_ID=" << header_ptr->getFractionId() << std::endl;
   output_ << "FILE_NAME=" << header_ptr->getFileName() << std::endl;
+  output_ << "SPECTRUM_ID=" << header_ptr->getSpecId() << std::endl;
+  output_ << "TITLE=" << header_ptr->getTitle() << std::endl;
   output_ << "SCANS=" << header_ptr->getScansString() << std::endl;
   output_ << "RETENTION_TIME=" << std::fixed << std::setprecision(2)
       << header_ptr->getRetentionTime() << std::endl;
   output_ << "LEVEL=" << header_ptr->getMsLevel() << std::endl;
 
   if (header_ptr->getMsLevel() > 1) {
+    output_ << "MS_ONE_ID=" << header_ptr->getMsOneId() << std::endl;
+    output_ << "MS_ONE_SCAN=" << header_ptr->getMsOneScan() << std::endl;
+    output_ << "PRECURSOR_WINDOW_BEGIN=" << header_ptr->getPrecWinBegin() << std::endl;
+    output_ << "PRECURSOR_WINDOW_END=" << header_ptr->getPrecWinEnd() << std::endl;
     if (header_ptr->getActivationPtr() != nullptr) {
       output_ << "ACTIVATION=" << header_ptr->getActivationPtr()->getName() << std::endl;
     }
-    output_ << "MS_ONE_ID=" << header_ptr->getMsOneId() << std::endl;
-    output_ << "MS_ONE_SCAN=" << header_ptr->getMsOneScan() << std::endl;
-    output_ << "PRECURSOR_MZ=" << std::fixed << std::setprecision(5) 
-        << header_ptr->getPrecMonoMz() << std::endl;
-    output_ << "PRECURSOR_CHARGE=" << header_ptr->getPrecCharge() << std::endl;
+    PrecursorPtrVec prec_ptrs = header_ptr->getPrecPtrVec();
+    output_ << "PRECURSOR_MZ=" << std::fixed << std::setprecision(5);
+    for (size_t i = 0; i < prec_ptrs.size(); i++) {
+      output_ << prec_ptrs[i]->getMonoMz();
+      // use : for separating multiple precursors
+      if (i < prec_ptrs.size() - 1) {output_ << ":";}
+    }
+    output_ << std::endl;
+    output_ << "PRECURSOR_CHARGE=";
+    for (size_t i = 0; i < prec_ptrs.size(); i++) {
+      output_ << prec_ptrs[i]->getCharge();
+      // use : for separating multiple precursors
+      if (i < prec_ptrs.size() - 1) {output_ << ":";}
+    }
+    output_ << std::endl;
     // The precision for mass is 5
-    output_ << "PRECURSOR_MASS=" << std::fixed << std::setprecision(5) 
-        << header_ptr->getPrecMonoMass() << std::endl;
-    output_ << "PRECURSOR_INTENSITY=" << std::fixed << std::setprecision(2) 
-        <<  header_ptr->getPrecInte() << std::endl;
+    output_ << "PRECURSOR_MASS=" << std::fixed << std::setprecision(5);
+    for (size_t i = 0; i < prec_ptrs.size(); i++) {
+      output_ << prec_ptrs[i]->getMonoMass();
+      // use : for separating multiple precursors
+      if (i < prec_ptrs.size() - 1) {output_ << ":";}
+    }
+    output_ << std::endl;
+    output_ << "PRECURSOR_INTENSITY=" << std::fixed << std::setprecision(2);
+    for (size_t i = 0; i < prec_ptrs.size(); i++) {
+      output_ << prec_ptrs[i]->getInte();
+      // use : for separating multiple precursors
+      if (i < prec_ptrs.size() - 1) {output_ << ":";}
+    }
+    output_ << std::endl;
+    output_ << "PRECURSOR_FEATURE_ID=";
+    for (size_t i = 0; i < prec_ptrs.size(); i++) {
+      output_ << prec_ptrs[i]->getFeatureId();
+      // use : for separating multiple precursors
+      if (i < prec_ptrs.size() - 1) {output_ << ":";}
+    }
+    output_ << std::endl;
   }
   for (size_t i = 0; i < ms_ptr->size(); i++) {
     DeconvPeakPtr peak_ptr = ms_ptr->getPeakPtr(i);
     output_ << std::fixed << std::setprecision(5) << peak_ptr->getPosition();
     output_ << "\t" << std::fixed << std::setprecision(2) << peak_ptr->getIntensity();
     output_ << "\t" << peak_ptr->getCharge();
-    //output_ << "\t" << std::fixed << std::setprecision(2) << peak_ptr->getScore();
+    output_ << "\t" << std::fixed << std::setprecision(2) << peak_ptr->getScore();
     output_ << std::endl;
   }
   output_ << "END IONS" << std::endl;

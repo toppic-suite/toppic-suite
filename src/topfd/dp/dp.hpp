@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -12,13 +12,12 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_TOPFD_DP_DP_HPP_
 #define TOPPIC_TOPFD_DP_DP_HPP_
 
-#include "topfd/spec/deconv_data.hpp"
-#include "topfd/dp/dp_para.hpp"
 #include "ms/env/match_env.hpp"
+#include "topfd/deconv/deconv_data.hpp"
+#include "topfd/dp/dp_para.hpp"
 
 namespace toppic {
 

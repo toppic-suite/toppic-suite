@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -21,8 +21,10 @@
 namespace toppic {
 
 namespace match_env_filter {
+  // filter envelopes in MS/MS spectra using precursor mass 
+  // and estimated number of fragment ions
   MatchEnvPtrVec filter(MatchEnvPtrVec &ori_envs, double prec_mass, 
-                        EnvParaPtr env_para_ptr);
+                        bool use_msdeconv, EnvParaPtr env_para_ptr);
 }
 
 }

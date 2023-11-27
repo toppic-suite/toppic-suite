@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -31,43 +31,43 @@ void mzRefine(MatchEnvPtrVec &envs) {
 }
 
 void mzRefine(MatchEnvPtr env) {
-  RealEnvPtr real_env = env->getRealEnvPtr();
+  ExpEnvPtr real_env = env->getExpEnvPtr();
   double cur_mz = real_env->getReferMz();
   int charge = real_env->getCharge();
-  double prev_mz = cur_mz - 1.0 / charge;
-  double next_mz = cur_mz + 1.0 / charge;
+  double prev_mz = cur_mz - mass_constant::getIsotopeMass()/ charge;
+  double next_mz = cur_mz + mass_constant::getIsotopeMass() / charge;
   // check if the mass is greater than the precursor mass
-  double bass_mass = cur_mz * charge - charge * mass_constant::getProtonMass();
-  // get a reference distribution based on the base mass
-  EnvelopePtr refer_env = EnvBase::getStaticEnvByBaseMass(bass_mass);
+  double ref_mass = peak_util::compPeakNeutralMass(cur_mz, charge); 
+  // get a reference distribution based on the reference mass
+  EnvPtr refer_env = EnvBase::getEnvByRefMass(ref_mass);
   /* add one zeros at both sides of the envelope */
-  EnvelopePtr ext_refer_env = refer_env->addZero(1);
+  EnvPtr ext_refer_env = refer_env->addZero(1);
 
   // convert the reference distribution to a theoretical distribution
   // based on the base mz and charge state
   int max_back_peak_num = real_env->getReferIdx();
   int max_forw_peak_num = real_env->getPeakNum() - real_env->getReferIdx() - 1;
-  EnvelopePtr theo_env = ext_refer_env->distrToTheoBase(cur_mz, charge);
-  double max_inte = theo_env->getReferIntensity();
+  EnvPtr theo_env = ext_refer_env->distrToTheoRef(cur_mz, charge);
+  double max_inte = theo_env->getReferInte();
   theo_env->changeIntensity(1.0 / max_inte);
 
-  EnvelopePtr cur_env = theo_env->getSubEnv(max_back_peak_num, max_forw_peak_num);
+  EnvPtr cur_env = theo_env->getSubEnv(max_back_peak_num, max_forw_peak_num);
 
-  theo_env = ext_refer_env->distrToTheoBase(prev_mz, charge);
-  max_inte = theo_env->getReferIntensity();
+  theo_env = ext_refer_env->distrToTheoRef(prev_mz, charge);
+  max_inte = theo_env->getReferInte();
   theo_env->changeIntensity(1.0 / max_inte);
-  EnvelopePtr prev_env;
+  EnvPtr prev_env;
   if (max_back_peak_num >= 1 && real_env->isExist(real_env->getReferIdx() - 1)) {
     prev_env = theo_env->getSubEnv(max_back_peak_num - 1, max_forw_peak_num + 1);
   } else {
     prev_env = nullptr;
   }
 
-  theo_env = ext_refer_env->distrToTheoBase(next_mz, charge);
-  max_inte = theo_env->getReferIntensity();
+  theo_env = ext_refer_env->distrToTheoRef(next_mz, charge);
+  max_inte = theo_env->getReferInte();
   theo_env->changeIntensity(1.0 / max_inte);
 
-  EnvelopePtr next_env;
+  EnvPtr next_env;
   if (max_forw_peak_num >= 1 && real_env->isExist(real_env->getReferIdx() + 1)) {
     next_env = theo_env->getSubEnv(max_back_peak_num + 1, max_forw_peak_num - 1);
   } else {
@@ -89,20 +89,20 @@ void mzRefine(MatchEnvPtr env) {
   } else if (prev_dist <= next_dist) {
     prev_env->changeIntensity(prev_ratio);
     env->setTheoEnvPtr(prev_env);
-    real_env->shift(-1);
+      real_env->changeReferIdx(-1);
   } else {
     next_env->changeIntensity(next_ratio);
     env->setTheoEnvPtr(next_env);
-    real_env->shift(1);
+      real_env->changeReferIdx(1);
   }
 }
 
-void compEnvDist(EnvelopePtr real_env, EnvelopePtr theo_env, 
+void compEnvDist(EnvPtr real_env, EnvPtr theo_env,
                  double &dist, double &ratio) {
   if (theo_env == nullptr) {
     dist = std::numeric_limits<double>::infinity();
   } else {
-    compDistWithNorm(real_env->getIntensities(), theo_env->getIntensities(),
+    compDistWithNorm(real_env->getInteList(), theo_env->getInteList(),
                      dist, ratio);
   }
 }

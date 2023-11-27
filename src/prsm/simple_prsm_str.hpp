@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -41,7 +41,8 @@ class SimplePrsmStr {
 
   double getScore() {return score_;}
 
-  static bool cmpScoreDec(const SimplePrsmStrPtr &a, const SimplePrsmStrPtr &b);
+  static bool cmpScoreDecSeqInc(const SimplePrsmStrPtr &a, 
+                                const SimplePrsmStrPtr &b);
 
  private:
   std::vector<std::string> str_vec_;

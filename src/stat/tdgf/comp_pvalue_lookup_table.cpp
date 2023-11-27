@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -265,9 +265,9 @@ void CompPValueLookupTable::process(const DeconvMsPtrVec &deconv_ms_ptr_vec, Prs
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
     peak_num += deconv_ms_ptr_vec[i]->size();
   }
-  double tolerance = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecErrorTolerance(ppo);
+  double tolerance = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecErrorTolerance(ppo);
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
-    double refine_prec_mass = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMassMinusWater();
+    double refine_prec_mass = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMassMinusWater();
     int match_frag_num = prsm_ptrs[i]->getMatchFragNum();
     int unexpected_shift_num = prsm_ptrs[i]->getProteoformPtr()->getAlterNum(AlterType::UNEXPECTED);
     if (unexpected_shift_num == 0) {

@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -16,12 +16,6 @@
 #include <fstream>
 #include <string>
 #include <vector>
-
-//#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
-//#include "common/thread/simple_thread_pool.hpp"
-//#else
-//#include <sys/wait.h>
-//#endif
 
 #include "common/thread/simple_thread_pool.hpp"
 
@@ -61,10 +55,9 @@ std::function<void()> geneTask(GraphAlignMngPtr mng_ptr,
     SimplePrsmReader simple_prsm_reader(input_file_name);
     SimplePrsmStrPtr prsm_ptr = simple_prsm_reader.readOnePrsmStr();
     int group_spec_num = prsm_para_ptr->getGroupSpecNum();
-    SimpleMsAlignReaderPtr ms_reader_ptr 
-      = std::make_shared<SimpleMsAlignReader>(sp_file_name, 
-                                              group_spec_num,
-                                              sp_para_ptr->getActivationPtr());
+    MsAlignReaderPtr ms_reader_ptr = std::make_shared<MsAlignReader>(sp_file_name, 
+                                                                     group_spec_num,
+                                                                     sp_para_ptr->getActivationPtr());
 
     SpecGraphReader spec_reader(sp_file_name,
                                 prsm_para_ptr->getGroupSpecNum(),
@@ -74,67 +67,74 @@ std::function<void()> geneTask(GraphAlignMngPtr mng_ptr,
     PrsmXmlWriterPtr writer_ptr
         = std::make_shared<PrsmXmlWriter>(file_util::basename(sp_file_name) + "." 
                                           + mng_ptr->output_file_ext_ + "_" + str_util::toString(idx));
-    SpectrumSetPtr spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(ms_reader_ptr, sp_para_ptr);
     ProteoAnnoPtr proteo_anno_ptr
         = std::make_shared<ProteoAnno>(prsm_para_ptr->getFixModPtrVec(),
                                        prsm_para_ptr->getProtModPtrVec(),
                                        var_mod_ptr_vec);
+    DeconvMsPtrVec deconv_ms_ptr_vec = ms_reader_ptr->getNextMsPtrVec(); 
 
     int cnt = 0;
-    while (spec_set_ptr != nullptr) {
-      cnt += group_spec_num;
-      if (spec_set_ptr->isValid()) {
-        int spec_id = spec_set_ptr->getSpectrumId();
-        std::vector<SimplePrsmStrPtr> selected_prsm_ptrs;
-        while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_id) {
-          selected_prsm_ptrs.push_back(prsm_ptr);
-          prsm_ptr = simple_prsm_reader.readOnePrsmStr();
-        }
+    while (deconv_ms_ptr_vec.size() > 0) {
+      if (deconv_ms_ptr_vec[0]->getMsHeaderPtr()->containsPrec()) {
+        double prec_mono_mass =
+                deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMass();
+        SpectrumSetPtr spec_set_ptr
+          = spectrum_set_factory::geneSpectrumSetPtr(deconv_ms_ptr_vec,
+                                                     sp_para_ptr, prec_mono_mass);
+        if (spec_set_ptr->isValid()) {
+          int spec_id = spec_set_ptr->getSpectrumId();
+          std::vector<SimplePrsmStrPtr> selected_prsm_ptrs;
+          while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_id) {
+            selected_prsm_ptrs.push_back(prsm_ptr);
+            prsm_ptr = simple_prsm_reader.readOnePrsmStr();
+          }
 
-        if (selected_prsm_ptrs.size() > 0) {
-          SpecGraphPtrVec spec_ptr_vec
+          if (selected_prsm_ptrs.size() > 0) {
+            SpecGraphPtrVec spec_ptr_vec
               = spec_reader.getNextSpecGraphPtrVec(spec_set_ptr, mng_ptr->prec_error_);
-          for (size_t i = 0; i < selected_prsm_ptrs.size(); i++) {
-            std::string seq_name = selected_prsm_ptrs[i]->getSeqName();
-            std::string seq_desc = selected_prsm_ptrs[i]->getSeqDesc();
-            //std::vector<FastaSubSeqPtr> seq_ptr_vec 
-            //= reader_ptr->readFastaSubSeqVec(seq_name, seq_desc);
-            FastaSeqPtr seq_ptr = reader_ptr->readFastaSeq(seq_name, seq_desc);
-            std::vector<FastaSubSeqPtr> seq_ptr_vec = fasta_sub_util::breakSeq(seq_ptr);
+            for (size_t i = 0; i < selected_prsm_ptrs.size(); i++) {
+              std::string seq_name = selected_prsm_ptrs[i]->getSeqName();
+              std::string seq_desc = selected_prsm_ptrs[i]->getSeqDesc();
+              //std::vector<FastaSubSeqPtr> seq_ptr_vec 
+              //= reader_ptr->readFastaSubSeqVec(seq_name, seq_desc);
+              FastaSeqPtr seq_ptr = reader_ptr->readFastaSeq(seq_name, seq_desc);
+              std::vector<FastaSubSeqPtr> seq_ptr_vec = fasta_sub_util::breakSeq(seq_ptr);
 
-            for (size_t j = 0; j < seq_ptr_vec.size(); j++) {
-              for (size_t k = 0; k < spec_ptr_vec.size(); k++) {
-                proteo_anno_ptr->anno(seq_ptr_vec[j]->getRawSeq(), seq_ptr_vec[j]->isNTerm());
-                MassGraphPtr graph_ptr = getMassGraphPtr(proteo_anno_ptr, mng_ptr->convert_ratio_);
-                ProteoGraphPtr proteo_ptr = std::make_shared<ProteoGraph>(seq_ptr_vec[j],
-                                                                          prsm_para_ptr->getFixModPtrVec(),
-                                                                          graph_ptr,
-                                                                          proteo_anno_ptr->isNme(),
-                                                                          mng_ptr->convert_ratio_,
-                                                                          mng_ptr->max_known_mods_,
-                                                                          mng_ptr->getIntMaxPtmSumMass(),
-                                                                          mng_ptr->proteo_graph_gap_,
-                                                                          mng_ptr->var_ptm_in_gap_);
-                GraphAlignPtr graph_align
+              for (size_t j = 0; j < seq_ptr_vec.size(); j++) {
+                for (size_t k = 0; k < spec_ptr_vec.size(); k++) {
+                  proteo_anno_ptr->anno(seq_ptr_vec[j]->getRawSeq(), seq_ptr_vec[j]->isNTerm());
+                  MassGraphPtr graph_ptr = getMassGraphPtr(proteo_anno_ptr, mng_ptr->convert_ratio_);
+                  ProteoGraphPtr proteo_ptr = std::make_shared<ProteoGraph>(seq_ptr_vec[j],
+                                                                            prsm_para_ptr->getFixModPtrVec(),
+                                                                            graph_ptr,
+                                                                            proteo_anno_ptr->isNme(),
+                                                                            mng_ptr->convert_ratio_,
+                                                                            mng_ptr->max_known_mods_,
+                                                                            mng_ptr->getIntMaxPtmSumMass(),
+                                                                            mng_ptr->proteo_graph_gap_,
+                                                                            mng_ptr->var_ptm_in_gap_);
+                  GraphAlignPtr graph_align
                     = std::make_shared<GraphAlign>(mng_ptr, proteo_ptr, spec_ptr_vec[k], seq_ptr);
-                graph_align->process();
-                for (int shift = 0; shift <= mng_ptr->n_unknown_shift_; shift++) {
-                  PrsmPtr prsm_ptr = graph_align->geneResult(shift);
-                  if (prsm_ptr != nullptr) {
-                    writer_ptr->write(prsm_ptr);
+                  graph_align->process();
+                  for (int shift = 0; shift <= mng_ptr->n_unknown_shift_; shift++) {
+                    PrsmPtr prsm_ptr = graph_align->geneResult(shift);
+                    if (prsm_ptr != nullptr) {
+                      writer_ptr->write(prsm_ptr);
+                    }
                   }
+                  graph_align = nullptr;
                 }
-                graph_align = nullptr;
               }
             }
           }
         }
       }
+      cnt += group_spec_num;
       if (idx == 0) {
         std::cout << std::flush << "Mass graph alignment - processing " << cnt
             << " of " << spectrum_num << " spectra.\r";
       }
-      spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(ms_reader_ptr, sp_para_ptr);
+      deconv_ms_ptr_vec = ms_reader_ptr->getNextMsPtrVec(); 
     }
     writer_ptr->close();
   };
@@ -146,7 +146,8 @@ void SimplePrsmFilter(SimplePrsmPtrVec & selected_prsm_ptrs) {
     if (selected_prsm_ptrs[0]->getScore() < 10) selected_prsm_ptrs.clear();
     return;
   }
-  std::sort(selected_prsm_ptrs.begin(), selected_prsm_ptrs.end(), SimplePrsm::cmpScoreDec);
+  std::sort(selected_prsm_ptrs.begin(), selected_prsm_ptrs.end(),
+            SimplePrsm::cmpScoreDecSeqInc);
   selected_prsm_ptrs.erase(std::remove_if(selected_prsm_ptrs.begin(), selected_prsm_ptrs.end(),
                                           [] (const SimplePrsmPtr & p) {return p->getScore() < 10;}),
                            selected_prsm_ptrs.end());

@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -77,8 +77,8 @@ double compScore(const ExtendMsPtrVec &ms_ptr_vec, ProteoformPtr proteo_ptr,
 ZpFastMatchPtr computeCompMatch(const ExtendMsPtrVec &ms_ptr_vec,
                                 ProteoformPtr proteo_ptr, double ppo) {
   MsHeaderPtr header_ptr = ms_ptr_vec[0]->getMsHeaderPtr();
-  double max_error = header_ptr->getPrecErrorTolerance(ppo);
-  double res_sum_mass = header_ptr->getPrecMonoMassMinusWater();
+  double max_error = header_ptr->getFirstPrecErrorTolerance(ppo);
+  double res_sum_mass = header_ptr->getFirstPrecMonoMassMinusWater();
   double prot_mass = proteo_ptr->getResSeqPtr()->getResMassSum();
   double error = std::abs(res_sum_mass - prot_mass);
   double score = 0;
@@ -94,8 +94,8 @@ ZpFastMatchPtr computePrefixMatch(const ExtendMsPtrVec &ms_ptr_vec,
   /* check if there is a matched prefix */
   std::vector<double> prms = proteo_ptr->getBpSpecPtr()->getPrmMasses();
   MsHeaderPtr header_ptr = ms_ptr_vec[0]->getMsHeaderPtr();
-  double max_error = header_ptr->getPrecErrorTolerance(ppo);
-  double res_sum_mass = header_ptr->getPrecMonoMassMinusWater();
+  double max_error = header_ptr->getFirstPrecErrorTolerance(ppo);
+  double res_sum_mass = header_ptr->getFirstPrecMonoMassMinusWater();
 
   bool is_prefix = false;
   int seq_end = 0;
@@ -122,8 +122,8 @@ ZpFastMatchPtr computeSuffixMatch(const ExtendMsPtrVec &ms_ptr_vec,
                                   ProteoformPtr proteo_ptr, double ppo) {
   std::vector<double> prms = proteo_ptr->getBpSpecPtr()->getPrmMasses();
   MsHeaderPtr header_ptr = ms_ptr_vec[0]->getMsHeaderPtr();
-  double max_error = header_ptr->getPrecErrorTolerance(ppo);
-  double res_sum_mass = header_ptr->getPrecMonoMassMinusWater();
+  double max_error = header_ptr->getFirstPrecErrorTolerance(ppo);
+  double res_sum_mass = header_ptr->getFirstPrecMonoMassMinusWater();
   double diff = prms[prms.size()-1] - res_sum_mass;
 
   bool is_suffix = false;
@@ -152,8 +152,8 @@ ZpFastMatchPtr computeInternalMatch(const ExtendMsPtrVec &ms_ptr_vec,
                                     ProteoformPtr proteo_ptr, double ppo) {
   std::vector<double> prms = proteo_ptr->getBpSpecPtr()->getPrmMasses();
   MsHeaderPtr header_ptr = ms_ptr_vec[0]->getMsHeaderPtr();
-  double max_error = header_ptr->getPrecErrorTolerance(ppo);
-  double res_sum_mass = header_ptr->getPrecMonoMassMinusWater();
+  double max_error = header_ptr->getFirstPrecErrorTolerance(ppo);
+  double res_sum_mass = header_ptr->getFirstPrecMonoMassMinusWater();
 
   ActivationPtr activation = header_ptr->getActivationPtr();
   IonTypePtr n_ion_type_ptr = activation->getNIonTypePtr();
@@ -211,7 +211,8 @@ ZpFastMatchPtrVec filter(ProteoformTypePtr align_type_ptr,
   }
 
   // sort
-  std::sort(match_vec.begin(), match_vec.end(), ZeroPtmFastMatch::cmpScoreDec);
+  std::sort(match_vec.begin(), match_vec.end(),
+            ZeroPtmFastMatch::cmpScoreDecProtNameInc);
 
   size_t num = report_num;
   if (num > proteo_ptrs.size()) {

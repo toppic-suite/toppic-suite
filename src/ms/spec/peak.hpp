@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -36,9 +36,9 @@ class Peak {
  public:
   Peak(double position, double intensity);
 
-  double getIntensity() {return intensity_;}
+  double getIntensity() const {return intensity_;}
 
-  double getPosition() {return position_;}
+  double getPosition() const {return position_;}
 
   void setIntensity(double intensity) {intensity_ = intensity;}
 
@@ -55,9 +55,12 @@ class Peak {
   static bool cmpInteDec(const PeakPtr &a, const PeakPtr &b) { 
     return a->getIntensity() > b->getIntensity();}
 
+  static bool cmpPosInc(const PeakPtr &a, const PeakPtr &b) { 
+    return a->getPosition() < b->getPosition();}
+
 private:
-  double position_;
-  double intensity_;
+  double position_ = -1;
+  double intensity_ = -1;
 };
 
 typedef std::vector<PeakPtrVec> PeakPtrVec2D;

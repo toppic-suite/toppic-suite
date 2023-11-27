@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -95,10 +95,11 @@ void process(const std::string &db_file_name,
   LOG_DEBUG("Reading prsm strings started");
   PrsmStrPtrVec prsm_ptrs = prsm_reader_util::readAllPrsmStrs(input_file_name);
   LOG_DEBUG("Reading prsm strings finished");
-  sort(prsm_ptrs.begin(), prsm_ptrs.end(), PrsmStr::cmpEValueInc);
+  sort(prsm_ptrs.begin(), prsm_ptrs.end(), PrsmStr::cmpEValueIncProtInc);
   PrsmStrPtrVec2D protein_prsms = setProtId(prsm_ptrs);
   setClusterId(protein_prsms, error_tole);
-  sort(prsm_ptrs.begin(), prsm_ptrs.end(), PrsmStr::cmpSpectrumIdIncPrecursorIdInc);
+  sort(prsm_ptrs.begin(), prsm_ptrs.end(),
+       PrsmStr::cmpSpecIncPrecIncEvalueIncProtInc);
   // output
   std::string output_file_name = base_name + "." + output_file_ext;
   PrsmXmlWriter writer(output_file_name);

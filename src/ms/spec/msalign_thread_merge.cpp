@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/str_util.hpp"
-#include "ms/spec/simple_msalign_reader.hpp"
+#include "ms/spec/msalign_reader.hpp"
 #include "ms/spec/msalign_writer.hpp"
 #include "ms/spec/msalign_thread_merge.hpp"
 
@@ -28,9 +28,23 @@ MsalignThreadMerge::MsalignThreadMerge(const std::string &spec_file_name,
                                        int in_num,
                                        const std::string &out_file_ext, 
                                        const std::string &para_str):
-    spec_file_name_(spec_file_name),
     output_file_ext_(out_file_ext),
     para_str_(para_str) {
+      spec_base_name_ = file_util::basename(spec_file_name);
+      for (int i = 0; i < in_num; i ++) {
+        std::string ext = in_file_ext + "_" + str_util::toString(i);
+        input_file_exts_.push_back(ext);
+      }
+    }
+
+MsalignThreadMerge::MsalignThreadMerge(const std::string &in_file_ext,
+                                       int in_num,
+                                       const std::string &out_file_ext, 
+                                       const std::string &spec_base_name,
+                                       const std::string &para_str):
+    output_file_ext_(out_file_ext),
+    para_str_(para_str) {
+      spec_base_name_ = spec_base_name;
       for (int i = 0; i < in_num; i ++) {
         std::string ext = in_file_ext + "_" + str_util::toString(i);
         input_file_exts_.push_back(ext);
@@ -53,23 +67,19 @@ inline int getCurMsIndex(DeconvMsPtrVec &ms_ptrs) {
 
 void MsalignThreadMerge::process() {
   size_t input_num = input_file_exts_.size();
-  std::string base_name = file_util::basename(spec_file_name_);
-  
   // open files
-  SimpleMsAlignReaderPtrVec reader_ptrs; 
+  MsAlignReaderPtrVec reader_ptrs; 
   DeconvMsPtrVec ms_ptrs;
   for (size_t i = 0; i < input_num; i++) {
-    std::string input_file_name = base_name + "_" + input_file_exts_[i];
-    SimpleMsAlignReaderPtr reader_ptr
-        = std::make_shared<SimpleMsAlignReader>(input_file_name); 
-    LOG_DEBUG("input file name " << input_file_name);
+    std::string input_file_name = spec_base_name_ + "_" + input_file_exts_[i];
+    MsAlignReaderPtr reader_ptr
+        = std::make_shared<MsAlignReader>(input_file_name); 
     DeconvMsPtr ms_ptr = reader_ptr->getNextMsPtr();
     reader_ptrs.push_back(reader_ptr);
     ms_ptrs.push_back(ms_ptr);
   }
-  std::string output_filename = base_name + "_" + output_file_ext_;
+  std::string output_filename = spec_base_name_ + "_" + output_file_ext_;
   MsAlignWriterPtr writer = std::make_shared<MsAlignWriter>(output_filename); 
-  
   writer->writePara(para_str_);
 
   // combine
@@ -83,15 +93,12 @@ void MsalignThreadMerge::process() {
     }
     else { 
       DeconvMsPtr cur_ms_ptr = ms_ptrs[cur_ms_idx];
-      cur_ms_ptr->getMsHeaderPtr()->setId(spec_id);
+      cur_ms_ptr->getMsHeaderPtr()->setSpecId(spec_id);
       spec_id++;
-      writer->write(cur_ms_ptr);
+      writer->writeMs(cur_ms_ptr);
       ms_ptrs[cur_ms_idx] = reader_ptrs[cur_ms_idx]->getNextMsPtr();
     }
   }
-
-  // close files
-  writer->close();
 }
 
 } /* namespace toppic */

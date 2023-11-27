@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 namespace toppic {
 
 TheoPeak::TheoPeak(IonPtr ion_ptr, double unmod_mass, double shift):
-    Peak(unmod_mass + shift, 1.0),
-    ion_ptr_(ion_ptr),
-    shift_(shift) {}
+  Peak(unmod_mass + shift, 1.0),
+  ion_ptr_(ion_ptr),
+  shift_(shift) {}
 
 } /* namespace toppic */

@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ VertexA::VertexA(VertexAPtr ptr):
 
 bool VertexA::addPreEnv(MatchEnvPtr env, int max_overlap) {
   bool result = Vertex::addPreEnv(env, max_overlap);
-  this_score_ += env->getScore();
+  this_score_ += env->getMsdeconvScore();
   return result;
 }
 

@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
 
 #include <set>
 #include <algorithm>
+#include <iomanip>
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
@@ -27,33 +28,54 @@ namespace sample_feature_writer {
 void writeHeader(std::ofstream &of) {
   of.precision(16);
   of << "Sample_ID" << "\t"
-      << "ID" << "\t"
-      << "Mass" << "\t"
+      << "Feature_ID" << "\t"
+      << "Monoisotopic_mass" << "\t"
       << "Intensity" << "\t"
-      << "Time_begin" << "\t"
-      << "Time_end" << "\t"
+      << "Min_time" << "\t"
+      << "Max_time" << "\t"
+      << "Min_scan" << "\t"
+      << "Max_scan" << "\t"
+      << "Min_charge" << "\t"
+      << "Max_charge" << "\t"
       << "Apex_time" << "\t"
+      << "Apex_scan" << "\t"
       << "Apex_intensity" << "\t"
-      << "Minimum_charge_state" << "\t"
-      << "Maximum_charge_state" << "\t"
-      << "Minimum_fraction_id" << "\t"
-      << "Maximum_fraction_id" 
+      << "Rep_charge" << "\t"
+      << "Rep_average_mz" << "\t"
+      << "Envelope_number" << "\t"
+      << "EC_score" << "\t"
+      << "Min_fraction_ID" << "\t"
+      << "Max_fraction_ID" << "\t"
+      << "Elution_length" 
       << std::endl;
 }
 
 void writeOneFeature(std::ofstream &of, SampleFeaturePtr feature) {
   of << feature->getSampleId() << "\t"
       << feature->getId() << "\t"
+      << std::fixed << std::setprecision(6) 
       << feature->getMonoMass() << "\t"
       << feature->getIntensity() << "\t"
-      << feature->getTimeBegin() << "\t"
-      << feature->getTimeEnd() << "\t"
-      << feature->getApexTime() << "\t"
-      << feature->getApexInte() << "\t"
+      << std::setprecision(2) 
+      << feature->getTimeBegin()/60 << "\t"
+      << feature->getTimeEnd()/60 << "\t"
+      << feature->getMinScan() << "\t"
+      << feature->getMaxScan() << "\t"
       << feature->getMinCharge() << "\t"
       << feature->getMaxCharge() << "\t"
+      << feature->getApexTime()/60 << "\t"
+      << feature->getApexScan() << "\t"
+      << std::setprecision(6)
+      << feature->getApexInte() << "\t"
+      << feature->getRepCharge() << "\t"
+      << feature->getRepAvgMz() << "\t"
+      << feature->getEnvNum() << "\t"
+      << feature->getEcScore() << "\t"
       << feature->getMinFracId() << "\t"
-      << feature->getMaxFracId() 
+      << feature->getMaxFracId() << "\t" 
+      << std::setprecision(2) 
+      << feature->getElutionLen() 
+      << std::setprecision(6) 
       << std::endl;
 }
 

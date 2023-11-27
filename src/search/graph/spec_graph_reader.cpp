@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@ SpecGraphReader::SpecGraphReader(const std::string &sp_file_name,
                                  int group_sp_num,
                                  double convert_ratio,
                                  SpParaPtr sp_para_ptr) {
-  ms_reader_ptr_ = std::make_shared<SimpleMsAlignReader>(sp_file_name, group_sp_num,
-                                                         sp_para_ptr->getActivationPtr());
+  ms_reader_ptr_ = std::make_shared<MsAlignReader>(sp_file_name, group_sp_num,
+                                                   sp_para_ptr->getActivationPtr());
   group_sp_num_ = group_sp_num;
   convert_ratio_ = convert_ratio;
   sp_para_ptr_ = sp_para_ptr;
@@ -76,7 +76,7 @@ SpecGraphPtrVec SpecGraphReader::getNextSpecGraphPtrVec(SpectrumSetPtr spec_set_
 
   DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
   //LOG_DEBUG("deconv ms size " << deconv_ms_ptr_vec.size());
-  double prec_mono_mass = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMass();
+  double prec_mono_mass = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMass();
   LOG_DEBUG("prec_mono_mass  " << prec_mono_mass);
   if (spec_set_ptr->isValid()) {
     LOG_DEBUG("valid");

@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -133,7 +133,7 @@ void process(const std::vector<std::string> &input_file_names,
     }
     all_prsms.insert(all_prsms.end(), prsms.begin(), prsms.end());
   }
-  std::sort(all_prsms.begin(), all_prsms.end(), PrsmStr::cmpEValueInc);
+  std::sort(all_prsms.begin(), all_prsms.end(), PrsmStr::cmpEValueIncProtInc);
   PrsmStrPtrVec2D clusters; 
   getPrsmClusters(all_prsms, clusters, error_tole);
   

@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["spectrumFileName"] = "";
   arguments["databaseBlockSize"] = "60000000";
   arguments["maxFragmentLength"] = "500";
-  arguments["minBlockNum"] = "10";
+  arguments["minBlockNum"] = "20";
   arguments["activation"] = "FILE";
   arguments["fixedMod"] = "";
   arguments["allowProtMod"] = "NONE,NME,NME_ACETYLATION,M_ACETYLATION";
@@ -116,8 +116,6 @@ void ToppicArgument::outputArguments(std::ostream &output,
 
   output << std::setw(gap) << std::left << "Allowed N-terminal forms:" << sep <<  arguments["allowProtMod"] << std::endl;
 
-  //output << std::setw(gap) << std::left << "N-terminal label mass" << sep << arguments["nTermLabelMass"] << std::endl;
-  
   if (arguments["variablePtmFileName"] != "" && arguments["variablePtmNum"]!="0") {
     output << std::setw(gap) << std::left <<  "Maximum number of variable modifications:" << sep << arguments["variablePtmNum"] << std::endl;
     output << std::setw(gap) << std::left <<  "Use approximate spectra in protein filtering:" << sep << arguments["useApproxSpectra"] << std::endl;

@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -132,30 +132,15 @@ class Prsm {
   void setIsExactMatch(bool is_exact_match) {is_exact_match_ = is_exact_match;}
 
   // comparion
-  static bool cmpEValueInc(const PrsmPtr &a, const PrsmPtr &b) {
-    return a->getEValue() < b->getEValue();}
-
-  static bool cmpEValueDec(const PrsmPtr &a, const PrsmPtr &b) {
-    return a->getEValue() > b->getEValue();}
-
-  static bool cmpMatchFragmentDec(const PrsmPtr &a, const PrsmPtr &b) {
-    return a->getMatchFragNum() > b->getMatchFragNum();}
-
-  static bool cmpNormMatchFragmentDec(const PrsmPtr &a, const PrsmPtr &b);
-
-  static bool cmpMatchFragmentDecMatchPeakDec(const PrsmPtr &a, const PrsmPtr &b);
+  static bool cmpMatchFragDecMatchPeakDecProtInc(const PrsmPtr &a, const PrsmPtr &b);
 
   // sort by number of matched fragment ions, then start position
-  static bool cmpMatchFragDecStartPosInc(const PrsmPtr &a, const PrsmPtr &b);
+  static bool cmpMatchFragDecMatchPeakDecProtIncStartPosInc(const PrsmPtr &a, const PrsmPtr &b);
 
-  // sort by the order of spectrum id, the precursor id
-  static bool cmpSpectrumIdIncPrecursorIdInc(const PrsmPtr &a, const PrsmPtr &b);
-
-  // sort by spectrum id then match ions
-  static bool cmpSpectrumIdIncMatchFragDec(const PrsmPtr &a, const PrsmPtr &b);
+  static bool cmpEValueIncProtInc(const PrsmPtr &a, const PrsmPtr &b); 
 
   // sort by spectrum id then evalue
-  static bool cmpSpectrumIdIncEvalueInc(const PrsmPtr &a, const PrsmPtr &b);
+  static bool cmpSpecIncPrecIncEvalueIncProtInc(const PrsmPtr &a, const PrsmPtr &b);
 
   // other functions
   XmlDOMElement* toXmlElement(XmlDOMDocument* xml_doc);

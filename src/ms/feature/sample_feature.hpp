@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -50,15 +50,31 @@ class SampleFeature {
 
   double getTimeEnd() {return time_end_;}
 
-  double getTimeMiddle() {return (time_begin_ + time_end_)/2;}
+  double getElutionLen() {return time_end_ - time_begin_;}
 
-  double getApexTime() {return apex_time_;}
+  double getMinScan() {return min_scan_;}
 
-  double getApexInte() {return apex_inte_;}
+  double getMaxScan() {return max_scan_;}
 
   int getMinCharge() {return min_charge_;}
 
   int getMaxCharge() {return max_charge_;}
+
+  double getTimeMiddle() {return (time_begin_ + time_end_)/2;}
+
+  double getApexTime() {return apex_time_;}
+
+  double getApexScan() {return apex_scan_;}
+
+  double getApexInte() {return apex_inte_;}
+
+  double getRepCharge() {return rep_charge_;}
+
+  double getRepAvgMz() {return rep_avg_mz_;}
+
+  int getEnvNum() {return env_num_;}
+
+  double getEcScore() {return ec_score_;}
 
   int getMinFracId() {return min_frac_id_;}
 
@@ -91,6 +107,14 @@ class SampleFeature {
   int max_charge_;
   int min_frac_id_;
   int max_frac_id_;
+
+  int rep_charge_;
+  double rep_avg_mz_;
+  int min_scan_;
+  int max_scan_;
+  int apex_scan_;
+  int env_num_;
+  double ec_score_;
   //FracFeaturePtrVec frac_features_;
 };
 

@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 
 namespace toppic {
 
-Peak::Peak(double position, double intensity): 
+Peak::Peak(const double position, const double intensity): 
       position_(position), 
       intensity_(intensity) {}
 

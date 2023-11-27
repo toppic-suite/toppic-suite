@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -23,8 +23,10 @@ namespace msalign_util {
 
 int countSpNum(const std::string &spectrum_file);
 
+// Store spectrum number information to an index file
 void geneSpIndex(const std::string &spectrum_file_name);
 
+// Get spectrum number information from the index file
 int getSpNum(const std::string &spectrum_file_name);
 
 }  // namespace msalign_util

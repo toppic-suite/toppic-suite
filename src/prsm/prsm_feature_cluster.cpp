@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -80,11 +80,18 @@ void setProteoClusterId(PrsmStrPtrVec& prsm_ptrs,
           break;
         }
       } 
-      else if (cur_ptr->getProteoformMatchSeq() == ref_ptr->getProteoformMatchSeq()) {
-        clusters[j].push_back(cur_ptr);
-        //LOG_DEBUG("Proteoform merging by sequence!");
-        is_found = true;
-        break;
+      else {
+        // if protein identifications are different, but the protein sequences
+        // are the same and the proteoform masses are similar, the two
+        // proteoforms are treated as one. 
+        if (cur_ptr->getProteoformDbSeq() == ref_ptr->getProteoformDbSeq()
+            && std::abs(cur_ptr->getAdjustedPrecMass() - ref_ptr->getAdjustedPrecMass()) 
+            <= prec_error_tole) {
+          clusters[j].push_back(cur_ptr);
+          //LOG_DEBUG("Proteoform merging by sequence!");
+          is_found = true;
+          break;
+        }
       }
     }
     if (!is_found) {
@@ -117,12 +124,13 @@ void process(const std::string &spec_file_name,
   // remove prsms without feature
   PrsmStrPtrVec filtered_prsm_ptrs;
   prsm_util::removePrsmsWithoutFeature(prsm_ptrs, filtered_prsm_ptrs);
-  std::sort(filtered_prsm_ptrs.begin(), filtered_prsm_ptrs.end(), PrsmStr::cmpEValueInc);
+  std::sort(filtered_prsm_ptrs.begin(), filtered_prsm_ptrs.end(),
+            PrsmStr::cmpEValueIncProtInc);
 
   setProtId(filtered_prsm_ptrs);
   setProteoClusterId(filtered_prsm_ptrs, prec_error_tole);
   std::sort(filtered_prsm_ptrs.begin(), filtered_prsm_ptrs.end(), 
-            PrsmStr::cmpSpectrumIdIncPrecursorIdInc);
+            PrsmStr::cmpSpecIncPrecIncEvalueIncProtInc);
   // output
   std::string output_file_name = base_name + "." + output_file_ext;
   PrsmXmlWriter writer(output_file_name);

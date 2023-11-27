@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -41,7 +41,8 @@ void seleTopPrsms(const PrsmPtrVec &all_prsm_ptrs,
       }
     }
   }
-  std::sort(sele_prsm_ptrs.begin(), sele_prsm_ptrs.end(), Prsm::cmpSpectrumIdIncPrecursorIdInc);
+  std::sort(sele_prsm_ptrs.begin(), sele_prsm_ptrs.end(), 
+            Prsm::cmpSpecIncPrecIncEvalueIncProtInc);
 }
 
 std::function<void()> geneTask(SpectrumSetPtr spectrum_set_ptr, 
@@ -70,26 +71,28 @@ std::function<void()> geneTask(SpectrumSetPtr spectrum_set_ptr,
     for (int s = 2; s <= mng_ptr->align_para_ptr_->n_unknown_shift_; s++) {
       PrsmPtrVec complete_prsm_ptrs = slow_filter_ptr->getPrsms(s-2, ProteoformType::COMPLETE);
       std::sort(complete_prsm_ptrs.begin(), complete_prsm_ptrs.end(), 
-                Prsm::cmpMatchFragDecStartPosInc);
+                Prsm::cmpMatchFragDecMatchPeakDecProtIncStartPosInc);
       PrsmPtrVec sele_complete_prsm_ptrs;
       seleTopPrsms(complete_prsm_ptrs, sele_complete_prsm_ptrs, mng_ptr->n_report_);
       writer_ptr->getCompleteWriterPtr(s)->writeVector(sele_complete_prsm_ptrs);
 
       PrsmPtrVec prefix_prsm_ptrs = slow_filter_ptr->getPrsms(s-2, ProteoformType::PREFIX);
       std::sort(prefix_prsm_ptrs.begin(), prefix_prsm_ptrs.end(), 
-                Prsm::cmpMatchFragDecStartPosInc);
+                Prsm::cmpMatchFragDecMatchPeakDecProtIncStartPosInc);
       PrsmPtrVec sele_prefix_prsm_ptrs;
       seleTopPrsms(prefix_prsm_ptrs, sele_prefix_prsm_ptrs, mng_ptr->n_report_);
       writer_ptr->getPrefixWriterPtr(s)->writeVector(sele_prefix_prsm_ptrs);
 
       PrsmPtrVec suffix_prsm_ptrs = slow_filter_ptr->getPrsms(s-2, ProteoformType::SUFFIX);
-      std::sort(suffix_prsm_ptrs.begin(), suffix_prsm_ptrs.end(), Prsm::cmpMatchFragmentDec);
+      std::sort(suffix_prsm_ptrs.begin(), suffix_prsm_ptrs.end(), 
+                Prsm::cmpMatchFragDecMatchPeakDecProtInc);
       PrsmPtrVec sele_suffix_prsm_ptrs;
       seleTopPrsms(suffix_prsm_ptrs, sele_suffix_prsm_ptrs, mng_ptr->n_report_);
       writer_ptr->getSuffixWriterPtr(s)->writeVector(sele_suffix_prsm_ptrs);
 
       PrsmPtrVec internal_prsm_ptrs = slow_filter_ptr->getPrsms(s-2, ProteoformType::INTERNAL);
-      std::sort(internal_prsm_ptrs.begin(), internal_prsm_ptrs.end(), Prsm::cmpMatchFragmentDec);
+      std::sort(internal_prsm_ptrs.begin(), internal_prsm_ptrs.end(), 
+                Prsm::cmpMatchFragDecMatchPeakDecProtInc);
       PrsmPtrVec sele_internal_prsm_ptrs;
       seleTopPrsms(internal_prsm_ptrs, sele_internal_prsm_ptrs, mng_ptr->n_report_);
       writer_ptr->getInternalWriterPtr(s)->writeVector(sele_internal_prsm_ptrs);
@@ -120,9 +123,9 @@ void PtmSearchProcessor::process(){
   std::string output_file_name = file_util::basename(sp_file_name) + "." + mng_ptr_->output_file_ext_;
 
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
-  SimpleMsAlignReaderPtr ms_reader_ptr = std::make_shared<SimpleMsAlignReader>(sp_file_name, 
-                                                                               group_spec_num,
-                                                                               sp_para_ptr->getActivationPtr());
+  MsAlignReaderPtr ms_reader_ptr = std::make_shared<MsAlignReader>(sp_file_name, 
+                                                                   group_spec_num,
+                                                                   sp_para_ptr->getActivationPtr());
 
   const int n_unknown_shift = 2;
 
@@ -140,29 +143,31 @@ void PtmSearchProcessor::process(){
   DeconvMsPtrVec deconv_ms_ptr_vec = ms_reader_ptr->getNextMsPtrVec(); 
   std::vector<double> prec_error_vec = sp_para_ptr->getMultiShiftSearchPrecErrorVec();
   while (deconv_ms_ptr_vec.size() > 0) {
-    std::vector<SpectrumSetPtr> spec_set_ptr_vec 
+    if (deconv_ms_ptr_vec[0]->getMsHeaderPtr()->containsPrec()) {
+      std::vector<SpectrumSetPtr> spec_set_ptr_vec 
         = spectrum_set_factory::geneSpectrumSetPtrVecWithPrecError(deconv_ms_ptr_vec, 
                                                                    sp_para_ptr,
                                                                    prec_error_vec);
-    cnt+= group_spec_num;
-    if(spec_set_ptr_vec[0]->isValid()){
-      int spec_id = spec_set_ptr_vec[0]->getSpectrumId();
-      SimplePrsmPtrVec selected_prsm_ptrs;
-      while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_id) {
-        selected_prsm_ptrs.push_back(prsm_ptr);
-        prsm_ptr = simple_prsm_reader.readOnePrsm();
-      }
-      if (selected_prsm_ptrs.size() > 0) {
-        for (size_t i = 0; i < spec_set_ptr_vec.size(); i++) {
-          while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ * 2) {
-            boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+      if(spec_set_ptr_vec[0]->isValid()){
+        int spec_id = spec_set_ptr_vec[0]->getSpectrumId();
+        SimplePrsmPtrVec selected_prsm_ptrs;
+        while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_id) {
+          selected_prsm_ptrs.push_back(prsm_ptr);
+          prsm_ptr = simple_prsm_reader.readOnePrsm();
+        }
+        if (selected_prsm_ptrs.size() > 0) {
+          for (size_t i = 0; i < spec_set_ptr_vec.size(); i++) {
+            while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ * 2) {
+              boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+            }
+            pool_ptr->Enqueue(geneTask(spec_set_ptr_vec[i], selected_prsm_ptrs,
+                                       mng_ptr_, pool_ptr, writer_set_ptr_vec));
           }
-          pool_ptr->Enqueue(geneTask(spec_set_ptr_vec[i], selected_prsm_ptrs,
-                                     mng_ptr_, pool_ptr, writer_set_ptr_vec));
         }
       }
     }
-    std::cout << std::flush <<  "Multiple PTM search - processing " << cnt 
+    cnt+= group_spec_num;
+    std::cout << std::flush <<  "Multiple unexpected shifts search - processing " << cnt 
         << " of " << spectrum_num << " spectra.\r";
     deconv_ms_ptr_vec = ms_reader_ptr->getNextMsPtrVec(); 
   }

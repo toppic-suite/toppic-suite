@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -59,7 +59,11 @@ class PrsmStr {
 
   std::string getProteoformMatchSeq() {return proteoform_match_seq_;}
 
+  std::string getProteoformDbSeq() {return proteoform_db_seq_;}
+
   double getPrecFeatureInte() {return sample_feature_inte_;}
+
+  double getMatchPeakNum() {return match_peak_num_;}
 
   double getMatchFragNum() {return match_frag_num_;}
 
@@ -76,8 +80,6 @@ class PrsmStr {
   double getAdjustedPrecMass() {return adjusted_prec_mass_;}
 
   std::vector<MassShiftPtr> getMassShiftVec() {return mass_shift_vec_;}
-
-  //std::string getProteinMatchSeq() {return protein_match_seq_;}
 
   int getSampleId() {return sample_id_;}
 
@@ -103,25 +105,17 @@ class PrsmStr {
 
   void setProteoformFdr(double proteoform_fdr);
 
-  //void setProteinMatchSeq(const std::string & seq) {protein_match_seq_ = seq;}
-
   void setSampleId(int sample_id) {sample_id_ = sample_id;}
 
   void setTimeApex(double time_apex) {time_apex_ = time_apex;}
 
-  static bool cmpEValueInc(const PrsmStrPtr &a, const PrsmStrPtr &b) {
-    return a->getEValue() < b->getEValue();}
+  static bool cmpEValueIncProtInc(const PrsmStrPtr &a, const PrsmStrPtr &b);
 
-  static bool cmpMatchFragmentDec(const PrsmStrPtr &a, const PrsmStrPtr &b) {
-    return a->getMatchFragNum() > b->getMatchFragNum();}
+  static bool cmpMatchFragDecMatchPeakDecProtInc(const PrsmStrPtr &a, const PrsmStrPtr &b);
 
-  static bool cmpNormMatchFragmentDec(const PrsmStrPtr &a, const PrsmStrPtr &b) {
-    return a->getNormMatchFragNum() > b->getNormMatchFragNum();}
+  static bool cmpNormMatchFragDecProtInc(const PrsmStrPtr &a, const PrsmStrPtr &b); 
 
-  static bool cmpSpectrumIdInc(const PrsmStrPtr &a, const PrsmStrPtr &b) {
-    return a->getSpectrumId() < b->getSpectrumId();}
-
-  static bool cmpSpectrumIdIncPrecursorIdInc(const PrsmStrPtr &a, const PrsmStrPtr &b);
+  static bool cmpSpecIncPrecIncEvalueIncProtInc(const PrsmStrPtr &a, const PrsmStrPtr &b);
 
   static bool isSameSeq(const PrsmStrPtr &a, const PrsmStrPtr &b) {
     return a->getSeqName() == b->getSeqName();
@@ -162,6 +156,8 @@ class PrsmStr {
 
   std::string proteoform_match_seq_;
 
+  std::string proteoform_db_seq_;
+
   int proteoform_start_pos_;
 
   int proteoform_end_pos_;
@@ -169,6 +165,8 @@ class PrsmStr {
   double ori_prec_mass_;
 
   double adjusted_prec_mass_;
+
+  double match_peak_num_;
 
   double match_frag_num_;
 
@@ -181,8 +179,6 @@ class PrsmStr {
   double proteoform_fdr_;
 
   std::vector<MassShiftPtr> mass_shift_vec_;
-
-  //std::string protein_match_seq_;
 
   int sample_id_;
 

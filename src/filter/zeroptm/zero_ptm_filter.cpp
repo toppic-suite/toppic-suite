@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -110,8 +110,8 @@ void ZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec) {
   std::vector<std::pair<int, int> > suff_mass_errors
       = extend_ms_util::getExtendIntMassErrorList(ms_ptr_vec, pref, mng_ptr_->filter_scale_);
   std::pair<int, int> prec_minus_water_mass_error
-      = ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMassMinusWaterError(tole_ptr->getPpo(),
-                                                                        mng_ptr_->filter_scale_);
+      = ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMassMinusWaterError(tole_ptr->getPpo(),
+                                                                             mng_ptr_->filter_scale_);
 
   int term_row_num = term_index_ptr_->getRowNum();
   std::vector<short> term_scores(term_row_num, 0);
@@ -129,8 +129,8 @@ void ZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec) {
   std::vector<short> rev_diag_scores(rev_diag_row_num, 0);
   rev_diag_index_ptr_->compMatchScores(suff_mass_errors, prec_minus_water_mass_error, rev_diag_scores);
 
-  double prec_minus_water_mass = ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMassMinusWater();
-  double prec_error_tole = ms_ptr_vec[0]->getMsHeaderPtr()->getPrecErrorTolerance(tole_ptr->getPpo());
+  double prec_minus_water_mass = ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMassMinusWater();
+  double prec_error_tole = ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecErrorTolerance(tole_ptr->getPpo());
 
   int threshold = MassMatch::getPrecursorMatchScore() * 2 + 4;
   ProtCandidatePtrVec comp_prots

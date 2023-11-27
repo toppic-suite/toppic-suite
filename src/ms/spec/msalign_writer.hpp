@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -27,11 +27,9 @@ class MsAlignWriter {
 
   ~MsAlignWriter();
 
-  void write(DeconvMsPtr ms_ptr);
-
   void writePara(const std::string &para_str);
 
-  void close();
+  void writeMs(DeconvMsPtr ms_ptr);
 
  private:
   std::string file_name_;

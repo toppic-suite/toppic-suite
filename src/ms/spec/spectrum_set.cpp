@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ namespace toppic {
 
 SpectrumSet::SpectrumSet(DeconvMsPtrVec deconv_ms_ptr_vec, 
                          double prec_mono_mass,
+                         double n_term_label_mass,
                          bool valid, 
                          ExtendMsPtrVec extend_ms_three_ptr_vec,
                          PrmMsPtrVec prm_ms_two_ptr_vec,
@@ -25,6 +26,7 @@ SpectrumSet::SpectrumSet(DeconvMsPtrVec deconv_ms_ptr_vec,
                          PrmMsPtrVec prm_ms_six_ptr_vec): 
     deconv_ms_ptr_vec_(deconv_ms_ptr_vec),
     prec_mono_mass_(prec_mono_mass), 
+    n_term_label_mass_(n_term_label_mass),
     valid_(valid),
     extend_ms_three_ptr_vec_(extend_ms_three_ptr_vec),
     prm_ms_two_ptr_vec_(prm_ms_two_ptr_vec),

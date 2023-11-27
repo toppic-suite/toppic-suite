@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -22,29 +22,29 @@ namespace toppic {
 namespace match_env_writer {
 
 void write_env(std::ofstream &file, MsHeaderPtr header, MatchEnvPtr match_env) {
-  EnvelopePtr theo_env = match_env->getTheoEnvPtr();
-  RealEnvPtr real_env = match_env->getRealEnvPtr();
+  EnvPtr theo_env = match_env->getTheoEnvPtr();
+  ExpEnvPtr real_env = match_env->getExpEnvPtr();
   file << std::endl;
   file << "BEGIN ENVELOPE" << std::endl;
-  file << "SPEC_ID=" << header->getId() << std::endl;
+  file << "SPEC_ID=" << header->getSpecId() << std::endl;
   file << "SPEC_SCAN=" << header->getScansString() << std::endl;
   file << "MS_LEVEL=" << header->getMsLevel() << std::endl;
   file << "REF_IDX=" << theo_env->getReferIdx() << std::endl;
   file << "CHARGE=" << theo_env->getCharge() << std::endl;
-  file << "SCORE=" << match_env->getScore() << std::endl;
+  file << "SCORE=" << match_env->getMsdeconvScore() << std::endl;
   file << "THEO_PEAK_NUM=" << theo_env->getPeakNum() << std::endl;
   file << "REAL_PEAK_NUM=" << (real_env->getPeakNum() - real_env->getMissPeakNum()) << std::endl;
   file << "THEO_MONO_MZ=" << theo_env->getMonoMz() << std::endl;
   file << "REAL_MONO_MZ=" << real_env->getMonoMz() << std::endl;
   file << "THEO_MONO_MASS=" << theo_env->getMonoNeutralMass() << std::endl;
   file << "REAL_MONO_MASS=" << real_env->getMonoNeutralMass() << std::endl;
-  file << "THEO_INTE_SUM=" << theo_env->compIntensitySum() << std::endl;
-  file << "REAL_INTE_SUM=" << real_env->compIntensitySum() << std::endl;
+  file << "THEO_INTE_SUM=" << theo_env->compInteSum() << std::endl;
+  file << "REAL_INTE_SUM=" << real_env->compInteSum() << std::endl;
 
   for (int i = 0; i < theo_env->getPeakNum(); i++) {
-    file << theo_env->getMz(i) << " " << theo_env->getIntensity(i) << " "
-        << (real_env->isExist(i) ? "True" : "False") << " " << real_env->getPeakIdx(i) << " "
-        << real_env->getMz(i) << " " << real_env->getIntensity(i) << std::endl;
+    file << theo_env->getMz(i) << " " << theo_env->getInte(i) << " "
+         << (real_env->isExist(i) ? "True" : "False") << " " << real_env->getPeakIdx(i) << " "
+         << real_env->getMz(i) << " " << real_env->getInte(i) << std::endl;
   }
 
   file << "END ENVELOPE" << std::endl;

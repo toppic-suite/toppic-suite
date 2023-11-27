@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -78,9 +78,9 @@ class PrmPeak : public Peak {
 
  private:
   int spec_id_;
+  int peak_id_;
   DeconvPeakPtr base_peak_ptr_;
   BasePeakTypePtr base_type_;
-  int peak_id_;
   double mono_mass_;
   double score_;
   double strict_tolerance_;

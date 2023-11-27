@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -110,9 +110,9 @@ void TopFDDialog::on_defaultButton_clicked() {
   ui->mzErrorEdit->setText(QString::number(para_ptr->getMzError()));
   ui->ms1snRatioEdit->setText(QString::number(para_ptr->getMsOneSnRatio()));
   ui->ms2snRatioEdit->setText(QString::number(para_ptr->getMsTwoSnRatio()));
-  ui->windowSizeEdit->setText(QString::number(para_ptr->getPrecWindow()));
+  ui->windowSizeEdit->setText(QString::number(para_ptr->getPrecWindowWidth()));
   ui->threadNumberEdit->setText(QString::number(para_ptr->getThreadNum()));
-  ui->envCNNCheckBox->setChecked(para_ptr->isUseEnvCnn());
+  ui->msDeconvCheckBox->setChecked(para_ptr->isUseMsDeconv());
   ui->missLevelOneCheckBox->setChecked(para_ptr->isMissingLevelOne());
   ui->geneHTMLCheckBox->setChecked(para_ptr->isGeneHtmlFolder());
   ui->disableFilteringCheckBox->setChecked(!para_ptr->isDoFinalFiltering());
@@ -214,7 +214,7 @@ void TopFDDialog::on_startButton_clicked() {
     if (finish) {
       QByteArray byteArray = process_.readAllStandardError();
       QString str = QString(byteArray);
-      if (process_.exitStatus() != QProcess::NormalExit) {
+      if (process_.exitCode() != 0) {
         str = str + "\nERROR Quit status: Crashed. \n";
         str = str + "ERROR Quit code: " + QString::number(process_.exitCode()) + ".\n";
       }
@@ -222,8 +222,6 @@ void TopFDDialog::on_startButton_clicked() {
       if (msg != "") {
         updateMsg(msg); 
       }
-      //qDebug() << "Status: " << process_.exitStatus();
-      //qDebug() << "Code: " << process_.exitCode();
     }
     sleep(100);
   }
@@ -270,11 +268,11 @@ toppic::TopfdParaPtr TopFDDialog::getParaPtr() {
   para_ptr_->setMzError(std::stod(ui->mzErrorEdit->text().toStdString()));
   para_ptr_->setMsOneSnRatio(std::stod(ui->ms1snRatioEdit->text().toStdString()));
   para_ptr_->setMsTwoSnRatio(std::stod(ui->ms2snRatioEdit->text().toStdString()));
-  para_ptr_->setPrecWindow(std::stod(ui->windowSizeEdit->text().toStdString()));
+    para_ptr_->setPrecWindowWidth(std::stod(ui->windowSizeEdit->text().toStdString()));
   para_ptr_->setMissingLevelOne(ui->missLevelOneCheckBox->isChecked()); 
   para_ptr_->setThreadNum(std::stoi(ui->threadNumberEdit->text().toStdString()));
   para_ptr_->setGeneHtmlFolder(ui->geneHTMLCheckBox->isChecked());
-  para_ptr_->setUseEnvCnn(ui->envCNNCheckBox->isChecked());
+  para_ptr_->setUseMsDeconv(ui->msDeconvCheckBox->isChecked());
   para_ptr_->setActivation(ui->activationComboBox->currentText().toStdString());
   para_ptr_->setDoFinalFiltering(!(ui->disableFilteringCheckBox->isChecked()));
 
@@ -297,7 +295,7 @@ void TopFDDialog::lockDialog() {
   ui->windowSizeEdit->setEnabled(false);
   ui->outputButton->setEnabled(false);
   ui->geneHTMLCheckBox->setEnabled(false);
-  ui->envCNNCheckBox->setEnabled(false);
+  ui->msDeconvCheckBox->setEnabled(false);
   ui->activationComboBox->setEnabled(false);
   ui->disableFilteringCheckBox->setEnabled(false);
 }
@@ -319,7 +317,7 @@ void TopFDDialog::unlockDialog() {
   ui->outputButton->setEnabled(true);
   ui->outputButton->setDefault(true);
   ui->geneHTMLCheckBox->setEnabled(true);
-  ui->envCNNCheckBox->setEnabled(true);
+  ui->msDeconvCheckBox->setEnabled(true);
   ui->activationComboBox->setEnabled(true);
   ui->disableFilteringCheckBox->setEnabled(true);
 }

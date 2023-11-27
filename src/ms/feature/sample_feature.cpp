@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -25,14 +25,21 @@ SampleFeature::SampleFeature(const std::string &line) {
   id_ = std::stoi(strs[1]);
   mono_mass_ = std::stod(strs[2]);
   intensity_ = std::stod(strs[3]);
-  time_begin_ = std::stod(strs[4]);
-  time_end_ = std::stod(strs[5]);
-  apex_time_ = std::stod(strs[6]);
-  apex_inte_ = std::stod(strs[7]);
+  time_begin_ = std::stod(strs[4]) * 60;
+  time_end_ = std::stod(strs[5]) * 60;
+  min_scan_ = std::stoi(strs[6]);
+  max_scan_ = std::stoi(strs[7]);
   min_charge_ = std::stoi(strs[8]);
   max_charge_ = std::stoi(strs[9]);
-  min_frac_id_ = std::stoi(strs[10]);
-  max_frac_id_ = std::stoi(strs[11]);
+  apex_time_ = std::stod(strs[10]) * 60;
+  apex_scan_ = std::stoi(strs[11]);
+  apex_inte_ = std::stod(strs[12]);
+  rep_charge_ = std::stoi(strs[13]);
+  rep_avg_mz_ = std::stoi(strs[14]);
+  env_num_ = std::stoi(strs[15]);
+  ec_score_ = std::stod(strs[16]);
+  min_frac_id_ = std::stoi(strs[17]);
+  max_frac_id_ = std::stoi(strs[18]);
 }
 
 SampleFeature::SampleFeature(FracFeaturePtr frac_feature, int id) {
@@ -45,12 +52,19 @@ void SampleFeature::init(FracFeaturePtr frac_feature) {
   intensity_ = frac_feature->getIntensity();
   time_begin_ = frac_feature->getTimeBegin();
   time_end_ = frac_feature->getTimeEnd();
+  min_scan_ = frac_feature->getScanBegin();
+  max_scan_ = frac_feature->getScanEnd();
   min_charge_ = frac_feature->getMinCharge();
   max_charge_ = frac_feature->getMaxCharge();
   min_frac_id_ = frac_feature->getFracId();
   max_frac_id_ = frac_feature->getFracId();
   apex_time_ = frac_feature->getApexTime();
+  apex_scan_ = frac_feature->getApexScan();
   apex_inte_ = frac_feature->getApexInte();
+  rep_charge_ = frac_feature->getRepCharge(); 
+  rep_avg_mz_ = frac_feature->getRepAvgMz();
+  env_num_ = frac_feature->getEnvNum(); 
+  ec_score_ = frac_feature->getEcScore(); 
 }
 
 SampleFeature::SampleFeature(FracFeaturePtrVec &frac_features, int id) {
@@ -70,6 +84,12 @@ SampleFeature::SampleFeature(FracFeaturePtrVec &frac_features, int id) {
     if (cur_ft->getTimeEnd() > time_end_) {
       time_end_ = cur_ft->getTimeEnd();
     }
+    if (cur_ft->getScanBegin() < min_scan_) {
+      min_scan_ = cur_ft->getScanBegin(); 
+    }
+    if (cur_ft->getScanEnd() > max_scan_) {
+      max_scan_ = cur_ft->getScanEnd();
+    }
     if (cur_ft->getMinCharge() < min_charge_) {
       min_charge_ = cur_ft->getMinCharge();
     }
@@ -81,6 +101,10 @@ SampleFeature::SampleFeature(FracFeaturePtrVec &frac_features, int id) {
     }
     if (cur_ft->getFracId() > max_frac_id_) {
       max_frac_id_ = cur_ft->getFracId();
+    }
+    env_num_ = env_num_ + cur_ft->getEnvNum();
+    if (cur_ft->getEcScore() > ec_score_) {
+      ec_score_ = cur_ft->getEcScore();
     }
   }
 }

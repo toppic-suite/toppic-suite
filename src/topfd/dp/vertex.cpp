@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -79,8 +79,8 @@ bool Vertex::addPreEnv(MatchEnvPtr env, int max_overlap) {
   if (dp_para_ptr_->check_double_increase_ && !passDblIncrCheck(env)) {
     return false;
   }
-  RealEnvPtr real_env_ptr = env->getRealEnvPtr();
-  //std::vector<int> idx_list = env->getRealEnvPtr()->getPeakIdxList();
+  ExpEnvPtr real_env_ptr = env->getExpEnvPtr();
+  //std::vector<int> idx_list = env->getExpEnvPtr()->getPeakIdxList();
   for (int i = 0; i < real_env_ptr->getPeakNum(); i++) {
     int peak_idx = real_env_ptr->getPeakIdx(i);
     if (real_env_ptr->isExist(i) && peak_idx >= bgn_peak_
@@ -103,7 +103,7 @@ bool Vertex::addCurEnv(MatchEnvPtr env, int max_overlap) {
   if (dp_para_ptr_->check_double_increase_ && !passDblIncrCheck(env)) {
     return false;
   }
-  RealEnvPtr real_env_ptr = env->getRealEnvPtr();
+  ExpEnvPtr real_env_ptr = env->getExpEnvPtr();
   for (int i = 0; i < real_env_ptr->getPeakNum(); i++) {
     int peak_idx = real_env_ptr->getPeakIdx(i);
     if (real_env_ptr->isExist(i) && peak_idx >= bgn_peak_

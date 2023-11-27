@@ -7,11 +7,9 @@ SET(CMAKE_VERBOSE_MAKEFILE ON)
 
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../bin)
 
-SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/../lib)
-
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   # Linux specific code
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unknown-pragmas -std=c++14 -Wl,-rpath=$ORIGIN,--disable-new-dtags -O3 -DWITHOUT_MZ5 -fPIC")
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unknown-pragmas -std=c++14 -Wl,-rpath=$ORIGIN/../lib/toppic,--disable-new-dtags -O3 -DWITHOUT_MZ5 -fPIC")
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
@@ -34,22 +32,19 @@ find_package(Qt5Gui)
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   # Linux specific code
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTOPPIC_LINUX")
-  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src
-                      ${CMAKE_CURRENT_SOURCE_DIR}/ext
-                      ${Qt5Widgets_INCLUDE_DIRS}
-                      ${Qt5Core_INCLUDE_DIRS}
-                      ${Qt5Gui_INCLUDE_DIRS})
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   # Windows specific code
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTOPPIC_WINDOWS -DWIN32")
-  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src
-                      ${CMAKE_CURRENT_SOURCE_DIR}/ext
-                      ${Qt5Widgets_INCLUDE_DIRS}
-                      ${Qt5Core_INCLUDE_DIRS}
-                      ${Qt5Gui_INCLUDE_DIRS})
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src
+                    ${CMAKE_CURRENT_SOURCE_DIR}/ext
+                    ${Qt5Widgets_INCLUDE_DIRS}
+                    ${Qt5Core_INCLUDE_DIRS}
+                    ${Qt5Gui_INCLUDE_DIRS})
+link_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/toppic)
 
 message(STATUS "cmake cxx flags " ${CMAKE_CXX_FLAGS})
 
@@ -69,9 +64,11 @@ file(GLOB_RECURSE COMMON_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/common/*.cpp)
 file(GLOB SEQ_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/seq/*.cpp)
 file(GLOB PARA_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/para/*.cpp)
 file(GLOB SPEC_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/ms/spec/*.cpp
+                     ${CMAKE_CURRENT_SOURCE_DIR}/src/ms/msmap/*.cpp
                      ${CMAKE_CURRENT_SOURCE_DIR}/src/ms/factory/*.cpp
                      ${CMAKE_CURRENT_SOURCE_DIR}/src/ms/env/*.cpp
                      ${CMAKE_CURRENT_SOURCE_DIR}/src/ms/feature/*.cpp)
+file(GLOB MZML_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/ms/mzml/*.cpp)
 file(GLOB PRSM_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/prsm/*.cpp)
 
 # classes for topfd 
@@ -181,29 +178,9 @@ file(GLOB GUI_UTIL_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/util/*.cpp
                         ${CMAKE_CURRENT_SOURCE_DIR}/src/common/base/*.cpp
                         ${CMAKE_CURRENT_SOURCE_DIR}/src/common/xml/*.cpp)
 
-# topmerge console main
-#file(GLOB TOPMERGE_PROC_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmerge_process.cpp
-#                             ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmerge_argument.cpp)		
-                             
-#file(GLOB TOPMERGE_SEARCH_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/search/duplicatematch/*.cpp)			 
-
-#file(GLOB TOPMERGE_CONSOLE_SRCS
-#                     		     ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmerge.cpp)
-
-# topindex gui main 
-#file(GLOB TOPMERGE_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topmerge/*.cpp
-#			                        ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topmerge/*.qrc)
-
-# topconvert
-#file(GLOB TOPCONVERT_SRCS     ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topconvert_process.cpp
-#		                  	      ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_argument.cpp
-#                              ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topconvert.cpp)
-                              
-#file(GLOB TOPCONVERT_SEARCH_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/search/duplicatematch/*.cpp)
-
 add_executable(topfd 
   ${TOPFD_CONSOLE_SRCS} ${TOPFD_SRCS} ${COMMON_SRCS} ${PARA_SRCS} 
-  ${SPEC_SRCS} ${ENV_SRCS} ${FEATURE_SRCS} ${PWIZ_SRCS} ${NOWIDE_SRCS})
+  ${SPEC_SRCS} ${MZML_SRCS} ${PWIZ_SRCS} ${NOWIDE_SRCS})
 
 add_executable(topindex 
   ${TOPINDEX_CONSOLE_SRCS} ${TOPINDEX_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS}
@@ -234,36 +211,16 @@ add_executable(topmg_gui ${TOPMG_GUI_SRCS} ${GUI_UTIL_SRCS})
 
 add_executable(topdiff_gui ${TOPDIFF_GUI_SRCS} ${GUI_UTIL_SRCS})
 
-#add_executable(topfd_single 
-#  ${TOPFD_SINGLE_CONSOLE_SRCS} ${TOPFD_SINGLE_PROC_SRCS} ${TOPFD_SRCS}
-#  ${SPEC_SRCS} ${ENV_SRCS} ${PWIZ_SRCS} ${COMMON_SRCS}) 
-
-#add_executable(topmerge ${TOPMERGE_CONSOLE_SRCS} ${TOPMERGE_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS} 
-#  ${TOPMERGE_SEARCH_SRCS} ${SEQ_SRCS} ${PARA_SRCS} ${SPEC_SRCS} ${LOCAL_SRCS} ${PRSM_SRCS} ${VISUAL_SRCS}) 
-  
-#add_executable(topmerge_gui ${TOPMERGE_GUI_SRCS} ${TOPMERGE_GUI_QRC} 
-#  ${TOPMERGE_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS} ${TOPMERGE_SEARCH_SRCS}
-#  ${SEQ_SRCS} ${PARA_SRCS} ${SPEC_SRCS} ${LOCAL_SRCS} ${PRSM_SRCS} ${VISUAL_SRCS} ${GUI_UTIL_SRCS}) 
-
-#add_executable(topconvert ${TOPCONVERT_SRCS} ${HTS_SRCS} ${COMMON_SRCS} 
-#  ${SEQ_SRCS} ${PARA_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS} ${PRSM_SRCS} ${TOPCONVERT_SEARCH_SRCS})
-
-#add_executable(toppic_test 
-#  ${TEST_SRCS} ${HTS_SRCS} ${COMMON_SRCS} 
-#  ${SEQ_SRCS} ${SPEC_SRCS} ${ENV_SRCS} ${FEATURE_SRCS} ${PRSM_SRCS} ${FILTER_SRCS}  
-#  ${ZERO_PTM_SRCS} ${ONE_PTM_SEARCH_SRCS} ${PTM_SRCS} 
-#  ${TDGF_SRCS} ${LOCAL_SRCS} ${VISUAL_SRCS})
-
-
-#add_executable(toppic_match_peak ${TOPPIC_MATCH_PEAK_SRCS} ${TOPPIC_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS} ${PRSM_VIEW_SRCS})
-
-#add_executable(topfd_train ${TOPFD_TRAIN_SRCS} ${TOPFD_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS} ${PWIZ_SRC})
-
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+
+  add_library(onnx_lib SHARED IMPORTED)
+  set_property(TARGET onnx_lib PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/lib/windows/onnxruntime.dll)
+  set_property(TARGET onnx_lib PROPERTY IMPORTED_IMPLIB ${CMAKE_CURRENT_SOURCE_DIR}/lib/windows/onnxruntime.lib)
+  
   target_link_libraries(topfd xerces-c
     boost_program_options-mt boost_filesystem-mt
     boost_system-mt boost_thread-mt
-    boost_iostreams-mt boost_chrono-mt pthread z psapi Ws2_32)
+    boost_iostreams-mt boost_chrono-mt pthread z psapi Ws2_32 onnx_lib)
 
   target_link_libraries(topindex xerces-c boost_program_options-mt
     boost_serialization-mt boost_filesystem-mt boost_system-mt boost_thread-mt pthread z Ws2_32)
@@ -303,21 +260,6 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     boost_filesystem-mt boost_system-mt 
     boost_program_options-mt boost_thread-mt pthread z Ws2_32)
 
-  #   target_link_libraries(topfd_single xerces-c
-  #  boost_program_options-mt boost_filesystem-mt
-  #  boost_system-mt boost_thread-mt
-  #  boost_iostreams-mt boost_chrono-mt pthread z Ws2_32)
-
-  #target_link_libraries(topmerge xerces-c boost_program_options-mt
-  #  boost_serialization-mt boost_filesystem-mt boost_system-mt boost_thread-mt pthread z Ws2_32)
-	
-  #target_link_libraries(topconvert xerces-c boost_program_options-mt
-  #  boost_filesystem-mt boost_system-mt boost_thread-mt pthread z Ws2_32)	
-
-  #target_link_libraries(topmerge_gui ${QTOPTION} Qt5Widgets Qt5Core Qt5Gui xerces-c
-  #  boost_filesystem-mt boost_system-mt boost_serialization-mt 
-  #  boost_program_options-mt boost_thread-mt pthread z Ws2_32)
-
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows") 
 
 # xerces-c boost_system, boost_thread boost_iostreams boost_chrono pthread z are required by
@@ -325,7 +267,7 @@ ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   target_link_libraries(topfd xerces-c boost_program_options
     boost_filesystem boost_system boost_thread boost_iostreams boost_chrono
-    pthread z)
+    pthread z onnxruntime)
 
   target_link_libraries(topindex xerces-c boost_program_options
     boost_filesystem boost_system boost_serialization boost_thread pthread z)
@@ -355,33 +297,10 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   target_link_libraries(topdiff_gui Qt5Widgets Qt5Core Qt5Gui
     xerces-c boost_program_options boost_filesystem boost_system boost_thread boost_iostreams pthread z)
 
-  #target_link_libraries(topfd_single xerces-c boost_program_options
-  #  boost_filesystem boost_system boost_thread boost_iostreams boost_chrono
-  #  pthread z)
-
-  #target_link_libraries(topmerge xerces-c boost_program_options
-  #  boost_filesystem boost_system boost_serialization boost_thread pthread z)
-
-  #target_link_libraries(topmerge_gui Qt5Widgets Qt5Core Qt5Gui
-  #  xerces-c boost_program_options boost_filesystem boost_serialization boost_system boost_thread boost_iostreams pthread z)  
-
-  #target_link_libraries(topconvert xerces-c boost_program_options
-  #  boost_filesystem boost_system boost_thread pthread z)
-
-
-  #    target_link_libraries(toppic_test xerces-c boost_program_options
-  #  boost_filesystem boost_system boost_thread pthread z)
-
-  #    target_link_libraries(toppic_match_peak xerces-c boost_program_options
-  #        boost_filesystem boost_system boost_thread pthread z)
-
-  #    target_link_libraries(topfd_train xerces-c boost_program_options
-  #        boost_filesystem boost_system boost_thread boost_iostreams boost_chrono pthread z)
-
-  #file(MAKE_DIRECTORY ${CMAKE_INSTALL_PREFIX}/usr/bin)
 install (TARGETS topfd topindex toppic topmg topdiff topfd_gui topindex_gui
   toppic_gui topmg_gui topdiff_gui DESTINATION bin/)
 install (DIRECTORY resources/ DESTINATION etc/toppic)
+install (DIRECTORY lib/toppic DESTINATION lib/toppic)
 
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
 

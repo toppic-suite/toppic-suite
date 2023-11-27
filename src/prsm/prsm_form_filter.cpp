@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ void process(const std::string &db_file_name,
                                                     fasta_reader_ptr,  
                                                     fix_mod_list);
 
-  std::sort(prsms.begin(), prsms.end(), Prsm::cmpEValueInc);
+  std::sort(prsms.begin(), prsms.end(), Prsm::cmpEValueIncProtInc);
 
   PrsmPtrVec selected_forms;
 
@@ -60,7 +60,8 @@ void process(const std::string &db_file_name,
   // output
   std::string output_file_name = base_name + "." + output_file_ext;
   PrsmXmlWriter writer(output_file_name);
-  std::sort(selected_forms.begin(), selected_forms.end(), Prsm::cmpSpectrumIdIncPrecursorIdInc);
+  std::sort(selected_forms.begin(), selected_forms.end(),
+            Prsm::cmpSpecIncPrecIncEvalueIncProtInc);
   writer.writeVector(selected_forms);
   writer.close();
 }

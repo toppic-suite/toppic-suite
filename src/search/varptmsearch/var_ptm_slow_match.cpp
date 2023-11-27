@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -27,10 +27,10 @@ VarPtmSlowMatch::VarPtmSlowMatch(ProteoformPtr proteo_ptr,
   deconv_ms_ptr_vec_ = spectrum_set_ptr->getDeconvMsPtrVec();
   ms_six_ptr_vec_ = spectrum_set_ptr->getMsSixPtrVec();
   prec_mono_mass_ = spectrum_set_ptr->getPrecMonoMass();
-  //LOG_ERROR("prec mass " << prec_mono_mass_ << " protein mass " << proteo_ptr->getMass());
+  //LOG_ERROR("prec mass " << prec_mono_mass_ << " protein mass " << proteo_ptr->getMonoNeutralMass());
   mng_ptr_ = mng_ptr;
   PeakTolerancePtr tole_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
-  prec_error_tole_ = deconv_ms_ptr_vec_[0]->getMsHeaderPtr()->getPrecErrorTolerance(tole_ptr->getPpo());
+  prec_error_tole_ = deconv_ms_ptr_vec_[0]->getMsHeaderPtr()->getFirstPrecErrorTolerance(tole_ptr->getPpo());
   //LOG_ERROR("error tolerance " << prec_error_tole_);
   init();
 }
@@ -94,12 +94,6 @@ void VarPtmSlowMatch::init() {
   DiagonalPtrVec diagonal_ptrs = diag_pair_util::geneDiagonalsWithEmptyList(n_term_shift_header_ptrs,
                                                                             prm_peaks, group_spec_num,
                                                                             proteo_ptr_);
-  /*
-  LOG_DEBUG("diagonal ptr size " << diagonal_ptrs.size());
-  for (size_t i = 0; i < diagonal_ptrs.size(); i++) {
-    LOG_DEBUG("shift " << diagonal_ptrs[i]->getHeader()->getProtNTermShift());
-  }
-  */
   if (diagonal_ptrs.size() == 0) {
     success_init_ = false;
     return;
@@ -111,6 +105,10 @@ void VarPtmSlowMatch::init() {
     ms_masses[i] = prm_peaks[i]->getPosition();
   }
   ResSeqPtr sub_res_seq_ptr = proteo_ptr_->getResSeqPtr(); 
+  if (sub_res_seq_ptr->getLen() == 0) {
+    success_init_ = false;
+    return;
+  }
   LOG_DEBUG("Seq mass " << sub_res_seq_ptr->getSeqMass()); 
   var_ptm_align_ptr_ = std::make_shared<VarPtmAlign>(ms_masses, seq_masses, 
                                                      sub_res_seq_ptr,  

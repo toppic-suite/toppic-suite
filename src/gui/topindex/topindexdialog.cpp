@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -166,7 +166,7 @@ void TopIndexDialog::on_startButton_clicked() {
     if (finish) {
       QByteArray byteArray = process_.readAllStandardError();
       QString str = QString(byteArray);
-      if (process_.exitStatus() != QProcess::NormalExit) {
+      if (process_.exitCode() != 0) {
         str = str + "\nERROR Quit status: Crashed. \n";
         str = str + "ERROR Quit code: " + QString::number(process_.exitCode()) + ".\n";
       }
@@ -174,8 +174,6 @@ void TopIndexDialog::on_startButton_clicked() {
       if (msg != "") {
         updateMsg(msg); 
       }
-      //qDebug() << "Status: " << process_.exitStatus();
-      //qDebug() << "Code: " << process_.exitCode();
     }
     sleep(100);
   }

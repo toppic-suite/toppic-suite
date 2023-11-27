@@ -23,6 +23,7 @@
 #include "pwiz/data/msdata/SpectrumListWrapper.hpp"
 #include <boost/smart_ptr/scoped_ptr.hpp>
 #include "pwiz/utility/chemistry/MZTolerance.hpp"
+#include "boost/enum.hpp"
 
 namespace pwiz {
 namespace analysis {
@@ -40,11 +41,10 @@ namespace analysis {
         struct Params
         {
             /// Optimization methods available
-            enum class Optimization
-            {
-                NONE,
-                OVERLAP_ONLY
-            };
+            BOOST_ENUM(Optimization,
+                (NONE)
+                (OVERLAP_ONLY)
+            );
 
             /// Converts an optimization enum to a string
             static std::string optimizationToString(Optimization opt);
@@ -62,7 +62,8 @@ namespace analysis {
                 variableFill(false),
                 interpolateRetentionTime(true),
                 optimization(Optimization::NONE),
-                minimumWindowSize(0.2)
+                minimumWindowSize(0.2),
+                removeNonOverlappingEdges(false)
             {}
 
             /// Error scalar for extracting MS/MS peaks.
@@ -97,6 +98,9 @@ namespace analysis {
             Optimization optimization;
 
             double minimumWindowSize;
+
+            /// In overlapping DIA schemes, remove any isolation window segments at the edges that are not covered at the same depth as the rest.
+            bool removeNonOverlappingEdges;
         };
 
         /// Generates an abstract SpectrumList_Demux decorator from inner SpectrumList

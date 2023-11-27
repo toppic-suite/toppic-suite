@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -85,13 +85,13 @@ class SimplePrsm {
 
   static std::string getXmlElementName() {return "simple_prsm";}
 
-  static bool cmpScoreDec(const SimplePrsmPtr a, const SimplePrsmPtr b);
+  static bool cmpScoreDecSeqInc(const SimplePrsmPtr a, const SimplePrsmPtr b);
 
-  static bool cmpIdInc(const SimplePrsmPtr a, const SimplePrsmPtr b);
+  static bool cmpSeqIncScoreDec(const SimplePrsmPtr a, const SimplePrsmPtr b);
 
-  static bool cmpIdIncScoreDec(const SimplePrsmPtr a, const SimplePrsmPtr b);
+  //static bool cmpSpecIncScoreDecSeqInc(const SimplePrsmPtr a, const SimplePrsmPtr b);
 
-  static bool cmpNameIncScoreDec(const SimplePrsmPtr a, const SimplePrsmPtr b);
+  //static bool cmpIdInc(const SimplePrsmPtr a, const SimplePrsmPtr b);
 
  private:
   std::string file_name_;

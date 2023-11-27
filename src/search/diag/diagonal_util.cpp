@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -77,11 +77,11 @@ double refinePrecursorAndHeaderShift(ProteoformPtr proteo_ptr,
                                      DiagHeaderPtrVec &header_ptrs,
                                      double ppo, double min_mass,
                                      double refine_prec_step_width) {
-  double prec_mass = ms_three_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMass();
+  double prec_mass = ms_three_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMass();
   if (header_ptrs.size() == 0) {
     return prec_mass;
   }
-  double tole = ms_three_ptr_vec[0]->getMsHeaderPtr()->getPrecErrorTolerance(ppo);
+  double tole = ms_three_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecErrorTolerance(ppo);
 
   int one_side_step_num = 0;
   if (tole > 0) {

@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -46,6 +46,9 @@ inline std::pair<int, int> getMassError(PrmPeakPtr peak_ptr, double scale,
 std::vector<std::pair<int, int> > getIntMassErrorList(const PrmMsPtrVec &prm_ms_ptr_vec,
                                                       PeakTolerancePtr tole_ptr,
                                                       double scale, bool n_strict, bool c_strict) {
+  bool prec_n_strict = true;
+  bool prec_c_strict = true;
+  double default_score = 1.0;
   std::vector<std::pair<int, int> > mass_errors;
   for (size_t i = 0; i < prm_ms_ptr_vec.size(); i++) {
     PrmMsPtr prm_ms_ptr = prm_ms_ptr_vec[i];
@@ -62,12 +65,12 @@ std::vector<std::pair<int, int> > getIntMassErrorList(const PrmMsPtrVec &prm_ms_
       }
     }
     // add zero mass for each spectrum to increase the score for zero mass
-    double prec_mass = prm_ms_ptr_vec[i]->getMsHeaderPtr()->getPrecMonoMass();
-    PrmPeakPtr zero_prm_ptr = prm_peak_factory::getZeroPeakPtr(i, prec_mass, tole_ptr, 1);
+    double prec_mass = prm_ms_ptr_vec[i]->getMsHeaderPtr()->getFirstPrecMonoMass();
+    PrmPeakPtr zero_prm_ptr = prm_peak_factory::getZeroPeakPtr(i, prec_mass, tole_ptr, default_score);
     mass_errors.push_back(getMassError(zero_prm_ptr, scale, n_strict, c_strict));
     // add prec mass for each spectrum
-    PrmPeakPtr prec_prm_ptr = prm_peak_factory::getPrecPeakPtr(i, prec_mass, tole_ptr, 1);
-    mass_errors.push_back(getMassError(prec_prm_ptr, scale, true, true));
+    PrmPeakPtr prec_prm_ptr = prm_peak_factory::getPrecPeakPtr(i, prec_mass, tole_ptr, default_score);
+    mass_errors.push_back(getMassError(prec_prm_ptr, scale, prec_n_strict, prec_c_strict));
   }
 
   std::sort(mass_errors.begin(), mass_errors.end(), massErrorUp);
@@ -83,7 +86,7 @@ PrmPeakPtrVec getPrmPeakPtrs(const PrmMsPtrVec &prm_ms_ptr_vec,
     }
   }
   // add zero
-  double prec_mass = prm_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMass();
+  double prec_mass = prm_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMass();
   // use spec_id = 0 and score = group_spec_num (size of prm_ms_ptr_vec)
   PrmPeakPtr zero_prm_ptr = prm_peak_factory::getZeroPeakPtr(0, prec_mass, tole_ptr, prm_ms_ptr_vec.size());
   peak_list.push_back(zero_prm_ptr);

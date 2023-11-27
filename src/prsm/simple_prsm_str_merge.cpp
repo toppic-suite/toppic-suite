@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -96,7 +96,7 @@ void SimplePrsmStrMerge::process() {
     }
 
     if (cur_str_ptrs.size() > 0) {
-      std::sort(cur_str_ptrs.begin(), cur_str_ptrs.end(), SimplePrsmStr::cmpScoreDec);
+      std::sort(cur_str_ptrs.begin(), cur_str_ptrs.end(), SimplePrsmStr::cmpScoreDecSeqInc);
       int count = 0;
       //std::set<std::string> name_set;
       for (size_t i = 0; i < cur_str_ptrs.size(); i++) {

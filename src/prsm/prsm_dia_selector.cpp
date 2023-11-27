@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -43,7 +43,8 @@ bool PrsmDiaSelector::containsSameFastaSeq(const PrsmStrPtrVec prsm_ptrs,
 
 PrsmStrPtrVec PrsmDiaSelector::getTopPrsms(PrsmStrPtrVec &prsm_str_ptrs, 
                                            int n_top) {
-  std::sort(prsm_str_ptrs.begin(), prsm_str_ptrs.end(), PrsmStr::cmpEValueInc);
+  std::sort(prsm_str_ptrs.begin(), prsm_str_ptrs.end(),
+            PrsmStr::cmpEValueIncProtInc);
   int size = prsm_str_ptrs.size();
   int max = size > n_top? n_top:size;
   PrsmStrPtrVec result_ptrs;

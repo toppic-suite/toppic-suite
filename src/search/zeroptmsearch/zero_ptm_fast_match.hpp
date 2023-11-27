@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -37,9 +37,8 @@ class ZeroPtmFastMatch {
 
   int getEnd() {return end_;}
 
-  static bool cmpScoreDec(const ZpFastMatchPtr &a, const ZpFastMatchPtr &b) {
-    return a->getScore() > b->getScore();
-  }
+  static bool cmpScoreDecProtNameInc(const ZpFastMatchPtr &a, 
+                                     const ZpFastMatchPtr &b);
 
  private:
   ProteoformPtr proteo_ptr_;

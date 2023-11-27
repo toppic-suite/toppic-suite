@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -103,6 +103,11 @@ double getMaxInte(const std::vector<double> &inte) {
 
 double getBaseLine(const std::vector<double> &inte) {
   double max_inte = getMaxInte(inte);
+  if (max_inte <= 0.0) {
+    LOG_WARN("The highest peak intensity is 0.");
+    // when there are no peaks, return default 1.0
+    return 1.0;
+  }
   int max_pos;
   IntvDensPtrVec dens;
   do {    

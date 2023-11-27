@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -23,5 +23,22 @@ ZeroPtmFastMatch::ZeroPtmFastMatch(ProteoformPtr proteo_ptr,
       score_(score),
       begin_(begin),
       end_(end) {}
+
+bool ZeroPtmFastMatch::cmpScoreDecProtNameInc(const ZpFastMatchPtr &a, 
+                                              const ZpFastMatchPtr &b) {
+  if (a->getScore() > b->getScore()) {
+    return true;
+  }
+  else if (a->getScore() < b->getScore()) {
+    return false;
+  }
+  else if (a->getProteoformPtr()->getSeqName() <
+           b->getProteoformPtr()->getSeqName()) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
 
 }  // namespace toppic

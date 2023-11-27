@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -31,12 +31,16 @@ SimplePrsmStr::SimplePrsmStr(const std::vector<std::string> &str_vec) {
   seq_desc_ = prsm_util::getValueStr(line);
 }
 
-bool SimplePrsmStr::cmpScoreDec(const SimplePrsmStrPtr &a, 
-                                const SimplePrsmStrPtr &b) {
-  if (a->getScore() == b->getScore()) {
+bool SimplePrsmStr::cmpScoreDecSeqInc(const SimplePrsmStrPtr &a, 
+                                      const SimplePrsmStrPtr &b) {
+  if (a->getScore() > b->getScore()) {
+    return true;
+  }
+  else if (a->getScore() < b->getScore()) {
+    return false;
+  }
+  else {
     return a->getSeqName() < b->getSeqName();
-  } else {
-    return a->getScore() > b->getScore();
   }
 }
 

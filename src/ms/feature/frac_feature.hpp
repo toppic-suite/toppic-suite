@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -37,8 +37,10 @@ class FracFeature {
               double retent_begin, double retent_end,
               int scan_begin, int scan_end,
               int min_charge, int max_charge, 
-              int env_num, double apex_time, 
-              double apex_inte);
+              double apex_time, int apex_scan, 
+              double apex_inte, int rep_charge, 
+              double rep_avg_mz, int env_num, 
+              double ec_score);  
 
   FracFeature(std::string line);
 
@@ -74,17 +76,23 @@ class FracFeature {
 
   int getMaxCharge() {return max_charge_;}
 
-  int getEnvNum() {return env_num_;}
-
   double getApexTime() {return apex_time_;}
 
+  int getApexScan() {return apex_scan_;}
+
   double getApexInte() {return apex_inte_;}
+
+  int getRepCharge() {return rep_charge_;}
+
+  double getRepAvgMz() {return rep_avg_mz_;}
+
+  int getEnvNum() {return env_num_;}
+
+  double getEcScore() {return ec_score_;}
 
   int getSampleFeatureId() {return sample_feature_id_;}
 
   double getSampleFeatureInte() {return sample_feature_inte_;}
-
-  double getPromexScore() {return promex_score_;}
 
   bool hasMs2Spec() {return has_ms2_spec_;}
 
@@ -92,7 +100,7 @@ class FracFeature {
 
   void setId(int id) {id_ = id;}
 
-  void setPromexScore(double score) {promex_score_ = score;}
+  void setEcScore(double score) {ec_score_ = score;}
 
   void setHasMs2Spec(bool has_ms2_spec) {has_ms2_spec_ = has_ms2_spec;}
 
@@ -126,7 +134,8 @@ class FracFeature {
   std::string file_name_;
   double mono_mass_;
   double intensity_;
-  // ms1 ids are used for promex score
+
+  // used for ecscore_score
   int min_ms1_id_;
   int max_ms1_id_;
 
@@ -136,16 +145,19 @@ class FracFeature {
   int scan_end_;
   int min_charge_;
   int max_charge_;
-  int env_num_ = 0;
   double apex_time_;
+  int apex_scan_;
   double apex_inte_;
+  int rep_charge_;
+  double rep_avg_mz_;
+
+  int env_num_ = 0;
+  double ec_score_;
+  bool has_ms2_spec_ = false;
+
   int sample_feature_id_ = -1;
   double sample_feature_inte_ = 0;
   SingleChargeFeaturePtrVec single_features_;
-
-  // used for promex_score
-  double promex_score_;
-  bool has_ms2_spec_ = false;
 };
 
 typedef std::vector<FracFeaturePtrVec> FracFeaturePtrVec2D;

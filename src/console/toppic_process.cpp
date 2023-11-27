@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -11,6 +11,7 @@
 //WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //See the License for the specific language governing permissions and
 //limitations under the License.
+
 #include <iostream>
 #include <iomanip>
 #include <map>
@@ -40,6 +41,7 @@
 #include "prsm/prsm_cutoff_selector.hpp"
 #include "prsm/prsm_match_table_writer.hpp"
 #include "prsm/prsm_fdr.hpp"
+#include "prsm/prsm_fdr_groups.hpp"
 #include "prsm/prsm_form_filter.hpp"
 #include "prsm/prsm_util.hpp"
 
@@ -432,6 +434,7 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     if (arguments["searchType"] == "TARGET+DECOY") {
       std::cout << "FDR computation - started. " << std::endl;
       prsm_fdr::process(sp_file_name, "toppic_cluster", "toppic_cluster_fdr", arguments["keepDecoyResults"]);
+      //prsm_fdr_groups::process(sp_file_name, "toppic_cluster", "toppic_cluster_fdr", arguments["keepDecoyResults"]);
       std::cout << "FDR computation - finished." << std::endl;
       cur_suffix = "toppic_cluster_fdr";
     }
@@ -598,7 +601,7 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
     std::string para_str = "";
     std::cout << "Merging files started." << std::endl;
     std::cout << "Merging msalign files started." << std::endl;
-    MsAlignFracMerge::mergeFiles(spec_file_lst, full_combined_name + "_ms2.msalign", para_str);
+    msalign_frac_merge::mergeMsalignFiles(spec_file_lst, full_combined_name + "_ms2.msalign", para_str);
     std::cout << "Merging msalign files finished." << std::endl;
     if (arguments["geneHTMLFolder"] == "true"){
       std::cout << "Merging json files started." << std::endl;

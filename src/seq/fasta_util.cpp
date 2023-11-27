@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -125,7 +125,7 @@ void generateDbBlock(const std::string &db_file_name, int block_size,
   // adjust block size if the database is too small and the sequence number 
   // is large enough > 50 * min_block_num
   int block_num = static_cast<int>(std::ceil(total_seq_size/block_size));
-  if (block_num < min_block_num && seq_num > (min_block_num * 50)) {
+  if (block_num < min_block_num) {
     block_num = min_block_num;
     // add +1 to make sure there is no error introduced in division.
     block_size = total_seq_size/block_num + 1;

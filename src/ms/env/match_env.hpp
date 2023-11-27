@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 #define TOPPIC_TOPFD_ENV_MATCH_ENVELOPE_HPP_
 
 #include "ms/env/env_para.hpp"
-#include "ms/env/envelope.hpp" 
-#include "ms/env/real_env.hpp" 
+#include "ms/env/env.hpp"
+#include "ms/env/exp_env.hpp"
 
 namespace toppic {
 
@@ -27,31 +27,38 @@ typedef std::shared_ptr<MatchEnv> MatchEnvPtr;
 
 class MatchEnv {
  public:
-  MatchEnv(int mass_group, EnvelopePtr theo_env_ptr, 
-           RealEnvPtr real_env_ptr);
-
-  void compScr(EnvParaPtr env_para_ptr);
-
-  static bool cmpScoreDec(const MatchEnvPtr &a, const MatchEnvPtr &b) { 
-    return a->getScore() > b->getScore();}
-
-  double calcPeakScr(int id_x, double inte_sum, double tolerance);
+  MatchEnv(int mass_group, EnvPtr theo_env_ptr,
+           ExpEnvPtr real_env_ptr);
 
   int getId() {return id_;}
 
   int getMassGroup() {return mass_group_;}
 
-  RealEnvPtr getRealEnvPtr() {return real_env_ptr_;}
+  ExpEnvPtr getExpEnvPtr() {return exp_env_ptr_;}
 
-  EnvelopePtr getTheoEnvPtr() {return theo_env_ptr_;}
+  EnvPtr getTheoEnvPtr() {return theo_env_ptr_;}
 
-  double getScore() {return score_;}
+  double getEnvcnnScore() {return envcnn_score_;}
 
-  void setScore(double score) {score_ = score;}
+  void setEnvcnnScore(double score) {envcnn_score_ = score;}
+
+  double getMsdeconvScore() {return msdeconv_score_;}
+
+  void setMsdeconvScore(double score) {msdeconv_score_ = score;}
 
   void setId(int id) {id_ = id;}
 
-  void setTheoEnvPtr(EnvelopePtr theo_env_ptr) {theo_env_ptr_ = theo_env_ptr;}
+  void setTheoEnvPtr(EnvPtr theo_env_ptr) { theo_env_ptr_ = theo_env_ptr;}
+
+  void compMsdeconvScr(EnvParaPtr env_para_ptr);
+
+  static bool cmpEnvcnnScoreDec(const MatchEnvPtr &a, const MatchEnvPtr &b) { 
+    return a->getEnvcnnScore() > b->getEnvcnnScore();}
+
+  static bool cmpMsdeconvScoreDec(const MatchEnvPtr &a, const MatchEnvPtr &b) { 
+    return a->getMsdeconvScore() > b->getMsdeconvScore();}
+
+  double calcPeakScr(int id_x, double inte_sum, double tolerance);
 
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
@@ -61,9 +68,10 @@ class MatchEnv {
   int id_;
   // we divide envelopes into several groups based on monoisotopic masses  
   int mass_group_;
-  double score_;
-  EnvelopePtr theo_env_ptr_;
-  RealEnvPtr real_env_ptr_;
+  double msdeconv_score_;
+  double envcnn_score_;
+  EnvPtr theo_env_ptr_;
+  ExpEnvPtr exp_env_ptr_;
 
   double calcShareInteAccu(int id_x, double inte_sum);
 

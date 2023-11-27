@@ -51,3 +51,6 @@ topmg
 
 /.vscode
 /src/.vscode
+/.idea
+
+cmake-build-debug/

@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ namespace toppic {
 namespace simple_prsm_util {
 
 SimplePrsmPtrVec getUniqueMatches(SimplePrsmPtrVec match_ptrs) {
-  std::sort(match_ptrs.begin(), match_ptrs.end(), SimplePrsm::cmpNameIncScoreDec);
+  std::sort(match_ptrs.begin(), match_ptrs.end(), SimplePrsm::cmpSeqIncScoreDec);
   SimplePrsmPtrVec unique_match_ptrs;
   std::string prev_name = "";
   int prev_id = -1;

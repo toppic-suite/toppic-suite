@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ EnvPeakPair::EnvPeakPair(EnvPeakPairPtr pair_ptr) {
 }
 
 double EnvPeakPair::getTheoIntensity() {
-  return env_ptr_->getTheoEnvPtr()->getIntensity(pos_idx_);
+  return env_ptr_->getTheoEnvPtr()->getInte(pos_idx_);
 }
 
 double EnvPeakPair::getPeakScore(double intensity_sum, double tolerance) {

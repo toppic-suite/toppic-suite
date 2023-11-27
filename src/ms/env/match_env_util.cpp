@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 #include "common/util/logger.hpp"
 #include "common/base/mass_constant.hpp"
-#include "ms/spec/raw_ms_util.hpp"
+#include "ms/spec/peak_list_util.hpp"
 #include "ms/env/match_env_util.hpp"
 
 namespace toppic {
@@ -26,7 +26,7 @@ namespace match_env_util {
 std::vector<double> getMassList(const MatchEnvPtrVec &envs) {
   std::vector<double> masses(envs.size());
   for (size_t i = 0; i < envs.size(); i++) {
-    masses[i] = envs[i]->getRealEnvPtr()->getMonoNeutralMass();
+    masses[i] = envs[i]->getExpEnvPtr()->getMonoNeutralMass();
   }
   return masses;
 }
@@ -34,7 +34,7 @@ std::vector<double> getMassList(const MatchEnvPtrVec &envs) {
 std::vector<int> getChargeList(const MatchEnvPtrVec &envs) {
   std::vector<int> charges(envs.size());
   for (size_t i = 0; i < envs.size(); i++) {
-    charges[i] = envs[i]->getRealEnvPtr()->getCharge();
+    charges[i] = envs[i]->getExpEnvPtr()->getCharge();
   }
   return charges;
 }
@@ -42,7 +42,7 @@ std::vector<int> getChargeList(const MatchEnvPtrVec &envs) {
 std::vector<double> getChargeOneMassList(const MatchEnvPtrVec &envs) {
   std::vector<double> masses(envs.size());
   for (size_t i = 0; i < envs.size(); i++) {
-    masses[i] = envs[i]->getRealEnvPtr()->getMonoNeutralMass() + mass_constant::getProtonMass();
+    masses[i] = envs[i]->getExpEnvPtr()->getMonoNeutralMass() + mass_constant::getProtonMass();
   }
   return masses;
 }
@@ -50,7 +50,7 @@ std::vector<double> getChargeOneMassList(const MatchEnvPtrVec &envs) {
 std::vector<double> getIntensitySums(const MatchEnvPtrVec &envs) {
   std::vector<double> intensity_sums(envs.size());
   for (size_t i = 0; i < envs.size(); i++) {
-    intensity_sums[i] = envs[i]->getTheoEnvPtr()->compIntensitySum();
+    intensity_sums[i] = envs[i]->getTheoEnvPtr()->compInteSum();
   }
   return intensity_sums;
 }
@@ -60,22 +60,22 @@ void assignIntensity(PeakPtrVec &ms, MatchEnvPtrVec &envs) {
   std::vector<double> intensity_sums_(peak_num, 0);
   for (size_t i = 0; i < envs.size(); i++) {
     MatchEnvPtr env = envs[i];
-    for (int j = 0; j < env->getRealEnvPtr()->getPeakNum(); j++) {
-      int peak = env->getRealEnvPtr()->getPeakIdx(j);
+    for (int j = 0; j < env->getExpEnvPtr()->getPeakNum(); j++) {
+      int peak = env->getExpEnvPtr()->getPeakIdx(j);
       if (peak >= 0) {
-        intensity_sums_[peak] += env->getTheoEnvPtr()->getIntensity(j);
+        intensity_sums_[peak] += env->getTheoEnvPtr()->getInte(j);
       }
     }
   }
   for (size_t i = 0; i < envs.size(); i++) {
     MatchEnvPtr env = envs[i];
-    for (int j = 0; j < env->getRealEnvPtr()->getPeakNum(); j++) {
-      int peak = env->getRealEnvPtr()->getPeakIdx(j);
+    for (int j = 0; j < env->getExpEnvPtr()->getPeakNum(); j++) {
+      int peak = env->getExpEnvPtr()->getPeakIdx(j);
       if (peak >= 0) {
-        EnvelopePtr real_env = env->getRealEnvPtr();
-        double intensity = real_env->getIntensity(j) * env->getTheoEnvPtr()->getIntensity(j)
-            / intensity_sums_[peak];
-        real_env->setIntensity(j, intensity);
+        EnvPtr real_env = env->getExpEnvPtr();
+        double intensity = real_env->getInte(j) * env->getTheoEnvPtr()->getInte(j)
+                           / intensity_sums_[peak];
+          real_env->setInte(j, intensity);
       }
     }
   }
@@ -86,7 +86,7 @@ PeakPtrVec  rmAnnoPeak(PeakPtrVec &ms, MatchEnvPtrVec &envs) {
   int peak_num = new_list.size();
   std::vector<bool> is_keeps(peak_num, true);
   for (size_t i = 0; i < envs.size(); i++) {
-    RealEnvPtr real_env_ptr = envs[i]->getRealEnvPtr();
+    ExpEnvPtr real_env_ptr = envs[i]->getExpEnvPtr();
     for (int j = 0; j < real_env_ptr->getPeakNum(); j++) {
       int peak_idx = real_env_ptr->getPeakIdx(j);
       if (peak_idx >= 0) {
@@ -94,7 +94,7 @@ PeakPtrVec  rmAnnoPeak(PeakPtrVec &ms, MatchEnvPtrVec &envs) {
       }
     }
   }
-  raw_ms_util::rmPeaks(new_list, is_keeps);
+  peak_list_util::rmPeaks(new_list, is_keeps);
   return new_list;
 }
 
@@ -102,8 +102,8 @@ MatchEnvPtrVec addUnusedMasses(MatchEnvPtrVec &envs, PeakPtrVec &ms, double tole
   std::vector<bool> is_uses(ms.size(), false);
   for (size_t i = 0; i < envs.size(); i++) {
     MatchEnvPtr env = envs[i];
-    for (int j = 0; j < env->getRealEnvPtr()->getPeakNum(); j++) {
-      int peak = env->getRealEnvPtr()->getPeakIdx(j);
+    for (int j = 0; j < env->getExpEnvPtr()->getPeakNum(); j++) {
+      int peak = env->getExpEnvPtr()->getPeakIdx(j);
       if (peak >= 0) {
         is_uses[peak] = true;
       }
@@ -120,7 +120,7 @@ MatchEnvPtrVec addUnusedMasses(MatchEnvPtrVec &envs, PeakPtrVec &ms, double tole
   MatchEnvPtrVec result;
   result.insert(std::end(result), std::begin(unused_mass_envs), std::end(unused_mass_envs));
   result.insert(std::end(result), std::begin(envs), std::end(envs));
-  std::sort(result.begin(), result.end(), MatchEnv::cmpScoreDec);
+  std::sort(result.begin(), result.end(), MatchEnv::cmpMsdeconvScoreDec);
   return result;
 }
 
@@ -132,34 +132,34 @@ MatchEnvPtr getNewMatchEnv(PeakPtrVec &ms, int idx, double tolerance) {
   peaks.push_back(peak_ptr);
   int ref_idx = 0;
   int charge = 1;
-  EnvelopePtr theo_env = std::make_shared<Envelope>(ref_idx, charge, mz, peaks);
-  RealEnvPtr real_env = std::make_shared<RealEnv>(ms, theo_env, tolerance, 0);
+  EnvPtr theo_env = std::make_shared<Env>(ref_idx, charge, mz, peaks);
+  ExpEnvPtr real_env = std::make_shared<ExpEnv>(ms, theo_env, tolerance, 0);
   int mass_group = 0;
   return std::make_shared<MatchEnv>(mass_group, theo_env, real_env);
 }
 
 MatchEnvPtrVec addMultipleMass(MatchEnvPtrVec &envs, MatchEnvPtr2D &candidates,
-                               double multi_min_mass, int multi_min_charge, double min_ratio) {
+                               EnvParaPtr env_para_ptr) {
   MatchEnvPtrVec mass_envs;
   for (size_t i = 0; i < envs.size(); i++) {
     // check if we can use another charge state
-    int charge = envs[i]->getRealEnvPtr()->getCharge();
-    int refer_peak = envs[i]->getRealEnvPtr()->getReferPeakIdx();
+    int charge = envs[i]->getExpEnvPtr()->getCharge();
+    int refer_peak = envs[i]->getExpEnvPtr()->getReferPeakIdx();
     MatchEnvPtrVec charge_envs(2, nullptr);
     // we use non-overlapping envelopes here
     // Current charge stored in [ref_peak][charge-1]
     charge_envs[0] = candidates[refer_peak][charge-1];
-    double min_score = charge_envs[0]->getScore() * min_ratio;
-    if (charge >= multi_min_charge) {
+    double min_score = charge_envs[0]->getMsdeconvScore() * env_para_ptr->multiple_min_ratio_;
+    if (charge >= env_para_ptr->multiple_min_charge_) {
       double score_minus_one  = 0;
-      // Envelope for charge - 1
+      // Env for charge - 1
       if (charge > 1 && candidates[refer_peak][charge-2] != nullptr) {
-        score_minus_one = candidates[refer_peak][charge-2]->getScore();
+        score_minus_one = candidates[refer_peak][charge-2]->getMsdeconvScore();
       }
       double score_plus_one = 0;
-      // Envelope for charge + 1
+      // Env for charge + 1
       if (charge < static_cast<int>(candidates[0].size()) && candidates[refer_peak][charge] != nullptr) {
-        score_plus_one = candidates[refer_peak][charge]->getScore();
+        score_plus_one = candidates[refer_peak][charge]->getMsdeconvScore();
       }
       if (score_minus_one > score_plus_one && score_minus_one >= min_score) {
         charge_envs[1] = candidates[refer_peak][charge-2];
@@ -172,15 +172,15 @@ MatchEnvPtrVec addMultipleMass(MatchEnvPtrVec &envs, MatchEnvPtr2D &candidates,
         continue;
       }
       mass_envs.push_back(charge_envs[j]);
-      double mono_mass = charge_envs[j]->getRealEnvPtr()->getMonoNeutralMass();
-      RealEnvPtr real_env_ptr = charge_envs[j]->getRealEnvPtr();
+      double mono_mass = charge_envs[j]->getExpEnvPtr()->getMonoNeutralMass();
+      ExpEnvPtr real_env_ptr = charge_envs[j]->getExpEnvPtr();
       int refer_idx = real_env_ptr->getReferIdx();
-      if (mono_mass >= multi_min_mass) {
+      if (mono_mass >= env_para_ptr->multiple_min_mass_) {
         // check left -1 Dalton
         if (refer_idx > 0) {
           int p = real_env_ptr->getPeakIdx(refer_idx-1);
           if (p >=0 && candidates[p][charge-1] != nullptr &&
-              candidates[p][charge-1]->getScore() >= min_score) {
+              candidates[p][charge-1]->getMsdeconvScore() >= min_score) {
             mass_envs.push_back(candidates[p][charge-1]);
           }
         }
@@ -188,7 +188,7 @@ MatchEnvPtrVec addMultipleMass(MatchEnvPtrVec &envs, MatchEnvPtr2D &candidates,
         if (refer_idx < real_env_ptr->getPeakNum() - 1) {
           int p = real_env_ptr->getPeakIdx(refer_idx+1);
           if (p >=0 && candidates[p][charge-1] != nullptr &&
-              candidates[p][charge-1]->getScore() >= min_score) {
+              candidates[p][charge-1]->getMsdeconvScore() >= min_score) {
             mass_envs.push_back(candidates[p][charge-1]);
           }
         }
@@ -199,16 +199,16 @@ MatchEnvPtrVec addMultipleMass(MatchEnvPtrVec &envs, MatchEnvPtr2D &candidates,
 }
 
 DeconvMsPtr getDeconvMsPtr(MsHeaderPtr header_ptr, MatchEnvPtrVec &envs) {
+  std::sort(envs.begin(), envs.end(), MatchEnv::cmpEnvcnnScoreDec);
   DeconvPeakPtrVec peak_list;
-  int sp_id = header_ptr->getId();
+  int sp_id = header_ptr->getSpecId();
   for (size_t i = 0; i < envs.size(); i++) {
-    EnvelopePtr theo_env = envs[i]->getTheoEnvPtr();
-    RealEnvPtr real_env = envs[i]->getRealEnvPtr();
+    EnvPtr theo_env = envs[i]->getTheoEnvPtr();
+    ExpEnvPtr real_env = envs[i]->getExpEnvPtr();
     double pos = real_env->getMonoNeutralMass();
-    double inte = theo_env->compIntensitySum();
+    double inte = theo_env->compInteSum();
     int charge = theo_env->getCharge();
-    double score = envs[i]->getScore();
-
+    double score = envs[i]->getEnvcnnScore();
     DeconvPeakPtr peak_ptr = std::make_shared<DeconvPeak>(sp_id, i, pos, inte, charge, score);
     peak_list.push_back(peak_ptr);
   }

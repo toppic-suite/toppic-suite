@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -97,8 +97,8 @@ void EValueProcessor::process(bool is_separate) {
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
   double ppo = sp_para_ptr->getPeakTolerancePtr()->getPpo();
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
-  SimpleMsAlignReaderPtr reader_ptr = std::make_shared<SimpleMsAlignReader>(sp_file_name, group_spec_num,
-                                                                            sp_para_ptr->getActivationPtr());
+  MsAlignReaderPtr reader_ptr = std::make_shared<MsAlignReader>(sp_file_name, group_spec_num,
+                                                                sp_para_ptr->getActivationPtr());
 
   PrsmXmlWriterPtrVec writer_ptr_vec = 
       prsm_xml_writer_util::geneWriterPtrVec(output_file_name, mng_ptr_->thread_num_);
@@ -106,29 +106,35 @@ void EValueProcessor::process(bool is_separate) {
   SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(mng_ptr_->thread_num_);
 
   int cnt = 0;
-  SpectrumSetPtr spec_set_ptr;
-
-  while((spec_set_ptr = spectrum_set_factory::readNextSpectrumSetPtr(reader_ptr, sp_para_ptr))!= nullptr){
+  DeconvMsPtrVec deconv_ms_ptr_vec = reader_ptr->getNextMsPtrVec();
+  while (deconv_ms_ptr_vec.size() != 0) {
     cnt += group_spec_num;
-    if(spec_set_ptr->isValid()){
-      PrsmPtrVec selected_prsm_ptrs;
-      while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_set_ptr->getSpectrumId()) {
-        selected_prsm_ptrs.push_back(prsm_ptr);
-        prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
-      }
-      if (!mng_ptr_->use_gf_) {
-        processOneSpectrum(spec_set_ptr, selected_prsm_ptrs, ppo, is_separate, writer);
-      } else if (checkPrsms(selected_prsm_ptrs)) {
-        while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ + 2) {
-          boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+    MsHeaderPtr header_ptr = deconv_ms_ptr_vec[0]->getMsHeaderPtr();
+    if (header_ptr->containsPrec()) {
+      double prec_mono_mass = header_ptr->getFirstPrecMonoMass() - sp_para_ptr->getNTermLabelMass();
+      SpectrumSetPtr spec_set_ptr  
+        = spectrum_set_factory::geneSpectrumSetPtr(deconv_ms_ptr_vec,
+                                                   sp_para_ptr, prec_mono_mass);
+      if(spec_set_ptr->isValid()){
+        PrsmPtrVec selected_prsm_ptrs;
+        while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_set_ptr->getSpectrumId()) {
+          selected_prsm_ptrs.push_back(prsm_ptr);
+          prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
         }
-        pool_ptr->Enqueue(geneTask(spec_set_ptr, selected_prsm_ptrs, ppo, is_separate,
-                                   mng_ptr_, test_num_ptr_, pool_ptr, writer_ptr_vec));
+        if (!mng_ptr_->use_gf_) {
+          processOneSpectrum(spec_set_ptr, selected_prsm_ptrs, ppo, is_separate, writer);
+        } else if (checkPrsms(selected_prsm_ptrs)) {
+          while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ + 2) {
+            boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+          }
+          pool_ptr->Enqueue(geneTask(spec_set_ptr, selected_prsm_ptrs, ppo, is_separate,
+                                     mng_ptr_, test_num_ptr_, pool_ptr, writer_ptr_vec));
+        }
       }
     }
-
     std::cout << std::flush << "E-value computation - processing " << cnt << " of " 
         << spectrum_num << " spectra.\r";
+    deconv_ms_ptr_vec = reader_ptr->getNextMsPtrVec();
   }
   int remainder = spectrum_num - cnt;
   if (prsm_para_ptr->getGroupSpecNum() > remainder && remainder > 0){
@@ -215,7 +221,8 @@ void EValueProcessor::processOneSpectrum(SpectrumSetPtr spec_set_ptr,
       compEvalues(spec_set_ptr, sele_prsm_ptrs, ppo, is_separate);
     }
 
-    std::sort(sele_prsm_ptrs.begin(), sele_prsm_ptrs.end(), Prsm::cmpEValueInc);
+    std::sort(sele_prsm_ptrs.begin(), sele_prsm_ptrs.end(),
+              Prsm::cmpEValueIncProtInc);
     writer.writeVector(sele_prsm_ptrs);
   }
 }
