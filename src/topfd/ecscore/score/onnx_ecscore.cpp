@@ -43,7 +43,8 @@ void initModel(const std::string &dir_name, int thread_num) {
   session_options->SetIntraOpNumThreads(thread_num);
 
 #ifdef _WIN32
-  const wchar_t* model_path = L"ecscore_seven_attr.onnx";
+  std::wstring widestr = std::wstring(file_name.begin(), file_name.end());
+  const wchar_t* model_path = widestr.c_str();
 #else
   const char* model_path = file_name.c_str();
 #endif
