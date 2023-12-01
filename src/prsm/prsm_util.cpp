@@ -183,8 +183,9 @@ void addFeatureIDToPrsms(PrsmStrPtrVec &prsm_ptrs, const std::string & feature_f
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     int spec_id = prsm_ptrs[i]->getSpectrumId();
     int sample_feature_id = prsm_ptrs[i]->getSampleFeatureId();
+    LOG_ERROR(spec_id << " " << sample_feature_id);
     if (feature_map.find(sample_feature_id) != feature_map.end()) { 
-      SpecFeaturePtr feature = feature_map.find(spec_id)->second;
+      SpecFeaturePtr feature = feature_map.find(sample_feature_id)->second;
       if (feature != nullptr) {
         prsm_ptrs[i]->setPrecFeatureInte(feature->getSampleFeatureInte());
         prsm_ptrs[i]->setFracFeatureScore(feature->getFracFeatureScore());
