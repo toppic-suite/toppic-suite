@@ -17,6 +17,7 @@
 
 #include <vector>
 
+#include "common/xml/xml_dom_document.hpp"
 #include "ms/msmap/ms_map_peak.hpp"
 #include "topfd/ecscore/env/seed_env.hpp"
 
@@ -31,6 +32,8 @@ class MsMapEnv {
   std::vector<double> getMzList();
 
   int getPeakNum() { return peak_list_.size(); }
+
+  double getInteSum(); 
 
   MsMapPeakPtr getPeakPtr(int idx) { return peak_list_[idx]; }
 
@@ -47,6 +50,8 @@ class MsMapEnv {
   double compTopThreeInteSum(int ref_idx);
 
   void removeLowIntePeaks(SeedEnvPtr seed_ptr, double ratio, double min_inte);
+
+  void appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 
  private:
   int spec_id_;

@@ -48,7 +48,7 @@ class Peak {
 
   void shiftPosition(double shift) {position_ = position_ + shift;}
 
-  void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
+  void appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 
   static std::string getXmlElementName() {return "peak";}
 

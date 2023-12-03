@@ -12,6 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include "common/util/logger.hpp"
+#include "common/util/str_util.hpp"
 #include "ms/spec/peak_util.hpp"
 #include "ms/env/env_base.hpp"
 #include "topfd/ecscore/env/seed_env.hpp"
@@ -129,6 +131,28 @@ std::string SeedEnv::getString() {
       + std::to_string(peak->getIntensity()) + "), ";
   peaks = peaks + ")\n";
   return header + peaks;
+}
+
+void SeedEnv::appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
+  std::string element_name = "seed_envelope";
+  XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
+  std::string str = str_util::toString(spec_id_);
+  xml_doc->addElement(element, "spec_id", str.c_str());
+  str = str_util::toString(seed_inte_);
+  xml_doc->addElement(element, "seed_inte", str.c_str());
+  str = str_util::toString(getMonoNeutralMass());
+  xml_doc->addElement(element, "mono_mass", str.c_str());
+  str = str_util::toString(getCharge());
+  xml_doc->addElement(element, "charge", str.c_str());
+  str = str_util::toString(getReferMz());
+  xml_doc->addElement(element, "refer_mz", str.c_str());
+  element_name = "peak_list";
+  XmlDOMElement* peak_list = xml_doc->createElement(element_name.c_str());
+  for (size_t i = 0; i < peak_ptr_list_.size(); i++) {
+    peak_ptr_list_[i]->appendToXml(xml_doc, peak_list);
+  }
+  element->appendChild(peak_list);
+  parent->appendChild(element);
 }
 
 }

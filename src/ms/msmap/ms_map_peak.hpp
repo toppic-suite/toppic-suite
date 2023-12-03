@@ -15,6 +15,8 @@
 #ifndef TOPPIC_MS_MS_MAP_MS_MAP_PEAK_HPP
 #define TOPPIC_MS_MS_MAP_MS_MAP_PEAK_HPP
 
+#include "common/util/str_util.hpp"
+#include "common/xml/xml_dom_document.hpp"
 #include "ms/spec/peak.hpp"
 
 namespace toppic {
@@ -32,6 +34,8 @@ class MsMapPeak : public Peak {
   bool getNeighbor() const { return neighbor_; }
 
   void setNeighbor(bool neighbor) { neighbor_ = neighbor; }
+
+  void appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 
  private:
   double ori_inte_;

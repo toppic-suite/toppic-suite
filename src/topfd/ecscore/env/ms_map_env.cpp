@@ -14,6 +14,7 @@
 
 
 #include "common/util/logger.hpp"
+#include "common/util/str_util.hpp"
 
 #include "topfd/ecscore/env/ms_map_env.hpp"
 
@@ -60,6 +61,16 @@ std::vector<double> MsMapEnv::getMzList() {
   return pos_list;
 }
 
+double MsMapEnv::getInteSum() {
+  double sum = 0;
+  for (auto p: peak_list_) {
+    if (p != nullptr)
+      sum = sum + p->getIntensity();
+  }
+  return sum;
+}
+
+
 double MsMapEnv::compTopThreeInteSum(int ref_idx) {
   double sum = 0;
   if (peak_list_[ref_idx] != nullptr) {
@@ -84,6 +95,24 @@ void MsMapEnv::removeLowIntePeaks(SeedEnvPtr seed_ptr, double ratio,
       peak_list_[i] = nullptr;
     }
   }
+}
+
+void MsMapEnv::appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
+  std::string element_name = "ms_map_envelope";
+  XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
+  std::string str = str_util::toString(spec_id_);
+  xml_doc->addElement(element, "spec_id", str.c_str());
+  str = str_util::toString(getInteSum());
+  xml_doc->addElement(element, "inte_sum", str.c_str());
+  element_name = "peak_list";
+  XmlDOMElement* peak_list_elem = xml_doc->createElement(element_name.c_str());
+  for (size_t i = 0; i < peak_list_.size(); i++) {
+    if (peak_list_[i] != nullptr) {
+      peak_list_[i]->appendToXml(xml_doc, peak_list_elem);
+    }
+  }
+  element->appendChild(peak_list_elem);
+  parent->appendChild(element);
 }
 
 }

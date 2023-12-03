@@ -323,7 +323,7 @@ void Env::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   str = str_util::toString(mono_mz_);
   xml_doc->addElement(element, "mono_mz", str.c_str());
   for (size_t i = 0; i < peak_ptr_list_.size(); i++) {
-    peak_ptr_list_[i]->appendXml(xml_doc, element);
+    peak_ptr_list_[i]->appendToXml(xml_doc, element);
   }
   parent->appendChild(element);
 }

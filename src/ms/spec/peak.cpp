@@ -22,7 +22,7 @@ Peak::Peak(const double position, const double intensity):
       position_(position), 
       intensity_(intensity) {}
 
-void Peak::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
+void Peak::appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
   std::string element_name = Peak::getXmlElementName();
   XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
   std::string str = str_util::toString(getPosition());

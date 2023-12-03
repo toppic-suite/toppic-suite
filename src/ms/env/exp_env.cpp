@@ -137,7 +137,7 @@ void ExpEnv::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   str = str_util::toString(max_consecutive_peak_num_);
   xml_doc->addElement(element, "max_consecutive_peak_num", str.c_str());
   for (size_t i = 0; i < peak_ptr_list_.size(); i++) {
-    peak_ptr_list_[i]->appendXml(xml_doc, element);
+    peak_ptr_list_[i]->appendToXml(xml_doc, element);
   }
   parent->appendChild(element);
 }

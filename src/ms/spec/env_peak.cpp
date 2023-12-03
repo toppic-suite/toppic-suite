@@ -47,8 +47,8 @@ EnvPeak::EnvPeak(XmlDOMElement* element):
       idx_ = xml_dom_util::getIntChildValue(element, "index", 0);
     }
 
-void EnvPeak::appendXml(XmlDOMDocument* xml_doc, 
-                        XmlDOMElement* parent) {
+void EnvPeak::appendToXml(XmlDOMDocument* xml_doc, 
+                          XmlDOMElement* parent) {
   std::string element_name = EnvPeak::getXmlElementName();
   XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
   std::string str = str_util::toString(getPosition());
