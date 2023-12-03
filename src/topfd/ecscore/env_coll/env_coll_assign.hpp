@@ -40,6 +40,9 @@ void assignEnvColls(FracFeaturePtrVec &frac_features,
                     TopfdParaPtr topfd_para_ptr,
                     EcscoreParaPtr score_para_ptr); 
 
+bool checkEnvColl(MsHeaderPtr header_ptr, 
+                  EnvCollPtrVec &env_coll_list); 
+
 
 }
 

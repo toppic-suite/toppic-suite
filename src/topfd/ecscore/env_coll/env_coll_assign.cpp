@@ -29,6 +29,46 @@ namespace toppic {
 
 namespace env_coll_assign {
 
+bool checkEnvColl(MsHeaderPtr header_ptr, EnvCollPtrVec &env_coll_list) {
+  int ms1_id = header_ptr->getMsOneId();
+  double prec_win_bgn = header_ptr->getPrecWinBegin();
+  double prec_win_end = header_ptr->getPrecWinEnd();
+
+  SpecFeaturePtrVec new_spec_feats;
+  for (size_t coll_id = 0; coll_id < env_coll_list.size(); coll_id++) {
+    // check retention time range
+    if (ms1_id < env_coll_list[coll_id]->getStartSpecId() 
+        || ms1_id > env_coll_list[coll_id]->getEndSpecId()) {
+      continue;
+    }
+    EnvSetPtrVec env_sets = env_coll_list[coll_id]->getEnvSetList();
+    double feature_mono_mass = env_coll_list[coll_id]->getMonoNeutralMass();
+    double feature_avg_mass = EnvBase::convertMonoMassToAvgMass(feature_mono_mass); 
+    for (size_t env_set_id = 0; env_set_id < env_sets.size(); env_set_id++) {
+      EnvSetPtr env_set_ptr = env_sets[env_set_id];
+      double mz = peak_util::compMz(feature_avg_mass, env_set_ptr->getCharge());
+      // check precsor window
+      // this part needs to be improved to consider only peaks in the window
+      if (mz < prec_win_bgn || mz > prec_win_end) {
+        continue;
+      }
+      // check retentime time range
+      if (ms1_id < env_set_ptr->getStartSpecId() 
+          || ms1_id > env_set_ptr->getEndSpecId()) {
+        continue;
+      }
+      // get intensity information
+      std::vector<double> env_intes = env_set_ptr->getXicPtr()->getAllPeakInteList();
+      if (env_intes.size() == 0) {
+        LOG_WARN("Empty envelope intensity list!");
+        continue; 
+      }
+      return true;
+    }
+  }
+  return false;
+}
+
 bool getHighestInteEnvColl(FracFeaturePtrVec &frac_features, EnvCollPtrVec &env_coll_list,
                            MsHeaderPtr header_ptr, double score_thresh, 
                            SpecFeaturePtrVec &ms2_features) {
@@ -213,11 +253,13 @@ void assignEnvColls(FracFeaturePtrVec &frac_feature_list,
         assigned = getHighestInteEnvColl(frac_feature_list, env_coll_list,  
                                          header_ptr, score_cutoff, ms2_feature_list);
       }
+      /*
       if (!assigned) {
         assigned = getNewEnvColl(header_ptr, ms1_idx, matrix_ptr, score_para_ptr, ecscore_list, 
                                  env_coll_list, ms1_ptr_vec, seed_ptr_2d, 
                                  frac_feature_list, ms2_feature_list); 
       }
+      */
       if (!assigned) {
         LOG_INFO("Scan " << header_ptr->getFirstScanNum() << " does not have MS1 feature!");
       }
