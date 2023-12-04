@@ -73,15 +73,19 @@ double MsMapEnv::getInteSum() {
 
 double MsMapEnv::compTopThreeInteSum(int ref_idx) {
   double sum = 0;
-  if (peak_list_[ref_idx] != nullptr) {
+  int peak_num = peak_list_.size();
+  if (ref_idx >= 0 && ref_idx < peak_num 
+      && peak_list_[ref_idx] != nullptr) {
     sum += peak_list_[ref_idx]->getIntensity();
   }
   int left_idx = ref_idx - 1;
-  if (left_idx >= 0 && peak_list_[left_idx] != nullptr) {
+  if (left_idx >= 0 && left_idx < peak_num 
+      && peak_list_[left_idx] != nullptr) {
     sum += peak_list_[left_idx]->getIntensity();
   }
-  size_t right_idx = ref_idx + 1;
-  if (right_idx < peak_list_.size() && peak_list_[right_idx] != nullptr) {
+  int right_idx = ref_idx + 1;
+  if (right_idx >= 0 && right_idx < peak_num 
+      && peak_list_[right_idx] != nullptr) {
     sum += peak_list_[right_idx]->getIntensity();
   }
   return sum;
