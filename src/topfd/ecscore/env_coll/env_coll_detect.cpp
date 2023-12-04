@@ -125,11 +125,11 @@ void process(TopfdParaPtr topfd_para_ptr) {
       env_coll_ptr->refineMonoMass();
       ECScorePtr ecscore_ptr = std::make_shared<ECScore>(env_coll_ptr, matrix_ptr,
                                                          feat_id, sn_ratio); 
-      ecscore_list.push_back(ecscore_ptr);
       env_coll_ptr->removePeakData(matrix_ptr);
       if (ecscore_ptr->getScore() < topfd_para_ptr->getEcscoreCutoff()) {
         continue;
       }
+      ecscore_list.push_back(ecscore_ptr);
       env_coll_ptr->setEcscore(ecscore_ptr->getScore());
       env_coll_list.push_back(env_coll_ptr);
       FracFeaturePtr frac_feat_ptr = env_coll_util::getFracFeature(feat_id, deconv_ms1_ptr_vec, 
