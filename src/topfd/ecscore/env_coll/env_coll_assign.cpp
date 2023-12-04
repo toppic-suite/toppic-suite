@@ -233,33 +233,21 @@ bool getNewEnvColl(MsHeaderPtr header_ptr, int ms1_idx, MsMapPtr matrix_ptr,
 
 void assignEnvColls(FracFeaturePtrVec &frac_feature_list,
                     EnvCollPtrVec &env_coll_list,
-                    ECScorePtrVec &ecscore_list,
-                    MsMapPtr matrix_ptr,
-                    DeconvMsPtrVec &ms1_ptr_vec,
                     MsHeaderPtr2D &ms2_header_ptr_2d,
-                    SeedEnvPtr2D &seed_ptr_2d,
-                    SpecFeaturePtrVec &ms2_feature_list,
-                    TopfdParaPtr topfd_para_ptr,
-                    EcscoreParaPtr score_para_ptr) {
-  double score_cutoff = topfd_para_ptr->getEcscoreCutoff();
-  for (size_t ms1_idx = 0; ms1_idx < ms1_ptr_vec.size(); ms1_idx++) {
+                    SpecFeaturePtrVec &ms2_feature_list, 
+                    double score_cutoff) {
+  for (size_t ms1_idx = 0; ms1_idx < ms2_header_ptr_2d.size(); ms1_idx++) {
     for (size_t i = 0; i < ms2_header_ptr_2d[ms1_idx].size(); i++) {
       MsHeaderPtr header_ptr = ms2_header_ptr_2d[ms1_idx][i];
       bool assigned = getHighestInteEnvColl(frac_feature_list, env_coll_list,  
                                             header_ptr, score_cutoff, ms2_feature_list);
       if (!assigned) {
-        // lower the cutoff to 0
+        // lower the cutoff to 0. This step is necessary when low intensity
+        // features are added.
         score_cutoff = 0;
         assigned = getHighestInteEnvColl(frac_feature_list, env_coll_list,  
                                          header_ptr, score_cutoff, ms2_feature_list);
       }
-      /*
-      if (!assigned) {
-        assigned = getNewEnvColl(header_ptr, ms1_idx, matrix_ptr, score_para_ptr, ecscore_list, 
-                                 env_coll_list, ms1_ptr_vec, seed_ptr_2d, 
-                                 frac_feature_list, ms2_feature_list); 
-      }
-      */
       if (!assigned) {
         LOG_INFO("Scan " << header_ptr->getFirstScanNum() << " does not have MS1 feature!");
       }

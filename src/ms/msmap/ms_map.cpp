@@ -77,7 +77,7 @@ void MsMap::initMap(PeakPtrVec2D &raw_peak_2d, DeconvMsPtrVec &ms1_ptr_vec, doub
   }
 }
 
-void MsMap::reconstruct(DeconvMsPtrVec &ms1_ptr_vec, double sn_ratio) {
+void MsMap::reconstruct(double sn_ratio) {
   for (size_t row_id = 0; row_id < row_ptr_list_.size(); row_id++) {
     MsMapRowPtr row_ptr = row_ptr_list_[row_id];
     MsMapRowHeaderPtr row_header_ptr = row_ptr->getHeaderPtr(); 

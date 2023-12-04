@@ -47,6 +47,7 @@ class TopfdPara {
   bool isOutputCsvFeatureFile() {return output_csv_feature_file_;}
   int getThreadNum() {return thread_num_;}
   double getEcscoreCutoff() {return ecscore_cutoff_;}
+  bool isSearchPrecWindow() {return search_prec_window_;}
 
   std::string getMzmlFileName() {return mzml_file_name_;}
   std::string getOutputBaseName() {return output_base_name_;}
@@ -99,6 +100,7 @@ class TopfdPara {
   std::string activation_ = "FILE";
   bool gene_html_folder_ = true;
   double ecscore_cutoff_ = 0.5;
+  bool search_prec_window_ = false;
 
   //** Fixed parameter setting **
   // estimate min intensity using thrash method. 

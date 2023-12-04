@@ -140,7 +140,7 @@ EnvCollPtr findEnvCollWithSingleEnv(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
                                     EcscoreParaPtr para_ptr, double sn_ratio) {
   EnvSetPtr env_set_ptr = env_set_util::searchEnvSet(matrix_ptr, seed_ptr, para_ptr, sn_ratio);
   if (env_set_ptr == nullptr) {
-    LOG_WARN("Envelope set is empty!");
+    LOG_INFO("Envelope set is empty!");
     return nullptr; 
   }
   env_set_ptr->refineXicBoundary();
