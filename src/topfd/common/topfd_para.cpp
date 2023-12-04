@@ -112,7 +112,7 @@ std::string TopfdPara::getParaStr(const std::string &prefix,
       << "Use single scan noise level in MS1 feature detection:" << sep << "No" << std::endl;
   }
   output << prefix << std::setw(gap) << std::left 
-      << "EC score cutoff:          " << sep  << ecscore_cutoff_ << std::endl;
+      << "ECScore cutoff:           " << sep  << ecscore_cutoff_ << std::endl;
   if (search_prec_window_) {
     output << prefix << std::setw(gap) << std::left 
       << "Additional feature search:" << sep << "Yes" << std::endl;

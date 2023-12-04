@@ -42,9 +42,9 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string ms_two_sn_ratio = "";
   std::string ms_one_sn_ratio = "";
   std::string prec_window = "";
-  std::string merged_file_name = "";
   std::string thread_number = "";
   std::string activation = "";
+  std::string ecscore_cutoff = "";
 
   // Define and parse the program options
   try {
@@ -67,8 +67,12 @@ bool Argument::parse(int argc, char* argv[]) {
          "<a positive number>. Set the signal-to-noise ratio for MS/MS spectra. The default value is 1.")
         ("precursor-window,w", po::value<std::string> (&prec_window),
          "<a positive number>. Set the default precursor window size. The default value is 3.0 m/z. When the input file contains the information of precursor windows, the parameter will be ignored.")
+        ("ecscore-cutoff,t", po::value<std::string> (&ecscore_cutoff),
+         "<a positive number in [0,1]>. Set the ECScore cutoff value for proteoform features. The default value is 0.5.")
         ("msdeconv,n", "Use the MS-Deconv score to rank isotopic envelopes.")
         ("missing-level-one,o","MS1 spectra are missing in the input file.")
+        ("single-scan-noise,i","Use the peak intensity noise levels in single MS1 scans to filter out low intensity peaks in proteoform feature detection. The default method is to use the peak intensity noise level of the whole LC-MS map to filter out low intensity peaks.")
+        ("additional-feature-search,f","Perform additional feature search for MS/MS scans that do not have proteoform features in their precursor isolation windows.")
         ("thread-number,u", po::value<std::string> (&thread_number), "<a positive integer>. Number of threads used in spectral deconvolution. Default value: 1.")
         ("skip-html-folder,g","Skip the generation of HTML files for visualization.")
         ("disable-final-filtering,d","Skip the final filtering of envelopes.")
@@ -84,14 +88,17 @@ bool Argument::parse(int argc, char* argv[]) {
         ("ms-one-sn-ratio,r", po::value<std::string> (&ms_one_sn_ratio), "")
         ("ms-two-sn-ratio,s", po::value<std::string> (&ms_two_sn_ratio), "")
         ("precursor-window,w", po::value<std::string> (&prec_window), "")
+        ("ecscore-cutoff,t", po::value<std::string> (&ecscore_cutoff), "")
         ("missing-level-one,o", "")
+        ("single-scan-noise,i","")
+        ("additional-feature-search,f","")
         ("thread-number,u", po::value<std::string> (&thread_number), "")
         ("skip-html-folder,g","")
-        ("keep,k", "Report monoisotopic masses extracted from low quality isotopic envelopes.")
         ("msdeconv,n", "")
+        ("disable-final-filtering,d", "")
+        ("keep,k", "Report monoisotopic masses extracted from low quality isotopic envelopes.")
         ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), 
          "Spectrum file name with its path.")
-         ("disable-final-filtering,d", "")
         ;
 
     po::positional_options_description positional_options;
@@ -171,6 +178,18 @@ bool Argument::parse(int argc, char* argv[]) {
 
     if (vm.count("precursor-window")) {
         topfd_para_ptr_->setPrecWindowWidth(std::stod(prec_window));
+    }
+
+    if (vm.count("ecscore-cutoff")) {
+      topfd_para_ptr_->setEcscoreCutoff(std::stod(ecscore_cutoff));
+    }
+
+    if (vm.count("single-scan-noise")) {
+      topfd_para_ptr_->setUseSingleScanNoiseLevel(true);
+    }
+
+    if (vm.count("additional-feature-search")) {
+      topfd_para_ptr_->setSearchPrecWindow(true);
     }
 
     if (vm.count("spectrum-file-name")) {
