@@ -117,28 +117,28 @@ void process(TopfdParaPtr topfd_para_ptr) {
     if (seed_ptr == nullptr) continue;
     EnvCollPtr env_coll_ptr = env_coll_util::findEnvColl(matrix_ptr, seed_ptr,
                                                          score_para_ptr, sn_ratio); 
-    if (env_coll_ptr != nullptr) {
-      if (env_coll_util::checkExistingFeatures(matrix_ptr, env_coll_ptr,
-                                               env_coll_list, score_para_ptr)) {
-        continue;
-      }
-      env_coll_ptr->refineMonoMass();
-      ECScorePtr ecscore_ptr = std::make_shared<ECScore>(env_coll_ptr, matrix_ptr,
-                                                         feat_id, sn_ratio); 
+    if (env_coll_ptr == nullptr) continue;
+    if (env_coll_util::checkExistingFeatures(matrix_ptr, env_coll_ptr,
+                                             env_coll_list, score_para_ptr)) {
       env_coll_ptr->removePeakData(matrix_ptr);
-      if (ecscore_ptr->getScore() < topfd_para_ptr->getEcscoreCutoff()) {
-        continue;
-      }
-      ecscore_list.push_back(ecscore_ptr);
-      env_coll_ptr->setEcscore(ecscore_ptr->getScore());
-      env_coll_list.push_back(env_coll_ptr);
-      FracFeaturePtr frac_feat_ptr = env_coll_util::getFracFeature(feat_id, deconv_ms1_ptr_vec, 
-                                                                   score_para_ptr->frac_id_,
-                                                                   score_para_ptr->file_name_,
-                                                                   env_coll_ptr, matrix_ptr, sn_ratio);
-      frac_features.push_back(frac_feat_ptr);
-      feat_id++;
+      continue;
     }
+    env_coll_ptr->refineMonoMass();
+    ECScorePtr ecscore_ptr = std::make_shared<ECScore>(env_coll_ptr, matrix_ptr,
+                                                       feat_id, sn_ratio); 
+    if (ecscore_ptr->getScore() < topfd_para_ptr->getEcscoreCutoff()) {
+      continue;
+    }
+    ecscore_list.push_back(ecscore_ptr);
+    env_coll_ptr->setEcscore(ecscore_ptr->getScore());
+    env_coll_ptr->removePeakData(matrix_ptr);
+    env_coll_list.push_back(env_coll_ptr);
+    FracFeaturePtr frac_feat_ptr = env_coll_util::getFracFeature(feat_id, deconv_ms1_ptr_vec, 
+                                                                 score_para_ptr->frac_id_,
+                                                                 score_para_ptr->file_name_,
+                                                                 env_coll_ptr, matrix_ptr, sn_ratio);
+    frac_features.push_back(frac_feat_ptr);
+    feat_id++;
   }
   
   // map MS2 features
