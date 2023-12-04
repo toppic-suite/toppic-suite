@@ -33,4 +33,10 @@ void MsMapRow::print() {
     }
   }
 }
+
+void MsMapRow::clearPeaks() {
+  for (size_t i = 0; i < peak_ptr_2d_.size(); i++) {
+    peak_ptr_2d_[i].clear();
+  }
+}
 }

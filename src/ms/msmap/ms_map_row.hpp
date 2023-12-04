@@ -40,6 +40,8 @@ class MsMapRow {
 
   void setPeakPtrVec(int i, MsMapPeakPtrVec &peak_ptr_vec) { peak_ptr_2d_[i] = peak_ptr_vec;}
 
+  void clearPeaks();
+
   void print();
 
  private:

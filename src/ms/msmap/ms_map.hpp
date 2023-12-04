@@ -52,6 +52,8 @@ class MsMap {
   void setBinPeakList(int row_idx, int bin_idx, MsMapPeakPtrVec &peaks) {
     return row_ptr_list_[row_idx]->setPeakPtrVec(bin_idx, peaks);}
 
+  void reconstruct(DeconvMsPtrVec &ms1_ptr_vec, double sn_ratio); 
+
  private:
   void initMap(PeakPtrVec2D &raw_peak_2d, DeconvMsPtrVec &ms1_ptr_vec, double sn_ratio);
 
@@ -65,7 +67,7 @@ class MsMap {
   double max_mz_;
   double base_inte_;
 
-  MsMapPeakPtrVec peaks_;
+  MsMapPeakPtr2D peaks_;
 };
 
 typedef std::shared_ptr<MsMap> MsMapPtr;

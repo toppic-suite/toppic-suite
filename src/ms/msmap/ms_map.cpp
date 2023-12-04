@@ -62,14 +62,35 @@ void MsMap::initMap(PeakPtrVec2D &raw_peak_2d, DeconvMsPtrVec &ms1_ptr_vec, doub
     MsMapRowPtr row_ptr = std::make_shared<MsMapRow>(row_header_ptr, col_num_);
     row_ptr_list_.push_back(row_ptr);
     // init indexes
+    MsMapPeakPtrVec ms_map_row_peaks;
     for (size_t j = 0; j < row_peaks.size(); j++) {
       PeakPtr p_ptr = row_peaks[j];
       MsMapPeakPtr new_peak_ptr = std::make_shared<MsMapPeak>(p_ptr);
-      peaks_.push_back(new_peak_ptr);
+      ms_map_row_peaks.push_back(new_peak_ptr);
       // filter low intensity peak
       if (new_peak_ptr->getIntensity() > sn_ratio * base_inte_) {
         int bin_idx = getColIndex(new_peak_ptr->getPosition());
         row_ptr_list_[row_id]->addPeak(bin_idx, new_peak_ptr);
+      }
+    }
+    peaks_.push_back(ms_map_row_peaks);
+  }
+}
+
+void MsMap::reconstruct(DeconvMsPtrVec &ms1_ptr_vec, double sn_ratio) {
+  for (size_t row_id = 0; row_id < row_ptr_list_.size(); row_id++) {
+    MsMapRowPtr row_ptr = row_ptr_list_[row_id];
+    MsMapRowHeaderPtr row_header_ptr = row_ptr->getHeaderPtr(); 
+    //double row_base_inte = row_header_ptr->getBaseInte();
+    MsMapPeakPtrVec row_peaks = peaks_[row_id];
+    row_ptr->clearPeaks();
+    // init indexes
+    for (size_t j = 0; j < row_peaks.size(); j++) {
+      MsMapPeakPtr new_peak_ptr = row_peaks[j]; 
+      // filter low intensity peak
+      if (new_peak_ptr->getIntensity() > sn_ratio * base_inte_) {
+        int bin_idx = getColIndex(new_peak_ptr->getPosition());
+        row_ptr->addPeak(bin_idx, new_peak_ptr);
       }
     }
   }
@@ -115,8 +136,11 @@ void MsMap::findNeighbors(int row_id, int search_bin_num, double mass_tol) {
 
 void MsMap::removeNonNeighbors(double mass_tol) {
   int search_bin_num = int(mass_tol / bin_size_) + 1;
-  for (auto peak: peaks_) {
-    peak->setNeighbor(false);
+  for (size_t i = 0; i < peaks_.size(); i++) {
+    MsMapPeakPtrVec ms_map_row_peaks = peaks_[i];
+    for (auto peak: ms_map_row_peaks) {
+      peak->setNeighbor(false);
+    }
   }
   size_t row_num = getRowNum();
   for (size_t row_id = 0; row_id < row_num - 1; row_id++) {
