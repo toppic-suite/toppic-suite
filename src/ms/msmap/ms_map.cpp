@@ -22,7 +22,7 @@
 namespace toppic {
 
 MsMap::MsMap(PeakPtrVec2D &raw_peak_2d, DeconvMsPtrVec &ms1_ptr_vec,
-             double bin_size, double sn_ratio) {
+             double bin_size, double sn_ratio, bool single_scan_noise) {
   bin_size_ = bin_size;
   /// get min mz value
   std::vector<double> intes;
@@ -37,14 +37,16 @@ MsMap::MsMap(PeakPtrVec2D &raw_peak_2d, DeconvMsPtrVec &ms1_ptr_vec,
   min_mz_ = *std::min_element(mz.begin(), mz.end());
   max_mz_ = *std::max_element(mz.begin(), mz.end());
   base_inte_ = baseline_util::getBaseLine(intes);
-    col_num_ = int((max_mz_ - min_mz_) / bin_size_) + 1;
+  col_num_ = int((max_mz_ - min_mz_) / bin_size_) + 1;
   LOG_DEBUG("Data Level Noise Intensity Level: " << base_inte_);
   LOG_DEBUG("Min and Max m/z values: " << min_mz_ << " , " << max_mz_);
 
-  initMap(raw_peak_2d, ms1_ptr_vec, sn_ratio);
+  initMap(raw_peak_2d, ms1_ptr_vec, sn_ratio, single_scan_noise);
 }
 
-void MsMap::initMap(PeakPtrVec2D &raw_peak_2d, DeconvMsPtrVec &ms1_ptr_vec, double sn_ratio) {
+void MsMap::initMap(PeakPtrVec2D &raw_peak_2d, DeconvMsPtrVec &ms1_ptr_vec, 
+                    double sn_ratio, bool single_scan_noise) {
+  double base_inte = base_inte_;
   for (size_t row_id = 0; row_id < ms1_ptr_vec.size(); row_id++) {
     MsHeaderPtr ms_header_ptr = ms1_ptr_vec[row_id]->getMsHeaderPtr();
     MsMapRowHeaderPtr row_header_ptr = std::make_shared<MsMapRowHeader>(ms_header_ptr->getSpecId(),
@@ -55,9 +57,13 @@ void MsMap::initMap(PeakPtrVec2D &raw_peak_2d, DeconvMsPtrVec &ms1_ptr_vec, doub
     std::vector<double> intes;
     for (auto &peak: row_peaks) { intes.push_back(peak->getIntensity()); }
     double row_base_inte = 0.0;
-    if (std::accumulate(intes.begin(), intes.end(), 0.0) > 0)
+    if (std::accumulate(intes.begin(), intes.end(), 0.0) > 0) {
       row_base_inte = baseline_util::getBaseLine(intes);
+    }
     row_header_ptr->setBaseInte(row_base_inte);
+    if (single_scan_noise) {
+      base_inte = row_base_inte;
+    }
     // add a new row
     MsMapRowPtr row_ptr = std::make_shared<MsMapRow>(row_header_ptr, col_num_);
     row_ptr_list_.push_back(row_ptr);
@@ -68,7 +74,7 @@ void MsMap::initMap(PeakPtrVec2D &raw_peak_2d, DeconvMsPtrVec &ms1_ptr_vec, doub
       MsMapPeakPtr new_peak_ptr = std::make_shared<MsMapPeak>(p_ptr);
       ms_map_row_peaks.push_back(new_peak_ptr);
       // filter low intensity peak
-      if (new_peak_ptr->getIntensity() > sn_ratio * base_inte_) {
+      if (new_peak_ptr->getIntensity() > sn_ratio * base_inte) {
         int bin_idx = getColIndex(new_peak_ptr->getPosition());
         row_ptr_list_[row_id]->addPeak(bin_idx, new_peak_ptr);
       }
@@ -77,18 +83,21 @@ void MsMap::initMap(PeakPtrVec2D &raw_peak_2d, DeconvMsPtrVec &ms1_ptr_vec, doub
   }
 }
 
-void MsMap::reconstruct(double sn_ratio) {
+void MsMap::reconstruct(double sn_ratio, bool single_scan_noise) {
+  double base_inte = base_inte_;
   for (size_t row_id = 0; row_id < row_ptr_list_.size(); row_id++) {
     MsMapRowPtr row_ptr = row_ptr_list_[row_id];
     MsMapRowHeaderPtr row_header_ptr = row_ptr->getHeaderPtr(); 
-    //double row_base_inte = row_header_ptr->getBaseInte();
+    if (single_scan_noise) {
+      base_inte = row_header_ptr->getBaseInte();
+    }
     MsMapPeakPtrVec row_peaks = peaks_[row_id];
     row_ptr->clearPeaks();
     // init indexes
     for (size_t j = 0; j < row_peaks.size(); j++) {
       MsMapPeakPtr new_peak_ptr = row_peaks[j]; 
       // filter low intensity peak
-      if (new_peak_ptr->getIntensity() > sn_ratio * base_inte_) {
+      if (new_peak_ptr->getIntensity() > sn_ratio * base_inte) {
         int bin_idx = getColIndex(new_peak_ptr->getPosition());
         row_ptr->addPeak(bin_idx, new_peak_ptr);
       }

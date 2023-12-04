@@ -24,7 +24,7 @@ class MsMap {
  public:
 
   MsMap(PeakPtrVec2D &raw_peak_2d, DeconvMsPtrVec &ms1_ptr_vec,
-        double bin_size, double sn_ratio);
+        double bin_size, double sn_ratio, bool single_scan_noise);
 
   int getColNum() { return col_num_; }
 
@@ -52,10 +52,11 @@ class MsMap {
   void setBinPeakList(int row_idx, int bin_idx, MsMapPeakPtrVec &peaks) {
     return row_ptr_list_[row_idx]->setPeakPtrVec(bin_idx, peaks);}
 
-  void reconstruct(double sn_ratio); 
+  void reconstruct(double sn_ratio, bool single_scan_noise); 
 
  private:
-  void initMap(PeakPtrVec2D &raw_peak_2d, DeconvMsPtrVec &ms1_ptr_vec, double sn_ratio);
+  void initMap(PeakPtrVec2D &raw_peak_2d, DeconvMsPtrVec &ms1_ptr_vec, 
+               double sn_ratio, bool single_scan_noise);
 
   void findNeighbors(int spec_id, int search_bin_num, double mass_tol);
 

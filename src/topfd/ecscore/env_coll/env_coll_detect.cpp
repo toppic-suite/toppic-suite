@@ -89,9 +89,11 @@ void process(TopfdParaPtr topfd_para_ptr) {
   // write_out_files::write_seed_envelopes(seed_envs, "envs.csv");
 
   double sn_ratio = topfd_para_ptr->getMsOneSnRatio();
+  bool single_scan_noise = topfd_para_ptr->isUseSingleScanNoiseLevel();
   /// Prepare data -- Peak Matrix
   MsMapPtr matrix_ptr = std::make_shared<MsMap>(ms1_mzml_peaks, deconv_ms1_ptr_vec,
-                                                score_para_ptr->bin_size_, sn_ratio);
+                                                score_para_ptr->bin_size_,
+                                                sn_ratio, single_scan_noise);
 
   if (score_para_ptr->filter_neighboring_peaks_) {
     matrix_ptr->removeNonNeighbors(score_para_ptr->neighbor_mass_tole_);
@@ -149,12 +151,12 @@ void process(TopfdParaPtr topfd_para_ptr) {
     score_para_ptr->min_match_peak_ = 1;
     score_para_ptr->min_seed_match_peak_ = 0;
     sn_ratio = 0;
-    matrix_ptr->reconstruct(sn_ratio); 
+    matrix_ptr->reconstruct(sn_ratio, single_scan_noise); 
     int ms1_spec_num = deconv_ms1_ptr_vec.size();
     for (size_t ms1_idx = 0; ms1_idx < deconv_ms1_ptr_vec.size(); ms1_idx++) {
       perc = static_cast<int>((ms1_idx + 1)* 100 / ms1_spec_num);
       int scan = deconv_ms1_ptr_vec[ms1_idx]->getMsHeaderPtr()->getFirstScanNum();
-      std::cout << "\r" << "Processing isolation windows in MS1 spectrum scan " 
+      std::cout << "\r" << "Additional feature search for isolation windows in MS1 spectrum scan " 
         << scan << " ...       " << perc << "\% finished." << std::flush;
       for (size_t i = 0; i < ms2_header_ptr_2d[ms1_idx].size(); i++) {
         MsHeaderPtr header_ptr = ms2_header_ptr_2d[ms1_idx][i];

@@ -103,6 +103,24 @@ std::string TopfdPara::getParaStr(const std::string &prefix,
     output << prefix << std::setw(gap) << std::left 
       << "Miss MS1 spectra:         " << sep << "No" << std::endl;
   }
+  if (use_single_scan_noise_level_) {
+    output << prefix << std::setw(gap) << std::left 
+      << "Use single scan noise level in MS1 feature detection:" << sep << "Yes" << std::endl;
+  }
+  else {
+    output << prefix << std::setw(gap) << std::left 
+      << "Use single scan noise level in MS1 feature detection:" << sep << "No" << std::endl;
+  }
+  output << prefix << std::setw(gap) << std::left 
+      << "EC score cutoff:          " << sep  << ecscore_cutoff_ << std::endl;
+  if (search_prec_window_) {
+    output << prefix << std::setw(gap) << std::left 
+      << "Additional feature search:" << sep << "Yes" << std::endl;
+  }
+  else {
+    output << prefix << std::setw(gap) << std::left 
+      << "Additional feature search:" << sep << "No" << std::endl;
+  }
   if (gene_html_folder_) {
     output << prefix << std::setw(gap) << std::left 
       << "Generate Html files:      " << sep << "Yes" << std::endl;
