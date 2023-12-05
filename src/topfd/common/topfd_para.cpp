@@ -52,93 +52,93 @@ std::string TopfdPara::getParaStr(const std::string &prefix,
   output << prefix << "Timestamp: " << time_util::getTimeStr() << std::endl;
   output << prefix << "###################### Parameters ######################" << std::endl;
   output << prefix << std::setw(gap) << std::left 
-      << "File name:                " << sep  << mzml_file_name_ << std::endl;
+      << "File name:                  " << sep  << mzml_file_name_ << std::endl;
   if (is_faims_) {
     output << prefix << std::setw(gap) << std::left 
-      << "Faims data:               " << sep << "Yes" << std::endl;
+      << "Faims data:                 " << sep << "Yes" << std::endl;
     output << prefix << std::setw(gap) << std::left 
-      << "Faims voltage:            " << sep << faims_volt_ << std::endl;
+      << "Faims voltage:              " << sep << faims_volt_ << std::endl;
   }
   else {
     output << prefix << std::setw(gap) << std::left 
-      << "Faims data:               " << sep << "No" << std::endl;
+      << "Faims data:                 " << sep << "No" << std::endl;
     output << prefix << std::setw(gap) << std::left 
-      << "Faims voltage:            " << sep << "N/A"<< std::endl;
+      << "Faims voltage:              " << sep << "N/A"<< std::endl;
   }
   output << prefix << std::setw(gap) << std::left 
-      << "Number of MS1 scans:      " << sep  << ms_1_scan_num_ << std::endl;
+      << "Number of MS1 scans:        " << sep  << ms_1_scan_num_ << std::endl;
   output << prefix << std::setw(gap) << std::left 
-      << "Number of MS/MS scans:    " << sep  << ms_2_scan_num_ << std::endl;
+      << "Number of MS/MS scans:      " << sep  << ms_2_scan_num_ << std::endl;
   output << prefix << std::setw(gap) << std::left 
-      << "Spectral data type:       " << sep  << "Centroid" << std::endl;
+      << "Spectral data type:         " << sep  << "Centroid" << std::endl;
   output << prefix << std::setw(gap) << std::left 
-      << "Maximum charge:           "  << sep << max_charge_ << std::endl;
+      << "Maximum charge:             "  << sep << max_charge_ << std::endl;
   output << prefix << std::setw(gap) << std::left 
-      << "Maximum monoisotopic mass:" << sep << max_mass_ << " Dalton" << std::endl;
+      << "Maximum monoisotopic mass:  " << sep << max_mass_ << " Dalton" << std::endl;
   output << prefix << std::setw(gap) << std::left 
-      << "Peak error tolerance:     " << sep << mz_error_ << " m/z" << std::endl;
+      << "Peak error tolerance:       " << sep << mz_error_ << " m/z" << std::endl;
   output << prefix << std::setw(gap) << std::left 
-      << "MS1 signal/noise ratio:   " << sep << ms_one_sn_ratio_ << std::endl;
+      << "MS1 signal/noise ratio:     " << sep << ms_one_sn_ratio_ << std::endl;
   output << prefix << std::setw(gap) << std::left 
-      << "MS/MS signal/noise ratio: " << sep << ms_two_sn_ratio_ << std::endl;
+      << "MS/MS signal/noise ratio:   " << sep << ms_two_sn_ratio_ << std::endl;
   output << prefix << std::setw(gap) << std::left 
-      << "Thread number:            " << sep << thread_num_ << std::endl;
+      << "Thread number:              " << sep << thread_num_ << std::endl;
   output << prefix << std::setw(gap) << std::left 
-      << "Default precursor window: " << sep << prec_window_ << " m/z" << std::endl;
+      << "Default precursor window:   " << sep << prec_window_ << " m/z" << std::endl;
   output << prefix << std::setw(gap) << std::left 
-      << "Activation type:          " << sep  << activation_ << std::endl;
+      << "Activation type:            " << sep  << activation_ << std::endl;
   if (use_msdeconv_) {
     output << prefix << std::setw(gap) << std::left 
-      << "Use MS-Deconv score:      " << sep << "Yes" << std::endl;
+      << "Use MS-Deconv score:        " << sep << "Yes" << std::endl;
   }
   else {
     output << prefix << std::setw(gap) << std::left 
-      << "Use MS-Deconv score:      " << sep << "No" << std::endl;
+      << "Use MS-Deconv score:        " << sep << "No" << std::endl;
   }
   if (missing_level_one_) {
     output << prefix << std::setw(gap) << std::left 
-      << "Miss MS1 spectra:         " << sep << "Yes" << std::endl;
+      << "Miss MS1 spectra:           " << sep << "Yes" << std::endl;
   }
   else {
     output << prefix << std::setw(gap) << std::left 
-      << "Miss MS1 spectra:         " << sep << "No" << std::endl;
+      << "Miss MS1 spectra:           " << sep << "No" << std::endl;
   }
   if (use_single_scan_noise_level_) {
     output << prefix << std::setw(gap) << std::left 
-      << "Use single scan noise level in MS1 feature detection:" << sep << "Yes" << std::endl;
+      << "Use single scan noise level:" << sep << "Yes" << std::endl;
   }
   else {
     output << prefix << std::setw(gap) << std::left 
-      << "Use single scan noise level in MS1 feature detection:" << sep << "No" << std::endl;
+      << "Use single scan noise level:" << sep << "No" << std::endl;
   }
   output << prefix << std::setw(gap) << std::left 
-      << "ECScore cutoff:           " << sep  << ecscore_cutoff_ << std::endl;
+      << "ECScore cutoff:             " << sep  << ecscore_cutoff_ << std::endl;
   if (search_prec_window_) {
     output << prefix << std::setw(gap) << std::left 
-      << "Additional feature search:" << sep << "Yes" << std::endl;
+      << "Additional feature search:  " << sep << "Yes" << std::endl;
   }
   else {
     output << prefix << std::setw(gap) << std::left 
-      << "Additional feature search:" << sep << "No" << std::endl;
+      << "Additional feature search:  " << sep << "No" << std::endl;
   }
   if (gene_html_folder_) {
     output << prefix << std::setw(gap) << std::left 
-      << "Generate Html files:      " << sep << "Yes" << std::endl;
+      << "Generate Html files:        " << sep << "Yes" << std::endl;
   }
   else {
     output << prefix << std::setw(gap) << std::left 
-      << "Generate Html files:      " << sep << "No" << std::endl;
+      << "Generate Html files:        " << sep << "No" << std::endl;
   }
   if (do_final_filtering_) {
     output << prefix << std::setw(gap) << std::left 
-      << "Do final filtering:       " << sep << "Yes" << std::endl;
+      << "Do final filtering:         " << sep << "Yes" << std::endl;
   }
   else {
     output << prefix << std::setw(gap) << std::left 
-      << "Do final filtering:       " << sep << "No" << std::endl;
+      << "Do final filtering:         " << sep << "No" << std::endl;
   }
   output << prefix << std::setw(gap) << std::left 
-      << "Version:                  " << sep << Version::getVersion() << std::endl;   
+      << "Version:                    " << sep << Version::getVersion() << std::endl;   
   output << prefix << "###################### Parameters ######################" << std::endl;
   return output.str();
 }
