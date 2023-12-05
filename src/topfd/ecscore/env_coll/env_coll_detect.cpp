@@ -156,7 +156,7 @@ void process(TopfdParaPtr topfd_para_ptr) {
     for (size_t ms1_idx = 0; ms1_idx < deconv_ms1_ptr_vec.size(); ms1_idx++) {
       perc = static_cast<int>((ms1_idx + 1)* 100 / ms1_spec_num);
       int scan = deconv_ms1_ptr_vec[ms1_idx]->getMsHeaderPtr()->getFirstScanNum();
-      std::cout << "\r" << "Additional feature search for isolation windows in MS1 spectrum scan " 
+      std::cout << "\r" << "Additional feature search MS1 spectrum scan " 
         << scan << " ...       " << perc << "\% finished." << std::flush;
       for (size_t i = 0; i < ms2_header_ptr_2d[ms1_idx].size(); i++) {
         MsHeaderPtr header_ptr = ms2_header_ptr_2d[ms1_idx][i];
