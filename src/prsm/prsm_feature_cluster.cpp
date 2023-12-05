@@ -60,21 +60,42 @@ void setProteoClusterId(PrsmStrPtrVec& prsm_ptrs,
                         double prec_error_tole) {
   std::vector<PrsmStrPtrVec> clusters;
   int prsm_count = prsm_ptrs.size();
-  
+  // first round, cluster proteoforms using feature id
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     bool is_found = false;
     PrsmStrPtr cur_ptr = prsm_ptrs[i];
     for (size_t j = 0; j < clusters.size(); j++) {
       PrsmStrPtr ref_ptr = clusters[j][0];
+      // if the same feature id
+      if (cur_ptr->getSampleFeatureId() == ref_ptr->getSampleFeatureId()) {
+        clusters[j].push_back(cur_ptr);
+        is_found = true;
+        break;
+      }
+    }
+    if (!is_found) {
+      PrsmStrPtrVec new_clusters;
+      new_clusters.push_back(cur_ptr);
+      clusters.push_back(new_clusters);
+    }
+    double perc = (i + 1) * 100.0 / prsm_count;
+    std::cout << std::flush << "Finding PrSM clusters - processing " 
+        << std::setprecision(3) << perc << "%. \r";
+  }
+  // second round, merge feature clusters
+  std::vector<PrsmStrPtrVec> merged_clusters;
+  for (size_t i = 0; i < clusters.size(); i++) {
+    bool is_found = false;
+    PrsmStrPtr cur_ptr = clusters[i][0];
+    for (size_t j = 0; j < merged_clusters.size(); j++) {
+      PrsmStrPtr ref_ptr = merged_clusters[j][0];
+      // if the same protein and similar mass
       if (cur_ptr->getProtId() == ref_ptr->getProtId()) {
-        if (cur_ptr->getSampleFeatureId() == ref_ptr->getSampleFeatureId()) {
-          clusters[j].push_back(cur_ptr);
-          is_found = true;
-          break;
-        }
         if (std::abs(cur_ptr->getAdjustedPrecMass() - ref_ptr->getAdjustedPrecMass()) 
             <= prec_error_tole) {
-          clusters[j].push_back(cur_ptr);
+          merged_clusters[j].insert(merged_clusters[j].end(),
+                                    clusters[i].begin(), 
+                                    clusters[i].end());
           //LOG_DEBUG("Proteoform merging by mass!");
           is_found = true;
           break;
@@ -87,7 +108,9 @@ void setProteoClusterId(PrsmStrPtrVec& prsm_ptrs,
         if (cur_ptr->getProteoformDbSeq() == ref_ptr->getProteoformDbSeq()
             && std::abs(cur_ptr->getAdjustedPrecMass() - ref_ptr->getAdjustedPrecMass()) 
             <= prec_error_tole) {
-          clusters[j].push_back(cur_ptr);
+          merged_clusters[j].insert(merged_clusters[j].end(),
+                                    clusters[i].begin(), 
+                                    clusters[i].end());
           //LOG_DEBUG("Proteoform merging by sequence!");
           is_found = true;
           break;
@@ -95,18 +118,13 @@ void setProteoClusterId(PrsmStrPtrVec& prsm_ptrs,
       }
     }
     if (!is_found) {
-      PrsmStrPtrVec new_clusters;
-      new_clusters.push_back(prsm_ptrs[i]);
-      clusters.push_back(new_clusters);
+      merged_clusters.push_back(clusters[i]);
     }
-    double perc = (i + 1) * 100.0 / prsm_count;
-    std::cout << std::flush << "Finding PrSM clusters - processing " 
-        << std::setprecision(3) << perc << "%. \r";
   }
   std::cout << std::endl;
-  for (size_t i = 0; i < clusters.size(); i++) {
-    for (size_t j = 0; j < clusters[i].size(); j++) {
-      clusters[i][j]->setClusterId(i);
+  for (size_t i = 0; i < merged_clusters.size(); i++) {
+    for (size_t j = 0; j < merged_clusters[i].size(); j++) {
+      merged_clusters[i][j]->setClusterId(i);
     }
   }
 }
