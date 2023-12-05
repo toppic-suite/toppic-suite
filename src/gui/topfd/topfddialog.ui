@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>965</width>
-    <height>610</height>
+    <height>630</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -19,13 +19,13 @@
   <property name="minimumSize">
    <size>
     <width>965</width>
-    <height>610</height>
+    <height>630</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>965</width>
-    <height>610</height>
+    <height>630</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -276,7 +276,7 @@
         </size>
        </property>
        <property name="text">
-        <string>100000</string>
+        <string>70000</string>
        </property>
       </widget>
      </item>
@@ -374,7 +374,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>550</y>
+      <y>580</y>
       <width>901</width>
       <height>50</height>
      </rect>
@@ -489,7 +489,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>350</y>
+      <y>380</y>
       <width>901</width>
       <height>191</height>
      </rect>
@@ -547,9 +547,9 @@ p, li { white-space: pre-wrap; }
    <widget class="QWidget" name="horizontalLayoutWidget_10">
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>620</x>
       <y>240</y>
-      <width>271</width>
+      <width>311</width>
       <height>42</height>
      </rect>
     </property>
@@ -571,13 +571,13 @@ p, li { white-space: pre-wrap; }
       <widget class="QLineEdit" name="threadNumberEdit">
        <property name="minimumSize">
         <size>
-         <width>70</width>
+         <width>75</width>
          <height>0</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>70</width>
+         <width>75</width>
          <height>16777215</height>
         </size>
        </property>
@@ -594,7 +594,7 @@ p, li { white-space: pre-wrap; }
       <x>30</x>
       <y>290</y>
       <width>901</width>
-      <height>51</height>
+      <height>81</height>
      </rect>
     </property>
     <property name="title">
@@ -603,7 +603,7 @@ p, li { white-space: pre-wrap; }
     <widget class="QWidget" name="horizontalLayoutWidget_11">
      <property name="geometry">
       <rect>
-       <x>240</x>
+       <x>270</x>
        <y>20</y>
        <width>201</width>
        <height>25</height>
@@ -631,8 +631,8 @@ p, li { white-space: pre-wrap; }
     <widget class="QWidget" name="horizontalLayoutWidget_12">
      <property name="geometry">
       <rect>
-       <x>700</x>
-       <y>20</y>
+       <x>10</x>
+       <y>50</y>
        <width>201</width>
        <height>25</height>
       </rect>
@@ -687,9 +687,9 @@ p, li { white-space: pre-wrap; }
     <widget class="QWidget" name="horizontalLayoutWidget_15">
      <property name="geometry">
       <rect>
-       <x>470</x>
+       <x>590</x>
        <y>20</y>
-       <width>201</width>
+       <width>221</width>
        <height>25</height>
       </rect>
      </property>
@@ -698,7 +698,7 @@ p, li { white-space: pre-wrap; }
        <widget class="QCheckBox" name="msDeconvCheckBox">
         <property name="minimumSize">
          <size>
-          <width>150</width>
+          <width>0</width>
           <height>0</height>
          </size>
         </property>
@@ -718,6 +718,106 @@ p, li { white-space: pre-wrap; }
       </item>
      </layout>
     </widget>
+    <widget class="QWidget" name="horizontalLayoutWidget_16">
+     <property name="geometry">
+      <rect>
+       <x>270</x>
+       <y>50</y>
+       <width>201</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_16">
+      <item>
+       <widget class="QCheckBox" name="additionalFeatureSearchCheckBox">
+        <property name="acceptDrops">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Additional feature search</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="horizontalLayoutWidget_17">
+     <property name="geometry">
+      <rect>
+       <x>590</x>
+       <y>50</y>
+       <width>222</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_17">
+      <item>
+       <widget class="QCheckBox" name="singleScanNoiseLevelCheckBox">
+        <property name="acceptDrops">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Use single scan noise level</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget_6">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>240</y>
+      <width>271</width>
+      <height>42</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_15">
+     <item>
+      <widget class="QLabel" name="label_9">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>ECScore cutoff:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="ecscoreCutoffEdit">
+       <property name="minimumSize">
+        <size>
+         <width>40</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>70</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>0.5</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
    <zorder>listWidget</zorder>
    <zorder>horizontalLayoutWidget</zorder>
@@ -732,6 +832,7 @@ p, li { white-space: pre-wrap; }
    <zorder>horizontalLayoutWidget_9</zorder>
    <zorder>horizontalLayoutWidget_10</zorder>
    <zorder>groupBox</zorder>
+   <zorder>horizontalLayoutWidget_6</zorder>
   </widget>
  </widget>
  <resources/>
