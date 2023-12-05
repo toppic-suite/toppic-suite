@@ -256,6 +256,7 @@ void PrsmMatchTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
       file << delim
         << delim
         << delim
+        << delim
         << delim;
 
       file << seq_ptr->getName() << delim
@@ -327,16 +328,20 @@ void PrsmMatchTableWriter::writePrsmStandardFormat(std::ofstream &file, PrsmPtr 
       << prsm_ptr->getProteoformPtr()->getProteoClusterId() << delim;
 
   if (prsm_ptr->getSampleFeatureInte() > 0) {
+    file << prsm_ptr->getSampleFeatureId() << delim;
     std::ostringstream str_stream;
     str_stream << std::scientific << std::setprecision(3);
     str_stream << prsm_ptr->getSampleFeatureInte();
     file << str_stream.str() << delim;
+    file << prsm_ptr->getFracFeatureScore() << delim;
+    file << prsm_ptr->getTimeApex() << delim;
   } else {
+    file << empty_str << delim;
+    file << empty_str << delim;
+    file << empty_str << delim;
     file << empty_str << delim;
   }
 
-  file << prsm_ptr->getFracFeatureScore() << delim;
-  file << prsm_ptr->getTimeApex() << delim;
   file << matches.size() << delim;
   
   ProteoformPtr form_ptr = prsm_ptr->getProteoformPtr();
@@ -401,6 +406,7 @@ void PrsmMatchTableWriter::writePrsmStandardFormat(std::ofstream &file, PrsmPtr 
 
       // feature
       file << delim
+        << delim
         << delim
         << delim
         << delim;
