@@ -72,7 +72,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("msdeconv,n", "Use the MS-Deconv score to rank isotopic envelopes.")
         ("missing-level-one,o","MS1 spectra are missing in the input file.")
         ("single-scan-noise,i","Use the peak intensity noise levels in single MS1 scans to filter out low intensity peaks in proteoform feature detection. The default method is to use the peak intensity noise level of the whole LC-MS map to filter out low intensity peaks.")
-        ("additional-feature-search,f","Perform additional feature search for MS/MS scans that do not have proteoform features in their precursor isolation windows.")
+        ("additional-feature-search,f","Perform additional feature search for MS/MS scans that do not have detected proteoform features in their precursor isolation windows.")
         ("thread-number,u", po::value<std::string> (&thread_number), "<a positive integer>. Number of threads used in spectral deconvolution. Default value: 1.")
         ("skip-html-folder,g","Skip the generation of HTML files for visualization.")
         ("disable-final-filtering,d","Skip the final filtering of envelopes.")
