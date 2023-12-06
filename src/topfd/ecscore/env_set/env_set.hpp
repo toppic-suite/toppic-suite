@@ -73,7 +73,7 @@ class EnvSet {
 
   bool containTwoValidEnvs(int min_match_peak_num); 
 
-  bool containValidNeighborEnvsForSeed(int min_match_peak_num);
+  bool containTwoValidOutOfThreeEnvs(int min_match_peak_num);
 
   bool containThreeValidOutOfFiveEnvs(int min_match_peak_num); 
 

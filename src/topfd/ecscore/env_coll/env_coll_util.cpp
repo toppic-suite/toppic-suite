@@ -102,13 +102,15 @@ EnvCollPtr findEnvColl(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
   }
   env_set_ptr->refineXicBoundary();
   int min_match_peak_num_in_top_three = para_ptr->getMinMatchPeakNumInTopThree();
-  if (para_ptr->filter_neighboring_peaks_) {
-    if (!env_set_ptr->containValidNeighborEnvsForSeed(min_match_peak_num_in_top_three))
-      return nullptr; 
-    else
-      if (!env_set_ptr->containThreeValidOutOfFiveEnvs(min_match_peak_num_in_top_three))
-        return nullptr;
+  // check if there are at least two envelopes
+  if (para_ptr->filter_neighboring_peaks_
+      && !env_set_ptr->containTwoValidOutOfThreeEnvs(min_match_peak_num_in_top_three)) {
+    return nullptr; 
   }
+  /*
+     if (!env_set_ptr->containThreeValidOutOfFiveEnvs(min_match_peak_num_in_top_three))
+     return nullptr;
+   */
   double even_odd_peak_ratio = component_score::getAggOddEvenPeakRatio(env_set_ptr);
   SeedEnvPtr new_seed_ptr = seed_ptr;
   if (std::abs(even_odd_peak_ratio) > para_ptr->even_odd_ratio_cutoff_) {
@@ -125,7 +127,9 @@ EnvCollPtr findEnvColl(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
     }
     env_set_ptr = tmp_env_set_ptr;
     env_set_ptr->refineXicBoundary();
-    if (!env_set_ptr->containValidNeighborEnvsForSeed(min_match_peak_num_in_top_three)) {                                             
+
+    if (para_ptr->filter_neighboring_peaks_
+        && !env_set_ptr->containTwoValidOutOfThreeEnvs(min_match_peak_num_in_top_three)) {
       return nullptr; 
     }
   }

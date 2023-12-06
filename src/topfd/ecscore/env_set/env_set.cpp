@@ -312,8 +312,8 @@ bool EnvSet::containTwoValidEnvs(int min_match_peak) {
   }
 }
 
-// check if the seed envelope and its two neighboring ones are valid
-bool EnvSet::containValidNeighborEnvsForSeed(int min_match_peak_num) {
+// check if the seed envelope and one of the neighboring ones are valid
+bool EnvSet::containTwoValidOutOfThreeEnvs(int min_match_peak_num) {
   int seed_spec_idx = seed_ptr_->getSpecId() - start_spec_id_; 
   size_t first_idx = seed_spec_idx - 1;
   if (first_idx < 0) {
@@ -324,13 +324,19 @@ bool EnvSet::containValidNeighborEnvsForSeed(int min_match_peak_num) {
     last_idx = ms_map_env_list_.size() -1;
   }
   int ref_idx = seed_ptr_->getReferIdx(); 
+  int count = 0;
   for (size_t i = first_idx; i <= last_idx; i++) {
     MsMapEnvPtr env_ptr = ms_map_env_list_[i];
-    if (env_ptr == nullptr || env_ptr->getTopThreeMatchNum(ref_idx) < min_match_peak_num) {
-      return false;
+    if (env_ptr != nullptr && env_ptr->getTopThreeMatchNum(ref_idx) >= min_match_peak_num) {
+      count = count + 1;
     }
   }
-  return true;
+  if (count >= 2) {
+    return true;
+  }
+  else {
+    return false;
+  }
 }
 
 bool EnvSet::containThreeValidOutOfFiveEnvs(int min_match_peak_num) {
