@@ -149,7 +149,6 @@ void process(TopfdParaPtr topfd_para_ptr) {
     // set min match envelope to 1 to accept single scan features
     score_para_ptr->min_match_env_ = 1;
     score_para_ptr->min_match_peak_ = 1;
-    score_para_ptr->min_seed_match_peak_ = 0;
     sn_ratio = 0;
     matrix_ptr->reconstruct(sn_ratio, single_scan_noise); 
     int ms1_spec_num = deconv_ms1_ptr_vec.size();

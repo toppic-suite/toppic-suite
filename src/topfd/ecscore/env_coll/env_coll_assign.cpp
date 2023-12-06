@@ -151,7 +151,6 @@ bool getNewEnvColl(MsHeaderPtr header_ptr, int ms1_idx, MsMapPtr matrix_ptr,
   // set min match envelope to 1 to accept single scan features
   score_para_ptr->min_match_env_ = 1;
   score_para_ptr->min_match_peak_ = 1;
-  score_para_ptr->min_seed_match_peak_ = 0;
   double sn_ratio = 0;
   
   double prec_win_begin = header_ptr->getPrecWinBegin();
