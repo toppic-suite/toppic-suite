@@ -49,6 +49,7 @@ class TopfdPara {
   double getEcscoreCutoff() {return ecscore_cutoff_;}
   bool isSearchPrecWindow() {return search_prec_window_;}
   bool isUseSingleScanNoiseLevel() {return use_single_scan_noise_level_;}
+  bool isReportSingleScanFeature() {return report_single_scan_feature_;}
 
   std::string getMzmlFileName() {return mzml_file_name_;}
   std::string getOutputBaseName() {return output_base_name_;}
@@ -79,8 +80,11 @@ class TopfdPara {
   void setOutputMultipleMass(bool output) {output_multiple_mass_ = output;}
   void setThreadNum(int num) {thread_num_ = num;}
   void setSearchPrecWindow(bool search) {search_prec_window_ = search;}
-  void setUseSingleScanNoiseLevel(bool single_scan) {use_single_scan_noise_level_ = single_scan;}
+  void setUseSingleScanNoiseLevel(bool single_scan_noise)
+  {use_single_scan_noise_level_ = single_scan_noise;}
   void setEcscoreCutoff(double cutoff) {ecscore_cutoff_ = cutoff;}
+  void setReportSingleScanFeature(bool single_scan_feature)
+  {report_single_scan_feature_ = single_scan_feature;}
 
   void setFracId(int frac_id) {frac_id_ = frac_id;}
   void setMzmlFileNameAndFaims(std::string &mzml_file_name, bool is_faims, double voltage);
@@ -106,6 +110,7 @@ class TopfdPara {
   double ecscore_cutoff_ = 0.5;
   bool search_prec_window_ = false;
   bool use_single_scan_noise_level_ = false;
+  bool report_single_scan_feature_ = false;
 
   //** Fixed parameter setting **
   // estimate min intensity using thrash method. 

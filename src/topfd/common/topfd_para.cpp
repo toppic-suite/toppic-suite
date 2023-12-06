@@ -103,6 +103,14 @@ std::string TopfdPara::getParaStr(const std::string &prefix,
     output << prefix << std::setw(gap) << std::left 
       << "Miss MS1 spectra:           " << sep << "No" << std::endl;
   }
+  if (report_single_scan_feature_) {
+    output << prefix << std::setw(gap) << std::left 
+      << "Search single scan features:" << sep << "Yes" << std::endl;
+  }
+  else {
+    output << prefix << std::setw(gap) << std::left 
+      << "Search single scan features:" << sep << "No" << std::endl;
+  }
   if (use_single_scan_noise_level_) {
     output << prefix << std::setw(gap) << std::left 
       << "Use single scan noise level:" << sep << "Yes" << std::endl;

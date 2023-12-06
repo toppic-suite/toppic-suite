@@ -73,6 +73,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("missing-level-one,o","MS1 spectra are missing in the input file.")
         ("single-scan-noise,i","Use the peak intensity noise levels in single MS1 scans to filter out low intensity peaks in proteoform feature detection. The default method is to use the peak intensity noise level of the whole LC-MS map to filter out low intensity peaks.")
         ("additional-feature-search,f","Perform additional feature search for MS/MS scans that do not have detected proteoform features in their precursor isolation windows.")
+        ("single-scan-feature,l","Search for proteoform features in single MS1 scans.")
         ("thread-number,u", po::value<std::string> (&thread_number), "<a positive integer>. Number of threads used in spectral deconvolution. Default value: 1.")
         ("skip-html-folder,g","Skip the generation of HTML files for visualization.")
         ("disable-final-filtering,d","Skip the final filtering of envelopes.")
@@ -92,6 +93,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("missing-level-one,o", "")
         ("single-scan-noise,i","")
         ("additional-feature-search,f","")
+        ("single-scan-feature,l","")
         ("thread-number,u", po::value<std::string> (&thread_number), "")
         ("skip-html-folder,g","")
         ("msdeconv,n", "")
@@ -190,6 +192,10 @@ bool Argument::parse(int argc, char* argv[]) {
 
     if (vm.count("additional-feature-search")) {
       topfd_para_ptr_->setSearchPrecWindow(true);
+    }
+
+    if (vm.count("single-scan-feature")) {
+      topfd_para_ptr_->setReportSingleScanFeature(true);
     }
 
     if (vm.count("spectrum-file-name")) {

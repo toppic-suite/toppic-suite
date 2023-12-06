@@ -54,7 +54,7 @@ EcscorePara::EcscorePara(int frac_id, const std::string &file_name,
   /// additional parameters
   para_max_charge_ = para_ptr->getMaxCharge();
   para_min_charge_ = 1;
-  filter_neighboring_peaks_ = true;
+  report_single_scan_feature_ = para_ptr->isReportSingleScanFeature();
   corr_tole_ = 0.5;
 }
 

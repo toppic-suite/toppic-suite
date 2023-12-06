@@ -60,7 +60,7 @@ class EcscorePara {
   ///// params
   int para_max_charge_;
   int para_min_charge_;
-  bool filter_neighboring_peaks_;
+  bool report_single_scan_feature_;
   double corr_tole_;
 
   double bin_size_ = 0.1;

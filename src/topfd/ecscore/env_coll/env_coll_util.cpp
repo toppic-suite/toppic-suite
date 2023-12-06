@@ -103,7 +103,7 @@ EnvCollPtr findEnvColl(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
   env_set_ptr->refineXicBoundary();
   int min_match_peak_num_in_top_three = para_ptr->getMinMatchPeakNumInTopThree();
   // check if there are at least two envelopes
-  if (para_ptr->filter_neighboring_peaks_
+  if (!para_ptr->report_single_scan_feature_
       && !env_set_ptr->containTwoValidOutOfThreeEnvs(min_match_peak_num_in_top_three)) {
     return nullptr; 
   }
@@ -128,7 +128,7 @@ EnvCollPtr findEnvColl(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
     env_set_ptr = tmp_env_set_ptr;
     env_set_ptr->refineXicBoundary();
 
-    if (para_ptr->filter_neighboring_peaks_
+    if (!para_ptr->report_single_scan_feature_
         && !env_set_ptr->containTwoValidOutOfThreeEnvs(min_match_peak_num_in_top_three)) {
       return nullptr; 
     }
