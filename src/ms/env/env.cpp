@@ -270,13 +270,19 @@ std::vector<double> Env::getScaledInteList(double scale_factor,
 }
 
 double Env::compTopThreeInteSum() {
-  double sum = peak_ptr_list_[refer_idx_]->getIntensity();
+  double sum = 0; 
+  if (refer_idx_ >= 0 && refer_idx_ < (int)peak_ptr_list_.size() 
+      && peak_ptr_list_[refer_idx_] != nullptr) {
+    sum = sum + peak_ptr_list_[refer_idx_]->getIntensity();
+  }
   int left_idx = refer_idx_ - 1;
-  if (left_idx >= 0) {
+  if (left_idx >= 0 && left_idx < (int)peak_ptr_list_.size() && 
+      peak_ptr_list_[left_idx] != nullptr) {
     sum += peak_ptr_list_[left_idx]->getIntensity();
   }
-  size_t right_idx = refer_idx_ + 1;
-  if (right_idx < peak_ptr_list_.size()) {
+  int right_idx = refer_idx_ + 1;
+  if (right_idx >= 0 && right_idx < (int)peak_ptr_list_.size() 
+      && peak_ptr_list_[right_idx] != nullptr) {
     sum += peak_ptr_list_[right_idx]->getIntensity();
   }
   return sum;
@@ -323,7 +329,7 @@ void Env::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   str = str_util::toString(mono_mz_);
   xml_doc->addElement(element, "mono_mz", str.c_str());
   for (size_t i = 0; i < peak_ptr_list_.size(); i++) {
-    peak_ptr_list_[i]->appendXml(xml_doc, element);
+    peak_ptr_list_[i]->appendToXml(xml_doc, element);
   }
   parent->appendChild(element);
 }

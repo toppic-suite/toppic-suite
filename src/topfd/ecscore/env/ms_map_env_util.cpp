@@ -24,11 +24,14 @@ namespace toppic {
 namespace ms_map_env_util {
 
 double compTopThreeInteRatio(SeedEnvPtr seed_ptr, MsMapEnvPtr env_ptr) {
+  if (env_ptr == nullptr) {
+    return 0;
+  }
   double seed_inte = seed_ptr->compTopThreeInteSum();
   int ref_idx = seed_ptr->getReferIdx();
   double env_inte = env_ptr->compTopThreeInteSum(ref_idx);
   if (seed_inte == 0) {
-    LOG_WARN("Empty peak list!");
+    LOG_INFO("Empty peak list!");
     return 0;
   }
   return env_inte/seed_inte;

@@ -384,5 +384,18 @@ void EnvSet::mergeEnvSet(EnvSetPtr new_set_ptr) {
   initMedianXic();
 }
 
+void EnvSet::appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
+  std::string element_name = "env_set";
+  XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
+  seed_ptr_->appendToXml(xml_doc, element);
+  element_name = "exp_env_list";
+  XmlDOMElement* env_list = xml_doc->createElement(element_name.c_str());
+  for (size_t i = 0; i < ms_map_env_list_.size(); i++) {
+    ms_map_env_list_[i]->appendToXml(xml_doc, env_list);
+  }
+  element->appendChild(env_list);
+  parent->appendChild(element);
+}
+
 }
 

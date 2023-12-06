@@ -18,6 +18,7 @@
 #include <memory>
 #include <vector>
 
+#include "common/xml/xml_dom_document.hpp"
 #include "ms/msmap/ms_map.hpp"
 #include "topfd/ecscore/env/seed_env.hpp"
 #include "topfd/ecscore/env_set/env_set.hpp"
@@ -63,6 +64,8 @@ class EnvColl {
   void removePeakData(MsMapPtr matrix_ptr);
 
   void mergeEnvSet(EnvSetPtr env_set_ptr);
+
+  XmlDOMElement* toXmlElement(XmlDOMDocument* xml_doc);
 
  private:
   SeedEnvPtr seed_ptr_;

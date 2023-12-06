@@ -28,4 +28,17 @@ std::string MsMapPeak::getString() {
     "Neighbor: " + std::to_string(neighbor_) + "\n";
 }
 
+void MsMapPeak::appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
+  std::string element_name = "ms_map_peak";
+  XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
+  std::string str = str_util::toString(getPosition());
+  xml_doc->addElement(element, "position", str.c_str());
+  str = str_util::toString(getIntensity());
+  xml_doc->addElement(element, "intensity", str.c_str());
+  str = str_util::toString(ori_inte_);
+  xml_doc->addElement(element, "ori_intensity", str.c_str());
+  parent->appendChild(element);
+}
+
+
 }

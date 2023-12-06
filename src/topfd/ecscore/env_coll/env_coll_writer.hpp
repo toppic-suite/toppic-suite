@@ -12,31 +12,21 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <iostream>
+#ifndef TOPPIC_TOPFD_ECSCORE_ENV_COLL_WRITER_HPP_
+#define TOPPIC_TOPFD_ECSCORE_ENV_COLL_WRITER_HPP_
 
-#include "ms/msmap/ms_map_row.hpp"
+#include <string>
+
+#include "topfd/ecscore/env_coll/env_coll.hpp"
 
 namespace toppic {
 
-MsMapRow::MsMapRow(MsMapRowHeaderPtr spec_ptr, int bin_num) {
-    header_ptr_ = spec_ptr;
-  for (int i = 0; i < bin_num; i++) {
-    MsMapPeakPtrVec vec;
-    peak_ptr_2d_.push_back(vec);
-  }
+namespace env_coll_writer {
+
+void writeXmlFeatures(const std::string &output_file_name,
+                      const EnvCollPtrVec &env_coll_ptrs);
 }
 
-void MsMapRow::print() {
-  for (size_t i = 0; i < peak_ptr_2d_.size(); i++) {
-    for (size_t j = 0; j < peak_ptr_2d_[i].size(); j++) {
-      std::cout << "bin " << i << " j " << j << " m/z " << peak_ptr_2d_[i][j]->getPosition() << std::endl;
-    }
-  }
-}
+} /* namespace toppic */
 
-void MsMapRow::clearPeaks() {
-  for (size_t i = 0; i < peak_ptr_2d_.size(); i++) {
-    peak_ptr_2d_[i].clear();
-  }
-}
-}
+#endif

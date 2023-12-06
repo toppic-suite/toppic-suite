@@ -47,6 +47,8 @@ class TopfdPara {
   bool isOutputCsvFeatureFile() {return output_csv_feature_file_;}
   int getThreadNum() {return thread_num_;}
   double getEcscoreCutoff() {return ecscore_cutoff_;}
+  bool isSearchPrecWindow() {return search_prec_window_;}
+  bool isUseSingleScanNoiseLevel() {return use_single_scan_noise_level_;}
 
   std::string getMzmlFileName() {return mzml_file_name_;}
   std::string getOutputBaseName() {return output_base_name_;}
@@ -76,6 +78,9 @@ class TopfdPara {
   void setKeepUnusedPeaks(bool keep) {keep_unused_peaks_ = keep;}
   void setOutputMultipleMass(bool output) {output_multiple_mass_ = output;}
   void setThreadNum(int num) {thread_num_ = num;}
+  void setSearchPrecWindow(bool search) {search_prec_window_ = search;}
+  void setUseSingleScanNoiseLevel(bool single_scan) {use_single_scan_noise_level_ = single_scan;}
+  void setEcscoreCutoff(double cutoff) {ecscore_cutoff_ = cutoff;}
 
   void setFracId(int frac_id) {frac_id_ = frac_id;}
   void setMzmlFileNameAndFaims(std::string &mzml_file_name, bool is_faims, double voltage);
@@ -99,6 +104,8 @@ class TopfdPara {
   std::string activation_ = "FILE";
   bool gene_html_folder_ = true;
   double ecscore_cutoff_ = 0.5;
+  bool search_prec_window_ = false;
+  bool use_single_scan_noise_level_ = false;
 
   //** Fixed parameter setting **
   // estimate min intensity using thrash method. 

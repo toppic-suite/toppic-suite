@@ -17,6 +17,7 @@
 
 #include <vector>
 
+#include "common/xml/xml_dom_document.hpp"
 #include "ms/spec/deconv_ms.hpp"
 #include "ms/env/env_base.hpp"
 
@@ -49,6 +50,8 @@ class SeedEnv : public Env {
   std::string getString();
 
   EnvPeakPtrVec getScaledPeakPtrList(double ratio, double min_inte);
+
+  void appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 
  private:
   int spec_id_;

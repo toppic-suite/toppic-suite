@@ -54,8 +54,9 @@ TopFDDialog::TopFDDialog(QWidget *parent) :
       QRegExpValidator *validator2 = new QRegExpValidator(rx2, this);
       ui->ms1snRatioEdit->setValidator(validator2);
       ui->ms2snRatioEdit->setValidator(validator2);
-      QRegExp rx3("^\\d{1,4}\\.\\d{0,2}|10000$");
       ui->threadNumberEdit->setValidator(new QIntValidator(0, 2147483647, this));
+      ui->ecscoreCutoffEdit->setValidator(new QDoubleValidator(0.0, 1.0, 4, this));
+      QRegExp rx3("^\\d{1,4}\\.\\d{0,2}|10000$");
       QRegExpValidator *validator3 = new QRegExpValidator(rx3, this);
       ui->windowSizeEdit->setValidator(validator3);
       QFont font;
@@ -112,10 +113,13 @@ void TopFDDialog::on_defaultButton_clicked() {
   ui->ms2snRatioEdit->setText(QString::number(para_ptr->getMsTwoSnRatio()));
   ui->windowSizeEdit->setText(QString::number(para_ptr->getPrecWindowWidth()));
   ui->threadNumberEdit->setText(QString::number(para_ptr->getThreadNum()));
+  ui->ecscoreCutoffEdit->setText(QString::number(para_ptr->getEcscoreCutoff()));
   ui->msDeconvCheckBox->setChecked(para_ptr->isUseMsDeconv());
   ui->missLevelOneCheckBox->setChecked(para_ptr->isMissingLevelOne());
   ui->geneHTMLCheckBox->setChecked(para_ptr->isGeneHtmlFolder());
   ui->disableFilteringCheckBox->setChecked(!para_ptr->isDoFinalFiltering());
+  ui->additionalFeatureSearchCheckBox->setChecked(para_ptr->isSearchPrecWindow());
+  ui->singleScanNoiseLevelCheckBox->setChecked(para_ptr->isUseSingleScanNoiseLevel());
 
   ui->outputTextBrowser->clear();
   ui->outputTextBrowser->setText("Click the Start button to process the spectrum files.");
@@ -268,13 +272,17 @@ toppic::TopfdParaPtr TopFDDialog::getParaPtr() {
   para_ptr_->setMzError(std::stod(ui->mzErrorEdit->text().toStdString()));
   para_ptr_->setMsOneSnRatio(std::stod(ui->ms1snRatioEdit->text().toStdString()));
   para_ptr_->setMsTwoSnRatio(std::stod(ui->ms2snRatioEdit->text().toStdString()));
-    para_ptr_->setPrecWindowWidth(std::stod(ui->windowSizeEdit->text().toStdString()));
+  para_ptr_->setPrecWindowWidth(std::stod(ui->windowSizeEdit->text().toStdString()));
   para_ptr_->setMissingLevelOne(ui->missLevelOneCheckBox->isChecked()); 
+  para_ptr_->setEcscoreCutoff(std::stod(ui->ecscoreCutoffEdit->text().toStdString()));
   para_ptr_->setThreadNum(std::stoi(ui->threadNumberEdit->text().toStdString()));
   para_ptr_->setGeneHtmlFolder(ui->geneHTMLCheckBox->isChecked());
   para_ptr_->setUseMsDeconv(ui->msDeconvCheckBox->isChecked());
   para_ptr_->setActivation(ui->activationComboBox->currentText().toStdString());
   para_ptr_->setDoFinalFiltering(!(ui->disableFilteringCheckBox->isChecked()));
+
+  para_ptr_->setSearchPrecWindow(ui->additionalFeatureSearchCheckBox->isChecked());
+  para_ptr_->setUseSingleScanNoiseLevel(ui->singleScanNoiseLevelCheckBox->isChecked());
 
   return para_ptr_;
 }
@@ -298,6 +306,9 @@ void TopFDDialog::lockDialog() {
   ui->msDeconvCheckBox->setEnabled(false);
   ui->activationComboBox->setEnabled(false);
   ui->disableFilteringCheckBox->setEnabled(false);
+  ui->ecscoreCutoffEdit->setEnabled(false); 
+  ui->additionalFeatureSearchCheckBox->setEnabled(false); 
+  ui->singleScanNoiseLevelCheckBox->setEnabled(false); 
 }
 
 void TopFDDialog::unlockDialog() {
@@ -320,6 +331,9 @@ void TopFDDialog::unlockDialog() {
   ui->msDeconvCheckBox->setEnabled(true);
   ui->activationComboBox->setEnabled(true);
   ui->disableFilteringCheckBox->setEnabled(true);
+  ui->ecscoreCutoffEdit->setEnabled(true); 
+  ui->additionalFeatureSearchCheckBox->setEnabled(true); 
+  ui->singleScanNoiseLevelCheckBox->setEnabled(true); 
 }
 
 bool TopFDDialog::checkError() {
@@ -367,6 +381,13 @@ bool TopFDDialog::checkError() {
   if (ui->threadNumberEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
                          tr("Thread number is empty!"),
+                         QMessageBox::Yes);
+    return true;
+  }
+
+  if (ui->ecscoreCutoffEdit->text().isEmpty()) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("ECScore cutoff is empty!"),
                          QMessageBox::Yes);
     return true;
   }

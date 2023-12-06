@@ -140,7 +140,7 @@ EnvCollPtr findEnvCollWithSingleEnv(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
                                     EcscoreParaPtr para_ptr, double sn_ratio) {
   EnvSetPtr env_set_ptr = env_set_util::searchEnvSet(matrix_ptr, seed_ptr, para_ptr, sn_ratio);
   if (env_set_ptr == nullptr) {
-    LOG_WARN("Envelope set is empty!");
+    LOG_INFO("Envelope set is empty!");
     return nullptr; 
   }
   env_set_ptr->refineXicBoundary();
@@ -158,18 +158,27 @@ bool checkOverlap(MsMapRowHeaderPtrVec &spectrum_list, EnvCollPtr coll_ptr,
   double start_rt = spectrum_list[start_spec_id]->getRt();
   double end_rt = spectrum_list[end_spec_id]->getRt();
   double start = -1;
-  if (start_rt <= feature_start_rt)
+  if (start_rt <= feature_start_rt) {
     start = feature_start_rt;
-  else
+  }
+  else {
     start = start_rt;
+  }
   double end = -1;
   if (start > -1) {
-    if (end_rt <= feature_end_rt)
+    if (end_rt <= feature_end_rt) {
       end = end_rt;
-    else
+    }
+    else {
       end = feature_end_rt;
+    }
   }
   if (end > -1) {
+    // if the coverage is 100%. Sometimes start = end for single scan
+    // and the coverage is 100%.
+    if (start == feature_start_rt && end == feature_end_rt) {
+      return true;
+    }
     double overlapping_rt_range = end - start;
     if (overlapping_rt_range > 0) {
       double feature_rt_range = feature_end_rt - feature_start_rt;

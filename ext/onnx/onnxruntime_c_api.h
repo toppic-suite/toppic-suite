@@ -38,7 +38,7 @@ extern "C" {
 
 //! @}
 // SAL2 Definitions
-#ifndef _WIN32
+//#ifndef _WIN32
 #define _In_
 #define _In_z_
 #define _In_opt_
@@ -60,10 +60,10 @@ extern "C" {
 #define _Success_(X)
 #define _Outptr_result_buffer_maybenull_(X)
 #define ORT_ALL_ARGS_NONNULL __attribute__((nonnull))
-#else
-#include <specstrings.h>
-#define ORT_ALL_ARGS_NONNULL
-#endif
+//#else
+//#include <specstrings.h>
+//#define ORT_ALL_ARGS_NONNULL
+//#endif
 
 #ifdef _WIN32
 // Define ORT_DLL_IMPORT if your program is dynamically linked to Ort.
@@ -73,7 +73,8 @@ extern "C" {
 #else
 #define ORT_EXPORT
 #endif
-#define ORT_API_CALL _stdcall
+//#define ORT_API_CALL _stdcall
+#define ORT_API_CALL 
 #define ORT_MUST_USE_RESULT
 #define ORTCHAR_T wchar_t
 #else
@@ -144,6 +145,7 @@ extern "C" {
 #undef NO_EXCEPTION
 #define NO_EXCEPTION
 #endif
+
 /** \addtogroup Global
  * ONNX Runtime C API
  * @{
@@ -271,11 +273,11 @@ ORT_RUNTIME_CLASS(CANNProviderOptions);
 ORT_RUNTIME_CLASS(Op);
 ORT_RUNTIME_CLASS(OpAttr);
 
-#ifdef _WIN32
-typedef _Return_type_success_(return == 0) OrtStatus* OrtStatusPtr;
-#else
+//#ifdef _WIN32
+//typedef _Return_type_success_(return == 0) OrtStatus* OrtStatusPtr;
+//#else
 typedef OrtStatus* OrtStatusPtr;
-#endif
+//#endif
 
 /** \brief Memory allocation interface
  *

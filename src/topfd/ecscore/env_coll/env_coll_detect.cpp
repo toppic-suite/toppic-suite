@@ -89,9 +89,11 @@ void process(TopfdParaPtr topfd_para_ptr) {
   // write_out_files::write_seed_envelopes(seed_envs, "envs.csv");
 
   double sn_ratio = topfd_para_ptr->getMsOneSnRatio();
+  bool single_scan_noise = topfd_para_ptr->isUseSingleScanNoiseLevel();
   /// Prepare data -- Peak Matrix
   MsMapPtr matrix_ptr = std::make_shared<MsMap>(ms1_mzml_peaks, deconv_ms1_ptr_vec,
-                                                score_para_ptr->bin_size_, sn_ratio);
+                                                score_para_ptr->bin_size_,
+                                                sn_ratio, single_scan_noise);
 
   if (score_para_ptr->filter_neighboring_peaks_) {
     matrix_ptr->removeNonNeighbors(score_para_ptr->neighbor_mass_tole_);
@@ -117,42 +119,108 @@ void process(TopfdParaPtr topfd_para_ptr) {
     if (seed_ptr == nullptr) continue;
     EnvCollPtr env_coll_ptr = env_coll_util::findEnvColl(matrix_ptr, seed_ptr,
                                                          score_para_ptr, sn_ratio); 
-    if (env_coll_ptr != nullptr) {
-      if (env_coll_util::checkExistingFeatures(matrix_ptr, env_coll_ptr,
-                                               env_coll_list, score_para_ptr)) {
-        continue;
-      }
-      env_coll_ptr->refineMonoMass();
-      ECScorePtr ecscore_ptr = std::make_shared<ECScore>(env_coll_ptr, matrix_ptr,
-                                                         feat_id, sn_ratio); 
-      ecscore_list.push_back(ecscore_ptr);
+    if (env_coll_ptr == nullptr) continue;
+    if (env_coll_util::checkExistingFeatures(matrix_ptr, env_coll_ptr,
+                                             env_coll_list, score_para_ptr)) {
       env_coll_ptr->removePeakData(matrix_ptr);
-      if (ecscore_ptr->getScore() < topfd_para_ptr->getEcscoreCutoff()) {
-        continue;
-      }
-      env_coll_ptr->setEcscore(ecscore_ptr->getScore());
-      env_coll_list.push_back(env_coll_ptr);
-      FracFeaturePtr frac_feat_ptr = env_coll_util::getFracFeature(feat_id, deconv_ms1_ptr_vec, 
-                                                                   score_para_ptr->frac_id_,
-                                                                   score_para_ptr->file_name_,
-                                                                   env_coll_ptr, matrix_ptr, sn_ratio);
-      frac_features.push_back(frac_feat_ptr);
-      feat_id++;
+      continue;
     }
+    env_coll_ptr->refineMonoMass();
+    ECScorePtr ecscore_ptr = std::make_shared<ECScore>(env_coll_ptr, matrix_ptr,
+                                                       feat_id, sn_ratio); 
+    if (ecscore_ptr->getScore() < topfd_para_ptr->getEcscoreCutoff()) {
+      continue;
+    }
+    ecscore_list.push_back(ecscore_ptr);
+    env_coll_ptr->setEcscore(ecscore_ptr->getScore());
+    env_coll_ptr->removePeakData(matrix_ptr);
+    env_coll_list.push_back(env_coll_ptr);
+    FracFeaturePtr frac_feat_ptr = env_coll_util::getFracFeature(feat_id, deconv_ms1_ptr_vec, 
+                                                                 score_para_ptr->frac_id_,
+                                                                 score_para_ptr->file_name_,
+                                                                 env_coll_ptr, matrix_ptr, sn_ratio);
+    frac_features.push_back(frac_feat_ptr);
+    feat_id++;
   }
-  
+  std::cout << std::endl; 
+
+  if (topfd_para_ptr->isSearchPrecWindow()) {
+    // add ms1 feature based on precursor windows
+    // set min match envelope to 1 to accept single scan features
+    score_para_ptr->min_match_env_ = 1;
+    score_para_ptr->min_match_peak_ = 1;
+    score_para_ptr->min_seed_match_peak_ = 0;
+    sn_ratio = 0;
+    matrix_ptr->reconstruct(sn_ratio, single_scan_noise); 
+    int ms1_spec_num = deconv_ms1_ptr_vec.size();
+    for (size_t ms1_idx = 0; ms1_idx < deconv_ms1_ptr_vec.size(); ms1_idx++) {
+      perc = static_cast<int>((ms1_idx + 1)* 100 / ms1_spec_num);
+      int scan = deconv_ms1_ptr_vec[ms1_idx]->getMsHeaderPtr()->getFirstScanNum();
+      std::cout << "\r" << "Additional feature search MS1 spectrum scan " 
+        << scan << " ...       " << perc << "\% finished." << std::flush;
+      for (size_t i = 0; i < ms2_header_ptr_2d[ms1_idx].size(); i++) {
+        MsHeaderPtr header_ptr = ms2_header_ptr_2d[ms1_idx][i];
+        if (env_coll_assign::checkEnvColl(header_ptr, env_coll_list)) {
+          continue;
+        }
+        double prec_win_begin = header_ptr->getPrecWinBegin();
+        double prec_win_end = header_ptr->getPrecWinEnd();
+        SeedEnvPtrVec seed_ptr_list = seed_ptr_2d[ms1_idx];
+        SeedEnvPtrVec selected_seed_list;
+        LOG_DEBUG("ms1 id  " << ms1_idx << " seed number " << seed_ptr_list.size());
+        for (size_t i = 0; i < seed_ptr_list.size(); i++) {
+          double ref_mz = seed_ptr_list[i]->getReferMz();
+          if (ref_mz > prec_win_begin && ref_mz < prec_win_end) {
+            selected_seed_list.push_back(seed_ptr_list[i]);
+          }
+        }
+        SeedEnvPtr seed_ptr;
+        if (selected_seed_list.size() > 0) {
+          // choose the highest intensity one
+          std::sort(selected_seed_list.begin(), selected_seed_list.end(),
+                    SeedEnv::cmpSeedInteDec);
+          seed_ptr = selected_seed_list[0];  
+          seed_ptr = seed_env_util::relaxProcessSeedEnvPtr(seed_ptr, matrix_ptr,  
+                                                           score_para_ptr, sn_ratio); 
+        }
+        if (seed_ptr == nullptr) {
+          continue;
+        }
+
+        EnvCollPtr env_coll_ptr = env_coll_util::findEnvCollWithSingleEnv(matrix_ptr, seed_ptr, score_para_ptr,
+                                                                          sn_ratio); 
+        if (env_coll_ptr == nullptr) continue;
+        if (env_coll_util::checkExistingFeatures(matrix_ptr, env_coll_ptr,
+                                                 env_coll_list, score_para_ptr)) {
+          env_coll_ptr->removePeakData(matrix_ptr);
+          continue;
+        }
+        env_coll_ptr->refineMonoMass();
+        ECScorePtr ecscore_ptr = std::make_shared<ECScore>(env_coll_ptr, matrix_ptr,
+                                                           feat_id, sn_ratio); 
+        if (ecscore_ptr->getScore() < 0 || std::isnan(ecscore_ptr->getScore())) {
+          continue;
+        }
+        ecscore_list.push_back(ecscore_ptr);
+        env_coll_ptr->setEcscore(ecscore_ptr->getScore());
+        env_coll_ptr->removePeakData(matrix_ptr);
+        env_coll_list.push_back(env_coll_ptr);
+        FracFeaturePtr frac_feat_ptr = env_coll_util::getFracFeature(feat_id, deconv_ms1_ptr_vec, 
+                                                                     score_para_ptr->frac_id_,
+                                                                     score_para_ptr->file_name_,
+                                                                     env_coll_ptr, matrix_ptr, sn_ratio);
+        frac_features.push_back(frac_feat_ptr);
+        feat_id++;
+      }
+    }
+    std::cout << std::endl; 
+  }
+
   // map MS2 features
-  double zero_sn_ratio = 0;
-  MsMapPtr raw_matrix_ptr = std::make_shared<MsMap>(ms1_mzml_peaks, deconv_ms1_ptr_vec,
-                                                    score_para_ptr->bin_size_,
-                                                    zero_sn_ratio);
   SpecFeaturePtrVec ms2_features;
-
-  env_coll_assign::assignEnvColls(frac_features, env_coll_list, ecscore_list, 
-                                  raw_matrix_ptr, deconv_ms1_ptr_vec, ms2_header_ptr_2d,
-                                  seed_ptr_2d, ms2_features, topfd_para_ptr, score_para_ptr); 
-
-  std::cout << std::endl << "Number of proteoform features: " << ecscore_list.size() << std::endl;
+  env_coll_assign::assignEnvColls(frac_features, env_coll_list, ms2_header_ptr_2d,
+                                  ms2_features, topfd_para_ptr->getEcscoreCutoff()); 
+  std::cout << "Number of proteoform features: " << env_coll_list.size() << std::endl;
   /// output files
   if (topfd_para_ptr->isOutputCsvFeatureFile()) {
     std::string feat_file_name = output_base_name + "_ms1.csv";

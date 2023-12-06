@@ -34,6 +34,7 @@ Prsm::Prsm(ProteoformPtr proteoform_ptr, const DeconvMsPtrVec &deconv_ms_ptr_vec
       precursor_id_ = header_ptr->getFirstPrecId();
       spectrum_num_ = deconv_ms_ptr_vec.size();
       ori_prec_mass_ = header_ptr->getFirstPrecMonoMass();
+      sample_feature_id_ = header_ptr->getFirstPrecFeatureId();
       init(sp_para_ptr);
     }
 

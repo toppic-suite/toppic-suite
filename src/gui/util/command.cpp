@@ -42,6 +42,7 @@ std::string geneTopfdCommand(TopfdParaPtr para_ptr,
   oss << "-r " << para_ptr->getMsOneSnRatio() << " ";
   oss << "-s " << para_ptr->getMsTwoSnRatio() << " ";
   oss << "-w " << para_ptr->getPrecWindowWidth() << " ";
+  oss << "-t " << para_ptr->getEcscoreCutoff() << " ";
   command = command + oss.str();
   if (para_ptr->isUseMsDeconv()) {
     command = command + "-n ";
@@ -55,6 +56,12 @@ std::string geneTopfdCommand(TopfdParaPtr para_ptr,
   }
   if (!para_ptr->isDoFinalFiltering()) {
     command = command + "-d ";
+  }
+  if (para_ptr->isSearchPrecWindow()) {
+    command = command + "-f ";
+  }
+  if (para_ptr->isUseSingleScanNoiseLevel()) {
+    command = command + "-i ";
   }
   for (size_t i = 0; i < spec_file_lst.size(); i++) {
     command = command + spec_file_lst[i] + " ";

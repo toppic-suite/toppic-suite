@@ -15,6 +15,8 @@
 #include <algorithm>
 
 #include "common/util/logger.hpp"
+#include "common/util/str_util.hpp"
+#include "common/xml/xml_dom_util.hpp"
 #include "topfd/ecscore/env_coll/env_coll.hpp"
 
 namespace toppic {
@@ -113,6 +115,35 @@ int EnvColl::countEnvNum() {
     env_num = env_num + env_set_list_[i]->countEnvNum();
   }
   return env_num;
+}
+
+  int min_charge_;
+  int max_charge_;
+  int start_spec_id_;
+  int end_spec_id_;
+  double ecscore_ = -1;
+
+XmlDOMElement* EnvColl::toXmlElement(XmlDOMDocument* xml_doc) {
+  std::string element_name = "envelope_collection";
+  XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
+  std::string str = str_util::toString(min_charge_);
+  xml_doc->addElement(element, "min_charge", str.c_str());
+  str = str_util::toString(max_charge_);
+  xml_doc->addElement(element, "max_charge", str.c_str());
+  str = str_util::toString(start_spec_id_);
+  xml_doc->addElement(element, "start_spec_id", str.c_str());
+  str = str_util::toString(end_spec_id_);
+  xml_doc->addElement(element, "end_spec_id", str.c_str());
+  str = str_util::toString(ecscore_);
+  xml_doc->addElement(element, "ecsore", str.c_str());
+
+  element_name = "envelope_set_list";
+  XmlDOMElement* set_list = xml_doc->createElement(element_name.c_str());
+  for (size_t i = 0; i < env_set_list_.size(); i++) {
+    env_set_list_[i]->appendToXml(xml_doc, set_list);
+  }
+  element->appendChild(set_list);
+  return element;
 }
 
 }

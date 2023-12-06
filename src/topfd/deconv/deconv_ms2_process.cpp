@@ -228,6 +228,9 @@ void DeconvMs2Process::process() {
     ms_group_ptr = reader_ptr->getNextMsGroupPtr();    
   }
   pool_ptr->ShutDown();
+  for (int i = 0; i < thread_num; i++) { 
+    ms2_writer_ptr_vec[i] = nullptr;
+  }
   // Merge files
   std::string file_name_ext = "ms2.msalign";
   std::string para_str = topfd_para_ptr_->getParaStr("#", "\t");

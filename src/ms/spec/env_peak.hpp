@@ -38,7 +38,7 @@ class EnvPeak : public Peak {
 
   bool isExist();
 
-  void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
+  void appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 
   static int getNonExistPeakIdx() {return -1;}
 

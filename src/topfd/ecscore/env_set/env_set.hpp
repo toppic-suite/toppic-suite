@@ -5,6 +5,7 @@
 #ifndef TOPPIC_TOPFD_ECSCORE_ENV_SET_ENV_SET_HPP
 #define TOPPIC_TOPFD_ECSCORE_ENV_SET_ENV_SET_HPP
 
+#include "common/xml/xml_dom_document.hpp"
 #include "ms/msmap/ms_map.hpp"
 #include "topfd/ecscore/env/seed_env.hpp"
 #include "topfd/ecscore/env/ms_map_env.hpp"
@@ -79,6 +80,8 @@ class EnvSet {
   void mergeEnvSet(EnvSetPtr new_set_ptr); 
 
   static bool cmpChargeInc(EnvSetPtr a, EnvSetPtr b) { return a->getCharge() < b->getCharge(); }
+  
+  void appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 
  private:
   void initMedianXic();
