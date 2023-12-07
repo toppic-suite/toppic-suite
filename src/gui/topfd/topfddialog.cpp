@@ -116,6 +116,8 @@ void TopFDDialog::on_defaultButton_clicked() {
   ui->missLevelOneCheckBox->setChecked(para_ptr->isMissingLevelOne());
   ui->geneHTMLCheckBox->setChecked(para_ptr->isGeneHtmlFolder());
   ui->disableFilteringCheckBox->setChecked(!para_ptr->isDoFinalFiltering());
+  ui->disableNieghborFilteringCheckBox->setChecked(!para_ptr->isDoNeighborFiltering());
+  ui->ecscore_cutoff->setText(QString::number(para_ptr->getECScore()));
 
   ui->outputTextBrowser->clear();
   ui->outputTextBrowser->setText("Click the Start button to process the spectrum files.");
@@ -274,6 +276,8 @@ toppic::TopfdParaPtr TopFDDialog::getParaPtr() {
   para_ptr_->setUseEnvCnn(ui->envCNNCheckBox->isChecked());
   para_ptr_->setActivation(ui->activationComboBox->currentText().toStdString());
   para_ptr_->setDoFinalFiltering(!(ui->disableFilteringCheckBox->isChecked()));
+  para_ptr_->setDoNeighborFiltering(!(ui->disableNieghborFilteringCheckBox->isChecked()));
+  para_ptr_->setECScore(std::stod(ui->ecscore_cutoff->text().toStdString()));
 
   return para_ptr_;
 }
@@ -297,6 +301,7 @@ void TopFDDialog::lockDialog() {
   ui->envCNNCheckBox->setEnabled(false);
   ui->activationComboBox->setEnabled(false);
   ui->disableFilteringCheckBox->setEnabled(false);
+  ui->disableNieghborFilteringCheckBox->setEnabled(false);
 }
 
 void TopFDDialog::unlockDialog() {
@@ -319,6 +324,7 @@ void TopFDDialog::unlockDialog() {
   ui->envCNNCheckBox->setEnabled(true);
   ui->activationComboBox->setEnabled(true);
   ui->disableFilteringCheckBox->setEnabled(true);
+  ui->disableNieghborFilteringCheckBox->setEnabled(true);
 }
 
 bool TopFDDialog::checkError() {
@@ -363,6 +369,14 @@ bool TopFDDialog::checkError() {
                          QMessageBox::Yes);
     return true;
   }
+
+  if (ui->ecscore_cutoff->text().isEmpty()) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("ECScore cutoff is empty!"),
+                         QMessageBox::Yes);
+    return true;
+  }
+
   if (ui->threadNumberEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
                          tr("Thread number is empty!"),

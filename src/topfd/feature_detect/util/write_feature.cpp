@@ -74,8 +74,10 @@ namespace toppic {
     void writeFeatures(const std::string &output_file_name, const std::vector<Feature> &features) {
       std::ofstream of(output_file_name);
       writeHeader(of);
-      for (auto &feature: features)
-        writeOneFeature(of, feature);
+      for (auto &feature: features) {
+        if (feature.getElutionLength() > 0)
+          writeOneFeature(of, feature);
+      }
       of.close();
     }
   }

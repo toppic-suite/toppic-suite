@@ -84,6 +84,14 @@ std::string TopfdPara::getParaStr(const std::string &prefix,
     output << prefix << std::setw(gap) << std::left 
       << "Do final filtering:       " << sep << "No" << std::endl;
   }
+  if (do_neighbor_filtering_) {
+    output << prefix << std::setw(gap) << std::left
+            << "Do neighbor peak filtering:       " << sep << "Yes" << std::endl;
+  }
+  else {
+    output << prefix << std::setw(gap) << std::left
+           << "Do neighbor peak filtering:       " << sep << "No" << std::endl;
+  }
   output << prefix << std::setw(gap) << std::left 
       << "Version:                  " << sep << Version::getVersion() << std::endl;   
   output << prefix << "###################### Parameters ######################" << std::endl;

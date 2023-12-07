@@ -16,6 +16,8 @@
 #include "evaluate_envelope.hpp"
 
 bool toppic::evaluate_envelope::preprocess_env(PeakMatrix &peak_matrix, SeedEnvelope &env, FeatureParaPtr para_ptr, double sn_ratio) {
+  if (env.getCharge() < para_ptr->para_min_charge_)
+    return false;
   double mass_tol = para_ptr->mass_tole_;
   double corr_tol = para_ptr->corr_tole_;
   double min_mz = peak_matrix.get_min_mz() - mass_tol;

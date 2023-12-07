@@ -63,6 +63,25 @@ namespace env_set_util {
     return valid;
   }
 
+  bool check_valid_env_set_seed_env_sparse(PeakMatrix& peak_matrix, EnvSet& env_set, int max_miss_peak) {
+    std::vector<double> theo_envelope_inte = env_set.get_theo_distribution_inte();
+    int refer_idx = std::max_element(theo_envelope_inte.begin(), theo_envelope_inte.end()) - theo_envelope_inte.begin();
+    int base_idx = env_set.getBaseSpecId();
+    int start_idx = std::max(base_idx-2, 0);
+    int end_idx = std::min(base_idx+2, peak_matrix.get_spec_num() -1);
+    std::vector<ExpEnvelope> env_list = env_set.getExpEnvList();
+    bool valid = true;
+    int false_counter = 0;
+    for (auto &exp_env : env_list) {
+      if (exp_env.getSpecId() >= start_idx and exp_env.getSpecId() <= end_idx)
+        if (exp_env.get_match_peak_num(refer_idx) < max_miss_peak)
+          false_counter++;
+    }
+    if (false_counter > 2)
+      valid = false;
+    return valid;
+  }
+
   bool check_valid_env_set(PeakMatrix& peak_matrix, EnvSet& env_set) {
     bool valid = true;
     int elems = 0;

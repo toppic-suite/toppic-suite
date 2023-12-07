@@ -43,6 +43,7 @@ class TopfdPara {
   bool isKeepUnusedPeaks() {return keep_unused_peaks_;}
   bool isOutputMultipleMass() {return output_multiple_mass_;}
   int getThreadNum() {return thread_num_;}
+  bool isDoNeighborFiltering() {return do_neighbor_filtering_;}
   double getECScore() {return ecscore_;}
 
   void setExeDir(std::string dir) {exe_dir_ = dir;}
@@ -61,7 +62,9 @@ class TopfdPara {
   void setKeepUnusedPeaks(bool keep) {keep_unused_peaks_ = keep;}
   void setOutputMultipleMass(bool output) {output_multiple_mass_ = output;}
   void setThreadNum(int num) {thread_num_ = num;}
+  void setDoNeighborFiltering(bool filtering) {do_neighbor_filtering_ = filtering;}
   void setECScore(double score_cutoff) {ecscore_ = score_cutoff;}
+
 
   void setMs1ScanNumber(int ms1_scan_num) {ms_1_scan_num_ = ms1_scan_num;}
   void setMs2ScanNumber(int ms2_scan_num) {ms_2_scan_num_ = ms2_scan_num;}
@@ -81,6 +84,8 @@ class TopfdPara {
   bool use_env_cnn_ = false;
   bool output_multiple_mass_ = false;
   bool do_final_filtering_ = true;
+  bool do_neighbor_filtering_ = true;
+
   bool output_match_env_ = false;
   int  thread_num_ = 1;
   std::string activation_ = "FILE";
@@ -88,6 +93,7 @@ class TopfdPara {
   int ms_1_scan_num_ = -1;
   int ms_2_scan_num_ = -1;
   double ecscore_ = 0.5;
+
 };
 
 typedef std::shared_ptr<TopfdPara> TopfdParaPtr;
