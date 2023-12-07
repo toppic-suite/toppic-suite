@@ -45,6 +45,7 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string thread_number = "";
   std::string activation = "";
   std::string ecscore_cutoff = "";
+  std::string min_scan_num = "";
 
   // Define and parse the program options
   try {
@@ -65,18 +66,19 @@ bool Argument::parse(int argc, char* argv[]) {
          "<a positive number>. Set the signal-to-noise ratio for MS1 spectra. The default value is 3.")
         ("ms-two-sn-ratio,s", po::value<std::string> (&ms_two_sn_ratio),
          "<a positive number>. Set the signal-to-noise ratio for MS/MS spectra. The default value is 1.")
+        ("missing-level-one,o","MS1 spectra are missing in the input file.")
+        ("msdeconv,n", "Use the MS-Deconv score to rank isotopic envelopes.")
         ("precursor-window,w", po::value<std::string> (&prec_window),
          "<a positive number>. Set the default precursor window size. The default value is 3.0 m/z. When the input file contains the information of precursor windows, the parameter will be ignored.")
         ("ecscore-cutoff,t", po::value<std::string> (&ecscore_cutoff),
          "<a positive number in [0,1]>. Set the ECScore cutoff value for proteoform features. The default value is 0.5.")
-        ("msdeconv,n", "Use the MS-Deconv score to rank isotopic envelopes.")
-        ("missing-level-one,o","MS1 spectra are missing in the input file.")
+        ("min-scan-number,b",po::value<std::string> (&min_scan_num), 
+         "<1|2|3>. The minimum number of MS1 scans in which a proteoform feature is detected. The default value is 3.")
         ("single-scan-noise,i","Use the peak intensity noise levels in single MS1 scans to filter out low intensity peaks in proteoform feature detection. The default method is to use the peak intensity noise level of the whole LC-MS map to filter out low intensity peaks.")
-        ("additional-feature-search,f","Perform additional feature search for MS/MS scans that do not have detected proteoform features in their precursor isolation windows.")
-        ("single-scan-feature,l","Search for proteoform features in single MS1 scans.")
+        ("additional-feature-search,f","Perform additional feature search for MS/MS scans that do not have detected proteoform features in their precursor isolation windows. In additional search, the signal noise ratio is set to 0, the min scan number is set to 1, and the ecscore cutoff is set to 0.")
+        ("disable-final-filtering,d","Skip the final filtering of envelopes in MS/MS scans.")
         ("thread-number,u", po::value<std::string> (&thread_number), "<a positive integer>. Number of threads used in spectral deconvolution. Default value: 1.")
         ("skip-html-folder,g","Skip the generation of HTML files for visualization.")
-        ("disable-final-filtering,d","Skip the final filtering of envelopes.")
         ;
 
     po::options_description desc("Options");
@@ -93,7 +95,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("missing-level-one,o", "")
         ("single-scan-noise,i","")
         ("additional-feature-search,f","")
-        ("single-scan-feature,l","")
+        ("min-scan-number,b",po::value<std::string> (&min_scan_num),"")
         ("thread-number,u", po::value<std::string> (&thread_number), "")
         ("skip-html-folder,g","")
         ("msdeconv,n", "")
@@ -194,8 +196,18 @@ bool Argument::parse(int argc, char* argv[]) {
       topfd_para_ptr_->setSearchPrecWindow(true);
     }
 
-    if (vm.count("single-scan-feature")) {
-      topfd_para_ptr_->setReportSingleScanFeature(true);
+    if (vm.count("min-scan-number")) {
+      try {
+        int n = std::stoi(min_scan_num);
+        if (n < 1 || n > 3) {
+          LOG_ERROR("Min scan number " << min_scan_num << " should be 1, 2, or 3.");
+          return false;
+        }
+        topfd_para_ptr_->setMinScanNum(n);
+      } catch (std::exception& e) {
+        LOG_ERROR("Min scan number " << min_scan_num << " should be 1, 2, or 3.");
+        return false;
+      }
     }
 
     if (vm.count("spectrum-file-name")) {

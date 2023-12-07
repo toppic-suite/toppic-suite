@@ -52,7 +52,7 @@ EnvSetPtr searchEnvSet(MsMapPtr ms_map_ptr, SeedEnvPtr seed_ptr,
 EnvSetPtr searchEnvSet(MsMapPtr ms_map_ptr, SeedEnvPtr seed_ptr,
                        int start_spec_id, int end_spec_id,
                        EcscoreParaPtr para_ptr, double sn_ratio) {
-  double mass_tole = para_ptr->getMassTole();
+  double peak_mz_tole = para_ptr->getPeakMzTole();
   int refer_peak_idx = seed_ptr->getReferIdx();
   double min_inte = ms_map_ptr->getBaseInte() * sn_ratio;
    // search backward
@@ -61,10 +61,9 @@ EnvSetPtr searchEnvSet(MsMapPtr ms_map_ptr, SeedEnvPtr seed_ptr,
   int spec_id = seed_ptr->getSpecId();
   while (spec_id >= start_spec_id) {
     MsMapEnvPtr ms_map_env_ptr = ms_map_env_util::getMatchMsMapEnv(ms_map_ptr, seed_ptr,
-                                                                   spec_id, mass_tole, min_inte);
+                                                                   spec_id, peak_mz_tole, min_inte);
     back_env_list.push_back(ms_map_env_ptr);
-    if (ms_map_env_ptr->getTopThreeMatchNum(refer_peak_idx)
-       < para_ptr->min_match_peak_) {
+    if (ms_map_env_ptr->getTopThreeMatchNum(refer_peak_idx) < para_ptr->min_match_peak_) {
       miss_num = miss_num + 1;
     }
     else {
@@ -83,7 +82,7 @@ EnvSetPtr searchEnvSet(MsMapPtr ms_map_ptr, SeedEnvPtr seed_ptr,
   miss_num = 0;
   while (spec_id <= end_spec_id) {
     MsMapEnvPtr ms_map_env_ptr = ms_map_env_util::getMatchMsMapEnv(ms_map_ptr, seed_ptr,
-                                                                   spec_id, mass_tole, min_inte);
+                                                                   spec_id, peak_mz_tole, min_inte);
     forw_env_list.push_back(ms_map_env_ptr);
     if (ms_map_env_ptr->getTopThreeMatchNum(refer_peak_idx) < para_ptr->min_match_peak_) {
       miss_num = miss_num + 1;
@@ -105,7 +104,7 @@ EnvSetPtr searchEnvSet(MsMapPtr ms_map_ptr, SeedEnvPtr seed_ptr,
   }
   start_spec_id = back_env_list[0]->getSpecId();
   end_spec_id = back_env_list[back_env_list.size() - 1]->getSpecId();
-  if ((end_spec_id - start_spec_id + 1) < para_ptr->min_match_env_) {
+  if ((end_spec_id - start_spec_id + 1) < para_ptr->min_scan_num_) {
     return nullptr;
   }
   EnvSetPtr env_set_ptr = std::make_shared<EnvSet>(seed_ptr, back_env_list, 

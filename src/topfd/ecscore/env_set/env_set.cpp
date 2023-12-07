@@ -294,6 +294,44 @@ void EnvSet::refineXicBoundary() {
   initMedianXic();
 }
 
+bool EnvSet::containValidEnvs(int min_scan_num, int min_match_peak_num) {
+  int seed_spec_idx = seed_ptr_->getSpecId() - start_spec_id_; 
+  int ref_idx = seed_ptr_->getReferIdx(); 
+  if (min_scan_num == 1) {
+    MsMapEnvPtr env_ptr = ms_map_env_list_[seed_spec_idx];
+    if (env_ptr != nullptr && env_ptr->getTopThreeMatchNum(ref_idx) >= min_match_peak_num) {
+      return true; 
+    }
+    else {
+      return false;
+    }
+  }
+  else {
+    size_t first_idx = seed_spec_idx - 1;
+    if (first_idx < 0) {
+      first_idx = 0;
+    }
+    size_t last_idx = seed_spec_idx + 1;
+    if (last_idx >= ms_map_env_list_.size()) {
+      last_idx = ms_map_env_list_.size() -1;
+    }
+    int count = 0;
+    for (size_t i = first_idx; i <= last_idx; i++) {
+      MsMapEnvPtr env_ptr = ms_map_env_list_[i];
+      if (env_ptr != nullptr && env_ptr->getTopThreeMatchNum(ref_idx) >= min_match_peak_num) {
+        count = count + 1;
+      }
+    }
+    if (count >= min_scan_num) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+}
+
+/*
 bool EnvSet::containTwoValidEnvs(int min_match_peak) {
   int cnt = 0;
   int ref_idx = seed_ptr_->getReferIdx();
@@ -364,6 +402,7 @@ bool EnvSet::containThreeValidOutOfFiveEnvs(int min_match_peak_num) {
     return false;
   }
 }
+*/
 
 void EnvSet::mergeEnvSet(EnvSetPtr new_set_ptr) {
   int new_start_id = new_set_ptr->getStartSpecId();

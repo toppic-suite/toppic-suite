@@ -49,7 +49,6 @@ class TopfdPara {
   double getEcscoreCutoff() {return ecscore_cutoff_;}
   bool isSearchPrecWindow() {return search_prec_window_;}
   bool isUseSingleScanNoiseLevel() {return use_single_scan_noise_level_;}
-  bool isReportSingleScanFeature() {return report_single_scan_feature_;}
 
   std::string getMzmlFileName() {return mzml_file_name_;}
   std::string getOutputBaseName() {return output_base_name_;}
@@ -62,6 +61,7 @@ class TopfdPara {
   double getFaimsVoltage() {return faims_volt_;}
   int getMs1ScanNum() {return ms_1_scan_num_;}
   int getMs2ScanNum() {return ms_2_scan_num_;}
+  int getMinScanNum() {return min_scan_num_;}
 
   void setExeDir(std::string dir) {exe_dir_ = dir;}
   void setResourceDir(std::string dir) {resource_dir_ = dir;}
@@ -83,8 +83,7 @@ class TopfdPara {
   void setUseSingleScanNoiseLevel(bool single_scan_noise)
   {use_single_scan_noise_level_ = single_scan_noise;}
   void setEcscoreCutoff(double cutoff) {ecscore_cutoff_ = cutoff;}
-  void setReportSingleScanFeature(bool single_scan_feature)
-  {report_single_scan_feature_ = single_scan_feature;}
+  void setMinScanNum(int min_scan_num) {min_scan_num_ = min_scan_num;}
 
   void setFracId(int frac_id) {frac_id_ = frac_id;}
   void setMzmlFileNameAndFaims(std::string &mzml_file_name, bool is_faims, double voltage);
@@ -110,10 +109,10 @@ class TopfdPara {
   double ecscore_cutoff_ = 0.5;
   bool search_prec_window_ = false;
   bool use_single_scan_noise_level_ = false;
-  bool report_single_scan_feature_ = false;
+  int min_scan_num_ = 3;
 
   //** Fixed parameter setting **
-  // estimate min intensity using thrash method. 
+  // estimate min intensity using the method in Thrash. 
   bool estimate_min_inte_ = true;
   bool output_multiple_mass_ = false;
   bool output_match_env_ = false;

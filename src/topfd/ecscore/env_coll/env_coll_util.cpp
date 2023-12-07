@@ -36,7 +36,8 @@ EnvCollPtr getEnvCollPtr(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
   EnvSetPtrVec env_set_list;
   int charge = seed_ptr->getCharge() - 1;
   int miss_num = 0;
-  int min_match_peak_num_in_top_three = para_ptr->getMinMatchPeakNumInTopThree();
+  int min_match_peak_num = para_ptr->getMinMatchPeakNumInTopThree();
+  int min_scan_num = para_ptr->min_scan_num_; 
   while (charge >= para_ptr->para_min_charge_) {
     SeedEnvPtr cur_seed_ptr = std::make_shared<SeedEnv>(seed_ptr, charge);
     EnvSetPtr env_set_ptr = env_set_util::searchEnvSet(matrix_ptr, cur_seed_ptr,
@@ -47,7 +48,7 @@ EnvCollPtr getEnvCollPtr(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
     } 
     else {
       env_set_ptr->refineXicBoundary();
-      if (!env_set_ptr->containTwoValidEnvs(min_match_peak_num_in_top_three)) {
+      if (!env_set_ptr->containValidEnvs(min_scan_num, min_match_peak_num)) {
         miss_num = miss_num + 1;
       }
       else {
@@ -72,7 +73,7 @@ EnvCollPtr getEnvCollPtr(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
       miss_num = miss_num + 1;
     } else {
       env_set_ptr->refineXicBoundary();
-      if (!env_set_ptr->containTwoValidEnvs(min_match_peak_num_in_top_three)) {
+      if (!env_set_ptr->containValidEnvs(min_scan_num, min_match_peak_num)) {
         miss_num = miss_num + 1;
       }
       else {
@@ -101,16 +102,12 @@ EnvCollPtr findEnvColl(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
     return nullptr; 
   }
   env_set_ptr->refineXicBoundary();
-  int min_match_peak_num_in_top_three = para_ptr->getMinMatchPeakNumInTopThree();
-  // check if there are at least two envelopes
-  if (!para_ptr->report_single_scan_feature_
-      && !env_set_ptr->containTwoValidOutOfThreeEnvs(min_match_peak_num_in_top_three)) {
-    return nullptr; 
+  int min_match_peak_num = para_ptr->getMinMatchPeakNumInTopThree();
+  int min_scan_num = para_ptr->min_scan_num_; 
+  // check if there are valid envelopes 
+  if (!env_set_ptr->containValidEnvs(min_scan_num, min_match_peak_num)) {
+    return nullptr;
   }
-  /*
-     if (!env_set_ptr->containThreeValidOutOfFiveEnvs(min_match_peak_num_in_top_three))
-     return nullptr;
-   */
   double even_odd_peak_ratio = component_score::getAggOddEvenPeakRatio(env_set_ptr);
   SeedEnvPtr new_seed_ptr = seed_ptr;
   if (std::abs(even_odd_peak_ratio) > para_ptr->even_odd_ratio_cutoff_) {
@@ -128,8 +125,7 @@ EnvCollPtr findEnvColl(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
     env_set_ptr = tmp_env_set_ptr;
     env_set_ptr->refineXicBoundary();
 
-    if (!para_ptr->report_single_scan_feature_
-        && !env_set_ptr->containTwoValidOutOfThreeEnvs(min_match_peak_num_in_top_three)) {
+    if (!env_set_ptr->containValidEnvs(min_scan_num, min_match_peak_num)) {
       return nullptr; 
     }
   }
@@ -199,7 +195,7 @@ bool checkOverlap(MsMapRowHeaderPtrVec &spectrum_list, EnvCollPtr coll_ptr,
 bool checkExistingFeatures(MsMapPtr matrix_ptr, EnvCollPtr env_coll_ptr,
                            EnvCollPtrVec &env_coll_list, EcscoreParaPtr para_ptr) {
   double env_mass = env_coll_ptr->getMonoNeutralMass();
-  double mass_tol = para_ptr->match_envelope_tolerance_ * env_mass;
+  double mass_tol = para_ptr->match_feature_ppm_tolerance_ * env_mass;
   std::vector<int> charge_states = env_coll_ptr->getChargeList();
   double isotope_mass = mass_constant::getIsotopeMass();
   std::vector<double> extended_masses = {env_mass - isotope_mass, env_mass, env_mass + isotope_mass};
@@ -213,7 +209,7 @@ bool checkExistingFeatures(MsMapPtr matrix_ptr, EnvCollPtr env_coll_ptr,
   EnvCollPtr overlap_env_coll_ptr;
   for (int i = 0; i < num_env_colls; i++) {
     bool overlap = checkOverlap(spectrum_list, env_coll_list[i], feature_start_rt, feature_end_rt, 
-                                para_ptr->time_overlap_tole_); 
+                                para_ptr->match_feature_time_overlap_tole_); 
     if (overlap) {
       double min_mass_diff = std::numeric_limits<double>::max();
       for (auto ext_mass: extended_masses) {

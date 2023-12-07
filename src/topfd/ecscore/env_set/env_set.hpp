@@ -71,11 +71,15 @@ class EnvSet {
 
   void refineXicBoundary();
 
+  bool containValidEnvs(int min_scan_num, int min_match_peak_num); 
+
+  /*
   bool containTwoValidEnvs(int min_match_peak_num); 
 
   bool containTwoValidOutOfThreeEnvs(int min_match_peak_num);
 
   bool containThreeValidOutOfFiveEnvs(int min_match_peak_num); 
+  */
 
   void mergeEnvSet(EnvSetPtr new_set_ptr); 
 
