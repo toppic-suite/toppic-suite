@@ -298,6 +298,9 @@ bool EnvSet::containValidEnvs(int min_scan_num, int min_match_peak_num) {
   int seed_spec_idx = seed_ptr_->getSpecId() - start_spec_id_; 
   int ref_idx = seed_ptr_->getReferIdx(); 
   if (min_scan_num == 1) {
+    if (seed_spec_idx < 0 || seed_spec_idx >= ms_map_env_list_.size()) {
+      return false;
+    }
     MsMapEnvPtr env_ptr = ms_map_env_list_[seed_spec_idx];
     if (env_ptr != nullptr && env_ptr->getTopThreeMatchNum(ref_idx) >= min_match_peak_num) {
       return true; 
