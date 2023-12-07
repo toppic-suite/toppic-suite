@@ -54,7 +54,8 @@ TopFDDialog::TopFDDialog(QWidget *parent) :
       QRegExpValidator *validator2 = new QRegExpValidator(rx2, this);
       ui->ms1snRatioEdit->setValidator(validator2);
       ui->ms2snRatioEdit->setValidator(validator2);
-      ui->threadNumberEdit->setValidator(new QIntValidator(0, 2147483647, this));
+      ui->threadNumberEdit->setValidator(new QIntValidator(0, 1000, this));
+      ui->minScanNumEdit->setValidator(new QIntValidator(1, 3, this));
       ui->ecscoreCutoffEdit->setValidator(new QDoubleValidator(0.0, 1.0, 4, this));
       QRegExp rx3("^\\d{1,4}\\.\\d{0,2}|10000$");
       QRegExpValidator *validator3 = new QRegExpValidator(rx3, this);
@@ -114,6 +115,7 @@ void TopFDDialog::on_defaultButton_clicked() {
   ui->windowSizeEdit->setText(QString::number(para_ptr->getPrecWindowWidth()));
   ui->threadNumberEdit->setText(QString::number(para_ptr->getThreadNum()));
   ui->ecscoreCutoffEdit->setText(QString::number(para_ptr->getEcscoreCutoff()));
+  ui->minScanNumEdit->setText(QString::number(para_ptr->getMinScanNum()));
   ui->msDeconvCheckBox->setChecked(para_ptr->isUseMsDeconv());
   ui->missLevelOneCheckBox->setChecked(para_ptr->isMissingLevelOne());
   ui->geneHTMLCheckBox->setChecked(para_ptr->isGeneHtmlFolder());
@@ -275,6 +277,7 @@ toppic::TopfdParaPtr TopFDDialog::getParaPtr() {
   para_ptr_->setPrecWindowWidth(std::stod(ui->windowSizeEdit->text().toStdString()));
   para_ptr_->setMissingLevelOne(ui->missLevelOneCheckBox->isChecked()); 
   para_ptr_->setEcscoreCutoff(std::stod(ui->ecscoreCutoffEdit->text().toStdString()));
+  para_ptr_->setMinScanNum(std::stoi(ui->minScanNumEdit->text().toStdString()));
   para_ptr_->setThreadNum(std::stoi(ui->threadNumberEdit->text().toStdString()));
   para_ptr_->setGeneHtmlFolder(ui->geneHTMLCheckBox->isChecked());
   para_ptr_->setUseMsDeconv(ui->msDeconvCheckBox->isChecked());
@@ -296,6 +299,7 @@ void TopFDDialog::lockDialog() {
   ui->ms1snRatioEdit->setEnabled(false);
   ui->ms2snRatioEdit->setEnabled(false);
   ui->threadNumberEdit->setEnabled(false);
+  ui->minScanNumEdit->setEnabled(false);
   ui->clearButton->setEnabled(false);
   ui->defaultButton->setEnabled(false);
   ui->startButton->setEnabled(false);
@@ -320,6 +324,7 @@ void TopFDDialog::unlockDialog() {
   ui->ms1snRatioEdit->setEnabled(true);
   ui->ms2snRatioEdit->setEnabled(true);
   ui->threadNumberEdit->setEnabled(true);
+  ui->minScanNumEdit->setEnabled(true);
   ui->clearButton->setEnabled(true);
   ui->defaultButton->setEnabled(true);
   ui->startButton->setEnabled(true);
@@ -384,6 +389,14 @@ bool TopFDDialog::checkError() {
                          QMessageBox::Yes);
     return true;
   }
+
+  if (ui->minScanNumEdit->text().isEmpty()) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("Mininum scan number is empty!"),
+                         QMessageBox::Yes);
+    return true;
+  }
+
 
   if (ui->ecscoreCutoffEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),

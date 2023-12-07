@@ -489,9 +489,9 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>380</y>
+      <y>410</y>
       <width>901</width>
-      <height>191</height>
+      <height>161</height>
      </rect>
     </property>
     <property name="html">
@@ -592,7 +592,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>290</y>
+      <y>330</y>
       <width>901</width>
       <height>81</height>
      </rect>
@@ -819,6 +819,50 @@ p, li { white-space: pre-wrap; }
      </item>
     </layout>
    </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget_18">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>280</y>
+      <width>241</width>
+      <height>42</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_18">
+     <item>
+      <widget class="QLabel" name="label_11">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Minimum scan number:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="minScanNumEdit">
+       <property name="minimumSize">
+        <size>
+         <width>40</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>70</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>3</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
    <zorder>listWidget</zorder>
    <zorder>horizontalLayoutWidget</zorder>
    <zorder>horizontalLayoutWidget_13</zorder>
@@ -833,6 +877,7 @@ p, li { white-space: pre-wrap; }
    <zorder>horizontalLayoutWidget_10</zorder>
    <zorder>groupBox</zorder>
    <zorder>horizontalLayoutWidget_6</zorder>
+   <zorder>horizontalLayoutWidget_18</zorder>
   </widget>
  </widget>
  <resources/>
