@@ -206,4 +206,25 @@ void MzmlMsGroupReader::getMs1Map(PeakPtrVec2D &ms1_mzml_peaks,
   }
 }
 
+void MzmlMsGroupReader::getMs2Map(PeakPtrVec2D &ms2_mzml_peaks, 
+                                  DeconvMsPtrVec &deconv_ms2_list) {
+  int idx = 0;
+  while (true && idx < static_cast<int>(deconv_ms2_list.size())) {
+    MzmlMsGroupPtr group_ptr = getMs1Ms2MsGroupPtr(); 
+    if (group_ptr == nullptr) {
+      break;
+    }
+    MzmlMsPtrVec mzml_ms2_spectra = group_ptr->getMsTwoPtrVec();
+    for (size_t i = 0; i < mzml_ms2_spectra.size(); i++) {
+      if (mzml_ms2_spectra[i]->getMsHeaderPtr()->getSpecId() ==
+          deconv_ms2_list[idx]->getMsHeaderPtr()->getSpecId()) {
+        PeakPtrVec peak_list = mzml_ms2_spectra[i]->getPeakPtrVec();
+        ms2_mzml_peaks.push_back(peak_list);
+        idx++;
+      }
+    }
+  }
+}
+
+
 }

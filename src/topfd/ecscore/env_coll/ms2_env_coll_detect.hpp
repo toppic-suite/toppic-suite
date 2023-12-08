@@ -12,21 +12,18 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_MS_SPEC_DECONV_MS_HPP_
-#define TOPPIC_MS_SPEC_DECONV_MS_HPP_
+#ifndef TOPPIC_TOPFD_ECSCORE_MS2_ENV_COLL_ENV_COLL_DETECT_HPP_
+#define TOPPIC_TOPFD_ECSCORE_MS2_ENV_COLL_ENV_COLL_DETECT_HPP_
 
-#include "ms/spec/deconv_peak.hpp"
-#include "ms/spec/ms.hpp"
+#include "topfd/common/topfd_para.hpp"
 
 namespace toppic {
 
-typedef Ms<DeconvPeakPtr> DeconvMs;
+namespace ms2_env_coll_detect {
 
-typedef std::shared_ptr<Ms<DeconvPeakPtr>> DeconvMsPtr;
+void process(TopfdParaPtr para_ptr);
 
-typedef std::vector<DeconvMsPtr> DeconvMsPtrVec;
-
-typedef std::vector<DeconvMsPtrVec> DeconvMsPtr2D;
+}
 
 }
 
