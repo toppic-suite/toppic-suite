@@ -48,7 +48,6 @@ void process(TopfdParaPtr topfd_para_ptr) {
   }
   EcscoreParaPtr score_para_ptr = std::make_shared<EcscorePara>(topfd_para_ptr->getFracId(), 
                                                                 topfd_para_ptr->getMzmlFileName(),
-                                                                topfd_para_ptr->getResourceDir(), 
                                                                 topfd_para_ptr);
   // read deconvoluted MS1 peaks
   std::string output_base_name = topfd_para_ptr->getOutputBaseName();
@@ -95,8 +94,8 @@ void process(TopfdParaPtr topfd_para_ptr) {
                                                 score_para_ptr->bin_size_,
                                                 sn_ratio, single_scan_noise);
 
-  if (score_para_ptr->filter_neighboring_peaks_) {
-    matrix_ptr->removeNonNeighbors(score_para_ptr->neighbor_mass_tole_);
+  if (score_para_ptr->min_scan_num_ >= 2) {
+    matrix_ptr->removeNonNeighbors(score_para_ptr->neighbor_mz_tole_);
   }
 
   /// Extract Fetures
@@ -147,9 +146,8 @@ void process(TopfdParaPtr topfd_para_ptr) {
   if (topfd_para_ptr->isSearchPrecWindow()) {
     // add ms1 feature based on precursor windows
     // set min match envelope to 1 to accept single scan features
-    score_para_ptr->min_match_env_ = 1;
+    score_para_ptr->min_scan_num_ = 1;
     score_para_ptr->min_match_peak_ = 1;
-    score_para_ptr->min_seed_match_peak_ = 0;
     sn_ratio = 0;
     matrix_ptr->reconstruct(sn_ratio, single_scan_noise); 
     int ms1_spec_num = deconv_ms1_ptr_vec.size();

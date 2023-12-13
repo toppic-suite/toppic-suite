@@ -18,67 +18,14 @@
 
 namespace toppic {
 
-EcscorePara::EcscorePara(int frac_id, const std::string &file_name, 
-                         const std::string &resource_dir): 
-  frac_id_(frac_id),
-  file_name_(file_name) {
-
-  double ppo = 0.000015;
-  peak_tolerance_ptr_ = std::make_shared<PeakTolerance>(ppo);
-
-  // extend sp parameter 
-  double IM = mass_constant::getIsotopeMass();
-  // the set of offsets used to expand the monoisotopic mass list 
-  std::vector<double> offsets_1 {{0, -IM, IM, -2 * IM, 2 * IM, -3*IM, 3*IM}};
-  search_offsets_ = offsets_1;
-  std::vector<double> offsets_2 {{0, -IM, IM, -2 * IM, 2 * IM}};
-  extend_offsets_ = offsets_2;
-}
-
 EcscorePara::EcscorePara(int frac_id, const std::string &file_name,
-                        const std::string &resource_dir, TopfdParaPtr para_ptr):
+                         TopfdParaPtr para_ptr):
     frac_id_(frac_id),
     file_name_(file_name) {
 
-  double ppo = 0.000015;
-  peak_tolerance_ptr_ = std::make_shared<PeakTolerance>(ppo);
-
-  // extend sp parameter
-  double IM = mass_constant::getIsotopeMass();
-  // the set of offsets used to expand the monoisotopic mass list
-  std::vector<double> offsets_1 {{0, -IM, IM, -2 * IM, 2 * IM, -3*IM, 3*IM}};
-  search_offsets_ = offsets_1;
-  std::vector<double> offsets_2 {{0, -IM, IM, -2 * IM, 2 * IM}};
-  extend_offsets_ = offsets_2;
-
   /// additional parameters
   para_max_charge_ = para_ptr->getMaxCharge();
-  para_min_charge_ = 1;
-  filter_neighboring_peaks_ = true;
-  corr_tole_ = 0.5;
-}
-
-std::vector<double> EcscorePara::getExtendMasses(double mass) {
-  std::vector<double> result;
-  if (mass < extend_min_mass_) {
-    result.push_back(mass);
-  }
-  else {
-    for (size_t i = 0; i < extend_offsets_.size(); i++) {
-      double new_mass = mass + extend_offsets_[i];
-      result.push_back(new_mass);
-    }
-  }
-  return result;
-}
-
-std::vector<double> EcscorePara::getSearchMasses(double mass) {
-  std::vector<double> result;
-  for (size_t i = 0; i < search_offsets_.size(); i++) {
-    double new_mass = mass + search_offsets_[i];
-    result.push_back(new_mass);
-  }
-  return result;
+  min_scan_num_ = para_ptr->getMinScanNum();
 }
 
 } /* namespace */

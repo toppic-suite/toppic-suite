@@ -24,61 +24,37 @@ namespace toppic {
 
 class EcscorePara {
  public:
-  EcscorePara(int frac_id, const std::string &file_name, 
-              const std::string &resource_dir);
-
   EcscorePara(int frac_id, const std::string &file_name,
-              const std::string &resource_dir, TopfdParaPtr para_ptr);
+              TopfdParaPtr para_ptr);
 
-  std::vector<double> getExtendMasses(double mass);
-
-  std::vector<double> getExtendOffsets() {return extend_offsets_;}
-
-  std::vector<double> getSearchMasses(double mass);
-
-  std::vector<double> getSearchOffsets() {return search_offsets_;}
-
-  PeakTolerancePtr peak_tolerance_ptr_;
-
-  double getMassTole() {return mass_tole_;}
+  double getPeakMzTole() {return peak_mz_tole_;}
 
   int getMinMatchPeakNumInTopThree() {return min_match_peak_;}
 
-  // extend_offset is -2, -1, 0, 1, 2. We use it to search matched masses 
-  // when a reference mass is given to find a feature. 
-  std::vector<double> extend_offsets_;
-
-  // search offset is  -3, -2, -1, 0, 1, 2, 3. We use it to search the precursor 
-  // mass of an MS/MS spectrum to find a matched feature.
-  std::vector<double> search_offsets_;
-
-  double extend_min_mass_ = 5000;
-  int intv_width_ = 500;
-  int feature_num_ = 20000;
   int frac_id_;
+  std::string file_name_;
 
   ///// params
-  int para_max_charge_;
-  int para_min_charge_;
-  bool filter_neighboring_peaks_;
-  double corr_tole_;
+  int para_min_charge_ = 1;
+  int para_max_charge_ = 30;
+  double seed_env_inte_corr_tole_cutoff_ = 0.5;
 
   double bin_size_ = 0.1;
-  double neighbor_mass_tole_ = 0.01;
-  double mass_tole_ = 0.008;
+  double neighbor_mz_tole_ = 0.01;
+  double peak_mz_tole_ = 0.008;
   int max_miss_env_ = 2;
   int max_miss_charge_ = 2;
-  int max_miss_peak_ = 2;
 
+  // min matched peak in an envelope
   int min_match_peak_ = 2;
-  int min_seed_match_peak_ = 2;
-  int min_match_env_ = 2;
-
-  double match_envelope_tolerance_ = 10E-6;
-  double time_overlap_tole_ = 0.8;
+  // min number of scans for a feature
+  int min_scan_num_ = 3;
+  
+  // used for match two feature masses 10 ppm 
+  double match_feature_ppm_tolerance_ = 0.000010;
+  double match_feature_time_overlap_tole_ = 0.8;
   double even_odd_ratio_cutoff_ = 0.4;
 
-  std::string file_name_;
 
 };
 

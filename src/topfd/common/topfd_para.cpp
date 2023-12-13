@@ -103,6 +103,8 @@ std::string TopfdPara::getParaStr(const std::string &prefix,
     output << prefix << std::setw(gap) << std::left 
       << "Miss MS1 spectra:           " << sep << "No" << std::endl;
   }
+  output << prefix << std::setw(gap) << std::left 
+      << "Min scan number:            " << sep << min_scan_num_ << std::endl;
   if (use_single_scan_noise_level_) {
     output << prefix << std::setw(gap) << std::left 
       << "Use single scan noise level:" << sep << "Yes" << std::endl;

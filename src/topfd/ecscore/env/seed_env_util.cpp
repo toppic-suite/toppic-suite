@@ -89,7 +89,7 @@ SeedEnvPtr preprocessSeedEnvPtr(SeedEnvPtr seed_ptr, MsMapPtr ms_map_ptr,
   MsMapEnvPtr ms_map_env_ptr
     = ms_map_env_util::getMatchMsMapEnv(ms_map_ptr, seed_ptr,
                                         seed_ptr->getSpecId(),
-                                        para_ptr->mass_tole_);
+                                        para_ptr->peak_mz_tole_);
   double inte_ratio = ms_map_env_util::compTopThreeInteRatio(seed_ptr, ms_map_env_ptr);
   double min_inte = ms_map_ptr->getBaseInte() * sn_ratio;
   EnvPeakPtrVec scaled_peak_ptr_list = seed_ptr->getScaledPeakPtrList(inte_ratio, min_inte);
@@ -100,7 +100,7 @@ SeedEnvPtr preprocessSeedEnvPtr(SeedEnvPtr seed_ptr, MsMapPtr ms_map_ptr,
   //5. Check Pearson correlation 
   std::vector<double> exp_inte_list = ms_map_env_ptr->getInteList();
   double corr = pearsonr(scaled_peak_ptr_list, exp_inte_list); 
-  if (corr < para_ptr->corr_tole_) {
+  if (corr < para_ptr->seed_env_inte_corr_tole_cutoff_) {
     return nullptr;
   }
   //6. Generate new seed envelope
@@ -139,7 +139,7 @@ SeedEnvPtr relaxProcessSeedEnvPtr(SeedEnvPtr seed_ptr, MsMapPtr ms_map_ptr,
   MsMapEnvPtr ms_map_env_ptr
     = ms_map_env_util::getMatchMsMapEnv(ms_map_ptr, seed_ptr,
                                         seed_ptr->getSpecId(),
-                                        para_ptr->mass_tole_);
+                                        para_ptr->peak_mz_tole_);
   double inte_ratio = ms_map_env_util::compTopThreeInteRatio(seed_ptr, ms_map_env_ptr);
   double min_inte = ms_map_ptr->getBaseInte() * sn_ratio;
   EnvPeakPtrVec scaled_peak_ptr_list = seed_ptr->getScaledPeakPtrList(inte_ratio, min_inte);

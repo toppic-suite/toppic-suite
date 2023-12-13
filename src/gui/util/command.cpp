@@ -43,6 +43,7 @@ std::string geneTopfdCommand(TopfdParaPtr para_ptr,
   oss << "-s " << para_ptr->getMsTwoSnRatio() << " ";
   oss << "-w " << para_ptr->getPrecWindowWidth() << " ";
   oss << "-t " << para_ptr->getEcscoreCutoff() << " ";
+  oss << "-b " << para_ptr->getMinScanNum() << " ";
   command = command + oss.str();
   if (para_ptr->isUseMsDeconv()) {
     command = command + "-n ";
