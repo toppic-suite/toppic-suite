@@ -1,3 +1,6 @@
+Version 1.7.0 (December, 2023)
+    & TopFD: Added new functions and machine learning models for proteoform feature detection and evaluation in LC-MS or CE-MS data.
+
 Version 1.6.0 (December, 2022)
     * TopPIC: Added support for variable PTMs
     * TopPIC: Rewrote protein sequence filtering methods

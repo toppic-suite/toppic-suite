@@ -33,8 +33,8 @@ void mergeMsalignFiles(const std::vector<std::string> &msalign_file_names,
     std::vector<std::string> ms_lines = sp_reader.readOneStrSpectrum();
     while (ms_lines.size() > 0) {
       for (size_t k = 0; k< ms_lines.size(); k++) {
-        if (ms_lines[k].substr(0, 8) == "SPECTRUM_ID=") {
-          outfile << "SPECTRUM_ID=" << (SpPara::getMaxSpecNumPerFile() * i + std::stoi(ms_lines[k].substr(8))) 
+        if (ms_lines[k].substr(0, 12) == "SPECTRUM_ID=") {
+          outfile << "SPECTRUM_ID=" << (SpPara::getMaxSpecNumPerFile() * i + std::stoi(ms_lines[k].substr(12))) 
             << std::endl;
         } else if (ms_lines[k].substr(0, 10) == "MS_ONE_ID=") {
           outfile << "MS_ONE_ID=" 
