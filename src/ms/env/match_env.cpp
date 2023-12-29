@@ -52,9 +52,10 @@ void MatchEnv::compMsdeconvScr(EnvParaPtr env_para_ptr) {
 double MatchEnv::findBestShift(EnvParaPtr env_para_ptr) {
   double best_score = - std::numeric_limits<double>::infinity();
   int best_shift = 0;
+  int charge = theo_env_ptr_->getCharge();
   // initialize start shift and end shift based on configuration 
-  int bgn_shift = (int)std::round(-env_para_ptr->mz_tolerance_ * env_para_ptr->shift_scale_);
-  int end_shift = (int)std::round(env_para_ptr->mz_tolerance_ * env_para_ptr->shift_scale_);
+  int bgn_shift = (int)std::round(-env_para_ptr->getMzTolerance(charge) * env_para_ptr->shift_scale_);
+  int end_shift = (int)std::round(env_para_ptr->getMzTolerance(charge) * env_para_ptr->shift_scale_);
 
   for (int s = bgn_shift; s <= end_shift; s++) {
     double tmp_score = calcScrWithSftRatio((double) s / env_para_ptr->shift_scale_,
