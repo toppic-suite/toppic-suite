@@ -39,8 +39,6 @@ namespace toppic {
 
     DpPara(double mz_tolerance){mz_tolerance_ = mz_tolerance;};
   
-    //mz tolerance used in computing msalign score
-    double mz_tolerance_ = 0.02;
 
     //dynamic programming window size
     double dp_window_size_ = 1.0;
@@ -59,6 +57,10 @@ namespace toppic {
     int dp_env_num_ = 300;
     // maximum number of vertices per window 
     int max_env_num_per_vertex_ = 10;
+
+    //mz tolerance used in computing msalign score
+    //mz tolerance is fixed, NOT reduced for high charge state envelopes
+    double mz_tolerance_ = 0.02;
   };
   
 } /* namespace */

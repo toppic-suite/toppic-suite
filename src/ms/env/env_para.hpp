@@ -33,14 +33,10 @@ class EnvPara {
   // set mz tolerance 
   EnvPara(double mz_tolerance);  
 
-  double getMzTolerance() {return mz_tolerance_;}
+  double getMzTolerance(int charge); 
 
   double getScoreErrorTolerance() {return score_error_tolerance_;}
 
-  // *** mz_tolerance and score_error_tolerance,
-  // *** are initialized and fixed for envelope detection, filtering, scoring
-  // error tolerance for matching real peaks to theoretical peaks 
-  double mz_tolerance_ = 0.02;
 
   //***fixed parameters used in env_detect***
   double getPercentBound(int mass_group) {return percentage_bound_[mass_group];}
@@ -131,6 +127,12 @@ class EnvPara {
   double multiple_min_mass_ = 5000;
   int multiple_min_charge_ = 20;
   double multiple_min_ratio_ = 0.9;
+
+ private:
+  // *** mz_tolerance and score_error_tolerance,
+  // *** are initialized and fixed for envelope detection, filtering, scoring
+  // error tolerance for matching real peaks to theoretical peaks 
+  double mz_tolerance_ = 0.02;
 };
 
 } /* namespace */
