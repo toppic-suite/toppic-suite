@@ -15,6 +15,8 @@
 #ifndef TOPPIC_MS_MZML_MZML_MS_GROUP_FAIME_READER_HPP_
 #define TOPPIC_MS_MZML_MZML_MS_GROUP_FAIME_READER_HPP_
 
+#include <set>
+
 #include "ms/env/match_env.hpp"
 #include "ms/mzml/mzml_ms_group.hpp"
 #include "ms/mzml/pw_ms_reader.hpp"
@@ -39,6 +41,9 @@ class MzmlMsGroupReader {
 
   void getMs1Map(PeakPtrVec2D &ms1_mzml_peaks, 
                  MsHeaderPtr2D &ms2_header_ptr_2d);
+
+  void getMs2Map(PeakPtrVec2D &ms2_mzml_peaks, 
+                 std::set<int> &spec_id_set);
 
  private:
   PwMsReaderPtr reader_ptr_;

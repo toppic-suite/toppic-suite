@@ -206,4 +206,23 @@ void MzmlMsGroupReader::getMs1Map(PeakPtrVec2D &ms1_mzml_peaks,
   }
 }
 
+void MzmlMsGroupReader::getMs2Map(PeakPtrVec2D &ms2_mzml_peaks, 
+                                  std::set<int> &spec_id_set) {
+  while (true) {
+    MzmlMsGroupPtr group_ptr = getMs1Ms2MsGroupPtr(); 
+    if (group_ptr == nullptr) {
+      break;
+    }
+    MzmlMsPtrVec ms2_ptr_vec = group_ptr->getMsTwoPtrVec(); 
+    for (size_t i = 0; i < ms2_ptr_vec.size(); i++) {
+      MzmlMsPtr ms2_ptr = ms2_ptr_vec[i];
+      int spec_id = ms2_ptr->getMsHeaderPtr()->getSpecId();
+      if (spec_id_set.find(spec_id) != spec_id_set.end()) {
+        PeakPtrVec peak_list = ms2_ptr->getPeakPtrVec();
+        ms2_mzml_peaks.push_back(peak_list);
+      }
+    }
+  }
+}
+
 }
