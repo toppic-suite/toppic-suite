@@ -23,6 +23,9 @@ namespace env_coll_detect {
 
 void process(TopfdParaPtr para_ptr);
 
+void processMs2(TopfdParaPtr topfd_para_ptr, double mz_bgn, double mz_end, 
+                std::set<int> spec_id_set); 
+
 }
 
 }

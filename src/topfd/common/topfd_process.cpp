@@ -26,6 +26,7 @@
 #include "topfd/ecscore/env_coll/env_coll_detect.hpp"
 #include "topfd/deconv/deconv_ms1_process.hpp"
 #include "topfd/deconv/deconv_ms2_process.hpp"
+#include "topfd/dia/feature_detect_ms2.hpp"
 
 namespace toppic {
 
@@ -51,6 +52,14 @@ void processOneFileWithFaims(TopfdParaPtr para_ptr) {
   ms2_proc_ptr->process();
   ms2_proc_ptr = nullptr;
   std::cout << "MS/MS deconvolution finished." << std::endl;
+  if (para_ptr->isDia()) {
+    std::cout << "MS/MS feature detection started." << std::endl;
+    FeatureDetectMs2Ptr ms2_feature_ptr =
+      std::make_shared<FeatureDetectMs2>(para_ptr);
+    ms2_feature_ptr->process();
+    ms2_feature_ptr = nullptr;
+    std::cout << "MS/MS feature detection finished." << std::endl;
+  }
 }
 
 int processOneFile(TopfdParaPtr para_ptr,  

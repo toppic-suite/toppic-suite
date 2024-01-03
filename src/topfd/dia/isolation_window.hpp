@@ -24,12 +24,18 @@ namespace toppic {
 class IsolationWindow {
  public:
   IsolationWindow(double mz_bgn, double mz_end);
-
+  
   void addSpecId(int id) {spec_id_set_.insert(id);}
 
   bool findSpecId(int id);
 
   bool isMatch(double mz_bgn, double mz_end);
+
+  double getMzBgn() {return mz_bgn_;}
+
+  double getMzEnd() {return mz_end_;}
+
+  std::set<int> getSpecIdSet() {return spec_id_set_;}
 
  private:
   double mz_bgn_;

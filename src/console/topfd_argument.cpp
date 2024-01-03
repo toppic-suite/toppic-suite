@@ -101,6 +101,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("msdeconv,n", "")
         ("disable-final-filtering,d", "")
         ("keep,k", "Report monoisotopic masses extracted from low quality isotopic envelopes.")
+        ("dia,D", "")
         ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), 
          "Spectrum file name with its path.")
         ;
@@ -222,11 +223,17 @@ bool Argument::parse(int argc, char* argv[]) {
         return false;
       }
     }
+
     if (vm.count("skip-html-folder")) {
       topfd_para_ptr_->setGeneHtmlFolder(false);
     }
+
     if (vm.count("disable-final-filtering")) {
       topfd_para_ptr_->setDoFinalFiltering(false);
+    }
+
+    if (vm.count("dia")) {
+      topfd_para_ptr_->setDia(true);
     }
   }
   catch(std::exception& e) {
