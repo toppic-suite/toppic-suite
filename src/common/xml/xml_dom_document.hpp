@@ -51,6 +51,8 @@ class XmlDOMDocument {
 
   int writeXmlDOMDocument(const char * filename);
 
+  void release() {doc_->release();}
+
  private:
   xercesc::DOMDocument* doc_;
 };
