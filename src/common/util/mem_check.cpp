@@ -41,8 +41,8 @@ std::map<std::string, double> memory_per_thread_list {
     {"toppic", 1.0},
     // topmg memory requirement per thread: about 0.75 gb
     {"topmg", 1.0}, 
-    // zero or one shift filter memory requirement per thread: about 1.5 gb
-    {"zero_one_shift_filter", 1.75},
+    // zero or one shift filter memory requirement per thread: about 0.75 gb
+    {"zero_one_shift_filter", 1.0},
     // diag filter memory requirement per thread: about 0.4 gb
     {"diag_filter", 0.5}
 };
