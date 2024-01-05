@@ -17,6 +17,8 @@
 
 #include <fstream>
 
+#include "common/xml/xml_dom_impl.hpp"
+
 #include "prsm/simple_prsm.hpp"
 #include "prsm/simple_prsm_str.hpp"
 
@@ -41,9 +43,9 @@ class SimplePrsmXmlWriter {
  private:
   std::ofstream file_;
 
-  xercesc::DOMLSSerializer* serializer_;
+  XmlDOMImpl* impl_; 
 
-  XmlDOMDocument* doc_;
+  xercesc::DOMLSSerializer* serializer_;
 
   std::string file_name_;
 };
