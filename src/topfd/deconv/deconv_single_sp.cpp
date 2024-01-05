@@ -79,8 +79,9 @@ void DeconvSingleSp::postprocess(MatchEnvPtrVec &dp_envs) {
     result_envs_ = dp_envs;
   }
   if (topfd_para_ptr_->isKeepUnusedPeaks()) {
-    match_env_util::addUnusedMasses(result_envs_, peak_list,
-                                    env_para_ptr_->getMzTolerance());
+    // all added envelopes have charge 1, so we use charge 1 to get mz_tolerance
+    double mz_tole = env_para_ptr_->getMzTolerance(1);
+    match_env_util::addUnusedMasses(result_envs_, peak_list, mz_tole);
   }
   // reassign intensity
   match_env_util::assignIntensity(peak_list, result_envs_);

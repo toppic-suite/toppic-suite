@@ -47,6 +47,7 @@ void PrsmXmlWriter::write(PrsmStrPtr prsm_str_ptr) {
   for (size_t i = 0; i < strs.size(); i++) {
     file_ << strs[i] << std::endl;
   }
+  file_ << std::flush;
 }
 
 void PrsmXmlWriter::writeVector(const PrsmStrPtrVec &prsm_str_ptr_vec) {

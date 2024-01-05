@@ -60,7 +60,9 @@ double calcInteRatio(const PeakPtrVec &peak_list, EnvPtr theo_env_ptr,
 MatchEnvPtr compEnv(const PeakPtrVec &peak_list, EnvPtr theo_env_ptr,
                     EnvParaPtr env_para_ptr, int mass_group, int min_inte) {
   // scale theoretical distribution
-  double ratio = calcInteRatio(peak_list, theo_env_ptr, env_para_ptr->getMzTolerance());
+  int charge = theo_env_ptr->getCharge();
+  double ratio = calcInteRatio(peak_list, theo_env_ptr,
+                               env_para_ptr->getMzTolerance(charge));
   theo_env_ptr->changeIntensity(ratio);
 
   // get the highest 85%--95% peaks
@@ -70,7 +72,7 @@ MatchEnvPtr compEnv(const PeakPtrVec &peak_list, EnvPtr theo_env_ptr,
                                          env_para_ptr->max_forw_peak_num_);
   // get real envelope
   ExpEnvPtr real_env_ptr = std::make_shared<ExpEnv>(peak_list, theo_env_ptr,
-                                                    env_para_ptr->getMzTolerance(),
+                                                    env_para_ptr->getMzTolerance(charge),
                                                     min_inte);
   MatchEnvPtr match_env_ptr = std::make_shared<MatchEnv>(mass_group, theo_env_ptr, real_env_ptr);
   return match_env_ptr;
@@ -102,7 +104,7 @@ MatchEnvPtr detectEnvByRefPeak(const PeakPtrVec &peak_list, int ref_peak, int ch
   // based on the refer mz and charge state
   EnvPtr theo_env_ptr = ref_env_ptr->distrToTheoRef(refer_mz, charge);
   int peak_idx = peak_list_util::getNearPeakIdx(peak_list, theo_env_ptr->getReferMz(), 
-                                                env_para_ptr->getMzTolerance());
+                                                env_para_ptr->getMzTolerance(charge));
   if (peak_idx < 0 || peak_list[peak_idx]->getIntensity() < min_ref_inte) {
     return nullptr; 
   }

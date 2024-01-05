@@ -41,10 +41,6 @@ class SimplePrsmXmlWriter {
  private:
   std::ofstream file_;
 
-  xercesc::DOMLSSerializer* serializer_;
-
-  XmlDOMDocument* doc_;
-
   std::string file_name_;
 };
 

@@ -24,16 +24,10 @@ SimplePrsmXmlWriter::SimplePrsmXmlWriter(const std::string &file_name) {
   file_.open(file_name.c_str());
   file_ << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << std::endl;
   file_ << "<simple_prsm_list>" << std::endl;
-  XmlDOMImpl* impl = XmlDOMImplFactory::getXmlDOMImplInstance();
-  doc_ = new XmlDOMDocument(impl->createDoc("simple_prsm_list"));
-  serializer_ = impl->createSerializer();
-
   file_name_ = file_util::basename(file_name) + ".msalign";
 }
 
 SimplePrsmXmlWriter::~SimplePrsmXmlWriter() {
-  serializer_->release();
-  delete doc_;
   if (file_.is_open()) {
     close();
   }
@@ -49,6 +43,7 @@ void SimplePrsmXmlWriter::write(SimplePrsmStrPtr prsm_str_ptr) {
   for (size_t i = 0; i < strs.size(); i++) {
     file_ << strs[i] << std::endl;
   }
+  file_ << std::flush;
 }
 
 void SimplePrsmXmlWriter::write(const SimplePrsmPtrVec &simple_prsm_ptrs) {
@@ -58,10 +53,14 @@ void SimplePrsmXmlWriter::write(const SimplePrsmPtrVec &simple_prsm_ptrs) {
 }
 
 void SimplePrsmXmlWriter::write(SimplePrsmPtr simple_prsm_ptr) {
-  XmlDOMElement * element = simple_prsm_ptr->toXml(doc_);
-  std::string str = xml_dom_util::writeToString(serializer_, element);
+  XmlDOMImpl* impl = XmlDOMImplFactory::getXmlDOMImplInstance();
+  xercesc::DOMLSSerializer* serializer = impl->createSerializer();
+  XmlDOMDocument doc(impl->createDoc("simple_prsm_list"));
+  XmlDOMElement * element = simple_prsm_ptr->toXml(&doc);
+  std::string str = xml_dom_util::writeToString(serializer, element);
   xml_dom_util::writeToStreamByRemovingDoubleLF(file_, str);
   element->release();
+  serializer->release();
 }
 
 }  // namespace toppic
