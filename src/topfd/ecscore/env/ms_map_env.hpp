@@ -25,7 +25,7 @@ namespace toppic {
 
 class MsMapEnv {
  public:
-  MsMapEnv(int spec_id, MsMapPeakPtrVec peak_list);
+  MsMapEnv(int row_id, MsMapPeakPtrVec peak_list);
 
   std::vector<double> getInteList();
 
@@ -37,9 +37,7 @@ class MsMapEnv {
 
   MsMapPeakPtr getPeakPtr(int idx) { return peak_list_[idx]; }
 
-  int getSpecId() const { return spec_id_; }
-
-  void setSpecId(int spec_id) { spec_id_ = spec_id; }
+  int getRowId() const {return row_id_;}
 
   MsMapPeakPtrVec getMsMapPeakList() { return peak_list_; }
 
@@ -54,7 +52,7 @@ class MsMapEnv {
   void appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 
  private:
-  int spec_id_;
+  int row_id_;
   MsMapPeakPtrVec peak_list_;
 };
 

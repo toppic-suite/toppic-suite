@@ -58,7 +58,7 @@ class MsMap {
   void initMap(PeakPtrVec2D &raw_peak_2d, DeconvMsPtrVec &ms1_ptr_vec, 
                double sn_ratio, bool single_scan_noise);
 
-  void findNeighbors(int spec_id, int search_bin_num, double mass_tol);
+  void findNeighbors(int row_idx, int search_bin_num, double mass_tol);
 
   MsMapRowPtrVec row_ptr_list_;
 

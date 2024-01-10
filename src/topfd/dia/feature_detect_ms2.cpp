@@ -83,8 +83,11 @@ void FeatureDetectMs2::process() {
  
   for (size_t i = 0; i < window_list.size(); i++) {
     IsolationWindowPtr win_ptr = window_list[i];
+    LOG_ERROR("Mz begin " << win_ptr->getMzBgn() << " mz end " <<
+              win_ptr->getMzEnd());
     env_coll_detect::processMs2(topfd_para_ptr_, win_ptr->getMzBgn(),
                                 win_ptr->getMzEnd(), win_ptr->getSpecIdSet());
+    break;
   }
 }
 

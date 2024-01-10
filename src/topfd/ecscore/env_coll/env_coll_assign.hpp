@@ -35,7 +35,7 @@ void assignEnvColls(FracFeaturePtrVec &frac_feature_list,
                     SpecFeaturePtrVec &ms2_feature_list, 
                     double score_cutoff); 
 
-bool checkEnvColl(MsHeaderPtr header_ptr, 
+bool checkEnvColl(int row_id, MsHeaderPtr header_ptr, 
                   EnvCollPtrVec &env_coll_list); 
 
 

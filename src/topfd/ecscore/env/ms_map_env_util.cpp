@@ -55,7 +55,7 @@ double compTopThreeInteRatio(SeedEnvPtr seed_ptr, std::vector<double> &inte_list
 }
 
 MsMapPeakPtr pickMsMapPeak(MsMapPtr ms_map_ptr, EnvPeakPtr seed_peak_ptr,
-                           int sp_id, double mass_tol) {
+                           int row_id, double mass_tol) {
   // get peaks within mass tolerance
   double max_inte = std::numeric_limits<double>::min();
   double mz = seed_peak_ptr->getPosition();
@@ -69,7 +69,7 @@ MsMapPeakPtr pickMsMapPeak(MsMapPtr ms_map_ptr, EnvPeakPtr seed_peak_ptr,
   }
   MsMapPeakPtr result_peak = nullptr;
   for (int idx = start_idx; idx <= end_idx; idx++) {
-    MsMapPeakPtrVec bin_peaks = ms_map_ptr->getBinPeakList(sp_id, idx);
+    MsMapPeakPtrVec bin_peaks = ms_map_ptr->getBinPeakList(row_id, idx);
     for (const auto& peak_ptr : bin_peaks) {
       double mass_diff = std::abs(mz - peak_ptr->getPosition());
       if ( mass_diff < mass_tol && peak_ptr->getIntensity() > max_inte) {
@@ -82,19 +82,19 @@ MsMapPeakPtr pickMsMapPeak(MsMapPtr ms_map_ptr, EnvPeakPtr seed_peak_ptr,
 }
 
 MsMapEnvPtr getMatchMsMapEnv(MsMapPtr ms_map_ptr, SeedEnvPtr seed_ptr,
-                             int sp_id, double mass_tol) {
+                             int row_id, double mass_tol) {
   MsMapPeakPtrVec peak_list;
   EnvPeakPtrVec peaks = seed_ptr->getPeakPtrList();
   for (auto& seed_peak : peaks) {
     if (seed_peak != nullptr) {
-      MsMapPeakPtr peak = pickMsMapPeak(ms_map_ptr, seed_peak, sp_id, mass_tol);
+      MsMapPeakPtr peak = pickMsMapPeak(ms_map_ptr, seed_peak, row_id, mass_tol);
       peak_list.push_back(peak);
     }
     else {
       peak_list.push_back(nullptr);
     }
   }
-  MsMapEnvPtr ms_map_env_ptr = std::make_shared<MsMapEnv>(sp_id, peak_list);
+  MsMapEnvPtr ms_map_env_ptr = std::make_shared<MsMapEnv>(row_id, peak_list);
   return ms_map_env_ptr;
 }
 

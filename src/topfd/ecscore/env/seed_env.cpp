@@ -20,7 +20,7 @@
 
 namespace toppic {
 
-SeedEnv::SeedEnv(DeconvPeakPtr peak_ptr) {
+SeedEnv::SeedEnv(int row_id, DeconvPeakPtr peak_ptr) {
   //init for parent class
   mono_mz_ = peak_ptr->getMonoMz();
   charge_ = peak_ptr->getCharge();
@@ -33,7 +33,7 @@ SeedEnv::SeedEnv(DeconvPeakPtr peak_ptr) {
     peak_ptr_list_.push_back(p_ptr);
   }
   // init for seed envelope
-  spec_id_ = peak_ptr->getSpId();
+  row_id_ = row_id;
   seed_inte_ = peak_ptr->getIntensity();
 }
 
@@ -53,7 +53,7 @@ SeedEnv::SeedEnv(SeedEnvPtr env_ptr, int new_charge) {
     peak_ptr_list_.push_back(p_ptr);
   }
   // init for seed envelope
-  spec_id_ = env_ptr->spec_id_;
+  row_id_ = env_ptr->row_id_;
   seed_inte_ = env_ptr->seed_inte_;
 }
 
@@ -77,7 +77,7 @@ SeedEnv::SeedEnv(SeedEnvPtr env_ptr, EnvPeakPtrVec &peak_ptr_list) {
     }
   }
   // init for seed envelope
-  spec_id_ = env_ptr->spec_id_;
+  row_id_ = env_ptr->row_id_;
   seed_inte_ = env_ptr->seed_inte_;
 }
 
@@ -92,7 +92,7 @@ SeedEnv::SeedEnv(SeedEnvPtr env_ptr) {
     peak_ptr_list_.push_back(p_ptr);
   }
   // init for seed envelope
-  spec_id_ = env_ptr->spec_id_;
+  row_id_ = env_ptr->row_id_;
   seed_inte_ = env_ptr->seed_inte_;
 }
 
@@ -121,7 +121,7 @@ EnvPeakPtrVec SeedEnv::getScaledPeakPtrList(double ratio, double min_inte) {
 }
 
 std::string SeedEnv::getString() {
-  std::string header = "Spec ID: " + std::to_string(spec_id_) + " " +
+  std::string header = "Row ID: " + std::to_string(row_id_) + " " +
                        "Pos: " + std::to_string(mono_mz_) + " " +
                        "Inte: " + std::to_string(seed_inte_) + " " +
                        "Charge: " + std::to_string(charge_) + "\n";
@@ -136,8 +136,8 @@ std::string SeedEnv::getString() {
 void SeedEnv::appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
   std::string element_name = "seed_envelope";
   XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
-  std::string str = str_util::toString(spec_id_);
-  xml_doc->addElement(element, "spec_id", str.c_str());
+  std::string str = str_util::toString(row_id_);
+  xml_doc->addElement(element, "row_id", str.c_str());
   str = str_util::toString(seed_inte_);
   xml_doc->addElement(element, "seed_inte", str.c_str());
   str = str_util::toString(getMonoNeutralMass());

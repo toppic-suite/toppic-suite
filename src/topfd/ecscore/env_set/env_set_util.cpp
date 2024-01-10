@@ -42,15 +42,15 @@ void removeNonMatchEnvs(MsMapEnvPtrVec &env_list, int refer_idx,
 
 EnvSetPtr searchEnvSet(MsMapPtr ms_map_ptr, SeedEnvPtr seed_ptr,
                       EcscoreParaPtr para_ptr, double sn_ratio) { 
-  int start_spec_id = 0;
-  int end_spec_id = ms_map_ptr->getRowNum() - 1;
+  int start_row_id = 0;
+  int end_row_id = ms_map_ptr->getRowNum() - 1;
   return searchEnvSet(ms_map_ptr, seed_ptr, 
-                      start_spec_id, end_spec_id,
+                      start_row_id, end_row_id,
                       para_ptr, sn_ratio);
 }
 
 EnvSetPtr searchEnvSet(MsMapPtr ms_map_ptr, SeedEnvPtr seed_ptr,
-                       int start_spec_id, int end_spec_id,
+                       int start_row_id, int end_row_id,
                        EcscoreParaPtr para_ptr, double sn_ratio) {
   double peak_mz_tole = para_ptr->getPeakMzTole();
   int refer_peak_idx = seed_ptr->getReferIdx();
@@ -58,10 +58,10 @@ EnvSetPtr searchEnvSet(MsMapPtr ms_map_ptr, SeedEnvPtr seed_ptr,
    // search backward
   MsMapEnvPtrVec back_env_list;
   int miss_num = 0;
-  int spec_id = seed_ptr->getSpecId();
-  while (spec_id >= start_spec_id) {
+  int row_id = seed_ptr->getRowId();
+  while (row_id >= start_row_id) {
     MsMapEnvPtr ms_map_env_ptr = ms_map_env_util::getMatchMsMapEnv(ms_map_ptr, seed_ptr,
-                                                                   spec_id, peak_mz_tole, min_inte);
+                                                                   row_id, peak_mz_tole, min_inte);
     back_env_list.push_back(ms_map_env_ptr);
     if (ms_map_env_ptr->getTopThreeMatchNum(refer_peak_idx) < para_ptr->min_match_peak_) {
       miss_num = miss_num + 1;
@@ -72,17 +72,17 @@ EnvSetPtr searchEnvSet(MsMapPtr ms_map_ptr, SeedEnvPtr seed_ptr,
     if (miss_num >= para_ptr->max_miss_env_) {
       break;
     }
-    spec_id = spec_id - 1;
+    row_id = row_id - 1;
   }
   removeNonMatchEnvs(back_env_list, refer_peak_idx, para_ptr->min_match_peak_);
 
   // search forward
   MsMapEnvPtrVec forw_env_list;
-  spec_id = seed_ptr->getSpecId() + 1;
+  row_id = seed_ptr->getRowId() + 1;
   miss_num = 0;
-  while (spec_id <= end_spec_id) {
+  while (row_id <= end_row_id) {
     MsMapEnvPtr ms_map_env_ptr = ms_map_env_util::getMatchMsMapEnv(ms_map_ptr, seed_ptr,
-                                                                   spec_id, peak_mz_tole, min_inte);
+                                                                   row_id, peak_mz_tole, min_inte);
     forw_env_list.push_back(ms_map_env_ptr);
     if (ms_map_env_ptr->getTopThreeMatchNum(refer_peak_idx) < para_ptr->min_match_peak_) {
       miss_num = miss_num + 1;
@@ -93,7 +93,7 @@ EnvSetPtr searchEnvSet(MsMapPtr ms_map_ptr, SeedEnvPtr seed_ptr,
     if (miss_num >= para_ptr->max_miss_env_) {
       break;
     }
-    spec_id = spec_id + 1;
+    row_id = row_id + 1;
   }
   removeNonMatchEnvs(forw_env_list, refer_peak_idx, para_ptr->min_match_peak_);
   // merge results
@@ -102,14 +102,14 @@ EnvSetPtr searchEnvSet(MsMapPtr ms_map_ptr, SeedEnvPtr seed_ptr,
   if (back_env_list.empty()) {
     return nullptr;
   }
-  start_spec_id = back_env_list[0]->getSpecId();
-  end_spec_id = back_env_list[back_env_list.size() - 1]->getSpecId();
-  if ((end_spec_id - start_spec_id + 1) < para_ptr->min_scan_num_) {
+  start_row_id = back_env_list[0]->getRowId();
+  end_row_id = back_env_list[back_env_list.size() - 1]->getRowId();
+  if ((end_row_id - start_row_id + 1) < para_ptr->min_scan_num_) {
     return nullptr;
   }
-  EnvSetPtr env_set_ptr = std::make_shared<EnvSet>(seed_ptr, back_env_list, 
-                                                   start_spec_id, end_spec_id, 
-                                                   min_inte);
+  EnvSetPtr env_set_ptr = std::make_shared<EnvSet>(seed_ptr, back_env_list,
+                                                   min_inte,
+                                                   start_row_id, end_row_id);
   return env_set_ptr;
 }
 

@@ -31,8 +31,8 @@ namespace env_coll_util {
 EnvCollPtr getEnvCollPtr(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
                          EnvSetPtr seed_env_set_ptr, EcscoreParaPtr para_ptr,
                          double sn_ratio) {
-  int start_spec_id = seed_env_set_ptr->getStartSpecId();
-  int end_spec_id = seed_env_set_ptr->getEndSpecId();
+  int start_row_id = seed_env_set_ptr->getStartRowId();
+  int end_row_id = seed_env_set_ptr->getEndRowId();
   EnvSetPtrVec env_set_list;
   int charge = seed_ptr->getCharge() - 1;
   int miss_num = 0;
@@ -41,7 +41,7 @@ EnvCollPtr getEnvCollPtr(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
   while (charge >= para_ptr->para_min_charge_) {
     SeedEnvPtr cur_seed_ptr = std::make_shared<SeedEnv>(seed_ptr, charge);
     EnvSetPtr env_set_ptr = env_set_util::searchEnvSet(matrix_ptr, cur_seed_ptr,
-                                                       start_spec_id, end_spec_id,
+                                                       start_row_id, end_row_id,
                                                        para_ptr, sn_ratio);
     if (env_set_ptr == nullptr) {
       miss_num = miss_num + 1;
@@ -66,8 +66,8 @@ EnvCollPtr getEnvCollPtr(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
   while (charge <= para_ptr->para_max_charge_) {
     SeedEnvPtr cur_seed_ptr = std::make_shared<SeedEnv>(seed_ptr, charge);
     EnvSetPtr env_set_ptr = env_set_util::searchEnvSet(matrix_ptr, cur_seed_ptr,
-                                                      start_spec_id, end_spec_id,
-                                                      para_ptr, sn_ratio);
+                                                       start_row_id, end_row_id,
+                                                       para_ptr, sn_ratio);
     charge = charge + 1;
     if (env_set_ptr == nullptr) {
       miss_num = miss_num + 1;
@@ -89,8 +89,8 @@ EnvCollPtr getEnvCollPtr(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
   int min_charge = env_set_list[0]->getCharge();
   int max_charge = env_set_list[env_set_list.size() - 1]->getCharge();
   EnvCollPtr env_coll_ptr = std::make_shared<EnvColl>(seed_ptr, env_set_list, 
-                                                      min_charge, max_charge, 
-                                                      start_spec_id, end_spec_id);
+                                                      start_row_id, end_row_id,
+                                                      min_charge, max_charge);
 
   return env_coll_ptr;
 }
@@ -153,10 +153,10 @@ EnvCollPtr findEnvCollWithSingleEnv(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
 bool checkOverlap(MsMapRowHeaderPtrVec &spectrum_list, EnvCollPtr coll_ptr,
                   double feature_start_rt,
                   double feature_end_rt, double time_tol) {
-  int start_spec_id = coll_ptr->getStartSpecId();
-  int end_spec_id = coll_ptr->getEndSpecId();
-  double start_rt = spectrum_list[start_spec_id]->getRt();
-  double end_rt = spectrum_list[end_spec_id]->getRt();
+  int start_row_id = coll_ptr->getStartRowId();
+  int end_row_id = coll_ptr->getEndRowId();
+  double start_rt = spectrum_list[start_row_id]->getRt();
+  double end_rt = spectrum_list[end_row_id]->getRt();
   double start = -1;
   if (start_rt <= feature_start_rt) {
     start = feature_start_rt;
@@ -201,10 +201,10 @@ bool checkExistingFeatures(MsMapPtr matrix_ptr, EnvCollPtr env_coll_ptr,
   std::vector<double> extended_masses = {env_mass - isotope_mass, env_mass, env_mass + isotope_mass};
   int num_env_colls = env_coll_list.size();
   MsMapRowHeaderPtrVec spectrum_list = matrix_ptr->getHeaderPtrList();
-  int start_spec_id = env_coll_ptr->getStartSpecId();
-  int end_spec_id = env_coll_ptr->getEndSpecId();
-  double feature_start_rt = spectrum_list[start_spec_id]->getRt();
-  double feature_end_rt = spectrum_list[end_spec_id]->getRt();
+  int start_row_id = env_coll_ptr->getStartRowId();
+  int end_row_id = env_coll_ptr->getEndRowId();
+  double feature_start_rt = spectrum_list[start_row_id]->getRt();
+  double feature_end_rt = spectrum_list[end_row_id]->getRt();
 
   EnvCollPtr overlap_env_coll_ptr;
   for (int i = 0; i < num_env_colls; i++) {
@@ -244,20 +244,22 @@ FracFeaturePtr getFracFeature(int feat_id, DeconvMsPtrVec &ms1_ptr_vec, int frac
                               MsMapPtr matrix_ptr, double sn_ratio) {
 
   MsMapRowHeaderPtrVec spec_list = matrix_ptr->getHeaderPtrList();
-  int ms1_id_begin = coll_ptr->getStartSpecId();
-  int ms1_id_end = coll_ptr->getEndSpecId();
+  int ms1_row_begin = coll_ptr->getStartRowId();
+  int ms1_row_end = coll_ptr->getEndRowId();
   double feat_inte = coll_ptr->getIntensity();
   double feat_mass = coll_ptr->getMonoNeutralMass();
   int min_charge = coll_ptr->getMinCharge();
   int max_charge = coll_ptr->getMaxCharge();
-  double ms1_time_begin = spec_list[ms1_id_begin]->getRt(); 
-  double ms1_time_end = spec_list[ms1_id_end]->getRt(); 
-  int ms1_scan_begin = ms1_ptr_vec[ms1_id_begin]->getMsHeaderPtr()->getFirstScanNum();
-  int ms1_scan_end = ms1_ptr_vec[ms1_id_end]->getMsHeaderPtr()->getFirstScanNum();
+  int ms1_id_begin = spec_list[ms1_row_begin]->getRawSpecId(); 
+  double ms1_id_end = spec_list[ms1_row_end]->getRawSpecId(); 
+  double ms1_time_begin = spec_list[ms1_row_begin]->getRt(); 
+  double ms1_time_end = spec_list[ms1_row_end]->getRt(); 
+  int ms1_scan_begin = ms1_ptr_vec[ms1_row_begin]->getMsHeaderPtr()->getFirstScanNum();
+  int ms1_scan_end = ms1_ptr_vec[ms1_row_end]->getMsHeaderPtr()->getFirstScanNum();
   // get apex inte
-  int ms1_apex_id = coll_ptr->getSeedSpecId();
-  double apex_time = spec_list[ms1_apex_id]->getRt(); 
-  int apex_scan = spec_list[ms1_apex_id]->getScanNum(); 
+  int ms1_apex_row = coll_ptr->getSeedRowId();
+  double apex_time = spec_list[ms1_apex_row]->getRt(); 
+  int apex_scan = spec_list[ms1_apex_row]->getScanNum(); 
   double apex_inte = coll_ptr->getSeedEnvSet()->getXicSeedAllPeakInte();
 
   int rep_charge = coll_ptr->getSeedPtr()->getCharge(); 
@@ -272,12 +274,12 @@ FracFeaturePtr getFracFeature(int feat_id, DeconvMsPtrVec &ms1_ptr_vec, int frac
                                                              env_num, ec_score);
   SingleChargeFeaturePtrVec single_features;
   for (EnvSetPtr es: coll_ptr->getEnvSetList()) {
-    int id_begin = es->getStartSpecId();
-    int id_end = es->getEndSpecId();
-    double time_begin = ms1_ptr_vec[id_begin]->getMsHeaderPtr()->getRetentionTime();
-    double time_end = ms1_ptr_vec[id_end]->getMsHeaderPtr()->getRetentionTime();
-    int scan_begin = ms1_ptr_vec[id_begin]->getMsHeaderPtr()->getFirstScanNum();
-    int scan_end = ms1_ptr_vec[id_end]->getMsHeaderPtr()->getFirstScanNum();
+    int row_begin = es->getStartRowId();
+    int row_end = es->getEndRowId();
+    double time_begin = ms1_ptr_vec[row_begin]->getMsHeaderPtr()->getRetentionTime();
+    double time_end = ms1_ptr_vec[row_end]->getMsHeaderPtr()->getRetentionTime();
+    int scan_begin = ms1_ptr_vec[row_begin]->getMsHeaderPtr()->getFirstScanNum();
+    int scan_end = ms1_ptr_vec[row_end]->getMsHeaderPtr()->getFirstScanNum();
     double inte = es->getInte();
     int env_num = es->countEnvNum();
     int charge = es->getCharge();

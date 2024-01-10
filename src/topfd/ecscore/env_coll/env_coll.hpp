@@ -29,7 +29,7 @@ class EnvColl {
  public:
   EnvColl(SeedEnvPtr send_ptr, EnvSetPtrVec &env_set_list,
           int min_charge, int max_charge,
-          int start_spec_id, int end_spec_id);
+          int start_row_id, int end_row_id);
 
   SeedEnvPtr getSeedPtr() { return seed_ptr_; }
 
@@ -39,15 +39,15 @@ class EnvColl {
 
   int getMaxCharge() const { return max_charge_; }
 
-  int getStartSpecId() const { return start_spec_id_; }
+  int getStartRowId() const { return start_row_id_; }
 
-  int getEndSpecId() const { return end_spec_id_; }
+  int getEndRowId() const { return end_row_id_; }
+
+  int getSeedRowId() {return seed_ptr_->getRowId();}
 
   double getEcscore() const { return ecscore_; }
 
   void setEcscore(double ecscore) { ecscore_ = ecscore; }
-
-  int getSeedSpecId() const { return seed_ptr_->getSpecId(); }
 
   double getMonoNeutralMass() const { return seed_ptr_->getMonoNeutralMass(); }
 
@@ -72,8 +72,8 @@ class EnvColl {
   EnvSetPtrVec env_set_list_;
   int min_charge_;
   int max_charge_;
-  int start_spec_id_;
-  int end_spec_id_;
+  int start_row_id_;
+  int end_row_id_;
   double ecscore_ = -1;
 };
 

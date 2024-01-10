@@ -20,8 +20,8 @@
 
 namespace toppic {
 
-MsMapEnv::MsMapEnv(int spec_id, MsMapPeakPtrVec peak_list) {
-  spec_id_ = spec_id;
+MsMapEnv::MsMapEnv(int row_id, MsMapPeakPtrVec peak_list) {
+  row_id_ = row_id;
   peak_list_ = peak_list;
 }
 
@@ -104,9 +104,7 @@ void MsMapEnv::removeLowIntePeaks(SeedEnvPtr seed_ptr, double ratio,
 void MsMapEnv::appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
   std::string element_name = "ms_map_envelope";
   XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
-  std::string str = str_util::toString(spec_id_);
-  xml_doc->addElement(element, "spec_id", str.c_str());
-  str = str_util::toString(getInteSum());
+  std::string str = str_util::toString(getInteSum());
   xml_doc->addElement(element, "inte_sum", str.c_str());
   element_name = "peak_list";
   XmlDOMElement* peak_list_elem = xml_doc->createElement(element_name.c_str());

@@ -29,16 +29,15 @@ namespace toppic {
 
 namespace env_coll_assign {
 
-bool checkEnvColl(MsHeaderPtr header_ptr, EnvCollPtrVec &env_coll_list) {
-  int ms1_id = header_ptr->getMsOneId();
+bool checkEnvColl(int row_id, MsHeaderPtr header_ptr, EnvCollPtrVec &env_coll_list) {
   double prec_win_bgn = header_ptr->getPrecWinBegin();
   double prec_win_end = header_ptr->getPrecWinEnd();
 
   SpecFeaturePtrVec new_spec_feats;
   for (size_t coll_id = 0; coll_id < env_coll_list.size(); coll_id++) {
     // check retention time range
-    if (ms1_id < env_coll_list[coll_id]->getStartSpecId() 
-        || ms1_id > env_coll_list[coll_id]->getEndSpecId()) {
+    if (row_id < env_coll_list[coll_id]->getStartRowId() 
+        || row_id > env_coll_list[coll_id]->getEndRowId()) {
       continue;
     }
     EnvSetPtrVec env_sets = env_coll_list[coll_id]->getEnvSetList();
@@ -53,8 +52,8 @@ bool checkEnvColl(MsHeaderPtr header_ptr, EnvCollPtrVec &env_coll_list) {
         continue;
       }
       // check retentime time range
-      if (ms1_id < env_set_ptr->getStartSpecId() 
-          || ms1_id > env_set_ptr->getEndSpecId()) {
+      if (row_id < env_set_ptr->getStartRowId() 
+          || row_id > env_set_ptr->getEndRowId()) {
         continue;
       }
       // get intensity information
@@ -70,9 +69,8 @@ bool checkEnvColl(MsHeaderPtr header_ptr, EnvCollPtrVec &env_coll_list) {
 }
 
 bool getHighestInteEnvColl(FracFeaturePtrVec &frac_features, EnvCollPtrVec &env_coll_list,
-                           MsHeaderPtr header_ptr, double score_thresh, 
+                           int row_id, MsHeaderPtr header_ptr, double score_thresh, 
                            SpecFeaturePtrVec &ms2_features) {
-  int ms1_id = header_ptr->getMsOneId();
   double prec_win_bgn = header_ptr->getPrecWinBegin();
   double prec_win_end = header_ptr->getPrecWinEnd();
 
@@ -84,8 +82,8 @@ bool getHighestInteEnvColl(FracFeaturePtrVec &frac_features, EnvCollPtrVec &env_
       continue;
     }
     // check retention time range
-    if (ms1_id < env_coll_list[coll_id]->getStartSpecId() 
-        || ms1_id > env_coll_list[coll_id]->getEndSpecId()) {
+    if (row_id < env_coll_list[coll_id]->getStartRowId() 
+        || row_id > env_coll_list[coll_id]->getEndRowId()) {
       continue;
     }
     EnvSetPtrVec env_sets = env_coll_list[coll_id]->getEnvSetList();
@@ -100,12 +98,12 @@ bool getHighestInteEnvColl(FracFeaturePtrVec &frac_features, EnvCollPtrVec &env_
         continue;
       }
       // check retentime time range
-      if (ms1_id < env_set_ptr->getStartSpecId() 
-          || ms1_id > env_set_ptr->getEndSpecId()) {
+      if (row_id < env_set_ptr->getStartRowId() 
+          || row_id > env_set_ptr->getEndRowId()) {
         continue;
       }
       // get intensity information
-      int inte_idx = ms1_id - env_set_ptr->getStartSpecId();
+      int inte_idx = row_id - env_set_ptr->getStartRowId();
       std::vector<double> env_intes = env_set_ptr->getXicPtr()->getAllPeakInteList();
       if (env_intes.size() == 0) {
         LOG_WARN("Empty envelope intensity list!");
@@ -152,13 +150,13 @@ void assignEnvColls(FracFeaturePtrVec &frac_feature_list,
     for (size_t i = 0; i < ms2_header_ptr_2d[ms1_idx].size(); i++) {
       MsHeaderPtr header_ptr = ms2_header_ptr_2d[ms1_idx][i];
       bool assigned = getHighestInteEnvColl(frac_feature_list, env_coll_list,  
-                                            header_ptr, score_cutoff, ms2_feature_list);
+                                            ms1_idx, header_ptr, score_cutoff, ms2_feature_list);
       if (!assigned) {
         // lower the cutoff to 0. This step is necessary when low intensity
         // features are added.
         score_cutoff = 0;
         assigned = getHighestInteEnvColl(frac_feature_list, env_coll_list,  
-                                         header_ptr, score_cutoff, ms2_feature_list);
+                                         ms1_idx, header_ptr, score_cutoff, ms2_feature_list);
       }
       if (!assigned) {
         LOG_INFO("Scan " << header_ptr->getFirstScanNum() << " does not have MS1 feature!");

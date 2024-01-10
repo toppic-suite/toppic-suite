@@ -35,6 +35,7 @@ namespace topfd_process {
 void processOneFileWithFaims(TopfdParaPtr para_ptr) {
   //print parameter for each file
   std::cout << para_ptr->getParaStr("", " ");
+  /*
   if (!para_ptr->isMissingLevelOne()) {
     std::cout << "MS1 deconvolution started." << std::endl;
     DeconvMs1ProcessPtr ms1_proc_ptr =
@@ -52,6 +53,7 @@ void processOneFileWithFaims(TopfdParaPtr para_ptr) {
   ms2_proc_ptr->process();
   ms2_proc_ptr = nullptr;
   std::cout << "MS/MS deconvolution finished." << std::endl;
+  */
   if (para_ptr->isDia()) {
     std::cout << "MS/MS feature detection started." << std::endl;
     FeatureDetectMs2Ptr ms2_feature_ptr =

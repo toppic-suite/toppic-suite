@@ -23,13 +23,13 @@ namespace toppic {
 
 EnvColl::EnvColl(SeedEnvPtr seed_ptr, EnvSetPtrVec &env_set_list,
                  int min_charge, int max_charge,
-                 int start_spec_id, int end_spec_id) {
+                 int start_row_id, int end_row_id) {
   seed_ptr_ = seed_ptr;
   env_set_list_ = env_set_list;
   min_charge_ = min_charge;
   max_charge_ = max_charge;
-  start_spec_id_ = start_spec_id;
-  end_spec_id_ = end_spec_id;
+  start_row_id_ = start_row_id;
+  end_row_id_ = end_row_id;
 }
 
 std::vector<int> EnvColl::getChargeList() {
@@ -85,11 +85,11 @@ void EnvColl::removePeakData(MsMapPtr matrix_ptr) {
 
 void EnvColl::mergeEnvSet(EnvSetPtr new_set_ptr) {
   new_set_ptr->setSeedPtr(seed_ptr_);
-  if (new_set_ptr->getStartSpecId() < start_spec_id_) {
-    start_spec_id_ = new_set_ptr->getStartSpecId();
+  if (new_set_ptr->getStartRowId() < start_row_id_) {
+    start_row_id_ = new_set_ptr->getStartRowId();
   }
-  if (new_set_ptr->getEndSpecId() > end_spec_id_) {
-    end_spec_id_ = new_set_ptr->getEndSpecId();
+  if (new_set_ptr->getEndRowId() > end_row_id_) {
+    end_row_id_ = new_set_ptr->getEndRowId();
   }
   int charge = new_set_ptr->getCharge();
   for (size_t i = 0; i < env_set_list_.size(); i++) {
@@ -117,12 +117,6 @@ int EnvColl::countEnvNum() {
   return env_num;
 }
 
-  int min_charge_;
-  int max_charge_;
-  int start_spec_id_;
-  int end_spec_id_;
-  double ecscore_ = -1;
-
 XmlDOMElement* EnvColl::toXmlElement(XmlDOMDocument* xml_doc) {
   std::string element_name = "envelope_collection";
   XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
@@ -130,10 +124,10 @@ XmlDOMElement* EnvColl::toXmlElement(XmlDOMDocument* xml_doc) {
   xml_doc->addElement(element, "min_charge", str.c_str());
   str = str_util::toString(max_charge_);
   xml_doc->addElement(element, "max_charge", str.c_str());
-  str = str_util::toString(start_spec_id_);
-  xml_doc->addElement(element, "start_spec_id", str.c_str());
-  str = str_util::toString(end_spec_id_);
-  xml_doc->addElement(element, "end_spec_id", str.c_str());
+  str = str_util::toString(start_row_id_);
+  xml_doc->addElement(element, "start_row_id", str.c_str());
+  str = str_util::toString(end_row_id_);
+  xml_doc->addElement(element, "end_row_id", str.c_str());
   str = str_util::toString(ecscore_);
   xml_doc->addElement(element, "ecsore", str.c_str());
 

@@ -29,10 +29,10 @@ double compTopThreeInteRatio(SeedEnvPtr seed_ptr,
                              std::vector<double> &inte_list);
 
 MsMapEnvPtr getMatchMsMapEnv(MsMapPtr ms_map_ptr, SeedEnvPtr seed_ptr,
-                             int sp_id, double mass_tol);
+                             int row_id, double mass_tol);
 
 MsMapEnvPtr getMatchMsMapEnv(MsMapPtr ms_map_ptr, SeedEnvPtr seed_ptr,
-                             int sp_id, double mass_tole,
+                             int row_id, double mass_tole,
                              double min_inte);
 }
 

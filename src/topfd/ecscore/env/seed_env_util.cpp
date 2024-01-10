@@ -81,14 +81,14 @@ SeedEnvPtr preprocessSeedEnvPtr(SeedEnvPtr seed_ptr, MsMapPtr ms_map_ptr,
     return nullptr;
   }
   //2. Check spectrum id
-  if (seed_ptr->getSpecId() >= ms_map_ptr->getRowNum()) {
-    LOG_ERROR("spec id " + std::to_string(seed_ptr->getSpecId()) + " is out of range!");
+  if (seed_ptr->getRowId() >= ms_map_ptr->getRowNum()) {
+    LOG_ERROR("spec id " + std::to_string(seed_ptr->getRowId()) + " is out of range!");
     return nullptr;
   }
   //3. Get high intensity peaks only. 
   MsMapEnvPtr ms_map_env_ptr
     = ms_map_env_util::getMatchMsMapEnv(ms_map_ptr, seed_ptr,
-                                        seed_ptr->getSpecId(),
+                                        seed_ptr->getRowId(),
                                         para_ptr->peak_mz_tole_);
   double inte_ratio = ms_map_env_util::compTopThreeInteRatio(seed_ptr, ms_map_env_ptr);
   double min_inte = ms_map_ptr->getBaseInte() * sn_ratio;
@@ -131,14 +131,14 @@ SeedEnvPtr relaxProcessSeedEnvPtr(SeedEnvPtr seed_ptr, MsMapPtr ms_map_ptr,
     return nullptr;
   }
   //2. Check spectrum id
-  if (seed_ptr->getSpecId() >= ms_map_ptr->getRowNum()) {
-    LOG_ERROR("spec id " + std::to_string(seed_ptr->getSpecId()) + " is out of range!");
+  if (seed_ptr->getRowId() >= ms_map_ptr->getRowNum()) {
+    LOG_ERROR("Row id " + std::to_string(seed_ptr->getRowId()) + " is out of range!");
     return nullptr;
   }
   //3. Get high intensity peaks only. 
   MsMapEnvPtr ms_map_env_ptr
     = ms_map_env_util::getMatchMsMapEnv(ms_map_ptr, seed_ptr,
-                                        seed_ptr->getSpecId(),
+                                        seed_ptr->getRowId(),
                                         para_ptr->peak_mz_tole_);
   double inte_ratio = ms_map_env_util::compTopThreeInteRatio(seed_ptr, ms_map_env_ptr);
   double min_inte = ms_map_ptr->getBaseInte() * sn_ratio;
@@ -168,14 +168,15 @@ SeedEnvPtr getHalfChargeEnvV1(SeedEnvPtr seed_ptr,
   }
   double mono_mass = peak_util::compPeakNeutralMass(mz, new_charge);
 
-  int sp_id = seed_ptr->getSpecId();
+  int row_id = seed_ptr->getRowId();
+  int sp_id = -1;
   int peak_id = -1;
   double inte = seed_ptr->getSeedInte()/2;
 
   DeconvPeakPtr peak_ptr = std::make_shared<DeconvPeak>(sp_id, peak_id,
                                                         mono_mass, inte,
                                                         new_charge);
-  SeedEnvPtr new_seed_ptr = std::make_shared<SeedEnv>(peak_ptr);
+  SeedEnvPtr new_seed_ptr = std::make_shared<SeedEnv>(row_id, peak_ptr);
 
   return new_seed_ptr;
 }
@@ -198,13 +199,14 @@ SeedEnvPtr getHalfChargeEnvV2(SeedEnvPtr seed_ptr,
       || ((refer_idx)%2 == 1 && even_odd_log_ratio >0)) {
     mono_mass += mass_constant::getIsotopeMass();
   }
-  int sp_id = seed_ptr->getSpecId();
+  int row_id = seed_ptr->getRowId();
+  int sp_id = -1;
   int peak_id = -1;
   double inte = seed_ptr->getSeedInte()/2;
   DeconvPeakPtr peak_ptr = std::make_shared<DeconvPeak>(sp_id, peak_id,
                                                         mono_mass, inte,
                                                         new_charge);
-  SeedEnvPtr new_seed_ptr = std::make_shared<SeedEnv>(peak_ptr);
+  SeedEnvPtr new_seed_ptr = std::make_shared<SeedEnv>(row_id, peak_ptr);
   return new_seed_ptr;
 }
 

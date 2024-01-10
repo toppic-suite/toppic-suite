@@ -19,24 +19,20 @@ typedef std::shared_ptr<EnvSet> EnvSetPtr;
 class EnvSet {
  public:
   EnvSet(const SeedEnvPtr seed_ptr, MsMapEnvPtrVec env_list,
-         int start, int end, double noise_inte_level, double sn_ratio);
+         double noise_inte_level, double sn_ratio, int start, int end);
 
   EnvSet(const SeedEnvPtr seed_ptr, MsMapEnvPtrVec env_list,
-         int start, int end, double min_inte);
+         double min_inte, int start, int end);
 
-  int getStartSpecId() const { return start_spec_id_; }
+  int getStartRowId() const {return start_row_id_;}
 
-  void setStartSpecId(int start_spec_id) { start_spec_id_ = start_spec_id; }
-
-  int getEndSpecId() const { return end_spec_id_; }
-
-  void setEndSpecId(int end_spec_id) { end_spec_id_ = end_spec_id; }
+  int getEndRowId() const {return end_row_id_;}
 
   int getCharge() { return seed_ptr_->getCharge(); }
 
   double getMonoMass() { return seed_ptr_->getMonoNeutralMass(); }
 
-  int getSeedSpecId() { return seed_ptr_->getSpecId(); }
+  int getSeedRowId() {return seed_ptr_->getRowId();}
 
   MsMapEnvPtrVec getMsMapEnvList() { return ms_map_env_list_; }
 
@@ -73,14 +69,6 @@ class EnvSet {
 
   bool containValidEnvs(int min_scan_num, int min_match_peak_num); 
 
-  /*
-  bool containTwoValidEnvs(int min_match_peak_num); 
-
-  bool containTwoValidOutOfThreeEnvs(int min_match_peak_num);
-
-  bool containThreeValidOutOfFiveEnvs(int min_match_peak_num); 
-  */
-
   void mergeEnvSet(EnvSetPtr new_set_ptr); 
 
   static bool cmpChargeInc(EnvSetPtr a, EnvSetPtr b) { return a->getCharge() < b->getCharge(); }
@@ -96,8 +84,8 @@ class EnvSet {
   SeedEnvPtr seed_ptr_;
   MsMapEnvPtrVec ms_map_env_list_;
   XicPtr xic_ptr_;
-  int start_spec_id_;
-  int end_spec_id_;
+  int start_row_id_;
+  int end_row_id_;
   double min_inte_;
 };
 

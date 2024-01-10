@@ -29,7 +29,7 @@ typedef std::shared_ptr<SeedEnv> SeedEnvPtr;
 
 class SeedEnv : public Env {
  public:
-  SeedEnv(DeconvPeakPtr peak_ptr);
+  SeedEnv(int row_id, DeconvPeakPtr peak_ptr);
   
   // deep copy
   SeedEnv(SeedEnvPtr env_ptr);
@@ -38,9 +38,7 @@ class SeedEnv : public Env {
 
   SeedEnv(SeedEnvPtr env_ptr, EnvPeakPtrVec &peak_ptr_list);
 
-  int getSpecId() const { return spec_id_; }
-
-  void setSpecId(int spec_id) { spec_id_ = spec_id; }
+  int getRowId() const {return row_id_;}
 
   double getSeedInte() const {return seed_inte_;}
 
@@ -54,7 +52,7 @@ class SeedEnv : public Env {
   void appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 
  private:
-  int spec_id_;
+  int row_id_;
   double seed_inte_;
 };
 

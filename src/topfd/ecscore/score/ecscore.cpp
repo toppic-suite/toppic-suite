@@ -38,8 +38,10 @@ ECScore::ECScore(EnvCollPtr env_coll_ptr, MsMapPtr matrix_ptr,
   EnvSetPtr env_set_ptr = env_coll_ptr->getSeedEnvSet();
   score_id_ = score_id;
 
-  min_scan_ = env_coll_ptr->getStartSpecId();
-  max_scan_ = env_coll_ptr->getEndSpecId();
+  int min_row = env_coll_ptr->getStartRowId();
+  int max_row = env_coll_ptr->getEndRowId();
+  min_scan_ = spec_list[min_row]->getScanNum();
+  max_scan_ = spec_list[max_row]->getScanNum();
   min_charge_ = env_coll_ptr->getMinCharge();
   max_charge_ = env_coll_ptr->getMaxCharge();
   mono_mass_ = seed_ptr->getMonoNeutralMass();
@@ -49,10 +51,10 @@ ECScore::ECScore(EnvCollPtr env_coll_ptr, MsMapPtr matrix_ptr,
   abundance_ = env_coll_ptr->getIntensity();
 
   // convert seconds to minutes
-  min_elution_time_ = spec_list[min_scan_]->getRt()/60;
-  max_elution_time_ = spec_list[max_scan_]->getRt()/60; 
-  int seed_spec_id = seed_ptr->getSpecId();
-  apex_elution_time_ = spec_list[seed_spec_id]->getRt()/60;
+  min_elution_time_ = spec_list[min_row]->getRt()/60;
+  max_elution_time_ = spec_list[max_row]->getRt()/60; 
+  int seed_row_id = seed_ptr->getRowId();
+  apex_elution_time_ = spec_list[seed_row_id]->getRt()/60;
   elution_length_ = max_elution_time_ - min_elution_time_; 
 
   EnvSetPtr seed_set_ptr = env_coll_ptr->getSeedEnvSet();
@@ -64,7 +66,7 @@ ECScore::ECScore(EnvCollPtr env_coll_ptr, MsMapPtr matrix_ptr,
 
   percent_matched_peaks_ = component_score::getMatchedPeakPercent(env_set_ptr, theo_map);
   intensity_correlation_ = component_score::getAggEnvCorr(env_set_ptr);
-  top3_correlation_ = component_score::get3ScanCorr(env_set_ptr, seed_spec_id, min_scan_);
+  top3_correlation_ = component_score::get3ScanCorr(env_set_ptr, seed_row_id, min_scan_);
   even_odd_peak_ratio_ = component_score::getAggOddEvenPeakRatio(env_set_ptr);
   percent_consec_peaks_ = component_score::getConsecutivePeakPercent(env_set_ptr);
   num_theo_peaks_ = component_score::getTheoPeakNum(theo_map);

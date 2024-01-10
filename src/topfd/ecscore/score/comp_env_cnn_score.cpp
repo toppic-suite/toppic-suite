@@ -34,7 +34,7 @@ int getIndex(double mz, double min_mz, double bin_size) {
 }
 
 MsMapPeakPtrVec  getIntvPeakList(MsMapPtr matrix_ptr, EnvSetPtr env_set_ptr,
-                                 int spec_id) {
+                                 int row_id) {
   EnvPeakPtrVec peak_list = env_set_ptr->getSeedPtr()->getPeakPtrList();
   double min_theo_peak = std::round(peak_list[0]->getPosition() * 1000.0) / 1000.0;
   double max_theo_peak = std::round(peak_list[peak_list.size() - 1]->getPosition() * 1000.0) / 1000.0;
@@ -42,7 +42,7 @@ MsMapPeakPtrVec  getIntvPeakList(MsMapPtr matrix_ptr, EnvSetPtr env_set_ptr,
   int end_idx = matrix_ptr->getColIndex(max_theo_peak + 0.1);
   MsMapPeakPtrVec intv_peak_list;
   for (int peak_idx = start_idx; peak_idx <= end_idx; peak_idx++) {
-    MsMapPeakPtrVec bin_peaks = matrix_ptr->getBinPeakList(spec_id, peak_idx);
+    MsMapPeakPtrVec bin_peaks = matrix_ptr->getBinPeakList(row_id, peak_idx);
     for (const auto &peak: bin_peaks)
       if (peak->getPosition() >= (min_theo_peak - 0.1) 
           && peak->getPosition() <= (max_theo_peak + 0.1))
@@ -104,8 +104,8 @@ std::vector<std::vector<float>> getEnvcnnInputMatrix(MsMapPtr matrix_ptr,
   std::vector<float> noise_arr(300, 0.0);
   std::vector<std::vector<double>> noise_distribution_list;
   std::vector<std::vector<double>> noise_inte_distribution_list;
-  for (int spec_id = coll_ptr->getStartSpecId(); spec_id <= coll_ptr->getEndSpecId(); spec_id++) {
-    MsMapPeakPtrVec intv_peak_list = getIntvPeakList(matrix_ptr, env_set_ptr, spec_id);
+  for (int row_id = coll_ptr->getStartRowId(); row_id <= coll_ptr->getEndRowId(); row_id++) {
+    MsMapPeakPtrVec intv_peak_list = getIntvPeakList(matrix_ptr, env_set_ptr, row_id);
     std::vector<double> t_noise_distribution_list;
     std::vector<double> t_noise_inte_distribution_list;
     for (const auto &elem: intv_peak_list) {
