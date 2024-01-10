@@ -49,8 +49,8 @@ void deconvMsTwo(MzmlMsPtr ms_ptr,
                  MsAlignWriterPtrVec ms2_writer_ptr_vec, 
                  SimpleThreadPoolPtr pool_ptr) { 
   // 1. Find max_mass and max_charge
-  double max_mass = 0; 
-  int max_charge = 1;
+  double  max_mass  = 0; 
+  double  max_charge = 1;
   for (size_t i = 0; i < sp_feat_ptr_vec.size(); i++) {
     double mass = sp_feat_ptr_vec[i]->getPrecMass();
     if (mass > max_mass) {max_mass = mass;}

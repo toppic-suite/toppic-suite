@@ -70,7 +70,7 @@ void DeconvSingleSp::postprocess(MatchEnvPtrVec &dp_envs) {
   }
 
   // filtering
-  if (topfd_para_ptr_->isDoFinalFiltering()) {
+  if (topfd_para_ptr_->isDoFinalFiltering() && !topfd_para_ptr_->isDia()) {
     result_envs_ = match_env_filter::filter(dp_envs, data_ptr_->getMaxMass(), 
                                             topfd_para_ptr_->isUseMsDeconv(), 
                                             env_para_ptr_);
