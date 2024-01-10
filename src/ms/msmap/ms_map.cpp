@@ -49,7 +49,8 @@ void MsMap::initMap(PeakPtrVec2D &raw_peak_2d, DeconvMsPtrVec &ms1_ptr_vec,
   double base_inte = base_inte_;
   for (size_t row_id = 0; row_id < ms1_ptr_vec.size(); row_id++) {
     MsHeaderPtr ms_header_ptr = ms1_ptr_vec[row_id]->getMsHeaderPtr();
-    MsMapRowHeaderPtr row_header_ptr = std::make_shared<MsMapRowHeader>(ms_header_ptr->getSpecId(),
+    MsMapRowHeaderPtr row_header_ptr = std::make_shared<MsMapRowHeader>(row_id, 
+                                                                        ms_header_ptr->getSpecId(),
                                                                         ms_header_ptr->getFirstScanNum(),
                                                                         ms_header_ptr->getRetentionTime());
     PeakPtrVec row_peaks = raw_peak_2d[row_id]; 

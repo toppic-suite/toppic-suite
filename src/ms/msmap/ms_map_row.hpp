@@ -28,7 +28,9 @@ class MsMapRow {
 
   void setHeaderPtr(MsMapRowHeaderPtr header_ptr) { header_ptr_ = header_ptr; }
 
-  int getSpecID() const { return header_ptr_->getSpecId(); }
+  int getRowID() const { return header_ptr_->getRowId(); }
+
+  int getRawSpecID() const { return header_ptr_->getRawSpecId(); }
 
   int getScanNum() const { return header_ptr_->getScanNum(); }
 

@@ -12,13 +12,15 @@ namespace toppic {
 
 class MsMapRowHeader {
  public:
-  MsMapRowHeader(int spec_id, int scan_num, double rt);
+  MsMapRowHeader(int row_id, int spec_id, int scan_num, double rt);
 
-  int getSpecId() const { return spec_id_; }
-  void setSpecId(int specId) { spec_id_ = specId; }
+  int getRowId() {return row_id_;}
+
+  int getRawSpecId() const { return raw_spec_id_; }
+  void setRawSpecId(int raw_spec_id) { raw_spec_id_ = raw_spec_id; }
 
   int getScanNum() const { return scan_num_; }
-  void setScanNum(int scanNum) { scan_num_ = scanNum; }
+  void setScanNum(int scan_num) { scan_num_ = scan_num; }
 
   double getRt() const { return rt_; }
   void setRt(double rt) { rt_ = rt; }
@@ -27,7 +29,8 @@ class MsMapRowHeader {
   void setBaseInte(double base_inte) {base_inte_ = base_inte;}
 
  private:
-  int spec_id_;
+  int row_id_;
+  int raw_spec_id_;
   int scan_num_;
   double rt_;
   double base_inte_;
