@@ -154,18 +154,18 @@ int getTheoPeakNum(std::vector<std::vector<double>> &theo_map) {
   return total_peaks;
 }
 
-double get3ScanCorr(EnvSetPtr env_set_ptr, int base_spec, int start_spec) {
+double get3ScanCorr(EnvSetPtr env_set_ptr, int base_row, int start_row) {
   double scan_3_corr;
   MsMapEnvPtrVec exp_envs = env_set_ptr->getMsMapEnvList();
-  base_spec = std::max(base_spec - start_spec, 0);
-  std::vector<double> data_sp = exp_envs[base_spec]->getInteList();
+  base_row = std::max(base_row - start_row, 0);
+  std::vector<double> data_sp = exp_envs[base_row]->getInteList();
   std::vector<double> data_sp_minus_1(data_sp.size(), 0.0);
   std::vector<double> data_sp_plus_1(data_sp.size(), 0.0);
 
-  if (base_spec - 1 > 0)
-    data_sp_minus_1 = exp_envs[base_spec - 1]->getInteList();
-  if (base_spec + 1 < static_cast<int>(exp_envs.size()))
-    data_sp_plus_1 = exp_envs[base_spec + 1]->getInteList();
+  if (base_row - 1 > 0)
+    data_sp_minus_1 = exp_envs[base_row - 1]->getInteList();
+  if (base_row + 1 < static_cast<int>(exp_envs.size()))
+    data_sp_plus_1 = exp_envs[base_row + 1]->getInteList();
   double sp_sum = std::accumulate(data_sp.begin(), data_sp.end(), 0.0);
   double sp_minus_1_sum = std::accumulate(data_sp_minus_1.begin(), data_sp_minus_1.end(), 0.0);
   double sp_plus_1_sum = std::accumulate(data_sp_plus_1.begin(), data_sp_plus_1.end(), 0.0);

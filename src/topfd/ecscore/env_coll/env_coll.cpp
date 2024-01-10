@@ -21,7 +21,7 @@
 
 namespace toppic {
 
-EnvColl::EnvColl(SeedEnvPtr seed_ptr, EnvSetPtrVec &env_set_list,
+EnvColl::EnvColl(EnvSetPtrVec &env_set_list, SeedEnvPtr seed_ptr,
                  int min_charge, int max_charge,
                  int start_row_id, int end_row_id) {
   seed_ptr_ = seed_ptr;

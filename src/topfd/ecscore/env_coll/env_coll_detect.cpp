@@ -313,10 +313,11 @@ void processMs2(TopfdParaPtr topfd_para_ptr, double mz_bgn, double mz_end,
     SeedEnvPtr seed_ptr = seed_ptrs[seed_env_idx];
     seed_ptr = seed_env_util::preprocessSeedEnvPtr(seed_ptr, matrix_ptr,  
                                                    score_para_ptr, sn_ratio); 
-    /*
     if (seed_ptr == nullptr) continue;
+    LOG_ERROR("start finding envelope");
     EnvCollPtr env_coll_ptr = env_coll_util::findEnvColl(matrix_ptr, seed_ptr,
                                                          score_para_ptr, sn_ratio); 
+    /*
     if (env_coll_ptr == nullptr) continue;
     if (env_coll_util::checkExistingFeatures(matrix_ptr, env_coll_ptr,
                                              env_coll_list, score_para_ptr)) {

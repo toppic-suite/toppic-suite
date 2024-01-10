@@ -88,9 +88,9 @@ EnvCollPtr getEnvCollPtr(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
   std::sort(env_set_list.begin(), env_set_list.end(), EnvSet::cmpChargeInc);
   int min_charge = env_set_list[0]->getCharge();
   int max_charge = env_set_list[env_set_list.size() - 1]->getCharge();
-  EnvCollPtr env_coll_ptr = std::make_shared<EnvColl>(seed_ptr, env_set_list, 
-                                                      start_row_id, end_row_id,
-                                                      min_charge, max_charge);
+  EnvCollPtr env_coll_ptr = std::make_shared<EnvColl>(env_set_list, seed_ptr,  
+                                                      min_charge, max_charge,
+                                                      start_row_id, end_row_id);
 
   return env_coll_ptr;
 }

@@ -27,7 +27,7 @@ namespace toppic {
 
 class EnvColl {
  public:
-  EnvColl(SeedEnvPtr send_ptr, EnvSetPtrVec &env_set_list,
+  EnvColl(EnvSetPtrVec &env_set_list, SeedEnvPtr send_ptr, 
           int min_charge, int max_charge,
           int start_row_id, int end_row_id);
 

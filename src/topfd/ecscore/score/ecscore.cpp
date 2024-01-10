@@ -57,6 +57,7 @@ ECScore::ECScore(EnvCollPtr env_coll_ptr, MsMapPtr matrix_ptr,
   apex_elution_time_ = spec_list[seed_row_id]->getRt()/60;
   elution_length_ = max_elution_time_ - min_elution_time_; 
 
+
   EnvSetPtr seed_set_ptr = env_coll_ptr->getSeedEnvSet();
   double min_inte = matrix_ptr->getBaseInte() * sn_ratio;
   std::vector<std::vector<double>> theo_map 
@@ -65,8 +66,9 @@ ECScore::ECScore(EnvCollPtr env_coll_ptr, MsMapPtr matrix_ptr,
   map_max_elution_time_ = spec_list[spec_list.size()-1]->getRt()/60;
 
   percent_matched_peaks_ = component_score::getMatchedPeakPercent(env_set_ptr, theo_map);
+
   intensity_correlation_ = component_score::getAggEnvCorr(env_set_ptr);
-  top3_correlation_ = component_score::get3ScanCorr(env_set_ptr, seed_row_id, min_scan_);
+  top3_correlation_ = component_score::get3ScanCorr(env_set_ptr, seed_row_id, min_row);
   even_odd_peak_ratio_ = component_score::getAggOddEvenPeakRatio(env_set_ptr);
   percent_consec_peaks_ = component_score::getConsecutivePeakPercent(env_set_ptr);
   num_theo_peaks_ = component_score::getTheoPeakNum(theo_map);
