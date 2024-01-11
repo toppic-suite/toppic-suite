@@ -244,6 +244,8 @@ void processMs2(TopfdParaPtr topfd_para_ptr, double mz_bgn, double mz_end,
   EcscoreParaPtr score_para_ptr = std::make_shared<EcscorePara>(topfd_para_ptr->getFracId(), 
                                                                 topfd_para_ptr->getMzmlFileName(),
                                                                 topfd_para_ptr);
+  score_para_ptr->min_match_peak_ = 1;
+  score_para_ptr->min_scan_num_ = 1;
   // read deconvoluted MS2 peaks
   LOG_ERROR("Read ms2 file started");
   std::string output_base_name = topfd_para_ptr->getOutputBaseName();
@@ -252,13 +254,19 @@ void processMs2(TopfdParaPtr topfd_para_ptr, double mz_bgn, double mz_end,
   msalign_reader_util::readAllSpectra(ms2_file_name, all_deconv_ms2_ptr_vec);
   DeconvMsPtrVec deconv_ms2_ptr_vec;
   LOG_ERROR("Total ms2 scan number " << all_deconv_ms2_ptr_vec.size());
+  std::set<int> prec_feat_ids;
   for (size_t i = 0; i < all_deconv_ms2_ptr_vec.size(); i++) {
     int id = all_deconv_ms2_ptr_vec[i]->getMsHeaderPtr()->getSpecId();
     if (spec_id_set.find(id) != spec_id_set.end()) {
       deconv_ms2_ptr_vec.push_back(all_deconv_ms2_ptr_vec[i]);
+      PrecursorPtrVec precursor_list = all_deconv_ms2_ptr_vec[i]->getMsHeaderPtr()->getPrecPtrVec();       
+      for (size_t j = 0; j < precursor_list.size(); j++) {
+        prec_feat_ids.insert(precursor_list[j]->getFeatureId());
+      }
     }
   }
   LOG_ERROR("Selected ms2 scan number " << deconv_ms2_ptr_vec.size());
+  LOG_ERROR("Selected ms1 feature number " << prec_feat_ids.size()); 
 
   // read ms2 raw peaks 
   PeakPtrVec2D ms2_mzml_peaks;
@@ -303,7 +311,6 @@ void processMs2(TopfdParaPtr topfd_para_ptr, double mz_bgn, double mz_end,
   double perc = 0;
   ECScorePtrVec ecscore_list;
   FracFeaturePtrVec frac_features;
-  seed_num = 1;
   for (int seed_env_idx = 0; seed_env_idx < seed_num; seed_env_idx++) {
     int count = seed_env_idx + 1;
     if (count % 100 == 0 || count == seed_num) {
@@ -314,10 +321,9 @@ void processMs2(TopfdParaPtr topfd_para_ptr, double mz_bgn, double mz_end,
     seed_ptr = seed_env_util::preprocessSeedEnvPtr(seed_ptr, matrix_ptr,  
                                                    score_para_ptr, sn_ratio); 
     if (seed_ptr == nullptr) continue;
-    LOG_ERROR("start finding envelope");
     EnvCollPtr env_coll_ptr = env_coll_util::findEnvColl(matrix_ptr, seed_ptr,
                                                          score_para_ptr, sn_ratio); 
-    /*
+  
     if (env_coll_ptr == nullptr) continue;
     if (env_coll_util::checkExistingFeatures(matrix_ptr, env_coll_ptr,
                                              env_coll_list, score_para_ptr)) {
@@ -327,9 +333,6 @@ void processMs2(TopfdParaPtr topfd_para_ptr, double mz_bgn, double mz_end,
     env_coll_ptr->refineMonoMass();
     ECScorePtr ecscore_ptr = std::make_shared<ECScore>(env_coll_ptr, matrix_ptr,
                                                        feat_id, sn_ratio); 
-    if (ecscore_ptr->getScore() < topfd_para_ptr->getEcscoreCutoff()) {
-      continue;
-    }
     ecscore_list.push_back(ecscore_ptr);
     env_coll_ptr->setEcscore(ecscore_ptr->getScore());
     env_coll_ptr->removePeakData(matrix_ptr);
@@ -340,23 +343,14 @@ void processMs2(TopfdParaPtr topfd_para_ptr, double mz_bgn, double mz_end,
                                                                  score_para_ptr->file_name_,
                                                                  env_coll_ptr, matrix_ptr, sn_ratio);
     frac_features.push_back(frac_feat_ptr);
-    */
     feat_id++;
   }
   std::cout << std::endl; 
 
   std::cout << "Number of fragment features: " << env_coll_list.size() << std::endl;
-  output_base_name = output_base_name + "_" + str_util::toString(mz_bgn);
-  /// output files
-  if (topfd_para_ptr->isOutputCsvFeatureFile()) {
-    std::string feat_file_name = output_base_name + "_ms2.csv";
-    ecscore_writer::writeScores(feat_file_name, ecscore_list);
-    std::string batmass_file_name = output_base_name + "_" + "frac.mzrt.csv";
-    frac_feature_writer::writeBatMassFeatures(batmass_file_name, frac_features);
-  }
+  std::string ms2_feature_file_name = output_base_name + "_" + str_util::toString(mz_bgn) + "_" + "ms2_feature.tsv";
+  frac_feature_writer::writeFeatures(ms2_feature_file_name, frac_features);
 
-  std::string output_file_name = output_base_name + "_" + "feature.xml";
-  frac_feature_writer::writeXmlFeatures(output_file_name, frac_features);
 }
 
 }  // namespace
