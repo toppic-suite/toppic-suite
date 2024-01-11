@@ -18,6 +18,7 @@
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/str_util.hpp"
+#include "ms/spec/peak_util.hpp"
 #include "ms/spec/deconv_ms.hpp"
 #include "ms/spec/ms_header.hpp"
 #include "ms/spec/msalign_reader_util.hpp"
@@ -230,6 +231,8 @@ void process(TopfdParaPtr topfd_para_ptr) {
 
   std::string output_file_name = output_base_name + "_" + "feature.xml";
   frac_feature_writer::writeXmlFeatures(output_file_name, frac_features);
+  output_file_name = output_base_name + "_" + "ms1.frac_feature";
+  frac_feature_writer::writeFeatures(output_file_name, frac_features);
 
   SampleFeaturePtrVec sample_features;
   feature_util::getSampleFeatures(sample_features, frac_features, ms2_features);
@@ -239,8 +242,9 @@ void process(TopfdParaPtr topfd_para_ptr) {
   spec_feature_writer::writeFeatures(output_file_name, ms2_features);
 }
 
-void processMs2(TopfdParaPtr topfd_para_ptr, double mz_bgn, double mz_end, 
-                std::set<int> spec_id_set) {
+void processMs2(TopfdParaPtr topfd_para_ptr, MsAlignWriterPtr writer_ptr, 
+                FracFeaturePtrVec all_ms1_feat_list, 
+                double mz_bgn, double mz_end, std::set<int> spec_id_set) {
   EcscoreParaPtr score_para_ptr = std::make_shared<EcscorePara>(topfd_para_ptr->getFracId(), 
                                                                 topfd_para_ptr->getMzmlFileName(),
                                                                 topfd_para_ptr);
@@ -249,7 +253,7 @@ void processMs2(TopfdParaPtr topfd_para_ptr, double mz_bgn, double mz_end,
   // read deconvoluted MS2 peaks
   LOG_ERROR("Read ms2 file started");
   std::string output_base_name = topfd_para_ptr->getOutputBaseName();
-  std::string ms2_file_name = output_base_name + "_ms2.msalign";
+  std::string ms2_file_name = output_base_name + "_pre_ms2.msalign";
   DeconvMsPtrVec all_deconv_ms2_ptr_vec;
   msalign_reader_util::readAllSpectra(ms2_file_name, all_deconv_ms2_ptr_vec);
   DeconvMsPtrVec deconv_ms2_ptr_vec;
@@ -265,8 +269,12 @@ void processMs2(TopfdParaPtr topfd_para_ptr, double mz_bgn, double mz_end,
       }
     }
   }
+  FracFeaturePtrVec ms1_feat_list; 
+  for (int feat_id : prec_feat_ids) {
+    ms1_feat_list.push_back(all_ms1_feat_list[feat_id]);
+  }
   LOG_ERROR("Selected ms2 scan number " << deconv_ms2_ptr_vec.size());
-  LOG_ERROR("Selected ms1 feature number " << prec_feat_ids.size()); 
+  LOG_ERROR("Selected ms1 feature number " << ms1_feat_list.size()); 
 
   // read ms2 raw peaks 
   PeakPtrVec2D ms2_mzml_peaks;
@@ -310,7 +318,7 @@ void processMs2(TopfdParaPtr topfd_para_ptr, double mz_bgn, double mz_end,
   int feat_id = 0;
   double perc = 0;
   ECScorePtrVec ecscore_list;
-  FracFeaturePtrVec frac_features;
+  FracFeaturePtrVec ms2_feat_list;
   for (int seed_env_idx = 0; seed_env_idx < seed_num; seed_env_idx++) {
     int count = seed_env_idx + 1;
     if (count % 100 == 0 || count == seed_num) {
@@ -342,15 +350,82 @@ void processMs2(TopfdParaPtr topfd_para_ptr, double mz_bgn, double mz_end,
                                                                  score_para_ptr->frac_id_,
                                                                  score_para_ptr->file_name_,
                                                                  env_coll_ptr, matrix_ptr, sn_ratio);
-    frac_features.push_back(frac_feat_ptr);
+    ms2_feat_list.push_back(frac_feat_ptr);
     feat_id++;
   }
   std::cout << std::endl; 
 
-  std::cout << "Number of fragment features: " << env_coll_list.size() << std::endl;
+  std::cout << "Number of fragment features: " << ms2_feat_list.size() << std::endl;
   std::string ms2_feature_file_name = output_base_name + "_" + str_util::toString(mz_bgn) + "_" + "ms2_feature.tsv";
-  frac_feature_writer::writeFeatures(ms2_feature_file_name, frac_features);
+  frac_feature_writer::writeFeatures(ms2_feature_file_name, ms2_feat_list);
 
+  //get pseudo spectra
+  std::sort (ms1_feat_list.begin(), ms1_feat_list.end(), FracFeature::cmpInteDec);
+  int ms2_scan_num = 20;
+  for (size_t i = 0; i < ms1_feat_list.size(); i++) {
+    FracFeaturePtr ms1_feat = ms1_feat_list[i];
+    int apex_ms1_scan = ms1_feat->getApexScan();
+    int min_scan = apex_ms1_scan - ms2_scan_num;
+    int max_scan = apex_ms1_scan + ms2_scan_num;
+    FracFeaturePtrVec ms2_sele_list;
+    FracFeaturePtrVec ms2_remain_feat_list;
+    for (size_t j = 0; j < ms2_feat_list.size(); j++) {
+      FracFeaturePtr ms2_feat = ms2_feat_list[j];
+      LOG_DEBUG("ms2 feat apex scan " << ms2_feat->getApexScan());
+      if (ms2_feat->getApexScan() >= min_scan 
+          && ms2_feat->getApexScan() <= max_scan 
+          && ms2_feat->getMonoMass() < ms1_feat->getMonoMass()) {
+        ms2_sele_list.push_back(ms2_feat);
+      }
+      else {
+        ms2_remain_feat_list.push_back(ms2_feat);
+      }
+    }
+    if (ms2_sele_list.size() > 10) {
+      ms2_feat_list = ms2_remain_feat_list;
+      LOG_ERROR(i << " ms1 feature " << ms1_feat->getId() << " apex scan " << ms1_feat->getApexScan() <<  " frac number " << ms2_sele_list.size());
+      DeconvMsPtr ms2_ptr;
+      for (size_t j = 0; j < deconv_ms2_ptr_vec.size(); j++) {
+        int ms2_scan = deconv_ms2_ptr_vec[j]->getMsHeaderPtr()->getFirstScanNum();
+        if (ms2_scan > apex_ms1_scan && ms2_scan <= max_scan) {
+          ms2_ptr = deconv_ms2_ptr_vec[j];
+          break;
+        }
+      }
+      if (ms2_ptr != nullptr) {
+        LOG_ERROR("Ms 2 scan " << ms2_ptr->getMsHeaderPtr()->getFirstScanNum());
+        MsHeaderPtr header_ptr = ms2_ptr->getMsHeaderPtr();
+        header_ptr->setSpecId(topfd_para_ptr->getDiaSpecId());
+        topfd_para_ptr->incDiaSpecId();
+        double mono_mass = ms1_feat->getMonoMass();
+        double prec_win_center = (header_ptr->getPrecWinBegin() + header_ptr->getPrecWinEnd())/2;
+        int charge = std::round(mono_mass/prec_win_center);
+        double mono_mz = peak_util::compMz(mono_mass, charge);
+        PrecursorPtr prec_ptr = std::make_shared<Precursor>(0,
+                                                            ms1_feat->getId(), 
+                                                            mono_mz, 
+                                                            charge, 
+                                                            ms1_feat->getIntensity());
+        PrecursorPtrVec prec_ptr_vec;
+        prec_ptr_vec.push_back(prec_ptr);
+        header_ptr->setPrecPtrVec(prec_ptr_vec);
+
+        DeconvPeakPtrVec peak_list;
+        int sp_id = header_ptr->getSpecId();
+        for (size_t j = 0; j < ms2_sele_list.size(); j++) {
+          FracFeaturePtr ms2_feat = ms2_sele_list[j];
+          DeconvPeakPtr peak_ptr = std::make_shared<DeconvPeak>(sp_id, j, 
+                                                                ms2_feat->getMonoMass(),
+                                                                ms2_feat->getIntensity(),
+                                                                ms2_feat->getRepCharge(),
+                                                                ms2_feat->getEcScore());
+          peak_list.push_back(peak_ptr);
+        }
+        ms2_ptr->setPeakPtrVec(peak_list);
+        writer_ptr->writeMs(ms2_ptr);
+      }
+    }
+  }
 }
 
 }  // namespace

@@ -63,6 +63,7 @@ class TopfdPara {
   int getMs1ScanNum() {return ms_1_scan_num_;}
   int getMs2ScanNum() {return ms_2_scan_num_;}
   int getMinScanNum() {return min_scan_num_;}
+  int getDiaSpecId() {return dia_spec_id_;}
 
   void setExeDir(std::string dir) {exe_dir_ = dir;}
   void setResourceDir(std::string dir) {resource_dir_ = dir;}
@@ -91,6 +92,7 @@ class TopfdPara {
   void setMzmlFileNameAndFaims(std::string &mzml_file_name, bool is_faims, double voltage);
   void setMs1ScanNumber(int ms1_scan_num) {ms_1_scan_num_ = ms1_scan_num;}
   void setMs2ScanNumber(int ms2_scan_num) {ms_2_scan_num_ = ms2_scan_num;}
+  void incDiaSpecId() {dia_spec_id_++;}
 
  private:
   std::string exe_dir_;
@@ -133,6 +135,8 @@ class TopfdPara {
 
   int ms_1_scan_num_ = -1;
   int ms_2_scan_num_ = -1;
+
+  int dia_spec_id_ = 0;
 };
 
 typedef std::shared_ptr<TopfdPara> TopfdParaPtr;

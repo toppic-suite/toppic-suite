@@ -17,6 +17,8 @@
 #include "common/util/file_util.hpp"
 
 #include "ms/mzml/mzml_ms_group_reader.hpp"
+#include "ms/spec/msalign_writer.hpp"
+#include "ms/feature/frac_feature_reader.hpp"
 #include "topfd/ecscore/env_coll/env_coll_detect.hpp"
 #include "topfd/dia/feature_detect_ms2.hpp"
 
@@ -75,17 +77,23 @@ IsolationWindowPtrVec FeatureDetectMs2::clusterIsolationWindows() {
   return window_list;
 }
 
-void FeatureDetectMs2::processSingleWindow(IsolationWindowPtr win_ptr) {
-}
-
 void FeatureDetectMs2::process() {
+  std::string output_base_name = topfd_para_ptr_->getOutputBaseName();
+  std::string ms1_feature_file_name = output_base_name + "_" + "ms1.frac_feature";
+  FracFeatureReader feature_reader(ms1_feature_file_name);
+  FracFeaturePtrVec ms1_feature_list = feature_reader.readAllFeatures();
+  std::string ms2_pre_file_name = output_base_name + "_pre_ms2.msalign";
+  std::string ms2_output_file_name = output_base_name + "_ms2.msalign";
+  file_util::rename(ms2_output_file_name, ms2_pre_file_name);
+  MsAlignWriterPtr ms_writer_ptr = std::make_shared<MsAlignWriter>(ms2_output_file_name);
+
   IsolationWindowPtrVec window_list = clusterIsolationWindows();
- 
   for (size_t i = 0; i < window_list.size(); i++) {
     IsolationWindowPtr win_ptr = window_list[i];
     LOG_ERROR("Mz begin " << win_ptr->getMzBgn() << " mz end " <<
               win_ptr->getMzEnd());
-    env_coll_detect::processMs2(topfd_para_ptr_, win_ptr->getMzBgn(),
+    env_coll_detect::processMs2(topfd_para_ptr_, ms_writer_ptr, 
+                                ms1_feature_list, win_ptr->getMzBgn(),
                                 win_ptr->getMzEnd(), win_ptr->getSpecIdSet());
     break;
   }

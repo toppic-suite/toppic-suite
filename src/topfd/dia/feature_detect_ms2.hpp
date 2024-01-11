@@ -33,8 +33,6 @@ class FeatureDetectMs2 {
   IsolationWindowPtr findWindow(IsolationWindowPtrVec & window_list, 
                                 double mz_bgn, double mz_end);
 
-  void processSingleWindow(IsolationWindowPtr win_ptr);
-
   TopfdParaPtr topfd_para_ptr_;
   
 };
