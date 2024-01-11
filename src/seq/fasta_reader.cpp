@@ -26,6 +26,11 @@ FastaReader::FastaReader(const std::string &file_name) {
     LOG_ERROR("Fasta file  " << file_name << " does not exist.");
     exit(EXIT_FAILURE);
   }
+  // if file is empty
+  if (input_.peek() == std::ifstream::traits_type::eof()) {
+    input_.close();
+    return;
+  }
   std::getline(input_, ori_name_);
 
   while (ori_name_.length() <= 1) {
