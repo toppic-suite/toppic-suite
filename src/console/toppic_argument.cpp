@@ -489,7 +489,7 @@ bool ToppicArgument::validateArguments() {
 
   for (size_t k = 0; k < spec_file_list_.size(); k++) {
     if (!file_util::exists(spec_file_list_[k])) {
-      LOG_ERROR(spec_file_list_[k] << " does not exist!\nPlease check if file directory contains unproper characters such as spaces/quotation makrks");
+      LOG_ERROR(spec_file_list_[k] << " does not exist!\nPlease check if file directory contains unproper characters such as spaces/quotation marks");
       return false;
     }
 
