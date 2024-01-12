@@ -29,6 +29,7 @@
 #include "ms/spec/msalign_frac_merge.hpp"
 #include "ms/spec/msalign_util.hpp"
 #include "ms/spec/deconv_json_merge.hpp"
+#include "ms/env/env_base.hpp"
 #include "ms/feature/feature_merge.hpp"
 
 #include "para/prsm_para.hpp"
@@ -159,7 +160,9 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
     arguments["startTime"] = buf;
     TopmgArgument::outputArguments(std::cout, " ", arguments);
 
+    std::string resource_dir = arguments["resourceDir"];
     base_data::init();
+    EnvBase::initBase(resource_dir);
 
     LOG_DEBUG("Init base data completed");
 

@@ -17,6 +17,7 @@
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
+#include "ms/env/env_base.hpp"
 #include "ms/factory/extend_ms_factory.hpp"
 #include "ms/factory/spectrum_set_factory.hpp"
 #include "prsm/prsm_reader.hpp"
@@ -52,8 +53,11 @@ void PrsmTableWriter::write() {
       << "Retention time" << delim
       << "#peaks"<< delim
       << "Charge" << delim
-      << "Precursor mass" << delim
-      << "Adjusted precursor mass" << delim
+      << "Precursor monoisotopic mass" << delim
+      << "Adjusted precursor monoisotopic mass" << delim
+      << "Precursor average m/z" << delim
+      << "Precursor window begin" << delim
+      << "Precursor window end" << delim
       << "Proteoform ID" << delim
       << "Feature intensity" << delim
       << "Feature score" << delim
@@ -149,6 +153,11 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   }
   file << std::setprecision(10);
   LOG_DEBUG("start output prsm ");
+  MsHeaderPtr header_ptr = deconv_ms_ptr_vec[0]->getMsHeaderPtr();
+  double prec_mono_mass = prsm_ptr->getOriPrecMass() + n_term_label_mass;
+  double prec_avg_mass = EnvBase::convertMonoMassToAvgMass(prec_mono_mass);
+  int charge = header_ptr->getFirstPrecCharge(); 
+  double prec_avg_mz = peak_util::compMz(prec_avg_mass, charge); 
   file << prsm_ptr->getFileName() << delim
        << prsm_ptr->getPrsmId() << delim
        << spec_ids << delim
@@ -156,10 +165,13 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
        << spec_scans << delim
        << retention_time << delim
        << peak_num << delim
-       << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecCharge() << delim
-      << (prsm_ptr->getOriPrecMass() + n_term_label_mass) << delim
-      << prsm_ptr->getAdjustedPrecMass() << delim
-      << prsm_ptr->getProteoformPtr()->getProteoClusterId() << delim;
+       << charge << delim
+       << prec_mono_mass << delim
+       << prsm_ptr->getAdjustedPrecMass() << delim
+       << prec_avg_mz << delim
+       << header_ptr->getPrecWinBegin() << delim
+       << header_ptr->getPrecWinEnd() << delim
+       << prsm_ptr->getProteoformPtr()->getProteoClusterId() << delim;
 
   if (prsm_ptr->getSampleFeatureInte() > 0) {
     std::ostringstream str_stream;
