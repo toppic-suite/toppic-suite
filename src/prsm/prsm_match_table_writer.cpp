@@ -339,17 +339,26 @@ void PrsmMatchTableWriter::writePrsmStandardFormat(std::ofstream &file, PrsmPtr 
 
   file << std::setprecision(10);
   LOG_DEBUG("start output prsm ");
+  MsHeaderPtr header_ptr = deconv_ms_ptr_vec[0]->getMsHeaderPtr();
+  double n_term_label_mass = prsm_para_ptr_->getSpParaPtr()->getNTermLabelMass();
+  double prec_mono_mass = prsm_ptr->getOriPrecMass() + n_term_label_mass;
+  double prec_avg_mass = EnvBase::convertMonoMassToAvgMass(prec_mono_mass);
+  int charge = header_ptr->getFirstPrecCharge(); 
+  double prec_avg_mz = peak_util::compMz(prec_avg_mass, charge); 
   file << prsm_ptr->getFileName() << delim
-       << prsm_ptr->getPrsmId() << delim
-       << spec_ids << delim
-       << spec_activations << delim
-       << spec_scans << delim
-       << retention_time << delim
-       << peak_num << delim
-       << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecCharge() << delim
-      << prsm_ptr->getOriPrecMass()<< delim
-      << prsm_ptr->getAdjustedPrecMass() << delim
-      << prsm_ptr->getProteoformPtr()->getProteoClusterId() << delim;
+    << prsm_ptr->getPrsmId() << delim
+    << spec_ids << delim
+    << spec_activations << delim
+    << spec_scans << delim
+    << retention_time << delim
+    << peak_num << delim
+    << charge << delim
+    << prsm_ptr->getOriPrecMass()<< delim
+    << prsm_ptr->getAdjustedPrecMass() << delim
+    << prec_avg_mz << delim
+    << header_ptr->getPrecWinBegin() << delim
+    << header_ptr->getPrecWinEnd() << delim
+    << prsm_ptr->getProteoformPtr()->getProteoClusterId() << delim;
 
   if (prsm_ptr->getSampleFeatureInte() > 0) {
     file << prsm_ptr->getSampleFeatureId() << delim;
@@ -402,10 +411,19 @@ void PrsmMatchTableWriter::writePrsmStandardFormat(std::ofstream &file, PrsmPtr 
 
   double proteoform_fdr = prsm_ptr->getProteoformFdr();
   if (proteoform_fdr >= 0) {
-    file << proteoform_fdr << std::endl;
+    file << proteoform_fdr << delim;
   } else {
-    file << empty_str << std::endl;
+    file << empty_str << delim;
   }
+
+  std::vector<double> frag_masses = prsm_ptr->compMatchMasses();
+  for (size_t i = 0; i < frag_masses.size()-1; i++) {
+    file << frag_masses[i] << ":";
+  }
+  if (frag_masses.size() > 0) {
+    file << frag_masses[frag_masses.size()-1]; 
+  }
+  file << std::endl;
 
   if (write_multiple_matches_) {
     // print out other matches
@@ -418,6 +436,9 @@ void PrsmMatchTableWriter::writePrsmStandardFormat(std::ofstream &file, PrsmPtr 
 
     file << prsm_ptr->getFileName() << delim
         << prsm_ptr->getPrsmId() << delim
+        << delim
+        << delim
+        << delim
         << delim
         << delim
         << delim
@@ -455,6 +476,7 @@ void PrsmMatchTableWriter::writePrsmStandardFormat(std::ofstream &file, PrsmPtr 
 
       // fdr
       file << delim
+        << delim
         << std::endl;
     }
   }
