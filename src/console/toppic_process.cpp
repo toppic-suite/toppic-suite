@@ -394,8 +394,8 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
 int TopPIC_post(std::map<std::string, std::string> & arguments) {
   try {
     std::string resource_dir = arguments["resourceDir"];
-
     base_data::init();
+    EnvBase::initBase(resource_dir);
     LOG_DEBUG("Init base data completed");
 
     std::string sp_file_name = arguments["spectrumFileName"];
@@ -551,7 +551,7 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
 }
 
 int TopPICProgress(std::map<std::string, std::string> & arguments) {
-  TopPIC_identify(arguments); 
+  //TopPIC_identify(arguments); 
   TopPIC_post(arguments);
   return 0;
 }
