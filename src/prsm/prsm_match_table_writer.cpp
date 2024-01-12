@@ -88,7 +88,8 @@ void PrsmMatchTableWriter::write() {
       << "#matched fragment ions" << delim
       << "E-value" << delim
       << "Spectrum-level Q-value" << delim
-      << "Proteoform-level Q-value" << std::endl;
+      << "Proteoform-level Q-value" << delim
+      << "Matched fragment masses" << std::endl;
 
   std::string input_file_name = file_util::basename(spectrum_file_name) + "." + input_file_ext_;  
   std::string db_file_name = prsm_para_ptr_->getSearchDbFileNameWithFolder();
@@ -239,10 +240,19 @@ void PrsmMatchTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
 
   double proteoform_fdr = prsm_ptr->getProteoformFdr();
   if (proteoform_fdr >= 0) {
-    file << proteoform_fdr << std::endl;
+    file << proteoform_fdr << delim;
   } else {
-    file << empty_str << std::endl;
+    file << empty_str << delim;
   }
+
+  std::vector<double> frag_masses = prsm_ptr->compMatchMasses();
+  for (size_t i = 0; i < frag_masses.size()-1; i++) {
+    file << frag_masses[i] << ":";
+  }
+  if (frag_masses.size() > 0) {
+    file << frag_masses[frag_masses.size()-1]; 
+  }
+  file << std::endl;
 
   if (write_multiple_matches_) {
     // print out other matches
@@ -253,7 +263,7 @@ void PrsmMatchTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
         continue;
       }
 
-    file << prsm_ptr->getFileName() << delim
+      file << prsm_ptr->getFileName() << delim
         << prsm_ptr->getPrsmId() << delim
         << delim
         << delim
@@ -289,6 +299,7 @@ void PrsmMatchTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
 
       // fdr
       file << delim
+        << delim
         << std::endl;
     }
   }
