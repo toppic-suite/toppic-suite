@@ -415,6 +415,9 @@ void PrsmMatchTableWriter::writePrsmStandardFormat(std::ofstream &file, PrsmPtr 
         << delim
         << delim
         << delim
+        << delim
+        << delim
+        << delim
         << delim;
 
       // feature
