@@ -76,6 +76,8 @@ class Prsm {
   // Normalized match fragment number is used in TopMG for ranking PrSMs
   double getNormMatchFragNum();
 
+  std::vector<double> compMatchMasses();
+
   // Expected related functions
   double getEValue();
 

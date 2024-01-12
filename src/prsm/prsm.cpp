@@ -89,6 +89,22 @@ void Prsm::initMatchNum(double min_mass) {
   }
 }
 
+std::vector<double> Prsm::compMatchMasses() {
+  std::vector<double> results;
+  int min_mass = 50;
+  PeakIonPairPtrVec pairs =
+      peak_ion_pair_util::genePeakIonPairs(proteoform_ptr_, refine_ms_three_vec_, min_mass);
+  std::sort(pairs.begin(), pairs.end(), PeakIonPair::cmpRealPeakPosInc);
+  DeconvPeakPtr prev_deconv_peak(nullptr);
+  for (size_t i = 0; i < pairs.size(); i++) {
+    if (pairs[i]->getRealPeakPtr()->getBasePeakPtr() != prev_deconv_peak) {
+      prev_deconv_peak = pairs[i]->getRealPeakPtr()->getBasePeakPtr();
+      results.push_back(pairs[i]->getRealPeakPtr()->getPosition()); 
+    }
+  }
+  return results;
+}
+
 void Prsm::initScores(SpParaPtr sp_para_ptr) {
   match_fragment_num_ = 0;
   match_peak_num_ = 0;
