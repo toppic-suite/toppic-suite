@@ -84,7 +84,7 @@ void FeatureDetectMs2::process() {
   FracFeaturePtrVec ms1_feature_list = feature_reader.readAllFeatures();
   std::string ms2_pre_file_name = output_base_name + "_pre_ms2.msalign";
   std::string ms2_output_file_name = output_base_name + "_ms2.msalign";
-  file_util::rename(ms2_output_file_name, ms2_pre_file_name);
+  //file_util::rename(ms2_output_file_name, ms2_pre_file_name);
   MsAlignWriterPtr ms_writer_ptr = std::make_shared<MsAlignWriter>(ms2_output_file_name);
 
   IsolationWindowPtrVec window_list = clusterIsolationWindows();

@@ -37,9 +37,16 @@ EnvCollPtr findEnvCollWithSingleEnv(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
 bool checkExistingFeatures(MsMapPtr matrix_ptr, EnvCollPtr coll_ptr,
                            EnvCollPtrVec &env_coll_list, EcscoreParaPtr para_ptr);
 
+bool checkSeedExistingFeatures(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
+                               EnvCollPtrVec &env_coll_list, EcscoreParaPtr para_ptr);
+
 FracFeaturePtr getFracFeature(int feat_id, DeconvMsPtrVec &ms1_ptr_vec, int
                               frac_id, std::string &file_name,
                               EnvCollPtr coll_ptr, MsMapPtr matrix_ptr, double snr);
+
+FracFeaturePtr getFracFeature(int feat_id, DeconvMsPtrVec &ms1_ptr_vec, int frac_id,
+                              std::string &file_name, SeedEnvPtr seed_ptr, 
+                              MsMapPtr matrix_ptr); 
 
 }
 }

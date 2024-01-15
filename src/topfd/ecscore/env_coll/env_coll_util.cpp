@@ -198,7 +198,13 @@ bool checkExistingFeatures(MsMapPtr matrix_ptr, EnvCollPtr env_coll_ptr,
   double mass_tol = para_ptr->match_feature_ppm_tolerance_ * env_mass;
   std::vector<int> charge_states = env_coll_ptr->getChargeList();
   double isotope_mass = mass_constant::getIsotopeMass();
-  std::vector<double> extended_masses = {env_mass - isotope_mass, env_mass, env_mass + isotope_mass};
+  std::vector<double> extended_masses; 
+  if (env_mass > 5000) {
+    extended_masses = {env_mass - isotope_mass, env_mass, env_mass + isotope_mass};
+  }
+  else {
+    extended_masses = {env_mass};
+  }
   int num_env_colls = env_coll_list.size();
   MsMapRowHeaderPtrVec spectrum_list = matrix_ptr->getHeaderPtrList();
   int start_row_id = env_coll_ptr->getStartRowId();
@@ -232,6 +238,48 @@ bool checkExistingFeatures(MsMapPtr matrix_ptr, EnvCollPtr env_coll_ptr,
     for (size_t i = 0; i < new_set_ptrs.size(); i++) {
       overlap_env_coll_ptr->mergeEnvSet(new_set_ptrs[i]);
     }
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
+bool checkSeedExistingFeatures(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
+                               EnvCollPtrVec &env_coll_list, EcscoreParaPtr para_ptr) {
+  double env_mass = seed_ptr->getMonoNeutralMass();
+  double mass_tol = para_ptr->match_feature_ppm_tolerance_ * env_mass;
+  double isotope_mass = mass_constant::getIsotopeMass();
+  std::vector<double> extended_masses; 
+  if (env_mass > 5000) {
+    extended_masses = {env_mass - isotope_mass, env_mass, env_mass + isotope_mass};
+  }
+  else {
+    extended_masses = {env_mass};
+  }
+  int row_id = seed_ptr->getRowId(); 
+  MsMapRowHeaderPtrVec spectrum_list = matrix_ptr->getHeaderPtrList();
+  double rt = spectrum_list[row_id]->getRt();
+  int num_env_colls = env_coll_list.size();
+  EnvCollPtr overlap_env_coll_ptr;
+  for (int i = 0; i < num_env_colls; i++) {
+    bool overlap = checkOverlap(spectrum_list, env_coll_list[i], rt, rt, 
+                                para_ptr->match_feature_time_overlap_tole_); 
+    if (overlap) {
+      double min_mass_diff = std::numeric_limits<double>::max();
+      for (auto ext_mass: extended_masses) {
+        double mass_diff = std::abs(ext_mass - env_coll_list[i]->getMonoNeutralMass());
+        if (mass_diff < min_mass_diff)
+          min_mass_diff = mass_diff;
+      }
+      if (min_mass_diff < mass_tol) {
+        overlap_env_coll_ptr = env_coll_list[i];
+        break;
+      }
+    }
+  }
+
+  if (overlap_env_coll_ptr != nullptr) {
     return true;
   }
   else {
@@ -288,6 +336,50 @@ FracFeaturePtr getFracFeature(int feat_id, DeconvMsPtrVec &ms1_ptr_vec, int frac
                                                                                   inte, env_num);
     single_features.push_back(single_feature);
   }
+  feature_ptr->setSingleFeatures(single_features);
+  return feature_ptr;
+}
+
+FracFeaturePtr getFracFeature(int feat_id, DeconvMsPtrVec &ms1_ptr_vec, int frac_id,
+                              std::string &file_name, SeedEnvPtr seed_ptr, 
+                              MsMapPtr matrix_ptr) {
+
+  MsMapRowHeaderPtrVec spec_list = matrix_ptr->getHeaderPtrList();
+  int ms1_row_begin = seed_ptr->getRowId();
+  int ms1_row_end = seed_ptr->getRowId();
+  double feat_inte = seed_ptr->compInteSum();
+  double feat_mass = seed_ptr->getMonoNeutralMass();
+  int min_charge = seed_ptr->getCharge();
+  int max_charge = seed_ptr->getCharge();
+  int ms1_id_begin = spec_list[ms1_row_begin]->getRawSpecId(); 
+  double ms1_id_end = spec_list[ms1_row_end]->getRawSpecId(); 
+  double ms1_time_begin = spec_list[ms1_row_begin]->getRt(); 
+  double ms1_time_end = spec_list[ms1_row_end]->getRt(); 
+  int ms1_scan_begin = ms1_ptr_vec[ms1_row_begin]->getMsHeaderPtr()->getFirstScanNum();
+  int ms1_scan_end = ms1_ptr_vec[ms1_row_end]->getMsHeaderPtr()->getFirstScanNum();
+  // get apex inte
+  int ms1_apex_row = seed_ptr->getRowId();
+  double apex_time = spec_list[ms1_apex_row]->getRt(); 
+  int apex_scan = spec_list[ms1_apex_row]->getScanNum(); 
+  double apex_inte = feat_inte;
+
+  int rep_charge = seed_ptr->getCharge(); 
+  double rep_avg_mz = seed_ptr->getAvgMz(); 
+  int env_num = 1; 
+  double ec_score = 0;
+
+  FracFeaturePtr feature_ptr = std::make_shared<FracFeature>(feat_id, frac_id, file_name, feat_mass, feat_inte,
+                                                             ms1_id_begin, ms1_id_end, ms1_time_begin, ms1_time_end,
+                                                             ms1_scan_begin, ms1_scan_end, min_charge, max_charge,
+                                                             apex_time, apex_scan, apex_inte, rep_charge, rep_avg_mz, 
+                                                             env_num, ec_score);
+  SingleChargeFeaturePtrVec single_features;
+  int charge = seed_ptr->getCharge();
+  SingleChargeFeaturePtr single_feature = std::make_shared<SingleChargeFeature>(charge, ms1_time_begin, ms1_time_end,
+                                                                                ms1_scan_begin,
+                                                                                ms1_scan_end,
+                                                                                feat_inte, env_num);
+  single_features.push_back(single_feature);
   feature_ptr->setSingleFeatures(single_features);
   return feature_ptr;
 }

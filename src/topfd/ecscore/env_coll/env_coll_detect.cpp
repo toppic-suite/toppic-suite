@@ -325,33 +325,49 @@ void processMs2(TopfdParaPtr topfd_para_ptr, MsAlignWriterPtr writer_ptr,
       perc = static_cast<int>(count * 100 / seed_num);
       std::cout << "\r" << "Processing feature " << count << " ...       " << perc << "\% finished." << std::flush;
     }
-    SeedEnvPtr seed_ptr = seed_ptrs[seed_env_idx];
-    seed_ptr = seed_env_util::preprocessSeedEnvPtr(seed_ptr, matrix_ptr,  
-                                                   score_para_ptr, sn_ratio); 
-    if (seed_ptr == nullptr) continue;
-    EnvCollPtr env_coll_ptr = env_coll_util::findEnvColl(matrix_ptr, seed_ptr,
-                                                         score_para_ptr, sn_ratio); 
-  
-    if (env_coll_ptr == nullptr) continue;
-    if (env_coll_util::checkExistingFeatures(matrix_ptr, env_coll_ptr,
-                                             env_coll_list, score_para_ptr)) {
-      env_coll_ptr->removePeakData(matrix_ptr);
-      continue;
+    SeedEnvPtr ori_seed_ptr = seed_ptrs[seed_env_idx];
+    SeedEnvPtr seed_ptr = seed_env_util::preprocessSeedEnvPtr(ori_seed_ptr, matrix_ptr,  
+                                                              score_para_ptr, sn_ratio); 
+    
+    EnvCollPtr env_coll_ptr;
+    if (seed_ptr != nullptr) { 
+      env_coll_ptr = env_coll_util::findEnvColl(matrix_ptr, seed_ptr,
+                                                score_para_ptr, sn_ratio); 
     }
-    env_coll_ptr->refineMonoMass();
-    ECScorePtr ecscore_ptr = std::make_shared<ECScore>(env_coll_ptr, matrix_ptr,
-                                                       feat_id, sn_ratio); 
-    ecscore_list.push_back(ecscore_ptr);
-    env_coll_ptr->setEcscore(ecscore_ptr->getScore());
-    env_coll_ptr->removePeakData(matrix_ptr);
-    env_coll_list.push_back(env_coll_ptr);
-    FracFeaturePtr frac_feat_ptr = env_coll_util::getFracFeature(feat_id,
-                                                                 deconv_ms2_ptr_vec, 
-                                                                 score_para_ptr->frac_id_,
-                                                                 score_para_ptr->file_name_,
-                                                                 env_coll_ptr, matrix_ptr, sn_ratio);
-    ms2_feat_list.push_back(frac_feat_ptr);
-    feat_id++;
+    if (seed_ptr == nullptr || env_coll_ptr == nullptr) {
+      if (env_coll_util::checkSeedExistingFeatures(matrix_ptr, ori_seed_ptr,
+                                                   env_coll_list, score_para_ptr)) {
+        continue;
+      }
+      FracFeaturePtr frac_feat_ptr = env_coll_util::getFracFeature(feat_id,
+                                                                   deconv_ms2_ptr_vec, 
+                                                                   score_para_ptr->frac_id_,
+                                                                   score_para_ptr->file_name_,
+                                                                   ori_seed_ptr, matrix_ptr);
+      ms2_feat_list.push_back(frac_feat_ptr);
+      feat_id++;
+    }
+    else {
+      if (env_coll_util::checkExistingFeatures(matrix_ptr, env_coll_ptr,
+                                               env_coll_list, score_para_ptr)) {
+        env_coll_ptr->removePeakData(matrix_ptr);
+        continue;
+      }
+      env_coll_ptr->refineMonoMass();
+      ECScorePtr ecscore_ptr = std::make_shared<ECScore>(env_coll_ptr, matrix_ptr,
+                                                         feat_id, sn_ratio); 
+      ecscore_list.push_back(ecscore_ptr);
+      env_coll_ptr->setEcscore(ecscore_ptr->getScore());
+      env_coll_ptr->removePeakData(matrix_ptr);
+      env_coll_list.push_back(env_coll_ptr);
+      FracFeaturePtr frac_feat_ptr = env_coll_util::getFracFeature(feat_id,
+                                                                   deconv_ms2_ptr_vec, 
+                                                                   score_para_ptr->frac_id_,
+                                                                   score_para_ptr->file_name_,
+                                                                   env_coll_ptr, matrix_ptr, sn_ratio);
+      ms2_feat_list.push_back(frac_feat_ptr);
+      feat_id++;
+    }
   }
   std::cout << std::endl; 
 
@@ -360,8 +376,8 @@ void processMs2(TopfdParaPtr topfd_para_ptr, MsAlignWriterPtr writer_ptr,
   frac_feature_writer::writeFeatures(ms2_feature_file_name, ms2_feat_list);
 
   //get pseudo spectra
-  std::sort (ms1_feat_list.begin(), ms1_feat_list.end(), FracFeature::cmpInteDec);
   int ms2_scan_num = 20;
+  std::sort (ms1_feat_list.begin(), ms1_feat_list.end(), FracFeature::cmpInteDec);
   for (size_t i = 0; i < ms1_feat_list.size(); i++) {
     FracFeaturePtr ms1_feat = ms1_feat_list[i];
     int apex_ms1_scan = ms1_feat->getApexScan();
@@ -371,14 +387,26 @@ void processMs2(TopfdParaPtr topfd_para_ptr, MsAlignWriterPtr writer_ptr,
     FracFeaturePtrVec ms2_remain_feat_list;
     for (size_t j = 0; j < ms2_feat_list.size(); j++) {
       FracFeaturePtr ms2_feat = ms2_feat_list[j];
-      LOG_DEBUG("ms2 feat apex scan " << ms2_feat->getApexScan());
-      if (ms2_feat->getApexScan() >= min_scan 
-          && ms2_feat->getApexScan() <= max_scan 
-          && ms2_feat->getMonoMass() < ms1_feat->getMonoMass()) {
-        ms2_sele_list.push_back(ms2_feat);
+      if (ms2_feat->getMinMs1Id() == ms2_feat->getMaxMs1Id()) {
+        if (ms2_feat->getApexScan() > apex_ms1_scan 
+            && ms2_feat->getApexScan() <= max_scan 
+            && ms2_feat->getMonoMass() < ms1_feat->getMonoMass()) {
+          ms2_sele_list.push_back(ms2_feat);
+        }
+        else {
+          ms2_remain_feat_list.push_back(ms2_feat);
+        }
       }
       else {
-        ms2_remain_feat_list.push_back(ms2_feat);
+        LOG_DEBUG("ms2 feat apex scan " << ms2_feat->getApexScan());
+        if (ms2_feat->getApexScan() >= min_scan 
+            && ms2_feat->getApexScan() <= max_scan 
+            && ms2_feat->getMonoMass() < ms1_feat->getMonoMass()) {
+          ms2_sele_list.push_back(ms2_feat);
+        }
+        else {
+          ms2_remain_feat_list.push_back(ms2_feat);
+        }
       }
     }
     if (ms2_sele_list.size() > 10) {
