@@ -723,18 +723,18 @@ p, li { white-space: pre-wrap; }
       <rect>
        <x>270</x>
        <y>50</y>
-       <width>201</width>
+       <width>270</width>
        <height>25</height>
       </rect>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_16">
       <item>
-       <widget class="QCheckBox" name="additionalFeatureSearchCheckBox">
+       <widget class="QCheckBox" name="disableAdditionalFeatureSearchCheckBox">
         <property name="acceptDrops">
          <bool>false</bool>
         </property>
         <property name="text">
-         <string>Additional feature search</string>
+         <string>Disable additional feature search</string>
         </property>
         <property name="checkable">
          <bool>true</bool>

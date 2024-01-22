@@ -120,7 +120,7 @@ void TopFDDialog::on_defaultButton_clicked() {
   ui->missLevelOneCheckBox->setChecked(para_ptr->isMissingLevelOne());
   ui->geneHTMLCheckBox->setChecked(para_ptr->isGeneHtmlFolder());
   ui->disableFilteringCheckBox->setChecked(!para_ptr->isDoFinalFiltering());
-  ui->additionalFeatureSearchCheckBox->setChecked(para_ptr->isSearchPrecWindow());
+  ui->disableAdditionalFeatureSearchCheckBox->setChecked(!para_ptr->isSearchPrecWindow());
   ui->singleScanNoiseLevelCheckBox->setChecked(para_ptr->isUseSingleScanNoiseLevel());
 
   ui->outputTextBrowser->clear();
@@ -284,7 +284,7 @@ toppic::TopfdParaPtr TopFDDialog::getParaPtr() {
   para_ptr_->setActivation(ui->activationComboBox->currentText().toStdString());
   para_ptr_->setDoFinalFiltering(!(ui->disableFilteringCheckBox->isChecked()));
 
-  para_ptr_->setSearchPrecWindow(ui->additionalFeatureSearchCheckBox->isChecked());
+  para_ptr_->setSearchPrecWindow((ui->disableAdditionalFeatureSearchCheckBox->isChecked()));
   para_ptr_->setUseSingleScanNoiseLevel(ui->singleScanNoiseLevelCheckBox->isChecked());
 
   return para_ptr_;
@@ -311,7 +311,7 @@ void TopFDDialog::lockDialog() {
   ui->activationComboBox->setEnabled(false);
   ui->disableFilteringCheckBox->setEnabled(false);
   ui->ecscoreCutoffEdit->setEnabled(false); 
-  ui->additionalFeatureSearchCheckBox->setEnabled(false); 
+  ui->disableAdditionalFeatureSearchCheckBox->setEnabled(false);
   ui->singleScanNoiseLevelCheckBox->setEnabled(false); 
 }
 
@@ -337,7 +337,7 @@ void TopFDDialog::unlockDialog() {
   ui->activationComboBox->setEnabled(true);
   ui->disableFilteringCheckBox->setEnabled(true);
   ui->ecscoreCutoffEdit->setEnabled(true); 
-  ui->additionalFeatureSearchCheckBox->setEnabled(true); 
+  ui->disableAdditionalFeatureSearchCheckBox->setEnabled(true);
   ui->singleScanNoiseLevelCheckBox->setEnabled(true); 
 }
 
