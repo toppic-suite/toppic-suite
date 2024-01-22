@@ -107,7 +107,7 @@ class TopfdPara {
   std::string activation_ = "FILE";
   bool gene_html_folder_ = true;
   double ecscore_cutoff_ = 0.5;
-  bool search_prec_window_ = false;
+  bool search_prec_window_ = true;
   bool use_single_scan_noise_level_ = false;
   int min_scan_num_ = 3;
 
