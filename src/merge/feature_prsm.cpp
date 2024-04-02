@@ -19,20 +19,7 @@ namespace toppic {
 
 FeaturePrsm::FeaturePrsm(std::string line):
     SampleFeature(line) {
-  std::vector<std::string> strs;
-  strs = str_util::split(line, "\t");
-  if (strs.size() > 12) {
-    prot_name_ = strs[11];
-    prot_desc_ = strs[12];
-    first_residue_ = std::stoi(strs[13]) - 1;
-    last_residue_ = std::stoi(strs[14]) - 1;
-    proteoform_ = strs[15];
-    ms2_id_ = std::stoi(strs[16]);
-    prec_mass_ = std::stod(strs[17]);
-  }
-  else {
     ms2_id_ = -1;
-  }
 }
 
 void FeaturePrsm::addPrsmInfo(PrsmStrPtr prsm) {
