@@ -12,21 +12,18 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_TOPFD_ECSCORE_ENV_COLL_ENV_COLL_DETECT_HPP_
-#define TOPPIC_TOPFD_ECSCORE_ENV_COLL_ENV_COLL_DETECT_HPP_
-
-#include "topfd/common/topfd_para.hpp"
+#include "pseudo_spectrum.hpp"
 
 namespace toppic {
 
-namespace env_coll_detect {
+    void PseudoSpectrum::add_fragments(const std::vector<PseudoPeaks> &fragmentFeatures){
+        for (auto f: fragmentFeatures) {
+            fragment_features_.push_back(f);
+        }
+    }
 
-void process(const TopfdParaPtr& para_ptr);
-void process_ms1(const TopdiaParaPtr& topdia_para_ptr);
-void process_ms2(const TopdiaParaPtr& topdia_para_ptr);
+    void PseudoSpectrum::add_fragment(PseudoPeaks &fragmentFeature){
+        fragment_features_.push_back(fragmentFeature);
+    }
 
-}
-
-}
-
-#endif
+} // toppic

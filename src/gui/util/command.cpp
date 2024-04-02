@@ -70,6 +70,53 @@ std::string geneTopfdCommand(TopfdParaPtr para_ptr,
   return command;
 }
 
+/*function for topdia*/
+std::string geneTopdiaCommand(TopdiaParaPtr para_ptr,
+                              const std::vector<std::string> spec_file_lst) {
+
+#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
+        std::string exe_path = para_ptr->getExeDir() + "\\" + "topdia.exe ";
+#else
+        std::string exe_path = para_ptr->getExeDir() + "/" + "topdia ";
+#endif
+
+    std::string command = exe_path;
+    std::stringstream oss;
+    oss << "-a " << para_ptr->getActivation() << " ";
+    oss << "-c " << para_ptr->getMaxCharge() << " ";
+    oss << "-m " << para_ptr->getMaxMass() << " ";
+    oss << "-e " << para_ptr->getMzError() << " ";
+    oss << "-r " << para_ptr->getMsOneSnRatio() << " ";
+    oss << "-s " << para_ptr->getMsTwoSnRatio() << " ";
+    oss << "-w " << para_ptr->getPrecWindowWidth() << " ";
+    oss << "-t " << para_ptr->getEcscoreCutoff() << " ";
+    oss << "-b " << para_ptr->getMinScanNum() << " ";
+    command = command + oss.str();
+    if (para_ptr->isUseMsDeconv()) {
+        command = command + "-n ";
+    }
+    if (para_ptr->isMissingLevelOne()) {
+        command = command + "-o ";
+    }
+    command = command + "-u " + std::to_string(para_ptr->getThreadNum()) + " ";
+    if (!para_ptr->isGeneHtmlFolder()) {
+        command = command + "-g ";
+    }
+    if (!para_ptr->isDoFinalFiltering()) {
+        command = command + "-d ";
+    }
+    if (para_ptr->isSearchPrecWindow()) {
+        command = command + "-f ";
+    }
+    if (para_ptr->isUseSingleScanNoiseLevel()) {
+        command = command + "-i ";
+    }
+    for (size_t i = 0; i < spec_file_lst.size(); i++) {
+        command = command + spec_file_lst[i] + " ";
+    }
+    return command;
+}
+
 std::map<std::string, std::string> topindex_para {
   {"fixedMod", "-f"},
     {"allowProtMod", "-n"},

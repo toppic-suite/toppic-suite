@@ -33,8 +33,10 @@ namespace toppic {
 namespace mem_check {
 
 std::map<std::string, double> memory_per_thread_list {
-  // topfd memory requirement per thread: about 0.15 gb
-  {"topfd", 0.3}, 
+    // topfd memory requirement per thread: about 0.15 gb
+    {"topfd", 0.3},
+    // topdia memory requirement per thread: about 0.15 gb
+    {"topdia", 0.3},
     // topindex memory requirement per thread: about 0.4 gb
     {"topindex", 0.5},  
     // toppic memory requirement per thread: about 0.75 gb

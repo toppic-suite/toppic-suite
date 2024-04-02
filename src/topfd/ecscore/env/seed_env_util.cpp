@@ -20,7 +20,6 @@
 #include "topfd/ecscore/env/seed_env_util.hpp"
 
 namespace toppic {
-
 namespace seed_env_util {
 
 bool containEnoughPeaks(EnvPeakPtrVec &peak_ptr_list, int charge) {
@@ -48,7 +47,7 @@ double pearsonr(std::vector<double> &X, std::vector<double> &Y) {
     squareSum_Y = squareSum_Y + Y[i] * Y[i];
   }
   double corr = (double) (n * sum_XY - sum_X * sum_Y) /
-    sqrt((n * squareSum_X - sum_X * sum_X) * (n * squareSum_Y - sum_Y * sum_Y));
+                sqrt((n * squareSum_X - sum_X * sum_X) * (n * squareSum_Y - sum_Y * sum_Y));
   return corr;
 }
 
@@ -69,10 +68,9 @@ double pearsonr(EnvPeakPtrVec &peak_list, std::vector<double> &Y) {
     n++;
   }
   double corr = (double) (n * sum_XY - sum_X * sum_Y) /
-    sqrt((n * squareSum_X - sum_X * sum_X) * (n * squareSum_Y - sum_Y * sum_Y));
+                sqrt((n * squareSum_X - sum_X * sum_X) * (n * squareSum_Y - sum_Y * sum_Y));
   return corr;
 }
-
 
 SeedEnvPtr preprocessSeedEnvPtr(SeedEnvPtr seed_ptr, MsMapPtr ms_map_ptr,
                                 EcscoreParaPtr para_ptr, double sn_ratio) {
@@ -85,11 +83,11 @@ SeedEnvPtr preprocessSeedEnvPtr(SeedEnvPtr seed_ptr, MsMapPtr ms_map_ptr,
     LOG_ERROR("spec id " + std::to_string(seed_ptr->getSpecId()) + " is out of range!");
     return nullptr;
   }
-  //3. Get high intensity peaks only. 
+  //3. Get high intensity peaks only.
   MsMapEnvPtr ms_map_env_ptr
-    = ms_map_env_util::getMatchMsMapEnv(ms_map_ptr, seed_ptr,
-                                        seed_ptr->getSpecId(),
-                                        para_ptr->peak_mz_tole_);
+      = ms_map_env_util::getMatchMsMapEnv(ms_map_ptr, seed_ptr,
+                                          seed_ptr->getSpecId(),
+                                          para_ptr->peak_mz_tole_);
   double inte_ratio = ms_map_env_util::compTopThreeInteRatio(seed_ptr, ms_map_env_ptr);
   double min_inte = ms_map_ptr->getBaseInte() * sn_ratio;
   EnvPeakPtrVec scaled_peak_ptr_list = seed_ptr->getScaledPeakPtrList(inte_ratio, min_inte);
@@ -97,15 +95,15 @@ SeedEnvPtr preprocessSeedEnvPtr(SeedEnvPtr seed_ptr, MsMapPtr ms_map_ptr,
   if (!containEnoughPeaks(scaled_peak_ptr_list, seed_ptr->getCharge())){
     return nullptr;
   }
-  //5. Check Pearson correlation 
+  //5. Check Pearson correlation
   std::vector<double> exp_inte_list = ms_map_env_ptr->getInteList();
-  double corr = pearsonr(scaled_peak_ptr_list, exp_inte_list); 
+  double corr = pearsonr(scaled_peak_ptr_list, exp_inte_list);
   if (corr < para_ptr->seed_env_inte_corr_tole_cutoff_) {
     return nullptr;
   }
   //6. Generate new seed envelope
   SeedEnvPtr result_seed_env_ptr = std::make_shared<SeedEnv>(seed_ptr,
-                                                             scaled_peak_ptr_list); 
+                                                             scaled_peak_ptr_list);
   return result_seed_env_ptr;
 }
 
@@ -135,11 +133,11 @@ SeedEnvPtr relaxProcessSeedEnvPtr(SeedEnvPtr seed_ptr, MsMapPtr ms_map_ptr,
     LOG_ERROR("spec id " + std::to_string(seed_ptr->getSpecId()) + " is out of range!");
     return nullptr;
   }
-  //3. Get high intensity peaks only. 
+  //3. Get high intensity peaks only.
   MsMapEnvPtr ms_map_env_ptr
-    = ms_map_env_util::getMatchMsMapEnv(ms_map_ptr, seed_ptr,
-                                        seed_ptr->getSpecId(),
-                                        para_ptr->peak_mz_tole_);
+      = ms_map_env_util::getMatchMsMapEnv(ms_map_ptr, seed_ptr,
+                                          seed_ptr->getSpecId(),
+                                          para_ptr->peak_mz_tole_);
   double inte_ratio = ms_map_env_util::compTopThreeInteRatio(seed_ptr, ms_map_env_ptr);
   double min_inte = ms_map_ptr->getBaseInte() * sn_ratio;
   EnvPeakPtrVec scaled_peak_ptr_list = seed_ptr->getScaledPeakPtrList(inte_ratio, min_inte);
@@ -149,7 +147,7 @@ SeedEnvPtr relaxProcessSeedEnvPtr(SeedEnvPtr seed_ptr, MsMapPtr ms_map_ptr,
   }
   //5. Generate new seed envelope
   SeedEnvPtr result_seed_env_ptr = std::make_shared<SeedEnv>(seed_ptr,
-                                                             scaled_peak_ptr_list); 
+                                                             scaled_peak_ptr_list);
   return result_seed_env_ptr;
 }
 
@@ -191,10 +189,10 @@ SeedEnvPtr getHalfChargeEnvV2(SeedEnvPtr seed_ptr,
   double ref_mass = peak_util::compPeakNeutralMass(ref_mz, new_charge);
   double mono_mass = EnvBase::convertRefMassToMonoMass(ref_mass);
   int refer_idx = seed_ptr->getReferIdx();
-  // if refer_idx is even and env_odd_log_ratio < 0 
+  // if refer_idx is even and env_odd_log_ratio < 0
   // or refer_idx is odd  and env_odd_log_ratio > 1
   // then increase mass by about 1 Dalton
-  if (((refer_idx)%2 == 0 && even_odd_log_ratio < 0) 
+  if (((refer_idx)%2 == 0 && even_odd_log_ratio < 0)
       || ((refer_idx)%2 == 1 && even_odd_log_ratio >0)) {
     mono_mass += mass_constant::getIsotopeMass();
   }
@@ -208,19 +206,16 @@ SeedEnvPtr getHalfChargeEnvV2(SeedEnvPtr seed_ptr,
   return new_seed_ptr;
 }
 
-SeedEnvPtr testHalfChargeEnv(SeedEnvPtr seed_ptr, MsMapPtr ms_map_ptr, 
-                             double even_odd_log_ratio, EcscoreParaPtr para_ptr, 
+SeedEnvPtr testHalfChargeEnv(SeedEnvPtr seed_ptr, MsMapPtr ms_map_ptr,
+                             double even_odd_log_ratio, EcscoreParaPtr para_ptr,
                              double sn_ratio) {
   SeedEnvPtr half_charge_seed = getHalfChargeEnvV1(seed_ptr, even_odd_log_ratio);
   if (half_charge_seed == nullptr) {
-      return nullptr;
+    return nullptr;
   }
-  SeedEnvPtr processed_seed_ptr = preprocessSeedEnvPtr(half_charge_seed, 
+  SeedEnvPtr processed_seed_ptr = preprocessSeedEnvPtr(half_charge_seed,
                                                        ms_map_ptr, para_ptr, sn_ratio);
   return processed_seed_ptr;
 }
-
-
 }
-
 }

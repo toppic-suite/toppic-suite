@@ -37,8 +37,8 @@ class MzmlMsGroupReader {
   int getInputSpNum() {return reader_ptr_->getInputSpNum();}
   bool checkCentroidData() {return reader_ptr_->checkCentroidData();}
 
-  void getMs1Map(PeakPtrVec2D &ms1_mzml_peaks, 
-                 MsHeaderPtr2D &ms2_header_ptr_2d);
+  void getMs1Map(PeakPtrVec2D &ms1_mzml_peaks, MsHeaderPtr2D &ms2_header_ptr_2d);
+  void getMs2Map(PeakPtrVec2D &ms2_mzml_peaks, double base_mz);
 
  private:
   PwMsReaderPtr reader_ptr_;

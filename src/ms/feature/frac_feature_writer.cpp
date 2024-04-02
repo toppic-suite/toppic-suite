@@ -14,6 +14,7 @@
 
 #include <set>
 #include <algorithm>
+#include <sstream>
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
@@ -90,65 +91,6 @@ void writeFeatures(const std::string &output_file_name,
   of.close();
 }
 
-void writeBatMassFeatures(const std::string &output_file_name,
-                          const FracFeaturePtrVec &features) {
-  std::ofstream of(output_file_name);
-  std::string delimit = ",";
-  of << "ID" << delimit
-      << "Fraction_ID" << delimit
-      << "Envelope_num" << delimit
-      << "Mass" << delimit
-      << "MonoMz" << delimit
-      << "Charge" << delimit
-      << "Intensity" << delimit
-      << "mzLo" << delimit
-      << "mzHi" << delimit
-      << "rtLo" << delimit
-      << "rtHi" << delimit
-      << "color" << delimit
-      << "opacity" << delimit
-      << "ecscore"
-      << std::endl;
-  for (size_t i = 0; i < features.size(); i++) {
-    FracFeaturePtr feature = features[i];
-    double mono_mass = feature->getMonoMass(); 
-    SingleChargeFeaturePtrVec single_features = feature->getSingleFeatures();
-
-    for (size_t j = 0; j < single_features.size(); j++) {
-      SingleChargeFeaturePtr single_feature = single_features[j];
-      int charge = single_feature->getCharge();
-      double mono_mz = peak_util::compMz(mono_mass, charge);
-      EnvPtr ref_env = EnvBase::getEnvByMonoMass(mono_mass);
-      EnvPtr theo_env = ref_env->distrToTheoMono(mono_mz, charge);
-      double min_inte = 0.03;
-      EnvPtr filtered_env = theo_env->getSubEnv(min_inte);
-      //margin for envelopes
-      double margin = 0.1; 
-      double min_mz = filtered_env->getMinMz() - margin;
-      if (min_mz < 0.0)  {
-        min_mz = 0.0;
-      }
-      double max_mz = filtered_env->getMaxMz() + margin;
-      of << feature->getId() << delimit
-          << feature->getFracId() << delimit
-          << single_feature->getEnvNum() << delimit
-          << feature->getMonoMass() << delimit
-          << mono_mz << delimit
-          << charge << delimit
-          << single_feature->getIntensity() << delimit
-          << min_mz << delimit
-          << max_mz << delimit
-          << (single_feature->getTimeBegin()/60) << delimit
-          << (single_feature->getTimeEnd()/60) << delimit
-          << "#FF0000" << delimit
-          << "0.1" << delimit
-          << feature->getEcScore()
-          << std::endl;
-    }
-  }
-  of.close();
-}
-
 void writeXmlFeatures(const std::string &output_file_name,
                       const FracFeaturePtrVec &features) {
   std::ofstream file;
@@ -172,6 +114,96 @@ void writeXmlFeatures(const std::string &output_file_name,
 
   file << "</frac_feature_list>" << std::endl;
   file.close();
+}
+
+void writeBatMassFeatures(const std::string &output_file_name, const FracFeaturePtrVec &features, int num_spectra) {
+    std::ofstream of(output_file_name);
+    std::string delimit = ",";
+    of << "ID" << delimit
+       << "Fraction_ID" << delimit
+       << "Envelope_num" << delimit
+       << "Mass" << delimit
+       << "MonoMz" << delimit
+       << "Charge" << delimit
+       << "Intensity" << delimit
+       << "mzLo" << delimit
+       << "mzHi" << delimit
+       << "rtLo" << delimit
+       << "rtHi" << delimit
+       << "specLow" << delimit
+       << "specHi" << delimit
+       << "rtApex" << delimit
+       << "Score" << delimit
+       << "XIC" << delimit
+       << "Envelope"
+       << std::endl;
+    for (size_t i = 0; i < features.size(); i++) {
+        FracFeaturePtr feature = features[i];
+        double mono_mass = feature->getMonoMass();
+        SingleChargeFeaturePtrVec single_features = feature->getSingleFeatures();
+
+        for (size_t j = 0; j < single_features.size(); j++) {
+            SingleChargeFeaturePtr single_feature = single_features[j];
+            int charge = single_feature->getCharge();
+            double mono_mz = peak_util::compMz(mono_mass, charge);
+            EnvPtr ref_env = EnvBase::getEnvByMonoMass(mono_mass);
+            EnvPtr theo_env = ref_env->distrToTheoMono(mono_mz, charge);
+            double min_inte = 0.03;
+            EnvPtr filtered_env = theo_env->getSubEnv(min_inte);
+            /////
+            std::vector<double> xic = single_feature->getXicInte();
+            std::stringstream ss;
+            int k = 0;
+            for (int i = 0; i < num_spectra; i++) {
+                if (i != 0)
+                    ss << ";";
+                if (i >= single_feature->getSpecIDBegin() and i <= single_feature->getSpecIDEnd()) {
+                    ss << xic[k];
+                    k++;
+                }
+                else
+                    ss << 0;
+            }
+
+            std::vector<double> envelopeMass = single_feature->getEnvelopeMass();
+            std::vector<double> aggregateEnvelopeInte = single_feature->getAggregateEnvelopeInte();
+            std::stringstream env;
+            for (size_t i = 0; i < envelopeMass.size(); i++) {
+                if (i != 0)
+                    env << ";";
+                env << envelopeMass[i];
+                env << '&';
+                env << aggregateEnvelopeInte[i];
+            }
+            /////
+            //margin for envelopes
+            double margin = 0.1;
+            double min_mz = filtered_env->getMinMz() - margin;
+            if (min_mz < 0.0)  {
+                min_mz = 0.0;
+            }
+            double max_mz = filtered_env->getMaxMz() + margin;
+            of << feature->getId() << delimit
+               << feature->getFracId() << delimit
+               << single_feature->getEnvNum() << delimit
+               << feature->getMonoMass() << delimit
+               << mono_mz << delimit
+               << charge << delimit
+               << single_feature->getIntensity() << delimit
+               << min_mz << delimit
+               << max_mz << delimit
+               << (single_feature->getTimeBegin()/60) << delimit
+               << (single_feature->getTimeEnd()/60) << delimit
+               << single_feature->getSpecIDBegin() << delimit
+               << single_feature->getSpecIDEnd() << delimit
+               << feature->getApexTime()/60 << delimit
+               << feature->getEcScore() << delimit
+               << ss.str() << delimit
+               << env.str()
+               << std::endl;
+        }
+    }
+    of.close();
 }
 
 }

@@ -24,8 +24,9 @@ namespace toppic {
 
 class EcscorePara {
  public:
-  EcscorePara(int frac_id, const std::string &file_name,
-              TopfdParaPtr para_ptr);
+  EcscorePara(int frac_id, const std::string &file_name, TopfdParaPtr para_ptr);
+
+  EcscorePara(int frac_id, const std::string &file_name, TopdiaParaPtr para_ptr);
 
   double getPeakMzTole() {return peak_mz_tole_;}
 

@@ -12,21 +12,24 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_TOPFD_ECSCORE_ENV_COLL_ENV_COLL_DETECT_HPP_
-#define TOPPIC_TOPFD_ECSCORE_ENV_COLL_ENV_COLL_DETECT_HPP_
+#include "topdia/common/topdia_para.hpp"
+#include "topdia/common/topdia_process.hpp"
+#include "console/topdia_argument.hpp"
 
-#include "topfd/common/topfd_para.hpp"
+int main(int argc, char* argv[]) {
 
-namespace toppic {
+    toppic::Argument argu_processor;
+    bool success = argu_processor.parse(argc, argv);
 
-namespace env_coll_detect {
+    if (!success) {
+        return 1;
+    }
 
-void process(const TopfdParaPtr& para_ptr);
-void process_ms1(const TopdiaParaPtr& topdia_para_ptr);
-void process_ms2(const TopdiaParaPtr& topdia_para_ptr);
+    toppic::TopdiaParaPtr topdia_para_ptr = argu_processor.getTopdiaParaPtr();
 
+    std::vector<std::string> spec_file_lst = argu_processor.getSpecFileList();
+
+    int result = toppic::topdia_process::process(topdia_para_ptr, spec_file_lst);
+
+    return result;
 }
-
-}
-
-#endif

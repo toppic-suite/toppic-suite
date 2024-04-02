@@ -22,16 +22,16 @@ EnvPara::EnvPara(double mz_tolerance) {
   score_error_tolerance_ = mz_tolerance; 
 }
 
-double EnvPara::getMzTolerance(int charge) {
-  // report mz_tolerance for charge <= 20
-  if (charge <= 20) {
-    return mz_tolerance_;
-  }
-  // otherwise, reduce mz_tolerance proportionally
-  else {
-    return mz_tolerance_ * 20/charge;
-  }
-}
+//double EnvPara::getMzTolerance(int charge) {
+//  // report mz_tolerance for charge <= 20
+//  if (charge <= 20) {
+//    return mz_tolerance_;
+//  }
+//  // otherwise, reduce mz_tolerance proportionally
+//  else {
+//    return mz_tolerance_ * 20/charge;
+//  }
+//}
 
 // get the mass group based on mass value 
 int EnvPara::getMassGroup(double base_mass) {

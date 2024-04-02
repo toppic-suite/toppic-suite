@@ -20,25 +20,29 @@
 #include <string>
 
 #include "topfd/common/topfd_para.hpp"
+#include "topdia/common/topdia_para.hpp"
 
 namespace toppic {
 
-namespace command {
+  namespace command {
 
-std::string geneTopfdCommand(TopfdParaPtr para_ptr,
-                             std::vector<std::string> spec_file_lst);  
+    std::string geneTopfdCommand(TopfdParaPtr para_ptr,
+                                 std::vector<std::string> spec_file_lst);
 
-std::string geneTopIndexCommand(std::map<std::string, std::string> arguments_); 
+    std::string geneTopdiaCommand(TopdiaParaPtr para_ptr,
+                                  std::vector<std::string> spec_file_lst);
 
-std::string geneToppicCommand(std::map<std::string, std::string> arguments_, 
-                              std::vector<std::string> spec_file_lst_); 
+    std::string geneTopIndexCommand(std::map<std::string, std::string> arguments_);
 
-std::string geneTopmgCommand(std::map<std::string, std::string> arguments_, 
-                              std::vector<std::string> spec_file_lst_); 
+    std::string geneToppicCommand(std::map<std::string, std::string> arguments_,
+                                  std::vector<std::string> spec_file_lst_);
 
-std::string geneTopDiffCommand(std::map<std::string, std::string> arguments_, 
-                               std::vector<std::string> spec_file_lst_); 
+    std::string geneTopmgCommand(std::map<std::string, std::string> arguments_,
+                                 std::vector<std::string> spec_file_lst_);
 
-}
+    std::string geneTopDiffCommand(std::map<std::string, std::string> arguments_,
+                                   std::vector<std::string> spec_file_lst_);
+
+  }
 }
 #endif

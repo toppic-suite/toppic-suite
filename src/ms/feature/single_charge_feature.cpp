@@ -22,6 +22,33 @@ namespace toppic {
 SingleChargeFeature::SingleChargeFeature(int charge,
                                          double time_begin, double time_end,
                                          int scan_begin, int scan_end,
+                                         double intensity, int env_num,
+                                         int spec_id_begin, int spec_id_end,
+                                         double mass, std::vector<double> xic_inte,
+                                         std::vector<double> envelopeMass, std::vector<double> aggregateEnvelopeInte) :
+        charge_(charge),
+        time_begin_(time_begin),
+        time_end_(time_end),
+        scan_begin_(scan_begin),
+        scan_end_(scan_end),
+        intensity_(intensity),
+        env_num_(env_num),
+        spec_id_begin_(spec_id_begin),
+        spec_id_end_(spec_id_end),
+        mass_(mass) {
+    for (auto inte: xic_inte)
+        xic_inte_.push_back(inte);
+
+    for (auto mass: envelopeMass)
+        envelopeMass_.push_back(mass);
+
+    for (auto inte: aggregateEnvelopeInte)
+        aggregateEnvelopeInte_.push_back(inte);
+}
+
+SingleChargeFeature::SingleChargeFeature(int charge,
+                                         double time_begin, double time_end,
+                                         int scan_begin, int scan_end,
                                          double intensity, int env_num): 
     charge_(charge),
     time_begin_(time_begin),

@@ -26,16 +26,14 @@ namespace toppic {
 
 namespace frac_feature_writer {
 
-void writeFeatures(const std::string &output_file_name,
-                   const FracFeaturePtrVec &features);
+void writeFeatures(const std::string &output_file_name, const FracFeaturePtrVec &features);
 
 void writeHeader(std::ofstream &of); 
 
 void writeOneFeature(std::ofstream &of, FracFeaturePtr feature);
 
 
-void writeBatMassFeatures(const std::string &output_file_name,
-                          const FracFeaturePtrVec &features);
+void writeBatMassFeatures(const std::string &output_file_name, const FracFeaturePtrVec &features, int num_spectra);
 
 void writeXmlFeatures(const std::string &output_file_name,
                       const FracFeaturePtrVec &features);

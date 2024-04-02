@@ -28,5 +28,15 @@ EcscorePara::EcscorePara(int frac_id, const std::string &file_name,
   min_scan_num_ = para_ptr->getMinScanNum();
 }
 
+EcscorePara::EcscorePara(int frac_id, const std::string &file_name,
+                         TopdiaParaPtr para_ptr):
+        frac_id_(frac_id),
+        file_name_(file_name) {
+
+    /// additional parameters
+    para_max_charge_ = para_ptr->getMaxCharge();
+    min_scan_num_ = para_ptr->getMinScanNum();
+}
+
 } /* namespace */
 

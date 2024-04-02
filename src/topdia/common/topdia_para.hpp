@@ -12,23 +12,19 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_TOPFD_COMMON_TOPFD_PARA_HPP_
-#define TOPPIC_TOPFD_COMMON_TOPFD_PARA_HPP_
+#ifndef TOPPIC_TOPDIA_COMMON_TOPDIA_PARA_HPP_
+#define TOPPIC_TOPDIA_COMMON_TOPDIA_PARA_HPP_
 
 #include <memory>
 #include <string>
-#include "topdia/common/topdia_para.hpp"
 
 namespace toppic {
+class TopdiaPara {
+public:
+  TopdiaPara() {};
 
-class TopfdPara {
- public:
-  TopfdPara() {};
-
-  TopfdPara(TopdiaParaPtr topdia_para_ptr);
-  
   std::string getParaStr(const std::string &prefix,
-		         const std::string &sep);
+                         const std::string &sep);
 
   std::string getExeDir() {return exe_dir_;}
   std::string getResourceDir() {return resource_dir_;}
@@ -93,7 +89,7 @@ class TopfdPara {
   void setMs1ScanNumber(int ms1_scan_num) {ms_1_scan_num_ = ms1_scan_num;}
   void setMs2ScanNumber(int ms2_scan_num) {ms_2_scan_num_ = ms2_scan_num;}
 
- private:
+private:
   std::string exe_dir_;
   std::string resource_dir_;
   int max_charge_ = 30;
@@ -115,11 +111,11 @@ class TopfdPara {
   int min_scan_num_ = 3;
 
   //** Fixed parameter setting **
-  // estimate min intensity using the method in Thrash. 
+  // estimate min intensity using the method in Thrash.
   bool estimate_min_inte_ = true;
   bool output_multiple_mass_ = false;
   bool output_match_env_ = false;
-  bool output_csv_feature_file_ = false;
+  bool output_csv_feature_file_ = true;
 
   //** information for each run **
   int frac_id_ = -1;
@@ -135,8 +131,8 @@ class TopfdPara {
   int ms_2_scan_num_ = -1;
 };
 
-typedef std::shared_ptr<TopfdPara> TopfdParaPtr;
+typedef std::shared_ptr<TopdiaPara> TopdiaParaPtr;
 
 }  // namespace toppic
 
-#endif 
+#endif
