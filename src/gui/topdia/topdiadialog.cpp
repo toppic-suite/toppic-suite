@@ -55,8 +55,14 @@ TopDIADialog::TopDIADialog(QWidget *parent) :
       ui->ms1snRatioEdit->setValidator(validator2);
       ui->ms2snRatioEdit->setValidator(validator2);
       ui->threadNumberEdit->setValidator(new QIntValidator(0, 1000, this));
-      ui->minScanNumEdit->setValidator(new QIntValidator(1, 3, this));
-      ui->ecscoreCutoffEdit->setValidator(new QDoubleValidator(0.0, 1.0, 4, this));
+      ui->ms1MinScanNumEdit->setValidator(new QIntValidator(1, 3, this));
+      ui->ms2MinScanNumEdit->setValidator(new QIntValidator(1, 3, this));
+      ui->pseudoMinPeakNumEdit->setValidator(new QIntValidator(10, 1000, this));
+      ui->ms1EcscoreCutoffEdit->setValidator(new QDoubleValidator(0.0, 1.0, 4, this));
+      ui->ms2EcscoreCutoffEdit->setValidator(new QDoubleValidator(0.0, 1.0, 4, this));
+      ui->pseudoScoreCutoffEdit->setValidator(new QDoubleValidator(0.0, 1.0, 4, this));
+      ui->ms1IntePccCutoffEdit->setValidator(new QDoubleValidator(0.0, 1.0, 4, this));
+      ui->ms2IntePccCutoffEdit->setValidator(new QDoubleValidator(0.0, 1.0, 4, this));
       QRegExp rx3("^\\d{1,4}\\.\\d{0,2}|10000$");
       QRegExpValidator *validator3 = new QRegExpValidator(rx3, this);
       ui->windowSizeEdit->setValidator(validator3);
@@ -114,14 +120,21 @@ void TopDIADialog::on_defaultButton_clicked() {
   ui->ms2snRatioEdit->setText(QString::number(para_ptr->getMsTwoSnRatio()));
   ui->windowSizeEdit->setText(QString::number(para_ptr->getPrecWindowWidth()));
   ui->threadNumberEdit->setText(QString::number(para_ptr->getThreadNum()));
-  ui->ecscoreCutoffEdit->setText(QString::number(para_ptr->getEcscoreCutoff()));
-  ui->minScanNumEdit->setText(QString::number(para_ptr->getMinScanNum()));
   ui->msDeconvCheckBox->setChecked(para_ptr->isUseMsDeconv());
-  ui->missLevelOneCheckBox->setChecked(para_ptr->isMissingLevelOne());
   ui->geneHTMLCheckBox->setChecked(para_ptr->isGeneHtmlFolder());
   ui->disableFilteringCheckBox->setChecked(!para_ptr->isDoFinalFiltering());
-  ui->disableAdditionalFeatureSearchCheckBox->setChecked(!para_ptr->isSearchPrecWindow());
   ui->singleScanNoiseLevelCheckBox->setChecked(para_ptr->isUseSingleScanNoiseLevel());
+
+  //////////////////////////////////////
+  ui->ms1EcscoreCutoffEdit->setText(QString::number(para_ptr->getMs1EcscoreCutoff()));
+  ui->ms2EcscoreCutoffEdit->setText(QString::number(para_ptr->getMs2EcscoreCutoff()));
+  ui->ms1MinScanNumEdit->setText(QString::number(para_ptr->getMs1MinScanNum()));
+  ui->ms2MinScanNumEdit->setText(QString::number(para_ptr->getMs2MinScanNum()));
+  ui->pseudoScoreCutoffEdit->setText(QString::number(para_ptr->getPseudoScoreCutoff()));
+  ui->pseudoMinPeakNumEdit->setText(QString::number(para_ptr->getPseudoMinPeaks()));
+  ui->ms1IntePccCutoffEdit->setText(QString::number(para_ptr->getMs1SeedEnvInteCorrToleCutoff()));
+  ui->ms2IntePccCutoffEdit->setText(QString::number(para_ptr->getMs2SeedEnvInteCorrToleCutoff()));
+  //////////////////////////////////////
 
   ui->outputTextBrowser->clear();
   ui->outputTextBrowser->setText("Click the Start button to process the spectrum files.");
@@ -275,16 +288,23 @@ toppic::TopdiaParaPtr TopDIADialog::getParaPtr() {
   para_ptr_->setMsOneSnRatio(std::stod(ui->ms1snRatioEdit->text().toStdString()));
   para_ptr_->setMsTwoSnRatio(std::stod(ui->ms2snRatioEdit->text().toStdString()));
   para_ptr_->setPrecWindowWidth(std::stod(ui->windowSizeEdit->text().toStdString()));
-  para_ptr_->setMissingLevelOne(ui->missLevelOneCheckBox->isChecked()); 
-  para_ptr_->setEcscoreCutoff(std::stod(ui->ecscoreCutoffEdit->text().toStdString()));
-  para_ptr_->setMinScanNum(std::stoi(ui->minScanNumEdit->text().toStdString()));
   para_ptr_->setThreadNum(std::stoi(ui->threadNumberEdit->text().toStdString()));
   para_ptr_->setGeneHtmlFolder(ui->geneHTMLCheckBox->isChecked());
   para_ptr_->setUseMsDeconv(ui->msDeconvCheckBox->isChecked());
   para_ptr_->setActivation(ui->activationComboBox->currentText().toStdString());
   para_ptr_->setDoFinalFiltering(!(ui->disableFilteringCheckBox->isChecked()));
 
-  para_ptr_->setSearchPrecWindow((ui->disableAdditionalFeatureSearchCheckBox->isChecked()));
+  //////////////////////////////////////
+  para_ptr_->setMs1EcscoreCutoff(std::stod(ui->ms1EcscoreCutoffEdit->text().toStdString()));
+  para_ptr_->setMs2EcscoreCutoff(std::stod(ui->ms2EcscoreCutoffEdit->text().toStdString()));
+  para_ptr_->setMs1MinScanNum(std::stoi(ui->ms1MinScanNumEdit->text().toStdString()));
+  para_ptr_->setMs2MinScanNum(std::stoi(ui->ms2MinScanNumEdit->text().toStdString()));
+  para_ptr_->setPseudoScoreCutoff(std::stod(ui->pseudoScoreCutoffEdit->text().toStdString()));
+  para_ptr_->setPseudoMinPeaks(std::stoi(ui->pseudoMinPeakNumEdit->text().toStdString()));
+  para_ptr_->setMs1SeedEnvInteCorrToleCutoff(std::stod(ui->ms1IntePccCutoffEdit->text().toStdString()));
+  para_ptr_->setMs2SeedEnvInteCorrToleCutoff(std::stod(ui->ms2IntePccCutoffEdit->text().toStdString()));
+  //////////////////////////////////////
+
   para_ptr_->setUseSingleScanNoiseLevel(ui->singleScanNoiseLevelCheckBox->isChecked());
 
   return para_ptr_;
@@ -299,20 +319,25 @@ void TopDIADialog::lockDialog() {
   ui->ms1snRatioEdit->setEnabled(false);
   ui->ms2snRatioEdit->setEnabled(false);
   ui->threadNumberEdit->setEnabled(false);
-  ui->minScanNumEdit->setEnabled(false);
   ui->clearButton->setEnabled(false);
   ui->defaultButton->setEnabled(false);
   ui->startButton->setEnabled(false);
-  ui->missLevelOneCheckBox->setEnabled(false);
   ui->windowSizeEdit->setEnabled(false);
   ui->outputButton->setEnabled(false);
   ui->geneHTMLCheckBox->setEnabled(false);
   ui->msDeconvCheckBox->setEnabled(false);
   ui->activationComboBox->setEnabled(false);
   ui->disableFilteringCheckBox->setEnabled(false);
-  ui->ecscoreCutoffEdit->setEnabled(false); 
-  ui->disableAdditionalFeatureSearchCheckBox->setEnabled(false);
-  ui->singleScanNoiseLevelCheckBox->setEnabled(false); 
+  ui->singleScanNoiseLevelCheckBox->setEnabled(false);
+
+  ui->ms1EcscoreCutoffEdit->setEnabled(false);
+  ui->ms2EcscoreCutoffEdit->setEnabled(false);
+  ui->ms1MinScanNumEdit->setEnabled(false);
+  ui->ms2MinScanNumEdit->setEnabled(false);
+  ui->pseudoScoreCutoffEdit->setEnabled(false);
+  ui->pseudoMinPeakNumEdit->setEnabled(false);
+  ui->ms1IntePccCutoffEdit->setEnabled(false);
+  ui->ms2IntePccCutoffEdit->setEnabled(false);
 }
 
 void TopDIADialog::unlockDialog() {
@@ -324,11 +349,9 @@ void TopDIADialog::unlockDialog() {
   ui->ms1snRatioEdit->setEnabled(true);
   ui->ms2snRatioEdit->setEnabled(true);
   ui->threadNumberEdit->setEnabled(true);
-  ui->minScanNumEdit->setEnabled(true);
   ui->clearButton->setEnabled(true);
   ui->defaultButton->setEnabled(true);
   ui->startButton->setEnabled(true);
-  ui->missLevelOneCheckBox->setEnabled(true);
   ui->windowSizeEdit->setEnabled(true);
   ui->outputButton->setEnabled(true);
   ui->outputButton->setDefault(true);
@@ -336,9 +359,17 @@ void TopDIADialog::unlockDialog() {
   ui->msDeconvCheckBox->setEnabled(true);
   ui->activationComboBox->setEnabled(true);
   ui->disableFilteringCheckBox->setEnabled(true);
-  ui->ecscoreCutoffEdit->setEnabled(true); 
-  ui->disableAdditionalFeatureSearchCheckBox->setEnabled(true);
-  ui->singleScanNoiseLevelCheckBox->setEnabled(true); 
+  ui->singleScanNoiseLevelCheckBox->setEnabled(true);
+
+  ui->ms1EcscoreCutoffEdit->setEnabled(true);
+  ui->ms2EcscoreCutoffEdit->setEnabled(true);
+  ui->ms1MinScanNumEdit->setEnabled(true);
+  ui->ms2MinScanNumEdit->setEnabled(true);
+  ui->pseudoScoreCutoffEdit->setEnabled(true);
+  ui->pseudoMinPeakNumEdit->setEnabled(true);
+  ui->ms1IntePccCutoffEdit->setEnabled(true);
+  ui->ms2IntePccCutoffEdit->setEnabled(true);
+
 }
 
 bool TopDIADialog::checkError() {
@@ -390,20 +421,62 @@ bool TopDIADialog::checkError() {
     return true;
   }
 
-  if (ui->minScanNumEdit->text().isEmpty()) {
+  if (ui->ms1MinScanNumEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
-                         tr("Mininum scan number is empty!"),
+                         tr("MS1 mininum scan number is empty!"),
                          QMessageBox::Yes);
     return true;
   }
 
-
-  if (ui->ecscoreCutoffEdit->text().isEmpty()) {
+  if (ui->ms2MinScanNumEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
-                         tr("ECScore cutoff is empty!"),
+                         tr("MS2 mininum scan number is empty!"),
                          QMessageBox::Yes);
     return true;
   }
+
+  if (ui->pseudoMinPeakNumEdit->text().isEmpty()) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("Pseudo mininum peak number is empty!"),
+                         QMessageBox::Yes);
+    return true;
+  }
+
+  if (ui->ms1EcscoreCutoffEdit->text().isEmpty()) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("MS1 ECScore cutoff is empty!"),
+                         QMessageBox::Yes);
+    return true;
+  }
+
+  if (ui->ms2EcscoreCutoffEdit->text().isEmpty()) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("MS2 ECScore cutoff is empty!"),
+                         QMessageBox::Yes);
+    return true;
+  }
+
+  if (ui->pseudoScoreCutoffEdit->text().isEmpty()) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("Pseudo Score cutoff is empty!"),
+                         QMessageBox::Yes);
+    return true;
+  }
+
+  if (ui->ms1IntePccCutoffEdit->text().isEmpty()) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("MS1 seed envelope intensity cutoff is empty!"),
+                         QMessageBox::Yes);
+    return true;
+  }
+
+  if (ui->ms2IntePccCutoffEdit->text().isEmpty()) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("MS2 seed envelope intensity cutoff is empty!"),
+                         QMessageBox::Yes);
+    return true;
+  }
+
   if (ui->threadNumberEdit->text().toInt() > toppic::mem_check::getMaxThreads("topdia")) {
     int max_thread = toppic::mem_check::getMaxThreads("topdia");
     QMessageBox::StandardButton reply = QMessageBox::warning(this, tr("Warning"),

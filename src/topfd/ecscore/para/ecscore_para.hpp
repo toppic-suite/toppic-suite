@@ -26,7 +26,7 @@ class EcscorePara {
  public:
   EcscorePara(int frac_id, const std::string &file_name, TopfdParaPtr para_ptr);
 
-  EcscorePara(int frac_id, const std::string &file_name, TopdiaParaPtr para_ptr);
+  EcscorePara(int frac_id, const std::string &file_name, TopdiaParaPtr para_ptr, int ms_level);
 
   double getPeakMzTole() {return peak_mz_tole_;}
 
@@ -40,6 +40,7 @@ class EcscorePara {
   int para_max_charge_ = 30;
   double seed_env_inte_corr_tole_cutoff_ = 0.5;
 
+
   double bin_size_ = 0.1;
   double neighbor_mz_tole_ = 0.01;
   double peak_mz_tole_ = 0.008;
@@ -50,7 +51,7 @@ class EcscorePara {
   int min_match_peak_ = 2;
   // min number of scans for a feature
   int min_scan_num_ = 3;
-  
+
   // used for match two feature masses 10 ppm 
   double match_feature_ppm_tolerance_ = 0.000010;
   double match_feature_time_overlap_tole_ = 0.8;

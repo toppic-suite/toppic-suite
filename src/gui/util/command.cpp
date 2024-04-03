@@ -89,8 +89,14 @@ std::string geneTopdiaCommand(TopdiaParaPtr para_ptr,
     oss << "-r " << para_ptr->getMsOneSnRatio() << " ";
     oss << "-s " << para_ptr->getMsTwoSnRatio() << " ";
     oss << "-w " << para_ptr->getPrecWindowWidth() << " ";
-    oss << "-t " << para_ptr->getEcscoreCutoff() << " ";
-    oss << "-b " << para_ptr->getMinScanNum() << " ";
+    oss << "-t " << para_ptr->getMs1EcscoreCutoff() << " ";
+    oss << "-T " << para_ptr->getMs2EcscoreCutoff() << " ";
+    oss << "-b " << para_ptr->getMs1MinScanNum() << " ";
+    oss << "-B " << para_ptr->getMs2MinScanNum() << " ";
+    oss << "-v " << para_ptr->getPseudoScoreCutoff() << " ";
+    oss << "-V " << para_ptr->getPseudoMinPeaks() << " ";
+    oss << "-p " << para_ptr->getMs1SeedEnvInteCorrToleCutoff() << " ";
+    oss << "-P " << para_ptr->getMs2SeedEnvInteCorrToleCutoff() << " ";
     command = command + oss.str();
     if (para_ptr->isUseMsDeconv()) {
         command = command + "-n ";
@@ -104,9 +110,6 @@ std::string geneTopdiaCommand(TopdiaParaPtr para_ptr,
     }
     if (!para_ptr->isDoFinalFiltering()) {
         command = command + "-d ";
-    }
-    if (para_ptr->isSearchPrecWindow()) {
-        command = command + "-f ";
     }
     if (para_ptr->isUseSingleScanNoiseLevel()) {
         command = command + "-i ";

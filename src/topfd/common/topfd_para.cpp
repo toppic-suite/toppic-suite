@@ -39,10 +39,10 @@ namespace toppic {
     thread_num_ = topdia_para_ptr->getThreadNum();
     activation_ = topdia_para_ptr->getActivation();
     gene_html_folder_ = topdia_para_ptr->isGeneHtmlFolder();
-    ecscore_cutoff_ = topdia_para_ptr->getEcscoreCutoff();
-    search_prec_window_ = topdia_para_ptr->isSearchPrecWindow();
+    ecscore_cutoff_ = topdia_para_ptr->getMs1EcscoreCutoff();
+    search_prec_window_ = false;
     use_single_scan_noise_level_ = topdia_para_ptr->isUseSingleScanNoiseLevel();
-    min_scan_num_ = topdia_para_ptr->getMinScanNum();
+    min_scan_num_ = topdia_para_ptr->getMs1MinScanNum();
 
     //** Fixed parameter setting **
     // estimate min intensity using the method in Thrash.

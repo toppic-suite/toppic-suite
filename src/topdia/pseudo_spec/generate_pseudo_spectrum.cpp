@@ -121,7 +121,7 @@ namespace toppic {
                 score_pseudo_peaks(pseudo_peak_list, ms1_feature);
                 std::vector<PseudoPeaks> filtered_pseudo_peak_list = filterPseudoPeaks(env_para_ptr, ms1_feature,
                                                                                        ms2_features_[iso_win_idx],
-                                                                                       pseudo_peak_list, 0.55, 25);
+                                                                                       pseudo_peak_list, topdia_para_ptr->getPseudoScoreCutoff(), topdia_para_ptr->getPseudoMinPeaks());
                 ms1_feature->setPseudoPeakNum(static_cast<int>(filtered_pseudo_peak_list.size()));
                 PseudoSpectrumPtr pseudo_spec_ptr = std::make_shared<PseudoSpectrum>(ms1_feature, filtered_pseudo_peak_list);
                 pseudo_spectra.push_back(pseudo_spec_ptr);

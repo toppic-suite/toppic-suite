@@ -240,7 +240,7 @@ namespace toppic {
       }
       EcscoreParaPtr score_para_ptr = std::make_shared<EcscorePara>(topdia_para_ptr->getFracId(),
                                                                     topdia_para_ptr->getMzmlFileName(),
-                                                                    topdia_para_ptr);
+                                                                    topdia_para_ptr, 1);
 
       // read deconvoluted MS1 peaks
       std::string output_base_name = topdia_para_ptr->getOutputBaseName();
@@ -316,7 +316,7 @@ namespace toppic {
         }
         env_coll_ptr->refineMonoMass();
         ECScorePtr ecscore_ptr = std::make_shared<ECScore>(env_coll_ptr, matrix_ptr, feat_id, sn_ratio);
-        if (ecscore_ptr->getScore() < topdia_para_ptr->getEcscoreCutoff()) {
+        if (ecscore_ptr->getScore() < topdia_para_ptr->getMs1EcscoreCutoff()) {
           continue;
         }
         ecscore_list.push_back(ecscore_ptr);
@@ -345,13 +345,7 @@ namespace toppic {
     void process_ms2(const TopdiaParaPtr& topdia_para_ptr) {
       EcscoreParaPtr score_para_ptr = std::make_shared<EcscorePara>(topdia_para_ptr->getFracId(),
                                                                     topdia_para_ptr->getMzmlFileName(),
-                                                                    topdia_para_ptr);
-      // Explicit parameters for MS/MS features
-      topdia_para_ptr->setEcscoreCutoff(0);
-      score_para_ptr->seed_env_inte_corr_tole_cutoff_ = 0;
-      score_para_ptr->min_scan_num_ = 1;
-
-
+                                                                    topdia_para_ptr, 2);
       // read deconvoluted MS2 peaks
       std::string output_base_name = topdia_para_ptr->getOutputBaseName();
       std::string ms2_file_name = output_base_name + "_ms2.msalign";
@@ -442,7 +436,7 @@ namespace toppic {
           }
           env_coll_ptr->refineMonoMass();
           ECScorePtr ecscore_ptr = std::make_shared<ECScore>(env_coll_ptr, matrix_ptr, feat_id, topdia_para_ptr->getMsTwoSnRatio());
-          if (ecscore_ptr->getScore() < topdia_para_ptr->getEcscoreCutoff()) {
+          if (ecscore_ptr->getScore() < topdia_para_ptr->getMs2EcscoreCutoff()) {
             continue;
           }
           ecscore_list.push_back(ecscore_ptr);

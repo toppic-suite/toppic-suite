@@ -29,13 +29,20 @@ EcscorePara::EcscorePara(int frac_id, const std::string &file_name,
 }
 
 EcscorePara::EcscorePara(int frac_id, const std::string &file_name,
-                         TopdiaParaPtr para_ptr):
+                         TopdiaParaPtr para_ptr, int ms_level):
         frac_id_(frac_id),
         file_name_(file_name) {
 
     /// additional parameters
     para_max_charge_ = para_ptr->getMaxCharge();
-    min_scan_num_ = para_ptr->getMinScanNum();
+    if (ms_level == 1) {
+      min_scan_num_ = para_ptr->getMs1MinScanNum();
+      seed_env_inte_corr_tole_cutoff_ = para_ptr->getMs1SeedEnvInteCorrToleCutoff();
+    }
+    else {
+      min_scan_num_ = para_ptr->getMs2MinScanNum();
+      seed_env_inte_corr_tole_cutoff_ = para_ptr->getMs2SeedEnvInteCorrToleCutoff();
+    }
 }
 
 } /* namespace */

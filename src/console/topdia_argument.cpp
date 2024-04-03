@@ -44,8 +44,15 @@ namespace toppic {
         std::string prec_window = "";
         std::string thread_number = "";
         std::string activation = "";
-        std::string ecscore_cutoff = "";
-        std::string min_scan_num = "";
+
+        std::string ms1_ecscore_cutoff = "";
+        std::string ms2_ecscore_cutoff = "";
+        std::string ms1_min_scan_num = "";
+        std::string ms2_min_scan_num = "";
+        std::string pseudo_score_cutoff = "";
+        std::string pseudo_min_peaks = "";
+        std::string ms1_seed_env_inte_corr_tole_cutoff = "";
+        std::string ms2_seed_env_inte_corr_tole_cutoff = "";
 
         // Define and parse the program options
         try {
@@ -69,13 +76,30 @@ namespace toppic {
                     ("missing-level-one,o","MS1 spectra are missing in the input file.")
                     ("msdeconv,n", "Use the MS-Deconv score to rank isotopic envelopes.")
                     ("precursor-window,w", po::value<std::string> (&prec_window),
-                     "<a positive number>. Set the default precursor window size. The default value is 3.0 m/z. When the input file contains the information of precursor windows, the parameter will be ignored.")
-                    ("ecscore-cutoff,t", po::value<std::string> (&ecscore_cutoff),
-                     "<a positive number in [0,1]>. Set the ECScore cutoff value for proteoform features. The default value is 0.5.")
-                    ("min-scan-number,b",po::value<std::string> (&min_scan_num),
-                     "<1|2|3>. The minimum number of MS1 scans in which a proteoform feature is detected. The default value is 3.")
+                     "<a positive number>. Set the default precursor window size. The default value is 4.0 m/z. When the input file contains the information of precursor windows, the parameter will be ignored.")
+
+                     ("ms1-ecscore-cutoff,t", po::value<std::string> (&ms1_ecscore_cutoff),
+                     "<a positive number in [0,1]>. Set the MS1 ECScore cutoff value for proteoform features. The default value is 0.")
+                    ("ms2-ecscore-cutoff,T", po::value<std::string> (&ms2_ecscore_cutoff),
+                     "<a positive number in [0,1]>. Set the MS2 ECScore cutoff value for proteoform features. The default value is 0")
+
+                    ("ms1-min-scan-number,b",po::value<std::string> (&ms1_min_scan_num),
+                     "<1|2|3>. The minimum number of MS1 scans in which a proteoform feature is detected. The default value is 2.")
+                    ("ms2-min-scan-number,B",po::value<std::string> (&ms1_min_scan_num),
+                     "<1|2|3>. The minimum number of MS2 scans in which a proteoform feature is detected. The default value is 1.")
                     ("single-scan-noise,i","Use the peak intensity noise levels in single MS1 scans to filter out low intensity peaks in proteoform feature detection. The default method is to use the peak intensity noise level of the whole LC-MS map to filter out low intensity peaks.")
-                    ("additional-feature-search,f","Perform additional feature search for MS/MS scans that do not have detected proteoform features in their precursor isolation windows. In additional search, the signal noise ratio is set to 0, the min scan number is set to 1, and the ecscore cutoff is set to 0.")
+
+                    ("pseudo-cutoff,v", po::value<std::string> (&pseudo_score_cutoff),
+                     "<a positive number in [0,1]>. Set the Pseudo Score cutoff value for generating pseudo-MS/MS spectrum. The default value is 0.55")
+                    ("pseudo-peak-number,V",po::value<std::string> (&pseudo_min_peaks),
+                     "The minimum number of peaks in pseudo-MS/MS spectrum. The default value is 25.")
+
+                    ("ms1-intensity-correlation-cutoff,p", po::value<std::string> (&ms1_seed_env_inte_corr_tole_cutoff),
+                     "<a positive number in [0,1]>. Set the MS1 seed envelope intensity correlation cutoff value for generating extracting features. The default value is 0.5")
+                    ("ms2-intensity-correlation-cutoff,P", po::value<std::string> (&ms2_seed_env_inte_corr_tole_cutoff),
+                     "<a positive number in [0,1]>. Set the MS2 seed envelope intensity correlation cutoff value for generating extracting features. The default value is 0")
+
+//                    ("additional-feature-search,f","Perform additional feature search for MS/MS scans that do not have detected proteoform features in their precursor isolation windows. In additional search, the signal noise ratio is set to 0, the min scan number is set to 1, and the ecscore cutoff is set to 0.")
                     ("disable-final-filtering,d","Skip the final filtering of envelopes in MS/MS scans.")
                     ("thread-number,u", po::value<std::string> (&thread_number), "<a positive integer>. Number of threads used in spectral deconvolution. Default value: 1.")
                     ("skip-html-folder,g","Skip the generation of HTML files for visualization.")
@@ -91,11 +115,17 @@ namespace toppic {
                     ("ms-one-sn-ratio,r", po::value<std::string> (&ms_one_sn_ratio), "")
                     ("ms-two-sn-ratio,s", po::value<std::string> (&ms_two_sn_ratio), "")
                     ("precursor-window,w", po::value<std::string> (&prec_window), "")
-                    ("ecscore-cutoff,t", po::value<std::string> (&ecscore_cutoff), "")
+                    ("ms1-ecscore-cutoff,t", po::value<std::string> (&ms1_ecscore_cutoff), "")
+                    ("ms2-ecscore-cutoff,T", po::value<std::string> (&ms2_ecscore_cutoff), "")
+                    ("pseudo-cutoff,v", po::value<std::string> (&pseudo_score_cutoff), "")
                     ("missing-level-one,o", "")
                     ("single-scan-noise,i","")
-                    ("additional-feature-search,f","")
-                    ("min-scan-number,b",po::value<std::string> (&min_scan_num),"")
+//                    ("additional-feature-search,f","")
+                    ("ms1-min-scan-number,b",po::value<std::string> (&ms1_min_scan_num),"")
+                    ("ms2-min-scan-number,B",po::value<std::string> (&ms2_min_scan_num),"")
+                    ("pseudo-peak-number,V",po::value<std::string> (&pseudo_min_peaks),"")
+                    ("ms1-intensity-correlation-cutoff,p", po::value<std::string> (&ms1_seed_env_inte_corr_tole_cutoff), "")
+                    ("ms2-intensity-correlation-cutoff,P", po::value<std::string> (&ms2_seed_env_inte_corr_tole_cutoff), "")
                     ("thread-number,u", po::value<std::string> (&thread_number), "")
                     ("skip-html-folder,g","")
                     ("msdeconv,n", "")
@@ -184,30 +214,68 @@ namespace toppic {
                 topdia_para_ptr_->setPrecWindowWidth(std::stod(prec_window));
             }
 
-            if (vm.count("ecscore-cutoff")) {
-                topdia_para_ptr_->setEcscoreCutoff(std::stod(ecscore_cutoff));
+            if (vm.count("ms1-ecscore-cutoff")) {
+                topdia_para_ptr_->setMs1EcscoreCutoff(std::stod(ms1_ecscore_cutoff));
+            }
+            if (vm.count("ms2-ecscore-cutoff")) {
+              topdia_para_ptr_->setMs2EcscoreCutoff(std::stod(ms2_ecscore_cutoff));
+            }
+            if (vm.count("pseudo-score-cutoff")) {
+              topdia_para_ptr_->setPseudoScoreCutoff(std::stod(pseudo_score_cutoff));
             }
 
             if (vm.count("single-scan-noise")) {
-                topdia_para_ptr_->setUseSingleScanNoiseLevel(true);
+              topdia_para_ptr_->setUseSingleScanNoiseLevel(true);
             }
 
-            if (vm.count("additional-feature-search")) {
-                topdia_para_ptr_->setSearchPrecWindow(true);
-            }
-
-            if (vm.count("min-scan-number")) {
+            if (vm.count("ms1-min-scan-number")) {
                 try {
-                    int n = std::stoi(min_scan_num);
+                    int n = std::stoi(ms1_min_scan_num);
                     if (n < 1 || n > 3) {
-                        LOG_ERROR("Min scan number " << min_scan_num << " should be 1, 2, or 3.");
+                        LOG_ERROR("MS1 Min scan number " << ms1_min_scan_num << " should be 1, 2, or 3.");
                         return false;
                     }
-                    topdia_para_ptr_->setMinScanNum(n);
+                    topdia_para_ptr_->setMs1MinScanNum(n);
                 } catch (std::exception& e) {
-                    LOG_ERROR("Min scan number " << min_scan_num << " should be 1, 2, or 3.");
+                    LOG_ERROR("MS1 Min scan number " << ms1_min_scan_num << " should be 1, 2, or 3.");
                     return false;
                 }
+            }
+
+            if (vm.count("ms2-min-scan-number")) {
+              try {
+                int n = std::stoi(ms2_min_scan_num);
+                if (n < 1 || n > 3) {
+                  LOG_ERROR("MS2 Min scan number " << ms2_min_scan_num << " should be 1, 2, or 3.");
+                  return false;
+                }
+                topdia_para_ptr_->setMs2MinScanNum(n);
+              } catch (std::exception& e) {
+                LOG_ERROR("MS2 Min scan number " << ms2_min_scan_num << " should be 1, 2, or 3.");
+                return false;
+              }
+            }
+
+            if (vm.count("pseudo-peak-number")) {
+              try {
+                int n = std::stoi(pseudo_min_peaks);
+                if (n < 10) {
+                  LOG_ERROR("Pseudo peak number " << pseudo_min_peaks << " should be > 10.");
+                  return false;
+                }
+                topdia_para_ptr_->setPseudoMinPeaks(n);
+              } catch (std::exception& e) {
+                LOG_ERROR("Pseudo peak number " << pseudo_min_peaks << " should be > 10.");
+                return false;
+              }
+            }
+
+            if (vm.count("ms1-intensity-correlation-cutoff")) {
+              topdia_para_ptr_->setMs1SeedEnvInteCorrToleCutoff(std::stod(ms1_seed_env_inte_corr_tole_cutoff));
+            }
+
+            if (vm.count("ms2-intensity-correlation-cutoff")) {
+              topdia_para_ptr_->setMs2SeedEnvInteCorrToleCutoff(std::stod(ms2_seed_env_inte_corr_tole_cutoff));
             }
 
             if (vm.count("spectrum-file-name")) {
