@@ -18,6 +18,7 @@
 #include <string>
 #include <vector>
 #include <ctime>
+#include <limits>
 
 #include "common/base/base_data.hpp"
 #include "common/base/mod_util.hpp"
@@ -356,9 +357,12 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     }
 
     std::cout << "Merging PrSMs - started." << std::endl;
-    int prsm_top_num = (shift_num + 1) * 4;
+    int prsm_top_num = std::numeric_limits<int>::max();
+    bool norm = false;
+    bool remove_dup = false;
     PrsmStrMergePtr merge_ptr
-        = std::make_shared<PrsmStrMerge>(sp_file_name, input_exts, "toppic_combined", prsm_top_num);
+        = std::make_shared<PrsmStrMerge>(sp_file_name, input_exts, "toppic_combined", 
+                                         prsm_top_num, norm, remove_dup);
     merge_ptr->process();
     merge_ptr = nullptr;
     std::cout << "Merging PrSMs - finished." << std::endl;

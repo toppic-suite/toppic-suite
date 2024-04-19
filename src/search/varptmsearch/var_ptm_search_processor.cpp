@@ -359,6 +359,8 @@ void VarPtmSearchProcessor::process() {
   }
   std::cout << std::endl;
 
+  bool norm = false;
+  bool remove_dup = true;
   PrsmStrMergePtr merge_ptr
     = std::make_shared<PrsmStrMerge>(sp_file_name, 
                                      mng_ptr_->output_file_ext_ + "_" +
@@ -366,7 +368,7 @@ void VarPtmSearchProcessor::process() {
                                      mng_ptr_->thread_num_,
                                      mng_ptr_->output_file_ext_ + "_" +
                                      ProteoformType::COMPLETE->getName(),
-                                     mng_ptr_->n_report_);
+                                     mng_ptr_->n_report_, norm, remove_dup);
   merge_ptr->process();
   merge_ptr = nullptr;
 
@@ -377,7 +379,7 @@ void VarPtmSearchProcessor::process() {
                                      mng_ptr_->thread_num_,
                                      mng_ptr_->output_file_ext_ + "_" +
                                      ProteoformType::PREFIX->getName(),
-                                     mng_ptr_->n_report_);
+                                     mng_ptr_->n_report_, norm, remove_dup);
   merge_ptr->process();
   merge_ptr = nullptr; 
 
@@ -388,7 +390,7 @@ void VarPtmSearchProcessor::process() {
                                      mng_ptr_->thread_num_,
                                      mng_ptr_->output_file_ext_ + "_" +
                                      ProteoformType::SUFFIX->getName(),
-                                     mng_ptr_->n_report_);
+                                     mng_ptr_->n_report_, norm, remove_dup);
   merge_ptr->process();
   merge_ptr = nullptr; 
 
@@ -399,7 +401,7 @@ void VarPtmSearchProcessor::process() {
                                      mng_ptr_->thread_num_,
                                      mng_ptr_->output_file_ext_ + "_" +
                                      ProteoformType::INTERNAL->getName(),
-                                     mng_ptr_->n_report_);
+                                     mng_ptr_->n_report_, norm, remove_dup);
   merge_ptr->process();
   merge_ptr = nullptr; 
 

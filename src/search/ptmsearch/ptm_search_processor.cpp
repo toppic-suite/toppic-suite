@@ -181,6 +181,8 @@ void PtmSearchProcessor::process(){
 
   // Combine results
   int prsm_top_num = mng_ptr_->thread_num_ * mng_ptr_->n_report_;
+  bool norm = false;
+  bool remove_dup = true;
   for (int s = 2; s <= n_unknown_shift; s++) {
     std::string end_str = "_" + str_util::toString(s);
     // Complete prsms
@@ -194,7 +196,7 @@ void PtmSearchProcessor::process(){
     }
     PrsmStrMergePtr merge_ptr
         = std::make_shared<PrsmStrMerge>(sp_file_name, complete_input_exts, 
-                                         complete_output_ext, prsm_top_num);
+                                         complete_output_ext, prsm_top_num, norm, remove_dup);
     merge_ptr->process();
     merge_ptr = nullptr;
 
@@ -209,7 +211,7 @@ void PtmSearchProcessor::process(){
     }
     merge_ptr
         = std::make_shared<PrsmStrMerge>(sp_file_name, prefix_input_exts, 
-                                           prefix_output_ext, prsm_top_num);
+                                           prefix_output_ext, prsm_top_num, norm, remove_dup);
     merge_ptr->process();
     merge_ptr = nullptr;
 
@@ -224,7 +226,7 @@ void PtmSearchProcessor::process(){
     }
     merge_ptr
         = std::make_shared<PrsmStrMerge>(sp_file_name, suffix_input_exts, 
-                                         suffix_output_ext, prsm_top_num);
+                                         suffix_output_ext, prsm_top_num, norm, remove_dup);
     merge_ptr->process();
     merge_ptr = nullptr;
 
@@ -239,7 +241,7 @@ void PtmSearchProcessor::process(){
     }
     merge_ptr
         = std::make_shared<PrsmStrMerge>(sp_file_name, internal_input_exts, 
-                                         internal_output_ext, prsm_top_num);
+                                         internal_output_ext, prsm_top_num, norm, remove_dup);
     merge_ptr->process();
     merge_ptr = nullptr;
 
