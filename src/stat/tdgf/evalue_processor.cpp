@@ -12,7 +12,7 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <climits>
+#include <limits>
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
@@ -152,14 +152,17 @@ void EValueProcessor::process(bool is_separate) {
   writer.close();
 
   if (mng_ptr_->use_gf_) {
-    int prsm_top_num = INT_MAX; 
+    int prsm_top_num = std::numeric_limits<int>::max(); 
+    bool norm = false;
+    bool remove_dup = false;
     std::vector<std::string> input_exts;
     for (int t = 0; t < mng_ptr_->thread_num_; t++) {
       input_exts.push_back(mng_ptr_->output_file_ext_ + "_" + str_util::toString(t));
     }
     PrsmStrMergePtr merge_ptr
         = std::make_shared<PrsmStrMerge>(sp_file_name, input_exts, 
-                                         mng_ptr_->output_file_ext_, prsm_top_num);
+                                         mng_ptr_->output_file_ext_, 
+                                         prsm_top_num, norm, remove_dup);
     merge_ptr->process();
     merge_ptr = nullptr;
   }

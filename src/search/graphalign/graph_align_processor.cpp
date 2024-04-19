@@ -261,11 +261,13 @@ void GraphAlignProcessor::process() {
   }
 
   int top_num = (mng_ptr_->n_unknown_shift_ + 1) * 4;
+  bool norm = true;
+  bool remove_dup = true;
   PrsmStrMergePtr merge_ptr
       = std::make_shared<PrsmStrMerge>(sp_file_name, input_exts,
-                                       mng_ptr_->output_file_ext_, top_num);
-  bool normalization = true;
-  merge_ptr->process(normalization);
+                                       mng_ptr_->output_file_ext_, 
+                                       top_num, norm, remove_dup);
+  merge_ptr->process();
   merge_ptr = nullptr;
 
   // remove temporary files
