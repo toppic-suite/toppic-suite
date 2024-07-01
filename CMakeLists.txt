@@ -9,12 +9,12 @@ SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../bin)
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   # Linux specific code
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unknown-pragmas -std=c++14 -Wl,-rpath=$ORIGIN/../lib/toppic,--disable-new-dtags -O3 -DWITHOUT_MZ5 -fPIC")
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unknown-pragmas -std=c++17 -Wl,-rpath=$ORIGIN/../lib/toppic,--disable-new-dtags -O3 -DWITHOUT_MZ5 -fPIC")
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   # Windows specific code
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unknown-pragmas -std=c++14 -O3 -DWITHOUT_MZ5 -fPIC -fpermissive")
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unknown-pragmas -std=c++17 -O3 -DWITHOUT_MZ5 -fPIC -fpermissive")
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
 # The options c++14 and mavx are set for the frugally-deep library
