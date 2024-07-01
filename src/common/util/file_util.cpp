@@ -183,7 +183,7 @@ bool copyDir(const std::string &src_name,
     LOG_WARN(e.what());
     return false;
   }
-
+  bool overwrite = true;
   for (fs::directory_iterator file(source); file != fs::directory_iterator(); ++file) {
     try {
       fs::path current(file->path());
@@ -192,7 +192,7 @@ bool copyDir(const std::string &src_name,
           return false;
         }
       } else {
-        fs::copy_file(current, destination / current.filename());
+        copyFile(current.string(), (destination / current.filename()).string(), overwrite);
       }
     }
     catch(fs::filesystem_error const & e) {
