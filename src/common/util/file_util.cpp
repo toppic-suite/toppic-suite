@@ -59,13 +59,13 @@ std::string getExecutiveDir(const std::string &argv_0) {
 }
 
 std::string getResourceDir(const std::string &exec_dir) {
-  std::string resource_dir = exec_dir + getFileSeparator() + getToppicResourceDirName();
+  std::string resource_dir = exec_dir + getToppicResourceDirName();
   if (exists(resource_dir)) {
     return resource_dir;
   }
 #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
 #else
-  std::string etc_dir = exec_dir + getFileSeparator() + getEtcDirName();
+  std::string etc_dir = exec_dir + getEtcDirName();
   if (exists(etc_dir)) {
     return etc_dir;
   }
