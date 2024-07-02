@@ -262,8 +262,8 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows") 
 
-# xerces-c boost_system, boost_thread boost_iostreams boost_chrono pthread z are required by
-# ProteoWizard
+# xerces-c boost_file_system, boost_system, boost_thread boost_iostreams 
+# boost_chrono pthread z are required by ProteoWizard
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   target_link_libraries(topfd xerces-c boost_program_options
     boost_filesystem boost_system boost_thread boost_iostreams boost_chrono
