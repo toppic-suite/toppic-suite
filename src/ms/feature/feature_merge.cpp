@@ -67,7 +67,7 @@ void mergeFiles(const std::vector<std::string> &frac_xml_feature_file_lst,
   //sample features;
   SampleFeaturePtrVec sample_features;
   for (size_t i = 0; i < clusters.size(); i++) {
-    SampleFeaturePtr sample_feature = std::make_shared<SampleFeature>(clusters[i], clusters[i][0]->getFracId());
+    SampleFeaturePtr sample_feature = std::make_shared<SampleFeature>(clusters[i], i);
     sample_features.push_back(sample_feature);
   }
   sample_feature_writer::writeFeatures(sample_feature_output_file_name, sample_features);
