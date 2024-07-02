@@ -4,8 +4,8 @@ For manual and reference, please visit https://www.toppic.org/software/toppic/
 
 ## System requirements
 
-* GCC version higher than 5.5.0 for C++14 support
-* CMake (>= 3.1)
+* GCC version higher than 11.4.0 for C++17 support
+* CMake (>= 3.26)
 
 ### Linux (Ubuntu 22.04):
 
