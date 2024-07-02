@@ -104,15 +104,16 @@ void cleanToppicDir(const std::string &fa_name,
   std::string sp_base = file_util::basename(abs_sp_name);
   std::replace(sp_base.begin(), sp_base.end(), '\\', '/');
   file_util::delFile(sp_base + "_toppic_proteoform.xml");
-  file_util::rename(sp_base + ".toppic_form_cutoff_form",
-                    sp_base + "_toppic_proteoform.xml");
+  bool overwrite = true;
+  file_util::copyFile(sp_base + ".toppic_form_cutoff_form",
+                      sp_base + "_toppic_proteoform.xml", overwrite);
   file_util::delFile(sp_base + "_toppic_prsm.xml");
   std::string toppic_prsm_suffix = "toppic_prsm_cutoff";
   if (file_util::exists(sp_base + ".toppic_prsm_cutoff_local")) {
     toppic_prsm_suffix = "toppic_prsm_cutoff_local";
   }
-  file_util::rename(sp_base + "." + toppic_prsm_suffix,
-                    sp_base + "_toppic_prsm.xml");
+  file_util::copyFile(sp_base + "." + toppic_prsm_suffix,
+                      sp_base + "_toppic_prsm.xml", overwrite);
   if (!keep_temp_files) {
     file_util::cleanPrefix(sp_name, sp_base + ".msalign_");
     file_util::delFile(abs_sp_name + "_index");
