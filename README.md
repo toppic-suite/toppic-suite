@@ -21,15 +21,7 @@ sudo apt install libboost-system-dev
 sudo apt install libboost-thread-dev 
 sudo apt install libboost-iostreams-dev 
 sudo apt install libboost-chrono-dev 
-
 sudo apt install libxerces-c-dev  
-sudo apt install libeigen3-dev 
-sudo apt install nlohmann-json3-dev
-
-sudo apt install libtorch
-
-# install the catch unit test framework (https://github.com/philsquared/Catch)
-sudo apt install catch
 
 # Qt5 for GUI
 sudo apt install qtbase5-dev
@@ -57,8 +49,6 @@ sudo dnf install gcc gcc-c++ make cmake
 sudo dnf install zlib-devel
 sudo dnf install boost-devel 
 sudo dnf install xerces-c-devel
-sudo dnf install eigen3-devel
-sudo dnf install json-devel
 
 # Qt5 for GUI
 sudo dnf install qt5-qtbase-devel
