@@ -39,12 +39,12 @@ class SpecFeature {
 
   SpecFeature(double prec_mono_mz, double prec_charge); 
 
-  int getSpecId() {return spec_id_;}
+  std::string getFileName() {return file_name_;}
 
   int getFracId() {return frac_id_;}
 
-  std::string getFileName() {return file_name_;}
-  
+  int getSpecId() {return spec_id_;}
+
   std::string getScans() {return scans_;}
 
   int getMsOneId() {return ms_one_id_;}
@@ -97,8 +97,8 @@ class SpecFeature {
   }
 
  protected:
-  int frac_id_;
   std::string file_name_;
+  int frac_id_;
   int spec_id_;
   std::string scans_;
   int ms_one_id_;

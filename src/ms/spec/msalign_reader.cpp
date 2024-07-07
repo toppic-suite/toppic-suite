@@ -81,7 +81,6 @@ void MsAlignReader::readNext() {
     return;
   }
   std::string ms_file_name = "";
-  int fraction_id = -1;
   int spec_id = -1;
 
   std::string title;
@@ -107,8 +106,6 @@ void MsAlignReader::readNext() {
       strs = str_util::split(spectrum_str_vec_[i], "=");
       if (strs[0] == "FILE_NAME") {
         ms_file_name = strs[1];
-      } else if (strs[0] == "FRACTION_ID") {
-        fraction_id = std::stoi(strs[1]);
       } else if (strs[0] == "SPECTRUM_ID") {
         spec_id = std::stoi(strs[1]);
       } else if (strs[0] == "TITLE") {
@@ -142,7 +139,6 @@ void MsAlignReader::readNext() {
   }
   MsHeaderPtr header_ptr = std::make_shared<MsHeader>();
   header_ptr->setFileName(ms_file_name);
-  header_ptr->setFractionId(fraction_id);
   //set spec_id
   if (spec_id < 0) {
     LOG_ERROR("Spectrum id is missing!");

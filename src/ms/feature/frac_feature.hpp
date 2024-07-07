@@ -30,8 +30,8 @@ class FracFeature {
  public:
   FracFeature() {};
 
-  FracFeature(int id, int fraction_id, 
-              const std::string &file_name,
+  FracFeature(const std::string &file_name,
+              int frac_id, int feat_id,  
               double mono_mass, double inte,
               int min_ms1_id, int max_ms1_id,
               double retent_begin, double retent_end,
@@ -48,11 +48,11 @@ class FracFeature {
 
   XmlDOMElement* toXmlElement(XmlDOMDocument* xml_doc);
 
-  int getId() {return id_;}
+  std::string getFileName() {return file_name_;}
 
   int getFracId() {return frac_id_;}
 
-  std::string getFileName() {return file_name_;}
+  int getFeatId() {return feat_id_;}
 
   double getMonoMass() {return mono_mass_;}
 
@@ -98,7 +98,7 @@ class FracFeature {
 
   SingleChargeFeaturePtrVec getSingleFeatures() {return single_features_;}
 
-  void setId(int id) {id_ = id;}
+  void setFeatId(int feat_id) {feat_id_ = feat_id;}
 
   void setEcScore(double score) {ec_score_ = score;}
 
@@ -129,9 +129,12 @@ class FracFeature {
 
 
  protected:
-  int id_;
-  int frac_id_;
+  //mzML file name
   std::string file_name_;
+  //the order of the mzML file in the command line input
+  int frac_id_;
+  //feature id
+  int feat_id_;
   double mono_mass_;
   double intensity_;
 

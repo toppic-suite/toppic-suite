@@ -265,7 +265,7 @@ FracFeaturePtr getFracFeature(int feat_id, DeconvMsPtrVec &ms1_ptr_vec, int frac
   int env_num = coll_ptr->countEnvNum();
   double ec_score = coll_ptr->getEcscore();
 
-  FracFeaturePtr feature_ptr = std::make_shared<FracFeature>(feat_id, frac_id, file_name, feat_mass, feat_inte,
+  FracFeaturePtr feature_ptr = std::make_shared<FracFeature>(file_name, frac_id, feat_id, feat_mass, feat_inte,
                                                              ms1_id_begin, ms1_id_end, ms1_time_begin, ms1_time_end,
                                                              ms1_scan_begin, ms1_scan_end, min_charge, max_charge,
                                                              apex_time, apex_scan, apex_inte, rep_charge, rep_avg_mz, 

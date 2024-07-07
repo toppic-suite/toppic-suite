@@ -40,7 +40,7 @@ class SampleFeature {
 
   int getSampleId() {return sample_id_;}
 
-  int getId() {return id_;}
+  int getFeatId() {return feat_id_;}
 
   double getMonoMass() {return mono_mass_;}
 
@@ -62,19 +62,21 @@ class SampleFeature {
 
   double getTimeMiddle() {return (time_begin_ + time_end_)/2;}
 
-  double getApexTime() {return apex_time_;}
+  int getRepFracId() {return rep_frac_id_;}
 
-  double getApexScan() {return apex_scan_;}
+  double getRepApexTime() {return rep_apex_time_;}
 
-  double getApexInte() {return apex_inte_;}
+  double getRepApexScan() {return rep_apex_scan_;}
 
   double getRepCharge() {return rep_charge_;}
 
   double getRepAvgMz() {return rep_avg_mz_;}
 
+  double getRepApexInte() {return rep_apex_inte_;}
+
   int getEnvNum() {return env_num_;}
 
-  double getEcScore() {return ec_score_;}
+  double getRepEcScore() {return rep_ec_score_;}
 
   int getMinFracId() {return min_frac_id_;}
 
@@ -96,25 +98,26 @@ class SampleFeature {
 
  protected:
   int sample_id_ = 0;
-  int id_;
+  int feat_id_;
   double mono_mass_;
   double intensity_;
   double time_begin_;
   double time_end_;
-  double apex_time_;
-  double apex_inte_;
   int min_charge_;
   int max_charge_;
   int min_frac_id_;
   int max_frac_id_;
-
-  int rep_charge_;
-  double rep_avg_mz_;
   int min_scan_;
   int max_scan_;
-  int apex_scan_;
+
+  int rep_frac_id_;
+  double rep_apex_time_;
+  int rep_apex_scan_;
+  int rep_charge_;
+  double rep_avg_mz_;
+  double rep_apex_inte_;
   int env_num_;
-  double ec_score_;
+  double rep_ec_score_;
   //FracFeaturePtrVec frac_features_;
 };
 

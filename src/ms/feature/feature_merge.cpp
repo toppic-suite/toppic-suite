@@ -49,8 +49,8 @@ void mergeFiles(const std::vector<std::string> &frac_xml_feature_file_lst,
     FracFeaturePtrVec features = ft_reader.readAllFeatures();
     ft_reader.close();
     for (size_t j = 0; j < features.size(); j++) {
-      int feature_id = features[j]->getId() + i * max_feature_num_per_file;
-      features[j]->setId(feature_id);
+      int feature_id = features[j]->getFeatId() + i * max_feature_num_per_file;
+      features[j]->setFeatId(feature_id);
       //frac_feature_writer::writeOneFeature(outfile, features[j]);
     }
     all_frac_features.insert(all_frac_features.end(), features.begin(), features.end());
@@ -85,7 +85,7 @@ void mergeFiles(const std::vector<std::string> &frac_xml_feature_file_lst,
   //spec features
   std::map<int,FracFeaturePtr> feature_map;
   for (size_t i = 0; i < all_frac_features.size(); i++) {
-    feature_map[all_frac_features[i]->getId()] =  all_frac_features[i];
+    feature_map[all_frac_features[i]->getFeatId()] =  all_frac_features[i];
   }
   SpecFeaturePtrVec all_spec_features;
   for (size_t i = 0; i < spec_feature_file_lst.size(); i++) {
