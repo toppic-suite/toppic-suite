@@ -30,8 +30,6 @@ class MsHeader {
   MsHeader(XmlDOMElement* element);
 
   // get functions for all spectra
-  int getFractionId() {return fraction_id_;}
-
   std::string getFileName() {return file_name_;}
 
   int getSpecId() {return spec_id_;}
@@ -89,8 +87,6 @@ class MsHeader {
   std::pair<int,int> getFirstPrecMonoMassMinusWaterError(double ppo, double scale);
 
   // set functions for all spectra 
-  void setFractionId(int fraction_id) {fraction_id_ = fraction_id;}
-
   void setFileName(const std::string &file_name) {file_name_ = file_name;}
 
   void setSpecId(int spec_id) {spec_id_ = spec_id;}
@@ -144,8 +140,6 @@ class MsHeader {
  private:
   // mass spec data file name 
   std::string file_name_;
-  // a data set may have multiple fractions
-  int fraction_id_ = -1;
   // spec id
   int spec_id_ = -1;
   // mass spec title

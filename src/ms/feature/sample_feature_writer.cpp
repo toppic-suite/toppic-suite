@@ -37,44 +37,51 @@ void writeHeader(std::ofstream &of) {
       << "Max_scan" << "\t"
       << "Min_charge" << "\t"
       << "Max_charge" << "\t"
-      << "Apex_time" << "\t"
-      << "Apex_scan" << "\t"
-      << "Apex_intensity" << "\t"
+      << "Min_fraction_ID" << "\t"
+      << "Max_fraction_ID" << "\t"
+      << "Rep_fraction_ID" << "\t"
+      << "Rep_Apex_time" << "\t"
+      << "Rep_Apex_scan" << "\t"
+      << "Rep_Apex_intensity" << "\t"
       << "Rep_charge" << "\t"
       << "Rep_average_mz" << "\t"
       << "Envelope_number" << "\t"
-      << "EC_score" << "\t"
-      << "Min_fraction_ID" << "\t"
-      << "Max_fraction_ID" << "\t"
+      << "Rep_EC_score" << "\t"
       << "Elution_length" 
       << std::endl;
 }
 
 void writeOneFeature(std::ofstream &of, SampleFeaturePtr feature) {
   of << feature->getSampleId() << "\t"
-      << feature->getId() << "\t"
+      << feature->getFeatId() << "\t"
       << std::fixed << std::setprecision(6) 
       << feature->getMonoMass() << "\t"
       << feature->getIntensity() << "\t"
       << std::setprecision(2) 
       << feature->getTimeBegin()/60 << "\t"
       << feature->getTimeEnd()/60 << "\t"
+      << std::setprecision(0) 
       << feature->getMinScan() << "\t"
       << feature->getMaxScan() << "\t"
       << feature->getMinCharge() << "\t"
       << feature->getMaxCharge() << "\t"
-      << feature->getApexTime()/60 << "\t"
-      << feature->getApexScan() << "\t"
-      << std::setprecision(6)
-      << feature->getApexInte() << "\t"
-      << feature->getRepCharge() << "\t"
-      << feature->getRepAvgMz() << "\t"
-      << feature->getEnvNum() << "\t"
-      << feature->getEcScore() << "\t"
       << feature->getMinFracId() << "\t"
       << feature->getMaxFracId() << "\t" 
+      << feature->getRepFracId() << "\t"
       << std::setprecision(2) 
-      << feature->getElutionLen() 
+      << feature->getRepApexTime()/60 << "\t"
+      << std::setprecision(0) 
+      << feature->getRepApexScan() << "\t"
+      << std::setprecision(6)
+      << feature->getRepApexInte() << "\t"
+      << std::setprecision(0) 
+      << feature->getRepCharge() << "\t"
+      << std::setprecision(6)
+      << feature->getRepAvgMz() << "\t";
+  of << feature->getEnvNum() << "\t"
+      << feature->getRepEcScore() << "\t"
+      << std::setprecision(4) 
+      << feature->getElutionLen()/60
       << std::setprecision(6) 
       << std::endl;
 }

@@ -22,7 +22,7 @@ SampleFeature::SampleFeature(const std::string &line) {
   std::vector<std::string> strs;
   strs = str_util::split(line, "\t");
   sample_id_ = std::stoi(strs[0]);
-  id_ = std::stoi(strs[1]);
+  feat_id_ = std::stoi(strs[1]);
   mono_mass_ = std::stod(strs[2]);
   intensity_ = std::stod(strs[3]);
   time_begin_ = std::stod(strs[4]) * 60;
@@ -31,19 +31,20 @@ SampleFeature::SampleFeature(const std::string &line) {
   max_scan_ = std::stoi(strs[7]);
   min_charge_ = std::stoi(strs[8]);
   max_charge_ = std::stoi(strs[9]);
-  apex_time_ = std::stod(strs[10]) * 60;
-  apex_scan_ = std::stoi(strs[11]);
-  apex_inte_ = std::stod(strs[12]);
-  rep_charge_ = std::stoi(strs[13]);
-  rep_avg_mz_ = std::stoi(strs[14]);
-  env_num_ = std::stoi(strs[15]);
-  ec_score_ = std::stod(strs[16]);
-  min_frac_id_ = std::stoi(strs[17]);
-  max_frac_id_ = std::stoi(strs[18]);
+  min_frac_id_ = std::stoi(strs[10]);
+  max_frac_id_ = std::stoi(strs[11]);
+  rep_frac_id_ = std::stoi(strs[12]);
+  rep_apex_time_ = std::stod(strs[13]) * 60;
+  rep_apex_scan_ = std::stoi(strs[14]);
+  rep_apex_inte_ = std::stod(strs[15]);
+  rep_charge_ = std::stoi(strs[16]);
+  rep_avg_mz_ = std::stoi(strs[17]);
+  env_num_ = std::stoi(strs[18]);
+  rep_ec_score_ = std::stod(strs[19]);
 }
 
-SampleFeature::SampleFeature(FracFeaturePtr frac_feature, int id) {
-  id_ = id;
+SampleFeature::SampleFeature(FracFeaturePtr frac_feature, int feat_id) {
+  feat_id_ = feat_id;
   init(frac_feature);
 }
 
@@ -58,21 +59,23 @@ void SampleFeature::init(FracFeaturePtr frac_feature) {
   max_charge_ = frac_feature->getMaxCharge();
   min_frac_id_ = frac_feature->getFracId();
   max_frac_id_ = frac_feature->getFracId();
-  apex_time_ = frac_feature->getApexTime();
-  apex_scan_ = frac_feature->getApexScan();
-  apex_inte_ = frac_feature->getApexInte();
+  rep_frac_id_ = frac_feature->getFracId();
+  rep_apex_time_ = frac_feature->getApexTime();
+  rep_apex_scan_ = frac_feature->getApexScan();
+  rep_apex_inte_ = frac_feature->getApexInte();
   rep_charge_ = frac_feature->getRepCharge(); 
   rep_avg_mz_ = frac_feature->getRepAvgMz();
   env_num_ = frac_feature->getEnvNum(); 
-  ec_score_ = frac_feature->getEcScore(); 
+  rep_ec_score_ = frac_feature->getEcScore(); 
 }
 
-SampleFeature::SampleFeature(FracFeaturePtrVec &frac_features, int id) {
+SampleFeature::SampleFeature(FracFeaturePtrVec &frac_features, 
+                             int feat_id) {
   if (frac_features.size() == 0) {
     LOG_ERROR("Fraction feature size is 0!");
     exit(EXIT_FAILURE);  
   }
-  id_ = id;
+  feat_id_ = feat_id;
   init(frac_features[0]);
 
   for (size_t i = 1; i < frac_features.size(); i++) {
@@ -103,8 +106,8 @@ SampleFeature::SampleFeature(FracFeaturePtrVec &frac_features, int id) {
       max_frac_id_ = cur_ft->getFracId();
     }
     env_num_ = env_num_ + cur_ft->getEnvNum();
-    if (cur_ft->getEcScore() > ec_score_) {
-      ec_score_ = cur_ft->getEcScore();
+    if (cur_ft->getEcScore() > rep_ec_score_) {
+      rep_ec_score_ = cur_ft->getEcScore();
     }
   }
 }

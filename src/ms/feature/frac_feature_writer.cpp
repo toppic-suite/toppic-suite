@@ -31,9 +31,9 @@ namespace frac_feature_writer {
 
 void writeHeader(std::ofstream &of) {
   of.precision(16);
-  of << "ID" << "\t"
+  of << "File_name" << "\t"
       << "Fraction_ID" << "\t"
-      << "File_name" << "\t"
+      << "Feature_ID" << "\t"
       << "Mass" << "\t"
       << "Intensity" << "\t"
       << "Min_time" << "\t"
@@ -55,18 +55,18 @@ void writeHeader(std::ofstream &of) {
 }
 
 void writeOneFeature(std::ofstream &of, FracFeaturePtr feature) {
-  of << feature->getId() << "\t"
+  of << feature->getFileName() << "\t"
       << feature->getFracId() << "\t"
-      << feature->getFileName() << "\t"
+      << feature->getFeatId() << "\t"
       << feature->getMonoMass() << "\t"
       << feature->getIntensity() << "\t"
-      << feature->getTimeBegin() << "\t"
-      << feature->getTimeEnd() << "\t"
+      << feature->getTimeBegin()/60 << "\t"
+      << feature->getTimeEnd()/60 << "\t"
       << feature->getScanBegin() << "\t"
       << feature->getScanEnd() << "\t"
       << feature->getMinCharge() << "\t"
       << feature->getMaxCharge() << "\t"
-      << feature->getApexTime() << "\t"
+      << feature->getApexTime()/60 << "\t"
       << feature->getApexScan() << "\t"
       << feature->getApexInte() << "\t"
       << feature->getRepCharge() << "\t"
@@ -94,7 +94,7 @@ void writeBatMassFeatures(const std::string &output_file_name,
                           const FracFeaturePtrVec &features) {
   std::ofstream of(output_file_name);
   std::string delimit = ",";
-  of << "ID" << delimit
+  of << "Feature_ID" << delimit
       << "Fraction_ID" << delimit
       << "Envelope_num" << delimit
       << "Mass" << delimit
@@ -129,7 +129,7 @@ void writeBatMassFeatures(const std::string &output_file_name,
         min_mz = 0.0;
       }
       double max_mz = filtered_env->getMaxMz() + margin;
-      of << feature->getId() << delimit
+      of << feature->getFeatId() << delimit
           << feature->getFracId() << delimit
           << single_feature->getEnvNum() << delimit
           << feature->getMonoMass() << delimit

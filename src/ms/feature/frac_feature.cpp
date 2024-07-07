@@ -19,8 +19,8 @@
 
 namespace toppic {
 
-FracFeature::FracFeature(int id, int frac_id, 
-                         const std::string &file_name,
+FracFeature::FracFeature(const std::string &file_name,
+                         int frac_id, int feat_id,
                          double mono_mass, double inte,
                          int min_ms1_id, int max_ms1_id,
                          double time_begin, double time_end,
@@ -30,9 +30,9 @@ FracFeature::FracFeature(int id, int frac_id,
                          double apex_inte, int rep_charge, 
                          double rep_avg_mz, int env_num,
                          double ec_score): 
-    id_(id),
-    frac_id_(frac_id),
     file_name_(file_name),
+    frac_id_(frac_id),
+    feat_id_(feat_id),
     mono_mass_(mono_mass),
     intensity_(inte),
     min_ms1_id_(min_ms1_id),
@@ -50,23 +50,27 @@ FracFeature::FracFeature(int id, int frac_id,
     rep_avg_mz_(rep_avg_mz), 
     env_num_(env_num),
     ec_score_(ec_score) {
+      // the default sample feature id and intensity 
+      // are the fraction feature id and intensity
+      sample_feature_id_ = feat_id_;
+      sample_feature_inte_ = intensity_;
     }
 
 FracFeature::FracFeature(std::string line) {
   std::vector<std::string> strs;
   strs = str_util::split(line, "\t");
-  id_ = std::stoi(strs[0]);
+  file_name_ = strs[0];
   frac_id_ = std::stoi(strs[1]);
-  file_name_ = strs[2];
+  feat_id_ = std::stoi(strs[2]);
   mono_mass_ = std::stod(strs[3]);
   intensity_ = std::stod(strs[4]);
-  time_begin_ = std::stod(strs[5]);
-  time_end_ = std::stod(strs[6]);
+  time_begin_ = std::stod(strs[5]) * 60;
+  time_end_ = std::stod(strs[6]) * 60;
   scan_begin_ = std::stoi(strs[7]);
   scan_end_ = std::stoi(strs[8]);
   min_charge_ = std::stoi(strs[9]);
   max_charge_ = std::stoi(strs[10]);
-  apex_time_ = std::stod(strs[11]);
+  apex_time_ = std::stod(strs[11]) * 60;
   apex_scan_ = std::stoi(strs[12]);
   apex_inte_ = std::stod(strs[13]);
   rep_charge_ = std::stoi(strs[14]);
@@ -94,9 +98,9 @@ bool FracFeature::cmpFracIncInteDec(const FracFeaturePtr &a,
 }
 
 FracFeature::FracFeature(XmlDOMElement* element) {
-  id_ = xml_dom_util::getIntChildValue(element, "id", 0);
-  frac_id_ = xml_dom_util::getIntChildValue(element, "frac_id", 0);
   file_name_ = xml_dom_util::getChildValue(element, "file_name", 0);
+  frac_id_ = xml_dom_util::getIntChildValue(element, "frac_id", 0);
+  feat_id_ = xml_dom_util::getIntChildValue(element, "feat_id", 0);
   mono_mass_ = xml_dom_util::getDoubleChildValue(element, "mono_mass", 0);
   intensity_ = xml_dom_util::getDoubleChildValue(element, "intensity", 0);
   time_begin_ = xml_dom_util::getDoubleChildValue(element, "time_begin", 0);
@@ -133,11 +137,11 @@ FracFeature::FracFeature(XmlDOMElement* element) {
 XmlDOMElement* FracFeature::toXmlElement(XmlDOMDocument* xml_doc) {
   std::string element_name = FracFeature::getXmlElementName();
   XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
-  std::string str = str_util::toString(id_);
-  xml_doc->addElement(element, "id", str.c_str());
-  str = str_util::toString(frac_id_);
-  xml_doc->addElement(element, "frac_id", str.c_str());
   xml_doc->addElement(element, "file_name", file_name_.c_str());
+  std::string str = str_util::toString(frac_id_);
+  xml_doc->addElement(element, "frac_id", str.c_str());
+  str = str_util::toString(feat_id_);
+  xml_doc->addElement(element, "feat_id", str.c_str());
   str = str_util::toString(mono_mass_);
   xml_doc->addElement(element, "mono_mass", str.c_str());
   str = str_util::toString(intensity_);
