@@ -163,6 +163,13 @@ void PrsmStr::setProtId(int id) {
   prot_id_ = id;
 }
 
+void PrsmStr::setSampleFeatureId(int id) {
+  int i = getXmlLineIndex(str_vec_, "<sample_feature_id>");
+  str_vec_[i] = "<sample_feature_id>" + str_util::toString(id) + "</sample_feature_id>";
+  sample_feature_id_  = id;
+}
+
+
 bool PrsmStr::isSameSeqAndMass(const PrsmStrPtr &a, const PrsmStrPtr &b, double ppo) {
   if (a->getSeqName() != b->getSeqName()) {
     return false;

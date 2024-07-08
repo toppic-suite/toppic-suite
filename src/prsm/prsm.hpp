@@ -132,6 +132,8 @@ class Prsm {
 
   void setIsExactMatch(bool is_exact_match) {is_exact_match_ = is_exact_match;}
 
+  void setSampleFeatureId(int id) {sample_feature_id_ = id;}
+
   // comparion
   static bool cmpMatchFragDecMatchPeakDecProtInc(const PrsmPtr &a, const PrsmPtr &b);
 

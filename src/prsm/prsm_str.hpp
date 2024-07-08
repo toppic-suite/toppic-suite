@@ -105,7 +105,9 @@ class PrsmStr {
 
   void setProteoformFdr(double proteoform_fdr);
 
-  void setSampleId(int sample_id) {sample_id_ = sample_id;}
+  void setSampleFeatureId(int feat_id); 
+
+  void setSampleId(int sample_id)  {sample_id_ = sample_id;}
 
   void setTimeApex(double time_apex) {time_apex_ = time_apex;}
 

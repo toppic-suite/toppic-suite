@@ -135,10 +135,10 @@ void cleanToppicDir(const std::string &fa_name,
     file_util::cleanPrefix(sp_name, sp_base + ".toppic_evalue_");
     file_util::delFile(sp_base + ".toppic_cluster");
     file_util::delFile(sp_base + ".toppic_cluster_fdr");
-    file_util::delFile(sp_base + ".toppic_prsm");
     file_util::delFile(sp_base + ".toppic_prsm_cutoff");
     file_util::delFile(sp_base + ".toppic_prsm_cutoff_local");
     file_util::delFile(sp_base + ".toppic_form_cutoff");
+    file_util::delFile(sp_base + ".toppic_form_cutoff_form");
     file_util::delDir(sp_base + "_toppic_proteoform_cutoff_xml");
     file_util::delDir(sp_base + "_toppic_prsm_cutoff_xml");
   }
@@ -592,17 +592,18 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
   bool keep_temp_files = (arguments["keepTempFiles"] == "true"); 
   std::string ori_db_file_name = arguments["oriDatabaseFileName"];
 
+  /*
   for (size_t k = 0; k < spec_file_lst.size(); k++) {
     std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));
     std::string start_time = buf;
     arguments["startTime"] = start_time;
     arguments["spectrumFileName"] = spec_file_lst[k];
-
     if (toppic::TopPICProgress(arguments) != 0) {
       return 1;
     }
     cleanToppicDir(ori_db_file_name, spec_file_lst[k], keep_temp_files);
   }
+  */
 
   if (arguments["combinedOutputName"] != "") {
     std::string merged_file_name = arguments["combinedOutputName"]; 
@@ -635,8 +636,9 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
     for (size_t i = 0; i < spec_file_lst.size(); i++) {
       prsm_file_lst[i] = file_util::basename(spec_file_lst[i]) + ".toppic_prsm"; 
     }
-    int N = 1000000;
-    prsm_util::mergePrsmFiles(prsm_file_lst, N , full_combined_name + "_ms2.toppic_prsm");
+    prsm_util::mergePrsmFiles(prsm_file_lst, SpPara::getMaxSpecNumPerFile(), 
+                              SpPara::getMaxFeatureNumPerFile(),
+                              full_combined_name + "_ms2.toppic_prsm");
     std::cout << "Merging identification files finished." << std::endl;
     std::cout << "Merging files - finished." << std::endl;
 
@@ -648,8 +650,6 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
     cleanToppicDir(ori_db_file_name, sp_file_name, keep_temp_files);
   }
 
-
-  
   base_data::release();
 
   std::cout << "TopPIC finished." << std::endl << std::flush;
