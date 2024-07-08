@@ -90,10 +90,6 @@ class FracFeature {
 
   double getEcScore() {return ec_score_;}
 
-  int getSampleFeatureId() {return sample_feature_id_;}
-
-  double getSampleFeatureInte() {return sample_feature_inte_;}
-
   bool hasMs2Spec() {return has_ms2_spec_;}
 
   SingleChargeFeaturePtrVec getSingleFeatures() {return single_features_;}
@@ -105,10 +101,6 @@ class FracFeature {
   void setEcScore(double score) {ec_score_ = score;}
 
   void setHasMs2Spec(bool has_ms2_spec) {has_ms2_spec_ = has_ms2_spec;}
-
-  void setSampleFeatureId(int id) {sample_feature_id_ = id;}
-
-  void setSampleFeatureInte(double inte) {sample_feature_inte_ = inte;}
 
   void setSingleFeatures(SingleChargeFeaturePtrVec &single_features) {
     single_features_ = single_features;}
@@ -160,8 +152,6 @@ class FracFeature {
   double ec_score_;
   bool has_ms2_spec_ = false;
 
-  int sample_feature_id_ = -1;
-  double sample_feature_inte_ = 0;
   SingleChargeFeaturePtrVec single_features_;
 };
 

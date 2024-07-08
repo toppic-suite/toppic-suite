@@ -53,7 +53,6 @@ void mergeFiles(const std::vector<std::string> &frac_feature_xml_file_list,
       int feature_id = features[j]->getFeatId() + i * max_feature_num_per_file;
       features[j]->setFracId(i);
       features[j]->setFeatId(feature_id);
-      features[j]->setSampleFeatureId(feature_id);
     }
     all_frac_features.insert(all_frac_features.end(), features.begin(), features.end());
   }
@@ -74,14 +73,6 @@ void mergeFiles(const std::vector<std::string> &frac_feature_xml_file_list,
   }
   sample_feature_writer::writeFeatures(sample_feature_output_file_name, sample_features);
 
-  //Set sample feature id for fraction features
-  for (size_t i = 0; i < clusters.size(); i++) {
-    double sample_feature_inte = sample_features[i]->getIntensity();
-    for (size_t j = 0; j < clusters[i].size(); j++) {
-      clusters[i][j]->setSampleFeatureId(sample_features[i]->getFeatId());
-      clusters[i][j]->setSampleFeatureInte(sample_feature_inte);
-    }
-  }
   frac_feature_writer::writeXmlFeatures(frac_feature_xml_output_file_name, all_frac_features);
   frac_feature_writer::writeFeatures(frac_feature_tsv_output_file_name, all_frac_features);
 
@@ -103,8 +94,6 @@ void mergeFiles(const std::vector<std::string> &frac_feature_xml_file_list,
       int frac_feature_id = spec_feature->getFracFeatureId()+ i * max_feature_num_per_file;
       spec_feature->setFracFeatureId(frac_feature_id);
       FracFeaturePtr frac_feature = feature_map.find(frac_feature_id)->second;
-      spec_feature->setSampleFeatureId(frac_feature->getSampleFeatureId());
-      spec_feature->setSampleFeatureInte(frac_feature->getSampleFeatureInte());
     }
     all_spec_features.insert(all_spec_features.end(), spec_features.begin(), spec_features.end());
   }

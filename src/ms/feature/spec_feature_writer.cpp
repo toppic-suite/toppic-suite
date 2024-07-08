@@ -38,8 +38,6 @@ void writeHeader(std::ofstream &of) {
      << "Fraction_feature_min_time" << "\t"
      << "Fraction_feature_max_time" << "\t"
      << "Fraction_feature_apex_time" << "\t"
-     << "Sample_feature_ID" << "\t"
-     << "Sample_feature_intensity" << "\t"
      << "Precursor_monoisotopic_mz" << "\t"
      << "Precursor_average_mz" << "\t"
      << "Precursor_charge" << "\t"
@@ -60,8 +58,6 @@ void writeOneFeature(std::ofstream &of, SpecFeaturePtr feature) {
      << feature->getFracFeatureMinTime()/60 << "\t"
      << feature->getFracFeatureMaxTime()/60 << "\t"
      << feature->getFracFeatureApexTime()/60 << "\t"
-     << feature->getSampleFeatureId() << "\t"
-     << feature->getSampleFeatureInte() << "\t" 
      << std::fixed << std::setprecision(5) 
      << feature->getPrecMonoMz() << "\t"
      << feature->getPrecAvgMz() << "\t"
