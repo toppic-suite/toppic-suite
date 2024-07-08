@@ -98,6 +98,8 @@ class FracFeature {
 
   SingleChargeFeaturePtrVec getSingleFeatures() {return single_features_;}
 
+  void setFracId(int frac_id) {frac_id_ = frac_id;}
+
   void setFeatId(int feat_id) {feat_id_ = feat_id;}
 
   void setEcScore(double score) {ec_score_ = score;}

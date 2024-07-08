@@ -227,7 +227,7 @@ void process(TopfdParaPtr topfd_para_ptr) {
     frac_feature_writer::writeBatMassFeatures(batmass_file_name, frac_features);
   }
 
-  std::string frac_feat_xml_file_name = output_base_name + "_" + "feature.xml";
+  std::string frac_feat_xml_file_name = output_base_name + "_" + "frac_feature.xml";
   frac_feature_writer::writeXmlFeatures(frac_feat_xml_file_name, frac_features);
   std::string frac_feat_file_name = output_base_name + "_" + "ms1.frac_feature";
   frac_feature_writer::writeFeatures(frac_feat_file_name, frac_features);

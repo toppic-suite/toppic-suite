@@ -595,7 +595,6 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
   bool keep_temp_files = (arguments["keepTempFiles"] == "true"); 
   std::string ori_db_file_name = arguments["oriDatabaseFileName"];
 
-  /*
   for (size_t k = 0; k < spec_file_lst.size(); k++) {
     std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));
     std::string start_time = buf;
@@ -607,14 +606,18 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
     }
     cleanToppicDir(ori_db_file_name, spec_file_lst[k], keep_temp_files);
   }
-  */
 
   if (arguments["combinedOutputName"] != "") {
     std::string merged_file_name = arguments["combinedOutputName"]; 
+    std::vector<std::string> raw_file_list;
+    for (size_t k = 0; k < spec_file_lst.size(); k++) {
+      std::string raw_file_name = spec_file_lst[k].substr(0, spec_file_lst[k].find("_ms2.msalign"));
+      raw_file_list.push_back(raw_file_name);
+    }
     std::string para_str = "";
     std::cout << "Merging files started." << std::endl;
     std::cout << "Merging msalign files started." << std::endl;
-    msalign_frac_merge::mergeMsalignFiles(spec_file_lst, full_combined_name + "_ms2.msalign", para_str);
+    msalign_frac_merge::mergeFractions(raw_file_list, full_combined_name, para_str); 
     std::cout << "Merging msalign files finished." << std::endl;
     if (arguments["geneHTMLFolder"] == "true"){
       std::cout << "Merging json files started." << std::endl;
@@ -624,10 +627,9 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
       json_merger = nullptr;
       std::cout << "Merging json files finished." << std::endl;
     }
-    /*
     if (arguments["useFeatureFile"] == "true") {//only when feature files are being used
       std::cout << "Merging feature files started." << std::endl;
-      feature_merge::process(spec_file_lst, full_combined_name, para_str);
+      feature_merge::process(raw_file_list, full_combined_name, para_str);
       std::cout << "Merging feature files finished." << std::endl;
     }
     // merge TOP files
@@ -645,11 +647,8 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
     arguments["spectrumFileName"] = sp_file_name;
     arguments["startTime"] = combined_start_time;
     TopPIC_post(arguments);
-    */
-    /*
-    std::string sp_file_name = full_combined_name + "_ms2.msalign";
+    sp_file_name = full_combined_name + "_ms2.msalign";
     cleanToppicDir(ori_db_file_name, sp_file_name, keep_temp_files);
-    */
   }
 
 

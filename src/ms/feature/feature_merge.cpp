@@ -35,8 +35,9 @@ namespace toppic {
 
 namespace feature_merge {
 
-void mergeFiles(const std::vector<std::string> &frac_xml_feature_file_lst,
-                const std::string &frac_xml_feature_output_file_name, 
+void mergeFiles(const std::vector<std::string> &frac_feature_xml_file_list,
+                const std::string &frac_feature_xml_output_file_name, 
+                const std::string &frac_feature_tsv_output_file_name, 
                 const std::vector<std::string> &spec_feature_file_lst,
                 const std::string &spec_feature_output_file_name,
                 const std::string &sample_feature_output_file_name,
@@ -44,14 +45,15 @@ void mergeFiles(const std::vector<std::string> &frac_xml_feature_file_lst,
                 int max_feature_num_per_file, 
                 const std::string &para_str) {
   FracFeaturePtrVec all_frac_features;
-  for (size_t i = 0; i < frac_xml_feature_file_lst.size(); i++) {
-    FracXmlFeatureReader ft_reader(frac_xml_feature_file_lst[i]); 
+  for (size_t i = 0; i < frac_feature_xml_file_list.size(); i++) {
+    FracXmlFeatureReader ft_reader(frac_feature_xml_file_list[i]); 
     FracFeaturePtrVec features = ft_reader.readAllFeatures();
     ft_reader.close();
     for (size_t j = 0; j < features.size(); j++) {
       int feature_id = features[j]->getFeatId() + i * max_feature_num_per_file;
+      features[j]->setFracId(i);
       features[j]->setFeatId(feature_id);
-      //frac_feature_writer::writeOneFeature(outfile, features[j]);
+      features[j]->setSampleFeatureId(feature_id);
     }
     all_frac_features.insert(all_frac_features.end(), features.begin(), features.end());
   }
@@ -80,7 +82,8 @@ void mergeFiles(const std::vector<std::string> &frac_xml_feature_file_lst,
       clusters[i][j]->setSampleFeatureInte(sample_feature_inte);
     }
   }
-  frac_feature_writer::writeXmlFeatures(frac_xml_feature_output_file_name, all_frac_features);
+  frac_feature_writer::writeXmlFeatures(frac_feature_xml_output_file_name, all_frac_features);
+  frac_feature_writer::writeFeatures(frac_feature_tsv_output_file_name, all_frac_features);
 
   //spec features
   std::map<int,FracFeaturePtr> feature_map;
@@ -109,25 +112,27 @@ void mergeFiles(const std::vector<std::string> &frac_xml_feature_file_lst,
   spec_feature_writer::writeFeatures(spec_feature_output_file_name, all_spec_features);
 }
 
-void process(const std::vector<std::string> &spec_file_names,
+void process(const std::vector<std::string> &raw_file_names,
              const std::string &output_file_name, 
              std::string &para_str) {
-  std::vector<std::string> frac_xml_feature_names;
+  std::vector<std::string> frac_feature_xml_names;
+  std::vector<std::string> frac_feature_names;
   std::vector<std::string> spec_feature_names;
-  for (size_t i = 0; i < spec_file_names.size(); i++) { 
-    std::string file_name = file_util::basename(spec_file_names[i]);
-    std::string base_name = file_name.substr(0, file_name.length() - 4);
-    std::string frac_xml_feature = base_name + "_feature.xml";
-    frac_xml_feature_names.push_back(frac_xml_feature);
+  for (size_t i = 0; i < raw_file_names.size(); i++) { 
+    std::string base_name = file_util::basename(raw_file_names[i]);
+    std::string frac_feature_xml = base_name + "_frac_feature.xml";
+    frac_feature_xml_names.push_back(frac_feature_xml);
     std::string spec_feature = base_name + "_ms2.feature";
     spec_feature_names.push_back(spec_feature);
   }
   
-  std::string sample_feature_output_name = output_file_name + "_ms1.feature";
-  std::string frac_xml_feature_output_name = output_file_name + "_feature.xml";
+  std::string frac_feature_xml_output_name = output_file_name + "_frac_feature.xml";
+  std::string frac_feature_tsv_output_name = output_file_name + "_ms1.frac_feature";
   std::string spec_feature_output_name = output_file_name + "_ms2.feature";
+  std::string sample_feature_output_name = output_file_name + "_ms1.feature";
 
-  mergeFiles(frac_xml_feature_names, frac_xml_feature_output_name, 
+  mergeFiles(frac_feature_xml_names, frac_feature_xml_output_name, 
+             frac_feature_tsv_output_name,
              spec_feature_names, spec_feature_output_name,
              sample_feature_output_name,
              SpPara::getMaxSpecNumPerFile(), 
