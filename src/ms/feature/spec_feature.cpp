@@ -34,12 +34,10 @@ SpecFeature::SpecFeature(std::string line) {
   frac_feature_min_time_ = std::stod(strs[9]) * 60;
   frac_feature_max_time_ = std::stod(strs[10]) * 60;
   frac_feature_apex_time_ = std::stod(strs[11]) * 60;
-  sample_feature_id_ = std::stoi(strs[12]);
-  sample_feature_inte_ = std::stod(strs[13]);
-  prec_mono_mz_ = std::stod(strs[14]);
-  prec_avg_mz_ = std::stod(strs[15]);
-  prec_charge_ = std::stoi(strs[16]);
-  prec_inte_ = std::stod(strs[17]);
+  prec_mono_mz_ = std::stod(strs[12]);
+  prec_avg_mz_ = std::stod(strs[13]);
+  prec_charge_ = std::stoi(strs[14]);
+  prec_inte_ = std::stod(strs[15]);
 }
 
 SpecFeature::SpecFeature(MsHeaderPtr header, FracFeaturePtr feature,
@@ -57,8 +55,6 @@ SpecFeature::SpecFeature(MsHeaderPtr header, FracFeaturePtr feature,
   frac_feature_min_time_ = feature->getTimeBegin();
   frac_feature_max_time_ = feature->getTimeEnd();
   frac_feature_apex_time_ = feature->getApexTime();
-  sample_feature_id_ = feature->getSampleFeatureId();
-  sample_feature_inte_ = feature->getSampleFeatureInte();
   prec_mono_mz_ = prec_mono_mz;
   prec_avg_mz_ = prec_avg_mz;
   prec_charge_ = prec_charge; 

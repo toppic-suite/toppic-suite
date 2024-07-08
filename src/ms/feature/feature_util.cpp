@@ -26,8 +26,6 @@ void getSampleFeatures(SampleFeaturePtrVec &sample_features, FracFeaturePtrVec &
   for (size_t i = 0; i < frac_features.size(); i++) {
     SampleFeaturePtr sample_feature = std::make_shared<SampleFeature>(frac_features[i], frac_features[i]->getFeatId());
     sample_features.push_back(sample_feature);
-    frac_features[i]->setSampleFeatureId(frac_features[i]->getFeatId());
-    frac_features[i]->setSampleFeatureInte(frac_features[i]->getIntensity());
   }
 
   //spec features
@@ -40,8 +38,6 @@ void getSampleFeatures(SampleFeaturePtrVec &sample_features, FracFeaturePtrVec &
     SpecFeaturePtr spec_feature = spec_features[j];
     int frac_feature_id = spec_feature->getFracFeatureId(); 
     FracFeaturePtr frac_feature = feature_map.find(frac_feature_id)->second;
-    spec_feature->setSampleFeatureId(frac_feature->getSampleFeatureId());
-    spec_feature->setSampleFeatureInte(frac_feature->getSampleFeatureInte());
   }
 }
 

@@ -49,8 +49,6 @@ void writeHeader(std::ofstream &of) {
       << "Rep_average_mz" << "\t"
       << "Envelope_num" << "\t"
       << "EC_score" << "\t"
-      << "Sample_feature_Id" << "\t"
-      << "Sample_feature_intensity"
       << std::endl;
 }
 
@@ -73,8 +71,6 @@ void writeOneFeature(std::ofstream &of, FracFeaturePtr feature) {
       << feature->getRepAvgMz() << "\t"
       << feature->getEnvNum() << "\t"
       << feature->getEcScore() << "\t"
-      << feature->getSampleFeatureId() << "\t"
-      << feature->getSampleFeatureInte() 
       << std::endl;
 }
 

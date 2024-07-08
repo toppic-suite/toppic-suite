@@ -50,10 +50,6 @@ FracFeature::FracFeature(const std::string &file_name,
     rep_avg_mz_(rep_avg_mz), 
     env_num_(env_num),
     ec_score_(ec_score) {
-      // the default sample feature id and intensity 
-      // are the fraction feature id and intensity
-      sample_feature_id_ = feat_id_;
-      sample_feature_inte_ = intensity_;
     }
 
 FracFeature::FracFeature(std::string line) {
@@ -77,8 +73,6 @@ FracFeature::FracFeature(std::string line) {
   rep_avg_mz_ = std::stod(strs[15]);
   env_num_ = std::stoi(strs[16]);
   ec_score_ = std::stod(strs[17]);
-  sample_feature_id_ = std::stoi(strs[18]);
-  sample_feature_inte_ = std::stod(strs[19]);
 }
 
 bool FracFeature::cmpFracIncInteDec(const FracFeaturePtr &a, 
@@ -116,8 +110,6 @@ FracFeature::FracFeature(XmlDOMElement* element) {
   rep_avg_mz_ = xml_dom_util::getDoubleChildValue(element, "rep_avg_mz", 0);
   env_num_ = xml_dom_util::getIntChildValue(element, "envelope_num", 0);
   ec_score_ = xml_dom_util::getDoubleChildValue(element, "ec_score", 0);
-  sample_feature_id_ = xml_dom_util::getIntChildValue(element, "sample_feature_id", 0);
-  sample_feature_inte_ = xml_dom_util::getDoubleChildValue(element, "sample_feature_inte", 0);
 
   // LOG_DEBUG("start parse changes");
   std::string single_feature_name = SingleChargeFeature::getXmlElementName();
@@ -172,10 +164,6 @@ XmlDOMElement* FracFeature::toXmlElement(XmlDOMDocument* xml_doc) {
   xml_doc->addElement(element, "envelope_num", str.c_str());
   str = str_util::toString(ec_score_);
   xml_doc->addElement(element, "ec_score", str.c_str());
-  str = str_util::toString(sample_feature_id_);
-  xml_doc->addElement(element, "sample_feature_id", str.c_str());
-  str = str_util::toString(sample_feature_inte_);
-  xml_doc->addElement(element, "sample_feature_inte", str.c_str());
 
   element_name = SingleChargeFeature::getXmlElementName() + "_list";
   XmlDOMElement* cl = xml_doc->createElement(element_name.c_str());
