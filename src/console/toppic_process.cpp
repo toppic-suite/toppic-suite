@@ -588,18 +588,24 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
       }
     }
   }
-  
+
+  bool keep_temp_files = (arguments["keepTempFiles"] == "true"); 
+  std::string ori_db_file_name = arguments["oriDatabaseFileName"];
+
+  /*
   for (size_t k = 0; k < spec_file_lst.size(); k++) {
     std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));
     std::string start_time = buf;
     arguments["startTime"] = start_time;
     arguments["spectrumFileName"] = spec_file_lst[k];
+
     if (toppic::TopPICProgress(arguments) != 0) {
       return 1;
     }
+    cleanToppicDir(ori_db_file_name, spec_file_lst[k], keep_temp_files);
   }
+  */
 
-  //if (spec_file_lst.size() > 1 && arguments["combinedOutputName"] != "") {
   if (arguments["combinedOutputName"] != "") {
     std::string merged_file_name = arguments["combinedOutputName"]; 
     std::string para_str = "";
@@ -610,12 +616,13 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
     if (arguments["geneHTMLFolder"] == "true"){
       std::cout << "Merging json files started." << std::endl;
       DeconvJsonMergePtr json_merger 
-          = std::make_shared<DeconvJsonMerge>(spec_file_lst, full_combined_name);
+        = std::make_shared<DeconvJsonMerge>(spec_file_lst, full_combined_name);
       json_merger->process();
       json_merger = nullptr;
       std::cout << "Merging json files finished." << std::endl;
     }
-	if (arguments["useFeatureFile"] == "true") {//only when feature files are being used
+    /*
+    if (arguments["useFeatureFile"] == "true") {//only when feature files are being used
       std::cout << "Merging feature files started." << std::endl;
       feature_merge::process(spec_file_lst, full_combined_name, para_str);
       std::cout << "Merging feature files finished." << std::endl;
@@ -635,24 +642,14 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
     arguments["spectrumFileName"] = sp_file_name;
     arguments["startTime"] = combined_start_time;
     TopPIC_post(arguments);
-  }
-
-  bool keep_temp_files = (arguments["keepTempFiles"] == "true"); 
-
-  std::cout << "Deleting temporary files - started." << std::endl;
-  std::string ori_db_file_name = arguments["oriDatabaseFileName"];
-
-  for (size_t k = 0; k < spec_file_lst.size(); k++) {
-    std::string sp_file_name = spec_file_lst[k];
-    cleanToppicDir(ori_db_file_name, sp_file_name, keep_temp_files);
-  }
-
-  //if (spec_file_lst.size() > 1 && arguments["combinedOutputName"] != "") {
-  if (arguments["combinedOutputName"] != "") {
+    */
+    /*
     std::string sp_file_name = full_combined_name + "_ms2.msalign";
     cleanToppicDir(ori_db_file_name, sp_file_name, keep_temp_files);
+    */
   }
-  std::cout << "Deleting temporary files - finished." << std::endl;
+
+
   
   base_data::release();
 
