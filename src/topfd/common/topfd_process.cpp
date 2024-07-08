@@ -53,13 +53,13 @@ void processOneFileWithFaims(TopfdParaPtr para_ptr) {
   std::cout << "MS/MS deconvolution finished." << std::endl;
 }
 
-int processOneFile(TopfdParaPtr para_ptr,  
-                   std::string &spec_file_name, 
-                   int frac_id) { 
+void processOneFile(TopfdParaPtr para_ptr,  
+                    std::string &spec_file_name) { 
   try {
     // Get mzml file profile
     PwMsReaderPtr reader_ptr = std::make_shared<PwMsReader>(spec_file_name);
     MzmlProfilePtr profile_ptr = reader_ptr->readProfile();
+    int frac_id = 0;
 
     // check if it is faims or not
     if (profile_ptr->isFaims()) {
@@ -77,7 +77,6 @@ int processOneFile(TopfdParaPtr para_ptr,
         frac_id++;
         std::cout << "Processing " << spec_file_name << " with voltage " << volt << " finished." << std::endl;
       }
-      return volt_map.size();
     }
     else {
       bool is_faims = false;
@@ -87,7 +86,6 @@ int processOneFile(TopfdParaPtr para_ptr,
       para_ptr->setMs1ScanNumber(profile_ptr->getMs1Cnt()); 
       para_ptr->setMs2ScanNumber(profile_ptr->getMs2Cnt()); 
       processOneFileWithFaims(para_ptr);
-      return 1;
     }
   } catch (const char* e) {
     LOG_ERROR("[Exception] " << e);
@@ -115,12 +113,10 @@ int process(TopfdParaPtr para_ptr,  std::vector<std::string> spec_file_list) {
   onnx_env_cnn::initModel(para_ptr->getResourceDir(), para_ptr->getThreadNum());
   onnx_ecscore::initModel(para_ptr->getResourceDir(), para_ptr->getThreadNum());
   
-  int frac_id = 0;
   for (size_t k = 0; k < spec_file_list.size(); k++) {
     if (isValidFile(spec_file_list[k])) {
       std::cout << "Processing " << spec_file_list[k] << " started." << std::endl;
-      int frac_num = processOneFile(para_ptr, spec_file_list[k], frac_id); 
-      frac_id = frac_id + frac_num;
+      processOneFile(para_ptr, spec_file_list[k]); 
       std::cout << "Timestamp: " << time_util::getTimeStr() << std::endl;
       std::cout << "Processing " << spec_file_list[k] << " finished." << std::endl;
     }
