@@ -74,6 +74,8 @@ class SpecFeature {
 
   double getFracFeatureApexTime() {return frac_feature_apex_time_;}
 
+  void setFracId(int frac_id) {frac_id_ = frac_id;}
+
   void setSpecId(int id) {spec_id_ = id;}
 
   void setMsOneId(int id) {ms_one_id_ = id;}
