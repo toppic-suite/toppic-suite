@@ -47,9 +47,9 @@ class Prsm {
 
   int getPrecursorId() {return precursor_id_;}
 
-  int getSampleFeatureId() {return sample_feature_id_;}
+  int getFracFeatureId() {return frac_feature_id_;}
 
-  double getSampleFeatureInte() {return sample_feature_inte_;}
+  double getFracFeatureInte() {return frac_feature_inte_;}
 
   double getFracFeatureScore() {return frac_feature_score_;}
 
@@ -106,7 +106,6 @@ class Prsm {
 
   void setPrecurorId(int precursor_id) {precursor_id_ = precursor_id;}
 
-
   void setFracFeatureScore(double score) {frac_feature_score_ = score;}
 
   void setOriPrecMass(double prec_mass) {ori_prec_mass_ = prec_mass;}
@@ -132,7 +131,7 @@ class Prsm {
 
   void setIsExactMatch(bool is_exact_match) {is_exact_match_ = is_exact_match;}
 
-  void setSampleFeatureId(int id) {sample_feature_id_ = id;}
+  void setFracFeatureId(int id) {frac_feature_id_ = id;}
 
   // comparion
   static bool cmpMatchFragDecMatchPeakDecProtInc(const PrsmPtr &a, const PrsmPtr &b);
@@ -167,14 +166,14 @@ class Prsm {
 
   int spectrum_num_;
 
-  // Sample feature id is stored in both deconv_ms_ptr_vec 
+  // frac feature id is stored in both deconv_ms_ptr_vec 
   // and the member variable. When a prsm is constructed from an xml file, 
   // only the member variable will be initialized.  
-  int sample_feature_id_ = -1;
+  int frac_feature_id_ = -1;
 
-  double sample_feature_inte_ = -1;
+  double frac_feature_inte_ = -1;
 
-  double frac_feature_score_ = -1000;
+  double frac_feature_score_ = -1;
 
   double ori_prec_mass_;
   /* adjusted precursor mass */

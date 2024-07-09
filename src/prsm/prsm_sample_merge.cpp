@@ -107,8 +107,8 @@ void outputTable(PrsmStrPtrVec2D &clusters,
         file << "," << ",";
       }
       else {
-        if (sample_prsm->getPrecFeatureInte() > 0) {
-          file << sample_prsm->getPrecFeatureInte() << ",";
+        if (sample_prsm->getFracFeatureInte() > 0) {
+          file << sample_prsm->getFracFeatureInte() << ",";
         } else {
           file << "-" << ",";
         }
@@ -128,9 +128,11 @@ void process(const std::vector<std::string> &input_file_names,
   for (size_t k = 0; k < sample_num; k++) {
     std::string input_file_name = input_file_names[k];
     PrsmStrPtrVec prsms = prsm_reader_util::readAllPrsmStrsMatchSeq(input_file_name);
+    /*
     for (size_t i = 0; i < prsms.size(); i++) {
       prsms[i]->setSampleId(k);
     }
+    */
     all_prsms.insert(all_prsms.end(), prsms.begin(), prsms.end());
   }
   std::sort(all_prsms.begin(), all_prsms.end(), PrsmStr::cmpEValueIncProtInc);

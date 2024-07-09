@@ -31,10 +31,10 @@ PrsmStr::PrsmStr(const std::vector<std::string> &str_vec) {
   spectrum_scan_ = std::stoi(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<precursor_id>");
   precursor_id_ = std::stoi(prsm_util::getValueStr(line));
-  line = prsm_util::getXmlLine(str_vec_, "<sample_feature_id>");
-  sample_feature_id_ = std::stoi(prsm_util::getValueStr(line));
-  line = prsm_util::getXmlLine(str_vec_, "<sample_feature_inte>");
-  sample_feature_inte_ = std::stod(prsm_util::getValueStr(line));
+  line = prsm_util::getXmlLine(str_vec_, "<frac_feature_id>");
+  frac_feature_id_ = std::stoi(prsm_util::getValueStr(line));
+  line = prsm_util::getXmlLine(str_vec_, "<frac_feature_inte>");
+  frac_feature_inte_ = std::stod(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<ori_prec_mass>");
   ori_prec_mass_ = std::stod(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<adjusted_prec_mass>");
@@ -127,16 +127,16 @@ void PrsmStr::setSpectrumId(int id) {
   spectrum_id_ = id;
 }
 
-void PrsmStr::setPrecFeatureId(int id) {
-  int i = getXmlLineIndex(str_vec_, "<sample_feature_id>");
-  str_vec_[i] = "<sample_feature_id>" + str_util::toString(id) + "</sample_feature_id>";
-  sample_feature_id_ = id;
+void PrsmStr::setFracFeatureId(int id) {
+  int i = getXmlLineIndex(str_vec_, "<frac_feature_id>");
+  str_vec_[i] = "<frac_feature_id>" + str_util::toString(id) + "</frac_feature_id>";
+  frac_feature_id_ = id;
 }
 
-void PrsmStr::setPrecFeatureInte(double inte) {
-  int i = getXmlLineIndex(str_vec_, "<sample_feature_inte>");
-  str_vec_[i] = "<sample_feature_inte>" + str_util::toString(inte) + "</sample_feature_inte>";
-  sample_feature_inte_ = inte;
+void PrsmStr::setFracFeatureInte(double inte) {
+  int i = getXmlLineIndex(str_vec_, "<frac_feature_inte>");
+  str_vec_[i] = "<frac_feature_inte>" + str_util::toString(inte) + "</frac_feature_inte>";
+  frac_feature_inte_ = inte;
 }
 
 void PrsmStr::setFracFeatureScore(double score) {
@@ -163,10 +163,10 @@ void PrsmStr::setProtId(int id) {
   prot_id_ = id;
 }
 
-void PrsmStr::setSampleFeatureId(int id) {
-  int i = getXmlLineIndex(str_vec_, "<sample_feature_id>");
-  str_vec_[i] = "<sample_feature_id>" + str_util::toString(id) + "</sample_feature_id>";
-  sample_feature_id_  = id;
+void PrsmStr::setTimeApex(double time_apex) {
+  int i = getXmlLineIndex(str_vec_, "<fraction_feature_time_apex>");
+  str_vec_[i] = "<fraction_feature_time_apex>" + str_util::toString(time_apex) + "</fraction_feature_time_apex>";
+  time_apex_ = time_apex; 
 }
 
 

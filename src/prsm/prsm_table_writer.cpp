@@ -161,10 +161,10 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
       << prsm_ptr->getAdjustedPrecMass() << delim
       << prsm_ptr->getProteoformPtr()->getProteoClusterId() << delim;
 
-  if (prsm_ptr->getSampleFeatureInte() > 0) {
+  if (prsm_ptr->getFracFeatureInte() > 0) {
     std::ostringstream str_stream;
     str_stream << std::scientific << std::setprecision(3);
-    str_stream << prsm_ptr->getSampleFeatureInte();
+    str_stream << prsm_ptr->getFracFeatureInte();
     file << str_stream.str() << delim;
   } else {
     file << empty_str << delim;

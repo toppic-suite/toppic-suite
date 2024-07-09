@@ -51,7 +51,7 @@ class PrsmStr {
 
   int getPrecursorId() {return precursor_id_;}
 
-  int getSampleFeatureId() {return sample_feature_id_;}
+  int getFracFeatureId() {return frac_feature_id_;}
 
   int getUnexpectedPtmNum() {return unexpected_ptm_num_;}
 
@@ -61,7 +61,7 @@ class PrsmStr {
 
   std::string getProteoformDbSeq() {return proteoform_db_seq_;}
 
-  double getPrecFeatureInte() {return sample_feature_inte_;}
+  double getFracFeatureInte() {return frac_feature_inte_;}
 
   double getMatchPeakNum() {return match_peak_num_;}
 
@@ -93,11 +93,11 @@ class PrsmStr {
 
   void setProtId(int id);
 
-  void setPrecFeatureId(int id);
+  void setFracFeatureId(int id);
 
   void setPrecursorId(int id);
 
-  void setPrecFeatureInte(double inte);
+  void setFracFeatureInte(double inte);
 
   void setFracFeatureScore(double score);
 
@@ -105,11 +105,10 @@ class PrsmStr {
 
   void setProteoformFdr(double proteoform_fdr);
 
-  void setSampleFeatureId(int feat_id); 
+  void setTimeApex(double time_apex); 
 
-  void setSampleId(int sample_id)  {sample_id_ = sample_id;}
-
-  void setTimeApex(double time_apex) {time_apex_ = time_apex;}
+  // need to be reviewed
+  //void setSampleId(int sample_id)  {sample_id_ = sample_id;}
 
   static bool cmpEValueIncProtInc(const PrsmStrPtr &a, const PrsmStrPtr &b);
 
@@ -148,9 +147,9 @@ class PrsmStr {
 
   int precursor_id_;
 
-  int sample_feature_id_;
+  int frac_feature_id_;
 
-  double sample_feature_inte_;
+  double frac_feature_inte_;
 
   int unexpected_ptm_num_;
 
