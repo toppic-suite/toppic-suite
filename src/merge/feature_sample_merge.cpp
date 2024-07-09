@@ -23,7 +23,6 @@
 #include "seq/fasta_index_reader.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_reader_util.hpp"
-#include "merge/feature_prsm_reader.hpp"
 #include "merge/feature_sample_merge.hpp"
 
 namespace toppic {
@@ -39,26 +38,6 @@ FeatureSampleMerge::FeatureSampleMerge(const std::vector<std::string> &input_fil
 
 
 
-void matchPrsms(FeaturePrsmPtrVec &features, PrsmStrPtrVec &prsms) {
-  for (size_t i = 0; i < prsms.size(); i++) {
-    PrsmStrPtr prsm = prsms[i];
-    int id = prsms[i]->getSampleFeatureId();
-    if (id < 0) {
-      LOG_ERROR("Prsm file does not contain feature information!");
-      exit(EXIT_FAILURE);
-    }
-    else {
-      // features are not sorted by their ids
-      for (size_t j = 0; j < features.size(); j++) {
-        if (features[j]->getId() == id) {
-          features[j]->addPrsmInfo(prsm);
-          break;
-        }
-      }
-    }
-  }
-}
-
 // normalize by the largest retention time 
 void normalizeTime(FeaturePrsmPtrVec &features) {
   double max_time = 1;
@@ -72,6 +51,8 @@ void normalizeTime(FeaturePrsmPtrVec &features) {
     features[i]->setAlignTimeBegin(time_begin);
     double time_end = features[i]->getTimeEnd()/max_time;
     features[i]->setAlignTimeEnd(time_end);
+    double time_apex = features[i]->getTimeApex()/max_time;
+    features[i]->setAlignTimeApex(time_apex);
   }
 }
 
@@ -102,7 +83,7 @@ inline FeaturePrsmPtrVec getTopFeatures(FeaturePrsmPtrVec &features) {
   return result;
 }
 
-inline CellPtrVec2D initCells(size_t a_size, size_t b_size, FeaturePrsmPtrVec &first) {
+inline CellPtrVec2D initCells(size_t a_size, size_t b_size) {
   CellPtrVec2D cell_2d;
   for (size_t i = 0; i < a_size + 1; i++) {
     CellPtrVec cells(b_size + 1);
@@ -129,10 +110,10 @@ int findMatch(FeaturePrsmPtr a, FeaturePrsmPtrVec &second, size_t b_index, doubl
   //if (mass_tole < 0.01) {
   //  mass_tole = 0.01;
   //}
-  double b_time = second[b_index]->getAlignTimeMiddle();
+  double b_time = second[b_index]->getAlignTimeApex();
   for (int i = b_index; i >= 0; i--) {
     double mass = second[i]->getMonoMass();
-    double time = second[i]->getAlignTimeMiddle();
+    double time = second[i]->getAlignTimeApex();
     if (b_time - time > time_tole) {
       break;
     }
@@ -143,7 +124,7 @@ int findMatch(FeaturePrsmPtr a, FeaturePrsmPtrVec &second, size_t b_index, doubl
   }
   for (size_t i = b_index; i < second.size(); i++) {
     double mass = second[i]->getMonoMass();
-    double time = second[i]->getAlignTimeMiddle();
+    double time = second[i]->getAlignTimeApex();
     if (time - b_time > time_tole) {
       break;
     }
@@ -165,7 +146,7 @@ void sampleAlignTime(FeaturePrsmPtrVec &first, FeaturePrsmPtrVec &second,
 
   size_t a_size = a.size();
   size_t b_size = b.size();
-  CellPtrVec2D cell_2d = initCells(a_size, b_size, a);
+  CellPtrVec2D cell_2d = initCells(a_size, b_size);
   //alignment
   for (size_t i = 1; i < a_size + 1; i++) {
     for (size_t j = 1; j < b_size + 1; j++) {
@@ -199,8 +180,8 @@ void sampleAlignTime(FeaturePrsmPtrVec &first, FeaturePrsmPtrVec &second,
   std::pair<double,double> last_pair(1,1);
   time_pairs.push_back(last_pair);
   while (i > 0 && j > 0) {
-    double a_time = a[i-1]->getAlignTimeMiddle();
-    double b_time = b[i-1]->getAlignTimeMiddle();
+    double a_time = a[i-1]->getAlignTimeApex();
+    double b_time = b[i-1]->getAlignTimeApex();
     std::pair<double, double>time_pair(a_time,b_time);
     time_pairs.push_back(time_pair);
     int pre = cell_2d[i][j]->pre_;
@@ -208,12 +189,12 @@ void sampleAlignTime(FeaturePrsmPtrVec &first, FeaturePrsmPtrVec &second,
       int pos = findMatch(a[i-1], b, j-1, mass_tole); 
       if (pos >= 0) {
         LOG_DEBUG("i " << (i-1) 
-                  << " time " << a[i-1]->getTimeMiddle() 
+                  << " time " << a[i-1]->getTimeApex() 
                   << " mass " << a[i-1]->getMonoMass() 
                   << " intensity " << a[i-1]->getIntensity() 
                   << " j " << (j-1) 
                   << " j " << pos 
-                  << " time " << b[pos]->getTimeMiddle() 
+                  << " time " << b[pos]->getTimeApex() 
                   << " mass " << b[pos]->getMonoMass() 
                   << " intensity " << b[pos]->getIntensity()); 
       }
@@ -258,6 +239,8 @@ void setAlignTime(FeaturePrsmPtrVec &features,
     features[i]->setAlignTimeBegin(time_begin);
     double time_end = findAlignTime(features[i]->getAlignTimeEnd(), time_pairs);
     features[i]->setAlignTimeEnd(time_end);
+    double time_apex = findAlignTime(features[i]->getAlignTimeApex(), time_pairs);
+    features[i]->setAlignTimeApex(time_apex);
   }
 }
 
@@ -268,7 +251,7 @@ FeaturePrsmPtr findMatchFeature(FeaturePrsmPtr feature, FeaturePrsmPtrVec &featu
   double strict_mass_tole = 0.01;
   double strict_time_tole = 0.01;
   double cur_mass = feature->getMonoMass();
-  double cur_time = feature->getAlignTimeMiddle();
+  double cur_time = feature->getAlignTimeApex();
   std::string cur_prot = feature->getProtName();
   for (size_t i = 0; i < features.size(); i++) {
     if (features[i] == nullptr) {
@@ -276,7 +259,7 @@ FeaturePrsmPtr findMatchFeature(FeaturePrsmPtr feature, FeaturePrsmPtrVec &featu
     }
     std::string prot = features[i]->getProtName();
     double mass = features[i]->getMonoMass();
-    double time = features[i]->getAlignTimeMiddle();
+    double time = features[i]->getAlignTimeApex();
     if (cur_prot == prot) {
       if (abs(time-cur_time) <= time_tole && abs(mass - cur_mass) <= mass_tole) {
         FeaturePrsmPtr result = features[i];
@@ -299,11 +282,11 @@ FeaturePrsmPtr findMatchFeature(FeaturePrsmPtr feature, FeaturePrsmPtrVec &featu
 
 bool featureUsed(FeaturePrsmPtr feature, FeaturePrsmPtrVec2D &table) {
   int cur_sample = feature->getSampleId();
-  int feature_id = feature->getId();
+  int feature_id = feature->getProteoId();
   for (size_t i = 0; i < table.size(); i++) {
     FeaturePrsmPtr cur_feature= table[i][cur_sample];
     if (cur_feature != nullptr) {
-      int cur_id = cur_feature->getId();
+      int cur_id = cur_feature->getProteoId();
       if (feature_id == cur_id) {
         return true;
       }
@@ -361,7 +344,7 @@ void FeatureSampleMerge::outputTable(FeaturePrsmPtrVec2D &table,
       << input_file_names_[i] << " Spectrum id" << delim
       << input_file_names_[i] << " Retention time begin" << delim
       << input_file_names_[i] << " Retention time end" << delim
-      << input_file_names_[i] << " Normalized time middle" << delim;
+      << input_file_names_[i] << " Normalized time apex" << delim;
   }
   file << std::endl;
   int cluster_num = table.size();
@@ -409,7 +392,7 @@ void FeatureSampleMerge::outputTable(FeaturePrsmPtrVec2D &table,
         }
         file << sample_feature->getTimeBegin() << delim
           << sample_feature->getTimeEnd() << delim
-          << sample_feature->getAlignTimeMiddle() << delim;
+          << sample_feature->getAlignTimeApex() << delim;
       }
     }
     file << std::endl;
@@ -431,18 +414,19 @@ void FeatureSampleMerge::process() {
       base_name = base_name.substr(0, base_name.size() - 4);
     }
     else {
-      LOG_ERROR("The file name " << input_file_name << " does not end with _ms1.feature!");
+      LOG_ERROR("The file name " << input_file_name << " does not end with _ms2.msalign!");
     }
-    FeaturePrsmReader reader(base_name + "_ms1.feature");
-    FeaturePrsmPtrVec features = reader.readAllFeatures();
-    reader.close();
 
     std::string prsm_file_name = base_name + "_ms2_" + tool_name_ + "_proteoform.xml";
     PrsmStrPtrVec prsms = prsm_reader_util::readAllPrsmStrsMatchSeq(prsm_file_name);
     if (prsms.size() == 0) {
       LOG_WARN("The file " << prsm_file_name  << " does not contain any PrSM identifications!");
     }
-    matchPrsms(features, prsms);
+    FeaturePrsmPtrVec features;
+    for (size_t i = 0; i < prsms.size(); i++) {
+      FeaturePrsmPtr feat_ptr = std::make_shared<FeaturePrsm>(prsms[i]);
+      features.push_back(feat_ptr);
+    }
     std::sort(features.begin(), features.end(), FeaturePrsm::cmpTimeInc);
     for (size_t i = 0; i < features.size(); i++) {
       features[i]->setSampleId(k);

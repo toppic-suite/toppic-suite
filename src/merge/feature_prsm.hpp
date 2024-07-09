@@ -16,18 +16,19 @@
 #define TOPPIC_MERGE_FEATURE_PRSM_HPP_
 
 #include "prsm/prsm_str.hpp"
-#include "ms/feature/sample_feature.hpp"
 
 namespace toppic {
 
 class FeaturePrsm;
 typedef std::shared_ptr<FeaturePrsm> FeaturePrsmPtr;
 
-class FeaturePrsm : public SampleFeature {
+class FeaturePrsm {
  public:
-  FeaturePrsm(std::string line);
+  FeaturePrsm(PrsmStrPtr prsm);
 
-  void addPrsmInfo(PrsmStrPtr prsm);
+  int getSampleId() {return sample_id_;}
+
+  int getProteoId() {return proteo_id_;}
 
   std::string getProtName() {return prot_name_;}
 
@@ -47,17 +48,35 @@ class FeaturePrsm : public SampleFeature {
 
   double getAlignTimeEnd() {return align_time_end_;}
 
-  double getAlignTimeMiddle() {return (align_time_begin_ + align_time_end_)/2;}
+  //double getAlignTimeMiddle() {return (align_time_begin_ + align_time_end_)/2;}
+  double getAlignTimeApex() {return align_time_apex_;}
+
+  double getMonoMass() {return mono_mass_;}
+
+  double getIntensity() {return inte_;}
+
+  double getTimeBegin() {return time_begin_;}
+
+  double getTimeEnd() {return time_end_;}
+
+  double getTimeApex() {return time_apex_;}
+
+  void setSampleId(int sample_id) {sample_id_ = sample_id;}
 
   void setAlignTimeBegin(double time_begin) {align_time_begin_ = time_begin;}
 
   void setAlignTimeEnd(double time_end) {align_time_end_ = time_end;}
+
+  void setAlignTimeApex(double time_apex) {align_time_apex_ = time_apex;}
 
   static bool cmpMassInc(const FeaturePrsmPtr &a, const FeaturePrsmPtr &b) { 
     return a->getMonoMass() < b->getMonoMass();}
 
   static bool cmpInteDec(const FeaturePrsmPtr &a, const FeaturePrsmPtr &b) { 
     return a->getIntensity() > b->getIntensity();}
+
+  static bool cmpTimeInc(const FeaturePrsmPtr &a, const FeaturePrsmPtr &b) { 
+    return a->getTimeApex() < b->getTimeApex();}
 
  private:
   std::string prot_name_;
@@ -69,6 +88,17 @@ class FeaturePrsm : public SampleFeature {
   double prec_mass_;
   double align_time_begin_;
   double align_time_end_;
+  double align_time_apex_;
+
+  int sample_id_;
+
+  // new variable needed from prsm_str
+  double mono_mass_;
+  double inte_;
+  double time_end_;
+  double time_begin_;
+  double time_apex_;
+  int proteo_id_;
 };
 
 typedef std::vector<FeaturePrsmPtr> FeaturePrsmPtrVec;
