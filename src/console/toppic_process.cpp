@@ -595,7 +595,6 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
   bool keep_temp_files = (arguments["keepTempFiles"] == "true"); 
   std::string ori_db_file_name = arguments["oriDatabaseFileName"];
 
-  /*
   for (size_t k = 0; k < spec_file_lst.size(); k++) {
     std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));
     std::string start_time = buf;
@@ -606,7 +605,6 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
     }
     cleanToppicDir(ori_db_file_name, spec_file_lst[k], keep_temp_files);
   }
-  */
 
   if (arguments["combinedOutputName"] != "") {
     std::string merged_file_name = arguments["combinedOutputName"]; 

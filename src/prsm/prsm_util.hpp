@@ -43,7 +43,7 @@ std::vector<int> getClusterIds(const PrsmPtrVec &prsm_ptrs);
 
 void addSpectrumPtrsToPrsms(PrsmPtrVec &prsm_ptrs, PrsmParaPtr prsm_para_ptr);
 
-void addFeatureIDToPrsms(PrsmStrPtrVec &prsm_ptrs, const std::string & feature_file_name);
+void addFeatureInfoToPrsms(PrsmStrPtrVec &prsm_ptrs, const std::string & feature_file_name);
 
 void removePrsmsWithoutFeature(PrsmStrPtrVec &prsm_ptrs, 
                                PrsmStrPtrVec &filtered_prsm_ptrs);

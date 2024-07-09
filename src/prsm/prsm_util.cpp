@@ -166,7 +166,7 @@ void addSpectrumPtrsToPrsms(PrsmPtrVec &prsm_ptrs, PrsmParaPtr prsm_para_ptr) {
   }
 }
 
-void addFeatureIDToPrsms(PrsmStrPtrVec &prsm_ptrs, const std::string & feature_file_name) {
+void addFeatureInfoToPrsms(PrsmStrPtrVec &prsm_ptrs, const std::string & feature_file_name) {
   // read TopFD featuers
   SpecFeatureReader ft_reader(feature_file_name); 
   SpecFeaturePtrVec ms2_features = ft_reader.readAllFeatures();
@@ -174,7 +174,7 @@ void addFeatureIDToPrsms(PrsmStrPtrVec &prsm_ptrs, const std::string & feature_f
 
   std::map<int,SpecFeaturePtr> feature_map;
   for (size_t i = 0; i < ms2_features.size(); i++) {
-    feature_map[ms2_features[i]->getSampleFeatureId()] =  ms2_features[i];
+    feature_map[ms2_features[i]->getFracFeatureId()] =  ms2_features[i];
   }
 
   // make sure prsms sorted by spectrum id
@@ -182,12 +182,12 @@ void addFeatureIDToPrsms(PrsmStrPtrVec &prsm_ptrs, const std::string & feature_f
 
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     int spec_id = prsm_ptrs[i]->getSpectrumId();
-    int sample_feature_id = prsm_ptrs[i]->getSampleFeatureId();
+    int frac_feature_id = prsm_ptrs[i]->getFracFeatureId();
     //LOG_ERROR(spec_id << " " << sample_feature_id);
-    if (feature_map.find(sample_feature_id) != feature_map.end()) { 
-      SpecFeaturePtr feature = feature_map.find(sample_feature_id)->second;
+    if (feature_map.find(frac_feature_id) != feature_map.end()) { 
+      SpecFeaturePtr feature = feature_map.find(frac_feature_id)->second;
       if (feature != nullptr) {
-        prsm_ptrs[i]->setPrecFeatureInte(feature->getSampleFeatureInte());
+        prsm_ptrs[i]->setFracFeatureInte(feature->getFracFeatureInte());
         prsm_ptrs[i]->setFracFeatureScore(feature->getFracFeatureScore());
         prsm_ptrs[i]->setTimeApex(feature->getFracFeatureApexTime());
       }
@@ -201,7 +201,7 @@ void addFeatureIDToPrsms(PrsmStrPtrVec &prsm_ptrs, const std::string & feature_f
 void removePrsmsWithoutFeature(PrsmStrPtrVec &prsm_ptrs, 
                                PrsmStrPtrVec &filtered_prsm_ptrs) {
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
-    if (prsm_ptrs[i]->getSampleFeatureId() >=0) {
+    if (prsm_ptrs[i]->getFracFeatureId() >=0) {
       filtered_prsm_ptrs.push_back(prsm_ptrs[i]);
     }
   }
@@ -219,7 +219,7 @@ void mergePrsmFiles(const std::vector<std::string> & prsm_file_lst,
     PrsmStrPtr prsm = prsm_reader->readOnePrsmStr();
     while (prsm != nullptr) {
       prsm->setSpectrumId(max_spec_num_per_file * i + prsm->getSpectrumId());
-      prsm->setSampleFeatureId(max_feat_num_per_file * i + prsm->getSampleFeatureId());
+      prsm->setFracFeatureId(max_feat_num_per_file * i + prsm->getFracFeatureId());
       prsm_writer->write(prsm);
       prsm = prsm_reader->readOnePrsmStr();
     }
