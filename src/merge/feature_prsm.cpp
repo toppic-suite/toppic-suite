@@ -17,12 +17,7 @@
 
 namespace toppic {
 
-FeaturePrsm::FeaturePrsm(std::string line):
-    SampleFeature(line) {
-    ms2_id_ = -1;
-}
-
-void FeaturePrsm::addPrsmInfo(PrsmStrPtr prsm) {
+FeaturePrsm::FeaturePrsm(PrsmStrPtr prsm) {
   prot_name_ = prsm->getSeqName();
   prot_desc_ = prsm->getSeqDesc();
   first_residue_ = prsm->getProteoformStartPos();

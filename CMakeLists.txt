@@ -105,14 +105,16 @@ file(GLOB VISUAL_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/visual/*.cpp)
 
 # toppic console main
 file(GLOB TOPPIC_PROC_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_process.cpp
-		                  	    ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_argument.cpp)
+		                  	    ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_argument.cpp
+		                  	    ${CMAKE_CURRENT_SOURCE_DIR}/src/console/console_util.cpp)
 
 file(GLOB TOPPIC_CONSOLE_SRCS	${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic.cpp)
 
 # toppic gui main
 file(GLOB TOPPIC_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/toppic/*.cpp
 	                  		    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/toppic/*.qrc
-                            ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_argument.cpp)
+                            ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_argument.cpp
+		                  	    ${CMAKE_CURRENT_SOURCE_DIR}/src/console/console_util.cpp)
 
 # classes for topmg
 file(GLOB GRAPH_ALIGN_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/search/diag/*.cpp
@@ -126,14 +128,16 @@ file(GLOB MCMC_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/stat/count/*.cpp
 # topmg console main
 file(GLOB TOPMG_PROC_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmg_process.cpp
 	                  		    ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmg_argument.cpp
-                      			${CMAKE_CURRENT_SOURCE_DIR}/src/console/topindex_file_name.cpp)
+                      			${CMAKE_CURRENT_SOURCE_DIR}/src/console/topindex_file_name.cpp
+		                  	    ${CMAKE_CURRENT_SOURCE_DIR}/src/console/console_util.cpp)
 
 file(GLOB TOPMG_CONSOLE_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmg.cpp)
 
 # topmg gui main
 file(GLOB TOPMG_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topmg/*.cpp
 	                  		   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topmg/*.qrc
-                           ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmg_argument.cpp)
+                           ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmg_argument.cpp
+		                  	   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/console_util.cpp)
 
 # topdiff classes
 file(GLOB DIFF_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/merge/*.cpp)
