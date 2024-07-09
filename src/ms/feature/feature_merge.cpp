@@ -27,8 +27,6 @@
 #include "ms/feature/frac_xml_feature_reader.hpp"
 #include "ms/feature/frac_feature_writer.hpp"
 #include "ms/feature/frac_feature_cluster.hpp"
-#include "ms/feature/sample_feature.hpp"
-#include "ms/feature/sample_feature_writer.hpp"
 #include "ms/feature/feature_merge.hpp"
 
 namespace toppic {
