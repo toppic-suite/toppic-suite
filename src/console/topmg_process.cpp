@@ -68,28 +68,11 @@
 #include "visual/xml_generator.hpp"
 #include "visual/json_transformer.hpp"
 
+#include "console/console_util.hpp"
 #include "console/topmg_argument.hpp"
 #include "console/topmg_process.hpp"
 
 namespace toppic {
-
-void copyTopMSV(std::map<std::string, std::string> &arguments) {
-  std::string spectrum_file_name = arguments["spectrumFileName"];
-  std::string base_name = file_util::basename(spectrum_file_name);
-  std::string base_name_short = base_name.substr(0, base_name.length() - 4);
-  std::string topmsv_dir = base_name_short + "_html" +  file_util::getFileSeparator() + "topmsv";
-  if (file_util::exists(topmsv_dir)) {
-    LOG_WARN("The TopMSV directory " << topmsv_dir << " exists!");
-    file_util::delDir(topmsv_dir);
-  }
-  if (!file_util::exists(base_name_short + "_html")){//if _html folder was not created before
-    file_util::createFolder(base_name_short + "_html");
-  }
-  std::string resource_dir = arguments["resourceDir"];
-  // copy resources 
-  std::string from_path(resource_dir + file_util::getFileSeparator() + "topmsv");
-  file_util::copyDir(from_path, topmsv_dir);
-}
 
 void cleanTopmgDir(const std::string &fa_name, 
                    const std::string & sp_name,
@@ -122,7 +105,6 @@ void cleanTopmgDir(const std::string &fa_name,
     file_util::cleanPrefix(sp_name, sp_base + ".topmg_evalue_");
     file_util::delFile(sp_base + ".topmg_cluster");
     file_util::delFile(sp_base + ".topmg_cluster_fdr");
-    file_util::delFile(sp_base + ".topmg_prsm");
     file_util::delFile(sp_base + ".topmg_form_cutoff");
     file_util::delDir(sp_base + "_topmg_proteoform_cutoff_xml");
     file_util::delDir(sp_base + "_topmg_prsm_cutoff_xml");
@@ -299,7 +281,7 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
     int n_top = std::stoi(arguments["numOfTopPrsms"]);
 
     std::cout << "Top PrSM selecting - started" << std::endl;
-    prsm_top_selector::process(sp_file_name, "topmg_evalue", "topmg_prsm", n_top);
+    prsm_top_selector::process(sp_file_name, "topmg_evalue", "topmg_raw_prsm", n_top);
     std::cout << "Top PrSM selecting - finished." << std::endl;
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
@@ -328,14 +310,14 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
       // TopFD msalign file with feature ID
       ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();
       prsm_feature_cluster::process(sp_file_name,
-                                    "topmg_prsm",
+                                    "topmg_raw_prsm",
                                     "topmg_cluster",
                                     form_error_tole);
     } 
     else {
       prsm_simple_cluster::process(db_file_name, 
                                    sp_file_name,
-                                   "topmg_prsm", 
+                                   "topmg_raw_prsm", 
                                    prsm_para_ptr->getFixModPtrVec(),
                                    "topmg_cluster", 
                                    form_error_tole);
@@ -380,13 +362,12 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
     XmlGeneratorPtr xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, resource_dir, "topmg_prsm_cutoff", "topmg_prsm_cutoff");
     
     if (arguments["geneHTMLFolder"] == "true"){//only when the parameter is set to true
-    
       std::cout << "Generating PrSM xml files - started." << std::endl;
       xml_gene->process();
       xml_gene = nullptr;
       std::cout << "Generating PrSM xml files - finished." << std::endl;
 
-      copyTopMSV(arguments);
+      console_util::copyTopMSV(arguments);
 
       std::cout << "Converting PrSM xml files to html files - started." << std::endl;
       jsonTranslate(arguments, "topmg_prsm_cutoff");
@@ -475,6 +456,9 @@ int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
     }
   }
 
+  bool keep_temp_files = (arguments["keepTempFiles"] == "true"); 
+  std::string ori_db_file_name = arguments["oriDatabaseFileName"];
+
   for (size_t k = 0; k < spec_file_lst.size(); k++) {
     std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));
     std::string start_time = buf;
@@ -483,58 +467,47 @@ int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
     if (TopMGProcess(arguments) != 0) {
       return 1;
     }
+    cleanTopmgDir(ori_db_file_name, spec_file_lst[k], keep_temp_files);
   }
 
   if (arguments["combinedOutputName"] != "") {
+    std::vector<std::string> raw_file_list;
+    for (size_t k = 0; k < spec_file_lst.size(); k++) {
+      std::string raw_file_name = spec_file_lst[k].substr(0, spec_file_lst[k].find("_ms2.msalign"));
+      raw_file_list.push_back(raw_file_name);
+    }
     std::string para_str = "";
     std::cout << "Merging files started." << std::endl;
     std::cout << "Merging msalign files started." << std::endl;
-    msalign_frac_merge::mergeMsalignFiles(spec_file_lst, full_combined_name + "_ms2.msalign", para_str);
+    msalign_frac_merge::mergeFractions(raw_file_list, full_combined_name, para_str); 
     std::cout << "Merging msalign files finished." << std::endl;
-    if (arguments["geneHTMLFolder"] == "true"){
-      std::cout << "Merging json files started." << std::endl;
-      DeconvJsonMergePtr json_merger 
-          = std::make_shared<DeconvJsonMerge>(spec_file_lst, full_combined_name);
-      json_merger->process();
-      json_merger = nullptr;
-      std::cout << "Merging json files finished." << std::endl;
-    }
-	if (arguments["useFeatureFile"] == "true") {//only when feature files are being used
+
+    if (arguments["useFeatureFile"] == "true") {//only when feature files are being used
       std::cout << "Merging feature files started." << std::endl;
-      feature_merge::process(spec_file_lst, full_combined_name, para_str);
+      feature_merge::process(raw_file_list, full_combined_name, para_str);
       std::cout << "Merging feature files finished." << std::endl;
     }
     // merge TOP files
     std::cout << "Merging identification files started." << std::endl;
     std::vector<std::string> prsm_file_lst(spec_file_lst.size());
     for (size_t i = 0; i < spec_file_lst.size(); i++) {
-      prsm_file_lst[i] = file_util::basename(spec_file_lst[i]) + ".topmg_prsm"; 
+      prsm_file_lst[i] = file_util::basename(spec_file_lst[i]) + ".topmg_raw_prsm"; 
     }
-    int N = 1000000;
-    prsm_util::mergePrsmFiles(prsm_file_lst, N , full_combined_name + "_ms2.topmg_prsm");
+    prsm_util::mergePrsmFiles(prsm_file_lst, SpPara::getMaxSpecNumPerFile(), 
+                              SpPara::getMaxFeatureNumPerFile(),
+                              full_combined_name + "_ms2.topmg_raw_prsm");
     std::cout << "Merging identification files finished." << std::endl;
     std::cout << "Merging files - finished." << std::endl;
 
     std::string sp_file_name = full_combined_name + "_ms2.msalign";
     arguments["spectrumFileName"] = sp_file_name;
     arguments["startTime"] = combined_start_time;
+    // do not generate html files for combined file
+    arguments["geneHTMLFolder"] = "false";
     TopMG_post(arguments);
-  }
-
-  bool keep_temp_files = (arguments["keepTempFiles"] == "true");
-  std::cout << "Deleting temporary files - started." << std::endl;
-  std::string ori_db_file_name = arguments["oriDatabaseFileName"];
-
-  for (size_t k = 0; k < spec_file_lst.size(); k++) {
-    std::string sp_file_name = spec_file_lst[k];
     cleanTopmgDir(ori_db_file_name, sp_file_name, keep_temp_files);
   }
 
-  if (arguments["combinedOutputName"] != "") {
-    std::string sp_file_name = full_combined_name + "_ms2.msalign";
-    cleanTopmgDir(ori_db_file_name, sp_file_name, keep_temp_files);
-  }
-  std::cout << "Deleting temporary files - finished." << std::endl; 
 
   base_data::release();
 

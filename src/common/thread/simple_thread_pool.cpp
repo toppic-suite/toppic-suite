@@ -18,13 +18,13 @@
 namespace toppic {
 
 SimpleThreadPool::SimpleThreadPool(int thread_num) :
-    terminate_(false), stopped_(false), idle_thread_num_(0) {
-      for (int i = 0; i < thread_num; i++) {
-        ThreadPtr thread_ptr = std::make_shared<boost::thread>(&SimpleThreadPool::Invoke, this);
-        ToppicThreadPtr toppic_thread_ptr = std::make_shared<ToppicThread>(i, thread_ptr);
-        thread_ptr_vec_.emplace_back(toppic_thread_ptr);
-      }
+  terminate_(false), stopped_(false), idle_thread_num_(0) {
+    for (int i = 0; i < thread_num; i++) {
+      ThreadPtr thread_ptr = std::make_shared<boost::thread>(&SimpleThreadPool::Invoke, this);
+      ToppicThreadPtr toppic_thread_ptr = std::make_shared<ToppicThread>(i, thread_ptr);
+      thread_ptr_vec_.emplace_back(toppic_thread_ptr);
     }
+  }
 
 void SimpleThreadPool::Enqueue(std::function<void()> f) {
   // Scope based locking.
@@ -90,7 +90,7 @@ void SimpleThreadPool::ShutDown() {
   }
 
   // Empty workers vector.
-  thread_ptr_vec_.empty();
+  thread_ptr_vec_.clear();
 
   // Indicate that the pool has been shut down.
   stopped_ = true;

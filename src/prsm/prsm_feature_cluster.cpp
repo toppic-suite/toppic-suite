@@ -123,8 +123,10 @@ void setProteoClusterId(PrsmStrPtrVec& prsm_ptrs,
   }
   std::cout << std::endl;
   for (size_t i = 0; i < merged_clusters.size(); i++) {
+    double inte = prsm_util::compClusterInte(merged_clusters[i]);
     for (size_t j = 0; j < merged_clusters[i].size(); j++) {
-      merged_clusters[i][j]->setClusterId(i);
+      merged_clusters[i][j]->setProteoClusterId(i);
+      merged_clusters[i][j]->setProteoInte(inte);
     }
   }
 }
@@ -146,6 +148,7 @@ void process(const std::string &spec_file_name,
             PrsmStr::cmpEValueIncProtInc);
 
   setProtId(filtered_prsm_ptrs);
+  // find proteoform clusters and add proteoform id and intensity information
   setProteoClusterId(filtered_prsm_ptrs, prec_error_tole);
   std::sort(filtered_prsm_ptrs.begin(), filtered_prsm_ptrs.end(), 
             PrsmStr::cmpSpecIncPrecIncEvalueIncProtInc);

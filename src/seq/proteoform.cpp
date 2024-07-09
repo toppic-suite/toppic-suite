@@ -69,6 +69,7 @@ void Proteoform::parseXml(XmlDOMElement* element, ProteoformPtr form_ptr) {
   start_pos_ = xml_dom_util::getIntChildValue(element, "start_pos", 0);
   end_pos_ = xml_dom_util::getIntChildValue(element, "end_pos", 0);
   proteo_cluster_id_ = xml_dom_util::getIntChildValue(element, "proteo_cluster_id", 0);
+  proteo_inte_ = xml_dom_util::getDoubleChildValue(element, "proteo_inte", 0);
   prot_id_ = xml_dom_util::getIntChildValue(element, "prot_id", 0);
 
   // Get protein N-terminal modification
@@ -332,6 +333,8 @@ void Proteoform::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
   xml_doc->addElement(element, "end_pos", str.c_str());
   str = str_util::toString(proteo_cluster_id_);
   xml_doc->addElement(element, "proteo_cluster_id", str.c_str());
+  str = str_util::toString(proteo_inte_);
+  xml_doc->addElement(element, "proteo_inte", str.c_str());
   str = str_util::toString(prot_id_);
   xml_doc->addElement(element, "prot_id", str.c_str());
   //The following three elements are used in prsm_str

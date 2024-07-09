@@ -45,9 +45,11 @@ class PrsmStr {
 
   int getProteoformEndPos() {return proteoform_end_pos_;}
 
-  int getClusterId() {return cluster_id_;}
+  int getProteoClusterId() {return proteo_cluster_id_;}
 
   int getProtId() {return prot_id_;}
+
+  int getProteoInte() {return proteo_inte_;}
 
   int getPrecursorId() {return precursor_id_;}
 
@@ -81,7 +83,7 @@ class PrsmStr {
 
   std::vector<MassShiftPtr> getMassShiftVec() {return mass_shift_vec_;}
 
-  int getSampleId() {return sample_id_;}
+  //int getSampleId() {return sample_id_;}
 
   double getTimeApex() {return time_apex_;}
 
@@ -89,7 +91,9 @@ class PrsmStr {
 
   void setSpectrumId(int id);
 
-  void setClusterId(int id);
+  void setProteoClusterId(int id);
+
+  void setProteoInte(double inte);
 
   void setProtId(int id);
 
@@ -141,7 +145,9 @@ class PrsmStr {
 
   std::string seq_desc_;
 
-  int cluster_id_;
+  int proteo_cluster_id_;
+
+  double proteo_inte_;
 
   int prot_id_;
 
@@ -179,9 +185,10 @@ class PrsmStr {
 
   double proteoform_fdr_;
 
+
   std::vector<MassShiftPtr> mass_shift_vec_;
 
-  int sample_id_;
+  //int sample_id_;
 
   double time_apex_ = -1;
 };

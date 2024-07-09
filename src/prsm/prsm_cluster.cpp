@@ -121,7 +121,7 @@ void setClusterId(PrsmStrPtrVec& prsm_ptrs, double ppo) {
 
   for (size_t i = 0; i < clusters.size(); i++) {
     for (size_t j = 0; j < clusters[i].size(); j++) {
-      clusters[i][j]->setClusterId(i);
+      clusters[i][j]->setProteoClusterId(i);
     }
   }
 }

@@ -69,9 +69,11 @@ PrsmStr::PrsmStr(const std::vector<std::string> &str_vec) {
   line = prsm_util::getXmlLine(str_vec_, "<end_pos>");
   proteoform_end_pos_ = std::stoi(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<proteo_cluster_id>");
-  cluster_id_ = std::stoi(prsm_util::getValueStr(line));
+  proteo_cluster_id_ = std::stoi(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<prot_id>");
   prot_id_ = std::stoi(prsm_util::getValueStr(line));
+  line = prsm_util::getXmlLine(str_vec_, "<proteo_inte>");
+  proteo_inte_ = std::stod(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<unexpected_ptm_num>");
   unexpected_ptm_num_ = std::stoi(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<variable_ptm_num>");
@@ -151,11 +153,18 @@ void PrsmStr::setPrecursorId(int id) {
   precursor_id_ = id;
 }
 
-void PrsmStr::setClusterId(int id) {
+void PrsmStr::setProteoClusterId(int id) {
   int i = getXmlLineIndex(str_vec_, "<proteo_cluster_id>");
   str_vec_[i] = "<proteo_cluster_id>" + str_util::toString(id) + "</proteo_cluster_id>";
-  cluster_id_ = id;
+  proteo_cluster_id_ = id;
 }
+
+void PrsmStr::setProteoInte(double inte) {
+  int i = getXmlLineIndex(str_vec_, "<proteo_inte>");
+  str_vec_[i] = "<proteo_inte>" + str_util::toString(inte) + "</proteo_inte>";
+  proteo_inte_ = inte;
+}
+
 
 void PrsmStr::setProtId(int id) {
   int i = getXmlLineIndex(str_vec_, "<prot_id>");
