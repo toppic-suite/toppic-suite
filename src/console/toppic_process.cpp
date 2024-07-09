@@ -383,7 +383,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     std::cout << "E-value computation - finished." << std::endl;
 
     std::cout << "Top PrSM selecting - started" << std::endl;
-    prsm_top_selector::process(sp_file_name, "toppic_evalue", "toppic_prsm", n_top);
+    prsm_top_selector::process(sp_file_name, "toppic_evalue", "toppic_raw_prsm", n_top);
     std::cout << "Top PrSM selecting - finished." << std::endl;
 
   } catch (const char* e) {
@@ -425,13 +425,13 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
       // TopFD msalign file with feature ID
       ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();
       prsm_feature_cluster::process(sp_file_name,
-                                    "toppic_prsm",
+                                    "toppic_raw_prsm",
                                     "toppic_cluster",
                                     form_error_tole);
     } 
     else {
       prsm_simple_cluster::process(db_file_name, sp_file_name,
-                                   "toppic_prsm", prsm_para_ptr->getFixModPtrVec(),
+                                   "toppic_raw_prsm", prsm_para_ptr->getFixModPtrVec(),
                                    "toppic_cluster", form_error_tole);
     }
     std::cout << "Finding PrSM clusters - finished." << std::endl;
@@ -595,7 +595,6 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
   bool keep_temp_files = (arguments["keepTempFiles"] == "true"); 
   std::string ori_db_file_name = arguments["oriDatabaseFileName"];
 
-  /*
   for (size_t k = 0; k < spec_file_lst.size(); k++) {
     std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));
     std::string start_time = buf;
@@ -606,7 +605,6 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
     }
     cleanToppicDir(ori_db_file_name, spec_file_lst[k], keep_temp_files);
   }
-  */
 
   if (arguments["combinedOutputName"] != "") {
     std::string merged_file_name = arguments["combinedOutputName"]; 
@@ -630,11 +628,11 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
     std::cout << "Merging identification files started." << std::endl;
     std::vector<std::string> prsm_file_lst(spec_file_lst.size());
     for (size_t i = 0; i < spec_file_lst.size(); i++) {
-      prsm_file_lst[i] = file_util::basename(spec_file_lst[i]) + ".toppic_prsm"; 
+      prsm_file_lst[i] = file_util::basename(spec_file_lst[i]) + ".toppic_raw_prsm"; 
     }
     prsm_util::mergePrsmFiles(prsm_file_lst, SpPara::getMaxSpecNumPerFile(), 
                               SpPara::getMaxFeatureNumPerFile(),
-                              full_combined_name + "_ms2.toppic_prsm");
+                              full_combined_name + "_ms2.toppic_raw_prsm");
     std::cout << "Merging identification files finished." << std::endl;
     std::cout << "Merging files - finished." << std::endl;
 
