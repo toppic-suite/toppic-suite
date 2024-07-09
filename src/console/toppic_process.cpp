@@ -76,26 +76,10 @@
 #include "visual/xml_generator.hpp"
 #include "visual/json_transformer.hpp"
 
+#include "console/console_util.hpp"
 #include "console/toppic_argument.hpp"
-namespace toppic {
 
-void copyTopMSV(std::map<std::string, std::string> &arguments) {
-  std::string spectrum_file_name = arguments["spectrumFileName"];
-  std::string base_name = file_util::basename(spectrum_file_name);
-  std::string base_name_short = base_name.substr(0, base_name.length() - 4);
-  std::string topmsv_dir = base_name_short + "_html" +  file_util::getFileSeparator() + "topmsv";
-  if (file_util::exists(topmsv_dir)) {
-    LOG_WARN("The TopMSV directory " << topmsv_dir << " exists!");
-    file_util::delDir(topmsv_dir);
-  }
-  if (!file_util::exists(base_name_short + "_html")){//if _html folder was not created with topfd
-    file_util::createFolder(base_name_short + "_html");
-  }
-  std::string resource_dir = arguments["resourceDir"];
-  // copy resources 
-  std::string from_path(resource_dir + file_util::getFileSeparator() + "topmsv");
-  file_util::copyDir(from_path, topmsv_dir);
-}
+namespace toppic {
 
 void cleanToppicDir(const std::string &fa_name, 
                     const std::string &sp_name,
@@ -500,7 +484,7 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
       xml_gene = nullptr;
       std::cout << "Generating PrSM XML files - finished." << std::endl;
 
-      copyTopMSV(arguments);
+      console_util::copyTopMSV(arguments);
   
       std::cout << "Converting PrSM XML files to JSON files - started." << std::endl;
       jsonTranslate(arguments, "toppic_prsm_cutoff");

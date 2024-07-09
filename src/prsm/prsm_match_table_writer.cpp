@@ -60,6 +60,7 @@ void PrsmMatchTableWriter::write() {
       << "Precursor mass" << delim
       << "Adjusted precursor mass" << delim
       << "Proteoform ID" << delim
+      << "Proteoform intensity" << delim
       << "Feature ID" << delim
       << "Feature intensity" << delim
       << "Feature score" << delim
@@ -175,7 +176,8 @@ void PrsmMatchTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
        << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecCharge() << delim
       << prsm_ptr->getOriPrecMass()<< delim
       << prsm_ptr->getAdjustedPrecMass() << delim
-      << prsm_ptr->getProteoformPtr()->getProteoClusterId() << delim;
+      << prsm_ptr->getProteoformPtr()->getProteoClusterId() << delim
+      << prsm_ptr->getProteoformPtr()->getProteoInte() << delim;
 
   if (prsm_ptr->getFracFeatureInte() > 0) {
     file << prsm_ptr->getFracFeatureId() << delim;
@@ -325,7 +327,8 @@ void PrsmMatchTableWriter::writePrsmStandardFormat(std::ofstream &file, PrsmPtr 
        << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecCharge() << delim
       << prsm_ptr->getOriPrecMass()<< delim
       << prsm_ptr->getAdjustedPrecMass() << delim
-      << prsm_ptr->getProteoformPtr()->getProteoClusterId() << delim;
+      << prsm_ptr->getProteoformPtr()->getProteoClusterId() << delim
+      << prsm_ptr->getProteoformPtr()->getProteoInte() << delim;
 
   if (prsm_ptr->getFracFeatureInte() > 0) {
     file << prsm_ptr->getFracFeatureId() << delim;

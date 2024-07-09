@@ -53,6 +53,8 @@ void mergePrsmFiles(const std::vector<std::string> & prsm_file_lst,
                     int max_feat_num_per_file,
                     const std::string & output_file);
 
+double compClusterInte(PrsmStrPtrVec prsm_list); 
+
 }  // namespace prsm_util
 
 }  // namespace toppic

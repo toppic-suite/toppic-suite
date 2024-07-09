@@ -175,6 +175,8 @@ class Prsm {
 
   double frac_feature_score_ = -1;
 
+  double time_apex_ = -1;
+
   double ori_prec_mass_;
   /* adjusted precursor mass */
   double adjusted_prec_mass_;
@@ -187,8 +189,6 @@ class Prsm {
   double fdr_ = -1;
 
   double proteoform_fdr_ = -1;
-
-  double time_apex_ = -1;
 
   int hit_cnt_ = 0;
 

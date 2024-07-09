@@ -228,6 +228,20 @@ void mergePrsmFiles(const std::vector<std::string> & prsm_file_lst,
   prsm_writer->close();
 }
 
+double compClusterInte(PrsmStrPtrVec prsm_list) {
+  double inte = 0;
+  std::set<int> feat_id_set;
+  for (size_t i = 0; i < prsm_list.size(); i++) {
+    PrsmStrPtr prsm_ptr = prsm_list[i];
+    int feat_id = prsm_ptr->getFracFeatureId();
+    if (feat_id_set.find(feat_id) == feat_id_set.end()) {
+      feat_id_set.insert(feat_id);
+      inte = inte + prsm_ptr->getFracFeatureInte();
+    }
+  }
+  return inte;
+}
+
 }  // namespace prsm_util
 
 }  // namespace toppic
