@@ -49,11 +49,19 @@ class PrsmStr {
 
   int getProtId() {return prot_id_;}
 
-  int getProteoInte() {return proteo_inte_;}
+  double getProteoInte() {return proteo_inte_;}
 
   int getPrecursorId() {return precursor_id_;}
 
   int getFracFeatureId() {return frac_feature_id_;}
+
+  double getFracFeatureInte() {return frac_feature_inte_;}
+
+  double getFracFeatureApexTime() {return frac_feature_apex_time_;}
+
+  double getFracFeatureMinTime() {return frac_feature_min_time_;}
+
+  double getFracFeatureMaxTime() {return frac_feature_max_time_;}
 
   int getUnexpectedPtmNum() {return unexpected_ptm_num_;}
 
@@ -62,8 +70,6 @@ class PrsmStr {
   std::string getProteoformMatchSeq() {return proteoform_match_seq_;}
 
   std::string getProteoformDbSeq() {return proteoform_db_seq_;}
-
-  double getFracFeatureInte() {return frac_feature_inte_;}
 
   double getMatchPeakNum() {return match_peak_num_;}
 
@@ -83,10 +89,6 @@ class PrsmStr {
 
   std::vector<MassShiftPtr> getMassShiftVec() {return mass_shift_vec_;}
 
-  //int getSampleId() {return sample_id_;}
-
-  double getTimeApex() {return time_apex_;}
-
   void setFileName(const std::string & fname);
 
   void setSpectrumId(int id);
@@ -105,14 +107,15 @@ class PrsmStr {
 
   void setFracFeatureScore(double score);
 
+  void setFracFeatureApexTime(double apex_time); 
+
+  void setFracFeatureMinTime(double min_time); 
+
+  void setFracFeatureMaxTime(double max_time); 
+
   void setFdr(double fdr);
 
   void setProteoformFdr(double proteoform_fdr);
-
-  void setTimeApex(double time_apex); 
-
-  // need to be reviewed
-  //void setSampleId(int sample_id)  {sample_id_ = sample_id;}
 
   static bool cmpEValueIncProtInc(const PrsmStrPtr &a, const PrsmStrPtr &b);
 
@@ -157,6 +160,12 @@ class PrsmStr {
 
   double frac_feature_inte_;
 
+  double frac_feature_apex_time_;
+
+  double frac_feature_min_time_;
+
+  double frac_feature_max_time_;
+
   int unexpected_ptm_num_;
 
   int variable_ptm_num_;
@@ -185,12 +194,8 @@ class PrsmStr {
 
   double proteoform_fdr_;
 
-
   std::vector<MassShiftPtr> mass_shift_vec_;
 
-  //int sample_id_;
-
-  double time_apex_ = -1;
 };
 
 typedef std::vector<PrsmStrPtr> PrsmStrPtrVec;

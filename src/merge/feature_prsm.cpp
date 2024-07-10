@@ -12,6 +12,7 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
 #include "merge/feature_prsm.hpp"
 
@@ -24,7 +25,12 @@ FeaturePrsm::FeaturePrsm(PrsmStrPtr prsm) {
   last_residue_ = prsm->getProteoformEndPos();
   proteoform_ = prsm->getProteoformMatchSeq();
   ms2_id_ = prsm->getSpectrumId();
-  prec_mass_ = prsm->getOriPrecMass(); 
+  prec_mass_ = prsm->getOriPrecMass();
+  proteo_id_ = prsm->getProteoClusterId();
+  proteo_inte_ = prsm->getProteoInte();
+  min_time_ = prsm->getFracFeatureMinTime();
+  max_time_ = prsm->getFracFeatureMaxTime();
+  apex_time_ = prsm->getFracFeatureApexTime();
 }
 
 }

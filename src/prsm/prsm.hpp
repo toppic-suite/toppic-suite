@@ -53,6 +53,12 @@ class Prsm {
 
   double getFracFeatureScore() {return frac_feature_score_;}
 
+  double getFracFeatureApexTime() {return frac_feature_apex_time_;}
+
+  double getFracFeatureMinTime() {return frac_feature_min_time_;}
+
+  double getFracFeatureMaxTime() {return frac_feature_max_time_;}
+
   double getOriPrecMass() {return ori_prec_mass_;}
 
   double getAdjustedPrecMass() {return adjusted_prec_mass_;}
@@ -83,8 +89,6 @@ class Prsm {
 
   double getOneProtProb();
 
-  double getTimeApex() {return time_apex_;};
-
   int getHitCnt() {return hit_cnt_;}
 
   bool getIsExactMatch() {return is_exact_match_;}
@@ -105,8 +109,6 @@ class Prsm {
   void setSpectrumScan(std::string spectrum_scan) {spectrum_scan_ = spectrum_scan;}
 
   void setPrecurorId(int precursor_id) {precursor_id_ = precursor_id;}
-
-  void setFracFeatureScore(double score) {frac_feature_score_ = score;}
 
   void setOriPrecMass(double prec_mass) {ori_prec_mass_ = prec_mass;}
 
@@ -175,7 +177,11 @@ class Prsm {
 
   double frac_feature_score_ = -1;
 
-  double time_apex_ = -1;
+  double frac_feature_min_time_ = -1; 
+
+  double frac_feature_max_time_ = -1;
+
+  double frac_feature_apex_time_ = -1;
 
   double ori_prec_mass_;
   /* adjusted precursor mass */

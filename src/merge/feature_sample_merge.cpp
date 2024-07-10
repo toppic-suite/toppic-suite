@@ -42,17 +42,17 @@ FeatureSampleMerge::FeatureSampleMerge(const std::vector<std::string> &input_fil
 void normalizeTime(FeaturePrsmPtrVec &features) {
   double max_time = 1;
   for (size_t i = 0; i < features.size(); i++) {
-    if (features[i]->getTimeEnd() > max_time) {
-      max_time = features[i]->getTimeEnd();
+    if (features[i]->getMaxTime() > max_time) {
+      max_time = features[i]->getMaxTime();
     }
   } 
   for (size_t i = 0; i < features.size(); i++) {
-    double time_begin = features[i]->getTimeBegin()/max_time;
-    features[i]->setAlignTimeBegin(time_begin);
-    double time_end = features[i]->getTimeEnd()/max_time;
-    features[i]->setAlignTimeEnd(time_end);
-    double time_apex = features[i]->getTimeApex()/max_time;
-    features[i]->setAlignTimeApex(time_apex);
+    double align_min_time = features[i]->getMinTime()/max_time;
+    features[i]->setAlignMinTime(align_min_time);
+    double align_max_time = features[i]->getMaxTime()/max_time;
+    features[i]->setAlignMaxTime(align_max_time);
+    double align_apex_time = features[i]->getApexTime()/max_time;
+    features[i]->setAlignApexTime(align_apex_time);
   }
 }
 
@@ -105,15 +105,15 @@ inline CellPtrVec2D initCells(size_t a_size, size_t b_size) {
 }
 
 int findMatch(FeaturePrsmPtr a, FeaturePrsmPtrVec &second, size_t b_index, double mass_tole) {
-  double time_tole = 0.02;
-  double a_mass = a->getMonoMass();
+  double time_tole = 0.1;
+  double a_mass = a->getPrecMass();
   //if (mass_tole < 0.01) {
   //  mass_tole = 0.01;
   //}
-  double b_time = second[b_index]->getAlignTimeApex();
+  double b_time = second[b_index]->getAlignApexTime();
   for (int i = b_index; i >= 0; i--) {
-    double mass = second[i]->getMonoMass();
-    double time = second[i]->getAlignTimeApex();
+    double mass = second[i]->getPrecMass();
+    double time = second[i]->getAlignApexTime();
     if (b_time - time > time_tole) {
       break;
     }
@@ -123,8 +123,8 @@ int findMatch(FeaturePrsmPtr a, FeaturePrsmPtrVec &second, size_t b_index, doubl
     }
   }
   for (size_t i = b_index; i < second.size(); i++) {
-    double mass = second[i]->getMonoMass();
-    double time = second[i]->getAlignTimeApex();
+    double mass = second[i]->getPrecMass();
+    double time = second[i]->getAlignApexTime();
     if (time - b_time > time_tole) {
       break;
     }
@@ -156,7 +156,7 @@ void sampleAlignTime(FeaturePrsmPtrVec &first, FeaturePrsmPtrVec &second,
       int pos = findMatch(a[i-1], b, j-1, mass_tole); 
       // if there is a match
       if (pos >= 0) {
-        double inte = a[i-1]->getIntensity();
+        double inte = a[i-1]->getProteoInte();
         double log_inte =  std::log10(inte + 1);
         diag_sim += log_inte;
       }
@@ -174,29 +174,37 @@ void sampleAlignTime(FeaturePrsmPtrVec &first, FeaturePrsmPtrVec &second,
       }
     }
   }
+  /*
+  for (size_t i = 0; i < a_size; i++) {
+    LOG_ERROR("A " << i << " time " << a[i]->getAlignApexTime());
+  }
+  for (size_t i = 0; i < b_size; i++) {
+    LOG_ERROR("B " << i << " time " << b[i]->getAlignApexTime());
+  }
+  */
   //backtracking
   size_t i = a_size;
   size_t j = b_size;
   std::pair<double,double> last_pair(1,1);
   time_pairs.push_back(last_pair);
   while (i > 0 && j > 0) {
-    double a_time = a[i-1]->getAlignTimeApex();
-    double b_time = b[i-1]->getAlignTimeApex();
-    std::pair<double, double>time_pair(a_time,b_time);
-    time_pairs.push_back(time_pair);
     int pre = cell_2d[i][j]->pre_;
     if (pre == 2) {// diag
       int pos = findMatch(a[i-1], b, j-1, mass_tole); 
       if (pos >= 0) {
+        double a_time = a[i-1]->getAlignApexTime();
+        double b_time = b[pos]->getAlignApexTime();
+        std::pair<double, double>time_pair(a_time,b_time);
+        time_pairs.push_back(time_pair);
         LOG_DEBUG("i " << (i-1) 
-                  << " time " << a[i-1]->getTimeApex() 
-                  << " mass " << a[i-1]->getMonoMass() 
-                  << " intensity " << a[i-1]->getIntensity() 
+                  << " time " << a[i-1]->getAlignApexTime() 
+                  << " mass " << a[i-1]->getPrecMass() 
+                  << " intensity " << a[i-1]->getProteoInte() 
                   << " j " << (j-1) 
                   << " j " << pos 
-                  << " time " << b[pos]->getTimeApex() 
-                  << " mass " << b[pos]->getMonoMass() 
-                  << " intensity " << b[pos]->getIntensity()); 
+                  << " time " << b[pos]->getAlignApexTime() 
+                  << " mass " << b[pos]->getPrecMass() 
+                  << " intensity " << b[pos]->getProteoInte()); 
       }
       i--;
       j--;
@@ -217,6 +225,7 @@ double findAlignTime(double time, std::vector<std::pair<double,double>> &time_pa
   for (size_t i = 0; i < time_pairs.size() - 1; i++) {
     double a = time_pairs[i].second;
     double b = time_pairs[i+1].second;
+    LOG_DEBUG("a " << a  << " b " << b << " time " << time);
     if (time >= a && time <= b) {
       double align_a = time_pairs[i].first;
       double align_b = time_pairs[i+1].first;
@@ -224,7 +233,9 @@ double findAlignTime(double time, std::vector<std::pair<double,double>> &time_pa
         return align_a;
       }
       else {
-        return align_a + (align_b - align_a) * (time-a)/(b-a);
+        double align_time  = align_a + (align_b - align_a) * (time-a)/(b-a);
+        LOG_DEBUG("time " << time   << " align time  " << align_time );
+        return align_time;
       }
     }
   }
@@ -235,12 +246,13 @@ double findAlignTime(double time, std::vector<std::pair<double,double>> &time_pa
 void setAlignTime(FeaturePrsmPtrVec &features, 
                   std::vector<std::pair<double,double>> &time_pairs) {
   for (size_t i = 0; i < features.size(); i++) {
-    double time_begin = findAlignTime(features[i]->getAlignTimeBegin(), time_pairs);
-    features[i]->setAlignTimeBegin(time_begin);
-    double time_end = findAlignTime(features[i]->getAlignTimeEnd(), time_pairs);
-    features[i]->setAlignTimeEnd(time_end);
-    double time_apex = findAlignTime(features[i]->getAlignTimeApex(), time_pairs);
-    features[i]->setAlignTimeApex(time_apex);
+    double time_begin = findAlignTime(features[i]->getAlignMinTime(), time_pairs);
+    features[i]->setAlignMinTime(time_begin);
+    double time_end = findAlignTime(features[i]->getAlignMaxTime(), time_pairs);
+    features[i]->setAlignMaxTime(time_end);
+    double time_apex = findAlignTime(features[i]->getAlignApexTime(), time_pairs);
+    LOG_DEBUG("ori align time " << features[i]->getAlignApexTime() << " normalized " << time_apex); 
+    features[i]->setAlignApexTime(time_apex);
   }
 }
 
@@ -250,16 +262,16 @@ FeaturePrsmPtr findMatchFeature(FeaturePrsmPtr feature, FeaturePrsmPtrVec &featu
   double time_tole = 0.3;
   double strict_mass_tole = 0.01;
   double strict_time_tole = 0.01;
-  double cur_mass = feature->getMonoMass();
-  double cur_time = feature->getAlignTimeApex();
+  double cur_mass = feature->getPrecMass();
+  double cur_time = feature->getAlignApexTime();
   std::string cur_prot = feature->getProtName();
   for (size_t i = 0; i < features.size(); i++) {
     if (features[i] == nullptr) {
       continue;
     }
     std::string prot = features[i]->getProtName();
-    double mass = features[i]->getMonoMass();
-    double time = features[i]->getAlignTimeApex();
+    double mass = features[i]->getPrecMass();
+    double time = features[i]->getAlignApexTime();
     if (cur_prot == prot) {
       if (abs(time-cur_time) <= time_tole && abs(mass - cur_mass) <= mass_tole) {
         FeaturePrsmPtr result = features[i];
@@ -314,7 +326,10 @@ void getFeatureTable(FeaturePrsmPtrVec& all_features, FeaturePrsmPtrVec2D& featu
         cur_row[j] = all_features[i];
       }
       else {
-        cur_row[j] = findMatchFeature(all_features[i], features_2d[j], mass_tole);
+        FeaturePrsmPtr feature_ptr = findMatchFeature(all_features[i], features_2d[j], mass_tole);
+        if (feature_ptr != nullptr && !featureUsed(feature_ptr, table)) {
+          cur_row[j] = feature_ptr;
+        }
       }
     }
     table.push_back(cur_row);
@@ -334,12 +349,11 @@ void FeatureSampleMerge::outputTable(FeaturePrsmPtrVec2D &table,
     << "Last residue" << delim
     << "Proteoform" << delim
     << "Precursor mass" << delim
-    << "# matched samples" << delim
-    << "# matched samples with MS/MS ID" << delim;
+    << "# matched samples" << delim;
+    //<< "# matched samples with MS/MS ID" << delim;
 
   for (int i = 0; i < sample_num; i++) {
     file 
-      << input_file_names_[i] << " Match type" << delim
       << input_file_names_[i] << " Abundance" << delim
       << input_file_names_[i] << " Spectrum id" << delim
       << input_file_names_[i] << " Retention time begin" << delim
@@ -367,32 +381,35 @@ void FeatureSampleMerge::outputTable(FeaturePrsmPtrVec2D &table,
         }
       }
     }
-    file << sample_match_num << delim << sample_id_match_num << delim;
+    file << sample_match_num << delim;
+    //file << sample_id_match_num << delim;
     if (sample_match_num == sample_num) {
       match_num = match_num + 1;
     }
     for (int j = 0; j < sample_num; j++) {
       FeaturePrsmPtr sample_feature = table[i][j];
       if (sample_feature == nullptr) {
-        file << "No match" << delim << delim << delim << delim << delim << delim;
+        file << delim << delim << delim << delim << delim;
       }
       else {
+        /*
         if (sample_feature->getMs2Id()>= 0) {
           file << "Match with MS/MS ID" << delim;
         }
         else {
           file << "Match without MS/MS ID" << delim; 
         }
-        file <<  std::setprecision(3) << std::scientific << sample_feature->getIntensity() << delim;
+        */
+        file <<  std::setprecision(3) << std::scientific << sample_feature->getProteoInte() << delim;
         if (sample_feature->getMs2Id()>= 0) {
           file << std::fixed << sample_feature->getMs2Id() << delim;
         }
         else {
           file << std::fixed << delim;
         }
-        file << sample_feature->getTimeBegin() << delim
-          << sample_feature->getTimeEnd() << delim
-          << sample_feature->getAlignTimeApex() << delim;
+        file << sample_feature->getMinTime() << delim
+          << sample_feature->getMaxTime() << delim
+          << sample_feature->getAlignApexTime() << delim;
       }
     }
     file << std::endl;

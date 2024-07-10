@@ -135,8 +135,12 @@ XmlDOMElement* Prsm::toXmlElement(XmlDOMDocument* xml_doc) {
   xml_doc->addElement(element, "frac_feature_inte", str.c_str());
   str = str_util::toString(frac_feature_score_);
   xml_doc->addElement(element, "frac_feature_score", str.c_str());
-  str = str_util::toString(time_apex_);
-  xml_doc->addElement(element, "fraction_feature_time_apex", str.c_str());
+  str = str_util::toString(frac_feature_apex_time_);
+  xml_doc->addElement(element, "frac_feature_apex_time", str.c_str());
+  str = str_util::toString(frac_feature_min_time_);
+  xml_doc->addElement(element, "frac_feature_min_time", str.c_str());
+  str = str_util::toString(frac_feature_max_time_);
+  xml_doc->addElement(element, "frac_feature_max_time", str.c_str());
   proteoform_ptr_->appendXml(xml_doc, element);
   if (expected_value_ptr_ != nullptr) {
     expected_value_ptr_->appendXml(xml_doc, element);
@@ -158,6 +162,9 @@ void Prsm::parseXml(XmlDOMElement *element) {
   frac_feature_id_ = xml_dom_util::getIntChildValue(element, "frac_feature_id", 0);
   frac_feature_inte_ = xml_dom_util::getDoubleChildValue(element, "frac_feature_inte", 0);
   frac_feature_score_ = xml_dom_util::getDoubleChildValue(element, "frac_feature_score", 0);
+  frac_feature_apex_time_ = xml_dom_util::getDoubleChildValue(element, "frac_feature_apex_time", 0);
+  frac_feature_min_time_ = xml_dom_util::getDoubleChildValue(element, "frac_feature_min_time", 0);
+  frac_feature_max_time_ = xml_dom_util::getDoubleChildValue(element, "frac_feature_max_time", 0);
   spectrum_num_ = xml_dom_util::getIntChildValue(element, "spectrum_number", 0);
   ori_prec_mass_ = xml_dom_util::getDoubleChildValue(element, "ori_prec_mass", 0);
   adjusted_prec_mass_ = xml_dom_util::getDoubleChildValue(element, "adjusted_prec_mass", 0);
@@ -165,7 +172,6 @@ void Prsm::parseXml(XmlDOMElement *element) {
   proteoform_fdr_ = xml_dom_util::getDoubleChildValue(element, "proteoform_fdr", 0);
   match_peak_num_ = xml_dom_util::getDoubleChildValue(element, "match_peak_num", 0);
   match_fragment_num_ = xml_dom_util::getDoubleChildValue(element, "match_fragment_num", 0);
-  time_apex_ = xml_dom_util::getDoubleChildValue(element, "fraction_feature_time_apex", 0);
 
   int prob_count = xml_dom_util::getChildCount(element, "extreme_value");
   if (prob_count != 0) {
