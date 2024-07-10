@@ -186,7 +186,7 @@ void PrsmMatchTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
     str_stream << prsm_ptr->getFracFeatureInte();
     file << str_stream.str() << delim;
     file << prsm_ptr->getFracFeatureScore() << delim;
-    file << prsm_ptr->getTimeApex() << delim;
+    file << prsm_ptr->getFracFeatureApexTime() << delim;
   } else {
     file << empty_str << delim;
     file << empty_str << delim;
@@ -337,7 +337,7 @@ void PrsmMatchTableWriter::writePrsmStandardFormat(std::ofstream &file, PrsmPtr 
     str_stream << prsm_ptr->getFracFeatureInte();
     file << str_stream.str() << delim;
     file << prsm_ptr->getFracFeatureScore() << delim;
-    file << prsm_ptr->getTimeApex() << delim;
+    file << prsm_ptr->getFracFeatureApexTime() << delim;
   } else {
     file << empty_str << delim;
     file << empty_str << delim;

@@ -35,6 +35,12 @@ PrsmStr::PrsmStr(const std::vector<std::string> &str_vec) {
   frac_feature_id_ = std::stoi(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<frac_feature_inte>");
   frac_feature_inte_ = std::stod(prsm_util::getValueStr(line));
+  line = prsm_util::getXmlLine(str_vec_, "<frac_feature_apex_time>");
+  frac_feature_apex_time_ =  std::stod(prsm_util::getValueStr(line));
+  line = prsm_util::getXmlLine(str_vec_, "<frac_feature_min_time>");
+  frac_feature_min_time_ =  std::stod(prsm_util::getValueStr(line));
+  line = prsm_util::getXmlLine(str_vec_, "<frac_feature_max_time>");
+  frac_feature_max_time_ =  std::stod(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<ori_prec_mass>");
   ori_prec_mass_ = std::stod(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<adjusted_prec_mass>");
@@ -49,8 +55,6 @@ PrsmStr::PrsmStr(const std::vector<std::string> &str_vec) {
   match_frag_num_ = std::stod(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<norm_match_fragment_num>");
   norm_match_frag_num_ = std::stod(prsm_util::getValueStr(line));
-  line = prsm_util::getXmlLine(str_vec_, "<fraction_feature_time_apex>");
-  time_apex_ =  std::stod(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<e_value>");
   if (line == "") {
     e_value_ = 0.0;
@@ -70,10 +74,10 @@ PrsmStr::PrsmStr(const std::vector<std::string> &str_vec) {
   proteoform_end_pos_ = std::stoi(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<proteo_cluster_id>");
   proteo_cluster_id_ = std::stoi(prsm_util::getValueStr(line));
-  line = prsm_util::getXmlLine(str_vec_, "<prot_id>");
-  prot_id_ = std::stoi(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<proteo_inte>");
   proteo_inte_ = std::stod(prsm_util::getValueStr(line));
+  line = prsm_util::getXmlLine(str_vec_, "<prot_id>");
+  prot_id_ = std::stoi(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<unexpected_ptm_num>");
   unexpected_ptm_num_ = std::stoi(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<variable_ptm_num>");
@@ -146,6 +150,23 @@ void PrsmStr::setFracFeatureScore(double score) {
   str_vec_[i] = "<frac_feature_score>" + str_util::toString(score) + "</frac_feature_score>";
 }
 
+void PrsmStr::setFracFeatureApexTime(double apex_time) {
+  int i = getXmlLineIndex(str_vec_, "<frac_feature_apex_time>");
+  str_vec_[i] = "<frac_feature_apex_time>" + str_util::toString(apex_time) + "</frac_feature_apex_time>";
+  frac_feature_apex_time_ = apex_time; 
+}
+
+void PrsmStr::setFracFeatureMinTime(double min_time) {
+  int i = getXmlLineIndex(str_vec_, "<frac_feature_min_time>");
+  str_vec_[i] = "<frac_feature_min_time>" + str_util::toString(min_time) + "</frac_feature_min_time>";
+  frac_feature_min_time_ = min_time; 
+}
+
+void PrsmStr::setFracFeatureMaxTime(double max_time) {
+  int i = getXmlLineIndex(str_vec_, "<frac_feature_max_time>");
+  str_vec_[i] = "<frac_feature_max_time>" + str_util::toString(max_time) + "</frac_feature_max_time>";
+  frac_feature_max_time_ = max_time; 
+}
 
 void PrsmStr::setPrecursorId(int id) {
   int i = getXmlLineIndex(str_vec_, "<precursor_id>");
@@ -172,12 +193,6 @@ void PrsmStr::setProtId(int id) {
   prot_id_ = id;
 }
 
-void PrsmStr::setTimeApex(double time_apex) {
-  int i = getXmlLineIndex(str_vec_, "<fraction_feature_time_apex>");
-  str_vec_[i] = "<fraction_feature_time_apex>" + str_util::toString(time_apex) + "</fraction_feature_time_apex>";
-  time_apex_ = time_apex; 
-}
-
 
 bool PrsmStr::isSameSeqAndMass(const PrsmStrPtr &a, const PrsmStrPtr &b, double ppo) {
   if (a->getSeqName() != b->getSeqName()) {
@@ -200,7 +215,7 @@ bool PrsmStr::isSimpleMatch(const PrsmStrPtr &a, const PrsmStrPtr &b, double tol
   if (a->getSeqName() != b->getSeqName()) {
     return false;
   }
-  if (std::abs(a->getAdjustedPrecMass() - b->getAdjustedPrecMass()) > tolerance) {
+  if (std::abs(a->getOriPrecMass() - b->getOriPrecMass()) > tolerance) {
     return false;
   }
   return true;

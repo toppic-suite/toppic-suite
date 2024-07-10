@@ -43,7 +43,6 @@ void PrsmXmlWriter::close() {
 
 void PrsmXmlWriter::write(PrsmStrPtr prsm_str_ptr) {
   std::vector<std::string> strs = prsm_str_ptr->getStrVec();
-  prsm_util::setValueStr(strs, "<fraction_feature_time_apex>", str_util::toString(prsm_str_ptr->getTimeApex()));
   for (size_t i = 0; i < strs.size(); i++) {
     file_ << strs[i] << std::endl;
   }

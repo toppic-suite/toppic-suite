@@ -42,41 +42,38 @@ class FeaturePrsm {
 
   int getMs2Id() {return ms2_id_;}
 
+  double getAlignMinTime() {return align_min_time_;}
+
+  double getAlignMaxTime() {return align_max_time_;}
+
+  double getAlignApexTime() {return align_apex_time_;}
+
   double getPrecMass() {return prec_mass_;}
 
-  double getAlignTimeBegin() {return align_time_begin_;}
+  double getProteoInte() {return proteo_inte_;}
 
-  double getAlignTimeEnd() {return align_time_end_;}
+  double getMinTime() {return min_time_;}
 
-  //double getAlignTimeMiddle() {return (align_time_begin_ + align_time_end_)/2;}
-  double getAlignTimeApex() {return align_time_apex_;}
+  double getMaxTime() {return max_time_;}
 
-  double getMonoMass() {return mono_mass_;}
-
-  double getIntensity() {return inte_;}
-
-  double getTimeBegin() {return time_begin_;}
-
-  double getTimeEnd() {return time_end_;}
-
-  double getTimeApex() {return time_apex_;}
+  double getApexTime() {return apex_time_;}
 
   void setSampleId(int sample_id) {sample_id_ = sample_id;}
 
-  void setAlignTimeBegin(double time_begin) {align_time_begin_ = time_begin;}
+  void setAlignMinTime(double min_time) {align_min_time_ = min_time;}
 
-  void setAlignTimeEnd(double time_end) {align_time_end_ = time_end;}
+  void setAlignMaxTime(double max_time) {align_max_time_ = max_time;}
 
-  void setAlignTimeApex(double time_apex) {align_time_apex_ = time_apex;}
+  void setAlignApexTime(double apex_time) {align_apex_time_ = apex_time;}
 
   static bool cmpMassInc(const FeaturePrsmPtr &a, const FeaturePrsmPtr &b) { 
-    return a->getMonoMass() < b->getMonoMass();}
+    return a->getPrecMass() < b->getPrecMass();}
 
   static bool cmpInteDec(const FeaturePrsmPtr &a, const FeaturePrsmPtr &b) { 
-    return a->getIntensity() > b->getIntensity();}
+    return a->getProteoInte() > b->getProteoInte();}
 
   static bool cmpTimeInc(const FeaturePrsmPtr &a, const FeaturePrsmPtr &b) { 
-    return a->getTimeApex() < b->getTimeApex();}
+    return a->getApexTime() < b->getApexTime();}
 
  private:
   std::string prot_name_;
@@ -85,20 +82,19 @@ class FeaturePrsm {
   int last_residue_;
   std::string proteoform_;
   int ms2_id_;
-  double prec_mass_;
-  double align_time_begin_;
-  double align_time_end_;
-  double align_time_apex_;
+  double align_min_time_;
+  double align_max_time_;
+  double align_apex_time_;
 
   int sample_id_;
 
   // new variable needed from prsm_str
-  double mono_mass_;
-  double inte_;
-  double time_end_;
-  double time_begin_;
-  double time_apex_;
+  double prec_mass_;
   int proteo_id_;
+  double proteo_inte_;
+  double max_time_;
+  double min_time_;
+  double apex_time_;
 };
 
 typedef std::vector<FeaturePrsmPtr> FeaturePrsmPtrVec;

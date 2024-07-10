@@ -189,7 +189,9 @@ void addFeatureInfoToPrsms(PrsmStrPtrVec &prsm_ptrs, const std::string & feature
       if (feature != nullptr) {
         prsm_ptrs[i]->setFracFeatureInte(feature->getFracFeatureInte());
         prsm_ptrs[i]->setFracFeatureScore(feature->getFracFeatureScore());
-        prsm_ptrs[i]->setTimeApex(feature->getFracFeatureApexTime());
+        prsm_ptrs[i]->setFracFeatureApexTime(feature->getFracFeatureApexTime());
+        prsm_ptrs[i]->setFracFeatureMinTime(feature->getFracFeatureMinTime());
+        prsm_ptrs[i]->setFracFeatureMaxTime(feature->getFracFeatureMaxTime());
       }
       else {
         LOG_ERROR("Spectrum " << spec_id << " does not have a feature!");
