@@ -12,13 +12,7 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef BOOST_SYSTEM_NO_DEPRECATED
-#define BOOST_SYSTEM_NO_DEPRECATED 1
-#endif
-
 #include <iomanip>
-
-#include "boost/thread/thread.hpp"
 
 #include "common/util/file_util.hpp"
 #include "common/xml/xml_dom_util.hpp"
@@ -76,6 +70,7 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["keepTempFiles"] = "false";
   arguments["keepDecoyResults"] = "false";
   arguments["geneHTMLFolder"] = "true";
+  arguments["combineResultOnly"] = "false";
 
   arguments["version"] = "";
   return arguments;
@@ -288,6 +283,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         ("keep-temp-files,k", "")
         ("keep-decoy-ids,K", "")
         ("skip-html-folder,g","")
+        ("combine-result-only,C","")
         ("filtering-result-number", po::value<std::string>(&filtering_result_num), "Filtering result number. Default value: 20.")
         ("database-file-name", po::value<std::string>(&database_file_name)->required(), "Database file name with its path.")
         ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), "Spectrum file name with its path.");
@@ -448,6 +444,11 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
     if (vm.count("skip-html-folder")) {
       arguments_["geneHTMLFolder"] = "false";
     }   
+
+    if (vm.count("combine-result-only")) {
+      arguments_["combineResultOnly"] = "true";
+    }   
+
 
     if (vm.count("filtering-result-number")) {
       arguments_["filteringResultNumber"] = filtering_result_num;
