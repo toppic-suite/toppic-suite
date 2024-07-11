@@ -12,10 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef BOOST_SYSTEM_NO_DEPRECATED
-#define BOOST_SYSTEM_NO_DEPRECATED 1
-#endif
-
 #include <iomanip>
 
 #include "common/base/mod_util.hpp"
