@@ -24,8 +24,6 @@
 #include "ms/mzml/mzml_ms_group_reader.hpp"
 #include "ms/feature/spec_feature_writer.hpp"
 #include "ms/feature/frac_feature_writer.hpp"
-#include "ms/feature/sample_feature_writer.hpp"
-#include "ms/feature/feature_util.hpp"
 #include "ms/msmap/ms_map.hpp"
 #include "topfd/common/topfd_para.hpp"
 #include "topfd/ecscore/para/ecscore_para.hpp"
