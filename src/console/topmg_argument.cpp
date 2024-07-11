@@ -12,17 +12,11 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef BOOST_SYSTEM_NO_DEPRECATED
-#define BOOST_SYSTEM_NO_DEPRECATED 1
-#endif
-
 #include <iomanip>
 #include <vector>
 #include <string>
 #include <set>
 #include <map>
-
-#include "boost/thread/thread.hpp"
 
 #include "common/util/file_util.hpp"
 #include "common/xml/xml_dom_util.hpp"

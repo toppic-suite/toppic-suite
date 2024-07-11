@@ -12,13 +12,7 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef BOOST_SYSTEM_NO_DEPRECATED
-#define BOOST_SYSTEM_NO_DEPRECATED 1
-#endif
-
 #include <iomanip>
-
-#include "boost/thread/thread.hpp"
 
 #include "common/util/file_util.hpp"
 #include "common/util/str_util.hpp"
