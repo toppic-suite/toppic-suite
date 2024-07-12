@@ -92,11 +92,7 @@ void cleanToppicDir(const std::string &fa_name,
   file_util::copyFile(sp_base + ".toppic_form_cutoff_form",
                       sp_base + "_toppic_proteoform.xml", overwrite);
   file_util::delFile(sp_base + "_toppic_prsm.xml");
-  std::string toppic_prsm_suffix = "toppic_prsm_cutoff";
-  if (file_util::exists(sp_base + ".toppic_prsm_cutoff_local")) {
-    toppic_prsm_suffix = "toppic_prsm_cutoff_local";
-  }
-  file_util::copyFile(sp_base + "." + toppic_prsm_suffix,
+  file_util::copyFile(sp_base + "." + "toppic_prsm_cutoff",
                       sp_base + "_toppic_prsm.xml", overwrite);
   if (!keep_temp_files) {
     file_util::cleanPrefix(sp_name, sp_base + ".msalign_");
@@ -120,8 +116,8 @@ void cleanToppicDir(const std::string &fa_name,
     file_util::cleanPrefix(sp_name, sp_base + ".toppic_evalue_");
     file_util::delFile(sp_base + ".toppic_cluster");
     file_util::delFile(sp_base + ".toppic_cluster_fdr");
+    file_util::delFile(sp_base + ".toppic_cluster_local");
     file_util::delFile(sp_base + ".toppic_prsm_cutoff");
-    file_util::delFile(sp_base + ".toppic_prsm_cutoff_local");
     file_util::delFile(sp_base + ".toppic_form_cutoff");
     file_util::delFile(sp_base + ".toppic_form_cutoff_form");
     file_util::delDir(sp_base + "_toppic_proteoform_cutoff_xml");
@@ -421,6 +417,45 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     std::cout << "Finding PrSM clusters - finished." << std::endl;
     std::string cur_suffix = "toppic_cluster";
 
+    if (localization) {
+      std::cout << "PTM characterization - started." << std::endl;
+      LocalMngPtr local_mng
+          = std::make_shared<LocalMng>(prsm_para_ptr,
+                                       std::stod(arguments["localThreshold"]),
+                                       arguments["localPtmFileName"],
+                                       min_shift_mass,
+                                       max_shift_mass,
+                                       cur_suffix,  
+                                       "toppic_cluster_local");
+      LocalProcessorPtr local_ptr = std::make_shared<LocalProcessor>(local_mng);
+      local_ptr->process();
+      local_ptr = nullptr;
+      std::cout << "PTM characterization - finished." << std::endl;
+      cur_suffix = "toppic_cluster_local";
+    }
+
+    std::time_t end = time(nullptr);
+    char buf[50];
+    std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&end));
+    arguments["endTime"] = buf;
+
+    std::string argu_str = ToppicArgument::outputTsvArguments(arguments);
+
+    if (arguments["outputRawPrsms"] == "true"){
+      std::cout << "Outputting Raw PrSM table - started." << std::endl;
+      PrsmMatchTableWriterPtr raw_table_out
+        = std::make_shared<PrsmMatchTableWriter>(prsm_para_ptr, argu_str, 
+                                                 cur_suffix, "_toppic_raw_prsm_single.tsv", false);
+      raw_table_out->write();
+
+      raw_table_out->setOutputName("_toppic_raw_prsm.tsv");
+      raw_table_out->setWriteMultiMatches(true);
+      raw_table_out->write();
+
+      raw_table_out = nullptr;
+      std::cout << "Outputting Raw PrSM table - finished." << std::endl;
+    }
+
     if (arguments["searchType"] == "TARGET+DECOY") {
       std::cout << "FDR computation - started. " << std::endl;
       prsm_fdr::process(sp_file_name, "toppic_cluster", "toppic_cluster_fdr", arguments["keepDecoyResults"]);
@@ -428,6 +463,7 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
       std::cout << "FDR computation - finished." << std::endl;
       cur_suffix = "toppic_cluster_fdr";
     }
+
 
     std::string cutoff_type = arguments["cutoffSpectralType"];
     std::cout << "PrSM filtering by " << cutoff_type << " - started." << std::endl;
@@ -437,30 +473,6 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
                                   "toppic_prsm_cutoff", cutoff_type, cutoff_value);
     std::cout << "PrSM filtering by " << cutoff_type << " - finished." << std::endl;
     cur_suffix = "toppic_prsm_cutoff";
-
-    if (localization) {
-      std::cout << "PTM characterization - started." << std::endl;
-      LocalMngPtr local_mng
-          = std::make_shared<LocalMng>(prsm_para_ptr,
-                                       std::stod(arguments["localThreshold"]),
-                                       arguments["localPtmFileName"],
-                                       min_shift_mass,
-                                       max_shift_mass,
-                                       "toppic_prsm_cutoff", 
-                                       "toppic_prsm_cutoff_local");
-      LocalProcessorPtr local_ptr = std::make_shared<LocalProcessor>(local_mng);
-      local_ptr->process();
-      local_ptr = nullptr;
-      std::cout << "PTM characterization - finished." << std::endl;
-      cur_suffix = "toppic_prsm_cutoff_local";
-    }
-
-    std::time_t end = time(nullptr);
-    char buf[50];
-    std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&end));
-    arguments["endTime"] = buf;
-
-    std::string argu_str = ToppicArgument::outputTsvArguments(arguments);
 
     std::cout << "Outputting PrSM table - started." << std::endl;
     PrsmMatchTableWriterPtr table_out

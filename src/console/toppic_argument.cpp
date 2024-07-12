@@ -71,6 +71,7 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["keepDecoyResults"] = "false";
   arguments["geneHTMLFolder"] = "true";
   arguments["combineResultOnly"] = "false";
+  arguments["outputRawPrsms"]="false";
 
   arguments["version"] = "";
   return arguments;
@@ -284,6 +285,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         ("keep-decoy-ids,K", "")
         ("skip-html-folder,g","")
         ("combine-result-only,C","")
+        ("output-raw-prsms,o","")
         ("filtering-result-number", po::value<std::string>(&filtering_result_num), "Filtering result number. Default value: 20.")
         ("database-file-name", po::value<std::string>(&database_file_name)->required(), "Database file name with its path.")
         ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), "Spectrum file name with its path.");
@@ -449,6 +451,9 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
       arguments_["combineResultOnly"] = "true";
     }   
 
+    if (vm.count("output-raw-prsms")) {
+      arguments_["outputRawPrsms"] = "true";
+    }   
 
     if (vm.count("filtering-result-number")) {
       arguments_["filteringResultNumber"] = filtering_result_num;
