@@ -9,12 +9,12 @@ SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../bin)
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   # Linux specific code
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unknown-pragmas -std=c++14 -Wl,-rpath=$ORIGIN/../lib/toppic,--disable-new-dtags -O3 -DWITHOUT_MZ5 -fPIC")
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unknown-pragmas -std=c++17 -Wl,-rpath=$ORIGIN/../lib/toppic,--disable-new-dtags -O3 -DWITHOUT_MZ5 -fPIC")
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   # Windows specific code
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unknown-pragmas -std=c++14 -O3 -DWITHOUT_MZ5 -fPIC -fpermissive")
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unknown-pragmas -std=c++17 -O3 -DWITHOUT_MZ5 -fPIC -fpermissive")
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
 # The options c++14 and mavx are set for the frugally-deep library
@@ -105,14 +105,16 @@ file(GLOB VISUAL_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/visual/*.cpp)
 
 # toppic console main
 file(GLOB TOPPIC_PROC_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_process.cpp
-		                  	    ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_argument.cpp)
+		                  	    ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_argument.cpp
+		                  	    ${CMAKE_CURRENT_SOURCE_DIR}/src/console/console_util.cpp)
 
 file(GLOB TOPPIC_CONSOLE_SRCS	${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic.cpp)
 
 # toppic gui main
 file(GLOB TOPPIC_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/toppic/*.cpp
 	                  		    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/toppic/*.qrc
-                            ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_argument.cpp)
+                            ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_argument.cpp
+		                  	    ${CMAKE_CURRENT_SOURCE_DIR}/src/console/console_util.cpp)
 
 # classes for topmg
 file(GLOB GRAPH_ALIGN_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/search/diag/*.cpp
@@ -126,14 +128,16 @@ file(GLOB MCMC_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/stat/count/*.cpp
 # topmg console main
 file(GLOB TOPMG_PROC_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmg_process.cpp
 	                  		    ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmg_argument.cpp
-                      			${CMAKE_CURRENT_SOURCE_DIR}/src/console/topindex_file_name.cpp)
+                      			${CMAKE_CURRENT_SOURCE_DIR}/src/console/topindex_file_name.cpp
+		                  	    ${CMAKE_CURRENT_SOURCE_DIR}/src/console/console_util.cpp)
 
 file(GLOB TOPMG_CONSOLE_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmg.cpp)
 
 # topmg gui main
 file(GLOB TOPMG_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topmg/*.cpp
 	                  		   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topmg/*.qrc
-                           ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmg_argument.cpp)
+                           ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmg_argument.cpp
+		                  	   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/console_util.cpp)
 
 # topdiff classes
 file(GLOB DIFF_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/merge/*.cpp)
@@ -262,8 +266,8 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows") 
 
-# xerces-c boost_system, boost_thread boost_iostreams boost_chrono pthread z are required by
-# ProteoWizard
+# xerces-c boost_file_system, boost_system, boost_thread boost_iostreams 
+# boost_chrono pthread z are required by ProteoWizard
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   target_link_libraries(topfd xerces-c boost_program_options
     boost_filesystem boost_system boost_thread boost_iostreams boost_chrono

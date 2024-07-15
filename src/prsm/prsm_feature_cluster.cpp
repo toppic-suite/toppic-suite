@@ -67,7 +67,7 @@ void setProteoClusterId(PrsmStrPtrVec& prsm_ptrs,
     for (size_t j = 0; j < clusters.size(); j++) {
       PrsmStrPtr ref_ptr = clusters[j][0];
       // if the same feature id
-      if (cur_ptr->getSampleFeatureId() == ref_ptr->getSampleFeatureId()) {
+      if (cur_ptr->getFracFeatureId() == ref_ptr->getFracFeatureId()) {
         clusters[j].push_back(cur_ptr);
         is_found = true;
         break;
@@ -91,7 +91,7 @@ void setProteoClusterId(PrsmStrPtrVec& prsm_ptrs,
       PrsmStrPtr ref_ptr = merged_clusters[j][0];
       // if the same protein and similar mass
       if (cur_ptr->getProtId() == ref_ptr->getProtId()) {
-        if (std::abs(cur_ptr->getAdjustedPrecMass() - ref_ptr->getAdjustedPrecMass()) 
+        if (std::abs(cur_ptr->getOriPrecMass() - ref_ptr->getOriPrecMass()) 
             <= prec_error_tole) {
           merged_clusters[j].insert(merged_clusters[j].end(),
                                     clusters[i].begin(), 
@@ -106,7 +106,7 @@ void setProteoClusterId(PrsmStrPtrVec& prsm_ptrs,
         // are the same and the proteoform masses are similar, the two
         // proteoforms are treated as one. 
         if (cur_ptr->getProteoformDbSeq() == ref_ptr->getProteoformDbSeq()
-            && std::abs(cur_ptr->getAdjustedPrecMass() - ref_ptr->getAdjustedPrecMass()) 
+            && std::abs(cur_ptr->getOriPrecMass() - ref_ptr->getOriPrecMass()) 
             <= prec_error_tole) {
           merged_clusters[j].insert(merged_clusters[j].end(),
                                     clusters[i].begin(), 
@@ -123,8 +123,10 @@ void setProteoClusterId(PrsmStrPtrVec& prsm_ptrs,
   }
   std::cout << std::endl;
   for (size_t i = 0; i < merged_clusters.size(); i++) {
+    double inte = prsm_util::compClusterInte(merged_clusters[i]);
     for (size_t j = 0; j < merged_clusters[i].size(); j++) {
-      merged_clusters[i][j]->setClusterId(i);
+      merged_clusters[i][j]->setProteoClusterId(i);
+      merged_clusters[i][j]->setProteoInte(inte);
     }
   }
 }
@@ -138,7 +140,7 @@ void process(const std::string &spec_file_name,
   PrsmStrPtrVec prsm_ptrs = prsm_reader_util::readAllPrsmStrsMatchSeq(input_file_name);
 
   std::string feature_file_name = base_name + ".feature";
-  prsm_util::addFeatureIDToPrsms(prsm_ptrs, feature_file_name);
+  prsm_util::addFeatureInfoToPrsms(prsm_ptrs, feature_file_name);
   // remove prsms without feature
   PrsmStrPtrVec filtered_prsm_ptrs;
   prsm_util::removePrsmsWithoutFeature(prsm_ptrs, filtered_prsm_ptrs);
@@ -146,6 +148,7 @@ void process(const std::string &spec_file_name,
             PrsmStr::cmpEValueIncProtInc);
 
   setProtId(filtered_prsm_ptrs);
+  // find proteoform clusters and add proteoform id and intensity information
   setProteoClusterId(filtered_prsm_ptrs, prec_error_tole);
   std::sort(filtered_prsm_ptrs.begin(), filtered_prsm_ptrs.end(), 
             PrsmStr::cmpSpecIncPrecIncEvalueIncProtInc);

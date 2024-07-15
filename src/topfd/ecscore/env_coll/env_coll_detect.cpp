@@ -24,8 +24,6 @@
 #include "ms/mzml/mzml_ms_group_reader.hpp"
 #include "ms/feature/spec_feature_writer.hpp"
 #include "ms/feature/frac_feature_writer.hpp"
-#include "ms/feature/sample_feature_writer.hpp"
-#include "ms/feature/feature_util.hpp"
 #include "ms/msmap/ms_map.hpp"
 #include "topfd/common/topfd_para.hpp"
 #include "topfd/ecscore/para/ecscore_para.hpp"
@@ -227,15 +225,17 @@ void process(TopfdParaPtr topfd_para_ptr) {
     frac_feature_writer::writeBatMassFeatures(batmass_file_name, frac_features);
   }
 
-  std::string output_file_name = output_base_name + "_" + "feature.xml";
-  frac_feature_writer::writeXmlFeatures(output_file_name, frac_features);
+  std::string frac_feat_xml_file_name = output_base_name + "_feature.xml";
+  frac_feature_writer::writeXmlFeatures(frac_feat_xml_file_name, frac_features);
+  std::string frac_feat_file_name = output_base_name + "_" + "ms1.feature";
+  frac_feature_writer::writeFeatures(frac_feat_file_name, frac_features);
 
-  SampleFeaturePtrVec sample_features;
-  feature_util::getSampleFeatures(sample_features, frac_features, ms2_features);
-  std::string sample_feature_file_name = output_base_name + "_"  + "ms1.feature";
-  sample_feature_writer::writeFeatures(sample_feature_file_name, sample_features);
-  output_file_name = output_base_name + "_"  + "ms2.feature";
-  spec_feature_writer::writeFeatures(output_file_name, ms2_features);
+  //SampleFeaturePtrVec sample_features;
+  //feature_util::getSampleFeatures(sample_features, frac_features, ms2_features);
+  //std::string sample_feature_file_name = output_base_name + "_"  + "ms1.feature";
+  //sample_feature_writer::writeFeatures(sample_feature_file_name, sample_features);
+  std::string ms2_feat_file_name = output_base_name + "_"  + "ms2.feature";
+  spec_feature_writer::writeFeatures(ms2_feat_file_name, ms2_features);
 }
 
 }  // namespace

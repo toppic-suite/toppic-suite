@@ -15,17 +15,7 @@
 #include <string>
 #include <algorithm>
 #include <iostream>
-
-//Deprecated features in boost are excluded.
-#ifndef BOOST_SYSTEM_NO_DEPRECATED
-#define BOOST_SYSTEM_NO_DEPRECATED 1
-#endif
-
-#define BOOST_NO_CXX11_SCOPED_ENUMS
-#include <boost/filesystem.hpp>
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/path.hpp>
-#undef BOOST_NO_CXX11_SCOPED_ENUMS
+#include <filesystem>
 
 #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
 #include <windows.h>
@@ -36,7 +26,7 @@
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 
-namespace fs = boost::filesystem;
+namespace fs = std::filesystem;
 
 namespace toppic {
 
@@ -69,13 +59,13 @@ std::string getExecutiveDir(const std::string &argv_0) {
 }
 
 std::string getResourceDir(const std::string &exec_dir) {
-  std::string resource_dir = exec_dir + getFileSeparator() + getToppicResourceDirName();
+  std::string resource_dir = exec_dir + getToppicResourceDirName();
   if (exists(resource_dir)) {
     return resource_dir;
   }
 #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
 #else
-  std::string etc_dir = exec_dir + getFileSeparator() + getEtcDirName();
+  std::string etc_dir = exec_dir + getEtcDirName();
   if (exists(etc_dir)) {
     return etc_dir;
   }
@@ -133,7 +123,7 @@ void createFolder(const std::string &folder_name) {
   try {
     fs::create_directories(path);
   }
-  catch(const boost::filesystem::filesystem_error& e) {
+  catch(const fs::filesystem_error& e) {
     LOG_ERROR("Output file/folder" << folder_name 
               << "could not be created because it was in use." 
               << "Please close the files/folders and try again.");
@@ -162,10 +152,10 @@ void copyFile(const std::string &file_name,
   }
 
   if (over_write) {
-    fs::copy_file(from_path, to_path, fs::copy_option::overwrite_if_exists);
+    fs::copy_file(from_path, to_path, fs::copy_options::overwrite_existing);
   }
   else {
-    fs::copy_file(from_path, to_path, fs::copy_option::fail_if_exists);
+    fs::copy_file(from_path, to_path, fs::copy_options::skip_existing);
   }
 }
 
@@ -193,7 +183,7 @@ bool copyDir(const std::string &src_name,
     LOG_WARN(e.what());
     return false;
   }
-
+  bool overwrite = true;
   for (fs::directory_iterator file(source); file != fs::directory_iterator(); ++file) {
     try {
       fs::path current(file->path());
@@ -202,7 +192,7 @@ bool copyDir(const std::string &src_name,
           return false;
         }
       } else {
-        fs::copy_file(current, destination / current.filename());
+        copyFile(current.string(), (destination / current.filename()).string(), overwrite);
       }
     }
     catch(fs::filesystem_error const & e) {
@@ -255,7 +245,7 @@ void delDir(const std::string &path) {
     try{
       fs::remove_all(dir);
     }
-    catch(const boost::filesystem::filesystem_error& e) {
+    catch(const fs::filesystem_error& e) {
       LOG_ERROR("Output file/folder" << path << " is in use."
                 << "Please close all output folders and files and try again");
       exit(EXIT_FAILURE);

@@ -12,7 +12,9 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
+#include "common/util/str_util.hpp"
 #include "para/sp_para.hpp"
 #include "ms/spec/msalign_reader.hpp"
 #include "ms/spec/msalign_frac_merge.hpp"
@@ -39,6 +41,17 @@ void mergeMsalignFiles(const std::vector<std::string> &msalign_file_names,
         } else if (ms_lines[k].substr(0, 10) == "MS_ONE_ID=") {
           outfile << "MS_ONE_ID=" 
             << (SpPara::getMaxSpecNumPerFile() * i + std::stoi(ms_lines[k].substr(10))) << std::endl;
+        } else if (ms_lines[k].substr(0, 21) == "PRECURSOR_FEATURE_ID=") {
+          outfile << "PRECURSOR_FEATURE_ID=";
+          std::string data = ms_lines[k].substr(21);
+          if (data != "") {
+            std::vector<std::string> ids = str_util::split(data, ":");
+            outfile << (SpPara::getMaxFeatureNumPerFile() * i + std::stoi(ids[0])); 
+            for (size_t cnt = 1; cnt < ids.size(); cnt++) {
+              outfile << ":" << (SpPara::getMaxFeatureNumPerFile() * i + std::stoi(ids[cnt])); 
+            }
+          }
+          outfile << std::endl;
         } else {
           outfile << ms_lines[k] << std::endl;
         }

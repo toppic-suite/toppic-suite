@@ -47,11 +47,17 @@ class Prsm {
 
   int getPrecursorId() {return precursor_id_;}
 
-  int getSampleFeatureId() {return sample_feature_id_;}
+  int getFracFeatureId() {return frac_feature_id_;}
 
-  double getSampleFeatureInte() {return sample_feature_inte_;}
+  double getFracFeatureInte() {return frac_feature_inte_;}
 
   double getFracFeatureScore() {return frac_feature_score_;}
+
+  double getFracFeatureApexTime() {return frac_feature_apex_time_;}
+
+  double getFracFeatureMinTime() {return frac_feature_min_time_;}
+
+  double getFracFeatureMaxTime() {return frac_feature_max_time_;}
 
   double getOriPrecMass() {return ori_prec_mass_;}
 
@@ -83,8 +89,6 @@ class Prsm {
 
   double getOneProtProb();
 
-  double getTimeApex() {return time_apex_;};
-
   int getHitCnt() {return hit_cnt_;}
 
   bool getIsExactMatch() {return is_exact_match_;}
@@ -105,9 +109,6 @@ class Prsm {
   void setSpectrumScan(std::string spectrum_scan) {spectrum_scan_ = spectrum_scan;}
 
   void setPrecurorId(int precursor_id) {precursor_id_ = precursor_id;}
-
-
-  void setFracFeatureScore(double score) {frac_feature_score_ = score;}
 
   void setOriPrecMass(double prec_mass) {ori_prec_mass_ = prec_mass;}
 
@@ -131,6 +132,8 @@ class Prsm {
   void setHitCnt(int hit_cnt) {hit_cnt_ = hit_cnt;}
 
   void setIsExactMatch(bool is_exact_match) {is_exact_match_ = is_exact_match;}
+
+  void setFracFeatureId(int id) {frac_feature_id_ = id;}
 
   // comparion
   static bool cmpMatchFragDecMatchPeakDecProtInc(const PrsmPtr &a, const PrsmPtr &b);
@@ -165,14 +168,20 @@ class Prsm {
 
   int spectrum_num_;
 
-  // Sample feature id is stored in both deconv_ms_ptr_vec 
+  // frac feature id is stored in both deconv_ms_ptr_vec 
   // and the member variable. When a prsm is constructed from an xml file, 
   // only the member variable will be initialized.  
-  int sample_feature_id_ = -1;
+  int frac_feature_id_ = -1;
 
-  double sample_feature_inte_ = -1;
+  double frac_feature_inte_ = -1;
 
-  double frac_feature_score_ = -1000;
+  double frac_feature_score_ = -1;
+
+  double frac_feature_min_time_ = -1; 
+
+  double frac_feature_max_time_ = -1;
+
+  double frac_feature_apex_time_ = -1;
 
   double ori_prec_mass_;
   /* adjusted precursor mass */
@@ -186,8 +195,6 @@ class Prsm {
   double fdr_ = -1;
 
   double proteoform_fdr_ = -1;
-
-  double time_apex_ = -1;
 
   int hit_cnt_ = 0;
 

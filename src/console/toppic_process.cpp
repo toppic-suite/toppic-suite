@@ -18,6 +18,7 @@
 #include <string>
 #include <vector>
 #include <ctime>
+#include <limits>
 
 #include "common/base/base_data.hpp"
 #include "common/base/mod_util.hpp"
@@ -31,6 +32,7 @@
 #include "ms/spec/msalign_util.hpp"
 #include "ms/spec/msalign_frac_merge.hpp"
 #include "ms/spec/deconv_json_merge.hpp"
+#include "ms/env/env_base.hpp"
 #include "ms/feature/feature_merge.hpp"
 
 #include "para/prsm_para.hpp"
@@ -74,28 +76,10 @@
 #include "visual/xml_generator.hpp"
 #include "visual/json_transformer.hpp"
 
+#include "console/console_util.hpp"
 #include "console/toppic_argument.hpp"
-namespace toppic {
 
-void copyTopMSV(std::map<std::string, std::string> &arguments) {
-  std::string spectrum_file_name = arguments["spectrumFileName"];
-  std::string base_name = file_util::basename(spectrum_file_name);
-  std::string base_name_short = base_name.substr(0, base_name.length() - 4);
-  std::string topmsv_dir = base_name_short + "_html" +  file_util::getFileSeparator() + "topmsv";
-  if (file_util::exists(topmsv_dir)) {
-    LOG_WARN("The TopMSV directory " << topmsv_dir << " exists!");
-    //file_util::delDir(topmsv_dir);
-  }
-  else{
-    if (!file_util::exists(base_name_short + "_html")){//if _html folder was not created with topfd
-      file_util::createFolder(base_name_short + "_html");
-    }
-    std::string resource_dir = arguments["resourceDir"];
-    // copy resources 
-    std::string from_path(resource_dir + file_util::getFileSeparator() + "topmsv");
-    file_util::copyDir(from_path, topmsv_dir);
-  }
-}
+namespace toppic {
 
 void cleanToppicDir(const std::string &fa_name, 
                     const std::string &sp_name,
@@ -104,15 +88,12 @@ void cleanToppicDir(const std::string &fa_name,
   std::string sp_base = file_util::basename(abs_sp_name);
   std::replace(sp_base.begin(), sp_base.end(), '\\', '/');
   file_util::delFile(sp_base + "_toppic_proteoform.xml");
-  file_util::rename(sp_base + ".toppic_form_cutoff_form",
-                    sp_base + "_toppic_proteoform.xml");
+  bool overwrite = true;
+  file_util::copyFile(sp_base + ".toppic_form_cutoff_form",
+                      sp_base + "_toppic_proteoform.xml", overwrite);
   file_util::delFile(sp_base + "_toppic_prsm.xml");
-  std::string toppic_prsm_suffix = "toppic_prsm_cutoff";
-  if (file_util::exists(sp_base + ".toppic_prsm_cutoff_local")) {
-    toppic_prsm_suffix = "toppic_prsm_cutoff_local";
-  }
-  file_util::rename(sp_base + "." + toppic_prsm_suffix,
-                    sp_base + "_toppic_prsm.xml");
+  file_util::copyFile(sp_base + "." + "toppic_prsm_cutoff",
+                      sp_base + "_toppic_prsm.xml", overwrite);
   if (!keep_temp_files) {
     file_util::cleanPrefix(sp_name, sp_base + ".msalign_");
     file_util::delFile(abs_sp_name + "_index");
@@ -135,10 +116,10 @@ void cleanToppicDir(const std::string &fa_name,
     file_util::cleanPrefix(sp_name, sp_base + ".toppic_evalue_");
     file_util::delFile(sp_base + ".toppic_cluster");
     file_util::delFile(sp_base + ".toppic_cluster_fdr");
-    file_util::delFile(sp_base + ".toppic_prsm");
+    file_util::delFile(sp_base + ".toppic_cluster_local");
     file_util::delFile(sp_base + ".toppic_prsm_cutoff");
-    file_util::delFile(sp_base + ".toppic_prsm_cutoff_local");
     file_util::delFile(sp_base + ".toppic_form_cutoff");
+    file_util::delFile(sp_base + ".toppic_form_cutoff_form");
     file_util::delDir(sp_base + "_toppic_proteoform_cutoff_xml");
     file_util::delDir(sp_base + "_toppic_prsm_cutoff_xml");
   }
@@ -180,7 +161,9 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     arguments["startTime"] = buf;
     ToppicArgument::outputArguments(std::cout, " ", arguments);
 
+    std::string resource_dir = arguments["resourceDir"];
     base_data::init();
+    EnvBase::initBase(resource_dir);
 
     LOG_DEBUG("Init base data completed");
 
@@ -356,9 +339,12 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     }
 
     std::cout << "Merging PrSMs - started." << std::endl;
-    int prsm_top_num = (shift_num + 1) * 4;
+    int prsm_top_num = std::numeric_limits<int>::max();
+    bool norm = false;
+    bool remove_dup = false;
     PrsmStrMergePtr merge_ptr
-        = std::make_shared<PrsmStrMerge>(sp_file_name, input_exts, "toppic_combined", prsm_top_num);
+        = std::make_shared<PrsmStrMerge>(sp_file_name, input_exts, "toppic_combined", 
+                                         prsm_top_num, norm, remove_dup);
     merge_ptr->process();
     merge_ptr = nullptr;
     std::cout << "Merging PrSMs - finished." << std::endl;
@@ -377,7 +363,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     std::cout << "E-value computation - finished." << std::endl;
 
     std::cout << "Top PrSM selecting - started" << std::endl;
-    prsm_top_selector::process(sp_file_name, "toppic_evalue", "toppic_prsm", n_top);
+    prsm_top_selector::process(sp_file_name, "toppic_evalue", "toppic_raw_prsm", n_top);
     std::cout << "Top PrSM selecting - finished." << std::endl;
 
   } catch (const char* e) {
@@ -419,34 +405,17 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
       // TopFD msalign file with feature ID
       ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();
       prsm_feature_cluster::process(sp_file_name,
-                                    "toppic_prsm",
+                                    "toppic_raw_prsm",
                                     "toppic_cluster",
                                     form_error_tole);
     } 
     else {
       prsm_simple_cluster::process(db_file_name, sp_file_name,
-                                   "toppic_prsm", prsm_para_ptr->getFixModPtrVec(),
+                                   "toppic_raw_prsm", prsm_para_ptr->getFixModPtrVec(),
                                    "toppic_cluster", form_error_tole);
     }
     std::cout << "Finding PrSM clusters - finished." << std::endl;
     std::string cur_suffix = "toppic_cluster";
-
-    if (arguments["searchType"] == "TARGET+DECOY") {
-      std::cout << "FDR computation - started. " << std::endl;
-      prsm_fdr::process(sp_file_name, "toppic_cluster", "toppic_cluster_fdr", arguments["keepDecoyResults"]);
-      //prsm_fdr_groups::process(sp_file_name, "toppic_cluster", "toppic_cluster_fdr", arguments["keepDecoyResults"]);
-      std::cout << "FDR computation - finished." << std::endl;
-      cur_suffix = "toppic_cluster_fdr";
-    }
-
-    std::string cutoff_type = arguments["cutoffSpectralType"];
-    std::cout << "PrSM filtering by " << cutoff_type << " - started." << std::endl;
-    double cutoff_value;
-    std::istringstream(arguments["cutoffSpectralValue"]) >> cutoff_value;
-    prsm_cutoff_selector::process(db_file_name, sp_file_name, cur_suffix,
-                                  "toppic_prsm_cutoff", cutoff_type, cutoff_value);
-    std::cout << "PrSM filtering by " << cutoff_type << " - finished." << std::endl;
-    cur_suffix = "toppic_prsm_cutoff";
 
     if (localization) {
       std::cout << "PTM characterization - started." << std::endl;
@@ -456,13 +425,13 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
                                        arguments["localPtmFileName"],
                                        min_shift_mass,
                                        max_shift_mass,
-                                       "toppic_prsm_cutoff", 
-                                       "toppic_prsm_cutoff_local");
+                                       cur_suffix,  
+                                       "toppic_cluster_local");
       LocalProcessorPtr local_ptr = std::make_shared<LocalProcessor>(local_mng);
       local_ptr->process();
       local_ptr = nullptr;
       std::cout << "PTM characterization - finished." << std::endl;
-      cur_suffix = "toppic_prsm_cutoff_local";
+      cur_suffix = "toppic_cluster_local";
     }
 
     std::time_t end = time(nullptr);
@@ -471,6 +440,39 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     arguments["endTime"] = buf;
 
     std::string argu_str = ToppicArgument::outputTsvArguments(arguments);
+
+    if (arguments["outputRawPrsms"] == "true"){
+      std::cout << "Outputting Raw PrSM table - started." << std::endl;
+      PrsmMatchTableWriterPtr raw_table_out
+        = std::make_shared<PrsmMatchTableWriter>(prsm_para_ptr, argu_str, 
+                                                 cur_suffix, "_toppic_raw_prsm_single.tsv", false);
+      raw_table_out->write();
+
+      raw_table_out->setOutputName("_toppic_raw_prsm.tsv");
+      raw_table_out->setWriteMultiMatches(true);
+      raw_table_out->write();
+
+      raw_table_out = nullptr;
+      std::cout << "Outputting Raw PrSM table - finished." << std::endl;
+    }
+
+    if (arguments["searchType"] == "TARGET+DECOY") {
+      std::cout << "FDR computation - started. " << std::endl;
+      prsm_fdr::process(sp_file_name, "toppic_cluster", "toppic_cluster_fdr", arguments["keepDecoyResults"]);
+      //prsm_fdr_groups::process(sp_file_name, "toppic_cluster", "toppic_cluster_fdr", arguments["keepDecoyResults"]);
+      std::cout << "FDR computation - finished." << std::endl;
+      cur_suffix = "toppic_cluster_fdr";
+    }
+
+
+    std::string cutoff_type = arguments["cutoffSpectralType"];
+    std::cout << "PrSM filtering by " << cutoff_type << " - started." << std::endl;
+    double cutoff_value;
+    std::istringstream(arguments["cutoffSpectralValue"]) >> cutoff_value;
+    prsm_cutoff_selector::process(db_file_name, sp_file_name, cur_suffix,
+                                  "toppic_prsm_cutoff", cutoff_type, cutoff_value);
+    std::cout << "PrSM filtering by " << cutoff_type << " - finished." << std::endl;
+    cur_suffix = "toppic_prsm_cutoff";
 
     std::cout << "Outputting PrSM table - started." << std::endl;
     PrsmMatchTableWriterPtr table_out
@@ -494,7 +496,7 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
       xml_gene = nullptr;
       std::cout << "Generating PrSM XML files - finished." << std::endl;
 
-      copyTopMSV(arguments);
+      console_util::copyTopMSV(arguments);
   
       std::cout << "Converting PrSM XML files to JSON files - started." << std::endl;
       jsonTranslate(arguments, "toppic_prsm_cutoff");
@@ -572,7 +574,8 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
 
   TopPIC_testModFile(arguments);
 
-  //check if a combined file name given in -c parameter is the same as one of the input spectrum file. If so, throw error.
+  //check if a combined file name given in -c parameter is the same as 
+  //one of the input spectrum file. If so, throw error.
   if (arguments["combinedOutputName"] != "") {
     std::string merged_file_name = arguments["combinedOutputName"] + "_ms2.msalign"; 
     for (size_t k = 0; k < spec_file_lst.size(); k++) {
@@ -584,72 +587,66 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
       }
     }
   }
-  
-  for (size_t k = 0; k < spec_file_lst.size(); k++) {
-    std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));
-    std::string start_time = buf;
-    arguments["startTime"] = start_time;
-    arguments["spectrumFileName"] = spec_file_lst[k];
-    if (toppic::TopPICProgress(arguments) != 0) {
-      return 1;
+
+  bool keep_temp_files = (arguments["keepTempFiles"] == "true"); 
+  std::string ori_db_file_name = arguments["oriDatabaseFileName"];
+
+  bool combine_result_only = (arguments["combineResultOnly"] == "true"); 
+
+  if (!combine_result_only) {
+    for (size_t k = 0; k < spec_file_lst.size(); k++) {
+      std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));
+      std::string start_time = buf;
+      arguments["startTime"] = start_time;
+      arguments["spectrumFileName"] = spec_file_lst[k];
+      if (toppic::TopPICProgress(arguments) != 0) {
+        return 1;
+      }
+      cleanToppicDir(ori_db_file_name, spec_file_lst[k], keep_temp_files);
     }
   }
 
-  //if (spec_file_lst.size() > 1 && arguments["combinedOutputName"] != "") {
   if (arguments["combinedOutputName"] != "") {
     std::string merged_file_name = arguments["combinedOutputName"]; 
+    std::vector<std::string> raw_file_list;
+    for (size_t k = 0; k < spec_file_lst.size(); k++) {
+      std::string raw_file_name = spec_file_lst[k].substr(0, spec_file_lst[k].find("_ms2.msalign"));
+      raw_file_list.push_back(raw_file_name);
+    }
     std::string para_str = "";
     std::cout << "Merging files started." << std::endl;
     std::cout << "Merging msalign files started." << std::endl;
-    msalign_frac_merge::mergeMsalignFiles(spec_file_lst, full_combined_name + "_ms2.msalign", para_str);
+    msalign_frac_merge::mergeFractions(raw_file_list, full_combined_name, para_str); 
     std::cout << "Merging msalign files finished." << std::endl;
-    if (arguments["geneHTMLFolder"] == "true"){
-      std::cout << "Merging json files started." << std::endl;
-      DeconvJsonMergePtr json_merger 
-          = std::make_shared<DeconvJsonMerge>(spec_file_lst, full_combined_name);
-      json_merger->process();
-      json_merger = nullptr;
-      std::cout << "Merging json files finished." << std::endl;
-    }
-	if (arguments["useFeatureFile"] == "true") {//only when feature files are being used
+
+    if (arguments["useFeatureFile"] == "true") {//only when feature files are being used
       std::cout << "Merging feature files started." << std::endl;
-      feature_merge::process(spec_file_lst, full_combined_name, para_str);
+      feature_merge::process(raw_file_list, full_combined_name, para_str);
       std::cout << "Merging feature files finished." << std::endl;
     }
     // merge TOP files
     std::cout << "Merging identification files started." << std::endl;
     std::vector<std::string> prsm_file_lst(spec_file_lst.size());
     for (size_t i = 0; i < spec_file_lst.size(); i++) {
-      prsm_file_lst[i] = file_util::basename(spec_file_lst[i]) + ".toppic_prsm"; 
+      prsm_file_lst[i] = file_util::basename(spec_file_lst[i]) + ".toppic_raw_prsm"; 
     }
-    int N = 1000000;
-    prsm_util::mergePrsmFiles(prsm_file_lst, N , full_combined_name + "_ms2.toppic_prsm");
+    prsm_util::mergePrsmFiles(prsm_file_lst, SpPara::getMaxSpecNumPerFile(), 
+                              SpPara::getMaxFeatureNumPerFile(),
+                              full_combined_name + "_ms2.toppic_raw_prsm");
     std::cout << "Merging identification files finished." << std::endl;
     std::cout << "Merging files - finished." << std::endl;
 
     std::string sp_file_name = full_combined_name + "_ms2.msalign";
     arguments["spectrumFileName"] = sp_file_name;
     arguments["startTime"] = combined_start_time;
+    // do not generate html files for combined file
+    arguments["geneHTMLFolder"] = "false";
+
     TopPIC_post(arguments);
-  }
-
-  bool keep_temp_files = (arguments["keepTempFiles"] == "true"); 
-
-  std::cout << "Deleting temporary files - started." << std::endl;
-  std::string ori_db_file_name = arguments["oriDatabaseFileName"];
-
-  for (size_t k = 0; k < spec_file_lst.size(); k++) {
-    std::string sp_file_name = spec_file_lst[k];
+    sp_file_name = full_combined_name + "_ms2.msalign";
     cleanToppicDir(ori_db_file_name, sp_file_name, keep_temp_files);
   }
 
-  //if (spec_file_lst.size() > 1 && arguments["combinedOutputName"] != "") {
-  if (arguments["combinedOutputName"] != "") {
-    std::string sp_file_name = full_combined_name + "_ms2.msalign";
-    cleanToppicDir(ori_db_file_name, sp_file_name, keep_temp_files);
-  }
-  std::cout << "Deleting temporary files - finished." << std::endl;
-  
   base_data::release();
 
   std::cout << "TopPIC finished." << std::endl << std::flush;

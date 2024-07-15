@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <vector>
 #include <map>
+#include <limits>
 
 #include "common/base/ptm_util.hpp"
 #include "common/base/mod_util.hpp"
@@ -203,14 +204,17 @@ void DprProcessor::process() {
   prsm_xml_writer_util::closeWriterPtrVec(writer_ptr_vec_);
 
   // combine results
-  int prsm_top_num = INT_MAX; 
+  int prsm_top_num = std::numeric_limits<int>::max(); 
   std::vector<std::string> input_exts;
   for (int t = 0; t < mng_ptr_->thread_num_; t++) {
     input_exts.push_back(mng_ptr_->output_file_ext_ + "_" + str_util::toString(t));
   }
+  bool norm = false;
+  bool remove_dup = true;
   PrsmStrMergePtr merge_ptr
       = std::make_shared<PrsmStrMerge>(sp_file_name, input_exts, 
-                                       mng_ptr_->output_file_ext_, prsm_top_num);
+                                       mng_ptr_->output_file_ext_, 
+                                       prsm_top_num, norm, remove_dup);
   merge_ptr->process();
   merge_ptr = nullptr;
 

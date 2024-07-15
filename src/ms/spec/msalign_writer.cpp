@@ -41,7 +41,6 @@ void MsAlignWriter::writeMs(DeconvMsPtr ms_ptr) {
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
   output_ << std::fixed;
   output_ << "BEGIN IONS" << std::endl;
-  output_ << "FRACTION_ID=" << header_ptr->getFractionId() << std::endl;
   output_ << "FILE_NAME=" << header_ptr->getFileName() << std::endl;
   output_ << "SPECTRUM_ID=" << header_ptr->getSpecId() << std::endl;
   output_ << "TITLE=" << header_ptr->getTitle() << std::endl;

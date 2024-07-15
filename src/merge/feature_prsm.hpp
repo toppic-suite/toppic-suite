@@ -16,18 +16,19 @@
 #define TOPPIC_MERGE_FEATURE_PRSM_HPP_
 
 #include "prsm/prsm_str.hpp"
-#include "ms/feature/sample_feature.hpp"
 
 namespace toppic {
 
 class FeaturePrsm;
 typedef std::shared_ptr<FeaturePrsm> FeaturePrsmPtr;
 
-class FeaturePrsm : public SampleFeature {
+class FeaturePrsm {
  public:
-  FeaturePrsm(std::string line);
+  FeaturePrsm(PrsmStrPtr prsm);
 
-  void addPrsmInfo(PrsmStrPtr prsm);
+  int getSampleId() {return sample_id_;}
+
+  int getProteoId() {return proteo_id_;}
 
   std::string getProtName() {return prot_name_;}
 
@@ -41,23 +42,38 @@ class FeaturePrsm : public SampleFeature {
 
   int getMs2Id() {return ms2_id_;}
 
+  double getAlignMinTime() {return align_min_time_;}
+
+  double getAlignMaxTime() {return align_max_time_;}
+
+  double getAlignApexTime() {return align_apex_time_;}
+
   double getPrecMass() {return prec_mass_;}
 
-  double getAlignTimeBegin() {return align_time_begin_;}
+  double getProteoInte() {return proteo_inte_;}
 
-  double getAlignTimeEnd() {return align_time_end_;}
+  double getMinTime() {return min_time_;}
 
-  double getAlignTimeMiddle() {return (align_time_begin_ + align_time_end_)/2;}
+  double getMaxTime() {return max_time_;}
 
-  void setAlignTimeBegin(double time_begin) {align_time_begin_ = time_begin;}
+  double getApexTime() {return apex_time_;}
 
-  void setAlignTimeEnd(double time_end) {align_time_end_ = time_end;}
+  void setSampleId(int sample_id) {sample_id_ = sample_id;}
+
+  void setAlignMinTime(double min_time) {align_min_time_ = min_time;}
+
+  void setAlignMaxTime(double max_time) {align_max_time_ = max_time;}
+
+  void setAlignApexTime(double apex_time) {align_apex_time_ = apex_time;}
 
   static bool cmpMassInc(const FeaturePrsmPtr &a, const FeaturePrsmPtr &b) { 
-    return a->getMonoMass() < b->getMonoMass();}
+    return a->getPrecMass() < b->getPrecMass();}
 
   static bool cmpInteDec(const FeaturePrsmPtr &a, const FeaturePrsmPtr &b) { 
-    return a->getIntensity() > b->getIntensity();}
+    return a->getProteoInte() > b->getProteoInte();}
+
+  static bool cmpTimeInc(const FeaturePrsmPtr &a, const FeaturePrsmPtr &b) { 
+    return a->getApexTime() < b->getApexTime();}
 
  private:
   std::string prot_name_;
@@ -66,9 +82,19 @@ class FeaturePrsm : public SampleFeature {
   int last_residue_;
   std::string proteoform_;
   int ms2_id_;
+  double align_min_time_;
+  double align_max_time_;
+  double align_apex_time_;
+
+  int sample_id_;
+
+  // new variable needed from prsm_str
   double prec_mass_;
-  double align_time_begin_;
-  double align_time_end_;
+  int proteo_id_;
+  double proteo_inte_;
+  double max_time_;
+  double min_time_;
+  double apex_time_;
 };
 
 typedef std::vector<FeaturePrsmPtr> FeaturePrsmPtrVec;

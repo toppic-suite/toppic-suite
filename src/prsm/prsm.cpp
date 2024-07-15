@@ -34,7 +34,7 @@ Prsm::Prsm(ProteoformPtr proteoform_ptr, const DeconvMsPtrVec &deconv_ms_ptr_vec
       precursor_id_ = header_ptr->getFirstPrecId();
       spectrum_num_ = deconv_ms_ptr_vec.size();
       ori_prec_mass_ = header_ptr->getFirstPrecMonoMass();
-      sample_feature_id_ = header_ptr->getFirstPrecFeatureId();
+      frac_feature_id_ = header_ptr->getFirstPrecFeatureId();
       init(sp_para_ptr);
     }
 
@@ -113,30 +113,34 @@ XmlDOMElement* Prsm::toXmlElement(XmlDOMDocument* xml_doc) {
   xml_doc->addElement(element, "spectrum_scan", spectrum_scan_.c_str());
   str = str_util::toString(precursor_id_);
   xml_doc->addElement(element, "precursor_id", str.c_str());
-  str = str_util::toString(sample_feature_id_);
-  xml_doc->addElement(element, "sample_feature_id", str.c_str());
-  str = str_util::toString(sample_feature_inte_);
-  xml_doc->addElement(element, "sample_feature_inte", str.c_str());
-  str = str_util::toString(frac_feature_score_);
-  xml_doc->addElement(element, "frac_feature_score", str.c_str());
+  str = str_util::toString(frac_feature_id_);
+  xml_doc->addElement(element, "frac_feature_id", str.c_str());
   str = str_util::toString(spectrum_num_);
   xml_doc->addElement(element, "spectrum_number", str.c_str());
   str = str_util::toString(ori_prec_mass_);
   xml_doc->addElement(element, "ori_prec_mass", str.c_str());
   str = str_util::toString(adjusted_prec_mass_);
   xml_doc->addElement(element, "adjusted_prec_mass", str.c_str());
-  str = str_util::toString(fdr_);
-  xml_doc->addElement(element, "fdr", str.c_str());
-  str = str_util::toString(proteoform_fdr_);
-  xml_doc->addElement(element, "proteoform_fdr", str.c_str());
   str = str_util::toString(match_peak_num_);
   xml_doc->addElement(element, "match_peak_num", str.c_str());
   str = str_util::toString(match_fragment_num_);
   xml_doc->addElement(element, "match_fragment_num", str.c_str());
   str = str_util::toString(getNormMatchFragNum());
   xml_doc->addElement(element, "norm_match_fragment_num", str.c_str());
-  str = str_util::toString(time_apex_);
-  xml_doc->addElement(element, "fraction_feature_time_apex", str.c_str());
+  str = str_util::toString(fdr_);
+  xml_doc->addElement(element, "fdr", str.c_str());
+  str = str_util::toString(proteoform_fdr_);
+  xml_doc->addElement(element, "proteoform_fdr", str.c_str());
+  str = str_util::toString(frac_feature_inte_);
+  xml_doc->addElement(element, "frac_feature_inte", str.c_str());
+  str = str_util::toString(frac_feature_score_);
+  xml_doc->addElement(element, "frac_feature_score", str.c_str());
+  str = str_util::toString(frac_feature_apex_time_);
+  xml_doc->addElement(element, "frac_feature_apex_time", str.c_str());
+  str = str_util::toString(frac_feature_min_time_);
+  xml_doc->addElement(element, "frac_feature_min_time", str.c_str());
+  str = str_util::toString(frac_feature_max_time_);
+  xml_doc->addElement(element, "frac_feature_max_time", str.c_str());
   proteoform_ptr_->appendXml(xml_doc, element);
   if (expected_value_ptr_ != nullptr) {
     expected_value_ptr_->appendXml(xml_doc, element);
@@ -155,9 +159,12 @@ void Prsm::parseXml(XmlDOMElement *element) {
   spectrum_id_ = xml_dom_util::getIntChildValue(element, "spectrum_id", 0);
   spectrum_scan_ = xml_dom_util::getChildValue(element, "spectrum_scan", 0);
   precursor_id_ = xml_dom_util::getIntChildValue(element, "precursor_id", 0);
-  sample_feature_id_ = xml_dom_util::getIntChildValue(element, "sample_feature_id", 0);
-  sample_feature_inte_ = xml_dom_util::getDoubleChildValue(element, "sample_feature_inte", 0);
+  frac_feature_id_ = xml_dom_util::getIntChildValue(element, "frac_feature_id", 0);
+  frac_feature_inte_ = xml_dom_util::getDoubleChildValue(element, "frac_feature_inte", 0);
   frac_feature_score_ = xml_dom_util::getDoubleChildValue(element, "frac_feature_score", 0);
+  frac_feature_apex_time_ = xml_dom_util::getDoubleChildValue(element, "frac_feature_apex_time", 0);
+  frac_feature_min_time_ = xml_dom_util::getDoubleChildValue(element, "frac_feature_min_time", 0);
+  frac_feature_max_time_ = xml_dom_util::getDoubleChildValue(element, "frac_feature_max_time", 0);
   spectrum_num_ = xml_dom_util::getIntChildValue(element, "spectrum_number", 0);
   ori_prec_mass_ = xml_dom_util::getDoubleChildValue(element, "ori_prec_mass", 0);
   adjusted_prec_mass_ = xml_dom_util::getDoubleChildValue(element, "adjusted_prec_mass", 0);
@@ -165,7 +172,6 @@ void Prsm::parseXml(XmlDOMElement *element) {
   proteoform_fdr_ = xml_dom_util::getDoubleChildValue(element, "proteoform_fdr", 0);
   match_peak_num_ = xml_dom_util::getDoubleChildValue(element, "match_peak_num", 0);
   match_fragment_num_ = xml_dom_util::getDoubleChildValue(element, "match_fragment_num", 0);
-  time_apex_ = xml_dom_util::getDoubleChildValue(element, "fraction_feature_time_apex", 0);
 
   int prob_count = xml_dom_util::getChildCount(element, "extreme_value");
   if (prob_count != 0) {

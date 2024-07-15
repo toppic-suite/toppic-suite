@@ -45,13 +45,23 @@ class PrsmStr {
 
   int getProteoformEndPos() {return proteoform_end_pos_;}
 
-  int getClusterId() {return cluster_id_;}
+  int getProteoClusterId() {return proteo_cluster_id_;}
 
   int getProtId() {return prot_id_;}
 
+  double getProteoInte() {return proteo_inte_;}
+
   int getPrecursorId() {return precursor_id_;}
 
-  int getSampleFeatureId() {return sample_feature_id_;}
+  int getFracFeatureId() {return frac_feature_id_;}
+
+  double getFracFeatureInte() {return frac_feature_inte_;}
+
+  double getFracFeatureApexTime() {return frac_feature_apex_time_;}
+
+  double getFracFeatureMinTime() {return frac_feature_min_time_;}
+
+  double getFracFeatureMaxTime() {return frac_feature_max_time_;}
 
   int getUnexpectedPtmNum() {return unexpected_ptm_num_;}
 
@@ -60,8 +70,6 @@ class PrsmStr {
   std::string getProteoformMatchSeq() {return proteoform_match_seq_;}
 
   std::string getProteoformDbSeq() {return proteoform_db_seq_;}
-
-  double getPrecFeatureInte() {return sample_feature_inte_;}
 
   double getMatchPeakNum() {return match_peak_num_;}
 
@@ -81,33 +89,33 @@ class PrsmStr {
 
   std::vector<MassShiftPtr> getMassShiftVec() {return mass_shift_vec_;}
 
-  int getSampleId() {return sample_id_;}
-
-  double getTimeApex() {return time_apex_;}
-
   void setFileName(const std::string & fname);
 
   void setSpectrumId(int id);
 
-  void setClusterId(int id);
+  void setProteoClusterId(int id);
+
+  void setProteoInte(double inte);
 
   void setProtId(int id);
 
-  void setPrecFeatureId(int id);
+  void setFracFeatureId(int id);
 
   void setPrecursorId(int id);
 
-  void setPrecFeatureInte(double inte);
+  void setFracFeatureInte(double inte);
 
   void setFracFeatureScore(double score);
+
+  void setFracFeatureApexTime(double apex_time); 
+
+  void setFracFeatureMinTime(double min_time); 
+
+  void setFracFeatureMaxTime(double max_time); 
 
   void setFdr(double fdr);
 
   void setProteoformFdr(double proteoform_fdr);
-
-  void setSampleId(int sample_id) {sample_id_ = sample_id;}
-
-  void setTimeApex(double time_apex) {time_apex_ = time_apex;}
 
   static bool cmpEValueIncProtInc(const PrsmStrPtr &a, const PrsmStrPtr &b);
 
@@ -140,15 +148,23 @@ class PrsmStr {
 
   std::string seq_desc_;
 
-  int cluster_id_;
+  int proteo_cluster_id_;
+
+  double proteo_inte_;
 
   int prot_id_;
 
   int precursor_id_;
 
-  int sample_feature_id_;
+  int frac_feature_id_;
 
-  double sample_feature_inte_;
+  double frac_feature_inte_;
+
+  double frac_feature_apex_time_;
+
+  double frac_feature_min_time_;
+
+  double frac_feature_max_time_;
 
   int unexpected_ptm_num_;
 
@@ -180,9 +196,6 @@ class PrsmStr {
 
   std::vector<MassShiftPtr> mass_shift_vec_;
 
-  int sample_id_;
-
-  double time_apex_ = -1;
 };
 
 typedef std::vector<PrsmStrPtr> PrsmStrPtrVec;

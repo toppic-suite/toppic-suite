@@ -39,12 +39,12 @@ class SpecFeature {
 
   SpecFeature(double prec_mono_mz, double prec_charge); 
 
-  int getSpecId() {return spec_id_;}
+  std::string getFileName() {return file_name_;}
 
   int getFracId() {return frac_id_;}
 
-  std::string getFileName() {return file_name_;}
-  
+  int getSpecId() {return spec_id_;}
+
   std::string getScans() {return scans_;}
 
   int getMsOneId() {return ms_one_id_;}
@@ -74,19 +74,13 @@ class SpecFeature {
 
   double getFracFeatureApexTime() {return frac_feature_apex_time_;}
 
-  int getSampleFeatureId() {return sample_feature_id_;}
-
-  double getSampleFeatureInte() {return sample_feature_inte_;}
+  void setFracId(int frac_id) {frac_id_ = frac_id;}
 
   void setSpecId(int id) {spec_id_ = id;}
 
   void setMsOneId(int id) {ms_one_id_ = id;}
 
   void setFracFeatureId(int id) {frac_feature_id_ = id;}
-
-  void setSampleFeatureId(int id) {sample_feature_id_ = id;}
-
-  void setSampleFeatureInte(double inte) {sample_feature_inte_ = inte;}
 
   static bool cmpSpecIdInc(const SpecFeaturePtr &a, const SpecFeaturePtr &b) { 
     return a->getSpecId() < b->getSpecId();
@@ -97,8 +91,8 @@ class SpecFeature {
   }
 
  protected:
-  int frac_id_;
   std::string file_name_;
+  int frac_id_;
   int spec_id_;
   std::string scans_;
   int ms_one_id_;
@@ -109,8 +103,6 @@ class SpecFeature {
   double frac_feature_min_time_;
   double frac_feature_max_time_;
   double frac_feature_apex_time_;
-  int sample_feature_id_;
-  double sample_feature_inte_;
   double prec_mono_mz_;
   double prec_avg_mz_;
   int prec_charge_;

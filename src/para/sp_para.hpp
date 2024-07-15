@@ -65,9 +65,9 @@ class SpPara {
 
   static std::string getXmlElementName() {return "sp_para";}
 
-  static int getMaxSpecNumPerFile() {return 1000000;}
+  static int getMaxSpecNumPerFile() {return 10000000;}
 
-  static int getMaxFeatureNumPerFile() {return 1000000;}
+  static int getMaxFeatureNumPerFile() {return 10000000;}
 
  private:
   int min_peak_num_ = 10;

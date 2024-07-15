@@ -25,23 +25,25 @@ class PrsmStrMerge {
   PrsmStrMerge(const std::string &spec_file_name, 
                const std::vector<std::string> &in_file_exts,
                const std::string &out_file_ext,
-               int top_num);
+               int top_num, bool norm, bool remove_dup);
 
   PrsmStrMerge(const std::string &spec_file_name,
                const std::string &in_file_ext,
                int in_num,
                const std::string &out_file_ext,
-               int top_num);
+               int top_num, bool norm, bool remove_dup);
 
-  void process(bool norm);
-
-  void process() {process(false);}
+  void process();
 
  private:
   std::string spec_file_name_;
   std::vector<std::string> input_file_exts_;
   std::string output_file_ext_;
   size_t top_num_;
+  // score normalization
+  bool norm_;
+  // remove duplicate prsms for the same protein
+  bool remove_dup_;
 };
 
 typedef std::shared_ptr<PrsmStrMerge> PrsmStrMergePtr;

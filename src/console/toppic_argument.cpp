@@ -12,13 +12,7 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef BOOST_SYSTEM_NO_DEPRECATED
-#define BOOST_SYSTEM_NO_DEPRECATED 1
-#endif
-
 #include <iomanip>
-
-#include "boost/thread/thread.hpp"
 
 #include "common/util/file_util.hpp"
 #include "common/xml/xml_dom_util.hpp"
@@ -76,6 +70,8 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["keepTempFiles"] = "false";
   arguments["keepDecoyResults"] = "false";
   arguments["geneHTMLFolder"] = "true";
+  arguments["combineResultOnly"] = "false";
+  arguments["outputRawPrsms"]="false";
 
   arguments["version"] = "";
   return arguments;
@@ -288,6 +284,8 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         ("keep-temp-files,k", "")
         ("keep-decoy-ids,K", "")
         ("skip-html-folder,g","")
+        ("combine-result-only,C","")
+        ("output-raw-prsms,o","")
         ("filtering-result-number", po::value<std::string>(&filtering_result_num), "Filtering result number. Default value: 20.")
         ("database-file-name", po::value<std::string>(&database_file_name)->required(), "Database file name with its path.")
         ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), "Spectrum file name with its path.");
@@ -449,6 +447,14 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
       arguments_["geneHTMLFolder"] = "false";
     }   
 
+    if (vm.count("combine-result-only")) {
+      arguments_["combineResultOnly"] = "true";
+    }   
+
+    if (vm.count("output-raw-prsms")) {
+      arguments_["outputRawPrsms"] = "true";
+    }   
+
     if (vm.count("filtering-result-number")) {
       arguments_["filteringResultNumber"] = filtering_result_num;
     }
@@ -489,7 +495,7 @@ bool ToppicArgument::validateArguments() {
 
   for (size_t k = 0; k < spec_file_list_.size(); k++) {
     if (!file_util::exists(spec_file_list_[k])) {
-      LOG_ERROR(spec_file_list_[k] << " does not exist!\nPlease check if file directory contains unproper characters such as spaces/quotation makrks");
+      LOG_ERROR(spec_file_list_[k] << " does not exist!\nPlease check if file directory contains unproper characters such as spaces/quotation marks");
       return false;
     }
 

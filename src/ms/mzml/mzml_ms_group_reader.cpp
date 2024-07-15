@@ -69,7 +69,7 @@ MzmlMsPtr MzmlMsGroupReader::readNextMzmlMs() {
     header_ptr->setSpecId(ms_two_cnt_);
     ms_two_cnt_++;
   }
-  header_ptr->setFractionId(fraction_id_);
+  //header_ptr->setFractionId(fraction_id_);
   PeakPtrVec peak_list = reader_ptr_->getPeakList();
   MzmlMsPtr ms_ptr = std::make_shared<Ms<PeakPtr> >(header_ptr, peak_list);
   return ms_ptr;

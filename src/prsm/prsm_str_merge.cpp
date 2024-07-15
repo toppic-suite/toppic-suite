@@ -26,20 +26,24 @@ namespace toppic {
 PrsmStrMerge::PrsmStrMerge(const std::string &spec_file_name, 
                            const std::vector<std::string> &in_file_exts,
                            const std::string &out_file_ext,
-                           int top_num):
+                           int top_num, bool norm, bool remove_dup):
     spec_file_name_(spec_file_name),
     input_file_exts_(in_file_exts),
     output_file_ext_(out_file_ext),
-    top_num_(top_num) {}
+    top_num_(top_num), 
+    norm_(norm),
+    remove_dup_(remove_dup) {}
 
 PrsmStrMerge::PrsmStrMerge(const std::string &spec_file_name,
                            const std::string &in_file_ext,
                            int in_num,
                            const std::string &out_file_ext,
-                           int top_num) {
+                           int top_num, bool norm, bool remove_dup) {
   output_file_ext_ = out_file_ext;
   spec_file_name_ = spec_file_name;
   top_num_ = top_num;
+  norm_ = norm;
+  remove_dup_ = remove_dup;
   for (int i = 0; i < in_num; i ++) {
     std::string ext = in_file_ext + "_" + str_util::toString(i);
     input_file_exts_.push_back(ext);
@@ -64,7 +68,7 @@ PrsmStrPtrVec removeDuplicates(PrsmStrPtrVec ori_list) {
   return result_list;
 }
 
-void PrsmStrMerge::process(bool norm) {
+void PrsmStrMerge::process() {
   size_t input_num = input_file_exts_.size();
   std::string base_name = file_util::basename(spec_file_name_);
   // open files
@@ -102,12 +106,14 @@ void PrsmStrMerge::process(bool norm) {
     }
 
     if (cur_str_ptrs.size() > 0) {
-      if (!norm) {
+      if (!norm_) {
         std::sort(cur_str_ptrs.begin(), cur_str_ptrs.end(),
                   PrsmStr::cmpMatchFragDecMatchPeakDecProtInc);
       } else {
         std::sort(cur_str_ptrs.begin(), cur_str_ptrs.end(),
                   PrsmStr::cmpNormMatchFragDecProtInc);
+      }
+      if (remove_dup_) {
         // Remove duplicated PrSMs from the same sequence.  
         cur_str_ptrs = removeDuplicates(cur_str_ptrs);
       }

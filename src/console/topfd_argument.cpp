@@ -75,7 +75,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("min-scan-number,b",po::value<std::string> (&min_scan_num), 
          "<1|2|3>. The minimum number of MS1 scans in which a proteoform feature is detected. The default value is 3.")
         ("single-scan-noise,i","Use the peak intensity noise levels in single MS1 scans to filter out low intensity peaks in proteoform feature detection. The default method is to use the peak intensity noise level of the whole LC-MS map to filter out low intensity peaks.")
-        ("additional-feature-search,f","Perform additional feature search for MS/MS scans that do not have detected proteoform features in their precursor isolation windows. In additional search, the signal noise ratio is set to 0, the min scan number is set to 1, and the ecscore cutoff is set to 0.")
+        ("disable-additional-feature-search,f","Disable additional feature search for MS/MS scans that do not have detected proteoform features in their precursor isolation windows. In additional search, the signal noise ratio is set to 0, the min scan number is set to 1, and the ecscore cutoff is set to 0.")
         ("disable-final-filtering,d","Skip the final filtering of envelopes in MS/MS scans.")
         ("thread-number,u", po::value<std::string> (&thread_number), "<a positive integer>. Number of threads used in spectral deconvolution. Default value: 1.")
         ("skip-html-folder,g","Skip the generation of HTML files for visualization.")
@@ -94,7 +94,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("ecscore-cutoff,t", po::value<std::string> (&ecscore_cutoff), "")
         ("missing-level-one,o", "")
         ("single-scan-noise,i","")
-        ("additional-feature-search,f","")
+        ("disable-additional-feature-search,f","")
         ("min-scan-number,b",po::value<std::string> (&min_scan_num),"")
         ("thread-number,u", po::value<std::string> (&thread_number), "")
         ("skip-html-folder,g","")
@@ -192,8 +192,8 @@ bool Argument::parse(int argc, char* argv[]) {
       topfd_para_ptr_->setUseSingleScanNoiseLevel(true);
     }
 
-    if (vm.count("additional-feature-search")) {
-      topfd_para_ptr_->setSearchPrecWindow(true);
+    if (vm.count("disable-additional-feature-search")) {
+      topfd_para_ptr_->setSearchPrecWindow(false);
     }
 
     if (vm.count("min-scan-number")) {

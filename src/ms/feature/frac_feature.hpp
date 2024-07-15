@@ -30,8 +30,8 @@ class FracFeature {
  public:
   FracFeature() {};
 
-  FracFeature(int id, int fraction_id, 
-              const std::string &file_name,
+  FracFeature(const std::string &file_name,
+              int frac_id, int feat_id,  
               double mono_mass, double inte,
               int min_ms1_id, int max_ms1_id,
               double retent_begin, double retent_end,
@@ -48,11 +48,11 @@ class FracFeature {
 
   XmlDOMElement* toXmlElement(XmlDOMDocument* xml_doc);
 
-  int getId() {return id_;}
+  std::string getFileName() {return file_name_;}
 
   int getFracId() {return frac_id_;}
 
-  std::string getFileName() {return file_name_;}
+  int getFeatId() {return feat_id_;}
 
   double getMonoMass() {return mono_mass_;}
 
@@ -90,23 +90,17 @@ class FracFeature {
 
   double getEcScore() {return ec_score_;}
 
-  int getSampleFeatureId() {return sample_feature_id_;}
-
-  double getSampleFeatureInte() {return sample_feature_inte_;}
-
   bool hasMs2Spec() {return has_ms2_spec_;}
 
   SingleChargeFeaturePtrVec getSingleFeatures() {return single_features_;}
 
-  void setId(int id) {id_ = id;}
+  void setFracId(int frac_id) {frac_id_ = frac_id;}
+
+  void setFeatId(int feat_id) {feat_id_ = feat_id;}
 
   void setEcScore(double score) {ec_score_ = score;}
 
   void setHasMs2Spec(bool has_ms2_spec) {has_ms2_spec_ = has_ms2_spec;}
-
-  void setSampleFeatureId(int id) {sample_feature_id_ = id;}
-
-  void setSampleFeatureInte(double inte) {sample_feature_inte_ = inte;}
 
   void setSingleFeatures(SingleChargeFeaturePtrVec &single_features) {
     single_features_ = single_features;}
@@ -129,9 +123,12 @@ class FracFeature {
 
 
  protected:
-  int id_;
-  int frac_id_;
+  //mzML file name
   std::string file_name_;
+  //the order of the mzML file in the command line input
+  int frac_id_;
+  //feature id
+  int feat_id_;
   double mono_mass_;
   double intensity_;
 
@@ -155,8 +152,6 @@ class FracFeature {
   double ec_score_;
   bool has_ms2_spec_ = false;
 
-  int sample_feature_id_ = -1;
-  double sample_feature_inte_ = 0;
   SingleChargeFeaturePtrVec single_features_;
 };
 

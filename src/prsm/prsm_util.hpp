@@ -43,13 +43,17 @@ std::vector<int> getClusterIds(const PrsmPtrVec &prsm_ptrs);
 
 void addSpectrumPtrsToPrsms(PrsmPtrVec &prsm_ptrs, PrsmParaPtr prsm_para_ptr);
 
-void addFeatureIDToPrsms(PrsmStrPtrVec &prsm_ptrs, const std::string & feature_file_name);
+void addFeatureInfoToPrsms(PrsmStrPtrVec &prsm_ptrs, const std::string & feature_file_name);
 
 void removePrsmsWithoutFeature(PrsmStrPtrVec &prsm_ptrs, 
                                PrsmStrPtrVec &filtered_prsm_ptrs);
 
-void mergePrsmFiles(const std::vector<std::string> & prsm_file_lst, int N,
+void mergePrsmFiles(const std::vector<std::string> & prsm_file_lst, 
+                    int max_spec_num_per_file,
+                    int max_feat_num_per_file,
                     const std::string & output_file);
+
+double compClusterInte(PrsmStrPtrVec prsm_list); 
 
 }  // namespace prsm_util
 

@@ -12,20 +12,20 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_PRSM_PRSM_SAMPLE_MERGE_HPP_
-#define TOPPIC_PRSM_PRSM_SAMPLE_MERGE_HPP_
+#ifndef TOPPIC_CONSOLE_CONSOLE_UTIL_HPP_
+#define TOPPIC_CONSOLE_CONSOLE_UTIL_HPP_
+
+#include <map>
+#include <string>
 
 namespace toppic {
 
-namespace prsm_sample_merge {
+namespace console_util {
 
-// This function is not used in the current version of toppic suite.
-void process(const std::vector<std::string> &input_file_names,
-             const std::string &output_file_name,
-             double error_tole);
+void copyTopMSV(std::map<std::string, std::string> &arguments); 
 
-}
+}  // namespace console_util
 
 }  // namespace toppic
 
-#endif /* PRSM_SAMPLE_MERGE_HPP_ */
+#endif

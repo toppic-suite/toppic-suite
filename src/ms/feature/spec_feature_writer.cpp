@@ -26,8 +26,8 @@ namespace toppic {
 namespace spec_feature_writer {
 
 void writeHeader(std::ofstream &of) {
-  of << "Fraction_ID" << "\t"
-     << "File_name" << "\t"
+  of << "File_name" << "\t"
+     << "Fraction_ID" << "\t"
      << "Spectrum_ID" << "\t"
      << "Scans" << "\t"
      << "MS_one_ID" << "\t"
@@ -38,8 +38,6 @@ void writeHeader(std::ofstream &of) {
      << "Fraction_feature_min_time" << "\t"
      << "Fraction_feature_max_time" << "\t"
      << "Fraction_feature_apex_time" << "\t"
-     << "Sample_feature_ID" << "\t"
-     << "Sample_feature_intensity" << "\t"
      << "Precursor_monoisotopic_mz" << "\t"
      << "Precursor_average_mz" << "\t"
      << "Precursor_charge" << "\t"
@@ -48,9 +46,8 @@ void writeHeader(std::ofstream &of) {
 }
 
 void writeOneFeature(std::ofstream &of, SpecFeaturePtr feature) {
-  of.precision(5);
-  of << feature->getFracId() << "\t"
-     << feature->getFileName() << "\t"
+  of << feature->getFileName() << "\t"
+     << feature->getFracId() << "\t"
      << feature->getSpecId() << "\t"
      << feature->getScans() << "\t"
      << feature->getMsOneId() << "\t"
@@ -58,16 +55,15 @@ void writeOneFeature(std::ofstream &of, SpecFeaturePtr feature) {
      << feature->getFracFeatureId() << "\t"
      << feature->getFracFeatureInte() << "\t"
      << feature->getFracFeatureScore() << "\t"
-     << feature->getFracFeatureMinTime() << "\t"
-     << feature->getFracFeatureMaxTime() << "\t"
-     << feature->getFracFeatureApexTime() << "\t"
-     << feature->getSampleFeatureId() << "\t"
-     << feature->getSampleFeatureInte() << "\t" 
-     << std::setprecision(9) 
+     << feature->getFracFeatureMinTime()/60 << "\t"
+     << feature->getFracFeatureMaxTime()/60 << "\t"
+     << feature->getFracFeatureApexTime()/60 << "\t"
+     << std::fixed << std::setprecision(5) 
      << feature->getPrecMonoMz() << "\t"
      << feature->getPrecAvgMz() << "\t"
-     << std::setprecision(5) 
+     << std::setprecision(0) 
      << feature->getPrecCharge() << "\t"
+     << std::setprecision(5) 
      << feature->getPrecInte() 
      << std::endl;
 }

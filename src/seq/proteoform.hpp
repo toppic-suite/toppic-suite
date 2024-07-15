@@ -78,6 +78,10 @@ class Proteoform {
 
   void setProtId(int id) {prot_id_ = id;}
 
+  double getProteoInte() {return proteo_inte_;}
+
+  void setProteoInte(double inte) {proteo_inte_ = inte;}
+
   double getMass();
 
   double getMinusWaterMass();
@@ -128,6 +132,8 @@ class Proteoform {
   int proteo_cluster_id_ = -1;
 
   int prot_id_ = -1;
+
+  double proteo_inte_ = -1;
 
   MassShiftPtrVec mass_shift_list_;
 };

@@ -31,7 +31,7 @@ inline PrsmStrPtrVec2D getGroups(PrsmStrPtrVec &prsm_ptrs) {
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     bool found = false;
     for (size_t j = 0; j < results.size(); j++) {
-      if (results[j][0]->getClusterId() == prsm_ptrs[i]->getClusterId()) {
+      if (results[j][0]->getProteoClusterId() == prsm_ptrs[i]->getProteoClusterId()) {
         found = true;
         results[j].push_back(prsm_ptrs[i]);
         break;
