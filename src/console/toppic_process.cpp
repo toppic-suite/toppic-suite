@@ -398,8 +398,12 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     LOG_DEBUG("prsm para inited");
 
     std::cout << "Finding PrSM clusters - started." << std::endl;
-    double form_error_tole = std::stod(arguments["proteoformErrorTolerance"]);
-    LOG_DEBUG("form error tole " << form_error_tole);
+    bool is_proteoform_ppm_error = (arguments["proteoformPpmError"] == "true"); 
+    double proteoform_error_tole = std::stod(arguments["proteoformErrorTolerance"]);
+    if (is_proteoform_ppm_error) {
+      proteoform_error_tole = proteoform_error_tole/1000000;
+    }
+    LOG_DEBUG("form error tole " << proteoform_error_tole);
 
     if (arguments["useFeatureFile"] == "true") {
       // TopFD msalign file with feature ID
@@ -407,12 +411,14 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
       prsm_feature_cluster::process(sp_file_name,
                                     "toppic_raw_prsm",
                                     "toppic_cluster",
-                                    form_error_tole);
+                                    is_proteoform_ppm_error,
+                                    proteoform_error_tole);
     } 
     else {
       prsm_simple_cluster::process(db_file_name, sp_file_name,
                                    "toppic_raw_prsm", prsm_para_ptr->getFixModPtrVec(),
-                                   "toppic_cluster", form_error_tole);
+                                   "toppic_cluster", is_proteoform_ppm_error, 
+                                   proteoform_error_tole);
     }
     std::cout << "Finding PrSM clusters - finished." << std::endl;
     std::string cur_suffix = "toppic_cluster";
