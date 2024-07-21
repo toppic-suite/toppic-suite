@@ -283,7 +283,7 @@ void PrsmMatchTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   }
 }
 
-void PrsmMatchTableWriter::writePrsmStandardFormat(std::ofstream &file, PrsmPtr prsm_ptr) {
+void PrsmMatchTableWriter::writePrsmStandardFormat(std::ofstream &output_file, PrsmPtr prsm_ptr) {
   std::string spec_ids;
   std::string spec_activations;
   std::string spec_scans;
@@ -291,7 +291,8 @@ void PrsmMatchTableWriter::writePrsmStandardFormat(std::ofstream &file, PrsmPtr 
   std::string delim = "\t";
   std::string empty_str = "-";
   std::vector<std::pair<FastaSeqPtr,int>> matches;
-
+  
+  
   int peak_num = 0;
   DeconvMsPtrVec deconv_ms_ptr_vec = prsm_ptr->getDeconvMsPtrVec();
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
@@ -315,37 +316,38 @@ void PrsmMatchTableWriter::writePrsmStandardFormat(std::ofstream &file, PrsmPtr 
 
   matches = search_match_ptr_->process(prsm_ptr);
 
-  file << std::setprecision(10);
+  std::stringstream line_str;
+  line_str << std::setprecision(10);
   LOG_DEBUG("start output prsm ");
-  file << prsm_ptr->getFileName() << delim
-       << prsm_ptr->getPrsmId() << delim
-       << spec_ids << delim
-       << spec_activations << delim
-       << spec_scans << delim
-       << retention_time << delim
-       << peak_num << delim
-       << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecCharge() << delim
-      << prsm_ptr->getOriPrecMass()<< delim
-      << prsm_ptr->getAdjustedPrecMass() << delim
-      << prsm_ptr->getProteoformPtr()->getProteoClusterId() << delim
-      << prsm_ptr->getProteoformPtr()->getProteoInte() << delim;
+  line_str << prsm_ptr->getFileName() << delim
+    << prsm_ptr->getPrsmId() << delim
+    << spec_ids << delim
+    << spec_activations << delim
+    << spec_scans << delim
+    << retention_time << delim
+    << peak_num << delim
+    << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecCharge() << delim
+    << prsm_ptr->getOriPrecMass()<< delim
+    << prsm_ptr->getAdjustedPrecMass() << delim
+    << prsm_ptr->getProteoformPtr()->getProteoClusterId() << delim
+    << prsm_ptr->getProteoformPtr()->getProteoInte() << delim;
 
   if (prsm_ptr->getFracFeatureInte() > 0) {
-    file << prsm_ptr->getFracFeatureId() << delim;
+    line_str << prsm_ptr->getFracFeatureId() << delim;
     std::ostringstream str_stream;
     str_stream << std::scientific << std::setprecision(3);
     str_stream << prsm_ptr->getFracFeatureInte();
-    file << str_stream.str() << delim;
-    file << prsm_ptr->getFracFeatureScore() << delim;
-    file << prsm_ptr->getFracFeatureApexTime() << delim;
+    line_str << str_stream.str() << delim;
+    line_str << prsm_ptr->getFracFeatureScore() << delim;
+    line_str << prsm_ptr->getFracFeatureApexTime() << delim;
   } else {
-    file << empty_str << delim;
-    file << empty_str << delim;
-    file << empty_str << delim;
-    file << empty_str << delim;
+    line_str << empty_str << delim;
+    line_str << empty_str << delim;
+    line_str << empty_str << delim;
+    line_str << empty_str << delim;
   }
 
-  file << matches.size() << delim;
+  line_str << matches.size() << delim;
   
   ProteoformPtr form_ptr = prsm_ptr->getProteoformPtr();
 
@@ -353,7 +355,7 @@ void PrsmMatchTableWriter::writePrsmStandardFormat(std::ofstream &file, PrsmPtr 
 
   int start_pos = form_ptr->getStartPos();
   int end_pos = form_ptr->getEndPos();
-  file << form_ptr->getSeqName() << delim
+  line_str << form_ptr->getSeqName() << delim
       << form_ptr->getSeqDesc() << delim
       << (start_pos + 1) << delim
       << (end_pos + 1) << delim
@@ -374,16 +376,16 @@ void PrsmMatchTableWriter::writePrsmStandardFormat(std::ofstream &file, PrsmPtr 
 
   double fdr = prsm_ptr->getFdr();
   if (fdr >= 0) {
-    file << fdr << delim;
+    line_str << fdr << delim;
   } else {
-    file << empty_str << delim;
+    line_str << empty_str << delim;
   }
 
   double proteoform_fdr = prsm_ptr->getProteoformFdr();
   if (proteoform_fdr >= 0) {
-    file << proteoform_fdr << std::endl;
+    line_str << proteoform_fdr << std::endl;
   } else {
-    file << empty_str << std::endl;
+    line_str << empty_str << std::endl;
   }
 
   if (write_multiple_matches_) {
@@ -395,8 +397,9 @@ void PrsmMatchTableWriter::writePrsmStandardFormat(std::ofstream &file, PrsmPtr 
         continue;
       }
 
-    file << prsm_ptr->getFileName() << delim
+    line_str << prsm_ptr->getFileName() << delim
         << prsm_ptr->getPrsmId() << delim
+        << delim
         << delim
         << delim
         << delim
@@ -408,13 +411,13 @@ void PrsmMatchTableWriter::writePrsmStandardFormat(std::ofstream &file, PrsmPtr 
         << delim;
 
       // feature
-      file << delim
+      line_str << delim
         << delim
         << delim
         << delim
         << delim;
 
-      file << seq_ptr->getName() << delim
+      line_str << seq_ptr->getName() << delim
         << seq_ptr->getDesc() << delim
         << (seq_pos + 1) << delim
         << (seq_pos + form_ptr->getLen()) << delim
@@ -430,10 +433,12 @@ void PrsmMatchTableWriter::writePrsmStandardFormat(std::ofstream &file, PrsmPtr 
         << delim;
 
       // fdr
-      file << delim
+      line_str << delim
         << std::endl;
     }
   }
+
+  output_file << line_str.str();
 }
 
 }  // namespace toppic
