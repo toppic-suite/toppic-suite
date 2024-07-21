@@ -29,6 +29,7 @@ void process(const std::string &db_file_name,
              const std::string &input_file_ext,
              const ModPtrVec &fix_mod_ptr_vec,
              const std::string &output_file_ext,
+             bool is_ppm_error,
              double error_tole);
 
 }

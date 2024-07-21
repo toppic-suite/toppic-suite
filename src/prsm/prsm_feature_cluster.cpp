@@ -57,6 +57,7 @@ void setProtId(PrsmStrPtrVec& prsm_ptrs) {
 }
 
 void setProteoClusterId(PrsmStrPtrVec& prsm_ptrs,
+                        bool ppm_error_type,
                         double prec_error_tole) {
   std::vector<PrsmStrPtrVec> clusters;
   int prsm_count = prsm_ptrs.size();
@@ -83,16 +84,20 @@ void setProteoClusterId(PrsmStrPtrVec& prsm_ptrs,
         << std::setprecision(3) << perc << "%. \r";
   }
   // second round, merge feature clusters
+  double dalton_error_tole = prec_error_tole;
   std::vector<PrsmStrPtrVec> merged_clusters;
   for (size_t i = 0; i < clusters.size(); i++) {
     bool is_found = false;
     PrsmStrPtr cur_ptr = clusters[i][0];
+    if (ppm_error_type) {
+      dalton_error_tole = cur_ptr->getOriPrecMass() * prec_error_tole;
+    }
     for (size_t j = 0; j < merged_clusters.size(); j++) {
       PrsmStrPtr ref_ptr = merged_clusters[j][0];
       // if the same protein and similar mass
       if (cur_ptr->getProtId() == ref_ptr->getProtId()) {
         if (std::abs(cur_ptr->getOriPrecMass() - ref_ptr->getOriPrecMass()) 
-            <= prec_error_tole) {
+            <= dalton_error_tole) {
           merged_clusters[j].insert(merged_clusters[j].end(),
                                     clusters[i].begin(), 
                                     clusters[i].end());
@@ -134,6 +139,7 @@ void setProteoClusterId(PrsmStrPtrVec& prsm_ptrs,
 void process(const std::string &spec_file_name,
              const std::string &input_file_ext,
              const std::string &output_file_ext,
+             bool ppm_error_type, 
              double prec_error_tole) {
   std::string base_name = file_util::basename(spec_file_name);
   std::string input_file_name = base_name + "." + input_file_ext;
@@ -149,7 +155,7 @@ void process(const std::string &spec_file_name,
 
   setProtId(filtered_prsm_ptrs);
   // find proteoform clusters and add proteoform id and intensity information
-  setProteoClusterId(filtered_prsm_ptrs, prec_error_tole);
+  setProteoClusterId(filtered_prsm_ptrs, ppm_error_type, prec_error_tole);
   std::sort(filtered_prsm_ptrs.begin(), filtered_prsm_ptrs.end(), 
             PrsmStr::cmpSpecIncPrecIncEvalueIncProtInc);
   // output

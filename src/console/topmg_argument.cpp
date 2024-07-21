@@ -47,6 +47,7 @@ std::map<std::string, std::string> TopmgArgument::initArguments() {
   arguments["fixedMod"] = "";
   arguments["shiftNumber"] = "0";
   arguments["massErrorTolerance"] = "10";
+  arguments["proteoformPpmError"] = "false";
   arguments["proteoformErrorTolerance"] = "1.2";
   arguments["cutoffSpectralType"] = "EVALUE";
   arguments["cutoffSpectralValue"] = "0.01";
@@ -233,6 +234,7 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
         ("n-terminal-form,n", po::value<std::string> (&allow_mod), "")
         ("decoy,d", "")
         ("mass-error-tolerance,e", po::value<std::string> (&mass_error_tole), "")
+        ("proteoform-ppm-error,P", "")
         ("proteoform-error-tolerance,p", po::value<std::string> (&form_error_tole), "")
         ("max-shift,M", po::value<std::string> (&max_shift_mass), "")
         ("spectrum-cutoff-type,t", po::value<std::string> (&cutoff_spectral_type), "")
@@ -330,6 +332,10 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
 
     if (vm.count("mass-error-tolerance")) {
       arguments_["massErrorTolerance"] = mass_error_tole;
+    }
+
+    if (vm.count("proteoform-ppm-error")) {
+      arguments_["proteoformPpmError"] = "true";
     }
 
     if (vm.count("proteoform-error-tolerance")) {
