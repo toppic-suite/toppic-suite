@@ -53,16 +53,21 @@ PrsmStrPtrVec2D setProtId(PrsmStrPtrVec& prsm_ptrs) {
   return proteins;
 }
 
-void setClusterId(PrsmStrPtrVec2D & proteins, double error_tole) {
+void setClusterId(PrsmStrPtrVec2D & proteins, bool is_ppm_error, 
+                  double error_tole) {
   PrsmStrPtrVec2D clusters; 
+  double dalton_error_tole = error_tole;
   for (size_t i = 0; i < proteins.size(); i++) {
     PrsmStrPtrVec2D protein_clusters;
     for (size_t j = 0; j < proteins[i].size(); j++) {
       bool is_found = false;
       PrsmStrPtr cur_prsm = proteins[i][j];
+      if (is_ppm_error) {
+        dalton_error_tole = cur_prsm->getOriPrecMass() * error_tole;
+      }
       for (size_t m = 0; m < protein_clusters.size(); m++) {
         PrsmStrPtr ref_prsm = protein_clusters[m][0]; 
-        if (PrsmStr::isSimpleMatch(cur_prsm, ref_prsm, error_tole)) {
+        if (PrsmStr::isSimpleMatch(cur_prsm, ref_prsm, dalton_error_tole)) {
           protein_clusters[m].push_back(cur_prsm);
           is_found = true;
           break;
@@ -89,6 +94,7 @@ void process(const std::string &db_file_name,
              const std::string &input_file_ext,
              const ModPtrVec &fix_mod_ptr_vec,
              const std::string &output_file_ext,
+             bool is_ppm_error,
              double error_tole)  {
   std::string base_name = file_util::basename(spec_file_name);
   std::string input_file_name = base_name + "." + input_file_ext;
@@ -97,7 +103,7 @@ void process(const std::string &db_file_name,
   LOG_DEBUG("Reading prsm strings finished");
   sort(prsm_ptrs.begin(), prsm_ptrs.end(), PrsmStr::cmpEValueIncProtInc);
   PrsmStrPtrVec2D protein_prsms = setProtId(prsm_ptrs);
-  setClusterId(protein_prsms, error_tole);
+  setClusterId(protein_prsms, is_ppm_error, error_tole);
   sort(prsm_ptrs.begin(), prsm_ptrs.end(),
        PrsmStr::cmpSpecIncPrecIncEvalueIncProtInc);
   // output
