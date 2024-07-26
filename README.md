@@ -22,7 +22,7 @@ sudo apt install libboost-thread-dev
 sudo apt install libxerces-c-dev  
 sudo apt install zlib1g-dev 
 
-# Qt5 for GUI
+# install Qt5 for GUI
 sudo apt install qtbase5-dev
 
 # building
@@ -33,23 +33,22 @@ make -j$(nproc)
 make install
 ```
 
-### Linux (CentOS Stream 8):
+### Linux (Redhat 9):
 
 ```sh
 # install Extra Packages for Enterprise Linux (EPEL)
-sudo dnf install 'dnf-command(config-manager)'
-sudo dnf config-manager --set-enabled powertools
-sudo dnf install epel-release 
+sudo subscription-manager repos --enable codeready-builder-for-rhel-9-$(arch)-rpms
+sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
 
 # install compiling tools
-sudo dnf install gcc gcc-c++ make cmake
+sudo dnf install gcc-c++ cmake
 
 # install dependencies
 sudo dnf install zlib-devel
 sudo dnf install boost-devel 
 sudo dnf install xerces-c-devel
 
-# Qt5 for GUI
+# install Qt5 for GUI
 sudo dnf install qt5-qtbase-devel
 
 # building
@@ -62,7 +61,7 @@ make install
 
 ### Language setting
 
-On some Linux distributions, you might meet the problem "Could not loading a transcoding service".
+On some Linux distributions, you might have the problem "Could not loading a transcoding service".
 To fix this, please add following lines into your `.bashrc`.
 
 ```sh
