@@ -4,7 +4,7 @@ For manual and reference, please visit https://www.toppic.org/software/toppic/
 
 ## System requirements
 
-* GCC version higher than 11.4.0 for C++17 support
+* GCC-C++ version higher than 11.4.0 for C++17 support
 * CMake (>= 3.5)
 
 ### Linux (Ubuntu 24.04):
@@ -13,7 +13,7 @@ For manual and reference, please visit https://www.toppic.org/software/toppic/
 # install compiling tools
 sudo apt install build-essential cmake
 
-# install other dependencies
+# install dependencies
 sudo apt install libboost-chrono-dev 
 sudo apt install libboost-filesystem-dev 
 sudo apt install libboost-iostreams-dev 
@@ -41,12 +41,12 @@ sudo subscription-manager repos --enable codeready-builder-for-rhel-9-$(arch)-rp
 sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
 
 # install compiling tools
-sudo dnf install gcc-c++ cmake
+sudo dnf install cmake gcc-c++ make
 
 # install dependencies
-sudo dnf install zlib-devel
 sudo dnf install boost-devel 
 sudo dnf install xerces-c-devel
+sudo dnf install zlib-devel
 
 # install Qt5 for GUI
 sudo dnf install qt5-qtbase-devel
