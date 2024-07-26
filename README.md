@@ -5,23 +5,22 @@ For manual and reference, please visit https://www.toppic.org/software/toppic/
 ## System requirements
 
 * GCC version higher than 11.4.0 for C++17 support
-* CMake (>= 3.26)
+* CMake (>= 3.5)
 
-### Linux (Ubuntu 22.04):
+### Linux (Ubuntu 24.04):
 
 ```sh
 # install compiling tools
 sudo apt install build-essential cmake
 
 # install other dependencies
-sudo apt install zlib1g-dev 
-sudo apt install libboost-filesystem-dev 
-sudo apt install libboost-program-options-dev 
-sudo apt install libboost-system-dev 
-sudo apt install libboost-thread-dev 
-sudo apt install libboost-iostreams-dev 
 sudo apt install libboost-chrono-dev 
+sudo apt install libboost-filesystem-dev 
+sudo apt install libboost-iostreams-dev 
+sudo apt install libboost-program-options-dev 
+sudo apt install libboost-thread-dev 
 sudo apt install libxerces-c-dev  
+sudo apt install zlib1g-dev 
 
 # Qt5 for GUI
 sudo apt install qtbase5-dev

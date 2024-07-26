@@ -24,7 +24,6 @@
 #ifndef _MSDATA_HPP_
 #define _MSDATA_HPP_
 
-
 #include "pwiz/utility/misc/Export.hpp"
 #include "pwiz/utility/misc/BinaryData.hpp"
 #include "pwiz/data/common/ParamTypes.hpp"
@@ -34,6 +33,7 @@
 #include <string>
 #include <map>
 #include <set>
+#include <cstdint>
 
 
 namespace pwiz {

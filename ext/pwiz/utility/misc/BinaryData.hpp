@@ -32,6 +32,7 @@
 #include <memory>
 #include <iterator>
 #include <limits>
+#include <cstdint>
 #include <boost/assert.hpp>
 #include "pwiz/utility/misc/Export.hpp"
 
