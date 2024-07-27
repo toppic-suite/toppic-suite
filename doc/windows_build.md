@@ -27,7 +27,7 @@ pacman -S mingw-w64-x86_64-qt5-base
 git clone https://github.com/toppic-suite/toppic-suite.git
 ```
 
-# Use Windows Terminal to build TopPIC suite.
+# Use Windows Terminal to build TopPIC suite
 
 Add `C:\msys64\mingw64\bin` into your PATH environmental variable. 
 
