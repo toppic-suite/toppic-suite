@@ -240,9 +240,9 @@ void BinaryDataEncoder::Impl::encode(const double* data, size_t dataSize, std::s
             else
                 byteBuffer = reinterpret_cast<const void*>(&numpressed[0]);
         } catch (int e) {
-            cerr << "MZNumpress encoder threw exception: " << e << endl;
+	    std::cerr << "MZNumpress encoder threw exception: " << e << endl;
         } catch (...) {
-            cerr << "Unknown exception while encoding " << dataSize << " doubles" << endl;
+	    std::cerr << "Unknown exception while encoding " << dataSize << " doubles" << endl;
         }
 
     }

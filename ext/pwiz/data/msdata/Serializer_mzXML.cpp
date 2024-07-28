@@ -760,7 +760,7 @@ void write_scans(XMLWriter& xmlWriter, const MSData& msd,
         {
             if (continueOnError)
             {
-                cerr << "Skipping spectrum " << i << " \"" << (spectrum ? spectrum->id : sl->spectrumIdentity(i).id) << "\": " << e.what() << endl;
+		std::cerr << "Skipping spectrum " << i << " \"" << (spectrum ? spectrum->id : sl->spectrumIdentity(i).id) << "\": " << e.what() << endl;
                 continue;
             }
             else

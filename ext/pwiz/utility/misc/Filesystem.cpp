@@ -25,7 +25,7 @@
 
 #include "Filesystem.hpp"
 
-#ifdef _MSC_VER
+#ifdef WIN32
     #ifdef _WIN32_WINNT
         #undef _WIN32_WINNT
     #endif
@@ -106,7 +106,7 @@ extern "C"
         ACCESS_MASK GrantedAccess;
     };
 
-    struct SYSTEM_HANDLE_INFORMATION {
+    struct PWIZ_SYSTEM_HANDLE_INFORMATION {
         ULONG HandleCount;
         SYSTEM_HANDLE Handles[1];
     };
@@ -159,7 +159,7 @@ extern "C"
     }
 }
 
-    int GetFileHandleTypeNumber(SYSTEM_HANDLE_INFORMATION* handleInfos)
+    int GetFileHandleTypeNumber(PWIZ_SYSTEM_HANDLE_INFORMATION* handleInfos)
     {
         DWORD currentProcessId = GetCurrentProcessId();
         wstring fileType = L"File";
@@ -286,7 +286,7 @@ PWIZ_API_DECL void force_close_handles_to_filepath(const std::string& filepath, 
     }
 
     NTSTATUS status = 0;
-    DWORD dwSize = sizeof(SYSTEM_HANDLE_INFORMATION);
+    DWORD dwSize = sizeof(PWIZ_SYSTEM_HANDLE_INFORMATION);
     vector<BYTE> pInfoBytes(dwSize);
 
     do
@@ -314,7 +314,7 @@ PWIZ_API_DECL void force_close_handles_to_filepath(const std::string& filepath, 
         return;
     }
 
-    auto pInfo = reinterpret_cast<SYSTEM_HANDLE_INFORMATION*>(pInfoBytes.data());
+    auto pInfo = reinterpret_cast<PWIZ_SYSTEM_HANDLE_INFORMATION*>(pInfoBytes.data());
     int fileHandleType = GetFileHandleTypeNumber(pInfo);
     if (fileHandleType == 0)
     {
@@ -446,7 +446,7 @@ PWIZ_API_DECL int expand_pathmask(const bfs::path& pathmask,
     int matchingPathCount = 0;
 
 #ifdef WIN32
-    path maskParentPath = pathmask.branch_path();
+    path maskParentPath = pathmask.parent_path();
 	WIN32_FIND_DATAW fdata;
 	HANDLE srcFile = FindFirstFileExW(boost::nowide::widen(pathmask.string()).c_str(), FindExInfoStandard, &fdata, FindExSearchNameMatch, NULL, 0);
 	if (srcFile == INVALID_HANDLE_VALUE)

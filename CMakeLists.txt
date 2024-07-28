@@ -57,6 +57,9 @@ file(GLOB PWIZ_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/utility/minimxml/*.cpp
 # hts
 file(GLOB HTS_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/ext/htslib/*.c)
 
+# nowide used for the Windows version of topfd
+file(GLOB NOWIDE_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/ext/boost/nowide/*.c)
+
 # common
 file(GLOB_RECURSE COMMON_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/common/*.cpp)
 file(GLOB SEQ_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/seq/*.cpp)
@@ -176,7 +179,7 @@ file(GLOB UNIT_TEST_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/*.cpp)
 
 add_executable(topfd 
   ${TOPFD_CONSOLE_SRCS} ${TOPFD_SRCS} ${COMMON_SRCS} ${PARA_SRCS} 
-  ${SPEC_SRCS} ${MZML_SRCS} ${PWIZ_SRCS})
+  ${SPEC_SRCS} ${MZML_SRCS} ${PWIZ_SRCS} ${NOWIDE_SRCS})
 
 add_executable(topindex 
   ${TOPINDEX_CONSOLE_SRCS} ${TOPINDEX_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS}

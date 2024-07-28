@@ -2905,7 +2905,7 @@ void write(minimxml::XMLWriter& writer, const SpectrumList& spectrumList, const 
         {
             if (continueOnError)
             {
-                cerr << "Skipping spectrum " << i << " \"" << (spectrum ? spectrum->id : spectrumList.spectrumIdentity(i).id) << "\": " << e.what() << endl;
+		std::cerr << "Skipping spectrum " << i << " \"" << (spectrum ? spectrum->id : spectrumList.spectrumIdentity(i).id) << "\": " << e.what() << endl;
                 ++skipped;
                 if (spectrumPositions)
                     spectrumPositions->push_back(-1);
@@ -3038,7 +3038,7 @@ void write(minimxml::XMLWriter& writer, const ChromatogramList& chromatogramList
         {
             if (continueOnError)
             {
-                cerr << "Skipping chromatogram " << i << " \"" << (chromatogram ? chromatogram->id : chromatogramList.chromatogramIdentity(i).id) << "\": " << e.what() << endl;
+		std::cerr << "Skipping chromatogram " << i << " \"" << (chromatogram ? chromatogram->id : chromatogramList.chromatogramIdentity(i).id) << "\": " << e.what() << endl;
                 ++skipped;
                 if (chromatogramPositions)
                     chromatogramPositions->push_back(-1);
