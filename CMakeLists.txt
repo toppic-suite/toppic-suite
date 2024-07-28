@@ -11,7 +11,7 @@ message(STATUS "System name: " ${CMAKE_SYSTEM_NAME})
 message(STATUS "Cmake cxx flags " ${CMAKE_CXX_FLAGS})
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-  # Linux specific code
+  # Linux specific code -DWITHOUT_MZ5 is used in pwiz
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unknown-pragmas -std=c++17 -Wl,-rpath=$ORIGIN/../lib/toppic,--disable-new-dtags -O3 -DWITHOUT_MZ5 -fPIC")
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
 
@@ -51,7 +51,8 @@ link_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/toppic)
 file(GLOB PWIZ_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/utility/minimxml/*.cpp
                     ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/utility/misc/*.cpp
                     ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/data/common/*.cpp
-                    ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/data/msdata/*.cpp)
+                    ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/data/msdata/*.cpp
+                    ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/data/msdata/mzmlb/*.cpp)
 
 # hts
 file(GLOB HTS_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/ext/htslib/*.c)

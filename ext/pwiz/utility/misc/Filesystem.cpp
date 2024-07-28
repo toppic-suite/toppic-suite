@@ -25,7 +25,7 @@
 
 #include "Filesystem.hpp"
 
-#ifdef WIN32
+#ifdef _MSC_VER
     #ifdef _WIN32_WINNT
         #undef _WIN32_WINNT
     #endif
@@ -106,7 +106,7 @@ extern "C"
         ACCESS_MASK GrantedAccess;
     };
 
-    struct PWIZ_SYSTEM_HANDLE_INFORMATION {
+    struct SYSTEM_HANDLE_INFORMATION {
         ULONG HandleCount;
         SYSTEM_HANDLE Handles[1];
     };
@@ -159,7 +159,7 @@ extern "C"
     }
 }
 
-    int GetFileHandleTypeNumber(PWIZ_SYSTEM_HANDLE_INFORMATION* handleInfos)
+    int GetFileHandleTypeNumber(SYSTEM_HANDLE_INFORMATION* handleInfos)
     {
         DWORD currentProcessId = GetCurrentProcessId();
         wstring fileType = L"File";
@@ -286,7 +286,7 @@ PWIZ_API_DECL void force_close_handles_to_filepath(const std::string& filepath, 
     }
 
     NTSTATUS status = 0;
-    DWORD dwSize = sizeof(PWIZ_SYSTEM_HANDLE_INFORMATION);
+    DWORD dwSize = sizeof(SYSTEM_HANDLE_INFORMATION);
     vector<BYTE> pInfoBytes(dwSize);
 
     do
@@ -314,7 +314,7 @@ PWIZ_API_DECL void force_close_handles_to_filepath(const std::string& filepath, 
         return;
     }
 
-    auto pInfo = reinterpret_cast<PWIZ_SYSTEM_HANDLE_INFORMATION*>(pInfoBytes.data());
+    auto pInfo = reinterpret_cast<SYSTEM_HANDLE_INFORMATION*>(pInfoBytes.data());
     int fileHandleType = GetFileHandleTypeNumber(pInfo);
     if (fileHandleType == 0)
     {
