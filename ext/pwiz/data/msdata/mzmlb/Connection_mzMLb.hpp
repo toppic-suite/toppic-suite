@@ -29,7 +29,7 @@
 #include <fstream>
 #include <vector>
 #include <map>
-#include <hdf5.h>
+//#include <hdf5.h>
 
 
 namespace pwiz {
@@ -70,14 +70,17 @@ public:
 
     
 private:
+    /*
     std::streamsize read(const std::string& id, void* buf, std::streamsize n, hid_t native_format);
     std::streamsize write(const std::string& path, const void* buf, std::streamsize n, hid_t native_format, hid_t format, size_t bytes);
 
     hid_t opaque_id_;
     hid_t file_;
+    */
     unsigned long chunk_size_;
     unsigned long compression_level_;
 
+    /*
     struct Stream {
         hid_t dataset;
         hid_t space;
@@ -93,6 +96,7 @@ private:
     
     Stream mzML_; // stream parameters for "mzML" text dataset
     std::map<std::string, Stream> binary_; // stream parameters for binary datasets 
+    */
 };
 
 } // mzmlb
