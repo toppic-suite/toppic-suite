@@ -8,17 +8,21 @@ SET(CMAKE_VERBOSE_MAKEFILE ON)
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../bin)
 
 message(STATUS "System name: " ${CMAKE_SYSTEM_NAME})
-message(STATUS "Cmake cxx flags " ${CMAKE_CXX_FLAGS})
+
+# -DWITHOUT_MZ5 is used in pwiz
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unknown-pragmas -std=c++17 -O3 -DWITHOUT_MZ5 -fPIC")
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-  # Linux specific code -DWITHOUT_MZ5 is used in pwiz
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unknown-pragmas -std=c++17 -Wl,-rpath=$ORIGIN/../lib/toppic,--disable-new-dtags -O3 -DWITHOUT_MZ5 -fPIC")
+  # Linux specific code 
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-rpath=$ORIGIN/../lib/toppic,--disable-new-dtags -DTOPPIC_LINUX")
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   # Windows specific code
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unknown-pragmas -std=c++17 -O3 -DWITHOUT_MZ5 -fPIC -fpermissive")
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTOPPIC_WINDOWS -DWIN32")
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+
+message(STATUS "Cmake cxx flags: " ${CMAKE_CXX_FLAGS})
 
 # for Qt
 set(CMAKE_AUTOMOC ON)
@@ -29,15 +33,6 @@ find_package(Qt5Widgets)
 find_package(Qt5Core)
 find_package(Qt5Gui)
 
-IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-  # Linux specific code
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTOPPIC_LINUX")
-ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
-
-IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-  # Windows specific code
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTOPPIC_WINDOWS -DWIN32")
-ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src
                     ${CMAKE_CURRENT_SOURCE_DIR}/ext
