@@ -70,7 +70,7 @@ void Serializer_MGF::Impl::write(ostream& os, const MSData& msd,
     if (msd.fileDescription.sourceFilePtrs.size() >= 1)
         titleIsThermoDTA = msd.fileDescription.sourceFilePtrs[0]->hasCVParam(MS_Thermo_nativeID_format);
     const string& thermoFilename = titleIsThermoDTA ? msd.fileDescription.sourceFilePtrs[0]->name : "";
-    string thermoBasename = titleIsThermoDTA ? bfs::basename(thermoFilename) : "";
+    string thermoBasename = titleIsThermoDTA ? bfs::path(thermoFilename).stem().string() : "";
 
     int scansWritten = 0;
 
