@@ -19,7 +19,8 @@ ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   # Windows specific code
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTOPPIC_WINDOWS -DWIN32")
+  # fpermissive is needed to compile ext/pwiz/utility/misc/Filesystem.cpp
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive -DTOPPIC_WINDOWS -DWIN32")
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
 message(STATUS "Cmake cxx flags: " ${CMAKE_CXX_FLAGS})
