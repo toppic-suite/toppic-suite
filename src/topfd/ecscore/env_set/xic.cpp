@@ -17,9 +17,9 @@
 
 namespace toppic {
 
-Xic::Xic(std::vector<double> &inte_ratio_list,
-         std::vector<double> &top_three_inte_list,
-         std::vector<double> &all_peak_inte_list) {
+Xic::Xic(std::vector<double> inte_ratio_list,
+         std::vector<double> top_three_inte_list,
+         std::vector<double> all_peak_inte_list) {
   inte_ratio_list_ = inte_ratio_list;
   top_three_inte_list_ = top_three_inte_list;
   top_three_inte_sum_ = std::accumulate(top_three_inte_list_.begin(), 
@@ -33,9 +33,8 @@ Xic::Xic(std::vector<double> &inte_ratio_list,
 }
 
 void Xic::moving_avg(int size) {
-  std::vector<double> data = top_three_inte_list_;
-  std::vector<double> left_padding(1, 0);
-  data.insert(data.begin(), left_padding.begin(), left_padding.end());
+  std::vector<double> data{0};
+  data.insert(data.end(), top_three_inte_list_.begin(), top_three_inte_list_.end());
   int num_spec = data.size();
   double sum = 0.0;
   int cnt = 0;

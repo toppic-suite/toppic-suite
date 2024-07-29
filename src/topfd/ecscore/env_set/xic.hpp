@@ -22,9 +22,9 @@ namespace toppic {
 
 class Xic {
  public:
-  Xic(std::vector<double> &inte_ratio_list,
-      std::vector<double> &top_three_inte_list, 
-      std::vector<double> &all_peak_inte_list);
+  Xic(std::vector<double> inte_ratio_list,
+      std::vector<double> top_three_inte_list, 
+      std::vector<double> all_peak_inte_list);
 
   std::vector<double> getInteRatioList() {return inte_ratio_list_; }
 

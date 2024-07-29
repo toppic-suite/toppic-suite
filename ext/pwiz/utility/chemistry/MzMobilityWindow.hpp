@@ -37,7 +37,7 @@ struct MzMobilityWindow
     bool mobilityValueInBounds(double mobilityValue) const
     {
         return !mobilityBounds ||
-               mobilityBounds.get().first < mobilityValue && mobilityValue < mobilityBounds.get().second;
+               (mobilityBounds.get().first < mobilityValue && mobilityValue < mobilityBounds.get().second);
     }
 
     static bool mobilityValueInBounds(const std::vector<MzMobilityWindow>& windows, double mobilityValue)
