@@ -22,6 +22,7 @@
 #include "common/util/file_util.hpp"
 #include "common/util/mem_check.hpp"
 #include "common/util/version.hpp"
+#include "common/util/console_util.hpp"
 
 #include "seq/fasta_reader.hpp"
 #include "seq/fasta_util.hpp"
@@ -69,7 +70,6 @@
 #include "visual/xml_generator.hpp"
 #include "visual/json_transformer.hpp"
 
-#include "console/console_util.hpp"
 #include "console/topmg_argument.hpp"
 #include "console/topmg_process.hpp"
 

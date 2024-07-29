@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_CONSOLE_CONSOLE_UTIL_HPP_
-#define TOPPIC_CONSOLE_CONSOLE_UTIL_HPP_
+#ifndef TOPPIC_COMMON_UTIL_CONSOLE_UTIL_HPP_
+#define TOPPIC_COMMON_UTIL_CONSOLE_UTIL_HPP_
 
 #include <map>
 #include <string>

@@ -14,7 +14,7 @@
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
-#include "console/console_util.hpp"
+#include "common/util/console_util.hpp"
 
 namespace toppic {
 
