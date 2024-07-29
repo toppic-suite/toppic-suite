@@ -47,6 +47,7 @@
 #include "prsm/prsm_fdr_groups.hpp"
 #include "prsm/prsm_form_filter.hpp"
 #include "prsm/prsm_util.hpp"
+#include "prsm/prsm_coverage.hpp"
 
 #include "filter/mng/zero_ptm_filter_mng.hpp"
 #include "filter/mng/index_file_name.hpp"
@@ -447,7 +448,7 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
 
     std::string argu_str = ToppicArgument::outputTsvArguments(arguments);
 
-    if (arguments["outputRawPrsms"] == "true"){
+    if (arguments["outputRawPrsmTable"] == "true"){
       std::cout << "Outputting Raw PrSM table - started." << std::endl;
       PrsmMatchTableWriterPtr raw_table_out
         = std::make_shared<PrsmMatchTableWriter>(prsm_para_ptr, argu_str, 
@@ -507,6 +508,14 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
       std::cout << "Converting PrSM XML files to JSON files - started." << std::endl;
       jsonTranslate(arguments, "toppic_prsm_cutoff");
       std::cout << "Converting PrSM XML files to JSON files - finished." << std::endl;
+    }
+
+    if (arguments["outputPrsmCoverage"] == "true") {
+      std::cout << "Outputting PrSM coverage - started." << std::endl;
+      PrsmCoveragePtr cov_ptr = std::make_shared<PrsmCoverage>(prsm_para_ptr, "toppic_prsm_cutoff", "toppic_prsm_coverage");
+      cov_ptr->processSingleCoverage();
+      cov_ptr = nullptr;
+      std::cout << "Outputting PrSM coverage - finished." << std::endl;
     }
 
     cutoff_type = (arguments["cutoffProteoformType"] == "FDR") ? "FORMFDR": "EVALUE";
