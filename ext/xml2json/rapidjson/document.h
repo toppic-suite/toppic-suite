@@ -97,19 +97,35 @@ struct GenericMember {
 
     \see GenericMember, GenericValue::MemberIterator, GenericValue::ConstMemberIterator
  */
+//template <bool Const, typename Encoding, typename Allocator>
+//class GenericMemberIterator
+//    : public std::iterator<std::random_access_iterator_tag
+//        , typename internal::MaybeAddConst<Const,GenericMember<Encoding,Allocator> >::Type> {
 template <bool Const, typename Encoding, typename Allocator>
-class GenericMemberIterator
-    : public std::iterator<std::random_access_iterator_tag
-        , typename internal::MaybeAddConst<Const,GenericMember<Encoding,Allocator> >::Type> {
+class GenericMemberIterator {
 
     friend class GenericValue<Encoding,Allocator>;
     template <bool, typename, typename> friend class GenericMemberIterator;
 
     typedef GenericMember<Encoding,Allocator> PlainType;
     typedef typename internal::MaybeAddConst<Const,PlainType>::Type ValueType;
-    typedef std::iterator<std::random_access_iterator_tag,ValueType> BaseType;
+    //typedef std::iterator<std::random_access_iterator_tag,ValueType> BaseType;
+    class BaseType {
+      public:
+      using iterator_category = std::random_access_iterator_tag;
+      using value_type = ValueType;  
+      using difference_type = std::ptrdiff_t;
+      using pointer = ValueType *; 
+      using reference = ValueType &; 
+    };
 
 public:
+    using iterator_category = std::random_access_iterator_tag;
+    using value_type = typename internal::MaybeAddConst<Const,GenericMember<Encoding,Allocator> >::Type; 
+    using difference_type = std::ptrdiff_t;
+    using pointer = typename internal::MaybeAddConst<Const,GenericMember<Encoding,Allocator> >::Type *; 
+    using reference = typename internal::MaybeAddConst<Const,GenericMember<Encoding,Allocator> >::Type &; 
+ 
     //! Iterator type itself
     typedef GenericMemberIterator Iterator;
     //! Constant iterator type
