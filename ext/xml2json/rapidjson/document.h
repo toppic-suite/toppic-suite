@@ -120,11 +120,12 @@ class GenericMemberIterator {
     };
 
 public:
+    typedef typename internal::MaybeAddConst<Const,GenericMember<Encoding,Allocator> >::Type IterValueType; 
     using iterator_category = std::random_access_iterator_tag;
-    using value_type = typename internal::MaybeAddConst<Const,GenericMember<Encoding,Allocator> >::Type; 
+    using value_type = IterValueType; 
     using difference_type = std::ptrdiff_t;
-    using pointer = typename internal::MaybeAddConst<Const,GenericMember<Encoding,Allocator> >::Type *; 
-    using reference = typename internal::MaybeAddConst<Const,GenericMember<Encoding,Allocator> >::Type &; 
+    using pointer = IterValueType *; 
+    using reference = IterValueType &; 
  
     //! Iterator type itself
     typedef GenericMemberIterator Iterator;
