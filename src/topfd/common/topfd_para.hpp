@@ -92,6 +92,7 @@ class TopfdPara {
   void setMs2ScanNumber(int ms2_scan_num) {ms_2_scan_num_ = ms2_scan_num;}
 
   void setTextMassList(bool text_mass_list) {text_mass_list_ = text_mass_list;}
+  void setOutputMatchEnv(bool output_match_env) {output_match_env_ = output_match_env;}
 
  private:
   std::string exe_dir_;
