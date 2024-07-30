@@ -14,7 +14,8 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unknown-pragmas -std=c++17 -O
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   # Linux specific code 
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-rpath=$ORIGIN/../lib/toppic,--disable-new-dtags -DTOPPIC_LINUX")
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTOPPIC_LINUX")
+  SET(CMAKE_SHARED_LINKER_FLAGS "-Wl,-rpath=$ORIGIN/../lib/toppic,--disable-new-dtags")
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")

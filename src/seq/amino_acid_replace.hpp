@@ -13,7 +13,7 @@
 //limitations under the License.
 
 #ifndef TOPPIC_SEQ_AMINO_ACID_REPLACE_HPP_
-#define TOPPIC_SEQ_AMICO_ACID_REPLACE_HPP_
+#define TOPPIC_SEQ_AMINO_ACID_REPLACE_HPP_
 
 #include <memory>
 #include <string>

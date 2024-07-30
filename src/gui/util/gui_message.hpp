@@ -35,7 +35,6 @@ class GuiMessage {
   std::string processed_lines_ = ""; 
   std::string current_line_ = "";
   unsigned cursor_pos_ = 0;
-  bool finish_ = false;
 };
 
 }
