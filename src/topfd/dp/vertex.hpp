@@ -33,6 +33,8 @@ class Vertex {
 
   Vertex() {};
 
+  virtual ~Vertex() {};
+
   virtual bool addPreEnv(MatchEnvPtr env, int max_overlap);
   bool addCurEnv(MatchEnvPtr env, int max_overlap);
   void trim();
