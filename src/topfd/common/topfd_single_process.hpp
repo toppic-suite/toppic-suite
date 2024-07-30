@@ -12,25 +12,19 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_CONSOLE_TOPFD_SINGLE_PROCESS_HPP_
-#define TOPPIC_CONSOLE_TOPFD_SINGLE_PROCESS_HPP_
+#ifndef TOPPIC_TOPFD_COMMON_TOPFD_SINGLE_PROCESS_HPP_
+#define TOPPIC_TOPFD_COMMON_TOPFD_SINGLE_PROCESS_HPP_
 
 #include <string>
 #include <vector>
-#include <map>
+
+#include "topfd/common/topfd_para.hpp"
 
 namespace toppic {
 
 namespace topfd_single_process {
 
-std::string geneArgumentStr(std::map<std::string, std::string> arguments, 
-                            const std::string & prefix);
-
-int processOneFile(std::map<std::string, std::string> arguments, 
-                   const std::string &argument_str,
-                   const std::string &spec_file_name, int frac_id);
-
-int process(std::map<std::string, std::string> arguments, 
+int process(TopfdParaPtr para_ptr, 
             std::vector<std::string> spec_file_lst); 
 
 }

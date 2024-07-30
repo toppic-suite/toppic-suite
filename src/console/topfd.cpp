@@ -13,6 +13,7 @@
 //limitations under the License.
 
 #include "topfd/common/topfd_para.hpp"
+#include "topfd/common/topfd_single_process.hpp"
 #include "topfd/common/topfd_process.hpp"
 #include "console/topfd_argument.hpp"
 
@@ -29,8 +30,13 @@ int main(int argc, char* argv[]) {
 
   std::vector<std::string> spec_file_lst = argu_processor.getSpecFileList();
 
-  int result = toppic::topfd_process::process(topfd_para_ptr, spec_file_lst);
-
+  int result;
+  if (topfd_para_ptr->isTextPeakList()) {
+    result = toppic::topfd_single_process::process(topfd_para_ptr, spec_file_lst);
+  }
+  else {
+    result = toppic::topfd_process::process(topfd_para_ptr, spec_file_lst);
+  }
   return result;
 }
 

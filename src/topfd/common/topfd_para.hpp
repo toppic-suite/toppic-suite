@@ -49,7 +49,7 @@ class TopfdPara {
   double getEcscoreCutoff() {return ecscore_cutoff_;}
   bool isSearchPrecWindow() {return search_prec_window_;}
   bool isUseSingleScanNoiseLevel() {return use_single_scan_noise_level_;}
-  bool isTextMassList() {return text_mass_list_;}
+  bool isTextPeakList() {return text_peak_list_;}
 
   std::string getMzmlFileName() {return mzml_file_name_;}
   std::string getOutputBaseName() {return output_base_name_;}
@@ -91,7 +91,7 @@ class TopfdPara {
   void setMs1ScanNumber(int ms1_scan_num) {ms_1_scan_num_ = ms1_scan_num;}
   void setMs2ScanNumber(int ms2_scan_num) {ms_2_scan_num_ = ms2_scan_num;}
 
-  void setTextMassList(bool text_mass_list) {text_mass_list_ = text_mass_list;}
+  void setTextPeakList(bool text_peak_list) {text_peak_list_ = text_peak_list;}
   void setOutputMatchEnv(bool output_match_env) {output_match_env_ = output_match_env;}
 
  private:
@@ -137,7 +137,7 @@ class TopfdPara {
 
   //call function for processing a simple text file 
   //containing a mass list
-  bool text_mass_list_ = false;
+  bool text_peak_list_ = false;
 };
 
 typedef std::shared_ptr<TopfdPara> TopfdParaPtr;
