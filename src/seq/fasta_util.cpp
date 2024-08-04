@@ -16,6 +16,7 @@
 #include <algorithm>
 #include <random>
 #include <cmath>
+#include <set>
 
 #include "htslib/faidx.h"
 
@@ -170,10 +171,27 @@ void generateDbBlock(const std::string &db_file_name, int block_size,
   block_output.close();
 }
 
+void checkDuplicate(std::string file_name, std::string idx_folder_name) { 
+  faidx_t *fai = fai_load(file_name.c_str());
+  std::set<std::string> name_set;
+  int seq_num = faidx_nseq(fai);
+  for (int i = 0; i < seq_num; i++) {
+    std::string name (faidx_iseq(fai, i));
+    if (! name_set.insert(name).second) {
+      file_util::delDir(idx_folder_name);
+      LOG_ERROR("The protein sequence database contains duplicated sequences: " << name);
+      exit(EXIT_FAILURE);
+    }
+  }
+  fai_destroy(fai);
+}
+
 void dbSimplePreprocess(const std::string &ori_db_file_name,
                         const std::string &db_file_name) {
-  if (!file_util::exists(ori_db_file_name + "_idx")){//if _idx folder doesn't exist yet
-    file_util::createFolder(ori_db_file_name + "_idx");
+  std::string idx_folder_name = ori_db_file_name + "_idx"; 
+  if (!file_util::exists(idx_folder_name)) {
+    //if _idx folder doesn't exist yet
+    file_util::createFolder(idx_folder_name);
   }
   if (file_util::exists(db_file_name)) {
     return;
@@ -184,15 +202,17 @@ void dbSimplePreprocess(const std::string &ori_db_file_name,
     return;
   }
   fai_build(db_file_name.c_str());
+  checkDuplicate(db_file_name, idx_folder_name);   
 }
 
 void dbPreprocess(const std::string &ori_db_file_name,
                   const std::string &file_name,
                   bool decoy, int block_size, 
                   int max_frag_len, int min_block_num) {
-  //if _idx folder doesn't exist yet
-  if (!file_util::exists(ori_db_file_name + "_idx")){
-    file_util::createFolder(ori_db_file_name + "_idx");
+  std::string idx_folder_name = ori_db_file_name + "_idx"; 
+  if (!file_util::exists(idx_folder_name)){
+    //if _idx folder doesn't exist yet
+    file_util::createFolder(idx_folder_name);
   }
   // Generate a stardard fasta file in which empty lines are removed
   std::string standard_db_file_name = ori_db_file_name + "_idx" 
@@ -233,6 +253,7 @@ void dbPreprocess(const std::string &ori_db_file_name,
   // Generate new database file index
   if (!file_util::exists(new_db_file_name + ".fai")) {
     fai_build(new_db_file_name.c_str());
+    checkDuplicate(new_db_file_name, idx_folder_name);   
   }
 }
 
