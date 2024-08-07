@@ -190,7 +190,7 @@ void MsAlignReader::readNext() {
       std::vector<std::string> charge_strs = str_util::split(prec_charge_list, ":");
       std::vector<std::string> inte_strs = str_util::split(prec_inte_list, ":");
       for (size_t id = 0; id < mass_strs.size(); id++) {    
-        double prec_mass = std::stod(mass_strs[id]);
+        double prec_mass = std::stod(mass_strs[id]) + 18.0106;
         int prec_feat_id = std::stoi(feat_id_strs[id]);
         int prec_charge = std::stoi(charge_strs[id]);
         double prec_inte = std::stod(inte_strs[id]);
