@@ -91,8 +91,6 @@ class Prsm {
 
   int getHitCnt() {return hit_cnt_;}
 
-  bool getIsExactMatch() {return is_exact_match_;}
-
   XmlDOMElement* getElement() {return element_;}
 
   FastaIndexReaderPtr getReaderPtr() {return reader_ptr_;}
@@ -130,8 +128,6 @@ class Prsm {
   void setAdjustedPrecMass(double new_prec_mass);
 
   void setHitCnt(int hit_cnt) {hit_cnt_ = hit_cnt;}
-
-  void setIsExactMatch(bool is_exact_match) {is_exact_match_ = is_exact_match;}
 
   void setFracFeatureId(int id) {frac_feature_id_ = id;}
 
@@ -192,21 +188,19 @@ class Prsm {
 
   ExpectedValuePtr expected_value_ptr_;
 
+  double match_peak_num_ = 0;
+  double match_fragment_num_ = 0;
+
   double fdr_ = -1;
 
   double proteoform_fdr_ = -1;
 
   int hit_cnt_ = 0;
 
-  bool is_exact_match_ = true; 
-
   /* The following are not saved in xml */
   DeconvMsPtrVec deconv_ms_ptr_vec_;
   /* adjusted extended msThree, used for matching ions and peaks */
   ExtendMsPtrVec refine_ms_three_vec_;
-
-  double match_peak_num_ = 0;
-  double match_fragment_num_ = 0;
 
   XmlDOMElement* element_;
   FastaIndexReaderPtr reader_ptr_;
