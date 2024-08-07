@@ -122,7 +122,7 @@ void generateDbBlock(const std::string &db_file_name, int block_size,
     seq_info = size_reader.getNextSeq();
   }
   size_reader.close();
-  //LOG_ERROR("total seq size " << total_seq_size); 
+  LOG_DEBUG("Seq num " << seq_num << " total seq size " << total_seq_size); 
   // adjust block size if the database is too small and the sequence number 
   // is large enough > 50 * min_block_num
   int block_num = static_cast<int>(std::ceil(total_seq_size/block_size));
