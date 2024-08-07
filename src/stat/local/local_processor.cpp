@@ -444,8 +444,7 @@ int LocalProcessor::compTwoPtmScr(ProteoformPtr form_ptr, const ExtendMsPtrVec &
   local_util::compTwoPtmMTable(m_table, form_ptr, extend_ms_ptr_vec, ptm_ptr_1, ptm_ptr_2, mng_ptr_);
 
   // fill D(f, g)
-  int d_table[3][len + 1];
-  memset(d_table, 0, sizeof(int) * 3 * (len + 1));
+  std::vector<std::vector<int>> d_table(3,std::vector<int>(len+1,0));
   d_table[0][0] = 0;
   d_table[1][0] = std::numeric_limits<int>::min();
   d_table[2][0] = std::numeric_limits<int>::min();
@@ -487,8 +486,7 @@ ProteoformPtr LocalProcessor::twoPtmLocalize(ProteoformPtr form_ptr, const Exten
   std::vector<int> n_term_scores = local_util::compPrefScore(m_table[0]); 
   std::vector<int> c_term_scores = local_util::compSuffScore(m_table[2]); 
 
-  int mid_scores[len+1][len + 1];
-  memset(mid_scores, 0, sizeof(int) * (len+1) * (len + 1));
+  std::vector<std::vector<int>> mid_scores(len+1, std::vector<int>(len+1, 0));
   for (int bgn = 0; bgn < len + 1; bgn ++) {
     int total_score = 0;
     for (int end = bgn ; end < len + 1; end++) {
@@ -509,12 +507,7 @@ ProteoformPtr LocalProcessor::twoPtmLocalize(ProteoformPtr form_ptr, const Exten
     }
   }
 
-  double b_table[len][len];
-  for (int i = 0; i < len; i++) {
-    for (int j = 0; j < len; j++) {
-      b_table[i][j] = 0.0;
-    }
-  }
+  std::vector<std::vector<double>> b_table(len, std::vector<double>(len, 0.0));
   double total_prob = 0.0;
   for (size_t i = 0; i < ptm_1_pos_list.size(); i++) {
     int pos_1 = ptm_1_pos_list[i];
