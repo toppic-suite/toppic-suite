@@ -190,11 +190,11 @@ class Prsm {
 
   double match_peak_num_ = 0;
   double match_fragment_num_ = 0;
+  // norm_match_fragment_num is computed in a function, 
+  // not stored in the class
 
   double fdr_ = -1;
-
   double proteoform_fdr_ = -1;
-
   int hit_cnt_ = 0;
 
   /* The following are not saved in xml */
