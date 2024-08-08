@@ -512,7 +512,7 @@ ProtCandidatePtrVec findVarPtmTopProteins(std::vector<short> &scores,
             break;
           }
         }
-        if (mass_match && mass <= max_mass && score > best_score) {
+        if (mass_match && score > best_score) {
           best_score = score;
           best_n_trunc_shift = n_trunc_shift; 
           best_c_trunc_shift = c_trunc_shift; 
