@@ -14,6 +14,7 @@
 
 
 #include <string>
+#include <algorithm>
 
 #ifndef BOOST_SYSTEM_NO_DEPRECATED
 #define BOOST_SYSTEM_NO_DEPRECATED 1
