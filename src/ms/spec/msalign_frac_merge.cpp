@@ -69,7 +69,7 @@ void mergeFractions(const std::vector<std::string> &spec_file_names,
   std::vector<std::string> ms1_file_names;
   std::vector<std::string> ms2_file_names;
   for (size_t i = 0; i < spec_file_names.size(); i++) { 
-    std::string base_name = file_util::basename(spec_file_names[i]);
+    std::string base_name = spec_file_names[i];
     std::string ms1_name = base_name + "_ms1.msalign";
     ms1_file_names.push_back(ms1_name);
     std::string ms2_name = base_name + "_ms2.msalign";

@@ -85,7 +85,7 @@ void process(const std::vector<std::string> &raw_file_names,
   std::vector<std::string> frac_feature_names;
   std::vector<std::string> spec_feature_names;
   for (size_t i = 0; i < raw_file_names.size(); i++) { 
-    std::string base_name = file_util::basename(raw_file_names[i]);
+    std::string base_name = raw_file_names[i];
     std::string frac_feature_xml = base_name + "_feature.xml";
     frac_feature_xml_names.push_back(frac_feature_xml);
     std::string spec_feature = base_name + "_ms2.feature";
