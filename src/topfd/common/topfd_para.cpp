@@ -81,6 +81,8 @@ std::string TopfdPara::getParaStr(const std::string &prefix,
       << "MS1 signal/noise ratio:     " << sep << ms_one_sn_ratio_ << std::endl;
   output << prefix << std::setw(gap) << std::left 
       << "MS/MS signal/noise ratio:   " << sep << ms_two_sn_ratio_ << std::endl;
+  output << prefix << std::setw(gap) << std::left
+      << "Split intensity ratio:      " << sep << split_intensity_ratio_ << std::endl;
   output << prefix << std::setw(gap) << std::left 
       << "Thread number:              " << sep << thread_num_ << std::endl;
   output << prefix << std::setw(gap) << std::left 

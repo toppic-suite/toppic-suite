@@ -37,6 +37,7 @@ class TopfdPara {
   bool isEstimateMinInte() {return estimate_min_inte_;}
   double getMsOneSnRatio() {return ms_one_sn_ratio_;}
   double getMsTwoSnRatio() {return ms_two_sn_ratio_;}
+  double getSplitIntensityRatio() {return split_intensity_ratio_;}
   double getPrecWindowWidth() {return prec_window_;}
   bool isUseMsDeconv() {return use_msdeconv_;}
   bool isDoFinalFiltering() {return do_final_filtering_;}
@@ -72,6 +73,7 @@ class TopfdPara {
   void setMzError(double error) {mz_error_ = error;}
   void setMsOneSnRatio(double ratio) {ms_one_sn_ratio_ = ratio;}
   void setMsTwoSnRatio(double ratio) {ms_two_sn_ratio_ = ratio;}
+  void setSplitIntensityRatio(double ratio) {split_intensity_ratio_ = ratio;}
   void setPrecWindowWidth(double window) { prec_window_ = window;}
   void setUseMsDeconv(bool use) {use_msdeconv_ = use;}
   void setDoFinalFiltering(bool filtering) {do_final_filtering_ = filtering;}
@@ -104,6 +106,7 @@ class TopfdPara {
   double mz_error_ = 0.02;
   double ms_one_sn_ratio_ = 3.0;
   double ms_two_sn_ratio_ = 1.0;
+  double split_intensity_ratio_ = 2.5;
   bool keep_unused_peaks_ = false;
   bool use_msdeconv_ = false;
   bool do_final_filtering_ = true;

@@ -69,7 +69,7 @@ class EnvSet {
 
   std::pair<double, double> getMzErrorAndWeight();
 
-  void refineXicBoundary();
+  void refineXicBoundary(double split_ratio);
 
   bool containValidEnvs(int min_scan_num, int min_match_peak_num); 
 
