@@ -574,8 +574,6 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
                               const std::vector<std::string> & spec_file_lst) {
 
   std::string base_path = file_util::absoluteDir(spec_file_lst[0]);
-  std::string full_combined_name = base_path + file_util::getFileSeparator() 
-      +  arguments["combinedOutputName"];
 
   std::time_t start = time(nullptr);
   char buf[50];
@@ -631,12 +629,12 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
     std::string para_str = "";
     std::cout << "Merging files started." << std::endl;
     std::cout << "Merging msalign files started." << std::endl;
-    msalign_frac_merge::mergeFractions(raw_file_list, full_combined_name, para_str); 
+    msalign_frac_merge::mergeFractions(raw_file_list, merged_file_name, para_str); 
     std::cout << "Merging msalign files finished." << std::endl;
 
     if (arguments["useFeatureFile"] == "true") {//only when feature files are being used
       std::cout << "Merging feature files started." << std::endl;
-      feature_merge::process(raw_file_list, full_combined_name, para_str);
+      feature_merge::process(raw_file_list, merged_file_name, para_str);
       std::cout << "Merging feature files finished." << std::endl;
     }
     // merge TOP files
@@ -647,18 +645,18 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
     }
     prsm_util::mergePrsmFiles(prsm_file_lst, SpPara::getMaxSpecNumPerFile(), 
                               SpPara::getMaxFeatureNumPerFile(),
-                              full_combined_name + "_ms2.toppic_raw_prsm");
+                              merged_file_name + "_ms2.toppic_raw_prsm");
     std::cout << "Merging identification files finished." << std::endl;
     std::cout << "Merging files - finished." << std::endl;
 
-    std::string sp_file_name = full_combined_name + "_ms2.msalign";
+    std::string sp_file_name = merged_file_name + "_ms2.msalign";
     arguments["spectrumFileName"] = sp_file_name;
     arguments["startTime"] = combined_start_time;
     // do not generate html files for combined file
     arguments["geneHTMLFolder"] = "false";
 
     TopPIC_post(arguments);
-    sp_file_name = full_combined_name + "_ms2.msalign";
+    sp_file_name = merged_file_name + "_ms2.msalign";
     cleanToppicDir(ori_db_file_name, sp_file_name, keep_temp_files);
   }
 
