@@ -41,7 +41,6 @@ std::string geneTopfdCommand(TopfdParaPtr para_ptr,
   oss << "-e " << para_ptr->getMzError() << " ";
   oss << "-r " << para_ptr->getMsOneSnRatio() << " ";
   oss << "-s " << para_ptr->getMsTwoSnRatio() << " ";
-  oss << "-l " << para_ptr->getSplitIntensityRatio() << " ";
   oss << "-w " << para_ptr->getPrecWindowWidth() << " ";
   oss << "-t " << para_ptr->getEcscoreCutoff() << " ";
   oss << "-b " << para_ptr->getMinScanNum() << " ";
@@ -69,6 +68,56 @@ std::string geneTopfdCommand(TopfdParaPtr para_ptr,
     command = command + spec_file_lst[i] + " ";
   }
   return command;
+}
+
+/*function for topdia*/
+std::string geneTopdiaCommand(TopdiaParaPtr para_ptr,
+                              const std::vector<std::string> spec_file_lst) {
+
+#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
+        std::string exe_path = para_ptr->getExeDir() + "\\" + "topdia.exe ";
+#else
+        std::string exe_path = para_ptr->getExeDir() + "/" + "topdia ";
+#endif
+
+    std::string command = exe_path;
+    std::stringstream oss;
+    oss << "-a " << para_ptr->getActivation() << " ";
+    oss << "-c " << para_ptr->getMaxCharge() << " ";
+    oss << "-m " << para_ptr->getMaxMass() << " ";
+    oss << "-e " << para_ptr->getMzError() << " ";
+    oss << "-r " << para_ptr->getMsOneSnRatio() << " ";
+    oss << "-s " << para_ptr->getMsTwoSnRatio() << " ";
+    oss << "-w " << para_ptr->getPrecWindowWidth() << " ";
+    oss << "-t " << para_ptr->getMs1EcscoreCutoff() << " ";
+    oss << "-T " << para_ptr->getMs2EcscoreCutoff() << " ";
+    oss << "-b " << para_ptr->getMs1MinScanNum() << " ";
+    oss << "-B " << para_ptr->getMs2MinScanNum() << " ";
+    oss << "-v " << para_ptr->getPseudoScoreCutoff() << " ";
+    oss << "-V " << para_ptr->getPseudoMinPeaks() << " ";
+    oss << "-p " << para_ptr->getMs1SeedEnvInteCorrToleCutoff() << " ";
+    oss << "-P " << para_ptr->getMs2SeedEnvInteCorrToleCutoff() << " ";
+    command = command + oss.str();
+    if (para_ptr->isUseMsDeconv()) {
+        command = command + "-n ";
+    }
+    if (para_ptr->isMissingLevelOne()) {
+        command = command + "-o ";
+    }
+    command = command + "-u " + std::to_string(para_ptr->getThreadNum()) + " ";
+    if (!para_ptr->isGeneHtmlFolder()) {
+        command = command + "-g ";
+    }
+    if (!para_ptr->isDoFinalFiltering()) {
+        command = command + "-d ";
+    }
+    if (para_ptr->isUseSingleScanNoiseLevel()) {
+        command = command + "-i ";
+    }
+    for (size_t i = 0; i < spec_file_lst.size(); i++) {
+        command = command + spec_file_lst[i] + " ";
+    }
+    return command;
 }
 
 std::map<std::string, std::string> topindex_para {
