@@ -30,7 +30,7 @@ namespace env_coll_util {
 
 EnvCollPtr getEnvCollPtr(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
                          EnvSetPtr seed_env_set_ptr, EcscoreParaPtr para_ptr,
-                         double sn_ratio) {
+                         double sn_ratio, double split_ratio) {
   int start_spec_id = seed_env_set_ptr->getStartSpecId();
   int end_spec_id = seed_env_set_ptr->getEndSpecId();
   EnvSetPtrVec env_set_list;
@@ -47,7 +47,7 @@ EnvCollPtr getEnvCollPtr(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
       miss_num = miss_num + 1;
     } 
     else {
-      env_set_ptr->refineXicBoundary();
+      env_set_ptr->refineXicBoundary(split_ratio);
       if (!env_set_ptr->containValidEnvs(min_scan_num, min_match_peak_num)) {
         miss_num = miss_num + 1;
       }
@@ -72,7 +72,7 @@ EnvCollPtr getEnvCollPtr(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
     if (env_set_ptr == nullptr) {
       miss_num = miss_num + 1;
     } else {
-      env_set_ptr->refineXicBoundary();
+      env_set_ptr->refineXicBoundary(split_ratio);
       if (!env_set_ptr->containValidEnvs(min_scan_num, min_match_peak_num)) {
         miss_num = miss_num + 1;
       }
@@ -96,12 +96,12 @@ EnvCollPtr getEnvCollPtr(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
 }
 
 EnvCollPtr findEnvColl(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
-                       EcscoreParaPtr para_ptr, double sn_ratio) {
+                       EcscoreParaPtr para_ptr, double sn_ratio, double split_ratio) {
   EnvSetPtr env_set_ptr = env_set_util::searchEnvSet(matrix_ptr, seed_ptr, para_ptr, sn_ratio);
   if (env_set_ptr == nullptr) {
     return nullptr; 
   }
-  env_set_ptr->refineXicBoundary();
+  env_set_ptr->refineXicBoundary(split_ratio);
   int min_match_peak_num = para_ptr->getMinMatchPeakNumInTopThree();
   int min_scan_num = para_ptr->min_scan_num_; 
   // check if there are valid envelopes 
@@ -123,7 +123,7 @@ EnvCollPtr findEnvColl(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
       return nullptr;
     }
     env_set_ptr = tmp_env_set_ptr;
-    env_set_ptr->refineXicBoundary();
+    env_set_ptr->refineXicBoundary(split_ratio);
 
     if (!env_set_ptr->containValidEnvs(min_scan_num, min_match_peak_num)) {
       return nullptr; 
@@ -131,22 +131,22 @@ EnvCollPtr findEnvColl(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
   }
   
   EnvCollPtr env_coll_ptr = getEnvCollPtr(matrix_ptr, new_seed_ptr, 
-                                          env_set_ptr, para_ptr, sn_ratio);
+                                          env_set_ptr, para_ptr, sn_ratio, split_ratio);
   
   return env_coll_ptr;
 }
 
 EnvCollPtr findEnvCollWithSingleEnv(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
-                                    EcscoreParaPtr para_ptr, double sn_ratio) {
+                                    EcscoreParaPtr para_ptr, double sn_ratio, double split_ratio) {
   EnvSetPtr env_set_ptr = env_set_util::searchEnvSet(matrix_ptr, seed_ptr, para_ptr, sn_ratio);
   if (env_set_ptr == nullptr) {
     LOG_INFO("Envelope set is empty!");
     return nullptr; 
   }
-  env_set_ptr->refineXicBoundary();
+  env_set_ptr->refineXicBoundary(split_ratio);
 
   EnvCollPtr env_coll_ptr = getEnvCollPtr(matrix_ptr, seed_ptr, 
-                                          env_set_ptr, para_ptr, sn_ratio);
+                                          env_set_ptr, para_ptr, sn_ratio, split_ratio);
   return env_coll_ptr;
 }
 
