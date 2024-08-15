@@ -4,9 +4,9 @@ For manual and reference, please visit https://www.toppic.org/software/toppic/
 
 ## System requirements
 
-* GCC version higher than 11.4.0 for C++17 support
-* Boost (>= 1.74)
-* CMake (>= 3.5)
+* GCC version >= 11.4.0 for C++17 support
+* Boost version >= 1.74.0
+* CMake version >= 3.5
 
 ### Linux (Ubuntu 24.04):
 
