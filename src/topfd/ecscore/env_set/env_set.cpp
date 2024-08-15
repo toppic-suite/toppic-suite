@@ -231,7 +231,7 @@ double getRightMax(int pos, std::vector<double> &y) {
 
 void EnvSet::refineXicBoundary(double split_ratio) {
   double split_feature_intensity_ratio = 1 / split_ratio;
-  std::cout << split_ratio << " " << split_feature_intensity_ratio << "\n";
+  //std::cout << split_ratio << " " << split_feature_intensity_ratio << "\n";
   int seed_idx = seed_ptr_->getSpecId() - start_spec_id_;
   std::vector<double> smoothed_env_xic = xic_ptr_->getSmoothedInteList();
 
