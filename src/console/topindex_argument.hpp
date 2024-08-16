@@ -16,15 +16,10 @@
 #define TOPPIC_TOPINDEX_ARGUMENT_HPP_
 
 #include <map>
-#include <iostream>
-#include <memory>
 #include <vector>
 #include <string>
 
 #include "boost/program_options.hpp" 
-
-#include "common/util/logger.hpp"
-#include "common/util/str_util.hpp"
 
 namespace toppic {
 

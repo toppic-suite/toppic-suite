@@ -14,6 +14,7 @@
 
 #include <iomanip>
 
+#include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/str_util.hpp"
 #include "common/util/version.hpp"

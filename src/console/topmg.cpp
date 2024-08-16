@@ -12,12 +12,9 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <iostream>
 #include <iomanip>
-#include <map>
-#include <string>
-#include <vector>
 
+#include "common/util/logger.hpp"
 #include "console/topmg_argument.hpp"
 #include "console/topmg_process.hpp"
 

@@ -16,17 +16,10 @@
 #define TOPPIC_TOPMG_ARGUMENT_HPP_
 
 #include <map>
-#include <iostream>
-#include <fstream>
-#include <algorithm>
-#include <memory>
+#include <vector>
 #include <string>
 
 #include <boost/program_options.hpp>
-
-#include "common/util/logger.hpp"
-#include "common/xml/xml_dom_document.hpp"
-#include "common/util/str_util.hpp"
 
 namespace toppic {
 

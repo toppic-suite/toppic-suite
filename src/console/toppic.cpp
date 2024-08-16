@@ -13,11 +13,8 @@
 //limitations under the License.
 
 #include <iomanip>
-#include <map>
-#include <string>
-#include <vector>
 
-
+#include "common/util/logger.hpp"
 #include "console/toppic_argument.hpp"
 #include "console/toppic_process.hpp"
 

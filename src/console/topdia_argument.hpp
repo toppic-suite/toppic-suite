@@ -22,34 +22,32 @@
 #include <boost/program_options.hpp>
 
 #include "topdia/common/topdia_para.hpp"
-#include "common/xml/xml_dom_document.hpp"
 
 namespace toppic {
 
-    class Argument {
+  class Argument {
     public:
-        Argument();
+    Argument();
 
-        bool parse(int argc, char* argv[]);
+    bool parse(int argc, char* argv[]);
 
-        TopdiaParaPtr getTopdiaParaPtr() {return topdia_para_ptr_;}
+    TopdiaParaPtr getTopdiaParaPtr() {return topdia_para_ptr_;}
 
-        std::vector<std::string> getSpecFileList() { return spec_file_list_;};
-
-    private:
-        void initArguments();
-
-        void setArgumentsByConfigFile(const std::string &file_name);
-
-        bool validateArguments();
-
-        void showUsage(boost::program_options::options_description &desc);
+    std::vector<std::string> getSpecFileList() { return spec_file_list_;};
 
     private:
-        TopdiaParaPtr topdia_para_ptr_;
+    void initArguments();
 
-        std::vector<std::string> spec_file_list_;
-    };
+    void setArgumentsByConfigFile(const std::string &file_name);
+
+    bool validateArguments();
+
+    void showUsage(boost::program_options::options_description &desc);
+
+    TopdiaParaPtr topdia_para_ptr_;
+
+    std::vector<std::string> spec_file_list_;
+  };
 
 }  // namespace toppic
 
