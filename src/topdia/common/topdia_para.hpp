@@ -19,8 +19,9 @@
 #include <string>
 
 namespace toppic {
+
 class TopdiaPara {
-public:
+ public:
   TopdiaPara() {};
 
   std::string getParaStr(const std::string &prefix,

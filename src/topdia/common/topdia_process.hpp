@@ -12,12 +12,13 @@
 
 namespace toppic {
 
-    namespace topdia_process {
+namespace topdia_process {
 
-        int process(TopdiaParaPtr para_ptr,
-                    std::vector<std::string> spec_file_lst);
+int process(TopdiaParaPtr para_ptr,
+            std::vector<std::string> spec_file_lst);
 
-    }
+}
+
 }
 
 #endif //TOPPIC_TOPDIA_PROCESS_HPP

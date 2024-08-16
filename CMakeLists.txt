@@ -173,8 +173,7 @@ file(GLOB TOPDIFF_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdiff_arg
 		                         ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topdiff/*.qrc)
 
 # classes for topdia
-file(GLOB_RECURSE TOPDIA_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/topdia/*.cpp
-                              ${CMAKE_CURRENT_SOURCE_DIR}/src/topfd/*.cpp)
+file(GLOB_RECURSE TOPDIA_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/topdia/common/*.cpp)
 
 # topdia console
 file(GLOB TOPDIA_CONSOLE_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdia_argument.cpp
@@ -214,7 +213,7 @@ add_executable(topdiff
 
 add_executable(topdia
         ${TOPDIA_CONSOLE_SRCS} ${TOPDIA_SRCS} ${COMMON_SRCS} ${PARA_SRCS}
-        ${SPEC_SRCS} ${MZML_SRCS} ${PWIZ_SRCS} ${NOWIDE_SRCS})
+        ${SPEC_SRCS} ${MZML_SRCS} ${TOPFD_SRCS} ${PWIZ_SRCS} ${NOWIDE_SRCS})
 
 add_executable(topfd_gui ${TOPFD_GUI_SRCS} ${GUI_UTIL_SRCS})
 
@@ -250,7 +249,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   target_link_libraries(topdiff boost_program_options-mt
     boost_thread-mt xerces-c z Ws2_32)
 
-  target_link_libraries(topfd boost_chrono-mt boost_filesystem-mt
+  target_link_libraries(topdia boost_chrono-mt boost_filesystem-mt
     boost_program_options-mt boost_iostreams-mt boost_thread-mt
     xerces-c z psapi Ws2_32 onnx_lib)
 
@@ -295,6 +294,9 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   target_link_libraries(topdiff boost_program_options
     boost_thread xerces-c z)
 
+	target_link_libraries(topdia boost_chrono boost_filesystem boost_program_options 
+    boost_iostreams boost_thread xerces-c z onnxruntime)
+
   target_link_libraries(topfd_gui Qt5Widgets Qt5Core Qt5Gui boost_thread xerces-c)
 
   target_link_libraries(topindex_gui Qt5Widgets Qt5Core Qt5Gui
@@ -308,6 +310,8 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
   target_link_libraries(topdiff_gui Qt5Widgets Qt5Core Qt5Gui
     boost_program_options boost_thread xerces-c)
+
+  target_link_libraries(topdia_gui Qt5Widgets Qt5Core Qt5Gui boost_thread xerces-c)
 
 install (TARGETS topfd topindex toppic topmg topdiff topdia topfd_gui topindex_gui
   toppic_gui topmg_gui topdiff_gui topdia_gui DESTINATION bin/)
