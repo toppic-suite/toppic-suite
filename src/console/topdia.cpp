@@ -12,9 +12,10 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include "console/topdia_argument.hpp"
+
 #include "topdia/common/topdia_para.hpp"
 #include "topdia/common/topdia_process.hpp"
-#include "console/topdia_argument.hpp"
 
 int main(int argc, char* argv[]) {
 
@@ -25,11 +26,11 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+    toppic::TopfdParaPtr topfd_para_ptr = argu_processor.getTopfdParaPtr();
     toppic::TopdiaParaPtr topdia_para_ptr = argu_processor.getTopdiaParaPtr();
-
     std::vector<std::string> spec_file_lst = argu_processor.getSpecFileList();
 
-    int result = toppic::topdia_process::process(topdia_para_ptr, spec_file_lst);
+    int result = toppic::topdia_process::process(topfd_para_ptr, topdia_para_ptr, spec_file_lst);
 
     return result;
 }

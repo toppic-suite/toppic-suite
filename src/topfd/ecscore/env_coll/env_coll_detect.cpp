@@ -125,7 +125,7 @@ void process(TopfdParaPtr topfd_para_ptr) {
     env_coll_ptr->refineMonoMass();
     ECScorePtr ecscore_ptr = std::make_shared<ECScore>(env_coll_ptr, matrix_ptr,
                                                        feat_id, sn_ratio); 
-    if (ecscore_ptr->getScore() < topfd_para_ptr->getEcscoreCutoff()) {
+    if (ecscore_ptr->getScore() < topfd_para_ptr->getMs1EcscoreCutoff()) {
       continue;
     }
     ecscore_list.push_back(ecscore_ptr);
@@ -215,7 +215,7 @@ void process(TopfdParaPtr topfd_para_ptr) {
   // map MS2 features
   SpecFeaturePtrVec ms2_features;
   env_coll_assign::assignEnvColls(frac_features, env_coll_list, ms2_header_ptr_2d,
-                                  ms2_features, topfd_para_ptr->getEcscoreCutoff()); 
+                                  ms2_features, topfd_para_ptr->getMs1EcscoreCutoff()); 
   std::cout << "Number of proteoform features: " << env_coll_list.size() << std::endl;
   /// output files
   if (topfd_para_ptr->isOutputCsvFeatureFile()) {

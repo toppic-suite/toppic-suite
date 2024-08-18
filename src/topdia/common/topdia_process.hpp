@@ -14,7 +14,8 @@ namespace toppic {
 
 namespace topdia_process {
 
-int process(TopdiaParaPtr para_ptr,
+int process(TopfdParaPtr topfd_para_ptr,
+            TopdiaParaPtr topdia_para_ptr,
             std::vector<std::string> spec_file_lst);
 
 }

@@ -34,7 +34,8 @@ namespace toppic {
 
 namespace topdia_process {
 
-void processOneFileWithFaims(TopdiaParaPtr topdia_para_ptr) {
+void processOneFileWithFaims(TopfdParaPtr topfd_para_ptr, 
+                             TopdiaParaPtr topdia_para_ptr) {
   ////////  print parameter for each file
   /*
   std::cout << topdia_para_ptr->getParaStr("", " ");
@@ -72,7 +73,8 @@ void processOneFileWithFaims(TopdiaParaPtr topdia_para_ptr) {
   */
 }
 
-void processOneFile(TopdiaParaPtr para_ptr,
+void processOneFile(TopfdParaPtr topfd_para_ptr,
+                    TopdiaParaPtr topdia_para_ptr,
                     std::string &spec_file_name) {
   try {
     // Get mzml file profile
@@ -87,12 +89,12 @@ void processOneFile(TopdiaParaPtr para_ptr,
       std::cout << spec_file_name << " is FAIMS data with " << volt_map.size() << " voltage levels." << std::endl;
       for (auto v : volt_map) {
         double volt = v.first;
-        para_ptr->setMzmlFileNameAndFaims(spec_file_name, is_faims, volt);
+        topfd_para_ptr->setMzmlFileNameAndFaims(spec_file_name, is_faims, volt);
         std::cout << "Processing " << spec_file_name << " with voltage " << volt << " started." << std::endl;
-        para_ptr->setFracId(frac_id);
-        para_ptr->setMs1ScanNumber(v.second.first);
-        para_ptr->setMs2ScanNumber(v.second.second);
-        processOneFileWithFaims(para_ptr);
+        topfd_para_ptr->setFracId(frac_id);
+        topfd_para_ptr->setMs1ScanNumber(v.second.first);
+        topfd_para_ptr->setMs2ScanNumber(v.second.second);
+        processOneFileWithFaims(topfd_para_ptr, topdia_para_ptr);
         frac_id++;
         std::cout << "Processing " << spec_file_name << " with voltage " << volt << " finished." << std::endl;
       }
@@ -100,11 +102,11 @@ void processOneFile(TopdiaParaPtr para_ptr,
     else {
       bool is_faims = false;
       double volt = -1;
-      para_ptr->setMzmlFileNameAndFaims(spec_file_name, is_faims, volt);
-      para_ptr->setFracId(frac_id);
-      para_ptr->setMs1ScanNumber(profile_ptr->getMs1Cnt());
-      para_ptr->setMs2ScanNumber(profile_ptr->getMs2Cnt());
-      processOneFileWithFaims(para_ptr);
+      topfd_para_ptr->setMzmlFileNameAndFaims(spec_file_name, is_faims, volt);
+      topfd_para_ptr->setFracId(frac_id);
+      topfd_para_ptr->setMs1ScanNumber(profile_ptr->getMs1Cnt());
+      topfd_para_ptr->setMs2ScanNumber(profile_ptr->getMs2Cnt());
+      processOneFileWithFaims(topfd_para_ptr, topdia_para_ptr);
     }
   } catch (const char* e) {
     LOG_ERROR("[Exception] " << e);
@@ -124,17 +126,18 @@ bool isValidFile(std::string &file_name) {
   }
 }
 
-int process(TopdiaParaPtr para_ptr,  std::vector<std::string> spec_file_list) {
+int process(TopfdParaPtr topfd_para_ptr, TopdiaParaPtr topdia_para_ptr, 
+            std::vector<std::string> spec_file_list) {
   // init data, envelope base, envcnn model, and ecscore model
   base_data::init();
-  EnvBase::initBase(para_ptr->getResourceDir());
-  onnx_env_cnn::initModel(para_ptr->getResourceDir(), para_ptr->getThreadNum());
-  onnx_ecscore::initModel(para_ptr->getResourceDir(), para_ptr->getThreadNum());
+  EnvBase::initBase(topfd_para_ptr->getResourceDir());
+  onnx_env_cnn::initModel(topfd_para_ptr->getResourceDir(), topfd_para_ptr->getThreadNum());
+  onnx_ecscore::initModel(topfd_para_ptr->getResourceDir(), topfd_para_ptr->getThreadNum());
 
   for (size_t k = 0; k < spec_file_list.size(); k++) {
     if (isValidFile(spec_file_list[k])) {
       std::cout << "Processing " << spec_file_list[k] << " started." << std::endl;
-      processOneFile(para_ptr, spec_file_list[k]); 
+      processOneFile(topfd_para_ptr, topdia_para_ptr, spec_file_list[k]); 
       std::cout << "Timestamp: " << time_util::getTimeStr() << std::endl;
       std::cout << "Processing " << spec_file_list[k] << " finished." << std::endl;
     }

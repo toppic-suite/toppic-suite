@@ -194,7 +194,7 @@ bool Argument::parse(int argc, char* argv[]) {
     }
 
     if (vm.count("ecscore-cutoff")) {
-      topfd_para_ptr_->setEcscoreCutoff(std::stod(ecscore_cutoff));
+      topfd_para_ptr_->setMs1EcscoreCutoff(std::stod(ecscore_cutoff));
     }
 
     if (vm.count("single-scan-noise")) {
@@ -216,7 +216,7 @@ bool Argument::parse(int argc, char* argv[]) {
           LOG_ERROR("Min scan number " << min_scan_num << " should be 1, 2, or 3.");
           return false;
         }
-        topfd_para_ptr_->setMinScanNum(n);
+        topfd_para_ptr_->setMs1MinScanNum(n);
       } catch (std::exception& e) {
         LOG_ERROR("Min scan number " << min_scan_num << " should be 1, 2, or 3.");
         return false;
