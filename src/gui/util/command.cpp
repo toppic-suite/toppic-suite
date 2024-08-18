@@ -71,47 +71,48 @@ std::string geneTopfdCommand(TopfdParaPtr para_ptr,
 }
 
 /*function for topdia*/
-std::string geneTopdiaCommand(TopdiaParaPtr para_ptr,
+std::string geneTopdiaCommand(TopfdParaPtr topfd_para_ptr, 
+                              TopdiaParaPtr topdia_para_ptr,
                               const std::vector<std::string> spec_file_lst) {
 
 #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
-        std::string exe_path = para_ptr->getExeDir() + "\\" + "topdia.exe ";
+        std::string exe_path = topfd_para_ptr->getExeDir() + "\\" + "topdia.exe ";
 #else
-        std::string exe_path = para_ptr->getExeDir() + "/" + "topdia ";
+        std::string exe_path = topfd_para_ptr->getExeDir() + "/" + "topdia ";
 #endif
 
     std::string command = exe_path;
     std::stringstream oss;
-    oss << "-a " << para_ptr->getActivation() << " ";
-    oss << "-c " << para_ptr->getMaxCharge() << " ";
-    oss << "-m " << para_ptr->getMaxMass() << " ";
-    oss << "-e " << para_ptr->getMzError() << " ";
-    oss << "-r " << para_ptr->getMsOneSnRatio() << " ";
-    oss << "-s " << para_ptr->getMsTwoSnRatio() << " ";
-    oss << "-w " << para_ptr->getPrecWindowWidth() << " ";
-    oss << "-t " << para_ptr->getMs1EcscoreCutoff() << " ";
-    oss << "-T " << para_ptr->getMs2EcscoreCutoff() << " ";
-    oss << "-b " << para_ptr->getMs1MinScanNum() << " ";
-    oss << "-B " << para_ptr->getMs2MinScanNum() << " ";
-    oss << "-v " << para_ptr->getPseudoScoreCutoff() << " ";
-    oss << "-V " << para_ptr->getPseudoMinPeaks() << " ";
-    oss << "-p " << para_ptr->getMs1SeedEnvInteCorrToleCutoff() << " ";
-    oss << "-P " << para_ptr->getMs2SeedEnvInteCorrToleCutoff() << " ";
+    oss << "-a " << topfd_para_ptr->getActivation() << " ";
+    oss << "-c " << topfd_para_ptr->getMaxCharge() << " ";
+    oss << "-m " << topfd_para_ptr->getMaxMass() << " ";
+    oss << "-e " << topfd_para_ptr->getMzError() << " ";
+    oss << "-r " << topfd_para_ptr->getMsOneSnRatio() << " ";
+    oss << "-s " << topfd_para_ptr->getMsTwoSnRatio() << " ";
+    oss << "-w " << topfd_para_ptr->getPrecWindowWidth() << " ";
+    oss << "-t " << topfd_para_ptr->getMs1EcscoreCutoff() << " ";
+    oss << "-T " << topfd_para_ptr->getMs2EcscoreCutoff() << " ";
+    oss << "-b " << topfd_para_ptr->getMs1MinScanNum() << " ";
+    oss << "-B " << topfd_para_ptr->getMs2MinScanNum() << " ";
+    oss << "-v " << topdia_para_ptr->getPseudoScoreCutoff() << " ";
+    oss << "-V " << topdia_para_ptr->getPseudoMinPeaks() << " ";
+    oss << "-p " << topdia_para_ptr->getMs1SeedEnvInteCorrToleCutoff() << " ";
+    oss << "-P " << topdia_para_ptr->getMs2SeedEnvInteCorrToleCutoff() << " ";
     command = command + oss.str();
-    if (para_ptr->isUseMsDeconv()) {
+    if (topfd_para_ptr->isUseMsDeconv()) {
         command = command + "-n ";
     }
-    if (para_ptr->isMissingLevelOne()) {
+    if (topfd_para_ptr->isMissingLevelOne()) {
         command = command + "-o ";
     }
-    command = command + "-u " + std::to_string(para_ptr->getThreadNum()) + " ";
-    if (!para_ptr->isGeneHtmlFolder()) {
+    command = command + "-u " + std::to_string(topfd_para_ptr->getThreadNum()) + " ";
+    if (!topfd_para_ptr->isGeneHtmlFolder()) {
         command = command + "-g ";
     }
-    if (!para_ptr->isDoFinalFiltering()) {
+    if (!topfd_para_ptr->isDoFinalFiltering()) {
         command = command + "-d ";
     }
-    if (para_ptr->isUseSingleScanNoiseLevel()) {
+    if (topfd_para_ptr->isUseSingleScanNoiseLevel()) {
         command = command + "-i ";
     }
     for (size_t i = 0; i < spec_file_lst.size(); i++) {
