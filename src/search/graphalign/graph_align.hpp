@@ -60,8 +60,6 @@ class GraphAlign {
 
   int spec_ver_num_;
 
-  int n_unknown_shift_;
-
   DistVec spec_dist_;
 
   DistVec2D dist_vec_;

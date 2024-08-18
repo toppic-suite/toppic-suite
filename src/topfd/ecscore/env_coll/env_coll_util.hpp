@@ -29,10 +29,10 @@ namespace toppic {
 namespace env_coll_util {
 
 EnvCollPtr findEnvColl(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
-                       EcscoreParaPtr para_ptr, double sn_ratio);
+                       EcscoreParaPtr para_ptr, double sn_ratio, double split_ratio);
 
 EnvCollPtr findEnvCollWithSingleEnv(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
-                                    EcscoreParaPtr para_ptr, double sn_ratio); 
+                                    EcscoreParaPtr para_ptr, double sn_ratio, double split_ratio);
 
 bool checkExistingFeatures(MsMapPtr matrix_ptr, EnvCollPtr coll_ptr,
                            EnvCollPtrVec &env_coll_list, EcscoreParaPtr para_ptr);

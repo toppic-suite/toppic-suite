@@ -24,6 +24,8 @@
 
 namespace toppic {
 
+std::mt19937 rng(0); 
+
 void getTheoMassVec(const ResiduePtrVec &residues,
                     IonTypePtr n_ion_type_ptr,
                     IonTypePtr c_ion_type_ptr,
@@ -74,7 +76,7 @@ ResiduePtrVec CompPValueMCMC::randomTrans(ResiduePtrVec residues) {
 
   ResiduePtrVec ori_res = {residues[pos1], residues[pos2], residues[pos3]};
 
-  std::random_shuffle(ori_res.begin(), ori_res.end());
+  std::shuffle(ori_res.begin(), ori_res.end(), rng);
 
   std::vector<std::string> res_vec = mass_table_[std::round(mass * mng_ptr_->convert_ratio_)];
 
@@ -83,7 +85,7 @@ ResiduePtrVec CompPValueMCMC::randomTrans(ResiduePtrVec residues) {
   if (res_vec.size() > 1) {
     res_dist = std::uniform_int_distribution<int>(0, res_vec.size() - 1);
     std::string res_seq = res_vec[res_dist(*generator_)];
-    std::random_shuffle(res_seq.begin(), res_seq.end());
+    std::shuffle(res_seq.begin(), res_seq.end(), rng);
     new_res_vec
         = residue_util::convertStrToResiduePtrVec(res_seq, mng_ptr_->prsm_para_ptr_->getFixModPtrVec());
   } else {

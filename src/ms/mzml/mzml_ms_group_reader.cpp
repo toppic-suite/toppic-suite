@@ -25,7 +25,7 @@ MzmlMsGroupReader::MzmlMsGroupReader(const std::string & file_name,
                                      bool is_faims,
                                      double faims_voltage,
                                      bool missing_level_one) {
-  fraction_id_ = fraction_id_;
+  fraction_id_ = fraction_id;
   is_faims_ = is_faims;
   faims_voltage_ = faims_voltage;
   missing_level_one_ = missing_level_one;

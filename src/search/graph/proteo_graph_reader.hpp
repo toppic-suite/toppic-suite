@@ -29,29 +29,15 @@ class ProteoGraphReader {
   ProteoGraphReader(const std::string &db_file_name,
                     const ModPtrVec &fix_mod_ptr_vec,
                     const ProtModPtrVec &prot_mod_ptr_vec,
-                    const ModPtrVec &var_mod_ptr_vec,
-                    double convert_ratio,
-                    int max_mod_num,
-                    int max_ptm_sum_mass,
-                    int proteo_graph_gap,
-                    int var_ptm_in_gap);
+                    const ModPtrVec &var_mod_ptr_vec);
 
  private:
   ModPtrVec fix_mod_ptr_vec_;
-
-  double convert_ratio_;
-
-  int max_mod_num_;
-
-  int max_ptm_sum_mass_;
 
   ProteoAnnoPtr proteo_anno_ptr_;
 
   FastaReaderPtr reader_ptr_;
 
-  int proteo_graph_gap_;
-
-  int var_ptm_in_gap_;
 };
 
 MassGraphPtr getMassGraphPtr(ProteoAnnoPtr proteo_anno_ptr, double convert_ratio);

@@ -41,6 +41,7 @@ std::string geneTopfdCommand(TopfdParaPtr para_ptr,
   oss << "-e " << para_ptr->getMzError() << " ";
   oss << "-r " << para_ptr->getMsOneSnRatio() << " ";
   oss << "-s " << para_ptr->getMsTwoSnRatio() << " ";
+  oss << "-l " << para_ptr->getSplitIntensityRatio() << " ";
   oss << "-w " << para_ptr->getPrecWindowWidth() << " ";
   oss << "-t " << para_ptr->getEcscoreCutoff() << " ";
   oss << "-b " << para_ptr->getMinScanNum() << " ";

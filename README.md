@@ -4,26 +4,26 @@ For manual and reference, please visit https://www.toppic.org/software/toppic/
 
 ## System requirements
 
-* GCC version higher than 11.4.0 for C++17 support
-* CMake (>= 3.26)
+* GCC version >= 11.4.0 for C++17 support
+* Boost version >= 1.74.0
+* CMake version >= 3.5
 
-### Linux (Ubuntu 22.04):
+### Linux (Ubuntu 24.04):
 
 ```sh
 # install compiling tools
 sudo apt install build-essential cmake
 
-# install other dependencies
-sudo apt install zlib1g-dev 
-sudo apt install libboost-filesystem-dev 
-sudo apt install libboost-program-options-dev 
-sudo apt install libboost-system-dev 
-sudo apt install libboost-thread-dev 
-sudo apt install libboost-iostreams-dev 
+# install dependencies
 sudo apt install libboost-chrono-dev 
+sudo apt install libboost-filesystem-dev 
+sudo apt install libboost-iostreams-dev 
+sudo apt install libboost-program-options-dev 
+sudo apt install libboost-thread-dev 
 sudo apt install libxerces-c-dev  
+sudo apt install zlib1g-dev 
 
-# Qt5 for GUI
+# install Qt5 for GUI
 sudo apt install qtbase5-dev
 
 # building
@@ -34,23 +34,22 @@ make -j$(nproc)
 make install
 ```
 
-### Linux (CentOS Stream 8):
+### Linux (Redhat 9):
 
 ```sh
 # install Extra Packages for Enterprise Linux (EPEL)
-sudo dnf install 'dnf-command(config-manager)'
-sudo dnf config-manager --set-enabled powertools
-sudo dnf install epel-release 
+sudo subscription-manager repos --enable codeready-builder-for-rhel-9-$(arch)-rpms
+sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
 
 # install compiling tools
-sudo dnf install gcc gcc-c++ make cmake
+sudo dnf install cmake gcc-c++ make
 
 # install dependencies
-sudo dnf install zlib-devel
 sudo dnf install boost-devel 
 sudo dnf install xerces-c-devel
+sudo dnf install zlib-devel
 
-# Qt5 for GUI
+# install Qt5 for GUI
 sudo dnf install qt5-qtbase-devel
 
 # building
@@ -63,7 +62,7 @@ make install
 
 ### Language setting
 
-On some Linux distributions, you might meet the problem "Could not loading a transcoding service".
+On some Linux distributions, you might have the problem "Could not loading a transcoding service".
 To fix this, please add following lines into your `.bashrc`.
 
 ```sh

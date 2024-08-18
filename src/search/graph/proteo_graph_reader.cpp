@@ -24,18 +24,8 @@ namespace toppic {
 ProteoGraphReader::ProteoGraphReader(const std::string &db_file_name,
                                      const ModPtrVec &fix_mod_ptr_vec,
                                      const ProtModPtrVec &prot_mod_ptr_vec,
-                                     const ModPtrVec &var_mod_ptr_vec,
-                                     double convert_ratio,
-                                     int max_mod_num,
-                                     int max_ptm_sum_mass,
-                                     int proteo_graph_gap,
-                                     int var_ptm_in_gap):
-    fix_mod_ptr_vec_(fix_mod_ptr_vec),
-    convert_ratio_(convert_ratio),
-    max_mod_num_(max_mod_num),
-    max_ptm_sum_mass_(max_ptm_sum_mass),
-    proteo_graph_gap_(proteo_graph_gap),
-    var_ptm_in_gap_(var_ptm_in_gap) {
+                                     const ModPtrVec &var_mod_ptr_vec):
+    fix_mod_ptr_vec_(fix_mod_ptr_vec) {
       reader_ptr_ = std::make_shared<FastaReader>(db_file_name);
       proteo_anno_ptr_
           = std::make_shared<ProteoAnno>(fix_mod_ptr_vec, prot_mod_ptr_vec, var_mod_ptr_vec);

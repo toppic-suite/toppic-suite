@@ -41,6 +41,7 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string mz_error = "";
   std::string ms_two_sn_ratio = "";
   std::string ms_one_sn_ratio = "";
+  std::string split_intensity_ratio = "";
   std::string prec_window = "";
   std::string thread_number = "";
   std::string activation = "";
@@ -66,6 +67,8 @@ bool Argument::parse(int argc, char* argv[]) {
          "<a positive number>. Set the signal-to-noise ratio for MS1 spectra. The default value is 3.")
         ("ms-two-sn-ratio,s", po::value<std::string> (&ms_two_sn_ratio),
          "<a positive number>. Set the signal-to-noise ratio for MS/MS spectra. The default value is 1.")
+        ("split-intensity-ratio,l", po::value<std::string> (&split_intensity_ratio),
+         "<a positive number>. Set the intensity ratio required to split one feature from another. The default value is 2.5.")
         ("missing-level-one,o","MS1 spectra are missing in the input file.")
         ("msdeconv,n", "Use the MS-Deconv score to rank isotopic envelopes.")
         ("precursor-window,w", po::value<std::string> (&prec_window),
@@ -90,6 +93,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("mz-error,e", po::value<std::string> (&mz_error), "")
         ("ms-one-sn-ratio,r", po::value<std::string> (&ms_one_sn_ratio), "")
         ("ms-two-sn-ratio,s", po::value<std::string> (&ms_two_sn_ratio), "")
+        ("split-intensity-ratio,l", po::value<std::string> (&split_intensity_ratio), "")
         ("precursor-window,w", po::value<std::string> (&prec_window), "")
         ("ecscore-cutoff,t", po::value<std::string> (&ecscore_cutoff), "")
         ("missing-level-one,o", "")
@@ -100,6 +104,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("skip-html-folder,g","")
         ("msdeconv,n", "")
         ("disable-final-filtering,d", "")
+        ("text-peak-list,T","") // Use a text file containing a mass list as the input
         ("keep,k", "Report monoisotopic masses extracted from low quality isotopic envelopes.")
         ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), 
          "Spectrum file name with its path.")
@@ -172,6 +177,10 @@ bool Argument::parse(int argc, char* argv[]) {
       topfd_para_ptr_->setMsOneSnRatio(std::stod(ms_one_sn_ratio));
     }
 
+    if (vm.count("split-intensity-ratio")) {
+      topfd_para_ptr_->setSplitIntensityRatio(std::stod(split_intensity_ratio));
+    }
+
     if (vm.count("missing-level-one")) {
       topfd_para_ptr_->setMissingLevelOne(true);
     }
@@ -194,6 +203,10 @@ bool Argument::parse(int argc, char* argv[]) {
 
     if (vm.count("disable-additional-feature-search")) {
       topfd_para_ptr_->setSearchPrecWindow(false);
+    }
+
+    if (vm.count("text-peak-list")) {
+      topfd_para_ptr_->setTextPeakList(true); 
     }
 
     if (vm.count("min-scan-number")) {

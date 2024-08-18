@@ -37,6 +37,7 @@ class TopfdPara {
   bool isEstimateMinInte() {return estimate_min_inte_;}
   double getMsOneSnRatio() {return ms_one_sn_ratio_;}
   double getMsTwoSnRatio() {return ms_two_sn_ratio_;}
+  double getSplitIntensityRatio() {return split_intensity_ratio_;}
   double getPrecWindowWidth() {return prec_window_;}
   bool isUseMsDeconv() {return use_msdeconv_;}
   bool isDoFinalFiltering() {return do_final_filtering_;}
@@ -49,6 +50,7 @@ class TopfdPara {
   double getEcscoreCutoff() {return ecscore_cutoff_;}
   bool isSearchPrecWindow() {return search_prec_window_;}
   bool isUseSingleScanNoiseLevel() {return use_single_scan_noise_level_;}
+  bool isTextPeakList() {return text_peak_list_;}
 
   std::string getMzmlFileName() {return mzml_file_name_;}
   std::string getOutputBaseName() {return output_base_name_;}
@@ -71,6 +73,7 @@ class TopfdPara {
   void setMzError(double error) {mz_error_ = error;}
   void setMsOneSnRatio(double ratio) {ms_one_sn_ratio_ = ratio;}
   void setMsTwoSnRatio(double ratio) {ms_two_sn_ratio_ = ratio;}
+  void setSplitIntensityRatio(double ratio) {split_intensity_ratio_ = ratio;}
   void setPrecWindowWidth(double window) { prec_window_ = window;}
   void setUseMsDeconv(bool use) {use_msdeconv_ = use;}
   void setDoFinalFiltering(bool filtering) {do_final_filtering_ = filtering;}
@@ -90,6 +93,9 @@ class TopfdPara {
   void setMs1ScanNumber(int ms1_scan_num) {ms_1_scan_num_ = ms1_scan_num;}
   void setMs2ScanNumber(int ms2_scan_num) {ms_2_scan_num_ = ms2_scan_num;}
 
+  void setTextPeakList(bool text_peak_list) {text_peak_list_ = text_peak_list;}
+  void setOutputMatchEnv(bool output_match_env) {output_match_env_ = output_match_env;}
+
  private:
   std::string exe_dir_;
   std::string resource_dir_;
@@ -100,6 +106,7 @@ class TopfdPara {
   double mz_error_ = 0.02;
   double ms_one_sn_ratio_ = 3.0;
   double ms_two_sn_ratio_ = 1.0;
+  double split_intensity_ratio_ = 2.5;
   bool keep_unused_peaks_ = false;
   bool use_msdeconv_ = false;
   bool do_final_filtering_ = true;
@@ -130,6 +137,10 @@ class TopfdPara {
 
   int ms_1_scan_num_ = -1;
   int ms_2_scan_num_ = -1;
+
+  //call function for processing a simple text file 
+  //containing a mass list
+  bool text_peak_list_ = false;
 };
 
 typedef std::shared_ptr<TopfdPara> TopfdParaPtr;

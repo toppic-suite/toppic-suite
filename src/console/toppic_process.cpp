@@ -22,9 +22,10 @@
 
 #include "common/base/base_data.hpp"
 #include "common/base/mod_util.hpp"
+#include "common/base/ptm_util.hpp"
 #include "common/util/mem_check.hpp"
 #include "common/util/version.hpp"
-#include "common/base/ptm_util.hpp"
+#include "common/util/console_util.hpp"
 
 #include "seq/fasta_reader.hpp"
 #include "seq/fasta_util.hpp"
@@ -46,6 +47,7 @@
 #include "prsm/prsm_fdr_groups.hpp"
 #include "prsm/prsm_form_filter.hpp"
 #include "prsm/prsm_util.hpp"
+#include "prsm/prsm_coverage.hpp"
 
 #include "filter/mng/zero_ptm_filter_mng.hpp"
 #include "filter/mng/index_file_name.hpp"
@@ -76,7 +78,6 @@
 #include "visual/xml_generator.hpp"
 #include "visual/json_transformer.hpp"
 
-#include "console/console_util.hpp"
 #include "console/toppic_argument.hpp"
 
 namespace toppic {
@@ -447,7 +448,7 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
 
     std::string argu_str = ToppicArgument::outputTsvArguments(arguments);
 
-    if (arguments["outputRawPrsms"] == "true"){
+    if (arguments["outputRawPrsmTable"] == "true"){
       std::cout << "Outputting Raw PrSM table - started." << std::endl;
       PrsmMatchTableWriterPtr raw_table_out
         = std::make_shared<PrsmMatchTableWriter>(prsm_para_ptr, argu_str, 
@@ -509,6 +510,14 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
       std::cout << "Converting PrSM XML files to JSON files - finished." << std::endl;
     }
 
+    if (arguments["outputPrsmCoverage"] == "true") {
+      std::cout << "Outputting PrSM coverage - started." << std::endl;
+      PrsmCoveragePtr cov_ptr = std::make_shared<PrsmCoverage>(prsm_para_ptr, "toppic_prsm_cutoff", "toppic_prsm_coverage");
+      cov_ptr->processSingleCoverage();
+      cov_ptr = nullptr;
+      std::cout << "Outputting PrSM coverage - finished." << std::endl;
+    }
+
     cutoff_type = (arguments["cutoffProteoformType"] == "FDR") ? "FORMFDR": "EVALUE";
     std::cout << "PrSM filtering by " << cutoff_type << " - started." << std::endl;
     std::istringstream(arguments["cutoffProteoformValue"]) >> cutoff_value;
@@ -565,8 +574,6 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
                               const std::vector<std::string> & spec_file_lst) {
 
   std::string base_path = file_util::absoluteDir(spec_file_lst[0]);
-  std::string full_combined_name = base_path + file_util::getFileSeparator() 
-      +  arguments["combinedOutputName"];
 
   std::time_t start = time(nullptr);
   char buf[50];
@@ -622,12 +629,12 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
     std::string para_str = "";
     std::cout << "Merging files started." << std::endl;
     std::cout << "Merging msalign files started." << std::endl;
-    msalign_frac_merge::mergeFractions(raw_file_list, full_combined_name, para_str); 
+    msalign_frac_merge::mergeFractions(raw_file_list, merged_file_name, para_str); 
     std::cout << "Merging msalign files finished." << std::endl;
 
     if (arguments["useFeatureFile"] == "true") {//only when feature files are being used
       std::cout << "Merging feature files started." << std::endl;
-      feature_merge::process(raw_file_list, full_combined_name, para_str);
+      feature_merge::process(raw_file_list, merged_file_name, para_str);
       std::cout << "Merging feature files finished." << std::endl;
     }
     // merge TOP files
@@ -638,18 +645,18 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
     }
     prsm_util::mergePrsmFiles(prsm_file_lst, SpPara::getMaxSpecNumPerFile(), 
                               SpPara::getMaxFeatureNumPerFile(),
-                              full_combined_name + "_ms2.toppic_raw_prsm");
+                              merged_file_name + "_ms2.toppic_raw_prsm");
     std::cout << "Merging identification files finished." << std::endl;
     std::cout << "Merging files - finished." << std::endl;
 
-    std::string sp_file_name = full_combined_name + "_ms2.msalign";
+    std::string sp_file_name = merged_file_name + "_ms2.msalign";
     arguments["spectrumFileName"] = sp_file_name;
     arguments["startTime"] = combined_start_time;
     // do not generate html files for combined file
     arguments["geneHTMLFolder"] = "false";
 
     TopPIC_post(arguments);
-    sp_file_name = full_combined_name + "_ms2.msalign";
+    sp_file_name = merged_file_name + "_ms2.msalign";
     cleanToppicDir(ori_db_file_name, sp_file_name, keep_temp_files);
   }
 

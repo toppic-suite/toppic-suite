@@ -51,9 +51,15 @@ class PWIZ_API_DECL BinaryData
     typedef T &reference;
     typedef const T &const_reference;
 
-    class PWIZ_API_DECL const_iterator : public std::iterator<std::random_access_iterator_tag, const T>
+    //class PWIZ_API_DECL const_iterator : public std::iterator<std::random_access_iterator_tag, const T>
+    class PWIZ_API_DECL const_iterator 
     {
         public:
+        using iterator_category = std::random_access_iterator_tag;
+        using value_type = T; 
+        using difference_type = std::ptrdiff_t;
+        using pointer = T*; 
+        using reference = T&; 
 
         const T& operator*() const { return *current_; }
         const T* operator->() const { return current_; }
@@ -85,9 +91,15 @@ class PWIZ_API_DECL BinaryData
         const T* current_;
     };
 
-    class PWIZ_API_DECL iterator : public std::iterator<std::random_access_iterator_tag, T>
+    //class PWIZ_API_DECL iterator : public std::iterator<std::random_access_iterator_tag, T>
+    class PWIZ_API_DECL iterator
     {
         public:
+        using iterator_category = std::random_access_iterator_tag;
+        using value_type = T; 
+        using difference_type = std::ptrdiff_t;
+        using pointer = T*; 
+        using reference = T&; 
 
         T& operator*() const { return *current_; }
         T* operator->() const { return current_; }

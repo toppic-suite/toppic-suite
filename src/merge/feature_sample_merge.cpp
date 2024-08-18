@@ -382,7 +382,7 @@ void FeatureSampleMerge::outputTable(FeaturePrsmPtrVec2D &table,
       }
     }
     file << sample_match_num << delim;
-    //file << sample_id_match_num << delim;
+    LOG_DEBUG("Sample ID match number: " << sample_id_match_num); 
     if (sample_match_num == sample_num) {
       match_num = match_num + 1;
     }

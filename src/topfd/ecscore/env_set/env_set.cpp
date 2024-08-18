@@ -229,8 +229,9 @@ double getRightMax(int pos, std::vector<double> &y) {
   return max_val;
 }
 
-void EnvSet::refineXicBoundary() {
-  double split_feature_intensity_ratio = 0.4;
+void EnvSet::refineXicBoundary(double split_ratio) {
+  double split_feature_intensity_ratio = 1 / split_ratio;
+  //std::cout << split_ratio << " " << split_feature_intensity_ratio << "\n";
   int seed_idx = seed_ptr_->getSpecId() - start_spec_id_;
   std::vector<double> smoothed_env_xic = xic_ptr_->getSmoothedInteList();
 
@@ -298,7 +299,7 @@ bool EnvSet::containValidEnvs(int min_scan_num, int min_match_peak_num) {
   int seed_spec_idx = seed_ptr_->getSpecId() - start_spec_id_; 
   int ref_idx = seed_ptr_->getReferIdx(); 
   if (min_scan_num == 1) {
-    if (seed_spec_idx < 0 || seed_spec_idx >= ms_map_env_list_.size()) {
+    if (seed_spec_idx < 0 || seed_spec_idx >= static_cast<int>(ms_map_env_list_.size())) {
       return false;
     }
     MsMapEnvPtr env_ptr = ms_map_env_list_[seed_spec_idx];

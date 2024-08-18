@@ -144,16 +144,6 @@ class PrsmStr {
 
   int spectrum_scan_;
 
-  std::string seq_name_;
-
-  std::string seq_desc_;
-
-  int proteo_cluster_id_;
-
-  double proteo_inte_;
-
-  int prot_id_;
-
   int precursor_id_;
 
   int frac_feature_id_;
@@ -165,6 +155,22 @@ class PrsmStr {
   double frac_feature_min_time_;
 
   double frac_feature_max_time_;
+
+  double ori_prec_mass_;
+
+  double adjusted_prec_mass_;
+
+  // The information from prot_id to mass_shift_vec  
+  // is stored in the proteoform class
+  int prot_id_;
+
+  std::string seq_name_;
+
+  std::string seq_desc_;
+
+  int proteo_cluster_id_;
+
+  double proteo_inte_;
 
   int unexpected_ptm_num_;
 
@@ -178,10 +184,9 @@ class PrsmStr {
 
   int proteoform_end_pos_;
 
-  double ori_prec_mass_;
+  std::vector<MassShiftPtr> mass_shift_vec_;
 
-  double adjusted_prec_mass_;
-
+  //The information below is stored in the prsm class
   double match_peak_num_;
 
   double match_frag_num_;
@@ -194,7 +199,6 @@ class PrsmStr {
 
   double proteoform_fdr_;
 
-  std::vector<MassShiftPtr> mass_shift_vec_;
 
 };
 
