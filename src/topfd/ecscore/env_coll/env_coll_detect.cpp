@@ -40,13 +40,15 @@ namespace toppic {
 
 namespace env_coll_detect {
 
-void process(TopfdParaPtr topfd_para_ptr) {
+void processMs1(TopfdParaPtr topfd_para_ptr) {
   if (topfd_para_ptr->isMissingLevelOne()) {
     return;
   }
+  
   EcscoreParaPtr score_para_ptr = std::make_shared<EcscorePara>(topfd_para_ptr->getFracId(), 
                                                                 topfd_para_ptr->getMzmlFileName(),
-                                                                topfd_para_ptr);
+                                                                topfd_para_ptr->getMaxCharge(),
+                                                                topfd_para_ptr->getMs1MinScanNum());
   // read deconvoluted MS1 peaks
   std::string output_base_name = topfd_para_ptr->getOutputBaseName();
   std::string ms1_file_name = output_base_name + "_ms1.msalign";
@@ -236,6 +238,134 @@ void process(TopfdParaPtr topfd_para_ptr) {
   //sample_feature_writer::writeFeatures(sample_feature_file_name, sample_features);
   std::string ms2_feat_file_name = output_base_name + "_"  + "ms2.feature";
   spec_feature_writer::writeFeatures(ms2_feat_file_name, ms2_features);
+}
+
+void processMs2(TopfdParaPtr topfd_para_ptr) {
+  EcscoreParaPtr score_para_ptr = std::make_shared<EcscorePara>(topfd_para_ptr->getFracId(),
+                                                                topfd_para_ptr->getMzmlFileName(),
+                                                                topfd_para_ptr->getMaxCharge(),
+                                                                topfd_para_ptr->getMs2MinScanNum());
+                                                      
+  // read deconvoluted MS2 peaks
+  std::string output_base_name = topfd_para_ptr->getOutputBaseName();
+  std::string ms2_file_name = output_base_name + "_ms2.msalign";
+  DeconvMsPtrVec deconv_ms2_ptr_vec;
+  msalign_reader_util::readAllSpectra(ms2_file_name, deconv_ms2_ptr_vec);
+
+  // get isolation window base mz
+  std::set<double> base_mz_set;
+  for (auto &ms2_data: deconv_ms2_ptr_vec) {
+    if (ms2_data->getMsHeaderPtr()->getMsLevel() == 1)
+      continue;
+    double base_mz = (ms2_data->getMsHeaderPtr()->getPrecWinBegin() + ms2_data->getMsHeaderPtr()->getPrecWinEnd())/2;
+    base_mz_set.insert(base_mz);
+  }
+  std::vector<double> isolation_window_base_mz(base_mz_set.begin(), base_mz_set.end());
+
+  
+  for (auto base_mz: isolation_window_base_mz) {
+    std::cout << "Processing Isolation Window: " << base_mz << std::endl;
+    // read ms1 raw peaks and ms2_headers
+    PeakPtrVec2D ms2_mzml_peaks;
+    
+    MzmlMsGroupReaderPtr mzml_reader_ptr =
+      std::make_shared<MzmlMsGroupReader>(topfd_para_ptr->getMzmlFileName(),
+                                          topfd_para_ptr->getPrecWindowWidth(),
+                                          topfd_para_ptr->getActivation(),
+                                          topfd_para_ptr->getFracId(),
+                                          topfd_para_ptr->isFaims(),
+                                          topfd_para_ptr->getFaimsVoltage(),
+                                          topfd_para_ptr->isMissingLevelOne());
+    mzml_reader_ptr->getMs2Map(ms2_mzml_peaks, base_mz);
+    mzml_reader_ptr = nullptr;
+
+    //Prepare seed envelopes
+    int spec_id = 0;
+    DeconvMsPtrVec deconv_ms2_ptr_shortlisted_vec;
+    SeedEnvPtrVec seed_ptrs;
+    for (auto &ms2_data: deconv_ms2_ptr_vec) {
+      double win_mz = (ms2_data->getMsHeaderPtr()->getPrecWinBegin() + ms2_data->getMsHeaderPtr()->getPrecWinEnd())/2;
+      if (win_mz != base_mz)
+        continue;
+      deconv_ms2_ptr_shortlisted_vec.push_back(ms2_data);
+      DeconvPeakPtrVec peaks = ms2_data->getPeakPtrVec();
+      for (auto &peak: peaks) {
+        peak->setSpId(spec_id);
+        SeedEnvPtr seed_ptr_1 = std::make_shared<SeedEnv>(peak);
+        seed_ptrs.push_back(seed_ptr_1);
+      }
+      spec_id = spec_id + 1;
+    }
+
+    std::sort(seed_ptrs.begin(), seed_ptrs.end(), SeedEnv::cmpSeedInteDec);
+
+    double sn_ratio = topfd_para_ptr->getMsTwoSnRatio();
+    bool single_scan_noise = topfd_para_ptr->isUseSingleScanNoiseLevel();
+    /// Prepare data -- Peak Matrix
+    MsMapPtr matrix_ptr = std::make_shared<MsMap>(ms2_mzml_peaks, deconv_ms2_ptr_shortlisted_vec,
+                                                  score_para_ptr->bin_size_,
+                                                  topfd_para_ptr->getMsTwoSnRatio(), single_scan_noise);
+
+    if (score_para_ptr->min_scan_num_ > 2) {
+      matrix_ptr->removeNonNeighbors(score_para_ptr->neighbor_mz_tole_);
+    }
+
+    /// Extract Fetures
+    LOG_DEBUG("Number of seed envelopes: " << seed_ptrs.size());
+    int seed_num = static_cast<int>(seed_ptrs.size());
+    EnvCollPtrVec env_coll_list;
+    int feat_id = 0;
+    double perc = 0;
+    ECScorePtrVec ecscore_list;
+    FracFeaturePtrVec frac_features;
+    for (int seed_env_idx = 0; seed_env_idx < seed_num; seed_env_idx++) {
+      int count = seed_env_idx + 1;
+      if (count % 100 == 0 || count == seed_num) {
+        perc = static_cast<int>(count * 100 / seed_num);
+        std::cout << "\r" << "Processing feature " << count << " ...       " << perc << "\% finished." << std::flush;
+      }
+      SeedEnvPtr seed_ptr = seed_ptrs[seed_env_idx];
+      seed_ptr = seed_env_util::preprocessSeedEnvPtr(seed_ptr, matrix_ptr, score_para_ptr, sn_ratio);
+      if (seed_ptr == nullptr) continue;
+      EnvCollPtr env_coll_ptr = env_coll_util::findEnvColl(matrix_ptr, seed_ptr, score_para_ptr, sn_ratio,
+                                                           topfd_para_ptr->getSplitIntensityRatio());
+      if (env_coll_ptr == nullptr) continue;
+      if (env_coll_util::checkExistingFeatures(matrix_ptr, env_coll_ptr, env_coll_list, score_para_ptr)) {
+        env_coll_ptr->removePeakData(matrix_ptr);
+        continue;
+      }
+      env_coll_ptr->refineMonoMass();
+      ECScorePtr ecscore_ptr = std::make_shared<ECScore>(env_coll_ptr, matrix_ptr, feat_id, topfd_para_ptr->getMsTwoSnRatio());
+      if (ecscore_ptr->getScore() < topfd_para_ptr->getMs2EcscoreCutoff()) {
+        continue;
+      }
+      ecscore_list.push_back(ecscore_ptr);
+      env_coll_ptr->setEcscore(ecscore_ptr->getScore());
+      env_coll_ptr->removePeakData(matrix_ptr);
+      env_coll_list.push_back(env_coll_ptr);
+      FracFeaturePtr frac_feat_ptr = env_coll_util::getFracFeature(feat_id, deconv_ms2_ptr_shortlisted_vec,
+                                                                   score_para_ptr->frac_id_,
+                                                                   score_para_ptr->file_name_,
+                                                                   env_coll_ptr, matrix_ptr, sn_ratio);
+      frac_features.push_back(frac_feat_ptr);
+      feat_id++;
+    }
+    std::cout << std::endl;
+
+    std::cout << "Number of proteoform features: " << env_coll_list.size() << std::endl;
+    /// output files
+    if (topfd_para_ptr->isOutputCsvFeatureFile()) {
+      std::string feat_file_name =
+        output_base_name + "_" + std::to_string(int(base_mz - topfd_para_ptr->getPrecWindowWidth()/2)) +
+        "_" + std::to_string(int(base_mz + topfd_para_ptr->getPrecWindowWidth()/2)) + "_ms2.csv";
+      ecscore_writer::writeScores(feat_file_name, ecscore_list);
+      std::string batmass_file_name;
+      batmass_file_name =
+        output_base_name + "_" + std::to_string(int(base_mz - topfd_para_ptr->getPrecWindowWidth()/2)) +
+        "_" + std::to_string(int(base_mz + topfd_para_ptr->getPrecWindowWidth()/2)) + "_frac_ms2.mzrt.csv";
+      frac_feature_writer::writeBatMassFeatures(batmass_file_name, frac_features);
+    }
+  }
 }
 
 }  // namespace

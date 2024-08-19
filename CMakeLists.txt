@@ -173,7 +173,7 @@ file(GLOB TOPDIFF_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdiff_arg
 		                         ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topdiff/*.qrc)
 
 # classes for topdia
-file(GLOB_RECURSE TOPDIA_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/topdia/common/*.cpp)
+file(GLOB_RECURSE TOPDIA_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/topdia/*.cpp)
 
 # topdia console
 file(GLOB TOPDIA_CONSOLE_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdia_argument.cpp

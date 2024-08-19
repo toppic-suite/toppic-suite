@@ -17,25 +17,26 @@
 #define TOPPIC_PSEUDO_SPECTRUM_HPP
 
 #include <vector>
-#include "pseudo_peaks.hpp"
-#include "mzrt_feature.hpp"
+
+#include "topdia/pseudo_spec/pseudo_peak.hpp"
+#include "topdia/pseudo_spec/mzrt_feature.hpp"
 
 namespace toppic {
 
     class PseudoSpectrum {
     public:
-        PseudoSpectrum(mzrtFeaturePtr ms1Feature, const std::vector<PseudoPeaks> &fragmentFeatures) : ms1_feature_(
+        PseudoSpectrum(MzrtFeaturePtr ms1Feature, const std::vector<PseudoPeak> &fragmentFeatures) : ms1_feature_(
                 ms1Feature), fragment_features_(fragmentFeatures), assigned_fragment_count_(fragmentFeatures.size()) {}
 
-        void add_fragments(const std::vector<PseudoPeaks> &fragmentFeatures);
-        void add_fragment(PseudoPeaks &fragmentFeature);
-        mzrtFeaturePtr getMs1Feature() const { return ms1_feature_;  }
-        std::vector<PseudoPeaks>& getFragmentFeatures() { return fragment_features_; }
+        void add_fragments(const std::vector<PseudoPeak> &fragmentFeatures);
+        void add_fragment(PseudoPeak &fragmentFeature);
+        MzrtFeaturePtr getMs1Feature() const { return ms1_feature_;  }
+        std::vector<PseudoPeak>& getFragmentFeatures() { return fragment_features_; }
         int getAssignedFragmentCount() const { return assigned_fragment_count_;  }
 
     private:
-        mzrtFeaturePtr ms1_feature_;
-        std::vector<PseudoPeaks> fragment_features_;
+        MzrtFeaturePtr ms1_feature_;
+        std::vector<PseudoPeak> fragment_features_;
         int assigned_fragment_count_;
 
     };

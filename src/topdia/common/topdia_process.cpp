@@ -28,7 +28,7 @@
 #include "topfd/deconv/deconv_ms2_process.hpp"
 #include "topdia/common/topdia_para.hpp"
 
-//#include "topdia/pseudo_spec/generate_pseudo_spectrum.hpp"
+#include "topdia/pseudo_spec/generate_pseudo_spectrum.hpp"
 
 namespace toppic {
 
@@ -36,41 +36,39 @@ namespace topdia_process {
 
 void processOneFileWithFaims(TopfdParaPtr topfd_para_ptr, 
                              TopdiaParaPtr topdia_para_ptr) {
-  ////////  print parameter for each file
-  /*
-  std::cout << topdia_para_ptr->getParaStr("", " ");
-  TopfdParaPtr para_ptr = std::make_shared<TopfdPara>(topdia_para_ptr);
-  if (!para_ptr->isMissingLevelOne()) {
+  //  print parameter for each file
+  std::cout << topdia_para_ptr->getParaStr("", " ", topfd_para_ptr);
+  if (!topfd_para_ptr->isMissingLevelOne()) {
     std::cout << "MS1 deconvolution started." << std::endl;
     DeconvMs1ProcessPtr ms1_proc_ptr =
-        std::make_shared<DeconvMs1Process>(para_ptr);
+        std::make_shared<DeconvMs1Process>(topfd_para_ptr);
     ms1_proc_ptr->process();
     ms1_proc_ptr = nullptr;
     std::cout << "MS1 deconvolution finished." << std::endl;
 
     std::cout << "MS1 feature detection started." << std::endl;
-    env_coll_detect::process_ms1(topdia_para_ptr);
+    env_coll_detect::processMs1(topfd_para_ptr);
     std::cout << "MS1 feature detection finished." << std::endl;
   }
 
   std::cout << "MS/MS deconvolution started." << std::endl;
-  para_ptr->setMissingLevelOne(true);
+  topfd_para_ptr->setMissingLevelOne(true);
   DeconvMs2ProcessPtr ms2_proc_ptr =
-      std::make_shared<DeconvMs2Process>(para_ptr);
+      std::make_shared<DeconvMs2Process>(topfd_para_ptr);
   ms2_proc_ptr->process();
   ms2_proc_ptr = nullptr;
   std::cout << "MS/MS deconvolution finished." << std::endl;
-
+  
   std::cout << "MS/MS feature detection started." << std::endl;
-  env_coll_detect::process_ms2(topdia_para_ptr);
+  env_coll_detect::processMs2(topfd_para_ptr);
   std::cout << "MS/MS feature detection finished." << std::endl;
-
+  
   std::cout << "Pseudo spectrum generation started." << std::endl;
-  GeneratePseudoSpectrumPtr pseudo_genrator_ptr = std::make_shared<GeneratePseudoSpectrum>(topdia_para_ptr);
-  pseudo_genrator_ptr->process(topdia_para_ptr);
+  GeneratePseudoSpectrumPtr pseudo_genrator_ptr = std::make_shared<GeneratePseudoSpectrum>(topfd_para_ptr, 
+                                                                                           topdia_para_ptr);
+  pseudo_genrator_ptr->process(topfd_para_ptr, topdia_para_ptr);
   pseudo_genrator_ptr = nullptr;
   std::cout << std::endl << "Pseudo spectrum generation finished." << std::endl;
-  */
 }
 
 void processOneFile(TopfdParaPtr topfd_para_ptr,

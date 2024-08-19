@@ -19,14 +19,11 @@
 namespace toppic {
 
 EcscorePara::EcscorePara(int frac_id, const std::string &file_name,
-                         TopfdParaPtr para_ptr):
+                         int max_charge, int min_scan_num):
     frac_id_(frac_id),
-    file_name_(file_name) {
-
-  /// additional parameters
-  para_max_charge_ = para_ptr->getMaxCharge();
-  min_scan_num_ = para_ptr->getMs1MinScanNum();
-}
+    file_name_(file_name),
+    para_max_charge_(max_charge),
+    min_scan_num_(min_scan_num) {}
 
 } /* namespace */
 
