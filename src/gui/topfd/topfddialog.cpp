@@ -116,8 +116,8 @@ void TopFDDialog::on_defaultButton_clicked() {
   ui->splitRatioEdit->setText(QString::number(para_ptr->getSplitIntensityRatio()));
   ui->windowSizeEdit->setText(QString::number(para_ptr->getPrecWindowWidth()));
   ui->threadNumberEdit->setText(QString::number(para_ptr->getThreadNum()));
-  ui->ecscoreCutoffEdit->setText(QString::number(para_ptr->getEcscoreCutoff()));
-  ui->minScanNumEdit->setText(QString::number(para_ptr->getMinScanNum()));
+  ui->ecscoreCutoffEdit->setText(QString::number(para_ptr->getMs1EcscoreCutoff()));
+  ui->minScanNumEdit->setText(QString::number(para_ptr->getMs1MinScanNum()));
   ui->msDeconvCheckBox->setChecked(para_ptr->isUseMsDeconv());
   ui->missLevelOneCheckBox->setChecked(para_ptr->isMissingLevelOne());
   ui->geneHTMLCheckBox->setChecked(para_ptr->isGeneHtmlFolder());
@@ -279,8 +279,8 @@ toppic::TopfdParaPtr TopFDDialog::getParaPtr() {
   para_ptr_->setSplitIntensityRatio(std::stod(ui->splitRatioEdit->text().toStdString()));
   para_ptr_->setPrecWindowWidth(std::stod(ui->windowSizeEdit->text().toStdString()));
   para_ptr_->setMissingLevelOne(ui->missLevelOneCheckBox->isChecked()); 
-  para_ptr_->setEcscoreCutoff(std::stod(ui->ecscoreCutoffEdit->text().toStdString()));
-  para_ptr_->setMinScanNum(std::stoi(ui->minScanNumEdit->text().toStdString()));
+  para_ptr_->setMs1EcscoreCutoff(std::stod(ui->ecscoreCutoffEdit->text().toStdString()));
+  para_ptr_->setMs1MinScanNum(std::stoi(ui->minScanNumEdit->text().toStdString()));
   para_ptr_->setThreadNum(std::stoi(ui->threadNumberEdit->text().toStdString()));
   para_ptr_->setGeneHtmlFolder(ui->geneHTMLCheckBox->isChecked());
   para_ptr_->setUseMsDeconv(ui->msDeconvCheckBox->isChecked());

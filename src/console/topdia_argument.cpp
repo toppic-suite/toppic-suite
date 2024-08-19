@@ -25,10 +25,7 @@
 namespace toppic {
 
 Argument::Argument() {
-  topfd_para_ptr_ = std::make_shared<TopfdPara>();
-  topfd_para_ptr_->setMs1EcscoreCutoff(0);
-  topfd_para_ptr_->setMs1MinScanNum(2);
-
+  topfd_para_ptr_ = TopfdPara::getTopfdParaPtrForTopdia();
   topdia_para_ptr_ = std::make_shared<TopdiaPara>();
 }
 

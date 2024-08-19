@@ -180,7 +180,8 @@ file(GLOB TOPDIA_CONSOLE_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdia_arg
                               ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdia.cpp)
 
 # topdia gui
-file(GLOB TOPDIA_GUI_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/topdia/common/topdia_para.cpp
+file(GLOB TOPDIA_GUI_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/topfd/common/topfd_para.cpp
+                          ${CMAKE_CURRENT_SOURCE_DIR}/src/topdia/common/topdia_para.cpp
                           ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topdia/*.cpp
                           ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topdia/*.qrc)
 

@@ -21,6 +21,7 @@
 #include <QMainWindow>
 #include <QProcess>
 
+#include "topfd/common/topfd_para.hpp"
 #include "topdia/common/topdia_para.hpp"
 
 namespace Ui {
@@ -52,7 +53,8 @@ private slots:
 private:
   QString lastDir_;
 
-  toppic::TopdiaParaPtr para_ptr_;
+  toppic::TopfdParaPtr topfd_para_ptr_;
+  toppic::TopdiaParaPtr topdia_para_ptr_;
 
   std::vector<std::string> spec_file_lst_;
 
@@ -60,7 +62,7 @@ private:
 
   Ui::TopDIADialog *ui;
 
-  toppic::TopdiaParaPtr getParaPtr();
+  void getParaPtr();
 
   std::vector<std::string> getSpecFileList();
 

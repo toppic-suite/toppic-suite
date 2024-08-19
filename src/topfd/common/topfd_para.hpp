@@ -20,6 +20,10 @@
 
 namespace toppic {
 
+class TopfdPara;
+
+typedef std::shared_ptr<TopfdPara> TopfdParaPtr;
+
 class TopfdPara {
  public:
   TopfdPara() {};
@@ -29,6 +33,8 @@ class TopfdPara {
 
   std::string getParaStr(const std::string &prefix,
 		         const std::string &sep);
+  
+  static TopfdParaPtr getTopfdParaPtrForTopdia();
 
   std::string getExeDir() {return exe_dir_;}
   std::string getResourceDir() {return resource_dir_;}
@@ -152,7 +158,6 @@ class TopfdPara {
   bool text_peak_list_ = false;
 };
 
-typedef std::shared_ptr<TopfdPara> TopfdParaPtr;
 
 }  // namespace toppic
 
