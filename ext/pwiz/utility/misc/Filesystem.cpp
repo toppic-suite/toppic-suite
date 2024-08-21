@@ -446,7 +446,7 @@ PWIZ_API_DECL int expand_pathmask(const bfs::path& pathmask,
     int matchingPathCount = 0;
 
 #ifdef WIN32
-    path maskParentPath = pathmask.branch_path();
+    path maskParentPath = pathmask.parent_path();
 	WIN32_FIND_DATAW fdata;
 	HANDLE srcFile = FindFirstFileExW(boost::nowide::widen(pathmask.string()).c_str(), FindExInfoStandard, &fdata, FindExSearchNameMatch, NULL, 0);
 	if (srcFile == INVALID_HANDLE_VALUE)
@@ -500,7 +500,7 @@ namespace
 {
     void copy_recursive(const bfs::path& from, const bfs::path& to)
     {
-        bfs::copy_directory(from, to);
+        bfs::create_directory(to, from);
 
         for(bfs::directory_entry& entry : bfs::directory_iterator(from))
         {
@@ -516,7 +516,7 @@ namespace
 
     void copy_recursive(const bfs::path& from, const bfs::path& to, boost::system::error_code& ec)
     {
-        bfs::copy_directory(from, to, ec);
+        bfs::create_directory(to, from, ec);
         if (ec.value() != 0)
             return;
 
@@ -556,9 +556,9 @@ PWIZ_API_DECL void copy_directory(const bfs::path& from, const bfs::path& to, bo
     else
     {
         if (ec != NULL)
-            bfs::copy_directory(from, to, *ec);
+            bfs::create_directory(to, from, *ec);
         else
-            bfs::copy_directory(from, to);
+            bfs::create_directory(to, from);
     }
 }
 

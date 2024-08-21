@@ -58,8 +58,8 @@ void appendSourceFile(const string& filename, MSData& msd)
 {
     SourceFilePtr sourceFile(new SourceFile);
     bfs::path p(filename);
-    sourceFile->id = sourceFile->name = BFS_STRING(p.leaf());
-    sourceFile->location = "file:///" + BFS_COMPLETE(p.branch_path()).string();
+    sourceFile->id = sourceFile->name = BFS_STRING(p.filename());
+    sourceFile->location = "file:///" + BFS_COMPLETE(p.parent_path()).string();
     msd.fileDescription.sourceFilePtrs.push_back(sourceFile);
 }
 
@@ -100,7 +100,7 @@ void fillInCommonMetadata(const string& filename, MSData& msd)
 
     // the file-level ids can't be empty
     if (msd.id.empty() || msd.run.id.empty())
-        msd.id = msd.run.id = bfs::basename(filename);
+        msd.id = msd.run.id = bfs::path(filename).stem().string();
 }
 
 // return true if filename has form xxxx.ext or xxxx.ext.gz
@@ -262,7 +262,7 @@ PWIZ_API_DECL void Reader_mzXML::read(const std::string& filename,
 
 PWIZ_API_DECL std::string Reader_MGF::identify(const string& filename, const string& head) const
 {
-    return std::string(((bal::to_lower_copy(bfs::extension(filename)) == ".mgf"))?getType():"");
+    return std::string(((bal::to_lower_copy(bfs::path(filename).extension().string()) == ".mgf"))?getType():"");
 }
 
 PWIZ_API_DECL void Reader_MGF::read(const string& filename,
@@ -390,11 +390,11 @@ PWIZ_API_DECL void Reader_BTDX::read(const string& filename,
     SourceFilePtr sourceFile(new SourceFile);
     sourceFile->id = "BTDX1";
     bfs::path p(filename);
-    sourceFile->name = BFS_STRING(p.leaf());
-    sourceFile->location = "file:///" + BFS_COMPLETE(p.branch_path()).string();
+    sourceFile->name = BFS_STRING(p.filename());
+    sourceFile->location = "file:///" + BFS_COMPLETE(p.parent_path()).string();
     result.fileDescription.sourceFilePtrs.push_back(sourceFile);
 
-    result.id = result.run.id = bfs::basename(filename);
+    result.id = result.run.id = bfs::path(filename).stem().string();
     result.run.spectrumListPtr = SpectrumListPtr(SpectrumList_BTDX::create(is, result));
     result.run.chromatogramListPtr = ChromatogramListPtr(new ChromatogramListSimple);
     return;
