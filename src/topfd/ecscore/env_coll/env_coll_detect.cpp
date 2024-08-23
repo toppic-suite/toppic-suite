@@ -253,19 +253,20 @@ void processMs2(TopfdParaPtr topfd_para_ptr) {
   DeconvMsPtrVec deconv_ms2_ptr_vec;
   msalign_reader_util::readAllSpectra(ms2_file_name, deconv_ms2_ptr_vec);
 
-  // get isolation window base mz
-  std::set<double> base_mz_set;
+  // get isolation window 
+  std::set<std::pair<double,double>> win_set;
   for (auto &ms2_data: deconv_ms2_ptr_vec) {
     if (ms2_data->getMsHeaderPtr()->getMsLevel() == 1)
       continue;
-    double base_mz = (ms2_data->getMsHeaderPtr()->getPrecWinBegin() + ms2_data->getMsHeaderPtr()->getPrecWinEnd())/2;
-    base_mz_set.insert(base_mz);
+    std::pair<double, double> cur_win(ms2_data->getMsHeaderPtr()->getPrecWinBegin(), 
+                                      ms2_data->getMsHeaderPtr()->getPrecWinEnd()); 
+    win_set.insert(cur_win);
   }
-  std::vector<double> isolation_window_base_mz(base_mz_set.begin(), base_mz_set.end());
+  std::vector<std::pair<double,double>> win_list(win_set.begin(), win_set.end()); 
 
   
-  for (auto base_mz: isolation_window_base_mz) {
-    std::cout << "Processing Isolation Window: " << base_mz << std::endl;
+  for (auto cur_win: win_list) {
+    std::cout << "Processing isolation window: [" << cur_win.first << "," << cur_win.second << "]"<< std::endl;
     // read ms1 raw peaks and ms2_headers
     PeakPtrVec2D ms2_mzml_peaks;
     
@@ -277,7 +278,7 @@ void processMs2(TopfdParaPtr topfd_para_ptr) {
                                           topfd_para_ptr->isFaims(),
                                           topfd_para_ptr->getFaimsVoltage(),
                                           topfd_para_ptr->isMissingLevelOne());
-    mzml_reader_ptr->getMs2Map(ms2_mzml_peaks, base_mz);
+    mzml_reader_ptr->getMs2Map(ms2_mzml_peaks, cur_win.first);
     mzml_reader_ptr = nullptr;
 
     //Prepare seed envelopes
@@ -285,8 +286,8 @@ void processMs2(TopfdParaPtr topfd_para_ptr) {
     DeconvMsPtrVec deconv_ms2_ptr_shortlisted_vec;
     SeedEnvPtrVec seed_ptrs;
     for (auto &ms2_data: deconv_ms2_ptr_vec) {
-      double win_mz = (ms2_data->getMsHeaderPtr()->getPrecWinBegin() + ms2_data->getMsHeaderPtr()->getPrecWinEnd())/2;
-      if (win_mz != base_mz)
+      double ms_win_begin = ms2_data->getMsHeaderPtr()->getPrecWinBegin(); 
+      if (ms_win_begin != cur_win.first)
         continue;
       deconv_ms2_ptr_shortlisted_vec.push_back(ms2_data);
       DeconvPeakPtrVec peaks = ms2_data->getPeakPtrVec();
@@ -353,17 +354,15 @@ void processMs2(TopfdParaPtr topfd_para_ptr) {
     }
     std::cout << std::endl;
 
-    std::cout << "Number of proteoform features: " << env_coll_list.size() << std::endl;
+    std::cout << "Number of fragment features: " << env_coll_list.size() << std::endl;
     /// output files
     if (topfd_para_ptr->isOutputCsvFeatureFile()) {
       std::string feat_file_name =
-        output_base_name + "_" + std::to_string(int(base_mz - topfd_para_ptr->getPrecWindowWidth()/2)) +
-        "_" + std::to_string(int(base_mz + topfd_para_ptr->getPrecWindowWidth()/2)) + "_ms2.csv";
+        output_base_name + "_" + std::to_string(cur_win.first) + "_ms2.csv";
       ecscore_writer::writeScores(feat_file_name, ecscore_list);
       std::string batmass_file_name;
       batmass_file_name =
-        output_base_name + "_" + std::to_string(int(base_mz - topfd_para_ptr->getPrecWindowWidth()/2)) +
-        "_" + std::to_string(int(base_mz + topfd_para_ptr->getPrecWindowWidth()/2)) + "_frac_ms2.mzrt.csv";
+        output_base_name + "_" + std::to_string(cur_win.first) + "_frac_ms2.mzrt.csv";
       frac_feature_writer::writeBatMassFeatures(batmass_file_name, frac_features);
     }
   }

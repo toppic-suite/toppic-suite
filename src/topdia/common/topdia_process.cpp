@@ -58,7 +58,8 @@ void processOneFileWithFaims(TopfdParaPtr topfd_para_ptr,
   ms2_proc_ptr->process();
   ms2_proc_ptr = nullptr;
   std::cout << "MS/MS deconvolution finished." << std::endl;
-  
+
+  topfd_para_ptr->setMissingLevelOne(false);
   std::cout << "MS/MS feature detection started." << std::endl;
   env_coll_detect::processMs2(topfd_para_ptr);
   std::cout << "MS/MS feature detection finished." << std::endl;

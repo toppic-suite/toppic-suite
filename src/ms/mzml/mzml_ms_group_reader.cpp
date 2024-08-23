@@ -206,7 +206,7 @@ void MzmlMsGroupReader::getMs1Map(PeakPtrVec2D &ms1_mzml_peaks,
   }
 }
 
-void MzmlMsGroupReader::getMs2Map(PeakPtrVec2D &ms2_mzml_peaks, double base_mz) {
+void MzmlMsGroupReader::getMs2Map(PeakPtrVec2D &ms2_mzml_peaks, double win_mz_begin) {
   while (true) {
     MzmlMsGroupPtr group_ptr = getMs1Ms2MsGroupPtr();
     if (group_ptr == nullptr) {
@@ -215,8 +215,8 @@ void MzmlMsGroupReader::getMs2Map(PeakPtrVec2D &ms2_mzml_peaks, double base_mz) 
     MzmlMsPtrVec ms2_ptr_vec = group_ptr->getMsTwoPtrVec();
     MsHeaderPtrVec header_vec;
     for (size_t i = 0; i < ms2_ptr_vec.size(); i++) {
-      double win_mz = (ms2_ptr_vec[i]->getMsHeaderPtr()->getPrecWinBegin() + ms2_ptr_vec[i]->getMsHeaderPtr()->getPrecWinEnd())/2;
-      if (win_mz == base_mz) {
+      double cur_win_begin = ms2_ptr_vec[i]->getMsHeaderPtr()->getPrecWinBegin(); 
+      if (cur_win_begin == win_mz_begin) {
         PeakPtrVec peak_list = ms2_ptr_vec[i]->getPeakPtrVec();
         ms2_mzml_peaks.push_back(peak_list);
       }

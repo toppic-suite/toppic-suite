@@ -41,7 +41,7 @@ class MzmlMsGroupReader {
                  MsHeaderPtr2D &ms2_header_ptr_2d);
 
   void getMs2Map(PeakPtrVec2D &ms2_mzml_peaks, 
-                 double base_mz);
+                 double win_mz_begin);
 
  private:
   PwMsReaderPtr reader_ptr_;
