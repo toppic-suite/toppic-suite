@@ -32,26 +32,24 @@ GeneratePseudoSpectrum::GeneratePseudoSpectrum(TopfdParaPtr topfd_para_ptr,
   msalign_reader_util::readAllSpectra(ms2_file_name, deconv_ms2_ptr_vec);
 
   // get isolation window base mz
-  std::set<double> base_mz_set;
-  for (auto &ms2_data : deconv_ms2_ptr_vec) {
-    if (ms2_data->getMsHeaderPtr()->getMsLevel() == 1) continue;
-    double base_mz = (ms2_data->getMsHeaderPtr()->getPrecWinBegin() +
-                      ms2_data->getMsHeaderPtr()->getPrecWinEnd()) /
-                     2;
-    base_mz_set.insert(base_mz);
+  std::set<std::pair<double,double>> win_set;
+  for (auto &ms2_data: deconv_ms2_ptr_vec) {
+    if (ms2_data->getMsHeaderPtr()->getMsLevel() == 1)
+      continue;
+    std::pair<double, double> cur_win(ms2_data->getMsHeaderPtr()->getPrecWinBegin(), 
+                                      ms2_data->getMsHeaderPtr()->getPrecWinEnd()); 
+    win_set.insert(cur_win);
   }
-  isolation_window_base_mz_ =
-      std::vector<double>(base_mz_set.begin(), base_mz_set.end());
+  std::vector<std::pair<double,double>> win_list(win_set.begin(), win_set.end()); 
+  win_list_ = win_list;
 
   // get retention times
-  for (auto base_mz : isolation_window_base_mz_) {
+  for (auto cur_win : win_list_) {
     DeconvMsPtrVec deconv_ms2_ptr_shortlisted_vec;
     std::vector<double> rt_ms2_window;
     for (auto &ms2_data : deconv_ms2_ptr_vec) {
-      double win_mz = (ms2_data->getMsHeaderPtr()->getPrecWinBegin() +
-                       ms2_data->getMsHeaderPtr()->getPrecWinEnd()) /
-                      2;
-      if (win_mz != base_mz) continue;
+      double ms_win_begin = ms2_data->getMsHeaderPtr()->getPrecWinBegin();
+      if (ms_win_begin != cur_win.first) continue;
       deconv_ms2_ptr_shortlisted_vec.push_back(ms2_data);
       rt_ms2_window.push_back(ms2_data->getMsHeaderPtr()->getRetentionTime() /
                               60);
@@ -64,13 +62,9 @@ GeneratePseudoSpectrum::GeneratePseudoSpectrum(TopfdParaPtr topfd_para_ptr,
   // read feature files
   std::string filename = output_base_name + "_frac_ms1.mzrt.csv";
   ms1_features_ = MzrtFeature::read_record(filename);
-  for (auto base_mz : isolation_window_base_mz_) {
+  for (auto cur_win : win_list_) {
     filename = output_base_name + "_" +
-               std::to_string(
-                   int(base_mz - topfd_para_ptr->getPrecWindowWidth() / 2)) +
-               "_" +
-               std::to_string(
-                   int(base_mz + topfd_para_ptr->getPrecWindowWidth() / 2)) +
+               std::to_string(cur_win.first) +
                "_frac_ms2.mzrt.csv";
     MzrtFeaturePtrVec feature_list = MzrtFeature::read_record(filename);
     ms2_features_.push_back(feature_list);
@@ -90,12 +84,12 @@ GeneratePseudoSpectrum::GeneratePseudoSpectrum(TopfdParaPtr topfd_para_ptr,
     ms1_feature->setInterpolatedXic(
         interp(rt_target, rt_ms1_, ms1_feature->getXic()));
 
-  for (int iso_win_idx = 0;
-       iso_win_idx < static_cast<int>(isolation_window_base_mz_.size());
-       iso_win_idx++)
-    for (auto &ms2_feature : ms2_features_[iso_win_idx])
+  for (size_t iso_win_idx = 0; iso_win_idx < win_list_.size(); iso_win_idx++) {
+    for (auto &ms2_feature : ms2_features_[iso_win_idx]) {
       ms2_feature->setInterpolatedXic(
           interp(rt_target, rt_ms2_[iso_win_idx], ms2_feature->getXic()));
+    }
+  }
 }
 
 void GeneratePseudoSpectrum::process(TopfdParaPtr topfd_para_ptr, 
@@ -103,13 +97,10 @@ void GeneratePseudoSpectrum::process(TopfdParaPtr topfd_para_ptr,
   int feature_id = 0;
   EnvParaPtr env_para_ptr =
       std::make_shared<EnvPara>(topfd_para_ptr->getMzError());
-  for (int iso_win_idx = 0;
-       iso_win_idx < static_cast<int>(isolation_window_base_mz_.size());
-       iso_win_idx++) {
+  for (size_t iso_win_idx = 0; iso_win_idx < win_list_.size(); iso_win_idx++) {
     PseudoSpectrumPtrVec pseudo_spectra;
-    double base_mz = isolation_window_base_mz_[iso_win_idx];
-    MzrtFeaturePtrVec selected_ms1_features = get_iso_win_ms1_features(
-        iso_win_idx, topfd_para_ptr->getPrecWindowWidth());
+    std::pair<double, double> win = win_list_[iso_win_idx];
+    MzrtFeaturePtrVec selected_ms1_features = get_iso_win_ms1_features(iso_win_idx);
     std::sort(selected_ms1_features.begin(), selected_ms1_features.end(),
               compareFeaturesInte);
     std::cout << "Processing Isolation window " << iso_win_idx << " with "
@@ -117,7 +108,8 @@ void GeneratePseudoSpectrum::process(TopfdParaPtr topfd_para_ptr,
     for (auto &ms1_feature : selected_ms1_features) {
       int apex_cycle_distance_tole =
           std::min(3, ms1_feature->getCycleSpan() / 2);
-      ms1_feature->setBaseMz(base_mz);
+      //TO CONTINUE
+      ms1_feature->setWin(win);
       std::vector<PseudoPeak> pseudo_peak_list;
       for (int ms2_feature_idx = 0;
            ms2_feature_idx <
@@ -174,9 +166,7 @@ void GeneratePseudoSpectrum::process(TopfdParaPtr topfd_para_ptr,
 
 double GeneratePseudoSpectrum::get_max_rt() {
   double max_rt = rt_ms1_.back();
-  for (int iso_win_idx = 0;
-       iso_win_idx < static_cast<int>(isolation_window_base_mz_.size());
-       iso_win_idx++) {
+  for (int iso_win_idx = 0; iso_win_idx < win_list_.size(); iso_win_idx++) {
     if (max_rt > rt_ms2_[iso_win_idx].back())
       max_rt = rt_ms2_[iso_win_idx].back();
   }
@@ -206,34 +196,35 @@ std::vector<double> GeneratePseudoSpectrum::interp(
   return interpolatedValues;
 }
 
-MzrtFeaturePtrVec GeneratePseudoSpectrum::get_iso_win_ms1_features(
-    int isolation_window_base_index, double window_size) {
+MzrtFeaturePtrVec GeneratePseudoSpectrum::get_iso_win_ms1_features(int isolation_window_base_index) {
   MzrtFeaturePtrVec selected_features;
-  double target_window = isolation_window_base_mz_[isolation_window_base_index];
+  std::pair<double, double> win = win_list_[isolation_window_base_index];
+  double window_start_mz = win.first; 
+  double window_end_mz = win.second;
   for (const auto &ms1_feature : ms1_features_) {
     std::vector<double> envelope_intensity = ms1_feature->getEnvelopeInte();
     std::vector<double> envelope_mz = ms1_feature->getEnvelopeMz();
     std::vector<double> xic = ms1_feature->getXic();
     double envelope_intensity_sum = std::accumulate(
         envelope_intensity.begin(), envelope_intensity.end(), 0.0);
-    if (envelope_intensity_sum > 0) {
-      for (double base_mz : isolation_window_base_mz_) {
-        if (base_mz == target_window and
-            std::accumulate(xic.begin(), xic.end(), 0.0) > 0) {
-          double window_start_mz = base_mz - window_size / 2;
-          double window_end_mz = base_mz + window_size / 2;
-          // get envelope peaks intensity present within isolation window
-          double env_inte_sum_iso_win = 0;
-          for (size_t idx = 0; idx < envelope_intensity.size(); idx++)
-            if (window_start_mz <= envelope_mz[idx] &&
-                envelope_mz[idx] < window_end_mz)
-              env_inte_sum_iso_win += envelope_intensity[idx];
-          double coverage = env_inte_sum_iso_win / envelope_intensity_sum;
-          if (coverage > 0.5) {
-            selected_features.push_back(ms1_feature);
-          }
-        }
-      }
+    if (envelope_intensity_sum == 0.0) {
+      continue;
+    }
+    double xic_sum = std::accumulate(xic.begin(), xic.end(), 0.0); 
+    if (xic_sum == 0.0) {
+      continue;
+    }
+  
+    // get envelope peaks intensity present within isolation window
+    double env_inte_sum_iso_win = 0;
+    for (size_t idx = 0; idx < envelope_intensity.size(); idx++) {
+      if (window_start_mz <= envelope_mz[idx] &&
+          envelope_mz[idx] <= window_end_mz)
+        env_inte_sum_iso_win += envelope_intensity[idx];
+    }
+    double coverage = env_inte_sum_iso_win / envelope_intensity_sum;
+    if (coverage > 0.5) {
+      selected_features.push_back(ms1_feature);
     }
   }
   std::sort(selected_features.begin(), selected_features.end(),
@@ -384,12 +375,8 @@ void GeneratePseudoSpectrum::write_pseudo_spectrum(
   output << "LEVEL=" << 2 << std::endl;
   output << "MS_ONE_ID=" << ms1_feature->getApexCycle() << std::endl;        ///
   output << "MS_ONE_SCAN=" << num_ms2_specs + ms1_feature_idx << std::endl;  ///
-  output << "PRECURSOR_WINDOW_BEGIN="
-         << ms1_feature->getBaseMz() - topfd_para_ptr->getPrecWindowWidth() / 2
-         << std::endl;
-  output << "PRECURSOR_WINDOW_END="
-         << ms1_feature->getBaseMz() + topfd_para_ptr->getPrecWindowWidth() / 2
-         << std::endl;
+  output << "PRECURSOR_WINDOW_BEGIN=" << ms1_feature->getWin().first << std::endl;
+  output << "PRECURSOR_WINDOW_END=" << ms1_feature->getWin().second << std::endl;
   output << "ACTIVATION=HCD" << std::endl;
   output << "PRECURSOR_MZ=" << ms1_feature->getMonoMz() << std::endl;
   output << "PRECURSOR_CHARGE=" << ms1_feature->getCharge() << std::endl;

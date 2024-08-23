@@ -48,8 +48,8 @@ class GeneratePseudoSpectrum {
   static std::vector<double> interp(const std::vector<double> &x,
                                     const std::vector<double> &xp,
                                     const std::vector<double> &fp);
-  MzrtFeaturePtrVec get_iso_win_ms1_features(int isolation_window_base_index,
-                                             double window_size);
+  MzrtFeaturePtrVec get_iso_win_ms1_features(int isolation_window_base_index);
+
   static int get_apex_cycle_distance(const MzrtFeaturePtr &ms1_feature,
                                      const MzrtFeaturePtr &ms2_feature);
   static std::vector<double> moving_avg(std::vector<double> xic, int size);
@@ -78,7 +78,8 @@ class GeneratePseudoSpectrum {
     return a.getScore() > b.getScore();
   }
 
-  std::vector<double> isolation_window_base_mz_;
+  //std::vector<double> isolation_window_base_mz_;
+  std::vector<std::pair<double,double>> win_list_;
   std::vector<double> rt_ms1_;
   std::vector<std::vector<double>> rt_ms2_;
   MzrtFeaturePtrVec ms1_features_;

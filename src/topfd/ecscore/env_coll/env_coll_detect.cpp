@@ -264,8 +264,9 @@ void processMs2(TopfdParaPtr topfd_para_ptr) {
   }
   std::vector<std::pair<double,double>> win_list(win_set.begin(), win_set.end()); 
 
-  
-  for (auto cur_win: win_list) {
+  //for (size_t i = 0; i < win_list.size(); i++) {
+  for (size_t i = 0; i < 1; i++) {
+    std::pair<double, double> cur_win =  win_list[i]; 
     std::cout << "Processing isolation window: [" << cur_win.first << "," << cur_win.second << "]"<< std::endl;
     // read ms1 raw peaks and ms2_headers
     PeakPtrVec2D ms2_mzml_peaks;
@@ -355,11 +356,12 @@ void processMs2(TopfdParaPtr topfd_para_ptr) {
     std::cout << std::endl;
 
     std::cout << "Number of fragment features: " << env_coll_list.size() << std::endl;
+
+    std::string feat_file_name =
+        output_base_name + "_" + std::to_string(cur_win.first) + "_ms2.csv";
+    ecscore_writer::writeScores(feat_file_name, ecscore_list);
     /// output files
     if (topfd_para_ptr->isOutputCsvFeatureFile()) {
-      std::string feat_file_name =
-        output_base_name + "_" + std::to_string(cur_win.first) + "_ms2.csv";
-      ecscore_writer::writeScores(feat_file_name, ecscore_list);
       std::string batmass_file_name;
       batmass_file_name =
         output_base_name + "_" + std::to_string(cur_win.first) + "_frac_ms2.mzrt.csv";

@@ -78,9 +78,9 @@ class MzrtFeature {
 
   const std::vector<double> &getEnvelopeInte() const { return envelope_inte_; }
 
-  double getBaseMz() const { return base_mz_; }
+  std::pair<double,double> getWin() const { return win_; }
 
-  void setBaseMz(double base_mz) { base_mz_ = base_mz; }
+  void setWin(std::pair<double, double> win) { win_ = win; }
 
   bool getUsedStatus() const { return used_; }
 
@@ -140,7 +140,7 @@ class MzrtFeature {
 
   int apex_cycle_;
   int cycle_span_;
-  double base_mz_;
+  std::pair<double,double> win_;
   bool used_;
   int pseudo_peak_num_ = 0;
 };
