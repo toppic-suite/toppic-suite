@@ -40,6 +40,9 @@ class MzmlMsGroupReader {
   void getMs1Map(PeakPtrVec2D &ms1_mzml_peaks, 
                  MsHeaderPtr2D &ms2_header_ptr_2d);
 
+  void getMs2Map(PeakPtrVec2D &ms2_mzml_peaks, 
+                 double base_mz);
+
  private:
   PwMsReaderPtr reader_ptr_;
   int fraction_id_ = 0;

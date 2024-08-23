@@ -14,4 +14,6 @@
 /stat/mcmc/     An Markov chain Monte Carlo method for E-value estimation
 /stat/tdgf/     A generation function method for E-value estimation
 /suffix/        Suffix tree used in the manuscript Deng et al, Bioinformatics 31, 532-538
+/topdia/        Code for TopDIA
+/topfd/         Code for TopFD
 /visual/        Functions for visualization of proteoform spectrum matches

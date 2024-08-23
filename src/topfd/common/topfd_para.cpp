@@ -24,6 +24,14 @@
 
 namespace toppic {
 
+TopfdParaPtr TopfdPara::getTopfdParaPtrForTopdia() {
+  TopfdParaPtr topfd_para_ptr = std::make_shared<TopfdPara>();
+  topfd_para_ptr->setMs1EcscoreCutoff(0);
+  topfd_para_ptr->setMs1MinScanNum(2);
+  topfd_para_ptr->setPrecWindowWidth(4.0);
+  return topfd_para_ptr;
+}
+
 void TopfdPara::setMzmlFileNameAndFaims(std::string &mzml_file_name, 
                                         bool is_faims, double voltage) {
   mzml_file_name_ = mzml_file_name;
@@ -44,13 +52,10 @@ void TopfdPara::setMzmlFileNameAndFaims(std::string &mzml_file_name,
     + file_util::getFileSeparator() + "ms2_json";
 }
 
-std::string TopfdPara::getParaStr(const std::string &prefix, 
-		                  const std::string &sep) {
+std::string TopfdPara::getTopfdParaStr(const std::string &prefix,
+                                       const std::string &sep,
+                                       int gap) {
   std::stringstream output;
-  int gap = 25;
-  output << prefix << "TopFD " << Version::getVersion() << std::endl;
-  output << prefix << "Timestamp: " << time_util::getTimeStr() << std::endl;
-  output << prefix << "###################### Parameters ######################" << std::endl;
   output << prefix << std::setw(gap) << std::left 
       << "File name:                  " << sep  << mzml_file_name_ << std::endl;
   if (is_faims_) {
@@ -106,7 +111,7 @@ std::string TopfdPara::getParaStr(const std::string &prefix,
       << "Miss MS1 spectra:           " << sep << "No" << std::endl;
   }
   output << prefix << std::setw(gap) << std::left 
-      << "Min scan number:            " << sep << min_scan_num_ << std::endl;
+      << "Min scan number:            " << sep << ms1_min_scan_num_ << std::endl;
   if (use_single_scan_noise_level_) {
     output << prefix << std::setw(gap) << std::left 
       << "Use single scan noise level:" << sep << "Yes" << std::endl;
@@ -116,7 +121,7 @@ std::string TopfdPara::getParaStr(const std::string &prefix,
       << "Use single scan noise level:" << sep << "No" << std::endl;
   }
   output << prefix << std::setw(gap) << std::left 
-      << "ECScore cutoff:             " << sep  << ecscore_cutoff_ << std::endl;
+      << "ECScore cutoff:             " << sep  << ms1_ecscore_cutoff_ << std::endl;
   if (search_prec_window_) {
     output << prefix << std::setw(gap) << std::left 
       << "Additional feature search:  " << sep << "Yes" << std::endl;
@@ -141,6 +146,17 @@ std::string TopfdPara::getParaStr(const std::string &prefix,
     output << prefix << std::setw(gap) << std::left 
       << "Do final filtering:         " << sep << "No" << std::endl;
   }
+  return output.str();
+}
+
+std::string TopfdPara::getParaStr(const std::string &prefix, 
+		                  const std::string &sep) {
+  std::stringstream output;
+  int gap = 25;
+  output << prefix << "TopFD " << Version::getVersion() << std::endl;
+  output << prefix << "Timestamp: " << time_util::getTimeStr() << std::endl;
+  output << prefix << "###################### Parameters ######################" << std::endl;
+  output << getTopfdParaStr(prefix, sep, gap);
   output << prefix << std::setw(gap) << std::left 
       << "Version:                    " << sep << Version::getVersion() << std::endl;   
   output << prefix << "###################### Parameters ######################" << std::endl;

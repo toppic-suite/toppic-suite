@@ -40,7 +40,7 @@ double compTopThreeInteRatio(SeedEnvPtr seed_ptr, MsMapEnvPtr env_ptr) {
 double compTopThreeInteRatio(SeedEnvPtr seed_ptr, std::vector<double> &inte_list) {
   double seed_inte = seed_ptr->compTopThreeInteSum();
   if (seed_inte == 0) {
-    LOG_WARN("Empty peak list!");
+    LOG_INFO("Empty peak list!");
     return 0;
   }
   size_t ref_idx = seed_ptr->getReferIdx();

@@ -16,8 +16,6 @@
 #define TOPPIC_TOPDIFF_ARGUMENT_HPP_
 
 #include <map>
-#include <iostream>
-#include <memory>
 #include <vector>
 #include <string>
 

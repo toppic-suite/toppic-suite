@@ -16,8 +16,9 @@
 
 #include "common/util/file_util.hpp"
 #include "common/xml/xml_dom_util.hpp"
-#include "common/util/str_util.hpp"
 #include "common/base/mod_util.hpp"
+#include "common/util/logger.hpp"
+#include "common/util/str_util.hpp"
 #include "common/util/version.hpp"
 #include "common/util/mem_check.hpp"
 

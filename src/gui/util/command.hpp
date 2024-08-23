@@ -20,6 +20,7 @@
 #include <string>
 
 #include "topfd/common/topfd_para.hpp"
+#include "topdia/common/topdia_para.hpp"
 
 namespace toppic {
 
@@ -38,6 +39,10 @@ std::string geneTopmgCommand(std::map<std::string, std::string> arguments_,
 
 std::string geneTopDiffCommand(std::map<std::string, std::string> arguments_, 
                                std::vector<std::string> spec_file_lst_); 
+
+std::string geneTopdiaCommand(TopfdParaPtr topfd_para_ptr, 
+                              TopdiaParaPtr todia_para_ptr,
+                              const std::vector<std::string> spec_file_lst); 
 
 }
 }

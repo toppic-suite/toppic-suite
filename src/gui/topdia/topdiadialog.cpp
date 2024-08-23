@@ -33,36 +33,46 @@
 
 #include "gui/util/command.hpp"
 #include "gui/util/gui_message.hpp"
-#include "gui/topfd/ui_topfddialog.h"
-#include "gui/topfd/topfddialog.hpp"
+#include "gui/topdia/ui_topdiadialog.h"
+#include "gui/topdia/topdiadialog.hpp"
 
-TopFDDialog::TopFDDialog(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::TopFDDialog) {
-      para_ptr_ = std::make_shared<toppic::TopfdPara>();
-      ui->setupUi(this);
-      std::string title = "TopFD v." + toppic::Version::getVersion();
-      QString qstr = QString::fromStdString(title);
-      this->setWindowTitle(qstr);
-      lastDir_ = ".";
-      ui->maxChargeEdit->setValidator(new QIntValidator(1, 100, this));
-      ui->maxMassEdit->setValidator(new QIntValidator(1, 1000000, this));
-      QRegExp rx1("^0\\.[0]\\d{0,2}[1-9]|0.1$");
-      QRegExpValidator *validator1 = new QRegExpValidator(rx1, this);
-      ui->mzErrorEdit->setValidator(validator1);
-      QRegExp rx2("^\\d{1,6}\\.\\d{0,2}$");
-      QRegExpValidator *validator2 = new QRegExpValidator(rx2, this);
-      ui->ms1snRatioEdit->setValidator(validator2);
-      ui->ms2snRatioEdit->setValidator(validator2);
-      ui->splitRatioEdit->setValidator(validator2);
-      ui->threadNumberEdit->setValidator(new QIntValidator(0, 1000, this));
-      ui->minScanNumEdit->setValidator(new QIntValidator(1, 3, this));
-      ui->ecscoreCutoffEdit->setValidator(new QDoubleValidator(0.0, 1.0, 4, this));
-      QRegExp rx3("^\\d{1,4}\\.\\d{0,2}|10000$");
-      QRegExpValidator *validator3 = new QRegExpValidator(rx3, this);
-      ui->windowSizeEdit->setValidator(validator3);
-      QFont font;
-      QFont outputFont;
+TopDIADialog::TopDIADialog(QWidget *parent)
+    : QMainWindow(parent), ui(new Ui::TopDIADialog) {
+  topfd_para_ptr_ = toppic::TopfdPara::getTopfdParaPtrForTopdia();
+  topdia_para_ptr_ = std::make_shared<toppic::TopdiaPara>();
+  ui->setupUi(this);
+  std::string title = "TopDIA v." + toppic::Version::getVersion();
+  QString qstr = QString::fromStdString(title);
+  this->setWindowTitle(qstr);
+  lastDir_ = ".";
+  ui->maxChargeEdit->setValidator(new QIntValidator(1, 100, this));
+  ui->maxMassEdit->setValidator(new QIntValidator(1, 1000000, this));
+  QRegExp rx1("^0\\.[0]\\d{0,2}[1-9]|0.1$");
+  QRegExpValidator *validator1 = new QRegExpValidator(rx1, this);
+  ui->mzErrorEdit->setValidator(validator1);
+  QRegExp rx2("^\\d{1,6}\\.\\d{0,2}$");
+  QRegExpValidator *validator2 = new QRegExpValidator(rx2, this);
+  ui->ms1snRatioEdit->setValidator(validator2);
+  ui->ms2snRatioEdit->setValidator(validator2);
+  ui->threadNumberEdit->setValidator(new QIntValidator(0, 1000, this));
+  ui->ms1MinScanNumEdit->setValidator(new QIntValidator(1, 3, this));
+  ui->ms2MinScanNumEdit->setValidator(new QIntValidator(1, 3, this));
+  ui->pseudoMinPeakNumEdit->setValidator(new QIntValidator(10, 1000, this));
+  ui->ms1EcscoreCutoffEdit->setValidator(
+      new QDoubleValidator(0.0, 1.0, 4, this));
+  ui->ms2EcscoreCutoffEdit->setValidator(
+      new QDoubleValidator(0.0, 1.0, 4, this));
+  ui->pseudoScoreCutoffEdit->setValidator(
+      new QDoubleValidator(0.0, 1.0, 4, this));
+  ui->ms1IntePccCutoffEdit->setValidator(
+      new QDoubleValidator(0.0, 1.0, 4, this));
+  ui->ms2IntePccCutoffEdit->setValidator(
+      new QDoubleValidator(0.0, 1.0, 4, this));
+  QRegExp rx3("^\\d{1,4}\\.\\d{0,2}|10000$");
+  QRegExpValidator *validator3 = new QRegExpValidator(rx3, this);
+  ui->windowSizeEdit->setValidator(validator3);
+  QFont font;
+  QFont outputFont;
 #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
       font.setFamily(QStringLiteral("Calibri"));
       outputFont.setFamily(QStringLiteral("Consolas"));
@@ -74,17 +84,17 @@ TopFDDialog::TopFDDialog(QWidget *parent) :
       outputFont.setPixelSize(12);
       QApplication::setFont(font);
       ui->outputTextBrowser->setFont(outputFont);
-      TopFDDialog::on_defaultButton_clicked();
-    }
+      TopDIADialog::on_defaultButton_clicked();
+}
 
-TopFDDialog::~TopFDDialog() {
+TopDIADialog::~TopDIADialog() {
   if(process_.state()!=QProcess::NotRunning) {
     process_.kill();
   }
   delete ui;
 }
 
-void TopFDDialog::closeEvent(QCloseEvent *event) {
+void TopDIADialog::closeEvent(QCloseEvent *event) {
   if(process_.state()!=QProcess::NotRunning) {
     if (!continueToClose()) {
       event->ignore();
@@ -98,39 +108,46 @@ void TopFDDialog::closeEvent(QCloseEvent *event) {
   return;
 }
 
-void TopFDDialog::on_clearButton_clicked() {
+void TopDIADialog::on_clearButton_clicked() {
   ui->listWidget->clear();
   ui->outputTextBrowser->clear();
   ui->outputTextBrowser->setText("Click the Start button to process the spectrum files.");
   lastDir_ = "/";
 }
 
-void TopFDDialog::on_defaultButton_clicked() {
+void TopDIADialog::on_defaultButton_clicked() {
   // default para_ptr
-  toppic::TopfdParaPtr para_ptr = std::make_shared<toppic::TopfdPara>();
-  ui->maxChargeEdit->setText(QString::number(para_ptr->getMaxCharge()));
-  ui->maxMassEdit->setText(QString::number(para_ptr->getMaxMass()));
-  ui->mzErrorEdit->setText(QString::number(para_ptr->getMzError()));
-  ui->ms1snRatioEdit->setText(QString::number(para_ptr->getMsOneSnRatio()));
-  ui->ms2snRatioEdit->setText(QString::number(para_ptr->getMsTwoSnRatio()));
-  ui->splitRatioEdit->setText(QString::number(para_ptr->getSplitIntensityRatio()));
-  ui->windowSizeEdit->setText(QString::number(para_ptr->getPrecWindowWidth()));
-  ui->threadNumberEdit->setText(QString::number(para_ptr->getThreadNum()));
-  ui->ecscoreCutoffEdit->setText(QString::number(para_ptr->getMs1EcscoreCutoff()));
-  ui->minScanNumEdit->setText(QString::number(para_ptr->getMs1MinScanNum()));
-  ui->msDeconvCheckBox->setChecked(para_ptr->isUseMsDeconv());
-  ui->missLevelOneCheckBox->setChecked(para_ptr->isMissingLevelOne());
-  ui->geneHTMLCheckBox->setChecked(para_ptr->isGeneHtmlFolder());
-  ui->disableFilteringCheckBox->setChecked(!para_ptr->isDoFinalFiltering());
-  ui->disableAdditionalFeatureSearchCheckBox->setChecked(!para_ptr->isSearchPrecWindow());
-  ui->singleScanNoiseLevelCheckBox->setChecked(para_ptr->isUseSingleScanNoiseLevel());
+  topfd_para_ptr_ = toppic::TopfdPara::getTopfdParaPtrForTopdia();
+  topdia_para_ptr_ = std::make_shared<toppic::TopdiaPara>();
+  ui->maxChargeEdit->setText(QString::number(topfd_para_ptr_->getMaxCharge()));
+  ui->maxMassEdit->setText(QString::number(topfd_para_ptr_->getMaxMass()));
+  ui->mzErrorEdit->setText(QString::number(topfd_para_ptr_->getMzError()));
+  ui->ms1snRatioEdit->setText(QString::number(topfd_para_ptr_->getMsOneSnRatio()));
+  ui->ms2snRatioEdit->setText(QString::number(topfd_para_ptr_->getMsTwoSnRatio()));
+  ui->windowSizeEdit->setText(QString::number(topfd_para_ptr_->getPrecWindowWidth()));
+  ui->threadNumberEdit->setText(QString::number(topfd_para_ptr_->getThreadNum()));
+  ui->msDeconvCheckBox->setChecked(topfd_para_ptr_->isUseMsDeconv());
+  ui->geneHTMLCheckBox->setChecked(topfd_para_ptr_->isGeneHtmlFolder());
+  ui->disableFilteringCheckBox->setChecked(!topfd_para_ptr_->isDoFinalFiltering());
+  ui->singleScanNoiseLevelCheckBox->setChecked(topfd_para_ptr_->isUseSingleScanNoiseLevel());
+
+  //////////////////////////////////////
+  ui->ms1EcscoreCutoffEdit->setText(QString::number(topfd_para_ptr_->getMs1EcscoreCutoff()));
+  ui->ms2EcscoreCutoffEdit->setText(QString::number(topfd_para_ptr_->getMs2EcscoreCutoff()));
+  ui->ms1MinScanNumEdit->setText(QString::number(topfd_para_ptr_->getMs1MinScanNum()));
+  ui->ms2MinScanNumEdit->setText(QString::number(topfd_para_ptr_->getMs2MinScanNum()));
+  ui->pseudoScoreCutoffEdit->setText(QString::number(topdia_para_ptr_->getPseudoScoreCutoff()));
+  ui->pseudoMinPeakNumEdit->setText(QString::number(topdia_para_ptr_->getPseudoMinPeaks()));
+  ui->ms1IntePccCutoffEdit->setText(QString::number(topdia_para_ptr_->getMs1SeedEnvInteCorrToleCutoff()));
+  ui->ms2IntePccCutoffEdit->setText(QString::number(topdia_para_ptr_->getMs2SeedEnvInteCorrToleCutoff()));
+  //////////////////////////////////////
 
   ui->outputTextBrowser->clear();
   ui->outputTextBrowser->setText("Click the Start button to process the spectrum files.");
   ui->activationComboBox->setCurrentIndex(0);
 }
 
-std::vector<std::string> TopFDDialog::getSpecFileList() {
+std::vector<std::string> TopDIADialog::getSpecFileList() {
   spec_file_lst_.clear();
   for (int i = 0; i < ui->listWidget->count(); i++) {
     spec_file_lst_.push_back(ui->listWidget->item(i)->text().toStdString());
@@ -138,7 +155,7 @@ std::vector<std::string> TopFDDialog::getSpecFileList() {
   return spec_file_lst_;
 }
 
-void TopFDDialog::on_addButton_clicked() {
+void TopDIADialog::on_addButton_clicked() {
   QStringList spfiles = QFileDialog::getOpenFileNames(
       this,
       "Select spectrum files",
@@ -153,13 +170,13 @@ void TopFDDialog::on_addButton_clicked() {
   }
 }
 
-void TopFDDialog::updatedir(QString s) {
+void TopDIADialog::updatedir(QString s) {
   if (!s.isEmpty()) {
     //lastDir_ = s;
     lastDir_ = "";
   }
 }
-bool TopFDDialog::ableToAdd(QString spfile) {
+bool TopDIADialog::ableToAdd(QString spfile) {
   bool able = true;
   if (spfile != "") {
     if (spfile.toStdString().length() > 200) {
@@ -180,18 +197,18 @@ bool TopFDDialog::ableToAdd(QString spfile) {
   return able;
 }
 
-void TopFDDialog::on_delButton_clicked() {
+void TopDIADialog::on_delButton_clicked() {
   QListWidgetItem *delItem = ui->listWidget->currentItem();
   ui->listWidget->removeItemWidget(delItem);
   delete delItem;
 }
 
-void TopFDDialog::on_startButton_clicked() {
+void TopDIADialog::on_startButton_clicked() {
   lockDialog();
-  toppic::TopfdParaPtr paraPtr = this->getParaPtr();
+  this->getParaPtr();
   std::vector<std::string> specFileList = this->getSpecFileList();
 
-  std::string cmd = toppic::command::geneTopfdCommand(para_ptr_, spec_file_lst_);
+  std::string cmd = toppic::command::geneTopdiaCommand(topfd_para_ptr_, topdia_para_ptr_, spec_file_lst_);
   QString q_cmd = QString::fromStdString(cmd);
   q_cmd = q_cmd.trimmed();
   QStringList cmd_list = q_cmd.split(" ");
@@ -236,14 +253,14 @@ void TopFDDialog::on_startButton_clicked() {
   unlockDialog();
 }
 
-void TopFDDialog::on_exitButton_clicked() {
+void TopDIADialog::on_exitButton_clicked() {
   close();
 }
 
-bool TopFDDialog::continueToClose() {
+bool TopDIADialog::continueToClose() {
   if (QMessageBox::question(this,
                             tr("Quit"),
-                            tr("TopFD is still running. Are you sure you want to quit?"),
+                            tr("TopDIA is still running. Are you sure you want to quit?"),
                             QMessageBox::Yes | QMessageBox::No,
                             QMessageBox::No)
       == QMessageBox::Yes) {
@@ -253,7 +270,7 @@ bool TopFDDialog::continueToClose() {
   }
 }
 
-void TopFDDialog::on_outputButton_clicked() {
+void TopDIADialog::on_outputButton_clicked() {
   std::string sp_file_name = "";
   if (spec_file_lst_.size() > 0) {
     sp_file_name = spec_file_lst_[0];
@@ -263,37 +280,41 @@ void TopFDDialog::on_outputButton_clicked() {
   QDesktopServices::openUrl(QUrl(outPath, QUrl::TolerantMode));
 }
 
-toppic::TopfdParaPtr TopFDDialog::getParaPtr() {
+void TopDIADialog::getParaPtr() {
   QString path = QCoreApplication::applicationFilePath();
   std::string exe_dir = toppic::file_util::getExecutiveDir(path.toStdString());
-  para_ptr_->setExeDir(exe_dir);
+  topfd_para_ptr_->setExeDir(exe_dir);
   if (toppic::file_util::checkSpace(exe_dir)) {
     ui->outputTextBrowser->setText("Current directory " + QString::fromStdString(exe_dir) + " contains space and will cause errors in the program!");
   }
-  para_ptr_->setResourceDir(toppic::file_util::getResourceDir(exe_dir));
-  para_ptr_->setMaxCharge(std::stoi(ui->maxChargeEdit->text().toStdString()));
-  para_ptr_->setMaxMass(std::stod(ui->maxMassEdit->text().toStdString()));
-  para_ptr_->setMzError(std::stod(ui->mzErrorEdit->text().toStdString()));
-  para_ptr_->setMsOneSnRatio(std::stod(ui->ms1snRatioEdit->text().toStdString()));
-  para_ptr_->setMsTwoSnRatio(std::stod(ui->ms2snRatioEdit->text().toStdString()));
-  para_ptr_->setSplitIntensityRatio(std::stod(ui->splitRatioEdit->text().toStdString()));
-  para_ptr_->setPrecWindowWidth(std::stod(ui->windowSizeEdit->text().toStdString()));
-  para_ptr_->setMissingLevelOne(ui->missLevelOneCheckBox->isChecked()); 
-  para_ptr_->setMs1EcscoreCutoff(std::stod(ui->ecscoreCutoffEdit->text().toStdString()));
-  para_ptr_->setMs1MinScanNum(std::stoi(ui->minScanNumEdit->text().toStdString()));
-  para_ptr_->setThreadNum(std::stoi(ui->threadNumberEdit->text().toStdString()));
-  para_ptr_->setGeneHtmlFolder(ui->geneHTMLCheckBox->isChecked());
-  para_ptr_->setUseMsDeconv(ui->msDeconvCheckBox->isChecked());
-  para_ptr_->setActivation(ui->activationComboBox->currentText().toStdString());
-  para_ptr_->setDoFinalFiltering(!(ui->disableFilteringCheckBox->isChecked()));
+  topfd_para_ptr_->setResourceDir(toppic::file_util::getResourceDir(exe_dir));
+  topfd_para_ptr_->setMaxCharge(std::stoi(ui->maxChargeEdit->text().toStdString()));
+  topfd_para_ptr_->setMaxMass(std::stod(ui->maxMassEdit->text().toStdString()));
+  topfd_para_ptr_->setMzError(std::stod(ui->mzErrorEdit->text().toStdString()));
+  topfd_para_ptr_->setMsOneSnRatio(std::stod(ui->ms1snRatioEdit->text().toStdString()));
+  topfd_para_ptr_->setMsTwoSnRatio(std::stod(ui->ms2snRatioEdit->text().toStdString()));
+  topfd_para_ptr_->setPrecWindowWidth(std::stod(ui->windowSizeEdit->text().toStdString()));
+  topfd_para_ptr_->setThreadNum(std::stoi(ui->threadNumberEdit->text().toStdString()));
+  topfd_para_ptr_->setGeneHtmlFolder(ui->geneHTMLCheckBox->isChecked());
+  topfd_para_ptr_->setUseMsDeconv(ui->msDeconvCheckBox->isChecked());
+  topfd_para_ptr_->setActivation(ui->activationComboBox->currentText().toStdString());
+  topfd_para_ptr_->setDoFinalFiltering(!(ui->disableFilteringCheckBox->isChecked()));
 
-  para_ptr_->setSearchPrecWindow((ui->disableAdditionalFeatureSearchCheckBox->isChecked()));
-  para_ptr_->setUseSingleScanNoiseLevel(ui->singleScanNoiseLevelCheckBox->isChecked());
+  //////////////////////////////////////
+  topfd_para_ptr_->setMs1EcscoreCutoff(std::stod(ui->ms1EcscoreCutoffEdit->text().toStdString()));
+  topfd_para_ptr_->setMs2EcscoreCutoff(std::stod(ui->ms2EcscoreCutoffEdit->text().toStdString()));
+  topfd_para_ptr_->setMs1MinScanNum(std::stoi(ui->ms1MinScanNumEdit->text().toStdString()));
+  topfd_para_ptr_->setMs2MinScanNum(std::stoi(ui->ms2MinScanNumEdit->text().toStdString()));
+  topdia_para_ptr_->setPseudoScoreCutoff(std::stod(ui->pseudoScoreCutoffEdit->text().toStdString()));
+  topdia_para_ptr_->setPseudoMinPeaks(std::stoi(ui->pseudoMinPeakNumEdit->text().toStdString()));
+  topdia_para_ptr_->setMs1SeedEnvInteCorrToleCutoff(std::stod(ui->ms1IntePccCutoffEdit->text().toStdString()));
+  topdia_para_ptr_->setMs2SeedEnvInteCorrToleCutoff(std::stod(ui->ms2IntePccCutoffEdit->text().toStdString()));
+  //////////////////////////////////////
 
-  return para_ptr_;
+  topfd_para_ptr_->setUseSingleScanNoiseLevel(ui->singleScanNoiseLevelCheckBox->isChecked());
 }
-
-void TopFDDialog::lockDialog() {
+  
+void TopDIADialog::lockDialog() {
   ui->addButton->setEnabled(false);
   ui->delButton->setEnabled(false);
   ui->maxChargeEdit->setEnabled(false);
@@ -301,25 +322,29 @@ void TopFDDialog::lockDialog() {
   ui->mzErrorEdit->setEnabled(false);
   ui->ms1snRatioEdit->setEnabled(false);
   ui->ms2snRatioEdit->setEnabled(false);
-  ui->splitRatioEdit->setEnabled(false);
   ui->threadNumberEdit->setEnabled(false);
-  ui->minScanNumEdit->setEnabled(false);
   ui->clearButton->setEnabled(false);
   ui->defaultButton->setEnabled(false);
   ui->startButton->setEnabled(false);
-  ui->missLevelOneCheckBox->setEnabled(false);
   ui->windowSizeEdit->setEnabled(false);
   ui->outputButton->setEnabled(false);
   ui->geneHTMLCheckBox->setEnabled(false);
   ui->msDeconvCheckBox->setEnabled(false);
   ui->activationComboBox->setEnabled(false);
   ui->disableFilteringCheckBox->setEnabled(false);
-  ui->ecscoreCutoffEdit->setEnabled(false); 
-  ui->disableAdditionalFeatureSearchCheckBox->setEnabled(false);
-  ui->singleScanNoiseLevelCheckBox->setEnabled(false); 
+  ui->singleScanNoiseLevelCheckBox->setEnabled(false);
+
+  ui->ms1EcscoreCutoffEdit->setEnabled(false);
+  ui->ms2EcscoreCutoffEdit->setEnabled(false);
+  ui->ms1MinScanNumEdit->setEnabled(false);
+  ui->ms2MinScanNumEdit->setEnabled(false);
+  ui->pseudoScoreCutoffEdit->setEnabled(false);
+  ui->pseudoMinPeakNumEdit->setEnabled(false);
+  ui->ms1IntePccCutoffEdit->setEnabled(false);
+  ui->ms2IntePccCutoffEdit->setEnabled(false);
 }
 
-void TopFDDialog::unlockDialog() {
+void TopDIADialog::unlockDialog() {
   ui->addButton->setEnabled(true);
   ui->delButton->setEnabled(true);
   ui->maxChargeEdit->setEnabled(true);
@@ -327,13 +352,10 @@ void TopFDDialog::unlockDialog() {
   ui->mzErrorEdit->setEnabled(true);
   ui->ms1snRatioEdit->setEnabled(true);
   ui->ms2snRatioEdit->setEnabled(true);
-  ui->splitRatioEdit->setEnabled(true);
   ui->threadNumberEdit->setEnabled(true);
-  ui->minScanNumEdit->setEnabled(true);
   ui->clearButton->setEnabled(true);
   ui->defaultButton->setEnabled(true);
   ui->startButton->setEnabled(true);
-  ui->missLevelOneCheckBox->setEnabled(true);
   ui->windowSizeEdit->setEnabled(true);
   ui->outputButton->setEnabled(true);
   ui->outputButton->setDefault(true);
@@ -341,12 +363,20 @@ void TopFDDialog::unlockDialog() {
   ui->msDeconvCheckBox->setEnabled(true);
   ui->activationComboBox->setEnabled(true);
   ui->disableFilteringCheckBox->setEnabled(true);
-  ui->ecscoreCutoffEdit->setEnabled(true); 
-  ui->disableAdditionalFeatureSearchCheckBox->setEnabled(true);
-  ui->singleScanNoiseLevelCheckBox->setEnabled(true); 
+  ui->singleScanNoiseLevelCheckBox->setEnabled(true);
+
+  ui->ms1EcscoreCutoffEdit->setEnabled(true);
+  ui->ms2EcscoreCutoffEdit->setEnabled(true);
+  ui->ms1MinScanNumEdit->setEnabled(true);
+  ui->ms2MinScanNumEdit->setEnabled(true);
+  ui->pseudoScoreCutoffEdit->setEnabled(true);
+  ui->pseudoMinPeakNumEdit->setEnabled(true);
+  ui->ms1IntePccCutoffEdit->setEnabled(true);
+  ui->ms2IntePccCutoffEdit->setEnabled(true);
+
 }
 
-bool TopFDDialog::checkError() {
+bool TopDIADialog::checkError() {
   if (ui->maxChargeEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
                          tr("Maximum charge is empty!"),
@@ -382,13 +412,6 @@ bool TopFDDialog::checkError() {
     return true;
   }
 
-  if (ui->splitRatioEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Split feature ratio is empty!"),
-                         QMessageBox::Yes);
-    return true;
-  }
-
   if (ui->windowSizeEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
                          tr("Precursor window size is empty!"),
@@ -402,22 +425,64 @@ bool TopFDDialog::checkError() {
     return true;
   }
 
-  if (ui->minScanNumEdit->text().isEmpty()) {
+  if (ui->ms1MinScanNumEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
-                         tr("Mininum scan number is empty!"),
+                         tr("MS1 mininum scan number is empty!"),
                          QMessageBox::Yes);
     return true;
   }
 
-
-  if (ui->ecscoreCutoffEdit->text().isEmpty()) {
+  if (ui->ms2MinScanNumEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
-                         tr("ECScore cutoff is empty!"),
+                         tr("MS2 mininum scan number is empty!"),
                          QMessageBox::Yes);
     return true;
   }
-  if (ui->threadNumberEdit->text().toInt() > toppic::mem_check::getMaxThreads("topfd")) {
-    int max_thread = toppic::mem_check::getMaxThreads("topfd");
+
+  if (ui->pseudoMinPeakNumEdit->text().isEmpty()) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("Pseudo mininum peak number is empty!"),
+                         QMessageBox::Yes);
+    return true;
+  }
+
+  if (ui->ms1EcscoreCutoffEdit->text().isEmpty()) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("MS1 ECScore cutoff is empty!"),
+                         QMessageBox::Yes);
+    return true;
+  }
+
+  if (ui->ms2EcscoreCutoffEdit->text().isEmpty()) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("MS2 ECScore cutoff is empty!"),
+                         QMessageBox::Yes);
+    return true;
+  }
+
+  if (ui->pseudoScoreCutoffEdit->text().isEmpty()) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("Pseudo Score cutoff is empty!"),
+                         QMessageBox::Yes);
+    return true;
+  }
+
+  if (ui->ms1IntePccCutoffEdit->text().isEmpty()) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("MS1 seed envelope intensity cutoff is empty!"),
+                         QMessageBox::Yes);
+    return true;
+  }
+
+  if (ui->ms2IntePccCutoffEdit->text().isEmpty()) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("MS2 seed envelope intensity cutoff is empty!"),
+                         QMessageBox::Yes);
+    return true;
+  }
+
+  if (ui->threadNumberEdit->text().toInt() > toppic::mem_check::getMaxThreads("topdia")) {
+    int max_thread = toppic::mem_check::getMaxThreads("topdia");
     QMessageBox::StandardButton reply = QMessageBox::warning(this, tr("Warning"),
                          QString("Thread number is too large! Based on the memory size, up to %1 threads can run on this computer. Are you sure you want to proceed?").arg(max_thread).arg(max_thread),
                          QMessageBox::Yes|QMessageBox::No);
@@ -429,7 +494,7 @@ bool TopFDDialog::checkError() {
   return false;
 }
 
-void TopFDDialog::updateMsg(std::string msg) {
+void TopDIADialog::updateMsg(std::string msg) {
   QTextCursor cursor = ui->outputTextBrowser->textCursor();
   int vertical_bar_pos = ui->outputTextBrowser->verticalScrollBar()->value();
   int max_bar_pos = ui->outputTextBrowser->verticalScrollBar()->maximum();
@@ -443,7 +508,7 @@ void TopFDDialog::updateMsg(std::string msg) {
   ui->outputTextBrowser->verticalScrollBar()->setValue(vertical_bar_pos);
 }
 
-void TopFDDialog::sleep(int wait) {
+void TopDIADialog::sleep(int wait) {
   QElapsedTimer t;
   t.start();
   while (t.elapsed() < wait) {

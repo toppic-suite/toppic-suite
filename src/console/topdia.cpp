@@ -12,25 +12,25 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <iomanip>
+#include "console/topdia_argument.hpp"
 
-#include "common/util/logger.hpp"
-#include "console/topmg_argument.hpp"
-#include "console/topmg_process.hpp"
+#include "topdia/common/topdia_para.hpp"
+#include "topdia/common/topdia_process.hpp"
 
 int main(int argc, char* argv[]) {
-  toppic::logger::log_level = 5;
-  std::cout << std::setprecision(10);
-  toppic::TopmgArgument argu_processor;
-  bool success = argu_processor.parse(argc, argv);
-  if (!success) {
-    return 1;
-  }
-  std::map<std::string, std::string> arguments = argu_processor.getArguments();
-  
-  std::vector<std::string> spec_file_lst = argu_processor.getSpecFileList();
 
-  std::sort(spec_file_lst.begin(), spec_file_lst.end());
+    toppic::Argument argu_processor;
+    bool success = argu_processor.parse(argc, argv);
 
-  return toppic::TopMGProgress_multi_file(arguments, spec_file_lst);
+    if (!success) {
+        return 1;
+    }
+
+    toppic::TopfdParaPtr topfd_para_ptr = argu_processor.getTopfdParaPtr();
+    toppic::TopdiaParaPtr topdia_para_ptr = argu_processor.getTopdiaParaPtr();
+    std::vector<std::string> spec_file_lst = argu_processor.getSpecFileList();
+
+    int result = toppic::topdia_process::process(topfd_para_ptr, topdia_para_ptr, spec_file_lst);
+
+    return result;
 }

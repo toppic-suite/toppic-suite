@@ -7,6 +7,9 @@ copy ..\bin\toppic.exe toppic-windows-%1
 copy ..\bin\topfd_gui.exe toppic-windows-%1
 copy ..\bin\topfd.exe toppic-windows-%1
 
+copy ..\bin\topdia_gui.exe toppic-windows-%1
+copy ..\bin\topdia.exe toppic-windows-%1
+
 copy ..\bin\topmg_gui.exe toppic-windows-%1
 copy ..\bin\topmg.exe toppic-windows-%1
 

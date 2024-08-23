@@ -20,12 +20,21 @@
 
 namespace toppic {
 
+class TopfdPara;
+
+typedef std::shared_ptr<TopfdPara> TopfdParaPtr;
+
 class TopfdPara {
  public:
   TopfdPara() {};
   
+  std::string getTopfdParaStr(const std::string &prefix,
+		         const std::string &sep, int gap);
+
   std::string getParaStr(const std::string &prefix,
 		         const std::string &sep);
+  
+  static TopfdParaPtr getTopfdParaPtrForTopdia();
 
   std::string getExeDir() {return exe_dir_;}
   std::string getResourceDir() {return resource_dir_;}
@@ -47,7 +56,8 @@ class TopfdPara {
   bool isOutputMultipleMass() {return output_multiple_mass_;}
   bool isOutputCsvFeatureFile() {return output_csv_feature_file_;}
   int getThreadNum() {return thread_num_;}
-  double getEcscoreCutoff() {return ecscore_cutoff_;}
+  double getMs1EcscoreCutoff() {return ms1_ecscore_cutoff_;}
+  double getMs2EcscoreCutoff() {return ms2_ecscore_cutoff_;}
   bool isSearchPrecWindow() {return search_prec_window_;}
   bool isUseSingleScanNoiseLevel() {return use_single_scan_noise_level_;}
   bool isTextPeakList() {return text_peak_list_;}
@@ -63,7 +73,8 @@ class TopfdPara {
   double getFaimsVoltage() {return faims_volt_;}
   int getMs1ScanNum() {return ms_1_scan_num_;}
   int getMs2ScanNum() {return ms_2_scan_num_;}
-  int getMinScanNum() {return min_scan_num_;}
+  int getMs1MinScanNum() {return ms1_min_scan_num_;}
+  int getMs2MinScanNum() {return ms2_min_scan_num_;}
 
   void setExeDir(std::string dir) {exe_dir_ = dir;}
   void setResourceDir(std::string dir) {resource_dir_ = dir;}
@@ -83,10 +94,11 @@ class TopfdPara {
   void setOutputMultipleMass(bool output) {output_multiple_mass_ = output;}
   void setThreadNum(int num) {thread_num_ = num;}
   void setSearchPrecWindow(bool search) {search_prec_window_ = search;}
-  void setUseSingleScanNoiseLevel(bool single_scan_noise)
-  {use_single_scan_noise_level_ = single_scan_noise;}
-  void setEcscoreCutoff(double cutoff) {ecscore_cutoff_ = cutoff;}
-  void setMinScanNum(int min_scan_num) {min_scan_num_ = min_scan_num;}
+  void setUseSingleScanNoiseLevel(bool single_scan_noise) {use_single_scan_noise_level_ = single_scan_noise;}
+  void setMs1EcscoreCutoff(double cutoff) {ms1_ecscore_cutoff_ = cutoff;}
+  void setMs2EcscoreCutoff(double cutoff) {ms2_ecscore_cutoff_ = cutoff;}
+  void setMs1MinScanNum(int min_scan_num) {ms1_min_scan_num_ = min_scan_num;}
+  void setMs2MinScanNum(int min_scan_num) {ms2_min_scan_num_ = min_scan_num;} 
 
   void setFracId(int frac_id) {frac_id_ = frac_id;}
   void setMzmlFileNameAndFaims(std::string &mzml_file_name, bool is_faims, double voltage);
@@ -113,10 +125,13 @@ class TopfdPara {
   int  thread_num_ = 1;
   std::string activation_ = "FILE";
   bool gene_html_folder_ = true;
-  double ecscore_cutoff_ = 0.5;
   bool search_prec_window_ = true;
   bool use_single_scan_noise_level_ = false;
-  int min_scan_num_ = 3;
+
+  double ms1_ecscore_cutoff_ = 0.5;
+  double ms2_ecscore_cutoff_ = 0;
+  int ms1_min_scan_num_ = 3;
+  int ms2_min_scan_num_ = 1;
 
   //** Fixed parameter setting **
   // estimate min intensity using the method in Thrash. 
@@ -143,7 +158,6 @@ class TopfdPara {
   bool text_peak_list_ = false;
 };
 
-typedef std::shared_ptr<TopfdPara> TopfdParaPtr;
 
 }  // namespace toppic
 
