@@ -117,7 +117,8 @@ void processMs1(TopfdParaPtr topfd_para_ptr) {
                                                    score_para_ptr, sn_ratio); 
     if (seed_ptr == nullptr) continue;
     EnvCollPtr env_coll_ptr = env_coll_util::findEnvColl(matrix_ptr, seed_ptr,
-                                                         score_para_ptr, sn_ratio, topfd_para_ptr->getSplitIntensityRatio());
+                                                         score_para_ptr, sn_ratio, 
+                                                         topfd_para_ptr->getSplitIntensityRatio());
     if (env_coll_ptr == nullptr) continue;
     if (env_coll_util::checkExistingFeatures(matrix_ptr, env_coll_ptr,
                                              env_coll_list, score_para_ptr, sn_ratio)) {
@@ -330,7 +331,7 @@ void processMs2(TopfdParaPtr topfd_para_ptr) {
       EnvCollPtr env_coll_ptr = env_coll_util::findEnvColl(matrix_ptr, seed_ptr, score_para_ptr, sn_ratio,
                                                            topfd_para_ptr->getSplitIntensityRatio());
       if (env_coll_ptr == nullptr) continue;
-      if (env_coll_util::checkExistingFeatures(matrix_ptr, env_coll_ptr, env_coll_list, score_para_ptr)) {
+      if (env_coll_util::checkExistingFeatures(matrix_ptr, env_coll_ptr, env_coll_list, score_para_ptr, sn_ratio)) {
         env_coll_ptr->removePeakData(matrix_ptr);
         continue;
       }
