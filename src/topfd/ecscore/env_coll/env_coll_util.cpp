@@ -244,7 +244,9 @@ bool checkExistingFeatures(MsMapPtr matrix_ptr, EnvCollPtr env_coll_ptr,
                                                          cur_seed_ptr->getSpecId(),
                                                          merge_start_spec_id, merge_end_spec_id,
                                                          para_ptr, sn_ratio);  
-      overlap_env_coll_ptr->mergeEnvSet(env_set_ptr);
+      if (env_set_ptr != nullptr) {
+        overlap_env_coll_ptr->mergeEnvSet(env_set_ptr);
+      }
     }
     return true;
   }
