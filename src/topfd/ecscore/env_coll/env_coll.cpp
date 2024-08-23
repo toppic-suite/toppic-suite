@@ -84,7 +84,6 @@ void EnvColl::removePeakData(MsMapPtr matrix_ptr) {
 }
 
 void EnvColl::mergeEnvSet(EnvSetPtr new_set_ptr) {
-  new_set_ptr->setSeedPtr(seed_ptr_);
   if (new_set_ptr->getStartSpecId() < start_spec_id_) {
     start_spec_id_ = new_set_ptr->getStartSpecId();
   }
@@ -109,6 +108,7 @@ void EnvColl::mergeEnvSet(EnvSetPtr new_set_ptr) {
   std::sort(env_set_list_.begin(), env_set_list_.end(),EnvSet::cmpChargeInc); 
 }
 
+
 int EnvColl::countEnvNum() {
   int env_num = 0;
   for (size_t i = 0; i < env_set_list_.size(); i++) {
@@ -116,12 +116,6 @@ int EnvColl::countEnvNum() {
   }
   return env_num;
 }
-
-  int min_charge_;
-  int max_charge_;
-  int start_spec_id_;
-  int end_spec_id_;
-  double ecscore_ = -1;
 
 XmlDOMElement* EnvColl::toXmlElement(XmlDOMDocument* xml_doc) {
   std::string element_name = "envelope_collection";

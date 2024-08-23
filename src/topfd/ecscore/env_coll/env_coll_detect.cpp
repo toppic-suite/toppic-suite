@@ -118,7 +118,7 @@ void process(TopfdParaPtr topfd_para_ptr) {
                                                          score_para_ptr, sn_ratio); 
     if (env_coll_ptr == nullptr) continue;
     if (env_coll_util::checkExistingFeatures(matrix_ptr, env_coll_ptr,
-                                             env_coll_list, score_para_ptr)) {
+                                             env_coll_list, score_para_ptr, sn_ratio)) {
       env_coll_ptr->removePeakData(matrix_ptr);
       continue;
     }
@@ -187,7 +187,7 @@ void process(TopfdParaPtr topfd_para_ptr) {
                                                                           sn_ratio); 
         if (env_coll_ptr == nullptr) continue;
         if (env_coll_util::checkExistingFeatures(matrix_ptr, env_coll_ptr,
-                                                 env_coll_list, score_para_ptr)) {
+                                                 env_coll_list, score_para_ptr, sn_ratio)) {
           env_coll_ptr->removePeakData(matrix_ptr);
           continue;
         }
