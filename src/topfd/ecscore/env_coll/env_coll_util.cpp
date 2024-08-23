@@ -235,8 +235,8 @@ bool checkExistingFeatures(MsMapPtr matrix_ptr, EnvCollPtr env_coll_ptr,
     if (merge_end_spec_id < end_spec_id) {
       merge_end_spec_id = end_spec_id;
     }
+    SeedEnvPtr seed_ptr = overlap_env_coll_ptr->getSeedPtr();
     EnvSetPtrVec new_set_ptrs = env_coll_ptr->getEnvSetList();
-    SeedEnvPtr seed_ptr = env_coll_ptr->getSeedPtr();
     for (size_t i = 0; i < new_set_ptrs.size(); i++) {
       int charge = new_set_ptrs[i]->getCharge();
       SeedEnvPtr cur_seed_ptr = std::make_shared<SeedEnv>(seed_ptr, charge);
