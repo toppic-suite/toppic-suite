@@ -24,14 +24,6 @@
 
 namespace toppic {
 
-TopfdParaPtr TopfdPara::getTopfdParaPtrForTopdia() {
-  TopfdParaPtr topfd_para_ptr = std::make_shared<TopfdPara>();
-  topfd_para_ptr->setMs1EcscoreCutoff(0);
-  topfd_para_ptr->setMs1MinScanNum(2);
-  topfd_para_ptr->setPrecWindowWidth(4.0);
-  return topfd_para_ptr;
-}
-
 void TopfdPara::setMzmlFileNameAndFaims(std::string &mzml_file_name, 
                                         bool is_faims, double voltage) {
   mzml_file_name_ = mzml_file_name;

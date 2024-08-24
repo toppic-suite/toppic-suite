@@ -40,6 +40,8 @@ class Argument {
  private:
   void initArguments();
 
+  TopfdParaPtr getTopfdParaPtrForTopdia();
+
   void setArgumentsByConfigFile(const std::string &file_name);
 
   bool validateArguments();

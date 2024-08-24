@@ -25,8 +25,17 @@
 namespace toppic {
 
 Argument::Argument() {
-  topfd_para_ptr_ = TopfdPara::getTopfdParaPtrForTopdia();
+  topfd_para_ptr_ = getTopfdParaPtrForTopdia();
   topdia_para_ptr_ = std::make_shared<TopdiaPara>();
+}
+
+TopfdParaPtr Argument::getTopfdParaPtrForTopdia() {
+  TopfdParaPtr topfd_para_ptr = std::make_shared<TopfdPara>();
+  topfd_para_ptr->setMs1EcscoreCutoff(0);
+  topfd_para_ptr->setMs1MinScanNum(2);
+  topfd_para_ptr->setPrecWindowWidth(4.0);
+  topfd_para_ptr->setOutputCsvFeatureFile(true);
+  return topfd_para_ptr;
 }
 
 void Argument::showUsage(boost::program_options::options_description &desc) {

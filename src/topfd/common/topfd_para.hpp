@@ -34,8 +34,6 @@ class TopfdPara {
   std::string getParaStr(const std::string &prefix,
 		         const std::string &sep);
   
-  static TopfdParaPtr getTopfdParaPtrForTopdia();
-
   std::string getExeDir() {return exe_dir_;}
   std::string getResourceDir() {return resource_dir_;}
   bool isMissingLevelOne() {return missing_level_one_;}
@@ -92,6 +90,7 @@ class TopfdPara {
   void setGeneHtmlFolder(bool gene) {gene_html_folder_ = gene;}
   void setKeepUnusedPeaks(bool keep) {keep_unused_peaks_ = keep;}
   void setOutputMultipleMass(bool output) {output_multiple_mass_ = output;}
+  void setOutputCsvFeatureFile(bool output) {output_csv_feature_file_ = output;}
   void setThreadNum(int num) {thread_num_ = num;}
   void setSearchPrecWindow(bool search) {search_prec_window_ = search;}
   void setUseSingleScanNoiseLevel(bool single_scan_noise) {use_single_scan_noise_level_ = single_scan_noise;}
