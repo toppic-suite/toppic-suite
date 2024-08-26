@@ -224,7 +224,7 @@ void processMs1(TopfdParaPtr topfd_para_ptr) {
   if (topfd_para_ptr->isOutputCsvFeatureFile()) {
     std::string feat_file_name = output_base_name + "_ms1.csv";
     ecscore_writer::writeScores(feat_file_name, ecscore_list);
-    std::string batmass_file_name = output_base_name + "_" + "frac.mzrt.csv";
+    std::string batmass_file_name = output_base_name + "_" + "frac_ms1.mzrt.csv";
     frac_feature_writer::writeBatMassFeatures(batmass_file_name, frac_features);
   }
 

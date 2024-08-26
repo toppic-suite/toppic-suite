@@ -23,12 +23,14 @@ GeneratePseudoSpectrum::GeneratePseudoSpectrum(TopfdParaPtr topfd_para_ptr,
 
   DeconvMsPtrVec deconv_ms1_ptr_vec;
   std::string ms1_file_name = output_base_name + "_ms1.msalign";
+  std::cout << "Reading ms1 file " << ms1_file_name << std::endl;
   msalign_reader_util::readAllSpectra(ms1_file_name, deconv_ms1_ptr_vec);
   for (const auto &ms1_data : deconv_ms1_ptr_vec)
     rt_ms1_.push_back(ms1_data->getMsHeaderPtr()->getRetentionTime() / 60);
 
   DeconvMsPtrVec deconv_ms2_ptr_vec;
   std::string ms2_file_name = output_base_name + "_ms2.msalign";
+  std::cout << "Reading ms2 file " << ms2_file_name << std::endl;
   msalign_reader_util::readAllSpectra(ms2_file_name, deconv_ms2_ptr_vec);
 
   // get isolation window base mz
@@ -45,14 +47,11 @@ GeneratePseudoSpectrum::GeneratePseudoSpectrum(TopfdParaPtr topfd_para_ptr,
 
   // get retention times
   for (auto cur_win : win_list_) {
-    DeconvMsPtrVec deconv_ms2_ptr_shortlisted_vec;
     std::vector<double> rt_ms2_window;
     for (auto &ms2_data : deconv_ms2_ptr_vec) {
       double ms_win_begin = ms2_data->getMsHeaderPtr()->getPrecWinBegin();
       if (ms_win_begin != cur_win.first) continue;
-      deconv_ms2_ptr_shortlisted_vec.push_back(ms2_data);
-      rt_ms2_window.push_back(ms2_data->getMsHeaderPtr()->getRetentionTime() /
-                              60);
+      rt_ms2_window.push_back(ms2_data->getMsHeaderPtr()->getRetentionTime() / 60);
     }
     if (rt_ms2_window.size() < rt_ms1_.size())
       rt_ms2_window.push_back(rt_ms2_window.back());
@@ -61,11 +60,12 @@ GeneratePseudoSpectrum::GeneratePseudoSpectrum(TopfdParaPtr topfd_para_ptr,
 
   // read feature files
   std::string filename = output_base_name + "_frac_ms1.mzrt.csv";
+  std::cout << "Reading ms1 feature file " << filename << std::endl;
   ms1_features_ = MzrtFeature::read_record(filename);
   for (auto cur_win : win_list_) {
-    filename = output_base_name + "_" +
-               std::to_string(cur_win.first) +
-               "_frac_ms2.mzrt.csv";
+    filename = output_base_name + "_" + std::to_string(cur_win.first) 
+               + "_frac_ms2.mzrt.csv";
+    std::cout << "Reading ms2 feature file " << filename << std::endl;
     MzrtFeaturePtrVec feature_list = MzrtFeature::read_record(filename);
     ms2_features_.push_back(feature_list);
   }

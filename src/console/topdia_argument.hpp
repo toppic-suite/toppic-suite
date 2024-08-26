@@ -31,6 +31,8 @@ class Argument {
 
   bool parse(int argc, char *argv[]);
 
+  static TopfdParaPtr getTopfdParaPtrForTopdia();
+
   TopfdParaPtr getTopfdParaPtr() { return topfd_para_ptr_; }
 
   TopdiaParaPtr getTopdiaParaPtr() { return topdia_para_ptr_; }
@@ -39,8 +41,6 @@ class Argument {
 
  private:
   void initArguments();
-
-  TopfdParaPtr getTopfdParaPtrForTopdia();
 
   void setArgumentsByConfigFile(const std::string &file_name);
 

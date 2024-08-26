@@ -30,6 +30,7 @@
 #include "common/util/file_util.hpp"
 #include "common/util/version.hpp"
 #include "common/util/mem_check.hpp"
+#include "console/topdia_argument.hpp"
 
 #include "gui/util/command.hpp"
 #include "gui/util/gui_message.hpp"
@@ -38,7 +39,7 @@
 
 TopDIADialog::TopDIADialog(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::TopDIADialog) {
-  topfd_para_ptr_ = toppic::TopfdPara::getTopfdParaPtrForTopdia();
+  topfd_para_ptr_ = toppic::Argument::getTopfdParaPtrForTopdia();
   topdia_para_ptr_ = std::make_shared<toppic::TopdiaPara>();
   ui->setupUi(this);
   std::string title = "TopDIA v." + toppic::Version::getVersion();
@@ -117,7 +118,7 @@ void TopDIADialog::on_clearButton_clicked() {
 
 void TopDIADialog::on_defaultButton_clicked() {
   // default para_ptr
-  topfd_para_ptr_ = toppic::TopfdPara::getTopfdParaPtrForTopdia();
+  topfd_para_ptr_ = toppic::Argument::getTopfdParaPtrForTopdia();
   topdia_para_ptr_ = std::make_shared<toppic::TopdiaPara>();
   ui->maxChargeEdit->setText(QString::number(topfd_para_ptr_->getMaxCharge()));
   ui->maxMassEdit->setText(QString::number(topfd_para_ptr_->getMaxMass()));
