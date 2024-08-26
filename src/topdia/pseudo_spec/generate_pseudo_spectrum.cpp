@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+#include <cstddef>
 
 #include "topdia/pseudo_spec/pseudo_spectrum.hpp"
 #include "topdia/pseudo_spec/generate_pseudo_spectrum.hpp"
@@ -84,7 +85,7 @@ GeneratePseudoSpectrum::GeneratePseudoSpectrum(TopfdParaPtr topfd_para_ptr,
     ms1_feature->setInterpolatedXic(
         interp(rt_target, rt_ms1_, ms1_feature->getXic()));
 
-  for (size_t iso_win_idx = 0; iso_win_idx < win_list_.size(); iso_win_idx++) {
+  for (std::size_t iso_win_idx = 0; iso_win_idx < win_list_.size(); iso_win_idx++) {
     for (auto &ms2_feature : ms2_features_[iso_win_idx]) {
       ms2_feature->setInterpolatedXic(
           interp(rt_target, rt_ms2_[iso_win_idx], ms2_feature->getXic()));
@@ -97,7 +98,7 @@ void GeneratePseudoSpectrum::process(TopfdParaPtr topfd_para_ptr,
   int feature_id = 0;
   EnvParaPtr env_para_ptr =
       std::make_shared<EnvPara>(topfd_para_ptr->getMzError());
-  for (size_t iso_win_idx = 0; iso_win_idx < win_list_.size(); iso_win_idx++) {
+  for (std::size_t iso_win_idx = 0; iso_win_idx < win_list_.size(); iso_win_idx++) {
     PseudoSpectrumPtrVec pseudo_spectra;
     std::pair<double, double> win = win_list_[iso_win_idx];
     MzrtFeaturePtrVec selected_ms1_features = get_iso_win_ms1_features(iso_win_idx);
@@ -184,7 +185,7 @@ std::vector<double> GeneratePseudoSpectrum::interp(
     if (it == xp.begin() || it == xp.end()) {
       interpolatedValues.push_back(0.0);
     } else {
-      size_t i = it - xp.begin();
+      std::size_t i = it - xp.begin();
       double x1 = xp[i - 1];
       double x2 = xp[i];
       double y1 = fp[i - 1];
@@ -217,7 +218,7 @@ MzrtFeaturePtrVec GeneratePseudoSpectrum::get_iso_win_ms1_features(int isolation
   
     // get envelope peaks intensity present within isolation window
     double env_inte_sum_iso_win = 0;
-    for (size_t idx = 0; idx < envelope_intensity.size(); idx++) {
+    for (std::size_t idx = 0; idx < envelope_intensity.size(); idx++) {
       if (window_start_mz <= envelope_mz[idx] &&
           envelope_mz[idx] <= window_end_mz)
         env_inte_sum_iso_win += envelope_intensity[idx];
@@ -275,7 +276,7 @@ std::vector<double> GeneratePseudoSpectrum::moving_avg(std::vector<double> xic,
 double GeneratePseudoSpectrum::computeSharedArea(
     const std::vector<double> &xic1, const std::vector<double> &xic2) {
   double sharedArea = 0.0;
-  for (size_t i = 0; i < xic1.size(); ++i) {
+  for (std::size_t i = 0; i < xic1.size(); ++i) {
     sharedArea += std::min(xic1[i], xic2[i]);
   }
   return sharedArea;
