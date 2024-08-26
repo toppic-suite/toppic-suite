@@ -23,14 +23,14 @@ GeneratePseudoSpectrum::GeneratePseudoSpectrum(TopfdParaPtr topfd_para_ptr,
 
   DeconvMsPtrVec deconv_ms1_ptr_vec;
   std::string ms1_file_name = output_base_name + "_ms1.msalign";
-  std::cout << "Reading ms1 file " << ms1_file_name << std::endl;
+  //std::cout << "Reading ms1 file " << ms1_file_name << std::endl;
   msalign_reader_util::readAllSpectra(ms1_file_name, deconv_ms1_ptr_vec);
   for (const auto &ms1_data : deconv_ms1_ptr_vec)
     rt_ms1_.push_back(ms1_data->getMsHeaderPtr()->getRetentionTime() / 60);
 
   DeconvMsPtrVec deconv_ms2_ptr_vec;
   std::string ms2_file_name = output_base_name + "_ms2.msalign";
-  std::cout << "Reading ms2 file " << ms2_file_name << std::endl;
+  //std::cout << "Reading ms2 file " << ms2_file_name << std::endl;
   msalign_reader_util::readAllSpectra(ms2_file_name, deconv_ms2_ptr_vec);
 
   // get isolation window base mz
@@ -60,12 +60,12 @@ GeneratePseudoSpectrum::GeneratePseudoSpectrum(TopfdParaPtr topfd_para_ptr,
 
   // read feature files
   std::string filename = output_base_name + "_frac_ms1.mzrt.csv";
-  std::cout << "Reading ms1 feature file " << filename << std::endl;
+  //std::cout << "Reading ms1 feature file " << filename << std::endl;
   ms1_features_ = MzrtFeature::read_record(filename);
   for (auto cur_win : win_list_) {
     filename = output_base_name + "_" + std::to_string(cur_win.first) 
                + "_frac_ms2.mzrt.csv";
-    std::cout << "Reading ms2 feature file " << filename << std::endl;
+    //std::cout << "Reading ms2 feature file " << filename << std::endl;
     MzrtFeaturePtrVec feature_list = MzrtFeature::read_record(filename);
     ms2_features_.push_back(feature_list);
   }
@@ -103,7 +103,7 @@ void GeneratePseudoSpectrum::process(TopfdParaPtr topfd_para_ptr,
     MzrtFeaturePtrVec selected_ms1_features = get_iso_win_ms1_features(iso_win_idx);
     std::sort(selected_ms1_features.begin(), selected_ms1_features.end(),
               compareFeaturesInte);
-    std::cout << "Processing Isolation window " << iso_win_idx << " with "
+    std::cout << "Processing isolation window [" << win.first << "," << win.second << "] with "
               << selected_ms1_features.size() << " features." << std::endl;
     for (auto &ms1_feature : selected_ms1_features) {
       int apex_cycle_distance_tole =

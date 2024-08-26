@@ -297,9 +297,14 @@ FracFeaturePtr getFracFeature(int feat_id, DeconvMsPtrVec &ms1_ptr_vec, int frac
     double inte = es->getInte();
     int env_num = es->countEnvNum();
     int charge = es->getCharge();
-    SingleChargeFeaturePtr single_feature = std::make_shared<SingleChargeFeature>(charge, time_begin, time_end,
-                                                                                  scan_begin, scan_end,
-                                                                                  inte, env_num);
+    std::vector<double> xic = es->getXicPtr()->getAllPeakInteList();
+    std::vector<double> aggregateEnvelopeInte = es->compAggrEnvInteList();
+    std::vector<double> envelopeMass = es->getSeedPtr()->getMzList();
+    SingleChargeFeaturePtr single_feature =
+        std::make_shared<SingleChargeFeature>(
+            charge, time_begin, time_end, scan_begin, scan_end, inte, env_num,
+            id_begin, id_end, feat_mass, xic, envelopeMass,
+            aggregateEnvelopeInte);
     single_features.push_back(single_feature);
   }
   feature_ptr->setSingleFeatures(single_features);

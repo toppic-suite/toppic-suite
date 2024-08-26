@@ -35,7 +35,7 @@ void writeOneFeature(std::ofstream &of, FracFeaturePtr feature);
 
 
 void writeBatMassFeatures(const std::string &output_file_name,
-                          const FracFeaturePtrVec &features);
+                          const FracFeaturePtrVec &features, int num_spectra);
 
 void writeXmlFeatures(const std::string &output_file_name,
                       const FracFeaturePtrVec &features);

@@ -32,13 +32,13 @@ typedef std::vector<ECScorePtr> ECScorePtrVec;
 
 class ECScore {
  public:
-  ECScore(EnvCollPtr env_coll_ptr, MsMapPtr matrix_ptr, int score_id, double sn_ratio);
+  ECScore(EnvCollPtr env_coll_ptr, MsMapPtr matrix_ptr, double sn_ratio);
 
   std::vector<float> getEcscoreInput(double max_retention_time);
 
-  int getEcscoreId() const { return score_id_; }
+  //int getEcscoreId() const { return score_id_; }
 
-  void setEcscoreId(int score_id) { score_id_ = score_id; }
+  //void setEcscoreId(int score_id) { score_id_ = score_id; }
 
   int getMinScan() const { return min_scan_; }
 
@@ -133,7 +133,7 @@ class ECScore {
   void setLabel(int label) { label_ = label; }
 
  private:
-  int score_id_ = 0;
+  //int score_id_ = 0;
   int min_scan_ = 0;
   int max_scan_ = 0;
   int min_charge_ = 0;

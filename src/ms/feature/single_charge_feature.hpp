@@ -26,6 +26,13 @@ namespace toppic {
 
 class SingleChargeFeature {
  public:
+  SingleChargeFeature(int charge,
+                      double time_begin, double time_end,
+                      int scan_begin, int scan_end,
+                      double intensity, int env_num,
+                      int spec_id_begin, int spec_id_end,
+                      double mass, std::vector<double> xic_inte,
+                      std::vector<double>envelopeMass, std::vector<double> aggregateEnvelopeInte);
 
   SingleChargeFeature(int charge,
                       double time_begin, double time_end,
@@ -50,6 +57,18 @@ class SingleChargeFeature {
 
   int getEnvNum() {return env_num_;}
 
+  double getMass() { return mass_; }
+
+  int getSpecIDBegin() { return spec_id_begin_; }
+
+  int getSpecIDEnd() { return spec_id_end_; }
+
+  std::vector<double> getXicInte() { return xic_inte_; }
+
+  std::vector<double> getAggregateEnvelopeInte() { return aggregateEnvelopeInte_; }
+
+  std::vector<double> getEnvelopeMass() { return envelopeMass_; }
+
   static std::string getXmlElementName() {return "single_charge_feature";}
 
   void appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement *parent);
@@ -62,6 +81,13 @@ class SingleChargeFeature {
   int scan_end_;
   double intensity_;
   int env_num_ = 0;
+  ////
+  int spec_id_begin_;
+  int spec_id_end_;
+  double mass_;
+  std::vector<double> xic_inte_;
+  std::vector<double> envelopeMass_;
+  std::vector<double> aggregateEnvelopeInte_;
 };
 
 typedef std::shared_ptr<SingleChargeFeature> SingleChargeFeaturePtr;

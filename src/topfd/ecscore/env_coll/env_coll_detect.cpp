@@ -102,14 +102,11 @@ void processMs1(TopfdParaPtr topfd_para_ptr) {
   LOG_DEBUG("Number of seed envelopes: " << seed_ptrs.size());
   int seed_num = seed_ptrs.size();
   EnvCollPtrVec env_coll_list;
-  int feat_id = 0;
-  double perc = 0;
   ECScorePtrVec ecscore_list;
-  FracFeaturePtrVec frac_features;
   for (int seed_env_idx = 0; seed_env_idx < seed_num; seed_env_idx++) {
     int count = seed_env_idx + 1;
     if (count % 100 == 0 || count == seed_num) {
-      perc = static_cast<int>(count * 100 / seed_num);
+      double perc = static_cast<int>(count * 100 / seed_num);
       std::cout << "\r" << "Processing feature " << count << " ...       " << perc << "\% finished." << std::flush;
     }
     SeedEnvPtr seed_ptr = seed_ptrs[seed_env_idx];
@@ -127,20 +124,14 @@ void processMs1(TopfdParaPtr topfd_para_ptr) {
     }
     env_coll_ptr->refineMonoMass();
     ECScorePtr ecscore_ptr = std::make_shared<ECScore>(env_coll_ptr, matrix_ptr,
-                                                       feat_id, sn_ratio); 
+                                                       sn_ratio); 
     if (ecscore_ptr->getScore() < topfd_para_ptr->getMs1EcscoreCutoff()) {
       continue;
     }
-    ecscore_list.push_back(ecscore_ptr);
     env_coll_ptr->setEcscore(ecscore_ptr->getScore());
     env_coll_ptr->removePeakData(matrix_ptr);
     env_coll_list.push_back(env_coll_ptr);
-    FracFeaturePtr frac_feat_ptr = env_coll_util::getFracFeature(feat_id, deconv_ms1_ptr_vec, 
-                                                                 score_para_ptr->frac_id_,
-                                                                 score_para_ptr->file_name_,
-                                                                 env_coll_ptr, matrix_ptr, sn_ratio);
-    frac_features.push_back(frac_feat_ptr);
-    feat_id++;
+    ecscore_list.push_back(ecscore_ptr);
   }
   std::cout << std::endl; 
 
@@ -153,7 +144,7 @@ void processMs1(TopfdParaPtr topfd_para_ptr) {
     matrix_ptr->reconstruct(sn_ratio, single_scan_noise); 
     int ms1_spec_num = deconv_ms1_ptr_vec.size();
     for (size_t ms1_idx = 0; ms1_idx < deconv_ms1_ptr_vec.size(); ms1_idx++) {
-      perc = static_cast<int>((ms1_idx + 1)* 100 / ms1_spec_num);
+      double perc = static_cast<int>((ms1_idx + 1)* 100 / ms1_spec_num);
       int scan = deconv_ms1_ptr_vec[ms1_idx]->getMsHeaderPtr()->getFirstScanNum();
       std::cout << "\r" << "Additional feature search MS1 spectrum scan " 
         << scan << " ...       " << perc << "\% finished." << std::flush;
@@ -196,23 +187,27 @@ void processMs1(TopfdParaPtr topfd_para_ptr) {
         }
         env_coll_ptr->refineMonoMass();
         ECScorePtr ecscore_ptr = std::make_shared<ECScore>(env_coll_ptr, matrix_ptr,
-                                                           feat_id, sn_ratio); 
+                                                           sn_ratio); 
         if (ecscore_ptr->getScore() < 0 || std::isnan(ecscore_ptr->getScore())) {
           continue;
         }
-        ecscore_list.push_back(ecscore_ptr);
         env_coll_ptr->setEcscore(ecscore_ptr->getScore());
         env_coll_ptr->removePeakData(matrix_ptr);
         env_coll_list.push_back(env_coll_ptr);
-        FracFeaturePtr frac_feat_ptr = env_coll_util::getFracFeature(feat_id, deconv_ms1_ptr_vec, 
-                                                                     score_para_ptr->frac_id_,
-                                                                     score_para_ptr->file_name_,
-                                                                     env_coll_ptr, matrix_ptr, sn_ratio);
-        frac_features.push_back(frac_feat_ptr);
-        feat_id++;
+        ecscore_list.push_back(ecscore_ptr);
       }
     }
     std::cout << std::endl; 
+  }
+
+  FracFeaturePtrVec frac_features;
+  for (size_t i = 0; i < env_coll_list.size(); i++) {
+    EnvCollPtr env_coll_ptr = env_coll_list[i];
+    FracFeaturePtr frac_feat_ptr = env_coll_util::getFracFeature(i, deconv_ms1_ptr_vec, 
+                                                                 score_para_ptr->frac_id_,
+                                                                 score_para_ptr->file_name_,
+                                                                 env_coll_ptr, matrix_ptr, sn_ratio);
+    frac_features.push_back(frac_feat_ptr);
   }
 
   // map MS2 features
@@ -225,7 +220,8 @@ void processMs1(TopfdParaPtr topfd_para_ptr) {
     std::string feat_file_name = output_base_name + "_ms1.csv";
     ecscore_writer::writeScores(feat_file_name, ecscore_list);
     std::string batmass_file_name = output_base_name + "_" + "frac_ms1.mzrt.csv";
-    frac_feature_writer::writeBatMassFeatures(batmass_file_name, frac_features);
+    int num_spec = ms1_mzml_peaks.size();
+    frac_feature_writer::writeBatMassFeatures(batmass_file_name, frac_features, num_spec);
   }
 
   std::string frac_feat_xml_file_name = output_base_name + "_feature.xml";
@@ -264,8 +260,8 @@ void processMs2(TopfdParaPtr topfd_para_ptr) {
   }
   std::vector<std::pair<double,double>> win_list(win_set.begin(), win_set.end()); 
 
-  //for (size_t i = 0; i < win_list.size(); i++) {
-  for (size_t i = 0; i < 1; i++) {
+  for (size_t i = 0; i < win_list.size(); i++) {
+  //for (size_t i = 0; i < 1; i++) {
     std::pair<double, double> cur_win =  win_list[i]; 
     std::cout << "Processing isolation window: [" << cur_win.first << "," << cur_win.second << "]"<< std::endl;
     // read ms1 raw peaks and ms2_headers
@@ -317,14 +313,11 @@ void processMs2(TopfdParaPtr topfd_para_ptr) {
     LOG_DEBUG("Number of seed envelopes: " << seed_ptrs.size());
     int seed_num = static_cast<int>(seed_ptrs.size());
     EnvCollPtrVec env_coll_list;
-    int feat_id = 0;
-    double perc = 0;
     ECScorePtrVec ecscore_list;
-    FracFeaturePtrVec frac_features;
     for (int seed_env_idx = 0; seed_env_idx < seed_num; seed_env_idx++) {
       int count = seed_env_idx + 1;
       if (count % 100 == 0 || count == seed_num) {
-        perc = static_cast<int>(count * 100 / seed_num);
+        double perc = static_cast<int>(count * 100 / seed_num);
         std::cout << "\r" << "Processing feature " << count << " ...       " << perc << "\% finished." << std::flush;
       }
       SeedEnvPtr seed_ptr = seed_ptrs[seed_env_idx];
@@ -338,7 +331,7 @@ void processMs2(TopfdParaPtr topfd_para_ptr) {
         continue;
       }
       env_coll_ptr->refineMonoMass();
-      ECScorePtr ecscore_ptr = std::make_shared<ECScore>(env_coll_ptr, matrix_ptr, feat_id, topfd_para_ptr->getMsTwoSnRatio());
+      ECScorePtr ecscore_ptr = std::make_shared<ECScore>(env_coll_ptr, matrix_ptr, topfd_para_ptr->getMsTwoSnRatio());
       if (ecscore_ptr->getScore() < topfd_para_ptr->getMs2EcscoreCutoff()) {
         continue;
       }
@@ -346,16 +339,20 @@ void processMs2(TopfdParaPtr topfd_para_ptr) {
       env_coll_ptr->setEcscore(ecscore_ptr->getScore());
       env_coll_ptr->removePeakData(matrix_ptr);
       env_coll_list.push_back(env_coll_ptr);
-      FracFeaturePtr frac_feat_ptr = env_coll_util::getFracFeature(feat_id, deconv_ms2_ptr_shortlisted_vec,
-                                                                   score_para_ptr->frac_id_,
-                                                                   score_para_ptr->file_name_,
-                                                                   env_coll_ptr, matrix_ptr, sn_ratio);
-      frac_features.push_back(frac_feat_ptr);
-      feat_id++;
     }
     std::cout << std::endl;
 
     std::cout << "Number of fragment features: " << env_coll_list.size() << std::endl;
+
+    FracFeaturePtrVec frac_features;
+    for (size_t i = 0; i < env_coll_list.size(); i++) {
+      EnvCollPtr env_coll_ptr = env_coll_list[i];
+      FracFeaturePtr frac_feat_ptr = env_coll_util::getFracFeature(i, deconv_ms2_ptr_shortlisted_vec,
+                                                                   score_para_ptr->frac_id_,
+                                                                   score_para_ptr->file_name_,
+                                                                   env_coll_ptr, matrix_ptr, sn_ratio);
+      frac_features.push_back(frac_feat_ptr);
+    }
 
     std::string feat_file_name =
         output_base_name + "_" + std::to_string(cur_win.first) + "_ms2.csv";
@@ -365,7 +362,8 @@ void processMs2(TopfdParaPtr topfd_para_ptr) {
       std::string batmass_file_name;
       batmass_file_name =
         output_base_name + "_" + std::to_string(cur_win.first) + "_frac_ms2.mzrt.csv";
-      frac_feature_writer::writeBatMassFeatures(batmass_file_name, frac_features);
+      int num_spec = ms2_mzml_peaks.size();
+      frac_feature_writer::writeBatMassFeatures(batmass_file_name, frac_features, num_spec);
     }
   }
 }

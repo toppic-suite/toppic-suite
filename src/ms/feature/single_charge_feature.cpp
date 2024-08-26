@@ -1,36 +1,58 @@
-//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
+// Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#include "ms/feature/single_charge_feature.hpp"
 
 #include "common/util/str_util.hpp"
 #include "common/xml/xml_dom_util.hpp"
 
-#include "ms/feature/single_charge_feature.hpp"
-
 namespace toppic {
 
-SingleChargeFeature::SingleChargeFeature(int charge,
-                                         double time_begin, double time_end,
-                                         int scan_begin, int scan_end,
-                                         double intensity, int env_num): 
-    charge_(charge),
-    time_begin_(time_begin),
-    time_end_(time_end),
-    scan_begin_(scan_begin),
-    scan_end_(scan_end),
-    intensity_(intensity),
-    env_num_(env_num) {
-    }
+SingleChargeFeature::SingleChargeFeature(
+    int charge, double time_begin, double time_end, int scan_begin,
+    int scan_end, double intensity, int env_num, int spec_id_begin,
+    int spec_id_end, double mass, std::vector<double> xic_inte,
+    std::vector<double> envelopeMass, std::vector<double> aggregateEnvelopeInte)
+    : charge_(charge),
+      time_begin_(time_begin),
+      time_end_(time_end),
+      scan_begin_(scan_begin),
+      scan_end_(scan_end),
+      intensity_(intensity),
+      env_num_(env_num),
+      spec_id_begin_(spec_id_begin),
+      spec_id_end_(spec_id_end),
+      mass_(mass) {
+  for (auto inte : xic_inte) xic_inte_.push_back(inte);
+
+  for (auto mass : envelopeMass) envelopeMass_.push_back(mass);
+
+  for (auto inte : aggregateEnvelopeInte)
+    aggregateEnvelopeInte_.push_back(inte);
+}
+
+SingleChargeFeature::SingleChargeFeature(int charge, double time_begin,
+                                         double time_end, int scan_begin,
+                                         int scan_end, double intensity,
+                                         int env_num)
+    : charge_(charge),
+      time_begin_(time_begin),
+      time_end_(time_end),
+      scan_begin_(scan_begin),
+      scan_end_(scan_end),
+      intensity_(intensity),
+      env_num_(env_num) {}
 
 SingleChargeFeature::SingleChargeFeature(XmlDOMElement* element) {
   charge_ = xml_dom_util::getIntChildValue(element, "charge", 0);
@@ -42,7 +64,8 @@ SingleChargeFeature::SingleChargeFeature(XmlDOMElement* element) {
   env_num_ = xml_dom_util::getIntChildValue(element, "envelope_num", 0);
 }
 
-void SingleChargeFeature::appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement *parent) {
+void SingleChargeFeature::appendToXml(XmlDOMDocument* xml_doc,
+                                      XmlDOMElement* parent) {
   std::string element_name = SingleChargeFeature::getXmlElementName();
   XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
   std::string str = str_util::toString(charge_);
@@ -62,4 +85,4 @@ void SingleChargeFeature::appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement *pa
   parent->appendChild(element);
 }
 
-}
+}  // namespace toppic

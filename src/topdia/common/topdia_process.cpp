@@ -36,7 +36,6 @@ namespace topdia_process {
 
 void processOneFileWithFaims(TopfdParaPtr topfd_para_ptr, 
                              TopdiaParaPtr topdia_para_ptr) {
-  /*
   //  print parameter for each file
   std::cout << topdia_para_ptr->getParaStr("", " ", topfd_para_ptr);
   if (!topfd_para_ptr->isMissingLevelOne()) {
@@ -64,14 +63,12 @@ void processOneFileWithFaims(TopfdParaPtr topfd_para_ptr,
   topfd_para_ptr->setMissingLevelOne(false);
   env_coll_detect::processMs2(topfd_para_ptr);
   std::cout << "MS/MS feature detection finished." << std::endl;
-  */
-  
   std::cout << "Pseudo spectrum generation started." << std::endl;
   GeneratePseudoSpectrumPtr pseudo_genrator_ptr = std::make_shared<GeneratePseudoSpectrum>(topfd_para_ptr, 
                                                                                            topdia_para_ptr);
   pseudo_genrator_ptr->process(topfd_para_ptr, topdia_para_ptr);
   pseudo_genrator_ptr = nullptr;
-  std::cout << std::endl << "Pseudo spectrum generation finished." << std::endl;
+  std::cout << "Pseudo spectrum generation finished." << std::endl;
 }
 
 void processOneFile(TopfdParaPtr topfd_para_ptr,

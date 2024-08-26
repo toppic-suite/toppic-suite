@@ -50,8 +50,7 @@ void writeHeader(std::ofstream &of) {
 }
 
 void writeOneScore(std::ofstream &of, ECScorePtr score) {
-  of << score->getEcscoreId() << "\t"
-    << score->getMinScan() << "\t"
+  of << score->getMinScan() << "\t"
     << score->getMaxScan() << "\t"
     << score->getMinCharge() << "\t"
     << score->getMaxCharge() << "\t"
