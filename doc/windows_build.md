@@ -48,4 +48,5 @@ mingw32-make
 ```sh
 cd ..\bin
 move ..\resources .
+move ..\lib\windows\* .
 ```
