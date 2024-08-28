@@ -101,7 +101,7 @@ void GeneratePseudoSpectrum::process(TopfdParaPtr topfd_para_ptr,
   std::string output_base_name = topfd_para_ptr->getOutputBaseName();
   std::string ms2_msalign_name = output_base_name + "_pseudo_ms2.msalign";
   std::ofstream output;
-  output.open(ms2_msalign_name, std::ios_base::app);
+  output.open(ms2_msalign_name); 
 
   for (std::size_t iso_win_idx = 0; iso_win_idx < win_list_.size(); iso_win_idx++) {
     std::pair<double, double> win = win_list_[iso_win_idx];
