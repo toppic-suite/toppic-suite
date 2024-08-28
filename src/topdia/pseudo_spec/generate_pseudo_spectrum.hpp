@@ -64,10 +64,12 @@ class GeneratePseudoSpectrum {
       MzrtFeaturePtrVec &ms2_features_window,
       std::vector<PseudoPeak> &pseudo_peak_list, double cutoff,
       int min_peak_num);
+
   static void write_pseudo_spectrum(
-        TopfdParaPtr topfd_para_ptr, TopdiaParaPtr topdia_para_ptr,
-        int ms1_feature_idx, MzrtFeaturePtr ms1_feature,
-        std::vector<PseudoPeak> &assigned_ms2_features);
+      std::ofstream &output, std::string &ms2_msalign_name,
+      TopfdParaPtr topfd_para_ptr, TopdiaParaPtr topdia_para_ptr,
+      int ms1_feature_idx, MzrtFeaturePtr ms1_feature,
+      std::vector<PseudoPeak> &assigned_ms2_features);
 
   static bool comparePseudoPeaksInte(const PseudoPeak &a,
                                      const PseudoPeak &b) {

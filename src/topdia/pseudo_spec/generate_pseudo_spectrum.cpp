@@ -98,8 +98,12 @@ void GeneratePseudoSpectrum::process(TopfdParaPtr topfd_para_ptr,
   int feature_id = 0;
   EnvParaPtr env_para_ptr =
       std::make_shared<EnvPara>(topfd_para_ptr->getMzError());
+  std::string output_base_name = topfd_para_ptr->getOutputBaseName();
+  std::string ms2_msalign_name = output_base_name + "_pseudo_ms2.msalign";
+  std::ofstream output;
+  output.open(ms2_msalign_name, std::ios_base::app);
+
   for (std::size_t iso_win_idx = 0; iso_win_idx < win_list_.size(); iso_win_idx++) {
-    PseudoSpectrumPtrVec pseudo_spectra;
     std::pair<double, double> win = win_list_[iso_win_idx];
     MzrtFeaturePtrVec selected_ms1_features = get_iso_win_ms1_features(iso_win_idx);
     std::sort(selected_ms1_features.begin(), selected_ms1_features.end(),
@@ -112,24 +116,19 @@ void GeneratePseudoSpectrum::process(TopfdParaPtr topfd_para_ptr,
       //TO CONTINUE
       ms1_feature->setWin(win);
       std::vector<PseudoPeak> pseudo_peak_list;
-      for (int ms2_feature_idx = 0;
-           ms2_feature_idx <
-           static_cast<int>(ms2_features_[iso_win_idx].size());
+      for (size_t ms2_feature_idx = 0; ms2_feature_idx < ms2_features_[iso_win_idx].size();
            ms2_feature_idx++) {
         if (ms2_features_[iso_win_idx][ms2_feature_idx]->getUsedStatus())
           continue;
-        MzrtFeaturePtr ms2_feature =
-            ms2_features_[iso_win_idx][ms2_feature_idx];
+        MzrtFeaturePtr ms2_feature = ms2_features_[iso_win_idx][ms2_feature_idx];
         if (ms2_feature->getMass() < ms1_feature->getMass()) {
           int apex_cycle_distance =
               get_apex_cycle_distance(ms1_feature, ms2_feature);
           if (apex_cycle_distance > apex_cycle_distance_tole) continue;
 
           /// Get shared intensity
-          std::vector<double> feature_xic_ms1 =
-              ms1_feature->getInterpolatedXic();
-          std::vector<double> feature_xic_ms2 =
-              ms2_feature->getInterpolatedXic();
+          std::vector<double> feature_xic_ms1 = ms1_feature->getInterpolatedXic();
+          std::vector<double> feature_xic_ms2 = ms2_feature->getInterpolatedXic();
           double shared_area =
               computeSharedArea(MzrtFeature::normalizeXIC(feature_xic_ms1),
                                 MzrtFeature::normalizeXIC(feature_xic_ms2));
@@ -154,15 +153,13 @@ void GeneratePseudoSpectrum::process(TopfdParaPtr topfd_para_ptr,
           static_cast<int>(filtered_pseudo_peak_list.size()));
       PseudoSpectrumPtr pseudo_spec_ptr = std::make_shared<PseudoSpectrum>(
           ms1_feature, filtered_pseudo_peak_list);
-      pseudo_spectra.push_back(pseudo_spec_ptr);
-    }
-
-    for (const auto &spec : pseudo_spectra) {
-      write_pseudo_spectrum(topfd_para_ptr, topdia_para_ptr, feature_id, spec->getMs1Feature(),
-                            spec->getFragmentFeatures());
+      write_pseudo_spectrum(output, ms2_msalign_name, topfd_para_ptr, topdia_para_ptr, 
+                            feature_id, pseudo_spec_ptr->getMs1Feature(),
+                            pseudo_spec_ptr->getFragmentFeatures());
       feature_id++;
     }
   }
+  output.close();
 }
 
 double GeneratePseudoSpectrum::get_max_rt() {
@@ -353,15 +350,12 @@ std::vector<PseudoPeak> GeneratePseudoSpectrum::filterPseudoPeaks(
 }
 
 void GeneratePseudoSpectrum::write_pseudo_spectrum(
+    std::ofstream &output, std::string &ms2_msalign_name,
     TopfdParaPtr topfd_para_ptr, TopdiaParaPtr topdia_para_ptr, 
     int ms1_feature_idx, MzrtFeaturePtr ms1_feature,
     std::vector<PseudoPeak> &assigned_ms2_features) {
-  std::string output_base_name = topfd_para_ptr->getOutputBaseName();
-  std::string ms2_msalign_name = output_base_name + "_pseudo_ms2.msalign";
-  int num_ms2_specs = 0;
 
-  std::ofstream output;
-  output.open(ms2_msalign_name, std::ios_base::app);
+  int num_ms2_specs = 0;
   output << std::fixed;
 
   output << "BEGIN IONS" << std::endl;
@@ -403,6 +397,5 @@ void GeneratePseudoSpectrum::write_pseudo_spectrum(
   }
   output << "END IONS" << std::endl;
   output << std::endl;
-  output.close();
 }
 }  // namespace toppic
