@@ -63,6 +63,7 @@ void processOneFileWithFaims(TopfdParaPtr topfd_para_ptr,
   topfd_para_ptr->setMissingLevelOne(false);
   env_coll_detect::processMs2(topfd_para_ptr);
   std::cout << "MS/MS feature detection finished." << std::endl;
+
   std::cout << "Pseudo spectrum generation started." << std::endl;
   GeneratePseudoSpectrumPtr pseudo_genrator_ptr = std::make_shared<GeneratePseudoSpectrum>(topfd_para_ptr, 
                                                                                            topdia_para_ptr);
