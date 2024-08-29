@@ -153,9 +153,9 @@ void GeneratePseudoSpectrum::process(TopfdParaPtr topfd_para_ptr,
           static_cast<int>(filtered_pseudo_peak_list.size()));
       PseudoSpectrumPtr pseudo_spec_ptr = std::make_shared<PseudoSpectrum>(
           ms1_feature, filtered_pseudo_peak_list);
-      write_pseudo_spectrum(output, ms2_msalign_name, topfd_para_ptr, topdia_para_ptr, 
-                            feature_id, pseudo_spec_ptr->getMs1Feature(),
-                            pseudo_spec_ptr->getFragmentFeatures());
+      writePseudoSpectrum(output, topfd_para_ptr, topdia_para_ptr, 
+                          feature_id, pseudo_spec_ptr->getMs1Feature(),
+                          pseudo_spec_ptr->getFragmentFeatures());
       feature_id++;
     }
   }
@@ -349,36 +349,37 @@ std::vector<PseudoPeak> GeneratePseudoSpectrum::filterPseudoPeaks(
   return result;
 }
 
-void GeneratePseudoSpectrum::write_pseudo_spectrum(
-    std::ofstream &output, std::string &ms2_msalign_name,
-    TopfdParaPtr topfd_para_ptr, TopdiaParaPtr topdia_para_ptr, 
+void GeneratePseudoSpectrum::writePseudoSpectrum(
+    std::ofstream &output, TopfdParaPtr topfd_para_ptr, 
+    TopdiaParaPtr topdia_para_ptr, 
     int ms1_feature_idx, MzrtFeaturePtr ms1_feature,
     std::vector<PseudoPeak> &assigned_ms2_features) {
 
-  int num_ms2_specs = 0;
   output << std::fixed;
 
   output << "BEGIN IONS" << std::endl;
-  output << "FRACTION_ID=" << ms1_feature_idx << std::endl;
-  output << "FILE_NAME=" << ms2_msalign_name << std::endl;
-  output << "SPECTRUM_ID=" << num_ms2_specs + ms1_feature_idx << std::endl;  ///
+  output << "FILE_NAME=" << topfd_para_ptr->getMzmlFileName() << std::endl;
+  output << "SPECTRUM_ID=" << ms1_feature_idx << std::endl;  ///
   output << "TITLE=" << "Pseudo_Scan_" + std::to_string(ms1_feature_idx)
          << std::endl;
-  output << "SCANS=" << num_ms2_specs + ms1_feature_idx << std::endl;  ///
+  output << "SCANS=" << ms1_feature_idx << std::endl;  ///
   output << "RETENTION_TIME=" << std::fixed << std::setprecision(2)
          << ms1_feature->getTimeApex() * 60.0 << std::endl;
   output << "LEVEL=" << 2 << std::endl;
   output << "MS_ONE_ID=" << ms1_feature->getApexCycle() << std::endl;        ///
-  output << "MS_ONE_SCAN=" << num_ms2_specs + ms1_feature_idx << std::endl;  ///
+  // need to add MS_ONE_SCAN information                                                                          
+  output << "MS_ONE_SCAN=" << ms1_feature_idx << std::endl;  ///
   output << "PRECURSOR_WINDOW_BEGIN=" << ms1_feature->getWin().first << std::endl;
   output << "PRECURSOR_WINDOW_END=" << ms1_feature->getWin().second << std::endl;
+  // need to add ACTIVATION information                                                                          
   output << "ACTIVATION=HCD" << std::endl;
   output << "PRECURSOR_MZ=" << ms1_feature->getMonoMz() << std::endl;
   output << "PRECURSOR_CHARGE=" << ms1_feature->getCharge() << std::endl;
   output << "PRECURSOR_MASS=" << ms1_feature->getMass() << std::endl;
   output << "PRECURSOR_INTENSITY=" << ms1_feature->getIntensity() << std::endl;
-  output << "PRECURSOR_LENGTH=" << ms1_feature->getCycleSpan() << std::endl;
+  // need to add MS1 feature ID                                                                           
   output << "PRECURSOR_FEATURE_ID=" << ms1_feature_idx << std::endl;  ///
+  output << "PRECURSOR_LENGTH=" << ms1_feature->getCycleSpan() << std::endl;
 
   for (const auto &peak : assigned_ms2_features) {
     output << std::fixed << std::setprecision(5) << peak.getMass();

@@ -16,6 +16,7 @@
 #include <algorithm>
 #include <numeric>
 
+#include "common/util/logger.hpp"
 #include "topdia/pseudo_spec/mzrt_feature.hpp"
 #include "topdia/pseudo_spec/generate_pseudo_spectrum.hpp"
 
@@ -57,7 +58,7 @@ MzrtFeaturePtrVec MzrtFeature::read_record(std::string filename) {
   MzrtFeaturePtrVec data;  // Store read data
   std::ifstream file(filename);
   if (!file.is_open()) {
-    std::cerr << "Error opening file!" << std::endl;
+    LOG_ERROR("Error opening file: " << filename); 
     return data;  // Return empty vector if file cannot be opened
   }
 

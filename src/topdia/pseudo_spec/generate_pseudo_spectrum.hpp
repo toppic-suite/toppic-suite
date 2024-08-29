@@ -65,9 +65,8 @@ class GeneratePseudoSpectrum {
       std::vector<PseudoPeak> &pseudo_peak_list, double cutoff,
       int min_peak_num);
 
-  static void write_pseudo_spectrum(
-      std::ofstream &output, std::string &ms2_msalign_name,
-      TopfdParaPtr topfd_para_ptr, TopdiaParaPtr topdia_para_ptr,
+  static void writePseudoSpectrum(
+      std::ofstream &output, TopfdParaPtr topfd_para_ptr, TopdiaParaPtr topdia_para_ptr,
       int ms1_feature_idx, MzrtFeaturePtr ms1_feature,
       std::vector<PseudoPeak> &assigned_ms2_features);
 
