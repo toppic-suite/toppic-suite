@@ -31,15 +31,16 @@ class PrsmMatchTableWriter {
 
   void write();
 
-  void writePrsm(std::ofstream &file, PrsmPtr prsm_ptr);
-  void writePrsmStandardFormat(std::ofstream &file, PrsmPtr prsm_ptr);
-  std::string formatSeq(std::string seq);
-
   void setOutputName(std::string output_file_ext) {output_file_ext_ = output_file_ext;}
 
   void setWriteMultiMatches(bool write_multiple_matches) {write_multiple_matches_ = write_multiple_matches;}
 
  private:
+
+  std::string formatSeq(std::string seq);
+
+  void writePrsmStandardFormat(std::ofstream &file, PrsmPtr prsm_ptr);
+
   PrsmParaPtr prsm_para_ptr_;
 
   std::string input_file_ext_;
