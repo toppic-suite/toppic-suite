@@ -106,6 +106,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("disable-final-filtering,d", "")
         ("text-peak-list,T","") // Use a text file containing a mass list as the input
         ("keep,k", "Report monoisotopic masses extracted from low quality isotopic envelopes.")
+        ("output-batmass-feature,O","")
         ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), 
          "Spectrum file name with its path.")
         ;
@@ -207,6 +208,10 @@ bool Argument::parse(int argc, char* argv[]) {
 
     if (vm.count("text-peak-list")) {
       topfd_para_ptr_->setTextPeakList(true); 
+    }
+
+    if (vm.count("output-batmass-feature")) {
+      topfd_para_ptr_->setOutputCsvFeatureFile(true); 
     }
 
     if (vm.count("min-scan-number")) {
