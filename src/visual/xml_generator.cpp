@@ -149,7 +149,7 @@ void XmlGenerator::outputAllPrsms() {
 
   for (std::size_t i = 0; i < prsm_ptrs.size(); i++) {
     cnt++;
-    std::cout << std::flush << "Generating XML files - processing " << cnt << " PrSMs.\r";
+    std::cout << std::flush << "Generating XML files - combining " << cnt << " single PrSMs.\r";
     prot_elements->appendChild(anno_prsm::geneAnnoPrsmBrief(writer.getDoc(), prsm_ptrs[i], mng_ptr_, true, false));                                                      
   }
   std::cout << std::endl;
