@@ -75,7 +75,7 @@ void deconvMsTwo(MzmlMsPtr ms_ptr,
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
   std::sort(sp_feat_ptr_vec.begin(), sp_feat_ptr_vec.end(), SpecFeature::cmpPrecInteDec);
   PrecursorPtrVec prec_ptr_vec;
-  for (size_t i = 0; i < sp_feat_ptr_vec.size(); i++) {
+  for (std::size_t i = 0; i < sp_feat_ptr_vec.size(); i++) {
     int prec_id = i;
     int feat_id = sp_feat_ptr_vec[i]->getFracFeatureId();
     double mono_mz = sp_feat_ptr_vec[i]->getPrecMonoMz();
@@ -143,7 +143,7 @@ void DeconvMs2Process::readSpecFeature(std::string feat_file_name,
   sp_feat_reader = nullptr;
   std::map<int, SpecFeaturePtrVec>::iterator feat_it;
   SpecFeaturePtrVec empty_vec;
-  for (size_t i = 0; i < sp_feat_ptr_vec.size(); i++) {
+  for (std::size_t i = 0; i < sp_feat_ptr_vec.size(); i++) {
     SpecFeaturePtr feat_ptr = sp_feat_ptr_vec[i];
     int sp_id = feat_ptr->getSpecId();
     feat_it = feat_map.find(sp_id);
@@ -204,7 +204,7 @@ void DeconvMs2Process::process() {
   std::map<int, SpecFeaturePtrVec>::iterator feat_it;
   while (ms_group_ptr != nullptr) {
     MzmlMsPtrVec ms_ptr_vec = ms_group_ptr->getMsTwoPtrVec();
-    for (size_t i = 0; i < ms_ptr_vec.size(); i++) {
+    for (std::size_t i = 0; i < ms_ptr_vec.size(); i++) {
       while(pool_ptr->getQueueSize() >= thread_num * 2){
         boost::this_thread::sleep(boost::posix_time::milliseconds(100));
       }

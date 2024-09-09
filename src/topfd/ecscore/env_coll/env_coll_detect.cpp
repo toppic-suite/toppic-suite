@@ -143,12 +143,12 @@ void processMs1(TopfdParaPtr topfd_para_ptr) {
     sn_ratio = 0;
     matrix_ptr->reconstruct(sn_ratio, single_scan_noise); 
     int ms1_spec_num = deconv_ms1_ptr_vec.size();
-    for (size_t ms1_idx = 0; ms1_idx < deconv_ms1_ptr_vec.size(); ms1_idx++) {
+    for (std::size_t ms1_idx = 0; ms1_idx < deconv_ms1_ptr_vec.size(); ms1_idx++) {
       double perc = static_cast<int>((ms1_idx + 1)* 100 / ms1_spec_num);
       int scan = deconv_ms1_ptr_vec[ms1_idx]->getMsHeaderPtr()->getFirstScanNum();
       std::cout << "\r" << "Additional feature search MS1 spectrum scan " 
         << scan << " ...       " << perc << "\% finished." << std::flush;
-      for (size_t i = 0; i < ms2_header_ptr_2d[ms1_idx].size(); i++) {
+      for (std::size_t i = 0; i < ms2_header_ptr_2d[ms1_idx].size(); i++) {
         MsHeaderPtr header_ptr = ms2_header_ptr_2d[ms1_idx][i];
         if (env_coll_assign::checkEnvColl(header_ptr, env_coll_list)) {
           continue;
@@ -158,7 +158,7 @@ void processMs1(TopfdParaPtr topfd_para_ptr) {
         SeedEnvPtrVec seed_ptr_list = seed_ptr_2d[ms1_idx];
         SeedEnvPtrVec selected_seed_list;
         LOG_DEBUG("ms1 id  " << ms1_idx << " seed number " << seed_ptr_list.size());
-        for (size_t i = 0; i < seed_ptr_list.size(); i++) {
+        for (std::size_t i = 0; i < seed_ptr_list.size(); i++) {
           double ref_mz = seed_ptr_list[i]->getReferMz();
           if (ref_mz > prec_win_begin && ref_mz < prec_win_end) {
             selected_seed_list.push_back(seed_ptr_list[i]);
@@ -201,7 +201,7 @@ void processMs1(TopfdParaPtr topfd_para_ptr) {
   }
 
   FracFeaturePtrVec frac_features;
-  for (size_t i = 0; i < env_coll_list.size(); i++) {
+  for (std::size_t i = 0; i < env_coll_list.size(); i++) {
     EnvCollPtr env_coll_ptr = env_coll_list[i];
     FracFeaturePtr frac_feat_ptr = env_coll_util::getFracFeature(i, deconv_ms1_ptr_vec, 
                                                                  score_para_ptr->frac_id_,
@@ -260,7 +260,7 @@ void processMs2(TopfdParaPtr topfd_para_ptr) {
   }
   std::vector<std::pair<double,double>> win_list(win_set.begin(), win_set.end()); 
 
-  for (size_t i = 0; i < win_list.size(); i++) {
+  for (std::size_t i = 0; i < win_list.size(); i++) {
   //for (size_t i = 0; i < 1; i++) {
     std::pair<double, double> cur_win =  win_list[i]; 
     std::cout << "Processing isolation window: [" << cur_win.first << "," << cur_win.second << "]"<< std::endl;
@@ -345,7 +345,7 @@ void processMs2(TopfdParaPtr topfd_para_ptr) {
     std::cout << "Number of fragment features: " << env_coll_list.size() << std::endl;
 
     FracFeaturePtrVec frac_features;
-    for (size_t i = 0; i < env_coll_list.size(); i++) {
+    for (std::size_t i = 0; i < env_coll_list.size(); i++) {
       EnvCollPtr env_coll_ptr = env_coll_list[i];
       FracFeaturePtr frac_feat_ptr = env_coll_util::getFracFeature(i, deconv_ms2_ptr_shortlisted_vec,
                                                                    score_para_ptr->frac_id_,

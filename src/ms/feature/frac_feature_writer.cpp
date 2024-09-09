@@ -14,6 +14,7 @@
 
 
 #include <algorithm>
+#include <iomanip>
 #include <cstddef>
 #include <set>
 #include <sstream>
@@ -135,10 +136,12 @@ void writeBatMassFeatures(const std::string &output_file_name,
       }
       double max_mz = filtered_env->getMaxMz() + margin;
       of << feature->getFeatId() << delimit << feature->getFracId() << delimit
-         << single_feature->getEnvNum() << delimit << feature->getMonoMass()
+         << single_feature->getEnvNum() << delimit;
+      of << std::fixed << std::setprecision(5) << feature->getMonoMass()
          << delimit << mono_mz << delimit << charge << delimit
          << single_feature->getIntensity() << delimit << min_mz << delimit
-         << max_mz << delimit << (single_feature->getTimeBegin() / 60)
+         << max_mz << delimit;
+      of << std::setprecision(2) << (single_feature->getTimeBegin() / 60)
          << delimit << (single_feature->getTimeEnd() / 60) << delimit
          << single_feature->getSpecIDBegin() << delimit
          << single_feature->getSpecIDEnd() << delimit

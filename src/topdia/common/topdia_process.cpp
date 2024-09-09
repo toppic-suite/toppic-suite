@@ -38,6 +38,7 @@ void processOneFileWithFaims(TopfdParaPtr topfd_para_ptr,
                              TopdiaParaPtr topdia_para_ptr) {
   //  print parameter for each file
   std::cout << topdia_para_ptr->getParaStr("", " ", topfd_para_ptr);
+   
   if (!topfd_para_ptr->isMissingLevelOne()) {
     std::cout << "MS1 deconvolution started." << std::endl;
     DeconvMs1ProcessPtr ms1_proc_ptr =
@@ -58,12 +59,12 @@ void processOneFileWithFaims(TopfdParaPtr topfd_para_ptr,
   ms2_proc_ptr->process();
   ms2_proc_ptr = nullptr;
   std::cout << "MS/MS deconvolution finished." << std::endl;
-
+     
   std::cout << "MS/MS feature detection started." << std::endl;
   topfd_para_ptr->setMissingLevelOne(false);
   env_coll_detect::processMs2(topfd_para_ptr);
   std::cout << "MS/MS feature detection finished." << std::endl;
-
+  
   std::cout << "Pseudo spectrum generation started." << std::endl;
   GeneratePseudoSpectrumPtr pseudo_genrator_ptr = std::make_shared<GeneratePseudoSpectrum>(topfd_para_ptr, 
                                                                                            topdia_para_ptr);
@@ -133,7 +134,7 @@ int process(TopfdParaPtr topfd_para_ptr, TopdiaParaPtr topdia_para_ptr,
   onnx_env_cnn::initModel(topfd_para_ptr->getResourceDir(), topfd_para_ptr->getThreadNum());
   onnx_ecscore::initModel(topfd_para_ptr->getResourceDir(), topfd_para_ptr->getThreadNum());
 
-  for (size_t k = 0; k < spec_file_list.size(); k++) {
+  for (std::size_t k = 0; k < spec_file_list.size(); k++) {
     if (isValidFile(spec_file_list[k])) {
       std::cout << "Processing " << spec_file_list[k] << " started." << std::endl;
       processOneFile(topfd_para_ptr, topdia_para_ptr, spec_file_list[k]); 

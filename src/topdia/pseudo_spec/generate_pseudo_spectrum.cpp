@@ -81,6 +81,7 @@ GeneratePseudoSpectrum::GeneratePseudoSpectrum(TopfdParaPtr topfd_para_ptr,
     i += interval;
   }
 
+  
   for (auto &ms1_feature : ms1_features_)
     ms1_feature->setInterpolatedXic(
         interp(rt_target, rt_ms1_, ms1_feature->getXic()));
@@ -116,7 +117,7 @@ void GeneratePseudoSpectrum::process(TopfdParaPtr topfd_para_ptr,
       //TO CONTINUE
       ms1_feature->setWin(win);
       std::vector<PseudoPeak> pseudo_peak_list;
-      for (size_t ms2_feature_idx = 0; ms2_feature_idx < ms2_features_[iso_win_idx].size();
+      for (std::size_t ms2_feature_idx = 0; ms2_feature_idx < ms2_features_[iso_win_idx].size();
            ms2_feature_idx++) {
         if (ms2_features_[iso_win_idx][ms2_feature_idx]->getUsedStatus())
           continue;
