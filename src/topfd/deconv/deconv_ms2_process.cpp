@@ -51,8 +51,8 @@ void deconvMsTwo(MzmlMsPtr ms_ptr,
   // 1. Find max_mass and max_charge
   double max_mass = 0; 
   int max_charge = 1;
-  for (size_t i = 0; i < sp_feat_ptr_vec.size(); i++) {
-    double mass = sp_feat_ptr_vec[i]->getPrecMass();
+  for (std::size_t i = 0; i < sp_feat_ptr_vec.size(); i++) {
+    double mass = sp_feat_ptr_vec[i]->getPrecMonoMass();
     if (mass > max_mass) {max_mass = mass;}
     int charge = sp_feat_ptr_vec[i]->getPrecCharge();
     if (charge > max_charge) {max_charge = charge;}

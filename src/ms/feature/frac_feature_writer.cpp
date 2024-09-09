@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "ms/feature/frac_feature_writer.hpp"
 
 #include <algorithm>
 #include <cstddef>
@@ -27,6 +26,7 @@
 #include "ms/env/env.hpp"
 #include "ms/env/env_base.hpp"
 #include "ms/spec/peak_util.hpp"
+#include "ms/feature/frac_feature_writer.hpp"
 
 namespace toppic {
 
@@ -72,7 +72,7 @@ void writeFeatures(const std::string &output_file_name,
   std::ofstream of(output_file_name);
   writeHeader(of);
 
-  for (size_t i = 0; i < features.size(); i++) {
+  for (std::size_t i = 0; i < features.size(); i++) {
     FracFeaturePtr feature = features[i];
     writeOneFeature(of, feature);
   }
@@ -89,12 +89,12 @@ void writeBatMassFeatures(const std::string &output_file_name,
      << "rtLo" << delimit << "rtHi" << delimit << "specLow" << delimit
      << "specHi" << delimit << "rtApex" << delimit << "Score" << delimit
      << "XIC" << delimit << "Envelope" << std::endl;
-  for (size_t i = 0; i < features.size(); i++) {
+  for (std::size_t i = 0; i < features.size(); i++) {
     FracFeaturePtr feature = features[i];
     double mono_mass = feature->getMonoMass();
     SingleChargeFeaturePtrVec single_features = feature->getSingleFeatures();
 
-    for (size_t j = 0; j < single_features.size(); j++) {
+    for (std::size_t j = 0; j < single_features.size(); j++) {
       SingleChargeFeaturePtr single_feature = single_features[j];
       int charge = single_feature->getCharge();
       double mono_mz = peak_util::compMz(mono_mass, charge);
@@ -120,7 +120,7 @@ void writeBatMassFeatures(const std::string &output_file_name,
       std::vector<double> aggregateEnvelopeInte =
           single_feature->getAggregateEnvelopeInte();
       std::stringstream env;
-      for (size_t i = 0; i < envelopeMass.size(); i++) {
+      for (std::size_t i = 0; i < envelopeMass.size(); i++) {
         if (i != 0) env << ";";
         env << envelopeMass[i];
         env << '&';
@@ -157,7 +157,7 @@ void writeXmlFeatures(const std::string &output_file_name,
   file << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << std::endl;
   file << "<frac_feature_list>" << std::endl;
 
-  for (size_t i = 0; i < features.size(); i++) {
+  for (std::size_t i = 0; i < features.size(); i++) {
     XmlDOMImpl *impl = XmlDOMImplFactory::getXmlDOMImplInstance();
     xercesc::DOMLSSerializer *serializer = impl->createSerializer();
     XmlDOMDocument doc(impl->createDoc("frac_feature_list"));
