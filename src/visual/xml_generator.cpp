@@ -131,12 +131,12 @@ void XmlGenerator::outputAllPrsms() {
 
   ModPtrVec fix_mod_ptr_vec = mng_ptr_->prsm_para_ptr_->getFixModPtrVec();
 
-  size_t cnt = 0;
+  std::size_t cnt = 0;
   FastaIndexReaderPtr fasta_reader_ptr 
       = std::make_shared<FastaIndexReader>(db_file_name);
   PrsmPtrVec prsm_ptrs 
       = prsm_reader_util::readAllPrsms(input_file_name, fasta_reader_ptr, fix_mod_ptr_vec);
-  for (size_t k = 0; k < prsm_ptrs.size(); k++) {
+  for (std::size_t k = 0; k < prsm_ptrs.size(); k++) {
     prsm_ptrs[k]->setDeconvMsPtrVec(
         deconv_ms_vec2d_[spec_id_extend_ms_map_[prsm_ptrs[k]->getSpectrumId()]]);
     prsm_ptrs[k]->setRefineMsVec(
@@ -147,9 +147,9 @@ void XmlGenerator::outputAllPrsms() {
 
   xercesc::DOMElement* prot_elements = writer.getDoc()->createElement("prsms");
 
-  for (size_t i = 0; i < prsm_ptrs.size(); i++) {
+  for (std::size_t i = 0; i < prsm_ptrs.size(); i++) {
     cnt++;
-    std::cout << std::flush << "Generating XML files - processing " << cnt << " PrSMs for a combined file.\r";
+    std::cout << std::flush << "Generating XML files - processing " << cnt << " PrSMs.\r";
     prot_elements->appendChild(anno_prsm::geneAnnoPrsmBrief(writer.getDoc(), prsm_ptrs[i], mng_ptr_, true, false));                                                      
   }
   std::cout << std::endl;
