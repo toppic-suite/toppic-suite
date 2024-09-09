@@ -25,19 +25,19 @@ namespace toppic {
 
     class PseudoSpectrum {
     public:
-        PseudoSpectrum(MzrtFeaturePtr ms1Feature, const std::vector<PseudoPeak> &fragmentFeatures) : ms1_feature_(
-                ms1Feature), fragment_features_(fragmentFeatures), assigned_fragment_count_(fragmentFeatures.size()) {}
+        PseudoSpectrum(MzrtFeaturePtr ms1Feature, const std::vector<PseudoPeak> &fragmentFeatures) : 
+            ms1_feature_(ms1Feature), 
+            fragment_features_(fragmentFeatures) {}
 
         void add_fragments(const std::vector<PseudoPeak> &fragmentFeatures);
         void add_fragment(PseudoPeak &fragmentFeature);
-        MzrtFeaturePtr getMs1Feature() const { return ms1_feature_;  }
+        MzrtFeaturePtr getMs1Feature() const { return ms1_feature_;}
         std::vector<PseudoPeak>& getFragmentFeatures() { return fragment_features_; }
-        int getAssignedFragmentCount() const { return assigned_fragment_count_;  }
+        int getAssignedFragmentCount() const { return fragment_features_.size();  }
 
     private:
         MzrtFeaturePtr ms1_feature_;
         std::vector<PseudoPeak> fragment_features_;
-        int assigned_fragment_count_;
 
     };
     typedef std::shared_ptr<PseudoSpectrum> PseudoSpectrumPtr;

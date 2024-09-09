@@ -56,6 +56,7 @@ class Activation {
 
 typedef std::shared_ptr<Activation> ActivationPtr;
 typedef std::vector<ActivationPtr> ActivationPtrVec;
+typedef std::vector<ActivationPtrVec> ActivationPtrVec2D;
 
 }  // namespace toppic
 

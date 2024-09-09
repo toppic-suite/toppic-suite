@@ -65,10 +65,10 @@ class GeneratePseudoSpectrum {
       std::vector<PseudoPeak> &pseudo_peak_list, double cutoff,
       int min_peak_num);
 
-  static void writePseudoSpectrum(
+  void writePseudoSpectrum(
       std::ofstream &output, TopfdParaPtr topfd_para_ptr, TopdiaParaPtr topdia_para_ptr,
       int ms1_feature_idx, MzrtFeaturePtr ms1_feature,
-      std::vector<PseudoPeak> &assigned_ms2_features);
+      std::vector<PseudoPeak> &assigned_ms2_features, int iso_win_idx);
 
   static bool comparePseudoPeaksInte(const PseudoPeak &a,
                                      const PseudoPeak &b) {
@@ -82,7 +82,9 @@ class GeneratePseudoSpectrum {
   //std::vector<double> isolation_window_base_mz_;
   std::vector<std::pair<double,double>> win_list_;
   std::vector<double> rt_ms1_;
+  std::vector<int> ms1_scan_;
   std::vector<std::vector<double>> rt_ms2_;
+  ActivationPtrVec2D activation_ms2_;
   MzrtFeaturePtrVec ms1_features_;
   std::vector<MzrtFeaturePtrVec> ms2_features_;
 };

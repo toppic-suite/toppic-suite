@@ -26,8 +26,10 @@ GeneratePseudoSpectrum::GeneratePseudoSpectrum(TopfdParaPtr topfd_para_ptr,
   std::string ms1_file_name = output_base_name + "_ms1.msalign";
   //std::cout << "Reading ms1 file " << ms1_file_name << std::endl;
   msalign_reader_util::readAllSpectra(ms1_file_name, deconv_ms1_ptr_vec);
-  for (const auto &ms1_data : deconv_ms1_ptr_vec)
+  for (const auto &ms1_data : deconv_ms1_ptr_vec) {
     rt_ms1_.push_back(ms1_data->getMsHeaderPtr()->getRetentionTime() / 60);
+    ms1_scan_.push_back(ms1_data->getMsHeaderPtr()->getFirstScanNum());
+  }
 
   DeconvMsPtrVec deconv_ms2_ptr_vec;
   std::string ms2_file_name = output_base_name + "_ms2.msalign";
@@ -49,14 +51,19 @@ GeneratePseudoSpectrum::GeneratePseudoSpectrum(TopfdParaPtr topfd_para_ptr,
   // get retention times
   for (auto cur_win : win_list_) {
     std::vector<double> rt_ms2_window;
+    ActivationPtrVec activation_ptr_vec;
     for (auto &ms2_data : deconv_ms2_ptr_vec) {
       double ms_win_begin = ms2_data->getMsHeaderPtr()->getPrecWinBegin();
       if (ms_win_begin != cur_win.first) continue;
       rt_ms2_window.push_back(ms2_data->getMsHeaderPtr()->getRetentionTime() / 60);
+      activation_ptr_vec.push_back(ms2_data->getMsHeaderPtr()->getActivationPtr());
     }
-    if (rt_ms2_window.size() < rt_ms1_.size())
+    while (rt_ms2_window.size() < rt_ms1_.size()) {
       rt_ms2_window.push_back(rt_ms2_window.back());
+      activation_ptr_vec.push_back(activation_ptr_vec.back());
+    }
     rt_ms2_.push_back(rt_ms2_window);
+    activation_ms2_.push_back(activation_ptr_vec);
   }
 
   // read feature files
@@ -156,7 +163,7 @@ void GeneratePseudoSpectrum::process(TopfdParaPtr topfd_para_ptr,
           ms1_feature, filtered_pseudo_peak_list);
       writePseudoSpectrum(output, topfd_para_ptr, topdia_para_ptr, 
                           feature_id, pseudo_spec_ptr->getMs1Feature(),
-                          pseudo_spec_ptr->getFragmentFeatures());
+                          pseudo_spec_ptr->getFragmentFeatures(), iso_win_idx);
       feature_id++;
     }
   }
@@ -354,8 +361,10 @@ void GeneratePseudoSpectrum::writePseudoSpectrum(
     std::ofstream &output, TopfdParaPtr topfd_para_ptr, 
     TopdiaParaPtr topdia_para_ptr, 
     int ms1_feature_idx, MzrtFeaturePtr ms1_feature,
-    std::vector<PseudoPeak> &assigned_ms2_features) {
+    std::vector<PseudoPeak> &assigned_ms2_features, 
+    int iso_win_idx) {
 
+  int ms1_apex_cycle = ms1_feature->getApexCycle();
   output << std::fixed;
 
   output << "BEGIN IONS" << std::endl;
@@ -363,23 +372,23 @@ void GeneratePseudoSpectrum::writePseudoSpectrum(
   output << "SPECTRUM_ID=" << ms1_feature_idx << std::endl;  ///
   output << "TITLE=" << "Pseudo_Scan_" + std::to_string(ms1_feature_idx)
          << std::endl;
-  output << "SCANS=" << ms1_feature_idx << std::endl;  ///
+  output << "SCANS=" << (ms1_scan_[ms1_apex_cycle]+ 1 + iso_win_idx) << std::endl;  ///
   output << "RETENTION_TIME=" << std::fixed << std::setprecision(2)
-         << ms1_feature->getTimeApex() * 60.0 << std::endl;
+         << ms1_feature->getTimeApex() << std::endl;
   output << "LEVEL=" << 2 << std::endl;
-  output << "MS_ONE_ID=" << ms1_feature->getApexCycle() << std::endl;        ///
+  output << "MS_ONE_ID=" << ms1_apex_cycle << std::endl;        ///
   // need to add MS_ONE_SCAN information                                                                          
-  output << "MS_ONE_SCAN=" << ms1_feature_idx << std::endl;  ///
+  output << "MS_ONE_SCAN=" << ms1_scan_[ms1_apex_cycle] << std::endl;  ///
   output << "PRECURSOR_WINDOW_BEGIN=" << ms1_feature->getWin().first << std::endl;
   output << "PRECURSOR_WINDOW_END=" << ms1_feature->getWin().second << std::endl;
   // need to add ACTIVATION information                                                                          
-  output << "ACTIVATION=HCD" << std::endl;
-  output << "PRECURSOR_MZ=" << ms1_feature->getMonoMz() << std::endl;
+  output << "ACTIVATION=" << activation_ms2_[iso_win_idx][ms1_apex_cycle]->getName() << std::endl;
+  output << "PRECURSOR_MZ=" << std::setprecision(5) << ms1_feature->getMonoMz() << std::endl;
   output << "PRECURSOR_CHARGE=" << ms1_feature->getCharge() << std::endl;
   output << "PRECURSOR_MASS=" << ms1_feature->getMass() << std::endl;
-  output << "PRECURSOR_INTENSITY=" << ms1_feature->getIntensity() << std::endl;
+  output << "PRECURSOR_INTENSITY=" << std::setprecision(2) << ms1_feature->getIntensity() << std::endl;
   // need to add MS1 feature ID                                                                           
-  output << "PRECURSOR_FEATURE_ID=" << ms1_feature_idx << std::endl;  ///
+  output << "PRECURSOR_FEATURE_ID=" << ms1_feature->getId() << std::endl;  ///
   output << "PRECURSOR_LENGTH=" << ms1_feature->getCycleSpan() << std::endl;
 
   for (const auto &peak : assigned_ms2_features) {
