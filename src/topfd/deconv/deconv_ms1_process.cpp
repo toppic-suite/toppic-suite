@@ -13,6 +13,8 @@
 //limitations under the License.
 //
 
+#include <cstddef>
+
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
 #include "common/util/file_util.hpp"
@@ -54,7 +56,7 @@ void deconvMsOne(MzmlMsGroupPtr ms_group_ptr,
   MzmlMsPtr ms_ptr = ms_group_ptr->getMsOnePtr();
   PeakPtrVec peak_list = ms_ptr->getPeakPtrVec();
   std::vector<double> intensities;
-  for (size_t i = 0; i < peak_list.size(); i++) {
+  for (std::size_t i = 0; i < peak_list.size(); i++) {
     intensities.push_back(peak_list[i]->getIntensity());
   }
   // 2. Deconv envelopes in precursor windows and remove them
@@ -66,7 +68,7 @@ void deconvMsOne(MzmlMsGroupPtr ms_group_ptr,
   onnx_env_cnn::computeEnvScores(peak_list, prec_envs); 
 
   //remove precursor peaks
-  for (size_t i = 0; i < prec_envs.size(); i++) {
+  for (std::size_t i = 0; i < prec_envs.size(); i++) {
     ExpEnvPtr env_ptr = prec_envs[i]->getExpEnvPtr();
     for (int p = 0; p < env_ptr->getPeakNum(); p++) {
       if (env_ptr->isExist(p)) {
@@ -104,7 +106,7 @@ void deconvMsOne(MzmlMsGroupPtr ms_group_ptr,
   //6. write json file 
   if (topfd_para_ptr->isGeneHtmlFolder()) {
     // add back precursor peaks
-    for (size_t i = 0; i < peak_list.size(); i++) {
+    for (std::size_t i = 0; i < peak_list.size(); i++) {
       peak_list[i]->setIntensity(intensities[i]);
     }
     std::string json_file_name = topfd_para_ptr->getMs1JsonDir() 

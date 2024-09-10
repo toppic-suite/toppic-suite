@@ -59,6 +59,7 @@ class TopfdPara {
   bool isSearchPrecWindow() {return search_prec_window_;}
   bool isUseSingleScanNoiseLevel() {return use_single_scan_noise_level_;}
   bool isTextPeakList() {return text_peak_list_;}
+  double getPrecInteCutoffRatio() {return prec_inte_cutoff_ratio_;}
 
   std::string getMzmlFileName() {return mzml_file_name_;}
   std::string getOutputBaseName() {return output_base_name_;}
@@ -131,6 +132,10 @@ class TopfdPara {
   double ms2_ecscore_cutoff_ = 0;
   int ms1_min_scan_num_ = 3;
   int ms2_min_scan_num_ = 1;
+
+  // For an MS/MS spectrum, the precursor is not reported if its intensity 
+  // is less than the cutoff ratio * the intensity of the first precusor
+  double prec_inte_cutoff_ratio_ = 0.1;
 
   //** Fixed parameter setting **
   // estimate min intensity using the method in Thrash. 
