@@ -94,6 +94,7 @@ void MsAlignWriter::writeMs(DeconvMsPtr ms_ptr) {
       if (i < prec_ptrs.size() - 1) {output_ << ":";}
     }
     output_ << std::endl;
+    output_ << "DECONVOLUTED_MASS_NUMBER=" << ms_ptr->size() << std::endl;
   }
   for (size_t i = 0; i < ms_ptr->size(); i++) {
     DeconvPeakPtr peak_ptr = ms_ptr->getPeakPtr(i);

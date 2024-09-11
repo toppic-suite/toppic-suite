@@ -189,7 +189,7 @@ bool Argument::parse(int argc, char* argv[]) {
     }
 
     if (vm.count("msdeconv")) {
-      topfd_para_ptr_->setUseMsDeconv(true);
+      topfd_para_ptr_->setSortUseMsDeconv(true);
     }
 
     if (vm.count("max-mass")) {
@@ -300,7 +300,7 @@ bool Argument::parse(int argc, char* argv[]) {
       topfd_para_ptr_->setGeneHtmlFolder(false);
     }
     if (vm.count("disable-final-filtering")) {
-      topfd_para_ptr_->setDoFinalFiltering(false);
+      topfd_para_ptr_->setAANumBasedFilter(false);
     }
   }
   catch(std::exception& e) {

@@ -73,27 +73,10 @@ std::string TopfdPara::getTopfdParaStr(const std::string &prefix,
   output << prefix << std::setw(gap) << std::left 
       << "Maximum monoisotopic mass:  " << sep << max_mass_ << " Dalton" << std::endl;
   output << prefix << std::setw(gap) << std::left 
-      << "Peak error tolerance:       " << sep << mz_error_ << " m/z" << std::endl;
+      << "Peak m/z error tolerance:   " << sep << mz_error_ << " m/z" << std::endl;
   output << prefix << std::setw(gap) << std::left 
       << "MS1 signal/noise ratio:     " << sep << ms_one_sn_ratio_ << std::endl;
-  output << prefix << std::setw(gap) << std::left 
-      << "MS/MS signal/noise ratio:   " << sep << ms_two_sn_ratio_ << std::endl;
-  output << prefix << std::setw(gap) << std::left
-      << "Split intensity ratio:      " << sep << split_intensity_ratio_ << std::endl;
-  output << prefix << std::setw(gap) << std::left 
-      << "Thread number:              " << sep << thread_num_ << std::endl;
-  output << prefix << std::setw(gap) << std::left 
-      << "Default precursor window:   " << sep << prec_window_ << " m/z" << std::endl;
-  output << prefix << std::setw(gap) << std::left 
-      << "Activation type:            " << sep  << activation_ << std::endl;
-  if (use_msdeconv_) {
-    output << prefix << std::setw(gap) << std::left 
-      << "Use MS-Deconv score:        " << sep << "Yes" << std::endl;
-  }
-  else {
-    output << prefix << std::setw(gap) << std::left 
-      << "Use MS-Deconv score:        " << sep << "No" << std::endl;
-  }
+
   if (missing_level_one_) {
     output << prefix << std::setw(gap) << std::left 
       << "Miss MS1 spectra:           " << sep << "Yes" << std::endl;
@@ -102,16 +85,37 @@ std::string TopfdPara::getTopfdParaStr(const std::string &prefix,
     output << prefix << std::setw(gap) << std::left 
       << "Miss MS1 spectra:           " << sep << "No" << std::endl;
   }
+
   output << prefix << std::setw(gap) << std::left 
-      << "Min scan number:            " << sep << ms1_min_scan_num_ << std::endl;
-  if (use_single_scan_noise_level_) {
+      << "MS/MS signal/noise ratio:   " << sep << ms_two_sn_ratio_ << std::endl;
+  output << prefix << std::setw(gap) << std::left 
+      << "Default precursor window:   " << sep << prec_window_ << " m/z" << std::endl;
+  output << prefix << std::setw(gap) << std::left 
+      << "Activation type:            " << sep  << activation_ << std::endl;
+
+  if (sort_use_msdeconv_) {
     output << prefix << std::setw(gap) << std::left 
-      << "Use single scan noise level:" << sep << "Yes" << std::endl;
+      << "Sorting method:             " << sep << "MS-Deconv score" << std::endl;
   }
   else {
     output << prefix << std::setw(gap) << std::left 
-      << "Use single scan noise level:" << sep << "No" << std::endl;
+      << "Sorting method:             " << sep << "EnvCNN score" << std::endl;
   }
+
+  output << prefix << std::setw(gap) << std::left 
+      << "MS/MS EnvCNN score cutoff:  " << sep  << ms2_env_cnn_score_cutoff_<< std::endl;
+
+  if (aa_num_based_filter_) {
+    output << prefix << std::setw(gap) << std::left 
+      << "Filtering use estimated amino acid number:" << sep << "Yes" << std::endl;
+  }
+  else {
+    output << prefix << std::setw(gap) << std::left 
+      << "Filtering use estimated amino acid number:" << sep << "No" << std::endl;
+  }
+
+  output << prefix << std::setw(gap) << std::left 
+      << "Min scan number:            " << sep << ms1_min_scan_num_ << std::endl;
   output << prefix << std::setw(gap) << std::left 
       << "ECScore cutoff:             " << sep  << ms1_ecscore_cutoff_ << std::endl;
   if (search_prec_window_) {
@@ -122,6 +126,20 @@ std::string TopfdPara::getTopfdParaStr(const std::string &prefix,
     output << prefix << std::setw(gap) << std::left 
       << "Additional feature search:  " << sep << "No" << std::endl;
   }
+
+  if (use_single_scan_noise_level_) {
+    output << prefix << std::setw(gap) << std::left 
+      << "Use single scan noise level:" << sep << "Yes" << std::endl;
+  }
+  else {
+    output << prefix << std::setw(gap) << std::left 
+      << "Use single scan noise level:" << sep << "No" << std::endl;
+  }
+
+  output << prefix << std::setw(gap) << std::left
+      << "Intensity ratio for splitting features:" << sep << split_intensity_ratio_ << std::endl;
+  output << prefix << std::setw(gap) << std::left 
+      << "Thread number:              " << sep << thread_num_ << std::endl;
   if (gene_html_folder_) {
     output << prefix << std::setw(gap) << std::left 
       << "Generate Html files:        " << sep << "Yes" << std::endl;
@@ -129,14 +147,6 @@ std::string TopfdPara::getTopfdParaStr(const std::string &prefix,
   else {
     output << prefix << std::setw(gap) << std::left 
       << "Generate Html files:        " << sep << "No" << std::endl;
-  }
-  if (do_final_filtering_) {
-    output << prefix << std::setw(gap) << std::left 
-      << "Do final filtering:         " << sep << "Yes" << std::endl;
-  }
-  else {
-    output << prefix << std::setw(gap) << std::left 
-      << "Do final filtering:         " << sep << "No" << std::endl;
   }
   return output.str();
 }

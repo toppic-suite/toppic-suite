@@ -36,15 +36,18 @@ void Argument::showUsage(boost::program_options::options_description &desc) {
 }
 
 bool Argument::parse(int argc, char* argv[]) {
+  //parameters for spectral deconvolution
   std::string max_charge = "";
   std::string max_mass = "";
   std::string mz_error = "";
   std::string ms_two_sn_ratio = "";
   std::string ms_one_sn_ratio = "";
-  std::string split_intensity_ratio = "";
   std::string prec_window = "";
   std::string thread_number = "";
   std::string activation = "";
+  std::string ms2_env_cnn_score_cutoff = "";
+  //parameters of ms1 feature detection
+  std::string split_intensity_ratio = "";
   std::string ecscore_cutoff = "";
   std::string min_scan_num = "";
 
@@ -67,19 +70,21 @@ bool Argument::parse(int argc, char* argv[]) {
          "<a positive number>. Set the signal-to-noise ratio for MS1 spectra. The default value is 3.")
         ("ms-two-sn-ratio,s", po::value<std::string> (&ms_two_sn_ratio),
          "<a positive number>. Set the signal-to-noise ratio for MS/MS spectra. The default value is 1.")
-        ("split-intensity-ratio,l", po::value<std::string> (&split_intensity_ratio),
-         "<a positive number>. Set the intensity ratio required to split one feature from another. The default value is 2.5.")
         ("missing-level-one,o","MS1 spectra are missing in the input file.")
-        ("msdeconv,n", "Use the MS-Deconv score to rank isotopic envelopes.")
         ("precursor-window,w", po::value<std::string> (&prec_window),
          "<a positive number>. Set the default precursor window size. The default value is 3.0 m/z. When the input file contains the information of precursor windows, the parameter will be ignored.")
+        ("msdeconv,n", "Use the MS-Deconv score to rank isotopic envelopes. The default method uses the EnvCNN score to rank isotopic envelopes.")
+        ("env-cnn-cutoff,v", po::value<std::string>(&ms2_env_cnn_score_cutoff), 
+         "<a number in [0,1]>. Set the cutoff value for the EnvCNN score to filter out low quality isotopic envelopes in MS/MS spectra. The default value is 0.")
+        ("disable-aa-num-filtering,d","Skip the filtering of envelopes in MS/MS scans based on the estimated number of amino acids in the proteoform.")
         ("ecscore-cutoff,t", po::value<std::string> (&ecscore_cutoff),
          "<a positive number in [0,1]>. Set the ECScore cutoff value for proteoform features. The default value is 0.5.")
         ("min-scan-number,b",po::value<std::string> (&min_scan_num), 
          "<1|2|3>. The minimum number of MS1 scans in which a proteoform feature is detected. The default value is 3.")
         ("single-scan-noise,i","Use the peak intensity noise levels in single MS1 scans to filter out low intensity peaks in proteoform feature detection. The default method is to use the peak intensity noise level of the whole LC-MS map to filter out low intensity peaks.")
         ("disable-additional-feature-search,f","Disable additional feature search for MS/MS scans that do not have detected proteoform features in their precursor isolation windows. In additional search, the signal noise ratio is set to 0, the min scan number is set to 1, and the ecscore cutoff is set to 0.")
-        ("disable-final-filtering,d","Skip the final filtering of envelopes in MS/MS scans.")
+        ("split-intensity-ratio,l", po::value<std::string> (&split_intensity_ratio),
+         "<a positive number>. Set the intensity ratio required to split one feature from another. The default value is 2.5.")
         ("thread-number,u", po::value<std::string> (&thread_number), "<a positive integer>. Number of threads used in spectral deconvolution. Default value: 1.")
         ("skip-html-folder,g","Skip the generation of HTML files for visualization.")
         ;
@@ -93,19 +98,20 @@ bool Argument::parse(int argc, char* argv[]) {
         ("mz-error,e", po::value<std::string> (&mz_error), "")
         ("ms-one-sn-ratio,r", po::value<std::string> (&ms_one_sn_ratio), "")
         ("ms-two-sn-ratio,s", po::value<std::string> (&ms_two_sn_ratio), "")
-        ("split-intensity-ratio,l", po::value<std::string> (&split_intensity_ratio), "")
         ("precursor-window,w", po::value<std::string> (&prec_window), "")
-        ("ecscore-cutoff,t", po::value<std::string> (&ecscore_cutoff), "")
         ("missing-level-one,o", "")
+        ("msdeconv,n", "")
+        ("keep,k", "Report monoisotopic masses extracted from low quality isotopic envelopes.")
+        ("env-cnn-cutoff,v", po::value<std::string>(&ms2_env_cnn_score_cutoff), "")
+        ("disable-aa-num-filtering,d", "")
         ("single-scan-noise,i","")
-        ("disable-additional-feature-search,f","")
         ("min-scan-number,b",po::value<std::string> (&min_scan_num),"")
+        ("ecscore-cutoff,t", po::value<std::string> (&ecscore_cutoff), "")
+        ("split-intensity-ratio,l", po::value<std::string> (&split_intensity_ratio), "")
+        ("disable-additional-feature-search,f","")
         ("thread-number,u", po::value<std::string> (&thread_number), "")
         ("skip-html-folder,g","")
-        ("msdeconv,n", "")
-        ("disable-final-filtering,d", "")
         ("text-peak-list,T","") // Use a text file containing a mass list as the input
-        ("keep,k", "Report monoisotopic masses extracted from low quality isotopic envelopes.")
         ("output-batmass-feature,O","")
         ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), 
          "Spectrum file name with its path.")
@@ -159,7 +165,7 @@ bool Argument::parse(int argc, char* argv[]) {
     }
 
     if (vm.count("msdeconv")) {
-      topfd_para_ptr_->setUseMsDeconv(true);
+      topfd_para_ptr_->setSortUseMsDeconv(true);
     }
 
     if (vm.count("max-mass")) {
@@ -178,21 +184,40 @@ bool Argument::parse(int argc, char* argv[]) {
       topfd_para_ptr_->setMsOneSnRatio(std::stod(ms_one_sn_ratio));
     }
 
-    if (vm.count("split-intensity-ratio")) {
-      topfd_para_ptr_->setSplitIntensityRatio(std::stod(split_intensity_ratio));
-    }
-
     if (vm.count("missing-level-one")) {
       topfd_para_ptr_->setMissingLevelOne(true);
+    }
+
+    if (vm.count("precursor-window")) {
+        topfd_para_ptr_->setPrecWindowWidth(std::stod(prec_window));
+    }
+
+    if (vm.count("env-cnn-cutoff")) {
+      try {
+        double cutoff = std::stod(ms2_env_cnn_score_cutoff);
+        if (cutoff < 0 || cutoff > 1) {
+          LOG_ERROR("Env-CNN cutoff " << ms2_env_cnn_score_cutoff << " should be in [0,1].");
+          return false;
+        }
+        topfd_para_ptr_->setMs2EnvCnnScoreCutoff(cutoff);
+      } catch (std::exception& e) {
+        LOG_ERROR("Env-CNN cutoff " << ms2_env_cnn_score_cutoff << " should be a number.");
+        return false;
+      }
     }
 
     if (vm.count("multiple-mass")) {
       topfd_para_ptr_->setOutputMultipleMass(true);
     }
 
-    if (vm.count("precursor-window")) {
-        topfd_para_ptr_->setPrecWindowWidth(std::stod(prec_window));
+    if (vm.count("output-batmass-feature")) {
+      topfd_para_ptr_->setOutputCsvFeatureFile(true); 
     }
+
+    if (vm.count("split-intensity-ratio")) {
+      topfd_para_ptr_->setSplitIntensityRatio(std::stod(split_intensity_ratio));
+    }
+
 
     if (vm.count("ecscore-cutoff")) {
       topfd_para_ptr_->setMs1EcscoreCutoff(std::stod(ecscore_cutoff));
@@ -208,10 +233,6 @@ bool Argument::parse(int argc, char* argv[]) {
 
     if (vm.count("text-peak-list")) {
       topfd_para_ptr_->setTextPeakList(true); 
-    }
-
-    if (vm.count("output-batmass-feature")) {
-      topfd_para_ptr_->setOutputCsvFeatureFile(true); 
     }
 
     if (vm.count("min-scan-number")) {
@@ -240,16 +261,17 @@ bool Argument::parse(int argc, char* argv[]) {
         return false;
       }
     }
+
     if (vm.count("skip-html-folder")) {
       topfd_para_ptr_->setGeneHtmlFolder(false);
     }
-    if (vm.count("disable-final-filtering")) {
-      topfd_para_ptr_->setDoFinalFiltering(false);
+    if (vm.count("disable-aa-num-filtering")) {
+      topfd_para_ptr_->setAANumBasedFilter(false);
     }
   }
   catch(std::exception& e) {
-    std::cerr << "Unhandled Exception in parsing command line "
-        << e.what() << ", application will now exit" << std::endl;
+    std::cerr << "Unhandled Exception in parsing command line "
+        << e.what() << ", application will now exit" << std::endl;
     return false;
   }
 

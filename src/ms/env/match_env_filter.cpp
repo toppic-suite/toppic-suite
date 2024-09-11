@@ -21,8 +21,18 @@ namespace toppic {
 
 namespace match_env_filter {
 
-MatchEnvPtrVec filter(MatchEnvPtrVec &ori_envs, double prec_mass,
-                      bool use_msdeconv, EnvParaPtr env_para_ptr) {
+MatchEnvPtrVec filterByEnvCnnScore(MatchEnvPtrVec &ori_envs, double cutoff) {
+  MatchEnvPtrVec result;
+  for (size_t i = 0; i < ori_envs.size(); i++) {
+    if (ori_envs[i]->getEnvcnnScore() >= cutoff) {
+      result.push_back(ori_envs[i]);
+    }
+  }
+  return result;
+}
+
+MatchEnvPtrVec filterByAANum(MatchEnvPtrVec &ori_envs, double prec_mass,
+                             bool use_msdeconv, EnvParaPtr env_para_ptr) {
   MatchEnvPtrVec low_mass_envs;
   MatchEnvPtrVec high_mass_envs;
   if (use_msdeconv) {
@@ -55,7 +65,6 @@ MatchEnvPtrVec filter(MatchEnvPtrVec &ori_envs, double prec_mass,
   }
   return result;
 }
-
 }
 
 }

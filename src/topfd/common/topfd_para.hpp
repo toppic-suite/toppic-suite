@@ -46,8 +46,9 @@ class TopfdPara {
   double getMsTwoSnRatio() {return ms_two_sn_ratio_;}
   double getSplitIntensityRatio() {return split_intensity_ratio_;}
   double getPrecWindowWidth() {return prec_window_;}
-  bool isUseMsDeconv() {return use_msdeconv_;}
-  bool isDoFinalFiltering() {return do_final_filtering_;}
+  bool isSortUseMsDeconv() {return sort_use_msdeconv_;}
+  bool isAANumBasedFilter() {return aa_num_based_filter_;}
+  double getMs2EnvCnnScoreCutoff() {return ms2_env_cnn_score_cutoff_;}
   std::string getActivation() {return activation_;}
   bool isGeneHtmlFolder() {return gene_html_folder_;}
   bool isKeepUnusedPeaks() {return keep_unused_peaks_;}
@@ -85,8 +86,9 @@ class TopfdPara {
   void setMsTwoSnRatio(double ratio) {ms_two_sn_ratio_ = ratio;}
   void setSplitIntensityRatio(double ratio) {split_intensity_ratio_ = ratio;}
   void setPrecWindowWidth(double window) { prec_window_ = window;}
-  void setUseMsDeconv(bool use) {use_msdeconv_ = use;}
-  void setDoFinalFiltering(bool filtering) {do_final_filtering_ = filtering;}
+  void setSortUseMsDeconv(bool use) {sort_use_msdeconv_ = use;}
+  void setAANumBasedFilter(bool filter) {aa_num_based_filter_ = filter;}
+  void setMs2EnvCnnScoreCutoff(double cutoff) {ms2_env_cnn_score_cutoff_ = cutoff;}
   void setActivation(std::string activation) {activation_ = activation;}
   void setGeneHtmlFolder(bool gene) {gene_html_folder_ = gene;}
   void setKeepUnusedPeaks(bool keep) {keep_unused_peaks_ = keep;}
@@ -111,23 +113,32 @@ class TopfdPara {
  private:
   std::string exe_dir_;
   std::string resource_dir_;
+
+  // parameters for deconcovolution 
   int max_charge_ = 30;
   double max_mass_ = 70000;
+  // precursor window is used only when the mzML file does not 
+  // contain the precursor window information
   double prec_window_ = 3.0;
   bool missing_level_one_ = false;
   double mz_error_ = 0.02;
   double ms_one_sn_ratio_ = 3.0;
   double ms_two_sn_ratio_ = 1.0;
-  double split_intensity_ratio_ = 2.5;
-  bool keep_unused_peaks_ = false;
-  bool use_msdeconv_ = false;
-  bool do_final_filtering_ = true;
   int  thread_num_ = 1;
   std::string activation_ = "FILE";
+  // keep unused peaks in dynamic programming
+  bool keep_unused_peaks_ = false;
+  // sorting using msdeconv, the default method is env_cnn score
+  bool sort_use_msdeconv_ = false;
+  double ms2_env_cnn_score_cutoff_ = 0.0;
+  bool aa_num_based_filter_ = true;
+  bool output_csv_feature_file_ = false;
   bool gene_html_folder_ = true;
+
+  // parameters for feature identification
+  double split_intensity_ratio_ = 2.5;
   bool search_prec_window_ = true;
   bool use_single_scan_noise_level_ = false;
-
   double ms1_ecscore_cutoff_ = 0.5;
   double ms2_ecscore_cutoff_ = 0;
   int ms1_min_scan_num_ = 3;
@@ -142,7 +153,6 @@ class TopfdPara {
   bool estimate_min_inte_ = true;
   bool output_multiple_mass_ = false;
   bool output_match_env_ = false;
-  bool output_csv_feature_file_ = false;
 
   //** information for each run **
   int frac_id_ = -1;

@@ -45,7 +45,7 @@ std::string geneTopfdCommand(TopfdParaPtr para_ptr,
   oss << "-t " << para_ptr->getMs1EcscoreCutoff() << " ";
   oss << "-b " << para_ptr->getMs1MinScanNum() << " ";
   command = command + oss.str();
-  if (para_ptr->isUseMsDeconv()) {
+  if (para_ptr->isSortUseMsDeconv()) {
     command = command + "-n ";
   }
   if (para_ptr->isMissingLevelOne()) {
@@ -55,7 +55,7 @@ std::string geneTopfdCommand(TopfdParaPtr para_ptr,
   if (!para_ptr->isGeneHtmlFolder()) {
     command = command + "-g ";
   }
-  if (!para_ptr->isDoFinalFiltering()) {
+  if (!para_ptr->isAANumBasedFilter()) {
     command = command + "-d ";
   }
   if (para_ptr->isSearchPrecWindow()) {
@@ -99,7 +99,7 @@ std::string geneTopdiaCommand(TopfdParaPtr topfd_para_ptr,
     oss << "-p " << topdia_para_ptr->getMs1SeedEnvInteCorrToleCutoff() << " ";
     oss << "-P " << topdia_para_ptr->getMs2SeedEnvInteCorrToleCutoff() << " ";
     command = command + oss.str();
-    if (topfd_para_ptr->isUseMsDeconv()) {
+    if (topfd_para_ptr->isSortUseMsDeconv()) {
         command = command + "-n ";
     }
     if (topfd_para_ptr->isMissingLevelOne()) {
@@ -109,7 +109,7 @@ std::string geneTopdiaCommand(TopfdParaPtr topfd_para_ptr,
     if (!topfd_para_ptr->isGeneHtmlFolder()) {
         command = command + "-g ";
     }
-    if (!topfd_para_ptr->isDoFinalFiltering()) {
+    if (!topfd_para_ptr->isAANumBasedFilter()) {
         command = command + "-d ";
     }
     if (topfd_para_ptr->isUseSingleScanNoiseLevel()) {
