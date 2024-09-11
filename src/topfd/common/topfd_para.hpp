@@ -139,9 +139,9 @@ class TopfdPara {
   double split_intensity_ratio_ = 2.5;
   bool search_prec_window_ = true;
   bool use_single_scan_noise_level_ = false;
-  double ms1_ecscore_cutoff_ = 0.5;
+  double ms1_ecscore_cutoff_ = 0.1;
   double ms2_ecscore_cutoff_ = 0;
-  int ms1_min_scan_num_ = 3;
+  int ms1_min_scan_num_ = 1;
   int ms2_min_scan_num_ = 1;
 
   // For an MS/MS spectrum, the precursor is not reported if its intensity 

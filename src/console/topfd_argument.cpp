@@ -78,9 +78,9 @@ bool Argument::parse(int argc, char* argv[]) {
          "<a number in [0,1]>. Set the cutoff value for the EnvCNN score to filter out low quality isotopic envelopes in MS/MS spectra. The default value is 0.")
         ("disable-aa-num-filtering,d","Skip the filtering of envelopes in MS/MS scans based on the estimated number of amino acids in the proteoform.")
         ("ecscore-cutoff,t", po::value<std::string> (&ecscore_cutoff),
-         "<a positive number in [0,1]>. Set the ECScore cutoff value for proteoform features. The default value is 0.5.")
+         "<a positive number in [0,1]>. Set the ECScore cutoff value for proteoform features. The default value is 0.1.")
         ("min-scan-number,b",po::value<std::string> (&min_scan_num), 
-         "<1|2|3>. The minimum number of MS1 scans in which a proteoform feature is detected. The default value is 3.")
+         "<1|2|3>. The minimum number of MS1 scans in which a proteoform feature is detected. The default value is 1.")
         ("single-scan-noise,i","Use the peak intensity noise levels in single MS1 scans to filter out low intensity peaks in proteoform feature detection. The default method is to use the peak intensity noise level of the whole LC-MS map to filter out low intensity peaks.")
         ("disable-additional-feature-search,f","Disable additional feature search for MS/MS scans that do not have detected proteoform features in their precursor isolation windows. In additional search, the signal noise ratio is set to 0, the min scan number is set to 1, and the ecscore cutoff is set to 0.")
         ("split-intensity-ratio,l", po::value<std::string> (&split_intensity_ratio),
