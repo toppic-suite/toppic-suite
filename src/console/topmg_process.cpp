@@ -215,10 +215,10 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
     one_ptm_filter_processor::process(one_ptm_filter_mng_ptr);
     std::cout << "ASF-One PTM filtering - finished." << std::endl;
 
-    input_exts.push_back("topmg_one_filter_complete");
-    input_exts.push_back("topmg_one_filter_prefix");
-    input_exts.push_back("topmg_one_filter_suffix");
-    input_exts.push_back("topmg_one_filter_internal");
+    input_exts.push_back("topmg_one_filter_COMPLETE");
+    input_exts.push_back("topmg_one_filter_PREFIX");
+    input_exts.push_back("topmg_one_filter_SUFFIX");
+    input_exts.push_back("topmg_one_filter_INTERNAL");
 
 
     if (arguments["useAsfDiag"] == "true") {

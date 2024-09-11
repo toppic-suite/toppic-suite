@@ -86,10 +86,18 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
                   = prm_ms_factory::geneSuffixMsTwoPtrVec(deconv_ms_ptr_vec, sp_para_ptr,
                                                           prec_mono_mass, n_term_label_mass, mod_mass);
                 filter_ptr->computeBestMatch(prm_ms_ptr_vec, srm_ms_ptr_vec);
-                writers.getCompleteWriterPtr()->write(filter_ptr->getCompMatchPtrs());
-                writers.getPrefixWriterPtr()->write(filter_ptr->getPrefMatchPtrs());
-                writers.getSuffixWriterPtr()->write(filter_ptr->getSuffMatchPtrs());
-                writers.getInternalWriterPtr()->write(filter_ptr->getInternalMatchPtrs());
+                if (prsm_para_ptr->allowCompleteProt()) {
+                  writers.getCompleteWriterPtr()->write(filter_ptr->getCompMatchPtrs());
+                }
+                if (prsm_para_ptr->allowPrefixProt()) {
+                  writers.getPrefixWriterPtr()->write(filter_ptr->getPrefMatchPtrs());
+                }
+                if (prsm_para_ptr->allowSuffixProt()) {
+                  writers.getSuffixWriterPtr()->write(filter_ptr->getSuffMatchPtrs());
+                }
+                if (prsm_para_ptr->allowInternalProt()) {
+                  writers.getInternalWriterPtr()->write(filter_ptr->getInternalMatchPtrs());
+                }
               }
             }
           }
@@ -104,10 +112,18 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
                                                       prec_mono_mass, n_term_label_mass, 
                                                       mod_mass);
             filter_ptr->computeBestMatch(prm_ms_ptr_vec, srm_ms_ptr_vec);
-            writers.getCompleteWriterPtr()->write(filter_ptr->getCompMatchPtrs());
-            writers.getPrefixWriterPtr()->write(filter_ptr->getPrefMatchPtrs());
-            writers.getSuffixWriterPtr()->write(filter_ptr->getSuffMatchPtrs());
-            writers.getInternalWriterPtr()->write(filter_ptr->getInternalMatchPtrs());
+            if (prsm_para_ptr->allowCompleteProt()) {
+              writers.getCompleteWriterPtr()->write(filter_ptr->getCompMatchPtrs());
+            }
+            if (prsm_para_ptr->allowPrefixProt()) {
+              writers.getPrefixWriterPtr()->write(filter_ptr->getPrefMatchPtrs());
+            }
+            if (prsm_para_ptr->allowSuffixProt()) {
+              writers.getSuffixWriterPtr()->write(filter_ptr->getSuffMatchPtrs());
+            }
+            if (prsm_para_ptr->allowInternalProt()) {
+              writers.getInternalWriterPtr()->write(filter_ptr->getInternalMatchPtrs());
+            }
           }
         }
       }

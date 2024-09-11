@@ -28,4 +28,20 @@ ProteoformType::ProteoformType(const std::string &name, int id):
     name_(name), 
     id_(id) {}
 
+ProteoformTypePtr ProteoformType::getProtTypePtrByName(std::string name) {
+  if (name == "COMPLETE") {
+    return ProteoformType::COMPLETE;
+  }
+  if (name == "PREFIX") {
+    return ProteoformType::PREFIX;
+  }
+  if (name == "SUFFIX") {
+    return ProteoformType::SUFFIX;
+  }
+  if (name == "INTERNAL") {
+    return ProteoformType::SUFFIX;
+  }
+  return nullptr;
+}
+
 }  // namespace toppic

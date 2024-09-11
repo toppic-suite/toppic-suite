@@ -104,6 +104,7 @@ void PrsmStrMerge::process() {
         }
       }
     }
+    LOG_DEBUG("spec id " << spec_id << " cur_str_ptrs size " << cur_str_ptrs.size() << " finish " << finish);
 
     if (cur_str_ptrs.size() > 0) {
       if (!norm_) {

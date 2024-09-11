@@ -232,7 +232,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     msalign_util::geneSpIndex(sp_file_name);
 
     std::vector<std::string> input_exts;
-
+    
     std::cout << "Zero unexpected shift filtering - started." << std::endl;
     ZeroPtmFilterMngPtr zero_filter_mng_ptr
         = std::make_shared<ZeroPtmFilterMng>(prsm_para_ptr, index_file_para, 
@@ -248,11 +248,11 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     zero_search_processor->process();
     zero_search_processor = nullptr;
     std::cout << "Zero unexpected shift search - finished." << std::endl;
-
-    input_exts.push_back("toppic_zero_shift_complete");
-    input_exts.push_back("toppic_zero_shift_prefix");
-    input_exts.push_back("toppic_zero_shift_suffix");
-    input_exts.push_back("toppic_zero_shift_internal");
+    
+    input_exts.push_back("toppic_zero_shift_COMPLETE");
+    input_exts.push_back("toppic_zero_shift_PREFIX");
+    input_exts.push_back("toppic_zero_shift_SUFFIX");
+    input_exts.push_back("toppic_zero_shift_INTERNAL");
 
     if (var_ptm_num >= 1 && var_ptm_file_name != "") {
       std::cout << "Variable PTM filtering - started." << std::endl;
@@ -278,10 +278,10 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
       var_ptm_search_processor->process();
       var_ptm_search_processor = nullptr;
       std::cout << "Variable PTM search - finished." << std::endl;
-      input_exts.push_back("toppic_var_ptm_complete");
-      input_exts.push_back("toppic_var_ptm_prefix");
-      input_exts.push_back("toppic_var_ptm_suffix");
-      input_exts.push_back("toppic_var_ptm_internal");
+      input_exts.push_back("toppic_var_ptm_COMPLETE");
+      input_exts.push_back("toppic_var_ptm_PREFIX");
+      input_exts.push_back("toppic_var_ptm_SUFFIX");
+      input_exts.push_back("toppic_var_ptm_INTERNAL");
     }
 
     if (shift_num >= 1) {
@@ -305,10 +305,10 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
       one_search_processor = nullptr;
       std::cout << "One unexpected shift search - finished." << std::endl;
 
-      input_exts.push_back("toppic_one_shift_complete");
-      input_exts.push_back("toppic_one_shift_prefix");
-      input_exts.push_back("toppic_one_shift_suffix");
-      input_exts.push_back("toppic_one_shift_internal");
+      input_exts.push_back("toppic_one_shift_COMPLETE");
+      input_exts.push_back("toppic_one_shift_PREFIX");
+      input_exts.push_back("toppic_one_shift_SUFFIX");
+      input_exts.push_back("toppic_one_shift_INTERNAL");
     }
 
     if (shift_num >= 2) {
@@ -333,10 +333,10 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
       processor = nullptr;
       std::cout << "Multiple unexpected shifts search - finished." << std::endl;
 
-      input_exts.push_back("toppic_multi_shift_complete_2");
-      input_exts.push_back("toppic_multi_shift_prefix_2");
-      input_exts.push_back("toppic_multi_shift_suffix_2");
-      input_exts.push_back("toppic_multi_shift_internal_2");
+      input_exts.push_back("toppic_multi_shift_COMPLETE_2");
+      input_exts.push_back("toppic_multi_shift_PREFIX_2");
+      input_exts.push_back("toppic_multi_shift_SUFFIX_2");
+      input_exts.push_back("toppic_multi_shift_INTERNAL_2");
     }
 
     std::cout << "Merging PrSMs - started." << std::endl;

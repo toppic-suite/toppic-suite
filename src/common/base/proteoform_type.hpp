@@ -17,6 +17,7 @@
 
 #include <string>
 #include <memory>
+#include <vector>
 
 namespace toppic {
 
@@ -36,10 +37,14 @@ class ProteoformType {
 
   int getId() {return id_;}
 
+  static ProteoformTypePtr getProtTypePtrByName(std::string name);
+
  private:
   std::string name_;
   int id_;
 };
+
+typedef std::vector<ProteoformTypePtr> ProteoformTypePtrVec;
 
 }  // namespace toppic
 

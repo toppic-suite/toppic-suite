@@ -51,6 +51,7 @@ std::map<std::string, std::string> TopmgArgument::initArguments() {
   arguments["cutoffProteoformType"] = "EVALUE";
   arguments["cutoffProteoformValue"] = "0.01";
   arguments["allowProtMod"] = "NONE,NME,NME_ACETYLATION,M_ACETYLATION";
+  arguments["allowProtType"] = "COMPLETE,PREFIX,SUFFIX,INTERNAL";
   arguments["numOfTopPrsms"] = "1";
   arguments["maxShiftMass"] = "500";
   arguments["executiveDir"] = ".";
