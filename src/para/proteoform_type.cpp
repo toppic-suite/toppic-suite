@@ -12,17 +12,17 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include "seq/proteoform_type.hpp"
+#include "para/proteoform_type.hpp"
 
 namespace toppic {
 
-ProteoformTypePtr ProteoformType::COMPLETE = std::make_shared<ProteoformType>("complete", 0);
+ProteoformTypePtr ProteoformType::COMPLETE = std::make_shared<ProteoformType>("COMPLETE", 0);
 
-ProteoformTypePtr ProteoformType::PREFIX = std::make_shared<ProteoformType>("prefix", 1);
+ProteoformTypePtr ProteoformType::PREFIX = std::make_shared<ProteoformType>("PREFIX", 1);
 
-ProteoformTypePtr ProteoformType::SUFFIX = std::make_shared<ProteoformType>("suffix", 2);
+ProteoformTypePtr ProteoformType::SUFFIX = std::make_shared<ProteoformType>("SUFFIX", 2);
 
-ProteoformTypePtr ProteoformType::INTERNAL = std::make_shared<ProteoformType>("internal", 3);
+ProteoformTypePtr ProteoformType::INTERNAL = std::make_shared<ProteoformType>("INTERNAL", 3);
 
 ProteoformType::ProteoformType(const std::string &name, int id): 
     name_(name), 
