@@ -18,7 +18,7 @@
 #include "common/base/ptm.hpp"
 #include "common/base/prot_mod.hpp"
 #include "common/base/residue_freq.hpp"
-#include "para/proteoform_type.hpp"
+#include "common/base/proteoform_type.hpp"
 #include "seq/fasta_seq.hpp"
 #include "seq/fasta_index_reader.hpp"
 #include "seq/bp_spec.hpp"
