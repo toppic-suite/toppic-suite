@@ -633,18 +633,24 @@ p, li { white-space: pre-wrap; }
       <rect>
        <x>10</x>
        <y>50</y>
-       <width>201</width>
+       <width>211</width>
        <height>25</height>
       </rect>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_11">
       <item>
        <widget class="QCheckBox" name="disableFilteringCheckBox">
+        <property name="maximumSize">
+         <size>
+          <width>259</width>
+          <height>16777215</height>
+         </size>
+        </property>
         <property name="acceptDrops">
          <bool>false</bool>
         </property>
         <property name="text">
-         <string>Disable final filtering</string>
+         <string>Disable AA-based filtering</string>
         </property>
         <property name="checkable">
          <bool>true</bool>
@@ -689,7 +695,7 @@ p, li { white-space: pre-wrap; }
       <rect>
        <x>590</x>
        <y>20</y>
-       <width>221</width>
+       <width>234</width>
        <height>25</height>
       </rect>
      </property>
@@ -706,7 +712,7 @@ p, li { white-space: pre-wrap; }
          <bool>false</bool>
         </property>
         <property name="text">
-         <string>Use MS-Deconv score</string>
+         <string>Sort using MS-Deconv score</string>
         </property>
         <property name="checkable">
          <bool>true</bool>
