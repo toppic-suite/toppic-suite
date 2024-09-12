@@ -125,8 +125,10 @@ std::function<void()> geneMsTwoTask(MzmlMsPtr ms_ptr,
 
 }  // namespace deconv_ms2_process
 
-DeconvMs2Process::DeconvMs2Process(TopfdParaPtr topfd_para_ptr) {
+DeconvMs2Process::DeconvMs2Process(TopfdParaPtr topfd_para_ptr, 
+                                   const std::string & output_filename_ext) {
   topfd_para_ptr_ = topfd_para_ptr;
+  output_filename_ext_ = output_filename_ext;
 }
 
 void DeconvMs2Process::prepareFileFolder() {
@@ -182,7 +184,7 @@ void DeconvMs2Process::process() {
   SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(thread_num);
   // init msalign writer vector for multiple threads
   std::string output_base_name = topfd_para_ptr_->getOutputBaseName();
-  std::string ms2_msalign_name = output_base_name + "_ms2.msalign";
+  std::string ms2_msalign_name = output_base_name + "_" + output_filename_ext_; 
   MsAlignWriterPtrVec ms2_writer_ptr_vec;
   for (int i = 0; i < thread_num; i++) {
     MsAlignWriterPtr ms2_ptr = std::make_shared<MsAlignWriter>(
@@ -252,18 +254,17 @@ void DeconvMs2Process::process() {
     ms2_writer_ptr_vec[i] = nullptr;
   }
   // Merge files
-  std::string file_name_ext = "ms2.msalign";
   std::string para_str = topfd_para_ptr_->getParaStr("#", "\t");
   MsalignThreadMergePtr ms2_merge_ptr = std::make_shared<MsalignThreadMerge>(
-      file_name_ext, topfd_para_ptr_->getThreadNum(), file_name_ext,
+      output_filename_ext_, topfd_para_ptr_->getThreadNum(), output_filename_ext_,
       output_base_name, para_str);
   ms2_merge_ptr->process();
 
   // remove tempory files
-  std::string ms1_prefix =
-      file_util::absoluteName(output_base_name) + "_ms2.msalign_";
+  std::string ms2_prefix =
+      file_util::absoluteName(output_base_name) + "_" + output_filename_ext_ + "_";
   std::replace(output_base_name.begin(), output_base_name.end(), '\\', '/');
-  file_util::cleanPrefix(output_base_name, ms1_prefix);
+  file_util::cleanPrefix(output_base_name, ms2_prefix);
   std::cout << std::endl;
 }
 

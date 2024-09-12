@@ -32,7 +32,7 @@ GeneratePseudoSpectrum::GeneratePseudoSpectrum(TopfdParaPtr topfd_para_ptr,
   }
 
   DeconvMsPtrVec deconv_ms2_ptr_vec;
-  std::string ms2_file_name = output_base_name + "_ms2.msalign";
+  std::string ms2_file_name = output_base_name + "_raw_ms2.msalign";
   //std::cout << "Reading ms2 file " << ms2_file_name << std::endl;
   msalign_reader_util::readAllSpectra(ms2_file_name, deconv_ms2_ptr_vec);
 
@@ -107,7 +107,7 @@ void GeneratePseudoSpectrum::process(TopfdParaPtr topfd_para_ptr,
   EnvParaPtr env_para_ptr =
       std::make_shared<EnvPara>(topfd_para_ptr->getMzError());
   std::string output_base_name = topfd_para_ptr->getOutputBaseName();
-  std::string ms2_msalign_name = output_base_name + "_pseudo_ms2.msalign";
+  std::string ms2_msalign_name = output_base_name + "_ms2.msalign";
   std::ofstream output;
   output.open(ms2_msalign_name); 
 

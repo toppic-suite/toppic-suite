@@ -38,7 +38,7 @@ void processOneFileWithFaims(TopfdParaPtr topfd_para_ptr,
                              TopdiaParaPtr topdia_para_ptr) {
   //  print parameter for each file
   std::cout << topdia_para_ptr->getParaStr("", " ", topfd_para_ptr);
-    
+  /*  
   if (!topfd_para_ptr->isMissingLevelOne()) {
     std::cout << "MS1 deconvolution started." << std::endl;
     DeconvMs1ProcessPtr ms1_proc_ptr =
@@ -51,11 +51,11 @@ void processOneFileWithFaims(TopfdParaPtr topfd_para_ptr,
     env_coll_detect::processMs1(topfd_para_ptr);
     std::cout << "MS1 feature detection finished." << std::endl;
   }
-
+  */
   std::cout << "MS/MS deconvolution started." << std::endl;
   topfd_para_ptr->setMissingLevelOne(true);
   DeconvMs2ProcessPtr ms2_proc_ptr =
-      std::make_shared<DeconvMs2Process>(topfd_para_ptr);
+      std::make_shared<DeconvMs2Process>(topfd_para_ptr, "raw_ms2.msalign");
   ms2_proc_ptr->process();
   ms2_proc_ptr = nullptr;
   std::cout << "MS/MS deconvolution finished." << std::endl;
