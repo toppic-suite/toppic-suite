@@ -245,7 +245,7 @@ void processMs2(TopfdParaPtr topfd_para_ptr) {
                                                       
   // read deconvoluted MS2 peaks
   std::string output_base_name = topfd_para_ptr->getOutputBaseName();
-  std::string ms2_file_name = output_base_name + "_raw_ms2.msalign";
+  std::string ms2_file_name = output_base_name + "_ms2_raw.msalign";
   DeconvMsPtrVec deconv_ms2_ptr_vec;
   msalign_reader_util::readAllSpectra(ms2_file_name, deconv_ms2_ptr_vec);
 

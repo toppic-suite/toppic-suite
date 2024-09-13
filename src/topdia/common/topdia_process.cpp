@@ -55,7 +55,7 @@ void processOneFileWithFaims(TopfdParaPtr topfd_para_ptr,
   std::cout << "MS/MS deconvolution started." << std::endl;
   topfd_para_ptr->setMissingLevelOne(true);
   DeconvMs2ProcessPtr ms2_proc_ptr =
-      std::make_shared<DeconvMs2Process>(topfd_para_ptr, "raw_ms2.msalign");
+      std::make_shared<DeconvMs2Process>(topfd_para_ptr, "ms2_raw.msalign");
   ms2_proc_ptr->process();
   ms2_proc_ptr = nullptr;
   std::cout << "MS/MS deconvolution finished." << std::endl;
