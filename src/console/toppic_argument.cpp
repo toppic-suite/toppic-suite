@@ -58,6 +58,7 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["massErrorTolerance"] = "10";
   arguments["proteoformPpmError"] = "false";
   arguments["proteoformErrorTolerance"] = "1.2";
+  arguments["clusterSimilarityCutoff"] = "0.5";
   arguments["cutoffSpectralType"] = "EVALUE";
   arguments["cutoffSpectralValue"] = "0.01";
   arguments["cutoffProteoformType"] = "EVALUE";

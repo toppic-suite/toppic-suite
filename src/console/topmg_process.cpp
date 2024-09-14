@@ -316,12 +316,15 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
 
     if (arguments["useFeatureFile"] == "true") {
       // TopFD msalign file with feature ID
-      ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();
+      double frag_error_tole = prsm_para_ptr->getSpParaPtr()->getPeakTolerancePtr()->getPpo();
+      double cluster_sim_cutoff = std::stod(arguments["clusterSimilarityCutoff"]);
       prsm_feature_cluster::process(sp_file_name,
                                     "topmg_raw_prsm",
                                     "topmg_cluster",
                                     is_proteoform_ppm_error,
-                                    proteoform_error_tole);
+                                    proteoform_error_tole, 
+                                    frag_error_tole,
+                                    cluster_sim_cutoff);
     } 
     else {
       prsm_simple_cluster::process(db_file_name, 

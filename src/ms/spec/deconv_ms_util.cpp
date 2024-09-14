@@ -12,6 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include <algorithm>
+
 #include "ms/spec/peak.hpp"
 #include "ms/spec/ms.hpp"
 #include "ms/spec/deconv_ms_util.hpp"
@@ -23,12 +25,12 @@ namespace deconv_ms_util {
 DeconvMsPtrVec getRefineMsPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, 
                                  double new_prec_mass) {
   DeconvMsPtrVec result_ptrs;
-  for (size_t m = 0; m < deconv_ms_ptr_vec.size(); m++) {
+  for (std::size_t m = 0; m < deconv_ms_ptr_vec.size(); m++) {
     DeconvMsPtr deconv_ms_ptr = deconv_ms_ptr_vec[m];
     MsHeaderPtr ori_header_ptr = deconv_ms_ptr->getMsHeaderPtr();
     MsHeaderPtr header_ptr = MsHeader::geneMsHeaderPtr(ori_header_ptr, new_prec_mass);
     std::vector<DeconvPeakPtr> peak_ptr_list;
-    for (size_t p = 0; p < deconv_ms_ptr->size(); p++) {
+    for (std::size_t p = 0; p < deconv_ms_ptr->size(); p++) {
       DeconvPeakPtr ori_peak_ptr = deconv_ms_ptr->getPeakPtr(p);
       // * is a dereference operator
       DeconvPeakPtr new_peak_ptr = std::make_shared<DeconvPeak>(*ori_peak_ptr.get());
@@ -41,10 +43,10 @@ DeconvMsPtrVec getRefineMsPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
 }
 
 void keepTopPeaks(DeconvMsPtrVec &deconv_ms_ptr_vec, size_t peak_num) {
-  for (size_t m = 0; m < deconv_ms_ptr_vec.size(); m++) {
+  for (std::size_t m = 0; m < deconv_ms_ptr_vec.size(); m++) {
     DeconvMsPtr deconv_ms_ptr = deconv_ms_ptr_vec[m];
     std::vector<DeconvPeakPtr> peak_ptr_list;
-    for (size_t p = 0; p < deconv_ms_ptr->size(); p++) {
+    for (std::size_t p = 0; p < deconv_ms_ptr->size(); p++) {
       if (p >= peak_num) {
         break;
       }
@@ -53,6 +55,67 @@ void keepTopPeaks(DeconvMsPtrVec &deconv_ms_ptr_vec, size_t peak_num) {
     }
     deconv_ms_ptr->setPeakPtrVec(peak_ptr_list);
   }
+}
+
+void log2Transform(DeconvMsPtrVec &deconv_ms_ptr_vec) { 
+  for (std::size_t m = 0; m < deconv_ms_ptr_vec.size(); m++) {
+    DeconvMsPtr deconv_ms_ptr = deconv_ms_ptr_vec[m];
+    for (std::size_t p = 0; p < deconv_ms_ptr->size(); p++) {
+      DeconvPeakPtr peak_ptr = deconv_ms_ptr->getPeakPtr(p);
+      peak_ptr->log2Transform();
+    }
+  }
+}
+
+void vectorNorm(DeconvMsPtrVec &deconv_ms_ptr_vec) { 
+  for (std::size_t m = 0; m < deconv_ms_ptr_vec.size(); m++) {
+    DeconvMsPtr deconv_ms_ptr = deconv_ms_ptr_vec[m];
+    double sum_square = 0;
+    for (std::size_t p = 0; p < deconv_ms_ptr->size(); p++) {
+      double inte = deconv_ms_ptr->getPeakPtr(p)->getIntensity();
+      sum_square = sum_square + (inte * inte);
+    }
+    double vector_len = std::sqrt(sum_square);
+    if (vector_len > 0) {
+      for (std::size_t p = 0; p < deconv_ms_ptr->size(); p++) {
+        double inte = deconv_ms_ptr->getPeakPtr(p)->getIntensity();
+        inte = inte /vector_len; 
+        deconv_ms_ptr->getPeakPtr(p)->setIntensity(inte);
+      }
+    }
+  }
+}
+
+double compDotProd(DeconvMsPtr ms1, DeconvMsPtr ms2, double ppo) {
+  DeconvPeakPtrVec peak_list_1 = ms1->getPeakPtrVec();
+  DeconvPeakPtrVec peak_list_2 = ms2->getPeakPtrVec();
+  std::sort(peak_list_1.begin(), peak_list_1.end(), Peak::cmpPosInc);
+  std::sort(peak_list_2.begin(), peak_list_2.end(), Peak::cmpPosInc);
+  int i = 0; 
+  int j = 0;
+  int len_1 = peak_list_1.size();
+  int len_2 = peak_list_2.size();
+  double dot_prod = 0;
+  while (i < len_1 && j < len_2) { 
+    DeconvPeakPtr peak_1 = peak_list_1[i];
+    DeconvPeakPtr peak_2 = peak_list_2[j];
+    double tol = peak_1->getPosition() * ppo;
+    if (peak_1->getCharge() == peak_2->getCharge() && 
+        std::abs(peak_1->getPosition() - peak_2->getPosition()) <= tol) {
+      dot_prod = dot_prod + peak_1->getIntensity() * peak_2->getIntensity();
+      i++;
+      j++;
+    }
+    else {
+      if (peak_1->getPosition() < peak_2->getPosition()) {
+        i++;
+      }
+      else {
+        j++;
+      }
+    }
+  }
+  return dot_prod;
 }
 
 }  // namespace deconv_ms_util

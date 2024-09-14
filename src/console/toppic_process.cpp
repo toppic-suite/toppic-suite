@@ -407,13 +407,17 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     LOG_DEBUG("form error tole " << proteoform_error_tole);
 
     if (arguments["useFeatureFile"] == "true") {
+      double frag_error_tole = prsm_para_ptr->getSpParaPtr()->getPeakTolerancePtr()->getPpo();
+      double cluster_sim_cutoff = std::stod(arguments["clusterSimilarityCutoff"]);
       // TopFD msalign file with feature ID
       ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();
       prsm_feature_cluster::process(sp_file_name,
                                     "toppic_raw_prsm",
                                     "toppic_cluster",
                                     is_proteoform_ppm_error,
-                                    proteoform_error_tole);
+                                    proteoform_error_tole,
+                                    frag_error_tole, 
+                                    cluster_sim_cutoff);
     } 
     else {
       prsm_simple_cluster::process(db_file_name, sp_file_name,

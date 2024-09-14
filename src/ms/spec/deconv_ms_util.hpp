@@ -26,6 +26,12 @@ DeconvMsPtrVec  getRefineMsPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
 
 void keepTopPeaks(DeconvMsPtrVec &deconv_ms_ptr_vec, size_t peak_num); 
 
+void log2Transform(DeconvMsPtrVec &deconv_ms_ptr_vec); 
+
+void vectorNorm(DeconvMsPtrVec &deconv_ms_ptr_vec);  
+
+double compDotProd(DeconvMsPtr ms1, DeconvMsPtr ms2, double ppo);
+
 }  // namespace deconv_ms_util
 
 }  // namespace toppic

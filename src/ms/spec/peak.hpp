@@ -15,6 +15,7 @@
 #ifndef TOPPIC_MS_SPEC_PEAK_HPP_
 #define TOPPIC_MS_SPEC_PEAK_HPP_
 
+#include <cmath>
 #include <memory>
 #include <vector>
 #include <string>
@@ -47,6 +48,8 @@ class Peak {
   void changeIntensity(double ratio) {intensity_ = intensity_ * ratio;}
 
   void shiftPosition(double shift) {position_ = position_ + shift;}
+
+  void log2Transform() {intensity_ = std::log2(intensity_);}
 
   void appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 

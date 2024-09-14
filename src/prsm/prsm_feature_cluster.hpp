@@ -25,7 +25,9 @@ void process(const std::string &spec_file_name,
              const std::string &input_file_ext,
              const std::string &output_file_ext,
              bool ppm_error_type,
-             double prec_error_tole); 
+             double prec_error_tole, 
+             double frac_error_tole,
+             double cluster_sim_cutoff); 
 
 }
 
