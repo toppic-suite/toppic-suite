@@ -136,6 +136,7 @@ void setProteoClusterId(const std::string &spec_file_name,
         }
         // if two spectra are highly similar to each other
         if (deconv_ms_util::compDotProd(cur_ms_ptr, ref_ms_ptr, frag_error_tole) >= cluster_sim_cutoff) {
+          LOG_ERROR("Merged " << ref_ptr->getSpectrumId() << " "  << ref_ptr->getSeqName() << " " << cur_ptr->getSpectrumId() << " " << cur_ptr->getSeqName() << " dot product " << deconv_ms_util::compDotProd(cur_ms_ptr, ref_ms_ptr, frag_error_tole) );
           is_found = true;
           merged_clusters[j].insert(merged_clusters[j].end(),
                                     clusters[i].begin(), 

@@ -106,7 +106,9 @@ void PrsmMatchTableWriter::write(const std::string &output_file_ext,
   DeconvMsPtrVec deconv_ms_ptr_vec = ms_reader_ptr->getNextMsPtrVec();
   PrsmPtrVec prsm_list;
   int max_proteo_id = -1;
+  int spec_num = 0;
   while (deconv_ms_ptr_vec.size() != 0) {
+    spec_num++;
     MsHeaderPtr header_ptr = deconv_ms_ptr_vec[0]->getMsHeaderPtr();
     if (header_ptr->containsPrec()) {
       double prec_mono_mass = header_ptr->getFirstPrecMonoMass() - sp_para_ptr->getNTermLabelMass();
@@ -134,6 +136,7 @@ void PrsmMatchTableWriter::write(const std::string &output_file_ext,
   }
   prsm_reader.close();
 
+  file << "Number of MS/MS spectra:    " << spec_num << std::endl;
   file << "Number of identified PrSMs: " << prsm_list.size() << std::endl;
   PrsmPtrVec2D prsm_2d; 
   for (size_t i = 0; i < max_proteo_id + 1; i++) {
