@@ -133,8 +133,14 @@ void ToppicArgument::outputArguments(std::ostream &output,
   output << std::setw(gap) << std::left << "Proteoform-level cutoff value:" << sep << arguments["cutoffProteoformValue"] << std::endl;
 
   output << std::setw(gap) << std::left << "Error tolerance for matching masses:" << sep << arguments["massErrorTolerance"] << " ppm" << std::endl;
-  output << std::setw(gap) << std::left << "Error tolerance for identifying PrSM clusters:" << sep << arguments["proteoformErrorTolerance"] 
-      << " Da" << std::endl;
+  if (arguments["proteoformPpmError"] == "false") {
+    output << std::setw(gap) << std::left << "Error tolerance for identifying PrSM clusters:" << sep << arguments["proteoformErrorTolerance"] 
+        << " Da" << std::endl;
+  }
+  else {
+    output << std::setw(gap) << std::left << "Error tolerance for identifying PrSM clusters:" << sep << arguments["proteoformErrorTolerance"] 
+        << " ppm" << std::endl;
+  }
 
   if (arguments["useFeatureFile"] == "true") {
     output << std::setw(gap) << std::left << "Use TopFD feature file:" << sep << "True" << std::endl;
