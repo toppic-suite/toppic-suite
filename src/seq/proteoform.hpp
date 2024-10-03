@@ -18,12 +18,12 @@
 #include "common/base/ptm.hpp"
 #include "common/base/prot_mod.hpp"
 #include "common/base/residue_freq.hpp"
+#include "common/base/proteoform_type.hpp"
 #include "seq/fasta_seq.hpp"
 #include "seq/fasta_index_reader.hpp"
 #include "seq/bp_spec.hpp"
 #include "seq/mass_shift.hpp"
 #include "seq/seq_segment.hpp"
-#include "seq/proteoform_type.hpp"
 
 namespace toppic {
 
@@ -93,6 +93,10 @@ class Proteoform {
   SeqSegmentPtrVec getSeqSegmentPtrVec();
 
   std::string getProteoformMatchSeq();
+
+  std::string getPrevAminoAcid();
+  
+  std::string getNextAminoAcid();
 
   std::string getAlterStr(AlterTypePtr type_ptr);
 

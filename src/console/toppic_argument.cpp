@@ -16,8 +16,9 @@
 
 #include "common/util/file_util.hpp"
 #include "common/xml/xml_dom_util.hpp"
-#include "common/util/str_util.hpp"
 #include "common/base/mod_util.hpp"
+#include "common/util/logger.hpp"
+#include "common/util/str_util.hpp"
 #include "common/util/version.hpp"
 #include "common/util/mem_check.hpp"
 
@@ -42,6 +43,7 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["activation"] = "FILE";
   arguments["fixedMod"] = "";
   arguments["allowProtMod"] = "NONE,NME,NME_ACETYLATION,M_ACETYLATION";
+  arguments["allowProtType"] = "COMPLETE,PREFIX,SUFFIX,INTERNAL";
   arguments["nTermLabelMass"] = "0";
   arguments["useApproxSpectra"]="false";
   arguments["variablePtmNum"] = "3";
@@ -114,6 +116,8 @@ void ToppicArgument::outputArguments(std::ostream &output,
 
   output << std::setw(gap) << std::left << "Allowed N-terminal forms:" << sep <<  arguments["allowProtMod"] << std::endl;
 
+  output << std::setw(gap) << std::left << "Allowed proteoform types:" << sep <<  arguments["allowProtType"] << std::endl;
+
   if (arguments["variablePtmFileName"] != "" && arguments["variablePtmNum"]!="0") {
     output << std::setw(gap) << std::left <<  "Maximum number of variable modifications:" << sep << arguments["variablePtmNum"] << std::endl;
     output << std::setw(gap) << std::left <<  "Use approximate spectra in protein filtering:" << sep << arguments["useApproxSpectra"] << std::endl;
@@ -135,8 +139,14 @@ void ToppicArgument::outputArguments(std::ostream &output,
   output << std::setw(gap) << std::left << "Proteoform-level cutoff value:" << sep << arguments["cutoffProteoformValue"] << std::endl;
 
   output << std::setw(gap) << std::left << "Error tolerance for matching masses:" << sep << arguments["massErrorTolerance"] << " ppm" << std::endl;
-  output << std::setw(gap) << std::left << "Error tolerance for identifying PrSM clusters:" << sep << arguments["proteoformErrorTolerance"] 
+  if (arguments["proteoformPpmError"] == "false") {
+    output << std::setw(gap) << std::left << "Error tolerance for identifying PrSM clusters:" << sep << arguments["proteoformErrorTolerance"] 
       << " Da" << std::endl;
+  }
+  else {
+    output << std::setw(gap) << std::left << "Error tolerance for identifying PrSM clusters:" << sep << arguments["proteoformErrorTolerance"] 
+      << " PPM" << std::endl;
+  }
 
   if (arguments["useFeatureFile"] == "true") {
     output << std::setw(gap) << std::left << "Use TopFD feature file:" << sep << "True" << std::endl;
@@ -197,6 +207,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
   std::string activation = "";
   std::string fixed_mod = "";
   std::string allow_mod = "";
+  std::string allow_prot_type="";
   std::string n_term_label_mass = "";
   std::string variable_ptm_num = "";
   std::string variable_ptm_file_name = "";
@@ -273,6 +284,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         ("mass-error-tolerance,e", po::value<std::string> (&mass_error_tole), "")
         ("proteoform-ppm-error,P", "")
         ("proteoform-error-tolerance,p", po::value<std::string> (&form_error_tole), "")
+        ("proteoform-type,R", po::value<std::string> (&allow_prot_type), "")
         ("spectrum-cutoff-type,t", po::value<std::string> (&cutoff_spectral_type), "")
         ("spectrum-cutoff-value,v", po::value<std::string> (&cutoff_spectral_value), "")
         ("proteoform-cutoff-type,T", po::value<std::string> (&cutoff_proteoform_type), "")
@@ -348,6 +360,10 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
 
     if (vm.count("n-terminal-form")) {
       arguments_["allowProtMod"] = allow_mod;
+    }    
+
+    if (vm.count("proteoform-type")) {
+      arguments_["allowProtType"] = allow_prot_type;
     }    
 
     if (vm.count("n-term-label")) {

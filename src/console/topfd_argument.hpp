@@ -21,7 +21,6 @@
 #include <boost/program_options.hpp> 
 
 #include "topfd/common/topfd_para.hpp"
-#include "common/xml/xml_dom_document.hpp"
 
 namespace toppic {
 
@@ -31,7 +30,6 @@ class Argument {
 
   bool parse(int argc, char* argv[]);
 
-  //std::map<std::string,std::string> getArguments(){ return arguments_;}
   TopfdParaPtr getTopfdParaPtr() {return topfd_para_ptr_;}
 
   std::vector<std::string> getSpecFileList() { return spec_file_list_;};

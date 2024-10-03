@@ -29,7 +29,8 @@ class PtmSearchSlowFilter {
   PtmSearchSlowFilter(SpectrumSetPtr spectrum_set_ptr,
                       SimplePrsmPtrVec simple_prsm_ptrs,
                       PtmSearchMngPtr mng_ptr);
-  PrsmPtrVec getPrsms(int shift_num, ProteoformTypePtr type_ptr);
+  PrsmPtrVec getPrsms(int shift_num, PrsmParaPtr prsm_para_ptr, 
+                      ProteoformTypePtr type_ptr);
 
  private:
   PtmSlowMatchPtrVec complete_prefix_slow_match_ptrs_;

@@ -31,12 +31,12 @@
 namespace toppic {
 
 ECScore::ECScore(EnvCollPtr env_coll_ptr, MsMapPtr matrix_ptr,
-                 int score_id, double sn_ratio) {
+                 double sn_ratio) {
   SeedEnvPtr seed_ptr = env_coll_ptr->getSeedPtr();
   MsMapRowHeaderPtrVec spec_list = matrix_ptr->getHeaderPtrList();
 
   EnvSetPtr env_set_ptr = env_coll_ptr->getSeedEnvSet();
-  score_id_ = score_id;
+  //score_id_ = score_id;
 
   min_scan_ = env_coll_ptr->getStartSpecId();
   max_scan_ = env_coll_ptr->getEndSpecId();

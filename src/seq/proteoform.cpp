@@ -310,16 +310,25 @@ std::string Proteoform::getProteoformMatchSeq() {
   // last break;
   result = result + right_strings[mid_string.length()];
 
-  std::string prefix = "";
+  return result;
+}
+
+std::string Proteoform::getPrevAminoAcid() {
+  StringPairVec string_pairs = fasta_seq_ptr_->getAcidPtmPairVec();
+  std::string prefix = "-";
   if (start_pos_ > 0) {
     prefix = string_pairs[start_pos_-1].first;
   }
-  std::string suffix = "";
+  return prefix;
+}
+
+std::string Proteoform::getNextAminoAcid() {
+  StringPairVec string_pairs = fasta_seq_ptr_->getAcidPtmPairVec();
+  std::string suffix = "-";
   if (end_pos_ < static_cast<int>(string_pairs.size()) - 1) {
     suffix = string_pairs[end_pos_+1].first;
   }
-
-  return prefix + "." + result + "." + suffix;
+  return suffix;
 }
 
 void Proteoform::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {

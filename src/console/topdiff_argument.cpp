@@ -17,7 +17,6 @@
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/str_util.hpp"
-#include "common/xml/xml_dom_util.hpp"
 #include "console/topdiff_argument.hpp"
 #include "common/util/version.hpp"
 

@@ -57,8 +57,8 @@ class SpecFeature {
 
   double getPrecCharge() {return prec_charge_;}
 
-  double getPrecMass() {return peak_util::compPeakNeutralMass(prec_mono_mz_, 
-                                                              prec_charge_);}
+  double getPrecMonoMass() {return peak_util::compPeakNeutralMass(prec_mono_mz_, 
+                                                                  prec_charge_);}
 
   double getPrecInte() {return prec_inte_;}
 

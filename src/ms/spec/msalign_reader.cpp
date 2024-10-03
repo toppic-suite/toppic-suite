@@ -113,7 +113,7 @@ void MsAlignReader::readNext() {
       } else if (strs[0] == "SCANS") {
         scans = strs[1];
       } else if (strs[0] == "RETENTION_TIME") {
-        retention_time = std::stod(strs[1]);
+        retention_time = std::stod(strs[1])*60;
       } else if (strs[0] == "LEVEL") {
         level = std::stoi(strs[1]);
       } else if (strs[0] == "MS_ONE_ID") {

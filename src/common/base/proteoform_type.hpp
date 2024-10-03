@@ -12,11 +12,12 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_SEQ_PROTEOFORM_TYPE_HPP_
-#define TOPPIC_SEQ_PROTEOFORM_TYPE_HPP_
+#ifndef TOPPIC_COMMON_BASE_PROTEOFORM_TYPE_HPP_
+#define TOPPIC_COMMON_BASE_PROTEOFORM_TYPE_HPP_
 
 #include <string>
 #include <memory>
+#include <vector>
 
 namespace toppic {
 
@@ -36,10 +37,14 @@ class ProteoformType {
 
   int getId() {return id_;}
 
+  static ProteoformTypePtr getProtTypePtrByName(std::string name);
+
  private:
   std::string name_;
   int id_;
 };
+
+typedef std::vector<ProteoformTypePtr> ProteoformTypePtrVec;
 
 }  // namespace toppic
 

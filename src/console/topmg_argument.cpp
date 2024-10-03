@@ -13,13 +13,10 @@
 //limitations under the License.
 
 #include <iomanip>
-#include <vector>
-#include <string>
-#include <set>
-#include <map>
+//#include <set>
 
 #include "common/util/file_util.hpp"
-#include "common/xml/xml_dom_util.hpp"
+#include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
 #include "common/base/mod_util.hpp"
 #include "common/util/version.hpp"
@@ -54,6 +51,7 @@ std::map<std::string, std::string> TopmgArgument::initArguments() {
   arguments["cutoffProteoformType"] = "EVALUE";
   arguments["cutoffProteoformValue"] = "0.01";
   arguments["allowProtMod"] = "NONE,NME,NME_ACETYLATION,M_ACETYLATION";
+  arguments["allowProtType"] = "COMPLETE,PREFIX,SUFFIX,INTERNAL";
   arguments["numOfTopPrsms"] = "1";
   arguments["maxShiftMass"] = "500";
   arguments["executiveDir"] = ".";

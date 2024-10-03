@@ -20,13 +20,20 @@
 
 namespace toppic {
 
+class TopfdPara;
+
+typedef std::shared_ptr<TopfdPara> TopfdParaPtr;
+
 class TopfdPara {
  public:
   TopfdPara() {};
   
+  std::string getTopfdParaStr(const std::string &prefix,
+		         const std::string &sep, int gap);
+
   std::string getParaStr(const std::string &prefix,
 		         const std::string &sep);
-
+  
   std::string getExeDir() {return exe_dir_;}
   std::string getResourceDir() {return resource_dir_;}
   bool isMissingLevelOne() {return missing_level_one_;}
@@ -39,18 +46,21 @@ class TopfdPara {
   double getMsTwoSnRatio() {return ms_two_sn_ratio_;}
   double getSplitIntensityRatio() {return split_intensity_ratio_;}
   double getPrecWindowWidth() {return prec_window_;}
-  bool isUseMsDeconv() {return use_msdeconv_;}
-  bool isDoFinalFiltering() {return do_final_filtering_;}
+  bool isSortUseMsDeconv() {return sort_use_msdeconv_;}
+  bool isAANumBasedFilter() {return aa_num_based_filter_;}
+  double getMs2EnvCnnScoreCutoff() {return ms2_env_cnn_score_cutoff_;}
   std::string getActivation() {return activation_;}
   bool isGeneHtmlFolder() {return gene_html_folder_;}
   bool isKeepUnusedPeaks() {return keep_unused_peaks_;}
   bool isOutputMultipleMass() {return output_multiple_mass_;}
   bool isOutputCsvFeatureFile() {return output_csv_feature_file_;}
   int getThreadNum() {return thread_num_;}
-  double getEcscoreCutoff() {return ecscore_cutoff_;}
+  double getMs1EcscoreCutoff() {return ms1_ecscore_cutoff_;}
+  double getMs2EcscoreCutoff() {return ms2_ecscore_cutoff_;}
   bool isSearchPrecWindow() {return search_prec_window_;}
   bool isUseSingleScanNoiseLevel() {return use_single_scan_noise_level_;}
   bool isTextPeakList() {return text_peak_list_;}
+  double getPrecInteCutoffRatio() {return prec_inte_cutoff_ratio_;}
 
   std::string getMzmlFileName() {return mzml_file_name_;}
   std::string getOutputBaseName() {return output_base_name_;}
@@ -63,7 +73,8 @@ class TopfdPara {
   double getFaimsVoltage() {return faims_volt_;}
   int getMs1ScanNum() {return ms_1_scan_num_;}
   int getMs2ScanNum() {return ms_2_scan_num_;}
-  int getMinScanNum() {return min_scan_num_;}
+  int getMs1MinScanNum() {return ms1_min_scan_num_;}
+  int getMs2MinScanNum() {return ms2_min_scan_num_;}
 
   void setExeDir(std::string dir) {exe_dir_ = dir;}
   void setResourceDir(std::string dir) {resource_dir_ = dir;}
@@ -75,18 +86,21 @@ class TopfdPara {
   void setMsTwoSnRatio(double ratio) {ms_two_sn_ratio_ = ratio;}
   void setSplitIntensityRatio(double ratio) {split_intensity_ratio_ = ratio;}
   void setPrecWindowWidth(double window) { prec_window_ = window;}
-  void setUseMsDeconv(bool use) {use_msdeconv_ = use;}
-  void setDoFinalFiltering(bool filtering) {do_final_filtering_ = filtering;}
+  void setSortUseMsDeconv(bool use) {sort_use_msdeconv_ = use;}
+  void setAANumBasedFilter(bool filter) {aa_num_based_filter_ = filter;}
+  void setMs2EnvCnnScoreCutoff(double cutoff) {ms2_env_cnn_score_cutoff_ = cutoff;}
   void setActivation(std::string activation) {activation_ = activation;}
   void setGeneHtmlFolder(bool gene) {gene_html_folder_ = gene;}
   void setKeepUnusedPeaks(bool keep) {keep_unused_peaks_ = keep;}
   void setOutputMultipleMass(bool output) {output_multiple_mass_ = output;}
+  void setOutputCsvFeatureFile(bool output) {output_csv_feature_file_ = output;}
   void setThreadNum(int num) {thread_num_ = num;}
   void setSearchPrecWindow(bool search) {search_prec_window_ = search;}
-  void setUseSingleScanNoiseLevel(bool single_scan_noise)
-  {use_single_scan_noise_level_ = single_scan_noise;}
-  void setEcscoreCutoff(double cutoff) {ecscore_cutoff_ = cutoff;}
-  void setMinScanNum(int min_scan_num) {min_scan_num_ = min_scan_num;}
+  void setUseSingleScanNoiseLevel(bool single_scan_noise) {use_single_scan_noise_level_ = single_scan_noise;}
+  void setMs1EcscoreCutoff(double cutoff) {ms1_ecscore_cutoff_ = cutoff;}
+  void setMs2EcscoreCutoff(double cutoff) {ms2_ecscore_cutoff_ = cutoff;}
+  void setMs1MinScanNum(int min_scan_num) {ms1_min_scan_num_ = min_scan_num;}
+  void setMs2MinScanNum(int min_scan_num) {ms2_min_scan_num_ = min_scan_num;} 
 
   void setFracId(int frac_id) {frac_id_ = frac_id;}
   void setMzmlFileNameAndFaims(std::string &mzml_file_name, bool is_faims, double voltage);
@@ -99,31 +113,46 @@ class TopfdPara {
  private:
   std::string exe_dir_;
   std::string resource_dir_;
+
+  // parameters for deconcovolution 
   int max_charge_ = 30;
   double max_mass_ = 70000;
+  // precursor window is used only when the mzML file does not 
+  // contain the precursor window information
   double prec_window_ = 3.0;
   bool missing_level_one_ = false;
   double mz_error_ = 0.02;
   double ms_one_sn_ratio_ = 3.0;
   double ms_two_sn_ratio_ = 1.0;
-  double split_intensity_ratio_ = 2.5;
-  bool keep_unused_peaks_ = false;
-  bool use_msdeconv_ = false;
-  bool do_final_filtering_ = true;
   int  thread_num_ = 1;
   std::string activation_ = "FILE";
+  // keep unused peaks in dynamic programming
+  bool keep_unused_peaks_ = false;
+  // sorting using msdeconv, the default method is env_cnn score
+  bool sort_use_msdeconv_ = false;
+  double ms2_env_cnn_score_cutoff_ = 0.0;
+  bool aa_num_based_filter_ = true;
+  bool output_csv_feature_file_ = false;
   bool gene_html_folder_ = true;
-  double ecscore_cutoff_ = 0.5;
+
+  // parameters for feature identification
+  double split_intensity_ratio_ = 2.5;
   bool search_prec_window_ = true;
   bool use_single_scan_noise_level_ = false;
-  int min_scan_num_ = 3;
+  double ms1_ecscore_cutoff_ = 0.1;
+  double ms2_ecscore_cutoff_ = 0;
+  int ms1_min_scan_num_ = 1;
+  int ms2_min_scan_num_ = 1;
+
+  // For an MS/MS spectrum, the precursor is not reported if its intensity 
+  // is less than the cutoff ratio * the intensity of the first precusor
+  double prec_inte_cutoff_ratio_ = 0.1;
 
   //** Fixed parameter setting **
   // estimate min intensity using the method in Thrash. 
   bool estimate_min_inte_ = true;
   bool output_multiple_mass_ = false;
   bool output_match_env_ = false;
-  bool output_csv_feature_file_ = false;
 
   //** information for each run **
   int frac_id_ = -1;
@@ -143,7 +172,6 @@ class TopfdPara {
   bool text_peak_list_ = false;
 };
 
-typedef std::shared_ptr<TopfdPara> TopfdParaPtr;
 
 }  // namespace toppic
 

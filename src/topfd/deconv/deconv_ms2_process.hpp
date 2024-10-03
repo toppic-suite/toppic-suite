@@ -26,7 +26,8 @@ namespace toppic {
 
 class DeconvMs2Process {
  public:
-  DeconvMs2Process(TopfdParaPtr topfd_para_ptr);
+  DeconvMs2Process(TopfdParaPtr topfd_para_ptr, 
+                   const std::string &output_filename_ext);
 
   void process();
 
@@ -34,6 +35,7 @@ class DeconvMs2Process {
   TopfdParaPtr topfd_para_ptr_;
   EnvParaPtr env_para_ptr_;
   DpParaPtr dp_para_ptr_;
+  std::string output_filename_ext_;
   
   void prepareFileFolder();
 

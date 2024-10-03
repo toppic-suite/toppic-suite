@@ -209,6 +209,9 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
       use_gf = false;
     }
 
+    // var_ptm_type number is used for E-value computation
+    int var_ptm_type_num = 0;
+
     // index file name
     IndexFileNamePtr file_name_ptr = std::make_shared<IndexFileName>();
     std::string index_file_para = file_name_ptr->geneFileName(arguments);
@@ -229,7 +232,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     msalign_util::geneSpIndex(sp_file_name);
 
     std::vector<std::string> input_exts;
-
+    
     std::cout << "Zero unexpected shift filtering - started." << std::endl;
     ZeroPtmFilterMngPtr zero_filter_mng_ptr
         = std::make_shared<ZeroPtmFilterMng>(prsm_para_ptr, index_file_para, 
@@ -245,14 +248,11 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     zero_search_processor->process();
     zero_search_processor = nullptr;
     std::cout << "Zero unexpected shift search - finished." << std::endl;
-
-    input_exts.push_back("toppic_zero_shift_complete");
-    input_exts.push_back("toppic_zero_shift_prefix");
-    input_exts.push_back("toppic_zero_shift_suffix");
-    input_exts.push_back("toppic_zero_shift_internal");
-
-    // var_ptm_type number is used for E-value computation
-    int var_ptm_type_num = 0;
+    
+    input_exts.push_back("toppic_zero_shift_COMPLETE");
+    input_exts.push_back("toppic_zero_shift_PREFIX");
+    input_exts.push_back("toppic_zero_shift_SUFFIX");
+    input_exts.push_back("toppic_zero_shift_INTERNAL");
 
     if (var_ptm_num >= 1 && var_ptm_file_name != "") {
       std::cout << "Variable PTM filtering - started." << std::endl;
@@ -278,10 +278,10 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
       var_ptm_search_processor->process();
       var_ptm_search_processor = nullptr;
       std::cout << "Variable PTM search - finished." << std::endl;
-      input_exts.push_back("toppic_var_ptm_complete");
-      input_exts.push_back("toppic_var_ptm_prefix");
-      input_exts.push_back("toppic_var_ptm_suffix");
-      input_exts.push_back("toppic_var_ptm_internal");
+      input_exts.push_back("toppic_var_ptm_COMPLETE");
+      input_exts.push_back("toppic_var_ptm_PREFIX");
+      input_exts.push_back("toppic_var_ptm_SUFFIX");
+      input_exts.push_back("toppic_var_ptm_INTERNAL");
     }
 
     if (shift_num >= 1) {
@@ -305,10 +305,10 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
       one_search_processor = nullptr;
       std::cout << "One unexpected shift search - finished." << std::endl;
 
-      input_exts.push_back("toppic_one_shift_complete");
-      input_exts.push_back("toppic_one_shift_prefix");
-      input_exts.push_back("toppic_one_shift_suffix");
-      input_exts.push_back("toppic_one_shift_internal");
+      input_exts.push_back("toppic_one_shift_COMPLETE");
+      input_exts.push_back("toppic_one_shift_PREFIX");
+      input_exts.push_back("toppic_one_shift_SUFFIX");
+      input_exts.push_back("toppic_one_shift_INTERNAL");
     }
 
     if (shift_num >= 2) {
@@ -333,10 +333,10 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
       processor = nullptr;
       std::cout << "Multiple unexpected shifts search - finished." << std::endl;
 
-      input_exts.push_back("toppic_multi_shift_complete_2");
-      input_exts.push_back("toppic_multi_shift_prefix_2");
-      input_exts.push_back("toppic_multi_shift_suffix_2");
-      input_exts.push_back("toppic_multi_shift_internal_2");
+      input_exts.push_back("toppic_multi_shift_COMPLETE_2");
+      input_exts.push_back("toppic_multi_shift_PREFIX_2");
+      input_exts.push_back("toppic_multi_shift_SUFFIX_2");
+      input_exts.push_back("toppic_multi_shift_INTERNAL_2");
     }
 
     std::cout << "Merging PrSMs - started." << std::endl;
@@ -451,13 +451,9 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     if (arguments["outputRawPrsmTable"] == "true"){
       std::cout << "Outputting Raw PrSM table - started." << std::endl;
       PrsmMatchTableWriterPtr raw_table_out
-        = std::make_shared<PrsmMatchTableWriter>(prsm_para_ptr, argu_str, 
-                                                 cur_suffix, "_toppic_raw_prsm_single.tsv", false);
-      raw_table_out->write();
-
-      raw_table_out->setOutputName("_toppic_raw_prsm.tsv");
-      raw_table_out->setWriteMultiMatches(true);
-      raw_table_out->write();
+        = std::make_shared<PrsmMatchTableWriter>(prsm_para_ptr, argu_str, cur_suffix);
+      raw_table_out->write("_toppic_raw_prsm_single.tsv", false);
+      raw_table_out->write("_toppic_raw_prsm.tsv", true);
 
       raw_table_out = nullptr;
       std::cout << "Outputting Raw PrSM table - finished." << std::endl;
@@ -484,12 +480,9 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     std::cout << "Outputting PrSM table - started." << std::endl;
     PrsmMatchTableWriterPtr table_out
         = std::make_shared<PrsmMatchTableWriter>(prsm_para_ptr, argu_str, 
-                                                 cur_suffix, "_toppic_prsm_single.tsv", false);
-    table_out->write();
-
-    table_out->setOutputName("_toppic_prsm.tsv");
-    table_out->setWriteMultiMatches(true);
-    table_out->write();
+                                                 cur_suffix);
+    table_out->write("_toppic_prsm_single.tsv", false);
+    table_out->write("_toppic_prsm.tsv", true);
 
     table_out = nullptr;
     std::cout << "Outputting PrSM table - finished." << std::endl;
@@ -532,14 +525,9 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     std::cout << "Selecting top PrSMs for proteoforms - finished." << std::endl;
     std::cout << "Outputting proteoform table - started." << std::endl;
     PrsmMatchTableWriterPtr form_out
-      = std::make_shared<PrsmMatchTableWriter>(prsm_para_ptr, argu_str,
-                                               "toppic_form_cutoff_form", 
-                                               "_toppic_proteoform_single.tsv", false);
-    form_out->write();
-
-    form_out->setOutputName("_toppic_proteoform.tsv");
-    form_out->setWriteMultiMatches(true);
-    form_out->write();
+      = std::make_shared<PrsmMatchTableWriter>(prsm_para_ptr, argu_str, "toppic_form_cutoff_form");  
+    form_out->write("_toppic_proteoform_single.tsv", false);
+    form_out->write("_toppic_proteoform.tsv", true);
     form_out = nullptr;
     std::cout << "Outputting proteoform table - finished." << std::endl;
 

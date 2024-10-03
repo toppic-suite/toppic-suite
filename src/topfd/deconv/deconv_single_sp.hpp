@@ -28,7 +28,7 @@ class DeconvSingleSp {
                           int ms_level, double max_mass, int max_charge);
   MatchEnvPtrVec deconv();
   
-  void postprocess(MatchEnvPtrVec  &dp_envs);
+  void postprocess(MatchEnvPtrVec  &dp_envs, int ms_level);
 
  private:
   TopfdParaPtr topfd_para_ptr_;
@@ -36,6 +36,7 @@ class DeconvSingleSp {
   DpParaPtr dp_para_ptr_;
   // spectral data
   DeconvDataPtr data_ptr_;
+  int ms_level_;
   // resulting envelopes
   MatchEnvPtrVec result_envs_;
 };

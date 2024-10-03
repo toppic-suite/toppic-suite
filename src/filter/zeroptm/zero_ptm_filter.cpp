@@ -133,61 +133,69 @@ void ZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec) {
   double prec_error_tole = ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecErrorTolerance(tole_ptr->getPpo());
 
   int threshold = MassMatch::getPrecursorMatchScore() * 2 + 4;
-  ProtCandidatePtrVec comp_prots
-    = mass_match_util::simpleFindZeroShiftTopProteins(term_scores, rev_term_scores, 
-                                                      term_index_ptr_, rev_term_index_ptr_,
-                                                      prec_minus_water_mass, prec_error_tole,
-                                                      threshold, mng_ptr_->comp_num_);
-  comp_match_ptrs_.clear();
   int group_spec_num = ms_ptr_vec.size();
-  for (size_t i = 0; i < comp_prots.size(); i++) {
-    int id = comp_prots[i]->getProteinId();
-    comp_match_ptrs_.push_back(std::make_shared<SimplePrsm>(ms_ptr_vec[0]->getMsHeaderPtr(),
-                                                            group_spec_num,
-                                                            proteo_ptrs_[id], 
-                                                            comp_prots[i]));
+  LOG_DEBUG("allow complete prot" << mng_ptr_->prsm_para_ptr_->allowCompleteProt());
+  if (mng_ptr_->prsm_para_ptr_->allowCompleteProt()) {
+    ProtCandidatePtrVec comp_prots
+      = mass_match_util::simpleFindZeroShiftTopProteins(term_scores, rev_term_scores, 
+                                                        term_index_ptr_, rev_term_index_ptr_,
+                                                        prec_minus_water_mass, prec_error_tole,
+                                                        threshold, mng_ptr_->comp_num_);
+    comp_match_ptrs_.clear();
+    for (size_t i = 0; i < comp_prots.size(); i++) {
+      int id = comp_prots[i]->getProteinId();
+      comp_match_ptrs_.push_back(std::make_shared<SimplePrsm>(ms_ptr_vec[0]->getMsHeaderPtr(),
+                                                              group_spec_num,
+                                                              proteo_ptrs_[id], 
+                                                              comp_prots[i]));
+    }
+  }
+  if (mng_ptr_->prsm_para_ptr_->allowPrefixProt()) {
+    ProtCandidatePtrVec pref_prots
+      = mass_match_util::simpleFindZeroShiftTopProteins(term_scores, rev_diag_scores, 
+                                                        term_index_ptr_, rev_diag_index_ptr_,
+                                                        prec_minus_water_mass, prec_error_tole,
+                                                        threshold, mng_ptr_->pref_suff_num_); 
+    pref_match_ptrs_.clear();
+    for (size_t i = 0; i < pref_prots.size(); i++) {
+      int id = pref_prots[i]->getProteinId();
+      pref_match_ptrs_.push_back(std::make_shared<SimplePrsm>(ms_ptr_vec[0]->getMsHeaderPtr(),
+                                                              group_spec_num,
+                                                              proteo_ptrs_[id], 
+                                                              pref_prots[i]));
+    }
   }
 
-  ProtCandidatePtrVec pref_prots
-    = mass_match_util::simpleFindZeroShiftTopProteins(term_scores, rev_diag_scores, 
-                                                      term_index_ptr_, rev_diag_index_ptr_,
-                                                      prec_minus_water_mass, prec_error_tole,
-                                                      threshold, mng_ptr_->pref_suff_num_); 
-  pref_match_ptrs_.clear();
-  for (size_t i = 0; i < pref_prots.size(); i++) {
-    int id = pref_prots[i]->getProteinId();
-    pref_match_ptrs_.push_back(std::make_shared<SimplePrsm>(ms_ptr_vec[0]->getMsHeaderPtr(),
-                                                            group_spec_num,
-                                                            proteo_ptrs_[id], 
-                                                            pref_prots[i]));
+  if (mng_ptr_->prsm_para_ptr_->allowSuffixProt()) {
+    ProtCandidatePtrVec suff_prots
+      = mass_match_util::simpleFindZeroShiftTopProteins(diag_scores, rev_term_scores, 
+                                                        diag_index_ptr_, rev_term_index_ptr_,
+                                                        prec_minus_water_mass, prec_error_tole,
+                                                        threshold, mng_ptr_->pref_suff_num_);
+    suff_match_ptrs_.clear();
+    for (size_t i = 0; i < suff_prots.size(); i++) {
+      int id = suff_prots[i]->getProteinId();
+      suff_match_ptrs_.push_back(std::make_shared<SimplePrsm>(ms_ptr_vec[0]->getMsHeaderPtr(),
+                                                              group_spec_num,
+                                                              proteo_ptrs_[id], 
+                                                              suff_prots[i]));
+    }
   }
 
-  ProtCandidatePtrVec suff_prots
-    = mass_match_util::simpleFindZeroShiftTopProteins(diag_scores, rev_term_scores, 
-                                                      diag_index_ptr_, rev_term_index_ptr_,
-                                                      prec_minus_water_mass, prec_error_tole,
-                                                      threshold, mng_ptr_->pref_suff_num_);
-  suff_match_ptrs_.clear();
-  for (size_t i = 0; i < suff_prots.size(); i++) {
-    int id = suff_prots[i]->getProteinId();
-    suff_match_ptrs_.push_back(std::make_shared<SimplePrsm>(ms_ptr_vec[0]->getMsHeaderPtr(),
-                                                            group_spec_num,
-                                                            proteo_ptrs_[id], 
-                                                            suff_prots[i]));
-  }
-
-  ProtCandidatePtrVec internal_prots
-    = mass_match_util::simpleFindZeroShiftTopProteins(diag_scores, rev_diag_scores, 
-                                                      diag_index_ptr_, rev_diag_index_ptr_,
-                                                      prec_minus_water_mass, prec_error_tole,
-                                                      threshold, mng_ptr_->inte_num_); 
-  internal_match_ptrs_.clear();
-  for (size_t i = 0; i < internal_prots.size(); i++) {
-    int id = internal_prots[i]->getProteinId();
-    internal_match_ptrs_.push_back(std::make_shared<SimplePrsm>(ms_ptr_vec[0]->getMsHeaderPtr(),
-                                                                group_spec_num,
-                                                                proteo_ptrs_[id], 
-                                                                internal_prots[i]));
+  if (mng_ptr_->prsm_para_ptr_->allowInternalProt()) {
+    ProtCandidatePtrVec internal_prots
+      = mass_match_util::simpleFindZeroShiftTopProteins(diag_scores, rev_diag_scores, 
+                                                        diag_index_ptr_, rev_diag_index_ptr_,
+                                                        prec_minus_water_mass, prec_error_tole,
+                                                        threshold, mng_ptr_->inte_num_); 
+    internal_match_ptrs_.clear();
+    for (size_t i = 0; i < internal_prots.size(); i++) {
+      int id = internal_prots[i]->getProteinId();
+      internal_match_ptrs_.push_back(std::make_shared<SimplePrsm>(ms_ptr_vec[0]->getMsHeaderPtr(),
+                                                                  group_spec_num,
+                                                                  proteo_ptrs_[id], 
+                                                                  internal_prots[i]));
+    }
   }
 }
 

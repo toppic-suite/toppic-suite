@@ -25,7 +25,7 @@ namespace toppic {
 class EcscorePara {
  public:
   EcscorePara(int frac_id, const std::string &file_name,
-              TopfdParaPtr para_ptr);
+              int max_charge, int min_scan_num);
 
   double getPeakMzTole() {return peak_mz_tole_;}
 

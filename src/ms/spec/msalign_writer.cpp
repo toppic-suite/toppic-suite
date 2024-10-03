@@ -45,8 +45,8 @@ void MsAlignWriter::writeMs(DeconvMsPtr ms_ptr) {
   output_ << "SPECTRUM_ID=" << header_ptr->getSpecId() << std::endl;
   output_ << "TITLE=" << header_ptr->getTitle() << std::endl;
   output_ << "SCANS=" << header_ptr->getScansString() << std::endl;
-  output_ << "RETENTION_TIME=" << std::fixed << std::setprecision(2)
-      << header_ptr->getRetentionTime() << std::endl;
+  output_ << "RETENTION_TIME=" << std::fixed << std::setprecision(3)
+      << header_ptr->getRetentionTime()/60 << std::endl;
   output_ << "LEVEL=" << header_ptr->getMsLevel() << std::endl;
 
   if (header_ptr->getMsLevel() > 1) {
@@ -94,6 +94,7 @@ void MsAlignWriter::writeMs(DeconvMsPtr ms_ptr) {
       if (i < prec_ptrs.size() - 1) {output_ << ":";}
     }
     output_ << std::endl;
+    output_ << "DECONVOLUTED_MASS_NUMBER=" << ms_ptr->size() << std::endl;
   }
   for (size_t i = 0; i < ms_ptr->size(); i++) {
     DeconvPeakPtr peak_ptr = ms_ptr->getPeakPtr(i);

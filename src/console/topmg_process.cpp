@@ -215,10 +215,10 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
     one_ptm_filter_processor::process(one_ptm_filter_mng_ptr);
     std::cout << "ASF-One PTM filtering - finished." << std::endl;
 
-    input_exts.push_back("topmg_one_filter_complete");
-    input_exts.push_back("topmg_one_filter_prefix");
-    input_exts.push_back("topmg_one_filter_suffix");
-    input_exts.push_back("topmg_one_filter_internal");
+    input_exts.push_back("topmg_one_filter_COMPLETE");
+    input_exts.push_back("topmg_one_filter_PREFIX");
+    input_exts.push_back("topmg_one_filter_SUFFIX");
+    input_exts.push_back("topmg_one_filter_INTERNAL");
 
 
     if (arguments["useAsfDiag"] == "true") {
@@ -360,12 +360,9 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
 
     std::cout << "Outputting PrSM table - started." << std::endl;
     PrsmMatchTableWriterPtr table_out
-        = std::make_shared<PrsmMatchTableWriter>(prsm_para_ptr, argu_str, "topmg_prsm_cutoff", "_topmg_prsm_single.tsv", false);
-    table_out->write();
-
-    table_out->setOutputName("_topmg_prsm.tsv");
-    table_out->setWriteMultiMatches(true);
-    table_out->write();
+        = std::make_shared<PrsmMatchTableWriter>(prsm_para_ptr, argu_str, "topmg_prsm_cutoff"); 
+    table_out->write("_topmg_prsm_single.tsv", false);
+    table_out->write("_topmg_prsm.tsv", true);
     table_out = nullptr;
     std::cout << "Outputting PrSM table - finished." << std::endl;
 
@@ -399,13 +396,9 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
     std::cout << "Outputting proteoform table - started." << std::endl;
     PrsmMatchTableWriterPtr form_out
         = std::make_shared<PrsmMatchTableWriter>(prsm_para_ptr, argu_str,
-                                            "topmg_form_cutoff_form", 
-                                            "_topmg_proteoform_single.tsv", false);
-    form_out->write();
-
-    form_out->setOutputName("_topmg_proteoform.tsv");
-    form_out->setWriteMultiMatches(true);
-    form_out->write();
+                                            "topmg_form_cutoff_form");
+    form_out->write("_topmg_proteoform_single.tsv", false);
+    form_out->write("_topmg_proteoform.tsv", true);
 
     form_out = nullptr;
     std::cout << "Outputting proteoform table - finished." << std::endl;

@@ -20,6 +20,7 @@
 
 #include "common/base/mod.hpp"
 #include "common/base/prot_mod.hpp"
+#include "common/base/proteoform_type.hpp"
 #include "para/sp_para.hpp"
 
 namespace toppic {
@@ -46,6 +47,16 @@ class PrsmPara {
 
   SpParaPtr getSpParaPtr() {return sp_para_ptr_;}
 
+  bool allowProtType(ProteoformTypePtr type_ptr); 
+
+  bool allowCompleteProt() {return allowProtType(ProteoformType::COMPLETE);}
+
+  bool allowPrefixProt() {return allowProtType(ProteoformType::PREFIX);}
+
+  bool allowSuffixProt() {return allowProtType(ProteoformType::SUFFIX);}
+
+  bool allowInternalProt() {return allowProtType(ProteoformType::INTERNAL);}
+
  private:
   std::string ori_db_name_;
 
@@ -60,6 +71,8 @@ class PrsmPara {
   ModPtrVec fix_mod_list_;
 
   ProtModPtrVec prot_mod_list_;
+
+  ProteoformTypePtrVec prot_type_list_;
 
   int group_spec_num_;
 

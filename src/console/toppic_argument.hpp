@@ -16,19 +16,10 @@
 #define TOPPIC_TOPPIC_ARGUMENT_HPP_
 
 #include <map>
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <algorithm>
-#include <memory>
 #include <vector>
 #include <string>
 
 #include "boost/program_options.hpp" 
-
-#include "common/util/logger.hpp"
-#include "common/xml/xml_dom_document.hpp"
-#include "common/util/str_util.hpp"
 
 namespace toppic {
 
@@ -37,8 +28,8 @@ class ToppicArgument {
   ToppicArgument();
 
   static void outputArguments(std::ostream &output, 
-		  	      const std::string &sep,
-                              std::map<std::string, std::string> arguments);
+      const std::string &sep,
+      std::map<std::string, std::string> arguments);
 
   static std::string outputTsvArguments(std::map<std::string, std::string> arguments);
 

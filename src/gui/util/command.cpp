@@ -41,12 +41,11 @@ std::string geneTopfdCommand(TopfdParaPtr para_ptr,
   oss << "-e " << para_ptr->getMzError() << " ";
   oss << "-r " << para_ptr->getMsOneSnRatio() << " ";
   oss << "-s " << para_ptr->getMsTwoSnRatio() << " ";
-  oss << "-l " << para_ptr->getSplitIntensityRatio() << " ";
   oss << "-w " << para_ptr->getPrecWindowWidth() << " ";
-  oss << "-t " << para_ptr->getEcscoreCutoff() << " ";
-  oss << "-b " << para_ptr->getMinScanNum() << " ";
+  oss << "-t " << para_ptr->getMs1EcscoreCutoff() << " ";
+  oss << "-b " << para_ptr->getMs1MinScanNum() << " ";
   command = command + oss.str();
-  if (para_ptr->isUseMsDeconv()) {
+  if (para_ptr->isSortUseMsDeconv()) {
     command = command + "-n ";
   }
   if (para_ptr->isMissingLevelOne()) {
@@ -56,7 +55,7 @@ std::string geneTopfdCommand(TopfdParaPtr para_ptr,
   if (!para_ptr->isGeneHtmlFolder()) {
     command = command + "-g ";
   }
-  if (!para_ptr->isDoFinalFiltering()) {
+  if (!para_ptr->isAANumBasedFilter()) {
     command = command + "-d ";
   }
   if (para_ptr->isSearchPrecWindow()) {
@@ -69,6 +68,57 @@ std::string geneTopfdCommand(TopfdParaPtr para_ptr,
     command = command + spec_file_lst[i] + " ";
   }
   return command;
+}
+
+/*function for topdia*/
+std::string geneTopdiaCommand(TopfdParaPtr topfd_para_ptr, 
+                              TopdiaParaPtr topdia_para_ptr,
+                              const std::vector<std::string> spec_file_lst) {
+
+#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
+        std::string exe_path = topfd_para_ptr->getExeDir() + "\\" + "topdia.exe ";
+#else
+        std::string exe_path = topfd_para_ptr->getExeDir() + "/" + "topdia ";
+#endif
+
+    std::string command = exe_path;
+    std::stringstream oss;
+    oss << "-a " << topfd_para_ptr->getActivation() << " ";
+    oss << "-c " << topfd_para_ptr->getMaxCharge() << " ";
+    oss << "-m " << topfd_para_ptr->getMaxMass() << " ";
+    oss << "-e " << topfd_para_ptr->getMzError() << " ";
+    oss << "-r " << topfd_para_ptr->getMsOneSnRatio() << " ";
+    oss << "-s " << topfd_para_ptr->getMsTwoSnRatio() << " ";
+    oss << "-w " << topfd_para_ptr->getPrecWindowWidth() << " ";
+    oss << "-t " << topfd_para_ptr->getMs1EcscoreCutoff() << " ";
+    oss << "-T " << topfd_para_ptr->getMs2EcscoreCutoff() << " ";
+    oss << "-b " << topfd_para_ptr->getMs1MinScanNum() << " ";
+    oss << "-B " << topfd_para_ptr->getMs2MinScanNum() << " ";
+    oss << "-v " << topdia_para_ptr->getPseudoScoreCutoff() << " ";
+    oss << "-V " << topdia_para_ptr->getPseudoMinPeaks() << " ";
+    oss << "-p " << topdia_para_ptr->getMs1SeedEnvInteCorrToleCutoff() << " ";
+    oss << "-P " << topdia_para_ptr->getMs2SeedEnvInteCorrToleCutoff() << " ";
+    command = command + oss.str();
+    if (topfd_para_ptr->isSortUseMsDeconv()) {
+        command = command + "-n ";
+    }
+    if (topfd_para_ptr->isMissingLevelOne()) {
+        command = command + "-o ";
+    }
+    command = command + "-u " + std::to_string(topfd_para_ptr->getThreadNum()) + " ";
+    if (!topfd_para_ptr->isGeneHtmlFolder()) {
+        command = command + "-g ";
+    }
+    if (!topfd_para_ptr->isAANumBasedFilter()) {
+        command = command + "-d ";
+    }
+    if (topfd_para_ptr->isUseSingleScanNoiseLevel()) {
+        command = command + "-i ";
+    }
+    for (size_t i = 0; i < spec_file_lst.size(); i++) {
+        command = command + spec_file_lst[i] + " ";
+    }
+    return command;
 }
 
 std::map<std::string, std::string> topindex_para {

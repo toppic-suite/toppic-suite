@@ -21,7 +21,9 @@ namespace toppic {
 
 namespace env_coll_detect {
 
-void process(TopfdParaPtr para_ptr);
+void processMs1(TopfdParaPtr para_ptr);
+
+void processMs2(TopfdParaPtr topfd_para_ptr); 
 
 }
 

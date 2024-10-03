@@ -25,36 +25,31 @@ class PrsmMatchTableWriter {
  public:
   PrsmMatchTableWriter(PrsmParaPtr prsm_para_ptr,  
                        std::string argu_str,
-                       const std::string &input_file_ext, 
-                       const std::string &output_file_ext,
-                       bool write_multiple_matches);
+                       const std::string &input_file_ext); 
 
-  void write();
-
-  void writePrsm(std::ofstream &file, PrsmPtr prsm_ptr);
-  void writePrsmStandardFormat(std::ofstream &file, PrsmPtr prsm_ptr);
-  std::string formatSeq(std::string seq);
-
-  void setOutputName(std::string output_file_ext) {output_file_ext_ = output_file_ext;}
-
-  void setWriteMultiMatches(bool write_multiple_matches) {write_multiple_matches_ = write_multiple_matches;}
+  void write(const std::string &output_file_ext, bool write_multiple_matches);
 
   void setOutputName(std::string output_file_ext) {output_file_ext_ = output_file_ext;}
 
   void setWriteMultiMatches(bool write_multiple_matches) {write_multiple_matches_ = write_multiple_matches;}
 
  private:
+
+  std::string formatSeq(std::string seq);
+
+  void writeHeader(std::ofstream &file);
+
+  void writePrsmStandardFormat(std::ofstream &file, PrsmPtr prsm_ptr, 
+                               bool write_multiple_matches);
+
   PrsmParaPtr prsm_para_ptr_;
 
   std::string input_file_ext_;
 
   std::string argu_str_;
 
-  std::string output_file_ext_;
-
   SearchFastaMatchPtr search_match_ptr_;
 
-  bool write_multiple_matches_;
 };
 
 typedef std::shared_ptr<PrsmMatchTableWriter> PrsmMatchTableWriterPtr;

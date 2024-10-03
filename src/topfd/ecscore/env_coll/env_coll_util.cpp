@@ -41,6 +41,7 @@ EnvCollPtr getEnvCollPtr(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
   while (charge >= para_ptr->para_min_charge_) {
     SeedEnvPtr cur_seed_ptr = std::make_shared<SeedEnv>(seed_ptr, charge);
     EnvSetPtr env_set_ptr = env_set_util::searchEnvSet(matrix_ptr, cur_seed_ptr,
+                                                       cur_seed_ptr->getSpecId(),
                                                        start_spec_id, end_spec_id,
                                                        para_ptr, sn_ratio);
     if (env_set_ptr == nullptr) {
@@ -66,8 +67,9 @@ EnvCollPtr getEnvCollPtr(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
   while (charge <= para_ptr->para_max_charge_) {
     SeedEnvPtr cur_seed_ptr = std::make_shared<SeedEnv>(seed_ptr, charge);
     EnvSetPtr env_set_ptr = env_set_util::searchEnvSet(matrix_ptr, cur_seed_ptr,
-                                                      start_spec_id, end_spec_id,
-                                                      para_ptr, sn_ratio);
+                                                       cur_seed_ptr->getSpecId(), 
+                                                       start_spec_id, end_spec_id,
+                                                       para_ptr, sn_ratio);
     charge = charge + 1;
     if (env_set_ptr == nullptr) {
       miss_num = miss_num + 1;
@@ -193,7 +195,7 @@ bool checkOverlap(MsMapRowHeaderPtrVec &spectrum_list, EnvCollPtr coll_ptr,
 }
 
 bool checkExistingFeatures(MsMapPtr matrix_ptr, EnvCollPtr env_coll_ptr,
-                           EnvCollPtrVec &env_coll_list, EcscoreParaPtr para_ptr) {
+                           EnvCollPtrVec &env_coll_list, EcscoreParaPtr para_ptr, double sn_ratio) {
   double env_mass = env_coll_ptr->getMonoNeutralMass();
   double mass_tol = para_ptr->match_feature_ppm_tolerance_ * env_mass;
   std::vector<int> charge_states = env_coll_ptr->getChargeList();
@@ -225,12 +227,27 @@ bool checkExistingFeatures(MsMapPtr matrix_ptr, EnvCollPtr env_coll_ptr,
   }
 
   if (overlap_env_coll_ptr != nullptr) {
-    /* The function is buggy and needs to be rewritten. 
+    int merge_start_spec_id = overlap_env_coll_ptr->getStartSpecId();
+    if (merge_start_spec_id > start_spec_id) {
+      merge_start_spec_id = start_spec_id;
+    }
+    int merge_end_spec_id = overlap_env_coll_ptr->getEndSpecId();
+    if (merge_end_spec_id < end_spec_id) {
+      merge_end_spec_id = end_spec_id;
+    }
+    SeedEnvPtr seed_ptr = overlap_env_coll_ptr->getSeedPtr();
     EnvSetPtrVec new_set_ptrs = env_coll_ptr->getEnvSetList();
     for (size_t i = 0; i < new_set_ptrs.size(); i++) {
-      overlap_env_coll_ptr->mergeEnvSet(new_set_ptrs[i]);
+      int charge = new_set_ptrs[i]->getCharge();
+      SeedEnvPtr cur_seed_ptr = std::make_shared<SeedEnv>(seed_ptr, charge);
+      EnvSetPtr env_set_ptr = env_set_util::searchEnvSet(matrix_ptr, cur_seed_ptr,
+                                                         cur_seed_ptr->getSpecId(),
+                                                         merge_start_spec_id, merge_end_spec_id,
+                                                         para_ptr, sn_ratio);  
+      if (env_set_ptr != nullptr) {
+        overlap_env_coll_ptr->mergeEnvSet(env_set_ptr);
+      }
     }
-    */
     return true;
   }
   else {
@@ -280,9 +297,14 @@ FracFeaturePtr getFracFeature(int feat_id, DeconvMsPtrVec &ms1_ptr_vec, int frac
     double inte = es->getInte();
     int env_num = es->countEnvNum();
     int charge = es->getCharge();
-    SingleChargeFeaturePtr single_feature = std::make_shared<SingleChargeFeature>(charge, time_begin, time_end,
-                                                                                  scan_begin, scan_end,
-                                                                                  inte, env_num);
+    std::vector<double> xic = es->getXicPtr()->getAllPeakInteList();
+    std::vector<double> aggregateEnvelopeInte = es->compAggrEnvInteList();
+    std::vector<double> envelopeMass = es->getSeedPtr()->getMzList();
+    SingleChargeFeaturePtr single_feature =
+        std::make_shared<SingleChargeFeature>(
+            charge, time_begin, time_end, scan_begin, scan_end, inte, env_num,
+            id_begin, id_end, feat_mass, xic, envelopeMass,
+            aggregateEnvelopeInte);
     single_features.push_back(single_feature);
   }
   feature_ptr->setSingleFeatures(single_features);

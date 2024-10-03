@@ -116,12 +116,12 @@ void TopFDDialog::on_defaultButton_clicked() {
   ui->splitRatioEdit->setText(QString::number(para_ptr->getSplitIntensityRatio()));
   ui->windowSizeEdit->setText(QString::number(para_ptr->getPrecWindowWidth()));
   ui->threadNumberEdit->setText(QString::number(para_ptr->getThreadNum()));
-  ui->ecscoreCutoffEdit->setText(QString::number(para_ptr->getEcscoreCutoff()));
-  ui->minScanNumEdit->setText(QString::number(para_ptr->getMinScanNum()));
-  ui->msDeconvCheckBox->setChecked(para_ptr->isUseMsDeconv());
+  ui->ecscoreCutoffEdit->setText(QString::number(para_ptr->getMs1EcscoreCutoff()));
+  ui->minScanNumEdit->setText(QString::number(para_ptr->getMs1MinScanNum()));
+  ui->msDeconvCheckBox->setChecked(para_ptr->isSortUseMsDeconv());
   ui->missLevelOneCheckBox->setChecked(para_ptr->isMissingLevelOne());
   ui->geneHTMLCheckBox->setChecked(para_ptr->isGeneHtmlFolder());
-  ui->disableFilteringCheckBox->setChecked(!para_ptr->isDoFinalFiltering());
+  ui->disableFilteringCheckBox->setChecked(!para_ptr->isAANumBasedFilter());
   ui->disableAdditionalFeatureSearchCheckBox->setChecked(!para_ptr->isSearchPrecWindow());
   ui->singleScanNoiseLevelCheckBox->setChecked(para_ptr->isUseSingleScanNoiseLevel());
 
@@ -279,13 +279,13 @@ toppic::TopfdParaPtr TopFDDialog::getParaPtr() {
   para_ptr_->setSplitIntensityRatio(std::stod(ui->splitRatioEdit->text().toStdString()));
   para_ptr_->setPrecWindowWidth(std::stod(ui->windowSizeEdit->text().toStdString()));
   para_ptr_->setMissingLevelOne(ui->missLevelOneCheckBox->isChecked()); 
-  para_ptr_->setEcscoreCutoff(std::stod(ui->ecscoreCutoffEdit->text().toStdString()));
-  para_ptr_->setMinScanNum(std::stoi(ui->minScanNumEdit->text().toStdString()));
+  para_ptr_->setMs1EcscoreCutoff(std::stod(ui->ecscoreCutoffEdit->text().toStdString()));
+  para_ptr_->setMs1MinScanNum(std::stoi(ui->minScanNumEdit->text().toStdString()));
   para_ptr_->setThreadNum(std::stoi(ui->threadNumberEdit->text().toStdString()));
   para_ptr_->setGeneHtmlFolder(ui->geneHTMLCheckBox->isChecked());
-  para_ptr_->setUseMsDeconv(ui->msDeconvCheckBox->isChecked());
+  para_ptr_->setSortUseMsDeconv(ui->msDeconvCheckBox->isChecked());
   para_ptr_->setActivation(ui->activationComboBox->currentText().toStdString());
-  para_ptr_->setDoFinalFiltering(!(ui->disableFilteringCheckBox->isChecked()));
+  para_ptr_->setAANumBasedFilter(!(ui->disableFilteringCheckBox->isChecked()));
 
   para_ptr_->setSearchPrecWindow((ui->disableAdditionalFeatureSearchCheckBox->isChecked()));
   para_ptr_->setUseSingleScanNoiseLevel(ui->singleScanNoiseLevelCheckBox->isChecked());
