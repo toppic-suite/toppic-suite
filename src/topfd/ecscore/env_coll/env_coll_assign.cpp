@@ -58,8 +58,7 @@ bool checkEnvColl(MsHeaderPtr header_ptr, EnvCollPtrVec &env_coll_list) {
         continue;
       }
       // get intensity information
-      std::vector<double> env_intes = env_set_ptr->getXicPtr()->getAllPeakInteList();
-      if (env_intes.size() == 0) {
+      if (env_set_ptr->getSeedPtr()->getPeakNum() == 0) {
         LOG_WARN("Empty envelope intensity list!");
         continue; 
       }
@@ -95,7 +94,6 @@ bool getHighestInteEnvColl(FracFeaturePtrVec &frac_features, EnvCollPtrVec &env_
       EnvSetPtr env_set_ptr = env_sets[env_set_id];
       double mz = peak_util::compMz(feature_avg_mass, env_set_ptr->getCharge());
       // check precsor window
-      // this part needs to be improved to consider only peaks in the window
       if (mz < prec_win_bgn || mz > prec_win_end) {
         continue;
       }
@@ -106,16 +104,18 @@ bool getHighestInteEnvColl(FracFeaturePtrVec &frac_features, EnvCollPtrVec &env_
       }
       // get intensity information
       int inte_idx = ms1_id - env_set_ptr->getStartSpecId();
-      std::vector<double> env_intes = env_set_ptr->getXicPtr()->getAllPeakInteList();
-      if (env_intes.size() == 0) {
+      if (env_set_ptr->getSeedPtr()->getPeakNum() == 0) {
         LOG_WARN("Empty envelope intensity list!");
         continue; 
       }
 
       int prec_charge = env_set_ptr->getCharge();
       double prec_mono_mz = peak_util::compMz(feature_mono_mass, prec_charge);
-      double prec_avg_mz = peak_util::compMz(feature_avg_mass, prec_charge); 
-      double prec_inte = env_intes[inte_idx];
+      double prec_avg_mz = peak_util::compMz(feature_avg_mass, prec_charge);
+      // Considers only peaks in the window
+      // Same calculation method as in EnvSet::initMedianXic() with window part added
+      double ratio = env_set_ptr->getXicPtr()->getInteRatio(inte_idx);
+      double prec_inte = env_set_ptr->getSeedPtr()->compScaledInteSumBounded(ratio, env_set_ptr->getMinInte(), prec_win_bgn, prec_win_end);
       if (prec_inte < 0) {
         prec_inte = 0;
       }

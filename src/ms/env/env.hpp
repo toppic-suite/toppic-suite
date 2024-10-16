@@ -100,6 +100,8 @@ class Env {
 
   double compScaledInteSum(double scale_factor, double min_inte);
 
+  double compScaledInteSumBounded(double scale_factor, double min_inte, double win_bgn, double win_end);
+
   double compTopThreeInteSum();
 
   int getCharge() {return charge_;}
