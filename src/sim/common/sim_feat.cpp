@@ -34,13 +34,37 @@
 #include "topfd/ecscore/score/ecscore.hpp"
 #include "topfd/ecscore/score/ecscore_writer.hpp"
 #include "topfd/ecscore/env_coll/env_coll_assign.hpp"
-#include "topfd/ecscore/env_coll/env_coll_detect.hpp"
+#include "sim/png/pngwriter.hpp"
 
 namespace toppic {
 
 namespace sim_feat {
 
+void writepng(std::string png_file_name) {
+  const int width = 640;
+  const int height = 480;
+
+  pngwriter png(width, height, 65535, png_file_name.c_str());
+
+  // Draw a red line
+  for (int x = 0; x < width; ++x) {
+    png.plot(x, height / 2, 255, 0, 0);
+  }
+
+  // Draw a blue circle
+  for (int i = 0; i < 360; ++i) {
+    double angle = i * 3.14159 / 180;
+    int x = width / 2 + 100 * cos(angle);
+    int y = height / 2 + 100 * sin(angle);
+    png.plot(x, y, 0, 0, 255);
+  }
+
+  png.close();
+}
+
 void processMs1(TopfdParaPtr topfd_para_ptr) {
+  writepng("test.png");
+  return;
   if (topfd_para_ptr->isMissingLevelOne()) {
     return;
   }
