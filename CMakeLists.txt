@@ -304,7 +304,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   target_link_libraries(topdiff boost_program_options
     boost_thread xerces-c z)
 
-	target_link_libraries(topsim boost_chrono boost_filesystem boost_program_options 
+	target_link_libraries(topsim png freetype boost_chrono boost_filesystem boost_program_options 
     boost_iostreams boost_thread xerces-c z onnxruntime)
 
 	target_link_libraries(topdia boost_chrono boost_filesystem boost_program_options 
