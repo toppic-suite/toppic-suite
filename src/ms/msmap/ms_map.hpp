@@ -42,6 +42,8 @@ class MsMap {
 
   MsMapRowHeaderPtrVec getHeaderPtrList();
 
+  MsMapPeakPtr2D get2DPeaks() {return peaks_;}
+
   void removeNonNeighbors(double mass_tol);
 
   int getColIndex(double mz);
