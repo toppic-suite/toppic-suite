@@ -40,14 +40,16 @@ namespace toppic {
 
 namespace sim_feat {
 
-void writepng(EnvSetPtr env_set_ptr, std::string png_file_name) {
-  int scale =  10;
+void writepng(MsMapPtr map_ptr, EnvSetPtr env_set_ptr, std::string png_file_name) {
+  int scale =  100;
   int width = 500;
   int height = 1400;
   int center = 250;
 
-  pngwriter png(width, height, 1.0, png_file_name.c_str());
+  double mz_win_size = 5.0;
 
+  pngwriter png(width, height, 1.0, png_file_name.c_str());
+  /* Add envelope feature*/
   int start_spec_id = env_set_ptr->getStartSpecId();
   int end_spec_id = env_set_ptr->getEndSpecId();
   SeedEnvPtr seed_env = env_set_ptr->getSeedPtr(); 
@@ -57,16 +59,47 @@ void writepng(EnvSetPtr env_set_ptr, std::string png_file_name) {
   int ref_idx = seed_env->getReferIdx();
   EnvPeakPtr ref_peak = peak_list[ref_idx];
   double ref_inte = ref_peak->getIntensity();
+  double ref_mz = ref_peak->getPosition();
+  double left_mz = ref_mz - mz_win_size/2.0;
+  double right_mz = ref_mz + mz_win_size/2.0;
   std::vector<double> xic_list = env_set_ptr->getXicPtr()->getTopThreeInteList();
   double max_xic = *std::max_element(xic_list.begin(), xic_list.end());
 
+  /* add backgroud */
+  double max_inte = 0;
+  MsMapPeakPtr2D peak_2d_list = map_ptr->get2DPeaks();
+  for (size_t i = 0; i < peak_2d_list.size(); i++) {
+    for (size_t j = 0; j < peak_2d_list[i].size(); j++) {
+      MsMapPeakPtr peak = peak_2d_list[i][j];
+      double peak_pos = peak->getPosition();
+      if (peak_pos >= left_mz && peak_pos < right_mz && peak->getIntensity() > max_inte) {
+        max_inte = peak->getIntensity();
+      }
+    }
+  }
+
+
+  for (size_t i = 0; i < peak_2d_list.size(); i++) {
+    for (size_t j = 0; j < peak_2d_list[i].size(); j++) {
+      MsMapPeakPtr peak = peak_2d_list[i][j];
+      double peak_pos = peak->getPosition();
+      if (peak_pos >= left_mz && peak_pos < right_mz) {
+        int x = (peak_pos - ref_mz)*scale + center;
+        int y = i;
+        double inte = peak->getIntensity() / max_inte;
+        png.plot(x, y, inte, 0.0, 0.0);
+      }
+    }
+  }
+
+  int shift = 200;
   for (int spec_id = start_spec_id; spec_id < end_spec_id; spec_id++) {
     double xic = xic_list[spec_id-start_spec_id]/max_xic;
     std::cout << "spec id " << spec_id << " xic " << xic << std::endl;
     for (size_t i = 0; i < peak_list.size(); i++) {
       EnvPeakPtr peak = peak_list[i];
       int x = (peak->getPosition() - ref_peak->getPosition())*scale + center;
-      int y = spec_id; 
+      int y = spec_id + shift; 
       double inte = peak->getIntensity() * xic/ref_inte;
       std::cout << "x: " << x << " y: " << y << " intensity: " << inte << " peak intensity " << peak->getIntensity() << std::endl;
       if (inte >= min_inte)  {
@@ -279,7 +312,7 @@ void processMs1(TopfdParaPtr topfd_para_ptr) {
       EnvSetPtr env_set_ptr = env_set_list[j];
       if (env_set_ptr != nullptr) {
         std::string png_file_name = "test_"+ std::to_string(i) + "_" + std::to_string(j) + ".jpg";
-        writepng(env_set_ptr, png_file_name); 
+        writepng(sim_matrix_ptr, env_set_ptr, png_file_name); 
       }
     }
   }
