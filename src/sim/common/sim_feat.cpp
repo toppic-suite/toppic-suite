@@ -40,31 +40,44 @@ namespace toppic {
 
 namespace sim_feat {
 
-void writepng(std::string png_file_name) {
-  const int width = 640;
-  const int height = 480;
+void writepng(EnvSetPtr env_set_ptr, std::string png_file_name) {
+  int scale =  10;
+  int width = 500;
+  int height = 1400;
+  int center = 250;
 
-  pngwriter png(width, height, 65535, png_file_name.c_str());
+  pngwriter png(width, height, 1.0, png_file_name.c_str());
 
-  // Draw a red line
-  for (int x = 0; x < width; ++x) {
-    png.plot(x, height / 2, 255, 0, 0);
+  int start_spec_id = env_set_ptr->getStartSpecId();
+  int end_spec_id = env_set_ptr->getEndSpecId();
+  SeedEnvPtr seed_env = env_set_ptr->getSeedPtr(); 
+  double ratio = 1;
+  double min_inte = 0.1;
+  EnvPeakPtrVec peak_list = seed_env->getScaledPeakPtrList(ratio, 0.0001);
+  int ref_idx = seed_env->getReferIdx();
+  EnvPeakPtr ref_peak = peak_list[ref_idx];
+  double ref_inte = ref_peak->getIntensity();
+  std::vector<double> xic_list = env_set_ptr->getXicPtr()->getTopThreeInteList();
+  double max_xic = *std::max_element(xic_list.begin(), xic_list.end());
+
+  for (int spec_id = start_spec_id; spec_id < end_spec_id; spec_id++) {
+    double xic = xic_list[spec_id-start_spec_id]/max_xic;
+    std::cout << "spec id " << spec_id << " xic " << xic << std::endl;
+    for (size_t i = 0; i < peak_list.size(); i++) {
+      EnvPeakPtr peak = peak_list[i];
+      int x = (peak->getPosition() - ref_peak->getPosition())*scale + center;
+      int y = spec_id; 
+      double inte = peak->getIntensity() * xic/ref_inte;
+      std::cout << "x: " << x << " y: " << y << " intensity: " << inte << " peak intensity " << peak->getIntensity() << std::endl;
+      if (inte >= min_inte)  {
+        png.plot(x, y, inte, 0.0, 0.0);
+      }
+    }
   }
-
-  // Draw a blue circle
-  for (int i = 0; i < 360; ++i) {
-    double angle = i * 3.14159 / 180;
-    int x = width / 2 + 100 * cos(angle);
-    int y = height / 2 + 100 * sin(angle);
-    png.plot(x, y, 0, 0, 255);
-  }
-
   png.close();
 }
 
 void processMs1(TopfdParaPtr topfd_para_ptr) {
-  writepng("test.png");
-  return;
   if (topfd_para_ptr->isMissingLevelOne()) {
     return;
   }
@@ -125,6 +138,7 @@ void processMs1(TopfdParaPtr topfd_para_ptr) {
   /// Extract Fetures
   LOG_DEBUG("Number of seed envelopes: " << seed_ptrs.size());
   int seed_num = seed_ptrs.size();
+  seed_num = 10;
   EnvCollPtrVec env_coll_list;
   ECScorePtrVec ecscore_list;
   for (int seed_env_idx = 0; seed_env_idx < seed_num; seed_env_idx++) {
@@ -159,6 +173,7 @@ void processMs1(TopfdParaPtr topfd_para_ptr) {
   }
   std::cout << std::endl; 
 
+  /*
   if (topfd_para_ptr->isSearchPrecWindow()) {
     // add ms1 feature based on precursor windows
     // set min match envelope to 1 to accept single scan features
@@ -223,7 +238,9 @@ void processMs1(TopfdParaPtr topfd_para_ptr) {
     }
     std::cout << std::endl; 
   }
+  */
 
+  /*
   FracFeaturePtrVec frac_features;
   for (std::size_t i = 0; i < env_coll_list.size(); i++) {
     EnvCollPtr env_coll_ptr = env_coll_list[i];
@@ -247,6 +264,26 @@ void processMs1(TopfdParaPtr topfd_para_ptr) {
   frac_feature_writer::writeXmlFeatures(frac_feat_xml_file_name, frac_features);
   std::string frac_feat_file_name = output_base_name + "_" + "ms1.feature";
   frac_feature_writer::writeFeatures(frac_feat_file_name, frac_features);
+  */
+
+  sn_ratio = 0;
+  MsMapPtr sim_matrix_ptr = std::make_shared<MsMap>(ms1_mzml_peaks, deconv_ms1_ptr_vec,
+                                                    score_para_ptr->bin_size_,
+                                                    sn_ratio, single_scan_noise);
+
+  //for (std::size_t i = 0; i < env_coll_list.size(); i++) {
+  for (std::size_t i = 0; i < 1; i++) {
+    EnvSetPtrVec env_set_list = env_coll_list[i]->getEnvSetList();
+    //for (std::size_t j = 0; j < env_set_list.size(); j++) {
+    for (std::size_t j = 0; j < 1; j++) {
+      EnvSetPtr env_set_ptr = env_set_list[j];
+      if (env_set_ptr != nullptr) {
+        std::string png_file_name = "test_"+ std::to_string(i) + "_" + std::to_string(j) + ".jpg";
+        writepng(env_set_ptr, png_file_name); 
+      }
+    }
+  }
+
 }
 
 }  // namespace
