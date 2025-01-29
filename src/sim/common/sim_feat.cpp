@@ -13,6 +13,7 @@
 //limitations under the License.
 
 #include <ctime>
+#include <cstdlib> 
 #include <iostream>
 
 #include "common/util/logger.hpp"
@@ -43,7 +44,7 @@ namespace sim_feat {
 void writepng(MsMapPtr map_ptr, EnvSetPtr env_set_ptr, std::string png_file_name) {
   int scale =  100;
   int width = 500;
-  int height = 1400;
+  int height = 500;
   int center = 250;
 
   double mz_win_size = 5.0;
@@ -52,56 +53,72 @@ void writepng(MsMapPtr map_ptr, EnvSetPtr env_set_ptr, std::string png_file_name
   /* Add envelope feature*/
   int start_spec_id = env_set_ptr->getStartSpecId();
   int end_spec_id = env_set_ptr->getEndSpecId();
+  int ref_spec_id = env_set_ptr->getSeedPtr()->getSpecId();
   SeedEnvPtr seed_env = env_set_ptr->getSeedPtr(); 
-  double ratio = 1;
-  double min_inte = 0.1;
-  EnvPeakPtrVec peak_list = seed_env->getScaledPeakPtrList(ratio, 0.0001);
+  //double ratio = 1;
+  //double min_inte = 0.1;
+  EnvPeakPtrVec peak_list = seed_env->getPeakPtrList(); 
   int ref_idx = seed_env->getReferIdx();
   EnvPeakPtr ref_peak = peak_list[ref_idx];
   double ref_inte = ref_peak->getIntensity();
   double ref_mz = ref_peak->getPosition();
   double left_mz = ref_mz - mz_win_size/2.0;
   double right_mz = ref_mz + mz_win_size/2.0;
-  std::vector<double> xic_list = env_set_ptr->getXicPtr()->getTopThreeInteList();
-  double max_xic = *std::max_element(xic_list.begin(), xic_list.end());
+  int spec_range = end_spec_id - start_spec_id + 1;
+  int direction = (rand() % 2 == 0) ? -1 : 1;
+  int shift = spec_range * direction * 2;
+  int png_ref_spec = ref_spec_id + direction * 2 * spec_range;
+  int png_start_spec = start_spec_id + direction  * spec_range;
+  int png_end_spec = png_start_spec + height - 1; 
+
+  MsMapPeakPtr2D peak_2d_list = map_ptr->get2DPeaks();
+  if (png_start_spec < 0 || png_end_spec >= peak_2d_list.size()) {
+    return;
+  }
 
   /* add backgroud */
   double max_inte = 0;
-  MsMapPeakPtr2D peak_2d_list = map_ptr->get2DPeaks();
-  for (size_t i = 0; i < peak_2d_list.size(); i++) {
-    for (size_t j = 0; j < peak_2d_list[i].size(); j++) {
-      MsMapPeakPtr peak = peak_2d_list[i][j];
-      double peak_pos = peak->getPosition();
-      if (peak_pos >= left_mz && peak_pos < right_mz && peak->getIntensity() > max_inte) {
-        max_inte = peak->getIntensity();
-      }
-    }
-  }
-
-
   for (size_t i = 0; i < peak_2d_list.size(); i++) {
     for (size_t j = 0; j < peak_2d_list[i].size(); j++) {
       MsMapPeakPtr peak = peak_2d_list[i][j];
       double peak_pos = peak->getPosition();
       if (peak_pos >= left_mz && peak_pos < right_mz) {
+        if (i == ref_spec_id) {
+          std::cout << "ref spec id " << i << " peak pos " << peak_pos << " intensity " << peak->getIntensity() << std::endl;
+        }
+        if (peak->getIntensity() > max_inte) {
+          max_inte = peak->getIntensity();
+        }
+      }
+    }
+  }
+
+  for (size_t i = png_start_spec; i <= png_end_spec; i++) {
+    for (size_t j = 0; j < peak_2d_list[i].size(); j++) {
+      MsMapPeakPtr peak = peak_2d_list[i][j];
+      double peak_pos = peak->getPosition();
+      if (peak_pos >= left_mz && peak_pos < right_mz) {
         int x = (peak_pos - ref_mz)*scale + center;
-        int y = i;
+        int y = i - png_start_spec;
         double inte = peak->getIntensity() / max_inte;
         png.plot(x, y, inte, 0.0, 0.0);
       }
     }
   }
 
-  int shift = 200;
+  std::vector<double> xic_list = env_set_ptr->getXicPtr()->getTopThreeInteList();
+  double max_xic = *std::max_element(xic_list.begin(), xic_list.end());
+  double min_inte = 0.1;
+  
   for (int spec_id = start_spec_id; spec_id < end_spec_id; spec_id++) {
     double xic = xic_list[spec_id-start_spec_id]/max_xic;
     std::cout << "spec id " << spec_id << " xic " << xic << std::endl;
     for (size_t i = 0; i < peak_list.size(); i++) {
       EnvPeakPtr peak = peak_list[i];
       int x = (peak->getPosition() - ref_peak->getPosition())*scale + center;
-      int y = spec_id + shift; 
-      double inte = peak->getIntensity() * xic/ref_inte;
-      std::cout << "x: " << x << " y: " << y << " intensity: " << inte << " peak intensity " << peak->getIntensity() << std::endl;
+      int y = spec_id + shift - png_start_spec; 
+      double inte = peak->getIntensity() * xic/max_inte;
+      std::cout << "x: " << x << " pos: " << peak->getPosition() << " y: " << y << " peak intensity: " << peak->getIntensity() << " xic " << xic << " max inte " << max_inte << std::endl;
       if (inte >= min_inte)  {
         png.plot(x, y, inte, 0.0, 0.0);
       }
@@ -299,8 +316,21 @@ void processMs1(TopfdParaPtr topfd_para_ptr) {
   frac_feature_writer::writeFeatures(frac_feat_file_name, frac_features);
   */
 
+  PeakPtrVec2D ms1_mzml_peaks_new;
+  MsHeaderPtr2D ms2_header_ptr_2d_new;
+  MzmlMsGroupReaderPtr mzml_reader_ptr_new = 
+    std::make_shared<MzmlMsGroupReader>(topfd_para_ptr->getMzmlFileName(), 
+                                        topfd_para_ptr->getPrecWindowWidth(),
+                                        topfd_para_ptr->getActivation(),
+                                        topfd_para_ptr->getFracId(),
+                                        topfd_para_ptr->isFaims(), 
+                                        topfd_para_ptr->getFaimsVoltage(), 
+                                        topfd_para_ptr->isMissingLevelOne());
+  mzml_reader_ptr_new->getMs1Map(ms1_mzml_peaks_new, ms2_header_ptr_2d_new); 
+  mzml_reader_ptr_new = nullptr;
+
   sn_ratio = 0;
-  MsMapPtr sim_matrix_ptr = std::make_shared<MsMap>(ms1_mzml_peaks, deconv_ms1_ptr_vec,
+  MsMapPtr sim_matrix_ptr = std::make_shared<MsMap>(ms1_mzml_peaks_new, deconv_ms1_ptr_vec,
                                                     score_para_ptr->bin_size_,
                                                     sn_ratio, single_scan_noise);
 
