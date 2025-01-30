@@ -40,6 +40,9 @@ EnvCollPtr getEnvCollPtr(MsMapPtr matrix_ptr, SeedEnvPtr seed_ptr,
   int min_scan_num = para_ptr->min_scan_num_; 
   while (charge >= para_ptr->para_min_charge_) {
     SeedEnvPtr cur_seed_ptr = std::make_shared<SeedEnv>(seed_ptr, charge);
+    if (charge == 5) {
+      std::cout << "cur seed mz " << cur_seed_ptr->getReferMz() << " intensity " << cur_seed_ptr->getReferInte() << std::endl;
+    }
     EnvSetPtr env_set_ptr = env_set_util::searchEnvSet(matrix_ptr, cur_seed_ptr,
                                                        cur_seed_ptr->getSpecId(),
                                                        start_spec_id, end_spec_id,
