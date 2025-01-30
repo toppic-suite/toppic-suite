@@ -45,47 +45,40 @@ void writepng(MsMapPtr map_ptr, EnvSetPtr env_set_ptr, std::string png_file_name
   int scale =  100;
   int width = 500;
   int height = 500;
-  int center = 250;
+  int center = width/2;
+  double mz_win_size = width/scale;
 
-  double mz_win_size = 5.0;
-
-  pngwriter png(width, height, 1.0, png_file_name.c_str());
-  /* Add envelope feature*/
-  int start_spec_id = env_set_ptr->getStartSpecId();
-  int end_spec_id = env_set_ptr->getEndSpecId();
+  // get the background row ranges
   int ref_spec_id = env_set_ptr->getSeedPtr()->getSpecId();
-  SeedEnvPtr seed_env = env_set_ptr->getSeedPtr(); 
-  //double ratio = 1;
-  //double min_inte = 0.1;
-  EnvPeakPtrVec peak_list = seed_env->getPeakPtrList(); 
-  int ref_idx = seed_env->getReferIdx();
-  EnvPeakPtr ref_peak = peak_list[ref_idx];
-  double ref_inte = ref_peak->getIntensity();
-  double ref_mz = ref_peak->getPosition();
-  double left_mz = ref_mz - mz_win_size/2.0;
-  double right_mz = ref_mz + mz_win_size/2.0;
-  int spec_range = end_spec_id - start_spec_id + 1;
+  int spec_range = env_set_ptr->getEndSpecId() - env_set_ptr->getStartSpecId() + 1;
   int direction = (rand() % 2 == 0) ? -1 : 1;
-  int shift = spec_range * direction * 2;
-  int png_ref_spec = ref_spec_id + direction * 2 * spec_range;
-  int png_start_spec = start_spec_id + direction  * spec_range;
-  int png_end_spec = png_start_spec + height - 1; 
+  int png_start_spec = ref_spec_id  + direction  * spec_range;
+  int png_end_spec = png_start_spec + height - 1;
+  if (direction == -1) {
+    png_end_spec = ref_spec_id + direction * spec_range;
+    png_start_spec = png_end_spec - height + 1;
+  } 
+  int png_ref_spec = png_start_spec + height/2;
+  int spec_shift = png_ref_spec - ref_spec_id;
 
-  MsMapPeakPtr2D peak_2d_list = map_ptr->get2DPeaks();
-  if (png_start_spec < 0 || png_end_spec >= peak_2d_list.size()) {
+  if (png_start_spec < 0 || png_end_spec >= map_ptr->getRowNum()) {
     return;
   }
 
-  /* add backgroud */
+  // get the background mz range
+  SeedEnvPtr seed_env = env_set_ptr->getSeedPtr(); 
+  double ref_mz = seed_env->getReferMz(); 
+  double left_mz = ref_mz - mz_win_size/2.0;
+  double right_mz = ref_mz + mz_win_size/2.0;
+
+  // get max intensity in m/z range
   double max_inte = 0;
+  MsMapPeakPtr2D peak_2d_list = map_ptr->get2DPeaks();
   for (size_t i = 0; i < peak_2d_list.size(); i++) {
     for (size_t j = 0; j < peak_2d_list[i].size(); j++) {
       MsMapPeakPtr peak = peak_2d_list[i][j];
       double peak_pos = peak->getPosition();
       if (peak_pos >= left_mz && peak_pos < right_mz) {
-        if (i == ref_spec_id) {
-          std::cout << "ref spec id " << i << " peak pos " << peak_pos << " intensity " << peak->getIntensity() << std::endl;
-        }
         if (peak->getIntensity() > max_inte) {
           max_inte = peak->getIntensity();
         }
@@ -93,6 +86,8 @@ void writepng(MsMapPtr map_ptr, EnvSetPtr env_set_ptr, std::string png_file_name
     }
   }
 
+  pngwriter png(width, height, 1.0, png_file_name.c_str());
+  // add background
   for (size_t i = png_start_spec; i <= png_end_spec; i++) {
     for (size_t j = 0; j < peak_2d_list[i].size(); j++) {
       MsMapPeakPtr peak = peak_2d_list[i][j];
@@ -106,22 +101,23 @@ void writepng(MsMapPtr map_ptr, EnvSetPtr env_set_ptr, std::string png_file_name
     }
   }
 
-  std::vector<double> xic_list = env_set_ptr->getXicPtr()->getTopThreeInteList();
-  double max_xic = *std::max_element(xic_list.begin(), xic_list.end());
-  double min_inte = 0.1;
-  
+  MsMapEnvPtrVec ms_map_env_list = env_set_ptr->getMsMapEnvList();
+  int start_spec_id = env_set_ptr->getStartSpecId();
+  int end_spec_id = env_set_ptr->getEndSpecId(); 
   for (int spec_id = start_spec_id; spec_id < end_spec_id; spec_id++) {
-    double xic = xic_list[spec_id-start_spec_id]/max_xic;
-    std::cout << "spec id " << spec_id << " xic " << xic << std::endl;
-    for (size_t i = 0; i < peak_list.size(); i++) {
-      EnvPeakPtr peak = peak_list[i];
-      int x = (peak->getPosition() - ref_peak->getPosition())*scale + center;
-      int y = spec_id + shift - png_start_spec; 
-      double inte = peak->getIntensity() * xic/max_inte;
-      std::cout << "x: " << x << " pos: " << peak->getPosition() << " y: " << y << " peak intensity: " << peak->getIntensity() << " xic " << xic << " max inte " << max_inte << std::endl;
-      if (inte >= min_inte)  {
-        png.plot(x, y, inte, 0.0, 0.0);
+    MsMapEnvPtr env_ptr = ms_map_env_list[spec_id-start_spec_id];
+    MsMapPeakPtrVec exp_peak_list = env_ptr->getMsMapPeakList();
+    LOG_DEBUG("spec id " << spec_id << " peak num " << exp_peak_list.size());
+    for (size_t i = 0; i < exp_peak_list.size(); i++) {
+      MsMapPeakPtr peak = exp_peak_list[i];
+      if (peak == nullptr) {
+        continue;
       }
+      int x = (peak->getPosition() - ref_mz)*scale + center;
+      int y = spec_id + spec_shift - png_start_spec; 
+      double inte = peak->getIntensity() /max_inte;
+      LOG_DEBUG("x: " << x << " pos: " << peak->getPosition() << " y: " << y << " peak intensity: " << peak->getIntensity() << " max inte " << max_inte);
+      png.plot(x, y, inte, 0.0, 0.0);
     }
   }
   png.close();
@@ -188,7 +184,7 @@ void processMs1(TopfdParaPtr topfd_para_ptr) {
   /// Extract Fetures
   LOG_DEBUG("Number of seed envelopes: " << seed_ptrs.size());
   int seed_num = seed_ptrs.size();
-  seed_num = 10;
+  seed_num = 1;
   EnvCollPtrVec env_coll_list;
   ECScorePtrVec ecscore_list;
   for (int seed_env_idx = 0; seed_env_idx < seed_num; seed_env_idx++) {
@@ -337,9 +333,10 @@ void processMs1(TopfdParaPtr topfd_para_ptr) {
   //for (std::size_t i = 0; i < env_coll_list.size(); i++) {
   for (std::size_t i = 0; i < 1; i++) {
     EnvSetPtrVec env_set_list = env_coll_list[i]->getEnvSetList();
-    //for (std::size_t j = 0; j < env_set_list.size(); j++) {
-    for (std::size_t j = 0; j < 1; j++) {
+    for (std::size_t j = 0; j < env_set_list.size(); j++) {
+    //for (std::size_t j = 2; j < 3; j++) {
       EnvSetPtr env_set_ptr = env_set_list[j];
+      std::cout << "env set " << j << " charge " << env_set_ptr->getCharge() << " mono mass " << env_set_ptr->getMonoMass() << std::endl;
       if (env_set_ptr != nullptr) {
         std::string png_file_name = "test_"+ std::to_string(i) + "_" + std::to_string(j) + ".jpg";
         writepng(sim_matrix_ptr, env_set_ptr, png_file_name); 
