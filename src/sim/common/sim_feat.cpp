@@ -43,8 +43,8 @@ namespace sim_feat {
 
 void writepng(MsMapPtr map_ptr, EnvSetPtr env_set_ptr, std::string png_file_name) {
   int scale =  100;
-  int width = 500;
-  int height = 500;
+  int width = 512;
+  int height = 512;
   int center = width/2;
   double mz_win_size = width/scale;
 
@@ -86,7 +86,7 @@ void writepng(MsMapPtr map_ptr, EnvSetPtr env_set_ptr, std::string png_file_name
     }
   }
 
-  pngwriter png(width, height, 1.0, png_file_name.c_str());
+  pngwriter png(width, height, 1.0, (png_file_name +"_data.png").c_str());
   // add background
   for (size_t i = png_start_spec; i <= png_end_spec; i++) {
     for (size_t j = 0; j < peak_2d_list[i].size(); j++) {
@@ -103,7 +103,10 @@ void writepng(MsMapPtr map_ptr, EnvSetPtr env_set_ptr, std::string png_file_name
 
   MsMapEnvPtrVec ms_map_env_list = env_set_ptr->getMsMapEnvList();
   int start_spec_id = env_set_ptr->getStartSpecId();
-  int end_spec_id = env_set_ptr->getEndSpecId(); 
+  int end_spec_id = env_set_ptr->getEndSpecId();
+  int peak_num = seed_env->getPeakPtrList().size();
+  std::vector<int> y_start_list(peak_num, -1);
+  std::vector<int> y_end_list (peak_num, -1); 
   for (int spec_id = start_spec_id; spec_id < end_spec_id; spec_id++) {
     MsMapEnvPtr env_ptr = ms_map_env_list[spec_id-start_spec_id];
     MsMapPeakPtrVec exp_peak_list = env_ptr->getMsMapPeakList();
@@ -115,12 +118,97 @@ void writepng(MsMapPtr map_ptr, EnvSetPtr env_set_ptr, std::string png_file_name
       }
       int x = (peak->getPosition() - ref_mz)*scale + center;
       int y = spec_id + spec_shift - png_start_spec; 
+      if (y_start_list[i] == -1) {
+        y_start_list[i] = y;
+        y_end_list[i] = y;
+      }
+      else {
+        if (y < y_start_list[i]) {
+          y_start_list[i] = y;
+        }
+        if (y > y_end_list[i]) {
+          y_end_list[i] = y;
+        }
+      }
       double inte = peak->getIntensity() /max_inte;
       LOG_DEBUG("x: " << x << " pos: " << peak->getPosition() << " y: " << y << " peak intensity: " << peak->getIntensity() << " max inte " << max_inte);
       png.plot(x, y, inte, 0.0, 0.0);
     }
   }
   png.close();
+
+  // update y_start_list and y_end_list
+  int ref_idx = seed_env->getReferIdx();
+  for (int i = 0; i < ref_idx; i++) {
+    if (y_start_list[i] == -1) {
+      continue;
+    }
+    if (y_start_list[i+1] == -1) {
+      y_start_list[i+1] = y_start_list[i];
+      y_end_list[i+1] = y_end_list[i];
+    }
+    else {
+      if (y_start_list[i+1] > y_start_list[i]) {
+        y_start_list[i+1] = y_start_list[i];
+      }
+      if (y_end_list[i+1] < y_end_list[i]) {
+        y_end_list[i+1] = y_end_list[i];
+      }
+    }
+  }
+  for (int i = peak_num -1; i >ref_idx; i--) {
+    if (y_start_list[i] == -1) {
+      continue;
+    }
+    if (y_start_list[i-1] == -1) {
+      y_start_list[i-1] = y_start_list[i];
+      y_end_list[i-1] = y_end_list[i];
+    }
+    else {
+      if (y_start_list[i-1] > y_start_list[i]) {
+        y_start_list[i-1] = y_start_list[i];
+      }
+      if (y_end_list[i-1] < y_end_list[i]) {
+        y_end_list[i-1] = y_end_list[i];
+      }
+    }
+  }
+
+  pngwriter mask_png(width, height, 0.0, (png_file_name + "_mask.png").c_str());
+  // plot mask 
+  std::vector<int> pos_list;
+  for (int i = 0; i < peak_num; i++) {
+    pos_list.push_back((seed_env->getMz(i) - ref_mz)*scale + center);
+    LOG_DEBUG(i << " start " << y_start_list[i] << " end " << y_end_list[i]); 
+  }
+  for (int i = 0; i < peak_num -1; i++) {
+    if (y_start_list[i] == -1 or y_start_list[i+1] == -1) { 
+      continue;
+    }
+    int left_pos = pos_list[i];
+    int right_pos = pos_list[i+1];
+    for (int j = left_pos; j <= right_pos; j++) {
+      int start = y_start_list[i] + (y_start_list[i+1] - y_start_list[i]) * (j - left_pos) / (right_pos - left_pos);
+      int end = y_end_list[i] + (y_end_list[i+1] - y_end_list[i]) * (j - left_pos) / (right_pos - left_pos);
+      for (int k = start; k <= end; k++) {
+        mask_png.plot(j, k, 1.0, 1.0, 1.0);
+      }
+    }
+  }
+  /*
+  for (int i = 0; i < peak_num; i++) {
+    if (y_start_list[i] == -1 or y_start_list[i+1] == -1) { 
+      continue;
+    }
+    int pos = pos_list[i];
+    int start = y_start_list[i]; 
+    int end = y_end_list[i];
+    for (int k = start; k <= end; k++) {
+      mask_png.plot(pos, k, 0.0, 0.0, 1.0);
+    }
+  }
+  */
+  mask_png.close();
 }
 
 void processMs1(TopfdParaPtr topfd_para_ptr) {
@@ -334,11 +422,11 @@ void processMs1(TopfdParaPtr topfd_para_ptr) {
   for (std::size_t i = 0; i < 1; i++) {
     EnvSetPtrVec env_set_list = env_coll_list[i]->getEnvSetList();
     for (std::size_t j = 0; j < env_set_list.size(); j++) {
-    //for (std::size_t j = 2; j < 3; j++) {
+    //for (std::size_t j = 0; j < 1; j++) {
       EnvSetPtr env_set_ptr = env_set_list[j];
-      std::cout << "env set " << j << " charge " << env_set_ptr->getCharge() << " mono mass " << env_set_ptr->getMonoMass() << std::endl;
+      std::cout << "feature " << i << " charge " << env_set_ptr->getCharge() << " mono mass " << env_set_ptr->getMonoMass() << std::endl;
       if (env_set_ptr != nullptr) {
-        std::string png_file_name = "test_"+ std::to_string(i) + "_" + std::to_string(j) + ".jpg";
+        std::string png_file_name = topfd_para_ptr->getMzmlFileName()+ "_feature_" + std::to_string(i) + "_charge_" + std::to_string(env_set_ptr->getCharge());
         writepng(sim_matrix_ptr, env_set_ptr, png_file_name); 
       }
     }
