@@ -91,7 +91,7 @@ void setProteoClusterId(PrsmStrPtrVec& prsm_ptrs,
       PrsmStrPtr ref_ptr = merged_clusters[j][0];
       // if the same protein and similar mass
       if (cur_ptr->getProtId() == ref_ptr->getProtId()) {
-        if (std::abs(cur_ptr->getOriPrecMass() - ref_ptr->getOriPrecMass()) 
+        if (std::abs(cur_ptr->getAdjustedPrecMass() - ref_ptr->getAdjustedPrecMass()) 
             <= prec_error_tole) {
           merged_clusters[j].insert(merged_clusters[j].end(),
                                     clusters[i].begin(), 
@@ -106,7 +106,7 @@ void setProteoClusterId(PrsmStrPtrVec& prsm_ptrs,
         // are the same and the proteoform masses are similar, the two
         // proteoforms are treated as one. 
         if (cur_ptr->getProteoformDbSeq() == ref_ptr->getProteoformDbSeq()
-            && std::abs(cur_ptr->getOriPrecMass() - ref_ptr->getOriPrecMass()) 
+            && std::abs(cur_ptr->getAdjustedPrecMass() - ref_ptr->getAdjustedPrecMass()) 
             <= prec_error_tole) {
           merged_clusters[j].insert(merged_clusters[j].end(),
                                     clusters[i].begin(), 
