@@ -25,7 +25,7 @@ FeaturePrsm::FeaturePrsm(PrsmStrPtr prsm) {
   last_residue_ = prsm->getProteoformEndPos();
   proteoform_ = prsm->getProteoformMatchSeq();
   ms2_id_ = prsm->getSpectrumId();
-  prec_mass_ = prsm->getOriPrecMass();
+  prec_mass_ = prsm->getAdjustedPrecMass();
   proteo_id_ = prsm->getProteoClusterId();
   proteo_inte_ = prsm->getProteoInte();
   min_time_ = prsm->getFracFeatureMinTime();
