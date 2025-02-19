@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2025, The Trustees of Indiana University, Tulane University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ FeaturePrsm::FeaturePrsm(PrsmStrPtr prsm) {
   last_residue_ = prsm->getProteoformEndPos();
   proteoform_ = prsm->getProteoformMatchSeq();
   ms2_id_ = prsm->getSpectrumId();
-  prec_mass_ = prsm->getOriPrecMass();
+  prec_mass_ = prsm->getAdjustedPrecMass();
   proteo_id_ = prsm->getProteoClusterId();
   proteo_inte_ = prsm->getProteoInte();
   min_time_ = prsm->getFracFeatureMinTime();
