@@ -4,7 +4,7 @@ For manual and reference, please visit https://www.toppic.org/software/toppic/
 
 ## System requirements
 
-* GCC version >= 11.4.0 for C++17 support
+* Clang version > 16.0.0 for C++17 support
 * Boost version >= 1.74.0
 * CMake version >= 3.5
 
@@ -12,7 +12,7 @@ For manual and reference, please visit https://www.toppic.org/software/toppic/
 
 ```sh
 # install compiling tools
-sudo apt install build-essential cmake
+sudo apt install build-essential cmake clang
 
 # install dependencies
 sudo apt install libboost-chrono-dev 
@@ -42,7 +42,7 @@ sudo subscription-manager repos --enable codeready-builder-for-rhel-9-$(arch)-rp
 sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
 
 # install compiling tools
-sudo dnf install cmake gcc-c++ make
+sudo dnf install cmake gcc-c++ make clang
 
 # install dependencies
 sudo dnf install boost-devel 

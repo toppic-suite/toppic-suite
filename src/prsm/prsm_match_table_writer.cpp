@@ -136,7 +136,7 @@ void PrsmMatchTableWriter::write(const std::string &output_file_ext,
 
   file << "Number of identified PrSMs: " << prsm_list.size() << std::endl;
   PrsmPtrVec2D prsm_2d; 
-  for (size_t i = 0; i < max_proteo_id + 1; i++) {
+  for (size_t i = 0; static_cast<int>(i) < (max_proteo_id + 1); i++) {
     PrsmPtrVec prsm_list; 
     prsm_2d.push_back(prsm_list);
   }
@@ -146,7 +146,7 @@ void PrsmMatchTableWriter::write(const std::string &output_file_ext,
   }
   int proteo_num = 0;
   std::set<std::string> prot_id_set;
-  for (size_t i = 0; i < max_proteo_id + 1; i++) {
+  for (size_t i = 0; static_cast<int>(i) < (max_proteo_id + 1); i++) {
     if (prsm_2d[i].size() > 0) {
       proteo_num++;
       std::sort(prsm_2d[i].begin(), prsm_2d[i].end(), Prsm::cmpEValueIncProtInc);
