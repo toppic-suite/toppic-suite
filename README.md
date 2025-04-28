@@ -4,9 +4,9 @@ For manual and reference, please visit https://www.toppic.org/software/toppic/
 
 ## System requirements
 
-* Clang version > 16.0.0 for C++17 support
+* Clang version >= 16.0.0 for C++17 support
 * Boost version >= 1.74.0
-* CMake version >= 3.5
+* CMake version >= 3.5.0
 
 ### Linux (Ubuntu 24.04):
 
