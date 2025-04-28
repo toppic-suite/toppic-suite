@@ -1,4 +1,4 @@
-This document describes how to build the command line and GUI tools in TopPIC suite.
+This document explains how to build the command-line and GUI tools in the TopPIC Suite on a Windows system.
 
 # MSYS2
 
@@ -12,7 +12,7 @@ downloading the source code.
 ```sh
 pacman -S git
 
-pacman -S mingw-w64-x86_64-gcc
+pacman -S mingw-w64-x86_64-clang
 
 pacman -S mingw-w64-x86_64-make
 
@@ -27,11 +27,11 @@ pacman -S mingw-w64-x86_64-qt5-base
 git clone https://github.com/toppic-suite/toppic-suite.git
 ```
 
-# Use Windows Terminal to build TopPIC suite
+# Use Windows Terminal to build TopPIC Suite
 
 Add `C:\msys64\mingw64\bin` into your PATH environmental variable. 
 
-**Make sure you can use `g++` in Windows Terminal.**
+**Make sure you can use `clang++` in Windows Terminal.**
 
 Open a Windows Terminal
 
@@ -44,7 +44,7 @@ cmake -G "MinGW Makefiles" ..
 mingw32-make
 ```
 
-**Move  the folder toppic_resources to the folder bin**
+**Move  the folders toppic_resources and lib\windows to the folder bin**
 ```sh
 cd ..\bin
 move ..\resources .
