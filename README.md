@@ -73,4 +73,4 @@ export LANGUAGE=en_US.UTF-8
 
 ### Windows:
 
-[MSYS2](http://www.msys2.org/) is used for Windows building. Please follow the instructions from [here](doc/windows_build.md).
+[MSYS2](http://www.msys2.org/) is used for building TopPIC Suite on Windows systems. Please follow the instructions from [here](doc/windows_build.md).
