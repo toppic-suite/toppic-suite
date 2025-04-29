@@ -650,7 +650,7 @@ p, li { white-space: pre-wrap; }
          <bool>false</bool>
         </property>
         <property name="text">
-         <string>Disable AA-based filtering</string>
+         <string>Disable frag num-based filtering</string>
         </property>
         <property name="checkable">
          <bool>true</bool>

@@ -48,7 +48,7 @@ Set the maximum charge state of precursor and fragment ions. The default value i
 -m [ --max-mass ] <a positive number>
 ```
 
-Set the maximum monoisotopic mass of precursor and fragment ions. The default value is 70,000 Dalton.
+Set the maximum monoisotopic mass of precursor and fragment ions. The default value is 50,000 Dalton.
 ```
 -e [ --mz-error ] <a positive number>
 ```
@@ -88,7 +88,7 @@ Use the noise intensity levels in single MS1 scans to filter out low intensity p
 ```
 -f [ --additional-feature-search ]
 ```
-Perform additional feature search for MS/MS scans that do not have detected proteoform features in their precursor isolation windows. In additional search, the signal noise ratio is set to 0, the mininum scan number is set to 1, and the ecscore cutoff is set to 0.
+Perform additional proteoform feature search in the LC-MS map for MS/MS scans that do not have detected proteoform features in their precursor isolation windows. In the additional search, the signal noise ratio is set to 0, the mininum scan number is set to 1, and the ecscore cutoff is set to 0.
 ```
 -d [ --disable-frag-num-filtering ]
 ```
