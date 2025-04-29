@@ -844,7 +844,7 @@ p, li { white-space: pre-wrap; }
         </size>
        </property>
        <property name="text">
-        <string>Minimum scan number:</string>
+        <string>Feature min scan number:</string>
        </property>
       </widget>
      </item>
@@ -888,7 +888,7 @@ p, li { white-space: pre-wrap; }
         </size>
        </property>
        <property name="text">
-        <string>Split feature ratio:</string>
+        <string>Feature split ratio:</string>
        </property>
       </widget>
      </item>
