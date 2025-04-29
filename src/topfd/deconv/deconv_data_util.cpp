@@ -17,9 +17,7 @@
 #include "ms/spec/peak_list_util.hpp"
 #include "topfd/deconv/deconv_data_util.hpp"
 
-namespace toppic {
-
-namespace deconv_data_util {
+namespace toppic::deconv_data_util {
 
 DeconvDataPtr getDataPtr(const PeakPtrVec &peak_list, 
                          double max_mass, int max_charge, 
@@ -35,9 +33,6 @@ DeconvDataPtr getDataPtr(const PeakPtrVec &peak_list,
   return std::make_shared<DeconvData>(peak_list, max_mass, 
                                       max_charge, dp_window_size, 
                                       estimate_min_inte, sn_ratio);
-}
-
-
 }
 
 }  // namespace toppic
