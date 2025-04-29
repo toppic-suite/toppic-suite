@@ -63,7 +63,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("max-charge,c", po::value<std::string> (&max_charge),
          "<a positive integer>. Set the maximum charge state of precursor and fragment ions. The default value is 30.")
         ("max-mass,m", po::value<std::string> (&max_mass),
-         "<a positive number>. Set the maximum monoisotopic mass of precursor and fragment ions. The default value is 70,000 Dalton.")
+         "<a positive number>. Set the maximum monoisotopic mass of precursor and fragment ions. The default value is 50,000 Dalton.")
         ("mz-error,e", po::value<std::string> (&mz_error),
          "<a positive number>. Set the error tolerance of m/z values of spectral peaks. The default value is 0.02 m/z.")
         ("ms-one-sn-ratio,r", po::value<std::string> (&ms_one_sn_ratio),
@@ -76,13 +76,13 @@ bool Argument::parse(int argc, char* argv[]) {
         ("msdeconv,n", "Use the MS-Deconv score to rank isotopic envelopes. The default method uses the EnvCNN score to rank isotopic envelopes.")
         ("env-cnn-cutoff,v", po::value<std::string>(&ms2_env_cnn_score_cutoff), 
          "<a number in [0,1]>. Set the cutoff value for the EnvCNN score to filter out low quality isotopic envelopes in MS/MS spectra. The default value is 0.")
-        ("disable-aa-num-filtering,d","Skip the filtering of envelopes in MS/MS scans based on the estimated number of amino acids in the proteoform.")
+        ("disable-frag-num-filtering,d","Skip the filtering of fragment ion envelopes in MS/MS scans based on the estimated number of fragment ions.")
         ("ecscore-cutoff,t", po::value<std::string> (&ecscore_cutoff),
-         "<a positive number in [0,1]>. Set the ECScore cutoff value for proteoform features. The default value is 0.1.")
+         "<a number in [0,1]>. Set the ECScore cutoff value for proteoform features. The default value is 0.1.")
         ("min-scan-number,b",po::value<std::string> (&min_scan_num), 
          "<1|2|3>. The minimum number of MS1 scans in which a proteoform feature is detected. The default value is 1.")
-        ("single-scan-noise,i","Use the peak intensity noise levels in single MS1 scans to filter out low intensity peaks in proteoform feature detection. The default method is to use the peak intensity noise level of the whole LC-MS map to filter out low intensity peaks.")
-        ("disable-additional-feature-search,f","Disable additional feature search for MS/MS scans that do not have detected proteoform features in their precursor isolation windows. In additional search, the signal noise ratio is set to 0, the min scan number is set to 1, and the ecscore cutoff is set to 0.")
+        ("single-scan-noise,i","Use the noise intensity levels in single MS1 scans to filter out low intensity peaks in proteoform feature detection. The default method is to use the noise intensity level of the whole LC-MS map to filter out low intensity peaks.")
+        ("disable-additional-feature-search,f","Disable additional proteoform feature search in the LC-MS map for MS/MS scans that do not have detected proteoform features in their precursor isolation windows. In the additional search, the signal noise ratio is set to 0, the min scan number is set to 1, and the ecscore cutoff is set to 0.")
         ("split-intensity-ratio,l", po::value<std::string> (&split_intensity_ratio),
          "<a positive number>. Set the intensity ratio required to split one feature from another. The default value is 2.5.")
         ("thread-number,u", po::value<std::string> (&thread_number), "<a positive integer>. Number of threads used in spectral deconvolution. Default value: 1.")

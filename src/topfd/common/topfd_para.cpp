@@ -107,11 +107,11 @@ std::string TopfdPara::getTopfdParaStr(const std::string &prefix,
 
     if (use_single_scan_noise_level_) {
       output << prefix << std::setw(gap) << std::left 
-      << "Use single scan single/noise level:             " << sep << "Yes" << std::endl;
+      << "Use single scan noise level:                    " << sep << "Yes" << std::endl;
     }
     else {
       output << prefix << std::setw(gap) << std::left 
-      << "Use single scan single/noise level:             " << sep << "No" << std::endl;
+      << "Use single scan noise level:                    " << sep << "No" << std::endl;
     }
     output << prefix << std::setw(gap) << std::left
       << "Intensity ratio for splitting features:         " << sep << split_intensity_ratio_ << std::endl;

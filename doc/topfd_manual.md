@@ -74,7 +74,7 @@ Use the MS-Deconv score (see [paper](https://pubmed.ncbi.nlm.nih.gov/20855543/))
 ```
 Set the precursor isolation window size. The default value is 3.0 m/z. When the input file contains the information of precursor windows, the parameter will be ignored.
 ```
--t [ --ecscore-cutoff ] <a positive number in [0, 1]>
+-t [ --ecscore-cutoff ] <a number in [0, 1]>
 ```
 Set the ECScore cutoff value for proteoform features. Default value is 0.5.
 ```
@@ -84,15 +84,16 @@ The minimum number of MS1 scans in which a proteoform feature is detected. The d
 ```
 -i [ --single-scan-noise ]
 ```
-Use the peak intensity noise levels in single MS1 scans to filter out low intensity peaks in proteoform feature detection. The default method is to use the peak intensity noise level of the whole LC-MS map to filter out low intensity peaks.
+Use the noise intensity levels in single MS1 scans to filter out low intensity peaks in proteoform feature detection. The default method is to use the noise intensity level of the whole LC-MS map to filter out low intensity peaks.
 ```
 -f [ --additional-feature-search ]
 ```
 Perform additional feature search for MS/MS scans that do not have detected proteoform features in their precursor isolation windows. In additional search, the signal noise ratio is set to 0, the mininum scan number is set to 1, and the ecscore cutoff is set to 0.
 ```
--d [ --disable-final-filtering ]
+-d [ --disable-frag-num-filtering ]
 ```
-Skip the final filtering of isotopic envelopes in MS/MS spectra.
+Skip filtering fragment ion envelopes in an MS/MS spectrum based on the estimated number of fragment ions. For CID or HCD MS/MS spectra, the expected numbers of b- and y-ions are estimated and used for filtering. For ETD spectra, the estimated numbers of c- and z•-ions guide the filtering process
+
 ```
 -u [ --thread-number ] <a positive integer>
 ```

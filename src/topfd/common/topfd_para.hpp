@@ -116,7 +116,7 @@ class TopfdPara {
 
   // parameters for deconcovolution 
   int max_charge_ = 30;
-  double max_mass_ = 70000;
+  double max_mass_ = 50000;
   // precursor window is used only when the mzML file does not 
   // contain the precursor window information
   double prec_window_ = 3.0;
