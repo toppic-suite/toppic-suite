@@ -75,70 +75,6 @@ std::string TopfdPara::getTopfdParaStr(const std::string &prefix,
   output << prefix << std::setw(gap) << std::left 
       << "Peak m/z error tolerance:   " << sep << mz_error_ << " m/z" << std::endl;
   output << prefix << std::setw(gap) << std::left 
-      << "MS1 signal/noise ratio:     " << sep << ms_one_sn_ratio_ << std::endl;
-
-  if (missing_level_one_) {
-    output << prefix << std::setw(gap) << std::left 
-      << "Miss MS1 spectra:           " << sep << "Yes" << std::endl;
-  }
-  else {
-    output << prefix << std::setw(gap) << std::left 
-      << "Miss MS1 spectra:           " << sep << "No" << std::endl;
-  }
-
-  output << prefix << std::setw(gap) << std::left 
-      << "MS/MS signal/noise ratio:   " << sep << ms_two_sn_ratio_ << std::endl;
-  output << prefix << std::setw(gap) << std::left 
-      << "Default precursor window:   " << sep << prec_window_ << " m/z" << std::endl;
-  output << prefix << std::setw(gap) << std::left 
-      << "Activation type:            " << sep  << activation_ << std::endl;
-
-  if (sort_use_msdeconv_) {
-    output << prefix << std::setw(gap) << std::left 
-      << "Sorting method:             " << sep << "MS-Deconv score" << std::endl;
-  }
-  else {
-    output << prefix << std::setw(gap) << std::left 
-      << "Sorting method:             " << sep << "EnvCNN score" << std::endl;
-  }
-
-  output << prefix << std::setw(gap) << std::left 
-      << "MS/MS EnvCNN score cutoff:  " << sep  << ms2_env_cnn_score_cutoff_<< std::endl;
-
-  if (aa_num_based_filter_) {
-    output << prefix << std::setw(gap) << std::left 
-      << "Filtering use estimated amino acid number:" << sep << "Yes" << std::endl;
-  }
-  else {
-    output << prefix << std::setw(gap) << std::left 
-      << "Filtering use estimated amino acid number:" << sep << "No" << std::endl;
-  }
-
-  output << prefix << std::setw(gap) << std::left 
-      << "Min scan number:            " << sep << ms1_min_scan_num_ << std::endl;
-  output << prefix << std::setw(gap) << std::left 
-      << "ECScore cutoff:             " << sep  << ms1_ecscore_cutoff_ << std::endl;
-  if (search_prec_window_) {
-    output << prefix << std::setw(gap) << std::left 
-      << "Additional feature search:  " << sep << "Yes" << std::endl;
-  }
-  else {
-    output << prefix << std::setw(gap) << std::left 
-      << "Additional feature search:  " << sep << "No" << std::endl;
-  }
-
-  if (use_single_scan_noise_level_) {
-    output << prefix << std::setw(gap) << std::left 
-      << "Use single scan noise level:" << sep << "Yes" << std::endl;
-  }
-  else {
-    output << prefix << std::setw(gap) << std::left 
-      << "Use single scan noise level:" << sep << "No" << std::endl;
-  }
-
-  output << prefix << std::setw(gap) << std::left
-      << "Intensity ratio for splitting features:" << sep << split_intensity_ratio_ << std::endl;
-  output << prefix << std::setw(gap) << std::left 
       << "Thread number:              " << sep << thread_num_ << std::endl;
   if (gene_html_folder_) {
     output << prefix << std::setw(gap) << std::left 
@@ -148,6 +84,81 @@ std::string TopfdPara::getTopfdParaStr(const std::string &prefix,
     output << prefix << std::setw(gap) << std::left 
       << "Generate Html files:        " << sep << "No" << std::endl;
   }
+
+  if (missing_level_one_) {
+    output << prefix << std::setw(gap) << std::left 
+      << "Miss MS1 spectra:           " << sep << "Yes" << std::endl;
+  }
+  else {
+    output << prefix << std::setw(gap) << std::left 
+      << "Miss MS1 spectra:           " << sep << "No" << std::endl;
+
+    output << std::endl << prefix << std::setw(gap) << std::left
+      << "####### MS1 spectral deconvolution parameters   #######" << std::endl;
+    output << prefix << std::setw(gap) << std::left 
+      << "MS1 signal/noise ratio:     " << sep << ms_one_sn_ratio_ << std::endl;
+    output << prefix << std::setw(gap) << std::left
+      << "####### MS1 spectral deconvolution parameters   #######" << std::endl;
+
+    output << std::endl << prefix << std::setw(gap) << std::left
+      << "####### MS1 feature detection parameters        #######" << std::endl;
+    output << prefix << std::setw(gap) << std::left 
+      << "Feature min scan number:                        " << sep << ms1_min_scan_num_ << std::endl;
+
+    if (use_single_scan_noise_level_) {
+      output << prefix << std::setw(gap) << std::left 
+      << "Use single scan single/noise level:             " << sep << "Yes" << std::endl;
+    }
+    else {
+      output << prefix << std::setw(gap) << std::left 
+      << "Use single scan single/noise level:             " << sep << "No" << std::endl;
+    }
+    output << prefix << std::setw(gap) << std::left
+      << "Intensity ratio for splitting features:         " << sep << split_intensity_ratio_ << std::endl;
+
+    output << prefix << std::setw(gap) << std::left 
+      << "Feature ECScore cutoff:                         " << sep  << ms1_ecscore_cutoff_ << std::endl;
+    if (search_prec_window_) {
+      output << prefix << std::setw(gap) << std::left 
+      << "Additional feature search for isolation windows:" << sep << "Yes" << std::endl;
+    }
+    else {
+      output << prefix << std::setw(gap) << std::left 
+      << "Additional feature search for isolation windows:" << sep << "No" << std::endl;
+    }
+    output << prefix << std::setw(gap) << std::left
+      << "####### MS1 feature detection parameters        #######" << std::endl;
+  }
+
+  output << std::endl << prefix << std::setw(gap) << std::left
+      << "####### MS/MS spectral deconvolution parameters #######" << std::endl;
+  output << prefix << std::setw(gap) << std::left 
+      << "Default precursor window:                           " << sep << prec_window_ << " m/z" << std::endl;
+  output << prefix << std::setw(gap) << std::left 
+      << "Activation type:                                    " << sep  << activation_ << std::endl;
+  output << prefix << std::setw(gap) << std::left 
+      << "MS/MS signal/noise ratio:                           " << sep << ms_two_sn_ratio_ << std::endl;
+  if (sort_use_msdeconv_) {
+    output << prefix << std::setw(gap) << std::left 
+      << "Fragment envelope ranking:                          " << sep << "MS-Deconv score" << std::endl;
+  }
+  else {
+    output << prefix << std::setw(gap) << std::left 
+      << "Fragment envelope ranking:                          " << sep << "EnvCNN score" << std::endl;
+  }
+  output << prefix << std::setw(gap) << std::left 
+      << "Fragment envelope EnvCNN score cutoff:              " << sep  << ms2_env_cnn_score_cutoff_<< std::endl;
+  if (aa_num_based_filter_) {
+    output << prefix << std::setw(gap) << std::left 
+      << "Filtering fragments using estimated fragment number:" << sep << "Yes" << std::endl;
+  }
+  else {
+    output << prefix << std::setw(gap) << std::left 
+      << "Filtering fragments using estimated fragment number:" << sep << "No" << std::endl;
+  }
+  output << prefix << std::setw(gap) << std::left
+      << "####### MS/MS spectral deconvolution parameters #######" << std::endl;
+
   return output.str();
 }
 
@@ -157,11 +168,9 @@ std::string TopfdPara::getParaStr(const std::string &prefix,
   int gap = 25;
   output << prefix << "TopFD " << Version::getVersion() << std::endl;
   output << prefix << "Timestamp: " << time_util::getTimeStr() << std::endl;
-  output << prefix << "###################### Parameters ######################" << std::endl;
+  output << prefix << "###################### Parameters #####################" << std::endl;
   output << getTopfdParaStr(prefix, sep, gap);
-  output << prefix << std::setw(gap) << std::left 
-      << "Version:                    " << sep << Version::getVersion() << std::endl;   
-  output << prefix << "###################### Parameters ######################" << std::endl;
+  output << prefix << "###################### Parameters #####################" << std::endl;
   return output.str();
 }
 
