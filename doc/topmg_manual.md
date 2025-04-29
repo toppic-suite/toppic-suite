@@ -2,7 +2,7 @@
 TopMG is a software tool for identifying highly modified proteoforms by searching top-down tandem mass spectra against a protein sequence database. It is capable of identifying proteoforms with multiple variable PTMs and unexpected alterations, such as histone proteoforms and phosphorylated ones. It uses mass graphs, which efficiently represent candidate proteoforms with multiple variable PTMs, to increase the speed and sensitivity in proteoform identification. In addition, approximate spectrum-based filtering methods are employed for protein sequence filtering, and a Markov chain Monte Carlo method (TopMCMC) is used for estimating the statistical significance of identifications.
 
 ### Minimum requirements
-A computer with at least 4 GB memory and a 64-bit Linux or Windows operating system is required. 
+A computer with at least 16 GB memory and a 64-bit Linux or Windows operating system is required. 
 
 ### Input
 

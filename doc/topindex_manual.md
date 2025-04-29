@@ -2,7 +2,7 @@
 TopIndex generates index files for protein sequence databases. The index files are used in TopPIC and TopMG to speed up proteoform identification by database search.
 
 ### Minimum requirements
-A computer with at least 4 GB memory and a 64-bit Linux or Windows operating system is required. 
+A computer with at least 16 GB memory and a 64-bit Linux or Windows operating system is required. 
 
 ###  Input
 The input is a protein sequence database file in the FASTA format.

@@ -2,7 +2,7 @@
 TopDiff compares the abundances of proteoforms and finds differentially expressed proteoforms by using identifications of top-down mass spectrometry data of several protein samples.
 
 ### Minimum requirements
-A computer with at least 4 GB memory and a 64-bit Linux or Windows operating system is required. 
+A computer with at least 16 GB memory and a 64-bit Linux or Windows operating system is required. 
 
 ### Input
 

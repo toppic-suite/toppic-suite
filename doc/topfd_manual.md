@@ -2,7 +2,7 @@
 TopFD (Top-down mass spectral Feature Detection) is a software tool for top-down spectral deconvolution, which groups top-down mass spectral peaks into isotopic envelopes and converts isotopic envelopes to monoisotopic neutral masses. In addition, it extracts proteoform features from MS1 spectra. 
 
 ### Minimum requirements
-A computer with at least 4 GB memory and a 64-bit Linux or Windows operating system is required. 
+A computer with at least 16 GB memory and a 64-bit Linux or Windows operating system is required. 
 
 ### Input
 The input of TopFD is mzML or mzXML top-down mass spectrometry data files. Raw mass spectral data generated from various mass spectrometers can be converted to mzML or mzXML files using [MSConvertGUI](https://proteowizard.sourceforge.io/tools/tools_base.html).

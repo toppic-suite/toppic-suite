@@ -3,7 +3,7 @@
 TopPIC identifies and characterizes proteoforms at the proteome level by searching top-down tandem mass spectra against a protein sequence database. It efficiently identifies proteoforms with post-translational modificatons (PTMs) and unexpected alterations, such as mutations, accurately estimates the statistical significance of identifications, and characterizes reported proteoforms with unknown mass shifts. It uses several techniques, such as indexes, spectral alignment, generating function methods, and the modification identification score (MIScore), to increase the speed, sensitivity, and accuracy.
 
 ### Minimum requirements
-A computer with at least 4 GB memory and a 64-bit Linux or Windows operating system is required. 
+A computer with at least 16 GB memory and a 64-bit Linux or Windows operating system is required. 
 
 ### Input
 
