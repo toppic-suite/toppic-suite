@@ -38,7 +38,7 @@ PWIZ_API_DECL void pwiz::msdata::ListBase::warn_once(const char * msg) const
 {
     boost::lock_guard<boost::mutex> g(m);
     if (warn_msg_hashes_.insert(hash(msg)).second) // .second is true iff value is new
-        std::cerr << msg << std::endl;
+        cerr << msg << std::endl;
 }
 
 

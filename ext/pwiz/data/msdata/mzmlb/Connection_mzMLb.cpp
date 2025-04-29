@@ -38,7 +38,7 @@ namespace mzmlb {
 
 Connection_mzMLb::Connection_mzMLb(const std::string& id, bool identifyOnly)
 {
-  /*
+    /*
     H5Eset_auto(H5E_DEFAULT, NULL, NULL);
 
     // open HDF5 file for reading
@@ -131,7 +131,7 @@ Connection_mzMLb::Connection_mzMLb(const std::string& id, int chunk_size, int co
     chunk_size_(chunk_size),
     compression_level_(compression_level)
 {    
-  /*
+    /*
     H5Eset_auto(H5E_DEFAULT, NULL, NULL);
 
     // create/truncate HDF5 file for writing
@@ -196,7 +196,7 @@ Connection_mzMLb::Connection_mzMLb(const std::string& id, int chunk_size, int co
 
 void Connection_mzMLb::close()
 {
-  /*
+    /*
     H5Tclose(opaque_id_);
 
     H5Dclose(mzML_.dataset);
@@ -216,7 +216,7 @@ void Connection_mzMLb::close()
 // read mzMLb "mzML" dataset
 std::streamsize Connection_mzMLb::read(char* s, std::streamsize n)
 {
-  /*
+    /*
     // don't read past end of dataset
     if (mzML_.pos + n > mzML_.size)
     {
@@ -243,14 +243,14 @@ std::streamsize Connection_mzMLb::read(char* s, std::streamsize n)
         return -1;
     }
     */
-  return 0;
+   return 0;
 }
 
 
 // write mzMLb "mzML" dataset
 std::streamsize Connection_mzMLb::write(const char* s, std::streamsize n)
 {
-  /*
+    /*
     // extend dataset size if needed
     if (mzML_.pos + n > mzML_.size)
     {
@@ -270,16 +270,17 @@ std::streamsize Connection_mzMLb::write(const char* s, std::streamsize n)
     H5Sclose(mspace);
     
     mzML_.pos += n;
-    */
 
     return n;
+    */
+   return 0;
 }
 
 
 // seek mzMLb "mzML" dataset
 stream_offset Connection_mzMLb::seek(stream_offset off, std::ios_base::seekdir way)
 {   
-  /*
+    /*
     switch (way)
     {
     case std::ios_base::beg:
@@ -293,10 +294,11 @@ stream_offset Connection_mzMLb::seek(stream_offset off, std::ios_base::seekdir w
         mzML_.pos = mzML_.size - off;
         break;
     }
-    return mzML_.pos;
     
+ 
+    return mzML_.pos;
     */
-  return 0;
+   return 0;
 }
 
 
@@ -352,6 +354,7 @@ stream_offset Connection_mzMLb::seek(stream_offset off, std::ios_base::seekdir w
     H5Pclose(dapl);
 }
 
+
 // write mzMLb mzML index
 void Connection_mzMLb::writeIndex(const std::string& id, const std::vector<stream_offset>& positions)
 {
@@ -391,14 +394,16 @@ void Connection_mzMLb::writeIndex(const std::string& id, const std::vector<strea
 
 bool Connection_mzMLb::exists(const std::string& id)
 {
-    //return H5Lexists(file_, id.c_str(), H5P_DEFAULT) > 0;
-    return false;
+    /*
+    return H5Lexists(file_, id.c_str(), H5P_DEFAULT) > 0;
+    */
+   return 0;
 }
 
 
 std::streamsize Connection_mzMLb::size(const std::string& id)
 {
-  /*
+    /*
     hid_t dataset = H5Dopen(file_, id.c_str(), H5P_DEFAULT);
 
     if (dataset < 0)
@@ -411,9 +416,10 @@ std::streamsize Connection_mzMLb::size(const std::string& id)
     
     H5Sclose(space);
     H5Dclose(dataset);
+
     return size;
     */
-  return 0;
+   return 0;
 }
 
 
@@ -452,9 +458,9 @@ std::streamsize Connection_mzMLb::read(const std::string& id, long long* buf, st
 }
 
 
-/*
 std::streamsize Connection_mzMLb::read(const std::string& id, void* buf, std::streamsize n, hid_t native_format)
 {
+    /*
     Stream& s_ = binary_[id];
     if (!s_.dataset)
     {
@@ -518,8 +524,9 @@ std::streamsize Connection_mzMLb::read(const std::string& id, void* buf, std::st
     {
        return -1;
     }
+    */
+   return 0;
 }
-*/
 
 
 std::streamsize Connection_mzMLb::write_opaque(const std::string& id, const void* buf, std::streamsize n)
@@ -563,9 +570,10 @@ std::streamsize Connection_mzMLb::write(const std::string& id, const long long* 
     return 0;
 }
 
-/*
+
 std::streamsize Connection_mzMLb::write(const std::string& id, const void* buf, std::streamsize n, hid_t native_format, hid_t format, size_t bytes)
 {
+    /*
     Stream& stream = binary_[id];
     if (!stream.dataset)
     {
@@ -615,13 +623,14 @@ std::streamsize Connection_mzMLb::write(const std::string& id, const void* buf, 
     stream.pos += n;
 
     return n;
+    */
+   return 0;
 }
-*/
 
 
 stream_offset Connection_mzMLb::seek(const std::string& id, stream_offset off, std::ios_base::seekdir way)
 {
-  /*
+    /*
     Stream& stream = binary_[id];
 
     switch (way)
@@ -638,11 +647,10 @@ stream_offset Connection_mzMLb::seek(const std::string& id, stream_offset off, s
         break;
     }
     
-   return stream.pos;
-   */
-  return 0;
+    return stream.pos;
+    */
+   return 0;
 }
-
 
 } // mzmlb
 } // msdata

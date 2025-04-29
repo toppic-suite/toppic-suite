@@ -146,48 +146,48 @@ void start_msRun(XMLWriter& xmlWriter, const MSData& msd, bool continueOnError)
 
 string translate_SourceFileTypeToRunID(const SourceFile& sf, CVID sourceFileType)
 {
-    string nameExtension = bal::to_lower_copy(bfs::path(sf.name).extension().string());
-    string locationExtension = bal::to_lower_copy(bfs::path(sf.location).extension().string());
+    string nameExtension = bal::to_lower_copy(bfs::extension(sf.name));
+    string locationExtension = bal::to_lower_copy(bfs::extension(sf.location));
 
     switch (sourceFileType)
     {
         // location="file://path/to" name="source.RAW"
         case MS_Thermo_RAW_format:
             if (nameExtension == ".raw")
-                return bfs::path(sf.name).stem().string();
+                return bfs::basename(sf.name);
             return "";
 
         // sane: location="file://path/to/source.raw" name="_FUNC001.DAT"
         // insane: location="file://path/to" name="source.raw"
         case MS_Waters_raw_format:
             if (nameExtension == ".dat" && locationExtension == ".raw")
-                return bfs::path(sf.location).stem().string();
+                return bfs::basename(bfs::path(sf.location).filename());
             else if (nameExtension == ".raw")
-                return bfs::path(sf.name).stem().string();
+                return bfs::basename(sf.name);
             return "";
 
         // location="file://path/to/source.d" name="Analysis.yep"
         case MS_Bruker_Agilent_YEP_format:
             if (nameExtension == ".yep" && locationExtension == ".d")
-                return bfs::path(sf.location).stem().string();
+                return bfs::basename(bfs::path(sf.location).filename());
             return "";
             
         // location="file://path/to/source.d" name="Analysis.baf"
         case MS_Bruker_BAF_format:
             if (nameExtension == ".baf" && locationExtension == ".d")
-                return bfs::path(sf.location).stem().string();
+                return bfs::basename(bfs::path(sf.location).filename());
             return "";
             
         // location="file://path/to/source.d" name="Analysis.tdf"
         case MS_Bruker_TDF_format:
             if (nameExtension == ".tdf" && locationExtension == ".d")
-                return bfs::path(sf.location).stem().string();
+                return bfs::basename(bfs::path(sf.location).filename());
             return "";
             
         // location="file://path/to/source.d" name="Analysis.tsf"
         case MS_Bruker_TSF_format:
             if (nameExtension == ".tsf" && locationExtension == ".d")
-                return bfs::path(sf.location).stem().string();
+                return bfs::basename(bfs::path(sf.location).filename());
             return "";
 
         // location="file://path/to/source.d/AcqData" name="msprofile.bin"
@@ -196,7 +196,7 @@ string translate_SourceFileTypeToRunID(const SourceFile& sf, CVID sourceFileType
                 (bal::iends_with(sf.name, "msprofile.bin") ||
                  bal::iends_with(sf.name, "mspeak.bin") ||
                  bal::iends_with(sf.name, "msscan.bin")))
-                return bfs::path(sf.location).parent_path().stem().string();
+                return bfs::basename(bfs::path(sf.location).parent_path().filename());
             return "";
 
         // location="file://path/to" name="source.mzXML"
@@ -204,7 +204,7 @@ string translate_SourceFileTypeToRunID(const SourceFile& sf, CVID sourceFileType
         // location="file://path/to" name="source.d" (ambiguous)
         case MS_ISB_mzXML_format:
             if (nameExtension == ".mzxml" || nameExtension == ".d")
-                return bfs::path(sf.name).stem().string();
+                return bfs::basename(sf.name);
             else if (bal::iends_with(sf.name, ".mz.xml"))
                 return sf.name.substr(0, sf.name.length()-7);
             return "";
@@ -213,19 +213,19 @@ string translate_SourceFileTypeToRunID(const SourceFile& sf, CVID sourceFileType
         // location="file://path/to" name="source.mz.data" ???
         case MS_PSI_mzData_format:
             if (nameExtension == ".mzdata")
-                return bfs::path(sf.name).stem().string();
+                return bfs::basename(sf.name);
             return "";
 
         // location="file://path/to" name="source.mgf"
         case MS_Mascot_MGF_format:
             if (nameExtension == ".mgf")
-                return bfs::path(sf.name).stem().string();
+                return bfs::basename(sf.name);
             return "";
 
         // location="file://path/to" name="source.wiff"
         case MS_ABI_WIFF_format:
             if (nameExtension == ".wiff")
-                return bfs::path(sf.name).stem().string();
+                return bfs::basename(sf.name);
             return "";
 
         // location="file://path/to/source/maldi-spot/1/1SRef" name="fid"
@@ -270,7 +270,7 @@ void write_parentFile(XMLWriter& xmlWriter, const MSData& msd)
 
         string fileName, fileType, fileSha1;
 
-        fileName = sf.location + "/" + sf.name;
+        fileName = (bfs::path(sf.location) / sf.name).string();
         switch (nativeIdFormat)
         {
             // nativeID formats from processed data file types
@@ -440,12 +440,14 @@ struct PrecursorInfo
     string charge;
     string collisionEnergy;
     string activation;
+    string ccs;
     double windowWideness;
+    
 
     bool empty() const 
     {
         return scanNum.empty() && mz.empty() && intensity.empty() && 
-               charge.empty() && collisionEnergy.empty() && activation.empty() && windowWideness == 0;
+               charge.empty() && collisionEnergy.empty() && activation.empty() && ccs.empty() && windowWideness == 0;
     }
 };
 
@@ -471,6 +473,7 @@ vector<PrecursorInfo> getPrecursorInfo(const Spectrum& spectrum,
             info.mz = it->selectedIons[0].cvParam(MS_selected_ion_m_z).value;
             info.intensity = it->selectedIons[0].cvParam(MS_peak_intensity).value;
             info.charge = it->selectedIons[0].cvParam(MS_charge_state).value;
+            info.ccs = it->selectedIons[0].cvParam(MS_collisional_cross_sectional_area).value;
         }
 
         if (!it->activation.empty())
@@ -514,7 +517,6 @@ vector<PrecursorInfo> getPrecursorInfo(const Spectrum& spectrum,
     return result;
 }
 
-
 void write_precursors(XMLWriter& xmlWriter, const vector<PrecursorInfo>& precursorInfo)
 {
     xmlWriter.pushStyle(XMLWriter::StyleFlag_InlineInner);
@@ -535,6 +537,8 @@ void write_precursors(XMLWriter& xmlWriter, const vector<PrecursorInfo>& precurs
             attributes.add("activationMethod", it->activation);
         if (it->windowWideness != 0)
             attributes.add("windowWideness", it->windowWideness);
+        if (!it->ccs.empty())
+            attributes.add("CCS", it->ccs);
 
         xmlWriter.startElement("precursorMz", attributes);
         xmlWriter.characters(it->mz, false);
@@ -760,7 +764,7 @@ void write_scans(XMLWriter& xmlWriter, const MSData& msd,
         {
             if (continueOnError)
             {
-		std::cerr << "Skipping spectrum " << i << " \"" << (spectrum ? spectrum->id : sl->spectrumIdentity(i).id) << "\": " << e.what() << endl;
+                cerr << "Skipping spectrum " << i << " \"" << (spectrum ? spectrum->id : sl->spectrumIdentity(i).id) << "\": " << e.what() << endl;
                 continue;
             }
             else
@@ -881,7 +885,7 @@ void splitFilename(const string& fullpath, string& path, string& basename)
 
 CVID translate_parentFilenameToSourceFileType(const string& name)
 {
-    string fileExtension = bal::to_lower_copy(bfs::path(name).extension().string());
+    string fileExtension = bal::to_lower_copy(bfs::extension(name));
 
     // check for known vendor formats
     if (fileExtension == ".raw")

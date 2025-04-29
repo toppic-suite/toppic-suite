@@ -470,7 +470,7 @@ void Serializer_MSn::Impl::write(ostream& os, const MSData& msd,
         {
             if (continueOnError)
             {
-		std::cerr << "Skipping spectrum " << i << " \"" << (s ? s->id : sl.spectrumIdentity(i).id) << "\": " << e.what() << endl;
+                cerr << "Skipping spectrum " << i << " \"" << (s ? s->id : sl.spectrumIdentity(i).id) << "\": " << e.what() << endl;
                 continue;
             }
             else

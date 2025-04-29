@@ -80,7 +80,7 @@ void Reader::Config::instrumentMetadataError(const std::string& msg) const
 {
     if (unknownInstrumentIsError)
         throw runtime_error(msg + string("; if want to convert the file anyway, use the ignoreUnknownInstrumentError flag"));
-    std::cerr << msg << endl;
+    cerr << msg << endl;
 }
 
 // default implementation; most Readers don't need to worry about multi-run input files

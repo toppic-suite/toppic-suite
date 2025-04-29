@@ -18,7 +18,7 @@ message(STATUS "System name: " ${CMAKE_SYSTEM_NAME})
 # C++ flags 
 # -Wall is used to enable all compiler warnings 
 # -Wno-unknown-pragmas is used to disable pragmas warnings 
-# -DWITHOUT_MZ5 is used in pwiz
+# -DWITHOUT_MZ5 is used in pwiz to exclude code for mz5 format support
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unknown-pragmas --std=c++17 -O3 -DWITHOUT_MZ5")
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")

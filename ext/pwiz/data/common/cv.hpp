@@ -41,12 +41,10 @@
 // [psi-ms.obo]
 #define _PSI_MS_OBO_
 //   format-version: 1.2
-//   data-version: 4.1.136
-//   date: 10:11:2023 11:30
-//   saved-by: Chris Bielow
+//   data-version: 4.1.182
+//   date: 11:10:2024 07:15
+//   saved-by: Joshua Klein
 //   auto-generated-by: OBO-Edit 2.3.1
-//   import: http://purl.obolibrary.org/obo/pato.obo
-//   import: http://purl.obolibrary.org/obo/stato.owl
 //   default-namespace: MS
 //   namespace-id-rule: * MS:$sequence(7,0,9999999)$
 //   namespace-id-rule: * PEFF:$sequence(7,0,9999999)$
@@ -64,7 +62,7 @@
 //   remark: creator: Gerhard Mayer <mayerg97 <-at-> rub.de>
 //   remark: creator: Joshua Klein <jaklein <-at-> bu.edu>
 //   remark: creator: Chris Bielow <chris.bielow <-at-> fu-berlin.de>
-//   remark: creator: Wout Bittremieux <wbittremieux <-at-> health.ucsd.edu>
+//   remark: creator: Wout Bittremieux <wout.bittremieux <-at-> uantwerpen.be>
 //   remark: creator: Nils Hoffmann < nils.hoffmann <-at-> cebitec.uni-bielefeld.de>
 //   remark: creator: Julian Uszkoreit <julian.uszkoreit <-at-> ruhr-uni-bochum.de>
 //   remark: creator: Mathias Walzer <walzer <-at-> ebi.ac.uk>
@@ -79,7 +77,7 @@
 // [unimod.obo]
 #define _UNIMOD_OBO_
 //   format-version: 1.4
-//   date: 05:10:2023 14:38
+//   date: 12:08:2024 11:33
 //
 // [unit.obo]
 #define _UNIT_OBO_
@@ -306,6 +304,9 @@ enum PWIZ_API_DECL CVID
 
     /// Duration: The period of time during which something continues.
     NCIT_Duration = 100325330,
+
+    /// Number: A numeral or string of numerals expressing value, quantity, or identification.
+    NCIT_Number = 100325337,
 
     /// Action: A thing done.
     NCIT_Action = 100325404,
@@ -1822,6 +1823,9 @@ enum PWIZ_API_DECL CVID
     /// laser desorption ionization: The formation of gas-phase ions by the interaction of a pulsed laser with a solid or liquid material.
     MS_laser_desorption_ionization = 1000393,
 
+    /// no sequence database: No reference sequence database was used in the search process to determine the identified peptide sequence, for example as with de novo sequencing.
+    MS_no_sequence_database = 1000394,
+
     /// liquid secondary ionization: The ionization of any species by the interaction of a focused beam of ions with a sample that is dissolved in a solvent matrix. See also fast atom bombardment and secondary ionization.
     MS_liquid_secondary_ionization = 1000395,
 
@@ -2719,6 +2723,9 @@ enum PWIZ_API_DECL CVID
     /// 4000 Series Explorer Software: SCIEX or Applied Biosystems software for data acquisition and analysis.
     MS_4000_Series_Explorer_Software = 1000659,
 
+    /// Xevo MRT MS: Waters Corporation Xevo MRT Mass Spectrometer.
+    MS_Xevo_MRT_MS = 1000660,
+
     /// GPS Explorer: SCIEX or Applied Biosystems software for data acquisition and analysis.
     MS_GPS_Explorer = 1000661,
 
@@ -3256,6 +3263,9 @@ enum PWIZ_API_DECL CVID
     /// isolation window upper offset: The extent of the isolation window in m/z above the isolation window target m/z. The lower and upper offsets may be asymmetric about the target m/z.
     MS_isolation_window_upper_offset = 1000829,
 
+    /// precision: Precision is the degree of how close repeated measurements are to each other. This can, for example, be expressed using the standard deviation.
+    MS_precision = 1000830,
+
     /// sample preparation: Properties of the preparation steps which took place before the measurement was performed.
     MS_sample_preparation = 1000831,
 
@@ -3373,8 +3383,8 @@ enum PWIZ_API_DECL CVID
     /// structural formula: A chemical formula showing the number of atoms of each element in a molecule, their spatial arrangement, and their linkage to each other.
     MS_structural_formula = 1000867,
 
-    /// SMILES formula: The simplified molecular input line entry specification or SMILES is a specification for unambiguously describing the structure of a chemical compound using a short ASCII string.
-    MS_SMILES_formula = 1000868,
+    /// SMILES string: The simplified molecular input line entry specification or SMILES is a specification for unambiguously describing the structure of a chemical compound using a short ASCII string.
+    MS_SMILES_string = 1000868,
 
     /// collision gas pressure: The gas pressure of the collision gas used for collisional excitation.
     MS_collision_gas_pressure = 1000869,
@@ -3886,8 +3896,11 @@ enum PWIZ_API_DECL CVID
     /// single protein identification statistic: Results specific for one protein as part of a protein ambiguity group (a result not valid for all the other proteins in the protein ambiguity group).
     MS_single_protein_identification_statistic = 1001116,
 
-    /// theoretical mass: The theoretical neutral mass of the molecule (e.g. the peptide sequence and its modifications) not including its charge carrier.
-    MS_theoretical_mass = 1001117,
+    /// theoretical neutral mass: The theoretical neutral mass of the molecule (e.g. the peptide sequence and its modifications) not including its charge carrier.
+    MS_theoretical_neutral_mass = 1001117,
+
+    /// theoretical mass (theoretical neutral mass): The theoretical neutral mass of the molecule (e.g. the peptide sequence and its modifications) not including its charge carrier.
+    MS_theoretical_mass = MS_theoretical_neutral_mass,
 
     /// param: b ion: Parameter information, type of product: b ion with charge on the N-terminal side.
     MS_param__b_ion = 1001118,
@@ -4077,6 +4090,12 @@ enum PWIZ_API_DECL CVID
 
     /// search statistics: The details of the actual run of the search.
     MS_search_statistics = 1001184,
+
+    /// Mobilion MBI format: Mobilion MBI file format.
+    MS_Mobilion_MBI_format = 1001185,
+
+    /// Mobilion MBI nativeID format: Native format defined by frame=xsd:nonNegativeInteger scan=xsd:nonNegativeInteger.
+    MS_Mobilion_MBI_nativeID_format = 1001186,
 
     /// modification specificity peptide N-term: As parameter for search engine: apply the modification only at the N-terminus of a peptide.
     MS_modification_specificity_peptide_N_term = 1001189,
@@ -7558,8 +7577,11 @@ enum PWIZ_API_DECL CVID
     /// second-pass peptide identification: A putative identified peptide found in a second-pass search of protein sequences selected from a first-pass search.
     MS_second_pass_peptide_identification = 1002341,
 
-    /// MZmine: A framework for differential analysis of mass spectrometry data.
-    MS_MZmine = 1002342,
+    /// mzmine: A framework for differential analysis of mass spectrometry data.
+    MS_mzmine = 1002342,
+
+    /// MZmine (mzmine): A framework for differential analysis of mass spectrometry data.
+    MS_MZmine = MS_mzmine,
 
     /// ion stability type: Stability type of the ion.
     MS_ion_stability_type_OBSOLETE = 1002343,
@@ -8712,6 +8734,12 @@ enum PWIZ_API_DECL CVID
 
     /// FLASHDeconv: Ultrafast, High-Quality Feature Deconvolution for Top-Down Proteomics.
     MS_FLASHDeconv = 1002714,
+
+    /// temperature chromatogram: Representation of temperature versus time.
+    MS_temperature_chromatogram = 1002715,
+
+    /// measured element: The component or dimension of an object being measured, for example the temperature of an instrument component over time.
+    MS_measured_element = 1002716,
 
     /// Pegasus BT: LECO bench-top GC time-of-flight mass spectrometer.
     MS_Pegasus_BT = 1002719,
@@ -10594,7 +10622,7 @@ enum PWIZ_API_DECL CVID
     /// identification based on multiple spectra: Provides an identifier to encode identifications based on multiple spectra.
     MS_identification_based_on_multiple_spectra = 1003332,
 
-    /// regular expression for encoding identifications based on multiple spectra.: ^(?<MULTIPLE_SPECTRA_IDENTIFIER>[0-9]+)(?::(?<PARENT_OR_CHILD>P|C))$
+    /// regular expression for encoding identifications based on multiple spectra.: ^(?<MULTIPLE_SPECTRA_IDENTIFIER>[0-9]+)(?::(?<PARENT_OR_CHILD>P|C))?$
     MS_regular_expression_for_encoding_identifications_based_on_multiple_spectra_ = 1003333,
 
     /// parent term for PSM-level scores for identifications based on multiple spectra: Parent term for PSM-level scores for identifications based on multiple spectra.
@@ -10813,6 +10841,75 @@ enum PWIZ_API_DECL CVID
     /// pymzqc: A Python package for reading, validating, and writing mzQC files.
     MS_pymzqc = 1003402,
 
+    /// InChI: IUPAC International Chemical Identifier.
+    MS_InChI = 1003403,
+
+    /// timsTOF HT: Bruker Daltonics' timsTOF HT.
+    MS_timsTOF_HT = 1003404,
+
+    /// mzRecal: MS1 recalibration using identified peptides as internal calibrants.
+    MS_mzRecal = 1003405,
+
+    /// spectrum clustering software: Software designed to group multiple mass spectra by high similarity, generally with the goal of grouping replicate spectra derived from the same analyte.
+    MS_spectrum_clustering_software = 1003406,
+
+    /// Scout: Identifying crosslinked peptides in complex protein mixtures
+    MS_Scout = 1003407,
+
+    /// Scout score: Scout identification search engine score
+    MS_Scout_score = 1003408,
+
+    /// Stellar: Thermo Scientific Stellar mass spectrometer contains a quadrupole mass filter, a collision cell, and a quadrupole linear ion trap mass analyzer.
+    MS_Stellar = 1003409,
+
+    /// electron beam energy: The kinetic energy of the electron beam used in dissociation methods induced by a free electron beam, such as electron-capture dissociation (ECD), electron-detachment dissociation (EDD), and electron-activated dissociation (EAD).
+    MS_electron_beam_energy = 1003410,
+
+    /// Orbitrap IQ-X: Thermo Scientific Orbitrap IQ-X mass spectrometer with Tribrid architecture consisting of quadrupole mass filter, linear ion trap and Orbitrap mass analyzers.
+    MS_Orbitrap_IQ_X = 1003411,
+
+    /// timsTOF Ultra 2: Bruker Daltonics timsTOF Ultra 2.
+    MS_timsTOF_Ultra_2 = 1003412,
+
+    /// Kojak: Kojak open-source crosslinked peptide sequence search engine developed at the Institute for Systems Biology.
+    MS_Kojak = 1003413,
+
+    /// Kojak:score: The Kojak score for an individual peptide sequence, similar to Comet:xcorr.
+    MS_Kojak_score = 1003414,
+
+    /// Kojak:expectation value: The Kojak expectation value for an individual peptide sequence.
+    MS_Kojak_expectation_value = 1003415,
+
+    /// Kojak:matched ions: The number of matched ions for an individual peptide sequence in a Kojak result.
+    MS_Kojak_matched_ions = 1003416,
+
+    /// Kojak:consecutive matched ions: The highest run of consecutive matched ions for an individual peptide sequence in a Kojak result.
+    MS_Kojak_consecutive_matched_ions = 1003417,
+
+    /// Kojak:delta score: The difference between the top Kojak score and the next best Kojak score for a PSM.
+    MS_Kojak_delta_score = 1003418,
+
+    /// Kojak:rank: The rank of an individual peptide from the first pass of the Kojak scoring algorithm. Applies only to sequences in a crosslinked result.
+    MS_Kojak_rank = 1003419,
+
+    /// Kojak:score xlink: The Kojak score for a crosslinked pair of peptide sequences, similar to Comet:xcorr.
+    MS_Kojak_score_xlink = 1003420,
+
+    /// Kojak:expectation value xlink: The Kojak expectation value for a crosslinked pair of peptide sequences.
+    MS_Kojak_expectation_value_xlink = 1003421,
+
+    /// Kojak:matched ions xlink: The number of matched ions for a crosslinked pair of peptide sequences in a Kojak result.
+    MS_Kojak_matched_ions_xlink = 1003422,
+
+    /// Orbitrap Exploris GC 240: Orbitrap Exploris GC 240 Mass Spectrometer.
+    MS_Orbitrap_Exploris_GC_240 = 1003423,
+
+    /// selected fragment theoretical m/z observed intensity spectrum: Spectrum for which the peaks are limited to a subset of known product ions that are important for subsequent identification, whose m/z values are corrected to theoretical values, and intensity values are experimentally derived.
+    MS_selected_fragment_theoretical_m_z_observed_intensity_spectrum = 1003424,
+
+    /// Number of Occurrences: The number of times something happened.
+    NCIT_Number_of_Occurrences = 103150827,
+
     /// PSI-MS CV Quality Control Vocabulary: PSI Quality Control controlled vocabulary term.
     MS_PSI_MS_CV_Quality_Control_Vocabulary = 4000000,
 
@@ -10884,6 +10981,30 @@ enum PWIZ_API_DECL CVID
 
     /// environment metric: QC metric related to measurements of the ambient environment, such as the laboratory.
     MS_environment_metric = 4000024,
+
+    /// precursor ion current chromatogram: Representation of the ion current assigned to detected precursors in the series of all MS1 spectra versus time.
+    MS_precursor_ion_current_chromatogram = 4000025,
+
+    /// precursor ion chromatogram (precursor ion current chromatogram): Representation of the ion current assigned to detected precursors in the series of all MS1 spectra versus time.
+    MS_precursor_ion_chromatogram = MS_precursor_ion_current_chromatogram,
+
+    /// fragment ppm deviation median: The median of the distribution of observed fragment mass accuracies (MS:4000072) [in ppm] of identified MS2 spectra after user-defined acceptance criteria (FDR) are applied.
+    MS_fragment_ppm_deviation_median = 4000026,
+
+    /// fragment ppm deviation mean: The mean of the distribution of observed fragment mass accuracies (MS:4000072) [in ppm] of identified MS2 spectra after user-defined acceptance criteria (FDR) are applied
+    MS_fragment_ppm_deviation_mean = 4000027,
+
+    /// fragment ppm deviation sigma: The standard deviation of the distribution of observed fragment mass accuracies (MS:4000072) [in ppm] of identified MS2 spectra after user-defined acceptance criteria (FDR) are applied
+    MS_fragment_ppm_deviation_sigma = 4000028,
+
+    /// area under TIC in MS1: The area under the total ion current chromatogram (MS:1000235) of all MS1 spectra.
+    MS_area_under_TIC_in_MS1 = 4000029,
+
+    /// area under TIC in MS2: The area under the total ion current chromatogram (MS:1000235) of all MS2 spectra.
+    MS_area_under_TIC_in_MS2 = 4000030,
+
+    /// peak area of MS1 vs MS2 signal ratio: The ratio of the area under TIC of MS1 (MS:4000029) divided by the area under the TIC of MS2 (MS:4000030).
+    MS_peak_area_of_MS1_vs_MS2_signal_ratio = 4000031,
 
     /// XIC50 fraction: The number of XIC that account for the top half of all XIC-FWHM divided by the number of all XIC.
     MS_XIC50_fraction = 4000050,
@@ -11301,6 +11422,21 @@ enum PWIZ_API_DECL CVID
 
     /// median MS2 precursor charge in identified spectra: Median MS2 precursor charge in identified spectra. The used type of identification should be noted in the metadata or analysis methods section of the recording file for the respective run. In case of multiple acceptance criteria (FDR) available in proteomics, PSM-level FDR should be used for better comparability.
     MS_median_MS2_precursor_charge_in_identified_spectra = 4000176,
+
+    /// contaminant protein abundance fraction: The fraction of total protein abundance in a mass spectrometry run or a group of runs which can be attributed to a user-defined list of contaminant proteins (e.g. using the cRAP contaminant database).
+    MS_contaminant_protein_abundance_fraction = 4000177,
+
+    /// precursor ppm deviation mean: The mean of the distribution of observed precursor mass accuracies (MS:4000072) [in ppm] of identified MS2 spectra after user-defined acceptance criteria (FDR) are applied
+    MS_precursor_ppm_deviation_mean = 4000178,
+
+    /// precursor ppm deviation sigma: The standard deviation of the distribution of observed precursor mass accuracies (MS:4000072) [in ppm] of identified MS2 spectra after user-defined acceptance criteria (FDR) are applied
+    MS_precursor_ppm_deviation_sigma = 4000179,
+
+    /// table of missed cleavage counts: The number of identified peptides with corresponding number of missed cleavages after user-defined acceptance criteria are applied. The number of missed cleavages per peptide is given in the 'number of missed cleavages' column, the respective count of such peptides identified in the 'Number of Occurrences' column. The highest 'missed cleavages' row is to be interpreted as that number of missed cleavages or higher.
+    MS_table_of_missed_cleavage_counts = 4000180,
+
+    /// identified MS2 quarter RT fraction: The interval used for acquisition of the first, second, third, and fourth quarter of all identified MS2 events divided by retention time duration.
+    MS_identified_MS2_quarter_RT_fraction = 4000181,
 
     /// unimod root node: The root node of the unimod modifications ontology.
     UNIMOD_unimod_root_node = 300000000,
@@ -15829,14 +15965,14 @@ enum PWIZ_API_DECL CVID
     /// DBIA: Desthiobiotinylation of cysteine with DBIA probe.
     UNIMOD_DBIA = 300002062,
 
-    /// Mono_Nγ-propargyl-L-Gln_desthiobiotin: Monomodification of Nγ-propargyl-L-Gln probe with clicked desthiobiotin-azide.
-    UNIMOD_Mono_N___propargyl_L_Gln_desthiobiotin = 300002067,
+    /// Mono_Ngamma-propargyl-L-Gln_desthiobiotin: Monomodification of Ngamma-propargyl-L-Gln probe with clicked desthiobiotin-azide.
+    UNIMOD_Mono_Ngamma_propargyl_L_Gln_desthiobiotin = 300002067,
 
-    /// Di_L-Glu_Nγ-propargyl-L-Gln_desthiobiotin: Dimodification of L-Glu and Nγ-propargyl-L-Gln probe with clicked desthiobiotin-azide.
-    UNIMOD_Di_L_Glu_N___propargyl_L_Gln_desthiobiotin = 300002068,
+    /// Di_L-Glu_Ngamma-propargyl-L-Gln_desthiobiotin: Dimodification of L-Glu and Ngamma-propargyl-L-Gln probe with clicked desthiobiotin-azide.
+    UNIMOD_Di_L_Glu_Ngamma_propargyl_L_Gln_desthiobiotin = 300002068,
 
-    /// Di_L-Gln_Nγ-propargyl-L-Gln_desthiobiotin: Dimodification of L-Gln and Nγ-propargyl-L-Gln probe with clicked desthiobiotin-azide.
-    UNIMOD_Di_L_Gln_N___propargyl_L_Gln_desthiobiotin = 300002069,
+    /// Di_L-Gln_Ngamma-propargyl-L-Gln_desthiobiotin: Dimodification of L-Gln and Ngamma-propargyl-L-Gln probe with clicked desthiobiotin-azide.
+    UNIMOD_Di_L_Gln_Ngamma_propargyl_L_Gln_desthiobiotin = 300002069,
 
     /// L-Gln: Monomodification with glutamine.
     UNIMOD_L_Gln = 300002070,
@@ -15870,6 +16006,69 @@ enum PWIZ_API_DECL CVID
 
     /// DVFQQQTGG: SUMOylation by Endogenous SUMO2/3 following Lys C and Asp-N serial digestion.
     UNIMOD_DVFQQQTGG = 300002085,
+
+    /// iST-NHS specific cysteine modification: Preomics iST-NHS Kit specific cysteine modification.
+    UNIMOD_iST_NHS_specific_cysteine_modification = 300002086,
+
+    /// Label:13C(2)15N(1): 13C(2) 15N(1) Silac label.
+    UNIMOD_Label_13C_2_15N_1_ = 300002088,
+
+    /// DPIA: Desthiobiotinylation of cysteine with DPIA (Desthiobiotin polyethyleneoxide iodoacetamide) probe.
+    UNIMOD_DPIA = 300002106,
+
+    /// Acetoacetyl: Acetoacetylation.
+    UNIMOD_Acetoacetyl = 300002107,
+
+    /// Isovaleryl: Isovalerylation.
+    UNIMOD_Isovaleryl = 300002108,
+
+    /// 2-methylbutyryl: 2-methylbutyrylation.
+    UNIMOD_2_methylbutyryl = 300002109,
+
+    /// Tiglyl: Tiglylation.
+    UNIMOD_Tiglyl = 300002110,
+
+    /// 3-methylglutaryl: 3-methylglutarylation.
+    UNIMOD_3_methylglutaryl = 300002111,
+
+    /// 3-methylglutaconyl: 3-methylglutaconylation.
+    UNIMOD_3_methylglutaconyl = 300002112,
+
+    /// 3-hydroxy-3-methylglutaryl: 3-hydroxy-3-methylglutarylation.
+    UNIMOD_3_hydroxy_3_methylglutaryl = 300002113,
+
+    /// Lactylation: Lactylation(Lac).
+    UNIMOD_Lactylation = 300002114,
+
+    /// Pyruvoyl: Pyruvoylation.
+    UNIMOD_Pyruvoyl = 300002115,
+
+    /// Glyoxylyl: Glyoxylylation.
+    UNIMOD_Glyoxylyl = 300002116,
+
+    /// Itaconatyl: Itaconatylation.
+    UNIMOD_Itaconatyl = 300002117,
+
+    /// Itaconyl: Itaconylation.
+    UNIMOD_Itaconyl = 300002118,
+
+    /// ValGly: UFMylation residue.
+    UNIMOD_ValGly = 300002119,
+
+    /// Pentanoyl: Pentanoylation.
+    UNIMOD_Pentanoyl = 300002120,
+
+    /// Hexanoyl: Hexanoylation.
+    UNIMOD_Hexanoyl = 300002121,
+
+    /// Label:13C(6)15N(2)+TMT6plex: Sixplex Tandem Mass Tag 13C(6) 15N(2) Silac label.
+    UNIMOD_Label_13C_6_15N_2__TMT6plex = 300002122,
+
+    /// Label:13C(6)15N(2)+TMTpro: TMTpro Tandem Mass Tag 13C(6) 15N(2) Silac label.
+    UNIMOD_Label_13C_6_15N_2__TMTpro = 300002123,
+
+    /// 2PCA-triazole-ethanethiol: Cleaved 2PCA clicked to biotin-SS-azide.
+    UNIMOD_2PCA_triazole_ethanethiol = 300002126,
 
     /// unit: A unit of measurement is a standardized quantity of a physical quality.
     UO_unit = 400000000,
@@ -17105,7 +17304,7 @@ struct PWIZ_API_DECL CVTermInfo
     std::vector<std::string> exactSynonyms;
     std::multimap<std::string, std::string> propertyValues;
 
-    CVTermInfo() : cvid((CVID)-1) {}
+    CVTermInfo() : cvid((CVID)-1), isObsolete(false) {}
     const std::string& shortName() const;
     std::string prefix() const;
 };

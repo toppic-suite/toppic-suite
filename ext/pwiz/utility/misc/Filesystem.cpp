@@ -25,7 +25,7 @@
 
 #include "Filesystem.hpp"
 
-#ifdef WIN32
+#ifdef _MSC_VER
     #ifdef _WIN32_WINNT
         #undef _WIN32_WINNT
     #endif
@@ -106,7 +106,7 @@ extern "C"
         ACCESS_MASK GrantedAccess;
     };
 
-    struct PWIZ_SYSTEM_HANDLE_INFORMATION {
+    struct SYSTEM_HANDLE_INFORMATION {
         ULONG HandleCount;
         SYSTEM_HANDLE Handles[1];
     };
@@ -159,7 +159,7 @@ extern "C"
     }
 }
 
-    int GetFileHandleTypeNumber(PWIZ_SYSTEM_HANDLE_INFORMATION* handleInfos)
+    int GetFileHandleTypeNumber(SYSTEM_HANDLE_INFORMATION* handleInfos)
     {
         DWORD currentProcessId = GetCurrentProcessId();
         wstring fileType = L"File";
@@ -286,7 +286,7 @@ PWIZ_API_DECL void force_close_handles_to_filepath(const std::string& filepath, 
     }
 
     NTSTATUS status = 0;
-    DWORD dwSize = sizeof(PWIZ_SYSTEM_HANDLE_INFORMATION);
+    DWORD dwSize = sizeof(SYSTEM_HANDLE_INFORMATION);
     vector<BYTE> pInfoBytes(dwSize);
 
     do
@@ -314,7 +314,7 @@ PWIZ_API_DECL void force_close_handles_to_filepath(const std::string& filepath, 
         return;
     }
 
-    auto pInfo = reinterpret_cast<PWIZ_SYSTEM_HANDLE_INFORMATION*>(pInfoBytes.data());
+    auto pInfo = reinterpret_cast<SYSTEM_HANDLE_INFORMATION*>(pInfoBytes.data());
     int fileHandleType = GetFileHandleTypeNumber(pInfo);
     if (fileHandleType == 0)
     {
@@ -496,43 +496,6 @@ PWIZ_API_DECL int expand_pathmask(const bfs::path& pathmask,
 }
 
 
-namespace
-{
-    void copy_recursive(const bfs::path& from, const bfs::path& to)
-    {
-        bfs::create_directory(to, from);
-
-        for(bfs::directory_entry& entry : bfs::directory_iterator(from))
-        {
-            bfs::file_status status = entry.status();
-            if (status.type() == bfs::directory_file)
-                copy_recursive(entry.path(), to / entry.path().filename());
-            else if (status.type() == bfs::regular_file)
-                bfs::copy_file(entry.path(), to / entry.path().filename());
-            else
-                throw bfs::filesystem_error("[copy_directory] invalid path type", entry.path(), boost::system::error_code(boost::system::errc::no_such_file_or_directory, boost::system::system_category()));
-        }
-    }
-
-    void copy_recursive(const bfs::path& from, const bfs::path& to, boost::system::error_code& ec)
-    {
-        bfs::create_directory(to, from, ec);
-        if (ec.value() != 0)
-            return;
-
-        for(bfs::directory_entry& entry : bfs::directory_iterator(from))
-        {
-            bfs::file_status status = entry.status(ec);
-            if (status.type() == bfs::directory_file)
-                copy_recursive(entry.path(), to / entry.path().filename(), ec);
-            else if (status.type() == bfs::regular_file)
-                bfs::copy_file(entry.path(), to / entry.path().filename(), ec);
-            else if (ec.value() != 0)
-                ec.assign(boost::system::errc::no_such_file_or_directory, boost::system::system_category());
-        }
-    }
-}
-
 PWIZ_API_DECL void copy_directory(const bfs::path& from, const bfs::path& to, bool recursive, boost::system::error_code* ec)
 {
     if (!bfs::is_directory(from))
@@ -549,16 +512,16 @@ PWIZ_API_DECL void copy_directory(const bfs::path& from, const bfs::path& to, bo
     if (recursive)
     {
         if (ec != NULL)
-            copy_recursive(from, to, *ec);
+            bfs::copy(from, to, bfs::copy_options::recursive, *ec);
         else
-            copy_recursive(from, to);
+            bfs::copy(from, to, bfs::copy_options::recursive);
     }
     else
     {
         if (ec != NULL)
-            bfs::create_directory(to, from, *ec);
+            bfs::copy(from, to, *ec);
         else
-            bfs::create_directory(to, from);
+            bfs::copy(from, to);
     }
 }
 
@@ -727,9 +690,9 @@ PWIZ_API_DECL void check_path_length(const string& path)
 }
 
 
-PWIZ_API_DECL TemporaryFile::TemporaryFile(const string& extension)
+PWIZ_API_DECL TemporaryFile::TemporaryFile(const string& filenamePrefix, const string& extension)
 {
-    filepath = bfs::temp_directory_path() / bfs::unique_path("%%%%%%%%%%%%%%%%" + extension);
+    filepath = bfs::temp_directory_path() / bfs::unique_path(filenamePrefix + "%%%%%%%%%%%%%%%%" + extension);
 }
 
 PWIZ_API_DECL TemporaryFile::~TemporaryFile()

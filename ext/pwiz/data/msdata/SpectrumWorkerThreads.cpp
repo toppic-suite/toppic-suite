@@ -75,14 +75,14 @@ class SpectrumWorkerThreads::Impl
             catch (exception& e)
             {
                 // TODO: log this
-		std::cerr << "[SpectrumWorkerThreads::ctor] " << e.what() << endl;
+                cerr << "[SpectrumWorkerThreads::ctor] " << e.what() << endl;
                 if (!continueOnError_)
                     throw;
             }
             catch (...)
             {
                 runtime_error e("[SpectrumWorkerThreads::ctor] unknown exception");
-		std::cerr << e.what() << endl;
+                cerr << e.what() << endl;
                 if (!continueOnError_)
                     throw;
             }
@@ -317,11 +317,11 @@ class SpectrumWorkerThreads::Impl
         catch (exception& e)
         {
             // TODO: log this
-	    std::cerr << "[SpectrumWorkerThreads::work] error in thread: " << e.what() << endl;
+            cerr << "[SpectrumWorkerThreads::work] error in thread: " << e.what() << endl;
         }
         catch (...)
         {
-	    std::cerr << "[SpectrumWorkerThreads::work] unknown exception in worker thread" << endl;
+            cerr << "[SpectrumWorkerThreads::work] unknown exception in worker thread" << endl;
         }
     }
 
