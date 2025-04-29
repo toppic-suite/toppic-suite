@@ -1,6 +1,7 @@
 ## TopFD
 TopFD (Top-down mass spectral Feature Detection) is a software tool for top-down spectral deconvolution, which groups top-down mass spectral peaks into isotopic envelopes and converts isotopic envelopes to monoisotopic neutral masses. In addition, it extracts proteoform features from MS1 spectra. 
 
+### Minimum requirements
 A computer with at least 4 GB memory and a 64-bit Linux or Windows operating system is required. 
 
 ### Input
@@ -12,12 +13,12 @@ TopFD outputs two LC-MS feature text files with a file extension `feature`, one 
 
 For example, when the input file name is spectra.mzML, the output includes: 
 
-* __spectra_ms1.feature__: a feature file containing LC-MS features.
-* __spectra_ms2.feature__: a feature file containing MS/MS scan IDs and their corresponding LC-MS feature IDs.
-* __spectra_feature.xml__: a feature file containing LC-MS features in the xml format.
-* __spectra_ms1.msalign__: a list of deconvoluted MS1 spectra.
-* __spectra_ms2.msalign__: a list of deconvoluted MS/MS spectra.
-* __spectra_html__: a folder containing JavaScript files for MS1 and MS/MS spectral visualization.
+* **spectra_ms1.feature**: a feature file containing LC-MS features.
+* **spectra_ms2.feature**: a feature file containing MS/MS scan IDs and their corresponding LC-MS feature IDs.
+* **spectra_feature.xml**: a feature file containing LC-MS features in the xml format.
+* **spectra_ms1.msalign**: a list of deconvoluted MS1 spectra.
+* **spectra_ms2.msalign**: a list of deconvoluted MS/MS spectra.
+* **spectra_html**: a folder containing JavaScript files for MS1 and MS/MS spectral visualization.
 
 
 ### Command line usage
@@ -26,7 +27,7 @@ To run TopFD, open a console and run the following command.
 topfd [options] spectrum-file-names
 ```
 
-#### Options
+Options
 
 ```
 -h [ --help ]
