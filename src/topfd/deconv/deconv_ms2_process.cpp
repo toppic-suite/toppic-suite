@@ -109,6 +109,10 @@ void deconvMsTwo(MzmlMsPtr ms_ptr, SpecFeaturePtrVec sp_feat_ptr_vec,
         "spectrum" + std::to_string(header_ptr->getSpecId()) + ".js";
     mzml_ms_json_writer::write(json_file_name, ms_ptr, deconv_envs);
   }
+  // 6. write sqlite file
+  if (topfd_para_ptr->isGeneSql()) {
+	  mzml_ms_sql_writer::write(ms_ptr, deconv_envs);
+  }
 }
 
 std::function<void()> geneMsTwoTask(MzmlMsPtr ms_ptr,

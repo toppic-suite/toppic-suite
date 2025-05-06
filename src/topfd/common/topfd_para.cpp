@@ -42,6 +42,8 @@ void TopfdPara::setMzmlFileNameAndFaims(std::string &mzml_file_name,
   ms2_json_dir_ = html_dir_ 
     + file_util::getFileSeparator() + "topfd" 
     + file_util::getFileSeparator() + "ms2_json";
+  sql_file_name_ = output_base_name_ + ".sqlite";
+
 }
 
 std::string TopfdPara::getTopfdParaStr(const std::string &prefix,
