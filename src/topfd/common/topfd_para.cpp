@@ -19,10 +19,18 @@
 #include "common/util/time_util.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/str_util.hpp"
-#include "topfd/common/topfd_para.hpp"
+#include "common/util/sql_util.hpp"
+#include "common/util/logger.hpp"
 #include "common/util/version.hpp"
+#include "topfd/common/topfd_para.hpp"
 
 namespace toppic {
+
+TopfdPara::~TopfdPara() {
+  if (sql_db != nullptr) {
+    sqlite3_close(sql_db);
+  }
+}
 
 void TopfdPara::setMzmlFileNameAndFaims(std::string &mzml_file_name, 
                                         bool is_faims, double voltage) {
@@ -43,7 +51,30 @@ void TopfdPara::setMzmlFileNameAndFaims(std::string &mzml_file_name,
     + file_util::getFileSeparator() + "topfd" 
     + file_util::getFileSeparator() + "ms2_json";
   sql_file_name_ = output_base_name_ + ".sqlite";
+  createSqlDb(sql_file_name_);
+}
 
+void TopfdPara::createSqlDb(std::string sql_db_name) {
+  char *errMsg = 0;
+  int rc;
+  // Open database
+  if (sql_db != nullptr) {
+    sqlite3_close(sql_db);
+  }
+  rc = sqlite3_open(sql_db_name.c_str(), &sql_db);
+  if (rc) {
+    LOG_ERROR("Can't open database: " << sqlite3_errmsg(sql_db)); 
+    exit(EXIT_FAILURE);
+  }
+
+  const char *sql_1 = "CREATE TABLE IF NOT EXISTS ms2_spectrum(id INTEGER PRIMARY KEY, scan INTEGER NOT NULL);";
+  sql_util::execSql(sql_db, sql_1); 
+  const char *sql_2 = "DELETE from ms2_spectrum;"; 
+  sql_util::execSql(sql_db, sql_2);
+  const char *sql_3 = "CREATE TABLE IF NOT EXISTS ms2_peak(id INTEGER PRIMARY KEY, spectrum_id INTEGER NOT NULL, mz REAL NOT NULL, intensity REAL NOT NULL);";
+  sql_util::execSql(sql_db, sql_3); 
+  const char *sql_4 = "DELETE from ms2_peak;"; 
+  sql_util::execSql(sql_db, sql_4);
 }
 
 std::string TopfdPara::getTopfdParaStr(const std::string &prefix,

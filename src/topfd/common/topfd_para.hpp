@@ -15,6 +15,7 @@
 #ifndef TOPPIC_TOPFD_COMMON_TOPFD_PARA_HPP_
 #define TOPPIC_TOPFD_COMMON_TOPFD_PARA_HPP_
 
+#include <sqlite3.h>
 #include <memory>
 #include <string>
 
@@ -27,7 +28,9 @@ typedef std::shared_ptr<TopfdPara> TopfdParaPtr;
 class TopfdPara {
  public:
   TopfdPara() {};
-  
+
+  ~TopfdPara();
+
   std::string getTopfdParaStr(const std::string &prefix,
 		         const std::string &sep, int gap);
 
@@ -165,6 +168,8 @@ class TopfdPara {
   double faims_volt_ = -1;
   std::string output_base_name_ = "";
   std::string sql_file_name_ = "";
+  sqlite3 *sql_db;
+
   std::string html_dir_ = "";
   std::string ms1_json_dir_ = "";
   std::string ms2_json_dir_ = "";

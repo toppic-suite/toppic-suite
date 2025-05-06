@@ -35,6 +35,7 @@ sudo apt install libboost-iostreams-dev
 sudo apt install libboost-program-options-dev 
 sudo apt install libboost-thread-dev 
 sudo apt install libxerces-c-dev  
+sudo apt install libsqlite3-dev
 sudo apt install zlib1g-dev 
 
 # install Qt5 for GUI
@@ -61,6 +62,7 @@ sudo dnf install cmake gcc-c++ make clang
 # install dependencies
 sudo dnf install boost-devel 
 sudo dnf install xerces-c-devel
+sudo dnf install sqlite3-devel 
 sudo dnf install zlib-devel
 
 # install Qt5 for GUI
