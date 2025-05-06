@@ -13,61 +13,59 @@
 //limitations under the License.
 
 #include "common/util/logger.hpp"
+#include "common/util/str_util.hpp"
 #include "common/util/sql_util.hpp"
-#include "ms/mzml/msml_ms_sql_writer.hpp" 
+#include "ms/mzml/mzml_ms_sql_writer.hpp" 
 
 namespace toppic {
 
-namespace mzml_ms_json_writer {
+namespace mzml_ms_sql_writer {
 
 void writeMs2(sqlite3* sql_db, MzmlMsPtr ms_ptr, MatchEnvPtrVec &envs) {
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
-  int ms_level = header_ptr->getMsLevel();
+  //int ms_level = header_ptr->getMsLevel();
   int spec_id = header_ptr->getSpecId();
   int scan_num = header_ptr->getFirstScanNum();
   double retention_time = header_ptr->getRetentionTime();
   double target_mz = header_ptr->getPrecTargetMz();
   double begin_mz = header_ptr->getPrecWinBegin();
   double end_mz = header_ptr->getPrecWinEnd();
+  std::string n_ion_type =
+      header_ptr->getActivationPtr()->getNIonTypePtr()->getName();
+  std::string c_ion_type =
+      header_ptr->getActivationPtr()->getCIonTypePtr()->getName();
 
-  //const char *sql_1 = "INSERT TABLE IF NOT EXISTS ms2_spectrum(id INTEGER PRIMARY KEY, scan INTEGER NOT NULL);";
-  //sql_util::execSql(sql_db, sql_1); 
-
-  /*
-  doc.AddMember("id", spec_id, allocator);
-  doc.AddMember("scan", scan_num, allocator);
-  doc.AddMember("retention_time", retention_time, allocator);
-  doc.AddMember("target_mz", target_mz, allocator);
-  doc.AddMember("min_mz", begin_mz, allocator);
-  doc.AddMember("max_mz", end_mz, allocator);
-
-  if (header_ptr->getMsLevel() == 2) {
-    std::string n_ion_type = header_ptr->getActivationPtr()->getNIonTypePtr()->getName();
-    std::string c_ion_type = header_ptr->getActivationPtr()->getCIonTypePtr()->getName();
-    rapidjson::Value n_ion(n_ion_type.c_str(), allocator);
-    doc.AddMember("n_ion_type", n_ion, allocator);
-    rapidjson::Value c_ion(c_ion_type.c_str(), allocator);
-    doc.AddMember("c_ion_type", c_ion, allocator);
-  }
-
-  // create a rapidjson array type with similar syntax to std::vector
-  rapidjson::Value peaks(rapidjson::kArrayType);
+  std::string sql =
+      "INSERT INTO ms2_spectrum(id, scan, retention_time, target_mz, begin_mz, end_mz, n_ion_type, c_ion_type) values ('" 
+            + std::to_string(spec_id) + "',"
+      + "'" + std::to_string(scan_num) + "',"
+      + "'" + std::to_string(retention_time) + "',"
+      + "'" + std::to_string(target_mz) + "',"
+      + "'" + std::to_string(begin_mz) + "',"
+      + "'" + std::to_string(end_mz) + "',"
+      + "'" + n_ion_type + "',"
+      + "'" + c_ion_type + "');";
+  LOG_ERROR("INSERT SQL: " << sql); 
+  sql_util::execSql(sql_db, sql); 
 
   PeakPtrVec raw_peaks = ms_ptr->getPeakPtrVec();
   for (size_t i = 0; i < raw_peaks.size(); i++) {
-    rapidjson::Value peak(rapidjson::kObjectType);
-    //peak.AddMember("peak_id", i, allocator);
-    std::string pos_str = str_util::fixedToString(raw_peaks[i]->getPosition(), 4); 
-    rapidjson::Value pos(pos_str.c_str(), allocator);
-    peak.AddMember("mz", pos, allocator);
-    std::string inte_str = str_util::toScientificStr(raw_peaks[i]->getIntensity(), 4); 
-    rapidjson::Value inte(inte_str.c_str(), allocator);
-    peak.AddMember("intensity", inte, allocator);
-    peaks.PushBack(peak, allocator);
+    std::string pos_str =
+        str_util::fixedToString(raw_peaks[i]->getPosition(), 4);
+    // peak.AddMember("mz", pos, allocator);
+    std::string inte_str =
+        str_util::toScientificStr(raw_peaks[i]->getIntensity(), 4);
+    // peak.AddMember("intensity", inte, allocator);
+    std::string sql =
+        "INSERT INTO ms2_peak(spec_id, peak_id, mz, intensity) values ('" 
+        + std::to_string(spec_id) + "'," 
+        + "'" + std::to_string(i) + "'," 
+        + "'" + pos_str + "'," 
+        + "'" + inte_str + "');";
+    sql_util::execSql(sql_db, sql);
   }
 
-  doc.AddMember("peaks", peaks, allocator);
-
+  /*
   rapidjson::Value envelopes(rapidjson::kArrayType);
   for (size_t i = 0; i < envs.size(); i++) {
     rapidjson::Value env(rapidjson::kObjectType);
@@ -87,7 +85,6 @@ void writeMs2(sqlite3* sql_db, MzmlMsPtr ms_ptr, MatchEnvPtrVec &envs) {
     envelopes.PushBack(env, allocator);
   }
   doc.AddMember("envelopes", envelopes, allocator);
-
   */
 }
 

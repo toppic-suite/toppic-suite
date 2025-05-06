@@ -19,14 +19,15 @@ namespace toppic {
 
 namespace sql_util {
 
-void execSql(sqlite3 *sql_db, const char *sql) {
+void execSql(sqlite3 *sql_db, const std::string &sql) {
   char *errMsg = 0;
   int rc;
   // Execute SQL statement
-  rc = sqlite3_exec(sql_db, sql, 0, 0, &errMsg);
+  rc = sqlite3_exec(sql_db, sql.c_str(), 0, 0, &errMsg);
   if (rc != SQLITE_OK) {
     LOG_ERROR("SQL error: " << errMsg);
     sqlite3_free(errMsg);
+    exit(EXIT_FAILURE);
   }
 }
 

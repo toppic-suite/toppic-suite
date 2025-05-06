@@ -22,7 +22,7 @@ namespace toppic {
 
 namespace sql_util {
 
-void execSql(sqlite3* sql_db, const char *sql);
+void execSql(sqlite3* sql_db, const std::string &sql);
 
 }  // namespace sql_util
 

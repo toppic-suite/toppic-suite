@@ -22,6 +22,7 @@
 #include "ms/feature/spec_feature_reader.hpp"
 #include "ms/mzml/mzml_ms_group_reader.hpp"
 #include "ms/mzml/mzml_ms_json_writer.hpp"
+#include "ms/mzml/mzml_ms_sql_writer.hpp"
 #include "ms/spec/msalign_thread_merge.hpp"
 #include "ms/spec/msalign_writer.hpp"
 #include "topfd/deconv/deconv_single_sp.hpp"
@@ -111,7 +112,8 @@ void deconvMsTwo(MzmlMsPtr ms_ptr, SpecFeaturePtrVec sp_feat_ptr_vec,
   }
   // 6. write sqlite file
   if (topfd_para_ptr->isGeneSql()) {
-    //mzml_ms_sql_writer::write(topfd_para_ptr, ms_ptr, deconv_envs);
+    LOG_ERROR("Update SQl")
+    mzml_ms_sql_writer::writeMs2(topfd_para_ptr->getSqlDb(), ms_ptr, deconv_envs);
   }
 }
 

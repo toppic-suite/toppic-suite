@@ -81,6 +81,7 @@ class TopfdPara {
   int getMs2ScanNum() {return ms_2_scan_num_;}
   int getMs1MinScanNum() {return ms1_min_scan_num_;}
   int getMs2MinScanNum() {return ms2_min_scan_num_;}
+  sqlite3* getSqlDb() {return sql_db;}  
 
   void setExeDir(std::string dir) {exe_dir_ = dir;}
   void setResourceDir(std::string dir) {resource_dir_ = dir;}

@@ -55,7 +55,6 @@ void TopfdPara::setMzmlFileNameAndFaims(std::string &mzml_file_name,
 }
 
 void TopfdPara::createSqlDb(std::string sql_db_name) {
-  char *errMsg = 0;
   int rc;
   // Open database
   if (sql_db != nullptr) {
@@ -66,15 +65,28 @@ void TopfdPara::createSqlDb(std::string sql_db_name) {
     LOG_ERROR("Can't open database: " << sqlite3_errmsg(sql_db)); 
     exit(EXIT_FAILURE);
   }
-
-  const char *sql_1 = "CREATE TABLE IF NOT EXISTS ms2_spectrum(id INTEGER PRIMARY KEY, scan INTEGER NOT NULL);";
-  sql_util::execSql(sql_db, sql_1); 
-  const char *sql_2 = "DELETE from ms2_spectrum;"; 
-  sql_util::execSql(sql_db, sql_2);
-  const char *sql_3 = "CREATE TABLE IF NOT EXISTS ms2_peak(id INTEGER PRIMARY KEY, spectrum_id INTEGER NOT NULL, mz REAL NOT NULL, intensity REAL NOT NULL);";
-  sql_util::execSql(sql_db, sql_3); 
-  const char *sql_4 = "DELETE from ms2_peak;"; 
-  sql_util::execSql(sql_db, sql_4);
+  std::string sql = "CREATE TABLE IF NOT EXISTS ms2_spectrum(id INTEGER PRIMARY KEY,"
+                                                            "scan INTEGER NOT NULL,"
+                                                            "retention_time REAL,"
+                                                            "target_mz REAL,"
+                                                            "begin_mz REAL,"
+                                                            "end_mz REAL,"
+                                                            "n_ion_type TEXT,"
+                                                            "c_ion_type TEXT);";
+  LOG_ERROR("SQL: " << sql);
+  sql_util::execSql(sql_db, sql); 
+  sql = "CREATE TABLE IF NOT EXISTS ms2_peak(spec_id INTEGER NOT NULL,"
+                                            "peak_id INTEGER NOT NULL,"
+                                            "mz REAL NOT NULL,"
+                                            "intensity REAL NOT NULL);";
+  LOG_ERROR("SQL: " << sql);
+  sql_util::execSql(sql_db, sql);
+  sql = "DELETE from ms2_peak;"; 
+  LOG_ERROR("SQL: " << sql);
+  sql_util::execSql(sql_db, sql);
+  sql = "DELETE from ms2_spectrum;"; 
+  LOG_ERROR("SQL: " << sql);
+  sql_util::execSql(sql_db, sql); 
 }
 
 std::string TopfdPara::getTopfdParaStr(const std::string &prefix,
