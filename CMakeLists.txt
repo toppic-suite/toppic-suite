@@ -288,7 +288,7 @@ ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 # boost_serialization boost_thread xerces-c z are required by toppic suite
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	target_link_libraries(topfd boost_chrono boost_filesystem boost_program_options 
-    boost_iostreams boost_thread xerces-c z onnxruntime)
+    boost_iostreams boost_thread sqlite3 xerces-c z onnxruntime)
 
   target_link_libraries(topindex boost_program_options 
     boost_serialization boost_thread xerces-c z)
