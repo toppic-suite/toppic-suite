@@ -60,6 +60,9 @@ void TopfdPara::createSqlDb(std::string sql_db_name) {
   if (sql_db != nullptr) {
     sqlite3_close(sql_db);
   }
+  if (file_util::exists(sql_db_name)) {
+    file_util::delFile(sql_db_name);
+  }
   rc = sqlite3_open(sql_db_name.c_str(), &sql_db);
   if (rc) {
     LOG_ERROR("Can't open database: " << sqlite3_errmsg(sql_db)); 
