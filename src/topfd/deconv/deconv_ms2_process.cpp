@@ -112,7 +112,6 @@ void deconvMsTwo(MzmlMsPtr ms_ptr, SpecFeaturePtrVec sp_feat_ptr_vec,
   }
   // 6. write sqlite file
   if (topfd_para_ptr->isGeneSql()) {
-    LOG_ERROR("Update SQl")
     mzml_ms_sql_writer::writeMs2(topfd_para_ptr->getSqlDb(), ms_ptr, deconv_envs);
   }
 }

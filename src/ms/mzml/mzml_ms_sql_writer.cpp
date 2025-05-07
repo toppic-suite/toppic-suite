@@ -12,6 +12,7 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include <boost/thread/mutex.hpp>
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
 #include "common/util/sql_util.hpp"
@@ -21,9 +22,53 @@ namespace toppic {
 
 namespace mzml_ms_sql_writer {
 
-void writeMs2(sqlite3* sql_db, MzmlMsPtr ms_ptr, MatchEnvPtrVec &envs) {
+// serialization mutex.
+boost::mutex writer_mutex;
+
+void writeMs1(sqlite3* sql_db, MzmlMsPtr ms_ptr, MatchEnvPtrVec& envs) {
+  char * err_msg = 0; 
+  const char *tail;
+  sqlite3_stmt *stmt;
+  std::string sql = "INSERT INTO ms1_peak(spec_id, peak_id, mz, intensity) VALUES (?, ?, ?, ?);";
+  writer_mutex.lock();
+  int rc = sqlite3_prepare_v2(sql_db, sql.c_str(), 256, &stmt, &tail);
+
+  sqlite3_exec(sql_db, "BEGIN TRANSACTION", NULL, NULL, &err_msg);
+
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
-  //int ms_level = header_ptr->getMsLevel();
+  int spec_id = header_ptr->getSpecId();
+  int scan_num = header_ptr->getFirstScanNum();
+  double retention_time = header_ptr->getRetentionTime();
+  sql = "INSERT INTO ms1_spectrum(id, scan, retention_time) values ('" +
+      std::to_string(spec_id) + "'," + "'" + std::to_string(scan_num) + "'," +
+      "'" + std::to_string(retention_time) + "');";
+  LOG_DEBUG("INSERT SQL: " << sql);
+  sql_util::execSql(sql_db, sql);
+
+  PeakPtrVec raw_peaks = ms_ptr->getPeakPtrVec();
+  for (size_t i = 0; i < raw_peaks.size(); i++) {
+    sqlite3_bind_int(stmt, 1, spec_id); 
+    sqlite3_bind_int(stmt, 2, i); 
+    sqlite3_bind_double(stmt, 3, raw_peaks[i]->getPosition()); 
+    sqlite3_bind_double(stmt, 4, raw_peaks[i]->getIntensity()); 
+    sqlite3_step(stmt);
+    sqlite3_clear_bindings(stmt);
+    sqlite3_reset(stmt);
+  }
+  sqlite3_exec(sql_db, "END TRANSACTION", NULL, NULL, &err_msg);
+  writer_mutex.unlock();
+}
+
+void writeMs2(sqlite3* sql_db, MzmlMsPtr ms_ptr, MatchEnvPtrVec &envs) {
+  char * err_msg = 0; 
+  const char *tail;
+  sqlite3_stmt *stmt;
+  std::string sql = "INSERT INTO ms2_peak(spec_id, peak_id, mz, intensity) VALUES (?, ?, ?, ?);";
+  writer_mutex.lock();
+  int rc = sqlite3_prepare_v2(sql_db, sql.c_str(), 256, &stmt, &tail);
+
+  sqlite3_exec(sql_db, "BEGIN TRANSACTION", NULL, NULL, &err_msg);
+  MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
   int spec_id = header_ptr->getSpecId();
   int scan_num = header_ptr->getFirstScanNum();
   double retention_time = header_ptr->getRetentionTime();
@@ -35,7 +80,7 @@ void writeMs2(sqlite3* sql_db, MzmlMsPtr ms_ptr, MatchEnvPtrVec &envs) {
   std::string c_ion_type =
       header_ptr->getActivationPtr()->getCIonTypePtr()->getName();
 
-  std::string sql =
+  sql =
       "INSERT INTO ms2_spectrum(id, scan, retention_time, target_mz, begin_mz, end_mz, n_ion_type, c_ion_type) values ('" 
             + std::to_string(spec_id) + "',"
       + "'" + std::to_string(scan_num) + "',"
@@ -45,25 +90,21 @@ void writeMs2(sqlite3* sql_db, MzmlMsPtr ms_ptr, MatchEnvPtrVec &envs) {
       + "'" + std::to_string(end_mz) + "',"
       + "'" + n_ion_type + "',"
       + "'" + c_ion_type + "');";
-  LOG_ERROR("INSERT SQL: " << sql); 
+  LOG_DEBUG("INSERT SQL: " << sql); 
   sql_util::execSql(sql_db, sql); 
 
   PeakPtrVec raw_peaks = ms_ptr->getPeakPtrVec();
   for (size_t i = 0; i < raw_peaks.size(); i++) {
-    std::string pos_str =
-        str_util::fixedToString(raw_peaks[i]->getPosition(), 4);
-    // peak.AddMember("mz", pos, allocator);
-    std::string inte_str =
-        str_util::toScientificStr(raw_peaks[i]->getIntensity(), 4);
-    // peak.AddMember("intensity", inte, allocator);
-    std::string sql =
-        "INSERT INTO ms2_peak(spec_id, peak_id, mz, intensity) values ('" 
-        + std::to_string(spec_id) + "'," 
-        + "'" + std::to_string(i) + "'," 
-        + "'" + pos_str + "'," 
-        + "'" + inte_str + "');";
-    sql_util::execSql(sql_db, sql);
+    sqlite3_bind_int(stmt, 1, spec_id); 
+    sqlite3_bind_int(stmt, 2, i); 
+    sqlite3_bind_double(stmt, 3, raw_peaks[i]->getPosition()); 
+    sqlite3_bind_double(stmt, 4, raw_peaks[i]->getIntensity()); 
+    sqlite3_step(stmt);
+    sqlite3_clear_bindings(stmt);
+    sqlite3_reset(stmt);
   }
+  sqlite3_exec(sql_db, "END TRANSACTION", NULL, NULL, &err_msg);
+  writer_mutex.unlock();
 
   /*
   rapidjson::Value envelopes(rapidjson::kArrayType);
@@ -88,6 +129,5 @@ void writeMs2(sqlite3* sql_db, MzmlMsPtr ms_ptr, MatchEnvPtrVec &envs) {
   */
 }
 
-}
-
+}  // namespace mzml_ms_sql_writer
 }

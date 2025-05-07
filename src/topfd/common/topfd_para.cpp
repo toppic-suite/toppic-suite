@@ -65,27 +65,45 @@ void TopfdPara::createSqlDb(std::string sql_db_name) {
     LOG_ERROR("Can't open database: " << sqlite3_errmsg(sql_db)); 
     exit(EXIT_FAILURE);
   }
-  std::string sql = "CREATE TABLE IF NOT EXISTS ms2_spectrum(id INTEGER PRIMARY KEY,"
+
+  std::string sql = "CREATE TABLE IF NOT EXISTS ms1_spectrum(id INTEGER PRIMARY KEY,"
                                                             "scan INTEGER NOT NULL,"
-                                                            "retention_time REAL,"
-                                                            "target_mz REAL,"
-                                                            "begin_mz REAL,"
-                                                            "end_mz REAL,"
-                                                            "n_ion_type TEXT,"
-                                                            "c_ion_type TEXT);";
-  LOG_ERROR("SQL: " << sql);
+                                                            "retention_time REAL);";
+  LOG_DEBUG("SQL: " << sql);
+  sql_util::execSql(sql_db, sql); 
+  sql = "CREATE TABLE IF NOT EXISTS ms1_peak(spec_id INTEGER NOT NULL,"
+                                            "peak_id INTEGER NOT NULL,"
+                                            "mz REAL NOT NULL,"
+                                            "intensity REAL NOT NULL);";
+  LOG_DEBUG("SQL: " << sql);
+  sql_util::execSql(sql_db, sql);
+  sql = "DELETE from ms1_peak;"; 
+  LOG_DEBUG("SQL: " << sql);
+  sql_util::execSql(sql_db, sql);
+  sql = "DELETE from ms1_spectrum;"; 
+  LOG_DEBUG("SQL: " << sql);
+
+  sql = "CREATE TABLE IF NOT EXISTS ms2_spectrum(id INTEGER PRIMARY KEY,"
+        "scan INTEGER NOT NULL,"
+        "retention_time REAL,"
+        "target_mz REAL,"
+        "begin_mz REAL,"
+        "end_mz REAL,"
+        "n_ion_type TEXT,"
+        "c_ion_type TEXT);";
+  LOG_DEBUG("SQL: " << sql);
   sql_util::execSql(sql_db, sql); 
   sql = "CREATE TABLE IF NOT EXISTS ms2_peak(spec_id INTEGER NOT NULL,"
                                             "peak_id INTEGER NOT NULL,"
                                             "mz REAL NOT NULL,"
                                             "intensity REAL NOT NULL);";
-  LOG_ERROR("SQL: " << sql);
+  LOG_DEBUG("SQL: " << sql);
   sql_util::execSql(sql_db, sql);
   sql = "DELETE from ms2_peak;"; 
-  LOG_ERROR("SQL: " << sql);
+  LOG_DEBUG("SQL: " << sql);
   sql_util::execSql(sql_db, sql);
   sql = "DELETE from ms2_spectrum;"; 
-  LOG_ERROR("SQL: " << sql);
+  LOG_DEBUG("SQL: " << sql);
   sql_util::execSql(sql_db, sql); 
 }
 

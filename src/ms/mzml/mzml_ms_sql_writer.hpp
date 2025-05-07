@@ -23,6 +23,8 @@ namespace toppic {
 
 namespace mzml_ms_sql_writer {
 
+void writeMs1(sqlite3* sql_db, MzmlMsPtr ms_ptr, MatchEnvPtrVec &env);
+
 void writeMs2(sqlite3* sql_db, MzmlMsPtr ms_ptr, MatchEnvPtrVec &env);
 
 }

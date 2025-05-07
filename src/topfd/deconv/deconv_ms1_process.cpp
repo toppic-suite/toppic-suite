@@ -25,6 +25,7 @@
 #include "ms/env/match_env_util.hpp"
 #include "ms/mzml/mzml_ms_group_reader.hpp"
 #include "ms/mzml/mzml_ms_json_writer.hpp"
+#include "ms/mzml/mzml_ms_sql_writer.hpp"
 
 #include "topfd/envcnn/onnx_env_cnn.hpp" 
 #include "topfd/deconv/deconv_prec_win.hpp"
@@ -113,7 +114,13 @@ void deconvMsOne(MzmlMsGroupPtr ms_group_ptr,
         + file_util::getFileSeparator() 
         + "spectrum" + std::to_string(header_ptr->getSpecId()) + ".js";
     mzml_ms_json_writer::write(json_file_name, ms_ptr, prec_envs);    
+  }  
+  // 7. write sqlite file
+  if (topfd_para_ptr->isGeneSql()) {
+    LOG_DEBUG("Update SQl")
+    mzml_ms_sql_writer::writeMs1(topfd_para_ptr->getSqlDb(), ms_ptr, deconv_envs);
   }
+
 }
 
 std::function<void()> geneTask(MzmlMsGroupPtr ms_group_ptr, 
