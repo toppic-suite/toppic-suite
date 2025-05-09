@@ -39,13 +39,15 @@ void writeMs1(sqlite3* sql_db, MzmlMsPtr ms_ptr, MatchEnvPtrVec& envs) {
   int spec_id = header_ptr->getSpecId();
   int scan_num = header_ptr->getFirstScanNum();
   double retention_time = header_ptr->getRetentionTime();
-  sql = "INSERT INTO ms1_spectrum(id, scan, retention_time) values ('" +
-      std::to_string(spec_id) + "'," + "'" + std::to_string(scan_num) + "'," +
-      "'" + std::to_string(retention_time) + "');";
+  PeakPtrVec raw_peaks = ms_ptr->getPeakPtrVec();
+  sql = "INSERT INTO ms1_spectrum(id, scan, retention_time) values ('" 
+  + std::to_string(spec_id) + "'," 
+  + "'" + std::to_string(scan_num) + "'," 
+  + "'" + std::to_string(retention_time) + "',"
+  + "'" + std::to_string(raw_peaks.size()) + "');";
   LOG_DEBUG("INSERT SQL: " << sql);
   sql_util::execSql(sql_db, sql);
 
-  PeakPtrVec raw_peaks = ms_ptr->getPeakPtrVec();
   for (size_t i = 0; i < raw_peaks.size(); i++) {
     sqlite3_bind_int(stmt, 1, spec_id); 
     sqlite3_bind_int(stmt, 2, i); 
@@ -79,6 +81,7 @@ void writeMs2(sqlite3* sql_db, MzmlMsPtr ms_ptr, MatchEnvPtrVec &envs) {
       header_ptr->getActivationPtr()->getNIonTypePtr()->getName();
   std::string c_ion_type =
       header_ptr->getActivationPtr()->getCIonTypePtr()->getName();
+  PeakPtrVec raw_peaks = ms_ptr->getPeakPtrVec();
 
   sql =
       "INSERT INTO ms2_spectrum(id, scan, retention_time, target_mz, begin_mz, end_mz, n_ion_type, c_ion_type) values ('" 
@@ -89,11 +92,11 @@ void writeMs2(sqlite3* sql_db, MzmlMsPtr ms_ptr, MatchEnvPtrVec &envs) {
       + "'" + std::to_string(begin_mz) + "',"
       + "'" + std::to_string(end_mz) + "',"
       + "'" + n_ion_type + "',"
-      + "'" + c_ion_type + "');";
+      + "'" + c_ion_type + "',"
+      + "'" + std::to_string(raw_peaks.size()) +"');";
   LOG_DEBUG("INSERT SQL: " << sql); 
   sql_util::execSql(sql_db, sql); 
 
-  PeakPtrVec raw_peaks = ms_ptr->getPeakPtrVec();
   for (size_t i = 0; i < raw_peaks.size(); i++) {
     sqlite3_bind_int(stmt, 1, spec_id); 
     sqlite3_bind_int(stmt, 2, i); 
