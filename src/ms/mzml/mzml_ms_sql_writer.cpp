@@ -40,7 +40,7 @@ void writeMs1(sqlite3* sql_db, MzmlMsPtr ms_ptr, MatchEnvPtrVec& envs) {
   int scan_num = header_ptr->getFirstScanNum();
   double retention_time = header_ptr->getRetentionTime();
   PeakPtrVec raw_peaks = ms_ptr->getPeakPtrVec();
-  sql = "INSERT INTO ms1_spectrum(id, scan, retention_time) values ('" 
+  sql = "INSERT INTO ms1_spectrum(id, scan, retention_time, peak_num) values ('" 
   + std::to_string(spec_id) + "'," 
   + "'" + std::to_string(scan_num) + "'," 
   + "'" + std::to_string(retention_time) + "',"
@@ -84,7 +84,7 @@ void writeMs2(sqlite3* sql_db, MzmlMsPtr ms_ptr, MatchEnvPtrVec &envs) {
   PeakPtrVec raw_peaks = ms_ptr->getPeakPtrVec();
 
   sql =
-      "INSERT INTO ms2_spectrum(id, scan, retention_time, target_mz, begin_mz, end_mz, n_ion_type, c_ion_type) values ('" 
+      "INSERT INTO ms2_spectrum(id, scan, retention_time, target_mz, begin_mz, end_mz, n_ion_type, c_ion_type, peak_num) values ('" 
             + std::to_string(spec_id) + "',"
       + "'" + std::to_string(scan_num) + "',"
       + "'" + std::to_string(retention_time) + "',"
