@@ -25,7 +25,7 @@ namespace mzml_ms_sql_writer {
 // serialization mutex.
 boost::mutex writer_mutex;
 
-void writeMs1(sqlite3* sql_db, MzmlMsPtr ms_ptr, MatchEnvPtrVec& envs) {
+void writeMs1(sqlite3* sql_db, MzmlMsPtr ms_ptr, MatchEnvPtrVec& envs, double base_inte, double min_ref_inte) {
   char * err_msg = 0; 
   const char *tail_peak;
   sqlite3_stmt *stmt_peak;
@@ -51,12 +51,14 @@ void writeMs1(sqlite3* sql_db, MzmlMsPtr ms_ptr, MatchEnvPtrVec& envs) {
   int scan_num = header_ptr->getFirstScanNum();
   double retention_time = header_ptr->getRetentionTime();
   PeakPtrVec raw_peaks = ms_ptr->getPeakPtrVec();
-  std::string sql = "INSERT INTO ms1_spectrum(id, scan, retention_time, peak_num, env_num) values ('" 
+  std::string sql = "INSERT INTO ms1_spectrum(id, scan, retention_time, peak_num, env_num, base_inte, min_ref_inte) values ('" 
   + std::to_string(spec_id) + "'," 
   + "'" + std::to_string(scan_num) + "'," 
   + "'" + std::to_string(retention_time) + "',"
   + "'" + std::to_string(raw_peaks.size()) + "',"
-  + "'" + std::to_string(envs.size()) + "');";
+  + "'" + std::to_string(envs.size()) + "',"
+  + "'" + std::to_string(base_inte) + "',"
+  + "'" + std::to_string(min_ref_inte) + "');";
   LOG_DEBUG("INSERT SQL: " << sql);
   sql_util::execSql(sql_db, sql);
 

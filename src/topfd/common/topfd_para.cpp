@@ -75,7 +75,9 @@ void TopfdPara::createSqlDb(std::string sql_db_name) {
                                                             "scan INTEGER NOT NULL,"
                                                             "retention_time REAL,"
                                                             "peak_num INTEGER,"
-                                                            "env_num INTEGER);";
+                                                            "env_num INTEGER,"
+                                                            "base_inte REAL,"
+                                                            "min_ref_inte REAL);";
   LOG_DEBUG("SQL: " << sql);
   sql_util::execSql(sql_db, sql); 
   sql = "CREATE TABLE IF NOT EXISTS ms1_peak(spec_id INTEGER NOT NULL,"

@@ -60,6 +60,8 @@ void deconvMsOne(MzmlMsGroupPtr ms_group_ptr,
   for (std::size_t i = 0; i < peak_list.size(); i++) {
     intensities.push_back(peak_list[i]->getIntensity());
   }
+  double base_inte = 0;
+  double min_ref_inte = 0;
   // 2. Deconv envelopes in precursor windows and remove them
   MatchEnvPtrVec prec_envs = deconv_prec_win::deconvPrecWinForMsGroup(ms_group_ptr, 
                                                                       topfd_para_ptr->getMaxMass(),
@@ -88,6 +90,8 @@ void deconvMsOne(MzmlMsGroupPtr ms_group_ptr,
       = std::make_shared<DeconvSingleSp>(topfd_para_ptr, peak_list, ms_level,
                                          max_mass, max_charge);
     deconv_envs = deconv_ptr->deconv();
+    base_inte = deconv_ptr->getDeconvDataPtr()->getMinInte();
+    min_ref_inte = deconv_ptr->getDeconvDataPtr()->getMinRefInte();
   }
   // 4. Merge precursor envelopes and deconvolution envelopes
   MatchEnvPtrVec result_envs;
@@ -99,6 +103,7 @@ void deconvMsOne(MzmlMsGroupPtr ms_group_ptr,
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
   DeconvMsPtr deconv_ms_ptr = match_env_util::getDeconvMsPtr(header_ptr,
                                                              result_envs);
+  
 
   boost::thread::id thread_id = boost::this_thread::get_id();
   int writer_id = pool_ptr->getId(thread_id);
@@ -118,7 +123,7 @@ void deconvMsOne(MzmlMsGroupPtr ms_group_ptr,
   // 7. write sqlite file
   if (topfd_para_ptr->isGeneSql()) {
     LOG_DEBUG("Update SQl")
-    mzml_ms_sql_writer::writeMs1(topfd_para_ptr->getSqlDb(), ms_ptr, deconv_envs);
+    mzml_ms_sql_writer::writeMs1(topfd_para_ptr->getSqlDb(), ms_ptr, deconv_envs, base_inte, min_ref_inte);
   }
 
 }
