@@ -25,6 +25,7 @@ void execSql(sqlite3 *sql_db, const std::string &sql) {
   // Execute SQL statement
   rc = sqlite3_exec(sql_db, sql.c_str(), 0, 0, &errMsg);
   if (rc != SQLITE_OK) {
+    LOG_ERROR("Sql" << sql);
     LOG_ERROR("SQL error: " << errMsg);
     sqlite3_free(errMsg);
     exit(EXIT_FAILURE);

@@ -74,7 +74,8 @@ void TopfdPara::createSqlDb(std::string sql_db_name) {
   std::string sql = "CREATE TABLE IF NOT EXISTS ms1_spectrum(id INTEGER PRIMARY KEY,"
                                                             "scan INTEGER NOT NULL,"
                                                             "retention_time REAL,"
-                                                            "peak_num INTEGER);";
+                                                            "peak_num INTEGER,"
+                                                            "env_num INTEGER);";
   LOG_DEBUG("SQL: " << sql);
   sql_util::execSql(sql_db, sql); 
   sql = "CREATE TABLE IF NOT EXISTS ms1_peak(spec_id INTEGER NOT NULL,"
@@ -116,7 +117,25 @@ void TopfdPara::createSqlDb(std::string sql_db_name) {
   LOG_DEBUG("INSERT SQL: " << sql); 
   sql_util::execSql(sql_db, sql); 
 
+  sql = "CREATE TABLE IF NOT EXISTS ms1_env(spec_id INTEGER NOT NULL,"
+                                           "env_id INTEGER NOT NULL,"
+                                           "mono_mass REAL NOT NULL,"
+                                           "charge INTEGER NOT NULL,"
+                                           "intensity REAL NOT NULL,"
+                                           "envcnn_score REAL NOT NULL,"
+                                           "peak_num INTEGER NOT NULL);";
+  LOG_DEBUG("SQL: " << sql);
+  sql_util::execSql(sql_db, sql);
+
+  sql = "CREATE TABLE IF NOT EXISTS ms1_env_peak(spec_id INTEGER NOT NULL,"
+                                           "env_id INTEGER NOT NULL,"
+                                           "peak_id INTEGER NOT NULL,"
+                                           "mz REAL NOT NULL,"
+                                           "intensity REAL NOT NULL);";
+  LOG_DEBUG("SQL: " << sql);
+  sql_util::execSql(sql_db, sql);
 }
+
 std::string TopfdPara::getTopfdParaStr(const std::string &prefix,
                                        const std::string &sep,
                                        int gap) {
