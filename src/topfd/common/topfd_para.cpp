@@ -51,7 +51,9 @@ void TopfdPara::setMzmlFileNameAndFaims(std::string &mzml_file_name,
     + file_util::getFileSeparator() + "topfd" 
     + file_util::getFileSeparator() + "ms2_json";
   sql_file_name_ = output_base_name_ + ".sqlite";
-  createSqlDb(sql_file_name_);
+  if (gene_sql_) {
+    createSqlDb(sql_file_name_);
+  }
 }
 
 void TopfdPara::createSqlDb(std::string sql_db_name) {
@@ -104,14 +106,17 @@ void TopfdPara::createSqlDb(std::string sql_db_name) {
                                             "intensity REAL NOT NULL);";
   LOG_DEBUG("SQL: " << sql);
   sql_util::execSql(sql_db, sql);
-  sql = "DELETE from ms2_peak;"; 
+  sql = "CREATE TABLE IF NOT EXISTS ms_info(ms1_scan_num INTEGER NOT NULL,"
+                                            "ms2_scan_num INTEGER NOT NULL);";
   LOG_DEBUG("SQL: " << sql);
   sql_util::execSql(sql_db, sql);
-  sql = "DELETE from ms2_spectrum;"; 
-  LOG_DEBUG("SQL: " << sql);
+  sql = "INSERT INTO ms_info(ms1_scan_num, ms2_scan_num) values ('" 
+            + std::to_string(ms_1_scan_num_) + "',"
+      + "'" + std::to_string(ms_2_scan_num_) + "');";
+  LOG_DEBUG("INSERT SQL: " << sql); 
   sql_util::execSql(sql_db, sql); 
-}
 
+}
 std::string TopfdPara::getTopfdParaStr(const std::string &prefix,
                                        const std::string &sep,
                                        int gap) {

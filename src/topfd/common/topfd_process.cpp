@@ -69,11 +69,11 @@ void processOneFile(TopfdParaPtr para_ptr,
       std::cout << spec_file_name << " is FAIMS data with " << volt_map.size() << " voltage levels." << std::endl;
       for (auto v : volt_map) {
         double volt = v.first;
-        para_ptr->setMzmlFileNameAndFaims(spec_file_name, is_faims, volt);
-        std::cout << "Processing " << spec_file_name << " with voltage " << volt << " started." << std::endl;
         para_ptr->setFracId(frac_id);
         para_ptr->setMs1ScanNumber(v.second.first); 
         para_ptr->setMs2ScanNumber(v.second.second);
+        para_ptr->setMzmlFileNameAndFaims(spec_file_name, is_faims, volt);
+        std::cout << "Processing " << spec_file_name << " with voltage " << volt << " started." << std::endl;
         processOneFileWithFaims(para_ptr);
         frac_id++;
         std::cout << "Processing " << spec_file_name << " with voltage " << volt << " finished." << std::endl;
@@ -82,10 +82,10 @@ void processOneFile(TopfdParaPtr para_ptr,
     else {
       bool is_faims = false;
       double volt = -1;
-      para_ptr->setMzmlFileNameAndFaims(spec_file_name, is_faims, volt);
       para_ptr->setFracId(frac_id);
       para_ptr->setMs1ScanNumber(profile_ptr->getMs1Cnt()); 
       para_ptr->setMs2ScanNumber(profile_ptr->getMs2Cnt()); 
+      para_ptr->setMzmlFileNameAndFaims(spec_file_name, is_faims, volt);
       processOneFileWithFaims(para_ptr);
     }
   } catch (const char* e) {
