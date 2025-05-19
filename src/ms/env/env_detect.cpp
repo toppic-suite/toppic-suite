@@ -167,7 +167,7 @@ MatchEnvPtr detectEnvByMonoMass(const PeakPtrVec &peak_list, double mono_mass,
 
 MatchEnvPtr2D getCandidateEnv(const PeakPtrVec &peak_list, int max_charge, double max_mass, 
                               double min_inte, double min_ref_inte, EnvParaPtr env_para_ptr) {
-  bool is_full = false;
+  bool is_full = true;
   int peak_num = peak_list.size();
   MatchEnvPtr2D match_envs(peak_num);
   for (int idx = 0; idx < peak_num; idx++) {
