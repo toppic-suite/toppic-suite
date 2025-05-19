@@ -23,7 +23,8 @@ namespace toppic {
 namespace deconv_prec_win {
 
 MatchEnvPtrVec deconvPrecWinForMsGroup(MzmlMsGroupPtr ms_group_ptr, 
-                                       double max_mass, int max_charge); 
+                                       double max_mass, int max_charge,
+                                       double base_inte, double min_ref_inte); 
 
 }  // namespace deconv_prec_win
 
