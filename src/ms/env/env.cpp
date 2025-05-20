@@ -120,6 +120,26 @@ EnvPtr Env::getSubEnv(int n_back, int n_forw) {
   return env_ptr;
 }
 
+void Env::removeLeftPeaks(int num) {
+  int new_refer_idx = refer_idx_ - num;
+  EnvPeakPtrVec new_peaks;
+  for (int i = num; i < peak_ptr_list_.size(); i++) {
+    new_peaks.push_back(peak_ptr_list_[i]);
+  }
+  refer_idx_ = new_refer_idx;
+  peak_ptr_list_ = new_peaks;
+}
+
+void Env::removeRightPeaks(int num) {
+  EnvPeakPtrVec new_peaks;
+  for (int i = 0; i < peak_ptr_list_.size() - num; i++) {
+    new_peaks.push_back(peak_ptr_list_[i]);
+  }
+  peak_ptr_list_ = new_peaks;
+}
+
+
+
 EnvPtr Env::addZero(int num) {
   int n_peak = peak_ptr_list_.size();
   EnvPeakPtrVec new_peaks; 

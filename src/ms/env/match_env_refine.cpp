@@ -87,13 +87,22 @@ void mzRefine(MatchEnvPtr env) {
     cur_env->changeIntensity(cur_ratio);
     env->setTheoEnvPtr(cur_env);
   } else if (prev_dist <= next_dist) {
+    int peak_num = prev_env->getPeakNum();
+    if (prev_env->getInte(peak_num-1) == 0)  {
+      prev_env->removeRightPeaks(1); 
+      real_env->removeRightPeaks(1); 
+    }
     prev_env->changeIntensity(prev_ratio);
     env->setTheoEnvPtr(prev_env);
-      real_env->changeReferIdx(-1);
+    real_env->changeReferIdx(-1);
   } else {
+    if (next_env->getInte(0) == 0)  {
+      next_env->removeLeftPeaks(1); 
+      real_env->removeLeftPeaks(1); 
+    }
     next_env->changeIntensity(next_ratio);
     env->setTheoEnvPtr(next_env);
-      real_env->changeReferIdx(1);
+    real_env->changeReferIdx(1);
   }
 }
 
