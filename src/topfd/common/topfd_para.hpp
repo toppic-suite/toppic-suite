@@ -18,6 +18,9 @@
 #include <sqlite3.h>
 #include <memory>
 #include <string>
+#include <vector>
+
+#include "common/base/mass_constant.hpp"
 
 namespace toppic {
 
@@ -67,6 +70,8 @@ class TopfdPara {
   bool isUseSingleScanNoiseLevel() {return use_single_scan_noise_level_;}
   bool isTextPeakList() {return text_peak_list_;}
   double getPrecInteCutoffRatio() {return prec_inte_cutoff_ratio_;}
+  std::vector<double> getPrecOffsets() {return prec_offsets_;}
+  double getPrecMergeTolerance() {return prec_merge_tolerance_;}
 
   std::string getMzmlFileName() {return mzml_file_name_;}
   std::string getOutputBaseName() {return output_base_name_;}
@@ -141,7 +146,10 @@ class TopfdPara {
   bool aa_num_based_filter_ = true;
   bool output_csv_feature_file_ = false;
   bool gene_html_folder_ = true;
-  bool gene_sql_ = true;
+  bool gene_sql_ = true; 
+  double IM = mass_constant::getIsotopeMass();
+  std::vector<double> prec_offsets_ = {-2*IM, -IM, 0, IM, 2*IM};
+  double prec_merge_tolerance_ = 0.1;
 
   // parameters for feature identification
   double split_intensity_ratio_ = 2.5;
