@@ -22,6 +22,7 @@
 #include "ms/feature/spec_feature_reader.hpp"
 #include "ms/mzml/mzml_ms_group_reader.hpp"
 #include "ms/mzml/mzml_ms_json_writer.hpp"
+#include "ms/mzml/mzml_ms_sql_writer.hpp"
 #include "ms/spec/msalign_thread_merge.hpp"
 #include "ms/spec/msalign_writer.hpp"
 #include "topfd/deconv/deconv_single_sp.hpp"
@@ -108,6 +109,10 @@ void deconvMsTwo(MzmlMsPtr ms_ptr, SpecFeaturePtrVec sp_feat_ptr_vec,
         topfd_para_ptr->getMs2JsonDir() + file_util::getFileSeparator() +
         "spectrum" + std::to_string(header_ptr->getSpecId()) + ".js";
     mzml_ms_json_writer::write(json_file_name, ms_ptr, deconv_envs);
+  }
+  // 6. write sqlite file
+  if (topfd_para_ptr->isGeneSql()) {
+    mzml_ms_sql_writer::writeMs2(topfd_para_ptr->getSqlDb(), ms_ptr, deconv_envs);
   }
 }
 

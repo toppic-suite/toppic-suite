@@ -122,6 +122,14 @@ double getBaseLine(const std::vector<double> &inte) {
   return dens[max_pos]->getBgn();
 }
 
+double getBaseLine(const PeakPtrVec &peak_list) {
+  std::vector<double> intensities;
+  for (size_t i = 0; i < peak_list.size(); i++) {
+    intensities.push_back(peak_list[i]->getIntensity());
+  }
+  return getBaseLine(intensities);
+}
+
 } // namespace deconv_util
 
 }  // namespace toppic

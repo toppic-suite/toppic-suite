@@ -12,21 +12,19 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_TOPFD_DECONV_DECONV_PREC_WIN_HPP_
-#define TOPPIC_TOPFD_DECONV_DECONV_PREC_WIN_HPP_
+#ifndef TOPPIC_COMMON_UTIL_SQL_UTIL_HPP_
+#define TOPPIC_COMMON_UTIL_SQL_UTIL_HPP_
 
-#include "ms/env/match_env.hpp"
-#include "ms/mzml/mzml_ms_group.hpp"
+#include <sqlite3.h>
+#include <string>
 
 namespace toppic {
 
-namespace deconv_prec_win {
+namespace sql_util {
 
-MatchEnvPtrVec deconvPrecWinForMsGroup(MzmlMsGroupPtr ms_group_ptr, 
-                                       double max_mass, int max_charge,
-                                       double base_inte, double min_ref_inte); 
+void execSql(sqlite3* sql_db, const std::string &sql);
 
-}  // namespace deconv_prec_win
+}  // namespace sql_util
 
 }  // namespace toppic
 

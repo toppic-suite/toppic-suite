@@ -54,9 +54,20 @@ void DeconvSingleSp::postprocess(MatchEnvPtrVec &dp_envs, int ms_level) {
   // assign intensity
   PeakPtrVec peak_list = data_ptr_->getPeakList();
   match_env_util::assignIntensity(peak_list, dp_envs);
+
   // refinement
   match_env_refine::mzRefine(dp_envs);
   result_envs_ = dp_envs;
+  /*
+  for (size_t i = 0; i < result_envs_.size(); i++) {
+    EnvPtr env_ptr = result_envs_[i]->getTheoEnvPtr();
+    LOG_ERROR("Result envelope id: " << i << " mz: " << env_ptr->getMonoMz() << " charge: " << env_ptr->getCharge());
+    for (size_t j = 0; j < env_ptr->getPeakNum(); j++) {
+      LOG_ERROR("Peak intensity: " << j << "  " << env_ptr->getInte(j));
+    }
+  }
+    */
+
   if (topfd_para_ptr_->isKeepUnusedPeaks()) {
     // all added envelopes have charge 1, so we use charge 1 to get mz_tolerance
     double mz_tole = env_para_ptr_->getMzTolerance(1);
@@ -128,6 +139,7 @@ MatchEnvPtrVec DeconvSingleSp::deconv() {
   MatchEnvPtrVec dp_envs = dp.getResult();
 
   postprocess(dp_envs, ms_level_);
+
   return result_envs_;
 }
 

@@ -15,6 +15,7 @@
 #ifndef TOPPIC_TOPFD_COMMON_TOPFD_PARA_HPP_
 #define TOPPIC_TOPFD_COMMON_TOPFD_PARA_HPP_
 
+#include <sqlite3.h>
 #include <memory>
 #include <string>
 
@@ -27,12 +28,16 @@ typedef std::shared_ptr<TopfdPara> TopfdParaPtr;
 class TopfdPara {
  public:
   TopfdPara() {};
-  
+
+  ~TopfdPara();
+
   std::string getTopfdParaStr(const std::string &prefix,
 		         const std::string &sep, int gap);
 
   std::string getParaStr(const std::string &prefix,
 		         const std::string &sep);
+
+  void createSqlDb(std::string db_name); 
   
   std::string getExeDir() {return exe_dir_;}
   std::string getResourceDir() {return resource_dir_;}
@@ -51,6 +56,7 @@ class TopfdPara {
   double getMs2EnvCnnScoreCutoff() {return ms2_env_cnn_score_cutoff_;}
   std::string getActivation() {return activation_;}
   bool isGeneHtmlFolder() {return gene_html_folder_;}
+  bool isGeneSql() {return gene_sql_;}
   bool isKeepUnusedPeaks() {return keep_unused_peaks_;}
   bool isOutputMultipleMass() {return output_multiple_mass_;}
   bool isOutputCsvFeatureFile() {return output_csv_feature_file_;}
@@ -75,6 +81,7 @@ class TopfdPara {
   int getMs2ScanNum() {return ms_2_scan_num_;}
   int getMs1MinScanNum() {return ms1_min_scan_num_;}
   int getMs2MinScanNum() {return ms2_min_scan_num_;}
+  sqlite3* getSqlDb() {return sql_db;}  
 
   void setExeDir(std::string dir) {exe_dir_ = dir;}
   void setResourceDir(std::string dir) {resource_dir_ = dir;}
@@ -134,6 +141,7 @@ class TopfdPara {
   bool aa_num_based_filter_ = true;
   bool output_csv_feature_file_ = false;
   bool gene_html_folder_ = true;
+  bool gene_sql_ = true;
 
   // parameters for feature identification
   double split_intensity_ratio_ = 2.5;
@@ -160,6 +168,9 @@ class TopfdPara {
   bool is_faims_ = false;
   double faims_volt_ = -1;
   std::string output_base_name_ = "";
+  std::string sql_file_name_ = "";
+  sqlite3 *sql_db;
+
   std::string html_dir_ = "";
   std::string ms1_json_dir_ = "";
   std::string ms2_json_dir_ = "";

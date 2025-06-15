@@ -17,11 +17,15 @@
 
 #include <vector>
 
+#include "ms/spec/peak.hpp"
+
 namespace toppic {
 
 namespace baseline_util {
 
 double getBaseLine(const std::vector<double> &inte);
+
+double getBaseLine(const PeakPtrVec &peak_list);
 
 }  // namespace deconv_util 
 

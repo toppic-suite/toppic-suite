@@ -55,6 +55,10 @@ class Env {
 
   EnvPtr addZero(int num);
 
+  void removeLeftPeaks(int num);
+
+  void removeRightPeaks(int num);
+
   EnvPtr getSubEnv(double percent_bound, double absolute_min_inte,
                    int max_back_peak_num, int max_forw_peak_num);
 

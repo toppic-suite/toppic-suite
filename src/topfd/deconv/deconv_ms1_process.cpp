@@ -20,11 +20,13 @@
 #include "common/util/file_util.hpp"
 #include "common/thread/simple_thread_pool.hpp"
 
+#include "ms/spec/baseline_util.hpp"
 #include "ms/spec/msalign_writer.hpp"
 #include "ms/spec/msalign_thread_merge.hpp"
 #include "ms/env/match_env_util.hpp"
 #include "ms/mzml/mzml_ms_group_reader.hpp"
 #include "ms/mzml/mzml_ms_json_writer.hpp"
+#include "ms/mzml/mzml_ms_sql_writer.hpp"
 
 #include "topfd/envcnn/onnx_env_cnn.hpp" 
 #include "topfd/deconv/deconv_prec_win.hpp"
@@ -59,10 +61,14 @@ void deconvMsOne(MzmlMsGroupPtr ms_group_ptr,
   for (std::size_t i = 0; i < peak_list.size(); i++) {
     intensities.push_back(peak_list[i]->getIntensity());
   }
+  double base_inte = baseline_util::getBaseLine(intensities);
+  double min_ref_inte = base_inte * topfd_para_ptr->getMsOneSnRatio();
+
   // 2. Deconv envelopes in precursor windows and remove them
   MatchEnvPtrVec prec_envs = deconv_prec_win::deconvPrecWinForMsGroup(ms_group_ptr, 
                                                                       topfd_para_ptr->getMaxMass(),
-                                                                      topfd_para_ptr->getMaxCharge()); 
+                                                                      topfd_para_ptr->getMaxCharge(),
+                                                                      base_inte, min_ref_inte); 
 
   // Obtain EnvCNN Score for envelopes
   onnx_env_cnn::computeEnvScores(peak_list, prec_envs); 
@@ -78,6 +84,7 @@ void deconvMsOne(MzmlMsGroupPtr ms_group_ptr,
     }
   }
   // 3. Deconv the whole spectrum with filtering 
+  // get base intensity and min_ref_intensity for sql writing
   MatchEnvPtrVec deconv_envs;
   if (peak_list.size() > 0) {
     int ms_level = 1;
@@ -98,6 +105,7 @@ void deconvMsOne(MzmlMsGroupPtr ms_group_ptr,
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
   DeconvMsPtr deconv_ms_ptr = match_env_util::getDeconvMsPtr(header_ptr,
                                                              result_envs);
+  
 
   boost::thread::id thread_id = boost::this_thread::get_id();
   int writer_id = pool_ptr->getId(thread_id);
@@ -113,7 +121,13 @@ void deconvMsOne(MzmlMsGroupPtr ms_group_ptr,
         + file_util::getFileSeparator() 
         + "spectrum" + std::to_string(header_ptr->getSpecId()) + ".js";
     mzml_ms_json_writer::write(json_file_name, ms_ptr, prec_envs);    
+  }  
+  // 7. write sqlite file
+  if (topfd_para_ptr->isGeneSql()) {
+    LOG_DEBUG("Update SQl")
+    mzml_ms_sql_writer::writeMs1(topfd_para_ptr->getSqlDb(), ms_ptr, result_envs, base_inte, min_ref_inte);
   }
+
 }
 
 std::function<void()> geneTask(MzmlMsGroupPtr ms_group_ptr, 

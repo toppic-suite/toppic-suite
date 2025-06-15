@@ -19,10 +19,18 @@
 #include "common/util/time_util.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/str_util.hpp"
-#include "topfd/common/topfd_para.hpp"
+#include "common/util/sql_util.hpp"
+#include "common/util/logger.hpp"
 #include "common/util/version.hpp"
+#include "topfd/common/topfd_para.hpp"
 
 namespace toppic {
+
+TopfdPara::~TopfdPara() {
+  if (sql_db != nullptr) {
+    sqlite3_close(sql_db);
+  }
+}
 
 void TopfdPara::setMzmlFileNameAndFaims(std::string &mzml_file_name, 
                                         bool is_faims, double voltage) {
@@ -42,6 +50,92 @@ void TopfdPara::setMzmlFileNameAndFaims(std::string &mzml_file_name,
   ms2_json_dir_ = html_dir_ 
     + file_util::getFileSeparator() + "topfd" 
     + file_util::getFileSeparator() + "ms2_json";
+  sql_file_name_ = output_base_name_ + ".sqlite";
+  if (gene_sql_) {
+    createSqlDb(sql_file_name_);
+  }
+}
+
+void TopfdPara::createSqlDb(std::string sql_db_name) {
+  int rc;
+  // Open database
+  if (sql_db != nullptr) {
+    sqlite3_close(sql_db);
+  }
+  if (file_util::exists(sql_db_name)) {
+    file_util::delFile(sql_db_name);
+  }
+  rc = sqlite3_open(sql_db_name.c_str(), &sql_db);
+  if (rc) {
+    LOG_ERROR("Can't open database: " << sqlite3_errmsg(sql_db)); 
+    exit(EXIT_FAILURE);
+  }
+
+  std::string sql = "CREATE TABLE IF NOT EXISTS ms1_spectrum(id INTEGER PRIMARY KEY,"
+                                                            "scan INTEGER NOT NULL,"
+                                                            "retention_time REAL,"
+                                                            "peak_num INTEGER,"
+                                                            "env_num INTEGER,"
+                                                            "base_inte REAL,"
+                                                            "min_ref_inte REAL);";
+  LOG_DEBUG("SQL: " << sql);
+  sql_util::execSql(sql_db, sql); 
+  sql = "CREATE TABLE IF NOT EXISTS ms1_peak(spec_id INTEGER NOT NULL,"
+                                            "peak_id INTEGER NOT NULL,"
+                                            "mz REAL NOT NULL,"
+                                            "intensity REAL NOT NULL);";
+  LOG_DEBUG("SQL: " << sql);
+  sql_util::execSql(sql_db, sql);
+  sql = "DELETE from ms1_peak;"; 
+  LOG_DEBUG("SQL: " << sql);
+  sql_util::execSql(sql_db, sql);
+  sql = "DELETE from ms1_spectrum;"; 
+  LOG_DEBUG("SQL: " << sql);
+
+  sql = "CREATE TABLE IF NOT EXISTS ms2_spectrum(id INTEGER PRIMARY KEY,"
+        "scan INTEGER NOT NULL,"
+        "retention_time REAL,"
+        "target_mz REAL,"
+        "begin_mz REAL,"
+        "end_mz REAL,"
+        "n_ion_type TEXT,"
+        "c_ion_type TEXT,"
+        "peak_num INTEGER);";
+  LOG_DEBUG("SQL: " << sql);
+  sql_util::execSql(sql_db, sql); 
+  sql = "CREATE TABLE IF NOT EXISTS ms2_peak(spec_id INTEGER NOT NULL,"
+                                            "peak_id INTEGER NOT NULL,"
+                                            "mz REAL NOT NULL,"
+                                            "intensity REAL NOT NULL);";
+  LOG_DEBUG("SQL: " << sql);
+  sql_util::execSql(sql_db, sql);
+  sql = "CREATE TABLE IF NOT EXISTS ms_info(ms1_scan_num INTEGER NOT NULL,"
+                                            "ms2_scan_num INTEGER NOT NULL);";
+  LOG_DEBUG("SQL: " << sql);
+  sql_util::execSql(sql_db, sql);
+  sql = "INSERT INTO ms_info(ms1_scan_num, ms2_scan_num) values ('" 
+            + std::to_string(ms_1_scan_num_) + "',"
+      + "'" + std::to_string(ms_2_scan_num_) + "');";
+  LOG_DEBUG("INSERT SQL: " << sql); 
+  sql_util::execSql(sql_db, sql); 
+
+  sql = "CREATE TABLE IF NOT EXISTS ms1_env(spec_id INTEGER NOT NULL,"
+                                           "env_id INTEGER NOT NULL,"
+                                           "mono_mass REAL NOT NULL,"
+                                           "charge INTEGER NOT NULL,"
+                                           "intensity REAL NOT NULL,"
+                                           "envcnn_score REAL NOT NULL,"
+                                           "peak_num INTEGER NOT NULL);";
+  LOG_DEBUG("SQL: " << sql);
+  sql_util::execSql(sql_db, sql);
+
+  sql = "CREATE TABLE IF NOT EXISTS ms1_env_peak(spec_id INTEGER NOT NULL,"
+                                           "env_id INTEGER NOT NULL,"
+                                           "peak_id INTEGER NOT NULL,"
+                                           "mz REAL NOT NULL,"
+                                           "intensity REAL NOT NULL);";
+  LOG_DEBUG("SQL: " << sql);
+  sql_util::execSql(sql_db, sql);
 }
 
 std::string TopfdPara::getTopfdParaStr(const std::string &prefix,

@@ -116,20 +116,18 @@ double initMinInte(PeakPtrVec &peak_list,
 MatchEnvPtr2D initMatchEnv(EnvParaPtr env_para_ptr, PeakPtrVec &peak_list,
                            PeakIntv peak_intv, int peak_num, 
                            double argu_max_mass, int max_charge, 
-                           double min_inte, double min_ref_inte) {
+                           double base_inte, double min_ref_inte) {
   MatchEnvPtr2D result;
   for (int idx = peak_intv.bgn; idx <= peak_intv.end; idx++) {
     MatchEnvPtrVec env_ptrs(max_charge);
-    if (peak_list[idx]->getIntensity() >= min_inte) {
+    if (peak_list[idx]->getIntensity() >= min_ref_inte) {
       for (int charge = 1; charge <= max_charge; charge++) {
         double max_mass = peak_list[idx]->getPosition() * charge + 1;
         MatchEnvPtr env_ptr;
-        if (max_mass > argu_max_mass) {
-          max_mass = argu_max_mass;
-        } else {
+        if (max_mass <= argu_max_mass) {
           env_ptr  = env_detect::detectEnvByRefPeak(peak_list, idx, charge, 
-                                                    max_mass, min_inte, min_ref_inte, 
-                                                    env_para_ptr);
+                                                    argu_max_mass, base_inte, min_ref_inte, 
+                                                    env_para_ptr, false);
         }
         if (env_ptr != nullptr) {
           if (!env_filter::checkRealEnvValid(env_ptr, env_para_ptr)) {
@@ -138,7 +136,17 @@ MatchEnvPtr2D initMatchEnv(EnvParaPtr env_para_ptr, PeakPtrVec &peak_list,
             env_ptr->compMsdeconvScr(env_para_ptr);
           }
         }
-        env_ptrs[charge-1] = env_ptr;
+        // detect envelope with full intensity percentage
+        MatchEnvPtr full_env_ptr = nullptr;
+        if (env_ptr != nullptr) {
+          full_env_ptr  = env_detect::detectEnvByRefPeak(peak_list, idx, charge, 
+                                                         argu_max_mass, base_inte, min_ref_inte, 
+                                                         env_para_ptr, true);
+          if (full_env_ptr != nullptr) {
+            full_env_ptr->setMsdeconvScore(env_ptr->getMsdeconvScore());
+          }
+        }
+        env_ptrs[charge-1] = full_env_ptr;
       }
     }
     result.push_back(env_ptrs);
@@ -163,7 +171,7 @@ MatchEnvPtr findBest(MatchEnvPtr2D &env_ptrs, double max_mass) {
 }
 
 MatchEnvPtr deconv(double prec_win_begin, double prec_win_end, PeakPtrVec &peak_list,
-                   double argu_max_mass, int argu_max_charge) {
+                   double argu_max_mass, int argu_max_charge, double base_inte, double min_ref_inte) {
   if (prec_win_begin <= 0) {
     return nullptr;
   }
@@ -174,26 +182,28 @@ MatchEnvPtr deconv(double prec_win_begin, double prec_win_end, PeakPtrVec &peak_
     return nullptr;
   }
   int max_charge = initMaxChrg(peak_list, peak_intv, argu_max_charge);
-  double min_inte = 0;
-  double min_ref_inte = 0;
   LOG_DEBUG("Calcate match envelopes...");
   MatchEnvPtr2D match_envs = initMatchEnv(env_para_ptr, peak_list, peak_intv,
-                                          peak_num, argu_max_mass, max_charge, min_inte, 
+                                          peak_num, argu_max_mass, max_charge, base_inte, 
                                           min_ref_inte);
   LOG_DEBUG("Do filtering...");
   MatchEnvPtr env_ptr = findBest(match_envs, argu_max_mass);
+  LOG_DEBUG("Env mass " << env_ptr->getTheoEnvPtr()->getMonoNeutralMass() 
+            << " charge " << env_ptr->getTheoEnvPtr()->getCharge() 
+            << " peak number " << env_ptr->getTheoEnvPtr()->getPeakNum());
   return env_ptr;
 }
 
 MatchEnvPtr deconvPrecWinForOneMs(MzmlMsPtr ms_one, MzmlMsPtr ms_two, 
-                                  double max_mass, int max_charge) {
+                                  double max_mass, int max_charge, 
+                                  double base_inte, double min_ref_inte) {
   MsHeaderPtr ms_two_header = ms_two->getMsHeaderPtr();
   double prec_win_begin = ms_two_header->getPrecWinBegin();
   double prec_win_end = ms_two_header->getPrecWinEnd();
 
   PeakPtrVec peak_list = ms_one->getPeakPtrVec();
   MatchEnvPtr match_env_ptr = deconv_prec_win::deconv(prec_win_begin, prec_win_end, peak_list,  
-                                                      max_mass, max_charge);
+                                                      max_mass, max_charge, base_inte, min_ref_inte);
   if (match_env_ptr == nullptr) {
     LOG_INFO("No precursor isotopic envelope is found for scan " << ms_two_header->getFirstScanNum());
   }
@@ -201,14 +211,16 @@ MatchEnvPtr deconvPrecWinForOneMs(MzmlMsPtr ms_one, MzmlMsPtr ms_two,
 }
 
 MatchEnvPtrVec deconvPrecWinForMsGroup(MzmlMsGroupPtr ms_group_ptr, 
-                                       double max_mass, int max_charge) {
+                                       double max_mass, int max_charge,
+                                       double base_inte, double min_ref_inte) {
   MzmlMsPtr ms_one_ptr = ms_group_ptr->getMsOnePtr();
   MzmlMsPtrVec ms_two_ptr_vec = ms_group_ptr->getMsTwoPtrVec();
   MatchEnvPtrVec result_envs;
   for (size_t i = 0; i < ms_two_ptr_vec.size(); i++) {
     MzmlMsPtr ms_two_ptr = ms_two_ptr_vec[i];
     MatchEnvPtr match_env_ptr = deconvPrecWinForOneMs(ms_one_ptr, ms_two_ptr, 
-                                                      max_mass, max_charge);
+                                                      max_mass, max_charge,
+                                                      base_inte, min_ref_inte);
     if (match_env_ptr != nullptr) {
       result_envs.push_back(match_env_ptr);
     }

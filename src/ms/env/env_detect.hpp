@@ -24,10 +24,10 @@ namespace toppic {
 namespace env_detect {
 
 MatchEnvPtr detectEnvByRefPeak(const PeakPtrVec &peak_list, int ref_peak, int charge, double max_mass, 
-                               double min_inte, double min_ref_inte, EnvParaPtr env_para_ptr);
+                               double min_inte, double min_ref_inte, EnvParaPtr env_para_ptr, bool is_full);
 
 MatchEnvPtr detectEnvByMonoMass(const PeakPtrVec &peak_list, double mono_mass,
-                                int charge, double min_inte, EnvParaPtr env_para_ptr); 
+                                int charge, double min_inte, EnvParaPtr env_para_ptr, bool is_full); 
 
 MatchEnvPtr2D getCandidateEnv(const PeakPtrVec &peak_list, int max_charge, double max_mass, 
                               double min_inte, double min_ref_inte, EnvParaPtr env_para_ptr);

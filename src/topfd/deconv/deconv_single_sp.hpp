@@ -27,6 +27,8 @@ class DeconvSingleSp {
   explicit DeconvSingleSp(TopfdParaPtr topfd_para_ptr, PeakPtrVec &peak_list,
                           int ms_level, double max_mass, int max_charge);
   MatchEnvPtrVec deconv();
+
+  DeconvDataPtr getDeconvDataPtr() {return data_ptr_;}
   
   void postprocess(MatchEnvPtrVec  &dp_envs, int ms_level);
 
