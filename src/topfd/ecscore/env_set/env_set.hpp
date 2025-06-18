@@ -50,6 +50,8 @@ class EnvSet {
 
   XicPtr getXicPtr() { return xic_ptr_; }
 
+  double getMinInte() const { return min_inte_; }
+
   void setXicPtr(XicPtr xic_ptr) { xic_ptr_ = xic_ptr; }
 
   // get the all peak intensity in xic for the seed spectrum

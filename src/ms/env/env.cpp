@@ -274,6 +274,20 @@ double Env::compScaledInteSum(double scale_factor, double min_inte) {
   return sum;
 }
 
+double Env::compScaledInteSumBounded(double scale_factor, double min_inte, double win_bgn, double win_end) {
+    double sum = 0;
+    for (size_t i = 0; i < peak_ptr_list_.size(); i++) {
+        if (peak_ptr_list_[i]->getPosition() < win_bgn || peak_ptr_list_[i]->getPosition() > win_end) {
+            continue;
+        }
+        double scale_inte = peak_ptr_list_[i]->getIntensity() * scale_factor;
+        if (scale_inte >= min_inte) {
+            sum += scale_inte;
+        }
+    }
+    return sum;
+}
+
 std::vector<double> Env::getScaledInteList(double scale_factor, 
                                            double min_inte) {
   std::vector<double> results; 
