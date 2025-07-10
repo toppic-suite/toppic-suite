@@ -294,7 +294,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     boost_serialization boost_thread xerces-c z)
 
   target_link_libraries(toppic boost_program_options
-    boost_serialization boost_thread xerces-c z)
+    boost_serialization boost_thread sqlite3 xerces-c z)
 
   target_link_libraries(topmg boost_program_options
     boost_serialization boost_thread xerces-c z)
