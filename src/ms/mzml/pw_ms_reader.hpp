@@ -52,6 +52,8 @@ class PwMsReader {
   void resetIndexes(); 
 
  private:
+  const double MAX_MZ_ = 100000.0;
+  const double MAX_INTE_ = 1e20;
   std::string file_name_;
   std::string activation_;
   double isolation_window_;
