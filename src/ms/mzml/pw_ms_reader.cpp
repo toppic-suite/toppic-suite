@@ -127,7 +127,7 @@ PeakPtrVec PwMsReader::parsePeaks(pwiz::msdata::SpectrumPtr cur_spec_ptr) {
   // get peaks
   PeakPtrVec peak_list; 
   for (size_t i = 0; i < pairs.size(); i++) {
-    if (pairs[i].intensity > 0.0) {
+    if (pairs[i].intensity > 0.0 && pairs[i].intensity < MAX_INTE_ && pairs[i].mz > 0.0 && pairs[i].mz < MAX_MZ_) {
       PeakPtr peak_ptr = std::make_shared<Peak>(pairs[i].mz, pairs[i].intensity);
       peak_list.push_back(peak_ptr);
     }
