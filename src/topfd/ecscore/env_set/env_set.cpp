@@ -79,6 +79,38 @@ int EnvSet::countEnvNum() {
   return count;
 }
 
+std::vector<int> EnvSet::getSpecIdList() {
+  std::vector<int> scan_id_list;
+  for (size_t i = 0; i < ms_map_env_list_.size(); i++) {
+    if (ms_map_env_list_[i] != nullptr) {
+      scan_id_list.push_back(ms_map_env_list_[i]->getSpecId());
+    }
+  }
+  return scan_id_list;
+}
+
+std::vector<double> EnvSet::getIntensitySumList() {
+  std::vector<double> intensity_sum_list;
+  double seed_inte_sum = seed_ptr_->compInteSum(); 
+  for (size_t i = 0; i < ms_map_env_list_.size(); i++) {
+    if (ms_map_env_list_[i] != nullptr) {
+      intensity_sum_list.push_back(seed_inte_sum * xic_ptr_->getInteRatio(i)); 
+    }
+  }
+  return intensity_sum_list;
+}
+
+std::vector<double> EnvSet::getMaxIntensityList() {
+  std::vector<double> max_intensity_list;
+  double seed_max_inte = seed_ptr_->getReferInte(); 
+  for (size_t i = 0; i < ms_map_env_list_.size(); i++) {
+    if (ms_map_env_list_[i] != nullptr) {
+      max_intensity_list.push_back(seed_max_inte * xic_ptr_->getInteRatio(i)); 
+    }
+  }
+  return max_intensity_list;
+}
+
 std::vector<double> EnvSet::compAggrEnvInteList() {
   int peak_num = seed_ptr_->getPeakNum();
   std::vector<double> inte_list(peak_num, 0);

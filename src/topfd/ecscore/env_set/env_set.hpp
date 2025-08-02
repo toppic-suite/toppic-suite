@@ -75,6 +75,12 @@ class EnvSet {
 
   bool containValidEnvs(int min_scan_num, int min_match_peak_num); 
 
+  std::vector<int> getSpecIdList();
+
+  std::vector<double> getIntensitySumList();
+
+  std::vector<double> getMaxIntensityList();
+
   /*
   bool containTwoValidEnvs(int min_match_peak_num); 
 

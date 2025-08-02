@@ -298,13 +298,25 @@ FracFeaturePtr getFracFeature(int feat_id, DeconvMsPtrVec &ms1_ptr_vec, int frac
     int env_num = es->countEnvNum();
     int charge = es->getCharge();
     std::vector<double> xic = es->getXicPtr()->getAllPeakInteList();
-    std::vector<double> aggregateEnvelopeInte = es->compAggrEnvInteList();
-    std::vector<double> envelopeMass = es->getSeedPtr()->getMzList();
+    std::vector<double> aggregate_env_inte = es->compAggrEnvInteList();
+    std::vector<double> envelope_mass = es->getSeedPtr()->getMzList();
+    double mono_mz = es->getSeedPtr()->getMonoMz(); 
+    double average_mz = es->getSeedPtr()->getAvgMz();
+    double refer_mz = es->getSeedPtr()->getReferMz();
+    std::vector<int> spec_id_list = es->getSpecIdList();
+    std::vector<int> scan_list = matrix_ptr->getScanListBySpecId(spec_id_list);
+    std::vector<double> rt_list = matrix_ptr->getRtListBySpecId(spec_id_list);
+    std::vector<double> intensity_sum_list = es->getIntensitySumList();
+    std::vector<double> max_intensity_list = es->getMaxIntensityList(); 
+
     SingleChargeFeaturePtr single_feature =
-        std::make_shared<SingleChargeFeature>(
-            charge, time_begin, time_end, scan_begin, scan_end, inte, env_num,
-            id_begin, id_end, feat_mass, xic, envelopeMass,
-            aggregateEnvelopeInte);
+	    std::make_shared<SingleChargeFeature>(
+			    charge, time_begin, time_end, scan_begin, scan_end, inte, env_num,
+			    id_begin, id_end, feat_mass, xic, envelope_mass,
+			    aggregate_env_inte,  
+			    mono_mz, average_mz, refer_mz,
+			    scan_list, rt_list,
+			    intensity_sum_list, max_intensity_list);
     single_features.push_back(single_feature);
   }
   feature_ptr->setSingleFeatures(single_features);

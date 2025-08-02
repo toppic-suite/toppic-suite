@@ -26,18 +26,16 @@ namespace toppic {
 
 class SingleChargeFeature {
  public:
-  SingleChargeFeature(int charge,
-                      double time_begin, double time_end,
-                      int scan_begin, int scan_end,
-                      double intensity, int env_num,
-                      int spec_id_begin, int spec_id_end,
+  SingleChargeFeature(int charge, double time_begin, double time_end,
+                      int scan_begin, int scan_end, double intensity,
+                      int env_num, int spec_id_begin, int spec_id_end,
                       double mass, std::vector<double> xic_inte,
-                      std::vector<double>envelopeMass, std::vector<double> aggregateEnvelopeInte);
-
-  SingleChargeFeature(int charge,
-                      double time_begin, double time_end,
-                      int scan_begin, int scan_end,
-                      double intensity, int env_num);
+                      std::vector<double> envelope_mass,
+                      std::vector<double> aggregate_envelope_inte,
+                      double mono_mz, double average_mz, double refer_mz,
+                      std::vector<int> scan_list, std::vector<double> rt_list,
+                      std::vector<double> intensity_sum_list,
+                      std::vector<double> max_intensity_list);
 
   SingleChargeFeature(XmlDOMElement* element);
 
@@ -65,9 +63,9 @@ class SingleChargeFeature {
 
   std::vector<double> getXicInte() { return xic_inte_; }
 
-  std::vector<double> getAggregateEnvelopeInte() { return aggregateEnvelopeInte_; }
+  std::vector<double> getAggregateEnvelopeInte() { return aggregate_envelope_inte_; }
 
-  std::vector<double> getEnvelopeMass() { return envelopeMass_; }
+  std::vector<double> getEnvelopeMass() { return envelope_mass_; }
 
   static std::string getXmlElementName() {return "single_charge_feature";}
 
@@ -86,8 +84,15 @@ class SingleChargeFeature {
   int spec_id_end_;
   double mass_;
   std::vector<double> xic_inte_;
-  std::vector<double> envelopeMass_;
-  std::vector<double> aggregateEnvelopeInte_;
+  std::vector<double> envelope_mass_;
+  std::vector<double> aggregate_envelope_inte_;
+  double mono_mz_ = 0.0;
+  double average_mz_ = 0.0;
+  double refer_mz_ = 0.0;
+  std::vector<int> scan_list_;
+  std::vector<double> rt_list_;
+  std::vector<double> intensity_sum_list_;
+  std::vector<double> max_intensity_list_;
 };
 
 typedef std::shared_ptr<SingleChargeFeature> SingleChargeFeaturePtr;

@@ -170,4 +170,30 @@ void MsMap::removeNonNeighbors(double mass_tol) {
   }
 }
 
+std::vector<int> MsMap::getScanListBySpecId(std::vector<int> spec_id_list) {
+  std::vector<int> scan_list;
+  for (auto spec_id: spec_id_list) {
+    if (spec_id >= 0 && spec_id < row_ptr_list_.size()) {
+      MsMapRowPtr row_ptr = row_ptr_list_[spec_id];
+      scan_list.push_back(row_ptr->getHeaderPtr()->getScanNum());
+    } else {
+      scan_list.push_back(-1); // invalid spec id
+    }
+  }
+  return scan_list;
 }
+
+std::vector<double> MsMap::getRtListBySpecId(std::vector<int> spec_id_list) {
+  std::vector<double> rt_list;
+  for (auto spec_id: spec_id_list) {
+    if (spec_id >= 0 && spec_id < row_ptr_list_.size()) {
+      MsMapRowPtr row_ptr = row_ptr_list_[spec_id];
+      rt_list.push_back(row_ptr->getHeaderPtr()->getRt());
+    } else {
+      rt_list.push_back(-1.0); // invalid spec id
+    }
+  }
+  return rt_list;
+}
+
+} // namespace toppic

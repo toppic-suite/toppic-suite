@@ -42,6 +42,10 @@ class MsMap {
 
   MsMapRowHeaderPtrVec getHeaderPtrList();
 
+  std::vector<int> getScanListBySpecId(std::vector<int> spec_id_list);
+
+  std::vector<double> getRtListBySpecId(std::vector<int> spec_id_list);
+
   void removeNonNeighbors(double mass_tol);
 
   int getColIndex(double mz);
