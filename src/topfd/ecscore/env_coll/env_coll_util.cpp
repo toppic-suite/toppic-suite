@@ -297,9 +297,22 @@ FracFeaturePtr getFracFeature(int feat_id, DeconvMsPtrVec &ms1_ptr_vec, int frac
     double inte = es->getInte();
     int env_num = es->countEnvNum();
     int charge = es->getCharge();
+
+    double mono_mz = es->getSeedPtr()->getMonoMz(); 
+    double average_mz = es->getSeedPtr()->getAvgMz();
+    double refer_mz = es->getSeedPtr()->getReferMz();
+    std::vector<int> spec_id_list = es->getSpecIdList();
+    std::vector<int> scan_list = matrix_ptr->getScanListBySpecId(spec_id_list);
+    std::vector<double> rt_list = matrix_ptr->getRtListBySpecId(spec_id_list);
+    std::vector<double> intensity_sum_list = es->getIntensitySumList();
+    std::vector<double> max_intensity_list = es->getMaxIntensityList(); 
+
     SingleChargeFeaturePtr single_feature = std::make_shared<SingleChargeFeature>(charge, time_begin, time_end,
                                                                                   scan_begin, scan_end,
-                                                                                  inte, env_num);
+                                                                                  inte, env_num,
+                                                                                  mono_mz, average_mz, refer_mz,
+                                                                                  scan_list, rt_list,
+                                                                                  intensity_sum_list, max_intensity_list);
     single_features.push_back(single_feature);
   }
   feature_ptr->setSingleFeatures(single_features);

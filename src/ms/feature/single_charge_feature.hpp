@@ -30,7 +30,13 @@ class SingleChargeFeature {
   SingleChargeFeature(int charge,
                       double time_begin, double time_end,
                       int scan_begin, int scan_end,
-                      double intensity, int env_num);
+                      double intensity, int env_num, 
+                      double mono_mz, double average_mz,
+                      double refer_mz,
+                      std::vector<int> scan_list,
+                      std::vector<double> rt_list,
+                      std::vector<double> intensity_sum_list,
+                      std::vector<double> max_intensity_list);
 
   SingleChargeFeature(XmlDOMElement* element);
 
@@ -62,6 +68,13 @@ class SingleChargeFeature {
   int scan_end_;
   double intensity_;
   int env_num_ = 0;
+  double mono_mz_ = 0.0;
+  double average_mz_ = 0.0;
+  double refer_mz_ = 0.0;
+  std::vector<int> scan_list_;
+  std::vector<double> rt_list_;
+  std::vector<double> intensity_sum_list_;
+  std::vector<double> max_intensity_list_;
 };
 
 typedef std::shared_ptr<SingleChargeFeature> SingleChargeFeaturePtr;
