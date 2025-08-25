@@ -23,6 +23,7 @@
 #include "prsm/simple_prsm_reader.hpp"
 #include "prsm/simple_prsm_util.hpp"
 #include "prsm/prsm.hpp"
+#include "prsm/prsm_util.hpp"
 #include "search/ptmsearch/ptm_search_slow_filter.hpp"
 #include "search/ptmsearch/ptm_search_processor.hpp"
 
@@ -30,17 +31,7 @@ namespace toppic {
 
 void seleTopPrsms(const PrsmPtrVec &all_prsm_ptrs, 
                   PrsmPtrVec &sele_prsm_ptrs, int n_report) {
-  int match_size = all_prsm_ptrs.size();
-  if(all_prsm_ptrs.size()!=0){
-    for(int r=0;r< n_report;r++){
-      if(r >= match_size){
-        break;
-      }
-      if(all_prsm_ptrs[r]->getMatchFragNum() > 0){
-        sele_prsm_ptrs.push_back(all_prsm_ptrs[r]);
-      }
-    }
-  }
+  sele_prsm_ptrs = prsm_util::getTopPrsms(all_prsm_ptrs, n_report);
   std::sort(sele_prsm_ptrs.begin(), sele_prsm_ptrs.end(), 
             Prsm::cmpSpecIncPrecIncEvalueIncProtInc);
 }
@@ -180,7 +171,8 @@ void PtmSearchProcessor::process(){
   std::cout << std::endl;
 
   // Combine results
-  int prsm_top_num = mng_ptr_->thread_num_ * mng_ptr_->n_report_;
+  //int prsm_top_num = mng_ptr_->thread_num_ * mng_ptr_->n_report_;
+  int prsm_top_num =  mng_ptr_->n_report_;
   bool norm = false;
   bool remove_dup = true;
   for (int s = 2; s <= n_unknown_shift; s++) {

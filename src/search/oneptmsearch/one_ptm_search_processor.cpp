@@ -77,12 +77,7 @@ PrsmPtrVec OnePtmSearchProcessor::onePtmSearchOneSpec(SpectrumSetPtr spec_set_pt
   }
   std::sort(prsms.begin(), prsms.end(),
             Prsm::cmpMatchFragDecMatchPeakDecProtInc);
-  /*
-  int prsm_num = prsms.size();
-  if (prsms.size() > 0 && mng_ptr->n_report_ < prsm_num) {
-    prsms.erase(prsms.begin() + mng_ptr->n_report_, prsms.end());
-  }
-  */
+
   PrsmPtrVec top_prsms = prsm_util::getTopPrsms(prsms, mng_ptr->n_report_);
   return top_prsms;
 }

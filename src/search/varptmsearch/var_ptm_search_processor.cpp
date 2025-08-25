@@ -24,6 +24,7 @@
 #include "ms/spec/msalign_util.hpp"
 #include "ms/spec/msalign_reader.hpp"
 #include "ms/factory/spectrum_set_factory.hpp"
+#include "prsm/prsm_util.hpp"
 #include "prsm/simple_prsm.hpp"
 #include "prsm/simple_prsm_reader.hpp"
 #include "prsm/prsm_xml_writer.hpp"
@@ -156,13 +157,11 @@ std::function<void()> geneTask(SpectrumSetPtr spec_set_ptr,
     }
     std::sort(prsms.begin(), prsms.end(),
               Prsm::cmpMatchFragDecMatchPeakDecProtInc);
-    if (prsms.size() > 0) {
-      prsms.erase(prsms.begin() + mng_ptr->n_report_, prsms.end());
-    }
+    PrsmPtrVec selected_prsms = prsm_util::getTopPrsms(prsms, mng_ptr->n_report_);
 
     boost::thread::id thread_id = boost::this_thread::get_id();
     int writer_id = pool_ptr->getId(thread_id);
-    writer_ptr_vec[writer_id]->writeVector(prsms);
+    writer_ptr_vec[writer_id]->writeVector(selected_prsms);
   };
 }
 

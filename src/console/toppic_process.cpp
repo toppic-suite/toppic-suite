@@ -234,7 +234,6 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
 
     std::vector<std::string> input_exts;
     
-    /*
     std::cout << "Zero unexpected shift filtering - started." << std::endl;
     ZeroPtmFilterMngPtr zero_filter_mng_ptr
         = std::make_shared<ZeroPtmFilterMng>(prsm_para_ptr, index_file_para, 
@@ -250,7 +249,6 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     zero_search_processor->process();
     zero_search_processor = nullptr;
     std::cout << "Zero unexpected shift search - finished." << std::endl;
-    */
     
     input_exts.push_back("toppic_zero_shift_COMPLETE");
     input_exts.push_back("toppic_zero_shift_PREFIX");
@@ -288,7 +286,6 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     }
 
     if (shift_num >= 1) {
-      /*
       std::cout << "One unexpected shift filtering - started." << std::endl;
       OnePtmFilterMngPtr one_ptm_filter_mng_ptr
           = std::make_shared<OnePtmFilterMng>(prsm_para_ptr, index_file_para, 
@@ -297,7 +294,6 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
                                               min_shift_mass, max_shift_mass); 
       one_ptm_filter_processor::process(one_ptm_filter_mng_ptr);
       std::cout << "One unexpected shift filtering - finished." << std::endl;
-      */
 
       std::cout << "One unexpected shift search - started." << std::endl;
       int search_shift_num = 1;
@@ -309,7 +305,6 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
       one_search_processor->process();
       one_search_processor = nullptr;
       std::cout << "One unexpected shift search - finished." << std::endl;
-
       input_exts.push_back("toppic_one_shift_COMPLETE");
       input_exts.push_back("toppic_one_shift_PREFIX");
       input_exts.push_back("toppic_one_shift_SUFFIX");

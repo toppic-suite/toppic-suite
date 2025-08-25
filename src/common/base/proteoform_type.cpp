@@ -39,7 +39,7 @@ ProteoformTypePtr ProteoformType::getProtTypePtrByName(std::string name) {
     return ProteoformType::SUFFIX;
   }
   if (name == "INTERNAL") {
-    return ProteoformType::SUFFIX;
+    return ProteoformType::INTERNAL;
   }
   return nullptr;
 }

@@ -251,6 +251,9 @@ PrsmPtrVec getTopPrsms(const PrsmPtrVec &prsm_ptrs, int top_num) {
     if ((int)top_prsms.size() >= top_num) {
       break;
     }
+    if (prsm_ptrs[i]->getMatchFragNum() < 1) {
+      continue;
+    }
     std::string prot = prsm_ptrs[i]->getProteoformPtr()->getSeqName();
     if (prot_set.find(prot) == prot_set.end()) {
       prot_set.insert(prot);
