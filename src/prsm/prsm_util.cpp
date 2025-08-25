@@ -244,6 +244,22 @@ double compClusterInte(PrsmStrPtrVec prsm_list) {
   return inte;
 }
 
+PrsmPtrVec getTopPrsms(const PrsmPtrVec &prsm_ptrs, int top_num) {
+  PrsmPtrVec top_prsms;
+  std::set<std::string> prot_set;
+  for (size_t i = 0; i < prsm_ptrs.size(); i++) {
+    if ((int)top_prsms.size() >= top_num) {
+      break;
+    }
+    std::string prot = prsm_ptrs[i]->getProteoformPtr()->getSeqName();
+    if (prot_set.find(prot) == prot_set.end()) {
+      prot_set.insert(prot);
+      top_prsms.push_back(prsm_ptrs[i]);
+    }
+  }
+  return top_prsms;
+}
+
 }  // namespace prsm_util
 
 }  // namespace toppic

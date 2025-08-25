@@ -226,6 +226,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
   std::string combined_output_name = "";
   std::string filtering_result_num = "";
   std::string thread_number = "";
+  std::string top_prsm_number = "";
 
   /** Define and parse the program options*/
   try {
@@ -295,6 +296,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         ("num-combined-spectra,r", po::value<std::string> (&group_num), "")
         ("combined-file-name,c", po::value<std::string>(&combined_output_name) , "")
         ("thread-number,u", po::value<std::string> (&thread_number), "")
+        ("top-prsm-number,U", po::value<std::string> (&top_prsm_number), "")
         ("no-topfd-feature,x", "")
         ("keep-temp-files,k", "")
         ("keep-decoy-ids,K", "")
@@ -454,6 +456,10 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
 
     if (vm.count("thread-number")) {
       arguments_["threadNumber"] = thread_number;
+    }
+
+    if (vm.count("top-prsm-number")) {
+      arguments_["numOfTopPrsms"] = top_prsm_number;
     }
 
     if (vm.count("no-topfd-feature")) {

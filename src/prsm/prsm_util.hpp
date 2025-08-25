@@ -55,6 +55,8 @@ void mergePrsmFiles(const std::vector<std::string> & prsm_file_lst,
 
 double compClusterInte(PrsmStrPtrVec prsm_list); 
 
+PrsmPtrVec getTopPrsms(const PrsmPtrVec &prsm_ptrs, int top_num);
+
 }  // namespace prsm_util
 
 }  // namespace toppic

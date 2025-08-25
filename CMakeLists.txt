@@ -291,7 +291,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     boost_iostreams boost_thread sqlite3 xerces-c z onnxruntime)
 
   target_link_libraries(topindex boost_program_options 
-    boost_serialization boost_thread xerces-c z)
+    boost_serialization boost_thread sqlite3 xerces-c z)
 
   target_link_libraries(toppic boost_program_options
     boost_serialization boost_thread sqlite3 xerces-c z)
