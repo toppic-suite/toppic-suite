@@ -297,13 +297,13 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     boost_serialization boost_thread sqlite3 xerces-c z)
 
   target_link_libraries(topmg boost_program_options
-    boost_serialization boost_thread xerces-c z)
+    boost_serialization boost_thread sqlite3 xerces-c z)
 
   target_link_libraries(topdiff boost_program_options
-    boost_thread xerces-c z)
+    boost_thread sqlite3 xerces-c z)
 
 	target_link_libraries(topdia boost_chrono boost_filesystem boost_program_options 
-    boost_iostreams boost_thread xerces-c z onnxruntime)
+    boost_iostreams boost_thread sqlite3 xerces-c z onnxruntime)
 
   target_link_libraries(topfd_gui Qt5Widgets Qt5Core Qt5Gui boost_thread xerces-c)
 
