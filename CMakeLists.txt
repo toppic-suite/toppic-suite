@@ -68,6 +68,10 @@ file(GLOB NOWIDE_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/ext/boost/nowide/*.c)
 
 # code shared by several executables
 file(GLOB_RECURSE COMMON_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/common/*.cpp)
+
+file(GLOB SQL_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/sql/*.cpp)
+
+
 file(GLOB SEQ_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/seq/*.cpp)
 file(GLOB PARA_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/para/*.cpp)
 file(GLOB SPEC_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/ms/spec/*.cpp
@@ -188,7 +192,8 @@ file(GLOB TOPDIA_CONSOLE_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdia_arg
                               ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdia.cpp)
 
 # topdia gui
-file(GLOB TOPDIA_GUI_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/topfd/common/topfd_para.cpp
+file(GLOB TOPDIA_GUI_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdia_argument.cpp
+                          ${CMAKE_CURRENT_SOURCE_DIR}/src/topfd/common/topfd_para.cpp
                           ${CMAKE_CURRENT_SOURCE_DIR}/src/topdia/common/topdia_para.cpp
                           ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topdia/*.cpp
                           ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topdia/*.qrc)
@@ -197,7 +202,7 @@ file(GLOB TOPDIA_GUI_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/topfd/common/topfd_par
 file(GLOB UNIT_TEST_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/*.cpp)
 
 add_executable(topfd 
-  ${TOPFD_CONSOLE_SRCS} ${TOPFD_SRCS} ${COMMON_SRCS} ${PARA_SRCS} 
+  ${TOPFD_CONSOLE_SRCS} ${TOPFD_SRCS} ${COMMON_SRCS} ${SQL_SRCS} ${PARA_SRCS} 
   ${SPEC_SRCS} ${MZML_SRCS} ${PWIZ_SRCS} ${NOWIDE_SRCS})
 
 add_executable(topindex 
@@ -221,10 +226,10 @@ add_executable(topdiff
   ${DIFF_SRCS})
 
 add_executable(topdia
-  ${TOPDIA_CONSOLE_SRCS} ${TOPDIA_SRCS} ${COMMON_SRCS} ${PARA_SRCS}
+  ${TOPDIA_CONSOLE_SRCS} ${TOPDIA_SRCS} ${COMMON_SRCS} ${SQL_SRCS} ${PARA_SRCS}
   ${SPEC_SRCS} ${MZML_SRCS} ${TOPFD_SRCS} ${PWIZ_SRCS} ${NOWIDE_SRCS})
 
-add_executable(topfd_gui ${TOPFD_GUI_SRCS} ${GUI_UTIL_SRCS})
+add_executable(topfd_gui ${TOPFD_GUI_SRCS} ${GUI_UTIL_SRCS} ${SQL_SRCS})
 
 add_executable(topindex_gui ${TOPINDEX_GUI_SRCS} ${GUI_UTIL_SRCS})
 
@@ -234,7 +239,7 @@ add_executable(topmg_gui ${TOPMG_GUI_SRCS} ${GUI_UTIL_SRCS})
 
 add_executable(topdiff_gui ${TOPDIFF_GUI_SRCS} ${GUI_UTIL_SRCS})
 
-add_executable(topdia_gui ${TOPDIA_GUI_SRCS} ${GUI_UTIL_SRCS})
+add_executable(topdia_gui ${TOPDIA_GUI_SRCS} ${GUI_UTIL_SRCS} ${SQL_SRCS})
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   # onnx runtime library
@@ -288,24 +293,24 @@ ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 # boost_serialization boost_thread xerces-c z are required by toppic suite
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	target_link_libraries(topfd boost_chrono boost_filesystem boost_program_options 
-    boost_iostreams boost_thread sqlite3 xerces-c z onnxruntime)
+    boost_iostreams boost_thread xerces-c sqlite3 z onnxruntime)
 
   target_link_libraries(topindex boost_program_options 
-    boost_serialization boost_thread sqlite3 xerces-c z)
+    boost_serialization boost_thread xerces-c z)
 
   target_link_libraries(toppic boost_program_options
-    boost_serialization boost_thread sqlite3 xerces-c z)
+    boost_serialization boost_thread xerces-c z)
 
   target_link_libraries(topmg boost_program_options
-    boost_serialization boost_thread sqlite3 xerces-c z)
+    boost_serialization boost_thread xerces-c z)
 
   target_link_libraries(topdiff boost_program_options
     boost_thread sqlite3 xerces-c z)
 
 	target_link_libraries(topdia boost_chrono boost_filesystem boost_program_options 
-    boost_iostreams boost_thread sqlite3 xerces-c z onnxruntime)
+    boost_iostreams boost_thread xerces-c sqlite3 z onnxruntime)
 
-  target_link_libraries(topfd_gui Qt5Widgets Qt5Core Qt5Gui boost_thread xerces-c)
+  target_link_libraries(topfd_gui Qt5Widgets Qt5Core Qt5Gui boost_thread xerces-c sqlite3)
 
   target_link_libraries(topindex_gui Qt5Widgets Qt5Core Qt5Gui
     boost_program_options boost_thread xerces-c)
@@ -319,7 +324,8 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   target_link_libraries(topdiff_gui Qt5Widgets Qt5Core Qt5Gui
     boost_program_options boost_thread xerces-c)
 
-  target_link_libraries(topdia_gui Qt5Widgets Qt5Core Qt5Gui boost_thread xerces-c)
+  target_link_libraries(topdia_gui Qt5Widgets Qt5Core Qt5Gui 
+    boost_thread boost_program_options xerces-c sqlite3)
 
 install (TARGETS topfd topindex toppic topmg topdiff topdia topfd_gui topindex_gui
   toppic_gui topmg_gui topdiff_gui topdia_gui DESTINATION bin/)

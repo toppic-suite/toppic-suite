@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_COMMON_UTIL_SQL_UTIL_HPP_
-#define TOPPIC_COMMON_UTIL_SQL_UTIL_HPP_
+#ifndef TOPPIC_SQL_SQL_UTIL_HPP_
+#define TOPPIC_SQL_SQL_UTIL_HPP_
 
 #include <sqlite3.h>
 #include <string>

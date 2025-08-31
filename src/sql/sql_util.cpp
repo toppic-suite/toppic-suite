@@ -13,7 +13,7 @@
 //limitations under the License.
 
 #include "common/util/logger.hpp"
-#include "common/util/sql_util.hpp"
+#include "sql/sql_util.hpp"
 
 namespace toppic {
 

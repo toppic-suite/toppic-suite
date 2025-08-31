@@ -98,6 +98,8 @@ TopDIADialog::~TopDIADialog() {
 void TopDIADialog::closeEvent(QCloseEvent *event) {
   if(process_.state()!=QProcess::NotRunning) {
     if (!continueToClose()) {
+
+
       event->ignore();
       return;
     }

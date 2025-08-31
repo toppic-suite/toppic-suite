@@ -19,9 +19,9 @@
 #include "common/util/time_util.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/str_util.hpp"
-#include "common/util/sql_util.hpp"
 #include "common/util/logger.hpp"
 #include "common/util/version.hpp"
+#include "sql/sql_util.hpp"
 #include "topfd/common/topfd_para.hpp"
 
 namespace toppic {

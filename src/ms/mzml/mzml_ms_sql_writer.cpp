@@ -15,7 +15,7 @@
 #include <boost/thread/mutex.hpp>
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
-#include "common/util/sql_util.hpp"
+#include "sql/sql_util.hpp"
 #include "ms/mzml/mzml_ms_sql_writer.hpp" 
 
 namespace toppic {
