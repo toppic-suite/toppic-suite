@@ -165,6 +165,7 @@ std::map<std::string, std::string> toppic_para {
   {"activation", "-a "},
     {"fixedMod", "-f "},
     {"allowProtMod", "-n "},
+    {"allowProtType", "-R "},
     {"searchType", "-d "},
     {"threadNumber", "-u "},
     {"proteoformErrorTolerance", "-p "},

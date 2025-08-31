@@ -126,12 +126,18 @@ void ToppicWindow::on_defaultButton_clicked() {
   ui->cutoffProteoformTypeComboBox->setCurrentIndex(0);
   ui->numModComboBox->setCurrentIndex(1);
   on_numModComboBox_currentIndexChanged(1);
+
   ui->NONECheckBox->setChecked(true);
   ui->NMECheckBox->setChecked(true);
   ui->NMEACCheckBox->setChecked(true);
   ui->MACCheckBox->setChecked(true);
+
+  ui->CompleteCheckBox->setChecked(true);
+  ui->PrefixCheckBox->setChecked(true);
+  ui->SuffixCheckBox->setChecked(true);
+  ui->InternalCheckBox->setChecked(true);
+
   ui->decoyCheckBox->setChecked(false);
-  ui->lookupTableCheckBox->setChecked(false);
   ui->topfdFeatureCheckBox->setChecked(false);
   ui->geneHTMLCheckBox->setChecked(true);
   ui->keepDecoyCheckBox->setChecked(false);
@@ -193,6 +199,8 @@ void ToppicWindow::on_startButton_clicked() {
   std::vector<std::string> spec_file_lst = this->getSpecFileList();
 
   std::string cmd = toppic::command::geneToppicCommand(argument, spec_file_lst);
+  //QMessageBox::warning(this, tr("Warning"), tr(cmd.c_str()), QMessageBox::Yes);
+
   QString q_cmd = QString::fromStdString(cmd);
   q_cmd = q_cmd.trimmed();
   QStringList cmd_list = q_cmd.split(" ");
@@ -298,6 +306,23 @@ std::map<std::string, std::string> ToppicWindow::getArguments() {
   if (arguments_["allowProtMod"] != "") {
     arguments_["allowProtMod"] = arguments_["allowProtMod"].substr(1);
   }
+  
+  arguments_["allowProtType"] = "";
+  if (ui->CompleteCheckBox->isChecked()) {
+    arguments_["allowProtType"] = arguments_["allowProtType"] + ",COMPLETE";
+  }
+  if (ui->PrefixCheckBox->isChecked()) {
+    arguments_["allowProtType"] = arguments_["allowProtType"] + ",PREFIX";
+  }
+  if (ui->SuffixCheckBox->isChecked()) {
+    arguments_["allowProtType"] = arguments_["allowProtType"] + ",SUFFIX";
+  }
+  if (ui->MACCheckBox->isChecked()) {
+    arguments_["allowProtType"] = arguments_["allowProtType"] + ",INTERNAL";
+  }
+  if (arguments_["allowProtType"] != "") {
+    arguments_["allowProtType"] = arguments_["allowProtType"].substr(1);
+  }
 
   arguments_["minShiftMass"] = ui->minModEdit->text().toStdString();
   arguments_["maxShiftMass"] = ui->maxModEdit->text().toStdString();
@@ -310,11 +335,13 @@ std::map<std::string, std::string> ToppicWindow::getArguments() {
   arguments_["variablePtmNum"] = ui->varPtmNumEdit->text().toStdString();
   arguments_["variablePtmFileName"] = ui->varPtmFileEdit->text().trimmed().toStdString();
 
+  /*
   if (ui->lookupTableCheckBox->isChecked()) {
     arguments_["useLookupTable"] = "true";
   } else {
     arguments_["useLookupTable"] = "false";
   }
+  */
   if (ui->keepTempCheckBox->isChecked()) {
     arguments_["keepTempFiles"] = "true";
   } else {
@@ -430,8 +457,13 @@ void ToppicWindow::lockDialog() {
   ui->NMECheckBox->setEnabled(false);
   ui->NMEACCheckBox->setEnabled(false);
   ui->MACCheckBox->setEnabled(false);
+
+  ui->CompleteCheckBox->setEnabled(false);
+  ui->PrefixCheckBox->setEnabled(false);
+  ui->SuffixCheckBox->setEnabled(false);
+  ui->InternalCheckBox->setEnabled(false);
+
   ui->decoyCheckBox->setEnabled(false);
-  ui->lookupTableCheckBox->setEnabled(false);
   ui->topfdFeatureCheckBox->setEnabled(false);
   ui->clearButton->setEnabled(false);
   ui->defaultButton->setEnabled(false);
@@ -472,8 +504,13 @@ void ToppicWindow::unlockDialog() {
   ui->NMECheckBox->setEnabled(true);
   ui->NMEACCheckBox->setEnabled(true);
   ui->MACCheckBox->setEnabled(true);
+
+  ui->CompleteCheckBox->setEnabled(true);
+  ui->PrefixCheckBox->setEnabled(true);
+  ui->SuffixCheckBox->setEnabled(true);
+  ui->InternalCheckBox->setEnabled(true);
+
   ui->decoyCheckBox->setEnabled(true);
-  ui->lookupTableCheckBox->setEnabled(true);
   ui->topfdFeatureCheckBox->setEnabled(true);
   ui->clearButton->setEnabled(true);
   ui->defaultButton->setEnabled(true);
@@ -519,12 +556,14 @@ bool ToppicWindow::checkError() {
   }
 
   QString currentText = ui->errorToleranceEdit->text();
+  /*
   if (ui->lookupTableCheckBox->isChecked() && currentText != "5" && currentText != "10" && currentText != "15") {
     QMessageBox::warning(this, tr("Warning"),
                          tr("To use an error tolerance other than 5, 10, and 15 ppm, the checkbox \"Lookup table for E-value computation\" should be not selected!"),
                          QMessageBox::Yes);
     return true;
   }
+    */
 
   if (ui->fixedModFileEdit->text().isEmpty() && ui->fixedModComboBox->currentIndex() == 3) {
     QMessageBox::warning(this, tr("Warning"),
@@ -624,7 +663,6 @@ void ToppicWindow::showArguments() {
                                         "\nnumOfTopPrsms:" + arguments_["numOfTopPrsms"] +
                                         "\nminShiftMass:" + arguments_["minShiftMass"] +
                                         "\nmaxShiftMass:" + arguments_["maxShiftMass"] +
-                                        "\nuseLookupTable:" + arguments_["useLookupTable"] +
                                         "\nkeepTempFiles:" + arguments_["keepTempFiles"] +
                                         "\nlocalThreshold:" + arguments_["localThreshold"] +
                                         "\ngroupSpectrumNumber:" + arguments_["groupSpectrumNumber"] +
@@ -674,14 +712,17 @@ void ToppicWindow::on_numModComboBox_currentIndexChanged(int index) {
 
 void ToppicWindow::on_errorToleranceEdit_textChanged(QString string) {
   QString currentText = ui->errorToleranceEdit->text();
+  /*
   if (ui->lookupTableCheckBox->isChecked() && currentText != "5" && currentText != "10" && currentText != "15" && currentText != "1") {
     QMessageBox::warning(this, tr("Warning"),
                          tr("When the checkbox \"Lookup table for E-value computation\" is checked, only three error tolerance values 5, 10, and 15 ppm can be used!"),
                          QMessageBox::Yes);
     ui->errorToleranceEdit->setText("15");
   }
+    */
 }
 
+/*
 void ToppicWindow::on_lookupTableCheckBox_clicked(bool checked) {
   QString currentText = ui->errorToleranceEdit->text();
   if (checked && currentText != "5" && currentText != "10" && currentText != "15") {
@@ -691,8 +732,9 @@ void ToppicWindow::on_lookupTableCheckBox_clicked(bool checked) {
     ui->lookupTableCheckBox->setChecked(true);
   }
 }
+  */
 
-bool ToppicWindow::nterminalerror() {
+bool ToppicWindow::nterminalError() {
   if (ui->NONECheckBox->isChecked() || ui->NMECheckBox->isChecked() || ui->NMEACCheckBox->isChecked() || ui->MACCheckBox->isChecked()) {
     return false;
   } else {
@@ -703,26 +745,61 @@ bool ToppicWindow::nterminalerror() {
   }
 }
 
+bool ToppicWindow::protTypeError() {
+  if (ui->CompleteCheckBox->isChecked() || ui->PrefixCheckBox->isChecked() || ui->SuffixCheckBox->isChecked() || ui->InternalCheckBox->isChecked()) {
+    return false;
+  } else {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("At least one proteoform type should be selected!"),
+                         QMessageBox::Yes);
+    return true;
+  }
+}
+
+void ToppicWindow::on_CompleteCheckBox_clicked(bool checked) {
+  if (protTypeError()) {
+    ui->CompleteCheckBox->setChecked(true);
+  }
+}
+
+void ToppicWindow::on_PrefixCheckBox_clicked(bool checked) {
+  if (protTypeError()) {
+    ui->PrefixCheckBox->setChecked(true);
+  }
+}
+
+void ToppicWindow::on_SuffixCheckBox_clicked(bool checked) {
+  if (protTypeError()) {
+    ui->SuffixCheckBox->setChecked(true);
+  }
+}
+
+void ToppicWindow::on_InternalCheckBox_clicked(bool checked) {
+  if (protTypeError()) {
+    ui->InternalCheckBox->setChecked(true);
+  }
+}
+
 void ToppicWindow::on_NONECheckBox_clicked(bool checked) {
-  if (nterminalerror()) {
+  if (nterminalError()) {
     ui->NONECheckBox->setChecked(true);
   }
 }
 
 void ToppicWindow::on_NMECheckBox_clicked(bool checked) {
-  if (nterminalerror()) {
+  if (nterminalError()) {
     ui->NMECheckBox->setChecked(true);
   }
 }
 
 void ToppicWindow::on_NMEACCheckBox_clicked(bool checked) {
-  if (nterminalerror()) {
+  if (nterminalError()) {
     ui->NMEACCheckBox->setChecked(true);
   }
 }
 
 void ToppicWindow::on_MACCheckBox_clicked(bool checked) {
-  if (nterminalerror()) {
+  if (nterminalError()) {
     ui->MACCheckBox->setChecked(true);
   }
 }

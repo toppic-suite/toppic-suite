@@ -57,8 +57,6 @@ class ToppicWindow : public QMainWindow {
 
   void on_errorToleranceEdit_textChanged(QString string);
 
-  void on_lookupTableCheckBox_clicked(bool checked);
-
   void on_NONECheckBox_clicked(bool checked);
 
   void on_NMECheckBox_clicked(bool checked);
@@ -66,6 +64,14 @@ class ToppicWindow : public QMainWindow {
   void on_NMEACCheckBox_clicked(bool checked);
 
   void on_MACCheckBox_clicked(bool checked);
+
+  void on_CompleteCheckBox_clicked(bool checked);
+
+  void on_PrefixCheckBox_clicked(bool checked);
+
+  void on_SuffixCheckBox_clicked(bool checked);
+
+  void on_InternalCheckBox_clicked(bool checked);
 
   void on_numModComboBox_currentIndexChanged(int index);
 
@@ -112,7 +118,9 @@ class ToppicWindow : public QMainWindow {
 
   bool continueToClose();
 
-  bool nterminalerror();
+  bool nterminalError();
+
+  bool protTypeError();
 
   bool event(QEvent *event);
 
