@@ -144,7 +144,7 @@ class TopfdPara {
   bool aa_num_based_filter_ = true;
   bool output_csv_feature_file_ = false;
   bool gene_html_folder_ = true;
-  bool gene_sql_ = true;
+  bool gene_sql_ = false;
 
   // parameters for feature identification
   double split_intensity_ratio_ = 2.5;

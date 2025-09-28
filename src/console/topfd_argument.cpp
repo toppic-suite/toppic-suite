@@ -191,7 +191,7 @@ bool Argument::parse(int argc, char* argv[]) {
     }
 
     if (vm.count("hybrid")) {
-      topfd_para_ptr_->setHybridMode(true);
+      topfd_para_ptr_->setMissingLevelOne(true);
     }
 
     if (vm.count("precursor-window")) {
