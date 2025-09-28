@@ -14,6 +14,8 @@ TopPIC Suite consists of six software tools for the analysis of top-down mass sp
 
 * **TopDiff** (Top-down mass spectrometry-based identification of Differentially expressed proteoforms) compares the abundances of proteoforms and finds differentially expressed proteoforms by using identifications of top-down mass spectrometry data of several protein samples.
 
+* **TopDIA** is a software tool for top-down data-independent-acquistion mass spectrometry (TD-DIA-MS) data analysis. It generates demultiplexed pseudo MS/MS spectra from TD-DIA-MS data, which are then searched against a protein sequence database using TopPIC or TopMG for proteoform identification.
+
 **For manuals, tutorials, and publications, please visit https://www.toppic.org/software/toppic/.** 
 
 ### System requirements
