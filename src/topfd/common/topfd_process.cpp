@@ -35,7 +35,8 @@ void processOneFileWithFaims(TopfdParaPtr para_ptr) {
   //print parameter for each file
   std::cout << para_ptr->getParaStr("", " ");
   
-  if (!para_ptr->isMissingLevelOne()) {
+  if (!para_ptr->isMissingLevelOne() && !para_ptr->isHybridMode()) {
+    // if not missing level one spectra, do ms1 deconvolution and feature detection first}
     std::cout << "MS1 deconvolution started." << std::endl;
     DeconvMs1ProcessPtr ms1_proc_ptr =
       std::make_shared<DeconvMs1Process>(para_ptr);

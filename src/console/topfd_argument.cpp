@@ -100,6 +100,8 @@ bool Argument::parse(int argc, char* argv[]) {
         ("ms-two-sn-ratio,s", po::value<std::string> (&ms_two_sn_ratio), "")
         ("precursor-window,w", po::value<std::string> (&prec_window), "")
         ("missing-level-one,o", "")
+        ("hybrid,H", "hybrid mode for low resolution MS1 and high resolution MS2")
+        ("multiple-mass,M", "Output multiple monoisotopic masses for each MS/MS spectrum")
         ("msdeconv,n", "")
         ("keep,k", "Report monoisotopic masses extracted from low quality isotopic envelopes.")
         ("env-cnn-cutoff,v", po::value<std::string>(&ms2_env_cnn_score_cutoff), "")
@@ -186,6 +188,10 @@ bool Argument::parse(int argc, char* argv[]) {
 
     if (vm.count("missing-level-one")) {
       topfd_para_ptr_->setMissingLevelOne(true);
+    }
+
+    if (vm.count("hybrid")) {
+      topfd_para_ptr_->setHybridMode(true);
     }
 
     if (vm.count("precursor-window")) {
