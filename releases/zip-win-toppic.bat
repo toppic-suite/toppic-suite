@@ -35,8 +35,9 @@ copy C:\msys64\mingw64\bin\libboost_serialization-mt.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libboost_thread-mt.dll toppic-windows-%1
 
 copy C:\msys64\mingw64\bin\libxerces-c-3-2.dll toppic-windows-%1
-copy C:\msys64\mingw64\bin\libicuuc69.dll toppic-windows-%1
-copy C:\msys64\mingw64\bin\libicudt69.dll toppic-windows-%1
+copy C:\msys64\mingw64\bin\libicuin75.dll toppic-windows-%1
+copy C:\msys64\mingw64\bin\libicuuc75.dll toppic-windows-%1
+copy C:\msys64\mingw64\bin\libicudt75.dll toppic-windows-%1
 
 copy C:\msys64\mingw64\bin\libzstd.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libcurl-4.dll toppic-windows-%1
@@ -51,7 +52,6 @@ copy C:\msys64\mingw64\bin\Qt5Widgets.dll toppic-windows-%1
 mkdir toppic-windows-%1\platforms
 copy C:\msys64\mingw64\share\qt5\plugins\platforms\qwindows.dll  toppic-windows-%1\platforms
 
-copy C:\msys64\mingw64\bin\libicuin69.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libpng16-16.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libharfbuzz-0.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libgraphite2.dll toppic-windows-%1
@@ -60,6 +60,7 @@ copy C:\msys64\mingw64\bin\libbz2-1.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libglib-2.0-0.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libintl-8.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libiconv-2.dll toppic-windows-%1
+copy C:\msys64\mingw64\bin\libpcre2-8-0.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libpcre2-16-0.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libpcre-1.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libmd4c.dll toppic-windows-%1
