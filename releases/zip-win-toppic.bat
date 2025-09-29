@@ -1,14 +1,14 @@
 rmdir /S toppic-windows-%1
 mkdir toppic-windows-%1
 
-copy ..\bin\toppic_gui.exe toppic-windows-%1
-copy ..\bin\toppic.exe toppic-windows-%1
-
 copy ..\bin\topfd_gui.exe toppic-windows-%1
 copy ..\bin\topfd.exe toppic-windows-%1
 
-copy ..\bin\topdia_gui.exe toppic-windows-%1
-copy ..\bin\topdia.exe toppic-windows-%1
+copy ..\bin\topindex_gui.exe toppic-windows-%1
+copy ..\bin\topindex.exe toppic-windows-%1
+
+copy ..\bin\toppic_gui.exe toppic-windows-%1
+copy ..\bin\toppic.exe toppic-windows-%1
 
 copy ..\bin\topmg_gui.exe toppic-windows-%1
 copy ..\bin\topmg.exe toppic-windows-%1
@@ -16,8 +16,8 @@ copy ..\bin\topmg.exe toppic-windows-%1
 copy ..\bin\topdiff_gui.exe toppic-windows-%1
 copy ..\bin\topdiff.exe toppic-windows-%1
 
-copy ..\bin\topindex_gui.exe toppic-windows-%1
-copy ..\bin\topindex.exe toppic-windows-%1
+copy ..\bin\topdia_gui.exe toppic-windows-%1
+copy ..\bin\topdia.exe toppic-windows-%1
 
 copy ..\bin\topconvert.exe toppic-windows-%1
 
@@ -38,6 +38,7 @@ copy C:\msys64\mingw64\bin\libboost_serialization-mt.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libboost_thread-mt.dll toppic-windows-%1
 
 copy C:\msys64\mingw64\bin\libxerces-c-3-2.dll toppic-windows-%1
+copy C:\msys64\mingw64\bin\libsqlite3-0.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libicuin75.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libicuuc75.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libicudt75.dll toppic-windows-%1
