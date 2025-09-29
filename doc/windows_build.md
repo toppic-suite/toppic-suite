@@ -22,6 +22,8 @@ pacman -S mingw-w64-x86_64-boost
 
 pacman -S mingw-w64-x86_64-xerces-c
 
+pacman -S mingw-w64-x86_64-sqlite3
+
 pacman -S mingw-w64-x86_64-qt5-base
 
 git clone https://github.com/toppic-suite/toppic-suite.git
