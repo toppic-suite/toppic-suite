@@ -82,7 +82,7 @@ class TopfdPara {
   int getMs2ScanNum() {return ms_2_scan_num_;}
   int getMs1MinScanNum() {return ms1_min_scan_num_;}
   int getMs2MinScanNum() {return ms2_min_scan_num_;}
-  sqlite3* getSqlDb() {return sql_db;}  
+  sqlite3* getSqlDb() {return sql_db_;}  
 
   void setExeDir(std::string dir) {exe_dir_ = dir;}
   void setResourceDir(std::string dir) {resource_dir_ = dir;}
@@ -172,7 +172,7 @@ class TopfdPara {
   double faims_volt_ = -1;
   std::string output_base_name_ = "";
   std::string sql_file_name_ = "";
-  sqlite3 *sql_db;
+  sqlite3 *sql_db_ = nullptr;
 
   std::string html_dir_ = "";
   std::string ms1_json_dir_ = "";
