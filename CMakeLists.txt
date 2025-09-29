@@ -249,7 +249,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
   target_link_libraries(topfd boost_chrono-mt boost_filesystem-mt
     boost_program_options-mt boost_iostreams-mt boost_thread-mt
-    xerces-c z psapi Ws2_32 onnx_lib)
+    boost_nowide-mt xerces-c sqlite3 z psapi Ws2_32 onnx_lib)
 
   target_link_libraries(topindex boost_program_options-mt
     boost_serialization-mt boost_thread-mt xerces-c z Ws2_32)
@@ -292,7 +292,7 @@ ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 # boost_chrono boost_file_system boost_iostreams boost_thread z are required by ProteoWizard
 # boost_serialization boost_thread xerces-c z are required by toppic suite
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-	target_link_libraries(topfd boost_chrono boost_filesystem boost_program_options 
+  target_link_libraries(topfd boost_chrono boost_filesystem boost_program_options 
     boost_iostreams boost_thread xerces-c sqlite3 z onnxruntime)
 
   target_link_libraries(topindex boost_program_options 

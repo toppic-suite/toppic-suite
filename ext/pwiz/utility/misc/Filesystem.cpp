@@ -155,7 +155,8 @@ extern "C"
         );
 
     PVOID GetLibraryProcAddress(PSTR LibraryName, PSTR ProcName) {
-        return GetProcAddress(GetModuleHandleA(LibraryName), ProcName);
+        //return GetProcAddress(GetModuleHandleA(LibraryName), ProcName);
+	return nullptr;
     }
 }
 
