@@ -265,12 +265,12 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
   target_link_libraries(topdia boost_chrono-mt boost_filesystem-mt
     boost_program_options-mt boost_iostreams-mt boost_thread-mt
-    xerces-c z psapi Ws2_32 onnx_lib)
+    boost_nowide-mt xerces-c sqlite3 z psapi Ws2_32 onnx_lib)
 
   # Qt
   SET(QTOPTION -Wl,-subsystem,windows)
   target_link_libraries(topfd_gui ${QTOPTION} Qt5Widgets Qt5Core Qt5Gui
-    boost_thread-mt xerces-c z Ws2_32)
+    boost_thread-mt xerces-c sqlite3 z Ws2_32)
 
   target_link_libraries(topindex_gui ${QTOPTION} Qt5Widgets Qt5Core Qt5Gui 
     boost_program_options-mt boost_thread-mt xerces-c z Ws2_32)
@@ -285,7 +285,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     boost_program_options-mt boost_thread-mt xerces-c z Ws2_32)
 
   target_link_libraries(topdia_gui ${QTOPTION} Qt5Widgets Qt5Core Qt5Gui
-    boost_thread-mt xerces-c z Ws2_32)
+    boost_program_options-mt boost_thread-mt xerces-c sqlite3 z Ws2_32)
 
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows") 
 
