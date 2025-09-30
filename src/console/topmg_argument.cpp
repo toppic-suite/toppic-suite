@@ -188,7 +188,7 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
   std::string var_ptm_in_gap = "";
   std::string combined_output_name = "";
 
-  // Define and parse the program options
+  // Define and parse the progra/m options
   try {
     namespace po = boost::program_options;
     po::options_description display_desc("Options");
@@ -232,7 +232,7 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
         ("n-terminal-form,n", po::value<std::string> (&allow_mod), "")
         ("decoy,d", "")
         ("mass-error-tolerance,e", po::value<std::string> (&mass_error_tole), "")
-        ("proteoform-ppm-error,P", "")
+        ("proteoform-ppm-error,E", "")
         ("proteoform-error-tolerance,p", po::value<std::string> (&form_error_tole), "")
         ("max-shift,M", po::value<std::string> (&max_shift_mass), "")
         ("spectrum-cutoff-type,t", po::value<std::string> (&cutoff_spectral_type), "")
