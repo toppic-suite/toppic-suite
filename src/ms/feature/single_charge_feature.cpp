@@ -63,6 +63,25 @@ SingleChargeFeature::SingleChargeFeature(XmlDOMElement* element) {
   scan_end_ = xml_dom_util::getIntChildValue(element, "scan_end", 0);
   intensity_ = xml_dom_util::getDoubleChildValue(element, "intensity", 0);
   env_num_ = xml_dom_util::getIntChildValue(element, "envelope_num", 0);
+  mono_mz_ = xml_dom_util::getDoubleChildValue(element, "mono_mz", 0);
+  average_mz_ = xml_dom_util::getDoubleChildValue(element, "average_mz", 0);
+  refer_mz_ = xml_dom_util::getDoubleChildValue(element, "refer_mz", 0);
+  scan_list_.clear();
+  rt_list_.clear();
+  intensity_sum_list_.clear();
+  max_intensity_list_.clear();
+  XmlDOMElement* env_list_element = xml_dom_util::getChildElement(element, "envelope_list", 0);
+  if (env_list_element) {
+    for (int i = 0; i < env_num_; i++) {
+      XmlDOMElement* env_element = xml_dom_util::getChildElement(env_list_element, "envelope", i);
+      if (env_element) {
+        scan_list_.push_back(xml_dom_util::getIntChildValue(env_element, "scan", 0));
+        rt_list_.push_back(xml_dom_util::getDoubleChildValue(env_element, "rt", 0));
+        intensity_sum_list_.push_back(xml_dom_util::getDoubleChildValue(env_element, "intensity_sum", 0));
+        max_intensity_list_.push_back(xml_dom_util::getDoubleChildValue(env_element, "max_intensity", 0));
+      }
+    }
+  }
 }
 
 void SingleChargeFeature::appendToXml(XmlDOMDocument* xml_doc,
