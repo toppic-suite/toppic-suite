@@ -36,6 +36,7 @@ copy C:\msys64\mingw64\bin\libboost_chrono-mt.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libboost_iostreams-mt.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libboost_serialization-mt.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libboost_thread-mt.dll toppic-windows-%1
+copy C:\msys64\mingw64\bin\libboost_nowide-mt.dll toppic-windows-%1
 
 copy C:\msys64\mingw64\bin\libxerces-c-3-2.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libsqlite3-0.dll toppic-windows-%1
