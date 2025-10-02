@@ -79,6 +79,7 @@
 #include "visual/json_transformer.hpp"
 
 #include "console/toppic_argument.hpp"
+#include <filesystem>
 
 namespace toppic {
 
@@ -613,6 +614,10 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
     for (size_t k = 0; k < spec_file_lst.size(); k++) {
       std::string raw_file_name = spec_file_lst[k].substr(0, spec_file_lst[k].find("_ms2.msalign"));
       raw_file_list.push_back(raw_file_name);
+    }
+    std::filesystem::path merge_file_path(merged_file_name);
+    if (!merge_file_path.is_absolute()) {
+      merged_file_name = base_path + file_util::getFileSeparator() + merged_file_name;
     }
     std::string para_str = "";
     std::cout << "Merging files started." << std::endl;
