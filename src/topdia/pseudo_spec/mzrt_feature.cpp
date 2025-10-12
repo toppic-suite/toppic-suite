@@ -126,8 +126,16 @@ std::vector<double> MzrtFeature::normalizeXIC(const std::vector<double> &xic) {
   }
   // Normalize the vector by dividing each element by the sum
   std::vector<double> normalized_xic;
-  for (auto &value : xic) {
-    normalized_xic.push_back(value / sum);
+  if (sum == 0.0) {
+    LOG_INFO("Sum of XIC is zero, cannot normalize.");
+    for (size_t i = 0; i < xic.size(); i++) {
+      normalized_xic.push_back(0);
+    }
+  }
+  else {
+    for (auto &value : xic) {
+      normalized_xic.push_back(value / sum);
+    }
   }
   return normalized_xic;
 }

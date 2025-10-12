@@ -206,7 +206,8 @@ void MzmlMsGroupReader::getMs1Map(PeakPtrVec2D &ms1_mzml_peaks,
   }
 }
 
-void MzmlMsGroupReader::getMs2Map(PeakPtrVec2D &ms2_mzml_peaks, double win_mz_begin) {
+int MzmlMsGroupReader::getMs2Map(PeakPtrVec2D &ms2_mzml_peaks, double win_mz_begin) {
+  int peak_num = 0;
   while (true) {
     MzmlMsGroupPtr group_ptr = getMs1Ms2MsGroupPtr();
     if (group_ptr == nullptr) {
@@ -216,12 +217,18 @@ void MzmlMsGroupReader::getMs2Map(PeakPtrVec2D &ms2_mzml_peaks, double win_mz_be
     MsHeaderPtrVec header_vec;
     for (size_t i = 0; i < ms2_ptr_vec.size(); i++) {
       double cur_win_begin = ms2_ptr_vec[i]->getMsHeaderPtr()->getPrecWinBegin(); 
-      if (cur_win_begin == win_mz_begin) {
+      //if (cur_win_begin == win_mz_begin) {
+      //Because a small error may be introduced in curr_win_begin when we write 
+      //the window begin value into the msalign file, we use a tolerance of 1e-4 here
+      //Using 1e-5 is also ok. 
+      if (std::abs(cur_win_begin - win_mz_begin) < 1e-4) {
         PeakPtrVec peak_list = ms2_ptr_vec[i]->getPeakPtrVec();
         ms2_mzml_peaks.push_back(peak_list);
+        peak_num = peak_num + peak_list.size();
       }
     }
   }
+  return peak_num;
 }
 
 }

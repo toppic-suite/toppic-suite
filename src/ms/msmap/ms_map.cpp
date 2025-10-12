@@ -33,6 +33,10 @@ MsMap::MsMap(PeakPtrVec2D &raw_peak_2d, DeconvMsPtrVec &ms1_ptr_vec,
       intes.push_back(p->getIntensity());
     }
   }
+  if (mz.size() == 0) {
+    LOG_ERROR("No peaks in the input data!");
+    exit(EXIT_FAILURE);
+  }
   /// set values!
   min_mz_ = *std::min_element(mz.begin(), mz.end());
   max_mz_ = *std::max_element(mz.begin(), mz.end());

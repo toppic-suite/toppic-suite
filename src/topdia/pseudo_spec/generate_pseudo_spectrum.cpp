@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 #include <cstddef>
+#include <cmath>
 
+#include "common/util/logger.hpp"
 #include "topdia/pseudo_spec/pseudo_spectrum.hpp"
 #include "topdia/pseudo_spec/generate_pseudo_spectrum.hpp"
 
@@ -116,7 +118,8 @@ void GeneratePseudoSpectrum::process(TopfdParaPtr topfd_para_ptr,
     MzrtFeaturePtrVec selected_ms1_features = get_iso_win_ms1_features(iso_win_idx);
     std::sort(selected_ms1_features.begin(), selected_ms1_features.end(),
               compareFeaturesInte);
-    std::cout << "Processing isolation window [" << win.first << "," << win.second << "] with "
+    std::cout << "Processing isolation window " << (iso_win_idx + 1) << " of " << win_list_.size()  
+              << " [" << win.first << "," << win.second << "] with "
               << selected_ms1_features.size() << " features." << std::endl;
     for (auto &ms1_feature : selected_ms1_features) {
       int apex_cycle_distance_tole =
@@ -195,7 +198,18 @@ std::vector<double> GeneratePseudoSpectrum::interp(
       double x2 = xp[i];
       double y1 = fp[i - 1];
       double y2 = fp[i];
-      double y = y1 + ((y2 - y1) / (x2 - x1)) * (xi - x1);
+      double distance = x2 - x1;
+      double y = 0.0;
+      if (distance == 0) {
+        y = y1;
+      }
+      else {
+        y = y1 + (y2 - y1) / distance * (xi - x1);
+      }
+      if (std::isnan(y)) {
+        LOG_ERROR("interpolated value is nan");
+        exit(EXIT_FAILURE);
+      }
       interpolatedValues.push_back(y);
     }
   }
@@ -284,6 +298,13 @@ double GeneratePseudoSpectrum::computeSharedArea(
   for (std::size_t i = 0; i < xic1.size(); ++i) {
     sharedArea += std::min(xic1[i], xic2[i]);
   }
+  if (std::isnan(sharedArea)) {
+    LOG_ERROR("computing shared area is nan " << xic1.size() << " " << xic2.size());
+    for(std::size_t i = 0; i < xic1.size(); ++i) {
+      std::cout << xic1[i] << "\t" << xic2[i] << std::endl;
+    }
+    exit(EXIT_FAILURE);
+  } 
   return sharedArea;
 }
 
@@ -296,23 +317,32 @@ void GeneratePseudoSpectrum::score_pseudo_peaks(
   double rank = total_peaks;
   for (int peak_idx = 0; peak_idx < total_peaks; peak_idx++) {
     pseudo_peak_list[peak_idx].setRank(rank / total_peaks);
-    double score =
-        get_pred(rank / total_peaks, pseudo_peak_list[peak_idx].getSharedInte(),
-                 (pseudo_peak_list[peak_idx].getMS2CycleSpan() * 1.0) /
-                     (ms1_feature->getCycleSpan() * 1.0));
+    double intensity_rank = rank/total_peaks; 
+    double length_ratio = (pseudo_peak_list[peak_idx].getMS2CycleSpan() * 1.0) /
+                     (ms1_feature->getCycleSpan() * 1.0);
+    double shared_area = pseudo_peak_list[peak_idx].getSharedInte();
+    if (std::isnan(shared_area)) {
+      LOG_ERROR("ms1 shared area is nan");
+      exit(EXIT_FAILURE);
+    }
+    double score = get_pred(intensity_rank, shared_area, length_ratio); 
+    if (std::isnan(score)) {
+      LOG_ERROR("score is nan");
+      exit(EXIT_FAILURE);
+    }
     pseudo_peak_list[peak_idx].setScore(score);
     rank--;
   }
 }
 
-double GeneratePseudoSpectrum::get_pred(double intensity_ratio,
+double GeneratePseudoSpectrum::get_pred(double intensity_rank,
                                         double shared_area,
                                         double length_ratio) {
   double B0 = -3.349924626238689;
   double B1 = 1.8679961011204878;
   double B2 = 0.27006086659334383;
   double B3 = 3.983766800414337;
-  double y = B0 + B1 * intensity_ratio + B2 * (length_ratio) + B3 * shared_area;
+  double y = B0 + B1 * intensity_rank + B2 * (length_ratio) + B3 * shared_area;
 
   double py = 1 / (1 + std::exp(-y));
   return py;
@@ -379,11 +409,11 @@ void GeneratePseudoSpectrum::writePseudoSpectrum(
   output << "MS_ONE_ID=" << ms1_apex_cycle << std::endl;        ///
   // need to add MS_ONE_SCAN information                                                                          
   output << "MS_ONE_SCAN=" << ms1_scan_[ms1_apex_cycle] << std::endl;  ///
-  output << "PRECURSOR_WINDOW_BEGIN=" << ms1_feature->getWin().first << std::endl;
+  output << std::setprecision(6) << "PRECURSOR_WINDOW_BEGIN=" << ms1_feature->getWin().first << std::endl;
   output << "PRECURSOR_WINDOW_END=" << ms1_feature->getWin().second << std::endl;
   // need to add ACTIVATION information                                                                          
   output << "ACTIVATION=" << activation_ms2_[iso_win_idx][ms1_apex_cycle]->getName() << std::endl;
-  output << "PRECURSOR_MZ=" << std::setprecision(5) << ms1_feature->getMonoMz() << std::endl;
+  output << "PRECURSOR_MZ=" << std::setprecision(6) << ms1_feature->getMonoMz() << std::endl;
   output << "PRECURSOR_CHARGE=" << ms1_feature->getCharge() << std::endl;
   output << "PRECURSOR_MASS=" << ms1_feature->getMass() << std::endl;
   output << "PRECURSOR_INTENSITY=" << std::setprecision(2) << ms1_feature->getIntensity() << std::endl;
@@ -392,7 +422,7 @@ void GeneratePseudoSpectrum::writePseudoSpectrum(
   output << "PRECURSOR_LENGTH=" << ms1_feature->getCycleSpan() << std::endl;
 
   for (const auto &peak : assigned_ms2_features) {
-    output << std::fixed << std::setprecision(5) << peak.getMass();
+    output << std::fixed << std::setprecision(6) << peak.getMass();
     output << "\t" << std::fixed << std::setprecision(2) << peak.getIntensity();
     output << "\t" << peak.getCharge();
     output << "\t" << std::fixed << std::setprecision(2) << peak.getScore();
