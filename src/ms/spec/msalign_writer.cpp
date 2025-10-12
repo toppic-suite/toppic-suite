@@ -52,13 +52,13 @@ void MsAlignWriter::writeMs(DeconvMsPtr ms_ptr) {
   if (header_ptr->getMsLevel() > 1) {
     output_ << "MS_ONE_ID=" << header_ptr->getMsOneId() << std::endl;
     output_ << "MS_ONE_SCAN=" << header_ptr->getMsOneScan() << std::endl;
-    output_ << "PRECURSOR_WINDOW_BEGIN=" << header_ptr->getPrecWinBegin() << std::endl;
+    output_ << "PRECURSOR_WINDOW_BEGIN=" << std::fixed << std::setprecision(6) << header_ptr->getPrecWinBegin() << std::endl;
     output_ << "PRECURSOR_WINDOW_END=" << header_ptr->getPrecWinEnd() << std::endl;
     if (header_ptr->getActivationPtr() != nullptr) {
       output_ << "ACTIVATION=" << header_ptr->getActivationPtr()->getName() << std::endl;
     }
     PrecursorPtrVec prec_ptrs = header_ptr->getPrecPtrVec();
-    output_ << "PRECURSOR_MZ=" << std::fixed << std::setprecision(5);
+    output_ << "PRECURSOR_MZ=" << std::fixed << std::setprecision(6);
     for (size_t i = 0; i < prec_ptrs.size(); i++) {
       output_ << prec_ptrs[i]->getMonoMz();
       // use : for separating multiple precursors
@@ -73,7 +73,7 @@ void MsAlignWriter::writeMs(DeconvMsPtr ms_ptr) {
     }
     output_ << std::endl;
     // The precision for mass is 5
-    output_ << "PRECURSOR_MASS=" << std::fixed << std::setprecision(5);
+    output_ << "PRECURSOR_MASS=" << std::fixed << std::setprecision(6);
     for (size_t i = 0; i < prec_ptrs.size(); i++) {
       output_ << prec_ptrs[i]->getMonoMass();
       // use : for separating multiple precursors
@@ -98,7 +98,7 @@ void MsAlignWriter::writeMs(DeconvMsPtr ms_ptr) {
   }
   for (size_t i = 0; i < ms_ptr->size(); i++) {
     DeconvPeakPtr peak_ptr = ms_ptr->getPeakPtr(i);
-    output_ << std::fixed << std::setprecision(5) << peak_ptr->getPosition();
+    output_ << std::fixed << std::setprecision(6) << peak_ptr->getPosition();
     output_ << "\t" << std::fixed << std::setprecision(2) << peak_ptr->getIntensity();
     output_ << "\t" << peak_ptr->getCharge();
     output_ << "\t" << std::fixed << std::setprecision(2) << peak_ptr->getScore();
