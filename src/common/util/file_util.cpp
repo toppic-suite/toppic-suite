@@ -65,11 +65,11 @@ std::string getResourceDir(const std::string &exec_dir) {
   }
 #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
 #else
-  std::string etc_dir = exec_dir + getEtcDirName();
-  if (exists(etc_dir)) {
-    return etc_dir;
+  std::string shared_dir = getSharedDirName();
+  if (exists(shared_dir)) {
+    return shared_dir;
   }
-  LOG_ERROR("The resource directory " << etc_dir << " does not exist!"); 
+  LOG_ERROR("The resource directory " << shared_dir << " does not exist!"); 
 #endif
   LOG_ERROR("The resource directory " << resource_dir << " does not exist!"); 
   exit(EXIT_FAILURE);

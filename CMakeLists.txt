@@ -10,10 +10,9 @@ set(CMAKE_CXX_COMPILER clang++ CACHE STRING "C++ compiler" FORCE)
 
 project(TopPIC_Suite)
 message(STATUS "Project name: " ${PROJECT_NAME})
+message(STATUS "System name: " ${CMAKE_SYSTEM_NAME})
 
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../bin)
-
-message(STATUS "System name: " ${CMAKE_SYSTEM_NAME})
 
 # C++ flags 
 # -Wall is used to enable all compiler warnings 
@@ -23,7 +22,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unknown-pragmas --std=c++17 -
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTOPPIC_LINUX")
-  # --disable-new-dtags is needed to first search the shared library in the lib/toppic directory
+  # --disable-new-dtags is needed to first search the shared library in the directory ../lib/toppic
   SET(CMAKE_SHARED_LINKER_FLAGS "-Wl,-rpath=$ORIGIN/../lib/toppic,--disable-new-dtags")
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
 
@@ -329,8 +328,9 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 install (TARGETS topfd topindex toppic topmg topdiff topdia topfd_gui topindex_gui
   toppic_gui topmg_gui topdiff_gui topdia_gui DESTINATION bin/)
-install (DIRECTORY resources/ DESTINATION etc/toppic)
-install (DIRECTORY lib/toppic DESTINATION lib/toppic)
+install (DIRECTORY lib/toppic/ DESTINATION lib/toppic)
+# install resource files to /usr/share/toppic
+install (DIRECTORY resources/ DESTINATION /usr/share/toppic)
 
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
 
