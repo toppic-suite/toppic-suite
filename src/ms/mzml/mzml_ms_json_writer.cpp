@@ -14,9 +14,9 @@
 
 #include <fstream>
 
-#include "xml2json/rapidjson/document.h"
-#include "xml2json/rapidjson/prettywriter.h"
-#include "xml2json/rapidjson/stringbuffer.h"
+#include "rapidjson/document.h"
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
 
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
