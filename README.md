@@ -31,11 +31,11 @@ TopPIC Suite consists of six software tools for the analysis of top-down mass sp
 sudo apt install build-essential cmake clang
 
 # install dependencies
-sudo apt install libboost-chrono-dev \
-libboost-filesystem-dev libboost-iostreams-dev \
-libboost-program-options-dev libboost-thread-dev \
-libxerces-c-dev libsqlite3-dev zlib1g-dev \
-rapidjson-dev
+sudo apt install libboost-all-dev \
+libxerces-c-dev \
+libsqlite3-dev \
+zlib1g-dev \
+rapidjson-dev \
 
 # install Qt5 for GUI
 sudo apt install qtbase5-dev
