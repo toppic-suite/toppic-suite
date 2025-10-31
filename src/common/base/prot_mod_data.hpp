@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2025, The Trustees of Indiana University, Tulane University.
+//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -122,6 +122,156 @@ std::string prot_mod_base_data = R"(
     </mod>
   </prot_mod>
   <prot_mod>
+    <name>NME_ACETYLATION_ARG</name>
+    <type>NME_ACETYLATION</type>
+    <truncation>
+      <name>NME</name>
+    </truncation>
+    <mod>
+      <ori_residue>
+        <amino_acid>
+	        <name>Arginine</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>No PTM</abbreviation>
+        </ptm>
+      </ori_residue>
+      <mod_residue>
+        <amino_acid>
+	        <name>Arginine</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>Acetyl</abbreviation>
+        </ptm>
+      </mod_residue>
+    </mod>
+  </prot_mod>
+  <prot_mod>
+    <name>NME_ACETYLATION_ASN</name>
+    <type>NME_ACETYLATION</type>
+    <truncation>
+      <name>NME</name>
+    </truncation>
+    <mod>
+      <ori_residue>
+        <amino_acid>
+	        <name>Asparagine</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>No PTM</abbreviation>
+        </ptm>
+      </ori_residue>
+      <mod_residue>
+        <amino_acid>
+	        <name>Asparagine</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>Acetyl</abbreviation>
+        </ptm>
+      </mod_residue>
+    </mod>
+  </prot_mod>
+  <prot_mod>
+    <name>NME_ACETYLATION_ASP</name>
+    <type>NME_ACETYLATION</type>
+    <truncation>
+      <name>NME</name>
+    </truncation>
+    <mod>
+      <ori_residue>
+        <amino_acid>
+	        <name>Aspartic_acid</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>No PTM</abbreviation>
+        </ptm>
+      </ori_residue>
+      <mod_residue>
+        <amino_acid>
+	        <name>Aspartic_acid</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>Acetyl</abbreviation>
+        </ptm>
+      </mod_residue>
+    </mod>
+  </prot_mod>
+  <prot_mod>
+    <name>NME_ACETYLATION_CYS</name>
+    <type>NME_ACETYLATION</type>
+    <truncation>
+      <name>NME</name>
+    </truncation>
+    <mod>
+      <ori_residue>
+        <amino_acid>
+	        <name>Cysteine</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>No PTM</abbreviation>
+        </ptm>
+      </ori_residue>
+      <mod_residue>
+        <amino_acid>
+	        <name>Cysteine</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>Acetyl</abbreviation>
+        </ptm>
+      </mod_residue>
+    </mod>
+  </prot_mod>
+  <prot_mod>
+    <name>NME_ACETYLATION_GLN</name>
+    <type>NME_ACETYLATION</type>
+    <truncation>
+      <name>NME</name>
+    </truncation>
+    <mod>
+      <ori_residue>
+        <amino_acid>
+	        <name>Glutamine</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>No PTM</abbreviation>
+        </ptm>
+      </ori_residue>
+      <mod_residue>
+        <amino_acid>
+	        <name>Glutamine</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>Acetyl</abbreviation>
+        </ptm>
+      </mod_residue>
+    </mod>
+  </prot_mod>
+  <prot_mod>
+    <name>NME_ACETYLATION_GLU</name>
+    <type>NME_ACETYLATION</type>
+    <truncation>
+      <name>NME</name>
+    </truncation>
+    <mod>
+      <ori_residue>
+        <amino_acid>
+	        <name>Glutamic_acid</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>No PTM</abbreviation>
+        </ptm>
+      </ori_residue>
+      <mod_residue>
+        <amino_acid>
+	        <name>Glutamic_acid</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>Acetyl</abbreviation>
+        </ptm>
+      </mod_residue>
+    </mod>
+  </prot_mod>
+  <prot_mod>
     <name>NME_ACETYLATION_GLY</name>
     <type>NME_ACETYLATION</type>
     <truncation>
@@ -139,6 +289,181 @@ std::string prot_mod_base_data = R"(
       <mod_residue>
         <amino_acid>
 	        <name>Glycine</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>Acetyl</abbreviation>
+        </ptm>
+      </mod_residue>
+    </mod>
+  </prot_mod>
+  <prot_mod>
+    <name>NME_ACETYLATION_HIS</name>
+    <type>NME_ACETYLATION</type>
+    <truncation>
+      <name>NME</name>
+    </truncation>
+    <mod>
+      <ori_residue>
+        <amino_acid>
+	        <name>Histidine</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>No PTM</abbreviation>
+        </ptm>
+      </ori_residue>
+      <mod_residue>
+        <amino_acid>
+	        <name>Histidine</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>Acetyl</abbreviation>
+        </ptm>
+      </mod_residue>
+    </mod>
+  </prot_mod>
+  <prot_mod>
+    <name>NME_ACETYLATION_ILE</name>
+    <type>NME_ACETYLATION</type>
+    <truncation>
+      <name>NME</name>
+    </truncation>
+    <mod>
+      <ori_residue>
+        <amino_acid>
+	        <name>Isoleucine</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>No PTM</abbreviation>
+        </ptm>
+      </ori_residue>
+      <mod_residue>
+        <amino_acid>
+	        <name>Isoleucine</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>Acetyl</abbreviation>
+        </ptm>
+      </mod_residue>
+    </mod>
+  </prot_mod>
+  <prot_mod>
+    <name>NME_ACETYLATION_LEU</name>
+    <type>NME_ACETYLATION</type>
+    <truncation>
+      <name>NME</name>
+    </truncation>
+    <mod>
+      <ori_residue>
+        <amino_acid>
+	        <name>Leucine</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>No PTM</abbreviation>
+        </ptm>
+      </ori_residue>
+      <mod_residue>
+        <amino_acid>
+	        <name>Leucine</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>Acetyl</abbreviation>
+        </ptm>
+      </mod_residue>
+    </mod>
+  </prot_mod>
+  <prot_mod>
+    <name>NME_ACETYLATION_LYS</name>
+    <type>NME_ACETYLATION</type>
+    <truncation>
+      <name>NME</name>
+    </truncation>
+    <mod>
+      <ori_residue>
+        <amino_acid>
+	        <name>Lysine</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>No PTM</abbreviation>
+        </ptm>
+      </ori_residue>
+      <mod_residue>
+        <amino_acid>
+	        <name>Lysine</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>Acetyl</abbreviation>
+        </ptm>
+      </mod_residue>
+    </mod>
+  </prot_mod>
+  <prot_mod>
+    <name>NME_ACETYLATION_MET</name>
+    <type>NME_ACETYLATION</type>
+    <truncation>
+      <name>NME</name>
+    </truncation>
+    <mod>
+      <ori_residue>
+        <amino_acid>
+	        <name>Methionine</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>No PTM</abbreviation>
+        </ptm>
+      </ori_residue>
+      <mod_residue>
+        <amino_acid>
+	        <name>Methionine</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>Acetyl</abbreviation>
+        </ptm>
+      </mod_residue>
+    </mod>
+  </prot_mod>
+  <prot_mod>
+    <name>NME_ACETYLATION_PHE</name>
+    <type>NME_ACETYLATION</type>
+    <truncation>
+      <name>NME</name>
+    </truncation>
+    <mod>
+      <ori_residue>
+        <amino_acid>
+	        <name>Phenylalanine</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>No PTM</abbreviation>
+        </ptm>
+      </ori_residue>
+      <mod_residue>
+        <amino_acid>
+	        <name>Phenylalanine</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>Acetyl</abbreviation>
+        </ptm>
+      </mod_residue>
+    </mod>
+  </prot_mod>
+  <prot_mod>
+    <name>NME_ACETYLATION_PRO</name>
+    <type>NME_ACETYLATION</type>
+    <truncation>
+      <name>NME</name>
+    </truncation>
+    <mod>
+      <ori_residue>
+        <amino_acid>
+	        <name>Proline</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>No PTM</abbreviation>
+        </ptm>
+      </ori_residue>
+      <mod_residue>
+        <amino_acid>
+	        <name>Proline</name>
         </amino_acid>
         <ptm>
           <abbreviation>Acetyl</abbreviation>
@@ -197,6 +522,56 @@ std::string prot_mod_base_data = R"(
     </mod>
   </prot_mod>
   <prot_mod>
+    <name>NME_ACETYLATION_TRP</name>
+    <type>NME_ACETYLATION</type>
+    <truncation>
+      <name>NME</name>
+    </truncation>
+    <mod>
+      <ori_residue>
+        <amino_acid>
+	        <name>Tryptophan</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>No PTM</abbreviation>
+        </ptm>
+      </ori_residue>
+      <mod_residue>
+        <amino_acid>
+	        <name>Tryptophan</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>Acetyl</abbreviation>
+        </ptm>
+      </mod_residue>
+    </mod>
+  </prot_mod>
+  <prot_mod>
+    <name>NME_ACETYLATION_TYR</name>
+    <type>NME_ACETYLATION</type>
+    <truncation>
+      <name>NME</name>
+    </truncation>
+    <mod>
+      <ori_residue>
+        <amino_acid>
+	        <name>Tyrosine</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>No PTM</abbreviation>
+        </ptm>
+      </ori_residue>
+      <mod_residue>
+        <amino_acid>
+	        <name>Tyrosine</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>Acetyl</abbreviation>
+        </ptm>
+      </mod_residue>
+    </mod>
+  </prot_mod>
+  <prot_mod>
     <name>NME_ACETYLATION_VAL</name>
     <type>NME_ACETYLATION</type>
     <truncation>
@@ -221,34 +596,9 @@ std::string prot_mod_base_data = R"(
       </mod_residue>
     </mod>
   </prot_mod>
-  <prot_mod>
-    <name>NME_ACETYLATION_CYS</name>
-    <type>NME_ACETYLATION</type>
-    <truncation>
-      <name>NME</name>
-    </truncation>
-    <mod>
-      <ori_residue>
-        <amino_acid>
-	        <name>Cysteine</name>
-        </amino_acid>
-        <ptm>
-          <abbreviation>No PTM</abbreviation>
-        </ptm>
-      </ori_residue>
-      <mod_residue>
-        <amino_acid>
-	        <name>Cysteine</name>
-        </amino_acid>
-        <ptm>
-          <abbreviation>Acetyl</abbreviation>
-        </ptm>
-      </mod_residue>
-    </mod>
-  </prot_mod>
 </prot_mod_list>
 )";
 
-} 
+}
 
 #endif
