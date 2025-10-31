@@ -12,7 +12,17 @@ project(TopPIC_Suite)
 message(STATUS "Project name: " ${PROJECT_NAME})
 message(STATUS "System name: " ${CMAKE_SYSTEM_NAME})
 
+IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+  set(CMAKE_INSTALL_BINDIR "/usr/local/bin")
+  set(CMAKE_INSTALL_LIBDIR "/usr/local/lib/toppic")
+  set(CMAKE_INSTALL_DATADIR "/usr/share/toppic")
+  message(STATUS "Bin installation directory: " ${CMAKE_INSTALL_BINDIR})
+  message(STATUS "Lib installation directory: " ${CMAKE_INSTALL_LIBDIR})
+  message(STATUS "Data installation directory: " ${CMAKE_INSTALL_DATADIR})
+ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../bin)
+message(STATUS "Executable output directory: " ${EXECUTABLE_OUTPUT_PATH})
 
 # C++ flags 
 # -Wall is used to enable all compiler warnings 
@@ -31,7 +41,8 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive -DTOPPIC_WINDOWS -DWIN32")
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
-message(STATUS "Cmake cxx flags: " ${CMAKE_CXX_FLAGS})
+message(STATUS "Cmake CXX flags: " ${CMAKE_CXX_FLAGS})
+message(STATUS "Cmake shared linker flags: " ${CMAKE_SHARED_LINKER_FLAGS})
 
 # Qt
 set(CMAKE_AUTOMOC ON)
@@ -327,10 +338,8 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     boost_thread boost_program_options xerces-c sqlite3)
 
 install (TARGETS topfd topindex toppic topmg topdiff topdia topfd_gui topindex_gui
-  toppic_gui topmg_gui topdiff_gui topdia_gui DESTINATION bin/)
-install (DIRECTORY lib/toppic/ DESTINATION lib/toppic)
-# install resource files to /usr/share/toppic
-install (DIRECTORY resources/ DESTINATION /usr/share/toppic)
+  toppic_gui topmg_gui topdiff_gui topdia_gui DESTINATION ${CMAKE_INSTALL_BINDIR})
+install (DIRECTORY lib/toppic/ DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install (DIRECTORY resources/ DESTINATION ${CMAKE_INSTALL_DATADIR})
 
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
-

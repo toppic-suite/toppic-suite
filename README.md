@@ -63,6 +63,7 @@ sudo dnf install boost-devel
 sudo dnf install xerces-c-devel
 sudo dnf install sqlite3-devel 
 sudo dnf install zlib-devel
+sudo dnf install rapidjson-devel
 
 # install Qt5 for GUI
 sudo dnf install qt5-qtbase-devel
