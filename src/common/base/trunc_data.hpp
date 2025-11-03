@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2023, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2025, The Trustees of Indiana University, Tulane University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ std::string trunc_base_data = R"(
 	<name>NME</name>
 	<trunc_len>1</trunc_len>
 	<trunc_residues>M</trunc_residues>
-  <allow_first_remain_residues>ACGPSTV</allow_first_remain_residues>
+  <allow_first_remain_residues>ACDEFGHIKLMNPQRSTVWY</allow_first_remain_residues>
 </truncation>
 </truncation_list>
 )";
