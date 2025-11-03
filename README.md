@@ -35,7 +35,7 @@ sudo apt install libboost-all-dev \
 libxerces-c-dev \
 libsqlite3-dev \
 zlib1g-dev \
-rapidjson-dev \
+rapidjson-dev 
 
 # install Qt5 for GUI
 sudo apt install qtbase5-dev
