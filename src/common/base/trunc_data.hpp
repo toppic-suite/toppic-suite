@@ -31,7 +31,7 @@ std::string trunc_base_data = R"(
 	<name>NME</name>
 	<trunc_len>1</trunc_len>
 	<trunc_residues>M</trunc_residues>
-  <allow_first_remain_residues>ACGPSTVD</allow_first_remain_residues>
+  <allow_first_remain_residues>ACDEFGHIKLMNPQRSTVWY</allow_first_remain_residues>
 </truncation>
 </truncation_list>
 )";
