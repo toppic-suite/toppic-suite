@@ -11,15 +11,16 @@
 //WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //See the License for the specific language governing permissions and
 //limitations under the License.
+
 #include <string>
 
 #include "xercesc/framework/MemBufInputSource.hpp"
 
 #include "common/util/logger.hpp"
+#include "common/util/file_util.hpp"
 #include "common/xml/xml_dom_document.hpp"
 #include "common/xml/xml_dom_util.hpp"
 #include "common/base/amino_acid_base.hpp"
-#include "common/base/amino_acid_data.hpp"
 
 namespace toppic {
 
@@ -33,12 +34,15 @@ std::unordered_map<std::string, AminoAcidPtr> AminoAcidBase::amino_acid_three_le
 
 std::unordered_map<std::string, AminoAcidPtr> AminoAcidBase::amino_acid_name_map_;
 
-void AminoAcidBase::initBase() {
+void AminoAcidBase::initBase(const std::string &base_dir) {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (!parser) {
     LOG_ERROR("Error in parsing amino acid data!");
     exit(EXIT_FAILURE);
   }
+  std::string amino_acid_base_file_name = base_dir 
+      + file_util::getFileSeparator() + "amino_acid_base.xml";
+  std::string amino_acid_base_data = file_util::readFile(amino_acid_base_file_name);
 
   xercesc::MemBufInputSource mem_str((const XMLByte*)amino_acid_base_data.c_str(), 
                                      amino_acid_base_data.length(), 

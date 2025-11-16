@@ -42,7 +42,7 @@ void init(const std::string &resource_dir) {
 
   std::string base_dir = resource_dir + file_util::getFileSeparator() + "base_data";
 
-  AminoAcidBase::initBase();
+  AminoAcidBase::initBase(base_dir);
   LOG_DEBUG("acid initialized ");
 
   PtmBase::initBase();
