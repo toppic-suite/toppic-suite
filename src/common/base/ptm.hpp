@@ -46,6 +46,8 @@ class Ptm {
 
   void appendAbbrNameToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 
+  void appendAbbrNameToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent, std::string element_name);
+
   // Add mass for visualization 
   void appendAbbrNameMassToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 

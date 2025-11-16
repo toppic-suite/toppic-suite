@@ -44,6 +44,15 @@ void Ptm::appendAbbrNameToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
   parent->appendChild(element);
 }
 
+void Ptm::appendAbbrNameToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent, std::string element_name) {
+  XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
+  xml_doc->addElement(element, "abbreviation", abbr_name_.c_str());
+  std::string str = str_util::toString(unimod_id_);
+  xml_doc->addElement(element, "unimod", str.c_str());
+  parent->appendChild(element);
+}
+
+
 
 void Ptm::appendAbbrNameMassToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
   std::string element_name = Ptm::getXmlElementName();
