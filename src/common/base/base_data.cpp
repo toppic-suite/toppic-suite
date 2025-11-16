@@ -45,31 +45,31 @@ void init(const std::string &resource_dir) {
   AminoAcidBase::initBase(base_dir);
   LOG_DEBUG("acid initialized ");
 
-  PtmBase::initBase();
+  PtmBase::initBase(base_dir);
   LOG_DEBUG("ptm initialized");
 
-  ResidueBase::initBase();
+  ResidueBase::initBase(base_dir);
   LOG_DEBUG("residue initialized");
 
-  TruncBase::initBase();
+  TruncBase::initBase(base_dir);
   LOG_DEBUG("trunc initialized ");
 
-  ModBase::initBase();
+  ModBase::initBase(base_dir);
   LOG_DEBUG("mod initialized ");
 
-  ProtModBase::initBase();
+  ProtModBase::initBase(base_dir);
   LOG_DEBUG("prot mod initialized ");
 
-  IonTypeBase::initBase();
+  IonTypeBase::initBase(base_dir);
   LOG_DEBUG("ion type initialized ");
 
-  NeutralLossBase::initBase();
+  NeutralLossBase::initBase(base_dir);
   LOG_DEBUG("neutral loss initialized ");
 
   ActivationBase::initBase(base_dir);
   LOG_DEBUG("activation initialized ");
 
-  SPTypeBase::initBase();
+  SPTypeBase::initBase(base_dir);
   LOG_DEBUG("support peak type initialized ");
 
   base_data_init_ = true;

@@ -15,10 +15,10 @@
 #include <string>
 
 #include "common/util/logger.hpp"
+#include "common/util/file_util.hpp"
 #include "common/xml/xml_dom_parser.hpp"
 #include "common/xml/xml_dom_document.hpp"
 #include "common/xml/xml_dom_util.hpp"
-#include "common/base/prot_mod_data.hpp"
 #include "common/base/prot_mod_base.hpp"
 
 namespace toppic {
@@ -28,13 +28,16 @@ ProtModPtr ProtModBase::prot_mod_ptr_NONE_;
 ProtModPtr ProtModBase::prot_mod_ptr_M_ACETYLATION_;
 ProtModPtr ProtModBase::prot_mod_ptr_NME_;
 
-void ProtModBase::initBase() {
+void ProtModBase::initBase(const std::string &base_dir) {
   toppic::XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (!parser) {
     LOG_ERROR("Error in parsing protein modification data!");
     exit(EXIT_FAILURE);
   }
 
+  std::string prot_mod_base_file_name = base_dir 
+      + file_util::getFileSeparator() + "prot_mod_base.xml";
+  std::string prot_mod_base_data = file_util::readFile(prot_mod_base_file_name);
   xercesc::MemBufInputSource mem_str((const XMLByte*)prot_mod_base_data.c_str(), 
                                      prot_mod_base_data.length(), 
                                      "prot_mod_data");

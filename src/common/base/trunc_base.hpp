@@ -22,7 +22,7 @@ namespace toppic {
 
 class TruncBase {
  public:
-  static void initBase();
+  static void initBase(const std::string &base_dir);
 
   static const TruncPtrVec& getBaseTruncPtrVec() {return trunc_ptr_vec_;}
 

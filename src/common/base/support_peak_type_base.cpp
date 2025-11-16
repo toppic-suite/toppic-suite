@@ -15,10 +15,10 @@
 #include <string>
 
 #include "common/util/logger.hpp"
+#include "common/util/file_util.hpp"
 #include "common/xml/xml_dom_parser.hpp"
 #include "common/xml/xml_dom_document.hpp"
 #include "common/xml/xml_dom_util.hpp"
-#include "common/base/support_peak_type_data.hpp"
 #include "common/base/support_peak_type_base.hpp"
 
 namespace toppic {
@@ -27,12 +27,16 @@ SPTypePtrVec SPTypeBase::sp_type_ptr_vec_;
 
 SPTypePtr SPTypeBase::sp_type_ptr_N_TERM_;
 
-void SPTypeBase::initBase() {
+void SPTypeBase::initBase(const std::string &base_dir) {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (!parser) {
     LOG_ERROR("Error in parsing support peak type data!");
     exit(EXIT_FAILURE);
   }
+
+  std::string sp_type_base_file_name = base_dir 
+      + file_util::getFileSeparator() + "support_peak_type_base.xml";
+  std::string sp_type_base_data = file_util::readFile(sp_type_base_file_name);
   xercesc::MemBufInputSource mem_str((const XMLByte*)sp_type_base_data.c_str(), 
                                      sp_type_base_data.length(), 
                                      "support_peak_type_data");

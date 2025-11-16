@@ -21,7 +21,7 @@ namespace toppic {
 
 class SPTypeBase {
  public:
-  static void initBase();
+  static void initBase(const std::string &base_dir);
 
   static const SPTypePtrVec& getBaseSPTypePtrVec() {
     return sp_type_ptr_vec_;}

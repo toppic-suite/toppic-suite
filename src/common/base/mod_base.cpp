@@ -15,11 +15,11 @@
 #include <string>
 
 #include "common/util/logger.hpp"
+#include "common/util/file_util.hpp"
 #include "common/xml/xml_dom_document.hpp"
 #include "common/xml/xml_dom_util.hpp"
 #include "common/base/ptm_base.hpp"
 #include "common/base/residue_base.hpp"
-#include "common/base/mod_data.hpp"
 #include "common/base/mod_base.hpp"
 
 namespace toppic {
@@ -29,14 +29,17 @@ ModPtr ModBase::none_mod_ptr_;
 ModPtr ModBase::c57_mod_ptr_;
 ModPtr ModBase::c58_mod_ptr_;
 
-void ModBase::initBase() {
+void ModBase::initBase(const std::string &base_dir) {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (!parser) {
     LOG_ERROR("Error in parsing modification data!");
     exit(EXIT_FAILURE);
   }
 
-  xercesc::MemBufInputSource mem_str((const XMLByte*)mod_base_data.c_str(), 
+  std::string mod_base_file_name = base_dir 
+      + file_util::getFileSeparator() + "mod_base.xml";
+  std::string mod_base_data = file_util::readFile(mod_base_file_name);
+  xercesc::MemBufInputSource mem_str((const XMLByte*)mod_base_data.c_str(),
                                      mod_base_data.length(), 
                                      "modification_data");
   XmlDOMDocument doc(parser, mem_str);

@@ -21,7 +21,7 @@ namespace toppic {
 
 class ResidueBase {
  public:
-  static void initBase();
+  static void initBase(const std::string &base_dir);
 
   static const ResiduePtrVec& getBaseResiduePtrVec() {return residue_ptr_vec_;}
 

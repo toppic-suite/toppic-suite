@@ -15,10 +15,10 @@
 #include <string>
 
 #include "common/util/logger.hpp"
+#include "common/util/file_util.hpp"
 #include "common/xml/xml_dom_parser.hpp"
 #include "common/xml/xml_dom_document.hpp"
 #include "common/xml/xml_dom_util.hpp"
-#include "common/base/ion_type_data.hpp"
 #include "common/base/ion_type_base.hpp"
 
 namespace toppic {
@@ -28,13 +28,16 @@ IonTypePtr IonTypeBase::ion_type_ptr_B_;
 IonTypePtr IonTypeBase::ion_type_ptr_PREC_;
 
 // class functions
-void IonTypeBase::initBase() {
+void IonTypeBase::initBase(const std::string &base_dir) {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (!parser) {
     LOG_ERROR("Error in parsing ion type data!");
     exit(EXIT_FAILURE);
   }
 
+  std::string ion_type_base_file_name = base_dir 
+      + file_util::getFileSeparator() + "ion_type_base.xml";
+  std::string ion_type_base_data = file_util::readFile(ion_type_base_file_name);
   xercesc::MemBufInputSource mem_str((const XMLByte*)ion_type_base_data.c_str(), 
                                      ion_type_base_data.length(), 
                                      "ion_type_data");

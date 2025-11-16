@@ -15,11 +15,11 @@
 #include <string>
 
 #include "common/util/logger.hpp"
+#include "common/util/file_util.hpp"
 #include "common/xml/xml_dom_document.hpp"
 #include "common/xml/xml_dom_util.hpp"
 #include "common/base/amino_acid_base.hpp"
 #include "common/base/ptm_base.hpp"
-#include "common/base/residue_data.hpp"
 #include "common/base/residue_base.hpp"
 
 namespace toppic {
@@ -27,13 +27,16 @@ namespace toppic {
 ResiduePtrVec ResidueBase::residue_ptr_vec_;
 ResiduePtr ResidueBase::empty_residue_ptr_;
 
-void ResidueBase::initBase() {
+void ResidueBase::initBase(const std::string &base_dir) {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (!parser) {
     LOG_ERROR("Error in parsing residue data!");
     exit(EXIT_FAILURE);
   }
 
+  std::string residue_base_file_name = base_dir 
+      + file_util::getFileSeparator() + "residue_base.xml";
+  std::string residue_base_data = file_util::readFile(residue_base_file_name);
   xercesc::MemBufInputSource mem_str((const XMLByte*)residue_base_data.c_str(), 
                                      residue_base_data.length(), 
                                      "residue_data");

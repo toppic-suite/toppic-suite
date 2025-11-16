@@ -16,9 +16,9 @@
 #include <algorithm>
 
 #include "common/util/logger.hpp"
+#include "common/util/file_util.hpp"
 #include "common/xml/xml_dom_document.hpp"
 #include "common/xml/xml_dom_util.hpp"
-#include "common/base/ptm_data.hpp"
 #include "common/base/ptm_base.hpp"
 
 namespace toppic {
@@ -31,13 +31,16 @@ PtmPtr PtmBase::acetylation_ptr_;
 PtmPtr PtmBase::c57_ptr_;
 PtmPtr PtmBase::c58_ptr_;
 
-void PtmBase::initBase() {
+void PtmBase::initBase(const std::string &base_dir) {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (!parser) {
     LOG_ERROR("Error in parsing ptm data!");
     exit(EXIT_FAILURE);
   }
 
+  std::string ptm_base_file_name = base_dir 
+      + file_util::getFileSeparator() + "ptm_base.xml";
+  std::string ptm_base_data = file_util::readFile(ptm_base_file_name);
   xercesc::MemBufInputSource mem_str((const XMLByte*)ptm_base_data.c_str(), 
                                      ptm_base_data.length(), 
                                      "ptm_data");

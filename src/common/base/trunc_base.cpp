@@ -15,21 +15,25 @@
 #include <string>
 
 #include "common/util/logger.hpp"
+#include "common/util/file_util.hpp"
 #include "common/xml/xml_dom_document.hpp"
 #include "common/xml/xml_dom_util.hpp"
-#include "common/base/trunc_data.hpp"
 #include "common/base/trunc_base.hpp"
 
 namespace toppic {
 
 TruncPtrVec TruncBase::trunc_ptr_vec_;
 
-void TruncBase::initBase() {
+void TruncBase::initBase(const std::string &base_dir) {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (!parser) {
     LOG_ERROR("Error in parsing truncation data!");
     exit(EXIT_FAILURE);
   }
+
+  std::string trunc_base_file_name = base_dir 
+      + file_util::getFileSeparator() + "trunc_base.xml";
+  std::string trunc_base_data = file_util::readFile(trunc_base_file_name);
   xercesc::MemBufInputSource mem_str((const XMLByte*)trunc_base_data.c_str(), 
                                      trunc_base_data.length(), 
                                      "truncation_data");

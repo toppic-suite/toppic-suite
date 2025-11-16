@@ -21,7 +21,7 @@ namespace toppic {
 
 class IonTypeBase {
  public:
-  static void initBase();
+  static void initBase(const std::string &base_dir);
 
   static IonTypePtr getIonTypePtrByName(const std::string &name);
 

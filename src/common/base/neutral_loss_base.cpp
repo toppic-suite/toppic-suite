@@ -15,10 +15,10 @@
 #include <string>
 
 #include "common/util/logger.hpp"
+#include "common/util/file_util.hpp"
 #include "common/xml/xml_dom_parser.hpp"
 #include "common/xml/xml_dom_document.hpp"
 #include "common/xml/xml_dom_util.hpp"
-#include "common/base/neutral_loss_data.hpp"
 #include "common/base/neutral_loss_base.hpp"
 
 namespace toppic {
@@ -27,13 +27,16 @@ NeutralLossPtrVec NeutralLossBase::neutral_loss_ptr_vec_;
 
 NeutralLossPtr NeutralLossBase::neutral_loss_ptr_NONE_;
 
-void NeutralLossBase::initBase() {
+void NeutralLossBase::initBase(const std::string &base_dir) {
   XmlDOMParser * parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (!parser) {
     LOG_ERROR("Error in parsing neutral loss data!");
     exit(EXIT_FAILURE);
   }
 
+  std::string neutral_loss_base_file_name = base_dir 
+      + file_util::getFileSeparator() + "neutral_loss_base.xml";
+  std::string neutral_loss_base_data = file_util::readFile(neutral_loss_base_file_name);
   xercesc::MemBufInputSource mem_str((const XMLByte*)neutral_loss_base_data.c_str(), 
                                      neutral_loss_base_data.length(), 
                                      "neutral_loss_data");

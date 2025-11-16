@@ -21,7 +21,7 @@ namespace toppic {
 
 class PtmBase {
  public:
-  static void initBase();
+  static void initBase(const std::string &base_dir);
 
   static const PtmPtrVec& getBasePtmPtrVec() {return ptm_ptr_vec_;}
 
