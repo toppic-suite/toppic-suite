@@ -37,6 +37,8 @@ class Mod {
 
   bool isSame(ModPtr mod_ptr);
 
+  double getReplaceShift();
+
   double getShift();
 
   void appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);

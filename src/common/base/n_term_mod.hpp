@@ -39,9 +39,9 @@ class NTermMod {
 
   bool isSame(NTermModPtr mod_ptr);
 
-  double getMass();
-
   double getShift();
+
+  double getReplaceShift();
 
   void appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 

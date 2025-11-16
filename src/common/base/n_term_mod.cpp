@@ -47,7 +47,7 @@ bool NTermMod::isSame(NTermModPtr mod_ptr) {
       && mod_ptm_ptr_ == mod_ptr->getModPtmPtr();
 }
 
-double NTermMod::getShift() {
+double NTermMod::getReplaceShift() {
   if (PtmBase::isEmptyPtmPtr(ori_ptm_ptr_)) {
     return mod_ptm_ptr_->getMonoMass();
   }
@@ -56,7 +56,7 @@ double NTermMod::getShift() {
   }
 }
 
-double NTermMod::getMass() {
+double NTermMod::getShift() {
   return mod_ptm_ptr_->getMonoMass();
 }
 

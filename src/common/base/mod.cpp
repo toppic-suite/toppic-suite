@@ -42,13 +42,17 @@ bool Mod::isSame(ModPtr mod_ptr) {
       && mod_residue_ptr_ == mod_ptr->getModResiduePtr();
 }
 
-double Mod::getShift() {
+double Mod::getReplaceShift() {
   if (PtmBase::isEmptyPtmPtr(ori_residue_ptr_->getPtmPtr())) {
     return mod_residue_ptr_->getPtmPtr()->getMonoMass();
   }
   else {
     return mod_residue_ptr_->getMass() - ori_residue_ptr_->getMass();
   }
+}
+
+double Mod::getShift() {
+  return mod_residue_ptr_->getMass();
 }
 
 void Mod::appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
