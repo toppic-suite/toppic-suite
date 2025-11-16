@@ -130,7 +130,8 @@ void cleanToppicDir(const std::string &fa_name,
 // Test modification files. 
 int TopPIC_testModFile(std::map<std::string, std::string> & arguments) {
   try {
-    base_data::init();
+    std::string resource_dir = arguments["resourceDir"];
+    base_data::init(resource_dir);
     LOG_DEBUG("Init base data completed");
 
     // Test arguments
@@ -164,7 +165,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     ToppicArgument::outputArguments(std::cout, " ", arguments);
 
     std::string resource_dir = arguments["resourceDir"];
-    base_data::init();
+    base_data::init(resource_dir);
     EnvBase::initBase(resource_dir);
 
     LOG_DEBUG("Init base data completed");
@@ -380,7 +381,7 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
   try {
     std::string resource_dir = arguments["resourceDir"];
 
-    base_data::init();
+    base_data::init(resource_dir);
     LOG_DEBUG("Init base data completed");
 
     std::string sp_file_name = arguments["spectrumFileName"];

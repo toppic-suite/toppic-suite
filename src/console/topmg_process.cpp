@@ -115,7 +115,8 @@ void cleanTopmgDir(const std::string &fa_name,
 
 int TopMG_testModFile(std::map<std::string, std::string> & arguments) {
   try {
-    base_data::init();
+    std::string resource_dir = arguments["resourceDir"];
+    base_data::init(resource_dir);
     LOG_DEBUG("Init base data completed");
 
     // Test arguments
@@ -142,7 +143,7 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
     TopmgArgument::outputArguments(std::cout, " ", arguments);
 
     std::string resource_dir = arguments["resourceDir"];
-    base_data::init();
+    base_data::init(resource_dir);
     EnvBase::initBase(resource_dir);
 
     LOG_DEBUG("Init base data completed");
@@ -297,8 +298,7 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
 int TopMG_post(std::map<std::string, std::string> & arguments) {
   try {
     std::string resource_dir = arguments["resourceDir"];
-
-    base_data::init();
+    base_data::init(resource_dir);
     LOG_DEBUG("Initialization completed");
     std::string ori_db_file_name = arguments["oriDatabaseFileName"];
     std::string db_file_name = ori_db_file_name + "_idx" + file_util::getFileSeparator() + file_util::filenameFromEntirePath(arguments["databaseFileName"]);    

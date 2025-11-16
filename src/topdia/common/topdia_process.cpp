@@ -129,7 +129,7 @@ bool isValidFile(std::string &file_name) {
 int process(TopfdParaPtr topfd_para_ptr, TopdiaParaPtr topdia_para_ptr, 
             std::vector<std::string> spec_file_list) {
   // init data, envelope base, envcnn model, and ecscore model
-  base_data::init();
+  base_data::init(topfd_para_ptr->getResourceDir());
   EnvBase::initBase(topfd_para_ptr->getResourceDir());
   onnx_env_cnn::initModel(topfd_para_ptr->getResourceDir(), topfd_para_ptr->getThreadNum());
   onnx_ecscore::initModel(topfd_para_ptr->getResourceDir(), topfd_para_ptr->getThreadNum());

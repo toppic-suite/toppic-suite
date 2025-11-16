@@ -37,6 +37,8 @@ std::string absoluteDir(const std::string &s);
 
 std::string absoluteName(const std::string &s);
 
+std::string readFile(const std::string &file_name);
+
 void createFolder(const std::string &folder_name);
 
 void copyFile(const std::string &file_name, const std::string &path,

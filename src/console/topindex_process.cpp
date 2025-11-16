@@ -38,7 +38,8 @@ void TopIndexProcess(std::map<std::string, std::string> &arguments){
     std::cout << "TopIndex " << Version::getVersion() << std::endl;
     arguments["version"] = toppic::Version::getVersion();
     TopIndexArgument::outputArguments(std::cout, " ", arguments);
-    base_data::init();
+    std::string resource_dir = arguments["resourceDir"];
+    base_data::init(resource_dir);
 
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
 

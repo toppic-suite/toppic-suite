@@ -15,10 +15,10 @@
 #include <string>
 
 #include "common/util/logger.hpp"
+#include "common/util/file_util.hpp"
 #include "common/xml/xml_dom_parser.hpp"
 #include "common/xml/xml_dom_document.hpp"
 #include "common/xml/xml_dom_util.hpp"
-#include "common/base/activation_data.hpp"
 #include "common/base/activation_base.hpp"
 
 namespace toppic {
@@ -26,13 +26,15 @@ namespace toppic {
 ActivationPtrVec ActivationBase::activation_ptr_vec_;
 
 // initialize activation database 
-void ActivationBase::initBase() {
+void ActivationBase::initBase(const std::string &base_dir) {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (!parser) {
     LOG_ERROR("Error in parsing activation data!");
     exit(EXIT_FAILURE);
   }
-
+  std::string activation_base_file_name = base_dir 
+      + file_util::getFileSeparator() + "activation_base.xml";
+  std::string activation_base_data = file_util::readFile(activation_base_file_name);
   xercesc::MemBufInputSource mem_str((const XMLByte*)activation_base_data.c_str(), 
                                      activation_base_data.length(), 
                                      "activation_data");

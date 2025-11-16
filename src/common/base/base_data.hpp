@@ -20,7 +20,7 @@ namespace toppic {
 
 namespace base_data {
 
-void init();
+void init(const std::string &resource_dir);
 
 void release(); 
 

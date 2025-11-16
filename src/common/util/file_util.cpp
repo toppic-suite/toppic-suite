@@ -14,8 +14,9 @@
 
 #include <string>
 #include <algorithm>
-#include <iostream>
 #include <filesystem>
+#include <fstream>
+#include <iostream>
 
 #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
 #include <windows.h>
@@ -311,6 +312,19 @@ bool checkSpace(const std::string &dir){
     }
   }
   return false;
+}
+
+std::string readFile(const std::string &file_name) {
+  fs::path path(file_name);
+  if (!fs::exists(path)) {
+    LOG_ERROR("The file " << file_name << " does not exist!");
+    return "";
+  }
+  std::ifstream in(file_name);
+  std::string content((std::istreambuf_iterator<char>(in)),
+                       std::istreambuf_iterator<char>());
+  in.close();
+  return content;
 }
 
 }  // namespace file_util

@@ -21,7 +21,7 @@ namespace toppic {
 
 class ActivationBase {
  public:
-  static void initBase();
+  static void initBase(const std::string &base_dir);
 
   static ActivationPtr getActivationPtrByName(const std::string &name);
 

@@ -13,6 +13,7 @@
 //limitations under the License.
 
 #include "common/util/logger.hpp"
+#include "common/util/file_util.hpp"
 #include "common/xml/xml_dom_parser.hpp"
 
 #include "common/base/amino_acid_base.hpp"
@@ -33,11 +34,13 @@ namespace base_data {
 
 bool base_data_init_ = false;
 
-void init() {
+void init(const std::string &resource_dir) {
   // base data only need to be init once
   if (base_data_init_) { 
     return; 
   }
+
+  std::string base_dir = resource_dir + file_util::getFileSeparator() + "base_data";
 
   AminoAcidBase::initBase();
   LOG_DEBUG("acid initialized ");
@@ -63,7 +66,7 @@ void init() {
   NeutralLossBase::initBase();
   LOG_DEBUG("neutral loss initialized ");
 
-  ActivationBase::initBase();
+  ActivationBase::initBase(base_dir);
   LOG_DEBUG("activation initialized ");
 
   SPTypeBase::initBase();

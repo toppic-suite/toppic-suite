@@ -115,7 +115,7 @@ bool isValidFile(std::string &file_name) {
 
 int process(TopfdParaPtr para_ptr,  std::vector<std::string> spec_file_list) {
   // init data, envelope base, envcnn model, and ecscore model
-  base_data::init();
+  base_data::init(para_ptr->getResourceDir());
   EnvBase::initBase(para_ptr->getResourceDir());
   onnx_env_cnn::initModel(para_ptr->getResourceDir(), para_ptr->getThreadNum());
 

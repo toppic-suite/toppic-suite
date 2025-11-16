@@ -29,7 +29,8 @@ int topDiffProcess(std::map<std::string, std::string> &arguments,
     std::cout << "TopDiff " << Version::getVersion() << std::endl;
     arguments["version"] = toppic::Version::getVersion();
     TopDiffArgument::outputArguments(std::cout, " ", arguments);
-    base_data::init();
+    std::string resource_dir = arguments["resourceDir"];
+    base_data::init(resource_dir);
 
     std::string base_path = file_util::absoluteDir(input_file_list[0]);
     std::string output_file_name = base_path + file_util::getFileSeparator() 
