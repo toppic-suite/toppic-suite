@@ -17,20 +17,20 @@
 #include "common/xml/xml_dom_util.hpp"
 #include "common/base/ptm_base.hpp"
 #include "common/base/trunc_base.hpp"
-#include "common/base/mod_base.hpp"
+#include "common/base/n_term_mod_base.hpp"
 #include "common/base/prot_mod.hpp"
 
 namespace toppic {
 
 ProtMod::ProtMod(const std::string &name, const std::string &type,
-                 TruncPtr trunc_ptr, ModPtr mod_ptr): 
+                 TruncPtr trunc_ptr, NTermModPtr n_term_mod_ptr): 
     name_(name),
     type_(type),
     trunc_ptr_(trunc_ptr),
-    mod_ptr_(mod_ptr) {
+    n_term_mod_ptr_(n_term_mod_ptr) {
       mod_pos_ = trunc_ptr->getTruncLen();
-      prot_shift_ = trunc_ptr_->getShift() + mod_ptr_->getShift();
-      pep_shift_ = mod_ptr_->getShift();
+      prot_shift_ = trunc_ptr_->getShift() + n_term_mod_ptr_->getShift();
+      pep_shift_ = n_term_mod_ptr_->getShift();
     }
 
 ProtMod::ProtMod(XmlDOMElement* element) { 
@@ -40,13 +40,13 @@ ProtMod::ProtMod(XmlDOMElement* element) {
   XmlDOMElement* trunc_element 
       = xml_dom_util::getChildElement(element, trunc_element_name.c_str(), 0);
   trunc_ptr_ = TruncBase::getTruncPtrFromXml(trunc_element);
-  std::string mod_element_name = Mod::getXmlElementName();
+  std::string mod_element_name = NTermMod::getXmlElementName();
   XmlDOMElement* mod_element 
       = xml_dom_util::getChildElement(element, mod_element_name.c_str(), 0);
-  mod_ptr_= ModBase::getModPtrFromXml(mod_element); 
+  n_term_mod_ptr_ = NTermModBase::getNTermModPtrFromXml(mod_element); 
   mod_pos_ = trunc_ptr_->getTruncLen();
-  prot_shift_ = trunc_ptr_->getShift() + mod_ptr_->getShift();
-  pep_shift_ = mod_ptr_->getShift();
+  prot_shift_ = trunc_ptr_->getShift() + n_term_mod_ptr_->getShift();
+  pep_shift_ = n_term_mod_ptr_->getShift();
 }
 
 void ProtMod::appendNameToXml(XmlDOMDocument* xml_doc,
@@ -63,8 +63,7 @@ std::string ProtMod::getNameFromXml(XmlDOMElement * element) {
 }
 
 bool ProtMod::isAcetylation() {
-  if (mod_ptr_->getModResiduePtr()->getPtmPtr() 
-      == PtmBase::getPtmPtr_Acetylation()) {
+  if (n_term_mod_ptr_->getModPtmPtr() == PtmBase::getPtmPtr_Acetylation()) {
     return true;
   }
   else {

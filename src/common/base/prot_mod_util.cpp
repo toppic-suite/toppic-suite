@@ -15,7 +15,7 @@
 #include <string>
 
 #include "common/util/logger.hpp"
-#include "common/base/mod_base.hpp"
+#include "common/base/n_term_mod_base.hpp"
 #include "common/base/prot_mod_base.hpp"
 #include "common/base/trunc_util.hpp"
 #include "common/base/prot_mod_util.hpp"
@@ -37,8 +37,10 @@ bool allowMod(ProtModPtr prot_mod_ptr, const ResiduePtrVec &residues) {
       // LOG_DEBUG("pos false");
       return false;
     }
-    ModPtr mod_ptr = prot_mod_ptr->getModPtr();
-    if (residues[mod_pos] != mod_ptr->getOriResiduePtr()) {
+    NTermModPtr n_term_mod_ptr = prot_mod_ptr->getNTermModPtr();
+    // check amino acid only
+    if (residues[mod_pos]->getAminoAcidPtr() 
+        != n_term_mod_ptr->getResiduePtr()->getAminoAcidPtr()) {
       // LOG_DEBUG("mod false");
       return false;
     }
@@ -52,14 +54,16 @@ bool allowMod(ProtModPtr prot_mod_ptr, const ResiduePtrVec &residues) {
     return false;
   }
   LOG_DEBUG("end check truncation!");
-  ModPtr mod_ptr = prot_mod_ptr->getModPtr();
-  if (mod_ptr != ModBase::getNoneModPtr()) {
+  NTermModPtr n_term_mod_ptr = prot_mod_ptr->getNTermModPtr();
+  if (n_term_mod_ptr != NTermModBase::getNoneNTermModPtr()) {
     // if NME_acetylation
     int mod_pos = prot_mod_ptr->getModPos();
     if (mod_pos >= static_cast<int>(residues.size())) {
       return false;
     }
-    if (residues[mod_pos] != mod_ptr->getOriResiduePtr()) {
+    // check amino acid only
+    if (residues[mod_pos]->getAminoAcidPtr() 
+        != n_term_mod_ptr->getResiduePtr()->getAminoAcidPtr()) {
       return false;
     }
   }

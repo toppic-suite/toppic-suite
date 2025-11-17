@@ -15,7 +15,7 @@
 #ifndef TOPPIC_COMMON_BASE_PROT_MOD_HPP_
 #define TOPPIC_COMMON_BASE_PROT_MOD_HPP_
 
-#include "common/base/mod.hpp"
+#include "common/base/n_term_mod.hpp"
 #include "common/base/trunc.hpp"
 
 namespace toppic {
@@ -25,7 +25,7 @@ class XmlDOMDocument;
 class ProtMod {
  public:
   ProtMod(const std::string &name, const std::string &type,
-          TruncPtr trunc_ptr, ModPtr mod_ptr);
+          TruncPtr trunc_ptr, NTermModPtr mod_ptr);
 
   ProtMod(XmlDOMElement* element); 
 
@@ -35,7 +35,7 @@ class ProtMod {
 
   TruncPtr getTruncPtr() { return trunc_ptr_;}
 
-  ModPtr getModPtr() { return mod_ptr_;}
+  NTermModPtr getNTermModPtr() { return n_term_mod_ptr_;}
 
   int getModPos() {return mod_pos_;}
 
@@ -55,7 +55,7 @@ class ProtMod {
   std::string name_;
   std::string type_;
   TruncPtr trunc_ptr_;
-  ModPtr mod_ptr_;
+  NTermModPtr n_term_mod_ptr_;
   int mod_pos_;
   double prot_shift_;
   double pep_shift_;

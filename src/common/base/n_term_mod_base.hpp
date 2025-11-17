@@ -27,9 +27,9 @@ class NTermModBase {
 
   static NTermModPtr getBaseNTermModPtr(NTermModPtr n_term_mod_ptr);
 
-  static NTermModPtr getNoneModPtr() {return none_mod_ptr_;}
-
-  static bool isNoneModPtr(NTermModPtr n_term_mod_ptr) {return n_term_mod_ptr == none_mod_ptr_;}
+  static NTermModPtr getNoneNTermModPtr() {return none_mod_ptr_;}
+  
+  static bool isNoneNTermModPtr(NTermModPtr n_term_mod_ptr) {return n_term_mod_ptr == none_mod_ptr_;}
 
   static NTermModPtr getNTermModPtrFromXml(XmlDOMElement * element);
 
