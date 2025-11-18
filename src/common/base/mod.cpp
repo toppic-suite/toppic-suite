@@ -26,7 +26,9 @@ namespace toppic {
 
 Mod::Mod(ResiduePtr ori_residue_ptr, ResiduePtr mod_residue_ptr):
     ori_residue_ptr_(ori_residue_ptr),
-    mod_residue_ptr_(mod_residue_ptr) {}
+    mod_residue_ptr_(mod_residue_ptr) {
+      mod_type_ptr_ = ModType::SIDE_CHAIN;
+}      
 
 Mod::Mod(XmlDOMElement* element) {
   XmlDOMElement* ori_residue_element
@@ -35,11 +37,22 @@ Mod::Mod(XmlDOMElement* element) {
   XmlDOMElement* mod_residue_element
       = xml_dom_util::getChildElement(element, "mod_residue", 0);
   mod_residue_ptr_ = ResidueBase::getResiduePtrFromXml(mod_residue_element);
+  XmlDOMElement* mod_type_element
+      = xml_dom_util::getChildElement(element, "mod_type", 0);
+  if (mod_type_element != nullptr) {
+    std::string mod_type_name 
+      = xml_dom_util::getChildValue(element, "mod_type", 0);
+    mod_type_ptr_ = ModType::getModTypePtrByName(mod_type_name);
+  }
+  else {
+    mod_type_ptr_ = ModType::SIDE_CHAIN;
+  }
 }
 
 bool Mod::isSame(ModPtr mod_ptr) {
   return ori_residue_ptr_ == mod_ptr->getOriResiduePtr()
-      && mod_residue_ptr_ == mod_ptr->getModResiduePtr();
+      && mod_residue_ptr_ == mod_ptr->getModResiduePtr()
+      && mod_type_ptr_ == mod_ptr->mod_type_ptr_;
 }
 
 double Mod::getReplaceShift() {
@@ -60,6 +73,7 @@ void Mod::appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
   XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
   ori_residue_ptr_->appendXml(xml_doc, element, "ori_residue");
   mod_residue_ptr_->appendXml(xml_doc, element, "mod_residue");
+  xml_doc->addElement(element, "mod_type", mod_type_ptr_->getName().c_str());
   parent->appendChild(element);
 }
 

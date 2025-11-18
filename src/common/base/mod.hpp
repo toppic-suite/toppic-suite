@@ -17,6 +17,7 @@
 
 #include "common/xml/xml_dom_element.hpp"
 #include "common/base/residue.hpp"
+#include "common/base/mod_type.hpp"
 
 namespace toppic {
 
@@ -48,6 +49,7 @@ class Mod {
  private:
   ResiduePtr ori_residue_ptr_;
   ResiduePtr mod_residue_ptr_;
+  ModTypePtr mod_type_ptr_;
 };
 
 typedef std::vector<ModPtr> ModPtrVec;
