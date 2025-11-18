@@ -35,7 +35,7 @@ void BpSpec::initBreakPoints(const ResSeqPtr &res_seq_ptr) {
       = std::make_shared<BreakPoint>(0, res_seq_ptr->getResMassSum());
   break_point_ptr_vec_.push_back(first_ptr);
 
-  double prm = 0;
+  double prm = res_seq_ptr->getNModPtr()->getShift();
   for (int i = 0; i < res_seq_ptr->getLen() - 1; i++) {
     prm += res_seq_ptr->getResiduePtr(i)->getMass();
     double srm = res_seq_ptr->getResMassSum()-prm;

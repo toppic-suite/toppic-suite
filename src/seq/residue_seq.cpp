@@ -15,6 +15,7 @@
 #include <sstream>
 #include <string>
 
+#include "common/base/n_term_mod_base.hpp"
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
 #include "seq/residue_seq.hpp"
@@ -28,7 +29,18 @@ ResidueSeq::ResidueSeq(const ResiduePtrVec &residues):
   for (size_t i = 0; i < residues_.size(); i++) {
     residue_mass_sum_ += residues_[i]->getMass();
   }
+  n_mod_ptr_ = NTermModBase::getNTermNoneModPtr();
 }
+
+ResidueSeq::ResidueSeq(const ResiduePtrVec &residues, ModPtr n_mod_ptr): 
+    residues_(residues), n_mod_ptr_(n_mod_ptr) {
+  // get residue mass sum 
+  residue_mass_sum_ = n_mod_ptr_->getShift();
+  for (size_t i = 0; i < residues_.size(); i++) {
+    residue_mass_sum_ += residues_[i]->getMass();
+  }
+}
+
 
 ResSeqPtr ResidueSeq::getSubResidueSeq(int bgn, int end) {
   if (end - bgn < 0) {
@@ -44,12 +56,18 @@ ResSeqPtr ResidueSeq::getSubResidueSeq(int bgn, int end) {
   // from bgn to end,the sum of residues shoule be end - bgn + 1
   std::copy(residues_.begin() + bgn, residues_.begin() + end + 1,
             std::back_inserter(sub_residues) );
-  return std::make_shared<ResidueSeq>(sub_residues);
-  
+  ModPtr n_mod_ptr_ = NTermModBase::getNTermNoneModPtr();
+  if (bgn == 0) {
+    n_mod_ptr_ = getNModPtr();
+  }
+  return std::make_shared<ResidueSeq>(sub_residues, n_mod_ptr_);
 }
 
 std::string ResidueSeq::toString() {
   std::stringstream s;
+  if (!NTermModBase::isNTermNoneModPtr(n_mod_ptr_)) {
+    s << "[" << n_mod_ptr_->getModResiduePtr()->getPtmPtr()->getAbbrName() << "]-"; 
+  }
   for (size_t i = 0; i < residues_.size(); i++) {
     s << residues_[i]->toString();
   }

@@ -16,6 +16,7 @@
 #define TOPPIC_SEQ_RESIDUE_SEQ_HPP_
 
 #include "common/base/mass_constant.hpp"
+#include "common/base/mod.hpp"
 #include "common/base/residue.hpp"
 
 namespace toppic {
@@ -29,8 +30,12 @@ class ResidueSeq {
  public:
   explicit ResidueSeq(const ResiduePtrVec &residues);
 
+  explicit ResidueSeq(const ResiduePtrVec &residues, ModPtr n_mod_ptr);
+
   // Returns a sub-peptide of the original peptide.
   ResSeqPtr getSubResidueSeq(int bgn, int end);
+
+  ModPtr getNModPtr() { return n_mod_ptr_;}
 
   int getLen() {return residues_.size();}
 
@@ -54,6 +59,8 @@ class ResidueSeq {
  private:
   // residue list 
   ResiduePtrVec residues_;
+  // n terminal modification
+  ModPtr n_mod_ptr_;
   // the sum of residue mass 
   double residue_mass_sum_;
 
