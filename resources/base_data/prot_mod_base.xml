@@ -22,6 +22,7 @@
           <abbreviation>No PTM</abbreviation>
         </ptm>
       </mod_residue>
+      <mod_type>N_TERM</mod_type>
     </mod>
   </prot_mod>
   <prot_mod>
@@ -47,6 +48,7 @@
           <abbreviation>Acetyl</abbreviation>
         </ptm>
       </mod_residue>
+      <mod_type>N_TERM</mod_type>
     </mod>
   </prot_mod>
   <prot_mod>
@@ -72,6 +74,7 @@
           <abbreviation>No PTM</abbreviation>
         </ptm>
       </mod_residue>
+      <mod_type>N_TERM</mod_type>
     </mod>
   </prot_mod>
   <prot_mod>
@@ -97,6 +100,7 @@
           <abbreviation>Acetyl</abbreviation>
         </ptm>
       </mod_residue>
+      <mod_type>N_TERM</mod_type>
     </mod>
   </prot_mod>
   <prot_mod>
@@ -122,6 +126,7 @@
           <abbreviation>Acetyl</abbreviation>
         </ptm>
       </mod_residue>
+      <mod_type>N_TERM</mod_type>
     </mod>
   </prot_mod>
   <prot_mod>
@@ -147,6 +152,7 @@
           <abbreviation>Acetyl</abbreviation>
         </ptm>
       </mod_residue>
+      <mod_type>N_TERM</mod_type>
     </mod>
   </prot_mod>
   <prot_mod>
@@ -172,6 +178,7 @@
           <abbreviation>Acetyl</abbreviation>
         </ptm>
       </mod_residue>
+      <mod_type>N_TERM</mod_type>
     </mod>
   </prot_mod>
   <prot_mod>
@@ -197,6 +204,7 @@
           <abbreviation>Acetyl</abbreviation>
         </ptm>
       </mod_residue>
+      <mod_type>N_TERM</mod_type>
     </mod>
   </prot_mod>
   <prot_mod>
@@ -222,6 +230,7 @@
           <abbreviation>Acetyl</abbreviation>
         </ptm>
       </mod_residue>
+      <mod_type>N_TERM</mod_type>
     </mod>
   </prot_mod>
   <prot_mod>
@@ -247,6 +256,7 @@
           <abbreviation>Acetyl</abbreviation>
         </ptm>
       </mod_residue>
+      <mod_type>N_TERM</mod_type>
     </mod>
   </prot_mod>
   <prot_mod>
@@ -272,6 +282,7 @@
           <abbreviation>Acetyl</abbreviation>
         </ptm>
       </mod_residue>
+      <mod_type>N_TERM</mod_type>
     </mod>
   </prot_mod>
   <prot_mod>
@@ -297,6 +308,7 @@
           <abbreviation>Acetyl</abbreviation>
         </ptm>
       </mod_residue>
+      <mod_type>N_TERM</mod_type>
     </mod>
   </prot_mod>
   <prot_mod>
@@ -322,6 +334,7 @@
           <abbreviation>Acetyl</abbreviation>
         </ptm>
       </mod_residue>
+      <mod_type>N_TERM</mod_type>
     </mod>
   </prot_mod>
   <prot_mod>
@@ -347,6 +360,7 @@
           <abbreviation>Acetyl</abbreviation>
         </ptm>
       </mod_residue>
+      <mod_type>N_TERM</mod_type>
     </mod>
   </prot_mod>
   <prot_mod>
@@ -372,6 +386,7 @@
           <abbreviation>Acetyl</abbreviation>
         </ptm>
       </mod_residue>
+      <mod_type>N_TERM</mod_type>
     </mod>
   </prot_mod>
   <prot_mod>
@@ -397,6 +412,7 @@
           <abbreviation>Acetyl</abbreviation>
         </ptm>
       </mod_residue>
+      <mod_type>N_TERM</mod_type>
     </mod>
   </prot_mod>
   <prot_mod>
@@ -422,6 +438,7 @@
           <abbreviation>Acetyl</abbreviation>
         </ptm>
       </mod_residue>
+      <mod_type>N_TERM</mod_type>
     </mod>
   </prot_mod>
   <prot_mod>
@@ -447,6 +464,7 @@
           <abbreviation>Acetyl</abbreviation>
         </ptm>
       </mod_residue>
+      <mod_type>N_TERM</mod_type>
     </mod>
   </prot_mod>
   <prot_mod>
@@ -472,6 +490,7 @@
           <abbreviation>Acetyl</abbreviation>
         </ptm>
       </mod_residue>
+      <mod_type>N_TERM</mod_type>
     </mod>
   </prot_mod>
   <prot_mod>
@@ -497,6 +516,7 @@
           <abbreviation>Acetyl</abbreviation>
         </ptm>
       </mod_residue>
+      <mod_type>N_TERM</mod_type>
     </mod>
   </prot_mod>
   <prot_mod>
@@ -522,6 +542,7 @@
           <abbreviation>Acetyl</abbreviation>
         </ptm>
       </mod_residue>
+      <mod_type>N_TERM</mod_type>
     </mod>
   </prot_mod>
   <prot_mod>
@@ -547,6 +568,7 @@
           <abbreviation>Acetyl</abbreviation>
         </ptm>
       </mod_residue>
+      <mod_type>N_TERM</mod_type>
     </mod>
   </prot_mod>
   <prot_mod>
@@ -572,6 +594,7 @@
           <abbreviation>Acetyl</abbreviation>
         </ptm>
       </mod_residue>
+      <mod_type>N_TERM</mod_type>
     </mod>
   </prot_mod>
 </prot_mod_list>

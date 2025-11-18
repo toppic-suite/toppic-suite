@@ -83,7 +83,7 @@ PtmPtr PtmBase::getPtmPtrByAbbrName(const std::string &abbr_name) {
       return ptm_ptr_vec_[i];
     }
   }
-  LOG_WARN("PTM " << abbr_name << " cannot be found!")
+  LOG_ERROR("PTM " << abbr_name << " cannot be found!")
   return PtmPtr(nullptr);
 }
 

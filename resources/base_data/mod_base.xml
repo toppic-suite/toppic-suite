@@ -16,6 +16,7 @@
         <abbreviation>No PTM</abbreviation>
       </ptm>
     </mod_residue>
+    <mod_type>SIDE_CHAIN</mod_type>
   </mod>
   <mod>
     <ori_residue>
@@ -34,6 +35,7 @@
         <abbreviation>Carbamidomethylation</abbreviation>
       </ptm>
     </mod_residue>
+    <mod_type>SIDE_CHAIN</mod_type>
   </mod>
   <mod>
     <ori_residue>
@@ -52,5 +54,6 @@
         <abbreviation>Carboxymethyl</abbreviation>
       </ptm>
     </mod_residue>
+    <mod_type>SIDE_CHAIN</mod_type>
   </mod>
 </mod_list>

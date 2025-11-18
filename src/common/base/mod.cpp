@@ -37,16 +37,9 @@ Mod::Mod(XmlDOMElement* element) {
   XmlDOMElement* mod_residue_element
       = xml_dom_util::getChildElement(element, "mod_residue", 0);
   mod_residue_ptr_ = ResidueBase::getResiduePtrFromXml(mod_residue_element);
-  XmlDOMElement* mod_type_element
-      = xml_dom_util::getChildElement(element, "mod_type", 0);
-  if (mod_type_element != nullptr) {
-    std::string mod_type_name 
-      = xml_dom_util::getChildValue(element, "mod_type", 0);
-    mod_type_ptr_ = ModType::getModTypePtrByName(mod_type_name);
-  }
-  else {
-    mod_type_ptr_ = ModType::SIDE_CHAIN;
-  }
+  std::string mod_type_name 
+    = xml_dom_util::getChildValue(element, "mod_type", 0);
+  mod_type_ptr_ = ModType::getModTypePtrByName(mod_type_name);
 }
 
 bool Mod::isSame(ModPtr mod_ptr) {

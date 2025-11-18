@@ -40,7 +40,6 @@ void init(const std::string &resource_dir) {
   if (base_data_init_) { 
     return; 
   }
-
   std::string base_dir = resource_dir + file_util::getFileSeparator() + "base_data";
 
   AminoAcidBase::initBase(base_dir);

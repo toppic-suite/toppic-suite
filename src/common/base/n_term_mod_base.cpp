@@ -24,8 +24,8 @@
 
 namespace toppic {
 
-NTermModPtrVec NTermModBase::mod_ptr_vec_;
-NTermModPtr NTermModBase::none_mod_ptr_;
+ModPtrVec NTermModBase::mod_ptr_vec_;
+ModPtr NTermModBase::none_mod_ptr_;
 
 void NTermModBase::initBase(const std::string &base_dir) {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
@@ -42,18 +42,15 @@ void NTermModBase::initBase(const std::string &base_dir) {
                                      "modification_data");
   XmlDOMDocument doc(parser, mem_str);
   XmlDOMElement* parent = doc.getDocumentElement();
-  std::string element_name = NTermMod::getXmlElementName();
+  std::string element_name = Mod::getXmlElementName();
   int mod_num = xml_dom_util::getChildCount(parent, element_name.c_str());
   for (int i = 0; i < mod_num; i++) {
     XmlDOMElement* element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
-    NTermModPtr mod_ptr = std::make_shared<NTermMod>(element);
+    ModPtr mod_ptr = std::make_shared<Mod>(element);
     mod_ptr_vec_.push_back(mod_ptr);
-    LOG_DEBUG("N-term mod name: " << mod_ptr->getResiduePtr()->getAminoAcidPtr()->getName() 
-              << " " << mod_ptr->getOriPtmPtr()->getName() 
-              << "->" << mod_ptr->getModPtmPtr()->getName());
     // check empty ptr
-    if (mod_ptr->getResiduePtr() == ResidueBase::getEmptyResiduePtr()
-        && mod_ptr->getModPtmPtr() == PtmBase::getEmptyPtmPtr()) {
+    if (mod_ptr->getOriResiduePtr() == ResidueBase::getEmptyResiduePtr() &&
+        mod_ptr->getModResiduePtr() == ResidueBase::getEmptyResiduePtr()) {
       none_mod_ptr_ = mod_ptr;
     }
   }
@@ -63,7 +60,7 @@ void NTermModBase::initBase(const std::string &base_dir) {
   }
 }
 
-NTermModPtr NTermModBase::getBaseNTermModPtr(NTermModPtr n_term_mod_ptr) {
+ModPtr NTermModBase::getBaseNTermModPtr(ModPtr n_term_mod_ptr) {
   for (size_t i = 0; i < mod_ptr_vec_.size(); i++) {
     if (mod_ptr_vec_[i]->isSame(n_term_mod_ptr)) {
       return mod_ptr_vec_[i];
@@ -74,8 +71,8 @@ NTermModPtr NTermModBase::getBaseNTermModPtr(NTermModPtr n_term_mod_ptr) {
 }
 
 
-NTermModPtr NTermModBase::getNTermModPtrFromXml(XmlDOMElement * element) {
-  NTermModPtr ptr = std::make_shared<NTermMod>(element);
+ModPtr NTermModBase::getNTermModPtrFromXml(XmlDOMElement * element) {
+  ModPtr ptr = std::make_shared<Mod>(element);
   return getBaseNTermModPtr(ptr);
 }
 
