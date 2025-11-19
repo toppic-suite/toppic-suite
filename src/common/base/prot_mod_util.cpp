@@ -38,7 +38,9 @@ bool allowMod(ProtModPtr prot_mod_ptr, const ResiduePtrVec &residues) {
       return false;
     }
     ModPtr mod_ptr = prot_mod_ptr->getModPtr();
-    if (residues[mod_pos] != mod_ptr->getOriResiduePtr()) {
+    // check if the first residue is M
+    if (residues[mod_pos]->getAminoAcidPtr() 
+        != mod_ptr->getOriResiduePtr()->getAminoAcidPtr()) {
       // LOG_DEBUG("mod false");
       return false;
     }
@@ -53,13 +55,15 @@ bool allowMod(ProtModPtr prot_mod_ptr, const ResiduePtrVec &residues) {
   }
   LOG_DEBUG("end check truncation!");
   ModPtr mod_ptr = prot_mod_ptr->getModPtr();
-  if (mod_ptr != ModBase::getNoneModPtr()) {
+  if (mod_ptr != ModBase::getNTermNoneModPtr()) {
     // if NME_acetylation
     int mod_pos = prot_mod_ptr->getModPos();
     if (mod_pos >= static_cast<int>(residues.size())) {
       return false;
     }
-    if (residues[mod_pos] != mod_ptr->getOriResiduePtr()) {
+    // check amino acid match only
+    if (residues[mod_pos]->getAminoAcidPtr() 
+        != mod_ptr->getOriResiduePtr()->getAminoAcidPtr()) {
       return false;
     }
   }
