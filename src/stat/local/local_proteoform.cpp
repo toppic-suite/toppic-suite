@@ -251,7 +251,8 @@ ProteoformPtr createProteoformPtr(ProteoformPtr base_form_ptr, int match_score,
                                                   match_score, ptm_ptr);
   AminoAcidPtr empty_aa_ptr = AminoAcidBase::getEmptyAminoAcidPtr();
   ModPtr mod_ptr = std::make_shared<Mod>(ResidueBase::getEmptyResiduePtr(),
-                                         ResidueBase::getBaseResiduePtr(empty_aa_ptr, ptm_ptr));
+                                         ResidueBase::getBaseResiduePtr(empty_aa_ptr, ptm_ptr),
+                                         ModType::SIDE_CHAIN);
 
   AlterPtr alter = std::make_shared<Alter>(anno->getLeftBpPos(),
                                            anno->getRightBpPos() + 1,
@@ -304,7 +305,8 @@ ProteoformPtr createProteoformPtr(ProteoformPtr base_form_ptr,
 
   AminoAcidPtr empty_aa_ptr = AminoAcidBase::getEmptyAminoAcidPtr();
   ModPtr mod_ptr_1 = std::make_shared<Mod>(ResidueBase::getEmptyResiduePtr(),
-                                           ResidueBase::getBaseResiduePtr(empty_aa_ptr, ptm_ptr_1));
+                                           ResidueBase::getBaseResiduePtr(empty_aa_ptr, ptm_ptr_1),
+                                           ModType::SIDE_CHAIN);
 
   AlterPtr alter_1 = std::make_shared<Alter>(anno_1->getLeftBpPos(),
                                              break_pos + 1,
@@ -318,7 +320,8 @@ ProteoformPtr createProteoformPtr(ProteoformPtr base_form_ptr,
                                                     match_score, ptm_ptr_2);
 
   ModPtr mod_ptr_2 = std::make_shared<Mod>(ResidueBase::getEmptyResiduePtr(),
-                                           ResidueBase::getBaseResiduePtr(empty_aa_ptr, ptm_ptr_2));
+                                           ResidueBase::getBaseResiduePtr(empty_aa_ptr, ptm_ptr_2),
+                                           ModType::SIDE_CHAIN);
   AlterPtr alter_2 = std::make_shared<Alter>(break_pos + 1, 
                                              anno_2->getRightBpPos() + 1,
                                              AlterType::VARIABLE, 

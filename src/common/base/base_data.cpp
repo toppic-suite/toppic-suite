@@ -21,7 +21,6 @@
 #include "common/base/residue_base.hpp"
 #include "common/base/trunc_base.hpp"
 #include "common/base/mod_base.hpp"
-#include "common/base/n_term_mod_base.hpp"
 #include "common/base/prot_mod_base.hpp"
 #include "common/base/ion_type_base.hpp"
 #include "common/base/neutral_loss_base.hpp"
@@ -56,9 +55,6 @@ void init(const std::string &resource_dir) {
 
   ModBase::initBase(base_dir);
   LOG_DEBUG("mod initialized ");
-
-  NTermModBase::initBase(base_dir);
-  LOG_DEBUG("n-term mod initialized ");
 
   ProtModBase::initBase(base_dir);
   LOG_DEBUG("prot mod initialized ");

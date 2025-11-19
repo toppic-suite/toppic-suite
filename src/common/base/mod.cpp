@@ -24,10 +24,10 @@
 
 namespace toppic {
 
-Mod::Mod(ResiduePtr ori_residue_ptr, ResiduePtr mod_residue_ptr):
+Mod::Mod(ResiduePtr ori_residue_ptr, ResiduePtr mod_residue_ptr, ModTypePtr mod_type_ptr):
     ori_residue_ptr_(ori_residue_ptr),
-    mod_residue_ptr_(mod_residue_ptr) {
-      mod_type_ptr_ = ModType::SIDE_CHAIN;
+    mod_residue_ptr_(mod_residue_ptr),
+    mod_type_ptr_(mod_type_ptr) {
 }      
 
 Mod::Mod(XmlDOMElement* element) {

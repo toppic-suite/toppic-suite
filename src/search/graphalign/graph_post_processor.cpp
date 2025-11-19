@@ -198,7 +198,8 @@ void GraphPostProcessor::process() {
             AlterPtrVec alter_vec;
             for (size_t i = 0; i < ptm_vec.size(); i++) {
               ResiduePtr mod_res = std::make_shared<Residue>(acid_ptr, ptm_vec[i]);
-              ModPtr mod = std::make_shared<Mod>(alter_ptr->getModPtr()->getOriResiduePtr(), mod_res);
+              ModPtr mod = std::make_shared<Mod>(alter_ptr->getModPtr()->getOriResiduePtr(), 
+                                                 mod_res, ModType::SIDE_CHAIN);
               AlterPtr a = std::make_shared<Alter>(alter_ptr->getLeftBpPos(),
                                                    alter_ptr->getRightBpPos(),
                                                    alter_ptr->getTypePtr(),

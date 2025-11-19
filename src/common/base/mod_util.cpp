@@ -145,7 +145,7 @@ ModPtrVec2D readModTxt(const std::string &file_name) {
         ResiduePtr mod_residue_ptr 
             = ResidueBase::getBaseResiduePtr(std::make_shared<Residue>(a, p));
         ModPtr m 
-            = ModBase::getBaseModPtr(std::make_shared<Mod>(ori_residue_ptr, mod_residue_ptr));
+            = ModBase::getBaseModPtr(std::make_shared<Mod>(ori_residue_ptr, mod_residue_ptr, ModType::SIDE_CHAIN));
         if (l[3] == "N-term") {
           mod_ptr_vec2d[0].push_back(m);
         } else if (l[3] == "C-term") {

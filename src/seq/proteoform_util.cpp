@@ -195,8 +195,7 @@ std::vector<double> getNTermAcets(ProteoformPtr db_form_ptr,
   std::vector<double> shifts;
   for (size_t i = 0; i < prot_mod_ptrs.size(); i++) {
     // check if it is acetylation
-    if (prot_mod_ptrs[i]->getModPtr()->getModResiduePtr()->getPtmPtr()
-        == PtmBase::getPtmPtr_Acetylation()) {
+    if (prot_mod_ptrs[i]->isAcetylation()) {
       ResSeqPtr db_res_seq_ptr = db_form_ptr->getResSeqPtr();
       bool valid = prot_mod_util::allowMod(prot_mod_ptrs[i], db_res_seq_ptr->getResidues());
       if (valid) {
@@ -227,49 +226,6 @@ std::vector<std::vector<double> > getNTermAcet2D(const ProteoformPtrVec & db_for
   return shifts_2d;
 }
 
-ProteoformPtr geneDbProteoformPtr(FastaSubSeqPtr fasta_seq_ptr, 
-                                  ModPtrVec fix_mod_list, int start_pos) {
-  if (fasta_seq_ptr == nullptr) {
-    return nullptr;
-  }
-  ProtModPtr none_prot_mod_ptr = ProtModBase::getProtModPtr_NONE();
-  ResiduePtrVec residue_ptrs 
-      = residue_util::convertStrToResiduePtrVec(fasta_seq_ptr->getAcidPtmPairVec());
-  int end_pos = start_pos + static_cast<int>(residue_ptrs.size()) - 1;
-
-  MassShiftPtrVec shift_list;
-  // add input ptms;
-  for (size_t i = 0; i < residue_ptrs.size(); i++) {
-    if (residue_ptrs[i]->getPtmPtr() != PtmBase::getEmptyPtmPtr()) {
-      ResiduePtr ori_residue 
-          = ResidueBase::getBaseResiduePtr(residue_ptrs[i]->getAminoAcidPtr());
-      ModPtr mod_ptr = ModBase::getBaseModPtr(ori_residue, residue_ptrs[i]);
-      AlterPtr alter_ptr = std::make_shared<Alter>(i, i + 1, AlterType::INPUT, 
-                                                   mod_ptr->getShift(), mod_ptr);
-      MassShiftPtr shift_ptr = std::make_shared<MassShift>(alter_ptr); 
-      shift_list.push_back(shift_ptr);
-    }
-  }
-
-  // add fixed ptms;
-  for (size_t i = 0; i < residue_ptrs.size(); i++) {
-    for (size_t j = 0; j < fix_mod_list.size(); j++) {
-      if (residue_ptrs[i] == fix_mod_list[j]->getOriResiduePtr()) {
-        residue_ptrs[i] = fix_mod_list[j]->getModResiduePtr();
-        AlterPtr alter_ptr = std::make_shared<Alter>(i, i + 1, AlterType::FIXED, 
-                                                     fix_mod_list[j]->getShift(), 
-                                                     fix_mod_list[j]);
-        MassShiftPtr shift_ptr = std::make_shared<MassShift>(alter_ptr); 
-        shift_list.push_back(shift_ptr);
-        break;
-      }
-    }
-  }
-  ResSeqPtr res_seq_ptr = std::make_shared<ResidueSeq>(residue_ptrs);
-  return std::make_shared<Proteoform>(fasta_seq_ptr, none_prot_mod_ptr, start_pos,
-                                      end_pos, res_seq_ptr, shift_list);
-}
-
-}  // namespace toppiceoform_util
+}  // namespace proteoform_util
 }  // namespace toppic
 

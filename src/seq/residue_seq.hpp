@@ -56,6 +56,8 @@ class ResidueSeq {
 
   static std::string getXmlElementName() {return "residue_seq";}
 
+  void setNModPtr(ModPtr n_mod_ptr);
+
  private:
   // residue list 
   ResiduePtrVec residues_;

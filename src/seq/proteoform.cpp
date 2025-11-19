@@ -82,13 +82,14 @@ void Proteoform::parseXml(XmlDOMElement* element, ProteoformPtr form_ptr) {
   fasta_seq_ptr_ = form_ptr->getFastaSeqPtr();
   residue_seq_ptr_ = form_ptr->getResSeqPtr()->getSubResidueSeq(start_pos_, end_pos_);
 
-  ModPtr mod_ptr = prot_mod_ptr_->getModPtr();
-  if (!ModBase::isNoneModPtr(mod_ptr)) {
+  ModPtr n_term_mod_ptr = prot_mod_ptr_->getModPtr();
+  if (!ModBase::isNTermNoneModPtr(n_term_mod_ptr)) {
+    // check only the amino acid to determine whether the modification can be added
     if (residue_seq_ptr_->getLen() >= 1 
-        && mod_ptr->getOriResiduePtr() == residue_seq_ptr_->getResiduePtr(0)) {
-      ResiduePtrVec residues = residue_seq_ptr_->getResidues();
-      residues[0] = mod_ptr->getModResiduePtr();
-      residue_seq_ptr_ = std::make_shared<ResidueSeq>(residues);
+        && ModBase::isNTermNoneModPtr(residue_seq_ptr_->getNModPtr()) 
+        && n_term_mod_ptr->getOriResiduePtr()->getAminoAcidPtr() 
+        == residue_seq_ptr_->getResiduePtr(0)->getAminoAcidPtr()) {
+      residue_seq_ptr_->setNModPtr(n_term_mod_ptr);
     }
   }
 
@@ -245,7 +246,7 @@ void updateMatchSeq(const MassShiftPtrVec & shifts,
 
     //if it is N-terminimal acetylation
     if (left_pos == 0 && right_pos == 1 
-        && shift->getTypePtr() != AlterType::UNEXPECTED  
+        && shift->getTypePtr() == AlterType::PROTEIN_VARIABLE  
         && shift->getAlterPtr(0)->getModPtr()->getModResiduePtr()->getPtmPtr() 
         == PtmBase::getPtmPtr_Acetylation()) {
       left_strings[left_pos] = "[Acetyl]-" + left_strings[left_pos]; 

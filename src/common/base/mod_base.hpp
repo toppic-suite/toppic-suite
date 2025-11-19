@@ -31,11 +31,17 @@ class ModBase {
 
   static ModPtr getC58ModPtr() {return c58_mod_ptr_;}
 
+  static ModPtr getNTermNoneModPtr() {return n_term_none_mod_ptr_;}
+
   static ModPtr getBaseModPtr(ModPtr mod_ptr);
 
-  static ModPtr getBaseModPtr(ResiduePtr ori_residue, ResiduePtr mod_residue);
+  static ModPtr getBaseModPtr(ResiduePtr ori_residue, 
+                              ResiduePtr mod_residue,
+                              ModTypePtr mod_type);
 
   static bool isNoneModPtr(ModPtr mod_ptr) {return mod_ptr == none_mod_ptr_;}
+
+  static bool isNTermNoneModPtr(ModPtr mod_ptr) {return mod_ptr == n_term_none_mod_ptr_;}
 
   static ModPtr getModPtrFromXml(XmlDOMElement * element);
 
@@ -46,6 +52,9 @@ class ModBase {
   static ModPtr c57_mod_ptr_;
   //C58
   static ModPtr c58_mod_ptr_;
+
+  static ModPtr n_term_none_mod_ptr_; 
+
 };
 
 }

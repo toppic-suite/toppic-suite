@@ -28,13 +28,17 @@ typedef std::shared_ptr<Mod> ModPtr;
 
 class Mod {
  public:
-  Mod(ResiduePtr ori_residue_ptr, ResiduePtr mod_residue_ptr);
+  Mod(ResiduePtr ori_residue_ptr, 
+      ResiduePtr mod_residue_ptr, 
+      ModTypePtr mod_type_ptr);
 
   explicit Mod(XmlDOMElement* element);
 
   ResiduePtr getOriResiduePtr() { return ori_residue_ptr_;}
 
   ResiduePtr getModResiduePtr() { return mod_residue_ptr_;}
+
+  ModTypePtr getModTypePtr() { return mod_type_ptr_;}
 
   bool isSame(ModPtr mod_ptr);
 

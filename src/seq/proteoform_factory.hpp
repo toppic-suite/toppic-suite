@@ -25,12 +25,17 @@ namespace proteoform_factory {
 
 ProteoformPtr geneDbProteoformPtr(FastaSeqPtr seq_ptr, ModPtrVec fix_mod_list);
 
+ProteoformPtr geneDbProteoformPtr(FastaSeqPtr seq_ptr, ModPtrVec fix_mod_list, int start_pos);
+
 // Generate a proteoform with protein N-terminal modification 
 ProteoformPtr geneProtModProteoform(ProteoformPtr db_form_ptr,
                                     ProtModPtr prot_mod_ptr);
 
 ProteoformPtrVec geneProtModProteoform(ProteoformPtr db_form_ptr,
                                        const ProtModPtrVec &prot_mod_ptrs);
+
+ProteoformPtrVec geneProtModProteoform(const ProteoformPtrVec &ori_forms,
+                                       const ProtModPtrVec &prot_mods);
 
 ProteoformPtrVec2D gene2DProtModProteoform(const ProteoformPtrVec &db_form_ptrs,
                                            const ProtModPtrVec &prot_mod_ptrs);
@@ -40,14 +45,6 @@ ProteoformPtrVec2D gene2DProtModProteoform(const ProteoformPtrVec &db_form_ptrs,
 ProteoformPtr geneSubProteoform(ProteoformPtr proteoform_ptr,
                                 FastaSeqPtr fasta_seq_ptr,
                                 int local_start, int local_end);
-
-ProteoformPtr geneProteoform(ProteoformPtr proteoform, int start_pos, int end_pos,
-                             const MassShiftPtrVec & mass_shift_vec,
-                             const ModPtrVec & mod_ptr_vec);
-
-// generate a proteoform vector with protein mod 
-ProteoformPtrVec geneProtModProteoform(const ProteoformPtrVec &ori_forms,
-                                       const ProtModPtrVec &prot_mods);
 
 ProteoformPtrVec readFastaToProteoformPtrVec(const std::string &file_name, 
                                              const ModPtrVec &fix_mod_list);

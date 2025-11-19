@@ -28,6 +28,7 @@ ModPtrVec ModBase::mod_ptr_vec_;
 ModPtr ModBase::none_mod_ptr_;
 ModPtr ModBase::c57_mod_ptr_;
 ModPtr ModBase::c58_mod_ptr_;
+ModPtr ModBase::n_term_none_mod_ptr_;
 
 void ModBase::initBase(const std::string &base_dir) {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
@@ -52,19 +53,28 @@ void ModBase::initBase(const std::string &base_dir) {
     mod_ptr_vec_.push_back(mod_ptr);
     // check empty ptr
     if (mod_ptr->getOriResiduePtr() == ResidueBase::getEmptyResiduePtr()
-        && mod_ptr->getModResiduePtr() ==ResidueBase::getEmptyResiduePtr()) {
+        && mod_ptr->getModResiduePtr() ==ResidueBase::getEmptyResiduePtr()
+        && mod_ptr->getModTypePtr() == ModType::SIDE_CHAIN) {
       none_mod_ptr_ = mod_ptr;
     }
     if (mod_ptr->getModResiduePtr()->getAminoAcidPtr()->getOneLetter() == "C"
-        && mod_ptr->getModResiduePtr()->getPtmPtr() == PtmBase::getPtmPtr_C57()) {
+        && mod_ptr->getModResiduePtr()->getPtmPtr() == PtmBase::getPtmPtr_C57()
+        && mod_ptr->getModTypePtr() == ModType::SIDE_CHAIN) {
       c57_mod_ptr_ = mod_ptr;
     }
     if (mod_ptr->getModResiduePtr()->getAminoAcidPtr()->getOneLetter() == "C"
-        && mod_ptr->getModResiduePtr()->getPtmPtr() == PtmBase::getPtmPtr_C58()) {
+        && mod_ptr->getModResiduePtr()->getPtmPtr() == PtmBase::getPtmPtr_C58()
+        && mod_ptr->getModTypePtr() == ModType::SIDE_CHAIN) {
       c58_mod_ptr_ = mod_ptr;
     }
+    if (mod_ptr->getOriResiduePtr() == ResidueBase::getEmptyResiduePtr()
+        && mod_ptr->getModResiduePtr() == ResidueBase::getEmptyResiduePtr()
+        && mod_ptr->getModTypePtr() == ModType::N_TERM) {
+      n_term_none_mod_ptr_ = mod_ptr;
+    }
   }
-  if (none_mod_ptr_ == nullptr || c57_mod_ptr_ == nullptr || c58_mod_ptr_ == nullptr) {
+  if (none_mod_ptr_ == nullptr || c57_mod_ptr_ == nullptr 
+    || c58_mod_ptr_ == nullptr || n_term_none_mod_ptr_ == nullptr) {
     LOG_ERROR("Modification configuration file is incomplete!");
     exit(EXIT_FAILURE);
   }
@@ -80,8 +90,10 @@ ModPtr ModBase::getBaseModPtr(ModPtr mod_ptr) {
   return mod_ptr;
 }
 
-ModPtr ModBase::getBaseModPtr(ResiduePtr ori_residue, ResiduePtr mod_residue) {
-  ModPtr mod_ptr = std::make_shared<Mod>(ori_residue, mod_residue);
+ModPtr ModBase::getBaseModPtr(ResiduePtr ori_residue, 
+                              ResiduePtr mod_residue, 
+                              ModTypePtr mod_type_ptr) {
+  ModPtr mod_ptr = std::make_shared<Mod>(ori_residue, mod_residue, mod_type_ptr);
   return getBaseModPtr(mod_ptr);
 }
 

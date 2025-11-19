@@ -22,7 +22,7 @@
 #include "seq/alter_type.hpp"
 #include "seq/fasta_reader.hpp"
 #include "seq/residue_seq.hpp"
-#include "seq/proteoform_util.hpp"
+#include "seq/proteoform_factory.hpp"
 
 #include "search/graph/proteo_graph.hpp"
 
@@ -36,8 +36,8 @@ ProteoGraph::ProteoGraph(FastaSubSeqPtr fasta_seq_ptr, ModPtrVec fix_mod_ptr_vec
     is_nme_(is_nme),
     proteo_graph_gap_(proteo_graph_gap),
     var_ptm_in_gap_(var_ptm_in_gap) {
-      db_proteo_ptr_ = proteoform_util::geneDbProteoformPtr(fasta_seq_ptr, fix_mod_ptr_vec,
-                                                            fasta_seq_ptr->getSubSeqStart());
+      db_proteo_ptr_ = proteoform_factory::geneDbProteoformPtr(fasta_seq_ptr, fix_mod_ptr_vec,
+                                                               fasta_seq_ptr->getSubSeqStart());
       graph_ptr_ = graph_ptr;
       node_num_ = num_vertices(*graph_ptr.get());
       LOG_DEBUG("node num " << node_num_);

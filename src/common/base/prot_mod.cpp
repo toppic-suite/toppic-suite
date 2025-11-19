@@ -17,7 +17,7 @@
 #include "common/xml/xml_dom_util.hpp"
 #include "common/base/ptm_base.hpp"
 #include "common/base/trunc_base.hpp"
-#include "common/base/n_term_mod_base.hpp"
+#include "common/base/mod_base.hpp"
 #include "common/base/prot_mod.hpp"
 
 namespace toppic {
@@ -43,7 +43,7 @@ ProtMod::ProtMod(XmlDOMElement* element) {
   std::string mod_element_name = Mod::getXmlElementName();
   XmlDOMElement* mod_element 
       = xml_dom_util::getChildElement(element, mod_element_name.c_str(), 0);
-  mod_ptr_= NTermModBase::getNTermModPtrFromXml(mod_element); 
+  mod_ptr_= ModBase::getModPtrFromXml(mod_element); 
   mod_pos_ = trunc_ptr_->getTruncLen();
   prot_shift_ = trunc_ptr_->getShift() + mod_ptr_->getShift();
   pep_shift_ = mod_ptr_->getShift();

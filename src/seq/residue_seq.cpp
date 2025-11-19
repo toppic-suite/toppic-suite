@@ -15,7 +15,7 @@
 #include <sstream>
 #include <string>
 
-#include "common/base/n_term_mod_base.hpp"
+#include "common/base/mod_base.hpp"
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
 #include "seq/residue_seq.hpp"
@@ -29,7 +29,7 @@ ResidueSeq::ResidueSeq(const ResiduePtrVec &residues):
   for (size_t i = 0; i < residues_.size(); i++) {
     residue_mass_sum_ += residues_[i]->getMass();
   }
-  n_mod_ptr_ = NTermModBase::getNTermNoneModPtr();
+  n_mod_ptr_ = ModBase::getNTermNoneModPtr();
 }
 
 ResidueSeq::ResidueSeq(const ResiduePtrVec &residues, ModPtr n_mod_ptr): 
@@ -56,7 +56,7 @@ ResSeqPtr ResidueSeq::getSubResidueSeq(int bgn, int end) {
   // from bgn to end,the sum of residues shoule be end - bgn + 1
   std::copy(residues_.begin() + bgn, residues_.begin() + end + 1,
             std::back_inserter(sub_residues) );
-  ModPtr n_mod_ptr_ = NTermModBase::getNTermNoneModPtr();
+  ModPtr n_mod_ptr_ = ModBase::getNTermNoneModPtr();
   if (bgn == 0) {
     n_mod_ptr_ = getNModPtr();
   }
@@ -65,7 +65,7 @@ ResSeqPtr ResidueSeq::getSubResidueSeq(int bgn, int end) {
 
 std::string ResidueSeq::toString() {
   std::stringstream s;
-  if (!NTermModBase::isNTermNoneModPtr(n_mod_ptr_)) {
+  if (!ModBase::isNTermNoneModPtr(n_mod_ptr_)) {
     s << "[" << n_mod_ptr_->getModResiduePtr()->getPtmPtr()->getAbbrName() << "]-"; 
   }
   for (size_t i = 0; i < residues_.size(); i++) {
@@ -87,5 +87,14 @@ ResSeqPtr ResidueSeq::getEmptyResidueSeq() {
   ResiduePtrVec residues;
   return std::make_shared<ResidueSeq>(residues);
 }
+
+void ResidueSeq::setNModPtr(ModPtr n_mod_ptr) {
+  n_mod_ptr_ = n_mod_ptr;
+  residue_mass_sum_ = n_mod_ptr_->getShift();
+  for (size_t i = 0; i < residues_.size(); i++) {
+    residue_mass_sum_ += residues_[i]->getMass();
+  }
+}
+
 
 }  // namespace toppic
