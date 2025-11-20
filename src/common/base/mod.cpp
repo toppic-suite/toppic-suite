@@ -58,7 +58,7 @@ double Mod::getReplaceShift() {
 }
 
 double Mod::getShift() {
-  return mod_residue_ptr_->getMass();
+  return mod_residue_ptr_->getPtmPtr()->getMonoMass(); 
 }
 
 void Mod::appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
