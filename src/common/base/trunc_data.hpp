@@ -19,8 +19,12 @@
 
 namespace toppic {
 
-// D and E are included because of noncanonical excision of N-terminal methionine.
-// See Haahr et al, Actin maturation requires the ACTMAP/C19orf54 protease, Science 2022.
+// MetAP specificity for N-terminal methionine excision: ACGPSTV
+// See Xiao et al., Protein N-Terminal Processing: Substrate Specificity of Escherichia coli and Human Methionine Aminopeptidases, 
+// Biochemistry, 49: 5588-5599, 2010.
+//
+// D and E are included due to noncanonical excision of N-terminal methionine.
+// See Haahr et al., Actin maturation requires the ACTMAP/C19orf54 protease, Science 2022.
 std::string trunc_base_data = R"(
 <truncation_list>
 <truncation>
