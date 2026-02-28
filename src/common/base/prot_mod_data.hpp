@@ -20,7 +20,7 @@
 namespace toppic {
 
 // None: Non-NME+Non-NTA: Observed for most amino acids at position 2. 
-// M_ACETYLATION: Non-NME+NTA: Observed for methionine at position 2
+// M_ACETYLATION: Non-NME+NTA: Observed for most amino acids at position 2
 
 // See Li et al., Comprehensive top-down mass spectral repository enables 
 // pan-dataset analysis and top-down spectral prediction, bioRxiv 2025. 
