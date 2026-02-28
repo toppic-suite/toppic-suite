@@ -20,7 +20,8 @@
 namespace toppic {
 
 // MetAP specificity for N-terminal methionine excision: ACGPSTV
-// See Xiao et al., Protein N-Terminal Processing: Substrate Specificity of Escherichia coli and Human Methionine Aminopeptidases, 
+// See Xiao et al., Protein N-Terminal Processing: Substrate Specificity 
+// of Escherichia coli and Human Methionine Aminopeptidases, 
 // Biochemistry, 49: 5588-5599, 2010.
 //
 // D and E are included due to noncanonical excision of N-terminal methionine.
