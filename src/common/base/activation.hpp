@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_COMMON_BASE_ACTIVATION_HPP_
 #define TOPPIC_COMMON_BASE_ACTIVATION_HPP_
 
@@ -39,7 +38,7 @@ class Activation {
 
   IonTypePtr getCIonTypePtr() const {return c_ion_type_ptr_;}
 
-  void appendNameToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
+  void appendNameToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) const;
 
   static std::string getNameFromXml(XmlDOMElement * element);
 
@@ -52,7 +51,6 @@ class Activation {
   // c terminal ion type
   IonTypePtr c_ion_type_ptr_;
 };
-
 
 typedef std::shared_ptr<Activation> ActivationPtr;
 typedef std::vector<ActivationPtr> ActivationPtrVec;

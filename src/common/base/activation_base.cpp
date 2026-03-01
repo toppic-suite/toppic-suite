@@ -62,8 +62,7 @@ ActivationPtr ActivationBase::getActivationPtrByName(const std::string &name) {
 
 ActivationPtr ActivationBase::getActivationPtrFromXml(XmlDOMElement* element) {
   std::string name = Activation::getNameFromXml(element);
-  ActivationPtr activation_ptr = getActivationPtrByName(name);
-  return activation_ptr;
+  return getActivationPtrByName(name);
 }
 
 }  // namespace toppic

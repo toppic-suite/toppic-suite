@@ -22,12 +22,19 @@
 
 namespace toppic {
 
-Activation::Activation(const std::string &name, 
+Activation::Activation(const std::string &name,
                        IonTypePtr n_ion_type_ptr,
                        IonTypePtr c_ion_type_ptr):
     name_(name),
     n_ion_type_ptr_(n_ion_type_ptr),
-    c_ion_type_ptr_(c_ion_type_ptr) {}
+    c_ion_type_ptr_(c_ion_type_ptr) {
+  if (n_ion_type_ptr_ == nullptr) {
+    throw std::runtime_error("Null N-terminal ion type for activation: " + name);
+  }
+  if (c_ion_type_ptr_ == nullptr) {
+    throw std::runtime_error("Null C-terminal ion type for activation: " + name);
+  }
+}
 
 Activation::Activation(XmlDOMElement * element) {
   name_ = xml_dom_util::getChildValue(element, "name", 0);
@@ -44,7 +51,7 @@ Activation::Activation(XmlDOMElement * element) {
 }
 
 void Activation::appendNameToXml(XmlDOMDocument* xml_doc,
-                                 XmlDOMElement* parent) {
+                                 XmlDOMElement* parent) const {
   std::string element_name = Activation::getXmlElementName();
   XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
   xml_doc->addElement(element, "name", name_.c_str());
@@ -52,8 +59,7 @@ void Activation::appendNameToXml(XmlDOMDocument* xml_doc,
 }
 
 std::string Activation::getNameFromXml(XmlDOMElement * element) {
-  std::string name = xml_dom_util::getChildValue(element, "name", 0);
-  return name;
+  return xml_dom_util::getChildValue(element, "name", 0);
 }
 
 }  // namespace toppic
