@@ -42,7 +42,7 @@ PtmPtrVec readPtmTxt(const std::string &file_name) {
 
   std::string line;
   while (std::getline(infile, line)) {
-    if (line[0] == '#') continue;
+    if (line.empty() || line[0] == '#') continue;
     line = str_util::rmComment(line);
     if (line == "") continue;
     try {
@@ -66,6 +66,10 @@ PtmPtrVec readPtmTxt(const std::string &file_name) {
     } catch (char const* e) {
       LOG_ERROR("Errors in the Variable PTM file: " << file_name);
       LOG_ERROR("Errors in the line: " << line);
+      exit(EXIT_FAILURE);
+    } catch (std::string& e) {
+      LOG_ERROR("Errors in the Variable PTM file: " << file_name);
+      LOG_ERROR("Errors in the line: " << e);
       exit(EXIT_FAILURE);
     } catch (DuplicatePtmError& e) {
       LOG_ERROR("Errors in the Variable PTM file: " << file_name);
