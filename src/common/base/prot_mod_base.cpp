@@ -25,6 +25,7 @@
 namespace toppic {
 
 ProtModPtrVec ProtModBase::prot_mod_ptr_vec_;
+std::unordered_map<std::string, ProtModPtr> ProtModBase::prot_mod_name_map_;
 ProtModPtr ProtModBase::prot_mod_ptr_NONE_;
 ProtModPtr ProtModBase::prot_mod_ptr_M_ACETYLATION_;
 ProtModPtr ProtModBase::prot_mod_ptr_NME_;
@@ -50,6 +51,7 @@ void ProtModBase::initBase(const std::string &base_dir) {
     XmlDOMElement* element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
     ProtModPtr prot_mod_ptr = std::make_shared<ProtMod>(element);
     prot_mod_ptr_vec_.push_back(prot_mod_ptr);
+    prot_mod_name_map_[prot_mod_ptr->getName()] = prot_mod_ptr;
     if (prot_mod_ptr->getType() == getType_NONE()) {
       prot_mod_ptr_NONE_ = prot_mod_ptr;
     }
@@ -63,14 +65,12 @@ void ProtModBase::initBase(const std::string &base_dir) {
 }
 
 ProtModPtr ProtModBase::getProtModPtrByName(const std::string &name) {
-  for (size_t i = 0; i < prot_mod_ptr_vec_.size(); i++) {
-    std::string n = prot_mod_ptr_vec_[i]->getName();
-    if (n == name) {
-      return prot_mod_ptr_vec_[i];
-    }
+  auto it = prot_mod_name_map_.find(name);
+  if (it == prot_mod_name_map_.end()) {
+    LOG_ERROR("Protein modification " << name << " cannot be found!");
+    return nullptr;
   }
-  LOG_ERROR("Protein modification " << name << " cannot be found!");
-  return ProtModPtr(nullptr);
+  return it->second;
 }
 
 ProtModPtrVec ProtModBase::getProtModPtrByType(const std::string &type) {

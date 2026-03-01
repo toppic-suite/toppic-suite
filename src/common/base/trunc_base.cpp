@@ -24,6 +24,7 @@
 namespace toppic {
 
 TruncPtrVec TruncBase::trunc_ptr_vec_;
+std::unordered_map<std::string, TruncPtr> TruncBase::trunc_name_map_;
 
 void TruncBase::initBase(const std::string &base_dir) {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
@@ -46,18 +47,17 @@ void TruncBase::initBase(const std::string &base_dir) {
     XmlDOMElement* element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
     TruncPtr trunc_ptr = std::make_shared<Trunc>(element);
     trunc_ptr_vec_.push_back(trunc_ptr);
+    trunc_name_map_[trunc_ptr->getName()] = trunc_ptr;
   }
 }
 
 TruncPtr TruncBase::getTruncPtrByName(const std::string &name) {
-  for (size_t i = 0; i < trunc_ptr_vec_.size(); i++) {
-    std::string n = trunc_ptr_vec_[i]->getName();
-    if (n == name) {
-      return trunc_ptr_vec_[i];
-    }
+  auto it = trunc_name_map_.find(name);
+  if (it == trunc_name_map_.end()) {
+    LOG_WARN("Truncation " << name << " cannot be found!");
+    return nullptr;
   }
-  LOG_WARN("Truncation " << name << " cannot be found!");
-  return TruncPtr(nullptr);
+  return it->second;
 }
 
 TruncPtr TruncBase::getTruncPtrFromXml(XmlDOMElement * element) {

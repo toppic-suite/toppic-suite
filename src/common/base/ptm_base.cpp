@@ -25,6 +25,7 @@
 namespace toppic {
 
 PtmPtrVec PtmBase::ptm_ptr_vec_;
+std::unordered_map<std::string, PtmPtr> PtmBase::ptm_abbr_name_map_;
 
 PtmPtr PtmBase::empty_ptm_ptr_;
 
@@ -53,6 +54,7 @@ void PtmBase::initBase(const std::string &base_dir) {
     XmlDOMElement* element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
     PtmPtr ptm_ptr = std::make_shared<Ptm>(element);
     ptm_ptr_vec_.push_back(ptm_ptr);
+    ptm_abbr_name_map_[ptm_ptr->getAbbrName()] = ptm_ptr;
     // check empty ptr
     if (ptm_ptr->getMonoMass() == 0.0) {
       empty_ptm_ptr_ = ptm_ptr;
@@ -78,23 +80,21 @@ void PtmBase::initBase(const std::string &base_dir) {
 // Returns a PTM based on the abbreviation name. Returns null if the
 // abbreviation name does not exist.
 PtmPtr PtmBase::getPtmPtrByAbbrName(const std::string &abbr_name) {
-  for (size_t i = 0; i < ptm_ptr_vec_.size(); i++) {
-    std::string n = ptm_ptr_vec_[i]->getAbbrName();
-    if (n == abbr_name) {
-      return ptm_ptr_vec_[i];
-    }
+  auto it = ptm_abbr_name_map_.find(abbr_name);
+  if (it == ptm_abbr_name_map_.end()) {
+    LOG_ERROR("PTM " << abbr_name << " cannot be found!")
+    return nullptr;
   }
-  LOG_ERROR("PTM " << abbr_name << " cannot be found!")
-  return PtmPtr(nullptr);
+  return it->second;
 }
 
 PtmPtr PtmBase::getPtmPtr(PtmPtr p) {
-  for (size_t i = 0; i < ptm_ptr_vec_.size(); i++) {
-    if (ptm_ptr_vec_[i]->isSame(p)) {
-      return ptm_ptr_vec_[i];
-    }
+  auto it = ptm_abbr_name_map_.find(p->getAbbrName());
+  if (it != ptm_abbr_name_map_.end()) {
+    return it->second;
   }
   ptm_ptr_vec_.push_back(p);
+  ptm_abbr_name_map_[p->getAbbrName()] = p;
   return p;
 }
 

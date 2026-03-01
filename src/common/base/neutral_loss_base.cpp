@@ -25,6 +25,7 @@
 namespace toppic {
 
 NeutralLossPtrVec NeutralLossBase::neutral_loss_ptr_vec_;
+std::unordered_map<std::string, NeutralLossPtr> NeutralLossBase::neutral_loss_name_map_;
 
 NeutralLossPtr NeutralLossBase::neutral_loss_ptr_NONE_;
 
@@ -49,6 +50,7 @@ void NeutralLossBase::initBase(const std::string &base_dir) {
     XmlDOMElement* element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
     NeutralLossPtr neutral_loss_ptr = std::make_shared<NeutralLoss>(element);
     neutral_loss_ptr_vec_.push_back(neutral_loss_ptr);
+    neutral_loss_name_map_[neutral_loss_ptr->getName()] = neutral_loss_ptr;
     if (neutral_loss_ptr->getName() == getName_NONE()) {
       neutral_loss_ptr_NONE_ = neutral_loss_ptr;
     }
@@ -56,14 +58,12 @@ void NeutralLossBase::initBase(const std::string &base_dir) {
 }
 
 NeutralLossPtr NeutralLossBase::getNeutralLossPtrByName(const std::string &name) {
-  for (size_t i = 0; i < neutral_loss_ptr_vec_.size(); i++) {
-    std::string n = neutral_loss_ptr_vec_[i]->getName();
-    if (n == name) {
-      return neutral_loss_ptr_vec_[i];
-    }
+  auto it = neutral_loss_name_map_.find(name);
+  if (it == neutral_loss_name_map_.end()) {
+    LOG_WARN("Neutral loss " << name << " cannot be found!");
+    return nullptr;
   }
-  LOG_WARN("Neutral loss " << name << " cannot be found!");
-  return NeutralLossPtr(nullptr);
+  return it->second;
 }
 
 } /* namespace toppic */

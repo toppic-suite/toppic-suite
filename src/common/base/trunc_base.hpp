@@ -14,6 +14,8 @@
 #ifndef TOPPIC_COMMON_BASE_TRUNC_BASE_HPP_
 #define TOPPIC_COMMON_BASE_TRUNC_BASE_HPP_
 
+#include <unordered_map>
+
 #include "common/xml/xml_dom_element.hpp"
 
 #include "common/base/trunc.hpp"
@@ -32,6 +34,7 @@ class TruncBase {
 
  private:
   static TruncPtrVec trunc_ptr_vec_;
+  static std::unordered_map<std::string, TruncPtr> trunc_name_map_;
 };
 
 }  // namespace toppic

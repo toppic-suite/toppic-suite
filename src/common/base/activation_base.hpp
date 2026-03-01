@@ -15,6 +15,8 @@
 #ifndef TOPPIC_COMMON_BASE_ACTIVATION_BASE_HPP_
 #define TOPPIC_COMMON_BASE_ACTIVATION_BASE_HPP_
 
+#include <unordered_map>
+
 #include "common/base/activation.hpp"
 
 namespace toppic {
@@ -28,7 +30,7 @@ class ActivationBase {
   static ActivationPtr getActivationPtrFromXml(XmlDOMElement* element);
 
  private:
-  static ActivationPtrVec activation_ptr_vec_;
+  static std::unordered_map<std::string, ActivationPtr> activation_name_map_;
 };
 
 }  // namespace toppic

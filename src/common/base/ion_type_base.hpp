@@ -15,6 +15,8 @@
 #ifndef TOPPIC_COMMON_BASE_ION_TYPE_BASE_HPP_
 #define TOPPIC_COMMON_BASE_ION_TYPE_BASE_HPP_
 
+#include <unordered_map>
+
 #include "common/base/ion_type.hpp"
 
 namespace toppic {
@@ -30,7 +32,7 @@ class IonTypeBase {
   static IonTypePtr getIonTypePtr_B() {return ion_type_ptr_B_;}
 
  private:
-  static IonTypePtrVec ion_type_ptr_vec_;
+  static std::unordered_map<std::string, IonTypePtr> ion_type_name_map_;
   static IonTypePtr ion_type_ptr_B_;
   static IonTypePtr ion_type_ptr_PREC_;
 

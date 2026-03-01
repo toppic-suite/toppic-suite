@@ -15,6 +15,8 @@
 #ifndef TOPPIC_COMMON_BASE_PTM_BASE_HPP_
 #define TOPPIC_COMMON_BASE_PTM_BASE_HPP_
 
+#include <unordered_map>
+
 #include "common/base/ptm.hpp"
 
 namespace toppic {
@@ -49,6 +51,7 @@ class PtmBase {
 
  private:
   static PtmPtrVec ptm_ptr_vec_;
+  static std::unordered_map<std::string, PtmPtr> ptm_abbr_name_map_;
   static PtmPtr empty_ptm_ptr_;
   static PtmPtr acetylation_ptr_;
   static PtmPtr c57_ptr_;

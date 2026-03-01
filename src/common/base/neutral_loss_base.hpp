@@ -15,6 +15,8 @@
 #ifndef TOPPIC_COMMON_BASE_NEUTRAL_LOSS_BASE_HPP_
 #define TOPPIC_COMMON_BASE_NEUTRAL_LOSS_BASE_HPP_
 
+#include <unordered_map>
+
 #include "common/base/neutral_loss.hpp"
 
 namespace toppic {
@@ -37,6 +39,7 @@ class NeutralLossBase {
 
  private:
   static NeutralLossPtrVec neutral_loss_ptr_vec_;
+  static std::unordered_map<std::string, NeutralLossPtr> neutral_loss_name_map_;
 
   static NeutralLossPtr neutral_loss_ptr_NONE_;
 };

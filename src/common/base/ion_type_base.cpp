@@ -24,7 +24,7 @@
 
 namespace toppic {
 
-IonTypePtrVec IonTypeBase::ion_type_ptr_vec_;
+std::unordered_map<std::string, IonTypePtr> IonTypeBase::ion_type_name_map_;
 IonTypePtr IonTypeBase::ion_type_ptr_B_;
 IonTypePtr IonTypeBase::ion_type_ptr_PREC_;
 
@@ -49,7 +49,7 @@ void IonTypeBase::initBase(const std::string &base_dir) {
   for (int i = 0; i < ion_type_num; i++) {
     XmlDOMElement* element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
     IonTypePtr ion_type_ptr = std::make_shared<IonType>(element);
-    ion_type_ptr_vec_.push_back(ion_type_ptr);
+    ion_type_name_map_[ion_type_ptr->getName()] = ion_type_ptr;
     if (ion_type_ptr->getName() == getName_B()) {
       ion_type_ptr_B_ = ion_type_ptr;
     }
@@ -60,14 +60,12 @@ void IonTypeBase::initBase(const std::string &base_dir) {
 }
 
 IonTypePtr IonTypeBase::getIonTypePtrByName(const std::string &name) {
-  for (size_t i = 0; i < ion_type_ptr_vec_.size(); i++) {
-    std::string n = ion_type_ptr_vec_[i]->getName();
-    if (n == name) {
-      return ion_type_ptr_vec_[i];
-    }
+  auto it = ion_type_name_map_.find(name);
+  if (it == ion_type_name_map_.end()) {
+    LOG_WARN("Ion type " << name << " cannot be found!");
+    return nullptr;
   }
-  LOG_WARN("Ion type " << name << " cannot be found!");
-  return IonTypePtr(nullptr);
+  return it->second;
 }
 
 }  // namespace toppic

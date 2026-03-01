@@ -15,6 +15,8 @@
 #ifndef TOPPIC_COMMON_BASE_SUPPORT_PEAK_TYPE_BASE_HPP_
 #define TOPPIC_COMMON_BASE_SUPPORT_PEAK_TYPE_BASE_HPP_
 
+#include <unordered_map>
+
 #include "common/base/support_peak_type.hpp"
 
 namespace toppic {
@@ -37,6 +39,8 @@ class SPTypeBase {
 
  private:
   static SPTypePtrVec sp_type_ptr_vec_;
+  static std::unordered_map<std::string, SPTypePtr> sp_type_name_map_;
+  static std::unordered_map<int, SPTypePtr> sp_type_id_map_;
   static SPTypePtr sp_type_ptr_N_TERM_;
 };
 

@@ -25,6 +25,8 @@
 namespace toppic {
 
 SPTypePtrVec SPTypeBase::sp_type_ptr_vec_;
+std::unordered_map<std::string, SPTypePtr> SPTypeBase::sp_type_name_map_;
+std::unordered_map<int, SPTypePtr> SPTypeBase::sp_type_id_map_;
 
 SPTypePtr SPTypeBase::sp_type_ptr_N_TERM_;
 
@@ -49,6 +51,8 @@ void SPTypeBase::initBase(const std::string &base_dir) {
     XmlDOMElement* element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
     SPTypePtr sp_type_ptr = std::make_shared<SupportPeakType>(element);
     sp_type_ptr_vec_.push_back(sp_type_ptr);
+    sp_type_name_map_[sp_type_ptr->getName()] = sp_type_ptr;
+    sp_type_id_map_[sp_type_ptr->getId()] = sp_type_ptr;
     if (sp_type_ptr->getName() == getName_N_TERM()) {
       sp_type_ptr_N_TERM_ = sp_type_ptr;
     }
@@ -56,25 +60,21 @@ void SPTypeBase::initBase(const std::string &base_dir) {
 }
 
 SPTypePtr SPTypeBase::getSPTypePtrByName(const std::string &name) {
-  for (size_t i = 0; i < sp_type_ptr_vec_.size(); i++) {
-    std::string n = sp_type_ptr_vec_[i]->getName();
-    if (n == name) {
-      return sp_type_ptr_vec_[i];
-    }
+  auto it = sp_type_name_map_.find(name);
+  if (it == sp_type_name_map_.end()) {
+    LOG_WARN("Support peak type " << name << " cannot be found!");
+    return nullptr;
   }
-  LOG_WARN("Support peak type " << name << " cannot be found!");
-  return SPTypePtr(nullptr);
+  return it->second;
 }
 
 SPTypePtr SPTypeBase::getSPTypePtrById(int id) {
-  for (size_t i = 0; i < sp_type_ptr_vec_.size(); i++) {
-    int n = sp_type_ptr_vec_[i]->getId();
-    if (n == id) {
-      return sp_type_ptr_vec_[i];
-    }
+  auto it = sp_type_id_map_.find(id);
+  if (it == sp_type_id_map_.end()) {
+    LOG_WARN("Support peak id " << id << " cannot be found!");
+    return nullptr;
   }
-  LOG_WARN("Support peak id " << id << " cannot be found!");
-  return SPTypePtr(nullptr);
+  return it->second;
 }
 
 }  // namespace toppic

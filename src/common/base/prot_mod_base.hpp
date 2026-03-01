@@ -15,6 +15,8 @@
 #ifndef TOPPIC_COMMON_BASE_PROT_MOD_BASE_HPP_
 #define TOPPIC_COMMON_BASE_PROT_MOD_BASE_HPP_
 
+#include <unordered_map>
+
 #include "common/base/ptm.hpp"
 #include "common/base/trunc.hpp"
 #include "common/base/prot_mod.hpp"
@@ -47,6 +49,7 @@ class ProtModBase {
 
  private:
   static ProtModPtrVec prot_mod_ptr_vec_;
+  static std::unordered_map<std::string, ProtModPtr> prot_mod_name_map_;
 
   static ProtModPtr prot_mod_ptr_NONE_;
 

@@ -24,7 +24,7 @@
 
 namespace toppic {
 
-ActivationPtrVec ActivationBase::activation_ptr_vec_;
+std::unordered_map<std::string, ActivationPtr> ActivationBase::activation_name_map_;
 
 // initialize activation database 
 void ActivationBase::initBase(const std::string &base_dir) {
@@ -47,19 +47,17 @@ void ActivationBase::initBase(const std::string &base_dir) {
     XmlDOMElement* element
         = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
     ActivationPtr ptr = std::make_shared<Activation>(element);
-    activation_ptr_vec_.push_back(ptr);
+    activation_name_map_[ptr->getName()] = ptr;
   }
 }
 
 ActivationPtr ActivationBase::getActivationPtrByName(const std::string &name) {
-  for (size_t i = 0; i < activation_ptr_vec_.size(); i++) {
-    std::string n = activation_ptr_vec_[i]->getName();
-    if (n == name) {
-      return activation_ptr_vec_[i];
-    }
+  auto it = activation_name_map_.find(name);
+  if (it == activation_name_map_.end()) {
+    LOG_WARN("Activation type " << name << " is not found!");
+    return nullptr;
   }
-  LOG_WARN("Activation type " << name << " is not found!");
-  return ActivationPtr(nullptr);
+  return it->second;
 }
 
 ActivationPtr ActivationBase::getActivationPtrFromXml(XmlDOMElement* element) {
