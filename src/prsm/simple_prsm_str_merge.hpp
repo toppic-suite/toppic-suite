@@ -49,6 +49,16 @@ class SimplePrsmStrMerge {
                                 int pref_suff_num,
                                 int inte_num);
 
+  static void mergeOneBlock(std::string& sp_file_name, std::string& input_pref,
+                            std::string& type_str, int block_id,
+                            int output_num);
+
+  static void mergeOneBlock(std::string& sp_file_name, std::string& input_pref,
+                            int block_id, int comp_num, int pref_suff_num,
+                            int inte_num);
+
+  static void renameFiles(std::string &sp_file_name, std::string &input_pref);  
+
  private:
   std::string spec_file_name_;
   std::vector<std::string> input_file_exts_;
