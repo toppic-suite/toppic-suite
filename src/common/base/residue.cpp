@@ -42,13 +42,13 @@ Residue::Residue(XmlDOMElement* element) {
   mass_ = acid_ptr_->getMonoMass() + ptm_ptr_->getMonoMass();
 }
 
-bool Residue::isSame(ResiduePtr residue_ptr) {
+bool Residue::isSame(ResiduePtr residue_ptr) const {
   return acid_ptr_ == residue_ptr->getAminoAcidPtr()
       && ptm_ptr_ == residue_ptr->getPtmPtr();
 }
 
-std::string Residue::toString(const std::string &delim_bgn, 
-                              const std::string &delim_end) {
+std::string Residue::toString(const std::string &delim_bgn,
+                              const std::string &delim_end) const {
   if (PtmBase::isEmptyPtmPtr(ptm_ptr_)) {
     return acid_ptr_->getOneLetter();
   } else {

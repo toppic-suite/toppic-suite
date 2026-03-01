@@ -16,6 +16,8 @@
 #ifndef TOPPIC_COMMON_BASE_BASE_DATA_HPP_
 #define TOPPIC_COMMON_BASE_BASE_DATA_HPP_
 
+#include <string>
+
 namespace toppic {
 
 namespace base_data {

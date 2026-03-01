@@ -12,6 +12,7 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include <stdexcept>
 #include <string>
 #include <algorithm>
 
@@ -35,7 +36,7 @@ void PtmBase::initBase(const std::string &base_dir) {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (!parser) {
     LOG_ERROR("Error in parsing ptm data!");
-    exit(EXIT_FAILURE);
+    throw std::runtime_error("Error in parsing ptm data!");
   }
 
   std::string ptm_base_file_name = base_dir 

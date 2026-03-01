@@ -12,6 +12,7 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include <stdexcept>
 #include <string>
 #include <cmath>
 #include <fstream>
@@ -56,7 +57,7 @@ std::vector<std::vector<std::string>> readModTxtForTsv(const std::string &file_n
   std::ifstream infile(file_name.c_str());
   if (!infile.is_open()) {
     LOG_ERROR("PTM file " << file_name <<  " cannot be opened!");
-    exit(EXIT_FAILURE);
+    throw std::runtime_error("PTM file " + file_name + " cannot be opened!");
   }
   std::string line;
   while (std::getline(infile, line)) {
@@ -91,7 +92,7 @@ std::vector<std::vector<std::string>> readModTxtForTsv(const std::string &file_n
       LOG_ERROR("Errors in the PTM file: " << file_name);
       LOG_ERROR("Please check the line:" << line);
       LOG_ERROR("Error message: " << e);
-      exit(EXIT_FAILURE);
+      throw std::runtime_error("Errors in the PTM file: " + file_name);
     }
   }
   return mod_data;
@@ -103,7 +104,7 @@ ModPtrVec2D readModTxt(const std::string &file_name) {
   std::ifstream infile(file_name.c_str());
   if (!infile.is_open()) {
     LOG_ERROR("Variable PTM file " << file_name <<  " cannot be opened!");
-    exit(EXIT_FAILURE);
+    throw std::runtime_error("Variable PTM file " + file_name + " cannot be opened!");
   }
   std::string line;
   while (std::getline(infile, line)) {
@@ -162,7 +163,7 @@ ModPtrVec2D readModTxt(const std::string &file_name) {
       LOG_ERROR("Errors in the Variable PTM file: " << file_name);
       LOG_ERROR("Please check the line: " << line);
       LOG_ERROR("Error message: " << e);
-      exit(EXIT_FAILURE);
+      throw std::runtime_error("Errors in the Variable PTM file: " + file_name);
     }
   }
   infile.close();
@@ -207,7 +208,7 @@ ModPtrVec geneFixedModList(const std::string &str) {
     }
   } catch (const char* e) {
     LOG_ERROR("[Exception]" << e);
-    exit(EXIT_FAILURE);
+    throw std::runtime_error(std::string("[Exception] ") + e);
   }
 }
 

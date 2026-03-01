@@ -12,6 +12,7 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include <stdexcept>
 #include <string>
 
 #include "common/util/logger.hpp"
@@ -31,7 +32,7 @@ void NeutralLossBase::initBase(const std::string &base_dir) {
   XmlDOMParser * parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (!parser) {
     LOG_ERROR("Error in parsing neutral loss data!");
-    exit(EXIT_FAILURE);
+    throw std::runtime_error("Error in parsing neutral loss data!");
   }
 
   std::string neutral_loss_base_file_name = base_dir 

@@ -12,6 +12,7 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include <stdexcept>
 #include <string>
 
 #include "common/util/logger.hpp"
@@ -30,7 +31,7 @@ void ActivationBase::initBase(const std::string &base_dir) {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (!parser) {
     LOG_ERROR("Error in parsing activation data!");
-    exit(EXIT_FAILURE);
+    throw std::runtime_error("Error in parsing activation data!");
   }
   std::string activation_base_file_name = base_dir 
       + file_util::getFileSeparator() + "activation_base.xml";
@@ -57,7 +58,7 @@ ActivationPtr ActivationBase::getActivationPtrByName(const std::string &name) {
       return activation_ptr_vec_[i];
     }
   }
-  LOG_WARN("Activition type " << name << " is not found!");
+  LOG_WARN("Activation type " << name << " is not found!");
   return ActivationPtr(nullptr);
 }
 

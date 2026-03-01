@@ -29,9 +29,9 @@ class SupportPeakType {
 
   explicit SupportPeakType(XmlDOMElement* element);
 
-  int getId() {return id_;}
+  int getId() const {return id_;}
 
-  std::string getName() {return name_;}
+  const std::string& getName() const {return name_;}
 
   static std::string getXmlElementName() {return "support_peak_type";}
 

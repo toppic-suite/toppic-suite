@@ -12,6 +12,7 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include <stdexcept>
 #include <string>
 
 #include "common/util/logger.hpp"
@@ -34,7 +35,7 @@ void ModBase::initBase(const std::string &base_dir) {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (!parser) {
     LOG_ERROR("Error in parsing modification data!");
-    exit(EXIT_FAILURE);
+    throw std::runtime_error("Error in parsing modification data!");
   }
 
   std::string mod_base_file_name = base_dir 
@@ -76,7 +77,7 @@ void ModBase::initBase(const std::string &base_dir) {
   if (none_mod_ptr_ == nullptr || c57_mod_ptr_ == nullptr 
     || c58_mod_ptr_ == nullptr || n_term_none_mod_ptr_ == nullptr) {
     LOG_ERROR("Modification configuration file is incomplete!");
-    exit(EXIT_FAILURE);
+    throw std::runtime_error("Modification configuration file is incomplete!");
   }
 }
 

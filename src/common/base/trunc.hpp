@@ -29,15 +29,15 @@ class Trunc {
 
   Trunc(XmlDOMElement* element); 
 
-  const std::string& getName() {return name_;}
+  const std::string& getName() const {return name_;}
 
-  int getTruncLen() {return trunc_len_;}
+  int getTruncLen() const {return trunc_len_;}
 
-  const ResiduePtrVec& getTruncResiduePtrVec() {return trunc_residue_ptr_vec_;}
+  const ResiduePtrVec& getTruncResiduePtrVec() const {return trunc_residue_ptr_vec_;}
 
-  const ResiduePtrVec& getAllowFirstRemainResiduePtrs() {return allow_first_remain_residue_ptrs_;}
+  const ResiduePtrVec& getAllowFirstRemainResiduePtrs() const {return allow_first_remain_residue_ptrs_;}
 
-  double getShift() {return shift_;}
+  double getShift() const {return shift_;}
 
   static std::string getNameFromXml(XmlDOMElement * element);
 

@@ -12,6 +12,7 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include <stdexcept>
 #include <string>
 
 #include "common/util/logger.hpp"
@@ -32,7 +33,7 @@ void IonTypeBase::initBase(const std::string &base_dir) {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (!parser) {
     LOG_ERROR("Error in parsing ion type data!");
-    exit(EXIT_FAILURE);
+    throw std::runtime_error("Error in parsing ion type data!");
   }
 
   std::string ion_type_base_file_name = base_dir 

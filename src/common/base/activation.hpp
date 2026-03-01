@@ -29,15 +29,15 @@ class Activation {
 
   explicit Activation(XmlDOMElement* element);
 
-  std::string getName() {return name_;}
+  const std::string& getName() const {return name_;}
 
-  double getN_BYShift() {return n_ion_type_ptr_->getBYShift();}
+  double getN_BYShift() const {return n_ion_type_ptr_->getBYShift();}
 
-  double getC_BYShift() {return c_ion_type_ptr_->getBYShift();}
+  double getC_BYShift() const {return c_ion_type_ptr_->getBYShift();}
 
-  IonTypePtr getNIonTypePtr() {return n_ion_type_ptr_;}
+  IonTypePtr getNIonTypePtr() const {return n_ion_type_ptr_;}
 
-  IonTypePtr getCIonTypePtr() {return c_ion_type_ptr_;}
+  IonTypePtr getCIonTypePtr() const {return c_ion_type_ptr_;}
 
   void appendNameToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 

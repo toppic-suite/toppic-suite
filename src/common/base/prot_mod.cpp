@@ -62,7 +62,7 @@ std::string ProtMod::getNameFromXml(XmlDOMElement * element) {
   return name;
 }
 
-bool ProtMod::isAcetylation() {
+bool ProtMod::isAcetylation() const {
   if (mod_ptr_->getModResiduePtr()->getPtmPtr() 
       == PtmBase::getPtmPtr_Acetylation()) {
     return true;

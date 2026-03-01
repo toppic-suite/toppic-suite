@@ -31,13 +31,13 @@ class IonType {
 
   explicit IonType(XmlDOMElement* element);
 
-  std::string getName() {return name_;}
+  const std::string& getName() const {return name_;}
 
-  bool isNTerm() {return n_term_;}
+  bool isNTerm() const {return n_term_;}
 
-  double getShift() {return shift_;}
+  double getShift() const {return shift_;}
 
-  double getBYShift() {return b_y_shift_;}
+  double getBYShift() const {return b_y_shift_;}
 
   void appendNameToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 

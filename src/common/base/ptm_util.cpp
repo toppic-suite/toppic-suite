@@ -13,6 +13,7 @@
 //limitations under the License.
 
 #include <fstream>
+#include <stdexcept>
 #include <string>
 #include <exception>
 
@@ -35,7 +36,7 @@ PtmPtrVec readPtmTxt(const std::string &file_name) {
   std::ifstream infile(file_name.c_str());
   if (!infile.is_open()) {
     LOG_ERROR("Variable PTM file " << file_name <<  " cannot be opened!");
-    exit(EXIT_FAILURE);
+    throw std::runtime_error("Variable PTM file " + file_name + " cannot be opened!");
   }
 
   PtmPtrVec ptm_vec;
@@ -66,16 +67,15 @@ PtmPtrVec readPtmTxt(const std::string &file_name) {
     } catch (char const* e) {
       LOG_ERROR("Errors in the Variable PTM file: " << file_name);
       LOG_ERROR("Errors in the line: " << line);
-      exit(EXIT_FAILURE);
+      throw std::runtime_error("Errors in the Variable PTM file: " + file_name);
     } catch (std::string& e) {
       LOG_ERROR("Errors in the Variable PTM file: " << file_name);
       LOG_ERROR("Errors in the line: " << e);
-      exit(EXIT_FAILURE);
+      throw std::runtime_error("Errors in the Variable PTM file: " + file_name);
     } catch (DuplicatePtmError& e) {
       LOG_ERROR("Errors in the Variable PTM file: " << file_name);
       LOG_ERROR("Errors in the line: " << line);
-      std::cout << "Mod file cannot have two ptms with the same name. Please review and edit the file." << std::endl;
-      exit(EXIT_FAILURE);
+      throw std::runtime_error("Mod file cannot have two ptms with the same name: " + file_name);
     } 
   }
   infile.close();

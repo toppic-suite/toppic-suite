@@ -29,7 +29,7 @@ Ion::Ion(int charge, int pos, int display_pos,
     ion_type_ptr_(ion_type_ptr),
     neutral_loss_ptr_(neutral_loss_ptr) {}
 
-std::string Ion::getDisplayName() {
+std::string Ion::getDisplayName() const {
   return ion_type_ptr_->getName() + str_util::toString(display_pos_);
 }
 

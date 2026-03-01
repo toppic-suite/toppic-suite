@@ -12,6 +12,7 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include <stdexcept>
 #include <string>
 
 #include "common/util/logger.hpp"
@@ -32,7 +33,7 @@ void ProtModBase::initBase(const std::string &base_dir) {
   toppic::XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (!parser) {
     LOG_ERROR("Error in parsing protein modification data!");
-    exit(EXIT_FAILURE);
+    throw std::runtime_error("Error in parsing protein modification data!");
   }
 
   std::string prot_mod_base_file_name = base_dir 

@@ -32,9 +32,9 @@ class ModType {
 
   ModType(const std::string &name, int id);
 
-  std::string getName() {return name_;}
+  const std::string& getName() const {return name_;}
 
-  int getId() {return id_;}
+  int getId() const {return id_;}
 
   static ModTypePtr getModTypePtrByName(std::string name);
 

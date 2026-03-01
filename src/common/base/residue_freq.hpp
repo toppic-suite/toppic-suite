@@ -23,7 +23,7 @@ class ResidueFreq: public Residue {
  public:
   ResidueFreq(AminoAcidPtr acid_ptr, PtmPtr ptm_ptr, double freq);
 
-  double getFreq() {return freq_;}
+  double getFreq() const {return freq_;}
 
  private:
   double freq_;

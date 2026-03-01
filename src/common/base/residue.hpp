@@ -29,17 +29,17 @@ class Residue {
 
   explicit Residue(XmlDOMElement* element);
   /** Get amino acid. */
-  AminoAcidPtr getAminoAcidPtr() {return acid_ptr_; }
+  AminoAcidPtr getAminoAcidPtr() const {return acid_ptr_; }
   /** Get residue mass. */
-  double getMass() { return mass_; }
+  double getMass() const { return mass_; }
   /** Get post-translational modification. */
-  PtmPtr getPtmPtr() { return ptm_ptr_; }
+  PtmPtr getPtmPtr() const { return ptm_ptr_; }
   /** Checks if the residue contains the same amino acid and ptm.  */
-  bool isSame(ResiduePtr residue_ptr);
+  bool isSame(ResiduePtr residue_ptr) const;
   /** Get string representation */
-  std::string toString(const std::string &delim_bgn, const std::string &delim_end);
+  std::string toString(const std::string &delim_bgn, const std::string &delim_end) const;
 
-  std::string toString() {return toString("[", "]");}
+  std::string toString() const {return toString("[", "]");}
 
   void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent,
                  const std::string &element_name);

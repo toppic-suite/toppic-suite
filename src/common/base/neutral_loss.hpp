@@ -29,9 +29,9 @@ class NeutralLoss {
 
   explicit NeutralLoss(XmlDOMElement* element);
 
-  std::string getName() {return name_;}
+  const std::string& getName() const {return name_;}
 
-  double getMass() {return mass_;}
+  double getMass() const {return mass_;}
 
   static std::string getXmlElementName() {return "neutral_loss";}
 

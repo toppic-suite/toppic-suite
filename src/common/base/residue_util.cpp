@@ -12,6 +12,7 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include <stdexcept>
 #include <string>
 
 #include "common/util/logger.hpp"
@@ -72,7 +73,7 @@ ResiduePtrVec convertStrToResiduePtrVec(const std::string &ori_seq) {
     AminoAcidPtr acid_ptr = AminoAcidBase::getAminoAcidPtrByOneLetter(seq.substr(i, 1));
     if (acid_ptr == nullptr) {
       LOG_ERROR("Sequence " << seq << " contain invalid letters: " << seq.substr(i,1));
-      exit(EXIT_FAILURE);
+      throw std::runtime_error("Sequence contains invalid letters: " + seq.substr(i,1));
     }
     PtmPtr ptm_ptr = PtmBase::getEmptyPtmPtr();
     ResiduePtr residue_ptr = ResidueBase::getBaseResiduePtr(acid_ptr, ptm_ptr);
@@ -104,8 +105,14 @@ ResiduePtrVec convertStrToResiduePtrVec(const StringPairVec &string_pair_vec) {
   for (size_t i = 0; i < string_pair_vec.size(); i++) {
     std::string acid_str = string_pair_vec[i].first;
     AminoAcidPtr acid_ptr = AminoAcidBase::getAminoAcidPtrByOneLetter(acid_str);
+    if (acid_ptr == nullptr) {
+      throw std::runtime_error("Unknown amino acid: " + acid_str);
+    }
     std::string ptm_str = string_pair_vec[i].second;
     PtmPtr ptm_ptr = PtmBase::getPtmPtrByAbbrName(ptm_str);
+    if (ptm_ptr == nullptr) {
+      throw std::runtime_error("Unknown PTM: " + ptm_str);
+    }
     ResiduePtr residue_ptr = ResidueBase::getBaseResiduePtr(acid_ptr, ptm_ptr);
     residue_ptr_vec.push_back(residue_ptr);
   }

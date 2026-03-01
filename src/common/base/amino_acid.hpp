@@ -34,17 +34,17 @@ class AminoAcid {
   explicit AminoAcid(XmlDOMElement* element);
 
   // Get amino acid composition
-  std::string getComposition() {return composition_;}
+  const std::string& getComposition() const {return composition_;}
   // Get average mass
-  double getAvgMass() {return average_mass_;}
+  double getAvgMass() const {return average_mass_;}
   // Get monoisotopic mass
-  double getMonoMass() {return mono_mass_;}
+  double getMonoMass() const {return mono_mass_;}
   // Get amino acid name
-  std::string getName() {return name_;}
+  const std::string& getName() const {return name_;}
   // Get amino acid one letter representation
-  std::string getOneLetter() {return one_letter_;}
+  const std::string& getOneLetter() const {return one_letter_;}
   // Get amino acid three letter representation
-  std::string getThreeLetter() {return three_letter_;}
+  const std::string& getThreeLetter() const {return three_letter_;}
 
   static std::string getXmlElementName() {return "amino_acid";}
 

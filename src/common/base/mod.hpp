@@ -34,17 +34,17 @@ class Mod {
 
   explicit Mod(XmlDOMElement* element);
 
-  ResiduePtr getOriResiduePtr() { return ori_residue_ptr_;}
+  ResiduePtr getOriResiduePtr() const { return ori_residue_ptr_;}
 
-  ResiduePtr getModResiduePtr() { return mod_residue_ptr_;}
+  ResiduePtr getModResiduePtr() const { return mod_residue_ptr_;}
 
-  ModTypePtr getModTypePtr() { return mod_type_ptr_;}
+  ModTypePtr getModTypePtr() const { return mod_type_ptr_;}
 
-  bool isSame(ModPtr mod_ptr);
+  bool isSame(ModPtr mod_ptr) const;
 
-  double getReplaceShift();
+  double getReplaceShift() const;
 
-  double getShift();
+  double getShift() const;
 
   void appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 

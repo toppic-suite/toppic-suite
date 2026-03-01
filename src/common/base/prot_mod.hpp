@@ -29,21 +29,21 @@ class ProtMod {
 
   ProtMod(XmlDOMElement* element); 
 
-  const std::string& getName() { return name_;};
+  const std::string& getName() const { return name_;}
 
-  const std::string& getType() { return type_;};
+  const std::string& getType() const { return type_;}
 
-  TruncPtr getTruncPtr() { return trunc_ptr_;}
+  TruncPtr getTruncPtr() const { return trunc_ptr_;}
 
-  ModPtr getModPtr() { return mod_ptr_;}
+  ModPtr getModPtr() const { return mod_ptr_;}
 
-  int getModPos() {return mod_pos_;}
+  int getModPos() const {return mod_pos_;}
 
-  double getProtShift() { return prot_shift_;}
+  double getProtShift() const { return prot_shift_;}
 
-  double getPepShift() { return pep_shift_;}
+  double getPepShift() const { return pep_shift_;}
 
-  bool isAcetylation();
+  bool isAcetylation() const;
 
   void appendNameToXml(XmlDOMDocument* xml_doc,XmlDOMElement* parent);
 

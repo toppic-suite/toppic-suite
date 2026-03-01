@@ -13,6 +13,7 @@
 //limitations under the License.
 
 
+#include <stdexcept>
 #include <string>
 
 #include "common/util/logger.hpp"
@@ -37,18 +38,21 @@ Mod::Mod(XmlDOMElement* element) {
   XmlDOMElement* mod_residue_element
       = xml_dom_util::getChildElement(element, "mod_residue", 0);
   mod_residue_ptr_ = ResidueBase::getResiduePtrFromXml(mod_residue_element);
-  std::string mod_type_name 
+  std::string mod_type_name
     = xml_dom_util::getChildValue(element, "mod_type", 0);
   mod_type_ptr_ = ModType::getModTypePtrByName(mod_type_name);
+  if (mod_type_ptr_ == nullptr) {
+    throw std::runtime_error("Unknown mod type: " + mod_type_name);
+  }
 }
 
-bool Mod::isSame(ModPtr mod_ptr) {
+bool Mod::isSame(ModPtr mod_ptr) const {
   return ori_residue_ptr_ == mod_ptr->getOriResiduePtr()
       && mod_residue_ptr_ == mod_ptr->getModResiduePtr()
       && mod_type_ptr_ == mod_ptr->mod_type_ptr_;
 }
 
-double Mod::getReplaceShift() {
+double Mod::getReplaceShift() const {
   if (PtmBase::isEmptyPtmPtr(ori_residue_ptr_->getPtmPtr())) {
     return mod_residue_ptr_->getPtmPtr()->getMonoMass();
   }
@@ -57,7 +61,7 @@ double Mod::getReplaceShift() {
   }
 }
 
-double Mod::getShift() {
+double Mod::getShift() const {
   return mod_residue_ptr_->getPtmPtr()->getMonoMass(); 
 }
 

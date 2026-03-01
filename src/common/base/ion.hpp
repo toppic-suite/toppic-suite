@@ -26,15 +26,15 @@ class Ion {
       IonTypePtr ion_type_ptr,
       NeutralLossPtr neutral_loss_ptr);
 
-  int getCharge() {return charge_;}
+  int getCharge() const {return charge_;}
 
-  int getPos() {return pos_;}
+  int getPos() const {return pos_;}
 
-  int getDisplayPos() {return display_pos_;}
+  int getDisplayPos() const {return display_pos_;}
 
-  IonTypePtr getIonTypePtr() {return ion_type_ptr_;}
+  IonTypePtr getIonTypePtr() const {return ion_type_ptr_;}
 
-  std::string getDisplayName();
+  std::string getDisplayName() const;
 
  private:
   int charge_;

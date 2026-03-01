@@ -35,14 +35,14 @@ class Ptm {
 
   explicit Ptm(XmlDOMElement* element);
 
-  const std::string& getName() {return name_;}
+  const std::string& getName() const {return name_;}
 
-  const std::string& getAbbrName() {return abbr_name_;}
+  const std::string& getAbbrName() const {return abbr_name_;}
 
-  // Get  monoisotopic mass. 
-  double getMonoMass() {return mono_mass_;}
+  // Get  monoisotopic mass.
+  double getMonoMass() const {return mono_mass_;}
 
-  int getUnimodId() {return unimod_id_;}
+  int getUnimodId() const {return unimod_id_;}
 
   void appendAbbrNameToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 
@@ -60,7 +60,7 @@ class Ptm {
     return a->getMonoMass() < b->getMonoMass();
   }
 
-  bool isSame(PtmPtr ptm_ptr) {return abbr_name_ == ptm_ptr->getAbbrName();}
+  bool isSame(PtmPtr ptm_ptr) const {return abbr_name_ == ptm_ptr->getAbbrName();}
 
  private:
   /* Full name */

@@ -12,6 +12,7 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include <stdexcept>
 #include <string>
 
 #include "common/xml/xml_dom_document.hpp"
@@ -32,8 +33,14 @@ Activation::Activation(XmlDOMElement * element) {
   name_ = xml_dom_util::getChildValue(element, "name", 0);
   std::string ion_type_name = xml_dom_util::getChildValue(element, "n_ion_type", 0);
   n_ion_type_ptr_ = IonTypeBase::getIonTypePtrByName(ion_type_name);
+  if (n_ion_type_ptr_ == nullptr) {
+    throw std::runtime_error("Unknown N-terminal ion type: " + ion_type_name);
+  }
   ion_type_name = xml_dom_util::getChildValue(element, "c_ion_type", 0);
   c_ion_type_ptr_ = IonTypeBase::getIonTypePtrByName(ion_type_name);
+  if (c_ion_type_ptr_ == nullptr) {
+    throw std::runtime_error("Unknown C-terminal ion type: " + ion_type_name);
+  }
 }
 
 void Activation::appendNameToXml(XmlDOMDocument* xml_doc,

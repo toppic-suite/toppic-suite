@@ -12,6 +12,7 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include <stdexcept>
 #include <string>
 
 #include "xercesc/framework/MemBufInputSource.hpp"
@@ -38,7 +39,7 @@ void AminoAcidBase::initBase(const std::string &base_dir) {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (!parser) {
     LOG_ERROR("Error in parsing amino acid data!");
-    exit(EXIT_FAILURE);
+    throw std::runtime_error("Error in parsing amino acid data!");
   }
   std::string amino_acid_base_file_name = base_dir 
       + file_util::getFileSeparator() + "amino_acid_base.xml";
