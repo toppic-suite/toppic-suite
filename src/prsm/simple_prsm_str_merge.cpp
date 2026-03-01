@@ -15,6 +15,8 @@
 #include <set>
 #include <algorithm>
 
+#include <boost/thread/mutex.hpp>
+
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "prsm/simple_prsm_reader.hpp"
@@ -22,6 +24,11 @@
 #include "prsm/simple_prsm_str_merge.hpp"
 
 namespace toppic {
+
+boost::mutex complete_simple_prsm_str_merge_mutex;
+boost::mutex prefix_simple_prsm_str_merge_mutex;
+boost::mutex suffix_simple_prsm_str_merge_mutex;
+boost::mutex internal_simple_prsm_str_merge_mutex;
 
 SimplePrsmStrMerge::SimplePrsmStrMerge(const std::string &spec_file_name,
                                        const std::vector<std::string> &in_file_exts,
@@ -171,6 +178,82 @@ void SimplePrsmStrMerge::mergeBlockResults(std::string &sp_file_name,
     std::string file_pref = input_pref + "_" + std::to_string(i) + "_";
     file_util::cleanTempFiles(sp_file_name, file_pref);
   }
+}
+
+void SimplePrsmStrMerge::mergeOneBlock(std::string &sp_file_name, 
+                                       std::string &input_pref,
+                                       std::string &type_str,
+                                       int block_id,
+                                       int output_num) {
+  std::string base_name = file_util::basename(sp_file_name);
+  std::string tmp_out_file_ext = input_pref + "_" + type_str + "_combine_tmp"; 
+  std::string tmp_out_file_name = base_name + "." + tmp_out_file_ext;
+  std::string out_file_ext = input_pref + "_" + type_str + "_combine";
+  std::string out_file_name = base_name + "." + out_file_ext;
+  std::string block_file_ext = input_pref + "_" + str_util::toString(block_id) + "_" + type_str;
+  std::string block_file_name = base_name + "." + block_file_ext;
+
+  // combine block file and output file
+  std::vector<std::string> input_file_exts;
+  input_file_exts.push_back(block_file_ext);
+  if (file_util::exists(out_file_name)) {
+    input_file_exts.push_back(out_file_ext);
+  }
+  SimplePrsmStrMerge merge(sp_file_name, 
+                           input_file_exts,  
+                           tmp_out_file_ext, 
+                           output_num);  
+  merge.process();  
+  // rename tmp to output
+  file_util::rename(tmp_out_file_name, out_file_name);
+  file_util::delFile(block_file_name);
+}
+  
+
+void SimplePrsmStrMerge::mergeOneBlock(std::string &sp_file_name, 
+                                       std::string &input_pref,
+                                       int block_id,
+                                       int comp_num, 
+                                       int pref_suff_num,
+                                       int inte_num) {
+
+  std::string complete = ProteoformType::COMPLETE->getName();
+  std::string prefix = ProteoformType::PREFIX->getName();
+  std::string suffix = ProteoformType::SUFFIX->getName();
+  std::string internal = ProteoformType::INTERNAL->getName();
+  {
+    boost::unique_lock<boost::mutex> lock(complete_simple_prsm_str_merge_mutex);
+    mergeOneBlock(sp_file_name, input_pref, complete, block_id, comp_num);
+  }
+  {
+    boost::unique_lock<boost::mutex> lock(prefix_simple_prsm_str_merge_mutex);
+    mergeOneBlock(sp_file_name, input_pref, prefix, block_id, pref_suff_num);
+  }
+  {
+    boost::unique_lock<boost::mutex> lock(suffix_simple_prsm_str_merge_mutex);
+    mergeOneBlock(sp_file_name, input_pref, suffix, block_id, pref_suff_num);
+  }
+  {
+    boost::unique_lock<boost::mutex> lock(internal_simple_prsm_str_merge_mutex);
+    mergeOneBlock(sp_file_name, input_pref, internal, block_id, inte_num);
+  }
+}
+
+void SimplePrsmStrMerge::renameFiles(std::string &sp_file_name, std::string &input_pref) {
+  std::string base_name = file_util::basename(sp_file_name);
+  std::string complete = ProteoformType::COMPLETE->getName();
+  std::string prefix = ProteoformType::PREFIX->getName();
+  std::string suffix = ProteoformType::SUFFIX->getName();
+  std::string internal = ProteoformType::INTERNAL->getName();
+  std::string complete_file = base_name + "." + input_pref + "_" + complete;
+  std::string prefix_file = base_name + "." + input_pref + "_" + prefix;
+  std::string suffix_file = base_name + "." + input_pref + "_" + suffix;
+  std::string internal_file = base_name + "." + input_pref + "_" + internal;
+
+  file_util::rename(complete_file + "_combine", complete_file);
+  file_util::rename(prefix_file + "_combine", prefix_file);
+  file_util::rename(suffix_file + "_combine", suffix_file);
+  file_util::rename(internal_file + "_combine", internal_file); 
 }
 
 } /* namespace toppic */
