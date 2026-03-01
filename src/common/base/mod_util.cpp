@@ -67,31 +67,19 @@ std::vector<std::vector<std::string>> readModTxtForTsv(const std::string &file_n
     if (line == "") continue;
     try {
       std::vector<std::string> l = str_util::split(line, ",");
-      if (l.size() != 5) throw "The number of commas is not 4.";
-      
-      std::string mod_name;
-      std::string mass;
-      
-      try {
-        mod_name = l[0];
+      if (l.size() != 5) {
+        throw std::runtime_error("The number of commas is not 4.");
       }
-      catch(std::invalid_argument& e){
-        throw "Error in PTM name.";
-      }
-      try {
-        mass = l[1];
-      }
-      catch(std::invalid_argument& e){
-        throw "Error in PTM mass.";
-      }
+      std::string mod_name = l[0];
+      std::string mass = l[1];
       // amino acid
       if (l[2] == "*") l[2] = "ARNDCEQGHILKMFPSTWYV";
       std::vector<std::string> single_mod{mod_name, mass, l[2]};
       mod_data.push_back(single_mod);
-    } catch (char const* e) {
+    } catch (std::exception& e) {
       LOG_ERROR("Errors in the PTM file: " << file_name);
       LOG_ERROR("Please check the line:" << line);
-      LOG_ERROR("Error message: " << e);
+      LOG_ERROR("Error message: " << e.what());
       throw std::runtime_error("Errors in the PTM file: " + file_name);
     }
   }
@@ -114,9 +102,12 @@ ModPtrVec2D readModTxt(const std::string &file_name) {
     if (line == "") continue;
     try {
       std::vector<std::string> l = str_util::split(line, ",");
-      if (l.size() != 5) throw "The number of commas is not 4.";
-
-      if (l[2] == "*" && l[3] == "any") throw "* and any cannot be used for the same modification.";
+      if (l.size() != 5) {
+        throw std::runtime_error("The number of commas is not 4.");
+      }
+      if (l[2] == "*" && l[3] == "any") {
+        throw std::runtime_error("* and any cannot be used for the same modification.");
+      }
       if (l[2] == "*") l[2] = "ARNDCEQGHILKMFPSTWYV";
 
       double mass;
@@ -125,13 +116,13 @@ ModPtrVec2D readModTxt(const std::string &file_name) {
         mass = std::stod(l[1]);
       }
       catch(std::invalid_argument& e){
-        throw "Error in PTM mass.";
+        throw std::runtime_error("Error in PTM mass.");
       }
       try {
         unimod_id = std::stoi(l[4]);
       }
       catch(std::invalid_argument& e){
-        throw "Error in UniModId";
+        throw std::runtime_error("Error in UniModId.");
       }
       PtmPtr p = std::make_shared<Ptm>(l[0], l[0], mass, unimod_id);
       p = PtmBase::getPtmPtr(p);
@@ -139,13 +130,15 @@ ModPtrVec2D readModTxt(const std::string &file_name) {
       for (size_t i = 0; i < l[2].length(); i++) {
         std::string aa = l[2].substr(i, 1);
         AminoAcidPtr a = AminoAcidBase::getAminoAcidPtrByOneLetter(aa);
-        if (a == nullptr) throw "Error in the list of residues.";
-        ResiduePtr ori_residue_ptr 
+        if (a == nullptr) {
+          throw std::runtime_error("Error in the list of residues.");
+        }
+        ResiduePtr ori_residue_ptr
             = ResidueBase::getBaseResiduePtr(
                 std::make_shared<Residue>(a, PtmBase::getEmptyPtmPtr()));
-        ResiduePtr mod_residue_ptr 
+        ResiduePtr mod_residue_ptr
             = ResidueBase::getBaseResiduePtr(std::make_shared<Residue>(a, p));
-        ModPtr m 
+        ModPtr m
             = ModBase::getBaseModPtr(std::make_shared<Mod>(ori_residue_ptr, mod_residue_ptr, ModType::SIDE_CHAIN));
         if (l[3] == "N-term") {
           mod_ptr_vec2d[0].push_back(m);
@@ -156,13 +149,13 @@ ModPtrVec2D readModTxt(const std::string &file_name) {
           mod_ptr_vec2d[1].push_back(m);
           mod_ptr_vec2d[2].push_back(m);
         } else {
-          throw "Error in Position.";
+          throw std::runtime_error("Error in Position.");
         }
       }
-    } catch (char const* e) {
+    } catch (std::exception& e) {
       LOG_ERROR("Errors in the Variable PTM file: " << file_name);
       LOG_ERROR("Please check the line: " << line);
-      LOG_ERROR("Error message: " << e);
+      LOG_ERROR("Error message: " << e.what());
       throw std::runtime_error("Errors in the Variable PTM file: " + file_name);
     }
   }
@@ -206,9 +199,9 @@ ModPtrVec geneFixedModList(const std::string &str) {
     } else {
       return readModTxt(str)[2];
     }
-  } catch (const char* e) {
-    LOG_ERROR("[Exception]" << e);
-    throw std::runtime_error(std::string("[Exception] ") + e);
+  } catch (std::exception& e) {
+    LOG_ERROR("[Exception] " << e.what());
+    throw;
   }
 }
 

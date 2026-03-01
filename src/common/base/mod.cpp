@@ -49,7 +49,7 @@ Mod::Mod(XmlDOMElement* element) {
 bool Mod::isSame(ModPtr mod_ptr) const {
   return ori_residue_ptr_ == mod_ptr->getOriResiduePtr()
       && mod_residue_ptr_ == mod_ptr->getModResiduePtr()
-      && mod_type_ptr_ == mod_ptr->mod_type_ptr_;
+      && mod_type_ptr_ == mod_ptr->getModTypePtr();
 }
 
 double Mod::getReplaceShift() const {

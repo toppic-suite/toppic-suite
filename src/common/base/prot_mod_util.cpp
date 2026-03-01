@@ -33,13 +33,13 @@ bool allowMod(ProtModPtr prot_mod_ptr, const ResiduePtrVec &residues) {
   // Case 2. N-terminal methionine acetylation
   if (prot_mod_ptr == ProtModBase::getProtModPtr_M_ACETYLATION()) {
     int mod_pos = prot_mod_ptr->getModPos();
-    if (mod_pos >= static_cast<int>(residues.size())) {
+    if (mod_pos < 0 || mod_pos >= static_cast<int>(residues.size())) {
       // LOG_DEBUG("pos false");
       return false;
     }
     ModPtr mod_ptr = prot_mod_ptr->getModPtr();
     // check if the first residue is M
-    if (residues[mod_pos]->getAminoAcidPtr() 
+    if (residues[mod_pos]->getAminoAcidPtr()
         != mod_ptr->getOriResiduePtr()->getAminoAcidPtr()) {
       // LOG_DEBUG("mod false");
       return false;
@@ -58,7 +58,7 @@ bool allowMod(ProtModPtr prot_mod_ptr, const ResiduePtrVec &residues) {
   if (mod_ptr != ModBase::getNTermNoneModPtr()) {
     // if NME_acetylation
     int mod_pos = prot_mod_ptr->getModPos();
-    if (mod_pos >= static_cast<int>(residues.size())) {
+    if (mod_pos < 0 || mod_pos >= static_cast<int>(residues.size())) {
       return false;
     }
     // check amino acid match only
