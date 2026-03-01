@@ -82,7 +82,7 @@ void PtmBase::initBase(const std::string &base_dir) {
 PtmPtr PtmBase::getPtmPtrByAbbrName(const std::string &abbr_name) {
   auto it = ptm_abbr_name_map_.find(abbr_name);
   if (it == ptm_abbr_name_map_.end()) {
-    LOG_ERROR("PTM " << abbr_name << " cannot be found!")
+    LOG_ERROR("PTM " << abbr_name << " cannot be found!");
     return nullptr;
   }
   return it->second;
