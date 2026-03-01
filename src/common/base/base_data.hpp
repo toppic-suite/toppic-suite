@@ -16,6 +16,7 @@
 #ifndef TOPPIC_COMMON_BASE_BASE_DATA_HPP_
 #define TOPPIC_COMMON_BASE_BASE_DATA_HPP_
 
+#include <mutex>
 #include <string>
 
 namespace toppic {
@@ -24,9 +25,7 @@ namespace base_data {
 
 void init(const std::string &resource_dir);
 
-void release(); 
-
-extern bool base_data_init_;
+void release();
 
 }  // namespace base_data
 

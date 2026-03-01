@@ -12,6 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include <mutex>
+
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "common/xml/xml_dom_parser.hpp"
@@ -32,15 +34,9 @@ namespace toppic {
 
 namespace base_data {
 
-bool base_data_init_ = false;
+static std::once_flag init_flag_;
 
-void init(const std::string &resource_dir) {
-  // base data only need to be init once
-  if (base_data_init_) { 
-    return; 
-  }
-  std::string base_dir = resource_dir + file_util::getFileSeparator() + "base_data";
-
+static void initAll(const std::string &base_dir) {
   AminoAcidBase::initBase(base_dir);
   LOG_DEBUG("acid initialized ");
 
@@ -70,8 +66,11 @@ void init(const std::string &resource_dir) {
 
   SPTypeBase::initBase(base_dir);
   LOG_DEBUG("support peak type initialized ");
+}
 
-  base_data_init_ = true;
+void init(const std::string &resource_dir) {
+  std::string base_dir = resource_dir + file_util::getFileSeparator() + "base_data";
+  std::call_once(init_flag_, initAll, base_dir);
 }
 
 void release() {
