@@ -16,7 +16,6 @@
 #ifndef TOPPIC_COMMON_BASE_BASE_DATA_HPP_
 #define TOPPIC_COMMON_BASE_BASE_DATA_HPP_
 
-#include <mutex>
 #include <string>
 
 namespace toppic {

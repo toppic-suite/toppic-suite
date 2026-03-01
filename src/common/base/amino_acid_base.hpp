@@ -29,7 +29,7 @@ class AminoAcidBase {
 
   static AminoAcidPtr getEmptyAminoAcidPtr() {return empty_amino_acid_ptr_;}
 
-  // Returns an amino acid based on the the name. Returns null if the amino
+  // Returns an amino acid based on the name. Returns null if the amino
   // acid name does not exist.
   static AminoAcidPtr getAminoAcidPtrByName(const std::string &name);
 

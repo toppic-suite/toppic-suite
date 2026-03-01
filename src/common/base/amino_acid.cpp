@@ -39,8 +39,7 @@ AminoAcid::AminoAcid(XmlDOMElement* element) {
   average_mass_ = xml_dom_util::getDoubleChildValue(element, "average_mass", 0);
 }
 
-
-void AminoAcid::appendNameToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
+void AminoAcid::appendNameToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) const {
   std::string element_name = AminoAcid::getXmlElementName();
   XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
   xml_doc->addElement(element, "name", name_.c_str());
@@ -48,9 +47,7 @@ void AminoAcid::appendNameToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) 
 }
 
 std::string AminoAcid::getNameFromXml(XmlDOMElement * element) {
-  std::string name = xml_dom_util::getChildValue(element, "name", 0);
-  return name;
+  return xml_dom_util::getChildValue(element, "name", 0);
 }
-
 
 }  // namespace toppic

@@ -15,8 +15,6 @@
 #include <stdexcept>
 #include <string>
 
-#include "xercesc/framework/MemBufInputSource.hpp"
-
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "common/xml/xml_dom_document.hpp"
@@ -48,7 +46,7 @@ void AminoAcidBase::initBase(const std::string &base_dir) {
   xercesc::MemBufInputSource mem_str((const XMLByte*)amino_acid_base_data.c_str(), 
                                      amino_acid_base_data.length(), 
                                      "amino_acid_data");
-  XmlDOMDocument doc(parser,mem_str);
+  XmlDOMDocument doc(parser, mem_str);
   XmlDOMElement* parent = doc.getDocumentElement();
   std::string element_name = AminoAcid::getXmlElementName();
   int acid_num = xml_dom_util::getChildCount(parent, element_name.c_str());
@@ -64,12 +62,15 @@ void AminoAcidBase::initBase(const std::string &base_dir) {
     amino_acid_name_map_[ptr->getName()]                = ptr;
 
     // check if it is an empty acid
-    if (ptr->getMonoMass() == 0.0) {
+    if (ptr->getName() == "None") {
       empty_amino_acid_ptr_ = ptr;
     }
   }
+  if (empty_amino_acid_ptr_ == nullptr) {
+    LOG_ERROR("Empty amino acid cannot be found in amino acid base data!");
+    throw std::runtime_error("Empty amino acid cannot be found in amino acid base data!");
+  }
 }
-
 
 AminoAcidPtr AminoAcidBase::getAminoAcidPtrByName(const std::string &name) {
   auto it = amino_acid_name_map_.find(name);
@@ -100,21 +101,20 @@ AminoAcidBase::getAminoAcidPtrByThreeLetter(const std::string &three_letter) {
 }
 
 bool AminoAcidBase::containsName(const std::string &name) {
-  return getAminoAcidPtrByName(name).get() != nullptr;
+  return getAminoAcidPtrByName(name) != nullptr;
 }
 
 bool AminoAcidBase::containsOneLetter(const std::string &one_letter) {
-  return getAminoAcidPtrByOneLetter(one_letter).get() != nullptr;
+  return getAminoAcidPtrByOneLetter(one_letter) != nullptr;
 }
 
 bool AminoAcidBase::containsThreeLetter(const std::string &three_letter) {
-  return getAminoAcidPtrByThreeLetter(three_letter).get() != nullptr;
+  return getAminoAcidPtrByThreeLetter(three_letter) != nullptr;
 }
 
 AminoAcidPtr AminoAcidBase::getAminoAcidPtrFromXml(XmlDOMElement * element) {
   std::string name = AminoAcid::getNameFromXml(element);
-  AminoAcidPtr acid_ptr = getAminoAcidPtrByName(name);
-  return acid_ptr;
+  return getAminoAcidPtrByName(name);
 }
 
 }  // namespace toppic

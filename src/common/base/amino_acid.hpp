@@ -48,7 +48,7 @@ class AminoAcid {
 
   static std::string getXmlElementName() {return "amino_acid";}
 
-  void appendNameToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
+  void appendNameToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) const;
 
   static std::string getNameFromXml(XmlDOMElement * element);
 
