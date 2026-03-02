@@ -27,10 +27,10 @@ namespace toppic {
 Residue::Residue(AminoAcidPtr acid_ptr, PtmPtr ptm_ptr):
     acid_ptr_(acid_ptr),
     ptm_ptr_(ptm_ptr) {
-      mass_ = acid_ptr_->getMonoMass() + ptm_ptr_->getMonoMass();
-    }
+  mass_ = acid_ptr_->getMonoMass() + ptm_ptr_->getMonoMass();
+}
 
-Residue::Residue(XmlDOMElement* element) { 
+Residue::Residue(XmlDOMElement* element) {
   std::string acid_element_name = AminoAcid::getXmlElementName();
   XmlDOMElement* acid_element 
       = xml_dom_util::getChildElement(element, acid_element_name.c_str(), 0);
@@ -58,15 +58,14 @@ std::string Residue::toString(const std::string &delim_bgn,
 }
 
 void Residue::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent,
-                        const std::string & element_name) {
+                        const std::string & element_name) const {
   XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
-  std::string str = str_util::toString(mass_);
   acid_ptr_->appendNameToXml(xml_doc, element);
   ptm_ptr_->appendAbbrNameToXml(xml_doc, element);
   parent->appendChild(element);
 }
 
-void Residue::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
+void Residue::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) const {
   std::string element_name = Residue::getXmlElementName();
   appendXml(xml_doc, parent, element_name);
 }

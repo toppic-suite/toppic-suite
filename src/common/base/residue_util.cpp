@@ -61,7 +61,7 @@ std::string rmUnknownResidues(const std::string &ori_seq) {
       continue;
     }
     char r = replaceResidueLetter(c);
-    seq = seq + r;
+    seq += r;
   }
   return seq;
 }

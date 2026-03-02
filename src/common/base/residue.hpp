@@ -42,9 +42,9 @@ class Residue {
   std::string toString() const {return toString("[", "]");}
 
   void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent,
-                 const std::string &element_name);
+                 const std::string &element_name) const;
 
-  void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
+  void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) const;
 
   static std::string getXmlElementName() {return "residue";}
 

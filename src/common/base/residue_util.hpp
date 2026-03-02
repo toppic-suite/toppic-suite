@@ -49,4 +49,5 @@ double compResiduePtrVecMass(const std::string & seq,
 }  // namespace residue_util
 
 }  // namespace toppic
+
 #endif
