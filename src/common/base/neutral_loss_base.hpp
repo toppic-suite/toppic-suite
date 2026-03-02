@@ -25,7 +25,7 @@ class NeutralLossBase {
  public:
   static void initBase(const std::string &base_dir);
 
-  static NeutralLossPtrVec getBaseNeutralLossPtrVec() {
+  static const NeutralLossPtrVec& getBaseNeutralLossPtrVec() {
     return neutral_loss_ptr_vec_;
   }
 
@@ -46,4 +46,4 @@ class NeutralLossBase {
 
 }  // namespace toppic
 
-#endif /* NEUTRALLOSS_HPP_ */
+#endif

@@ -47,4 +47,4 @@ typedef std::vector<NeutralLossPtr> NeutralLossPtrVec;
 
 }  // namespace toppic
 
-#endif /* NEUTRALLOSS_HPP_ */
+#endif

@@ -42,7 +42,7 @@ void NeutralLossBase::initBase(const std::string &base_dir) {
   xercesc::MemBufInputSource mem_str((const XMLByte*)neutral_loss_base_data.c_str(), 
                                      neutral_loss_base_data.length(), 
                                      "neutral_loss_data");
-  XmlDOMDocument doc(parser, mem_str); 
+  XmlDOMDocument doc(parser, mem_str);
   XmlDOMElement* parent = doc.getDocumentElement();
   std::string element_name = NeutralLoss::getXmlElementName();
   int neutral_loss_num = xml_dom_util::getChildCount(parent, element_name.c_str());
@@ -66,4 +66,4 @@ NeutralLossPtr NeutralLossBase::getNeutralLossPtrByName(const std::string &name)
   return it->second;
 }
 
-} /* namespace toppic */
+}  // namespace toppic
