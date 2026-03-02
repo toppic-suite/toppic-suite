@@ -39,11 +39,13 @@ class IonType {
 
   double getBYShift() const {return b_y_shift_;}
 
-  void appendNameToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
+  void appendNameToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) const;
 
   static std::string getXmlElementName() {return "ion_type";}
 
  private:
+  void computeBYShift();
+
   // ion name
   std::string name_;
   // A B C are n-terminal ions and X Y Z are non-n-terminal ions

@@ -14,7 +14,6 @@
 
 #include <string>
 
-#include "common/util/str_util.hpp"
 #include "common/xml/xml_dom_document.hpp"
 #include "common/xml/xml_dom_util.hpp"
 #include "common/base/mass_constant.hpp"
@@ -26,17 +25,17 @@ IonType::IonType(const std::string &name, bool n_term, double shift):
     name_(name),
     n_term_(n_term),
     shift_(shift) {
-      if (n_term_) {
-        b_y_shift_ = shift_;
-      } else {
-        b_y_shift_ = shift_ - mass_constant::getYIonShift();
-      }
-    }
+  computeBYShift();
+}
 
 IonType::IonType(XmlDOMElement* element) {
   name_ = xml_dom_util::getChildValue(element, "name", 0);
   n_term_ = xml_dom_util::getBoolChildValue(element, "n_term", 0);
   shift_ = xml_dom_util::getDoubleChildValue(element, "shift", 0);
+  computeBYShift();
+}
+
+void IonType::computeBYShift() {
   if (n_term_) {
     b_y_shift_ = shift_;
   } else {
@@ -44,7 +43,7 @@ IonType::IonType(XmlDOMElement* element) {
   }
 }
 
-void IonType::appendNameToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
+void IonType::appendNameToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) const {
   XmlDOMElement* element = xml_doc->createElement("ion_type");
   xml_doc->addElement(element, "name", name_.c_str());
   parent->appendChild(element);
