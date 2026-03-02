@@ -27,7 +27,7 @@ class Trunc {
         const std::string &trunc_residues,
         const std::string &allow_first_remain_residues_);
 
-  Trunc(XmlDOMElement* element); 
+  explicit Trunc(XmlDOMElement* element);
 
   const std::string& getName() const {return name_;}
 
@@ -54,6 +54,6 @@ class Trunc {
 typedef std::shared_ptr<Trunc> TruncPtr;
 typedef std::vector<TruncPtr> TruncPtrVec;
 
-}
+}  // namespace toppic
 
 #endif

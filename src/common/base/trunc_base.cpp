@@ -62,8 +62,7 @@ TruncPtr TruncBase::getTruncPtrByName(const std::string &name) {
 
 TruncPtr TruncBase::getTruncPtrFromXml(XmlDOMElement * element) {
   std::string name = Trunc::getNameFromXml(element);
-  TruncPtr trunc_ptr = getTruncPtrByName(name);
-  return trunc_ptr;
+  return getTruncPtrByName(name);
 }
 
 }  // namespace toppic

@@ -22,14 +22,14 @@ namespace trunc_util {
 bool isValidTrunc(TruncPtr trunc_ptr, const ResiduePtrVec & res_ptr_vec) {
   // check if trunc acids match N-terminal acids of the protein 
   int trunc_len = trunc_ptr->getTruncLen();
-  if (trunc_len >= (int)res_ptr_vec.size()) {
+  if (trunc_len >= static_cast<int>(res_ptr_vec.size())) {
     return false;
   }
 
   ResiduePtrVec trunc_residue_ptr_vec = trunc_ptr->getTruncResiduePtrVec();
-  for(int i = 0; i < trunc_ptr->getTruncLen(); i++){
+  for (int i = 0; i < trunc_ptr->getTruncLen(); i++) {
     // check amino acid match only
-    if (trunc_residue_ptr_vec[i]->getAminoAcidPtr() != res_ptr_vec[i]->getAminoAcidPtr()){
+    if (trunc_residue_ptr_vec[i]->getAminoAcidPtr() != res_ptr_vec[i]->getAminoAcidPtr()) {
       return false;
     }
   }
@@ -45,6 +45,6 @@ bool isValidTrunc(TruncPtr trunc_ptr, const ResiduePtrVec & res_ptr_vec) {
   return false;
 }
 
-} // namespace trunc_util
+}  // namespace trunc_util
 
 }  // namespace toppic

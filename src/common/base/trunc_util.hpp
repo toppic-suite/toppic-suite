@@ -27,4 +27,5 @@ bool isValidTrunc(TruncPtr trunc_ptr, const ResiduePtrVec & res_ptr_vec);
 }  // namespace trunc_util
 
 }  // namespace toppic
+
 #endif

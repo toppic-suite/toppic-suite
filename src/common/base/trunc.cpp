@@ -29,11 +29,11 @@ Trunc::Trunc(const std::string &name, int trunc_len,
   shift_ = -residue_util::compResiduePtrVecMass(trunc_residue_ptr_vec_);
 }
 
-Trunc::Trunc(XmlDOMElement* element) { 
+Trunc::Trunc(XmlDOMElement* element) {
   name_ = xml_dom_util::getChildValue(element, "name", 0);
   trunc_len_ = xml_dom_util::getIntChildValue(element, "trunc_len", 0);
   std::string trunc_residues = xml_dom_util::getChildValue(element, "trunc_residues", 0);
-  LOG_DEBUG( "name " << name_ << " str " << trunc_residues << " trunc len " << trunc_len_);
+  LOG_DEBUG("name " << name_ << " str " << trunc_residues << " trunc len " << trunc_len_);
   trunc_residue_ptr_vec_ = residue_util::convertStrToResiduePtrVec(trunc_residues);
   std::string allow_first_remain_residues 
       = xml_dom_util::getChildValue(element, "allow_first_remain_residues", 0);
@@ -43,8 +43,7 @@ Trunc::Trunc(XmlDOMElement* element) {
 }
 
 std::string Trunc::getNameFromXml(XmlDOMElement * element) {
-  std::string name = xml_dom_util::getChildValue(element, "name", 0);
-  return name;
+  return xml_dom_util::getChildValue(element, "name", 0);
 }
 
-}
+}  // namespace toppic
