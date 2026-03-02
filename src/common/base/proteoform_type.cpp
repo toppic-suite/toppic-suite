@@ -24,11 +24,11 @@ ProteoformTypePtr ProteoformType::SUFFIX = std::make_shared<ProteoformType>("SUF
 
 ProteoformTypePtr ProteoformType::INTERNAL = std::make_shared<ProteoformType>("INTERNAL", 3);
 
-ProteoformType::ProteoformType(const std::string &name, int id): 
-    name_(name), 
+ProteoformType::ProteoformType(const std::string &name, int id):
+    name_(name),
     id_(id) {}
 
-ProteoformTypePtr ProteoformType::getProtTypePtrByName(std::string name) {
+ProteoformTypePtr ProteoformType::getProtTypePtrByName(const std::string &name) {
   if (name == "COMPLETE") {
     return ProteoformType::COMPLETE;
   }

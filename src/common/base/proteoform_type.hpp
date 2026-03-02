@@ -37,7 +37,7 @@ class ProteoformType {
 
   int getId() const {return id_;}
 
-  static ProteoformTypePtr getProtTypePtrByName(std::string name);
+  static ProteoformTypePtr getProtTypePtrByName(const std::string &name);
 
  private:
   std::string name_;
