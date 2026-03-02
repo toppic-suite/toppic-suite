@@ -72,7 +72,8 @@ void PtmBase::initBase(const std::string &base_dir) {
   }
   if (empty_ptm_ptr_ == nullptr || acetylation_ptr_ == nullptr
       || c57_ptr_ == nullptr || c58_ptr_ == nullptr) {
-    LOG_WARN("There are some PTMs missing in initialization!");
+    LOG_ERROR("There are some PTMs missing in initialization!");
+    throw std::runtime_error("There are some PTMs missing in initialization!");
   }
   std::sort(ptm_ptr_vec_.begin(), ptm_ptr_vec_.end(), Ptm::cmpMassInc);
 }
@@ -98,15 +99,14 @@ PtmPtr PtmBase::getPtmPtr(PtmPtr p) {
   return p;
 }
 
-// Checks if the list contains an amino acid with the specific name.
+// Checks if the list contains a PTM with the specific name.
 bool PtmBase::containsAbbrName(const std::string &abbr_name) {
-  return getPtmPtrByAbbrName(abbr_name).get() != nullptr;
+  return getPtmPtrByAbbrName(abbr_name) != nullptr;
 }
 
 PtmPtr PtmBase::getPtmPtrFromXml(XmlDOMElement * element) {
   std::string abbr_name = Ptm::getAbbrNameFromXml(element);
-  PtmPtr ptm_ptr = getPtmPtrByAbbrName(abbr_name);
-  return ptm_ptr;
+  return getPtmPtrByAbbrName(abbr_name);
 }
 
 }  // namespace toppic

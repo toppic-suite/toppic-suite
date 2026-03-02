@@ -15,7 +15,6 @@
 #include <fstream>
 #include <stdexcept>
 #include <string>
-#include <exception>
 
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
@@ -26,10 +25,8 @@ namespace toppic {
 
 namespace ptm_util {
 
-struct DuplicatePtmError: public std::exception {
-  const char * what () const throw () {
-    return "";
-  }
+struct DuplicatePtmError: public std::runtime_error {
+  DuplicatePtmError(const std::string &msg) : std::runtime_error(msg) {}
 };
 
 PtmPtrVec readPtmTxt(const std::string &file_name) {
@@ -48,8 +45,8 @@ PtmPtrVec readPtmTxt(const std::string &file_name) {
     if (line == "") continue;
     try {
       std::vector<std::string> l = str_util::split(line, ",");
-      if (l.size() != 5) throw line;
-      if (l[2] == "*" && l[3] == "any") throw line;
+      if (l.size() != 5) throw std::runtime_error("Invalid format in line: " + line);
+      if (l[2] == "*" && l[3] == "any") throw std::runtime_error("Invalid format in line: " + line);
 
       std::string name = l[0];
       double mass = std::stod(l[1]);
@@ -60,23 +57,19 @@ PtmPtrVec readPtmTxt(const std::string &file_name) {
       //check if same name exists in the ptm_vec
       for (size_t i = 0; i < ptm_vec.size(); i++) {
         if (ptm_vec[i]->getName() == name) {
-          throw DuplicatePtmError();
+          throw DuplicatePtmError("Duplicate PTM name: " + name);
         }
       }
       ptm_vec.push_back(ptm_ptr);
-    } catch (char const* e) {
-      LOG_ERROR("Errors in the Variable PTM file: " << file_name);
-      LOG_ERROR("Errors in the line: " << line);
-      throw std::runtime_error("Errors in the Variable PTM file: " + file_name);
-    } catch (std::string& e) {
-      LOG_ERROR("Errors in the Variable PTM file: " << file_name);
-      LOG_ERROR("Errors in the line: " << e);
-      throw std::runtime_error("Errors in the Variable PTM file: " + file_name);
     } catch (DuplicatePtmError& e) {
       LOG_ERROR("Errors in the Variable PTM file: " << file_name);
       LOG_ERROR("Errors in the line: " << line);
       throw std::runtime_error("Mod file cannot have two ptms with the same name: " + file_name);
-    } 
+    } catch (std::exception& e) {
+      LOG_ERROR("Errors in the Variable PTM file: " << file_name);
+      LOG_ERROR("Errors in the line: " << line);
+      throw std::runtime_error("Errors in the Variable PTM file: " + file_name);
+    }
   }
   infile.close();
 

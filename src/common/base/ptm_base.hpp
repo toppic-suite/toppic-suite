@@ -43,7 +43,7 @@ class PtmBase {
   static PtmPtr getPtmPtr(PtmPtr p);
 
   /**
-   * Checks if the list contains an amino acid with the specific name.
+   * Checks if the list contains a PTM with the specific name.
    */
   static bool containsAbbrName(const std::string &abbr_name);
 
@@ -62,7 +62,7 @@ class PtmBase {
   static std::string getC58AbbrName() {return "Carboxymethyl";}
 };
 
-}
+}  // namespace toppic
 
 #endif
 

@@ -35,7 +35,7 @@ Ptm::Ptm(XmlDOMElement* element) {
   unimod_id_ = xml_dom_util::getIntChildValue(element, "unimod", 0);
 }
 
-void Ptm::appendAbbrNameToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
+void Ptm::appendAbbrNameToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) const {
   std::string element_name = Ptm::getXmlElementName();
   XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
   xml_doc->addElement(element, "abbreviation", abbr_name_.c_str());
@@ -44,7 +44,7 @@ void Ptm::appendAbbrNameToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
   parent->appendChild(element);
 }
 
-void Ptm::appendAbbrNameToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent, std::string element_name) {
+void Ptm::appendAbbrNameToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent, const std::string &element_name) const {
   XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
   xml_doc->addElement(element, "abbreviation", abbr_name_.c_str());
   std::string str = str_util::toString(unimod_id_);
@@ -52,9 +52,7 @@ void Ptm::appendAbbrNameToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent, st
   parent->appendChild(element);
 }
 
-
-
-void Ptm::appendAbbrNameMassToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
+void Ptm::appendAbbrNameMassToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) const {
   std::string element_name = Ptm::getXmlElementName();
   XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
   xml_doc->addElement(element, "abbreviation", abbr_name_.c_str());
@@ -66,8 +64,7 @@ void Ptm::appendAbbrNameMassToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent
 }
 
 std::string Ptm::getAbbrNameFromXml(XmlDOMElement * element) {
-  std::string abbr_name = xml_dom_util::getChildValue(element, "abbreviation", 0);
-  return abbr_name;
+  return xml_dom_util::getChildValue(element, "abbreviation", 0);
 }
 
 }  // namespace toppic

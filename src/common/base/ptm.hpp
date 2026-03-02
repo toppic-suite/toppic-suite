@@ -39,17 +39,17 @@ class Ptm {
 
   const std::string& getAbbrName() const {return abbr_name_;}
 
-  // Get  monoisotopic mass.
+  // Get monoisotopic mass.
   double getMonoMass() const {return mono_mass_;}
 
   int getUnimodId() const {return unimod_id_;}
 
-  void appendAbbrNameToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
+  void appendAbbrNameToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) const;
 
-  void appendAbbrNameToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent, std::string element_name);
+  void appendAbbrNameToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent, const std::string &element_name) const;
 
-  // Add mass for visualization 
-  void appendAbbrNameMassToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
+  // Add mass for visualization
+  void appendAbbrNameMassToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) const;
 
   static std::string getAbbrNameFromXml(XmlDOMElement * element);
 
@@ -65,7 +65,7 @@ class Ptm {
  private:
   /* Full name */
   std::string name_;
-  // abbrevation name
+  // abbreviation name
   std::string abbr_name_;
   /* monoisotopic mass */
   double mono_mass_;
@@ -76,6 +76,7 @@ class Ptm {
 typedef std::vector<PtmPtr> PtmPtrVec;
 typedef std::pair<PtmPtr, PtmPtr> PtmPair;
 typedef std::vector<PtmPair> PtmPairVec;
+
 }  // namespace toppic
 
 #endif
