@@ -27,7 +27,7 @@ class ProtMod {
   ProtMod(const std::string &name, const std::string &type,
           TruncPtr trunc_ptr, ModPtr mod_ptr);
 
-  ProtMod(XmlDOMElement* element); 
+  explicit ProtMod(XmlDOMElement* element);
 
   const std::string& getName() const { return name_;}
 
@@ -45,13 +45,15 @@ class ProtMod {
 
   bool isAcetylation() const;
 
-  void appendNameToXml(XmlDOMDocument* xml_doc,XmlDOMElement* parent);
+  void appendNameToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) const;
 
   static std::string getXmlElementName() {return "prot_mod";}
 
   static std::string getNameFromXml(XmlDOMElement * element);
 
  private:
+  void computeShifts();
+
   std::string name_;
   std::string type_;
   TruncPtr trunc_ptr_;
@@ -64,5 +66,6 @@ class ProtMod {
 typedef std::shared_ptr<ProtMod> ProtModPtr;
 typedef std::vector<ProtModPtr> ProtModPtrVec;
 
-}
+}  // namespace toppic
+
 #endif

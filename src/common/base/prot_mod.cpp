@@ -12,6 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include <stdexcept>
+
 #include "common/util/logger.hpp"
 #include "common/xml/xml_dom_document.hpp"
 #include "common/xml/xml_dom_util.hpp"
@@ -23,34 +25,42 @@
 namespace toppic {
 
 ProtMod::ProtMod(const std::string &name, const std::string &type,
-                 TruncPtr trunc_ptr, ModPtr mod_ptr): 
+                 TruncPtr trunc_ptr, ModPtr mod_ptr):
     name_(name),
     type_(type),
     trunc_ptr_(trunc_ptr),
     mod_ptr_(mod_ptr) {
-      mod_pos_ = trunc_ptr->getTruncLen();
-      prot_shift_ = trunc_ptr_->getShift() + mod_ptr_->getShift();
-      pep_shift_ = mod_ptr_->getShift();
-    }
+  if (trunc_ptr_ == nullptr) {
+    throw std::runtime_error("Null trunc pointer in ProtMod: " + name);
+  }
+  if (mod_ptr_ == nullptr) {
+    throw std::runtime_error("Null mod pointer in ProtMod: " + name);
+  }
+  computeShifts();
+}
 
-ProtMod::ProtMod(XmlDOMElement* element) { 
+ProtMod::ProtMod(XmlDOMElement* element) {
   name_ = xml_dom_util::getChildValue(element, "name", 0);
   type_ = xml_dom_util::getChildValue(element, "type", 0);
   std::string trunc_element_name = Trunc::getXmlElementName();
-  XmlDOMElement* trunc_element 
+  XmlDOMElement* trunc_element
       = xml_dom_util::getChildElement(element, trunc_element_name.c_str(), 0);
   trunc_ptr_ = TruncBase::getTruncPtrFromXml(trunc_element);
   std::string mod_element_name = Mod::getXmlElementName();
-  XmlDOMElement* mod_element 
+  XmlDOMElement* mod_element
       = xml_dom_util::getChildElement(element, mod_element_name.c_str(), 0);
-  mod_ptr_= ModBase::getModPtrFromXml(mod_element); 
+  mod_ptr_ = ModBase::getModPtrFromXml(mod_element);
+  computeShifts();
+}
+
+void ProtMod::computeShifts() {
   mod_pos_ = trunc_ptr_->getTruncLen();
   prot_shift_ = trunc_ptr_->getShift() + mod_ptr_->getShift();
   pep_shift_ = mod_ptr_->getShift();
 }
 
 void ProtMod::appendNameToXml(XmlDOMDocument* xml_doc,
-                              XmlDOMElement* parent){
+                              XmlDOMElement* parent) const {
   std::string element_name = ProtMod::getXmlElementName();
   XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
   xml_doc->addElement(element, "name", name_.c_str());
@@ -58,18 +68,12 @@ void ProtMod::appendNameToXml(XmlDOMDocument* xml_doc,
 }
 
 std::string ProtMod::getNameFromXml(XmlDOMElement * element) {
-  std::string name = xml_dom_util::getChildValue(element, "name", 0);
-  return name;
+  return xml_dom_util::getChildValue(element, "name", 0);
 }
 
 bool ProtMod::isAcetylation() const {
-  if (mod_ptr_->getModResiduePtr()->getPtmPtr() 
-      == PtmBase::getPtmPtr_Acetylation()) {
-    return true;
-  }
-  else {
-    return false;
-  }
+  return mod_ptr_->getModResiduePtr()->getPtmPtr()
+      == PtmBase::getPtmPtr_Acetylation();
 }
 
-}
+}  // namespace toppic

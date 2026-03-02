@@ -70,7 +70,7 @@ bool allowMod(ProtModPtr prot_mod_ptr, const ResiduePtrVec &residues) {
   return true;
 }
 
-bool containMod(ProtModPtrVec prot_mod_ptr_vec, ProtModPtr prot_mod_ptr) {
+bool containMod(const ProtModPtrVec &prot_mod_ptr_vec, ProtModPtr prot_mod_ptr) {
   for (size_t i = 0; i < prot_mod_ptr_vec.size(); i++) {
     if (prot_mod_ptr_vec[i] == prot_mod_ptr) {
       return true;

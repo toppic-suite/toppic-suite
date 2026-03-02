@@ -31,7 +31,7 @@ ProtModPtr ProtModBase::prot_mod_ptr_M_ACETYLATION_;
 ProtModPtr ProtModBase::prot_mod_ptr_NME_;
 
 void ProtModBase::initBase(const std::string &base_dir) {
-  toppic::XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
+  XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (!parser) {
     LOG_ERROR("Error in parsing protein modification data!");
     throw std::runtime_error("Error in parsing protein modification data!");
@@ -86,8 +86,7 @@ ProtModPtrVec ProtModBase::getProtModPtrByType(const std::string &type) {
 
 ProtModPtr ProtModBase::getProtModPtrFromXml(XmlDOMElement * element) {
   std::string name = ProtMod::getNameFromXml(element);
-  ProtModPtr prot_mod_ptr = getProtModPtrByName(name);
-  return prot_mod_ptr;
+  return getProtModPtrByName(name);
 }
 
 }  // namespace toppic
