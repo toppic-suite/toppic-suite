@@ -19,10 +19,12 @@ copy ..\bin\topdiff.exe toppic-windows-%1
 copy ..\bin\topdia_gui.exe toppic-windows-%1
 copy ..\bin\topdia.exe toppic-windows-%1
 
-copy ..\bin\topconvert.exe toppic-windows-%1
+copy ..\bin\lib* toppic-windows-%1
 
 copy ..\LICENSE toppic-windows-%1
 xcopy /S ..\resources toppic-windows-%1\resources
+
+copy ..\lib\windows\* toppic-windows-%1
 
 copy C:\msys64\mingw64\bin\libwinpthread-1.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libgcc_s_seh-1.dll toppic-windows-%1
