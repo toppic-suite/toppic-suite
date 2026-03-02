@@ -25,8 +25,7 @@ class SPTypeBase {
  public:
   static void initBase(const std::string &base_dir);
 
-  static const SPTypePtrVec& getBaseSPTypePtrVec() {
-    return sp_type_ptr_vec_;}
+  static const SPTypePtrVec& getBaseSPTypePtrVec() {return sp_type_ptr_vec_;}
 
   static SPTypePtr getSPTypePtrByName(const std::string &name);
   static SPTypePtr getSPTypePtrById(int id);
@@ -44,6 +43,6 @@ class SPTypeBase {
   static SPTypePtr sp_type_ptr_N_TERM_;
 };
 
-} // namespace toppic 
+}  // namespace toppic
 
-#endif 
+#endif

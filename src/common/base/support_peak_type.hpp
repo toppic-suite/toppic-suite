@@ -46,4 +46,4 @@ typedef std::vector<SPTypePtr> SPTypePtrVec;
 
 }  // namespace toppic
 
-#endif /* SUPPORT_PEAK_TYPE_HPP_ */
+#endif

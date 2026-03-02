@@ -17,7 +17,7 @@
 
 namespace toppic {
 
-SupportPeakType::SupportPeakType(int id, const std::string &name): 
+SupportPeakType::SupportPeakType(int id, const std::string &name):
     id_(id), 
     name_(name) {}
 
