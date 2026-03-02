@@ -171,9 +171,9 @@ void process(OnePtmFilterMngPtr mng_ptr) {
     while (pool_ptr->getQueueSize() > 0 || pool_ptr->getIdleThreadNum() == 0) {
       boost::this_thread::sleep(boost::posix_time::milliseconds(100));
     }
-    pool_ptr->Enqueue(geneTask(db_block_ptr_vec[i]->getBlockIdx(), mod_mass_list, mng_ptr));
+    pool_ptr->enqueue(geneTask(db_block_ptr_vec[i]->getBlockIdx(), mod_mass_list, mng_ptr));
   }
-  pool_ptr->ShutDown();
+  pool_ptr->shutDown();
   std::cout << std::endl;
 
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();

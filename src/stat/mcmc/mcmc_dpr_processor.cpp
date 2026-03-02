@@ -197,7 +197,7 @@ void DprProcessor::process() {
         << spectrum_num << " spectra.\r";
     deconv_ms_ptr_vec = ms_reader_ptr->getNextMsPtrVec();
   }
-  pool_ptr_->ShutDown();
+  pool_ptr_->shutDown();
   std::cout << std::endl;
   prsm_reader->close();
   prsm_writer->close();
@@ -303,7 +303,7 @@ void DprProcessor::processOnePrsm(PrsmPtr prsm_ptr, SpectrumSetPtr spec_set_ptr,
   while (pool_ptr_->getQueueSize() >= mng_ptr_->thread_num_ + 2) {
     boost::this_thread::sleep(boost::posix_time::milliseconds(100));
   }
-  pool_ptr_->Enqueue(geneTask(spec_set_ptr, prsm_ptr, mng_ptr_,
+  pool_ptr_->enqueue(geneTask(spec_set_ptr, prsm_ptr, mng_ptr_,
                               ptm_residue_map_, mass_table_,
                               test_num_ptr_, ptm_mass_vec2d_, pool_ptr_,
                               writer_ptr_vec_));

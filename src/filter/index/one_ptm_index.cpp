@@ -135,9 +135,9 @@ void process(OnePtmFilterMngPtr mng_ptr) {
     }
     std::cout << "One shift index files - processing " << (i+1) 
         << " of " << block_num << " files." << std::endl;
-    pool_ptr->Enqueue(geneIndexTask(db_block_ptr_vec[i]->getBlockIdx(), mng_ptr));
+    pool_ptr->enqueue(geneIndexTask(db_block_ptr_vec[i]->getBlockIdx(), mng_ptr));
   }
-  pool_ptr->ShutDown();
+  pool_ptr->shutDown();
   std::cout << "Generating one shift index files --- finished" << std::endl;
 }
 

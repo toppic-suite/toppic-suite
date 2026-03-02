@@ -15,6 +15,8 @@
 #ifndef TOPPIC_COMMON_THREAD_SIMPLE_THREAD_POOL_HPP_
 #define TOPPIC_COMMON_THREAD_SIMPLE_THREAD_POOL_HPP_
 
+#include <memory>
+#include <functional>
 #include <vector>
 #include <queue>
 
@@ -28,15 +30,15 @@ typedef std::shared_ptr<boost::thread> ThreadPtr;
 
 class ToppicThread {
  public:
-  ToppicThread (int id, ThreadPtr thread_ptr):
-      id_(id), 
+  ToppicThread(int id, ThreadPtr thread_ptr):
+      id_(id),
       thread_ptr_(thread_ptr) {}
-  int getId () {return id_;}
-  ThreadPtr getThreadPtr() {return thread_ptr_;}
+  int getId() const { return id_; }
+  const ThreadPtr& getThreadPtr() const { return thread_ptr_; }
 
  private:
   int id_;
-  ThreadPtr thread_ptr_;  
+  ThreadPtr thread_ptr_;
 };
 
 typedef std::shared_ptr<ToppicThread> ToppicThreadPtr;
@@ -51,16 +53,16 @@ class SimpleThreadPool {
   ~SimpleThreadPool();
 
   // Adds task to a task queue.
-  void Enqueue(std::function<void()> f);
+  void enqueue(std::function<void()> f);
 
   // Shut down the pool.
-  void ShutDown();
+  void shutDown();
 
-  int getQueueSize() {return tasks_.size();}
+  int getQueueSize() const {return tasks_.size();}
 
-  int getThreadNum() {return thread_ptr_vec_.size();}
+  int getThreadNum() const {return thread_ptr_vec_.size();}
 
-  int getIdleThreadNum() {return idle_thread_num_;}
+  int getIdleThreadNum() const {return idle_thread_num_;}
 
   int getId(boost::thread::id thread_id);
 
@@ -80,14 +82,11 @@ class SimpleThreadPool {
   // Indicates that pool needs to be shut down.
   bool terminate_;
 
-  // Indicates that pool has been terminated.
-  bool stopped_;
-
-  // Idle thread number
+  // Idle thread number.
   int idle_thread_num_;
 
   // Function that will be invoked by our threads.
-  void Invoke();
+  void invoke();
 };
 
 typedef std::shared_ptr<SimpleThreadPool> SimpleThreadPoolPtr;

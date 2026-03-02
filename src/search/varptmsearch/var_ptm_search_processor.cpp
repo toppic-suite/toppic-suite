@@ -251,7 +251,7 @@ void VarPtmSearchProcessor::process() {
             while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ * 2) {
               boost::this_thread::sleep(boost::posix_time::milliseconds(100));
             }
-            pool_ptr->Enqueue(geneTask(spec_set_vec[k], 
+            pool_ptr->enqueue(geneTask(spec_set_vec[k], 
                                        comp_selected_prsm_ptrs,
                                        reader_ptr, 
                                        mng_ptr_,
@@ -274,7 +274,7 @@ void VarPtmSearchProcessor::process() {
             while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ * 2) {
               boost::this_thread::sleep(boost::posix_time::milliseconds(100));
             }
-            pool_ptr->Enqueue(geneTask(spec_set_vec[k], 
+            pool_ptr->enqueue(geneTask(spec_set_vec[k], 
                                        pref_selected_prsm_ptrs,
                                        reader_ptr, 
                                        mng_ptr_,
@@ -297,7 +297,7 @@ void VarPtmSearchProcessor::process() {
             while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ * 2) {
               boost::this_thread::sleep(boost::posix_time::milliseconds(100));
             }
-            pool_ptr->Enqueue(geneTask(spec_set_vec[k], 
+            pool_ptr->enqueue(geneTask(spec_set_vec[k], 
                                        suff_selected_prsm_ptrs,
                                        reader_ptr, 
                                        mng_ptr_,
@@ -320,7 +320,7 @@ void VarPtmSearchProcessor::process() {
             while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ * 2) {
               boost::this_thread::sleep(boost::posix_time::milliseconds(100));
             }
-            pool_ptr->Enqueue(geneTask(spec_set_vec[k], 
+            pool_ptr->enqueue(geneTask(spec_set_vec[k], 
                                        internal_selected_prsm_ptrs,
                                        reader_ptr, 
                                        mng_ptr_,
@@ -336,7 +336,7 @@ void VarPtmSearchProcessor::process() {
         << " of " << spectrum_num << " spectra.\r";
     deconv_ms_ptr_vec = msalign_reader_ptr->getNextMsPtrVec(); 
   }
-  pool_ptr->ShutDown();
+  pool_ptr->shutDown();
   int remainder = spectrum_num - cnt;
   if (prsm_para_ptr->getGroupSpecNum() > remainder && remainder > 0){
       //if there are spectrum remaining because they were not combined due to not having enough pairs

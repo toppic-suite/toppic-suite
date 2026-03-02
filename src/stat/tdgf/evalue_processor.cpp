@@ -127,7 +127,7 @@ void EValueProcessor::process(bool is_separate) {
           while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ + 2) {
             boost::this_thread::sleep(boost::posix_time::milliseconds(100));
           }
-          pool_ptr->Enqueue(geneTask(spec_set_ptr, selected_prsm_ptrs, ppo, is_separate,
+          pool_ptr->enqueue(geneTask(spec_set_ptr, selected_prsm_ptrs, ppo, is_separate,
                                      mng_ptr_, test_num_ptr_, pool_ptr, writer_ptr_vec));
         }
       }
@@ -145,7 +145,7 @@ void EValueProcessor::process(bool is_separate) {
       std::cout << std::flush <<  "E-value computation - processing " << spectrum_num
         << " of " << spectrum_num << " spectra.\r";
   } 
-  pool_ptr->ShutDown();
+  pool_ptr->shutDown();
   std::cout << std::endl;
   prsm_reader.close();
   prsm_xml_writer_util::closeWriterPtrVec(writer_ptr_vec);

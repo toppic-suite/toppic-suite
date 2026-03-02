@@ -151,7 +151,7 @@ void PtmSearchProcessor::process(){
             while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ * 2) {
               boost::this_thread::sleep(boost::posix_time::milliseconds(100));
             }
-            pool_ptr->Enqueue(geneTask(spec_set_ptr_vec[i], selected_prsm_ptrs,
+            pool_ptr->enqueue(geneTask(spec_set_ptr_vec[i], selected_prsm_ptrs,
                                        mng_ptr_, pool_ptr, writer_set_ptr_vec));
           }
         }
@@ -162,7 +162,7 @@ void PtmSearchProcessor::process(){
         << " of " << spectrum_num << " spectra.\r";
     deconv_ms_ptr_vec = ms_reader_ptr->getNextMsPtrVec(); 
   }
-  pool_ptr->ShutDown();
+  pool_ptr->shutDown();
   simple_prsm_reader.close();
   for (int i = 0; i < mng_ptr_->thread_num_; i++) { 
     writer_set_ptr_vec[i]->close();

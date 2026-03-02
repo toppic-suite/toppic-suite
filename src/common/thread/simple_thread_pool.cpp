@@ -12,35 +12,37 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include <stdexcept>
+
 #include "common/util/logger.hpp"
 #include "common/thread/simple_thread_pool.hpp"
 
 namespace toppic {
 
 SimpleThreadPool::SimpleThreadPool(int thread_num) :
-  terminate_(false), stopped_(false), idle_thread_num_(0) {
-    for (int i = 0; i < thread_num; i++) {
-      ThreadPtr thread_ptr = std::make_shared<boost::thread>(&SimpleThreadPool::Invoke, this);
-      ToppicThreadPtr toppic_thread_ptr = std::make_shared<ToppicThread>(i, thread_ptr);
-      thread_ptr_vec_.emplace_back(toppic_thread_ptr);
-    }
+    terminate_(false), idle_thread_num_(0) {
+  for (int i = 0; i < thread_num; i++) {
+    ThreadPtr thread_ptr = std::make_shared<boost::thread>(&SimpleThreadPool::invoke, this);
+    ToppicThreadPtr toppic_thread_ptr = std::make_shared<ToppicThread>(i, thread_ptr);
+    thread_ptr_vec_.emplace_back(toppic_thread_ptr);
   }
+}
 
-void SimpleThreadPool::Enqueue(std::function<void()> f) {
+void SimpleThreadPool::enqueue(std::function<void()> f) {
   // Scope based locking.
   {
     // Put unique lock on task mutex.
     boost::unique_lock<boost::mutex> lock(tasks_mutex_);
 
     // Push task into queue.
-    tasks_.push(f);
+    tasks_.push(std::move(f));
   }
 
   // Wake up one thread.
   condition_.notify_one();
 }
 
-void SimpleThreadPool::Invoke() {
+void SimpleThreadPool::invoke() {
   std::function<void()> task;
   while (true) {
     // Scope based locking.
@@ -54,6 +56,7 @@ void SimpleThreadPool::Invoke() {
 
       // If termination signal received and queue is empty then exit else continue clearing the queue.
       if (terminate_ && tasks_.empty()) {
+        idle_thread_num_--;
         return;
       }
 
@@ -70,7 +73,7 @@ void SimpleThreadPool::Invoke() {
   }
 }
 
-void SimpleThreadPool::ShutDown() {
+void SimpleThreadPool::shutDown() {
   // Scope based locking.
   {
     // Put unique lock on task mutex.
@@ -85,31 +88,28 @@ void SimpleThreadPool::ShutDown() {
 
   // Join all threads.
   for (ToppicThreadPtr top_thread_ptr : thread_ptr_vec_) {
-    ThreadPtr thread_ptr = top_thread_ptr->getThreadPtr();
+    const ThreadPtr& thread_ptr = top_thread_ptr->getThreadPtr();
     if (thread_ptr->joinable()) thread_ptr->join();
   }
 
   // Empty workers vector.
   thread_ptr_vec_.clear();
-
-  // Indicate that the pool has been shut down.
-  stopped_ = true;
 }
 
 int SimpleThreadPool::getId(boost::thread::id thread_id) {
-  for (size_t i = 0; i < thread_ptr_vec_.size(); i++) {
-    if (thread_ptr_vec_[i]->getThreadPtr()->get_id() == thread_id) {
-      return thread_ptr_vec_[i]->getId();
+  for (const ToppicThreadPtr& t : thread_ptr_vec_) {
+    if (t->getThreadPtr()->get_id() == thread_id) {
+      return t->getId();
     }
   }
   LOG_ERROR("Thread Error: thread id " << thread_id << " cannot be found!");
-  exit(EXIT_FAILURE);
+  throw std::runtime_error("Thread id not found in pool");
 }
 
 // Destructor
 SimpleThreadPool::~SimpleThreadPool() {
-  if (!stopped_) {
-    ShutDown();
+  if (!thread_ptr_vec_.empty()) {
+    shutDown();
   }
 }
 
