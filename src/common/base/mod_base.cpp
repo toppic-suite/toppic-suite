@@ -54,7 +54,7 @@ void ModBase::initBase(const std::string &base_dir) {
     mod_ptr_vec_.push_back(mod_ptr);
     // check empty ptr
     if (mod_ptr->getOriResiduePtr() == ResidueBase::getEmptyResiduePtr()
-        && mod_ptr->getModResiduePtr() ==ResidueBase::getEmptyResiduePtr()
+        && mod_ptr->getModResiduePtr() == ResidueBase::getEmptyResiduePtr()
         && mod_ptr->getModTypePtr() == ModType::SIDE_CHAIN) {
       none_mod_ptr_ = mod_ptr;
     }

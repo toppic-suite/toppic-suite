@@ -11,6 +11,7 @@
 //WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //See the License for the specific language governing permissions and
 //limitations under the License.
+
 #ifndef TOPPIC_COMMON_BASE_MOD_UTIL_HPP_
 #define TOPPIC_COMMON_BASE_MOD_UTIL_HPP_
 

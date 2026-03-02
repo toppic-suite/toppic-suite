@@ -57,7 +57,7 @@ class ModBase {
 
 };
 
-}
+}  // namespace toppic
 
 #endif
 

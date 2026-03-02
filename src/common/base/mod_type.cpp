@@ -26,7 +26,7 @@ ModType::ModType(const std::string &name, int id):
     name_(name), 
     id_(id) {}
 
-ModTypePtr ModType::getModTypePtrByName(std::string name) {
+ModTypePtr ModType::getModTypePtrByName(const std::string &name) {
   if (name == "SIDE_CHAIN") {
     return ModType::SIDE_CHAIN;
   }

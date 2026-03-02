@@ -46,7 +46,7 @@ class Mod {
 
   double getShift() const;
 
-  void appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
+  void appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) const;
 
   static std::string getXmlElementName() {return "mod";}
 

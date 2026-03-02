@@ -36,7 +36,7 @@ class ModType {
 
   int getId() const {return id_;}
 
-  static ModTypePtr getModTypePtrByName(std::string name);
+  static ModTypePtr getModTypePtrByName(const std::string &name);
 
  private:
   std::string name_;

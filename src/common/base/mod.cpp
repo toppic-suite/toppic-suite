@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include <stdexcept>
 #include <string>
 
@@ -29,7 +28,7 @@ Mod::Mod(ResiduePtr ori_residue_ptr, ResiduePtr mod_residue_ptr, ModTypePtr mod_
     ori_residue_ptr_(ori_residue_ptr),
     mod_residue_ptr_(mod_residue_ptr),
     mod_type_ptr_(mod_type_ptr) {
-}      
+}
 
 Mod::Mod(XmlDOMElement* element) {
   XmlDOMElement* ori_residue_element
@@ -65,7 +64,7 @@ double Mod::getShift() const {
   return mod_residue_ptr_->getPtmPtr()->getMonoMass(); 
 }
 
-void Mod::appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
+void Mod::appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) const {
   std::string element_name = Mod::getXmlElementName();
   XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
   ori_residue_ptr_->appendXml(xml_doc, element, "ori_residue");

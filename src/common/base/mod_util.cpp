@@ -61,7 +61,7 @@ std::vector<std::vector<std::string>> readModTxtForTsv(const std::string &file_n
   }
   std::string line;
   while (std::getline(infile, line)) {
-    if (line.size() == 0) continue;
+    if (line.empty()) continue;
     if (line[0] == '#') continue;
     line = str_util::rmComment(line);
     if (line == "") continue;
@@ -96,7 +96,7 @@ ModPtrVec2D readModTxt(const std::string &file_name) {
   }
   std::string line;
   while (std::getline(infile, line)) {
-    if (line.size() == 0) continue;
+    if (line.empty()) continue;
     if (line[0] == '#') continue;
     line = str_util::rmComment(line);
     if (line == "") continue;
@@ -163,7 +163,7 @@ ModPtrVec2D readModTxt(const std::string &file_name) {
   return mod_ptr_vec2d;
 }
 
-ModPtrVec readAnywhereModTxt (const std::string &file_name) {
+ModPtrVec readAnywhereModTxt(const std::string &file_name) {
   ModPtrVec2D mod_vec_2d = readModTxt(file_name);
   // the vector at index 2 is the anywhere modifications
   return mod_vec_2d[2];
@@ -232,7 +232,7 @@ std::vector<double> getModMassVec(const ModPtrVec & var_mod_list) {
   std::sort(mod_mass_vec.begin(), mod_mass_vec.end());
   auto last = std::unique(mod_mass_vec.begin(), mod_mass_vec.end(),
                           [] (double a, double b) {
-                            return std::abs(a - b) <= std::pow(10, -4);
+                            return std::abs(a - b) <= 1e-4;
                           });
   mod_mass_vec.erase(last, mod_mass_vec.end());
   std::sort(mod_mass_vec.begin(), mod_mass_vec.end());
@@ -242,4 +242,3 @@ std::vector<double> getModMassVec(const ModPtrVec & var_mod_list) {
 } // namespace mod_util
 
 }  // namespace toppic
-
