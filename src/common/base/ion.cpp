@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include <stdexcept>
 #include <string>
-#include <vector>
 
 #include "common/util/str_util.hpp"
 #include "common/base/ion.hpp"
@@ -27,11 +27,14 @@ Ion::Ion(int charge, int pos, int display_pos,
     pos_(pos),
     display_pos_(display_pos),
     ion_type_ptr_(ion_type_ptr),
-    neutral_loss_ptr_(neutral_loss_ptr) {}
+    neutral_loss_ptr_(neutral_loss_ptr) {
+  if (ion_type_ptr_ == nullptr) {
+    throw std::runtime_error("Null ion type pointer in Ion constructor");
+  }
+}
 
 std::string Ion::getDisplayName() const {
   return ion_type_ptr_->getName() + str_util::toString(display_pos_);
 }
 
-} /* namespace toppic */
-
+}  // namespace toppic

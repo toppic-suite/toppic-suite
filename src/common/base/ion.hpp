@@ -47,6 +47,6 @@ class Ion {
 typedef std::shared_ptr<Ion> IonPtr;
 typedef std::vector<IonPtr> IonPtrVec;
 
-} // namespace toppic 
+}  // namespace toppic
 
 #endif 
