@@ -38,9 +38,7 @@ std::vector<std::string> split(const std::string &s, const std::string &delim) {
 }
 
 std::string toString(bool value) {
-  std::stringstream stream;
-  stream << value;
-  return stream.str();
+  return value ? "true" : "false";
 }
 
 std::string toString(int value) {
@@ -64,60 +62,59 @@ std::string toString(double value) {
   return stream.str();
 }
 
-std::string evalueToString(double value, int number) {
+std::string evalueToString(double value, int precision) {
   std::stringstream stream;
   if (value == 0) {
     stream << std::fixed << std::setprecision(0);
   } else if (value < 0.01 && value > -0.01 && value != 0) {
-    if (number > 2) {
+    if (precision > 2) {
       stream << std::scientific << std::setprecision(2);
     } else {
-      stream << std::scientific << std::setprecision(number);
+      stream << std::scientific << std::setprecision(precision);
     }
   } else {
-    stream << std::fixed << std::setprecision(number);
+    stream << std::fixed << std::setprecision(precision);
   }
   stream << value;
   return stream.str();
 }
 
-std::string confToString(double value, int number) {
+std::string confToString(double value, int precision) {
   std::stringstream stream;
   if (value == 0) {
     stream << std::fixed << std::setprecision(0);
   } else if (value < 0.01 && value > -0.01 && value != 0) {
-    if (number > 2) {
+    if (precision > 2) {
       stream << std::scientific << std::setprecision(2);
     } else {
-      stream << std::scientific << std::setprecision(number);
+      stream << std::scientific << std::setprecision(precision);
     }
   } else {
-    stream << std::fixed << std::setprecision(number);
+    stream << std::fixed << std::setprecision(precision);
   }
   stream << value;
   return stream.str();
 }
 
 
-std::string fixedToString(double value, int number) {
-  std::stringstream stream;
-  if (value == 0) {
-    stream << std::fixed << std::setprecision(0);
-  } 
-  else { 
-    stream << std::fixed << std::setprecision(number);
-  }
-  stream << value;
-  return stream.str();
-}
-
-
-std::string toScientificStr(double value, int number) {
+std::string fixedToString(double value, int precision) {
   std::stringstream stream;
   if (value == 0) {
     stream << std::fixed << std::setprecision(0);
   } else {
-    stream << std::scientific << std::setprecision(number);
+    stream << std::fixed << std::setprecision(precision);
+  }
+  stream << value;
+  return stream.str();
+}
+
+
+std::string toScientificStr(double value, int precision) {
+  std::stringstream stream;
+  if (value == 0) {
+    stream << std::fixed << std::setprecision(0);
+  } else {
+    stream << std::scientific << std::setprecision(precision);
   }
   stream << value;
   return stream.str();

@@ -21,7 +21,7 @@
 namespace toppic {
 
 using StringPair = std::pair<std::string, std::string>;
-using StringPairVec = std::vector<std::pair<std::string, std::string> >;
+using StringPairVec = std::vector<StringPair>;
 
 namespace str_util {
 
