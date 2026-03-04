@@ -22,7 +22,7 @@ namespace toppic {
 
 namespace console_util {
 
-void copyTopMSV(std::map<std::string, std::string> &arguments); 
+void copyTopMSV(const std::map<std::string, std::string> &arguments);
 
 }  // namespace console_util
 

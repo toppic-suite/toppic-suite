@@ -20,20 +20,22 @@ namespace toppic {
 
 namespace console_util {
 
-void copyTopMSV(std::map<std::string, std::string> &arguments) {
-  std::string spectrum_file_name = arguments["spectrumFileName"];
+void copyTopMSV(const std::map<std::string, std::string> &arguments) {
+  std::string spectrum_file_name = arguments.at("spectrumFileName");
   std::string base_name = file_util::basename(spectrum_file_name);
+  // remove ".raw" or similar 4-char extension
   std::string base_name_short = base_name.substr(0, base_name.length() - 4);
-  std::string topmsv_dir = base_name_short + "_html" +  file_util::getFileSeparator() + "topmsv";
+  std::string topmsv_dir = base_name_short + "_html" + file_util::getFileSeparator() + "topmsv";
   if (file_util::exists(topmsv_dir)) {
     LOG_WARN("The TopMSV directory " << topmsv_dir << " exists!");
     file_util::delDir(topmsv_dir);
   }
-  if (!file_util::exists(base_name_short + "_html")){//if _html folder was not created with topfd
+  // if _html folder was not created with topfd
+  if (!file_util::exists(base_name_short + "_html")) {
     file_util::createFolder(base_name_short + "_html");
   }
-  std::string resource_dir = arguments["resourceDir"];
-  // copy resources 
+  std::string resource_dir = arguments.at("resourceDir");
+  // copy resources
   std::string from_path(resource_dir + file_util::getFileSeparator() + "topmsv");
   file_util::copyDir(from_path, topmsv_dir);
 }
@@ -41,4 +43,3 @@ void copyTopMSV(std::map<std::string, std::string> &arguments) {
 }  // namespace console_util
 
 }  // namespace toppic
-
