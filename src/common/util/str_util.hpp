@@ -16,6 +16,7 @@
 #define TOPPIC_COMMON_UTIL_STR_UTIL_HPP_
 
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace toppic {
@@ -45,7 +46,7 @@ std::string fixedToString(double value, int precision);
 
 std::string toScientificStr(double value, int precision);
 
-std::string rmComment(const std::string &ori_s, const std::string & comment = "#");
+std::string rmComment(const std::string &ori_s, const std::string &comment = "#");
 
 double scientificToDouble(const std::string &str);
 

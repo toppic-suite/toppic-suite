@@ -12,15 +12,13 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <string>
-#include <sstream>
-
 #include <iomanip>
-#include <vector>
+#include <sstream>
+#include <stdexcept>
+#include <string>
 
 #include <boost/algorithm/string.hpp>
 
-#include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
 
 namespace toppic {
@@ -49,11 +47,9 @@ std::string toString(size_t value) {
   return std::to_string(value);
 }
 
-
 std::string toString(double value) {
   std::stringstream stream;
-
-  if (value < 1 && value > -1 && value !=0) {
+  if (value != 0 && value < 1 && value > -1) {
     stream << std::scientific << std::setprecision(10);
   } else {
     stream << std::fixed << std::setprecision(10);
@@ -66,7 +62,7 @@ std::string evalueToString(double value, int precision) {
   std::stringstream stream;
   if (value == 0) {
     stream << std::fixed << std::setprecision(0);
-  } else if (value < 0.01 && value > -0.01 && value != 0) {
+  } else if (value < 0.01 && value > -0.01) {
     if (precision > 2) {
       stream << std::scientific << std::setprecision(2);
     } else {
@@ -80,22 +76,8 @@ std::string evalueToString(double value, int precision) {
 }
 
 std::string confToString(double value, int precision) {
-  std::stringstream stream;
-  if (value == 0) {
-    stream << std::fixed << std::setprecision(0);
-  } else if (value < 0.01 && value > -0.01 && value != 0) {
-    if (precision > 2) {
-      stream << std::scientific << std::setprecision(2);
-    } else {
-      stream << std::scientific << std::setprecision(precision);
-    }
-  } else {
-    stream << std::fixed << std::setprecision(precision);
-  }
-  stream << value;
-  return stream.str();
+  return evalueToString(value, precision);
 }
-
 
 std::string fixedToString(double value, int precision) {
   std::stringstream stream;
@@ -108,7 +90,6 @@ std::string fixedToString(double value, int precision) {
   return stream.str();
 }
 
-
 std::string toScientificStr(double value, int precision) {
   std::stringstream stream;
   if (value == 0) {
@@ -120,15 +101,11 @@ std::string toScientificStr(double value, int precision) {
   return stream.str();
 }
 
-
 std::string rmComment(const std::string &ori_s, const std::string &comment) {
   std::string s = ori_s;
   std::string::size_type i = s.find(comment);
-
   if (i != std::string::npos) s.erase(i);
-
   boost::trim_right(s);
-
   return s;
 }
 
@@ -137,14 +114,9 @@ double scientificToDouble(const std::string &str) {
   double d = 0;
   ss >> d;
   if (ss.fail()) {
-    std::string s = "Unable to format ";
-    s += str;
-    s += " as a number!";
-    LOG_ERROR("Can not convert " << s << " to double!");
-    exit(EXIT_FAILURE);
+    throw std::invalid_argument("Cannot convert \"" + str + "\" to double!");
   }
-
-  return (d);
+  return d;
 }
 
 bool endsWith(const std::string &str, const std::string &suffix) {
@@ -152,7 +124,6 @@ bool endsWith(const std::string &str, const std::string &suffix) {
       str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
 }
 
-} // namespace str_util
+}  // namespace str_util
 
 }  // namespace toppic
-
