@@ -14,7 +14,6 @@
 
 #include <ctime>
 
-#include "common/util/logger.hpp"
 #include "common/util/time_util.hpp"
 
 namespace toppic {
@@ -32,4 +31,3 @@ std::string getTimeStr() {
 }  // namespace time_util
 
 }  // namespace toppic
-
