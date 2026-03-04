@@ -46,10 +46,7 @@ using ToppicThreadPtrVec = std::vector<ToppicThreadPtr>;
 
 class SimpleThreadPool {
  public:
-  // Constructor.
   SimpleThreadPool(int thread_num);
-
-  // Destructor.
   ~SimpleThreadPool();
 
   SimpleThreadPool(const SimpleThreadPool&) = delete;
@@ -63,15 +60,8 @@ class SimpleThreadPool {
   // Shut down the pool.
   void shutDown();
 
-  size_t getQueueSize() const {
-    std::unique_lock<std::mutex> lock(tasks_mutex_);
-    return tasks_.size();
-  }
-
-  size_t getThreadNum() const {
-    std::unique_lock<std::mutex> lock(tasks_mutex_);
-    return thread_ptr_vec_.size();
-  }
+  size_t getQueueSize() const;
+  size_t getThreadNum() const;
 
   int getIdleThreadNum() const { return idle_thread_num_; }
 

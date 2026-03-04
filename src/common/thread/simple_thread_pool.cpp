@@ -28,6 +28,16 @@ SimpleThreadPool::SimpleThreadPool(int thread_num) :
   }
 }
 
+size_t SimpleThreadPool::getQueueSize() const {
+  std::lock_guard<std::mutex> lock(tasks_mutex_);
+  return tasks_.size();
+}
+
+size_t SimpleThreadPool::getThreadNum() const {
+  std::lock_guard<std::mutex> lock(tasks_mutex_);
+  return thread_ptr_vec_.size();
+}
+
 void SimpleThreadPool::enqueue(std::function<void()> f) {
   // Scope based locking.
   {
@@ -108,6 +118,7 @@ void SimpleThreadPool::shutDown() {
 }
 
 int SimpleThreadPool::getId(std::thread::id thread_id) {
+  std::lock_guard<std::mutex> lock(tasks_mutex_);
   for (const ToppicThreadPtr& t : thread_ptr_vec_) {
     if (t->getThreadPtr()->get_id() == thread_id) {
       return t->getId();
