@@ -34,7 +34,7 @@ inline constexpr int LOG_LEVEL_WARN  = 4;
 inline constexpr int LOG_LEVEL_ERROR = 5;
 
 #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
-#define SRC_FILENAME__ (strstr(__FILE__, "\\src") ? strstr(__FILE__, "\\src") : __FILE__)
+#define SRC_FILENAME__ (strstr(__FILE__, "\\src") ? strstr(__FILE__, "\\src") + 1: __FILE__)
 #else
 #define SRC_FILENAME__ (strstr(__FILE__, "/src") ? strstr(__FILE__, "/src") + 1 : __FILE__)
 #endif
