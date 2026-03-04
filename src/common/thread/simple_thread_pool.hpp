@@ -52,18 +52,23 @@ class SimpleThreadPool {
   // Destructor.
   ~SimpleThreadPool();
 
+  SimpleThreadPool(const SimpleThreadPool&) = delete;
+  SimpleThreadPool& operator=(const SimpleThreadPool&) = delete;
+  SimpleThreadPool(SimpleThreadPool&&) = delete;
+  SimpleThreadPool& operator=(SimpleThreadPool&&) = delete;
+
   // Adds task to a task queue.
   void enqueue(std::function<void()> f);
 
   // Shut down the pool.
   void shutDown();
 
-  int getQueueSize() const {
+  size_t getQueueSize() const {
     std::unique_lock<std::mutex> lock(tasks_mutex_);
     return tasks_.size();
   }
 
-  int getThreadNum() const {
+  size_t getThreadNum() const {
     std::unique_lock<std::mutex> lock(tasks_mutex_);
     return thread_ptr_vec_.size();
   }

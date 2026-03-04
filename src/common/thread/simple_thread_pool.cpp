@@ -31,8 +31,8 @@ SimpleThreadPool::SimpleThreadPool(int thread_num) :
 void SimpleThreadPool::enqueue(std::function<void()> f) {
   // Scope based locking.
   {
-    // Put unique lock on task mutex.
-    std::unique_lock<std::mutex> lock(tasks_mutex_);
+    // Put lock on task mutex.
+    std::lock_guard<std::mutex> lock(tasks_mutex_);
 
     // Reject tasks after shutdown to avoid silent data loss.
     if (terminate_) {
@@ -55,7 +55,7 @@ void SimpleThreadPool::invoke() {
     {
       // Put unique lock on task mutex.
       std::unique_lock<std::mutex> lock(tasks_mutex_);
-      idle_thread_num_ ++;
+      ++idle_thread_num_;
 
       // Wait until queue is not empty or termination signal is sent.
       // The predicate is evaluated while holding the lock, so accessing
@@ -64,7 +64,7 @@ void SimpleThreadPool::invoke() {
 
       // If termination signal received and queue is empty then exit else continue clearing the queue.
       if (terminate_ && tasks_.empty()) {
-        idle_thread_num_--;
+        --idle_thread_num_;
         return;
       }
 
@@ -73,7 +73,7 @@ void SimpleThreadPool::invoke() {
 
       // Remove it from the queue.
       tasks_.pop();
-      idle_thread_num_ --;
+      --idle_thread_num_;
     }
 
     // Execute the task.
@@ -84,8 +84,8 @@ void SimpleThreadPool::invoke() {
 void SimpleThreadPool::shutDown() {
   // Scope based locking.
   {
-    // Put unique lock on task mutex.
-    std::unique_lock<std::mutex> lock(tasks_mutex_);
+    // Put lock on task mutex.
+    std::lock_guard<std::mutex> lock(tasks_mutex_);
 
     // Set termination flag to true.
     terminate_ = true;
@@ -101,7 +101,10 @@ void SimpleThreadPool::shutDown() {
   }
 
   // Empty workers vector.
-  thread_ptr_vec_.clear();
+  {
+    std::lock_guard<std::mutex> lock(tasks_mutex_);
+    thread_ptr_vec_.clear();
+  }
 }
 
 int SimpleThreadPool::getId(std::thread::id thread_id) {
@@ -114,7 +117,6 @@ int SimpleThreadPool::getId(std::thread::id thread_id) {
   throw std::runtime_error("Thread id not found in pool");
 }
 
-// Destructor
 SimpleThreadPool::~SimpleThreadPool() {
   if (!thread_ptr_vec_.empty()) {
     shutDown();
