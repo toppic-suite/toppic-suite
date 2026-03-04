@@ -16,14 +16,13 @@
 #define TOPPIC_COMMON_THREAD_SIMPLE_THREAD_POOL_HPP_
 
 #include <atomic>
-#include <memory>
-#include <functional>
-#include <vector>
-#include <queue>
-
 #include <condition_variable>
+#include <functional>
+#include <memory>
 #include <mutex>
+#include <queue>
 #include <thread>
+#include <vector>
 
 namespace toppic {
 
@@ -64,7 +63,10 @@ class SimpleThreadPool {
     return tasks_.size();
   }
 
-  int getThreadNum() const {return thread_ptr_vec_.size();}
+  int getThreadNum() const {
+    std::unique_lock<std::mutex> lock(tasks_mutex_);
+    return thread_ptr_vec_.size();
+  }
 
   int getIdleThreadNum() const { return idle_thread_num_; }
 
@@ -84,7 +86,7 @@ class SimpleThreadPool {
   std::condition_variable condition_;
 
   // Indicates that pool needs to be shut down.
-  bool terminate_;
+  std::atomic<bool> terminate_;
 
   // Idle thread number.
   std::atomic<int> idle_thread_num_;

@@ -34,6 +34,12 @@ void SimpleThreadPool::enqueue(std::function<void()> f) {
     // Put unique lock on task mutex.
     std::unique_lock<std::mutex> lock(tasks_mutex_);
 
+    // Reject tasks after shutdown to avoid silent data loss.
+    if (terminate_) {
+      LOG_ERROR("SimpleThreadPool::enqueue called after shutDown; task dropped.");
+      return;
+    }
+
     // Push task into queue.
     tasks_.push(std::move(f));
   }
@@ -89,7 +95,7 @@ void SimpleThreadPool::shutDown() {
   condition_.notify_all();
 
   // Join all threads.
-  for (ToppicThreadPtr top_thread_ptr : thread_ptr_vec_) {
+  for (ToppicThreadPtr& top_thread_ptr : thread_ptr_vec_) {
     const ThreadPtr& thread_ptr = top_thread_ptr->getThreadPtr();
     if (thread_ptr->joinable()) thread_ptr->join();
   }
