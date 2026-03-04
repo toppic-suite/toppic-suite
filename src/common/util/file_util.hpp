@@ -51,9 +51,9 @@ bool copyJsonDir(const std::string &src_name,
                  const std::string &des_name,
                  int id_base);
 
-void createLink(const std::string &a_link, 
-		const std::string &a_dir,
-		const std::string &b);
+void createLink(const std::string &a_link,
+                const std::string &a_dir,
+                const std::string &b);
 
 bool exists(const std::string &path);
 
@@ -64,13 +64,13 @@ void delFile(const std::string &path);
 void rename(const std::string &ori_name, 
             const std::string &new_name);
 
-void cleanPrefix(std::string ref_name, 
-                 std::string prefix);
+void cleanPrefix(const std::string &ref_name,
+                 const std::string &prefix);
 
 void cleanTempFiles(const std::string & ref_name, 
                     const std::string & ext_prefix);
 
-void moveFile(std::string &file_name, std::string &folder_name);
+void moveFile(const std::string &file_name, const std::string &folder_name);
 
 inline std::string getToppicResourceDirName() {return "resources";}
 
@@ -83,4 +83,5 @@ bool checkSpace(const std::string &dir);
 }  // namespace file_util
 
 }  // namespace toppic
+
 #endif

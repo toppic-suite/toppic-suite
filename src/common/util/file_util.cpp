@@ -268,7 +268,7 @@ void rename(const std::string &ori_name,
 
 }
 
-void moveFile(std::string &path_name, std::string &folder_name) {
+void moveFile(const std::string &path_name, const std::string &folder_name) {
   fs::path ori_path(path_name);
   std::string new_path_name = folder_name + getFileSeparator() 
       + ori_path.filename().string();
@@ -277,9 +277,10 @@ void moveFile(std::string &path_name, std::string &folder_name) {
   delFile(path_name);
 }
 
-void cleanPrefix(std::string ref_name, std::string prefix) {
-  std::replace(ref_name.begin(), ref_name.end(), '\\', '/');
-  fs::path ref_path(ref_name);
+void cleanPrefix(const std::string &ref_name, const std::string &prefix) {
+  std::string ref_name_copy = ref_name;
+  std::replace(ref_name_copy.begin(), ref_name_copy.end(), '\\', '/');
+  fs::path ref_path(ref_name_copy);
   fs::path ref_dir = absolute(ref_path).parent_path(); 
   fs::directory_iterator end_iter;
 
