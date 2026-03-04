@@ -21,10 +21,10 @@ namespace toppic {
 
 SimpleThreadPool::SimpleThreadPool(int thread_num) :
     terminate_(false), idle_thread_num_(0) {
+  threads_.reserve(thread_num);
   for (int i = 0; i < thread_num; i++) {
-    ThreadPtr thread_ptr = std::make_shared<std::thread>(&SimpleThreadPool::invoke, this);
-    ToppicThreadPtr toppic_thread_ptr = std::make_shared<ToppicThread>(i, thread_ptr);
-    thread_ptr_vec_.emplace_back(toppic_thread_ptr);
+    threads_.emplace_back(&SimpleThreadPool::invoke, this);
+    thread_id_map_[threads_.back().get_id()] = i;
   }
 }
 
@@ -35,7 +35,7 @@ size_t SimpleThreadPool::getQueueSize() const {
 
 size_t SimpleThreadPool::getThreadNum() const {
   std::lock_guard<std::mutex> lock(tasks_mutex_);
-  return thread_ptr_vec_.size();
+  return threads_.size();
 }
 
 void SimpleThreadPool::enqueue(std::function<void()> f) {
@@ -105,31 +105,28 @@ void SimpleThreadPool::shutDown() {
   condition_.notify_all();
 
   // Join all threads.
-  for (ToppicThreadPtr& top_thread_ptr : thread_ptr_vec_) {
-    const ThreadPtr& thread_ptr = top_thread_ptr->getThreadPtr();
-    if (thread_ptr->joinable()) thread_ptr->join();
+  for (std::thread& t : threads_) {
+    if (t.joinable()) t.join();
   }
 
   // Empty workers vector.
   {
     std::lock_guard<std::mutex> lock(tasks_mutex_);
-    thread_ptr_vec_.clear();
+    threads_.clear();
+    thread_id_map_.clear();
   }
 }
 
-int SimpleThreadPool::getId(std::thread::id thread_id) {
+int SimpleThreadPool::getId(std::thread::id thread_id) const {
   std::lock_guard<std::mutex> lock(tasks_mutex_);
-  for (const ToppicThreadPtr& t : thread_ptr_vec_) {
-    if (t->getThreadPtr()->get_id() == thread_id) {
-      return t->getId();
-    }
-  }
+  auto it = thread_id_map_.find(thread_id);
+  if (it != thread_id_map_.end()) return it->second;
   LOG_ERROR("Thread Error: thread id " << thread_id << " cannot be found!");
   throw std::runtime_error("Thread id not found in pool");
 }
 
 SimpleThreadPool::~SimpleThreadPool() {
-  if (!thread_ptr_vec_.empty()) {
+  if (!threads_.empty()) {
     shutDown();
   }
 }

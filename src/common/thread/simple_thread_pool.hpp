@@ -22,27 +22,10 @@
 #include <mutex>
 #include <queue>
 #include <thread>
+#include <unordered_map>
 #include <vector>
 
 namespace toppic {
-
-using ThreadPtr = std::shared_ptr<std::thread>;
-
-class ToppicThread {
- public:
-  ToppicThread(int id, ThreadPtr thread_ptr):
-      id_(id),
-      thread_ptr_(thread_ptr) {}
-  int getId() const { return id_; }
-  const ThreadPtr& getThreadPtr() const { return thread_ptr_; }
-
- private:
-  int id_;
-  ThreadPtr thread_ptr_;
-};
-
-using ToppicThreadPtr = std::shared_ptr<ToppicThread>;
-using ToppicThreadPtrVec = std::vector<ToppicThreadPtr>;
 
 class SimpleThreadPool {
  public:
@@ -65,16 +48,19 @@ class SimpleThreadPool {
 
   int getIdleThreadNum() const { return idle_thread_num_; }
 
-  int getId(std::thread::id thread_id);
+  int getId(std::thread::id thread_id) const;
 
  private:
   // Thread pool storage.
-  ToppicThreadPtrVec thread_ptr_vec_;
+  std::vector<std::thread> threads_;
+
+  // Maps thread::id to index in threads_ for O(1) lookup in getId().
+  std::unordered_map<std::thread::id, int> thread_id_map_;
 
   // Queue to keep track of incoming tasks.
   std::queue<std::function<void()> > tasks_;
 
-  // Task queue mutex.
+  // Mutex protecting tasks_, threads_, and thread_id_map_.
   mutable std::mutex tasks_mutex_;
 
   // Condition variable.
