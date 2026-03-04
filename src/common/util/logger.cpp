@@ -18,10 +18,10 @@ namespace toppic {
 
 namespace logger {
 
-int log_level = 4;
+int log_level = LOG_LEVEL_WARN;
 
 void setLogLevel(int level) {log_level = level;}
 
-}
+}  // namespace logger
 
-}
+}  // namespace toppic
