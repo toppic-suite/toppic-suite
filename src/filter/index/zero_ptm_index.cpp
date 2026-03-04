@@ -137,7 +137,7 @@ void process(ZeroPtmFilterMngPtr mng_ptr) {
   std::cout << "Generating non shift index files --- started" << std::endl;
   for (int i = 0; i < block_num; i++) {
     while (pool_ptr->getQueueSize() > 0 || pool_ptr->getIdleThreadNum() == 0) {
-      boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
     std::cout << "Non shift index files - processing " << (i+1) 
       << " of " << block_num << " files." << std::endl;

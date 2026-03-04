@@ -17,8 +17,8 @@
 #include <iomanip>
 #include <fstream>
 #include <limits>
+#include <thread>
 
-#include "boost/thread/thread.hpp"
 #include "common/util/mem_check.hpp"
 #include "common/util/logger.hpp"
 
@@ -158,7 +158,7 @@ bool checkThreadNum(int thread_number, std::string prog) {
     LOG_ERROR("Thread number " << thread_number << " error! The value should be positive.");
     return false;
   }
-  int total_thread_num = static_cast<int>(boost::thread::hardware_concurrency());
+  int total_thread_num = static_cast<int>(std::thread::hardware_concurrency());
   float total_mem_in_gb = mem_check::getTotalMemInGb(); 
   float avail_mem_in_gb = mem_check::getAvailMemInGb();
   std::cout << "Total thread number: " << total_thread_num << std::endl;

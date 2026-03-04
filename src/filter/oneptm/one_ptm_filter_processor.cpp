@@ -169,7 +169,7 @@ void process(OnePtmFilterMngPtr mng_ptr) {
   mng_ptr->cnts_.resize(block_num, 0);
   for (int i = 0; i < block_num; i++) {
     while (pool_ptr->getQueueSize() > 0 || pool_ptr->getIdleThreadNum() == 0) {
-      boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
     pool_ptr->enqueue(geneTask(db_block_ptr_vec[i]->getBlockIdx(), mod_mass_list, mng_ptr));
   }

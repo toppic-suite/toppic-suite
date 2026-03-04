@@ -22,7 +22,7 @@ namespace toppic {
 SimpleThreadPool::SimpleThreadPool(int thread_num) :
     terminate_(false), idle_thread_num_(0) {
   for (int i = 0; i < thread_num; i++) {
-    ThreadPtr thread_ptr = std::make_shared<boost::thread>(&SimpleThreadPool::invoke, this);
+    ThreadPtr thread_ptr = std::make_shared<std::thread>(&SimpleThreadPool::invoke, this);
     ToppicThreadPtr toppic_thread_ptr = std::make_shared<ToppicThread>(i, thread_ptr);
     thread_ptr_vec_.emplace_back(toppic_thread_ptr);
   }
@@ -32,7 +32,7 @@ void SimpleThreadPool::enqueue(std::function<void()> f) {
   // Scope based locking.
   {
     // Put unique lock on task mutex.
-    boost::unique_lock<boost::mutex> lock(tasks_mutex_);
+    std::unique_lock<std::mutex> lock(tasks_mutex_);
 
     // Push task into queue.
     tasks_.push(std::move(f));
@@ -48,10 +48,12 @@ void SimpleThreadPool::invoke() {
     // Scope based locking.
     {
       // Put unique lock on task mutex.
-      boost::unique_lock<boost::mutex> lock(tasks_mutex_);
+      std::unique_lock<std::mutex> lock(tasks_mutex_);
       idle_thread_num_ ++;
 
       // Wait until queue is not empty or termination signal is sent.
+      // The predicate is evaluated while holding the lock, so accessing
+      // tasks_ and terminate_ here is safe.
       condition_.wait(lock, [this]{ return !tasks_.empty() || terminate_; });
 
       // If termination signal received and queue is empty then exit else continue clearing the queue.
@@ -77,7 +79,7 @@ void SimpleThreadPool::shutDown() {
   // Scope based locking.
   {
     // Put unique lock on task mutex.
-    boost::unique_lock<boost::mutex> lock(tasks_mutex_);
+    std::unique_lock<std::mutex> lock(tasks_mutex_);
 
     // Set termination flag to true.
     terminate_ = true;
@@ -96,7 +98,7 @@ void SimpleThreadPool::shutDown() {
   thread_ptr_vec_.clear();
 }
 
-int SimpleThreadPool::getId(boost::thread::id thread_id) {
+int SimpleThreadPool::getId(std::thread::id thread_id) {
   for (const ToppicThreadPtr& t : thread_ptr_vec_) {
     if (t->getThreadPtr()->get_id() == thread_id) {
       return t->getId();

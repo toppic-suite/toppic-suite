@@ -174,7 +174,7 @@ void process(VarPtmFilterMngPtr mng_ptr) {
   LOG_DEBUG("thread num " << mng_ptr->thread_num_);
   for (int i = 0; i < block_num; i++) {
     while (pool_ptr->getQueueSize() > 0 || pool_ptr->getIdleThreadNum() ==0) {
-      boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
     pool_ptr->enqueue(geneTask(db_block_ptr_vec[i]->getBlockIdx(), mng_ptr));
   }

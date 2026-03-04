@@ -15,18 +15,19 @@
 #ifndef TOPPIC_COMMON_THREAD_SIMPLE_THREAD_POOL_HPP_
 #define TOPPIC_COMMON_THREAD_SIMPLE_THREAD_POOL_HPP_
 
+#include <atomic>
 #include <memory>
 #include <functional>
 #include <vector>
 #include <queue>
 
-#include <boost/thread/thread.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/condition_variable.hpp>
+#include <condition_variable>
+#include <mutex>
+#include <thread>
 
 namespace toppic {
 
-using ThreadPtr = std::shared_ptr<boost::thread>;
+using ThreadPtr = std::shared_ptr<std::thread>;
 
 class ToppicThread {
  public:
@@ -47,7 +48,7 @@ using ToppicThreadPtrVec = std::vector<ToppicThreadPtr>;
 class SimpleThreadPool {
  public:
   // Constructor.
-  SimpleThreadPool(int threads);
+  SimpleThreadPool(int thread_num);
 
   // Destructor.
   ~SimpleThreadPool();
@@ -58,13 +59,16 @@ class SimpleThreadPool {
   // Shut down the pool.
   void shutDown();
 
-  int getQueueSize() const {return tasks_.size();}
+  int getQueueSize() const {
+    std::unique_lock<std::mutex> lock(tasks_mutex_);
+    return tasks_.size();
+  }
 
   int getThreadNum() const {return thread_ptr_vec_.size();}
 
-  int getIdleThreadNum() const {return idle_thread_num_;}
+  int getIdleThreadNum() const { return idle_thread_num_; }
 
-  int getId(boost::thread::id thread_id);
+  int getId(std::thread::id thread_id);
 
  private:
   // Thread pool storage.
@@ -74,16 +78,16 @@ class SimpleThreadPool {
   std::queue<std::function<void()> > tasks_;
 
   // Task queue mutex.
-  boost::mutex tasks_mutex_;
+  mutable std::mutex tasks_mutex_;
 
   // Condition variable.
-  boost::condition_variable condition_;
+  std::condition_variable condition_;
 
   // Indicates that pool needs to be shut down.
   bool terminate_;
 
   // Idle thread number.
-  int idle_thread_num_;
+  std::atomic<int> idle_thread_num_;
 
   // Function that will be invoked by our threads.
   void invoke();

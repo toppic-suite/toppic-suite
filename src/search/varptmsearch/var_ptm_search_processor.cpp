@@ -159,7 +159,7 @@ std::function<void()> geneTask(SpectrumSetPtr spec_set_ptr,
               Prsm::cmpMatchFragDecMatchPeakDecProtInc);
     PrsmPtrVec selected_prsms = prsm_util::getTopPrsms(prsms, mng_ptr->n_report_);
 
-    boost::thread::id thread_id = boost::this_thread::get_id();
+    std::thread::id thread_id = std::this_thread::get_id();
     int writer_id = pool_ptr->getId(thread_id);
     writer_ptr_vec[writer_id]->writeVector(selected_prsms);
   };
@@ -249,7 +249,7 @@ void VarPtmSearchProcessor::process() {
           // LOG_DEBUG("start processing one spectrum.");
           for (size_t k = 0; k < spec_set_vec.size(); k++) {
             while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ * 2) {
-              boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+              std::this_thread::sleep_for(std::chrono::milliseconds(100));
             }
             pool_ptr->enqueue(geneTask(spec_set_vec[k], 
                                        comp_selected_prsm_ptrs,
@@ -272,7 +272,7 @@ void VarPtmSearchProcessor::process() {
           // LOG_DEBUG("start processing one spectrum.");
           for (size_t k = 0; k < spec_set_vec.size(); k++) {
             while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ * 2) {
-              boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+              std::this_thread::sleep_for(std::chrono::milliseconds(100));
             }
             pool_ptr->enqueue(geneTask(spec_set_vec[k], 
                                        pref_selected_prsm_ptrs,
@@ -295,7 +295,7 @@ void VarPtmSearchProcessor::process() {
           // LOG_DEBUG("start processing one spectrum.");
           for (size_t k = 0; k < spec_set_vec.size(); k++) {
             while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ * 2) {
-              boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+              std::this_thread::sleep_for(std::chrono::milliseconds(100));
             }
             pool_ptr->enqueue(geneTask(spec_set_vec[k], 
                                        suff_selected_prsm_ptrs,
@@ -318,7 +318,7 @@ void VarPtmSearchProcessor::process() {
           // LOG_DEBUG("start processing one spectrum.");
           for (size_t k = 0; k < spec_set_vec.size(); k++) {
             while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ * 2) {
-              boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+              std::this_thread::sleep_for(std::chrono::milliseconds(100));
             }
             pool_ptr->enqueue(geneTask(spec_set_vec[k], 
                                        internal_selected_prsm_ptrs,

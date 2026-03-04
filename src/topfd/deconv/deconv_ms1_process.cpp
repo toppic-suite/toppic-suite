@@ -107,7 +107,7 @@ void deconvMsOne(MzmlMsGroupPtr ms_group_ptr,
                                                              result_envs);
   
 
-  boost::thread::id thread_id = boost::this_thread::get_id();
+  std::thread::id thread_id = std::this_thread::get_id();
   int writer_id = pool_ptr->getId(thread_id);
   ms1_writer_ptr_vec[writer_id]->writeMs(deconv_ms_ptr);
   
@@ -198,7 +198,7 @@ void DeconvMs1Process::process() {
   int total_spec_num = topfd_para_ptr_->getMs1ScanNum(); 
   while (ms_group_ptr != nullptr) {
     while(pool_ptr->getQueueSize() >= thread_num * 2){
-      boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
     pool_ptr->enqueue(deconv_ms1_process::geneTask(ms_group_ptr, topfd_para_ptr_, ms1_writer_ptr_vec, pool_ptr)); 
     spec_cnt++; 

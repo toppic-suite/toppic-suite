@@ -13,6 +13,7 @@
 //limitations under the License.
 
 #include <limits>
+#include <cmath>
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
@@ -70,7 +71,7 @@ std::function<void()> geneTask(SpectrumSetPtr spec_set_ptr,
       }
     }
 
-    boost::thread::id thread_id = boost::this_thread::get_id();
+    std::thread::id thread_id = std::this_thread::get_id();
     int writer_id = pool_ptr->getId(thread_id);
     for (size_t i = 0; i < prsm_vec.size(); i++) {
       writer_ptr_vec[writer_id]->write(prsm_vec[i]);
@@ -125,7 +126,7 @@ void EValueProcessor::process(bool is_separate) {
           processOneSpectrum(spec_set_ptr, selected_prsm_ptrs, ppo, is_separate, writer);
         } else if (checkPrsms(selected_prsm_ptrs)) {
           while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ + 2) {
-            boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
           }
           pool_ptr->enqueue(geneTask(spec_set_ptr, selected_prsm_ptrs, ppo, is_separate,
                                      mng_ptr_, test_num_ptr_, pool_ptr, writer_ptr_vec));

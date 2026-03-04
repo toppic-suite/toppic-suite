@@ -144,7 +144,7 @@ void DiagFilterProcessor::process() {
 
   for (size_t i = 0; i < db_block_ptr_vec.size(); i++) {
     while (pool_ptr->getQueueSize() > 0 || pool_ptr->getIdleThreadNum() == 0) {
-      boost::this_thread::sleep(boost::posix_time::milliseconds(10));
+      std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
     pool_ptr->enqueue(geneTask(db_block_ptr_vec[i]->getBlockIdx(), mod_mass_list, mng_ptr_));
   }

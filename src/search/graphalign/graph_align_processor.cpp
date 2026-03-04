@@ -219,7 +219,7 @@ void GraphAlignProcessor::process() {
   std::vector<ThreadPtr> thread_vec;
   for (int i = 0; i < mng_ptr_->thread_num_; i++) {
     ThreadPtr thread_ptr 
-      = std::make_shared<boost::thread>(geneTask(mng_ptr_, var_mod_ptr_vec, spectrum_num, i));
+      = std::make_shared<std::thread>(geneTask(mng_ptr_, var_mod_ptr_vec, spectrum_num, i));
     thread_vec.push_back(thread_ptr);
   }
 

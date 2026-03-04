@@ -12,6 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include <cmath>
+
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "common/thread/simple_thread_pool.hpp"
@@ -55,7 +57,7 @@ std::function<void()> geneTask(SpectrumSetPtr spectrum_set_ptr,
         simple_prsm_util::getUniqueMatches(match_prsm_ptrs);
     PtmSearchSlowFilterPtr slow_filter_ptr = 
         std::make_shared<PtmSearchSlowFilter>(spectrum_set_ptr, simple_prsm_ptrs, mng_ptr);
-    boost::thread::id thread_id = boost::this_thread::get_id();
+    std::thread::id thread_id = std::this_thread::get_id();
     int writer_id = pool_ptr->getId(thread_id);
     PrsmXmlWriterSetPtr writer_ptr = writer_ptr_vec[writer_id];
 
@@ -149,7 +151,7 @@ void PtmSearchProcessor::process(){
         if (selected_prsm_ptrs.size() > 0) {
           for (size_t i = 0; i < spec_set_ptr_vec.size(); i++) {
             while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ * 2) {
-              boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+              std::this_thread::sleep_for(std::chrono::milliseconds(100));
             }
             pool_ptr->enqueue(geneTask(spec_set_ptr_vec[i], selected_prsm_ptrs,
                                        mng_ptr_, pool_ptr, writer_set_ptr_vec));

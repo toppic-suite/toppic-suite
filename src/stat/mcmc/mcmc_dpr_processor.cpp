@@ -286,7 +286,7 @@ std::function<void()> geneTask(SpectrumSetPtr spec_set_ptr,
     ExpectedValuePtr evalue = std::make_shared<ExpectedValue>(one_prob, cand_num, 0.005);
     prsm_ptr->setExpectedValuePtr(evalue);
 
-    boost::thread::id thread_id = boost::this_thread::get_id();
+    std::thread::id thread_id = std::this_thread::get_id();
     int writer_id = pool_ptr->getId(thread_id);
     writer_ptr_vec[writer_id]->write(prsm_ptr);
   };
@@ -301,7 +301,7 @@ void DprProcessor::processOnePrsm(PrsmPtr prsm_ptr, SpectrumSetPtr spec_set_ptr,
   }
 
   while (pool_ptr_->getQueueSize() >= mng_ptr_->thread_num_ + 2) {
-    boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
   pool_ptr_->enqueue(geneTask(spec_set_ptr, prsm_ptr, mng_ptr_,
                               ptm_residue_map_, mass_table_,

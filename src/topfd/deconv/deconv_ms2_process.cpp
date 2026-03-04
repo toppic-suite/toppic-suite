@@ -99,7 +99,7 @@ void deconvMsTwo(MzmlMsPtr ms_ptr, SpecFeaturePtrVec sp_feat_ptr_vec,
   DeconvMsPtr deconv_ms_ptr =
       match_env_util::getDeconvMsPtr(header_ptr, deconv_envs);
 
-  boost::thread::id thread_id = boost::this_thread::get_id();
+  std::thread::id thread_id = std::this_thread::get_id();
   int writer_id = pool_ptr->getId(thread_id);
   ms2_writer_ptr_vec[writer_id]->writeMs(deconv_ms_ptr);
 
@@ -219,7 +219,7 @@ void DeconvMs2Process::process() {
     MzmlMsPtrVec ms_ptr_vec = ms_group_ptr->getMsTwoPtrVec();
     for (std::size_t i = 0; i < ms_ptr_vec.size(); i++) {
       while (pool_ptr->getQueueSize() >= thread_num * 2) {
-        boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
       }
       spec_cnt++;
       MzmlMsPtr ms_ptr = ms_ptr_vec[i];
