@@ -29,7 +29,7 @@ class GraphAlignProcessor {
   GraphAlignMngPtr mng_ptr_;
 };
 
-typedef std::shared_ptr<GraphAlignProcessor> GraphAlignProcessorPtr;
+using GraphAlignProcessorPtr = std::shared_ptr<GraphAlignProcessor>;
 
 }  // namespace toppic
 

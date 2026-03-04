@@ -28,7 +28,7 @@
 
 namespace toppic {
 
-typedef std::vector<std::vector<std::vector<std::vector<std::pair<int, int>>>>> ConsistentPairs;
+using ConsistentPairs = std::vector<std::vector<std::vector<std::vector<std::pair<int, int>>>>>;
 
 class GraphAlign {
  public:
@@ -100,7 +100,7 @@ class GraphAlign {
   void geneHeaders();
 };
 
-typedef std::shared_ptr<GraphAlign> GraphAlignPtr;
+using GraphAlignPtr = std::shared_ptr<GraphAlign>;
 
 }  // namespace toppic
 

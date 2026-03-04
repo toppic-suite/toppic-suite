@@ -44,8 +44,8 @@ class SimplePrsmXmlWriter {
   std::string file_name_;
 };
 
-typedef std::shared_ptr<SimplePrsmXmlWriter>   SimplePrsmXmlWriterPtr;
-typedef std::vector<SimplePrsmXmlWriterPtr>    SimplePrsmXmlWriterPtrVec;
+using SimplePrsmXmlWriterPtr = std::shared_ptr<SimplePrsmXmlWriter>;
+using SimplePrsmXmlWriterPtrVec = std::vector<SimplePrsmXmlWriterPtr>;
 
 }  // namespace toppic
 

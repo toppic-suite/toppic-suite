@@ -71,7 +71,7 @@ class LocalProcessor {
   ModPtrVec mod_list_any_;
 };
 
-typedef std::shared_ptr<LocalProcessor> LocalProcessorPtr;
+using LocalProcessorPtr = std::shared_ptr<LocalProcessor>;
 
 }  // namespace toppic
 

@@ -23,7 +23,7 @@ namespace toppic {
 
 class TopfdPara;
 
-typedef std::shared_ptr<TopfdPara> TopfdParaPtr;
+using TopfdParaPtr = std::shared_ptr<TopfdPara>;
 
 class TopfdPara {
  public:

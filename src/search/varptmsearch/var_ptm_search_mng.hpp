@@ -65,7 +65,7 @@ class VarPtmSearchMng {
   std::vector<std::vector<int>> diag_matrix_shift_idxes_;
 };
 
-typedef std::shared_ptr<VarPtmSearchMng> VarPtmSearchMngPtr;
+using VarPtmSearchMngPtr = std::shared_ptr<VarPtmSearchMng>;
 
 } /* namespace toppic */
 

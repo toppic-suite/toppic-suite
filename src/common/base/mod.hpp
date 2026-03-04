@@ -24,7 +24,7 @@ namespace toppic {
 class XmlDOMDocument;
 
 class Mod;
-typedef std::shared_ptr<Mod> ModPtr;
+using ModPtr = std::shared_ptr<Mod>;
 
 class Mod {
  public:
@@ -56,9 +56,9 @@ class Mod {
   ModTypePtr mod_type_ptr_;
 };
 
-typedef std::vector<ModPtr> ModPtrVec;
+using ModPtrVec = std::vector<ModPtr>;
 
-typedef std::vector<ModPtrVec> ModPtrVec2D;
+using ModPtrVec2D = std::vector<ModPtrVec>;
 
 }  // namespace toppic
 

@@ -66,7 +66,7 @@ class SimplePrsmStrMerge {
   int top_num_;
 };
 
-typedef std::shared_ptr<SimplePrsmStrMerge> SimplePrsmStrMergePtr;
+using SimplePrsmStrMergePtr = std::shared_ptr<SimplePrsmStrMerge>;
 } /* namespace toppic */
 
 #endif

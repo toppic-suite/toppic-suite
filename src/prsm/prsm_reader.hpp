@@ -42,8 +42,8 @@ class PrsmReader {
   std::ifstream input_;
 };
 
-typedef std::shared_ptr<PrsmReader> PrsmReaderPtr;
-typedef std::vector<PrsmReaderPtr> PrsmReaderPtrVec;
+using PrsmReaderPtr = std::shared_ptr<PrsmReader>;
+using PrsmReaderPtrVec = std::vector<PrsmReaderPtr>;
 
 } /* namespace toppic */
 

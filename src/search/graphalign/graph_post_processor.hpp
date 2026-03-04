@@ -46,7 +46,7 @@ class GraphPostProcessor {
   std::unordered_map<int, PtmPtrVec> mass_ptm_map_;
 };
 
-typedef std::shared_ptr<GraphPostProcessor> GraphPostProcessorPtr;
+using GraphPostProcessorPtr = std::shared_ptr<GraphPostProcessor>;
 
 }  // namespace toppic
 

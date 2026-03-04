@@ -67,8 +67,8 @@ class ProteoGraph {
   void compDistances(int max_mod_num, int max_ptm_sum_mass);
 };
 
-typedef std::shared_ptr<ProteoGraph> ProteoGraphPtr;
-typedef std::vector<ProteoGraphPtr> ProteoGraphPtrVec;
+using ProteoGraphPtr = std::shared_ptr<ProteoGraph>;
+using ProteoGraphPtrVec = std::vector<ProteoGraphPtr>;
 
 } /* namespace toppic */
 

@@ -23,8 +23,8 @@
 namespace toppic {
 
 class ProtCandidate;
-typedef std::shared_ptr<ProtCandidate> ProtCandidatePtr;
-typedef std::vector<ProtCandidatePtr> ProtCandidatePtrVec;
+using ProtCandidatePtr = std::shared_ptr<ProtCandidate>;
+using ProtCandidatePtrVec = std::vector<ProtCandidatePtr>;
 
 class ProtCandidate {
  public:

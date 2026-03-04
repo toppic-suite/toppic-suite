@@ -25,9 +25,9 @@ namespace toppic {
 class XmlDOMDocument;
 
 class SimplePrsm;
-typedef std::shared_ptr<SimplePrsm>   SimplePrsmPtr;
-typedef std::vector<SimplePrsmPtr>    SimplePrsmPtrVec;
-typedef std::vector<SimplePrsmPtrVec> SimplePrsmPtrVec2D;
+using SimplePrsmPtr = std::shared_ptr<SimplePrsm>;
+using SimplePrsmPtrVec = std::vector<SimplePrsmPtr>;
+using SimplePrsmPtrVec2D = std::vector<SimplePrsmPtrVec>;
 
 class SimplePrsm {
  public:

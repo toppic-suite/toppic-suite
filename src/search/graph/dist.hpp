@@ -46,8 +46,8 @@ class Dist{
   MassGraphPtr graph_ptr_;
 };
 
-typedef std::vector<Dist> DistVec;
-typedef std::vector<DistVec> DistVec2D;
+using DistVec = std::vector<Dist>;
+using DistVec2D = std::vector<DistVec>;
 
 inline bool distVecUp(const Dist & a, const Dist & b) {
   return a.dist_ < b.dist_;

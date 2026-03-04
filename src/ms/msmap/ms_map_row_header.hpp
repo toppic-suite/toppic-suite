@@ -33,8 +33,8 @@ class MsMapRowHeader {
   double base_inte_;
 };
 
-typedef std::shared_ptr<MsMapRowHeader> MsMapRowHeaderPtr;
-typedef std::vector<MsMapRowHeaderPtr> MsMapRowHeaderPtrVec;
+using MsMapRowHeaderPtr = std::shared_ptr<MsMapRowHeader>;
+using MsMapRowHeaderPtrVec = std::vector<MsMapRowHeaderPtr>;
 
 }
 

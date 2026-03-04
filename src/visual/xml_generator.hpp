@@ -83,7 +83,7 @@ class XmlGenerator {
   
 };
 
-typedef std::shared_ptr<XmlGenerator> XmlGeneratorPtr;
+using XmlGeneratorPtr = std::shared_ptr<XmlGenerator>;
 
 }  // namespace toppic
 

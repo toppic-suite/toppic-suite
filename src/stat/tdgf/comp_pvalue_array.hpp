@@ -47,7 +47,7 @@ class CompPValueArray {
   ResFreqPtrVec prot_n_term_residue_ptrs_;
 };
 
-typedef std::shared_ptr<CompPValueArray> CompPValueArrayPtr;
+using CompPValueArrayPtr = std::shared_ptr<CompPValueArray>;
 
 }  // namespace toppic
 

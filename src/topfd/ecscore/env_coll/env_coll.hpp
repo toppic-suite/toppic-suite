@@ -77,8 +77,8 @@ class EnvColl {
   double ecscore_ = -1;
 };
 
-typedef std::shared_ptr<EnvColl> EnvCollPtr;
-typedef std::vector<EnvCollPtr> EnvCollPtrVec;
+using EnvCollPtr = std::shared_ptr<EnvColl>;
+using EnvCollPtrVec = std::vector<EnvCollPtr>;
 
 
 }  // namespace toppic

@@ -67,9 +67,9 @@ class Cell {
   double pre_ = -1;
 };
 
-typedef std::shared_ptr<Cell> CellPtr;
-typedef std::vector<CellPtr> CellPtrVec;
-typedef std::vector<CellPtrVec> CellPtrVec2D;
+using CellPtr = std::shared_ptr<Cell>;
+using CellPtrVec = std::vector<CellPtr>;
+using CellPtrVec2D = std::vector<CellPtrVec>;
 
 
 inline FeaturePrsmPtrVec getTopFeatures(FeaturePrsmPtrVec &features) {

@@ -22,8 +22,8 @@
 namespace toppic {
 
 class DbBlock;
-typedef std::shared_ptr<DbBlock> DbBlockPtr;
-typedef std::vector<DbBlockPtr> DbBlockPtrVec;
+using DbBlockPtr = std::shared_ptr<DbBlock>;
+using DbBlockPtrVec = std::vector<DbBlockPtr>;
 
 // A large fasta database is divided into several database blocks (DbBlock)
 class DbBlock {

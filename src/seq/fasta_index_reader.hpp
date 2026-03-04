@@ -37,7 +37,7 @@ class FastaIndexReader {
   faidx_t *fai_;
 };
 
-typedef std::shared_ptr<FastaIndexReader> FastaIndexReaderPtr;
+using FastaIndexReaderPtr = std::shared_ptr<FastaIndexReader>;
 
 }  // namespace toppic
 

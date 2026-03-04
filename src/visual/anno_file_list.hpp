@@ -32,7 +32,7 @@ class AnnoFileList {
   static std::vector<std::vector<std::string>> readFromXml(const std::string &file_name);
 };
 
-typedef std::shared_ptr<AnnoFileList> AnnoFileListPtr;
+using AnnoFileListPtr = std::shared_ptr<AnnoFileList>;
 
 
 }  // namespace toppic

@@ -54,7 +54,7 @@ class PrsmCoverage {
   void outputMatchPeaks(PrsmPtr prsm_ptr, PrsmParaPtr prsm_para_ptr);
 };
 
-typedef std::shared_ptr<PrsmCoverage> PrsmCoveragePtr;
+using PrsmCoveragePtr = std::shared_ptr<PrsmCoverage>;
 
 }  // namespace toppic
 

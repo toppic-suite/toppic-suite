@@ -89,7 +89,7 @@ class VarPtmFilterMng {
   std::vector<int> int_shift_list_;
 };
 
-typedef std::shared_ptr<VarPtmFilterMng> VarPtmFilterMngPtr;
+using VarPtmFilterMngPtr = std::shared_ptr<VarPtmFilterMng>;
 
 } 
 

@@ -21,7 +21,7 @@
 namespace toppic {
 
 class BasePeakType;
-typedef std::shared_ptr<BasePeakType> BasePeakTypePtr;
+using BasePeakTypePtr = std::shared_ptr<BasePeakType>;
 
 class BasePeakType {
  public:

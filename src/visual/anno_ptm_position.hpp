@@ -43,8 +43,8 @@ class AnnoPtmPosition {
   std::string anno_;
 };
 
-typedef std::shared_ptr<AnnoPtmPosition> AnnoPtmPositionPtr;
-typedef std::vector<AnnoPtmPositionPtr> AnnoPtmPositionPtrVec;
+using AnnoPtmPositionPtr = std::shared_ptr<AnnoPtmPosition>;
+using AnnoPtmPositionPtrVec = std::vector<AnnoPtmPositionPtr>;
 
 }  // namespace toppic
 

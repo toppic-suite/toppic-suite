@@ -46,7 +46,7 @@ class PrsmStrMerge {
   bool remove_dup_;
 };
 
-typedef std::shared_ptr<PrsmStrMerge> PrsmStrMergePtr;
+using PrsmStrMergePtr = std::shared_ptr<PrsmStrMerge>;
 } /* namespace toppic */
 
 #endif

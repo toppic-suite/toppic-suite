@@ -21,8 +21,8 @@
 namespace toppic {
 
 class DpPair;
-typedef std::shared_ptr<DpPair>  DpPairPtr;
-typedef std::vector<DpPairPtr> DpPairPtrVec;
+using DpPairPtr = std::shared_ptr<DpPair>;
+using DpPairPtrVec = std::vector<DpPairPtr>;
 
 class DpPair : public Pair{
  public:

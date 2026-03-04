@@ -22,7 +22,7 @@
 namespace toppic {
 
 class ModType;
-typedef std::shared_ptr<ModType> ModTypePtr;
+using ModTypePtr = std::shared_ptr<ModType>;
 
 class ModType {
  public:
@@ -43,7 +43,7 @@ class ModType {
   int id_;
 };
 
-typedef std::vector<ModTypePtr> ModTypePtrVec;
+using ModTypePtrVec = std::vector<ModTypePtr>;
 
 }  // namespace toppic
 

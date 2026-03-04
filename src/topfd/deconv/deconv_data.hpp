@@ -86,7 +86,7 @@ class DeconvData {
   void initMinInte(bool estimate_min_inte, double sn_ratio);
 };
 
-typedef std::shared_ptr<DeconvData> DeconvDataPtr;
+using DeconvDataPtr = std::shared_ptr<DeconvData>;
 
 }
 

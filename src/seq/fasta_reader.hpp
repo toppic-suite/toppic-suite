@@ -39,7 +39,7 @@ class FastaReader {
   std::string ori_name_;
 };
 
-typedef std::shared_ptr<FastaReader> FastaReaderPtr;
+using FastaReaderPtr = std::shared_ptr<FastaReader>;
 
 }  //namepace prot
 

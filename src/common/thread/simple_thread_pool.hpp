@@ -26,7 +26,7 @@
 
 namespace toppic {
 
-typedef std::shared_ptr<boost::thread> ThreadPtr;
+using ThreadPtr = std::shared_ptr<boost::thread>;
 
 class ToppicThread {
  public:
@@ -41,8 +41,8 @@ class ToppicThread {
   ThreadPtr thread_ptr_;
 };
 
-typedef std::shared_ptr<ToppicThread> ToppicThreadPtr;
-typedef std::vector<ToppicThreadPtr> ToppicThreadPtrVec;
+using ToppicThreadPtr = std::shared_ptr<ToppicThread>;
+using ToppicThreadPtrVec = std::vector<ToppicThreadPtr>;
 
 class SimpleThreadPool {
  public:
@@ -89,7 +89,7 @@ class SimpleThreadPool {
   void invoke();
 };
 
-typedef std::shared_ptr<SimpleThreadPool> SimpleThreadPoolPtr;
+using SimpleThreadPoolPtr = std::shared_ptr<SimpleThreadPool>;
 
 }  // namespace toppic
 

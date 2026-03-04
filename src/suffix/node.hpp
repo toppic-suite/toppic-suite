@@ -26,7 +26,7 @@ namespace toppic {
 namespace suffix {
 
 class Node;
-typedef std::shared_ptr<Node> NodePtr;
+using NodePtr = std::shared_ptr<Node>;
 
 class Node {
  public:

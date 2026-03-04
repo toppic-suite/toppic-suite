@@ -38,7 +38,7 @@ class SpecFeatureReader {
   std::ifstream input_;
 };
 
-typedef std::shared_ptr<SpecFeatureReader> SpecFeatureReaderPtr;
+using SpecFeatureReaderPtr = std::shared_ptr<SpecFeatureReader>;
 
 }  // namespace toppic
 #endif

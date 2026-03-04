@@ -23,7 +23,7 @@
 namespace toppic {
 
 class PrsmStr;
-typedef std::shared_ptr<PrsmStr> PrsmStrPtr;
+using PrsmStrPtr = std::shared_ptr<PrsmStr>;
 
 class PrsmStr {
  public:
@@ -202,8 +202,8 @@ class PrsmStr {
 
 };
 
-typedef std::vector<PrsmStrPtr> PrsmStrPtrVec;
-typedef std::vector<PrsmStrPtrVec> PrsmStrPtrVec2D;
+using PrsmStrPtrVec = std::vector<PrsmStrPtr>;
+using PrsmStrPtrVec2D = std::vector<PrsmStrPtrVec>;
 
 }  // namespace toppic
 

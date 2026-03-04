@@ -23,7 +23,7 @@
 namespace toppic {
 
 class PrmPeak;
-typedef std::shared_ptr<PrmPeak> PrmPeakPtr;
+using PrmPeakPtr = std::shared_ptr<PrmPeak>;
 
 class PrmPeak : public Peak {
  public:
@@ -89,8 +89,8 @@ class PrmPeak : public Peak {
   SupportPeakPtrVec neighbor_list_;
 };
 
-typedef std::vector<PrmPeakPtr> PrmPeakPtrVec;
-typedef std::vector<PrmPeakPtrVec> PrmPeakPtrVec2D;
+using PrmPeakPtrVec = std::vector<PrmPeakPtr>;
+using PrmPeakPtrVec2D = std::vector<PrmPeakPtrVec>;
 
 
 } /* namespace toppic */

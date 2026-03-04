@@ -48,7 +48,7 @@ class PrsmMatchTableWriter {
 
 };
 
-typedef std::shared_ptr<PrsmMatchTableWriter> PrsmMatchTableWriterPtr;
+using PrsmMatchTableWriterPtr = std::shared_ptr<PrsmMatchTableWriter>;
 
 } /* namespace toppic */
 

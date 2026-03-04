@@ -245,7 +245,7 @@ void DeconvMs2Process::process() {
                     << (feat_list.size() -sp_feat_ptr_vec.size()) << " features."); 
         }
       }
-      pool_ptr->Enqueue(deconv_ms2_process::geneMsTwoTask(
+      pool_ptr->enqueue(deconv_ms2_process::geneMsTwoTask(
           ms_ptr, sp_feat_ptr_vec, topfd_para_ptr_, ms2_writer_ptr_vec,
           pool_ptr));
       std::string msg = deconv_ms2_process::updateMsTwoMsg(
@@ -254,7 +254,7 @@ void DeconvMs2Process::process() {
     }
     ms_group_ptr = reader_ptr->getNextMsGroupPtr();
   }
-  pool_ptr->ShutDown();
+  pool_ptr->shutDown();
   for (int i = 0; i < thread_num; i++) {
     ms2_writer_ptr_vec[i] = nullptr;
   }

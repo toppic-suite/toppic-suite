@@ -67,8 +67,8 @@ class AminoAcid {
   double average_mass_;
 };
 
-typedef std::shared_ptr<AminoAcid> AminoAcidPtr;
-typedef std::vector<AminoAcidPtr> AminoAcidPtrVec;
+using AminoAcidPtr = std::shared_ptr<AminoAcid>;
+using AminoAcidPtrVec = std::vector<AminoAcidPtr>;
 
 }  // namespace toppic
 

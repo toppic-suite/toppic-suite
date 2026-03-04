@@ -111,7 +111,7 @@ class CompPValueMCMC{
   std::vector<int> score_stack_;
 };
 
-typedef std::shared_ptr<CompPValueMCMC> CompPValueMCMCPtr;
+using CompPValueMCMCPtr = std::shared_ptr<CompPValueMCMC>;
 
 }  // namespace toppic
 

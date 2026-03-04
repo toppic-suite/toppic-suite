@@ -200,14 +200,14 @@ void DeconvMs1Process::process() {
     while(pool_ptr->getQueueSize() >= thread_num * 2){
       boost::this_thread::sleep(boost::posix_time::milliseconds(100));
     }
-    pool_ptr->Enqueue(deconv_ms1_process::geneTask(ms_group_ptr, topfd_para_ptr_, ms1_writer_ptr_vec, pool_ptr)); 
+    pool_ptr->enqueue(deconv_ms1_process::geneTask(ms_group_ptr, topfd_para_ptr_, ms1_writer_ptr_vec, pool_ptr)); 
     spec_cnt++; 
     std::string msg = deconv_ms1_process::updateMsOneMsg(ms_group_ptr->getMsOnePtr()->getMsHeaderPtr(), 
                                                          spec_cnt, total_spec_num);
     std::cout << "\r" << msg << std::flush;
     ms_group_ptr = reader_ptr->getNextMsGroupPtr();    
   }
-  pool_ptr->ShutDown();
+  pool_ptr->shutDown();
   for (int i = 0; i < thread_num; i++) { 
     ms1_writer_ptr_vec[i] = nullptr;
   }

@@ -41,8 +41,8 @@ class SeqSegment {
   double c_term_shift_;
 };
 
-typedef std::shared_ptr<SeqSegment> SeqSegmentPtr;
-typedef std::vector<SeqSegmentPtr> SeqSegmentPtrVec;
+using SeqSegmentPtr = std::shared_ptr<SeqSegment>;
+using SeqSegmentPtrVec = std::vector<SeqSegmentPtr>;
 
 }  // namespace toppic
 

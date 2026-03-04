@@ -29,7 +29,7 @@
 
 namespace toppic {
 
-typedef std::shared_ptr<pwiz::msdata::MSDataFile> MSDataFilePtr;
+using MSDataFilePtr = std::shared_ptr<pwiz::msdata::MSDataFile>;
 
 class PwMsReader {
  public:
@@ -97,7 +97,7 @@ class PwMsReader {
   double parseFaims(pwiz::msdata::SpectrumPtr cur_spec_ptr);
 };
 
-typedef std::shared_ptr<PwMsReader> PwMsReaderPtr;
+using PwMsReaderPtr = std::shared_ptr<PwMsReader>;
 
 }  // namespace toppic
 

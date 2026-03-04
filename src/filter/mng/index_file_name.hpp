@@ -36,7 +36,7 @@ class IndexFileName{
     {"TARGET", "no_decoy"}, {"TARGET+DECOY", "decoy"}};
 };
 
-typedef std::shared_ptr<IndexFileName> IndexFileNamePtr;
+using IndexFileNamePtr = std::shared_ptr<IndexFileName>;
 
 }
 

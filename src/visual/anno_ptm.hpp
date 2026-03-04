@@ -23,8 +23,8 @@
 namespace toppic {
 
 class AnnoPtm;
-typedef std::shared_ptr<AnnoPtm> AnnoPtmPtr;
-typedef std::vector<AnnoPtmPtr> AnnoPtmPtrVec;
+using AnnoPtmPtr = std::shared_ptr<AnnoPtm>;
+using AnnoPtmPtrVec = std::vector<AnnoPtmPtr>;
 
 class AnnoPtm {
  public:

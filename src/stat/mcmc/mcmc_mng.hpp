@@ -72,7 +72,7 @@ class MCMCMng {
   int getIntTolerance() {return int_tolerance_;}
 };
 
-typedef std::shared_ptr<MCMCMng> MCMCMngPtr;
+using MCMCMngPtr = std::shared_ptr<MCMCMng>;
 
 }  // namespace toppic
 

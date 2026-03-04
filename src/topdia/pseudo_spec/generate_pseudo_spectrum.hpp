@@ -89,7 +89,7 @@ class GeneratePseudoSpectrum {
   std::vector<MzrtFeaturePtrVec> ms2_features_;
 };
 
-typedef std::shared_ptr<GeneratePseudoSpectrum> GeneratePseudoSpectrumPtr;
+using GeneratePseudoSpectrumPtr = std::shared_ptr<GeneratePseudoSpectrum>;
 
 }  // namespace toppic
 #endif  // TOPPIC_GENERATE_PSEUDO_SPECTRUM_HPP

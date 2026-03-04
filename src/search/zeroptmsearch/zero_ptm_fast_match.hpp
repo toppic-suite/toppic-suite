@@ -22,8 +22,8 @@
 namespace toppic {
 
 class ZeroPtmFastMatch;
-typedef std::shared_ptr<ZeroPtmFastMatch> ZpFastMatchPtr;
-typedef std::vector<ZpFastMatchPtr> ZpFastMatchPtrVec;
+using ZpFastMatchPtr = std::shared_ptr<ZeroPtmFastMatch>;
+using ZpFastMatchPtrVec = std::vector<ZpFastMatchPtr>;
 
 class ZeroPtmFastMatch {
  public:

@@ -42,9 +42,9 @@ class MsMapPeak : public Peak {
   bool neighbor_;
 };
 
-typedef std::shared_ptr<MsMapPeak> MsMapPeakPtr;
-typedef std::vector<MsMapPeakPtr> MsMapPeakPtrVec;
-typedef std::vector<MsMapPeakPtrVec> MsMapPeakPtr2D;
+using MsMapPeakPtr = std::shared_ptr<MsMapPeak>;
+using MsMapPeakPtrVec = std::vector<MsMapPeakPtr>;
+using MsMapPeakPtr2D = std::vector<MsMapPeakPtrVec>;
 
 }
 #endif

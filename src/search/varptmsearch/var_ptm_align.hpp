@@ -86,7 +86,7 @@ class VarPtmAlign {
   ModPtrVec backtrack_mod_ptrs_;
 };
 
-typedef std::shared_ptr<VarPtmAlign> VarPtmAlignPtr;
+using VarPtmAlignPtr = std::shared_ptr<VarPtmAlign>;
 
 } /* namespace toppic */
 

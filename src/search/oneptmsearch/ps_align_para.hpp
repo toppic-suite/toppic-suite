@@ -45,7 +45,7 @@ class PsAlignPara {
 
 };
 
-typedef std::shared_ptr<PsAlignPara> PsAlignParaPtr;
+using PsAlignParaPtr = std::shared_ptr<PsAlignPara>;
 
 } /* namespace toppic */
 

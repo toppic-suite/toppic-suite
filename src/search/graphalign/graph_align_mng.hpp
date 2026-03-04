@@ -90,7 +90,7 @@ class GraphAlignMng {
   std::string output_file_ext_;
 };
 
-typedef std::shared_ptr<GraphAlignMng> GraphAlignMngPtr;
+using GraphAlignMngPtr = std::shared_ptr<GraphAlignMng>;
 
 }  // namespace toppic
 

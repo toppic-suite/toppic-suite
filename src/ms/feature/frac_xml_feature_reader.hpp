@@ -40,7 +40,7 @@ class FracXmlFeatureReader {
   std::ifstream input_;
 };
 
-typedef std::shared_ptr<FracXmlFeatureReader> FracXmlFeatureReaderPtr;
+using FracXmlFeatureReaderPtr = std::shared_ptr<FracXmlFeatureReader>;
 
 }  // namespace toppic
 

@@ -95,8 +95,8 @@ class SingleChargeFeature {
   std::vector<double> max_intensity_list_;
 };
 
-typedef std::shared_ptr<SingleChargeFeature> SingleChargeFeaturePtr;
-typedef std::vector<SingleChargeFeaturePtr> SingleChargeFeaturePtrVec;
+using SingleChargeFeaturePtr = std::shared_ptr<SingleChargeFeature>;
+using SingleChargeFeaturePtrVec = std::vector<SingleChargeFeaturePtr>;
 
 }
 #endif

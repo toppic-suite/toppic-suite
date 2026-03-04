@@ -85,8 +85,8 @@ class PsAlign {
   DpPairPtr getShiftPre(int p, int s);
 };
 
-typedef std::shared_ptr<PsAlign> PsAlignPtr;
-typedef std::vector<PsAlignPtr> PsAlignPtrVec;
+using PsAlignPtr = std::shared_ptr<PsAlign>;
+using PsAlignPtrVec = std::vector<PsAlignPtr>;
 
 } /* namespace toppic */
 

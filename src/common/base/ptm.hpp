@@ -26,7 +26,7 @@ namespace toppic {
 class XmlDOMDocument;
 
 class Ptm;
-typedef std::shared_ptr<Ptm> PtmPtr;
+using PtmPtr = std::shared_ptr<Ptm>;
 
 class Ptm {
  public:
@@ -73,9 +73,9 @@ class Ptm {
   int unimod_id_;
 };
 
-typedef std::vector<PtmPtr> PtmPtrVec;
-typedef std::pair<PtmPtr, PtmPtr> PtmPair;
-typedef std::vector<PtmPair> PtmPairVec;
+using PtmPtrVec = std::vector<PtmPtr>;
+using PtmPair = std::pair<PtmPtr, PtmPtr>;
+using PtmPairVec = std::vector<PtmPair>;
 
 }  // namespace toppic
 

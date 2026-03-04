@@ -50,7 +50,7 @@ class OnePtmFilter {
   SimplePrsmPtrVec internal_match_ptrs_;
 };
 
-typedef std::shared_ptr<OnePtmFilter> OnePtmFilterPtr;
+using OnePtmFilterPtr = std::shared_ptr<OnePtmFilter>;
 } /* namespace toppic */
 
 #endif 

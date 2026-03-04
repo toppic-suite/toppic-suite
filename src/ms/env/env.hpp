@@ -22,7 +22,7 @@ namespace toppic {
 
 class Env;
 
-typedef std::shared_ptr<Env> EnvPtr;
+using EnvPtr = std::shared_ptr<Env>;
 
 class Env {
  public:
@@ -138,7 +138,7 @@ class Env {
   int getHighestPeakIdx();
 };
 
-typedef std::vector<EnvPtr> EnvPtrVec;
+using EnvPtrVec = std::vector<EnvPtr>;
 
 }
 

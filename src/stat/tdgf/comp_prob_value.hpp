@@ -132,7 +132,7 @@ class CompProbValue {
 
 };
 
-typedef std::shared_ptr<CompProbValue> CompProbValuePtr;
+using CompProbValuePtr = std::shared_ptr<CompProbValue>;
 
 }
 #endif

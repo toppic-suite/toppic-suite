@@ -23,7 +23,7 @@
 namespace toppic {
 
 class Vertex;
-typedef std::shared_ptr<Vertex> VertexPtr;
+using VertexPtr = std::shared_ptr<Vertex>;
 
 class Vertex {
  public:
@@ -73,7 +73,7 @@ class Vertex {
   bool passDblIncrCheck(MatchEnvPtrVec &env_list); 
 };
 
-typedef std::vector<VertexPtr> VertexPtrVec;
+using VertexPtrVec = std::vector<VertexPtr>;
 
 }
 #endif

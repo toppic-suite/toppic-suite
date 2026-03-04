@@ -41,7 +41,7 @@ class PtmSearchSlowFilter {
   PrsmPtrVec2D internal_prsm_2d_ptrs_;
 };
 
-typedef std::shared_ptr<PtmSearchSlowFilter> PtmSearchSlowFilterPtr;
+using PtmSearchSlowFilterPtr = std::shared_ptr<PtmSearchSlowFilter>;
 
 } /* namespace toppic */
 

@@ -37,8 +37,8 @@ class AminoAcidReplace {
   int pos_;
 };
 
-typedef std::shared_ptr<AminoAcidReplace> AminoAcidReplacePtr;
-typedef std::vector<AminoAcidReplacePtr> AminoAcidReplacePtrVec;
+using AminoAcidReplacePtr = std::shared_ptr<AminoAcidReplace>;
+using AminoAcidReplacePtrVec = std::vector<AminoAcidReplacePtr>;
 
 }  // namespace toppic
 

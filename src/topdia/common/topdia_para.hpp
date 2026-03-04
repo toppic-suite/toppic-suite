@@ -47,7 +47,7 @@ private:
   double ms2_seed_env_inte_corr_tole_cutoff_ = 0;
 };
 
-typedef std::shared_ptr<TopdiaPara> TopdiaParaPtr;
+using TopdiaParaPtr = std::shared_ptr<TopdiaPara>;
 
 }  // namespace toppic
 

@@ -64,8 +64,8 @@ class SpecGraph {
   void compSpecDistances(double convert_ratio);
 };
 
-typedef std::shared_ptr<SpecGraph> SpecGraphPtr;
-typedef std::vector<SpecGraphPtr> SpecGraphPtrVec;
+using SpecGraphPtr = std::shared_ptr<SpecGraph>;
+using SpecGraphPtrVec = std::vector<SpecGraphPtr>;
 
 }  // namespace toppic
 

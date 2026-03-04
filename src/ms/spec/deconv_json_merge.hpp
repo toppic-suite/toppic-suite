@@ -37,7 +37,7 @@ class DeconvJsonMerge {
   std::string output_file_name_;
 };
 
-typedef std::shared_ptr<DeconvJsonMerge> DeconvJsonMergePtr;
+using DeconvJsonMergePtr = std::shared_ptr<DeconvJsonMerge>;
 
 } /* namespace toppic */
 

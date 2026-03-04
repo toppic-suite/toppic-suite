@@ -43,7 +43,7 @@ class DeconvSingleSp {
   MatchEnvPtrVec result_envs_;
 };
 
-typedef std::shared_ptr<DeconvSingleSp> DeconvSingleSpPtr;
+using DeconvSingleSpPtr = std::shared_ptr<DeconvSingleSp>;
 
 }
 

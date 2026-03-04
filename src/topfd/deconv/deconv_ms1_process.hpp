@@ -35,7 +35,7 @@ class DeconvMs1Process {
   void prepareFileFolder();
 };
 
-typedef std::shared_ptr<DeconvMs1Process> DeconvMs1ProcessPtr;
+using DeconvMs1ProcessPtr = std::shared_ptr<DeconvMs1Process>;
 
 }
 

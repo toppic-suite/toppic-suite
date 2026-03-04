@@ -21,7 +21,7 @@ namespace toppic {
 
 class EnvBase;
 
-typedef std::shared_ptr<EnvBase> EnvBasePtr;
+using EnvBasePtr = std::shared_ptr<EnvBase>;
 
 // A list of envelopes read from a file theo_patt.txt
 class EnvBase {

@@ -58,7 +58,7 @@ class EcscorePara {
 
 };
 
-typedef std::shared_ptr<EcscorePara> EcscoreParaPtr;
+using EcscoreParaPtr = std::shared_ptr<EcscorePara>;
 
 } /* namespace */
 

@@ -71,7 +71,7 @@ class LocalMng {
   //double p2_ = 21.1822; 
 };
 
-typedef std::shared_ptr<LocalMng> LocalMngPtr;
+using LocalMngPtr = std::shared_ptr<LocalMng>;
 
 }  // namespace toppic
 

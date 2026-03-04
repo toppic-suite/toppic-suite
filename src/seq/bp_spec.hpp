@@ -49,8 +49,8 @@ class BpSpec {
   void initBreakPoints(const ResSeqPtr &req_seq_ptr);
 };
 
-typedef std::shared_ptr<BpSpec> BpSpecPtr;
-typedef std::vector<BpSpecPtr> BpSpecPtrVec;
+using BpSpecPtr = std::shared_ptr<BpSpec>;
+using BpSpecPtrVec = std::vector<BpSpecPtr>;
 
 }  // namespace toppic
 

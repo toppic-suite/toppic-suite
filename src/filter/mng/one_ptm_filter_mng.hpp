@@ -91,7 +91,7 @@ class OnePtmFilterMng {
     "one_ptm_rev_term_index", "one_ptm_rev_diag_index"};
 };
 
-typedef std::shared_ptr<OnePtmFilterMng> OnePtmFilterMngPtr;
+using OnePtmFilterMngPtr = std::shared_ptr<OnePtmFilterMng>;
 
 }  // namespace toppic
 

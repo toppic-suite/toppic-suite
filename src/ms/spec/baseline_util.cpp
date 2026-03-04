@@ -43,8 +43,8 @@ class IntvDens {
   double perc_;
 };
 
-typedef std::shared_ptr<IntvDens> IntvDensPtr;
-typedef std::vector<IntvDensPtr> IntvDensPtrVec;
+using IntvDensPtr = std::shared_ptr<IntvDens>;
+using IntvDensPtrVec = std::vector<IntvDensPtr>;
 
 IntvDensPtrVec getDensity(const std::vector<double> &inte, double max_inte) {
   double intv_width = 10;

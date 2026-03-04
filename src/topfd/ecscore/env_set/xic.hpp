@@ -58,8 +58,8 @@ class Xic {
 
 };
 
-typedef std::shared_ptr<Xic> XicPtr;
-typedef std::vector<XicPtr> XicPtrVec;
+using XicPtr = std::shared_ptr<Xic>;
+using XicPtrVec = std::vector<XicPtr>;
 
 }
 

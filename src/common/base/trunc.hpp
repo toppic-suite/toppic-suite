@@ -51,8 +51,8 @@ class Trunc {
   double shift_;
 };
 
-typedef std::shared_ptr<Trunc> TruncPtr;
-typedef std::vector<TruncPtr> TruncPtrVec;
+using TruncPtr = std::shared_ptr<Trunc>;
+using TruncPtrVec = std::vector<TruncPtr>;
 
 }  // namespace toppic
 

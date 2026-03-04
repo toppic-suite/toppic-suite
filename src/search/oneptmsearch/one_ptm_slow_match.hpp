@@ -65,8 +65,8 @@ class OnePtmSlowMatch {
   DiagHeaderPtrVec geneOnePtmNTermShiftHeaders();
 };
 
-typedef std::shared_ptr<OnePtmSlowMatch> OnePtmSlowMatchPtr;
-typedef std::vector<OnePtmSlowMatchPtr> OnePtmSlowMatchPtrVec;
+using OnePtmSlowMatchPtr = std::shared_ptr<OnePtmSlowMatch>;
+using OnePtmSlowMatchPtrVec = std::vector<OnePtmSlowMatchPtr>;
 
 } /* namespace toppic */
 

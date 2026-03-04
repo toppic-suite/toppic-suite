@@ -52,9 +52,9 @@ class Activation {
   IonTypePtr c_ion_type_ptr_;
 };
 
-typedef std::shared_ptr<Activation> ActivationPtr;
-typedef std::vector<ActivationPtr> ActivationPtrVec;
-typedef std::vector<ActivationPtrVec> ActivationPtrVec2D;
+using ActivationPtr = std::shared_ptr<Activation>;
+using ActivationPtrVec = std::vector<ActivationPtr>;
+using ActivationPtrVec2D = std::vector<ActivationPtrVec>;
 
 }  // namespace toppic
 

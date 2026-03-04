@@ -36,7 +36,7 @@ class VarPtmSearchProcessor {
   VarPtmSearchMngPtr mng_ptr_;
 };
 
-typedef std::shared_ptr<VarPtmSearchProcessor> VarPtmSearchProcessorPtr;
+using VarPtmSearchProcessorPtr = std::shared_ptr<VarPtmSearchProcessor>;
 
 }  // namespace toppic
 

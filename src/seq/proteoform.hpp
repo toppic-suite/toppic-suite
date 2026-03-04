@@ -29,7 +29,7 @@ namespace toppic {
 
 class Proteoform;
 
-typedef std::shared_ptr<Proteoform> ProteoformPtr;
+using ProteoformPtr = std::shared_ptr<Proteoform>;
 
 class Proteoform {
  public:
@@ -142,8 +142,8 @@ class Proteoform {
   MassShiftPtrVec mass_shift_list_;
 };
 
-typedef std::vector<ProteoformPtr> ProteoformPtrVec;
-typedef std::vector<ProteoformPtrVec> ProteoformPtrVec2D;
+using ProteoformPtrVec = std::vector<ProteoformPtr>;
+using ProteoformPtrVec2D = std::vector<ProteoformPtrVec>;
 
 } /* namespace toppic */
 

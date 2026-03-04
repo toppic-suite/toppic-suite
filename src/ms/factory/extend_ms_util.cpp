@@ -23,10 +23,10 @@ namespace toppic {
 
 namespace extend_ms_util {
 
-typedef std::pair<int, int> IntPair;
-typedef std::vector<std::pair<int, int>> IntPairVec;
-typedef std::pair<double, double> DoublePair;
-typedef std::vector<std::pair<double, double>> DoublePairVec;
+using IntPair = std::pair<int, int>;
+using IntPairVec = std::vector<std::pair<int, int>>;
+using DoublePair = std::pair<double, double>;
+using DoublePairVec = std::vector<std::pair<double, double>>;
 
 std::vector<double> getExtendMassVec(ExtendMsPtr extend_ms_ptr) {
   std::vector<double> masses;

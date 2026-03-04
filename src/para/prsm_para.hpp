@@ -80,8 +80,8 @@ class PrsmPara {
   SpParaPtr sp_para_ptr_;
 };
 
-typedef std::shared_ptr<PrsmPara> PrsmParaPtr;
-typedef std::vector<PrsmParaPtr> PrsmParaPtrVec;
+using PrsmParaPtr = std::shared_ptr<PrsmPara>;
+using PrsmParaPtrVec = std::vector<PrsmParaPtr>;
 
 } /* namespace toppic */
 

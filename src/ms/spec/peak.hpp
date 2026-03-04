@@ -29,8 +29,8 @@ class XmlDOMDocument;
 
 class Peak;
 
-typedef std::shared_ptr<Peak> PeakPtr;
-typedef std::vector<PeakPtr> PeakPtrVec;
+using PeakPtr = std::shared_ptr<Peak>;
+using PeakPtrVec = std::vector<PeakPtr>;
 
 class Peak {
  public:
@@ -63,7 +63,7 @@ private:
   double intensity_ = -1;
 };
 
-typedef std::vector<PeakPtrVec> PeakPtrVec2D;
+using PeakPtrVec2D = std::vector<PeakPtrVec>;
 
 }  // namespace toppic
 #endif

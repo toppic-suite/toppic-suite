@@ -29,13 +29,13 @@ namespace toppic {
 namespace suffix {
 
 class Edge;
-typedef std::shared_ptr<Edge> EdgePtr;
+using EdgePtr = std::shared_ptr<Edge>;
 
 class Suffix;
-typedef std::shared_ptr<Suffix> SuffixPtr;
+using SuffixPtr = std::shared_ptr<Suffix>;
 
 class Node;
-typedef std::shared_ptr<Node> NodePtr;
+using NodePtr = std::shared_ptr<Node>;
 
 class SuffixTree;
 
@@ -81,7 +81,7 @@ class SuffixTree : public std::enable_shared_from_this<SuffixTree> {
   void determineSuffixPos();
 };
 
-typedef std::shared_ptr<SuffixTree> SuffixTreePtr;
+using SuffixTreePtr = std::shared_ptr<SuffixTree>;
 
 }  // namespace suffix
 

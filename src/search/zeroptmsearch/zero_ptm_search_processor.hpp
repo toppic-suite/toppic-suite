@@ -35,7 +35,7 @@ class ZeroPtmSearchProcessor {
   ZeroPtmSearchMngPtr mng_ptr_;
 };
 
-typedef std::shared_ptr<ZeroPtmSearchProcessor> ZeroPtmSearchProcessorPtr;
+using ZeroPtmSearchProcessorPtr = std::shared_ptr<ZeroPtmSearchProcessor>;
 
 }  // namespace toppic
 

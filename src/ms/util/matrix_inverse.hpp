@@ -39,7 +39,7 @@ bool InvertMatrix(const boost::numeric::ublas::matrix<double>& input,
 {
 
     using namespace boost::numeric::ublas;
-    typedef permutation_matrix<std::size_t> pmatrix;
+    using pmatrix = permutation_matrix<std::size_t>;
 
     // create a working copy of the input
     matrix<double> A(input);

@@ -36,7 +36,7 @@ class OnePtmSearchProcessor {
   PtmSearchMngPtr mng_ptr_;
 };
 
-typedef std::shared_ptr<OnePtmSearchProcessor> OnePtmSearchProcessorPtr;
+using OnePtmSearchProcessorPtr = std::shared_ptr<OnePtmSearchProcessor>;
 
 }  // namespace toppic
 

@@ -26,8 +26,8 @@
 namespace toppic {
 
 class SpecFeature;
-typedef std::shared_ptr<SpecFeature> SpecFeaturePtr;
-typedef std::vector<SpecFeaturePtr> SpecFeaturePtrVec;
+using SpecFeaturePtr = std::shared_ptr<SpecFeature>;
+using SpecFeaturePtrVec = std::vector<SpecFeaturePtr>;
 
 class SpecFeature {
  public:

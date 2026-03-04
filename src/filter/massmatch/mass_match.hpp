@@ -114,7 +114,7 @@ class MassMatch {
                        std::vector<short> &scores);
 };
 
-typedef std::shared_ptr<MassMatch> MassMatchPtr;
+using MassMatchPtr = std::shared_ptr<MassMatch>;
 
 } /* namespace toppic */
 

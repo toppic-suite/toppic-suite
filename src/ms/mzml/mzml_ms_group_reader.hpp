@@ -74,7 +74,7 @@ class MzmlMsGroupReader {
   MzmlMsGroupPtr getMs1Ms2MsGroupPtr(); 
 };
 
-typedef std::shared_ptr<MzmlMsGroupReader> MzmlMsGroupReaderPtr;
+using MzmlMsGroupReaderPtr = std::shared_ptr<MzmlMsGroupReader>;
 
 }
 

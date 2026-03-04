@@ -75,7 +75,7 @@ class MsMap {
   MsMapPeakPtr2D peaks_;
 };
 
-typedef std::shared_ptr<MsMap> MsMapPtr;
+using MsMapPtr = std::shared_ptr<MsMap>;
 
 }
 

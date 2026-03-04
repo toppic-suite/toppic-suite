@@ -60,8 +60,8 @@ class IonType {
   double b_y_shift_;
 };
 
-typedef std::shared_ptr<IonType> IonTypePtr;
-typedef std::vector<IonTypePtr> IonTypePtrVec;
+using IonTypePtr = std::shared_ptr<IonType>;
+using IonTypePtrVec = std::vector<IonTypePtr>;
 
 }  // namespace toppic
 

@@ -49,8 +49,8 @@ class MsMapRow {
   MsMapPeakPtr2D peak_ptr_2d_;
 };
 
-typedef std::shared_ptr<MsMapRow> MsMapRowPtr;
-typedef std::vector<MsMapRowPtr> MsMapRowPtrVec;
+using MsMapRowPtr = std::shared_ptr<MsMapRow>;
+using MsMapRowPtrVec = std::vector<MsMapRowPtr>;
 
 }
 

@@ -22,7 +22,7 @@
 namespace toppic {
 
 class ProteoformType;
-typedef std::shared_ptr<ProteoformType> ProteoformTypePtr;
+using ProteoformTypePtr = std::shared_ptr<ProteoformType>;
 
 class ProteoformType {
  public:
@@ -44,7 +44,7 @@ class ProteoformType {
   int id_;
 };
 
-typedef std::vector<ProteoformTypePtr> ProteoformTypePtrVec;
+using ProteoformTypePtrVec = std::vector<ProteoformTypePtr>;
 
 }  // namespace toppic
 

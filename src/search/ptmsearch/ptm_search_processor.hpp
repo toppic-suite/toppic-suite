@@ -36,7 +36,7 @@ class PtmSearchProcessor {
 
 };
 
-typedef std::shared_ptr<PtmSearchProcessor> PtmSearchProcessorPtr;
+using PtmSearchProcessorPtr = std::shared_ptr<PtmSearchProcessor>;
 
 } /* namespace toppic */
 

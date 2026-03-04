@@ -76,7 +76,7 @@ class DprProcessor {
   std::shared_ptr<SimpleThreadPool> pool_ptr_;
 };
 
-typedef std::shared_ptr<DprProcessor> DprProcessorPtr;
+using DprProcessorPtr = std::shared_ptr<DprProcessor>;
 
 }  // namespace toppic
 

@@ -42,8 +42,8 @@ class SimplePrsmReader {
   std::ifstream input_;
 };
 
-typedef std::shared_ptr<SimplePrsmReader> SimplePrsmReaderPtr;
-typedef std::vector<SimplePrsmReaderPtr> SimplePrsmReaderPtrVec;
+using SimplePrsmReaderPtr = std::shared_ptr<SimplePrsmReader>;
+using SimplePrsmReaderPtrVec = std::vector<SimplePrsmReaderPtr>;
 
 } /* namespace toppic */
 

@@ -45,10 +45,10 @@ class GraphResultNode {
   int prev_edge_type_;
 };
 
-typedef std::shared_ptr<GraphResultNode> GraphResultNodePtr;
-typedef std::vector<GraphResultNodePtr> GraphResultNodePtrVec;
-typedef std::vector<GraphResultNodePtrVec> GraphResultNodePtrVec2D;
-typedef std::vector<GraphResultNodePtrVec2D> GraphResultNodePtrVec3D;
+using GraphResultNodePtr = std::shared_ptr<GraphResultNode>;
+using GraphResultNodePtrVec = std::vector<GraphResultNodePtr>;
+using GraphResultNodePtrVec2D = std::vector<GraphResultNodePtrVec>;
+using GraphResultNodePtrVec3D = std::vector<GraphResultNodePtrVec2D>;
 
 } /* namespace toppic */
 

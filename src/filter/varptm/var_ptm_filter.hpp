@@ -59,7 +59,7 @@ class VarPtmFilter {
   std::string block_str; 
 };
 
-typedef std::shared_ptr<VarPtmFilter> VarPtmFilterPtr;
+using VarPtmFilterPtr = std::shared_ptr<VarPtmFilter>;
 
 } /* namespace toppic */
 

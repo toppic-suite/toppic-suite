@@ -52,7 +52,7 @@ class EValueProcessor {
   bool checkPrsms(const PrsmPtrVec &prsm_ptrs);
 };
 
-typedef std::shared_ptr<EValueProcessor> EValueProcessorPtr;
+using EValueProcessorPtr = std::shared_ptr<EValueProcessor>;
 
 }
 

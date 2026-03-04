@@ -20,7 +20,7 @@
 
 namespace toppic {
   class DpPara;
-  typedef std::shared_ptr<DpPara> DpParaPtr;
+  using DpParaPtr = std::shared_ptr<DpPara>;
 
   class DpPara {
   public:

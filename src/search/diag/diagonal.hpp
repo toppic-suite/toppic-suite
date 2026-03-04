@@ -22,8 +22,8 @@ namespace toppic {
 
 class Diagonal;
 
-typedef std::shared_ptr<Diagonal> DiagonalPtr;
-typedef std::vector<DiagonalPtr>  DiagonalPtrVec;
+using DiagonalPtr = std::shared_ptr<Diagonal>;
+using DiagonalPtrVec = std::vector<DiagonalPtr>;
 
 class Diagonal {
   public:

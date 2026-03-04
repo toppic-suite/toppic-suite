@@ -48,8 +48,8 @@ class PrsmXmlWriter {
   std::string file_name_;
 };
 
-typedef std::shared_ptr<PrsmXmlWriter> PrsmXmlWriterPtr;
-typedef std::vector<PrsmXmlWriterPtr> PrsmXmlWriterPtrVec;
+using PrsmXmlWriterPtr = std::shared_ptr<PrsmXmlWriter>;
+using PrsmXmlWriterPtrVec = std::vector<PrsmXmlWriterPtr>;
 
 } /* namespace toppic */
 

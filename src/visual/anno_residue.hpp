@@ -22,8 +22,8 @@
 namespace toppic {
 
 class AnnoResidue;
-typedef std::shared_ptr<AnnoResidue> AnnoResiduePtr;
-typedef std::vector<AnnoResiduePtr> AnnoResiduePtrVec;
+using AnnoResiduePtr = std::shared_ptr<AnnoResidue>;
+using AnnoResiduePtrVec = std::vector<AnnoResiduePtr>;
 
 class AnnoResidue : public Residue {
  public:

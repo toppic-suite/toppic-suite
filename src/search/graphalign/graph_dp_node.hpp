@@ -26,13 +26,13 @@ namespace toppic {
 #define GRAPH_ALIGN_TYPE_UNEXPECTED 1
 
 class GraphDpNode;
-typedef std::shared_ptr<GraphDpNode>  GraphDpNodePtr;
-typedef std::vector<GraphDpNodePtr> GraphDpNodePtrVec;
-typedef std::vector<GraphDpNodePtrVec> GraphDpNodePtrVec2D;
+using GraphDpNodePtr = std::shared_ptr<GraphDpNode>;
+using GraphDpNodePtrVec = std::vector<GraphDpNodePtr>;
+using GraphDpNodePtrVec2D = std::vector<GraphDpNodePtrVec>;
 
-typedef std::weak_ptr<GraphDpNode>  GraphDpNodeWeakPtr;
-typedef std::vector<GraphDpNodeWeakPtr> GraphDpNodeWeakPtrVec;
-typedef std::vector<GraphDpNodeWeakPtrVec> GraphDpNodeWeakPtrVec2D;
+using GraphDpNodeWeakPtr = std::weak_ptr<GraphDpNode>;
+using GraphDpNodeWeakPtrVec = std::vector<GraphDpNodeWeakPtr>;
+using GraphDpNodeWeakPtrVec2D = std::vector<GraphDpNodeWeakPtrVec>;
 
 class GraphDpNode { 
  public:

@@ -72,13 +72,13 @@ struct GraphInfo {
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS,
         VertexInfo, EdgeInfo, GraphInfo> MassGraph;
 
-typedef std::shared_ptr<MassGraph> MassGraphPtr;
+using MassGraphPtr = std::shared_ptr<MassGraph>;
 
-typedef std::vector<MassGraphPtr> MassGraphPtrVec;
+using MassGraphPtrVec = std::vector<MassGraphPtr>;
 
-typedef boost::graph_traits<MassGraph>::vertex_descriptor Vertex;
+using Vertex = boost::graph_traits<MassGraph>::vertex_descriptor;
 
-typedef boost::graph_traits<MassGraph>::edge_descriptor Edge;
+using Edge = boost::graph_traits<MassGraph>::edge_descriptor;
 
 }  // namespace toppic
 

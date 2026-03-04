@@ -20,9 +20,9 @@
 
 namespace toppic {
 
-typedef std::shared_ptr<Ms<PeakPtr>> MzmlMsPtr;
-typedef std::vector<MzmlMsPtr> MzmlMsPtrVec;
-typedef std::vector<MzmlMsPtrVec> MzmlMsPtrVec2D;
+using MzmlMsPtr = std::shared_ptr<Ms<PeakPtr>>;
+using MzmlMsPtrVec = std::vector<MzmlMsPtr>;
+using MzmlMsPtrVec2D = std::vector<MzmlMsPtrVec>;
 
 } /* namespace toppic */
 

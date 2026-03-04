@@ -39,7 +39,7 @@ class FeatureSampleMerge {
   double error_tole_;
 };
 
-typedef std::shared_ptr<FeatureSampleMerge> FeatureSampleMergePtr;
+using FeatureSampleMergePtr = std::shared_ptr<FeatureSampleMerge>;
 
 }  // namespace toppic
 

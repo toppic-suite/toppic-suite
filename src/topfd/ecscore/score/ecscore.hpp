@@ -27,8 +27,8 @@
 namespace toppic {
 
 class ECScore;
-typedef std::shared_ptr<ECScore> ECScorePtr;
-typedef std::vector<ECScorePtr> ECScorePtrVec; 
+using ECScorePtr = std::shared_ptr<ECScore>;
+using ECScorePtrVec = std::vector<ECScorePtr>; 
 
 class ECScore {
  public:

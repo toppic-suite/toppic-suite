@@ -70,7 +70,7 @@ class ProteinDatabase {
   std::vector<size_t> seq_len_;
 };
 
-typedef std::shared_ptr<ProteinDatabase> ProteinDBPtr;
+using ProteinDBPtr = std::shared_ptr<ProteinDatabase>;
 
 }  // namespace suffix
 

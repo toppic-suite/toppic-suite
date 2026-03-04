@@ -14,7 +14,7 @@
 namespace toppic {
 
 class EnvSet;
-typedef std::shared_ptr<EnvSet> EnvSetPtr;
+using EnvSetPtr = std::shared_ptr<EnvSet>;
 
 class EnvSet {
  public:
@@ -109,7 +109,7 @@ class EnvSet {
   double min_inte_;
 };
 
-typedef std::vector<EnvSetPtr> EnvSetPtrVec;
+using EnvSetPtrVec = std::vector<EnvSetPtr>;
 
 }
 

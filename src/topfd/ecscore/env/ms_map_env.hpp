@@ -58,8 +58,8 @@ class MsMapEnv {
   MsMapPeakPtrVec peak_list_;
 };
 
-typedef std::shared_ptr<MsMapEnv> MsMapEnvPtr;
-typedef std::vector<MsMapEnvPtr> MsMapEnvPtrVec;
+using MsMapEnvPtr = std::shared_ptr<MsMapEnv>;
+using MsMapEnvPtrVec = std::vector<MsMapEnvPtr>;
 
 }
 

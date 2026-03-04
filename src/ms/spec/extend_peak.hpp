@@ -20,7 +20,7 @@
 namespace toppic {
 
 class ExtendPeak;
-typedef std::shared_ptr<ExtendPeak> ExtendPeakPtr;
+using ExtendPeakPtr = std::shared_ptr<ExtendPeak>;
 
 class ExtendPeak : public Peak {
  public:
@@ -59,7 +59,7 @@ class ExtendPeak : public Peak {
   double reverse_tolerance_;
 };
 
-typedef std::vector<ExtendPeakPtr> ExtendPeakPtrVec;
+using ExtendPeakPtrVec = std::vector<ExtendPeakPtr>;
 
 } // namespace toppic 
 

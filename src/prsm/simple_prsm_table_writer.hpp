@@ -30,7 +30,7 @@ class SimplePrsmTableWriter {
   std::string output_file_ext_;
 };
 
-typedef std::shared_ptr<SimplePrsmTableWriter> SimplePrsmTableWriterPtr;
+using SimplePrsmTableWriterPtr = std::shared_ptr<SimplePrsmTableWriter>;
 
 }  // namespace toppic
 

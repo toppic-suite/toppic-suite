@@ -22,12 +22,12 @@
 namespace toppic {
 
 class DiagPair;
-typedef std::shared_ptr<DiagPair> DiagPairPtr;
-typedef std::vector<DiagPairPtr>  DiagPairPtrVec;
+using DiagPairPtr = std::shared_ptr<DiagPair>;
+using DiagPairPtrVec = std::vector<DiagPairPtr>;
 
 class Diagonal;
-typedef std::shared_ptr<Diagonal>   DiagonalPtr;
-typedef std::weak_ptr<Diagonal>   DiagonalWeakPtr;
+using DiagonalPtr = std::shared_ptr<Diagonal>;
+using DiagonalWeakPtr = std::weak_ptr<Diagonal>;
 
 class DiagPair:public Pair {
   public:

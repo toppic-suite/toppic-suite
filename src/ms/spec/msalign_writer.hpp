@@ -36,8 +36,8 @@ class MsAlignWriter {
   std::ofstream output_;
 };
 
-typedef std::shared_ptr<MsAlignWriter> MsAlignWriterPtr;
-typedef std::vector<MsAlignWriterPtr>  MsAlignWriterPtrVec;
+using MsAlignWriterPtr = std::shared_ptr<MsAlignWriter>;
+using MsAlignWriterPtrVec = std::vector<MsAlignWriterPtr>;
 
 }  // namespace toppic
 

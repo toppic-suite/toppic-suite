@@ -20,7 +20,7 @@
 namespace toppic {
 
 class EnvPeakPair;
-typedef std::shared_ptr<EnvPeakPair> EnvPeakPairPtr;
+using EnvPeakPairPtr = std::shared_ptr<EnvPeakPair>;
 
 // Used in dynamic programming algorithm for envelope selection
 class EnvPeakPair {
@@ -42,8 +42,8 @@ class EnvPeakPair {
   int pos_idx_;
 };
 
-typedef std::vector<EnvPeakPairPtr> EnvPeakPairPtrVec;
-typedef std::vector<EnvPeakPairPtrVec> EnvPeakPairPtr2D;
+using EnvPeakPairPtrVec = std::vector<EnvPeakPairPtr>;
+using EnvPeakPairPtr2D = std::vector<EnvPeakPairPtrVec>;
 
 }
 #endif

@@ -26,7 +26,7 @@ namespace toppic {
 class XmlDOMDocument;
 
 class ExpectedValue;
-typedef std::shared_ptr<ExpectedValue> ExpectedValuePtr;
+using ExpectedValuePtr = std::shared_ptr<ExpectedValue>;
 
 class ExpectedValue {
  public:
@@ -71,7 +71,7 @@ class ExpectedValue {
   void init();
 };
 
-typedef std::vector<ExpectedValuePtr> ExpectedValuePtrVec;
+using ExpectedValuePtrVec = std::vector<ExpectedValuePtr>;
 
 }  // namespace toppic
 

@@ -64,7 +64,7 @@ class TdgfMng {
   int min_height_ = 10;
 };
 
-typedef std::shared_ptr<TdgfMng> TdgfMngPtr;
+using TdgfMngPtr = std::shared_ptr<TdgfMng>;
 
 }  // namespace toppic
 

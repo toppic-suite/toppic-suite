@@ -21,7 +21,7 @@
 namespace toppic {
 
 class DeconvPeak;
-typedef std::shared_ptr<DeconvPeak> DeconvPeakPtr;
+using DeconvPeakPtr = std::shared_ptr<DeconvPeak>;
 
 class DeconvPeak : public Peak {
  public:
@@ -63,8 +63,8 @@ class DeconvPeak : public Peak {
   double score_ = 1.0;
 };
 
-typedef std::vector<DeconvPeakPtr> DeconvPeakPtrVec;
-typedef std::vector<DeconvPeakPtrVec> DeconvPeakPtrVec2D;
+using DeconvPeakPtrVec = std::vector<DeconvPeakPtr>;
+using DeconvPeakPtrVec2D = std::vector<DeconvPeakPtrVec>;
 
 }  // namespace toppic
 

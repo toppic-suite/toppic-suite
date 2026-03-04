@@ -20,7 +20,7 @@
 namespace toppic {
 
 class FeaturePrsm;
-typedef std::shared_ptr<FeaturePrsm> FeaturePrsmPtr;
+using FeaturePrsmPtr = std::shared_ptr<FeaturePrsm>;
 
 class FeaturePrsm {
  public:
@@ -97,8 +97,8 @@ class FeaturePrsm {
   double apex_time_;
 };
 
-typedef std::vector<FeaturePrsmPtr> FeaturePrsmPtrVec;
-typedef std::vector<FeaturePrsmPtrVec> FeaturePrsmPtrVec2D;
+using FeaturePrsmPtrVec = std::vector<FeaturePrsmPtr>;
+using FeaturePrsmPtrVec2D = std::vector<FeaturePrsmPtrVec>;
 
 }
 

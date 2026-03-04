@@ -55,7 +55,7 @@ class PrsmViewMng {
   double min_mass_;
 };
 
-typedef std::shared_ptr<PrsmViewMng> PrsmViewMngPtr;
+using PrsmViewMngPtr = std::shared_ptr<PrsmViewMng>;
 
 } /* namespace toppic */
 

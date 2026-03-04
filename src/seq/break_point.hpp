@@ -36,8 +36,8 @@ class BreakPoint {
   double srm_;
 };
 
-typedef std::shared_ptr<BreakPoint> BreakPointPtr;
-typedef std::vector<BreakPointPtr> BreakPointPtrVec;
+using BreakPointPtr = std::shared_ptr<BreakPoint>;
+using BreakPointPtrVec = std::vector<BreakPointPtr>;
 
 }  // namespace toppic
 

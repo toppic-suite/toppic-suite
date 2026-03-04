@@ -21,7 +21,7 @@
 namespace toppic {
 
 class MsHeader;
-typedef std::shared_ptr<MsHeader> MsHeaderPtr;
+using MsHeaderPtr = std::shared_ptr<MsHeader>;
 
 class MsHeader {
  public:
@@ -171,8 +171,8 @@ class MsHeader {
   PrecursorPtrVec prec_ptr_vec_;
 };
 
-typedef std::vector<MsHeaderPtr> MsHeaderPtrVec;
-typedef std::vector<MsHeaderPtrVec> MsHeaderPtr2D;
+using MsHeaderPtrVec = std::vector<MsHeaderPtr>;
+using MsHeaderPtr2D = std::vector<MsHeaderPtrVec>;
 
 }
 

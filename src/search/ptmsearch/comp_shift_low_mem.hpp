@@ -49,7 +49,7 @@ class CompShiftLowMem {
   void resetNumbers();
 };
 
-typedef std::shared_ptr<CompShiftLowMem> CompShiftLowMemPtr;
+using CompShiftLowMemPtr = std::shared_ptr<CompShiftLowMem>;
 
 } /* namespace toppic */
 

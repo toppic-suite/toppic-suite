@@ -95,8 +95,8 @@ class SpPara {
   PeakTolerancePtr peak_tolerance_ptr_;
 };
 
-typedef std::shared_ptr<SpPara> SpParaPtr;
-typedef std::vector<SpParaPtr> SpParaPtrVec;
+using SpParaPtr = std::shared_ptr<SpPara>;
+using SpParaPtrVec = std::vector<SpParaPtr>;
 
 } /* namespace toppic */
 

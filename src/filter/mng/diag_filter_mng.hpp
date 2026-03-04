@@ -61,7 +61,7 @@ class DiagFilterMng {
 
 };
 
-typedef std::shared_ptr<DiagFilterMng> DiagFilterMngPtr;
+using DiagFilterMngPtr = std::shared_ptr<DiagFilterMng>;
 
 }  // namespace toppic
 

@@ -28,7 +28,7 @@ class XmlDOMDocument;
 
 class FastaSeq;
 
-typedef std::shared_ptr<FastaSeq> FastaSeqPtr;
+using FastaSeqPtr = std::shared_ptr<FastaSeq>;
 
 class FastaSeq {
  public:
@@ -75,7 +75,7 @@ class FastaSeq {
   void compAcidPtmPairVec();
 };
 
-typedef std::vector<FastaSeqPtr> FastaSeqPtrVec;
+using FastaSeqPtrVec = std::vector<FastaSeqPtr>;
 
 }  // namespace toppic
 

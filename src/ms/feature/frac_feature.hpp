@@ -23,8 +23,8 @@
 namespace toppic {
 
 class FracFeature;
-typedef std::shared_ptr<FracFeature> FracFeaturePtr;
-typedef std::vector<FracFeaturePtr> FracFeaturePtrVec;
+using FracFeaturePtr = std::shared_ptr<FracFeature>;
+using FracFeaturePtrVec = std::vector<FracFeaturePtr>;
 
 class FracFeature {
  public:
@@ -155,7 +155,7 @@ class FracFeature {
   SingleChargeFeaturePtrVec single_features_;
 };
 
-typedef std::vector<FracFeaturePtrVec> FracFeaturePtrVec2D;
+using FracFeaturePtrVec2D = std::vector<FracFeaturePtrVec>;
 
 }
 #endif

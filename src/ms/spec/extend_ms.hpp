@@ -20,9 +20,9 @@
 
 namespace toppic {
 
-typedef std::shared_ptr<Ms<ExtendPeakPtr> > ExtendMsPtr;
+using ExtendMsPtr = std::shared_ptr<Ms<ExtendPeakPtr> >;
 
-typedef std::vector<ExtendMsPtr> ExtendMsPtrVec;
+using ExtendMsPtrVec = std::vector<ExtendMsPtr>;
 
 }  // namespace toppic
 

@@ -69,8 +69,8 @@ class LocalAnno {
   double mass_shift_;
 };
 
-typedef std::shared_ptr<LocalAnno> LocalAnnoPtr;
-typedef std::vector<LocalAnnoPtr> LocalAnnoPtrVec;
+using LocalAnnoPtr = std::shared_ptr<LocalAnno>;
+using LocalAnnoPtrVec = std::vector<LocalAnnoPtr>;
 
 }  // namespace toppic
 

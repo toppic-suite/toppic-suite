@@ -19,7 +19,7 @@
 
 namespace toppic {
 
-typedef xercesc::DOMElement XmlDOMElement;
+using XmlDOMElement = xercesc::DOMElement;
 
 }  // namespace toppic
 #endif

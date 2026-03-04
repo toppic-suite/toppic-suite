@@ -57,8 +57,8 @@ class MsAlignReader {
   void readNext();
 };
 
-typedef std::shared_ptr<MsAlignReader> MsAlignReaderPtr;
-typedef std::vector<MsAlignReaderPtr>  MsAlignReaderPtrVec;
+using MsAlignReaderPtr = std::shared_ptr<MsAlignReader>;
+using MsAlignReaderPtrVec = std::vector<MsAlignReaderPtr>;
 
 }  // namespace toppic
 #endif

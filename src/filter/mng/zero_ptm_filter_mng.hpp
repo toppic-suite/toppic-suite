@@ -59,7 +59,7 @@ class ZeroPtmFilterMng {
     "zero_ptm_rev_term_index", "zero_ptm_rev_diag_index"};
 };
 
-typedef std::shared_ptr<ZeroPtmFilterMng> ZeroPtmFilterMngPtr;
+using ZeroPtmFilterMngPtr = std::shared_ptr<ZeroPtmFilterMng>;
 
 } 
 

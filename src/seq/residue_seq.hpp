@@ -23,8 +23,8 @@ namespace toppic {
 
 class ResidueSeq;
 
-typedef std::shared_ptr<ResidueSeq> ResSeqPtr;
-typedef std::vector<ResSeqPtr> ResSeqPtrVec;
+using ResSeqPtr = std::shared_ptr<ResidueSeq>;
+using ResSeqPtrVec = std::vector<ResSeqPtr>;
 
 class ResidueSeq {
  public:

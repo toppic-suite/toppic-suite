@@ -48,7 +48,7 @@ class XmlWriter {
   std::string root_ = "";
 };
 
-typedef std::shared_ptr<XmlWriter> XmlWriterPtr;
+using XmlWriterPtr = std::shared_ptr<XmlWriter>;
 
 } /* namespace toppic */
 

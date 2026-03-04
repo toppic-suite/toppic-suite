@@ -20,7 +20,7 @@
 namespace toppic {
 
 class EnvPeak;
-typedef std::shared_ptr<EnvPeak> EnvPeakPtr;
+using EnvPeakPtr = std::shared_ptr<EnvPeak>;
 
 class EnvPeak : public Peak {
  public:
@@ -52,7 +52,7 @@ class EnvPeak : public Peak {
   int idx_;
 };
 
-typedef std::vector<EnvPeakPtr> EnvPeakPtrVec;
+using EnvPeakPtrVec = std::vector<EnvPeakPtr>;
 
 }  // namespace toppic
 

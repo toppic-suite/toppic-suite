@@ -68,7 +68,7 @@ class ProteoAnno {
   bool is_nme_;
 };
 
-typedef std::shared_ptr<ProteoAnno> ProteoAnnoPtr;
+using ProteoAnnoPtr = std::shared_ptr<ProteoAnno>;
 
 }  // namespace toppic
 

@@ -23,7 +23,7 @@
 namespace toppic {
 
 class Precursor;
-typedef std::shared_ptr<Precursor> PrecursorPtr;
+using PrecursorPtr = std::shared_ptr<Precursor>;
 
 class Precursor {
  public:
@@ -84,7 +84,7 @@ class Precursor {
   double inte_ = 0;
 };
 
-typedef std::vector<PrecursorPtr> PrecursorPtrVec;
+using PrecursorPtrVec = std::vector<PrecursorPtr>;
 
 }
 

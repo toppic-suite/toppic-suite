@@ -40,8 +40,8 @@ namespace toppic {
         std::vector<PseudoPeak> fragment_features_;
 
     };
-    typedef std::shared_ptr<PseudoSpectrum> PseudoSpectrumPtr;
-    typedef std::vector<PseudoSpectrumPtr> PseudoSpectrumPtrVec;
+    using PseudoSpectrumPtr = std::shared_ptr<PseudoSpectrum>;
+    using PseudoSpectrumPtrVec = std::vector<PseudoSpectrumPtr>;
 
 } // toppic
 

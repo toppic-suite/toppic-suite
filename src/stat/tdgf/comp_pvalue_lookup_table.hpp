@@ -53,7 +53,7 @@ class CompPValueLookupTable {
   double ptm2_[48][20];
 };
 
-typedef std::shared_ptr<CompPValueLookupTable> CompPValueLookupTablePtr;
+using CompPValueLookupTablePtr = std::shared_ptr<CompPValueLookupTable>;
 
 }  // namespace toppic
 

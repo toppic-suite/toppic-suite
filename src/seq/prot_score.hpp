@@ -38,8 +38,8 @@ class ProtScore {
   double c_term_shift_;
 };
 
-typedef std::shared_ptr<ProtScore> ProtScorePtr;
-typedef std::vector<ProtScorePtr> ProtScorePtrVec;
+using ProtScorePtr = std::shared_ptr<ProtScore>;
+using ProtScorePtrVec = std::vector<ProtScorePtr>;
 
 } /* namespace toppic */
 

@@ -57,7 +57,7 @@ class ZeroPtmFilter {
   std::string block_str; 
 };
 
-typedef std::shared_ptr<ZeroPtmFilter> ZeroPtmFilterPtr;
+using ZeroPtmFilterPtr = std::shared_ptr<ZeroPtmFilter>;
 
 } /* namespace toppic */
 

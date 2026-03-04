@@ -26,7 +26,7 @@ namespace toppic {
 class XmlDOMDocument;
 
 class AlterType;
-typedef std::shared_ptr<AlterType> AlterTypePtr;
+using AlterTypePtr = std::shared_ptr<AlterType>;
 
 class AlterType {
  public:
@@ -57,7 +57,7 @@ class AlterType {
   std::string name_;
 };
 
-typedef std::vector<AlterTypePtr> AlterTypePtrVec;
+using AlterTypePtrVec = std::vector<AlterTypePtr>;
 
 }  // namespace toppic
 

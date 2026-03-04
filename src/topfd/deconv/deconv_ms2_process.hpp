@@ -43,7 +43,7 @@ class DeconvMs2Process {
                        std::map<int, SpecFeaturePtrVec> &feat_map);
 };
 
-typedef std::shared_ptr<DeconvMs2Process> DeconvMs2ProcessPtr;
+using DeconvMs2ProcessPtr = std::shared_ptr<DeconvMs2Process>;
 
 }
 

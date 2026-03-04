@@ -63,8 +63,8 @@ class PeakTolerance {
   double min_tolerance_ = 0.01;
 };
 
-typedef std::shared_ptr<PeakTolerance> PeakTolerancePtr;
-typedef std::vector<PeakTolerancePtr> PeakTolerancePtrVec;
+using PeakTolerancePtr = std::shared_ptr<PeakTolerance>;
+using PeakTolerancePtrVec = std::vector<PeakTolerancePtr>;
 
 } /* namespace toppic */
 

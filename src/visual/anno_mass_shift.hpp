@@ -46,9 +46,9 @@ class AnnoMassShift {
   AlterTypePtr mass_shift_type_;
 };
 
-typedef std::shared_ptr<AnnoMassShift> AnnoMassShiftPtr;
+using AnnoMassShiftPtr = std::shared_ptr<AnnoMassShift>;
 
-typedef std::vector<AnnoMassShiftPtr> AnnoMassShiftPtrVec;
+using AnnoMassShiftPtrVec = std::vector<AnnoMassShiftPtr>;
 
 }  // namespace toppic
 

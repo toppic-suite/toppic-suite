@@ -41,9 +41,9 @@ class NeutralLoss {
   double mass_;
 };
 
-typedef std::shared_ptr<NeutralLoss> NeutralLossPtr;
+using NeutralLossPtr = std::shared_ptr<NeutralLoss>;
 
-typedef std::vector<NeutralLossPtr> NeutralLossPtrVec;
+using NeutralLossPtrVec = std::vector<NeutralLossPtr>;
 
 }  // namespace toppic
 

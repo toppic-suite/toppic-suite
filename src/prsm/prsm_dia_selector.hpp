@@ -51,7 +51,7 @@ class PrsmDiaSelector {
   int n_top_;
 };
 
-typedef std::shared_ptr<PrsmDiaSelector> PrsmDiaSelectorPtr;
+using PrsmDiaSelectorPtr = std::shared_ptr<PrsmDiaSelector>;
 
 } /* namespace toppic */
 

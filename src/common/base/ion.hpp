@@ -44,8 +44,8 @@ class Ion {
   NeutralLossPtr neutral_loss_ptr_;
 };
 
-typedef std::shared_ptr<Ion> IonPtr;
-typedef std::vector<IonPtr> IonPtrVec;
+using IonPtr = std::shared_ptr<Ion>;
+using IonPtrVec = std::vector<IonPtr>;
 
 }  // namespace toppic
 

@@ -21,7 +21,7 @@
 namespace toppic {
 
 class Residue;
-typedef std::shared_ptr<Residue> ResiduePtr;
+using ResiduePtr = std::shared_ptr<Residue>;
 
 class Residue {
  public:
@@ -57,8 +57,8 @@ class Residue {
   double mass_;
 };
 
-typedef std::vector<ResiduePtr> ResiduePtrVec;
-typedef std::vector<ResiduePtrVec> ResiduePtrVec2D;
+using ResiduePtrVec = std::vector<ResiduePtr>;
+using ResiduePtrVec2D = std::vector<ResiduePtrVec>;
 
 }  // namespace toppic
 

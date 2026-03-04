@@ -24,8 +24,8 @@
 namespace toppic {
 
 class MzrtFeature;
-typedef std::shared_ptr<MzrtFeature> MzrtFeaturePtr;
-typedef std::vector<MzrtFeaturePtr> MzrtFeaturePtrVec;
+using MzrtFeaturePtr = std::shared_ptr<MzrtFeature>;
+using MzrtFeaturePtrVec = std::vector<MzrtFeaturePtr>;
 
 class MzrtFeature {
  public:

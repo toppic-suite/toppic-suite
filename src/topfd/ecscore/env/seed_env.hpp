@@ -25,7 +25,7 @@ namespace toppic {
 
 class SeedEnv;
 
-typedef std::shared_ptr<SeedEnv> SeedEnvPtr;
+using SeedEnvPtr = std::shared_ptr<SeedEnv>;
 
 class SeedEnv : public Env {
  public:
@@ -58,8 +58,8 @@ class SeedEnv : public Env {
   double seed_inte_;
 };
 
-typedef std::vector<SeedEnvPtr> SeedEnvPtrVec;
-typedef std::vector<SeedEnvPtrVec> SeedEnvPtr2D;
+using SeedEnvPtrVec = std::vector<SeedEnvPtr>;
+using SeedEnvPtr2D = std::vector<SeedEnvPtrVec>;
 
 }
 

@@ -26,7 +26,7 @@ namespace toppic {
 class XmlDOMDocument;
 
 class PeakIonPair;
-typedef std::shared_ptr<PeakIonPair> PeakIonPairPtr;
+using PeakIonPairPtr = std::shared_ptr<PeakIonPair>;
 
 // A pair of matched theoretical mass and experimental mass
 class PeakIonPair {
@@ -58,8 +58,8 @@ class PeakIonPair {
   TheoPeakPtr theo_peak_ptr_;
 };
 
-typedef std::vector<PeakIonPairPtr> PeakIonPairPtrVec;
-typedef std::vector<PeakIonPairPtrVec> PeakIonPairPtrVec2D;
+using PeakIonPairPtrVec = std::vector<PeakIonPairPtr>;
+using PeakIonPairPtrVec2D = std::vector<PeakIonPairPtrVec>;
 
 }  // namespace toppic
 

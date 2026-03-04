@@ -23,10 +23,10 @@ namespace toppic {
 
 class DiagHeader;
 
-typedef std::shared_ptr<DiagHeader>     DiagHeaderPtr;
-typedef std::vector<DiagHeaderPtr>      DiagHeaderPtrVec;
-typedef std::vector<DiagHeaderPtrVec>   DiagHeaderPtrVec2D;
-typedef std::vector<DiagHeaderPtrVec2D> DiagHeaderPtrVec3D;
+using DiagHeaderPtr = std::shared_ptr<DiagHeader>;
+using DiagHeaderPtrVec = std::vector<DiagHeaderPtr>;
+using DiagHeaderPtrVec2D = std::vector<DiagHeaderPtrVec>;
+using DiagHeaderPtrVec3D = std::vector<DiagHeaderPtrVec2D>;
 
 class DiagHeader {
   public:

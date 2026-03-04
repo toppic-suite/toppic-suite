@@ -37,7 +37,7 @@ class MzmlProfile {
   std::map<double, std::pair<int,int>> volt_map_;
 };
 
-typedef std::shared_ptr<MzmlProfile> MzmlProfilePtr;
+using MzmlProfilePtr = std::shared_ptr<MzmlProfile>;
 
 }
 

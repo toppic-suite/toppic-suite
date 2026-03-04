@@ -23,7 +23,7 @@ namespace toppic {
 
 class SimplePrsmStr;
 
-typedef std::shared_ptr<SimplePrsmStr> SimplePrsmStrPtr;
+using SimplePrsmStrPtr = std::shared_ptr<SimplePrsmStr>;
 
 class SimplePrsmStr {
  public:
@@ -58,7 +58,7 @@ class SimplePrsmStr {
   std::string seq_desc_;
 };
 
-typedef std::vector<SimplePrsmStrPtr> SimplePrsmStrPtrVec;
+using SimplePrsmStrPtrVec = std::vector<SimplePrsmStrPtr>;
 
 }  // namespace toppic
 

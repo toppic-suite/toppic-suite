@@ -22,7 +22,7 @@ namespace toppic {
 
 // residue mass break type
 class RmBreakType;
-typedef std::shared_ptr<RmBreakType> RmBreakTypePtr;
+using RmBreakTypePtr = std::shared_ptr<RmBreakType>;
 
 class RmBreakType {
  public:

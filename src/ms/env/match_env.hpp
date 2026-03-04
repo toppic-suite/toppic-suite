@@ -23,7 +23,7 @@ namespace toppic {
 
 class MatchEnv;
 
-typedef std::shared_ptr<MatchEnv> MatchEnvPtr;
+using MatchEnvPtr = std::shared_ptr<MatchEnv>;
 
 class MatchEnv {
  public:
@@ -88,8 +88,8 @@ class MatchEnv {
   double calcScrWithSftRatio(double shift, double ratio, double tolerance);
 };
 
-typedef std::vector<MatchEnvPtr> MatchEnvPtrVec;
-typedef std::vector<MatchEnvPtrVec> MatchEnvPtr2D;
+using MatchEnvPtrVec = std::vector<MatchEnvPtr>;
+using MatchEnvPtr2D = std::vector<MatchEnvPtrVec>;
 
 }  // namespace toppic
 

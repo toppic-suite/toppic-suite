@@ -21,7 +21,7 @@
 namespace toppic {
 
 class VertexB;
-typedef std::shared_ptr<VertexB> VertexBPtr;
+using VertexBPtr = std::shared_ptr<VertexB>;
 
 class VertexB : public Vertex {
  public:
@@ -47,8 +47,8 @@ class VertexB : public Vertex {
   std::vector<int> prevs_;
 };
 
-typedef std::vector<VertexBPtr> VertexBPtrVec;
-typedef std::vector<VertexBPtrVec> VertexBPtr2D;
+using VertexBPtrVec = std::vector<VertexBPtr>;
+using VertexBPtr2D = std::vector<VertexBPtrVec>;
 
 }
 #endif

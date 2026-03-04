@@ -37,7 +37,7 @@ class DiagFilter {
   SimplePrsmPtrVec compute(const PrmMsPtrVec &ms_ptr_vec);
 };
 
-typedef std::shared_ptr<DiagFilter> DiagFilterPtr;
+using DiagFilterPtr = std::shared_ptr<DiagFilter>;
 } /* namespace toppic */
 
 #endif

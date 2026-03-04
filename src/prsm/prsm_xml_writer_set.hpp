@@ -45,8 +45,8 @@ class PrsmXmlWriterSet {
 
 };
 
-typedef std::shared_ptr<PrsmXmlWriterSet> PrsmXmlWriterSetPtr;
-typedef std::vector<PrsmXmlWriterSetPtr> PrsmXmlWriterSetPtrVec;
+using PrsmXmlWriterSetPtr = std::shared_ptr<PrsmXmlWriterSet>;
+using PrsmXmlWriterSetPtrVec = std::vector<PrsmXmlWriterSetPtr>;
 
 } /* namespace toppic */
 

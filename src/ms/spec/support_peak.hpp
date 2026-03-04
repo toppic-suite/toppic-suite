@@ -43,8 +43,8 @@ class SupportPeak {
   SPTypePtr peak_type_ptr_;
 };
 
-typedef std::shared_ptr<SupportPeak> SupportPeakPtr;
-typedef std::vector<SupportPeakPtr> SupportPeakPtrVec;
+using SupportPeakPtr = std::shared_ptr<SupportPeak>;
+using SupportPeakPtrVec = std::vector<SupportPeakPtr>;
 
 } /* namespace toppic */
 

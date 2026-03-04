@@ -25,8 +25,8 @@
 namespace toppic {
 
 class AnnoCleavage;
-typedef std::shared_ptr<AnnoCleavage> AnnoCleavagePtr;
-typedef std::vector<AnnoCleavagePtr> AnnoCleavagePtrVec;
+using AnnoCleavagePtr = std::shared_ptr<AnnoCleavage>;
+using AnnoCleavagePtrVec = std::vector<AnnoCleavagePtr>;
 
 class AnnoCleavage {
  public:

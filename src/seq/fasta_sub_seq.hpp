@@ -39,8 +39,8 @@ class FastaSubSeq : public FastaSeq {
   int length_;
 };
 
-typedef std::shared_ptr<FastaSubSeq> FastaSubSeqPtr;
-typedef std::vector<FastaSubSeqPtr> FastaSubSeqPtrVec;
+using FastaSubSeqPtr = std::shared_ptr<FastaSubSeq>;
+using FastaSubSeqPtrVec = std::vector<FastaSubSeqPtr>;
 
 }  // namespace toppic
 

@@ -31,7 +31,7 @@ class SearchFastaMatch {
   std::vector<std::string> seq_vec_;
 };
 
-typedef std::shared_ptr<SearchFastaMatch> SearchFastaMatchPtr;
+using SearchFastaMatchPtr = std::shared_ptr<SearchFastaMatch>;
 
 } //namespace toppic
 

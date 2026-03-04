@@ -58,7 +58,7 @@ class PtmSearchMng {
   PsAlignParaPtr align_para_ptr_;
 };
 
-typedef std::shared_ptr<PtmSearchMng> PtmSearchMngPtr;
+using PtmSearchMngPtr = std::shared_ptr<PtmSearchMng>;
 
 } /* namespace toppic */
 

@@ -32,7 +32,7 @@ class SavitzkyGolay {
   boost::numeric::ublas::matrix<double> coef_mat_;
 };
 
-typedef std::shared_ptr<SavitzkyGolay> SavitzkyGolayPtr;
+using SavitzkyGolayPtr = std::shared_ptr<SavitzkyGolay>;
 
 }
 

@@ -69,7 +69,7 @@ class SuffixPosition {
   int peptide_end_pos_;  // index starts from 0, peptide ranges from [peptideStartPos, peptideEndPos)
 };
 
-typedef std::shared_ptr<SuffixPosition> SuffixPosPtr;
+using SuffixPosPtr = std::shared_ptr<SuffixPosition>;
 
 }  // namespace suffix
 

@@ -81,7 +81,7 @@ class CountTestNum {
   double compMassNum(double *cnts, int low, int high);
 };
 
-typedef std::shared_ptr<CountTestNum> CountTestNumPtr;
+using CountTestNumPtr = std::shared_ptr<CountTestNum>;
 
 
 }

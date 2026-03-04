@@ -57,7 +57,7 @@ class Suffix {
   int end_idx_;
 };
 
-typedef std::shared_ptr<Suffix> SuffixPtr;
+using SuffixPtr = std::shared_ptr<Suffix>;
 
 }  // namespace suffix
 

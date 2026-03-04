@@ -22,7 +22,7 @@ namespace toppic {
 
 class ExpEnv;
 
-typedef std::shared_ptr<ExpEnv> ExpEnvPtr;
+using ExpEnvPtr = std::shared_ptr<ExpEnv>;
 
 class ExpEnv : public Env {
  public:
@@ -68,8 +68,8 @@ class ExpEnv : public Env {
   void cntMaxConsPeakNum();
 };
 
-typedef std::vector<ExpEnvPtr> ExpEnvPtrVec;
-typedef std::vector<ExpEnvPtrVec> ExpEnvPtrVec2D;
+using ExpEnvPtrVec = std::vector<ExpEnvPtr>;
+using ExpEnvPtrVec2D = std::vector<ExpEnvPtrVec>;
 
 }
 

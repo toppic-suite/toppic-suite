@@ -63,8 +63,8 @@ class ProtMod {
   double pep_shift_;
 };
 
-typedef std::shared_ptr<ProtMod> ProtModPtr;
-typedef std::vector<ProtModPtr> ProtModPtrVec;
+using ProtModPtr = std::shared_ptr<ProtMod>;
+using ProtModPtrVec = std::vector<ProtModPtr>;
 
 }  // namespace toppic
 

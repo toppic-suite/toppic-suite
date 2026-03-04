@@ -40,7 +40,7 @@ class XmlDOMDocument;
 // localized amino acid.
 
 class Alter;
-typedef std::shared_ptr<Alter> AlterPtr;
+using AlterPtr = std::shared_ptr<Alter>;
 
 class Alter {
  public:
@@ -91,7 +91,7 @@ class Alter {
   LocalAnnoPtr local_anno_ptr_;
 };
 
-typedef std::vector<AlterPtr> AlterPtrVec;
+using AlterPtrVec = std::vector<AlterPtr>;
 
 }  // namespace toppic
 

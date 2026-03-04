@@ -44,7 +44,7 @@ class MsalignThreadMerge {
   std::string spec_base_name_;
 };
 
-typedef std::shared_ptr<MsalignThreadMerge> MsalignThreadMergePtr;
+using MsalignThreadMergePtr = std::shared_ptr<MsalignThreadMerge>;
 } /* namespace toppic */
 
 #endif

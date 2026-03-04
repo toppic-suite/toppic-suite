@@ -48,7 +48,7 @@ class ZeroPtmSearchMng {
   std::string output_file_ext_;
 };
 
-typedef std::shared_ptr<ZeroPtmSearchMng> ZeroPtmSearchMngPtr;
+using ZeroPtmSearchMngPtr = std::shared_ptr<ZeroPtmSearchMng>;
 
 }  // namespace toppic
 

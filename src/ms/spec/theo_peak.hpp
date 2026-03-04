@@ -21,7 +21,7 @@
 namespace toppic {
 
 class TheoPeak;
-typedef std::shared_ptr<TheoPeak> TheoPeakPtr;
+using TheoPeakPtr = std::shared_ptr<TheoPeak>;
 
 class TheoPeak : public Peak {
  public:
@@ -42,7 +42,7 @@ class TheoPeak : public Peak {
   double shift_;
 };
 
-typedef std::vector<TheoPeakPtr> TheoPeakPtrVec;
+using TheoPeakPtrVec = std::vector<TheoPeakPtr>;
 
 } /* namespace toppic */
 

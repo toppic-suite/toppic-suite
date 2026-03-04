@@ -29,8 +29,8 @@ class ResidueFreq: public Residue {
   double freq_;
 };
 
-typedef std::shared_ptr<ResidueFreq> ResFreqPtr;
-typedef std::vector<ResFreqPtr> ResFreqPtrVec;
+using ResFreqPtr = std::shared_ptr<ResidueFreq>;
+using ResFreqPtrVec = std::vector<ResFreqPtr>;
 
 }  // namespace toppic
 

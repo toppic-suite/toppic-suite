@@ -34,7 +34,7 @@ class MzmlMsGroup {
   MzmlMsPtrVec ms2_ptr_vec_;
 };
 
-typedef std::shared_ptr<MzmlMsGroup> MzmlMsGroupPtr;
+using MzmlMsGroupPtr = std::shared_ptr<MzmlMsGroup>;
 
 } /* namespace toppic */
 

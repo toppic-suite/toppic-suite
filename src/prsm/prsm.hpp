@@ -27,7 +27,7 @@
 namespace toppic {
 
 class Prsm;
-typedef std::shared_ptr<Prsm> PrsmPtr;
+using PrsmPtr = std::shared_ptr<Prsm>;
 
 class Prsm {
  public:
@@ -212,9 +212,9 @@ class Prsm {
   void initScores(SpParaPtr sp_para_ptr);
 };
 
-typedef std::vector<PrsmPtr> PrsmPtrVec;
-typedef std::vector<PrsmPtrVec> PrsmPtrVec2D;
-typedef std::vector<PrsmPtrVec2D> PrsmPtrVec3D;
+using PrsmPtrVec = std::vector<PrsmPtr>;
+using PrsmPtrVec2D = std::vector<PrsmPtrVec>;
+using PrsmPtrVec3D = std::vector<PrsmPtrVec2D>;
 
 }  // namespace toppic
 #endif

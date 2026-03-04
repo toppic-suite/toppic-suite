@@ -22,8 +22,8 @@
 namespace toppic {
 
 class SpectrumSet;
-typedef std::shared_ptr<SpectrumSet> SpectrumSetPtr;
-typedef std::vector<SpectrumSetPtr> SpectrumSetPtrVec;
+using SpectrumSetPtr = std::shared_ptr<SpectrumSet>;
+using SpectrumSetPtrVec = std::vector<SpectrumSetPtr>;
 
 class SpectrumSet {
  public:

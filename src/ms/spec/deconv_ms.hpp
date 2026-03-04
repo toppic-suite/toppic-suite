@@ -20,11 +20,11 @@
 
 namespace toppic {
 
-typedef Ms<DeconvPeakPtr> DeconvMs;
+using DeconvMs = Ms<DeconvPeakPtr>;
 
-typedef std::shared_ptr<Ms<DeconvPeakPtr>> DeconvMsPtr;
+using DeconvMsPtr = std::shared_ptr<Ms<DeconvPeakPtr>>;
 
-typedef std::vector<DeconvMsPtr> DeconvMsPtrVec;
+using DeconvMsPtrVec = std::vector<DeconvMsPtr>;
 
 }
 

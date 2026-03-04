@@ -20,7 +20,7 @@
 namespace toppic {
 
 class MassShift;
-typedef std::shared_ptr<MassShift> MassShiftPtr;
+using MassShiftPtr = std::shared_ptr<MassShift>;
 
 class MassShift {
  public:
@@ -73,7 +73,7 @@ class MassShift {
   std::vector<AlterPtr> alter_vec_;
 };
 
-typedef std::vector<MassShiftPtr> MassShiftPtrVec;
+using MassShiftPtrVec = std::vector<MassShiftPtr>;
 
 }  // namespace toppic
 

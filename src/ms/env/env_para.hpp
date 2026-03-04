@@ -24,7 +24,7 @@
 namespace toppic {
 
 class EnvPara;
-typedef std::shared_ptr<EnvPara> EnvParaPtr;
+using EnvParaPtr = std::shared_ptr<EnvPara>;
 
 class EnvPara {
  public:
