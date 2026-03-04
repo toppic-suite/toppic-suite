@@ -12,7 +12,7 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <catch.hpp>
+#include "catch/catch.hpp"
 
 #include "common/base/support_peak_type_base.hpp"
 

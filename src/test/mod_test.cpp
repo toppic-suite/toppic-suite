@@ -12,7 +12,7 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <catch.hpp>
+#include "catch/catch.hpp"
 
 #include "common/base/mod_base.hpp"
 #include "common/base/residue_base.hpp"

@@ -1,5 +1,7 @@
 /boost/         Some code from Boost used by pwiz/libraries/boost_aux/
 
+/catch/		catch.hpp for code testing
+
 /htslib/        Library for creating fasta indexes and reading fasta files.
                 Version 2016. (http://www.htslib.org/download/) 
 

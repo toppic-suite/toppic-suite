@@ -13,7 +13,7 @@
 //limitations under the License.
 
 #include <string>
-#include <catch.hpp>
+#include "catch/catch.hpp"
 
 #include "common/base/amino_acid_base.hpp"
 

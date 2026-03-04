@@ -15,7 +15,7 @@
 #include <iostream>
 #include <fstream>
 
-#include <catch.hpp>
+#include "catch/catch.hpp"
 
 #include "suffix/db_file_handler.hpp"
 #include "suffix/suffix_tree.hpp"

@@ -15,7 +15,7 @@
 #include <iostream>
 #include <fstream>
 
-#include <catch.hpp>
+#include "catch/catch.hpp"
 
 #include "common/base/base_data.hpp"
 #include "seq/fasta_reader.hpp"
