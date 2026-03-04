@@ -44,7 +44,7 @@ void createFolder(const std::string &folder_name);
 void copyFile(const std::string &file_name, const std::string &path,
               bool over_write);
 
-bool copyDir(const std::string &source, 
+bool copyDir(const std::string &source,
              const std::string &destination);
 
 bool copyJsonDir(const std::string &src_name,
@@ -61,20 +61,19 @@ void delDir(const std::string &path);
 
 void delFile(const std::string &path);
 
-void rename(const std::string &ori_name, 
-            const std::string &new_name);
+void rename(const std::string &ori_name, const std::string &new_name);
 
 void cleanPrefix(const std::string &ref_name,
                  const std::string &prefix);
 
-void cleanTempFiles(const std::string & ref_name, 
-                    const std::string & ext_prefix);
+void cleanTempFiles(const std::string &ref_name, 
+                    const std::string &ext_prefix);
 
 void moveFile(const std::string &file_name, const std::string &folder_name);
 
-inline std::string getToppicResourceDirName() {return "resources";}
+inline std::string getToppicResourceDirName() { return "resources"; }
 
-inline std::string getSharedDirName() {return "/usr/share/toppic";}
+inline std::string getSharedDirName() { return "/usr/share/toppic"; }
 
 std::string getResourceDir(const std::string &exec_dir);
 
