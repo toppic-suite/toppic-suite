@@ -35,7 +35,7 @@
 #include "topfd/ecscore/score/ecscore.hpp"
 #include "topfd/ecscore/score/ecscore_writer.hpp"
 #include "topfd/ecscore/env_coll/env_coll_assign.hpp"
-//#include "sim/png/pngwriter.hpp"
+#include "sim/png/pngwriter.hpp"
 
 namespace toppic {
 
@@ -86,7 +86,7 @@ void writepng(MsMapPtr map_ptr, EnvSetPtr env_set_ptr, std::string png_file_name
     }
   }
 
-  //pngwriter png(width, height, 1.0, (png_file_name +"_data.png").c_str());
+  pngwriter png(width, height, 1.0, (png_file_name +"_data.png").c_str());
   // add background
   for (size_t i = png_start_spec; i <= png_end_spec; i++) {
     for (size_t j = 0; j < peak_2d_list[i].size(); j++) {
@@ -96,7 +96,7 @@ void writepng(MsMapPtr map_ptr, EnvSetPtr env_set_ptr, std::string png_file_name
         int x = (peak_pos - ref_mz)*scale + center;
         int y = i - png_start_spec;
         double inte = peak->getIntensity() / max_inte;
-        //png.plot(x, y, inte, 0.0, 0.0);
+        png.plot(x, y, inte, 0.0, 0.0);
       }
     }
   }
@@ -132,10 +132,10 @@ void writepng(MsMapPtr map_ptr, EnvSetPtr env_set_ptr, std::string png_file_name
       }
       double inte = peak->getIntensity() /max_inte;
       LOG_DEBUG("x: " << x << " pos: " << peak->getPosition() << " y: " << y << " peak intensity: " << peak->getIntensity() << " max inte " << max_inte);
-      //png.plot(x, y, inte, 0.0, 0.0);
+      png.plot(x, y, inte, 0.0, 0.0);
     }
   }
-  //png.close();
+  png.close();
 
   // update y_start_list and y_end_list
   int ref_idx = seed_env->getReferIdx();
@@ -174,7 +174,7 @@ void writepng(MsMapPtr map_ptr, EnvSetPtr env_set_ptr, std::string png_file_name
     }
   }
 
-  //pngwriter mask_png(width, height, 0.0, (png_file_name + "_mask.png").c_str());
+  pngwriter mask_png(width, height, 0.0, (png_file_name + "_mask.png").c_str());
   // plot mask 
   std::vector<int> pos_list;
   for (int i = 0; i < peak_num; i++) {
@@ -191,7 +191,7 @@ void writepng(MsMapPtr map_ptr, EnvSetPtr env_set_ptr, std::string png_file_name
       int start = y_start_list[i] + (y_start_list[i+1] - y_start_list[i]) * (j - left_pos) / (right_pos - left_pos);
       int end = y_end_list[i] + (y_end_list[i+1] - y_end_list[i]) * (j - left_pos) / (right_pos - left_pos);
       for (int k = start; k <= end; k++) {
-        //mask_png.plot(j, k, 1.0, 1.0, 1.0);
+        mask_png.plot(j, k, 1.0, 1.0, 1.0);
       }
     }
   }
@@ -208,7 +208,7 @@ void writepng(MsMapPtr map_ptr, EnvSetPtr env_set_ptr, std::string png_file_name
     }
   }
   */
-  //mask_png.close();
+  mask_png.close();
 }
 
 void processMs1(TopfdParaPtr topfd_para_ptr) {
