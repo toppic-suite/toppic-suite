@@ -258,7 +258,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   set_property(TARGET onnx_lib PROPERTY IMPORTED_IMPLIB ${CMAKE_CURRENT_SOURCE_DIR}/lib/windows/onnxruntime.lib)
 
   target_link_libraries(topfd boost_chrono-mt boost_filesystem-mt
-    boost_program_options-mt boost_iostreams-mt 
+    boost_program_options-mt boost_iostreams-mt boost-thread-mt
     boost_nowide-mt xerces-c sqlite3 z psapi Ws2_32 onnx_lib)
 
   target_link_libraries(topindex boost_program_options-mt
@@ -274,7 +274,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     xerces-c z Ws2_32)
 
   target_link_libraries(topdia boost_chrono-mt boost_filesystem-mt
-    boost_program_options-mt boost_iostreams-mt 
+    boost_program_options-mt boost_iostreams-mt boost_thread-mt
     boost_nowide-mt xerces-c sqlite3 z psapi Ws2_32 onnx_lib)
 
   # Qt
@@ -303,7 +303,7 @@ ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 # boost_serialization xerces-c z are required by toppic suite
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   target_link_libraries(topfd boost_chrono boost_filesystem boost_program_options 
-    boost_iostreams xerces-c sqlite3 z onnxruntime)
+    boost_iostreams boost_thread xerces-c sqlite3 z onnxruntime)
 
   target_link_libraries(topindex boost_program_options 
     boost_serialization xerces-c z)
@@ -317,8 +317,8 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   target_link_libraries(topdiff boost_program_options
     sqlite3 xerces-c z)
 
-	target_link_libraries(topdia boost_chrono boost_filesystem boost_program_options 
-    boost_iostreams xerces-c sqlite3 z onnxruntime)
+  target_link_libraries(topdia boost_chrono boost_filesystem boost_program_options 
+    boost_iostreams boost_thread xerces-c sqlite3 z onnxruntime)
 
   target_link_libraries(topfd_gui Qt5Widgets Qt5Core Qt5Gui xerces-c sqlite3)
 

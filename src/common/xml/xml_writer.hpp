@@ -27,29 +27,31 @@ class XmlWriter {
  public:
   XmlWriter(const std::string &file_name,
             const std::string &root);
+  XmlWriter(const XmlWriter&) = delete;
+  XmlWriter& operator=(const XmlWriter&) = delete;
 
   ~XmlWriter();
 
-  XmlDOMDocument* getDoc(){return doc_;}
+  XmlDOMDocument* getDoc() { return doc_; }
 
   void write(xercesc::DOMElement* element);
 
-  void write_str(const std::string & str);
+  void writeStr(const std::string& str);
 
   void close();
 
  private:
-  xercesc::DOMLSSerializer * serializer_;
+  xercesc::DOMLSSerializer* serializer_;
 
-  XmlDOMDocument * doc_;
+  XmlDOMDocument* doc_;
 
   std::ofstream file_;
 
-  std::string root_ = "";
+  std::string root_;
 };
 
 using XmlWriterPtr = std::shared_ptr<XmlWriter>;
 
-} /* namespace toppic */
+}  // namespace toppic
 
-#endif /* XML_WRITER_HPP_ */
+#endif  // TOPPIC_COMMON_XML_XML_WRITER_HPP_

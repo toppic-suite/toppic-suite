@@ -12,23 +12,28 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include "common/xml/xml_writer.hpp"
+
+#include <stdexcept>
+
 #include "common/util/logger.hpp"
 #include "common/xml/xml_dom_impl.hpp"
 #include "common/xml/xml_dom_util.hpp"
-#include "common/xml/xml_writer.hpp"
 
 namespace toppic {
 
 XmlWriter::XmlWriter(const std::string &file_name, const std::string &root) {
-  file_.open(file_name.c_str());
+  file_.open(file_name);
+  if (!file_.is_open())
+    throw std::runtime_error("XmlWriter: failed to open file: " + file_name);
   root_ = root;
   LOG_DEBUG("file_name " << file_name);
   file_ << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << std::endl;
-  if(root_.compare("")!=0){
-    file_ << ("<"+root_+">");
+  if (!root_.empty()) {
+    file_ << "<" + root_ + ">";
   }
   XmlDOMImpl* impl = XmlDOMImplFactory::getXmlDOMImplInstance();
-  doc_ = new XmlDOMDocument(impl->createDoc(root_.compare("")!=0?root_:"ROOT"));
+  doc_ = new XmlDOMDocument(impl->createDoc(!root_.empty() ? root_ : "ROOT"));
   serializer_ = impl->createSerializer();
 }
 
@@ -40,21 +45,22 @@ XmlWriter::~XmlWriter() {
   delete doc_;
 }
 
+// Takes ownership of element and releases it after writing.
 void XmlWriter::write(xercesc::DOMElement* element) {
   std::string str = xml_dom_util::writeToString(serializer_, element);
   xml_dom_util::writeToStreamByRemovingDoubleLF(file_, str);
   element->release();
 }
 
-void XmlWriter::write_str(const std::string & str) {
+void XmlWriter::writeStr(const std::string& str) {
   file_ << str << std::endl;
 }
 
 void XmlWriter::close() {
-  if(root_.compare("")!=0){
-    file_ << "</"+root_+">" << std::endl;
+  if (!root_.empty()) {
+    file_ << "</" + root_ + ">" << std::endl;
   }
   file_.close();
 }
 
-} /* namespace toppic */
+}  // namespace toppic

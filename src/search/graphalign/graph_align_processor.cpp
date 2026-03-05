@@ -38,6 +38,8 @@
 
 namespace toppic {
 
+using ThreadPtr = std::shared_ptr<std::thread>;
+
 std::function<void()> geneTask(GraphAlignMngPtr mng_ptr,
                                ModPtrVec var_mod_ptr_vec,
                                int spectrum_num, int idx) {

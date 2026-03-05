@@ -51,14 +51,14 @@ void writeProteinToXml(XmlWriterPtr xml_writer,
                        const std::vector<int> &species_ids,
                        PrsmViewMngPtr mng_ptr,
                        bool detail, bool add_ms) {
-  xml_writer->write_str("<protein>");
-  xml_writer->write_str("<sequence_id>" + str_util::toString(prot_id) + "</sequence_id>");
-  xml_writer->write_str("<sequence_name>" 
+  xml_writer->writeStr("<protein>");
+  xml_writer->writeStr("<sequence_id>" + str_util::toString(prot_id) + "</sequence_id>");
+  xml_writer->writeStr("<sequence_name>" 
                         + prsm_ptrs[0]->getProteoformPtr()->getSeqName() + "</sequence_name>");
-  xml_writer->write_str("<sequence_description>" 
+  xml_writer->writeStr("<sequence_description>" 
                         + prsm_ptrs[0]->getProteoformPtr()->getSeqDesc() 
                         + "</sequence_description>");
-  xml_writer->write_str("<compatible_proteoform_number>" 
+  xml_writer->writeStr("<compatible_proteoform_number>" 
                         + str_util::toString(species_ids.size()) 
                         + "</compatible_proteoform_number>");
   for (size_t i = 0; i < species_ids.size(); i++) {
@@ -68,7 +68,7 @@ void writeProteinToXml(XmlWriterPtr xml_writer,
     xml_writer->write(geneXmlForProteoform(xml_writer->getDoc(), select_prsm_ptrs, mng_ptr, 
                                            detail, add_ms));
   }
-  xml_writer->write_str("</protein>");
+  xml_writer->writeStr("</protein>");
 }
 
 xercesc::DOMElement* geneXmlForProteinList(XmlDOMDocument* xml_doc,
