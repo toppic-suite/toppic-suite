@@ -34,7 +34,7 @@ class XmlWriter {
 
   XmlDOMDocument* getDoc() { return doc_; }
 
-  void write(xercesc::DOMElement* element);
+  void writeAndRelease(xercesc::DOMElement* element);
 
   void writeStr(const std::string& str);
 

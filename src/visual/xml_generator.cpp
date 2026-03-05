@@ -93,7 +93,7 @@ void XmlGenerator::outputPrsms() {
             "prsms" + file_util::getFileSeparator() + "prsm" +
             str_util::toString(prsm_ptr->getPrsmId()) + ".xml";
           XmlWriter writer(file_name, "");
-          writer.write(anno_prsm::geneAnnoPrsm(writer.getDoc(), prsm_ptr, mng_ptr_));
+          writer.writeAndRelease(anno_prsm::geneAnnoPrsm(writer.getDoc(), prsm_ptr, mng_ptr_));
           writer.close();
 
           std::vector<std::string> file_info;
@@ -153,7 +153,7 @@ void XmlGenerator::outputAllPrsms() {
     prot_elements->appendChild(anno_prsm::geneAnnoPrsmBrief(writer.getDoc(), prsm_ptrs[i], mng_ptr_, true, false));                                                      
   }
   std::cout << std::endl;
-  writer.write(prot_elements);
+  writer.writeAndRelease(prot_elements);
   writer.close();
 
   std::vector<std::string> file_info;
@@ -242,8 +242,8 @@ void XmlGenerator::outputProteoforms(){
                 Prsm::cmpEValueIncProtInc);
       bool detail = true; 
       bool add_ms = true;
-      writer.write(anno_xml_util::geneXmlForProteoform(writer.getDoc(), select_prsm_ptrs, 
-                                                       mng_ptr_, detail, add_ms));
+      writer.writeAndRelease(anno_xml_util::geneXmlForProteoform(writer.getDoc(), select_prsm_ptrs,
+                                                                 mng_ptr_, detail, add_ms));
       writer.close();
       LOG_DEBUG("output proteoform completed " << i);
         std::vector<std::string> file_info;
@@ -401,7 +401,7 @@ void XmlGenerator::outputAllProteins() {
     }
   }
   std::cout << std::endl;
-  writer.write(prot_elements);
+  writer.writeAndRelease(prot_elements);
   writer.close();
 
   std::vector<std::string> file_info;
@@ -415,7 +415,7 @@ void XmlGenerator::outputAllProteins() {
 void XmlGenerator::outputFileList() {
   std::string file_name = mng_ptr_->xml_path_+ file_util::getFileSeparator() + "files.xml";
   XmlWriter writer(file_name, "");
-  writer.write(anno_file_list_ptr_->geneFileList(writer.getDoc()));
+  writer.writeAndRelease(anno_file_list_ptr_->geneFileList(writer.getDoc()));
   writer.close();
 }
 

@@ -46,7 +46,7 @@ XmlWriter::~XmlWriter() {
 }
 
 // Takes ownership of element and releases it after writing.
-void XmlWriter::write(xercesc::DOMElement* element) {
+void XmlWriter::writeAndRelease(xercesc::DOMElement* element) {
   std::string str = xml_dom_util::writeToString(serializer_, element);
   xml_dom_util::writeToStreamByRemovingDoubleLF(file_, str);
   element->release();

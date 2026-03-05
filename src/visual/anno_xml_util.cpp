@@ -65,8 +65,8 @@ void writeProteinToXml(XmlWriterPtr xml_writer,
     PrsmPtrVec select_prsm_ptrs = prsm_util::selectClusterPrsms(prsm_ptrs, species_ids[i]);
     std::sort(select_prsm_ptrs.begin(), select_prsm_ptrs.end(),
               Prsm::cmpEValueIncProtInc);
-    xml_writer->write(geneXmlForProteoform(xml_writer->getDoc(), select_prsm_ptrs, mng_ptr, 
-                                           detail, add_ms));
+    xml_writer->writeAndRelease(geneXmlForProteoform(xml_writer->getDoc(), select_prsm_ptrs, mng_ptr,
+                                                     detail, add_ms));
   }
   xml_writer->writeStr("</protein>");
 }
