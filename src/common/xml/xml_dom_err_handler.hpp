@@ -21,8 +21,9 @@ namespace toppic {
 
 class XmlDOMErrorHandler : public xercesc::HandlerBase {
  public:
-  void fatalError(const xercesc::SAXParseException &ex);
+  void fatalError(const xercesc::SAXParseException &ex) override;
 };
- 
-}
-#endif
+
+}  // namespace toppic
+
+#endif  // TOPPIC_COMMON_XML_XML_DOM_ERR_HANDLER_HPP_

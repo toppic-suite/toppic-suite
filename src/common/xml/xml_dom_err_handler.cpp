@@ -12,14 +12,23 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include "common/util/logger.hpp"
 #include "common/xml/xml_dom_err_handler.hpp"
+
+#include <stdexcept>
+#include <string>
+
+#include "common/util/logger.hpp"
+#include "common/xml/xml_dom_str.hpp"
 
 namespace toppic {
 
 void XmlDOMErrorHandler::fatalError(const xercesc::SAXParseException &ex) {
-  LOG_ERROR("Fatal xml file parsing error at line " << ex.getLineNumber()); 
-  exit(EXIT_FAILURE);
+  const XMLCh* sys_id = ex.getSystemId();
+  const auto line = ex.getLineNumber();
+  std::string file = sys_id ? CharStr(sys_id).getString() : "<unknown>";
+  LOG_ERROR("Fatal xml parsing error in " << file << " at line " << line);
+  throw std::runtime_error("Fatal xml parsing error in " + file
+                           + " at line " + std::to_string(line));
 }
 
-}
+}  // namespace toppic
