@@ -46,7 +46,7 @@ XmlDOMDocument::XmlDOMDocument(XmlDOMParser* parser,
 
 XmlDOMDocument::XmlDOMDocument(xercesc::DOMImplementation* implementation,
                                const std::string &root){
-    xercesc::DOMDocument* doc = implementation->createDocument(0,xml_dom_str::xmlStr(root.c_str()),0);
+    xercesc::DOMDocument* doc = implementation->createDocument(0,XmlStr(root.c_str()).unicodeForm(),0);
     doc_=doc;
 }
 
@@ -69,12 +69,12 @@ void XmlDOMDocument::addElement(XmlDOMElement* parent, XmlDOMElement* child){
 }
 
 XmlDOMElement* XmlDOMDocument::createElement(const char* tag) {
-  XmlDOMElement* element = doc_->createElement(xml_dom_str::xmlStr(tag));
+  XmlDOMElement* element = doc_->createElement(XmlStr(tag).unicodeForm());
   return element;
 }
 
 xercesc::DOMText* XmlDOMDocument::createTextNode(const char* text) {
-  xercesc::DOMText* text_node = doc_->createTextNode(xml_dom_str::xmlStr(text));
+  xercesc::DOMText* text_node = doc_->createTextNode(XmlStr(text).unicodeForm());
   return text_node;
 }
 
