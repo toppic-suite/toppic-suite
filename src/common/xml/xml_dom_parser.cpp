@@ -12,12 +12,11 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include "common/xml/xml_dom_parser.hpp"
+
 #include <xercesc/util/PlatformUtils.hpp>
-#include <xercesc/dom/DOMDocument.hpp>
-#include <xercesc/framework/MemBufInputSource.hpp>
 
 #include "common/xml/xml_dom_err_handler.hpp"
-#include "common/xml/xml_dom_parser.hpp"
 
 namespace toppic {
 
@@ -26,17 +25,22 @@ XmlDOMParser* XmlDOMParserFactory::dom_parser_ = nullptr;
 /* XmlDOMParser */
 XmlDOMParser::XmlDOMParser() : parser_(nullptr), err_handler_(nullptr) {
   xercesc::XMLPlatformUtils::Initialize();
-  parser_ = new xercesc::XercesDOMParser();
-  err_handler_ = (xercesc::ErrorHandler*) new XmlDOMErrorHandler();
-  parser_->setErrorHandler(err_handler_);
+  try {
+    parser_ = new xercesc::XercesDOMParser();
+    err_handler_ = new XmlDOMErrorHandler();
+    parser_->setErrorHandler(err_handler_);
+  } catch (...) {
+    delete err_handler_;
+    delete parser_;
+    xercesc::XMLPlatformUtils::Terminate();
+    throw;
+  }
 }
 
 XmlDOMParser::~XmlDOMParser() {
-  if (parser_ != nullptr) {
-    delete parser_;
-    delete err_handler_;
-    xercesc::XMLPlatformUtils::Terminate();
-  }
+  delete parser_;
+  delete err_handler_;
+  xercesc::XMLPlatformUtils::Terminate();
 }
 
 xercesc::DOMDocument* XmlDOMParser::parse(const std::string &xml_file) {
@@ -58,9 +62,8 @@ XmlDOMParser* XmlDOMParserFactory::getXmlDOMParserInstance() {
 }
 
 void XmlDOMParserFactory::deleteParserInstance() {
-  if (dom_parser_ != nullptr) {
-    delete dom_parser_;
-  }
+  delete dom_parser_;
+  dom_parser_ = nullptr;
 }
 
-}
+}  // namespace toppic

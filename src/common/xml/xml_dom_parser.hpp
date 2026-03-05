@@ -19,7 +19,7 @@
 
 #include <xercesc/parsers/XercesDOMParser.hpp>
 #include <xercesc/dom/DOMDocument.hpp>
-#include <xercesc/sax/HandlerBase.hpp>
+#include <xercesc/sax/ErrorHandler.hpp>
 #include <xercesc/framework/MemBufInputSource.hpp>
 
 namespace toppic {
@@ -28,6 +28,8 @@ namespace toppic {
 class XmlDOMParser {
  public:
   XmlDOMParser();
+  XmlDOMParser(const XmlDOMParser&) = delete;
+  XmlDOMParser& operator=(const XmlDOMParser&) = delete;
   ~XmlDOMParser();
 
   xercesc::DOMDocument* parse(const std::string &xml_file);
@@ -36,18 +38,19 @@ class XmlDOMParser {
 
  private:
   xercesc::XercesDOMParser* parser_;
-  xercesc::ErrorHandler*    err_handler_;
+  xercesc::ErrorHandler* err_handler_;
 };
 
 class XmlDOMParserFactory {
+ public:
+  XmlDOMParserFactory() = delete;
+  static XmlDOMParser* getXmlDOMParserInstance();
+  static void deleteParserInstance();
+
  private:
   static XmlDOMParser* dom_parser_;
- public:
-  static XmlDOMParser* getXmlDOMParserInstance();
-
-  static void deleteParserInstance(); 
 };
 
 }  // namespace toppic
 
-#endif
+#endif  // TOPPIC_COMMON_XML_XML_DOM_PARSER_HPP_
