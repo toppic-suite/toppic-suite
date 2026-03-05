@@ -208,6 +208,12 @@ file(GLOB TOPDIA_GUI_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdia_argumen
                           ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topdia/*.cpp
                           ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topdia/*.qrc)
 
+# topsim_console
+file(GLOB TOPSIM_CONSOLE_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd_argument.cpp)
+
+# topsim
+file(GLOB_RECURSE TOPSIM_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/sim/*.cpp)
+
 # unit test 
 file(GLOB UNIT_TEST_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/*.cpp)
 
@@ -238,6 +244,10 @@ add_executable(topdiff
 add_executable(topdia
   ${TOPDIA_CONSOLE_SRCS} ${TOPDIA_SRCS} ${COMMON_SRCS} ${SQL_SRCS} ${PARA_SRCS}
   ${SPEC_SRCS} ${MZML_SRCS} ${TOPFD_SRCS} ${PWIZ_SRCS} ${NOWIDE_SRCS})
+
+add_executable(topsim 
+  ${TOPSIM_CONSOLE_SRCS} ${TOPSIM_SRCS} ${TOPFD_SRCS} ${COMMON_SRCS} ${PARA_SRCS} 
+  ${SPEC_SRCS} ${MZML_SRCS} ${PWIZ_SRCS} ${NOWIDE_SRCS})
 
 add_executable(topfd_gui ${TOPFD_GUI_SRCS} ${GUI_UTIL_SRCS} ${SQL_SRCS})
 
@@ -318,6 +328,9 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     sqlite3 xerces-c z)
 
   target_link_libraries(topdia boost_chrono boost_filesystem boost_program_options 
+    boost_iostreams boost_thread xerces-c sqlite3 z onnxruntime)
+
+  target_link_libraries(topsim boost_chrono boost_filesystem boost_program_options 
     boost_iostreams boost_thread xerces-c sqlite3 z onnxruntime)
 
   target_link_libraries(topfd_gui Qt5Widgets Qt5Core Qt5Gui xerces-c sqlite3)
