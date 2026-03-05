@@ -331,7 +331,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     boost_iostreams boost_thread xerces-c sqlite3 z onnxruntime)
 
   target_link_libraries(topsim boost_chrono boost_filesystem boost_program_options 
-    boost_iostreams boost_thread xerces-c sqlite3 z onnxruntime)
+    boost_iostreams boost_thread xerces-c sqlite3 z png onnxruntime)
 
   target_link_libraries(topfd_gui Qt5Widgets Qt5Core Qt5Gui xerces-c sqlite3)
 
