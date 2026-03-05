@@ -15,9 +15,10 @@
 #ifndef TOPPIC_COMMON_XML_XML_DOM_UTIL_HPP_
 #define TOPPIC_COMMON_XML_XML_DOM_UTIL_HPP_
 
+#include <fstream>
 #include <string>
 
-#include <xercesc/dom/DOMDocument.hpp>
+#include <xercesc/dom/DOMNode.hpp>
 #include <xercesc/dom/DOMLSSerializer.hpp>
 
 #include "common/xml/xml_dom_element.hpp"
@@ -25,8 +26,6 @@
 namespace toppic {
 
 namespace xml_dom_util {
-
-xercesc::DOMNodeList* getChildElements(XmlDOMElement *parent, const char* tag);
 
 XmlDOMElement* getChildElement(XmlDOMElement* parent, const char* tag, int index);
 
@@ -44,11 +43,12 @@ int getChildCount(XmlDOMElement* parent, const char* child_tag);
 
 std::string getAttributeValue(XmlDOMElement* parent, const char* attribute_tag);
 
-std::string writeToString(xercesc::DOMLSSerializer* serializer, xercesc::DOMNode *node);
+std::string writeToString(xercesc::DOMLSSerializer* serializer, xercesc::DOMNode* node);
 
-void writeToStreamByRemovingDoubleLF(std::ofstream & file, std::string &str);
+void writeToStreamByRemovingDoubleLF(std::ofstream& file, const std::string& str);
 
 }  // namespace xml_dom_util
 
 }  // namespace toppic
-#endif
+
+#endif  // TOPPIC_COMMON_XML_XML_DOM_UTIL_HPP_

@@ -12,30 +12,29 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <string>
-#include <fstream>
+#include "common/xml/xml_dom_util.hpp"
+
 #include <algorithm>
+#include <stdexcept>
 
 #include <xercesc/dom/DOMElement.hpp>
 #include <xercesc/dom/DOMNodeList.hpp>
-#include <xercesc/dom/DOMLSSerializer.hpp>
 
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
 #include "common/xml/xml_dom_str.hpp"
-#include "common/xml/xml_dom_util.hpp"
 
 namespace toppic {
 
 namespace xml_dom_util {
 
-XmlDOMElement* getChildElement(XmlDOMElement *parent,
+XmlDOMElement* getChildElement(XmlDOMElement* parent,
                                const char* tag, int index) {
   xercesc::DOMNodeList* list = parent->getElementsByTagName(XmlStr(tag).unicodeForm());
   XmlDOMElement* element = dynamic_cast<XmlDOMElement*>(list->item(index));
   if (element == nullptr) {
     LOG_WARN("Get Child Element " << tag << " return null!");
-    exit(EXIT_FAILURE);
+    throw std::runtime_error(std::string("getChildElement: element not found: ") + tag);
   }
   return element;
 }
@@ -43,47 +42,38 @@ XmlDOMElement* getChildElement(XmlDOMElement *parent,
 std::string getChildValue(XmlDOMElement* parent,
                           const char* child_tag, int i) {
   xercesc::DOMNodeList* node_list = parent->getElementsByTagName(XmlStr(child_tag).unicodeForm());
-  if (node_list == nullptr) {
+  if (node_list->getLength() == 0) {
     LOG_WARN("Get Child Element " << child_tag << " return null!");
-    exit(EXIT_FAILURE);
+    throw std::runtime_error(std::string("getChildValue: node list not found: ") + child_tag);
   }
   XmlDOMElement* child = dynamic_cast<XmlDOMElement*>(node_list->item(i));
   if (child == nullptr) {
     LOG_WARN("Get Child Element " << child_tag << " return null!");
-    exit(EXIT_FAILURE);
+    throw std::runtime_error(std::string("getChildValue: element not found: ") + child_tag);
   }
-
-  std::string value;
-  if (child) {
-    value = CharStr(child->getTextContent()).getString();
-  } else {
-    value = "";
-  }
-  return value;
+  return CharStr(child->getTextContent()).getString();
 }
 
-double getScientificChildValue(XmlDOMElement* parent, 
+double getScientificChildValue(XmlDOMElement* parent,
                                const char* child_tag, int i) {
   std::string value = getChildValue(parent, child_tag, i);
-  //LOG_DEBUG("tag " << child_tag << "double value " << value);
   return str_util::scientificToDouble(value);
 }
 
-double getDoubleChildValue(XmlDOMElement* parent, 
+double getDoubleChildValue(XmlDOMElement* parent,
                            const char* child_tag, int i) {
   std::string value = getChildValue(parent, child_tag, i);
-  //LOG_DEBUG("tag " << child_tag << "double value " << value);
   return std::stod(value);
 }
 
-int getIntChildValue(XmlDOMElement* parent, 
+int getIntChildValue(XmlDOMElement* parent,
                      const char* child_tag, int i) {
   try {
     std::string value = getChildValue(parent, child_tag, i);
     return std::stoi(value);
   }
-  catch (std::string s) {
-    LOG_WARN("Get Child Element " << child_tag << " error!");
+  catch (const std::logic_error& e) {
+    LOG_WARN("Get Child Element " << child_tag << " error: " << e.what());
     return 0;
   }
 }
@@ -92,33 +82,31 @@ bool getBoolChildValue(XmlDOMElement* parent,
                        const char* child_tag, int i) {
   std::string value = getChildValue(parent, child_tag, i);
   std::transform(value.begin(), value.end(), value.begin(), ::tolower);
-  if (value == "true") {
-    return true;
-  }
-  return false;
+  return value == "true";
 }
 
 int getChildCount(XmlDOMElement* parent, const char* child_tag) {
-  xercesc::DOMNodeList* childList = parent->getElementsByTagName(XmlStr(child_tag).unicodeForm());
-  return static_cast<int>(childList->getLength());
+  xercesc::DOMNodeList* child_list = parent->getElementsByTagName(XmlStr(child_tag).unicodeForm());
+  return static_cast<int>(child_list->getLength());
 }
 
 std::string getAttributeValue(XmlDOMElement* element,
                               const char* attribute_tag) {
-  std::string value = CharStr(element->getAttribute(XmlStr(attribute_tag).unicodeForm())).getString();
-  return value;
+  return CharStr(element->getAttribute(XmlStr(attribute_tag).unicodeForm())).getString();
 }
 
 std::string writeToString(xercesc::DOMLSSerializer* serializer,
-                          xercesc::DOMNode *node) {
+                          xercesc::DOMNode* node) {
   XMLCh* ch = serializer->writeToString(node, 0);
+  if (ch == nullptr)
+    throw std::runtime_error("writeToString: serializer returned null");
   std::string result = CharStr(ch).getString();
   xercesc::XMLString::release(&ch);
   return result;
 }
 
-void writeToStreamByRemovingDoubleLF(std::ofstream &file, std::string &str) {
-  int pos = 0;
+void writeToStreamByRemovingDoubleLF(std::ofstream& file, const std::string& str) {
+  std::size_t pos = 0;
   std::size_t found = str.find("\n\n", pos);
   while (found != std::string::npos) {
     std::string sub = str.substr(pos, found - pos);
@@ -126,12 +114,12 @@ void writeToStreamByRemovingDoubleLF(std::ofstream &file, std::string &str) {
     pos = found + 2;
     found = str.find("\n\n", pos);
   }
-  if (pos < static_cast<int>(str.length())) {
+  if (pos < str.length()) {
     std::string sub = str.substr(pos);
     file << sub << std::endl;
   }
 }
 
-} // namespace xml_dom_util
+}  // namespace xml_dom_util
 
 }  // namespace toppic
