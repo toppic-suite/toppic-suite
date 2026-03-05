@@ -12,31 +12,28 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include "common/xml/xml_dom_impl.hpp"
+
+#include <stdexcept>
 #include <xercesc/dom/DOMDocument.hpp>
 #include <xercesc/dom/DOMImplementationRegistry.hpp>
 #include <xercesc/dom/DOMLSSerializer.hpp>
 
 #include "common/xml/xml_dom_str.hpp"
-#include "common/xml/xml_dom_impl.hpp"
- 
+
 namespace toppic {
 
-/* XmlDOMImplenmation */
+/* XmlDOMImplementation */
 XmlDOMImpl* XmlDOMImplFactory::dom_impl_ = nullptr;
 
 XmlDOMImpl::XmlDOMImpl() {
   impl_ = xercesc::DOMImplementationRegistry::getDOMImplementation(XmlStr("Core").unicodeForm());
-}
-
-XmlDOMImpl::~XmlDOMImpl() {
-  if (impl_ != nullptr) {
-    delete impl_;
-  }
+  if (impl_ == nullptr)
+    throw std::runtime_error("XmlDOMImpl: DOMImplementation unavailable");
 }
 
 xercesc::DOMDocument* XmlDOMImpl::createDoc(const std::string &root) {
-  xercesc::DOMDocument* doc = impl_->createDocument(0,XmlStr(root.c_str()).unicodeForm(), 0);
-  return doc;
+  return impl_->createDocument(0, XmlStr(root.c_str()).unicodeForm(), 0);
 }
 
 xercesc::DOMLSSerializer* XmlDOMImpl::createSerializer() {
@@ -49,7 +46,7 @@ xercesc::DOMLSSerializer* XmlDOMImpl::createSerializer() {
   return writer;
 }
 
-/*XmlDOMImplFactory */
+/* XmlDOMImplFactory */
 XmlDOMImpl* XmlDOMImplFactory::getXmlDOMImplInstance() {
   if (dom_impl_ == nullptr) {
     dom_impl_ = new XmlDOMImpl();
@@ -57,4 +54,4 @@ XmlDOMImpl* XmlDOMImplFactory::getXmlDOMImplInstance() {
   return dom_impl_;
 }
 
-}
+}  // namespace toppic

@@ -24,10 +24,12 @@
 namespace toppic {
 
 /* DOM Implementation */
-class XmlDOMImpl{
+class XmlDOMImpl {
  public:
   XmlDOMImpl();
-  ~XmlDOMImpl();
+  XmlDOMImpl(const XmlDOMImpl&) = delete;
+  XmlDOMImpl& operator=(const XmlDOMImpl&) = delete;
+  ~XmlDOMImpl() = default;
   xercesc::DOMDocument* createDoc(const std::string &root);
   xercesc::DOMLSSerializer* createSerializer();
 
@@ -36,11 +38,14 @@ class XmlDOMImpl{
 };
 
 class XmlDOMImplFactory {
+ public:
+  XmlDOMImplFactory() = delete;
+  static XmlDOMImpl* getXmlDOMImplInstance();
+
  private:
   static XmlDOMImpl* dom_impl_;
- public:
-  static XmlDOMImpl* getXmlDOMImplInstance();
 };
 
 }  // namespace toppic
-#endif
+
+#endif  // TOPPIC_COMMON_XML_XML_DOM_IMPL_HPP_
