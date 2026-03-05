@@ -15,6 +15,8 @@
 #ifndef TOPPIC_COMMON_XML_XML_DOM_DOCUMENT_HPP_
 #define TOPPIC_COMMON_XML_XML_DOM_DOCUMENT_HPP_
 
+#include <string>
+
 #include <xercesc/dom/DOMDocument.hpp>
 #include <xercesc/dom/DOMImplementation.hpp>
 #include <xercesc/framework/MemBufInputSource.hpp>
@@ -31,15 +33,18 @@ class XmlDOMDocument {
 
   XmlDOMDocument(xercesc::DOMDocument* doc);
 
-  XmlDOMDocument(xercesc::DOMImplementation* implementation, 
+  XmlDOMDocument(xercesc::DOMImplementation* implementation,
                  const std::string &root);
+  XmlDOMDocument(const XmlDOMDocument&) = delete;
+  XmlDOMDocument& operator=(const XmlDOMDocument&) = delete;
+
   ~XmlDOMDocument();
 
   XmlDOMElement* createElement(const char* tag);
 
   xercesc::DOMText* createTextNode(const char* text);
 
-  void addElement(XmlDOMElement* element, 
+  void addElement(XmlDOMElement* element,
                   const char* tag, const char* value);
 
   XmlDOMElement* getDocumentElement() {
@@ -49,14 +54,12 @@ class XmlDOMDocument {
   void addElement(XmlDOMElement* element);
   void addElement(XmlDOMElement* parent, XmlDOMElement* child);
 
-  int writeXmlDOMDocument(const char * filename);
-
-  void release() {doc_->release();}
+  void release() { doc_->release(); doc_ = nullptr; }
 
  private:
   xercesc::DOMDocument* doc_;
 };
 
-}
+}  // namespace toppic
 
-#endif
+#endif  // TOPPIC_COMMON_XML_XML_DOM_DOCUMENT_HPP_

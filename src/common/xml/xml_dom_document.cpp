@@ -12,46 +12,47 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include "common/xml/xml_dom_document.hpp"
+
 #include <xercesc/dom/DOMDocument.hpp>
 #include <xercesc/dom/DOMText.hpp>
 
 #include "common/util/logger.hpp"
 #include "common/xml/xml_dom_str.hpp"
-#include "common/xml/xml_dom_document.hpp"
 
 namespace toppic {
 
-XmlDOMDocument::XmlDOMDocument(XmlDOMParser* parser, 
-                               const char* xml_file) 
-    : doc_(NULL) {
+XmlDOMDocument::XmlDOMDocument(XmlDOMParser* parser,
+                               const char* xml_file)
+    : doc_(nullptr) {
   try {
     doc_ = parser->parse(xml_file);
   }
   catch (std::exception &e) {
-    LOG_ERROR("The xml file " << xml_file << " contains errors!");
-    exit(EXIT_FAILURE);
+    LOG_ERROR("The xml file " << xml_file << " contains errors: " << e.what());
+    throw;
   }
 }
 
-XmlDOMDocument::XmlDOMDocument(XmlDOMParser* parser, 
-                               const xercesc::MemBufInputSource &str_buf) {
+XmlDOMDocument::XmlDOMDocument(XmlDOMParser* parser,
+                               const xercesc::MemBufInputSource &str_buf)
+    : doc_(nullptr) {
   try {
     doc_ = parser->parse(str_buf);
   }
   catch (std::exception &e) {
-    LOG_ERROR("Xml str buffer contain errors!");
-    exit(EXIT_FAILURE);
+    LOG_ERROR("Xml str buffer contains errors: " << e.what());
+    throw;
   }
 }
 
 XmlDOMDocument::XmlDOMDocument(xercesc::DOMImplementation* implementation,
-                               const std::string &root){
-    xercesc::DOMDocument* doc = implementation->createDocument(0,XmlStr(root.c_str()).unicodeForm(),0);
-    doc_=doc;
+                               const std::string &root) {
+  doc_ = implementation->createDocument(0, XmlStr(root.c_str()).unicodeForm(), 0);
 }
 
-XmlDOMDocument::XmlDOMDocument(xercesc::DOMDocument* doc){
-    doc_=doc;
+XmlDOMDocument::XmlDOMDocument(xercesc::DOMDocument* doc) {
+  doc_ = doc;
 }
 
 XmlDOMDocument::~XmlDOMDocument() {
@@ -61,29 +62,27 @@ XmlDOMDocument::~XmlDOMDocument() {
 }
 
 void XmlDOMDocument::addElement(XmlDOMElement* element) {
-    doc_->appendChild(element);
+  doc_->appendChild(element);
 }
 
-void XmlDOMDocument::addElement(XmlDOMElement* parent, XmlDOMElement* child){
-    parent->appendChild(child);
+void XmlDOMDocument::addElement(XmlDOMElement* parent, XmlDOMElement* child) {
+  parent->appendChild(child);
 }
 
 XmlDOMElement* XmlDOMDocument::createElement(const char* tag) {
-  XmlDOMElement* element = doc_->createElement(XmlStr(tag).unicodeForm());
-  return element;
+  return doc_->createElement(XmlStr(tag).unicodeForm());
 }
 
 xercesc::DOMText* XmlDOMDocument::createTextNode(const char* text) {
-  xercesc::DOMText* text_node = doc_->createTextNode(XmlStr(text).unicodeForm());
-  return text_node;
+  return doc_->createTextNode(XmlStr(text).unicodeForm());
 }
 
-void XmlDOMDocument::addElement(xercesc::DOMElement* element, 
-                const char* tag, const char* value) {
+void XmlDOMDocument::addElement(XmlDOMElement* element,
+                                const char* tag, const char* value) {
   XmlDOMElement* child = createElement(tag);
   element->appendChild(child);
   xercesc::DOMText* text_node = createTextNode(value);
   child->appendChild(text_node);
 }
 
-}
+}  // namespace toppic
