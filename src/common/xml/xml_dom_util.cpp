@@ -31,7 +31,7 @@ namespace xml_dom_util {
 
 XmlDOMElement* getChildElement(XmlDOMElement *parent,
                                const char* tag, int index) {
-  xercesc::DOMNodeList* list = parent->getElementsByTagName(X(tag));
+  xercesc::DOMNodeList* list = parent->getElementsByTagName(xml_dom_str::xmlStr(tag));
   XmlDOMElement* element = dynamic_cast<XmlDOMElement*>(list->item(index));
   if (element == nullptr) {
     LOG_WARN("Get Child Element " << tag << " return null!");
@@ -42,7 +42,7 @@ XmlDOMElement* getChildElement(XmlDOMElement *parent,
 
 std::string getChildValue(XmlDOMElement* parent,
                           const char* child_tag, int i) {
-  xercesc::DOMNodeList* node_list = parent->getElementsByTagName(X(child_tag));
+  xercesc::DOMNodeList* node_list = parent->getElementsByTagName(xml_dom_str::xmlStr(child_tag));
   if (node_list == nullptr) {
     LOG_WARN("Get Child Element " << child_tag << " return null!");
     exit(EXIT_FAILURE);
@@ -55,7 +55,7 @@ std::string getChildValue(XmlDOMElement* parent,
 
   std::string value;
   if (child) {
-    value = Y(child->getTextContent());
+    value = xml_dom_str::charStr(child->getTextContent());
   } else {
     value = "";
   }
@@ -99,20 +99,20 @@ bool getBoolChildValue(XmlDOMElement* parent,
 }
 
 int getChildCount(XmlDOMElement* parent, const char* child_tag) {
-  xercesc::DOMNodeList* childList = parent->getElementsByTagName(X(child_tag));
+  xercesc::DOMNodeList* childList = parent->getElementsByTagName(xml_dom_str::xmlStr(child_tag));
   return static_cast<int>(childList->getLength());
 }
 
 std::string getAttributeValue(XmlDOMElement* element,
                               const char* attribute_tag) {
-  std::string value = Y(element->getAttribute(X(attribute_tag)));
+  std::string value = xml_dom_str::charStr(element->getAttribute(xml_dom_str::xmlStr(attribute_tag)));
   return value;
 }
 
 std::string writeToString(xercesc::DOMLSSerializer* serializer,
                           xercesc::DOMNode *node) {
   XMLCh* ch = serializer->writeToString(node, 0);
-  std::string result = Y(ch);
+  std::string result = xml_dom_str::charStr(ch);
   xercesc::XMLString::release(&ch);
   return result;
 }

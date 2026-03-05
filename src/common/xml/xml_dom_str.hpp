@@ -15,48 +15,57 @@
 #ifndef TOPPIC_COMMON_XML_XML_DOM_STR_HPP_
 #define TOPPIC_COMMON_XML_XML_DOM_STR_HPP_
 
+#include <cassert>
 #include <string>
 
 #include <xercesc/util/XMLString.hpp>
 
 namespace toppic {
 
-class XStr {
+namespace xml_dom_str {
+
+class XmlStr {
  public:
-  explicit XStr(const char*  str) {
+  explicit XmlStr(const char* str) {
     // Call the private transcoding method
+    assert(str != nullptr);
     unicode_form_ = xercesc::XMLString::transcode(str);
   }
 
-  ~XStr() {
-    xercesc::XMLString::release(&unicode_form_);
+  ~XmlStr() {
+    if (unicode_form_ != nullptr)
+      xercesc::XMLString::release(&unicode_form_);
   }
 
-  const XMLCh* unicodeForm() {return unicode_form_;}
+  const XMLCh* unicodeForm() const {return unicode_form_;}
 
  private:
   XMLCh* unicode_form_;
 };
 
-class YStr {
+class CharStr {
  public:
-  explicit YStr(const XMLCh* xml_ch) {
+  explicit CharStr(const XMLCh* xml_ch) {
     // Call the private transcoding method
+    assert(xml_ch != nullptr);
     ch_ = xercesc::XMLString::transcode(xml_ch);
   }
 
-  ~YStr() {
-    delete ch_;
+  ~CharStr() {
+    xercesc::XMLString::release(&ch_);
   }
 
-  std::string  getString() {return std::string(ch_);}
+  std::string getString() const {return std::string(ch_);}
 
  private:
   char* ch_;
 };
 
-#define X(str) XStr(str).unicodeForm()
-#define Y(str) YStr(str).getString()
+std::string charStr(const XMLCh* xml_ch);
+const XMLCh* xmlStr(const char* str);
+
+}  // namespace xml_dom_str
 
 }  // namespace toppic
-#endif
+
+#endif  // TOPPIC_COMMON_XML_XML_DOM_STR_HPP_

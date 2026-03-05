@@ -25,7 +25,7 @@ namespace toppic {
 XmlDOMImpl* XmlDOMImplFactory::dom_impl_ = nullptr;
 
 XmlDOMImpl::XmlDOMImpl() {
-  impl_ = xercesc::DOMImplementationRegistry::getDOMImplementation(X("Core"));
+  impl_ = xercesc::DOMImplementationRegistry::getDOMImplementation(xml_dom_str::xmlStr("Core"));
 }
 
 XmlDOMImpl::~XmlDOMImpl() {
@@ -35,7 +35,7 @@ XmlDOMImpl::~XmlDOMImpl() {
 }
 
 xercesc::DOMDocument* XmlDOMImpl::createDoc(const std::string &root) {
-  xercesc::DOMDocument* doc = impl_->createDocument(0, X(root.c_str()), 0);
+  xercesc::DOMDocument* doc = impl_->createDocument(0, xml_dom_str::xmlStr(root.c_str()), 0);
   return doc;
 }
 
@@ -45,7 +45,7 @@ xercesc::DOMLSSerializer* XmlDOMImpl::createSerializer() {
       xercesc::XMLUni::fgDOMWRTFormatPrettyPrint, true);
   writer->getDomConfig()->setParameter(
       xercesc::XMLUni::fgDOMWRTDiscardDefaultContent, true);
-  writer->setNewLine(X("\n"));
+  writer->setNewLine(xml_dom_str::xmlStr("\n"));
   return writer;
 }
 

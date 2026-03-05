@@ -12,15 +12,16 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_COMMON_XML_XML_DOM_ELEMENT_HPP_
-#define TOPPIC_COMMON_XML_XML_DOM_ELEMENT_HPP_
-
-#include <xercesc/dom/DOMElement.hpp>
+#include "common/xml/xml_dom_str.hpp"
 
 namespace toppic {
 
-using XmlDOMElement = xercesc::DOMElement;
+namespace xml_dom_str {
+
+std::string charStr(const XMLCh* xml_ch) { return CharStr(xml_ch).getString(); }
+
+const XMLCh* xmlStr(const char* str) { return XmlStr(str).unicodeForm(); }
+
+} // namespace xml_dom_str
 
 }  // namespace toppic
-
-#endif
