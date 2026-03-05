@@ -1,5 +1,3 @@
 Install libraries
 
 sudo apt-get install libpng-dev
-
-sudo apt install libfreetype-dev
