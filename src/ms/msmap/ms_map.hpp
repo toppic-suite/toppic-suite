@@ -38,7 +38,7 @@ class MsMap {
 
   double getBaseInte() { return base_inte_; }
 
-  MsMapPeakPtr2D getMs2DPeaks() {return peaks_;}
+  MsMapPeakPtr2D get2DPeaks() {return peaks_;}
 
   MsMapRowPtr getRowPtr(int i) {return row_ptr_list_[i];}
 
