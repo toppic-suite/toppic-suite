@@ -27,8 +27,6 @@ class LowResMs1Process {
 
  private:
   TopfdParaPtr topfd_para_ptr_;
-  
-  void prepareFileFolder();
 };
 
 using LowResMs1ProcessPtr = std::shared_ptr<LowResMs1Process>;

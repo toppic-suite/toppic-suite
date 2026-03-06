@@ -28,9 +28,10 @@
 #include "ms/mzml/mzml_ms_json_writer.hpp"
 #include "ms/mzml/mzml_ms_sql_writer.hpp"
 
-#include "topfd/envcnn/onnx_env_cnn.hpp" 
+#include "topfd/common/topfd_para.hpp"
 #include "topfd/deconv/deconv_prec_win.hpp"
 #include "topfd/deconv/deconv_single_sp.hpp"
+#include "topfd/deconv/deconv_util.hpp"
 #include "sim/common/low_res_ms1_process.hpp"
 
 namespace toppic {
@@ -38,23 +39,10 @@ namespace toppic {
 //add a namespace to avoid duplicated method names
 namespace low_res_ms1_process {
 
-std::string updateMsOneMsg(MsHeaderPtr header_ptr, 
-                           int scan_cnt, int total_scan_num) {
-  std::string percentage = str_util::toString(scan_cnt * 100 / total_scan_num);
-  std::string msg = "Processing MS1 spectrum scan " 
-    + std::to_string(header_ptr->getFirstScanNum()) + " ...";
-  while (msg.length() < 40) {
-    msg += " ";
-  }
-  msg = msg + percentage + "% finished.";
-  return msg;
-}
-
 void processMsOne(MzmlMsGroupPtr ms_group_ptr, 
                  TopfdParaPtr topfd_para_ptr,  
                  MsAlignWriterPtrVec ms1_writer_ptr_vec, 
                  SimpleThreadPoolPtr pool_ptr) { 
-                  /*
   // 1. Store peak intensity 
   MzmlMsPtr ms_ptr = ms_group_ptr->getMsOnePtr();
   PeakPtrVec peak_list = ms_ptr->getPeakPtrVec();
@@ -65,28 +53,8 @@ void processMsOne(MzmlMsGroupPtr ms_group_ptr,
   double base_inte = baseline_util::getBaseLine(intensities);
   double min_ref_inte = base_inte * topfd_para_ptr->getMsOneSnRatio();
 
-  // 2. Deconv envelopes in precursor windows and remove them
-  MatchEnvPtrVec prec_envs = deconv_prec_win::deconvPrecWinForMsGroup(ms_group_ptr, 
-                                                                      topfd_para_ptr->getMaxMass(),
-                                                                      topfd_para_ptr->getMaxCharge(),
-                                                                      base_inte, min_ref_inte); 
-
-  // Obtain EnvCNN Score for envelopes
-  onnx_env_cnn::computeEnvScores(peak_list, prec_envs); 
-
-  //remove precursor peaks
-  for (std::size_t i = 0; i < prec_envs.size(); i++) {
-    ExpEnvPtr env_ptr = prec_envs[i]->getExpEnvPtr();
-    for (int p = 0; p < env_ptr->getPeakNum(); p++) {
-      if (env_ptr->isExist(p)) {
-        int idx = env_ptr->getPeakIdx(p);
-        peak_list[idx]->setIntensity(0);
-      }
-    }
-  }
-  // 3. Deconv the whole spectrum with filtering 
-  // get base intensity and min_ref_intensity for sql writing
-  MatchEnvPtrVec deconv_envs;
+  /*
+  // 2. Deconv the whole spectrum with filtering 
   if (peak_list.size() > 0) {
     int ms_level = 1;
     double max_mass = topfd_para_ptr->getMaxMass();
@@ -96,23 +64,21 @@ void processMsOne(MzmlMsGroupPtr ms_group_ptr,
                                          max_mass, max_charge);
     deconv_envs = deconv_ptr->deconv();
   }
-  // 4. Merge precursor envelopes and deconvolution envelopes
-  MatchEnvPtrVec result_envs;
-  result_envs.insert(result_envs.end(), prec_envs.begin(), prec_envs.end());
-  result_envs.insert(result_envs.end(), deconv_envs.begin(), deconv_envs.end());
-  LOG_DEBUG("result num " << prec_envs.size());
-  
-  // 5. Write to msalign file
+  */
+
+  /*
+  // 3. Write to msalign file
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
   DeconvMsPtr deconv_ms_ptr = match_env_util::getDeconvMsPtr(header_ptr,
                                                              result_envs);
   
-
   std::thread::id thread_id = std::this_thread::get_id();
   int writer_id = pool_ptr->getId(thread_id);
   ms1_writer_ptr_vec[writer_id]->writeMs(deconv_ms_ptr);
+  */
   
-  //6. write json file 
+  /*
+  //4. write json file 
   if (topfd_para_ptr->isGeneHtmlFolder()) {
     // add back precursor peaks
     for (std::size_t i = 0; i < peak_list.size(); i++) {
@@ -122,13 +88,8 @@ void processMsOne(MzmlMsGroupPtr ms_group_ptr,
         + file_util::getFileSeparator() 
         + "spectrum" + std::to_string(header_ptr->getSpecId()) + ".js";
     mzml_ms_json_writer::write(json_file_name, ms_ptr, prec_envs);    
-  }  
-  // 7. write sqlite file
-  if (topfd_para_ptr->isGeneSql()) {
-    LOG_DEBUG("Update SQl")
-    mzml_ms_sql_writer::writeMs1(topfd_para_ptr->getSqlDb(), ms_ptr, result_envs, base_inte, min_ref_inte);
-  }
-  */
+  } 
+  */ 
 }
 
 std::function<void()> geneTask(MzmlMsGroupPtr ms_group_ptr, 
@@ -148,20 +109,6 @@ LowResMs1Process::LowResMs1Process(TopfdParaPtr topfd_para_ptr) {
   topfd_para_ptr_ = topfd_para_ptr;
 }
 
-void LowResMs1Process::prepareFileFolder() {
-  if (topfd_para_ptr_->isGeneHtmlFolder()) {
-    //json file names
-    std::string html_dir = topfd_para_ptr_->getHtmlDir();
-    if (!file_util::exists(html_dir)) {
-      file_util::createFolder(html_dir);
-    }
-    std::string ms1_json_dir = topfd_para_ptr_->getMs1JsonDir();
-    if (!file_util::exists(ms1_json_dir)) {
-      file_util::createFolder(ms1_json_dir);
-    }
-  }
-}
-
 void LowResMs1Process::process() {
   MzmlMsGroupReaderPtr reader_ptr = 
     std::make_shared<MzmlMsGroupReader>(topfd_para_ptr_->getMzmlFileName(), 
@@ -177,7 +124,7 @@ void LowResMs1Process::process() {
     LOG_ERROR("No spectrum to read in mzML file!");
     return;
   }
-  prepareFileFolder();
+  deconv_util::prepareFileFolder(topfd_para_ptr_);
   // init thread pool
   int thread_num = topfd_para_ptr_->getThreadNum();
   SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(thread_num);  
@@ -199,9 +146,9 @@ void LowResMs1Process::process() {
       std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
     pool_ptr->enqueue(low_res_ms1_process::geneTask(ms_group_ptr, topfd_para_ptr_, ms1_writer_ptr_vec, pool_ptr)); 
-    spec_cnt++; 
-    std::string msg = low_res_ms1_process::updateMsOneMsg(ms_group_ptr->getMsOnePtr()->getMsHeaderPtr(), 
-                                                          spec_cnt, total_spec_num);
+    spec_cnt++;
+    std::string msg = deconv_util::updateMsOneMsg(ms_group_ptr->getMsOnePtr()->getMsHeaderPtr(),
+                                                  spec_cnt, total_spec_num);
     std::cout << "\r" << msg << std::flush;
     ms_group_ptr = reader_ptr->getNextMsGroupPtr();    
   }
@@ -209,21 +156,7 @@ void LowResMs1Process::process() {
   for (int i = 0; i < thread_num; i++) { 
     ms1_writer_ptr_vec[i] = nullptr;
   }
-  // Merge files
-  std::string file_name_ext = "ms1.msalign";
-  std::string para_str = topfd_para_ptr_->getParaStr("#", "\t");
-  MsalignThreadMergePtr ms1_merge_ptr
-    = std::make_shared<MsalignThreadMerge>(file_name_ext,
-                                           topfd_para_ptr_->getThreadNum(), 
-                                           file_name_ext, output_base_name,  
-                                           para_str);
-  ms1_merge_ptr->process();
-
-  // remove tempory files
-  std::string ms1_prefix = file_util::absoluteName(output_base_name) + "_ms1.msalign_";
-  std::replace(output_base_name.begin(), output_base_name.end(), '\\', '/');
-  file_util::cleanPrefix(output_base_name, ms1_prefix);
-  std::cout << std::endl;
+  deconv_util::mergeMs1MsalignFiles(topfd_para_ptr_, output_base_name);
 }
 
 }; // namespace toppic
