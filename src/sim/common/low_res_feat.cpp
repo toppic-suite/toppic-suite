@@ -23,12 +23,13 @@
 #include "ms/spec/ms_header.hpp"
 #include "ms/spec/msalign_reader_util.hpp"
 #include "ms/mzml/mzml_ms_group_reader.hpp"
+#include "ms/msmap/ms_map.hpp"
+#include "topfd/ecscore/para/ecscore_para.hpp"
+#include "sim/common/ms_feat_util.hpp"
 /*
 #include "ms/feature/spec_feature_writer.hpp"
 #include "ms/feature/frac_feature_writer.hpp"
-#include "ms/msmap/ms_map.hpp"
 #include "topfd/common/topfd_para.hpp"
-#include "topfd/ecscore/para/ecscore_para.hpp"
 #include "topfd/ecscore/env/seed_env.hpp"
 #include "topfd/ecscore/env/seed_env_util.hpp"
 #include "topfd/ecscore/env_coll/env_coll.hpp"
@@ -49,7 +50,6 @@ void processMs1(TopfdParaPtr topfd_para_ptr) {
   
   // read deconvoluted MS1 peaks
   std::string output_base_name = topfd_para_ptr->getOutputBaseName();
-  std::string ms1_file_name = output_base_name + "_ms1.msalign";
 
   // read ms1 raw peaks and ms2_headers
   PeakPtrVec2D ms1_mzml_peaks;
@@ -63,20 +63,25 @@ void processMs1(TopfdParaPtr topfd_para_ptr) {
                                         topfd_para_ptr->getFaimsVoltage(), 
                                         topfd_para_ptr->isMissingLevelOne());
   mzml_reader_ptr->getMs1Map(ms1_mzml_peaks, ms2_header_ptr_2d); 
+  MsHeaderPtrVec ms1_header_ptr_vec = mzml_reader_ptr->getMs1HeaderPtrVec();
   mzml_reader_ptr = nullptr;
 
   double sn_ratio = topfd_para_ptr->getMsOneSnRatio();
   bool single_scan_noise = topfd_para_ptr->isUseSingleScanNoiseLevel();
 
-  /*
-  MsMapPtr matrix_ptr = std::make_shared<MsMap>(ms1_mzml_peaks, nullptr, 
+  EcscoreParaPtr score_para_ptr = std::make_shared<EcscorePara>(
+      topfd_para_ptr->getFracId(), topfd_para_ptr->getMzmlFileName(),
+      topfd_para_ptr->getMaxCharge(), topfd_para_ptr->getMs1MinScanNum());
+
+  MsMapPtr matrix_ptr = std::make_shared<MsMap>(ms1_mzml_peaks, ms1_header_ptr_vec, 
                                                 score_para_ptr->bin_size_,
                                                 sn_ratio, single_scan_noise);
 
   if (score_para_ptr->min_scan_num_ >= 2) {
     matrix_ptr->removeNonNeighbors(score_para_ptr->neighbor_mz_tole_);
   }
-    */
+
+  ms_feat_util::writepng(matrix_ptr, output_base_name + "_ms1.png");
 
   /*
   for (int seed_env_idx = 0; seed_env_idx < seed_num; seed_env_idx++) {
