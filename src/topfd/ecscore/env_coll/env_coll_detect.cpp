@@ -87,9 +87,13 @@ void processMs1(TopfdParaPtr topfd_para_ptr) {
 
   double sn_ratio = topfd_para_ptr->getMsOneSnRatio();
   bool single_scan_noise = topfd_para_ptr->isUseSingleScanNoiseLevel();
+  MsHeaderPtrVec ms1_header_ptr_vec;
+  for (auto &ms1_spectrum : deconv_ms1_ptr_vec) {
+    ms1_header_ptr_vec.push_back(ms1_spectrum->getMsHeaderPtr());
+  }
   /// Prepare data -- Peak Matrix
   MsMapPtr matrix_ptr = std::make_shared<MsMap>(
-      ms1_mzml_peaks, deconv_ms1_ptr_vec, score_para_ptr->bin_size_, sn_ratio,
+      ms1_mzml_peaks, ms1_header_ptr_vec, score_para_ptr->bin_size_, sn_ratio,
       single_scan_noise);
 
   if (score_para_ptr->min_scan_num_ >= 2) {
@@ -316,9 +320,13 @@ void processMs2(TopfdParaPtr topfd_para_ptr) {
 
       double sn_ratio = topfd_para_ptr->getMsTwoSnRatio();
       bool single_scan_noise = topfd_para_ptr->isUseSingleScanNoiseLevel();
+      MsHeaderPtrVec ms2_header_ptr_vec;
+      for (auto &ms2_spectrum : deconv_ms2_ptr_shortlisted_vec) {
+        ms2_header_ptr_vec.push_back(ms2_spectrum->getMsHeaderPtr());
+      }
       /// Prepare data -- Peak Matrix
       MsMapPtr matrix_ptr = std::make_shared<MsMap>(
-          ms2_mzml_peaks, deconv_ms2_ptr_shortlisted_vec,
+          ms2_mzml_peaks, ms2_header_ptr_vec,
           score_para_ptr->bin_size_, topfd_para_ptr->getMsTwoSnRatio(),
           single_scan_noise);
 

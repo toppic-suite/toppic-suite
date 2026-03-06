@@ -21,7 +21,7 @@
 
 namespace toppic {
 
-MsMap::MsMap(PeakPtrVec2D &raw_peak_2d, DeconvMsPtrVec &ms1_ptr_vec,
+MsMap::MsMap(PeakPtrVec2D &raw_peak_2d, MsHeaderPtrVec &ms1_header_ptr_vec,
              double bin_size, double sn_ratio, bool single_scan_noise) {
   bin_size_ = bin_size;
   /// get min mz value
@@ -45,14 +45,14 @@ MsMap::MsMap(PeakPtrVec2D &raw_peak_2d, DeconvMsPtrVec &ms1_ptr_vec,
   LOG_DEBUG("Data Level Noise Intensity Level: " << base_inte_);
   LOG_DEBUG("Min and Max m/z values: " << min_mz_ << " , " << max_mz_);
 
-  initMap(raw_peak_2d, ms1_ptr_vec, sn_ratio, single_scan_noise);
+  initMap(raw_peak_2d, ms1_header_ptr_vec, sn_ratio, single_scan_noise);
 }
 
-void MsMap::initMap(PeakPtrVec2D &raw_peak_2d, DeconvMsPtrVec &ms1_ptr_vec, 
+void MsMap::initMap(PeakPtrVec2D &raw_peak_2d, MsHeaderPtrVec &ms1_header_ptr_vec, 
                     double sn_ratio, bool single_scan_noise) {
   double base_inte = base_inte_;
-  for (size_t row_id = 0; row_id < ms1_ptr_vec.size(); row_id++) {
-    MsHeaderPtr ms_header_ptr = ms1_ptr_vec[row_id]->getMsHeaderPtr();
+  for (size_t row_id = 0; row_id < ms1_header_ptr_vec.size(); row_id++) {
+    MsHeaderPtr ms_header_ptr = ms1_header_ptr_vec[row_id];
     MsMapRowHeaderPtr row_header_ptr = std::make_shared<MsMapRowHeader>(ms_header_ptr->getSpecId(),
                                                                         ms_header_ptr->getFirstScanNum(),
                                                                         ms_header_ptr->getRetentionTime());
