@@ -12,14 +12,14 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_SIM_SIM_FEATURE_HPP_
-#define TOPPIC_SIM_SIM_FEATURE_HPP_
+#ifndef TOPPIC_SIM_LOW_RES_FEATURE_HPP_
+#define TOPPIC_SIM_LOW_RES_FEATURE_HPP_
 
 #include "topfd/common/topfd_para.hpp"
 
 namespace toppic {
 
-namespace sim_feat {
+namespace low_res_feat {
 
 void processMs1(TopfdParaPtr para_ptr);
 
