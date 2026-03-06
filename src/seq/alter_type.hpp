@@ -42,15 +42,18 @@ class AlterType {
 
   AlterType(int id, std::string name);
 
-  int getId() {return id_;}
+  int getId() const {return id_;}
 
-  std::string getName() {return name_;}
+  const std::string& getName() const {return name_;}
 
   void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 
   static AlterTypePtr getTypePtrFromXml(XmlDOMElement* element);
 
-  static std::string getXmlElementName() {return "alter_type";}
+  static const std::string& getXmlElementName() {
+    static const std::string name = "alter_type";
+    return name;
+  }
 
  private:
   int id_;
@@ -62,4 +65,3 @@ using AlterTypePtrVec = std::vector<AlterTypePtr>;
 }  // namespace toppic
 
 #endif
-

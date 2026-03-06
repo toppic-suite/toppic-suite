@@ -24,16 +24,16 @@ namespace toppic {
 
 class XmlDOMDocument;
 
-// A mass shift is explained by a list of alterations (alter class).  
+// A mass shift is explained by a list of alterations (alter class).
 //
 // Case 1: If the PTM in an alteration is identified but not localized, then the
 // PTM information is stored in mod_ptr_. Since the modified amino acid is
 // unknown, the mod instance will contain an empty amino acid and a modified
-// version of the empty amino acid. 
+// version of the empty amino acid.
 //
-// In addition, if the alteration mass is charaterized by MIScore, but not
-// fulled charaterized, then the output of MIScore method is store in
-// local_anno_ptr_. 
+// In addition, if the alteration mass is characterized by MIScore, but not
+// fully characterized, then the output of MIScore method is stored in
+// local_anno_ptr_.
 //
 // Case 2: If the PTM in an alteration is identified and localized, then the PTM
 // information is stored in mod_ptr_. The amino acid in the mod_ptr_ will be the
@@ -50,31 +50,34 @@ class Alter {
 
   explicit Alter(XmlDOMElement* change_element);
 
-  int getLeftBpPos() {return left_bp_pos_;}
+  int getLeftBpPos() const {return left_bp_pos_;}
 
   void setLeftBpPos(int p) {left_bp_pos_ = p;}
 
-  int getRightBpPos() {return right_bp_pos_;}
+  int getRightBpPos() const {return right_bp_pos_;}
 
   void setRightBpPos(int p) {right_bp_pos_ = p;}
 
-  AlterTypePtr getTypePtr() {return type_ptr_;}
+  AlterTypePtr getTypePtr() const {return type_ptr_;}
 
-  double getMass() {return mass_;}
+  double getMass() const {return mass_;}
 
   void setMass(double m) {mass_ = m;}
 
-  ModPtr getModPtr() {return mod_ptr_;}
+  ModPtr getModPtr() const {return mod_ptr_;}
 
-  LocalAnnoPtr getLocalAnno() {return local_anno_ptr_;}
+  LocalAnnoPtr getLocalAnno() const {return local_anno_ptr_;}
 
   void setLocalAnno(LocalAnnoPtr p);
 
   void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 
-  static std::string getXmlElementName() {return "alteration";}
+  static const std::string& getXmlElementName() {
+    static const std::string name = "alteration";
+    return name;
+  }
 
-  static AlterPtr geneAlterPtr(AlterPtr ori_alter_ptr, int start_pos);
+  static AlterPtr genAlterPtr(AlterPtr ori_alter_ptr, int start_pos);
 
  protected:
   // left and right positions are based on break point positions
@@ -96,4 +99,3 @@ using AlterPtrVec = std::vector<AlterPtr>;
 }  // namespace toppic
 
 #endif
-

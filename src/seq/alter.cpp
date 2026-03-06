@@ -12,8 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <string>
-
 #include "common/util/str_util.hpp"
 #include "common/xml/xml_dom_util.hpp"
 #include "common/base/mod_base.hpp"
@@ -27,7 +25,7 @@ Alter::Alter(int left_bp_pos, int right_bp_pos,
     left_bp_pos_(left_bp_pos),
     right_bp_pos_(right_bp_pos),
     type_ptr_(type_ptr),
-    mass_(mass), mod_ptr_(mod_ptr) {}
+    mass_(mass), mod_ptr_(mod_ptr), local_anno_ptr_(nullptr) {}
 
 Alter::Alter(XmlDOMElement* element) {
   left_bp_pos_ = xml_dom_util::getIntChildValue(element, "left_bp_pos", 0);
@@ -46,10 +44,10 @@ Alter::Alter(XmlDOMElement* element) {
     mod_ptr_ = ModBase::getModPtrFromXml(mod_element);
   }
 
-  std::string local_element_name = LocalAnno::getXmlElementName();;
+  std::string local_element_name = LocalAnno::getXmlElementName();
   int local_count = xml_dom_util::getChildCount(element, local_element_name.c_str());
   if (local_count != 0) {
-    XmlDOMElement * local_element
+    XmlDOMElement* local_element
         = xml_dom_util::getChildElement(element, local_element_name.c_str(), 0);
     local_anno_ptr_ = std::make_shared<LocalAnno>(local_element);
   }
@@ -74,14 +72,15 @@ void Alter::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
   parent->appendChild(element);
 }
 
-AlterPtr Alter::geneAlterPtr(AlterPtr ori_ptr, int start_pos) {
+AlterPtr Alter::genAlterPtr(AlterPtr ori_ptr, int start_pos) {
   int left_bp_pos = ori_ptr->left_bp_pos_ - start_pos;
   int right_bp_pos = ori_ptr->right_bp_pos_ - start_pos;
   AlterTypePtr type_ptr = ori_ptr->type_ptr_;
-  double mass = ori_ptr->getMass();
+  double mass = ori_ptr->mass_;
   ModPtr mod_ptr = ori_ptr->mod_ptr_;
-  AlterPtr alter_ptr = std::make_shared<Alter>(left_bp_pos, right_bp_pos, 
+  AlterPtr alter_ptr = std::make_shared<Alter>(left_bp_pos, right_bp_pos,
                                                type_ptr, mass, mod_ptr);
+  alter_ptr->local_anno_ptr_ = ori_ptr->local_anno_ptr_;
   return alter_ptr;
 }
 

@@ -12,32 +12,31 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <string>
-
+#include "common/util/logger.hpp"
 #include "common/xml/xml_dom_util.hpp"
 #include "common/xml/xml_dom_document.hpp"
 #include "seq/alter_type.hpp"
 
 namespace toppic {
 
-const AlterTypePtr AlterType::INPUT 
+const AlterTypePtr AlterType::INPUT
     = std::make_shared<AlterType>(1, "Input");
 
-const AlterTypePtr AlterType::FIXED 
+const AlterTypePtr AlterType::FIXED
     = std::make_shared<AlterType>(2, "Fixed");
 
-const AlterTypePtr AlterType::PROTEIN_VARIABLE 
+const AlterTypePtr AlterType::PROTEIN_VARIABLE
     = std::make_shared<AlterType>(3, "Protein variable");
 
-const AlterTypePtr AlterType::VARIABLE 
+const AlterTypePtr AlterType::VARIABLE
     = std::make_shared<AlterType>(4, "Variable");
 
 const AlterTypePtr AlterType::UNEXPECTED
     = std::make_shared<AlterType>(5, "Unexpected");
 
-AlterType::AlterType(int id, std::string name): 
-    id_(id), 
-    name_(name) {}
+AlterType::AlterType(int id, std::string name):
+    id_(id),
+    name_(std::move(name)) {}
 
 void AlterType::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
   std::string element_name = AlterType::getXmlElementName();
@@ -46,7 +45,7 @@ void AlterType::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
   parent->appendChild(element);
 }
 
-AlterTypePtr AlterType::getTypePtrFromXml(XmlDOMElement * element) {
+AlterTypePtr AlterType::getTypePtrFromXml(XmlDOMElement* element) {
   std::string name = xml_dom_util::getChildValue(element, "name", 0);
   if (name == AlterType::INPUT->getName()) {
     return AlterType::INPUT;
@@ -63,6 +62,7 @@ AlterTypePtr AlterType::getTypePtrFromXml(XmlDOMElement * element) {
   if (name == AlterType::UNEXPECTED->getName()) {
     return AlterType::UNEXPECTED;
   }
+  LOG_WARN("Unknown alteration type name " << name);
   return nullptr;
 }
 

@@ -34,7 +34,7 @@ MassShift::MassShift(MassShiftPtr shift_ptr, int start) {
   right_bp_pos_ = shift_ptr->getRightBpPos() - start;
   AlterPtrVec alter_ptrs = shift_ptr->getAlterPtrVec();
   for (size_t k = 0; k < alter_ptrs.size(); k++) {
-    AlterPtr alter_ptr = Alter::geneAlterPtr(alter_ptrs[k], start); 
+    AlterPtr alter_ptr = Alter::genAlterPtr(alter_ptrs[k], start); 
     alter_vec_.push_back(alter_ptr);
   }
 }
