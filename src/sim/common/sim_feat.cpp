@@ -238,6 +238,7 @@ void processMs1(TopfdParaPtr topfd_para_ptr) {
                                         topfd_para_ptr->getFaimsVoltage(), 
                                         topfd_para_ptr->isMissingLevelOne());
   mzml_reader_ptr->getMs1Map(ms1_mzml_peaks, ms2_header_ptr_2d); 
+  MsHeaderPtrVec ms1_header_ptr_vec = mzml_reader_ptr->getMs1HeaderPtrVec();
   mzml_reader_ptr = nullptr;
 
   //Prepare seed envelopes
@@ -261,7 +262,7 @@ void processMs1(TopfdParaPtr topfd_para_ptr) {
   double sn_ratio = topfd_para_ptr->getMsOneSnRatio();
   bool single_scan_noise = topfd_para_ptr->isUseSingleScanNoiseLevel();
   /// Prepare data -- Peak Matrix
-  MsMapPtr matrix_ptr = std::make_shared<MsMap>(ms1_mzml_peaks, deconv_ms1_ptr_vec,
+  MsMapPtr matrix_ptr = std::make_shared<MsMap>(ms1_mzml_peaks, ms1_header_ptr_vec, 
                                                 score_para_ptr->bin_size_,
                                                 sn_ratio, single_scan_noise);
 
@@ -414,7 +415,7 @@ void processMs1(TopfdParaPtr topfd_para_ptr) {
   mzml_reader_ptr_new = nullptr;
 
   sn_ratio = 0;
-  MsMapPtr sim_matrix_ptr = std::make_shared<MsMap>(ms1_mzml_peaks_new, deconv_ms1_ptr_vec,
+  MsMapPtr sim_matrix_ptr = std::make_shared<MsMap>(ms1_mzml_peaks_new, ms1_header_ptr_vec,
                                                     score_para_ptr->bin_size_,
                                                     sn_ratio, single_scan_noise);
 

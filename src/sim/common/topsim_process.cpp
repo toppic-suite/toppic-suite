@@ -23,7 +23,7 @@
 #include "ms/mzml/mzml_profile.hpp"
 #include "topfd/envcnn/onnx_env_cnn.hpp" 
 #include "topfd/ecscore/score/onnx_ecscore.hpp"
-#include "sim/common/sim_feat.hpp"
+#include "sim/common/low_res_feat.hpp"
 
 namespace toppic {
 
@@ -35,7 +35,7 @@ void processOneFileWithFaims(TopfdParaPtr para_ptr) {
   
   if (!para_ptr->isMissingLevelOne()) {
     std::cout << "MS1 feature detection started." << std::endl;
-    sim_feat::processMs1(para_ptr);
+    low_res_feat::processMs1(para_ptr);
     std::cout << "MS1 feature detection finished." << std::endl;
   }
 }
