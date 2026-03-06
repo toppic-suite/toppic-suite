@@ -31,8 +31,6 @@ class DeconvMs1Process {
   TopfdParaPtr topfd_para_ptr_;
   EnvParaPtr env_para_ptr_;
   DpParaPtr dp_para_ptr_;
-  
-  void prepareFileFolder();
 };
 
 using DeconvMs1ProcessPtr = std::shared_ptr<DeconvMs1Process>;
