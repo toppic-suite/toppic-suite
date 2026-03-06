@@ -38,7 +38,6 @@ MzmlMsGroupReader::MzmlMsGroupReader(const std::string & file_name,
     exit(EXIT_FAILURE);
   }
 
-  reader_ptr_->resetIndexes();
   if (!missing_level_one_) {
     initMs2Ms1Map();
     reader_ptr_->resetIndexes();
@@ -88,6 +87,7 @@ MzmlMsPtr MzmlMsGroupReader::readNextMs2MzmlMs() {
 }
 
 void MzmlMsGroupReader::initMs2Ms1Map() {
+  reader_ptr_->resetIndexes();
   int idx = 0;
   MzmlMsPtr ms_ptr = readNextMzmlMs(); 
   while (ms_ptr != nullptr) {
@@ -190,6 +190,7 @@ MzmlMsGroupPtr MzmlMsGroupReader::getNextMsGroupPtr() {
 
 void MzmlMsGroupReader::getMs1Map(PeakPtrVec2D &ms1_mzml_peaks, 
                                   MsHeaderPtr2D &ms2_header_ptr_2d) {
+  reader_ptr_->resetIndexes();
   while (true) {
     MzmlMsGroupPtr group_ptr = getMs1Ms2MsGroupPtr(); 
     if (group_ptr == nullptr) {
@@ -207,6 +208,7 @@ void MzmlMsGroupReader::getMs1Map(PeakPtrVec2D &ms1_mzml_peaks,
 }
 
 int MzmlMsGroupReader::getMs2Map(PeakPtrVec2D &ms2_mzml_peaks, double win_mz_begin) {
+  reader_ptr_->resetIndexes();
   int peak_num = 0;
   while (true) {
     MzmlMsGroupPtr group_ptr = getMs1Ms2MsGroupPtr();
@@ -229,6 +231,20 @@ int MzmlMsGroupReader::getMs2Map(PeakPtrVec2D &ms2_mzml_peaks, double win_mz_beg
     }
   }
   return peak_num;
+}
+
+MsHeaderPtrVec MzmlMsGroupReader::getMs1HeaderPtrVec() {
+  reader_ptr_->resetIndexes();
+  MsHeaderPtrVec header_ptr_vec;
+  MzmlMsPtr ms_ptr = readNextMzmlMs(); 
+  while (ms_ptr != nullptr) {
+    MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
+    if (header_ptr->getMsLevel() == 1) {
+      header_ptr_vec.push_back(header_ptr);
+    }
+    ms_ptr = readNextMzmlMs();
+  }
+  return header_ptr_vec;
 }
 
 }
