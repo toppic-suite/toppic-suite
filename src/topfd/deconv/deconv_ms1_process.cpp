@@ -30,6 +30,7 @@
 
 #include "topfd/envcnn/onnx_env_cnn.hpp" 
 #include "topfd/deconv/deconv_prec_win.hpp"
+#include "topfd/deconv/deconv_util.hpp"
 #include "topfd/deconv/deconv_single_sp.hpp"
 #include "topfd/deconv/deconv_ms1_process.hpp"
 
@@ -37,18 +38,6 @@ namespace toppic {
 
 //add a namespace to avoid duplicated method names
 namespace deconv_ms1_process {
-
-std::string updateMsOneMsg(MsHeaderPtr header_ptr, 
-                           int scan_cnt, int total_scan_num) {
-  std::string percentage = str_util::toString(scan_cnt * 100 / total_scan_num);
-  std::string msg = "Processing MS1 spectrum scan " 
-    + std::to_string(header_ptr->getFirstScanNum()) + " ...";
-  while (msg.length() < 40) {
-    msg += " ";
-  }
-  msg = msg + percentage + "% finished.";
-  return msg;
-}
 
 void deconvMsOne(MzmlMsGroupPtr ms_group_ptr, 
                  TopfdParaPtr topfd_para_ptr,  
@@ -147,23 +136,6 @@ DeconvMs1Process::DeconvMs1Process(TopfdParaPtr topfd_para_ptr) {
   topfd_para_ptr_ = topfd_para_ptr;
 }
 
-void DeconvMs1Process::prepareFileFolder() {
-  if (topfd_para_ptr_->isGeneHtmlFolder()) {
-    //json file names
-    std::string html_dir = topfd_para_ptr_->getHtmlDir();
-    if (!file_util::exists(html_dir)) {
-      file_util::createFolder(html_dir);
-    }
-    std::string ms1_json_dir = topfd_para_ptr_->getMs1JsonDir();
-    if (!file_util::exists(ms1_json_dir)) {
-      file_util::createFolder(ms1_json_dir);
-    }
-  }
-}
-
-
-
-
 void DeconvMs1Process::process() {
   MzmlMsGroupReaderPtr reader_ptr = 
     std::make_shared<MzmlMsGroupReader>(topfd_para_ptr_->getMzmlFileName(), 
@@ -179,7 +151,7 @@ void DeconvMs1Process::process() {
     LOG_ERROR("No spectrum to read in mzML file!");
     return;
   }
-  prepareFileFolder();
+  deconv_util::prepareFileFolder(topfd_para_ptr_);
   // init thread pool
   int thread_num = topfd_para_ptr_->getThreadNum();
   SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(thread_num);  
@@ -201,9 +173,9 @@ void DeconvMs1Process::process() {
       std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
     pool_ptr->enqueue(deconv_ms1_process::geneTask(ms_group_ptr, topfd_para_ptr_, ms1_writer_ptr_vec, pool_ptr)); 
-    spec_cnt++; 
-    std::string msg = deconv_ms1_process::updateMsOneMsg(ms_group_ptr->getMsOnePtr()->getMsHeaderPtr(), 
-                                                         spec_cnt, total_spec_num);
+    spec_cnt++;
+    std::string msg = deconv_util::updateMsOneMsg(ms_group_ptr->getMsOnePtr()->getMsHeaderPtr(),
+                                                  spec_cnt, total_spec_num);
     std::cout << "\r" << msg << std::flush;
     ms_group_ptr = reader_ptr->getNextMsGroupPtr();    
   }
@@ -211,21 +183,7 @@ void DeconvMs1Process::process() {
   for (int i = 0; i < thread_num; i++) { 
     ms1_writer_ptr_vec[i] = nullptr;
   }
-  // Merge files
-  std::string file_name_ext = "ms1.msalign";
-  std::string para_str = topfd_para_ptr_->getParaStr("#", "\t");
-  MsalignThreadMergePtr ms1_merge_ptr
-    = std::make_shared<MsalignThreadMerge>(file_name_ext,
-                                           topfd_para_ptr_->getThreadNum(), 
-                                           file_name_ext, output_base_name,  
-                                           para_str);
-  ms1_merge_ptr->process();
-
-  // remove tempory files
-  std::string ms1_prefix = file_util::absoluteName(output_base_name) + "_ms1.msalign_";
-  std::replace(output_base_name.begin(), output_base_name.end(), '\\', '/');
-  file_util::cleanPrefix(output_base_name, ms1_prefix);
-  std::cout << std::endl;
+  deconv_util::mergeMs1MsalignFiles(topfd_para_ptr_, output_base_name);
 }
 
 }; // namespace toppic
