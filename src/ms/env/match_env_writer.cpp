@@ -16,6 +16,7 @@
 
 #include "ms/env/match_env.hpp"
 #include "ms/env/match_env_writer.hpp"
+#include <iomanip>
 
 namespace toppic {
 
@@ -58,11 +59,42 @@ void write_env_vec(std::ofstream &file, MsHeaderPtr header, const MatchEnvPtrVec
 }
 
 void write(const std::string & file, MsHeaderPtr header, const MatchEnvPtrVec & envs) {
-  std::ofstream of(file, std::ofstream::out|std::ofstream::app);
+  std::ofstream of(file, std::ofstream::out);
   write_env_vec(of, header, envs);
   of.close();
 }
 
-}  // namespace msalign_writer
+void writePeakList(const std::string & file, const PeakPtrVec &peak_list, const MatchEnvPtrVec & envs) {
+  std::ofstream of(file, std::ofstream::out);
+  of << "PEAK_IDX\tORIG_MZ\tORIG_INTE\tTHEO_MONO_MZ\tTHEO_MONO_MASS\tTHEO_INTE_SUM\tTHEO_CHARGE\tENV_CNN_SCORE\tTHEO_MZ\tTHEO_NEUTRAL_MASS\tTHEO_INTE" << std::endl;
+  of << std::fixed << std::setprecision(8);
+  for (size_t i = 0; i < envs.size(); i++) {
+    EnvPtr theo_env = envs[i]->getTheoEnvPtr();
+    ExpEnvPtr real_env = envs[i]->getExpEnvPtr();
+    for (int j = 0; j < real_env->getPeakNum(); j++) {
+      if (real_env->isExist(j) > 0) {
+        EnvPeakPtr theo_peak_ptr = theo_env->getPeakPtr(j);
+        EnvPeakPtr exp_peak_ptr = real_env->getPeakPtr(j);
+        int idx = exp_peak_ptr->getIdx();
+        PeakPtr orig_peak_ptr = peak_list[idx];
+        of << exp_peak_ptr->getIdx() 
+        << "\t" << orig_peak_ptr->getPosition() 
+        << "\t" << orig_peak_ptr->getIntensity() 
+        << "\t" << theo_env->getMonoMz() 
+        << "\t" << theo_env->getMonoNeutralMass() 
+        << "\t" << theo_env->compInteSum() 
+        << "\t" << theo_env->getCharge() 
+        << "\t" << envs[i]->getEnvcnnScore()
+        << "\t" << theo_peak_ptr->getPosition() 
+        << "\t" << peak_util::compPeakNeutralMass(theo_peak_ptr->getPosition(), theo_env->getCharge()) 
+        << "\t" << theo_peak_ptr->getIntensity() 
+        << std::endl;
+      }
+    }
+  }
+  of.close();
+}
+
+}  // namespace match_env_writer
 
 }  // namespace toppic
