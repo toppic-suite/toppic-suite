@@ -170,7 +170,7 @@ class TopfdPara {
   std::string mzml_file_name_ = "";
   bool is_faims_ = false;
   double faims_volt_ = -1;
-  std::string output_base_name_ = "";
+  std::string output_base_name_ = "deconv";
   std::string sql_file_name_ = "";
   sqlite3 *sql_db_ = nullptr;
 

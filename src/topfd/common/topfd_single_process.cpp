@@ -35,6 +35,7 @@
 
 #include "ms/env/env_base.hpp"
 #include "ms/env/match_env_util.hpp"
+#include "ms/env/match_env_writer.hpp"
 #include "ms/spec/msalign_writer.hpp"
 #include "ms/spec/deconv_ms.hpp"
 #include "topfd/envcnn/onnx_env_cnn.hpp" 
@@ -93,25 +94,14 @@ int processOneFile(TopfdParaPtr para_ptr,
     MsAlignWriterPtr ms2_writer_ptr = std::make_shared<MsAlignWriter>(ms2_msalign_name);
     ms2_writer_ptr->writeMs(ms_ptr);
     ms2_writer_ptr = nullptr;
+    std::string ms_env_name = output_base_name + "_ms2.env";
+    match_env_writer::writePeakList(ms_env_name, peak_list, result_envs);
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;
   }
   return 0;
 }
-
-bool isValidFile(std::string &file_name) {
-  if (str_util::endsWith(file_name, "mzML")
-      || str_util::endsWith(file_name, "mzXML")
-      || str_util::endsWith(file_name, "mzml")
-      || str_util::endsWith(file_name, "mzxml")) {
-    return true;
-  }
-  else {
-    return false;
-  }
-}
-
 
 int process(TopfdParaPtr para_ptr,  std::vector<std::string> spec_file_list) {
   // init data, envelope base, envcnn model, and ecscore model
@@ -120,15 +110,10 @@ int process(TopfdParaPtr para_ptr,  std::vector<std::string> spec_file_list) {
   onnx_env_cnn::initModel(para_ptr->getResourceDir(), para_ptr->getThreadNum());
 
   for (size_t k = 0; k < spec_file_list.size(); k++) {
-    if (isValidFile(spec_file_list[k])) {
-      std::cout << "Processing " << spec_file_list[k] << " started." << std::endl;
-      processOneFile(para_ptr, spec_file_list[k]); 
-      std::cout << "Timestamp: " << time_util::getTimeStr() << std::endl;
-      std::cout << "Processing " << spec_file_list[k] << " finished." << std::endl;
-    }
-    else {
-      std::cout << spec_file_list[k] << " is not a valid mass spectral file!" << std::endl; 
-    }
+    std::cout << "Processing " << spec_file_list[k] << " started." << std::endl;
+    processOneFile(para_ptr, spec_file_list[k]); 
+    std::cout << "Timestamp: " << time_util::getTimeStr() << std::endl;
+    std::cout << "Processing " << spec_file_list[k] << " finished." << std::endl;
   }
 
   base_data::release();

@@ -25,6 +25,8 @@ void write_env_vec(std::ofstream &file, MsHeaderPtr header, const MatchEnvPtrVec
 
 void write(const std::string & file, MsHeaderPtr header, const MatchEnvPtrVec & envs); 
 
+void writePeakList(const std::string & file, const PeakPtrVec &peak_list, const MatchEnvPtrVec & envs);
+
 }  // namespace match_env_writer
 
 }  // namespace toppic
