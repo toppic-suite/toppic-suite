@@ -258,7 +258,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   set_property(TARGET onnx_lib PROPERTY IMPORTED_IMPLIB ${CMAKE_CURRENT_SOURCE_DIR}/lib/windows/onnxruntime.lib)
 
   target_link_libraries(topfd boost_chrono-mt boost_filesystem-mt
-    boost_program_options-mt boost_iostreams-mt boost-thread-mt
+    boost_program_options-mt boost_iostreams-mt boost_thread-mt
     boost_nowide-mt xerces-c sqlite3 z psapi Ws2_32 onnx_lib)
 
   target_link_libraries(topindex boost_program_options-mt
