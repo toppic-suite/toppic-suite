@@ -23,13 +23,13 @@ namespace toppic {
 
 class AminoAcidReplace {
  public:
-  AminoAcidReplace(std::string ori_letter, std::string new_letter, int pos); 
+  AminoAcidReplace(const std::string& ori_letter, const std::string& new_letter, int pos);
 
-  std::string getOriLetter() {return ori_letter_;}
+  const std::string& getOriLetter() const {return ori_letter_;}
 
-  std::string getNewLetter() {return new_letter_;} 
+  const std::string& getNewLetter() const {return new_letter_;}
 
-  int getPos() {return pos_;}
+  int getPos() const {return pos_;}
 
  private:
   std::string ori_letter_;

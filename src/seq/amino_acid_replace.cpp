@@ -16,9 +16,9 @@
 
 namespace toppic {
 
-AminoAcidReplace::AminoAcidReplace(std::string ori_letter, 
-                                   std::string new_letter, 
-                                   int pos): 
+AminoAcidReplace::AminoAcidReplace(const std::string& ori_letter,
+                                   const std::string& new_letter,
+                                   int pos):
     ori_letter_(ori_letter),
     new_letter_(new_letter),
     pos_(pos) {}
