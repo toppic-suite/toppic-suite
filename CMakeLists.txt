@@ -56,19 +56,19 @@ find_package(Qt5Gui)
 
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src
-                    ${CMAKE_CURRENT_SOURCE_DIR}/ext
-                    ${Qt5Widgets_INCLUDE_DIRS}
-                    ${Qt5Core_INCLUDE_DIRS}
-                    ${Qt5Gui_INCLUDE_DIRS})
+  ${CMAKE_CURRENT_SOURCE_DIR}/ext
+  ${Qt5Widgets_INCLUDE_DIRS}
+  ${Qt5Core_INCLUDE_DIRS}
+  ${Qt5Gui_INCLUDE_DIRS})
 
 link_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/toppic)
 
 # pwiz 
 file(GLOB PWIZ_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/utility/minimxml/*.cpp
-                    ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/utility/misc/*.cpp
-                    ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/data/common/*.cpp
-                    ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/data/msdata/*.cpp
-                    ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/data/msdata/mzmlb/*.cpp)
+  ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/utility/misc/*.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/data/common/*.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/data/msdata/*.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/data/msdata/mzmlb/*.cpp)
 
 # hts 
 file(GLOB HTS_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/ext/htslib/*.c)
@@ -85,18 +85,18 @@ file(GLOB SQL_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/sql/*.cpp)
 file(GLOB SEQ_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/seq/*.cpp)
 file(GLOB PARA_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/para/*.cpp)
 file(GLOB SPEC_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/ms/spec/*.cpp
-                     ${CMAKE_CURRENT_SOURCE_DIR}/src/ms/msmap/*.cpp
-                     ${CMAKE_CURRENT_SOURCE_DIR}/src/ms/factory/*.cpp
-                     ${CMAKE_CURRENT_SOURCE_DIR}/src/ms/env/*.cpp
-                     ${CMAKE_CURRENT_SOURCE_DIR}/src/ms/feature/*.cpp)
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/ms/msmap/*.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/ms/factory/*.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/ms/env/*.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/ms/feature/*.cpp)
 file(GLOB MZML_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/ms/mzml/*.cpp)
 file(GLOB PRSM_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/prsm/*.cpp)
 
 # gui code to run exe in command line
 file(GLOB GUI_UTIL_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/util/*.cpp
-                        ${CMAKE_CURRENT_SOURCE_DIR}/src/common/util/*.cpp
-                        ${CMAKE_CURRENT_SOURCE_DIR}/src/common/base/*.cpp
-                        ${CMAKE_CURRENT_SOURCE_DIR}/src/common/xml/*.cpp)
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/common/util/*.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/common/base/*.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/common/xml/*.cpp)
 
 
 # topfd 
@@ -104,79 +104,79 @@ file(GLOB_RECURSE TOPFD_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/topfd/*.cpp)
 
 # topfd console 
 file(GLOB TOPFD_CONSOLE_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd_argument.cpp
-                             ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd.cpp)
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd.cpp)
 
 # topfd gui
 file(GLOB TOPFD_GUI_SRCS    ${CMAKE_CURRENT_SOURCE_DIR}/src/topfd/common/topfd_para.cpp
-                            ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topfd/*.cpp
-                            ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topfd/*.qrc)
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topfd/*.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topfd/*.qrc)
 
 # topindex 
 file(GLOB FILTER_INDEX_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/massmatch/*.cpp
-                            ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/mng/*.cpp
-                            ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/index/*.cpp)
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/mng/*.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/index/*.cpp)
 
 # topindex console
 file(GLOB TOPINDEX_PROC_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topindex_process.cpp
-                             ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topindex_argument.cpp)					 
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topindex_argument.cpp)					 
 
 file(GLOB TOPINDEX_CONSOLE_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topindex.cpp)
 
 # topindex gui  
 file(GLOB TOPINDEX_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topindex/*.cpp
-			                        ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topindex/*.qrc
-                              ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topindex_argument.cpp)
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topindex/*.qrc
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topindex_argument.cpp)
 
 # toppic
 file(GLOB_RECURSE FILTER_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/*.cpp)
 
 file(GLOB SEARCH_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/search/diag/*.cpp 
-                       ${CMAKE_CURRENT_SOURCE_DIR}/src/search/zeroptmsearch/*.cpp
-                       ${CMAKE_CURRENT_SOURCE_DIR}/src/search/oneptmsearch/*.cpp
-                       ${CMAKE_CURRENT_SOURCE_DIR}/src/search/varptmsearch/*.cpp
-                       ${CMAKE_CURRENT_SOURCE_DIR}/src/search/ptmsearch/*.cpp
-                       ${CMAKE_CURRENT_SOURCE_DIR}/src/search/duplicatematch/*.cpp)
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/search/zeroptmsearch/*.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/search/oneptmsearch/*.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/search/varptmsearch/*.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/search/ptmsearch/*.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/search/duplicatematch/*.cpp)
 
 file(GLOB TDGF_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/stat/count/*.cpp
-                      ${CMAKE_CURRENT_SOURCE_DIR}/src/stat/tdgf/*.cpp)
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/stat/tdgf/*.cpp)
 file(GLOB LOCAL_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/stat/local/*.cpp)
 file(GLOB VISUAL_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/visual/*.cpp)
 
 # toppic console
 file(GLOB TOPPIC_PROC_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_process.cpp
-		                  	    ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_argument.cpp
-		                  	    ${CMAKE_CURRENT_SOURCE_DIR}/src/console/console_util.cpp)
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_argument.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/console_util.cpp)
 
 file(GLOB TOPPIC_CONSOLE_SRCS	${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic.cpp)
 
 # toppic gui 
 file(GLOB TOPPIC_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/toppic/*.cpp
-	                  		    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/toppic/*.qrc
-                            ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_argument.cpp
-		                  	    ${CMAKE_CURRENT_SOURCE_DIR}/src/console/console_util.cpp)
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/toppic/*.qrc
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_argument.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/console_util.cpp)
 
 # topmg
 file(GLOB GRAPH_ALIGN_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/search/diag/*.cpp
-                            ${CMAKE_CURRENT_SOURCE_DIR}/src/search/graph/*.cpp
-                            ${CMAKE_CURRENT_SOURCE_DIR}/src/search/graphalign/*.cpp
-                            ${CMAKE_CURRENT_SOURCE_DIR}/src/search/duplicatematch/*.cpp)
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/search/graph/*.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/search/graphalign/*.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/search/duplicatematch/*.cpp)
 
 file(GLOB MCMC_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/stat/count/*.cpp
-                     ${CMAKE_CURRENT_SOURCE_DIR}/src/stat/mcmc/*.cpp)
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/stat/mcmc/*.cpp)
 
 # topmg console 
 file(GLOB TOPMG_PROC_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmg_process.cpp
-	                  		    ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmg_argument.cpp
-                      			${CMAKE_CURRENT_SOURCE_DIR}/src/console/topindex_file_name.cpp
-		                  	    ${CMAKE_CURRENT_SOURCE_DIR}/src/console/console_util.cpp)
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmg_argument.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topindex_file_name.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/console_util.cpp)
 
 file(GLOB TOPMG_CONSOLE_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmg.cpp)
 
 # topmg gui 
 file(GLOB TOPMG_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topmg/*.cpp
-	                  		   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topmg/*.qrc
-                           ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmg_argument.cpp
-		                  	   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/console_util.cpp)
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topmg/*.qrc
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmg_argument.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/console_util.cpp)
 
 # topdiff 
 file(GLOB DIFF_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/merge/*.cpp)
@@ -185,28 +185,28 @@ file(GLOB DIFF_SEARCH_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/search/duplicatematch
 
 # topdiff console 
 file(GLOB TOPDIFF_PROC_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdiff_process.cpp
-                            ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdiff_argument.cpp)
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdiff_argument.cpp)
 file(GLOB TOPDIFF_CONSOLE_SRCS
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdiff.cpp)
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdiff.cpp)
 
 # topdiff gui  
 file(GLOB TOPDIFF_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdiff_argument.cpp
-                             ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topdiff/*.cpp
-		                         ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topdiff/*.qrc)
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topdiff/*.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topdiff/*.qrc)
 
 # topdia
 file(GLOB_RECURSE TOPDIA_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/topdia/*.cpp)
 
 # topdia console
 file(GLOB TOPDIA_CONSOLE_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdia_argument.cpp
-                              ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdia.cpp)
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdia.cpp)
 
 # topdia gui
 file(GLOB TOPDIA_GUI_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdia_argument.cpp
-                          ${CMAKE_CURRENT_SOURCE_DIR}/src/topfd/common/topfd_para.cpp
-                          ${CMAKE_CURRENT_SOURCE_DIR}/src/topdia/common/topdia_para.cpp
-                          ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topdia/*.cpp
-                          ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topdia/*.qrc)
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/topfd/common/topfd_para.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/topdia/common/topdia_para.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topdia/*.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topdia/*.qrc)
 
 # unit test 
 file(GLOB UNIT_TEST_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/*.cpp)
@@ -220,15 +220,15 @@ add_executable(topindex
   ${SEQ_SRCS} ${PARA_SRCS} ${FILTER_INDEX_SRCS}) 
 
 add_executable(toppic 
-	${TOPPIC_CONSOLE_SRCS} ${TOPPIC_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS} 
+  ${TOPPIC_CONSOLE_SRCS} ${TOPPIC_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS} 
   ${SEQ_SRCS} ${PARA_SRCS} ${SPEC_SRCS}  
   ${PRSM_SRCS} ${FILTER_SRCS} ${SEARCH_SRCS}  
   ${TDGF_SRCS} ${LOCAL_SRCS} ${VISUAL_SRCS})
 
 add_executable(topmg 
-	${TOPMG_CONSOLE_SRCS} ${TOPMG_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS}
+  ${TOPMG_CONSOLE_SRCS} ${TOPMG_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS}
   ${SEQ_SRCS} ${PARA_SRCS} ${SPEC_SRCS} ${PRSM_SRCS} ${FILTER_SRCS} 
-	${GRAPH_ALIGN_SRCS} ${MCMC_SRCS} ${VISUAL_SRCS})
+  ${GRAPH_ALIGN_SRCS} ${MCMC_SRCS} ${VISUAL_SRCS})
 
 add_executable(topdiff 
   ${TOPDIFF_CONSOLE_SRCS} ${TOPDIFF_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS} 
@@ -335,11 +335,11 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     boost_program_options  xerces-c)
 
   target_link_libraries(topdia_gui Qt5Widgets Qt5Core Qt5Gui 
-     boost_program_options xerces-c sqlite3)
+    boost_program_options xerces-c sqlite3)
 
-install (TARGETS topfd topindex toppic topmg topdiff topdia topfd_gui topindex_gui
-  toppic_gui topmg_gui topdiff_gui topdia_gui DESTINATION ${CMAKE_INSTALL_BINDIR})
-install (DIRECTORY lib/toppic/ DESTINATION ${CMAKE_INSTALL_LIBDIR})
-install (DIRECTORY resources/ DESTINATION ${CMAKE_INSTALL_DATADIR})
+  install (TARGETS topfd topindex toppic topmg topdiff topdia topfd_gui topindex_gui
+    toppic_gui topmg_gui topdiff_gui topdia_gui DESTINATION ${CMAKE_INSTALL_BINDIR})
+  install (DIRECTORY lib/toppic/ DESTINATION ${CMAKE_INSTALL_LIBDIR})
+  install (DIRECTORY resources/ DESTINATION ${CMAKE_INSTALL_DATADIR})
 
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
