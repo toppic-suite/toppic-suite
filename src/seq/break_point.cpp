@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include "common/base/ion_type.hpp"
 #include "seq/break_point.hpp"
 
 namespace toppic {
@@ -20,11 +19,11 @@ namespace toppic {
 BreakPoint::BreakPoint(double prm, double srm): 
     prm_(prm), srm_(srm) {}
 
-double BreakPoint::getNTermMass(IonTypePtr ion_type_ptr) {
+double BreakPoint::getNTermMass(const IonTypePtr& ion_type_ptr) const {
   return prm_ + ion_type_ptr->getShift();
 }
 
-double BreakPoint::getCTermMass(IonTypePtr ion_type_ptr) {
+double BreakPoint::getCTermMass(const IonTypePtr& ion_type_ptr) const {
   return srm_ + ion_type_ptr->getShift();
 }
 

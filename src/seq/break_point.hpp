@@ -15,21 +15,23 @@
 #ifndef TOPPIC_SEQ_BREAK_POINT_HPP_
 #define TOPPIC_SEQ_BREAK_POINT_HPP_
 
+#include <memory>
+#include <vector>
 #include "common/base/ion_type.hpp"
 
 namespace toppic {
 
 class BreakPoint {
  public:
-  BreakPoint(double prm, double srm);
+  explicit BreakPoint(double prm, double srm);
 
-  double getPrm() {return prm_;}
+  double getPrm() const {return prm_;}
 
-  double getSrm() {return srm_;}
+  double getSrm() const {return srm_;}
 
-  double getNTermMass(IonTypePtr ion_type_ptr);
+  double getNTermMass(const IonTypePtr& ion_type_ptr) const;
 
-  double getCTermMass(IonTypePtr ion_type_ptr);
+  double getCTermMass(const IonTypePtr& ion_type_ptr) const;
 
  private:
   double prm_;
