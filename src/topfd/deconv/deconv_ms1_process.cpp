@@ -88,7 +88,7 @@ void deconvMsOne(MzmlMsGroupPtr ms_group_ptr,
   MatchEnvPtrVec result_envs;
   result_envs.insert(result_envs.end(), prec_envs.begin(), prec_envs.end());
   result_envs.insert(result_envs.end(), deconv_envs.begin(), deconv_envs.end());
-  LOG_DEBUG("result num " << prec_envs.size());
+  LOG_DEBUG("result num " << result_envs.size());
   
   // 5. Write to msalign file
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
@@ -109,6 +109,7 @@ void deconvMsOne(MzmlMsGroupPtr ms_group_ptr,
     std::string json_file_name = topfd_para_ptr->getMs1JsonDir() 
         + file_util::getFileSeparator() 
         + "spectrum" + std::to_string(header_ptr->getSpecId()) + ".js";
+    // store only envelopes in precursor isolation windows
     mzml_ms_json_writer::write(json_file_name, ms_ptr, prec_envs);    
   }  
   // 7. write sqlite file
