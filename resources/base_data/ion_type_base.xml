@@ -1,3 +1,12 @@
+<!--
+ B: 0
+ A: -CO        -27.9949146
+ C: +NH3       +17.0265491
+ Y: +H2O       +18.0105647
+ X: +O + CO    +43.9898292
+ Z: H2O - NH3   +0.9840156
+ Z_DOT: Z + H   +1.9918406
+-->
 <ion_type_list>
 <ion_type>
 	<name>B</name>
@@ -7,31 +16,36 @@
 <ion_type>
 	<name>Y</name>
 	<n_term>false</n_term>
-	<shift>18.01056468362</shift>
+	<shift>18.0105647</shift>
 </ion_type>
 <ion_type>
 	<name>C</name>
 	<n_term>true</n_term>
-	<shift>17.0265</shift>
+ 	<shift>17.0265491</shift>
 </ion_type>
 <ion_type>
 	<name>Z_DOT</name>
 	<n_term>false</n_term>
-	<shift>1.9919</shift>
+ 	<shift>1.9918406</shift>
+</ion_type>
+<ion_type>
+	<name>Z</name>
+	<n_term>false</n_term>
+ 	<shift>0.9840156</shift>
 </ion_type>
 <ion_type>
 	<name>A</name>
 	<n_term>true</n_term>
-	<shift>-27.9944</shift>
+ 	<shift>-27.9949146</shift>
 </ion_type>
 <ion_type>
 	<name>X</name>
 	<n_term>false</n_term>
-	<shift>43.9904</shift>
+ 	<shift>43.9898292</shift>
 </ion_type>
 <ion_type>
 	<name>PREC</name>
 	<n_term>false</n_term>
-	<shift>18.0106</shift>
+	<shift>18.0105647</shift>
 </ion_type>
 </ion_type_list>
