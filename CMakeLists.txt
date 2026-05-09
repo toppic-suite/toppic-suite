@@ -3,6 +3,13 @@ cmake_minimum_required(VERSION 3.5)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # Use clang++ as the compiler
+# Homebrew on Apple Silicon installs to /opt/homebrew (Intel Macs use /usr/local).
+# Neither prefix is on the default compiler / linker search path, so the project's
+# bare-name target_link_libraries calls and #include directives need help here.
+if(APPLE)
+  include_directories(/opt/homebrew/include)
+  link_directories(/opt/homebrew/lib)
+endif()
 find_program(CLANG_EXECUTABLE clang)
 find_program(CLANGXX_EXECUTABLE clang++)
 set(CMAKE_C_COMPILER clang CACHE STRING "C compiler" FORCE)
@@ -20,6 +27,15 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   message(STATUS "Lib installation directory: " ${CMAKE_INSTALL_LIBDIR})
   message(STATUS "Data installation directory: " ${CMAKE_INSTALL_DATADIR})
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+
+# macOS installs binaries to /usr/local/bin and the resources alongside them
+# so that getResourceDir()'s "<exec_dir>/resources" lookup finds them.
+IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+  set(CMAKE_INSTALL_BINDIR "/usr/local/bin")
+  set(CMAKE_INSTALL_DATADIR "/usr/local/bin/resources")
+  message(STATUS "Bin installation directory: " ${CMAKE_INSTALL_BINDIR})
+  message(STATUS "Data installation directory: " ${CMAKE_INSTALL_DATADIR})
+ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../bin)
 message(STATUS "Executable output directory: " ${EXECUTABLE_OUTPUT_PATH})
@@ -299,13 +315,14 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows") 
 
-# boost_chrono boost_file_system boost_iostreams  z are required by ProteoWizard
-# boost_serialization xerces-c z are required by toppic suite
-IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-  target_link_libraries(topfd boost_chrono boost_filesystem boost_program_options 
+# Linux and macOS share the same dependency list and link flags. boost_chrono,
+# boost_filesystem, boost_iostreams and z are required by ProteoWizard;
+# boost_serialization, xerces-c and z are required by the rest of the suite.
+if(UNIX)
+  target_link_libraries(topfd boost_chrono boost_filesystem boost_program_options
     boost_iostreams boost_thread xerces-c sqlite3 z onnxruntime)
 
-  target_link_libraries(topindex boost_program_options 
+  target_link_libraries(topindex boost_program_options
     boost_serialization xerces-c z)
 
   target_link_libraries(toppic boost_program_options
@@ -317,29 +334,35 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   target_link_libraries(topdiff boost_program_options
     sqlite3 xerces-c z)
 
-  target_link_libraries(topdia boost_chrono boost_filesystem boost_program_options 
+  target_link_libraries(topdia boost_chrono boost_filesystem boost_program_options
     boost_iostreams boost_thread xerces-c sqlite3 z onnxruntime)
 
-  target_link_libraries(topfd_gui Qt5Widgets Qt5Core Qt5Gui xerces-c sqlite3)
+  target_link_libraries(topfd_gui Qt5::Widgets Qt5::Core Qt5::Gui
+    xerces-c sqlite3)
 
-  target_link_libraries(topindex_gui Qt5Widgets Qt5Core Qt5Gui
-    boost_program_options  xerces-c)
+  target_link_libraries(topindex_gui Qt5::Widgets Qt5::Core Qt5::Gui
+    boost_program_options xerces-c)
 
-  target_link_libraries(toppic_gui Qt5Widgets Qt5Core Qt5Gui 
-    boost_program_options  xerces-c)
+  target_link_libraries(toppic_gui Qt5::Widgets Qt5::Core Qt5::Gui
+    boost_program_options xerces-c)
 
-  target_link_libraries(topmg_gui Qt5Widgets Qt5Core Qt5Gui 
-    boost_program_options  xerces-c)
+  target_link_libraries(topmg_gui Qt5::Widgets Qt5::Core Qt5::Gui
+    boost_program_options xerces-c)
 
-  target_link_libraries(topdiff_gui Qt5Widgets Qt5Core Qt5Gui
-    boost_program_options  xerces-c)
+  target_link_libraries(topdiff_gui Qt5::Widgets Qt5::Core Qt5::Gui
+    boost_program_options xerces-c)
 
-  target_link_libraries(topdia_gui Qt5Widgets Qt5Core Qt5Gui 
+  target_link_libraries(topdia_gui Qt5::Widgets Qt5::Core Qt5::Gui
     boost_program_options xerces-c sqlite3)
 
-  install (TARGETS topfd topindex toppic topmg topdiff topdia topfd_gui topindex_gui
-    toppic_gui topmg_gui topdiff_gui topdia_gui DESTINATION ${CMAKE_INSTALL_BINDIR})
-  install (DIRECTORY lib/toppic/ DESTINATION ${CMAKE_INSTALL_LIBDIR})
-  install (DIRECTORY resources/ DESTINATION ${CMAKE_INSTALL_DATADIR})
+  install(TARGETS topfd topindex toppic topmg topdiff topdia
+    topfd_gui topindex_gui toppic_gui topmg_gui topdiff_gui topdia_gui
+    DESTINATION ${CMAKE_INSTALL_BINDIR})
+  install(DIRECTORY resources/ DESTINATION ${CMAKE_INSTALL_DATADIR})
+endif()
 
-ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
+# Bundled libonnxruntime.so is shipped only for Linux; macOS uses the system
+# Homebrew dylib and Windows uses the bundled .dll handled in its own block.
+IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+  install(DIRECTORY lib/toppic/ DESTINATION ${CMAKE_INSTALL_LIBDIR})
+ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
