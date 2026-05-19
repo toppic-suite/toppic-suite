@@ -91,3 +91,19 @@ export LANGUAGE=en_US.UTF-8
 
 [MSYS2](http://www.msys2.org/) is used for building TopPIC Suite on Windows systems. Please follow the instructions from [here](doc/windows_build.md).
 
+### Building on MacOS
+
+```sh
+# install compiling tools and dependencies
+brew install boost xerces-c sqlite3 zlib onnxruntime rapidjson cmake
+
+# install Qt5 for GUI
+brew install qt@5
+
+# building
+mkdir build
+cd build
+cmake ..
+make -j$(sysctl -n hw.ncpu)
+make install
+```
