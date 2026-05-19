@@ -20,6 +20,9 @@
 
 #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
 #include <windows.h>
+#elif defined (__APPLE__)
+#include <climits>
+#include <mach-o/dyld.h>
 #else
 #include <unistd.h>
 #endif
@@ -46,6 +49,10 @@ std::string getExecutiveDir(const std::string &argv_0) {
   LPSTR lpFilePart;
   char file_name[MAX_PATH];
   SearchPath(NULL, argv_0.c_str(), ".exe", MAX_PATH, file_name, &lpFilePart);
+#elif defined (__APPLE__)
+  char file_name[PATH_MAX];
+  uint32_t size = sizeof(file_name);
+  _NSGetExecutablePath(file_name, &size);
 #else
   char buffer[1024];
   size_t len = readlink("/proc/self/exe", buffer, sizeof(buffer) - 1);

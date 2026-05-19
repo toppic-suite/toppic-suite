@@ -83,7 +83,7 @@ void write(std::string &file_name, MzmlMsPtr ms_ptr, MatchEnvPtrVec &envs) {
   for (size_t i = 0; i < envs.size(); i++) {
     rapidjson::Value env(rapidjson::kObjectType);
     EnvPtr theo_env = envs[i]->getTheoEnvPtr();
-    env.AddMember("id", i, allocator);
+    env.AddMember("id", static_cast<int64_t>(i), allocator);
     env.AddMember("mono_mass", theo_env->getMonoNeutralMass(), allocator);
     env.AddMember("charge", theo_env->getCharge(), allocator);
 
