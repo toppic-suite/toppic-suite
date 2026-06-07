@@ -18,32 +18,37 @@
 #include <fstream>
 #include <string>
 
-#include <xercesc/dom/DOMNode.hpp>
-#include <xercesc/dom/DOMLSSerializer.hpp>
-
 #include "common/xml/xml_dom_element.hpp"
 
 namespace toppic {
 
 namespace xml_dom_util {
 
-XmlDOMElement* getChildElement(XmlDOMElement* parent, const char* tag, int index);
+// These helpers search ALL descendant elements named child_tag (any depth, in
+// document order), matching the previous Xerces getElementsByTagName behavior.
+// This was chosen to preserve behavior exactly during the pugixml migration; an
+// audit can later switch the safe call sites to direct-children lookups
+// (parent.children(tag)), which are faster.
 
-std::string getChildValue(XmlDOMElement* parent, const char* child_tag, int index);
+XmlDOMElement getChildElement(const XmlDOMElement& parent, const char* tag, int index);
 
-double getScientificChildValue(XmlDOMElement* parent, const char* child_tag, int index);
+std::string getChildValue(const XmlDOMElement& parent, const char* child_tag, int index);
 
-double getDoubleChildValue(XmlDOMElement* parent, const char* child_tag, int index);
+double getScientificChildValue(const XmlDOMElement& parent, const char* child_tag, int index);
 
-int getIntChildValue(XmlDOMElement* parent, const char* child_tag, int index);
+double getDoubleChildValue(const XmlDOMElement& parent, const char* child_tag, int index);
 
-bool getBoolChildValue(XmlDOMElement* parent, const char* child_tag, int index);
+int getIntChildValue(const XmlDOMElement& parent, const char* child_tag, int index);
 
-int getChildCount(XmlDOMElement* parent, const char* child_tag);
+bool getBoolChildValue(const XmlDOMElement& parent, const char* child_tag, int index);
 
-std::string getAttributeValue(XmlDOMElement* parent, const char* attribute_tag);
+int getChildCount(const XmlDOMElement& parent, const char* child_tag);
 
-std::string writeToString(xercesc::DOMLSSerializer* serializer, xercesc::DOMNode* node);
+std::string getAttributeValue(const XmlDOMElement& element, const char* attribute_tag);
+
+// Serializes a node (element or document) to a string. pugixml needs no
+// separate serializer object, so the Xerces DOMLSSerializer argument is gone.
+std::string writeToString(const XmlDOMElement& node);
 
 void writeToStreamByRemovingDoubleLF(std::ofstream& file, const std::string& str);
 

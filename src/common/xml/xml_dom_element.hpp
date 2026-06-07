@@ -15,11 +15,15 @@
 #ifndef TOPPIC_COMMON_XML_XML_DOM_ELEMENT_HPP_
 #define TOPPIC_COMMON_XML_XML_DOM_ELEMENT_HPP_
 
-#include <xercesc/dom/DOMElement.hpp>
+#include <pugixml.hpp>
 
 namespace toppic {
 
-using XmlDOMElement = xercesc::DOMElement;
+// pugixml uses lightweight value handles (pugi::xml_node) rather than DOM node
+// pointers, so XmlDOMElement is now a value type. Code that previously passed
+// XmlDOMElement* now passes XmlDOMElement (by value or const reference); an
+// empty/absent node is tested with `if (!element)` instead of `== nullptr`.
+using XmlDOMElement = pugi::xml_node;
 
 }  // namespace toppic
 

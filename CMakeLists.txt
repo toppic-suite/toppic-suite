@@ -132,9 +132,9 @@ ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 message(STATUS "Cmake CXX flags: " ${CMAKE_CXX_FLAGS})
 message(STATUS "Cmake shared linker flags: " ${CMAKE_SHARED_LINKER_FLAGS})
 
-# Xerces-C++ is used by src/common/xml for XML parsing and serialization.
-find_package(XercesC REQUIRED)
-message(STATUS "Xerces-C++ version: ${XercesC_VERSION}")
+# pugixml is used by src/common/xml for XML parsing and serialization.
+find_package(pugixml REQUIRED)
+message(STATUS "pugixml version: ${pugixml_VERSION}")
 
 # src for the hand-written headers, and the build-tree gen/ dir for the
 # CMake-generated common/util/version.hpp.
@@ -150,9 +150,9 @@ target_include_directories(toppic_common PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/src
   ${CMAKE_CURRENT_BINARY_DIR}/gen)
 
-# PUBLIC: the common/xml headers expose Xerces types, so consumers of
-# toppic_common need Xerces on their include and link lines too.
-target_link_libraries(toppic_common PUBLIC XercesC::XercesC)
+# PUBLIC: the common/xml headers expose pugixml types, so consumers of
+# toppic_common need pugixml on their include and link lines too.
+target_link_libraries(toppic_common PUBLIC pugixml::pugixml)
 
 # Install the shared library using the prefix-relative GNUInstallDirs locations.
 # On Linux/macOS it is a LIBRARY artifact and lands in <prefix>/lib/toppic
