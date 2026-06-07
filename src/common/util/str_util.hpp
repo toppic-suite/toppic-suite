@@ -44,6 +44,8 @@ std::string toScientificStr(double value, int precision);
 
 std::string rmComment(const std::string &ori_s, const std::string &comment = "#");
 
+bool endsWith(const std::string &str, const std::string &suffix);
+
 }  // namespace str_util
 
 }  // namespace toppic
