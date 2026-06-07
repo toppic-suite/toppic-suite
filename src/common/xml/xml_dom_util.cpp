@@ -29,30 +29,20 @@ namespace toppic {
 
 namespace xml_dom_util {
 
-namespace {
-
-// All descendant elements named `tag` (any depth) below `parent`, in document
-// order. This reproduces Xerces' DOMElement::getElementsByTagName: the XPath
-// ".//tag" selects tag-named descendants (excluding `parent` itself), and
-// sort() puts the result in document order so indexing matches Xerces.
-pugi::xpath_node_set descendantsByTag(const XmlDOMElement& parent, const char* tag) {
-  std::string xpath = ".//";
-  xpath += tag;
-  pugi::xpath_node_set nodes = parent.select_nodes(xpath.c_str());
-  nodes.sort();
-  return nodes;
-}
-
-}  // namespace
-
 XmlDOMElement getChildElement(const XmlDOMElement& parent,
                               const char* tag, int index) {
-  pugi::xpath_node_set nodes = descendantsByTag(parent, tag);
-  if (index < 0 || static_cast<std::size_t>(index) >= nodes.size()) {
-    LOG_WARN("Get Child Element " << tag << " return null!");
-    throw std::runtime_error(std::string("getChildElement: element not found: ") + tag);
+  // Direct children named `tag`, in document order. The call-site audit
+  // confirmed no query relies on a deeper (descendant) match, so this is a
+  // faster, behavior-equivalent replacement for an XPath ".//tag" search.
+  int count = 0;
+  for (pugi::xml_node child : parent.children(tag)) {
+    if (count == index) {
+      return child;
+    }
+    ++count;
   }
-  return nodes[index].node();
+  LOG_WARN("Get Child Element " << tag << " return null!");
+  throw std::runtime_error(std::string("getChildElement: element not found: ") + tag);
 }
 
 std::string getChildValue(const XmlDOMElement& parent,
@@ -96,7 +86,12 @@ bool getBoolChildValue(const XmlDOMElement& parent,
 }
 
 int getChildCount(const XmlDOMElement& parent, const char* child_tag) {
-  return static_cast<int>(descendantsByTag(parent, child_tag).size());
+  int count = 0;
+  for (pugi::xml_node child : parent.children(child_tag)) {
+    (void) child;
+    ++count;
+  }
+  return count;
 }
 
 std::string getAttributeValue(const XmlDOMElement& element,

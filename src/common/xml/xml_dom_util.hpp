@@ -24,11 +24,11 @@ namespace toppic {
 
 namespace xml_dom_util {
 
-// These helpers search ALL descendant elements named child_tag (any depth, in
-// document order), matching the previous Xerces getElementsByTagName behavior.
-// This was chosen to preserve behavior exactly during the pugixml migration; an
-// audit can later switch the safe call sites to direct-children lookups
-// (parent.children(tag)), which are faster.
+// These helpers look up DIRECT children named child_tag (in document order).
+// The call-site audit confirmed no query relies on a deeper descendant match
+// (TopPIC reads level-by-level and wraps collections in dedicated *_list
+// elements), so this is faster than -- and behavior-equivalent to -- the Xerces
+// getElementsByTagName descendant search it replaced.
 
 XmlDOMElement getChildElement(const XmlDOMElement& parent, const char* tag, int index);
 
