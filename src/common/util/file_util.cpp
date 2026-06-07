@@ -12,6 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include "common/util/file_util.hpp"
+
 #include <algorithm>
 #include <cctype>
 #include <filesystem>
@@ -30,7 +32,6 @@
 #endif
 
 #include "common/util/logger.hpp"
-#include "common/util/file_util.hpp"
 
 namespace fs = std::filesystem;
 

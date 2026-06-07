@@ -12,10 +12,10 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include "common/util/time_util.hpp"
+
 #include <ctime>
 #include <string>
-
-#include "common/util/time_util.hpp"
 
 namespace toppic {
 

@@ -16,12 +16,12 @@
 #define TOPPIC_COMMON_UTIL_LOGGER_HPP_
 
 #include <atomic>
-// <iostream> (std::cout/std::cerr) and <cstring> (strstr) are used only inside
+// <cstring> (strstr) and <iostream> (std::cout/std::cerr) are used only inside
 // the LOG_* / SRC_FILENAME__ macros below. include-what-you-use does not see
 // those uses (macros are only expanded at call sites), so it would wrongly flag
 // these as removable -- keep them explicitly.
-#include <iostream>  // IWYU pragma: keep
 #include <cstring>   // IWYU pragma: keep
+#include <iostream>  // IWYU pragma: keep
 
 namespace toppic {
 

@@ -12,6 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include "common/thread/simple_thread_pool.hpp"
+
 #include <algorithm>
 #include <exception>
 #include <ostream>
@@ -20,7 +22,6 @@
 #include <utility>
 
 #include "common/util/logger.hpp"
-#include "common/thread/simple_thread_pool.hpp"
 
 namespace toppic {
 

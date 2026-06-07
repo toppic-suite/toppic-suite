@@ -12,14 +12,14 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include "common/util/str_util.hpp"
+
 #include <algorithm>
 #include <cctype>
 #include <iomanip>
 #include <sstream>
 #include <string>
 #include <vector>
-
-#include "common/util/str_util.hpp"
 
 namespace toppic {
 

@@ -12,6 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include "common/util/mem_check.hpp"
+
 #include <cmath>
 #include <fstream>
 #include <iomanip>
@@ -20,9 +22,6 @@
 #include <map>
 #include <thread>
 
-#include "common/util/mem_check.hpp"
-#include "common/util/logger.hpp"
-
 #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
 #include <windows.h>
 #elif defined (__APPLE__)
@@ -30,6 +29,8 @@
 #include <mach/mach.h>
 #include <sys/sysctl.h>
 #endif
+
+#include "common/util/logger.hpp"
 
 namespace toppic {
 
