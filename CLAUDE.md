@@ -1,7 +1,7 @@
 # Project conventions and migration notes
 
-Guidance for working on this codebase (the `common/` layer of TopPIC). Read this
-before adding or changing code in `src/common`.
+Guidance for working on this codebase (the `common/` and `seq/` layers of
+TopPIC). Read this before adding or changing code in `src/common` or `src/seq`.
 
 ## Removed functions in `str_util.hpp` (use the standard library)
 
@@ -108,7 +108,7 @@ and a by-value pass does an **atomic** refcount inc/dec on every call, so:
 
 - **Read-only `shared_ptr` params → `const&`.** `void f(const ModPtr &p)`, not
   `void f(ModPtr p)`. Same for `std::shared_ptr<T>` written out. This is applied
-  throughout `common/seq` and `common/base`; keep new code consistent.
+  throughout `seq` and `common/base`; keep new code consistent.
 - **Sink params that store the pointer → by value + `std::move`.** A setter or
   constructor that *keeps* its argument takes it by value and moves it into the
   member (`void setX(ModPtr p) { x_ = std::move(p); }`). Do **not** "fix" these
@@ -124,9 +124,9 @@ introduces and the compiler will **not** catch: if a function mutates the
 container its `shared_ptr` argument was passed from while still using the
 argument, the reference can dangle — pass such an argument by value.
 
-## Vendored htslib (`common/seq` indexed-FASTA access)
+## Vendored htslib (`seq` indexed-FASTA access)
 
-`common/seq/fasta_index_reader` uses htslib's `faidx` API for random access into
+`seq/fasta_index_reader` uses htslib's `faidx` API for random access into
 `.fai`-indexed FASTA files. A **trimmed** copy of htslib (only `faidx`, `bgzf`
 and `hfile` — the C sources plus their headers) is vendored under `ext/htslib`,
 mirroring how the upstream TopPIC tree carries it. It is built by `CMakeLists.txt`
@@ -139,5 +139,13 @@ include themselves as `"htslib/<name>.h"` and `fasta_index_reader.hpp` exposes
 Notes:
 - It is third-party C code: do not reformat it or hold it to this project's
   include-order / IWYU rules. The `-w` flag deliberately silences its warnings.
-- `ext/htslib` is the **only** non-pugixml external dependency of the common
-  layer; do not add htslib calls outside `common/seq` without reason.
+- `ext/htslib` is the **only** non-pugixml external dependency; do not add
+  htslib calls outside `seq` without reason.
+
+## Source layout
+
+`src/common` holds the foundation layers (`base`, `util`, `xml`, `thread`);
+`src/seq` is the sequence/proteoform layer built on top of them and depends on
+`common/...` (but not vice versa). Both compile into the single `toppic_common`
+shared library (the `COMMON_SRCS` glob covers `src/common` and `src/seq`), and
+`src` is the include root, so headers are included as `common/...` or `seq/...`.

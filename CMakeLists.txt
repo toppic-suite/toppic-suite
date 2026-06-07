@@ -137,7 +137,7 @@ find_package(pugixml REQUIRED)
 message(STATUS "pugixml version: ${pugixml_VERSION}")
 
 # A trimmed copy of htslib (faidx/bgzf/hfile only) is vendored under ext/htslib;
-# common/seq/fasta_index_reader uses faidx to random-access indexed FASTA files.
+# seq/fasta_index_reader uses faidx to random-access indexed FASTA files.
 # It is built as a small static library and linked into toppic_common. The
 # vendored C sources include themselves as "htslib/<name>.h", so the parent
 # ext/ directory is the include root. zlib (and threads, for BGZF_MT) are the
@@ -158,10 +158,13 @@ target_compile_options(htslib PRIVATE -w)
 # CMake-generated common/util/version.hpp.
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_BINARY_DIR}/gen)
 
-# code shared by several executables
+# code shared by several executables: the common/ layer (base, util, xml,
+# thread) and the seq/ layer built on top of it.
 # CONFIGURE_DEPENDS makes CMake re-glob (and so reconfigure) when source files
-# are added or removed under src/common.
-file(GLOB_RECURSE COMMON_SRCS CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/common/*.cpp)
+# are added or removed under src/common or src/seq.
+file(GLOB_RECURSE COMMON_SRCS CONFIGURE_DEPENDS
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/common/*.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/seq/*.cpp)
 
 add_library(toppic_common SHARED ${COMMON_SRCS})
 target_include_directories(toppic_common PUBLIC
@@ -172,7 +175,7 @@ target_include_directories(toppic_common PUBLIC
 # toppic_common need pugixml on their include and link lines too.
 target_link_libraries(toppic_common PUBLIC pugixml::pugixml)
 
-# common/seq/fasta_index_reader.hpp includes <htslib/faidx.h>, so the vendored
+# seq/fasta_index_reader.hpp includes <htslib/faidx.h>, so the vendored
 # htslib include path is PUBLIC; the library itself is an implementation detail
 # (PRIVATE) of toppic_common.
 target_include_directories(toppic_common PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/ext)
