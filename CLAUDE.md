@@ -100,3 +100,44 @@ A `.hpp` follows the same order without step 1. Putting the related header first
 keeps each header self-contained. Include hygiene is checked with
 include-what-you-use (configure with `-DTOPPIC_ENABLE_IWYU=ON`, or run
 `iwyu_tool -p <build>`); keep new files IWYU-clean.
+
+## Parameter passing (smart pointers and handles)
+
+The `...Ptr` typedefs are `std::shared_ptr` aliases. A `shared_ptr` is 16 bytes
+and a by-value pass does an **atomic** refcount inc/dec on every call, so:
+
+- **Read-only `shared_ptr` params → `const&`.** `void f(const ModPtr &p)`, not
+  `void f(ModPtr p)`. Same for `std::shared_ptr<T>` written out. This is applied
+  throughout `common/seq` and `common/base`; keep new code consistent.
+- **Sink params that store the pointer → by value + `std::move`.** A setter or
+  constructor that *keeps* its argument takes it by value and moves it into the
+  member (`void setX(ModPtr p) { x_ = std::move(p); }`). Do **not** "fix" these
+  to `const&` — that would force a copy on assignment.
+- **`...PtrVec` (and other container) params → `const&`** when read-only.
+- **`XmlDOMElement` stays by value** — see the pugixml section above. It is a
+  trivially-copyable 8-byte handle (`pugi::xml_node` wraps a single pointer), so
+  `const&` would only add a layer of indirection. The same reasoning applies to
+  any thin handle/iterator-like type.
+
+Scalars (`int`, `double`, `bool`, ...) stay by value. The one risk `const&`
+introduces and the compiler will **not** catch: if a function mutates the
+container its `shared_ptr` argument was passed from while still using the
+argument, the reference can dangle — pass such an argument by value.
+
+## Vendored htslib (`common/seq` indexed-FASTA access)
+
+`common/seq/fasta_index_reader` uses htslib's `faidx` API for random access into
+`.fai`-indexed FASTA files. A **trimmed** copy of htslib (only `faidx`, `bgzf`
+and `hfile` — the C sources plus their headers) is vendored under `ext/htslib`,
+mirroring how the upstream TopPIC tree carries it. It is built by `CMakeLists.txt`
+as a small static library `htslib` (links `ZLIB::ZLIB` and `Threads::Threads`,
+compiled with `-w` and PIC) and linked **PRIVATE** into `toppic_common`; the
+`ext/` directory is a **PUBLIC** include root because the vendored sources
+include themselves as `"htslib/<name>.h"` and `fasta_index_reader.hpp` exposes
+`<htslib/faidx.h>`.
+
+Notes:
+- It is third-party C code: do not reformat it or hold it to this project's
+  include-order / IWYU rules. The `-w` flag deliberately silences its warnings.
+- `ext/htslib` is the **only** non-pugixml external dependency of the common
+  layer; do not add htslib calls outside `common/seq` without reason.
