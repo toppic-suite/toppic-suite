@@ -17,9 +17,19 @@ if(NOT CMAKE_CXX_COMPILER)
   endif()
 endif()
 
-project(TopPIC_claude VERSION 1.0.0 LANGUAGES C CXX)
+project(TopPIC_claude VERSION 1.9.0 LANGUAGES C CXX)
 message(STATUS "Project name: " ${PROJECT_NAME})
 message(STATUS "System name: " ${CMAKE_SYSTEM_NAME})
+
+# Version is defined once, here, via project(). src/common/util/version.hpp is
+# generated from version.hpp.in so the runtime Version::getVersion() string and
+# CMake's PROJECT_VERSION (used for packaging) can never drift apart.
+set(TOPPIC_VERSION_SUFFIX "_alpha")   # pre-release tag appended to PROJECT_VERSION
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/common/util/version.hpp.in
+  ${CMAKE_CURRENT_BINARY_DIR}/gen/common/util/version.hpp
+  @ONLY)
+message(STATUS "Project version: " ${PROJECT_VERSION}${TOPPIC_VERSION_SUFFIX})
 
 # C++ standard (replaces a raw -std=c++17 flag).
 set(CMAKE_CXX_STANDARD 17)
@@ -87,7 +97,9 @@ ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 message(STATUS "Cmake CXX flags: " ${CMAKE_CXX_FLAGS})
 message(STATUS "Cmake shared linker flags: " ${CMAKE_SHARED_LINKER_FLAGS})
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
+# src for the hand-written headers, and the build-tree gen/ dir for the
+# CMake-generated common/util/version.hpp.
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_BINARY_DIR}/gen)
 
 # code shared by several executables
 # CONFIGURE_DEPENDS makes CMake re-glob (and so reconfigure) when source files
@@ -95,7 +107,9 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 file(GLOB_RECURSE COMMON_SRCS CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/common/*.cpp)
 
 add_library(toppic_common SHARED ${COMMON_SRCS})
-target_include_directories(toppic_common PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_include_directories(toppic_common PUBLIC
+  ${CMAKE_CURRENT_SOURCE_DIR}/src
+  ${CMAKE_CURRENT_BINARY_DIR}/gen)
 
 # Install the shared library using the prefix-relative GNUInstallDirs locations.
 # On Linux/macOS it is a LIBRARY artifact and lands in <prefix>/lib/toppic

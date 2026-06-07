@@ -52,6 +52,9 @@ Makefile
 install_manifest.txt
 compile_commands.json
 
+# CMake configure_file output (e.g. the generated common/util/version.hpp)
+gen/
+
 # Temporary files
 *.tmp
 *.log
