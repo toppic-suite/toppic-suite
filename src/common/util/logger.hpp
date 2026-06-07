@@ -21,7 +21,7 @@
 // those uses (macros are only expanded at call sites), so it would wrongly flag
 // these as removable -- keep them explicitly.
 #include <iostream>  // IWYU pragma: keep
-#include <cstring>   // IWYU pragma: keep, for strstr, used by SRC_FILENAME__ macro
+#include <cstring>   // IWYU pragma: keep
 
 namespace toppic {
 
