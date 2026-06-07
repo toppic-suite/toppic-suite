@@ -28,9 +28,9 @@ using ModPtr = std::shared_ptr<Mod>;
 
 class Mod {
  public:
-  Mod(ResiduePtr ori_residue_ptr, 
-      ResiduePtr mod_residue_ptr, 
-      ModTypePtr mod_type_ptr);
+  Mod(const ResiduePtr &ori_residue_ptr, 
+      const ResiduePtr &mod_residue_ptr, 
+      const ModTypePtr &mod_type_ptr);
 
   explicit Mod(XmlDOMElement element);
 
@@ -40,7 +40,7 @@ class Mod {
 
   ModTypePtr getModTypePtr() const { return mod_type_ptr_;}
 
-  bool isSame(ModPtr mod_ptr) const;
+  bool isSame(const ModPtr &mod_ptr) const;
 
   double getReplaceShift() const;
 

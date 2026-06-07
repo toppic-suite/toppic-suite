@@ -60,7 +60,7 @@ class Ptm {
     return a->getMonoMass() < b->getMonoMass();
   }
 
-  bool isSame(PtmPtr ptm_ptr) const {return abbr_name_ == ptm_ptr->getAbbrName();}
+  bool isSame(const PtmPtr &ptm_ptr) const {return abbr_name_ == ptm_ptr->getAbbrName();}
 
  private:
   /* Full name */

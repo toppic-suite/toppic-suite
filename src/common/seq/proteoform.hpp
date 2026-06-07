@@ -37,13 +37,13 @@ using ProteoformPtr = std::shared_ptr<Proteoform>;
 
 class Proteoform {
  public:
-  Proteoform(FastaSeqPtr fasta_seq_ptr,
-             ProtModPtr prot_mod_ptr,
+  Proteoform(const FastaSeqPtr &fasta_seq_ptr,
+             const ProtModPtr &prot_mod_ptr,
              int start_pos, int end_pos,
-             ResSeqPtr res_seq_ptr,
+             const ResSeqPtr &res_seq_ptr,
              const MassShiftPtrVec &mass_shift_ptr_vec);
 
-  Proteoform(XmlDOMElement element, FastaIndexReaderPtr reader_ptr,
+  Proteoform(XmlDOMElement element, const FastaIndexReaderPtr &reader_ptr,
              const ModPtrVec &fix_mod_list);
 
   FastaSeqPtr getFastaSeqPtr() const {return fasta_seq_ptr_;}
@@ -66,13 +66,13 @@ class Proteoform {
 
   int getMassShiftNum() const {return static_cast<int>(mass_shift_list_.size());}
 
-  int getAlterNum(AlterTypePtr type_ptr);
+  int getAlterNum(const AlterTypePtr &type_ptr);
 
   int getVarPtmNum();
 
   const MassShiftPtrVec& getMassShiftPtrVec() const {return mass_shift_list_;}
 
-  MassShiftPtrVec getMassShiftPtrVec(AlterTypePtr type_ptr);
+  MassShiftPtrVec getMassShiftPtrVec(const AlterTypePtr &type_ptr);
 
   int getProteoClusterId() const {return proteo_cluster_id_;}
 
@@ -102,15 +102,15 @@ class Proteoform {
 
   std::string getNextAminoAcid();
 
-  std::string getAlterStr(AlterTypePtr type_ptr);
+  std::string getAlterStr(const AlterTypePtr &type_ptr);
 
   void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement parent);
 
-  void parseXml(XmlDOMElement element, ProteoformPtr db_proteoform);
+  void parseXml(XmlDOMElement element, const ProteoformPtr &db_proteoform);
 
   static std::string getXmlElementName() {return "proteoform";}
 
-  PtmPtrVec getPtmVec(AlterTypePtr type);
+  PtmPtrVec getPtmVec(const AlterTypePtr &type);
 
   std::string getMIScore();
 
@@ -118,7 +118,7 @@ class Proteoform {
 
   void setEndPos(int end_pos) {end_pos_ = end_pos;}
 
-  void setFastaSeqPtr(FastaSeqPtr fasta_seq_ptr) {fasta_seq_ptr_ = fasta_seq_ptr;}
+  void setFastaSeqPtr(const FastaSeqPtr &fasta_seq_ptr) {fasta_seq_ptr_ = fasta_seq_ptr;}
 
  private:
   FastaSeqPtr fasta_seq_ptr_;

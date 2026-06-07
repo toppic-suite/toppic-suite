@@ -18,8 +18,8 @@
 
 namespace toppic {
 
-ResidueFreq::ResidueFreq(AminoAcidPtr acid_ptr, 
-                         PtmPtr ptm_ptr, double freq):
+ResidueFreq::ResidueFreq(const AminoAcidPtr &acid_ptr, 
+                         const PtmPtr &ptm_ptr, double freq):
     Residue(acid_ptr, ptm_ptr),
     freq_(freq) {}
 

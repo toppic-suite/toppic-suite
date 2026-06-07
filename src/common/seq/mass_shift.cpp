@@ -24,14 +24,14 @@
 
 namespace toppic {
 
-MassShift::MassShift(AlterPtr alter_ptr) {
+MassShift::MassShift(const AlterPtr &alter_ptr) {
   shift_ = alter_ptr->getMass();
   alter_vec_.push_back(alter_ptr);
   left_bp_pos_ = alter_vec_[0]->getLeftBpPos();
   right_bp_pos_ = alter_vec_[0]->getRightBpPos();
 }
 
-MassShift::MassShift(MassShiftPtr shift_ptr, int start) {
+MassShift::MassShift(const MassShiftPtr &shift_ptr, int start) {
   shift_ = shift_ptr->getMassShift();
   left_bp_pos_ = shift_ptr->getLeftBpPos() - start;
   right_bp_pos_ = shift_ptr->getRightBpPos() - start;

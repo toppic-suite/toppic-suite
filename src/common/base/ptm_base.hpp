@@ -29,7 +29,7 @@ class PtmBase {
 
   static PtmPtr getEmptyPtmPtr() {return empty_ptm_ptr_;}
 
-  static bool isEmptyPtmPtr(PtmPtr ptm_ptr) {return ptm_ptr == empty_ptm_ptr_;}
+  static bool isEmptyPtmPtr(const PtmPtr &ptm_ptr) {return ptm_ptr == empty_ptm_ptr_;}
 
   static PtmPtr getPtmPtr_Acetylation() {return acetylation_ptr_;}
   static PtmPtr getPtmPtr_C57() {return c57_ptr_;}
@@ -40,7 +40,7 @@ class PtmBase {
    */
   static PtmPtr getPtmPtrByAbbrName(const std::string &abbr_name);
 
-  static PtmPtr getPtmPtr(PtmPtr p);
+  static PtmPtr getPtmPtr(const PtmPtr &p);
 
   /**
    * Checks if the list contains a PTM with the specific name.

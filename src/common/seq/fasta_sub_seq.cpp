@@ -16,7 +16,7 @@
 
 namespace toppic {
 
-FastaSubSeq::FastaSubSeq(FastaSeqPtr seq_ptr,
+FastaSubSeq::FastaSubSeq(const FastaSeqPtr &seq_ptr,
                          int sub_seq_start,
                          int sub_seq_len):
     FastaSeq(seq_ptr, sub_seq_start, sub_seq_len),

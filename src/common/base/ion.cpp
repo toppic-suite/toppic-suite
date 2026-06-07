@@ -22,8 +22,8 @@
 namespace toppic {
 
 Ion::Ion(int charge, int pos, int display_pos,
-         IonTypePtr ion_type_ptr,
-         NeutralLossPtr neutral_loss_ptr):
+         const IonTypePtr &ion_type_ptr,
+         const NeutralLossPtr &neutral_loss_ptr):
     charge_(charge),
     pos_(pos),
     display_pos_(display_pos),

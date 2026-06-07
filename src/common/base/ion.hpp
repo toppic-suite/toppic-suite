@@ -23,8 +23,8 @@ namespace toppic {
 class Ion {
  public:
   Ion(int charge, int pos, int display_pos,
-      IonTypePtr ion_type_ptr,
-      NeutralLossPtr neutral_loss_ptr);
+      const IonTypePtr &ion_type_ptr,
+      const NeutralLossPtr &neutral_loss_ptr);
 
   int getCharge() const {return charge_;}
 

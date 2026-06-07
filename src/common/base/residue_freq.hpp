@@ -21,7 +21,7 @@ namespace toppic {
 
 class ResidueFreq: public Residue {
  public:
-  ResidueFreq(AminoAcidPtr acid_ptr, PtmPtr ptm_ptr, double freq);
+  ResidueFreq(const AminoAcidPtr &acid_ptr, const PtmPtr &ptm_ptr, double freq);
 
   double getFreq() const {return freq_;}
 

@@ -20,7 +20,7 @@ namespace toppic {
 
 namespace trunc_util {
 
-bool isValidTrunc(TruncPtr trunc_ptr, const ResiduePtrVec & res_ptr_vec) {
+bool isValidTrunc(const TruncPtr &trunc_ptr, const ResiduePtrVec & res_ptr_vec) {
   // check if trunc acids match N-terminal acids of the protein 
   int trunc_len = trunc_ptr->getTruncLen();
   if (trunc_len >= static_cast<int>(res_ptr_vec.size())) {

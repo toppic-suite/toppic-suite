@@ -88,7 +88,7 @@ PtmPtr PtmBase::getPtmPtrByAbbrName(const std::string &abbr_name) {
   return it->second;
 }
 
-PtmPtr PtmBase::getPtmPtr(PtmPtr p) {
+PtmPtr PtmBase::getPtmPtr(const PtmPtr &p) {
   auto it = ptm_abbr_name_map_.find(p->getAbbrName());
   if (it != ptm_abbr_name_map_.end()) {
     return it->second;

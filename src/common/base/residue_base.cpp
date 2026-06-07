@@ -59,7 +59,7 @@ void ResidueBase::initBase(const std::string &base_dir) {
 
 // use residue in residue_base to remove duplications and reduce memory usage
 // add the residue to base if it is a new one
-ResiduePtr ResidueBase::getBaseResiduePtr(ResiduePtr residue_ptr) {
+ResiduePtr ResidueBase::getBaseResiduePtr(const ResiduePtr &residue_ptr) {
   for (size_t i = 0; i < residue_ptr_vec_.size(); i++) {
     if (residue_ptr_vec_[i]->isSame(residue_ptr)) {
       return residue_ptr_vec_[i];
@@ -79,12 +79,12 @@ ResiduePtrVec ResidueBase::getBaseNonePtmResiduePtrVec() {
   return result;
 }
 
-ResiduePtr ResidueBase::getBaseResiduePtr(AminoAcidPtr acid_ptr, PtmPtr ptm_ptr) {
+ResiduePtr ResidueBase::getBaseResiduePtr(const AminoAcidPtr &acid_ptr, const PtmPtr &ptm_ptr) {
   ResiduePtr residue_ptr = std::make_shared<Residue>(acid_ptr, ptm_ptr);
   return getBaseResiduePtr(residue_ptr);
 }
 
-ResiduePtr ResidueBase::getBaseResiduePtr(AminoAcidPtr acid_ptr) {
+ResiduePtr ResidueBase::getBaseResiduePtr(const AminoAcidPtr &acid_ptr) {
   ResiduePtr residue_ptr = std::make_shared<Residue>(acid_ptr, PtmBase::getEmptyPtmPtr());
   return getBaseResiduePtr(residue_ptr);
 }

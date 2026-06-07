@@ -33,15 +33,15 @@ class ModBase {
 
   static ModPtr getNTermNoneModPtr() {return n_term_none_mod_ptr_;}
 
-  static ModPtr getBaseModPtr(ModPtr mod_ptr);
+  static ModPtr getBaseModPtr(const ModPtr &mod_ptr);
 
-  static ModPtr getBaseModPtr(ResiduePtr ori_residue, 
-                              ResiduePtr mod_residue,
-                              ModTypePtr mod_type);
+  static ModPtr getBaseModPtr(const ResiduePtr &ori_residue, 
+                              const ResiduePtr &mod_residue,
+                              const ModTypePtr &mod_type);
 
-  static bool isNoneModPtr(ModPtr mod_ptr) {return mod_ptr == none_mod_ptr_;}
+  static bool isNoneModPtr(const ModPtr &mod_ptr) {return mod_ptr == none_mod_ptr_;}
 
-  static bool isNTermNoneModPtr(ModPtr mod_ptr) {return mod_ptr == n_term_none_mod_ptr_;}
+  static bool isNTermNoneModPtr(const ModPtr &mod_ptr) {return mod_ptr == n_term_none_mod_ptr_;}
 
   static ModPtr getModPtrFromXml(XmlDOMElement element);
 

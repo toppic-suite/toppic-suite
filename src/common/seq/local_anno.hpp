@@ -33,7 +33,7 @@ class LocalAnno {
 
   LocalAnno(int left_pos, int right_pos, double conf,
             const std::vector<double> & scr_vec,
-            double raw_scr, PtmPtr p);
+            double raw_scr, const PtmPtr &p);
 
   int getLeftBpPos() const {return left_pos_;}
 

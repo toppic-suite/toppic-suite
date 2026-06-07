@@ -49,7 +49,7 @@ FastaSeq::FastaSeq(const std::string &name,
     }
 
 // Create a FastaSeq using a subsequence of another FastaSeq
-FastaSeq::FastaSeq(FastaSeqPtr seq_ptr, int start, int len) {
+FastaSeq::FastaSeq(const FastaSeqPtr &seq_ptr, int start, int len) {
   name_ = seq_ptr->getName();
   desc_ = seq_ptr->getDesc();
   const StringPairVec& str_pair_vec = seq_ptr->getAcidPtmPairVec();

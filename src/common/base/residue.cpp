@@ -25,7 +25,7 @@
 
 namespace toppic {
 
-Residue::Residue(AminoAcidPtr acid_ptr, PtmPtr ptm_ptr):
+Residue::Residue(const AminoAcidPtr &acid_ptr, const PtmPtr &ptm_ptr):
     acid_ptr_(acid_ptr),
     ptm_ptr_(ptm_ptr) {
   mass_ = acid_ptr_->getMonoMass() + ptm_ptr_->getMonoMass();
@@ -43,7 +43,7 @@ Residue::Residue(XmlDOMElement element) {
   mass_ = acid_ptr_->getMonoMass() + ptm_ptr_->getMonoMass();
 }
 
-bool Residue::isSame(ResiduePtr residue_ptr) const {
+bool Residue::isSame(const ResiduePtr &residue_ptr) const {
   return acid_ptr_ == residue_ptr->getAminoAcidPtr()
       && ptm_ptr_ == residue_ptr->getPtmPtr();
 }

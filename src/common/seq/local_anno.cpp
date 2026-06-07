@@ -28,7 +28,7 @@ namespace toppic {
 LocalAnno::LocalAnno(int left_pos, int right_pos, double conf,
                       const std::vector<double> & scr_vec,
                       double raw_scr,
-                      PtmPtr p):
+                      const PtmPtr &p):
     left_pos_(left_pos),
     right_pos_(right_pos),
     conf_(conf),

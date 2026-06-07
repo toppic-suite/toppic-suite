@@ -24,16 +24,16 @@ namespace toppic {
 
 namespace proteoform_factory {
 
-ProteoformPtr geneDbProteoformPtr(FastaSeqPtr seq_ptr, const ModPtrVec &fix_mod_list);
+ProteoformPtr geneDbProteoformPtr(const FastaSeqPtr &seq_ptr, const ModPtrVec &fix_mod_list);
 
-ProteoformPtr geneDbProteoformPtr(FastaSeqPtr seq_ptr, const ModPtrVec &fix_mod_list,
+ProteoformPtr geneDbProteoformPtr(const FastaSeqPtr &seq_ptr, const ModPtrVec &fix_mod_list,
                                   int start_pos);
 
 // Generate a proteoform with protein N-terminal modification
-ProteoformPtr geneProtModProteoform(ProteoformPtr db_form_ptr,
-                                    ProtModPtr prot_mod_ptr);
+ProteoformPtr geneProtModProteoform(const ProteoformPtr &db_form_ptr,
+                                    const ProtModPtr &prot_mod_ptr);
 
-ProteoformPtrVec geneProtModProteoform(ProteoformPtr db_form_ptr,
+ProteoformPtrVec geneProtModProteoform(const ProteoformPtr &db_form_ptr,
                                        const ProtModPtrVec &prot_mod_ptrs);
 
 ProteoformPtrVec geneProtModProteoform(const ProteoformPtrVec &ori_forms,
@@ -44,14 +44,14 @@ ProteoformPtrVec2D gene2DProtModProteoform(const ProteoformPtrVec &db_form_ptrs,
 
 // Get subproteoform. local_start and local_end are relatively to
 // the start position in the original proteoform
-ProteoformPtr geneSubProteoform(ProteoformPtr proteoform_ptr,
-                                FastaSeqPtr fasta_seq_ptr,
+ProteoformPtr geneSubProteoform(const ProteoformPtr &proteoform_ptr,
+                                const FastaSeqPtr &fasta_seq_ptr,
                                 int local_start, int local_end);
 
 ProteoformPtrVec readFastaToProteoformPtrVec(const std::string &file_name,
                                              const ModPtrVec &fix_mod_list);
 
-ProteoformPtr readFastaToProteoformPtr(FastaIndexReaderPtr reader_ptr,
+ProteoformPtr readFastaToProteoformPtr(const FastaIndexReaderPtr &reader_ptr,
                                        const std::string &seq_name,
                                        const std::string &seq_desc,
                                        const ModPtrVec &fix_mod_list);

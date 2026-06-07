@@ -127,7 +127,7 @@ ResiduePtrVec convertStrToResiduePtrVec(const StringPairVec &string_pair_vec,
   return residue_ptrs;
 }
 
-int findResidue(const ResiduePtrVec &residue_list, ResiduePtr residue_ptr) {
+int findResidue(const ResiduePtrVec &residue_list, const ResiduePtr &residue_ptr) {
   for (size_t i = 0; i < residue_list.size(); i++) {
     if (residue_list[i] == residue_ptr) {
       return i;

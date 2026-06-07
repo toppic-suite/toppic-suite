@@ -49,8 +49,8 @@ using AlterPtr = std::shared_ptr<Alter>;
 class Alter {
  public:
   Alter(int left_bp_pos, int right_bp_pos,
-        AlterTypePtr type_ptr,
-        double mass, ModPtr mod_ptr);
+        const AlterTypePtr &type_ptr,
+        double mass, const ModPtr &mod_ptr);
 
   explicit Alter(XmlDOMElement change_element);
 
@@ -72,13 +72,13 @@ class Alter {
 
   LocalAnnoPtr getLocalAnno() const {return local_anno_ptr_;}
 
-  void setLocalAnno(LocalAnnoPtr p);
+  void setLocalAnno(const LocalAnnoPtr &p);
 
   void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) const;
 
   static std::string getXmlElementName() {return "alteration";}
 
-  static AlterPtr genAlterPtr(AlterPtr ori_alter_ptr, int start_pos);
+  static AlterPtr genAlterPtr(const AlterPtr &ori_alter_ptr, int start_pos);
 
  protected:
   // left and right positions are based on break point positions

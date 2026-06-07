@@ -20,12 +20,12 @@ namespace toppic {
 
 namespace fasta_sub_util {
 
-FastaSubSeqPtrVec breakSeq(FastaSeqPtr seq_ptr) {
+FastaSubSeqPtrVec breakSeq(const FastaSeqPtr &seq_ptr) {
   int N = 2000;
   return breakSeq(seq_ptr, N);
 }
 
-FastaSubSeqPtrVec breakSeq(FastaSeqPtr seq_ptr, int N) {
+FastaSubSeqPtrVec breakSeq(const FastaSeqPtr &seq_ptr, int N) {
   FastaSubSeqPtrVec fasta_seq_vec;
   int seq_last_pos = seq_ptr->getAcidPtmPairLen() - 1;
   int sub_bgn_pos = 0;

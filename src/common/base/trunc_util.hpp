@@ -22,7 +22,7 @@ namespace toppic {
 
 namespace trunc_util {
 
-bool isValidTrunc(TruncPtr trunc_ptr, const ResiduePtrVec & res_ptr_vec);
+bool isValidTrunc(const TruncPtr &trunc_ptr, const ResiduePtrVec & res_ptr_vec);
 
 }  // namespace trunc_util
 

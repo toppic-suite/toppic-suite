@@ -25,7 +25,7 @@ using ResiduePtr = std::shared_ptr<Residue>;
 
 class Residue {
  public:
-  Residue(AminoAcidPtr acid_ptr, PtmPtr ptm_ptr);
+  Residue(const AminoAcidPtr &acid_ptr, const PtmPtr &ptm_ptr);
 
   explicit Residue(XmlDOMElement element);
   /** Get amino acid. */
@@ -35,7 +35,7 @@ class Residue {
   /** Get post-translational modification. */
   PtmPtr getPtmPtr() const { return ptm_ptr_; }
   /** Checks if the residue contains the same amino acid and ptm.  */
-  bool isSame(ResiduePtr residue_ptr) const;
+  bool isSame(const ResiduePtr &residue_ptr) const;
   /** Get string representation */
   std::string toString(const std::string &delim_bgn, const std::string &delim_end) const;
 

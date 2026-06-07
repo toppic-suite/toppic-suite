@@ -25,7 +25,7 @@ class XmlDOMDocument;
 class ProtMod {
  public:
   ProtMod(const std::string &name, const std::string &type,
-          TruncPtr trunc_ptr, ModPtr mod_ptr);
+          const TruncPtr &trunc_ptr, const ModPtr &mod_ptr);
 
   explicit ProtMod(XmlDOMElement element);
 

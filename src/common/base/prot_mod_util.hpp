@@ -22,9 +22,9 @@ namespace toppic {
 
 namespace prot_mod_util {
 
-bool allowMod(ProtModPtr prot_mod_ptr, const ResiduePtrVec &residues);
+bool allowMod(const ProtModPtr &prot_mod_ptr, const ResiduePtrVec &residues);
 
-bool containMod(const ProtModPtrVec &prot_mod_ptr_vec, ProtModPtr prot_mod_ptr);
+bool containMod(const ProtModPtrVec &prot_mod_ptr_vec, const ProtModPtr &prot_mod_ptr);
 
 }  // namespace prot_mod_util
 

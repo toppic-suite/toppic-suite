@@ -31,9 +31,9 @@ class MassShift {
  public:
   MassShift(int left_bp_pos, int right_bp_pos, double shift);
 
-  explicit MassShift(AlterPtr alter_ptr);
+  explicit MassShift(const AlterPtr &alter_ptr);
 
-  MassShift(MassShiftPtr shift_ptr, int start);
+  MassShift(const MassShiftPtr &shift_ptr, int start);
 
   explicit MassShift(XmlDOMElement mass_shift_element);
 

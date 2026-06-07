@@ -37,7 +37,7 @@ ResiduePtrVec convertStrToResiduePtrVec(const StringPairVec &string_pair_vec);
 ResiduePtrVec convertStrToResiduePtrVec(const StringPairVec &string_pair_vec,
                                         const ModPtrVec &fix_mod_ptr_vec);
 
-int findResidue(const ResiduePtrVec &residue_list, ResiduePtr residue_ptr);
+int findResidue(const ResiduePtrVec &residue_list, const ResiduePtr &residue_ptr);
 
 double compResiduePtrVecMass(const ResiduePtrVec &ptr_vec);
 

@@ -38,7 +38,7 @@ class FastaSeq {
   FastaSeq(const std::string &name, const std::string &desc,
            const std::string &ori_seq);
 
-  FastaSeq(FastaSeqPtr seq_ptr, int start, int len);
+  FastaSeq(const FastaSeqPtr &seq_ptr, int start, int len);
 
   const std::string& getName() const {return name_;}
 

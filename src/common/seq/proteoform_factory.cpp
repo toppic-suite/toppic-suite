@@ -33,7 +33,7 @@ namespace toppic {
 
 namespace proteoform_factory {
 
-ProteoformPtr geneDbProteoformPtr(FastaSeqPtr fasta_seq_ptr, const ModPtrVec &fix_mod_list,
+ProteoformPtr geneDbProteoformPtr(const FastaSeqPtr &fasta_seq_ptr, const ModPtrVec &fix_mod_list,
                                   int start_pos) {
   if (fasta_seq_ptr == nullptr) {
     return ProteoformPtr(nullptr);
@@ -77,11 +77,11 @@ ProteoformPtr geneDbProteoformPtr(FastaSeqPtr fasta_seq_ptr, const ModPtrVec &fi
                                       end_pos, res_seq_ptr, shift_list);
 }
 
-ProteoformPtr geneDbProteoformPtr(FastaSeqPtr fasta_seq_ptr, const ModPtrVec &fix_mod_list) {
+ProteoformPtr geneDbProteoformPtr(const FastaSeqPtr &fasta_seq_ptr, const ModPtrVec &fix_mod_list) {
   return geneDbProteoformPtr(fasta_seq_ptr, fix_mod_list, 0);
 }
 
-ProteoformPtr geneProtModProteoform(ProteoformPtr db_form_ptr, ProtModPtr prot_mod_ptr) {
+ProteoformPtr geneProtModProteoform(const ProteoformPtr &db_form_ptr, const ProtModPtr &prot_mod_ptr) {
   // check if the proteoform can be truncated
   ResSeqPtr db_res_seq_ptr = db_form_ptr->getResSeqPtr();
   bool valid_mod = prot_mod_util::allowMod(prot_mod_ptr, db_res_seq_ptr->getResidues());
@@ -128,7 +128,7 @@ ProteoformPtr geneProtModProteoform(ProteoformPtr db_form_ptr, ProtModPtr prot_m
                                       end, seq_ptr, shift_ptrs);
 }
 
-ProteoformPtrVec geneProtModProteoform(ProteoformPtr proteo_ptr, 
+ProteoformPtrVec geneProtModProteoform(const ProteoformPtr &proteo_ptr, 
                                        const ProtModPtrVec &prot_mods) {
   ProteoformPtrVec new_forms;
   for (size_t j = 0; j < prot_mods.size(); j++) {
@@ -171,8 +171,8 @@ ProteoformPtrVec2D gene2DProtModProteoform(const ProteoformPtrVec &ori_forms,
   return new_forms;
 }
 
-ProteoformPtr geneSubProteoform(ProteoformPtr proteoform_ptr, 
-                                FastaSeqPtr fasta_seq_ptr,
+ProteoformPtr geneSubProteoform(const ProteoformPtr &proteoform_ptr, 
+                                const FastaSeqPtr &fasta_seq_ptr,
                                 int residue_start, int residue_end) {
 
   const ResiduePtrVec& ori_residues = proteoform_ptr->getResSeqPtr()->getResidues();
@@ -224,7 +224,7 @@ ProteoformPtrVec readFastaToProteoformPtrVec(const std::string &file_name,
   return list;
 }
 
-ProteoformPtr readFastaToProteoformPtr(FastaIndexReaderPtr reader_ptr,
+ProteoformPtr readFastaToProteoformPtr(const FastaIndexReaderPtr &reader_ptr,
                                        const std::string &seq_name,
                                        const std::string &seq_desc,
                                        const ModPtrVec &fix_mod_list) {

@@ -29,11 +29,11 @@ class ResidueBase {
 
   static ResiduePtr getResiduePtrFromXml(XmlDOMElement element);
 
-  static ResiduePtr getBaseResiduePtr(ResiduePtr residue_ptr);
+  static ResiduePtr getBaseResiduePtr(const ResiduePtr &residue_ptr);
 
-  static ResiduePtr getBaseResiduePtr(AminoAcidPtr acid_ptr, PtmPtr ptm_ptr);
+  static ResiduePtr getBaseResiduePtr(const AminoAcidPtr &acid_ptr, const PtmPtr &ptm_ptr);
 
-  static ResiduePtr getBaseResiduePtr(AminoAcidPtr acid_ptr);
+  static ResiduePtr getBaseResiduePtr(const AminoAcidPtr &acid_ptr);
 
   static ResiduePtrVec getBaseNonePtmResiduePtrVec();
 

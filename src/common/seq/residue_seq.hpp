@@ -34,7 +34,7 @@ class ResidueSeq {
  public:
   explicit ResidueSeq(const ResiduePtrVec &residues);
 
-  explicit ResidueSeq(const ResiduePtrVec &residues, ModPtr n_mod_ptr);
+  explicit ResidueSeq(const ResiduePtrVec &residues, const ModPtr &n_mod_ptr);
 
   // Returns a sub-peptide of the original peptide.
   ResSeqPtr getSubResidueSeq(int bgn, int end);
@@ -60,7 +60,7 @@ class ResidueSeq {
 
   static std::string getXmlElementName() {return "residue_seq";}
 
-  void setNModPtr(ModPtr n_mod_ptr);
+  void setNModPtr(const ModPtr &n_mod_ptr);
 
  private:
   // residue list 

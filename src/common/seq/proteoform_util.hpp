@@ -30,20 +30,20 @@ ResFreqPtrVec compNTermResidueFreq(const ProteoformPtrVec &prot_mod_forms);
 ResFreqPtrVec compResidueFreq(const ResiduePtrVec &residue_list,
                               const ProteoformPtrVec &raw_mods);
 
-bool isSameSeqAndMass(ProteoformPtr a, ProteoformPtr b, double ppo);
+bool isSameSeqAndMass(const ProteoformPtr &a, const ProteoformPtr &b, double ppo);
 
-bool isStrictCompatiablePtmSpecies(ProteoformPtr a, ProteoformPtr b, double ppo);
+bool isStrictCompatiablePtmSpecies(const ProteoformPtr &a, const ProteoformPtr &b, double ppo);
 
 ProteoformPtrVec2D divideProteoIntoBlocks(const ProteoformPtrVec &proteo_ptrs,
                                           int db_block_size);
 
-std::vector<double> getNTermShift(ProteoformPtr db_form_ptr,
+std::vector<double> getNTermShift(const ProteoformPtr &db_form_ptr,
                                   const ProtModPtrVec &prot_mod_ptrs);
 
 std::vector<std::vector<double> > getNTermShift2D(const ProteoformPtrVec & db_form_ptr_vec,
                                                   const ProtModPtrVec & prot_mod_ptrs);
 
-std::vector<double> getNTermAcets(ProteoformPtr db_form_ptr,
+std::vector<double> getNTermAcets(const ProteoformPtr &db_form_ptr,
                                   const ProtModPtrVec & prot_mod_ptrs);
 
 std::vector<std::vector<double> > getNTermAcet2D(const ProteoformPtrVec & db_form_ptr_vec,

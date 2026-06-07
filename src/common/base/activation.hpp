@@ -23,8 +23,8 @@ class XmlDOMDocument;
 
 class Activation {
  public:
-  Activation(const std::string &name, IonTypePtr n_ion_type_ptr,
-             IonTypePtr c_ion_type_ptr);
+  Activation(const std::string &name, const IonTypePtr &n_ion_type_ptr,
+             const IonTypePtr &c_ion_type_ptr);
 
   explicit Activation(XmlDOMElement element);
 

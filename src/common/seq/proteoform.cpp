@@ -34,10 +34,10 @@
 
 namespace toppic {
 
-Proteoform::Proteoform(FastaSeqPtr fasta_seq_ptr,
-                       ProtModPtr prot_mod_ptr, 
+Proteoform::Proteoform(const FastaSeqPtr &fasta_seq_ptr,
+                       const ProtModPtr &prot_mod_ptr, 
                        int start_pos, int end_pos,
-                       ResSeqPtr res_seq_ptr, 
+                       const ResSeqPtr &res_seq_ptr, 
                        const MassShiftPtrVec & mass_shift_ptr_vec):
     fasta_seq_ptr_(fasta_seq_ptr),
     prot_mod_ptr_(prot_mod_ptr),
@@ -52,7 +52,7 @@ Proteoform::Proteoform(FastaSeqPtr fasta_seq_ptr,
                 MassShift::cmpPosInc);
     }
 
-Proteoform::Proteoform(XmlDOMElement element, FastaIndexReaderPtr reader_ptr,
+Proteoform::Proteoform(XmlDOMElement element, const FastaIndexReaderPtr &reader_ptr,
                        const ModPtrVec &fix_mod_list) {
   std::string seq_element_name = FastaSeq::getXmlElementName();
   XmlDOMElement seq_element
@@ -66,7 +66,7 @@ Proteoform::Proteoform(XmlDOMElement element, FastaIndexReaderPtr reader_ptr,
   parseXml(element, form_ptr);
 }
 
-void Proteoform::parseXml(XmlDOMElement element, ProteoformPtr form_ptr) {
+void Proteoform::parseXml(XmlDOMElement element, const ProteoformPtr &form_ptr) {
   start_pos_ = xml_dom_util::getIntChildValue(element, "start_pos", 0);
   end_pos_ = xml_dom_util::getIntChildValue(element, "end_pos", 0);
   proteo_cluster_id_ = xml_dom_util::getIntChildValue(element, "proteo_cluster_id", 0);
@@ -128,7 +128,7 @@ double Proteoform::getMinusWaterMass() {
   return mass - mass_constant::getWaterMass(); 
 }
 
-PtmPtrVec Proteoform::getPtmVec(AlterTypePtr type) {
+PtmPtrVec Proteoform::getPtmVec(const AlterTypePtr &type) {
   PtmPtrVec ptm_vec;
   for (size_t i = 0; i < mass_shift_list_.size(); i++) {
     if (mass_shift_list_[i]->getTypePtr() != type) {
@@ -175,7 +175,7 @@ ProteoformTypePtr Proteoform::getProteoformType() {
   }
 }
 
-int Proteoform::getAlterNum(AlterTypePtr type_ptr) {
+int Proteoform::getAlterNum(const AlterTypePtr &type_ptr) {
   int n = 0;
   for (size_t i = 0; i < mass_shift_list_.size(); i++) {
     if (mass_shift_list_[i]->getTypePtr() == type_ptr) {
@@ -190,7 +190,7 @@ int Proteoform::getVarPtmNum() {
 }
 
 
-MassShiftPtrVec Proteoform::getMassShiftPtrVec(AlterTypePtr type_ptr) {
+MassShiftPtrVec Proteoform::getMassShiftPtrVec(const AlterTypePtr &type_ptr) {
   MassShiftPtrVec shift_ptr_vec;
   for (size_t i = 0; i < mass_shift_list_.size(); i++) {
     if (mass_shift_list_[i]->getTypePtr() == type_ptr) {
@@ -265,7 +265,7 @@ void updateMatchSeq(const MassShiftPtrVec & shifts,
 
 }  // namespace
 
-std::string Proteoform::getAlterStr(AlterTypePtr type_ptr) {
+std::string Proteoform::getAlterStr(const AlterTypePtr &type_ptr) {
   MassShiftPtrVec shifts = getMassShiftPtrVec(type_ptr);
   std::string result;
   for (size_t i = 0; i < shifts.size(); i++) {

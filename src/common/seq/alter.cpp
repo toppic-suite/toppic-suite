@@ -25,8 +25,8 @@
 namespace toppic {
 
 Alter::Alter(int left_bp_pos, int right_bp_pos,
-             AlterTypePtr type_ptr,
-             double mass, ModPtr mod_ptr):
+             const AlterTypePtr &type_ptr,
+             double mass, const ModPtr &mod_ptr):
     left_bp_pos_(left_bp_pos),
     right_bp_pos_(right_bp_pos),
     type_ptr_(type_ptr),
@@ -76,7 +76,7 @@ void Alter::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) const {
   }
 }
 
-AlterPtr Alter::genAlterPtr(AlterPtr ori_ptr, int start_pos) {
+AlterPtr Alter::genAlterPtr(const AlterPtr &ori_ptr, int start_pos) {
   int left_bp_pos = ori_ptr->left_bp_pos_ - start_pos;
   int right_bp_pos = ori_ptr->right_bp_pos_ - start_pos;
   AlterTypePtr type_ptr = ori_ptr->type_ptr_;
@@ -88,7 +88,7 @@ AlterPtr Alter::genAlterPtr(AlterPtr ori_ptr, int start_pos) {
   return alter_ptr;
 }
 
-void Alter::setLocalAnno(LocalAnnoPtr p) {
+void Alter::setLocalAnno(const LocalAnnoPtr &p) {
   local_anno_ptr_ = p;
   if (p != nullptr) {
     left_bp_pos_ = p->getLeftBpPos();

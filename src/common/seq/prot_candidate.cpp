@@ -26,7 +26,7 @@ ProtCandidate::ProtCandidate(int protein_id, int score):
     score_(score) {
     }
 
-ProtCandidate::ProtCandidate(ProtScorePtr prot_score_ptr) {
+ProtCandidate::ProtCandidate(const ProtScorePtr &prot_score_ptr) {
   protein_id_ = prot_score_ptr->getId();
   score_ = prot_score_ptr->getScore();
   n_term_shifts_.push_back(prot_score_ptr->getNTermShift());

@@ -25,7 +25,7 @@
 
 namespace toppic {
 
-Mod::Mod(ResiduePtr ori_residue_ptr, ResiduePtr mod_residue_ptr, ModTypePtr mod_type_ptr):
+Mod::Mod(const ResiduePtr &ori_residue_ptr, const ResiduePtr &mod_residue_ptr, const ModTypePtr &mod_type_ptr):
     ori_residue_ptr_(ori_residue_ptr),
     mod_residue_ptr_(mod_residue_ptr),
     mod_type_ptr_(mod_type_ptr) {
@@ -46,7 +46,7 @@ Mod::Mod(XmlDOMElement element) {
   }
 }
 
-bool Mod::isSame(ModPtr mod_ptr) const {
+bool Mod::isSame(const ModPtr &mod_ptr) const {
   return ori_residue_ptr_ == mod_ptr->getOriResiduePtr()
       && mod_residue_ptr_ == mod_ptr->getModResiduePtr()
       && mod_type_ptr_ == mod_ptr->getModTypePtr();

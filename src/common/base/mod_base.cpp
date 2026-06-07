@@ -80,7 +80,7 @@ void ModBase::initBase(const std::string &base_dir) {
   }
 }
 
-ModPtr ModBase::getBaseModPtr(ModPtr mod_ptr) {
+ModPtr ModBase::getBaseModPtr(const ModPtr &mod_ptr) {
   for (size_t i = 0; i < mod_ptr_vec_.size(); i++) {
     if (mod_ptr_vec_[i]->isSame(mod_ptr)) {
       return mod_ptr_vec_[i];
@@ -90,9 +90,9 @@ ModPtr ModBase::getBaseModPtr(ModPtr mod_ptr) {
   return mod_ptr;
 }
 
-ModPtr ModBase::getBaseModPtr(ResiduePtr ori_residue, 
-                              ResiduePtr mod_residue, 
-                              ModTypePtr mod_type_ptr) {
+ModPtr ModBase::getBaseModPtr(const ResiduePtr &ori_residue, 
+                              const ResiduePtr &mod_residue, 
+                              const ModTypePtr &mod_type_ptr) {
   ModPtr mod_ptr = std::make_shared<Mod>(ori_residue, mod_residue, mod_type_ptr);
   return getBaseModPtr(mod_ptr);
 }

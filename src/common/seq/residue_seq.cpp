@@ -36,7 +36,7 @@ ResidueSeq::ResidueSeq(const ResiduePtrVec &residues):
   n_mod_ptr_ = ModBase::getNTermNoneModPtr();
 }
 
-ResidueSeq::ResidueSeq(const ResiduePtrVec &residues, ModPtr n_mod_ptr): 
+ResidueSeq::ResidueSeq(const ResiduePtrVec &residues, const ModPtr &n_mod_ptr): 
     residues_(residues), n_mod_ptr_(n_mod_ptr) {
   // get residue mass sum 
   residue_mass_sum_ = n_mod_ptr_->getShift();
@@ -94,7 +94,7 @@ ResSeqPtr ResidueSeq::getEmptyResidueSeq() {
   return std::make_shared<ResidueSeq>(residues);
 }
 
-void ResidueSeq::setNModPtr(ModPtr n_mod_ptr) {
+void ResidueSeq::setNModPtr(const ModPtr &n_mod_ptr) {
   n_mod_ptr_ = n_mod_ptr;
   residue_mass_sum_ = n_mod_ptr_->getShift();
   for (size_t i = 0; i < residues_.size(); i++) {

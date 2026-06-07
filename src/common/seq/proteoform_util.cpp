@@ -93,7 +93,7 @@ ResFreqPtrVec compResidueFreq(const ResiduePtrVec &residue_list,
   return res_freq_list;
 }
 
-bool isSameSeqAndMass(ProteoformPtr a, ProteoformPtr b, double ppo) {
+bool isSameSeqAndMass(const ProteoformPtr &a, const ProteoformPtr &b, double ppo) {
   if (a->getSeqName() != b->getSeqName()) {
     return false;
   }
@@ -115,7 +115,7 @@ bool isSameSeqAndMass(ProteoformPtr a, ProteoformPtr b, double ppo) {
   return true;
 }
 
-bool isStrictCompatiablePtmSpecies(ProteoformPtr a, ProteoformPtr b, double ppo) {
+bool isStrictCompatiablePtmSpecies(const ProteoformPtr &a, const ProteoformPtr &b, double ppo) {
   if (!isSameSeqAndMass(a, b, ppo)) {
     return false;
   }
@@ -178,7 +178,7 @@ ProteoformPtrVec2D divideProteoIntoBlocks(const ProteoformPtrVec &proteo_ptrs,
   return proteo_blocks;
 }
 
-std::vector<double> getNTermShift(ProteoformPtr db_form_ptr,
+std::vector<double> getNTermShift(const ProteoformPtr &db_form_ptr,
                                   const ProtModPtrVec &prot_mod_ptrs) {
   std::vector<double> shifts;
   for (size_t i = 0; i < prot_mod_ptrs.size(); i++) {
@@ -193,7 +193,7 @@ std::vector<double> getNTermShift(ProteoformPtr db_form_ptr,
   return shifts;
 }
 
-std::vector<double> getNTermAcets(ProteoformPtr db_form_ptr,
+std::vector<double> getNTermAcets(const ProteoformPtr &db_form_ptr,
                                   const ProtModPtrVec &prot_mod_ptrs) {
   std::vector<double> shifts;
   for (size_t i = 0; i < prot_mod_ptrs.size(); i++) {

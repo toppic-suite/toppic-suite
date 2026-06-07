@@ -21,7 +21,7 @@ namespace toppic {
 
 class FastaSubSeq : public FastaSeq {
  public:
-  FastaSubSeq(FastaSeqPtr seq_ptr, int sub_seq_start, int sub_seq_len);
+  FastaSubSeq(const FastaSeqPtr &seq_ptr, int sub_seq_start, int sub_seq_len);
 
   int getSubSeqStart() const {return sub_seq_start_;}
 

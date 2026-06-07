@@ -26,7 +26,7 @@
 namespace toppic {
 
 ProtMod::ProtMod(const std::string &name, const std::string &type,
-                 TruncPtr trunc_ptr, ModPtr mod_ptr):
+                 const TruncPtr &trunc_ptr, const ModPtr &mod_ptr):
     name_(name),
     type_(type),
     trunc_ptr_(trunc_ptr),

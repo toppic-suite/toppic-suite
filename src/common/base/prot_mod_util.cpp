@@ -25,7 +25,7 @@ namespace toppic {
 
 namespace prot_mod_util {
 
-bool allowMod(ProtModPtr prot_mod_ptr, const ResiduePtrVec &residues) {
+bool allowMod(const ProtModPtr &prot_mod_ptr, const ResiduePtrVec &residues) {
   // Case 1. no protein modification
   if (prot_mod_ptr == ProtModBase::getProtModPtr_NONE()) {
     return true;
@@ -71,7 +71,7 @@ bool allowMod(ProtModPtr prot_mod_ptr, const ResiduePtrVec &residues) {
   return true;
 }
 
-bool containMod(const ProtModPtrVec &prot_mod_ptr_vec, ProtModPtr prot_mod_ptr) {
+bool containMod(const ProtModPtrVec &prot_mod_ptr_vec, const ProtModPtr &prot_mod_ptr) {
   for (size_t i = 0; i < prot_mod_ptr_vec.size(); i++) {
     if (prot_mod_ptr_vec[i] == prot_mod_ptr) {
       return true;

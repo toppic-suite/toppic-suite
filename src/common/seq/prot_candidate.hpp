@@ -31,7 +31,7 @@ class ProtCandidate {
  public:
   ProtCandidate(int protein_id, int score);
 
-  explicit ProtCandidate(ProtScorePtr prot_score_ptr);
+  explicit ProtCandidate(const ProtScorePtr &prot_score_ptr);
 
   int getProteinId() const {return protein_id_;}
   int getScore() const {return score_;}
