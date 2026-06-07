@@ -98,6 +98,17 @@ message(STATUS "Bin installation directory:  ${CMAKE_INSTALL_PREFIX}/${CMAKE_INS
 message(STATUS "Lib installation directory:  ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 message(STATUS "Data installation directory: ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATADIR}")
 
+# Compile the resolved (absolute) data directory into the binaries so that
+# file_util::getSharedDirName() / getResourceDir() look exactly where the
+# resources are installed, instead of a hard-coded /usr/share/toppic.
+if(IS_ABSOLUTE "${CMAKE_INSTALL_DATADIR}")
+  set(TOPPIC_SHARED_DIR "${CMAKE_INSTALL_DATADIR}")
+else()
+  set(TOPPIC_SHARED_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATADIR}")
+endif()
+add_compile_definitions(TOPPIC_SHARED_DIR="${TOPPIC_SHARED_DIR}")
+message(STATUS "Compiled-in shared dir:      ${TOPPIC_SHARED_DIR}")
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/../bin)
 message(STATUS "Executable output directory: " ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 

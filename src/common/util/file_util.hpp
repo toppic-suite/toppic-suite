@@ -69,7 +69,15 @@ void moveFile(const std::string &file_name, const std::string &folder_name);
 
 inline std::string getToppicResourceDirName() { return "resources"; }
 
-inline std::string getSharedDirName() { return "/usr/share/toppic"; }
+// TOPPIC_SHARED_DIR is defined by CMake as the configured install data dir
+// (CMAKE_INSTALL_DATADIR, e.g. <prefix>/share/toppic), so getSharedDirName()
+// matches where the resources are actually installed. The fallback is only for
+// builds that do not go through CMake.
+#ifndef TOPPIC_SHARED_DIR
+#define TOPPIC_SHARED_DIR "/usr/local/share/toppic"
+#endif
+
+inline std::string getSharedDirName() { return TOPPIC_SHARED_DIR; }
 
 std::string getResourceDir(const std::string &exec_dir);
 
