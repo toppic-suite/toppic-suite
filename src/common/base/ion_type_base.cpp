@@ -1,0 +1,73 @@
+//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+//
+//Licensed under the Apache License, Version 2.0 (the "License");
+//you may not use this file except in compliance with the License.
+//You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+//Unless required by applicable law or agreed to in writing, software
+//distributed under the License is distributed on an "AS IS" BASIS,
+//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//See the License for the specific language governing permissions and
+//limitations under the License.
+
+#include "common/base/ion_type_base.hpp"
+
+#include <stdexcept>
+#include <string>
+
+#include "common/util/logger.hpp"
+#include "common/util/file_util.hpp"
+#include "common/xml/xml_dom_parser.hpp"
+#include "common/xml/xml_dom_document.hpp"
+#include "common/xml/xml_dom_util.hpp"
+
+namespace toppic {
+
+std::unordered_map<std::string, IonTypePtr> IonTypeBase::ion_type_name_map_;
+IonTypePtr IonTypeBase::ion_type_ptr_B_;
+IonTypePtr IonTypeBase::ion_type_ptr_PREC_;
+
+// class functions
+void IonTypeBase::initBase(const std::string &base_dir) {
+  XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
+  if (!parser) {
+    LOG_ERROR("Error in parsing ion type data!");
+    throw std::runtime_error("Error in parsing ion type data!");
+  }
+
+  std::string ion_type_base_file_name = base_dir 
+      + file_util::getFileSeparator() + "ion_type_base.xml";
+  std::string ion_type_base_data = file_util::readFile(ion_type_base_file_name);
+  XmlDOMDocument doc(parser->parseStr(ion_type_base_data));
+  XmlDOMElement parent = doc.getDocumentElement();
+  std::string element_name = IonType::getXmlElementName();
+  int ion_type_num = xml_dom_util::getChildCount(parent, element_name.c_str());
+  for (int i = 0; i < ion_type_num; i++) {
+    XmlDOMElement element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
+    IonTypePtr ion_type_ptr = std::make_shared<IonType>(element);
+    ion_type_name_map_[ion_type_ptr->getName()] = ion_type_ptr;
+    if (ion_type_ptr->getName() == getName_B()) {
+      ion_type_ptr_B_ = ion_type_ptr;
+    }
+    if (ion_type_ptr->getName() == getName_PREC()) {
+      ion_type_ptr_PREC_ = ion_type_ptr;
+    }
+  }
+  if (ion_type_ptr_B_ == nullptr || ion_type_ptr_PREC_ == nullptr) {
+    LOG_ERROR("Ion type configuration file is incomplete!");
+    throw std::runtime_error("Ion type configuration file is incomplete!");
+  }
+}
+
+IonTypePtr IonTypeBase::getIonTypePtrByName(const std::string &name) {
+  auto it = ion_type_name_map_.find(name);
+  if (it == ion_type_name_map_.end()) {
+    LOG_WARN("Ion type " << name << " cannot be found!");
+    return nullptr;
+  }
+  return it->second;
+}
+
+}  // namespace toppic

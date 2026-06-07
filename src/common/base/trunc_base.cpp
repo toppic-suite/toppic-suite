@@ -1,0 +1,68 @@
+//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+//
+//Licensed under the Apache License, Version 2.0 (the "License");
+//you may not use this file except in compliance with the License.
+//You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+//Unless required by applicable law or agreed to in writing, software
+//distributed under the License is distributed on an "AS IS" BASIS,
+//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//See the License for the specific language governing permissions and
+//limitations under the License.
+
+#include "common/base/trunc_base.hpp"
+
+#include <stdexcept>
+#include <string>
+
+#include "common/util/logger.hpp"
+#include "common/util/file_util.hpp"
+#include "common/xml/xml_dom_document.hpp"
+#include "common/xml/xml_dom_parser.hpp"
+#include "common/xml/xml_dom_util.hpp"
+
+namespace toppic {
+
+TruncPtrVec TruncBase::trunc_ptr_vec_;
+std::unordered_map<std::string, TruncPtr> TruncBase::trunc_name_map_;
+
+void TruncBase::initBase(const std::string &base_dir) {
+  XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
+  if (!parser) {
+    LOG_ERROR("Error in parsing truncation data!");
+    throw std::runtime_error("Error in parsing truncation data!");
+  }
+
+  std::string trunc_base_file_name = base_dir 
+      + file_util::getFileSeparator() + "trunc_base.xml";
+  std::string trunc_base_data = file_util::readFile(trunc_base_file_name);
+  XmlDOMDocument doc(parser->parseStr(trunc_base_data));
+  XmlDOMElement parent = doc.getDocumentElement();
+  std::string element_name = Trunc::getXmlElementName();
+  int trunc_num = xml_dom_util::getChildCount(parent, element_name.c_str());
+  for (int i = 0; i < trunc_num; i++) {
+    XmlDOMElement element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
+    TruncPtr trunc_ptr = std::make_shared<Trunc>(element);
+    trunc_ptr_vec_.push_back(trunc_ptr);
+    trunc_name_map_[trunc_ptr->getName()] = trunc_ptr;
+  }
+}
+
+TruncPtr TruncBase::getTruncPtrByName(const std::string &name) {
+  auto it = trunc_name_map_.find(name);
+  if (it == trunc_name_map_.end()) {
+    LOG_WARN("Truncation " << name << " cannot be found!");
+    return nullptr;
+  }
+  return it->second;
+}
+
+TruncPtr TruncBase::getTruncPtrFromXml(XmlDOMElement element) {
+  std::string name = Trunc::getNameFromXml(element);
+  return getTruncPtrByName(name);
+}
+
+}  // namespace toppic
+
