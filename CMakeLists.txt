@@ -136,6 +136,24 @@ message(STATUS "Cmake shared linker flags: " ${CMAKE_SHARED_LINKER_FLAGS})
 find_package(pugixml REQUIRED)
 message(STATUS "pugixml version: ${pugixml_VERSION}")
 
+# A trimmed copy of htslib (faidx/bgzf/hfile only) is vendored under ext/htslib;
+# common/seq/fasta_index_reader uses faidx to random-access indexed FASTA files.
+# It is built as a small static library and linked into toppic_common. The
+# vendored C sources include themselves as "htslib/<name>.h", so the parent
+# ext/ directory is the include root. zlib (and threads, for BGZF_MT) are the
+# only external dependencies.
+find_package(ZLIB REQUIRED)
+find_package(Threads REQUIRED)
+file(GLOB HTSLIB_SRCS CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/ext/htslib/*.c)
+add_library(htslib STATIC ${HTSLIB_SRCS})
+target_include_directories(htslib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/ext)
+target_link_libraries(htslib PUBLIC ZLIB::ZLIB Threads::Threads)
+# The vendored C sources are third-party; keep their (many) warnings out of our
+# build output and build them with position-independent code so they can be
+# linked into the toppic_common shared library.
+set_target_properties(htslib PROPERTIES POSITION_INDEPENDENT_CODE ON)
+target_compile_options(htslib PRIVATE -w)
+
 # src for the hand-written headers, and the build-tree gen/ dir for the
 # CMake-generated common/util/version.hpp.
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_BINARY_DIR}/gen)
@@ -153,6 +171,12 @@ target_include_directories(toppic_common PUBLIC
 # PUBLIC: the common/xml headers expose pugixml types, so consumers of
 # toppic_common need pugixml on their include and link lines too.
 target_link_libraries(toppic_common PUBLIC pugixml::pugixml)
+
+# common/seq/fasta_index_reader.hpp includes <htslib/faidx.h>, so the vendored
+# htslib include path is PUBLIC; the library itself is an implementation detail
+# (PRIVATE) of toppic_common.
+target_include_directories(toppic_common PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/ext)
+target_link_libraries(toppic_common PRIVATE htslib)
 
 # Install the shared library using the prefix-relative GNUInstallDirs locations.
 # On Linux/macOS it is a LIBRARY artifact and lands in <prefix>/lib/toppic
