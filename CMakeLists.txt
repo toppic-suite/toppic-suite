@@ -42,6 +42,30 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
 endif()
 
+# Export compile_commands.json (used by include-what-you-use's iwyu_tool.py,
+# clangd, and clang-tidy).
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# Optional include-what-you-use (IWYU) analysis. Off by default because IWYU is
+# slow, noisy, and not always installed. Enable with -DTOPPIC_ENABLE_IWYU=ON
+# (requires the include-what-you-use tool, e.g. `apt install iwyu`). IWYU runs
+# alongside the compiler and prints its add/remove-include suggestions as build
+# output; the build itself still proceeds normally.
+option(TOPPIC_ENABLE_IWYU "Run include-what-you-use during compilation" OFF)
+if(TOPPIC_ENABLE_IWYU)
+  find_program(IWYU_EXECUTABLE NAMES include-what-you-use iwyu)
+  if(IWYU_EXECUTABLE)
+    message(STATUS "include-what-you-use enabled: ${IWYU_EXECUTABLE}")
+    # Pass options through to IWYU itself with -Xiwyu (mapping files, verbosity,
+    # etc.); none are needed for now.
+    set(CMAKE_CXX_INCLUDE_WHAT_YOU_USE "${IWYU_EXECUTABLE}")
+  else()
+    message(WARNING
+      "TOPPIC_ENABLE_IWYU=ON but include-what-you-use was not found; "
+      "install it (e.g. 'apt install iwyu') or pass -DIWYU_EXECUTABLE=/path/to/it.")
+  endif()
+endif()
+
 # Homebrew on Apple Silicon installs to /opt/homebrew (Intel Macs use /usr/local).
 # Neither prefix is on the default compiler / linker search path, so the project's
 # bare-name target_link_libraries calls and #include directives need help here.
