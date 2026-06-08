@@ -139,13 +139,43 @@ include themselves as `"htslib/<name>.h"` and `fasta_index_reader.hpp` exposes
 Notes:
 - It is third-party C code: do not reformat it or hold it to this project's
   include-order / IWYU rules. The `-w` flag deliberately silences its warnings.
-- `ext/htslib` is the **only** non-pugixml external dependency; do not add
-  htslib calls outside `seq` without reason.
+- do not add htslib calls outside `seq` without reason.
+
+## Other external dependencies
+
+Besides pugixml (XML) and the vendored htslib (indexed FASTA), the layers below
+pull in a few system libraries, all found via `find_package`/the default include
+path and linked into `toppic_common`:
+
+- **SQLite3** (`find_package(SQLite3)` → `SQLite::SQLite3`) — used by
+  `sql/sql_util` and `ms/mzml/mzml_ms_sql_writer`.
+- **rapidjson** — header-only, on the default include path (no `find_package`,
+  no link); used by `ms/mzml/mzml_ms_json_writer`.
+- **Boost uBLAS** — header-only; used by `ms/util` (Savitzky-Golay). Its headers
+  still derive from the C++17-deprecated `std::iterator`, so wrap Boost includes
+  in `#pragma GCC diagnostic ignored "-Wdeprecated-declarations"` to keep the
+  build warning-free. (Prefer `std::mutex` etc. over `boost::*` in our own code.)
+
+**ProteoWizard (pwiz)** is *not* available here. `ms/mzml/pw_ms_reader` and
+`ms/mzml/mzml_ms_group_reader` (which includes it) read mzML via pwiz and are
+therefore **not yet migrated** — pwiz is vendored as `ext/pwiz` upstream and is
+too large to bring in. Nothing else depends on them.
 
 ## Source layout
 
-`src/common` holds the foundation layers (`base`, `util`, `xml`, `thread`);
-`src/seq` is the sequence/proteoform layer built on top of them and depends on
-`common/...` (but not vice versa). Both compile into the single `toppic_common`
-shared library (the `COMMON_SRCS` glob covers `src/common` and `src/seq`), and
-`src` is the include root, so headers are included as `common/...` or `seq/...`.
+`src` is the include root, so headers are included by their path from `src`
+(`common/...`, `seq/...`, `ms/spec/...`, `para/...`, `sql/...`). All of the
+following compile into the single `toppic_common` shared library (the
+`COMMON_SRCS` glob in `CMakeLists.txt` lists each directory). Each layer depends
+only on the ones above it, never the reverse:
+
+- `src/common` — foundation: `base`, `util`, `xml`, `thread`.
+- `src/sql` — thin SQLite helper (`sql_util`).
+- `src/para` — analysis parameters (`sp_para`, `peak_tolerance`).
+- `src/seq` — sequence/proteoform layer.
+- `src/ms` — mass-spectrum layer: `spec` (peaks/spectra/msalign), `util`,
+  `msmap`, `factory`, `env` (envelope detection), `feature`, `mzml`.
+
+When migrating a folder from the upstream Xerces tree, watch for include guards
+that don't match the destination path (e.g. an `ms/env` file guarded
+`TOPPIC_TOPFD_ENV_*`) and rename them to `TOPPIC_<PATH>_<FILE>_HPP_`.
