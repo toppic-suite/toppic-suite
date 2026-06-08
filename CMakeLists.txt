@@ -151,7 +151,7 @@ find_package(Threads REQUIRED)
 find_package(SQLite3 REQUIRED)
 file(GLOB HTSLIB_SRCS CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/ext/htslib/*.c)
 add_library(htslib STATIC ${HTSLIB_SRCS})
-target_include_directories(htslib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/ext)
+target_include_directories(htslib SYSTEM PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/ext)
 target_link_libraries(htslib PUBLIC ZLIB::ZLIB Threads::Threads)
 # The vendored C sources are third-party; keep their (many) warnings out of our
 # build output and build them with position-independent code so they can be
@@ -173,7 +173,7 @@ file(GLOB PWIZ_SRCS CONFIGURE_DEPENDS
   ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/data/msdata/*.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/data/msdata/mzmlb/*.cpp)
 add_library(pwiz STATIC ${PWIZ_SRCS})
-target_include_directories(pwiz PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/ext)
+target_include_directories(pwiz SYSTEM PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/ext)
 target_link_libraries(pwiz PUBLIC
   Boost::filesystem Boost::iostreams Boost::thread Boost::chrono Boost::system
   ZLIB::ZLIB)
@@ -209,7 +209,7 @@ target_link_libraries(toppic_common PUBLIC pugixml::pugixml)
 # seq/fasta_index_reader.hpp includes <htslib/faidx.h>, so the vendored
 # htslib include path is PUBLIC; the library itself is an implementation detail
 # (PRIVATE) of toppic_common.
-target_include_directories(toppic_common PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/ext)
+target_include_directories(toppic_common SYSTEM PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/ext)
 target_link_libraries(toppic_common PRIVATE htslib)
 
 # sql/sql_util.hpp and ms/mzml/mzml_ms_sql_writer.hpp expose <sqlite3.h>, so the
