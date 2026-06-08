@@ -72,7 +72,6 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["useFeatureFile"] = "true";
   arguments["keepTempFiles"] = "false";
   arguments["keepDecoyResults"] = "false";
-  arguments["geneHTMLFolder"] = "true";
   arguments["combineResultOnly"] = "false";
   arguments["outputRawPrsmTable"]="false";
   arguments["outputPrsmCoverage"]="false";
@@ -261,8 +260,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         ("combined-file-name,c", po::value<std::string>(&combined_output_name) , "Specify a file name for the combined spectrum data file and analysis results.")
         ("no-topfd-feature,x", "No TopFD feature file for proteoform identification.")
         ("keep-temp-files,k", "Keep intermediate files.")
-        ("keep-decoy-ids,K", "Keep decoy identifications.")
-        ("skip-html-folder,g", "Skip the generation of HTML files for visualization.");
+        ("keep-decoy-ids,K", "Keep decoy identifications.");
 
     po::options_description desc("Options");
 
@@ -296,7 +294,6 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         ("no-topfd-feature,x", "")
         ("keep-temp-files,k", "")
         ("keep-decoy-ids,K", "")
-        ("skip-html-folder,g","")
         ("combine-result-only,C","")
         ("output-raw-prsm-table,o","")
         ("output-prsm-coverage,O","")
@@ -464,10 +461,6 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
     if (vm.count("keep-decoy-ids")) {
       arguments_["keepDecoyResults"] = "true";
     }
-
-    if (vm.count("skip-html-folder")) {
-      arguments_["geneHTMLFolder"] = "false";
-    }   
 
     if (vm.count("combine-result-only")) {
       arguments_["combineResultOnly"] = "true";

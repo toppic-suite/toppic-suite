@@ -125,7 +125,6 @@ void TopmgWindow::on_defaultButton_clicked() {
   ui->decoyCheckBox->setChecked(false);
   ui->topfdFeatureCheckBox->setChecked(false);
   ui->asfDiagCheckBox->setChecked(false);
-  ui->geneHTMLCheckBox->setChecked(true);
   ui->wholeProteinCheckBox->setChecked(false);
   ui->maxGapLength->setText(QString::fromStdString(arguments_["proteoGraphGap"]));
   ui->maxVarPTMGap->setText(QString::fromStdString(arguments_["varPtmNumInGap"]));
@@ -307,11 +306,6 @@ std::map<std::string, std::string> TopmgWindow::getArguments() {
   } else {
     arguments_["useAsfDiag"] = "false";
   }
-  if (ui->geneHTMLCheckBox->isChecked()) {
-    arguments_["geneHTMLFolder"] = "true";
-  } else {
-    arguments_["geneHTMLFolder"] = "false";
-  }
   if (ui->wholeProteinCheckBox->isChecked()) {
     arguments_["wholeProteinOnly"] = "true";
   } else {
@@ -411,7 +405,6 @@ void TopmgWindow::lockDialog() {
   ui->outputButton->setEnabled(false);
   ui->addButton->setEnabled(false);
   ui->delButton->setEnabled(false);
-  ui->geneHTMLCheckBox->setEnabled(false);
   ui->wholeProteinCheckBox->setEnabled(false);
   ui->maxGapLength->setEnabled(false);
   ui->maxVarPTMGap->setEnabled(false);
@@ -455,7 +448,6 @@ void TopmgWindow::unlockDialog() {
   ui->outputButton->setDefault(true);
   ui->addButton->setEnabled(true);
   ui->delButton->setEnabled(true);
-  ui->geneHTMLCheckBox->setEnabled(true);
   ui->wholeProteinCheckBox->setEnabled(true);
   ui->maxGapLength->setEnabled(true);
   ui->maxVarPTMGap->setEnabled(true);

@@ -69,8 +69,6 @@
 #include "stat/mcmc/mcmc_mng.hpp"
 #include "stat/mcmc/mcmc_dpr_processor.hpp"
 
-#include "visual/xml_generator.hpp"
-#include "visual/json_transformer.hpp"
 
 #include "console/topmg_argument.hpp"
 
@@ -367,18 +365,7 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
     table_out = nullptr;
     std::cout << "Outputting PrSM table - finished." << std::endl;
 
-    XmlGeneratorPtr xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, resource_dir, "topmg_prsm_cutoff", "topmg_prsm_cutoff");
     
-    if (arguments["geneHTMLFolder"] == "true"){//only when the parameter is set to true
-      std::cout << "Generating PrSM xml files - started." << std::endl;
-      xml_gene->process();
-      xml_gene = nullptr;
-      std::cout << "Generating PrSM xml files - finished." << std::endl;
-
-      std::cout << "Converting PrSM xml files to html files - started." << std::endl;
-      jsonTranslate(arguments, "topmg_prsm_cutoff");
-      std::cout << "Converting PrSM xml files to html files - finished." << std::endl;  
-    }
     
     cutoff_type = (arguments["cutoffProteoformType"] == "FDR") ? "FORMFDR": "EVALUE";
     std::cout << "PrSM filtering by " << cutoff_type << " - started." << std::endl;
@@ -402,18 +389,6 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
     form_out = nullptr;
     std::cout << "Outputting proteoform table - finished." << std::endl;
 
-    if (arguments["geneHTMLFolder"] == "true"){//only when the parameter is set to true
-      std::cout << "Generating proteoform xml files - started." << std::endl;
-      xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, resource_dir, "topmg_form_cutoff", "topmg_proteoform_cutoff");
-
-      xml_gene->process();
-      xml_gene = nullptr;
-      std::cout << "Generating proteoform xml files - finished." << std::endl;
-
-      std::cout << "Converting proteoform xml files to html files - started." << std::endl;
-      jsonTranslate(arguments, "topmg_proteoform_cutoff");
-      std::cout << "Converting proteoform xml files to html files - finished." << std::endl;
-    }
   } catch (const char* e) {
     LOG_ERROR("[Exception]" << e);
   }
@@ -506,8 +481,6 @@ int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
     std::string sp_file_name = merged_file_name + "_ms2.msalign";
     arguments["spectrumFileName"] = sp_file_name;
     arguments["startTime"] = combined_start_time;
-    // do not generate html files for combined file
-    arguments["geneHTMLFolder"] = "false";
     TopMG_post(arguments);
     cleanTopmgDir(ori_db_file_name, sp_file_name, keep_temp_files);
   }

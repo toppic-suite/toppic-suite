@@ -177,7 +177,6 @@ std::map<std::string, std::string> toppic_para {
     {"useFeatureFile", "-x "},
     {"keepTempFiles", "-k "},
     {"keepDecoyResults", "-K "},
-    {"geneHTMLFolder", "-g "},
     {"combinedOutputName", "-c "},
     {"massErrorTolerance", "-e "},
     {"groupSpectrumNumber", "-r "},
@@ -218,11 +217,6 @@ std::string geneToppicCommand(std::map<std::string, std::string> arguments_,
       }
       else if (it->first == "keepTempFiles" || it->first == "keepDecoyResults") {
         if (it->second == "true") {
-          command = command + toppic_para[it->first];
-        }
-      }
-      else if (it->first == "geneHTMLFolder" ) {//for geneHTML folder, the argument should be added when the value is false
-        if (it->second != "true") {
           command = command + toppic_para[it->first];
         }
       }
@@ -270,7 +264,6 @@ std::map<std::string, std::string> topmg_para {
     {"useFeatureFile", "-x "},
     {"keepTempFiles", "-k "},
     {"keepDecoyResults", "-K "},
-    {"geneHTMLFolder", "-g "},
     {"combinedOutputName", "-c "},
     {"massErrorTolerance", "-e "},
     {"useAsfDiag", "-D "},
@@ -312,11 +305,6 @@ std::string geneTopmgCommand(std::map<std::string, std::string> arguments_,
       }
       else if (it->first == "keepTempFiles" || it->first == "keepDecoyResults") {
         if (it->second == "true") {
-          command = command + topmg_para[it->first];
-        }
-      }
-      else if (it->first == "geneHTMLFolder" ) {//for geneHTML folder, the argument should be added when the value is false
-        if (it->second != "true") {
           command = command + topmg_para[it->first];
         }
       }

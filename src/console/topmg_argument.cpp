@@ -67,7 +67,6 @@ std::map<std::string, std::string> TopmgArgument::initArguments() {
   arguments["useAsfDiag"] = "false";
   arguments["varPtmNumber"] = "5";
   arguments["varPtmNumInGap"] = "5";
-  arguments["geneHTMLFolder"] = "true";
   arguments["wholeProteinOnly"] = "false";
   arguments["keepDecoyResults"] = "false";
   arguments["version"] = "";
@@ -221,8 +220,7 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
         ("whole-protein-only,w", "Report only proteoforms from whole proteins.")
         ("combined-file-name,c", po::value<std::string>(&combined_output_name) , "Specify a file name for the combined spectrum data file and analysis results.")
         ("keep-temp-files,k", "Keep intermediate files.")
-        ("keep-decoy-ids,K", "Keep decoy identifications.")
-        ("skip-html-folder,g", "Skip the generation of HTML files for visualization.");
+        ("keep-decoy-ids,K", "Keep decoy identifications.");
   
     po::options_description desc("Options");
 
@@ -254,7 +252,6 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
         ("whole-protein-only,w", "")
         ("keep-temp-files,k", "")
         ("keep-decoy-ids,K", "")
-        ("skip-html-folder,g", "")
         ("database-file-name", po::value<std::string>(&database_file_name)->required(), "Database file name with its path.")
         ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), "Spectrum file name with its path.");
 
@@ -408,10 +405,6 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
 
     if (vm.count("keep-decoy-ids")) {
       arguments_["keepDecoyResults"] = "true";
-    }
-
-    if (vm.count("skip-html-folder")) {
-      arguments_["geneHTMLFolder"] = "false";
     }
   }
   catch(std::exception & e) {

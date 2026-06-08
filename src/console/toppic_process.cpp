@@ -24,6 +24,8 @@
 #include "common/base/base_data.hpp"
 #include "common/base/mod_util.hpp"
 #include "common/base/ptm_util.hpp"
+#include "common/util/file_util.hpp"
+#include "common/util/logger.hpp"
 #include "common/util/mem_check.hpp"
 #include "common/util/version.hpp"
 
@@ -75,8 +77,6 @@
 #include "stat/local/local_mng.hpp"
 #include "stat/local/local_processor.hpp"
 
-#include "visual/xml_generator.hpp"
-#include "visual/json_transformer.hpp"
 
 #include "console/toppic_argument.hpp"
 
@@ -483,19 +483,6 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     table_out = nullptr;
     std::cout << "Outputting PrSM table - finished." << std::endl;
 
-    XmlGeneratorPtr xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, resource_dir, 
-                                                              cur_suffix, "toppic_prsm_cutoff");
-    if (arguments["geneHTMLFolder"] == "true"){
-      std::cout << "Generating PrSM XML files - started." << std::endl;
-    
-      xml_gene->process();
-      xml_gene = nullptr;
-      std::cout << "Generating PrSM XML files - finished." << std::endl;
-
-      std::cout << "Converting PrSM XML files to JSON files - started." << std::endl;
-      jsonTranslate(arguments, "toppic_prsm_cutoff");
-      std::cout << "Converting PrSM XML files to JSON files - finished." << std::endl;
-    }
 
     if (arguments["outputPrsmCoverage"] == "true") {
       std::cout << "Outputting PrSM coverage - started." << std::endl;
@@ -525,20 +512,6 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     form_out = nullptr;
     std::cout << "Outputting proteoform table - finished." << std::endl;
 
-    if (arguments["geneHTMLFolder"] == "true"){
-
-      std::cout << "Generating proteoform XML files - started." << std::endl;
-      xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, resource_dir, 
-                                              "toppic_form_cutoff", 
-                                              "toppic_proteoform_cutoff");
-    
-      xml_gene->process();
-      xml_gene = nullptr;
-      std::cout << "Generating proteoform XML files - finished." << std::endl;
-      std::cout << "Converting proteoform XML files to HTML files - started." << std::endl;
-      jsonTranslate(arguments, "toppic_proteoform_cutoff");
-      std::cout << "Converting proteoform XML files to HTML files - finished." << std::endl;
-    }
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;
@@ -636,8 +609,6 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
     std::string sp_file_name = merged_file_name + "_ms2.msalign";
     arguments["spectrumFileName"] = sp_file_name;
     arguments["startTime"] = combined_start_time;
-    // do not generate html files for combined file
-    arguments["geneHTMLFolder"] = "false";
 
     TopPIC_post(arguments);
     sp_file_name = merged_file_name + "_ms2.msalign";

@@ -140,7 +140,6 @@ void ToppicWindow::on_defaultButton_clicked() {
 
   ui->decoyCheckBox->setChecked(false);
   ui->topfdFeatureCheckBox->setChecked(false);
-  ui->geneHTMLCheckBox->setChecked(true);
   ui->keepDecoyCheckBox->setChecked(false);
   ui->keepTempCheckBox->setChecked(false);
 }
@@ -355,11 +354,6 @@ std::map<std::string, std::string> ToppicWindow::getArguments() {
   } else {
     arguments_["useFeatureFile"] = "true";
   }
-  if (ui->geneHTMLCheckBox->isChecked()) {
-    arguments_["geneHTMLFolder"] = "true";
-  } else {
-    arguments_["geneHTMLFolder"] = "false";
-  }
   //showArguments();
   return arguments_;
 }
@@ -465,7 +459,6 @@ void ToppicWindow::lockDialog() {
   ui->outputButton->setEnabled(false);
   ui->addButton->setEnabled(false);
   ui->delButton->setEnabled(false);
-  ui->geneHTMLCheckBox->setEnabled(false);
   ui->keepDecoyCheckBox->setEnabled(false);
   ui->keepTempCheckBox->setEnabled(false);
 }
@@ -513,7 +506,6 @@ void ToppicWindow::unlockDialog() {
   ui->outputButton->setDefault(true);
   ui->addButton->setEnabled(true);
   ui->delButton->setEnabled(true);
-  ui->geneHTMLCheckBox->setEnabled(true);
   ui->keepDecoyCheckBox->setEnabled(true);
   ui->keepTempCheckBox->setEnabled(true);
 }
