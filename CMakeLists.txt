@@ -196,7 +196,8 @@ file(GLOB_RECURSE COMMON_SRCS CONFIGURE_DEPENDS
   ${CMAKE_CURRENT_SOURCE_DIR}/src/sql/*.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/ms/*.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/topfd/*.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/topdia/*.cpp)
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/topdia/*.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/prsm/*.cpp)
 
 add_library(toppic_common SHARED ${COMMON_SRCS})
 target_include_directories(toppic_common PUBLIC
