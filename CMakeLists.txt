@@ -164,7 +164,7 @@ target_compile_options(htslib PRIVATE -w)
 # as a static library against Boost + zlib and linked into toppic_common. The
 # vendored sources include themselves as "pwiz/...", so ext/ is the include root.
 # WITHOUT_MZ5 drops the HDF5-backed mz5 format so no HDF5 dependency is needed.
-find_package(Boost 1.74 REQUIRED COMPONENTS filesystem iostreams thread chrono system)
+find_package(Boost 1.74 REQUIRED COMPONENTS filesystem iostreams thread chrono system serialization)
 file(GLOB PWIZ_SRCS CONFIGURE_DEPENDS
   ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/utility/minimxml/*.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/utility/misc/*.cpp
@@ -197,7 +197,8 @@ file(GLOB_RECURSE COMMON_SRCS CONFIGURE_DEPENDS
   ${CMAKE_CURRENT_SOURCE_DIR}/src/ms/*.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/topfd/*.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/topdia/*.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/prsm/*.cpp)
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/prsm/*.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/*.cpp)
 
 add_library(toppic_common SHARED ${COMMON_SRCS})
 target_include_directories(toppic_common PUBLIC
@@ -222,6 +223,10 @@ target_link_libraries(toppic_common PUBLIC SQLite::SQLite3)
 # ms/mzml/pw_ms_reader.hpp exposes pwiz types (pwiz::msdata::*), so consumers of
 # toppic_common need the pwiz headers (and Boost) too: link pwiz PUBLIC.
 target_link_libraries(toppic_common PUBLIC pwiz)
+
+# filter/massmatch/mass_match (de)serializes its index with Boost.Serialization;
+# its header exposes boost::serialization::access, so link it PUBLIC.
+target_link_libraries(toppic_common PUBLIC Boost::serialization)
 
 # ONNX Runtime: topfd/envcnn and topfd/ecscore/score run the EnvCNN / ECScore
 # neural-network models via the ONNX Runtime C++ API. A prebuilt libonnxruntime
