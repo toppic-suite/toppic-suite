@@ -249,11 +249,20 @@ only on the ones above it, never the reverse:
 - `src/visual` — TopMSV annotation output (`anno_*` + `xml_generator` build the
   annotation XML with the migrated pugixml `XmlWriter`; `json_transformer`
   converts it to JSON via the vendored `xml2json`).
+- `src/merge` — the topdiff feature-merge backend (`feature_prsm`,
+  `feature_sample_merge`), used by `console/topdiff_process`.
 
 These are all library layers. The **executable** layers are separate (they are
 NOT in `COMMON_SRCS`; each is its own `add_executable` that links
 `toppic_common`):
 
+- `src/console` — the command-line tools. Each is a `main()` (`topfd.cpp`,
+  `topdia.cpp`, `topindex.cpp`, `toppic.cpp`, `topmg.cpp`, `topdiff.cpp`) plus
+  its `<tool>_argument.cpp` parser (`boost::program_options`) plus, for the four
+  multi-step tools, its `<tool>_process.cpp` orchestrator. topfd/topdia have no
+  `*_process` here — they drive the `topfd_process`/`topdia_process`
+  orchestrators that live in the library. The `toppic_console_exe()` helper in
+  `CMakeLists.txt` builds each, linking `toppic_common` + `Boost::program_options`.
 - `src/gui` — Qt5 desktop front-ends (`topfd`/`topindex`/`toppic`/`topmg`/
   `topdiff`/`topdia`, plus `util` = a QProcess command builder + message
   helpers). The `toppic_gui_exe()` helper in `CMakeLists.txt` defines each
@@ -263,10 +272,12 @@ NOT in `COMMON_SRCS`; each is its own `add_executable` that links
   `Boost::program_options`. A dialog collects parameters and **shells out** to
   the matching CLI tool via QProcess, reading its default values from that
   tool's console argument parser. `src/gui/topmerge` is migrated but has no
-  target (its merge backend is not part of this library).
-- `src/console` — currently only the `*_argument.cpp` parameter parsers that the
-  five non-topfd GUIs compile in (the console driver mains / `*_process` files
-  are not migrated yet). They use `boost::program_options`.
+  target (no `topmerge` CLI tool drives the `merge` backend yet).
+
+The `<tool>_argument.cpp` parsers are compiled into both the CLI tool and its
+GUI (each target compiles its own object — no shared lib for them). When
+migrating the remaining `*_process` drivers, drop the leftover
+`xercesc::XMLPlatformUtils::Initialize()` calls — pugixml needs no global init.
 
 When migrating a folder from the upstream Xerces tree, watch for include guards
 that don't match the destination path (e.g. an `ms/env` file guarded
