@@ -43,7 +43,7 @@ ProtModPtr findMatchedProtModPtr(const ProteoformPtr &db_proteo_ptr,
   for (size_t i = 0; i < mod_ptr_vec.size(); i++) {
     double mod_shift = mod_ptr_vec[i]->getProtShift();
     // allow small errors introduced in double addition
-    if (abs(mod_shift - n_term_shift) < 0.0001) {
+    if (std::abs(mod_shift - n_term_shift) < 0.0001) {
       bool valid_mod = prot_mod_util::allowMod(mod_ptr_vec[i], residues); 
       if (valid_mod) {
         return mod_ptr_vec[i];
@@ -58,7 +58,7 @@ int findMatchedPos(const ProteoformPtr &proteo_ptr, double n_term_trunc) {
   std::vector<double> prms = proteo_ptr->getBpSpecPtr()->getPrmMasses();
   for (size_t i = 0; i < prms.size(); i++) {
     // allow small errors introduced in double addition
-    if (abs(prms[i] - n_term_trunc) < 0.0001) {
+    if (std::abs(prms[i] - n_term_trunc) < 0.0001) {
       return i;
     }
   }
