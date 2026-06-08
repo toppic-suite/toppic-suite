@@ -15,6 +15,9 @@
 #ifndef TOPPIC_MS_SPEC_DECONV_MS_HPP_
 #define TOPPIC_MS_SPEC_DECONV_MS_HPP_
 
+#include <memory>
+#include <vector>
+
 #include "ms/spec/deconv_peak.hpp"
 #include "ms/spec/ms.hpp"
 

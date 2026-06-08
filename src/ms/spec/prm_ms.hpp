@@ -15,12 +15,15 @@
 #ifndef TOPPIC_MS_SPEC_PRM_MS_HPP_
 #define TOPPIC_MS_SPEC_PRM_MS_HPP_
 
+#include <memory>
+#include <vector>
+
 #include "ms/spec/prm_peak.hpp"
 #include "ms/spec/ms.hpp"
 
 namespace toppic {
 
-using PrmMsPtr = std::shared_ptr<Ms<PrmPeakPtr> >;
+using PrmMsPtr = std::shared_ptr<Ms<PrmPeakPtr>>;
 
 using PrmMsPtrVec = std::vector<PrmMsPtr>;
 

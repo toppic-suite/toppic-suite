@@ -18,6 +18,7 @@
 #include <cstddef>
 #include <iterator>
 #include <memory>
+#include <utility>
 #include <vector>
 
 #include "common/base/mass_constant.hpp"
@@ -216,7 +217,7 @@ DeconvMsPtr getDeconvMsPtr(const MsHeaderPtr &header_ptr, MatchEnvPtrVec &envs) 
     DeconvPeakPtr peak_ptr = std::make_shared<DeconvPeak>(sp_id, i, pos, inte, charge, score);
     peak_list.push_back(peak_ptr);
   }
-  DeconvMsPtr ms_ptr = std::make_shared<DeconvMs>(header_ptr, peak_list);
+  DeconvMsPtr ms_ptr = std::make_shared<DeconvMs>(header_ptr, std::move(peak_list));
   return ms_ptr;
 }
 

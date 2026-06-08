@@ -15,12 +15,15 @@
 #ifndef TOPPIC_MS_SPEC_EXTEND_MS_HPP_
 #define TOPPIC_MS_SPEC_EXTEND_MS_HPP_
 
+#include <memory>
+#include <vector>
+
 #include "ms/spec/extend_peak.hpp"
 #include "ms/spec/ms.hpp"
 
 namespace toppic {
 
-using ExtendMsPtr = std::shared_ptr<Ms<ExtendPeakPtr> >;
+using ExtendMsPtr = std::shared_ptr<Ms<ExtendPeakPtr>>;
 
 using ExtendMsPtrVec = std::vector<ExtendMsPtr>;
 
