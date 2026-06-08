@@ -91,9 +91,9 @@ std::vector<std::vector<int>> CompShiftLowMem::findBestShift(
     const std::vector<int> &b, int total,int minimum_gap){
   int a_length = a.size();
   int b_length = b.size();
-  std::vector<std::vector<int>> ans;
+  std::vector<std::vector<int>> best_shifts;
   if(b_length == 0){
-    return ans;
+    return best_shifts;
   }
   int delta = a[0]-b[b_length-1];
   int minD = delta-1;
@@ -119,22 +119,22 @@ std::vector<std::vector<int>> CompShiftLowMem::findBestShift(
       }
       for(int k = start;k<=d+errors[i];k++){
         num_[k]++;
-        current_minimum = checkD(ans,k,current_minimum,total,minimum_gap);
+        current_minimum = checkShift(best_shifts,k,current_minimum,total,minimum_gap);
       }
     }
   }
 
-  for(size_t i=0;i<ans.size();i++){
-    ans[i][0] += minD;
+  for(size_t i=0;i<best_shifts.size();i++){
+    best_shifts[i][0] += minD;
   }
-  return ans;
+  return best_shifts;
 }
 
 inline std::vector<std::vector<int>> CompShiftLowMem::findBestShift(
     const std::vector<int> &a, const std::vector<int> &b,int total,int min_gap) {
   const int a_length = a.size();
   const int b_length = b.size();
-  std::vector<std::vector<int>> ans;
+  std::vector<std::vector<int>> best_shifts;
   const int delta = a[0]-b[b_length-1];
   const int minD = delta-1;
   const int maxD = a[a_length-1]-b[0]+1;
@@ -154,31 +154,31 @@ inline std::vector<std::vector<int>> CompShiftLowMem::findBestShift(
     for(int j =0;j <b_length;j++){
       int d = a_value - b[j]- minD;
       num_[d-1] ++;
-      cur_min=checkD(ans,d-1,cur_min,total,min_gap);
+      cur_min=checkShift(best_shifts,d-1,cur_min,total,min_gap);
       num_[d] ++;
-      cur_min=checkD(ans,d,cur_min,total,min_gap);
+      cur_min=checkShift(best_shifts,d,cur_min,total,min_gap);
       num_[d+1] ++;
-      cur_min=checkD(ans,d+1,cur_min,total,min_gap);
+      cur_min=checkShift(best_shifts,d+1,cur_min,total,min_gap);
     }
   }
 
-  for(size_t i=0;i<ans.size();i++){
-    ans[i][0] +=minD;
+  for(size_t i=0;i<best_shifts.size();i++){
+    best_shifts[i][0] +=minD;
   }
-  return ans;
+  return best_shifts;
 }
 
-inline int CompShiftLowMem::checkD(std::vector<std::vector<int>> &ans,int d,
-                                   int cur_min,int total,int min_gap){
+inline int CompShiftLowMem::checkShift(std::vector<std::vector<int>> &best_shifts,int d,
+                                       int cur_min,int total,int min_gap){
   short new_value = num_[d];
   if(new_value < cur_min){
     return cur_min;
   }
-  for(size_t i =0;i<ans.size();i++){
-    std::vector<int>  cur = ans[i];
+  for(size_t i =0;i<best_shifts.size();i++){
+    std::vector<int>  cur = best_shifts[i];
     if(std::abs(cur[0]-d)<= min_gap){
       if(cur[1]<new_value){
-        ans.erase(ans.begin()+i);
+        best_shifts.erase(best_shifts.begin()+i);
         i--;
       }
       else {
@@ -187,19 +187,19 @@ inline int CompShiftLowMem::checkD(std::vector<std::vector<int>> &ans,int d,
     }
   }
 
-  int insert_pos = ans.size()-1;
+  int insert_pos = best_shifts.size()-1;
 
-  while(insert_pos >= 0 && ans[insert_pos][1] < new_value){
+  while(insert_pos >= 0 && best_shifts[insert_pos][1] < new_value){
     insert_pos--;
   }
   std::vector<int> insert_temp = {d,new_value};
-  ans.insert(ans.begin()+insert_pos+1, insert_temp);
-  if((int)ans.size()>total){
-    ans.pop_back();
+  best_shifts.insert(best_shifts.begin()+insert_pos+1, insert_temp);
+  if((int)best_shifts.size()>total){
+    best_shifts.pop_back();
   }
 
-  if ((int)ans.size() == total) {
-    return ans[ans.size()-1][1]+1;
+  if ((int)best_shifts.size() == total) {
+    return best_shifts[best_shifts.size()-1][1]+1;
   }
   else {
     return 1;
