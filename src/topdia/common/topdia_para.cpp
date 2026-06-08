@@ -23,31 +23,48 @@
 
 namespace toppic {
 
+namespace {
+
+// Mirrors TopfdPara's printout so the two reports look identical: one label
+// column (wide enough for the longest label) and fixed-width centered banners.
+constexpr int kParaLabelWidth = 53;
+constexpr int kParaBannerWidth = 55;
+
+std::string banner(const std::string &prefix, const std::string &title) {
+  int fill = kParaBannerWidth - 2 - static_cast<int>(title.size());
+  if (fill < 2) fill = 2;
+  int left = fill / 2;
+  int right = fill - left;
+  return prefix + std::string(left, '#') + " " + title + " " + std::string(right, '#');
+}
+
+}  // namespace
+
 std::string TopdiaPara::getParaStr(const std::string &prefix,
                                    const std::string &sep,
                                    const TopfdParaPtr &topfd_para) const {
-    std::stringstream output;
-    // Same label-column width as TopfdPara's printout so the TopDIA-specific
-    // lines below line up with the TopFD parameters printed by getTopfdParaStr.
-    const int gap = 53;
-    output << prefix << "TopDIA " << Version::getVersion() << std::endl;
-    output << prefix << "Timestamp: " << time_util::getTimeStr() << std::endl;
-    output << prefix << "###################### Parameters ######################" << std::endl;
-    output << topfd_para->getTopfdParaStr(prefix, sep);
-    output << prefix << std::setw(gap) << std::left
-           << "MS2 Min scan number:" << sep << topfd_para->getMs2MinScanNum() << std::endl;
-    output << prefix << std::setw(gap) << std::left
-           << "MS1 ECScore cutoff:" << sep << topfd_para->getMs1EcscoreCutoff() << std::endl;
-    output << prefix << std::setw(gap) << std::left
-           << "MS2 ECScore cutoff:" << sep << topfd_para->getMs2EcscoreCutoff() << std::endl;
-    output << prefix << std::setw(gap) << std::left
-           << "Pseudo Score cutoff:" << sep << pseudo_score_cutoff_ << std::endl;
-    output << prefix << std::setw(gap) << std::left
-           << "Pseudo Min peak number:" << sep << pseudo_min_peaks_ << std::endl;
-    output << prefix << std::setw(gap) << std::left
-           << "Version:" << sep << Version::getVersion() << std::endl;
-    output << prefix << "###################### Parameters ######################" << std::endl;
-    return output.str();
-  }
+  std::stringstream output;
+  const int w = kParaLabelWidth;
+  auto kv = [&](const char* label) -> std::ostream& {
+    return output << prefix << std::setw(w) << std::left << label << sep;
+  };
+
+  output << prefix << "TopDIA " << Version::getVersion() << std::endl;
+  output << prefix << "Timestamp: " << time_util::getTimeStr() << std::endl;
+  output << banner(prefix, "Parameters") << std::endl;
+
+  output << topfd_para->getTopfdParaStr(prefix, sep);
+
+  output << std::endl
+         << banner(prefix, "TopDIA feature and pseudo-spectrum parameters") << std::endl;
+  kv("MS2 Min scan number:") << topfd_para->getMs2MinScanNum() << std::endl;
+  kv("MS1 ECScore cutoff:") << topfd_para->getMs1EcscoreCutoff() << std::endl;
+  kv("MS2 ECScore cutoff:") << topfd_para->getMs2EcscoreCutoff() << std::endl;
+  kv("Pseudo Score cutoff:") << pseudo_score_cutoff_ << std::endl;
+  kv("Pseudo Min peak number:") << pseudo_min_peaks_ << std::endl;
+
+  output << banner(prefix, "Parameters") << std::endl;
+  return output.str();
+}
 
 }  // namespace toppic
