@@ -1,0 +1,105 @@
+//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+//
+//Licensed under the Apache License, Version 2.0 (the "License");
+//you may not use this file except in compliance with the License.
+//You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+//Unless required by applicable law or agreed to in writing, software
+//distributed under the License is distributed on an "AS IS" BASIS,
+//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//See the License for the specific language governing permissions and
+//limitations under the License.
+
+
+#ifndef TOPPIC_MS_FEATURE_SINGLE_CHARGE_FEATURE_HPP_
+#define TOPPIC_MS_FEATURE_SINGLE_CHARGE_FEATURE_HPP_
+
+#include <memory>
+#include <string>
+#include <vector>
+
+#include "common/xml/xml_dom_element.hpp"
+
+namespace toppic {
+
+class XmlDOMDocument;
+
+class SingleChargeFeature {
+ public:
+  SingleChargeFeature(int charge, double time_begin, double time_end,
+                      int scan_begin, int scan_end, double intensity,
+                      int env_num, int spec_id_begin, int spec_id_end,
+                      double mass, std::vector<double> xic_inte,
+                      std::vector<double> envelope_mass,
+                      std::vector<double> aggregate_envelope_inte,
+                      double mono_mz, double average_mz, double refer_mz,
+                      std::vector<int> scan_list, std::vector<double> rt_list,
+                      std::vector<double> intensity_sum_list,
+                      std::vector<double> max_intensity_list);
+
+  explicit SingleChargeFeature(XmlDOMElement element);
+
+  int getCharge() const {return charge_;}
+
+  double getIntensity() const {return intensity_;}
+
+  double getTimeBegin() const {return time_begin_;}
+
+  double getTimeEnd() const {return time_end_;}
+
+  double getTimeMiddle() const {return (time_begin_ + time_end_)/2;}
+
+  int getScanBegin() const {return scan_begin_;}
+
+  int getScanEnd() const {return scan_end_;}
+
+  int getEnvNum() const {return env_num_;}
+
+  double getMass() { return mass_; }
+
+  int getSpecIDBegin() { return spec_id_begin_; }
+
+  int getSpecIDEnd() { return spec_id_end_; }
+
+  std::vector<double> getXicInte() { return xic_inte_; }
+
+  std::vector<double> getAggregateEnvelopeInte() { return aggregate_envelope_inte_; }
+
+  std::vector<double> getEnvelopeMass() { return envelope_mass_; }
+
+  static std::string getXmlElementName() {return "single_charge_feature";}
+
+  void appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) const;
+
+ protected:
+  int charge_;
+  double time_begin_;
+  double time_end_;
+  int scan_begin_;
+  int scan_end_;
+  double intensity_;
+  int env_num_ = 0;
+  ////
+  int spec_id_begin_;
+  int spec_id_end_;
+  double mass_;
+  std::vector<double> xic_inte_;
+  std::vector<double> envelope_mass_;
+  std::vector<double> aggregate_envelope_inte_;
+  double mono_mz_ = 0.0;
+  double average_mz_ = 0.0;
+  double refer_mz_ = 0.0;
+  std::vector<int> scan_list_;
+  std::vector<double> rt_list_;
+  std::vector<double> intensity_sum_list_;
+  std::vector<double> max_intensity_list_;
+};
+
+using SingleChargeFeaturePtr = std::shared_ptr<SingleChargeFeature>;
+using SingleChargeFeaturePtrVec = std::vector<SingleChargeFeaturePtr>;
+
+}  // namespace toppic
+
+#endif
