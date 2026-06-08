@@ -151,15 +151,23 @@ path and linked into `toppic_common`:
   `sql/sql_util` and `ms/mzml/mzml_ms_sql_writer`.
 - **rapidjson** — header-only, on the default include path (no `find_package`,
   no link); used by `ms/mzml/mzml_ms_json_writer`.
-- **Boost uBLAS** — header-only; used by `ms/util` (Savitzky-Golay). Its headers
-  still derive from the C++17-deprecated `std::iterator`, so wrap Boost includes
-  in `#pragma GCC diagnostic ignored "-Wdeprecated-declarations"` to keep the
-  build warning-free. (Prefer `std::mutex` etc. over `boost::*` in our own code.)
-
-**ProteoWizard (pwiz)** is *not* available here. `ms/mzml/pw_ms_reader` and
-`ms/mzml/mzml_ms_group_reader` (which includes it) read mzML via pwiz and are
-therefore **not yet migrated** — pwiz is vendored as `ext/pwiz` upstream and is
-too large to bring in. Nothing else depends on them.
+- **Boost** — `ms/util` (Savitzky-Golay) uses header-only uBLAS; `ms/mzml`'s
+  pwiz reader links the compiled Boost libs (`filesystem`, `iostreams`, `thread`,
+  `chrono`, `system`) via `find_package(Boost)`. uBLAS headers still derive from
+  the C++17-deprecated `std::iterator`, so wrap Boost includes in
+  `#pragma GCC diagnostic ignored "-Wdeprecated-declarations"` to keep the build
+  warning-free. (Prefer `std::mutex` etc. over `boost::*` in our own code.)
+- **ProteoWizard (pwiz)** — a trimmed copy is vendored under `ext/pwiz` (only the
+  `utility/minimxml`, `utility/misc`, `data/common`, `data/msdata` source dirs
+  are compiled; the rest is headers), built as a static `pwiz` library against
+  Boost + zlib with `WITHOUT_MZ5` (so no HDF5). `ms/mzml/pw_ms_reader` uses it to
+  read mzML/mzMLb. pwiz uses its own `minimxml` parser, **not** Xerces. It needs
+  a few Boost pieces the system package lacks (`boost/nowide`, the `boost::enums`
+  library, `foreach_field.hpp`); those are vendored under `ext/boost`, which
+  `ext/` (the include root) resolves ahead of the system Boost while everything
+  else still comes from the system. Treat `ext/pwiz` and `ext/boost` as
+  third-party: do not reformat them or hold them to the IWYU/include-order rules
+  (`-w` silences their warnings).
 
 ## Source layout
 

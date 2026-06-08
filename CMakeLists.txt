@@ -159,6 +159,29 @@ target_link_libraries(htslib PUBLIC ZLIB::ZLIB Threads::Threads)
 set_target_properties(htslib PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_compile_options(htslib PRIVATE -w)
 
+# A trimmed copy of ProteoWizard (pwiz) is vendored under ext/pwiz; ms/mzml's
+# pw_ms_reader uses it to read mzML/mzMLb files. Only the four source
+# directories below are compiled (the rest of the tree is headers). It is built
+# as a static library against Boost + zlib and linked into toppic_common. The
+# vendored sources include themselves as "pwiz/...", so ext/ is the include root.
+# WITHOUT_MZ5 drops the HDF5-backed mz5 format so no HDF5 dependency is needed.
+find_package(Boost 1.74 REQUIRED COMPONENTS filesystem iostreams thread chrono system)
+file(GLOB PWIZ_SRCS CONFIGURE_DEPENDS
+  ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/utility/minimxml/*.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/utility/misc/*.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/data/common/*.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/data/msdata/*.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/data/msdata/mzmlb/*.cpp)
+add_library(pwiz STATIC ${PWIZ_SRCS})
+target_include_directories(pwiz PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/ext)
+target_link_libraries(pwiz PUBLIC
+  Boost::filesystem Boost::iostreams Boost::thread Boost::chrono Boost::system
+  ZLIB::ZLIB)
+target_compile_definitions(pwiz PUBLIC WITHOUT_MZ5)
+set_target_properties(pwiz PROPERTIES POSITION_INDEPENDENT_CODE ON)
+# Third-party: silence its warnings (the -Wdeprecated noise from Boost especially).
+target_compile_options(pwiz PRIVATE -w)
+
 # src for the hand-written headers, and the build-tree gen/ dir for the
 # CMake-generated common/util/version.hpp.
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_BINARY_DIR}/gen)
@@ -193,6 +216,10 @@ target_link_libraries(toppic_common PRIVATE htslib)
 # SQLite3 include path is PUBLIC; the library is PRIVATE (an implementation
 # detail of toppic_common).
 target_link_libraries(toppic_common PUBLIC SQLite::SQLite3)
+
+# ms/mzml/pw_ms_reader.hpp exposes pwiz types (pwiz::msdata::*), so consumers of
+# toppic_common need the pwiz headers (and Boost) too: link pwiz PUBLIC.
+target_link_libraries(toppic_common PUBLIC pwiz)
 
 # Install the shared library using the prefix-relative GNUInstallDirs locations.
 # On Linux/macOS it is a LIBRARY artifact and lands in <prefix>/lib/toppic
