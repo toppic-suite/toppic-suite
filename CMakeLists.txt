@@ -200,7 +200,8 @@ file(GLOB_RECURSE COMMON_SRCS CONFIGURE_DEPENDS
   ${CMAKE_CURRENT_SOURCE_DIR}/src/prsm/*.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/*.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/search/*.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/stat/*.cpp)
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/stat/*.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/visual/*.cpp)
 
 add_library(toppic_common SHARED ${COMMON_SRCS})
 target_include_directories(toppic_common PUBLIC
