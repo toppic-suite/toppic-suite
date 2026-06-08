@@ -1,0 +1,68 @@
+//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+//
+//Licensed under the Apache License, Version 2.0 (the "License");
+//you may not use this file except in compliance with the License.
+//You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+//Unless required by applicable law or agreed to in writing, software
+//distributed under the License is distributed on an "AS IS" BASIS,
+//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//See the License for the specific language governing permissions and
+//limitations under the License.
+
+#include "ms/spec/deconv_peak.hpp"
+
+#include <string>
+
+#include "common/util/str_util.hpp"
+#include "common/xml/xml_dom_document.hpp"
+#include "common/xml/xml_dom_util.hpp"
+
+namespace toppic {
+
+DeconvPeak::DeconvPeak(int sp_id, int peak_id, double mono_mass,
+                       double intensity, int charge):
+    Peak(mono_mass, intensity),
+    sp_id_(sp_id),
+    peak_id_(peak_id),
+    charge_(charge),
+    score_(1.0) {}
+
+DeconvPeak::DeconvPeak(int sp_id, int peak_id, double mono_mass,
+                       double intensity, int charge, double score):
+    Peak(mono_mass, intensity),
+    sp_id_(sp_id),
+    peak_id_(peak_id),
+    charge_(charge),
+    score_(score) {}
+
+DeconvPeak::DeconvPeak(XmlDOMElement element):
+    Peak(xml_dom_util::getDoubleChildValue(element, "position", 0),
+         xml_dom_util::getDoubleChildValue(element, "intensity", 0)) {
+      sp_id_ = xml_dom_util::getIntChildValue(element, "sp_id", 0);
+      peak_id_ = xml_dom_util::getIntChildValue(element, "peak_id", 0);
+      charge_ = xml_dom_util::getIntChildValue(element, "charge", 0);
+      score_ = xml_dom_util::getDoubleChildValue(element, "score", 0);
+    }
+
+void DeconvPeak::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) const {
+  std::string element_name = DeconvPeak::getXmlElementName();
+  XmlDOMElement element = xml_doc->addElement(parent, element_name.c_str());
+  std::string str = str_util::toString(getPosition());
+  xml_doc->addElement(element, "position", str.c_str());
+  str = str_util::toString(getIntensity());
+  xml_doc->addElement(element, "intensity", str.c_str());
+  str = std::to_string(sp_id_);
+  xml_doc->addElement(element, "sp_id", str.c_str());
+  str = std::to_string(peak_id_);
+  xml_doc->addElement(element, "peak_id", str.c_str());
+  str = std::to_string(charge_);
+  xml_doc->addElement(element, "charge", str.c_str());
+  str = str_util::toString(score_);
+  xml_doc->addElement(element, "score", str.c_str());
+}
+
+}  // namespace toppic
+

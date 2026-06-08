@@ -1,0 +1,92 @@
+//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+//
+//Licensed under the Apache License, Version 2.0 (the "License");
+//you may not use this file except in compliance with the License.
+//You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+//Unless required by applicable law or agreed to in writing, software
+//distributed under the License is distributed on an "AS IS" BASIS,
+//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//See the License for the specific language governing permissions and
+//limitations under the License.
+
+#include "para/sp_para.hpp"
+
+#include <cstddef>
+#include <memory>
+#include <string>
+
+#include "common/base/activation_base.hpp"
+#include "common/base/mass_constant.hpp"
+#include "common/util/str_util.hpp"
+#include "common/xml/xml_dom_document.hpp"
+#include "common/xml/xml_dom_util.hpp"
+
+namespace toppic {
+
+SpPara::SpPara(const std::string &activation_name, double n_term_label_mass,
+               double ppm) {
+  if (activation_name != "FILE") {
+    activation_ptr_ = ActivationBase::getActivationPtrByName(activation_name);
+  }
+  n_term_label_mass_ = n_term_label_mass;
+  double ppo = ppm * 0.000001;
+  peak_tolerance_ptr_ = std::make_shared<PeakTolerance>(ppo); 
+
+  // extend sp parameter 
+  double IM = mass_constant::getIsotopeMass();
+  // the set of offsets used to expand the monoisotopic mass list 
+  ext_offsets_ = {0, -IM, IM};
+
+  zero_shift_search_prec_error_vec_ = {0, -IM, IM};
+
+  var_ptm_search_prec_error_vec_ = {0};
+
+  one_shift_search_prec_error_vec_ = {0, -IM, IM};
+
+  multi_shift_search_prec_error_vec_ = {0};
+}
+
+SpPara::SpPara(XmlDOMElement element) {
+  min_peak_num_ = xml_dom_util::getIntChildValue(element, "min_peak_num", 0);
+  min_mass_ = xml_dom_util::getDoubleChildValue(element, "min_mass", 0);
+  extend_min_mass_ = xml_dom_util::getDoubleChildValue(element, "extend_min_mass", 0);
+  XmlDOMElement list_element = xml_dom_util::getChildElement(element, "extend_offset_list", 0);
+  int offset_num =  xml_dom_util::getChildCount(list_element, "extend_offset");
+  for (int i = 0; i < offset_num; i++) {
+    double offset = xml_dom_util::getDoubleChildValue(list_element, "extend_offset", i);
+    ext_offsets_.push_back(offset);
+  }
+  n_term_label_mass_ = xml_dom_util::getDoubleChildValue(element, "n_term_label_mass", 0);
+  std::string element_name = PeakTolerance::getXmlElementName();
+  XmlDOMElement pt_element = xml_dom_util::getChildElement(element, element_name.c_str(), 0);
+  peak_tolerance_ptr_ = std::make_shared<PeakTolerance>(pt_element);
+
+  element_name = Activation::getXmlElementName();
+  XmlDOMElement ac_element = xml_dom_util::getChildElement(element, element_name.c_str(), 0);
+  activation_ptr_ = ActivationBase::getActivationPtrFromXml(ac_element);
+}
+
+void SpPara::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) const {
+  std::string element_name = SpPara::getXmlElementName();
+  XmlDOMElement element = xml_doc->addElement(parent, element_name.c_str());
+  std::string str = std::to_string(min_peak_num_);
+  xml_doc->addElement(element, "min_peak_num", str.c_str());
+  str = str_util::toString(min_mass_);
+  xml_doc->addElement(element, "min_mass", str.c_str());
+  str = str_util::toString(extend_min_mass_);
+  xml_doc->addElement(element, "extend_min_mass", str.c_str());
+  XmlDOMElement list_element = xml_doc->addElement(element, "extend_offset_list");
+  for (size_t i = 0; i < ext_offsets_.size(); i++) {
+    str = str_util::toString(ext_offsets_[i]);
+    xml_doc->addElement(list_element, "extend_offset", str.c_str());
+  }
+  str = str_util::toString(n_term_label_mass_);
+  xml_doc->addElement(element, "n_term_label_mass", str.c_str());
+  peak_tolerance_ptr_->appendXml(xml_doc, element);
+  activation_ptr_->appendNameToXml(xml_doc, element);
+}
+
+}  // namespace toppic

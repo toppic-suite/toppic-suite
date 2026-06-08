@@ -1,0 +1,63 @@
+//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+//
+//Licensed under the Apache License, Version 2.0 (the "License");
+//you may not use this file except in compliance with the License.
+//You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+//Unless required by applicable law or agreed to in writing, software
+//distributed under the License is distributed on an "AS IS" BASIS,
+//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//See the License for the specific language governing permissions and
+//limitations under the License.
+
+#ifndef TOPPIC_MS_SPEC_ENV_PEAK_HPP_
+#define TOPPIC_MS_SPEC_ENV_PEAK_HPP_
+
+#include <memory>
+#include <string>
+#include <vector>
+
+#include "ms/spec/peak.hpp"
+
+namespace toppic {
+
+class EnvPeak;
+using EnvPeakPtr = std::shared_ptr<EnvPeak>;
+
+class EnvPeak : public Peak {
+ public:
+  EnvPeak(double mz, double intensity);
+
+  EnvPeak(double mz, double intensity, int idx);
+
+  explicit EnvPeak(const EnvPeakPtr &peak_ptr);
+
+  explicit EnvPeak(XmlDOMElement element);
+
+  int getIdx() const {return idx_;}
+
+  void setIdx(int idx) {idx_ = idx;}
+
+  bool isExist() const;
+
+  void appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) const;
+
+  static int getNonExistPeakIdx() {return -1;}
+
+  static bool cmpPosInc(const EnvPeakPtr &a, const EnvPeakPtr &b);
+
+  static bool cmpInteInc(const EnvPeakPtr &a, const EnvPeakPtr &b);
+
+  static std::string getXmlElementName() {return "env_peak";}
+
+ private:
+  int idx_;
+};
+
+using EnvPeakPtrVec = std::vector<EnvPeakPtr>;
+
+}  // namespace toppic
+
+#endif

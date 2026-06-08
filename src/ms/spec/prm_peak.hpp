@@ -1,0 +1,100 @@
+//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+//
+//Licensed under the Apache License, Version 2.0 (the "License");
+//you may not use this file except in compliance with the License.
+//You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+//Unless required by applicable law or agreed to in writing, software
+//distributed under the License is distributed on an "AS IS" BASIS,
+//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//See the License for the specific language governing permissions and
+//limitations under the License.
+
+#ifndef TOPPIC_MS_SPEC_PRM_PEAK_HPP_
+#define TOPPIC_MS_SPEC_PRM_PEAK_HPP_
+
+#include <memory>
+#include <vector>
+
+#include "ms/spec/base_peak_type.hpp"
+#include "ms/spec/deconv_peak.hpp"
+#include "ms/spec/rm_break_type.hpp"
+#include "ms/spec/support_peak.hpp"
+
+namespace toppic {
+
+class PrmPeak;
+using PrmPeakPtr = std::shared_ptr<PrmPeak>;
+
+class PrmPeak : public Peak {
+ public:
+  PrmPeak(int spec_id, const DeconvPeakPtr &base_peak_ptr,
+          const BasePeakTypePtr &base_type,
+          double mono_mass, double score,
+          double strict_tolerance = 0.0,
+          double n_strict_c_relax_tolerance = 0.0,
+          double n_relax_c_strict_tolerance = 0.0);
+
+  void addNghbEdge(const DeconvPeakPtr &deconv_peak_ptr, double offset,
+                   const SPTypePtr &peak_type, double score);
+
+  int getNeighborSize() const {return neighbor_list_.size();}
+
+  DeconvPeakPtr getBasePeakPtr() const {return base_peak_ptr_;}
+
+  double getMonoMass() const {return mono_mass_;}
+
+  void setMonoMass(double m);
+
+  double getScore() const {return score_;}
+
+  double getStrictTolerance() const {return strict_tolerance_;}
+
+  BasePeakTypePtr getBaseTypePtr() const {return base_type_;}
+
+  double getNStrictCRelaxTolerance() const {return n_strict_c_relax_tolerance_;}
+
+  double getNRelaxCStrictTolerance() const {return n_relax_c_strict_tolerance_;}
+
+  int getSpectrumId() const {return spec_id_;}
+
+  int getPeakId() const {return peak_id_;}
+
+  RmBreakTypePtr getBreakType() const;
+
+  void setStrictTolerance(double tolerance) {strict_tolerance_ = tolerance;}
+
+  void setNStrictCRelaxTolerance(double tolerance) {
+    n_strict_c_relax_tolerance_ = tolerance;
+  }
+
+  void setNRelaxCStrictTolerance(double tolerance) {
+    n_relax_c_strict_tolerance_ = tolerance;
+  }
+
+  void setPeakId(int peak_id) {peak_id_ = peak_id;}
+
+  static bool cmpPosInc(const PrmPeakPtr &a, const PrmPeakPtr &b) {
+    return a->getPosition() < b->getPosition();}
+
+ private:
+  int spec_id_;
+  int peak_id_;
+  DeconvPeakPtr base_peak_ptr_;
+  BasePeakTypePtr base_type_;
+  double mono_mass_;
+  double score_;
+  double strict_tolerance_;
+  double n_strict_c_relax_tolerance_;
+  double n_relax_c_strict_tolerance_;
+  SupportPeakPtrVec neighbor_list_;
+};
+
+using PrmPeakPtrVec = std::vector<PrmPeakPtr>;
+using PrmPeakPtrVec2D = std::vector<PrmPeakPtrVec>;
+
+}  // namespace toppic
+
+#endif

@@ -159,12 +159,14 @@ target_compile_options(htslib PRIVATE -w)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_BINARY_DIR}/gen)
 
 # code shared by several executables: the common/ layer (base, util, xml,
-# thread) and the seq/ layer built on top of it.
+# thread) and the seq/, para/ and ms/ layers built on top of it.
 # CONFIGURE_DEPENDS makes CMake re-glob (and so reconfigure) when source files
-# are added or removed under src/common or src/seq.
+# are added or removed under these directories.
 file(GLOB_RECURSE COMMON_SRCS CONFIGURE_DEPENDS
   ${CMAKE_CURRENT_SOURCE_DIR}/src/common/*.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/seq/*.cpp)
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/seq/*.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/para/*.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/ms/*.cpp)
 
 add_library(toppic_common SHARED ${COMMON_SRCS})
 target_include_directories(toppic_common PUBLIC

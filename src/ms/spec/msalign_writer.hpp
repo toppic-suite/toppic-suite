@@ -1,0 +1,47 @@
+//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+//
+//Licensed under the Apache License, Version 2.0 (the "License");
+//you may not use this file except in compliance with the License.
+//You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+//Unless required by applicable law or agreed to in writing, software
+//distributed under the License is distributed on an "AS IS" BASIS,
+//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//See the License for the specific language governing permissions and
+//limitations under the License.
+
+#ifndef TOPPIC_MS_SPEC_MSALIGN_WRITER_HPP_
+#define TOPPIC_MS_SPEC_MSALIGN_WRITER_HPP_
+
+#include <fstream>
+#include <memory>
+#include <string>
+#include <vector>
+
+#include "ms/spec/deconv_ms.hpp"
+
+namespace toppic {
+
+class MsAlignWriter {
+ public:
+  explicit MsAlignWriter(const std::string &file_name);
+
+  ~MsAlignWriter();
+
+  void writePara(const std::string &para_str);
+
+  void writeMs(const DeconvMsPtr &ms_ptr);
+
+ private:
+  std::string file_name_;
+  std::ofstream output_;
+};
+
+using MsAlignWriterPtr = std::shared_ptr<MsAlignWriter>;
+using MsAlignWriterPtrVec = std::vector<MsAlignWriterPtr>;
+
+}  // namespace toppic
+
+#endif
