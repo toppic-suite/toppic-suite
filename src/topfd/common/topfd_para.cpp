@@ -167,11 +167,11 @@ std::string TopfdPara::getTopfdParaStr(const std::string &prefix,
 
   kv("File name:") << mzml_file_name_ << std::endl;
   if (is_faims_) {
-    kv("Faims data:") << "Yes" << std::endl;
-    kv("Faims voltage:") << faims_volt_ << std::endl;
+    kv("FAIMS data:") << "Yes" << std::endl;
+    kv("FAIMS voltage:") << faims_volt_ << std::endl;
   } else {
-    kv("Faims data:") << "No" << std::endl;
-    kv("Faims voltage:") << "N/A" << std::endl;
+    kv("FAIMS data:") << "No" << std::endl;
+    kv("FAIMS voltage:") << "N/A" << std::endl;
   }
   kv("Number of MS1 scans:") << ms_1_scan_num_ << std::endl;
   kv("Number of MS/MS scans:") << ms_2_scan_num_ << std::endl;
