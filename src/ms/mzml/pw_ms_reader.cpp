@@ -332,7 +332,7 @@ bool specHasPrecWindow(const pwiz::msdata::SpectrumPtr &spec) {
 MzmlProfilePtr PwMsReader::readProfile() {
   int ms_1_cnt = 0;
   int ms_2_cnt = 0;
-  bool has_prec_window = false;
+  bool all_ms2_have_prec_window = true;
   std::map<double, std::pair<int,int>> volt_map;
   bool get_binary_data = false;
   for (int sp_id = 0; sp_id < input_sp_num_; sp_id++) {
@@ -346,8 +346,8 @@ MzmlProfilePtr PwMsReader::readProfile() {
     }
     else if (ms_level == 2) {
       ms_2_cnt++;
-      if (!has_prec_window && specHasPrecWindow(cur_spec_ptr)) {
-        has_prec_window = true;
+      if (all_ms2_have_prec_window && !specHasPrecWindow(cur_spec_ptr)) {
+        all_ms2_have_prec_window = false;
       }
     }
     if (voltage != std::numeric_limits<double>::max()) {
@@ -376,6 +376,9 @@ MzmlProfilePtr PwMsReader::readProfile() {
       }
     }
   }
+  // The file carries the MS/MS precursor windows only when every MS/MS scan
+  // specifies one (and there is at least one MS/MS scan).
+  bool has_prec_window = (ms_2_cnt > 0) && all_ms2_have_prec_window;
   MzmlProfilePtr profile_ptr =
       std::make_shared<MzmlProfile>(ms_1_cnt, ms_2_cnt, has_prec_window, volt_map);
   return profile_ptr;

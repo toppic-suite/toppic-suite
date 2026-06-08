@@ -30,9 +30,9 @@ class MzmlProfile {
   int getMs2Cnt() const {return total_ms2_cnt_;}
   bool isFaims() const {return volt_map_.size() > 0;}
 
-  // True if at least one MS/MS scan in the file specifies its precursor
-  // isolation window (an isolation-window offset), so the per-scan windows from
-  // the file are used instead of the default precursor window width.
+  // True if every MS/MS scan in the file specifies its precursor isolation
+  // window (an isolation-window offset), so the per-scan windows from the file
+  // are used instead of the default precursor window width.
   bool hasPrecWindow() const {return has_prec_window_;}
 
   const std::map<double, std::pair<int, int>>& getVoltageMap() const {return volt_map_;}
