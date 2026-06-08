@@ -213,7 +213,6 @@ file(GLOB_RECURSE COMMON_SRCS CONFIGURE_DEPENDS
   ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/*.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/search/*.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/stat/*.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/visual/*.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/merge/*.cpp)
 
 add_library(toppic_common OBJECT ${COMMON_SRCS})
@@ -297,7 +296,7 @@ toppic_console_exe(topdiff
 #
 # Each tool's dialog collects parameters and shells out to the matching
 # command-line tool via QProcess (gui/util/command). All the heavy lifting
-# (common/seq/para/ms/prsm/filter/search/stat/visual/topfd/topdia) already
+# (common/seq/para/ms/prsm/filter/search/stat/topfd/topdia) already
 # lives in the toppic_common shared library, so a GUI target only compiles its
 # own Qt sources -- plus, for the five tools whose dialog reads default values
 # from the console parser, that tool's src/console/<tool>_argument.cpp -- and

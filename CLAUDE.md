@@ -179,13 +179,6 @@ path and linked into `toppic_common`:
   desktop executables (see the source-layout note). Only the GUI targets use it,
   via per-target `AUTOMOC`/`AUTOUIC`/`AUTORCC`; the `toppic_common` library has
   no Qt dependency.
-- **xml2json / rapidxml / rapidjson** — `visual/json_transformer` converts the
-  annotation XML to JSON with the header-only `xml2json` (vendored at
-  `ext/xml2json/xml2json.hpp`), which parses with **rapidxml** (vendored at
-  `ext/rapidxml`, resolved via the `SYSTEM` `ext/` include) and emits with
-  **rapidjson** (the system package, `/usr/include/rapidjson`). All header-only,
-  no link step. This is the project's only JSON path — `rapidjson` is not used
-  elsewhere (the old per-scan-JSON spectrum writer was replaced by SQLite).
 - **ProteoWizard (pwiz)** — a trimmed copy is vendored under `ext/pwiz` (only the
   `utility/minimxml`, `utility/misc`, `data/common`, `data/msdata` source dirs
   are compiled; the rest is headers), built as a static `pwiz` library against
@@ -248,9 +241,6 @@ above it, never the reverse:
   `oneptmsearch`/`ptmsearch`/`varptmsearch`/`zeroptmsearch`). `graph` uses the
   header-only Boost Graph Library (`adjacency_list`, `graph_traits`, `graphviz`).
 - `src/stat` — E-value/p-value estimation (`count`/`local`/`mcmc`/`tdgf`).
-- `src/visual` — TopMSV annotation output (`anno_*` + `xml_generator` build the
-  annotation XML with the migrated pugixml `XmlWriter`; `json_transformer`
-  converts it to JSON via the vendored `xml2json`).
 - `src/merge` — the topdiff feature-merge backend (`feature_prsm`,
   `feature_sample_merge`), used by `console/topdiff_process`.
 
