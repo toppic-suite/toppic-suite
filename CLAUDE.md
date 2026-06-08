@@ -182,6 +182,12 @@ path and linked into `toppic_common`:
   Their `.cpp` files are built with `-w`; the `ext/` directory is added to every
   target as a **`SYSTEM`** include (`-isystem`), so warnings from vendored
   headers are silenced even when our own `-Wall` sources include them.
+- **ONNX Runtime** — `topfd/envcnn` and `topfd/ecscore/score` run the EnvCNN /
+  ECScore neural-network models through the ONNX Runtime C++ API. A prebuilt
+  `libonnxruntime.so.1.14.1` and the C/C++ API headers are vendored under
+  `ext/onnx` (sources include it as `"onnx/onnxruntime_cxx_api.h"`, covered by
+  the `SYSTEM` `ext/` include); it is linked as an `IMPORTED` shared object,
+  `PRIVATE`, into `toppic_common`. Treat it as third-party.
 
 ## Source layout
 
@@ -197,6 +203,15 @@ only on the ones above it, never the reverse:
 - `src/seq` — sequence/proteoform layer.
 - `src/ms` — mass-spectrum layer: `spec` (peaks/spectra/msalign), `msmap`,
   `factory`, `env` (envelope detection), `feature`, `mzml`.
+- `src/topfd` — the TopFD deconvolution/feature-detection layer, built on `ms`:
+  `common` (`topfd_para` config + the `topfd_process`/`topfd_single_process`
+  orchestrators), `dp` (dynamic-programming envelope assignment), `envcnn` and
+  `ecscore/score` (the EnvCNN / ECScore neural-network scorers, via ONNX
+  Runtime), `deconv`, and `ecscore` (`env`/`env_set`/`env_coll`/`para`/`score`).
+  Note two folder-level cycles handled by the single-library glob: `dp <-> deconv`
+  and `ecscore/env_coll <-> ecscore/score`. `deconv` constructs the
+  `MzmlMsSqlWriter` (see the SQLite note) once per run, shared across its worker
+  threads; it no longer writes per-scan JSON.
 
 When migrating a folder from the upstream Xerces tree, watch for include guards
 that don't match the destination path (e.g. an `ms/env` file guarded
