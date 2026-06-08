@@ -98,9 +98,9 @@ int process(const TopfdParaPtr &para_ptr,  std::vector<std::string> spec_file_li
 
   for (size_t k = 0; k < spec_file_list.size(); k++) {
     std::cout << "Processing " << spec_file_list[k] << " started." << std::endl;
-    processOneFile(para_ptr, spec_file_list[k]); 
-    std::cout << "Timestamp: " << time_util::getTimeStr() << std::endl;
+    processOneFile(para_ptr, spec_file_list[k]);
     std::cout << "Processing " << spec_file_list[k] << " finished." << std::endl;
+    std::cout << "Timestamp: " << time_util::getTimeStr() << std::endl;
   }
 
   base_data::release();
