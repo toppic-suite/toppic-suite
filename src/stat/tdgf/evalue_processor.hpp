@@ -30,12 +30,7 @@ class EValueProcessor {
 
   void process(bool is_separate);
 
-  void processOneSpectrum(const SpectrumSetPtr &spec_set_ptr,
-                          PrsmPtrVec &sele_prsm_ptrs,
-                          double ppo, bool is_separate,
-                          PrsmXmlWriter &writer);
-
-  void compEvalues(const SpectrumSetPtr &spectrum_set_ptr, 
+  void compEvalues(const SpectrumSetPtr &spectrum_set_ptr,
                    PrsmPtrVec &sele_prsm_ptrs,
                    double ppo, bool is_separate);
 

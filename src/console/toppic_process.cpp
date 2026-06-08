@@ -206,8 +206,6 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
       diag_filter_thread_num = thread_num;
     }
 
-    bool use_gf = true;
-
     // var_ptm_type number is used for E-value computation
     int var_ptm_type_num = 0;
 
@@ -352,7 +350,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     TdgfMngPtr tdgf_mng_ptr
         = std::make_shared<TdgfMng>(prsm_para_ptr, shift_num,
                                     std::max(std::abs(max_shift_mass), std::abs(min_shift_mass)),
-                                    use_gf, var_ptm_type_num, thread_num, 
+                                    var_ptm_type_num, thread_num,
                                     "toppic_combined", "toppic_evalue");
     EValueProcessorPtr processor = std::make_shared<EValueProcessor>(tdgf_mng_ptr);
     processor->init();

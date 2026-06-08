@@ -119,9 +119,7 @@ void EValueProcessor::process(bool is_separate) {
           selected_prsm_ptrs.push_back(prsm_ptr);
           prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
         }
-        if (!mng_ptr_->use_gf_) {
-          processOneSpectrum(spec_set_ptr, selected_prsm_ptrs, ppo, is_separate, writer);
-        } else if (checkPrsms(selected_prsm_ptrs)) {
+        if (checkPrsms(selected_prsm_ptrs)) {
           while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ + 2) {
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
           }
@@ -149,21 +147,19 @@ void EValueProcessor::process(bool is_separate) {
   prsm_xml_writer_util::closeWriterPtrVec(writer_ptr_vec);
   writer.close();
 
-  if (mng_ptr_->use_gf_) {
-    int prsm_top_num = std::numeric_limits<int>::max(); 
-    bool norm = false;
-    bool remove_dup = false;
-    std::vector<std::string> input_exts;
-    for (int t = 0; t < mng_ptr_->thread_num_; t++) {
-      input_exts.push_back(mng_ptr_->output_file_ext_ + "_" + std::to_string(t));
-    }
-    PrsmStrMergePtr merge_ptr
-        = std::make_shared<PrsmStrMerge>(sp_file_name, input_exts, 
-                                         mng_ptr_->output_file_ext_, 
-                                         prsm_top_num, norm, remove_dup);
-    merge_ptr->process();
-    merge_ptr = nullptr;
+  int prsm_top_num = std::numeric_limits<int>::max();
+  bool norm = false;
+  bool remove_dup = false;
+  std::vector<std::string> input_exts;
+  for (int t = 0; t < mng_ptr_->thread_num_; t++) {
+    input_exts.push_back(mng_ptr_->output_file_ext_ + "_" + std::to_string(t));
   }
+  PrsmStrMergePtr merge_ptr
+      = std::make_shared<PrsmStrMerge>(sp_file_name, input_exts,
+                                       mng_ptr_->output_file_ext_,
+                                       prsm_top_num, norm, remove_dup);
+  merge_ptr->process();
+  merge_ptr = nullptr;
 
   // remove tempory files
   file_util::cleanTempFiles(sp_file_name, mng_ptr_->output_file_ext_ + "_");
@@ -204,22 +200,5 @@ void EValueProcessor::compEvalues(const SpectrumSetPtr &spec_set_ptr, PrsmPtrVec
   }
 }
 
-void EValueProcessor::processOneSpectrum(const SpectrumSetPtr &spec_set_ptr,
-                                         PrsmPtrVec &sele_prsm_ptrs,
-                                         double ppo, bool is_separate,
-                                         PrsmXmlWriter &writer) {
-  if (spec_set_ptr->isValid()) {
-
-    bool need_comp = checkPrsms(sele_prsm_ptrs);
-
-    if (need_comp) {
-      compEvalues(spec_set_ptr, sele_prsm_ptrs, ppo, is_separate);
-    }
-
-    std::sort(sele_prsm_ptrs.begin(), sele_prsm_ptrs.end(),
-              Prsm::cmpEValueIncProtInc);
-    writer.writeVector(sele_prsm_ptrs);
-  }
-}
 
 }
