@@ -25,10 +25,8 @@ namespace toppic {
 
 namespace deconv_util {
 
-std::string updateMsOneMsg(const MsHeaderPtr &header_ptr, 
+std::string updateMsOneMsg(const MsHeaderPtr &header_ptr,
                            int scan_cnt, int total_scan_num);
-
-void prepareFileFolder(const TopfdParaPtr &topfd_para_ptr);
 
 void mergeMs1MsalignFiles(const TopfdParaPtr &topfd_para_ptr,
                           std::string output_base_name);

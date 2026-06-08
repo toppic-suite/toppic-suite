@@ -121,7 +121,6 @@ void TopFDDialog::on_defaultButton_clicked() {
   ui->minScanNumEdit->setText(QString::number(para_ptr->getMs1MinScanNum()));
   ui->msDeconvCheckBox->setChecked(para_ptr->isSortUseMsDeconv());
   ui->missLevelOneCheckBox->setChecked(para_ptr->isMissingLevelOne());
-  ui->geneHTMLCheckBox->setChecked(para_ptr->isGeneHtmlFolder());
   ui->disableFilteringCheckBox->setChecked(!para_ptr->isAANumBasedFilter());
   ui->disableAdditionalFeatureSearchCheckBox->setChecked(!para_ptr->isSearchPrecWindow());
   ui->singleScanNoiseLevelCheckBox->setChecked(para_ptr->isUseSingleScanNoiseLevel());
@@ -283,7 +282,6 @@ toppic::TopfdParaPtr TopFDDialog::getParaPtr() {
   para_ptr_->setMs1EcscoreCutoff(std::stod(ui->ecscoreCutoffEdit->text().toStdString()));
   para_ptr_->setMs1MinScanNum(std::stoi(ui->minScanNumEdit->text().toStdString()));
   para_ptr_->setThreadNum(std::stoi(ui->threadNumberEdit->text().toStdString()));
-  para_ptr_->setGeneHtmlFolder(ui->geneHTMLCheckBox->isChecked());
   para_ptr_->setSortUseMsDeconv(ui->msDeconvCheckBox->isChecked());
   para_ptr_->setActivation(ui->activationComboBox->currentText().toStdString());
   para_ptr_->setAANumBasedFilter(!(ui->disableFilteringCheckBox->isChecked()));
@@ -311,7 +309,6 @@ void TopFDDialog::lockDialog() {
   ui->missLevelOneCheckBox->setEnabled(false);
   ui->windowSizeEdit->setEnabled(false);
   ui->outputButton->setEnabled(false);
-  ui->geneHTMLCheckBox->setEnabled(false);
   ui->msDeconvCheckBox->setEnabled(false);
   ui->activationComboBox->setEnabled(false);
   ui->disableFilteringCheckBox->setEnabled(false);
@@ -338,7 +335,6 @@ void TopFDDialog::unlockDialog() {
   ui->windowSizeEdit->setEnabled(true);
   ui->outputButton->setEnabled(true);
   ui->outputButton->setDefault(true);
-  ui->geneHTMLCheckBox->setEnabled(true);
   ui->msDeconvCheckBox->setEnabled(true);
   ui->activationComboBox->setEnabled(true);
   ui->disableFilteringCheckBox->setEnabled(true);

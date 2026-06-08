@@ -136,7 +136,6 @@ void DeconvMs1Process::process() {
     LOG_ERROR("No spectrum to read in mzML file!");
     return;
   }
-  deconv_util::prepareFileFolder(topfd_para_ptr_);
   // One SQLite writer shared across the worker threads (it is internally
   // synchronized and batches inserts); created only when SQLite output is on.
   MzmlMsSqlWriterPtr sql_writer_ptr = topfd_para_ptr_->isGeneSql()

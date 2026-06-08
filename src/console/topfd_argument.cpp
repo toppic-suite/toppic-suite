@@ -88,7 +88,6 @@ bool Argument::parse(int argc, char* argv[]) {
         ("split-intensity-ratio,l", po::value<std::string> (&split_intensity_ratio),
          "<a positive number>. Set the intensity ratio required to split one feature from another. The default value is 2.5.")
         ("thread-number,u", po::value<std::string> (&thread_number), "<a positive integer>. Number of threads used in spectral deconvolution. Default value: 1.")
-        ("skip-html-folder,g","Skip the generation of HTML files for visualization.")
         ;
 
     po::options_description desc("Options");
@@ -114,7 +113,6 @@ bool Argument::parse(int argc, char* argv[]) {
         ("split-intensity-ratio,l", po::value<std::string> (&split_intensity_ratio), "")
         ("disable-additional-feature-search,f","")
         ("thread-number,u", po::value<std::string> (&thread_number), "")
-        ("skip-html-folder,g","")
         ("text-peak-list,T","") // Use a text file containing a mass list as the input
         ("output-batmass-feature,O","")
         ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), 
@@ -270,9 +268,6 @@ bool Argument::parse(int argc, char* argv[]) {
       }
     }
 
-    if (vm.count("skip-html-folder")) {
-      topfd_para_ptr_->setGeneHtmlFolder(false);
-    }
     if (vm.count("disable-aa-num-filtering")) {
       topfd_para_ptr_->setAANumBasedFilter(false);
     }

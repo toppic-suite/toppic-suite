@@ -16,7 +16,6 @@
 #include "topfd/deconv/deconv_util.hpp"
 
 #include <algorithm>
-#include <filesystem>
 #include <iostream>
 
 #include "common/util/file_util.hpp"
@@ -39,20 +38,6 @@ std::string updateMsOneMsg(const MsHeaderPtr &header_ptr,
   }
   msg = msg + percentage + "% finished.";
   return msg;
-}
-
-void prepareFileFolder(const TopfdParaPtr &topfd_para_ptr) {
-  if (topfd_para_ptr->isGeneHtmlFolder()) {
-    //json file names
-    std::string html_dir = topfd_para_ptr->getHtmlDir();
-    if (!std::filesystem::exists(html_dir)) {
-      file_util::createFolder(html_dir);
-    }
-    std::string ms1_json_dir = topfd_para_ptr->getMs1JsonDir();
-    if (!std::filesystem::exists(ms1_json_dir)) {
-      file_util::createFolder(ms1_json_dir);
-    }
-  }
 }
 
 void mergeMs1MsalignFiles(const TopfdParaPtr &topfd_para_ptr,

@@ -131,7 +131,6 @@ void TopDIADialog::on_defaultButton_clicked() {
   ui->windowSizeEdit->setText(QString::number(topfd_para_ptr_->getPrecWindowWidth()));
   ui->threadNumberEdit->setText(QString::number(topfd_para_ptr_->getThreadNum()));
   ui->msDeconvCheckBox->setChecked(topfd_para_ptr_->isSortUseMsDeconv());
-  ui->geneHTMLCheckBox->setChecked(topfd_para_ptr_->isGeneHtmlFolder());
   ui->disableFilteringCheckBox->setChecked(!topfd_para_ptr_->isAANumBasedFilter());
   ui->singleScanNoiseLevelCheckBox->setChecked(topfd_para_ptr_->isUseSingleScanNoiseLevel());
 
@@ -299,7 +298,6 @@ void TopDIADialog::getParaPtr() {
   topfd_para_ptr_->setMsTwoSnRatio(std::stod(ui->ms2snRatioEdit->text().toStdString()));
   topfd_para_ptr_->setPrecWindowWidth(std::stod(ui->windowSizeEdit->text().toStdString()));
   topfd_para_ptr_->setThreadNum(std::stoi(ui->threadNumberEdit->text().toStdString()));
-  topfd_para_ptr_->setGeneHtmlFolder(ui->geneHTMLCheckBox->isChecked());
   topfd_para_ptr_->setSortUseMsDeconv(ui->msDeconvCheckBox->isChecked());
   topfd_para_ptr_->setActivation(ui->activationComboBox->currentText().toStdString());
   topfd_para_ptr_->setAANumBasedFilter(!(ui->disableFilteringCheckBox->isChecked()));
@@ -332,7 +330,6 @@ void TopDIADialog::lockDialog() {
   ui->startButton->setEnabled(false);
   ui->windowSizeEdit->setEnabled(false);
   ui->outputButton->setEnabled(false);
-  ui->geneHTMLCheckBox->setEnabled(false);
   ui->msDeconvCheckBox->setEnabled(false);
   ui->activationComboBox->setEnabled(false);
   ui->disableFilteringCheckBox->setEnabled(false);
@@ -363,7 +360,6 @@ void TopDIADialog::unlockDialog() {
   ui->windowSizeEdit->setEnabled(true);
   ui->outputButton->setEnabled(true);
   ui->outputButton->setDefault(true);
-  ui->geneHTMLCheckBox->setEnabled(true);
   ui->msDeconvCheckBox->setEnabled(true);
   ui->activationComboBox->setEnabled(true);
   ui->disableFilteringCheckBox->setEnabled(true);

@@ -53,9 +53,6 @@ std::string geneTopfdCommand(const TopfdParaPtr &para_ptr,
     command = command + "-o ";
   }
   command = command + "-u " + std::to_string(para_ptr->getThreadNum()) + " ";
-  if (!para_ptr->isGeneHtmlFolder()) {
-    command = command + "-g ";
-  }
   if (!para_ptr->isAANumBasedFilter()) {
     command = command + "-d ";
   }
@@ -107,9 +104,6 @@ std::string geneTopdiaCommand(const TopfdParaPtr &topfd_para_ptr,
         command = command + "-o ";
     }
     command = command + "-u " + std::to_string(topfd_para_ptr->getThreadNum()) + " ";
-    if (!topfd_para_ptr->isGeneHtmlFolder()) {
-        command = command + "-g ";
-    }
     if (!topfd_para_ptr->isAANumBasedFilter()) {
         command = command + "-d ";
     }

@@ -112,7 +112,6 @@ bool Argument::parse(int argc, char* argv[]) {
 
       ("disable-final-filtering,d","Skip the final filtering of envelopes in MS/MS scans.")
       ("thread-number,u", po::value<std::string> (&thread_number), "<a positive integer>. Number of threads used in spectral deconvolution. Default value: 1.")
-      ("skip-html-folder,g","Skip the generation of HTML files for visualization.")
       ;
 
     po::options_description desc("Options");
@@ -136,7 +135,6 @@ bool Argument::parse(int argc, char* argv[]) {
       ("ms1-intensity-correlation-cutoff,p", po::value<std::string> (&ms1_seed_env_inte_corr_tole_cutoff), "")
       ("ms2-intensity-correlation-cutoff,P", po::value<std::string> (&ms2_seed_env_inte_corr_tole_cutoff), "")
       ("thread-number,u", po::value<std::string> (&thread_number), "")
-      ("skip-html-folder,g","")
       ("msdeconv,n", "")
       ("disable-final-filtering,d", "")
       ("keep,k", "Report monoisotopic masses extracted from low quality isotopic envelopes.")
@@ -297,9 +295,6 @@ bool Argument::parse(int argc, char* argv[]) {
         LOG_ERROR("Thread number " << thread_number << " should be a number.");
         return false;
       }
-    }
-    if (vm.count("skip-html-folder")) {
-      topfd_para_ptr_->setGeneHtmlFolder(false);
     }
     if (vm.count("disable-final-filtering")) {
       topfd_para_ptr_->setAANumBasedFilter(false);

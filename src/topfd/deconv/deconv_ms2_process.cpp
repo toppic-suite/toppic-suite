@@ -14,7 +14,6 @@
 
 #include "topfd/deconv/deconv_ms2_process.hpp"
 
-#include <filesystem>
 #include <string>
 
 #include "common/thread/simple_thread_pool.hpp"
@@ -132,20 +131,6 @@ DeconvMs2Process::DeconvMs2Process(const TopfdParaPtr &topfd_para_ptr,
   output_filename_ext_ = output_filename_ext;
 }
 
-void DeconvMs2Process::prepareFileFolder() {
-  if (topfd_para_ptr_->isGeneHtmlFolder()) {
-    // json file names
-    std::string html_dir = topfd_para_ptr_->getHtmlDir();
-    if (!std::filesystem::exists(html_dir)) {
-      file_util::createFolder(html_dir);
-    }
-    std::string ms2_json_dir = topfd_para_ptr_->getMs2JsonDir();
-    if (!std::filesystem::exists(ms2_json_dir)) {
-      file_util::createFolder(ms2_json_dir);
-    }
-  }
-}
-
 void DeconvMs2Process::readSpecFeature(
     std::string feat_file_name, std::map<int, SpecFeaturePtrVec> &feat_map) {
   SpecFeatureReaderPtr sp_feat_reader =
@@ -179,7 +164,6 @@ void DeconvMs2Process::process() {
     LOG_ERROR("No spectrum to read in mzML file!");
     return;
   }
-  prepareFileFolder();
   // One SQLite writer shared across the worker threads (internally synchronized,
   // batched); created only when SQLite output is enabled.
   MzmlMsSqlWriterPtr sql_writer_ptr = topfd_para_ptr_->isGeneSql()

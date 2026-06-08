@@ -47,13 +47,6 @@ void TopfdPara::setMzmlFileNameAndFaims(const std::string &mzml_file_name,
     output_base_name_ = output_base_name_ + "_" 
       + std::to_string(static_cast<int>(faims_volt_)); 
   }
-  html_dir_ =  output_base_name_ + "_" + "html";
-  ms1_json_dir_ = html_dir_ 
-    + file_util::getFileSeparator() + "topfd" 
-    + file_util::getFileSeparator() + "ms1_json";
-  ms2_json_dir_ = html_dir_ 
-    + file_util::getFileSeparator() + "topfd" 
-    + file_util::getFileSeparator() + "ms2_json";
   sql_file_name_ = output_base_name_ + ".sqlite";
   if (gene_sql_) {
     createSqlDb(sql_file_name_);
@@ -172,16 +165,8 @@ std::string TopfdPara::getTopfdParaStr(const std::string &prefix,
       << "Maximum monoisotopic mass:  " << sep << max_mass_ << " Dalton" << std::endl;
   output << prefix << std::setw(gap) << std::left 
       << "Peak m/z error tolerance:   " << sep << mz_error_ << " m/z" << std::endl;
-  output << prefix << std::setw(gap) << std::left 
+  output << prefix << std::setw(gap) << std::left
       << "Thread number:              " << sep << thread_num_ << std::endl;
-  if (gene_html_folder_) {
-    output << prefix << std::setw(gap) << std::left 
-      << "Generate Html files:        " << sep << "Yes" << std::endl;
-  }
-  else {
-    output << prefix << std::setw(gap) << std::left 
-      << "Generate Html files:        " << sep << "No" << std::endl;
-  }
 
   if (missing_level_one_) {
     output << prefix << std::setw(gap) << std::left 

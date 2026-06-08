@@ -58,7 +58,6 @@ class TopfdPara {
   bool isAANumBasedFilter() const {return aa_num_based_filter_;}
   double getMs2EnvCnnScoreCutoff() const {return ms2_env_cnn_score_cutoff_;}
   const std::string& getActivation() const {return activation_;}
-  bool isGeneHtmlFolder() const {return gene_html_folder_;}
   bool isGeneSql() const {return gene_sql_;}
   bool isKeepUnusedPeaks() const {return keep_unused_peaks_;}
   bool isOutputMultipleMass() const {return output_multiple_mass_;}
@@ -73,9 +72,6 @@ class TopfdPara {
 
   const std::string& getMzmlFileName() const {return mzml_file_name_;}
   const std::string& getOutputBaseName() const {return output_base_name_;}
-  const std::string& getHtmlDir() const {return html_dir_;}
-  const std::string& getMs1JsonDir() const {return ms1_json_dir_;}
-  const std::string& getMs2JsonDir() const {return ms2_json_dir_;}
 
   int getFracId() const {return frac_id_;}
   bool isFaims() const {return is_faims_;}
@@ -101,7 +97,6 @@ class TopfdPara {
   void setAANumBasedFilter(bool filter) {aa_num_based_filter_ = filter;}
   void setMs2EnvCnnScoreCutoff(double cutoff) {ms2_env_cnn_score_cutoff_ = cutoff;}
   void setActivation(std::string activation) {activation_ = std::move(activation);}
-  void setGeneHtmlFolder(bool gene) {gene_html_folder_ = gene;}
   void setKeepUnusedPeaks(bool keep) {keep_unused_peaks_ = keep;}
   void setOutputMultipleMass(bool output) {output_multiple_mass_ = output;}
   void setOutputCsvFeatureFile(bool output) {output_csv_feature_file_ = output;}
@@ -145,7 +140,6 @@ class TopfdPara {
   double ms2_env_cnn_score_cutoff_ = 0.0;
   bool aa_num_based_filter_ = true;
   bool output_csv_feature_file_ = false;
-  bool gene_html_folder_ = true;
   bool gene_sql_ = false;
 
   // parameters for feature identification
@@ -175,10 +169,6 @@ class TopfdPara {
   std::string output_base_name_ = "deconv";
   std::string sql_file_name_ = "";
   sqlite3 *sql_db_ = nullptr;
-
-  std::string html_dir_ = "";
-  std::string ms1_json_dir_ = "";
-  std::string ms2_json_dir_ = "";
 
   int ms_1_scan_num_ = -1;
   int ms_2_scan_num_ = -1;

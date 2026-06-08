@@ -36,8 +36,6 @@ class DeconvMs2Process {
   EnvParaPtr env_para_ptr_;
   DpParaPtr dp_para_ptr_;
   std::string output_filename_ext_;
-  
-  void prepareFileFolder();
 
   void readSpecFeature(std::string feat_file_name, 
                        std::map<int, SpecFeaturePtrVec> &feat_map);

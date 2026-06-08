@@ -600,34 +600,6 @@ p, li { white-space: pre-wrap; }
     <property name="title">
      <string>Additional settings</string>
     </property>
-    <widget class="QWidget" name="horizontalLayoutWidget_11">
-     <property name="geometry">
-      <rect>
-       <x>270</x>
-       <y>20</y>
-       <width>201</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_10">
-      <item>
-       <widget class="QCheckBox" name="geneHTMLCheckBox">
-        <property name="acceptDrops">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>Generate HTML files</string>
-        </property>
-        <property name="checkable">
-         <bool>true</bool>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
     <widget class="QWidget" name="horizontalLayoutWidget_12">
      <property name="geometry">
       <rect>
