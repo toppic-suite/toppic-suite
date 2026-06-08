@@ -144,6 +144,11 @@ message(STATUS "pugixml version: ${pugixml_VERSION}")
 # only external dependencies.
 find_package(ZLIB REQUIRED)
 find_package(Threads REQUIRED)
+
+# SQLite3 backs sql/sql_util and ms/mzml/mzml_ms_sql_writer (the topfd SQLite
+# output). rapidjson (used by ms/mzml/mzml_ms_json_writer) is header-only and
+# found on the default include path, so it needs no find_package/link.
+find_package(SQLite3 REQUIRED)
 file(GLOB HTSLIB_SRCS CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/ext/htslib/*.c)
 add_library(htslib STATIC ${HTSLIB_SRCS})
 target_include_directories(htslib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/ext)
@@ -166,6 +171,7 @@ file(GLOB_RECURSE COMMON_SRCS CONFIGURE_DEPENDS
   ${CMAKE_CURRENT_SOURCE_DIR}/src/common/*.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/seq/*.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/para/*.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/sql/*.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/ms/*.cpp)
 
 add_library(toppic_common SHARED ${COMMON_SRCS})
@@ -182,6 +188,11 @@ target_link_libraries(toppic_common PUBLIC pugixml::pugixml)
 # (PRIVATE) of toppic_common.
 target_include_directories(toppic_common PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/ext)
 target_link_libraries(toppic_common PRIVATE htslib)
+
+# sql/sql_util.hpp and ms/mzml/mzml_ms_sql_writer.hpp expose <sqlite3.h>, so the
+# SQLite3 include path is PUBLIC; the library is PRIVATE (an implementation
+# detail of toppic_common).
+target_link_libraries(toppic_common PUBLIC SQLite::SQLite3)
 
 # Install the shared library using the prefix-relative GNUInstallDirs locations.
 # On Linux/macOS it is a LIBRARY artifact and lands in <prefix>/lib/toppic
