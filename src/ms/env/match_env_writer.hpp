@@ -1,0 +1,41 @@
+//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+//
+//Licensed under the Apache License, Version 2.0 (the "License");
+//you may not use this file except in compliance with the License.
+//You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+//Unless required by applicable law or agreed to in writing, software
+//distributed under the License is distributed on an "AS IS" BASIS,
+//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//See the License for the specific language governing permissions and
+//limitations under the License.
+
+#ifndef TOPPIC_MS_ENV_MATCH_ENV_WRITER_HPP_
+#define TOPPIC_MS_ENV_MATCH_ENV_WRITER_HPP_
+
+#include <fstream>
+#include <string>
+#include <vector>
+
+#include "ms/spec/ms_header.hpp"
+#include "ms/env/match_env.hpp"
+
+namespace toppic {
+
+namespace match_env_writer {
+
+void write_env(std::ofstream &file, const MsHeaderPtr &header, const MatchEnvPtr &match_env); 
+
+void write_env_vec(std::ofstream &file, const MsHeaderPtr &header, const MatchEnvPtrVec & envs); 
+
+void write(const std::string & file, const MsHeaderPtr &header, const MatchEnvPtrVec & envs); 
+
+void writePeakList(const std::string & file, const PeakPtrVec &peak_list, const MatchEnvPtrVec & envs);
+
+}  // namespace match_env_writer
+
+}  // namespace toppic
+
+#endif
