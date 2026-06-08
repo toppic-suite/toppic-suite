@@ -86,6 +86,7 @@ void processOneFile(const TopfdParaPtr &topfd_para_ptr,
     // Get mzml file profile
     PwMsReaderPtr reader_ptr = std::make_shared<PwMsReader>(spec_file_name);
     MzmlProfilePtr profile_ptr = reader_ptr->readProfile();
+    topfd_para_ptr->setFilePrecWindow(profile_ptr->hasPrecWindow());
     int frac_id = 0;
 
     // check if it is faims or not

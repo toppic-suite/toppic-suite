@@ -19,10 +19,11 @@
 
 namespace toppic {
 
-MzmlProfile::MzmlProfile(int ms1_cnt, int ms2_cnt,
+MzmlProfile::MzmlProfile(int ms1_cnt, int ms2_cnt, bool has_prec_window,
                          const std::map<double, std::pair<int,int>> &volt_map):
     total_ms1_cnt_(ms1_cnt),
     total_ms2_cnt_(ms2_cnt),
+    has_prec_window_(has_prec_window),
     volt_map_(volt_map) {}
 
 }  // namespace toppic

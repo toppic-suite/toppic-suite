@@ -309,9 +309,30 @@ int PwMsReader::readNextWithVoltage(double voltage) {
   return 1;
 }
 
+namespace {
+
+// Returns true if the spectrum's precursor specifies its isolation window width
+// (a lower/upper isolation-window offset cvParam) -- i.e. the file carries the
+// MS/MS precursor window rather than relying on a default width.
+bool specHasPrecWindow(const pwiz::msdata::SpectrumPtr &spec) {
+  if (spec->precursors.empty()) {
+    return false;
+  }
+  for (const pwiz::data::CVParam &cv : spec->precursors[0].isolationWindow.cvParams) {
+    if (cv.cvid == pwiz::cv::MS_isolation_window_lower_offset ||
+        cv.cvid == pwiz::cv::MS_isolation_window_upper_offset) {
+      return true;
+    }
+  }
+  return false;
+}
+
+}  // namespace
+
 MzmlProfilePtr PwMsReader::readProfile() {
   int ms_1_cnt = 0;
   int ms_2_cnt = 0;
+  bool has_prec_window = false;
   std::map<double, std::pair<int,int>> volt_map;
   bool get_binary_data = false;
   for (int sp_id = 0; sp_id < input_sp_num_; sp_id++) {
@@ -325,6 +346,9 @@ MzmlProfilePtr PwMsReader::readProfile() {
     }
     else if (ms_level == 2) {
       ms_2_cnt++;
+      if (!has_prec_window && specHasPrecWindow(cur_spec_ptr)) {
+        has_prec_window = true;
+      }
     }
     if (voltage != std::numeric_limits<double>::max()) {
       auto search = volt_map.find(voltage);
@@ -352,7 +376,8 @@ MzmlProfilePtr PwMsReader::readProfile() {
       }
     }
   }
-  MzmlProfilePtr profile_ptr = std::make_shared<MzmlProfile>(ms_1_cnt, ms_2_cnt, volt_map);
+  MzmlProfilePtr profile_ptr =
+      std::make_shared<MzmlProfile>(ms_1_cnt, ms_2_cnt, has_prec_window, volt_map);
   return profile_ptr;
 }
 

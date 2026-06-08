@@ -66,6 +66,9 @@ class TopfdPara {
   double getMs1EcscoreCutoff() const {return ms1_ecscore_cutoff_;}
   double getMs2EcscoreCutoff() const {return ms2_ecscore_cutoff_;}
   bool isSearchPrecWindow() const {return search_prec_window_;}
+  // True when the input mzML carries MS/MS precursor windows (so prec_window_,
+  // the default width, is unused). Set from MzmlProfile::hasPrecWindow().
+  bool isFilePrecWindow() const {return file_prec_window_;}
   bool isUseSingleScanNoiseLevel() const {return use_single_scan_noise_level_;}
   bool isTextPeakList() const {return text_peak_list_;}
   double getPrecInteCutoffRatio() const {return prec_inte_cutoff_ratio_;}
@@ -102,6 +105,7 @@ class TopfdPara {
   void setOutputCsvFeatureFile(bool output) {output_csv_feature_file_ = output;}
   void setThreadNum(int num) {thread_num_ = num;}
   void setSearchPrecWindow(bool search) {search_prec_window_ = search;}
+  void setFilePrecWindow(bool file_prec_window) {file_prec_window_ = file_prec_window;}
   void setUseSingleScanNoiseLevel(bool single_scan_noise) {use_single_scan_noise_level_ = single_scan_noise;}
   void setMs1EcscoreCutoff(double cutoff) {ms1_ecscore_cutoff_ = cutoff;}
   void setMs2EcscoreCutoff(double cutoff) {ms2_ecscore_cutoff_ = cutoff;}
@@ -141,6 +145,8 @@ class TopfdPara {
   bool aa_num_based_filter_ = true;
   bool output_csv_feature_file_ = false;
   bool gene_sql_ = false;
+  // set per input file from MzmlProfile::hasPrecWindow()
+  bool file_prec_window_ = false;
 
   // parameters for feature identification
   double split_intensity_ratio_ = 2.5;

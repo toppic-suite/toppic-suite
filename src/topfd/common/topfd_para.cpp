@@ -201,7 +201,13 @@ std::string TopfdPara::getTopfdParaStr(const std::string &prefix,
 
   output << std::endl
          << banner(prefix, "MS/MS spectral deconvolution parameters") << std::endl;
-  kv("Default precursor window:") << prec_window_ << " m/z" << std::endl;
+  if (isFilePrecWindow()) {
+    // the input file carries the MS/MS precursor windows, so prec_window_ (the
+    // default width) is not used.
+    kv("Default precursor window:") << "FILE" << std::endl;
+  } else {
+    kv("Default precursor window:") << prec_window_ << " m/z" << std::endl;
+  }
   kv("Activation type:") << activation_ << std::endl;
   kv("MS/MS signal/noise ratio:") << ms_two_sn_ratio_ << std::endl;
   kv("Fragment envelope ranking:") << (sort_use_msdeconv_ ? "MS-Deconv score" : "EnvCNN score") << std::endl;
