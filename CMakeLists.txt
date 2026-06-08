@@ -164,7 +164,7 @@ target_compile_options(htslib PRIVATE -w)
 # as a static library against Boost + zlib and linked into toppic_common. The
 # vendored sources include themselves as "pwiz/...", so ext/ is the include root.
 # WITHOUT_MZ5 drops the HDF5-backed mz5 format so no HDF5 dependency is needed.
-find_package(Boost 1.74 REQUIRED COMPONENTS filesystem iostreams thread chrono system serialization)
+find_package(Boost 1.74 REQUIRED COMPONENTS filesystem iostreams thread chrono system serialization program_options)
 file(GLOB PWIZ_SRCS CONFIGURE_DEPENDS
   ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/utility/minimxml/*.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/utility/misc/*.cpp
@@ -251,3 +251,46 @@ install(TARGETS toppic_common
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+# ---------------------------------------------------------------------------
+# GUI executables (Qt5)
+#
+# Each tool's dialog collects parameters and shells out to the matching
+# command-line tool via QProcess (gui/util/command). All the heavy lifting
+# (common/seq/para/ms/prsm/filter/search/stat/visual/topfd/topdia) already
+# lives in the toppic_common shared library, so a GUI target only compiles its
+# own Qt sources -- plus, for the five tools whose dialog reads default values
+# from the console parser, that tool's src/console/<tool>_argument.cpp -- and
+# links against toppic_common, Qt5 and Boost::program_options.
+#
+# (The src/gui/topmerge sources are migrated for completeness but, as upstream,
+# get no executable target: the merge backend is not part of this library.)
+# ---------------------------------------------------------------------------
+find_package(Qt5 COMPONENTS Widgets Core Gui REQUIRED)
+
+# Shared by every GUI target (a QProcess command builder + message helpers).
+# It is QObject-based, so it is built per target via the target's AUTOMOC.
+file(GLOB GUI_UTIL_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/util/*.cpp)
+
+# toppic_gui_exe(<target> <gui-subdir> [extra sources...])
+function(toppic_gui_exe name dir)
+  file(GLOB _srcs
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/${dir}/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/${dir}/*.qrc)
+  add_executable(${name} ${_srcs} ${GUI_UTIL_SRCS} ${ARGN})
+  # AUTOUIC resolves the dialogs' "gui/<dir>/ui_*.h" includes by finding the
+  # matching .ui under src/ (the search path) and emitting the header with the
+  # same relative path into the target's autogen include dir.
+  set_target_properties(${name} PROPERTIES
+    AUTOMOC ON AUTOUIC ON AUTORCC ON
+    AUTOUIC_SEARCH_PATHS ${CMAKE_CURRENT_SOURCE_DIR}/src)
+  target_link_libraries(${name} PRIVATE
+    toppic_common Qt5::Widgets Qt5::Core Qt5::Gui Boost::program_options)
+endfunction()
+
+toppic_gui_exe(topfd_gui    topfd)
+toppic_gui_exe(topindex_gui topindex ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topindex_argument.cpp)
+toppic_gui_exe(toppic_gui   toppic   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_argument.cpp)
+toppic_gui_exe(topmg_gui    topmg    ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmg_argument.cpp)
+toppic_gui_exe(topdiff_gui  topdiff  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdiff_argument.cpp)
+toppic_gui_exe(topdia_gui   topdia   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdia_argument.cpp)
