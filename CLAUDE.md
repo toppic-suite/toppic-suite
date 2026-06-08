@@ -152,6 +152,15 @@ path and linked into `toppic_common`:
   store for deconvoluted MS1/MS2 spectra (it replaced an earlier one-JSON-file-
   per-scan writer): it inserts via reused prepared statements batched into
   chunked transactions under bulk-load PRAGMAs, so it scales to many scans.
+  **Interface note:** `mzml_ms_sql_writer` is now the stateful class
+  `MzmlMsSqlWriter` (construct once, call `writeMs1`/`writeMs2` per spectrum, let
+  it destruct to flush the final transaction), **not** the old
+  `mzml_ms_sql_writer::writeMs1/writeMs2(sqlite3*, ...)` free functions — the
+  batching needs state a per-call free function can't hold. The caller still owns
+  the connection (opens it, creates the schema, closes it). When migrating the
+  upstream topfd driver that wrote spectra, adopt the object; do not reintroduce
+  per-call free-function wrappers (they would restore the per-scan
+  transaction/prepare cost this rewrite removed).
 - **Boost** — `ms/mzml`'s pwiz reader links the compiled Boost libs
   (`filesystem`, `iostreams`, `thread`, `chrono`, `system`) via
   `find_package(Boost)`. Prefer `std::mutex` etc. over `boost::*` in our own
