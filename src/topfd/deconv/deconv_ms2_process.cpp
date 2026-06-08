@@ -253,7 +253,7 @@ void DeconvMs2Process::process() {
       output_base_name, para_str);
   ms2_merge_ptr->process();
 
-  // remove tempory files
+  // remove temporary files
   std::string ms2_prefix =
       file_util::absoluteName(output_base_name) + "_" + output_filename_ext_ + "_";
   std::replace(output_base_name.begin(), output_base_name.end(), '\\', '/');

@@ -197,7 +197,7 @@ std::string geneToppicCommand(std::map<std::string, std::string> arguments_,
   for (std::map<std::string, std::string>::iterator it = arguments_.begin(); it != arguments_.end(); ++it) {
     //if one of the toppic parameters
     if (toppic_para.find(it->first) != toppic_para.end()) { 
-      //skip some paramters based on parameter values
+      //skip some parameters based on parameter values
       LOG_DEBUG(it->first << " " << it->second);
       if (it->first == "fixedMod" && it->second == "") {
         continue;
@@ -286,7 +286,7 @@ std::string geneTopmgCommand(std::map<std::string, std::string> arguments_,
 
   for (std::map<std::string, std::string>::iterator it = arguments_.begin(); it != arguments_.end(); ++it) {
     if (topmg_para.find(it->first) != topmg_para.end()) { //if one of the common parameters
-      //skip some paramters based on parameter values
+      //skip some parameters based on parameter values
       if (it->first == "fixedMod" && it->second == "") {
         continue;
       }

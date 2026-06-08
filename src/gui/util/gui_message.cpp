@@ -26,7 +26,7 @@ GuiMessage::GuiMessage() {}
 
 std::string GuiMessage::getMsg(std::string new_msg) {
   buffer_ << new_msg;
-  // Here is the infomation been shown in the infoBox.
+  // Here is the information been shown in the infoBox.
   info_ = buffer_.str();
   std::string new_info = info_.substr(processed_len_);
   processed_len_ = info_.length();
@@ -43,7 +43,7 @@ std::string GuiMessage::getMsg(std::string new_msg) {
       if (new_info.at(i) == '\r') {
         cursor_pos_ = 0;
       }
-      // add a new charactor
+      // add a new character
       if (new_info.at(i) != '\n' && new_info.at(i) != '\r') {
         if (cursor_pos_ < current_line_.length()) {
           current_line_[cursor_pos_] = new_info.at(i);

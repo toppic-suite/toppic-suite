@@ -224,13 +224,13 @@ void process(const std::string &spec_file_name,
     all_ptrs3.insert(all_ptrs3.begin(), target_ptrs3.begin(), target_ptrs3.end());
     all_ptrs3.insert(all_ptrs3.end(), decoy_ptrs3.begin(), decoy_ptrs3.end());
     std::sort(all_ptrs3.begin(), all_ptrs3.end(), PrsmStr::cmpSpecIncPrecIncEvalueIncProtInc);
-    std::cout << "Goup 3 target_ptrs: " << target_ptrs3.size() << ", Group 3 decoy_ptrs: " << decoy_ptrs3.size() << std::endl;
+    std::cout << "Group 3 target_ptrs: " << target_ptrs3.size() << ", Group 3 decoy_ptrs: " << decoy_ptrs3.size() << std::endl;
     writer.writeVector(all_ptrs3);
 
     all_ptrs4.insert(all_ptrs4.begin(), target_ptrs4.begin(), target_ptrs4.end());
     all_ptrs4.insert(all_ptrs4.end(), decoy_ptrs4.begin(), decoy_ptrs4.end());
     std::sort(all_ptrs4.begin(), all_ptrs4.end(), PrsmStr::cmpSpecIncPrecIncEvalueIncProtInc);
-    std::cout << "Goup 4 target_ptrs: " << target_ptrs4.size() << ", Group 4 decoy_ptrs: " << decoy_ptrs4.size() << std::endl;
+    std::cout << "Group 4 target_ptrs: " << target_ptrs4.size() << ", Group 4 decoy_ptrs: " << decoy_ptrs4.size() << std::endl;
     writer.writeVector(all_ptrs4);
   }
   else {

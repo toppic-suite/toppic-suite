@@ -208,7 +208,7 @@ double Prsm::getOneProtProb() {
   }
 }
 
-/* this function is tempory for testing mass graph alignment */
+/* this function is temporary for testing mass graph alignment */
 double Prsm::getNormMatchFragNum() {
   int var_change_num = proteoform_ptr_->getAlterNum(AlterType::VARIABLE);
   int unexp_change_num = proteoform_ptr_->getAlterNum(AlterType::UNEXPECTED);

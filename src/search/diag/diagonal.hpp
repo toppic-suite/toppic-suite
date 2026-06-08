@@ -29,7 +29,7 @@ class Diagonal {
   public:
     Diagonal() {}
 
-    // Add contruction method here because a template 
+    // Add construction method here because a template 
     // is used. 
     explicit Diagonal(const DiagHeaderPtr &header_ptr):
       header_ptr_(header_ptr) {}

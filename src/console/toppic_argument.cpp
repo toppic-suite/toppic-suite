@@ -243,7 +243,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         ("max-shift,M", po::value<std::string> (&max_shift_mass), "Maximum value of the mass shift of an unexpected modification. Default value: 500 Dalton.")
         //("n-terminal-label,N", po::value<std::string> (&n_term_label_mass), "N-terminal modification mass for iTRAQ or TMT labeling. Default value: 0")
         ("variable-ptm-num,S", po::value<std::string> (&variable_ptm_num), "Maximum number of variable modifications in a proteoform-spectrum-match. Default value: 3.")
-        ("variable-ptm-file-name,b", po::value<std::string>(&variable_ptm_file_name), "<a variable modification file>. Specify a text file containing the information of varaible modifications.")
+        ("variable-ptm-file-name,b", po::value<std::string>(&variable_ptm_file_name), "<a variable modification file>. Specify a text file containing the information of variable modifications.")
         ("decoy,d", "Use a shuffled decoy protein database to estimate false discovery rates.")
         ("mass-error-tolerance,e", po::value<std::string> (&mass_error_tole), "<a positive integer>. Error tolerance for precursor and fragment masses in PPM. Default value: 10.")
         ("proteoform-error-tolerance,p", po::value<std::string> (&form_error_tole), "<a positive number>. Error tolerance for identifying PrSM clusters. Default value: 1.2 Dalton.")
@@ -489,7 +489,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
 
 bool ToppicArgument::validateArguments() {
   if (!std::filesystem::exists(arguments_["resourceDir"])) {
-    LOG_ERROR("Resource direcotry " << arguments_["resourceDir"] << " does not exist!\n"
+    LOG_ERROR("Resource directory " << arguments_["resourceDir"] << " does not exist!\n"
               << "Please check if the file directory or name contains special characters such as spaces or quotation marks.");
     return false;
   }

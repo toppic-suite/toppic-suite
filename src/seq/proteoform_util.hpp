@@ -26,7 +26,7 @@ namespace proteoform_util {
 // calculate frequencies for n_terminal_residues
 ResFreqPtrVec compNTermResidueFreq(const ProteoformPtrVec &prot_mod_forms);
 
-// calculater frequences for all residues
+// calculate frequencies for all residues
 ResFreqPtrVec compResidueFreq(const ResiduePtrVec &residue_list,
                               const ProteoformPtrVec &raw_mods);
 

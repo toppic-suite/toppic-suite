@@ -136,7 +136,7 @@ bool TopDiffArgument::parse(int argc, char* argv[]) {
 
 bool TopDiffArgument::validateArguments() {
   if (!std::filesystem::exists(arguments_["resourceDir"])) {
-    LOG_ERROR("Resource direcotry " << arguments_["resourceDir"] << " does not exist!\n" 
+    LOG_ERROR("Resource directory " << arguments_["resourceDir"] << " does not exist!\n" 
               << "Please check if the file directory or name contains special characters such as spaces or quotation marks.");
     return false;
   }
@@ -149,7 +149,7 @@ bool TopDiffArgument::validateArguments() {
     }
   }
   if (spectrum_file_list_.size() < 2) {
-    LOG_ERROR("Only 1 spectrum file added. Please add at least 2 spectum files to make a comparison.");
+    LOG_ERROR("Only 1 spectrum file added. Please add at least 2 spectrum files to make a comparison.");
     return false;
   }
 

@@ -401,7 +401,7 @@ bool TopFDDialog::checkError() {
 
   if (ui->minScanNumEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
-                         tr("Mininum scan number is empty!"),
+                         tr("Minimum scan number is empty!"),
                          QMessageBox::Yes);
     return true;
   }

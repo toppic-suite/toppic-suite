@@ -219,7 +219,7 @@ void DprProcessor::process() {
   merge_ptr->process();
   merge_ptr = nullptr;
 
-  // remove tempory files
+  // remove temporary files
   file_util::cleanTempFiles(sp_file_name, mng_ptr_->output_file_ext_ + "_");
 }
 

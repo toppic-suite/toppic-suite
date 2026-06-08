@@ -136,7 +136,7 @@ double refinePrecursorAndHeaderShift(const ProteoformPtr &proteo_ptr,
       counts[idx]++;
     }
   }
-  /* get median positon */
+  /* get median position */
   int median = matched_pair_ptrs.size()/2;
   int sum = 0;
   int best_pos = one_side_step_num;

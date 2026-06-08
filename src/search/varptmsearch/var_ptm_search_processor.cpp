@@ -104,7 +104,7 @@ std::function<void()> geneTask(const SpectrumSetPtr &spec_set_ptr,
       int start_pos = 0;
       if (type_ptr == ProteoformType::COMPLETE || type_ptr == ProteoformType::PREFIX) {
         if (n_term_shift != 0) {
-          // Get the proteoform with N-terminal modificaiton
+          // Get the proteoform with N-terminal modification
           ProtModPtr prot_mod_ptr = findMatchedProtModPtr(db_proteo_ptr, prot_mod_ptr_vec, n_term_shift);
           LOG_DEBUG("Db seq: " << db_proteo_ptr->getProteoformMatchSeq());
           proteo_with_prot_mod_ptr = proteoform_factory::geneProtModProteoform(db_proteo_ptr, prot_mod_ptr);

@@ -91,7 +91,7 @@ class EnvPara {
   // minimum score for matching envelopes 
   double min_match_env_score_ = 0;
 
-  // 3. fitering using envelopes with charge Z, 2 times of Z, 3 times of Z, 
+  // 3. filtering using envelopes with charge Z, 2 times of Z, 3 times of Z, 
   // no parameters here
 
   // 4. filtering by comparing envelopes with similar charge.

@@ -132,7 +132,7 @@ inline void CountTestNum::initInternalMassCnt() {
   internal_mass_cnts_ = new double[max_sp_len_]();
   // middle
   double norm_count = 0;
-  // use approxiation to speed up
+  // use approximation to speed up
   LOG_DEBUG("residue_avg_len_ " << residue_avg_len_);
   for (int i = max_sp_len_ - 1; i >= 0; i--) {
     norm_count += suff_mass_cnts_[i];

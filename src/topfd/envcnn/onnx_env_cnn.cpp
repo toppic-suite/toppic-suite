@@ -215,7 +215,7 @@ void addNoisePeaksToMatrix(std::vector<std::vector<float>> &matrix,
     int bin_index = int((exp_peak - min_mz) * 100);
     // Evaluate Peak Condition
     bool matched_peak = false;
-    // to accomodate +2 and -2 bins - reason tolerance of 0.02
+    // to accommodate +2 and -2 bins - reason tolerance of 0.02
     for (int shift = -2; shift <= 2; shift++) {
       int shifted_idx = bin_index + shift;
       if ((shifted_idx < 300) && (shifted_idx >= 0) && (matrix[0][shifted_idx] != 0)) {

@@ -194,7 +194,7 @@ ProteoformPtrVec getAllCandidateForms(const ProteoformPtr &ori_form_ptr,
   FastaSeqPtr fasta_seq_ptr = ori_form_ptr->getFastaSeqPtr();
   int ori_start_pos = ori_form_ptr->getStartPos();
   int ori_end_pos = ori_form_ptr->getEndPos();
-  // 1. Add the orignal form
+  // 1. Add the original form
   ProteoformPtrVec base_form_ptr_vec = getCandidateForm(fasta_seq_ptr, 
                                                         ori_start_pos,
                                                         ori_start_pos,

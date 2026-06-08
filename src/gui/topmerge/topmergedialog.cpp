@@ -177,7 +177,7 @@ void TopMergeDialog::on_startButton_clicked() {
     if (thread_->isFinished()) {
       finish = true;
     }
-    // Here is the infomation been shown in the infoBox.
+    // Here is the information been shown in the infoBox.
     info = buffer.str();
     std::string new_info = info.substr(processed_len);
     processed_len = info.length();
@@ -194,7 +194,7 @@ void TopMergeDialog::on_startButton_clicked() {
         if (new_info.at(i) == '\r') {
           cursor_pos = 0;
         }
-        // add a new charactor
+        // add a new character
         if (new_info.at(i) != '\n' && new_info.at(i) != '\r') {
           if (cursor_pos < current_line.length()) {
             current_line[cursor_pos] = new_info.at(i);

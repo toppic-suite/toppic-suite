@@ -168,7 +168,7 @@ void addSpectrumPtrsToPrsms(PrsmPtrVec &prsm_ptrs, const PrsmParaPtr &prsm_para_
 }
 
 void addFeatureInfoToPrsms(PrsmStrPtrVec &prsm_ptrs, const std::string & feature_file_name) {
-  // read TopFD featuers
+  // read TopFD features
   SpecFeatureReader ft_reader(feature_file_name); 
   SpecFeaturePtrVec ms2_features = ft_reader.readAllFeatures();
   ft_reader.close();

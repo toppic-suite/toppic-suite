@@ -132,7 +132,7 @@ class Prsm {
 
   void setFracFeatureId(int id) {frac_feature_id_ = id;}
 
-  // comparion
+  // comparison
   static bool cmpMatchFragDecMatchPeakDecProtInc(const PrsmPtr &a, const PrsmPtr &b);
 
   // sort by number of matched fragment ions, then start position

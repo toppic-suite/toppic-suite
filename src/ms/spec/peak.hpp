@@ -23,7 +23,7 @@
 
 namespace toppic {
 
-// Use forword declaration instead of header files
+// Use forward declaration instead of header files
 // to speed up compilation
 class XmlDOMDocument;
 

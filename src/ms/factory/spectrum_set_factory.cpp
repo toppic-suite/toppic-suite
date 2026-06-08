@@ -55,7 +55,7 @@ SpectrumSetPtr geneSpectrumSetPtr(const DeconvMsPtrVec &deconv_ms_ptr_vec,
                                   double prec_mono_mass) { 
   bool valid = checkValid(deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass);
 
-  // when the spectrum is invalid, the ms vectors below are empy ones
+  // when the spectrum is invalid, the ms vectors below are empty ones
   ExtendMsPtrVec extend_ms_three_ptr_vec;
   PrmMsPtrVec prm_ms_two_ptr_vec;
   PrmMsPtrVec srm_ms_two_ptr_vec;

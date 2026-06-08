@@ -85,15 +85,15 @@ std::pair<int, int> Precursor::getMonoMassMinusWaterError(double ppo, double sca
 }
 
 XmlDOMElement Precursor::getPrecursorXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) const {
-  // float number precison
-  int precison = 4;
+  // float number precision
+  int precision = 4;
   std::string precursor_str = Precursor::getXmlElementName();
   XmlDOMElement element = xml_doc->addElement(parent, precursor_str.c_str());
   std::string str = std::to_string(prec_id_);
   xml_doc->addElement(element, "prec_id", str.c_str());
   str = std::to_string(feat_id_);
   xml_doc->addElement(element, "feat_id", str.c_str());
-  str = str_util::fixedToString(mono_mz_, precison);
+  str = str_util::fixedToString(mono_mz_, precision);
   xml_doc->addElement(element, "mono_mz", str.c_str());
   str = std::to_string(charge_);
   xml_doc->addElement(element, "charge", str.c_str());

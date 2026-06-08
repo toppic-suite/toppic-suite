@@ -200,7 +200,7 @@ bool TopIndexArgument::parse(int argc, char* argv[]) {
 
 bool TopIndexArgument::validateArguments() {
   if (!std::filesystem::exists(arguments_["resourceDir"])) {
-    LOG_ERROR("Resource direcotry " << arguments_["resourceDir"] << " does not exist!\n" 
+    LOG_ERROR("Resource directory " << arguments_["resourceDir"] << " does not exist!\n" 
               << "Please check if file directory or name contains special characters such as spaces or quotation marks.");
     return false;
   }

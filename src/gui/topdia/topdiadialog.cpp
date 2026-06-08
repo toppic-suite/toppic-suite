@@ -427,21 +427,21 @@ bool TopDIADialog::checkError() {
 
   if (ui->ms1MinScanNumEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
-                         tr("MS1 mininum scan number is empty!"),
+                         tr("MS1 minimum scan number is empty!"),
                          QMessageBox::Yes);
     return true;
   }
 
   if (ui->ms2MinScanNumEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
-                         tr("MS2 mininum scan number is empty!"),
+                         tr("MS2 minimum scan number is empty!"),
                          QMessageBox::Yes);
     return true;
   }
 
   if (ui->pseudoMinPeakNumEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
-                         tr("Pseudo mininum peak number is empty!"),
+                         tr("Pseudo minimum peak number is empty!"),
                          QMessageBox::Yes);
     return true;
   }

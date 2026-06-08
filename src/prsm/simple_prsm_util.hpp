@@ -23,7 +23,7 @@ namespace simple_prsm_util {
 
 SimplePrsmPtrVec getUniqueMatches(SimplePrsmPtrVec match_ptrs);
 
-}  // namesapce simple_prsm_util
+}  // namespace simple_prsm_util
 
 }  // namespace toppic
 

@@ -32,7 +32,7 @@ bool increaseIJ(size_t i, size_t j, double deviation,
   if (deviation <= 0) {
     return true;
   }
-  // severl real peak can be matched to the same theoretical peak
+  // several real peak can be matched to the same theoretical peak
   if (i >= ms_masses.size() - 1) {
     return false;
   }

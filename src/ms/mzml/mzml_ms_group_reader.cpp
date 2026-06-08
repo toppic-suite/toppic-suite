@@ -100,7 +100,7 @@ void MzmlMsGroupReader::initMs2Ms1Map() {
     MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
     if (header_ptr->getMsLevel() == 1) {
       int ms1_scan = header_ptr->getFirstScanNum();
-      //set inital value of the last ms two scan of the ms1 scan to -1 
+      //set initial value of the last ms two scan of the ms1 scan to -1 
       last_ms_two_scan_map_[ms1_scan] = -1;
       ms_one_scans_.push_back(ms1_scan);
       ms_one_scan_idx_map_[ms1_scan] = idx;

@@ -244,7 +244,7 @@ bool LocalProcessor::modifiable(const ProteoformPtr &proteoform_ptr, int i, cons
 
 // we will get a nullptr if the mass shift can't be explained by a variable ptm
 ProteoformPtr LocalProcessor::processOneKnownPtm(const PrsmPtr &prsm_ptr) {
-  //get canidate forms
+  //get candidate forms
   ProteoformPtr ori_form_ptr = prsm_ptr->getProteoformPtr();
   ProteoformPtrVec cand_form_vec = local_proteoform::getAllCandidateForms(ori_form_ptr, mng_ptr_);
 

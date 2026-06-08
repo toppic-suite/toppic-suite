@@ -100,7 +100,7 @@ void processMs1(const TopfdParaPtr &topfd_para_ptr) {
     matrix_ptr->removeNonNeighbors(score_para_ptr->neighbor_mz_tole_);
   }
 
-  /// Extract Fetures
+  /// Extract Features
   LOG_DEBUG("Number of seed envelopes: " << seed_ptrs.size());
   int seed_num = seed_ptrs.size();
   EnvCollPtrVec env_coll_list;
@@ -334,7 +334,7 @@ void processMs2(const TopfdParaPtr &topfd_para_ptr) {
         matrix_ptr->removeNonNeighbors(score_para_ptr->neighbor_mz_tole_);
       }
 
-      /// Extract Fetures
+      /// Extract Features
       LOG_DEBUG("Number of seed envelopes: " << seed_ptrs.size());
       int seed_num = static_cast<int>(seed_ptrs.size());
       EnvCollPtrVec env_coll_list;

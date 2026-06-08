@@ -161,7 +161,7 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
     }
 
     int shift_num = std::stoi(arguments["shiftNumber"]);
-    LOG_DEBUG("num of unknown shfit " << shift_num);
+    LOG_DEBUG("num of unknown shift " << shift_num);
     int filter_result_num = std::stoi(arguments["filteringResultNumber"]);
     double max_shift_mass = std::stod(arguments["maxShiftMass"]);
 

@@ -178,7 +178,7 @@ void SimplePrsmStrMerge::mergeBlockResults(std::string &sp_file_name,
                                     inte_num);
   internal_merge.process();
 
-  // remove tempory files
+  // remove temporary files
   for (int i = 0; i < block_num; i++) {
     std::string file_pref = input_pref + "_" + std::to_string(i) + "_";
     file_util::cleanTempFiles(sp_file_name, file_pref);

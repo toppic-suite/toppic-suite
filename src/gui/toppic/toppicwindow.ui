@@ -830,7 +830,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
        <item>
         <widget class="QLabel" name="label_16">
          <property name="text">
-          <string>Nummber of combined spectra:</string>
+          <string>Number of combined spectra:</string>
          </property>
         </widget>
        </item>

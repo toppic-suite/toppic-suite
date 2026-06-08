@@ -219,7 +219,7 @@ void dbPreprocess(const std::string &ori_db_file_name,
     //if _idx folder doesn't exist yet
     file_util::createFolder(idx_folder_name);
   }
-  // Generate a stardard fasta file in which empty lines are removed
+  // Generate a standard fasta file in which empty lines are removed
   std::string standard_db_file_name = ori_db_file_name + "_idx" 
     + file_util::getFileSeparator() 
     + file_util::filenameFromEntirePath(ori_db_file_name) + "_standard";  

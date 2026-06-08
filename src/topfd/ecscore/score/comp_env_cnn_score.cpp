@@ -125,7 +125,7 @@ std::vector<std::vector<float>> getEnvcnnInputMatrix(const MsMapPtr &matrix_ptr,
       if (p_idx >= 300) break;
       /// check if peak has been used as the data peak.
       bool matched_peak = false;
-      // to accomodate +2 and -2 bins - reason tolerance of 0.02
+      // to accommodate +2 and -2 bins - reason tolerance of 0.02
       for (int shift = -2; shift <= 2; shift++) {
         int shifted_idx = p_idx + shift;
         if ((shifted_idx < 300) && (shifted_idx >= 0) && (data_matrix[0][shifted_idx] != 0)) {
