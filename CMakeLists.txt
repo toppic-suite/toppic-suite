@@ -120,8 +120,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unknown-pragmas -DWITHOUT_MZ5
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTOPPIC_LINUX")
-  # --disable-new-dtags is needed to first search the shared library in the directory ../lib/toppic
-  SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath=$ORIGIN/../lib/toppic,--disable-new-dtags")
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
@@ -185,8 +183,12 @@ target_compile_options(pwiz PRIVATE -w)
 # CMake-generated common/util/version.hpp.
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_BINARY_DIR}/gen)
 
-# code shared by several executables: the common/ layer (base, util, xml,
-# thread) and the seq/, para/ and ms/ layers built on top of it.
+# Code shared by every executable. It is compiled once into an OBJECT library
+# (no libtoppic_common.so / .a is produced); the object files are linked
+# directly into each command-line / GUI executable, which keeps them
+# self-contained (no shared library to locate at runtime). Its PUBLIC/PRIVATE
+# link dependencies and usage requirements still propagate to the executables
+# that link it.
 # CONFIGURE_DEPENDS makes CMake re-glob (and so reconfigure) when source files
 # are added or removed under these directories.
 file(GLOB_RECURSE COMMON_SRCS CONFIGURE_DEPENDS
@@ -204,7 +206,7 @@ file(GLOB_RECURSE COMMON_SRCS CONFIGURE_DEPENDS
   ${CMAKE_CURRENT_SOURCE_DIR}/src/visual/*.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/merge/*.cpp)
 
-add_library(toppic_common SHARED ${COMMON_SRCS})
+add_library(toppic_common OBJECT ${COMMON_SRCS})
 target_include_directories(toppic_common PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/src
   ${CMAKE_CURRENT_BINARY_DIR}/gen)
@@ -242,16 +244,6 @@ set_target_properties(onnxruntime PROPERTIES
   IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/ext/onnx/libonnxruntime.so.1.14.1
   IMPORTED_SONAME libonnxruntime.so.1.14.1)
 target_link_libraries(toppic_common PRIVATE onnxruntime)
-
-# Install the shared library using the prefix-relative GNUInstallDirs locations.
-# On Linux/macOS it is a LIBRARY artifact and lands in <prefix>/lib/toppic
-# (matched by the $ORIGIN/../lib/toppic rpath); on Windows the DLL is a RUNTIME
-# artifact (placed in <prefix>/bin next to the executables) and the import
-# library is an ARCHIVE artifact.
-install(TARGETS toppic_common
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 # ---------------------------------------------------------------------------
 # Command-line executables

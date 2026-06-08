@@ -210,9 +210,11 @@ path and linked into `toppic_common`:
 
 `src` is the include root, so headers are included by their path from `src`
 (`common/...`, `seq/...`, `ms/spec/...`, `para/...`, `sql/...`). All of the
-following compile into the single `toppic_common` shared library (the
-`COMMON_SRCS` glob in `CMakeLists.txt` lists each directory). Each layer depends
-only on the ones above it, never the reverse:
+following compile into the single `toppic_common` **OBJECT** library (the
+`COMMON_SRCS` glob in `CMakeLists.txt` lists each directory) — its object files
+are linked directly into each executable, so **no `libtoppic_common.so`/`.a` is
+built**; the executables are self-contained. Each layer depends only on the ones
+above it, never the reverse:
 
 - `src/common` — foundation: `base`, `util`, `xml`, `thread`.
 - `src/sql` — thin SQLite helper (`sql_util`).
