@@ -25,7 +25,6 @@
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
 #include "common/util/time_util.hpp"
-#include "common/util/version.hpp"
 #include "sql/sql_util.hpp"
 
 namespace toppic {
@@ -215,7 +214,6 @@ std::string TopfdPara::getTopfdParaStr(const std::string &prefix,
 std::string TopfdPara::getParaStr(const std::string &prefix,
                                   const std::string &sep) const {
   std::stringstream output;
-  output << prefix << "TopFD " << Version::getVersion() << std::endl;
   output << prefix << "Timestamp: " << time_util::getTimeStr() << std::endl;
   output << banner(prefix, "Parameters") << std::endl;
   output << getTopfdParaStr(prefix, sep);

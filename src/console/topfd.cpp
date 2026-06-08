@@ -12,12 +12,17 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include <iostream>
+
+#include "common/util/version.hpp"
 #include "topfd/common/topfd_para.hpp"
 #include "topfd/common/topfd_single_process.hpp"
 #include "topfd/common/topfd_process.hpp"
 #include "console/topfd_argument.hpp"
 
 int main(int argc, char* argv[]) {
+
+  std::cout << "TopFD " << toppic::Version::getVersion() << std::endl;
 
   toppic::Argument argu_processor;
   bool success = argu_processor.parse(argc, argv);
