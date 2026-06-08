@@ -194,7 +194,8 @@ file(GLOB_RECURSE COMMON_SRCS CONFIGURE_DEPENDS
   ${CMAKE_CURRENT_SOURCE_DIR}/src/seq/*.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/para/*.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/sql/*.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/ms/*.cpp)
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/ms/*.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/topfd/*.cpp)
 
 add_library(toppic_common SHARED ${COMMON_SRCS})
 target_include_directories(toppic_common PUBLIC
@@ -219,6 +220,17 @@ target_link_libraries(toppic_common PUBLIC SQLite::SQLite3)
 # ms/mzml/pw_ms_reader.hpp exposes pwiz types (pwiz::msdata::*), so consumers of
 # toppic_common need the pwiz headers (and Boost) too: link pwiz PUBLIC.
 target_link_libraries(toppic_common PUBLIC pwiz)
+
+# ONNX Runtime: topfd/envcnn and topfd/ecscore/score run the EnvCNN / ECScore
+# neural-network models via the ONNX Runtime C++ API. A prebuilt libonnxruntime
+# and the C/C++ API headers are vendored under ext/onnx (the sources include it
+# as "onnx/onnxruntime_cxx_api.h", so the existing SYSTEM ext/ include covers the
+# headers). The library is an IMPORTED shared object linked into toppic_common.
+add_library(onnxruntime SHARED IMPORTED)
+set_target_properties(onnxruntime PROPERTIES
+  IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/ext/onnx/libonnxruntime.so.1.14.1
+  IMPORTED_SONAME libonnxruntime.so.1.14.1)
+target_link_libraries(toppic_common PRIVATE onnxruntime)
 
 # Install the shared library using the prefix-relative GNUInstallDirs locations.
 # On Linux/macOS it is a LIBRARY artifact and lands in <prefix>/lib/toppic
