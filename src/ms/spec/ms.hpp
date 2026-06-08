@@ -26,23 +26,17 @@ namespace toppic {
 template <class T>
 class Ms {
  public:
-  Ms() {}
-
-  explicit Ms(const MsHeaderPtr &header_ptr): header_ptr_(header_ptr) {}
-
-  Ms(const MsHeaderPtr &header_ptr, const std::vector<T> &peak_ptr_list):
-    header_ptr_(header_ptr),
-    peak_ptr_list_(peak_ptr_list) {}
+  // A spectrum keeps its header and peak list, so both are sink parameters:
+  // taken by value and moved into the members (see CLAUDE.md parameter passing).
+  Ms(MsHeaderPtr header_ptr, std::vector<T> peak_ptr_list):
+    header_ptr_(std::move(header_ptr)),
+    peak_ptr_list_(std::move(peak_ptr_list)) {}
 
   MsHeaderPtr getMsHeaderPtr() const {return header_ptr_;}
-
-  void setHeaderPtr(MsHeaderPtr header_ptr) {header_ptr_ = std::move(header_ptr);}
 
   size_t size() const {return peak_ptr_list_.size();}
 
   T getPeakPtr(int i) const {return peak_ptr_list_[i];}
-
-  void setPeakPtrNull(int i) {peak_ptr_list_[i] = nullptr;}
 
   const std::vector<T>& getPeakPtrVec() const {return peak_ptr_list_;}
 

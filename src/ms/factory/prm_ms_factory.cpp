@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <memory>
+#include <utility>
 #include <vector>
 
 #include "common/base/mass_constant.hpp"
@@ -185,7 +186,7 @@ PrmMsPtr geneMsTwoPtr(const DeconvMsPtr &deconv_ms_ptr, int spec_id, const SpPar
     // generate approximate spectrum
     geneApproxSpecPeaks(list_filtered, prec_mass_without_label, mod_mass);
   }
-  return std::make_shared<Ms<PrmPeakPtr> >(header_ptr, list_filtered);
+  return std::make_shared<Ms<PrmPeakPtr> >(header_ptr, std::move(list_filtered));
 }
 
 PrmMsPtr geneSuffixMsTwoPtr(const DeconvMsPtr &deconv_ms_ptr, int spec_id, const SpParaPtr &sp_para_ptr,
@@ -212,7 +213,7 @@ PrmMsPtr geneSuffixMsTwoPtr(const DeconvMsPtr &deconv_ms_ptr, int spec_id, const
     std::reverse(rev_mod_mass.begin(), rev_mod_mass.end()); 
     geneApproxSpecPeaks(list_filtered, prec_mass_without_label, rev_mod_mass);
   }
-  return std::make_shared<Ms<PrmPeakPtr> >(header_ptr, list_filtered);
+  return std::make_shared<Ms<PrmPeakPtr> >(header_ptr, std::move(list_filtered));
 }
 
 PrmMsPtr geneMsSixPtr(const DeconvMsPtr &deconv_ms_ptr, int spec_id, const SpParaPtr &sp_para_ptr,
@@ -240,7 +241,7 @@ PrmMsPtr geneMsSixPtr(const DeconvMsPtr &deconv_ms_ptr, int spec_id, const SpPar
   filterPeaks(list, list_filtered, prec_mass_without_label, sp_para_ptr->getMinMass());
   std::sort(list_filtered.begin(), list_filtered.end(), PrmPeak::cmpPosInc);
 
-  return std::make_shared<Ms<PrmPeakPtr>>(header_ptr, list_filtered);
+  return std::make_shared<Ms<PrmPeakPtr>>(header_ptr, std::move(list_filtered));
 }
 
 PrmMsPtr geneSuffixMsSixPtr(const DeconvMsPtr &deconv_ms_ptr, int spec_id, const SpParaPtr &sp_para_ptr,
@@ -266,7 +267,7 @@ PrmMsPtr geneSuffixMsSixPtr(const DeconvMsPtr &deconv_ms_ptr, int spec_id, const
   PrmPeakPtrVec list_filtered;
   filterPeaks(list, list_filtered, prec_mass_without_label, sp_para_ptr->getMinMass());
   std::sort(list_filtered.begin(), list_filtered.end(), PrmPeak::cmpPosInc);
-  return std::make_shared<Ms<PrmPeakPtr> >(header_ptr, list_filtered);
+  return std::make_shared<Ms<PrmPeakPtr> >(header_ptr, std::move(list_filtered));
 }
 
 

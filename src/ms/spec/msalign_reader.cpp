@@ -17,6 +17,7 @@
 #include <cstddef>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "common/base/activation_base.hpp"
@@ -228,7 +229,7 @@ void MsAlignReader::readNext() {
     }
   }
 
-  deconv_ms_ptr_ = std::make_shared<Ms<DeconvPeakPtr> >(header_ptr, peak_ptr_list);
+  deconv_ms_ptr_ = std::make_shared<Ms<DeconvPeakPtr> >(header_ptr, std::move(peak_ptr_list));
   current_++;
 }
 

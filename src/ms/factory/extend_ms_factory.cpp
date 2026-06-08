@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <memory>
+#include <utility>
 #include <vector>
 
 #include "ms/spec/extend_ms.hpp"
@@ -72,7 +73,7 @@ ExtendMsPtr geneMsThreePtr(const DeconvMsPtr &deconv_ms_ptr, const SpParaPtr &sp
     double reve_tole = peak_tole_ptr->compRelaxErrorTole(mass, prec_mono_mass);
     list_filtered[i]->setReverseTolerance(reve_tole);
   }
-  return std::make_shared<Ms<ExtendPeakPtr> >(header_ptr, list_filtered);
+  return std::make_shared<Ms<ExtendPeakPtr> >(header_ptr, std::move(list_filtered));
 }
 
 }  // namespace

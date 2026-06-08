@@ -16,6 +16,7 @@
 
 #include <cstddef>
 #include <memory>
+#include <utility>
 #include <vector>
 
 #include "ms/spec/deconv_peak.hpp"
@@ -40,7 +41,7 @@ DeconvMsPtrVec getRefineMsPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
       DeconvPeakPtr new_peak_ptr = std::make_shared<DeconvPeak>(*ori_peak_ptr.get());
       peak_ptr_list.push_back(new_peak_ptr);
     }
-    DeconvMsPtr ms_ptr = std::make_shared<Ms<DeconvPeakPtr> >(header_ptr, peak_ptr_list);
+    DeconvMsPtr ms_ptr = std::make_shared<Ms<DeconvPeakPtr> >(header_ptr, std::move(peak_ptr_list));
     result_ptrs.push_back(ms_ptr);
   }
   return result_ptrs;
@@ -57,7 +58,7 @@ void keepTopPeaks(DeconvMsPtrVec &deconv_ms_ptr_vec, size_t peak_num) {
       DeconvPeakPtr peak_ptr = deconv_ms_ptr->getPeakPtr(p);
       peak_ptr_list.push_back(peak_ptr);
     }
-    deconv_ms_ptr->setPeakPtrVec(peak_ptr_list);
+    deconv_ms_ptr->setPeakPtrVec(std::move(peak_ptr_list));
   }
 }
 
