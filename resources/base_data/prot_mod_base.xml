@@ -1,0 +1,250 @@
+<prot_mod_list>
+<!--
+   None: Non-NME+Non-NTA: Observed for most amino acids at position 2. 
+   See Li et al., Comprehensive top-down mass spectral repository enables 
+   pan-dataset analysis and top-down spectral prediction, bioRxiv 2025. 
+   doi: 10.64898/2026.02.20.707032
+-->
+  <prot_mod>
+    <name>NONE</name>
+    <type>NONE</type>
+    <truncation>
+      <name>NONE</name>
+    </truncation>
+    <mod>
+      <ori_residue>
+        <amino_acid>
+          <name>None</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>No PTM</abbreviation>
+        </ptm>
+      </ori_residue>
+      <mod_residue>
+        <amino_acid>
+          <name>None</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>No PTM</abbreviation>
+        </ptm>
+      </mod_residue>
+      <mod_type>N_TERM</mod_type>
+    </mod>
+  </prot_mod>
+<!--
+   M_ACETYLATION: Non-NME+NTA: Observed for most amino acids at position 2
+   See Li et al., Comprehensive top-down mass spectral repository enables 
+   pan-dataset analysis and top-down spectral prediction, bioRxiv 2025. 
+   doi: 10.64898/2026.02.20.707032
+-->
+  <prot_mod>
+    <name>M_ACETYLATION</name>
+    <type>M_ACETYLATION</type>
+    <truncation>
+      <name>NONE</name>
+    </truncation>
+    <mod>
+      <ori_residue>
+        <amino_acid>
+	        <name>Methionine</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>No PTM</abbreviation>
+        </ptm>
+      </ori_residue>
+      <mod_residue>
+        <amino_acid>
+	        <name>Methionine</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>Acetyl</abbreviation>
+        </ptm>
+      </mod_residue>
+      <mod_type>N_TERM</mod_type>
+    </mod>
+  </prot_mod>
+<!-- NME: NME+Non-NTA: ACGSTVPDE. See trunc_base.xml for details.  -->
+  <prot_mod>
+    <name>NME</name>
+    <type>NME</type>
+    <truncation>
+      <name>NME</name>
+    </truncation>
+    <mod>
+      <ori_residue>
+        <amino_acid>
+          <name>None</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>No PTM</abbreviation>
+        </ptm>
+      </ori_residue>
+      <mod_residue>
+        <amino_acid>
+          <name>None</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>No PTM</abbreviation>
+        </ptm>
+      </mod_residue>
+      <mod_type>N_TERM</mod_type>
+    </mod>
+  </prot_mod>
+<!-- NME+NTA: NtaA specificity: ACGSTV -->
+  <prot_mod>
+    <name>NME_ACETYLATION_ALA</name>
+    <type>NME_ACETYLATION</type>
+    <truncation>
+      <name>NME</name>
+    </truncation>
+    <mod>
+      <ori_residue>
+        <amino_acid>
+	        <name>Alanine</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>No PTM</abbreviation>
+        </ptm>
+      </ori_residue>
+      <mod_residue>
+        <amino_acid>
+	        <name>Alanine</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>Acetyl</abbreviation>
+        </ptm>
+      </mod_residue>
+      <mod_type>N_TERM</mod_type>
+    </mod>
+  </prot_mod>
+  <prot_mod>
+    <name>NME_ACETYLATION_CYS</name>
+    <type>NME_ACETYLATION</type>
+    <truncation>
+      <name>NME</name>
+    </truncation>
+    <mod>
+      <ori_residue>
+        <amino_acid>
+	        <name>Cysteine</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>No PTM</abbreviation>
+        </ptm>
+      </ori_residue>
+      <mod_residue>
+        <amino_acid>
+	        <name>Cysteine</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>Acetyl</abbreviation>
+        </ptm>
+      </mod_residue>
+      <mod_type>N_TERM</mod_type>
+    </mod>
+  </prot_mod>
+  <prot_mod>
+    <name>NME_ACETYLATION_GLY</name>
+    <type>NME_ACETYLATION</type>
+    <truncation>
+      <name>NME</name>
+    </truncation>
+    <mod>
+      <ori_residue>
+        <amino_acid>
+	        <name>Glycine</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>No PTM</abbreviation>
+        </ptm>
+      </ori_residue>
+      <mod_residue>
+        <amino_acid>
+	        <name>Glycine</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>Acetyl</abbreviation>
+        </ptm>
+      </mod_residue>
+      <mod_type>N_TERM</mod_type>
+    </mod>
+  </prot_mod>
+  <prot_mod>
+    <name>NME_ACETYLATION_SER</name>
+    <type>NME_ACETYLATION</type>
+    <truncation>
+      <name>NME</name>
+    </truncation>
+    <mod>
+      <ori_residue>
+        <amino_acid>
+	        <name>Serine</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>No PTM</abbreviation>
+        </ptm>
+      </ori_residue>
+      <mod_residue>
+        <amino_acid>
+	        <name>Serine</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>Acetyl</abbreviation>
+        </ptm>
+      </mod_residue>
+      <mod_type>N_TERM</mod_type>
+    </mod>
+  </prot_mod>
+  <prot_mod>
+    <name>NME_ACETYLATION_THR</name>
+    <type>NME_ACETYLATION</type>
+    <truncation>
+      <name>NME</name>
+    </truncation>
+    <mod>
+      <ori_residue>
+        <amino_acid>
+	        <name>Threonine</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>No PTM</abbreviation>
+        </ptm>
+      </ori_residue>
+      <mod_residue>
+        <amino_acid>
+	        <name>Threonine</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>Acetyl</abbreviation>
+        </ptm>
+      </mod_residue>
+      <mod_type>N_TERM</mod_type>
+    </mod>
+  </prot_mod>
+  <prot_mod>
+    <name>NME_ACETYLATION_VAL</name>
+    <type>NME_ACETYLATION</type>
+    <truncation>
+      <name>NME</name>
+    </truncation>
+    <mod>
+      <ori_residue>
+        <amino_acid>
+	        <name>Valine</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>No PTM</abbreviation>
+        </ptm>
+      </ori_residue>
+      <mod_residue>
+        <amino_acid>
+	        <name>Valine</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>Acetyl</abbreviation>
+        </ptm>
+      </mod_residue>
+      <mod_type>N_TERM</mod_type>
+    </mod>
+  </prot_mod>
+</prot_mod_list>
