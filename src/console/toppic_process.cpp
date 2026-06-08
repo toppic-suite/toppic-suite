@@ -207,9 +207,6 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     }
 
     bool use_gf = true;
-    if (arguments["useLookupTable"] == "true") {
-      use_gf = false;
-    }
 
     // var_ptm_type number is used for E-value computation
     int var_ptm_type_num = 0;

@@ -186,7 +186,6 @@ std::map<std::string, std::string> toppic_para {
     {"geneHTMLFolder", "-g "},
     {"combinedOutputName", "-c "},
     {"massErrorTolerance", "-e "},
-    {"useLookupTable", "-l "},
     {"groupSpectrumNumber", "-r "},
     {"localPtmFileName", "-B "},
     {"localThreshold", "-H "}
@@ -243,11 +242,6 @@ std::string geneToppicCommand(std::map<std::string, std::string> arguments_,
       }
       else if (it->first == "localPtmFileName" && it->second == "") {
         continue; //don't add -B
-      }
-      else if (it->first == "useLookupTable") {
-        if (it->second == "true") {
-          command = command + toppic_para[it->first];
-        }
       }
       else{
         command = command + toppic_para[it->first] + it->second + " ";

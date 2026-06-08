@@ -55,8 +55,6 @@ class ToppicWindow : public QMainWindow {
 
   void on_fixedModComboBox_currentIndexChanged(int index);
 
-  void on_errorToleranceEdit_textChanged(QString string);
-
   void on_NONECheckBox_clicked(bool checked);
 
   void on_NMECheckBox_clicked(bool checked);

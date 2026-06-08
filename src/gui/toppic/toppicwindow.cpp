@@ -336,13 +336,6 @@ std::map<std::string, std::string> ToppicWindow::getArguments() {
   arguments_["variablePtmNum"] = ui->varPtmNumEdit->text().toStdString();
   arguments_["variablePtmFileName"] = ui->varPtmFileEdit->text().trimmed().toStdString();
 
-  /*
-  if (ui->lookupTableCheckBox->isChecked()) {
-    arguments_["useLookupTable"] = "true";
-  } else {
-    arguments_["useLookupTable"] = "false";
-  }
-  */
   if (ui->keepTempCheckBox->isChecked()) {
     arguments_["keepTempFiles"] = "true";
   } else {
@@ -556,16 +549,6 @@ bool ToppicWindow::checkError() {
     return true;
   }
 
-  QString currentText = ui->errorToleranceEdit->text();
-  /*
-  if (ui->lookupTableCheckBox->isChecked() && currentText != "5" && currentText != "10" && currentText != "15") {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("To use an error tolerance other than 5, 10, and 15 ppm, the checkbox \"Lookup table for E-value computation\" should be not selected!"),
-                         QMessageBox::Yes);
-    return true;
-  }
-    */
-
   if (ui->fixedModFileEdit->text().isEmpty() && ui->fixedModComboBox->currentIndex() == 3) {
     QMessageBox::warning(this, tr("Warning"),
                          tr("Please select a fixed modification file!"),
@@ -711,29 +694,6 @@ void ToppicWindow::on_numModComboBox_currentIndexChanged(int index) {
   }
 }
 
-void ToppicWindow::on_errorToleranceEdit_textChanged(QString string) {
-  QString currentText = ui->errorToleranceEdit->text();
-  /*
-  if (ui->lookupTableCheckBox->isChecked() && currentText != "5" && currentText != "10" && currentText != "15" && currentText != "1") {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("When the checkbox \"Lookup table for E-value computation\" is checked, only three error tolerance values 5, 10, and 15 ppm can be used!"),
-                         QMessageBox::Yes);
-    ui->errorToleranceEdit->setText("15");
-  }
-    */
-}
-
-/*
-void ToppicWindow::on_lookupTableCheckBox_clicked(bool checked) {
-  QString currentText = ui->errorToleranceEdit->text();
-  if (checked && currentText != "5" && currentText != "10" && currentText != "15") {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("To use an error tolerance other than 5, 10, and 15 ppm, the checkbox \"Lookup table for E-value computation\" should not be checked!"),
-                         QMessageBox::Yes);
-    ui->lookupTableCheckBox->setChecked(true);
-  }
-}
-  */
 
 bool ToppicWindow::nterminalError() {
   if (ui->NONECheckBox->isChecked() || ui->NMECheckBox->isChecked() || ui->NMEACCheckBox->isChecked() || ui->MACCheckBox->isChecked()) {

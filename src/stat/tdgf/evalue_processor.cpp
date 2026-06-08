@@ -38,10 +38,6 @@ void EValueProcessor::init() {
                                                  mng_ptr_->prsm_para_ptr_);
 
   ResFreqPtrVec residue_freqs = test_num_ptr_->getResFreqPtrVec();
-  if (!mng_ptr_->use_gf_) {
-    comp_pvalue_table_ptr_ = std::make_shared<CompPValueLookupTable>(mng_ptr_);
-  }
-
   comp_pvalue_ptr_ = std::make_shared<CompPValueArray>(test_num_ptr_, mng_ptr_);
 
 }
@@ -190,13 +186,7 @@ bool EValueProcessor::checkPrsms(const PrsmPtrVec &prsm_ptrs) {
 
 void EValueProcessor::compEvalues(const SpectrumSetPtr &spec_set_ptr, PrsmPtrVec &sele_prsm_ptrs,
                                   double ppo, bool is_separate) {
-  if (!mng_ptr_->use_gf_ 
-      && comp_pvalue_table_ptr_->inTable(spec_set_ptr->getDeconvMsPtrVec(), sele_prsm_ptrs)) {
-    comp_pvalue_table_ptr_->process(spec_set_ptr->getDeconvMsPtrVec(), sele_prsm_ptrs, ppo);
-    //LOG_DEBUG("Using table");
-  } else {
-    comp_pvalue_ptr_->process(spec_set_ptr, sele_prsm_ptrs, ppo, is_separate);
-  }
+  comp_pvalue_ptr_->process(spec_set_ptr, sele_prsm_ptrs, ppo, is_separate);
 
   // if matched peak number is too small or E-value is 0, replace it
   // with a max evalue.

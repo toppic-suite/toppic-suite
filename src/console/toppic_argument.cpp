@@ -63,7 +63,6 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["cutoffSpectralValue"] = "0.01";
   arguments["cutoffProteoformType"] = "EVALUE";
   arguments["cutoffProteoformValue"] = "0.01";
-  arguments["useLookupTable"] = "false";
   arguments["localPtmFileName"] = "";
   arguments["localThreshold"] = "0.15";
 
@@ -156,11 +155,7 @@ void ToppicArgument::outputArguments(std::ostream &output,
     output << std::setw(gap) << std::left << "Use TopFD feature file:" << sep << "False" << std::endl;
   }
 
-  if (arguments["useLookupTable"] == "true") {
-    output << std::setw(gap) << std::left << "E-value computation:" << sep << "Lookup table" << std::endl;
-  } else {
-    output << std::setw(gap) << std::left << "E-value computation:" << sep << "Generating function" << std::endl;
-  }
+  output << std::setw(gap) << std::left << "E-value computation:" << sep << "Generating function" << std::endl;
 
   if (arguments["localPtmFileName"] != "") {
     output << std::setw(gap) << std::left << "Localization with MIScore:" << sep << "True" << std::endl;
@@ -258,7 +253,6 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         ("proteoform-cutoff-type,T", po::value<std::string> (&cutoff_proteoform_type), "<EVALUE|FDR>. Proteoform-level cutoff type for filtering identified proteoform-spectrum-matches. Default value: EVALUE.")
         ("proteoform-cutoff-value,V", po::value<std::string> (&cutoff_proteoform_value), "<a positive number>. Proteoform-level cutoff value for filtering identified proteoform-spectrum-matches. Default value: 0.01.")
         ("approximate-spectra,A", "Use approximate spectra to increase the sensitivity in protein filtering. Default value: false.")
-        ("lookup-table,l", "Use a lookup table method for computing p-values and E-values.")
         ("local-ptm-file-name,B", po::value<std::string>(&local_ptm_file_name), "<a common modification file>. Specify a text file containing the information of common modifications for the characterization of unexpected shifts.")
         ("miscore-threshold,H", po::value<std::string> (&local_threshold), "<a positive number between 0 and 1>. Score threshold (modification identification score) for filtering results of modification characterization. Default value: 0.15.")
         ("thread-number,u", po::value<std::string> (&thread_number), "<a positive integer>. Number of threads used in the computation. Default value: 1.")
@@ -293,7 +287,6 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         ("spectrum-cutoff-value,v", po::value<std::string> (&cutoff_spectral_value), "")
         ("proteoform-cutoff-type,T", po::value<std::string> (&cutoff_proteoform_type), "")
         ("proteoform-cutoff-value,V", po::value<std::string> (&cutoff_proteoform_value), "")
-        ("lookup-table,l", "")
         ("local-ptm-file-name,B", po::value<std::string>(&local_ptm_file_name), "")
         ("miscore-threshold,H", po::value<std::string> (&local_threshold), "")
         ("num-combined-spectra,r", po::value<std::string> (&group_num), "")
@@ -435,10 +428,6 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
 
     if (vm.count("proteoform-cutoff-value")) {
       arguments_["cutoffProteoformValue"] = cutoff_proteoform_value;
-    }
-
-    if (vm.count("lookup-table")) {
-      arguments_["useLookupTable"] = "true";
     }
 
     if (vm.count("local-ptm-file-name")) {
@@ -613,17 +602,6 @@ bool ToppicArgument::validateArguments() {
 
   if (cutoff_proteoform_type == "FDR" && search_type != "TARGET+DECOY"){
     LOG_ERROR("Proteoform-level cutoff type "<< cutoff_proteoform_type << " error! FDR cutoff cannot be used when no decoy database is used! Please add argument '-d' in the command.");
-    return false;
-  }
-
-  std::string use_lookup_table = arguments_["useLookupTable"];
-  if(use_lookup_table != "true" && use_lookup_table != "false"){
-    LOG_ERROR("Use lookup_table " << use_lookup_table << " error! The value should be true|false!");
-    return false;
-  }
-
-  if(use_lookup_table == "true" && arguments_["massErrorTolerance"] !="5" && arguments_["massErrorTolerance"]!="10" && arguments_["massErrorTolerance"]!="15"){
-    LOG_ERROR("Error tolerance can only be 5, 10 or 15 when the lookup table approach for E-value computation is selected!");
     return false;
   }
 

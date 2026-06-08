@@ -19,7 +19,6 @@
 #include "prsm/prsm_xml_writer.hpp"
 #include "stat/tdgf/tdgf_mng.hpp"
 #include "stat/tdgf/comp_pvalue_array.hpp"
-#include "stat/tdgf/comp_pvalue_lookup_table.hpp"
 
 namespace toppic {
 
@@ -46,9 +45,7 @@ class EValueProcessor {
   CountTestNumPtr test_num_ptr_;
   
   CompPValueArrayPtr comp_pvalue_ptr_;
-  
-  CompPValueLookupTablePtr comp_pvalue_table_ptr_;
-  
+
   bool checkPrsms(const PrsmPtrVec &prsm_ptrs);
 };
 
