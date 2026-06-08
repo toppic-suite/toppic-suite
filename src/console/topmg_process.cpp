@@ -25,7 +25,6 @@
 #include "common/util/file_util.hpp"
 #include "common/util/mem_check.hpp"
 #include "common/util/version.hpp"
-#include "common/util/console_util.hpp"
 
 #include "seq/fasta_reader.hpp"
 #include "seq/fasta_util.hpp"
@@ -375,8 +374,6 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
       xml_gene->process();
       xml_gene = nullptr;
       std::cout << "Generating PrSM xml files - finished." << std::endl;
-
-      console_util::copyTopMSV(arguments);
 
       std::cout << "Converting PrSM xml files to html files - started." << std::endl;
       jsonTranslate(arguments, "topmg_prsm_cutoff");

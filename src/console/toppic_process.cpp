@@ -26,7 +26,6 @@
 #include "common/base/ptm_util.hpp"
 #include "common/util/mem_check.hpp"
 #include "common/util/version.hpp"
-#include "common/util/console_util.hpp"
 
 #include "seq/fasta_reader.hpp"
 #include "seq/fasta_util.hpp"
@@ -498,8 +497,6 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
       xml_gene = nullptr;
       std::cout << "Generating PrSM XML files - finished." << std::endl;
 
-      console_util::copyTopMSV(arguments);
-  
       std::cout << "Converting PrSM XML files to JSON files - started." << std::endl;
       jsonTranslate(arguments, "toppic_prsm_cutoff");
       std::cout << "Converting PrSM XML files to JSON files - finished." << std::endl;
