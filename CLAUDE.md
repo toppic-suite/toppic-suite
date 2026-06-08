@@ -161,14 +161,31 @@ path and linked into `toppic_common`:
   upstream topfd driver that wrote spectra, adopt the object; do not reintroduce
   per-call free-function wrappers (they would restore the per-scan
   transaction/prepare cost this rewrite removed).
-- **Boost** — `ms/mzml`'s pwiz reader links the compiled Boost libs
-  (`filesystem`, `iostreams`, `thread`, `chrono`, `system`) via
-  `find_package(Boost)`. Prefer `std::mutex` etc. over `boost::*` in our own
-  code. (Boost headers, pulled in only through the third-party `ext/` tree, are
-  silenced by the system-include treatment below; if you ever include a Boost
-  header directly in our own code and it warns — e.g. uBLAS still deriving from
-  the C++17-deprecated `std::iterator` — wrap it in
-  `#pragma GCC diagnostic ignored "-Wdeprecated-declarations"`.)
+- **Boost** — `find_package(Boost ... COMPONENTS filesystem iostreams thread
+  chrono system serialization program_options)`. `ms/mzml`'s pwiz reader needs
+  `filesystem`/`iostreams`/`thread`/`chrono`/`system`; `filter/massmatch/
+  mass_match` needs `serialization` (its binary index archive — linked PUBLIC
+  into `toppic_common` because the header exposes `boost::serialization::access`);
+  the GUI argument parsers need `program_options`. `search/graph` additionally
+  uses the **header-only** Boost Graph Library (no link). Prefer `std::mutex` etc.
+  over `boost::*` in our own code (the filter/index mutexes were converted from
+  `boost::mutex`; only `mass_match`'s serialization genuinely needs Boost). (Boost
+  headers pulled in through the third-party `ext/` tree are silenced by the
+  system-include treatment below; if you include a Boost header directly in our
+  own code and it warns — e.g. uBLAS still deriving from the C++17-deprecated
+  `std::iterator` — wrap it in `#pragma GCC diagnostic ignored
+  "-Wdeprecated-declarations"`.)
+- **Qt5** — `find_package(Qt5 COMPONENTS Widgets Core Gui)` backs the `src/gui`
+  desktop executables (see the source-layout note). Only the GUI targets use it,
+  via per-target `AUTOMOC`/`AUTOUIC`/`AUTORCC`; the `toppic_common` library has
+  no Qt dependency.
+- **xml2json / rapidxml / rapidjson** — `visual/json_transformer` converts the
+  annotation XML to JSON with the header-only `xml2json` (vendored at
+  `ext/xml2json/xml2json.hpp`), which parses with **rapidxml** (vendored at
+  `ext/rapidxml`, resolved via the `SYSTEM` `ext/` include) and emits with
+  **rapidjson** (the system package, `/usr/include/rapidjson`). All header-only,
+  no link step. This is the project's only JSON path — `rapidjson` is not used
+  elsewhere (the old per-scan-JSON spectrum writer was replaced by SQLite).
 - **ProteoWizard (pwiz)** — a trimmed copy is vendored under `ext/pwiz` (only the
   `utility/minimxml`, `utility/misc`, `data/common`, `data/msdata` source dirs
   are compiled; the rest is headers), built as a static `pwiz` library against
@@ -199,7 +216,7 @@ only on the ones above it, never the reverse:
 
 - `src/common` — foundation: `base`, `util`, `xml`, `thread`.
 - `src/sql` — thin SQLite helper (`sql_util`).
-- `src/para` — analysis parameters (`sp_para`, `peak_tolerance`).
+- `src/para` — analysis parameters (`sp_para`, `peak_tolerance`, `prsm_para`).
 - `src/seq` — sequence/proteoform layer.
 - `src/ms` — mass-spectrum layer: `spec` (peaks/spectra/msalign), `msmap`,
   `factory`, `env` (envelope detection), `feature`, `mzml`.
@@ -212,7 +229,52 @@ only on the ones above it, never the reverse:
   and `ecscore/env_coll <-> ecscore/score`. `deconv` constructs the
   `MzmlMsSqlWriter` (see the SQLite note) once per run, shared across its worker
   threads; it no longer writes per-scan JSON.
+- `src/topdia` — the TopDIA pseudo-spectrum layer built on `topfd`/`ms`:
+  `common` (`topdia_para` + `topdia_process`) and `pseudo_spec`
+  (`mzrt_feature`, `pseudo_peak`, `pseudo_spectrum`, `generate_pseudo_spectrum`).
+- `src/prsm` — proteoform-spectrum-match layer (`Prsm`/`SimplePrsm`, readers,
+  writers, FDR, clustering, coverage). `prsm`/`simple_prsm`/`expected_value`/
+  `peak_ion_pair` carry the pugixml XML (de)serialization (`toXmlElement`/`toXml`/
+  `appendXml` take a parent `XmlDOMElement` and return the attached node).
+- `src/filter` — proteoform filtering (`diag`/`index`/`massmatch`/`mng`/
+  `oneptm`/`varptm`/`zeroptm`). `massmatch/mass_match` (de)serializes its binary
+  index with Boost.Serialization. The file-global `serial_mutex` (and the other
+  filter/index mutexes) live in **anonymous namespaces** — they previously had
+  external linkage and the same name in several TUs, which only becomes a
+  multiple-definition error once everything compiles into one library.
+- `src/search` — sequence/spectrum alignment (`diag`/`graph`/`graphalign`/
+  `oneptmsearch`/`ptmsearch`/`varptmsearch`/`zeroptmsearch`). `graph` uses the
+  header-only Boost Graph Library (`adjacency_list`, `graph_traits`, `graphviz`).
+- `src/stat` — E-value/p-value estimation (`count`/`local`/`mcmc`/`tdgf`).
+- `src/visual` — TopMSV annotation output (`anno_*` + `xml_generator` build the
+  annotation XML with the migrated pugixml `XmlWriter`; `json_transformer`
+  converts it to JSON via the vendored `xml2json`).
+
+These are all library layers. The **executable** layers are separate (they are
+NOT in `COMMON_SRCS`; each is its own `add_executable` that links
+`toppic_common`):
+
+- `src/gui` — Qt5 desktop front-ends (`topfd`/`topindex`/`toppic`/`topmg`/
+  `topdiff`/`topdia`, plus `util` = a QProcess command builder + message
+  helpers). The `toppic_gui_exe()` helper in `CMakeLists.txt` defines each
+  target with per-target `AUTOMOC`/`AUTOUIC`/`AUTORCC` and
+  `AUTOUIC_SEARCH_PATHS=src` (so the dialogs' `"gui/<tool>/ui_*.h"` includes
+  resolve), linking `toppic_common` + `Qt5::Widgets/Core/Gui` +
+  `Boost::program_options`. A dialog collects parameters and **shells out** to
+  the matching CLI tool via QProcess, reading its default values from that
+  tool's console argument parser. `src/gui/topmerge` is migrated but has no
+  target (its merge backend is not part of this library).
+- `src/console` — currently only the `*_argument.cpp` parameter parsers that the
+  five non-topfd GUIs compile in (the console driver mains / `*_process` files
+  are not migrated yet). They use `boost::program_options`.
 
 When migrating a folder from the upstream Xerces tree, watch for include guards
 that don't match the destination path (e.g. an `ms/env` file guarded
-`TOPPIC_TOPFD_ENV_*`) and rename them to `TOPPIC_<PATH>_<FILE>_HPP_`.
+`TOPPIC_TOPFD_ENV_*`, or filter subdirs split as `ONE_PTM`/`VAR_PTM`) and
+rename them to `TOPPIC_<PATH>_<FILE>_HPP_`. Three recurring upstream bites: a
+missing `;` after a `LOG_ERROR(...)`/`LOG_DEBUG(...)` (our logger macro is a
+`do {…} while(0)`, so it needs the terminator the upstream code omits); the
+`str_util::toString(int)` calls that must become `std::to_string` (keep the
+`toString(double)` ones — see the str_util table above); and a by-value Ptr/
+container parameter that the function sorts/mutates in place, which must NOT be
+"upgraded" to `const&` (it will not compile).
