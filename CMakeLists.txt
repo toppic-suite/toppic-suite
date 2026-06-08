@@ -109,6 +109,16 @@ endif()
 add_compile_definitions(TOPPIC_SHARED_DIR="${TOPPIC_SHARED_DIR}")
 message(STATUS "Compiled-in shared dir:      ${TOPPIC_SHARED_DIR}")
 
+# Install the runtime resources (base_data, envcnn_models, ecscore_models,
+# p_value_table, topmsv) into the compiled-in shared dir. The trailing slash on
+# "resources/" installs the directory's CONTENTS into CMAKE_INSTALL_DATADIR, so
+# at runtime getResourceDir()/getSharedDirName() (== TOPPIC_SHARED_DIR ==
+# <prefix>/${CMAKE_INSTALL_DATADIR}) finds base_data/, envcnn_models/, ...
+# directly inside it. On macOS CMAKE_INSTALL_DATADIR is "<bindir>/resources",
+# which getResourceDir()'s "<exec_dir>/resources" lookup also resolves.
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/resources/
+        DESTINATION ${CMAKE_INSTALL_DATADIR})
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/../bin)
 message(STATUS "Executable output directory: " ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
