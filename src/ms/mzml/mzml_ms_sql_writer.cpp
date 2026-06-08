@@ -16,8 +16,6 @@
 
 #include <cstddef>
 #include <cstdlib>
-#include <map>
-#include <memory>
 #include <mutex>
 #include <string>
 
@@ -198,46 +196,5 @@ void MzmlMsSqlWriter::writeMs2(const MzmlMsPtr &ms_ptr, const MatchEnvPtrVec &en
     commit();
   }
 }
-
-namespace {
-
-// One writer per connection, so the free-function facade below reuses prepared
-// statements and chunked transactions across calls instead of rebuilding them
-// per spectrum. g_registry_mutex serializes facade calls (matching the single
-// global lock the previous free-function writer used) and keeps the returned
-// writer reference alive for the duration of the call.
-std::mutex g_registry_mutex;
-std::map<sqlite3 *, std::unique_ptr<MzmlMsSqlWriter>> g_writers;
-
-MzmlMsSqlWriter &getWriter(sqlite3 *sql_db) {  // caller holds g_registry_mutex
-  auto it = g_writers.find(sql_db);
-  if (it == g_writers.end()) {
-    it = g_writers.emplace(sql_db, std::make_unique<MzmlMsSqlWriter>(sql_db)).first;
-  }
-  return *it->second;
-}
-
-}  // namespace
-
-namespace mzml_ms_sql_writer {
-
-void writeMs1(sqlite3 *sql_db, const MzmlMsPtr &ms_ptr, const MatchEnvPtrVec &envs,
-              double base_inte, double min_ref_inte) {
-  std::lock_guard<std::mutex> lock(g_registry_mutex);
-  getWriter(sql_db).writeMs1(ms_ptr, envs, base_inte, min_ref_inte);
-}
-
-void writeMs2(sqlite3 *sql_db, const MzmlMsPtr &ms_ptr, const MatchEnvPtrVec &envs) {
-  std::lock_guard<std::mutex> lock(g_registry_mutex);
-  getWriter(sql_db).writeMs2(ms_ptr, envs);
-}
-
-void close(sqlite3 *sql_db) {
-  std::lock_guard<std::mutex> lock(g_registry_mutex);
-  // ~MzmlMsSqlWriter flushes the final transaction and finalizes the statements.
-  g_writers.erase(sql_db);
-}
-
-}  // namespace mzml_ms_sql_writer
 
 }  // namespace toppic

@@ -76,29 +76,6 @@ class MzmlMsSqlWriter {
   static constexpr int kCommitChunk = 2000;
 };
 
-// Backward-compatible free-function facade matching the historic
-// writeMs1/writeMs2(sqlite3*, ...) signature, for callers that pass a raw
-// connection rather than holding a MzmlMsSqlWriter. One writer is kept per
-// sqlite3 connection behind the scenes, so prepared statements and chunked
-// transactions are still reused across calls (these are NOT per-call writers).
-//
-// IMPORTANT: because writes are batched, the caller MUST call close(sql_db)
-// before sqlite3_close(sql_db). close() commits the final partial transaction
-// and finalizes the prepared statements (sqlite3_close fails while statements
-// are live). Skipping it loses the last < kCommitChunk spectra. Prefer the
-// MzmlMsSqlWriter object directly in new code; it flushes in its destructor.
-namespace mzml_ms_sql_writer {
-
-void writeMs1(sqlite3 *sql_db, const MzmlMsPtr &ms_ptr, const MatchEnvPtrVec &envs,
-              double base_inte, double min_ref_inte);
-
-void writeMs2(sqlite3 *sql_db, const MzmlMsPtr &ms_ptr, const MatchEnvPtrVec &envs);
-
-// Flush and release the writer for this connection. Call before sqlite3_close.
-void close(sqlite3 *sql_db);
-
-}  // namespace mzml_ms_sql_writer
-
 }  // namespace toppic
 
 #endif
