@@ -15,6 +15,7 @@
 #ifndef TOPPIC_MS_MZML_MZML_MS_SQL_WRITER_HPP_
 #define TOPPIC_MS_MZML_MZML_MS_SQL_WRITER_HPP_
 
+#include <memory>
 #include <mutex>
 
 #include <sqlite3.h>
@@ -75,6 +76,8 @@ class MzmlMsSqlWriter {
   // fsync across many scans while bounding the WAL/journal size.
   static constexpr int kCommitChunk = 2000;
 };
+
+using MzmlMsSqlWriterPtr = std::shared_ptr<MzmlMsSqlWriter>;
 
 }  // namespace toppic
 
