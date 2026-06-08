@@ -27,23 +27,25 @@ std::string TopdiaPara::getParaStr(const std::string &prefix,
                                    const std::string &sep,
                                    const TopfdParaPtr &topfd_para) const {
     std::stringstream output;
-    int gap = 25;
+    // Same label-column width as TopfdPara's printout so the TopDIA-specific
+    // lines below line up with the TopFD parameters printed by getTopfdParaStr.
+    const int gap = 53;
     output << prefix << "TopDIA " << Version::getVersion() << std::endl;
     output << prefix << "Timestamp: " << time_util::getTimeStr() << std::endl;
     output << prefix << "###################### Parameters ######################" << std::endl;
-    output << topfd_para->getTopfdParaStr(prefix, sep, gap); 
+    output << topfd_para->getTopfdParaStr(prefix, sep);
     output << prefix << std::setw(gap) << std::left
-           << "MS2 Min scan number:        " << sep << topfd_para->getMs2MinScanNum() << std::endl;
+           << "MS2 Min scan number:" << sep << topfd_para->getMs2MinScanNum() << std::endl;
     output << prefix << std::setw(gap) << std::left
-           << "MS1 ECScore cutoff:         " << sep  << topfd_para->getMs1EcscoreCutoff() << std::endl;
+           << "MS1 ECScore cutoff:" << sep << topfd_para->getMs1EcscoreCutoff() << std::endl;
     output << prefix << std::setw(gap) << std::left
-           << "MS2 ECScore cutoff:         " << sep  << topfd_para->getMs2EcscoreCutoff() << std::endl;
+           << "MS2 ECScore cutoff:" << sep << topfd_para->getMs2EcscoreCutoff() << std::endl;
     output << prefix << std::setw(gap) << std::left
-           << "Pseudo Score cutoff:        " << sep  << pseudo_score_cutoff_ << std::endl;
+           << "Pseudo Score cutoff:" << sep << pseudo_score_cutoff_ << std::endl;
     output << prefix << std::setw(gap) << std::left
-           << "Pseudo Min peak number:     " << sep << pseudo_min_peaks_ << std::endl;
+           << "Pseudo Min peak number:" << sep << pseudo_min_peaks_ << std::endl;
     output << prefix << std::setw(gap) << std::left
-           << "Version:                    " << sep << Version::getVersion() << std::endl;
+           << "Version:" << sep << Version::getVersion() << std::endl;
     output << prefix << "###################### Parameters ######################" << std::endl;
     return output.str();
   }

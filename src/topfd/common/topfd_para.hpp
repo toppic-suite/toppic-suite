@@ -34,7 +34,7 @@ class TopfdPara {
   ~TopfdPara();
 
   std::string getTopfdParaStr(const std::string &prefix,
-                              const std::string &sep, int gap) const;
+                              const std::string &sep) const;
 
   std::string getParaStr(const std::string &prefix,
                          const std::string &sep) const;
