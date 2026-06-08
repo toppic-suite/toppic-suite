@@ -148,9 +148,10 @@ pull in a few system libraries, all found via `find_package`/the default include
 path and linked into `toppic_common`:
 
 - **SQLite3** (`find_package(SQLite3)` → `SQLite::SQLite3`) — used by
-  `sql/sql_util` and `ms/mzml/mzml_ms_sql_writer`.
-- **rapidjson** — header-only, on the default include path (no `find_package`,
-  no link); used by `ms/mzml/mzml_ms_json_writer`.
+  `sql/sql_util` and `ms/mzml/mzml_ms_sql_writer`. The latter is the single-file
+  store for deconvoluted MS1/MS2 spectra (it replaced an earlier one-JSON-file-
+  per-scan writer): it inserts via reused prepared statements batched into
+  chunked transactions under bulk-load PRAGMAs, so it scales to many scans.
 - **Boost** — `ms/mzml`'s pwiz reader links the compiled Boost libs
   (`filesystem`, `iostreams`, `thread`, `chrono`, `system`) via
   `find_package(Boost)`. Prefer `std::mutex` etc. over `boost::*` in our own

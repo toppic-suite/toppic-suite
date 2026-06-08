@@ -146,8 +146,7 @@ find_package(ZLIB REQUIRED)
 find_package(Threads REQUIRED)
 
 # SQLite3 backs sql/sql_util and ms/mzml/mzml_ms_sql_writer (the topfd SQLite
-# output). rapidjson (used by ms/mzml/mzml_ms_json_writer) is header-only and
-# found on the default include path, so it needs no find_package/link.
+# output).
 find_package(SQLite3 REQUIRED)
 file(GLOB HTSLIB_SRCS CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/ext/htslib/*.c)
 add_library(htslib STATIC ${HTSLIB_SRCS})
