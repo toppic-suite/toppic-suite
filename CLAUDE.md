@@ -151,12 +151,14 @@ path and linked into `toppic_common`:
   `sql/sql_util` and `ms/mzml/mzml_ms_sql_writer`.
 - **rapidjson** — header-only, on the default include path (no `find_package`,
   no link); used by `ms/mzml/mzml_ms_json_writer`.
-- **Boost** — `ms/util` (Savitzky-Golay) uses header-only uBLAS; `ms/mzml`'s
-  pwiz reader links the compiled Boost libs (`filesystem`, `iostreams`, `thread`,
-  `chrono`, `system`) via `find_package(Boost)`. uBLAS headers still derive from
-  the C++17-deprecated `std::iterator`, so wrap Boost includes in
-  `#pragma GCC diagnostic ignored "-Wdeprecated-declarations"` to keep the build
-  warning-free. (Prefer `std::mutex` etc. over `boost::*` in our own code.)
+- **Boost** — `ms/mzml`'s pwiz reader links the compiled Boost libs
+  (`filesystem`, `iostreams`, `thread`, `chrono`, `system`) via
+  `find_package(Boost)`. Prefer `std::mutex` etc. over `boost::*` in our own
+  code. (Boost headers, pulled in only through the third-party `ext/` tree, are
+  silenced by the system-include treatment below; if you ever include a Boost
+  header directly in our own code and it warns — e.g. uBLAS still deriving from
+  the C++17-deprecated `std::iterator` — wrap it in
+  `#pragma GCC diagnostic ignored "-Wdeprecated-declarations"`.)
 - **ProteoWizard (pwiz)** — a trimmed copy is vendored under `ext/pwiz` (only the
   `utility/minimxml`, `utility/misc`, `data/common`, `data/msdata` source dirs
   are compiled; the rest is headers), built as a static `pwiz` library against
@@ -166,8 +168,10 @@ path and linked into `toppic_common`:
   library, `foreach_field.hpp`); those are vendored under `ext/boost`, which
   `ext/` (the include root) resolves ahead of the system Boost while everything
   else still comes from the system. Treat `ext/pwiz` and `ext/boost` as
-  third-party: do not reformat them or hold them to the IWYU/include-order rules
-  (`-w` silences their warnings).
+  third-party: do not reformat them or hold them to the IWYU/include-order rules.
+  Their `.cpp` files are built with `-w`; the `ext/` directory is added to every
+  target as a **`SYSTEM`** include (`-isystem`), so warnings from vendored
+  headers are silenced even when our own `-Wall` sources include them.
 
 ## Source layout
 
@@ -181,8 +185,8 @@ only on the ones above it, never the reverse:
 - `src/sql` — thin SQLite helper (`sql_util`).
 - `src/para` — analysis parameters (`sp_para`, `peak_tolerance`).
 - `src/seq` — sequence/proteoform layer.
-- `src/ms` — mass-spectrum layer: `spec` (peaks/spectra/msalign), `util`,
-  `msmap`, `factory`, `env` (envelope detection), `feature`, `mzml`.
+- `src/ms` — mass-spectrum layer: `spec` (peaks/spectra/msalign), `msmap`,
+  `factory`, `env` (envelope detection), `feature`, `mzml`.
 
 When migrating a folder from the upstream Xerces tree, watch for include guards
 that don't match the destination path (e.g. an `ms/env` file guarded
