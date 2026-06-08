@@ -274,15 +274,15 @@ FeaturePrsmPtr findMatchFeature(const FeaturePrsmPtr &feature, FeaturePrsmPtrVec
     double mass = features[i]->getPrecMass();
     double time = features[i]->getAlignApexTime();
     if (cur_prot == prot) {
-      if (abs(time-cur_time) <= time_tole && abs(mass - cur_mass) <= mass_tole) {
+      if (std::abs(time-cur_time) <= time_tole && std::abs(mass - cur_mass) <= mass_tole) {
         FeaturePrsmPtr result = features[i];
         features[i] = nullptr;
         return result;
       }
     }
     if (prot == "") {
-      if (abs(time-cur_time) <= strict_time_tole 
-          && abs(mass - cur_mass) <= strict_mass_tole) {
+      if (std::abs(time-cur_time) <= strict_time_tole
+          && std::abs(mass - cur_mass) <= strict_mass_tole) {
         FeaturePrsmPtr result = features[i];
         features[i] = nullptr;
         return result;
