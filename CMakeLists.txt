@@ -201,7 +201,8 @@ file(GLOB_RECURSE COMMON_SRCS CONFIGURE_DEPENDS
   ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/*.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/search/*.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/stat/*.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/visual/*.cpp)
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/visual/*.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/merge/*.cpp)
 
 add_library(toppic_common SHARED ${COMMON_SRCS})
 target_include_directories(toppic_common PUBLIC
@@ -251,6 +252,43 @@ install(TARGETS toppic_common
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+# ---------------------------------------------------------------------------
+# Command-line executables
+#
+# Each tool is its own main() in src/console plus its argument parser and, for
+# the four multi-step tools, its src/console/<tool>_process.cpp orchestrator
+# (topfd/topdia drive the topfd_process/topdia_process orchestrators that are
+# already in toppic_common). Everything else they call lives in the library, so
+# each exe links toppic_common + Boost::program_options (the argument parsers).
+# ---------------------------------------------------------------------------
+function(toppic_console_exe name)
+  add_executable(${name} ${ARGN})
+  target_link_libraries(${name} PRIVATE toppic_common Boost::program_options)
+endfunction()
+
+toppic_console_exe(topfd
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd_argument.cpp)
+toppic_console_exe(topdia
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdia.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdia_argument.cpp)
+toppic_console_exe(topindex
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topindex.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topindex_argument.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topindex_process.cpp)
+toppic_console_exe(toppic
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_argument.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_process.cpp)
+toppic_console_exe(topmg
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmg.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmg_argument.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmg_process.cpp)
+toppic_console_exe(topdiff
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdiff.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdiff_argument.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdiff_process.cpp)
 
 # ---------------------------------------------------------------------------
 # GUI executables (Qt5)
