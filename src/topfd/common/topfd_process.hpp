@@ -26,7 +26,7 @@ namespace toppic {
 namespace topfd_process {
 
 int process(const TopfdParaPtr& para_ptr,
-            std::vector<std::string> spec_file_lst);
+            const std::vector<std::string>& spec_file_list);
 
 }
 }  // namespace toppic

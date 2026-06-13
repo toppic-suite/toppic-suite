@@ -16,9 +16,17 @@
 
 #include "topfd/common/topfd_process.hpp"
 
+#include <cstdlib>
+#include <iostream>
+#include <map>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "common/base/base_data.hpp"
+#include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
-#include "common/util/str_util.hpp"
 #include "common/util/time_util.hpp"
 #include "ms/env/env_base.hpp"
 #include "ms/mzml/mzml_profile.hpp"
@@ -33,13 +41,17 @@ namespace toppic {
 
 namespace topfd_process {
 
-void processOneFileWithFaims(const TopfdParaPtr& para_ptr) {
-  // print parameter for each file
+namespace {
+
+// Deconvolute one fraction (a single FAIMS voltage level, or the whole file
+// when the data is not FAIMS): optional MS1 deconvolution and feature
+// detection, followed by MS/MS deconvolution.
+void processFraction(const TopfdParaPtr& para_ptr) {
+  // print parameters for each fraction
   std::cout << para_ptr->getParaStr("", " ");
 
   if (!para_ptr->isMissingLevelOne() && !para_ptr->isHybridMode()) {
-    // if not missing level one spectra, do ms1 deconvolution and feature
-    // detection first}
+    // MS1 spectra are present: deconvolute them and detect features first.
     std::cout << "MS1 deconvolution started." << std::endl;
     DeconvMs1ProcessPtr ms1_proc_ptr =
         std::make_shared<DeconvMs1Process>(para_ptr);
@@ -59,42 +71,39 @@ void processOneFileWithFaims(const TopfdParaPtr& para_ptr) {
   std::cout << "MS/MS deconvolution finished." << std::endl;
 }
 
-void processOneFile(const TopfdParaPtr& para_ptr, std::string& spec_file_name) {
+void processOneFile(const TopfdParaPtr& para_ptr,
+                    const std::string& spec_file_name) {
   try {
-    // Get mzml file profile
+    // Get mzML file profile.
     PwMsReaderPtr reader_ptr = std::make_shared<PwMsReader>(spec_file_name);
     MzmlProfilePtr profile_ptr = reader_ptr->readProfile();
     para_ptr->setFilePrecWindow(profile_ptr->hasPrecWindow());
-    int frac_id = 0;
 
-    // check if it is faims or not
     if (profile_ptr->isFaims()) {
-      bool is_faims = true;
-      std::map<double, std::pair<int, int>> volt_map =
+      // FAIMS data: process each voltage level as a separate fraction.
+      const std::map<double, std::pair<int, int>>& volt_map =
           profile_ptr->getVoltageMap();
       std::cout << spec_file_name << " is FAIMS data with " << volt_map.size()
                 << " voltage levels." << std::endl;
-      for (auto v : volt_map) {
-        double volt = v.first;
+      int frac_id = 0;
+      for (const auto& [volt, scan_counts] : volt_map) {
         para_ptr->setFracId(frac_id);
-        para_ptr->setMs1ScanNumber(v.second.first);
-        para_ptr->setMs2ScanNumber(v.second.second);
-        para_ptr->setMzmlFileNameAndFaims(spec_file_name, is_faims, volt);
+        para_ptr->setMs1ScanNumber(scan_counts.first);
+        para_ptr->setMs2ScanNumber(scan_counts.second);
+        para_ptr->setMzmlFileNameAndFaims(spec_file_name, true, volt);
         std::cout << "Processing " << spec_file_name << " with voltage " << volt
                   << " started." << std::endl;
-        processOneFileWithFaims(para_ptr);
-        frac_id++;
+        processFraction(para_ptr);
         std::cout << "Processing " << spec_file_name << " with voltage " << volt
                   << " finished." << std::endl;
+        frac_id++;
       }
     } else {
-      bool is_faims = false;
-      double volt = -1;
-      para_ptr->setFracId(frac_id);
+      para_ptr->setFracId(0);
       para_ptr->setMs1ScanNumber(profile_ptr->getMs1Cnt());
       para_ptr->setMs2ScanNumber(profile_ptr->getMs2Cnt());
-      para_ptr->setMzmlFileNameAndFaims(spec_file_name, is_faims, volt);
-      processOneFileWithFaims(para_ptr);
+      para_ptr->setMzmlFileNameAndFaims(spec_file_name, false, -1);
+      processFraction(para_ptr);
     }
   } catch (const char* e) {
     LOG_ERROR("[Exception] " << e);
@@ -102,37 +111,26 @@ void processOneFile(const TopfdParaPtr& para_ptr, std::string& spec_file_name) {
   }
 }
 
-bool isValidFile(std::string& file_name) {
-  if (str_util::endsWith(file_name, "mzML") ||
-      str_util::endsWith(file_name, "mzXML") ||
-      str_util::endsWith(file_name, "mzml") ||
-      str_util::endsWith(file_name, "mzxml")) {
-    return true;
-  } else {
-    return false;
-  }
-}
+}  // namespace
 
 int process(const TopfdParaPtr& para_ptr,
-            std::vector<std::string> spec_file_list) {
+            const std::vector<std::string>& spec_file_list) {
   // init data, envelope base, envcnn model, and ecscore model
   base_data::init(para_ptr->getResourceDir());
   EnvBase::initBase(para_ptr->getResourceDir());
   onnx_env_cnn::initModel(para_ptr->getResourceDir(), para_ptr->getThreadNum());
   onnx_ecscore::initModel(para_ptr->getResourceDir(), para_ptr->getThreadNum());
 
-  for (size_t k = 0; k < spec_file_list.size(); k++) {
-    if (isValidFile(spec_file_list[k])) {
-      std::cout << "Processing " << spec_file_list[k] << " started."
+  for (const std::string& spec_file_name : spec_file_list) {
+    if (!file_util::isValidMzmlFile(spec_file_name)) {
+      std::cout << spec_file_name << " is not a valid mass spectral file!"
                 << std::endl;
-      processOneFile(para_ptr, spec_file_list[k]);
-      std::cout << "Processing " << spec_file_list[k] << " finished."
-                << std::endl;
-      std::cout << "Timestamp: " << time_util::getTimeStr() << std::endl;
-    } else {
-      std::cout << spec_file_list[k] << " is not a valid mass spectral file!"
-                << std::endl;
+      continue;
     }
+    std::cout << "Processing " << spec_file_name << " started." << std::endl;
+    processOneFile(para_ptr, spec_file_name);
+    std::cout << "Processing " << spec_file_name << " finished." << std::endl;
+    std::cout << "Timestamp: " << time_util::getTimeStr() << std::endl;
   }
 
   base_data::release();
