@@ -1,16 +1,17 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #ifndef TOPPIC_MS_MZML_MZML_MS_GROUP_READER_HPP_
 #define TOPPIC_MS_MZML_MZML_MS_GROUP_READER_HPP_
@@ -27,26 +28,22 @@ namespace toppic {
 
 class MzmlMsGroupReader {
  public:
-  MzmlMsGroupReader(const std::string & file_name, 
-                    double isolation_window, 
-                    const std::string &activation, 
-                    int fraction_id,
-                    bool is_faims,
-                    double faims_voltage,
-                    bool missing_level_one); 
+  MzmlMsGroupReader(const std::string& file_name, double isolation_window,
+                    const std::string& activation, int fraction_id,
+                    bool is_faims, double faims_voltage,
+                    bool missing_level_one);
 
   MzmlMsGroupPtr getNextMsGroupPtr();
 
-  PwMsReaderPtr getReaderPtr() const {return reader_ptr_;}
-  int getInputSpNum() const {return reader_ptr_->getInputSpNum();}
-  bool checkCentroidData() {return reader_ptr_->checkCentroidData();}
+  PwMsReaderPtr getReaderPtr() const { return reader_ptr_; }
+  int getInputSpNum() const { return reader_ptr_->getInputSpNum(); }
+  bool checkCentroidData() { return reader_ptr_->checkCentroidData(); }
 
-  void getMs1Map(PeakPtrVec2D &ms1_mzml_peaks, 
-                 MsHeaderPtr2D &ms2_header_ptr_2d);
+  void getMs1Map(PeakPtrVec2D& ms1_mzml_peaks,
+                 MsHeaderPtr2D& ms2_header_ptr_2d);
 
-  int getMs2Map(PeakPtrVec2D &ms2_mzml_peaks, 
-                double win_mz_begin);
-  
+  int getMs2Map(PeakPtrVec2D& ms2_mzml_peaks, double win_mz_begin);
+
   MsHeaderPtrVec getMs1HeaderPtrVec();
 
  private:
@@ -73,11 +70,11 @@ class MzmlMsGroupReader {
 
   void initMs2Ms1Map();
 
-  MzmlMsPtr readNextMs2MzmlMs(); 
+  MzmlMsPtr readNextMs2MzmlMs();
 
   MzmlMsGroupPtr getMs2OnlyMsGroupPtr();
 
-  MzmlMsGroupPtr getMs1Ms2MsGroupPtr(); 
+  MzmlMsGroupPtr getMs1Ms2MsGroupPtr();
 };
 
 using MzmlMsGroupReaderPtr = std::shared_ptr<MzmlMsGroupReader>;

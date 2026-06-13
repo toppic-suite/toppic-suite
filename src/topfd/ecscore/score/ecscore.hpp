@@ -1,16 +1,17 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #ifndef TOPPIC_TOPFD_ECSCORE_SCORE_ECSCORE_HPP_
 #define TOPPIC_TOPFD_ECSCORE_SCORE_ECSCORE_HPP_
@@ -18,27 +19,26 @@
 #include "ms/feature/frac_feature.hpp"
 #include "ms/feature/spec_feature.hpp"
 #include "ms/msmap/ms_map.hpp"
-
 #include "topfd/common/topfd_para.hpp"
-
-#include "topfd/ecscore/para/ecscore_para.hpp"
 #include "topfd/ecscore/env_coll/env_coll.hpp"
+#include "topfd/ecscore/para/ecscore_para.hpp"
 
 namespace toppic {
 
 class ECScore;
 using ECScorePtr = std::shared_ptr<ECScore>;
-using ECScorePtrVec = std::vector<ECScorePtr>; 
+using ECScorePtrVec = std::vector<ECScorePtr>;
 
 class ECScore {
  public:
-  ECScore(const EnvCollPtr &env_coll_ptr, const MsMapPtr &matrix_ptr, double sn_ratio);
+  ECScore(const EnvCollPtr& env_coll_ptr, const MsMapPtr& matrix_ptr,
+          double sn_ratio);
 
   std::vector<float> getEcscoreInput(double max_retention_time);
 
-  //int getEcscoreId() const { return score_id_; }
+  // int getEcscoreId() const { return score_id_; }
 
-  //void setEcscoreId(int score_id) { score_id_ = score_id; }
+  // void setEcscoreId(int score_id) { score_id_ = score_id; }
 
   int getMinScan() const { return min_scan_; }
 
@@ -74,23 +74,33 @@ class ECScore {
 
   double getMinElutionTime() const { return min_elution_time_; }
 
-  void setMinElutionTime(double min_elution_time) { min_elution_time_ = min_elution_time; }
+  void setMinElutionTime(double min_elution_time) {
+    min_elution_time_ = min_elution_time;
+  }
 
   double getMaxElutionTime() const { return max_elution_time_; }
 
-  void setMaxElutionTime(double max_elution_time) { max_elution_time_ = max_elution_time; }
+  void setMaxElutionTime(double max_elution_time) {
+    max_elution_time_ = max_elution_time;
+  }
 
   double getApexElutionTime() const { return apex_elution_time_; }
 
-  void setApexElutionTime(double apex_elution_time) { apex_elution_time_ = apex_elution_time; }
+  void setApexElutionTime(double apex_elution_time) {
+    apex_elution_time_ = apex_elution_time;
+  }
 
   double getElutionLength() const { return elution_length_; }
 
-  void setElutionLength(double elution_length) { elution_length_ = elution_length; }
+  void setElutionLength(double elution_length) {
+    elution_length_ = elution_length;
+  }
 
   double getMapMaxElutionTime() const { return map_max_elution_time_; }
 
-  void setMapMaxElutionTime(double map_max_elution_time) { map_max_elution_time_ = map_max_elution_time; }
+  void setMapMaxElutionTime(double map_max_elution_time) {
+    map_max_elution_time_ = map_max_elution_time;
+  }
 
   double getEnvcnnScore() const { return envcnn_score_; }
 
@@ -98,23 +108,33 @@ class ECScore {
 
   double getPercentMatchedPeaks() const { return percent_matched_peaks_; }
 
-  void setPercentMatchedPeaks(double percent_matched_peaks) { percent_matched_peaks_ = percent_matched_peaks; }
+  void setPercentMatchedPeaks(double percent_matched_peaks) {
+    percent_matched_peaks_ = percent_matched_peaks;
+  }
 
   double getIntensityCorrelation() const { return intensity_correlation_; }
 
-  void setIntensityCorrelation(double intensity_correlation) { intensity_correlation_ = intensity_correlation; }
+  void setIntensityCorrelation(double intensity_correlation) {
+    intensity_correlation_ = intensity_correlation;
+  }
 
   double getTop3Correlation() const { return top3_correlation_; }
 
-  void setTop3Correlation(double top_3_correlation) { top3_correlation_ = top_3_correlation; }
+  void setTop3Correlation(double top_3_correlation) {
+    top3_correlation_ = top_3_correlation;
+  }
 
   double getEvenOddPeakRatio() const { return even_odd_peak_ratio_; }
 
-  void setEvenOddPeakRatio(double even_odd_peak_ratio) { even_odd_peak_ratio_ = even_odd_peak_ratio; }
+  void setEvenOddPeakRatio(double even_odd_peak_ratio) {
+    even_odd_peak_ratio_ = even_odd_peak_ratio;
+  }
 
   double getPercentConsecPeaks() const { return percent_consec_peaks_; }
 
-  void setPercentConsecPeaks(double percent_consec_peaks) { percent_consec_peaks_ = percent_consec_peaks; }
+  void setPercentConsecPeaks(double percent_consec_peaks) {
+    percent_consec_peaks_ = percent_consec_peaks;
+  }
 
   int getNumTheoPeaks() const { return num_theo_peaks_; }
 
@@ -133,7 +153,7 @@ class ECScore {
   void setLabel(int label) { label_ = label; }
 
  private:
-  //int score_id_ = 0;
+  // int score_id_ = 0;
   int min_scan_ = 0;
   int max_scan_ = 0;
   int min_charge_ = 0;
@@ -159,6 +179,6 @@ class ECScore {
   int label_ = 0;
 };
 
-}
+}  // namespace toppic
 
-#endif 
+#endif

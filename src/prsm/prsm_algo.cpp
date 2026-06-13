@@ -1,16 +1,17 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include "prsm/prsm_algo.hpp"
 
@@ -24,9 +25,9 @@ namespace toppic {
 namespace prsm_algo {
 
 // if we need to increase i, return true, otherwise, return false
-bool increaseIJ(size_t i, size_t j, double deviation,
-                double tolerance, const std::vector<double> &ms_masses,
-                const std::vector<double> &theo_masses) {
+bool increaseIJ(size_t i, size_t j, double deviation, double tolerance,
+                const std::vector<double>& ms_masses,
+                const std::vector<double>& theo_masses) {
   // we assume that each real peak is matched to at most one theoretical
   // peak, so we do not check i and j+1
   if (deviation <= 0) {
@@ -42,10 +43,11 @@ bool increaseIJ(size_t i, size_t j, double deviation,
   if (j >= theo_masses.size() - 1) {
     j_is_closer = true;
   } else {
-    j_is_closer = std::abs(next_pos - theo_masses[j]) < std::abs(next_pos - theo_masses[j + 1]);
+    j_is_closer = std::abs(next_pos - theo_masses[j]) <
+                  std::abs(next_pos - theo_masses[j + 1]);
   }
 
-  if (std::abs(next_pos - theo_masses[j]) <= tolerance  && j_is_closer) {
+  if (std::abs(next_pos - theo_masses[j]) <= tolerance && j_is_closer) {
     return true;
   } else {
     return false;
@@ -53,8 +55,8 @@ bool increaseIJ(size_t i, size_t j, double deviation,
 }
 
 // compute deviation for each peak
-std::vector<double> compMsMassPpos(const std::vector<double> &ms_masses,
-                                   const std::vector<double> &theo_masses,
+std::vector<double> compMsMassPpos(const std::vector<double>& ms_masses,
+                                   const std::vector<double>& theo_masses,
                                    double ppo) {
   // extendMsThree do not have 0 and precursor mass
   std::vector<double> min_distances;
@@ -69,7 +71,7 @@ std::vector<double> compMsMassPpos(const std::vector<double> &ms_masses,
       min_distances[i] = d;
     }
     double tolerance = ms_masses[i] * ppo;
-    if (prsm_algo::increaseIJ(i, j, d,  tolerance, ms_masses, theo_masses)) {
+    if (prsm_algo::increaseIJ(i, j, d, tolerance, ms_masses, theo_masses)) {
       i++;
     } else {
       j++;
@@ -87,8 +89,8 @@ std::vector<double> compMsMassPpos(const std::vector<double> &ms_masses,
   return result_ppos;
 }
 
-std::vector<double> compTheoMassPpos(const std::vector<double> &ms_masses,
-                                     const std::vector<double> &theo_masses,
+std::vector<double> compTheoMassPpos(const std::vector<double>& ms_masses,
+                                     const std::vector<double>& theo_masses,
                                      double ppo) {
   std::vector<double> min_distances;
   for (size_t p = 0; p < theo_masses.size(); p++) {
@@ -122,11 +124,11 @@ std::vector<double> compTheoMassPpos(const std::vector<double> &ms_masses,
 }
 
 // compute the number of matched theoretical masses (fragment ions)
-double compNumMatchedTheoMasses(const std::vector<double> &ms_masses,
-                                const std::vector<double> &theo_masses,
+double compNumMatchedTheoMasses(const std::vector<double>& ms_masses,
+                                const std::vector<double>& theo_masses,
                                 double ppo) {
-  std::vector<double> theo_mass_ppos
-      = compTheoMassPpos(ms_masses, theo_masses, ppo);
+  std::vector<double> theo_mass_ppos =
+      compTheoMassPpos(ms_masses, theo_masses, ppo);
   double score = 0;
   for (size_t i = 0; i < theo_mass_ppos.size(); i++) {
     if (std::abs(theo_mass_ppos[i]) <= ppo) {
@@ -138,8 +140,8 @@ double compNumMatchedTheoMasses(const std::vector<double> &ms_masses,
 
 // compute the position of the last residue of a proteoform based
 // on its n term shift
-int getFirstResPos(double n_term_shift, const std::vector<double> &prm_masses) {
-  double trunc_mass = - n_term_shift;
+int getFirstResPos(double n_term_shift, const std::vector<double>& prm_masses) {
+  double trunc_mass = -n_term_shift;
   int best_pos = -1;
   double best_shift = std::numeric_limits<double>::infinity();
   for (size_t i = 0; i < prm_masses.size(); i++) {
@@ -153,20 +155,20 @@ int getFirstResPos(double n_term_shift, const std::vector<double> &prm_masses) {
 
 // compute the position of the last residue of a proteoform based on
 // its c term shift
-int getLastResPos(double c_term_shift, const std::vector<double> &prm_masses) {
+int getLastResPos(double c_term_shift, const std::vector<double>& prm_masses) {
   double trunc_mass = -c_term_shift;
   int best_pos = -1;
   double best_shift = std::numeric_limits<double>::infinity();
-  double residue_mass_sum = prm_masses[prm_masses.size()-1];
+  double residue_mass_sum = prm_masses[prm_masses.size() - 1];
   for (size_t i = 0; i < prm_masses.size(); i++) {
-    if (std::abs(residue_mass_sum-prm_masses[i]-trunc_mass) < best_shift) {
+    if (std::abs(residue_mass_sum - prm_masses[i] - trunc_mass) < best_shift) {
       best_pos = i;
-      best_shift = std::abs(residue_mass_sum-prm_masses[i]-trunc_mass);
+      best_shift = std::abs(residue_mass_sum - prm_masses[i] - trunc_mass);
     }
   }
   if (best_pos < 0) {
     LOG_ERROR("Get last residue position error! ");
-    exit(EXIT_FAILURE); 
+    exit(EXIT_FAILURE);
   }
   return best_pos - 1;
 }

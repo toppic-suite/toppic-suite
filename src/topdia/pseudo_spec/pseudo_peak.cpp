@@ -1,4 +1,5 @@
-// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,11 +16,10 @@
 #include "topdia/pseudo_spec/pseudo_peak.hpp"
 
 namespace toppic {
-PseudoPeak::PseudoPeak(double mass, double monoMz, int charge,
-                         double intensity, double score, double corr,
-                         double shared_inte, int ms2_cycle_span,
-                         double apexDiffScan, double rtLow, double rtHigh,
-                         int ms2_apex_cycle) {
+PseudoPeak::PseudoPeak(double mass, double monoMz, int charge, double intensity,
+                       double score, double corr, double shared_inte,
+                       int ms2_cycle_span, double apexDiffScan, double rtLow,
+                       double rtHigh, int ms2_apex_cycle) {
   mass_ = mass;
   mono_mz_ = monoMz;
   charge_ = charge;
@@ -34,7 +34,7 @@ PseudoPeak::PseudoPeak(double mass, double monoMz, int charge,
   ms2_apex_cycle_ = ms2_apex_cycle;
 }
 
-PseudoPeak::PseudoPeak(const PseudoPeak &peaks) {
+PseudoPeak::PseudoPeak(const PseudoPeak& peaks) {
   mass_ = peaks.mass_;
   mono_mz_ = peaks.mono_mz_;
   charge_ = peaks.charge_;

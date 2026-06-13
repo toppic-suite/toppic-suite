@@ -1,31 +1,32 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include "prsm/theo_peak_util.hpp"
 
 #include <algorithm>
 
 #include "common/base/neutral_loss_base.hpp"
+#include "ms/spec/theo_peak.hpp"
 #include "seq/bp_spec.hpp"
 #include "seq/proteoform.hpp"
-#include "ms/spec/theo_peak.hpp"
 
 namespace toppic {
 
 namespace theo_peak_util {
 
-std::vector<double> getTheoMassVec(const TheoPeakPtrVec &theo_peak_list) {
+std::vector<double> getTheoMassVec(const TheoPeakPtrVec& theo_peak_list) {
   std::vector<double> masses;
   for (size_t i = 0; i < theo_peak_list.size(); i++) {
     masses.push_back(theo_peak_list[i]->getModMass());
@@ -33,10 +34,11 @@ std::vector<double> getTheoMassVec(const TheoPeakPtrVec &theo_peak_list) {
   return masses;
 }
 
-TheoPeakPtrVec geneTheoPeak(const BpSpecPtr &bp_spec_ptr, const ActivationPtr &activation_ptr,
-                            const NeutralLossPtr &neutral_loss_ptr,
-                            double n_term_shift, double c_term_shift,
-                            int bgn, int end, double min_mass, double max_mass) {
+TheoPeakPtrVec geneTheoPeak(const BpSpecPtr& bp_spec_ptr,
+                            const ActivationPtr& activation_ptr,
+                            const NeutralLossPtr& neutral_loss_ptr,
+                            double n_term_shift, double c_term_shift, int bgn,
+                            int end, double min_mass, double max_mass) {
   TheoPeakPtrVec theo_peaks;
   BreakPointPtrVec bps = bp_spec_ptr->getBreakPointPtrVec();
   IonTypePtr n_ion_type_ptr = activation_ptr->getNIonTypePtr();
@@ -45,9 +47,10 @@ TheoPeakPtrVec geneTheoPeak(const BpSpecPtr &bp_spec_ptr, const ActivationPtr &a
     double n_mass = bps[i]->getNTermMass(n_ion_type_ptr);
     double new_mass = n_mass + n_term_shift;
     if (new_mass >= min_mass && new_mass <= max_mass) {
-      IonPtr ion = std::make_shared<Ion>(charge, i, i,
-                                         n_ion_type_ptr, neutral_loss_ptr);
-      TheoPeakPtr theo_peak = std::make_shared<TheoPeak>(ion, n_mass, n_term_shift);
+      IonPtr ion =
+          std::make_shared<Ion>(charge, i, i, n_ion_type_ptr, neutral_loss_ptr);
+      TheoPeakPtr theo_peak =
+          std::make_shared<TheoPeak>(ion, n_mass, n_term_shift);
       theo_peaks.push_back(theo_peak);
     }
   }
@@ -57,36 +60,32 @@ TheoPeakPtrVec geneTheoPeak(const BpSpecPtr &bp_spec_ptr, const ActivationPtr &a
     double c_mass = bps[i]->getCTermMass(c_ion_type_ptr);
     double new_mass = c_mass + c_term_shift;
     if (new_mass >= min_mass && new_mass <= max_mass) {
-      IonPtr ion = std::make_shared<Ion>(charge, i, bps.size()-i-1,
+      IonPtr ion = std::make_shared<Ion>(charge, i, bps.size() - i - 1,
                                          c_ion_type_ptr, neutral_loss_ptr);
-      theo_peaks.push_back(std::make_shared<TheoPeak>(ion, c_mass, c_term_shift));
+      theo_peaks.push_back(
+          std::make_shared<TheoPeak>(ion, c_mass, c_term_shift));
     }
   }
   std::sort(theo_peaks.begin(), theo_peaks.end(), TheoPeak::cmpPosInc);
   return theo_peaks;
 }
 
-TheoPeakPtrVec geneProteoformTheoPeak(const ProteoformPtr &proteoform_ptr,
-                                      const ActivationPtr &activation_ptr,
+TheoPeakPtrVec geneProteoformTheoPeak(const ProteoformPtr& proteoform_ptr,
+                                      const ActivationPtr& activation_ptr,
                                       double min_mass) {
   BpSpecPtr bp_ptr = proteoform_ptr->getBpSpecPtr();
 
   TheoPeakPtrVec all_peaks;
   SeqSegmentPtrVec segments = proteoform_ptr->getSeqSegmentPtrVec();
   for (size_t i = 0; i < segments.size(); i++) {
-    NeutralLossPtr neutral_loss_ptr
-        = NeutralLossBase::getNeutralLossPtr_NONE();
-    double max_mass = proteoform_ptr->getResSeqPtr()->getSeqMass()
-        + segments[i]->getNTermShift() + segments[i]->getCTermShift() - min_mass;
-    TheoPeakPtrVec  peaks = geneTheoPeak(bp_ptr,
-                                         activation_ptr,
-                                         neutral_loss_ptr,
-                                         segments[i]->getNTermShift(),
-                                         segments[i]->getCTermShift(),
-                                         segments[i]->getLeftBpPos(),
-                                         segments[i]->getRightBpPos(),
-                                         min_mass,
-                                         max_mass);
+    NeutralLossPtr neutral_loss_ptr = NeutralLossBase::getNeutralLossPtr_NONE();
+    double max_mass = proteoform_ptr->getResSeqPtr()->getSeqMass() +
+                      segments[i]->getNTermShift() +
+                      segments[i]->getCTermShift() - min_mass;
+    TheoPeakPtrVec peaks = geneTheoPeak(
+        bp_ptr, activation_ptr, neutral_loss_ptr, segments[i]->getNTermShift(),
+        segments[i]->getCTermShift(), segments[i]->getLeftBpPos(),
+        segments[i]->getRightBpPos(), min_mass, max_mass);
     all_peaks.insert(all_peaks.end(), peaks.begin(), peaks.end());
   }
   return all_peaks;

@@ -1,16 +1,17 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #ifndef TOPPIC_COMMON_BASE_PROT_MOD_HPP_
 #define TOPPIC_COMMON_BASE_PROT_MOD_HPP_
@@ -24,30 +25,30 @@ class XmlDOMDocument;
 
 class ProtMod {
  public:
-  ProtMod(const std::string &name, const std::string &type,
-          const TruncPtr &trunc_ptr, const ModPtr &mod_ptr);
+  ProtMod(const std::string& name, const std::string& type,
+          const TruncPtr& trunc_ptr, const ModPtr& mod_ptr);
 
   explicit ProtMod(XmlDOMElement element);
 
-  const std::string& getName() const { return name_;}
+  const std::string& getName() const { return name_; }
 
-  const std::string& getType() const { return type_;}
+  const std::string& getType() const { return type_; }
 
-  TruncPtr getTruncPtr() const { return trunc_ptr_;}
+  TruncPtr getTruncPtr() const { return trunc_ptr_; }
 
-  ModPtr getModPtr() const { return mod_ptr_;}
+  ModPtr getModPtr() const { return mod_ptr_; }
 
-  int getModPos() const {return mod_pos_;}
+  int getModPos() const { return mod_pos_; }
 
-  double getProtShift() const { return prot_shift_;}
+  double getProtShift() const { return prot_shift_; }
 
-  double getPepShift() const { return pep_shift_;}
+  double getPepShift() const { return pep_shift_; }
 
   bool isAcetylation() const;
 
   void appendNameToXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) const;
 
-  static std::string getXmlElementName() {return "prot_mod";}
+  static std::string getXmlElementName() { return "prot_mod"; }
 
   static std::string getNameFromXml(XmlDOMElement element);
 

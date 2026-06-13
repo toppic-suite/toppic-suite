@@ -1,16 +1,17 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #ifndef TOPPIC_PARA_PRSM_PARA_HPP_
 #define TOPPIC_PARA_PRSM_PARA_HPP_
@@ -29,35 +30,41 @@ namespace toppic {
 
 class PrsmPara {
  public:
-  explicit PrsmPara(const std::map<std::string, std::string> &arguments);
+  explicit PrsmPara(const std::map<std::string, std::string>& arguments);
 
-  const std::string &getOriDbName() const {return ori_db_name_;}
+  const std::string& getOriDbName() const { return ori_db_name_; }
 
-  const std::string &getSearchDbFileNameWithFolder() const {return search_db_file_name_with_folder_;}
+  const std::string& getSearchDbFileNameWithFolder() const {
+    return search_db_file_name_with_folder_;
+  }
 
-  std::string getDbIndexDir() const {return ori_db_name_ + "_idx";}
+  std::string getDbIndexDir() const { return ori_db_name_ + "_idx"; }
 
-  const std::string &getSpectrumFileName() const {return spec_file_name_;}
+  const std::string& getSpectrumFileName() const { return spec_file_name_; }
 
-  const std::string &getResourceDir() const {return resource_dir_;}
+  const std::string& getResourceDir() const { return resource_dir_; }
 
-  int getGroupSpecNum() const {return group_spec_num_;}
+  int getGroupSpecNum() const { return group_spec_num_; }
 
-  const ModPtrVec& getFixModPtrVec() const {return fix_mod_list_;}
+  const ModPtrVec& getFixModPtrVec() const { return fix_mod_list_; }
 
-  const ProtModPtrVec& getProtModPtrVec() const {return prot_mod_list_;}
+  const ProtModPtrVec& getProtModPtrVec() const { return prot_mod_list_; }
 
-  const SpParaPtr& getSpParaPtr() const {return sp_para_ptr_;}
+  const SpParaPtr& getSpParaPtr() const { return sp_para_ptr_; }
 
-  bool allowProtType(const ProteoformTypePtr &type_ptr) const;
+  bool allowProtType(const ProteoformTypePtr& type_ptr) const;
 
-  bool allowCompleteProt() const {return allowProtType(ProteoformType::COMPLETE);}
+  bool allowCompleteProt() const {
+    return allowProtType(ProteoformType::COMPLETE);
+  }
 
-  bool allowPrefixProt() const {return allowProtType(ProteoformType::PREFIX);}
+  bool allowPrefixProt() const { return allowProtType(ProteoformType::PREFIX); }
 
-  bool allowSuffixProt() const {return allowProtType(ProteoformType::SUFFIX);}
+  bool allowSuffixProt() const { return allowProtType(ProteoformType::SUFFIX); }
 
-  bool allowInternalProt() const {return allowProtType(ProteoformType::INTERNAL);}
+  bool allowInternalProt() const {
+    return allowProtType(ProteoformType::INTERNAL);
+  }
 
  private:
   std::string ori_db_name_;

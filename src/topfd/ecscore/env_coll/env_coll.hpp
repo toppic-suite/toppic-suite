@@ -1,16 +1,17 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #ifndef TOPPIC_TOPFD_ECSCORE_ENV_COLL_ENV_COLL_HPP_
 #define TOPPIC_TOPFD_ECSCORE_ENV_COLL_ENV_COLL_HPP_
@@ -27,9 +28,8 @@ namespace toppic {
 
 class EnvColl {
  public:
-  EnvColl(const SeedEnvPtr &send_ptr, EnvSetPtrVec &env_set_list,
-          int min_charge, int max_charge,
-          int start_spec_id, int end_spec_id);
+  EnvColl(const SeedEnvPtr& send_ptr, EnvSetPtrVec& env_set_list,
+          int min_charge, int max_charge, int start_spec_id, int end_spec_id);
 
   SeedEnvPtr getSeedPtr() { return seed_ptr_; }
 
@@ -52,18 +52,18 @@ class EnvColl {
   double getMonoNeutralMass() const { return seed_ptr_->getMonoNeutralMass(); }
 
   double getIntensity();
-  
+
   int countEnvNum();
 
   EnvSetPtr getSeedEnvSet();
-  
+
   std::vector<int> getChargeList();
 
   void refineMonoMass();
 
-  void removePeakData(const MsMapPtr &matrix_ptr);
+  void removePeakData(const MsMapPtr& matrix_ptr);
 
-  void mergeEnvSet(const EnvSetPtr &env_set_ptr);
+  void mergeEnvSet(const EnvSetPtr& env_set_ptr);
 
   XmlDOMElement toXmlElement(XmlDOMDocument* xml_doc, XmlDOMElement parent);
 
@@ -80,7 +80,6 @@ class EnvColl {
 using EnvCollPtr = std::shared_ptr<EnvColl>;
 using EnvCollPtrVec = std::vector<EnvCollPtr>;
 
-
 }  // namespace toppic
 
-#endif //TOPPIC_ENV_COLLECTION_HPP
+#endif  // TOPPIC_ENV_COLLECTION_HPP

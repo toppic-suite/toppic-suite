@@ -1,17 +1,17 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
-
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include "search/graph/proteo_graph_reader.hpp"
 
@@ -22,17 +22,18 @@
 
 namespace toppic {
 
-ProteoGraphReader::ProteoGraphReader(const std::string &db_file_name,
-                                     const ModPtrVec &fix_mod_ptr_vec,
-                                     const ProtModPtrVec &prot_mod_ptr_vec,
-                                     const ModPtrVec &var_mod_ptr_vec):
-    fix_mod_ptr_vec_(fix_mod_ptr_vec) {
-      reader_ptr_ = std::make_shared<FastaReader>(db_file_name);
-      proteo_anno_ptr_
-          = std::make_shared<ProteoAnno>(fix_mod_ptr_vec, prot_mod_ptr_vec, var_mod_ptr_vec);
-    }
+ProteoGraphReader::ProteoGraphReader(const std::string& db_file_name,
+                                     const ModPtrVec& fix_mod_ptr_vec,
+                                     const ProtModPtrVec& prot_mod_ptr_vec,
+                                     const ModPtrVec& var_mod_ptr_vec)
+    : fix_mod_ptr_vec_(fix_mod_ptr_vec) {
+  reader_ptr_ = std::make_shared<FastaReader>(db_file_name);
+  proteo_anno_ptr_ = std::make_shared<ProteoAnno>(
+      fix_mod_ptr_vec, prot_mod_ptr_vec, var_mod_ptr_vec);
+}
 
-MassGraphPtr getMassGraphPtr(const ProteoAnnoPtr &proteo_anno_ptr, double convert_ratio) {
+MassGraphPtr getMassGraphPtr(const ProteoAnnoPtr& proteo_anno_ptr,
+                             double convert_ratio) {
   MassGraphPtr graph_ptr = std::make_shared<MassGraph>();
   int seq_len = proteo_anno_ptr->getLen();
   for (int i = 0; i < seq_len + 1; i++) {
@@ -46,17 +47,18 @@ MassGraphPtr getMassGraphPtr(const ProteoAnnoPtr &proteo_anno_ptr, double conver
     v2 = vertex(i + 1, *graph_ptr.get());
     ResiduePtrVec res_ptr_vec = proteo_anno_ptr->getResiduePtrVec(i);
     std::vector<int> change_vec = proteo_anno_ptr->getChangeVec(i);
-    if (std::find(change_vec.begin(), change_vec.end(), AlterType::FIXED->getId()) != change_vec.end()) {
+    if (std::find(change_vec.begin(), change_vec.end(),
+                  AlterType::FIXED->getId()) != change_vec.end()) {
       for (size_t j = 0; j < res_ptr_vec.size(); j++) {
         if (change_vec[j] == AlterType::FIXED->getId()) {
           EdgeInfo edge_info(res_ptr_vec[j], change_vec[j], convert_ratio);
-          add_edge(v1, v2, edge_info , *graph_ptr.get());
+          add_edge(v1, v2, edge_info, *graph_ptr.get());
         }
       }
     } else {
       for (size_t j = 0; j < res_ptr_vec.size(); j++) {
         EdgeInfo edge_info(res_ptr_vec[j], change_vec[j], convert_ratio);
-        add_edge(v1, v2, edge_info , *graph_ptr.get());
+        add_edge(v1, v2, edge_info, *graph_ptr.get());
       }
     }
   }
@@ -64,4 +66,3 @@ MassGraphPtr getMassGraphPtr(const ProteoAnnoPtr &proteo_anno_ptr, double conver
 }
 
 }  // namespace toppic
-

@@ -1,35 +1,35 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-#include <numeric>
+#include "topfd/ecscore/env_coll/env_coll_assign.hpp"
+
 #include <algorithm>
+#include <numeric>
 
 #include "common/util/logger.hpp"
-
-#include "ms/spec/peak_util.hpp"
 #include "ms/env/env_base.hpp"
 #include "ms/msmap/ms_map_row_header.hpp"
-
+#include "ms/spec/peak_util.hpp"
 #include "topfd/ecscore/env/seed_env_util.hpp"
 #include "topfd/ecscore/env_coll/env_coll_util.hpp"
-#include "topfd/ecscore/env_coll/env_coll_assign.hpp"
 
 namespace toppic {
 
 namespace env_coll_assign {
 
-bool checkEnvColl(const MsHeaderPtr &header_ptr, EnvCollPtrVec &env_coll_list) {
+bool checkEnvColl(const MsHeaderPtr& header_ptr, EnvCollPtrVec& env_coll_list) {
   int ms1_id = header_ptr->getMsOneId();
   double prec_win_bgn = header_ptr->getPrecWinBegin();
   double prec_win_end = header_ptr->getPrecWinEnd();
@@ -37,13 +37,14 @@ bool checkEnvColl(const MsHeaderPtr &header_ptr, EnvCollPtrVec &env_coll_list) {
   SpecFeaturePtrVec new_spec_feats;
   for (size_t coll_id = 0; coll_id < env_coll_list.size(); coll_id++) {
     // check retention time range
-    if (ms1_id < env_coll_list[coll_id]->getStartSpecId() 
-        || ms1_id > env_coll_list[coll_id]->getEndSpecId()) {
+    if (ms1_id < env_coll_list[coll_id]->getStartSpecId() ||
+        ms1_id > env_coll_list[coll_id]->getEndSpecId()) {
       continue;
     }
     EnvSetPtrVec env_sets = env_coll_list[coll_id]->getEnvSetList();
     double feature_mono_mass = env_coll_list[coll_id]->getMonoNeutralMass();
-    double feature_avg_mass = EnvBase::convertMonoMassToAvgMass(feature_mono_mass); 
+    double feature_avg_mass =
+        EnvBase::convertMonoMassToAvgMass(feature_mono_mass);
     for (size_t env_set_id = 0; env_set_id < env_sets.size(); env_set_id++) {
       EnvSetPtr env_set_ptr = env_sets[env_set_id];
       double mz = peak_util::compMz(feature_avg_mass, env_set_ptr->getCharge());
@@ -53,14 +54,14 @@ bool checkEnvColl(const MsHeaderPtr &header_ptr, EnvCollPtrVec &env_coll_list) {
         continue;
       }
       // check retentime time range
-      if (ms1_id < env_set_ptr->getStartSpecId() 
-          || ms1_id > env_set_ptr->getEndSpecId()) {
+      if (ms1_id < env_set_ptr->getStartSpecId() ||
+          ms1_id > env_set_ptr->getEndSpecId()) {
         continue;
       }
       // get intensity information
       if (env_set_ptr->getSeedPtr()->getPeakNum() == 0) {
         LOG_WARN("Empty envelope intensity list!");
-        continue; 
+        continue;
       }
       return true;
     }
@@ -68,9 +69,10 @@ bool checkEnvColl(const MsHeaderPtr &header_ptr, EnvCollPtrVec &env_coll_list) {
   return false;
 }
 
-bool getHighestInteEnvColl(FracFeaturePtrVec &frac_features, EnvCollPtrVec &env_coll_list,
-                           const MsHeaderPtr &header_ptr, double score_thresh, 
-                           SpecFeaturePtrVec &ms2_features) {
+bool getHighestInteEnvColl(FracFeaturePtrVec& frac_features,
+                           EnvCollPtrVec& env_coll_list,
+                           const MsHeaderPtr& header_ptr, double score_thresh,
+                           SpecFeaturePtrVec& ms2_features) {
   int ms1_id = header_ptr->getMsOneId();
   double prec_win_bgn = header_ptr->getPrecWinBegin();
   double prec_win_end = header_ptr->getPrecWinEnd();
@@ -83,13 +85,14 @@ bool getHighestInteEnvColl(FracFeaturePtrVec &frac_features, EnvCollPtrVec &env_
       continue;
     }
     // check retention time range
-    if (ms1_id < env_coll_list[coll_id]->getStartSpecId() 
-        || ms1_id > env_coll_list[coll_id]->getEndSpecId()) {
+    if (ms1_id < env_coll_list[coll_id]->getStartSpecId() ||
+        ms1_id > env_coll_list[coll_id]->getEndSpecId()) {
       continue;
     }
     EnvSetPtrVec env_sets = env_coll_list[coll_id]->getEnvSetList();
     double feature_mono_mass = env_coll_list[coll_id]->getMonoNeutralMass();
-    double feature_avg_mass = EnvBase::convertMonoMassToAvgMass(feature_mono_mass); 
+    double feature_avg_mass =
+        EnvBase::convertMonoMassToAvgMass(feature_mono_mass);
     for (size_t env_set_id = 0; env_set_id < env_sets.size(); env_set_id++) {
       EnvSetPtr env_set_ptr = env_sets[env_set_id];
       double mz = peak_util::compMz(feature_avg_mass, env_set_ptr->getCharge());
@@ -98,33 +101,32 @@ bool getHighestInteEnvColl(FracFeaturePtrVec &frac_features, EnvCollPtrVec &env_
         continue;
       }
       // check retentime time range
-      if (ms1_id < env_set_ptr->getStartSpecId() 
-          || ms1_id > env_set_ptr->getEndSpecId()) {
+      if (ms1_id < env_set_ptr->getStartSpecId() ||
+          ms1_id > env_set_ptr->getEndSpecId()) {
         continue;
       }
       // get intensity information
       int inte_idx = ms1_id - env_set_ptr->getStartSpecId();
       if (env_set_ptr->getSeedPtr()->getPeakNum() == 0) {
         LOG_WARN("Empty envelope intensity list!");
-        continue; 
+        continue;
       }
 
       int prec_charge = env_set_ptr->getCharge();
       double prec_mono_mz = peak_util::compMz(feature_mono_mass, prec_charge);
       double prec_avg_mz = peak_util::compMz(feature_avg_mass, prec_charge);
       // Considers only peaks in the window
-      // Same calculation method as in EnvSet::initMedianXic() with window part added
+      // Same calculation method as in EnvSet::initMedianXic() with window part
+      // added
       double ratio = env_set_ptr->getXicPtr()->getInteRatio(inte_idx);
-      double prec_inte = env_set_ptr->getSeedPtr()->compScaledInteSumBounded(ratio, env_set_ptr->getMinInte(), prec_win_bgn, prec_win_end);
+      double prec_inte = env_set_ptr->getSeedPtr()->compScaledInteSumBounded(
+          ratio, env_set_ptr->getMinInte(), prec_win_bgn, prec_win_end);
       if (prec_inte < 0) {
         prec_inte = 0;
       }
-      SpecFeaturePtr ms2_feature = std::make_shared<SpecFeature>(header_ptr,
-                                                                 frac_feature_ptr, 
-                                                                 prec_mono_mz, 
-                                                                 prec_avg_mz, 
-                                                                 prec_charge,
-                                                                 prec_inte);
+      SpecFeaturePtr ms2_feature = std::make_shared<SpecFeature>(
+          header_ptr, frac_feature_ptr, prec_mono_mz, prec_avg_mz, prec_charge,
+          prec_inte);
       new_spec_feats.push_back(ms2_feature);
       frac_feature_ptr->setHasMs2Spec(true);
       break;
@@ -134,40 +136,42 @@ bool getHighestInteEnvColl(FracFeaturePtrVec &frac_features, EnvCollPtrVec &env_
     // sort by intensity
     std::sort(new_spec_feats.begin(), new_spec_feats.end(),
               SpecFeature::cmpPrecInteDec);
-    ms2_features.insert(std::end(ms2_features), std::begin(new_spec_feats), 
-                        std::end(new_spec_feats)); 
+    ms2_features.insert(std::end(ms2_features), std::begin(new_spec_feats),
+                        std::end(new_spec_feats));
     return true;
-  }
-  else {
+  } else {
     return false;
   }
 }
 
-void assignEnvColls(FracFeaturePtrVec &frac_feature_list,
-                    EnvCollPtrVec &env_coll_list,
-                    MsHeaderPtr2D &ms2_header_ptr_2d,
-                    SpecFeaturePtrVec &ms2_feature_list, 
-                    double score_cutoff) {
+void assignEnvColls(FracFeaturePtrVec& frac_feature_list,
+                    EnvCollPtrVec& env_coll_list,
+                    MsHeaderPtr2D& ms2_header_ptr_2d,
+                    SpecFeaturePtrVec& ms2_feature_list, double score_cutoff) {
   for (size_t ms1_idx = 0; ms1_idx < ms2_header_ptr_2d.size(); ms1_idx++) {
     for (size_t i = 0; i < ms2_header_ptr_2d[ms1_idx].size(); i++) {
       MsHeaderPtr header_ptr = ms2_header_ptr_2d[ms1_idx][i];
-      bool assigned = getHighestInteEnvColl(frac_feature_list, env_coll_list,  
-                                            header_ptr, score_cutoff, ms2_feature_list);
+      bool assigned =
+          getHighestInteEnvColl(frac_feature_list, env_coll_list, header_ptr,
+                                score_cutoff, ms2_feature_list);
       if (!assigned) {
         // lower the cutoff to 0. This step is necessary when low intensity
         // features are added.
         score_cutoff = 0;
-        assigned = getHighestInteEnvColl(frac_feature_list, env_coll_list,  
-                                         header_ptr, score_cutoff, ms2_feature_list);
+        assigned =
+            getHighestInteEnvColl(frac_feature_list, env_coll_list, header_ptr,
+                                  score_cutoff, ms2_feature_list);
       }
       if (!assigned) {
-        LOG_INFO("Scan " << header_ptr->getFirstScanNum() << " does not have MS1 feature!");
+        LOG_INFO("Scan " << header_ptr->getFirstScanNum()
+                         << " does not have MS1 feature!");
       }
     }
   }
-  std::sort(ms2_feature_list.begin(), ms2_feature_list.end(), SpecFeature::cmpSpecIdInc);
+  std::sort(ms2_feature_list.begin(), ms2_feature_list.end(),
+            SpecFeature::cmpSpecIdInc);
 }
 
-}
+}  // namespace env_coll_assign
 
-}
+}  // namespace toppic

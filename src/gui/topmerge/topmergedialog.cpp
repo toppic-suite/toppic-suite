@@ -1,60 +1,58 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include "gui/topmerge/topmergedialog.h"
 
-#include <map>
-#include <string>
-#include <vector>
-#include <sstream>
-
-#include <QFileDialog>
-#include <QElapsedTimer>
-#include <QMessageBox>
 #include <QCloseEvent>
 #include <QDesktopServices>
+#include <QElapsedTimer>
+#include <QFileDialog>
+#include <QMessageBox>
+#include <map>
+#include <sstream>
+#include <string>
+#include <vector>
 
-#include "common/util/file_util.hpp"
 #include "common/base/base_data.hpp"
+#include "common/util/file_util.hpp"
 #include "common/util/version.hpp"
-
-#include "gui/topmerge/ui_topmergedialog.h"
 #include "gui/topmerge/threadtopmerge.h"
+#include "gui/topmerge/ui_topmergedialog.h"
 
-
-TopMergeDialog::TopMergeDialog(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::TopMergeDialog) {
-      initArguments();
-      ui->setupUi(this);
-      std::string title = "TopMerge v." + toppic::Version::getVersion();
-      QString qstr = QString::fromStdString(title);
-      this->setWindowTitle(qstr);
-      lastDir_ = ".";
-      QFont font;
-#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
-      font.setFamily(QStringLiteral("Calibri"));
+TopMergeDialog::TopMergeDialog(QWidget* parent)
+    : QMainWindow(parent), ui(new Ui::TopMergeDialog) {
+  initArguments();
+  ui->setupUi(this);
+  std::string title = "TopMerge v." + toppic::Version::getVersion();
+  QString qstr = QString::fromStdString(title);
+  this->setWindowTitle(qstr);
+  lastDir_ = ".";
+  QFont font;
+#if defined(_WIN32) || defined(_WIN64) || defined(__MINGW32__) || \
+    defined(__MINGW64__)
+  font.setFamily(QStringLiteral("Calibri"));
 #else
-      font.setFamily(QStringLiteral("Monospace"));
+  font.setFamily(QStringLiteral("Monospace"));
 #endif
-      font.setPixelSize(12);
-      QApplication::setFont(font);
-      ui->outputTextBrowser->setFont(font);
-      thread_ = new ThreadTopMerge(this);
-      showInfo = "";
-      TopMergeDialog::on_defaultButton_clicked();
-    }
+  font.setPixelSize(12);
+  QApplication::setFont(font);
+  ui->outputTextBrowser->setFont(font);
+  thread_ = new ThreadTopMerge(this);
+  showInfo = "";
+  TopMergeDialog::on_defaultButton_clicked();
+}
 
 TopMergeDialog::~TopMergeDialog() {
   thread_->terminate();
@@ -63,16 +61,14 @@ TopMergeDialog::~TopMergeDialog() {
 }
 
 void TopMergeDialog::on_databaseFileButton_clicked() {
-  QString s = QFileDialog::getOpenFileName(
-      this,
-      "Select a protein database file",
-      lastDir_,
-      "Database files(*.fasta *.fa)");
+  QString s =
+      QFileDialog::getOpenFileName(this, "Select a protein database file",
+                                   lastDir_, "Database files(*.fasta *.fa)");
   updatedir(s);
   ui->databaseFileEdit->setText(s);
 }
 
-void TopMergeDialog::closeEvent(QCloseEvent *event) {
+void TopMergeDialog::closeEvent(QCloseEvent* event) {
   if (thread_->isRunning()) {
     if (!continueToClose()) {
       event->ignore();
@@ -86,7 +82,7 @@ void TopMergeDialog::closeEvent(QCloseEvent *event) {
 }
 
 void TopMergeDialog::initArguments() {
-  arguments_["oriDatabaseFileName"]="";
+  arguments_["oriDatabaseFileName"] = "";
   arguments_["databaseFileName"] = "";
   arguments_["combinedOutputName"] = "";
   arguments_["proteoformErrorTolerance"] = "1.2";
@@ -154,12 +150,12 @@ void TopMergeDialog::updatedir(QString s) {
 
 void TopMergeDialog::on_startButton_clicked() {
   std::stringstream buffer;
-  std::streambuf *oldbuf = std::cout.rdbuf(buffer.rdbuf());
+  std::streambuf* oldbuf = std::cout.rdbuf(buffer.rdbuf());
   if (checkError()) {
     return;
   }
   lockDialog();
-  
+
   ui->outputTextBrowser->setText(showInfo);
   std::map<std::string, std::string> argument = this->getArguments();
   std::vector<std::string> spec_file_lst = this->getSpecFileList();
@@ -168,7 +164,7 @@ void TopMergeDialog::on_startButton_clicked() {
 
   std::string info;
   int processed_len = 0;
-  std::string processed_lines = ""; 
+  std::string processed_lines = "";
   std::string current_line = "";
   unsigned cursor_pos = 0;
   bool finish = false;
@@ -198,8 +194,7 @@ void TopMergeDialog::on_startButton_clicked() {
         if (new_info.at(i) != '\n' && new_info.at(i) != '\r') {
           if (cursor_pos < current_line.length()) {
             current_line[cursor_pos] = new_info.at(i);
-          }
-          else {
+          } else {
             current_line = current_line + new_info.at(i);
           }
           cursor_pos++;
@@ -216,20 +211,16 @@ void TopMergeDialog::on_startButton_clicked() {
   showInfo = "";
   thread_->exit();
   std::cout.rdbuf(oldbuf);
-  
 }
 
-void TopMergeDialog::on_exitButton_clicked() {
-  close();
-}
+void TopMergeDialog::on_exitButton_clicked() { close(); }
 
 bool TopMergeDialog::continueToClose() {
-  if (QMessageBox::question(this,
-                            tr("Quit"),
-                            tr("TopMerge is still running. Are you sure you want to quit?"),
-                            QMessageBox::Yes | QMessageBox::No,
-                            QMessageBox::No)
-      == QMessageBox::Yes) {
+  if (QMessageBox::question(
+          this, tr("Quit"),
+          tr("TopMerge is still running. Are you sure you want to quit?"),
+          QMessageBox::Yes | QMessageBox::No,
+          QMessageBox::No) == QMessageBox::Yes) {
     return true;
   } else {
     return false;
@@ -238,9 +229,7 @@ bool TopMergeDialog::continueToClose() {
 
 void TopMergeDialog::on_fixedModFileButton_clicked() {
   QString s = QFileDialog::getOpenFileName(
-      this,
-      "Select a fixed modification file",
-      lastDir_,
+      this, "Select a fixed modification file", lastDir_,
       "Modification files(*.txt);;All files(*.*)");
   updatedir(s);
   ui->fixedModFileEdit->setText(s);
@@ -256,7 +245,8 @@ void TopMergeDialog::on_fixedModComboBox_currentIndexChanged(int index) {
   }
 }
 bool TopMergeDialog::nterminalerror() {
-  if (ui->NONECheckBox->isChecked() || ui->NMECheckBox->isChecked() || ui->NMEACCheckBox->isChecked() || ui->MACCheckBox->isChecked()) {
+  if (ui->NONECheckBox->isChecked() || ui->NMECheckBox->isChecked() ||
+      ui->NMEACCheckBox->isChecked() || ui->MACCheckBox->isChecked()) {
     return false;
   } else {
     QMessageBox::warning(this, tr("Warning"),
@@ -292,9 +282,7 @@ void TopMergeDialog::on_MACCheckBox_clicked(bool checked) {
 
 void TopMergeDialog::on_modFileButton_clicked() {
   QString s = QFileDialog::getOpenFileName(
-      this,
-      "Select a modification file for PTM localization",
-      lastDir_,
+      this, "Select a modification file for PTM localization", lastDir_,
       "Modification files(*.txt);;All files(*.*)");
   updatedir(s);
   ui->modFileEdit->setText(s);
@@ -311,41 +299,55 @@ void TopMergeDialog::on_outputButton_clicked() {
 
 std::map<std::string, std::string> TopMergeDialog::getArguments() {
   QString path = QCoreApplication::applicationFilePath();
-  arguments_["executiveDir"] = toppic::file_util::getExecutiveDir(path.toStdString());
+  arguments_["executiveDir"] =
+      toppic::file_util::getExecutiveDir(path.toStdString());
   if (toppic::file_util::checkSpace(arguments_["executiveDir"])) {
-    ui->outputTextBrowser->setText("Current directory " + QString::fromStdString(arguments_["executiveDir"]) + " contains space and will cause errors in the program!");
+    ui->outputTextBrowser->setText(
+        "Current directory " +
+        QString::fromStdString(arguments_["executiveDir"]) +
+        " contains space and will cause errors in the program!");
   }
-  arguments_["resourceDir"] = toppic::file_util::getResourceDir(arguments_["executiveDir"]);
-  arguments_["oriDatabaseFileName"] = ui->databaseFileEdit->text().toStdString();
-  arguments_["combinedOutputName"] = ui->combinedOutputEdit->text().trimmed().toStdString();
-  arguments_["activation"] = ui->activationComboBox->currentText().toStdString();
+  arguments_["resourceDir"] =
+      toppic::file_util::getResourceDir(arguments_["executiveDir"]);
+  arguments_["oriDatabaseFileName"] =
+      ui->databaseFileEdit->text().toStdString();
+  arguments_["combinedOutputName"] =
+      ui->combinedOutputEdit->text().trimmed().toStdString();
+  arguments_["activation"] =
+      ui->activationComboBox->currentText().toStdString();
 
   if (ui->decoyCheckBox->isChecked()) {
-  arguments_["searchType"] = "TARGET+DECOY";
-  arguments_["databaseFileName"] = arguments_["oriDatabaseFileName"] + "_target_decoy";
+    arguments_["searchType"] = "TARGET+DECOY";
+    arguments_["databaseFileName"] =
+        arguments_["oriDatabaseFileName"] + "_target_decoy";
   } else {
     arguments_["searchType"] = "TARGET";
-    arguments_["databaseFileName"] = arguments_["oriDatabaseFileName"] + "_target";
+    arguments_["databaseFileName"] =
+        arguments_["oriDatabaseFileName"] + "_target";
   }
   arguments_["fixedMod"] = ui->fixedModComboBox->currentText().toStdString();
   if (arguments_["fixedMod"] == "NONE") {
     arguments_["fixedMod"] = "";
-  }
-  else if (arguments_["fixedMod"] == "Carbamidomethylation on cysteine") {
+  } else if (arguments_["fixedMod"] == "Carbamidomethylation on cysteine") {
     arguments_["fixedMod"] = "C57";
-  }
-  else if (arguments_["fixedMod"] == "Carboxymethylation on cysteine") {
+  } else if (arguments_["fixedMod"] == "Carboxymethylation on cysteine") {
     arguments_["fixedMod"] = "C58";
   }
   if (ui->fixedModComboBox->currentIndex() == 3) {
     arguments_["fixedMod"] = ui->fixedModFileEdit->text().toStdString();
   }
-  arguments_["massErrorTolerance"] = ui->errorToleranceEdit->text().toStdString();
-  arguments_["proteoformErrorTolerance"] = ui->formErrorToleranceEdit->text().toStdString();
-  arguments_["cutoffSpectralType"] = ui->cutoffSpectralTypeComboBox->currentText().toStdString();
-  arguments_["cutoffSpectralValue"] = ui->cutoffSpectralValueEdit->text().toStdString();
-  arguments_["cutoffProteoformType"] = ui->cutoffProteoformTypeComboBox->currentText().toStdString();
-  arguments_["cutoffProteoformValue"] = ui->cutoffProteoformValueEdit->text().toStdString();
+  arguments_["massErrorTolerance"] =
+      ui->errorToleranceEdit->text().toStdString();
+  arguments_["proteoformErrorTolerance"] =
+      ui->formErrorToleranceEdit->text().toStdString();
+  arguments_["cutoffSpectralType"] =
+      ui->cutoffSpectralTypeComboBox->currentText().toStdString();
+  arguments_["cutoffSpectralValue"] =
+      ui->cutoffSpectralValueEdit->text().toStdString();
+  arguments_["cutoffProteoformType"] =
+      ui->cutoffProteoformTypeComboBox->currentText().toStdString();
+  arguments_["cutoffProteoformValue"] =
+      ui->cutoffProteoformValueEdit->text().toStdString();
   arguments_["allowProtMod"] = "";
   if (ui->NONECheckBox->isChecked()) {
     arguments_["allowProtMod"] = arguments_["allowProtMod"] + ",NONE";
@@ -354,7 +356,8 @@ std::map<std::string, std::string> TopMergeDialog::getArguments() {
     arguments_["allowProtMod"] = arguments_["allowProtMod"] + ",NME";
   }
   if (ui->NMEACCheckBox->isChecked()) {
-    arguments_["allowProtMod"] = arguments_["allowProtMod"] + ",NME_ACETYLATION";
+    arguments_["allowProtMod"] =
+        arguments_["allowProtMod"] + ",NME_ACETYLATION";
   }
   if (ui->MACCheckBox->isChecked()) {
     arguments_["allowProtMod"] = arguments_["allowProtMod"] + ",M_ACETYLATION";
@@ -364,7 +367,7 @@ std::map<std::string, std::string> TopMergeDialog::getArguments() {
   }
   arguments_["maxPtmMass"] = ui->maxModEdit->text().toStdString();
   arguments_["minPtmMass"] = ui->minModEdit->text().toStdString();
-  arguments_["keepTempFiles"] = "false";   // default
+  arguments_["keepTempFiles"] = "false";  // default
   arguments_["localThreshold"] = ui->miscoreThresholdEdit->text().toStdString();
   arguments_["residueModFileName"] = ui->modFileEdit->text().toStdString();
   if (ui->topfdFeatureCheckBox->isChecked()) {
@@ -398,10 +401,7 @@ std::vector<std::string> TopMergeDialog::getSpecFileList() {
 }
 void TopMergeDialog::on_addButton_clicked() {
   QStringList idfiles = QFileDialog::getOpenFileNames(
-      this,
-      "Select spectrum files",
-      lastDir_,
-      "Spectrum files(*ms2.msalign)");
+      this, "Select spectrum files", lastDir_, "Spectrum files(*ms2.msalign)");
   for (int i = 0; i < idfiles.size(); i++) {
     QString idfile = idfiles.at(i);
     updatedir(idfile);
@@ -416,8 +416,7 @@ bool TopMergeDialog::ableToAdd(QString idfile) {
   if (idfile != "") {
     if (idfile.toStdString().length() > 200) {
       QMessageBox::warning(this, tr("Warning"),
-                           tr("The file path is too long!"),
-                           QMessageBox::Yes);
+                           tr("The file path is too long!"), QMessageBox::Yes);
       able = false;
     } else {
       for (int i = 0; i < ui->listWidget->count(); i++) {
@@ -432,7 +431,7 @@ bool TopMergeDialog::ableToAdd(QString idfile) {
   return able;
 }
 void TopMergeDialog::on_delButton_clicked() {
-  QListWidgetItem *delItem = ui->listWidget->currentItem();
+  QListWidgetItem* delItem = ui->listWidget->currentItem();
   ui->listWidget->removeItemWidget(delItem);
   delete delItem;
 }
@@ -446,15 +445,15 @@ void TopMergeDialog::lockDialog() {
   ui->startButton->setEnabled(false);
   ui->outputButton->setEnabled(false);
   ui->errorToleranceEdit->setEnabled(false);
-  ui->formErrorToleranceEdit->setEnabled(false);  
-  ui->maxModEdit->setEnabled(false);  
-  ui->minModEdit->setEnabled(false);  
-  ui->cutoffSpectralValueEdit->setEnabled(false);  
-  ui->cutoffProteoformValueEdit->setEnabled(false);  
+  ui->formErrorToleranceEdit->setEnabled(false);
+  ui->maxModEdit->setEnabled(false);
+  ui->minModEdit->setEnabled(false);
+  ui->cutoffSpectralValueEdit->setEnabled(false);
+  ui->cutoffProteoformValueEdit->setEnabled(false);
   ui->modFileEdit->setEnabled(false);
-  ui->miscoreThresholdEdit->setEnabled(false);  
-  ui->cutoffSpectralTypeComboBox->setEnabled(false);  
-  ui->cutoffProteoformTypeComboBox->setEnabled(false);  
+  ui->miscoreThresholdEdit->setEnabled(false);
+  ui->cutoffSpectralTypeComboBox->setEnabled(false);
+  ui->cutoffProteoformTypeComboBox->setEnabled(false);
   ui->databaseFileButton->setEnabled(false);
   ui->databaseFileEdit->setEnabled(false);
   ui->decoyCheckBox->setEnabled(false);
@@ -483,18 +482,18 @@ void TopMergeDialog::unlockDialog() {
   ui->databaseFileButton->setEnabled(true);
   ui->databaseFileEdit->setEnabled(true);
   ui->fixedModFileEdit->setEnabled(true);
-  ui->errorToleranceEdit->setEnabled(true);  
-  ui->formErrorToleranceEdit->setEnabled(true);  
-  ui->maxModEdit->setEnabled(true);  
-  ui->minModEdit->setEnabled(true);  
+  ui->errorToleranceEdit->setEnabled(true);
+  ui->formErrorToleranceEdit->setEnabled(true);
+  ui->maxModEdit->setEnabled(true);
+  ui->minModEdit->setEnabled(true);
   ui->fixedModComboBox->setEnabled(true);
   on_fixedModComboBox_currentIndexChanged(ui->fixedModComboBox->currentIndex());
   ui->activationComboBox->setEnabled(true);
-  ui->cutoffSpectralValueEdit->setEnabled(true);  
-  ui->cutoffProteoformValueEdit->setEnabled(true);  
-  ui->miscoreThresholdEdit->setEnabled(true);  
-  ui->cutoffSpectralTypeComboBox->setEnabled(true);  
-  ui->cutoffProteoformTypeComboBox->setEnabled(true);  
+  ui->cutoffSpectralValueEdit->setEnabled(true);
+  ui->cutoffProteoformValueEdit->setEnabled(true);
+  ui->miscoreThresholdEdit->setEnabled(true);
+  ui->cutoffSpectralTypeComboBox->setEnabled(true);
+  ui->cutoffProteoformTypeComboBox->setEnabled(true);
   ui->NONECheckBox->setEnabled(true);
   ui->NMECheckBox->setEnabled(true);
   ui->NMEACCheckBox->setEnabled(true);
@@ -510,8 +509,7 @@ void TopMergeDialog::unlockDialog() {
 
 bool TopMergeDialog::checkError() {
   if (ui->databaseFileEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Database file is empty!"),
+    QMessageBox::warning(this, tr("Warning"), tr("Database file is empty!"),
                          QMessageBox::Yes);
     return true;
   }
@@ -527,7 +525,8 @@ bool TopMergeDialog::checkError() {
                          QMessageBox::Yes);
     return true;
   }
-  if (ui->fixedModFileEdit->text().isEmpty() && ui->fixedModComboBox->currentIndex() == 3) {
+  if (ui->fixedModFileEdit->text().isEmpty() &&
+      ui->fixedModComboBox->currentIndex() == 3) {
     QMessageBox::warning(this, tr("Warning"),
                          tr("Please select a fixed modification file!"),
                          QMessageBox::Yes);

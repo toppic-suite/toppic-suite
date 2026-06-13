@@ -1,16 +1,17 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include "ms/env/env.hpp"
 
@@ -28,41 +29,36 @@
 
 namespace toppic {
 
-Env::Env(Env &env):
-  refer_idx_(env.refer_idx_),
-  charge_(env.charge_),
-  mono_mz_(env.mono_mz_) {
-    for (int i = 0; i < env.getPeakNum(); i++) {
-      EnvPeakPtr peak_ptr = std::make_shared<EnvPeak>(env.getPeakPtr(i));
-      peak_ptr_list_.push_back(peak_ptr);
-    }
+Env::Env(Env& env)
+    : refer_idx_(env.refer_idx_), charge_(env.charge_), mono_mz_(env.mono_mz_) {
+  for (int i = 0; i < env.getPeakNum(); i++) {
+    EnvPeakPtr peak_ptr = std::make_shared<EnvPeak>(env.getPeakPtr(i));
+    peak_ptr_list_.push_back(peak_ptr);
   }
+}
 
-Env::Env(int num, std::vector<std::string> &line_list) {
+Env::Env(int num, std::vector<std::string>& line_list) {
   charge_ = 1;
   std::vector<std::string> words = str_util::split(line_list[0], " ");
   peak_ptr_list_.resize(num);
   for (int i = 0; i < num; i++) {
-    words = str_util::split(line_list[i+1], " ");
+    words = str_util::split(line_list[i + 1], " ");
     double mz = std::stod(words[0]);
     double inte = std::stod(words[1]) / 100;
     EnvPeakPtr peak_ptr = std::make_shared<EnvPeak>(mz, inte);
-      peak_ptr_list_[i] = peak_ptr;
+    peak_ptr_list_[i] = peak_ptr;
   }
   refer_idx_ = getHighestPeakIdx();
   mono_mz_ = peak_ptr_list_[0]->getPosition();
 }
 
-Env::Env(int refer_idx, int charge, double mono_mz,
-         EnvPeakPtrVec &peaks):
-  refer_idx_(refer_idx),
-  charge_(charge),
-  mono_mz_(mono_mz) {
-    for (size_t i = 0; i < peaks.size(); i++) {
-      EnvPeakPtr peak_ptr = std::make_shared<EnvPeak>(peaks[i]);
-      peak_ptr_list_.push_back(peak_ptr);
-    }
+Env::Env(int refer_idx, int charge, double mono_mz, EnvPeakPtrVec& peaks)
+    : refer_idx_(refer_idx), charge_(charge), mono_mz_(mono_mz) {
+  for (size_t i = 0; i < peaks.size(); i++) {
+    EnvPeakPtr peak_ptr = std::make_shared<EnvPeak>(peaks[i]);
+    peak_ptr_list_.push_back(peak_ptr);
   }
+}
 
 EnvPtr Env::convertToTheo(double mass_diff, int new_charge) {
   int ori_charge = 1;
@@ -70,16 +66,17 @@ EnvPtr Env::convertToTheo(double mass_diff, int new_charge) {
   EnvPeakPtrVec new_peaks(peak_ptr_list_.size());
   for (size_t i = 0; i < peak_ptr_list_.size(); i++) {
     double new_mz = (peak_ptr_list_[i]->getPosition() + mass_diff) / new_charge;
-    new_peaks[i] = std::make_shared<EnvPeak>(new_mz, peak_ptr_list_[i]->getIntensity());
+    new_peaks[i] =
+        std::make_shared<EnvPeak>(new_mz, peak_ptr_list_[i]->getIntensity());
   }
-  return std::make_shared<Env>(refer_idx_, new_charge, new_mono_mz,
-                               new_peaks);
+  return std::make_shared<Env>(refer_idx_, new_charge, new_mono_mz, new_peaks);
 }
 
 // Convert a theoretical distribution to a theoretical envelope
 EnvPtr Env::distrToTheoRef(double new_ref_mz, int new_charge) {
   int ori_charge = 1;
-  double mass_diff = new_ref_mz * new_charge - peak_ptr_list_[refer_idx_]->getPosition() * ori_charge;
+  double mass_diff = new_ref_mz * new_charge -
+                     peak_ptr_list_[refer_idx_]->getPosition() * ori_charge;
   return convertToTheo(mass_diff, new_charge);
 }
 
@@ -120,8 +117,8 @@ EnvPtr Env::getSubEnv(int n_back, int n_forw) {
   for (int i = refer_idx_ - n_back; i <= refer_idx_ + n_forw; i++) {
     new_peaks.push_back(peak_ptr_list_[i]);
   }
-  EnvPtr env_ptr = std::make_shared<Env>(new_refer_idx, charge_, mono_mz_,
-                                         new_peaks);
+  EnvPtr env_ptr =
+      std::make_shared<Env>(new_refer_idx, charge_, mono_mz_, new_peaks);
   return env_ptr;
 }
 
@@ -143,13 +140,11 @@ void Env::removeRightPeaks(int num) {
   peak_ptr_list_ = new_peaks;
 }
 
-
-
 EnvPtr Env::addZero(int num) {
   int n_peak = peak_ptr_list_.size();
-  EnvPeakPtrVec new_peaks; 
+  EnvPeakPtrVec new_peaks;
   for (int i = 0; i < n_peak + 2 * num; i++) {
-    EnvPeakPtr peak_ptr = std::make_shared<EnvPeak>(0 , 0);
+    EnvPeakPtr peak_ptr = std::make_shared<EnvPeak>(0, 0);
     new_peaks.push_back(peak_ptr);
   }
   for (int i = 0; i < n_peak; i++) {
@@ -157,18 +152,18 @@ EnvPtr Env::addZero(int num) {
     new_peaks[i + num]->setIntensity(peak_ptr_list_[i]->getIntensity());
   }
   for (int i = num - 1; i >= 0; i--) {
-    double pos = new_peaks[i+1]->getPosition() 
-        - mass_constant::getIsotopeMass() / charge_;
+    double pos = new_peaks[i + 1]->getPosition() -
+                 mass_constant::getIsotopeMass() / charge_;
     new_peaks[i]->setPosition(pos);
   }
   for (int i = n_peak + num; i < n_peak + num * 2; i++) {
-    double pos = new_peaks[i-1]->getPosition() 
-        + mass_constant::getIsotopeMass() / charge_;
+    double pos = new_peaks[i - 1]->getPosition() +
+                 mass_constant::getIsotopeMass() / charge_;
     new_peaks[i]->setPosition(pos);
   }
   int new_refer_idx = refer_idx_ + num;
-  EnvPtr env_ptr = std::make_shared<Env>(new_refer_idx, charge_, mono_mz_,
-                                         new_peaks);
+  EnvPtr env_ptr =
+      std::make_shared<Env>(new_refer_idx, charge_, mono_mz_, new_peaks);
   return env_ptr;
 }
 
@@ -192,9 +187,8 @@ EnvPtr Env::getSubEnv(double min_inte) {
       }
     }
   }
-  return getSubEnv(refer_idx_ - left, right - refer_idx_); 
+  return getSubEnv(refer_idx_ - left, right - refer_idx_);
 }
-
 
 // Compute the bound of highest peaks with intensity 85%.
 std::vector<int> Env::calcBound(double percent_bound, double absolute_min_inte,
@@ -279,29 +273,30 @@ double Env::compScaledInteSum(double scale_factor, double min_inte) {
   return sum;
 }
 
-double Env::compScaledInteSumBounded(double scale_factor, double min_inte, double win_bgn, double win_end) {
-    double sum = 0;
-    for (size_t i = 0; i < peak_ptr_list_.size(); i++) {
-        if (peak_ptr_list_[i]->getPosition() < win_bgn || peak_ptr_list_[i]->getPosition() > win_end) {
-            continue;
-        }
-        double scale_inte = peak_ptr_list_[i]->getIntensity() * scale_factor;
-        if (scale_inte >= min_inte) {
-            sum += scale_inte;
-        }
+double Env::compScaledInteSumBounded(double scale_factor, double min_inte,
+                                     double win_bgn, double win_end) {
+  double sum = 0;
+  for (size_t i = 0; i < peak_ptr_list_.size(); i++) {
+    if (peak_ptr_list_[i]->getPosition() < win_bgn ||
+        peak_ptr_list_[i]->getPosition() > win_end) {
+      continue;
     }
-    return sum;
+    double scale_inte = peak_ptr_list_[i]->getIntensity() * scale_factor;
+    if (scale_inte >= min_inte) {
+      sum += scale_inte;
+    }
+  }
+  return sum;
 }
 
-std::vector<double> Env::getScaledInteList(double scale_factor, 
+std::vector<double> Env::getScaledInteList(double scale_factor,
                                            double min_inte) {
-  std::vector<double> results; 
+  std::vector<double> results;
   for (size_t i = 0; i < peak_ptr_list_.size(); i++) {
     double scale_inte = peak_ptr_list_[i]->getIntensity() * scale_factor;
     if (scale_inte >= min_inte) {
       results.push_back(scale_inte);
-    }
-    else {
+    } else {
       results.push_back(0);
     }
   }
@@ -309,19 +304,19 @@ std::vector<double> Env::getScaledInteList(double scale_factor,
 }
 
 double Env::compTopThreeInteSum() {
-  double sum = 0; 
-  if (refer_idx_ >= 0 && refer_idx_ < (int)peak_ptr_list_.size() 
-      && peak_ptr_list_[refer_idx_] != nullptr) {
+  double sum = 0;
+  if (refer_idx_ >= 0 && refer_idx_ < (int)peak_ptr_list_.size() &&
+      peak_ptr_list_[refer_idx_] != nullptr) {
     sum = sum + peak_ptr_list_[refer_idx_]->getIntensity();
   }
   int left_idx = refer_idx_ - 1;
-  if (left_idx >= 0 && left_idx < (int)peak_ptr_list_.size() && 
+  if (left_idx >= 0 && left_idx < (int)peak_ptr_list_.size() &&
       peak_ptr_list_[left_idx] != nullptr) {
     sum += peak_ptr_list_[left_idx]->getIntensity();
   }
   int right_idx = refer_idx_ + 1;
-  if (right_idx >= 0 && right_idx < (int)peak_ptr_list_.size() 
-      && peak_ptr_list_[right_idx] != nullptr) {
+  if (right_idx >= 0 && right_idx < (int)peak_ptr_list_.size() &&
+      peak_ptr_list_[right_idx] != nullptr) {
     sum += peak_ptr_list_[right_idx]->getIntensity();
   }
   return sum;
@@ -331,15 +326,18 @@ double Env::getAvgMz() {
   double sum = 0;
   for (size_t i = 0; i < peak_ptr_list_.size(); i++) {
     if (peak_ptr_list_[i]->getPosition() >= 0) {
-      sum = sum + peak_ptr_list_[i]->getPosition() * peak_ptr_list_[i]->getIntensity();
+      sum = sum + peak_ptr_list_[i]->getPosition() *
+                      peak_ptr_list_[i]->getIntensity();
     }
   }
   return sum / compInteSum();
 }
 
 int Env::getHighestPeakIdx() {
-  return std::distance(peak_ptr_list_.begin(),
-                       std::max_element(peak_ptr_list_.begin(), peak_ptr_list_.end(), EnvPeak::cmpInteInc));
+  return std::distance(
+      peak_ptr_list_.begin(),
+      std::max_element(peak_ptr_list_.begin(), peak_ptr_list_.end(),
+                       EnvPeak::cmpInteInc));
 }
 
 std::vector<double> Env::getInteList() {
@@ -352,11 +350,9 @@ std::vector<double> Env::getInteList() {
 
 std::vector<double> Env::getMzList() {
   std::vector<double> pos_list;
-  for (auto p: peak_ptr_list_)
-    pos_list.push_back(p->getPosition());
+  for (auto p : peak_ptr_list_) pos_list.push_back(p->getPosition());
   return pos_list;
 }
-
 
 void Env::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) const {
   std::string element_name = Env::getXmlElementName();

@@ -1,16 +1,17 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include "ms/env/match_env_refine.hpp"
 
@@ -27,20 +28,20 @@ namespace toppic {
 
 namespace match_env_refine {
 
-void mzRefine(MatchEnvPtrVec &envs) {
+void mzRefine(MatchEnvPtrVec& envs) {
   for (size_t i = 0; i < envs.size(); i++) {
     mzRefine(envs[i]);
   }
 }
 
-void mzRefine(const MatchEnvPtr &env) {
+void mzRefine(const MatchEnvPtr& env) {
   ExpEnvPtr real_env = env->getExpEnvPtr();
   double cur_mz = real_env->getReferMz();
   int charge = real_env->getCharge();
-  double prev_mz = cur_mz - mass_constant::getIsotopeMass()/ charge;
+  double prev_mz = cur_mz - mass_constant::getIsotopeMass() / charge;
   double next_mz = cur_mz + mass_constant::getIsotopeMass() / charge;
   // check if the mass is greater than the precursor mass
-  double ref_mass = peak_util::compPeakNeutralMass(cur_mz, charge); 
+  double ref_mass = peak_util::compPeakNeutralMass(cur_mz, charge);
   // get a reference distribution based on the reference mass
   EnvPtr refer_env = EnvBase::getEnvByRefMass(ref_mass);
   /* add one zeros at both sides of the envelope */
@@ -60,8 +61,10 @@ void mzRefine(const MatchEnvPtr &env) {
   max_inte = theo_env->getReferInte();
   theo_env->changeIntensity(1.0 / max_inte);
   EnvPtr prev_env;
-  if (max_back_peak_num >= 1 && real_env->isExist(real_env->getReferIdx() - 1)) {
-    prev_env = theo_env->getSubEnv(max_back_peak_num - 1, max_forw_peak_num + 1);
+  if (max_back_peak_num >= 1 &&
+      real_env->isExist(real_env->getReferIdx() - 1)) {
+    prev_env =
+        theo_env->getSubEnv(max_back_peak_num - 1, max_forw_peak_num + 1);
   } else {
     prev_env = nullptr;
   }
@@ -71,8 +74,10 @@ void mzRefine(const MatchEnvPtr &env) {
   theo_env->changeIntensity(1.0 / max_inte);
 
   EnvPtr next_env;
-  if (max_forw_peak_num >= 1 && real_env->isExist(real_env->getReferIdx() + 1)) {
-    next_env = theo_env->getSubEnv(max_back_peak_num + 1, max_forw_peak_num - 1);
+  if (max_forw_peak_num >= 1 &&
+      real_env->isExist(real_env->getReferIdx() + 1)) {
+    next_env =
+        theo_env->getSubEnv(max_back_peak_num + 1, max_forw_peak_num - 1);
   } else {
     next_env = nullptr;
   }
@@ -91,17 +96,17 @@ void mzRefine(const MatchEnvPtr &env) {
     env->setTheoEnvPtr(cur_env);
   } else if (prev_dist <= next_dist) {
     int peak_num = prev_env->getPeakNum();
-    if (prev_env->getInte(peak_num-1) == 0)  {
-      prev_env->removeRightPeaks(1); 
-      real_env->removeRightPeaks(1); 
+    if (prev_env->getInte(peak_num - 1) == 0) {
+      prev_env->removeRightPeaks(1);
+      real_env->removeRightPeaks(1);
     }
     prev_env->changeIntensity(prev_ratio);
     env->setTheoEnvPtr(prev_env);
     real_env->changeReferIdx(-1);
   } else {
-    if (next_env->getInte(0) == 0)  {
-      next_env->removeLeftPeaks(1); 
-      real_env->removeLeftPeaks(1); 
+    if (next_env->getInte(0) == 0) {
+      next_env->removeLeftPeaks(1);
+      real_env->removeLeftPeaks(1);
     }
     next_env->changeIntensity(next_ratio);
     env->setTheoEnvPtr(next_env);
@@ -109,20 +114,19 @@ void mzRefine(const MatchEnvPtr &env) {
   }
 }
 
-void compEnvDist(const EnvPtr &real_env, const EnvPtr &theo_env,
-                 double &dist, double &ratio) {
+void compEnvDist(const EnvPtr& real_env, const EnvPtr& theo_env, double& dist,
+                 double& ratio) {
   if (theo_env == nullptr) {
     dist = std::numeric_limits<double>::infinity();
   } else {
-    compDistWithNorm(real_env->getInteList(), theo_env->getInteList(),
-                     dist, ratio);
+    compDistWithNorm(real_env->getInteList(), theo_env->getInteList(), dist,
+                     ratio);
   }
 }
 
 void compDistWithNorm(const std::vector<double>& real,
-                      const std::vector<double>& theo, 
-                      double &best_dist,
-                      double &best_ratio) {
+                      const std::vector<double>& theo, double& best_dist,
+                      double& best_ratio) {
   best_dist = std::numeric_limits<double>::infinity();
   best_ratio = -1;
   for (size_t i = 0; i < real.size(); i++) {
@@ -148,7 +152,7 @@ void compDistWithNorm(const std::vector<double>& real,
   }
 }
 
-std::vector<double> norm(const std::vector<double> &obs, double ratio) {
+std::vector<double> norm(const std::vector<double>& obs, double ratio) {
   std::vector<double> result(obs.size());
   for (size_t i = 0; i < obs.size(); i++) {
     result[i] = obs[i] / ratio;
@@ -156,7 +160,8 @@ std::vector<double> norm(const std::vector<double> &obs, double ratio) {
   return result;
 }
 
-double compDist(const std::vector<double> &norm, const std::vector<double> &theo) {
+double compDist(const std::vector<double>& norm,
+                const std::vector<double>& theo) {
   double max_distance_a = 1.0;
   double max_distance_b = 1.0;
   double result = 0;

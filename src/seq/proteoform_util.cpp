@@ -1,16 +1,17 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include "seq/proteoform_util.hpp"
 
@@ -30,7 +31,7 @@
 namespace toppic {
 namespace proteoform_util {
 
-ResFreqPtrVec compNTermResidueFreq(const ProteoformPtrVec &prot_mod_forms) {
+ResFreqPtrVec compNTermResidueFreq(const ProteoformPtrVec& prot_mod_forms) {
   std::vector<double> counts;
   ResiduePtrVec residue_list;
   for (size_t i = 0; i < prot_mod_forms.size(); i++) {
@@ -54,17 +55,16 @@ ResFreqPtrVec compNTermResidueFreq(const ProteoformPtrVec &prot_mod_forms) {
   }
   ResFreqPtrVec res_freq_list;
   for (size_t i = 0; i < residue_list.size(); i++) {
-    ResFreqPtr res_freq_ptr 
-        = std::make_shared<ResidueFreq>(residue_list[i]->getAminoAcidPtr(),
-                                        residue_list[i]->getPtmPtr(),
-                                        counts[i] / sum);
+    ResFreqPtr res_freq_ptr = std::make_shared<ResidueFreq>(
+        residue_list[i]->getAminoAcidPtr(), residue_list[i]->getPtmPtr(),
+        counts[i] / sum);
     res_freq_list.push_back(res_freq_ptr);
   }
   return res_freq_list;
 }
 
-ResFreqPtrVec compResidueFreq(const ResiduePtrVec &residue_list,
-                              const ProteoformPtrVec &prot_mod_forms) {
+ResFreqPtrVec compResidueFreq(const ResiduePtrVec& residue_list,
+                              const ProteoformPtrVec& prot_mod_forms) {
   std::vector<double> counts(residue_list.size(), 0.0);
   for (size_t i = 0; i < prot_mod_forms.size(); i++) {
     ResSeqPtr seq_ptr = prot_mod_forms[i]->getResSeqPtr();
@@ -73,7 +73,7 @@ ResFreqPtrVec compResidueFreq(const ResiduePtrVec &residue_list,
       int pos = residue_util::findResidue(residue_list, res_ptr);
       if (pos >= 0) {
         // found
-        counts[pos] = counts[pos]+1;
+        counts[pos] = counts[pos] + 1;
       }
     }
   }
@@ -84,16 +84,16 @@ ResFreqPtrVec compResidueFreq(const ResiduePtrVec &residue_list,
   }
   ResFreqPtrVec res_freq_list;
   for (size_t i = 0; i < residue_list.size(); i++) {
-    ResFreqPtr res_freq_ptr 
-        = std::make_shared<ResidueFreq>(residue_list[i]->getAminoAcidPtr(),
-                                        residue_list[i]->getPtmPtr(),
-                                        counts[i] / sum);
+    ResFreqPtr res_freq_ptr = std::make_shared<ResidueFreq>(
+        residue_list[i]->getAminoAcidPtr(), residue_list[i]->getPtmPtr(),
+        counts[i] / sum);
     res_freq_list.push_back(res_freq_ptr);
   }
   return res_freq_list;
 }
 
-bool isSameSeqAndMass(const ProteoformPtr &a, const ProteoformPtr &b, double ppo) {
+bool isSameSeqAndMass(const ProteoformPtr& a, const ProteoformPtr& b,
+                      double ppo) {
   if (a->getSeqName() != b->getSeqName()) {
     return false;
   }
@@ -108,14 +108,15 @@ bool isSameSeqAndMass(const ProteoformPtr &a, const ProteoformPtr &b, double ppo
 
   double thresh = a->getMass() * ppo;
 
-  if (std::abs(a->getMass() -b->getMass())> thresh) {
+  if (std::abs(a->getMass() - b->getMass()) > thresh) {
     return false;
   }
 
   return true;
 }
 
-bool isStrictCompatiablePtmSpecies(const ProteoformPtr &a, const ProteoformPtr &b, double ppo) {
+bool isStrictCompatiablePtmSpecies(const ProteoformPtr& a,
+                                   const ProteoformPtr& b, double ppo) {
   if (!isSameSeqAndMass(a, b, ppo)) {
     return false;
   }
@@ -133,18 +134,18 @@ bool isStrictCompatiablePtmSpecies(const ProteoformPtr &a, const ProteoformPtr &
   for (int i = 0; i < a->getMassShiftNum(); i++) {
     MassShiftPtr ac = a_shift_vec[i];
     MassShiftPtr bc = b_shift_vec[i];
-    if (ac->getRightBpPos() <= bc->getLeftBpPos() 
-        || bc->getRightBpPos() <= ac->getLeftBpPos()) {
+    if (ac->getRightBpPos() <= bc->getLeftBpPos() ||
+        bc->getRightBpPos() <= ac->getLeftBpPos()) {
       return false;
     }
-    if (std::abs(ac->getMassShift()-bc->getMassShift()) > shift_tolerance) {
+    if (std::abs(ac->getMassShift() - bc->getMassShift()) > shift_tolerance) {
       return false;
     }
   }
   return true;
 }
 
-ProteoformPtrVec2D divideProteoIntoBlocks(const ProteoformPtrVec &proteo_ptrs, 
+ProteoformPtrVec2D divideProteoIntoBlocks(const ProteoformPtrVec& proteo_ptrs,
                                           int db_block_size) {
   size_t start_idx = 0;
   size_t proteo_idx = 0;
@@ -162,12 +163,12 @@ ProteoformPtrVec2D divideProteoIntoBlocks(const ProteoformPtrVec &proteo_ptrs,
         proteo_in_block.push_back(proteo_ptrs[i]);
       }
       proteo_blocks.push_back(proteo_in_block);
-      start_idx = end_idx +1;
-      proteo_idx = end_idx +1;
+      start_idx = end_idx + 1;
+      proteo_idx = end_idx + 1;
       block_len = 0;
     }
   }
-  // last block 
+  // last block
   if (start_idx < proteo_ptrs.size()) {
     ProteoformPtrVec proteo_in_block;
     for (size_t i = start_idx; i < proteo_ptrs.size(); i++) {
@@ -178,29 +179,31 @@ ProteoformPtrVec2D divideProteoIntoBlocks(const ProteoformPtrVec &proteo_ptrs,
   return proteo_blocks;
 }
 
-std::vector<double> getNTermShift(const ProteoformPtr &db_form_ptr,
-                                  const ProtModPtrVec &prot_mod_ptrs) {
+std::vector<double> getNTermShift(const ProteoformPtr& db_form_ptr,
+                                  const ProtModPtrVec& prot_mod_ptrs) {
   std::vector<double> shifts;
   for (size_t i = 0; i < prot_mod_ptrs.size(); i++) {
     ResSeqPtr db_res_seq_ptr = db_form_ptr->getResSeqPtr();
-    bool valid = prot_mod_util::allowMod(prot_mod_ptrs[i], db_res_seq_ptr->getResidues());
+    bool valid = prot_mod_util::allowMod(prot_mod_ptrs[i],
+                                         db_res_seq_ptr->getResidues());
     if (valid) {
       shifts.push_back(prot_mod_ptrs[i]->getProtShift());
     }
   }
   // sort shifts in the decreasing order
-  std::sort(shifts.begin(), shifts.end(), std::greater <>());
+  std::sort(shifts.begin(), shifts.end(), std::greater<>());
   return shifts;
 }
 
-std::vector<double> getNTermAcets(const ProteoformPtr &db_form_ptr,
-                                  const ProtModPtrVec &prot_mod_ptrs) {
+std::vector<double> getNTermAcets(const ProteoformPtr& db_form_ptr,
+                                  const ProtModPtrVec& prot_mod_ptrs) {
   std::vector<double> shifts;
   for (size_t i = 0; i < prot_mod_ptrs.size(); i++) {
     // check if it is acetylation
     if (prot_mod_ptrs[i]->isAcetylation()) {
       ResSeqPtr db_res_seq_ptr = db_form_ptr->getResSeqPtr();
-      bool valid = prot_mod_util::allowMod(prot_mod_ptrs[i], db_res_seq_ptr->getResidues());
+      bool valid = prot_mod_util::allowMod(prot_mod_ptrs[i],
+                                           db_res_seq_ptr->getResidues());
       if (valid) {
         shifts.push_back(prot_mod_ptrs[i]->getProtShift());
       }
@@ -209,21 +212,25 @@ std::vector<double> getNTermAcets(const ProteoformPtr &db_form_ptr,
   return shifts;
 }
 
-std::vector<std::vector<double> > getNTermShift2D(const ProteoformPtrVec & db_form_ptr_vec,
-                                                  const ProtModPtrVec &prot_mod_ptrs) {
+std::vector<std::vector<double> > getNTermShift2D(
+    const ProteoformPtrVec& db_form_ptr_vec,
+    const ProtModPtrVec& prot_mod_ptrs) {
   std::vector<std::vector<double> > shifts_2d;
   for (size_t i = 0; i < db_form_ptr_vec.size(); i++) {
-    std::vector<double> shifts = getNTermShift(db_form_ptr_vec[i], prot_mod_ptrs);
+    std::vector<double> shifts =
+        getNTermShift(db_form_ptr_vec[i], prot_mod_ptrs);
     shifts_2d.push_back(shifts);
   }
   return shifts_2d;
 }
 
-std::vector<std::vector<double> > getNTermAcet2D(const ProteoformPtrVec & db_form_ptr_vec,
-                                                 const ProtModPtrVec &prot_mod_ptrs) {
+std::vector<std::vector<double> > getNTermAcet2D(
+    const ProteoformPtrVec& db_form_ptr_vec,
+    const ProtModPtrVec& prot_mod_ptrs) {
   std::vector<std::vector<double> > shifts_2d;
   for (size_t i = 0; i < db_form_ptr_vec.size(); i++) {
-    std::vector<double> shifts = getNTermAcets(db_form_ptr_vec[i], prot_mod_ptrs);
+    std::vector<double> shifts =
+        getNTermAcets(db_form_ptr_vec[i], prot_mod_ptrs);
     shifts_2d.push_back(shifts);
   }
   return shifts_2d;
@@ -231,4 +238,3 @@ std::vector<std::vector<double> > getNTermAcet2D(const ProteoformPtrVec & db_for
 
 }  // namespace proteoform_util
 }  // namespace toppic
-

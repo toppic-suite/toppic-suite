@@ -1,4 +1,5 @@
-// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,12 +26,12 @@ namespace toppic {
 
 namespace env_set_util {
 
-EnvSetPtr searchEnvSet(const MsMapPtr &ms_map_ptr, const SeedEnvPtr &seed_ptr,
-                       const EcscoreParaPtr &para_ptr, double sn_ratio);
+EnvSetPtr searchEnvSet(const MsMapPtr& ms_map_ptr, const SeedEnvPtr& seed_ptr,
+                       const EcscoreParaPtr& para_ptr, double sn_ratio);
 
-EnvSetPtr searchEnvSet(const MsMapPtr &ms_map_ptr, const SeedEnvPtr &seed_ptr,
+EnvSetPtr searchEnvSet(const MsMapPtr& ms_map_ptr, const SeedEnvPtr& seed_ptr,
                        int center_spec_id, int start_spec_id, int end_spec_id,
-                       const EcscoreParaPtr &para_ptr, double sn_ratio);
+                       const EcscoreParaPtr& para_ptr, double sn_ratio);
 
 }  // namespace env_set_util
 

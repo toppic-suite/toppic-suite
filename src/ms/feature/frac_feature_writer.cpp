@@ -1,4 +1,5 @@
-// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,10 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "ms/feature/frac_feature_writer.hpp"
 
 #include <algorithm>
-#include <iomanip>
 #include <cstddef>
+#include <iomanip>
 #include <set>
 #include <sstream>
 
@@ -27,13 +29,12 @@
 #include "ms/env/env.hpp"
 #include "ms/env/env_base.hpp"
 #include "ms/spec/peak_util.hpp"
-#include "ms/feature/frac_feature_writer.hpp"
 
 namespace toppic {
 
 namespace frac_feature_writer {
 
-void writeHeader(std::ofstream &of) {
+void writeHeader(std::ofstream& of) {
   of.precision(16);
   of << "File_name" << "\t"
      << "Fraction_ID" << "\t"
@@ -55,7 +56,7 @@ void writeHeader(std::ofstream &of) {
      << "EC_score" << "\t" << std::endl;
 }
 
-void writeOneFeature(std::ofstream &of, const FracFeaturePtr &feature) {
+void writeOneFeature(std::ofstream& of, const FracFeaturePtr& feature) {
   of << feature->getFileName() << "\t" << feature->getFracId() << "\t"
      << feature->getFeatId() << "\t" << feature->getMonoMass() << "\t"
      << feature->getIntensity() << "\t" << feature->getTimeBegin() / 60 << "\t"
@@ -68,8 +69,8 @@ void writeOneFeature(std::ofstream &of, const FracFeaturePtr &feature) {
      << std::endl;
 }
 
-void writeFeatures(const std::string &output_file_name,
-                   const FracFeaturePtrVec &features) {
+void writeFeatures(const std::string& output_file_name,
+                   const FracFeaturePtrVec& features) {
   std::ofstream of(output_file_name);
   writeHeader(of);
 
@@ -80,8 +81,8 @@ void writeFeatures(const std::string &output_file_name,
   of.close();
 }
 
-void writeBatMassFeatures(const std::string &output_file_name,
-                          const FracFeaturePtrVec &features, int num_spectra) {
+void writeBatMassFeatures(const std::string& output_file_name,
+                          const FracFeaturePtrVec& features, int num_spectra) {
   std::ofstream of(output_file_name);
   std::string delimit = ",";
   of << "ID" << delimit << "Fraction_ID" << delimit << "Envelope_num" << delimit
@@ -152,8 +153,8 @@ void writeBatMassFeatures(const std::string &output_file_name,
   of.close();
 }
 
-void writeXmlFeatures(const std::string &output_file_name,
-                      const FracFeaturePtrVec &features) {
+void writeXmlFeatures(const std::string& output_file_name,
+                      const FracFeaturePtrVec& features) {
   std::ofstream file;
   file.open(output_file_name.c_str());
   LOG_DEBUG("file_name " << output_file_name);

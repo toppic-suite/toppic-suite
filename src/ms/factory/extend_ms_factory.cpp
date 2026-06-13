@@ -1,16 +1,17 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include "ms/factory/extend_ms_factory.hpp"
 
@@ -28,8 +29,8 @@ namespace extend_ms_factory {
 
 namespace {
 
-ExtendMsPtr geneMsThreePtr(const DeconvMsPtr &deconv_ms_ptr, const SpParaPtr &sp_para_ptr,
-                           double prec_mass) {
+ExtendMsPtr geneMsThreePtr(const DeconvMsPtr& deconv_ms_ptr,
+                           const SpParaPtr& sp_para_ptr, double prec_mass) {
   MsHeaderPtr ori_header_ptr = deconv_ms_ptr->getMsHeaderPtr();
   MsHeaderPtr header_ptr = MsHeader::geneMsHeaderPtr(ori_header_ptr, prec_mass);
   ExtendPeakPtrVec list;
@@ -40,14 +41,14 @@ ExtendMsPtr geneMsThreePtr(const DeconvMsPtr &deconv_ms_ptr, const SpParaPtr &sp
     DeconvPeakPtr deconv_peak_ptr = deconv_ms_ptr->getPeakPtr(i);
     if (deconv_peak_ptr->getMonoMass() <= ext_min_mass) {
       double orig_mass = deconv_peak_ptr->getMonoMass();
-      ExtendPeakPtr extend_peak_ptr
-          = std::make_shared<ExtendPeak>(deconv_peak_ptr, orig_mass, 1.0);
+      ExtendPeakPtr extend_peak_ptr =
+          std::make_shared<ExtendPeak>(deconv_peak_ptr, orig_mass, 1.0);
       list.push_back(extend_peak_ptr);
     } else {
       for (size_t j = 0; j < ext_offsets.size(); j++) {
         double mass = deconv_peak_ptr->getMonoMass() + ext_offsets[j];
-        ExtendPeakPtr extend_peak_ptr
-            = std::make_shared<ExtendPeak>(deconv_peak_ptr, mass, 1.0);
+        ExtendPeakPtr extend_peak_ptr =
+            std::make_shared<ExtendPeak>(deconv_peak_ptr, mass, 1.0);
         list.push_back(extend_peak_ptr);
       }
     }
@@ -73,13 +74,15 @@ ExtendMsPtr geneMsThreePtr(const DeconvMsPtr &deconv_ms_ptr, const SpParaPtr &sp
     double reve_tole = peak_tole_ptr->compRelaxErrorTole(mass, prec_mono_mass);
     list_filtered[i]->setReverseTolerance(reve_tole);
   }
-  return std::make_shared<Ms<ExtendPeakPtr> >(header_ptr, std::move(list_filtered));
+  return std::make_shared<Ms<ExtendPeakPtr> >(header_ptr,
+                                              std::move(list_filtered));
 }
 
 }  // namespace
 
-ExtendMsPtrVec geneMsThreePtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
-                                 const SpParaPtr &sp_para_ptr, double prec_mass) {
+ExtendMsPtrVec geneMsThreePtrVec(const DeconvMsPtrVec& deconv_ms_ptr_vec,
+                                 const SpParaPtr& sp_para_ptr,
+                                 double prec_mass) {
   ExtendMsPtrVec extend_ms_ptr_vec;
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
     extend_ms_ptr_vec.push_back(

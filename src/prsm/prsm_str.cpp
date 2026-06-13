@@ -1,28 +1,29 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include "prsm/prsm_str.hpp"
 
-#include <limits>
 #include <algorithm>
+#include <limits>
 
 #include "common/util/logger.hpp"
 #include "prsm/prsm_util.hpp"
 
 namespace toppic {
 
-PrsmStr::PrsmStr(const std::vector<std::string> &str_vec) {
+PrsmStr::PrsmStr(const std::vector<std::string>& str_vec) {
   str_vec_ = str_vec;
   std::string line = prsm_util::getXmlLine(str_vec_, "<file_name>");
   file_name_ = prsm_util::getValueStr(line);
@@ -37,11 +38,11 @@ PrsmStr::PrsmStr(const std::vector<std::string> &str_vec) {
   line = prsm_util::getXmlLine(str_vec_, "<frac_feature_inte>");
   frac_feature_inte_ = std::stod(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<frac_feature_apex_time>");
-  frac_feature_apex_time_ =  std::stod(prsm_util::getValueStr(line));
+  frac_feature_apex_time_ = std::stod(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<frac_feature_min_time>");
-  frac_feature_min_time_ =  std::stod(prsm_util::getValueStr(line));
+  frac_feature_min_time_ = std::stod(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<frac_feature_max_time>");
-  frac_feature_max_time_ =  std::stod(prsm_util::getValueStr(line));
+  frac_feature_max_time_ = std::stod(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<ori_prec_mass>");
   ori_prec_mass_ = std::stod(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<adjusted_prec_mass>");
@@ -84,23 +85,27 @@ PrsmStr::PrsmStr(const std::vector<std::string> &str_vec) {
   line = prsm_util::getXmlLine(str_vec_, "<variable_ptm_num>");
   variable_ptm_num_ = std::stoi(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<proteo_match_seq>");
-  proteoform_match_seq_ = prsm_util::getValueStr(line); 
+  proteoform_match_seq_ = prsm_util::getValueStr(line);
   line = prsm_util::getXmlLine(str_vec_, "<proteo_db_seq>");
-  proteoform_db_seq_ = prsm_util::getValueStr(line); 
+  proteoform_db_seq_ = prsm_util::getValueStr(line);
 
-  std::vector<std::string> mass_lines = prsm_util::getXmlLineVec(str_vec_, "<shift>");
-  std::vector<std::string> left_pos_lines = prsm_util::getXmlLineVec(str_vec_, "<left_bp_pos>");
-  std::vector<std::string> right_pos_lines = prsm_util::getXmlLineVec(str_vec_, "<right_bp_pos>");
+  std::vector<std::string> mass_lines =
+      prsm_util::getXmlLineVec(str_vec_, "<shift>");
+  std::vector<std::string> left_pos_lines =
+      prsm_util::getXmlLineVec(str_vec_, "<left_bp_pos>");
+  std::vector<std::string> right_pos_lines =
+      prsm_util::getXmlLineVec(str_vec_, "<right_bp_pos>");
 
   for (size_t i = 0; i < mass_lines.size(); i++) {
-    mass_shift_vec_.push_back(std::make_shared<MassShift>(std::stoi(prsm_util::getValueStr(left_pos_lines[i])),
-                                                          std::stoi(prsm_util::getValueStr(right_pos_lines[i])),
-                                                          std::stod(prsm_util::getValueStr(mass_lines[i]))));
+    mass_shift_vec_.push_back(std::make_shared<MassShift>(
+        std::stoi(prsm_util::getValueStr(left_pos_lines[i])),
+        std::stoi(prsm_util::getValueStr(right_pos_lines[i])),
+        std::stod(prsm_util::getValueStr(mass_lines[i]))));
   }
 }
 
-int getXmlLineIndex(const std::vector<std::string> &str_vec,
-                    const std::string &property) {
+int getXmlLineIndex(const std::vector<std::string>& str_vec,
+                    const std::string& property) {
   for (size_t i = 0; i < str_vec.size(); i++) {
     size_t found = str_vec[i].find(property);
     if (found != std::string::npos) {
@@ -118,11 +123,12 @@ void PrsmStr::setFdr(double fdr) {
 
 void PrsmStr::setProteoformFdr(double proteoform_fdr) {
   int i = getXmlLineIndex(str_vec_, "<proteoform_fdr>");
-  str_vec_[i] = "<proteoform_fdr>" + str_util::toString(proteoform_fdr) + "</proteoform_fdr>";
+  str_vec_[i] = "<proteoform_fdr>" + str_util::toString(proteoform_fdr) +
+                "</proteoform_fdr>";
   proteoform_fdr_ = proteoform_fdr;
 }
 
-void PrsmStr::setFileName(const std::string & fname) {
+void PrsmStr::setFileName(const std::string& fname) {
   int i = getXmlLineIndex(str_vec_, "<file_name>");
   str_vec_[i] = "<file_name>" + fname + "</file_name>";
   file_name_ = fname;
@@ -142,31 +148,36 @@ void PrsmStr::setFracFeatureId(int id) {
 
 void PrsmStr::setFracFeatureInte(double inte) {
   int i = getXmlLineIndex(str_vec_, "<frac_feature_inte>");
-  str_vec_[i] = "<frac_feature_inte>" + str_util::toString(inte) + "</frac_feature_inte>";
+  str_vec_[i] =
+      "<frac_feature_inte>" + str_util::toString(inte) + "</frac_feature_inte>";
   frac_feature_inte_ = inte;
 }
 
 void PrsmStr::setFracFeatureScore(double score) {
   int i = getXmlLineIndex(str_vec_, "<frac_feature_score>");
-  str_vec_[i] = "<frac_feature_score>" + str_util::toString(score) + "</frac_feature_score>";
+  str_vec_[i] = "<frac_feature_score>" + str_util::toString(score) +
+                "</frac_feature_score>";
 }
 
 void PrsmStr::setFracFeatureApexTime(double apex_time) {
   int i = getXmlLineIndex(str_vec_, "<frac_feature_apex_time>");
-  str_vec_[i] = "<frac_feature_apex_time>" + str_util::toString(apex_time) + "</frac_feature_apex_time>";
-  frac_feature_apex_time_ = apex_time; 
+  str_vec_[i] = "<frac_feature_apex_time>" + str_util::toString(apex_time) +
+                "</frac_feature_apex_time>";
+  frac_feature_apex_time_ = apex_time;
 }
 
 void PrsmStr::setFracFeatureMinTime(double min_time) {
   int i = getXmlLineIndex(str_vec_, "<frac_feature_min_time>");
-  str_vec_[i] = "<frac_feature_min_time>" + str_util::toString(min_time) + "</frac_feature_min_time>";
-  frac_feature_min_time_ = min_time; 
+  str_vec_[i] = "<frac_feature_min_time>" + str_util::toString(min_time) +
+                "</frac_feature_min_time>";
+  frac_feature_min_time_ = min_time;
 }
 
 void PrsmStr::setFracFeatureMaxTime(double max_time) {
   int i = getXmlLineIndex(str_vec_, "<frac_feature_max_time>");
-  str_vec_[i] = "<frac_feature_max_time>" + str_util::toString(max_time) + "</frac_feature_max_time>";
-  frac_feature_max_time_ = max_time; 
+  str_vec_[i] = "<frac_feature_max_time>" + str_util::toString(max_time) +
+                "</frac_feature_max_time>";
+  frac_feature_max_time_ = max_time;
 }
 
 void PrsmStr::setPrecursorId(int id) {
@@ -177,7 +188,8 @@ void PrsmStr::setPrecursorId(int id) {
 
 void PrsmStr::setProteoClusterId(int id) {
   int i = getXmlLineIndex(str_vec_, "<proteo_cluster_id>");
-  str_vec_[i] = "<proteo_cluster_id>" + std::to_string(id) + "</proteo_cluster_id>";
+  str_vec_[i] =
+      "<proteo_cluster_id>" + std::to_string(id) + "</proteo_cluster_id>";
   proteo_cluster_id_ = id;
 }
 
@@ -187,15 +199,14 @@ void PrsmStr::setProteoInte(double inte) {
   proteo_inte_ = inte;
 }
 
-
 void PrsmStr::setProtId(int id) {
   int i = getXmlLineIndex(str_vec_, "<prot_id>");
   str_vec_[i] = "<prot_id>" + std::to_string(id) + "</prot_id>";
   prot_id_ = id;
 }
 
-
-bool PrsmStr::isSameSeqAndMass(const PrsmStrPtr &a, const PrsmStrPtr &b, double ppo) {
+bool PrsmStr::isSameSeqAndMass(const PrsmStrPtr& a, const PrsmStrPtr& b,
+                               double ppo) {
   if (a->getSeqName() != b->getSeqName()) {
     return false;
   }
@@ -212,7 +223,8 @@ bool PrsmStr::isSameSeqAndMass(const PrsmStrPtr &a, const PrsmStrPtr &b, double 
   return true;
 }
 
-bool PrsmStr::isSimpleMatch(const PrsmStrPtr &a, const PrsmStrPtr &b, double tolerance) {
+bool PrsmStr::isSimpleMatch(const PrsmStrPtr& a, const PrsmStrPtr& b,
+                            double tolerance) {
   if (a->getSeqName() != b->getSeqName()) {
     return false;
   }
@@ -222,7 +234,8 @@ bool PrsmStr::isSimpleMatch(const PrsmStrPtr &a, const PrsmStrPtr &b, double tol
   return true;
 }
 
-bool PrsmStr::isStrictCompatiablePtmSpecies(const PrsmStrPtr & a, const PrsmStrPtr & b, double ppo) {
+bool PrsmStr::isStrictCompatiablePtmSpecies(const PrsmStrPtr& a,
+                                            const PrsmStrPtr& b, double ppo) {
   if (!isSameSeqAndMass(a, b, ppo)) {
     return false;
   }
@@ -239,8 +252,8 @@ bool PrsmStr::isStrictCompatiablePtmSpecies(const PrsmStrPtr & a, const PrsmStrP
   for (size_t i = 0; i < a->getMassShiftVec().size(); i++) {
     MassShiftPtr ac = a_shift_vec[i];
     MassShiftPtr bc = b_shift_vec[i];
-    if (ac->getRightBpPos() <= bc->getLeftBpPos() 
-        || bc->getRightBpPos() <= ac->getLeftBpPos()) {
+    if (ac->getRightBpPos() <= bc->getLeftBpPos() ||
+        bc->getRightBpPos() <= ac->getLeftBpPos()) {
       return false;
     }
     if (std::abs(ac->getMassShift() - bc->getMassShift()) > shift_tolerance) {
@@ -250,95 +263,79 @@ bool PrsmStr::isStrictCompatiablePtmSpecies(const PrsmStrPtr & a, const PrsmStrP
   return true;
 }
 
-bool PrsmStr::cmpEValueIncProtInc(const PrsmStrPtr &a, const PrsmStrPtr &b) {
+bool PrsmStr::cmpEValueIncProtInc(const PrsmStrPtr& a, const PrsmStrPtr& b) {
   if (a->getEValue() < b->getEValue()) {
     return true;
-  }
-  else if (a->getEValue() > b->getEValue()) {
+  } else if (a->getEValue() > b->getEValue()) {
     return false;
-  }
-  else {
+  } else {
     return a->getSeqName() < b->getSeqName();
   }
 }
 
-bool PrsmStr::cmpMatchFragDecMatchPeakDecProtInc(const PrsmStrPtr &a, const PrsmStrPtr &b) {
+bool PrsmStr::cmpMatchFragDecMatchPeakDecProtInc(const PrsmStrPtr& a,
+                                                 const PrsmStrPtr& b) {
   if (a->getMatchFragNum() > b->getMatchFragNum()) {
     return true;
-  }
-  else if (a->getMatchFragNum() < b->getMatchFragNum()) {
+  } else if (a->getMatchFragNum() < b->getMatchFragNum()) {
     return false;
-  }
-  else if (a->getMatchPeakNum() > b->getMatchPeakNum()) {
+  } else if (a->getMatchPeakNum() > b->getMatchPeakNum()) {
     return true;
-  }
-  else if (a->getMatchPeakNum() < b->getMatchPeakNum()) {
+  } else if (a->getMatchPeakNum() < b->getMatchPeakNum()) {
     return false;
-  }
-  else {
+  } else {
     return a->getSeqName() < b->getSeqName();
   }
 }
 
-bool PrsmStr::cmpNormMatchFragDecProtInc(const PrsmStrPtr &a, const PrsmStrPtr &b) { 
+bool PrsmStr::cmpNormMatchFragDecProtInc(const PrsmStrPtr& a,
+                                         const PrsmStrPtr& b) {
   if (a->getNormMatchFragNum() > b->getNormMatchFragNum()) {
     return true;
-  }
-  else if (a->getNormMatchFragNum() < b->getNormMatchFragNum()) {
+  } else if (a->getNormMatchFragNum() < b->getNormMatchFragNum()) {
     return false;
-  }
-  else {
+  } else {
     return a->getSeqName() < b->getSeqName();
   }
 }
 
-bool PrsmStr::cmpSpecIncPrecIncEvalueIncProtInc(const PrsmStrPtr &a, const PrsmStrPtr &b) {
+bool PrsmStr::cmpSpecIncPrecIncEvalueIncProtInc(const PrsmStrPtr& a,
+                                                const PrsmStrPtr& b) {
   if (a->getSpectrumId() < b->getSpectrumId()) {
     return true;
-  } 
-  else if (a->getSpectrumId() > b->getSpectrumId()) {
+  } else if (a->getSpectrumId() > b->getSpectrumId()) {
     return false;
-  } 
-  else if (a->getPrecursorId() < b->getPrecursorId()) {
+  } else if (a->getPrecursorId() < b->getPrecursorId()) {
     return true;
-  }
-  else if (a->getPrecursorId() > b->getPrecursorId()) {
+  } else if (a->getPrecursorId() > b->getPrecursorId()) {
     return false;
-  }
-  else if (a->getEValue() < b->getEValue()) {
+  } else if (a->getEValue() < b->getEValue()) {
     return true;
-  } 
-  else if (a->getEValue() > b->getEValue()) {
+  } else if (a->getEValue() > b->getEValue()) {
     return false;
-  } 
-  else {
+  } else {
     return a->getSeqName() < b->getSeqName();
   }
 }
 
-bool cmpSpecIncPrecIncEvalueIncProtInc(const PrsmStrPtr &a, const PrsmStrPtr &b) {
+bool cmpSpecIncPrecIncEvalueIncProtInc(const PrsmStrPtr& a,
+                                       const PrsmStrPtr& b) {
   if (a->getSpectrumId() < b->getSpectrumId()) {
     return true;
-  } 
-  else if (a->getSpectrumId() > b->getSpectrumId()) {
+  } else if (a->getSpectrumId() > b->getSpectrumId()) {
     return false;
-  }
-  else if (a->getPrecursorId() < b->getPrecursorId()) {
+  } else if (a->getPrecursorId() < b->getPrecursorId()) {
     return true;
-  }
-  else if (a->getPrecursorId() > b->getPrecursorId()) {
+  } else if (a->getPrecursorId() > b->getPrecursorId()) {
     return false;
-  }
-  else if (a->getEValue() < b->getEValue()) {
+  } else if (a->getEValue() < b->getEValue()) {
     return true;
-  } 
-  else if (a->getEValue() > b->getEValue()) {
+  } else if (a->getEValue() > b->getEValue()) {
     return false;
-  } 
-  else {
+  } else {
     return a->getSeqName() < b->getSeqName();
   }
-}  
-
 }
+
+}  // namespace toppic
 // namespace toppic

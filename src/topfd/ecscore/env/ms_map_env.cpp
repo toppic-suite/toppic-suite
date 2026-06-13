@@ -1,26 +1,26 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
+#include "topfd/ecscore/env/ms_map_env.hpp"
 
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
 
-#include "topfd/ecscore/env/ms_map_env.hpp"
-
 namespace toppic {
 
-MsMapEnv::MsMapEnv(int spec_id, const MsMapPeakPtrVec &peak_list) {
+MsMapEnv::MsMapEnv(int spec_id, const MsMapPeakPtrVec& peak_list) {
   spec_id_ = spec_id;
   peak_list_ = peak_list;
 }
@@ -41,7 +41,7 @@ int MsMapEnv::getTopThreeMatchNum(int ref_idx) {
 
 std::vector<double> MsMapEnv::getInteList() {
   std::vector<double> inte_list;
-  for (auto p: peak_list_) {
+  for (auto p : peak_list_) {
     if (p != nullptr)
       inte_list.push_back(p->getIntensity());
     else
@@ -52,7 +52,7 @@ std::vector<double> MsMapEnv::getInteList() {
 
 std::vector<double> MsMapEnv::getMzList() {
   std::vector<double> pos_list;
-  for (auto p: peak_list_) {
+  for (auto p : peak_list_) {
     if (p != nullptr)
       pos_list.push_back(p->getPosition());
     else
@@ -63,35 +63,31 @@ std::vector<double> MsMapEnv::getMzList() {
 
 double MsMapEnv::getInteSum() {
   double sum = 0;
-  for (auto p: peak_list_) {
-    if (p != nullptr)
-      sum = sum + p->getIntensity();
+  for (auto p : peak_list_) {
+    if (p != nullptr) sum = sum + p->getIntensity();
   }
   return sum;
 }
 
-
 double MsMapEnv::compTopThreeInteSum(int ref_idx) {
   double sum = 0;
   int peak_num = peak_list_.size();
-  if (ref_idx >= 0 && ref_idx < peak_num 
-      && peak_list_[ref_idx] != nullptr) {
+  if (ref_idx >= 0 && ref_idx < peak_num && peak_list_[ref_idx] != nullptr) {
     sum += peak_list_[ref_idx]->getIntensity();
   }
   int left_idx = ref_idx - 1;
-  if (left_idx >= 0 && left_idx < peak_num 
-      && peak_list_[left_idx] != nullptr) {
+  if (left_idx >= 0 && left_idx < peak_num && peak_list_[left_idx] != nullptr) {
     sum += peak_list_[left_idx]->getIntensity();
   }
   int right_idx = ref_idx + 1;
-  if (right_idx >= 0 && right_idx < peak_num 
-      && peak_list_[right_idx] != nullptr) {
+  if (right_idx >= 0 && right_idx < peak_num &&
+      peak_list_[right_idx] != nullptr) {
     sum += peak_list_[right_idx]->getIntensity();
   }
   return sum;
 }
 
-void MsMapEnv::removeLowIntePeaks(const SeedEnvPtr &seed_ptr, double ratio,
+void MsMapEnv::removeLowIntePeaks(const SeedEnvPtr& seed_ptr, double ratio,
                                   double min_inte) {
   for (int i = 0; i < seed_ptr->getPeakNum(); i++) {
     double inte = seed_ptr->getPeakPtr(i)->getIntensity() * ratio;
@@ -115,5 +111,4 @@ void MsMapEnv::appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) {
   }
 }
 
-}
-
+}  // namespace toppic

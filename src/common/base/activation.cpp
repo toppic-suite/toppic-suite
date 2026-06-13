@@ -1,45 +1,49 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include "common/base/activation.hpp"
 
 #include <stdexcept>
 #include <string>
 
+#include "common/base/ion_type_base.hpp"
 #include "common/xml/xml_dom_document.hpp"
 #include "common/xml/xml_dom_util.hpp"
-#include "common/base/ion_type_base.hpp"
 
 namespace toppic {
 
-Activation::Activation(const std::string &name,
-                       const IonTypePtr &n_ion_type_ptr,
-                       const IonTypePtr &c_ion_type_ptr):
-    name_(name),
-    n_ion_type_ptr_(n_ion_type_ptr),
-    c_ion_type_ptr_(c_ion_type_ptr) {
+Activation::Activation(const std::string& name,
+                       const IonTypePtr& n_ion_type_ptr,
+                       const IonTypePtr& c_ion_type_ptr)
+    : name_(name),
+      n_ion_type_ptr_(n_ion_type_ptr),
+      c_ion_type_ptr_(c_ion_type_ptr) {
   if (n_ion_type_ptr_ == nullptr) {
-    throw std::runtime_error("Null N-terminal ion type for activation: " + name);
+    throw std::runtime_error("Null N-terminal ion type for activation: " +
+                             name);
   }
   if (c_ion_type_ptr_ == nullptr) {
-    throw std::runtime_error("Null C-terminal ion type for activation: " + name);
+    throw std::runtime_error("Null C-terminal ion type for activation: " +
+                             name);
   }
 }
 
 Activation::Activation(XmlDOMElement element) {
   name_ = xml_dom_util::getChildValue(element, "name", 0);
-  std::string ion_type_name = xml_dom_util::getChildValue(element, "n_ion_type", 0);
+  std::string ion_type_name =
+      xml_dom_util::getChildValue(element, "n_ion_type", 0);
   n_ion_type_ptr_ = IonTypeBase::getIonTypePtrByName(ion_type_name);
   if (n_ion_type_ptr_ == nullptr) {
     throw std::runtime_error("Unknown N-terminal ion type: " + ion_type_name);

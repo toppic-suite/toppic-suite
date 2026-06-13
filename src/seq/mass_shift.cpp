@@ -1,16 +1,17 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include "seq/mass_shift.hpp"
 
@@ -24,29 +25,26 @@
 
 namespace toppic {
 
-MassShift::MassShift(const AlterPtr &alter_ptr) {
+MassShift::MassShift(const AlterPtr& alter_ptr) {
   shift_ = alter_ptr->getMass();
   alter_vec_.push_back(alter_ptr);
   left_bp_pos_ = alter_vec_[0]->getLeftBpPos();
   right_bp_pos_ = alter_vec_[0]->getRightBpPos();
 }
 
-MassShift::MassShift(const MassShiftPtr &shift_ptr, int start) {
+MassShift::MassShift(const MassShiftPtr& shift_ptr, int start) {
   shift_ = shift_ptr->getMassShift();
   left_bp_pos_ = shift_ptr->getLeftBpPos() - start;
   right_bp_pos_ = shift_ptr->getRightBpPos() - start;
   AlterPtrVec alter_ptrs = shift_ptr->getAlterPtrVec();
   for (size_t k = 0; k < alter_ptrs.size(); k++) {
-    AlterPtr alter_ptr = Alter::genAlterPtr(alter_ptrs[k], start); 
+    AlterPtr alter_ptr = Alter::genAlterPtr(alter_ptrs[k], start);
     alter_vec_.push_back(alter_ptr);
   }
 }
 
-MassShift::MassShift(int left_bp_pos, int right_bp_pos, 
-                     double shift):
-    left_bp_pos_(left_bp_pos),
-    right_bp_pos_(right_bp_pos),
-    shift_(shift) {}
+MassShift::MassShift(int left_bp_pos, int right_bp_pos, double shift)
+    : left_bp_pos_(left_bp_pos), right_bp_pos_(right_bp_pos), shift_(shift) {}
 
 AlterTypePtr MassShift::getTypePtr() const {
   if (alter_vec_.size() == 0) {
@@ -64,14 +62,14 @@ MassShift::MassShift(XmlDOMElement element) {
 
   std::string alter_element_name = Alter::getXmlElementName();
   std::string alter_element_list = alter_element_name + "_list";
-  XmlDOMElement alter_list_element
-      = xml_dom_util::getChildElement(element, alter_element_list.c_str(), 0);
+  XmlDOMElement alter_list_element =
+      xml_dom_util::getChildElement(element, alter_element_list.c_str(), 0);
 
   int alter_len = xml_dom_util::getChildCount(alter_list_element,
                                               alter_element_name.c_str());
   for (int i = 0; i < alter_len; i++) {
-    XmlDOMElement alter_element
-        = xml_dom_util::getChildElement(alter_list_element, alter_element_name.c_str(), i);
+    XmlDOMElement alter_element = xml_dom_util::getChildElement(
+        alter_list_element, alter_element_name.c_str(), i);
     alter_vec_.push_back(std::make_shared<Alter>(alter_element));
   }
 }
@@ -90,7 +88,11 @@ std::string MassShift::getAnnoStr() const {
     }
   } else {
     for (size_t i = 0; i < alter_vec_.size(); i++) {
-      seq_str += alter_vec_[i]->getModPtr()->getModResiduePtr()->getPtmPtr()->getAbbrName();
+      seq_str += alter_vec_[i]
+                     ->getModPtr()
+                     ->getModResiduePtr()
+                     ->getPtmPtr()
+                     ->getAbbrName();
       seq_str += ";";
     }
     seq_str.pop_back();
@@ -116,7 +118,7 @@ void MassShift::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) const {
   }
 }
 
-bool MassShift::cmpPosInc(const MassShiftPtr &a, const MassShiftPtr &b) {
+bool MassShift::cmpPosInc(const MassShiftPtr& a, const MassShiftPtr& b) {
   if (a->getLeftBpPos() < b->getLeftBpPos()) {
     return true;
   } else if (a->getLeftBpPos() > b->getLeftBpPos()) {

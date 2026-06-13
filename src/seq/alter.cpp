@@ -1,16 +1,17 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include "seq/alter.hpp"
 
@@ -24,36 +25,39 @@
 
 namespace toppic {
 
-Alter::Alter(int left_bp_pos, int right_bp_pos,
-             const AlterTypePtr &type_ptr,
-             double mass, const ModPtr &mod_ptr):
-    left_bp_pos_(left_bp_pos),
-    right_bp_pos_(right_bp_pos),
-    type_ptr_(type_ptr),
-    mass_(mass), mod_ptr_(mod_ptr), local_anno_ptr_(nullptr) {}
+Alter::Alter(int left_bp_pos, int right_bp_pos, const AlterTypePtr& type_ptr,
+             double mass, const ModPtr& mod_ptr)
+    : left_bp_pos_(left_bp_pos),
+      right_bp_pos_(right_bp_pos),
+      type_ptr_(type_ptr),
+      mass_(mass),
+      mod_ptr_(mod_ptr),
+      local_anno_ptr_(nullptr) {}
 
 Alter::Alter(XmlDOMElement element) {
   left_bp_pos_ = xml_dom_util::getIntChildValue(element, "left_bp_pos", 0);
   right_bp_pos_ = xml_dom_util::getIntChildValue(element, "right_bp_pos", 0);
   std::string type_element_name = AlterType::getXmlElementName();
-  XmlDOMElement type_element
-      = xml_dom_util::getChildElement(element, type_element_name.c_str(), 0);
+  XmlDOMElement type_element =
+      xml_dom_util::getChildElement(element, type_element_name.c_str(), 0);
   type_ptr_ = AlterType::getTypePtrFromXml(type_element);
   mass_ = xml_dom_util::getDoubleChildValue(element, "mass", 0);
   std::string mod_element_name = Mod::getXmlElementName();
 
-  int mod_count = xml_dom_util::getChildCount(element, mod_element_name.c_str());
+  int mod_count =
+      xml_dom_util::getChildCount(element, mod_element_name.c_str());
   if (mod_count != 0) {
-    XmlDOMElement mod_element
-        = xml_dom_util::getChildElement(element, mod_element_name.c_str(), 0);
+    XmlDOMElement mod_element =
+        xml_dom_util::getChildElement(element, mod_element_name.c_str(), 0);
     mod_ptr_ = ModBase::getModPtrFromXml(mod_element);
   }
 
   std::string local_element_name = LocalAnno::getXmlElementName();
-  int local_count = xml_dom_util::getChildCount(element, local_element_name.c_str());
+  int local_count =
+      xml_dom_util::getChildCount(element, local_element_name.c_str());
   if (local_count != 0) {
-    XmlDOMElement local_element
-        = xml_dom_util::getChildElement(element, local_element_name.c_str(), 0);
+    XmlDOMElement local_element =
+        xml_dom_util::getChildElement(element, local_element_name.c_str(), 0);
     local_anno_ptr_ = std::make_shared<LocalAnno>(local_element);
   }
 }
@@ -76,7 +80,7 @@ void Alter::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) const {
   }
 }
 
-AlterPtr Alter::genAlterPtr(const AlterPtr &ori_ptr, int start_pos) {
+AlterPtr Alter::genAlterPtr(const AlterPtr& ori_ptr, int start_pos) {
   int left_bp_pos = ori_ptr->left_bp_pos_ - start_pos;
   int right_bp_pos = ori_ptr->right_bp_pos_ - start_pos;
   AlterTypePtr type_ptr = ori_ptr->type_ptr_;
@@ -88,7 +92,7 @@ AlterPtr Alter::genAlterPtr(const AlterPtr &ori_ptr, int start_pos) {
   return alter_ptr;
 }
 
-void Alter::setLocalAnno(const LocalAnnoPtr &p) {
+void Alter::setLocalAnno(const LocalAnnoPtr& p) {
   local_anno_ptr_ = p;
   if (p != nullptr) {
     left_bp_pos_ = p->getLeftBpPos();

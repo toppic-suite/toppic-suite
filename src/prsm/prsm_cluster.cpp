@@ -1,16 +1,17 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include "prsm/prsm_cluster.hpp"
 
@@ -24,7 +25,7 @@ namespace toppic {
 
 namespace prsm_cluster {
 
-std::vector<PrsmStrPtrVec> groupProteins(const PrsmStrPtrVec &prsm_ptrs) {
+std::vector<PrsmStrPtrVec> groupProteins(const PrsmStrPtrVec& prsm_ptrs) {
   // get max shift number
   int max_shift_number = 0;
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
@@ -47,7 +48,7 @@ std::vector<PrsmStrPtrVec> groupProteins(const PrsmStrPtrVec &prsm_ptrs) {
   return proteogroups;
 }
 
-std::vector<PrsmStrPtrVec> getZeroPtmList(const PrsmStrPtrVec& proteo_ptrs, 
+std::vector<PrsmStrPtrVec> getZeroPtmList(const PrsmStrPtrVec& proteo_ptrs,
                                           double ppo) {
   std::vector<PrsmStrPtrVec> clusters;
   for (size_t i = 0; i < proteo_ptrs.size(); i++) {
@@ -106,7 +107,8 @@ void setClusterId(PrsmStrPtrVec& prsm_ptrs, double ppo) {
     for (size_t j = 0; j < proteo_groups[i].size(); j++) {
       bool is_found = false;
       for (size_t m = 0; m < clusters.size(); m++) {
-        if (PrsmStr::isStrictCompatiablePtmSpecies(proteo_groups[i][j], clusters[m][0], ppo)) {
+        if (PrsmStr::isStrictCompatiablePtmSpecies(proteo_groups[i][j],
+                                                   clusters[m][0], ppo)) {
           clusters[m].push_back(proteo_groups[i][j]);
           is_found = true;
           break;
@@ -127,10 +129,9 @@ void setClusterId(PrsmStrPtrVec& prsm_ptrs, double ppo) {
   }
 }
 
-void process(const std::string &spec_file_name,
-             const std::string &input_file_ext,
-             const std::string &output_file_ext,
-             double ppo)  {
+void process(const std::string& spec_file_name,
+             const std::string& input_file_ext,
+             const std::string& output_file_ext, double ppo) {
   std::string base_name = file_util::basename(spec_file_name);
   std::string input_file_name = base_name + "." + input_file_ext;
   PrsmStrPtrVec prsm_ptrs = prsm_reader_util::readAllPrsmStrs(input_file_name);
@@ -149,5 +150,3 @@ void process(const std::string &spec_file_name,
 }  // namespace prsm_cluster
 
 }  // namespace toppic
-
-

@@ -1,16 +1,17 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #ifndef TOPPIC_SEQ_PROTEOFORM_UTIL_HPP_
 #define TOPPIC_SEQ_PROTEOFORM_UTIL_HPP_
@@ -24,30 +25,34 @@ namespace toppic {
 namespace proteoform_util {
 
 // calculate frequencies for n_terminal_residues
-ResFreqPtrVec compNTermResidueFreq(const ProteoformPtrVec &prot_mod_forms);
+ResFreqPtrVec compNTermResidueFreq(const ProteoformPtrVec& prot_mod_forms);
 
 // calculate frequencies for all residues
-ResFreqPtrVec compResidueFreq(const ResiduePtrVec &residue_list,
-                              const ProteoformPtrVec &raw_mods);
+ResFreqPtrVec compResidueFreq(const ResiduePtrVec& residue_list,
+                              const ProteoformPtrVec& raw_mods);
 
-bool isSameSeqAndMass(const ProteoformPtr &a, const ProteoformPtr &b, double ppo);
+bool isSameSeqAndMass(const ProteoformPtr& a, const ProteoformPtr& b,
+                      double ppo);
 
-bool isStrictCompatiablePtmSpecies(const ProteoformPtr &a, const ProteoformPtr &b, double ppo);
+bool isStrictCompatiablePtmSpecies(const ProteoformPtr& a,
+                                   const ProteoformPtr& b, double ppo);
 
-ProteoformPtrVec2D divideProteoIntoBlocks(const ProteoformPtrVec &proteo_ptrs,
+ProteoformPtrVec2D divideProteoIntoBlocks(const ProteoformPtrVec& proteo_ptrs,
                                           int db_block_size);
 
-std::vector<double> getNTermShift(const ProteoformPtr &db_form_ptr,
-                                  const ProtModPtrVec &prot_mod_ptrs);
+std::vector<double> getNTermShift(const ProteoformPtr& db_form_ptr,
+                                  const ProtModPtrVec& prot_mod_ptrs);
 
-std::vector<std::vector<double> > getNTermShift2D(const ProteoformPtrVec & db_form_ptr_vec,
-                                                  const ProtModPtrVec & prot_mod_ptrs);
+std::vector<std::vector<double> > getNTermShift2D(
+    const ProteoformPtrVec& db_form_ptr_vec,
+    const ProtModPtrVec& prot_mod_ptrs);
 
-std::vector<double> getNTermAcets(const ProteoformPtr &db_form_ptr,
-                                  const ProtModPtrVec & prot_mod_ptrs);
+std::vector<double> getNTermAcets(const ProteoformPtr& db_form_ptr,
+                                  const ProtModPtrVec& prot_mod_ptrs);
 
-std::vector<std::vector<double> > getNTermAcet2D(const ProteoformPtrVec & db_form_ptr_vec,
-                                                 const ProtModPtrVec & prot_mod_ptrs);
+std::vector<std::vector<double> > getNTermAcet2D(
+    const ProteoformPtrVec& db_form_ptr_vec,
+    const ProtModPtrVec& prot_mod_ptrs);
 
 }  // namespace proteoform_util
 

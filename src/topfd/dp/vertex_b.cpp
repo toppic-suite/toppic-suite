@@ -1,39 +1,39 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
-
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include "topfd/dp/vertex_b.hpp"
 
 namespace toppic {
 
-VertexB::VertexB(const DpParaPtr &dp_para_ptr, int bgn_peak, 
+VertexB::VertexB(const DpParaPtr& dp_para_ptr, int bgn_peak,
                  int pre_win_peak_num, int cur_win_peak_num, int env_num) {
-  // zero envelope is considered, so we have env_num + 1 
+  // zero envelope is considered, so we have env_num + 1
   dp_para_ptr_ = dp_para_ptr;
   bgn_peak_ = bgn_peak;
   peak_num_ = pre_win_peak_num + cur_win_peak_num;
   cur_bgn_pos_ = pre_win_peak_num;
   peak_use_cnts_.resize(peak_num_, 0);
 
-  pre_env_peak_pairs_.resize(peak_num_); 
-  cur_env_peak_pairs_.resize(peak_num_); 
+  pre_env_peak_pairs_.resize(peak_num_);
+  cur_env_peak_pairs_.resize(peak_num_);
   scores_.resize(env_num + 1, 0);
   prevs_.resize(env_num + 1, -1);
 }
 
-VertexB::VertexB(const VertexBPtr &ptr) {
-  dp_para_ptr_= ptr->dp_para_ptr_;
+VertexB::VertexB(const VertexBPtr& ptr) {
+  dp_para_ptr_ = ptr->dp_para_ptr_;
   bgn_peak_ = ptr->bgn_peak_;
   peak_num_ = ptr->peak_num_;
   cur_bgn_pos_ = ptr->cur_bgn_pos_;
@@ -49,4 +49,4 @@ VertexB::VertexB(const VertexBPtr &ptr) {
   prevs_ = ptr->prevs_;
 }
 
-}
+}  // namespace toppic

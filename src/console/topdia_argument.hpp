@@ -1,4 +1,5 @@
-// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,13 +16,12 @@
 #ifndef TOPPIC_CONSOLE_TOPDIA_ARGUMENT_HPP_
 #define TOPPIC_CONSOLE_TOPDIA_ARGUMENT_HPP_
 
+#include <boost/program_options.hpp>
 #include <string>
 #include <vector>
 
-#include <boost/program_options.hpp>
-
-#include "topfd/common/topfd_para.hpp"
 #include "topdia/common/topdia_para.hpp"
+#include "topfd/common/topfd_para.hpp"
 
 namespace toppic {
 
@@ -29,7 +29,7 @@ class Argument {
  public:
   Argument();
 
-  bool parse(int argc, char *argv[]);
+  bool parse(int argc, char* argv[]);
 
   static TopfdParaPtr getTopfdParaPtrForTopdia();
 
@@ -42,11 +42,11 @@ class Argument {
  private:
   void initArguments();
 
-  void setArgumentsByConfigFile(const std::string &file_name);
+  void setArgumentsByConfigFile(const std::string& file_name);
 
   bool validateArguments();
 
-  void showUsage(boost::program_options::options_description &desc);
+  void showUsage(boost::program_options::options_description& desc);
 
   TopfdParaPtr topfd_para_ptr_;
 

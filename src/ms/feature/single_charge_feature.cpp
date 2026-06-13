@@ -1,4 +1,5 @@
-// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,17 +24,14 @@
 namespace toppic {
 
 SingleChargeFeature::SingleChargeFeature(
-		int charge, double time_begin, double time_end, int scan_begin,
-		int scan_end, double intensity, int env_num, int spec_id_begin,
-		int spec_id_end, double mass, std::vector<double> xic_inte,
-		std::vector<double> envelope_mass, 
-		std::vector<double> aggregate_envelope_inte,
-		double mono_mz, double average_mz,
-		double refer_mz,
-		std::vector<int> scan_list,
-		std::vector<double> rt_list,
-		std::vector<double> intensity_sum_list,
-		std::vector<double> max_intensity_list)
+    int charge, double time_begin, double time_end, int scan_begin,
+    int scan_end, double intensity, int env_num, int spec_id_begin,
+    int spec_id_end, double mass, std::vector<double> xic_inte,
+    std::vector<double> envelope_mass,
+    std::vector<double> aggregate_envelope_inte, double mono_mz,
+    double average_mz, double refer_mz, std::vector<int> scan_list,
+    std::vector<double> rt_list, std::vector<double> intensity_sum_list,
+    std::vector<double> max_intensity_list)
     : charge_(charge),
       time_begin_(time_begin),
       time_end_(time_end),
@@ -53,10 +51,9 @@ SingleChargeFeature::SingleChargeFeature(
       scan_list_(scan_list),
       rt_list_(rt_list),
       intensity_sum_list_(intensity_sum_list),
-      max_intensity_list_(max_intensity_list) {
-} 
+      max_intensity_list_(max_intensity_list) {}
 
-// the constructor needs to be UPDATED. 
+// the constructor needs to be UPDATED.
 SingleChargeFeature::SingleChargeFeature(XmlDOMElement element) {
   charge_ = xml_dom_util::getIntChildValue(element, "charge", 0);
   time_begin_ = xml_dom_util::getDoubleChildValue(element, "time_begin", 0);
@@ -72,15 +69,21 @@ SingleChargeFeature::SingleChargeFeature(XmlDOMElement element) {
   rt_list_.clear();
   intensity_sum_list_.clear();
   max_intensity_list_.clear();
-  XmlDOMElement env_list_element = xml_dom_util::getChildElement(element, "envelope_list", 0);
+  XmlDOMElement env_list_element =
+      xml_dom_util::getChildElement(element, "envelope_list", 0);
   if (env_list_element) {
     for (int i = 0; i < env_num_; i++) {
-      XmlDOMElement env_element = xml_dom_util::getChildElement(env_list_element, "envelope", i);
+      XmlDOMElement env_element =
+          xml_dom_util::getChildElement(env_list_element, "envelope", i);
       if (env_element) {
-        scan_list_.push_back(xml_dom_util::getIntChildValue(env_element, "scan", 0));
-        rt_list_.push_back(xml_dom_util::getDoubleChildValue(env_element, "rt", 0));
-        intensity_sum_list_.push_back(xml_dom_util::getDoubleChildValue(env_element, "intensity_sum", 0));
-        max_intensity_list_.push_back(xml_dom_util::getDoubleChildValue(env_element, "max_intensity", 0));
+        scan_list_.push_back(
+            xml_dom_util::getIntChildValue(env_element, "scan", 0));
+        rt_list_.push_back(
+            xml_dom_util::getDoubleChildValue(env_element, "rt", 0));
+        intensity_sum_list_.push_back(
+            xml_dom_util::getDoubleChildValue(env_element, "intensity_sum", 0));
+        max_intensity_list_.push_back(
+            xml_dom_util::getDoubleChildValue(env_element, "max_intensity", 0));
       }
     }
   }
@@ -110,12 +113,15 @@ void SingleChargeFeature::appendToXml(XmlDOMDocument* xml_doc,
   xml_doc->addElement(element, "average_mz", str.c_str());
   str = str_util::toString(refer_mz_);
   xml_doc->addElement(element, "refer_mz", str.c_str());
-  double max_inte = *std::max_element(max_intensity_list_.begin(), max_intensity_list_.end());
+  double max_inte =
+      *std::max_element(max_intensity_list_.begin(), max_intensity_list_.end());
   str = str_util::toString(max_inte);
   xml_doc->addElement(element, "max_intensity", str.c_str());
-  XmlDOMElement env_list_element = xml_doc->addElement(element, "envelope_list");
+  XmlDOMElement env_list_element =
+      xml_doc->addElement(element, "envelope_list");
   for (int i = 0; i < env_num_; i++) {
-    XmlDOMElement env_element = xml_doc->addElement(env_list_element, "envelope");
+    XmlDOMElement env_element =
+        xml_doc->addElement(env_list_element, "envelope");
     str = std::to_string(scan_list_[i]);
     xml_doc->addElement(env_element, "scan", str.c_str());
     str = str_util::fixedToString(rt_list_[i], 2);

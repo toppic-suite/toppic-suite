@@ -1,16 +1,17 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include "prsm/expected_value.hpp"
 
@@ -22,13 +23,13 @@
 
 namespace toppic {
 
-ExpectedValue::ExpectedValue(double one_prot_prob, double test_num, 
-                             double adjust_factor):
-    one_prot_prob_(one_prot_prob),
-    test_num_(test_num),
-    adjust_factor_(adjust_factor) {
-      init();
-    }
+ExpectedValue::ExpectedValue(double one_prot_prob, double test_num,
+                             double adjust_factor)
+    : one_prot_prob_(one_prot_prob),
+      test_num_(test_num),
+      adjust_factor_(adjust_factor) {
+  init();
+}
 
 void ExpectedValue::setOneProtProb(double one_prot_prob) {
   one_prot_prob_ = one_prot_prob;
@@ -36,22 +37,24 @@ void ExpectedValue::setOneProtProb(double one_prot_prob) {
 }
 
 ExpectedValue::ExpectedValue(XmlDOMElement element) {
-  one_prot_prob_ = xml_dom_util::getDoubleChildValue(element, "one_protein_probability", 0);
+  one_prot_prob_ =
+      xml_dom_util::getDoubleChildValue(element, "one_protein_probability", 0);
   test_num_ = xml_dom_util::getDoubleChildValue(element, "test_number", 0);
-  adjust_factor_ = xml_dom_util::getDoubleChildValue(element, "adjust_factor", 0);
+  adjust_factor_ =
+      xml_dom_util::getDoubleChildValue(element, "adjust_factor", 0);
   init();
 }
 
 void ExpectedValue::init() {
   e_value_ = one_prot_prob_ * test_num_ * adjust_factor_;
   if (one_prot_prob_ >= 1 || test_num_ == ExpectedValue::getMaxDouble()) {
-    p_value_  = 1.0;
+    p_value_ = 1.0;
   } else {
     double n = std::max(test_num_ * adjust_factor_, 1.0);
     // approximation of 1 - (1- one_prot_prob)^n
-    p_value_ =  n * one_prot_prob_
-        - (n * (n - 1)) / 2 * one_prot_prob_ * one_prot_prob_
-        + (n * (n - 1) * (n - 2)) / 6 * std::pow(one_prot_prob_, 3);
+    p_value_ = n * one_prot_prob_ -
+               (n * (n - 1)) / 2 * one_prot_prob_ * one_prot_prob_ +
+               (n * (n - 1) * (n - 2)) / 6 * std::pow(one_prot_prob_, 3);
     if (p_value_ > 1.0) {
       p_value_ = 1.0;
     }
@@ -74,8 +77,8 @@ void ExpectedValue::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) {
 }
 
 ExpectedValuePtr ExpectedValue::getMaxEvaluePtr() {
-  ExpectedValuePtr evalue_ptr
-      = std::make_shared<ExpectedValue>(1.0, ExpectedValue::getMaxDouble(), 1.0);
+  ExpectedValuePtr evalue_ptr =
+      std::make_shared<ExpectedValue>(1.0, ExpectedValue::getMaxDouble(), 1.0);
   return evalue_ptr;
 }
 

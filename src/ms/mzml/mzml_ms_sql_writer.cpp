@@ -1,25 +1,26 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include "ms/mzml/mzml_ms_sql_writer.hpp"
+
+#include <sqlite3.h>
 
 #include <cstddef>
 #include <cstdlib>
 #include <mutex>
 #include <string>
-
-#include <sqlite3.h>
 
 #include "common/util/logger.hpp"
 #include "sql/sql_util.hpp"
@@ -29,8 +30,8 @@ namespace toppic {
 namespace {
 
 // Compile a statement once, aborting on failure (matching sql_util::execSql).
-sqlite3_stmt *prepare(sqlite3 *db, const std::string &sql) {
-  sqlite3_stmt *stmt = nullptr;
+sqlite3_stmt* prepare(sqlite3* db, const std::string& sql) {
+  sqlite3_stmt* stmt = nullptr;
   if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
     LOG_ERROR("Failed to prepare SQL: " << sql);
     LOG_ERROR("SQL error: " << sqlite3_errmsg(db));
@@ -40,7 +41,7 @@ sqlite3_stmt *prepare(sqlite3 *db, const std::string &sql) {
 }
 
 // Run a fully-bound INSERT and reset it so the handle can be reused.
-void stepAndReset(sqlite3_stmt *stmt) {
+void stepAndReset(sqlite3_stmt* stmt) {
   sqlite3_step(stmt);
   sqlite3_clear_bindings(stmt);
   sqlite3_reset(stmt);
@@ -48,34 +49,41 @@ void stepAndReset(sqlite3_stmt *stmt) {
 
 }  // namespace
 
-MzmlMsSqlWriter::MzmlMsSqlWriter(sqlite3 *sql_db): sql_db_(sql_db) {
+MzmlMsSqlWriter::MzmlMsSqlWriter(sqlite3* sql_db) : sql_db_(sql_db) {
   // Bulk-load PRAGMAs. WAL + synchronous=NORMAL removes the per-commit fsync
   // while staying crash-safe; the cache/mmap settings keep working pages in
   // memory. (This is a regenerable visualization database, so synchronous=OFF
-  // with journal_mode=MEMORY would be faster still if durability is not needed.)
+  // with journal_mode=MEMORY would be faster still if durability is not
+  // needed.)
   sql_util::execSql(sql_db_, "PRAGMA journal_mode = WAL;");
   sql_util::execSql(sql_db_, "PRAGMA synchronous = NORMAL;");
   sql_util::execSql(sql_db_, "PRAGMA temp_store = MEMORY;");
   sql_util::execSql(sql_db_, "PRAGMA cache_size = -65536;");    // ~64 MiB
   sql_util::execSql(sql_db_, "PRAGMA mmap_size = 268435456;");  // 256 MiB
 
-  ms1_spec_stmt_ = prepare(sql_db_,
+  ms1_spec_stmt_ = prepare(
+      sql_db_,
       "INSERT INTO ms1_spectrum(id, scan, retention_time, peak_num, env_num, "
       "base_inte, min_ref_inte) VALUES (?, ?, ?, ?, ?, ?, ?);");
   ms1_peak_stmt_ = prepare(sql_db_,
-      "INSERT INTO ms1_peak(spec_id, peak_id, mz, intensity) VALUES (?, ?, ?, ?);");
-  ms1_env_stmt_ = prepare(sql_db_,
+                           "INSERT INTO ms1_peak(spec_id, peak_id, mz, "
+                           "intensity) VALUES (?, ?, ?, ?);");
+  ms1_env_stmt_ = prepare(
+      sql_db_,
       "INSERT INTO ms1_env(spec_id, env_id, mono_mass, charge, intensity, "
       "envcnn_score, peak_num) VALUES (?, ?, ?, ?, ?, ?, ?);");
-  ms1_env_peak_stmt_ = prepare(sql_db_,
+  ms1_env_peak_stmt_ = prepare(
+      sql_db_,
       "INSERT INTO ms1_env_peak(spec_id, env_id, peak_id, mz, intensity) "
       "VALUES (?, ?, ?, ?, ?);");
-  ms2_spec_stmt_ = prepare(sql_db_,
+  ms2_spec_stmt_ = prepare(
+      sql_db_,
       "INSERT INTO ms2_spectrum(id, scan, retention_time, target_mz, begin_mz, "
       "end_mz, n_ion_type, c_ion_type, peak_num) "
       "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);");
   ms2_peak_stmt_ = prepare(sql_db_,
-      "INSERT INTO ms2_peak(spec_id, peak_id, mz, intensity) VALUES (?, ?, ?, ?);");
+                           "INSERT INTO ms2_peak(spec_id, peak_id, mz, "
+                           "intensity) VALUES (?, ?, ?, ?);");
 }
 
 MzmlMsSqlWriter::~MzmlMsSqlWriter() {
@@ -108,14 +116,15 @@ void MzmlMsSqlWriter::flush() {
   commit();
 }
 
-void MzmlMsSqlWriter::writeMs1(const MzmlMsPtr &ms_ptr, const MatchEnvPtrVec &envs,
-                               double base_inte, double min_ref_inte) {
+void MzmlMsSqlWriter::writeMs1(const MzmlMsPtr& ms_ptr,
+                               const MatchEnvPtrVec& envs, double base_inte,
+                               double min_ref_inte) {
   std::lock_guard<std::mutex> lock(mutex_);
   begin();
 
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
   int spec_id = header_ptr->getSpecId();
-  const PeakPtrVec &raw_peaks = ms_ptr->getPeakPtrVec();
+  const PeakPtrVec& raw_peaks = ms_ptr->getPeakPtrVec();
 
   sqlite3_bind_int(ms1_spec_stmt_, 1, spec_id);
   sqlite3_bind_int(ms1_spec_stmt_, 2, header_ptr->getFirstScanNum());
@@ -161,13 +170,14 @@ void MzmlMsSqlWriter::writeMs1(const MzmlMsPtr &ms_ptr, const MatchEnvPtrVec &en
   }
 }
 
-void MzmlMsSqlWriter::writeMs2(const MzmlMsPtr &ms_ptr, const MatchEnvPtrVec &envs) {
+void MzmlMsSqlWriter::writeMs2(const MzmlMsPtr& ms_ptr,
+                               const MatchEnvPtrVec& envs) {
   std::lock_guard<std::mutex> lock(mutex_);
   begin();
 
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
   int spec_id = header_ptr->getSpecId();
-  const PeakPtrVec &raw_peaks = ms_ptr->getPeakPtrVec();
+  const PeakPtrVec& raw_peaks = ms_ptr->getPeakPtrVec();
   std::string n_ion_type =
       header_ptr->getActivationPtr()->getNIonTypePtr()->getName();
   std::string c_ion_type =
@@ -179,8 +189,10 @@ void MzmlMsSqlWriter::writeMs2(const MzmlMsPtr &ms_ptr, const MatchEnvPtrVec &en
   sqlite3_bind_double(ms2_spec_stmt_, 4, header_ptr->getPrecTargetMz());
   sqlite3_bind_double(ms2_spec_stmt_, 5, header_ptr->getPrecWinBegin());
   sqlite3_bind_double(ms2_spec_stmt_, 6, header_ptr->getPrecWinEnd());
-  sqlite3_bind_text(ms2_spec_stmt_, 7, n_ion_type.c_str(), -1, SQLITE_TRANSIENT);
-  sqlite3_bind_text(ms2_spec_stmt_, 8, c_ion_type.c_str(), -1, SQLITE_TRANSIENT);
+  sqlite3_bind_text(ms2_spec_stmt_, 7, n_ion_type.c_str(), -1,
+                    SQLITE_TRANSIENT);
+  sqlite3_bind_text(ms2_spec_stmt_, 8, c_ion_type.c_str(), -1,
+                    SQLITE_TRANSIENT);
   sqlite3_bind_int(ms2_spec_stmt_, 9, static_cast<int>(raw_peaks.size()));
   stepAndReset(ms2_spec_stmt_);
 

@@ -1,16 +1,17 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 //
 
 #include "topfd/deconv/deconv_ms1_process.hpp"
@@ -33,15 +34,15 @@
 
 namespace toppic {
 
-//add a namespace to avoid duplicated method names
+// add a namespace to avoid duplicated method names
 namespace deconv_ms1_process {
 
-void deconvMsOne(const MzmlMsGroupPtr &ms_group_ptr, 
-                 const TopfdParaPtr &topfd_para_ptr,  
-                 const MsAlignWriterPtrVec &ms1_writer_ptr_vec,
-                 const SimpleThreadPoolPtr &pool_ptr,
-                 const MzmlMsSqlWriterPtr &sql_writer_ptr) {
-  // 1. Store peak intensity 
+void deconvMsOne(const MzmlMsGroupPtr& ms_group_ptr,
+                 const TopfdParaPtr& topfd_para_ptr,
+                 const MsAlignWriterPtrVec& ms1_writer_ptr_vec,
+                 const SimpleThreadPoolPtr& pool_ptr,
+                 const MzmlMsSqlWriterPtr& sql_writer_ptr) {
+  // 1. Store peak intensity
   MzmlMsPtr ms_ptr = ms_group_ptr->getMsOnePtr();
   PeakPtrVec peak_list = ms_ptr->getPeakPtrVec();
   std::vector<double> intensities;
@@ -52,15 +53,14 @@ void deconvMsOne(const MzmlMsGroupPtr &ms_group_ptr,
   double min_ref_inte = base_inte * topfd_para_ptr->getMsOneSnRatio();
 
   // 2. Deconv envelopes in precursor windows and remove them
-  MatchEnvPtrVec prec_envs = deconv_prec_win::deconvPrecWinForMsGroup(ms_group_ptr, 
-                                                                      topfd_para_ptr->getMaxMass(),
-                                                                      topfd_para_ptr->getMaxCharge(),
-                                                                      base_inte, min_ref_inte); 
+  MatchEnvPtrVec prec_envs = deconv_prec_win::deconvPrecWinForMsGroup(
+      ms_group_ptr, topfd_para_ptr->getMaxMass(),
+      topfd_para_ptr->getMaxCharge(), base_inte, min_ref_inte);
 
   // Obtain EnvCNN Score for envelopes
-  onnx_env_cnn::computeEnvScores(peak_list, prec_envs); 
+  onnx_env_cnn::computeEnvScores(peak_list, prec_envs);
 
-  //remove precursor peaks
+  // remove precursor peaks
   for (std::size_t i = 0; i < prec_envs.size(); i++) {
     ExpEnvPtr env_ptr = prec_envs[i]->getExpEnvPtr();
     for (int p = 0; p < env_ptr->getPeakNum(); p++) {
@@ -70,16 +70,15 @@ void deconvMsOne(const MzmlMsGroupPtr &ms_group_ptr,
       }
     }
   }
-  // 3. Deconv the whole spectrum with filtering 
+  // 3. Deconv the whole spectrum with filtering
   // get base intensity and min_ref_intensity for sql writing
   MatchEnvPtrVec deconv_envs;
   if (peak_list.size() > 0) {
     int ms_level = 1;
     double max_mass = topfd_para_ptr->getMaxMass();
     int max_charge = topfd_para_ptr->getMaxCharge();
-    DeconvSingleSpPtr deconv_ptr 
-      = std::make_shared<DeconvSingleSp>(topfd_para_ptr, peak_list, ms_level,
-                                         max_mass, max_charge);
+    DeconvSingleSpPtr deconv_ptr = std::make_shared<DeconvSingleSp>(
+        topfd_para_ptr, peak_list, ms_level, max_mass, max_charge);
     deconv_envs = deconv_ptr->deconv();
   }
   // 4. Merge precursor envelopes and deconvolution envelopes
@@ -87,49 +86,46 @@ void deconvMsOne(const MzmlMsGroupPtr &ms_group_ptr,
   result_envs.insert(result_envs.end(), prec_envs.begin(), prec_envs.end());
   result_envs.insert(result_envs.end(), deconv_envs.begin(), deconv_envs.end());
   LOG_DEBUG("result num " << result_envs.size());
-  
+
   // 5. Write to msalign file
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
-  DeconvMsPtr deconv_ms_ptr = match_env_util::getDeconvMsPtr(header_ptr,
-                                                             result_envs);
-  
+  DeconvMsPtr deconv_ms_ptr =
+      match_env_util::getDeconvMsPtr(header_ptr, result_envs);
 
   std::thread::id thread_id = std::this_thread::get_id();
   int writer_id = pool_ptr->getId(thread_id);
   ms1_writer_ptr_vec[writer_id]->writeMs(deconv_ms_ptr);
-  
+
   // 6. write the deconvoluted spectrum to the SQLite database (if enabled)
   if (sql_writer_ptr != nullptr) {
     sql_writer_ptr->writeMs1(ms_ptr, result_envs, base_inte, min_ref_inte);
   }
-
 }
 
-std::function<void()> geneTask(const MzmlMsGroupPtr &ms_group_ptr,
-                               const TopfdParaPtr &topfd_para_ptr,
-                               const MsAlignWriterPtrVec &ms1_writer_ptr_vec,
-                               const SimpleThreadPoolPtr &pool_ptr,
-                               const MzmlMsSqlWriterPtr &sql_writer_ptr) {
-  return [ms_group_ptr, topfd_para_ptr, ms1_writer_ptr_vec, pool_ptr, sql_writer_ptr]() {
-    deconvMsOne(ms_group_ptr, topfd_para_ptr, ms1_writer_ptr_vec, pool_ptr, sql_writer_ptr);
+std::function<void()> geneTask(const MzmlMsGroupPtr& ms_group_ptr,
+                               const TopfdParaPtr& topfd_para_ptr,
+                               const MsAlignWriterPtrVec& ms1_writer_ptr_vec,
+                               const SimpleThreadPoolPtr& pool_ptr,
+                               const MzmlMsSqlWriterPtr& sql_writer_ptr) {
+  return [ms_group_ptr, topfd_para_ptr, ms1_writer_ptr_vec, pool_ptr,
+          sql_writer_ptr]() {
+    deconvMsOne(ms_group_ptr, topfd_para_ptr, ms1_writer_ptr_vec, pool_ptr,
+                sql_writer_ptr);
   };
 }
 
-} // namespace deconv_ms1_process end
+}  // namespace deconv_ms1_process
 
-DeconvMs1Process::DeconvMs1Process(const TopfdParaPtr &topfd_para_ptr) {
+DeconvMs1Process::DeconvMs1Process(const TopfdParaPtr& topfd_para_ptr) {
   topfd_para_ptr_ = topfd_para_ptr;
 }
 
 void DeconvMs1Process::process() {
-  MzmlMsGroupReaderPtr reader_ptr = 
-    std::make_shared<MzmlMsGroupReader>(topfd_para_ptr_->getMzmlFileName(), 
-                                        topfd_para_ptr_->getPrecWindowWidth(),
-                                        topfd_para_ptr_->getActivation(),
-                                        topfd_para_ptr_->getFracId(),
-                                        topfd_para_ptr_->isFaims(), 
-                                        topfd_para_ptr_->getFaimsVoltage(), 
-                                        topfd_para_ptr_->isMissingLevelOne());
+  MzmlMsGroupReaderPtr reader_ptr = std::make_shared<MzmlMsGroupReader>(
+      topfd_para_ptr_->getMzmlFileName(), topfd_para_ptr_->getPrecWindowWidth(),
+      topfd_para_ptr_->getActivation(), topfd_para_ptr_->getFracId(),
+      topfd_para_ptr_->isFaims(), topfd_para_ptr_->getFaimsVoltage(),
+      topfd_para_ptr_->isMissingLevelOne());
 
   MzmlMsGroupPtr ms_group_ptr = reader_ptr->getNextMsGroupPtr();
   if (ms_group_ptr == nullptr) {
@@ -138,35 +134,39 @@ void DeconvMs1Process::process() {
   }
   // One SQLite writer shared across the worker threads (it is internally
   // synchronized and batches inserts); created only when SQLite output is on.
-  MzmlMsSqlWriterPtr sql_writer_ptr = topfd_para_ptr_->isGeneSql()
-      ? std::make_shared<MzmlMsSqlWriter>(topfd_para_ptr_->getSqlDb())
-      : nullptr;
+  MzmlMsSqlWriterPtr sql_writer_ptr =
+      topfd_para_ptr_->isGeneSql()
+          ? std::make_shared<MzmlMsSqlWriter>(topfd_para_ptr_->getSqlDb())
+          : nullptr;
   // init thread pool
   int thread_num = topfd_para_ptr_->getThreadNum();
-  SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(thread_num);  
+  SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(thread_num);
   // init msalign writer vector for multiple threads
   std::string output_base_name = topfd_para_ptr_->getOutputBaseName();
   std::string ms1_msalign_name = output_base_name + "_ms1.msalign";
   MsAlignWriterPtrVec ms1_writer_ptr_vec;
-  for (int i = 0; i < thread_num; i++) { 
-    MsAlignWriterPtr ms1_ptr 
-        = std::make_shared<MsAlignWriter>(ms1_msalign_name + "_" + std::to_string(i));
+  for (int i = 0; i < thread_num; i++) {
+    MsAlignWriterPtr ms1_ptr = std::make_shared<MsAlignWriter>(
+        ms1_msalign_name + "_" + std::to_string(i));
     ms1_writer_ptr_vec.push_back(ms1_ptr);
   }
   // counter for processed spectra
   int spec_cnt = 0;
   // total spectrum number
-  int total_spec_num = topfd_para_ptr_->getMs1ScanNum(); 
+  int total_spec_num = topfd_para_ptr_->getMs1ScanNum();
   while (ms_group_ptr != nullptr) {
-    while(pool_ptr->getQueueSize() >= thread_num * 2){
+    while (pool_ptr->getQueueSize() >= thread_num * 2) {
       std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
-    pool_ptr->enqueue(deconv_ms1_process::geneTask(ms_group_ptr, topfd_para_ptr_, ms1_writer_ptr_vec, pool_ptr, sql_writer_ptr));
+    pool_ptr->enqueue(deconv_ms1_process::geneTask(
+        ms_group_ptr, topfd_para_ptr_, ms1_writer_ptr_vec, pool_ptr,
+        sql_writer_ptr));
     spec_cnt++;
-    std::string msg = deconv_util::updateMsOneMsg(ms_group_ptr->getMsOnePtr()->getMsHeaderPtr(),
-                                                  spec_cnt, total_spec_num);
+    std::string msg = deconv_util::updateMsOneMsg(
+        ms_group_ptr->getMsOnePtr()->getMsHeaderPtr(), spec_cnt,
+        total_spec_num);
     std::cout << "\r" << msg << std::flush;
-    ms_group_ptr = reader_ptr->getNextMsGroupPtr();    
+    ms_group_ptr = reader_ptr->getNextMsGroupPtr();
   }
   pool_ptr->shutDown();
   if (sql_writer_ptr != nullptr) {
@@ -178,4 +178,4 @@ void DeconvMs1Process::process() {
   deconv_util::mergeMs1MsalignFiles(topfd_para_ptr_, output_base_name);
 }
 
-}; // namespace toppic
+};  // namespace toppic

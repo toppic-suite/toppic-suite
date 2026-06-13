@@ -1,16 +1,17 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include "ms/factory/extend_ms_util.hpp"
 
@@ -32,7 +33,7 @@ using IntPairVec = std::vector<std::pair<int, int>>;
 using DoublePair = std::pair<double, double>;
 using DoublePairVec = std::vector<std::pair<double, double>>;
 
-std::vector<double> getExtendMassVec(const ExtendMsPtr &extend_ms_ptr) {
+std::vector<double> getExtendMassVec(const ExtendMsPtr& extend_ms_ptr) {
   std::vector<double> masses;
   const ExtendPeakPtrVec& peak_ptr_list = extend_ms_ptr->getPeakPtrVec();
   for (size_t i = 0; i < peak_ptr_list.size(); i++) {
@@ -43,13 +44,13 @@ std::vector<double> getExtendMassVec(const ExtendMsPtr &extend_ms_ptr) {
 
 namespace {
 
-bool massErrorUp(const IntPair &a, const IntPair &b) {
+bool massErrorUp(const IntPair& a, const IntPair& b) {
   return a.first < b.first;
 }
 
 }  // namespace
 
-IntPairVec getExtendIntMassErrorList(const ExtendMsPtrVec &ext_ms_ptr_vec,
+IntPairVec getExtendIntMassErrorList(const ExtendMsPtrVec& ext_ms_ptr_vec,
                                      bool pref, double scale) {
   std::vector<std::pair<int, int>> mass_errors;
   for (size_t i = 0; i < ext_ms_ptr_vec.size(); i++) {
@@ -58,13 +59,14 @@ IntPairVec getExtendIntMassErrorList(const ExtendMsPtrVec &ext_ms_ptr_vec,
     if (pref) {
       shift = ext_ms_ptr->getMsHeaderPtr()->getActivationPtr()->getN_BYShift();
     } else {
-      shift = ext_ms_ptr->getMsHeaderPtr()->getActivationPtr()->getC_BYShift()
-          + mass_constant::getWaterMass();
+      shift = ext_ms_ptr->getMsHeaderPtr()->getActivationPtr()->getC_BYShift() +
+              mass_constant::getWaterMass();
     }
 
     IntPair last_mass_error(-1, 0);
     for (size_t j = 0; j < ext_ms_ptr->size(); j++) {
-      double double_m = (ext_ms_ptr->getPeakPtr(j)->getPosition() - shift) * scale;
+      double double_m =
+          (ext_ms_ptr->getPeakPtr(j)->getPosition() - shift) * scale;
       int m = static_cast<int>(std::round(double_m));
       double double_e = (ext_ms_ptr->getPeakPtr(j)->getOrigTolerance() * scale);
       int e = static_cast<int>(std::ceil(double_e));
@@ -85,12 +87,13 @@ IntPairVec getExtendIntMassErrorList(const ExtendMsPtrVec &ext_ms_ptr_vec,
   return mass_errors;
 }
 
-DoublePairVec getExtendMassToleranceList(const ExtendMsPtr &extend_ms_ptr) {
+DoublePairVec getExtendMassToleranceList(const ExtendMsPtr& extend_ms_ptr) {
   DoublePairVec mass_tole_list(extend_ms_ptr->getPeakPtrVec().size());
 
   for (size_t j = 0; j < extend_ms_ptr->getPeakPtrVec().size(); j++) {
-    mass_tole_list[j] = std::make_pair(extend_ms_ptr->getPeakPtr(j)->getMonoMass(),
-                                       extend_ms_ptr->getPeakPtr(j)->getOrigTolerance());
+    mass_tole_list[j] =
+        std::make_pair(extend_ms_ptr->getPeakPtr(j)->getMonoMass(),
+                       extend_ms_ptr->getPeakPtr(j)->getOrigTolerance());
   }
 
   return mass_tole_list;

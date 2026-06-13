@@ -1,26 +1,27 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include "prsm/prsm_feature_cluster.hpp"
 
 #include <algorithm>
 #include <iomanip>
 #include <iostream>
-#include <sstream> 
+#include <sstream>
 
-#include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
+#include "common/util/logger.hpp"
 #include "prsm/prsm_reader_util.hpp"
 #include "prsm/prsm_util.hpp"
 #include "prsm/prsm_xml_writer.hpp"
@@ -57,8 +58,7 @@ void setProtId(PrsmStrPtrVec& prsm_ptrs) {
   }
 }
 
-void setProteoClusterId(PrsmStrPtrVec& prsm_ptrs,
-                        bool ppm_error_type,
+void setProteoClusterId(PrsmStrPtrVec& prsm_ptrs, bool ppm_error_type,
                         double prec_error_tole) {
   std::vector<PrsmStrPtrVec> clusters;
   int prsm_count = prsm_ptrs.size();
@@ -81,8 +81,8 @@ void setProteoClusterId(PrsmStrPtrVec& prsm_ptrs,
       clusters.push_back(new_clusters);
     }
     double perc = (i + 1) * 100.0 / prsm_count;
-    std::cout << std::flush << "Finding PrSM clusters - processing " 
-        << std::setprecision(3) << perc << "%. \r";
+    std::cout << std::flush << "Finding PrSM clusters - processing "
+              << std::setprecision(3) << perc << "%. \r";
   }
   // second round, merge feature clusters
   double dalton_error_tole = prec_error_tole;
@@ -97,27 +97,24 @@ void setProteoClusterId(PrsmStrPtrVec& prsm_ptrs,
       PrsmStrPtr ref_ptr = merged_clusters[j][0];
       // if the same protein and similar mass
       if (cur_ptr->getProtId() == ref_ptr->getProtId()) {
-        if (std::abs(cur_ptr->getAdjustedPrecMass() - ref_ptr->getAdjustedPrecMass()) 
-            <= dalton_error_tole) {
+        if (std::abs(cur_ptr->getAdjustedPrecMass() -
+                     ref_ptr->getAdjustedPrecMass()) <= dalton_error_tole) {
           merged_clusters[j].insert(merged_clusters[j].end(),
-                                    clusters[i].begin(), 
-                                    clusters[i].end());
-          //LOG_DEBUG("Proteoform merging by mass!");
+                                    clusters[i].begin(), clusters[i].end());
+          // LOG_DEBUG("Proteoform merging by mass!");
           is_found = true;
           break;
         }
-      } 
-      else {
+      } else {
         // if protein identifications are different, but the protein sequences
         // are the same and the proteoform masses are similar, the two
-        // proteoforms are treated as one. 
-        if (cur_ptr->getProteoformDbSeq() == ref_ptr->getProteoformDbSeq()
-            && std::abs(cur_ptr->getAdjustedPrecMass() - ref_ptr->getAdjustedPrecMass()) 
-            <= prec_error_tole) {
+        // proteoforms are treated as one.
+        if (cur_ptr->getProteoformDbSeq() == ref_ptr->getProteoformDbSeq() &&
+            std::abs(cur_ptr->getAdjustedPrecMass() -
+                     ref_ptr->getAdjustedPrecMass()) <= prec_error_tole) {
           merged_clusters[j].insert(merged_clusters[j].end(),
-                                    clusters[i].begin(), 
-                                    clusters[i].end());
-          //LOG_DEBUG("Proteoform merging by sequence!");
+                                    clusters[i].begin(), clusters[i].end());
+          // LOG_DEBUG("Proteoform merging by sequence!");
           is_found = true;
           break;
         }
@@ -137,14 +134,14 @@ void setProteoClusterId(PrsmStrPtrVec& prsm_ptrs,
   }
 }
 
-void process(const std::string &spec_file_name,
-             const std::string &input_file_ext,
-             const std::string &output_file_ext,
-             bool ppm_error_type, 
+void process(const std::string& spec_file_name,
+             const std::string& input_file_ext,
+             const std::string& output_file_ext, bool ppm_error_type,
              double prec_error_tole) {
   std::string base_name = file_util::basename(spec_file_name);
   std::string input_file_name = base_name + "." + input_file_ext;
-  PrsmStrPtrVec prsm_ptrs = prsm_reader_util::readAllPrsmStrsMatchSeq(input_file_name);
+  PrsmStrPtrVec prsm_ptrs =
+      prsm_reader_util::readAllPrsmStrsMatchSeq(input_file_name);
 
   std::string feature_file_name = base_name + ".feature";
   prsm_util::addFeatureInfoToPrsms(prsm_ptrs, feature_file_name);
@@ -157,7 +154,7 @@ void process(const std::string &spec_file_name,
   setProtId(filtered_prsm_ptrs);
   // find proteoform clusters and add proteoform id and intensity information
   setProteoClusterId(filtered_prsm_ptrs, ppm_error_type, prec_error_tole);
-  std::sort(filtered_prsm_ptrs.begin(), filtered_prsm_ptrs.end(), 
+  std::sort(filtered_prsm_ptrs.begin(), filtered_prsm_ptrs.end(),
             PrsmStr::cmpSpecIncPrecIncEvalueIncProtInc);
   // output
   std::string output_file_name = base_name + "." + output_file_ext;
@@ -166,6 +163,6 @@ void process(const std::string &spec_file_name,
   writer.close();
 }
 
-}
+}  // namespace prsm_feature_cluster
 
 }  // namespace toppic

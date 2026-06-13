@@ -7,8 +7,8 @@
 
 #include "common/xml/xml_dom_document.hpp"
 #include "ms/msmap/ms_map.hpp"
-#include "topfd/ecscore/env/seed_env.hpp"
 #include "topfd/ecscore/env/ms_map_env.hpp"
+#include "topfd/ecscore/env/seed_env.hpp"
 #include "topfd/ecscore/env_set/xic.hpp"
 
 namespace toppic {
@@ -18,11 +18,11 @@ using EnvSetPtr = std::shared_ptr<EnvSet>;
 
 class EnvSet {
  public:
-  EnvSet(const SeedEnvPtr seed_ptr, const MsMapEnvPtrVec &env_list,
-         int start, int end, double noise_inte_level, double sn_ratio);
+  EnvSet(const SeedEnvPtr seed_ptr, const MsMapEnvPtrVec& env_list, int start,
+         int end, double noise_inte_level, double sn_ratio);
 
-  EnvSet(const SeedEnvPtr seed_ptr, const MsMapEnvPtrVec &env_list,
-         int start, int end, double min_inte);
+  EnvSet(const SeedEnvPtr seed_ptr, const MsMapEnvPtrVec& env_list, int start,
+         int end, double min_inte);
 
   int getStartSpecId() const { return start_spec_id_; }
 
@@ -42,17 +42,19 @@ class EnvSet {
 
   int countEnvNum();
 
-  void setMsMapEnvList(const MsMapEnvPtrVec &ms_map_env_list) { ms_map_env_list_ = ms_map_env_list; }
+  void setMsMapEnvList(const MsMapEnvPtrVec& ms_map_env_list) {
+    ms_map_env_list_ = ms_map_env_list;
+  }
 
   SeedEnvPtr getSeedPtr() { return seed_ptr_; }
 
-  void setSeedPtr(const SeedEnvPtr &seed_ptr) {seed_ptr_ = seed_ptr;}
+  void setSeedPtr(const SeedEnvPtr& seed_ptr) { seed_ptr_ = seed_ptr; }
 
   XicPtr getXicPtr() { return xic_ptr_; }
 
   double getMinInte() const { return min_inte_; }
 
-  void setXicPtr(const XicPtr &xic_ptr) { xic_ptr_ = xic_ptr; }
+  void setXicPtr(const XicPtr& xic_ptr) { xic_ptr_ = xic_ptr; }
 
   // get the all peak intensity in xic for the seed spectrum
   double getXicSeedAllPeakInte();
@@ -60,20 +62,20 @@ class EnvSet {
   // compute aggregate envelope peak intensities
   std::vector<double> compAggrEnvInteList();
 
-  std::vector<double> compAggrEnvMzList(); 
+  std::vector<double> compAggrEnvMzList();
 
   // seed peak intensity list x spectrum intensity ratio list
   std::vector<std::vector<double>> getScaledTheoIntes(int min_inte);
 
-  double getInte() {return xic_ptr_->getAllPeakInteSum(); }
+  double getInte() { return xic_ptr_->getAllPeakInteSum(); }
 
-  void removePeakData(const MsMapPtr &matrix_ptr);
+  void removePeakData(const MsMapPtr& matrix_ptr);
 
   std::pair<double, double> getMzErrorAndWeight();
 
   void refineXicBoundary(double split_ratio);
 
-  bool containValidEnvs(int min_scan_num, int min_match_peak_num); 
+  bool containValidEnvs(int min_scan_num, int min_match_peak_num);
 
   std::vector<int> getSpecIdList();
 
@@ -82,17 +84,19 @@ class EnvSet {
   std::vector<double> getMaxIntensityList();
 
   /*
-  bool containTwoValidEnvs(int min_match_peak_num); 
+  bool containTwoValidEnvs(int min_match_peak_num);
 
   bool containTwoValidOutOfThreeEnvs(int min_match_peak_num);
 
-  bool containThreeValidOutOfFiveEnvs(int min_match_peak_num); 
+  bool containThreeValidOutOfFiveEnvs(int min_match_peak_num);
   */
 
-  void mergeEnvSet(const EnvSetPtr &new_set_ptr); 
+  void mergeEnvSet(const EnvSetPtr& new_set_ptr);
 
-  static bool cmpChargeInc(const EnvSetPtr &a, const EnvSetPtr &b) { return a->getCharge() < b->getCharge(); }
-  
+  static bool cmpChargeInc(const EnvSetPtr& a, const EnvSetPtr& b) {
+    return a->getCharge() < b->getCharge();
+  }
+
   void appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement parent);
 
  private:
@@ -111,6 +115,6 @@ class EnvSet {
 
 using EnvSetPtrVec = std::vector<EnvSetPtr>;
 
-}
+}  // namespace toppic
 
-#endif //TOPPIC_ENV_SET_HPP
+#endif  // TOPPIC_ENV_SET_HPP

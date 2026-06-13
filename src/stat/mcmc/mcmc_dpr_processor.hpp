@@ -1,49 +1,45 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #ifndef TOPPIC_STAT_MCMC_MCMC_DPR_PROCESSOR_HPP_
 #define TOPPIC_STAT_MCMC_MCMC_DPR_PROCESSOR_HPP_
 
-
-#include <random>
-#include <vector>
 #include <map>
-#include <unordered_map>
+#include <random>
 #include <string>
+#include <unordered_map>
+#include <vector>
 
 #include "common/base/activation.hpp"
 #include "common/thread/simple_thread_pool.hpp"
-#include "seq/proteoform.hpp"
-
 #include "ms/spec/deconv_ms.hpp"
 #include "ms/spec/spectrum_set.hpp"
-
 #include "prsm/prsm.hpp"
 #include "prsm/prsm_xml_writer.hpp"
-
+#include "seq/proteoform.hpp"
 #include "stat/count/count_test_num.hpp"
-
 #include "stat/mcmc/mcmc_mng.hpp"
 
 namespace toppic {
 
 class DprProcessor {
  public:
-  explicit DprProcessor(const MCMCMngPtr &mng_ptr):
-      mng_ptr_(mng_ptr), mt_(42) {
-        init();
-      }
+  explicit DprProcessor(const MCMCMngPtr& mng_ptr)
+      : mng_ptr_(mng_ptr), mt_(42) {
+    init();
+  }
 
   void process();
 
@@ -52,7 +48,9 @@ class DprProcessor {
 
   std::vector<std::vector<double> > compPtmComb();
 
-  void processOnePrsm(const PrsmPtr &prsm_ptr, const SpectrumSetPtr &spec_set_ptr, const PrsmXmlWriterPtr &prsm_writer);
+  void processOnePrsm(const PrsmPtr& prsm_ptr,
+                      const SpectrumSetPtr& spec_set_ptr,
+                      const PrsmXmlWriterPtr& prsm_writer);
 
   MCMCMngPtr mng_ptr_;
 

@@ -1,27 +1,27 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include <iostream>
 
 #include "common/util/version.hpp"
-#include "topfd/common/topfd_para.hpp"
-#include "topfd/common/topfd_single_process.hpp"
-#include "topfd/common/topfd_process.hpp"
 #include "console/topfd_argument.hpp"
+#include "topfd/common/topfd_para.hpp"
+#include "topfd/common/topfd_process.hpp"
+#include "topfd/common/topfd_single_process.hpp"
 
 int main(int argc, char* argv[]) {
-
   std::cout << "TopFD " << toppic::Version::getVersion() << std::endl;
 
   toppic::Argument argu_processor;
@@ -37,11 +37,10 @@ int main(int argc, char* argv[]) {
 
   int result;
   if (topfd_para_ptr->isTextPeakList()) {
-    result = toppic::topfd_single_process::process(topfd_para_ptr, spec_file_lst);
-  }
-  else {
+    result =
+        toppic::topfd_single_process::process(topfd_para_ptr, spec_file_lst);
+  } else {
     result = toppic::topfd_process::process(topfd_para_ptr, spec_file_lst);
   }
   return result;
 }
-

@@ -1,16 +1,17 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #ifndef TOPPIC_COMMON_BASE_ACTIVATION_HPP_
 #define TOPPIC_COMMON_BASE_ACTIVATION_HPP_
@@ -23,26 +24,26 @@ class XmlDOMDocument;
 
 class Activation {
  public:
-  Activation(const std::string &name, const IonTypePtr &n_ion_type_ptr,
-             const IonTypePtr &c_ion_type_ptr);
+  Activation(const std::string& name, const IonTypePtr& n_ion_type_ptr,
+             const IonTypePtr& c_ion_type_ptr);
 
   explicit Activation(XmlDOMElement element);
 
-  const std::string& getName() const {return name_;}
+  const std::string& getName() const { return name_; }
 
-  double getN_BYShift() const {return n_ion_type_ptr_->getBYShift();}
+  double getN_BYShift() const { return n_ion_type_ptr_->getBYShift(); }
 
-  double getC_BYShift() const {return c_ion_type_ptr_->getBYShift();}
+  double getC_BYShift() const { return c_ion_type_ptr_->getBYShift(); }
 
-  IonTypePtr getNIonTypePtr() const {return n_ion_type_ptr_;}
+  IonTypePtr getNIonTypePtr() const { return n_ion_type_ptr_; }
 
-  IonTypePtr getCIonTypePtr() const {return c_ion_type_ptr_;}
+  IonTypePtr getCIonTypePtr() const { return c_ion_type_ptr_; }
 
   void appendNameToXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) const;
 
   static std::string getNameFromXml(XmlDOMElement element);
 
-  static std::string getXmlElementName() {return "activation";}
+  static std::string getXmlElementName() { return "activation"; }
 
  private:
   std::string name_;

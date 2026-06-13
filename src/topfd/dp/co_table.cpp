@@ -1,22 +1,23 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include "topfd/dp/co_table.hpp"
 
 namespace toppic {
 
-int CoTable::cntTableSize(MatchEnvPtr2D &win_envs, int win, int pnt) {
+int CoTable::cntTableSize(MatchEnvPtr2D& win_envs, int win, int pnt) {
   int size = 0;
   if (win - 2 >= 0) {
     size += win_envs[win - 2].size();
@@ -30,8 +31,8 @@ int CoTable::cntTableSize(MatchEnvPtr2D &win_envs, int win, int pnt) {
 
 // When pos_a in env_a and pos_b in env_b are from the same peak,
 // check if splitting the peak intensity can increase the peak similarity score.
-bool CoTable::checkCoexist(const MatchEnvPtr &env_a, const MatchEnvPtr &env_b, int pos_a,
-                           int pos_b, double tolerance) {
+bool CoTable::checkCoexist(const MatchEnvPtr& env_a, const MatchEnvPtr& env_b,
+                           int pos_a, int pos_b, double tolerance) {
   double inte_a = env_a->getTheoEnvPtr()->getInte(pos_a);
   double inte_b = env_b->getTheoEnvPtr()->getInte(pos_b);
   double inte_sum = inte_a + inte_b;
@@ -48,7 +49,7 @@ bool CoTable::checkCoexist(const MatchEnvPtr &env_a, const MatchEnvPtr &env_b, i
   return true;
 }
 
-bool CoTable::checkCoexist(const MatchEnvPtr &env_a, const MatchEnvPtr &env_b,
+bool CoTable::checkCoexist(const MatchEnvPtr& env_a, const MatchEnvPtr& env_b,
                            double tolerance) {
   int cnt_share = 0;
   int cnt_coexist = 0;
@@ -73,8 +74,8 @@ bool CoTable::checkCoexist(const MatchEnvPtr &env_a, const MatchEnvPtr &env_b,
   }
 }
 
-void CoTable::compTableEntry(MatchEnvPtrVec &env_list, MatchEnvPtr2D &win_envs,
-                             std::vector<bool> &rows, int id, int win,
+void CoTable::compTableEntry(MatchEnvPtrVec& env_list, MatchEnvPtr2D& win_envs,
+                             std::vector<bool>& rows, int id, int win,
                              double tolerance) {
   if (win < 0) {
     return;
@@ -84,13 +85,14 @@ void CoTable::compTableEntry(MatchEnvPtrVec &env_list, MatchEnvPtr2D &win_envs,
     if (prev_id >= id) {
       return;
     }
-    rows[id - prev_id - 1] = checkCoexist(env_list[prev_id], env_list[id], tolerance);
+    rows[id - prev_id - 1] =
+        checkCoexist(env_list[prev_id], env_list[id], tolerance);
   }
 }
 
 // initialize coexist table
-std::vector<std::vector<bool> >  CoTable::initCoexistTable(MatchEnvPtr2D &win_envs,
-                                                           double tolerance) {
+std::vector<std::vector<bool>> CoTable::initCoexistTable(
+    MatchEnvPtr2D& win_envs, double tolerance) {
   MatchEnvPtrVec env_list;
   for (size_t i = 0; i < win_envs.size(); i++) {
     for (size_t j = 0; j < win_envs[i].size(); j++) {
@@ -115,4 +117,3 @@ std::vector<std::vector<bool> >  CoTable::initCoexistTable(MatchEnvPtr2D &win_en
 }
 
 }  // namespace toppic
-

@@ -1,43 +1,43 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include "stat/mcmc/comp_pvalue_mcmc.hpp"
 
-#include <vector>
-#include <string>
 #include <algorithm>
+#include <string>
+#include <vector>
 
-#include "common/util/logger.hpp"
 #include "common/base/residue_util.hpp"
+#include "common/util/logger.hpp"
 #include "prsm/prsm_algo.hpp"
 
 namespace toppic {
 
-std::mt19937 rng(0); 
+std::mt19937 rng(0);
 
-void getTheoMassVec(const ResiduePtrVec &residues,
-                    const IonTypePtr &n_ion_type_ptr,
-                    const IonTypePtr &c_ion_type_ptr,
-                    double min_mass,
-                    std::vector<double> & n_theo_masses,
-                    std::vector<double> & c_theo_masses) {
+void getTheoMassVec(const ResiduePtrVec& residues,
+                    const IonTypePtr& n_ion_type_ptr,
+                    const IonTypePtr& c_ion_type_ptr, double min_mass,
+                    std::vector<double>& n_theo_masses,
+                    std::vector<double>& c_theo_masses) {
   n_theo_masses.clear();
 
   c_theo_masses.clear();
 
   double res_mass = residue_util::compResiduePtrVecMass(residues);
-  //double max_mass = res_mass + mass_constant::getWaterMass() - min_mass;
+  // double max_mass = res_mass + mass_constant::getWaterMass() - min_mass;
 
   double prm = 0;
 
@@ -59,7 +59,8 @@ void getTheoMassVec(const ResiduePtrVec &residues,
 
 ResiduePtrVec CompPValueMCMC::randomTrans(ResiduePtrVec residues) {
   double mass = 0.0;
-  bool is_small = (residue_util::compResiduePtrVecMass(residues) < this->pep_mass_);
+  bool is_small =
+      (residue_util::compResiduePtrVecMass(residues) < this->pep_mass_);
   std::uniform_int_distribution<int> res_dist(0, residues.size() / 2 - 1);
   int pos1 = res_dist(*generator_);
   mass += residues[pos1]->getMass();
@@ -68,7 +69,8 @@ ResiduePtrVec CompPValueMCMC::randomTrans(ResiduePtrVec residues) {
 
   mass += residues[pos2]->getMass();
 
-  res_dist = std::uniform_int_distribution<int>(residues.size() / 2 + 1, residues.size() - 1);
+  res_dist = std::uniform_int_distribution<int>(residues.size() / 2 + 1,
+                                                residues.size() - 1);
 
   int pos3 = res_dist(*generator_);
 
@@ -78,7 +80,8 @@ ResiduePtrVec CompPValueMCMC::randomTrans(ResiduePtrVec residues) {
 
   std::shuffle(ori_res.begin(), ori_res.end(), rng);
 
-  std::vector<std::string> res_vec = mass_table_[std::round(mass * mng_ptr_->convert_ratio_)];
+  std::vector<std::string> res_vec =
+      mass_table_[std::round(mass * mng_ptr_->convert_ratio_)];
 
   ResiduePtrVec new_res_vec;
 
@@ -86,8 +89,8 @@ ResiduePtrVec CompPValueMCMC::randomTrans(ResiduePtrVec residues) {
     res_dist = std::uniform_int_distribution<int>(0, res_vec.size() - 1);
     std::string res_seq = res_vec[res_dist(*generator_)];
     std::shuffle(res_seq.begin(), res_seq.end(), rng);
-    new_res_vec
-        = residue_util::convertStrToResiduePtrVec(res_seq, mng_ptr_->prsm_para_ptr_->getFixModPtrVec());
+    new_res_vec = residue_util::convertStrToResiduePtrVec(
+        res_seq, mng_ptr_->prsm_para_ptr_->getFixModPtrVec());
   } else {
     new_res_vec = ori_res;
   }
@@ -111,15 +114,17 @@ ResiduePtrVec CompPValueMCMC::randomTrans(ResiduePtrVec residues) {
   return residues;
 }
 
-double CompPValueMCMC::compOneProbMCMC(const PrsmPtr &prsm_ptr, const ActivationPtr &act,
-                                       const std::vector<int> & ms_mass_int) {
+double CompPValueMCMC::compOneProbMCMC(const PrsmPtr& prsm_ptr,
+                                       const ActivationPtr& act,
+                                       const std::vector<int>& ms_mass_int) {
   this->act_ = act;
 
   this->ms_mass_int_ = ms_mass_int;
 
   ProteoformPtr prot_form = prsm_ptr->getProteoformPtr();
 
-  pep_mass_ = residue_util::compResiduePtrVecMass(prot_form->getResSeqPtr()->getResidues());
+  pep_mass_ = residue_util::compResiduePtrVecMass(
+      prot_form->getResSeqPtr()->getResidues());
 
   ptm_vec_ = prot_form->getPtmVec(AlterType::VARIABLE);
 
@@ -129,7 +134,8 @@ double CompPValueMCMC::compOneProbMCMC(const PrsmPtr &prsm_ptr, const Activation
     ptm_mass_vec_[i] = ptm_vec_[i]->getMonoMass();
   }
 
-  MassShiftPtrVec unknown_shift_vec = prot_form->getMassShiftPtrVec(AlterType::UNEXPECTED);
+  MassShiftPtrVec unknown_shift_vec =
+      prot_form->getMassShiftPtrVec(AlterType::UNEXPECTED);
 
   if (unknown_shift_vec.size() > 0) {
     for (size_t k = 0; k < unknown_shift_vec.size(); k++) {
@@ -188,11 +194,12 @@ double CompPValueMCMC::compOneProbMCMC(const PrsmPtr &prsm_ptr, const Activation
       p[i] = p[i] / sum;
       // LOG_DEBUG("p[" << i << "] " << p[i]);
     }
-    if (scr >= static_cast<int>(p.size())){ 
-        scr = p.size() - 1;
+    if (scr >= static_cast<int>(p.size())) {
+      scr = p.size() - 1;
     }
     if (prsm_ptr->getMatchFragNum() < 10) {
-      int corrected_scr = std::min(scr, static_cast<int>(prsm_ptr->getMatchFragNum()));
+      int corrected_scr =
+          std::min(scr, static_cast<int>(prsm_ptr->getMatchFragNum()));
       one_prob = std::accumulate(p.begin() + corrected_scr, p.end(), 0.0);
     } else {
       one_prob = std::accumulate(p.begin() + scr, p.end(), 0.0);
@@ -212,7 +219,8 @@ int CompPValueMCMC::compScoreNoPtm() {
   std::vector<int> n_theo_masses_int(n_theo_masses_.size());
 
   for (size_t k = 0; k < n_theo_masses_.size(); k++) {
-    n_theo_masses_int[k] = static_cast<int>(n_theo_masses_[k] * mng_ptr_->convert_ratio_) >> 5;
+    n_theo_masses_int[k] =
+        static_cast<int>(n_theo_masses_[k] * mng_ptr_->convert_ratio_) >> 5;
   }
 
   std::vector<int> n_match;
@@ -224,7 +232,8 @@ int CompPValueMCMC::compScoreNoPtm() {
   std::vector<int> c_theo_masses_int(c_theo_masses_.size());
 
   for (size_t k = 0; k < c_theo_masses_.size(); k++) {
-    c_theo_masses_int[k] = static_cast<int>(c_theo_masses_[k] * mng_ptr_->convert_ratio_) >> 5;
+    c_theo_masses_int[k] =
+        static_cast<int>(c_theo_masses_[k] * mng_ptr_->convert_ratio_) >> 5;
   }
 
   std::vector<int> c_match;
@@ -236,7 +245,7 @@ int CompPValueMCMC::compScoreNoPtm() {
   return n_match.size() + c_match.size();
 }
 
-int CompPValueMCMC::getMaxScore(const ResiduePtrVec &residues) {
+int CompPValueMCMC::getMaxScore(const ResiduePtrVec& residues) {
   getTheoMassVec(residues, act_->getNIonTypePtr(), act_->getCIonTypePtr(),
                  min_mass_, n_theo_masses_, c_theo_masses_);
 
@@ -254,15 +263,16 @@ int CompPValueMCMC::getMaxScore(const ResiduePtrVec &residues) {
 
 // update n_theo_masses, c_theo_masses
 // this should be called first
-void CompPValueMCMC::initTheoMassWithPtm(const std::vector<size_t> & change_pos) {
+void CompPValueMCMC::initTheoMassWithPtm(
+    const std::vector<size_t>& change_pos) {
   std::vector<double> change_masses(n_theo_masses_.size(), 0.0);
 
   for (size_t i = 0; i < ptm_vec_.size(); i++) {
     // n theo mass won't change if it modifies the last residue
     if (change_pos[i] <= change_masses.size()) {
       double m = ptm_mass_vec_[i];
-      std::for_each(change_masses.begin() + change_pos[i],
-                    change_masses.end(), [m](double& d) { d += m;});
+      std::for_each(change_masses.begin() + change_pos[i], change_masses.end(),
+                    [m](double& d) { d += m; });
     }
   }
 
@@ -278,8 +288,9 @@ void CompPValueMCMC::initTheoMassWithPtm(const std::vector<size_t> & change_pos)
     // c theo mass won't change if it modifies the first residue
     if (change_pos[i] > 0) {
       double m = ptm_mass_vec_[i];
-      std::for_each(change_masses.begin() + change_masses.size() - change_pos[i],
-                    change_masses.end(), [m](double& d) { d += m;});
+      std::for_each(
+          change_masses.begin() + change_masses.size() - change_pos[i],
+          change_masses.end(), [m](double& d) { d += m; });
     }
   }
 
@@ -288,10 +299,12 @@ void CompPValueMCMC::initTheoMassWithPtm(const std::vector<size_t> & change_pos)
   }
 }
 
-std::vector<int> CompPValueMCMC::compTheoMassPpos(const std::vector<double> &theo_masses) {
+std::vector<int> CompPValueMCMC::compTheoMassPpos(
+    const std::vector<double>& theo_masses) {
   std::vector<int> theo_mass_int(theo_masses.size());
   for (size_t k = 0; k < theo_masses.size(); k++) {
-    theo_mass_int[k] = static_cast<int>(theo_masses[k] * mng_ptr_->convert_ratio_) >> 5;
+    theo_mass_int[k] =
+        static_cast<int>(theo_masses[k] * mng_ptr_->convert_ratio_) >> 5;
   }
 
   std::vector<int> results(theo_masses.size(), 0);
@@ -314,17 +327,17 @@ std::vector<int> CompPValueMCMC::compTheoMassPpos(const std::vector<double> &the
   return results;
 }
 
-void CompPValueMCMC::geneScrVec(std::vector<int> & n_scr_no_ptm,
-                                std::vector<int> & n_scr_with_ptm,
-                                std::vector<int> & c_scr_no_ptm,
-                                std::vector<int> & c_scr_with_ptm,
-                                double mass) {
+void CompPValueMCMC::geneScrVec(std::vector<int>& n_scr_no_ptm,
+                                std::vector<int>& n_scr_with_ptm,
+                                std::vector<int>& c_scr_no_ptm,
+                                std::vector<int>& c_scr_with_ptm, double mass) {
   // n-term
   n_scr_no_ptm = compTheoMassPpos(n_theo_masses_);
 
   std::vector<double> n_theo_masses_ptm(n_theo_masses_);
 
-  std::for_each(n_theo_masses_ptm.begin(), n_theo_masses_ptm.end(), [mass](double& d) { d += mass;});
+  std::for_each(n_theo_masses_ptm.begin(), n_theo_masses_ptm.end(),
+                [mass](double& d) { d += mass; });
 
   n_scr_with_ptm = compTheoMassPpos(n_theo_masses_ptm);
 
@@ -333,16 +346,17 @@ void CompPValueMCMC::geneScrVec(std::vector<int> & n_scr_no_ptm,
 
   std::vector<double> c_theo_masses_ptm(c_theo_masses_);
 
-  std::for_each(c_theo_masses_ptm.begin(), c_theo_masses_ptm.end(), [mass](double& d) { d += mass;});
+  std::for_each(c_theo_masses_ptm.begin(), c_theo_masses_ptm.end(),
+                [mass](double& d) { d += mass; });
 
   c_scr_with_ptm = compTheoMassPpos(c_theo_masses_ptm);
 }
 
-int getMaxPosScrVec(const std::vector<size_t> & possible_change_pos,
-                    const std::vector<int> & n_scr_no_ptm,
-                    const std::vector<int> & n_scr_with_ptm,
-                    const std::vector<int> & c_scr_no_ptm,
-                    const std::vector<int> & c_scr_with_ptm, size_t & p) {
+int getMaxPosScrVec(const std::vector<size_t>& possible_change_pos,
+                    const std::vector<int>& n_scr_no_ptm,
+                    const std::vector<int>& n_scr_with_ptm,
+                    const std::vector<int>& c_scr_no_ptm,
+                    const std::vector<int>& c_scr_with_ptm, size_t& p) {
   int max_scr = 0;
 
   size_t prev_n_pos = 0;
@@ -386,32 +400,32 @@ int getMaxPosScrVec(const std::vector<size_t> & possible_change_pos,
 void CompPValueMCMC::rmMassTheoMass(size_t pos, double mass) {
   // n theo mass won't change if it modifies the last residue
   if (pos <= n_theo_masses_.size()) {
-    std::for_each(n_theo_masses_.begin() + pos,
-                  n_theo_masses_.end(), [mass](double& d) { d -= mass;});
+    std::for_each(n_theo_masses_.begin() + pos, n_theo_masses_.end(),
+                  [mass](double& d) { d -= mass; });
   }
 
   // c theo mass won't change if it modifies the first residue
   if (pos > 0) {
     std::for_each(c_theo_masses_.begin() + c_theo_masses_.size() - pos,
-                  c_theo_masses_.end(), [mass](double& d) { d -= mass;});
+                  c_theo_masses_.end(), [mass](double& d) { d -= mass; });
   }
 }
 
 void CompPValueMCMC::addMassTheoMass(size_t pos, double mass) {
   // n theo mass won't change if it modifies the last residue
   if (pos <= n_theo_masses_.size()) {
-    std::for_each(n_theo_masses_.begin() + pos,
-                  n_theo_masses_.end(), [mass](double& d) { d += mass;});
+    std::for_each(n_theo_masses_.begin() + pos, n_theo_masses_.end(),
+                  [mass](double& d) { d += mass; });
   }
 
   // c theo mass won't change if it modifies the first residue
   if (pos > 0) {
     std::for_each(c_theo_masses_.begin() + c_theo_masses_.size() - pos,
-                  c_theo_masses_.end(), [mass](double& d) { d += mass;});
+                  c_theo_masses_.end(), [mass](double& d) { d += mass; });
   }
 }
 
-int CompPValueMCMC::getMaxScoreN(const ResiduePtrVec &residues) {
+int CompPValueMCMC::getMaxScoreN(const ResiduePtrVec& residues) {
   std::vector<std::vector<size_t> > possible_change_pos(ptm_vec_.size());
   std::vector<size_t> change_pos(ptm_vec_.size());
 
@@ -419,7 +433,8 @@ int CompPValueMCMC::getMaxScoreN(const ResiduePtrVec &residues) {
     if (ptm_vec_[i] != nullptr) {
       ResiduePtrVec possible_res = ptm_residue_map_[ptm_vec_[i]];
       for (size_t k = 0; k < residues.size(); k++) {
-        if (std::find(possible_res.begin(), possible_res.end(), residues[k]) != possible_res.end()) {
+        if (std::find(possible_res.begin(), possible_res.end(), residues[k]) !=
+            possible_res.end()) {
           possible_change_pos[i].push_back(k);
         }
       }
@@ -436,7 +451,8 @@ int CompPValueMCMC::getMaxScoreN(const ResiduePtrVec &residues) {
     if (possible_change_pos[i].size() == 0) {
       return 0;
     } else {
-      std::uniform_int_distribution<size_t> dis(0, possible_change_pos[i].size() - 1);
+      std::uniform_int_distribution<size_t> dis(
+          0, possible_change_pos[i].size() - 1);
       change_pos[i] = possible_change_pos[i][dis(*generator_)];
     }
   }
@@ -455,14 +471,12 @@ int CompPValueMCMC::getMaxScoreN(const ResiduePtrVec &residues) {
 
   for (size_t p = 0; p < this->ptm_vec_.size(); p++) {
     rmMassTheoMass(change_pos[p], ptm_mass_vec_[p]);
-    geneScrVec(n_scr_no_ptm, n_scr_with_ptm, c_scr_no_ptm, c_scr_with_ptm, ptm_mass_vec_[p]);
+    geneScrVec(n_scr_no_ptm, n_scr_with_ptm, c_scr_no_ptm, c_scr_with_ptm,
+               ptm_mass_vec_[p]);
     size_t new_pos = change_pos[p];
-    int new_max_scr = getMaxPosScrVec(possible_change_pos[p],
-                                      n_scr_no_ptm,
-                                      n_scr_with_ptm,
-                                      c_scr_no_ptm,
-                                      c_scr_with_ptm,
-                                      new_pos);
+    int new_max_scr =
+        getMaxPosScrVec(possible_change_pos[p], n_scr_no_ptm, n_scr_with_ptm,
+                        c_scr_no_ptm, c_scr_with_ptm, new_pos);
     if (new_max_scr > max_scr) {
       change_pos[p] = new_pos;
       max_scr = new_max_scr;
@@ -474,7 +488,8 @@ int CompPValueMCMC::getMaxScoreN(const ResiduePtrVec &residues) {
   return max_scr;
 }
 
-void CompPValueMCMC::simulateDPR(ResiduePtrVec &residues, long omega, int scr_init, int k) {
+void CompPValueMCMC::simulateDPR(ResiduePtrVec& residues, long omega,
+                                 int scr_init, int k) {
   size_t CT_LIMIT = 20000;
 
   residues_stack_.reserve(CT_LIMIT);
@@ -508,7 +523,8 @@ void CompPValueMCMC::simulateDPR(ResiduePtrVec &residues, long omega, int scr_in
       if (mu_[score2] > mu_[score1] && residues_stack_.size() < CT_LIMIT) {
         long Y = std::round(mu_[score2] / mu_[score1]);
         Y = std::min(Y, 100L);
-        std::uniform_int_distribution<long> omega_dist(static_cast<long>(mu_[score1]), static_cast<long>(mu_[score2]));
+        std::uniform_int_distribution<long> omega_dist(
+            static_cast<long>(mu_[score1]), static_cast<long>(mu_[score2]));
         for (long i = 1; i < Y; i++) {
           long omega2 = omega_dist(*generator_);
           residues_stack_.push_back(residues2);

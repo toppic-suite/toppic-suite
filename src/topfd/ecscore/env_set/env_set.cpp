@@ -1,30 +1,31 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-#include <numeric>
-#include <limits>
+#include "topfd/ecscore/env_set/env_set.hpp"
+
 #include <algorithm>
+#include <limits>
+#include <numeric>
 
 #include "common/util/logger.hpp"
-
 #include "topfd/ecscore/env/ms_map_env_util.hpp"
 #include "topfd/ecscore/env_set/xic_util.hpp"
-#include "topfd/ecscore/env_set/env_set.hpp"
 
 namespace toppic {
 
-EnvSet::EnvSet(const SeedEnvPtr seed_ptr, const MsMapEnvPtrVec &env_list,
+EnvSet::EnvSet(const SeedEnvPtr seed_ptr, const MsMapEnvPtrVec& env_list,
                int start, int end, double noise_inte, double sn_ratio) {
   seed_ptr_ = seed_ptr;
   ms_map_env_list_ = env_list;
@@ -34,7 +35,7 @@ EnvSet::EnvSet(const SeedEnvPtr seed_ptr, const MsMapEnvPtrVec &env_list,
   initMedianXic();
 }
 
-EnvSet::EnvSet(const SeedEnvPtr seed_ptr, const MsMapEnvPtrVec &env_list,
+EnvSet::EnvSet(const SeedEnvPtr seed_ptr, const MsMapEnvPtrVec& env_list,
                int start, int end, double min_inte) {
   seed_ptr_ = seed_ptr;
   ms_map_env_list_ = env_list;
@@ -48,15 +49,15 @@ void EnvSet::initMedianXic() {
   std::vector<double> inte_ratio_list;
   std::vector<double> top_three_inte_list;
   std::vector<double> all_peak_inte_list;
-  for (MsMapEnvPtr env_ptr: ms_map_env_list_) {
-    double ratio = ms_map_env_util::compTopThreeInteRatio(seed_ptr_, env_ptr); 
+  for (MsMapEnvPtr env_ptr : ms_map_env_list_) {
+    double ratio = ms_map_env_util::compTopThreeInteRatio(seed_ptr_, env_ptr);
     inte_ratio_list.push_back(ratio);
     double top_three_inte = seed_ptr_->compTopThreeInteSum() * ratio;
     top_three_inte_list.push_back(top_three_inte);
     double all_peak_inte = seed_ptr_->compScaledInteSum(ratio, min_inte_);
-    all_peak_inte_list.push_back(all_peak_inte); 
+    all_peak_inte_list.push_back(all_peak_inte);
   }
-  xic_ptr_ = std::make_shared<Xic>(inte_ratio_list, top_three_inte_list, 
+  xic_ptr_ = std::make_shared<Xic>(inte_ratio_list, top_three_inte_list,
                                    all_peak_inte_list);
 }
 
@@ -91,10 +92,10 @@ std::vector<int> EnvSet::getSpecIdList() {
 
 std::vector<double> EnvSet::getIntensitySumList() {
   std::vector<double> intensity_sum_list;
-  double seed_inte_sum = seed_ptr_->compInteSum(); 
+  double seed_inte_sum = seed_ptr_->compInteSum();
   for (size_t i = 0; i < ms_map_env_list_.size(); i++) {
     if (ms_map_env_list_[i] != nullptr) {
-      intensity_sum_list.push_back(seed_inte_sum * xic_ptr_->getInteRatio(i)); 
+      intensity_sum_list.push_back(seed_inte_sum * xic_ptr_->getInteRatio(i));
     }
   }
   return intensity_sum_list;
@@ -102,10 +103,10 @@ std::vector<double> EnvSet::getIntensitySumList() {
 
 std::vector<double> EnvSet::getMaxIntensityList() {
   std::vector<double> max_intensity_list;
-  double seed_max_inte = seed_ptr_->getReferInte(); 
+  double seed_max_inte = seed_ptr_->getReferInte();
   for (size_t i = 0; i < ms_map_env_list_.size(); i++) {
     if (ms_map_env_list_[i] != nullptr) {
-      max_intensity_list.push_back(seed_max_inte * xic_ptr_->getInteRatio(i)); 
+      max_intensity_list.push_back(seed_max_inte * xic_ptr_->getInteRatio(i));
     }
   }
   return max_intensity_list;
@@ -114,7 +115,7 @@ std::vector<double> EnvSet::getMaxIntensityList() {
 std::vector<double> EnvSet::compAggrEnvInteList() {
   int peak_num = seed_ptr_->getPeakNum();
   std::vector<double> inte_list(peak_num, 0);
-  for (auto &env: ms_map_env_list_) {
+  for (auto& env : ms_map_env_list_) {
     if (env == nullptr) {
       continue;
     }
@@ -133,8 +134,8 @@ std::vector<double> EnvSet::compAggrEnvMzList() {
     for (size_t env_idx = 0; env_idx < ms_map_env_list_.size(); env_idx++) {
       MsMapPeakPtr peak_ptr = ms_map_env_list_[env_idx]->getPeakPtr(peak_idx);
       if (peak_ptr != nullptr) {
-        mz_list[peak_idx] = mz_list[peak_idx]
-          + (peak_ptr->getPosition() * peak_ptr->getIntensity());
+        mz_list[peak_idx] = mz_list[peak_idx] + (peak_ptr->getPosition() *
+                                                 peak_ptr->getIntensity());
         weight += peak_ptr->getIntensity();
       }
     }
@@ -142,21 +143,21 @@ std::vector<double> EnvSet::compAggrEnvMzList() {
       mz_list[peak_idx] = mz_list[peak_idx] / weight;
     }
   }
-  return mz_list; 
+  return mz_list;
 }
-
 
 std::vector<std::vector<double>> EnvSet::getScaledTheoIntes(int min_inte) {
   std::vector<std::vector<double>> results;
   std::vector<double> ratio_list = xic_ptr_->getInteRatioList();
   for (size_t i = 0; i < ratio_list.size(); i++) {
-    std::vector<double> spec_inte_list = seed_ptr_->getScaledInteList(ratio_list[i], min_inte);
+    std::vector<double> spec_inte_list =
+        seed_ptr_->getScaledInteList(ratio_list[i], min_inte);
     results.push_back(spec_inte_list);
   }
   return results;
 }
 
-void EnvSet::removePeakData(const MsMapPtr &ms_map_ptr) {
+void EnvSet::removePeakData(const MsMapPtr& ms_map_ptr) {
   double peak_remove_ratio = 4;
   int env_num = ms_map_env_list_.size();
   for (int env_id = 0; env_id < env_num; env_id++) {
@@ -170,10 +171,12 @@ void EnvSet::removePeakData(const MsMapPtr &ms_map_ptr) {
     }
     MsMapPeakPtrVec env_peak_list = env_ptr->getMsMapPeakList();
     double ratio = xic_ptr_->getInteRatio(env_id);
-    std::vector<double> theo_env_peak_intes = seed_ptr_->getScaledInteList(ratio, min_inte_);
+    std::vector<double> theo_env_peak_intes =
+        seed_ptr_->getScaledInteList(ratio, min_inte_);
     int peak_num = env_peak_list.size();
     if (peak_num != theo_env_peak_intes.size()) {
-      LOG_ERROR("peak num " << peak_num << " theo env peak num " << theo_env_peak_intes.size());
+      LOG_ERROR("peak num " << peak_num << " theo env peak num "
+                            << theo_env_peak_intes.size());
     }
     for (int peak_id = 0; peak_id < peak_num; peak_id++) {
       MsMapPeakPtr exp_peak = env_peak_list[peak_id];
@@ -184,7 +187,7 @@ void EnvSet::removePeakData(const MsMapPtr &ms_map_ptr) {
       MsMapPeakPtrVec bin_peaks = ms_map_ptr->getBinPeakList(spec_id, col_idx);
       double theo_peak_inte = theo_env_peak_intes[peak_id];
       MsMapPeakPtrVec remain_peaks;
-      for (auto peak: bin_peaks) {
+      for (auto peak : bin_peaks) {
         // check if peak is the same as exp_peak
         if (peak == nullptr) {
           continue;
@@ -194,8 +197,7 @@ void EnvSet::removePeakData(const MsMapPtr &ms_map_ptr) {
           if (peak->getIntensity() / theo_peak_inte < peak_remove_ratio) {
             // skip this peak
             continue;
-          }
-          else {
+          } else {
             peak->setIntensity(peak->getIntensity() - theo_peak_inte);
           }
         }
@@ -215,7 +217,7 @@ void EnvSet::shortlistExpEnvs() {
       tmp.push_back(ms_map_env_list_[i]);
     }
   }
-    ms_map_env_list_ = tmp;
+  ms_map_env_list_ = tmp;
 }
 
 std::pair<double, double> EnvSet::getMzErrorAndWeight() {
@@ -235,7 +237,8 @@ std::pair<double, double> EnvSet::getMzErrorAndWeight() {
       MsMapPeakPtr peak = exp_peak_list[peak_idx];
       if (peak != nullptr) {
         double cur_inte = seed_peak_list[peak_idx]->getIntensity() * ratio;
-        double cur_err = peak->getPosition() - seed_peak_list[peak_idx]->getPosition();
+        double cur_err =
+            peak->getPosition() - seed_peak_list[peak_idx]->getPosition();
         error_sum = error_sum + (cur_inte * cur_err);
         weight_sum = weight_sum + cur_inte;
       }
@@ -245,85 +248,87 @@ std::pair<double, double> EnvSet::getMzErrorAndWeight() {
   return results;
 }
 
-double getLeftMax(int pos, std::vector<double> &y) {
+double getLeftMax(int pos, std::vector<double>& y) {
   double max_val = std::numeric_limits<double>::lowest();
   for (int i = 0; i < pos; i++) {
-    if (y[i] > max_val)
-      max_val = y[i];
+    if (y[i] > max_val) max_val = y[i];
   }
   return max_val;
 }
 
-double getRightMax(int pos, std::vector<double> &y) {
+double getRightMax(int pos, std::vector<double>& y) {
   double max_val = std::numeric_limits<double>::lowest();
   int vec_length = y.size();
   for (int i = pos + 1; i < vec_length; i++) {
-    if (y[i] > max_val)
-      max_val = y[i];
+    if (y[i] > max_val) max_val = y[i];
   }
   return max_val;
 }
 
 void EnvSet::refineXicBoundary(double split_ratio) {
   double split_feature_intensity_ratio = 1 / split_ratio;
-  //std::cout << split_ratio << " " << split_feature_intensity_ratio << "\n";
+  // std::cout << split_ratio << " " << split_feature_intensity_ratio << "\n";
   int seed_idx = seed_ptr_->getSpecId() - start_spec_id_;
   std::vector<double> smoothed_env_xic = xic_ptr_->getSmoothedInteList();
 
   /// Left side
-  std::vector<double> left_data(smoothed_env_xic.begin(), smoothed_env_xic.begin() + seed_idx + 1);
+  std::vector<double> left_data(smoothed_env_xic.begin(),
+                                smoothed_env_xic.begin() + seed_idx + 1);
   std::vector<int> minima_left = xic_util::findLocalMinima(left_data);
   std::vector<double> minima_vals_left;
-  for (auto m: minima_left) minima_vals_left.push_back(left_data[m]);
+  for (auto m : minima_left) minima_vals_left.push_back(left_data[m]);
   int start_split_point = start_spec_id_;
   while (!minima_vals_left.empty()) {
-    int idx = std::min_element(minima_vals_left.begin(), 
-                               minima_vals_left.end()) - minima_vals_left.begin();
+    int idx =
+        std::min_element(minima_vals_left.begin(), minima_vals_left.end()) -
+        minima_vals_left.begin();
     int pos = minima_left[idx];
     minima_vals_left.erase(minima_vals_left.begin() + idx);
     double left_max = getLeftMax(pos, left_data);
     if (left_max == 0) continue;
     if (left_data[pos] / left_max <= split_feature_intensity_ratio) {
       start_split_point = start_split_point + pos;
-      std::vector<double> temp_left_data(left_data.begin() + pos, left_data.end());
+      std::vector<double> temp_left_data(left_data.begin() + pos,
+                                         left_data.end());
       left_data = temp_left_data;
       minima_left = xic_util::findLocalMinima(left_data);
       minima_vals_left.clear();
-      for (auto m: minima_left) minima_vals_left.push_back(left_data[m]);
+      for (auto m : minima_left) minima_vals_left.push_back(left_data[m]);
     }
   }
 
   /// Right side
-  std::vector<double> right_data(smoothed_env_xic.begin() + seed_idx, smoothed_env_xic.end());
+  std::vector<double> right_data(smoothed_env_xic.begin() + seed_idx,
+                                 smoothed_env_xic.end());
   std::vector<int> minima_right = xic_util::findLocalMinima(right_data);
   std::vector<double> minima_vals_right;
-  for (auto m: minima_right) minima_vals_right.push_back(right_data[m]);
+  for (auto m : minima_right) minima_vals_right.push_back(right_data[m]);
   int end_split_point = -1;
   while (!minima_vals_right.empty()) {
-    int idx = std::min_element(minima_vals_right.begin(), 
-                               minima_vals_right.end()) - minima_vals_right.begin();
+    int idx =
+        std::min_element(minima_vals_right.begin(), minima_vals_right.end()) -
+        minima_vals_right.begin();
     int pos = minima_right[idx];
     minima_vals_right.erase(minima_vals_right.begin() + idx);
     double right_max = getRightMax(pos, right_data);
     if (right_max == 0) continue;
     if (right_data[pos] / right_max <= split_feature_intensity_ratio) {
       end_split_point = pos;
-      std::vector<double> temp_right_data(right_data.begin(), right_data.begin() + pos - 1);
+      std::vector<double> temp_right_data(right_data.begin(),
+                                          right_data.begin() + pos - 1);
       right_data = temp_right_data;
       minima_right = xic_util::findLocalMinima(right_data);
       minima_vals_right.clear();
-      for (auto m: minima_right) minima_vals_right.push_back(right_data[m]);
+      for (auto m : minima_right) minima_vals_right.push_back(right_data[m]);
     }
   }
   // find new start and end spec ids
   int start = start_spec_id_;
-  if (start_split_point > -1)
-    start = start_split_point;
+  if (start_split_point > -1) start = start_split_point;
   int end = end_spec_id_;
-  if (end_split_point > -1)
-    end = seed_ptr_->getSpecId() + end_split_point;
-  start_spec_id_ = start; 
-  end_spec_id_ = end; 
+  if (end_split_point > -1) end = seed_ptr_->getSpecId() + end_split_point;
+  start_spec_id_ = start;
+  end_spec_id_ = end;
 
   // update env_set list and xic
   shortlistExpEnvs();
@@ -331,40 +336,40 @@ void EnvSet::refineXicBoundary(double split_ratio) {
 }
 
 bool EnvSet::containValidEnvs(int min_scan_num, int min_match_peak_num) {
-  int seed_spec_idx = seed_ptr_->getSpecId() - start_spec_id_; 
-  int ref_idx = seed_ptr_->getReferIdx(); 
+  int seed_spec_idx = seed_ptr_->getSpecId() - start_spec_id_;
+  int ref_idx = seed_ptr_->getReferIdx();
   if (min_scan_num == 1) {
-    if (seed_spec_idx < 0 || seed_spec_idx >= static_cast<int>(ms_map_env_list_.size())) {
+    if (seed_spec_idx < 0 ||
+        seed_spec_idx >= static_cast<int>(ms_map_env_list_.size())) {
       return false;
     }
     MsMapEnvPtr env_ptr = ms_map_env_list_[seed_spec_idx];
-    if (env_ptr != nullptr && env_ptr->getTopThreeMatchNum(ref_idx) >= min_match_peak_num) {
-      return true; 
-    }
-    else {
+    if (env_ptr != nullptr &&
+        env_ptr->getTopThreeMatchNum(ref_idx) >= min_match_peak_num) {
+      return true;
+    } else {
       return false;
     }
-  }
-  else {
+  } else {
     size_t first_idx = seed_spec_idx - 1;
     if (first_idx < 0) {
       first_idx = 0;
     }
     size_t last_idx = seed_spec_idx + 1;
     if (last_idx >= ms_map_env_list_.size()) {
-      last_idx = ms_map_env_list_.size() -1;
+      last_idx = ms_map_env_list_.size() - 1;
     }
     int count = 0;
     for (size_t i = first_idx; i <= last_idx; i++) {
       MsMapEnvPtr env_ptr = ms_map_env_list_[i];
-      if (env_ptr != nullptr && env_ptr->getTopThreeMatchNum(ref_idx) >= min_match_peak_num) {
+      if (env_ptr != nullptr &&
+          env_ptr->getTopThreeMatchNum(ref_idx) >= min_match_peak_num) {
         count = count + 1;
       }
     }
     if (count >= min_scan_num) {
       return true;
-    }
-    else {
+    } else {
       return false;
     }
   }
@@ -376,7 +381,7 @@ bool EnvSet::containTwoValidEnvs(int min_match_peak) {
   int ref_idx = seed_ptr_->getReferIdx();
   for (size_t i = 0; i < ms_map_env_list_.size(); i++) {
     MsMapEnvPtr env_ptr = ms_map_env_list_[i];
-    if (env_ptr != nullptr 
+    if (env_ptr != nullptr
         && env_ptr->getTopThreeMatchNum(ref_idx) >= min_match_peak) {
       cnt++;
     }
@@ -391,7 +396,7 @@ bool EnvSet::containTwoValidEnvs(int min_match_peak) {
 
 // check if the seed envelope and one of the neighboring ones are valid
 bool EnvSet::containTwoValidOutOfThreeEnvs(int min_match_peak_num) {
-  int seed_spec_idx = seed_ptr_->getSpecId() - start_spec_id_; 
+  int seed_spec_idx = seed_ptr_->getSpecId() - start_spec_id_;
   size_t first_idx = seed_spec_idx - 1;
   if (first_idx < 0) {
     first_idx = 0;
@@ -400,12 +405,12 @@ bool EnvSet::containTwoValidOutOfThreeEnvs(int min_match_peak_num) {
   if (last_idx >= ms_map_env_list_.size()) {
     last_idx = ms_map_env_list_.size() -1;
   }
-  int ref_idx = seed_ptr_->getReferIdx(); 
+  int ref_idx = seed_ptr_->getReferIdx();
   int count = 0;
   for (size_t i = first_idx; i <= last_idx; i++) {
     MsMapEnvPtr env_ptr = ms_map_env_list_[i];
-    if (env_ptr != nullptr && env_ptr->getTopThreeMatchNum(ref_idx) >= min_match_peak_num) {
-      count = count + 1;
+    if (env_ptr != nullptr && env_ptr->getTopThreeMatchNum(ref_idx) >=
+min_match_peak_num) { count = count + 1;
     }
   }
   if (count >= 2) {
@@ -417,7 +422,7 @@ bool EnvSet::containTwoValidOutOfThreeEnvs(int min_match_peak_num) {
 }
 
 bool EnvSet::containThreeValidOutOfFiveEnvs(int min_match_peak_num) {
-  int seed_spec_idx = seed_ptr_->getSpecId() - start_spec_id_; 
+  int seed_spec_idx = seed_ptr_->getSpecId() - start_spec_id_;
   size_t first_idx = seed_spec_idx - 2;
   if (first_idx < 0) {
     first_idx = 0;
@@ -430,8 +435,8 @@ bool EnvSet::containThreeValidOutOfFiveEnvs(int min_match_peak_num) {
   int cnt = 0;
   for (size_t i = first_idx; i <= last_idx; i++) {
     MsMapEnvPtr env_ptr = ms_map_env_list_[i];
-    if (env_ptr != nullptr && env_ptr->getTopThreeMatchNum(ref_idx) >= min_match_peak_num) {
-      cnt++;
+    if (env_ptr != nullptr && env_ptr->getTopThreeMatchNum(ref_idx) >=
+min_match_peak_num) { cnt++;
     }
   }
   if (cnt >= 3) {
@@ -443,13 +448,13 @@ bool EnvSet::containThreeValidOutOfFiveEnvs(int min_match_peak_num) {
 }
 */
 
-void EnvSet::mergeEnvSet(const EnvSetPtr &new_set_ptr) {
+void EnvSet::mergeEnvSet(const EnvSetPtr& new_set_ptr) {
   int new_start_id = new_set_ptr->getStartSpecId();
   int merge_start_id = std::min(start_spec_id_, new_start_id);
   int new_end_id = new_set_ptr->getEndSpecId();
   int merge_end_id = std::max(end_spec_id_, new_end_id);
-  // merge 
-  MsMapEnvPtrVec merge_env_list (merge_end_id - merge_start_id + 1, nullptr);
+  // merge
+  MsMapEnvPtrVec merge_env_list(merge_end_id - merge_start_id + 1, nullptr);
   for (size_t i = 0; i < ms_map_env_list_.size(); i++) {
     int idx = start_spec_id_ + i - merge_start_id;
     merge_env_list[idx] = ms_map_env_list_[i];
@@ -477,5 +482,4 @@ void EnvSet::appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) {
   }
 }
 
-}
-
+}  // namespace toppic

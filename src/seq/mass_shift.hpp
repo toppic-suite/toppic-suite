@@ -1,16 +1,17 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #ifndef TOPPIC_SEQ_MASS_SHIFT_HPP_
 #define TOPPIC_SEQ_MASS_SHIFT_HPP_
@@ -31,41 +32,43 @@ class MassShift {
  public:
   MassShift(int left_bp_pos, int right_bp_pos, double shift);
 
-  explicit MassShift(const AlterPtr &alter_ptr);
+  explicit MassShift(const AlterPtr& alter_ptr);
 
-  MassShift(const MassShiftPtr &shift_ptr, int start);
+  MassShift(const MassShiftPtr& shift_ptr, int start);
 
   explicit MassShift(XmlDOMElement mass_shift_element);
 
-  int getLeftBpPos() const {return left_bp_pos_;}
+  int getLeftBpPos() const { return left_bp_pos_; }
 
-  void setLeftBpPos(int p) {left_bp_pos_ = p;}
+  void setLeftBpPos(int p) { left_bp_pos_ = p; }
 
-  int getRightBpPos() const {return right_bp_pos_;}
+  int getRightBpPos() const { return right_bp_pos_; }
 
-  void setRightBpPos(int p) {right_bp_pos_ = p;}
+  void setRightBpPos(int p) { right_bp_pos_ = p; }
 
-  const std::vector<AlterPtr>& getAlterPtrVec() const {return alter_vec_;}
+  const std::vector<AlterPtr>& getAlterPtrVec() const { return alter_vec_; }
 
-  AlterPtr getAlterPtr(size_t idx) const {return alter_vec_[idx];}
+  AlterPtr getAlterPtr(size_t idx) const { return alter_vec_[idx]; }
 
-  int getAlterNum() const {return alter_vec_.size();}
+  int getAlterNum() const { return alter_vec_.size(); }
 
-  void setAlterPtrVec(AlterPtrVec alter_vec) {alter_vec_ = std::move(alter_vec);}
+  void setAlterPtrVec(AlterPtrVec alter_vec) {
+    alter_vec_ = std::move(alter_vec);
+  }
 
   AlterTypePtr getTypePtr() const;
 
-  double getMassShift() const {return shift_;}
+  double getMassShift() const { return shift_; }
 
-  void setMassShift(double shift) {shift_ = shift;}
+  void setMassShift(double shift) { shift_ = shift; }
 
   std::string getAnnoStr() const;
 
-  static std::string getXmlElementName() {return "mass_shift";}
+  static std::string getXmlElementName() { return "mass_shift"; }
 
   void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) const;
 
-  static bool cmpPosInc(const MassShiftPtr & a, const MassShiftPtr & b);
+  static bool cmpPosInc(const MassShiftPtr& a, const MassShiftPtr& b);
 
  private:
   int left_bp_pos_;
@@ -74,7 +77,7 @@ class MassShift {
 
   double shift_;
 
-  // A mass shift is annotated by a list of alterations. 
+  // A mass shift is annotated by a list of alterations.
   std::vector<AlterPtr> alter_vec_;
 };
 

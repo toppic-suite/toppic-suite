@@ -1,16 +1,17 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #ifndef TOPPIC_PARA_SP_PARA_HPP_
 #define TOPPIC_PARA_SP_PARA_HPP_
@@ -29,44 +30,48 @@ class XmlDOMDocument;
 
 class SpPara {
  public:
-  SpPara(const std::string &activation_name, double n_term_mod_mass,
+  SpPara(const std::string& activation_name, double n_term_mod_mass,
          double ppm);
 
   explicit SpPara(XmlDOMElement element);
 
-  double getMinMass() const {return min_mass_;}
+  double getMinMass() const { return min_mass_; }
 
-  double getExtendMinMass() const {return extend_min_mass_;}
+  double getExtendMinMass() const { return extend_min_mass_; }
 
-  const std::vector<double>& getExtendOffsets() const {return ext_offsets_;}
+  const std::vector<double>& getExtendOffsets() const { return ext_offsets_; }
 
   const std::vector<double>& getZeroShiftSearchPrecErrorVec() const {
-    return zero_shift_search_prec_error_vec_;}
+    return zero_shift_search_prec_error_vec_;
+  }
 
   const std::vector<double>& getVarPtmSearchPrecErrorVec() const {
-    return var_ptm_search_prec_error_vec_;}
+    return var_ptm_search_prec_error_vec_;
+  }
 
   const std::vector<double>& getOneShiftSearchPrecErrorVec() const {
-    return one_shift_search_prec_error_vec_;}
+    return one_shift_search_prec_error_vec_;
+  }
 
   const std::vector<double>& getMultiShiftSearchPrecErrorVec() const {
-    return multi_shift_search_prec_error_vec_;}
+    return multi_shift_search_prec_error_vec_;
+  }
 
-  PeakTolerancePtr getPeakTolerancePtr() const {return peak_tolerance_ptr_;}
+  PeakTolerancePtr getPeakTolerancePtr() const { return peak_tolerance_ptr_; }
 
-  ActivationPtr getActivationPtr() const {return activation_ptr_;}
+  ActivationPtr getActivationPtr() const { return activation_ptr_; }
 
-  int getMinPeakNum() const {return min_peak_num_;}
+  int getMinPeakNum() const { return min_peak_num_; }
 
-  double getNTermLabelMass() const {return n_term_label_mass_;}
+  double getNTermLabelMass() const { return n_term_label_mass_; }
 
   void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) const;
 
-  static std::string getXmlElementName() {return "sp_para";}
+  static std::string getXmlElementName() { return "sp_para"; }
 
-  static int getMaxSpecNumPerFile() {return 10000000;}
+  static int getMaxSpecNumPerFile() { return 10000000; }
 
-  static int getMaxFeatureNumPerFile() {return 10000000;}
+  static int getMaxFeatureNumPerFile() { return 10000000; }
 
  private:
   int min_peak_num_ = 10;

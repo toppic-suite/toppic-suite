@@ -1,16 +1,17 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include "para/prsm_para.hpp"
 
@@ -30,21 +31,23 @@ namespace {
 
 // Look up an argument, returning an empty string when the key is absent. This
 // preserves the old operator[] behaviour without mutating the (now const) map.
-std::string getArg(const std::map<std::string, std::string> &arguments,
-                   const std::string &key) {
+std::string getArg(const std::map<std::string, std::string>& arguments,
+                   const std::string& key) {
   auto it = arguments.find(key);
   return it == arguments.end() ? std::string() : it->second;
 }
 
 }  // namespace
 
-PrsmPara::PrsmPara(const std::map<std::string, std::string> &arguments) {
+PrsmPara::PrsmPara(const std::map<std::string, std::string>& arguments) {
   ori_db_name_ = getArg(arguments, "oriDatabaseFileName");
 
-  search_db_file_name_ = file_util::filenameFromEntirePath(getArg(arguments, "databaseFileName"));
+  search_db_file_name_ =
+      file_util::filenameFromEntirePath(getArg(arguments, "databaseFileName"));
 
-  search_db_file_name_with_folder_ = ori_db_name_ + "_idx"
-    + file_util::getFileSeparator() + search_db_file_name_;
+  search_db_file_name_with_folder_ = ori_db_name_ + "_idx" +
+                                     file_util::getFileSeparator() +
+                                     search_db_file_name_;
 
   spec_file_name_ = getArg(arguments, "spectrumFileName");
 
@@ -65,7 +68,8 @@ PrsmPara::PrsmPara(const std::map<std::string, std::string> &arguments) {
   std::string prot_type_str = getArg(arguments, "allowProtType");
   std::vector<std::string> type_strs = str_util::split(prot_type_str, ",");
   for (std::size_t i = 0; i < type_strs.size(); i++) {
-    ProteoformTypePtr prot_type = ProteoformType::getProtTypePtrByName(type_strs[i]);
+    ProteoformTypePtr prot_type =
+        ProteoformType::getProtTypePtrByName(type_strs[i]);
     if (prot_type != nullptr) {
       LOG_DEBUG("Proteoform type " << prot_type->getName());
       prot_type_list_.push_back(prot_type);
@@ -78,10 +82,11 @@ PrsmPara::PrsmPara(const std::map<std::string, std::string> &arguments) {
   if (getArg(arguments, "nTermLabelMass") != "") {
     n_term_label_mass = std::stod(getArg(arguments, "nTermLabelMass"));
   }
-  sp_para_ptr_ = std::make_shared<SpPara>(activation_name, n_term_label_mass, ppm);
+  sp_para_ptr_ =
+      std::make_shared<SpPara>(activation_name, n_term_label_mass, ppm);
 }
 
-bool PrsmPara::allowProtType(const ProteoformTypePtr &type_ptr) const {
+bool PrsmPara::allowProtType(const ProteoformTypePtr& type_ptr) const {
   for (std::size_t i = 0; i < prot_type_list_.size(); i++) {
     if (prot_type_list_[i] == type_ptr) {
       return true;

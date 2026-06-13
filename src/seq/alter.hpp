@@ -1,16 +1,17 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #ifndef TOPPIC_SEQ_ALTER_HPP_
 #define TOPPIC_SEQ_ALTER_HPP_
@@ -20,9 +21,9 @@
 #include <vector>
 
 #include "common/base/mod.hpp"
+#include "common/xml/xml_dom_element.hpp"
 #include "seq/alter_type.hpp"
 #include "seq/local_anno.hpp"
-#include "common/xml/xml_dom_element.hpp"
 
 namespace toppic {
 
@@ -48,37 +49,36 @@ using AlterPtr = std::shared_ptr<Alter>;
 
 class Alter {
  public:
-  Alter(int left_bp_pos, int right_bp_pos,
-        const AlterTypePtr &type_ptr,
-        double mass, const ModPtr &mod_ptr);
+  Alter(int left_bp_pos, int right_bp_pos, const AlterTypePtr& type_ptr,
+        double mass, const ModPtr& mod_ptr);
 
   explicit Alter(XmlDOMElement change_element);
 
-  int getLeftBpPos() const {return left_bp_pos_;}
+  int getLeftBpPos() const { return left_bp_pos_; }
 
-  void setLeftBpPos(int p) {left_bp_pos_ = p;}
+  void setLeftBpPos(int p) { left_bp_pos_ = p; }
 
-  int getRightBpPos() const {return right_bp_pos_;}
+  int getRightBpPos() const { return right_bp_pos_; }
 
-  void setRightBpPos(int p) {right_bp_pos_ = p;}
+  void setRightBpPos(int p) { right_bp_pos_ = p; }
 
-  AlterTypePtr getTypePtr() const {return type_ptr_;}
+  AlterTypePtr getTypePtr() const { return type_ptr_; }
 
-  double getMass() const {return mass_;}
+  double getMass() const { return mass_; }
 
-  void setMass(double m) {mass_ = m;}
+  void setMass(double m) { mass_ = m; }
 
-  ModPtr getModPtr() const {return mod_ptr_;}
+  ModPtr getModPtr() const { return mod_ptr_; }
 
-  LocalAnnoPtr getLocalAnno() const {return local_anno_ptr_;}
+  LocalAnnoPtr getLocalAnno() const { return local_anno_ptr_; }
 
-  void setLocalAnno(const LocalAnnoPtr &p);
+  void setLocalAnno(const LocalAnnoPtr& p);
 
   void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) const;
 
-  static std::string getXmlElementName() {return "alteration";}
+  static std::string getXmlElementName() { return "alteration"; }
 
-  static AlterPtr genAlterPtr(const AlterPtr &ori_alter_ptr, int start_pos);
+  static AlterPtr genAlterPtr(const AlterPtr& ori_alter_ptr, int start_pos);
 
  protected:
   // left and right positions are based on break point positions

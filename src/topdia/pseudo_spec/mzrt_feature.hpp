@@ -1,4 +1,5 @@
-// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,7 +36,7 @@ class MzrtFeature {
               std::vector<double> xic, std::vector<double> normalized_xic,
               std::vector<double> envelope_mz,
               std::vector<double> envelope_inte, int apex_cycle);
-  static MzrtFeaturePtrVec read_record(const std::string &filename);
+  static MzrtFeaturePtrVec read_record(const std::string& filename);
 
   int getId() const { return id_; }
 
@@ -67,17 +68,17 @@ class MzrtFeature {
 
   double getEcScore() const { return ec_score_; }
 
-  const std::vector<double> &getXic() const { return xic_; }
+  const std::vector<double>& getXic() const { return xic_; }
 
-  const std::vector<double> &getNormalizedXic() const {
+  const std::vector<double>& getNormalizedXic() const {
     return normalized_xic_;
   }
 
-  const std::vector<double> &getEnvelopeMz() const { return envelope_mz_; }
+  const std::vector<double>& getEnvelopeMz() const { return envelope_mz_; }
 
-  const std::vector<double> &getEnvelopeInte() const { return envelope_inte_; }
+  const std::vector<double>& getEnvelopeInte() const { return envelope_inte_; }
 
-  std::pair<double,double> getWin() const { return win_; }
+  std::pair<double, double> getWin() const { return win_; }
 
   void setWin(std::pair<double, double> win) { win_ = win; }
 
@@ -85,7 +86,7 @@ class MzrtFeature {
 
   void setUsedStatus(bool used) { used_ = used; }
 
-  static std::vector<double> normalizeXIC(const std::vector<double> &xic);
+  static std::vector<double> normalizeXIC(const std::vector<double>& xic);
 
   int getApexCycle() const { return apex_cycle_; }
 
@@ -95,7 +96,7 @@ class MzrtFeature {
 
   void setCycleSpan(int cycleSpan) { cycle_span_ = cycleSpan; }
 
-  const std::vector<double> &getInterpolatedXic() const {
+  const std::vector<double>& getInterpolatedXic() const {
     return interpolated_xic_;
   }
 
@@ -108,14 +109,14 @@ class MzrtFeature {
   void setPseudoPeakNum(int pseudoPeakNum) { pseudo_peak_num_ = pseudoPeakNum; }
 
  private:
-  static std::vector<double> parseXIC(const std::string &line);
-  static void parseEnvelope(const std::string &input,
-                            std::vector<double> &array1,
-                            std::vector<double> &array2);
-  static int countNonZero(const std::vector<double> &xic);
-  static std::vector<double> interp(const std::vector<double> &x,
-                                    const std::vector<double> &xp,
-                                    const std::vector<double> &fp);
+  static std::vector<double> parseXIC(const std::string& line);
+  static void parseEnvelope(const std::string& input,
+                            std::vector<double>& array1,
+                            std::vector<double>& array2);
+  static int countNonZero(const std::vector<double>& xic);
+  static std::vector<double> interp(const std::vector<double>& x,
+                                    const std::vector<double>& xp,
+                                    const std::vector<double>& fp);
 
   int id_;
   int fraction_id_;
@@ -140,7 +141,7 @@ class MzrtFeature {
 
   int apex_cycle_;
   int cycle_span_;
-  std::pair<double,double> win_;
+  std::pair<double, double> win_;
   bool used_;
   int pseudo_peak_num_ = 0;
 };

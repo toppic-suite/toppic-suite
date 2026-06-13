@@ -1,4 +1,5 @@
-// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,8 +33,8 @@
 
 namespace toppic {
 
-DeconvSingleSp::DeconvSingleSp(const TopfdParaPtr &topfd_para_ptr,
-                               PeakPtrVec &peak_list, int ms_level,
+DeconvSingleSp::DeconvSingleSp(const TopfdParaPtr& topfd_para_ptr,
+                               PeakPtrVec& peak_list, int ms_level,
                                double max_mass, int max_charge) {
   topfd_para_ptr_ = topfd_para_ptr;
   env_para_ptr_ = std::make_shared<EnvPara>(topfd_para_ptr->getMzError());
@@ -50,7 +51,7 @@ DeconvSingleSp::DeconvSingleSp(const TopfdParaPtr &topfd_para_ptr,
       topfd_para_ptr_->isEstimateMinInte(), sn_ratio);
 }
 
-void DeconvSingleSp::postprocess(MatchEnvPtrVec &dp_envs, int ms_level) {
+void DeconvSingleSp::postprocess(MatchEnvPtrVec& dp_envs, int ms_level) {
   // assign intensity
   PeakPtrVec peak_list = data_ptr_->getPeakList();
   match_env_util::assignIntensity(peak_list, dp_envs);
@@ -61,9 +62,10 @@ void DeconvSingleSp::postprocess(MatchEnvPtrVec &dp_envs, int ms_level) {
   /*
   for (size_t i = 0; i < result_envs_.size(); i++) {
     EnvPtr env_ptr = result_envs_[i]->getTheoEnvPtr();
-    LOG_ERROR("Result envelope id: " << i << " mz: " << env_ptr->getMonoMz() << " charge: " << env_ptr->getCharge());
-    for (size_t j = 0; j < env_ptr->getPeakNum(); j++) {
-      LOG_ERROR("Peak intensity: " << j << "  " << env_ptr->getInte(j));
+    LOG_ERROR("Result envelope id: " << i << " mz: " << env_ptr->getMonoMz() <<
+  " charge: " << env_ptr->getCharge()); for (size_t j = 0; j <
+  env_ptr->getPeakNum(); j++) { LOG_ERROR("Peak intensity: " << j << "  " <<
+  env_ptr->getInte(j));
     }
   }
     */
@@ -71,7 +73,8 @@ void DeconvSingleSp::postprocess(MatchEnvPtrVec &dp_envs, int ms_level) {
   if (topfd_para_ptr_->isKeepUnusedPeaks()) {
     // all added envelopes have charge 1, so we use charge 1 to get mz_tolerance
     double mz_tole = env_para_ptr_->getMzTolerance(1);
-    result_envs_ = match_env_util::addUnusedMasses(result_envs_, peak_list, mz_tole);
+    result_envs_ =
+        match_env_util::addUnusedMasses(result_envs_, peak_list, mz_tole);
   }
 
   // Obtain EnvCNN Scores for envelopes
@@ -87,7 +90,7 @@ void DeconvSingleSp::postprocess(MatchEnvPtrVec &dp_envs, int ms_level) {
         result_envs_, data_ptr_->getMaxMass(),
         topfd_para_ptr_->isSortUseMsDeconv(), env_para_ptr_);
   }
-  //sorting
+  // sorting
   if (topfd_para_ptr_->isSortUseMsDeconv()) {
     std::sort(result_envs_.begin(), result_envs_.end(),
               MatchEnv::cmpMsdeconvScoreDec);

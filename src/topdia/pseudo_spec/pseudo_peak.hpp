@@ -1,4 +1,5 @@
-// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,11 +21,11 @@ namespace toppic {
 class PseudoPeak {
  public:
   PseudoPeak(double mass, double monoMz, int charge, double intensity,
-              double score, double corr, double shared_inte, int ms2_cycle_span,
-              double apexDiffScan, double rtLow, double rtHigh,
-              int ms2_apex_cycle);
+             double score, double corr, double shared_inte, int ms2_cycle_span,
+             double apexDiffScan, double rtLow, double rtHigh,
+             int ms2_apex_cycle);
 
-  PseudoPeak(const PseudoPeak &peaks);
+  PseudoPeak(const PseudoPeak& peaks);
 
   double getMass() const { return mass_; }
 

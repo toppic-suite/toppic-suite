@@ -1,17 +1,17 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
-
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #ifndef TOPPIC_SEARCH_GRAPHALIGN_GRAPH_DP_NODE_HPP_
 #define TOPPIC_SEARCH_GRAPHALIGN_GRAPH_DP_NODE_HPP_
@@ -22,7 +22,7 @@
 namespace toppic {
 
 #define GRAPH_ALIGN_TYPE_NULL -1
-#define GRAPH_ALIGN_TYPE_VARIABLE 0 
+#define GRAPH_ALIGN_TYPE_VARIABLE 0
 #define GRAPH_ALIGN_TYPE_UNEXPECTED 1
 
 class GraphDpNode;
@@ -34,30 +34,34 @@ using GraphDpNodeWeakPtr = std::weak_ptr<GraphDpNode>;
 using GraphDpNodeWeakPtrVec = std::vector<GraphDpNodeWeakPtr>;
 using GraphDpNodeWeakPtrVec2D = std::vector<GraphDpNodeWeakPtrVec>;
 
-class GraphDpNode { 
+class GraphDpNode {
  public:
   GraphDpNode(int first_idx, int second_idx, double node_score,
               int n_unknown_shifts, int max_known_mods);
-  int getFirstIdx() {return first_idx_;}
-  int getSecondIdx() {return second_idx_;}
+  int getFirstIdx() { return first_idx_; }
+  int getSecondIdx() { return second_idx_; }
 
-  double getNodeScore() {return node_score_;}
-  int getPrevEdgeType(int s, int m){return prev_edge_types_[s][m];}
-  int getPrevEdgeModNum(int s, int m){return prev_edge_mod_nums_[s][m];}
+  double getNodeScore() { return node_score_; }
+  int getPrevEdgeType(int s, int m) { return prev_edge_types_[s][m]; }
+  int getPrevEdgeModNum(int s, int m) { return prev_edge_mod_nums_[s][m]; }
 
-  double getBestScore(int s, int m) {return best_scores_[s][m];}
+  double getBestScore(int s, int m) { return best_scores_[s][m]; }
 
-  GraphDpNodePtr getPrevNodePtr(int s, int m){return prev_node_ptrs_[s][m].lock();}
+  GraphDpNodePtr getPrevNodePtr(int s, int m) {
+    return prev_node_ptrs_[s][m].lock();
+  }
 
   void updateTable(int s, int m, int path_type, int mod_num,
-                   const GraphDpNodePtr &prev_node_ptr, int score);
+                   const GraphDpNodePtr& prev_node_ptr, int score);
 
-  void updateBestShiftNode(int s, int m, double score, const GraphDpNodePtr &prev_node_ptr);
+  void updateBestShiftNode(int s, int m, double score,
+                           const GraphDpNodePtr& prev_node_ptr);
 
-  double getBestShiftScore(int s, int m) {return best_shift_scores_[s][m];}
+  double getBestShiftScore(int s, int m) { return best_shift_scores_[s][m]; }
 
-  GraphDpNodePtr getBestShiftNodePtr(int s, int m) {return best_shift_node_ptrs_[s][m].lock();}
-
+  GraphDpNodePtr getBestShiftNodePtr(int s, int m) {
+    return best_shift_node_ptrs_[s][m].lock();
+  }
 
  private:
   int first_idx_;
@@ -76,7 +80,6 @@ class GraphDpNode {
   GraphDpNodeWeakPtrVec2D best_shift_node_ptrs_;
   std::vector<std::vector<double>> best_shift_scores_;
 };
-
 
 } /* namespace toppic */
 

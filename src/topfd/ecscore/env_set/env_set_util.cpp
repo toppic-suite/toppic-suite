@@ -1,4 +1,5 @@
-// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,7 +28,7 @@ namespace toppic {
 
 namespace env_set_util {
 
-void removeNonMatchEnvs(MsMapEnvPtrVec &env_list, int refer_idx,
+void removeNonMatchEnvs(MsMapEnvPtrVec& env_list, int refer_idx,
                         int min_match_peak_num) {
   int idx = env_list.size() - 1;
   while (idx >= 0) {
@@ -40,18 +41,17 @@ void removeNonMatchEnvs(MsMapEnvPtrVec &env_list, int refer_idx,
   }
 }
 
-EnvSetPtr searchEnvSet(const MsMapPtr &ms_map_ptr, const SeedEnvPtr &seed_ptr,
-                       const EcscoreParaPtr &para_ptr, double sn_ratio) {
+EnvSetPtr searchEnvSet(const MsMapPtr& ms_map_ptr, const SeedEnvPtr& seed_ptr,
+                       const EcscoreParaPtr& para_ptr, double sn_ratio) {
   int start_spec_id = 0;
   int end_spec_id = ms_map_ptr->getRowNum() - 1;
-  return searchEnvSet(ms_map_ptr, seed_ptr, seed_ptr->getSpecId(), start_spec_id, end_spec_id,
-                      para_ptr, sn_ratio);
+  return searchEnvSet(ms_map_ptr, seed_ptr, seed_ptr->getSpecId(),
+                      start_spec_id, end_spec_id, para_ptr, sn_ratio);
 }
 
-EnvSetPtr searchEnvSet(const MsMapPtr &ms_map_ptr, const SeedEnvPtr &seed_ptr,
-                       int center_spec_id,
-                       int start_spec_id, int end_spec_id,
-                       const EcscoreParaPtr &para_ptr, double sn_ratio) {
+EnvSetPtr searchEnvSet(const MsMapPtr& ms_map_ptr, const SeedEnvPtr& seed_ptr,
+                       int center_spec_id, int start_spec_id, int end_spec_id,
+                       const EcscoreParaPtr& para_ptr, double sn_ratio) {
   double peak_mz_tole = para_ptr->getPeakMzTole();
   int refer_peak_idx = seed_ptr->getReferIdx();
   double min_inte = ms_map_ptr->getBaseInte() * sn_ratio;

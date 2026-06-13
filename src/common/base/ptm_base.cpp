@@ -1,25 +1,26 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include "common/base/ptm_base.hpp"
 
+#include <algorithm>
 #include <stdexcept>
 #include <string>
-#include <algorithm>
 
-#include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
+#include "common/util/logger.hpp"
 #include "common/xml/xml_dom_document.hpp"
 #include "common/xml/xml_dom_parser.hpp"
 #include "common/xml/xml_dom_util.hpp"
@@ -35,22 +36,23 @@ PtmPtr PtmBase::acetylation_ptr_;
 PtmPtr PtmBase::c57_ptr_;
 PtmPtr PtmBase::c58_ptr_;
 
-void PtmBase::initBase(const std::string &base_dir) {
+void PtmBase::initBase(const std::string& base_dir) {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (!parser) {
     LOG_ERROR("Error in parsing ptm data!");
     throw std::runtime_error("Error in parsing ptm data!");
   }
 
-  std::string ptm_base_file_name = base_dir 
-      + file_util::getFileSeparator() + "ptm_base.xml";
+  std::string ptm_base_file_name =
+      base_dir + file_util::getFileSeparator() + "ptm_base.xml";
   std::string ptm_base_data = file_util::readFile(ptm_base_file_name);
   XmlDOMDocument doc(parser->parseStr(ptm_base_data));
   XmlDOMElement parent = doc.getDocumentElement();
   std::string element_name = Ptm::getXmlElementName();
   int ptm_num = xml_dom_util::getChildCount(parent, element_name.c_str());
   for (int i = 0; i < ptm_num; i++) {
-    XmlDOMElement element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
+    XmlDOMElement element =
+        xml_dom_util::getChildElement(parent, element_name.c_str(), i);
     PtmPtr ptm_ptr = std::make_shared<Ptm>(element);
     ptm_ptr_vec_.push_back(ptm_ptr);
     ptm_abbr_name_map_[ptm_ptr->getAbbrName()] = ptm_ptr;
@@ -69,8 +71,8 @@ void PtmBase::initBase(const std::string &base_dir) {
       c58_ptr_ = ptm_ptr;
     }
   }
-  if (empty_ptm_ptr_ == nullptr || acetylation_ptr_ == nullptr
-      || c57_ptr_ == nullptr || c58_ptr_ == nullptr) {
+  if (empty_ptm_ptr_ == nullptr || acetylation_ptr_ == nullptr ||
+      c57_ptr_ == nullptr || c58_ptr_ == nullptr) {
     LOG_ERROR("There are some PTMs missing in initialization!");
     throw std::runtime_error("There are some PTMs missing in initialization!");
   }
@@ -79,7 +81,7 @@ void PtmBase::initBase(const std::string &base_dir) {
 
 // Returns a PTM based on the abbreviation name. Returns null if the
 // abbreviation name does not exist.
-PtmPtr PtmBase::getPtmPtrByAbbrName(const std::string &abbr_name) {
+PtmPtr PtmBase::getPtmPtrByAbbrName(const std::string& abbr_name) {
   auto it = ptm_abbr_name_map_.find(abbr_name);
   if (it == ptm_abbr_name_map_.end()) {
     LOG_ERROR("PTM " << abbr_name << " cannot be found!");
@@ -88,7 +90,7 @@ PtmPtr PtmBase::getPtmPtrByAbbrName(const std::string &abbr_name) {
   return it->second;
 }
 
-PtmPtr PtmBase::getPtmPtr(const PtmPtr &p) {
+PtmPtr PtmBase::getPtmPtr(const PtmPtr& p) {
   auto it = ptm_abbr_name_map_.find(p->getAbbrName());
   if (it != ptm_abbr_name_map_.end()) {
     return it->second;
@@ -99,7 +101,7 @@ PtmPtr PtmBase::getPtmPtr(const PtmPtr &p) {
 }
 
 // Checks if the list contains a PTM with the specific name.
-bool PtmBase::containsAbbrName(const std::string &abbr_name) {
+bool PtmBase::containsAbbrName(const std::string& abbr_name) {
   return ptm_abbr_name_map_.find(abbr_name) != ptm_abbr_name_map_.end();
 }
 
@@ -109,4 +111,3 @@ PtmPtr PtmBase::getPtmPtrFromXml(XmlDOMElement element) {
 }
 
 }  // namespace toppic
-

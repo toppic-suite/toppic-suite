@@ -1,16 +1,17 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #ifndef TOPPIC_SEQ_LOCAL_ANNO_HPP_
 #define TOPPIC_SEQ_LOCAL_ANNO_HPP_
@@ -32,31 +33,31 @@ class LocalAnno {
   explicit LocalAnno(XmlDOMElement element);
 
   LocalAnno(int left_pos, int right_pos, double conf,
-            const std::vector<double> & scr_vec,
-            double raw_scr, const PtmPtr &p);
+            const std::vector<double>& scr_vec, double raw_scr,
+            const PtmPtr& p);
 
-  int getLeftBpPos() const {return left_pos_;}
+  int getLeftBpPos() const { return left_pos_; }
 
-  int getRightBpPos() const {return right_pos_;}
+  int getRightBpPos() const { return right_pos_; }
   // get the confidence score
-  double getConf() const {return conf_;}
+  double getConf() const { return conf_; }
   // get the score vector containing score for each site
-  const std::vector<double>& getScrVec() const {return scr_vec_;}
+  const std::vector<double>& getScrVec() const { return scr_vec_; }
 
   double getScr() const;
 
-  PtmPtr getPtmPtr() const {return ptm_ptr_;}
+  PtmPtr getPtmPtr() const { return ptm_ptr_; }
 
   // raw score is not used in toppic and topmg
-  double getRawScr() const {return raw_scr_;}
+  double getRawScr() const { return raw_scr_; }
 
-  void setRawScr(double s) {raw_scr_ = s;}
+  void setRawScr(double s) { raw_scr_ = s; }
 
-  double getMassShift() const {return mass_shift_;}
+  double getMassShift() const { return mass_shift_; }
 
-  void setMassShift(double m) {mass_shift_ = m;}
+  void setMassShift(double m) { mass_shift_ = m; }
 
-  static std::string getXmlElementName() {return "localization_annotation";}
+  static std::string getXmlElementName() { return "localization_annotation"; }
 
   void appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) const;
 

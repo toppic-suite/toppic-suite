@@ -1,34 +1,36 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#include "ms/feature/frac_feature_reader.hpp"
 
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
-#include "ms/feature/frac_feature_reader.hpp"
 
 namespace toppic {
 
-FracFeatureReader::FracFeatureReader(const std::string &file_name):
-    file_name_(file_name) {
-      input_.open(file_name);
-      if (!input_.is_open()) {
-        LOG_ERROR("Feature file  " << file_name << " does not exist.");
-        exit(EXIT_FAILURE); 
-      }
-      // read header line
-      std::string line;
-      std::getline(input_, line);
-    }
+FracFeatureReader::FracFeatureReader(const std::string& file_name)
+    : file_name_(file_name) {
+  input_.open(file_name);
+  if (!input_.is_open()) {
+    LOG_ERROR("Feature file  " << file_name << " does not exist.");
+    exit(EXIT_FAILURE);
+  }
+  // read header line
+  std::string line;
+  std::getline(input_, line);
+}
 
 FracFeatureReader::~FracFeatureReader() {
   if (input_.is_open()) {
@@ -36,24 +38,20 @@ FracFeatureReader::~FracFeatureReader() {
   }
 }
 
-void FracFeatureReader::close() {
-  input_.close();
-}
+void FracFeatureReader::close() { input_.close(); }
 
 FracFeaturePtr FracFeatureReader::readOneFeature() {
-  std::string line; 
+  std::string line;
   if (std::getline(input_, line)) {
     str_util::trim(line);
-    //std::cout << "line " << line << std::endl;
+    // std::cout << "line " << line << std::endl;
     FracFeaturePtr feature = std::make_shared<FracFeature>(line);
-    //std::cout << "feature created " << std::endl;
+    // std::cout << "feature created " << std::endl;
     return feature;
-  }
-  else {
+  } else {
     return nullptr;
   }
 }
-
 
 FracFeaturePtrVec FracFeatureReader::readAllFeatures() {
   FracFeaturePtrVec all_features;
@@ -63,6 +61,5 @@ FracFeaturePtrVec FracFeatureReader::readAllFeatures() {
   }
   return all_features;
 }
-
 
 }  // namespace toppic

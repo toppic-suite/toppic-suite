@@ -1,16 +1,17 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include "common/base/ptm.hpp"
 
@@ -22,12 +23,12 @@
 
 namespace toppic {
 
-Ptm::Ptm(const std::string &name, const std::string &abbr_name,
-         double mono_mass, int unimod_id):
-    name_(name),
-    abbr_name_(abbr_name),
-    mono_mass_(mono_mass),
-    unimod_id_(unimod_id) {}
+Ptm::Ptm(const std::string& name, const std::string& abbr_name,
+         double mono_mass, int unimod_id)
+    : name_(name),
+      abbr_name_(abbr_name),
+      mono_mass_(mono_mass),
+      unimod_id_(unimod_id) {}
 
 Ptm::Ptm(XmlDOMElement element) {
   name_ = xml_dom_util::getChildValue(element, "name", 0);
@@ -36,18 +37,21 @@ Ptm::Ptm(XmlDOMElement element) {
   unimod_id_ = xml_dom_util::getIntChildValue(element, "unimod", 0);
 }
 
-void Ptm::appendAbbrNameToXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) const {
+void Ptm::appendAbbrNameToXml(XmlDOMDocument* xml_doc,
+                              XmlDOMElement parent) const {
   appendAbbrNameToXml(xml_doc, parent, Ptm::getXmlElementName());
 }
 
-void Ptm::appendAbbrNameToXml(XmlDOMDocument* xml_doc, XmlDOMElement parent, const std::string &element_name) const {
+void Ptm::appendAbbrNameToXml(XmlDOMDocument* xml_doc, XmlDOMElement parent,
+                              const std::string& element_name) const {
   XmlDOMElement element = xml_doc->addElement(parent, element_name.c_str());
   xml_doc->addElement(element, "abbreviation", abbr_name_.c_str());
   std::string str = std::to_string(unimod_id_);
   xml_doc->addElement(element, "unimod", str.c_str());
 }
 
-void Ptm::appendAbbrNameMassToXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) const {
+void Ptm::appendAbbrNameMassToXml(XmlDOMDocument* xml_doc,
+                                  XmlDOMElement parent) const {
   std::string element_name = Ptm::getXmlElementName();
   XmlDOMElement element = xml_doc->addElement(parent, element_name.c_str());
   xml_doc->addElement(element, "abbreviation", abbr_name_.c_str());
@@ -62,4 +66,3 @@ std::string Ptm::getAbbrNameFromXml(XmlDOMElement element) {
 }
 
 }  // namespace toppic
-

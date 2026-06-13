@@ -1,4 +1,5 @@
-// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,7 +33,7 @@ namespace toppic {
 // add a namespace to avoid duplicated method names
 namespace deconv_ms2_process {
 
-std::string updateMsTwoMsg(const MsHeaderPtr &header_ptr, int scan_cnt,
+std::string updateMsTwoMsg(const MsHeaderPtr& header_ptr, int scan_cnt,
                            int total_scan_num) {
   std::string percentage = std::to_string(scan_cnt * 100 / total_scan_num);
   std::string msg = "Processing MS/MS spectrum scan " +
@@ -44,11 +45,11 @@ std::string updateMsTwoMsg(const MsHeaderPtr &header_ptr, int scan_cnt,
   return msg;
 }
 
-void deconvMsTwo(const MzmlMsPtr &ms_ptr, SpecFeaturePtrVec sp_feat_ptr_vec,
-                 const TopfdParaPtr &topfd_para_ptr,
-                 const MsAlignWriterPtrVec &ms2_writer_ptr_vec,
-                 const SimpleThreadPoolPtr &pool_ptr,
-                 const MzmlMsSqlWriterPtr &sql_writer_ptr) {
+void deconvMsTwo(const MzmlMsPtr& ms_ptr, SpecFeaturePtrVec sp_feat_ptr_vec,
+                 const TopfdParaPtr& topfd_para_ptr,
+                 const MsAlignWriterPtrVec& ms2_writer_ptr_vec,
+                 const SimpleThreadPoolPtr& pool_ptr,
+                 const MzmlMsSqlWriterPtr& sql_writer_ptr) {
   // 1. Find max_mass and max_charge
   double max_mass = 0;
   int max_charge = 1;
@@ -110,12 +111,12 @@ void deconvMsTwo(const MzmlMsPtr &ms_ptr, SpecFeaturePtrVec sp_feat_ptr_vec,
   }
 }
 
-std::function<void()> geneMsTwoTask(const MzmlMsPtr &ms_ptr,
-                                    const SpecFeaturePtrVec &feat_ptr_vec,
-                                    const TopfdParaPtr &topfd_para_ptr,
-                                    const MsAlignWriterPtrVec &ms2_writer_ptr_vec,
-                                    const SimpleThreadPoolPtr &pool_ptr,
-                                    const MzmlMsSqlWriterPtr &sql_writer_ptr) {
+std::function<void()> geneMsTwoTask(
+    const MzmlMsPtr& ms_ptr, const SpecFeaturePtrVec& feat_ptr_vec,
+    const TopfdParaPtr& topfd_para_ptr,
+    const MsAlignWriterPtrVec& ms2_writer_ptr_vec,
+    const SimpleThreadPoolPtr& pool_ptr,
+    const MzmlMsSqlWriterPtr& sql_writer_ptr) {
   return [ms_ptr, feat_ptr_vec, topfd_para_ptr, ms2_writer_ptr_vec, pool_ptr,
           sql_writer_ptr]() {
     deconvMsTwo(ms_ptr, feat_ptr_vec, topfd_para_ptr, ms2_writer_ptr_vec,
@@ -125,14 +126,14 @@ std::function<void()> geneMsTwoTask(const MzmlMsPtr &ms_ptr,
 
 }  // namespace deconv_ms2_process
 
-DeconvMs2Process::DeconvMs2Process(const TopfdParaPtr &topfd_para_ptr, 
-                                   const std::string & output_filename_ext) {
+DeconvMs2Process::DeconvMs2Process(const TopfdParaPtr& topfd_para_ptr,
+                                   const std::string& output_filename_ext) {
   topfd_para_ptr_ = topfd_para_ptr;
   output_filename_ext_ = output_filename_ext;
 }
 
 void DeconvMs2Process::readSpecFeature(
-    std::string feat_file_name, std::map<int, SpecFeaturePtrVec> &feat_map) {
+    std::string feat_file_name, std::map<int, SpecFeaturePtrVec>& feat_map) {
   SpecFeatureReaderPtr sp_feat_reader =
       std::make_shared<SpecFeatureReader>(feat_file_name);
   SpecFeaturePtrVec sp_feat_ptr_vec = sp_feat_reader->readAllFeatures();
@@ -164,17 +165,18 @@ void DeconvMs2Process::process() {
     LOG_ERROR("No spectrum to read in mzML file!");
     return;
   }
-  // One SQLite writer shared across the worker threads (internally synchronized,
-  // batched); created only when SQLite output is enabled.
-  MzmlMsSqlWriterPtr sql_writer_ptr = topfd_para_ptr_->isGeneSql()
-      ? std::make_shared<MzmlMsSqlWriter>(topfd_para_ptr_->getSqlDb())
-      : nullptr;
+  // One SQLite writer shared across the worker threads (internally
+  // synchronized, batched); created only when SQLite output is enabled.
+  MzmlMsSqlWriterPtr sql_writer_ptr =
+      topfd_para_ptr_->isGeneSql()
+          ? std::make_shared<MzmlMsSqlWriter>(topfd_para_ptr_->getSqlDb())
+          : nullptr;
   // init thread pool
   int thread_num = topfd_para_ptr_->getThreadNum();
   SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(thread_num);
   // init msalign writer vector for multiple threads
   std::string output_base_name = topfd_para_ptr_->getOutputBaseName();
-  std::string ms2_msalign_name = output_base_name + "_" + output_filename_ext_; 
+  std::string ms2_msalign_name = output_base_name + "_" + output_filename_ext_;
   MsAlignWriterPtrVec ms2_writer_ptr_vec;
   for (int i = 0; i < thread_num; i++) {
     MsAlignWriterPtr ms2_ptr = std::make_shared<MsAlignWriter>(
@@ -215,19 +217,23 @@ void DeconvMs2Process::process() {
         feat_it = feat_map.find(ms_ptr->getMsHeaderPtr()->getSpecId());
         if (feat_it != feat_map.end()) {
           SpecFeaturePtrVec feat_list = feat_it->second;
-          std::sort(feat_list.begin(), feat_list.end(), SpecFeature::cmpPrecInteDec);
+          std::sort(feat_list.begin(), feat_list.end(),
+                    SpecFeature::cmpPrecInteDec);
           sp_feat_ptr_vec.push_back(feat_list[0]);
           double first_inte = feat_list[0]->getPrecInte();
           for (std::size_t i = 1; i < feat_list.size(); i++) {
             if (feat_list[i]->getPrecInte() >=
                 first_inte * topfd_para_ptr_->getPrecInteCutoffRatio()) {
               sp_feat_ptr_vec.push_back(feat_list[i]);
-              LOG_DEBUG("Inte " << feat_list[i]->getPrecInte() <<  " first inte " << first_inte); 
+              LOG_DEBUG("Inte " << feat_list[i]->getPrecInte() << " first inte "
+                                << first_inte);
             }
           }
           LOG_DEBUG("Spectrum " << ms_ptr->getMsHeaderPtr()->getFirstScanNum()
-                    << " feature " << feat_list.size() << " filtered " 
-                    << (feat_list.size() -sp_feat_ptr_vec.size()) << " features."); 
+                                << " feature " << feat_list.size()
+                                << " filtered "
+                                << (feat_list.size() - sp_feat_ptr_vec.size())
+                                << " features.");
         }
       }
       pool_ptr->enqueue(deconv_ms2_process::geneMsTwoTask(
@@ -249,13 +255,13 @@ void DeconvMs2Process::process() {
   // Merge files
   std::string para_str = topfd_para_ptr_->getParaStr("#", "\t");
   MsalignThreadMergePtr ms2_merge_ptr = std::make_shared<MsalignThreadMerge>(
-      output_filename_ext_, topfd_para_ptr_->getThreadNum(), output_filename_ext_,
-      output_base_name, para_str);
+      output_filename_ext_, topfd_para_ptr_->getThreadNum(),
+      output_filename_ext_, output_base_name, para_str);
   ms2_merge_ptr->process();
 
   // remove temporary files
-  std::string ms2_prefix =
-      file_util::absoluteName(output_base_name) + "_" + output_filename_ext_ + "_";
+  std::string ms2_prefix = file_util::absoluteName(output_base_name) + "_" +
+                           output_filename_ext_ + "_";
   std::replace(output_base_name.begin(), output_base_name.end(), '\\', '/');
   file_util::cleanPrefix(output_base_name, ms2_prefix);
   std::cout << std::endl;

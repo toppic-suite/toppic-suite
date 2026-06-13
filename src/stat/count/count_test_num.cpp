@@ -1,33 +1,35 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include "stat/count/count_test_num.hpp"
 
 #include <cmath>
 
+#include "common/base/mod_util.hpp"
+#include "common/base/residue_base.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
 #include "seq/fasta_reader.hpp"
-#include "common/base/mod_util.hpp"
-#include "common/base/residue_base.hpp"
 #include "seq/proteoform_factory.hpp"
 #include "stat/count/count_util.hpp"
 
 namespace toppic {
 
-CountTestNum::CountTestNum(double convert_ratio, double max_ptm_mass, 
-                           double max_prec_mass, const PrsmParaPtr &prsm_para_ptr) {
+CountTestNum::CountTestNum(double convert_ratio, double max_ptm_mass,
+                           double max_prec_mass,
+                           const PrsmParaPtr& prsm_para_ptr) {
   convert_ratio_ = convert_ratio;
   max_ptm_mass_ = max_ptm_mass;
   max_sp_len_ = static_cast<int>(std::round(max_prec_mass * convert_ratio_));
@@ -61,15 +63,17 @@ inline int CountTestNum::convertMass(double m) {
   return n;
 }
 
-void CountTestNum::init(const PrsmParaPtr &para_ptr) {
+void CountTestNum::init(const PrsmParaPtr& para_ptr) {
   std::string db_file_name = para_ptr->getSearchDbFileNameWithFolder();
-  comp_mass_cnts_ = new double[max_sp_len_](); 
+  comp_mass_cnts_ = new double[max_sp_len_]();
   pref_mass_cnts_ = new double[max_sp_len_]();
   suff_mass_cnts_ = new double[max_sp_len_]();
 
-  ResiduePtrVec non_ptm_residue_list = ResidueBase::getBaseNonePtmResiduePtrVec();
+  ResiduePtrVec non_ptm_residue_list =
+      ResidueBase::getBaseNonePtmResiduePtrVec();
   ModPtrVec fix_mod_list = para_ptr->getFixModPtrVec();
-  ResiduePtrVec residue_list = mod_util::geneResidueListWithMod(non_ptm_residue_list, fix_mod_list);
+  ResiduePtrVec residue_list =
+      mod_util::geneResidueListWithMod(non_ptm_residue_list, fix_mod_list);
 
   std::vector<double> residue_counts(residue_list.size(), 0.0);
 
@@ -81,20 +85,24 @@ void CountTestNum::init(const PrsmParaPtr &para_ptr) {
   FastaSeqPtr seq_ptr = reader.getNextSeq();
 
   while (seq_ptr != nullptr) {
-    ProteoformPtr proteo_ptr = proteoform_factory::geneDbProteoformPtr(seq_ptr, fix_mod_list);
-    ProteoformPtrVec mod_proteo_ptrs = proteoform_factory::geneProtModProteoform(proteo_ptr, prot_mods);
+    ProteoformPtr proteo_ptr =
+        proteoform_factory::geneDbProteoformPtr(seq_ptr, fix_mod_list);
+    ProteoformPtrVec mod_proteo_ptrs =
+        proteoform_factory::geneProtModProteoform(proteo_ptr, prot_mods);
     for (size_t i = 0; i < mod_proteo_ptrs.size(); i++) {
       // complete
       double m = mod_proteo_ptrs[i]->getResSeqPtr()->getResMassSum();
       comp_mass_cnts_[convertMass(m)] += 1.0;
       // prefix
-      std::vector<double> prm_masses = mod_proteo_ptrs[i]->getBpSpecPtr()->getPrmMasses();
+      std::vector<double> prm_masses =
+          mod_proteo_ptrs[i]->getBpSpecPtr()->getPrmMasses();
       for (size_t j = 1; j < prm_masses.size() - 1; j++) {
         pref_mass_cnts_[convertMass(prm_masses[j])] += 1.0;
       }
     }
     // suffix
-    BreakPointPtrVec break_points = proteo_ptr->getBpSpecPtr()->getBreakPointPtrVec();
+    BreakPointPtrVec break_points =
+        proteo_ptr->getBpSpecPtr()->getBreakPointPtrVec();
     for (size_t i = 1; i < break_points.size() - 1; i++) {
       suff_mass_cnts_[convertMass(break_points[i]->getSrm())] += 1.0;
     }
@@ -105,25 +113,28 @@ void CountTestNum::init(const PrsmParaPtr &para_ptr) {
       mod_proteo_lens_.push_back(mod_proteo_ptrs[i]->getLen());
     }
 
-    // update residue counts 
-    count_util::updateResidueCounts(residue_list,residue_counts, proteo_ptr);
+    // update residue counts
+    count_util::updateResidueCounts(residue_list, residue_counts, proteo_ptr);
 
     // update n terminal residue counts
-    count_util::updateNTermResidueCounts(n_term_residue_list, n_term_residue_counts, mod_proteo_ptrs);
+    count_util::updateNTermResidueCounts(
+        n_term_residue_list, n_term_residue_counts, mod_proteo_ptrs);
 
-    // next protein 
+    // next protein
     seq_ptr = reader.getNextSeq();
   }
   // compute residue freq;
-  residue_ptrs_ =  count_util::compResidueFreq(residue_list, residue_counts);
+  residue_ptrs_ = count_util::compResidueFreq(residue_list, residue_counts);
 
   // compute residue average length
-  residue_avg_len_ = count_util::computeAvgLength(residue_ptrs_, convert_ratio_);
+  residue_avg_len_ =
+      count_util::computeAvgLength(residue_ptrs_, convert_ratio_);
 
   // compute n term residue freq;
-  prot_n_term_residue_ptrs_ =  count_util::compResidueFreq(n_term_residue_list, n_term_residue_counts);
+  prot_n_term_residue_ptrs_ =
+      count_util::compResidueFreq(n_term_residue_list, n_term_residue_counts);
 
-  // internal 
+  // internal
   initInternalMassCnt();
 }
 
@@ -136,19 +147,20 @@ inline void CountTestNum::initInternalMassCnt() {
   LOG_DEBUG("residue_avg_len_ " << residue_avg_len_);
   for (int i = max_sp_len_ - 1; i >= 0; i--) {
     norm_count += suff_mass_cnts_[i];
-    internal_mass_cnts_[i] = norm_count/ residue_avg_len_;
+    internal_mass_cnts_[i] = norm_count / residue_avg_len_;
   }
 }
 
-double CountTestNum::compCandNum(const ProteoformTypePtr &type_ptr, int index, 
+double CountTestNum::compCandNum(const ProteoformTypePtr& type_ptr, int index,
                                  double ori_mass, double ori_tolerance) {
   double cand_num = 0;
   if (index == 0) {
     cand_num = compNonPtmCandNum(type_ptr, ori_mass, ori_tolerance);
-  } else if (index >= 1){ // with shifts
+  } else if (index >= 1) {  // with shifts
     cand_num = compPtmRestrictCandNum(type_ptr, index, ori_mass);
-    // multiple adjustment 
-    if (type_ptr == ProteoformType::PREFIX || type_ptr == ProteoformType::SUFFIX) {
+    // multiple adjustment
+    if (type_ptr == ProteoformType::PREFIX ||
+        type_ptr == ProteoformType::SUFFIX) {
       cand_num = cand_num * PREFIX_SUFFIX_ADJUST();
     } else if (type_ptr == ProteoformType::INTERNAL) {
       cand_num = cand_num * INTERNAL_ADJUST();
@@ -161,7 +173,7 @@ double CountTestNum::compCandNum(const ProteoformTypePtr &type_ptr, int index,
   return cand_num;
 }
 
-double CountTestNum::compNonPtmCandNum(const ProteoformTypePtr &type_ptr,
+double CountTestNum::compNonPtmCandNum(const ProteoformTypePtr& type_ptr,
                                        double ori_mass, double ori_tolerance) {
   int low = std::floor((ori_mass - ori_tolerance) * convert_ratio_);
   int high = std::ceil((ori_mass + ori_tolerance) * convert_ratio_);
@@ -170,7 +182,7 @@ double CountTestNum::compNonPtmCandNum(const ProteoformTypePtr &type_ptr,
   return cand_num;
 }
 
-double CountTestNum::compPtmCandNum(const ProteoformTypePtr &type_ptr) {
+double CountTestNum::compPtmCandNum(const ProteoformTypePtr& type_ptr) {
   double cand_num = 0;
   if (type_ptr == ProteoformType::COMPLETE) {
     cand_num = mod_proteo_lens_.size();
@@ -190,7 +202,7 @@ double CountTestNum::compPtmCandNum(const ProteoformTypePtr &type_ptr) {
   return cand_num;
 }
 
-double CountTestNum::compPtmRestrictCandNum(const ProteoformTypePtr &type_ptr,
+double CountTestNum::compPtmRestrictCandNum(const ProteoformTypePtr& type_ptr,
                                             int shift_num, double ori_mass) {
   double shift = max_ptm_mass_ * shift_num;
   int low = std::floor((ori_mass - shift) * convert_ratio_);
@@ -199,7 +211,8 @@ double CountTestNum::compPtmRestrictCandNum(const ProteoformTypePtr &type_ptr,
   return cand_num;
 }
 
-double CountTestNum::compSeqNum(const ProteoformTypePtr &type_ptr, int low, int high) {
+double CountTestNum::compSeqNum(const ProteoformTypePtr& type_ptr, int low,
+                                int high) {
   double candNum = 0;
   if (type_ptr == ProteoformType::COMPLETE) {
     candNum = compMassNum(comp_mass_cnts_, low, high);
@@ -213,7 +226,7 @@ double CountTestNum::compSeqNum(const ProteoformTypePtr &type_ptr, int low, int 
   return candNum;
 }
 
-double CountTestNum::compMassNum(double *cnts, int low, int high) {
+double CountTestNum::compMassNum(double* cnts, int low, int high) {
   double cnt = 0;
   if (high >= max_sp_len_) {
     high = max_sp_len_ - 1;

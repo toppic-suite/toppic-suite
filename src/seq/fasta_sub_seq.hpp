@@ -1,16 +1,17 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #ifndef TOPPIC_SEQ_FASTA_SUB_SEQ_HPP_
 #define TOPPIC_SEQ_FASTA_SUB_SEQ_HPP_
@@ -21,15 +22,15 @@ namespace toppic {
 
 class FastaSubSeq : public FastaSeq {
  public:
-  FastaSubSeq(const FastaSeqPtr &seq_ptr, int sub_seq_start, int sub_seq_len);
+  FastaSubSeq(const FastaSeqPtr& seq_ptr, int sub_seq_start, int sub_seq_len);
 
-  int getSubSeqStart() const {return sub_seq_start_;}
+  int getSubSeqStart() const { return sub_seq_start_; }
 
-  int getSubSeqEnd() const {return sub_seq_end_;}
+  int getSubSeqEnd() const { return sub_seq_end_; }
 
-  bool isNTerm() const {return sub_seq_start_ == 0;}
+  bool isNTerm() const { return sub_seq_start_ == 0; }
 
-  int getLen() const {return length_;}
+  int getLen() const { return length_; }
 
  private:
   int sub_seq_start_;

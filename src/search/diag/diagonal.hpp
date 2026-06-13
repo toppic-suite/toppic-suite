@@ -1,16 +1,17 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #ifndef TOPPIC_SEARCH_DIAG_DIAGONAL_HPP_
 #define TOPPIC_SEARCH_DIAG_DIAGONAL_HPP_
@@ -26,32 +27,31 @@ using DiagonalPtr = std::shared_ptr<Diagonal>;
 using DiagonalPtrVec = std::vector<DiagonalPtr>;
 
 class Diagonal {
-  public:
-    Diagonal() {}
+ public:
+  Diagonal() {}
 
-    // Add construction method here because a template 
-    // is used. 
-    explicit Diagonal(const DiagHeaderPtr &header_ptr):
-      header_ptr_(header_ptr) {}
+  // Add construction method here because a template
+  // is used.
+  explicit Diagonal(const DiagHeaderPtr& header_ptr)
+      : header_ptr_(header_ptr) {}
 
-    // need init pair_ptr_list after create
-    explicit Diagonal(const DiagHeaderPtr &header_ptr, 
-                      const DiagPairPtrVec &pair_ptr_list):
-      header_ptr_(header_ptr),
-      pair_ptr_list_(pair_ptr_list) {}
+  // need init pair_ptr_list after create
+  explicit Diagonal(const DiagHeaderPtr& header_ptr,
+                    const DiagPairPtrVec& pair_ptr_list)
+      : header_ptr_(header_ptr), pair_ptr_list_(pair_ptr_list) {}
 
-    size_t size() {return pair_ptr_list_.size(); }
+  size_t size() { return pair_ptr_list_.size(); }
 
-    DiagHeaderPtr getHeader() {return header_ptr_;}
+  DiagHeaderPtr getHeader() { return header_ptr_; }
 
-    const DiagPairPtrVec& getDiagPairPtrVec() {return pair_ptr_list_;}
+  const DiagPairPtrVec& getDiagPairPtrVec() { return pair_ptr_list_; }
 
-    DiagPairPtr getDiagPair(int i) {return pair_ptr_list_[i];}
+  DiagPairPtr getDiagPair(int i) { return pair_ptr_list_[i]; }
 
-  private:
-    DiagHeaderPtr header_ptr_;
+ private:
+  DiagHeaderPtr header_ptr_;
 
-    DiagPairPtrVec pair_ptr_list_;
+  DiagPairPtrVec pair_ptr_list_;
 };
 
 } /* namespace toppic */

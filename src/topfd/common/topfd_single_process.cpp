@@ -1,16 +1,17 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 //
 #include "topfd/common/topfd_single_process.hpp"
 
@@ -41,32 +42,32 @@ PeakPtrVec readPeakFile(std::string file_name) {
     str_util::trim(line);
     if (line.length() == 0) {
       continue;
-    } 
+    }
     std::vector<std::string> strs = str_util::split(line, " ");
     double mz = std::stod(strs[0]);
     double inte = std::stod(strs[1]);
-    //std::cout << "mz " << mz << " intensity " << inte << std::endl;
+    // std::cout << "mz " << mz << " intensity " << inte << std::endl;
     PeakPtr peak_ptr = std::make_shared<Peak>(mz, inte);
     peak_list.push_back(peak_ptr);
   }
   input.close();
-  //std::cout << "peak list finished" << std::endl;
+  // std::cout << "peak list finished" << std::endl;
   return peak_list;
 }
 
-int processOneFile(const TopfdParaPtr &para_ptr, 
-    const std::string &spec_file_name) {
+int processOneFile(const TopfdParaPtr& para_ptr,
+                   const std::string& spec_file_name) {
   try {
     int ms_level = 2;
     double max_mass = para_ptr->getMaxMass();
     double max_charge = para_ptr->getMaxCharge();
-    PeakPtrVec peak_list = readPeakFile(spec_file_name); 
+    PeakPtrVec peak_list = readPeakFile(spec_file_name);
 
-    MatchEnvPtrVec result_envs; 
+    MatchEnvPtrVec result_envs;
     if (peak_list.size() > 0) {
-      DeconvSingleSpPtr deconv_ptr = std::make_shared<DeconvSingleSp>(para_ptr, peak_list, 
-          ms_level, max_mass, max_charge);
-      result_envs = deconv_ptr->deconv(); 
+      DeconvSingleSpPtr deconv_ptr = std::make_shared<DeconvSingleSp>(
+          para_ptr, peak_list, ms_level, max_mass, max_charge);
+      result_envs = deconv_ptr->deconv();
     }
 
     // header
@@ -74,11 +75,13 @@ int processOneFile(const TopfdParaPtr &para_ptr,
     header_ptr->setSpecId(0);
     header_ptr->setSingleScan(1);
 
-    DeconvMsPtr ms_ptr = match_env_util::getDeconvMsPtr(header_ptr, result_envs);
+    DeconvMsPtr ms_ptr =
+        match_env_util::getDeconvMsPtr(header_ptr, result_envs);
 
     std::string output_base_name = para_ptr->getOutputBaseName();
     std::string ms2_msalign_name = output_base_name + "_ms2.msalign";
-    MsAlignWriterPtr ms2_writer_ptr = std::make_shared<MsAlignWriter>(ms2_msalign_name);
+    MsAlignWriterPtr ms2_writer_ptr =
+        std::make_shared<MsAlignWriter>(ms2_msalign_name);
     ms2_writer_ptr->writeMs(ms_ptr);
     ms2_writer_ptr = nullptr;
     std::string ms_env_name = output_base_name + "_ms2.env";
@@ -90,7 +93,8 @@ int processOneFile(const TopfdParaPtr &para_ptr,
   return 0;
 }
 
-int process(const TopfdParaPtr &para_ptr,  std::vector<std::string> spec_file_list) {
+int process(const TopfdParaPtr& para_ptr,
+            std::vector<std::string> spec_file_list) {
   // init data, envelope base, envcnn model, and ecscore model
   base_data::init(para_ptr->getResourceDir());
   EnvBase::initBase(para_ptr->getResourceDir());
@@ -99,7 +103,8 @@ int process(const TopfdParaPtr &para_ptr,  std::vector<std::string> spec_file_li
   for (size_t k = 0; k < spec_file_list.size(); k++) {
     std::cout << "Processing " << spec_file_list[k] << " started." << std::endl;
     processOneFile(para_ptr, spec_file_list[k]);
-    std::cout << "Processing " << spec_file_list[k] << " finished." << std::endl;
+    std::cout << "Processing " << spec_file_list[k] << " finished."
+              << std::endl;
     std::cout << "Timestamp: " << time_util::getTimeStr() << std::endl;
   }
 
@@ -108,9 +113,6 @@ int process(const TopfdParaPtr &para_ptr,  std::vector<std::string> spec_file_li
   return 0;
 }
 
-
-
-} // namespace topfd_process 
+}  // namespace topfd_single_process
 
 }  // namespace toppic
-
