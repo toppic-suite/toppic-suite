@@ -45,7 +45,6 @@ class TopfdPara {
   const std::string& getExeDir() const { return exe_dir_; }
   const std::string& getResourceDir() const { return resource_dir_; }
   bool isMissingLevelOne() const { return missing_level_one_; }
-  bool isHybridMode() const { return hybrid_mode_; }
   int getMaxCharge() const { return max_charge_; }
   double getMaxMass() const { return max_mass_; }
   double getMzError() const { return mz_error_; }
@@ -91,7 +90,6 @@ class TopfdPara {
   void setExeDir(std::string dir) { exe_dir_ = std::move(dir); }
   void setResourceDir(std::string dir) { resource_dir_ = std::move(dir); }
   void setMissingLevelOne(bool missing) { missing_level_one_ = missing; }
-  void setHybridMode(bool hybrid) { hybrid_mode_ = hybrid; }
   void setMaxCharge(int charge) { max_charge_ = charge; }
   void setMaxMass(double mass) { max_mass_ = mass; }
   void setMzError(double error) { mz_error_ = error; }
@@ -163,7 +161,6 @@ class TopfdPara {
   // contain the precursor window information
   double prec_window_ = 3.0;
   bool missing_level_one_ = false;
-  bool hybrid_mode_ = false;
   double mz_error_ = 0.02;
   double ms_one_sn_ratio_ = 3.0;
   double ms_two_sn_ratio_ = 1.0;

@@ -50,7 +50,7 @@ void processFraction(const TopfdParaPtr& para_ptr) {
   // print parameters for each fraction
   std::cout << para_ptr->getParaStr("", " ");
 
-  if (!para_ptr->isMissingLevelOne() && !para_ptr->isHybridMode()) {
+  if (!para_ptr->isMissingLevelOne()) {
     // MS1 spectra are present: deconvolute them and detect features first.
     std::cout << "MS1 deconvolution started." << std::endl;
     DeconvMs1ProcessPtr ms1_proc_ptr =
