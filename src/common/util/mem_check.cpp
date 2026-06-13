@@ -63,8 +63,8 @@ double getTotalMemInGb() {
   if (!GlobalMemoryStatusEx(&mem_info)) {
     return -1;
   }
-  double kBytesPerGb = 1024.0 * 1024.0 * 1024.0;
-  return mem_info.ullTotalPhys / kBytesPerGb;
+  double bytes_per_gb = 1024.0 * 1024.0 * 1024.0;
+  return mem_info.ullTotalPhys / bytes_per_gb;
 #elif defined(__APPLE__)
   // hw.memsize is the physical memory size in bytes.
   int64_t total_mem = 0;
@@ -72,8 +72,8 @@ double getTotalMemInGb() {
   if (sysctlbyname("hw.memsize", &total_mem, &len, nullptr, 0) != 0) {
     return -1;
   }
-  double kBytesPerGb = 1024.0 * 1024.0 * 1024.0;
-  return total_mem / kBytesPerGb;
+  double bytes_per_gb = 1024.0 * 1024.0 * 1024.0;
+  return total_mem / bytes_per_gb;
 #else
   // Linux: MemTotal in /proc/meminfo is reported in kB.
   std::string token;
@@ -102,8 +102,8 @@ double getAvailMemInGb() {
   MEMORYSTATUSEX mem_info;
   mem_info.dwLength = sizeof(MEMORYSTATUSEX);
   if (GlobalMemoryStatusEx(&mem_info)) {
-    double kBytesPerGb = 1024.0 * 1024.0 * 1024.0;
-    avail_mem_in_gb = mem_info.ullAvailPhys / kBytesPerGb;
+    double bytes_per_gb = 1024.0 * 1024.0 * 1024.0;
+    avail_mem_in_gb = mem_info.ullAvailPhys / bytes_per_gb;
   }
 #elif defined(__APPLE__)
   // macOS has no MemAvailable; approximate it with the free and inactive
@@ -119,8 +119,8 @@ double getAvailMemInGb() {
     uint64_t avail_bytes =
         (static_cast<uint64_t>(vm_stat.free_count) + vm_stat.inactive_count) *
         page_size;
-    double kBytesPerGb = 1024.0 * 1024.0 * 1024.0;
-    avail_mem_in_gb = avail_bytes / kBytesPerGb;
+    double bytes_per_gb = 1024.0 * 1024.0 * 1024.0;
+    avail_mem_in_gb = avail_bytes / bytes_per_gb;
   }
 #else
   // Linux: MemAvailable in /proc/meminfo is reported in kB.
