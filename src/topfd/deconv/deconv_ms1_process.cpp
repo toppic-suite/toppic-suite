@@ -17,7 +17,10 @@
 #include "topfd/deconv/deconv_ms1_process.hpp"
 
 #include <cstddef>
+#include <memory>
 #include <string>
+#include <utility>
+#include <vector>
 
 #include "common/thread/simple_thread_pool.hpp"
 #include "common/util/logger.hpp"
@@ -37,11 +40,27 @@ namespace toppic {
 // add a namespace to avoid duplicated method names
 namespace deconv_ms1_process {
 
+// One deconvoluted MS1 spectrum's data, buffered in memory so the slow SQLite
+// writes can be deferred and done sequentially after the parallel
+// deconvolution finishes, instead of every worker thread contending on the
+// writer lock and the SSD.
+struct Ms1SqlRecord {
+  MzmlMsPtr ms_ptr;
+  MatchEnvPtrVec result_envs;
+  double base_inte;
+  double min_ref_inte;
+};
+
+// One record buffer per worker thread (indexed by writer id) so threads append
+// without locking.
+using Ms1SqlBuffer = std::vector<std::vector<Ms1SqlRecord>>;
+using Ms1SqlBufferPtr = std::shared_ptr<Ms1SqlBuffer>;
+
 void deconvMsOne(const MzmlMsGroupPtr& ms_group_ptr,
                  const TopfdParaPtr& topfd_para_ptr,
                  const MsAlignWriterPtrVec& ms1_writer_ptr_vec,
                  const SimpleThreadPoolPtr& pool_ptr,
-                 const MzmlMsSqlWriterPtr& sql_writer_ptr) {
+                 const Ms1SqlBufferPtr& sql_buffer_ptr) {
   // 1. Store peak intensity
   MzmlMsPtr ms_ptr = ms_group_ptr->getMsOnePtr();
   PeakPtrVec peak_list = ms_ptr->getPeakPtrVec();
@@ -96,9 +115,13 @@ void deconvMsOne(const MzmlMsGroupPtr& ms_group_ptr,
   int writer_id = pool_ptr->getId(thread_id);
   ms1_writer_ptr_vec[writer_id]->writeMs(deconv_ms_ptr);
 
-  // 6. write the deconvoluted spectrum to the SQLite database (if enabled)
-  if (sql_writer_ptr != nullptr) {
-    sql_writer_ptr->writeMs1(ms_ptr, result_envs, base_inte, min_ref_inte);
+  // 6. Buffer the deconvoluted spectrum in memory for SQLite output (if
+  // enabled). Each worker thread appends to its own buffer (indexed by writer
+  // id), so there is no lock contention; the records are written to the
+  // database sequentially after the thread pool finishes.
+  if (sql_buffer_ptr != nullptr) {
+    (*sql_buffer_ptr)[writer_id].push_back(
+        Ms1SqlRecord{ms_ptr, std::move(result_envs), base_inte, min_ref_inte});
   }
 }
 
@@ -106,11 +129,11 @@ std::function<void()> geneTask(const MzmlMsGroupPtr& ms_group_ptr,
                                const TopfdParaPtr& topfd_para_ptr,
                                const MsAlignWriterPtrVec& ms1_writer_ptr_vec,
                                const SimpleThreadPoolPtr& pool_ptr,
-                               const MzmlMsSqlWriterPtr& sql_writer_ptr) {
+                               const Ms1SqlBufferPtr& sql_buffer_ptr) {
   return [ms_group_ptr, topfd_para_ptr, ms1_writer_ptr_vec, pool_ptr,
-          sql_writer_ptr]() {
+          sql_buffer_ptr]() {
     deconvMsOne(ms_group_ptr, topfd_para_ptr, ms1_writer_ptr_vec, pool_ptr,
-                sql_writer_ptr);
+                sql_buffer_ptr);
   };
 }
 
@@ -141,6 +164,14 @@ void DeconvMs1Process::process() {
   // init thread pool
   int thread_num = topfd_para_ptr_->getThreadNum();
   SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(thread_num);
+  // Per-thread in-memory buffers for the SQLite records. Writing to SQLite from
+  // every worker thread serializes on the writer lock and the SSD; instead each
+  // thread buffers its records here (one sub-vector per thread, no locking) and
+  // they are written to the database sequentially once deconvolution is done.
+  deconv_ms1_process::Ms1SqlBufferPtr sql_buffer_ptr =
+      sql_writer_ptr != nullptr
+          ? std::make_shared<deconv_ms1_process::Ms1SqlBuffer>(thread_num)
+          : nullptr;
   // init msalign writer vector for multiple threads
   std::string output_base_name = topfd_para_ptr_->getOutputBaseName();
   std::string ms1_msalign_name = output_base_name + "_ms1.msalign";
@@ -160,7 +191,7 @@ void DeconvMs1Process::process() {
     }
     pool_ptr->enqueue(deconv_ms1_process::geneTask(
         ms_group_ptr, topfd_para_ptr_, ms1_writer_ptr_vec, pool_ptr,
-        sql_writer_ptr));
+        sql_buffer_ptr));
     spec_cnt++;
     std::string msg = deconv_util::updateMsOneMsg(
         ms_group_ptr->getMsOnePtr()->getMsHeaderPtr(), spec_cnt,
@@ -169,7 +200,16 @@ void DeconvMs1Process::process() {
     ms_group_ptr = reader_ptr->getNextMsGroupPtr();
   }
   pool_ptr->shutDown();
+  // Write the buffered MS1 records to SQLite sequentially: single-threaded, so
+  // there is no lock contention and the writer's batched transactions are not
+  // stalled by per-spectrum disk waits on the worker threads.
   if (sql_writer_ptr != nullptr) {
+    for (const auto& thread_buffer : *sql_buffer_ptr) {
+      for (const auto& record : thread_buffer) {
+        sql_writer_ptr->writeMs1(record.ms_ptr, record.result_envs,
+                                 record.base_inte, record.min_ref_inte);
+      }
+    }
     sql_writer_ptr->flush();
   }
   for (int i = 0; i < thread_num; i++) {
