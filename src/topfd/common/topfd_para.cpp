@@ -15,6 +15,8 @@
 
 #include "topfd/common/topfd_para.hpp"
 
+#include <sqlite3.h>
+
 #include <cstdlib>
 #include <filesystem>
 #include <iomanip>
@@ -24,7 +26,6 @@
 
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
-#include "common/util/str_util.hpp"
 #include "common/util/time_util.hpp"
 #include "sql/sql_util.hpp"
 
