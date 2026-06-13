@@ -90,13 +90,13 @@ bool Argument::parse(int argc, char* argv[]) {
         "activation,a", po::value<std::string>(&activation),
         "<CID|ETD|HCD|MPD|UVPD|FILE>. Fragmentation method of MS/MS spectra. "
         "When FILE is used, the fragmentation methods of spectra are given in "
-        "the input spectral data file. Default value: FILE.")(
+        "the input spectral data file. The default value is FILE.")(
         "max-charge,c", po::value<std::string>(&max_charge),
         "<a positive integer>. Set the maximum charge state of precursor and "
         "fragment ions. The default value is 30.")(
         "max-mass,m", po::value<std::string>(&max_mass),
         "<a positive number>. Set the maximum monoisotopic mass of precursor "
-        "and fragment ions. The default value is 50,000 Dalton.")(
+        "and fragment ions. The default value is 50,000 Daltons.")(
         "mz-error,e", po::value<std::string>(&mz_error),
         "<a positive number>. Set the error tolerance of m/z values of "
         "spectral peaks. The default value is 0.02 m/z.")(
@@ -109,14 +109,14 @@ bool Argument::parse(int argc, char* argv[]) {
         "missing-level-one,o", "MS1 spectra are missing in the input file.")(
         "precursor-window,w", po::value<std::string>(&prec_window),
         "<a positive number>. Set the default precursor window size. The "
-        "default value is 3.0 m/z. When the input file contains the "
-        "information of precursor windows, the parameter will be ignored.")(
+        "default value is 3.0 m/z. When the input file contains precursor "
+        "window information, the parameter is ignored.")(
         "msdeconv,n",
         "Use the MS-Deconv score to rank isotopic envelopes. The default "
         "method uses the EnvCNN score to rank isotopic envelopes.")(
         "env-cnn-cutoff,v", po::value<std::string>(&ms2_env_cnn_score_cutoff),
         "<a number in [0,1]>. Set the cutoff value for the EnvCNN score to "
-        "filter out low quality isotopic envelopes in MS/MS spectra. The "
+        "filter out low-quality isotopic envelopes in MS/MS spectra. The "
         "default value is 0.")(
         "disable-frag-num-filtering,d",
         "Skip the filtering of fragment ion envelopes in MS/MS scans based on "
@@ -128,23 +128,23 @@ bool Argument::parse(int argc, char* argv[]) {
         "<1|2|3>. The minimum number of MS1 scans in which a proteoform "
         "feature is detected. The default value is 1.")(
         "single-scan-noise,i",
-        "Use the noise intensity levels in single MS1 scans to filter out low "
-        "intensity peaks in proteoform feature detection. The default method "
-        "is to use the noise intensity level of the whole LC-MS map to filter "
-        "out low intensity peaks.")(
+        "Use the noise intensity levels in single MS1 scans to filter out "
+        "low-intensity peaks in proteoform feature detection. The default "
+        "method is to use the noise intensity level of the whole LC-MS map to "
+        "filter out low-intensity peaks.")(
         "disable-additional-feature-search,f",
         "Disable additional proteoform feature search in the LC-MS map for "
         "MS/MS scans that do not have detected proteoform features in their "
-        "precursor isolation windows. In the additional search, the signal "
-        "noise ratio is set to 0, the min scan number is set to 1, and the "
-        "ecscore cutoff is set to 0.")(
+        "precursor isolation windows. In the additional search, the "
+        "signal-to-noise ratio is set to 0, the minimum scan number is set to "
+        "1, and the ECScore cutoff is set to 0.")(
         "split-intensity-ratio,l",
         po::value<std::string>(&split_intensity_ratio),
         "<a positive number>. Set the intensity ratio required to split one "
         "feature from another. The default value is 2.5.")(
         "thread-number,u", po::value<std::string>(&thread_number),
         "<a positive integer>. Number of threads used in spectral "
-        "deconvolution. Default value: 1.");
+        "deconvolution. The default value is 1.");
 
     // Advanced options accepted on the command line but hidden from the help
     // message; the positional spectrum file argument is also hidden here.
