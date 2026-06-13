@@ -35,6 +35,7 @@
 #endif
 
 #include "common/util/logger.hpp"
+#include "common/util/str_util.hpp"
 
 namespace fs = std::filesystem;
 
@@ -286,6 +287,13 @@ std::string readFile(const std::string& file_name) {
                       std::istreambuf_iterator<char>());
   in.close();
   return content;
+}
+
+bool isValidMzmlFile(const std::string& file_name) {
+  return str_util::endsWith(file_name, "mzML") ||
+         str_util::endsWith(file_name, "mzXML") ||
+         str_util::endsWith(file_name, "mzml") ||
+         str_util::endsWith(file_name, "mzxml");
 }
 
 }  // namespace file_util

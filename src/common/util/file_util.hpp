@@ -32,6 +32,10 @@ std::string filenameFromEntirePath(const std::string& s);
 
 std::string basename(const std::string& s);
 
+// True if `file_name` has an mzML or mzXML extension (case variants mzML,
+// mzXML, mzml, mzxml).
+bool isValidMzmlFile(const std::string& file_name);
+
 std::string directory(const std::string& s);
 
 std::string absoluteDir(const std::string& s);
