@@ -16,9 +16,12 @@
 #include "topfd/common/topfd_single_process.hpp"
 
 #include <fstream>
+#include <iostream>
+#include <memory>
+#include <string>
+#include <vector>
 
 #include "common/base/base_data.hpp"
-#include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
 #include "common/util/time_util.hpp"
 #include "ms/env/env_base.hpp"
@@ -33,7 +36,9 @@ namespace toppic {
 
 namespace topfd_single_process {
 
-PeakPtrVec readPeakFile(std::string file_name) {
+namespace {
+
+PeakPtrVec readPeakFile(const std::string& file_name) {
   PeakPtrVec peak_list;
   std::ifstream input;
   input.open(file_name.c_str(), std::ios::in);
@@ -46,17 +51,15 @@ PeakPtrVec readPeakFile(std::string file_name) {
     std::vector<std::string> strs = str_util::split(line, " ");
     double mz = std::stod(strs[0]);
     double inte = std::stod(strs[1]);
-    // std::cout << "mz " << mz << " intensity " << inte << std::endl;
     PeakPtr peak_ptr = std::make_shared<Peak>(mz, inte);
     peak_list.push_back(peak_ptr);
   }
   input.close();
-  // std::cout << "peak list finished" << std::endl;
   return peak_list;
 }
 
-int processOneFile(const TopfdParaPtr& para_ptr,
-                   const std::string& spec_file_name) {
+void processOneFile(const TopfdParaPtr& para_ptr,
+                    const std::string& spec_file_name) {
   try {
     int ms_level = 2;
     double max_mass = para_ptr->getMaxMass();
@@ -90,21 +93,21 @@ int processOneFile(const TopfdParaPtr& para_ptr,
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;
   }
-  return 0;
 }
 
+}  // namespace
+
 int process(const TopfdParaPtr& para_ptr,
-            std::vector<std::string> spec_file_list) {
+            const std::vector<std::string>& spec_file_list) {
   // init data, envelope base, envcnn model, and ecscore model
   base_data::init(para_ptr->getResourceDir());
   EnvBase::initBase(para_ptr->getResourceDir());
   onnx_env_cnn::initModel(para_ptr->getResourceDir(), para_ptr->getThreadNum());
 
-  for (size_t k = 0; k < spec_file_list.size(); k++) {
-    std::cout << "Processing " << spec_file_list[k] << " started." << std::endl;
-    processOneFile(para_ptr, spec_file_list[k]);
-    std::cout << "Processing " << spec_file_list[k] << " finished."
-              << std::endl;
+  for (const std::string& spec_file_name : spec_file_list) {
+    std::cout << "Processing " << spec_file_name << " started." << std::endl;
+    processOneFile(para_ptr, spec_file_name);
+    std::cout << "Processing " << spec_file_name << " finished." << std::endl;
     std::cout << "Timestamp: " << time_util::getTimeStr() << std::endl;
   }
 
