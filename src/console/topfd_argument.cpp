@@ -15,22 +15,51 @@
 
 #include "console/topfd_argument.hpp"
 
+#include <cstddef>
+#include <exception>
 #include <filesystem>
-#include <iomanip>
 #include <iostream>
+#include <string>
 
-#include "boost/thread/thread.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
 #include "common/util/mem_check.hpp"
-#include "common/util/time_util.hpp"
 #include "common/util/version.hpp"
 
 namespace toppic {
 
+namespace {
+
+// Parse `str` as a double, rejecting empty strings and trailing characters
+// (e.g. "1.5x" or "3abc"). Returns true and sets `val` only on a full parse.
+bool toDouble(const std::string& str, double& val) {
+  try {
+    size_t pos = 0;
+    val = std::stod(str, &pos);
+    return pos == str.size();
+  } catch (const std::exception&) {
+    return false;
+  }
+}
+
+// Parse `str` as an int, rejecting empty strings and trailing characters.
+// Returns true and sets `val` only on a full parse.
+bool toInt(const std::string& str, int& val) {
+  try {
+    size_t pos = 0;
+    val = std::stoi(str, &pos);
+    return pos == str.size();
+  } catch (const std::exception&) {
+    return false;
+  }
+}
+
+}  // namespace
+
 Argument::Argument() { topfd_para_ptr_ = std::make_shared<TopfdPara>(); }
 
-void Argument::showUsage(boost::program_options::options_description& desc) {
+void Argument::showUsage(
+    const boost::program_options::options_description& desc) {
   std::cout << "Usage: topfd [options] spectrum-file-name" << std::endl;
   std::cout << desc << std::endl;
   std::cout << "Version: " << Version::getVersion() << std::endl;
@@ -55,9 +84,9 @@ bool Argument::parse(int argc, char* argv[]) {
   // Define and parse the program options
   try {
     namespace po = boost::program_options;
-    po::options_description display_desc("Options");
-
-    display_desc.add_options()("help,h", "Print this help message.")(
+    // Documented options shown in the help message.
+    po::options_description visible_desc("Options");
+    visible_desc.add_options()("help,h", "Print this help message.")(
         "activation,a", po::value<std::string>(&activation),
         "<CID|ETD|HCD|MPD|UVPD|FILE>. Fragmentation method of MS/MS spectra. "
         "When FILE is used, the fragmentation methods of spectra are given in "
@@ -75,8 +104,8 @@ bool Argument::parse(int argc, char* argv[]) {
         "<a positive number>. Set the signal-to-noise ratio for MS1 spectra. "
         "The default value is 3.")(
         "ms-two-sn-ratio,s", po::value<std::string>(&ms_two_sn_ratio),
-        "<a positive number>. Set the signal-to-noise ratio for MS/MS spectra. "
-        "The default value is 1.")(
+        "<a positive number>. Set the signal-to-noise ratio for MS/MS "
+        "spectra. The default value is 1.")(
         "missing-level-one,o", "MS1 spectra are missing in the input file.")(
         "precursor-window,w", po::value<std::string>(&prec_window),
         "<a positive number>. Set the default precursor window size. The "
@@ -117,37 +146,28 @@ bool Argument::parse(int argc, char* argv[]) {
         "<a positive integer>. Number of threads used in spectral "
         "deconvolution. Default value: 1.");
 
-    po::options_description desc("Options");
-    desc.add_options()("help,h", "Print this help message.")(
-        "activation,a", po::value<std::string>(&activation), "")(
-        "max-charge,c", po::value<std::string>(&max_charge), "")(
-        "max-mass,m", po::value<std::string>(&max_mass), "")(
-        "mz-error,e", po::value<std::string>(&mz_error), "")(
-        "ms-one-sn-ratio,r", po::value<std::string>(&ms_one_sn_ratio), "")(
-        "ms-two-sn-ratio,s", po::value<std::string>(&ms_two_sn_ratio), "")(
-        "precursor-window,w", po::value<std::string>(&prec_window), "")(
-        "missing-level-one,o", "")(
+    // Advanced options accepted on the command line but hidden from the help
+    // message; the positional spectrum file argument is also hidden here.
+    po::options_description hidden_desc("Hidden options");
+    hidden_desc.add_options()(
         "hybrid,H",
-        "hybrid mode for low resolution MS1 and high resolution MS2")(
+        "Hybrid mode for low resolution MS1 and high resolution MS2.")(
         "multiple-mass,M",
-        "Output multiple monoisotopic masses for each MS/MS spectrum")(
-        "msdeconv,n", "")("keep,k",
-                          "Report monoisotopic masses extracted from low "
-                          "quality isotopic envelopes.")(
-        "env-cnn-cutoff,v", po::value<std::string>(&ms2_env_cnn_score_cutoff),
-        "")("disable-aa-num-filtering,d", "")("single-scan-noise,i", "")(
-        "min-scan-number,b", po::value<std::string>(&min_scan_num), "")(
-        "ecscore-cutoff,t", po::value<std::string>(&ecscore_cutoff), "")(
-        "split-intensity-ratio,l",
-        po::value<std::string>(&split_intensity_ratio),
-        "")("disable-additional-feature-search,f", "")(
-        "thread-number,u", po::value<std::string>(&thread_number), "")(
-        "text-peak-list,T",
-        "")  // Use a text file containing a mass list as the input
-        ("output-batmass-feature,O", "")(
-            "spectrum-file-name",
-            po::value<std::vector<std::string> >()->multitoken()->required(),
-            "Spectrum file name with its path.");
+        "Output multiple monoisotopic masses for each MS/MS spectrum.")(
+        "keep,k",
+        "Report monoisotopic masses extracted from low quality isotopic "
+        "envelopes.")("text-peak-list,T",
+                      "Use a text file containing a mass list as the input.")(
+        "output-batmass-feature,O",
+        "Output a feature file in the BatMass CSV format.")(
+        "spectrum-file-name",
+        po::value<std::vector<std::string> >()->multitoken()->required(),
+        "Spectrum file name with its path.");
+
+    // All options (visible + hidden) are used for parsing; only visible_desc
+    // is shown to the user, so the help text and the parser cannot drift apart.
+    po::options_description desc("All options");
+    desc.add(visible_desc).add(hidden_desc);
 
     po::positional_options_description positional_options;
     positional_options.add("spectrum-file-name", -1);
@@ -160,18 +180,18 @@ bool Argument::parse(int argc, char* argv[]) {
                     .run(),
                 vm);
       if (vm.count("help")) {
-        showUsage(display_desc);
+        showUsage(visible_desc);
         return false;
       }
       po::notify(vm);
       // throws on error, so do after help in case there are any problems
     } catch (boost::program_options::required_option& e) {
       std::cerr << "ERROR: " << e.what() << std::endl << std::endl;
-      showUsage(display_desc);
+      showUsage(visible_desc);
       return false;
     } catch (boost::program_options::error& e) {
       std::cerr << "ERROR: " << e.what() << std::endl << std::endl;
-      showUsage(display_desc);
+      showUsage(visible_desc);
       return false;
     }
 
@@ -192,7 +212,13 @@ bool Argument::parse(int argc, char* argv[]) {
     }
 
     if (vm.count("max-charge")) {
-      topfd_para_ptr_->setMaxCharge(std::stoi(max_charge));
+      int charge = 0;
+      if (!toInt(max_charge, charge) || charge <= 0) {
+        LOG_ERROR("Max charge " << max_charge
+                                << " should be a positive integer.");
+        return false;
+      }
+      topfd_para_ptr_->setMaxCharge(charge);
     }
 
     if (vm.count("keep")) {
@@ -204,19 +230,41 @@ bool Argument::parse(int argc, char* argv[]) {
     }
 
     if (vm.count("max-mass")) {
-      topfd_para_ptr_->setMaxMass(std::stod(max_mass));
+      double mass = 0;
+      if (!toDouble(max_mass, mass) || mass <= 0) {
+        LOG_ERROR("Max mass " << max_mass << " should be a positive number.");
+        return false;
+      }
+      topfd_para_ptr_->setMaxMass(mass);
     }
 
     if (vm.count("mz-error")) {
-      topfd_para_ptr_->setMzError(std::stod(mz_error));
+      double error = 0;
+      if (!toDouble(mz_error, error) || error <= 0) {
+        LOG_ERROR("M/z error " << mz_error << " should be a positive number.");
+        return false;
+      }
+      topfd_para_ptr_->setMzError(error);
     }
 
     if (vm.count("ms-two-sn-ratio")) {
-      topfd_para_ptr_->setMsTwoSnRatio(std::stod(ms_two_sn_ratio));
+      double sn_ratio = 0;
+      if (!toDouble(ms_two_sn_ratio, sn_ratio) || sn_ratio < 0) {
+        LOG_ERROR("MS/MS S/N ratio " << ms_two_sn_ratio
+                                     << " should be a non-negative number.");
+        return false;
+      }
+      topfd_para_ptr_->setMsTwoSnRatio(sn_ratio);
     }
 
     if (vm.count("ms-one-sn-ratio")) {
-      topfd_para_ptr_->setMsOneSnRatio(std::stod(ms_one_sn_ratio));
+      double sn_ratio = 0;
+      if (!toDouble(ms_one_sn_ratio, sn_ratio) || sn_ratio < 0) {
+        LOG_ERROR("MS1 S/N ratio " << ms_one_sn_ratio
+                                   << " should be a non-negative number.");
+        return false;
+      }
+      topfd_para_ptr_->setMsOneSnRatio(sn_ratio);
     }
 
     if (vm.count("missing-level-one")) {
@@ -228,23 +276,24 @@ bool Argument::parse(int argc, char* argv[]) {
     }
 
     if (vm.count("precursor-window")) {
-      topfd_para_ptr_->setPrecWindowWidth(std::stod(prec_window));
+      double window = 0;
+      if (!toDouble(prec_window, window) || window <= 0) {
+        LOG_ERROR("Precursor window " << prec_window
+                                      << " should be a positive number.");
+        return false;
+      }
+      topfd_para_ptr_->setPrecWindowWidth(window);
     }
 
     if (vm.count("env-cnn-cutoff")) {
-      try {
-        double cutoff = std::stod(ms2_env_cnn_score_cutoff);
-        if (cutoff < 0 || cutoff > 1) {
-          LOG_ERROR("Env-CNN cutoff " << ms2_env_cnn_score_cutoff
-                                      << " should be in [0,1].");
-          return false;
-        }
-        topfd_para_ptr_->setMs2EnvCnnScoreCutoff(cutoff);
-      } catch (std::exception& e) {
+      double cutoff = 0;
+      if (!toDouble(ms2_env_cnn_score_cutoff, cutoff) || cutoff < 0 ||
+          cutoff > 1) {
         LOG_ERROR("Env-CNN cutoff " << ms2_env_cnn_score_cutoff
-                                    << " should be a number.");
+                                    << " should be a number in [0,1].");
         return false;
       }
+      topfd_para_ptr_->setMs2EnvCnnScoreCutoff(cutoff);
     }
 
     if (vm.count("multiple-mass")) {
@@ -256,11 +305,23 @@ bool Argument::parse(int argc, char* argv[]) {
     }
 
     if (vm.count("split-intensity-ratio")) {
-      topfd_para_ptr_->setSplitIntensityRatio(std::stod(split_intensity_ratio));
+      double ratio = 0;
+      if (!toDouble(split_intensity_ratio, ratio) || ratio <= 0) {
+        LOG_ERROR("Split intensity ratio " << split_intensity_ratio
+                                           << " should be a positive number.");
+        return false;
+      }
+      topfd_para_ptr_->setSplitIntensityRatio(ratio);
     }
 
     if (vm.count("ecscore-cutoff")) {
-      topfd_para_ptr_->setMs1EcscoreCutoff(std::stod(ecscore_cutoff));
+      double cutoff = 0;
+      if (!toDouble(ecscore_cutoff, cutoff) || cutoff < 0 || cutoff > 1) {
+        LOG_ERROR("ECScore cutoff " << ecscore_cutoff
+                                    << " should be a number in [0,1].");
+        return false;
+      }
+      topfd_para_ptr_->setMs1EcscoreCutoff(cutoff);
     }
 
     if (vm.count("single-scan-noise")) {
@@ -276,19 +337,13 @@ bool Argument::parse(int argc, char* argv[]) {
     }
 
     if (vm.count("min-scan-number")) {
-      try {
-        int n = std::stoi(min_scan_num);
-        if (n < 1 || n > 3) {
-          LOG_ERROR("Min scan number " << min_scan_num
-                                       << " should be 1, 2, or 3.");
-          return false;
-        }
-        topfd_para_ptr_->setMs1MinScanNum(n);
-      } catch (std::exception& e) {
+      int n = 0;
+      if (!toInt(min_scan_num, n) || n < 1 || n > 3) {
         LOG_ERROR("Min scan number " << min_scan_num
                                      << " should be 1, 2, or 3.");
         return false;
       }
+      topfd_para_ptr_->setMs1MinScanNum(n);
     }
 
     if (vm.count("spectrum-file-name")) {
@@ -297,15 +352,16 @@ bool Argument::parse(int argc, char* argv[]) {
     }
 
     if (vm.count("thread-number")) {
-      try {
-        topfd_para_ptr_->setThreadNum(std::stoi(thread_number));
-      } catch (std::exception& e) {
-        LOG_ERROR("Thread number " << thread_number << " should be a number.");
+      int num = 0;
+      if (!toInt(thread_number, num) || num <= 0) {
+        LOG_ERROR("Thread number " << thread_number
+                                   << " should be a positive integer.");
         return false;
       }
+      topfd_para_ptr_->setThreadNum(num);
     }
 
-    if (vm.count("disable-aa-num-filtering")) {
+    if (vm.count("disable-frag-num-filtering")) {
       topfd_para_ptr_->setAANumBasedFilter(false);
     }
   } catch (std::exception& e) {

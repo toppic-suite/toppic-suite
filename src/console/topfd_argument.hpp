@@ -30,25 +30,20 @@ class Argument {
 
   bool parse(int argc, char* argv[]);
 
-  TopfdParaPtr getTopfdParaPtr() { return topfd_para_ptr_; }
+  const TopfdParaPtr& getTopfdParaPtr() const { return topfd_para_ptr_; }
 
-  std::vector<std::string> getSpecFileList() { return spec_file_list_; };
+  const std::vector<std::string>& getSpecFileList() const {
+    return spec_file_list_;
+  }
 
  private:
-  void initArguments();
-
-  void setArgumentsByConfigFile(const std::string& file_name);
-
   bool validateArguments();
 
-  void showUsage(boost::program_options::options_description& desc);
+  void showUsage(const boost::program_options::options_description& desc);
 
- private:
   TopfdParaPtr topfd_para_ptr_;
 
   std::vector<std::string> spec_file_list_;
-
-  // std::map<std::string,std::string> arguments_;
 };
 
 }  // namespace toppic
