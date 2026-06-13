@@ -36,8 +36,8 @@ void ExpectedValue::setOneProtProb(double one_prot_prob) {
 }
 
 ExpectedValue::ExpectedValue(XmlDOMElement element) {
-  one_prot_prob_ = xml_dom_util::getScientificChildValue(element, "one_protein_probability", 0);
-  test_num_ = xml_dom_util::getScientificChildValue(element, "test_number", 0);
+  one_prot_prob_ = xml_dom_util::getDoubleChildValue(element, "one_protein_probability", 0);
+  test_num_ = xml_dom_util::getDoubleChildValue(element, "test_number", 0);
   adjust_factor_ = xml_dom_util::getDoubleChildValue(element, "adjust_factor", 0);
   init();
 }

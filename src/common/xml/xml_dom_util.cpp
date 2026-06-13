@@ -52,12 +52,6 @@ std::string getChildValue(const XmlDOMElement& parent,
   return child.text().as_string();
 }
 
-double getScientificChildValue(const XmlDOMElement& parent,
-                               const char* child_tag, int i) {
-  std::string value = getChildValue(parent, child_tag, i);
-  return std::stod(value);
-}
-
 double getDoubleChildValue(const XmlDOMElement& parent,
                            const char* child_tag, int i) {
   std::string value = getChildValue(parent, child_tag, i);

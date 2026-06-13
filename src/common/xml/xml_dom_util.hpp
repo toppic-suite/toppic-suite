@@ -34,8 +34,6 @@ XmlDOMElement getChildElement(const XmlDOMElement& parent, const char* tag, int 
 
 std::string getChildValue(const XmlDOMElement& parent, const char* child_tag, int index);
 
-double getScientificChildValue(const XmlDOMElement& parent, const char* child_tag, int index);
-
 double getDoubleChildValue(const XmlDOMElement& parent, const char* child_tag, int index);
 
 int getIntChildValue(const XmlDOMElement& parent, const char* child_tag, int index);
