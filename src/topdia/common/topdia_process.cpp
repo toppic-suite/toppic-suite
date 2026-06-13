@@ -41,6 +41,8 @@ namespace toppic {
 
 namespace topdia_process {
 
+namespace {
+
 void processOneFileWithFaims(const TopfdParaPtr& topfd_para_ptr,
                              const TopdiaParaPtr& topdia_para_ptr) {
   //  print parameter for each file
@@ -124,6 +126,8 @@ void processOneFile(const TopfdParaPtr& topfd_para_ptr,
     exit(EXIT_FAILURE);
   }
 }
+
+}  // namespace
 
 int process(const TopfdParaPtr& topfd_para_ptr,
             const TopdiaParaPtr& topdia_para_ptr,
