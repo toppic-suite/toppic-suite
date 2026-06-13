@@ -32,7 +32,7 @@ namespace toppic {
 // Performance: rather than a transaction-per-spectrum (one fsync per scan), the
 // spectra are inserted across a small number of large transactions using
 // prepared statements that are compiled once and reused. Call writeMs1/writeMs2
-// once per spectrum; the writer commits automatically every kCommitChunk
+// once per spectrum; the writer commits automatically every COMMIT_CHUNK
 // spectra and flushes the final batch when it is destroyed (or via flush()).
 //
 // The sqlite3 connection is owned by the caller, which creates the schema
@@ -75,7 +75,7 @@ class MzmlMsSqlWriter {
 
   // Commit (and reopen) a transaction every this many spectra, to amortize the
   // fsync across many scans while bounding the WAL/journal size.
-  static constexpr int kCommitChunk = 2000;
+  static constexpr int COMMIT_CHUNK = 2000;
 };
 
 using MzmlMsSqlWriterPtr = std::shared_ptr<MzmlMsSqlWriter>;

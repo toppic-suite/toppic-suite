@@ -28,11 +28,11 @@ namespace {
 
 // Mirrors TopfdPara's printout so the two reports look identical: one label
 // column (wide enough for the longest label) and fixed-width centered banners.
-constexpr int kParaLabelWidth = 53;
-constexpr int kParaBannerWidth = 55;
+constexpr int PARA_LABEL_WIDTH = 53;
+constexpr int PARA_BANNER_WIDTH = 55;
 
 std::string banner(const std::string& prefix, const std::string& title) {
-  int fill = kParaBannerWidth - 2 - static_cast<int>(title.size());
+  int fill = PARA_BANNER_WIDTH - 2 - static_cast<int>(title.size());
   if (fill < 2) fill = 2;
   int left = fill / 2;
   int right = fill - left;
@@ -46,7 +46,7 @@ std::string TopdiaPara::getParaStr(const std::string& prefix,
                                    const std::string& sep,
                                    const TopfdParaPtr& topfd_para) const {
   std::stringstream output;
-  const int w = kParaLabelWidth;
+  const int w = PARA_LABEL_WIDTH;
   auto kv = [&](const char* label) -> std::ostream& {
     return output << prefix << std::setw(w) << std::left << label << sep;
   };

@@ -165,7 +165,7 @@ void MzmlMsSqlWriter::writeMs1(const MzmlMsPtr& ms_ptr,
     }
   }
 
-  if (++pending_ >= kCommitChunk) {
+  if (++pending_ >= COMMIT_CHUNK) {
     commit();
   }
 }
@@ -204,7 +204,7 @@ void MzmlMsSqlWriter::writeMs2(const MzmlMsPtr& ms_ptr,
     stepAndReset(ms2_peak_stmt_);
   }
 
-  if (++pending_ >= kCommitChunk) {
+  if (++pending_ >= COMMIT_CHUNK) {
     commit();
   }
 }
