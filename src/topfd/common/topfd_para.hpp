@@ -143,10 +143,10 @@ class TopfdPara {
   // the same column so the report is aligned across all sections. It is wide
   // enough for the longest label ("Filtering fragments using estimated fragment
   // number:").
-  static constexpr int PARA_LABEL_WIDTH = 53;
+  static constexpr int para_label_width_ = 53;
 
   // Total width of the "### <title> ###" section banners.
-  static constexpr int PARA_BANNER_WIDTH = 55;
+  static constexpr int para_banner_width_ = 55;
 
   // A banner line with the title centered and padded with '#' to a fixed width,
   // e.g. "############### Parameters ###############".

@@ -56,8 +56,8 @@ class TopdiaPara {
   // Mirrors TopfdPara's printout so the two reports look identical: one label
   // column (wide enough for the longest label) and fixed-width centered
   // banners.
-  static constexpr int PARA_LABEL_WIDTH = 53;
-  static constexpr int PARA_BANNER_WIDTH = 55;
+  static constexpr int para_label_width_ = 53;
+  static constexpr int para_banner_width_ = 55;
 
   // A banner line with the title centered and padded with '#' to a fixed width,
   // e.g. "############### Parameters ###############".

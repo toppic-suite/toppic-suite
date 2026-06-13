@@ -34,7 +34,7 @@ namespace toppic {
 // e.g. "############### Parameters ###############".
 std::string TopfdPara::banner(const std::string& prefix,
                               const std::string& title) {
-  int fill = PARA_BANNER_WIDTH - 2 - static_cast<int>(title.size());
+  int fill = para_banner_width_ - 2 - static_cast<int>(title.size());
   if (fill < 2) fill = 2;
   int left = fill / 2;
   int right = fill - left;
@@ -157,7 +157,7 @@ void TopfdPara::createSqlDb(const std::string& sql_db_name) {
 std::string TopfdPara::getTopfdParaStr(const std::string& prefix,
                                        const std::string& sep) const {
   std::stringstream output;
-  const int w = PARA_LABEL_WIDTH;
+  const int w = para_label_width_;
   auto kv = [&](const char* label) -> std::ostream& {
     return output << prefix << std::setw(w) << std::left << label << sep;
   };
