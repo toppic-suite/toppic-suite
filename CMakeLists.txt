@@ -89,8 +89,8 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   set(CMAKE_INSTALL_DATADIR "${CMAKE_INSTALL_DATADIR}/toppic")
 ELSEIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   # macOS: resources are installed next to the executable so that
-  # getResourceDir()'s "<exec_dir>/resources" lookup finds them.
-  set(CMAKE_INSTALL_DATADIR "${CMAKE_INSTALL_BINDIR}/resources")
+  # getResourceDir()'s "<exec_dir>/res" lookup finds them.
+  set(CMAKE_INSTALL_DATADIR "${CMAKE_INSTALL_BINDIR}/res")
 ENDIF()
 
 message(STATUS "Install prefix:              ${CMAKE_INSTALL_PREFIX}")
@@ -111,12 +111,12 @@ message(STATUS "Compiled-in shared dir:      ${TOPPIC_SHARED_DIR}")
 
 # Install the runtime resources (base_data, envcnn_models, ecscore_models,
 # p_value_table, topmsv) into the compiled-in shared dir. The trailing slash on
-# "resources/" installs the directory's CONTENTS into CMAKE_INSTALL_DATADIR, so
+# "res/" installs the directory's CONTENTS into CMAKE_INSTALL_DATADIR, so
 # at runtime getResourceDir()/getSharedDirName() (== TOPPIC_SHARED_DIR ==
 # <prefix>/${CMAKE_INSTALL_DATADIR}) finds base_data/, envcnn_models/, ...
-# directly inside it. On macOS CMAKE_INSTALL_DATADIR is "<bindir>/resources",
-# which getResourceDir()'s "<exec_dir>/resources" lookup also resolves.
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/resources/
+# directly inside it. On macOS CMAKE_INSTALL_DATADIR is "<bindir>/res",
+# which getResourceDir()'s "<exec_dir>/res" lookup also resolves.
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/res/
         DESTINATION ${CMAKE_INSTALL_DATADIR})
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/../bin)

@@ -1,2 +1,2 @@
 *.onnx filter=lfs diff=lfs merge=lfs -text
-resources/base_data/theo_patt.txt filter=lfs diff=lfs merge=lfs -text
+res/base_data/theo_patt.txt filter=lfs diff=lfs merge=lfs -text

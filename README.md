@@ -2,13 +2,13 @@
 
 ## Git LFS is required
 
-Some of the runtime resources under `resources/` are large binary/data blobs
+Some of the runtime resources under `res/` are large binary/data blobs
 and are stored with [Git LFS](https://git-lfs.com/) rather than in the normal
 Git history:
 
-- `resources/envcnn_models/*.onnx`, `resources/ecscore_models/*.onnx` — the
+- `res/envcnn_models/*.onnx`, `res/ecscore_models/*.onnx` — the
   EnvCNN / ECScore neural-network models.
-- `resources/base_data/theo_patt.txt` — the theoretical isotope-pattern table.
+- `res/base_data/theo_patt.txt` — the theoretical isotope-pattern table.
 
 You **must** have Git LFS installed to get the real files. Without it, a plain
 `git clone` leaves small text *pointer* files in their place, and the build /
