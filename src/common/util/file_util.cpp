@@ -206,37 +206,6 @@ bool copyDir(const std::string &src_name,
   return true;
 }
 
-bool copyJsonDir(const std::string &src_name,
-                 const std::string &des_name,
-                 int id_base) {
-  try {
-    fs::path source(src_name);
-    if (!fs::exists(source) || !fs::is_directory(source)) {
-      LOG_WARN("The source folder " << source.string() << " does not exist!");
-      return false;
-    }
-    for (const auto& source_file : fs::directory_iterator(source)) {
-      if (fs::is_regular_file(source_file)) {
-        fs::path current(source_file.path());
-        std::string file_name = current.filename().string();
-        // file names are like "spectrum<id>.js": prefix "spectrum" = 8, suffix ".js" = 3
-        const int prefix_len = 8, suffix_len = 3;
-        std::string id_str = file_name.substr(prefix_len, file_name.length() - prefix_len - suffix_len);
-        int new_id = std::stoi(id_str) + id_base;
-        std::string new_name = "spectrum" + std::to_string(new_id) + ".js";
-        fs::path des_file(des_name + getFileSeparator() + new_name);
-        LOG_INFO("Copying file: " << current);
-        fs::copy_file(current, des_file);
-      }
-    }
-  }
-  catch (const fs::filesystem_error &e) {
-    LOG_WARN("[Exception] " << e.what());
-    return false;
-  }
-  return true;
-}
-
 void delDir(const std::string &path) {
   fs::path dir(path);
   if (fs::exists(dir)) {
