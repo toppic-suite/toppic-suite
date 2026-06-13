@@ -16,6 +16,7 @@
 
 #include "topfd/deconv/deconv_ms1_process.hpp"
 
+#include <atomic>
 #include <cstddef>
 #include <memory>
 #include <string>
@@ -52,9 +53,38 @@ struct Ms1SqlRecord {
 };
 
 // One record buffer per worker thread (indexed by writer id) so threads append
-// without locking.
-using Ms1SqlBuffer = std::vector<std::vector<Ms1SqlRecord>>;
+// without locking, plus an approximate byte counter shared across threads so
+// the main thread can cap the buffer's memory use and flush it when full.
+struct Ms1SqlBuffer {
+  explicit Ms1SqlBuffer(int thread_num) : thread_records(thread_num) {}
+  std::vector<std::vector<Ms1SqlRecord>> thread_records;
+  std::atomic<std::size_t> bytes{0};
+};
 using Ms1SqlBufferPtr = std::shared_ptr<Ms1SqlBuffer>;
+
+// Approximate bytes held per buffered peak (the Peak/EnvPeak object, its
+// shared_ptr control block, and the vector slot). Used only to bound the
+// buffer's memory, so a rough value is sufficient.
+constexpr std::size_t BYTES_PER_PEAK = 64;
+
+// Hard ceiling for the in-memory SQL buffer.
+constexpr std::size_t MAX_SQL_BUFFER_BYTES =
+    4ULL * 1024 * 1024 * 1024;  // 4 GiB
+
+// Start draining at 90% of the ceiling, leaving headroom for the records that
+// in-flight worker tasks keep appending while the buffer is being drained, so
+// the actual peak stays under MAX_SQL_BUFFER_BYTES.
+constexpr std::size_t SQL_BUFFER_FLUSH_BYTES = MAX_SQL_BUFFER_BYTES * 9 / 10;
+
+// Rough memory estimate for one buffered record: the spectrum peaks plus the
+// peaks of all its envelopes.
+std::size_t estimateRecordBytes(const Ms1SqlRecord& record) {
+  std::size_t peak_num = record.ms_ptr->size();
+  for (const auto& env : record.result_envs) {
+    peak_num += env->getExpEnvPtr()->getPeakNum();
+  }
+  return peak_num * BYTES_PER_PEAK;
+}
 
 void deconvMsOne(const MzmlMsGroupPtr& ms_group_ptr,
                  const TopfdParaPtr& topfd_para_ptr,
@@ -120,8 +150,10 @@ void deconvMsOne(const MzmlMsGroupPtr& ms_group_ptr,
   // id), so there is no lock contention; the records are written to the
   // database sequentially after the thread pool finishes.
   if (sql_buffer_ptr != nullptr) {
-    (*sql_buffer_ptr)[writer_id].push_back(
-        Ms1SqlRecord{ms_ptr, std::move(result_envs), base_inte, min_ref_inte});
+    Ms1SqlRecord record{ms_ptr, std::move(result_envs), base_inte,
+                        min_ref_inte};
+    sql_buffer_ptr->bytes += estimateRecordBytes(record);
+    sql_buffer_ptr->thread_records[writer_id].push_back(std::move(record));
   }
 }
 
@@ -172,6 +204,28 @@ void DeconvMs1Process::process() {
       sql_writer_ptr != nullptr
           ? std::make_shared<deconv_ms1_process::Ms1SqlBuffer>(thread_num)
           : nullptr;
+
+  // Wait until the pool has drained: no queued tasks and every worker idle, so
+  // no thread is touching the SQL buffer and the main thread can flush it.
+  auto wait_until_pool_idle = [&]() {
+    while (pool_ptr->getQueueSize() > 0 ||
+           pool_ptr->getIdleThreadNum() < thread_num) {
+      std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+  };
+  // Write the buffered records to SQLite sequentially and empty the buffer.
+  // Must be called only while the pool is idle (see wait_until_pool_idle).
+  auto flush_sql_buffer = [&]() {
+    for (auto& thread_buffer : sql_buffer_ptr->thread_records) {
+      for (const auto& record : thread_buffer) {
+        sql_writer_ptr->writeMs1(record.ms_ptr, record.result_envs,
+                                 record.base_inte, record.min_ref_inte);
+      }
+      thread_buffer.clear();
+    }
+    sql_buffer_ptr->bytes = 0;
+  };
+
   // init msalign writer vector for multiple threads
   std::string output_base_name = topfd_para_ptr_->getOutputBaseName();
   std::string ms1_msalign_name = output_base_name + "_ms1.msalign";
@@ -197,19 +251,23 @@ void DeconvMs1Process::process() {
         ms_group_ptr->getMsOnePtr()->getMsHeaderPtr(), spec_cnt,
         total_spec_num);
     std::cout << "\r" << msg << std::flush;
+
+    // Backpressure: if the in-memory SQL buffer is full, pause deconvolution,
+    // drain the buffer to the database, and then resume.
+    if (sql_writer_ptr != nullptr &&
+        sql_buffer_ptr->bytes.load() >=
+            deconv_ms1_process::SQL_BUFFER_FLUSH_BYTES) {
+      wait_until_pool_idle();
+      flush_sql_buffer();
+    }
+
     ms_group_ptr = reader_ptr->getNextMsGroupPtr();
   }
   pool_ptr->shutDown();
-  // Write the buffered MS1 records to SQLite sequentially: single-threaded, so
-  // there is no lock contention and the writer's batched transactions are not
-  // stalled by per-spectrum disk waits on the worker threads.
+  // Write any remaining buffered records to SQLite sequentially (single-
+  // threaded, so no lock contention) and commit the final batch.
   if (sql_writer_ptr != nullptr) {
-    for (const auto& thread_buffer : *sql_buffer_ptr) {
-      for (const auto& record : thread_buffer) {
-        sql_writer_ptr->writeMs1(record.ms_ptr, record.result_envs,
-                                 record.base_inte, record.min_ref_inte);
-      }
-    }
+    flush_sql_buffer();
     sql_writer_ptr->flush();
   }
   for (int i = 0; i < thread_num; i++) {
