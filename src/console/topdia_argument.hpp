@@ -33,20 +33,18 @@ class Argument {
 
   static TopfdParaPtr getTopfdParaPtrForTopdia();
 
-  TopfdParaPtr getTopfdParaPtr() { return topfd_para_ptr_; }
+  const TopfdParaPtr& getTopfdParaPtr() const { return topfd_para_ptr_; }
 
-  TopdiaParaPtr getTopdiaParaPtr() { return topdia_para_ptr_; }
+  const TopdiaParaPtr& getTopdiaParaPtr() const { return topdia_para_ptr_; }
 
-  std::vector<std::string> getSpecFileList() { return spec_file_list_; };
+  const std::vector<std::string>& getSpecFileList() const {
+    return spec_file_list_;
+  }
 
  private:
-  void initArguments();
-
-  void setArgumentsByConfigFile(const std::string& file_name);
-
   bool validateArguments();
 
-  void showUsage(boost::program_options::options_description& desc);
+  void showUsage(const boost::program_options::options_description& desc);
 
   TopfdParaPtr topfd_para_ptr_;
 
