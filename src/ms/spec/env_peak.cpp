@@ -22,35 +22,31 @@
 
 namespace toppic {
 
-EnvPeak::EnvPeak(double mz, double intensity):
-    Peak(mz, intensity) {
-      idx_ = EnvPeak::getNonExistPeakIdx();
-    }
+EnvPeak::EnvPeak(double mz, double intensity)
+    : Peak(mz, intensity), idx_(EnvPeak::getNonExistPeakIdx()) {}
 
-EnvPeak::EnvPeak(double mz, double intensity, int idx):
-      Peak(mz, intensity),
-      idx_(idx) {}
+EnvPeak::EnvPeak(double mz, double intensity, int idx)
+    : Peak(mz, intensity), idx_(idx) {}
 
-EnvPeak::EnvPeak(const EnvPeakPtr &peak_ptr):
-      Peak(peak_ptr->getPosition(), peak_ptr->getIntensity()),
+EnvPeak::EnvPeak(const EnvPeakPtr& peak_ptr)
+    : Peak(peak_ptr->getPosition(), peak_ptr->getIntensity()),
       idx_(peak_ptr->getIdx()) {}
 
-bool EnvPeak::cmpPosInc(const EnvPeakPtr &a, const EnvPeakPtr &b) {
+bool EnvPeak::cmpPosInc(const EnvPeakPtr& a, const EnvPeakPtr& b) {
   return a->getPosition() < b->getPosition();
 }
 
-bool EnvPeak::cmpInteInc(const EnvPeakPtr &a, const EnvPeakPtr &b) {
+bool EnvPeak::cmpInteInc(const EnvPeakPtr& a, const EnvPeakPtr& b) {
   return a->getIntensity() < b->getIntensity();
 }
 
-EnvPeak::EnvPeak(XmlDOMElement element):
-    Peak(xml_dom_util::getDoubleChildValue(element, "position", 0),
-         xml_dom_util::getDoubleChildValue(element, "intensity", 0)) {
-      idx_ = xml_dom_util::getIntChildValue(element, "index", 0);
-    }
+EnvPeak::EnvPeak(XmlDOMElement element)
+    : Peak(xml_dom_util::getDoubleChildValue(element, "position", 0),
+           xml_dom_util::getDoubleChildValue(element, "intensity", 0)) {
+  idx_ = xml_dom_util::getIntChildValue(element, "index", 0);
+}
 
-void EnvPeak::appendToXml(XmlDOMDocument* xml_doc,
-                          XmlDOMElement parent) const {
+void EnvPeak::appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) const {
   std::string element_name = EnvPeak::getXmlElementName();
   XmlDOMElement element = xml_doc->addElement(parent, element_name.c_str());
   std::string str = str_util::toString(getPosition());
@@ -61,9 +57,6 @@ void EnvPeak::appendToXml(XmlDOMDocument* xml_doc,
   xml_doc->addElement(element, "index", str.c_str());
 }
 
-bool EnvPeak::isExist() const {
-  return idx_ != getNonExistPeakIdx();
-}
+bool EnvPeak::isExist() const { return idx_ != getNonExistPeakIdx(); }
 
 }  // namespace toppic
-
