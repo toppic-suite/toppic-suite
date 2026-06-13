@@ -53,6 +53,17 @@ class TopdiaPara {
   }
 
  private:
+  // Mirrors TopfdPara's printout so the two reports look identical: one label
+  // column (wide enough for the longest label) and fixed-width centered
+  // banners.
+  static constexpr int PARA_LABEL_WIDTH = 53;
+  static constexpr int PARA_BANNER_WIDTH = 55;
+
+  // A banner line with the title centered and padded with '#' to a fixed width,
+  // e.g. "############### Parameters ###############".
+  static std::string banner(const std::string& prefix,
+                            const std::string& title);
+
   double pseudo_score_cutoff_ = 0.55;
   int pseudo_min_peaks_ = 25;
   double ms1_seed_env_inte_corr_tole_cutoff_ = 0.5;

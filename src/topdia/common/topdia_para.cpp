@@ -24,14 +24,10 @@
 
 namespace toppic {
 
-namespace {
-
-// Mirrors TopfdPara's printout so the two reports look identical: one label
-// column (wide enough for the longest label) and fixed-width centered banners.
-constexpr int PARA_LABEL_WIDTH = 53;
-constexpr int PARA_BANNER_WIDTH = 55;
-
-std::string banner(const std::string& prefix, const std::string& title) {
+// A banner line with the title centered and padded with '#' to a fixed width,
+// e.g. "############### Parameters ###############".
+std::string TopdiaPara::banner(const std::string& prefix,
+                               const std::string& title) {
   int fill = PARA_BANNER_WIDTH - 2 - static_cast<int>(title.size());
   if (fill < 2) fill = 2;
   int left = fill / 2;
@@ -39,8 +35,6 @@ std::string banner(const std::string& prefix, const std::string& title) {
   return prefix + std::string(left, '#') + " " + title + " " +
          std::string(right, '#');
 }
-
-}  // namespace
 
 std::string TopdiaPara::getParaStr(const std::string& prefix,
                                    const std::string& sep,

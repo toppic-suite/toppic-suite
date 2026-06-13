@@ -30,20 +30,10 @@
 
 namespace toppic {
 
-namespace {
-
-// Width of the label column in the parameter printout: every value starts at
-// the same column so the report is aligned across all sections. It is wide
-// enough for the longest label ("Filtering fragments using estimated fragment
-// number:").
-constexpr int PARA_LABEL_WIDTH = 53;
-
-// Total width of the "### <title> ###" section banners.
-constexpr int PARA_BANNER_WIDTH = 55;
-
 // A banner line with the title centered and padded with '#' to a fixed width,
 // e.g. "############### Parameters ###############".
-std::string banner(const std::string& prefix, const std::string& title) {
+std::string TopfdPara::banner(const std::string& prefix,
+                              const std::string& title) {
   int fill = PARA_BANNER_WIDTH - 2 - static_cast<int>(title.size());
   if (fill < 2) fill = 2;
   int left = fill / 2;
@@ -51,8 +41,6 @@ std::string banner(const std::string& prefix, const std::string& title) {
   return prefix + std::string(left, '#') + " " + title + " " +
          std::string(right, '#');
 }
-
-}  // namespace
 
 TopfdPara::~TopfdPara() {
   if (sql_db_ != nullptr) {

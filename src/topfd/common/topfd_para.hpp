@@ -139,6 +139,20 @@ class TopfdPara {
   }
 
  private:
+  // Width of the label column in the parameter printout: every value starts at
+  // the same column so the report is aligned across all sections. It is wide
+  // enough for the longest label ("Filtering fragments using estimated fragment
+  // number:").
+  static constexpr int PARA_LABEL_WIDTH = 53;
+
+  // Total width of the "### <title> ###" section banners.
+  static constexpr int PARA_BANNER_WIDTH = 55;
+
+  // A banner line with the title centered and padded with '#' to a fixed width,
+  // e.g. "############### Parameters ###############".
+  static std::string banner(const std::string& prefix,
+                            const std::string& title);
+
   std::string exe_dir_;
   std::string resource_dir_;
 
