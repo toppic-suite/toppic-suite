@@ -1,16 +1,17 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include "ms/spec/precursor.hpp"
 
@@ -27,18 +28,18 @@
 
 namespace toppic {
 
-Precursor::Precursor(int prec_id, int feat_id,
-                     double mono_mz, int charge, double inte):
-  prec_id_(prec_id),
-  feat_id_(feat_id),
-  mono_mz_(mono_mz),
-  charge_(charge),
-  inte_ (inte) {
-    if (mono_mz_ < 0 || std::isnan(mono_mz_)) {
-      LOG_WARN("id " << prec_id_ << " monoisotopic mass is not initialized!");
-      mono_mz_ = 0.0;
-    }
+Precursor::Precursor(int prec_id, int feat_id, double mono_mz, int charge,
+                     double inte)
+    : prec_id_(prec_id),
+      feat_id_(feat_id),
+      mono_mz_(mono_mz),
+      charge_(charge),
+      inte_(inte) {
+  if (mono_mz_ < 0 || std::isnan(mono_mz_)) {
+    LOG_WARN("id " << prec_id_ << " monoisotopic mass is not initialized!");
+    mono_mz_ = 0.0;
   }
+}
 
 Precursor::Precursor(XmlDOMElement element) {
   prec_id_ = xml_dom_util::getIntChildValue(element, "prec_id", 0);
@@ -51,7 +52,7 @@ Precursor::Precursor(XmlDOMElement element) {
 double Precursor::getMonoMz() const {
   if (std::isnan(mono_mz_)) {
     LOG_INFO("id " << prec_id_ << " monoisotopic mz is not initialized!");
-    return 0.0; 
+    return 0.0;
   } else {
     return mono_mz_;
   }
@@ -71,20 +72,22 @@ double Precursor::getMonoMassMinusWater() const {
     LOG_INFO("monoisotopic mass is not initialized!");
     return 0.0;
   } else {
-    return peak_util::compPeakNeutralMass(mono_mz_, charge_)
-        - mass_constant::getWaterMass();
+    return peak_util::compPeakNeutralMass(mono_mz_, charge_) -
+           mass_constant::getWaterMass();
   }
 }
 
-std::pair<int, int> Precursor::getMonoMassMinusWaterError(double ppo, double scale) const {
+std::pair<int, int> Precursor::getMonoMassMinusWaterError(double ppo,
+                                                          double scale) const {
   int mass = static_cast<int>(std::round(getMonoMassMinusWater() * scale));
   double error_tolerance = getErrorTolerance(ppo);
-  int error = static_cast<int>(std::ceil(error_tolerance*scale));
+  int error = static_cast<int>(std::ceil(error_tolerance * scale));
   std::pair<int, int> result(mass, error);
   return result;
 }
 
-XmlDOMElement Precursor::getPrecursorXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) const {
+XmlDOMElement Precursor::getPrecursorXml(XmlDOMDocument* xml_doc,
+                                         XmlDOMElement parent) const {
   // float number precision
   int precision = 4;
   std::string precursor_str = Precursor::getXmlElementName();
@@ -106,7 +109,7 @@ void Precursor::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) const {
   getPrecursorXml(xml_doc, parent);
 }
 
-bool Precursor::cmpInteDec(const PrecursorPtr &a, const PrecursorPtr &b) {
+bool Precursor::cmpInteDec(const PrecursorPtr& a, const PrecursorPtr& b) {
   return a->getInte() > b->getInte();
 }
 

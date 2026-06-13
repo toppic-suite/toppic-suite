@@ -1,16 +1,17 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include "ms/spec/baseline_util.hpp"
 
@@ -27,18 +28,14 @@ namespace baseline_util {
 
 class IntvDens {
  public:
-  IntvDens(double bgn, double end, int num, double perc):
-      bgn_(bgn),
-      end_(end),
-      num_(num),
-      perc_(perc) {
-      }
+  IntvDens(double bgn, double end, int num, double perc)
+      : bgn_(bgn), end_(end), num_(num), perc_(perc) {}
 
-  double getBgn() const {return bgn_;}
-  double getEnd() const {return end_;}
-  double getMiddle() const {return (bgn_ + end_) / 2;}
-  int getNum() const {return num_;}
-  double getPerc() const {return perc_;}
+  double getBgn() const { return bgn_; }
+  double getEnd() const { return end_; }
+  double getMiddle() const { return (bgn_ + end_) / 2; }
+  int getNum() const { return num_; }
+  double getPerc() const { return perc_; }
 
  private:
   double bgn_, end_;
@@ -49,7 +46,7 @@ class IntvDens {
 using IntvDensPtr = std::shared_ptr<IntvDens>;
 using IntvDensPtrVec = std::vector<IntvDensPtr>;
 
-IntvDensPtrVec getDensity(const std::vector<double> &inte, double max_inte) {
+IntvDensPtrVec getDensity(const std::vector<double>& inte, double max_inte) {
   double intv_width = 10;
   if (max_inte > 10000) {
     intv_width = max_inte / 1000;
@@ -68,13 +65,14 @@ IntvDensPtrVec getDensity(const std::vector<double> &inte, double max_inte) {
         num++;
       }
     }
-    IntvDensPtr cur_den = std::make_shared<IntvDens>(bgn, end, num, num / total_num);
+    IntvDensPtr cur_den =
+        std::make_shared<IntvDens>(bgn, end, num, num / total_num);
     dens[i] = cur_den;
   }
   return dens;
 }
 
-int getMaxPos(const IntvDensPtrVec &dens) {
+int getMaxPos(const IntvDensPtrVec& dens) {
   int max_pos = -1;
   int max_num = -1;
   for (size_t i = 0; i < dens.size(); i++) {
@@ -86,8 +84,7 @@ int getMaxPos(const IntvDensPtrVec &dens) {
   return max_pos;
 }
 
-
-double getMaxInte(const std::vector<double> &inte) {
+double getMaxInte(const std::vector<double>& inte) {
   double max_inte = -1;
   for (size_t i = 0; i < inte.size(); i++) {
     if (inte[i] > max_inte) {
@@ -97,7 +94,7 @@ double getMaxInte(const std::vector<double> &inte) {
   return max_inte;
 }
 
-double getBaseLine(const std::vector<double> &inte) {
+double getBaseLine(const std::vector<double>& inte) {
   double max_inte = getMaxInte(inte);
   if (max_inte <= 0.0) {
     LOG_WARN("The highest peak intensity is 0.");
@@ -106,19 +103,18 @@ double getBaseLine(const std::vector<double> &inte) {
   }
   int max_pos;
   IntvDensPtrVec dens;
-  do {    
+  do {
     dens = getDensity(inte, max_inte);
     max_pos = getMaxPos(dens);
     if (max_pos == 0) {
       max_inte = dens[max_pos]->getEnd();
     }
-  }
-  while (max_pos == 0);
+  } while (max_pos == 0);
 
   return dens[max_pos]->getBgn();
 }
 
-double getBaseLine(const PeakPtrVec &peak_list) {
+double getBaseLine(const PeakPtrVec& peak_list) {
   std::vector<double> intensities;
   for (size_t i = 0; i < peak_list.size(); i++) {
     intensities.push_back(peak_list[i]->getIntensity());
