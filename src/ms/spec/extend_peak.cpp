@@ -21,17 +21,16 @@
 
 namespace toppic {
 
-ExtendPeak::ExtendPeak(const DeconvPeakPtr &base_peak_ptr,
-                       double mono_mass, double score):
-    Peak(mono_mass, base_peak_ptr->getIntensity()),
-    base_peak_ptr_(base_peak_ptr),
-    mono_mass_(mono_mass),
-    score_(score),
-    orig_tolerance_(0.0),
-    reverse_tolerance_(0.0) {}
+ExtendPeak::ExtendPeak(const DeconvPeakPtr& base_peak_ptr,
+                       double mono_mass, double score)
+    : Peak(mono_mass, base_peak_ptr->getIntensity()),
+      base_peak_ptr_(base_peak_ptr),
+      mono_mass_(mono_mass),
+      score_(score),
+      orig_tolerance_(0.0),
+      reverse_tolerance_(0.0) {}
 
-void ExtendPeak::appendXml(XmlDOMDocument* xml_doc,
-                           XmlDOMElement parent) const {
+void ExtendPeak::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) const {
   std::string element_name = ExtendPeak::getXmlElementName();
   XmlDOMElement element = xml_doc->addElement(parent, element_name.c_str());
   std::string str = str_util::toString(getPosition());
