@@ -150,10 +150,9 @@ bool Argument::parse(int argc, char* argv[]) {
     // message; the positional spectrum file argument is also hidden here.
     po::options_description hidden_desc("Hidden options");
     hidden_desc.add_options()(
-        "hybrid,H",
-        "Hybrid mode for low resolution MS1 and high resolution MS2.")(
         "multiple-mass,M",
         "Output multiple monoisotopic masses for each MS/MS spectrum.")(
+        "gene-sql", "Write the deconvoluted spectra to an SQLite database.")(
         "keep,k",
         "Report monoisotopic masses extracted from low quality isotopic "
         "envelopes.")("text-peak-list,T",
@@ -271,10 +270,6 @@ bool Argument::parse(int argc, char* argv[]) {
       topfd_para_ptr_->setMissingLevelOne(true);
     }
 
-    if (vm.count("hybrid")) {
-      topfd_para_ptr_->setMissingLevelOne(true);
-    }
-
     if (vm.count("precursor-window")) {
       double window = 0;
       if (!toDouble(prec_window, window) || window <= 0) {
@@ -298,6 +293,10 @@ bool Argument::parse(int argc, char* argv[]) {
 
     if (vm.count("multiple-mass")) {
       topfd_para_ptr_->setOutputMultipleMass(true);
+    }
+
+    if (vm.count("gene-sql")) {
+      topfd_para_ptr_->setGeneSql(true);
     }
 
     if (vm.count("output-batmass-feature")) {

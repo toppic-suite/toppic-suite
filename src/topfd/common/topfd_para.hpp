@@ -110,6 +110,7 @@ class TopfdPara {
   void setOutputCsvFeatureFile(bool output) {
     output_csv_feature_file_ = output;
   }
+  void setGeneSql(bool gene_sql) { gene_sql_ = gene_sql; }
   void setThreadNum(int num) { thread_num_ = num; }
   void setSearchPrecWindow(bool search) { search_prec_window_ = search; }
   void setFilePrecWindow(bool file_prec_window) {
