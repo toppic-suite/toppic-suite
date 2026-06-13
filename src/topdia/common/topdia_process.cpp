@@ -24,8 +24,8 @@
 #include <vector>
 
 #include "common/base/base_data.hpp"
+#include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
-#include "common/util/str_util.hpp"
 #include "common/util/time_util.hpp"
 #include "ms/env/env_base.hpp"
 #include "ms/mzml/mzml_profile.hpp"
@@ -125,17 +125,6 @@ void processOneFile(const TopfdParaPtr& topfd_para_ptr,
   }
 }
 
-bool isValidFile(std::string& file_name) {
-  if (str_util::endsWith(file_name, "mzML") ||
-      str_util::endsWith(file_name, "mzXML") ||
-      str_util::endsWith(file_name, "mzml") ||
-      str_util::endsWith(file_name, "mzxml")) {
-    return true;
-  } else {
-    return false;
-  }
-}
-
 int process(const TopfdParaPtr& topfd_para_ptr,
             const TopdiaParaPtr& topdia_para_ptr,
             std::vector<std::string> spec_file_list) {
@@ -148,7 +137,7 @@ int process(const TopfdParaPtr& topfd_para_ptr,
                           topfd_para_ptr->getThreadNum());
 
   for (std::size_t k = 0; k < spec_file_list.size(); k++) {
-    if (isValidFile(spec_file_list[k])) {
+    if (file_util::isValidMzmlFile(spec_file_list[k])) {
       std::cout << "Processing " << spec_file_list[k] << " started."
                 << std::endl;
       processOneFile(topfd_para_ptr, topdia_para_ptr, spec_file_list[k]);
