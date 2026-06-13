@@ -27,6 +27,10 @@ namespace toppic {
 
 namespace deconv_ms_util {
 
+// Returns a deep copy of the deconvoluted spectra in which the precursor mass
+// has been refined to new_prec_mass. Each spectrum gets a new header (cloned
+// from the original but carrying new_prec_mass) and a fresh, independent copy of
+// every deconvoluted peak, so the input vector is left unchanged.
 DeconvMsPtrVec getRefineMsPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
                                  double new_prec_mass) {
   DeconvMsPtrVec result_ptrs;
