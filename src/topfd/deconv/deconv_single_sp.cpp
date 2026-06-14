@@ -16,6 +16,10 @@
 #include "topfd/deconv/deconv_single_sp.hpp"
 
 #include <algorithm>
+#include <cstddef>
+#include <fstream>
+#include <mutex>
+#include <ostream>
 
 #include "common/util/logger.hpp"
 #include "ms/env/env_detect.hpp"
@@ -32,6 +36,57 @@
 #include "topfd/envcnn/onnx_env_cnn.hpp"
 
 namespace toppic {
+
+namespace {
+
+// Serializes the debug dumps and numbers the spectra across worker threads.
+std::mutex g_dp_env_mutex;
+int g_dp_env_spec_count = 0;
+
+// Write one envelope's information: a summary line followed by its peaks.
+void writeEnv(std::ostream& os, const MatchEnvPtr& match_env) {
+  EnvPtr theo_env = match_env->getTheoEnvPtr();
+  int peak_num = theo_env->getPeakNum();
+  os << "  env mono_mass " << theo_env->getMonoNeutralMass() << " charge "
+     << theo_env->getCharge() << " intensity " << theo_env->compInteSum()
+     << " peak_num " << peak_num << "\n";
+  for (int k = 0; k < peak_num; k++) {
+    os << "    " << theo_env->getMz(k) << " " << theo_env->getInte(k) << "\n";
+  }
+}
+
+// Dump the non-empty windowed candidate envelopes (win_envs) and the
+// DP-selected envelopes (dp_envs) of one spectrum to win_envs.txt /
+// dp_envs.txt. The first spectrum of the run truncates the files; later spectra
+// append.
+void outputDpEnvs(const MatchEnvPtr2D& win_envs, const MatchEnvPtrVec& dp_envs,
+                  int ms_level) {
+  std::lock_guard<std::mutex> lock(g_dp_env_mutex);
+  std::ios::openmode mode =
+      (g_dp_env_spec_count == 0) ? std::ios::out : std::ios::app;
+  int spec_index = g_dp_env_spec_count++;
+
+  std::ofstream win_out("win_envs.txt", mode);
+  win_out << "# spectrum " << spec_index << " ms_level " << ms_level << "\n";
+  for (size_t w = 0; w < win_envs.size(); w++) {
+    if (win_envs[w].empty()) {
+      continue;
+    }
+    win_out << "window " << w << " " << win_envs[w].size() << " envelopes\n";
+    for (size_t i = 0; i < win_envs[w].size(); i++) {
+      writeEnv(win_out, win_envs[w][i]);
+    }
+  }
+
+  std::ofstream dp_out("dp_envs.txt", mode);
+  dp_out << "# spectrum " << spec_index << " ms_level " << ms_level << " "
+         << dp_envs.size() << " envelopes\n";
+  for (size_t i = 0; i < dp_envs.size(); i++) {
+    writeEnv(dp_out, dp_envs[i]);
+  }
+}
+
+}  // namespace
 
 DeconvSingleSp::DeconvSingleSp(const TopfdParaPtr& topfd_para_ptr,
                                PeakPtrVec& peak_list, int ms_level,
@@ -130,6 +185,10 @@ MatchEnvPtrVec DeconvSingleSp::deconv() {
   LOG_DEBUG("Generating Graph and DP...");
   DpA dp(data_ptr_, win_envs, dp_para_ptr_, dp_para_ptr_->mz_tolerance_);
   MatchEnvPtrVec dp_envs = dp.getResult();
+
+  if (topfd_para_ptr_->isOutputDpEnvs()) {
+    outputDpEnvs(win_envs, dp_envs, ms_level_);
+  }
 
   postprocess(dp_envs, ms_level_);
 

@@ -153,10 +153,13 @@ bool Argument::parse(int argc, char* argv[]) {
         "multiple-mass,M",
         "Output multiple monoisotopic masses for each MS/MS spectrum.")(
         "gene-sql", "Write the deconvoluted spectra to an SQLite database.")(
+        "output-dp-envs",
+        "Dump the windowed candidate envelopes and DP-selected envelopes of "
+        "each spectrum to win_envs.txt / dp_envs.txt (debugging).")(
         "keep,k",
         "Report monoisotopic masses extracted from low quality isotopic "
-        "envelopes.")(
-        "text-peak-list,T", "Use a text file containing a mass list as the input.")(
+        "envelopes.")("text-peak-list,T",
+                      "Use a text file containing a mass list as the input.")(
         "output-batmass-feature,O",
         "Output a feature file in the BatMass CSV format.")(
         "spectrum-file-name",
@@ -297,6 +300,10 @@ bool Argument::parse(int argc, char* argv[]) {
 
     if (vm.count("gene-sql")) {
       topfd_para_ptr_->setGeneSql(true);
+    }
+
+    if (vm.count("output-dp-envs")) {
+      topfd_para_ptr_->setOutputDpEnvs(true);
     }
 
     if (vm.count("output-batmass-feature")) {

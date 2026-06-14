@@ -62,6 +62,7 @@ class TopfdPara {
   bool isKeepUnusedPeaks() const { return keep_unused_peaks_; }
   bool isOutputMultipleMass() const { return output_multiple_mass_; }
   bool isOutputCsvFeatureFile() const { return output_csv_feature_file_; }
+  bool isOutputDpEnvs() const { return output_dp_envs_; }
   int getThreadNum() const { return thread_num_; }
   double getMs1EcscoreCutoff() const { return ms1_ecscore_cutoff_; }
   double getMs2EcscoreCutoff() const { return ms2_ecscore_cutoff_; }
@@ -111,6 +112,7 @@ class TopfdPara {
     output_csv_feature_file_ = output;
   }
   void setGeneSql(bool gene_sql) { gene_sql_ = gene_sql; }
+  void setOutputDpEnvs(bool output) { output_dp_envs_ = output; }
   void setThreadNum(int num) { thread_num_ = num; }
   void setSearchPrecWindow(bool search) { search_prec_window_ = search; }
   void setFilePrecWindow(bool file_prec_window) {
@@ -196,6 +198,10 @@ class TopfdPara {
   bool estimate_min_inte_ = true;
   bool output_multiple_mass_ = false;
   bool output_match_env_ = false;
+  // When true, dump the windowed candidate envelopes and the DP-selected
+  // envelopes of every deconvoluted spectrum to win_envs.txt / dp_envs.txt
+  // (debugging aid).
+  bool output_dp_envs_ = false;
 
   //** information for each run **
   int frac_id_ = -1;
