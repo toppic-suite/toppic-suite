@@ -110,6 +110,8 @@ class EnvPara {
   double rank_peak_distance_ = 12;
   // Only keep the top envelope
   int max_similar_mz_env_rank_ = 0;
+  // When false, the "filtering by mz" step (filterEnvByMz) is skipped.
+  bool run_filter_by_mz_ = true;
 
   // ***** Fixed parameters for match env filter ***
   // Monoisotopic masses are divided into two groups

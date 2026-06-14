@@ -206,7 +206,9 @@ void filter(MatchEnvPtr2D& match_envs, const PeakPtrVec& peak_list,
 
   LOG_DEBUG("Valid match envelope number " << cntValid(match_envs));
   LOG_DEBUG("Filtering by mz...");
-  filterEnvByMz(match_envs, peak_list, env_para_ptr);
+  if (env_para_ptr->run_filter_by_mz_) {
+    filterEnvByMz(match_envs, peak_list, env_para_ptr);
+  }
 
   LOG_DEBUG("Valid match envelope number " << cntValid(match_envs));
 }
