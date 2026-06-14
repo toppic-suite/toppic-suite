@@ -98,8 +98,15 @@ void DeconvData::initMinInte(bool estimate_min_inte, double sn_ratio) {
     for (size_t i = 0; i < peak_list_.size(); i++) {
       intes.push_back(peak_list_[i]->getIntensity());
     }
-    min_inte_ = baseline_util::getBaseLine(intes);
-    min_ref_inte_ = min_inte_ * sn_ratio;
+    double noise_inte = baseline_util::getBaseLine(intes);
+    min_ref_inte_ = noise_inte * sn_ratio;
+    // Keep the general peak threshold at the noise level, but allow it to be
+    // lowered below noise (e.g. -s 0) so weak isotope peaks are not pruned.
+    if (sn_ratio < 1.0) {
+      min_inte_ = noise_inte * sn_ratio;
+    } else {
+      min_inte_ = noise_inte;
+    }
   }
 }
 
