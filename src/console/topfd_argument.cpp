@@ -80,6 +80,7 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string split_intensity_ratio = "";
   std::string ecscore_cutoff = "";
   std::string min_scan_num = "";
+  std::string max_miss_peak_num = "";
 
   // Define and parse the program options
   try {
@@ -156,6 +157,9 @@ bool Argument::parse(int argc, char* argv[]) {
         "output-dp-envs",
         "Dump the windowed candidate envelopes and DP-selected envelopes of "
         "each spectrum to win_envs.txt / dp_envs.txt (debugging).")(
+        "max-miss-peak-num", po::value<std::string>(&max_miss_peak_num),
+        "<a non-negative integer>. Maximum number of missing peaks allowed in "
+        "a matched envelope. The default value is 1.")(
         "keep,k",
         "Report monoisotopic masses extracted from low quality isotopic "
         "envelopes.")("text-peak-list,T",
@@ -304,6 +308,16 @@ bool Argument::parse(int argc, char* argv[]) {
 
     if (vm.count("output-dp-envs")) {
       topfd_para_ptr_->setOutputDpEnvs(true);
+    }
+
+    if (vm.count("max-miss-peak-num")) {
+      int num = 0;
+      if (!toInt(max_miss_peak_num, num) || num < 0) {
+        LOG_ERROR("Max missing peak number "
+                  << max_miss_peak_num << " should be a non-negative integer.");
+        return false;
+      }
+      topfd_para_ptr_->setMaxMissPeakNum(num);
     }
 
     if (vm.count("output-batmass-feature")) {

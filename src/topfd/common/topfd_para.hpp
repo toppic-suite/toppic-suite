@@ -48,6 +48,7 @@ class TopfdPara {
   int getMaxCharge() const { return max_charge_; }
   double getMaxMass() const { return max_mass_; }
   double getMzError() const { return mz_error_; }
+  int getMaxMissPeakNum() const { return max_miss_peak_num_; }
 
   bool isEstimateMinInte() const { return estimate_min_inte_; }
   double getMsOneSnRatio() const { return ms_one_sn_ratio_; }
@@ -113,6 +114,7 @@ class TopfdPara {
   }
   void setGeneSql(bool gene_sql) { gene_sql_ = gene_sql; }
   void setOutputDpEnvs(bool output) { output_dp_envs_ = output; }
+  void setMaxMissPeakNum(int num) { max_miss_peak_num_ = num; }
   void setThreadNum(int num) { thread_num_ = num; }
   void setSearchPrecWindow(bool search) { search_prec_window_ = search; }
   void setFilePrecWindow(bool file_prec_window) {
@@ -165,6 +167,9 @@ class TopfdPara {
   double prec_window_ = 3.0;
   bool missing_level_one_ = false;
   double mz_error_ = 0.02;
+  // Maximum number of missing peaks allowed in a matched envelope; used to
+  // initialize EnvPara::max_miss_peak_num_.
+  int max_miss_peak_num_ = 1;
   double ms_one_sn_ratio_ = 3.0;
   double ms_two_sn_ratio_ = 1.0;
   int thread_num_ = 1;

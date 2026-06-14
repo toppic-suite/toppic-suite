@@ -29,8 +29,8 @@ class EnvPara {
  public:
   // EnvPara() to be removed
   EnvPara() {};
-  // set mz tolerance
-  EnvPara(double mz_tolerance);
+  // set mz tolerance and the maximum number of missing peaks
+  EnvPara(double mz_tolerance, int max_miss_peak_num);
 
   double getMzTolerance(int charge);
 

@@ -17,10 +17,11 @@
 
 namespace toppic {
 
-EnvPara::EnvPara(double mz_tolerance) {
+EnvPara::EnvPara(double mz_tolerance, int max_miss_peak_num) {
   mz_tolerance_ = mz_tolerance;
   score_error_tolerance_ = mz_tolerance;
-}  // namespace toppic
+  max_miss_peak_num_ = max_miss_peak_num;
+}
 
 double EnvPara::getMzTolerance(int charge) {
   // report mz_tolerance for charge <= 20

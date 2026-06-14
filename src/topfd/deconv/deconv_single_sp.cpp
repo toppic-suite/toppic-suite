@@ -114,7 +114,8 @@ DeconvSingleSp::DeconvSingleSp(const TopfdParaPtr& topfd_para_ptr,
                                PeakPtrVec& peak_list, int ms_level,
                                double max_mass, int max_charge) {
   topfd_para_ptr_ = topfd_para_ptr;
-  env_para_ptr_ = std::make_shared<EnvPara>(topfd_para_ptr->getMzError());
+  env_para_ptr_ = std::make_shared<EnvPara>(
+      topfd_para_ptr->getMzError(), topfd_para_ptr->getMaxMissPeakNum());
   dp_para_ptr_ = std::make_shared<DpPara>(topfd_para_ptr->getMzError());
   ms_level_ = ms_level;
   double sn_ratio;

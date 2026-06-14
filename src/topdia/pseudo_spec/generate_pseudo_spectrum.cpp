@@ -122,8 +122,8 @@ GeneratePseudoSpectrum::GeneratePseudoSpectrum(
 void GeneratePseudoSpectrum::process(const TopfdParaPtr& topfd_para_ptr,
                                      const TopdiaParaPtr& topdia_para_ptr) {
   int feature_id = 0;
-  EnvParaPtr env_para_ptr =
-      std::make_shared<EnvPara>(topfd_para_ptr->getMzError());
+  EnvParaPtr env_para_ptr = std::make_shared<EnvPara>(
+      topfd_para_ptr->getMzError(), topfd_para_ptr->getMaxMissPeakNum());
   std::string output_base_name = topfd_para_ptr->getOutputBaseName();
   std::string ms2_msalign_name = output_base_name + "_ms2.msalign";
   std::ofstream output;
