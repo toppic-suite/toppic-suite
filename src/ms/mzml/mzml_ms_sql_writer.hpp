@@ -69,6 +69,8 @@ class MzmlMsSqlWriter {
   sqlite3_stmt* ms1_env_peak_stmt_ = nullptr;
   sqlite3_stmt* ms2_spec_stmt_ = nullptr;
   sqlite3_stmt* ms2_peak_stmt_ = nullptr;
+  sqlite3_stmt* ms2_env_stmt_ = nullptr;
+  sqlite3_stmt* ms2_env_peak_stmt_ = nullptr;
 
   int pending_ = 0;  // spectra inserted in the current transaction
   bool in_transaction_ = false;

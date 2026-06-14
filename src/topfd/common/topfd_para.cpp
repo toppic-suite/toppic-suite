@@ -153,6 +153,26 @@ void TopfdPara::createSqlDb(const std::string& sql_db_name) {
       "intensity REAL NOT NULL);";
   LOG_DEBUG("SQL: " << sql);
   sql_util::execSql(sql_db_, sql);
+
+  sql =
+      "CREATE TABLE IF NOT EXISTS ms2_env(spec_id INTEGER NOT NULL,"
+      "env_id INTEGER NOT NULL,"
+      "mono_mass REAL NOT NULL,"
+      "charge INTEGER NOT NULL,"
+      "intensity REAL NOT NULL,"
+      "envcnn_score REAL NOT NULL,"
+      "peak_num INTEGER NOT NULL);";
+  LOG_DEBUG("SQL: " << sql);
+  sql_util::execSql(sql_db_, sql);
+
+  sql =
+      "CREATE TABLE IF NOT EXISTS ms2_env_peak(spec_id INTEGER NOT NULL,"
+      "env_id INTEGER NOT NULL,"
+      "peak_id INTEGER NOT NULL,"
+      "mz REAL NOT NULL,"
+      "intensity REAL NOT NULL);";
+  LOG_DEBUG("SQL: " << sql);
+  sql_util::execSql(sql_db_, sql);
 }
 
 std::string TopfdPara::getTopfdParaStr(const std::string& prefix,

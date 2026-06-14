@@ -84,6 +84,14 @@ MzmlMsSqlWriter::MzmlMsSqlWriter(sqlite3* sql_db) : sql_db_(sql_db) {
   ms2_peak_stmt_ = prepare(sql_db_,
                            "INSERT INTO ms2_peak(spec_id, peak_id, mz, "
                            "intensity) VALUES (?, ?, ?, ?);");
+  ms2_env_stmt_ = prepare(
+      sql_db_,
+      "INSERT INTO ms2_env(spec_id, env_id, mono_mass, charge, intensity, "
+      "envcnn_score, peak_num) VALUES (?, ?, ?, ?, ?, ?, ?);");
+  ms2_env_peak_stmt_ = prepare(
+      sql_db_,
+      "INSERT INTO ms2_env_peak(spec_id, env_id, peak_id, mz, intensity) "
+      "VALUES (?, ?, ?, ?, ?);");
 }
 
 MzmlMsSqlWriter::~MzmlMsSqlWriter() {
@@ -94,6 +102,8 @@ MzmlMsSqlWriter::~MzmlMsSqlWriter() {
   sqlite3_finalize(ms1_env_peak_stmt_);
   sqlite3_finalize(ms2_spec_stmt_);
   sqlite3_finalize(ms2_peak_stmt_);
+  sqlite3_finalize(ms2_env_stmt_);
+  sqlite3_finalize(ms2_env_peak_stmt_);
 }
 
 void MzmlMsSqlWriter::begin() {
@@ -202,6 +212,28 @@ void MzmlMsSqlWriter::writeMs2(const MzmlMsPtr& ms_ptr,
     sqlite3_bind_double(ms2_peak_stmt_, 3, raw_peaks[i]->getPosition());
     sqlite3_bind_double(ms2_peak_stmt_, 4, raw_peaks[i]->getIntensity());
     stepAndReset(ms2_peak_stmt_);
+  }
+
+  for (size_t i = 0; i < envs.size(); i++) {
+    EnvPtr theo_env = envs[i]->getTheoEnvPtr();
+    int peak_num = theo_env->getPeakNum();
+    sqlite3_bind_int(ms2_env_stmt_, 1, spec_id);
+    sqlite3_bind_int(ms2_env_stmt_, 2, static_cast<int>(i));
+    sqlite3_bind_double(ms2_env_stmt_, 3, theo_env->getMonoNeutralMass());
+    sqlite3_bind_int(ms2_env_stmt_, 4, theo_env->getCharge());
+    sqlite3_bind_double(ms2_env_stmt_, 5, theo_env->compInteSum());
+    sqlite3_bind_double(ms2_env_stmt_, 6, envs[i]->getEnvcnnScore());
+    sqlite3_bind_int(ms2_env_stmt_, 7, peak_num);
+    stepAndReset(ms2_env_stmt_);
+
+    for (int k = 0; k < peak_num; k++) {
+      sqlite3_bind_int(ms2_env_peak_stmt_, 1, spec_id);
+      sqlite3_bind_int(ms2_env_peak_stmt_, 2, static_cast<int>(i));
+      sqlite3_bind_int(ms2_env_peak_stmt_, 3, k);
+      sqlite3_bind_double(ms2_env_peak_stmt_, 4, theo_env->getMz(k));
+      sqlite3_bind_double(ms2_env_peak_stmt_, 5, theo_env->getInte(k));
+      stepAndReset(ms2_env_peak_stmt_);
+    }
   }
 
   if (++pending_ >= COMMIT_CHUNK) {
