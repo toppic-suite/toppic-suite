@@ -21,12 +21,15 @@
 #include <string>
 #include <vector>
 
+#include "common/base/activation_base.hpp"
 #include "common/base/base_data.hpp"
 #include "common/util/str_util.hpp"
 #include "common/util/time_util.hpp"
 #include "ms/env/env_base.hpp"
 #include "ms/env/match_env_util.hpp"
 #include "ms/env/match_env_writer.hpp"
+#include "ms/mzml/mzml_ms.hpp"
+#include "ms/mzml/mzml_ms_sql_writer.hpp"
 #include "ms/spec/deconv_ms.hpp"
 #include "ms/spec/msalign_writer.hpp"
 #include "topfd/deconv/deconv_single_sp.hpp"
@@ -89,6 +92,30 @@ void processOneFile(const TopfdParaPtr& para_ptr,
     ms2_writer_ptr = nullptr;
     std::string ms_env_name = output_base_name + "_ms2.env";
     match_env_writer::writePeakList(ms_env_name, peak_list, result_envs);
+
+    // Optionally write the deconvoluted spectrum to an SQLite database. The
+    // MzmlMsSqlWriter consumes a raw MzmlMs (header + peaks) and reads the
+    // activation's N/C ion types from the header, so an activation is attached
+    // here. The text-peak-list input carries no activation information, so the
+    // requested activation is used, falling back to HCD when it is unset/FILE.
+    if (para_ptr->isGeneSql()) {
+      ActivationPtr activation_ptr =
+          ActivationBase::getActivationPtrByName(para_ptr->getActivation());
+      if (activation_ptr == nullptr) {
+        activation_ptr = ActivationBase::getActivationPtrByName("HCD");
+      }
+      header_ptr->setActivationPtr(activation_ptr);
+
+      MzmlMsPtr raw_ms_ptr =
+          std::make_shared<Ms<PeakPtr>>(header_ptr, peak_list);
+
+      std::string sql_db_name = output_base_name + ".sqlite";
+      para_ptr->createSqlDb(sql_db_name);
+      MzmlMsSqlWriterPtr sql_writer_ptr =
+          std::make_shared<MzmlMsSqlWriter>(para_ptr->getSqlDb());
+      sql_writer_ptr->writeMs2(raw_ms_ptr, result_envs);
+      sql_writer_ptr->flush();
+    }
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;
