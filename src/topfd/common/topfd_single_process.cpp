@@ -109,6 +109,11 @@ void processOneFile(const TopfdParaPtr& para_ptr,
       MzmlMsPtr raw_ms_ptr =
           std::make_shared<Ms<PeakPtr>>(header_ptr, peak_list);
 
+      // The text-peak-list input is a single MS/MS spectrum with no MS1 scan.
+      // createSqlDb writes these into the ms_info table, so set them before it
+      // (they default to -1, which is only updated in the mzML flow).
+      para_ptr->setMs1ScanNumber(0);
+      para_ptr->setMs2ScanNumber(1);
       std::string sql_db_name = output_base_name + ".sqlite";
       para_ptr->createSqlDb(sql_db_name);
       MzmlMsSqlWriterPtr sql_writer_ptr =
