@@ -160,6 +160,9 @@ bool Argument::parse(int argc, char* argv[]) {
         "max-miss-peak-num", po::value<std::string>(&max_miss_peak_num),
         "<a non-negative integer>. Maximum number of missing peaks allowed in "
         "a matched envelope. The default value is 1.")(
+        "disable-filter-by-mz",
+        "Skip the filtering-by-mz step that removes an envelope outranked by a "
+        "higher-scoring neighbor with the same charge.")(
         "keep,k",
         "Report monoisotopic masses extracted from low quality isotopic "
         "envelopes.")("text-peak-list,T",
@@ -318,6 +321,10 @@ bool Argument::parse(int argc, char* argv[]) {
         return false;
       }
       topfd_para_ptr_->setMaxMissPeakNum(num);
+    }
+
+    if (vm.count("disable-filter-by-mz")) {
+      topfd_para_ptr_->setRunFilterByMz(false);
     }
 
     if (vm.count("output-batmass-feature")) {
