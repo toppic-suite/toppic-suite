@@ -42,6 +42,7 @@ namespace {
 // Serializes the debug dumps and numbers the spectra across worker threads.
 std::mutex g_dp_env_mutex;
 int g_dp_env_spec_count = 0;
+int g_cand_env_spec_count = 0;
 
 // Write one envelope's information: a summary line followed by its peaks.
 void writeEnv(std::ostream& os, const MatchEnvPtr& match_env) {
@@ -83,6 +84,27 @@ void outputDpEnvs(const MatchEnvPtr2D& win_envs, const MatchEnvPtrVec& dp_envs,
          << dp_envs.size() << " envelopes\n";
   for (size_t i = 0; i < dp_envs.size(); i++) {
     writeEnv(dp_out, dp_envs[i]);
+  }
+}
+
+// Dump the non-null candidate envelopes (per peak and charge) of one spectrum
+// to cand_envs.txt, before any filtering. The first spectrum truncates the
+// file; later spectra append.
+void outputCandEnvs(const MatchEnvPtr2D& cand_envs, int ms_level) {
+  std::lock_guard<std::mutex> lock(g_dp_env_mutex);
+  std::ios::openmode mode =
+      (g_cand_env_spec_count == 0) ? std::ios::out : std::ios::app;
+  int spec_index = g_cand_env_spec_count++;
+
+  std::ofstream out("cand_envs.txt", mode);
+  out << "# spectrum " << spec_index << " ms_level " << ms_level << "\n";
+  for (size_t i = 0; i < cand_envs.size(); i++) {
+    for (size_t j = 0; j < cand_envs[i].size(); j++) {
+      if (cand_envs[i][j] != nullptr) {
+        out << "peak " << i << " charge " << (j + 1) << "\n";
+        writeEnv(out, cand_envs[i][j]);
+      }
+    }
   }
 }
 
@@ -168,6 +190,11 @@ MatchEnvPtrVec DeconvSingleSp::deconv() {
       peak_list, data_ptr_->getMaxCharge(), data_ptr_->getMaxMass(),
       data_ptr_->getMinInte(), data_ptr_->getMinRefInte(), env_para_ptr_);
   LOG_DEBUG("candidate complete");
+
+  if (topfd_para_ptr_->isOutputDpEnvs()) {
+    outputCandEnvs(cand_envs, ms_level_);
+  }
+
   // envelope filter
   env_filter::filter(cand_envs, peak_list, env_para_ptr_);
   // prepare for dp
