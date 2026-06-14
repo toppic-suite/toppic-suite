@@ -155,8 +155,8 @@ bool Argument::parse(int argc, char* argv[]) {
         "gene-sql", "Write the deconvoluted spectra to an SQLite database.")(
         "keep,k",
         "Report monoisotopic masses extracted from low quality isotopic "
-        "envelopes.")("text-peak-list,T",
-                      "Use a text file containing a mass list as the input.")(
+        "envelopes.")(
+        "text-peak-list,T", "Use a text file containing a mass list as the input.")(
         "output-batmass-feature,O",
         "Output a feature file in the BatMass CSV format.")(
         "spectrum-file-name",

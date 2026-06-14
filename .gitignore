@@ -70,6 +70,8 @@ vcpkg_installed/
 # test output & cache
 Testing/
 .cache/
+# top-level scratch/test data folder
+/test/
 
 # build artifacts
 /bin/
