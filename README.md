@@ -42,3 +42,73 @@ files are pointer text), install it as above and then pull the real blobs:
 git lfs install
 git lfs pull
 ```
+
+## Building on Ubuntu Linux
+
+### 1. Install the build dependencies
+
+```sh
+sudo apt-get update
+sudo apt-get install build-essential cmake clang git git-lfs \
+    zlib1g-dev libsqlite3-dev libpugixml-dev \
+    libboost-filesystem-dev libboost-iostreams-dev libboost-thread-dev \
+    libboost-chrono-dev libboost-system-dev libboost-serialization-dev \
+    libboost-program-options-dev \
+    qtbase5-dev
+```
+
+Notes:
+
+- The build defaults to **clang/clang++** when they are found; if clang is not
+  installed, CMake falls back to the system default compiler (g++ works too).
+  To force a compiler, pass `-DCMAKE_CXX_COMPILER=...` at configure time.
+- **Boost ≥ 1.74** is required. The Ubuntu packages above are sufficient
+  (`libboost-all-dev` also works if you prefer one package).
+- **Qt5** (`qtbase5-dev`) is needed for the GUI tools (`topfd_gui`, etc.).
+- Other third-party code (htslib, ProteoWizard, ONNX Runtime) is vendored
+  under `ext/` and built/linked automatically — no packages needed.
+
+### 2. Clone (with Git LFS — see above)
+
+```sh
+git clone https://github.com/liuxiaowen/toppic_claude.git
+cd toppic_claude
+```
+
+### 3. Configure and build
+
+```sh
+mkdir -p build
+cd build
+cmake ..
+make -j$(nproc)
+```
+
+The build type defaults to `Release`. The executables (`topfd`, `topdia`,
+`topindex`, `toppic`, `topmg`, `topdiff` and their `*_gui` counterparts) are
+placed in the repository's `bin/` directory. To build just one tool, e.g.
+TopFD:
+
+```sh
+make -j$(nproc) topfd
+```
+
+### 4. (Optional) Install
+
+```sh
+sudo make install
+```
+
+This installs the binaries to `/usr/local/bin`, the shared library directory
+to `/usr/local/lib/toppic`, and the runtime resources (model files, isotope
+tables, ...) to `/usr/local/share/toppic`. Use
+`cmake -DCMAKE_INSTALL_PREFIX=<dir> ..` at configure time for a different
+prefix.
+
+To run the tools from `bin/` **without** installing, they need to find the
+runtime resources in a `res` directory next to the executable; create a
+symlink to the repository's `res/` once:
+
+```sh
+ln -s ../res bin/res
+```
