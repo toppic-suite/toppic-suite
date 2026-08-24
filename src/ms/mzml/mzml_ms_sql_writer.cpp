@@ -79,8 +79,8 @@ MzmlMsSqlWriter::MzmlMsSqlWriter(sqlite3* sql_db) : sql_db_(sql_db) {
   ms2_spec_stmt_ = prepare(
       sql_db_,
       "INSERT INTO ms2_spectrum(id, scan, retention_time, target_mz, begin_mz, "
-      "end_mz, n_ion_type, c_ion_type, peak_num) "
-      "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);");
+      "end_mz, n_ion_type, c_ion_type, peak_num, ms1_id) "
+      "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
   ms2_peak_stmt_ = prepare(sql_db_,
                            "INSERT INTO ms2_peak(spec_id, peak_id, mz, "
                            "intensity) VALUES (?, ?, ?, ?);");
@@ -187,6 +187,7 @@ void MzmlMsSqlWriter::writeMs2(const MzmlMsPtr& ms_ptr,
 
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
   int spec_id = header_ptr->getSpecId();
+  int ms1_id = header_ptr->getMsOneId();
   const PeakPtrVec& raw_peaks = ms_ptr->getPeakPtrVec();
   std::string n_ion_type =
       header_ptr->getActivationPtr()->getNIonTypePtr()->getName();
@@ -204,6 +205,7 @@ void MzmlMsSqlWriter::writeMs2(const MzmlMsPtr& ms_ptr,
   sqlite3_bind_text(ms2_spec_stmt_, 8, c_ion_type.c_str(), -1,
                     SQLITE_TRANSIENT);
   sqlite3_bind_int(ms2_spec_stmt_, 9, static_cast<int>(raw_peaks.size()));
+  sqlite3_bind_int(ms2_spec_stmt_, 10, ms1_id);
   stepAndReset(ms2_spec_stmt_);
 
   for (size_t i = 0; i < raw_peaks.size(); i++) {

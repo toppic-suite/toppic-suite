@@ -113,7 +113,9 @@ void TopfdPara::createSqlDb(const std::string& sql_db_name) {
       "end_mz REAL,"
       "n_ion_type TEXT,"
       "c_ion_type TEXT,"
-      "peak_num INTEGER);";
+      "peak_num INTEGER,"
+      "ms1_id INTEGER,"
+      "FOREIGN KEY(ms1_id) REFERENCES ms1_spectrum(id));";
   LOG_DEBUG("SQL: " << sql);
   sql_util::execSql(sql_db_, sql);
   sql =
