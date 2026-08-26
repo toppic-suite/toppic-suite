@@ -130,6 +130,19 @@ void deconvMsOne(const MzmlMsGroupPtr& ms_group_ptr,
         topfd_para_ptr, peak_list, ms_level, max_mass, max_charge);
     deconv_envs = deconv_ptr->deconv();
   }
+  // Restore the intensities of the removed precursor peaks (zeroed above so
+  // the whole-spectrum deconvolution skips them). The peaks are shared with
+  // ms_ptr, which is buffered for SQLite output below, so the spectrum must be
+  // written with its original intensities.
+  for (std::size_t i = 0; i < prec_envs.size(); i++) {
+    ExpEnvPtr env_ptr = prec_envs[i]->getExpEnvPtr();
+    for (int p = 0; p < env_ptr->getPeakNum(); p++) {
+      if (env_ptr->isExist(p)) {
+        int idx = env_ptr->getPeakIdx(p);
+        peak_list[idx]->setIntensity(intensities[idx]);
+      }
+    }
+  }
   // 4. Merge precursor envelopes and deconvolution envelopes
   MatchEnvPtrVec result_envs;
   result_envs.insert(result_envs.end(), prec_envs.begin(), prec_envs.end());
