@@ -135,43 +135,10 @@ by `make install`, deletes every file listed there, and removes any directories
 has been deleted, there is no manifest and `make uninstall` will report an
 error; in that case remove the installed files by hand.
 
-## Building on Red Hat Enterprise Linux 10
+## Building on Red Hat Enterprise Linux
 
 The steps are the same as for Ubuntu above; only the package installation
-differs. `pugixml-devel` is not in RHEL 10 itself and comes from EPEL (Extra
-Packages for Enterprise Linux), which in turn needs the CodeReady Builder
-repository, so enable both first.
-
-```sh
-# enable CodeReady Builder and EPEL
-sudo subscription-manager repos --enable codeready-builder-for-rhel-10-$(arch)-rpms
-sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-10.noarch.rpm
-
-# compilers and build tools
-sudo dnf install cmake gcc-c++ make clang git git-lfs
-
-# libraries (zlib-ng-compat-devel is RHEL 10's replacement for zlib-devel)
-sudo dnf install zlib-ng-compat-devel sqlite-devel pugixml-devel boost-devel
-
-# Qt6 for the GUI tools
-sudo dnf install qt6-qtbase-devel
-```
-
-`boost-devel` on RHEL 10 provides Boost 1.83, which satisfies the ≥ 1.74
-requirement. Then continue with steps 2–5 of the Ubuntu instructions (clone
-with Git LFS, configure and build, install, uninstall); they are identical.
-On Red Hat the same commands apply, e.g.:
-
-```sh
-git lfs install
-git clone https://github.com/toppic_suite/toppic_suite.git
-cd toppic_suite
-mkdir -p build
-cd build
-cmake ..
-make -j$(nproc)
-sudo make install
-```
+differs. Please follow the instructions from [here](doc/redhat_build.md).
 
 ## Building on Windows
 
@@ -180,37 +147,5 @@ sudo make install
 
 ## Building on macOS
 
-The steps are the same as for Ubuntu above; only the package installation and
-two configure details differ. Xcode Command Line Tools provide clang, and
-[Homebrew](https://brew.sh/) provides everything else. No ONNX Runtime library
-is vendored for macOS, so the Homebrew package is used instead.
-
-```sh
-# compiler
-xcode-select --install
-
-# build tools and libraries
-brew install cmake git git-lfs boost pugixml sqlite zlib onnxruntime
-
-# Qt6 for the GUI tools
-brew install qt
-```
-
-Then clone as in step 2 of the Ubuntu instructions and build:
-
-```sh
-mkdir -p build
-cd build
-cmake ..
-make -j$(sysctl -n hw.ncpu)
-sudo make install
-```
-
-Notes:
-
-- Homebrew's `qt` formula is Qt6 and is linked into the Homebrew prefix, so
-  CMake finds it without further hints. If CMake still cannot find Qt6, pass
-  `-DCMAKE_PREFIX_PATH="$(brew --prefix qt)"`.
-- On macOS the runtime resources are installed next to the executables, in
-  `<prefix>/bin/res`, rather than in `share/toppic`, because that is where the
-  tools look for them on this platform. `make uninstall` works as on Linux.
+Xcode Command Line Tools and [Homebrew](https://brew.sh/) are used for building
+TopPIC Suite on macOS. Please follow the instructions from [here](doc/macos_build.md).
