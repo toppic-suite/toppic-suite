@@ -82,9 +82,10 @@ endif()
 include(GNUInstallDirs)   # standard bin/lib/share defaults, all under the prefix
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-  # The shared library goes in <prefix>/lib/toppic and the data in
-  # <prefix>/share/toppic. NOTE: "lib/toppic" must stay in sync with the
-  # "$ORIGIN/../lib/toppic" rpath set in the Linux linker flags below.
+  # The vendored ONNX Runtime shared library goes in <prefix>/lib/toppic and
+  # the data in <prefix>/share/toppic. The installed executables find the
+  # library through the INSTALL_RPATH set in the install section at the end of
+  # this file, which is derived from this value.
   set(CMAKE_INSTALL_LIBDIR  "lib/toppic")
   set(CMAKE_INSTALL_DATADIR "${CMAKE_INSTALL_DATADIR}/toppic")
 ELSEIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
@@ -118,6 +119,19 @@ message(STATUS "Compiled-in shared dir:      ${TOPPIC_SHARED_DIR}")
 # which getResourceDir()'s "<exec_dir>/res" lookup also resolves.
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/res/
         DESTINATION ${CMAKE_INSTALL_DATADIR})
+
+# `make uninstall`: remove everything that `make install` recorded in the build
+# directory's install_manifest.txt, plus any directories left empty by that
+# (see cmake/cmake_uninstall.cmake.in). CMake has no built-in uninstall.
+if(NOT TARGET uninstall)
+  configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake
+    @ONLY)
+  add_custom_target(uninstall
+    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake
+    COMMENT "Uninstalling files listed in install_manifest.txt")
+endif()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/../bin)
 message(STATUS "Executable output directory: " ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
@@ -333,3 +347,28 @@ toppic_gui_exe(toppic_gui   toppic   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/top
 toppic_gui_exe(topmg_gui    topmg    ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmg_argument.cpp)
 toppic_gui_exe(topdiff_gui  topdiff  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdiff_argument.cpp)
 toppic_gui_exe(topdia_gui   topdia   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdia_argument.cpp)
+
+# ---------------------------------------------------------------------------
+# Install the executables
+#
+# All twelve command-line and GUI executables go to <prefix>/bin. Every one of
+# them links the vendored ONNX Runtime shared library (through toppic_common),
+# so on Linux that library is installed to <prefix>/${CMAKE_INSTALL_LIBDIR}
+# (lib/toppic) and the executables get an $ORIGIN-relative rpath pointing at
+# it, keeping the installed tree relocatable. In the build tree CMake already
+# adds the ext/onnx directory to the executables' rpath, so `bin/` works
+# without installing.
+# ---------------------------------------------------------------------------
+set(TOPPIC_EXECUTABLES
+  topfd topdia topindex toppic topmg topdiff
+  topfd_gui topdia_gui topindex_gui toppic_gui topmg_gui topdiff_gui)
+
+install(TARGETS ${TOPPIC_EXECUTABLES}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+  install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/ext/onnx/libonnxruntime.so.1.14.1
+          DESTINATION ${CMAKE_INSTALL_LIBDIR})
+  set_target_properties(${TOPPIC_EXECUTABLES} PROPERTIES
+    INSTALL_RPATH "$ORIGIN/../${CMAKE_INSTALL_LIBDIR}")
+endif()

@@ -108,11 +108,14 @@ make -j$(nproc) topfd
 sudo make install
 ```
 
-This installs the binaries to `/usr/local/bin`, the shared library directory
-to `/usr/local/lib/toppic`, and the runtime resources (model files, isotope
-tables, ...) to `/usr/local/share/toppic`. Use
+This installs the binaries to `/usr/local/bin`, the ONNX Runtime shared
+library they use to `/usr/local/lib/toppic`, and the runtime resources (model
+files, isotope tables, ...) to `/usr/local/share/toppic`. Use
 `cmake -DCMAKE_INSTALL_PREFIX=<dir> ..` at configure time for a different
 prefix.
+
+To remove the installed files again, run `sudo make uninstall` from the same
+build directory (it uses the `install_manifest.txt` written by `make install`).
 
 To run the tools from `bin/` **without** installing, they need to find the
 runtime resources in a `res` directory next to the executable; create a
