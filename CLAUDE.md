@@ -198,10 +198,14 @@ path and linked into `toppic_common`:
   `ext/onnx` (sources include it as `"onnx/onnxruntime_cxx_api.h"`, covered by
   the `SYSTEM` `ext/` include); it is linked as an `IMPORTED` shared object,
   `PRIVATE`, into `toppic_common`. The vendored `.so` is Linux x86-64 only;
-  on macOS `CMakeLists.txt` instead locates Homebrew's `libonnxruntime.dylib`
-  (`find_library` under the Homebrew prefix, overridable with
-  `-DONNXRUNTIME_LIBRARY=...`) and still compiles against the vendored 1.14
-  headers. Treat it as third-party.
+  on macOS and Windows `CMakeLists.txt` instead locates the system package
+  (Homebrew's `libonnxruntime.dylib`; MSYS2 UCRT64's `libonnxruntime.dll.a`)
+  with `find_library` (overridable with `-DONNXRUNTIME_LIBRARY=...`) as an
+  `UNKNOWN IMPORTED` target, and still compiles against the vendored 1.14
+  headers. Windows also links `ws2_32` into the vendored htslib and pwiz
+  (Winsock), builds the GUI targets as `WIN32_EXECUTABLE`, and installs `res/`
+  next to the executables because `getResourceDir()` only checks
+  `<exec_dir>/res` there. Treat it as third-party.
 
 ## Install and uninstall (`make install` / `make uninstall`)
 

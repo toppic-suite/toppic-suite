@@ -175,6 +175,11 @@ make -j$(nproc)
 sudo make install
 ```
 
+## Building on Windows
+
+[MSYS2](http://www.msys2.org/) is used for building TopPIC Suite on Windows systems. Please follow the instructions from [here](doc/windows_build.md).
+
+
 ## Building on macOS
 
 The steps are the same as for Ubuntu above; only the package installation and

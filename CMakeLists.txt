@@ -88,9 +88,10 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   # this file, which is derived from this value.
   set(CMAKE_INSTALL_LIBDIR  "lib/toppic")
   set(CMAKE_INSTALL_DATADIR "${CMAKE_INSTALL_DATADIR}/toppic")
-ELSEIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-  # macOS: resources are installed next to the executable so that
-  # getResourceDir()'s "<exec_dir>/res" lookup finds them.
+ELSEIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin|Windows")
+  # macOS and Windows: resources are installed next to the executable so that
+  # getResourceDir()'s "<exec_dir>/res" lookup finds them (on Windows that is
+  # the only lookup; the compiled-in shared dir is not consulted).
   set(CMAKE_INSTALL_DATADIR "${CMAKE_INSTALL_BINDIR}/res")
 ENDIF()
 
@@ -179,6 +180,10 @@ target_link_libraries(htslib PUBLIC ZLIB::ZLIB Threads::Threads)
 # linked into the toppic_common shared library.
 set_target_properties(htslib PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_compile_options(htslib PRIVATE -w)
+if(WIN32)
+  # hfile.c uses send()/recv() from Winsock on Windows.
+  target_link_libraries(htslib PUBLIC ws2_32)
+endif()
 
 # A trimmed copy of ProteoWizard (pwiz) is vendored under ext/pwiz; ms/mzml's
 # pw_ms_reader uses it to read mzML/mzMLb files. Only the four source
@@ -202,6 +207,10 @@ target_compile_definitions(pwiz PUBLIC WITHOUT_MZ5)
 set_target_properties(pwiz PROPERTIES POSITION_INDEPENDENT_CODE ON)
 # Third-party: silence its warnings (the -Wdeprecated noise from Boost especially).
 target_compile_options(pwiz PRIVATE -w)
+if(WIN32)
+  # random_access_compressed_ifstream.cpp uses ntohl()/htonl() from Winsock.
+  target_link_libraries(pwiz PUBLIC ws2_32)
+endif()
 
 # src for the hand-written headers, and the build-tree gen/ dir for the
 # CMake-generated common/util/version.hpp.
@@ -261,29 +270,34 @@ target_link_libraries(toppic_common PUBLIC Boost::serialization)
 # neural-network models via the ONNX Runtime C++ API. The C/C++ API headers are
 # vendored under ext/onnx (the sources include it as "onnx/onnxruntime_cxx_api.h",
 # so the existing SYSTEM ext/ include covers the headers) and the library is an
-# IMPORTED shared object linked into toppic_common.
+# IMPORTED target linked into toppic_common.
 #
-# The vendored prebuilt libonnxruntime.so.1.14.1 is a Linux x86-64 binary. On
-# macOS no library is vendored: the Homebrew package is used instead
-# (`brew install onnxruntime`), found under the Homebrew prefix. A newer
-# runtime serves the vendored 1.14 API headers (the ONNX Runtime C API is
-# backward compatible).
-add_library(onnxruntime SHARED IMPORTED)
-if(APPLE)
+# The vendored prebuilt libonnxruntime.so.1.14.1 is a Linux x86-64 binary and is
+# used on Linux. On macOS and Windows no library is vendored: the system package
+# is used instead (`brew install onnxruntime` on macOS; the MSYS2 package
+# mingw-w64-ucrt-x86_64-onnxruntime in a UCRT64 shell on Windows), located with
+# find_library. A newer runtime serves the vendored 1.14 API headers (the ONNX
+# Runtime C API is backward compatible).
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+  add_library(onnxruntime SHARED IMPORTED)
+  set_target_properties(onnxruntime PROPERTIES
+    IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/ext/onnx/libonnxruntime.so.1.14.1
+    IMPORTED_SONAME libonnxruntime.so.1.14.1)
+else()
   find_library(ONNXRUNTIME_LIBRARY onnxruntime
     HINTS /opt/homebrew/lib /usr/local/lib)
   if(NOT ONNXRUNTIME_LIBRARY)
     message(FATAL_ERROR
-      "ONNX Runtime not found. Install it with 'brew install onnxruntime' or pass "
-      "-DONNXRUNTIME_LIBRARY=/path/to/libonnxruntime.dylib.")
+      "ONNX Runtime not found. Install it ('brew install onnxruntime' on macOS, "
+      "'pacman -S mingw-w64-ucrt-x86_64-onnxruntime' in an MSYS2 UCRT64 shell on "
+      "Windows) or pass -DONNXRUNTIME_LIBRARY=/path/to/the/library.")
   endif()
   message(STATUS "ONNX Runtime library: ${ONNXRUNTIME_LIBRARY}")
+  # UNKNOWN: link the found file by path (a .dylib, or the MinGW .dll.a import
+  # library whose DLL is found on PATH at run time).
+  add_library(onnxruntime UNKNOWN IMPORTED)
   set_target_properties(onnxruntime PROPERTIES
     IMPORTED_LOCATION ${ONNXRUNTIME_LIBRARY})
-else()
-  set_target_properties(onnxruntime PROPERTIES
-    IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/ext/onnx/libonnxruntime.so.1.14.1
-    IMPORTED_SONAME libonnxruntime.so.1.14.1)
 endif()
 target_link_libraries(toppic_common PRIVATE onnxruntime)
 
@@ -356,6 +370,11 @@ function(toppic_gui_exe name dir)
   set_target_properties(${name} PROPERTIES
     AUTOMOC ON AUTOUIC ON AUTORCC ON
     AUTOUIC_SEARCH_PATHS ${CMAKE_CURRENT_SOURCE_DIR}/src)
+  if(WIN32)
+    # GUI subsystem (no console window); Qt5's CMake config links qtmain
+    # automatically for WIN32_EXECUTABLE targets.
+    set_target_properties(${name} PROPERTIES WIN32_EXECUTABLE ON)
+  endif()
   target_link_libraries(${name} PRIVATE
     toppic_common Qt5::Widgets Qt5::Core Qt5::Gui Boost::program_options)
 endfunction()
@@ -377,7 +396,8 @@ toppic_gui_exe(topdia_gui   topdia   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/top
 # it, keeping the installed tree relocatable. In the build tree CMake already
 # adds the ext/onnx directory to the executables' rpath, so `bin/` works
 # without installing. On macOS the Homebrew dylib is found through its own
-# absolute install name, so nothing extra is installed.
+# absolute install name and on Windows the MSYS2 DLL is on PATH, so nothing
+# extra is installed there.
 # ---------------------------------------------------------------------------
 set(TOPPIC_EXECUTABLES
   topfd topdia topindex toppic topmg topdiff
