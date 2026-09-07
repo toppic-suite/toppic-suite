@@ -114,9 +114,6 @@ files, isotope tables, ...) to `/usr/local/share/toppic`. Use
 `cmake -DCMAKE_INSTALL_PREFIX=<dir> ..` at configure time for a different
 prefix.
 
-To remove the installed files again, run `sudo make uninstall` from the same
-build directory (it uses the `install_manifest.txt` written by `make install`).
-
 To run the tools from `bin/` **without** installing, they need to find the
 runtime resources in a `res` directory next to the executable; create a
 symlink to the repository's `res/` once:
@@ -124,3 +121,19 @@ symlink to the repository's `res/` once:
 ```sh
 ln -s ../res bin/res
 ```
+
+### 5. Uninstall
+
+To remove everything that `make install` placed under the prefix (the
+binaries, the ONNX Runtime library and the runtime resources), run the
+following from the **same build directory** that was used for `make install`:
+
+```sh
+sudo make uninstall
+```
+
+The command reads the `install_manifest.txt` written into the build directory
+by `make install`, deletes every file listed there, and removes any directories
+(e.g. `/usr/local/share/toppic`) that are left empty. If the build directory
+has been deleted, there is no manifest and `make uninstall` will report an
+error; in that case remove the installed files by hand.
