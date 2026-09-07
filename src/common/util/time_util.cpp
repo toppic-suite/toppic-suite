@@ -29,7 +29,10 @@ std::string getTimeStr() {
   // std::localtime returns a pointer to a shared static std::tm and is
   // therefore not thread-safe; use the reentrant per-platform variant instead.
   std::tm local_tm;
-#if defined(_MSC_VER)
+#if defined(_WIN32)
+  // Both MSVC and the MinGW-w64 UCRT headers (MSYS2) provide the Microsoft
+  // localtime_s(tm*, time_t*); MinGW does not expose localtime_r under
+  // -std=c++17, so select on _WIN32 rather than _MSC_VER.
   if (localtime_s(&local_tm, &cur_time) != 0) {
     return std::string();
   }
