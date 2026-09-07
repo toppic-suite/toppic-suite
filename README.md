@@ -80,8 +80,8 @@ Notes:
 ### 2. Clone (with Git LFS — see above)
 
 ```sh
-git clone https://github.com/liuxiaowen/toppic_claude.git
-cd toppic_claude
+git clone https://github.com/toppic_suite/toppic_suite.git
+cd toppic_suite
 ```
 
 ### 3. Configure and build
