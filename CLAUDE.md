@@ -175,6 +175,14 @@ path and linked into `toppic_common`:
   own code and it warns — e.g. uBLAS still deriving from the C++17-deprecated
   `std::iterator` — wrap it in `#pragma GCC diagnostic ignored
   "-Wdeprecated-declarations"`.)
+- **Compiler default** — `CMakeLists.txt` defaults to clang/clang++ when found,
+  except on Windows hosts (MSYS2), where it leaves CMake's `cc`/`c++` default
+  so the compiler matches the one the MSYS2 packages were built with (GCC in
+  UCRT64/MINGW64, clang in CLANG64). Mixing clang objects with GCC-built
+  static Boost fails at link time with "duplicate section ... has different
+  size" warnings and "multiple definition" errors for COMDAT variables that
+  clang places in `.bss` and GCC in `.data`. Keep that `CMAKE_HOST_WIN32`
+  guard; `doc/windows_build.md` tells users to install `...-gcc`, not `-clang`.
 - **Qt6** — `find_package(Qt6 COMPONENTS Widgets Core Gui)` backs the `src/gui`
   desktop executables (see the source-layout note). Only the GUI targets use it,
   via per-target `AUTOMOC`/`AUTOUIC`/`AUTORCC`; the `toppic_common` library has
@@ -187,8 +195,13 @@ path and linked into `toppic_common`:
   a few Boost pieces the system package lacks (`boost/nowide`, the `boost::enums`
   library, `foreach_field.hpp`); those are vendored under `ext/boost`, which
   `ext/` (the include root) resolves ahead of the system Boost while everything
-  else still comes from the system. Treat `ext/pwiz` and `ext/boost` as
-  third-party: do not reformat them or hold them to the IWYU/include-order rules.
+  else still comes from the system. The vendored nowide's `iostream.cpp` (the
+  Windows UTF-8 console streams `boost::nowide::cerr` etc. that pwiz's
+  `Stream.hpp` uses) is appended to the `pwiz` sources; it is an empty TU off
+  Windows, and it must be that copy, not the system `boost_nowide` library,
+  because the vendored headers predate Boost.Nowide. Treat `ext/pwiz` and
+  `ext/boost` as third-party: do not reformat them or hold them to the
+  IWYU/include-order rules.
   Their `.cpp` files are built with `-w`; the `ext/` directory is added to every
   target as a **`SYSTEM`** include (`-isystem`), so warnings from vendored
   headers are silenced even when our own `-Wall` sources include them.

@@ -11,16 +11,26 @@ endif()
 # This must happen before project(), because the compiler cannot be changed
 # afterwards. We only set it when unset so the user can still override with
 # -DCMAKE_CXX_COMPILER=... or a toolchain file.
-if(NOT CMAKE_C_COMPILER)
-  find_program(CLANG_EXECUTABLE clang)
-  if(CLANG_EXECUTABLE)
-    set(CMAKE_C_COMPILER "${CLANG_EXECUTABLE}" CACHE STRING "C compiler")
+#
+# Not on Windows hosts (MSYS2): there the environment's default compiler must
+# be used, because the MSYS2 UCRT64/MINGW64 packages (Boost, Qt6, ...) are
+# built with GCC, and linking clang-compiled objects against GCC-built static
+# Boost fails ("duplicate section ... has different size" warnings, then
+# "multiple definition" errors for COMDAT variables that clang puts in .bss
+# and GCC in .data). CMake's default cc/c++ is gcc in UCRT64/MINGW64 and
+# clang in CLANG64, i.e. always the compiler the packages were built with.
+if(NOT CMAKE_HOST_WIN32)
+  if(NOT CMAKE_C_COMPILER)
+    find_program(CLANG_EXECUTABLE clang)
+    if(CLANG_EXECUTABLE)
+      set(CMAKE_C_COMPILER "${CLANG_EXECUTABLE}" CACHE STRING "C compiler")
+    endif()
   endif()
-endif()
-if(NOT CMAKE_CXX_COMPILER)
-  find_program(CLANGXX_EXECUTABLE clang++)
-  if(CLANGXX_EXECUTABLE)
-    set(CMAKE_CXX_COMPILER "${CLANGXX_EXECUTABLE}" CACHE STRING "C++ compiler")
+  if(NOT CMAKE_CXX_COMPILER)
+    find_program(CLANGXX_EXECUTABLE clang++)
+    if(CLANGXX_EXECUTABLE)
+      set(CMAKE_CXX_COMPILER "${CLANGXX_EXECUTABLE}" CACHE STRING "C++ compiler")
+    endif()
   endif()
 endif()
 
@@ -213,6 +223,13 @@ file(GLOB PWIZ_SRCS CONFIGURE_DEPENDS
   ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/data/common/*.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/data/msdata/*.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/data/msdata/mzmlb/*.cpp)
+# pwiz writes its diagnostics through boost::nowide::cerr/cout (utility/misc/
+# Stream.hpp). On Windows the vendored ext/boost/nowide headers declare those
+# as UTF-8 console streams defined in nowide's iostream.cpp, so that source is
+# compiled into pwiz as well (elsewhere it is an empty translation unit: the
+# header just aliases std::cerr etc.). It is the vendored copy, not the
+# system Boost.Nowide, because the vendored headers predate Boost's version.
+list(APPEND PWIZ_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/ext/boost/nowide/iostream.cpp)
 add_library(pwiz STATIC ${PWIZ_SRCS})
 target_include_directories(pwiz SYSTEM PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/ext)
 target_link_libraries(pwiz PUBLIC

@@ -21,7 +21,7 @@ TopDIA need, only for its UCRT64 and CLANG64 environments, not for MINGW64.
 pacman -S git mingw-w64-ucrt-x86_64-git-lfs
 
 # compiler and build tools
-pacman -S mingw-w64-ucrt-x86_64-clang mingw-w64-ucrt-x86_64-cmake mingw-w64-ucrt-x86_64-ninja
+pacman -S mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-cmake mingw-w64-ucrt-x86_64-ninja
 
 # libraries
 pacman -S mingw-w64-ucrt-x86_64-boost mingw-w64-ucrt-x86_64-pugixml \
@@ -56,8 +56,14 @@ ninja
 ```
 
 The Ninja generator is used because CMake's "MinGW Makefiles" generator
-refuses to run inside an MSYS2 shell (it rejects `sh.exe` on the `PATH`). The
-build defaults to clang when it is found, otherwise to gcc. The executables
+refuses to run inside an MSYS2 shell (it rejects `sh.exe` on the `PATH`). On
+Windows the build uses the environment's default compiler, which is GCC in
+the UCRT64 shell (on Linux and macOS it defaults to clang). Do not build with
+clang in the UCRT64 shell: the UCRT64 packages, including the static Boost
+libraries, are built with GCC, and linking clang-compiled objects against them
+fails with "duplicate section ... has different size" warnings followed by
+"multiple definition" errors. To use clang, use the MSYS2 CLANG64 shell with
+the matching `mingw-w64-clang-x86_64-*` packages instead. The executables
 (`topfd.exe`, `topdia.exe`, `topindex.exe`, `toppic.exe`, `topmg.exe`,
 `topdiff.exe` and their `*_gui.exe` counterparts) are placed in the
 repository's `bin/` directory.
