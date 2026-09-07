@@ -260,6 +260,27 @@ that was left empty (the manifest lists files only). Consequences:
   automatically — do not add per-file removal code to the script.
 - Running it twice is harmless (missing files are reported, not errors).
 
+## Platform build documentation
+
+The build instructions are split by platform. `README.md` carries the full
+Ubuntu walkthrough (packages, clone with Git LFS, configure/build, install,
+uninstall) and only a one-paragraph link for each other platform; the details
+live in `doc/`, all laid out with the same six steps:
+
+- `doc/windows_build.md` — MSYS2 **UCRT64** shell, Ninja generator, GCC (not
+  clang; see the compiler-default note above), `pacman` package list, system
+  ONNX Runtime, `res/` installed next to the executables.
+- `doc/redhat_build.md` — RHEL 10 (and Rocky/AlmaLinux): CodeReady Builder +
+  EPEL for `pugixml-devel`, `dnf` package list, otherwise identical to Ubuntu.
+- `doc/macos_build.md` — Xcode Command Line Tools + Homebrew, Homebrew
+  `onnxruntime` (nothing is vendored for macOS; `-DONNXRUNTIME_LIBRARY`
+  override), Qt6 hint, resources installed to `<prefix>/bin/res`.
+
+When you change anything platform-specific in `CMakeLists.txt` — a required
+package, the compiler choice, how a library is located, the install layout —
+update the matching doc (and the README for Ubuntu) in the same commit; the
+docs are hand-written and nothing checks them against the build.
+
 ## Source layout
 
 `src` is the include root, so headers are included by their path from `src`
