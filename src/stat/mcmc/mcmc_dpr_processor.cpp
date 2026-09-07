@@ -16,6 +16,7 @@
 #include "stat/mcmc/mcmc_dpr_processor.hpp"
 
 #include <algorithm>
+#include <cstddef>
 #include <limits>
 #include <map>
 #include <random>
@@ -330,7 +331,7 @@ void DprProcessor::processOnePrsm(const PrsmPtr& prsm_ptr,
     return;
   }
 
-  while (pool_ptr_->getQueueSize() >= mng_ptr_->thread_num_ + 2) {
+  while (pool_ptr_->getQueueSize() >= static_cast<std::size_t>(mng_ptr_->thread_num_) + 2) {
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
   pool_ptr_->enqueue(geneTask(spec_set_ptr, prsm_ptr, mng_ptr_,

@@ -16,6 +16,7 @@
 #include "stat/tdgf/evalue_processor.hpp"
 
 #include <cmath>
+#include <cstddef>
 #include <limits>
 
 #include "common/thread/simple_thread_pool.hpp"
@@ -125,7 +126,7 @@ void EValueProcessor::process(bool is_separate) {
           prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
         }
         if (checkPrsms(selected_prsm_ptrs)) {
-          while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ + 2) {
+          while (pool_ptr->getQueueSize() >= static_cast<std::size_t>(mng_ptr_->thread_num_) + 2) {
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
           }
           pool_ptr->enqueue(geneTask(spec_set_ptr, selected_prsm_ptrs, ppo,

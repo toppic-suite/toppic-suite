@@ -253,7 +253,7 @@ void DeconvMs1Process::process() {
   // total spectrum number
   int total_spec_num = topfd_para_ptr_->getMs1ScanNum();
   while (ms_group_ptr != nullptr) {
-    while (pool_ptr->getQueueSize() >= thread_num * 2) {
+    while (pool_ptr->getQueueSize() >= static_cast<std::size_t>(thread_num) * 2) {
       std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
     pool_ptr->enqueue(deconv_ms1_process::geneTask(

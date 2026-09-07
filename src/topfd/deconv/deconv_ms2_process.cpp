@@ -288,7 +288,7 @@ void DeconvMs2Process::process() {
   while (ms_group_ptr != nullptr) {
     MzmlMsPtrVec ms_ptr_vec = ms_group_ptr->getMsTwoPtrVec();
     for (std::size_t i = 0; i < ms_ptr_vec.size(); i++) {
-      while (pool_ptr->getQueueSize() >= thread_num * 2) {
+      while (pool_ptr->getQueueSize() >= static_cast<std::size_t>(thread_num) * 2) {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
       }
       spec_cnt++;

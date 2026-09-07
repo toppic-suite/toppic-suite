@@ -174,7 +174,7 @@ void EnvSet::removePeakData(const MsMapPtr& ms_map_ptr) {
     std::vector<double> theo_env_peak_intes =
         seed_ptr_->getScaledInteList(ratio, min_inte_);
     int peak_num = env_peak_list.size();
-    if (peak_num != theo_env_peak_intes.size()) {
+    if (peak_num != static_cast<int>(theo_env_peak_intes.size())) {
       LOG_ERROR("peak num " << peak_num << " theo env peak num "
                             << theo_env_peak_intes.size());
     }

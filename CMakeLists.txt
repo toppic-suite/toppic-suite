@@ -159,6 +159,14 @@ message(STATUS "Executable output directory: " ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
 # -Wno-unknown-pragmas is used to disable pragmas warnings
 # -DWITHOUT_MZ5 is used in pwiz to exclude code for mz5 format support
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unknown-pragmas -DWITHOUT_MZ5")
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  # GCC 12+ at -O2/-O3 reports spurious "array subscript ... is partly outside
+  # array bounds of 'unsigned char [N]'" warnings from libstdc++'s inlined
+  # std::make_shared / shared_ptr destructor code (GCC bugs 106297, 110879,
+  # 111632, ...), one multi-screen trace per make_shared call site. They are
+  # false positives, so drop the whole diagnostic under GCC.
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-array-bounds")
+endif()
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTOPPIC_LINUX")
@@ -236,6 +244,10 @@ target_link_libraries(pwiz PUBLIC
   Boost::filesystem Boost::iostreams Boost::thread Boost::chrono Boost::system
   ZLIB::ZLIB)
 target_compile_definitions(pwiz PUBLIC WITHOUT_MZ5)
+# SpectrumList_mzML.cpp includes <boost/bind.hpp>, whose "#pragma message"
+# about the deprecated global _1/_2 placeholders is not a warning and so is
+# not silenced by -w below; this keeps the old behaviour and quiets it.
+target_compile_definitions(pwiz PRIVATE BOOST_BIND_GLOBAL_PLACEHOLDERS)
 set_target_properties(pwiz PROPERTIES POSITION_INDEPENDENT_CODE ON)
 # Third-party: silence its warnings (the -Wdeprecated noise from Boost especially).
 target_compile_options(pwiz PRIVATE -w)
