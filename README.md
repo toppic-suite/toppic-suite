@@ -18,7 +18,7 @@ TopPIC Suite consists of six software tools for the analysis of top-down mass sp
 
 **For manuals, tutorials, and publications, please visit https://www.toppic.org/software/toppic/.** 
 
-### System requirements
+## System requirements
 
 * A C++17 compiler: Clang >= 7 (default) or GCC >= 8
 * CMake version >= 3.16
@@ -27,7 +27,7 @@ TopPIC Suite consists of six software tools for the analysis of top-down mass sp
 * Qt5 (Core, Gui, Widgets) for the GUI tools
 * Git LFS (see below)
 
-## Git LFS is required
+### Git LFS is required
 
 Some of the runtime resources under `res/` are large binary/data blobs
 and are stored with [Git LFS](https://git-lfs.com/) rather than in the normal
@@ -41,7 +41,7 @@ You **must** have Git LFS installed to get the real files. Without it, a plain
 `git clone` leaves small text *pointer* files in their place, and the build /
 the tools will fail to load the models and tables.
 
-### Install Git LFS (one time per machine)
+#### Install Git LFS (one time per machine)
 
 ```sh
 # Debian/Ubuntu
@@ -52,7 +52,7 @@ brew install git-lfs
 git lfs install
 ```
 
-### Clone
+#### Clone
 
 With Git LFS installed, a normal clone fetches the LFS files automatically:
 
@@ -60,7 +60,7 @@ With Git LFS installed, a normal clone fetches the LFS files automatically:
 git clone https://github.com/liuxiaowen/toppic_claude.git
 ```
 
-### Already cloned without Git LFS?
+#### Already cloned without Git LFS?
 
 If you cloned before installing Git LFS (so the `.onnx` / `theo_patt.txt`
 files are pointer text), install it as above and then pull the real blobs:
