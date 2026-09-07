@@ -63,7 +63,8 @@ sudo apt-get install build-essential cmake clang git git-lfs \
     libboost-filesystem-dev libboost-iostreams-dev libboost-thread-dev \
     libboost-chrono-dev libboost-system-dev libboost-serialization-dev \
     libboost-program-options-dev \
-    qt6-base-dev
+    qt6-base-dev \
+    libpwiz-dev libpwiz3t64 libhts-dev libhts3t64
 ```
 
 Notes:
@@ -74,8 +75,9 @@ Notes:
 - **Boost ≥ 1.74** is required. The Ubuntu packages above are sufficient
   (`libboost-all-dev` also works if you prefer one package).
 - **Qt6** (`qt6-base-dev`) is needed for the GUI tools (`topfd_gui`, etc.).
-- Other third-party code (htslib, ProteoWizard, ONNX Runtime) is vendored
-  under `ext/` and built/linked automatically — no packages needed.
+- The build currently compiles and links the copies of htslib, ProteoWizard
+  and ONNX Runtime vendored under `ext/`; the `libhts` and `libpwiz` packages
+  above are the Ubuntu versions of the first two.
 
 ### 2. Clone (with Git LFS — see above)
 
