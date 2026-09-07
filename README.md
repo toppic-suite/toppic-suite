@@ -135,28 +135,30 @@ by `make install`, deletes every file listed there, and removes any directories
 has been deleted, there is no manifest and `make uninstall` will report an
 error; in that case remove the installed files by hand.
 
-## Building on Red Hat Enterprise Linux 9
+## Building on Red Hat Enterprise Linux 10
 
 The steps are the same as for Ubuntu above; only the package installation
-differs. `pugixml-devel` comes from EPEL (Extra Packages for Enterprise Linux),
-which in turn needs the CodeReady Builder repository, so enable both first.
+differs. Two of the dependencies are not in RHEL 10 itself and come from EPEL
+(Extra Packages for Enterprise Linux): `pugixml-devel`, and `qt5-qtbase-devel`
+because RHEL 10 ships only Qt6. EPEL in turn needs the CodeReady Builder
+repository, so enable both first.
 
 ```sh
 # enable CodeReady Builder and EPEL
-sudo subscription-manager repos --enable codeready-builder-for-rhel-9-$(arch)-rpms
-sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
+sudo subscription-manager repos --enable codeready-builder-for-rhel-10-$(arch)-rpms
+sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-10.noarch.rpm
 
 # compilers and build tools
 sudo dnf install cmake gcc-c++ make clang git git-lfs
 
-# libraries
-sudo dnf install zlib-devel sqlite-devel pugixml-devel boost-devel
+# libraries (zlib-ng-compat-devel is RHEL 10's replacement for zlib-devel)
+sudo dnf install zlib-ng-compat-devel sqlite-devel pugixml-devel boost-devel
 
-# Qt5 for the GUI tools
+# Qt5 for the GUI tools (from EPEL)
 sudo dnf install qt5-qtbase-devel
 ```
 
-`boost-devel` on RHEL 9 provides Boost 1.75, which satisfies the ≥ 1.74
+`boost-devel` on RHEL 10 provides Boost 1.83, which satisfies the ≥ 1.74
 requirement. Then continue with steps 2–5 of the Ubuntu instructions (clone
 with Git LFS, configure and build, install, uninstall); they are identical.
 On Red Hat the same commands apply, e.g.:
