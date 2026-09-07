@@ -1,24 +1,26 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#include "prsm/prsm_simple_cluster.hpp"
 
 #include <algorithm>
 
-#include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
+#include "common/util/logger.hpp"
 #include "prsm/prsm_reader_util.hpp"
 #include "prsm/prsm_xml_writer.hpp"
-#include "prsm/prsm_simple_cluster.hpp"
 
 namespace toppic {
 
@@ -53,9 +55,9 @@ PrsmStrPtrVec2D setProtId(PrsmStrPtrVec& prsm_ptrs) {
   return proteins;
 }
 
-void setClusterId(PrsmStrPtrVec2D & proteins, bool is_ppm_error, 
+void setClusterId(PrsmStrPtrVec2D& proteins, bool is_ppm_error,
                   double error_tole) {
-  PrsmStrPtrVec2D clusters; 
+  PrsmStrPtrVec2D clusters;
   double dalton_error_tole = error_tole;
   for (size_t i = 0; i < proteins.size(); i++) {
     PrsmStrPtrVec2D protein_clusters;
@@ -66,7 +68,7 @@ void setClusterId(PrsmStrPtrVec2D & proteins, bool is_ppm_error,
         dalton_error_tole = cur_prsm->getOriPrecMass() * error_tole;
       }
       for (size_t m = 0; m < protein_clusters.size(); m++) {
-        PrsmStrPtr ref_prsm = protein_clusters[m][0]; 
+        PrsmStrPtr ref_prsm = protein_clusters[m][0];
         if (PrsmStr::isSimpleMatch(cur_prsm, ref_prsm, dalton_error_tole)) {
           protein_clusters[m].push_back(cur_prsm);
           is_found = true;
@@ -79,7 +81,8 @@ void setClusterId(PrsmStrPtrVec2D & proteins, bool is_ppm_error,
         protein_clusters.push_back(new_clusters);
       }
     }
-    clusters.insert(std::end(clusters), std::begin(protein_clusters), std::end(protein_clusters));
+    clusters.insert(std::end(clusters), std::begin(protein_clusters),
+                    std::end(protein_clusters));
   }
 
   for (size_t i = 0; i < clusters.size(); i++) {
@@ -89,13 +92,11 @@ void setClusterId(PrsmStrPtrVec2D & proteins, bool is_ppm_error,
   }
 }
 
-void process(const std::string &db_file_name,
-             const std::string &spec_file_name,
-             const std::string &input_file_ext,
-             const ModPtrVec &fix_mod_ptr_vec,
-             const std::string &output_file_ext,
-             bool is_ppm_error,
-             double error_tole)  {
+void process(const std::string& db_file_name, const std::string& spec_file_name,
+             const std::string& input_file_ext,
+             const ModPtrVec& fix_mod_ptr_vec,
+             const std::string& output_file_ext, bool is_ppm_error,
+             double error_tole) {
   std::string base_name = file_util::basename(spec_file_name);
   std::string input_file_name = base_name + "." + input_file_ext;
   LOG_DEBUG("Reading prsm strings started");
@@ -113,8 +114,6 @@ void process(const std::string &db_file_name,
   writer.close();
 }
 
-}
+}  // namespace prsm_simple_cluster
 
 }  // namespace toppic
-
-

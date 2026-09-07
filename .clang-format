@@ -1,0 +1,6 @@
+---
+# Standard Google C++ style. clang-format expands this to the full Google
+# configuration built into the tool (PointerAlignment: Left, 2-space indent,
+# ColumnLimit 80, leading-colon constructor initializer lists, etc.).
+BasedOnStyle: Google
+...

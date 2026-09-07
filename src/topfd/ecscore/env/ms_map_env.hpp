@@ -1,19 +1,20 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-#ifndef TOPPIC_ECSCORE_ENV_MS_MAP_ENV_HPP
-#define TOPPIC_ECSCORE_ENV_MS_MAP_ENV_HPP
+#ifndef TOPPIC_TOPFD_ECSCORE_ENV_MS_MAP_ENV_HPP_
+#define TOPPIC_TOPFD_ECSCORE_ENV_MS_MAP_ENV_HPP_
 
 #include <vector>
 
@@ -25,7 +26,7 @@ namespace toppic {
 
 class MsMapEnv {
  public:
-  MsMapEnv(int spec_id, MsMapPeakPtrVec peak_list);
+  MsMapEnv(int spec_id, const MsMapPeakPtrVec& peak_list);
 
   std::vector<double> getInteList();
 
@@ -33,7 +34,7 @@ class MsMapEnv {
 
   int getPeakNum() { return peak_list_.size(); }
 
-  double getInteSum(); 
+  double getInteSum();
 
   MsMapPeakPtr getPeakPtr(int idx) { return peak_list_[idx]; }
 
@@ -43,15 +44,18 @@ class MsMapEnv {
 
   MsMapPeakPtrVec getMsMapPeakList() { return peak_list_; }
 
-  void setPeakPtr(int idx, MsMapPeakPtr peak_ptr) { peak_list_[idx] = peak_ptr; }
+  void setPeakPtr(int idx, const MsMapPeakPtr& peak_ptr) {
+    peak_list_[idx] = peak_ptr;
+  }
 
   int getTopThreeMatchNum(int ref_idx);
 
   double compTopThreeInteSum(int ref_idx);
 
-  void removeLowIntePeaks(SeedEnvPtr seed_ptr, double ratio, double min_inte);
+  void removeLowIntePeaks(const SeedEnvPtr& seed_ptr, double ratio,
+                          double min_inte);
 
-  void appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
+  void appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement parent);
 
  private:
   int spec_id_;
@@ -61,6 +65,6 @@ class MsMapEnv {
 using MsMapEnvPtr = std::shared_ptr<MsMapEnv>;
 using MsMapEnvPtrVec = std::vector<MsMapEnvPtr>;
 
-}
+}  // namespace toppic
 
 #endif

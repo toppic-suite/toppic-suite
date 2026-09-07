@@ -1,37 +1,37 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-#ifndef TOPPIC_GUI_TOPPICWINDOW_H
-#define TOPPIC_GUI_TOPPICWINDOW_H
-
-#include <vector>
-#include <map>
-#include <string>
+#ifndef TOPPIC_GUI_TOPPIC_TOPPICWINDOW_HPP_
+#define TOPPIC_GUI_TOPPIC_TOPPICWINDOW_HPP_
 
 #include <QMainWindow>
 #include <QMouseEvent>
 #include <QProcess>
+#include <map>
+#include <string>
+#include <vector>
 
 namespace Ui {
 class ToppicWindow;
 }
 
 class ToppicWindow : public QMainWindow {
- Q_OBJECT
+  Q_OBJECT
 
  public:
-  explicit ToppicWindow(QWidget *parent = 0);
+  explicit ToppicWindow(QWidget* parent = 0);
   ~ToppicWindow();
 
  private slots:
@@ -54,8 +54,6 @@ class ToppicWindow : public QMainWindow {
   void on_outputButton_clicked();
 
   void on_fixedModComboBox_currentIndexChanged(int index);
-
-  void on_errorToleranceEdit_textChanged(QString string);
 
   void on_NONECheckBox_clicked(bool checked);
 
@@ -86,7 +84,7 @@ class ToppicWindow : public QMainWindow {
   void on_delButton_clicked();
 
  private:
-  Ui::ToppicWindow *ui;
+  Ui::ToppicWindow* ui;
 
   QString lastDir_;
 
@@ -114,7 +112,7 @@ class ToppicWindow : public QMainWindow {
 
   void sleep(int wait);
 
-  void closeEvent(QCloseEvent *event);
+  void closeEvent(QCloseEvent* event);
 
   bool continueToClose();
 
@@ -122,9 +120,9 @@ class ToppicWindow : public QMainWindow {
 
   bool protTypeError();
 
-  bool event(QEvent *event);
+  bool event(QEvent* event);
 
   bool ableToAdd(QString spfile);
 };
 
-#endif  // TOPPIC_GUI_TOPPICWINDOW_H
+#endif  // TOPPIC_GUI_TOPPIC_TOPPICWINDOW_HPP_

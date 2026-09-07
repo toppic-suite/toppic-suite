@@ -42,7 +42,7 @@ namespace toppic {
 
 namespace env_coll_detect {
 
-void processMs1(TopfdParaPtr topfd_para_ptr) {
+void processMs1(const TopfdParaPtr& topfd_para_ptr) {
   if (topfd_para_ptr->isMissingLevelOne()) {
     return;
   }
@@ -70,10 +70,10 @@ void processMs1(TopfdParaPtr topfd_para_ptr) {
   // Prepare seed envelopes
   SeedEnvPtrVec seed_ptrs;
   SeedEnvPtr2D seed_ptr_2d;
-  for (auto &ms1_data : deconv_ms1_ptr_vec) {
+  for (auto& ms1_data : deconv_ms1_ptr_vec) {
     DeconvPeakPtrVec peaks = ms1_data->getPeakPtrVec();
     SeedEnvPtrVec one_spec_seed_ptrs;
-    for (auto &peak : peaks) {
+    for (auto& peak : peaks) {
       SeedEnvPtr seed_ptr_1 = std::make_shared<SeedEnv>(peak);
       seed_ptrs.push_back(seed_ptr_1);
       SeedEnvPtr seed_ptr_2 = std::make_shared<SeedEnv>(peak);
@@ -88,7 +88,7 @@ void processMs1(TopfdParaPtr topfd_para_ptr) {
   double sn_ratio = topfd_para_ptr->getMsOneSnRatio();
   bool single_scan_noise = topfd_para_ptr->isUseSingleScanNoiseLevel();
   MsHeaderPtrVec ms1_header_ptr_vec;
-  for (auto &ms1_spectrum : deconv_ms1_ptr_vec) {
+  for (auto& ms1_spectrum : deconv_ms1_ptr_vec) {
     ms1_header_ptr_vec.push_back(ms1_spectrum->getMsHeaderPtr());
   }
   /// Prepare data -- Peak Matrix
@@ -100,7 +100,7 @@ void processMs1(TopfdParaPtr topfd_para_ptr) {
     matrix_ptr->removeNonNeighbors(score_para_ptr->neighbor_mz_tole_);
   }
 
-  /// Extract Fetures
+  /// Extract Features
   LOG_DEBUG("Number of seed envelopes: " << seed_ptrs.size());
   int seed_num = seed_ptrs.size();
   EnvCollPtrVec env_coll_list;
@@ -253,7 +253,7 @@ void processMs1(TopfdParaPtr topfd_para_ptr) {
   spec_feature_writer::writeFeatures(ms2_feat_file_name, ms2_features);
 }
 
-void processMs2(TopfdParaPtr topfd_para_ptr) {
+void processMs2(const TopfdParaPtr& topfd_para_ptr) {
   EcscoreParaPtr score_para_ptr = std::make_shared<EcscorePara>(
       topfd_para_ptr->getFracId(), topfd_para_ptr->getMzmlFileName(),
       topfd_para_ptr->getMaxCharge(), topfd_para_ptr->getMs2MinScanNum());
@@ -266,7 +266,7 @@ void processMs2(TopfdParaPtr topfd_para_ptr) {
 
   // get isolation window
   std::set<std::pair<double, double>> win_set;
-  for (auto &ms2_data : deconv_ms2_ptr_vec) {
+  for (auto& ms2_data : deconv_ms2_ptr_vec) {
     if (ms2_data->getMsHeaderPtr()->getMsLevel() == 1) continue;
     std::pair<double, double> cur_win(
         ms2_data->getMsHeaderPtr()->getPrecWinBegin(),
@@ -279,7 +279,8 @@ void processMs2(TopfdParaPtr topfd_para_ptr) {
   for (std::size_t i = 0; i < win_list.size(); i++) {
     std::pair<double, double> cur_win = win_list[i];
     std::cout << std::fixed << std::setprecision(6)
-              << "Processing isolation window: " << (i+1) << " of " << win_list.size() << " [" << cur_win.first << ","
+              << "Processing isolation window: " << (i + 1) << " of "
+              << win_list.size() << " [" << cur_win.first << ","
               << cur_win.second << "]" << std::endl;
     std::cout << std::setprecision(2);
     // read ms1 raw peaks and ms2_headers
@@ -303,12 +304,12 @@ void processMs2(TopfdParaPtr topfd_para_ptr) {
       int spec_id = 0;
       DeconvMsPtrVec deconv_ms2_ptr_shortlisted_vec;
       SeedEnvPtrVec seed_ptrs;
-      for (auto &ms2_data : deconv_ms2_ptr_vec) {
+      for (auto& ms2_data : deconv_ms2_ptr_vec) {
         double ms_win_begin = ms2_data->getMsHeaderPtr()->getPrecWinBegin();
         if (ms_win_begin != cur_win.first) continue;
         deconv_ms2_ptr_shortlisted_vec.push_back(ms2_data);
         DeconvPeakPtrVec peaks = ms2_data->getPeakPtrVec();
-        for (auto &peak : peaks) {
+        for (auto& peak : peaks) {
           peak->setSpId(spec_id);
           SeedEnvPtr seed_ptr_1 = std::make_shared<SeedEnv>(peak);
           seed_ptrs.push_back(seed_ptr_1);
@@ -321,20 +322,19 @@ void processMs2(TopfdParaPtr topfd_para_ptr) {
       double sn_ratio = topfd_para_ptr->getMsTwoSnRatio();
       bool single_scan_noise = topfd_para_ptr->isUseSingleScanNoiseLevel();
       MsHeaderPtrVec ms2_header_ptr_vec;
-      for (auto &ms2_spectrum : deconv_ms2_ptr_shortlisted_vec) {
+      for (auto& ms2_spectrum : deconv_ms2_ptr_shortlisted_vec) {
         ms2_header_ptr_vec.push_back(ms2_spectrum->getMsHeaderPtr());
       }
       /// Prepare data -- Peak Matrix
       MsMapPtr matrix_ptr = std::make_shared<MsMap>(
-          ms2_mzml_peaks, ms2_header_ptr_vec,
-          score_para_ptr->bin_size_, topfd_para_ptr->getMsTwoSnRatio(),
-          single_scan_noise);
+          ms2_mzml_peaks, ms2_header_ptr_vec, score_para_ptr->bin_size_,
+          topfd_para_ptr->getMsTwoSnRatio(), single_scan_noise);
 
       if (score_para_ptr->min_scan_num_ > 2) {
         matrix_ptr->removeNonNeighbors(score_para_ptr->neighbor_mz_tole_);
       }
 
-      /// Extract Fetures
+      /// Extract Features
       LOG_DEBUG("Number of seed envelopes: " << seed_ptrs.size());
       int seed_num = static_cast<int>(seed_ptrs.size());
       EnvCollPtrVec env_coll_list;

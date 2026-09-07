@@ -1,16 +1,17 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #ifndef TOPPIC_SEARCH_DIAG_DIAG_HEADER_HPP_
 #define TOPPIC_SEARCH_DIAG_DIAG_HEADER_HPP_
@@ -29,114 +30,109 @@ using DiagHeaderPtrVec2D = std::vector<DiagHeaderPtrVec>;
 using DiagHeaderPtrVec3D = std::vector<DiagHeaderPtrVec2D>;
 
 class DiagHeader {
-  public:
-    DiagHeader(double n_term_shift,
-               bool n_strict, bool c_strict,
-               bool prot_n_match, bool prot_c_match,
-               bool pep_n_match, bool pep_c_match);
+ public:
+  DiagHeader(double n_term_shift, bool n_strict, bool c_strict,
+             bool prot_n_match, bool prot_c_match, bool pep_n_match,
+             bool pep_c_match);
 
-    void initHeader(double c_shift, ProteoformPtr proteoform); 
+  void initHeader(double c_shift, const ProteoformPtr& proteoform);
 
-    void changeOnlyNTermShift(double s);
+  void changeOnlyNTermShift(double s);
 
-    void changeOnlyCTermShift(double s);
+  void changeOnlyCTermShift(double s);
 
-    int getTruncFirstResPos() {return trunc_first_res_pos_;}
+  int getTruncFirstResPos() { return trunc_first_res_pos_; }
 
-    int getMatchFirstBpPos() {return match_first_bp_pos_;}
+  int getMatchFirstBpPos() { return match_first_bp_pos_; }
 
-    int getMatchLastBpPos() {return match_last_bp_pos_;}
+  int getMatchLastBpPos() { return match_last_bp_pos_; }
 
-    int getTruncLastResPos() {return trunc_last_res_pos_;}
+  int getTruncLastResPos() { return trunc_last_res_pos_; }
 
-    double getPepCTermShift() {return pep_C_term_shift_;}
+  double getPepCTermShift() { return pep_C_term_shift_; }
 
-    double getPepNTermShift() { return pep_N_term_shift_;}
+  double getPepNTermShift() { return pep_N_term_shift_; }
 
-    double getProtCTermShift() {return prot_C_term_shift_;}
+  double getProtCTermShift() { return prot_C_term_shift_; }
 
-    double getProtNTermShift() {return prot_N_term_shift_;}
+  double getProtNTermShift() { return prot_N_term_shift_; }
 
-    void setPepCTermShift(double pepCTermShift) {
-      pep_C_term_shift_ = pepCTermShift;
-    }
+  void setPepCTermShift(double pepCTermShift) {
+    pep_C_term_shift_ = pepCTermShift;
+  }
 
-    void setPepNTermShift(double pepNTermShift) {
-      pep_N_term_shift_ = pepNTermShift;
-    }
+  void setPepNTermShift(double pepNTermShift) {
+    pep_N_term_shift_ = pepNTermShift;
+  }
 
-    void setProtCTermShift(double protCTermShift) {
-      prot_C_term_shift_ = protCTermShift;
-    }
+  void setProtCTermShift(double protCTermShift) {
+    prot_C_term_shift_ = protCTermShift;
+  }
 
-    void setProtNTermShift(double protNTermShift) {
-      prot_N_term_shift_ = protNTermShift;
-    }
+  void setProtNTermShift(double protNTermShift) {
+    prot_N_term_shift_ = protNTermShift;
+  }
 
-    void setTruncFirstResPos(int truncFirstResPos) {
-      trunc_first_res_pos_ = truncFirstResPos;
-    }
+  void setTruncFirstResPos(int truncFirstResPos) {
+    trunc_first_res_pos_ = truncFirstResPos;
+  }
 
-    void setTruncLastResPos(int truncLastResPos) {
-      trunc_last_res_pos_ = truncLastResPos;
-    }
+  void setTruncLastResPos(int truncLastResPos) {
+    trunc_last_res_pos_ = truncLastResPos;
+  }
 
-    void setMatchFirstBpPos(int match_first_bp_pos) {
-      match_first_bp_pos_ = match_first_bp_pos;
-    }
+  void setMatchFirstBpPos(int match_first_bp_pos) {
+    match_first_bp_pos_ = match_first_bp_pos;
+  }
 
-    void setMatchLastBpPos(int match_last_bp_pos) {
-      match_last_bp_pos_ = match_last_bp_pos;
-    }
+  void setMatchLastBpPos(int match_last_bp_pos) {
+    match_last_bp_pos_ = match_last_bp_pos;
+  }
 
-    bool isNStrict() {return n_strict_;}
-    bool isCStrict() {return c_strict_;}
+  bool isNStrict() { return n_strict_; }
+  bool isCStrict() { return c_strict_; }
 
-    int getId() { return id_; }
-    void setId(int id) { id_ = id; }
+  int getId() { return id_; }
+  void setId(int id) { id_ = id; }
 
-    bool isProtNTermMatch() {return prot_N_term_match_;}
-    bool isProtCTermMatch() {return prot_C_term_match_;}
-    bool isPepNTermMatch() {return pep_N_term_match_;}
-    bool isPepCTermMatch() {return pep_C_term_match_;}
+  bool isProtNTermMatch() { return prot_N_term_match_; }
+  bool isProtCTermMatch() { return prot_C_term_match_; }
+  bool isPepNTermMatch() { return pep_N_term_match_; }
+  bool isPepCTermMatch() { return pep_C_term_match_; }
 
-    void setProtNTermMatch(bool match) {
-      prot_N_term_match_ = match;
-    }
+  void setProtNTermMatch(bool match) { prot_N_term_match_ = match; }
 
-    void setProtCTermMatch(bool match) {
-      prot_C_term_match_ = match;
-    }
+  void setProtCTermMatch(bool match) { prot_C_term_match_ = match; }
 
-  private:
-    int id_ = 0;
+ private:
+  int id_ = 0;
 
-    double prot_N_term_shift_ = 0;
+  double prot_N_term_shift_ = 0;
 
-    // if it is generated by n-terminal truncation shift
-    bool n_strict_ = false;
+  // if it is generated by n-terminal truncation shift
+  bool n_strict_ = false;
 
-    // if it is generated by c-teriminal truncation shift
-    bool c_strict_ = false;
+  // if it is generated by c-teriminal truncation shift
+  bool c_strict_ = false;
 
-    // with respect to the whole protein
-    int trunc_first_res_pos_ = 0;
-    int match_first_bp_pos_ = 0;
+  // with respect to the whole protein
+  int trunc_first_res_pos_ = 0;
+  int match_first_bp_pos_ = 0;
 
-    bool prot_N_term_match_ = false;
-    bool prot_C_term_match_ = false;
+  bool prot_N_term_match_ = false;
+  bool prot_C_term_match_ = false;
 
-    double pep_N_term_shift_ = 0.0;
-    bool pep_N_term_match_ = false;
+  double pep_N_term_shift_ = 0.0;
+  bool pep_N_term_match_ = false;
 
-    int trunc_last_res_pos_ = 0;
-    int match_last_bp_pos_ = 0;
-    double prot_C_term_shift_ = 0.0;
+  int trunc_last_res_pos_ = 0;
+  int match_last_bp_pos_ = 0;
+  double prot_C_term_shift_ = 0.0;
 
-    double pep_C_term_shift_ = 0.0;
-    bool pep_C_term_match_ = false;
+  double pep_C_term_shift_ = 0.0;
+  bool pep_C_term_match_ = false;
 };
 
-} // namespace toppic 
+}  // namespace toppic
 
-#endif  
+#endif

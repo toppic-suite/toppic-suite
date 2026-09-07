@@ -1,25 +1,29 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this output_ except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
+#include "ms/spec/msalign_writer.hpp"
+
+#include <cstddef>
 #include <iomanip>
+#include <string>
 
 #include "common/util/logger.hpp"
-#include "ms/spec/msalign_writer.hpp"
 
 namespace toppic {
 
-MsAlignWriter::MsAlignWriter(const std::string &file_name) {
+MsAlignWriter::MsAlignWriter(const std::string& file_name) {
   output_.open(file_name);
   if (!output_.is_open()) {
     LOG_ERROR("Cannot open the msalign file  " << file_name << "!");
@@ -33,11 +37,11 @@ MsAlignWriter::~MsAlignWriter() {
   }
 }
 
-void MsAlignWriter::writePara(const std::string &para_str) {
+void MsAlignWriter::writePara(const std::string& para_str) {
   output_ << para_str << "\n";
 }
 
-void MsAlignWriter::writeMs(DeconvMsPtr ms_ptr) {
+void MsAlignWriter::writeMs(const DeconvMsPtr& ms_ptr) {
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
   output_ << std::fixed;
   output_ << "BEGIN IONS" << std::endl;
@@ -46,30 +50,37 @@ void MsAlignWriter::writeMs(DeconvMsPtr ms_ptr) {
   output_ << "TITLE=" << header_ptr->getTitle() << std::endl;
   output_ << "SCANS=" << header_ptr->getScansString() << std::endl;
   output_ << "RETENTION_TIME=" << std::fixed << std::setprecision(3)
-      << header_ptr->getRetentionTime()/60 << std::endl;
+          << header_ptr->getRetentionTime() / 60 << std::endl;
   output_ << "LEVEL=" << header_ptr->getMsLevel() << std::endl;
 
   if (header_ptr->getMsLevel() > 1) {
     output_ << "MS_ONE_ID=" << header_ptr->getMsOneId() << std::endl;
     output_ << "MS_ONE_SCAN=" << header_ptr->getMsOneScan() << std::endl;
-    output_ << "PRECURSOR_WINDOW_BEGIN=" << std::fixed << std::setprecision(6) << header_ptr->getPrecWinBegin() << std::endl;
-    output_ << "PRECURSOR_WINDOW_END=" << header_ptr->getPrecWinEnd() << std::endl;
+    output_ << "PRECURSOR_WINDOW_BEGIN=" << std::fixed << std::setprecision(6)
+            << header_ptr->getPrecWinBegin() << std::endl;
+    output_ << "PRECURSOR_WINDOW_END=" << header_ptr->getPrecWinEnd()
+            << std::endl;
     if (header_ptr->getActivationPtr() != nullptr) {
-      output_ << "ACTIVATION=" << header_ptr->getActivationPtr()->getName() << std::endl;
+      output_ << "ACTIVATION=" << header_ptr->getActivationPtr()->getName()
+              << std::endl;
     }
-    PrecursorPtrVec prec_ptrs = header_ptr->getPrecPtrVec();
+    const PrecursorPtrVec& prec_ptrs = header_ptr->getPrecPtrVec();
     output_ << "PRECURSOR_MZ=" << std::fixed << std::setprecision(6);
     for (size_t i = 0; i < prec_ptrs.size(); i++) {
       output_ << prec_ptrs[i]->getMonoMz();
       // use : for separating multiple precursors
-      if (i < prec_ptrs.size() - 1) {output_ << ":";}
+      if (i < prec_ptrs.size() - 1) {
+        output_ << ":";
+      }
     }
     output_ << std::endl;
     output_ << "PRECURSOR_CHARGE=";
     for (size_t i = 0; i < prec_ptrs.size(); i++) {
       output_ << prec_ptrs[i]->getCharge();
       // use : for separating multiple precursors
-      if (i < prec_ptrs.size() - 1) {output_ << ":";}
+      if (i < prec_ptrs.size() - 1) {
+        output_ << ":";
+      }
     }
     output_ << std::endl;
     // The precision for mass is 5
@@ -77,21 +88,27 @@ void MsAlignWriter::writeMs(DeconvMsPtr ms_ptr) {
     for (size_t i = 0; i < prec_ptrs.size(); i++) {
       output_ << prec_ptrs[i]->getMonoMass();
       // use : for separating multiple precursors
-      if (i < prec_ptrs.size() - 1) {output_ << ":";}
+      if (i < prec_ptrs.size() - 1) {
+        output_ << ":";
+      }
     }
     output_ << std::endl;
     output_ << "PRECURSOR_INTENSITY=" << std::fixed << std::setprecision(2);
     for (size_t i = 0; i < prec_ptrs.size(); i++) {
       output_ << prec_ptrs[i]->getInte();
       // use : for separating multiple precursors
-      if (i < prec_ptrs.size() - 1) {output_ << ":";}
+      if (i < prec_ptrs.size() - 1) {
+        output_ << ":";
+      }
     }
     output_ << std::endl;
     output_ << "PRECURSOR_FEATURE_ID=";
     for (size_t i = 0; i < prec_ptrs.size(); i++) {
       output_ << prec_ptrs[i]->getFeatureId();
       // use : for separating multiple precursors
-      if (i < prec_ptrs.size() - 1) {output_ << ":";}
+      if (i < prec_ptrs.size() - 1) {
+        output_ << ":";
+      }
     }
     output_ << std::endl;
     output_ << "DECONVOLUTED_MASS_NUMBER=" << ms_ptr->size() << std::endl;
@@ -99,9 +116,11 @@ void MsAlignWriter::writeMs(DeconvMsPtr ms_ptr) {
   for (size_t i = 0; i < ms_ptr->size(); i++) {
     DeconvPeakPtr peak_ptr = ms_ptr->getPeakPtr(i);
     output_ << std::fixed << std::setprecision(6) << peak_ptr->getPosition();
-    output_ << "\t" << std::fixed << std::setprecision(2) << peak_ptr->getIntensity();
+    output_ << "\t" << std::fixed << std::setprecision(2)
+            << peak_ptr->getIntensity();
     output_ << "\t" << peak_ptr->getCharge();
-    output_ << "\t" << std::fixed << std::setprecision(2) << peak_ptr->getScore();
+    output_ << "\t" << std::fixed << std::setprecision(2)
+            << peak_ptr->getScore();
     output_ << std::endl;
   }
   output_ << "END IONS" << std::endl;

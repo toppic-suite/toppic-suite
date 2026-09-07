@@ -1,44 +1,48 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#include "para/peak_tolerance.hpp"
 
 #include <cmath>
+#include <string>
 
 #include "common/util/str_util.hpp"
-#include "common/xml/xml_dom_util.hpp"
 #include "common/xml/xml_dom_document.hpp"
-#include "para/peak_tolerance.hpp"
+#include "common/xml/xml_dom_util.hpp"
 
 namespace toppic {
 
-PeakTolerance::PeakTolerance(double ppo): 
-    ppo_(ppo) {}
+PeakTolerance::PeakTolerance(double ppo) : ppo_(ppo) {}
 
-double PeakTolerance::compRelaxErrorTole(double m1, double m2) {
+double PeakTolerance::compRelaxErrorTole(double m1, double m2) const {
   return compStrictErrorTole(m1 + m2);
 }
 
-PeakTolerance::PeakTolerance(xercesc::DOMElement* element) {
+PeakTolerance::PeakTolerance(XmlDOMElement element) {
   ppo_ = xml_dom_util::getDoubleChildValue(element, "ppo", 0);
-  use_min_tolerance_ = xml_dom_util::getDoubleChildValue(element, "use_min_tolerance", 0);
-  min_tolerance_ = xml_dom_util::getDoubleChildValue(element, "min_tolerance", 0);
+  use_min_tolerance_ =
+      xml_dom_util::getDoubleChildValue(element, "use_min_tolerance", 0);
+  min_tolerance_ =
+      xml_dom_util::getDoubleChildValue(element, "min_tolerance", 0);
 }
 
-int PeakTolerance::getIntPpm() {
+int PeakTolerance::getIntPpm() const {
   return static_cast<int>(std::round(ppo_ * 1000000));
 }
 
-double PeakTolerance::compStrictErrorTole(double mass) {
+double PeakTolerance::compStrictErrorTole(double mass) const {
   double tolerance = mass * ppo_;
   if (use_min_tolerance_ && tolerance < min_tolerance_) {
     tolerance = min_tolerance_;
@@ -46,17 +50,16 @@ double PeakTolerance::compStrictErrorTole(double mass) {
   return tolerance;
 }
 
-void PeakTolerance::appendXml(XmlDOMDocument* xml_doc, 
-                              xercesc::DOMElement* parent) {
+void PeakTolerance::appendXml(XmlDOMDocument* xml_doc,
+                              XmlDOMElement parent) const {
   std::string element_name = PeakTolerance::getXmlElementName();
-  xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
+  XmlDOMElement element = xml_doc->addElement(parent, element_name.c_str());
   std::string str = str_util::toString(ppo_);
   xml_doc->addElement(element, "ppo", str.c_str());
   str = str_util::toString(use_min_tolerance_);
   xml_doc->addElement(element, "use_min_tolerance", str.c_str());
   str = str_util::toString(min_tolerance_);
   xml_doc->addElement(element, "min_tolerance", str.c_str());
-  parent->appendChild(element);
 }
 
-} /* namespace toppic */
+}  // namespace toppic

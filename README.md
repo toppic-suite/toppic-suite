@@ -1,109 +1,114 @@
-## TopPIC Suite
+# toppic_claude
 
-TopPIC Suite consists of six software tools for the analysis of top-down mass spectrometry-based proteomics data. 
+## Git LFS is required
 
-* **TopFD** (Top-down mass spectral Feature Detection) is a software tool for top-down mass spectral deconvolution. It groups top-down spectral peaks into isotopic envelopes and converts isotopic envelopes to monoisotopic neutral masses. In addition, it extracts proteoform features from LC-MS or CE-MS data.
+Some of the runtime resources under `res/` are large binary/data blobs
+and are stored with [Git LFS](https://git-lfs.com/) rather than in the normal
+Git history:
 
-* **TopDIA** is a tool for demultiplexing top-down data independent acquisition mass spectrometry (TD-DIA-MS) data. It processes TD-DIA-MS data to generate demultiplexed pseudo-MS/MS spectra, which are subsequently searched against a protein database to identify proteoforms.
+- `res/envcnn_models/*.onnx`, `res/ecscore_models/*.onnx` — the
+  EnvCNN / ECScore neural-network models.
+- `res/base_data/theo_patt.txt` — the theoretical isotope-pattern table.
 
-* **TopIndex** (Top-down protein sequence database Indexing) generates index files for protein sequence databases. The index files are used in TopPIC and TopMG to speed up proteoform identification by database search.
+You **must** have Git LFS installed to get the real files. Without it, a plain
+`git clone` leaves small text *pointer* files in their place, and the build /
+the tools will fail to load the models and tables.
 
-* **TopPIC** (Top-down mass spectrometry-based Proteoform Identification and Characterization) identifies and characterizes proteoforms at the proteome level by searching top-down tandem mass spectra against a protein sequence database. It efficiently identifies proteoforms with post-translational modificatons (PTMs) and unexpected alterations, such as mutations, accurately estimates the statistical significance of identifications, and characterizes reported proteoforms with unknown mass shifts. It uses several techniques, such as indexes, spectral alignment, generating function methods, and the modification identification score (MIScore), to increase the speed, sensitivity, and accuracy.
-
-* **TopMG** (Top-down mass spectrometry-based proteoform identification using Mass Graphs) is a software tool for identifying highly modified proteoforms by searching top-down tandem mass spectra against a protein sequence database. It is capable of identifying proteoforms with multiple variable PTMs and unexpected alterations, such as histone proteoforms and phosphorylated ones. It uses mass graphs, which efficiently represent candidate proteoforms with multiple variable PTMs, to increase the speed and sensitivity in proteoform identification. In addition, approximate spectrum-based filtering methods are employed for protein sequence filtering, and a Markov chain Monte Carlo method (TopMCMC) is used for estimating the statistical significance of identifications.
-
-* **TopDiff** (Top-down mass spectrometry-based identification of Differentially expressed proteoforms) compares the abundances of proteoforms and finds differentially expressed proteoforms by using identifications of top-down mass spectrometry data of several protein samples.
-
-* **TopDIA** is a software tool for top-down data-independent-acquistion mass spectrometry (TD-DIA-MS) data analysis. It generates demultiplexed pseudo MS/MS spectra from TD-DIA-MS data, which are then searched against a protein sequence database using TopPIC or TopMG for proteoform identification.
-
-**For manuals, tutorials, and publications, please visit https://www.toppic.org/software/toppic/.** 
-
-### System requirements
-
-* Clang version >= 16.0.0 for C++17 support
-* Boost version >= 1.74.0
-* CMake version >= 3.5.0
-
-### Building on Linux (Ubuntu 24.04)
+### Install Git LFS (one time per machine)
 
 ```sh
-# install compiling tools
-sudo apt install build-essential cmake clang
+# Debian/Ubuntu
+sudo apt-get install git-lfs
+# macOS (Homebrew)
+brew install git-lfs
+# Then register the Git hooks/filters for your user
+git lfs install
+```
 
-# install dependencies
-sudo apt install libboost-all-dev \
-libxerces-c-dev \
-libsqlite3-dev \
-zlib1g-dev \
-rapidjson-dev 
+### Clone
 
-# install Qt5 for GUI
-sudo apt install qtbase5-dev
+With Git LFS installed, a normal clone fetches the LFS files automatically:
 
-# building
-mkdir build
+```sh
+git clone https://github.com/liuxiaowen/toppic_claude.git
+```
+
+### Already cloned without Git LFS?
+
+If you cloned before installing Git LFS (so the `.onnx` / `theo_patt.txt`
+files are pointer text), install it as above and then pull the real blobs:
+
+```sh
+git lfs install
+git lfs pull
+```
+
+## Building on Ubuntu Linux
+
+### 1. Install the build dependencies
+
+```sh
+sudo apt-get update
+sudo apt-get install build-essential cmake clang git git-lfs \
+    zlib1g-dev libsqlite3-dev libpugixml-dev \
+    libboost-filesystem-dev libboost-iostreams-dev libboost-thread-dev \
+    libboost-chrono-dev libboost-system-dev libboost-serialization-dev \
+    libboost-program-options-dev \
+    qtbase5-dev
+```
+
+Notes:
+
+- The build defaults to **clang/clang++** when they are found; if clang is not
+  installed, CMake falls back to the system default compiler (g++ works too).
+  To force a compiler, pass `-DCMAKE_CXX_COMPILER=...` at configure time.
+- **Boost ≥ 1.74** is required. The Ubuntu packages above are sufficient
+  (`libboost-all-dev` also works if you prefer one package).
+- **Qt5** (`qtbase5-dev`) is needed for the GUI tools (`topfd_gui`, etc.).
+- Other third-party code (htslib, ProteoWizard, ONNX Runtime) is vendored
+  under `ext/` and built/linked automatically — no packages needed.
+
+### 2. Clone (with Git LFS — see above)
+
+```sh
+git clone https://github.com/liuxiaowen/toppic_claude.git
+cd toppic_claude
+```
+
+### 3. Configure and build
+
+```sh
+mkdir -p build
 cd build
 cmake ..
 make -j$(nproc)
-make install
 ```
 
-### Building on Linux (Redhat 9)
+The build type defaults to `Release`. The executables (`topfd`, `topdia`,
+`topindex`, `toppic`, `topmg`, `topdiff` and their `*_gui` counterparts) are
+placed in the repository's `bin/` directory. To build just one tool, e.g.
+TopFD:
 
 ```sh
-# install Extra Packages for Enterprise Linux (EPEL)
-sudo subscription-manager repos --enable codeready-builder-for-rhel-9-$(arch)-rpms
-sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
-
-# install compiling tools
-sudo dnf install cmake gcc-c++ make clang
-
-# install dependencies
-sudo dnf install boost-devel 
-sudo dnf install xerces-c-devel
-sudo dnf install sqlite3-devel 
-sudo dnf install zlib-devel
-sudo dnf install rapidjson-devel
-
-# install Qt5 for GUI
-sudo dnf install qt5-qtbase-devel
-
-# building
-mkdir build
-cd build
-cmake ..
-make -j$(nproc)
-make install
+make -j$(nproc) topfd
 ```
 
-#### Language setting
-
-On some Linux distributions, you might have the problem "Could not loading a transcoding service".
-To fix this, please add following lines into your `.bashrc`.
+### 4. (Optional) Install
 
 ```sh
-export LC_ALL=en_US.UTF-8
-export LANG=en_US.UTF-8
-export LANGUAGE=en_US.UTF-8
+sudo make install
 ```
 
-### Building on Windows
+This installs the binaries to `/usr/local/bin`, the shared library directory
+to `/usr/local/lib/toppic`, and the runtime resources (model files, isotope
+tables, ...) to `/usr/local/share/toppic`. Use
+`cmake -DCMAKE_INSTALL_PREFIX=<dir> ..` at configure time for a different
+prefix.
 
-[MSYS2](http://www.msys2.org/) is used for building TopPIC Suite on Windows systems. Please follow the instructions from [here](doc/windows_build.md).
-
-### Building on MacOS
+To run the tools from `bin/` **without** installing, they need to find the
+runtime resources in a `res` directory next to the executable; create a
+symlink to the repository's `res/` once:
 
 ```sh
-# install compiling tools and dependencies
-brew install boost xerces-c sqlite3 zlib onnxruntime rapidjson cmake
-
-# install Qt5 for GUI
-brew install qt@5
-
-# building
-mkdir build
-cd build
-cmake ..
-make -j$(sysctl -n hw.ncpu)
-make install
+ln -s ../res bin/res
 ```

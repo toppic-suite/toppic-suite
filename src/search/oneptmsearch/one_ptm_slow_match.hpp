@@ -1,44 +1,45 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-#ifndef TOPPIC_SEARCH_ONE_PTM_SEARCH_ONE_PTM_SLOW_MATCH_HPP_
-#define TOPPIC_SEARCH_ONE_PTM_SEARCH_ONE_PTM_SLOW_MATCH_HPP_
+#ifndef TOPPIC_SEARCH_ONEPTMSEARCH_ONE_PTM_SLOW_MATCH_HPP_
+#define TOPPIC_SEARCH_ONEPTMSEARCH_ONE_PTM_SLOW_MATCH_HPP_
 
 #include <memory>
 #include <vector>
 
-#include "seq/proteoform.hpp"
-#include "ms/spec/prm_peak.hpp"
 #include "ms/spec/deconv_ms.hpp"
+#include "ms/spec/prm_peak.hpp"
 #include "ms/spec/spectrum_set.hpp"
 #include "prsm/prsm.hpp"
 #include "prsm/simple_prsm.hpp"
 #include "search/diag/diag_header.hpp"
-#include "search/oneptmsearch/ptm_search_mng.hpp"
 #include "search/oneptmsearch/ps_align.hpp"
+#include "search/oneptmsearch/ptm_search_mng.hpp"
+#include "seq/proteoform.hpp"
 
 namespace toppic {
 
 class OnePtmSlowMatch {
  public:
-  OnePtmSlowMatch(ProteoformPtr proteo_ptr,
-                  SpectrumSetPtr spectrum_set_ptr,
-                  SimplePrsmPtr simple_prsm_ptr,
-                  ProteoformTypePtr align_type_ptr,
-                  PtmSearchMngPtr mng_ptr);
+  OnePtmSlowMatch(const ProteoformPtr& proteo_ptr,
+                  const SpectrumSetPtr& spectrum_set_ptr,
+                  const SimplePrsmPtr& simple_prsm_ptr,
+                  const ProteoformTypePtr& align_type_ptr,
+                  const PtmSearchMngPtr& mng_ptr);
 
-  ProteoformPtr getProteoform(){return proteo_ptr_;};
+  ProteoformPtr getProteoform() { return proteo_ptr_; };
 
   void init();
 
@@ -55,12 +56,12 @@ class OnePtmSlowMatch {
   SimplePrsmPtr simple_prsm_ptr_;
   PsAlignPtr ps_align_ptr_;
 
-  void addPrefixDiagonals(DiagHeaderPtrVec &n_extend_header_ptrs);
+  void addPrefixDiagonals(DiagHeaderPtrVec& n_extend_header_ptrs);
 
-  void addSuffixDiagonals(DiagHeaderPtrVec &c_extend_header_ptrs);
+  void addSuffixDiagonals(DiagHeaderPtrVec& c_extend_header_ptrs);
 
-  void addComplementDiagonals(DiagHeaderPtrVec &n_extend_header_ptrs,
-                              DiagHeaderPtrVec &c_extend_header_ptrs);
+  void addComplementDiagonals(DiagHeaderPtrVec& n_extend_header_ptrs,
+                              DiagHeaderPtrVec& c_extend_header_ptrs);
 
   DiagHeaderPtrVec geneOnePtmNTermShiftHeaders();
 };
@@ -70,4 +71,4 @@ using OnePtmSlowMatchPtrVec = std::vector<OnePtmSlowMatchPtr>;
 
 } /* namespace toppic */
 
-#endif 
+#endif

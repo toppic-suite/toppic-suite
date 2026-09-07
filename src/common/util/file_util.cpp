@@ -1,34 +1,41 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#include "common/util/file_util.hpp"
 
 #include <algorithm>
+#include <cctype>
 #include <filesystem>
 #include <fstream>
+#include <iterator>
 #include <stdexcept>
 #include <string>
 
-#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
+#if defined(_WIN32) || defined(_WIN64) || defined(__MINGW32__) || \
+    defined(__MINGW64__)
 #include <windows.h>
-#elif defined (__APPLE__)
-#include <climits>
+#elif defined(__APPLE__)
 #include <mach-o/dyld.h>
+
+#include <climits>
 #else
 #include <unistd.h>
 #endif
 
 #include "common/util/logger.hpp"
-#include "common/util/file_util.hpp"
+#include "common/util/str_util.hpp"
 
 namespace fs = std::filesystem;
 
@@ -37,25 +44,31 @@ namespace toppic {
 namespace file_util {
 
 std::string getFileSeparator() {
-#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
+#if defined(_WIN32) || defined(_WIN64) || defined(__MINGW32__) || \
+    defined(__MINGW64__)
   return "\\";
 #else
   return "/";
 #endif
 }
 
-std::string getExecutiveDir(const std::string &argv_0) {
-#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
+std::string getExecutiveDir(const std::string& argv_0) {
+#if defined(_WIN32) || defined(_WIN64) || defined(__MINGW32__) || \
+    defined(__MINGW64__)
   LPSTR lpFilePart;
   char file_name[MAX_PATH];
   SearchPath(NULL, argv_0.c_str(), ".exe", MAX_PATH, file_name, &lpFilePart);
-#elif defined (__APPLE__)
+#elif defined(__APPLE__)
   char file_name[PATH_MAX];
   uint32_t size = sizeof(file_name);
   _NSGetExecutablePath(file_name, &size);
 #else
   char buffer[1024];
-  size_t len = readlink("/proc/self/exe", buffer, sizeof(buffer) - 1);
+  ssize_t len = readlink("/proc/self/exe", buffer, sizeof(buffer) - 1);
+  if (len < 0) {
+    LOG_ERROR("Cannot determine the executable path from /proc/self/exe!");
+    throw std::runtime_error("Cannot determine the executable path!");
+  }
   buffer[len] = '\0';
   std::string file_name(buffer);
 #endif
@@ -64,14 +77,15 @@ std::string getExecutiveDir(const std::string &argv_0) {
   return exe_dir;
 }
 
-std::string getResourceDir(const std::string &exec_dir) {
+std::string getResourceDir(const std::string& exec_dir) {
   std::string resource_dir = exec_dir + getToppicResourceDirName();
-  if (exists(resource_dir)) {
+  if (fs::exists(resource_dir)) {
     return resource_dir;
   }
-#if !defined (_WIN32) && !defined (_WIN64) && !defined (__MINGW32__) && !defined (__MINGW64__)
+#if !defined(_WIN32) && !defined(_WIN64) && !defined(__MINGW32__) && \
+    !defined(__MINGW64__)
   std::string shared_dir = getSharedDirName();
-  if (exists(shared_dir)) {
+  if (fs::exists(shared_dir)) {
     return shared_dir;
   }
   LOG_ERROR("The resource directory " << shared_dir << " does not exist!");
@@ -80,7 +94,7 @@ std::string getResourceDir(const std::string &exec_dir) {
   throw std::runtime_error("Resource directory not found: " + resource_dir);
 }
 
-std::string basenameFromEntirePath(const std::string &s) {
+std::string basenameFromEntirePath(const std::string& s) {
   size_t slash_pos = s.find_last_of("\\/");
   if (slash_pos < s.length()) {
     return basename(s.substr(slash_pos + 1));
@@ -88,7 +102,7 @@ std::string basenameFromEntirePath(const std::string &s) {
   return basename(s);
 }
 
-std::string filenameFromEntirePath(const std::string &s) {
+std::string filenameFromEntirePath(const std::string& s) {
   // for files like */uniprot-st.fasta_target
   size_t slash_pos = s.find_last_of("\\/");
   if (slash_pos < s.length()) {
@@ -97,7 +111,7 @@ std::string filenameFromEntirePath(const std::string &s) {
   return s;
 }
 
-std::string basename(const std::string &s) {
+std::string basename(const std::string& s) {
   size_t dot_pos = s.find_last_of(".");
   if (dot_pos < s.length()) {
     return s.substr(0, dot_pos);
@@ -105,34 +119,34 @@ std::string basename(const std::string &s) {
   return s;
 }
 
-std::string absoluteDir(const std::string &s) {
+std::string absoluteDir(const std::string& s) {
   return absolute(fs::path(s)).parent_path().string();
 }
 
-std::string absoluteName(const std::string &s) {
+std::string absoluteName(const std::string& s) {
   return absolute(fs::path(s)).string();
 }
 
-std::string directory(const std::string &s) {
+std::string directory(const std::string& s) {
   return fs::path(s).parent_path().string();
 }
 
-void createFolder(const std::string &folder_name) {
+void createFolder(const std::string& folder_name) {
   fs::path path(folder_name);
   try {
     fs::create_directories(path);
-  }
-  catch (const fs::filesystem_error &e) {
-    LOG_ERROR("Output file/folder " << folder_name
-              << " could not be created because it was in use."
+  } catch (const fs::filesystem_error& e) {
+    LOG_ERROR("Output file/folder "
+              << folder_name << " could not be created because it was in use."
               << " Please close the files/folders and try again.");
     throw std::runtime_error("Cannot create folder: " + folder_name);
   }
 }
 
-void createLink(const std::string &a_link, const std::string &a_dir,
-                const std::string &b) {
-#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
+void createLink(const std::string& a_link, const std::string& a_dir,
+                const std::string& b) {
+#if defined(_WIN32) || defined(_WIN64) || defined(__MINGW32__) || \
+    defined(__MINGW64__)
   copyDir(a_dir, b);
 #else
   fs::path path_a(a_link);
@@ -141,8 +155,8 @@ void createLink(const std::string &a_link, const std::string &a_dir,
 #endif
 }
 
-void copyFile(const std::string &file_name,
-              const std::string &to_file, bool over_write) {
+void copyFile(const std::string& file_name, const std::string& to_file,
+              bool over_write) {
   fs::path from_path(file_name);
   fs::path to_path(to_file);
   if (!fs::exists(from_path)) {
@@ -156,8 +170,7 @@ void copyFile(const std::string &file_name,
   }
 }
 
-bool copyDir(const std::string &src_name,
-             const std::string &des_name) {
+bool copyDir(const std::string& src_name, const std::string& des_name) {
   fs::path source(src_name);
   fs::path destination(des_name);
   try {
@@ -166,118 +179,79 @@ bool copyDir(const std::string &src_name,
       return false;
     }
     if (fs::exists(destination)) {
-      LOG_WARN("The destination folder " << destination.string()
-          << " already exists. Fail to create the destination directory.");
+      LOG_WARN("The destination folder "
+               << destination.string()
+               << " already exists. Fail to create the destination directory.");
       return false;
     }
     if (!fs::create_directory(destination)) {
       LOG_WARN("Unable to create the destination folder "
-                << destination.string());
+               << destination.string());
       return false;
     }
-  }
-  catch (const fs::filesystem_error &e) {
+  } catch (const fs::filesystem_error& e) {
     LOG_WARN(e.what());
     return false;
   }
   bool overwrite = true;
-  for (fs::directory_iterator file(source); file != fs::directory_iterator(); ++file) {
+  for (fs::directory_iterator file(source); file != fs::directory_iterator();
+       ++file) {
     try {
       fs::path current(file->path());
       if (fs::is_directory(current)) {
-        if (!copyDir(current.string(), (destination / current.filename()).string())) {
+        if (!copyDir(current.string(),
+                     (destination / current.filename()).string())) {
           return false;
         }
       } else {
-        copyFile(current.string(), (destination / current.filename()).string(), overwrite);
+        copyFile(current.string(), (destination / current.filename()).string(),
+                 overwrite);
       }
-    }
-    catch (const fs::filesystem_error &e) {
+    } catch (const fs::filesystem_error& e) {
       LOG_WARN("[Exception] " << e.what());
     }
   }
   return true;
 }
 
-bool copyJsonDir(const std::string &src_name,
-                 const std::string &des_name,
-                 int id_base) {
-  try {
-    fs::path source(src_name);
-    if (!fs::exists(source) || !fs::is_directory(source)) {
-      LOG_WARN("The source folder " << source.string() << " does not exist!");
-      return false;
-    }
-    for (const auto& source_file : fs::directory_iterator(source)) {
-      if (fs::is_regular_file(source_file)) {
-        fs::path current(source_file.path());
-        std::string file_name = current.filename().string();
-        // file names are like "spectrum<id>.js": prefix "spectrum" = 8, suffix ".js" = 3
-        const int prefix_len = 8, suffix_len = 3;
-        std::string id_str = file_name.substr(prefix_len, file_name.length() - prefix_len - suffix_len);
-        int new_id = std::stoi(id_str) + id_base;
-        std::string new_name = "spectrum" + std::to_string(new_id) + ".js";
-        fs::path des_file(des_name + getFileSeparator() + new_name);
-        LOG_INFO("Copying file: " << current);
-        fs::copy_file(current, des_file);
-      }
-    }
-  }
-  catch (const fs::filesystem_error &e) {
-    LOG_WARN("[Exception] " << e.what());
-    return false;
-  }
-  return true;
-}
-
-bool exists(const std::string &path) {
-  return fs::exists(path);
-}
-
-void delDir(const std::string &path) {
+void delDir(const std::string& path) {
   fs::path dir(path);
   if (fs::exists(dir)) {
     try {
       fs::remove_all(dir);
-    }
-    catch (const fs::filesystem_error &e) {
-      LOG_ERROR("Output file/folder " << path << " is in use."
+    } catch (const fs::filesystem_error& e) {
+      LOG_ERROR("Output file/folder "
+                << path << " is in use."
                 << " Please close all output folders and files and try again.");
       throw std::runtime_error("Cannot delete folder: " + path);
     }
   }
 }
 
-void delFile(const std::string &path) {
+void delFile(const std::string& path) {
   fs::path file(path);
   if (fs::exists(file)) {
     fs::remove(file);
   }
 }
 
-void rename(const std::string &ori_name, const std::string &new_name) {
-  fs::path ori_path(ori_name);
-  fs::path new_path(new_name);
-  fs::rename(ori_path, new_path);
-}
-
-void moveFile(const std::string &path_name, const std::string &folder_name) {
+void moveFile(const std::string& path_name, const std::string& folder_name) {
   fs::path ori_path(path_name);
-  std::string new_path_name = folder_name + getFileSeparator()
-      + ori_path.filename().string();
+  std::string new_path_name =
+      folder_name + getFileSeparator() + ori_path.filename().string();
   bool over_write = true;
   copyFile(path_name, new_path_name, over_write);
   delFile(path_name);
 }
 
-void cleanPrefix(const std::string &ref_name, const std::string &prefix) {
+void cleanPrefix(const std::string& ref_name, const std::string& prefix) {
   std::string ref_name_copy = ref_name;
   std::replace(ref_name_copy.begin(), ref_name_copy.end(), '\\', '/');
   fs::path ref_path(ref_name_copy);
   fs::path ref_dir = absolute(ref_path).parent_path();
   fs::directory_iterator end_iter;
-  for (fs::directory_iterator dir_iter(ref_dir);
-       dir_iter != end_iter; ++dir_iter) {
+  for (fs::directory_iterator dir_iter(ref_dir); dir_iter != end_iter;
+       ++dir_iter) {
     std::string file_name = dir_iter->path().string();
     std::replace(file_name.begin(), file_name.end(), '\\', '/');
     if (file_name.compare(0, prefix.length(), prefix) == 0) {
@@ -288,18 +262,21 @@ void cleanPrefix(const std::string &ref_name, const std::string &prefix) {
   }
 }
 
-void cleanTempFiles(const std::string &ref_name, const std::string &ext_prefix) {
+void cleanTempFiles(const std::string& ref_name,
+                    const std::string& ext_prefix) {
   fs::path ref_path(ref_name);
   std::string ref_base = basename(absolute(ref_path).string());
   std::replace(ref_base.begin(), ref_base.end(), '\\', '/');
   cleanPrefix(ref_name, ref_base + "." + ext_prefix);
 }
 
-bool checkSpace(const std::string &dir) {
-  return std::any_of(dir.begin(), dir.end(), ::isspace);
+bool checkSpace(const std::string& dir) {
+  // Cast to unsigned char: passing a negative char to std::isspace is UB.
+  return std::any_of(dir.begin(), dir.end(),
+                     [](unsigned char c) { return std::isspace(c) != 0; });
 }
 
-std::string readFile(const std::string &file_name) {
+std::string readFile(const std::string& file_name) {
   fs::path path(file_name);
   if (!fs::exists(path)) {
     LOG_ERROR("The file " << file_name << " does not exist!");
@@ -307,9 +284,16 @@ std::string readFile(const std::string &file_name) {
   }
   std::ifstream in(file_name);
   std::string content((std::istreambuf_iterator<char>(in)),
-                       std::istreambuf_iterator<char>());
+                      std::istreambuf_iterator<char>());
   in.close();
   return content;
+}
+
+bool isValidMzmlFile(const std::string& file_name) {
+  return str_util::endsWith(file_name, "mzML") ||
+         str_util::endsWith(file_name, "mzXML") ||
+         str_util::endsWith(file_name, "mzml") ||
+         str_util::endsWith(file_name, "mzxml");
 }
 
 }  // namespace file_util

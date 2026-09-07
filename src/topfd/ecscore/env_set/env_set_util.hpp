@@ -1,4 +1,5 @@
-// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TOPPIC_TOPFD_ECSCORE_ENV_SET_ENV_SET_UTIL_HPP
-#define TOPPIC_TOPFD_ECSCORE_ENV_SET_ENV_SET_UTIL_HPP
+#ifndef TOPPIC_TOPFD_ECSCORE_ENV_SET_ENV_SET_UTIL_HPP_
+#define TOPPIC_TOPFD_ECSCORE_ENV_SET_ENV_SET_UTIL_HPP_
 
 #include <vector>
 
@@ -25,12 +26,12 @@ namespace toppic {
 
 namespace env_set_util {
 
-EnvSetPtr searchEnvSet(MsMapPtr ms_map_ptr, SeedEnvPtr seed_ptr,
-                       EcscoreParaPtr para_ptr, double sn_ratio);
+EnvSetPtr searchEnvSet(const MsMapPtr& ms_map_ptr, const SeedEnvPtr& seed_ptr,
+                       const EcscoreParaPtr& para_ptr, double sn_ratio);
 
-EnvSetPtr searchEnvSet(MsMapPtr ms_map_ptr, SeedEnvPtr seed_ptr,
+EnvSetPtr searchEnvSet(const MsMapPtr& ms_map_ptr, const SeedEnvPtr& seed_ptr,
                        int center_spec_id, int start_spec_id, int end_spec_id,
-                       EcscoreParaPtr para_ptr, double sn_ratio);
+                       const EcscoreParaPtr& para_ptr, double sn_ratio);
 
 }  // namespace env_set_util
 

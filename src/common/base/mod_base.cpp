@@ -1,27 +1,30 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#include "common/base/mod_base.hpp"
 
 #include <stdexcept>
 #include <string>
 
-#include "common/util/logger.hpp"
-#include "common/util/file_util.hpp"
-#include "common/xml/xml_dom_document.hpp"
-#include "common/xml/xml_dom_util.hpp"
 #include "common/base/ptm_base.hpp"
 #include "common/base/residue_base.hpp"
-#include "common/base/mod_base.hpp"
+#include "common/util/file_util.hpp"
+#include "common/util/logger.hpp"
+#include "common/xml/xml_dom_document.hpp"
+#include "common/xml/xml_dom_parser.hpp"
+#include "common/xml/xml_dom_util.hpp"
 
 namespace toppic {
 
@@ -31,57 +34,55 @@ ModPtr ModBase::c57_mod_ptr_;
 ModPtr ModBase::c58_mod_ptr_;
 ModPtr ModBase::n_term_none_mod_ptr_;
 
-void ModBase::initBase(const std::string &base_dir) {
+void ModBase::initBase(const std::string& base_dir) {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (!parser) {
     LOG_ERROR("Error in parsing modification data!");
     throw std::runtime_error("Error in parsing modification data!");
   }
 
-  std::string mod_base_file_name = base_dir 
-      + file_util::getFileSeparator() + "mod_base.xml";
+  std::string mod_base_file_name =
+      base_dir + file_util::getFileSeparator() + "mod_base.xml";
   std::string mod_base_data = file_util::readFile(mod_base_file_name);
-  xercesc::MemBufInputSource mem_str((const XMLByte*)mod_base_data.c_str(),
-                                     mod_base_data.length(), 
-                                     "modification_data");
-  XmlDOMDocument doc(parser, mem_str);
-  XmlDOMElement* parent = doc.getDocumentElement();
+  XmlDOMDocument doc(parser->parseStr(mod_base_data));
+  XmlDOMElement parent = doc.getDocumentElement();
   std::string element_name = Mod::getXmlElementName();
   int mod_num = xml_dom_util::getChildCount(parent, element_name.c_str());
   for (int i = 0; i < mod_num; i++) {
-    XmlDOMElement* element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
+    XmlDOMElement element =
+        xml_dom_util::getChildElement(parent, element_name.c_str(), i);
     ModPtr mod_ptr = std::make_shared<Mod>(element);
     mod_ptr_vec_.push_back(mod_ptr);
     // check empty ptr
-    if (mod_ptr->getOriResiduePtr() == ResidueBase::getEmptyResiduePtr()
-        && mod_ptr->getModResiduePtr() == ResidueBase::getEmptyResiduePtr()
-        && mod_ptr->getModTypePtr() == ModType::SIDE_CHAIN) {
+    if (mod_ptr->getOriResiduePtr() == ResidueBase::getEmptyResiduePtr() &&
+        mod_ptr->getModResiduePtr() == ResidueBase::getEmptyResiduePtr() &&
+        mod_ptr->getModTypePtr() == ModType::SIDE_CHAIN) {
       none_mod_ptr_ = mod_ptr;
     }
-    if (mod_ptr->getModResiduePtr()->getAminoAcidPtr()->getOneLetter() == "C"
-        && mod_ptr->getModResiduePtr()->getPtmPtr() == PtmBase::getPtmPtr_C57()
-        && mod_ptr->getModTypePtr() == ModType::SIDE_CHAIN) {
+    if (mod_ptr->getModResiduePtr()->getAminoAcidPtr()->getOneLetter() == "C" &&
+        mod_ptr->getModResiduePtr()->getPtmPtr() == PtmBase::getPtmPtr_C57() &&
+        mod_ptr->getModTypePtr() == ModType::SIDE_CHAIN) {
       c57_mod_ptr_ = mod_ptr;
     }
-    if (mod_ptr->getModResiduePtr()->getAminoAcidPtr()->getOneLetter() == "C"
-        && mod_ptr->getModResiduePtr()->getPtmPtr() == PtmBase::getPtmPtr_C58()
-        && mod_ptr->getModTypePtr() == ModType::SIDE_CHAIN) {
+    if (mod_ptr->getModResiduePtr()->getAminoAcidPtr()->getOneLetter() == "C" &&
+        mod_ptr->getModResiduePtr()->getPtmPtr() == PtmBase::getPtmPtr_C58() &&
+        mod_ptr->getModTypePtr() == ModType::SIDE_CHAIN) {
       c58_mod_ptr_ = mod_ptr;
     }
-    if (mod_ptr->getOriResiduePtr() == ResidueBase::getEmptyResiduePtr()
-        && mod_ptr->getModResiduePtr() == ResidueBase::getEmptyResiduePtr()
-        && mod_ptr->getModTypePtr() == ModType::N_TERM) {
+    if (mod_ptr->getOriResiduePtr() == ResidueBase::getEmptyResiduePtr() &&
+        mod_ptr->getModResiduePtr() == ResidueBase::getEmptyResiduePtr() &&
+        mod_ptr->getModTypePtr() == ModType::N_TERM) {
       n_term_none_mod_ptr_ = mod_ptr;
     }
   }
-  if (none_mod_ptr_ == nullptr || c57_mod_ptr_ == nullptr 
-    || c58_mod_ptr_ == nullptr || n_term_none_mod_ptr_ == nullptr) {
+  if (none_mod_ptr_ == nullptr || c57_mod_ptr_ == nullptr ||
+      c58_mod_ptr_ == nullptr || n_term_none_mod_ptr_ == nullptr) {
     LOG_ERROR("Modification configuration file is incomplete!");
     throw std::runtime_error("Modification configuration file is incomplete!");
   }
 }
 
-ModPtr ModBase::getBaseModPtr(ModPtr mod_ptr) {
+ModPtr ModBase::getBaseModPtr(const ModPtr& mod_ptr) {
   for (size_t i = 0; i < mod_ptr_vec_.size(); i++) {
     if (mod_ptr_vec_[i]->isSame(mod_ptr)) {
       return mod_ptr_vec_[i];
@@ -91,17 +92,17 @@ ModPtr ModBase::getBaseModPtr(ModPtr mod_ptr) {
   return mod_ptr;
 }
 
-ModPtr ModBase::getBaseModPtr(ResiduePtr ori_residue, 
-                              ResiduePtr mod_residue, 
-                              ModTypePtr mod_type_ptr) {
-  ModPtr mod_ptr = std::make_shared<Mod>(ori_residue, mod_residue, mod_type_ptr);
+ModPtr ModBase::getBaseModPtr(const ResiduePtr& ori_residue,
+                              const ResiduePtr& mod_residue,
+                              const ModTypePtr& mod_type_ptr) {
+  ModPtr mod_ptr =
+      std::make_shared<Mod>(ori_residue, mod_residue, mod_type_ptr);
   return getBaseModPtr(mod_ptr);
 }
 
-ModPtr ModBase::getModPtrFromXml(XmlDOMElement * element) {
+ModPtr ModBase::getModPtrFromXml(XmlDOMElement element) {
   ModPtr ptr = std::make_shared<Mod>(element);
   return getBaseModPtr(ptr);
 }
 
 }  // namespace toppic
-

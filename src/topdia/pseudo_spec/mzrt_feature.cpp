@@ -1,4 +1,5 @@
-// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,13 +12,17 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
+#include "topdia/pseudo_spec/mzrt_feature.hpp"
 
 #include <algorithm>
+#include <fstream>
+#include <iterator>
 #include <numeric>
+#include <sstream>
+#include <string>
+#include <utility>
 
 #include "common/util/logger.hpp"
-#include "topdia/pseudo_spec/mzrt_feature.hpp"
 #include "topdia/pseudo_spec/generate_pseudo_spectrum.hpp"
 
 namespace toppic {
@@ -45,20 +50,20 @@ MzrtFeature::MzrtFeature(int id, int fraction_id, int env_num, double mass,
   spec_id_begin_ = spec_id_begin;
   spec_id_end_ = spec_id_end;
   ec_score_ = ec_score;
-  xic_ = xic;
   apex_cycle_ = apex_cycle;
-  envelope_mz_ = envelope_mz;
-  envelope_inte_ = envelope_inte;
-  normalized_xic_ = normalized_xic;
   used_ = false;
   cycle_span_ = countNonZero(xic);
+  xic_ = std::move(xic);
+  envelope_mz_ = std::move(envelope_mz);
+  envelope_inte_ = std::move(envelope_inte);
+  normalized_xic_ = std::move(normalized_xic);
 }
 
-MzrtFeaturePtrVec MzrtFeature::read_record(std::string filename) {
+MzrtFeaturePtrVec MzrtFeature::read_record(const std::string& filename) {
   MzrtFeaturePtrVec data;  // Store read data
   std::ifstream file(filename);
   if (!file.is_open()) {
-    LOG_ERROR("Error opening file: " << filename); 
+    LOG_ERROR("Error opening file: " << filename);
     return data;  // Return empty vector if file cannot be opened
   }
 
@@ -71,7 +76,7 @@ MzrtFeaturePtrVec MzrtFeature::read_record(std::string filename) {
     while (std::getline(ss, cell, ',')) {
       tokens.push_back(cell);
     }
-    if (tokens.size() >= 0) {
+    if (tokens.size() >= 17) {
       int id = std::stoi(tokens[0]);
       int fraction_id = std::stoi(tokens[1]);
       int env_num = std::stoi(tokens[2]);
@@ -79,8 +84,8 @@ MzrtFeaturePtrVec MzrtFeature::read_record(std::string filename) {
       double mono_mz = std::stod(tokens[4]);
       int charge = std::stoi(tokens[5]);
       double intensity = std::stod(tokens[6]);
-      int mz_begin = std::stod(tokens[7]);
-      int mz_end = std::stod(tokens[8]);
+      int mz_begin = std::stoi(tokens[7]);
+      int mz_end = std::stoi(tokens[8]);
       double time_begin = std::stod(tokens[9]);
       double time_end = std::stod(tokens[10]);
       int spec_id_begin = std::stoi(tokens[11]);
@@ -98,7 +103,7 @@ MzrtFeaturePtrVec MzrtFeature::read_record(std::string filename) {
           mz_end, time_begin, time_end, spec_id_begin, spec_id_end, time_apex,
           ec_score, xic, normalized_xic, envelope_mz, envelope_inte,
           apex_cycle);
-      if (std::accumulate(xic.begin(), xic.end(), 0) == 0) continue;
+      if (std::accumulate(xic.begin(), xic.end(), 0.0) == 0.0) continue;
       data.push_back(feature);
     }
   }
@@ -108,7 +113,7 @@ MzrtFeaturePtrVec MzrtFeature::read_record(std::string filename) {
   return data;
 }
 
-std::vector<double> MzrtFeature::parseXIC(const std::string &line) {
+std::vector<double> MzrtFeature::parseXIC(const std::string& line) {
   std::vector<double> result;
   std::stringstream ss(line);
   std::string cell;
@@ -118,10 +123,10 @@ std::vector<double> MzrtFeature::parseXIC(const std::string &line) {
   return result;
 }
 
-std::vector<double> MzrtFeature::normalizeXIC(const std::vector<double> &xic) {
+std::vector<double> MzrtFeature::normalizeXIC(const std::vector<double>& xic) {
   // Calculate the sum of all elements in xic
   double sum = 0.0;
-  for (const auto &value : xic) {
+  for (const auto& value : xic) {
     sum += value;
   }
   // Normalize the vector by dividing each element by the sum
@@ -131,18 +136,17 @@ std::vector<double> MzrtFeature::normalizeXIC(const std::vector<double> &xic) {
     for (size_t i = 0; i < xic.size(); i++) {
       normalized_xic.push_back(0);
     }
-  }
-  else {
-    for (auto &value : xic) {
+  } else {
+    for (auto& value : xic) {
       normalized_xic.push_back(value / sum);
     }
   }
   return normalized_xic;
 }
 
-void MzrtFeature::parseEnvelope(const std::string &input,
-                                std::vector<double> &array1,
-                                std::vector<double> &array2) {
+void MzrtFeature::parseEnvelope(const std::string& input,
+                                std::vector<double>& array1,
+                                std::vector<double>& array2) {
   std::stringstream ss(input);
   std::string pair;
   while (std::getline(ss, pair, ';')) {
@@ -155,9 +159,9 @@ void MzrtFeature::parseEnvelope(const std::string &input,
   }
 }
 
-int MzrtFeature::countNonZero(const std::vector<double> &xic) {
+int MzrtFeature::countNonZero(const std::vector<double>& xic) {
   int nonZeroCount = 0;
-  for (int num : xic)
+  for (double num : xic)
     if (num != 0) nonZeroCount++;
   return nonZeroCount;
 }

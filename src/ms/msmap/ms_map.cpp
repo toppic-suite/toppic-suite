@@ -1,34 +1,41 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#include "ms/msmap/ms_map.hpp"
 
 #include <algorithm>
+#include <cmath>
+#include <cstddef>
+#include <cstdlib>
 #include <numeric>
+#include <vector>
 
 #include "common/util/logger.hpp"
 #include "ms/spec/baseline_util.hpp"
-#include "ms/msmap/ms_map.hpp"
 
 namespace toppic {
 
-MsMap::MsMap(PeakPtrVec2D &raw_peak_2d, MsHeaderPtrVec &ms1_header_ptr_vec,
-             double bin_size, double sn_ratio, bool single_scan_noise) {
+MsMap::MsMap(const PeakPtrVec2D& raw_peak_2d,
+             const MsHeaderPtrVec& ms1_header_ptr_vec, double bin_size,
+             double sn_ratio, bool single_scan_noise) {
   bin_size_ = bin_size;
   /// get min mz value
   std::vector<double> intes;
   std::vector<double> mz;
-  for (auto &row_peaks: raw_peak_2d) {
-    for (auto &p: row_peaks) {
+  for (auto& row_peaks : raw_peak_2d) {
+    for (auto& p : row_peaks) {
       mz.push_back(p->getPosition());
       intes.push_back(p->getIntensity());
     }
@@ -48,18 +55,21 @@ MsMap::MsMap(PeakPtrVec2D &raw_peak_2d, MsHeaderPtrVec &ms1_header_ptr_vec,
   initMap(raw_peak_2d, ms1_header_ptr_vec, sn_ratio, single_scan_noise);
 }
 
-void MsMap::initMap(PeakPtrVec2D &raw_peak_2d, MsHeaderPtrVec &ms1_header_ptr_vec, 
-                    double sn_ratio, bool single_scan_noise) {
+void MsMap::initMap(const PeakPtrVec2D& raw_peak_2d,
+                    const MsHeaderPtrVec& ms1_header_ptr_vec, double sn_ratio,
+                    bool single_scan_noise) {
   double base_inte = base_inte_;
   for (size_t row_id = 0; row_id < ms1_header_ptr_vec.size(); row_id++) {
     MsHeaderPtr ms_header_ptr = ms1_header_ptr_vec[row_id];
-    MsMapRowHeaderPtr row_header_ptr = std::make_shared<MsMapRowHeader>(ms_header_ptr->getSpecId(),
-                                                                        ms_header_ptr->getFirstScanNum(),
-                                                                        ms_header_ptr->getRetentionTime());
-    PeakPtrVec row_peaks = raw_peak_2d[row_id]; 
+    MsMapRowHeaderPtr row_header_ptr = std::make_shared<MsMapRowHeader>(
+        ms_header_ptr->getSpecId(), ms_header_ptr->getFirstScanNum(),
+        ms_header_ptr->getRetentionTime());
+    const PeakPtrVec& row_peaks = raw_peak_2d[row_id];
     // get base peak intensity for each row
     std::vector<double> intes;
-    for (auto &peak: row_peaks) { intes.push_back(peak->getIntensity()); }
+    for (auto& peak : row_peaks) {
+      intes.push_back(peak->getIntensity());
+    }
     double row_base_inte = 0.0;
     if (std::accumulate(intes.begin(), intes.end(), 0.0) > 0) {
       row_base_inte = baseline_util::getBaseLine(intes);
@@ -91,15 +101,15 @@ void MsMap::reconstruct(double sn_ratio, bool single_scan_noise) {
   double base_inte = base_inte_;
   for (size_t row_id = 0; row_id < row_ptr_list_.size(); row_id++) {
     MsMapRowPtr row_ptr = row_ptr_list_[row_id];
-    MsMapRowHeaderPtr row_header_ptr = row_ptr->getHeaderPtr(); 
+    MsMapRowHeaderPtr row_header_ptr = row_ptr->getHeaderPtr();
     if (single_scan_noise) {
       base_inte = row_header_ptr->getBaseInte();
     }
-    MsMapPeakPtrVec row_peaks = peaks_[row_id];
+    const MsMapPeakPtrVec& row_peaks = peaks_[row_id];
     row_ptr->clearPeaks();
     // init indexes
     for (size_t j = 0; j < row_peaks.size(); j++) {
-      MsMapPeakPtr new_peak_ptr = row_peaks[j]; 
+      MsMapPeakPtr new_peak_ptr = row_peaks[j];
       // filter low intensity peak
       if (new_peak_ptr->getIntensity() > sn_ratio * base_inte) {
         int bin_idx = getColIndex(new_peak_ptr->getPosition());
@@ -109,7 +119,7 @@ void MsMap::reconstruct(double sn_ratio, bool single_scan_noise) {
   }
 }
 
-MsMapRowHeaderPtrVec MsMap::getHeaderPtrList() {
+MsMapRowHeaderPtrVec MsMap::getHeaderPtrList() const {
   MsMapRowHeaderPtrVec header_list;
   for (size_t i = 0; i < row_ptr_list_.size(); i++) {
     header_list.push_back(row_ptr_list_[i]->getHeaderPtr());
@@ -117,7 +127,7 @@ MsMapRowHeaderPtrVec MsMap::getHeaderPtrList() {
   return header_list;
 }
 
-int MsMap::getColIndex(double mz) {
+int MsMap::getColIndex(double mz) const {
   double mz_diff = mz - min_mz_;
   int bin_idx = int(mz_diff / bin_size_);
   if (bin_idx < 0) bin_idx = 0;
@@ -131,12 +141,14 @@ void MsMap::findNeighbors(int row_id, int search_bin_num, double mass_tol) {
   for (int bin_idx = 0; bin_idx < col_num_; bin_idx++) {
     int start = std::max(0, bin_idx - search_bin_num);
     int end = std::min(bin_idx + search_bin_num, col_num_ - 1);
-    MsMapPeakPtrVec first_row_peaks = first_row->getPeakPtrVec(bin_idx);
-    for (auto &first_peak: first_row_peaks) {
+    const MsMapPeakPtrVec& first_row_peaks = first_row->getPeakPtrVec(bin_idx);
+    for (auto& first_peak : first_row_peaks) {
       for (int second_idx = start; second_idx < end + 1; second_idx++) {
-        MsMapPeakPtrVec second_row_peaks = first_row->getPeakPtrVec(second_idx);
-        for (auto &second_peak: second_row_peaks) {
-          double mass_diff = std::abs(first_peak->getPosition() - second_peak->getPosition());
+        const MsMapPeakPtrVec& second_row_peaks =
+            first_row->getPeakPtrVec(second_idx);
+        for (auto& second_peak : second_row_peaks) {
+          double mass_diff =
+              std::abs(first_peak->getPosition() - second_peak->getPosition());
           if (mass_diff <= mass_tol) {
             first_peak->setNeighbor(true);
             second_peak->setNeighbor(true);
@@ -150,8 +162,8 @@ void MsMap::findNeighbors(int row_id, int search_bin_num, double mass_tol) {
 void MsMap::removeNonNeighbors(double mass_tol) {
   int search_bin_num = int(mass_tol / bin_size_) + 1;
   for (size_t i = 0; i < peaks_.size(); i++) {
-    MsMapPeakPtrVec ms_map_row_peaks = peaks_[i];
-    for (auto peak: ms_map_row_peaks) {
+    const MsMapPeakPtrVec& ms_map_row_peaks = peaks_[i];
+    for (auto peak : ms_map_row_peaks) {
       peak->setNeighbor(false);
     }
   }
@@ -162,9 +174,9 @@ void MsMap::removeNonNeighbors(double mass_tol) {
   for (size_t row_id = 0; row_id < row_num; row_id++) {
     MsMapRowPtr peak_row_ptr = row_ptr_list_[row_id];
     for (int bin_idx = 0; bin_idx < col_num_; bin_idx++) {
-      MsMapPeakPtrVec peak_ptrs = peak_row_ptr->getPeakPtrVec(bin_idx);
+      const MsMapPeakPtrVec& peak_ptrs = peak_row_ptr->getPeakPtrVec(bin_idx);
       MsMapPeakPtrVec new_peak_ptrs;
-      for (auto peak: peak_ptrs) {
+      for (auto peak : peak_ptrs) {
         if (peak->getNeighbor()) {
           new_peak_ptrs.push_back(peak);
         }
@@ -174,30 +186,32 @@ void MsMap::removeNonNeighbors(double mass_tol) {
   }
 }
 
-std::vector<int> MsMap::getScanListBySpecId(std::vector<int> spec_id_list) {
+std::vector<int> MsMap::getScanListBySpecId(
+    const std::vector<int>& spec_id_list) const {
   std::vector<int> scan_list;
-  for (auto spec_id: spec_id_list) {
-    if (spec_id >= 0 && spec_id < row_ptr_list_.size()) {
+  for (auto spec_id : spec_id_list) {
+    if (spec_id >= 0 && spec_id < static_cast<int>(row_ptr_list_.size())) {
       MsMapRowPtr row_ptr = row_ptr_list_[spec_id];
       scan_list.push_back(row_ptr->getHeaderPtr()->getScanNum());
     } else {
-      scan_list.push_back(-1); // invalid spec id
+      scan_list.push_back(-1);  // invalid spec id
     }
   }
   return scan_list;
 }
 
-std::vector<double> MsMap::getRtListBySpecId(std::vector<int> spec_id_list) {
+std::vector<double> MsMap::getRtListBySpecId(
+    const std::vector<int>& spec_id_list) const {
   std::vector<double> rt_list;
-  for (auto spec_id: spec_id_list) {
-    if (spec_id >= 0 && spec_id < row_ptr_list_.size()) {
+  for (auto spec_id : spec_id_list) {
+    if (spec_id >= 0 && spec_id < static_cast<int>(row_ptr_list_.size())) {
       MsMapRowPtr row_ptr = row_ptr_list_[spec_id];
       rt_list.push_back(row_ptr->getHeaderPtr()->getRt());
     } else {
-      rt_list.push_back(-1.0); // invalid spec id
+      rt_list.push_back(-1.0);  // invalid spec id
     }
   }
   return rt_list;
 }
 
-} // namespace toppic
+}  // namespace toppic

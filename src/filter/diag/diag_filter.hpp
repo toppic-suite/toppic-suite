@@ -1,40 +1,42 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-#ifndef TOPPIC_FILTER_DIAG_DIAG_FILTER_H_
-#define TOPPIC_FILTER_DIAG_DIAG_FILTER_H_
+#ifndef TOPPIC_FILTER_DIAG_DIAG_FILTER_HPP_
+#define TOPPIC_FILTER_DIAG_DIAG_FILTER_HPP_
 
-#include "seq/proteoform.hpp"
-#include "ms/spec/prm_ms.hpp"
-#include "prsm/simple_prsm.hpp"
 #include "filter/massmatch/mass_match.hpp"
 #include "filter/mng/diag_filter_mng.hpp"
+#include "ms/spec/prm_ms.hpp"
+#include "prsm/simple_prsm.hpp"
+#include "seq/proteoform.hpp"
 
 namespace toppic {
 
 class DiagFilter {
  public:
-  DiagFilter(const ProteoformPtrVec &proteo_ptrs, DiagFilterMngPtr mng_ptr, std::string block_str);
+  DiagFilter(const ProteoformPtrVec& proteo_ptrs,
+             const DiagFilterMngPtr& mng_ptr, std::string block_str);
 
-  SimplePrsmPtrVec getBestMatch(const PrmMsPtrVec &ms_ptr_vec);
+  SimplePrsmPtrVec getBestMatch(const PrmMsPtrVec& ms_ptr_vec);
 
  private:
   DiagFilterMngPtr mng_ptr_;
   ProteoformPtrVec proteo_ptrs_;
   MassMatchPtr index_ptr_;
 
-  SimplePrsmPtrVec compute(const PrmMsPtrVec &ms_ptr_vec);
+  SimplePrsmPtrVec compute(const PrmMsPtrVec& ms_ptr_vec);
 };
 
 using DiagFilterPtr = std::shared_ptr<DiagFilter>;

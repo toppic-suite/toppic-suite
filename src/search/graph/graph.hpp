@@ -1,29 +1,28 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
-
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #ifndef TOPPIC_SEARCH_GRAPH_GRAPH_HPP_
 #define TOPPIC_SEARCH_GRAPH_GRAPH_HPP_
 
-#include <iostream>
-#include <string>
-#include <vector>
-#include <memory>
-#include <map>
-
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/graphviz.hpp>
+#include <iostream>
+#include <map>
+#include <memory>
+#include <string>
+#include <vector>
 
 #include "common/base/ptm_base.hpp"
 #include "common/base/residue.hpp"
@@ -39,18 +38,18 @@ struct EdgeInfo {
 
   int int_mass_;
 
-  EdgeInfo():res_ptr_(nullptr), alter_type_(-1), int_mass_(0) {}
+  EdgeInfo() : res_ptr_(nullptr), alter_type_(-1), int_mass_(0) {}
 
-  EdgeInfo(ResiduePtr res_ptr, int alter_type, double convert_ratio):
-      res_ptr_(res_ptr),
-      alter_type_(alter_type) {
-        int_mass_ = static_cast<int>(std::round(res_ptr->getMass() * convert_ratio));
-        LOG_DEBUG("int mass " << int_mass_
-                  << " res mass " << res_ptr->getMass()
-                  << " convert_ratio " << convert_ratio);
-      }
+  EdgeInfo(const ResiduePtr& res_ptr, int alter_type, double convert_ratio)
+      : res_ptr_(res_ptr), alter_type_(alter_type) {
+    int_mass_ =
+        static_cast<int>(std::round(res_ptr->getMass() * convert_ratio));
+    LOG_DEBUG("int mass " << int_mass_ << " res mass " << res_ptr->getMass()
+                          << " convert_ratio " << convert_ratio);
+  }
 
-  EdgeInfo(double mass, double convert_ratio):res_ptr_(nullptr), alter_type_(-1) {
+  EdgeInfo(double mass, double convert_ratio)
+      : res_ptr_(nullptr), alter_type_(-1) {
     int_mass_ = static_cast<int>(std::round(mass * convert_ratio));
   }
 };
@@ -58,19 +57,20 @@ struct EdgeInfo {
 struct VertexInfo {
   int id_;
 
-  VertexInfo():id_(0) {}
+  VertexInfo() : id_(0) {}
 
-  explicit VertexInfo(int id):id_(id) {}
+  explicit VertexInfo(int id) : id_(id) {}
 };
 
 struct GraphInfo {
   std::string name_;
 
-  GraphInfo():name_("") {}
+  GraphInfo() : name_("") {}
 };
 
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS,
-        VertexInfo, EdgeInfo, GraphInfo> MassGraph;
+                              VertexInfo, EdgeInfo, GraphInfo>
+    MassGraph;
 
 using MassGraphPtr = std::shared_ptr<MassGraph>;
 

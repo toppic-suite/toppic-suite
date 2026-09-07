@@ -1,4 +1,5 @@
-// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,14 +15,19 @@
 
 #include "topfd/deconv/deconv_ms2_process.hpp"
 
+#include <atomic>
+#include <cstddef>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "common/thread/simple_thread_pool.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
-#include "common/util/str_util.hpp"
 #include "ms/env/match_env_util.hpp"
 #include "ms/feature/spec_feature_reader.hpp"
 #include "ms/mzml/mzml_ms_group_reader.hpp"
-#include "ms/mzml/mzml_ms_json_writer.hpp"
 #include "ms/mzml/mzml_ms_sql_writer.hpp"
 #include "ms/spec/msalign_thread_merge.hpp"
 #include "ms/spec/msalign_writer.hpp"
@@ -32,9 +38,52 @@ namespace toppic {
 // add a namespace to avoid duplicated method names
 namespace deconv_ms2_process {
 
-std::string updateMsTwoMsg(MsHeaderPtr header_ptr, int scan_cnt,
+// One deconvoluted MS/MS spectrum's data, buffered in memory so the slow SQLite
+// writes can be deferred and done sequentially after the parallel
+// deconvolution finishes, instead of every worker thread contending on the
+// writer lock and the SSD.
+struct Ms2SqlRecord {
+  MzmlMsPtr ms_ptr;
+  MatchEnvPtrVec deconv_envs;
+};
+
+// One record buffer per worker thread (indexed by writer id) so threads append
+// without locking, plus an approximate byte counter shared across threads so
+// the main thread can cap the buffer's memory use and flush it when full.
+struct Ms2SqlBuffer {
+  explicit Ms2SqlBuffer(int thread_num) : thread_records(thread_num) {}
+  std::vector<std::vector<Ms2SqlRecord>> thread_records;
+  std::atomic<std::size_t> bytes{0};
+};
+using Ms2SqlBufferPtr = std::shared_ptr<Ms2SqlBuffer>;
+
+// Approximate bytes held per buffered peak (the Peak/EnvPeak object, its
+// shared_ptr control block, and the vector slot). Used only to bound the
+// buffer's memory, so a rough value is sufficient.
+constexpr std::size_t BYTES_PER_PEAK = 64;
+
+// Hard ceiling for the in-memory SQL buffer.
+constexpr std::size_t MAX_SQL_BUFFER_BYTES =
+    4ULL * 1024 * 1024 * 1024;  // 4 GiB
+
+// Start draining at 90% of the ceiling, leaving headroom for the records that
+// in-flight worker tasks keep appending while the buffer is being drained, so
+// the actual peak stays under MAX_SQL_BUFFER_BYTES.
+constexpr std::size_t SQL_BUFFER_FLUSH_BYTES = MAX_SQL_BUFFER_BYTES * 9 / 10;
+
+// Rough memory estimate for one buffered record: the spectrum peaks plus the
+// peaks of all its envelopes.
+std::size_t estimateRecordBytes(const Ms2SqlRecord& record) {
+  std::size_t peak_num = record.ms_ptr->size();
+  for (const auto& env : record.deconv_envs) {
+    peak_num += env->getExpEnvPtr()->getPeakNum();
+  }
+  return peak_num * BYTES_PER_PEAK;
+}
+
+std::string updateMsTwoMsg(const MsHeaderPtr& header_ptr, int scan_cnt,
                            int total_scan_num) {
-  std::string percentage = str_util::toString(scan_cnt * 100 / total_scan_num);
+  std::string percentage = std::to_string(scan_cnt * 100 / total_scan_num);
   std::string msg = "Processing MS/MS spectrum scan " +
                     std::to_string(header_ptr->getFirstScanNum()) + " ...";
   while (msg.length() < 40) {
@@ -44,10 +93,11 @@ std::string updateMsTwoMsg(MsHeaderPtr header_ptr, int scan_cnt,
   return msg;
 }
 
-void deconvMsTwo(MzmlMsPtr ms_ptr, SpecFeaturePtrVec sp_feat_ptr_vec,
-                 TopfdParaPtr topfd_para_ptr,
-                 MsAlignWriterPtrVec ms2_writer_ptr_vec,
-                 SimpleThreadPoolPtr pool_ptr) {
+void deconvMsTwo(const MzmlMsPtr& ms_ptr, SpecFeaturePtrVec sp_feat_ptr_vec,
+                 const TopfdParaPtr& topfd_para_ptr,
+                 const MsAlignWriterPtrVec& ms2_writer_ptr_vec,
+                 const SimpleThreadPoolPtr& pool_ptr,
+                 const Ms2SqlBufferPtr& sql_buffer_ptr) {
   // 1. Find max_mass and max_charge
   double max_mass = 0;
   int max_charge = 1;
@@ -103,55 +153,40 @@ void deconvMsTwo(MzmlMsPtr ms_ptr, SpecFeaturePtrVec sp_feat_ptr_vec,
   int writer_id = pool_ptr->getId(thread_id);
   ms2_writer_ptr_vec[writer_id]->writeMs(deconv_ms_ptr);
 
-  // 5. write json file
-  if (topfd_para_ptr->isGeneHtmlFolder()) {
-    std::string json_file_name =
-        topfd_para_ptr->getMs2JsonDir() + file_util::getFileSeparator() +
-        "spectrum" + std::to_string(header_ptr->getSpecId()) + ".js";
-    mzml_ms_json_writer::write(json_file_name, ms_ptr, deconv_envs);
-  }
-  // 6. write sqlite file
-  if (topfd_para_ptr->isGeneSql()) {
-    mzml_ms_sql_writer::writeMs2(topfd_para_ptr->getSqlDb(), ms_ptr, deconv_envs);
+  // 5. Buffer the deconvoluted spectrum in memory for SQLite output (if
+  // enabled). Each worker thread appends to its own buffer (indexed by writer
+  // id), so there is no lock contention; the records are written to the
+  // database sequentially after the thread pool finishes.
+  if (sql_buffer_ptr != nullptr) {
+    Ms2SqlRecord record{ms_ptr, std::move(deconv_envs)};
+    sql_buffer_ptr->bytes += estimateRecordBytes(record);
+    sql_buffer_ptr->thread_records[writer_id].push_back(std::move(record));
   }
 }
 
-std::function<void()> geneMsTwoTask(MzmlMsPtr ms_ptr,
-                                    SpecFeaturePtrVec feat_ptr_vec,
-                                    TopfdParaPtr topfd_para_ptr,
-                                    MsAlignWriterPtrVec ms2_writer_ptr_vec,
-                                    SimpleThreadPoolPtr pool_ptr) {
-  return
-      [ms_ptr, feat_ptr_vec, topfd_para_ptr, ms2_writer_ptr_vec, pool_ptr]() {
-        deconvMsTwo(ms_ptr, feat_ptr_vec, topfd_para_ptr, ms2_writer_ptr_vec,
-                    pool_ptr);
-      };
+std::function<void()> geneMsTwoTask(
+    const MzmlMsPtr& ms_ptr, const SpecFeaturePtrVec& feat_ptr_vec,
+    const TopfdParaPtr& topfd_para_ptr,
+    const MsAlignWriterPtrVec& ms2_writer_ptr_vec,
+    const SimpleThreadPoolPtr& pool_ptr,
+    const Ms2SqlBufferPtr& sql_buffer_ptr) {
+  return [ms_ptr, feat_ptr_vec, topfd_para_ptr, ms2_writer_ptr_vec, pool_ptr,
+          sql_buffer_ptr]() {
+    deconvMsTwo(ms_ptr, feat_ptr_vec, topfd_para_ptr, ms2_writer_ptr_vec,
+                pool_ptr, sql_buffer_ptr);
+  };
 }
 
 }  // namespace deconv_ms2_process
 
-DeconvMs2Process::DeconvMs2Process(TopfdParaPtr topfd_para_ptr, 
-                                   const std::string & output_filename_ext) {
+DeconvMs2Process::DeconvMs2Process(const TopfdParaPtr& topfd_para_ptr,
+                                   const std::string& output_filename_ext) {
   topfd_para_ptr_ = topfd_para_ptr;
   output_filename_ext_ = output_filename_ext;
 }
 
-void DeconvMs2Process::prepareFileFolder() {
-  if (topfd_para_ptr_->isGeneHtmlFolder()) {
-    // json file names
-    std::string html_dir = topfd_para_ptr_->getHtmlDir();
-    if (!file_util::exists(html_dir)) {
-      file_util::createFolder(html_dir);
-    }
-    std::string ms2_json_dir = topfd_para_ptr_->getMs2JsonDir();
-    if (!file_util::exists(ms2_json_dir)) {
-      file_util::createFolder(ms2_json_dir);
-    }
-  }
-}
-
 void DeconvMs2Process::readSpecFeature(
-    std::string feat_file_name, std::map<int, SpecFeaturePtrVec> &feat_map) {
+    std::string feat_file_name, std::map<int, SpecFeaturePtrVec>& feat_map) {
   SpecFeatureReaderPtr sp_feat_reader =
       std::make_shared<SpecFeatureReader>(feat_file_name);
   SpecFeaturePtrVec sp_feat_ptr_vec = sp_feat_reader->readAllFeatures();
@@ -183,17 +218,51 @@ void DeconvMs2Process::process() {
     LOG_ERROR("No spectrum to read in mzML file!");
     return;
   }
-  prepareFileFolder();
+  // One SQLite writer shared across the worker threads (internally
+  // synchronized, batched); created only when SQLite output is enabled.
+  MzmlMsSqlWriterPtr sql_writer_ptr =
+      topfd_para_ptr_->isGeneSql()
+          ? std::make_shared<MzmlMsSqlWriter>(topfd_para_ptr_->getSqlDb())
+          : nullptr;
   // init thread pool
   int thread_num = topfd_para_ptr_->getThreadNum();
   SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(thread_num);
+  // Per-thread in-memory buffers for the SQLite records. Writing to SQLite from
+  // every worker thread serializes on the writer lock and the SSD; instead each
+  // thread buffers its records here (one sub-vector per thread, no locking) and
+  // they are written to the database sequentially after deconvolution.
+  deconv_ms2_process::Ms2SqlBufferPtr sql_buffer_ptr =
+      sql_writer_ptr != nullptr
+          ? std::make_shared<deconv_ms2_process::Ms2SqlBuffer>(thread_num)
+          : nullptr;
+
+  // Wait until the pool has drained: no queued tasks and every worker idle, so
+  // no thread is touching the SQL buffer and the main thread can flush it.
+  auto wait_until_pool_idle = [&]() {
+    while (pool_ptr->getQueueSize() > 0 ||
+           pool_ptr->getIdleThreadNum() < thread_num) {
+      std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+  };
+  // Write the buffered records to SQLite sequentially and empty the buffer.
+  // Must be called only while the pool is idle (see wait_until_pool_idle).
+  auto flush_sql_buffer = [&]() {
+    for (auto& thread_buffer : sql_buffer_ptr->thread_records) {
+      for (const auto& record : thread_buffer) {
+        sql_writer_ptr->writeMs2(record.ms_ptr, record.deconv_envs);
+      }
+      thread_buffer.clear();
+    }
+    sql_buffer_ptr->bytes = 0;
+  };
+
   // init msalign writer vector for multiple threads
   std::string output_base_name = topfd_para_ptr_->getOutputBaseName();
-  std::string ms2_msalign_name = output_base_name + "_" + output_filename_ext_; 
+  std::string ms2_msalign_name = output_base_name + "_" + output_filename_ext_;
   MsAlignWriterPtrVec ms2_writer_ptr_vec;
   for (int i = 0; i < thread_num; i++) {
     MsAlignWriterPtr ms2_ptr = std::make_shared<MsAlignWriter>(
-        ms2_msalign_name + "_" + str_util::toString(i));
+        ms2_msalign_name + "_" + std::to_string(i));
     ms2_writer_ptr_vec.push_back(ms2_ptr);
   }
   // reader spectrum features
@@ -230,44 +299,63 @@ void DeconvMs2Process::process() {
         feat_it = feat_map.find(ms_ptr->getMsHeaderPtr()->getSpecId());
         if (feat_it != feat_map.end()) {
           SpecFeaturePtrVec feat_list = feat_it->second;
-          std::sort(feat_list.begin(), feat_list.end(), SpecFeature::cmpPrecInteDec);
+          std::sort(feat_list.begin(), feat_list.end(),
+                    SpecFeature::cmpPrecInteDec);
           sp_feat_ptr_vec.push_back(feat_list[0]);
           double first_inte = feat_list[0]->getPrecInte();
           for (std::size_t i = 1; i < feat_list.size(); i++) {
             if (feat_list[i]->getPrecInte() >=
                 first_inte * topfd_para_ptr_->getPrecInteCutoffRatio()) {
               sp_feat_ptr_vec.push_back(feat_list[i]);
-              LOG_DEBUG("Inte " << feat_list[i]->getPrecInte() <<  " first inte " << first_inte); 
+              LOG_DEBUG("Inte " << feat_list[i]->getPrecInte() << " first inte "
+                                << first_inte);
             }
           }
           LOG_DEBUG("Spectrum " << ms_ptr->getMsHeaderPtr()->getFirstScanNum()
-                    << " feature " << feat_list.size() << " filtered " 
-                    << (feat_list.size() -sp_feat_ptr_vec.size()) << " features."); 
+                                << " feature " << feat_list.size()
+                                << " filtered "
+                                << (feat_list.size() - sp_feat_ptr_vec.size())
+                                << " features.");
         }
       }
       pool_ptr->enqueue(deconv_ms2_process::geneMsTwoTask(
           ms_ptr, sp_feat_ptr_vec, topfd_para_ptr_, ms2_writer_ptr_vec,
-          pool_ptr));
+          pool_ptr, sql_buffer_ptr));
       std::string msg = deconv_ms2_process::updateMsTwoMsg(
           ms_ptr->getMsHeaderPtr(), spec_cnt, total_spec_num);
       std::cout << "\r" << msg << std::flush;
+
+      // Backpressure: if the in-memory SQL buffer is full, pause deconvolution,
+      // drain the buffer to the database, and then resume.
+      if (sql_writer_ptr != nullptr &&
+          sql_buffer_ptr->bytes.load() >=
+              deconv_ms2_process::SQL_BUFFER_FLUSH_BYTES) {
+        wait_until_pool_idle();
+        flush_sql_buffer();
+      }
     }
     ms_group_ptr = reader_ptr->getNextMsGroupPtr();
   }
   pool_ptr->shutDown();
+  // Write any remaining buffered records to SQLite sequentially (single-
+  // threaded, so no lock contention) and commit the final batch.
+  if (sql_writer_ptr != nullptr) {
+    flush_sql_buffer();
+    sql_writer_ptr->flush();
+  }
   for (int i = 0; i < thread_num; i++) {
     ms2_writer_ptr_vec[i] = nullptr;
   }
   // Merge files
   std::string para_str = topfd_para_ptr_->getParaStr("#", "\t");
   MsalignThreadMergePtr ms2_merge_ptr = std::make_shared<MsalignThreadMerge>(
-      output_filename_ext_, topfd_para_ptr_->getThreadNum(), output_filename_ext_,
-      output_base_name, para_str);
+      output_filename_ext_, topfd_para_ptr_->getThreadNum(),
+      output_filename_ext_, output_base_name, para_str);
   ms2_merge_ptr->process();
 
-  // remove tempory files
-  std::string ms2_prefix =
-      file_util::absoluteName(output_base_name) + "_" + output_filename_ext_ + "_";
+  // remove temporary files
+  std::string ms2_prefix = file_util::absoluteName(output_base_name) + "_" +
+                           output_filename_ext_ + "_";
   std::replace(output_base_name.begin(), output_base_name.end(), '\\', '/');
   file_util::cleanPrefix(output_base_name, ms2_prefix);
   std::cout << std::endl;

@@ -1,26 +1,28 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-#include <xercesc/framework/MemBufInputSource.hpp>
+#include "prsm/simple_prsm_reader.hpp"
 
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
-#include "prsm/simple_prsm_reader.hpp"
+#include "common/xml/xml_dom_document.hpp"
+#include "common/xml/xml_dom_parser.hpp"
 
 namespace toppic {
 
-SimplePrsmReader::SimplePrsmReader(const std::string &file_name) {
+SimplePrsmReader::SimplePrsmReader(const std::string& file_name) {
   input_.open(file_name.c_str(), std::ios::in);
 }
 
@@ -35,7 +37,7 @@ std::vector<std::string> SimplePrsmReader::readOnePrsmLines() {
   std::vector<std::string> line_list;
   while (std::getline(input_, line)) {
     str_util::trim(line);
-    if (line ==  "<simple_prsm>") {
+    if (line == "<simple_prsm>") {
       line_list.push_back(line);
     } else if (line == "</simple_prsm>") {
       if (line_list.size() != 0) {
@@ -71,26 +73,22 @@ SimplePrsmPtr SimplePrsmReader::readOnePrsm() {
   for (size_t i = 0; i < prsm_str_vec.size(); i++) {
     prsm_str += prsm_str_vec[i];
   }
-  xercesc::MemBufInputSource prsm_buf(
-      (const XMLByte*)prsm_str.c_str(), prsm_str.size(), "prsm_str (in memory)");
-
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   SimplePrsmPtr ptr;
   if (parser) {
-    XmlDOMDocument doc(parser, prsm_buf);
-    XmlDOMElement* root = doc.getDocumentElement();
+    XmlDOMDocument doc(parser->parseStr(prsm_str));
+    XmlDOMElement root = doc.getDocumentElement();
     ptr = std::make_shared<SimplePrsm>(root);
   }
-  // LOG_DEBUG("simple prsm spectrum id " << ptr->getSpectrumId() << " seq name " << ptr->getSeqName());
+  // LOG_DEBUG("simple prsm spectrum id " << ptr->getSpectrumId() << " seq name
+  // " << ptr->getSeqName());
   return ptr;
 }
 
+void SimplePrsmReader::close() { input_.close(); }
 
-void SimplePrsmReader::close() {
-  input_.close();
-}
-
-SimplePrsmPtrVec SimplePrsmReader::readSimplePrsms(const std::string &file_name) {
+SimplePrsmPtrVec SimplePrsmReader::readSimplePrsms(
+    const std::string& file_name) {
   SimplePrsmPtrVec result_ptrs;
   SimplePrsmReader reader(file_name);
   SimplePrsmPtr prsm_ptr = reader.readOnePrsm();

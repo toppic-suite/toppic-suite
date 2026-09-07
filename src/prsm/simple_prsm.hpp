@@ -1,24 +1,25 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #ifndef TOPPIC_PRSM_SIMPLE_PRSM_HPP_
 #define TOPPIC_PRSM_SIMPLE_PRSM_HPP_
 
 #include "common/xml/xml_dom_element.hpp"
-#include "seq/proteoform.hpp"
-#include "seq/prot_candidate.hpp"
 #include "ms/spec/ms_header.hpp"
+#include "seq/prot_candidate.hpp"
+#include "seq/proteoform.hpp"
 
 namespace toppic {
 
@@ -31,67 +32,70 @@ using SimplePrsmPtrVec2D = std::vector<SimplePrsmPtrVec>;
 
 class SimplePrsm {
  public:
-  SimplePrsm(MsHeaderPtr header_ptr, int spectrum_num,
-             ProteoformPtr proteo_ptr, int score);
+  SimplePrsm(const MsHeaderPtr& header_ptr, int spectrum_num,
+             const ProteoformPtr& proteo_ptr, int score);
 
-  SimplePrsm(MsHeaderPtr header_ptr, int spectrum_num,
-             ProteoformPtr proteo_ptr,
-             ProtCandidatePtr prot_ptr); 
+  SimplePrsm(const MsHeaderPtr& header_ptr, int spectrum_num,
+             const ProteoformPtr& proteo_ptr, const ProtCandidatePtr& prot_ptr);
 
-  SimplePrsm(MsHeaderPtr header_ptr, int spectrum_num,
-             const std::string & seq_name,
-             const std::string & seq_desc,
+  SimplePrsm(const MsHeaderPtr& header_ptr, int spectrum_num,
+             const std::string& seq_name, const std::string& seq_desc,
              int score);
 
-  explicit SimplePrsm(XmlDOMElement* element);
+  explicit SimplePrsm(XmlDOMElement element);
 
-  std::string getFileName () {return file_name_;}
+  std::string getFileName() { return file_name_; }
 
-  void setFileName(const std::string & fname) {file_name_ = fname;}
+  void setFileName(const std::string& fname) { file_name_ = fname; }
 
-  std::string getSeqName() {return seq_name_;}
+  std::string getSeqName() { return seq_name_; }
 
-  std::string getSeqDesc() {return seq_desc_;}
+  std::string getSeqDesc() { return seq_desc_; }
 
-  double getScore() {return score_;}
+  double getScore() { return score_; }
 
-  int getSpectrumId() {return spectrum_id_;}
+  int getSpectrumId() { return spectrum_id_; }
 
-  const std::string& getSpectrumScan() {return spectrum_scan_;}
+  const std::string& getSpectrumScan() { return spectrum_scan_; }
 
-  int getSpectrumNum() {return spectrum_num_;}
+  int getSpectrumNum() { return spectrum_num_; }
 
-  double getPrecMass() {return prec_mass_;}
+  double getPrecMass() { return prec_mass_; }
 
-  void setPrecursorId(int precursorId) {precursor_id_ = precursorId;}
+  void setPrecursorId(int precursorId) { precursor_id_ = precursorId; }
 
-  int getPrecursorId() {return precursor_id_;}
+  int getPrecursorId() { return precursor_id_; }
 
-  double getProteoformMass() {return prot_mass_;}
+  double getProteoformMass() { return prot_mass_; }
 
-  std::vector<double>& getNTermShifts() {return n_term_shifts_;}
+  std::vector<double>& getNTermShifts() { return n_term_shifts_; }
 
-  std::vector<double>& getCTermShifts() {return c_term_shifts_;}
+  std::vector<double>& getCTermShifts() { return c_term_shifts_; }
 
-  std::vector<double> getNTermShiftsFromCTermShifts(); 
+  std::vector<double> getNTermShiftsFromCTermShifts();
 
-  void setNTermShifts(const std::vector<double> &shifts) {n_term_shifts_ = shifts;}
+  void setNTermShifts(const std::vector<double>& shifts) {
+    n_term_shifts_ = shifts;
+  }
 
-  void setCTermShifts(const std::vector<double> &c_term_shifts) {c_term_shifts_ = c_term_shifts;}
+  void setCTermShifts(const std::vector<double>& c_term_shifts) {
+    c_term_shifts_ = c_term_shifts;
+  }
 
-  XmlDOMElement* toXml(XmlDOMDocument* xml_doc);
+  XmlDOMElement toXml(XmlDOMDocument* xml_doc, XmlDOMElement parent);
 
   std::vector<std::string> toStrVec();
 
-  static std::string getXmlElementName() {return "simple_prsm";}
+  static std::string getXmlElementName() { return "simple_prsm"; }
 
   static bool cmpScoreDecSeqInc(const SimplePrsmPtr a, const SimplePrsmPtr b);
 
   static bool cmpSeqIncScoreDec(const SimplePrsmPtr a, const SimplePrsmPtr b);
 
-  //static bool cmpSpecIncScoreDecSeqInc(const SimplePrsmPtr a, const SimplePrsmPtr b);
+  // static bool cmpSpecIncScoreDecSeqInc(const SimplePrsmPtr a, const
+  // SimplePrsmPtr b);
 
-  //static bool cmpIdInc(const SimplePrsmPtr a, const SimplePrsmPtr b);
+  // static bool cmpIdInc(const SimplePrsmPtr a, const SimplePrsmPtr b);
 
  private:
   std::string file_name_;

@@ -1,42 +1,72 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-#include <iostream>
-#include <iomanip>
-
-#include "boost/thread/thread.hpp"
-#include "common/util/version.hpp"
-#include "common/util/logger.hpp"
-#include "common/util/file_util.hpp"
-#include "common/util/time_util.hpp"
-#include "common/util/mem_check.hpp"
 #include "console/topfd_argument.hpp"
+
+#include <cstddef>
+#include <exception>
+#include <filesystem>
+#include <iostream>
+#include <string>
+
+#include "common/util/file_util.hpp"
+#include "common/util/logger.hpp"
+#include "common/util/mem_check.hpp"
+#include "common/util/version.hpp"
 
 namespace toppic {
 
-Argument::Argument() {
-  topfd_para_ptr_ = std::make_shared<TopfdPara>();
+namespace {
+
+// Parse `str` as a double, rejecting empty strings and trailing characters
+// (e.g. "1.5x" or "3abc"). Returns true and sets `val` only on a full parse.
+bool toDouble(const std::string& str, double& val) {
+  try {
+    size_t pos = 0;
+    val = std::stod(str, &pos);
+    return pos == str.size();
+  } catch (const std::exception&) {
+    return false;
+  }
 }
 
-void Argument::showUsage(boost::program_options::options_description &desc) {
+// Parse `str` as an int, rejecting empty strings and trailing characters.
+// Returns true and sets `val` only on a full parse.
+bool toInt(const std::string& str, int& val) {
+  try {
+    size_t pos = 0;
+    val = std::stoi(str, &pos);
+    return pos == str.size();
+  } catch (const std::exception&) {
+    return false;
+  }
+}
+
+}  // namespace
+
+Argument::Argument() { topfd_para_ptr_ = std::make_shared<TopfdPara>(); }
+
+void Argument::showUsage(
+    const boost::program_options::options_description& desc) {
   std::cout << "Usage: topfd [options] spectrum-file-name" << std::endl;
   std::cout << desc << std::endl;
   std::cout << "Version: " << Version::getVersion() << std::endl;
 }
 
 bool Argument::parse(int argc, char* argv[]) {
-  //parameters for spectral deconvolution
+  // parameters for spectral deconvolution
   std::string max_charge = "";
   std::string max_mass = "";
   std::string mz_error = "";
@@ -46,101 +76,131 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string thread_number = "";
   std::string activation = "";
   std::string ms2_env_cnn_score_cutoff = "";
-  //parameters of ms1 feature detection
+  // parameters of ms1 feature detection
   std::string split_intensity_ratio = "";
   std::string ecscore_cutoff = "";
   std::string min_scan_num = "";
+  std::string max_miss_peak_num = "";
 
   // Define and parse the program options
   try {
     namespace po = boost::program_options;
-    po::options_description display_desc("Options");
+    // Documented options shown in the help message.
+    po::options_description visible_desc("Options");
+    visible_desc.add_options()("help,h", "Print this help message.")(
+        "activation,a", po::value<std::string>(&activation),
+        "<CID|ETD|HCD|MPD|UVPD|FILE>. Fragmentation method of MS/MS spectra. "
+        "When FILE is used, the fragmentation methods of spectra are given in "
+        "the input spectral data file. The default value is FILE.")(
+        "max-charge,c", po::value<std::string>(&max_charge),
+        "<a positive integer>. Set the maximum charge state of precursor and "
+        "fragment ions. The default value is 30.")(
+        "max-mass,m", po::value<std::string>(&max_mass),
+        "<a positive number>. Set the maximum monoisotopic mass of precursor "
+        "and fragment ions. The default value is 50,000 Daltons.")(
+        "mz-error,e", po::value<std::string>(&mz_error),
+        "<a positive number>. Set the error tolerance of m/z values of "
+        "spectral peaks. The default value is 0.02 m/z.")(
+        "ms-one-sn-ratio,r", po::value<std::string>(&ms_one_sn_ratio),
+        "<a positive number>. Set the signal-to-noise ratio for MS1 spectra. "
+        "The default value is 3.")(
+        "ms-two-sn-ratio,s", po::value<std::string>(&ms_two_sn_ratio),
+        "<a positive number>. Set the signal-to-noise ratio for MS/MS "
+        "spectra. The default value is 1.")(
+        "missing-level-one,o", "MS1 spectra are missing in the input file.")(
+        "precursor-window,w", po::value<std::string>(&prec_window),
+        "<a positive number>. Set the default precursor window size. The "
+        "default value is 3.0 m/z. When the input file contains precursor "
+        "window information, the parameter is ignored.")(
+        "msdeconv,n",
+        "Use the MS-Deconv score to rank isotopic envelopes. The default "
+        "method uses the EnvCNN score to rank isotopic envelopes.")(
+        "env-cnn-cutoff,v", po::value<std::string>(&ms2_env_cnn_score_cutoff),
+        "<a number in [0,1]>. Set the cutoff value for the EnvCNN score to "
+        "filter out low-quality isotopic envelopes in MS/MS spectra. The "
+        "default value is 0.")(
+        "disable-frag-num-filtering,d",
+        "Skip the filtering of fragment ion envelopes in MS/MS scans based on "
+        "the estimated number of fragment ions.")(
+        "ecscore-cutoff,t", po::value<std::string>(&ecscore_cutoff),
+        "<a number in [0,1]>. Set the ECScore cutoff value for proteoform "
+        "features. The default value is 0.1.")(
+        "min-scan-number,b", po::value<std::string>(&min_scan_num),
+        "<1|2|3>. The minimum number of MS1 scans in which a proteoform "
+        "feature is detected. The default value is 1.")(
+        "single-scan-noise,i",
+        "Use the noise intensity levels in single MS1 scans to filter out "
+        "low-intensity peaks in proteoform feature detection. The default "
+        "method is to use the noise intensity level of the whole LC-MS map to "
+        "filter out low-intensity peaks.")(
+        "disable-additional-feature-search,f",
+        "Disable additional proteoform feature search in the LC-MS map for "
+        "MS/MS scans that do not have detected proteoform features in their "
+        "precursor isolation windows. In the additional search, the "
+        "signal-to-noise ratio is set to 0, the minimum scan number is set to "
+        "1, and the ECScore cutoff is set to 0.")(
+        "split-intensity-ratio,l",
+        po::value<std::string>(&split_intensity_ratio),
+        "<a positive number>. Set the intensity ratio required to split one "
+        "feature from another. The default value is 2.5.")(
+        "thread-number,u", po::value<std::string>(&thread_number),
+        "<a positive integer>. Number of threads used in spectral "
+        "deconvolution. The default value is 1.");
 
-    display_desc.add_options()
-        ("help,h", "Print this help message.")
-        ("activation,a", po::value<std::string> (&activation),
-        "<CID|ETD|HCD|MPD|UVPD|FILE>. Fragmentation method of MS/MS spectra. When FILE is used, the fragmentation methods of spectra are given in the input spectral data file. Default value: FILE.")
-        ("max-charge,c", po::value<std::string> (&max_charge),
-         "<a positive integer>. Set the maximum charge state of precursor and fragment ions. The default value is 30.")
-        ("max-mass,m", po::value<std::string> (&max_mass),
-         "<a positive number>. Set the maximum monoisotopic mass of precursor and fragment ions. The default value is 50,000 Dalton.")
-        ("mz-error,e", po::value<std::string> (&mz_error),
-         "<a positive number>. Set the error tolerance of m/z values of spectral peaks. The default value is 0.02 m/z.")
-        ("ms-one-sn-ratio,r", po::value<std::string> (&ms_one_sn_ratio),
-         "<a positive number>. Set the signal-to-noise ratio for MS1 spectra. The default value is 3.")
-        ("ms-two-sn-ratio,s", po::value<std::string> (&ms_two_sn_ratio),
-         "<a positive number>. Set the signal-to-noise ratio for MS/MS spectra. The default value is 1.")
-        ("missing-level-one,o","MS1 spectra are missing in the input file.")
-        ("precursor-window,w", po::value<std::string> (&prec_window),
-         "<a positive number>. Set the default precursor window size. The default value is 3.0 m/z. When the input file contains the information of precursor windows, the parameter will be ignored.")
-        ("msdeconv,n", "Use the MS-Deconv score to rank isotopic envelopes. The default method uses the EnvCNN score to rank isotopic envelopes.")
-        ("env-cnn-cutoff,v", po::value<std::string>(&ms2_env_cnn_score_cutoff), 
-         "<a number in [0,1]>. Set the cutoff value for the EnvCNN score to filter out low quality isotopic envelopes in MS/MS spectra. The default value is 0.")
-        ("disable-frag-num-filtering,d","Skip the filtering of fragment ion envelopes in MS/MS scans based on the estimated number of fragment ions.")
-        ("ecscore-cutoff,t", po::value<std::string> (&ecscore_cutoff),
-         "<a number in [0,1]>. Set the ECScore cutoff value for proteoform features. The default value is 0.1.")
-        ("min-scan-number,b",po::value<std::string> (&min_scan_num), 
-         "<1|2|3>. The minimum number of MS1 scans in which a proteoform feature is detected. The default value is 1.")
-        ("single-scan-noise,i","Use the noise intensity levels in single MS1 scans to filter out low intensity peaks in proteoform feature detection. The default method is to use the noise intensity level of the whole LC-MS map to filter out low intensity peaks.")
-        ("disable-additional-feature-search,f","Disable additional proteoform feature search in the LC-MS map for MS/MS scans that do not have detected proteoform features in their precursor isolation windows. In the additional search, the signal noise ratio is set to 0, the min scan number is set to 1, and the ecscore cutoff is set to 0.")
-        ("split-intensity-ratio,l", po::value<std::string> (&split_intensity_ratio),
-         "<a positive number>. Set the intensity ratio required to split one feature from another. The default value is 2.5.")
-        ("thread-number,u", po::value<std::string> (&thread_number), "<a positive integer>. Number of threads used in spectral deconvolution. Default value: 1.")
-        ("skip-html-folder,g","Skip the generation of HTML files for visualization.")
-        ;
+    // Advanced options accepted on the command line but hidden from the help
+    // message; the positional spectrum file argument is also hidden here.
+    po::options_description hidden_desc("Hidden options");
+    hidden_desc.add_options()(
+        "multiple-mass,M",
+        "Output multiple monoisotopic masses for each MS/MS spectrum.")(
+        "gene-sql", "Write the deconvoluted spectra to an SQLite database.")(
+        "output-dp-envs",
+        "Dump the windowed candidate envelopes and DP-selected envelopes of "
+        "each spectrum to win_envs.txt / dp_envs.txt (debugging).")(
+        "max-miss-peak-num", po::value<std::string>(&max_miss_peak_num),
+        "<a non-negative integer>. Maximum number of missing peaks allowed in "
+        "a matched envelope. The default value is 1.")(
+        "disable-filter-by-mz",
+        "Skip the filtering-by-mz step that removes an envelope outranked by a "
+        "higher-scoring neighbor with the same charge.")(
+        "keep,k",
+        "Report monoisotopic masses extracted from low quality isotopic "
+        "envelopes.")("text-peak-list,T",
+                      "Use a text file containing a mass list as the input.")(
+        "output-batmass-feature,O",
+        "Output a feature file in the BatMass CSV format.")(
+        "spectrum-file-name",
+        po::value<std::vector<std::string> >()->multitoken()->required(),
+        "Spectrum file name with its path.");
 
-    po::options_description desc("Options");
-    desc.add_options() 
-        ("help,h", "Print this help message.") 
-        ("activation,a", po::value<std::string> (&activation), "")
-        ("max-charge,c", po::value<std::string> (&max_charge), "")
-        ("max-mass,m", po::value<std::string> (&max_mass), "")
-        ("mz-error,e", po::value<std::string> (&mz_error), "")
-        ("ms-one-sn-ratio,r", po::value<std::string> (&ms_one_sn_ratio), "")
-        ("ms-two-sn-ratio,s", po::value<std::string> (&ms_two_sn_ratio), "")
-        ("precursor-window,w", po::value<std::string> (&prec_window), "")
-        ("missing-level-one,o", "")
-        ("hybrid,H", "hybrid mode for low resolution MS1 and high resolution MS2")
-        ("multiple-mass,M", "Output multiple monoisotopic masses for each MS/MS spectrum")
-        ("msdeconv,n", "")
-        ("keep,k", "Report monoisotopic masses extracted from low quality isotopic envelopes.")
-        ("env-cnn-cutoff,v", po::value<std::string>(&ms2_env_cnn_score_cutoff), "")
-        ("disable-aa-num-filtering,d", "")
-        ("single-scan-noise,i","")
-        ("min-scan-number,b",po::value<std::string> (&min_scan_num),"")
-        ("ecscore-cutoff,t", po::value<std::string> (&ecscore_cutoff), "")
-        ("split-intensity-ratio,l", po::value<std::string> (&split_intensity_ratio), "")
-        ("disable-additional-feature-search,f","")
-        ("thread-number,u", po::value<std::string> (&thread_number), "")
-        ("skip-html-folder,g","")
-        ("text-peak-list,T","") // Use a text file containing a mass list as the input
-        ("output-batmass-feature,O","")
-        ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), 
-         "Spectrum file name with its path.")
-        ;
+    // All options (visible + hidden) are used for parsing; only visible_desc
+    // is shown to the user, so the help text and the parser cannot drift apart.
+    po::options_description desc("All options");
+    desc.add(visible_desc).add(hidden_desc);
 
     po::positional_options_description positional_options;
     positional_options.add("spectrum-file-name", -1);
 
     po::variables_map vm;
     try {
-      po::store(
-          po::command_line_parser(argc, argv).options(desc).positional(positional_options).run(), vm);
+      po::store(po::command_line_parser(argc, argv)
+                    .options(desc)
+                    .positional(positional_options)
+                    .run(),
+                vm);
       if (vm.count("help")) {
-        showUsage(display_desc);
+        showUsage(visible_desc);
         return false;
       }
       po::notify(vm);
       // throws on error, so do after help in case there are any problems
-    }
-    catch(boost::program_options::required_option& e) {
+    } catch (boost::program_options::required_option& e) {
       std::cerr << "ERROR: " << e.what() << std::endl << std::endl;
-      showUsage(display_desc);
+      showUsage(visible_desc);
       return false;
-    }
-    catch(boost::program_options::error& e) {
+    } catch (boost::program_options::error& e) {
       std::cerr << "ERROR: " << e.what() << std::endl << std::endl;
-      showUsage(display_desc);
+      showUsage(visible_desc);
       return false;
     }
 
@@ -148,7 +208,9 @@ bool Argument::parse(int argc, char* argv[]) {
     std::string argv_0(argv[0]);
     std::string exec_dir = file_util::getExecutiveDir(argv_0);
     if (file_util::checkSpace(exec_dir)) {
-      LOG_ERROR("Current directory " << exec_dir << " contains space and will cause errors in the program!")
+      LOG_ERROR("Current directory "
+                << exec_dir
+                << " contains space and will cause errors in the program!");
       exit(EXIT_FAILURE);
     }
 
@@ -159,7 +221,13 @@ bool Argument::parse(int argc, char* argv[]) {
     }
 
     if (vm.count("max-charge")) {
-      topfd_para_ptr_->setMaxCharge(std::stoi(max_charge));
+      int charge = 0;
+      if (!toInt(max_charge, charge) || charge <= 0) {
+        LOG_ERROR("Max charge " << max_charge
+                                << " should be a positive integer.");
+        return false;
+      }
+      topfd_para_ptr_->setMaxCharge(charge);
     }
 
     if (vm.count("keep")) {
@@ -171,62 +239,116 @@ bool Argument::parse(int argc, char* argv[]) {
     }
 
     if (vm.count("max-mass")) {
-      topfd_para_ptr_->setMaxMass(std::stod(max_mass));
+      double mass = 0;
+      if (!toDouble(max_mass, mass) || mass <= 0) {
+        LOG_ERROR("Max mass " << max_mass << " should be a positive number.");
+        return false;
+      }
+      topfd_para_ptr_->setMaxMass(mass);
     }
 
     if (vm.count("mz-error")) {
-      topfd_para_ptr_->setMzError(std::stod(mz_error));
+      double error = 0;
+      if (!toDouble(mz_error, error) || error <= 0) {
+        LOG_ERROR("M/z error " << mz_error << " should be a positive number.");
+        return false;
+      }
+      topfd_para_ptr_->setMzError(error);
     }
 
     if (vm.count("ms-two-sn-ratio")) {
-      topfd_para_ptr_->setMsTwoSnRatio(std::stod(ms_two_sn_ratio));
+      double sn_ratio = 0;
+      if (!toDouble(ms_two_sn_ratio, sn_ratio) || sn_ratio < 0) {
+        LOG_ERROR("MS/MS S/N ratio " << ms_two_sn_ratio
+                                     << " should be a non-negative number.");
+        return false;
+      }
+      topfd_para_ptr_->setMsTwoSnRatio(sn_ratio);
     }
 
     if (vm.count("ms-one-sn-ratio")) {
-      topfd_para_ptr_->setMsOneSnRatio(std::stod(ms_one_sn_ratio));
+      double sn_ratio = 0;
+      if (!toDouble(ms_one_sn_ratio, sn_ratio) || sn_ratio < 0) {
+        LOG_ERROR("MS1 S/N ratio " << ms_one_sn_ratio
+                                   << " should be a non-negative number.");
+        return false;
+      }
+      topfd_para_ptr_->setMsOneSnRatio(sn_ratio);
     }
 
     if (vm.count("missing-level-one")) {
       topfd_para_ptr_->setMissingLevelOne(true);
     }
 
-    if (vm.count("hybrid")) {
-      topfd_para_ptr_->setMissingLevelOne(true);
-    }
-
     if (vm.count("precursor-window")) {
-        topfd_para_ptr_->setPrecWindowWidth(std::stod(prec_window));
+      double window = 0;
+      if (!toDouble(prec_window, window) || window <= 0) {
+        LOG_ERROR("Precursor window " << prec_window
+                                      << " should be a positive number.");
+        return false;
+      }
+      topfd_para_ptr_->setPrecWindowWidth(window);
     }
 
     if (vm.count("env-cnn-cutoff")) {
-      try {
-        double cutoff = std::stod(ms2_env_cnn_score_cutoff);
-        if (cutoff < 0 || cutoff > 1) {
-          LOG_ERROR("Env-CNN cutoff " << ms2_env_cnn_score_cutoff << " should be in [0,1].");
-          return false;
-        }
-        topfd_para_ptr_->setMs2EnvCnnScoreCutoff(cutoff);
-      } catch (std::exception& e) {
-        LOG_ERROR("Env-CNN cutoff " << ms2_env_cnn_score_cutoff << " should be a number.");
+      double cutoff = 0;
+      if (!toDouble(ms2_env_cnn_score_cutoff, cutoff) || cutoff < 0 ||
+          cutoff > 1) {
+        LOG_ERROR("Env-CNN cutoff " << ms2_env_cnn_score_cutoff
+                                    << " should be a number in [0,1].");
         return false;
       }
+      topfd_para_ptr_->setMs2EnvCnnScoreCutoff(cutoff);
     }
 
     if (vm.count("multiple-mass")) {
       topfd_para_ptr_->setOutputMultipleMass(true);
     }
 
+    if (vm.count("gene-sql")) {
+      topfd_para_ptr_->setGeneSql(true);
+    }
+
+    if (vm.count("output-dp-envs")) {
+      topfd_para_ptr_->setOutputDpEnvs(true);
+    }
+
+    if (vm.count("max-miss-peak-num")) {
+      int num = 0;
+      if (!toInt(max_miss_peak_num, num) || num < 0) {
+        LOG_ERROR("Max missing peak number "
+                  << max_miss_peak_num << " should be a non-negative integer.");
+        return false;
+      }
+      topfd_para_ptr_->setMaxMissPeakNum(num);
+    }
+
+    if (vm.count("disable-filter-by-mz")) {
+      topfd_para_ptr_->setRunFilterByMz(false);
+    }
+
     if (vm.count("output-batmass-feature")) {
-      topfd_para_ptr_->setOutputCsvFeatureFile(true); 
+      topfd_para_ptr_->setOutputCsvFeatureFile(true);
     }
 
     if (vm.count("split-intensity-ratio")) {
-      topfd_para_ptr_->setSplitIntensityRatio(std::stod(split_intensity_ratio));
+      double ratio = 0;
+      if (!toDouble(split_intensity_ratio, ratio) || ratio <= 0) {
+        LOG_ERROR("Split intensity ratio " << split_intensity_ratio
+                                           << " should be a positive number.");
+        return false;
+      }
+      topfd_para_ptr_->setSplitIntensityRatio(ratio);
     }
 
-
     if (vm.count("ecscore-cutoff")) {
-      topfd_para_ptr_->setMs1EcscoreCutoff(std::stod(ecscore_cutoff));
+      double cutoff = 0;
+      if (!toDouble(ecscore_cutoff, cutoff) || cutoff < 0 || cutoff > 1) {
+        LOG_ERROR("ECScore cutoff " << ecscore_cutoff
+                                    << " should be a number in [0,1].");
+        return false;
+      }
+      topfd_para_ptr_->setMs1EcscoreCutoff(cutoff);
     }
 
     if (vm.count("single-scan-noise")) {
@@ -238,46 +360,40 @@ bool Argument::parse(int argc, char* argv[]) {
     }
 
     if (vm.count("text-peak-list")) {
-      topfd_para_ptr_->setTextPeakList(true); 
+      topfd_para_ptr_->setTextPeakList(true);
     }
 
     if (vm.count("min-scan-number")) {
-      try {
-        int n = std::stoi(min_scan_num);
-        if (n < 1 || n > 3) {
-          LOG_ERROR("Min scan number " << min_scan_num << " should be 1, 2, or 3.");
-          return false;
-        }
-        topfd_para_ptr_->setMs1MinScanNum(n);
-      } catch (std::exception& e) {
-        LOG_ERROR("Min scan number " << min_scan_num << " should be 1, 2, or 3.");
+      int n = 0;
+      if (!toInt(min_scan_num, n) || n < 1 || n > 3) {
+        LOG_ERROR("Min scan number " << min_scan_num
+                                     << " should be 1, 2, or 3.");
         return false;
       }
+      topfd_para_ptr_->setMs1MinScanNum(n);
     }
 
     if (vm.count("spectrum-file-name")) {
-      spec_file_list_ = vm["spectrum-file-name"].as<std::vector<std::string> >(); 
+      spec_file_list_ =
+          vm["spectrum-file-name"].as<std::vector<std::string> >();
     }
 
     if (vm.count("thread-number")) {
-      try {
-        topfd_para_ptr_->setThreadNum(std::stoi(thread_number));
-      } catch (std::exception& e) {
-        LOG_ERROR("Thread number " << thread_number << " should be a number.");
+      int num = 0;
+      if (!toInt(thread_number, num) || num <= 0) {
+        LOG_ERROR("Thread number " << thread_number
+                                   << " should be a positive integer.");
         return false;
       }
+      topfd_para_ptr_->setThreadNum(num);
     }
 
-    if (vm.count("skip-html-folder")) {
-      topfd_para_ptr_->setGeneHtmlFolder(false);
-    }
-    if (vm.count("disable-aa-num-filtering")) {
+    if (vm.count("disable-frag-num-filtering")) {
       topfd_para_ptr_->setAANumBasedFilter(false);
     }
-  }
-  catch(std::exception& e) {
-    std::cerr << "Unhandled Exception in parsing command line "
-        << e.what() << ", application will now exit" << std::endl;
+  } catch (std::exception& e) {
+    std::cerr << "Unhandled Exception in parsing command line " << e.what()
+              << ", application will now exit" << std::endl;
     return false;
   }
 
@@ -285,16 +401,21 @@ bool Argument::parse(int argc, char* argv[]) {
 }
 
 bool Argument::validateArguments() {
-  if (!file_util::exists(topfd_para_ptr_->getResourceDir())) {
-    LOG_ERROR("The directory " << topfd_para_ptr_->getResourceDir() << " does not exist!\n"
-              << "Please check if the file directory or name contains special characters such as spaces or quotation marks.");
+  if (!std::filesystem::exists(topfd_para_ptr_->getResourceDir())) {
+    LOG_ERROR("The directory "
+              << topfd_para_ptr_->getResourceDir() << " does not exist!\n"
+              << "Please check if the file directory or name contains special "
+                 "characters such as spaces or quotation marks.");
     return false;
   }
 
   for (size_t k = 0; k < spec_file_list_.size(); k++) {
-    if (!file_util::exists(spec_file_list_[k])) {
-      LOG_ERROR(spec_file_list_[k] << " does not exist!\n" 
-                << "Please check if file directory or name contains special characters such as spaces or quotation marks, or the file has been deleted.");
+    if (!std::filesystem::exists(spec_file_list_[k])) {
+      LOG_ERROR(spec_file_list_[k]
+                << " does not exist!\n"
+                << "Please check if file directory or name contains special "
+                   "characters such as spaces or quotation marks, or the file "
+                   "has been deleted.");
       return false;
     }
   }
@@ -304,12 +425,13 @@ bool Argument::validateArguments() {
     return false;
   }
 
-  //validate activation method
+  // validate activation method
   std::string activation = topfd_para_ptr_->getActivation();
-  if (activation != "FILE" && activation != "CID" && activation != "ETD" 
-      && activation != "MPD" && activation != "HCD" && activation != "UVPD"){
-    //throw InvalidActivation();
-    LOG_ERROR("Activation method should be one out of |FILE|CID|ETD|HCD|MPD|UVPD.");
+  if (activation != "FILE" && activation != "CID" && activation != "ETD" &&
+      activation != "MPD" && activation != "HCD" && activation != "UVPD") {
+    // throw InvalidActivation();
+    LOG_ERROR(
+        "Activation method should be one out of |FILE|CID|ETD|HCD|MPD|UVPD.");
     return false;
   }
 

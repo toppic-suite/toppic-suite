@@ -1,41 +1,42 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
+#ifndef TOPPIC_SEARCH_GRAPHALIGN_GRAPH_ALIGN_HPP_
+#define TOPPIC_SEARCH_GRAPHALIGN_GRAPH_ALIGN_HPP_
 
-#ifndef TOPPIC_SEARCH_GRAPH_ALIGN_GRAPH_ALIGN_HPP_
-#define TOPPIC_SEARCH_GRAPH_ALIGN_GRAPH_ALIGN_HPP_
-
-#include "seq/fasta_seq.hpp"
 #include "prsm/prsm.hpp"
 #include "search/diag/diag_header.hpp"
 #include "search/graph/graph.hpp"
 #include "search/graph/proteo_graph.hpp"
 #include "search/graph/spec_graph.hpp"
+#include "search/graphalign/graph_align_mng.hpp"
 #include "search/graphalign/graph_dp_node.hpp"
 #include "search/graphalign/graph_result_node.hpp"
-#include "search/graphalign/graph_align_mng.hpp"
+#include "seq/fasta_seq.hpp"
 
 namespace toppic {
 
-using ConsistentPairs = std::vector<std::vector<std::vector<std::vector<std::pair<int, int>>>>>;
+using ConsistentPairs =
+    std::vector<std::vector<std::vector<std::vector<std::pair<int, int>>>>>;
 
 class GraphAlign {
  public:
-  GraphAlign(GraphAlignMngPtr mng_ptr, 
-             ProteoGraphPtr proteo_graph_ptr,
-             SpecGraphPtr spec_graph_ptr,
-             FastaSeqPtr fasta_seq_ptr);
+  GraphAlign(const GraphAlignMngPtr& mng_ptr,
+             const ProteoGraphPtr& proteo_graph_ptr,
+             const SpecGraphPtr& spec_graph_ptr,
+             const FastaSeqPtr& fasta_seq_ptr);
 
   void process();
 
@@ -72,18 +73,20 @@ class GraphAlign {
 
   GraphResultNodePtrVec2D nodes_2d_;
 
-  DiagHeaderPtrVec diag_headers_; 
+  DiagHeaderPtrVec diag_headers_;
 
-  DiagHeaderPtrVec2D diag_headers_2d_; 
+  DiagHeaderPtrVec2D diag_headers_2d_;
 
   void getConsistentPairs();
 
-  void addToConsistentPairs(int m, const std::vector<std::pair<int, int>> & sp_pair_ij,
-                            const std::vector<std::pair<int, int>> & pg_pair_ij);
+  void addToConsistentPairs(int m,
+                            const std::vector<std::pair<int, int>>& sp_pair_ij,
+                            const std::vector<std::pair<int, int>>& pg_pair_ij);
 
   void initTable();
 
-  GraphDpNodePtr compBestVariableNode(int i, int j, int s, int m, int &best_edge_mod_num);
+  GraphDpNodePtr compBestVariableNode(int i, int j, int s, int m,
+                                      int& best_edge_mod_num);
 
   GraphDpNodePtr compBestShiftNode(int i, int j, int s, int m);
 
@@ -105,4 +108,3 @@ using GraphAlignPtr = std::shared_ptr<GraphAlign>;
 }  // namespace toppic
 
 #endif
-

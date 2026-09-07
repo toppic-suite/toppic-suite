@@ -1,31 +1,32 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
-
-#include <algorithm>
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include "search/zeroptmsearch/zero_ptm_fast_search.hpp"
+
+#include <algorithm>
 
 namespace toppic {
 
 namespace zero_ptm_fast_search {
 
 /*
- * In the computing of diagonal score in fast filtering, we use a 
+ * In the computing of diagonal score in fast filtering, we use a
  * large error tolerance for N-terminal fragment masses
  */
-double compDiagScr(ExtendMsPtr ms_ptr,
-                   const std::vector<double> &masses, double center) {
+double compDiagScr(const ExtendMsPtr& ms_ptr, const std::vector<double>& masses,
+                   double center) {
   size_t i = 0;
   size_t j = 0;
   double s = 0;
@@ -51,12 +52,13 @@ double compDiagScr(ExtendMsPtr ms_ptr,
   return s;
 }
 
-double compScore(ExtendMsPtr ms_ptr, ProteoformPtr proteo_ptr, double n_shift,
-                 double c_shift) {
+double compScore(const ExtendMsPtr& ms_ptr, const ProteoformPtr& proteo_ptr,
+                 double n_shift, double c_shift) {
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
   ActivationPtr activation = header_ptr->getActivationPtr();
   IonTypePtr n_ion_type_ptr = activation->getNIonTypePtr();
-  std::vector<double> masses = proteo_ptr->getBpSpecPtr()->getBreakPointMasses(n_ion_type_ptr);
+  std::vector<double> masses =
+      proteo_ptr->getBpSpecPtr()->getBreakPointMasses(n_ion_type_ptr);
   double score = compDiagScr(ms_ptr, masses, n_shift);
 
   IonTypePtr c_ion_type_ptr = activation->getCIonTypePtr();
@@ -65,8 +67,9 @@ double compScore(ExtendMsPtr ms_ptr, ProteoformPtr proteo_ptr, double n_shift,
   return score;
 }
 
-double compScore(const ExtendMsPtrVec &ms_ptr_vec, ProteoformPtr proteo_ptr,
-                 double n_shift, double c_shift) {
+double compScore(const ExtendMsPtrVec& ms_ptr_vec,
+                 const ProteoformPtr& proteo_ptr, double n_shift,
+                 double c_shift) {
   double score = 0;
   for (size_t i = 0; i < ms_ptr_vec.size(); i++) {
     score = score + compScore(ms_ptr_vec[i], proteo_ptr, n_shift, c_shift);
@@ -74,8 +77,8 @@ double compScore(const ExtendMsPtrVec &ms_ptr_vec, ProteoformPtr proteo_ptr,
   return score;
 }
 
-ZpFastMatchPtr computeCompMatch(const ExtendMsPtrVec &ms_ptr_vec,
-                                ProteoformPtr proteo_ptr, double ppo) {
+ZpFastMatchPtr computeCompMatch(const ExtendMsPtrVec& ms_ptr_vec,
+                                const ProteoformPtr& proteo_ptr, double ppo) {
   MsHeaderPtr header_ptr = ms_ptr_vec[0]->getMsHeaderPtr();
   double max_error = header_ptr->getFirstPrecErrorTolerance(ppo);
   double res_sum_mass = header_ptr->getFirstPrecMonoMassMinusWater();
@@ -89,8 +92,8 @@ ZpFastMatchPtr computeCompMatch(const ExtendMsPtrVec &ms_ptr_vec,
   return std::make_shared<ZeroPtmFastMatch>(proteo_ptr, score, 0, end);
 }
 
-ZpFastMatchPtr computePrefixMatch(const ExtendMsPtrVec &ms_ptr_vec,
-                                  ProteoformPtr proteo_ptr, double ppo) {
+ZpFastMatchPtr computePrefixMatch(const ExtendMsPtrVec& ms_ptr_vec,
+                                  const ProteoformPtr& proteo_ptr, double ppo) {
   /* check if there is a matched prefix */
   std::vector<double> prms = proteo_ptr->getBpSpecPtr()->getPrmMasses();
   MsHeaderPtr header_ptr = ms_ptr_vec[0]->getMsHeaderPtr();
@@ -112,19 +115,19 @@ ZpFastMatchPtr computePrefixMatch(const ExtendMsPtrVec &ms_ptr_vec,
   }
   double score = 0;
   if (is_prefix) {
-    double c_term_shift = prms[seq_end+1] - prms[prms.size()-1];
+    double c_term_shift = prms[seq_end + 1] - prms[prms.size() - 1];
     score = compScore(ms_ptr_vec, proteo_ptr, 0, c_term_shift);
   }
   return std::make_shared<ZeroPtmFastMatch>(proteo_ptr, score, 0, seq_end);
 }
 
-ZpFastMatchPtr computeSuffixMatch(const ExtendMsPtrVec &ms_ptr_vec,
-                                  ProteoformPtr proteo_ptr, double ppo) {
+ZpFastMatchPtr computeSuffixMatch(const ExtendMsPtrVec& ms_ptr_vec,
+                                  const ProteoformPtr& proteo_ptr, double ppo) {
   std::vector<double> prms = proteo_ptr->getBpSpecPtr()->getPrmMasses();
   MsHeaderPtr header_ptr = ms_ptr_vec[0]->getMsHeaderPtr();
   double max_error = header_ptr->getFirstPrecErrorTolerance(ppo);
   double res_sum_mass = header_ptr->getFirstPrecMonoMassMinusWater();
-  double diff = prms[prms.size()-1] - res_sum_mass;
+  double diff = prms[prms.size() - 1] - res_sum_mass;
 
   bool is_suffix = false;
   int seq_bgn = 0;
@@ -141,15 +144,17 @@ ZpFastMatchPtr computeSuffixMatch(const ExtendMsPtrVec &ms_ptr_vec,
   }
   double score = 0;
   if (is_suffix) {
-    double n_term_shift = - prms[seq_bgn];
+    double n_term_shift = -prms[seq_bgn];
     score = compScore(ms_ptr_vec, proteo_ptr, n_term_shift, 0);
   }
   int seq_end = proteo_ptr->getResSeqPtr()->getLen() - 1;
-  return std::make_shared<ZeroPtmFastMatch>(proteo_ptr, score, seq_bgn, seq_end);
+  return std::make_shared<ZeroPtmFastMatch>(proteo_ptr, score, seq_bgn,
+                                            seq_end);
 }
 
-ZpFastMatchPtr computeInternalMatch(const ExtendMsPtrVec &ms_ptr_vec,
-                                    ProteoformPtr proteo_ptr, double ppo) {
+ZpFastMatchPtr computeInternalMatch(const ExtendMsPtrVec& ms_ptr_vec,
+                                    const ProteoformPtr& proteo_ptr,
+                                    double ppo) {
   std::vector<double> prms = proteo_ptr->getBpSpecPtr()->getPrmMasses();
   MsHeaderPtr header_ptr = ms_ptr_vec[0]->getMsHeaderPtr();
   double max_error = header_ptr->getFirstPrecErrorTolerance(ppo);
@@ -157,9 +162,11 @@ ZpFastMatchPtr computeInternalMatch(const ExtendMsPtrVec &ms_ptr_vec,
 
   ActivationPtr activation = header_ptr->getActivationPtr();
   IonTypePtr n_ion_type_ptr = activation->getNIonTypePtr();
-  std::vector<double> n_masses = proteo_ptr->getBpSpecPtr()->getBreakPointMasses(n_ion_type_ptr);
+  std::vector<double> n_masses =
+      proteo_ptr->getBpSpecPtr()->getBreakPointMasses(n_ion_type_ptr);
   IonTypePtr c_ion_type_ptr = activation->getCIonTypePtr();
-  std::vector<double> c_masses = proteo_ptr->getBpSpecPtr()->getBreakPointMasses(c_ion_type_ptr);
+  std::vector<double> c_masses =
+      proteo_ptr->getBpSpecPtr()->getBreakPointMasses(c_ion_type_ptr);
 
   double best_score = 0;
   int best_bgn = -1;
@@ -167,11 +174,11 @@ ZpFastMatchPtr computeInternalMatch(const ExtendMsPtrVec &ms_ptr_vec,
 
   size_t mass_bgn = 1;
   size_t mass_end = 1;
-  while (mass_end < prms.size()-1 && mass_bgn < prms.size()-1) {
+  while (mass_end < prms.size() - 1 && mass_bgn < prms.size() - 1) {
     double diff = prms[mass_end] - prms[mass_bgn] - res_sum_mass;
     if (std::abs(diff) <= max_error) {
       double n_term_shift = -prms[mass_bgn];
-      double c_term_shift = prms[mass_end] - prms[prms.size() -1];
+      double c_term_shift = prms[mass_end] - prms[prms.size() - 1];
       double cur_score = 0;
       for (size_t i = 0; i < ms_ptr_vec.size(); i++) {
         cur_score += compDiagScr(ms_ptr_vec[i], n_masses, n_term_shift);
@@ -190,13 +197,14 @@ ZpFastMatchPtr computeInternalMatch(const ExtendMsPtrVec &ms_ptr_vec,
       mass_bgn++;
     }
   }
-  return std::make_shared<ZeroPtmFastMatch>(proteo_ptr, best_score, best_bgn, best_end-1);
+  return std::make_shared<ZeroPtmFastMatch>(proteo_ptr, best_score, best_bgn,
+                                            best_end - 1);
 }
 
-ZpFastMatchPtrVec filter(ProteoformTypePtr align_type_ptr,
-                         const ExtendMsPtrVec &ms_ptr_vec,
-                         const ProteoformPtrVec &proteo_ptrs,
-                         int report_num, double ppo) {
+ZpFastMatchPtrVec filter(const ProteoformTypePtr& align_type_ptr,
+                         const ExtendMsPtrVec& ms_ptr_vec,
+                         const ProteoformPtrVec& proteo_ptrs, int report_num,
+                         double ppo) {
   ZpFastMatchPtrVec match_vec;
   for (size_t i = 0; i < proteo_ptrs.size(); i++) {
     if (align_type_ptr == ProteoformType::COMPLETE) {
@@ -206,7 +214,8 @@ ZpFastMatchPtrVec filter(ProteoformTypePtr align_type_ptr,
     } else if (align_type_ptr == ProteoformType::SUFFIX) {
       match_vec.push_back(computeSuffixMatch(ms_ptr_vec, proteo_ptrs[i], ppo));
     } else if (align_type_ptr == ProteoformType::INTERNAL) {
-      match_vec.push_back(computeInternalMatch(ms_ptr_vec, proteo_ptrs[i], ppo));
+      match_vec.push_back(
+          computeInternalMatch(ms_ptr_vec, proteo_ptrs[i], ppo));
     }
   }
 

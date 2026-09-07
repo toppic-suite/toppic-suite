@@ -1,63 +1,57 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #ifndef TOPPIC_COMMON_XML_XML_DOM_DOCUMENT_HPP_
 #define TOPPIC_COMMON_XML_XML_DOM_DOCUMENT_HPP_
 
+#include <memory>
+#include <pugixml.hpp>
 #include <string>
 
-#include <xercesc/dom/DOMDocument.hpp>
-#include <xercesc/dom/DOMImplementation.hpp>
-#include <xercesc/framework/MemBufInputSource.hpp>
-
 #include "common/xml/xml_dom_element.hpp"
-#include "common/xml/xml_dom_parser.hpp"
 
 namespace toppic {
 
+// Owns a pugi::xml_document and exposes element creation/lookup. Unlike the
+// Xerces version this is RAII (no manual release()), and because pugixml has no
+// detached nodes, createElement()/createTextNode() are replaced by an
+// addElement() that creates the child already attached to its parent.
 class XmlDOMDocument {
  public:
-  XmlDOMDocument(XmlDOMParser* parser, const char* xml_file);
-  XmlDOMDocument(XmlDOMParser* parser, const xercesc::MemBufInputSource &str_buf);
+  // Take ownership of a parsed document (from XmlDOMParser::parse / parseStr).
+  explicit XmlDOMDocument(std::unique_ptr<pugi::xml_document> doc);
 
-  XmlDOMDocument(xercesc::DOMDocument* doc);
+  // Create a new document with a single root element named `root`.
+  explicit XmlDOMDocument(const std::string& root);
 
-  XmlDOMDocument(xercesc::DOMImplementation* implementation,
-                 const std::string &root);
   XmlDOMDocument(const XmlDOMDocument&) = delete;
   XmlDOMDocument& operator=(const XmlDOMDocument&) = delete;
 
-  ~XmlDOMDocument();
+  // The root element of the document.
+  XmlDOMElement getDocumentElement();
 
-  XmlDOMElement* createElement(const char* tag);
+  // Append a child element named `tag` to `parent` and return it (build its
+  // subtree by passing the returned node as the next parent). pugixml creates
+  // the node already attached, so there is no separate "append" step.
+  XmlDOMElement addElement(XmlDOMElement parent, const char* tag);
 
-  xercesc::DOMText* createTextNode(const char* text);
-
-  void addElement(XmlDOMElement* element,
-                  const char* tag, const char* value);
-
-  XmlDOMElement* getDocumentElement() {
-    return doc_->getDocumentElement();
-  }
-
-  void addElement(XmlDOMElement* element);
-  void addElement(XmlDOMElement* parent, XmlDOMElement* child);
-
-  void release() { doc_->release(); doc_ = nullptr; }
+  // Append a leaf element <tag>value</tag> to `parent`.
+  void addElement(XmlDOMElement parent, const char* tag, const char* value);
 
  private:
-  xercesc::DOMDocument* doc_;
+  std::unique_ptr<pugi::xml_document> doc_;
 };
 
 }  // namespace toppic

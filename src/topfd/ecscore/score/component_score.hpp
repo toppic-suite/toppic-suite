@@ -1,19 +1,20 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-#ifndef TOPPIC_ECSORE_SCORE_COMPONENT_SCORE_HPP
-#define TOPPIC_ECSORE_SCORE_COMPONENT_SCORE_HPP
+#ifndef TOPPIC_TOPFD_ECSCORE_SCORE_COMPONENT_SCORE_HPP_
+#define TOPPIC_TOPFD_ECSCORE_SCORE_COMPONENT_SCORE_HPP_
 
 #include "topfd/ecscore/env_set/env_set.hpp"
 
@@ -21,23 +22,24 @@ namespace toppic {
 
 namespace component_score {
 
-double getAggOddEvenPeakRatio(EnvSetPtr env_set_ptr);
+double getAggOddEvenPeakRatio(const EnvSetPtr& env_set_ptr);
 
-double getAggEnvCorr(EnvSetPtr env_set_ptr);
+double getAggEnvCorr(const EnvSetPtr& env_set_ptr);
 
-double get3ScanCorr(EnvSetPtr env_set_ptr, int base_spec, int start_spec);
+double get3ScanCorr(const EnvSetPtr& env_set_ptr, int base_spec,
+                    int start_spec);
 
-double getMatchedPeakPercent(EnvSetPtr env_set_ptr,
-                             std::vector<std::vector<double>> &theo_map);
+double getMatchedPeakPercent(const EnvSetPtr& env_set_ptr,
+                             std::vector<std::vector<double>>& theo_map);
 
-int getTheoPeakNum(std::vector<std::vector<double>> &theo_map);
+int getTheoPeakNum(std::vector<std::vector<double>>& theo_map);
 
-double getConsecutivePeakPercent(EnvSetPtr env_set_ptr);
+double getConsecutivePeakPercent(const EnvSetPtr& env_set_ptr);
 
-double getMzErrors(EnvSetPtr env_set_ptr);
+double getMzErrors(const EnvSetPtr& env_set_ptr);
 
-}
+}  // namespace component_score
 
-}
+}  // namespace toppic
 
-#endif //TOPPIC_GET_COMPONENT_SCORE_HPP
+#endif  // TOPPIC_GET_COMPONENT_SCORE_HPP

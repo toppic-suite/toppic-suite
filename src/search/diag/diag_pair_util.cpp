@@ -1,34 +1,36 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#include "search/diag/diag_pair_util.hpp"
 
 #include <algorithm>
 
 #include "prsm/prsm_algo.hpp"
-#include "search/diag/diag_pair_util.hpp"
 
 namespace toppic {
 
 namespace diag_pair_util {
 
-inline DiagPairPtrVec compDiagPair(const PrmPeakPtrVec &prm_peaks,
-                                   int group_spec_num, const std::vector<double> &seq_masses,
-                                   DiagHeaderPtr header_ptr) {
-
-  std::vector<std::vector<double>> n_term_scores(group_spec_num, 
-                                                 std::vector<double>(seq_masses.size(), 0));
-  std::vector<std::vector<double>> c_term_scores(group_spec_num, 
-                                                 std::vector<double>(seq_masses.size(), 0));
+inline DiagPairPtrVec compDiagPair(const PrmPeakPtrVec& prm_peaks,
+                                   int group_spec_num,
+                                   const std::vector<double>& seq_masses,
+                                   const DiagHeaderPtr& header_ptr) {
+  std::vector<std::vector<double>> n_term_scores(
+      group_spec_num, std::vector<double>(seq_masses.size(), 0));
+  std::vector<std::vector<double>> c_term_scores(
+      group_spec_num, std::vector<double>(seq_masses.size(), 0));
   std::vector<double> top_scores(seq_masses.size(), 0);
   std::vector<int> top_positions(seq_masses.size(), -1);
 
@@ -52,7 +54,7 @@ inline DiagPairPtrVec compDiagPair(const PrmPeakPtrVec &prm_peaks,
     } else {
       error = peak->getNRelaxCStrictTolerance();
     }
-    double deviation = peak->getPosition()-seq_masses[j] - n_term_shift;
+    double deviation = peak->getPosition() - seq_masses[j] - n_term_shift;
     if (std::abs(deviation) <= error) {
       double peak_score = peak->getScore();
       if (type_ptr == BasePeakType::ORIGINAL) {
@@ -70,8 +72,9 @@ inline DiagPairPtrVec compDiagPair(const PrmPeakPtrVec &prm_peaks,
         top_positions[j] = i;
       }
     }
-    if (prsm_algo::increaseIJ(i, j, deviation, peak->getNRelaxCStrictTolerance(),
-                              real_masses, seq_masses)) {
+    if (prsm_algo::increaseIJ(i, j, deviation,
+                              peak->getNRelaxCStrictTolerance(), real_masses,
+                              seq_masses)) {
       i++;
     } else {
       j++;
@@ -86,14 +89,14 @@ inline DiagPairPtrVec compDiagPair(const PrmPeakPtrVec &prm_peaks,
   }
 
   // add pairs
-  DiagPairPtrVec  pair_list;
+  DiagPairPtrVec pair_list;
   for (j = 0; j < seq_masses.size(); j++) {
     int pos = top_positions[j];
     if (pos >= 0) {
       double diff = prm_peaks[pos]->getPosition() - seq_masses[j];
       double score = sum_scores[j];
-      DiagPairPtr diag_pair_ptr
-        = std::make_shared<DiagPair>(pos, j, score, pair_list.size(), diff);
+      DiagPairPtr diag_pair_ptr =
+          std::make_shared<DiagPair>(pos, j, score, pair_list.size(), diff);
       pair_list.push_back(diag_pair_ptr);
     }
   }
@@ -102,18 +105,18 @@ inline DiagPairPtrVec compDiagPair(const PrmPeakPtrVec &prm_peaks,
   return pair_list;
 }
 
-DiagonalPtr getDiagonalPtrWithoutEmptyList(DiagHeaderPtr header_ptr,
-                                           const PrmPeakPtrVec &prm_peaks,
+DiagonalPtr getDiagonalPtrWithoutEmptyList(const DiagHeaderPtr& header_ptr,
+                                           const PrmPeakPtrVec& prm_peaks,
                                            int group_spec_num,
-                                           ProteoformPtr proteo_ptr) {
+                                           const ProteoformPtr& proteo_ptr) {
   BpSpecPtr bp_spec_ptr = proteo_ptr->getBpSpecPtr();
 
   std::vector<double> prm_masses = bp_spec_ptr->getPrmMasses();
-  DiagPairPtrVec diag_pair_list = compDiagPair(prm_peaks, group_spec_num, 
-                                               prm_masses, header_ptr);
+  DiagPairPtrVec diag_pair_list =
+      compDiagPair(prm_peaks, group_spec_num, prm_masses, header_ptr);
   if (diag_pair_list.size() > 0) {
-    DiagonalPtr diagonal_ptr
-      = std::make_shared<Diagonal>(header_ptr, diag_pair_list);
+    DiagonalPtr diagonal_ptr =
+        std::make_shared<Diagonal>(header_ptr, diag_pair_list);
     for (size_t i = 0; i < diag_pair_list.size(); i++) {
       diag_pair_list[i]->setDiagonalPtr(diagonal_ptr);
     }
@@ -122,31 +125,30 @@ DiagonalPtr getDiagonalPtrWithoutEmptyList(DiagHeaderPtr header_ptr,
   return nullptr;
 }
 
-DiagonalPtr getDiagonalPtrWithEmptyList(DiagHeaderPtr header_ptr,
-                                        const PrmPeakPtrVec &prm_peaks,
+DiagonalPtr getDiagonalPtrWithEmptyList(const DiagHeaderPtr& header_ptr,
+                                        const PrmPeakPtrVec& prm_peaks,
                                         int group_spec_num,
-                                        ProteoformPtr proteo_ptr) {
+                                        const ProteoformPtr& proteo_ptr) {
   BpSpecPtr bp_spec_ptr = proteo_ptr->getBpSpecPtr();
 
   std::vector<double> prm_masses = bp_spec_ptr->getPrmMasses();
-  DiagPairPtrVec diag_pair_list = compDiagPair(prm_peaks, group_spec_num, 
-                                               prm_masses, header_ptr);
-  DiagonalPtr diagonal_ptr
-    = std::make_shared<Diagonal>(header_ptr, diag_pair_list);
+  DiagPairPtrVec diag_pair_list =
+      compDiagPair(prm_peaks, group_spec_num, prm_masses, header_ptr);
+  DiagonalPtr diagonal_ptr =
+      std::make_shared<Diagonal>(header_ptr, diag_pair_list);
   for (size_t i = 0; i < diag_pair_list.size(); i++) {
     diag_pair_list[i]->setDiagonalPtr(diagonal_ptr);
   }
   return diagonal_ptr;
 }
 
-
-DiagonalPtrVec geneDiagonalsWithoutEmptyList(const DiagHeaderPtrVec& header_ptr_vec,
-                                             const PrmPeakPtrVec &prm_peaks,
-                                             int group_spec_num, ProteoformPtr proteo_ptr) {
+DiagonalPtrVec geneDiagonalsWithoutEmptyList(
+    const DiagHeaderPtrVec& header_ptr_vec, const PrmPeakPtrVec& prm_peaks,
+    int group_spec_num, const ProteoformPtr& proteo_ptr) {
   DiagonalPtrVec diagonal_list;
   for (size_t i = 0; i < header_ptr_vec.size(); i++) {
-    DiagonalPtr diagonal_ptr = getDiagonalPtrWithoutEmptyList(header_ptr_vec[i], prm_peaks,
-                                                              group_spec_num, proteo_ptr);
+    DiagonalPtr diagonal_ptr = getDiagonalPtrWithoutEmptyList(
+        header_ptr_vec[i], prm_peaks, group_spec_num, proteo_ptr);
     if (diagonal_ptr != nullptr) {
       diagonal_list.push_back(diagonal_ptr);
     }
@@ -158,13 +160,13 @@ DiagonalPtrVec geneDiagonalsWithoutEmptyList(const DiagHeaderPtrVec& header_ptr_
   return diagonal_list;
 }
 
-DiagonalPtrVec geneDiagonalsWithEmptyList(const DiagHeaderPtrVec& header_ptr_vec,
-                                          const PrmPeakPtrVec &prm_peaks,
-                                          int group_spec_num, ProteoformPtr proteo_ptr) {
+DiagonalPtrVec geneDiagonalsWithEmptyList(
+    const DiagHeaderPtrVec& header_ptr_vec, const PrmPeakPtrVec& prm_peaks,
+    int group_spec_num, const ProteoformPtr& proteo_ptr) {
   DiagonalPtrVec diagonal_list;
   for (size_t i = 0; i < header_ptr_vec.size(); i++) {
-    DiagonalPtr diagonal_ptr = getDiagonalPtrWithEmptyList(header_ptr_vec[i], prm_peaks,
-                                                           group_spec_num, proteo_ptr);
+    DiagonalPtr diagonal_ptr = getDiagonalPtrWithEmptyList(
+        header_ptr_vec[i], prm_peaks, group_spec_num, proteo_ptr);
     diagonal_list.push_back(diagonal_ptr);
   }
   // important set id for headers
@@ -174,7 +176,6 @@ DiagonalPtrVec geneDiagonalsWithEmptyList(const DiagHeaderPtrVec& header_ptr_vec
   return diagonal_list;
 }
 
-
-}
+}  // namespace diag_pair_util
 
 } /* namespace toppic */

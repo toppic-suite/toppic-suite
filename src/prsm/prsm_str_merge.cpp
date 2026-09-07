@@ -1,56 +1,57 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#include "prsm/prsm_str_merge.hpp"
 
 #include <algorithm>
 
-#include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
+#include "common/util/logger.hpp"
 #include "prsm/prsm_reader.hpp"
-#include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_str.hpp"
-#include "prsm/prsm_str_merge.hpp"
+#include "prsm/prsm_xml_writer.hpp"
 
 namespace toppic {
 
-PrsmStrMerge::PrsmStrMerge(const std::string &spec_file_name, 
-                           const std::vector<std::string> &in_file_exts,
-                           const std::string &out_file_ext,
-                           int top_num, bool norm, bool remove_dup):
-    spec_file_name_(spec_file_name),
-    input_file_exts_(in_file_exts),
-    output_file_ext_(out_file_ext),
-    top_num_(top_num), 
-    norm_(norm),
-    remove_dup_(remove_dup) {}
+PrsmStrMerge::PrsmStrMerge(const std::string& spec_file_name,
+                           const std::vector<std::string>& in_file_exts,
+                           const std::string& out_file_ext, int top_num,
+                           bool norm, bool remove_dup)
+    : spec_file_name_(spec_file_name),
+      input_file_exts_(in_file_exts),
+      output_file_ext_(out_file_ext),
+      top_num_(top_num),
+      norm_(norm),
+      remove_dup_(remove_dup) {}
 
-PrsmStrMerge::PrsmStrMerge(const std::string &spec_file_name,
-                           const std::string &in_file_ext,
-                           int in_num,
-                           const std::string &out_file_ext,
-                           int top_num, bool norm, bool remove_dup) {
+PrsmStrMerge::PrsmStrMerge(const std::string& spec_file_name,
+                           const std::string& in_file_ext, int in_num,
+                           const std::string& out_file_ext, int top_num,
+                           bool norm, bool remove_dup) {
   output_file_ext_ = out_file_ext;
   spec_file_name_ = spec_file_name;
   top_num_ = top_num;
   norm_ = norm;
   remove_dup_ = remove_dup;
-  for (int i = 0; i < in_num; i ++) {
-    std::string ext = in_file_ext + "_" + str_util::toString(i);
+  for (int i = 0; i < in_num; i++) {
+    std::string ext = in_file_ext + "_" + std::to_string(i);
     input_file_exts_.push_back(ext);
   }
 }
 
-PrsmStrPtrVec removeDuplicates(PrsmStrPtrVec ori_list) {
+PrsmStrPtrVec removeDuplicates(const PrsmStrPtrVec& ori_list) {
   PrsmStrPtrVec result_list;
   for (size_t i = 0; i < ori_list.size(); i++) {
     bool dup = false;
@@ -92,19 +93,20 @@ void PrsmStrMerge::process() {
     for (size_t i = 0; i < input_num; i++) {
       if (prsm_str_ptrs[i] != nullptr) {
         finish = false;
-        if (prsm_str_ptrs[i] != nullptr 
-            && prsm_str_ptrs[i]->getSpectrumId() < spec_id) {
+        if (prsm_str_ptrs[i] != nullptr &&
+            prsm_str_ptrs[i]->getSpectrumId() < spec_id) {
           LOG_ERROR("Error in the order of reported PrSMs!");
           exit(1);
         }
-        while (prsm_str_ptrs[i] != nullptr 
-               && prsm_str_ptrs[i]->getSpectrumId() == spec_id) {
+        while (prsm_str_ptrs[i] != nullptr &&
+               prsm_str_ptrs[i]->getSpectrumId() == spec_id) {
           cur_str_ptrs.push_back(prsm_str_ptrs[i]);
           prsm_str_ptrs[i] = reader_ptrs[i]->readOnePrsmStr();
         }
       }
     }
-    LOG_DEBUG("spec id " << spec_id << " cur_str_ptrs size " << cur_str_ptrs.size() << " finish " << finish);
+    LOG_DEBUG("spec id " << spec_id << " cur_str_ptrs size "
+                         << cur_str_ptrs.size() << " finish " << finish);
 
     if (cur_str_ptrs.size() > 0) {
       if (!norm_) {
@@ -115,7 +117,7 @@ void PrsmStrMerge::process() {
                   PrsmStr::cmpNormMatchFragDecProtInc);
       }
       if (remove_dup_) {
-        // Remove duplicated PrSMs from the same sequence.  
+        // Remove duplicated PrSMs from the same sequence.
         cur_str_ptrs = removeDuplicates(cur_str_ptrs);
       }
       for (size_t i = 0; i < top_num_; i++) {

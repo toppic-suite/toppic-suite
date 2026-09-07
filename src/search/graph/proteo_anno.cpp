@@ -1,36 +1,37 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
+#include "search/graph/proteo_anno.hpp"
 
 #include <string>
 #include <vector>
 
-#include "common/util/logger.hpp"
 #include "common/base/prot_mod_base.hpp"
 #include "common/base/prot_mod_util.hpp"
 #include "common/base/ptm_base.hpp"
 #include "common/base/residue_base.hpp"
 #include "common/base/residue_util.hpp"
+#include "common/util/logger.hpp"
 #include "common/xml/xml_dom_document.hpp"
 #include "seq/alter_type.hpp"
-#include "search/graph/proteo_anno.hpp"
 
 namespace toppic {
 
-ProteoAnno::ProteoAnno(const ModPtrVec &fix_mod_ptr_vec,
-                       const ProtModPtrVec &prot_mod_ptr_vec,
-                       const ModPtrVec &var_mod_ptr_vec) {
+ProteoAnno::ProteoAnno(const ModPtrVec& fix_mod_ptr_vec,
+                       const ProtModPtrVec& prot_mod_ptr_vec,
+                       const ModPtrVec& var_mod_ptr_vec) {
   fix_mod_ptr_vec_ = fix_mod_ptr_vec;
   prot_mod_ptr_vec_ = prot_mod_ptr_vec;
   var_mod_ptr_vec_ = var_mod_ptr_vec;
@@ -41,15 +42,16 @@ ProteoAnno::ProteoAnno(const ModPtrVec &fix_mod_ptr_vec,
     if (ptm_map_.find(acid_ptr) == ptm_map_.end()) {
       ResiduePtrVec cur_vec;
       cur_vec.push_back(res_ptr);
-      ptm_map_[acid_ptr]= cur_vec;
+      ptm_map_[acid_ptr] = cur_vec;
     } else {
       ptm_map_[acid_ptr].push_back(res_ptr);
     }
   }
 }
 
-void ProteoAnno::anno(const std::string &seq, bool is_complete) {
-  ResiduePtrVec residue_ptr_vec = residue_util::convertStrToResiduePtrVec(seq, fix_mod_ptr_vec_);
+void ProteoAnno::anno(const std::string& seq, bool is_complete) {
+  ResiduePtrVec residue_ptr_vec =
+      residue_util::convertStrToResiduePtrVec(seq, fix_mod_ptr_vec_);
   res_vec_2d_.clear();
   shift_vec_2d_.clear();
   // input and fixed mod
@@ -83,20 +85,21 @@ void ProteoAnno::anno(const std::string &seq, bool is_complete) {
       ResiduePtr empty_residue_ptr = ResidueBase::getEmptyResiduePtr();
       // LOG_DEBUG("empty acid mass " << acid_ptr->getMonoMass());
       // LOG_DEBUG("empty ptm mass " << ptm_ptr->getMonoMass());
-      LOG_DEBUG("empty residue mass " << empty_residue_ptr->getMonoNeutralMass());
-      if (empty_residue_ptr == nullptr) {
-        LOG_ERROR("Proteoform:: residue not found");
-        throw("Residue not found");
+      LOG_DEBUG("empty residue mass " <<
+    empty_residue_ptr->getMonoNeutralMass()); if (empty_residue_ptr == nullptr)
+    { LOG_ERROR("Proteoform:: residue not found"); throw("Residue not found");
       }
       res_vec_2d_[0].push_back(empty_residue_ptr);
       shift_vec_2d_[0].push_back(AlterType::PROTEIN_VARIABLE->getId());
-    } 
+    }
     */
-    if (is_complete && mod_ptr->getType() == ProtModBase::getType_M_ACETYLATION()) {
+    if (is_complete &&
+        mod_ptr->getType() == ProtModBase::getType_M_ACETYLATION()) {
       ResiduePtr mut_residue_ptr = mod_ptr->getModPtr()->getModResiduePtr();
       res_vec_2d_[0].push_back(mut_residue_ptr);
       shift_vec_2d_[0].push_back(AlterType::PROTEIN_VARIABLE->getId());
-    } else if (is_complete && mod_ptr->getType() == ProtModBase::getType_NME_ACETYLATION()) {
+    } else if (is_complete &&
+               mod_ptr->getType() == ProtModBase::getType_NME_ACETYLATION()) {
       LOG_DEBUG("NME_ACETYLATION");
       // add acetylation to the second residue
       is_nme_ = true;

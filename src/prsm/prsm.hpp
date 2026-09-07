@@ -1,28 +1,30 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #ifndef TOPPIC_PRSM_PRSM_HPP_
 #define TOPPIC_PRSM_PRSM_HPP_
 
 #include <string>
+#include <utility>
 #include <vector>
 
-#include "seq/proteoform.hpp"
 #include "ms/spec/deconv_ms.hpp"
 #include "ms/spec/extend_ms.hpp"
 #include "para/sp_para.hpp"
 #include "prsm/expected_value.hpp"
+#include "seq/proteoform.hpp"
 
 namespace toppic {
 
@@ -31,53 +33,54 @@ using PrsmPtr = std::shared_ptr<Prsm>;
 
 class Prsm {
  public:
-  Prsm(ProteoformPtr proteoform_ptr, const DeconvMsPtrVec &deconv_ms_ptr_vec,
-       double adjusted_prec_mass, SpParaPtr sp_para_ptr);
+  Prsm(const ProteoformPtr& proteoform_ptr,
+       const DeconvMsPtrVec& deconv_ms_ptr_vec, double adjusted_prec_mass,
+       const SpParaPtr& sp_para_ptr);
 
-  Prsm(XmlDOMElement* element, FastaIndexReaderPtr reader_ptr,
-       const ModPtrVec &fix_mod_list);
+  Prsm(XmlDOMElement element, const FastaIndexReaderPtr& reader_ptr,
+       const ModPtrVec& fix_mod_list);
 
-  std::string getFileName() {return file_name_;}
+  std::string getFileName() { return file_name_; }
 
-  int getPrsmId() {return prsm_id_;}
+  int getPrsmId() { return prsm_id_; }
 
-  int getSpectrumId() {return spectrum_id_;}
+  int getSpectrumId() { return spectrum_id_; }
 
-  std::string getSpectrumScan() {return spectrum_scan_;}
+  std::string getSpectrumScan() { return spectrum_scan_; }
 
-  int getPrecursorId() {return precursor_id_;}
+  int getPrecursorId() { return precursor_id_; }
 
-  int getFracFeatureId() {return frac_feature_id_;}
+  int getFracFeatureId() { return frac_feature_id_; }
 
-  double getFracFeatureInte() {return frac_feature_inte_;}
+  double getFracFeatureInte() { return frac_feature_inte_; }
 
-  double getFracFeatureScore() {return frac_feature_score_;}
+  double getFracFeatureScore() { return frac_feature_score_; }
 
-  double getFracFeatureApexTime() {return frac_feature_apex_time_;}
+  double getFracFeatureApexTime() { return frac_feature_apex_time_; }
 
-  double getFracFeatureMinTime() {return frac_feature_min_time_;}
+  double getFracFeatureMinTime() { return frac_feature_min_time_; }
 
-  double getFracFeatureMaxTime() {return frac_feature_max_time_;}
+  double getFracFeatureMaxTime() { return frac_feature_max_time_; }
 
-  double getOriPrecMass() {return ori_prec_mass_;}
+  double getOriPrecMass() { return ori_prec_mass_; }
 
-  double getAdjustedPrecMass() {return adjusted_prec_mass_;}
+  double getAdjustedPrecMass() { return adjusted_prec_mass_; }
 
-  ProteoformPtr getProteoformPtr() {return proteoform_ptr_;}
+  ProteoformPtr getProteoformPtr() { return proteoform_ptr_; }
 
-  ExpectedValuePtr getExpectedValuePtr() {return expected_value_ptr_;}
+  ExpectedValuePtr getExpectedValuePtr() { return expected_value_ptr_; }
 
-  double getFdr() {return fdr_;}
+  double getFdr() { return fdr_; }
 
-  double getProteoformFdr() {return proteoform_fdr_;}
+  double getProteoformFdr() { return proteoform_fdr_; }
 
-  DeconvMsPtrVec getDeconvMsPtrVec() {return deconv_ms_ptr_vec_;}
+  DeconvMsPtrVec getDeconvMsPtrVec() { return deconv_ms_ptr_vec_; }
 
-  ExtendMsPtrVec getRefineMsPtrVec() {return refine_ms_three_vec_;}
+  ExtendMsPtrVec getRefineMsPtrVec() { return refine_ms_three_vec_; }
 
-  double getMatchPeakNum() {return match_peak_num_;}
+  double getMatchPeakNum() { return match_peak_num_; }
 
-  double getMatchFragNum() {return match_fragment_num_;}
+  double getMatchFragNum() { return match_fragment_num_; }
 
   // Normalized match fragment number is used in TopMG for ranking PrSMs
   double getNormMatchFragNum();
@@ -89,73 +92,87 @@ class Prsm {
 
   double getOneProtProb();
 
-  int getHitCnt() {return hit_cnt_;}
+  int getHitCnt() { return hit_cnt_; }
 
-  XmlDOMElement* getElement() {return element_;}
+  XmlDOMElement getElement() { return element_; }
 
-  FastaIndexReaderPtr getReaderPtr() {return reader_ptr_;}
+  FastaIndexReaderPtr getReaderPtr() { return reader_ptr_; }
 
-  const ModPtrVec& getFixModList() {return fix_mod_list_;}
+  const ModPtrVec& getFixModList() { return fix_mod_list_; }
 
   // setter
-  void setFileName(const std::string & fname) {file_name_ = fname;}
+  void setFileName(const std::string& fname) { file_name_ = fname; }
 
-  void setPrsmId(int id) {prsm_id_ = id;}
+  void setPrsmId(int id) { prsm_id_ = id; }
 
-  void setSpectrumId(int spectrum_id) {spectrum_id_ = spectrum_id;}
+  void setSpectrumId(int spectrum_id) { spectrum_id_ = spectrum_id; }
 
-  void setSpectrumScan(std::string spectrum_scan) {spectrum_scan_ = spectrum_scan;}
+  void setSpectrumScan(std::string spectrum_scan) {
+    spectrum_scan_ = spectrum_scan;
+  }
 
-  void setPrecurorId(int precursor_id) {precursor_id_ = precursor_id;}
+  void setPrecurorId(int precursor_id) { precursor_id_ = precursor_id; }
 
-  void setOriPrecMass(double prec_mass) {ori_prec_mass_ = prec_mass;}
+  void setOriPrecMass(double prec_mass) { ori_prec_mass_ = prec_mass; }
 
-  void setProteoformPtr(ProteoformPtr proteoform) {proteoform_ptr_ = proteoform;}
+  void setProteoformPtr(ProteoformPtr proteoform) {
+    proteoform_ptr_ = std::move(proteoform);
+  }
 
-  void setProteoformPtr(ProteoformPtr proteoform, SpParaPtr sp_para_ptr);
+  void setProteoformPtr(ProteoformPtr proteoform, const SpParaPtr& sp_para_ptr);
 
-  void setExpectedValuePtr(ExpectedValuePtr ev_ptr) {expected_value_ptr_ = ev_ptr;}
+  void setExpectedValuePtr(ExpectedValuePtr ev_ptr) {
+    expected_value_ptr_ = std::move(ev_ptr);
+  }
 
-  void setFdr(double fdr) {fdr_ = fdr;}
+  void setFdr(double fdr) { fdr_ = fdr; }
 
-  void setProteoformFdr(double proteoform_fdr) {proteoform_fdr_ = proteoform_fdr;}
+  void setProteoformFdr(double proteoform_fdr) {
+    proteoform_fdr_ = proteoform_fdr;
+  }
 
-  void setDeconvMsPtrVec(DeconvMsPtrVec ms_vec) {deconv_ms_ptr_vec_ = ms_vec;}
+  void setDeconvMsPtrVec(DeconvMsPtrVec ms_vec) {
+    deconv_ms_ptr_vec_ = std::move(ms_vec);
+  }
 
   void setRefineMsVec(ExtendMsPtrVec refine_ms_three_vec) {
-    refine_ms_three_vec_ = refine_ms_three_vec;}
+    refine_ms_three_vec_ = std::move(refine_ms_three_vec);
+  }
 
   void setAdjustedPrecMass(double new_prec_mass);
 
-  void setHitCnt(int hit_cnt) {hit_cnt_ = hit_cnt;}
+  void setHitCnt(int hit_cnt) { hit_cnt_ = hit_cnt; }
 
-  void setFracFeatureId(int id) {frac_feature_id_ = id;}
+  void setFracFeatureId(int id) { frac_feature_id_ = id; }
 
-  // comparion
-  static bool cmpMatchFragDecMatchPeakDecProtInc(const PrsmPtr &a, const PrsmPtr &b);
+  // comparison
+  static bool cmpMatchFragDecMatchPeakDecProtInc(const PrsmPtr& a,
+                                                 const PrsmPtr& b);
 
   // sort by number of matched fragment ions, then start position
-  static bool cmpMatchFragDecMatchPeakDecProtIncStartPosInc(const PrsmPtr &a, const PrsmPtr &b);
+  static bool cmpMatchFragDecMatchPeakDecProtIncStartPosInc(const PrsmPtr& a,
+                                                            const PrsmPtr& b);
 
-  static bool cmpEValueIncProtInc(const PrsmPtr &a, const PrsmPtr &b); 
+  static bool cmpEValueIncProtInc(const PrsmPtr& a, const PrsmPtr& b);
 
   // sort by spectrum id then evalue
-  static bool cmpSpecIncPrecIncEvalueIncProtInc(const PrsmPtr &a, const PrsmPtr &b);
+  static bool cmpSpecIncPrecIncEvalueIncProtInc(const PrsmPtr& a,
+                                                const PrsmPtr& b);
 
   // other functions
-  XmlDOMElement* toXmlElement(XmlDOMDocument* xml_doc);
+  XmlDOMElement toXmlElement(XmlDOMDocument* xml_doc, XmlDOMElement parent);
 
-  void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
+  void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement parent);
 
-  void parseXml(XmlDOMElement *element);
+  void parseXml(XmlDOMElement element);
 
-  static std::string getXmlElementName() {return "prsm";}
+  static std::string getXmlElementName() { return "prsm"; }
 
  private:
   std::string file_name_;
 
   int prsm_id_ = -1;
-  // spectrum information 
+  // spectrum information
   int spectrum_id_;
 
   std::string spectrum_scan_;
@@ -164,16 +181,16 @@ class Prsm {
 
   int spectrum_num_;
 
-  // frac feature id is stored in both deconv_ms_ptr_vec 
-  // and the member variable. When a prsm is constructed from an xml file, 
-  // only the member variable will be initialized.  
+  // frac feature id is stored in both deconv_ms_ptr_vec
+  // and the member variable. When a prsm is constructed from an xml file,
+  // only the member variable will be initialized.
   int frac_feature_id_ = -1;
 
   double frac_feature_inte_ = -1;
 
   double frac_feature_score_ = -1;
 
-  double frac_feature_min_time_ = -1; 
+  double frac_feature_min_time_ = -1;
 
   double frac_feature_max_time_ = -1;
 
@@ -190,7 +207,7 @@ class Prsm {
 
   double match_peak_num_ = 0;
   double match_fragment_num_ = 0;
-  // norm_match_fragment_num is computed in a function, 
+  // norm_match_fragment_num is computed in a function,
   // not stored in the class
 
   double fdr_ = -1;
@@ -202,14 +219,14 @@ class Prsm {
   /* adjusted extended msThree, used for matching ions and peaks */
   ExtendMsPtrVec refine_ms_three_vec_;
 
-  XmlDOMElement* element_;
+  XmlDOMElement element_;
   FastaIndexReaderPtr reader_ptr_;
   ModPtrVec fix_mod_list_;
 
   // functions for initialization
-  void init(SpParaPtr sp_para_ptr);
+  void init(const SpParaPtr& sp_para_ptr);
   void initMatchNum(double min_mass);
-  void initScores(SpParaPtr sp_para_ptr);
+  void initScores(const SpParaPtr& sp_para_ptr);
 };
 
 using PrsmPtrVec = std::vector<PrsmPtr>;
@@ -218,4 +235,3 @@ using PrsmPtrVec3D = std::vector<PrsmPtrVec2D>;
 
 }  // namespace toppic
 #endif
-
