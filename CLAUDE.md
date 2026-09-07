@@ -197,7 +197,11 @@ path and linked into `toppic_common`:
   `libonnxruntime.so.1.14.1` and the C/C++ API headers are vendored under
   `ext/onnx` (sources include it as `"onnx/onnxruntime_cxx_api.h"`, covered by
   the `SYSTEM` `ext/` include); it is linked as an `IMPORTED` shared object,
-  `PRIVATE`, into `toppic_common`. Treat it as third-party.
+  `PRIVATE`, into `toppic_common`. The vendored `.so` is Linux x86-64 only;
+  on macOS `CMakeLists.txt` instead locates Homebrew's `libonnxruntime.dylib`
+  (`find_library` under the Homebrew prefix, overridable with
+  `-DONNXRUNTIME_LIBRARY=...`) and still compiles against the vendored 1.14
+  headers. Treat it as third-party.
 
 ## Install and uninstall (`make install` / `make uninstall`)
 

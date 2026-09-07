@@ -174,3 +174,40 @@ cmake ..
 make -j$(nproc)
 sudo make install
 ```
+
+## Building on macOS
+
+The steps are the same as for Ubuntu above; only the package installation and
+two configure details differ. Xcode Command Line Tools provide clang, and
+[Homebrew](https://brew.sh/) provides everything else. No ONNX Runtime library
+is vendored for macOS, so the Homebrew package is used instead.
+
+```sh
+# compiler
+xcode-select --install
+
+# build tools and libraries
+brew install cmake git git-lfs boost pugixml sqlite zlib onnxruntime
+
+# Qt5 for the GUI tools
+brew install qt@5
+```
+
+Then clone as in step 2 of the Ubuntu instructions and build:
+
+```sh
+mkdir -p build
+cd build
+cmake -DCMAKE_PREFIX_PATH="$(brew --prefix qt@5)" ..
+make -j$(sysctl -n hw.ncpu)
+sudo make install
+```
+
+Notes:
+
+- `qt@5` is a keg-only Homebrew formula (it is not linked into the Homebrew
+  prefix), so CMake cannot find it unless its location is passed via
+  `CMAKE_PREFIX_PATH` as above.
+- On macOS the runtime resources are installed next to the executables, in
+  `<prefix>/bin/res`, rather than in `share/toppic`, because that is where the
+  tools look for them on this platform. `make uninstall` works as on Linux.

@@ -258,14 +258,33 @@ target_link_libraries(toppic_common PUBLIC pwiz)
 target_link_libraries(toppic_common PUBLIC Boost::serialization)
 
 # ONNX Runtime: topfd/envcnn and topfd/ecscore/score run the EnvCNN / ECScore
-# neural-network models via the ONNX Runtime C++ API. A prebuilt libonnxruntime
-# and the C/C++ API headers are vendored under ext/onnx (the sources include it
-# as "onnx/onnxruntime_cxx_api.h", so the existing SYSTEM ext/ include covers the
-# headers). The library is an IMPORTED shared object linked into toppic_common.
+# neural-network models via the ONNX Runtime C++ API. The C/C++ API headers are
+# vendored under ext/onnx (the sources include it as "onnx/onnxruntime_cxx_api.h",
+# so the existing SYSTEM ext/ include covers the headers) and the library is an
+# IMPORTED shared object linked into toppic_common.
+#
+# The vendored prebuilt libonnxruntime.so.1.14.1 is a Linux x86-64 binary. On
+# macOS no library is vendored: the Homebrew package is used instead
+# (`brew install onnxruntime`), found under the Homebrew prefix. A newer
+# runtime serves the vendored 1.14 API headers (the ONNX Runtime C API is
+# backward compatible).
 add_library(onnxruntime SHARED IMPORTED)
-set_target_properties(onnxruntime PROPERTIES
-  IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/ext/onnx/libonnxruntime.so.1.14.1
-  IMPORTED_SONAME libonnxruntime.so.1.14.1)
+if(APPLE)
+  find_library(ONNXRUNTIME_LIBRARY onnxruntime
+    HINTS /opt/homebrew/lib /usr/local/lib)
+  if(NOT ONNXRUNTIME_LIBRARY)
+    message(FATAL_ERROR
+      "ONNX Runtime not found. Install it with 'brew install onnxruntime' or pass "
+      "-DONNXRUNTIME_LIBRARY=/path/to/libonnxruntime.dylib.")
+  endif()
+  message(STATUS "ONNX Runtime library: ${ONNXRUNTIME_LIBRARY}")
+  set_target_properties(onnxruntime PROPERTIES
+    IMPORTED_LOCATION ${ONNXRUNTIME_LIBRARY})
+else()
+  set_target_properties(onnxruntime PROPERTIES
+    IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/ext/onnx/libonnxruntime.so.1.14.1
+    IMPORTED_SONAME libonnxruntime.so.1.14.1)
+endif()
 target_link_libraries(toppic_common PRIVATE onnxruntime)
 
 # ---------------------------------------------------------------------------
@@ -352,12 +371,13 @@ toppic_gui_exe(topdia_gui   topdia   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/top
 # Install the executables
 #
 # All twelve command-line and GUI executables go to <prefix>/bin. Every one of
-# them links the vendored ONNX Runtime shared library (through toppic_common),
-# so on Linux that library is installed to <prefix>/${CMAKE_INSTALL_LIBDIR}
+# them links the ONNX Runtime shared library (through toppic_common). On Linux
+# that is the vendored .so, so it is installed to <prefix>/${CMAKE_INSTALL_LIBDIR}
 # (lib/toppic) and the executables get an $ORIGIN-relative rpath pointing at
 # it, keeping the installed tree relocatable. In the build tree CMake already
 # adds the ext/onnx directory to the executables' rpath, so `bin/` works
-# without installing.
+# without installing. On macOS the Homebrew dylib is found through its own
+# absolute install name, so nothing extra is installed.
 # ---------------------------------------------------------------------------
 set(TOPPIC_EXECUTABLES
   topfd topdia topindex toppic topmg topdiff
