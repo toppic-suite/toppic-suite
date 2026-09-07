@@ -102,7 +102,7 @@ TopFD:
 make -j$(nproc) topfd
 ```
 
-### 4. (Optional) Install
+### 4. Install
 
 ```sh
 sudo make install
