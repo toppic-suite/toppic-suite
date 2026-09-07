@@ -137,3 +137,40 @@ by `make install`, deletes every file listed there, and removes any directories
 (e.g. `/usr/local/share/toppic`) that are left empty. If the build directory
 has been deleted, there is no manifest and `make uninstall` will report an
 error; in that case remove the installed files by hand.
+
+## Building on Red Hat Enterprise Linux 9
+
+The steps are the same as for Ubuntu above; only the package installation
+differs. `pugixml-devel` comes from EPEL (Extra Packages for Enterprise Linux),
+which in turn needs the CodeReady Builder repository, so enable both first.
+
+```sh
+# enable CodeReady Builder and EPEL
+sudo subscription-manager repos --enable codeready-builder-for-rhel-9-$(arch)-rpms
+sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
+
+# compilers and build tools
+sudo dnf install cmake gcc-c++ make clang git git-lfs
+
+# libraries
+sudo dnf install zlib-devel sqlite-devel pugixml-devel boost-devel
+
+# Qt5 for the GUI tools
+sudo dnf install qt5-qtbase-devel
+```
+
+`boost-devel` on RHEL 9 provides Boost 1.75, which satisfies the ≥ 1.74
+requirement. Then continue with steps 2–5 of the Ubuntu instructions (clone
+with Git LFS, configure and build, install, uninstall); they are identical.
+On Red Hat the same commands apply, e.g.:
+
+```sh
+git lfs install
+git clone https://github.com/toppic_suite/toppic_suite.git
+cd toppic_suite
+mkdir -p build
+cd build
+cmake ..
+make -j$(nproc)
+sudo make install
+```

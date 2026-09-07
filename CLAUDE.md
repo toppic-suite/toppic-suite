@@ -199,6 +199,40 @@ path and linked into `toppic_common`:
   the `SYSTEM` `ext/` include); it is linked as an `IMPORTED` shared object,
   `PRIVATE`, into `toppic_common`. Treat it as third-party.
 
+## Install and uninstall (`make install` / `make uninstall`)
+
+`make install` is defined by three rules in `CMakeLists.txt`, all relative to
+`CMAKE_INSTALL_PREFIX` (default `/usr/local`), so `DESTDIR` staging and a
+custom prefix both work:
+
+- `install(TARGETS ${TOPPIC_EXECUTABLES} ...)` puts the six CLI tools and their
+  six `*_gui` counterparts in `<prefix>/bin`. **When you add a new executable
+  target, append it to the `TOPPIC_EXECUTABLES` list** (end of the file) so it
+  is installed and gets the rpath below — nothing else is needed.
+- On Linux the vendored `ext/onnx/libonnxruntime.so.1.14.1` (which every
+  executable loads at run time, via `toppic_common`) is installed to
+  `<prefix>/${CMAKE_INSTALL_LIBDIR}` (= `lib/toppic`), and the executables get
+  `INSTALL_RPATH "$ORIGIN/../lib/toppic"` so the installed tree is relocatable.
+  In the build tree CMake already points the rpath at `ext/onnx`, so `bin/`
+  works without installing. Keep the `CMAKE_INSTALL_LIBDIR` value and this
+  rpath in sync.
+- `install(DIRECTORY res/ ...)` copies the runtime resources into
+  `<prefix>/${CMAKE_INSTALL_DATADIR}` (= `share/toppic`), which is also the
+  compiled-in `TOPPIC_SHARED_DIR` the binaries look in.
+
+`make uninstall` is a custom target (CMake has no built-in one). It runs
+`cmake -P <build>/cmake_uninstall.cmake`, configured from
+`cmake/cmake_uninstall.cmake.in`, which reads the `install_manifest.txt` that
+`make install` writes into the **build directory**, deletes every file listed
+there (honouring `DESTDIR`) and then removes any directory under the prefix
+that was left empty (the manifest lists files only). Consequences:
+
+- It must be run from the same build directory as the install; without a
+  manifest it fails with a clear error rather than guessing.
+- Anything added through a normal `install(...)` rule is uninstalled
+  automatically — do not add per-file removal code to the script.
+- Running it twice is harmless (missing files are reported, not errors).
+
 ## Source layout
 
 `src` is the include root, so headers are included by their path from `src`
