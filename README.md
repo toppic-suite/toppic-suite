@@ -52,24 +52,6 @@ brew install git-lfs
 git lfs install
 ```
 
-#### Clone
-
-With Git LFS installed, a normal clone fetches the LFS files automatically:
-
-```sh
-git clone https://github.com/liuxiaowen/toppic_claude.git
-```
-
-#### Already cloned without Git LFS?
-
-If you cloned before installing Git LFS (so the `.onnx` / `theo_patt.txt`
-files are pointer text), install it as above and then pull the real blobs:
-
-```sh
-git lfs install
-git lfs pull
-```
-
 ## Building on Ubuntu Linux
 
 ### 1. Install the build dependencies
