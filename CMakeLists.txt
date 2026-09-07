@@ -339,7 +339,7 @@ toppic_console_exe(topdiff
   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdiff_process.cpp)
 
 # ---------------------------------------------------------------------------
-# GUI executables (Qt5)
+# GUI executables (Qt6)
 #
 # Each tool's dialog collects parameters and shells out to the matching
 # command-line tool via QProcess (gui/util/command). All the heavy lifting
@@ -347,12 +347,13 @@ toppic_console_exe(topdiff
 # lives in the toppic_common shared library, so a GUI target only compiles its
 # own Qt sources -- plus, for the five tools whose dialog reads default values
 # from the console parser, that tool's src/console/<tool>_argument.cpp -- and
-# links against toppic_common, Qt5 and Boost::program_options.
+# links against toppic_common, Qt6 and Boost::program_options.
 #
 # (The src/gui/topmerge sources are migrated for completeness but, as upstream,
 # get no executable target: the merge backend is not part of this library.)
 # ---------------------------------------------------------------------------
-find_package(Qt5 COMPONENTS Widgets Core Gui REQUIRED)
+find_package(Qt6 COMPONENTS Widgets Core Gui REQUIRED)
+message(STATUS "Qt version: ${Qt6_VERSION}")
 
 # Shared by every GUI target (a QProcess command builder + message helpers).
 # It is QObject-based, so it is built per target via the target's AUTOMOC.
@@ -371,12 +372,12 @@ function(toppic_gui_exe name dir)
     AUTOMOC ON AUTOUIC ON AUTORCC ON
     AUTOUIC_SEARCH_PATHS ${CMAKE_CURRENT_SOURCE_DIR}/src)
   if(WIN32)
-    # GUI subsystem (no console window); Qt5's CMake config links qtmain
-    # automatically for WIN32_EXECUTABLE targets.
+    # GUI subsystem (no console window); Qt6's CMake config links its
+    # entry-point library automatically for WIN32_EXECUTABLE targets.
     set_target_properties(${name} PROPERTIES WIN32_EXECUTABLE ON)
   endif()
   target_link_libraries(${name} PRIVATE
-    toppic_common Qt5::Widgets Qt5::Core Qt5::Gui Boost::program_options)
+    toppic_common Qt6::Widgets Qt6::Core Qt6::Gui Boost::program_options)
 endfunction()
 
 toppic_gui_exe(topfd_gui    topfd)

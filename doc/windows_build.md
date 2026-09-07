@@ -28,8 +28,8 @@ pacman -S mingw-w64-ucrt-x86_64-boost mingw-w64-ucrt-x86_64-pugixml \
           mingw-w64-ucrt-x86_64-sqlite3 mingw-w64-ucrt-x86_64-zlib \
           mingw-w64-ucrt-x86_64-onnxruntime
 
-# Qt5 for the GUI tools
-pacman -S mingw-w64-ucrt-x86_64-qt5-base
+# Qt6 for the GUI tools
+pacman -S mingw-w64-ucrt-x86_64-qt6-base
 ```
 
 The other third-party code (htslib, ProteoWizard) is vendored under `ext/`
@@ -68,7 +68,7 @@ The tools can be run directly from `bin/`: they find the runtime resources in
 the repository's `res/` directory (they look in `res` next to the executable
 first, then in `..\res`).
 
-The executables depend on the DLLs of the UCRT64 environment (Boost, Qt5,
+The executables depend on the DLLs of the UCRT64 environment (Boost, Qt6,
 ONNX Runtime, ...), which live in `C:\msys64\ucrt64\bin`. Inside the UCRT64
 shell that directory is already on the `PATH`; to run the tools from a
 Windows Terminal or PowerShell instead, add `C:\msys64\ucrt64\bin` to the

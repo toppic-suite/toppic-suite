@@ -22,6 +22,8 @@
 #include <QElapsedTimer>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QRegularExpression>
+#include <QRegularExpressionValidator>
 #include <QScrollBar>
 #include <QToolTip>
 
@@ -40,21 +42,21 @@ ToppicWindow::ToppicWindow(QWidget* parent)
   QString qstr = QString::fromStdString(title);
   this->setWindowTitle(qstr);
   lastDir_ = ".";
-  QRegExp rx1("^\\d{1,8}\\.\\d{0,2}$");
-  QRegExpValidator* validator1 = new QRegExpValidator(rx1, this);
+  QRegularExpression rx1("^\\d{1,8}\\.\\d{0,2}$");
+  QRegularExpressionValidator* validator1 = new QRegularExpressionValidator(rx1, this);
   ui->maxModEdit->setValidator(validator1);
   ui->cutoffSpectralValueEdit->setValidator(validator1);
   ui->cutoffProteoformValueEdit->setValidator(validator1);
   ui->numCombinedEdit->setValidator(new QIntValidator(0, 2147483647, this));
-  QRegExp rx2("^0\\.\\d{0,2}|1.00$");
-  QRegExpValidator* validator2 = new QRegExpValidator(rx2, this);
+  QRegularExpression rx2("^0\\.\\d{0,2}|1.00$");
+  QRegularExpressionValidator* validator2 = new QRegularExpressionValidator(rx2, this);
   ui->miscoreThresholdEdit->setValidator(validator2);
   ui->threadNumberEdit->setValidator(new QIntValidator(0, 2147483647, this));
   ui->errorToleranceEdit->setValidator(new QIntValidator(0, 2147483647, this));
   ui->formErrorToleranceEdit->setValidator(
       new QDoubleValidator(0, 2147483647, 4, this));
-  QRegExp rx3("^-?\\d{1,8}\\.\\d{0,2}$");
-  QRegExpValidator* validator3 = new QRegExpValidator(rx3, this);
+  QRegularExpression rx3("^-?\\d{1,8}\\.\\d{0,2}$");
+  QRegularExpressionValidator* validator3 = new QRegularExpressionValidator(rx3, this);
   ui->minModEdit->setValidator(validator3);
 
   QFont font;

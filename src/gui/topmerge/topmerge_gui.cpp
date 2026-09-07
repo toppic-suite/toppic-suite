@@ -14,9 +14,10 @@
 // limitations under the License.
 
 #include <QApplication>
-#include <QDesktopWidget>
 #include <QFontDatabase>
+#include <QGuiApplication>
 #include <QLocale>
+#include <QScreen>
 
 #include "gui/topmerge/topmergedialog.h"
 
@@ -30,15 +31,13 @@ int main(int argc, char* argv[]) {
   QFont font("Calibri");
   font.setPointSize(12);
   QApplication::setFont(font);
-  QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
   QApplication a(argc, argv);
 
   TopMergeDialog td;
 
-  QDesktopWidget* desk = QApplication::desktop();
-
-  QRect deskRect = desk->availableGeometry();
+  QScreen* screen = QGuiApplication::primaryScreen();
+  QRect deskRect = screen->availableGeometry();
 
   td.show();
 

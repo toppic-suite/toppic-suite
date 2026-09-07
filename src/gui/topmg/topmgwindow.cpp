@@ -21,6 +21,8 @@
 #include <QElapsedTimer>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QRegularExpression>
+#include <QRegularExpressionValidator>
 #include <QScrollBar>
 #include <QToolTip>
 
@@ -39,8 +41,8 @@ TopmgWindow::TopmgWindow(QWidget* parent)
   QString qstr = QString::fromStdString(title);
   this->setWindowTitle(qstr);
   lastDir_ = ".";
-  QRegExp rx1("^\\d{1,8}\\.\\d{0,2}$");
-  QRegExpValidator* validator1 = new QRegExpValidator(rx1, this);
+  QRegularExpression rx1("^\\d{1,8}\\.\\d{0,2}$");
+  QRegularExpressionValidator* validator1 = new QRegularExpressionValidator(rx1, this);
   ui->maxModEdit->setValidator(validator1);
   ui->cutoffSpectralValueEdit->setValidator(validator1);
   ui->cutoffProteoformValueEdit->setValidator(validator1);

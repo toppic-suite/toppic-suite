@@ -24,7 +24,7 @@ TopPIC Suite consists of six software tools for the analysis of top-down mass sp
 * CMake version >= 3.16
 * Boost version >= 1.74 (filesystem, iostreams, thread, chrono, system, serialization, program_options)
 * pugixml, SQLite3 and zlib development libraries
-* Qt5 (Core, Gui, Widgets) for the GUI tools
+* Qt6 (Core, Gui, Widgets) for the GUI tools
 * Git LFS (see below)
 
 ### Git LFS is required
@@ -63,7 +63,7 @@ sudo apt-get install build-essential cmake clang git git-lfs \
     libboost-filesystem-dev libboost-iostreams-dev libboost-thread-dev \
     libboost-chrono-dev libboost-system-dev libboost-serialization-dev \
     libboost-program-options-dev \
-    qtbase5-dev
+    qt6-base-dev
 ```
 
 Notes:
@@ -73,7 +73,7 @@ Notes:
   To force a compiler, pass `-DCMAKE_CXX_COMPILER=...` at configure time.
 - **Boost ≥ 1.74** is required. The Ubuntu packages above are sufficient
   (`libboost-all-dev` also works if you prefer one package).
-- **Qt5** (`qtbase5-dev`) is needed for the GUI tools (`topfd_gui`, etc.).
+- **Qt6** (`qt6-base-dev`) is needed for the GUI tools (`topfd_gui`, etc.).
 - Other third-party code (htslib, ProteoWizard, ONNX Runtime) is vendored
   under `ext/` and built/linked automatically — no packages needed.
 
@@ -138,9 +138,8 @@ error; in that case remove the installed files by hand.
 ## Building on Red Hat Enterprise Linux 10
 
 The steps are the same as for Ubuntu above; only the package installation
-differs. Two of the dependencies are not in RHEL 10 itself and come from EPEL
-(Extra Packages for Enterprise Linux): `pugixml-devel`, and `qt5-qtbase-devel`
-because RHEL 10 ships only Qt6. EPEL in turn needs the CodeReady Builder
+differs. `pugixml-devel` is not in RHEL 10 itself and comes from EPEL (Extra
+Packages for Enterprise Linux), which in turn needs the CodeReady Builder
 repository, so enable both first.
 
 ```sh
@@ -154,8 +153,8 @@ sudo dnf install cmake gcc-c++ make clang git git-lfs
 # libraries (zlib-ng-compat-devel is RHEL 10's replacement for zlib-devel)
 sudo dnf install zlib-ng-compat-devel sqlite-devel pugixml-devel boost-devel
 
-# Qt5 for the GUI tools (from EPEL)
-sudo dnf install qt5-qtbase-devel
+# Qt6 for the GUI tools
+sudo dnf install qt6-qtbase-devel
 ```
 
 `boost-devel` on RHEL 10 provides Boost 1.83, which satisfies the ≥ 1.74
@@ -193,8 +192,8 @@ xcode-select --install
 # build tools and libraries
 brew install cmake git git-lfs boost pugixml sqlite zlib onnxruntime
 
-# Qt5 for the GUI tools
-brew install qt@5
+# Qt6 for the GUI tools
+brew install qt
 ```
 
 Then clone as in step 2 of the Ubuntu instructions and build:
@@ -202,16 +201,16 @@ Then clone as in step 2 of the Ubuntu instructions and build:
 ```sh
 mkdir -p build
 cd build
-cmake -DCMAKE_PREFIX_PATH="$(brew --prefix qt@5)" ..
+cmake ..
 make -j$(sysctl -n hw.ncpu)
 sudo make install
 ```
 
 Notes:
 
-- `qt@5` is a keg-only Homebrew formula (it is not linked into the Homebrew
-  prefix), so CMake cannot find it unless its location is passed via
-  `CMAKE_PREFIX_PATH` as above.
+- Homebrew's `qt` formula is Qt6 and is linked into the Homebrew prefix, so
+  CMake finds it without further hints. If CMake still cannot find Qt6, pass
+  `-DCMAKE_PREFIX_PATH="$(brew --prefix qt)"`.
 - On macOS the runtime resources are installed next to the executables, in
   `<prefix>/bin/res`, rather than in `share/toppic`, because that is where the
   tools look for them on this platform. `make uninstall` works as on Linux.

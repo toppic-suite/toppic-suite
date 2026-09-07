@@ -175,7 +175,7 @@ path and linked into `toppic_common`:
   own code and it warns — e.g. uBLAS still deriving from the C++17-deprecated
   `std::iterator` — wrap it in `#pragma GCC diagnostic ignored
   "-Wdeprecated-declarations"`.)
-- **Qt5** — `find_package(Qt5 COMPONENTS Widgets Core Gui)` backs the `src/gui`
+- **Qt6** — `find_package(Qt6 COMPONENTS Widgets Core Gui)` backs the `src/gui`
   desktop executables (see the source-layout note). Only the GUI targets use it,
   via per-target `AUTOMOC`/`AUTOUIC`/`AUTORCC`; the `toppic_common` library has
   no Qt dependency.
@@ -303,12 +303,12 @@ NOT in `COMMON_SRCS`; each is its own `add_executable` that links
   `*_process` here — they drive the `topfd_process`/`topdia_process`
   orchestrators that live in the library. The `toppic_console_exe()` helper in
   `CMakeLists.txt` builds each, linking `toppic_common` + `Boost::program_options`.
-- `src/gui` — Qt5 desktop front-ends (`topfd`/`topindex`/`toppic`/`topmg`/
+- `src/gui` — Qt6 desktop front-ends (`topfd`/`topindex`/`toppic`/`topmg`/
   `topdiff`/`topdia`, plus `util` = a QProcess command builder + message
   helpers). The `toppic_gui_exe()` helper in `CMakeLists.txt` defines each
   target with per-target `AUTOMOC`/`AUTOUIC`/`AUTORCC` and
   `AUTOUIC_SEARCH_PATHS=src` (so the dialogs' `"gui/<tool>/ui_*.h"` includes
-  resolve), linking `toppic_common` + `Qt5::Widgets/Core/Gui` +
+  resolve), linking `toppic_common` + `Qt6::Widgets/Core/Gui` +
   `Boost::program_options`. A dialog collects parameters and **shells out** to
   the matching CLI tool via QProcess, reading its default values from that
   tool's console argument parser. `src/gui/topmerge` is migrated but has no

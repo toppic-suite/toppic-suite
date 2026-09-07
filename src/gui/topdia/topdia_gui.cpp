@@ -14,7 +14,6 @@
 // limitations under the License.
 
 #include <QApplication>
-#include <QDesktopWidget>
 #include <QFontDatabase>
 #include <QGuiApplication>
 #include <QLocale>
@@ -25,7 +24,6 @@
 int main(int argc, char* argv[]) {
   // make sure we are using the c locale
   QLocale::setDefault(QLocale::c());
-  QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
   QApplication app(argc, argv);
 

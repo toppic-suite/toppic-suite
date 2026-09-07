@@ -22,6 +22,8 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QProcess>
+#include <QRegularExpression>
+#include <QRegularExpressionValidator>
 #include <QScrollBar>
 #include <iostream>
 #include <map>
@@ -48,11 +50,11 @@ TopDIADialog::TopDIADialog(QWidget* parent)
   lastDir_ = ".";
   ui->maxChargeEdit->setValidator(new QIntValidator(1, 100, this));
   ui->maxMassEdit->setValidator(new QIntValidator(1, 1000000, this));
-  QRegExp rx1("^0\\.[0]\\d{0,2}[1-9]|0.1$");
-  QRegExpValidator* validator1 = new QRegExpValidator(rx1, this);
+  QRegularExpression rx1("^0\\.[0]\\d{0,2}[1-9]|0.1$");
+  QRegularExpressionValidator* validator1 = new QRegularExpressionValidator(rx1, this);
   ui->mzErrorEdit->setValidator(validator1);
-  QRegExp rx2("^\\d{1,6}\\.\\d{0,2}$");
-  QRegExpValidator* validator2 = new QRegExpValidator(rx2, this);
+  QRegularExpression rx2("^\\d{1,6}\\.\\d{0,2}$");
+  QRegularExpressionValidator* validator2 = new QRegularExpressionValidator(rx2, this);
   ui->ms1snRatioEdit->setValidator(validator2);
   ui->ms2snRatioEdit->setValidator(validator2);
   ui->threadNumberEdit->setValidator(new QIntValidator(0, 1000, this));
@@ -69,8 +71,8 @@ TopDIADialog::TopDIADialog(QWidget* parent)
       new QDoubleValidator(0.0, 1.0, 4, this));
   ui->ms2IntePccCutoffEdit->setValidator(
       new QDoubleValidator(0.0, 1.0, 4, this));
-  QRegExp rx3("^\\d{1,4}\\.\\d{0,2}|10000$");
-  QRegExpValidator* validator3 = new QRegExpValidator(rx3, this);
+  QRegularExpression rx3("^\\d{1,4}\\.\\d{0,2}|10000$");
+  QRegularExpressionValidator* validator3 = new QRegularExpressionValidator(rx3, this);
   ui->windowSizeEdit->setValidator(validator3);
   QFont font;
   QFont outputFont;
