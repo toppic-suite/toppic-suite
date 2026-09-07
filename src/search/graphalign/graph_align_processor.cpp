@@ -15,6 +15,7 @@
 
 #include "search/graphalign/graph_align_processor.hpp"
 
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <string>

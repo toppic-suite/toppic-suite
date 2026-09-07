@@ -15,6 +15,7 @@
 
 #include "filter/varptm/var_ptm_filter_processor.hpp"
 
+#include <algorithm>
 #include <iomanip>
 
 #include "common/thread/simple_thread_pool.hpp"

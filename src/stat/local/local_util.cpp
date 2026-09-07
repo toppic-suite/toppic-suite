@@ -17,6 +17,7 @@
 
 #include <algorithm>
 #include <iomanip>
+#include <iterator>
 #include <numeric>
 
 #include "common/base/mass_constant.hpp"

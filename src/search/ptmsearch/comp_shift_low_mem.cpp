@@ -15,6 +15,7 @@
 
 #include "search/ptmsearch/comp_shift_low_mem.hpp"
 
+#include <algorithm>
 #include <cmath>
 
 #include "common/util/logger.hpp"

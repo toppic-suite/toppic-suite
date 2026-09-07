@@ -15,6 +15,7 @@
 
 #include "topfd/deconv/deconv_ms2_process.hpp"
 
+#include <algorithm>
 #include <atomic>
 #include <cstddef>
 #include <memory>

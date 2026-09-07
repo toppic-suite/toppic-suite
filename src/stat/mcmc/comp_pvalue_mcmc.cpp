@@ -16,6 +16,7 @@
 #include "stat/mcmc/comp_pvalue_mcmc.hpp"
 
 #include <algorithm>
+#include <numeric>
 #include <string>
 #include <vector>
 

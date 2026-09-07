@@ -15,6 +15,7 @@
 
 #include "filter/oneptm/one_ptm_filter_processor.hpp"
 
+#include <algorithm>
 #include <iomanip>
 #include <iostream>
 

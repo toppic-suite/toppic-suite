@@ -15,6 +15,7 @@
 
 #include "topfd/ecscore/env_coll/env_coll_detect.hpp"
 
+#include <algorithm>
 #include <ctime>
 #include <iostream>
 

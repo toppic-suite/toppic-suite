@@ -15,6 +15,7 @@
 
 #include "filter/diag/diag_filter_processor.hpp"
 
+#include <algorithm>
 #include <iomanip>
 #include <iostream>
 #include <sstream>

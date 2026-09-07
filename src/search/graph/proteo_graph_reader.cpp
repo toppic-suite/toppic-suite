@@ -15,6 +15,7 @@
 
 #include "search/graph/proteo_graph_reader.hpp"
 
+#include <algorithm>
 #include <string>
 #include <vector>
 

@@ -15,6 +15,7 @@
 
 #include "search/ptmsearch/ptm_search_processor.hpp"
 
+#include <algorithm>
 #include <cmath>
 
 #include "common/thread/simple_thread_pool.hpp"
