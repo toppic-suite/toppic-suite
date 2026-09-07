@@ -1,5 +1,12 @@
 cmake_minimum_required(VERSION 3.16)
 
+# CMake >= 3.30 removed the FindBoost module (policy CMP0167) and warns unless
+# the policy is set. Boost >= 1.70 ships its own BoostConfig.cmake, and we
+# require >= 1.74, so always use the config file.
+if(POLICY CMP0167)
+  cmake_policy(SET CMP0167 NEW)
+endif()
+
 # Default to clang / clang++ unless the user already chose a compiler.
 # This must happen before project(), because the compiler cannot be changed
 # afterwards. We only set it when unset so the user can still override with
@@ -171,6 +178,14 @@ find_package(Threads REQUIRED)
 # SQLite3 backs sql/sql_util and ms/mzml/mzml_ms_sql_writer (the topfd SQLite
 # output).
 find_package(SQLite3 REQUIRED)
+# Newer CMake renamed the imported target to SQLite3::SQLite3 and warns that
+# SQLite::SQLite3 is deprecated; older CMake (our 3.16 minimum) only provides
+# the old name. Pick whichever exists.
+if(TARGET SQLite3::SQLite3)
+  set(TOPPIC_SQLITE3_TARGET SQLite3::SQLite3)
+else()
+  set(TOPPIC_SQLITE3_TARGET SQLite::SQLite3)
+endif()
 file(GLOB HTSLIB_SRCS CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/ext/htslib/*.c)
 add_library(htslib STATIC ${HTSLIB_SRCS})
 target_include_directories(htslib SYSTEM PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/ext)
@@ -256,7 +271,7 @@ target_link_libraries(toppic_common PRIVATE htslib)
 # sql/sql_util.hpp and ms/mzml/mzml_ms_sql_writer.hpp expose <sqlite3.h>, so the
 # SQLite3 include path is PUBLIC; the library is PRIVATE (an implementation
 # detail of toppic_common).
-target_link_libraries(toppic_common PUBLIC SQLite::SQLite3)
+target_link_libraries(toppic_common PUBLIC ${TOPPIC_SQLITE3_TARGET})
 
 # ms/mzml/pw_ms_reader.hpp exposes pwiz types (pwiz::msdata::*), so consumers of
 # toppic_common need the pwiz headers (and Boost) too: link pwiz PUBLIC.
