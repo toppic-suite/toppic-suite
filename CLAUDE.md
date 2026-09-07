@@ -204,8 +204,14 @@ path and linked into `toppic_common`:
   `UNKNOWN IMPORTED` target, and still compiles against the vendored 1.14
   headers. Windows also links `ws2_32` into the vendored htslib and pwiz
   (Winsock), builds the GUI targets as `WIN32_EXECUTABLE`, and installs `res/`
-  next to the executables because `getResourceDir()` only checks
-  `<exec_dir>/res` there. Treat it as third-party.
+  next to the executables because `getResourceDir()` does not consult the
+  compiled-in shared dir there. Treat it as third-party.
+
+`file_util::getResourceDir()` looks for the resources in `<exec_dir>/res`
+(installed layout on macOS/Windows), then `<exec_dir>/../res` (the build tree:
+executables in `<repo>/bin`, resources in `<repo>/res`, so nothing needs to be
+copied or symlinked to run from `bin/`), then the compiled-in shared dir
+(installed layout on Linux). Keep that order if you touch it.
 
 ## Install and uninstall (`make install` / `make uninstall`)
 

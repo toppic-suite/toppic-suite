@@ -77,10 +77,23 @@ std::string getExecutiveDir(const std::string& argv_0) {
   return exe_dir;
 }
 
+// The resources are looked for, in order, in
+//   1. <exec_dir>/res     -- the installed layout on macOS and Windows;
+//   2. <exec_dir>/../res  -- the build tree: the executables are written to
+//                            <repo>/bin and the resources live in <repo>/res,
+//                            so the tools run from bin/ without any copying
+//                            or symlinking of res/;
+//   3. the compiled-in shared dir (e.g. <prefix>/share/toppic) -- the
+//      installed layout on Linux (not used on Windows).
 std::string getResourceDir(const std::string& exec_dir) {
   std::string resource_dir = exec_dir + getToppicResourceDirName();
   if (fs::exists(resource_dir)) {
     return resource_dir;
+  }
+  fs::path parent_res = (fs::path(exec_dir) / ".." / getToppicResourceDirName())
+                            .lexically_normal();
+  if (fs::exists(parent_res)) {
+    return parent_res.string();
   }
 #if !defined(_WIN32) && !defined(_WIN64) && !defined(__MINGW32__) && \
     !defined(__MINGW64__)
@@ -90,6 +103,8 @@ std::string getResourceDir(const std::string& exec_dir) {
   }
   LOG_ERROR("The resource directory " << shared_dir << " does not exist!");
 #endif
+  LOG_ERROR("The resource directory " << parent_res.string()
+            << " does not exist!");
   LOG_ERROR("The resource directory " << resource_dir << " does not exist!");
   throw std::runtime_error("Resource directory not found: " + resource_dir);
 }

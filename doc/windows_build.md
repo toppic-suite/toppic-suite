@@ -64,13 +64,9 @@ repository's `bin/` directory.
 
 ## 5. Run the tools
 
-The tools look for the runtime resources in a `res` directory next to the
-executable. To run them from `bin/`, copy the repository's `res/` there once:
-
-```sh
-cd ..
-cp -r res bin/
-```
+The tools can be run directly from `bin/`: they find the runtime resources in
+the repository's `res/` directory (they look in `res` next to the executable
+first, then in `..\res`).
 
 The executables depend on the DLLs of the UCRT64 environment (Boost, Qt5,
 ONNX Runtime, ...), which live in `C:\msys64\ucrt64\bin`. Inside the UCRT64

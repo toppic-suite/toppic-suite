@@ -114,13 +114,10 @@ files, isotope tables, ...) to `/usr/local/share/toppic`. Use
 `cmake -DCMAKE_INSTALL_PREFIX=<dir> ..` at configure time for a different
 prefix.
 
-To run the tools from `bin/` **without** installing, they need to find the
-runtime resources in a `res` directory next to the executable; create a
-symlink to the repository's `res/` once:
-
-```sh
-ln -s ../res bin/res
-```
+The tools can also be run directly from `bin/` **without** installing: they
+find the runtime resources in the repository's `res/` directory (the tools
+look in `res` next to the executable first, then in `../res`, then in the
+installed shared directory).
 
 ### 5. Uninstall
 
