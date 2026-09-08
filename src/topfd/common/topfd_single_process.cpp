@@ -67,6 +67,19 @@ void processOneFile(const TopfdParaPtr& para_ptr,
     int ms_level = 2;
     double max_mass = para_ptr->getMaxMass();
     double max_charge = para_ptr->getMaxCharge();
+
+    // The text-peak-list input is a single MS/MS spectrum with no MS1 scan.
+    // createSqlDb (called below through setMzmlFileNameAndFaims) writes these
+    // into the ms_info table, so set them first (they default to -1, which is
+    // only updated in the mzML flow).
+    para_ptr->setMs1ScanNumber(0);
+    para_ptr->setMs2ScanNumber(1);
+    // Name the outputs after the input file, as the mzML flow does: the base
+    // name is the input path minus its extension, so <input>_ms2.msalign,
+    // <input>_ms2.env and <input>.sqlite land next to the input file. This
+    // also creates the SQLite database when it is enabled.
+    para_ptr->setMzmlFileNameAndFaims(spec_file_name, false, -1);
+
     PeakPtrVec peak_list = readPeakFile(spec_file_name);
 
     MatchEnvPtrVec result_envs;
@@ -97,10 +110,15 @@ void processOneFile(const TopfdParaPtr& para_ptr,
     // MzmlMsSqlWriter consumes a raw MzmlMs (header + peaks) and reads the
     // activation's N/C ion types from the header, so an activation is attached
     // here. The text-peak-list input carries no activation information, so the
-    // requested activation is used, falling back to HCD when it is unset/FILE.
+    // requested activation is used, falling back to HCD when it is unset
+    // (the default "FILE" is not an activation name, so it is not looked up).
     if (para_ptr->isGeneSql()) {
+      std::string activation_name = para_ptr->getActivation();
+      if (activation_name == "FILE") {
+        activation_name = "HCD";
+      }
       ActivationPtr activation_ptr =
-          ActivationBase::getActivationPtrByName(para_ptr->getActivation());
+          ActivationBase::getActivationPtrByName(activation_name);
       if (activation_ptr == nullptr) {
         activation_ptr = ActivationBase::getActivationPtrByName("HCD");
       }
@@ -109,13 +127,6 @@ void processOneFile(const TopfdParaPtr& para_ptr,
       MzmlMsPtr raw_ms_ptr =
           std::make_shared<Ms<PeakPtr>>(header_ptr, peak_list);
 
-      // The text-peak-list input is a single MS/MS spectrum with no MS1 scan.
-      // createSqlDb writes these into the ms_info table, so set them before it
-      // (they default to -1, which is only updated in the mzML flow).
-      para_ptr->setMs1ScanNumber(0);
-      para_ptr->setMs2ScanNumber(1);
-      std::string sql_db_name = output_base_name + ".sqlite";
-      para_ptr->createSqlDb(sql_db_name);
       MzmlMsSqlWriterPtr sql_writer_ptr =
           std::make_shared<MzmlMsSqlWriter>(para_ptr->getSqlDb());
       sql_writer_ptr->writeMs2(raw_ms_ptr, result_envs);

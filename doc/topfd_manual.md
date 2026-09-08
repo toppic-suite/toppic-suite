@@ -221,22 +221,17 @@ topfd -T -c 10 -e 0.01 -N peaks.txt
 
 ### 2.3 Output files
 
-The output files are written to the **current working directory** with the
-fixed base name `deconv`, whatever the input file is called:
+As in mzML mode, the output files are written next to the input file, with
+the input file name minus its extension as the base name (`peaks` for
+`peaks.txt`). Each peak list given on the command line gets its own set:
 
 | File | Contents |
 |---|---|
-| `deconv_ms2.msalign` | The deconvoluted spectrum in the `msalign` format (spectrum ID 0, one line per monoisotopic mass: mass, intensity, charge, score). |
-| `deconv_ms2.env` | The matched isotopic envelopes, peak by peak (see below). |
-| `deconv.sqlite` | The spectrum and its envelopes in the SQLite database format. Not written with `--no-sql`. |
+| `peaks_ms2.msalign` | The deconvoluted spectrum in the `msalign` format (spectrum ID 0, one line per monoisotopic mass: mass, intensity, charge, score). |
+| `peaks_ms2.env` | The matched isotopic envelopes, peak by peak (see below). |
+| `peaks.sqlite` | The spectrum and its envelopes in the SQLite database format. Not written with `--no-sql`. |
 
-Because the base name is fixed, running TopFD on a second peak list in the
-same directory overwrites the previous output. Run each peak list from its
-own directory, or rename the output files between runs. Several peak list
-files given on one command line are processed in order and all write the
-same `deconv_*` files, so only the last one survives.
-
-`deconv_ms2.env` is a tab-separated table with one line per **matched
+`peaks_ms2.env` is a tab-separated table with one line per **matched
 peak**, i.e. per input peak that was assigned to an isotopic envelope:
 
 | Column | Meaning |
@@ -257,20 +252,20 @@ each reported mass.
 ### 2.4 Example
 
 ```sh
-mkdir spectrum_1 && cd spectrum_1
-topfd -T -c 20 -m 30000 ../spectrum_1.txt
+topfd -T -c 20 -m 30000 data/spectrum_1.txt
 ```
 
 prints
 
 ```text
 TopFD 1.9.0
-Processing ../spectrum_1.txt started.
-Processing ../spectrum_1.txt finished.
+Processing data/spectrum_1.txt started.
+Processing data/spectrum_1.txt finished.
 Timestamp: ...
 TopFD single finished.
 ```
 
-and leaves `deconv_ms2.msalign`, `deconv_ms2.env` and `deconv.sqlite` in
-`spectrum_1/`. The monoisotopic masses are in `deconv_ms2.msalign`; open
-`deconv_ms2.env` in a spreadsheet to see which input peaks support each mass.
+and leaves `spectrum_1_ms2.msalign`, `spectrum_1_ms2.env` and
+`spectrum_1.sqlite` in `data/`. The monoisotopic masses are in
+`spectrum_1_ms2.msalign`; open `spectrum_1_ms2.env` in a spreadsheet to see
+which input peaks support each mass.
