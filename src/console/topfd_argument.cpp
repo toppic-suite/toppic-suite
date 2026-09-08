@@ -153,7 +153,7 @@ bool Argument::parse(int argc, char* argv[]) {
     hidden_desc.add_options()(
         "multiple-mass,M",
         "Output multiple monoisotopic masses for each MS/MS spectrum.")(
-        "gene-sql", "Write the deconvoluted spectra to an SQLite database.")(
+        "no-sql", "Do not write the deconvoluted spectra to an SQLite database.")(
         "output-dp-envs",
         "Dump the windowed candidate envelopes and DP-selected envelopes of "
         "each spectrum to win_envs.txt / dp_envs.txt (debugging).")(
@@ -305,8 +305,8 @@ bool Argument::parse(int argc, char* argv[]) {
       topfd_para_ptr_->setOutputMultipleMass(true);
     }
 
-    if (vm.count("gene-sql")) {
-      topfd_para_ptr_->setGeneSql(true);
+    if (vm.count("no-sql")) {
+      topfd_para_ptr_->setGeneSql(false);
     }
 
     if (vm.count("output-dp-envs")) {

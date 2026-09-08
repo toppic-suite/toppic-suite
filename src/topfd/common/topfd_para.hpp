@@ -186,7 +186,7 @@ class TopfdPara {
   double ms2_env_cnn_score_cutoff_ = 0.0;
   bool aa_num_based_filter_ = true;
   bool output_csv_feature_file_ = false;
-  bool gene_sql_ = false;
+  bool gene_sql_ = true;
   // set per input file from MzmlProfile::hasPrecWindow()
   bool file_prec_window_ = false;
 
