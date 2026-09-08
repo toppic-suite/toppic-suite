@@ -33,6 +33,7 @@ TopPIC Suite consists of six software tools for the analysis of top-down mass sp
 
 ```sh
 sudo apt-get update
+# build tools and libraries (Git LFS is needed for the model files under res/)
 sudo apt-get install build-essential cmake clang git git-lfs \
     zlib1g-dev libsqlite3-dev libpugixml-dev \
     libboost-filesystem-dev libboost-iostreams-dev libboost-thread-dev \
@@ -55,13 +56,8 @@ Notes:
 ### 2. Clone (with Git LFS)
 
 ```sh
-# Install Git LFS (the model files under res/ are stored with Git LFS)
-sudo apt-get install git-lfs
-# Then register the Git hooks/filters for your user
+# register the Git LFS hooks/filters for your user (one time per machine)
 git lfs install
-```
-
-```sh
 git clone https://github.com/toppic_suite/toppic_suite.git
 cd toppic_suite
 ```
