@@ -121,6 +121,7 @@ Parameters that apply to both MS1 and MS/MS deconvolution:
 | `-u`, `--thread-number <int>` | 1 | Number of threads. TopFD checks that the machine has enough memory for the requested number. |
 | `-o`, `--missing-level-one` | off | The file has no MS1 spectra: skip MS1 deconvolution and feature detection. |
 | `-N`, `--no-sql` | off | Do not write the `.sqlite` database. |
+| `-T`, `--text-peak-list` | off | The input is a text peak list (one MS/MS spectrum), not an mzML file; see section 2. |
 
 MS1 deconvolution and proteoform feature detection:
 
@@ -148,7 +149,6 @@ Advanced options (accepted but not shown by `-h`):
 
 | Option | Meaning |
 |---|---|
-| `-T`, `--text-peak-list` | The input is a text peak list, not an mzML file (see section 2). |
 | `-k`, `--keep` | Also report monoisotopic masses from low-quality envelopes. |
 | `-M`, `--multiple-mass` | Output several candidate monoisotopic masses per envelope for MS/MS spectra. |
 | `-O`, `--output-batmass-feature` | Also write the feature files in the BatMass CSV format. |

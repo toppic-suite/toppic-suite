@@ -146,7 +146,11 @@ bool Argument::parse(int argc, char* argv[]) {
         "thread-number,u", po::value<std::string>(&thread_number),
         "<a positive integer>. Number of threads used in spectral "
         "deconvolution. The default value is 1.")(
-        "no-sql,N", "Do not write the deconvoluted spectra to an SQLite database.");
+        "no-sql,N", "Do not write the deconvoluted spectra to an SQLite database.")(
+        "text-peak-list,T",
+        "Deconvolute a single MS/MS spectrum given as a text peak list: one "
+        "peak per line, m/z and intensity separated by a space. The output "
+        "files are named after the input file.");
 
     // Advanced options accepted on the command line but hidden from the help
     // message; the positional spectrum file argument is also hidden here.
@@ -166,7 +170,6 @@ bool Argument::parse(int argc, char* argv[]) {
         "keep,k",
         "Report monoisotopic masses extracted from low quality isotopic "
         "envelopes.")(
-        "text-peak-list,T", "Use a text file containing a mass list as the input.")(
         "output-batmass-feature,O",
         "Output a feature file in the BatMass CSV format.")(
         "spectrum-file-name",
