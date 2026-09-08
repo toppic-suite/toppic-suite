@@ -281,6 +281,28 @@ package, the compiler choice, how a library is located, the install layout —
 update the matching doc (and the README for Ubuntu) in the same commit; the
 docs are hand-written and nothing checks them against the build.
 
+## TopFD user manual (`doc/topfd_manual.md`)
+
+`doc/topfd_manual.md` is the user-facing manual for the `topfd` command line:
+its two functions (mzML/mzXML deconvolution, and `-T` text-peak-list
+deconvolution of a single MS/MS spectrum), the input requirements, every
+output file, and every option with its default — the visible ones in the
+tables of section 1.4 and the hidden ones (`-k`, `-M`, `-O`,
+`--max-miss-peak-num`, `--disable-filter-by-mz`, `--output-dp-envs`) in the
+"Advanced options" table. It was written from `console/topfd_argument.cpp`,
+`topfd/common/topfd_process.cpp`, `topfd/common/topfd_single_process.cpp` and
+the `msalign`/feature/env writers, and nothing checks it against the code, so:
+
+- When you add, rename, hide/unhide or change the default of an option in
+  `topfd_argument.cpp`, or change an output file name, format or the columns
+  of a writer, update the manual in the same commit. The option table there
+  mirrors the `-h` text; keep the two descriptions saying the same thing.
+- Do not document an option in the manual that the parser does not accept,
+  and do not put a `-T`-mode claim in section 2 without checking
+  `topfd_single_process.cpp` — that mode ignores the MS1/feature options.
+- The examples use no `-a`: the activation defaults to `FILE` (read from the
+  input), which is the recommended usage; keep new examples consistent.
+
 ## Source layout
 
 `src` is the include root, so headers are included by their path from `src`
@@ -306,6 +328,17 @@ above it, never the reverse:
   and `ecscore/env_coll <-> ecscore/score`. `deconv` constructs the
   `MzmlMsSqlWriter` (see the SQLite note) once per run, shared across its worker
   threads; it no longer writes per-scan JSON.
+  TopFD has two entry points, chosen in `console/topfd.cpp` by
+  `TopfdPara::isTextPeakList()` (`-T`): `topfd_process` deconvolutes
+  mzML/mzXML files (MS1 deconvolution → feature detection → MS/MS
+  deconvolution, one fraction per FAIMS voltage), and `topfd_single_process`
+  deconvolutes one MS/MS spectrum from a text peak list (`m/z intensity` per
+  line, space-separated) with `DeconvSingleSp`, writing `<input>_ms2.msalign`,
+  `<input>_ms2.env` and `<input>.sqlite`. **Both** name their outputs through
+  `TopfdPara::setMzmlFileNameAndFaims` (base name = input path minus
+  extension, `_<voltage>` appended for FAIMS; it also creates the SQLite
+  database when enabled) — do not hand-roll output names or a second
+  `createSqlDb` call in a driver.
 - `src/topdia` — the TopDIA pseudo-spectrum layer built on `topfd`/`ms`:
   `common` (`topdia_para` + `topdia_process`) and `pseudo_spec`
   (`mzrt_feature`, `pseudo_peak`, `pseudo_spectrum`, `generate_pseudo_spectrum`).
