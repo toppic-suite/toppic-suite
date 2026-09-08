@@ -62,6 +62,9 @@ std::string geneTopfdCommand(const TopfdParaPtr& para_ptr,
   if (para_ptr->isUseSingleScanNoiseLevel()) {
     command = command + "-i ";
   }
+  if (!para_ptr->isGeneSql()) {
+    command = command + "-N ";
+  }
   for (size_t i = 0; i < spec_file_lst.size(); i++) {
     command = command + spec_file_lst[i] + " ";
   }

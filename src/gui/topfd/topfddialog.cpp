@@ -129,6 +129,7 @@ void TopFDDialog::on_defaultButton_clicked() {
       !para_ptr->isSearchPrecWindow());
   ui->singleScanNoiseLevelCheckBox->setChecked(
       para_ptr->isUseSingleScanNoiseLevel());
+  ui->noSqlCheckBox->setChecked(!para_ptr->isGeneSql());
 
   ui->outputTextBrowser->clear();
   ui->outputTextBrowser->setText(
@@ -302,6 +303,7 @@ toppic::TopfdParaPtr TopFDDialog::getParaPtr() {
       (ui->disableAdditionalFeatureSearchCheckBox->isChecked()));
   para_ptr_->setUseSingleScanNoiseLevel(
       ui->singleScanNoiseLevelCheckBox->isChecked());
+  para_ptr_->setGeneSql(!ui->noSqlCheckBox->isChecked());
 
   return para_ptr_;
 }
@@ -329,6 +331,7 @@ void TopFDDialog::lockDialog() {
   ui->ecscoreCutoffEdit->setEnabled(false);
   ui->disableAdditionalFeatureSearchCheckBox->setEnabled(false);
   ui->singleScanNoiseLevelCheckBox->setEnabled(false);
+  ui->noSqlCheckBox->setEnabled(false);
 }
 
 void TopFDDialog::unlockDialog() {
@@ -355,6 +358,7 @@ void TopFDDialog::unlockDialog() {
   ui->ecscoreCutoffEdit->setEnabled(true);
   ui->disableAdditionalFeatureSearchCheckBox->setEnabled(true);
   ui->singleScanNoiseLevelCheckBox->setEnabled(true);
+  ui->noSqlCheckBox->setEnabled(true);
 }
 
 bool TopFDDialog::checkError() {
