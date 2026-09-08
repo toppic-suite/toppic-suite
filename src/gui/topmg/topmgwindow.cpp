@@ -20,6 +20,7 @@
 #include <QDesktopServices>
 #include <QElapsedTimer>
 #include <QFileDialog>
+#include <QFontDatabase>
 #include <QMessageBox>
 #include <QRegularExpression>
 #include <QRegularExpressionValidator>
@@ -60,9 +61,11 @@ TopmgWindow::TopmgWindow(QWidget* parent)
   tableFont.setFamily(QStringLiteral("Calibri"));
   outputFont.setFamily(QStringLiteral("Consolas"));
 #else
-  font.setFamily(QStringLiteral("Monospace"));
-  tableFont.setFamily(QStringLiteral("Monospace"));
-  outputFont.setFamily(QStringLiteral("Monospace"));
+  const QString monoFamily =
+      QFontDatabase::systemFont(QFontDatabase::FixedFont).family();
+  font.setFamily(monoFamily);
+  tableFont.setFamily(monoFamily);
+  outputFont.setFamily(monoFamily);
 #endif
   font.setPixelSize(12);
   QApplication::setFont(font);

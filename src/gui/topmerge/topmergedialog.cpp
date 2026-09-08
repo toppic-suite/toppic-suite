@@ -19,6 +19,7 @@
 #include <QDesktopServices>
 #include <QElapsedTimer>
 #include <QFileDialog>
+#include <QFontDatabase>
 #include <QMessageBox>
 #include <map>
 #include <sstream>
@@ -44,7 +45,9 @@ TopMergeDialog::TopMergeDialog(QWidget* parent)
     defined(__MINGW64__)
   font.setFamily(QStringLiteral("Calibri"));
 #else
-  font.setFamily(QStringLiteral("Monospace"));
+  const QString monoFamily =
+      QFontDatabase::systemFont(QFontDatabase::FixedFont).family();
+  font.setFamily(monoFamily);
 #endif
   font.setPixelSize(12);
   QApplication::setFont(font);

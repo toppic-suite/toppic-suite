@@ -19,6 +19,7 @@
 #include <QDesktopServices>
 #include <QElapsedTimer>
 #include <QFileDialog>
+#include <QFontDatabase>
 #include <QMessageBox>
 #include <QScrollBar>
 #include <sstream>
@@ -46,8 +47,10 @@ TopDiffDialog::TopDiffDialog(QWidget* parent)
   font.setFamily(QStringLiteral("Calibri"));
   outputFont.setFamily(QStringLiteral("Consolas"));
 #else
-  font.setFamily(QStringLiteral("Monospace"));
-  outputFont.setFamily(QStringLiteral("Monospace"));
+  const QString monoFamily =
+      QFontDatabase::systemFont(QFontDatabase::FixedFont).family();
+  font.setFamily(monoFamily);
+  outputFont.setFamily(monoFamily);
 #endif
   font.setPixelSize(12);
   outputFont.setPixelSize(12);
