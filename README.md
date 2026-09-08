@@ -25,30 +25,7 @@ TopPIC Suite consists of six software tools for the analysis of top-down mass sp
 * Boost version >= 1.74 (filesystem, iostreams, thread, chrono, system, serialization, program_options)
 * pugixml, SQLite3 and zlib development libraries
 * Qt6 (Core, Gui, Widgets) for the GUI tools
-* Git LFS (see below)
-
-### Git LFS is required
-
-Some of the runtime resources under `res/` are large binary/data blobs
-and are stored with [Git LFS](https://git-lfs.com/) rather than in the normal
-Git history:
-
-- `res/envcnn_models/*.onnx`, `res/ecscore_models/*.onnx` — the
-  EnvCNN / ECScore neural-network models.
-- `res/base_data/theo_patt.txt` — the theoretical isotope-pattern table.
-
-You **must** have Git LFS installed to get the real files. Without it, a plain
-`git clone` leaves small text *pointer* files in their place, and the build /
-the tools will fail to load the models and tables.
-
-#### Install Git LFS (one time per machine)
-
-```sh
-# Debian/Ubuntu
-sudo apt-get install git-lfs
-# Then register the Git hooks/filters for your user
-git lfs install
-```
+* Git LFS for some runtime resources under `res/`
 
 ## Building on Ubuntu Linux
 
@@ -75,12 +52,22 @@ Notes:
 - Other third-party code (htslib, ProteoWizard, ONNX Runtime) is vendored
   under `ext/` and built/linked automatically — no packages needed.
 
-### 2. Clone (with Git LFS — see above)
+### 2. Clone (with Git LFS)
+
+```sh
+# Install Git LFS (the model files under res/ are stored with Git LFS)
+sudo apt-get install git-lfs
+# Then register the Git hooks/filters for your user
+git lfs install
+```
 
 ```sh
 git clone https://github.com/toppic_suite/toppic_suite.git
 cd toppic_suite
 ```
+
+If the clone was made before installing Git LFS, run `git lfs pull` inside the
+repository to replace the LFS pointer files with the real model files.
 
 ### 3. Configure and build
 
