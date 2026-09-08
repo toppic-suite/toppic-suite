@@ -59,8 +59,8 @@ the integer voltage is appended to the output file names (see 1.3).
 # max charge 30, max mass 50,000 Da, m/z error 0.02, 1 thread
 topfd sample.mzML
 
-# several files, 8 threads, HCD fragmentation for all MS/MS spectra
-topfd -u 8 -a HCD sample_1.mzML sample_2.mzML
+# several files, 8 threads
+topfd -u 8 sample_1.mzML sample_2.mzML
 ```
 
 For each file TopFD prints the parameters it uses, then runs three steps:
@@ -159,8 +159,8 @@ Advanced options (accepted but not shown by `-h`):
 ### 1.5 Examples
 
 ```sh
-# Thermo HCD data, 16 threads, no SQLite database
-topfd -a HCD -u 16 -N sample.mzML
+# 16 threads, no SQLite database
+topfd -u 16 -N sample.mzML
 
 # Low-mass proteins: limit charge and mass to speed up deconvolution
 topfd -c 20 -m 30000 sample.mzML
@@ -168,8 +168,8 @@ topfd -c 20 -m 30000 sample.mzML
 # Stricter features: at least 2 MS1 scans and ECScore >= 0.5
 topfd -b 2 -t 0.5 sample.mzML
 
-# MS/MS-only file (no MS1 scans), ETD fragmentation
-topfd -o -a ETD sample.mzML
+# MS/MS-only file (no MS1 scans)
+topfd -o sample.mzML
 ```
 
 After TopFD finishes, `sample_ms2.msalign` (with `sample_ms1.msalign` and the
