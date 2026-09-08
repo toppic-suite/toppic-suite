@@ -16,6 +16,15 @@ xcode-select --install
 Then install Homebrew by following the instructions on
 [brew.sh](https://brew.sh/) if it is not installed yet.
 
+On Apple Silicon Macs, Homebrew installs into `/opt/homebrew`, which is not on
+the default `PATH`. If `brew` is not found after the installation, add it to
+the shell start-up file (zsh is the default shell on macOS):
+
+```sh
+echo 'export PATH="/opt/homebrew/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+```
+
 ## 2. Install the required packages
 
 ```sh
