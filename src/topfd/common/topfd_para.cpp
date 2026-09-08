@@ -200,6 +200,7 @@ std::string TopfdPara::getTopfdParaStr(const std::string& prefix,
   kv("Maximum monoisotopic mass:") << max_mass_ << " Dalton" << std::endl;
   kv("Peak m/z error tolerance:") << mz_error_ << " m/z" << std::endl;
   kv("Thread number:") << thread_num_ << std::endl;
+  kv("SQLite database output:") << (gene_sql_ ? "Yes" : "No") << std::endl;
 
   if (missing_level_one_) {
     kv("Miss MS1 spectra:") << "Yes" << std::endl;
