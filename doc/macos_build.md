@@ -38,6 +38,15 @@ Notes:
   `-DCMAKE_PREFIX_PATH="$(brew --prefix qt)"` to `cmake`.
 - The other third-party code (htslib, ProteoWizard) is vendored under `ext/`
   and built automatically.
+- [Git LFS](https://git-lfs.com/) is required: the EnvCNN / ECScore model
+  files and the isotope-pattern table under `res/` are stored with Git LFS,
+  and without it `git clone` leaves small text pointer files in their place.
+  It is installed by the `brew install git-lfs` above; then register the Git
+  hooks/filters for your user (one time per machine):
+
+  ```sh
+  git lfs install
+  ```
 
 ## 3. Clone the source code
 

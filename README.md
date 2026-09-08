@@ -46,8 +46,6 @@ the tools will fail to load the models and tables.
 ```sh
 # Debian/Ubuntu
 sudo apt-get install git-lfs
-# macOS (Homebrew)
-brew install git-lfs
 # Then register the Git hooks/filters for your user
 git lfs install
 ```
