@@ -70,8 +70,8 @@ MzmlMsSqlWriter::MzmlMsSqlWriter(sqlite3* sql_db) : sql_db_(sql_db) {
                            "intensity) VALUES (?, ?, ?, ?);");
   ms1_env_stmt_ = prepare(
       sql_db_,
-      "INSERT INTO ms1_env(spec_id, env_id, mono_mass, charge, intensity, "
-      "envcnn_score, peak_num) VALUES (?, ?, ?, ?, ?, ?, ?);");
+      "INSERT INTO ms1_env(spec_id, env_id, mono_mass, ref_mass, charge, "
+      "intensity, envcnn_score, peak_num) VALUES (?, ?, ?, ?, ?, ?, ?, ?);");
   ms1_env_peak_stmt_ = prepare(
       sql_db_,
       "INSERT INTO ms1_env_peak(spec_id, env_id, peak_id, mz, intensity) "
@@ -86,8 +86,8 @@ MzmlMsSqlWriter::MzmlMsSqlWriter(sqlite3* sql_db) : sql_db_(sql_db) {
                            "intensity) VALUES (?, ?, ?, ?);");
   ms2_env_stmt_ = prepare(
       sql_db_,
-      "INSERT INTO ms2_env(spec_id, env_id, mono_mass, charge, intensity, "
-      "envcnn_score, peak_num) VALUES (?, ?, ?, ?, ?, ?, ?);");
+      "INSERT INTO ms2_env(spec_id, env_id, mono_mass, ref_mass, charge, "
+      "intensity, envcnn_score, peak_num) VALUES (?, ?, ?, ?, ?, ?, ?, ?);");
   ms2_env_peak_stmt_ = prepare(
       sql_db_,
       "INSERT INTO ms2_env_peak(spec_id, env_id, peak_id, mz, intensity) "
@@ -159,10 +159,12 @@ void MzmlMsSqlWriter::writeMs1(const MzmlMsPtr& ms_ptr,
     sqlite3_bind_int(ms1_env_stmt_, 1, spec_id);
     sqlite3_bind_int(ms1_env_stmt_, 2, static_cast<int>(i));
     sqlite3_bind_double(ms1_env_stmt_, 3, theo_env->getMonoNeutralMass());
-    sqlite3_bind_int(ms1_env_stmt_, 4, theo_env->getCharge());
-    sqlite3_bind_double(ms1_env_stmt_, 5, theo_env->compInteSum());
-    sqlite3_bind_double(ms1_env_stmt_, 6, envs[i]->getEnvcnnScore());
-    sqlite3_bind_int(ms1_env_stmt_, 7, peak_num);
+    // Neutral mass of the reference (most abundant) isotopic peak.
+    sqlite3_bind_double(ms1_env_stmt_, 4, theo_env->getReferNeutralMass());
+    sqlite3_bind_int(ms1_env_stmt_, 5, theo_env->getCharge());
+    sqlite3_bind_double(ms1_env_stmt_, 6, theo_env->compInteSum());
+    sqlite3_bind_double(ms1_env_stmt_, 7, envs[i]->getEnvcnnScore());
+    sqlite3_bind_int(ms1_env_stmt_, 8, peak_num);
     stepAndReset(ms1_env_stmt_);
 
     for (int k = 0; k < peak_num; k++) {
@@ -222,10 +224,12 @@ void MzmlMsSqlWriter::writeMs2(const MzmlMsPtr& ms_ptr,
     sqlite3_bind_int(ms2_env_stmt_, 1, spec_id);
     sqlite3_bind_int(ms2_env_stmt_, 2, static_cast<int>(i));
     sqlite3_bind_double(ms2_env_stmt_, 3, theo_env->getMonoNeutralMass());
-    sqlite3_bind_int(ms2_env_stmt_, 4, theo_env->getCharge());
-    sqlite3_bind_double(ms2_env_stmt_, 5, theo_env->compInteSum());
-    sqlite3_bind_double(ms2_env_stmt_, 6, envs[i]->getEnvcnnScore());
-    sqlite3_bind_int(ms2_env_stmt_, 7, peak_num);
+    // Neutral mass of the reference (most abundant) isotopic peak.
+    sqlite3_bind_double(ms2_env_stmt_, 4, theo_env->getReferNeutralMass());
+    sqlite3_bind_int(ms2_env_stmt_, 5, theo_env->getCharge());
+    sqlite3_bind_double(ms2_env_stmt_, 6, theo_env->compInteSum());
+    sqlite3_bind_double(ms2_env_stmt_, 7, envs[i]->getEnvcnnScore());
+    sqlite3_bind_int(ms2_env_stmt_, 8, peak_num);
     stepAndReset(ms2_env_stmt_);
 
     for (int k = 0; k < peak_num; k++) {
