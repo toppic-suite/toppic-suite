@@ -303,6 +303,39 @@ the `msalign`/feature/env writers, and nothing checks it against the code, so:
 - The examples use no `-a`: the activation defaults to `FILE` (read from the
   input), which is the recommended usage; keep new examples consistent.
 
+## Envelope refinement and the core-peak intensity fit (`ms/env/match_env_refine`)
+
+After the DP stage, `DeconvSingleSp::postprocess` calls
+`match_env_refine::mzRefine`, which regenerates each envelope's theoretical
+distribution from its reference peak and rescales it to the experimental
+peaks. It is two-stage, and the split is deliberate (issue 532):
+
+1. **Monoisotopic choice** (current / previous / next isotope) uses the
+   whole-envelope distance, unchanged from the original code. A core-only
+   choice was tried and matched no more theoretical b/y fragments of horse
+   myoglobin on a test MS/MS spectrum, so do not "simplify" stage 2's core
+   into stage 1.
+2. **Intensity ratio** of the chosen distribution is refit on the **core
+   peaks only**: theoretical intensity >= `EnvPara::refine_core_ratio_`
+   (0.5) x the reference peak, and present in the experimental envelope;
+   fewer than 3 such peaks -> whole envelope (small envelopes unchanged).
+   `compDistWithNorm`/`compDist` take an index list (empty = all peaks).
+   Fitting every peak let tails inflated by overlapping neighbouring
+   envelopes drag the ratio up, leaving theoretical apexes far above the
+   observed ones (1.58x on the 16896 Da envelope near m/z 891 of
+   `~/code/mms/data/myoglobin_peaks.txt`).
+
+The theoretical intensities set here are what reach the outputs: the
+`msalign` intensity per mass is the theoretical envelope's intensity sum,
+the `.env` file's `THEO_INTE` column, and the SQLite `ms1_env`/`ms2_env`
+rows. `assignIntensity` (called before `mzRefine` and again after sorting)
+only splits an experimental peak among envelopes that share it; it never
+changes theoretical intensities. When touching any of this, validate with
+`topfd -T -d` on the myoglobin peak list: compare the deconvoluted masses
+against the sequence's b/y ions (46 exact / 14 off-by-one-isotope is the
+reference), and count envelopes whose theoretical apex exceeds the observed
+apex by > 20% (77 of 611 before the core fit, 1 after).
+
 ## Source layout
 
 `src` is the include root, so headers are included by their path from `src`

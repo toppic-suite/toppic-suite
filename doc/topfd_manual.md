@@ -249,6 +249,13 @@ lines of one envelope share the same `THEO_MONO_MASS` and `THEO_CHARGE`, so
 the table can be grouped by those columns to see which input peaks make up
 each reported mass.
 
+The theoretical intensities (`THEO_INTE`, and `THEO_INTE_SUM`, which is also
+the intensity reported in the `msalign` file) are scaled to the envelope's
+core peaks, the most abundant isotopic peaks around the reference peak. Where
+isotopic envelopes overlap, the observed intensities in an envelope's tails
+can therefore be higher than the theoretical ones; the surplus belongs to
+the neighbouring envelope.
+
 ### 2.4 Example
 
 ```sh
