@@ -160,7 +160,7 @@ DeconvSingleSp::DeconvSingleSp(const TopfdParaPtr& topfd_para_ptr,
 void DeconvSingleSp::postprocess(MatchEnvPtrVec& dp_envs, int ms_level) {
   // assign intensity
   PeakPtrVec peak_list = data_ptr_->getPeakList();
-  //match_env_util::assignIntensity(peak_list, dp_envs);
+  match_env_util::assignIntensity(peak_list, dp_envs);
 
   // refinement
   match_env_refine::mzRefine(dp_envs);
@@ -195,7 +195,7 @@ void DeconvSingleSp::postprocess(MatchEnvPtrVec& dp_envs, int ms_level) {
               MatchEnv::cmpEnvcnnScoreDec);
   }
   // reassign intensity
-  //match_env_util::assignIntensity(peak_list, result_envs_);
+  match_env_util::assignIntensity(peak_list, result_envs_);
 
   // if output multiple masses sharing the same envelope
   if (topfd_para_ptr_->isOutputMultipleMass()) {
