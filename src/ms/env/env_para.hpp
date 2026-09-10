@@ -90,6 +90,17 @@ class EnvPara {
   double bgn_ratio_ = 0.8;
   double end_ratio_ = 1.2;
 
+  // match_env_refine::mzRefine regenerates each envelope's theoretical
+  // distribution, picks its monoisotopic position on the whole envelope, and
+  // then rescales it by fitting the intensity ratio to the experimental
+  // peaks. Only the "core" peaks take part in that intensity fit:
+  // theoretical intensity >= refine_core_ratio_ * the reference-peak
+  // intensity, and present in the experimental envelope. Fitting the whole
+  // envelope let tails inflated by overlapping neighbouring envelopes pull
+  // the scale up (theoretical apex well above the observed one). 0 fits all
+  // peaks (the old behaviour).
+  double refine_core_ratio_ = 0.5;
+
   // maximum m/z error used in msdeconv score computation of match envelopes.
   double score_error_tolerance_ = 0.02;
   // minimum score for matching envelopes

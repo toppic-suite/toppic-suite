@@ -163,7 +163,7 @@ void DeconvSingleSp::postprocess(MatchEnvPtrVec& dp_envs, int ms_level) {
   match_env_util::assignIntensity(peak_list, dp_envs);
 
   // refinement
-  match_env_refine::mzRefine(dp_envs);
+  match_env_refine::mzRefine(dp_envs, env_para_ptr_->refine_core_ratio_);
   result_envs_ = dp_envs;
 
   if (topfd_para_ptr_->isKeepUnusedPeaks()) {
