@@ -382,7 +382,7 @@ toppic_console_exe(topdiff
   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdiff_argument.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdiff_process.cpp)
 # ms_sql_converter (MS1 peaks -> SQLite for the 3D visualization) parses its
-# few options inline; the conversion lives in src/sql/ms_sql.
+# few options inline; the conversion lives in src/sql/ms_sql (ms_sql_util).
 toppic_console_exe(ms_sql_converter
   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/ms_sql_converter.cpp)
 

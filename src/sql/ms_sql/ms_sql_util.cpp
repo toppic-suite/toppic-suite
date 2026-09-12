@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "sql/ms_sql/ms_sql_converter.hpp"
+#include "sql/ms_sql/ms_sql_util.hpp"
 
 #include <cstddef>
 #include <iostream>
@@ -30,7 +30,7 @@
 
 namespace toppic {
 
-namespace ms_sql_converter {
+namespace ms_sql_util {
 
 std::string getDbFileName(const std::string& spec_file_name) {
   return file_util::basename(spec_file_name) + "_3d.db";
@@ -81,6 +81,6 @@ void convert(const std::string& spec_file_name, double mz_size,
   std::cout << "Writing " << db_file_name << " - finished." << std::endl;
 }
 
-}  // namespace ms_sql_converter
+}  // namespace ms_sql_util
 
 }  // namespace toppic

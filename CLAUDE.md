@@ -349,7 +349,7 @@ above it, never the reverse:
 - `src/common` — foundation: `base`, `util`, `xml`, `thread`.
 - `src/sql` — thin SQLite helper (`sql_util`) plus `ms_sql`, the
   MS1-peaks-to-SQLite backend of the `ms_sql_converter` tool (a 3D
-  visualization database): `ms_sql_converter` reads the MS1 peaks of an
+  visualization database): `ms_sql_util::convert` reads the MS1 peaks of an
   mzML/mzXML file with pwiz, and `MsSqlWriter` writes them as `PEAKS0` (all
   peaks) plus down-sampled `PEAKS1..n` layer tables, one `CONFIG` row per
   layer, and a colour bucket per peak. `MsSqlWriter` owns its connection (it

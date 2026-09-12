@@ -13,14 +13,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TOPPIC_SQL_MS_SQL_MS_SQL_CONVERTER_HPP_
-#define TOPPIC_SQL_MS_SQL_MS_SQL_CONVERTER_HPP_
+#ifndef TOPPIC_SQL_MS_SQL_MS_SQL_UTIL_HPP_
+#define TOPPIC_SQL_MS_SQL_MS_SQL_UTIL_HPP_
 
 #include <string>
 
 namespace toppic {
 
-namespace ms_sql_converter {
+namespace ms_sql_util {
 
 // The database written for a spectrum file: the file name with its extension
 // replaced by _3d.db.
@@ -32,7 +32,7 @@ std::string getDbFileName(const std::string& spec_file_name);
 void convert(const std::string& spec_file_name, double mz_size,
              double rt_divider);
 
-}  // namespace ms_sql_converter
+}  // namespace ms_sql_util
 
 }  // namespace toppic
 

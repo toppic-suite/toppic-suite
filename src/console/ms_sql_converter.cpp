@@ -20,7 +20,7 @@
 #include <boost/program_options.hpp>
 
 #include "common/util/version.hpp"
-#include "sql/ms_sql/ms_sql_converter.hpp"
+#include "sql/ms_sql/ms_sql_util.hpp"
 #include "sql/ms_sql/ms_sql_writer.hpp"
 
 namespace {
@@ -85,7 +85,7 @@ int main(int argc, char* argv[]) {
   std::cout << "ms_sql_converter " << toppic::Version::getVersion()
             << std::endl;
   try {
-    toppic::ms_sql_converter::convert(spec_file_name, mz_size, rt_divider);
+    toppic::ms_sql_util::convert(spec_file_name, mz_size, rt_divider);
   } catch (const std::exception& e) {
     std::cerr << "ERROR: " << e.what() << std::endl;
     return 1;
