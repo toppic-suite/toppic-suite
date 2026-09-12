@@ -45,6 +45,11 @@ std::string geneTopdiaCommand(const TopfdParaPtr& topfd_para_ptr,
                               const TopdiaParaPtr& todia_para_ptr,
                               const std::vector<std::string> spec_file_lst);
 
+std::string geneTopSqlConverterCommand(const std::string& exe_dir,
+                                       const std::string& spec_file_name,
+                                       const std::string& mz_size,
+                                       const std::string& rt_divider);
+
 }  // namespace command
 }  // namespace toppic
 #endif
