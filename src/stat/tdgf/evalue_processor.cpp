@@ -100,7 +100,8 @@ void EValueProcessor::process(bool is_separate) {
   double ppo = sp_para_ptr->getPeakTolerancePtr()->getPpo();
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
   MsAlignReaderPtr reader_ptr = std::make_shared<MsAlignReader>(
-      sp_file_name, group_spec_num, sp_para_ptr->getActivationPtr());
+      sp_file_name, group_spec_num, sp_para_ptr->getActivationPtr(),
+      sp_para_ptr->getEnvCnnCutoff());
 
   PrsmXmlWriterPtrVec writer_ptr_vec = prsm_xml_writer_util::geneWriterPtrVec(
       output_file_name, mng_ptr_->thread_num_);
@@ -126,7 +127,8 @@ void EValueProcessor::process(bool is_separate) {
           prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
         }
         if (checkPrsms(selected_prsm_ptrs)) {
-          while (pool_ptr->getQueueSize() >= static_cast<std::size_t>(mng_ptr_->thread_num_) + 2) {
+          while (pool_ptr->getQueueSize() >=
+                 static_cast<std::size_t>(mng_ptr_->thread_num_) + 2) {
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
           }
           pool_ptr->enqueue(geneTask(spec_set_ptr, selected_prsm_ptrs, ppo,

@@ -131,7 +131,8 @@ void OnePtmSearchProcessor::process() {
 
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
   MsAlignReaderPtr msalign_reader_ptr = std::make_shared<MsAlignReader>(
-      sp_file_name, group_spec_num, sp_para_ptr->getActivationPtr());
+      sp_file_name, group_spec_num, sp_para_ptr->getActivationPtr(),
+      sp_para_ptr->getEnvCnnCutoff());
   int cnt = 0;
   DeconvMsPtrVec deconv_ms_ptr_vec = msalign_reader_ptr->getNextMsPtrVec();
   std::vector<double> prec_error_vec =

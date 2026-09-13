@@ -44,6 +44,7 @@ std::map<std::string, std::string> TopmgArgument::initArguments() {
   arguments["fixedMod"] = "";
   arguments["shiftNumber"] = "0";
   arguments["massErrorTolerance"] = "10";
+  arguments["envCnnCutoff"] = "0.2";
   arguments["proteoformPpmError"] = "false";
   arguments["proteoformErrorTolerance"] = "1.2";
   arguments["cutoffSpectralType"] = "EVALUE";
@@ -179,6 +180,8 @@ void TopmgArgument::outputArguments(
   output << std::setw(gap) << std::left
          << "Error tolerance for matching masses:" << sep
          << arguments["massErrorTolerance"] << " ppm" << std::endl;
+  output << std::setw(gap) << std::left << "EnvCNN score cutoff:" << sep
+         << arguments["envCnnCutoff"] << std::endl;
   output << std::setw(gap) << std::left
          << "Error tolerance for identifying PrSM clusters:" << sep
          << arguments["proteoformErrorTolerance"] << " Da" << std::endl;
@@ -229,6 +232,7 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
   std::string allow_mod = "";
   std::string shift_num = "";
   std::string mass_error_tole = "";
+  std::string env_cnn_cutoff = "";
   std::string form_error_tole = "";
   std::string max_shift_mass = "";
   std::string cutoff_spectral_type = "";
@@ -279,6 +283,10 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
                   po::value<std::string>(&mass_error_tole),
                   "<a positive integer>. Error tolerance for precursor and "
                   "fragment masses in PPM. Default value: 10.")(
+        "filter-by-env-cnn,F", po::value<std::string>(&env_cnn_cutoff),
+        "<a number between 0 and 1>. Remove the deconvoluted masses whose "
+        "EnvCNN score is below the cutoff before spectral filtering, "
+        "database search and E-value computation. Default value: 0.2.")(
         "proteoform-error-tolerance,p",
         po::value<std::string>(&form_error_tole),
         "<a positive number>. Error tolerance for identifying PrSM clusters "
@@ -342,11 +350,12 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
         "fixed-mod,f", po::value<std::string>(&fixed_mod), "")(
         "n-terminal-form,n", po::value<std::string>(&allow_mod), "")(
         "decoy,d", "")("mass-error-tolerance,e",
-                       po::value<std::string>(&mass_error_tole),
-                       "")("proteoform-ppm-error,E", "")(
-        "proteoform-error-tolerance,p",
-        po::value<std::string>(&form_error_tole),
-        "")("max-shift,M", po::value<std::string>(&max_shift_mass), "")(
+                       po::value<std::string>(&mass_error_tole), "")(
+        "filter-by-env-cnn,F", po::value<std::string>(&env_cnn_cutoff), "")(
+        "proteoform-ppm-error,E", "")("proteoform-error-tolerance,p",
+                                      po::value<std::string>(&form_error_tole),
+                                      "")(
+        "max-shift,M", po::value<std::string>(&max_shift_mass), "")(
         "spectrum-cutoff-type,t", po::value<std::string>(&cutoff_spectral_type),
         "")("spectrum-cutoff-value,v",
             po::value<std::string>(&cutoff_spectral_value),
@@ -358,9 +367,9 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
                         po::value<std::string>(&cutoff_protein_type), "")(
         "protein-cutoff-value,Y", po::value<std::string>(&cutoff_protein_value),
         "")("filtering-result-number",
-                        po::value<std::string>(&filtering_result_num),
-                        "Filtering result number. Default value: 20.")(
-        "full-binary-path,b", "Full binary path.")(
+            po::value<std::string>(&filtering_result_num),
+            "Filtering result number. Default value: 20.")("full-binary-path,b",
+                                                           "Full binary path.")(
         "mod-file-name,i", po::value<std::string>(&var_mod_file_name), "")(
         "thread-number,u", po::value<std::string>(&thread_number), "")(
         "no-topfd-feature,x", "")(
@@ -459,6 +468,10 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
 
     if (vm.count("mass-error-tolerance")) {
       arguments_["massErrorTolerance"] = mass_error_tole;
+    }
+
+    if (vm.count("filter-by-env-cnn")) {
+      arguments_["envCnnCutoff"] = env_cnn_cutoff;
     }
 
     if (vm.count("proteoform-ppm-error")) {
@@ -792,6 +805,21 @@ bool TopmgArgument::validateArguments() {
   } catch (int e) {
     LOG_ERROR("Mass error tolerance: " << mass_error_tole_value
                                        << " should be a number.");
+    return false;
+  }
+
+  std::string env_cnn_cutoff_value = arguments_["envCnnCutoff"];
+  try {
+    double cutoff = std::stod(env_cnn_cutoff_value);
+    if (cutoff < 0 || cutoff > 1) {
+      LOG_ERROR("EnvCNN score cutoff: "
+                << env_cnn_cutoff_value
+                << " error! The value should be between 0 and 1.");
+      return false;
+    }
+  } catch (const std::exception& ex) {
+    LOG_ERROR("EnvCNN score cutoff: " << env_cnn_cutoff_value
+                                      << " should be a number.");
     return false;
   }
 

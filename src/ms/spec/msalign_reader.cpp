@@ -50,6 +50,13 @@ MsAlignReader::MsAlignReader(const std::string& file_name, int group_spec_num,
   }
 }
 
+MsAlignReader::MsAlignReader(const std::string& file_name, int group_spec_num,
+                             const ActivationPtr& activation_ptr,
+                             double env_cnn_cutoff)
+    : MsAlignReader(file_name, group_spec_num, activation_ptr) {
+  env_cnn_cutoff_ = env_cnn_cutoff;
+}
+
 MsAlignReader::~MsAlignReader() {
   if (input_.is_open()) {
     input_.close();
@@ -225,9 +232,11 @@ void MsAlignReader::readNext() {
       if (strs.size() > 3) {
         score = std::stod(strs[3]);
       }
-      DeconvPeakPtr peak_ptr = std::make_shared<DeconvPeak>(
-          spec_id, peak_id, mass, inte, charge, score);
-      peak_ptr_list.push_back(peak_ptr);
+      if (score >= env_cnn_cutoff_) {
+        DeconvPeakPtr peak_ptr = std::make_shared<DeconvPeak>(
+            spec_id, peak_id, mass, inte, charge, score);
+        peak_ptr_list.push_back(peak_ptr);
+      }
       peak_id++;
     }
   }

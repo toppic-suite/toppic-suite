@@ -84,6 +84,9 @@ PrsmPara::PrsmPara(const std::map<std::string, std::string>& arguments) {
   }
   sp_para_ptr_ =
       std::make_shared<SpPara>(activation_name, n_term_label_mass, ppm);
+  if (getArg(arguments, "envCnnCutoff") != "") {
+    sp_para_ptr_->setEnvCnnCutoff(std::stod(getArg(arguments, "envCnnCutoff")));
+  }
 }
 
 bool PrsmPara::allowProtType(const ProteoformTypePtr& type_ptr) const {

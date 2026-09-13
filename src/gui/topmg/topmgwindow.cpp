@@ -43,13 +43,15 @@ TopmgWindow::TopmgWindow(QWidget* parent)
   this->setWindowTitle(qstr);
   lastDir_ = ".";
   QRegularExpression rx1("^\\d{1,8}\\.\\d{0,2}$");
-  QRegularExpressionValidator* validator1 = new QRegularExpressionValidator(rx1, this);
+  QRegularExpressionValidator* validator1 =
+      new QRegularExpressionValidator(rx1, this);
   ui->maxModEdit->setValidator(validator1);
   ui->cutoffSpectralValueEdit->setValidator(validator1);
   ui->cutoffProteoformValueEdit->setValidator(validator1);
   ui->cutoffProteinValueEdit->setValidator(validator1);
   ui->threadNumberEdit->setValidator(new QIntValidator(0, 2147483647, this));
   ui->errorToleranceEdit->setValidator(new QIntValidator(0, 2147483647, this));
+  ui->envCnnCutoffEdit->setValidator(new QDoubleValidator(0, 1, 4, this));
   ui->formErrorToleranceEdit->setValidator(
       new QDoubleValidator(0, 2147483647, 4, this));
 
@@ -108,6 +110,8 @@ void TopmgWindow::on_defaultButton_clicked() {
 
   ui->errorToleranceEdit->setText(
       QString::fromStdString(arguments_["massErrorTolerance"]));
+  ui->envCnnCutoffEdit->setText(
+      QString::fromStdString(arguments_["envCnnCutoff"]));
   ui->formErrorToleranceEdit->setText(
       QString::fromStdString(arguments_["proteoformErrorTolerance"]));
   ui->maxModEdit->setText(QString::fromStdString(arguments_["maxShiftMass"]));
@@ -279,6 +283,7 @@ std::map<std::string, std::string> TopmgWindow::getArguments() {
       ui->numUnknownShiftComboBox->currentText().toStdString();
   arguments_["massErrorTolerance"] =
       ui->errorToleranceEdit->text().toStdString();
+  arguments_["envCnnCutoff"] = ui->envCnnCutoffEdit->text().toStdString();
   arguments_["proteoformErrorTolerance"] =
       ui->formErrorToleranceEdit->text().toStdString();
   arguments_["cutoffSpectralType"] =
@@ -412,6 +417,7 @@ void TopmgWindow::lockDialog() {
   ui->fixedModFileEdit->setEnabled(false);
   ui->fixedModFileButton->setEnabled(false);
   ui->errorToleranceEdit->setEnabled(false);
+  ui->envCnnCutoffEdit->setEnabled(false);
   ui->formErrorToleranceEdit->setEnabled(false);
   ui->maxModEdit->setEnabled(false);
   ui->cutoffSpectralValueEdit->setEnabled(false);
@@ -455,6 +461,7 @@ void TopmgWindow::unlockDialog() {
   }
   ui->fixedModFileEdit->setEnabled(true);
   ui->errorToleranceEdit->setEnabled(true);
+  ui->envCnnCutoffEdit->setEnabled(true);
   ui->formErrorToleranceEdit->setEnabled(true);
   ui->maxModEdit->setEnabled(true);
   ui->cutoffSpectralValueEdit->setEnabled(true);
@@ -541,6 +548,11 @@ bool TopmgWindow::checkError() {
     QMessageBox::warning(this, tr("Warning"),
                          tr("Mass error tolerance is empty!"),
                          QMessageBox::Yes);
+    return true;
+  }
+  if (ui->envCnnCutoffEdit->text().isEmpty()) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("EnvCNN score cutoff is empty!"), QMessageBox::Yes);
     return true;
   }
   if (ui->formErrorToleranceEdit->text().isEmpty()) {
@@ -733,8 +745,7 @@ void TopmgWindow::on_cutoffProteoformTypeComboBox_currentIndexChanged(
   }
 }
 
-void TopmgWindow::on_cutoffProteinTypeComboBox_currentIndexChanged(
-    int index) {
+void TopmgWindow::on_cutoffProteinTypeComboBox_currentIndexChanged(int index) {
   if (index == 1 && !ui->decoyCheckBox->isChecked()) {
     QMessageBox::warning(this, tr("Warning"),
                          tr("To use an FDR cutoff, the checkbox \"decoy "

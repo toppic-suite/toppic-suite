@@ -729,6 +729,38 @@ level:</string>
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="horizontalLayoutWidget_envcnn">
+      <property name="geometry">
+       <rect>
+        <x>490</x>
+        <y>190</y>
+        <width>294</width>
+        <height>33</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_envcnn">
+       <item>
+        <widget class="QLabel" name="label_envCnn">
+         <property name="minimumSize">
+          <size>
+           <width>160</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>EnvCNN score cutoff:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="envCnnCutoffEdit">
+         <property name="text">
+          <string>0.2</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </widget>
     <widget class="QWidget" name="tab_2">
      <attribute name="title">

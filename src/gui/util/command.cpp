@@ -184,6 +184,7 @@ std::map<std::string, std::string> toppic_para{
     {"keepDecoyResults", "-K "},
     {"combinedOutputName", "-c "},
     {"massErrorTolerance", "-e "},
+    {"envCnnCutoff", "-F "},
     {"groupSpectrumNumber", "-r "},
     {"localPtmFileName", "-B "},
     {"localThreshold", "-H "}};
@@ -267,6 +268,7 @@ std::map<std::string, std::string> topmg_para{
     {"keepDecoyResults", "-K "},
     {"combinedOutputName", "-c "},
     {"massErrorTolerance", "-e "},
+    {"envCnnCutoff", "-F "},
     {"useAsfDiag", "-D "},
     {"varModFileName", "-i "},
     {"varPtmNumber", "-P "},

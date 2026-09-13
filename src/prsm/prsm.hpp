@@ -145,6 +145,10 @@ class Prsm {
 
   void setAdjustedPrecMass(double new_prec_mass);
 
+  // Recompute the matched mass and matched fragment numbers from the current
+  // refined spectra (see setRefineMsVec).
+  void updateMatchNum(const SpParaPtr& sp_para_ptr) { initScores(sp_para_ptr); }
+
   void setHitCnt(int hit_cnt) { hit_cnt_ = hit_cnt; }
 
   void setFracFeatureId(int id) { frac_feature_id_ = id; }

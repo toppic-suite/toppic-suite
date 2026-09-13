@@ -359,6 +359,20 @@ above it, never the reverse:
 - `src/seq` — sequence/proteoform layer.
 - `src/ms` — mass-spectrum layer: `spec` (peaks/spectra/msalign), `msmap`,
   `factory`, `env` (envelope detection), `feature`, `mzml`.
+  `MsAlignReader` has a four-argument constructor taking an EnvCNN score
+  cutoff (`SpPara::getEnvCnnCutoff()`, default 0.2): masses whose fourth
+  msalign column is below it are skipped, keeping the file's peak ids. The
+  filter, search and E-value/p-value stages (`filter/*`, `search/*`,
+  `stat/tdgf`, `stat/mcmc`, `search/graph/spec_graph_reader`) construct their
+  readers with it, so they work on the filtered masses; the PrSM output
+  stages (`prsm_reader_util`, coverage, localization, tables) deliberately
+  read the unfiltered spectra. Use the cutoff constructor in a new
+  identification stage, and the three-argument one in a new output stage.
+  Because the search stores matched mass/fragment numbers counted on the
+  filtered masses, toppic and topmg run `prsm/prsm_match_num_recount` on
+  `<tool>_raw_prsm` (writing `<tool>_recount`) before clustering to recount
+  them against the full spectra; the number of masses in the tables is not
+  stored in the PrSM but computed from the attached full spectra at output.
 - `src/topfd` — the TopFD deconvolution/feature-detection layer, built on `ms`:
   `common` (`topfd_para` config + the `topfd_process`/`topfd_single_process`
   orchestrators), `dp` (dynamic-programming envelope assignment), `envcnn` and

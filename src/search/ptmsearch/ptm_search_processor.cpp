@@ -130,7 +130,8 @@ void PtmSearchProcessor::process() {
 
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
   MsAlignReaderPtr ms_reader_ptr = std::make_shared<MsAlignReader>(
-      sp_file_name, group_spec_num, sp_para_ptr->getActivationPtr());
+      sp_file_name, group_spec_num, sp_para_ptr->getActivationPtr(),
+      sp_para_ptr->getEnvCnnCutoff());
 
   const int n_unknown_shift = 2;
 
@@ -164,7 +165,8 @@ void PtmSearchProcessor::process() {
         }
         if (selected_prsm_ptrs.size() > 0) {
           for (size_t i = 0; i < spec_set_ptr_vec.size(); i++) {
-            while (pool_ptr->getQueueSize() >= static_cast<std::size_t>(mng_ptr_->thread_num_) * 2) {
+            while (pool_ptr->getQueueSize() >=
+                   static_cast<std::size_t>(mng_ptr_->thread_num_) * 2) {
               std::this_thread::sleep_for(std::chrono::milliseconds(100));
             }
             pool_ptr->enqueue(geneTask(spec_set_ptr_vec[i], selected_prsm_ptrs,

@@ -49,7 +49,8 @@ inline void filterBlock(const ProteoformPtrVec& raw_forms, int block_idx,
   int group_spec_num = mng_ptr->prsm_para_ptr_->getGroupSpecNum();
 
   MsAlignReaderPtr reader_ptr = std::make_shared<MsAlignReader>(
-      sp_file_name, group_spec_num, sp_para_ptr->getActivationPtr());
+      sp_file_name, group_spec_num, sp_para_ptr->getActivationPtr(),
+      sp_para_ptr->getEnvCnnCutoff());
 
   // init writer
   std::string output_file_name =

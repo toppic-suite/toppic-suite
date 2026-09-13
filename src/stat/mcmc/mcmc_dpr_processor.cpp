@@ -168,10 +168,10 @@ void DprProcessor::process() {
                                               prsm_para_ptr->getFixModPtrVec());
 
   // no multi-spec support now
-  MsAlignReaderPtr ms_reader_ptr =
-      std::make_shared<MsAlignReader>(sp_file_name,
-                                      1,  // prsm_para_ptr->getGroupSpecNum()
-                                      sp_para_ptr_->getActivationPtr());
+  MsAlignReaderPtr ms_reader_ptr = std::make_shared<MsAlignReader>(
+      sp_file_name,
+      1,  // prsm_para_ptr->getGroupSpecNum()
+      sp_para_ptr_->getActivationPtr(), sp_para_ptr_->getEnvCnnCutoff());
 
   int peak_num_limit = 500;
 
@@ -331,7 +331,8 @@ void DprProcessor::processOnePrsm(const PrsmPtr& prsm_ptr,
     return;
   }
 
-  while (pool_ptr_->getQueueSize() >= static_cast<std::size_t>(mng_ptr_->thread_num_) + 2) {
+  while (pool_ptr_->getQueueSize() >=
+         static_cast<std::size_t>(mng_ptr_->thread_num_) + 2) {
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
   pool_ptr_->enqueue(geneTask(spec_set_ptr, prsm_ptr, mng_ptr_,

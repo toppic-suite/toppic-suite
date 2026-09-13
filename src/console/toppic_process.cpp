@@ -51,6 +51,7 @@
 #include "prsm/prsm_fdr_groups.hpp"
 #include "prsm/prsm_feature_cluster.hpp"
 #include "prsm/prsm_form_filter.hpp"
+#include "prsm/prsm_match_num_recount.hpp"
 #include "prsm/prsm_match_table_writer.hpp"
 #include "prsm/prsm_prot_cluster.hpp"
 #include "prsm/prsm_prot_filter.hpp"
@@ -110,6 +111,7 @@ void cleanToppicDir(const std::string& fa_name, const std::string& sp_name,
     file_util::delFile(sp_base + ".toppic_combined");
     file_util::delFile(sp_base + ".toppic_evalue");
     file_util::cleanPrefix(sp_name, sp_base + ".toppic_evalue_");
+    file_util::delFile(sp_base + ".toppic_recount");
     file_util::delFile(sp_base + ".toppic_proteoform_cluster");
     file_util::delFile(sp_base + ".toppic_cluster");
     file_util::delFile(sp_base + ".toppic_cluster_fdr");
@@ -400,6 +402,15 @@ int TopPIC_post(std::map<std::string, std::string>& arguments) {
     msalign_util::geneSpIndex(sp_file_name);
     LOG_DEBUG("prsm para inited");
 
+    std::cout << "Recounting matched masses and fragments - started."
+              << std::endl;
+    // the search counted only the masses above the EnvCNN cutoff; recount
+    // against the full spectra
+    prsm_match_num_recount::process(prsm_para_ptr, "toppic_raw_prsm",
+                                    "toppic_recount");
+    std::cout << "Recounting matched masses and fragments - finished."
+              << std::endl;
+
     std::cout << "Finding PrSM proteoform clusters - started." << std::endl;
     bool is_proteoform_ppm_error = (arguments["proteoformPpmError"] == "true");
     double proteoform_error_tole =
@@ -413,11 +424,11 @@ int TopPIC_post(std::map<std::string, std::string>& arguments) {
       // TopFD msalign file with feature ID
       ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();
       prsm_feature_cluster::process(
-          sp_file_name, "toppic_raw_prsm", "toppic_proteoform_cluster",
+          sp_file_name, "toppic_recount", "toppic_proteoform_cluster",
           is_proteoform_ppm_error, proteoform_error_tole);
     } else {
       prsm_simple_cluster::process(
-          db_file_name, sp_file_name, "toppic_raw_prsm",
+          db_file_name, sp_file_name, "toppic_recount",
           prsm_para_ptr->getFixModPtrVec(), "toppic_proteoform_cluster",
           is_proteoform_ppm_error, proteoform_error_tole);
     }
@@ -509,8 +520,8 @@ int TopPIC_post(std::map<std::string, std::string>& arguments) {
     prsm_cutoff_selector::process(db_file_name, sp_file_name, cur_suffix,
                                   "toppic_form_cutoff", form_cutoff_type,
                                   cutoff_value);
-    std::cout << "Proteoform filtering by " << form_cutoff_type << " - finished."
-              << std::endl;
+    std::cout << "Proteoform filtering by " << form_cutoff_type
+              << " - finished." << std::endl;
 
     std::cout << "Selecting top PrSMs for proteoforms - started." << std::endl;
     prsm_form_filter::process(db_file_name, sp_file_name, "toppic_form_cutoff",

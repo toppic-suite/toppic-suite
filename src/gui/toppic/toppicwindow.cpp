@@ -44,21 +44,25 @@ ToppicWindow::ToppicWindow(QWidget* parent)
   this->setWindowTitle(qstr);
   lastDir_ = ".";
   QRegularExpression rx1("^\\d{1,8}\\.\\d{0,2}$");
-  QRegularExpressionValidator* validator1 = new QRegularExpressionValidator(rx1, this);
+  QRegularExpressionValidator* validator1 =
+      new QRegularExpressionValidator(rx1, this);
   ui->maxModEdit->setValidator(validator1);
   ui->cutoffSpectralValueEdit->setValidator(validator1);
   ui->cutoffProteoformValueEdit->setValidator(validator1);
   ui->cutoffProteinValueEdit->setValidator(validator1);
   ui->numCombinedEdit->setValidator(new QIntValidator(0, 2147483647, this));
   QRegularExpression rx2("^0\\.\\d{0,2}|1.00$");
-  QRegularExpressionValidator* validator2 = new QRegularExpressionValidator(rx2, this);
+  QRegularExpressionValidator* validator2 =
+      new QRegularExpressionValidator(rx2, this);
   ui->miscoreThresholdEdit->setValidator(validator2);
   ui->threadNumberEdit->setValidator(new QIntValidator(0, 2147483647, this));
   ui->errorToleranceEdit->setValidator(new QIntValidator(0, 2147483647, this));
+  ui->envCnnCutoffEdit->setValidator(new QDoubleValidator(0, 1, 4, this));
   ui->formErrorToleranceEdit->setValidator(
       new QDoubleValidator(0, 2147483647, 4, this));
   QRegularExpression rx3("^-?\\d{1,8}\\.\\d{0,2}$");
-  QRegularExpressionValidator* validator3 = new QRegularExpressionValidator(rx3, this);
+  QRegularExpressionValidator* validator3 =
+      new QRegularExpressionValidator(rx3, this);
   ui->minModEdit->setValidator(validator3);
 
   QFont font;
@@ -115,6 +119,8 @@ void ToppicWindow::on_defaultButton_clicked() {
   ui->fixedModFileEdit->clear();
   ui->errorToleranceEdit->setText(
       QString::fromStdString(arguments_["massErrorTolerance"]));
+  ui->envCnnCutoffEdit->setText(
+      QString::fromStdString(arguments_["envCnnCutoff"]));
   ui->formErrorToleranceEdit->setText(
       QString::fromStdString(arguments_["proteoformErrorTolerance"]));
   ui->varPtmNumEdit->setText(
@@ -307,6 +313,7 @@ std::map<std::string, std::string> ToppicWindow::getArguments() {
   arguments_["shiftNumber"] = ui->numModComboBox->currentText().toStdString();
   arguments_["massErrorTolerance"] =
       ui->errorToleranceEdit->text().toStdString();
+  arguments_["envCnnCutoff"] = ui->envCnnCutoffEdit->text().toStdString();
   arguments_["proteoformErrorTolerance"] =
       ui->formErrorToleranceEdit->text().toStdString();
   arguments_["cutoffSpectralType"] =
@@ -457,6 +464,7 @@ void ToppicWindow::lockDialog() {
   ui->fixedModFileEdit->setEnabled(false);
   ui->fixedModFileButton->setEnabled(false);
   ui->errorToleranceEdit->setEnabled(false);
+  ui->envCnnCutoffEdit->setEnabled(false);
   ui->formErrorToleranceEdit->setEnabled(false);
   ui->maxModEdit->setEnabled(false);
   ui->minModEdit->setEnabled(false);
@@ -504,6 +512,7 @@ void ToppicWindow::unlockDialog() {
   }
   ui->fixedModFileEdit->setEnabled(true);
   ui->errorToleranceEdit->setEnabled(true);
+  ui->envCnnCutoffEdit->setEnabled(true);
   ui->formErrorToleranceEdit->setEnabled(true);
   ui->maxModEdit->setEnabled(true);
   ui->minModEdit->setEnabled(true);
@@ -586,6 +595,11 @@ bool ToppicWindow::checkError() {
     QMessageBox::warning(this, tr("Warning"),
                          tr("Mass error tolerance is empty!"),
                          QMessageBox::Yes);
+    return true;
+  }
+  if (ui->envCnnCutoffEdit->text().isEmpty()) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("EnvCNN score cutoff is empty!"), QMessageBox::Yes);
     return true;
   }
   if (ui->formErrorToleranceEdit->text().isEmpty()) {
@@ -818,8 +832,7 @@ void ToppicWindow::on_cutoffProteoformTypeComboBox_currentIndexChanged(
   }
 }
 
-void ToppicWindow::on_cutoffProteinTypeComboBox_currentIndexChanged(
-    int index) {
+void ToppicWindow::on_cutoffProteinTypeComboBox_currentIndexChanged(int index) {
   if (index == 1 && !ui->decoyCheckBox->isChecked()) {
     QMessageBox::warning(this, tr("Warning"),
                          tr("To use an FDR cutoff, the checkbox \"decoy "

@@ -236,7 +236,8 @@ void VarPtmSearchProcessor::process() {
 
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
   MsAlignReaderPtr msalign_reader_ptr = std::make_shared<MsAlignReader>(
-      sp_file_name, group_spec_num, sp_para_ptr->getActivationPtr());
+      sp_file_name, group_spec_num, sp_para_ptr->getActivationPtr(),
+      sp_para_ptr->getEnvCnnCutoff());
   int cnt = 0;
   DeconvMsPtrVec deconv_ms_ptr_vec = msalign_reader_ptr->getNextMsPtrVec();
   std::vector<double> prec_error_vec =
@@ -264,7 +265,8 @@ void VarPtmSearchProcessor::process() {
         if (comp_selected_prsm_ptrs.size() > 0) {
           // LOG_DEBUG("start processing one spectrum.");
           for (size_t k = 0; k < spec_set_vec.size(); k++) {
-            while (pool_ptr->getQueueSize() >= static_cast<std::size_t>(mng_ptr_->thread_num_) * 2) {
+            while (pool_ptr->getQueueSize() >=
+                   static_cast<std::size_t>(mng_ptr_->thread_num_) * 2) {
               std::this_thread::sleep_for(std::chrono::milliseconds(100));
             }
             pool_ptr->enqueue(geneTask(
@@ -284,7 +286,8 @@ void VarPtmSearchProcessor::process() {
         if (pref_selected_prsm_ptrs.size() > 0) {
           // LOG_DEBUG("start processing one spectrum.");
           for (size_t k = 0; k < spec_set_vec.size(); k++) {
-            while (pool_ptr->getQueueSize() >= static_cast<std::size_t>(mng_ptr_->thread_num_) * 2) {
+            while (pool_ptr->getQueueSize() >=
+                   static_cast<std::size_t>(mng_ptr_->thread_num_) * 2) {
               std::this_thread::sleep_for(std::chrono::milliseconds(100));
             }
             pool_ptr->enqueue(geneTask(
@@ -304,7 +307,8 @@ void VarPtmSearchProcessor::process() {
         if (suff_selected_prsm_ptrs.size() > 0) {
           // LOG_DEBUG("start processing one spectrum.");
           for (size_t k = 0; k < spec_set_vec.size(); k++) {
-            while (pool_ptr->getQueueSize() >= static_cast<std::size_t>(mng_ptr_->thread_num_) * 2) {
+            while (pool_ptr->getQueueSize() >=
+                   static_cast<std::size_t>(mng_ptr_->thread_num_) * 2) {
               std::this_thread::sleep_for(std::chrono::milliseconds(100));
             }
             pool_ptr->enqueue(geneTask(
@@ -324,7 +328,8 @@ void VarPtmSearchProcessor::process() {
         if (internal_selected_prsm_ptrs.size() > 0) {
           // LOG_DEBUG("start processing one spectrum.");
           for (size_t k = 0; k < spec_set_vec.size(); k++) {
-            while (pool_ptr->getQueueSize() >= static_cast<std::size_t>(mng_ptr_->thread_num_) * 2) {
+            while (pool_ptr->getQueueSize() >=
+                   static_cast<std::size_t>(mng_ptr_->thread_num_) * 2) {
               std::this_thread::sleep_for(std::chrono::milliseconds(100));
             }
             pool_ptr->enqueue(geneTask(spec_set_vec[k],

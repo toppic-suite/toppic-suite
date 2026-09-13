@@ -32,6 +32,12 @@ class MsAlignReader {
   MsAlignReader(const std::string& file_name, int group_spec_num,
                 const ActivationPtr& activation_ptr);
 
+  // Skips the masses whose EnvCNN score (the fourth msalign column) is below
+  // env_cnn_cutoff; peak ids still count the masses of the file, so they
+  // match the ids of an unfiltered read.
+  MsAlignReader(const std::string& file_name, int group_spec_num,
+                const ActivationPtr& activation_ptr, double env_cnn_cutoff);
+
   ~MsAlignReader();
 
   std::vector<std::string> readOneStrSpectrum();
@@ -46,6 +52,9 @@ class MsAlignReader {
   int group_spec_num_ = 1;
 
   ActivationPtr activation_ptr_;
+
+  // masses with an EnvCNN score below the cutoff are skipped (0 = keep all)
+  double env_cnn_cutoff_ = 0.0;
 
   std::ifstream input_;
 
