@@ -119,9 +119,9 @@ bool Argument::parse(int argc, char* argv[]) {
         "<a number in [0,1]>. Set the cutoff value for the EnvCNN score to "
         "filter out low-quality isotopic envelopes in MS/MS spectra. The "
         "default value is 0.")(
-        "disable-frag-num-filtering,d",
-        "Skip the filtering of fragment ion envelopes in MS/MS scans based on "
-        "the estimated number of fragment ions.")(
+        "frag-num-filtering,d",
+        "Filter fragment ion envelopes in MS/MS scans based on the estimated "
+        "number of fragment ions.")(
         "ecscore-cutoff,t", po::value<std::string>(&ecscore_cutoff),
         "<a number in [0,1]>. Set the ECScore cutoff value for proteoform "
         "features. The default value is 0.1.")(
@@ -402,8 +402,8 @@ bool Argument::parse(int argc, char* argv[]) {
       topfd_para_ptr_->setThreadNum(num);
     }
 
-    if (vm.count("disable-frag-num-filtering")) {
-      topfd_para_ptr_->setAANumBasedFilter(false);
+    if (vm.count("frag-num-filtering")) {
+      topfd_para_ptr_->setAANumBasedFilter(true);
     }
   } catch (std::exception& e) {
     std::cerr << "Unhandled Exception in parsing command line " << e.what()

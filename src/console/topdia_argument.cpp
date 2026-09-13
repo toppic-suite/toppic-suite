@@ -158,8 +158,9 @@ bool Argument::parse(int argc, char* argv[]) {
         po::value<std::string>(&ms2_seed_env_inte_corr_tole_cutoff),
         "<a number in [0,1]>. Set the MS2 seed envelope intensity correlation "
         "cutoff value for extracting features. The default value is 0.")(
-        "disable-final-filtering,d",
-        "Skip the final filtering of envelopes in MS/MS scans.")(
+        "final-filtering,d",
+        "Filter envelopes in MS/MS scans based on the estimated number of "
+        "fragment ions.")(
         "thread-number,u", po::value<std::string>(&thread_number),
         "<a positive integer>. Number of threads used in spectral "
         "deconvolution. Default value: 1.");
@@ -395,8 +396,8 @@ bool Argument::parse(int argc, char* argv[]) {
       topfd_para_ptr_->setThreadNum(num);
     }
 
-    if (vm.count("disable-final-filtering")) {
-      topfd_para_ptr_->setAANumBasedFilter(false);
+    if (vm.count("final-filtering")) {
+      topfd_para_ptr_->setAANumBasedFilter(true);
     }
   } catch (std::exception& e) {
     std::cerr << "Unhandled Exception in parsing command line " << e.what()

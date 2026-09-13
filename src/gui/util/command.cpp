@@ -53,7 +53,7 @@ std::string geneTopfdCommand(const TopfdParaPtr& para_ptr,
     command = command + "-o ";
   }
   command = command + "-u " + std::to_string(para_ptr->getThreadNum()) + " ";
-  if (!para_ptr->isAANumBasedFilter()) {
+  if (para_ptr->isAANumBasedFilter()) {
     command = command + "-d ";
   }
   if (para_ptr->isSearchPrecWindow()) {
@@ -110,7 +110,7 @@ std::string geneTopdiaCommand(const TopfdParaPtr& topfd_para_ptr,
   }
   command =
       command + "-u " + std::to_string(topfd_para_ptr->getThreadNum()) + " ";
-  if (!topfd_para_ptr->isAANumBasedFilter()) {
+  if (topfd_para_ptr->isAANumBasedFilter()) {
     command = command + "-d ";
   }
   if (topfd_para_ptr->isUseSingleScanNoiseLevel()) {

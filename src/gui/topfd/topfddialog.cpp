@@ -127,7 +127,7 @@ void TopFDDialog::on_defaultButton_clicked() {
   ui->minScanNumEdit->setText(QString::number(para_ptr->getMs1MinScanNum()));
   ui->msDeconvCheckBox->setChecked(para_ptr->isSortUseMsDeconv());
   ui->missLevelOneCheckBox->setChecked(para_ptr->isMissingLevelOne());
-  ui->disableFilteringCheckBox->setChecked(!para_ptr->isAANumBasedFilter());
+  ui->fragNumFilteringCheckBox->setChecked(para_ptr->isAANumBasedFilter());
   ui->disableAdditionalFeatureSearchCheckBox->setChecked(
       !para_ptr->isSearchPrecWindow());
   ui->singleScanNoiseLevelCheckBox->setChecked(
@@ -311,7 +311,7 @@ toppic::TopfdParaPtr TopFDDialog::getParaPtr() {
       std::stoi(ui->threadNumberEdit->text().toStdString()));
   para_ptr_->setSortUseMsDeconv(ui->msDeconvCheckBox->isChecked());
   para_ptr_->setActivation(ui->activationComboBox->currentText().toStdString());
-  para_ptr_->setAANumBasedFilter(!(ui->disableFilteringCheckBox->isChecked()));
+  para_ptr_->setAANumBasedFilter(ui->fragNumFilteringCheckBox->isChecked());
 
   para_ptr_->setSearchPrecWindow(
       (ui->disableAdditionalFeatureSearchCheckBox->isChecked()));
@@ -342,7 +342,7 @@ void TopFDDialog::lockDialog() {
   ui->outputButton->setEnabled(false);
   ui->msDeconvCheckBox->setEnabled(false);
   ui->activationComboBox->setEnabled(false);
-  ui->disableFilteringCheckBox->setEnabled(false);
+  ui->fragNumFilteringCheckBox->setEnabled(false);
   ui->ecscoreCutoffEdit->setEnabled(false);
   ui->disableAdditionalFeatureSearchCheckBox->setEnabled(false);
   ui->singleScanNoiseLevelCheckBox->setEnabled(false);
@@ -370,7 +370,7 @@ void TopFDDialog::unlockDialog() {
   ui->outputButton->setDefault(true);
   ui->msDeconvCheckBox->setEnabled(true);
   ui->activationComboBox->setEnabled(true);
-  ui->disableFilteringCheckBox->setEnabled(true);
+  ui->fragNumFilteringCheckBox->setEnabled(true);
   ui->ecscoreCutoffEdit->setEnabled(true);
   ui->disableAdditionalFeatureSearchCheckBox->setEnabled(true);
   ui->singleScanNoiseLevelCheckBox->setEnabled(true);

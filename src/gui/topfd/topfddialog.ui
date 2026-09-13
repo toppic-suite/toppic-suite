@@ -611,7 +611,7 @@ p, li { white-space: pre-wrap; }
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_11">
       <item>
-       <widget class="QCheckBox" name="disableFilteringCheckBox">
+       <widget class="QCheckBox" name="fragNumFilteringCheckBox">
         <property name="maximumSize">
          <size>
           <width>259</width>
@@ -622,7 +622,7 @@ p, li { white-space: pre-wrap; }
          <bool>false</bool>
         </property>
         <property name="text">
-         <string>Disable frag num-based filtering</string>
+         <string>Enable frag num-based filtering</string>
         </property>
         <property name="checkable">
          <bool>true</bool>

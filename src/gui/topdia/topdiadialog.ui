@@ -531,12 +531,12 @@ li.checked::marker { content: &quot;\2612&quot;; }
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_11">
       <item>
-       <widget class="QCheckBox" name="disableFilteringCheckBox">
+       <widget class="QCheckBox" name="finalFilteringCheckBox">
         <property name="acceptDrops">
          <bool>false</bool>
         </property>
         <property name="text">
-         <string>Disable final filtering</string>
+         <string>Enable final filtering</string>
         </property>
         <property name="checkable">
          <bool>true</bool>

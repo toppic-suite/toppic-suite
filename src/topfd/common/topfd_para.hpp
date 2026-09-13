@@ -186,7 +186,7 @@ class TopfdPara {
   // sorting using msdeconv, the default method is env_cnn score
   bool sort_use_msdeconv_ = false;
   double ms2_env_cnn_score_cutoff_ = 0.0;
-  bool aa_num_based_filter_ = true;
+  bool aa_num_based_filter_ = false;
   bool output_csv_feature_file_ = false;
   bool gene_sql_ = true;
   // also write the MS1 peak tables for 3D visualization (--sql-3d)
