@@ -301,11 +301,11 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
         po::value<std::string>(&cutoff_proteoform_value),
         "<a positive number>. Proteoform-level cutoff value for filtering "
         "identified proteoform spectrum-matches. Default value: 0.01.")(
-        "protein-cutoff-type", po::value<std::string>(&cutoff_protein_type),
+        "protein-cutoff-type,y", po::value<std::string>(&cutoff_protein_type),
         "<EVALUE|FDR>. Protein-level cutoff type for filtering identified "
         "proteoform spectrum-matches. With FDR, a protein is represented by "
         "its best proteoform (the lowest E-value). Default value: EVALUE.")(
-        "protein-cutoff-value", po::value<std::string>(&cutoff_protein_value),
+        "protein-cutoff-value,Y", po::value<std::string>(&cutoff_protein_value),
         "<a positive number>. Protein-level cutoff value for filtering "
         "identified proteoform spectrum-matches. Default value: 0.01.")(
         "mod-file-name,i", po::value<std::string>(&var_mod_file_name),
@@ -354,9 +354,9 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
                 po::value<std::string>(&cutoff_proteoform_type),
                 "")("proteoform-cutoff-value,V",
                     po::value<std::string>(&cutoff_proteoform_value),
-                    "")("protein-cutoff-type",
+                    "")("protein-cutoff-type,y",
                         po::value<std::string>(&cutoff_protein_type), "")(
-        "protein-cutoff-value", po::value<std::string>(&cutoff_protein_value),
+        "protein-cutoff-value,Y", po::value<std::string>(&cutoff_protein_value),
         "")("filtering-result-number",
                         po::value<std::string>(&filtering_result_num),
                         "Filtering result number. Default value: 20.")(
