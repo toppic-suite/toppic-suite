@@ -412,7 +412,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
        <rect>
         <x>10</x>
         <y>170</y>
-        <width>261</width>
+        <width>401</width>
         <height>31</height>
        </rect>
       </property>
@@ -421,8 +421,14 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <widget class="QLabel" name="label_9">
          <property name="minimumSize">
           <size>
-           <width>160</width>
+           <width>200</width>
            <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>200</width>
+           <height>16777215</height>
           </size>
          </property>
          <property name="text">
@@ -470,7 +476,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
        <rect>
         <x>10</x>
         <y>210</y>
-        <width>261</width>
+        <width>401</width>
         <height>33</height>
        </rect>
       </property>
@@ -479,8 +485,14 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <widget class="QLabel" name="label_23">
          <property name="minimumSize">
           <size>
-           <width>160</width>
+           <width>200</width>
            <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>200</width>
+           <height>16777215</height>
           </size>
          </property>
          <property name="text">
@@ -490,12 +502,6 @@ li.checked::marker { content: &quot;\2612&quot;; }
        </item>
        <item>
         <widget class="QLineEdit" name="threadNumberEdit">
-         <property name="maximumSize">
-          <size>
-           <width>110</width>
-           <height>16777215</height>
-          </size>
-         </property>
          <property name="text">
           <string>1</string>
          </property>
@@ -543,7 +549,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
        <rect>
         <x>10</x>
         <y>90</y>
-        <width>261</width>
+        <width>401</width>
         <height>31</height>
        </rect>
       </property>
@@ -552,8 +558,14 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <widget class="QLabel" name="label_15">
          <property name="minimumSize">
           <size>
-           <width>160</width>
+           <width>200</width>
            <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>200</width>
+           <height>16777215</height>
           </size>
          </property>
          <property name="text">
