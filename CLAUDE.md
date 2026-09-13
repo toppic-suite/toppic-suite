@@ -387,10 +387,13 @@ above it, never the reverse:
   reads a PrSM file and attaches the deconvoluted/refined spectra from the
   msalign file; both `prsm_match_table_writer` (the TSV tables) and
   `prsm_sql_writer` (the same columns as `prsm`/`proteoform`/`protein` tables, plus
-  `prsm_mass_shift` and `prsm_protein_match`, written by toppic into the
-  topfd `.sqlite` of the spectrum file when it exists) are built on it.
-  `seq/fasta_sql_writer` adds the `fasta_seq` table there. Keep the TSV and
-  SQL columns in step when changing either. `prsm`/`simple_prsm`/`expected_value`/
+  `prsm_mass_shift` and `prsm_protein_match`) are built on it.
+  `prsm_sql_output::write` is the one entry point that writes those tables
+  plus `seq/fasta_sql_writer`'s `fasta_seq` table into the topfd `.sqlite` of
+  the spectrum file when it exists; toppic and topmg both call it after their
+  protein table, passing their own cutoff file extensions — do not duplicate
+  the open/write/close sequence in a driver. Keep the TSV and SQL columns in
+  step when changing either. `prsm`/`simple_prsm`/`expected_value`/
   `peak_ion_pair` carry the pugixml XML (de)serialization (`toXmlElement`/`toXml`/
   `appendXml` take a parent `XmlDOMElement` and return the attached node).
 - `src/filter` — proteoform filtering (`diag`/`index`/`massmatch`/`mng`/

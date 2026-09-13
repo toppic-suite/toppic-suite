@@ -13,8 +13,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <sqlite3.h>
-
 #include <cstdlib>
 #include <ctime>
 #include <filesystem>
@@ -30,7 +28,6 @@
 #include "common/base/ptm_util.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
-#include "common/util/str_util.hpp"
 #include "common/util/mem_check.hpp"
 #include "common/util/version.hpp"
 #include "console/toppic_argument.hpp"
@@ -57,8 +54,8 @@
 #include "prsm/prsm_match_table_writer.hpp"
 #include "prsm/prsm_prot_cluster.hpp"
 #include "prsm/prsm_prot_filter.hpp"
-#include "prsm/prsm_sql_writer.hpp"
 #include "prsm/prsm_simple_cluster.hpp"
+#include "prsm/prsm_sql_output.hpp"
 #include "prsm/prsm_str_merge.hpp"
 #include "prsm/prsm_top_selector.hpp"
 #include "prsm/prsm_util.hpp"
@@ -70,7 +67,6 @@
 #include "search/zeroptmsearch/zero_ptm_search_mng.hpp"
 #include "search/zeroptmsearch/zero_ptm_search_processor.hpp"
 #include "seq/fasta_reader.hpp"
-#include "seq/fasta_sql_writer.hpp"
 #include "seq/fasta_util.hpp"
 #include "stat/local/local_mng.hpp"
 #include "stat/local/local_processor.hpp"
@@ -126,43 +122,6 @@ void cleanToppicDir(const std::string& fa_name, const std::string& sp_name,
     file_util::delDir(sp_base + "_toppic_proteoform_cutoff_xml");
     file_util::delDir(sp_base + "_toppic_prsm_cutoff_xml");
   }
-}
-
-// Write the identified PrSMs, the proteoforms, the proteins and the FASTA
-// sequences into the topfd SQLite database of the spectrum file
-// (<base>.sqlite for <base>_ms2.msalign), if it exists.
-void writeToppicSqlOutput(const PrsmParaPtr& prsm_para_ptr,
-                          const std::string& sp_file_name,
-                          const std::string& fasta_file_name) {
-  std::string sql_base = file_util::basename(sp_file_name);
-  if (str_util::endsWith(sql_base, "_ms2")) {
-    sql_base = sql_base.substr(0, sql_base.size() - 4);
-  }
-  std::string sql_file_name = sql_base + ".sqlite";
-  if (!std::filesystem::exists(sql_file_name)) {
-    std::cout << "SQLite database " << sql_file_name
-              << " not found: identifications are not written to a database."
-              << std::endl;
-    return;
-  }
-  std::cout << "Writing identifications to " << sql_file_name << " - started."
-            << std::endl;
-  sqlite3* sql_db = nullptr;
-  if (sqlite3_open(sql_file_name.c_str(), &sql_db) != SQLITE_OK) {
-    LOG_ERROR("Cannot open the database " << sql_file_name << ": "
-                                          << sqlite3_errmsg(sql_db));
-    exit(EXIT_FAILURE);
-  }
-  {
-    PrsmSqlWriter sql_writer(prsm_para_ptr, sql_db);
-    sql_writer.write("toppic_prsm_cutoff", "prsm", true);
-    sql_writer.write("toppic_form_cutoff_form", "proteoform", false);
-    sql_writer.write("toppic_prot_cutoff_prot", "protein", false);
-  }
-  fasta_sql_writer::write(sql_db, fasta_file_name);
-  sqlite3_close(sql_db);
-  std::cout << "Writing identifications to " << sql_file_name << " - finished."
-            << std::endl;
 }
 
 // Test modification files.
@@ -588,7 +547,9 @@ int TopPIC_post(std::map<std::string, std::string>& arguments) {
     prot_out = nullptr;
     std::cout << "Outputting protein table - finished." << std::endl;
 
-    writeToppicSqlOutput(prsm_para_ptr, sp_file_name, ori_db_file_name);
+    prsm_sql_output::write(prsm_para_ptr, sp_file_name, ori_db_file_name,
+                           "toppic_prsm_cutoff", "toppic_form_cutoff_form",
+                           "toppic_prot_cutoff_prot");
 
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;

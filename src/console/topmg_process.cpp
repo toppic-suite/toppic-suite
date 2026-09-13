@@ -45,6 +45,7 @@
 #include "prsm/prsm_prot_cluster.hpp"
 #include "prsm/prsm_prot_filter.hpp"
 #include "prsm/prsm_simple_cluster.hpp"
+#include "prsm/prsm_sql_output.hpp"
 #include "prsm/prsm_str_merge.hpp"
 #include "prsm/prsm_top_selector.hpp"
 #include "prsm/prsm_util.hpp"
@@ -411,6 +412,10 @@ int TopMG_post(std::map<std::string, std::string>& arguments) {
     prot_out->write("_topmg_protein.tsv", true);
     prot_out = nullptr;
     std::cout << "Outputting protein table - finished." << std::endl;
+
+    prsm_sql_output::write(prsm_para_ptr, sp_file_name, ori_db_file_name,
+                           "topmg_prsm_cutoff", "topmg_form_cutoff_form",
+                           "topmg_prot_cutoff_prot");
 
   } catch (const char* e) {
     LOG_ERROR("[Exception]" << e);
