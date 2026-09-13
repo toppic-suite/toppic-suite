@@ -386,7 +386,7 @@ above it, never the reverse:
   writers, FDR, clustering, coverage). `prsm_reader_util::readPrsmsWithSpectra`
   reads a PrSM file and attaches the deconvoluted/refined spectra from the
   msalign file; both `prsm_match_table_writer` (the TSV tables) and
-  `prsm_sql_writer` (the same columns as `prsm`/`proteoform` tables, plus
+  `prsm_sql_writer` (the same columns as `prsm`/`proteoform`/`protein` tables, plus
   `prsm_mass_shift` and `prsm_protein_match`, written by toppic into the
   topfd `.sqlite` of the spectrum file when it exists) are built on it.
   `seq/fasta_sql_writer` adds the `fasta_seq` table there. Keep the TSV and

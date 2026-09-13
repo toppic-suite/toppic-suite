@@ -36,7 +36,7 @@ class PrsmSqlWriter {
   PrsmSqlWriter(const PrsmParaPtr& prsm_para_ptr, sqlite3* sql_db);
 
   // Reads the PrSMs of <spectrum base name>.<input_file_ext> and (re)creates
-  // the table table_name with one row per PrSM. With write_details, the
+  // the table table_name (prsm, proteoform or protein) with one row per PrSM. With write_details, the
   // prsm_mass_shift table (one row per mass shift of a PrSM) and the
   // prsm_protein_match table (the other proteins whose sequence also matches
   // the PrSM) are (re)created as well; the rows of both are keyed by prsm_id.

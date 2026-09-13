@@ -55,6 +55,7 @@
 #include "prsm/prsm_feature_cluster.hpp"
 #include "prsm/prsm_form_filter.hpp"
 #include "prsm/prsm_match_table_writer.hpp"
+#include "prsm/prsm_prot_filter.hpp"
 #include "prsm/prsm_sql_writer.hpp"
 #include "prsm/prsm_simple_cluster.hpp"
 #include "prsm/prsm_str_merge.hpp"
@@ -89,6 +90,9 @@ void cleanToppicDir(const std::string& fa_name, const std::string& sp_name,
   file_util::delFile(sp_base + "_toppic_prsm.xml");
   file_util::copyFile(sp_base + "." + "toppic_prsm_cutoff",
                       sp_base + "_toppic_prsm.xml", overwrite);
+  file_util::delFile(sp_base + "_toppic_protein.xml");
+  file_util::copyFile(sp_base + ".toppic_prot_cutoff_prot",
+                      sp_base + "_toppic_protein.xml", overwrite);
   if (!keep_temp_files) {
     file_util::cleanPrefix(sp_name, sp_base + ".msalign_");
     file_util::delFile(abs_sp_name + "_index");
@@ -115,15 +119,16 @@ void cleanToppicDir(const std::string& fa_name, const std::string& sp_name,
     file_util::delFile(sp_base + ".toppic_prsm_cutoff");
     file_util::delFile(sp_base + ".toppic_form_cutoff");
     file_util::delFile(sp_base + ".toppic_prot_cutoff");
+    file_util::delFile(sp_base + ".toppic_prot_cutoff_prot");
     file_util::delFile(sp_base + ".toppic_form_cutoff_form");
     file_util::delDir(sp_base + "_toppic_proteoform_cutoff_xml");
     file_util::delDir(sp_base + "_toppic_prsm_cutoff_xml");
   }
 }
 
-// Write the identified PrSMs, the proteoforms and the FASTA sequences into
-// the topfd SQLite database of the spectrum file (<base>.sqlite for
-// <base>_ms2.msalign), if it exists.
+// Write the identified PrSMs, the proteoforms, the proteins and the FASTA
+// sequences into the topfd SQLite database of the spectrum file
+// (<base>.sqlite for <base>_ms2.msalign), if it exists.
 void writeToppicSqlOutput(const PrsmParaPtr& prsm_para_ptr,
                           const std::string& sp_file_name,
                           const std::string& fasta_file_name) {
@@ -150,6 +155,7 @@ void writeToppicSqlOutput(const PrsmParaPtr& prsm_para_ptr,
     PrsmSqlWriter sql_writer(prsm_para_ptr, sql_db);
     sql_writer.write("toppic_prsm_cutoff", "prsm", true);
     sql_writer.write("toppic_form_cutoff_form", "proteoform", false);
+    sql_writer.write("toppic_prot_cutoff_prot", "protein", false);
   }
   fasta_sql_writer::write(sql_db, fasta_file_name);
   sqlite3_close(sql_db);
@@ -540,6 +546,18 @@ int TopPIC_post(std::map<std::string, std::string>& arguments) {
     std::cout << "Proteoform filtering by " << form_cutoff_type << " - finished."
               << std::endl;
 
+    std::cout << "Selecting top PrSMs for proteoforms - started." << std::endl;
+    prsm_form_filter::process(db_file_name, sp_file_name, "toppic_form_cutoff",
+                              "toppic_form_cutoff_form");
+    std::cout << "Selecting top PrSMs for proteoforms - finished." << std::endl;
+    std::cout << "Outputting proteoform table - started." << std::endl;
+    PrsmMatchTableWriterPtr form_out = std::make_shared<PrsmMatchTableWriter>(
+        prsm_para_ptr, argu_str, "toppic_form_cutoff_form");
+    form_out->write("_toppic_proteoform_single.tsv", false);
+    form_out->write("_toppic_proteoform.tsv", true);
+    form_out = nullptr;
+    std::cout << "Outputting proteoform table - finished." << std::endl;
+
     std::string prot_cutoff_type =
         (arguments["cutoffProteinType"] == "FDR") ? "PROTFDR" : "EVALUE";
     std::cout << "Protein filtering by " << prot_cutoff_type << " - started."
@@ -551,17 +569,17 @@ int TopPIC_post(std::map<std::string, std::string>& arguments) {
     std::cout << "Protein filtering by " << prot_cutoff_type << " - finished."
               << std::endl;
 
-    std::cout << "Selecting top PrSMs for proteoforms - started." << std::endl;
-    prsm_form_filter::process(db_file_name, sp_file_name, "toppic_prot_cutoff",
-                              "toppic_form_cutoff_form");
-    std::cout << "Selecting top PrSMs for proteoforms - finished." << std::endl;
-    std::cout << "Outputting proteoform table - started." << std::endl;
-    PrsmMatchTableWriterPtr form_out = std::make_shared<PrsmMatchTableWriter>(
-        prsm_para_ptr, argu_str, "toppic_form_cutoff_form");
-    form_out->write("_toppic_proteoform_single.tsv", false);
-    form_out->write("_toppic_proteoform.tsv", true);
-    form_out = nullptr;
-    std::cout << "Outputting proteoform table - finished." << std::endl;
+    std::cout << "Selecting top PrSMs for proteins - started." << std::endl;
+    prsm_prot_filter::process(db_file_name, sp_file_name, "toppic_prot_cutoff",
+                              "toppic_prot_cutoff_prot");
+    std::cout << "Selecting top PrSMs for proteins - finished." << std::endl;
+    std::cout << "Outputting protein table - started." << std::endl;
+    PrsmMatchTableWriterPtr prot_out = std::make_shared<PrsmMatchTableWriter>(
+        prsm_para_ptr, argu_str, "toppic_prot_cutoff_prot");
+    prot_out->write("_toppic_protein_single.tsv", false);
+    prot_out->write("_toppic_protein.tsv", true);
+    prot_out = nullptr;
+    std::cout << "Outputting protein table - finished." << std::endl;
 
     writeToppicSqlOutput(prsm_para_ptr, sp_file_name, ori_db_file_name);
 
