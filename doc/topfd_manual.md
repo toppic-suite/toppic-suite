@@ -144,7 +144,7 @@ MS/MS deconvolution:
 | `-w`, `--precursor-window <number>` | 3.0 | Default precursor isolation window width (m/z). Ignored when the file contains isolation window information. |
 | `-n`, `--msdeconv` | off | Rank isotopic envelopes with the MS-Deconv score instead of the EnvCNN neural-network score. |
 | `-v`, `--env-cnn-cutoff <0..1>` | 0 | Remove MS/MS envelopes whose EnvCNN score is below the cutoff. |
-| `-d`, `--frag-num-filtering` | off | Limit the number of fragment envelopes in an MS/MS spectrum based on the estimated number of fragment ions. |
+| `-g`, `--frag-num-filtering` | off | Limit the number of fragment envelopes in an MS/MS spectrum based on the estimated number of fragment ions. |
 
 Advanced options (accepted but not shown by `-h`):
 
@@ -207,7 +207,7 @@ topfd -T [options] peaks.txt
 Only the parameters of MS/MS deconvolution apply. The useful ones are
 `-c`/`--max-charge`, `-m`/`--max-mass`, `-e`/`--mz-error`,
 `-s`/`--ms-two-sn-ratio`, `-n`/`--msdeconv`, `-v`/`--env-cnn-cutoff`,
-`-d`/`--frag-num-filtering`, `-k`/`--keep`, `-M`/`--multiple-mass`,
+`-g`/`--frag-num-filtering`, `-k`/`--keep`, `-M`/`--multiple-mass`,
 `--max-miss-peak-num` and `--disable-filter-by-mz`. The MS1 and feature
 detection options (`-r`, `-t`, `-b`, `-l`, `-i`, `-f`), `-o`, `-w` and
 `-u` have no effect. `-a`/`--activation` only sets the activation recorded

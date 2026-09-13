@@ -54,7 +54,7 @@ std::string geneTopfdCommand(const TopfdParaPtr& para_ptr,
   }
   command = command + "-u " + std::to_string(para_ptr->getThreadNum()) + " ";
   if (para_ptr->isAANumBasedFilter()) {
-    command = command + "-d ";
+    command = command + "-g ";
   }
   if (para_ptr->isSearchPrecWindow()) {
     command = command + "-f ";

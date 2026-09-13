@@ -119,7 +119,7 @@ bool Argument::parse(int argc, char* argv[]) {
         "<a number in [0,1]>. Set the cutoff value for the EnvCNN score to "
         "filter out low-quality isotopic envelopes in MS/MS spectra. The "
         "default value is 0.")(
-        "frag-num-filtering,d",
+        "frag-num-filtering,g",
         "Filter fragment ion envelopes in MS/MS scans based on the estimated "
         "number of fragment ions.")(
         "ecscore-cutoff,t", po::value<std::string>(&ecscore_cutoff),

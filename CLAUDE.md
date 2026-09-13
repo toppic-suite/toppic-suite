@@ -331,7 +331,7 @@ the `.env` file's `THEO_INTE` column, and the SQLite `ms1_env`/`ms2_env`
 rows. `assignIntensity` (called before `mzRefine` and again after sorting)
 only splits an experimental peak among envelopes that share it; it never
 changes theoretical intensities. When touching any of this, validate with
-`topfd -T -d` on the myoglobin peak list: compare the deconvoluted masses
+`topfd -T -g` on the myoglobin peak list: compare the deconvoluted masses
 against the sequence's b/y ions (46 exact / 14 off-by-one-isotope is the
 reference), and count envelopes whose theoretical apex exceeds the observed
 apex by > 20% (77 of 611 before the core fit, 1 after).
