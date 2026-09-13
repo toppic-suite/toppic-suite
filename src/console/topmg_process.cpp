@@ -42,6 +42,7 @@
 #include "prsm/prsm_feature_cluster.hpp"
 #include "prsm/prsm_form_filter.hpp"
 #include "prsm/prsm_match_table_writer.hpp"
+#include "prsm/prsm_prot_cluster.hpp"
 #include "prsm/prsm_simple_cluster.hpp"
 #include "prsm/prsm_str_merge.hpp"
 #include "prsm/prsm_top_selector.hpp"
@@ -91,6 +92,7 @@ void cleanTopmgDir(const std::string& fa_name, const std::string& sp_name,
     file_util::delFile(sp_base + ".topmg_graph");
     file_util::delFile(sp_base + ".topmg_evalue");
     file_util::cleanPrefix(sp_name, sp_base + ".topmg_evalue_");
+    file_util::delFile(sp_base + ".topmg_proteoform_cluster");
     file_util::delFile(sp_base + ".topmg_cluster");
     file_util::delFile(sp_base + ".topmg_cluster_fdr");
     file_util::delFile(sp_base + ".topmg_form_cutoff");
@@ -294,7 +296,7 @@ int TopMG_post(std::map<std::string, std::string>& arguments) {
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
     msalign_util::geneSpIndex(sp_file_name);
 
-    std::cout << "Finding PrSM clusters - started." << std::endl;
+    std::cout << "Finding PrSM proteoform clusters - started." << std::endl;
     bool is_proteoform_ppm_error = (arguments["proteoformPpmError"] == "true");
     double proteoform_error_tole =
         std::stod(arguments["proteoformErrorTolerance"]);
@@ -305,16 +307,21 @@ int TopMG_post(std::map<std::string, std::string>& arguments) {
     if (arguments["useFeatureFile"] == "true") {
       // TopFD msalign file with feature ID
       ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();
-      prsm_feature_cluster::process(sp_file_name, "topmg_raw_prsm",
-                                    "topmg_cluster", is_proteoform_ppm_error,
-                                    proteoform_error_tole);
+      prsm_feature_cluster::process(
+          sp_file_name, "topmg_raw_prsm", "topmg_proteoform_cluster",
+          is_proteoform_ppm_error, proteoform_error_tole);
     } else {
-      prsm_simple_cluster::process(db_file_name, sp_file_name, "topmg_raw_prsm",
-                                   prsm_para_ptr->getFixModPtrVec(),
-                                   "topmg_cluster", is_proteoform_ppm_error,
-                                   proteoform_error_tole);
+      prsm_simple_cluster::process(
+          db_file_name, sp_file_name, "topmg_raw_prsm",
+          prsm_para_ptr->getFixModPtrVec(), "topmg_proteoform_cluster",
+          is_proteoform_ppm_error, proteoform_error_tole);
     }
-    std::cout << "Finding PrSM clusters - finished." << std::endl;
+    std::cout << "Finding PrSM proteoform clusters - finished." << std::endl;
+
+    std::cout << "Finding PrSM protein clusters - started." << std::endl;
+    prsm_prot_cluster::process(sp_file_name, "topmg_proteoform_cluster",
+                               "topmg_cluster");
+    std::cout << "Finding PrSM protein clusters - finished." << std::endl;
 
     std::string cur_suffix = "topmg_cluster";
 

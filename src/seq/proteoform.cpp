@@ -46,6 +46,7 @@ Proteoform::Proteoform(const FastaSeqPtr& fasta_seq_ptr,
       residue_seq_ptr_(res_seq_ptr),
       proteo_cluster_id_(-1),
       prot_id_(-1),
+      prot_cluster_id_(-1),
       mass_shift_list_(mass_shift_ptr_vec) {
   bp_spec_ptr_ = std::make_shared<BpSpec>(res_seq_ptr);
   std::sort(mass_shift_list_.begin(), mass_shift_list_.end(),
@@ -74,6 +75,8 @@ void Proteoform::parseXml(XmlDOMElement element,
       xml_dom_util::getIntChildValue(element, "proteo_cluster_id", 0);
   proteo_inte_ = xml_dom_util::getDoubleChildValue(element, "proteo_inte", 0);
   prot_id_ = xml_dom_util::getIntChildValue(element, "prot_id", 0);
+  prot_cluster_id_ =
+      xml_dom_util::getIntChildValue(element, "prot_cluster_id", 0);
 
   // Get protein N-terminal modification
   std::string pm_element_name = ProtMod::getXmlElementName();
@@ -356,6 +359,8 @@ void Proteoform::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) {
   xml_doc->addElement(element, "proteo_inte", str.c_str());
   str = std::to_string(prot_id_);
   xml_doc->addElement(element, "prot_id", str.c_str());
+  str = std::to_string(prot_cluster_id_);
+  xml_doc->addElement(element, "prot_cluster_id", str.c_str());
   // The following three elements are used in prsm_str
   str = std::to_string(getAlterNum(AlterType::VARIABLE));
   xml_doc->addElement(element, "variable_ptm_num", str.c_str());

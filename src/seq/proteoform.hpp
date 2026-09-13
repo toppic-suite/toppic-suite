@@ -83,6 +83,11 @@ class Proteoform {
 
   void setProtId(int id) { prot_id_ = id; }
 
+  // protein cluster (see prsm/prsm_prot_cluster); -1 until assigned
+  int getProtClusterId() const { return prot_cluster_id_; }
+
+  void setProtClusterId(int id) { prot_cluster_id_ = id; }
+
   double getProteoInte() const { return proteo_inte_; }
 
   void setProteoInte(double inte) { proteo_inte_ = inte; }
@@ -143,6 +148,7 @@ class Proteoform {
   int proteo_cluster_id_ = -1;
 
   int prot_id_ = -1;
+  int prot_cluster_id_ = -1;
 
   double proteo_inte_ = -1;
 

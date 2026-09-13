@@ -50,6 +50,8 @@ class PrsmStr {
 
   int getProtId() { return prot_id_; }
 
+  int getProtClusterId() { return prot_cluster_id_; }
+
   double getProteoInte() { return proteo_inte_; }
 
   int getPrecursorId() { return precursor_id_; }
@@ -101,6 +103,8 @@ class PrsmStr {
   void setProteoInte(double inte);
 
   void setProtId(int id);
+
+  void setProtClusterId(int id);
 
   void setFracFeatureId(int id);
 
@@ -174,6 +178,8 @@ class PrsmStr {
   // The information from prot_id to mass_shift_vec
   // is stored in the proteoform class
   int prot_id_;
+
+  int prot_cluster_id_;
 
   std::string seq_name_;
 

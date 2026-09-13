@@ -44,13 +44,14 @@ void process(const std::string& db_file_name, const std::string& spec_file_name,
   PrsmPtrVec prsms = prsm_reader_util::readAllPrsms(
       input_file_name, fasta_reader_ptr, fix_mod_list);
 
-  // E-value order, so the first PrSM seen for a protein is its best one.
+  // E-value order, so the first PrSM seen for a protein cluster is its best
+  // one.
   std::sort(prsms.begin(), prsms.end(), Prsm::cmpEValueIncProtInc);
   PrsmPtrVec selected_prsms;
-  std::set<std::string> seen_prots;
+  std::set<int> seen_prots;
   for (size_t i = 0; i < prsms.size(); i++) {
-    const std::string& seq_name = prsms[i]->getProteoformPtr()->getSeqName();
-    if (seen_prots.insert(seq_name).second) {
+    int cluster_id = prsms[i]->getProteoformPtr()->getProtClusterId();
+    if (seen_prots.insert(cluster_id).second) {
       selected_prsms.push_back(prsms[i]);
     }
   }

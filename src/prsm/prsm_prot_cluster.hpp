@@ -13,24 +13,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TOPPIC_PRSM_PRSM_PROT_FILTER_HPP_
-#define TOPPIC_PRSM_PRSM_PROT_FILTER_HPP_
+#ifndef TOPPIC_PRSM_PRSM_PROT_CLUSTER_HPP_
+#define TOPPIC_PRSM_PRSM_PROT_CLUSTER_HPP_
 
 #include <string>
 
 namespace toppic {
 
-namespace prsm_prot_filter {
+namespace prsm_prot_cluster {
 
-// Keep, for each protein cluster (prot_cluster_id, see prsm_prot_cluster) of
-// <base>.<input_file_ext>, only its best PrSM (the lowest E-value), and write
-// them to <base>.<output_file_ext>. The protein counterpart of
-// prsm_form_filter.
-void process(const std::string& db_file_name, const std::string& spec_file_name,
+// Assign the PrSMs of <base>.<input_file_ext> to protein clusters and write
+// them to <base>.<output_file_ext>. All PrSMs of a proteoform cluster go to
+// the same protein cluster, and two proteoform clusters are merged into one
+// protein cluster when their best (lowest E-value) proteoforms are from the
+// same protein. Cluster ids are assigned in E-value order of the clusters'
+// best PrSMs.
+void process(const std::string& spec_file_name,
              const std::string& input_file_ext,
              const std::string& output_file_ext);
 
-}  // namespace prsm_prot_filter
+}  // namespace prsm_prot_cluster
 
 }  // namespace toppic
 

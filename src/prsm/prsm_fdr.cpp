@@ -51,17 +51,17 @@ inline PrsmStrPtrVec2D getGroups(PrsmStrPtrVec& prsm_ptrs) {
   return results;
 }
 
-// Group the PrSMs by protein (sequence name). The input is sorted by E-value,
-// so the first PrSM of a group is the protein's best proteoform (lowest
-// E-value) and the groups come out ordered by that E-value.
+// Group the PrSMs by protein cluster (see prsm_prot_cluster). The input is
+// sorted by E-value, so the first PrSM of a group is the cluster's best
+// proteoform (lowest E-value) and the groups come out ordered by that E-value.
 PrsmStrPtrVec2D getProteinGroups(const PrsmStrPtrVec& prsm_ptrs) {
   PrsmStrPtrVec2D results;
-  std::map<std::string, size_t> group_idx;
+  std::map<int, size_t> group_idx;
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
-    std::string seq_name = prsm_ptrs[i]->getSeqName();
-    auto it = group_idx.find(seq_name);
+    int cluster_id = prsm_ptrs[i]->getProtClusterId();
+    auto it = group_idx.find(cluster_id);
     if (it == group_idx.end()) {
-      group_idx[seq_name] = results.size();
+      group_idx[cluster_id] = results.size();
       results.push_back(PrsmStrPtrVec{prsm_ptrs[i]});
     } else {
       results[it->second].push_back(prsm_ptrs[i]);

@@ -82,6 +82,8 @@ PrsmStr::PrsmStr(const std::vector<std::string>& str_vec) {
   proteo_inte_ = std::stod(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<prot_id>");
   prot_id_ = std::stoi(prsm_util::getValueStr(line));
+  line = prsm_util::getXmlLine(str_vec_, "<prot_cluster_id>");
+  prot_cluster_id_ = std::stoi(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<unexpected_ptm_num>");
   unexpected_ptm_num_ = std::stoi(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<variable_ptm_num>");
@@ -212,6 +214,13 @@ void PrsmStr::setProtId(int id) {
   int i = getXmlLineIndex(str_vec_, "<prot_id>");
   str_vec_[i] = "<prot_id>" + std::to_string(id) + "</prot_id>";
   prot_id_ = id;
+}
+
+void PrsmStr::setProtClusterId(int id) {
+  int i = getXmlLineIndex(str_vec_, "<prot_cluster_id>");
+  str_vec_[i] =
+      "<prot_cluster_id>" + std::to_string(id) + "</prot_cluster_id>";
+  prot_cluster_id_ = id;
 }
 
 bool PrsmStr::isSameSeqAndMass(const PrsmStrPtr& a, const PrsmStrPtr& b,

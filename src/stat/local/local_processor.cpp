@@ -161,6 +161,8 @@ PrsmPtr LocalProcessor::processOneMassShift(const PrsmPtr& prsm) {
       one_known_proteoform->setProteoClusterId(
           prsm->getProteoformPtr()->getProteoClusterId());
       one_known_proteoform->setProtId(prsm->getProteoformPtr()->getProtId());
+      one_known_proteoform->setProtClusterId(
+          prsm->getProteoformPtr()->getProtClusterId());
       prsm->setProteoformPtr(one_known_proteoform,
                              mng_ptr_->prsm_para_ptr_->getSpParaPtr());
       prsm->setAdjustedPrecMass(one_known_proteoform->getMass());
@@ -209,6 +211,8 @@ PrsmPtr LocalProcessor::processTwoMassShifts(const PrsmPtr& prsm) {
       two_known_proteoform->setProteoClusterId(
           prsm->getProteoformPtr()->getProteoClusterId());
       two_known_proteoform->setProtId(prsm->getProteoformPtr()->getProtId());
+      two_known_proteoform->setProtClusterId(
+          prsm->getProteoformPtr()->getProtClusterId());
       prsm->setProteoformPtr(two_known_proteoform,
                              mng_ptr_->prsm_para_ptr_->getSpParaPtr());
       prsm->setAdjustedPrecMass(two_known_proteoform->getMass());
