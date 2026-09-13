@@ -241,8 +241,8 @@ void DeconvMs1Process::process() {
   };
 
   // With --sql-3d, the raw MS1 peaks are kept (main thread only) and written
-  // to the same database as the PEAKS0..n / CONFIG tables of top_converter
-  // once deconvolution is done.
+  // to the same database as the PEAKS0..n / CONFIG tables once
+  // deconvolution is done.
   bool gene_sql_3d = sql_writer_ptr != nullptr && topfd_para_ptr_->isSql3d();
   std::vector<MsSqlPeak> peaks_3d;
   int ms1_scan_num_3d = 0;

@@ -44,8 +44,7 @@ struct MsSqlRange {
 };
 
 // Writes the MS1 peaks of an LC-MS map into the SQLite database read by the
-// 3D visualization. Used by top_converter (its own database) and by topfd
-// --sql-3d (added to the topfd .sqlite database).
+// 3D visualization (topfd --sql-3d adds them to the topfd .sqlite database).
 //
 // Layout: table PEAKS0 holds every MS1 peak, and PEAKS1, PEAKS2, ... hold
 // progressively down-sampled copies of it. The map is cut into a grid of

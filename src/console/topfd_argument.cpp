@@ -148,8 +148,7 @@ bool Argument::parse(int argc, char* argv[]) {
         "deconvolution. The default value is 1.")(
         "no-sql,N", "Do not write the deconvoluted spectra to an SQLite database.")(
         "sql-3d",
-        "Add the MS1 peaks for 3D visualization (the tables written by "
-        "top_converter) to the SQLite database.")(
+        "Add the MS1 peaks for 3D visualization to the SQLite database.")(
         "text-peak-list,T",
         "Deconvolute a single MS/MS spectrum given as a text peak list: one "
         "peak per line, m/z and intensity separated by a space. The output "
