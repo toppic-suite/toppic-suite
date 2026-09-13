@@ -94,6 +94,7 @@ void cleanTopmgDir(const std::string& fa_name, const std::string& sp_name,
     file_util::delFile(sp_base + ".topmg_cluster");
     file_util::delFile(sp_base + ".topmg_cluster_fdr");
     file_util::delFile(sp_base + ".topmg_form_cutoff");
+    file_util::delFile(sp_base + ".topmg_prot_cutoff");
     file_util::delDir(sp_base + "_topmg_proteoform_cutoff_xml");
     file_util::delDir(sp_base + "_topmg_prsm_cutoff_xml");
   }
@@ -363,8 +364,19 @@ int TopMG_post(std::map<std::string, std::string>& arguments) {
     std::cout << "PrSM filtering by " << cutoff_type << " - finished."
               << std::endl;
 
+    cutoff_type =
+        (arguments["cutoffProteinType"] == "FDR") ? "PROTFDR" : "EVALUE";
+    std::cout << "Protein filtering by " << cutoff_type << " - started."
+              << std::endl;
+    std::istringstream(arguments["cutoffProteinValue"]) >> cutoff_value;
+    prsm_cutoff_selector::process(db_file_name, sp_file_name,
+                                  "topmg_form_cutoff", "topmg_prot_cutoff",
+                                  cutoff_type, cutoff_value);
+    std::cout << "Protein filtering by " << cutoff_type << " - finished."
+              << std::endl;
+
     std::cout << "Selecting top PrSMs for proteoforms - started." << std::endl;
-    prsm_form_filter::process(db_file_name, sp_file_name, "topmg_form_cutoff",
+    prsm_form_filter::process(db_file_name, sp_file_name, "topmg_prot_cutoff",
                               "topmg_form_cutoff_form");
     std::cout << "Selecting top PrSMs for proteoforms - finished." << std::endl;
 

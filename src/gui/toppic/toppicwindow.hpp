@@ -77,6 +77,8 @@ class ToppicWindow : public QMainWindow {
 
   void on_cutoffProteoformTypeComboBox_currentIndexChanged(int index);
 
+  void on_cutoffProteinTypeComboBox_currentIndexChanged(int index);
+
   void on_decoyCheckBox_clicked(bool checked);
 
   void on_addButton_clicked();

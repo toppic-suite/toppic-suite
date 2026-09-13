@@ -48,6 +48,7 @@ ToppicWindow::ToppicWindow(QWidget* parent)
   ui->maxModEdit->setValidator(validator1);
   ui->cutoffSpectralValueEdit->setValidator(validator1);
   ui->cutoffProteoformValueEdit->setValidator(validator1);
+  ui->cutoffProteinValueEdit->setValidator(validator1);
   ui->numCombinedEdit->setValidator(new QIntValidator(0, 2147483647, this));
   QRegularExpression rx2("^0\\.\\d{0,2}|1.00$");
   QRegularExpressionValidator* validator2 = new QRegularExpressionValidator(rx2, this);
@@ -126,6 +127,8 @@ void ToppicWindow::on_defaultButton_clicked() {
       QString::fromStdString(arguments_["cutoffSpectralValue"]));
   ui->cutoffProteoformValueEdit->setText(
       QString::fromStdString(arguments_["cutoffProteoformValue"]));
+  ui->cutoffProteinValueEdit->setText(
+      QString::fromStdString(arguments_["cutoffProteinValue"]));
   ui->numCombinedEdit->setText(
       QString::fromStdString(arguments_["groupSpectrumNumber"]));
   ui->miscoreThresholdEdit->setText(
@@ -140,6 +143,7 @@ void ToppicWindow::on_defaultButton_clicked() {
   ui->activationComboBox->setCurrentIndex(0);
   ui->cutoffSpectralTypeComboBox->setCurrentIndex(0);
   ui->cutoffProteoformTypeComboBox->setCurrentIndex(0);
+  ui->cutoffProteinTypeComboBox->setCurrentIndex(0);
   ui->numModComboBox->setCurrentIndex(1);
   on_numModComboBox_currentIndexChanged(1);
 
@@ -313,6 +317,10 @@ std::map<std::string, std::string> ToppicWindow::getArguments() {
       ui->cutoffProteoformTypeComboBox->currentText().toStdString();
   arguments_["cutoffProteoformValue"] =
       ui->cutoffProteoformValueEdit->text().toStdString();
+  arguments_["cutoffProteinType"] =
+      ui->cutoffProteinTypeComboBox->currentText().toStdString();
+  arguments_["cutoffProteinValue"] =
+      ui->cutoffProteinValueEdit->text().toStdString();
   arguments_["allowProtMod"] = "";
   if (ui->NONECheckBox->isChecked()) {
     arguments_["allowProtMod"] = arguments_["allowProtMod"] + ",NONE";
@@ -454,6 +462,7 @@ void ToppicWindow::lockDialog() {
   ui->minModEdit->setEnabled(false);
   ui->cutoffSpectralValueEdit->setEnabled(false);
   ui->cutoffProteoformValueEdit->setEnabled(false);
+  ui->cutoffProteinValueEdit->setEnabled(false);
   ui->numCombinedEdit->setEnabled(false);
   ui->modFileEdit->setEnabled(false);
   ui->miscoreThresholdEdit->setEnabled(false);
@@ -462,6 +471,7 @@ void ToppicWindow::lockDialog() {
   ui->activationComboBox->setEnabled(false);
   ui->cutoffSpectralTypeComboBox->setEnabled(false);
   ui->cutoffProteoformTypeComboBox->setEnabled(false);
+  ui->cutoffProteinTypeComboBox->setEnabled(false);
   ui->numModComboBox->setEnabled(false);
   ui->NONECheckBox->setEnabled(false);
   ui->NMECheckBox->setEnabled(false);
@@ -499,6 +509,7 @@ void ToppicWindow::unlockDialog() {
   ui->minModEdit->setEnabled(true);
   ui->cutoffSpectralValueEdit->setEnabled(true);
   ui->cutoffProteoformValueEdit->setEnabled(true);
+  ui->cutoffProteinValueEdit->setEnabled(true);
   ui->numCombinedEdit->setEnabled(true);
   ui->modFileEdit->setEnabled(true);
   ui->miscoreThresholdEdit->setEnabled(true);
@@ -508,6 +519,7 @@ void ToppicWindow::unlockDialog() {
   ui->activationComboBox->setEnabled(true);
   ui->cutoffSpectralTypeComboBox->setEnabled(true);
   ui->cutoffProteoformTypeComboBox->setEnabled(true);
+  ui->cutoffProteinTypeComboBox->setEnabled(true);
   ui->numModComboBox->setEnabled(true);
   ui->NONECheckBox->setEnabled(true);
   ui->NMECheckBox->setEnabled(true);
@@ -604,6 +616,12 @@ bool ToppicWindow::checkError() {
                          QMessageBox::Yes);
     return true;
   }
+  if (ui->cutoffProteinValueEdit->text().isEmpty()) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("Protein-level cutoff value is empty!"),
+                         QMessageBox::Yes);
+    return true;
+  }
   if (ui->numCombinedEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
                          tr("Number of combined spectra is empty!"),
@@ -655,6 +673,8 @@ void ToppicWindow::showArguments() {
        "\ncutoffSpectralValue:" + arguments_["cutoffSpectralValue"] +
        "\ncutoffProteoformType:" + arguments_["cutoffProteoformType"] +
        "\ncutoffProteoformValue:" + arguments_["cutoffProteoformValue"] +
+       "\ncutoffProteinType:" + arguments_["cutoffProteinType"] +
+       "\ncutoffProteinValue:" + arguments_["cutoffProteinValue"] +
        "\nallowProtMod:" + arguments_["allowProtMod"] +
        "\nnumOfTopPrsms:" + arguments_["numOfTopPrsms"] +
        "\nminShiftMass:" + arguments_["minShiftMass"] +
@@ -798,9 +818,21 @@ void ToppicWindow::on_cutoffProteoformTypeComboBox_currentIndexChanged(
   }
 }
 
+void ToppicWindow::on_cutoffProteinTypeComboBox_currentIndexChanged(
+    int index) {
+  if (index == 1 && !ui->decoyCheckBox->isChecked()) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("To use an FDR cutoff, the checkbox \"decoy "
+                            "database\" should be checked!"),
+                         QMessageBox::Yes);
+    ui->cutoffProteinTypeComboBox->setCurrentIndex(0);
+  }
+}
+
 void ToppicWindow::on_decoyCheckBox_clicked(bool checked) {
   if (!checked && (ui->cutoffSpectralTypeComboBox->currentIndex() > 0 ||
-                   ui->cutoffProteoformTypeComboBox->currentIndex() > 0)) {
+                   ui->cutoffProteoformTypeComboBox->currentIndex() > 0 ||
+                   ui->cutoffProteinTypeComboBox->currentIndex() > 0)) {
     QMessageBox::warning(this, tr("Warning"),
                          tr("Because an FDR cutoff is selected, the checkbox "
                             "\"decoy database\" cannot be unchecked."),
