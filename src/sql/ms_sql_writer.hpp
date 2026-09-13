@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TOPPIC_SQL_MS_SQL_MS_SQL_WRITER_HPP_
-#define TOPPIC_SQL_MS_SQL_MS_SQL_WRITER_HPP_
+#ifndef TOPPIC_SQL_MS_SQL_WRITER_HPP_
+#define TOPPIC_SQL_MS_SQL_WRITER_HPP_
 
 #include <sqlite3.h>
 

@@ -347,8 +347,8 @@ built**; the executables are self-contained. Each layer depends only on the ones
 above it, never the reverse:
 
 - `src/common` — foundation: `base`, `util`, `xml`, `thread`.
-- `src/sql` — thin SQLite helper (`sql_util`) plus `ms_sql`, the MS1-peak
-  tables for 3D visualization: `MsSqlWriter` writes a peak list as `PEAKS0`
+- `src/sql` — thin SQLite helper (`sql_util`) plus `ms_sql_writer`, the
+  MS1-peak tables for 3D visualization: `MsSqlWriter` writes a peak list as `PEAKS0`
   (all peaks) plus down-sampled `PEAKS1..n` layer tables, one `CONFIG` row
   per layer, and a colour bucket per peak, on a caller-owned connection like
   the topfd writer below. topfd `--sql-3d` (in `deconv_ms1_process`) writes

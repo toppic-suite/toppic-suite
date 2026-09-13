@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "sql/ms_sql/ms_sql_writer.hpp"
+#include "sql/ms_sql_writer.hpp"
 
 #include <sqlite3.h>
 

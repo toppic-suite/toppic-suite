@@ -49,6 +49,8 @@ class TopFDDialog : public QMainWindow {
 
   void on_delButton_clicked();
 
+  void on_noSqlCheckBox_toggled(bool checked);
+
  private:
   QString lastDir_;
 

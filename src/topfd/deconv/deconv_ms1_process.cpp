@@ -31,7 +31,7 @@
 #include "ms/spec/baseline_util.hpp"
 #include "ms/spec/msalign_thread_merge.hpp"
 #include "ms/spec/msalign_writer.hpp"
-#include "sql/ms_sql/ms_sql_writer.hpp"
+#include "sql/ms_sql_writer.hpp"
 #include "topfd/deconv/deconv_prec_win.hpp"
 #include "topfd/deconv/deconv_single_sp.hpp"
 #include "topfd/deconv/deconv_util.hpp"

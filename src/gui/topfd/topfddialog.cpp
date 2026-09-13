@@ -133,6 +133,8 @@ void TopFDDialog::on_defaultButton_clicked() {
   ui->singleScanNoiseLevelCheckBox->setChecked(
       para_ptr->isUseSingleScanNoiseLevel());
   ui->noSqlCheckBox->setChecked(!para_ptr->isGeneSql());
+  ui->sql3dCheckBox->setChecked(para_ptr->isSql3d());
+  ui->sql3dCheckBox->setEnabled(para_ptr->isGeneSql());
 
   ui->outputTextBrowser->clear();
   ui->outputTextBrowser->setText(
@@ -186,6 +188,15 @@ bool TopFDDialog::ableToAdd(QString spfile) {
     able = false;
   }
   return able;
+}
+
+// --sql-3d needs the SQLite database, so the option is unavailable (and
+// cleared) while the database output is turned off.
+void TopFDDialog::on_noSqlCheckBox_toggled(bool checked) {
+  if (checked) {
+    ui->sql3dCheckBox->setChecked(false);
+  }
+  ui->sql3dCheckBox->setEnabled(!checked);
 }
 
 void TopFDDialog::on_delButton_clicked() {
@@ -307,6 +318,7 @@ toppic::TopfdParaPtr TopFDDialog::getParaPtr() {
   para_ptr_->setUseSingleScanNoiseLevel(
       ui->singleScanNoiseLevelCheckBox->isChecked());
   para_ptr_->setGeneSql(!ui->noSqlCheckBox->isChecked());
+  para_ptr_->setSql3d(ui->sql3dCheckBox->isChecked());
 
   return para_ptr_;
 }
@@ -335,6 +347,7 @@ void TopFDDialog::lockDialog() {
   ui->disableAdditionalFeatureSearchCheckBox->setEnabled(false);
   ui->singleScanNoiseLevelCheckBox->setEnabled(false);
   ui->noSqlCheckBox->setEnabled(false);
+  ui->sql3dCheckBox->setEnabled(false);
 }
 
 void TopFDDialog::unlockDialog() {
@@ -362,6 +375,7 @@ void TopFDDialog::unlockDialog() {
   ui->disableAdditionalFeatureSearchCheckBox->setEnabled(true);
   ui->singleScanNoiseLevelCheckBox->setEnabled(true);
   ui->noSqlCheckBox->setEnabled(true);
+  ui->sql3dCheckBox->setEnabled(!ui->noSqlCheckBox->isChecked());
 }
 
 bool TopFDDialog::checkError() {
