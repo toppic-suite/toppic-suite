@@ -475,12 +475,13 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>10</x>
          <y>25</y>
-         <width>111</width>
-         <height>31</height>
+         <width>91</width>
+         <height>41</height>
         </rect>
        </property>
        <property name="text">
-        <string>Spectrum level:</string>
+        <string>Spectrum
+level:</string>
        </property>
       </widget>
       <widget class="QLabel" name="label_13">
@@ -488,12 +489,13 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>300</x>
          <y>25</y>
-         <width>121</width>
-         <height>31</height>
+         <width>91</width>
+         <height>41</height>
         </rect>
        </property>
        <property name="text">
-        <string>Proteoform level:</string>
+        <string>Proteoform
+level:</string>
        </property>
       </widget>
       <widget class="QWidget" name="verticalLayoutWidget">
@@ -579,12 +581,13 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>600</x>
          <y>20</y>
-         <width>101</width>
-         <height>31</height>
+         <width>91</width>
+         <height>41</height>
         </rect>
        </property>
        <property name="text">
-        <string>Protein level:</string>
+        <string>Protein
+level:</string>
        </property>
       </widget>
       <widget class="QWidget" name="layoutWidget_2">
