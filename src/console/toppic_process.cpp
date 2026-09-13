@@ -114,6 +114,7 @@ void cleanToppicDir(const std::string& fa_name, const std::string& sp_name,
     file_util::delFile(sp_base + ".toppic_cluster_local");
     file_util::delFile(sp_base + ".toppic_prsm_cutoff");
     file_util::delFile(sp_base + ".toppic_form_cutoff");
+    file_util::delFile(sp_base + ".toppic_prot_cutoff");
     file_util::delFile(sp_base + ".toppic_form_cutoff_form");
     file_util::delDir(sp_base + "_toppic_proteoform_cutoff_xml");
     file_util::delDir(sp_base + "_toppic_prsm_cutoff_xml");
@@ -498,15 +499,15 @@ int TopPIC_post(std::map<std::string, std::string>& arguments) {
       cur_suffix = "toppic_cluster_fdr";
     }
 
-    std::string cutoff_type = arguments["cutoffSpectralType"];
-    std::cout << "PrSM filtering by " << cutoff_type << " - started."
+    std::string spectra_cutoff_type = arguments["cutoffSpectralType"];
+    std::cout << "PrSM filtering by " << spectra_cutoff_type << " - started."
               << std::endl;
     double cutoff_value;
     std::istringstream(arguments["cutoffSpectralValue"]) >> cutoff_value;
     prsm_cutoff_selector::process(db_file_name, sp_file_name, cur_suffix,
-                                  "toppic_prsm_cutoff", cutoff_type,
+                                  "toppic_prsm_cutoff", spectra_cutoff_type,
                                   cutoff_value);
-    std::cout << "PrSM filtering by " << cutoff_type << " - finished."
+    std::cout << "PrSM filtering by " << spectra_cutoff_type << " - finished."
               << std::endl;
     cur_suffix = "toppic_prsm_cutoff";
 
@@ -528,19 +529,30 @@ int TopPIC_post(std::map<std::string, std::string>& arguments) {
       std::cout << "Outputting PrSM coverage - finished." << std::endl;
     }
 
-    cutoff_type =
+    std::string form_cutoff_type =
         (arguments["cutoffProteoformType"] == "FDR") ? "FORMFDR" : "EVALUE";
-    std::cout << "PrSM filtering by " << cutoff_type << " - started."
+    std::cout << "Proteoform filtering by " << form_cutoff_type << " - started."
               << std::endl;
     std::istringstream(arguments["cutoffProteoformValue"]) >> cutoff_value;
     prsm_cutoff_selector::process(db_file_name, sp_file_name, cur_suffix,
-                                  "toppic_form_cutoff", cutoff_type,
+                                  "toppic_form_cutoff", form_cutoff_type,
                                   cutoff_value);
-    std::cout << "PrSM filtering by " << cutoff_type << " - finished."
+    std::cout << "Proteoform filtering by " << form_cutoff_type << " - finished."
+              << std::endl;
+
+    std::string prot_cutoff_type =
+        (arguments["cutoffProteinType"] == "FDR") ? "PROTFDR" : "EVALUE";
+    std::cout << "Protein filtering by " << prot_cutoff_type << " - started."
+              << std::endl;
+    std::istringstream(arguments["cutoffProteinValue"]) >> cutoff_value;
+    prsm_cutoff_selector::process(db_file_name, sp_file_name,
+                                  "toppic_form_cutoff", "toppic_prot_cutoff",
+                                  prot_cutoff_type, cutoff_value);
+    std::cout << "Protein filtering by " << prot_cutoff_type << " - finished."
               << std::endl;
 
     std::cout << "Selecting top PrSMs for proteoforms - started." << std::endl;
-    prsm_form_filter::process(db_file_name, sp_file_name, "toppic_form_cutoff",
+    prsm_form_filter::process(db_file_name, sp_file_name, "toppic_prot_cutoff",
                               "toppic_form_cutoff_form");
     std::cout << "Selecting top PrSMs for proteoforms - finished." << std::endl;
     std::cout << "Outputting proteoform table - started." << std::endl;

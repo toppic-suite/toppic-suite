@@ -57,7 +57,7 @@ void PrsmMatchTableWriter::writeHeader(std::ofstream& file) {
        << "Variable PTMs" << delim << "MIScore" << delim << "# Matched masses"
        << delim << "# Matched fragments" << delim << "E-value" << delim
        << "Spectrum-level Q-value" << delim << "Proteoform-level Q-value"
-       << std::endl;
+       << delim << "Protein-level Q-value" << std::endl;
 }
 
 void PrsmMatchTableWriter::write(const std::string& output_file_ext,
@@ -217,7 +217,14 @@ void PrsmMatchTableWriter::writePrsmStandardFormat(
 
   double proteoform_fdr = prsm_ptr->getProteoformFdr();
   if (proteoform_fdr >= 0) {
-    line_str << proteoform_fdr << std::endl;
+    line_str << proteoform_fdr << delim;
+  } else {
+    line_str << empty_str << delim;
+  }
+
+  double protein_fdr = prsm_ptr->getProteinFdr();
+  if (protein_fdr >= 0) {
+    line_str << protein_fdr << std::endl;
   } else {
     line_str << empty_str << std::endl;
   }
@@ -247,7 +254,7 @@ void PrsmMatchTableWriter::writePrsmStandardFormat(
                << delim << delim << delim << delim << delim;
 
       // fdr
-      line_str << delim << std::endl;
+      line_str << delim << delim << std::endl;
     }
   }
 

@@ -70,6 +70,8 @@ PrsmStr::PrsmStr(const std::vector<std::string>& str_vec) {
   fdr_ = std::stod(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<proteoform_fdr>");
   proteoform_fdr_ = std::stod(prsm_util::getValueStr(line));
+  line = prsm_util::getXmlLine(str_vec_, "<protein_fdr>");
+  protein_fdr_ = std::stod(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<start_pos>");
   proteoform_start_pos_ = std::stoi(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<end_pos>");
@@ -126,6 +128,13 @@ void PrsmStr::setProteoformFdr(double proteoform_fdr) {
   str_vec_[i] = "<proteoform_fdr>" + str_util::toString(proteoform_fdr) +
                 "</proteoform_fdr>";
   proteoform_fdr_ = proteoform_fdr;
+}
+
+void PrsmStr::setProteinFdr(double protein_fdr) {
+  int i = getXmlLineIndex(str_vec_, "<protein_fdr>");
+  str_vec_[i] =
+      "<protein_fdr>" + str_util::toString(protein_fdr) + "</protein_fdr>";
+  protein_fdr_ = protein_fdr;
 }
 
 void PrsmStr::setFileName(const std::string& fname) {

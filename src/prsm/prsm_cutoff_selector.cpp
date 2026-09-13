@@ -46,6 +46,7 @@ void process(const std::string& db_file_name, const std::string& spec_file_name,
   bool evalue_cutoff = (cutoff_type == "EVALUE");
   bool fdr_cutoff = (cutoff_type == "FDR");
   bool form_fdr_cutoff = (cutoff_type == "FORMFDR");
+  bool prot_fdr_cutoff = (cutoff_type == "PROTFDR");
   bool frag_cutoff = (cutoff_type == "FRAG");
 
   PrsmPtrVec selected_prsms;
@@ -61,6 +62,13 @@ void process(const std::string& db_file_name, const std::string& spec_file_name,
       id++;
     } else if (form_fdr_cutoff && prsms[i]->getFdr() <= cutoff_value &&
                prsms[i]->getProteoformFdr() <= cutoff_value) {
+      prsms[i]->setPrsmId(id);
+      selected_prsms.push_back(prsms[i]);
+      id++;
+    } else if (prot_fdr_cutoff && prsms[i]->getProteinFdr() >= 0 &&
+               prsms[i]->getProteinFdr() <= cutoff_value) {
+      // protein-level FDR: keep the PrSMs of proteins whose best proteoform
+      // passes the cutoff (see prsm_fdr::computeProteinFdr)
       prsms[i]->setPrsmId(id);
       selected_prsms.push_back(prsms[i]);
       id++;

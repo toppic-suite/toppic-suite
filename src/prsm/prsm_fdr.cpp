@@ -16,6 +16,9 @@
 #include "prsm/prsm_fdr.hpp"
 
 #include <algorithm>
+#include <cstddef>
+#include <map>
+#include <string>
 
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
@@ -43,6 +46,25 @@ inline PrsmStrPtrVec2D getGroups(PrsmStrPtrVec& prsm_ptrs) {
       PrsmStrPtrVec new_group;
       new_group.push_back(prsm_ptrs[i]);
       results.push_back(new_group);
+    }
+  }
+  return results;
+}
+
+// Group the PrSMs by protein (sequence name). The input is sorted by E-value,
+// so the first PrSM of a group is the protein's best proteoform (lowest
+// E-value) and the groups come out ordered by that E-value.
+PrsmStrPtrVec2D getProteinGroups(const PrsmStrPtrVec& prsm_ptrs) {
+  PrsmStrPtrVec2D results;
+  std::map<std::string, size_t> group_idx;
+  for (size_t i = 0; i < prsm_ptrs.size(); i++) {
+    std::string seq_name = prsm_ptrs[i]->getSeqName();
+    auto it = group_idx.find(seq_name);
+    if (it == group_idx.end()) {
+      group_idx[seq_name] = results.size();
+      results.push_back(PrsmStrPtrVec{prsm_ptrs[i]});
+    } else {
+      results[it->second].push_back(prsm_ptrs[i]);
     }
   }
   return results;
@@ -99,6 +121,41 @@ void computeProteoformFdr(PrsmStrPtrVec2D& target_proteoforms,
   }
 }
 
+// Protein-level FDR: each protein is represented by its best proteoform (the
+// PrSM with the lowest E-value, the first of its group); target and decoy
+// proteins are walked in E-value order and the FDR at a target protein is
+// (#decoy proteins with a better or equal E-value) / (#target proteins so
+// far). The value is assigned to every PrSM of the protein.
+void computeProteinFdr(PrsmStrPtrVec2D& target_proteins,
+                       PrsmStrPtrVec2D& decoy_proteins) {
+  int n_decoy = 0;
+  for (size_t i = 0; i < target_proteins.size(); i++) {
+    int n_target = i + 1;
+    double target_evalue = target_proteins[i][0]->getEValue();
+    for (size_t j = n_decoy; j < decoy_proteins.size(); j++) {
+      if (decoy_proteins[j][0]->getEValue() <= target_evalue) {
+        n_decoy++;
+        double fdr = computeFdr(n_decoy, n_target);
+        for (size_t k = 0; k < decoy_proteins[j].size(); k++) {
+          decoy_proteins[j][k]->setProteinFdr(fdr);
+        }
+      } else {
+        break;
+      }
+    }
+    double fdr = computeFdr(n_decoy, n_target);
+    for (size_t k = 0; k < target_proteins[i].size(); k++) {
+      target_proteins[i][k]->setProteinFdr(fdr);
+    }
+  }
+  // decoy proteins ranked below every target protein
+  for (size_t j = n_decoy; j < decoy_proteins.size(); j++) {
+    for (size_t k = 0; k < decoy_proteins[j].size(); k++) {
+      decoy_proteins[j][k]->setProteinFdr(1.0);
+    }
+  }
+}
+
 void process(const std::string& spec_file_name,
              const std::string& input_file_ext,
              const std::string& output_file_ext,
@@ -133,6 +190,10 @@ void process(const std::string& spec_file_name,
   PrsmStrPtrVec2D target_proteoforms = getGroups(target_ptrs);
   PrsmStrPtrVec2D decoy_proteoforms = getGroups(decoy_ptrs);
   computeProteoformFdr(target_proteoforms, decoy_proteoforms);
+
+  PrsmStrPtrVec2D target_proteins = getProteinGroups(target_ptrs);
+  PrsmStrPtrVec2D decoy_proteins = getProteinGroups(decoy_ptrs);
+  computeProteinFdr(target_proteins, decoy_proteins);
 
   std::string output_file_name = base_name + "." + output_file_ext;
   PrsmXmlWriter writer(output_file_name);

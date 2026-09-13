@@ -62,6 +62,8 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["cutoffSpectralValue"] = "0.01";
   arguments["cutoffProteoformType"] = "EVALUE";
   arguments["cutoffProteoformValue"] = "0.01";
+  arguments["cutoffProteinType"] = "EVALUE";
+  arguments["cutoffProteinValue"] = "0.01";
   arguments["localPtmFileName"] = "";
   arguments["localThreshold"] = "0.15";
 
@@ -176,6 +178,10 @@ void ToppicArgument::outputArguments(
   output << std::setw(gap) << std::left
          << "Proteoform-level cutoff value:" << sep
          << arguments["cutoffProteoformValue"] << std::endl;
+  output << std::setw(gap) << std::left << "Protein-level cutoff type:" << sep
+         << arguments["cutoffProteinType"] << std::endl;
+  output << std::setw(gap) << std::left << "Protein-level cutoff value:" << sep
+         << arguments["cutoffProteinValue"] << std::endl;
 
   output << std::setw(gap) << std::left
          << "Error tolerance for matching masses:" << sep
@@ -276,6 +282,8 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
   std::string cutoff_spectral_value = "";
   std::string cutoff_proteoform_type = "";
   std::string cutoff_proteoform_value = "";
+  std::string cutoff_protein_type = "";
+  std::string cutoff_protein_value = "";
   std::string local_ptm_file_name = "";
   std::string local_threshold = "";
   std::string group_num = "";
@@ -364,6 +372,15 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
             po::value<std::string>(&cutoff_proteoform_value),
             "<a positive number>. Proteoform-level cutoff value for filtering "
             "identified proteoform-spectrum-matches. Default value: 0.01.")(
+            "protein-cutoff-type", po::value<std::string>(&cutoff_protein_type),
+            "<EVALUE|FDR>. Protein-level cutoff type for filtering identified "
+            "proteoform-spectrum-matches. With FDR, a protein is represented "
+            "by its best proteoform (the lowest E-value). Default value: "
+            "EVALUE.")(
+            "protein-cutoff-value",
+            po::value<std::string>(&cutoff_protein_value),
+            "<a positive number>. Protein-level cutoff value for filtering "
+            "identified proteoform-spectrum-matches. Default value: 0.01.")(
             "approximate-spectra,A",
             "Use approximate spectra to increase the sensitivity in protein "
             "filtering. Default value: false.")(
@@ -418,7 +435,10 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
                 po::value<std::string>(&cutoff_proteoform_type),
                 "")("proteoform-cutoff-value,V",
                     po::value<std::string>(&cutoff_proteoform_value),
-                    "")("local-ptm-file-name,B",
+                    "")("protein-cutoff-type",
+                        po::value<std::string>(&cutoff_protein_type), "")(
+        "protein-cutoff-value", po::value<std::string>(&cutoff_protein_value),
+        "")("local-ptm-file-name,B",
                         po::value<std::string>(&local_ptm_file_name), "")(
         "miscore-threshold,H", po::value<std::string>(&local_threshold), "")(
         "num-combined-spectra,r", po::value<std::string>(&group_num), "")(
@@ -569,6 +589,14 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
 
     if (vm.count("proteoform-cutoff-value")) {
       arguments_["cutoffProteoformValue"] = cutoff_proteoform_value;
+    }
+
+    if (vm.count("protein-cutoff-type")) {
+      arguments_["cutoffProteinType"] = cutoff_protein_type;
+    }
+
+    if (vm.count("protein-cutoff-value")) {
+      arguments_["cutoffProteinValue"] = cutoff_protein_value;
     }
 
     if (vm.count("local-ptm-file-name")) {
@@ -769,6 +797,22 @@ bool ToppicArgument::validateArguments() {
     return false;
   }
 
+  std::string cutoff_protein_type = arguments_["cutoffProteinType"];
+  if (cutoff_protein_type != "EVALUE" && cutoff_protein_type != "FDR") {
+    LOG_ERROR("Protein-level cutoff type "
+              << cutoff_protein_type
+              << " error! The value should be EVALUE|FDR");
+    return false;
+  }
+
+  if (cutoff_protein_type == "FDR" && search_type != "TARGET+DECOY") {
+    LOG_ERROR("Protein-level cutoff type "
+              << cutoff_protein_type
+              << " error! FDR cutoff cannot be used when no decoy database is "
+                 "used! Please add argument '-d' in the command.");
+    return false;
+  }
+
   std::string min_shift_mass = arguments_["minShiftMass"];
   try {
     std::stod(min_shift_mass);
@@ -852,7 +896,7 @@ bool ToppicArgument::validateArguments() {
     return false;
   }
 
-  std::string cutoff_proteoform_value = arguments_["cutoffSpectralValue"];
+  std::string cutoff_proteoform_value = arguments_["cutoffProteoformValue"];
   try {
     double th = std::stod(cutoff_proteoform_value);
     if (th < 0) {
@@ -864,6 +908,21 @@ bool ToppicArgument::validateArguments() {
   } catch (const std::exception& ex) {
     LOG_ERROR("Proteoform-level cutoff value " << cutoff_proteoform_value
                                                << " should be a number.");
+    return false;
+  }
+
+  std::string cutoff_protein_value = arguments_["cutoffProteinValue"];
+  try {
+    double th = std::stod(cutoff_protein_value);
+    if (th < 0) {
+      LOG_ERROR("Protein-level cutoff value "
+                << cutoff_protein_value
+                << " error! The value should be positive.");
+      return false;
+    }
+  } catch (const std::exception& ex) {
+    LOG_ERROR("Protein-level cutoff value " << cutoff_protein_value
+                                            << " should be a number.");
     return false;
   }
 

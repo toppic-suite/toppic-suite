@@ -96,7 +96,8 @@ void PrsmSqlWriter::createPrsmTable(const std::string& table_name) {
                                  "matched_fragment_num INT NOT NULL,"
                                  "e_value REAL NOT NULL,"
                                  "spectrum_fdr REAL,"
-                                 "proteoform_fdr REAL);");
+                                 "proteoform_fdr REAL,"
+                                 "protein_fdr REAL);");
 }
 
 void PrsmSqlWriter::write(const std::string& input_file_ext,
@@ -110,7 +111,7 @@ void PrsmSqlWriter::write(const std::string& input_file_ext,
       sql_db_, "INSERT INTO " + table_name +
                    " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
-                   "?, ?, ?);");
+                   "?, ?, ?, ?);");
   sqlite3_stmt* shift_stmt = nullptr;
   sqlite3_stmt* match_stmt = nullptr;
   if (write_details) {
@@ -222,6 +223,7 @@ void PrsmSqlWriter::writePrsm(sqlite3_stmt* stmt, const PrsmPtr& prsm_ptr) {
   sqlite3_bind_double(stmt, idx++, prsm_ptr->getEValue());
   bindFdr(stmt, idx++, prsm_ptr->getFdr());
   bindFdr(stmt, idx++, prsm_ptr->getProteoformFdr());
+  bindFdr(stmt, idx++, prsm_ptr->getProteinFdr());
   sql_util::stepAndReset(sql_db_, stmt);
 }
 

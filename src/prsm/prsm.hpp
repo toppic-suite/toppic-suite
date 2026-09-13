@@ -74,6 +74,8 @@ class Prsm {
 
   double getProteoformFdr() { return proteoform_fdr_; }
 
+  double getProteinFdr() { return protein_fdr_; }
+
   DeconvMsPtrVec getDeconvMsPtrVec() { return deconv_ms_ptr_vec_; }
 
   ExtendMsPtrVec getRefineMsPtrVec() { return refine_ms_three_vec_; }
@@ -130,6 +132,8 @@ class Prsm {
   void setProteoformFdr(double proteoform_fdr) {
     proteoform_fdr_ = proteoform_fdr;
   }
+
+  void setProteinFdr(double protein_fdr) { protein_fdr_ = protein_fdr; }
 
   void setDeconvMsPtrVec(DeconvMsPtrVec ms_vec) {
     deconv_ms_ptr_vec_ = std::move(ms_vec);
@@ -212,6 +216,7 @@ class Prsm {
 
   double fdr_ = -1;
   double proteoform_fdr_ = -1;
+  double protein_fdr_ = -1;
   int hit_cnt_ = 0;
 
   /* The following are not saved in xml */

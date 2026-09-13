@@ -136,6 +136,8 @@ XmlDOMElement Prsm::toXmlElement(XmlDOMDocument* xml_doc,
   xml_doc->addElement(element, "fdr", str.c_str());
   str = str_util::toString(proteoform_fdr_);
   xml_doc->addElement(element, "proteoform_fdr", str.c_str());
+  str = str_util::toString(protein_fdr_);
+  xml_doc->addElement(element, "protein_fdr", str.c_str());
   str = str_util::toString(frac_feature_inte_);
   xml_doc->addElement(element, "frac_feature_inte", str.c_str());
   str = str_util::toString(frac_feature_score_);
@@ -183,6 +185,7 @@ void Prsm::parseXml(XmlDOMElement element) {
   fdr_ = xml_dom_util::getDoubleChildValue(element, "fdr", 0);
   proteoform_fdr_ =
       xml_dom_util::getDoubleChildValue(element, "proteoform_fdr", 0);
+  protein_fdr_ = xml_dom_util::getDoubleChildValue(element, "protein_fdr", 0);
   match_peak_num_ =
       xml_dom_util::getDoubleChildValue(element, "match_peak_num", 0);
   match_fragment_num_ =

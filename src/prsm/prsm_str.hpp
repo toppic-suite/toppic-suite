@@ -84,6 +84,8 @@ class PrsmStr {
 
   double getProteoformFdr() { return proteoform_fdr_; }
 
+  double getProteinFdr() { return protein_fdr_; }
+
   double getOriPrecMass() { return ori_prec_mass_; }
 
   double getAdjustedPrecMass() { return adjusted_prec_mass_; }
@@ -117,6 +119,8 @@ class PrsmStr {
   void setFdr(double fdr);
 
   void setProteoformFdr(double proteoform_fdr);
+
+  void setProteinFdr(double protein_fdr);
 
   static bool cmpEValueIncProtInc(const PrsmStrPtr& a, const PrsmStrPtr& b);
 
@@ -205,6 +209,8 @@ class PrsmStr {
   double fdr_;
 
   double proteoform_fdr_;
+
+  double protein_fdr_;
 };
 
 using PrsmStrPtrVec = std::vector<PrsmStrPtr>;
