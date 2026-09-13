@@ -43,6 +43,7 @@
 #include "prsm/prsm_form_filter.hpp"
 #include "prsm/prsm_match_table_writer.hpp"
 #include "prsm/prsm_prot_cluster.hpp"
+#include "prsm/prsm_prot_filter.hpp"
 #include "prsm/prsm_simple_cluster.hpp"
 #include "prsm/prsm_str_merge.hpp"
 #include "prsm/prsm_top_selector.hpp"
@@ -73,6 +74,10 @@ void cleanTopmgDir(const std::string& fa_name, const std::string& sp_name,
   file_util::delFile(sp_base + "_topmg_proteoform.xml");
   std::filesystem::rename(sp_base + ".topmg_form_cutoff_form",
                           sp_base + "_topmg_proteoform.xml");
+
+  file_util::delFile(sp_base + "_topmg_protein.xml");
+  std::filesystem::rename(sp_base + ".topmg_prot_cutoff_prot",
+                          sp_base + "_topmg_protein.xml");
 
   file_util::delFile(sp_base + "_topmg_prsm_cutoff.xml");
   std::filesystem::rename(sp_base + ".topmg_prsm_cutoff",
@@ -344,6 +349,7 @@ int TopMG_post(std::map<std::string, std::string>& arguments) {
                                   cutoff_value);
     std::cout << "PrSM filtering by " << cutoff_type << " - finished."
               << std::endl;
+    cur_suffix = "topmg_prsm_cutoff";
 
     std::time_t end = time(nullptr);
     char buf[50];
@@ -362,14 +368,26 @@ int TopMG_post(std::map<std::string, std::string>& arguments) {
 
     cutoff_type =
         (arguments["cutoffProteoformType"] == "FDR") ? "FORMFDR" : "EVALUE";
-    std::cout << "PrSM filtering by " << cutoff_type << " - started."
+    std::cout << "Proteoform filtering by " << cutoff_type << " - started."
               << std::endl;
     std::istringstream(arguments["cutoffProteoformValue"]) >> cutoff_value;
     prsm_cutoff_selector::process(db_file_name, sp_file_name, cur_suffix,
                                   "topmg_form_cutoff", cutoff_type,
                                   cutoff_value);
-    std::cout << "PrSM filtering by " << cutoff_type << " - finished."
+    std::cout << "Proteoform filtering by " << cutoff_type << " - finished."
               << std::endl;
+
+    std::cout << "Selecting top PrSMs for proteoforms - started." << std::endl;
+    prsm_form_filter::process(db_file_name, sp_file_name, "topmg_form_cutoff",
+                              "topmg_form_cutoff_form");
+    std::cout << "Selecting top PrSMs for proteoforms - finished." << std::endl;
+    std::cout << "Outputting proteoform table - started." << std::endl;
+    PrsmMatchTableWriterPtr form_out = std::make_shared<PrsmMatchTableWriter>(
+        prsm_para_ptr, argu_str, "topmg_form_cutoff_form");
+    form_out->write("_topmg_proteoform_single.tsv", false);
+    form_out->write("_topmg_proteoform.tsv", true);
+    form_out = nullptr;
+    std::cout << "Outputting proteoform table - finished." << std::endl;
 
     cutoff_type =
         (arguments["cutoffProteinType"] == "FDR") ? "PROTFDR" : "EVALUE";
@@ -382,19 +400,17 @@ int TopMG_post(std::map<std::string, std::string>& arguments) {
     std::cout << "Protein filtering by " << cutoff_type << " - finished."
               << std::endl;
 
-    std::cout << "Selecting top PrSMs for proteoforms - started." << std::endl;
-    prsm_form_filter::process(db_file_name, sp_file_name, "topmg_prot_cutoff",
-                              "topmg_form_cutoff_form");
-    std::cout << "Selecting top PrSMs for proteoforms - finished." << std::endl;
-
-    std::cout << "Outputting proteoform table - started." << std::endl;
-    PrsmMatchTableWriterPtr form_out = std::make_shared<PrsmMatchTableWriter>(
-        prsm_para_ptr, argu_str, "topmg_form_cutoff_form");
-    form_out->write("_topmg_proteoform_single.tsv", false);
-    form_out->write("_topmg_proteoform.tsv", true);
-
-    form_out = nullptr;
-    std::cout << "Outputting proteoform table - finished." << std::endl;
+    std::cout << "Selecting top PrSMs for proteins - started." << std::endl;
+    prsm_prot_filter::process(db_file_name, sp_file_name, "topmg_prot_cutoff",
+                              "topmg_prot_cutoff_prot");
+    std::cout << "Selecting top PrSMs for proteins - finished." << std::endl;
+    std::cout << "Outputting protein table - started." << std::endl;
+    PrsmMatchTableWriterPtr prot_out = std::make_shared<PrsmMatchTableWriter>(
+        prsm_para_ptr, argu_str, "topmg_prot_cutoff_prot");
+    prot_out->write("_topmg_protein_single.tsv", false);
+    prot_out->write("_topmg_protein.tsv", true);
+    prot_out = nullptr;
+    std::cout << "Outputting protein table - finished." << std::endl;
 
   } catch (const char* e) {
     LOG_ERROR("[Exception]" << e);
