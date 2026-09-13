@@ -91,7 +91,7 @@ FAIMS data `sample_<voltage>` per voltage level, e.g. `sample_-40`).
 | `sample_ms1.feature` | Proteoform features detected in the LC-MS map: one line per feature with its mass, intensity, retention-time and scan range, charge range, apex and ECScore. |
 | `sample_ms2.feature` | The feature assigned to each MS/MS spectrum (precursor mass, m/z, charge and intensity). |
 | `sample_feature.xml` | The proteoform features in XML, with their per-charge envelope information; used by TopDiff. |
-| `sample.sqlite` | An SQLite database with the deconvoluted MS1 and MS/MS spectra and their peaks, for spectrum visualisation. Not written with `--no-sql`. |
+| `sample.sqlite` | An SQLite database with the deconvoluted MS1 and MS/MS spectra and their peaks, for spectrum visualisation. Not written with `--no-sql`. With `--sql-3d` it also holds the raw MS1 peak tables for 3D visualisation (`CONFIG` and `PEAKS0`, `PEAKS1`, ...) that `top_converter` would otherwise write to a separate `_3d.db` file. |
 | `sample_ms1.csv`, `sample_frac_ms1.mzrt.csv` | Only with `--output-batmass-feature`: the ECScore table and the features in the BatMass CSV format. |
 
 The `msalign` format is a text format. Each spectrum is a `BEGIN IONS` ...
@@ -121,6 +121,7 @@ Parameters that apply to both MS1 and MS/MS deconvolution:
 | `-u`, `--thread-number <int>` | 1 | Number of threads. TopFD checks that the machine has enough memory for the requested number. |
 | `-o`, `--missing-level-one` | off | The file has no MS1 spectra: skip MS1 deconvolution and feature detection. |
 | `-N`, `--no-sql` | off | Do not write the `.sqlite` database. |
+| `--sql-3d` | off | Also store the raw MS1 peaks for 3D visualisation in the `.sqlite` database (the tables `top_converter` writes), so that tool need not be run separately. Cannot be combined with `--no-sql`; has no effect with `-T` or `-o`. |
 | `-T`, `--text-peak-list` | off | The input is a text peak list (one MS/MS spectrum), not an mzML file; see section 2. |
 
 MS1 deconvolution and proteoform feature detection:

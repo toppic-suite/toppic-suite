@@ -15,7 +15,11 @@
 
 #include "sql/ms_sql/ms_sql_util.hpp"
 
+#include <sqlite3.h>
+
 #include <cstddef>
+#include <cstdlib>
+#include <filesystem>
 #include <iostream>
 #include <string>
 #include <utility>
@@ -26,7 +30,9 @@
 #include "pwiz/data/msdata/SpectrumInfo.hpp"
 
 #include "common/util/file_util.hpp"
+#include "common/util/logger.hpp"
 #include "sql/ms_sql/ms_sql_writer.hpp"
+#include "sql/sql_util.hpp"
 
 namespace toppic {
 
@@ -76,8 +82,24 @@ void convert(const std::string& spec_file_name, double mz_size,
 
   std::string db_file_name = getDbFileName(spec_file_name);
   std::cout << "Writing " << db_file_name << " - started." << std::endl;
-  MsSqlWriter writer(db_file_name);
-  writer.write(std::move(peaks), ms1_scan_num, mz_size, rt_divider);
+  std::error_code ec;
+  std::filesystem::remove(db_file_name, ec);
+  sqlite3* db = nullptr;
+  if (sqlite3_open(db_file_name.c_str(), &db) != SQLITE_OK) {
+    LOG_ERROR("Cannot open the database " << db_file_name << ": "
+                                          << sqlite3_errmsg(db));
+    exit(EXIT_FAILURE);
+  }
+  // Bulk-load settings: the database is written once, in one transaction,
+  // and simply regenerated if that is interrupted.
+  sql_util::execSql(db, "PRAGMA temp_store = MEMORY;");
+  sql_util::execSql(db, "PRAGMA journal_mode = MEMORY;");
+  sql_util::execSql(db, "PRAGMA synchronous = OFF;");
+  {
+    MsSqlWriter writer(db);
+    writer.write(std::move(peaks), ms1_scan_num, mz_size, rt_divider);
+  }
+  sqlite3_close(db);
   std::cout << "Writing " << db_file_name << " - finished." << std::endl;
 }
 

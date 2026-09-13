@@ -203,6 +203,8 @@ std::string TopfdPara::getTopfdParaStr(const std::string& prefix,
   kv("Peak m/z error tolerance:") << mz_error_ << " m/z" << std::endl;
   kv("Thread number:") << thread_num_ << std::endl;
   kv("SQLite database output:") << (gene_sql_ ? "Yes" : "No") << std::endl;
+  kv("MS1 peaks for 3D visualization:")
+      << (gene_sql_ && sql_3d_ ? "Yes" : "No") << std::endl;
 
   if (missing_level_one_) {
     kv("Miss MS1 spectra:") << "Yes" << std::endl;

@@ -44,7 +44,8 @@ struct MsSqlRange {
 };
 
 // Writes the MS1 peaks of an LC-MS map into the SQLite database read by the
-// 3D visualization.
+// 3D visualization. Used by top_converter (its own database) and by topfd
+// --sql-3d (added to the topfd .sqlite database).
 //
 // Layout: table PEAKS0 holds every MS1 peak, and PEAKS1, PEAKS2, ... hold
 // progressively down-sampled copies of it. The map is cut into a grid of
@@ -56,10 +57,9 @@ struct MsSqlRange {
 // map.
 class MsSqlWriter {
  public:
-  // Opens the database file, replacing an existing one.
-  explicit MsSqlWriter(const std::string& db_file_name);
-
-  ~MsSqlWriter();
+  // The sqlite3 connection is owned by the caller, which opens and closes it;
+  // it must not hold an open transaction while write() runs.
+  explicit MsSqlWriter(sqlite3* db) : db_(db) {}
 
   MsSqlWriter(const MsSqlWriter&) = delete;
   MsSqlWriter& operator=(const MsSqlWriter&) = delete;
@@ -81,7 +81,7 @@ class MsSqlWriter {
   void createLayerTable(int layer);  // table and its (RETENTIONTIME, MZ) index
   void insertLayerPeaks(const std::vector<MsSqlPeak>& peaks, int layer);
 
-  sqlite3* db_ = nullptr;
+  sqlite3* db_;  // not owned
 
   // A layer with fewer peaks than this is the last one.
   static constexpr int MIN_LAYER_PEAKS = 3000;

@@ -31,6 +31,7 @@
 #include "ms/spec/baseline_util.hpp"
 #include "ms/spec/msalign_thread_merge.hpp"
 #include "ms/spec/msalign_writer.hpp"
+#include "sql/ms_sql/ms_sql_writer.hpp"
 #include "topfd/deconv/deconv_prec_win.hpp"
 #include "topfd/deconv/deconv_single_sp.hpp"
 #include "topfd/deconv/deconv_util.hpp"
@@ -239,6 +240,13 @@ void DeconvMs1Process::process() {
     sql_buffer_ptr->bytes = 0;
   };
 
+  // With --sql-3d, the raw MS1 peaks are kept (main thread only) and written
+  // to the same database as the PEAKS0..n / CONFIG tables of top_converter
+  // once deconvolution is done.
+  bool gene_sql_3d = sql_writer_ptr != nullptr && topfd_para_ptr_->isSql3d();
+  std::vector<MsSqlPeak> peaks_3d;
+  int ms1_scan_num_3d = 0;
+
   // init msalign writer vector for multiple threads
   std::string output_base_name = topfd_para_ptr_->getOutputBaseName();
   std::string ms1_msalign_name = output_base_name + "_ms1.msalign";
@@ -255,6 +263,22 @@ void DeconvMs1Process::process() {
   while (ms_group_ptr != nullptr) {
     while (pool_ptr->getQueueSize() >= static_cast<std::size_t>(thread_num) * 2) {
       std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+    if (gene_sql_3d) {
+      MzmlMsPtr ms_one_ptr = ms_group_ptr->getMsOnePtr();
+      int rt = static_cast<int>(
+          ms_one_ptr->getMsHeaderPtr()->getRetentionTime() * 1000);  // ms
+      for (const PeakPtr& peak_ptr : ms_one_ptr->getPeakPtrVec()) {
+        if (peak_ptr->getIntensity() <= 0.0) {
+          continue;
+        }
+        MsSqlPeak peak;
+        peak.mz = peak_ptr->getPosition();
+        peak.inte = peak_ptr->getIntensity();
+        peak.rt = rt;
+        peaks_3d.push_back(peak);
+      }
+      ms1_scan_num_3d++;
     }
     pool_ptr->enqueue(deconv_ms1_process::geneTask(
         ms_group_ptr, topfd_para_ptr_, ms1_writer_ptr_vec, pool_ptr,
@@ -282,6 +306,16 @@ void DeconvMs1Process::process() {
   if (sql_writer_ptr != nullptr) {
     flush_sql_buffer();
     sql_writer_ptr->flush();
+  }
+  if (gene_sql_3d) {
+    std::cout << "Writing MS1 peaks for 3D visualization started."
+              << std::endl;
+    MsSqlWriter writer_3d(topfd_para_ptr_->getSqlDb());
+    writer_3d.write(std::move(peaks_3d), ms1_scan_num_3d,
+                    MsSqlWriter::DEFAULT_MZ_SIZE,
+                    MsSqlWriter::DEFAULT_RT_DIVIDER);
+    std::cout << "Writing MS1 peaks for 3D visualization finished."
+              << std::endl;
   }
   for (int i = 0; i < thread_num; i++) {
     ms1_writer_ptr_vec[i] = nullptr;

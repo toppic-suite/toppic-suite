@@ -21,7 +21,6 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdlib>
-#include <filesystem>
 #include <iostream>
 #include <limits>
 #include <string>
@@ -175,23 +174,6 @@ void sortByRtMz(std::vector<MsSqlPeak>& peaks) {
 }
 
 }  // namespace
-
-MsSqlWriter::MsSqlWriter(const std::string& db_file_name) {
-  std::error_code ec;
-  std::filesystem::remove(db_file_name, ec);
-  if (sqlite3_open(db_file_name.c_str(), &db_) != SQLITE_OK) {
-    LOG_ERROR("Cannot open the database " << db_file_name << ": "
-                                          << sqlite3_errmsg(db_));
-    exit(EXIT_FAILURE);
-  }
-  // Bulk-load settings: the database is written once, in one transaction,
-  // and simply regenerated if that is interrupted.
-  sql_util::execSql(db_, "PRAGMA temp_store = MEMORY;");
-  sql_util::execSql(db_, "PRAGMA journal_mode = MEMORY;");
-  sql_util::execSql(db_, "PRAGMA synchronous = OFF;");
-}
-
-MsSqlWriter::~MsSqlWriter() { sqlite3_close(db_); }
 
 void MsSqlWriter::write(std::vector<MsSqlPeak> peaks, int ms1_scan_num,
                         double mz_size, double rt_divider) {

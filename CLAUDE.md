@@ -352,9 +352,10 @@ above it, never the reverse:
   visualization database): `ms_sql_util::convert` reads the MS1 peaks of an
   mzML/mzXML file with pwiz, and `MsSqlWriter` writes them as `PEAKS0` (all
   peaks) plus down-sampled `PEAKS1..n` layer tables, one `CONFIG` row per
-  layer, and a colour bucket per peak. `MsSqlWriter` owns its connection (it
-  replaces the `.db` file), unlike the topfd writer below. Only that tool uses
-  it.
+  layer, and a colour bucket per peak. Like the topfd writer below,
+  `MsSqlWriter` writes on a caller-owned connection: `ms_sql_util::convert`
+  opens its own `_3d.db`, and topfd `--sql-3d` (in `deconv_ms1_process`)
+  writes the same tables into the topfd `.sqlite` after MS1 deconvolution.
 - `src/para` — analysis parameters (`sp_para`, `peak_tolerance`, `prsm_para`).
 - `src/seq` — sequence/proteoform layer.
 - `src/ms` — mass-spectrum layer: `spec` (peaks/spectra/msalign), `msmap`,
