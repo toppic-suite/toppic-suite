@@ -65,6 +65,8 @@ class SpPara {
 
   double getNTermLabelMass() const { return n_term_label_mass_; }
 
+  double getEnvCnnCutoff() const { return env_cnn_cutoff_; }
+
   void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) const;
 
   static std::string getXmlElementName() { return "sp_para"; }
@@ -84,6 +86,9 @@ class SpPara {
 
   // n_term_label_mass is for iTRAQ or TMT labeling
   double n_term_label_mass_ = 0.0;
+
+  // envelopes with an EnvCNN score below env_cnn_cutoff are removed
+  double env_cnn_cutoff_ = 0.5;
 
   ActivationPtr activation_ptr_;
 

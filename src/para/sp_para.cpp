@@ -65,6 +65,11 @@ SpPara::SpPara(XmlDOMElement element) {
   }
   n_term_label_mass_ =
       xml_dom_util::getDoubleChildValue(element, "n_term_label_mass", 0);
+  // optional: files written before the parameter was added lack it
+  if (xml_dom_util::getChildCount(element, "env_cnn_cutoff") > 0) {
+    env_cnn_cutoff_ =
+        xml_dom_util::getDoubleChildValue(element, "env_cnn_cutoff", 0);
+  }
   std::string element_name = PeakTolerance::getXmlElementName();
   XmlDOMElement pt_element =
       xml_dom_util::getChildElement(element, element_name.c_str(), 0);
@@ -93,6 +98,8 @@ void SpPara::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) const {
   }
   str = str_util::toString(n_term_label_mass_);
   xml_doc->addElement(element, "n_term_label_mass", str.c_str());
+  str = str_util::toString(env_cnn_cutoff_);
+  xml_doc->addElement(element, "env_cnn_cutoff", str.c_str());
   peak_tolerance_ptr_->appendXml(xml_doc, element);
   activation_ptr_->appendNameToXml(xml_doc, element);
 }
