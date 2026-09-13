@@ -19,6 +19,7 @@
 #include <fstream>
 
 #include "common/base/mod.hpp"
+#include "para/prsm_para.hpp"
 #include "prsm/prsm.hpp"
 #include "prsm/prsm_str.hpp"
 #include "seq/fasta_index_reader.hpp"
@@ -34,6 +35,12 @@ PrsmStrPtrVec readAllPrsmStrsMatchSeq(const std::string& input_file_name);
 PrsmPtrVec readAllPrsms(const std::string& prsm_file_name,
                         const FastaIndexReaderPtr& fasta_reader_ptr,
                         const ModPtrVec& fix_mod_list);
+
+// Read the PrSMs of <spectrum base name>.<input_file_ext> and attach to each
+// its deconvoluted spectra (from the msalign file) and refined spectra, as the
+// table and SQL writers need them.
+PrsmPtrVec readPrsmsWithSpectra(const PrsmParaPtr& prsm_para_ptr,
+                                const std::string& input_file_ext);
 
 }  // namespace prsm_reader_util
 

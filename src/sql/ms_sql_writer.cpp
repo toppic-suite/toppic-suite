@@ -34,27 +34,6 @@ namespace toppic {
 
 namespace {
 
-// Compile a statement, aborting on failure (matching sql_util::execSql).
-sqlite3_stmt* prepare(sqlite3* db, const std::string& sql) {
-  sqlite3_stmt* stmt = nullptr;
-  if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
-    LOG_ERROR("Failed to prepare SQL: " << sql);
-    LOG_ERROR("SQL error: " << sqlite3_errmsg(db));
-    exit(EXIT_FAILURE);
-  }
-  return stmt;
-}
-
-// Run a fully-bound statement and reset it so the handle can be reused (every
-// parameter is rebound before the next step, so no clear_bindings is needed).
-void stepAndReset(sqlite3* db, sqlite3_stmt* stmt) {
-  if (sqlite3_step(stmt) != SQLITE_DONE) {
-    LOG_ERROR("SQL error: " << sqlite3_errmsg(db));
-    exit(EXIT_FAILURE);
-  }
-  sqlite3_reset(stmt);
-}
-
 MsSqlRange emptyRange() {
   MsSqlRange range;
   range.mz_min = std::numeric_limits<double>::max();
@@ -231,10 +210,10 @@ void MsSqlWriter::createConfigTable() {
 }
 
 void MsSqlWriter::insertConfig(const MsSqlRange& range) {
-  sqlite3_stmt* stmt =
-      prepare(db_,
-              "INSERT INTO CONFIG(MZMIN, MZMAX, RTMIN, RTMAX, INTMIN, INTMAX, "
-              "COUNT) VALUES (?, ?, ?, ?, ?, ?, ?);");
+  sqlite3_stmt* stmt = sql_util::prepareSql(
+      db_,
+      "INSERT INTO CONFIG(MZMIN, MZMAX, RTMIN, RTMAX, INTMIN, INTMAX, "
+      "COUNT) VALUES (?, ?, ?, ?, ?, ?, ?);");
   sqlite3_bind_double(stmt, 1, range.mz_min);
   sqlite3_bind_double(stmt, 2, range.mz_max);
   sqlite3_bind_int(stmt, 3, range.rt_min);
@@ -242,7 +221,7 @@ void MsSqlWriter::insertConfig(const MsSqlRange& range) {
   sqlite3_bind_double(stmt, 5, range.int_min);
   sqlite3_bind_double(stmt, 6, range.int_max);
   sqlite3_bind_int(stmt, 7, range.count);
-  stepAndReset(db_, stmt);
+  sql_util::stepAndReset(db_, stmt);
   sqlite3_finalize(stmt);
 }
 
@@ -262,16 +241,15 @@ void MsSqlWriter::createLayerTable(int layer) {
 
 void MsSqlWriter::insertLayerPeaks(const std::vector<MsSqlPeak>& peaks,
                                    int layer) {
-  sqlite3_stmt* stmt =
-      prepare(db_, "INSERT INTO PEAKS" + std::to_string(layer) +
-                       "(MZ, INTENSITY, RETENTIONTIME, COLOR) "
-                       "VALUES (?, ?, ?, ?);");
+  sqlite3_stmt* stmt = sql_util::prepareSql(
+      db_, "INSERT INTO PEAKS" + std::to_string(layer) +
+               "(MZ, INTENSITY, RETENTIONTIME, COLOR) VALUES (?, ?, ?, ?);");
   for (const MsSqlPeak& peak : peaks) {
     sqlite3_bind_double(stmt, 1, peak.mz);
     sqlite3_bind_double(stmt, 2, peak.inte);
     sqlite3_bind_int(stmt, 3, peak.rt);
     sqlite3_bind_int(stmt, 4, peak.color);
-    stepAndReset(db_, stmt);
+    sql_util::stepAndReset(db_, stmt);
   }
   sqlite3_finalize(stmt);
 }

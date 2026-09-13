@@ -37,6 +37,25 @@ void execSql(sqlite3* sql_db, const std::string& sql) {
   }
 }
 
+sqlite3_stmt* prepareSql(sqlite3* sql_db, const std::string& sql) {
+  sqlite3_stmt* stmt = nullptr;
+  if (sqlite3_prepare_v2(sql_db, sql.c_str(), -1, &stmt, nullptr) !=
+      SQLITE_OK) {
+    LOG_ERROR("Failed to prepare SQL: " << sql);
+    LOG_ERROR("SQL error: " << sqlite3_errmsg(sql_db));
+    exit(EXIT_FAILURE);
+  }
+  return stmt;
+}
+
+void stepAndReset(sqlite3* sql_db, sqlite3_stmt* stmt) {
+  if (sqlite3_step(stmt) != SQLITE_DONE) {
+    LOG_ERROR("SQL error: " << sqlite3_errmsg(sql_db));
+    exit(EXIT_FAILURE);
+  }
+  sqlite3_reset(stmt);
+}
+
 }  // namespace sql_util
 
 }  // namespace toppic

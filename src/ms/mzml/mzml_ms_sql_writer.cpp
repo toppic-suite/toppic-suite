@@ -29,17 +29,6 @@ namespace toppic {
 
 namespace {
 
-// Compile a statement once, aborting on failure (matching sql_util::execSql).
-sqlite3_stmt* prepare(sqlite3* db, const std::string& sql) {
-  sqlite3_stmt* stmt = nullptr;
-  if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
-    LOG_ERROR("Failed to prepare SQL: " << sql);
-    LOG_ERROR("SQL error: " << sqlite3_errmsg(db));
-    exit(EXIT_FAILURE);
-  }
-  return stmt;
-}
-
 // Run a fully-bound INSERT and reset it so the handle can be reused.
 void stepAndReset(sqlite3_stmt* stmt) {
   sqlite3_step(stmt);
@@ -61,35 +50,29 @@ MzmlMsSqlWriter::MzmlMsSqlWriter(sqlite3* sql_db) : sql_db_(sql_db) {
   sql_util::execSql(sql_db_, "PRAGMA cache_size = -65536;");    // ~64 MiB
   sql_util::execSql(sql_db_, "PRAGMA mmap_size = 268435456;");  // 256 MiB
 
-  ms1_spec_stmt_ = prepare(
-      sql_db_,
+  ms1_spec_stmt_ = sql_util::prepareSql(sql_db_,
       "INSERT INTO ms1_spectrum(id, scan, retention_time, peak_num, env_num, "
       "base_inte, min_ref_inte) VALUES (?, ?, ?, ?, ?, ?, ?);");
-  ms1_peak_stmt_ = prepare(sql_db_,
+  ms1_peak_stmt_ = sql_util::prepareSql(sql_db_,
                            "INSERT INTO ms1_peak(spec_id, peak_id, mz, "
                            "intensity) VALUES (?, ?, ?, ?);");
-  ms1_env_stmt_ = prepare(
-      sql_db_,
+  ms1_env_stmt_ = sql_util::prepareSql(sql_db_,
       "INSERT INTO ms1_env(spec_id, env_id, mono_mass, ref_mass, charge, "
       "intensity, envcnn_score, peak_num) VALUES (?, ?, ?, ?, ?, ?, ?, ?);");
-  ms1_env_peak_stmt_ = prepare(
-      sql_db_,
+  ms1_env_peak_stmt_ = sql_util::prepareSql(sql_db_,
       "INSERT INTO ms1_env_peak(spec_id, env_id, peak_id, mz, intensity) "
       "VALUES (?, ?, ?, ?, ?);");
-  ms2_spec_stmt_ = prepare(
-      sql_db_,
+  ms2_spec_stmt_ = sql_util::prepareSql(sql_db_,
       "INSERT INTO ms2_spectrum(id, scan, retention_time, target_mz, begin_mz, "
       "end_mz, n_ion_type, c_ion_type, peak_num, ms1_id) "
       "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
-  ms2_peak_stmt_ = prepare(sql_db_,
+  ms2_peak_stmt_ = sql_util::prepareSql(sql_db_,
                            "INSERT INTO ms2_peak(spec_id, peak_id, mz, "
                            "intensity) VALUES (?, ?, ?, ?);");
-  ms2_env_stmt_ = prepare(
-      sql_db_,
+  ms2_env_stmt_ = sql_util::prepareSql(sql_db_,
       "INSERT INTO ms2_env(spec_id, env_id, mono_mass, ref_mass, charge, "
       "intensity, envcnn_score, peak_num) VALUES (?, ?, ?, ?, ?, ?, ?, ?);");
-  ms2_env_peak_stmt_ = prepare(
-      sql_db_,
+  ms2_env_peak_stmt_ = sql_util::prepareSql(sql_db_,
       "INSERT INTO ms2_env_peak(spec_id, env_id, peak_id, mz, intensity) "
       "VALUES (?, ?, ?, ?, ?);");
 }

@@ -22,9 +22,7 @@
 
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
-#include "ms/factory/extend_ms_factory.hpp"
-#include "ms/factory/spectrum_set_factory.hpp"
-#include "prsm/prsm_reader.hpp"
+#include "prsm/prsm_reader_util.hpp"
 
 namespace toppic {
 
@@ -71,53 +69,15 @@ void PrsmMatchTableWriter::write(const std::string& output_file_ext,
   file.open(output_file_name.c_str());
   file << argu_str_ << std::endl;
 
-  std::string input_file_name =
-      file_util::basename(spectrum_file_name) + "." + input_file_ext_;
-  std::string db_file_name = prsm_para_ptr_->getSearchDbFileNameWithFolder();
-  FastaIndexReaderPtr seq_reader =
-      std::make_shared<FastaIndexReader>(db_file_name);
-  ModPtrVec fix_mod_ptr_vec = prsm_para_ptr_->getFixModPtrVec();
-  PrsmReader prsm_reader(input_file_name);
-  PrsmPtr prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
-
-  // init variables
-  std::string sp_file_name = prsm_para_ptr_->getSpectrumFileName();
-  int group_spec_num = prsm_para_ptr_->getGroupSpecNum();
-  SpParaPtr sp_para_ptr = prsm_para_ptr_->getSpParaPtr();
-  MsAlignReaderPtr ms_reader_ptr = std::make_shared<MsAlignReader>(
-      sp_file_name, group_spec_num, sp_para_ptr->getActivationPtr());
-  DeconvMsPtrVec deconv_ms_ptr_vec = ms_reader_ptr->getNextMsPtrVec();
-  PrsmPtrVec prsm_list;
+  PrsmPtrVec prsm_list =
+      prsm_reader_util::readPrsmsWithSpectra(prsm_para_ptr_, input_file_ext_);
   int max_proteo_id = -1;
-  while (deconv_ms_ptr_vec.size() != 0) {
-    MsHeaderPtr header_ptr = deconv_ms_ptr_vec[0]->getMsHeaderPtr();
-    if (header_ptr->containsPrec()) {
-      double prec_mono_mass =
-          header_ptr->getFirstPrecMonoMass() - sp_para_ptr->getNTermLabelMass();
-      SpectrumSetPtr spec_set_ptr = spectrum_set_factory::geneSpectrumSetPtr(
-          deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass);
-      if (spec_set_ptr->isValid()) {
-        int spec_id = spec_set_ptr->getSpectrumId();
-        while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_id) {
-          DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
-          prsm_ptr->setDeconvMsPtrVec(deconv_ms_ptr_vec);
-          double new_prec_mass = prsm_ptr->getAdjustedPrecMass();
-          ExtendMsPtrVec extend_ms_ptr_vec =
-              extend_ms_factory::geneMsThreePtrVec(deconv_ms_ptr_vec,
-                                                   sp_para_ptr, new_prec_mass);
-          prsm_ptr->setRefineMsVec(extend_ms_ptr_vec);
-          prsm_list.push_back(prsm_ptr);
-          if (prsm_ptr->getProteoformPtr()->getProteoClusterId() >
-              max_proteo_id) {
-            max_proteo_id = prsm_ptr->getProteoformPtr()->getProteoClusterId();
-          }
-          prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
-        }
-      }
+  for (size_t i = 0; i < prsm_list.size(); i++) {
+    int proteo_id = prsm_list[i]->getProteoformPtr()->getProteoClusterId();
+    if (proteo_id > max_proteo_id) {
+      max_proteo_id = proteo_id;
     }
-    deconv_ms_ptr_vec = ms_reader_ptr->getNextMsPtrVec();
   }
-  prsm_reader.close();
 
   file << "Number of identified PrSMs: " << prsm_list.size() << std::endl;
   PrsmPtrVec2D prsm_2d;

@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TOPPIC_SQL_SQL_UTIL_HPP_
-#define TOPPIC_SQL_SQL_UTIL_HPP_
+#ifndef TOPPIC_SEQ_FASTA_SQL_WRITER_HPP_
+#define TOPPIC_SEQ_FASTA_SQL_WRITER_HPP_
 
 #include <sqlite3.h>
 
@@ -22,19 +22,13 @@
 
 namespace toppic {
 
-namespace sql_util {
+namespace fasta_sql_writer {
 
-// Execute a statement, logging and aborting on failure.
-void execSql(sqlite3* sql_db, const std::string& sql);
+// (Re)creates the fasta_seq table (name, description, sequence) in the
+// database and fills it with the proteins of the FASTA file.
+void write(sqlite3* sql_db, const std::string& fasta_file_name);
 
-// Compile a statement, aborting on failure (matching execSql).
-sqlite3_stmt* prepareSql(sqlite3* sql_db, const std::string& sql);
-
-// Run a fully-bound statement (aborting on failure) and reset it so the
-// handle can be reused; every parameter must be rebound before the next step.
-void stepAndReset(sqlite3* sql_db, sqlite3_stmt* stmt);
-
-}  // namespace sql_util
+}  // namespace fasta_sql_writer
 
 }  // namespace toppic
 
