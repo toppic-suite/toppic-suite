@@ -78,9 +78,8 @@ class MsSqlWriter {
  private:
   void createConfigTable();
   void insertConfig(const MsSqlRange& range);
-  void createLayerTable(int layer);
+  void createLayerTable(int layer);  // table and its (RETENTIONTIME, MZ) index
   void insertLayerPeaks(const std::vector<MsSqlPeak>& peaks, int layer);
-  void createLayerIndex(int layer);
 
   sqlite3* db_ = nullptr;
 

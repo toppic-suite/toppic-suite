@@ -348,7 +348,7 @@ above it, never the reverse:
 
 - `src/common` — foundation: `base`, `util`, `xml`, `thread`.
 - `src/sql` — thin SQLite helper (`sql_util`) plus `ms_sql`, the
-  MS1-peaks-to-SQLite backend of the `top_sql_converter` tool (a 3D
+  MS1-peaks-to-SQLite backend of the `top_converter` tool (a 3D
   visualization database): `ms_sql_util::convert` reads the MS1 peaks of an
   mzML/mzXML file with pwiz, and `MsSqlWriter` writes them as `PEAKS0` (all
   peaks) plus down-sampled `PEAKS1..n` layer tables, one `CONFIG` row per
@@ -410,11 +410,11 @@ NOT in `COMMON_SRCS`; each is its own `add_executable` that links
   `*_process` here — they drive the `topfd_process`/`topdia_process`
   orchestrators that live in the library. The `toppic_console_exe()` helper in
   `CMakeLists.txt` builds each, linking `toppic_common` + `Boost::program_options`.
-  `top_sql_converter.cpp` is the one tool without a `*_argument.cpp`: its two
+  `top_converter.cpp` is the one tool without a `*_argument.cpp`: its two
   options are parsed inline in `main()`.
 - `src/gui` — Qt6 desktop front-ends (`topfd`/`topindex`/`toppic`/`topmg`/
-  `topdiff`/`topdia`, and `top_converter` = the `top_sql_converter_gui`
-  target for `top_sql_converter`, plus `util` = a QProcess command builder +
+  `topdiff`/`topdia`, and `top_converter` = the `top_converter_gui`
+  target for `top_converter`, plus `util` = a QProcess command builder +
   message helpers). The `toppic_gui_exe()` helper in `CMakeLists.txt` defines each
   target with per-target `AUTOMOC`/`AUTOUIC`/`AUTORCC` and
   `AUTOUIC_SEARCH_PATHS=src` (so the dialogs' `"gui/<tool>/ui_*.h"` includes

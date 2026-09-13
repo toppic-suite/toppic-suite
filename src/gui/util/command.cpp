@@ -356,16 +356,16 @@ std::string geneTopDiffCommand(std::map<std::string, std::string> arguments_,
   return command;
 };
 
-/*function for top_sql_converter*/
-std::string geneTopSqlConverterCommand(const std::string& exe_dir,
+/*function for top_converter*/
+std::string geneTopConverterCommand(const std::string& exe_dir,
                                        const std::string& spec_file_name,
                                        const std::string& mz_size,
                                        const std::string& rt_divider) {
 #if defined(_WIN32) || defined(_WIN64) || defined(__MINGW32__) || \
     defined(__MINGW64__)
-  std::string exe_path = exe_dir + "\\" + "top_sql_converter.exe ";
+  std::string exe_path = exe_dir + "\\" + "top_converter.exe ";
 #else
-  std::string exe_path = exe_dir + "/" + "top_sql_converter ";
+  std::string exe_path = exe_dir + "/" + "top_converter ";
 #endif
   return exe_path + "-m " + mz_size + " -r " + rt_divider + " " +
          spec_file_name + " ";

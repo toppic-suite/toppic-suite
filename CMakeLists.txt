@@ -381,10 +381,10 @@ toppic_console_exe(topdiff
   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdiff.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdiff_argument.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdiff_process.cpp)
-# top_sql_converter (MS1 peaks -> SQLite for the 3D visualization) parses its
+# top_converter (MS1 peaks -> SQLite for the 3D visualization) parses its
 # few options inline; the conversion lives in src/sql/ms_sql (ms_sql_util).
-toppic_console_exe(top_sql_converter
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/top_sql_converter.cpp)
+toppic_console_exe(top_converter
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/top_converter.cpp)
 
 # ---------------------------------------------------------------------------
 # GUI executables (Qt6)
@@ -434,7 +434,7 @@ toppic_gui_exe(toppic_gui   toppic   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/top
 toppic_gui_exe(topmg_gui    topmg    ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmg_argument.cpp)
 toppic_gui_exe(topdiff_gui  topdiff  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdiff_argument.cpp)
 toppic_gui_exe(topdia_gui   topdia   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdia_argument.cpp)
-toppic_gui_exe(top_sql_converter_gui top_converter)
+toppic_gui_exe(top_converter_gui top_converter)
 
 # ---------------------------------------------------------------------------
 # Install the executables
@@ -450,9 +450,9 @@ toppic_gui_exe(top_sql_converter_gui top_converter)
 # extra is installed there.
 # ---------------------------------------------------------------------------
 set(TOPPIC_EXECUTABLES
-  topfd topdia topindex toppic topmg topdiff top_sql_converter
+  topfd topdia topindex toppic topmg topdiff top_converter
   topfd_gui topdia_gui topindex_gui toppic_gui topmg_gui topdiff_gui
-  top_sql_converter_gui)
+  top_converter_gui)
 
 install(TARGETS ${TOPPIC_EXECUTABLES}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

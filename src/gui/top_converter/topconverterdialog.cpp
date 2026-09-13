@@ -42,7 +42,7 @@ const char* kIdleMsg = "Click the Start button to convert the spectrum file.";
 TopConverterDialog::TopConverterDialog(QWidget* parent)
     : QMainWindow(parent), ui(new Ui::TopConverterDialog) {
   ui->setupUi(this);
-  std::string title = "TopSqlConverter v." + toppic::Version::getVersion();
+  std::string title = "TopConverter v." + toppic::Version::getVersion();
   this->setWindowTitle(QString::fromStdString(title));
   lastDir_ = ".";
 
@@ -135,7 +135,7 @@ void TopConverterDialog::on_startButton_clicked() {
         "Current directory " + QString::fromStdString(exe_dir) +
         " contains space and will cause errors in the program!");
   }
-  std::string cmd = toppic::command::geneTopSqlConverterCommand(
+  std::string cmd = toppic::command::geneTopConverterCommand(
       exe_dir, getSpectrumFileName(),
       ui->mzSizeEdit->text().toStdString(),
       ui->rtDividerEdit->text().toStdString());
@@ -184,7 +184,7 @@ void TopConverterDialog::on_exitButton_clicked() { close(); }
 bool TopConverterDialog::continueToClose() {
   return QMessageBox::question(
              this, tr("Quit"),
-             tr("TopSqlConverter is still running. Are you sure you want to "
+             tr("TopConverter is still running. Are you sure you want to "
                 "quit?"),
              QMessageBox::Yes | QMessageBox::No,
              QMessageBox::No) == QMessageBox::Yes;

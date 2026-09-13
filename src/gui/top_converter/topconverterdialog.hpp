@@ -24,7 +24,7 @@ namespace Ui {
 class TopConverterDialog;
 }
 
-// Front-end of top_sql_converter: picks one mzML/mzXML file and the two grid
+// Front-end of top_converter: picks one mzML/mzXML file and the two grid
 // parameters, then runs the command-line tool and shows its output.
 class TopConverterDialog : public QMainWindow {
   Q_OBJECT

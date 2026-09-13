@@ -26,7 +26,7 @@
 namespace {
 
 void showUsage(const boost::program_options::options_description& desc) {
-  std::cout << "Usage: top_sql_converter [options] spectrum-file-name"
+  std::cout << "Usage: top_converter [options] spectrum-file-name"
             << std::endl;
   std::cout << desc << std::endl;
   std::cout << "Version: " << toppic::Version::getVersion() << std::endl;
@@ -82,7 +82,7 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  std::cout << "top_sql_converter " << toppic::Version::getVersion()
+  std::cout << "top_converter " << toppic::Version::getVersion()
             << std::endl;
   try {
     toppic::ms_sql_util::convert(spec_file_name, mz_size, rt_divider);

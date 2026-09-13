@@ -46,13 +46,13 @@ sqlite3_stmt* prepare(sqlite3* db, const std::string& sql) {
   return stmt;
 }
 
-// Run a fully-bound statement and reset it so the handle can be reused.
+// Run a fully-bound statement and reset it so the handle can be reused (every
+// parameter is rebound before the next step, so no clear_bindings is needed).
 void stepAndReset(sqlite3* db, sqlite3_stmt* stmt) {
   if (sqlite3_step(stmt) != SQLITE_DONE) {
     LOG_ERROR("SQL error: " << sqlite3_errmsg(db));
     exit(EXIT_FAILURE);
   }
-  sqlite3_clear_bindings(stmt);
   sqlite3_reset(stmt);
 }
 
@@ -165,6 +165,15 @@ std::vector<MsSqlPeak> downsample(std::vector<MsSqlPeak>& peaks,
   return layer;
 }
 
+// Order the peaks the way the (RETENTIONTIME, MZ) index is ordered, so that
+// inserting them after the index exists only appends to it.
+void sortByRtMz(std::vector<MsSqlPeak>& peaks) {
+  std::sort(peaks.begin(), peaks.end(),
+            [](const MsSqlPeak& a, const MsSqlPeak& b) {
+              return a.rt < b.rt || (a.rt == b.rt && a.mz < b.mz);
+            });
+}
+
 }  // namespace
 
 MsSqlWriter::MsSqlWriter(const std::string& db_file_name) {
@@ -198,6 +207,7 @@ void MsSqlWriter::write(std::vector<MsSqlPeak> peaks, int ms1_scan_num,
   sql_util::execSql(db_, "BEGIN;");
   createConfigTable();
   int layer = 0;
+  sortByRtMz(peaks);
   createLayerTable(layer);
   insertLayerPeaks(peaks, layer);
   insertConfig(range);
@@ -215,16 +225,13 @@ void MsSqlWriter::write(std::vector<MsSqlPeak> peaks, int ms1_scan_num,
       continue;
     }
     layer++;
+    sortByRtMz(layer_peaks);
     createLayerTable(layer);
     insertLayerPeaks(layer_peaks, layer);
     insertConfig(layer_range);
     std::cout << layer_peaks.size() << " peaks written to PEAKS" << layer << "."
               << std::endl;
     peaks = std::move(layer_peaks);
-  }
-
-  for (int i = 0; i <= layer; i++) {
-    createLayerIndex(i);
   }
   sql_util::execSql(db_, "COMMIT;");
 }
@@ -258,11 +265,17 @@ void MsSqlWriter::insertConfig(const MsSqlRange& range) {
 }
 
 void MsSqlWriter::createLayerTable(int layer) {
-  sql_util::execSql(db_, "CREATE TABLE PEAKS" + std::to_string(layer) +
+  std::string num = std::to_string(layer);
+  sql_util::execSql(db_, "CREATE TABLE PEAKS" + num +
                              "(MZ REAL NOT NULL,"
                              "INTENSITY REAL NOT NULL,"
                              "RETENTIONTIME INT NOT NULL,"
                              "COLOR TINYINT NOT NULL);");
+  // The index is created before the rows: they arrive in index order (see
+  // sortByRtMz), so building it incrementally is cheaper than sorting the
+  // whole table afterwards.
+  sql_util::execSql(db_, "CREATE INDEX rtmz_index" + num + " ON PEAKS" + num +
+                             " (RETENTIONTIME, MZ);");
 }
 
 void MsSqlWriter::insertLayerPeaks(const std::vector<MsSqlPeak>& peaks,
@@ -279,12 +292,6 @@ void MsSqlWriter::insertLayerPeaks(const std::vector<MsSqlPeak>& peaks,
     stepAndReset(db_, stmt);
   }
   sqlite3_finalize(stmt);
-}
-
-void MsSqlWriter::createLayerIndex(int layer) {
-  std::string num = std::to_string(layer);
-  sql_util::execSql(db_, "CREATE INDEX rtmz_index" + num + " ON PEAKS" + num +
-                             " (RETENTIONTIME, MZ);");
 }
 
 }  // namespace toppic

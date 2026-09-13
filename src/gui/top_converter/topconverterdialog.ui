@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>TopSqlConverter</string>
+   <string>TopConverter</string>
   </property>
   <property name="windowIcon">
    <iconset resource="icon.qrc">
