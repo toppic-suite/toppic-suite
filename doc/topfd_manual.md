@@ -121,7 +121,7 @@ Parameters that apply to both MS1 and MS/MS deconvolution:
 | `-u`, `--thread-number <int>` | 1 | Number of threads. TopFD checks that the machine has enough memory for the requested number. |
 | `-o`, `--missing-level-one` | off | The file has no MS1 spectra: skip MS1 deconvolution and feature detection. |
 | `-N`, `--no-sql` | off | Do not write the `.sqlite` database. |
-| `--sql-3d` | off | Also store the raw MS1 peaks for 3D visualisation in the `.sqlite` database: `PEAKS0` holds every MS1 peak and `PEAKS1`, `PEAKS2`, ... progressively down-sampled copies, with one `CONFIG` row per table. Cannot be combined with `--no-sql`; has no effect with `-T` or `-o`. In `topfd_gui`, the checkbox "Add MS1 peaks for 3D visualization" under "Additional settings" turns this on (it is greyed out while "Do not generate SQLite database" is checked). |
+| `-D`, `--sql-3d` | off | Also store the raw MS1 peaks for 3D visualisation in the `.sqlite` database: `PEAKS0` holds every MS1 peak and `PEAKS1`, `PEAKS2`, ... progressively down-sampled copies, with one `CONFIG` row per table. Cannot be combined with `--no-sql`; has no effect with `-T` or `-o`. In `topfd_gui`, the checkbox "Add MS1 peaks for 3D visualization" under "Additional settings" turns this on (it is greyed out while "Do not generate SQLite database" is checked). |
 | `-T`, `--text-peak-list` | off | The input is a text peak list (one MS/MS spectrum), not an mzML file; see section 2. |
 
 MS1 deconvolution and proteoform feature detection:

@@ -147,7 +147,7 @@ bool Argument::parse(int argc, char* argv[]) {
         "<a positive integer>. Number of threads used in spectral "
         "deconvolution. The default value is 1.")(
         "no-sql,N", "Do not write the deconvoluted spectra to an SQLite database.")(
-        "sql-3d",
+        "sql-3d,D",
         "Add the MS1 peaks for 3D visualization to the SQLite database.")(
         "text-peak-list,T",
         "Deconvolute a single MS/MS spectrum given as a text peak list: one "
