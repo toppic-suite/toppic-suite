@@ -41,7 +41,7 @@ message(STATUS "System name: " ${CMAKE_SYSTEM_NAME})
 # Version is defined once, here, via project(). src/common/util/version.hpp is
 # generated from version.hpp.in so the runtime Version::getVersion() string and
 # CMake's PROJECT_VERSION (used for packaging) can never drift apart.
-set(TOPPIC_VERSION_SUFFIX "_alpha")   # pre-release tag appended to PROJECT_VERSION
+set(TOPPIC_VERSION_SUFFIX "")   # pre-release tag appended to PROJECT_VERSION (e.g. "_alpha"); empty for a release
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/src/common/util/version.hpp.in
   ${CMAKE_CURRENT_BINARY_DIR}/gen/common/util/version.hpp
