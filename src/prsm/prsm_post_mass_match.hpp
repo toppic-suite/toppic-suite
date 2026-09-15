@@ -32,7 +32,8 @@ namespace toppic {
 // min_peak_num of its isotopic peaks are present, and the observed intensities
 // have a Pearson correlation >= 0.7 or a Bhattacharyya distance <= 0.03 with
 // the theoretical ones. Each accepted fragment adds one experimental
-// monoisotopic mass to the spectrum.
+// monoisotopic mass to the spectrum, whose confidence score is the EnvCNN
+// score of its envelope, computed as TopFD does for the deconvoluted masses.
 namespace prsm_post_mass_match {
 
 // Reads the PrSMs of <spectrum base name>.<input_file_ext> with their spectra,
@@ -47,7 +48,8 @@ namespace prsm_post_mass_match {
 //                              downstream steps find it under the new name.
 // Returns the name of the new spectrum file, which the downstream steps read
 // instead of the input one. If the SQLite database is missing (TopFD run with
-// -N), nothing is matched and the files are written unchanged.
+// -N), nothing is matched and the files are written unchanged. The EnvCNN
+// model must have been loaded with onnx_env_cnn::initModel.
 std::string process(const PrsmParaPtr& prsm_para_ptr,
                     const std::string& input_file_ext,
                     const std::string& output_file_ext, int min_peak_num);

@@ -39,12 +39,15 @@
 #include "common/util/str_util.hpp"
 #include "ms/env/env.hpp"
 #include "ms/env/env_base.hpp"
+#include "ms/env/exp_env.hpp"
+#include "ms/env/match_env.hpp"
 #include "ms/factory/extend_ms_factory.hpp"
 #include "ms/spec/deconv_ms.hpp"
 #include "ms/spec/deconv_peak.hpp"
 #include "ms/spec/ms_header.hpp"
 #include "ms/spec/msalign_reader.hpp"
 #include "ms/spec/msalign_writer.hpp"
+#include "ms/spec/peak.hpp"
 #include "ms/spec/peak_util.hpp"
 #include "ms/spec/theo_peak.hpp"
 #include "para/peak_tolerance.hpp"
@@ -56,6 +59,7 @@
 #include "prsm/prsm_xml_writer.hpp"
 #include "prsm/theo_peak_util.hpp"
 #include "sql/sql_util.hpp"
+#include "topfd/envcnn/onnx_env_cnn.hpp"
 
 namespace toppic {
 
@@ -74,6 +78,11 @@ constexpr double MAX_DIST = 0.03;
 constexpr int MAX_CHARGE = 15;
 constexpr int CHARGE_ABOVE_PREC = 2;
 
+// m/z tolerance for pairing the theoretical isotopic peaks of an accepted
+// envelope with the observed peaks when the envelope is scored by EnvCNN
+// (EnvPara::mz_tolerance_, the value TopFD uses for its envelopes).
+constexpr double ENVCNN_MZ_TOLERANCE = 0.02;
+
 struct RawPeak {
   int id;
   double mz;
@@ -89,9 +98,9 @@ struct PostMatch {
   double apex_inte;  // intensity of the observed most abundant isotopic peak
   double apex_mz;
   int charge;
-  double corr;
-  int peak_num;  // observed isotopic peaks
-  EnvPtr env;    // theoretical envelope shifted and scaled to the apex peak
+  int peak_num;         // observed isotopic peaks
+  double envcnn_score;  // EnvCNN score, the confidence score of the mass
+  EnvPtr env;  // theoretical envelope shifted and scaled to the apex peak
 };
 
 using PostMatchVec = std::vector<PostMatch>;
@@ -257,8 +266,8 @@ bool matchTheoMass(const RawPeakVec& peaks, double mass, int charge,
   match.apex_inte = peaks[apex_idx].inte;
   match.apex_mz = apex_mz;
   match.charge = charge;
-  match.corr = dist_corr.second;
   match.peak_num = peak_num;
+  match.envcnn_score = 0.0;
   match.env = env_ptr;
   return true;
 }
@@ -322,6 +331,34 @@ PostMatchVec matchPrsm(const PrsmPtr& prsm_ptr, const RawPeakVec& peaks,
   return matches;
 }
 
+// Compute the EnvCNN score of each matched mass, the way TopFD scores its
+// deconvoluted envelopes: the theoretical envelope, shifted and scaled to the
+// observed apex peak, is paired with the observed isotopic peaks of the
+// centroided spectrum and the pair is scored by the EnvCNN model. The model
+// must have been loaded with onnx_env_cnn::initModel.
+void compEnvCnnScores(const RawPeakVec& peaks, PostMatchVec& matches) {
+  if (matches.empty()) {
+    return;
+  }
+  PeakPtrVec peak_list;
+  for (size_t i = 0; i < peaks.size(); i++) {
+    peak_list.push_back(std::make_shared<Peak>(peaks[i].mz, peaks[i].inte));
+  }
+  MatchEnvPtrVec envs;
+  for (size_t i = 0; i < matches.size(); i++) {
+    EnvPtr theo_env_ptr = matches[i].env;
+    ExpEnvPtr exp_env_ptr = std::make_shared<ExpEnv>(
+        peak_list, theo_env_ptr, ENVCNN_MZ_TOLERANCE, 0.0);
+    int mass_group = 0;
+    envs.push_back(
+        std::make_shared<MatchEnv>(mass_group, theo_env_ptr, exp_env_ptr));
+  }
+  onnx_env_cnn::computeEnvScores(peak_list, envs);
+  for (size_t i = 0; i < matches.size(); i++) {
+    matches[i].envcnn_score = envs[i]->getEnvcnnScore();
+  }
+}
+
 // Append the matched masses to the PrSM's spectrum and recount its matched
 // masses and fragments.
 void addMatchesToPrsm(const PrsmPtr& prsm_ptr, const PostMatchVec& matches,
@@ -333,7 +370,7 @@ void addMatchesToPrsm(const PrsmPtr& prsm_ptr, const PostMatchVec& matches,
   for (size_t i = 0; i < matches.size(); i++) {
     peaks.push_back(std::make_shared<DeconvPeak>(
         sp_id, static_cast<int>(peaks.size()), matches[i].mono_mass,
-        matches[i].inte, matches[i].charge, matches[i].corr));
+        matches[i].inte, matches[i].charge, matches[i].envcnn_score));
   }
   std::sort(peaks.begin(), peaks.end(), DeconvPeak::cmpPosInc);
   ms_ptr->setPeakPtrVec(peaks);
@@ -379,7 +416,7 @@ void writeMsalign(const std::string& sp_file_name,
         const PostMatch& match = it->second[i];
         peaks.push_back(std::make_shared<DeconvPeak>(
             sp_id, static_cast<int>(peaks.size()), match.mono_mass,
-            match.inte, match.charge, match.corr));
+            match.inte, match.charge, match.envcnn_score));
       }
       ms_ptr->setPeakPtrVec(peaks);
     }
@@ -421,7 +458,7 @@ void writeSqlEnvs(sqlite3* db,
       sqlite3_bind_double(env_stmt, 4, env_ptr->getReferNeutralMass());
       sqlite3_bind_int(env_stmt, 5, match.charge);
       sqlite3_bind_double(env_stmt, 6, env_ptr->compInteSum());
-      sqlite3_bind_double(env_stmt, 7, match.corr);
+      sqlite3_bind_double(env_stmt, 7, match.envcnn_score);
       sqlite3_bind_int(env_stmt, 8, peak_num);
       sql_util::stepAndReset(db, env_stmt);
       for (int k = 0; k < peak_num; k++) {
@@ -496,6 +533,7 @@ std::string process(const PrsmParaPtr& prsm_para_ptr,
         if (matches.empty()) {
           continue;
         }
+        compEnvCnnScores(peaks, matches);
         addMatchesToPrsm(prsm_ptr, matches, sp_para_ptr);
         int sp_id = header_ptr->getSpecId();
         PostMatchVec& spec_vec = spec_matches[sp_id];

@@ -74,6 +74,7 @@
 #include "stat/local/local_processor.hpp"
 #include "stat/tdgf/evalue_processor.hpp"
 #include "stat/tdgf/tdgf_mng.hpp"
+#include "topfd/envcnn/onnx_env_cnn.hpp"
 
 namespace toppic {
 
@@ -439,6 +440,9 @@ int TopPIC_post(std::map<std::string, std::string>& arguments) {
     if (arguments["postMassMatch"] == "true") {
       std::cout << "Post mass matching - started." << std::endl;
       int min_peak_num = std::stoi(arguments["postMinPeakNum"]);
+      // the EnvCNN model scores the added masses
+      onnx_env_cnn::initModel(resource_dir,
+                              std::stoi(arguments["threadNumber"]));
       sp_file_name = prsm_post_mass_match::process(
           prsm_para_ptr, "toppic_recount", "toppic_recount", min_peak_num);
       // The steps below read the spectra with the added masses and the PrSMs
