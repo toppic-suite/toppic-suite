@@ -67,16 +67,16 @@ double calcInteRatio(const PeakPtrVec& peak_list, EnvPtr theo_env_ptr,
 
 MatchEnvPtr compEnv(const PeakPtrVec& peak_list, EnvPtr theo_env_ptr,
                     const EnvParaPtr& env_para_ptr, int mass_group,
-                    int min_inte) {
+                    double min_inte, double bound_inte) {
   // scale theoretical distribution
   int charge = theo_env_ptr->getCharge();
   double ratio = calcInteRatio(peak_list, theo_env_ptr,
                                env_para_ptr->getMzTolerance(charge));
   theo_env_ptr->changeIntensity(ratio);
 
-  // get the highest 85%--95% peaks
+  // get the highest 85%--95% peaks above the noise level
   double percentage = env_para_ptr->getPercentBound(mass_group);
-  theo_env_ptr = theo_env_ptr->getSubEnv(percentage, min_inte,
+  theo_env_ptr = theo_env_ptr->getSubEnv(percentage, bound_inte,
                                          env_para_ptr->max_back_peak_num_,
                                          env_para_ptr->max_forw_peak_num_);
   // get real envelope
@@ -89,7 +89,7 @@ MatchEnvPtr compEnv(const PeakPtrVec& peak_list, EnvPtr theo_env_ptr,
 
 MatchEnvPtr compFullEnv(const PeakPtrVec& peak_list, EnvPtr theo_env_ptr,
                         const EnvParaPtr& env_para_ptr, int mass_group,
-                        int min_inte) {
+                        double min_inte, double bound_inte) {
   // scale theoretical distribution
   int charge = theo_env_ptr->getCharge();
   double ratio = calcInteRatio(peak_list, theo_env_ptr,
@@ -100,7 +100,7 @@ MatchEnvPtr compFullEnv(const PeakPtrVec& peak_list, EnvPtr theo_env_ptr,
   double max_back = INT_MAX;
   double max_forw = INT_MAX;
   theo_env_ptr =
-      theo_env_ptr->getSubEnv(percentage, min_inte, max_back, max_forw);
+      theo_env_ptr->getSubEnv(percentage, bound_inte, max_back, max_forw);
   // get real envelope
   ExpEnvPtr real_env_ptr = std::make_shared<ExpEnv>(
       peak_list, theo_env_ptr, env_para_ptr->getMzTolerance(charge), min_inte);
@@ -114,7 +114,7 @@ MatchEnvPtr compFullEnv(const PeakPtrVec& peak_list, EnvPtr theo_env_ptr,
 // detect a MatchEnv
 MatchEnvPtr detectEnvByRefPeak(const PeakPtrVec& peak_list, int ref_peak,
                                int charge, double max_mass, double min_inte,
-                               double min_ref_inte,
+                               double min_ref_inte, double bound_inte,
                                const EnvParaPtr& env_para_ptr, bool is_full) {
   double refer_mz = peak_list[ref_peak]->getPosition();
   // check if the mass is greater than the precursor mass
@@ -146,14 +146,15 @@ MatchEnvPtr detectEnvByRefPeak(const PeakPtrVec& peak_list, int ref_peak,
   int mass_group = env_para_ptr->getMassGroup(ref_mass);
   if (is_full) {
     return compFullEnv(peak_list, theo_env_ptr, env_para_ptr, mass_group,
-                       min_inte);
+                       min_inte, bound_inte);
   } else {
-    return compEnv(peak_list, theo_env_ptr, env_para_ptr, mass_group, min_inte);
+    return compEnv(peak_list, theo_env_ptr, env_para_ptr, mass_group, min_inte,
+                   bound_inte);
   }
 }
 
 MatchEnvPtr detectEnvByMonoMass(const PeakPtrVec& peak_list, double mono_mass,
-                                int charge, double min_inte,
+                                int charge, double min_inte, double bound_inte,
                                 const EnvParaPtr& env_para_ptr, bool is_full) {
   if (mono_mass < env_para_ptr->min_mass_) {
     return nullptr;
@@ -174,15 +175,16 @@ MatchEnvPtr detectEnvByMonoMass(const PeakPtrVec& peak_list, double mono_mass,
   int mass_group = env_para_ptr->getMassGroup(mono_mass);
   if (is_full) {
     return compFullEnv(peak_list, theo_env_ptr, env_para_ptr, mass_group,
-                       min_inte);
+                       min_inte, bound_inte);
   } else {
-    return compEnv(peak_list, theo_env_ptr, env_para_ptr, mass_group, min_inte);
+    return compEnv(peak_list, theo_env_ptr, env_para_ptr, mass_group, min_inte,
+                   bound_inte);
   }
 }
 
 MatchEnvPtr2D getCandidateEnv(const PeakPtrVec& peak_list, int max_charge,
                               double max_mass, double min_inte,
-                              double min_ref_inte,
+                              double min_ref_inte, double bound_inte,
                               const EnvParaPtr& env_para_ptr) {
   bool is_full = true;
   int peak_num = peak_list.size();
@@ -192,7 +194,7 @@ MatchEnvPtr2D getCandidateEnv(const PeakPtrVec& peak_list, int max_charge,
     for (int charge = 1; charge <= max_charge; charge++) {
       match_envs[idx][charge - 1] =
           detectEnvByRefPeak(peak_list, idx, charge, max_mass, min_inte,
-                             min_ref_inte, env_para_ptr, is_full);
+                             min_ref_inte, bound_inte, env_para_ptr, is_full);
     }
   }
   return match_envs;

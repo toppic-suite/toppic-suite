@@ -93,19 +93,24 @@ void DeconvData::initWinBgnEnd() {
 void DeconvData::initMinInte(bool estimate_min_inte, double sn_ratio) {
   min_inte_ = 0;
   min_ref_inte_ = 0;
+  noise_inte_ = 0;
   if (estimate_min_inte) {
     std::vector<double> intes;
     for (size_t i = 0; i < peak_list_.size(); i++) {
       intes.push_back(peak_list_[i]->getIntensity());
     }
-    double noise_inte = baseline_util::getBaseLine(intes);
-    min_ref_inte_ = noise_inte * sn_ratio;
+    noise_inte_ = baseline_util::getBaseLine(intes);
+    min_ref_inte_ = noise_inte_ * sn_ratio;
     // Keep the general peak threshold at the noise level, but allow it to be
     // lowered below noise (e.g. -s 0) so weak isotope peaks are not pruned.
+    // The extent of a theoretical envelope is always bounded by the noise
+    // level (noise_inte_): theoretical isotope peaks expected below the noise
+    // cannot be observed, and extending envelopes into them only adds missing
+    // peaks that get the envelope rejected.
     if (sn_ratio < 1.0) {
-      min_inte_ = noise_inte * sn_ratio;
+      min_inte_ = noise_inte_ * sn_ratio;
     } else {
-      min_inte_ = noise_inte;
+      min_inte_ = noise_inte_;
     }
   }
 }

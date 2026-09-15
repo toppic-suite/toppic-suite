@@ -24,18 +24,22 @@ namespace toppic {
 
 namespace env_detect {
 
+// min_inte: minimum intensity of an experimental peak counted as present in
+// an envelope; min_ref_inte: minimum intensity of the reference (seed) peak;
+// bound_inte: theoretical isotope peaks expected below this intensity (the
+// noise level) are left out of the envelope.
 MatchEnvPtr detectEnvByRefPeak(const PeakPtrVec& peak_list, int ref_peak,
                                int charge, double max_mass, double min_inte,
-                               double min_ref_inte,
+                               double min_ref_inte, double bound_inte,
                                const EnvParaPtr& env_para_ptr, bool is_full);
 
 MatchEnvPtr detectEnvByMonoMass(const PeakPtrVec& peak_list, double mono_mass,
-                                int charge, double min_inte,
+                                int charge, double min_inte, double bound_inte,
                                 const EnvParaPtr& env_para_ptr, bool is_full);
 
 MatchEnvPtr2D getCandidateEnv(const PeakPtrVec& peak_list, int max_charge,
                               double max_mass, double min_inte,
-                              double min_ref_inte,
+                              double min_ref_inte, double bound_inte,
                               const EnvParaPtr& env_para_ptr);
 }  // namespace env_detect
 

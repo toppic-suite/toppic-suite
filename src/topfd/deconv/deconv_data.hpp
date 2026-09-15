@@ -45,6 +45,9 @@ class DeconvData {
 
   double getMinInte() { return min_inte_; }
 
+  // Noise baseline of the spectrum; bounds the extent of theoretical envelopes.
+  double getNoiseInte() { return noise_inte_; }
+
   double getMinRefInte() { return min_ref_inte_; }
 
   PeakPtrVec& getPeakList() { return peak_list_; }
@@ -70,6 +73,7 @@ class DeconvData {
 
   double min_inte_;
   double min_ref_inte_;
+  double noise_inte_;
 
   // the number of windows
   int win_num_;

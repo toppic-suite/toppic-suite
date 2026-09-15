@@ -131,7 +131,7 @@ MatchEnvPtr2D initMatchEnv(const EnvParaPtr& env_para_ptr,
         if (max_mass <= argu_max_mass) {
           env_ptr = env_detect::detectEnvByRefPeak(
               peak_list, idx, charge, argu_max_mass, base_inte, min_ref_inte,
-              env_para_ptr, false);
+              base_inte, env_para_ptr, false);
         }
         if (env_ptr != nullptr) {
           if (!env_filter::checkRealEnvValid(env_ptr, env_para_ptr)) {
@@ -145,7 +145,7 @@ MatchEnvPtr2D initMatchEnv(const EnvParaPtr& env_para_ptr,
         if (env_ptr != nullptr) {
           full_env_ptr = env_detect::detectEnvByRefPeak(
               peak_list, idx, charge, argu_max_mass, base_inte, min_ref_inte,
-              env_para_ptr, true);
+              base_inte, env_para_ptr, true);
           if (full_env_ptr != nullptr) {
             full_env_ptr->setMsdeconvScore(env_ptr->getMsdeconvScore());
           }

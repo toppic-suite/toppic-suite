@@ -201,7 +201,8 @@ void DeconvSingleSp::postprocess(MatchEnvPtrVec& dp_envs, int ms_level) {
   if (topfd_para_ptr_->isOutputMultipleMass()) {
     MatchEnvPtr2D cand_envs = env_detect::getCandidateEnv(
         peak_list, data_ptr_->getMaxCharge(), data_ptr_->getMaxMass(),
-        data_ptr_->getMinInte(), data_ptr_->getMinRefInte(), env_para_ptr_);
+        data_ptr_->getMinInte(), data_ptr_->getMinRefInte(),
+        data_ptr_->getNoiseInte(), env_para_ptr_);
     // envelope filter
     env_filter::multipleMassFilter(cand_envs, env_para_ptr_);
     result_envs_ =
@@ -217,7 +218,8 @@ MatchEnvPtrVec DeconvSingleSp::deconv() {
   // envelope detection
   MatchEnvPtr2D cand_envs = env_detect::getCandidateEnv(
       peak_list, data_ptr_->getMaxCharge(), data_ptr_->getMaxMass(),
-      data_ptr_->getMinInte(), data_ptr_->getMinRefInte(), env_para_ptr_);
+      data_ptr_->getMinInte(), data_ptr_->getMinRefInte(),
+      data_ptr_->getNoiseInte(), env_para_ptr_);
   LOG_DEBUG("candidate complete");
 
   if (topfd_para_ptr_->isOutputDpEnvs()) {
