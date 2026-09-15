@@ -53,6 +53,7 @@
 #include "prsm/prsm_form_filter.hpp"
 #include "prsm/prsm_match_num_recount.hpp"
 #include "prsm/prsm_match_table_writer.hpp"
+#include "prsm/prsm_post_mass_match.hpp"
 #include "prsm/prsm_prot_cluster.hpp"
 #include "prsm/prsm_prot_filter.hpp"
 #include "prsm/prsm_simple_cluster.hpp"
@@ -76,21 +77,45 @@
 
 namespace toppic {
 
+// post_sp_name is the spectrum file written by the post mass matching
+// (--post-mass-match), whose name the result files carry; "" if it did not
+// run.
 void cleanToppicDir(const std::string& fa_name, const std::string& sp_name,
-                    bool keep_temp_files) {
+                    bool keep_temp_files, const std::string& post_sp_name) {
   std::string abs_sp_name = file_util::absoluteName(sp_name);
   std::string sp_base = file_util::basename(abs_sp_name);
   std::replace(sp_base.begin(), sp_base.end(), '\\', '/');
-  file_util::delFile(sp_base + "_toppic_proteoform.xml");
+  std::string out_base = sp_base;
+  if (post_sp_name != "") {
+    out_base = file_util::basename(file_util::absoluteName(post_sp_name));
+    std::replace(out_base.begin(), out_base.end(), '\\', '/');
+  }
+  file_util::delFile(out_base + "_toppic_proteoform.xml");
   bool overwrite = true;
-  file_util::copyFile(sp_base + ".toppic_form_cutoff_form",
-                      sp_base + "_toppic_proteoform.xml", overwrite);
-  file_util::delFile(sp_base + "_toppic_prsm.xml");
-  file_util::copyFile(sp_base + "." + "toppic_prsm_cutoff",
-                      sp_base + "_toppic_prsm.xml", overwrite);
-  file_util::delFile(sp_base + "_toppic_protein.xml");
-  file_util::copyFile(sp_base + ".toppic_prot_cutoff_prot",
-                      sp_base + "_toppic_protein.xml", overwrite);
+  file_util::copyFile(out_base + ".toppic_form_cutoff_form",
+                      out_base + "_toppic_proteoform.xml", overwrite);
+  file_util::delFile(out_base + "_toppic_prsm.xml");
+  file_util::copyFile(out_base + "." + "toppic_prsm_cutoff",
+                      out_base + "_toppic_prsm.xml", overwrite);
+  file_util::delFile(out_base + "_toppic_protein.xml");
+  file_util::copyFile(out_base + ".toppic_prot_cutoff_prot",
+                      out_base + "_toppic_protein.xml", overwrite);
+  if (!keep_temp_files && post_sp_name != "") {
+    file_util::delFile(file_util::absoluteName(post_sp_name) + "_index");
+    file_util::delFile(out_base + ".feature");
+    file_util::delFile(out_base + ".toppic_recount");
+    file_util::delFile(out_base + ".toppic_proteoform_cluster");
+    file_util::delFile(out_base + ".toppic_cluster");
+    file_util::delFile(out_base + ".toppic_cluster_fdr");
+    file_util::delFile(out_base + ".toppic_cluster_local");
+    file_util::delFile(out_base + ".toppic_prsm_cutoff");
+    file_util::delFile(out_base + ".toppic_form_cutoff");
+    file_util::delFile(out_base + ".toppic_prot_cutoff");
+    file_util::delFile(out_base + ".toppic_prot_cutoff_prot");
+    file_util::delFile(out_base + ".toppic_form_cutoff_form");
+    file_util::delDir(out_base + "_toppic_proteoform_cutoff_xml");
+    file_util::delDir(out_base + "_toppic_prsm_cutoff_xml");
+  }
   if (!keep_temp_files) {
     file_util::cleanPrefix(sp_name, sp_base + ".msalign_");
     file_util::delFile(abs_sp_name + "_index");
@@ -411,6 +436,20 @@ int TopPIC_post(std::map<std::string, std::string>& arguments) {
     std::cout << "Recounting matched masses and fragments - finished."
               << std::endl;
 
+    if (arguments["postMassMatch"] == "true") {
+      std::cout << "Post mass matching - started." << std::endl;
+      int min_peak_num = std::stoi(arguments["postMinPeakNum"]);
+      sp_file_name = prsm_post_mass_match::process(
+          prsm_para_ptr, "toppic_recount", "toppic_recount", min_peak_num);
+      // The steps below read the spectra with the added masses and the PrSMs
+      // with the recounted matches, and name their files after the new
+      // spectrum file.
+      arguments["spectrumFileName"] = sp_file_name;
+      prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
+      msalign_util::geneSpIndex(sp_file_name);
+      std::cout << "Post mass matching - finished." << std::endl;
+    }
+
     std::cout << "Finding PrSM proteoform clusters - started." << std::endl;
     bool is_proteoform_ppm_error = (arguments["proteoformPpmError"] == "true");
     double proteoform_error_tole =
@@ -623,7 +662,13 @@ int TopPICProgress_multi_file(std::map<std::string, std::string>& arguments,
       if (toppic::TopPICProgress(arguments) != 0) {
         return 1;
       }
-      cleanToppicDir(ori_db_file_name, spec_file_lst[k], keep_temp_files);
+      // the post mass matching replaces the spectrum file name
+      std::string post_sp_name = "";
+      if (arguments["spectrumFileName"] != spec_file_lst[k]) {
+        post_sp_name = arguments["spectrumFileName"];
+      }
+      cleanToppicDir(ori_db_file_name, spec_file_lst[k], keep_temp_files,
+                     post_sp_name);
     }
   }
 
@@ -672,7 +717,12 @@ int TopPICProgress_multi_file(std::map<std::string, std::string>& arguments,
 
     TopPIC_post(arguments);
     sp_file_name = merged_file_name + "_ms2.msalign";
-    cleanToppicDir(ori_db_file_name, sp_file_name, keep_temp_files);
+    std::string post_sp_name = "";
+    if (arguments["spectrumFileName"] != sp_file_name) {
+      post_sp_name = arguments["spectrumFileName"];
+    }
+    cleanToppicDir(ori_db_file_name, sp_file_name, keep_temp_files,
+                   post_sp_name);
   }
 
   base_data::release();

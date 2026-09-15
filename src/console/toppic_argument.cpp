@@ -77,6 +77,8 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["combineResultOnly"] = "false";
   arguments["outputRawPrsmTable"] = "false";
   arguments["outputPrsmCoverage"] = "false";
+  arguments["postMassMatch"] = "false";
+  arguments["postMinPeakNum"] = "1";
 
   arguments["version"] = "";
   return arguments;
@@ -189,6 +191,16 @@ void ToppicArgument::outputArguments(
          << arguments["massErrorTolerance"] << " ppm" << std::endl;
   output << std::setw(gap) << std::left << "EnvCNN score cutoff:" << sep
          << arguments["envCnnCutoff"] << std::endl;
+  if (arguments["postMassMatch"] == "true") {
+    output << std::setw(gap) << std::left << "Post mass matching:" << sep
+           << "True" << std::endl;
+    output << std::setw(gap) << std::left
+           << "Post mass matching minimum isotopic peaks:" << sep
+           << arguments["postMinPeakNum"] << std::endl;
+  } else {
+    output << std::setw(gap) << std::left << "Post mass matching:" << sep
+           << "False" << std::endl;
+  }
   if (arguments["proteoformPpmError"] == "false") {
     output << std::setw(gap) << std::left
            << "Error tolerance for identifying PrSM clusters:" << sep
@@ -295,6 +307,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
   std::string filtering_result_num = "";
   std::string thread_number = "";
   std::string top_prsm_number = "";
+  std::string post_min_peak_num = "";
 
   /** Define and parse the program options*/
   try {
@@ -416,7 +429,18 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
             "no-topfd-feature,x",
             "No TopFD feature file for proteoform identification.")(
             "keep-temp-files,k", "Keep intermediate files.")(
-            "keep-decoy-ids,K", "Keep decoy identifications.");
+            "keep-decoy-ids,K", "Keep decoy identifications.")(
+            "post-mass-match",
+            "Post mass matching: after the search, match the theoretical "
+            "fragment masses of each PrSM that no deconvoluted mass matched "
+            "against the centroided MS/MS peaks in the TopFD SQLite database "
+            "(run topfd without -N) with the method of MSPathFinderT, and add "
+            "the matched masses to the spectra (written to "
+            "<name>_post_ms2.msalign).")(
+            "post-min-peak-num", po::value<std::string>(&post_min_peak_num),
+            "<a positive integer>. Minimum number of observed isotopic peaks "
+            "of a fragment mass matched by the post mass matching. Default "
+            "value: 1.");
 
     po::options_description desc("Options");
 
@@ -458,6 +482,8 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "no-topfd-feature,x", "")("keep-temp-files,k", "")(
         "keep-decoy-ids,K", "")("combine-result-only,C", "")(
         "output-raw-prsm-table,o", "")("output-prsm-coverage,O", "")(
+        "post-mass-match", "")(
+        "post-min-peak-num", po::value<std::string>(&post_min_peak_num), "")(
         "filtering-result-number",
         po::value<std::string>(&filtering_result_num),
         "Filtering result number. Default value: 20.")(
@@ -658,6 +684,14 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
 
     if (vm.count("output-prsm-coverage")) {
       arguments_["outputPrsmCoverage"] = "true";
+    }
+
+    if (vm.count("post-mass-match")) {
+      arguments_["postMassMatch"] = "true";
+    }
+
+    if (vm.count("post-min-peak-num")) {
+      arguments_["postMinPeakNum"] = post_min_peak_num;
     }
 
     if (vm.count("filtering-result-number")) {
@@ -964,6 +998,19 @@ bool ToppicArgument::validateArguments() {
     }
   } catch (const std::exception& ex) {
     LOG_ERROR("Thread number " << thread_number << " should be a number.");
+    return false;
+  }
+
+  std::string post_min_peak_num = arguments_["postMinPeakNum"];
+  try {
+    if (std::stoi(post_min_peak_num) < 1) {
+      LOG_ERROR("Post mass matching minimum isotopic peak number "
+                << post_min_peak_num << " should be at least 1.");
+      return false;
+    }
+  } catch (const std::exception& ex) {
+    LOG_ERROR("Post mass matching minimum isotopic peak number "
+              << post_min_peak_num << " should be a number.");
     return false;
   }
 

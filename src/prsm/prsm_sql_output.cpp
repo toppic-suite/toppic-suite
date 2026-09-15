@@ -39,7 +39,10 @@ void write(const PrsmParaPtr& prsm_para_ptr, const std::string& sp_file_name,
            const std::string& form_file_ext,
            const std::string& prot_file_ext) {
   std::string sql_base = file_util::basename(sp_file_name);
-  if (str_util::endsWith(sql_base, "_ms2")) {
+  // the spectra written by the post mass matching keep TopFD's database name
+  if (str_util::endsWith(sql_base, "_post_ms2")) {
+    sql_base = sql_base.substr(0, sql_base.size() - 9);
+  } else if (str_util::endsWith(sql_base, "_ms2")) {
     sql_base = sql_base.substr(0, sql_base.size() - 4);
   }
   std::string sql_file_name = sql_base + ".sqlite";
