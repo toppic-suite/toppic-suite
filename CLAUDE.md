@@ -336,6 +336,43 @@ against the sequence's b/y ions (46 exact / 14 off-by-one-isotope is the
 reference), and count envelopes whose theoretical apex exceeds the observed
 apex by > 20% (77 of 611 before the core fit, 1 after).
 
+## Post mass matching (`prsm/prsm_post_mass_match`, toppic only)
+
+After the search and the match recount, `console/toppic_process` runs
+`prsm_post_mass_match::process`, which matches the theoretical fragment
+masses of each PrSM that no deconvoluted mass matched against the
+**centroided MS/MS peaks stored in TopFD's SQLite database** (MSPathFinderT's
+envelope test), scores the added masses with EnvCNN, and writes
+`<base>_post_ms2.msalign` plus PrSM/feature files under that name, which every
+downstream step (clustering, FDR, tables, SQL output) then reads instead of
+the input. Facts to keep straight:
+
+- **It is on by default.** `initArguments()` sets `postMassMatch = "true"`;
+  `-E` / `--disable-post-match` sets it to false (there is no enabling flag
+  any more), and `-I` / `--post-min-peak-num` (default 1) is the minimum
+  number of observed isotopic peaks per accepted fragment.
+- **A missing database is an error, not a skip.** The database name comes
+  from `prsm_post_mass_match::sqlFileName(sp_file)` (`<base>.sqlite` for
+  `<base>_ms2.msalign`; use it, do not re-derive the name). It is checked in
+  three places with the same message ("run TopFD without disabling its SQLite
+  database output (without -N) ..., or run TopPIC with --disable-post-match"):
+  `ToppicArgument::validateArguments` (so a run fails before the search),
+  `process()` itself (abort), and `toppic_gui`'s `checkError()` (a warning
+  dialog before toppic is launched). Keep all three in step.
+- **Result file names carry `_post_ms2`** whenever post matching ran; the
+  cleanup in `toppic_process` (`cleanToppicDir`) takes that name to find the
+  intermediate files. With `-E` the names are the plain `<base>_ms2` ones.
+- **GUI wiring.** `toppicwindow.ui` has `postMassMatchCheckBox` (checked by
+  default from the parser's argument map, enables `postMinPeakNumEdit`) on the
+  bottom row of the Advanced Parameters tab; `gui/util/command.cpp` emits
+  `-E` when the box is **cleared** and `-I <n>` only while it is checked.
+- **Short options in `toppic_argument.cpp` are nearly exhausted.** Before
+  adding one, list the letters in use with
+  `grep -oE '"[a-z-]+,[A-Za-z]"' src/console/toppic_argument.cpp`; a clash is
+  only reported at run time as "option '-X' is ambiguous" (that is how `-P`
+  collided with `--proteoform-ppm-error`). Every option is declared twice
+  (the visible `display_desc` and the full parse `desc`); change both.
+
 ## Source layout
 
 `src` is the include root, so headers are included by their path from `src`
