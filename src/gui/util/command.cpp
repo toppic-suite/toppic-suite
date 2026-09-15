@@ -187,7 +187,9 @@ std::map<std::string, std::string> toppic_para{
     {"envCnnCutoff", "-F "},
     {"groupSpectrumNumber", "-r "},
     {"localPtmFileName", "-B "},
-    {"localThreshold", "-H "}};
+    {"localThreshold", "-H "},
+    {"postMassMatch", "-E "},
+    {"postMinPeakNum", "-I "}};
 
 std::string geneToppicCommand(std::map<std::string, std::string> arguments_,
                               std::vector<std::string> spec_file_lst_) {
@@ -226,6 +228,15 @@ std::string geneToppicCommand(std::map<std::string, std::string> arguments_,
       } else if (it->first == "useApproxSpectra") {
         if (it->second == "true") {
           command = command + toppic_para[it->first];
+        }
+      } else if (it->first == "postMassMatch") {
+        if (it->second == "true") {
+          command = command + toppic_para[it->first];
+        }
+      } else if (it->first == "postMinPeakNum") {
+        // only meaningful together with -E
+        if (arguments_["postMassMatch"] == "true") {
+          command = command + toppic_para[it->first] + it->second + " ";
         }
       } else if (it->first == "variablePtmFileName" && it->second == "") {
         continue;  // don't add -b

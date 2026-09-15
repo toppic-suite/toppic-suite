@@ -40,9 +40,9 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>410</y>
+      <y>450</y>
       <width>881</width>
-      <height>241</height>
+      <height>201</height>
      </rect>
     </property>
     <property name="html">
@@ -136,7 +136,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
       <x>20</x>
       <y>10</y>
       <width>881</width>
-      <height>391</height>
+      <height>431</height>
      </rect>
     </property>
     <property name="currentIndex">
@@ -1261,6 +1261,69 @@ level:</string>
          </property>
          <property name="text">
           <string>Keep decoy identifications</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="horizontalLayoutWidget_30">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>348</y>
+        <width>451</width>
+        <height>33</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_30">
+       <item>
+        <widget class="QCheckBox" name="postMassMatchCheckBox">
+         <property name="minimumSize">
+          <size>
+           <width>120</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>After the search, match the theoretical fragment masses of each PrSM that no deconvoluted mass matched against the centroided MS/MS peaks in the TopFD SQLite database (run TopFD with the SQLite database output enabled), and add the matched masses to the spectra.</string>
+         </property>
+         <property name="text">
+          <string>Post mass matching (needs the TopFD SQLite database)</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="horizontalLayoutWidget_31">
+      <property name="geometry">
+       <rect>
+        <x>500</x>
+        <y>348</y>
+        <width>361</width>
+        <height>33</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_31">
+       <item>
+        <widget class="QLabel" name="label_30">
+         <property name="minimumSize">
+          <size>
+           <width>200</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Minimum isotopic peak number:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="postMinPeakNumEdit">
+         <property name="toolTip">
+          <string>Minimum number of observed isotopic peaks of a fragment mass matched by the post mass matching.</string>
+         </property>
+         <property name="text">
+          <string>1</string>
          </property>
         </widget>
        </item>
