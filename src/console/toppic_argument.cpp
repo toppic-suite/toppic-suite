@@ -430,14 +430,14 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
             "No TopFD feature file for proteoform identification.")(
             "keep-temp-files,k", "Keep intermediate files.")(
             "keep-decoy-ids,K", "Keep decoy identifications.")(
-            "post-mass-match",
+            "post-mass-match,P",
             "Post mass matching: after the search, match the theoretical "
             "fragment masses of each PrSM that no deconvoluted mass matched "
             "against the centroided MS/MS peaks in the TopFD SQLite database "
             "(run topfd without -N) with the method of MSPathFinderT, and add "
             "the matched masses to the spectra (written to "
             "<name>_post_ms2.msalign).")(
-            "post-min-peak-num", po::value<std::string>(&post_min_peak_num),
+            "post-min-peak-num,I", po::value<std::string>(&post_min_peak_num),
             "<a positive integer>. Minimum number of observed isotopic peaks "
             "of a fragment mass matched by the post mass matching. Default "
             "value: 1.");
@@ -482,8 +482,8 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "no-topfd-feature,x", "")("keep-temp-files,k", "")(
         "keep-decoy-ids,K", "")("combine-result-only,C", "")(
         "output-raw-prsm-table,o", "")("output-prsm-coverage,O", "")(
-        "post-mass-match", "")(
-        "post-min-peak-num", po::value<std::string>(&post_min_peak_num), "")(
+        "post-mass-match,P", "")(
+        "post-min-peak-num,I", po::value<std::string>(&post_min_peak_num), "")(
         "filtering-result-number",
         po::value<std::string>(&filtering_result_num),
         "Filtering result number. Default value: 20.")(
