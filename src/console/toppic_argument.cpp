@@ -430,7 +430,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
             "No TopFD feature file for proteoform identification.")(
             "keep-temp-files,k", "Keep intermediate files.")(
             "keep-decoy-ids,K", "Keep decoy identifications.")(
-            "post-mass-match,P",
+            "post-mass-match,E",
             "Post mass matching: after the search, match the theoretical "
             "fragment masses of each PrSM that no deconvoluted mass matched "
             "against the centroided MS/MS peaks in the TopFD SQLite database "
@@ -482,7 +482,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "no-topfd-feature,x", "")("keep-temp-files,k", "")(
         "keep-decoy-ids,K", "")("combine-result-only,C", "")(
         "output-raw-prsm-table,o", "")("output-prsm-coverage,O", "")(
-        "post-mass-match,P", "")(
+        "post-mass-match,E", "")(
         "post-min-peak-num,I", po::value<std::string>(&post_min_peak_num), "")(
         "filtering-result-number",
         po::value<std::string>(&filtering_result_num),
