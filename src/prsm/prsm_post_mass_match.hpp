@@ -48,12 +48,18 @@ namespace prsm_post_mass_match {
 //   <base>_post_ms2.feature    a copy of the TopFD feature file, so the
 //                              downstream steps find it under the new name.
 // Returns the name of the new spectrum file, which the downstream steps read
-// instead of the input one. If the SQLite database is missing (TopFD run with
-// -N), nothing is matched and the files are written unchanged. The EnvCNN
+// instead of the input one. The SQLite database must exist (see
+// sqlFileName); if it is missing the run stops with an error. The EnvCNN
 // model must have been loaded with onnx_env_cnn::initModel.
 std::string process(const PrsmParaPtr& prsm_para_ptr,
                     const std::string& input_file_ext,
                     const std::string& output_file_ext, int min_peak_num);
+
+// The TopFD SQLite database that goes with an msalign spectrum file:
+// <path>/<base>.sqlite, where <base> is the file name without its extension
+// and without a trailing "_ms2" (TopFD writes <base>_ms2.msalign and
+// <base>.sqlite). The argument parser checks it exists before the search.
+std::string sqlFileName(const std::string& sp_file_name);
 
 }  // namespace prsm_post_mass_match
 

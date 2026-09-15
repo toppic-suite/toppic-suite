@@ -480,18 +480,22 @@ void writeSqlEnvs(sqlite3* db,
 
 }  // namespace
 
+std::string sqlFileName(const std::string& sp_file_name) {
+  std::string sql_base = file_util::basename(sp_file_name);
+  if (str_util::endsWith(sql_base, "_ms2")) {
+    sql_base = sql_base.substr(0, sql_base.size() - 4);
+  }
+  return sql_base + ".sqlite";
+}
+
 std::string process(const PrsmParaPtr& prsm_para_ptr,
                     const std::string& input_file_ext,
                     const std::string& output_file_ext, int min_peak_num) {
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
-  std::string base_name = file_util::basename(sp_file_name);
-  std::string sql_base = base_name;
-  if (str_util::endsWith(sql_base, "_ms2")) {
-    sql_base = sql_base.substr(0, sql_base.size() - 4);
-  }
-  std::string post_base_name = sql_base + "_post_ms2";
+  std::string sql_file_name = sqlFileName(sp_file_name);
+  std::string post_base_name =
+      sql_file_name.substr(0, sql_file_name.size() - 7) + "_post_ms2";
   std::string post_sp_file_name = post_base_name + ".msalign";
-  std::string sql_file_name = sql_base + ".sqlite";
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
 
   PrsmPtrVec prsm_ptrs =
@@ -504,10 +508,13 @@ std::string process(const PrsmParaPtr& prsm_para_ptr,
   int match_num = 0;
   int prsm_num = 0;
   if (!std::filesystem::exists(sql_file_name)) {
-    std::cout << "SQLite database " << sql_file_name
-              << " not found (run topfd without -N): no centroided peaks, "
-                 "post mass matching skipped."
-              << std::endl;
+    LOG_ERROR("The TopFD SQLite database "
+              << sql_file_name << " for " << sp_file_name
+              << " is missing! Post mass matching needs the centroided MS/MS "
+                 "peaks stored in it: run TopFD without disabling its SQLite "
+                 "database output (without -N) to deconvolute the spectra, or "
+                 "run TopPIC with --disable-post-match.");
+    exit(EXIT_FAILURE);
   } else {
     sqlite3* db = nullptr;
     if (sqlite3_open(sql_file_name.c_str(), &db) != SQLITE_OK) {
@@ -564,7 +571,8 @@ std::string process(const PrsmParaPtr& prsm_para_ptr,
   writeMsalign(sp_file_name, post_sp_file_name, sp_para_ptr, spec_matches);
 
   // the downstream steps look for the TopFD feature file under the new name
-  std::string feature_file_name = base_name + ".feature";
+  std::string feature_file_name =
+      file_util::basename(sp_file_name) + ".feature";
   if (std::filesystem::exists(feature_file_name)) {
     std::filesystem::copy_file(
         feature_file_name, post_base_name + ".feature",

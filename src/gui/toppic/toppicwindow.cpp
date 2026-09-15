@@ -28,11 +28,14 @@
 #include <QScrollBar>
 #include <QToolTip>
 
+#include <filesystem>
+
 #include "common/util/file_util.hpp"
 #include "common/util/mem_check.hpp"
 #include "common/util/version.hpp"
 #include "console/toppic_argument.hpp"
 #include "gui/toppic/ui_toppicwindow.h"
+#include "prsm/prsm_post_mass_match.hpp"
 #include "gui/util/command.hpp"
 #include "gui/util/gui_message.hpp"
 
@@ -675,6 +678,28 @@ bool ToppicWindow::checkError() {
         tr("Minimum isotopic peak number for post mass matching is empty!"),
         QMessageBox::Yes);
     return true;
+  }
+  // Post mass matching reads the TopFD SQLite database of each spectrum file;
+  // report a missing one before starting toppic.
+  if (ui->postMassMatchCheckBox->isChecked()) {
+    for (int i = 0; i < ui->listWidget->count(); i++) {
+      std::string sp_file_name = ui->listWidget->item(i)->text().toStdString();
+      std::string sql_file_name =
+          toppic::prsm_post_mass_match::sqlFileName(sp_file_name);
+      if (!std::filesystem::exists(sql_file_name)) {
+        QMessageBox::warning(
+            this, tr("Warning"),
+            tr("The TopFD SQLite database %1 for %2 is missing!\n"
+               "Post mass matching needs the centroided MS/MS peaks stored "
+               "in it: run TopFD without disabling its SQLite database "
+               "output to deconvolute the spectra, or uncheck post mass "
+               "matching.")
+                .arg(QString::fromStdString(sql_file_name),
+                     QString::fromStdString(sp_file_name)),
+            QMessageBox::Yes);
+        return true;
+      }
+    }
   }
   return false;
 }

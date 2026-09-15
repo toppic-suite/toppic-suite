@@ -25,6 +25,7 @@
 #include "common/util/str_util.hpp"
 #include "common/util/version.hpp"
 #include "common/xml/xml_dom_util.hpp"
+#include "prsm/prsm_post_mass_match.hpp"
 
 namespace toppic {
 
@@ -750,6 +751,22 @@ bool ToppicArgument::validateArguments() {
       LOG_ERROR("Spectrum file " << spec_file_list_[k]
                                  << " is not a msalign file!");
       return false;
+    }
+
+    // Post mass matching (the default) reads the centroided MS/MS peaks from
+    // the TopFD SQLite database; fail here rather than after the search.
+    if (arguments_["postMassMatch"] == "true") {
+      std::string sql_file_name =
+          prsm_post_mass_match::sqlFileName(spec_file_list_[k]);
+      if (!std::filesystem::exists(sql_file_name)) {
+        LOG_ERROR("The TopFD SQLite database "
+                  << sql_file_name << " for " << spec_file_list_[k]
+                  << " is missing! Post mass matching needs the centroided "
+                     "MS/MS peaks stored in it: run TopFD without disabling "
+                     "its SQLite database output (without -N) to deconvolute "
+                     "the spectra, or run TopPIC with --disable-post-match.");
+        return false;
+      }
     }
 
     if (spec_file_list_[k].length() > 200) {
