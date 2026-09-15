@@ -77,7 +77,7 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["combineResultOnly"] = "false";
   arguments["outputRawPrsmTable"] = "false";
   arguments["outputPrsmCoverage"] = "false";
-  arguments["postMassMatch"] = "false";
+  arguments["postMassMatch"] = "true";
   arguments["postMinPeakNum"] = "1";
 
   arguments["version"] = "";
@@ -430,13 +430,13 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
             "No TopFD feature file for proteoform identification.")(
             "keep-temp-files,k", "Keep intermediate files.")(
             "keep-decoy-ids,K", "Keep decoy identifications.")(
-            "post-mass-match,E",
-            "Post mass matching: after the search, match the theoretical "
-            "fragment masses of each PrSM that no deconvoluted mass matched "
-            "against the centroided MS/MS peaks in the TopFD SQLite database "
-            "(run topfd without -N) with the method of MSPathFinderT, and add "
-            "the matched masses to the spectra (written to "
-            "<name>_post_ms2.msalign).")(
+            "disable-post-match,E",
+            "Disable post mass matching. By default, after the search, the "
+            "theoretical fragment masses of each PrSM that no deconvoluted "
+            "mass matched are matched against the centroided MS/MS peaks in "
+            "the TopFD SQLite database (run topfd without -N) with the method "
+            "of MSPathFinderT, and the matched masses are added to the "
+            "spectra (written to <name>_post_ms2.msalign).")(
             "post-min-peak-num,I", po::value<std::string>(&post_min_peak_num),
             "<a positive integer>. Minimum number of observed isotopic peaks "
             "of a fragment mass matched by the post mass matching. Default "
@@ -482,7 +482,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "no-topfd-feature,x", "")("keep-temp-files,k", "")(
         "keep-decoy-ids,K", "")("combine-result-only,C", "")(
         "output-raw-prsm-table,o", "")("output-prsm-coverage,O", "")(
-        "post-mass-match,E", "")(
+        "disable-post-match,E", "")(
         "post-min-peak-num,I", po::value<std::string>(&post_min_peak_num), "")(
         "filtering-result-number",
         po::value<std::string>(&filtering_result_num),
@@ -686,8 +686,8 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
       arguments_["outputPrsmCoverage"] = "true";
     }
 
-    if (vm.count("post-mass-match")) {
-      arguments_["postMassMatch"] = "true";
+    if (vm.count("disable-post-match")) {
+      arguments_["postMassMatch"] = "false";
     }
 
     if (vm.count("post-min-peak-num")) {

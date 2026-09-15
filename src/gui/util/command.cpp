@@ -230,11 +230,12 @@ std::string geneToppicCommand(std::map<std::string, std::string> arguments_,
           command = command + toppic_para[it->first];
         }
       } else if (it->first == "postMassMatch") {
-        if (it->second == "true") {
+        // on by default; -E (--disable-post-match) turns it off
+        if (it->second == "false") {
           command = command + toppic_para[it->first];
         }
       } else if (it->first == "postMinPeakNum") {
-        // only meaningful together with -E
+        // only meaningful while post mass matching is on
         if (arguments_["postMassMatch"] == "true") {
           command = command + toppic_para[it->first] + it->second + " ";
         }

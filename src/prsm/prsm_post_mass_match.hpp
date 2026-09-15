@@ -22,7 +22,8 @@
 
 namespace toppic {
 
-// Post mass matching (toppic --post-mass-match): after the search, match the
+// Post mass matching (on by default in toppic; --disable-post-match turns it
+// off): after the search, match the
 // theoretical fragment masses of each PrSM that none of TopFD's deconvoluted
 // masses matched against the centroided MS/MS peaks that TopFD stored in its
 // SQLite database, using the method of MSPathFinderT (Informed-Proteomics):

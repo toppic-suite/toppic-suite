@@ -168,10 +168,11 @@ void ToppicWindow::on_defaultButton_clicked() {
   ui->topfdFeatureCheckBox->setChecked(false);
   ui->keepDecoyCheckBox->setChecked(false);
   ui->keepTempCheckBox->setChecked(false);
-  ui->postMassMatchCheckBox->setChecked(false);
+  // post mass matching is on by default (arguments_["postMassMatch"])
+  ui->postMassMatchCheckBox->setChecked(arguments_["postMassMatch"] == "true");
   ui->postMinPeakNumEdit->setText(
       QString::fromStdString(arguments_["postMinPeakNum"]));
-  ui->postMinPeakNumEdit->setEnabled(false);
+  ui->postMinPeakNumEdit->setEnabled(ui->postMassMatchCheckBox->isChecked());
 }
 
 void ToppicWindow::updatedir(QString s) {

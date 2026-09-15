@@ -78,9 +78,9 @@
 
 namespace toppic {
 
-// post_sp_name is the spectrum file written by the post mass matching
-// (--post-mass-match), whose name the result files carry; "" if it did not
-// run.
+// post_sp_name is the spectrum file written by the post mass matching (on by
+// default; --disable-post-match turns it off), whose name the result files
+// carry; "" if it did not run.
 void cleanToppicDir(const std::string& fa_name, const std::string& sp_name,
                     bool keep_temp_files, const std::string& post_sp_name) {
   std::string abs_sp_name = file_util::absoluteName(sp_name);
