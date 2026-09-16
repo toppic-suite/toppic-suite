@@ -308,7 +308,7 @@ writers, and nothing checks them against the code, so:
 - `topfd_manual.md` specifics: its examples use no `-a` (activation
   defaults to `FILE`), and `-T`-mode claims must be checked against
   `topfd_single_process.cpp` (that mode ignores the MS1/feature options).
-- TopDIA's hidden `-p`/`-P` options set `TopfdPara::seed_env_inte_corr_tole_cutoff_`
+- TopDIA's `-p`/`-P` options set `TopfdPara::seed_env_inte_corr_tole_cutoff_`
   (copied into `EcscorePara` by `env_coll_detect::processMs1/processMs2`)
   before each feature-detection stage; both default to 0.5, the value the
   detector had hard-coded, so default runs are unchanged. TopPIC's hidden

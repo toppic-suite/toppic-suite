@@ -150,6 +150,14 @@ bool Argument::parse(int argc, char* argv[]) {
         "pseudo-peak-number,V", po::value<std::string>(&pseudo_min_peaks),
         "<an integer of at least 10>. The minimum number of peaks in a "
         "pseudo-MS/MS spectrum. The default value is 25.")(
+        "ms1-intensity-correlation-cutoff,p",
+        po::value<std::string>(&ms1_seed_env_inte_corr_tole_cutoff),
+        "<a number in [0,1]>. Set the MS1 seed envelope intensity correlation "
+        "cutoff value for extracting features. The default value is 0.5.")(
+        "ms2-intensity-correlation-cutoff,P",
+        po::value<std::string>(&ms2_seed_env_inte_corr_tole_cutoff),
+        "<a number in [0,1]>. Set the MS2 seed envelope intensity correlation "
+        "cutoff value for extracting features. The default value is 0.5.")(
         "final-filtering,d",
         "Filter envelopes in MS/MS scans based on the estimated number of "
         "fragment ions.")(
@@ -164,14 +172,6 @@ bool Argument::parse(int argc, char* argv[]) {
         "keep,k",
         "Report monoisotopic masses extracted from low quality isotopic "
         "envelopes.")(
-        "ms1-intensity-correlation-cutoff,p",
-        po::value<std::string>(&ms1_seed_env_inte_corr_tole_cutoff),
-        "<a number in [0,1]>. Set the MS1 seed envelope intensity correlation "
-        "cutoff value for extracting features. The default value is 0.5.")(
-        "ms2-intensity-correlation-cutoff,P",
-        po::value<std::string>(&ms2_seed_env_inte_corr_tole_cutoff),
-        "<a number in [0,1]>. Set the MS2 seed envelope intensity correlation "
-        "cutoff value for extracting features. The default value is 0.5.")(
         "spectrum-file-name",
         po::value<std::vector<std::string> >()->multitoken()->required(),
         "Spectrum file name with its path.");

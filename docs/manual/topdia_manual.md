@@ -118,6 +118,8 @@ Feature detection:
 | `-T`, `--ms2-ecscore-cutoff <0..1>` | 0 | ECScore cutoff for fragment features. |
 | `-B`, `--ms2-min-scan-number <1\|2\|3>` | 1 | Minimum number of MS/MS scans of a fragment feature. |
 | `-i`, `--single-scan-noise` | off | Use each MS1 scan's own noise level instead of the whole map's when filtering low-intensity peaks. |
+| `-p`, `--ms1-intensity-correlation-cutoff <0..1>` | 0.5 | Minimum correlation between the intensities of a seed isotopic envelope and the theoretical ones for starting an MS1 proteoform feature. |
+| `-P`, `--ms2-intensity-correlation-cutoff <0..1>` | 0.5 | The same cutoff for starting a fragment feature in an isolation window. |
 
 Pseudo spectra:
 
