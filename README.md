@@ -36,6 +36,14 @@ The GUI tools (`topfd_gui`, `topdia_gui`, `topindex_gui`, `toppic_gui`,
 `topmg_gui`, `topdiff_gui`) offer the same options as the command-line tools
 and run them.
 
+**TopMSV** (Top-down Mass Spectrometry Visualization) is the web-based
+viewer for TopPIC Suite results. It reads the SQLite database written by
+TopFD and TopPIC and shows the MS1 and MS/MS spectra with their
+deconvoluted envelopes, the LC-MS map with the detected proteoform
+features, and the identified proteoform-spectrum matches with their
+annotated fragment ions. It is distributed separately; see the
+[TopMSV manual](https://toppic.org/software/topmsv/manual.html).
+
 ## System requirements
 
 * A C++17 compiler: Clang >= 7 (default) or GCC >= 8
