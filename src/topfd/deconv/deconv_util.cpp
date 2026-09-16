@@ -16,7 +16,6 @@
 
 #include "topfd/deconv/deconv_util.hpp"
 
-#include <algorithm>
 #include <iostream>
 
 #include "common/util/file_util.hpp"
@@ -54,7 +53,6 @@ void mergeMs1MsalignFiles(const TopfdParaPtr& topfd_para_ptr,
   // remove temporary files
   std::string ms1_prefix =
       file_util::absoluteName(output_base_name) + "_ms1.msalign_";
-  std::replace(output_base_name.begin(), output_base_name.end(), '\\', '/');
   file_util::cleanPrefix(output_base_name, ms1_prefix);
   std::cout << std::endl;
 }

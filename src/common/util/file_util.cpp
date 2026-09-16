@@ -264,12 +264,18 @@ void cleanPrefix(const std::string& ref_name, const std::string& prefix) {
   std::replace(ref_name_copy.begin(), ref_name_copy.end(), '\\', '/');
   fs::path ref_path(ref_name_copy);
   fs::path ref_dir = absolute(ref_path).parent_path();
+  // Compare with '/' separators on both sides: callers build the prefix from
+  // absoluteName(), which on Windows contains '\', while the directory
+  // entries below are normalized to '/'. Without this the prefix never
+  // matched on Windows and the per-thread temporary files were left behind.
+  std::string prefix_copy = prefix;
+  std::replace(prefix_copy.begin(), prefix_copy.end(), '\\', '/');
   fs::directory_iterator end_iter;
   for (fs::directory_iterator dir_iter(ref_dir); dir_iter != end_iter;
        ++dir_iter) {
     std::string file_name = dir_iter->path().string();
     std::replace(file_name.begin(), file_name.end(), '\\', '/');
-    if (file_name.compare(0, prefix.length(), prefix) == 0) {
+    if (file_name.compare(0, prefix_copy.length(), prefix_copy) == 0) {
       if (!fs::is_directory(fs::status(dir_iter->path()))) {
         fs::remove(dir_iter->path());
       }

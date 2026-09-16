@@ -357,7 +357,6 @@ void DeconvMs2Process::process() {
   // remove temporary files
   std::string ms2_prefix = file_util::absoluteName(output_base_name) + "_" +
                            output_filename_ext_ + "_";
-  std::replace(output_base_name.begin(), output_base_name.end(), '\\', '/');
   file_util::cleanPrefix(output_base_name, ms2_prefix);
   std::cout << std::endl;
 }
