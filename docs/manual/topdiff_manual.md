@@ -17,25 +17,25 @@ same function. Paths must not contain spaces.
 ## 1. Input
 
 Each command-line argument is the MS/MS spectrum file of one sample, and at
-least two samples are required. For every spectrum file TopDiff reads one
-result file written by the database search tool, named after the spectrum
-file:
+least two samples are required. For every spectrum file TopDiff reads the
+proteoform result file that the database search tool wrote for it. The
+name is derived from the spectrum file: the extension and a trailing `_ms2`
+or `_post_ms2` are removed, and TopDiff then looks for, in this order,
 
-| Spectrum file given | Result file read (`--tool-name toppic`, the default) | Result file read (`--tool-name topmg`) |
-|---|---|---|
-| `sample_ms2.msalign` | `sample_ms2_toppic_proteoform.xml` | `sample_ms2_topmg_proteoform.xml` |
-| `sample_post_ms2.msalign` | `sample_post_ms2_toppic_proteoform.xml` | `sample_post_ms2_topmg_proteoform.xml` |
+1. `<base>_post_ms2_<tool>_proteoform.xml`, the results of a TopPIC run
+   with its default post mass matching, and
+2. `<base>_ms2_<tool>_proteoform.xml`, the results of TopMG or of TopPIC
+   run with `--disable-post-match`,
 
-The rule is: strip the extension and a trailing `_ms2`, then append
-`_ms2_<tool>_proteoform.xml`. Two consequences:
+where `<tool>` is `toppic` (the default) or `topmg` (`--tool-name topmg`).
+So for a sample deconvoluted by TopFD into `sample_ms2.msalign` and
+searched by TopPIC, either `sample_ms2.msalign` or `sample_post_ms2.msalign`
+can be given, and `sample_post_ms2_toppic_proteoform.xml` is read. TopDiff
+prints the name of each result file it reads. When neither file exists, the
+sample contributes no identifications and a warning "does not contain any
+PrSM identifications" is printed, so check that the search finished for
+every sample.
 
-- **After a default TopPIC run, give TopDiff the `_post_ms2.msalign`
-  files.** TopPIC's post mass matching (on by default) names all its result
-  files after `sample_post_ms2.msalign`. If you pass the original
-  `sample_ms2.msalign` instead, TopDiff looks for
-  `sample_ms2_toppic_proteoform.xml`, does not find it, prints "does not
-  contain any PrSM identifications" and produces an empty table. TopPIC runs
-  with `--disable-post-match` and all TopMG runs keep the plain `_ms2` names.
 - **Run TopPIC/TopMG with the TopFD feature file** (the default; not with
   `--no-topfd-feature`). Abundances and retention times come from the
   proteoform features stored in the result file; without them the table has
@@ -109,11 +109,11 @@ spectrum files are given or when one of them does not exist.
 Three samples searched with TopPIC using its default settings:
 
 ```sh
-topdiff -o abundance_diff.tsv \
-    sample_1_post_ms2.msalign sample_2_post_ms2.msalign sample_3_post_ms2.msalign
+topdiff -o abundance_diff.tsv sample_1_ms2.msalign sample_2_ms2.msalign sample_3_ms2.msalign
 ```
 
-writes `abundance_diff.tsv` next to `sample_1_post_ms2.msalign`. The same
+reads `sample_1_post_ms2_toppic_proteoform.xml` and its two counterparts
+and writes `abundance_diff.tsv` next to `sample_1_ms2.msalign`. The same
 samples searched with TopMG:
 
 ```sh

@@ -310,9 +310,11 @@ writers, and nothing checks them against the code, so:
 - Known gaps recorded in the manuals rather than papered over: TopDIA's `-m`
   help text says 70,000 Da while the effective default is TopFD's 50,000;
   TopDIA's `-p`/`-P` intensity-correlation options are parsed but unused by
-  the CLI pipeline; TopDiff must be given `_post_ms2.msalign` files after a
-  default TopPIC run; TopPIC `-c` combined runs need `-E`. Fix the code and
-  the manual together if you address one of them.
+  the CLI pipeline; TopPIC `-c` combined runs need `-E`. Fix the code and
+  the manual together if you address one of them. (TopDiff resolves result
+  files itself: `<base>_post_ms2_<tool>_proteoform.xml` first, then
+  `<base>_ms2_...`, for either `_ms2.msalign` or `_post_ms2.msalign` input —
+  `merge/feature_sample_merge.cpp`; keep the manual's section 1 in step.)
 
 `res/README.md` describes the runtime resource files (which class loads
 each `base_data` file, the two ONNX models, the Git LFS-tracked files);

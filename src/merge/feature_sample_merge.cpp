@@ -17,7 +17,9 @@
 
 #include <algorithm>
 #include <cmath>
+#include <filesystem>
 #include <iomanip>
+#include <iostream>
 
 #include "common/base/mod_util.hpp"
 #include "common/util/file_util.hpp"
@@ -421,15 +423,26 @@ void FeatureSampleMerge::process() {
   for (size_t k = 0; k < sample_num; k++) {
     std::string input_file_name = input_file_names_[k];
     std::string base_name = file_util::basename(input_file_name);
-    if (str_util::endsWith(base_name, "_ms2")) {
+    // Accept both the TopFD spectrum file (<base>_ms2.msalign) and the one
+    // written by TopPIC's post mass matching (<base>_post_ms2.msalign).
+    if (str_util::endsWith(base_name, "_post_ms2")) {
+      base_name = base_name.substr(0, base_name.size() - 9);
+    } else if (str_util::endsWith(base_name, "_ms2")) {
       base_name = base_name.substr(0, base_name.size() - 4);
     } else {
       LOG_ERROR("The file name " << input_file_name
                                  << " does not end with _ms2.msalign!");
     }
 
+    // TopPIC's post mass matching (on by default) names its results after
+    // <base>_post_ms2; TopMG, and TopPIC with --disable-post-match, use
+    // <base>_ms2. Prefer the post-matched results when they exist.
     std::string prsm_file_name =
-        base_name + "_ms2_" + tool_name_ + "_proteoform.xml";
+        base_name + "_post_ms2_" + tool_name_ + "_proteoform.xml";
+    if (!std::filesystem::exists(prsm_file_name)) {
+      prsm_file_name = base_name + "_ms2_" + tool_name_ + "_proteoform.xml";
+    }
+    std::cout << "Reading " << prsm_file_name << std::endl;
     PrsmStrPtrVec prsms =
         prsm_reader_util::readAllPrsmStrsMatchSeq(prsm_file_name);
     if (prsms.size() == 0) {
