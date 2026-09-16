@@ -48,7 +48,7 @@ git clone https://github.com/toppic-suite/toppic-suite.git toppic_suite
 cd toppic_suite
 git remote add upstream https://github.com/liuxiaowen/toppic_suite_private.git
 git fetch upstream --tags
-git lfs fetch upstream main            # the model files behind the pointers
+git lfs fetch upstream upstream/main   # the model files behind the pointers
 
 # 1. Does the public main have commits the private one lacks?
 git log --oneline upstream/main..main
@@ -136,10 +136,16 @@ It fails for four reasons, now fixed above:
   done for `v1.9.0.0` once). If the private tag is the intended one, run
   `git fetch upstream --tags --force` and later `git push origin --tags
   --force`; announce it, since existing clones keep the old tag.
-- **`Object does not exist on the server`** or `LFS: object not found`
-  during `git push`: an LFS object referenced by a pushed commit is not in
-  the local cache. `git lfs fetch upstream --all` (every version of every
-  LFS file; several hundred MB) then `git lfs push origin --all`.
+- **`Object does not exist on the server` ... smudge filter lfs failed**
+  during `read-tree`: the LFS objects were not fetched from the private
+  repository, so the checkout asked the public server for them. The ref
+  must be spelled `upstream/main`: `git lfs fetch upstream main` resolves
+  `main` to the local (public) branch and fetches nothing. Run
+  `git lfs fetch upstream upstream/main` and repeat the `read-tree` line.
+- **`LFS: object not found`** during `git push`: an LFS object referenced
+  by a pushed commit is not in the local cache. `git lfs fetch upstream
+  --all` (every version of every LFS file; several hundred MB) then
+  `git lfs push origin --all`.
 - **`git diff --stat upstream/main HEAD` prints files** after the merge:
   the read-tree step was skipped or ran against the wrong ref; do not
   push. `git reset --hard main` (the clone's original tip) and redo it.
