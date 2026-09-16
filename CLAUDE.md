@@ -182,7 +182,7 @@ path and linked into `toppic_common`:
   static Boost fails at link time with "duplicate section ... has different
   size" warnings and "multiple definition" errors for COMDAT variables that
   clang places in `.bss` and GCC in `.data`. Keep that `CMAKE_HOST_WIN32`
-  guard; `docs/windows_build.md` tells users to install `...-gcc`, not `-clang`.
+  guard; `docs/build/windows_build.md` tells users to install `...-gcc`, not `-clang`.
 - **Qt6** — `find_package(Qt6 COMPONENTS Widgets Core Gui)` backs the `src/gui`
   desktop executables (see the source-layout note). Only the GUI targets use it,
   via per-target `AUTOMOC`/`AUTOUIC`/`AUTORCC`; the `toppic_common` library has
@@ -267,12 +267,12 @@ Ubuntu walkthrough (packages, clone with Git LFS, configure/build, install,
 uninstall) and only a one-paragraph link for each other platform; the details
 live in `docs/build/`, all laid out with the same six steps:
 
-- `docs/windows_build.md` — MSYS2 **UCRT64** shell, Ninja generator, GCC (not
+- `docs/build/windows_build.md` — MSYS2 **UCRT64** shell, Ninja generator, GCC (not
   clang; see the compiler-default note above), `pacman` package list, system
   ONNX Runtime, `res/` installed next to the executables.
-- `docs/redhat_build.md` — RHEL 10 (and Rocky/AlmaLinux): CodeReady Builder +
+- `docs/build/redhat_build.md` — RHEL 10 (and Rocky/AlmaLinux): CodeReady Builder +
   EPEL for `pugixml-devel`, `dnf` package list, otherwise identical to Ubuntu.
-- `docs/macos_build.md` — Xcode Command Line Tools + Homebrew, Homebrew
+- `docs/build/macos_build.md` — Xcode Command Line Tools + Homebrew, Homebrew
   `onnxruntime` (nothing is vendored for macOS; `-DONNXRUNTIME_LIBRARY`
   override), Qt6 hint, resources installed to `<prefix>/bin/res`.
 
