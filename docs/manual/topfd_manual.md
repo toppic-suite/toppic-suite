@@ -91,7 +91,7 @@ FAIMS data `sample_<voltage>` per voltage level, e.g. `sample_-40`).
 | `sample_ms1.feature` | Proteoform features detected in the LC-MS map: one line per feature with its mass, intensity, retention-time and scan range, charge range, apex and ECScore. |
 | `sample_ms2.feature` | The feature assigned to each MS/MS spectrum (precursor mass, m/z, charge and intensity). |
 | `sample_feature.xml` | The proteoform features in XML, with their per-charge envelope information; used by TopDiff. |
-| `sample.sqlite` | An SQLite database with the deconvoluted MS1 and MS/MS spectra and their peaks, for spectrum visualisation. Not written with `--no-sql`. With `--sql-3d` it also holds the raw MS1 peak tables for 3D visualisation (`CONFIG` and `PEAKS0`, `PEAKS1`, ...). |
+| `sample.sqlite` | An SQLite database with the deconvoluted MS1 and MS/MS spectra and their peaks, for spectrum visualisation and for TopPIC's post mass matching (see the `-N` option). Not written with `--no-sql`. With `--sql-3d` it also holds the raw MS1 peak tables for 3D visualisation (`CONFIG` and `PEAKS0`, `PEAKS1`, ...). |
 | `sample_ms1.csv`, `sample_frac_ms1.mzrt.csv` | Only with `--output-batmass-feature`: the ECScore table and the features in the BatMass CSV format. |
 
 The `msalign` format is a text format. Each spectrum is a `BEGIN IONS` ...
@@ -120,7 +120,7 @@ Parameters that apply to both MS1 and MS/MS deconvolution:
 | `-e`, `--mz-error <number>` | 0.02 | Error tolerance of peak m/z values (m/z units). |
 | `-u`, `--thread-number <int>` | 1 | Number of threads. TopFD checks that the machine has enough memory for the requested number. |
 | `-o`, `--missing-level-one` | off | The file has no MS1 spectra: skip MS1 deconvolution and feature detection. |
-| `-N`, `--no-sql` | off | Do not write the `.sqlite` database. |
+| `-N`, `--no-sql` | off | Do not write the `.sqlite` database. **Do not use it if TopPIC will search the spectra**: TopPIC's post mass matching, which is on by default, reads the centroided MS/MS peaks from this database and stops with an error when it is missing (see the [TopPIC manual](toppic_manual.md); `toppic --disable-post-match` is the alternative). |
 | `-D`, `--sql-3d` | off | Also store the raw MS1 peaks for 3D visualisation in the `.sqlite` database: `PEAKS0` holds every MS1 peak and `PEAKS1`, `PEAKS2`, ... progressively down-sampled copies, with one `CONFIG` row per table. Cannot be combined with `--no-sql`; has no effect with `-T` or `-o`. In `topfd_gui`, the checkbox "Add MS1 peaks for 3D visualization" under "Additional settings" turns this on (it is greyed out while "Do not generate SQLite database" is checked). |
 | `-T`, `--text-peak-list` | off | The input is a text peak list (one MS/MS spectrum), not an mzML file; see section 2. |
 
@@ -140,7 +140,7 @@ MS/MS deconvolution:
 | Option | Default | Meaning |
 |---|---|---|
 | `-a`, `--activation <CID\|ETD\|HCD\|MPD\|UVPD\|FILE>` | FILE | Fragmentation method. `FILE` takes it from each spectrum in the input file; give a method explicitly when the file does not record it or records it wrongly. |
-| `-s`, `--ms-two-sn-ratio <number>` | 1 | Signal-to-noise ratio for MS/MS spectra. |
+| `-s`, `--ms-two-sn-ratio <number>` | 1 | Signal-to-noise ratio for MS/MS spectra; peaks below `ratio × noise level` are discarded. Values below 1, down to 0, keep peaks below the estimated noise level; the noise level itself still bounds how far isotopic envelopes extend. |
 | `-w`, `--precursor-window <number>` | 3.0 | Default precursor isolation window width (m/z). Ignored when the file contains isolation window information. |
 | `-n`, `--msdeconv` | off | Rank isotopic envelopes with the MS-Deconv score instead of the EnvCNN neural-network score. |
 | `-v`, `--env-cnn-cutoff <0..1>` | 0 | Remove MS/MS envelopes whose EnvCNN score is below the cutoff. |

@@ -18,6 +18,21 @@ TopPIC Suite consists of six software tools for the analysis of top-down mass sp
 
 **For manuals, tutorials, and publications, please visit https://www.toppic.org/software/toppic/.** 
 
+## Manuals
+
+The command-line tools are documented in `docs/manual/`:
+
+- [TopFD](docs/manual/topfd_manual.md) — spectral deconvolution of mzML/mzXML files and of a single peak list
+- [TopDIA](docs/manual/topdia_manual.md) — pseudo-MS/MS spectra from top-down DIA data
+- [TopIndex](docs/manual/topindex_manual.md) — index files for a protein database
+- [TopPIC](docs/manual/toppic_manual.md) — proteoform identification and characterization
+- [TopMG](docs/manual/topmg_manual.md) — identification of highly modified proteoforms with mass graphs
+- [TopDiff](docs/manual/topdiff_manual.md) — differential abundance of proteoforms across samples
+
+The GUI tools (`topfd_gui`, `topdia_gui`, `topindex_gui`, `toppic_gui`,
+`topmg_gui`, `topdiff_gui`) offer the same options as the command-line tools
+and run them.
+
 ## System requirements
 
 * A C++17 compiler: Clang >= 7 (default) or GCC >= 8

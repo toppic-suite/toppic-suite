@@ -281,27 +281,42 @@ package, the compiler choice, how a library is located, the install layout —
 update the matching doc (and the README for Ubuntu) in the same commit; the
 docs are hand-written and nothing checks them against the build.
 
-## TopFD user manual (`docs/manual/topfd_manual.md`)
+## User manuals (`docs/manual/`)
 
-`docs/manual/topfd_manual.md` is the user-facing manual for the `topfd` command line:
-its two functions (mzML/mzXML deconvolution, and `-T` text-peak-list
-deconvolution of a single MS/MS spectrum), the input requirements, every
-output file, and every option with its default — the visible ones in the
-tables of section 1.4 and the hidden ones (`-k`, `-M`, `-O`,
-`--max-miss-peak-num`, `--disable-filter-by-mz`, `--output-dp-envs`) in the
-"Advanced options" table. It was written from `console/topfd_argument.cpp`,
-`topfd/common/topfd_process.cpp`, `topfd/common/topfd_single_process.cpp` and
-the `msalign`/feature/env writers, and nothing checks it against the code, so:
+One manual per command-line tool, linked from README.md's "Manuals" section:
+`topfd_manual.md`, `topdia_manual.md`, `topindex_manual.md`,
+`toppic_manual.md`, `topmg_manual.md`, `topdiff_manual.md`. Each follows the
+same layout: overview and usage line, input (including the companion files a
+tool needs, e.g. TopPIC's `_ms2.feature` and `.sqlite`), the pipeline steps
+as the console prints them, the output files with their columns, option
+tables (visible options with defaults, then "Advanced options" for the ones
+the parser accepts but `-h` hides), examples. They were written from the
+`console/<tool>_argument.cpp` parsers, the `*_process.cpp` drivers and the
+writers, and nothing checks them against the code, so:
 
-- When you add, rename, hide/unhide or change the default of an option in
-  `topfd_argument.cpp`, or change an output file name, format or the columns
-  of a writer, update the manual in the same commit. The option table there
-  mirrors the `-h` text; keep the two descriptions saying the same thing.
-- Do not document an option in the manual that the parser does not accept,
-  and do not put a `-T`-mode claim in section 2 without checking
-  `topfd_single_process.cpp` — that mode ignores the MS1/feature options.
-- The examples use no `-a`: the activation defaults to `FILE` (read from the
-  input), which is the recommended usage; keep new examples consistent.
+- When you add, rename, hide/unhide or change the default of an option in a
+  `<tool>_argument.cpp`, or change an output file name, format or the
+  columns of a writer, update that tool's manual in the same commit. The
+  option tables mirror the `-h` text; keep the two saying the same thing.
+- Do not document an option the parser does not accept. Cross-tool facts
+  that several manuals repeat and must stay consistent: result-file naming
+  (`_post_ms2` after TopPIC's default post mass matching, plain `_ms2` for
+  TopMG and with `-E`), which tool needs which TopFD file, the modification
+  file format (`Name,Mass,Residues,Position,UnimodID`), and the shared PrSM
+  table columns (documented once in the TopPIC manual, referenced by TopMG).
+- `topfd_manual.md` specifics: its examples use no `-a` (activation
+  defaults to `FILE`), and `-T`-mode claims must be checked against
+  `topfd_single_process.cpp` (that mode ignores the MS1/feature options).
+- Known gaps recorded in the manuals rather than papered over: TopDIA's `-m`
+  help text says 70,000 Da while the effective default is TopFD's 50,000;
+  TopDIA's `-p`/`-P` intensity-correlation options are parsed but unused by
+  the CLI pipeline; TopDiff must be given `_post_ms2.msalign` files after a
+  default TopPIC run; TopPIC `-c` combined runs need `-E`. Fix the code and
+  the manual together if you address one of them.
+
+`res/README.md` describes the runtime resource files (which class loads
+each `base_data` file, the two ONNX models, the Git LFS-tracked files);
+update it when a resource file is added, removed or repurposed.
 
 ## Envelope refinement and the core-peak intensity fit (`ms/env/match_env_refine`)
 
