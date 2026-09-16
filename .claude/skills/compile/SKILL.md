@@ -13,7 +13,7 @@ find the runtime resources in `<repo>/res/` (`res` next to the executable,
 then `../res`, then the installed share directory).
 
 The authoritative, user-facing instructions are `README.md` (Ubuntu) and
-`docs/build/{redhat,windows,macos}_build.md`. Keep them in step with
+`docs/compile/{redhat,windows,macos}_build.md`. Keep them in step with
 `CMakeLists.txt` when the build changes.
 
 ## Quick path (an existing checkout on Linux or macOS)
@@ -185,5 +185,5 @@ removed by hand.
   `build/CMakeCache.txt` (or the whole `build/`) and configure again.
 - **Adding an executable target**: append it to the `TOPPIC_EXECUTABLES`
   list at the end of `CMakeLists.txt` so it is installed and gets the
-  rpath, then update `README.md` and the `docs/build/` documents that list
+  rpath, then update `README.md` and the `docs/compile/` documents that list
   the tools.

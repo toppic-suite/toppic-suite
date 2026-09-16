@@ -11,7 +11,7 @@ rem the repository root (the parent of this scripts folder). The staging
 rem folder is removed afterwards.
 rem
 rem Usage:   scripts\win_release.bat [version]   (default: the VERSION below)
-rem Needs:   a finished build (docs\build\windows_build.md) and MSYS2 with
+rem Needs:   a finished build (docs\compile\windows_build.md) and MSYS2 with
 rem          the UCRT64 packages from that document, installed at
 rem          %MSYS2_ROOT% (default C:\msys64).
 
@@ -36,7 +36,7 @@ set "PATH=%UCRT_BIN%;%PATH%"
 rem ---- checks -------------------------------------------------------------
 if not exist "%UCRT_BIN%\objdump.exe" (
   echo ERROR: %UCRT_BIN%\objdump.exe not found.
-  echo        Install MSYS2 UCRT64 with the packages listed in docs\build\windows_build.md,
+  echo        Install MSYS2 UCRT64 with the packages listed in docs\compile\windows_build.md,
   echo        or set MSYS2_ROOT to the MSYS2 installation directory.
   exit /b 1
 )
