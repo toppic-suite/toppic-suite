@@ -28,6 +28,7 @@ The command-line tools are documented in `docs/manual/`:
 - [TopPIC](docs/manual/toppic_manual.md) — proteoform identification and characterization
 - [TopMG](docs/manual/topmg_manual.md) — identification of highly modified proteoforms with mass graphs
 - [TopDiff](docs/manual/topdiff_manual.md) — differential abundance of proteoforms across samples
+- [Proteoform annotation](docs/manual/proteoform.md) — how to read the annotated proteoform strings in TopPIC and TopMG results
 
 The GUI tools (`topfd_gui`, `topdia_gui`, `topindex_gui`, `toppic_gui`,
 `topmg_gui`, `topdiff_gui`) offer the same options as the command-line tools

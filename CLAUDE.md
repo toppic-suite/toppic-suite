@@ -317,6 +317,14 @@ writers, and nothing checks them against the code, so:
   `<base>_ms2_...`, for either `_ms2.msalign` or `_post_ms2.msalign` input —
   `merge/feature_sample_merge.cpp`; keep the manual's section 1 in step.)
 
+`docs/manual/proteoform.md` (linked from the TopPIC and TopMG manuals and
+the README) explains the annotated proteoform string of the `Proteoform`
+column: it is built by `Proteoform::getProteoformMatchSeq` (`seq/
+proteoform.cpp`, labels from `MassShift::getAnnoStr`), and modification
+names/masses resolve through `PtmBase::getPtmPtr`, which prefers the
+`res/base_data/ptm_base.xml` entry over a modification file's mass when the
+abbreviation matches. Update it when that code or the table columns change.
+
 `res/README.md` describes the runtime resource files (which class loads
 each `base_data` file, the two ONNX models, the Git LFS-tracked files);
 update it when a resource file is added, removed or repurposed.

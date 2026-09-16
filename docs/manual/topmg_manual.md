@@ -116,7 +116,9 @@ numbers of identified PrSMs, proteoforms and proteins, then one line per PrSM
 in the `_single` files, with extra lines for other proteins containing the
 proteoform in the others. The `MIScore` column is always `-`, since TopMG
 has no PTM characterization step; the `Variable PTMs` columns hold the
-modifications assigned from the modification file.
+modifications assigned from the modification file. The annotation of the
+`Proteoform` column (parentheses, brackets, named modifications and mass
+shifts) is explained in [Proteoform annotation](proteoform.md).
 
 ## 4. Options
 
