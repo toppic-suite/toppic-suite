@@ -38,7 +38,6 @@ database sequence. Modifications are annotated on top of them:
 | `(XYZ...)[label]` | The mass shift or modification `label` is located somewhere on the residues in parentheses; the fragment ions do not determine which one. |
 | `(...)[+123.4567]`, `(...)[-116.0905]` | An unexpected mass shift, given as a mass in Da (see section 4). |
 | `[Acetyl]-M...` | Acetylation of the protein N-terminus, written as a prefix before the first residue. |
-| `[Name1;Name2]` | Several modifications in one annotation, separated by `;`. |
 
 Every annotation is written as a pair of parentheses around the residues it
 applies to, immediately followed by its label in brackets. The label is
