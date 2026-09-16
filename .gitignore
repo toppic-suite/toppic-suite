@@ -43,8 +43,6 @@
 build/
 Build/
 build-*/
-# ... but not the Claude Code build skill
-!.claude/skills/build/
 
 # CMake generated files
 CMakeFiles/

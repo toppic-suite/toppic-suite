@@ -5,7 +5,7 @@ description: Run the TopPIC Suite command-line tools (topfd, topdia, topindex, t
 
 # Running the TopPIC Suite tools
 
-Six command-line tools, built into `<repo>/bin/` (see the `build` skill),
+Six command-line tools, built into `<repo>/bin/` (see the `compile` skill),
 each with a `*_gui` counterpart that shells out to it. Every tool prints its
 option list with `-h`. The full manuals are in `docs/manual/`; this skill is
 the operational summary. Consult the manual before quoting a default or an

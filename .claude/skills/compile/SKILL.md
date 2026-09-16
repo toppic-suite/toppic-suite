@@ -1,5 +1,5 @@
 ---
-name: build
+name: compile
 description: Build, run, install and uninstall the TopPIC Suite (topfd, topdia, topindex, toppic, topmg, topdiff and their Qt GUIs) from source on Ubuntu, Red Hat, Windows (MSYS2) or macOS. Use when asked to build or rebuild the suite or one tool, to fix a configure/build failure, to install or uninstall it, or to set up a machine for building.
 ---
 
