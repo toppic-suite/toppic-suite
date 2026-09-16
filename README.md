@@ -1,5 +1,9 @@
 ## TopPIC Suite
 
+For tutorials, publications and binary downloads, please visit
+https://www.toppic.org/software/toppic/. The user manuals are in this
+repository (see [Manuals](#manuals) below).
+
 TopPIC Suite consists of six software tools for the analysis of top-down mass spectrometry-based proteomics data. 
 
 * **TopFD** (Top-down mass spectral Feature Detection) is a software tool for top-down mass spectral deconvolution. It groups top-down spectral peaks into isotopic envelopes and converts isotopic envelopes to monoisotopic neutral masses. In addition, it extracts proteoform features from LC-MS or CE-MS data.
@@ -15,8 +19,6 @@ TopPIC Suite consists of six software tools for the analysis of top-down mass sp
 * **TopDiff** (Top-down mass spectrometry-based identification of Differentially expressed proteoforms) compares the abundances of proteoforms and finds differentially expressed proteoforms by using identifications of top-down mass spectrometry data of several protein samples.
 
 * **TopDIA** is a software tool for top-down data-independent-acquistion mass spectrometry (TD-DIA-MS) data analysis. It generates demultiplexed pseudo MS/MS spectra from TD-DIA-MS data, which are then searched against a protein sequence database using TopPIC or TopMG for proteoform identification.
-
-**For manuals, tutorials, and publications, please visit https://www.toppic.org/software/toppic/.** 
 
 ## Manuals
 
