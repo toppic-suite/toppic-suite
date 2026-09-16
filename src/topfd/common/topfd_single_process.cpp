@@ -15,6 +15,7 @@
 //
 #include "topfd/common/topfd_single_process.hpp"
 
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <memory>
@@ -58,6 +59,9 @@ PeakPtrVec readPeakFile(const std::string& file_name) {
     peak_list.push_back(peak_ptr);
   }
   input.close();
+  // Deconvolution assumes peaks in increasing m/z order; the input file need
+  // not be sorted. A stable sort keeps the file order of equal m/z values.
+  std::stable_sort(peak_list.begin(), peak_list.end(), Peak::cmpPosInc);
   return peak_list;
 }
 

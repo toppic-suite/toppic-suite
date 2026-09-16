@@ -35,8 +35,9 @@ is processed as a separate fraction, with the integer voltage appended to the
 output file names (`sample_-40_ms2.msalign`).
 
 The `--missing-level-one` option is accepted for compatibility with TopFD,
-but pseudo spectra need the MS1 features, so TopDIA cannot produce them
-without MS1 scans.
+but pseudo spectra need the MS1 features: with it TopDIA still deconvolutes
+the MS/MS scans and then stops with an error (`msalign file sample_ms1.msalign
+does not exist.`) at the pseudo-spectrum step. Do not use it.
 
 ## 2. What TopDIA does
 
@@ -65,7 +66,9 @@ and runs five steps:
    spectrum in decreasing score order while the score is at least
    `--pseudo-cutoff` or fewer than `--pseudo-peak-number` fragments have been
    accepted, and a fragment feature assigned to one precursor is not reused
-   for another.
+   for another. In addition, at most 25 fragments with mass up to 1,500 Da
+   and at most 2 × (precursor mass − 1,500) / 120 fragments above it are
+   accepted.
 
 ## 3. Output files
 
@@ -74,12 +77,12 @@ For an input `sample.mzML`:
 | File | Contents |
 |---|---|
 | `sample_ms2.msalign` | **The pseudo-MS/MS spectra, the file to search with TopPIC or TopMG.** One spectrum per precursor feature and isolation window, with the precursor mass, charge, intensity and feature id in its header, and one line per fragment mass with its intensity, charge and pseudo score (followed by the elution-profile statistics behind the score). |
-| `sample_ms2.feature` | The precursor feature of each pseudo spectrum, in the format TopPIC and TopMG read; no special option is needed to search the pseudo spectra with them. |
+| `sample_ms2.feature` | TopFD's feature file for the DIA MS/MS scans: for each scan, the most intense MS1 feature in its isolation window. TopPIC and TopMG use it to attach feature intensities and elution times to the pseudo spectra through the `PRECURSOR_FEATURE_ID` in the msalign header; no special option is needed. |
 | `sample_ms1.msalign` | The deconvoluted MS1 spectra. |
-| `sample_ms1.feature`, `sample_feature.xml` | The proteoform features detected in the MS1 data, as text and as XML (the XML is used by TopDiff and by the visualization tools). |
+| `sample_ms1.feature`, `sample_feature.xml` | The proteoform features detected in the MS1 data, as text and as XML (the XML is read by TopPIC and TopMG when they combine fractions with `-c`). |
 | `sample_ms2_raw.msalign` | The deconvoluted DIA MS/MS scans before pseudo-spectrum generation; intermediate. |
 | `sample_ms1.csv`, `sample_frac_ms1.mzrt.csv` | The MS1 feature ECScore table and the MS1 features with their elution profiles (BatMass format); intermediate. |
-| `sample_<window>_ms2.csv`, `sample_<window>_frac_ms2.mzrt.csv` | The same two tables for the fragment features of each isolation window, named by the window's lower m/z bound; intermediate. |
+| `sample_<window>_ms2.csv`, `sample_<window>_frac_ms2.mzrt.csv` | The same two tables for the fragment features of each isolation window, named by the window's lower m/z bound written with six decimals (`sample_400.000000_ms2.csv`); intermediate. |
 | `sample.sqlite` | The SQLite database with the deconvoluted MS1 and MS/MS scans and their peaks, as written by TopFD. It is always written. |
 
 The intermediate files are left in place. When searching the pseudo spectra
@@ -106,7 +109,7 @@ Deconvolution:
 | `-w`, `--precursor-window <number>` | 4.0 (TopFD: 3.0) | Default isolation window width (m/z), used only when the file records none. |
 | `-n`, `--msdeconv` | off | Rank isotopic envelopes with the MS-Deconv score instead of EnvCNN. |
 | `-d`, `--final-filtering` | off | Filter the envelopes of MS/MS scans by the estimated number of fragment ions. |
-| `-o`, `--missing-level-one` | off | Accepted, but pseudo spectra cannot be generated without MS1 scans (section 1). |
+| `-o`, `--missing-level-one` | off | Accepted, but the run fails at the pseudo-spectrum step without MS1 scans (section 1). |
 | `-u`, `--thread-number <int>` | 1 | Number of threads. |
 
 Feature detection:

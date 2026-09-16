@@ -48,21 +48,24 @@ accession, precursor mass and aligned retention time.
 ## 2. What TopDiff does
 
 1. **Reads** each sample's proteoform identifications: protein, residue
-   range, proteoform sequence, precursor mass, spectrum id, and the feature's
-   abundance and retention-time range and apex.
-2. **Normalizes** each sample's retention times to the 0 to 1 range of its
-   own run.
+   range, proteoform sequence, precursor mass, spectrum id, the proteoform's
+   cluster abundance, and the feature's retention-time range and apex.
+2. **Normalizes** each sample's retention times by dividing them by the
+   latest feature end time of the sample.
 3. **Aligns** the retention times of samples 2 to n onto sample 1 with a
-   dynamic-programming alignment of the 1,000 most abundant features of each
-   pair (two features can be paired when their precursor masses agree within
-   `--error-tolerance` and their normalized times within 0.1), then warps
-   every feature's times piecewise-linearly onto sample 1's scale.
-4. **Matches proteoforms across samples.** Features are visited in order of
-   decreasing abundance; each identified feature not yet used starts a table
-   row, and in every other sample the feature with the same protein
-   accession, a precursor mass within `--error-tolerance`, and an aligned
-   apex time within 0.3 is taken as the same proteoform. Every feature is
-   used at most once.
+   dynamic-programming alignment, by apex time, of the 1,000 most abundant
+   proteoforms of sample 1 and of the other sample (two positions are scored
+   as a match when a proteoform of the other sample within 0.1 normalized
+   time of that position has a precursor mass within `--error-tolerance` of
+   the sample 1 proteoform), then warps every feature's times
+   piecewise-linearly onto sample 1's scale.
+4. **Matches proteoforms across samples.** PrSMs are visited in order of
+   decreasing abundance; each PrSM whose proteoform (cluster) is not yet in
+   the table starts a row, and in every other sample the most abundant
+   unused proteoform with the same protein accession, a precursor mass
+   within `--error-tolerance`, and an aligned apex time within 0.3 is taken
+   as the same proteoform. Each proteoform cluster of a sample appears in at
+   most one row.
 5. **Writes** the table and prints the number of proteoform rows and how
    many of them were found in all samples.
 
@@ -86,9 +89,9 @@ prefixed by the spectrum file name as typed:
 
 | Column | Meaning |
 |---|---|
-| `<file> Abundance` | Abundance (intensity) of the proteoform feature, in scientific notation. |
-| `<file> Spectrum id` | MS/MS spectrum id of the identification; empty when the feature was matched but not identified in that sample. |
-| `<file> Retention time begin`, `<file> Retention time end` | Retention-time range of the feature, in the sample's own time scale. |
+| `<file> Abundance` | Abundance of the proteoform in that sample, as written by TopPIC or TopMG: the sum of the intensities of the distinct TopFD features in the proteoform's cluster, in scientific notation. |
+| `<file> Spectrum id` | MS/MS spectrum id of the PrSM matched in that sample. |
+| `<file> Retention time begin`, `<file> Retention time end` | Retention-time range of the feature in seconds, in the sample's own time scale (TopFD's `.feature` files list minutes). |
 | `<file> Normalized time apex` | Apex time after normalization and alignment onto sample 1 (0 to 1). |
 
 A sample in which the proteoform was not found has five empty fields.

@@ -11,14 +11,16 @@ topindex [options] database-file
 ```
 
 `topindex -h` prints the option list. The GUI tool `topindex_gui` offers the
-same function. Paths must not contain spaces, and the database path must be
-shorter than 200 characters.
+same function. Avoid spaces in paths (the directory of the `topindex`
+executable must not contain spaces), and the database path must be at most
+200 characters long.
 
 ## 1. Input
 
-A protein database in FASTA format (`.fasta` or `.fa`). Every protein needs
-a unique accession: if two share one, TopIndex reports the duplicate,
-removes the index directory it started, and stops.
+A protein database in FASTA format (`.fasta`, `.fa`, `.FASTA` or `.FA`).
+Every protein needs a unique accession: if two share one, TopIndex reports
+it, deletes the whole `<database>_idx/` directory (including index files
+from earlier runs), and stops.
 
 ## 2. What TopIndex does
 
@@ -30,8 +32,8 @@ removes the index directory it started, and stops.
    proteins whose accessions start with `DECOY_`), its block files and block
    index, and its `.fai` index for random access. These are the same files
    TopPIC and TopMG create when they run without an index.
-3. Writes three families of index files, one file per database block, each
-   processed in a thread of its own:
+3. Writes three families of index files, one file per index name and
+   database block; blocks are processed in parallel on the `-u` threads:
    - `Generating non shift index files`: the zero-shift indexes
      `zero_ptm_term_index`, `zero_ptm_diag_index`, `zero_ptm_rev_term_index`
      and `zero_ptm_rev_diag_index`, used by TopPIC's zero-shift and
@@ -47,7 +49,8 @@ Each file name carries the parameters the index depends on, in the form
 `<family>_<fixed mod>_<N-terminal forms>_<error tolerance>_<no_decoy|decoy><block>`,
 for example `zero_ptm_term_index_C57_N_NME_NMEA_MA_10_decoy0`. The N-terminal
 forms are abbreviated `N`, `NME`, `NMEA` and `MA`; a fixed-modification file
-appears by its file name.
+appears by its file name without directory or extension (`-f mods/C57.txt`
+gives `C57`).
 
 ## 3. Using the indexes
 
@@ -72,7 +75,7 @@ fall back to in-memory indexes.
 | `-n`, `--n-terminal-form <list>` | NONE,NME,NME_ACETYLATION,M_ACETYLATION | Allowed protein N-terminal forms, comma-separated. |
 | `-d`, `--decoy` | off | Also index a shuffled decoy database. |
 | `-e`, `--mass-error-tolerance <int>` | 10 | Error tolerance of precursor and fragment masses (ppm). |
-| `-u`, `--thread-number <int>` | 1 | Number of threads, one database block per thread. Each thread needs about 0.5 GiB of memory; TopIndex warns when the machine has too little for the requested number. |
+| `-u`, `--thread-number <int>` | 1 | Number of threads; database blocks are processed in parallel. Must not exceed the number of hardware threads. Each thread needs about 0.5 GiB of memory; TopIndex warns (but still runs) when the machine has too little for the requested number. |
 
 
 ## 5. Example

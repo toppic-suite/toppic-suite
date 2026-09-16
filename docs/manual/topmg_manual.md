@@ -13,13 +13,14 @@ topmg [options] -i modification-file database-file spectrum-file ...
 ```
 
 `topmg -h` prints the option list. The GUI tool `topmg_gui` offers the same
-function. Paths must not contain spaces or quotation marks, and the database
-and spectrum paths must be shorter than 200 characters.
+function. Avoid spaces and quotation marks in paths (the directory of the
+`topmg` executable must not contain spaces), and the database and spectrum
+paths must be at most 200 characters long.
 
 ## 1. Input
 
-**Protein database.** A FASTA file (`.fasta` or `.fa`) with unique protein
-accessions.
+**Protein database.** A FASTA file (`.fasta`, `.fa`, `.FASTA` or `.FA`)
+with unique protein accessions.
 
 **Modification file (required).** TopMG has no built-in list of
 modifications: the variable modifications used to build the proteoform
@@ -35,17 +36,20 @@ Phospho,79.966331,STY,any,21
 ```
 
 `Residues` lists the residues that can carry the modification or `*` for
-any; `Position` is `any`, `N-term` or `C-term`; `UnimodID` is `-1` when
-unknown. The file is checked before the search starts.
+any; `Position` is `any`, `N-term` or `C-term` (`*` and `any` cannot be
+combined); `UnimodID` is `-1` when unknown. Lines starting with `#` are
+comments. The file is checked before the search starts.
 
 **Spectrum files.** One or more `_ms2.msalign` files written by TopFD or
 TopDIA, searched one after another with the same parameters.
 
 **Companion file from TopFD.** For `sample_ms2.msalign`, TopMG reads
 `sample_ms2.feature` from the same directory to cluster the identifications
-of one proteoform and to report abundances. `--no-topfd-feature` (`-x`) runs
-without it. If `sample.sqlite` exists, the identifications are also written
-into it; it is not required.
+of one proteoform and to report abundances; a missing feature file is an
+error, and PrSMs whose spectrum has no feature are discarded at the
+clustering step. `--no-topfd-feature` (`-x`) runs without it, clustering
+proteoforms by protein and precursor mass instead. If `sample.sqlite`
+exists, the identifications are also written into it; it is not required.
 
 **Database indexes.** `topindex` is optional. TopMG prepares the database in
 `<database>_idx/` next to the FASTA file and builds its filtering indexes in
@@ -55,8 +59,9 @@ memory unless `topindex` stored them with the same `-f`, `-n`, `-e` and
 ## 2. What TopMG does
 
 For each spectrum file TopMG prints its parameters and runs these steps.
-Intermediate files carry the spectrum file name plus a `.topmg_*` extension
-and are deleted at the end unless `--keep-temp-files` is given.
+Intermediate files (`sample_ms2.topmg_*`, `sample_ms2.msalign_*` and two
+`_cutoff_xml` directories) are deleted at the end unless `--keep-temp-files`
+is given; `sample_ms2.topmg_raw_prsm` is always kept.
 
 1. **ASF-One PTM filtering.** Approximate spectrum-based filtering selects
    candidate proteins allowing one modification from the modification file,
@@ -78,8 +83,10 @@ and are deleted at the end unless `--keep-temp-files` is given.
 8. **Recounting matched masses and fragments** against the complete spectra
    (the search uses only masses with an EnvCNN score of at least
    `--filter-by-env-cnn`).
-9. **Proteoform and protein clustering.** PrSMs are grouped into proteoforms
-   by their TopFD feature and precursor mass, then by protein.
+9. **Proteoform and protein clustering.** PrSMs sharing a TopFD feature form
+   one proteoform; proteoforms of the same protein whose precursor masses
+   agree within `--proteoform-error-tolerance` are merged; proteoforms are
+   then grouped by protein.
 10. **FDR computation** (only with `--decoy`).
 11. **Filtering and output at three levels.** PrSMs by the spectrum-level
     cutoff, the best PrSM per proteoform by the proteoform-level cutoff, and
@@ -101,7 +108,7 @@ For an input `sample_ms2.msalign`:
 | `sample_ms2_topmg_protein.tsv`, `..._protein_single.tsv` | One PrSM per identified protein, passing the protein-level cutoff. |
 | `sample_ms2_topmg_prsm.xml`, `..._proteoform.xml`, `..._protein.xml` | The same three sets in XML, read by TopDiff and the visualization tools. |
 | `sample.sqlite` | Updated with the identification tables when it exists. |
-| `sample_ms2.topmg_raw_prsm` | The PrSMs before recounting and cutoffs; kept for combining fractions. |
+| `sample_ms2.topmg_raw_prsm` | The PrSMs before recounting and cutoffs. Always kept, even without `--keep-temp-files`; a later combined run (`-c`) reads it. |
 
 The tables have the same layout and columns as TopPIC's (see the
 [TopPIC manual](toppic_manual.md), section 3): a parameter block, the
@@ -151,7 +158,7 @@ Cutoffs and output:
 | `-t`, `--spectrum-cutoff-type <EVALUE\|FDR>`, `-v`, `--spectrum-cutoff-value <number>` | EVALUE, 0.01 | Cutoff for PrSMs. |
 | `-T`, `--proteoform-cutoff-type <EVALUE\|FDR>`, `-V`, `--proteoform-cutoff-value <number>` | EVALUE, 0.01 | Cutoff for proteoforms. |
 | `-y`, `--protein-cutoff-type <EVALUE\|FDR>`, `-Y`, `--protein-cutoff-value <number>` | EVALUE, 0.01 | Cutoff for proteins; with `FDR` a protein is represented by its best proteoform. |
-| `-c`, `--combined-file-name <name>` | none | Combine fractions: after the files are searched, their spectra, features and PrSMs are merged under `<name>_ms2.msalign` and the post-search steps are repeated on the merged data. |
+| `-c`, `--combined-file-name <name>` | none | Combine fractions: after the files are searched, their spectra, features (unless `-x`) and raw PrSMs are merged into `<name>_ms2.msalign`, `<name>_ms2.feature` and `<name>_ms2.topmg_raw_prsm`, and the post-search steps are repeated on them, giving `<name>_ms2_topmg_*` results. A relative `<name>` is placed in the directory of the first spectrum file and must differ from the input file names. No SQLite database is written for the combined results. |
 | `-u`, `--thread-number <int>` | 1 | Number of threads. The filtering steps may use fewer, depending on the available memory. |
 | `-k`, `--keep-temp-files` | off | Keep the intermediate files. |
 | `-K`, `--keep-decoy-ids` | off | Keep decoy identifications in the result tables. |
