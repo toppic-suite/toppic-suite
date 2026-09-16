@@ -307,11 +307,9 @@ writers, and nothing checks them against the code, so:
 - `topfd_manual.md` specifics: its examples use no `-a` (activation
   defaults to `FILE`), and `-T`-mode claims must be checked against
   `topfd_single_process.cpp` (that mode ignores the MS1/feature options).
-- Known gaps recorded in the manuals rather than papered over: TopDIA's `-m`
-  help text says 70,000 Da while the effective default is TopFD's 50,000;
-  TopDIA's `-p`/`-P` intensity-correlation options are parsed but unused by
-  the CLI pipeline; TopPIC `-c` combined runs need `-E`. Fix the code and
-  the manual together if you address one of them. (TopDiff resolves result
+- Known gap recorded in the manual rather than papered over: TopDIA's
+  `-p`/`-P` intensity-correlation options are parsed but unused by the CLI
+  pipeline. Fix the code and the manual together if you address it. (TopDiff resolves result
   files itself: `<base>_post_ms2_<tool>_proteoform.xml` first, then
   `<base>_ms2_...`, for either `_ms2.msalign` or `_post_ms2.msalign` input —
   `merge/feature_sample_merge.cpp`; keep the manual's section 1 in step.)
@@ -379,6 +377,14 @@ the input. Facts to keep straight:
 - **Result file names carry `_post_ms2`** whenever post matching ran; the
   cleanup in `toppic_process` (`cleanToppicDir`) takes that name to find the
   intermediate files. With `-E` the names are the plain `<base>_ms2` ones.
+- **Combined runs (`-c`) never post-match the merged file** (it has no
+  SQLite database): `TopPICProgress_multi_file` forces `postMassMatch` to
+  false for the merged `TopPIC_post`. Per fraction, `cleanToppicDir` keeps
+  `<frac>_post_ms2.toppic_recount` when a combined run follows; the merge
+  uses `<frac>_post_ms2.msalign` + that file for every fraction if all exist
+  (then deletes the recount files unless `-k`), else TopFD's `_ms2.msalign`
+  + `.toppic_raw_prsm`. `msalign_frac_merge::mergeFractions` takes the MS/MS
+  file suffix for this. Combined results are always `<name>_ms2_toppic_*`.
 - **GUI wiring.** `toppicwindow.ui` has `postMassMatchCheckBox` (checked by
   default from the parser's argument map, enables `postMinPeakNumEdit`) on the
   bottom row of the Advanced Parameters tab; `gui/util/command.cpp` emits

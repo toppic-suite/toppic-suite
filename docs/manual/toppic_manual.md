@@ -97,7 +97,8 @@ extension and are deleted at the end unless `--keep-temp-files` is given.
 
 For an input `sample_ms2.msalign` searched with the default settings, the
 result files are named after `sample_post_ms2`; with `--disable-post-match`
-they are named after `sample_ms2`:
+they are named after `sample_ms2`, and the combined results of a `-c` run
+after `<name>_ms2`:
 
 | File | Contents |
 |---|---|
@@ -179,7 +180,7 @@ Cutoffs and output:
 | `-t`, `--spectrum-cutoff-type <EVALUE\|FDR>`, `-v`, `--spectrum-cutoff-value <number>` | EVALUE, 0.01 | Cutoff for PrSMs. |
 | `-T`, `--proteoform-cutoff-type <EVALUE\|FDR>`, `-V`, `--proteoform-cutoff-value <number>` | EVALUE, 0.01 | Cutoff for proteoforms. |
 | `-y`, `--protein-cutoff-type <EVALUE\|FDR>`, `-Y`, `--protein-cutoff-value <number>` | EVALUE, 0.01 | Cutoff for proteins; with `FDR` a protein is represented by its best proteoform. |
-| `-c`, `--combined-file-name <name>` | none | Combine several fractions: after the files are searched, their spectra, features and PrSMs are merged under `<name>_ms2.msalign` and the post-search steps are repeated on the merged data. See the note below. |
+| `-c`, `--combined-file-name <name>` | none | Combine several fractions: after the files are searched, their spectra, features and PrSMs are merged under `<name>_ms2.msalign` and the post-search steps (clustering, cutoffs, tables) are repeated on the merged data. See the note below. |
 | `-u`, `--thread-number <int>` | 1 | Number of threads. The filtering steps may use fewer, depending on the available memory. |
 | `-k`, `--keep-temp-files` | off | Keep the intermediate files. |
 | `-K`, `--keep-decoy-ids` | off | Keep decoy identifications in the result tables. |
@@ -195,9 +196,17 @@ Advanced options (accepted but not shown by `-h`):
 | `-O`, `--output-prsm-coverage` | Write a `.toppic_prsm_coverage` file with the fragment coverage of each PrSM. |
 | `--filtering-result-number <int>` | Number of candidates kept by the multiple-shift filter (default 20). |
 
-**Combining fractions.** With `-c`, the merged spectrum file
-`<name>_ms2.msalign` has no TopFD SQLite database, so post mass matching
-cannot run on it. Use `-c` together with `--disable-post-match`.
+**Combining fractions.** With `-c`, each fraction is searched and
+post-matched on its own first (post mass matching needs the fraction's own
+TopFD SQLite database). The merge then uses, for every fraction, the
+spectra and PrSMs **with** the post-matched masses
+(`<fraction>_post_ms2.msalign` and its PrSMs) when all fractions have them,
+and otherwise (fractions searched with `--disable-post-match`, or the
+results of an earlier run combined with `-C`) the TopFD spectra and the raw
+PrSMs; the console says which ("Merging the results with/without post mass
+matching"). Post mass matching is not repeated on the merged file, which has
+no SQLite database. The combined results are always named
+`<name>_ms2_toppic_*`, and the merged spectra `<name>_ms2.msalign`.
 
 ## 5. Modification files
 
@@ -231,8 +240,8 @@ toppic -f C57 -b phospho.txt -s 0 proteins.fasta sample_ms2.msalign
 # Two unexpected shifts characterized with a list of common modifications
 toppic -s 2 -B common_mods.txt proteins.fasta sample_ms2.msalign
 
-# Three fractions searched and combined (post mass matching off, see section 4)
-toppic -E -c combined proteins.fasta frac1_ms2.msalign frac2_ms2.msalign frac3_ms2.msalign
+# Three fractions searched, post-matched and combined into combined_ms2_toppic_*
+toppic -c combined proteins.fasta frac1_ms2.msalign frac2_ms2.msalign frac3_ms2.msalign
 ```
 
 The identifications of the first example are in

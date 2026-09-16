@@ -27,9 +27,14 @@ void mergeMsalignFiles(const std::vector<std::string>& spec_file_lst,
                        const std::string& output_file,
                        const std::string& para_str);
 
+// Merges <name>_ms1.msalign and <name><ms2_suffix> of every fraction into
+// <output>_ms1.msalign and <output>_ms2.msalign. ms2_suffix is "_ms2.msalign"
+// for TopFD's spectra and "_post_ms2.msalign" for the spectra written by
+// TopPIC's post mass matching.
 void mergeFractions(const std::vector<std::string>& spec_file_names,
                     const std::string& output_file_name,
-                    const std::string& para_str);
+                    const std::string& para_str,
+                    const std::string& ms2_suffix = "_ms2.msalign");
 
 }  // namespace msalign_frac_merge
 

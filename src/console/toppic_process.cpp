@@ -80,9 +80,12 @@ namespace toppic {
 
 // post_sp_name is the spectrum file written by the post mass matching (on by
 // default; --disable-post-match turns it off), whose name the result files
-// carry; "" if it did not run.
+// carry; "" if it did not run. keep_post_prsms keeps <post>.toppic_recount,
+// the PrSMs with the post-matched masses, which a following combined run
+// (-c) merges; the merge deletes it afterwards.
 void cleanToppicDir(const std::string& fa_name, const std::string& sp_name,
-                    bool keep_temp_files, const std::string& post_sp_name) {
+                    bool keep_temp_files, const std::string& post_sp_name,
+                    bool keep_post_prsms) {
   std::string abs_sp_name = file_util::absoluteName(sp_name);
   std::string sp_base = file_util::basename(abs_sp_name);
   std::replace(sp_base.begin(), sp_base.end(), '\\', '/');
@@ -104,7 +107,9 @@ void cleanToppicDir(const std::string& fa_name, const std::string& sp_name,
   if (!keep_temp_files && post_sp_name != "") {
     file_util::delFile(file_util::absoluteName(post_sp_name) + "_index");
     file_util::delFile(out_base + ".feature");
-    file_util::delFile(out_base + ".toppic_recount");
+    if (!keep_post_prsms) {
+      file_util::delFile(out_base + ".toppic_recount");
+    }
     file_util::delFile(out_base + ".toppic_proteoform_cluster");
     file_util::delFile(out_base + ".toppic_cluster");
     file_util::delFile(out_base + ".toppic_cluster_fdr");
@@ -671,8 +676,10 @@ int TopPICProgress_multi_file(std::map<std::string, std::string>& arguments,
       if (arguments["spectrumFileName"] != spec_file_lst[k]) {
         post_sp_name = arguments["spectrumFileName"];
       }
+      // a combined run merges the post-matched PrSMs of the fractions
+      bool keep_post_prsms = (arguments["combinedOutputName"] != "");
       cleanToppicDir(ori_db_file_name, spec_file_lst[k], keep_temp_files,
-                     post_sp_name);
+                     post_sp_name, keep_post_prsms);
     }
   }
 
@@ -689,11 +696,36 @@ int TopPICProgress_multi_file(std::map<std::string, std::string>& arguments,
       merged_file_name =
           base_path + file_util::getFileSeparator() + merged_file_name;
     }
+    // Post mass matching runs per fraction (it needs each fraction's TopFD
+    // SQLite database) and writes <frac>_post_ms2.msalign and
+    // <frac>_post_ms2.toppic_recount. When every fraction has them, merge
+    // those, so the combined spectra carry the post-matched masses; otherwise
+    // (fractions searched with --disable-post-match, or results of an
+    // earlier run) merge TopFD's spectra and the raw PrSMs. The merged file
+    // has no SQLite database, so post mass matching is not repeated on it.
+    bool use_post = true;
+    for (size_t k = 0; k < raw_file_list.size(); k++) {
+      if (!std::filesystem::exists(raw_file_list[k] + "_post_ms2.msalign") ||
+          !std::filesystem::exists(raw_file_list[k] +
+                                   "_post_ms2.toppic_recount")) {
+        use_post = false;
+        break;
+      }
+    }
+    if (use_post) {
+      std::cout << "Merging the results with post mass matching." << std::endl;
+    } else {
+      std::cout << "Merging the results without post mass matching."
+                << std::endl;
+    }
+    std::string ms2_suffix = use_post ? "_post_ms2.msalign" : "_ms2.msalign";
+    std::string prsm_ext = use_post ? "_post_ms2.toppic_recount"
+                                    : "_ms2.toppic_raw_prsm";
     std::string para_str = "";
     std::cout << "Merging files started." << std::endl;
     std::cout << "Merging msalign files started." << std::endl;
     msalign_frac_merge::mergeFractions(raw_file_list, merged_file_name,
-                                       para_str);
+                                       para_str, ms2_suffix);
     std::cout << "Merging msalign files finished." << std::endl;
 
     if (arguments["useFeatureFile"] ==
@@ -704,29 +736,38 @@ int TopPICProgress_multi_file(std::map<std::string, std::string>& arguments,
     }
     // merge TOP files
     std::cout << "Merging identification files started." << std::endl;
-    std::vector<std::string> prsm_file_lst(spec_file_lst.size());
-    for (size_t i = 0; i < spec_file_lst.size(); i++) {
-      prsm_file_lst[i] =
-          file_util::basename(spec_file_lst[i]) + ".toppic_raw_prsm";
+    std::vector<std::string> prsm_file_lst(raw_file_list.size());
+    for (size_t i = 0; i < raw_file_list.size(); i++) {
+      prsm_file_lst[i] = raw_file_list[i] + prsm_ext;
     }
     prsm_util::mergePrsmFiles(prsm_file_lst, SpPara::getMaxSpecNumPerFile(),
                               SpPara::getMaxFeatureNumPerFile(),
                               merged_file_name + "_ms2.toppic_raw_prsm");
     std::cout << "Merging identification files finished." << std::endl;
     std::cout << "Merging files - finished." << std::endl;
+    if (use_post && !keep_temp_files) {
+      for (size_t i = 0; i < prsm_file_lst.size(); i++) {
+        file_util::delFile(prsm_file_lst[i]);
+      }
+    }
 
     std::string sp_file_name = merged_file_name + "_ms2.msalign";
     arguments["spectrumFileName"] = sp_file_name;
     arguments["startTime"] = combined_start_time;
 
+    // no SQLite database for the merged spectra: the post-matched masses, if
+    // any, are already in them
+    std::string post_mass_match = arguments["postMassMatch"];
+    arguments["postMassMatch"] = "false";
     TopPIC_post(arguments);
+    arguments["postMassMatch"] = post_mass_match;
     sp_file_name = merged_file_name + "_ms2.msalign";
     std::string post_sp_name = "";
     if (arguments["spectrumFileName"] != sp_file_name) {
       post_sp_name = arguments["spectrumFileName"];
     }
     cleanToppicDir(ori_db_file_name, sp_file_name, keep_temp_files,
-                   post_sp_name);
+                   post_sp_name, false);
   }
 
   base_data::release();
