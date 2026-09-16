@@ -99,7 +99,7 @@ Deconvolution:
 |---|---|---|
 | `-a`, `--activation <CID\|ETD\|HCD\|MPD\|UVPD\|FILE>` | FILE | Fragmentation method; `FILE` takes it from the file. |
 | `-c`, `--max-charge <int>` | 30 | Maximum charge state of precursor and fragment ions. |
-| `-m`, `--max-mass <number>` | 50000 | Maximum monoisotopic mass (Da). The help text says 70,000, but the value in effect is TopFD's 50,000. |
+| `-m`, `--max-mass <number>` | 50000 | Maximum monoisotopic mass (Da) of precursor and fragment ions. |
 | `-e`, `--mz-error <number>` | 0.02 | Error tolerance of peak m/z values. |
 | `-r`, `--ms-one-sn-ratio <number>` | 3 | Signal-to-noise ratio for MS1 spectra. |
 | `-s`, `--ms-two-sn-ratio <number>` | 1 | Signal-to-noise ratio for MS/MS spectra. |

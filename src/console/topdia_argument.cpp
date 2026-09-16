@@ -111,7 +111,7 @@ bool Argument::parse(int argc, char* argv[]) {
         "fragment ions. The default value is 30.")(
         "max-mass,m", po::value<std::string>(&max_mass),
         "<a positive number>. Set the maximum monoisotopic mass of precursor "
-        "and fragment ions. The default value is 70,000 Dalton.")(
+        "and fragment ions. The default value is 50,000 Dalton.")(
         "mz-error,e", po::value<std::string>(&mz_error),
         "<a positive number>. Set the error tolerance of m/z values of "
         "spectral peaks. The default value is 0.02 m/z.")(
