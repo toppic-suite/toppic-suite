@@ -92,7 +92,6 @@ FAIMS data `sample_<voltage>` per voltage level, e.g. `sample_-40`).
 | `sample_ms2.feature` | The feature assigned to each MS/MS spectrum (precursor mass, m/z, charge and intensity). |
 | `sample_feature.xml` | The proteoform features in XML, with their per-charge envelope information; used by TopDiff. |
 | `sample.sqlite` | An SQLite database with the deconvoluted MS1 and MS/MS spectra and their peaks, for spectrum visualisation and for TopPIC's post mass matching (see the `-N` option). Not written with `--no-sql`. With `--sql-3d` it also holds the raw MS1 peak tables for 3D visualisation (`CONFIG` and `PEAKS0`, `PEAKS1`, ...). |
-| `sample_ms1.csv`, `sample_frac_ms1.mzrt.csv` | Only with `--output-batmass-feature`: the ECScore table and the features in the BatMass CSV format. |
 
 The `msalign` format is a text format. Each spectrum is a `BEGIN IONS` ...
 `END IONS` block with header lines (`SPECTRUM_ID`, `SCANS`,
@@ -146,17 +145,6 @@ MS/MS deconvolution:
 | `-v`, `--env-cnn-cutoff <0..1>` | 0 | Remove MS/MS envelopes whose EnvCNN score is below the cutoff. |
 | `-g`, `--frag-num-filtering` | off | Limit the number of fragment envelopes in an MS/MS spectrum based on the estimated number of fragment ions. |
 
-Advanced options (accepted but not shown by `-h`):
-
-| Option | Meaning |
-|---|---|
-| `-k`, `--keep` | Also report monoisotopic masses from low-quality envelopes. |
-| `-M`, `--multiple-mass` | Output several candidate monoisotopic masses per envelope for MS/MS spectra. |
-| `-O`, `--output-batmass-feature` | Also write the feature files in the BatMass CSV format. |
-| `--max-miss-peak-num <int>` | Maximum number of missing peaks allowed in a matched envelope (default 1). |
-| `--disable-filter-by-mz` | Skip the step that removes an envelope outranked by a higher-scoring neighbour with the same charge. |
-| `--output-dp-envs` | Dump the candidate envelopes of every spectrum to `win_envs.txt` / `dp_envs.txt` (debugging). |
-
 ### 1.5 Examples
 
 ```sh
@@ -206,9 +194,8 @@ topfd -T [options] peaks.txt
 
 Only the parameters of MS/MS deconvolution apply. The useful ones are
 `-c`/`--max-charge`, `-m`/`--max-mass`, `-e`/`--mz-error`,
-`-s`/`--ms-two-sn-ratio`, `-n`/`--msdeconv`, `-v`/`--env-cnn-cutoff`,
-`-g`/`--frag-num-filtering`, `-k`/`--keep`, `-M`/`--multiple-mass`,
-`--max-miss-peak-num` and `--disable-filter-by-mz`. The MS1 and feature
+`-s`/`--ms-two-sn-ratio`, `-n`/`--msdeconv`, `-v`/`--env-cnn-cutoff` and
+`-g`/`--frag-num-filtering`. The MS1 and feature
 detection options (`-r`, `-t`, `-b`, `-l`, `-i`, `-f`), `-o`, `-w` and
 `-u` have no effect. `-a`/`--activation` only sets the activation recorded
 in the SQLite database; when it is not given (or is `FILE`), HCD is

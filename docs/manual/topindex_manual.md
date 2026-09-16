@@ -74,7 +74,6 @@ fall back to in-memory indexes.
 | `-e`, `--mass-error-tolerance <int>` | 10 | Error tolerance of precursor and fragment masses (ppm). |
 | `-u`, `--thread-number <int>` | 1 | Number of threads, one database block per thread. Each thread needs about 0.5 GiB of memory; TopIndex warns when the machine has too little for the requested number. |
 
-TopIndex has no hidden options.
 
 ## 5. Example
 

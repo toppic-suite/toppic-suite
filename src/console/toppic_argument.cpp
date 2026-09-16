@@ -560,7 +560,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
       arguments_["allowProtType"] = allow_prot_type;
     }
 
-    if (vm.count("n-term-label")) {
+    if (vm.count("n-terminal-label")) {
       arguments_["nTermLabelMass"] = n_term_label_mass;
     }
 

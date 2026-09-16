@@ -118,7 +118,6 @@ Feature detection:
 | `-T`, `--ms2-ecscore-cutoff <0..1>` | 0 | ECScore cutoff for fragment features. |
 | `-B`, `--ms2-min-scan-number <1\|2\|3>` | 1 | Minimum number of MS/MS scans of a fragment feature. |
 | `-i`, `--single-scan-noise` | off | Use each MS1 scan's own noise level instead of the whole map's when filtering low-intensity peaks. |
-| `-p`, `--ms1-intensity-correlation-cutoff <0..1>`, `-P`, `--ms2-intensity-correlation-cutoff <0..1>` | 0.5, 0 | Accepted and printed, but not used by the command-line pipeline in this version; feature detection applies a fixed correlation cutoff of 0.5. |
 
 Pseudo spectra:
 
@@ -127,9 +126,8 @@ Pseudo spectra:
 | `-v`, `--pseudo-cutoff <0..1>` | 0.55 | Minimum pseudo score of a fragment added to a pseudo spectrum, once the minimum number of fragments is reached. |
 | `-V`, `--pseudo-peak-number <int>` | 25 | Number of fragments (at least 10) always added to a pseudo spectrum, regardless of their score, when available. |
 
-Advanced option (accepted but not shown by `-h`): `-k`, `--keep`, report
-masses from low-quality envelopes as well. TopDIA has no `--no-sql`,
-`--sql-3d` or text-peak-list mode; those are TopFD only.
+TopDIA has no `--no-sql`, `--sql-3d` or text-peak-list mode; those are
+TopFD only.
 
 ## 5. Example
 

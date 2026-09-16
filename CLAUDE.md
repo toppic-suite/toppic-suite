@@ -289,8 +289,9 @@ One manual per command-line tool, linked from README.md's "Manuals" section:
 same layout: overview and usage line, input (including the companion files a
 tool needs, e.g. TopPIC's `_ms2.feature` and `.sqlite`), the pipeline steps
 as the console prints them, the output files with their columns, option
-tables (visible options with defaults, then "Advanced options" for the ones
-the parser accepts but `-h` hides), examples. They were written from the
+tables of the **visible** options with defaults (hidden options — the ones
+the parser accepts but `-h` does not print — are deliberately not
+documented in the manuals), examples. They were written from the
 `console/<tool>_argument.cpp` parsers, the `*_process.cpp` drivers and the
 writers, and nothing checks them against the code, so:
 
@@ -307,9 +308,11 @@ writers, and nothing checks them against the code, so:
 - `topfd_manual.md` specifics: its examples use no `-a` (activation
   defaults to `FILE`), and `-T`-mode claims must be checked against
   `topfd_single_process.cpp` (that mode ignores the MS1/feature options).
-- Known gap recorded in the manual rather than papered over: TopDIA's
-  `-p`/`-P` intensity-correlation options are parsed but unused by the CLI
-  pipeline. Fix the code and the manual together if you address it. (TopDiff resolves result
+- TopDIA's hidden `-p`/`-P` options set `TopfdPara::seed_env_inte_corr_tole_cutoff_`
+  (copied into `EcscorePara` by `env_coll_detect::processMs1/processMs2`)
+  before each feature-detection stage; both default to 0.5, the value the
+  detector had hard-coded, so default runs are unchanged. TopPIC's hidden
+  `-N`/`--n-terminal-label` works (its handler used to test the wrong key). (TopDiff resolves result
   files itself: `<base>_post_ms2_<tool>_proteoform.xml` first, then
   `<base>_ms2_...`, for either `_ms2.msalign` or `_post_ms2.msalign` input —
   `merge/feature_sample_merge.cpp`; keep the manual's section 1 in step.)

@@ -156,13 +156,6 @@ Cutoffs and output:
 | `-k`, `--keep-temp-files` | off | Keep the intermediate files. |
 | `-K`, `--keep-decoy-ids` | off | Keep decoy identifications in the result tables. |
 
-Advanced options (accepted but not shown by `-h`):
-
-| Option | Meaning |
-|---|---|
-| `-E`, `--proteoform-ppm-error` | Interpret `--proteoform-error-tolerance` in ppm instead of Da. |
-| `--filtering-result-number <int>` | Accepted for compatibility with TopPIC; TopMG uses fixed candidate numbers. |
-
 ## 5. Examples
 
 ```sh

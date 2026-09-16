@@ -88,6 +88,9 @@ class TopfdPara {
   int getMs1ScanNum() const { return ms_1_scan_num_; }
   int getMs2ScanNum() const { return ms_2_scan_num_; }
   int getMs1MinScanNum() const { return ms1_min_scan_num_; }
+  double getSeedEnvInteCorrToleCutoff() const {
+    return seed_env_inte_corr_tole_cutoff_;
+  }
   int getMs2MinScanNum() const { return ms2_min_scan_num_; }
   sqlite3* getSqlDb() const { return sql_db_; }
 
@@ -130,6 +133,9 @@ class TopfdPara {
   void setMs1EcscoreCutoff(double cutoff) { ms1_ecscore_cutoff_ = cutoff; }
   void setMs2EcscoreCutoff(double cutoff) { ms2_ecscore_cutoff_ = cutoff; }
   void setMs1MinScanNum(int min_scan_num) { ms1_min_scan_num_ = min_scan_num; }
+  void setSeedEnvInteCorrToleCutoff(double cutoff) {
+    seed_env_inte_corr_tole_cutoff_ = cutoff;
+  }
   void setMs2MinScanNum(int min_scan_num) { ms2_min_scan_num_ = min_scan_num; }
 
   void setFracId(int frac_id) { frac_id_ = frac_id; }
@@ -201,6 +207,10 @@ class TopfdPara {
   double ms1_ecscore_cutoff_ = 0.1;
   double ms2_ecscore_cutoff_ = 0;
   int ms1_min_scan_num_ = 1;
+  // Minimum correlation between a seed envelope's intensities and the
+  // theoretical ones in feature detection (EcscorePara). TopDIA sets it per
+  // stage from its -p (MS1) / -P (MS2) options; TopFD uses the default.
+  double seed_env_inte_corr_tole_cutoff_ = 0.5;
   int ms2_min_scan_num_ = 1;
 
   // For an MS/MS spectrum, the precursor is not reported if its intensity

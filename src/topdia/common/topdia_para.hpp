@@ -67,7 +67,7 @@ class TopdiaPara {
   double pseudo_score_cutoff_ = 0.55;
   int pseudo_min_peaks_ = 25;
   double ms1_seed_env_inte_corr_tole_cutoff_ = 0.5;
-  double ms2_seed_env_inte_corr_tole_cutoff_ = 0;
+  double ms2_seed_env_inte_corr_tole_cutoff_ = 0.5;
 };
 
 using TopdiaParaPtr = std::shared_ptr<TopdiaPara>;

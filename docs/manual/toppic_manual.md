@@ -185,25 +185,13 @@ Cutoffs and output:
 | `-k`, `--keep-temp-files` | off | Keep the intermediate files. |
 | `-K`, `--keep-decoy-ids` | off | Keep decoy identifications in the result tables. |
 
-Advanced options (accepted but not shown by `-h`):
-
-| Option | Meaning |
-|---|---|
-| `-P`, `--proteoform-ppm-error` | Interpret `--proteoform-error-tolerance` in ppm instead of Da. |
-| `-U`, `--top-prsm-number <int>` | Number of best PrSMs kept per spectrum (default 1). |
-| `-C`, `--combine-result-only` | With `-c`: skip the searches and only merge the existing results of the fractions. |
-| `-o`, `--output-raw-prsm-table` | Also write the PrSM tables before the cutoffs (`_toppic_raw_prsm.tsv`, `_toppic_raw_prsm_single.tsv`). |
-| `-O`, `--output-prsm-coverage` | Write a `.toppic_prsm_coverage` file with the fragment coverage of each PrSM. |
-| `--filtering-result-number <int>` | Number of candidates kept by the multiple-shift filter (default 20). |
-
 **Combining fractions.** With `-c`, each fraction is searched and
 post-matched on its own first (post mass matching needs the fraction's own
 TopFD SQLite database). The merge then uses, for every fraction, the
 spectra and PrSMs **with** the post-matched masses
 (`<fraction>_post_ms2.msalign` and its PrSMs) when all fractions have them,
-and otherwise (fractions searched with `--disable-post-match`, or the
-results of an earlier run combined with `-C`) the TopFD spectra and the raw
-PrSMs; the console says which ("Merging the results with/without post mass
+and otherwise (fractions searched with `--disable-post-match`) the TopFD
+spectra and the raw PrSMs; the console says which ("Merging the results with/without post mass
 matching"). Post mass matching is not repeated on the merged file, which has
 no SQLite database. The combined results are always named
 `<name>_ms2_toppic_*`, and the merged spectra `<name>_ms2.msalign`.

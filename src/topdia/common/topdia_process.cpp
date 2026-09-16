@@ -57,6 +57,8 @@ void processOneFileWithFaims(const TopfdParaPtr& topfd_para_ptr,
     std::cout << "MS1 deconvolution finished." << std::endl;
 
     std::cout << "MS1 feature detection started." << std::endl;
+    topfd_para_ptr->setSeedEnvInteCorrToleCutoff(
+        topdia_para_ptr->getMs1SeedEnvInteCorrToleCutoff());
     env_coll_detect::processMs1(topfd_para_ptr);
     std::cout << "MS1 feature detection finished." << std::endl;
   }
@@ -71,6 +73,8 @@ void processOneFileWithFaims(const TopfdParaPtr& topfd_para_ptr,
 
   std::cout << "MS/MS feature detection started." << std::endl;
   topfd_para_ptr->setMissingLevelOne(false);
+  topfd_para_ptr->setSeedEnvInteCorrToleCutoff(
+      topdia_para_ptr->getMs2SeedEnvInteCorrToleCutoff());
   env_coll_detect::processMs2(topfd_para_ptr);
   std::cout << "MS/MS feature detection finished." << std::endl;
 

@@ -101,8 +101,8 @@ A sample in which the proteoform was not found has five empty fields.
 | `-t`, `--tool-name <toppic\|topmg>` | toppic | Which tool's result files to read. |
 | `-o`, `--output <name>` | sample_diff.tsv | Name of the output table, written next to the first spectrum file. |
 
-TopDiff has no hidden options. It stops with an error when fewer than two
-spectrum files are given or when one of them does not exist.
+TopDiff stops with an error when fewer than two spectrum files are given
+or when one of them does not exist.
 
 ## 5. Example
 

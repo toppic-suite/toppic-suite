@@ -51,6 +51,8 @@ void processMs1(const TopfdParaPtr& topfd_para_ptr) {
   EcscoreParaPtr score_para_ptr = std::make_shared<EcscorePara>(
       topfd_para_ptr->getFracId(), topfd_para_ptr->getMzmlFileName(),
       topfd_para_ptr->getMaxCharge(), topfd_para_ptr->getMs1MinScanNum());
+  score_para_ptr->seed_env_inte_corr_tole_cutoff_ =
+      topfd_para_ptr->getSeedEnvInteCorrToleCutoff();
   // read deconvoluted MS1 peaks
   std::string output_base_name = topfd_para_ptr->getOutputBaseName();
   std::string ms1_file_name = output_base_name + "_ms1.msalign";
@@ -258,6 +260,8 @@ void processMs2(const TopfdParaPtr& topfd_para_ptr) {
   EcscoreParaPtr score_para_ptr = std::make_shared<EcscorePara>(
       topfd_para_ptr->getFracId(), topfd_para_ptr->getMzmlFileName(),
       topfd_para_ptr->getMaxCharge(), topfd_para_ptr->getMs2MinScanNum());
+  score_para_ptr->seed_env_inte_corr_tole_cutoff_ =
+      topfd_para_ptr->getSeedEnvInteCorrToleCutoff();
 
   // read deconvoluted MS2 peaks
   std::string output_base_name = topfd_para_ptr->getOutputBaseName();
