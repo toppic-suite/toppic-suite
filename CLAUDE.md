@@ -281,9 +281,9 @@ package, the compiler choice, how a library is located, the install layout —
 update the matching doc (and the README for Ubuntu) in the same commit; the
 docs are hand-written and nothing checks them against the build.
 
-## TopFD user manual (`docs/topfd_manual.md`)
+## TopFD user manual (`docs/manual/topfd_manual.md`)
 
-`docs/topfd_manual.md` is the user-facing manual for the `topfd` command line:
+`docs/manual/topfd_manual.md` is the user-facing manual for the `topfd` command line:
 its two functions (mzML/mzXML deconvolution, and `-T` text-peak-list
 deconvolution of a single MS/MS spectrum), the input requirements, every
 output file, and every option with its default — the visible ones in the
