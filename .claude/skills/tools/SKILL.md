@@ -197,12 +197,6 @@ sample (abundance, spectrum id, RT begin/end in seconds, normalized apex).
   protein terminus). Full description: `docs/manual/proteoform.md`.
 - Shifts near 0 or ±1 Da are precursor or isotope errors, not modifications.
 
-## Local test data
-
-Untracked test data lives in `<repo>/data/` (ignored by git): TopFD outputs
-`st_1_*`, `st_2_*`, TopPIC result tables and a `sample_diff.tsv`. Run
-tools there for smoke tests; keep new scratch outputs out of the tree.
-
 ## When the code changes
 
 Options, defaults, output names and columns come from
