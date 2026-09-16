@@ -115,6 +115,11 @@ ninja
   for the Boost/Qt6/ONNX DLLs.
 - Install: `cmake --install .` or `ninja install`; `res/` is installed next
   to the executables. `ninja uninstall` reverses it.
+- Release zip: `scripts\win_release.bat [version]` (run from cmd or
+  PowerShell after building) bundles `bin\*.exe`, the UCRT64 DLLs they
+  import, the Qt plugins and `res/` into `toppic-win-<version>.zip` in the
+  repository root (default version `1.9.0.0`); the extracted folder runs
+  without MSYS2 on `PATH`.
 
 ### macOS (Xcode CLT + Homebrew)
 

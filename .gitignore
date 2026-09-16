@@ -78,3 +78,7 @@ Testing/
 
 # top-level local data folder (test inputs/outputs)
 /data/
+
+# Windows release packages made by scripts/win_release.bat
+/toppic-win-*/
+/toppic-win-*.zip
