@@ -265,7 +265,7 @@ that was left empty (the manifest lists files only). Consequences:
 The build instructions are split by platform. `README.md` carries the full
 Ubuntu walkthrough (packages, clone with Git LFS, configure/build, install,
 uninstall) and only a one-paragraph link for each other platform; the details
-live in `docs/`, all laid out with the same six steps:
+live in `docs/build/`, all laid out with the same six steps:
 
 - `docs/windows_build.md` — MSYS2 **UCRT64** shell, Ninja generator, GCC (not
   clang; see the compiler-default note above), `pacman` package list, system
