@@ -1,23 +1,24 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #ifndef TOPPIC_PRSM_EXPECTED_VALUE_HPP_
 #define TOPPIC_PRSM_EXPECTED_VALUE_HPP_
 
 #include <memory>
-#include <vector>
 #include <string>
+#include <vector>
 
 #include "common/xml/xml_dom_element.hpp"
 
@@ -30,28 +31,27 @@ using ExpectedValuePtr = std::shared_ptr<ExpectedValue>;
 
 class ExpectedValue {
  public:
-  ExpectedValue(double one_prot_prob, double test_num, 
-               double adjust_factor);
+  ExpectedValue(double one_prot_prob, double test_num, double adjust_factor);
 
-  explicit ExpectedValue(XmlDOMElement* element);
+  explicit ExpectedValue(XmlDOMElement element);
 
-  double getPValue() {return p_value_;}
+  double getPValue() { return p_value_; }
 
-  double getEValue() {return e_value_;}
+  double getEValue() { return e_value_; }
 
-  double getOneProtProb() {return one_prot_prob_;}
+  double getOneProtProb() { return one_prot_prob_; }
 
-  double getTestNum() {return test_num_;}
+  double getTestNum() { return test_num_; }
 
-  double getAdjustFactor() { return adjust_factor_;}
+  double getAdjustFactor() { return adjust_factor_; }
 
   void setOneProtProb(double one_prot_prob);
 
-  void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
+  void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement parent);
 
-  static std::string getXmlElementName() {return "extreme_value";}
+  static std::string getXmlElementName() { return "extreme_value"; }
 
-  static double getMaxDouble() {return 1e+300;}
+  static double getMaxDouble() { return 1e+300; }
 
   static ExpectedValuePtr getMaxEvaluePtr();
 

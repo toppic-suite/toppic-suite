@@ -1,178 +1,233 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-#include <boost/thread/mutex.hpp>
+#include "ms/mzml/mzml_ms_sql_writer.hpp"
+
+#include <sqlite3.h>
+
+#include <cstddef>
+#include <cstdlib>
+#include <mutex>
+#include <string>
+
 #include "common/util/logger.hpp"
-#include "common/util/str_util.hpp"
 #include "sql/sql_util.hpp"
-#include "ms/mzml/mzml_ms_sql_writer.hpp" 
 
 namespace toppic {
 
-namespace mzml_ms_sql_writer {
+namespace {
 
-// serialization mutex.
-boost::mutex writer_mutex;
+// Run a fully-bound INSERT and reset it so the handle can be reused.
+void stepAndReset(sqlite3_stmt* stmt) {
+  sqlite3_step(stmt);
+  sqlite3_clear_bindings(stmt);
+  sqlite3_reset(stmt);
+}
 
-void writeMs1(sqlite3* sql_db, MzmlMsPtr ms_ptr, MatchEnvPtrVec& envs, double base_inte, double min_ref_inte) {
-  char * err_msg = 0; 
-  const char *tail_peak;
-  sqlite3_stmt *stmt_peak;
-  std::string sql_peak = "INSERT INTO ms1_peak(spec_id, peak_id, mz, intensity) VALUES (?, ?, ?, ?);";
+}  // namespace
 
-  const char *tail_env;
-  sqlite3_stmt *stmt_env;
-  std::string sql_env = "INSERT INTO ms1_env(spec_id, env_id, mono_mass, charge, intensity, envcnn_score, peak_num) VALUES (?, ?, ?, ?, ?, ?, ?);";
+MzmlMsSqlWriter::MzmlMsSqlWriter(sqlite3* sql_db) : sql_db_(sql_db) {
+  // Bulk-load PRAGMAs. WAL + synchronous=NORMAL removes the per-commit fsync
+  // while staying crash-safe; the cache/mmap settings keep working pages in
+  // memory. (This is a regenerable visualization database, so synchronous=OFF
+  // with journal_mode=MEMORY would be faster still if durability is not
+  // needed.)
+  sql_util::execSql(sql_db_, "PRAGMA journal_mode = WAL;");
+  sql_util::execSql(sql_db_, "PRAGMA synchronous = NORMAL;");
+  sql_util::execSql(sql_db_, "PRAGMA temp_store = MEMORY;");
+  sql_util::execSql(sql_db_, "PRAGMA cache_size = -65536;");    // ~64 MiB
+  sql_util::execSql(sql_db_, "PRAGMA mmap_size = 268435456;");  // 256 MiB
 
-  const char *tail_env_peak;
-  sqlite3_stmt *stmt_env_peak;
-  std::string sql_env_peak = "INSERT INTO ms1_env_peak(spec_id, env_id, peak_id, mz, intensity) VALUES (?, ?, ?, ?, ?);";
+  ms1_spec_stmt_ = sql_util::prepareSql(sql_db_,
+      "INSERT INTO ms1_spectrum(id, scan, retention_time, peak_num, env_num, "
+      "base_inte, min_ref_inte) VALUES (?, ?, ?, ?, ?, ?, ?);");
+  ms1_peak_stmt_ = sql_util::prepareSql(sql_db_,
+                           "INSERT INTO ms1_peak(spec_id, peak_id, mz, "
+                           "intensity) VALUES (?, ?, ?, ?);");
+  ms1_env_stmt_ = sql_util::prepareSql(sql_db_,
+      "INSERT INTO ms1_env(spec_id, env_id, mono_mass, ref_mass, charge, "
+      "intensity, envcnn_score, peak_num) VALUES (?, ?, ?, ?, ?, ?, ?, ?);");
+  ms1_env_peak_stmt_ = sql_util::prepareSql(sql_db_,
+      "INSERT INTO ms1_env_peak(spec_id, env_id, peak_id, mz, intensity) "
+      "VALUES (?, ?, ?, ?, ?);");
+  ms2_spec_stmt_ = sql_util::prepareSql(sql_db_,
+      "INSERT INTO ms2_spectrum(id, scan, retention_time, target_mz, begin_mz, "
+      "end_mz, n_ion_type, c_ion_type, peak_num, ms1_id) "
+      "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+  ms2_peak_stmt_ = sql_util::prepareSql(sql_db_,
+                           "INSERT INTO ms2_peak(spec_id, peak_id, mz, "
+                           "intensity) VALUES (?, ?, ?, ?);");
+  ms2_env_stmt_ = sql_util::prepareSql(sql_db_,
+      "INSERT INTO ms2_env(spec_id, env_id, mono_mass, ref_mass, charge, "
+      "intensity, envcnn_score, peak_num) VALUES (?, ?, ?, ?, ?, ?, ?, ?);");
+  ms2_env_peak_stmt_ = sql_util::prepareSql(sql_db_,
+      "INSERT INTO ms2_env_peak(spec_id, env_id, peak_id, mz, intensity) "
+      "VALUES (?, ?, ?, ?, ?);");
+}
 
-  writer_mutex.lock();
-  sqlite3_prepare_v2(sql_db, sql_peak.c_str(), 256, &stmt_peak, &tail_peak);
-  sqlite3_prepare_v2(sql_db, sql_env.c_str(), 256, &stmt_env, &tail_env);
-  sqlite3_prepare_v2(sql_db, sql_env_peak.c_str(), 256, &stmt_env_peak, &tail_env_peak);
+MzmlMsSqlWriter::~MzmlMsSqlWriter() {
+  flush();
+  sqlite3_finalize(ms1_spec_stmt_);
+  sqlite3_finalize(ms1_peak_stmt_);
+  sqlite3_finalize(ms1_env_stmt_);
+  sqlite3_finalize(ms1_env_peak_stmt_);
+  sqlite3_finalize(ms2_spec_stmt_);
+  sqlite3_finalize(ms2_peak_stmt_);
+  sqlite3_finalize(ms2_env_stmt_);
+  sqlite3_finalize(ms2_env_peak_stmt_);
+}
 
-  sqlite3_exec(sql_db, "BEGIN TRANSACTION", NULL, NULL, &err_msg);
+void MzmlMsSqlWriter::begin() {
+  if (!in_transaction_) {
+    sql_util::execSql(sql_db_, "BEGIN TRANSACTION;");
+    in_transaction_ = true;
+  }
+}
+
+void MzmlMsSqlWriter::commit() {
+  if (in_transaction_) {
+    sql_util::execSql(sql_db_, "END TRANSACTION;");
+    in_transaction_ = false;
+    pending_ = 0;
+  }
+}
+
+void MzmlMsSqlWriter::flush() {
+  std::lock_guard<std::mutex> lock(mutex_);
+  commit();
+}
+
+void MzmlMsSqlWriter::writeMs1(const MzmlMsPtr& ms_ptr,
+                               const MatchEnvPtrVec& envs, double base_inte,
+                               double min_ref_inte) {
+  std::lock_guard<std::mutex> lock(mutex_);
+  begin();
 
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
   int spec_id = header_ptr->getSpecId();
-  int scan_num = header_ptr->getFirstScanNum();
-  double retention_time = header_ptr->getRetentionTime();
-  PeakPtrVec raw_peaks = ms_ptr->getPeakPtrVec();
-  std::string sql = "INSERT INTO ms1_spectrum(id, scan, retention_time, peak_num, env_num, base_inte, min_ref_inte) values ('" 
-  + std::to_string(spec_id) + "'," 
-  + "'" + std::to_string(scan_num) + "'," 
-  + "'" + std::to_string(retention_time) + "',"
-  + "'" + std::to_string(raw_peaks.size()) + "',"
-  + "'" + std::to_string(envs.size()) + "',"
-  + "'" + std::to_string(base_inte) + "',"
-  + "'" + std::to_string(min_ref_inte) + "');";
-  LOG_DEBUG("INSERT SQL: " << sql);
-  sql_util::execSql(sql_db, sql);
+  const PeakPtrVec& raw_peaks = ms_ptr->getPeakPtrVec();
+
+  sqlite3_bind_int(ms1_spec_stmt_, 1, spec_id);
+  sqlite3_bind_int(ms1_spec_stmt_, 2, header_ptr->getFirstScanNum());
+  sqlite3_bind_double(ms1_spec_stmt_, 3, header_ptr->getRetentionTime());
+  sqlite3_bind_int(ms1_spec_stmt_, 4, static_cast<int>(raw_peaks.size()));
+  sqlite3_bind_int(ms1_spec_stmt_, 5, static_cast<int>(envs.size()));
+  sqlite3_bind_double(ms1_spec_stmt_, 6, base_inte);
+  sqlite3_bind_double(ms1_spec_stmt_, 7, min_ref_inte);
+  stepAndReset(ms1_spec_stmt_);
 
   for (size_t i = 0; i < raw_peaks.size(); i++) {
-    sqlite3_bind_int(stmt_peak, 1, spec_id); 
-    sqlite3_bind_int(stmt_peak, 2, i); 
-    sqlite3_bind_double(stmt_peak, 3, raw_peaks[i]->getPosition()); 
-    sqlite3_bind_double(stmt_peak, 4, raw_peaks[i]->getIntensity()); 
-    sqlite3_step(stmt_peak);
-    sqlite3_clear_bindings(stmt_peak);
-    sqlite3_reset(stmt_peak);
+    sqlite3_bind_int(ms1_peak_stmt_, 1, spec_id);
+    sqlite3_bind_int(ms1_peak_stmt_, 2, static_cast<int>(i));
+    sqlite3_bind_double(ms1_peak_stmt_, 3, raw_peaks[i]->getPosition());
+    sqlite3_bind_double(ms1_peak_stmt_, 4, raw_peaks[i]->getIntensity());
+    stepAndReset(ms1_peak_stmt_);
   }
 
   for (size_t i = 0; i < envs.size(); i++) {
     EnvPtr theo_env = envs[i]->getTheoEnvPtr();
-    sqlite3_bind_int(stmt_env, 1, spec_id); 
-    sqlite3_bind_int(stmt_env, 2, i); 
-    sqlite3_bind_double(stmt_env, 3, theo_env->getMonoNeutralMass());  
-    sqlite3_bind_int(stmt_env, 4, theo_env->getCharge()); 
-    sqlite3_bind_double(stmt_env, 5, theo_env->compInteSum());  
-    sqlite3_bind_double(stmt_env, 6, envs[i]->getEnvcnnScore());  
-    sqlite3_bind_double(stmt_env, 7, theo_env->getPeakNum());  
-    sqlite3_step(stmt_env);
-    sqlite3_clear_bindings(stmt_env);
-    sqlite3_reset(stmt_env);
-    for (int k = 0; k < theo_env->getPeakNum(); k++) {
-      sqlite3_bind_int(stmt_env_peak, 1, spec_id);
-      sqlite3_bind_int(stmt_env_peak, 2, i);
-      sqlite3_bind_int(stmt_env_peak, 3, k); 
-      sqlite3_bind_double(stmt_env_peak, 4, theo_env->getMz(k));
-      sqlite3_bind_double(stmt_env_peak, 5, theo_env->getInte(k)); 
-      sqlite3_step(stmt_env_peak);
-      sqlite3_clear_bindings(stmt_env_peak);
-      sqlite3_reset(stmt_env_peak);
+    int peak_num = theo_env->getPeakNum();
+    sqlite3_bind_int(ms1_env_stmt_, 1, spec_id);
+    sqlite3_bind_int(ms1_env_stmt_, 2, static_cast<int>(i));
+    sqlite3_bind_double(ms1_env_stmt_, 3, theo_env->getMonoNeutralMass());
+    // Neutral mass of the reference (most abundant) isotopic peak.
+    sqlite3_bind_double(ms1_env_stmt_, 4, theo_env->getReferNeutralMass());
+    sqlite3_bind_int(ms1_env_stmt_, 5, theo_env->getCharge());
+    sqlite3_bind_double(ms1_env_stmt_, 6, theo_env->compInteSum());
+    sqlite3_bind_double(ms1_env_stmt_, 7, envs[i]->getEnvcnnScore());
+    sqlite3_bind_int(ms1_env_stmt_, 8, peak_num);
+    stepAndReset(ms1_env_stmt_);
+
+    for (int k = 0; k < peak_num; k++) {
+      sqlite3_bind_int(ms1_env_peak_stmt_, 1, spec_id);
+      sqlite3_bind_int(ms1_env_peak_stmt_, 2, static_cast<int>(i));
+      sqlite3_bind_int(ms1_env_peak_stmt_, 3, k);
+      sqlite3_bind_double(ms1_env_peak_stmt_, 4, theo_env->getMz(k));
+      sqlite3_bind_double(ms1_env_peak_stmt_, 5, theo_env->getInte(k));
+      stepAndReset(ms1_env_peak_stmt_);
     }
   }
 
-  sqlite3_exec(sql_db, "END TRANSACTION", NULL, NULL, &err_msg);
-  writer_mutex.unlock();
+  if (++pending_ >= COMMIT_CHUNK) {
+    commit();
+  }
 }
 
-void writeMs2(sqlite3* sql_db, MzmlMsPtr ms_ptr, MatchEnvPtrVec &envs) {
-  char * err_msg = 0; 
-  const char *tail;
-  sqlite3_stmt *stmt;
-  std::string sql = "INSERT INTO ms2_peak(spec_id, peak_id, mz, intensity) VALUES (?, ?, ?, ?);";
-  writer_mutex.lock();
-  sqlite3_prepare_v2(sql_db, sql.c_str(), 256, &stmt, &tail);
+void MzmlMsSqlWriter::writeMs2(const MzmlMsPtr& ms_ptr,
+                               const MatchEnvPtrVec& envs) {
+  std::lock_guard<std::mutex> lock(mutex_);
+  begin();
 
-  sqlite3_exec(sql_db, "BEGIN TRANSACTION", NULL, NULL, &err_msg);
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
   int spec_id = header_ptr->getSpecId();
-  int scan_num = header_ptr->getFirstScanNum();
-  double retention_time = header_ptr->getRetentionTime();
-  double target_mz = header_ptr->getPrecTargetMz();
-  double begin_mz = header_ptr->getPrecWinBegin();
-  double end_mz = header_ptr->getPrecWinEnd();
+  int ms1_id = header_ptr->getMsOneId();
+  const PeakPtrVec& raw_peaks = ms_ptr->getPeakPtrVec();
   std::string n_ion_type =
       header_ptr->getActivationPtr()->getNIonTypePtr()->getName();
   std::string c_ion_type =
       header_ptr->getActivationPtr()->getCIonTypePtr()->getName();
-  PeakPtrVec raw_peaks = ms_ptr->getPeakPtrVec();
 
-  sql =
-      "INSERT INTO ms2_spectrum(id, scan, retention_time, target_mz, begin_mz, end_mz, n_ion_type, c_ion_type, peak_num) values ('" 
-            + std::to_string(spec_id) + "',"
-      + "'" + std::to_string(scan_num) + "',"
-      + "'" + std::to_string(retention_time) + "',"
-      + "'" + std::to_string(target_mz) + "',"
-      + "'" + std::to_string(begin_mz) + "',"
-      + "'" + std::to_string(end_mz) + "',"
-      + "'" + n_ion_type + "',"
-      + "'" + c_ion_type + "',"
-      + "'" + std::to_string(raw_peaks.size()) +"');";
-  LOG_DEBUG("INSERT SQL: " << sql); 
-  sql_util::execSql(sql_db, sql); 
+  sqlite3_bind_int(ms2_spec_stmt_, 1, spec_id);
+  sqlite3_bind_int(ms2_spec_stmt_, 2, header_ptr->getFirstScanNum());
+  sqlite3_bind_double(ms2_spec_stmt_, 3, header_ptr->getRetentionTime());
+  sqlite3_bind_double(ms2_spec_stmt_, 4, header_ptr->getPrecTargetMz());
+  sqlite3_bind_double(ms2_spec_stmt_, 5, header_ptr->getPrecWinBegin());
+  sqlite3_bind_double(ms2_spec_stmt_, 6, header_ptr->getPrecWinEnd());
+  sqlite3_bind_text(ms2_spec_stmt_, 7, n_ion_type.c_str(), -1,
+                    SQLITE_TRANSIENT);
+  sqlite3_bind_text(ms2_spec_stmt_, 8, c_ion_type.c_str(), -1,
+                    SQLITE_TRANSIENT);
+  sqlite3_bind_int(ms2_spec_stmt_, 9, static_cast<int>(raw_peaks.size()));
+  sqlite3_bind_int(ms2_spec_stmt_, 10, ms1_id);
+  stepAndReset(ms2_spec_stmt_);
 
   for (size_t i = 0; i < raw_peaks.size(); i++) {
-    sqlite3_bind_int(stmt, 1, spec_id); 
-    sqlite3_bind_int(stmt, 2, i); 
-    sqlite3_bind_double(stmt, 3, raw_peaks[i]->getPosition()); 
-    sqlite3_bind_double(stmt, 4, raw_peaks[i]->getIntensity()); 
-    sqlite3_step(stmt);
-    sqlite3_clear_bindings(stmt);
-    sqlite3_reset(stmt);
+    sqlite3_bind_int(ms2_peak_stmt_, 1, spec_id);
+    sqlite3_bind_int(ms2_peak_stmt_, 2, static_cast<int>(i));
+    sqlite3_bind_double(ms2_peak_stmt_, 3, raw_peaks[i]->getPosition());
+    sqlite3_bind_double(ms2_peak_stmt_, 4, raw_peaks[i]->getIntensity());
+    stepAndReset(ms2_peak_stmt_);
   }
 
-
-  sqlite3_exec(sql_db, "END TRANSACTION", NULL, NULL, &err_msg);
-
-  writer_mutex.unlock();
-
-  /*
-  rapidjson::Value envelopes(rapidjson::kArrayType);
   for (size_t i = 0; i < envs.size(); i++) {
-    rapidjson::Value env(rapidjson::kObjectType);
     EnvPtr theo_env = envs[i]->getTheoEnvPtr();
-    env.AddMember("id", i, allocator);
-    env.AddMember("mono_mass", theo_env->getMonoNeutralMass(), allocator);
-    env.AddMember("charge", theo_env->getCharge(), allocator);
+    int peak_num = theo_env->getPeakNum();
+    sqlite3_bind_int(ms2_env_stmt_, 1, spec_id);
+    sqlite3_bind_int(ms2_env_stmt_, 2, static_cast<int>(i));
+    sqlite3_bind_double(ms2_env_stmt_, 3, theo_env->getMonoNeutralMass());
+    // Neutral mass of the reference (most abundant) isotopic peak.
+    sqlite3_bind_double(ms2_env_stmt_, 4, theo_env->getReferNeutralMass());
+    sqlite3_bind_int(ms2_env_stmt_, 5, theo_env->getCharge());
+    sqlite3_bind_double(ms2_env_stmt_, 6, theo_env->compInteSum());
+    sqlite3_bind_double(ms2_env_stmt_, 7, envs[i]->getEnvcnnScore());
+    sqlite3_bind_int(ms2_env_stmt_, 8, peak_num);
+    stepAndReset(ms2_env_stmt_);
 
-    rapidjson::Value env_peaks(rapidjson::kArrayType);
-    for (int k = 0; k < theo_env->getPeakNum(); k++) {
-      rapidjson::Value peak(rapidjson::kObjectType);
-      peak.AddMember("mz", theo_env->getMz(k), allocator);
-      peak.AddMember("intensity", theo_env->getInte(k), allocator);
-      env_peaks.PushBack(peak, allocator);
+    for (int k = 0; k < peak_num; k++) {
+      sqlite3_bind_int(ms2_env_peak_stmt_, 1, spec_id);
+      sqlite3_bind_int(ms2_env_peak_stmt_, 2, static_cast<int>(i));
+      sqlite3_bind_int(ms2_env_peak_stmt_, 3, k);
+      sqlite3_bind_double(ms2_env_peak_stmt_, 4, theo_env->getMz(k));
+      sqlite3_bind_double(ms2_env_peak_stmt_, 5, theo_env->getInte(k));
+      stepAndReset(ms2_env_peak_stmt_);
     }
-    env.AddMember("env_peaks", env_peaks, allocator);
-    envelopes.PushBack(env, allocator);
   }
-  doc.AddMember("envelopes", envelopes, allocator);
-  */
+
+  if (++pending_ >= COMMIT_CHUNK) {
+    commit();
+  }
 }
 
-}  // namespace mzml_ms_sql_writer
-}
+}  // namespace toppic

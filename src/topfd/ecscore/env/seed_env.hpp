@@ -1,25 +1,26 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-#ifndef TOPPIC_TOPFD_ECSCORE_ENV_SEED_ENV_HPP
-#define TOPPIC_TOPFD_ECSCORE_ENV_SEED_ENV_HPP
+#ifndef TOPPIC_TOPFD_ECSCORE_ENV_SEED_ENV_HPP_
+#define TOPPIC_TOPFD_ECSCORE_ENV_SEED_ENV_HPP_
 
 #include <vector>
 
 #include "common/xml/xml_dom_document.hpp"
-#include "ms/spec/deconv_ms.hpp"
 #include "ms/env/env_base.hpp"
+#include "ms/spec/deconv_ms.hpp"
 
 namespace toppic {
 
@@ -29,29 +30,30 @@ using SeedEnvPtr = std::shared_ptr<SeedEnv>;
 
 class SeedEnv : public Env {
  public:
-  SeedEnv(DeconvPeakPtr peak_ptr);
-  
+  SeedEnv(const DeconvPeakPtr& peak_ptr);
+
   // deep copy
-  SeedEnv(SeedEnvPtr env_ptr);
+  SeedEnv(const SeedEnvPtr& env_ptr);
 
-  SeedEnv(SeedEnvPtr env_ptr, int new_charge);
+  SeedEnv(const SeedEnvPtr& env_ptr, int new_charge);
 
-  SeedEnv(SeedEnvPtr env_ptr, EnvPeakPtrVec &peak_ptr_list);
+  SeedEnv(const SeedEnvPtr& env_ptr, EnvPeakPtrVec& peak_ptr_list);
 
   int getSpecId() const { return spec_id_; }
 
   void setSpecId(int spec_id) { spec_id_ = spec_id; }
 
-  double getSeedInte() const {return seed_inte_;}
+  double getSeedInte() const { return seed_inte_; }
 
   static bool cmpSeedInteDec(const SeedEnvPtr a, const SeedEnvPtr b) {
-    return a->getSeedInte() > b->getSeedInte(); }
+    return a->getSeedInte() > b->getSeedInte();
+  }
 
   std::string getString();
 
   EnvPeakPtrVec getScaledPeakPtrList(double ratio, double min_inte);
 
-  void appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
+  void appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement parent);
 
  private:
   int spec_id_;
@@ -61,6 +63,6 @@ class SeedEnv : public Env {
 using SeedEnvPtrVec = std::vector<SeedEnvPtr>;
 using SeedEnvPtr2D = std::vector<SeedEnvPtrVec>;
 
-}
+}  // namespace toppic
 
-#endif //TOPPIC_SEED_ENVELOPE_HPP
+#endif  // TOPPIC_SEED_ENVELOPE_HPP

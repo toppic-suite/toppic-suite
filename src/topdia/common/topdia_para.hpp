@@ -1,16 +1,17 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #ifndef TOPPIC_TOPDIA_COMMON_TOPDIA_PARA_HPP_
 #define TOPPIC_TOPDIA_COMMON_TOPDIA_PARA_HPP_
@@ -24,27 +25,49 @@ namespace toppic {
 
 class TopdiaPara {
  public:
-  TopdiaPara() {};
+  TopdiaPara() = default;
 
-  std::string getParaStr(const std::string &prefix,
-                         const std::string &sep,
-                         TopfdParaPtr topfd_para);
+  std::string getParaStr(const std::string& prefix, const std::string& sep,
+                         const TopfdParaPtr& topfd_para) const;
 
   double getPseudoScoreCutoff() const { return pseudo_score_cutoff_; }
   int getPseudoMinPeaks() const { return pseudo_min_peaks_; }
-  double getMs1SeedEnvInteCorrToleCutoff() const { return ms1_seed_env_inte_corr_tole_cutoff_; }
-  double getMs2SeedEnvInteCorrToleCutoff() const { return ms2_seed_env_inte_corr_tole_cutoff_; }
+  double getMs1SeedEnvInteCorrToleCutoff() const {
+    return ms1_seed_env_inte_corr_tole_cutoff_;
+  }
+  double getMs2SeedEnvInteCorrToleCutoff() const {
+    return ms2_seed_env_inte_corr_tole_cutoff_;
+  }
 
-  void setPseudoScoreCutoff(double pseudoScoreCutoff) { pseudo_score_cutoff_ = pseudoScoreCutoff; }
-  void setPseudoMinPeaks(int pseudoMinPeaks) { pseudo_min_peaks_ = pseudoMinPeaks; }
-  void setMs1SeedEnvInteCorrToleCutoff(double ms1SeedEnvInteCorrToleCutoff) { ms1_seed_env_inte_corr_tole_cutoff_ = ms1SeedEnvInteCorrToleCutoff; }
-  void setMs2SeedEnvInteCorrToleCutoff(double ms2SeedEnvInteCorrToleCutoff) { ms2_seed_env_inte_corr_tole_cutoff_ = ms2SeedEnvInteCorrToleCutoff; }
+  void setPseudoScoreCutoff(double pseudoScoreCutoff) {
+    pseudo_score_cutoff_ = pseudoScoreCutoff;
+  }
+  void setPseudoMinPeaks(int pseudoMinPeaks) {
+    pseudo_min_peaks_ = pseudoMinPeaks;
+  }
+  void setMs1SeedEnvInteCorrToleCutoff(double ms1SeedEnvInteCorrToleCutoff) {
+    ms1_seed_env_inte_corr_tole_cutoff_ = ms1SeedEnvInteCorrToleCutoff;
+  }
+  void setMs2SeedEnvInteCorrToleCutoff(double ms2SeedEnvInteCorrToleCutoff) {
+    ms2_seed_env_inte_corr_tole_cutoff_ = ms2SeedEnvInteCorrToleCutoff;
+  }
 
-private:
+ private:
+  // Mirrors TopfdPara's printout so the two reports look identical: one label
+  // column (wide enough for the longest label) and fixed-width centered
+  // banners.
+  static constexpr int para_label_width_ = 53;
+  static constexpr int para_banner_width_ = 55;
+
+  // A banner line with the title centered and padded with '#' to a fixed width,
+  // e.g. "############### Parameters ###############".
+  static std::string banner(const std::string& prefix,
+                            const std::string& title);
+
   double pseudo_score_cutoff_ = 0.55;
   int pseudo_min_peaks_ = 25;
   double ms1_seed_env_inte_corr_tole_cutoff_ = 0.5;
-  double ms2_seed_env_inte_corr_tole_cutoff_ = 0;
+  double ms2_seed_env_inte_corr_tole_cutoff_ = 0.5;
 };
 
 using TopdiaParaPtr = std::shared_ptr<TopdiaPara>;

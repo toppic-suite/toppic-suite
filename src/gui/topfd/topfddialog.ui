@@ -489,9 +489,9 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>410</y>
+      <y>440</y>
       <width>901</width>
-      <height>161</height>
+      <height>131</height>
      </rect>
     </property>
     <property name="html">
@@ -594,40 +594,12 @@ p, li { white-space: pre-wrap; }
       <x>30</x>
       <y>330</y>
       <width>901</width>
-      <height>81</height>
+      <height>111</height>
      </rect>
     </property>
     <property name="title">
      <string>Additional settings</string>
     </property>
-    <widget class="QWidget" name="horizontalLayoutWidget_11">
-     <property name="geometry">
-      <rect>
-       <x>270</x>
-       <y>20</y>
-       <width>201</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_10">
-      <item>
-       <widget class="QCheckBox" name="geneHTMLCheckBox">
-        <property name="acceptDrops">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>Generate HTML files</string>
-        </property>
-        <property name="checkable">
-         <bool>true</bool>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
     <widget class="QWidget" name="horizontalLayoutWidget_12">
      <property name="geometry">
       <rect>
@@ -639,7 +611,7 @@ p, li { white-space: pre-wrap; }
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_11">
       <item>
-       <widget class="QCheckBox" name="disableFilteringCheckBox">
+       <widget class="QCheckBox" name="fragNumFilteringCheckBox">
         <property name="maximumSize">
          <size>
           <width>259</width>
@@ -650,7 +622,7 @@ p, li { white-space: pre-wrap; }
          <bool>false</bool>
         </property>
         <property name="text">
-         <string>Disable frag num-based filtering</string>
+         <string>Enable frag num-based filtering</string>
         </property>
         <property name="checkable">
          <bool>true</bool>
@@ -741,6 +713,65 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="text">
          <string>Disable additional feature search</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="horizontalLayoutWidget_20">
+     <property name="geometry">
+      <rect>
+       <x>270</x>
+       <y>20</y>
+       <width>270</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_20">
+      <item>
+       <widget class="QCheckBox" name="noSqlCheckBox">
+        <property name="acceptDrops">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Do not generate SQLite database</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="horizontalLayoutWidget_21">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>80</y>
+       <width>320</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_21">
+      <item>
+       <widget class="QCheckBox" name="sql3dCheckBox">
+        <property name="toolTip">
+         <string>Also store the raw MS1 peaks for 3D visualization in the SQLite database (topfd --sql-3d).</string>
+        </property>
+        <property name="acceptDrops">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Add MS1 peaks for 3D visualization</string>
         </property>
         <property name="checkable">
          <bool>true</bool>
@@ -880,7 +911,7 @@ p, li { white-space: pre-wrap; }
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_19">
      <item>
-      <widget class="QLabel" name="label_11">
+      <widget class="QLabel" name="label_12">
        <property name="minimumSize">
         <size>
          <width>0</width>

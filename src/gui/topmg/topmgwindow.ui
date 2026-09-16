@@ -473,35 +473,37 @@ p, li { white-space: pre-wrap; }
       <widget class="QLabel" name="label_11">
        <property name="geometry">
         <rect>
-         <x>20</x>
+         <x>10</x>
          <y>25</y>
-         <width>151</width>
-         <height>31</height>
+         <width>91</width>
+         <height>41</height>
         </rect>
        </property>
        <property name="text">
-        <string>Spectrum level:</string>
+        <string>Spectrum
+level:</string>
        </property>
       </widget>
       <widget class="QLabel" name="label_13">
        <property name="geometry">
         <rect>
-         <x>480</x>
+         <x>300</x>
          <y>25</y>
-         <width>171</width>
-         <height>31</height>
+         <width>91</width>
+         <height>41</height>
         </rect>
        </property>
        <property name="text">
-        <string>Proteoform level:</string>
+        <string>Proteoform
+level:</string>
        </property>
       </widget>
       <widget class="QWidget" name="verticalLayoutWidget">
        <property name="geometry">
         <rect>
-         <x>150</x>
+         <x>120</x>
          <y>20</y>
-         <width>171</width>
+         <width>151</width>
          <height>80</height>
         </rect>
        </property>
@@ -538,9 +540,9 @@ p, li { white-space: pre-wrap; }
       <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
-         <x>620</x>
+         <x>420</x>
          <y>20</y>
-         <width>171</width>
+         <width>151</width>
          <height>81</height>
         </rect>
        </property>
@@ -564,6 +566,59 @@ p, li { white-space: pre-wrap; }
         </item>
         <item>
          <widget class="QLineEdit" name="cutoffProteoformValueEdit">
+          <property name="text">
+           <string>0.01</string>
+          </property>
+          <property name="readOnly">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QLabel" name="label_17">
+       <property name="geometry">
+        <rect>
+         <x>600</x>
+         <y>20</y>
+         <width>91</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Protein
+level:</string>
+       </property>
+      </widget>
+      <widget class="QWidget" name="layoutWidget_2">
+       <property name="geometry">
+        <rect>
+         <x>700</x>
+         <y>20</y>
+         <width>151</width>
+         <height>81</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_5">
+        <item>
+         <widget class="QComboBox" name="cutoffProteinTypeComboBox">
+          <property name="editable">
+           <bool>false</bool>
+          </property>
+          <item>
+           <property name="text">
+            <string>EVALUE</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>FDR</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="cutoffProteinValueEdit">
           <property name="text">
            <string>0.01</string>
           </property>
@@ -618,16 +673,6 @@ p, li { white-space: pre-wrap; }
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_4">
        <item>
-        <widget class="QCheckBox" name="geneHTMLCheckBox">
-         <property name="text">
-          <string>Generate HTML files</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
         <widget class="QCheckBox" name="keepDecoyCheckBox">
          <property name="text">
           <string>Keep decoy identifications</string>
@@ -679,6 +724,38 @@ p, li { white-space: pre-wrap; }
          </property>
          <property name="readOnly">
           <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="horizontalLayoutWidget_envcnn">
+      <property name="geometry">
+       <rect>
+        <x>490</x>
+        <y>190</y>
+        <width>294</width>
+        <height>33</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_envcnn">
+       <item>
+        <widget class="QLabel" name="label_envCnn">
+         <property name="minimumSize">
+          <size>
+           <width>160</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>EnvCNN score cutoff:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="envCnnCutoffEdit">
+         <property name="text">
+          <string>0.2</string>
          </property>
         </widget>
        </item>

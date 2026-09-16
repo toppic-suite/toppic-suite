@@ -1,78 +1,78 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-#include <sstream>
+#include "gui/topdiff/topdiffdialog.hpp"
 
-#include <QFileDialog>
-#include <QElapsedTimer>
-#include <QMessageBox>
 #include <QCloseEvent>
 #include <QDesktopServices>
+#include <QElapsedTimer>
+#include <QFileDialog>
+#include <QFontDatabase>
+#include <QMessageBox>
 #include <QScrollBar>
+#include <sstream>
 
-#include "common/util/file_util.hpp"
 #include "common/base/base_data.hpp"
+#include "common/util/file_util.hpp"
 #include "common/util/version.hpp"
-
 #include "console/topdiff_argument.hpp"
-
+#include "gui/topdiff/ui_topdiffdialog.h"
 #include "gui/util/command.hpp"
 #include "gui/util/gui_message.hpp"
 
-#include "gui/topdiff/ui_topdiffdialog.h"
-#include "gui/topdiff/topdiffdialog.hpp"
+TopDiffDialog::TopDiffDialog(QWidget* parent)
+    : QMainWindow(parent), ui(new Ui::TopDiffDialog) {
+  ui->setupUi(this);
+  std::string title = "TopDiff v." + toppic::Version::getVersion();
+  QString qstr = QString::fromStdString(title);
+  this->setWindowTitle(qstr);
+  lastDir_ = ".";
 
-TopDiffDialog::TopDiffDialog(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::TopDiffDialog) {
-      ui->setupUi(this);
-      std::string title = "TopDiff v." + toppic::Version::getVersion();
-      QString qstr = QString::fromStdString(title);
-      this->setWindowTitle(qstr);
-      lastDir_ = ".";
-
-      QFont font;
-      QFont outputFont;
-#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
-      font.setFamily(QStringLiteral("Calibri"));
-      outputFont.setFamily(QStringLiteral("Consolas"));
+  QFont font;
+  QFont outputFont;
+#if defined(_WIN32) || defined(_WIN64) || defined(__MINGW32__) || \
+    defined(__MINGW64__)
+  font.setFamily(QStringLiteral("Calibri"));
+  outputFont.setFamily(QStringLiteral("Consolas"));
 #else
-      font.setFamily(QStringLiteral("Monospace"));
-      outputFont.setFamily(QStringLiteral("Monospace"));
+  const QString monoFamily =
+      QFontDatabase::systemFont(QFontDatabase::FixedFont).family();
+  font.setFamily(monoFamily);
+  outputFont.setFamily(monoFamily);
 #endif
-      font.setPixelSize(12);
-      outputFont.setPixelSize(12);
-      QApplication::setFont(font);
-      ui->outputTextBrowser->setFont(outputFont);
+  font.setPixelSize(12);
+  outputFont.setPixelSize(12);
+  QApplication::setFont(font);
+  ui->outputTextBrowser->setFont(outputFont);
 
-      TopDiffDialog::on_defaultButton_clicked();
-    }
+  TopDiffDialog::on_defaultButton_clicked();
+}
 
 TopDiffDialog::~TopDiffDialog() {
-  if(process_.state()!=QProcess::NotRunning) {
+  if (process_.state() != QProcess::NotRunning) {
     process_.kill();
   }
   delete ui;
 }
 
-void TopDiffDialog::closeEvent(QCloseEvent *event) {
-  if(process_.state()!=QProcess::NotRunning) {
+void TopDiffDialog::closeEvent(QCloseEvent* event) {
+  if (process_.state() != QProcess::NotRunning) {
     if (!continueToClose()) {
       event->ignore();
       return;
-    }
-    else {
+    } else {
       process_.kill();
     }
   }
@@ -89,8 +89,10 @@ void TopDiffDialog::on_clearButton_clicked() {
 void TopDiffDialog::on_defaultButton_clicked() {
   arguments_ = toppic::TopDiffArgument::initArguments();
   ui->toolComboBox->setCurrentIndex(0);
-  ui->precErrorEdit->setText(QString::fromStdString(arguments_["errorTolerance"]));
-  ui->outputEdit->setText(QString::fromStdString(arguments_["mergedOutputFileName"])); 
+  ui->precErrorEdit->setText(
+      QString::fromStdString(arguments_["errorTolerance"]));
+  ui->outputEdit->setText(
+      QString::fromStdString(arguments_["mergedOutputFileName"]));
   ui->outputTextBrowser->setText("Click the Start button to process the data.");
 }
 
@@ -104,10 +106,7 @@ std::vector<std::string> TopDiffDialog::getSpecFileList() {
 
 void TopDiffDialog::on_addButton_clicked() {
   QStringList idfiles = QFileDialog::getOpenFileNames(
-      this,
-      "Select spectrum files",
-      lastDir_,
-      "Spectrum files (*ms2.msalign)");
+      this, "Select spectrum files", lastDir_, "Spectrum files (*ms2.msalign)");
   for (int i = 0; i < idfiles.size(); i++) {
     QString idfile = idfiles.at(i);
     updatedir(idfile);
@@ -119,7 +118,7 @@ void TopDiffDialog::on_addButton_clicked() {
 
 void TopDiffDialog::updatedir(QString s) {
   if (!s.isEmpty()) {
-    //lastDir_ = s;
+    // lastDir_ = s;
     lastDir_ = "";
   }
 }
@@ -128,8 +127,7 @@ bool TopDiffDialog::ableToAdd(QString idfile) {
   if (idfile != "") {
     if (idfile.toStdString().length() > 200) {
       QMessageBox::warning(this, tr("Warning"),
-                           tr("The file path is too long!"),
-                           QMessageBox::Yes);
+                           tr("The file path is too long!"), QMessageBox::Yes);
       able = false;
     } else {
       for (int i = 0; i < ui->listWidget->count(); i++) {
@@ -145,7 +143,7 @@ bool TopDiffDialog::ableToAdd(QString idfile) {
 }
 
 void TopDiffDialog::on_delButton_clicked() {
-  QListWidgetItem *delItem = ui->listWidget->currentItem();
+  QListWidgetItem* delItem = ui->listWidget->currentItem();
   ui->listWidget->removeItemWidget(delItem);
   delete delItem;
 }
@@ -155,7 +153,8 @@ void TopDiffDialog::on_startButton_clicked() {
   std::map<std::string, std::string> argument = this->getArguments();
   std::vector<std::string> spec_file_lst = this->getSpecFileList();
 
-  std::string cmd = toppic::command::geneTopDiffCommand(argument, spec_file_lst_);
+  std::string cmd =
+      toppic::command::geneTopDiffCommand(argument, spec_file_lst_);
   QString q_cmd = QString::fromStdString(cmd);
   q_cmd = q_cmd.trimmed();
   QStringList cmd_list = q_cmd.split(" ");
@@ -168,7 +167,7 @@ void TopDiffDialog::on_startButton_clicked() {
   toppic::GuiMessage guiMsg;
   bool finish = false;
   while (!finish) {
-    if(process_.state()==QProcess::NotRunning) {
+    if (process_.state() == QProcess::NotRunning) {
       finish = true;
     }
     bool ready = process_.waitForReadyRead(100);
@@ -177,7 +176,7 @@ void TopDiffDialog::on_startButton_clicked() {
       QString str = QString(byteArray);
       std::string msg = guiMsg.getMsg(str.toStdString());
       if (msg != "") {
-        updateMsg(msg); 
+        updateMsg(msg);
       }
     }
     if (finish) {
@@ -185,11 +184,12 @@ void TopDiffDialog::on_startButton_clicked() {
       QString str = QString(byteArray);
       if (process_.exitCode() != 0) {
         str = str + "\nERROR Quit status: Crashed. \n";
-        str = str + "ERROR Quit code: " + QString::number(process_.exitCode()) + ".\n";
+        str = str + "ERROR Quit code: " + QString::number(process_.exitCode()) +
+              ".\n";
       }
       std::string msg = guiMsg.getMsg(str.toStdString());
       if (msg != "") {
-        updateMsg(msg); 
+        updateMsg(msg);
       }
     }
     sleep(100);
@@ -197,17 +197,14 @@ void TopDiffDialog::on_startButton_clicked() {
   unlockDialog();
 }
 
-void TopDiffDialog::on_exitButton_clicked() {
-  close();
-}
+void TopDiffDialog::on_exitButton_clicked() { close(); }
 
 bool TopDiffDialog::continueToClose() {
-  if (QMessageBox::question(this,
-                            tr("Quit"),
-                            tr("TopDiff is still running. Are you sure you want to quit?"),
-                            QMessageBox::Yes | QMessageBox::No,
-                            QMessageBox::No)
-      == QMessageBox::Yes) {
+  if (QMessageBox::question(
+          this, tr("Quit"),
+          tr("TopDiff is still running. Are you sure you want to quit?"),
+          QMessageBox::Yes | QMessageBox::No,
+          QMessageBox::No) == QMessageBox::Yes) {
     return true;
   } else {
     return false;
@@ -229,12 +226,15 @@ std::map<std::string, std::string> TopDiffDialog::getArguments() {
   std::string exe_dir = toppic::file_util::getExecutiveDir(path.toStdString());
   arguments_["executiveDir"] = exe_dir;
   if (toppic::file_util::checkSpace(exe_dir)) {
-    ui->outputTextBrowser->setText("Current directory " + QString::fromStdString(exe_dir) + " contains space and will cause errors in the program!");
+    ui->outputTextBrowser->setText(
+        "Current directory " + QString::fromStdString(exe_dir) +
+        " contains space and will cause errors in the program!");
   }
   arguments_["resourceDir"] = toppic::file_util::getResourceDir(exe_dir);
   arguments_["toolName"] = ui->toolComboBox->currentText().toStdString();
   arguments_["errorTolerance"] = ui->precErrorEdit->text().toStdString();
-  arguments_["mergedOutputFileName"] = ui->outputEdit->text().trimmed().toStdString();
+  arguments_["mergedOutputFileName"] =
+      ui->outputEdit->text().trimmed().toStdString();
   return arguments_;
 }
 
@@ -245,7 +245,7 @@ void TopDiffDialog::lockDialog() {
   ui->defaultButton->setEnabled(false);
   ui->startButton->setEnabled(false);
   ui->outputButton->setEnabled(false);
-  
+
   ui->outputEdit->setEnabled(false);
   ui->toolComboBox->setEnabled(false);
   ui->precErrorEdit->setEnabled(false);
@@ -274,15 +274,13 @@ bool TopDiffDialog::checkError() {
   }
 
   if (ui->precErrorEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Error tolerance is empty!"),
+    QMessageBox::warning(this, tr("Warning"), tr("Error tolerance is empty!"),
                          QMessageBox::Yes);
     return true;
   }
 
   if (ui->outputEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Output filename is empty!"),
+    QMessageBox::warning(this, tr("Warning"), tr("Output filename is empty!"),
                          QMessageBox::Yes);
     return true;
   }
@@ -311,4 +309,3 @@ void TopDiffDialog::sleep(int wait) {
     QCoreApplication::processEvents();
   }
 }
-

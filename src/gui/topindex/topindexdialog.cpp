@@ -1,101 +1,96 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-#include <map>
-#include <string>
-#include <vector>
-#include <sstream>
+#include "gui/topindex/topindexdialog.hpp"
 
-#include <QFileDialog>
-#include <QElapsedTimer>
-#include <QMessageBox>
 #include <QCloseEvent>
 #include <QDesktopServices>
+#include <QElapsedTimer>
+#include <QFileDialog>
+#include <QFontDatabase>
+#include <QMessageBox>
 #include <QScrollBar>
+#include <map>
+#include <sstream>
+#include <string>
+#include <vector>
 
 #include "common/util/file_util.hpp"
-#include "common/util/version.hpp"
 #include "common/util/mem_check.hpp"
-
+#include "common/util/version.hpp"
 #include "console/topindex_argument.hpp"
-
+#include "gui/topindex/ui_topindexdialog.h"
 #include "gui/util/command.hpp"
 #include "gui/util/gui_message.hpp"
 
-#include "gui/topindex/ui_topindexdialog.h"
-#include "gui/topindex/topindexdialog.hpp"
-
-
-TopIndexDialog::TopIndexDialog(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::TopIndexDialog) {
-      arguments_ = toppic::TopIndexArgument::initArguments();
-      ui->setupUi(this);
-      std::string title = "TopIndex v." + toppic::Version::getVersion();
-      QString qstr = QString::fromStdString(title);
-      this->setWindowTitle(qstr);
-      lastDir_ = ".";
-      QFont font;
-      QFont outputFont;
-#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
-      font.setFamily(QStringLiteral("Calibri"));
-      outputFont.setFamily(QStringLiteral("Consolas"));
+TopIndexDialog::TopIndexDialog(QWidget* parent)
+    : QMainWindow(parent), ui(new Ui::TopIndexDialog) {
+  arguments_ = toppic::TopIndexArgument::initArguments();
+  ui->setupUi(this);
+  std::string title = "TopIndex v." + toppic::Version::getVersion();
+  QString qstr = QString::fromStdString(title);
+  this->setWindowTitle(qstr);
+  lastDir_ = ".";
+  QFont font;
+  QFont outputFont;
+#if defined(_WIN32) || defined(_WIN64) || defined(__MINGW32__) || \
+    defined(__MINGW64__)
+  font.setFamily(QStringLiteral("Calibri"));
+  outputFont.setFamily(QStringLiteral("Consolas"));
 #else
-      font.setFamily(QStringLiteral("Monospace"));
-      outputFont.setFamily(QStringLiteral("Monospace"));
+  const QString monoFamily =
+      QFontDatabase::systemFont(QFontDatabase::FixedFont).family();
+  font.setFamily(monoFamily);
+  outputFont.setFamily(monoFamily);
 #endif
-      font.setPixelSize(12);
-      outputFont.setPixelSize(12);
-      QApplication::setFont(font);
-      ui->outputTextBrowser->setFont(outputFont);
+  font.setPixelSize(12);
+  outputFont.setPixelSize(12);
+  QApplication::setFont(font);
+  ui->outputTextBrowser->setFont(outputFont);
 
-      TopIndexDialog::on_defaultButton_clicked();
-    }
+  TopIndexDialog::on_defaultButton_clicked();
+}
 
 TopIndexDialog::~TopIndexDialog() {
-  if(process_.state()!=QProcess::NotRunning) {
+  if (process_.state() != QProcess::NotRunning) {
     process_.kill();
   }
   delete ui;
 }
 
 void TopIndexDialog::on_databaseFileButton_clicked() {
-  QString s = QFileDialog::getOpenFileName(
-      this,
-      "Select a protein database file",
-      lastDir_,
-      "Database files (*.fasta *.fa)");
+  QString s =
+      QFileDialog::getOpenFileName(this, "Select a protein database file",
+                                   lastDir_, "Database files (*.fasta *.fa)");
   updatedir(s);
   ui->databaseFileEdit->setText(s);
 }
 void TopIndexDialog::on_fixedModFileButton_clicked() {
   QString s = QFileDialog::getOpenFileName(
-      this,
-      "Select a fixed modification file",
-      lastDir_,
+      this, "Select a fixed modification file", lastDir_,
       "Modification files (*.txt);;All files (*.*)");
   updatedir(s);
   ui->fixedModFileEdit->setText(s);
 }
 
-void TopIndexDialog::closeEvent(QCloseEvent *event) {
-  if(process_.state()!=QProcess::NotRunning) {
+void TopIndexDialog::closeEvent(QCloseEvent* event) {
+  if (process_.state() != QProcess::NotRunning) {
     if (!continueToClose()) {
       event->ignore();
       return;
-    }
-    else {
+    } else {
       process_.kill();
     }
   }
@@ -112,8 +107,10 @@ void TopIndexDialog::on_clearButton_clicked() {
 void TopIndexDialog::on_defaultButton_clicked() {
   arguments_ = toppic::TopIndexArgument::initArguments();
   ui->fixedModComboBox->setCurrentIndex(0);
-  ui->errorToleranceEdit_2->setText(QString::fromStdString(arguments_["massErrorTolerance"])); 
-  ui->threadNumberEdit->setText(QString::fromStdString(arguments_["threadNumber"]));
+  ui->errorToleranceEdit_2->setText(
+      QString::fromStdString(arguments_["massErrorTolerance"]));
+  ui->threadNumberEdit->setText(
+      QString::fromStdString(arguments_["threadNumber"]));
   ui->fixedModComboBox->setCurrentIndex(0);
   on_fixedModComboBox_currentIndexChanged(0);
   ui->NONECheckBox->setChecked(true);
@@ -126,41 +123,41 @@ void TopIndexDialog::on_defaultButton_clicked() {
 
 void TopIndexDialog::updatedir(QString s) {
   if (!s.isEmpty()) {
-    //lastDir_ = s;
+    // lastDir_ = s;
     lastDir_ = "";
   }
 }
 void TopIndexDialog::on_startButton_clicked() {
   lockDialog();
-  
+
   std::map<std::string, std::string> argument = this->getArguments();
 
-  std::string cmd = toppic::command::geneTopIndexCommand(argument); 
+  std::string cmd = toppic::command::geneTopIndexCommand(argument);
   QString q_cmd = QString::fromStdString(cmd);
   q_cmd = q_cmd.trimmed();
   QStringList cmd_list = q_cmd.split(" ");
   QString prog = cmd_list[0];
   cmd_list.removeFirst();
 
-  //qDebug() << "start process ";
+  // qDebug() << "start process ";
   process_.start(prog, cmd_list);
   process_.waitForStarted();
-  //qDebug() << "start process finished";
+  // qDebug() << "start process finished";
 
   toppic::GuiMessage guiMsg;
   bool finish = false;
   while (!finish) {
-    if(process_.state()==QProcess::NotRunning) {
+    if (process_.state() == QProcess::NotRunning) {
       finish = true;
     }
     bool ready = process_.waitForReadyRead(100);
     if (ready || finish) {
-      //qDebug() << "read finished";
+      // qDebug() << "read finished";
       QByteArray byteArray = process_.readAllStandardOutput();
       QString str = QString(byteArray);
       std::string msg = guiMsg.getMsg(str.toStdString());
       if (msg != "") {
-        updateMsg(msg); 
+        updateMsg(msg);
       }
     }
     if (finish) {
@@ -168,11 +165,12 @@ void TopIndexDialog::on_startButton_clicked() {
       QString str = QString(byteArray);
       if (process_.exitCode() != 0) {
         str = str + "\nERROR Quit status: Crashed. \n";
-        str = str + "ERROR Quit code: " + QString::number(process_.exitCode()) + ".\n";
+        str = str + "ERROR Quit code: " + QString::number(process_.exitCode()) +
+              ".\n";
       }
       std::string msg = guiMsg.getMsg(str.toStdString());
       if (msg != "") {
-        updateMsg(msg); 
+        updateMsg(msg);
       }
     }
     sleep(100);
@@ -180,17 +178,14 @@ void TopIndexDialog::on_startButton_clicked() {
   unlockDialog();
 }
 
-void TopIndexDialog::on_exitButton_clicked() {
-  close();
-}
+void TopIndexDialog::on_exitButton_clicked() { close(); }
 
 bool TopIndexDialog::continueToClose() {
-  if (QMessageBox::question(this,
-                            tr("Quit"),
-                            tr("TopIndex is still running. Are you sure you want to quit?"),
-                            QMessageBox::Yes | QMessageBox::No,
-                            QMessageBox::No)
-      == QMessageBox::Yes) {
+  if (QMessageBox::question(
+          this, tr("Quit"),
+          tr("TopIndex is still running. Are you sure you want to quit?"),
+          QMessageBox::Yes | QMessageBox::No,
+          QMessageBox::No) == QMessageBox::Yes) {
     return true;
   } else {
     return false;
@@ -208,35 +203,41 @@ void TopIndexDialog::on_outputButton_clicked() {
 
 std::map<std::string, std::string> TopIndexDialog::getArguments() {
   QString path = QCoreApplication::applicationFilePath();
-  arguments_["executiveDir"] = toppic::file_util::getExecutiveDir(path.toStdString());
+  arguments_["executiveDir"] =
+      toppic::file_util::getExecutiveDir(path.toStdString());
   if (toppic::file_util::checkSpace(arguments_["executiveDir"])) {
-    ui->outputTextBrowser->setText("Current directory " + QString::fromStdString(arguments_["executiveDir"]) + " contains space and will cause errors in the program!");
+    ui->outputTextBrowser->setText(
+        "Current directory " +
+        QString::fromStdString(arguments_["executiveDir"]) +
+        " contains space and will cause errors in the program!");
   }
-  arguments_["resourceDir"] = toppic::file_util::getResourceDir(arguments_["executiveDir"]);
-  arguments_["oriDatabaseFileName"] = ui->databaseFileEdit->text().toStdString();
+  arguments_["resourceDir"] =
+      toppic::file_util::getResourceDir(arguments_["executiveDir"]);
+  arguments_["oriDatabaseFileName"] =
+      ui->databaseFileEdit->text().toStdString();
 
   if (ui->decoyCheckBox->isChecked()) {
     arguments_["searchType"] = "TARGET+DECOY";
-    arguments_["databaseFileName"] = arguments_["oriDatabaseFileName"] + "_target_decoy";
-  } 
-  else {
+    arguments_["databaseFileName"] =
+        arguments_["oriDatabaseFileName"] + "_target_decoy";
+  } else {
     arguments_["searchType"] = "TARGET";
-    arguments_["databaseFileName"] = arguments_["oriDatabaseFileName"] + "_target";
+    arguments_["databaseFileName"] =
+        arguments_["oriDatabaseFileName"] + "_target";
   }
   arguments_["fixedMod"] = ui->fixedModComboBox->currentText().toStdString();
   if (arguments_["fixedMod"] == "NONE") {
     arguments_["fixedMod"] = "";
-  }
-  else if (arguments_["fixedMod"] == "Carbamidomethylation on cysteine") {
+  } else if (arguments_["fixedMod"] == "Carbamidomethylation on cysteine") {
     arguments_["fixedMod"] = "C57";
-  }
-  else if (arguments_["fixedMod"] == "Carboxymethylation on cysteine") {
+  } else if (arguments_["fixedMod"] == "Carboxymethylation on cysteine") {
     arguments_["fixedMod"] = "C58";
   }
   if (ui->fixedModComboBox->currentIndex() == 3) {
     arguments_["fixedMod"] = ui->fixedModFileEdit->text().toStdString();
   }
-  arguments_["massErrorTolerance"] = ui->errorToleranceEdit_2->text().toStdString();
+  arguments_["massErrorTolerance"] =
+      ui->errorToleranceEdit_2->text().toStdString();
 
   arguments_["allowProtMod"] = "";
   if (ui->NONECheckBox->isChecked()) {
@@ -247,7 +248,8 @@ std::map<std::string, std::string> TopIndexDialog::getArguments() {
   }
 
   if (ui->NMEACCheckBox->isChecked()) {
-    arguments_["allowProtMod"] = arguments_["allowProtMod"] + ",NME_ACETYLATION";
+    arguments_["allowProtMod"] =
+        arguments_["allowProtMod"] + ",NME_ACETYLATION";
   }
   if (ui->MACCheckBox->isChecked()) {
     arguments_["allowProtMod"] = arguments_["allowProtMod"] + ",M_ACETYLATION";
@@ -299,8 +301,7 @@ void TopIndexDialog::unlockDialog() {
 
 bool TopIndexDialog::checkError() {
   if (ui->databaseFileEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Database file is empty!"),
+    QMessageBox::warning(this, tr("Warning"), tr("Database file is empty!"),
                          QMessageBox::Yes);
     return true;
   }
@@ -310,7 +311,8 @@ bool TopIndexDialog::checkError() {
                          QMessageBox::Yes);
     return true;
   }
-  if (ui->fixedModFileEdit->text().isEmpty() && ui->fixedModComboBox->currentIndex() == 3) {
+  if (ui->fixedModFileEdit->text().isEmpty() &&
+      ui->fixedModComboBox->currentIndex() == 3) {
     QMessageBox::warning(this, tr("Warning"),
                          tr("Please select a fixed modification file!"),
                          QMessageBox::Yes);
@@ -322,18 +324,23 @@ bool TopIndexDialog::checkError() {
                          QMessageBox::Yes);
     return true;
   }
-  if (ui->threadNumberEdit->text().toInt() > toppic::mem_check::getMaxThreads("topindex")) {
+  if (ui->threadNumberEdit->text().toInt() >
+      toppic::mem_check::getMaxThreads("topindex")) {
     int max_thread = toppic::mem_check::getMaxThreads("topindex");
-    QMessageBox::StandardButton reply = QMessageBox::warning(this, tr("Warning"),
-                         QString("Thread number is too large! Based on the memory size, up to %1 threads can run on this computer. Are you sure you want to proceed?").arg(max_thread).arg(max_thread),
-                         QMessageBox::Yes|QMessageBox::No);
+    QMessageBox::StandardButton reply = QMessageBox::warning(
+        this, tr("Warning"),
+        QString("Thread number is too large! Based on the memory size, up to "
+                "%1 threads can run on this computer. Are you sure you want to "
+                "proceed?")
+            .arg(max_thread)
+            .arg(max_thread),
+        QMessageBox::Yes | QMessageBox::No);
     if (reply == QMessageBox::No) {
       return true;
     }
   }
   if (ui->threadNumberEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Thread number is empty!"),
+    QMessageBox::warning(this, tr("Warning"), tr("Thread number is empty!"),
                          QMessageBox::Yes);
     return true;
   }
@@ -395,7 +402,8 @@ void TopIndexDialog::on_MACCheckBox_clicked(bool checked) {
   }
 }
 bool TopIndexDialog::nterminalerror() {
-  if (ui->NONECheckBox->isChecked() || ui->NMECheckBox->isChecked() || ui->NMEACCheckBox->isChecked() || ui->MACCheckBox->isChecked()) {
+  if (ui->NONECheckBox->isChecked() || ui->NMECheckBox->isChecked() ||
+      ui->NMEACCheckBox->isChecked() || ui->MACCheckBox->isChecked()) {
     return false;
   } else {
     QMessageBox::warning(this, tr("Warning"),

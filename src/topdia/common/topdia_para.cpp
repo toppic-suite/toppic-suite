@@ -1,53 +1,67 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
-
-#include <iostream>
-#include <sstream>
-#include <iomanip>
-#include "common/util/version.hpp"
-#include "common/util/time_util.hpp"
-#include "common/util/file_util.hpp"
-#include "common/util/str_util.hpp"
-#include "common/util/version.hpp"
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include "topdia/common/topdia_para.hpp"
 
+#include <iomanip>
+#include <sstream>
+#include <string>
+
+#include "common/util/time_util.hpp"
+#include "common/util/version.hpp"
+
 namespace toppic {
 
-std::string TopdiaPara::getParaStr(const std::string &prefix,
-                                   const std::string &sep,
-                                   TopfdParaPtr topfd_para) {
-    std::stringstream output;
-    int gap = 25;
-    output << prefix << "TopDIA " << Version::getVersion() << std::endl;
-    output << prefix << "Timestamp: " << time_util::getTimeStr() << std::endl;
-    output << prefix << "###################### Parameters ######################" << std::endl;
-    output << topfd_para->getTopfdParaStr(prefix, sep, gap); 
-    output << prefix << std::setw(gap) << std::left
-           << "MS2 Min scan number:        " << sep << topfd_para->getMs2MinScanNum() << std::endl;
-    output << prefix << std::setw(gap) << std::left
-           << "MS1 ECScore cutoff:         " << sep  << topfd_para->getMs1EcscoreCutoff() << std::endl;
-    output << prefix << std::setw(gap) << std::left
-           << "MS2 ECScore cutoff:         " << sep  << topfd_para->getMs2EcscoreCutoff() << std::endl;
-    output << prefix << std::setw(gap) << std::left
-           << "Pseudo Score cutoff:        " << sep  << pseudo_score_cutoff_ << std::endl;
-    output << prefix << std::setw(gap) << std::left
-           << "Pseudo Min peak number:     " << sep << pseudo_min_peaks_ << std::endl;
-    output << prefix << std::setw(gap) << std::left
-           << "Version:                    " << sep << Version::getVersion() << std::endl;
-    output << prefix << "###################### Parameters ######################" << std::endl;
-    return output.str();
-  }
+// A banner line with the title centered and padded with '#' to a fixed width,
+// e.g. "############### Parameters ###############".
+std::string TopdiaPara::banner(const std::string& prefix,
+                               const std::string& title) {
+  int fill = para_banner_width_ - 2 - static_cast<int>(title.size());
+  if (fill < 2) fill = 2;
+  int left = fill / 2;
+  int right = fill - left;
+  return prefix + std::string(left, '#') + " " + title + " " +
+         std::string(right, '#');
+}
+
+std::string TopdiaPara::getParaStr(const std::string& prefix,
+                                   const std::string& sep,
+                                   const TopfdParaPtr& topfd_para) const {
+  std::stringstream output;
+  const int w = para_label_width_;
+  auto kv = [&](const char* label) -> std::ostream& {
+    return output << prefix << std::setw(w) << std::left << label << sep;
+  };
+
+  output << prefix << "TopDIA " << Version::getVersion() << std::endl;
+  output << prefix << "Timestamp: " << time_util::getTimeStr() << std::endl;
+  output << banner(prefix, "Parameters") << std::endl;
+
+  output << topfd_para->getTopfdParaStr(prefix, sep);
+
+  output << std::endl
+         << banner(prefix, "TopDIA feature and pseudo-spectrum parameters")
+         << std::endl;
+  kv("MS2 Min scan number:") << topfd_para->getMs2MinScanNum() << std::endl;
+  kv("MS1 ECScore cutoff:") << topfd_para->getMs1EcscoreCutoff() << std::endl;
+  kv("MS2 ECScore cutoff:") << topfd_para->getMs2EcscoreCutoff() << std::endl;
+  kv("Pseudo Score cutoff:") << pseudo_score_cutoff_ << std::endl;
+  kv("Pseudo Min peak number:") << pseudo_min_peaks_ << std::endl;
+
+  output << banner(prefix, "Parameters") << std::endl;
+  return output.str();
+}
 
 }  // namespace toppic

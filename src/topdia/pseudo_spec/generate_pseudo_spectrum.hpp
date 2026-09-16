@@ -1,4 +1,5 @@
-// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,75 +13,75 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TOPPIC_GENERATE_PSEUDO_SPECTRUM_HPP
-#define TOPPIC_GENERATE_PSEUDO_SPECTRUM_HPP
+#ifndef TOPPIC_TOPDIA_PSEUDO_SPEC_GENERATE_PSEUDO_SPECTRUM_HPP_
+#define TOPPIC_TOPDIA_PSEUDO_SPEC_GENERATE_PSEUDO_SPECTRUM_HPP_
 
-#include <algorithm>
-#include <cmath>
-#include <iomanip>
+#include <fstream>
 #include <memory>
-#include <numeric>
-#include <set>
+#include <utility>
+#include <vector>
 
+#include "common/base/activation.hpp"
 #include "ms/env/env_para.hpp"
-#include "ms/spec/msalign_reader_util.hpp"
 #include "topdia/common/topdia_para.hpp"
-#include "topdia/pseudo_spec/pseudo_peak.hpp"
 #include "topdia/pseudo_spec/mzrt_feature.hpp"
+#include "topdia/pseudo_spec/pseudo_peak.hpp"
 
 namespace toppic {
 
 class GeneratePseudoSpectrum {
  public:
-  explicit GeneratePseudoSpectrum(TopfdParaPtr topfd_para_ptr,
-                                  TopdiaParaPtr topdia_para_ptr);
-  void process(TopfdParaPtr topfd_para_ptr,
-               TopdiaParaPtr topdia_para_ptr);
+  explicit GeneratePseudoSpectrum(const TopfdParaPtr& topfd_para_ptr,
+                                  const TopdiaParaPtr& topdia_para_ptr);
+  void process(const TopfdParaPtr& topfd_para_ptr,
+               const TopdiaParaPtr& topdia_para_ptr);
 
   ///////////////////////
-  static bool compareFeaturesInte(const MzrtFeaturePtr &a,
-                                  const MzrtFeaturePtr &b) {
+  static bool compareFeaturesInte(const MzrtFeaturePtr& a,
+                                  const MzrtFeaturePtr& b) {
     return a->getIntensity() > b->getIntensity();
   }
 
  private:
   double get_max_rt();
-  static std::vector<double> interp(const std::vector<double> &x,
-                                    const std::vector<double> &xp,
-                                    const std::vector<double> &fp);
+  static std::vector<double> interp(const std::vector<double>& x,
+                                    const std::vector<double>& xp,
+                                    const std::vector<double>& fp);
   MzrtFeaturePtrVec get_iso_win_ms1_features(int isolation_window_base_index);
 
-  static int get_apex_cycle_distance(const MzrtFeaturePtr &ms1_feature,
-                                     const MzrtFeaturePtr &ms2_feature);
+  static int get_apex_cycle_distance(const MzrtFeaturePtr& ms1_feature,
+                                     const MzrtFeaturePtr& ms2_feature);
   static std::vector<double> moving_avg(std::vector<double> xic, int size);
-  static double computeSharedArea(const std::vector<double> &xic1,
-                                  const std::vector<double> &xic2);
-  static void score_pseudo_peaks(std::vector<PseudoPeak> &pseudo_peak_list,
-                                 const MzrtFeaturePtr &ms1_feature);
+  static double computeSharedArea(const std::vector<double>& xic1,
+                                  const std::vector<double>& xic2);
+  static void score_pseudo_peaks(std::vector<PseudoPeak>& pseudo_peak_list,
+                                 const MzrtFeaturePtr& ms1_feature);
   static double get_pred(double intensity_ratio, double shared_area,
                          double length_ratio);
   static std::vector<PseudoPeak> filterPseudoPeaks(
-      const EnvParaPtr &env_para_ptr, const MzrtFeaturePtr &ms1_feature,
-      MzrtFeaturePtrVec &ms2_features_window,
-      std::vector<PseudoPeak> &pseudo_peak_list, double cutoff,
+      const EnvParaPtr& env_para_ptr, const MzrtFeaturePtr& ms1_feature,
+      MzrtFeaturePtrVec& ms2_features_window,
+      std::vector<PseudoPeak>& pseudo_peak_list, double cutoff,
       int min_peak_num);
 
-  void writePseudoSpectrum(
-      std::ofstream &output, TopfdParaPtr topfd_para_ptr, TopdiaParaPtr topdia_para_ptr,
-      int ms1_feature_idx, MzrtFeaturePtr ms1_feature,
-      std::vector<PseudoPeak> &assigned_ms2_features, int iso_win_idx);
+  void writePseudoSpectrum(std::ofstream& output,
+                           const TopfdParaPtr& topfd_para_ptr,
+                           const TopdiaParaPtr& topdia_para_ptr,
+                           int ms1_feature_idx,
+                           const MzrtFeaturePtr& ms1_feature,
+                           std::vector<PseudoPeak>& assigned_ms2_features,
+                           int iso_win_idx);
 
-  static bool comparePseudoPeaksInte(const PseudoPeak &a,
-                                     const PseudoPeak &b) {
+  static bool comparePseudoPeaksInte(const PseudoPeak& a, const PseudoPeak& b) {
     return a.getIntensity() > b.getIntensity();
   }
-  static bool comparePseudoPeaksScore(const PseudoPeak &a,
-                                      const PseudoPeak &b) {
+  static bool comparePseudoPeaksScore(const PseudoPeak& a,
+                                      const PseudoPeak& b) {
     return a.getScore() > b.getScore();
   }
 
-  //std::vector<double> isolation_window_base_mz_;
-  std::vector<std::pair<double,double>> win_list_;
+  // std::vector<double> isolation_window_base_mz_;
+  std::vector<std::pair<double, double>> win_list_;
   std::vector<double> rt_ms1_;
   std::vector<int> ms1_scan_;
   std::vector<std::vector<double>> rt_ms2_;
@@ -92,4 +93,4 @@ class GeneratePseudoSpectrum {
 using GeneratePseudoSpectrumPtr = std::shared_ptr<GeneratePseudoSpectrum>;
 
 }  // namespace toppic
-#endif  // TOPPIC_GENERATE_PSEUDO_SPECTRUM_HPP
+#endif  // TOPPIC_TOPDIA_PSEUDO_SPEC_GENERATE_PSEUDO_SPECTRUM_HPP_

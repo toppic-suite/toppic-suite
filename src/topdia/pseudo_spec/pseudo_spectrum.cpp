@@ -1,4 +1,5 @@
-// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,18 +13,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "pseudo_spectrum.hpp"
+#include "topdia/pseudo_spec/pseudo_spectrum.hpp"
 
 namespace toppic {
 
 void PseudoSpectrum::add_fragments(
-    const std::vector<PseudoPeak> &fragmentFeatures) {
-  for (auto f : fragmentFeatures) {
+    const std::vector<PseudoPeak>& fragmentFeatures) {
+  for (const auto& f : fragmentFeatures) {
     fragment_features_.push_back(f);
   }
 }
 
-void PseudoSpectrum::add_fragment(PseudoPeak &fragmentFeature) {
+void PseudoSpectrum::add_fragment(const PseudoPeak& fragmentFeature) {
   fragment_features_.push_back(fragmentFeature);
 }
 

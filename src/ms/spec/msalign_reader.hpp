@@ -1,21 +1,23 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
 
 #ifndef TOPPIC_MS_SPEC_MSALIGN_READER_HPP_
 #define TOPPIC_MS_SPEC_MSALIGN_READER_HPP_
 
 #include <fstream>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -25,11 +27,16 @@ namespace toppic {
 
 class MsAlignReader {
  public:
-  MsAlignReader(const std::string &file_name);
+  explicit MsAlignReader(const std::string& file_name);
 
-  MsAlignReader(const std::string &file_name, 
-                      int group_spec_num,
-                      ActivationPtr activation_ptr);
+  MsAlignReader(const std::string& file_name, int group_spec_num,
+                const ActivationPtr& activation_ptr);
+
+  // Skips the masses whose EnvCNN score (the fourth msalign column) is below
+  // env_cnn_cutoff; peak ids still count the masses of the file, so they
+  // match the ids of an unfiltered read.
+  MsAlignReader(const std::string& file_name, int group_spec_num,
+                const ActivationPtr& activation_ptr, double env_cnn_cutoff);
 
   ~MsAlignReader();
 
@@ -37,7 +44,7 @@ class MsAlignReader {
 
   DeconvMsPtr getNextMsPtr();
 
-  DeconvMsPtrVec getNextMsPtrVec(); 
+  DeconvMsPtrVec getNextMsPtrVec();
 
  private:
   std::string file_name_;
@@ -45,6 +52,9 @@ class MsAlignReader {
   int group_spec_num_ = 1;
 
   ActivationPtr activation_ptr_;
+
+  // masses with an EnvCNN score below the cutoff are skipped (0 = keep all)
+  double env_cnn_cutoff_ = 0.0;
 
   std::ifstream input_;
 

@@ -1,33 +1,34 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#include "gui/util/command.hpp"
 
 #include <iostream>
 #include <sstream>
 
 #include "common/util/logger.hpp"
-#include "gui/util/command.hpp"
-
 
 namespace toppic {
 
 namespace command {
 
-/*function for topfd*/ 
-std::string geneTopfdCommand(TopfdParaPtr para_ptr, 
-                             const std::vector<std::string> spec_file_lst) { 
-
-#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
+/*function for topfd*/
+std::string geneTopfdCommand(const TopfdParaPtr& para_ptr,
+                             const std::vector<std::string> spec_file_lst) {
+#if defined(_WIN32) || defined(_WIN64) || defined(__MINGW32__) || \
+    defined(__MINGW64__)
   std::string exe_path = para_ptr->getExeDir() + "\\" + "topfd.exe ";
 #else
   std::string exe_path = para_ptr->getExeDir() + "/" + "topfd ";
@@ -52,17 +53,19 @@ std::string geneTopfdCommand(TopfdParaPtr para_ptr,
     command = command + "-o ";
   }
   command = command + "-u " + std::to_string(para_ptr->getThreadNum()) + " ";
-  if (!para_ptr->isGeneHtmlFolder()) {
+  if (para_ptr->isAANumBasedFilter()) {
     command = command + "-g ";
-  }
-  if (!para_ptr->isAANumBasedFilter()) {
-    command = command + "-d ";
   }
   if (para_ptr->isSearchPrecWindow()) {
     command = command + "-f ";
   }
   if (para_ptr->isUseSingleScanNoiseLevel()) {
     command = command + "-i ";
+  }
+  if (!para_ptr->isGeneSql()) {
+    command = command + "-N ";
+  } else if (para_ptr->isSql3d()) {
+    command = command + "-D ";
   }
   for (size_t i = 0; i < spec_file_lst.size(); i++) {
     command = command + spec_file_lst[i] + " ";
@@ -71,84 +74,79 @@ std::string geneTopfdCommand(TopfdParaPtr para_ptr,
 }
 
 /*function for topdia*/
-std::string geneTopdiaCommand(TopfdParaPtr topfd_para_ptr, 
-                              TopdiaParaPtr topdia_para_ptr,
+std::string geneTopdiaCommand(const TopfdParaPtr& topfd_para_ptr,
+                              const TopdiaParaPtr& topdia_para_ptr,
                               const std::vector<std::string> spec_file_lst) {
-
-#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
-        std::string exe_path = topfd_para_ptr->getExeDir() + "\\" + "topdia.exe ";
+#if defined(_WIN32) || defined(_WIN64) || defined(__MINGW32__) || \
+    defined(__MINGW64__)
+  std::string exe_path = topfd_para_ptr->getExeDir() + "\\" + "topdia.exe ";
 #else
-        std::string exe_path = topfd_para_ptr->getExeDir() + "/" + "topdia ";
+  std::string exe_path = topfd_para_ptr->getExeDir() + "/" + "topdia ";
 #endif
 
-    std::string command = exe_path;
-    std::stringstream oss;
-    oss << "-a " << topfd_para_ptr->getActivation() << " ";
-    oss << "-c " << topfd_para_ptr->getMaxCharge() << " ";
-    oss << "-m " << topfd_para_ptr->getMaxMass() << " ";
-    oss << "-e " << topfd_para_ptr->getMzError() << " ";
-    oss << "-r " << topfd_para_ptr->getMsOneSnRatio() << " ";
-    oss << "-s " << topfd_para_ptr->getMsTwoSnRatio() << " ";
-    oss << "-w " << topfd_para_ptr->getPrecWindowWidth() << " ";
-    oss << "-t " << topfd_para_ptr->getMs1EcscoreCutoff() << " ";
-    oss << "-T " << topfd_para_ptr->getMs2EcscoreCutoff() << " ";
-    oss << "-b " << topfd_para_ptr->getMs1MinScanNum() << " ";
-    oss << "-B " << topfd_para_ptr->getMs2MinScanNum() << " ";
-    oss << "-v " << topdia_para_ptr->getPseudoScoreCutoff() << " ";
-    oss << "-V " << topdia_para_ptr->getPseudoMinPeaks() << " ";
-    oss << "-p " << topdia_para_ptr->getMs1SeedEnvInteCorrToleCutoff() << " ";
-    oss << "-P " << topdia_para_ptr->getMs2SeedEnvInteCorrToleCutoff() << " ";
-    command = command + oss.str();
-    if (topfd_para_ptr->isSortUseMsDeconv()) {
-        command = command + "-n ";
-    }
-    if (topfd_para_ptr->isMissingLevelOne()) {
-        command = command + "-o ";
-    }
-    command = command + "-u " + std::to_string(topfd_para_ptr->getThreadNum()) + " ";
-    if (!topfd_para_ptr->isGeneHtmlFolder()) {
-        command = command + "-g ";
-    }
-    if (!topfd_para_ptr->isAANumBasedFilter()) {
-        command = command + "-d ";
-    }
-    if (topfd_para_ptr->isUseSingleScanNoiseLevel()) {
-        command = command + "-i ";
-    }
-    for (size_t i = 0; i < spec_file_lst.size(); i++) {
-        command = command + spec_file_lst[i] + " ";
-    }
-    return command;
+  std::string command = exe_path;
+  std::stringstream oss;
+  oss << "-a " << topfd_para_ptr->getActivation() << " ";
+  oss << "-c " << topfd_para_ptr->getMaxCharge() << " ";
+  oss << "-m " << topfd_para_ptr->getMaxMass() << " ";
+  oss << "-e " << topfd_para_ptr->getMzError() << " ";
+  oss << "-r " << topfd_para_ptr->getMsOneSnRatio() << " ";
+  oss << "-s " << topfd_para_ptr->getMsTwoSnRatio() << " ";
+  oss << "-w " << topfd_para_ptr->getPrecWindowWidth() << " ";
+  oss << "-t " << topfd_para_ptr->getMs1EcscoreCutoff() << " ";
+  oss << "-T " << topfd_para_ptr->getMs2EcscoreCutoff() << " ";
+  oss << "-b " << topfd_para_ptr->getMs1MinScanNum() << " ";
+  oss << "-B " << topfd_para_ptr->getMs2MinScanNum() << " ";
+  oss << "-v " << topdia_para_ptr->getPseudoScoreCutoff() << " ";
+  oss << "-V " << topdia_para_ptr->getPseudoMinPeaks() << " ";
+  oss << "-p " << topdia_para_ptr->getMs1SeedEnvInteCorrToleCutoff() << " ";
+  oss << "-P " << topdia_para_ptr->getMs2SeedEnvInteCorrToleCutoff() << " ";
+  command = command + oss.str();
+  if (topfd_para_ptr->isSortUseMsDeconv()) {
+    command = command + "-n ";
+  }
+  if (topfd_para_ptr->isMissingLevelOne()) {
+    command = command + "-o ";
+  }
+  command =
+      command + "-u " + std::to_string(topfd_para_ptr->getThreadNum()) + " ";
+  if (topfd_para_ptr->isAANumBasedFilter()) {
+    command = command + "-d ";
+  }
+  if (topfd_para_ptr->isUseSingleScanNoiseLevel()) {
+    command = command + "-i ";
+  }
+  for (size_t i = 0; i < spec_file_lst.size(); i++) {
+    command = command + spec_file_lst[i] + " ";
+  }
+  return command;
 }
 
-std::map<std::string, std::string> topindex_para {
-  {"fixedMod", "-f"},
-    {"allowProtMod", "-n"},
-    {"searchType", "-d"},
-    {"threadNumber", "-u"},
-    {"massErrorTolerance", "-e"}
-};
-
+std::map<std::string, std::string> topindex_para{{"fixedMod", "-f"},
+                                                 {"allowProtMod", "-n"},
+                                                 {"searchType", "-d"},
+                                                 {"threadNumber", "-u"},
+                                                 {"massErrorTolerance", "-e"}};
 
 /*function for topindex*/
-std::string geneTopIndexCommand(std::map<std::string, 
-                                std::string> arguments_) {
-  #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
+std::string geneTopIndexCommand(std::map<std::string, std::string> arguments_) {
+#if defined(_WIN32) || defined(_WIN64) || defined(__MINGW32__) || \
+    defined(__MINGW64__)
   std::string exe_path = arguments_["executiveDir"] + "\\" + "topindex.exe ";
-  #else
+#else
   std::string exe_path = arguments_["executiveDir"] + "/" + "topindex ";
-  #endif
+#endif
 
   std::string command = exe_path;
 
-  for (std::map<std::string, std::string>::iterator it = arguments_.begin(); it != arguments_.end(); ++it) {
-    //if one of the topindex parameters
-    if (topindex_para.find(it->first) != topindex_para.end()) { 
-      //some parameters require extra processing
+  for (std::map<std::string, std::string>::iterator it = arguments_.begin();
+       it != arguments_.end(); ++it) {
+    // if one of the topindex parameters
+    if (topindex_para.find(it->first) != topindex_para.end()) {
+      // some parameters require extra processing
       if (it->first == "fixedMod" && it->second == "") {
-        continue; //don't add -f
-      }
-      else if (it->first == "searchType") {
+        continue;  // don't add -f
+      } else if (it->first == "searchType") {
         if (it->second != "TARGET") {
           command = command + "-d ";
         }
@@ -161,8 +159,8 @@ std::string geneTopIndexCommand(std::map<std::string,
   return command;
 };
 
-std::map<std::string, std::string> toppic_para {
-  {"activation", "-a "},
+std::map<std::string, std::string> toppic_para{
+    {"activation", "-a "},
     {"fixedMod", "-f "},
     {"allowProtMod", "-n "},
     {"allowProtType", "-R "},
@@ -178,84 +176,81 @@ std::map<std::string, std::string> toppic_para {
     {"cutoffSpectralValue", "-v "},
     {"cutoffProteoformType", "-T "},
     {"cutoffProteoformValue", "-V "},
+    {"cutoffProteinType", "-y "},
+    {"cutoffProteinValue", "-Y "},
     {"shiftNumber", "-s "},
     {"useFeatureFile", "-x "},
     {"keepTempFiles", "-k "},
     {"keepDecoyResults", "-K "},
-    {"geneHTMLFolder", "-g "},
     {"combinedOutputName", "-c "},
     {"massErrorTolerance", "-e "},
-    {"useLookupTable", "-l "},
+    {"envCnnCutoff", "-F "},
     {"groupSpectrumNumber", "-r "},
     {"localPtmFileName", "-B "},
-    {"localThreshold", "-H "}
-};
+    {"localThreshold", "-H "},
+    {"postMassMatch", "-E "},
+    {"postMinPeakNum", "-I "}};
 
-std::string geneToppicCommand(std::map<std::string, std::string> arguments_, 
-                              std::vector<std::string> spec_file_lst_) { 
-  #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
+std::string geneToppicCommand(std::map<std::string, std::string> arguments_,
+                              std::vector<std::string> spec_file_lst_) {
+#if defined(_WIN32) || defined(_WIN64) || defined(__MINGW32__) || \
+    defined(__MINGW64__)
   std::string exe_path = arguments_["executiveDir"] + "\\" + "toppic.exe ";
-  #else
+#else
   std::string exe_path = arguments_["executiveDir"] + "/" + "toppic ";
-  #endif
+#endif
 
   std::string command = exe_path;
 
-  for (std::map<std::string, std::string>::iterator it = arguments_.begin(); it != arguments_.end(); ++it) {
-    //if one of the toppic parameters
-    if (toppic_para.find(it->first) != toppic_para.end()) { 
-      //skip some paramters based on parameter values
+  for (std::map<std::string, std::string>::iterator it = arguments_.begin();
+       it != arguments_.end(); ++it) {
+    // if one of the toppic parameters
+    if (toppic_para.find(it->first) != toppic_para.end()) {
+      // skip some parameters based on parameter values
       LOG_DEBUG(it->first << " " << it->second);
       if (it->first == "fixedMod" && it->second == "") {
         continue;
-      }
-      else if (it->first == "combinedOutputName" && it->second == "") {
+      } else if (it->first == "combinedOutputName" && it->second == "") {
         continue;
-      }
-      else if (it->first == "useFeatureFile") {
+      } else if (it->first == "useFeatureFile") {
         if (it->second == "false") {
           command = command + toppic_para[it->first];
         }
-      }
-      else if (it->first == "searchType") {
+      } else if (it->first == "searchType") {
         if (it->second != "TARGET") {
           command = command + toppic_para[it->first];
         }
-      }
-      else if (it->first == "keepTempFiles" || it->first == "keepDecoyResults") {
+      } else if (it->first == "keepTempFiles" ||
+                 it->first == "keepDecoyResults") {
         if (it->second == "true") {
           command = command + toppic_para[it->first];
         }
-      }
-      else if (it->first == "geneHTMLFolder" ) {//for geneHTML folder, the argument should be added when the value is false
-        if (it->second != "true") {
-          command = command + toppic_para[it->first];
-        }
-      }
-      else if (it->first == "useApproxSpectra") {
+      } else if (it->first == "useApproxSpectra") {
         if (it->second == "true") {
           command = command + toppic_para[it->first];
         }
-      }
-      else if (it->first == "variablePtmFileName" && it->second == "") {
-        continue; //don't add -b
-      }
-      else if (it->first == "localPtmFileName" && it->second == "") {
-        continue; //don't add -B
-      }
-      else if (it->first == "useLookupTable") {
-        if (it->second == "true") {
+      } else if (it->first == "postMassMatch") {
+        // on by default; -E (--disable-post-match) turns it off
+        if (it->second == "false") {
           command = command + toppic_para[it->first];
         }
-      }
-      else{
+      } else if (it->first == "postMinPeakNum") {
+        // only meaningful while post mass matching is on
+        if (arguments_["postMassMatch"] == "true") {
+          command = command + toppic_para[it->first] + it->second + " ";
+        }
+      } else if (it->first == "variablePtmFileName" && it->second == "") {
+        continue;  // don't add -b
+      } else if (it->first == "localPtmFileName" && it->second == "") {
+        continue;  // don't add -B
+      } else {
         command = command + toppic_para[it->first] + it->second + " ";
       }
+    } else {  // parameter is not found anywhere
+      LOG_DEBUG("Parameter " << it->first
+                             << " from toppic was not found in any apps!");
     }
-    else {//parameter is not found anywhere
-      LOG_DEBUG("Parameter " << it->first << " from toppic was not found in any apps!");
-    }
-  }  
+  }
   command = command + arguments_["oriDatabaseFileName"] + " ";
 
   for (size_t i = 0; i < spec_file_lst_.size(); i++) {
@@ -265,8 +260,8 @@ std::string geneToppicCommand(std::map<std::string, std::string> arguments_,
   return command;
 };
 
-std::map<std::string, std::string> topmg_para {
-  {"activation", "-a "},
+std::map<std::string, std::string> topmg_para{
+    {"activation", "-a "},
     {"fixedMod", "-f "},
     {"allowProtMod", "-n "},
     {"searchType", "-d "},
@@ -277,74 +272,69 @@ std::map<std::string, std::string> topmg_para {
     {"cutoffSpectralValue", "-v "},
     {"cutoffProteoformType", "-T "},
     {"cutoffProteoformValue", "-V "},
+    {"cutoffProteinType", "-y "},
+    {"cutoffProteinValue", "-Y "},
     {"shiftNumber", "-s "},
     {"useFeatureFile", "-x "},
     {"keepTempFiles", "-k "},
     {"keepDecoyResults", "-K "},
-    {"geneHTMLFolder", "-g "},
     {"combinedOutputName", "-c "},
     {"massErrorTolerance", "-e "},
+    {"envCnnCutoff", "-F "},
     {"useAsfDiag", "-D "},
     {"varModFileName", "-i "},
     {"varPtmNumber", "-P "},
     {"wholeProteinOnly", "-w "},
     {"proteoGraphGap", "-j "},
-    {"varPtmNumInGap", "-G "}
-};
+    {"varPtmNumInGap", "-G "}};
 
-std::string geneTopmgCommand(std::map<std::string, std::string> arguments_, 
-                             std::vector<std::string> spec_file_lst_) { 
-  #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
+std::string geneTopmgCommand(std::map<std::string, std::string> arguments_,
+                             std::vector<std::string> spec_file_lst_) {
+#if defined(_WIN32) || defined(_WIN64) || defined(__MINGW32__) || \
+    defined(__MINGW64__)
   std::string exe_path = arguments_["executiveDir"] + "\\" + "topmg.exe ";
-  #else
+#else
   std::string exe_path = arguments_["executiveDir"] + "/" + "topmg ";
-  #endif
+#endif
 
   std::string command = exe_path;
 
-  for (std::map<std::string, std::string>::iterator it = arguments_.begin(); it != arguments_.end(); ++it) {
-    if (topmg_para.find(it->first) != topmg_para.end()) { //if one of the common parameters
-      //skip some paramters based on parameter values
+  for (std::map<std::string, std::string>::iterator it = arguments_.begin();
+       it != arguments_.end(); ++it) {
+    if (topmg_para.find(it->first) !=
+        topmg_para.end()) {  // if one of the common parameters
+      // skip some parameters based on parameter values
       if (it->first == "fixedMod" && it->second == "") {
         continue;
-      }
-      else if (it->first == "combinedOutputName" && it->second == "") {
+      } else if (it->first == "combinedOutputName" && it->second == "") {
         continue;
-      }
-      else if (it->first == "useFeatureFile") {
+      } else if (it->first == "useFeatureFile") {
         if (it->second == "false") {
           command = command + topmg_para[it->first];
         }
-      }
-      else if (it->first == "searchType") {
+      } else if (it->first == "searchType") {
         if (it->second != "TARGET") {
           command = command + topmg_para[it->first];
         }
-      }
-      else if (it->first == "keepTempFiles" || it->first == "keepDecoyResults") {
+      } else if (it->first == "keepTempFiles" ||
+                 it->first == "keepDecoyResults") {
         if (it->second == "true") {
           command = command + topmg_para[it->first];
         }
       }
-      else if (it->first == "geneHTMLFolder" ) {//for geneHTML folder, the argument should be added when the value is false
-        if (it->second != "true") {
-          command = command + topmg_para[it->first];
-        }
-      }
-      //some parameters require extra processing
+      // some parameters require extra processing
       else if (it->first == "useAsfDiag" || it->first == "wholeProteinOnly") {
         if (it->second == "true") {
           command = command + topmg_para[it->first];
         }
-      }
-      else {
+      } else {
         command = command + topmg_para[it->first] + it->second + " ";
       }
+    } else {  // parameter is not found anywhere
+      LOG_DEBUG("Parameter " << it->first
+                             << " from topmg was not found in any apps!");
     }
-    else {//parameter is not found anywhere
-      LOG_DEBUG("Parameter " << it->first << " from topmg was not found in any apps!");
-    }
-  }  
+  }
   command = command + arguments_["oriDatabaseFileName"] + " ";
 
   for (size_t i = 0; i < spec_file_lst_.size(); i++) {
@@ -353,38 +343,39 @@ std::string geneTopmgCommand(std::map<std::string, std::string> arguments_,
   return command;
 };
 
-std::map<std::string, std::string> topdiff_para {
-  {"errorTolerance", "-e "},
+std::map<std::string, std::string> topdiff_para{
+    {"errorTolerance", "-e "},
     {"mergedOutputFileName", "-o "},
     {"toolName", "-t "},
 };
 
-
 // function for topdiff
-std::string geneTopDiffCommand(std::map<std::string, std::string> arguments_, 
-                               std::vector<std::string> spec_file_lst_) { 
-  #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
+std::string geneTopDiffCommand(std::map<std::string, std::string> arguments_,
+                               std::vector<std::string> spec_file_lst_) {
+#if defined(_WIN32) || defined(_WIN64) || defined(__MINGW32__) || \
+    defined(__MINGW64__)
   std::string exe_path = arguments_["executiveDir"] + "\\" + "topdiff.exe ";
-  #else
+#else
   std::string exe_path = arguments_["executiveDir"] + "/" + "topdiff ";
-  #endif
+#endif
 
   std::string command = exe_path;
 
-  for (std::map<std::string, std::string>::iterator it = arguments_.begin(); it != arguments_.end(); ++it) {
+  for (std::map<std::string, std::string>::iterator it = arguments_.begin();
+       it != arguments_.end(); ++it) {
     if (topdiff_para.find(it->first) != topdiff_para.end()) {
       command = command + topdiff_para[it->first] + it->second + " ";
+    } else {  // parameter is not found anywhere
+      LOG_DEBUG("Parameter " << it->first
+                             << " from topdiff was not found in any apps!");
     }
-    else {//parameter is not found anywhere
-      LOG_DEBUG("Parameter " << it->first << " from topdiff was not found in any apps!");
-    }
-  }  
+  }
   for (size_t i = 0; i < spec_file_lst_.size(); i++) {
     command = command + spec_file_lst_[i] + " ";
   }
   return command;
 };
 
-}
+}  // namespace command
 
-}
+}  // namespace toppic

@@ -1,0 +1,56 @@
+# Uninstall script, run by `make uninstall` (see the uninstall target in the
+# top-level CMakeLists.txt). It is configured into the build directory at
+# configure time and executed with `cmake -P`.
+#
+# It removes every file recorded in install_manifest.txt, which `make install`
+# writes into the build directory, and then deletes any directory below the
+# install prefix that the removal left empty (CMake's manifest lists files
+# only, so e.g. <prefix>/share/toppic would otherwise be left behind). DESTDIR
+# is honoured the same way `make install` honours it.
+
+set(MANIFEST "@CMAKE_BINARY_DIR@/install_manifest.txt")
+set(PREFIX   "$ENV{DESTDIR}@CMAKE_INSTALL_PREFIX@")
+
+if(NOT EXISTS "${MANIFEST}")
+  message(FATAL_ERROR
+    "Cannot find the install manifest: ${MANIFEST}\n"
+    "Nothing has been installed from this build directory (run 'make install' first).")
+endif()
+
+file(STRINGS "${MANIFEST}" files)
+
+set(dirs "")
+foreach(file IN LISTS files)
+  set(path "$ENV{DESTDIR}${file}")
+  if(IS_SYMLINK "${path}" OR EXISTS "${path}")
+    message(STATUS "Uninstalling ${path}")
+    file(REMOVE "${path}")
+    if(IS_SYMLINK "${path}" OR EXISTS "${path}")
+      message(FATAL_ERROR "Problem removing ${path}")
+    endif()
+  else()
+    message(STATUS "File ${path} does not exist (already removed?)")
+  endif()
+  get_filename_component(dir "${path}" DIRECTORY)
+  list(APPEND dirs "${dir}")
+endforeach()
+
+# Remove directories that are now empty, deepest first, walking up towards the
+# install prefix. The prefix itself is never removed.
+list(REMOVE_DUPLICATES dirs)
+list(SORT dirs ORDER DESCENDING)
+foreach(dir IN LISTS dirs)
+  while(NOT "${dir}" STREQUAL "${PREFIX}" AND IS_DIRECTORY "${dir}")
+    string(FIND "${dir}" "${PREFIX}/" pos)
+    if(NOT pos EQUAL 0)
+      break()   # outside the install prefix: leave it alone
+    endif()
+    file(GLOB entries LIST_DIRECTORIES true "${dir}/*")
+    if(entries)
+      break()   # not empty
+    endif()
+    message(STATUS "Removing empty directory ${dir}")
+    file(REMOVE_RECURSE "${dir}")
+    get_filename_component(dir "${dir}" DIRECTORY)
+  endwhile()
+endforeach()

@@ -1,48 +1,61 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
+#include "ms/spec/msalign_reader.hpp"
+
+#include <cstddef>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+
+#include "common/base/activation_base.hpp"
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
-#include "common/base/mass_constant.hpp"
-#include "common/base/activation_base.hpp"
 #include "ms/spec/peak_util.hpp"
-#include "ms/spec/msalign_reader.hpp"
 
 namespace toppic {
 
-MsAlignReader::MsAlignReader(const std::string &file_name):
-  file_name_(file_name) {
-    input_.open(file_name.c_str(), std::ios::in);
-    if (!input_.is_open()) {
-      LOG_ERROR("msalign file  " << file_name << " does not exist.");
-      exit(EXIT_FAILURE);
-    }
-    group_spec_num_ = 1;
+MsAlignReader::MsAlignReader(const std::string& file_name)
+    : file_name_(file_name) {
+  input_.open(file_name);
+  if (!input_.is_open()) {
+    LOG_ERROR("msalign file  " << file_name << " does not exist.");
+    exit(EXIT_FAILURE);
   }
+  group_spec_num_ = 1;
+}
 
-MsAlignReader::MsAlignReader(const std::string &file_name, 
-                             int group_spec_num,
-                             ActivationPtr activation_ptr):
-  file_name_(file_name),
-  group_spec_num_(group_spec_num),
-  activation_ptr_(activation_ptr) {
-    input_.open(file_name.c_str(), std::ios::in);
-    if (!input_.is_open()) {
-      LOG_ERROR("msalign file  " << file_name << " does not exist.");
-      exit(EXIT_FAILURE);
-    }
+MsAlignReader::MsAlignReader(const std::string& file_name, int group_spec_num,
+                             const ActivationPtr& activation_ptr)
+    : file_name_(file_name),
+      group_spec_num_(group_spec_num),
+      activation_ptr_(activation_ptr) {
+  input_.open(file_name);
+  if (!input_.is_open()) {
+    LOG_ERROR("msalign file  " << file_name << " does not exist.");
+    exit(EXIT_FAILURE);
   }
+}
+
+MsAlignReader::MsAlignReader(const std::string& file_name, int group_spec_num,
+                             const ActivationPtr& activation_ptr,
+                             double env_cnn_cutoff)
+    : MsAlignReader(file_name, group_spec_num, activation_ptr) {
+  env_cnn_cutoff_ = env_cnn_cutoff;
+}
 
 MsAlignReader::~MsAlignReader() {
   if (input_.is_open()) {
@@ -113,7 +126,7 @@ void MsAlignReader::readNext() {
       } else if (strs[0] == "SCANS") {
         scans = strs[1];
       } else if (strs[0] == "RETENTION_TIME") {
-        retention_time = std::stod(strs[1])*60;
+        retention_time = std::stod(strs[1]) * 60;
       } else if (strs[0] == "LEVEL") {
         level = std::stoi(strs[1]);
       } else if (strs[0] == "MS_ONE_ID") {
@@ -134,12 +147,12 @@ void MsAlignReader::readNext() {
         prec_inte_list = strs[1];
       } else if (strs[0] == "PRECURSOR_FEATURE_ID") {
         prec_feat_id_list = strs[1];
-      } 
+      }
     }
   }
   MsHeaderPtr header_ptr = std::make_shared<MsHeader>();
   header_ptr->setFileName(ms_file_name);
-  //set spec_id
+  // set spec_id
   if (spec_id < 0) {
     LOG_ERROR("Spectrum id is missing!");
     exit(EXIT_FAILURE);
@@ -147,7 +160,7 @@ void MsAlignReader::readNext() {
   header_ptr->setSpecId(spec_id);
   // set title
   if (title == "") {
-    title = "sp_" + str_util::toString(spec_id);
+    title = "sp_" + std::to_string(spec_id);
   }
   header_ptr->setTitle(title);
   // set scans
@@ -167,7 +180,7 @@ void MsAlignReader::readNext() {
   if (level > 1) {
     header_ptr->setMsOneId(ms_one_id);
     header_ptr->setMsOneScan(ms_one_scan);
-    //set prec window 
+    // set prec window
     if (prec_win_begin < 0 || prec_win_end < 0) {
       LOG_ERROR("Precursor window information is missing in MSALIGN file!");
       exit(EXIT_FAILURE);
@@ -179,24 +192,27 @@ void MsAlignReader::readNext() {
       // use the default activation if the information is missing
       header_ptr->setActivationPtr(activation_ptr_);
     } else if (activation != "") {
-      ActivationPtr activation_ptr = ActivationBase::getActivationPtrByName(activation);
+      ActivationPtr activation_ptr =
+          ActivationBase::getActivationPtrByName(activation);
       header_ptr->setActivationPtr(activation_ptr);
     }
     // set precursor information
     PrecursorPtrVec prec_ptr_vec;
     if (prec_mass_list != "") {
       std::vector<std::string> mass_strs = str_util::split(prec_mass_list, ":");
-      std::vector<std::string> feat_id_strs = str_util::split(prec_feat_id_list, ":");
-      std::vector<std::string> charge_strs = str_util::split(prec_charge_list, ":");
+      std::vector<std::string> feat_id_strs =
+          str_util::split(prec_feat_id_list, ":");
+      std::vector<std::string> charge_strs =
+          str_util::split(prec_charge_list, ":");
       std::vector<std::string> inte_strs = str_util::split(prec_inte_list, ":");
-      for (size_t id = 0; id < mass_strs.size(); id++) {    
+      for (size_t id = 0; id < mass_strs.size(); id++) {
         double prec_mass = std::stod(mass_strs[id]);
         int prec_feat_id = std::stoi(feat_id_strs[id]);
         int prec_charge = std::stoi(charge_strs[id]);
         double prec_inte = std::stod(inte_strs[id]);
-        double prec_mono_mz = peak_util::compMz(prec_mass, prec_charge); 
-        PrecursorPtr prec_ptr = std::make_shared<Precursor>(id, prec_feat_id, 
-                                                            prec_mono_mz, prec_charge, prec_inte);
+        double prec_mono_mz = peak_util::compMz(prec_mass, prec_charge);
+        PrecursorPtr prec_ptr = std::make_shared<Precursor>(
+            id, prec_feat_id, prec_mono_mz, prec_charge, prec_inte);
         prec_ptr_vec.push_back(prec_ptr);
       }
     }
@@ -216,14 +232,17 @@ void MsAlignReader::readNext() {
       if (strs.size() > 3) {
         score = std::stod(strs[3]);
       }
-      DeconvPeakPtr peak_ptr = std::make_shared<DeconvPeak>(spec_id, peak_id, mass, inte,
-                                                            charge, score);
-      peak_ptr_list.push_back(peak_ptr);
+      if (score >= env_cnn_cutoff_) {
+        DeconvPeakPtr peak_ptr = std::make_shared<DeconvPeak>(
+            spec_id, peak_id, mass, inte, charge, score);
+        peak_ptr_list.push_back(peak_ptr);
+      }
       peak_id++;
     }
   }
 
-  deconv_ms_ptr_ = std::make_shared<Ms<DeconvPeakPtr> >(header_ptr, peak_ptr_list);
+  deconv_ms_ptr_ = std::make_shared<Ms<DeconvPeakPtr> >(
+      header_ptr, std::move(peak_ptr_list));
   current_++;
 }
 
@@ -242,11 +261,11 @@ DeconvMsPtrVec MsAlignReader::getNextMsPtrVec() {
     }
     deconv_ms_ptr_vec.push_back(deconv_ms_ptr_);
   }
-  // make sure that all MS/MS spectra have the same precursors 
-  // we may need to implement deep copy here to make sure the 
+  // make sure that all MS/MS spectra have the same precursors
+  // we may need to implement deep copy here to make sure the
   // scans do not share precursor instances
-  PrecursorPtrVec prec_ptr_vec =
-    deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecPtrVec();
+  const PrecursorPtrVec& prec_ptr_vec =
+      deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecPtrVec();
   for (int i = 1; i < group_spec_num_; i++) {
     deconv_ms_ptr_vec[i]->getMsHeaderPtr()->setPrecPtrVec(prec_ptr_vec);
   }

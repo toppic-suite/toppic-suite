@@ -1,96 +1,100 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-#include <map>
-#include <string>
-#include <vector>
-#include <sstream>
-#include <iostream>
-
-#include <QFileDialog>
-#include <QElapsedTimer>
-#include <QMessageBox>
-#include <QCloseEvent>
-#include <QDesktopServices>
-#include <QScrollBar>
-#include <QProcess>
-#include <QDebug>
-
-#include "common/util/file_util.hpp"
-#include "common/util/version.hpp"
-#include "common/util/mem_check.hpp"
-
-#include "gui/util/command.hpp"
-#include "gui/util/gui_message.hpp"
-#include "gui/topfd/ui_topfddialog.h"
 #include "gui/topfd/topfddialog.hpp"
 
-TopFDDialog::TopFDDialog(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::TopFDDialog) {
-      para_ptr_ = std::make_shared<toppic::TopfdPara>();
-      ui->setupUi(this);
-      std::string title = "TopFD v." + toppic::Version::getVersion();
-      QString qstr = QString::fromStdString(title);
-      this->setWindowTitle(qstr);
-      lastDir_ = ".";
-      ui->maxChargeEdit->setValidator(new QIntValidator(1, 100, this));
-      ui->maxMassEdit->setValidator(new QIntValidator(1, 1000000, this));
-      QRegExp rx1("^0\\.[0]\\d{0,2}[1-9]|0.1$");
-      QRegExpValidator *validator1 = new QRegExpValidator(rx1, this);
-      ui->mzErrorEdit->setValidator(validator1);
-      QRegExp rx2("^\\d{1,6}\\.\\d{0,2}$");
-      QRegExpValidator *validator2 = new QRegExpValidator(rx2, this);
-      ui->ms1snRatioEdit->setValidator(validator2);
-      ui->ms2snRatioEdit->setValidator(validator2);
-      ui->splitRatioEdit->setValidator(validator2);
-      ui->threadNumberEdit->setValidator(new QIntValidator(0, 1000, this));
-      ui->minScanNumEdit->setValidator(new QIntValidator(1, 3, this));
-      ui->ecscoreCutoffEdit->setValidator(new QDoubleValidator(0.0, 1.0, 4, this));
-      QRegExp rx3("^\\d{1,4}\\.\\d{0,2}|10000$");
-      QRegExpValidator *validator3 = new QRegExpValidator(rx3, this);
-      ui->windowSizeEdit->setValidator(validator3);
-      QFont font;
-      QFont outputFont;
-#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
-      font.setFamily(QStringLiteral("Calibri"));
-      outputFont.setFamily(QStringLiteral("Consolas"));
+#include <QCloseEvent>
+#include <QDebug>
+#include <QDesktopServices>
+#include <QElapsedTimer>
+#include <QFileDialog>
+#include <QFontDatabase>
+#include <QMessageBox>
+#include <QProcess>
+#include <QRegularExpression>
+#include <QRegularExpressionValidator>
+#include <QScrollBar>
+#include <iostream>
+#include <map>
+#include <sstream>
+#include <string>
+#include <vector>
+
+#include "common/util/file_util.hpp"
+#include "common/util/mem_check.hpp"
+#include "common/util/version.hpp"
+#include "gui/topfd/ui_topfddialog.h"
+#include "gui/util/command.hpp"
+#include "gui/util/gui_message.hpp"
+
+TopFDDialog::TopFDDialog(QWidget* parent)
+    : QMainWindow(parent), ui(new Ui::TopFDDialog) {
+  para_ptr_ = std::make_shared<toppic::TopfdPara>();
+  ui->setupUi(this);
+  std::string title = "TopFD v." + toppic::Version::getVersion();
+  QString qstr = QString::fromStdString(title);
+  this->setWindowTitle(qstr);
+  lastDir_ = ".";
+  ui->maxChargeEdit->setValidator(new QIntValidator(1, 100, this));
+  ui->maxMassEdit->setValidator(new QIntValidator(1, 1000000, this));
+  QRegularExpression rx1("^0\\.[0]\\d{0,2}[1-9]|0.1$");
+  QRegularExpressionValidator* validator1 = new QRegularExpressionValidator(rx1, this);
+  ui->mzErrorEdit->setValidator(validator1);
+  QRegularExpression rx2("^\\d{1,6}\\.\\d{0,2}$");
+  QRegularExpressionValidator* validator2 = new QRegularExpressionValidator(rx2, this);
+  ui->ms1snRatioEdit->setValidator(validator2);
+  ui->ms2snRatioEdit->setValidator(validator2);
+  ui->splitRatioEdit->setValidator(validator2);
+  ui->threadNumberEdit->setValidator(new QIntValidator(0, 1000, this));
+  ui->minScanNumEdit->setValidator(new QIntValidator(1, 3, this));
+  ui->ecscoreCutoffEdit->setValidator(new QDoubleValidator(0.0, 1.0, 4, this));
+  QRegularExpression rx3("^\\d{1,4}\\.\\d{0,2}|10000$");
+  QRegularExpressionValidator* validator3 = new QRegularExpressionValidator(rx3, this);
+  ui->windowSizeEdit->setValidator(validator3);
+  QFont font;
+  QFont outputFont;
+#if defined(_WIN32) || defined(_WIN64) || defined(__MINGW32__) || \
+    defined(__MINGW64__)
+  font.setFamily(QStringLiteral("Calibri"));
+  outputFont.setFamily(QStringLiteral("Consolas"));
 #else
-      font.setFamily(QStringLiteral("Monospace"));
-      outputFont.setFamily(QStringLiteral("Monospace"));
+  const QString monoFamily =
+      QFontDatabase::systemFont(QFontDatabase::FixedFont).family();
+  font.setFamily(monoFamily);
+  outputFont.setFamily(monoFamily);
 #endif
-      font.setPixelSize(12);
-      outputFont.setPixelSize(12);
-      QApplication::setFont(font);
-      ui->outputTextBrowser->setFont(outputFont);
-      TopFDDialog::on_defaultButton_clicked();
-    }
+  font.setPixelSize(12);
+  outputFont.setPixelSize(12);
+  QApplication::setFont(font);
+  ui->outputTextBrowser->setFont(outputFont);
+  TopFDDialog::on_defaultButton_clicked();
+}
 
 TopFDDialog::~TopFDDialog() {
-  if(process_.state()!=QProcess::NotRunning) {
+  if (process_.state() != QProcess::NotRunning) {
     process_.kill();
   }
   delete ui;
 }
 
-void TopFDDialog::closeEvent(QCloseEvent *event) {
-  if(process_.state()!=QProcess::NotRunning) {
+void TopFDDialog::closeEvent(QCloseEvent* event) {
+  if (process_.state() != QProcess::NotRunning) {
     if (!continueToClose()) {
       event->ignore();
       return;
-    }
-    else {
+    } else {
       process_.kill();
     }
   }
@@ -101,7 +105,8 @@ void TopFDDialog::closeEvent(QCloseEvent *event) {
 void TopFDDialog::on_clearButton_clicked() {
   ui->listWidget->clear();
   ui->outputTextBrowser->clear();
-  ui->outputTextBrowser->setText("Click the Start button to process the spectrum files.");
+  ui->outputTextBrowser->setText(
+      "Click the Start button to process the spectrum files.");
   lastDir_ = "/";
 }
 
@@ -113,20 +118,27 @@ void TopFDDialog::on_defaultButton_clicked() {
   ui->mzErrorEdit->setText(QString::number(para_ptr->getMzError()));
   ui->ms1snRatioEdit->setText(QString::number(para_ptr->getMsOneSnRatio()));
   ui->ms2snRatioEdit->setText(QString::number(para_ptr->getMsTwoSnRatio()));
-  ui->splitRatioEdit->setText(QString::number(para_ptr->getSplitIntensityRatio()));
+  ui->splitRatioEdit->setText(
+      QString::number(para_ptr->getSplitIntensityRatio()));
   ui->windowSizeEdit->setText(QString::number(para_ptr->getPrecWindowWidth()));
   ui->threadNumberEdit->setText(QString::number(para_ptr->getThreadNum()));
-  ui->ecscoreCutoffEdit->setText(QString::number(para_ptr->getMs1EcscoreCutoff()));
+  ui->ecscoreCutoffEdit->setText(
+      QString::number(para_ptr->getMs1EcscoreCutoff()));
   ui->minScanNumEdit->setText(QString::number(para_ptr->getMs1MinScanNum()));
   ui->msDeconvCheckBox->setChecked(para_ptr->isSortUseMsDeconv());
   ui->missLevelOneCheckBox->setChecked(para_ptr->isMissingLevelOne());
-  ui->geneHTMLCheckBox->setChecked(para_ptr->isGeneHtmlFolder());
-  ui->disableFilteringCheckBox->setChecked(!para_ptr->isAANumBasedFilter());
-  ui->disableAdditionalFeatureSearchCheckBox->setChecked(!para_ptr->isSearchPrecWindow());
-  ui->singleScanNoiseLevelCheckBox->setChecked(para_ptr->isUseSingleScanNoiseLevel());
+  ui->fragNumFilteringCheckBox->setChecked(para_ptr->isAANumBasedFilter());
+  ui->disableAdditionalFeatureSearchCheckBox->setChecked(
+      !para_ptr->isSearchPrecWindow());
+  ui->singleScanNoiseLevelCheckBox->setChecked(
+      para_ptr->isUseSingleScanNoiseLevel());
+  ui->noSqlCheckBox->setChecked(!para_ptr->isGeneSql());
+  ui->sql3dCheckBox->setChecked(para_ptr->isSql3d());
+  ui->sql3dCheckBox->setEnabled(para_ptr->isGeneSql());
 
   ui->outputTextBrowser->clear();
-  ui->outputTextBrowser->setText("Click the Start button to process the spectrum files.");
+  ui->outputTextBrowser->setText(
+      "Click the Start button to process the spectrum files.");
   ui->activationComboBox->setCurrentIndex(0);
 }
 
@@ -140,9 +152,7 @@ std::vector<std::string> TopFDDialog::getSpecFileList() {
 
 void TopFDDialog::on_addButton_clicked() {
   QStringList spfiles = QFileDialog::getOpenFileNames(
-      this,
-      "Select spectrum files",
-      lastDir_,
+      this, "Select spectrum files", lastDir_,
       "Spectra files (*.mzXML *.mzML *.mzxml *.mzml)");
   for (int i = 0; i < spfiles.size(); i++) {
     QString spfile = spfiles.at(i);
@@ -155,7 +165,7 @@ void TopFDDialog::on_addButton_clicked() {
 
 void TopFDDialog::updatedir(QString s) {
   if (!s.isEmpty()) {
-    //lastDir_ = s;
+    // lastDir_ = s;
     lastDir_ = "";
   }
 }
@@ -180,8 +190,17 @@ bool TopFDDialog::ableToAdd(QString spfile) {
   return able;
 }
 
+// --sql-3d needs the SQLite database, so the option is unavailable (and
+// cleared) while the database output is turned off.
+void TopFDDialog::on_noSqlCheckBox_toggled(bool checked) {
+  if (checked) {
+    ui->sql3dCheckBox->setChecked(false);
+  }
+  ui->sql3dCheckBox->setEnabled(!checked);
+}
+
 void TopFDDialog::on_delButton_clicked() {
-  QListWidgetItem *delItem = ui->listWidget->currentItem();
+  QListWidgetItem* delItem = ui->listWidget->currentItem();
   ui->listWidget->removeItemWidget(delItem);
   delete delItem;
 }
@@ -191,32 +210,33 @@ void TopFDDialog::on_startButton_clicked() {
   toppic::TopfdParaPtr paraPtr = this->getParaPtr();
   std::vector<std::string> specFileList = this->getSpecFileList();
 
-  std::string cmd = toppic::command::geneTopfdCommand(para_ptr_, spec_file_lst_);
+  std::string cmd =
+      toppic::command::geneTopfdCommand(para_ptr_, spec_file_lst_);
   QString q_cmd = QString::fromStdString(cmd);
   q_cmd = q_cmd.trimmed();
   QStringList cmd_list = q_cmd.split(" ");
   QString prog = cmd_list[0];
   cmd_list.removeFirst();
 
-  //qDebug() << "start process ";
+  // qDebug() << "start process ";
   process_.start(prog, cmd_list);
   process_.waitForStarted();
-  //qDebug() << "start process finished";
+  // qDebug() << "start process finished";
 
   toppic::GuiMessage guiMsg;
   bool finish = false;
   while (!finish) {
-    if(process_.state()==QProcess::NotRunning) {
+    if (process_.state() == QProcess::NotRunning) {
       finish = true;
     }
     bool ready = process_.waitForReadyRead(100);
     if (ready || finish) {
-      //qDebug() << "read finished";
+      // qDebug() << "read finished";
       QByteArray byteArray = process_.readAllStandardOutput();
       QString str = QString(byteArray);
       std::string msg = guiMsg.getMsg(str.toStdString());
       if (msg != "") {
-        updateMsg(msg); 
+        updateMsg(msg);
       }
     }
     if (finish) {
@@ -224,11 +244,12 @@ void TopFDDialog::on_startButton_clicked() {
       QString str = QString(byteArray);
       if (process_.exitCode() != 0) {
         str = str + "\nERROR Quit status: Crashed. \n";
-        str = str + "ERROR Quit code: " + QString::number(process_.exitCode()) + ".\n";
+        str = str + "ERROR Quit code: " + QString::number(process_.exitCode()) +
+              ".\n";
       }
       std::string msg = guiMsg.getMsg(str.toStdString());
       if (msg != "") {
-        updateMsg(msg); 
+        updateMsg(msg);
       }
     }
     sleep(100);
@@ -236,17 +257,14 @@ void TopFDDialog::on_startButton_clicked() {
   unlockDialog();
 }
 
-void TopFDDialog::on_exitButton_clicked() {
-  close();
-}
+void TopFDDialog::on_exitButton_clicked() { close(); }
 
 bool TopFDDialog::continueToClose() {
-  if (QMessageBox::question(this,
-                            tr("Quit"),
-                            tr("TopFD is still running. Are you sure you want to quit?"),
-                            QMessageBox::Yes | QMessageBox::No,
-                            QMessageBox::No)
-      == QMessageBox::Yes) {
+  if (QMessageBox::question(
+          this, tr("Quit"),
+          tr("TopFD is still running. Are you sure you want to quit?"),
+          QMessageBox::Yes | QMessageBox::No,
+          QMessageBox::No) == QMessageBox::Yes) {
     return true;
   } else {
     return false;
@@ -268,27 +286,39 @@ toppic::TopfdParaPtr TopFDDialog::getParaPtr() {
   std::string exe_dir = toppic::file_util::getExecutiveDir(path.toStdString());
   para_ptr_->setExeDir(exe_dir);
   if (toppic::file_util::checkSpace(exe_dir)) {
-    ui->outputTextBrowser->setText("Current directory " + QString::fromStdString(exe_dir) + " contains space and will cause errors in the program!");
+    ui->outputTextBrowser->setText(
+        "Current directory " + QString::fromStdString(exe_dir) +
+        " contains space and will cause errors in the program!");
   }
   para_ptr_->setResourceDir(toppic::file_util::getResourceDir(exe_dir));
   para_ptr_->setMaxCharge(std::stoi(ui->maxChargeEdit->text().toStdString()));
   para_ptr_->setMaxMass(std::stod(ui->maxMassEdit->text().toStdString()));
   para_ptr_->setMzError(std::stod(ui->mzErrorEdit->text().toStdString()));
-  para_ptr_->setMsOneSnRatio(std::stod(ui->ms1snRatioEdit->text().toStdString()));
-  para_ptr_->setMsTwoSnRatio(std::stod(ui->ms2snRatioEdit->text().toStdString()));
-  para_ptr_->setSplitIntensityRatio(std::stod(ui->splitRatioEdit->text().toStdString()));
-  para_ptr_->setPrecWindowWidth(std::stod(ui->windowSizeEdit->text().toStdString()));
-  para_ptr_->setMissingLevelOne(ui->missLevelOneCheckBox->isChecked()); 
-  para_ptr_->setMs1EcscoreCutoff(std::stod(ui->ecscoreCutoffEdit->text().toStdString()));
-  para_ptr_->setMs1MinScanNum(std::stoi(ui->minScanNumEdit->text().toStdString()));
-  para_ptr_->setThreadNum(std::stoi(ui->threadNumberEdit->text().toStdString()));
-  para_ptr_->setGeneHtmlFolder(ui->geneHTMLCheckBox->isChecked());
+  para_ptr_->setMsOneSnRatio(
+      std::stod(ui->ms1snRatioEdit->text().toStdString()));
+  para_ptr_->setMsTwoSnRatio(
+      std::stod(ui->ms2snRatioEdit->text().toStdString()));
+  para_ptr_->setSplitIntensityRatio(
+      std::stod(ui->splitRatioEdit->text().toStdString()));
+  para_ptr_->setPrecWindowWidth(
+      std::stod(ui->windowSizeEdit->text().toStdString()));
+  para_ptr_->setMissingLevelOne(ui->missLevelOneCheckBox->isChecked());
+  para_ptr_->setMs1EcscoreCutoff(
+      std::stod(ui->ecscoreCutoffEdit->text().toStdString()));
+  para_ptr_->setMs1MinScanNum(
+      std::stoi(ui->minScanNumEdit->text().toStdString()));
+  para_ptr_->setThreadNum(
+      std::stoi(ui->threadNumberEdit->text().toStdString()));
   para_ptr_->setSortUseMsDeconv(ui->msDeconvCheckBox->isChecked());
   para_ptr_->setActivation(ui->activationComboBox->currentText().toStdString());
-  para_ptr_->setAANumBasedFilter(!(ui->disableFilteringCheckBox->isChecked()));
+  para_ptr_->setAANumBasedFilter(ui->fragNumFilteringCheckBox->isChecked());
 
-  para_ptr_->setSearchPrecWindow((ui->disableAdditionalFeatureSearchCheckBox->isChecked()));
-  para_ptr_->setUseSingleScanNoiseLevel(ui->singleScanNoiseLevelCheckBox->isChecked());
+  para_ptr_->setSearchPrecWindow(
+      (ui->disableAdditionalFeatureSearchCheckBox->isChecked()));
+  para_ptr_->setUseSingleScanNoiseLevel(
+      ui->singleScanNoiseLevelCheckBox->isChecked());
+  para_ptr_->setGeneSql(!ui->noSqlCheckBox->isChecked());
+  para_ptr_->setSql3d(ui->sql3dCheckBox->isChecked());
 
   return para_ptr_;
 }
@@ -310,13 +340,14 @@ void TopFDDialog::lockDialog() {
   ui->missLevelOneCheckBox->setEnabled(false);
   ui->windowSizeEdit->setEnabled(false);
   ui->outputButton->setEnabled(false);
-  ui->geneHTMLCheckBox->setEnabled(false);
   ui->msDeconvCheckBox->setEnabled(false);
   ui->activationComboBox->setEnabled(false);
-  ui->disableFilteringCheckBox->setEnabled(false);
-  ui->ecscoreCutoffEdit->setEnabled(false); 
+  ui->fragNumFilteringCheckBox->setEnabled(false);
+  ui->ecscoreCutoffEdit->setEnabled(false);
   ui->disableAdditionalFeatureSearchCheckBox->setEnabled(false);
-  ui->singleScanNoiseLevelCheckBox->setEnabled(false); 
+  ui->singleScanNoiseLevelCheckBox->setEnabled(false);
+  ui->noSqlCheckBox->setEnabled(false);
+  ui->sql3dCheckBox->setEnabled(false);
 }
 
 void TopFDDialog::unlockDialog() {
@@ -337,55 +368,50 @@ void TopFDDialog::unlockDialog() {
   ui->windowSizeEdit->setEnabled(true);
   ui->outputButton->setEnabled(true);
   ui->outputButton->setDefault(true);
-  ui->geneHTMLCheckBox->setEnabled(true);
   ui->msDeconvCheckBox->setEnabled(true);
   ui->activationComboBox->setEnabled(true);
-  ui->disableFilteringCheckBox->setEnabled(true);
-  ui->ecscoreCutoffEdit->setEnabled(true); 
+  ui->fragNumFilteringCheckBox->setEnabled(true);
+  ui->ecscoreCutoffEdit->setEnabled(true);
   ui->disableAdditionalFeatureSearchCheckBox->setEnabled(true);
-  ui->singleScanNoiseLevelCheckBox->setEnabled(true); 
+  ui->singleScanNoiseLevelCheckBox->setEnabled(true);
+  ui->noSqlCheckBox->setEnabled(true);
+  ui->sql3dCheckBox->setEnabled(!ui->noSqlCheckBox->isChecked());
 }
 
 bool TopFDDialog::checkError() {
   if (ui->maxChargeEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Maximum charge is empty!"),
+    QMessageBox::warning(this, tr("Warning"), tr("Maximum charge is empty!"),
                          QMessageBox::Yes);
     return true;
   }
 
   if (ui->maxMassEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Maximum mass is empty!"),
+    QMessageBox::warning(this, tr("Warning"), tr("Maximum mass is empty!"),
                          QMessageBox::Yes);
     return true;
   }
 
   if (ui->mzErrorEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
-                         tr("M/z error tolerance is empty!"),
-                         QMessageBox::Yes);
+                         tr("M/z error tolerance is empty!"), QMessageBox::Yes);
     return true;
   }
 
   if (ui->ms1snRatioEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("MS1 S/N ratio is empty!"),
+    QMessageBox::warning(this, tr("Warning"), tr("MS1 S/N ratio is empty!"),
                          QMessageBox::Yes);
     return true;
   }
 
   if (ui->ms2snRatioEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("MS2 S/N ratio is empty!"),
+    QMessageBox::warning(this, tr("Warning"), tr("MS2 S/N ratio is empty!"),
                          QMessageBox::Yes);
     return true;
   }
 
   if (ui->splitRatioEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
-                         tr("Split feature ratio is empty!"),
-                         QMessageBox::Yes);
+                         tr("Split feature ratio is empty!"), QMessageBox::Yes);
     return true;
   }
 
@@ -396,31 +422,33 @@ bool TopFDDialog::checkError() {
     return true;
   }
   if (ui->threadNumberEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Thread number is empty!"),
+    QMessageBox::warning(this, tr("Warning"), tr("Thread number is empty!"),
                          QMessageBox::Yes);
     return true;
   }
 
   if (ui->minScanNumEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
-                         tr("Mininum scan number is empty!"),
-                         QMessageBox::Yes);
+                         tr("Minimum scan number is empty!"), QMessageBox::Yes);
     return true;
   }
-
 
   if (ui->ecscoreCutoffEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("ECScore cutoff is empty!"),
+    QMessageBox::warning(this, tr("Warning"), tr("ECScore cutoff is empty!"),
                          QMessageBox::Yes);
     return true;
   }
-  if (ui->threadNumberEdit->text().toInt() > toppic::mem_check::getMaxThreads("topfd")) {
+  if (ui->threadNumberEdit->text().toInt() >
+      toppic::mem_check::getMaxThreads("topfd")) {
     int max_thread = toppic::mem_check::getMaxThreads("topfd");
-    QMessageBox::StandardButton reply = QMessageBox::warning(this, tr("Warning"),
-                         QString("Thread number is too large! Based on the memory size, up to %1 threads can run on this computer. Are you sure you want to proceed?").arg(max_thread).arg(max_thread),
-                         QMessageBox::Yes|QMessageBox::No);
+    QMessageBox::StandardButton reply = QMessageBox::warning(
+        this, tr("Warning"),
+        QString("Thread number is too large! Based on the memory size, up to "
+                "%1 threads can run on this computer. Are you sure you want to "
+                "proceed?")
+            .arg(max_thread)
+            .arg(max_thread),
+        QMessageBox::Yes | QMessageBox::No);
     if (reply == QMessageBox::No) {
       return true;
     }
@@ -450,4 +478,3 @@ void TopFDDialog::sleep(int wait) {
     QCoreApplication::processEvents();
   }
 }
-

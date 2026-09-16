@@ -1,33 +1,37 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#include "stat/tdgf/comp_prob_value.hpp"
 
 #include <cmath>
 
 #include "common/util/logger.hpp"
 #include "ms/factory/prm_peak_factory.hpp"
-#include "stat/tdgf/comp_prob_value.hpp"
 
 namespace toppic {
 
-CompProbValue::CompProbValue(double convert_ratio, const ResFreqPtrVec &residue_ptrs, 
-                             double residue_avg_len, int max_layer_num, int max_table_height, 
-                             double max_sp_prec_mass) {
+CompProbValue::CompProbValue(double convert_ratio,
+                             const ResFreqPtrVec& residue_ptrs,
+                             double residue_avg_len, int max_layer_num,
+                             int max_table_height, double max_sp_prec_mass) {
   convert_ratio_ = convert_ratio;
   residue_avg_len_ = residue_avg_len;
 
   for (size_t i = 0; i < residue_ptrs.size(); i++) {
-    int int_mass = static_cast<int> (std::round(residue_ptrs[i]->getMass() * convert_ratio));
+    int int_mass = static_cast<int>(
+        std::round(residue_ptrs[i]->getMass() * convert_ratio));
     residue_masses_.push_back(int_mass);
     residue_frequencies_.push_back(residue_ptrs[i]->getFreq());
   }
@@ -35,8 +39,8 @@ CompProbValue::CompProbValue(double convert_ratio, const ResFreqPtrVec &residue_
   max_layer_num_ = max_layer_num;
   max_table_height_ = max_table_height;
 
-  page_len_ = ORI_PAGE_LEN * static_cast<int> (convert_ratio_);
-  block_len_ = ORI_BLOCK_LEN * static_cast<int> (convert_ratio_);
+  page_len_ = ORI_PAGE_LEN * static_cast<int>(convert_ratio_);
+  block_len_ = ORI_BLOCK_LEN * static_cast<int>(convert_ratio_);
   page_table_ = new double[page_len_ * max_table_height_];
 
   max_sp_len_ = static_cast<int>(std::round(max_sp_prec_mass * convert_ratio_));
@@ -57,13 +61,12 @@ CompProbValue::~CompProbValue() {
   }
 }
 
-
-inline void CompProbValue::setFactors () {
-  //zero ptm 
+inline void CompProbValue::setFactors() {
+  // zero ptm
   factors_.push_back(1);
-  //one ptm
+  // one ptm
   factors_.push_back(K1());
-  //i>=2 ptms based on experience: divide K by i^2
+  // i>=2 ptms based on experience: divide K by i^2
   int max_shift_num = max_layer_num_ - 1;
   for (int i = 2; i <= max_shift_num; i++) {
     factors_.push_back(K2());
@@ -77,23 +80,23 @@ inline void CompProbValue::clearVar() {
 
   prob_peaks_.clear();
 
-  acid_dists_.clear();   // acidMass * height;
+  acid_dists_.clear();  // acidMass * height;
 
-  results_.clear();      // nLayer peak number, height;
+  results_.clear();  // nLayer peak number, height;
 
-  // the prob that a randam protein has the same precursor to the spectrum 
-  prec_probs_.clear(); 
+  // the prob that a randam protein has the same precursor to the spectrum
+  prec_probs_.clear();
 
-  //page_table_ = new double[page_len_ * max_table_height_];
+  // page_table_ = new double[page_len_ * max_table_height_];
   memset(pos_scores_, 0, (max_sp_len_ + block_len_) * sizeof(short));
   memset(page_table_, 0, page_len_ * max_table_height_ * sizeof(double));
 }
 
-void CompProbValue::compute(const ResFreqPtrVec &n_residue_ptrs, 
-                            const PrmPeakPtrVec2D &peak_ptr_2d, 
-                            int thresh, int shift_num, bool strict, 
-                            double prec_mass, PeakTolerancePtr tole_ptr) {
-  //clear variables
+void CompProbValue::compute(const ResFreqPtrVec& n_residue_ptrs,
+                            const PrmPeakPtrVec2D& peak_ptr_2d, int thresh,
+                            int shift_num, bool strict, double prec_mass,
+                            const PeakTolerancePtr& tole_ptr) {
+  // clear variables
   clearVar();
   // if peak number is 0, we do not compute p-value
   int peak_num = 0;
@@ -103,17 +106,18 @@ void CompProbValue::compute(const ResFreqPtrVec &n_residue_ptrs,
   if (peak_num == 0) {
     return;
   }
-  // if score is less than 1, we do not compute p-value 
+  // if score is less than 1, we do not compute p-value
   if (thresh < 1) {
     return;
   }
   // init n-terminal residue frequencies
   for (size_t i = 0; i < n_residue_ptrs.size(); i++) {
-    int int_mass = (int)std::round(n_residue_ptrs[i]->getMass() * convert_ratio_);
+    int int_mass =
+        (int)std::round(n_residue_ptrs[i]->getMass() * convert_ratio_);
     n_term_acid_masses_.push_back(int_mass);
     n_term_acid_frequencies_.push_back(n_residue_ptrs[i]->getFreq());
   }
-  // initialize height 
+  // initialize height
   height_ = thresh + 1;
   if (height_ > max_table_height_) {
     height_ = max_table_height_;
@@ -135,30 +139,34 @@ void CompProbValue::compute(const ResFreqPtrVec &n_residue_ptrs,
   comp();
 }
 
-inline void CompProbValue::setMassErr(const PrmPeakPtrVec2D &peak_ptr_2d, bool strict,
-                                      double prec_mass, PeakTolerancePtr tole_ptr) {
-  PrmPeakPtr zero_peak_ptr = prm_peak_factory::getZeroPeakPtr(0, prec_mass, tole_ptr, 0.0);
-  ProbPeak zero_peak (zero_peak_ptr, 0, height_, strict, convert_ratio_);
+inline void CompProbValue::setMassErr(const PrmPeakPtrVec2D& peak_ptr_2d,
+                                      bool strict, double prec_mass,
+                                      const PeakTolerancePtr& tole_ptr) {
+  PrmPeakPtr zero_peak_ptr =
+      prm_peak_factory::getZeroPeakPtr(0, prec_mass, tole_ptr, 0.0);
+  ProbPeak zero_peak(zero_peak_ptr, 0, height_, strict, convert_ratio_);
   prob_peaks_.push_back(zero_peak);
 
   for (size_t spec_id = 0; spec_id < peak_ptr_2d.size(); spec_id++) {
     for (size_t peak_id = 0; peak_id < peak_ptr_2d[spec_id].size(); peak_id++) {
-      ProbPeak cur_peak(peak_ptr_2d[spec_id][peak_id], spec_id, height_, strict, convert_ratio_);
+      ProbPeak cur_peak(peak_ptr_2d[spec_id][peak_id], spec_id, height_, strict,
+                        convert_ratio_);
       prob_peaks_.push_back(cur_peak);
     }
   }
-  // precursor mass 
-  PrmPeakPtr prec_peak_ptr = prm_peak_factory::getPrecPeakPtr(0, prec_mass, tole_ptr, 0.0);
+  // precursor mass
+  PrmPeakPtr prec_peak_ptr =
+      prm_peak_factory::getPrecPeakPtr(0, prec_mass, tole_ptr, 0.0);
   ProbPeak prec_peak(prec_peak_ptr, 0, height_, strict, convert_ratio_);
   prob_peaks_.push_back(prec_peak);
 }
 
-inline void CompProbValue::updatePosScores(const std::vector<ProbPeak> &prob_peaks, 
-                                           int spectrum_id) {
+inline void CompProbValue::updatePosScores(
+    const std::vector<ProbPeak>& prob_peaks, int spectrum_id) {
   int len = max_sp_len_ + block_len_;
   memset(tmp_pos_scores_, 0, len * sizeof(short));
-  //mass 0 and residue sum mass are not used for scoring 
-  for (size_t i = 1; i < prob_peaks.size() -1; i++) {
+  // mass 0 and residue sum mass are not used for scoring
+  for (size_t i = 1; i < prob_peaks.size() - 1; i++) {
     if (prob_peaks[i].spectrum_id_ == spectrum_id) {
       // here we use ceil/floor not round since each unit is very accurate
       int bgn = prob_peaks[i].mass_bgn_;
@@ -201,7 +209,7 @@ inline void CompProbValue::updatePosScores(const std::vector<ProbPeak> &prob_pea
   }
 }
 
-inline void CompProbValue::setPosScores(const std::vector<ProbPeak> &prob_peaks, 
+inline void CompProbValue::setPosScores(const std::vector<ProbPeak>& prob_peaks,
                                         int group_spec_num) {
   for (int i = 0; i < group_spec_num; i++) {
     updatePosScores(prob_peaks, i);
@@ -220,9 +228,9 @@ inline void CompProbValue::setVars(int thresh) {
   }
 }
 
-inline double CompProbValue::getShiftProb() { 
-  std::vector<double> probs (height_, 0);
-  size_t peak_index = prob_peaks_.size()-1;
+inline double CompProbValue::getShiftProb() {
+  std::vector<double> probs(height_, 0);
+  size_t peak_index = prob_peaks_.size() - 1;
 
   int prior_mass_bgn = prob_peaks_[peak_index].mass_bgn_ - residue_avg_len_;
   int prior_mass_end = prob_peaks_[peak_index].mass_bgn_ - 1;
@@ -268,29 +276,29 @@ void CompProbValue::compPrecProbs() {
     prob += results_[0][last_peak_index][i];
   }
   if (prob == 0 && prec_mass_minus_water >= 1000) {
-    LOG_INFO("Precursor probability is zero!"); 
+    LOG_INFO("Precursor probability is zero!");
   }
   prec_probs_.push_back(prob);
 
   // one ptm
-  double peak_width = prob_peaks_[last_peak_index].mass_end_ 
-    - prob_peaks_[last_peak_index].mass_bgn_ + 1;
-  // because in results[], all probabilities are calculated 
-  // with an error tolerance and all proteins are counted 
-  // several times. The prec_probability also needs to 
-  // to be normalized by the error tolerance. 
+  double peak_width = prob_peaks_[last_peak_index].mass_end_ -
+                      prob_peaks_[last_peak_index].mass_bgn_ + 1;
+  // because in results[], all probabilities are calculated
+  // with an error tolerance and all proteins are counted
+  // several times. The prec_probability also needs to
+  // to be normalized by the error tolerance.
   double one_ptm_prec_prob = shift_prob_ * peak_width;
   prec_probs_.push_back(one_ptm_prec_prob);
 
-  // i >=2 ptms 
+  // i >=2 ptms
   for (int i = 2; i <= shift_num_; i++) {
-    // for i ptms, all random proteins with an error 
+    // for i ptms, all random proteins with an error
     // < i * avg_residue_len are counted.
     double prec_prob = one_ptm_prec_prob * i;
-    // because in results[], all probabilities are calculated 
-    // with an error tolerance and all proteins are counted 
-    // several times. The prec_probability also needs to 
-    // to be normalized by the error tolerance. 
+    // because in results[], all probabilities are calculated
+    // with an error tolerance and all proteins are counted
+    // several times. The prec_probability also needs to
+    // to be normalized by the error tolerance.
     prec_prob = prec_prob * peak_width;
     prec_probs_.push_back(prec_prob);
   }
@@ -300,7 +308,8 @@ inline void CompProbValue::runClear(int page_pos) {
   std::memset(&page_table_[page_pos], 0, block_table_size_ * sizeof(double));
 }
 
-inline void CompProbValue::runFirstLayerInit(int win_table_bgn, int win_table_end) {
+inline void CompProbValue::runFirstLayerInit(int win_table_bgn,
+                                             int win_table_end) {
   for (size_t i = 0; i < n_term_acid_masses_.size(); i++) {
     if (n_term_acid_frequencies_[i] <= 0) {
       continue;
@@ -314,7 +323,7 @@ inline void CompProbValue::runFirstLayerInit(int win_table_bgn, int win_table_en
   }
 }
 
-inline void CompProbValue::runInit(std::vector<std::vector<double>> &results, 
+inline void CompProbValue::runInit(std::vector<std::vector<double>>& results,
                                    int win_table_bgn, int win_table_end) {
   // zero
   double base_prob = 1.0;
@@ -327,7 +336,8 @@ inline void CompProbValue::runInit(std::vector<std::vector<double>> &results,
       int score = pos_scores_[cur_pos];
       int k = cur_pos * height_ + score;
       if (k >= win_table_bgn && k <= win_table_end) {
-        page_table_[k % page_table_size_] += base_prob * n_term_acid_frequencies_[i];
+        page_table_[k % page_table_size_] +=
+            base_prob * n_term_acid_frequencies_[i];
       }
       if (k > win_table_end) {
         break;
@@ -340,9 +350,11 @@ inline void CompProbValue::runInit(std::vector<std::vector<double>> &results,
     if (prob_peaks_[i].table_end_ >= win_table_end) {
       break;
     }
-    if (prob_peaks_[i].table_end_ + residue_avg_len_ * height_ > win_table_bgn) {
-      for (int k = prob_peaks_[i].table_end_ + 1; k < prob_peaks_[i].table_end_
-           + residue_avg_len_ * height_; k += height_) {
+    if (prob_peaks_[i].table_end_ + residue_avg_len_ * height_ >
+        win_table_bgn) {
+      for (int k = prob_peaks_[i].table_end_ + 1;
+           k < prob_peaks_[i].table_end_ + residue_avg_len_ * height_;
+           k += height_) {
         if (k >= win_table_bgn && k <= win_table_end) {
           for (int h = 0; h < height_; h++) {
             page_table_[(k + h) % page_table_size_] += results[i][h];
@@ -356,8 +368,8 @@ inline void CompProbValue::runInit(std::vector<std::vector<double>> &results,
   }
 }
 
-inline void CompProbValue::runAddProb(int page_pos, int prev_pos, 
-                                      int size, double f) {
+inline void CompProbValue::runAddProb(int page_pos, int prev_pos, int size,
+                                      double f) {
   for (int i = page_pos; i < page_pos + size; i++) {
     page_table_[i] = page_table_[i] + page_table_[prev_pos] * f;
     prev_pos++;
@@ -394,16 +406,16 @@ inline void CompProbValue::runUpdate(int page_end, int scr_bgn, int scr_end) {
   }
 }
 
-inline void CompProbValue::compOneLayer(std::vector<std::vector<double>> &prev_results, 
-                                        bool is_first_layer,  
-                                        std::vector<std::vector<double>> &cur_results) { 
+inline void CompProbValue::compOneLayer(
+    std::vector<std::vector<double>>& prev_results, bool is_first_layer,
+    std::vector<std::vector<double>>& cur_results) {
   cur_results.clear();
   for (size_t i = 0; i < prob_peaks_.size(); i++) {
     std::vector<double> tmp(height_, 0.0);
     cur_results.push_back(tmp);
   }
   size_t peak_index = 0;
-  for (int win_table_bgn = 0; win_table_bgn < sp_table_size_; 
+  for (int win_table_bgn = 0; win_table_bgn < sp_table_size_;
        win_table_bgn = win_table_bgn + block_table_size_) {
     // clear result block
     int win_table_end = win_table_bgn + block_table_size_ - 1;
@@ -428,19 +440,20 @@ inline void CompProbValue::compOneLayer(std::vector<std::vector<double>> &prev_r
                    residue_frequencies_[i]);
       } else {
         int first_part_size = page_table_size_ - prev_block_bgn;
-        runAddProb(page_pos, prev_block_bgn, first_part_size, 
+        runAddProb(page_pos, prev_block_bgn, first_part_size,
                    residue_frequencies_[i]);
-        runAddProb(page_pos + first_part_size, 0, block_table_size_
-                   - first_part_size, residue_frequencies_[i]);
+        runAddProb(page_pos + first_part_size, 0,
+                   block_table_size_ - first_part_size,
+                   residue_frequencies_[i]);
       }
     }
     int sp_bgn = win_table_bgn / height_;
     int sp_end = win_table_bgn / height_ + block_len_ - 1;
     runUpdate(page_pos + block_table_size_ - 1, sp_bgn, sp_end);
-    // update peakPnt and get probs 
-    while (peak_index < prob_peaks_.size()
-           && prob_peaks_[peak_index].table_end_ <= win_table_end) {
-      for (int i = prob_peaks_[peak_index].mass_bgn_; 
+    // update peakPnt and get probs
+    while (peak_index < prob_peaks_.size() &&
+           prob_peaks_[peak_index].table_end_ <= win_table_end) {
+      for (int i = prob_peaks_[peak_index].mass_bgn_;
            i <= prob_peaks_[peak_index].mass_end_; i++) {
         for (int j = 0; j < height_; j++) {
           int pos = (i * height_ + j) % page_table_size_;
@@ -461,15 +474,14 @@ double CompProbValue::getCondProb(int shift, int thresh) {
   for (int score = thresh; score < height_; score++) {
     prob_sum = prob_sum + results_[shift][last_peak_index][score];
   }
-  //compute conditional probability
+  // compute conditional probability
   double cond_prob;
   if (prec_probs_[shift] > 0) {
     cond_prob = prob_sum / prec_probs_[shift];
-  }
-  else {
+  } else {
     cond_prob = 1000000;
   }
-  //normalization
+  // normalization
   double norm_cond_prob = cond_prob * factors_[shift];
   return norm_cond_prob;
 }
@@ -480,17 +492,16 @@ double CompProbValue::getCondProbOneValue(int shift, int value) {
   }
   int last_peak_index = prob_peaks_.size() - 1;
   double prob = results_[shift][last_peak_index][value];
-  //compute conditional probability
+  // compute conditional probability
   double cond_prob;
   if (prec_probs_[shift] > 0) {
     cond_prob = prob / prec_probs_[shift];
-  }
-  else {
+  } else {
     cond_prob = 1000000;
   }
-  //normalization
+  // normalization
   double norm_cond_prob = cond_prob * factors_[shift];
   return norm_cond_prob;
 }
 
-}
+}  // namespace toppic

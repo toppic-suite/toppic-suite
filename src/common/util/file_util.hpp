@@ -1,16 +1,17 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #ifndef TOPPIC_COMMON_UTIL_FILE_UTIL_HPP_
 #define TOPPIC_COMMON_UTIL_FILE_UTIL_HPP_
@@ -21,63 +22,63 @@ namespace toppic {
 
 namespace file_util {
 
-std::string getExecutiveDir(const std::string &argv_0);
+std::string getExecutiveDir(const std::string& argv_0);
 
 std::string getFileSeparator();
 
-std::string basenameFromEntirePath(const std::string &s);
+std::string basenameFromEntirePath(const std::string& s);
 
-std::string filenameFromEntirePath(const std::string &s);
+std::string filenameFromEntirePath(const std::string& s);
 
-std::string basename(const std::string &s);
+std::string basename(const std::string& s);
 
-std::string directory(const std::string &s);
+// True if `file_name` has an mzML or mzXML extension (case variants mzML,
+// mzXML, mzml, mzxml).
+bool isValidMzmlFile(const std::string& file_name);
 
-std::string absoluteDir(const std::string &s);
+std::string directory(const std::string& s);
 
-std::string absoluteName(const std::string &s);
+std::string absoluteDir(const std::string& s);
 
-std::string readFile(const std::string &file_name);
+std::string absoluteName(const std::string& s);
 
-void createFolder(const std::string &folder_name);
+std::string readFile(const std::string& file_name);
 
-void copyFile(const std::string &file_name, const std::string &path,
+void createFolder(const std::string& folder_name);
+
+void copyFile(const std::string& file_name, const std::string& path,
               bool over_write);
 
-bool copyDir(const std::string &source,
-             const std::string &destination);
+bool copyDir(const std::string& source, const std::string& destination);
 
-bool copyJsonDir(const std::string &src_name,
-                 const std::string &des_name,
-                 int id_base);
+void createLink(const std::string& a_link, const std::string& a_dir,
+                const std::string& b);
 
-void createLink(const std::string &a_link,
-                const std::string &a_dir,
-                const std::string &b);
+void delDir(const std::string& path);
 
-bool exists(const std::string &path);
+void delFile(const std::string& path);
 
-void delDir(const std::string &path);
+void cleanPrefix(const std::string& ref_name, const std::string& prefix);
 
-void delFile(const std::string &path);
+void cleanTempFiles(const std::string& ref_name, const std::string& ext_prefix);
 
-void rename(const std::string &ori_name, const std::string &new_name);
+void moveFile(const std::string& file_name, const std::string& folder_name);
 
-void cleanPrefix(const std::string &ref_name,
-                 const std::string &prefix);
+inline std::string getToppicResourceDirName() { return "res"; }
 
-void cleanTempFiles(const std::string &ref_name, 
-                    const std::string &ext_prefix);
+// TOPPIC_SHARED_DIR is defined by CMake as the configured install data dir
+// (CMAKE_INSTALL_DATADIR, e.g. <prefix>/share/toppic), so getSharedDirName()
+// matches where the resources are actually installed. The fallback is only for
+// builds that do not go through CMake.
+#ifndef TOPPIC_SHARED_DIR
+#define TOPPIC_SHARED_DIR "/usr/local/share/toppic"
+#endif
 
-void moveFile(const std::string &file_name, const std::string &folder_name);
+inline std::string getSharedDirName() { return TOPPIC_SHARED_DIR; }
 
-inline std::string getToppicResourceDirName() { return "resources"; }
+std::string getResourceDir(const std::string& exec_dir);
 
-inline std::string getSharedDirName() { return "/usr/share/toppic"; }
-
-std::string getResourceDir(const std::string &exec_dir);
-
-bool checkSpace(const std::string &dir);
+bool checkSpace(const std::string& dir);
 
 }  // namespace file_util
 

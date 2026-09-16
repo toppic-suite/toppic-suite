@@ -1,47 +1,51 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #ifndef TOPPIC_COMMON_BASE_TRUNC_HPP_
 #define TOPPIC_COMMON_BASE_TRUNC_HPP_
 
-#include "common/xml/xml_dom_element.hpp"
-
 #include "common/base/residue.hpp"
+#include "common/xml/xml_dom_element.hpp"
 
 namespace toppic {
 
 class Trunc {
  public:
-  Trunc(const std::string &name, int trunc_len, 
-        const std::string &trunc_residues,
-        const std::string &allow_first_remain_residues_);
+  Trunc(const std::string& name, int trunc_len,
+        const std::string& trunc_residues,
+        const std::string& allow_first_remain_residues_);
 
-  explicit Trunc(XmlDOMElement* element);
+  explicit Trunc(XmlDOMElement element);
 
-  const std::string& getName() const {return name_;}
+  const std::string& getName() const { return name_; }
 
-  int getTruncLen() const {return trunc_len_;}
+  int getTruncLen() const { return trunc_len_; }
 
-  const ResiduePtrVec& getTruncResiduePtrVec() const {return trunc_residue_ptr_vec_;}
+  const ResiduePtrVec& getTruncResiduePtrVec() const {
+    return trunc_residue_ptr_vec_;
+  }
 
-  const ResiduePtrVec& getAllowFirstRemainResiduePtrs() const {return allow_first_remain_residue_ptrs_;}
+  const ResiduePtrVec& getAllowFirstRemainResiduePtrs() const {
+    return allow_first_remain_residue_ptrs_;
+  }
 
-  double getShift() const {return shift_;}
+  double getShift() const { return shift_; }
 
-  static std::string getNameFromXml(XmlDOMElement * element);
+  static std::string getNameFromXml(XmlDOMElement element);
 
-  static std::string getXmlElementName() {return "truncation";}
+  static std::string getXmlElementName() { return "truncation"; }
 
  private:
   std::string name_;

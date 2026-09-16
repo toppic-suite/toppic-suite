@@ -1,19 +1,20 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-#ifndef TOPPIC_SEARCH_VAR_PTM_SEARCH_VAR_PTM_ALIGN_HPP_
-#define TOPPIC_SEARCH_VAR_PTM_SEARCH_VAR_PTM_ALIGN_HPP_
+#ifndef TOPPIC_SEARCH_VARPTMSEARCH_VAR_PTM_ALIGN_HPP_
+#define TOPPIC_SEARCH_VARPTMSEARCH_VAR_PTM_ALIGN_HPP_
 
 #include <vector>
 
@@ -25,11 +26,11 @@ namespace toppic {
 
 class VarPtmAlign {
  public:
-  VarPtmAlign(const std::vector<double> &ms_masses,
-              const std::vector<double> &seq_masses,
-              ResSeqPtr sub_res_seq_ptr,
-              const DiagonalPtrVec &diagonal_ptrs,
-              VarPtmSearchMngPtr mng_ptr);
+  VarPtmAlign(const std::vector<double>& ms_masses,
+              const std::vector<double>& seq_masses,
+              const ResSeqPtr& sub_res_seq_ptr,
+              const DiagonalPtrVec& diagonal_ptrs,
+              const VarPtmSearchMngPtr& mng_ptr);
 
   void initMatchTable();
 
@@ -44,19 +45,19 @@ class VarPtmAlign {
   void backtrack();
 
   // backtrack for diagonal d and variable ptm number ptm
-  void backtrack(int d, int ptm); 
+  void backtrack(int d, int ptm);
 
-  double getAlignScr() {return best_score_;}
+  double getAlignScr() { return best_score_; }
 
-  DiagHeaderPtrVec getDiagHeaders() {return backtrack_diag_header_ptrs_;}
+  DiagHeaderPtrVec getDiagHeaders() { return backtrack_diag_header_ptrs_; }
 
-  MassShiftPtrVec geneShiftVec(ProteoformPtr sub_proteo_ptr,
-                               DiagHeaderPtrVec &ori_header_ptrs,
-                               DiagHeaderPtrVec &refined_header_ptrs); 
+  MassShiftPtrVec geneShiftVec(const ProteoformPtr& sub_proteo_ptr,
+                               DiagHeaderPtrVec& ori_header_ptrs,
+                               DiagHeaderPtrVec& refined_header_ptrs);
 
-  PrsmPtr geneResult(ProteoformPtr sub_proteo_ptr,
-                     DeconvMsPtrVec &deconv_ms_ptr_vec,
-                     PrsmParaPtr prsm_para_ptr);
+  PrsmPtr geneResult(const ProteoformPtr& sub_proteo_ptr,
+                     DeconvMsPtrVec& deconv_ms_ptr_vec,
+                     const PrsmParaPtr& prsm_para_ptr);
 
  protected:
   std::vector<double> ms_masses_;
@@ -71,7 +72,7 @@ class VarPtmAlign {
 
   std::vector<std::vector<int>> matches_2d_;
 
-  std::vector<std::vector<bool>> allow_shift_2d_; 
+  std::vector<std::vector<bool>> allow_shift_2d_;
 
   std::vector<std::vector<std::vector<int>>> scores_3d_;
 

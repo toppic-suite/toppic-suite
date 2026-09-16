@@ -1,26 +1,27 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #ifndef TOPPIC_PARA_SP_PARA_HPP_
 #define TOPPIC_PARA_SP_PARA_HPP_
 
-#include <string>
 #include <memory>
+#include <string>
 #include <vector>
 
-#include "common/xml/xml_dom_element.hpp"
 #include "common/base/activation.hpp"
+#include "common/xml/xml_dom_element.hpp"
 #include "para/peak_tolerance.hpp"
 
 namespace toppic {
@@ -29,45 +30,52 @@ class XmlDOMDocument;
 
 class SpPara {
  public:
-
-  SpPara(std::string activation_name, double n_term_mod_mass, 
+  SpPara(const std::string& activation_name, double n_term_mod_mass,
          double ppm);
 
-  explicit SpPara(xercesc::DOMElement* element);
+  explicit SpPara(XmlDOMElement element);
 
-  double getMinMass() {return min_mass_;}
+  double getMinMass() const { return min_mass_; }
 
-  double getExtendMinMass() {return extend_min_mass_;}
+  double getExtendMinMass() const { return extend_min_mass_; }
 
-  const std::vector<double>& getExtendOffsets() {return ext_offsets_;}
+  const std::vector<double>& getExtendOffsets() const { return ext_offsets_; }
 
-  const std::vector<double>& getZeroShiftSearchPrecErrorVec() {
-    return zero_shift_search_prec_error_vec_;}
+  const std::vector<double>& getZeroShiftSearchPrecErrorVec() const {
+    return zero_shift_search_prec_error_vec_;
+  }
 
-  const std::vector<double>& getVarPtmSearchPrecErrorVec() {
-    return var_ptm_search_prec_error_vec_;}
+  const std::vector<double>& getVarPtmSearchPrecErrorVec() const {
+    return var_ptm_search_prec_error_vec_;
+  }
 
-  const std::vector<double>& getOneShiftSearchPrecErrorVec() {
-    return one_shift_search_prec_error_vec_;}
+  const std::vector<double>& getOneShiftSearchPrecErrorVec() const {
+    return one_shift_search_prec_error_vec_;
+  }
 
-  const std::vector<double>& getMultiShiftSearchPrecErrorVec() {
-    return multi_shift_search_prec_error_vec_;}
+  const std::vector<double>& getMultiShiftSearchPrecErrorVec() const {
+    return multi_shift_search_prec_error_vec_;
+  }
 
-  PeakTolerancePtr getPeakTolerancePtr() {return peak_tolerance_ptr_;}
+  PeakTolerancePtr getPeakTolerancePtr() const { return peak_tolerance_ptr_; }
 
-  ActivationPtr getActivationPtr() {return activation_ptr_;}
+  ActivationPtr getActivationPtr() const { return activation_ptr_; }
 
-  int getMinPeakNum() {return min_peak_num_;}
+  int getMinPeakNum() const { return min_peak_num_; }
 
-  double getNTermLabelMass() {return n_term_label_mass_;}
+  double getNTermLabelMass() const { return n_term_label_mass_; }
 
-  void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
+  double getEnvCnnCutoff() const { return env_cnn_cutoff_; }
 
-  static std::string getXmlElementName() {return "sp_para";}
+  void setEnvCnnCutoff(double cutoff) { env_cnn_cutoff_ = cutoff; }
 
-  static int getMaxSpecNumPerFile() {return 10000000;}
+  void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) const;
 
-  static int getMaxFeatureNumPerFile() {return 10000000;}
+  static std::string getXmlElementName() { return "sp_para"; }
+
+  static int getMaxSpecNumPerFile() { return 10000000; }
+
+  static int getMaxFeatureNumPerFile() { return 10000000; }
 
  private:
   int min_peak_num_ = 10;
@@ -80,6 +88,9 @@ class SpPara {
 
   // n_term_label_mass is for iTRAQ or TMT labeling
   double n_term_label_mass_ = 0.0;
+
+  // envelopes with an EnvCNN score below env_cnn_cutoff are removed
+  double env_cnn_cutoff_ = 0.2;
 
   ActivationPtr activation_ptr_;
 
@@ -98,6 +109,6 @@ class SpPara {
 using SpParaPtr = std::shared_ptr<SpPara>;
 using SpParaPtrVec = std::vector<SpParaPtr>;
 
-} /* namespace toppic */
+}  // namespace toppic
 
-#endif /* SP_PARA_HPP_ */
+#endif

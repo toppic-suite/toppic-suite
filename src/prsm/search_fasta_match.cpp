@@ -1,42 +1,46 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#include "prsm/search_fasta_match.hpp"
 
 #include <iostream>
-#include <string>  
-#include <vector>  
 #include <sstream>
+#include <string>
+#include <vector>
 
 #include "common/util/logger.hpp"
-#include "seq/fasta_reader.hpp"
 #include "prsm/prsm.hpp"
-#include "prsm/search_fasta_match.hpp"
+#include "seq/fasta_reader.hpp"
 
 namespace toppic {
 
-SearchFastaMatch::SearchFastaMatch(std::string db_file_name):
-  db_file_name_(db_file_name) {
-    FastaReaderPtr reader_ptr = std::make_shared<FastaReader>(db_file_name_);
-    FastaSeqPtr seq_ptr = reader_ptr->getNextSeq();
-    while (seq_ptr != nullptr) {
-      fasta_seq_vec_.push_back(seq_ptr);
-      seq_vec_.push_back(seq_ptr->getRawSeq());
-      seq_ptr = reader_ptr->getNextSeq();
-    }
+SearchFastaMatch::SearchFastaMatch(std::string db_file_name)
+    : db_file_name_(db_file_name) {
+  FastaReaderPtr reader_ptr = std::make_shared<FastaReader>(db_file_name_);
+  FastaSeqPtr seq_ptr = reader_ptr->getNextSeq();
+  while (seq_ptr != nullptr) {
+    fasta_seq_vec_.push_back(seq_ptr);
+    seq_vec_.push_back(seq_ptr->getRawSeq());
+    seq_ptr = reader_ptr->getNextSeq();
   }
+}
 
-std::vector<std::pair<FastaSeqPtr, int>> SearchFastaMatch::process(PrsmPtr prsm_ptr_) {
-  std::string raw_seq = prsm_ptr_->getProteoformPtr()->getFastaSeqPtr()->getRawSeq();
+std::vector<std::pair<FastaSeqPtr, int>> SearchFastaMatch::process(
+    const PrsmPtr& prsm_ptr_) {
+  std::string raw_seq =
+      prsm_ptr_->getProteoformPtr()->getFastaSeqPtr()->getRawSeq();
   int start_pos = prsm_ptr_->getProteoformPtr()->getStartPos();
   int end_pos = prsm_ptr_->getProteoformPtr()->getEndPos();
 
@@ -54,4 +58,4 @@ std::vector<std::pair<FastaSeqPtr, int>> SearchFastaMatch::process(PrsmPtr prsm_
   return matches;
 }
 
-}
+}  // namespace toppic

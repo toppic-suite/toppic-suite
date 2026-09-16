@@ -1,4 +1,5 @@
-// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,19 +13,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TOPPIC_PSEUDO_PEAKS_HPP
-#define TOPPIC_PSEUDO_PEAKS_HPP
+#ifndef TOPPIC_TOPDIA_PSEUDO_SPEC_PSEUDO_PEAK_HPP_
+#define TOPPIC_TOPDIA_PSEUDO_SPEC_PSEUDO_PEAK_HPP_
 
 namespace toppic {
 
 class PseudoPeak {
  public:
   PseudoPeak(double mass, double monoMz, int charge, double intensity,
-              double score, double corr, double shared_inte, int ms2_cycle_span,
-              double apexDiffScan, double rtLow, double rtHigh,
-              int ms2_apex_cycle);
+             double score, double corr, double shared_inte, int ms2_cycle_span,
+             double apexDiffScan, double rtLow, double rtHigh,
+             int ms2_apex_cycle);
 
-  PseudoPeak(const PseudoPeak &peaks);
+  PseudoPeak(const PseudoPeak& peaks);
 
   double getMass() const { return mass_; }
 
@@ -80,4 +81,4 @@ class PseudoPeak {
 };
 }  // namespace toppic
 
-#endif  // TOPPIC_PSEUDO_PEAKS_HPP
+#endif  // TOPPIC_TOPDIA_PSEUDO_SPEC_PSEUDO_PEAK_HPP_

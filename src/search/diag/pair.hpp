@@ -1,16 +1,17 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #ifndef TOPPIC_SEARCH_DIAG_PAIR_HPP_
 #define TOPPIC_SEARCH_DIAG_PAIR_HPP_
@@ -25,17 +26,17 @@ using PairPtr = std::shared_ptr<Pair>;
 
 class Pair {
  public:
-  Pair(int x, int y): x_(x), y_(y) {}
+  Pair(int x, int y) : x_(x), y_(y) {}
 
-  int getX() {return x_;}
+  int getX() { return x_; }
 
-  int getY() {return y_;}
+  int getY() { return y_; }
 
-  void setX(int x) {x_ = x;}
+  void setX(int x) { x_ = x; }
 
-  void setY(int y) {y_ = y;}
+  void setY(int y) { y_ = y; }
 
-  static bool cmpPosInc(const PairPtr &a, const PairPtr &b) {
+  static bool cmpPosInc(const PairPtr& a, const PairPtr& b) {
     if (a->getY() != b->getY()) {
       return a->getY() < b->getY();
     }
@@ -48,7 +49,6 @@ class Pair {
   int y_ = 0;
 };
 
-
 } /* namespace toppic */
 
-#endif 
+#endif

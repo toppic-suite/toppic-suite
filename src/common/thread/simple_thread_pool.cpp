@@ -1,26 +1,38 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
+#include "common/thread/simple_thread_pool.hpp"
+
+#include <algorithm>
+#include <exception>
+#include <ostream>
 #include <stdexcept>
+#include <string>
+#include <utility>
 
 #include "common/util/logger.hpp"
-#include "common/thread/simple_thread_pool.hpp"
 
 namespace toppic {
 
-SimpleThreadPool::SimpleThreadPool(int thread_num) :
-    terminate_(false), idle_thread_num_(0) {
+SimpleThreadPool::SimpleThreadPool(int thread_num)
+    : terminate_(false), idle_thread_num_(0) {
+  if (thread_num < 1) {
+    throw std::invalid_argument(
+        "SimpleThreadPool requires at least one thread, got " +
+        std::to_string(thread_num) + ".");
+  }
   threads_.reserve(thread_num);
   for (int i = 0; i < thread_num; i++) {
     threads_.emplace_back(&SimpleThreadPool::invoke, this);
@@ -28,12 +40,12 @@ SimpleThreadPool::SimpleThreadPool(int thread_num) :
   }
 }
 
-size_t SimpleThreadPool::getQueueSize() const {
+std::size_t SimpleThreadPool::getQueueSize() const {
   std::lock_guard<std::mutex> lock(tasks_mutex_);
   return tasks_.size();
 }
 
-size_t SimpleThreadPool::getThreadNum() const {
+std::size_t SimpleThreadPool::getThreadNum() const {
   std::lock_guard<std::mutex> lock(tasks_mutex_);
   return threads_.size();
 }
@@ -46,7 +58,8 @@ void SimpleThreadPool::enqueue(std::function<void()> f) {
 
     // Reject tasks after shutdown to avoid silent data loss.
     if (terminate_) {
-      LOG_ERROR("SimpleThreadPool::enqueue called after shutDown; task dropped.");
+      LOG_ERROR(
+          "SimpleThreadPool::enqueue called after shutDown; task dropped.");
       return;
     }
 
@@ -70,24 +83,32 @@ void SimpleThreadPool::invoke() {
       // Wait until queue is not empty or termination signal is sent.
       // The predicate is evaluated while holding the lock, so accessing
       // tasks_ and terminate_ here is safe.
-      condition_.wait(lock, [this]{ return !tasks_.empty() || terminate_; });
+      condition_.wait(lock, [this] { return !tasks_.empty() || terminate_; });
 
-      // If termination signal received and queue is empty then exit else continue clearing the queue.
+      // If termination signal received and queue is empty then exit else
+      // continue clearing the queue.
       if (terminate_ && tasks_.empty()) {
         --idle_thread_num_;
         return;
       }
 
-      // Get next task in the queue.
-      task = tasks_.front();
+      // Get next task in the queue (move to avoid copying the std::function).
+      task = std::move(tasks_.front());
 
       // Remove it from the queue.
       tasks_.pop();
       --idle_thread_num_;
     }
 
-    // Execute the task.
-    task();
+    // Execute the task. Catch exceptions so that one failing task cannot
+    // escape the worker thread and call std::terminate on the whole program.
+    try {
+      task();
+    } catch (const std::exception& e) {
+      LOG_ERROR("Exception in a thread pool task: " << e.what());
+    } catch (...) {
+      LOG_ERROR("Unknown exception in a thread pool task.");
+    }
   }
 }
 

@@ -1,47 +1,50 @@
-//Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane University.
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
+#include "topfd/dp/dp_b.hpp"
 
-#include <limits>
 #include <algorithm>
+#include <limits>
 
 #include "common/util/logger.hpp"
 #include "topfd/dp/vertex_util.hpp"
-#include "topfd/dp/dp_b.hpp"
 
 namespace toppic {
 
-DpB::DpB(DeconvDataPtr data_ptr, MatchEnvPtr2D &win_envs_, 
-         DpParaPtr dp_para_ptr, double score_error_tolerance):
-    Dp(data_ptr, win_envs_, dp_para_ptr, score_error_tolerance) {
-      initGraph();
-      dp();
-      backtrace();
-    }
+DpB::DpB(const DeconvDataPtr& data_ptr, MatchEnvPtr2D& win_envs_,
+         const DpParaPtr& dp_para_ptr, double score_error_tolerance)
+    : Dp(data_ptr, win_envs_, dp_para_ptr, score_error_tolerance) {
+  initGraph();
+  dp();
+  backtrace();
+}
 
 void DpB::initGraph() {
-  // use win_num__ + 2 columns 
+  // use win_num__ + 2 columns
   vertices_.resize(win_num_ + 2);
   MatchEnvPtrVec envs;
-  vertices_[0] = vertex_util::getVertexBList(data_ptr_, -1, envs, envs, dp_para_ptr_);
-  vertices_[1] = vertex_util::getVertexBList(data_ptr_, 0, envs, win_envs_[0], dp_para_ptr_);
+  vertices_[0] =
+      vertex_util::getVertexBList(data_ptr_, -1, envs, envs, dp_para_ptr_);
+  vertices_[1] = vertex_util::getVertexBList(data_ptr_, 0, envs, win_envs_[0],
+                                             dp_para_ptr_);
   for (int i = 1; i < win_num_; i++) {
-    vertices_[i + 1] = vertex_util::getVertexBList(data_ptr_, i, win_envs_[i - 1], 
-                                                   win_envs_[i], dp_para_ptr_);
+    vertices_[i + 1] = vertex_util::getVertexBList(
+        data_ptr_, i, win_envs_[i - 1], win_envs_[i], dp_para_ptr_);
   }
-  vertices_[win_num_ + 1] = vertex_util::getVertexBList(data_ptr_, win_num_, 
-                                                        win_envs_[win_num_ - 1], envs, dp_para_ptr_);
+  vertices_[win_num_ + 1] = vertex_util::getVertexBList(
+      data_ptr_, win_num_, win_envs_[win_num_ - 1], envs, dp_para_ptr_);
 }
 
 void DpB::dp() {
@@ -50,9 +53,12 @@ void DpB::dp() {
       VertexBPtr cur_ver = vertices_[i][j];
       for (size_t k = 0; k < vertices_[i - 1].size(); k++) {
         VertexBPtr prev_ver = vertices_[i - 1][k];
-        if (Vertex::checkConsist(prev_ver, cur_ver, dp_para_ptr_->max_env_num_per_peak_)) {
-          double new_score = Vertex::getShareScr(prev_ver, cur_ver, score_error_tolerance_);
-          for (int cur_num = 0; cur_num <= dp_para_ptr_->dp_env_num_; cur_num++) {
+        if (Vertex::checkConsist(prev_ver, cur_ver,
+                                 dp_para_ptr_->max_env_num_per_peak_)) {
+          double new_score =
+              Vertex::getShareScr(prev_ver, cur_ver, score_error_tolerance_);
+          for (int cur_num = 0; cur_num <= dp_para_ptr_->dp_env_num_;
+               cur_num++) {
             int prev_num = cur_num - cur_ver->getPreMatchEnvSize();
             if (prev_num >= 0) {
               double cur_score = prev_ver->getScoreB(prev_num) + new_score;
@@ -68,10 +74,10 @@ void DpB::dp() {
   }
 }
 
-// backtracking 
+// backtracking
 void DpB::backtrace() {
   int best_ver = -1;
-  double best_score = - std::numeric_limits<double>::max();
+  double best_score = -std::numeric_limits<double>::max();
   int num = dp_para_ptr_->dp_env_num_;
   for (size_t i = 0; i < vertices_[win_num_ + 1].size(); i++) {
     double cur_score = vertices_[win_num_ + 1][i]->getScoreB(num);
@@ -93,4 +99,4 @@ void DpB::backtrace() {
   std::sort(results_.begin(), results_.end(), MatchEnv::cmpMsdeconvScoreDec);
 }
 
-}
+}  // namespace toppic
