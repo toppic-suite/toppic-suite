@@ -117,7 +117,7 @@ ninja
   to the executables. `ninja uninstall` reverses it.
 - Release zip: `scripts\win_release.bat [version]` (run from cmd or
   PowerShell after building) bundles `bin\*.exe`, the UCRT64 DLLs they
-  import, the Qt plugins and `res/` into `toppic-win-<version>.zip` in the
+  import, the Qt plugins and `res/` into `toppic-windows-<version>.zip` in the
   repository root (default version `1.9.0.0`); the extracted folder runs
   without MSYS2 on `PATH`.
 

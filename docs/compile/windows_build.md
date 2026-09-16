@@ -92,7 +92,7 @@ installed files again.
 ## 7. (Optional) Package a release zip
 
 `scripts\win_release.bat` bundles a finished build into a self-contained
-`toppic-win-<version>.zip` in the repository root (default version
+`toppic-windows-<version>.zip` in the repository root (default version
 `1.9.0.0`; pass another as the first argument). Run it from a Windows
 command prompt or PowerShell in the repository root after building:
 
@@ -106,7 +106,7 @@ with `objdump` and copies every UCRT64 DLL they need (Boost is linked
 statically; the runtime DLLs are the GCC runtime, pugixml, SQLite, zlib,
 ONNX Runtime and, for the GUIs, Qt6 and its dependencies), the Qt
 `platforms`, `styles` and `imageformats` plugins, the `res` directory and
-the `LICENSE` into `toppic-win-<version>\`, zips that folder with the
+the `LICENSE` into `toppic-windows-<version>\`, zips that folder with the
 built-in `tar.exe` (or `Compress-Archive`) and deletes the staging folder.
 The extracted folder runs without MSYS2 on the `PATH`. If MSYS2 is not
 installed at `C:\msys64`, set the `MSYS2_ROOT` environment variable first.

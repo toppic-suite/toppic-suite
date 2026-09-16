@@ -6,9 +6,9 @@ rem
 rem Collects the twelve executables from bin\, every MSYS2 UCRT64 DLL they
 rem import (walked transitively with objdump), the Qt plugins the GUI tools
 rem need, the runtime resources in res\ and the LICENSE into a staging folder
-rem toppic-win-<version>\ and zips it as toppic-win-<version>.zip, both in
-rem the repository root (the parent of this scripts folder). The staging
-rem folder is removed afterwards.
+rem toppic-windows-<version>\ and zips it as toppic-windows-<version>.zip,
+rem both in the repository root (the parent of this scripts folder). The
+rem staging folder is removed afterwards.
 rem
 rem Usage:   scripts\win_release.bat [version]   (default: the VERSION below)
 rem Needs:   a finished build (docs\compile\windows_build.md) and MSYS2 with
@@ -25,7 +25,7 @@ set "QT_PLUGINS=%MSYS2_ROOT%\ucrt64\share\qt6\plugins"
 rem Repository root = the parent of the directory holding this script.
 for %%I in ("%~dp0..") do set "ROOT=%%~fI"
 set "BIN=%ROOT%\bin"
-set "NAME=toppic-win-%VERSION%"
+set "NAME=toppic-windows-%VERSION%"
 set "STAGE=%ROOT%\%NAME%"
 set "ZIP=%ROOT%\%NAME%.zip"
 set "TOOLS=topfd topdia topindex toppic topmg topdiff"
