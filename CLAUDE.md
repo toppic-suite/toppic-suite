@@ -182,7 +182,7 @@ path and linked into `toppic_common`:
   static Boost fails at link time with "duplicate section ... has different
   size" warnings and "multiple definition" errors for COMDAT variables that
   clang places in `.bss` and GCC in `.data`. Keep that `CMAKE_HOST_WIN32`
-  guard; `doc/windows_build.md` tells users to install `...-gcc`, not `-clang`.
+  guard; `docs/windows_build.md` tells users to install `...-gcc`, not `-clang`.
 - **Qt6** — `find_package(Qt6 COMPONENTS Widgets Core Gui)` backs the `src/gui`
   desktop executables (see the source-layout note). Only the GUI targets use it,
   via per-target `AUTOMOC`/`AUTOUIC`/`AUTORCC`; the `toppic_common` library has
@@ -265,14 +265,14 @@ that was left empty (the manifest lists files only). Consequences:
 The build instructions are split by platform. `README.md` carries the full
 Ubuntu walkthrough (packages, clone with Git LFS, configure/build, install,
 uninstall) and only a one-paragraph link for each other platform; the details
-live in `doc/`, all laid out with the same six steps:
+live in `docs/`, all laid out with the same six steps:
 
-- `doc/windows_build.md` — MSYS2 **UCRT64** shell, Ninja generator, GCC (not
+- `docs/windows_build.md` — MSYS2 **UCRT64** shell, Ninja generator, GCC (not
   clang; see the compiler-default note above), `pacman` package list, system
   ONNX Runtime, `res/` installed next to the executables.
-- `doc/redhat_build.md` — RHEL 10 (and Rocky/AlmaLinux): CodeReady Builder +
+- `docs/redhat_build.md` — RHEL 10 (and Rocky/AlmaLinux): CodeReady Builder +
   EPEL for `pugixml-devel`, `dnf` package list, otherwise identical to Ubuntu.
-- `doc/macos_build.md` — Xcode Command Line Tools + Homebrew, Homebrew
+- `docs/macos_build.md` — Xcode Command Line Tools + Homebrew, Homebrew
   `onnxruntime` (nothing is vendored for macOS; `-DONNXRUNTIME_LIBRARY`
   override), Qt6 hint, resources installed to `<prefix>/bin/res`.
 
@@ -281,9 +281,9 @@ package, the compiler choice, how a library is located, the install layout —
 update the matching doc (and the README for Ubuntu) in the same commit; the
 docs are hand-written and nothing checks them against the build.
 
-## TopFD user manual (`doc/topfd_manual.md`)
+## TopFD user manual (`docs/topfd_manual.md`)
 
-`doc/topfd_manual.md` is the user-facing manual for the `topfd` command line:
+`docs/topfd_manual.md` is the user-facing manual for the `topfd` command line:
 its two functions (mzML/mzXML deconvolution, and `-T` text-peak-list
 deconvolution of a single MS/MS spectrum), the input requirements, every
 output file, and every option with its default — the visible ones in the

@@ -119,14 +119,14 @@ error; in that case remove the installed files by hand.
 ## Building on Red Hat Enterprise Linux
 
 The steps are the same as for Ubuntu above; only the package installation
-differs. Please follow the instructions from [here](doc/redhat_build.md).
+differs. Please follow the instructions from [here](docs/redhat_build.md).
 
 ## Building on Windows
 
-[MSYS2](http://www.msys2.org/) is used for building TopPIC Suite on Windows systems. Please follow the instructions from [here](doc/windows_build.md).
+[MSYS2](http://www.msys2.org/) is used for building TopPIC Suite on Windows systems. Please follow the instructions from [here](docs/windows_build.md).
 
 
 ## Building on macOS
 
 Xcode Command Line Tools and [Homebrew](https://brew.sh/) are used for building
-TopPIC Suite on macOS. Please follow the instructions from [here](doc/macos_build.md).
+TopPIC Suite on macOS. Please follow the instructions from [here](docs/macos_build.md).
