@@ -75,3 +75,6 @@ Testing/
 
 # build artifacts
 /bin/
+
+# top-level local data folder (test inputs/outputs)
+/data/

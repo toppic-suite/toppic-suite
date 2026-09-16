@@ -83,7 +83,7 @@ For an input `sample.mzML`:
 | `sample.sqlite` | The SQLite database with the deconvoluted MS1 and MS/MS scans and their peaks, as written by TopFD. It is always written. |
 
 The intermediate files are left in place. When searching the pseudo spectra
-with TopPIC, add `--disable-post-match`: post mass matching looks up the
+with TopPIC, add `-E`: post mass matching looks up the
 centroided peaks of a single MS/MS scan, and a pseudo spectrum does not
 correspond to one scan.
 
@@ -135,7 +135,7 @@ TopFD only.
 
 ```sh
 topdia -u 8 sample.mzML
-toppic --disable-post-match -d -t FDR -v 0.01 proteins.fasta sample_ms2.msalign
+toppic -E -d -t FDR -v 0.01 proteins.fasta sample_ms2.msalign
 ```
 
 The first command writes `sample_ms2.msalign` (pseudo spectra) and
