@@ -60,7 +60,7 @@ void CompPValueArray::compMultiExpectedValues(const PrmMsPtrVec& ms_six_ptr_vec,
   }
 
   PeakTolerancePtr tole_ptr =
-      mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
+      mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr();
   std::vector<double> prot_probs;
   comp_prob_value_array::compProbArray(
       comp_prob_ptr_, prot_n_term_residue_ptrs_, prm_ptr_2d, prsm_ptrs, strict,

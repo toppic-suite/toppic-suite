@@ -66,7 +66,7 @@ ExtendMsPtr geneMsThreePtr(const DeconvMsPtr& deconv_ms_ptr,
 
   std::sort(list_filtered.begin(), list_filtered.end(), ExtendPeak::cmpPosInc);
   // set error tolerance
-  PeakTolerancePtr peak_tole_ptr = sp_para_ptr->getPeakTolerancePtr();
+  PeakTolerancePtr peak_tole_ptr = sp_para_ptr->getFragTolerancePtr();
   for (size_t i = 0; i < list_filtered.size(); i++) {
     double mass = list_filtered[i]->getBasePeakPtr()->getMonoMass();
     double ori_tole = peak_tole_ptr->compStrictErrorTole(mass);

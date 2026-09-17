@@ -16,11 +16,6 @@
 #include "para/peak_tolerance.hpp"
 
 #include <cmath>
-#include <string>
-
-#include "common/util/str_util.hpp"
-#include "common/xml/xml_dom_document.hpp"
-#include "common/xml/xml_dom_util.hpp"
 
 namespace toppic {
 
@@ -28,14 +23,6 @@ PeakTolerance::PeakTolerance(double ppo) : ppo_(ppo) {}
 
 double PeakTolerance::compRelaxErrorTole(double m1, double m2) const {
   return compStrictErrorTole(m1 + m2);
-}
-
-PeakTolerance::PeakTolerance(XmlDOMElement element) {
-  ppo_ = xml_dom_util::getDoubleChildValue(element, "ppo", 0);
-  use_min_tolerance_ =
-      xml_dom_util::getDoubleChildValue(element, "use_min_tolerance", 0);
-  min_tolerance_ =
-      xml_dom_util::getDoubleChildValue(element, "min_tolerance", 0);
 }
 
 int PeakTolerance::getIntPpm() const {
@@ -48,18 +35,6 @@ double PeakTolerance::compStrictErrorTole(double mass) const {
     tolerance = min_tolerance_;
   }
   return tolerance;
-}
-
-void PeakTolerance::appendXml(XmlDOMDocument* xml_doc,
-                              XmlDOMElement parent) const {
-  std::string element_name = PeakTolerance::getXmlElementName();
-  XmlDOMElement element = xml_doc->addElement(parent, element_name.c_str());
-  std::string str = str_util::toString(ppo_);
-  xml_doc->addElement(element, "ppo", str.c_str());
-  str = str_util::toString(use_min_tolerance_);
-  xml_doc->addElement(element, "use_min_tolerance", str.c_str());
-  str = str_util::toString(min_tolerance_);
-  xml_doc->addElement(element, "min_tolerance", str.c_str());
 }
 
 }  // namespace toppic

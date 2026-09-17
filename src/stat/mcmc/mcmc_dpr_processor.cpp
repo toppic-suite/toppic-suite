@@ -253,7 +253,7 @@ std::function<void()> geneTask(
         prsm_ptr->getAdjustedPrecMass());
 
     double ppo = mng_ptr->prsm_para_ptr_->getSpParaPtr()
-                     ->getPeakTolerancePtr()
+                     ->getPrecTolerancePtr()
                      ->getPpo();
 
     double tolerance =

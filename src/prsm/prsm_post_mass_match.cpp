@@ -311,7 +311,7 @@ PostMatchVec matchPrsm(const PrsmPtr& prsm_ptr, const RawPeakVec& peaks,
       prsm_ptr, header_ptr->getActivationPtr(), sp_para_ptr->getMinMass());
   int max_charge =
       std::min(MAX_CHARGE, header_ptr->getFirstPrecCharge() + CHARGE_ABOVE_PREC);
-  double ppo = sp_para_ptr->getPeakTolerancePtr()->getPpo();
+  double ppo = sp_para_ptr->getFragTolerancePtr()->getPpo();
   PostMatchVec matches;
   for (size_t i = 0; i < theo_peaks.size(); i++) {
     double mass = theo_peaks[i]->getModMass();

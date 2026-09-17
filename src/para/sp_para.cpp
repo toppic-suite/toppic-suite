@@ -15,16 +15,12 @@
 
 #include "para/sp_para.hpp"
 
-#include <cstddef>
 #include <memory>
 #include <string>
 #include <vector>
 
 #include "common/base/activation_base.hpp"
 #include "common/base/mass_constant.hpp"
-#include "common/util/str_util.hpp"
-#include "common/xml/xml_dom_document.hpp"
-#include "common/xml/xml_dom_util.hpp"
 
 namespace toppic {
 
@@ -35,7 +31,8 @@ SpPara::SpPara(const std::string& activation_name, double n_term_label_mass,
   }
   n_term_label_mass_ = n_term_label_mass;
   double ppo = ppm * 0.000001;
-  peak_tolerance_ptr_ = std::make_shared<PeakTolerance>(ppo);
+  prec_tolerance_ptr_ = std::make_shared<PeakTolerance>(ppo);
+  frag_tolerance_ptr_ = std::make_shared<PeakTolerance>(ppo);
 
   // the set of offsets used to expand the monoisotopic mass list
   setFragMassExtension(true);
@@ -73,60 +70,6 @@ void SpPara::setVarPtmPrecOneDaError(bool allow) {
 
 void SpPara::setFragMassExtension(bool extend) {
   frag_ext_offsets_ = precErrorVec(extend);
-}
-
-SpPara::SpPara(XmlDOMElement element) {
-  min_peak_num_ = xml_dom_util::getIntChildValue(element, "min_peak_num", 0);
-  min_mass_ = xml_dom_util::getDoubleChildValue(element, "min_mass", 0);
-  frag_extend_min_mass_ =
-      xml_dom_util::getDoubleChildValue(element, "frag_extend_min_mass", 0);
-  XmlDOMElement list_element =
-      xml_dom_util::getChildElement(element, "frag_ext_offset_list", 0);
-  int offset_num = xml_dom_util::getChildCount(list_element, "frag_ext_offset");
-  for (int i = 0; i < offset_num; i++) {
-    double offset =
-        xml_dom_util::getDoubleChildValue(list_element, "frag_ext_offset", i);
-    frag_ext_offsets_.push_back(offset);
-  }
-  n_term_label_mass_ =
-      xml_dom_util::getDoubleChildValue(element, "n_term_label_mass", 0);
-  // optional: files written before the parameter was added lack it
-  if (xml_dom_util::getChildCount(element, "env_cnn_cutoff") > 0) {
-    env_cnn_cutoff_ =
-        xml_dom_util::getDoubleChildValue(element, "env_cnn_cutoff", 0);
-  }
-  std::string element_name = PeakTolerance::getXmlElementName();
-  XmlDOMElement pt_element =
-      xml_dom_util::getChildElement(element, element_name.c_str(), 0);
-  peak_tolerance_ptr_ = std::make_shared<PeakTolerance>(pt_element);
-
-  element_name = Activation::getXmlElementName();
-  XmlDOMElement ac_element =
-      xml_dom_util::getChildElement(element, element_name.c_str(), 0);
-  activation_ptr_ = ActivationBase::getActivationPtrFromXml(ac_element);
-}
-
-void SpPara::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) const {
-  std::string element_name = SpPara::getXmlElementName();
-  XmlDOMElement element = xml_doc->addElement(parent, element_name.c_str());
-  std::string str = std::to_string(min_peak_num_);
-  xml_doc->addElement(element, "min_peak_num", str.c_str());
-  str = str_util::toString(min_mass_);
-  xml_doc->addElement(element, "min_mass", str.c_str());
-  str = str_util::toString(frag_extend_min_mass_);
-  xml_doc->addElement(element, "frag_extend_min_mass", str.c_str());
-  XmlDOMElement list_element =
-      xml_doc->addElement(element, "frag_ext_offset_list");
-  for (size_t i = 0; i < frag_ext_offsets_.size(); i++) {
-    str = str_util::toString(frag_ext_offsets_[i]);
-    xml_doc->addElement(list_element, "frag_ext_offset", str.c_str());
-  }
-  str = str_util::toString(n_term_label_mass_);
-  xml_doc->addElement(element, "n_term_label_mass", str.c_str());
-  str = str_util::toString(env_cnn_cutoff_);
-  xml_doc->addElement(element, "env_cnn_cutoff", str.c_str());
-  peak_tolerance_ptr_->appendXml(xml_doc, element);
-  activation_ptr_->appendNameToXml(xml_doc, element);
 }
 
 }  // namespace toppic

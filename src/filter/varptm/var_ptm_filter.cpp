@@ -126,7 +126,7 @@ std::vector<std::pair<int, int>> getShiftedMassErrors(
 void VarPtmFilter::computeBestMatch(const PrmMsPtrVec& prm_ms_ptr_vec,
                                     const PrmMsPtrVec& srm_ms_ptr_vec) {
   PeakTolerancePtr tole_ptr =
-      mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
+      mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr();
   std::vector<std::pair<int, int>> pref_mass_errors =
       prm_ms_util::getIntMassErrorList(prm_ms_ptr_vec, tole_ptr,
                                        mng_ptr_->filter_scale_, true, false);
@@ -220,7 +220,7 @@ void VarPtmFilter::computeBestMatch(const PrmMsPtrVec& prm_ms_ptr_vec,
 void VarPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec) {
 
   PeakTolerancePtr tole_ptr =
-mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr(); bool pref =
+mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr(); bool pref =
 true; std::vector<std::pair<int, int> > pref_mass_errors =
 extend_ms_util::getExtendIntMassErrorList(ms_ptr_vec, pref,
 mng_ptr_->filter_scale_); pref = false; std::vector<std::pair<int, int> >

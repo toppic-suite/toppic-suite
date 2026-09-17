@@ -33,7 +33,7 @@ VarPtmSlowMatch::VarPtmSlowMatch(const ProteoformPtr& proteo_ptr,
   // proteo_ptr->getMonoNeutralMass());
   mng_ptr_ = mng_ptr;
   PeakTolerancePtr tole_ptr =
-      mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
+      mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr();
   prec_error_tole_ =
       deconv_ms_ptr_vec_[0]->getMsHeaderPtr()->getFirstPrecErrorTolerance(
           tole_ptr->getPpo());
@@ -94,7 +94,7 @@ void VarPtmSlowMatch::init() {
   // LOG_ERROR("var ptm slow match init");
   DiagHeaderPtrVec n_term_shift_header_ptrs = geneVarPtmNTermShiftHeaders();
   PeakTolerancePtr tole_ptr =
-      mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
+      mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr();
   PrmPeakPtrVec prm_peaks =
       prm_ms_util::getPrmPeakPtrs(ms_six_ptr_vec_, tole_ptr);
   int group_spec_num = ms_six_ptr_vec_.size();

@@ -111,7 +111,7 @@ ZeroPtmFilter::ZeroPtmFilter(const ProteoformPtrVec& proteo_ptrs,
 
 void ZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec& ms_ptr_vec) {
   PeakTolerancePtr tole_ptr =
-      mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
+      mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr();
   bool pref = true;
   std::vector<std::pair<int, int> > pref_mass_errors =
       extend_ms_util::getExtendIntMassErrorList(ms_ptr_vec, pref,

@@ -41,7 +41,7 @@ DiagHeaderPtrVec PtmSlowMatch::getNTermShiftListCommonHeaders() {
   double scale = mng_ptr_->ptm_fast_filter_scale_;
   // n term strict c term nonstrict
   PeakTolerancePtr tole_ptr =
-      mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
+      mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr();
   std::vector<std::pair<int, int>> sp_masses_toles =
       prm_ms_util::getIntMassErrorList(ms_six_ptr_vec_, tole_ptr, scale, true,
                                        false);
@@ -167,7 +167,7 @@ DiagHeaderPtrVec PtmSlowMatch::geneNTermShiftHeaders() {
 void PtmSlowMatch::init() {
   DiagHeaderPtrVec n_term_shift_header_ptrs = geneNTermShiftHeaders();
   PeakTolerancePtr tole_ptr =
-      mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
+      mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr();
   PrmPeakPtrVec prm_peaks =
       prm_ms_util::getPrmPeakPtrs(ms_six_ptr_vec_, tole_ptr);
   int group_spec_num = ms_six_ptr_vec_.size();

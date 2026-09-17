@@ -97,7 +97,7 @@ void EValueProcessor::process(bool is_separate) {
   // init variables
   int spectrum_num = msalign_util::getSpNum(sp_file_name);
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
-  double ppo = sp_para_ptr->getPeakTolerancePtr()->getPpo();
+  double ppo = sp_para_ptr->getPrecTolerancePtr()->getPpo();
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
   MsAlignReaderPtr reader_ptr = std::make_shared<MsAlignReader>(
       sp_file_name, group_spec_num, sp_para_ptr->getActivationPtr(),

@@ -91,7 +91,7 @@ SpecGraphPtrVec SpecGraphReader::getNextSpecGraphPtrVec(
               deconv_ms_ptr_vec, sp_para_ptr_, prec_mono_mass + prec_errors[i]);
       PrmMsPtrVec ms_six_vec = adjusted_spec_set_ptr->getMsSixPtrVec();
       PrmPeakPtrVec peak_vec = prm_ms_util::getPrmPeakPtrs(
-          ms_six_vec, sp_para_ptr_->getPeakTolerancePtr());
+          ms_six_vec, sp_para_ptr_->getPrecTolerancePtr());
       MassGraphPtr graph_ptr = getMassGraphPtr(peak_vec);
       LOG_DEBUG("search/graph complete");
       SpecGraphPtr spec_graph_ptr = std::make_shared<SpecGraph>(

@@ -21,19 +21,14 @@
 #include <vector>
 
 #include "common/base/activation.hpp"
-#include "common/xml/xml_dom_element.hpp"
 #include "para/peak_tolerance.hpp"
 
 namespace toppic {
-
-class XmlDOMDocument;
 
 class SpPara {
  public:
   SpPara(const std::string& activation_name, double n_term_mod_mass,
          double ppm);
-
-  explicit SpPara(XmlDOMElement element);
 
   double getMinMass() const { return min_mass_; }
 
@@ -59,7 +54,10 @@ class SpPara {
     return multi_shift_search_prec_error_vec_;
   }
 
-  PeakTolerancePtr getPeakTolerancePtr() const { return peak_tolerance_ptr_; }
+  // Error tolerance of precursor masses (the precursor mass itself and the
+  // synthetic zero/precursor PRM peaks) and of fragment masses.
+  PeakTolerancePtr getPrecTolerancePtr() const { return prec_tolerance_ptr_; }
+  PeakTolerancePtr getFragTolerancePtr() const { return frag_tolerance_ptr_; }
 
   ActivationPtr getActivationPtr() const { return activation_ptr_; }
 
@@ -84,10 +82,6 @@ class SpPara {
   // isotope error, i.e. frag_ext_offsets_ = {0, -1 Da, +1 Da}; false keeps
   // only the mass itself ({0}).
   void setFragMassExtension(bool extend);
-
-  void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) const;
-
-  static std::string getXmlElementName() { return "sp_para"; }
 
   static int getMaxSpecNumPerFile() { return 10000000; }
 
@@ -120,7 +114,8 @@ class SpPara {
 
   std::vector<double> var_ptm_search_prec_error_vec_;
 
-  PeakTolerancePtr peak_tolerance_ptr_;
+  PeakTolerancePtr prec_tolerance_ptr_;
+  PeakTolerancePtr frag_tolerance_ptr_;
 };
 
 using SpParaPtr = std::shared_ptr<SpPara>;

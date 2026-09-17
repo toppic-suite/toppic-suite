@@ -37,10 +37,7 @@ class CompPValueMCMC {
         generator_(new std::default_random_engine(42)),
         min_mass_(mng_ptr->prsm_para_ptr_->getSpParaPtr()->getMinMass()),
         ptm_residue_map_(ptm_residue_map),
-        mass_table_(mass_table),
-        ppo_(mng_ptr->prsm_para_ptr_->getSpParaPtr()
-                 ->getPeakTolerancePtr()
-                 ->getPpo()) {
+        mass_table_(mass_table) {
     mu_.resize(mng_ptr_->n_);
     std::fill(mu_.begin(), mu_.end(), 1);
   }
@@ -89,8 +86,6 @@ class CompPValueMCMC {
   int z_;
 
   double pep_mass_;
-
-  double ppo_;
 
   std::vector<long long> mu_;
 

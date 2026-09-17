@@ -65,7 +65,7 @@ PrsmPtrVec ZeroPtmSearchProcessor::zeroPtmSearchOneSpec(
     }
   }
   double ppo =
-      mng_ptr->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()->getPpo();
+      mng_ptr->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr()->getPpo();
   ZpFastMatchPtrVec fast_matches =
       zero_ptm_fast_search::filter(type_ptr, ms_three_vec, proteoform_ptr_vec,
                                    mng_ptr->zero_ptm_filter_result_num_, ppo);

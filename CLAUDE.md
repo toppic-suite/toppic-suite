@@ -407,6 +407,26 @@ the input. Facts to keep straight:
   collided with `--proteoform-ppm-error`). Every option is declared twice
   (the visible `display_desc` and the full parse `desc`); change both.
 
+## Precursor and fragment mass tolerances (`para/sp_para`)
+
+`SpPara` holds two `PeakTolerance` objects, `prec_tolerance_ptr_` and
+`frag_tolerance_ptr_` (both built from the one `-e` ppm today; the split is
+so they can differ later). The rule for choosing between them: the
+precursor tolerance covers anything sized on the precursor mass — the
+`getFirstPrecErrorTolerance(ppo)` checks in the filters/searches/E-value
+code, `refinePrecursorAndHeaderShift`, the localization shift checks
+(`LocalMng::prec_tole_ptr_`), **and** the tolerance handed to
+`prm_ms_util::getIntMassErrorList` / `getPrmPeakPtrs` and
+`comp_prob_value`, which use it only to build the synthetic zero and
+precursor PRM peaks (`prm_peak_factory`, sized on the precursor mass; the
+real fragment peaks already carry their own tolerances). The fragment
+tolerance covers per-peak tolerances set on fragment masses: the PRM /
+extend spectrum factories, post mass matching's m/z test, and the
+localization M tables (`LocalMng::frag_tole_ptr_`). Neither `SpPara` nor
+`PeakTolerance` has XML (de)serialization any more: their `appendXml` and
+`XmlDOMElement` constructors were never called and were removed; `SpPara`
+is built only from the toppic/topmg arguments in `PrsmPara`.
+
 ## Precursor +-1 Da error per identification stage (`para/sp_para`)
 
 `SpPara` holds one precursor-offset list per stage; each filter/search
