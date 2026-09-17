@@ -429,7 +429,10 @@ keep the `SpPara` defaults, so topmg is unaffected. The fragment-mass
 `extend_ms_factory` to every fragment above `frag_extend_min_mass_`) is separate:
 `SpPara::setFragMassExtension(false)` reduces it to `{0}`, reached through
 toppic's hidden `--disable-frag-mass-extension` (key `fragMassExtension`,
-default `"true"`).
+default `"true"`), and `setFragExtendMinMass` sets the threshold, reached
+through the hidden `--frag-extend-min-mass <Da>` (key `fragExtendMinMass`,
+default `"5000"`, the `SpPara` default; validated as a non-negative
+number).
 
 ## Source layout
 

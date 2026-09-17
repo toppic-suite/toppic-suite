@@ -113,6 +113,12 @@ PrsmPara::PrsmPara(const std::map<std::string, std::string>& arguments) {
   if (getArg(arguments, "fragMassExtension") == "false") {
     sp_para_ptr_->setFragMassExtension(false);
   }
+  // minimum fragment mass for the extension (toppic hidden
+  // --frag-extend-min-mass); an absent key keeps the SpPara default
+  if (getArg(arguments, "fragExtendMinMass") != "") {
+    sp_para_ptr_->setFragExtendMinMass(
+        std::stod(getArg(arguments, "fragExtendMinMass")));
+  }
 }
 
 bool PrsmPara::allowProtType(const ProteoformTypePtr& type_ptr) const {

@@ -84,6 +84,7 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["oneShiftPrecOneDaError"] = "false";
   arguments["varPtmPrecOneDaError"] = "true";
   arguments["fragMassExtension"] = "true";
+  arguments["fragExtendMinMass"] = "5000";
 
   arguments["version"] = "";
   return arguments;
@@ -313,6 +314,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
   std::string thread_number = "";
   std::string top_prsm_number = "";
   std::string post_min_peak_num = "";
+  std::string frag_extend_min_mass = "";
 
   /** Define and parse the program options*/
   try {
@@ -493,6 +495,8 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "enable-one-shift-prec-error", "")(
         "disable-var-ptm-prec-error", "")(
         "disable-frag-mass-extension", "")(
+        "frag-extend-min-mass", po::value<std::string>(&frag_extend_min_mass),
+        "")(
         "filtering-result-number",
         po::value<std::string>(&filtering_result_num),
         "Filtering result number. Default value: 20.")(
@@ -713,6 +717,9 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
     }
     if (vm.count("disable-frag-mass-extension")) {
       arguments_["fragMassExtension"] = "false";
+    }
+    if (vm.count("frag-extend-min-mass")) {
+      arguments_["fragExtendMinMass"] = frag_extend_min_mass;
     }
 
     if (vm.count("filtering-result-number")) {
@@ -1048,6 +1055,19 @@ bool ToppicArgument::validateArguments() {
   } catch (const std::exception& ex) {
     LOG_ERROR("Post mass matching minimum isotopic peak number "
               << post_min_peak_num << " should be a number.");
+    return false;
+  }
+
+  std::string frag_extend_min_mass = arguments_["fragExtendMinMass"];
+  try {
+    if (std::stod(frag_extend_min_mass) < 0) {
+      LOG_ERROR("Fragment extension minimum mass "
+                << frag_extend_min_mass << " should not be negative.");
+      return false;
+    }
+  } catch (const std::exception& ex) {
+    LOG_ERROR("Fragment extension minimum mass " << frag_extend_min_mass
+                                                 << " should be a number.");
     return false;
   }
 

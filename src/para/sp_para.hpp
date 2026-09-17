@@ -71,6 +71,9 @@ class SpPara {
 
   void setEnvCnnCutoff(double cutoff) { env_cnn_cutoff_ = cutoff; }
 
+  // Fragment masses at or below this value (Da) are not extended.
+  void setFragExtendMinMass(double mass) { frag_extend_min_mass_ = mass; }
+
   // Allow (true) or disallow (false) a +-1 Da precursor mass error in the
   // zero-shift, one-shift and variable-PTM filtering and search stages.
   void setZeroShiftPrecOneDaError(bool allow);
