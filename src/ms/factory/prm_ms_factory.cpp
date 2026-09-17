@@ -277,7 +277,7 @@ PrmMsPtr geneMsSixPtr(const DeconvMsPtr& deconv_ms_ptr, int spec_id,
     } else {
       addSixMasses(list, spec_id, deconv_ms_ptr->getPeakPtr(i), prec_mono_mass,
                    n_term_label_mass, active_type_ptr, tole_ptr,
-                   sp_para_ptr->getExtendOffsets());
+                   sp_para_ptr->getFragExtOffsets());
     }
   }
 
@@ -309,7 +309,7 @@ PrmMsPtr geneSuffixMsSixPtr(const DeconvMsPtr& deconv_ms_ptr, int spec_id,
     } else {
       addSuffixSixMasses(list, spec_id, deconv_ms_ptr->getPeakPtr(i),
                          prec_mono_mass, active_type_ptr, tole_ptr,
-                         sp_para_ptr->getExtendOffsets());
+                         sp_para_ptr->getFragExtOffsets());
     }
   }
   // filter low mass peaks

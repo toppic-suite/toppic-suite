@@ -425,7 +425,7 @@ and `--disable-var-ptm-prec-error` (argument keys `zeroShiftPrecOneDaError`,
 `varPtmPrecOneDaError = "true"` (variable-PTM stage searched with
 `{0, -1, +1}`; `--disable-var-ptm-prec-error` restores `{0}`). Absent keys
 keep the `SpPara` defaults, so topmg is unaffected. The fragment-mass
-`ext_offsets_` expansion is separate.
+`frag_ext_offsets_` expansion is separate.
 
 ## Source layout
 

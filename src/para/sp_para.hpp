@@ -39,7 +39,9 @@ class SpPara {
 
   double getExtendMinMass() const { return extend_min_mass_; }
 
-  const std::vector<double>& getExtendOffsets() const { return ext_offsets_; }
+  const std::vector<double>& getFragExtOffsets() const {
+    return frag_ext_offsets_;
+  }
 
   const std::vector<double>& getZeroShiftSearchPrecErrorVec() const {
     return zero_shift_search_prec_error_vec_;
@@ -90,7 +92,7 @@ class SpPara {
   // if the mass is smaller than extend_min_mass, the peak is not extended
   double extend_min_mass_ = 5000;
 
-  std::vector<double> ext_offsets_;
+  std::vector<double> frag_ext_offsets_;
 
   // n_term_label_mass is for iTRAQ or TMT labeling
   double n_term_label_mass_ = 0.0;

@@ -35,7 +35,7 @@ ExtendMsPtr geneMsThreePtr(const DeconvMsPtr& deconv_ms_ptr,
   MsHeaderPtr header_ptr = MsHeader::geneMsHeaderPtr(ori_header_ptr, prec_mass);
   ExtendPeakPtrVec list;
   double ext_min_mass = sp_para_ptr->getExtendMinMass();
-  const std::vector<double>& ext_offsets = sp_para_ptr->getExtendOffsets();
+  const std::vector<double>& ext_offsets = sp_para_ptr->getFragExtOffsets();
 
   for (size_t i = 0; i < deconv_ms_ptr->size(); i++) {
     DeconvPeakPtr deconv_peak_ptr = deconv_ms_ptr->getPeakPtr(i);

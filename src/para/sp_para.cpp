@@ -40,7 +40,7 @@ SpPara::SpPara(const std::string& activation_name, double n_term_label_mass,
   // extend sp parameter
   double IM = mass_constant::getIsotopeMass();
   // the set of offsets used to expand the monoisotopic mass list
-  ext_offsets_ = {0, -IM, IM};
+  frag_ext_offsets_ = {0, -IM, IM};
 
   setZeroShiftPrecOneDaError(true);
   setOneShiftPrecOneDaError(true);
@@ -79,12 +79,12 @@ SpPara::SpPara(XmlDOMElement element) {
   extend_min_mass_ =
       xml_dom_util::getDoubleChildValue(element, "extend_min_mass", 0);
   XmlDOMElement list_element =
-      xml_dom_util::getChildElement(element, "extend_offset_list", 0);
-  int offset_num = xml_dom_util::getChildCount(list_element, "extend_offset");
+      xml_dom_util::getChildElement(element, "frag_ext_offset_list", 0);
+  int offset_num = xml_dom_util::getChildCount(list_element, "frag_ext_offset");
   for (int i = 0; i < offset_num; i++) {
     double offset =
-        xml_dom_util::getDoubleChildValue(list_element, "extend_offset", i);
-    ext_offsets_.push_back(offset);
+        xml_dom_util::getDoubleChildValue(list_element, "frag_ext_offset", i);
+    frag_ext_offsets_.push_back(offset);
   }
   n_term_label_mass_ =
       xml_dom_util::getDoubleChildValue(element, "n_term_label_mass", 0);
@@ -114,10 +114,10 @@ void SpPara::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) const {
   str = str_util::toString(extend_min_mass_);
   xml_doc->addElement(element, "extend_min_mass", str.c_str());
   XmlDOMElement list_element =
-      xml_doc->addElement(element, "extend_offset_list");
-  for (size_t i = 0; i < ext_offsets_.size(); i++) {
-    str = str_util::toString(ext_offsets_[i]);
-    xml_doc->addElement(list_element, "extend_offset", str.c_str());
+      xml_doc->addElement(element, "frag_ext_offset_list");
+  for (size_t i = 0; i < frag_ext_offsets_.size(); i++) {
+    str = str_util::toString(frag_ext_offsets_[i]);
+    xml_doc->addElement(list_element, "frag_ext_offset", str.c_str());
   }
   str = str_util::toString(n_term_label_mass_);
   xml_doc->addElement(element, "n_term_label_mass", str.c_str());
