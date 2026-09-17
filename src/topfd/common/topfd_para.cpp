@@ -180,7 +180,8 @@ void TopfdPara::createSqlDb(const std::string& sql_db_name) {
 }
 
 std::string TopfdPara::getTopfdParaStr(const std::string& prefix,
-                                       const std::string& sep) const {
+                                       const std::string& sep,
+                                       const std::string& msalign_ext) const {
   std::stringstream output;
   const int w = para_label_width_;
   auto kv = [&](const char* label) -> std::ostream& {
@@ -188,6 +189,10 @@ std::string TopfdPara::getTopfdParaStr(const std::string& prefix,
   };
 
   kv("File name:") << mzml_file_name_ << std::endl;
+  if (!msalign_ext.empty()) {
+    kv("Msalign file name:") << output_base_name_ << "_" << msalign_ext
+                             << std::endl;
+  }
   if (is_faims_) {
     kv("FAIMS data:") << "Yes" << std::endl;
     kv("FAIMS voltage:") << faims_volt_ << std::endl;
@@ -251,11 +256,12 @@ std::string TopfdPara::getTopfdParaStr(const std::string& prefix,
 }
 
 std::string TopfdPara::getParaStr(const std::string& prefix,
-                                  const std::string& sep) const {
+                                  const std::string& sep,
+                                  const std::string& msalign_ext) const {
   std::stringstream output;
   output << prefix << "Timestamp: " << time_util::getTimeStr() << std::endl;
   output << banner(prefix, "Parameters") << std::endl;
-  output << getTopfdParaStr(prefix, sep);
+  output << getTopfdParaStr(prefix, sep, msalign_ext);
   output << banner(prefix, "Parameters") << std::endl;
   return output.str();
 }

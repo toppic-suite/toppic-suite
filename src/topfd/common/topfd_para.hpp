@@ -34,11 +34,16 @@ class TopfdPara {
 
   ~TopfdPara();
 
+  // msalign_ext ("ms1.msalign", "ms2.msalign", ...) names the msalign file
+  // the block is written into: it adds an "Msalign file name:" line
+  // (<output base name>_<ext>, so FAIMS runs show their per-voltage file).
+  // Empty for the console printout, which belongs to no file.
   std::string getTopfdParaStr(const std::string& prefix,
-                              const std::string& sep) const;
+                              const std::string& sep,
+                              const std::string& msalign_ext = "") const;
 
-  std::string getParaStr(const std::string& prefix,
-                         const std::string& sep) const;
+  std::string getParaStr(const std::string& prefix, const std::string& sep,
+                         const std::string& msalign_ext = "") const;
 
   void createSqlDb(const std::string& db_name);
 

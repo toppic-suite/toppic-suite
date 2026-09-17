@@ -348,7 +348,8 @@ void DeconvMs2Process::process() {
     ms2_writer_ptr_vec[i] = nullptr;
   }
   // Merge files
-  std::string para_str = topfd_para_ptr_->getParaStr("#", "\t");
+  std::string para_str =
+      topfd_para_ptr_->getParaStr("#", "\t", output_filename_ext_);
   MsalignThreadMergePtr ms2_merge_ptr = std::make_shared<MsalignThreadMerge>(
       output_filename_ext_, topfd_para_ptr_->getThreadNum(),
       output_filename_ext_, output_base_name, para_str);

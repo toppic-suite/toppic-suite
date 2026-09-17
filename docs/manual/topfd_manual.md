@@ -107,8 +107,10 @@ mass, intensity, charge and score. When several features fall in the
 isolation window of an MS/MS spectrum, those with at least a tenth of the
 strongest feature's intensity are all kept and the `PRECURSOR_*` values are
 separated by `:`. The parameters used are recorded as `#` comment lines at
-the top of the file. With `--missing-level-one` no `_ms1.msalign` and no
-feature files are produced.
+the top of the file, starting with the input file (`File name`) and the
+msalign file's own name (`Msalign file name`, e.g. `sample_-40_ms1.msalign`
+for a FAIMS voltage level). With `--missing-level-one` no `_ms1.msalign`
+and no feature files are produced.
 
 With more than one thread, per-thread partial `msalign` files
 (`sample_ms1.msalign_0`, `sample_ms2.msalign_0`, `_1`, ...) exist while
