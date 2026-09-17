@@ -71,12 +71,13 @@ namespace {
 // AbstractFragmentScorer in Informed-Proteomics): theoretical isotopic peaks
 // below 10% of the highest one are neither looked for nor scored; an envelope
 // is accepted with a Pearson correlation >= 0.7 or a Bhattacharyya distance
-// <= 0.03; fragment charges run from 1 to min(15, precursor charge + 2).
+// <= 0.03; fragment charges run from 1 to min(15, precursor charge +
+// CHARGE_ABOVE_PREC) (MSPathFinderT uses 2 above the precursor charge).
 constexpr double MIN_RELATIVE_INTE = 0.1;
 constexpr double MIN_CORR = 0.7;
 constexpr double MAX_DIST = 0.03;
 constexpr int MAX_CHARGE = 15;
-constexpr int CHARGE_ABOVE_PREC = 2;
+constexpr int CHARGE_ABOVE_PREC = 0;
 
 // m/z tolerance for pairing the theoretical isotopic peaks of an accepted
 // envelope with the observed peaks when the envelope is scored by EnvCNN
