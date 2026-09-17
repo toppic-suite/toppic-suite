@@ -87,16 +87,26 @@ PrsmPara::PrsmPara(const std::map<std::string, std::string>& arguments) {
   if (getArg(arguments, "envCnnCutoff") != "") {
     sp_para_ptr_->setEnvCnnCutoff(std::stod(getArg(arguments, "envCnnCutoff")));
   }
-  // +-1 Da precursor mass error per stage; absent keys keep the defaults
-  // (allowed for zero/one shift, not for variable PTMs)
+  // +-1 Da precursor mass error per stage; absent keys keep the SpPara
+  // defaults (allowed for zero/one shift, not for variable PTMs). toppic
+  // overrides two of them: oneShiftPrecOneDaError = "false" unless
+  // --enable-one-shift-prec-error is given, and varPtmPrecOneDaError =
+  // "true" unless --disable-var-ptm-prec-error is given.
   if (getArg(arguments, "zeroShiftPrecOneDaError") == "false") {
     sp_para_ptr_->setZeroShiftPrecOneDaError(false);
   }
-  if (getArg(arguments, "oneShiftPrecOneDaError") == "false") {
+  std::string one_shift_prec_error =
+      getArg(arguments, "oneShiftPrecOneDaError");
+  if (one_shift_prec_error == "false") {
     sp_para_ptr_->setOneShiftPrecOneDaError(false);
+  } else if (one_shift_prec_error == "true") {
+    sp_para_ptr_->setOneShiftPrecOneDaError(true);
   }
-  if (getArg(arguments, "varPtmPrecOneDaError") == "true") {
+  std::string var_ptm_prec_error = getArg(arguments, "varPtmPrecOneDaError");
+  if (var_ptm_prec_error == "true") {
     sp_para_ptr_->setVarPtmPrecOneDaError(true);
+  } else if (var_ptm_prec_error == "false") {
+    sp_para_ptr_->setVarPtmPrecOneDaError(false);
   }
 }
 
