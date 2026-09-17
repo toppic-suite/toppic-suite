@@ -77,6 +77,11 @@ class SpPara {
   void setOneShiftPrecOneDaError(bool allow);
   void setVarPtmPrecOneDaError(bool allow);
 
+  // Extend (true) each fragment mass above extend_min_mass_ by a +-1 Da
+  // isotope error, i.e. frag_ext_offsets_ = {0, -1 Da, +1 Da}; false keeps
+  // only the mass itself ({0}).
+  void setFragMassExtension(bool extend);
+
   void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) const;
 
   static std::string getXmlElementName() { return "sp_para"; }

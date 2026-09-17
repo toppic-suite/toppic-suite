@@ -83,6 +83,7 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["zeroShiftPrecOneDaError"] = "true";
   arguments["oneShiftPrecOneDaError"] = "false";
   arguments["varPtmPrecOneDaError"] = "true";
+  arguments["fragMassExtension"] = "true";
 
   arguments["version"] = "";
   return arguments;
@@ -491,6 +492,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "disable-zero-shift-prec-error", "")(
         "enable-one-shift-prec-error", "")(
         "disable-var-ptm-prec-error", "")(
+        "disable-frag-mass-extension", "")(
         "filtering-result-number",
         po::value<std::string>(&filtering_result_num),
         "Filtering result number. Default value: 20.")(
@@ -708,6 +710,9 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
     }
     if (vm.count("disable-var-ptm-prec-error")) {
       arguments_["varPtmPrecOneDaError"] = "false";
+    }
+    if (vm.count("disable-frag-mass-extension")) {
+      arguments_["fragMassExtension"] = "false";
     }
 
     if (vm.count("filtering-result-number")) {

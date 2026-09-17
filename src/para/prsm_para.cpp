@@ -108,6 +108,11 @@ PrsmPara::PrsmPara(const std::map<std::string, std::string>& arguments) {
   } else if (var_ptm_prec_error == "false") {
     sp_para_ptr_->setVarPtmPrecOneDaError(false);
   }
+  // +-1 Da fragment mass extension (toppic hidden
+  // --disable-frag-mass-extension); an absent key keeps the SpPara default
+  if (getArg(arguments, "fragMassExtension") == "false") {
+    sp_para_ptr_->setFragMassExtension(false);
+  }
 }
 
 bool PrsmPara::allowProtType(const ProteoformTypePtr& type_ptr) const {

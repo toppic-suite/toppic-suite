@@ -37,10 +37,8 @@ SpPara::SpPara(const std::string& activation_name, double n_term_label_mass,
   double ppo = ppm * 0.000001;
   peak_tolerance_ptr_ = std::make_shared<PeakTolerance>(ppo);
 
-  // extend sp parameter
-  double IM = mass_constant::getIsotopeMass();
   // the set of offsets used to expand the monoisotopic mass list
-  frag_ext_offsets_ = {0, -IM, IM};
+  setFragMassExtension(true);
 
   setZeroShiftPrecOneDaError(true);
   setOneShiftPrecOneDaError(true);
@@ -71,6 +69,10 @@ void SpPara::setOneShiftPrecOneDaError(bool allow) {
 
 void SpPara::setVarPtmPrecOneDaError(bool allow) {
   var_ptm_search_prec_error_vec_ = precErrorVec(allow);
+}
+
+void SpPara::setFragMassExtension(bool extend) {
+  frag_ext_offsets_ = precErrorVec(extend);
 }
 
 SpPara::SpPara(XmlDOMElement element) {
