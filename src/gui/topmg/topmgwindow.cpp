@@ -51,6 +51,8 @@ TopmgWindow::TopmgWindow(QWidget* parent)
   ui->cutoffProteinValueEdit->setValidator(validator1);
   ui->threadNumberEdit->setValidator(new QIntValidator(0, 2147483647, this));
   ui->errorToleranceEdit->setValidator(new QIntValidator(0, 2147483647, this));
+  ui->precErrorToleranceEdit->setValidator(
+      new QIntValidator(0, 2147483647, this));
   ui->envCnnCutoffEdit->setValidator(new QDoubleValidator(0, 1, 4, this));
   ui->formErrorToleranceEdit->setValidator(
       new QDoubleValidator(0, 2147483647, 4, this));
@@ -109,7 +111,9 @@ void TopmgWindow::on_defaultButton_clicked() {
   ui->modFileEdit->setText("");
 
   ui->errorToleranceEdit->setText(
-      QString::fromStdString(arguments_["massErrorTolerance"]));
+      QString::fromStdString(arguments_["fragErrorTolerance"]));
+  ui->precErrorToleranceEdit->setText(
+      QString::fromStdString(arguments_["precErrorTolerance"]));
   ui->envCnnCutoffEdit->setText(
       QString::fromStdString(arguments_["envCnnCutoff"]));
   ui->formErrorToleranceEdit->setText(
@@ -281,8 +285,10 @@ std::map<std::string, std::string> TopmgWindow::getArguments() {
   arguments_["varPtmNumber"] = ui->numModComboBox->currentText().toStdString();
   arguments_["shiftNumber"] =
       ui->numUnknownShiftComboBox->currentText().toStdString();
-  arguments_["massErrorTolerance"] =
+  arguments_["fragErrorTolerance"] =
       ui->errorToleranceEdit->text().toStdString();
+  arguments_["precErrorTolerance"] =
+      ui->precErrorToleranceEdit->text().toStdString();
   arguments_["envCnnCutoff"] = ui->envCnnCutoffEdit->text().toStdString();
   arguments_["proteoformErrorTolerance"] =
       ui->formErrorToleranceEdit->text().toStdString();
@@ -417,6 +423,7 @@ void TopmgWindow::lockDialog() {
   ui->fixedModFileEdit->setEnabled(false);
   ui->fixedModFileButton->setEnabled(false);
   ui->errorToleranceEdit->setEnabled(false);
+  ui->precErrorToleranceEdit->setEnabled(false);
   ui->envCnnCutoffEdit->setEnabled(false);
   ui->formErrorToleranceEdit->setEnabled(false);
   ui->maxModEdit->setEnabled(false);
@@ -461,6 +468,7 @@ void TopmgWindow::unlockDialog() {
   }
   ui->fixedModFileEdit->setEnabled(true);
   ui->errorToleranceEdit->setEnabled(true);
+  ui->precErrorToleranceEdit->setEnabled(true);
   ui->envCnnCutoffEdit->setEnabled(true);
   ui->formErrorToleranceEdit->setEnabled(true);
   ui->maxModEdit->setEnabled(true);
@@ -546,7 +554,13 @@ bool TopmgWindow::checkError() {
 
   if (ui->errorToleranceEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
-                         tr("Mass error tolerance is empty!"),
+                         tr("Fragment error tolerance is empty!"),
+                         QMessageBox::Yes);
+    return true;
+  }
+  if (ui->precErrorToleranceEdit->text().isEmpty()) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("Precursor error tolerance is empty!"),
                          QMessageBox::Yes);
     return true;
   }
@@ -645,7 +659,8 @@ void TopmgWindow::showArguments() {
        "\nactivation:" + arguments_["activation"] + "\nsearchType:" +
        arguments_["searchType"] + "\nfixedMod:" + arguments_["fixedMod"] +
        "\nshiftNumber:" + arguments_["shiftNumber"] +
-       "\nerrorTolerance:" + arguments_["massErrorTolerance"] +
+       "\nprecErrorTolerance:" + arguments_["precErrorTolerance"] +
+       "\nfragErrorTolerance:" + arguments_["fragErrorTolerance"] +
        "\nformErrorTolerance:" + arguments_["proteoformErrorTolerance"] +
        "\ncutoffSpectralType:" + arguments_["cutoffSpectralType"] +
        "\ncutoffSpectralValue:" + arguments_["cutoffSpectralValue"] +

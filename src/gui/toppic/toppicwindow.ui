@@ -387,7 +387,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
        <rect>
         <x>480</x>
         <y>90</y>
-        <width>391</width>
+        <width>190</width>
         <height>31</height>
        </rect>
       </property>
@@ -402,6 +402,44 @@ li.checked::marker { content: &quot;\2612&quot;; }
          </property>
          <property name="text">
           <string>Decoy database</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="horizontalLayoutWidget_precTole">
+      <property name="geometry">
+       <rect>
+        <x>480</x>
+        <y>170</y>
+        <width>391</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_precTole">
+       <item>
+        <widget class="QLabel" name="label_precTole">
+         <property name="minimumSize">
+          <size>
+           <width>200</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>200</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Precursor tolerance (PPM):</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="precErrorToleranceEdit">
+         <property name="text">
+          <string>10</string>
          </property>
         </widget>
        </item>
@@ -432,7 +470,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
           </size>
          </property>
          <property name="text">
-          <string>Mass error tolerance (PPM):</string>
+          <string>Fragment tolerance (PPM):</string>
          </property>
         </widget>
        </item>
@@ -661,9 +699,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
      <widget class="QWidget" name="horizontalLayoutWidget_26">
       <property name="geometry">
        <rect>
-        <x>480</x>
-        <y>170</y>
-        <width>391</width>
+        <x>680</x>
+        <y>90</y>
+        <width>191</width>
         <height>31</height>
        </rect>
       </property>

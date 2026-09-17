@@ -25,14 +25,13 @@
 namespace toppic {
 
 SpPara::SpPara(const std::string& activation_name, double n_term_label_mass,
-               double ppm) {
+               double prec_ppm, double frag_ppm) {
   if (activation_name != "FILE") {
     activation_ptr_ = ActivationBase::getActivationPtrByName(activation_name);
   }
   n_term_label_mass_ = n_term_label_mass;
-  double ppo = ppm * 0.000001;
-  prec_tolerance_ptr_ = std::make_shared<PeakTolerance>(ppo);
-  frag_tolerance_ptr_ = std::make_shared<PeakTolerance>(ppo);
+  prec_tolerance_ptr_ = std::make_shared<PeakTolerance>(prec_ppm * 0.000001);
+  frag_tolerance_ptr_ = std::make_shared<PeakTolerance>(frag_ppm * 0.000001);
 
   // the set of offsets used to expand the monoisotopic mass list
   setFragMassExtension(true);

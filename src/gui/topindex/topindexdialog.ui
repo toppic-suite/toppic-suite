@@ -230,8 +230,8 @@ p, li { white-space: pre-wrap; }
    <widget class="QWidget" name="horizontalLayoutWidget_21">
     <property name="geometry">
      <rect>
-      <x>560</x>
-      <y>110</y>
+      <x>390</x>
+      <y>120</y>
       <width>151</width>
       <height>33</height>
      </rect>
@@ -250,7 +250,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>560</x>
-      <y>150</y>
+      <y>110</y>
       <width>331</width>
       <height>33</height>
      </rect>
@@ -287,11 +287,49 @@ p, li { white-space: pre-wrap; }
      </item>
     </layout>
    </widget>
+     <widget class="QWidget" name="horizontalLayoutWidget_precTole">
+      <property name="geometry">
+       <rect>
+        <x>560</x>
+        <y>190</y>
+        <width>331</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_precTole">
+       <item>
+        <widget class="QLabel" name="label_precTole">
+         <property name="minimumSize">
+          <size>
+           <width>200</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>200</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Precursor tolerance (PPM):</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="precErrorToleranceEdit">
+         <property name="text">
+          <string>10</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
    <widget class="QWidget" name="horizontalLayoutWidget_14">
     <property name="geometry">
      <rect>
       <x>560</x>
-      <y>190</y>
+      <y>150</y>
       <width>331</width>
       <height>31</height>
      </rect>
@@ -299,8 +337,20 @@ p, li { white-space: pre-wrap; }
     <layout class="QHBoxLayout" name="horizontalLayout_14">
      <item alignment="Qt::AlignLeft">
       <widget class="QLabel" name="label_15">
+         <property name="minimumSize">
+          <size>
+           <width>200</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>200</width>
+           <height>16777215</height>
+          </size>
+         </property>
        <property name="text">
-        <string>Mass error tolerance (PPM):</string>
+        <string>Fragment tolerance (PPM):</string>
        </property>
       </widget>
      </item>

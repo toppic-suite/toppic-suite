@@ -28,7 +28,7 @@ namespace toppic {
 class SpPara {
  public:
   SpPara(const std::string& activation_name, double n_term_mod_mass,
-         double ppm);
+         double prec_ppm, double frag_ppm);
 
   double getMinMass() const { return min_mass_; }
 

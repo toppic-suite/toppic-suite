@@ -126,7 +126,8 @@ std::map<std::string, std::string> topindex_para{{"fixedMod", "-f"},
                                                  {"allowProtMod", "-n"},
                                                  {"searchType", "-d"},
                                                  {"threadNumber", "-u"},
-                                                 {"massErrorTolerance", "-e"}};
+                                                 {"fragErrorTolerance", "-e"},
+                                                 {"precErrorTolerance", "-E"}};
 
 /*function for topindex*/
 std::string geneTopIndexCommand(std::map<std::string, std::string> arguments_) {
@@ -183,7 +184,8 @@ std::map<std::string, std::string> toppic_para{
     {"keepTempFiles", "-k "},
     {"keepDecoyResults", "-K "},
     {"combinedOutputName", "-c "},
-    {"massErrorTolerance", "-e "},
+    {"fragErrorTolerance", "-e "},
+    {"precErrorTolerance", "-E "},
     {"envCnnCutoff", "-F "},
     {"groupSpectrumNumber", "-r "},
     {"localPtmFileName", "-B "},
@@ -279,7 +281,8 @@ std::map<std::string, std::string> topmg_para{
     {"keepTempFiles", "-k "},
     {"keepDecoyResults", "-K "},
     {"combinedOutputName", "-c "},
-    {"massErrorTolerance", "-e "},
+    {"fragErrorTolerance", "-e "},
+    {"precErrorTolerance", "-E "},
     {"envCnnCutoff", "-F "},
     {"useAsfDiag", "-D "},
     {"varModFileName", "-i "},

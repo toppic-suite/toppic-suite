@@ -129,7 +129,8 @@ Key options (defaults): `-f` fixed mod none (`C57`, `C58` or file), `-n`
 N-terminal forms all four, `-R` proteoform types all four, `-d` decoy,
 `-s` unexpected shifts 1 (0..2), `-m`/`-M` shift range -500/500 Da,
 `-b` variable-PTM file with `-S` max 3, `-B` common-modification file for
-characterization with `-H` MIScore threshold 0.15, `-e` tolerance 10 ppm,
+characterization with `-H` MIScore threshold 0.15, `-e` fragment and `-E`
+precursor tolerance 10 ppm,
 `-F` EnvCNN filter 0.2, `-p` cluster tolerance 1.2 Da, `-r` combined
 spectra 1, `-x` no feature file, `-D` disable post matching, `-I` post
 min peaks 1, cutoffs `-t/-v`, `-T/-V`, `-y/-Y` (EVALUE 0.01 each; `FDR`
@@ -162,7 +163,7 @@ same file format as TopPIC). Needs `sample_ms2.feature` unless `-x`;
 `sample_ms2_topmg_*`; `MIScore` is always `-`. Key options (defaults):
 `-P` max variable PTMs 5, `-j` graph gap 40, `-G` PTMs per gap 5, `-s`
 unexpected shifts 0, `-M` max shift 500, `-D` add the ASF-Diagonal filter,
-`-w` whole proteins only, plus the same `-f -n -d -a -e -F -p -x`, cutoff,
+`-w` whole proteins only, plus the same `-f -n -d -a -e -E -F -p -x`, cutoff,
 `-c`, `-u`, `-k`, `-K` options as TopPIC. PrSMs with fewer than four
 matched fragments get the maximum E-value.
 

@@ -108,7 +108,9 @@ void TopIndexDialog::on_defaultButton_clicked() {
   arguments_ = toppic::TopIndexArgument::initArguments();
   ui->fixedModComboBox->setCurrentIndex(0);
   ui->errorToleranceEdit_2->setText(
-      QString::fromStdString(arguments_["massErrorTolerance"]));
+      QString::fromStdString(arguments_["fragErrorTolerance"]));
+  ui->precErrorToleranceEdit->setText(
+      QString::fromStdString(arguments_["precErrorTolerance"]));
   ui->threadNumberEdit->setText(
       QString::fromStdString(arguments_["threadNumber"]));
   ui->fixedModComboBox->setCurrentIndex(0);
@@ -236,8 +238,10 @@ std::map<std::string, std::string> TopIndexDialog::getArguments() {
   if (ui->fixedModComboBox->currentIndex() == 3) {
     arguments_["fixedMod"] = ui->fixedModFileEdit->text().toStdString();
   }
-  arguments_["massErrorTolerance"] =
+  arguments_["fragErrorTolerance"] =
       ui->errorToleranceEdit_2->text().toStdString();
+  arguments_["precErrorTolerance"] =
+      ui->precErrorToleranceEdit->text().toStdString();
 
   arguments_["allowProtMod"] = "";
   if (ui->NONECheckBox->isChecked()) {
@@ -268,6 +272,7 @@ void TopIndexDialog::lockDialog() {
   ui->fixedModFileEdit->setEnabled(false);
   ui->fixedModFileButton->setEnabled(false);
   ui->errorToleranceEdit_2->setEnabled(false);
+  ui->precErrorToleranceEdit->setEnabled(false);
   ui->databaseFileButton->setEnabled(false);
   ui->databaseFileEdit->setEnabled(false);
   ui->threadNumberEdit->setEnabled(false);
@@ -289,6 +294,7 @@ void TopIndexDialog::unlockDialog() {
   ui->databaseFileEdit->setEnabled(true);
   ui->fixedModFileEdit->setEnabled(true);
   ui->errorToleranceEdit_2->setEnabled(true);
+  ui->precErrorToleranceEdit->setEnabled(true);
   ui->threadNumberEdit->setEnabled(true);
   ui->fixedModComboBox->setEnabled(true);
   on_fixedModComboBox_currentIndexChanged(ui->fixedModComboBox->currentIndex());
@@ -320,7 +326,13 @@ bool TopIndexDialog::checkError() {
   }
   if (ui->errorToleranceEdit_2->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
-                         tr("Mass error tolerance is empty!"),
+                         tr("Fragment error tolerance is empty!"),
+                         QMessageBox::Yes);
+    return true;
+  }
+  if (ui->precErrorToleranceEdit->text().isEmpty()) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("Precursor error tolerance is empty!"),
                          QMessageBox::Yes);
     return true;
   }

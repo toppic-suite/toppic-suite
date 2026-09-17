@@ -410,8 +410,14 @@ the input. Facts to keep straight:
 ## Precursor and fragment mass tolerances (`para/sp_para`)
 
 `SpPara` holds two `PeakTolerance` objects, `prec_tolerance_ptr_` and
-`frag_tolerance_ptr_` (both built from the one `-e` ppm today; the split is
-so they can differ later). The rule for choosing between them: the
+`frag_tolerance_ptr_`, set by `-E`/`--prec-error-tolerance` and
+`-e`/`--frag-error-tolerance` (argument keys `precErrorTolerance` and
+`fragErrorTolerance`, both default 10 ppm) in toppic, topindex and topmg and
+their GUIs. The index file name (`filter/mng/index_file_name`) carries only
+the fragment value: the indexes depend on neither tolerance, and the manuals
+say an index is reused when `-f`, `-n`, `-e` and `-d` match. topmg's hidden
+`--proteoform-ppm-error` moved from `-E` to `-Q` to free the letter. The
+rule for choosing between the two tolerances: the
 precursor tolerance covers anything sized on the precursor mass — the
 `getFirstPrecErrorTolerance(ppo)` checks in the filters/searches/E-value
 code, `refinePrecursorAndHeaderShift`, the localization shift checks

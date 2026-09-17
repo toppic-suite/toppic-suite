@@ -77,13 +77,15 @@ PrsmPara::PrsmPara(const std::map<std::string, std::string>& arguments) {
   }
 
   std::string activation_name = getArg(arguments, "activation");
-  int ppm = std::stoi(getArg(arguments, "massErrorTolerance"));
+  int prec_ppm = std::stoi(getArg(arguments, "precErrorTolerance"));
+  int frag_ppm = std::stoi(getArg(arguments, "fragErrorTolerance"));
   double n_term_label_mass = 0;
   if (getArg(arguments, "nTermLabelMass") != "") {
     n_term_label_mass = std::stod(getArg(arguments, "nTermLabelMass"));
   }
   sp_para_ptr_ =
-      std::make_shared<SpPara>(activation_name, n_term_label_mass, ppm);
+      std::make_shared<SpPara>(activation_name, n_term_label_mass, prec_ppm,
+                               frag_ppm);
   if (getArg(arguments, "envCnnCutoff") != "") {
     sp_para_ptr_->setEnvCnnCutoff(std::stod(getArg(arguments, "envCnnCutoff")));
   }

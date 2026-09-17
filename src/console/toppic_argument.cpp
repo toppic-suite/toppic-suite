@@ -15,8 +15,11 @@
 
 #include "console/toppic_argument.hpp"
 
+#include <exception>
 #include <filesystem>
 #include <iomanip>
+#include <string>
+#include <utility>
 
 #include "common/base/mod_util.hpp"
 #include "common/util/file_util.hpp"
@@ -56,7 +59,8 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["searchType"] = "TARGET";
   arguments["numOfTopPrsms"] = "1";
   arguments["filteringResultNumber"] = "20";
-  arguments["massErrorTolerance"] = "10";
+  arguments["precErrorTolerance"] = "10";
+  arguments["fragErrorTolerance"] = "10";
   arguments["envCnnCutoff"] = "0.2";
   arguments["proteoformPpmError"] = "false";
   arguments["proteoformErrorTolerance"] = "1.2";
@@ -193,8 +197,11 @@ void ToppicArgument::outputArguments(
          << arguments["cutoffProteinValue"] << std::endl;
 
   output << std::setw(gap) << std::left
-         << "Error tolerance for matching masses:" << sep
-         << arguments["massErrorTolerance"] << " ppm" << std::endl;
+         << "Error tolerance for precursor masses:" << sep
+         << arguments["precErrorTolerance"] << " ppm" << std::endl;
+  output << std::setw(gap) << std::left
+         << "Error tolerance for fragment masses:" << sep
+         << arguments["fragErrorTolerance"] << " ppm" << std::endl;
   output << std::setw(gap) << std::left << "EnvCNN score cutoff:" << sep
          << arguments["envCnnCutoff"] << std::endl;
   if (arguments["postMassMatch"] == "true") {
@@ -297,7 +304,8 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
   std::string shift_num = "";
   std::string min_shift_mass = "";
   std::string max_shift_mass = "";
-  std::string mass_error_tole = "";
+  std::string frag_error_tole = "";
+  std::string prec_error_tole = "";
   std::string env_cnn_cutoff = "";
   std::string form_error_tole = "";
   std::string cutoff_spectral_type = "";
@@ -372,10 +380,13 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
             "the information of variable modifications.")(
             "decoy,d",
             "Use a shuffled decoy protein database to estimate false discovery "
-            "rates.")("mass-error-tolerance,e",
-                      po::value<std::string>(&mass_error_tole),
-                      "<a positive integer>. Error tolerance for precursor and "
-                      "fragment masses in PPM. Default value: 10.")(
+            "rates.")("frag-error-tolerance,e",
+                      po::value<std::string>(&frag_error_tole),
+                      "<a positive integer>. Error tolerance for fragment "
+                      "masses in PPM. Default value: 10.")(
+            "prec-error-tolerance,E", po::value<std::string>(&prec_error_tole),
+            "<a positive integer>. Error tolerance for precursor masses in "
+            "PPM. Default value: 10.")(
             "filter-by-env-cnn,F", po::value<std::string>(&env_cnn_cutoff),
             "<a number between 0 and 1>. Remove the deconvoluted masses whose "
             "EnvCNN score is below the cutoff before spectral filtering, "
@@ -463,7 +474,8 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "variable-ptm-file-name,b",
         po::value<std::string>(&variable_ptm_file_name),
         "")("approximate-spectra,A", "")("decoy,d", "")(
-        "mass-error-tolerance,e", po::value<std::string>(&mass_error_tole), "")(
+        "frag-error-tolerance,e", po::value<std::string>(&frag_error_tole), "")(
+        "prec-error-tolerance,E", po::value<std::string>(&prec_error_tole), "")(
         "filter-by-env-cnn,F", po::value<std::string>(&env_cnn_cutoff), "")(
         "proteoform-ppm-error,P", "")("proteoform-error-tolerance,p",
                                       po::value<std::string>(&form_error_tole),
@@ -612,8 +624,12 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
           arguments_["oriDatabaseFileName"] + "_target";
     }
 
-    if (vm.count("mass-error-tolerance")) {
-      arguments_["massErrorTolerance"] = mass_error_tole;
+    if (vm.count("frag-error-tolerance")) {
+      arguments_["fragErrorTolerance"] = frag_error_tole;
+    }
+
+    if (vm.count("prec-error-tolerance")) {
+      arguments_["precErrorTolerance"] = prec_error_tole;
     }
 
     if (vm.count("filter-by-env-cnn")) {
@@ -943,19 +959,23 @@ bool ToppicArgument::validateArguments() {
     return false;
   }
 
-  std::string mass_error_tole_value = arguments_["massErrorTolerance"];
-  try {
-    double tole = std::stoi(mass_error_tole_value);
-    if (tole <= 0) {
-      LOG_ERROR("Mass error tolerance: "
-                << mass_error_tole_value
-                << " error! The value should be positive.");
+  for (const auto& [key, name] :
+       {std::pair<const char*, const char*>{"precErrorTolerance",
+                                            "Precursor error tolerance"},
+        std::pair<const char*, const char*>{"fragErrorTolerance",
+                                            "Fragment error tolerance"}}) {
+    std::string tole_value = arguments_[key];
+    try {
+      double tole = std::stoi(tole_value);
+      if (tole <= 0) {
+        LOG_ERROR(name << ": " << tole_value
+                       << " error! The value should be positive.");
+        return false;
+      }
+    } catch (const std::exception& ex) {
+      LOG_ERROR(name << ": " << tole_value << " should be a number.");
       return false;
     }
-  } catch (const std::exception& ex) {
-    LOG_ERROR("Mass error tolerance: " << mass_error_tole_value
-                                       << " should be a number.");
-    return false;
   }
 
   std::string env_cnn_cutoff_value = arguments_["envCnnCutoff"];
