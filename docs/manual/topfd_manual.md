@@ -97,8 +97,9 @@ FAIMS data `sample_<voltage>` per voltage level, e.g. `sample_-40`).
 | `sample.sqlite` | An SQLite database with the deconvoluted MS1 and MS/MS spectra and their peaks, for spectrum visualisation and for TopPIC's post mass matching (see the `-N` option). Not written with `--no-sql`. With `--sql-3d` it also holds the raw MS1 peak tables for 3D visualisation (`CONFIG` and `PEAKS0`, `PEAKS1`, ...). |
 
 The `msalign` format is a text format. Each spectrum is a `BEGIN IONS` ...
-`END IONS` block with header lines (`FILE_NAME`, `SPECTRUM_ID`, `TITLE`,
-`SCANS`, `RETENTION_TIME` in minutes, `LEVEL`, and for MS/MS spectra
+`END IONS` block with header lines (`FILE_NAME`, `MSALIGN_FILE_NAME` (the
+msalign file itself, per voltage level for FAIMS data), `SPECTRUM_ID`,
+`TITLE`, `SCANS`, `RETENTION_TIME` in minutes, `LEVEL`, and for MS/MS spectra
 `MS_ONE_ID`, `MS_ONE_SCAN`, `PRECURSOR_WINDOW_BEGIN/END`, `ACTIVATION`,
 `PRECURSOR_MZ`, `PRECURSOR_CHARGE`, `PRECURSOR_MASS`, `PRECURSOR_INTENSITY`,
 `PRECURSOR_FEATURE_ID`, `DECONVOLUTED_MASS_NUMBER`) followed by one line per

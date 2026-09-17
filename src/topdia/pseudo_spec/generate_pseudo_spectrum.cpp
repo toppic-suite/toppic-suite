@@ -423,6 +423,8 @@ void GeneratePseudoSpectrum::writePseudoSpectrum(
 
   output << "BEGIN IONS" << std::endl;
   output << "FILE_NAME=" << topfd_para_ptr->getMzmlFileName() << std::endl;
+  output << "MSALIGN_FILE_NAME=" << topfd_para_ptr->getOutputBaseName()
+         << "_ms2.msalign" << std::endl;
   output << "SPECTRUM_ID=" << ms1_feature_idx << std::endl;  ///
   output << "TITLE=" << "Pseudo_Scan_" + std::to_string(ms1_feature_idx)
          << std::endl;
