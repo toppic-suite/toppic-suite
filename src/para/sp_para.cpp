@@ -78,8 +78,8 @@ void SpPara::setFragMassExtension(bool extend) {
 SpPara::SpPara(XmlDOMElement element) {
   min_peak_num_ = xml_dom_util::getIntChildValue(element, "min_peak_num", 0);
   min_mass_ = xml_dom_util::getDoubleChildValue(element, "min_mass", 0);
-  extend_min_mass_ =
-      xml_dom_util::getDoubleChildValue(element, "extend_min_mass", 0);
+  frag_extend_min_mass_ =
+      xml_dom_util::getDoubleChildValue(element, "frag_extend_min_mass", 0);
   XmlDOMElement list_element =
       xml_dom_util::getChildElement(element, "frag_ext_offset_list", 0);
   int offset_num = xml_dom_util::getChildCount(list_element, "frag_ext_offset");
@@ -113,8 +113,8 @@ void SpPara::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) const {
   xml_doc->addElement(element, "min_peak_num", str.c_str());
   str = str_util::toString(min_mass_);
   xml_doc->addElement(element, "min_mass", str.c_str());
-  str = str_util::toString(extend_min_mass_);
-  xml_doc->addElement(element, "extend_min_mass", str.c_str());
+  str = str_util::toString(frag_extend_min_mass_);
+  xml_doc->addElement(element, "frag_extend_min_mass", str.c_str());
   XmlDOMElement list_element =
       xml_doc->addElement(element, "frag_ext_offset_list");
   for (size_t i = 0; i < frag_ext_offsets_.size(); i++) {

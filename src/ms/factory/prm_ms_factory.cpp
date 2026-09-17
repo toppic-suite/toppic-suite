@@ -268,10 +268,10 @@ PrmMsPtr geneMsSixPtr(const DeconvMsPtr& deconv_ms_ptr, int spec_id,
   // get six prm peaks
   ActivationPtr active_type_ptr = header_ptr->getActivationPtr();
   PeakTolerancePtr tole_ptr = sp_para_ptr->getPeakTolerancePtr();
-  double extend_min_mass = sp_para_ptr->getExtendMinMass();
+  double frag_extend_min_mass = sp_para_ptr->getFragExtendMinMass();
   PrmPeakPtrVec list;
   for (size_t i = 0; i < deconv_ms_ptr->size(); i++) {
-    if (deconv_ms_ptr->getPeakPtr(i)->getMonoMass() <= extend_min_mass) {
+    if (deconv_ms_ptr->getPeakPtr(i)->getMonoMass() <= frag_extend_min_mass) {
       addTwoMasses(list, spec_id, deconv_ms_ptr->getPeakPtr(i), prec_mono_mass,
                    n_term_label_mass, active_type_ptr, tole_ptr);
     } else {
@@ -300,10 +300,10 @@ PrmMsPtr geneSuffixMsSixPtr(const DeconvMsPtr& deconv_ms_ptr, int spec_id,
   // get two prm peaks
   ActivationPtr active_type_ptr = header_ptr->getActivationPtr();
   PeakTolerancePtr tole_ptr = sp_para_ptr->getPeakTolerancePtr();
-  double extend_min_mass = sp_para_ptr->getExtendMinMass();
+  double frag_extend_min_mass = sp_para_ptr->getFragExtendMinMass();
   PrmPeakPtrVec list;
   for (size_t i = 0; i < deconv_ms_ptr->size(); i++) {
-    if (deconv_ms_ptr->getPeakPtr(i)->getMonoMass() <= extend_min_mass) {
+    if (deconv_ms_ptr->getPeakPtr(i)->getMonoMass() <= frag_extend_min_mass) {
       addSuffixTwoMasses(list, spec_id, deconv_ms_ptr->getPeakPtr(i),
                          prec_mono_mass, active_type_ptr, tole_ptr);
     } else {

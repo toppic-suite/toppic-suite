@@ -37,7 +37,7 @@ class SpPara {
 
   double getMinMass() const { return min_mass_; }
 
-  double getExtendMinMass() const { return extend_min_mass_; }
+  double getFragExtendMinMass() const { return frag_extend_min_mass_; }
 
   const std::vector<double>& getFragExtOffsets() const {
     return frag_ext_offsets_;
@@ -77,7 +77,7 @@ class SpPara {
   void setOneShiftPrecOneDaError(bool allow);
   void setVarPtmPrecOneDaError(bool allow);
 
-  // Extend (true) each fragment mass above extend_min_mass_ by a +-1 Da
+  // Extend (true) each fragment mass above frag_extend_min_mass_ by a +-1 Da
   // isotope error, i.e. frag_ext_offsets_ = {0, -1 Da, +1 Da}; false keeps
   // only the mass itself ({0}).
   void setFragMassExtension(bool extend);
@@ -94,8 +94,8 @@ class SpPara {
   int min_peak_num_ = 10;
   // if the mass if smaller than min_mass, the mass is removed.
   double min_mass_ = 50.0;
-  // if the mass is smaller than extend_min_mass, the peak is not extended
-  double extend_min_mass_ = 5000;
+  // if the mass is smaller than frag_extend_min_mass_, the peak is not extended
+  double frag_extend_min_mass_ = 5000;
 
   std::vector<double> frag_ext_offsets_;
 

@@ -426,7 +426,7 @@ and `--disable-var-ptm-prec-error` (argument keys `zeroShiftPrecOneDaError`,
 `{0, -1, +1}`; `--disable-var-ptm-prec-error` restores `{0}`). Absent keys
 keep the `SpPara` defaults, so topmg is unaffected. The fragment-mass
 `frag_ext_offsets_` expansion (`{0, -1 Da, +1 Da}` applied by
-`extend_ms_factory` to every fragment above `extend_min_mass_`) is separate:
+`extend_ms_factory` to every fragment above `frag_extend_min_mass_`) is separate:
 `SpPara::setFragMassExtension(false)` reduces it to `{0}`, reached through
 toppic's hidden `--disable-frag-mass-extension` (key `fragMassExtension`,
 default `"true"`).
