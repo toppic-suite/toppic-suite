@@ -407,6 +407,20 @@ the input. Facts to keep straight:
   collided with `--proteoform-ppm-error`). Every option is declared twice
   (the visible `display_desc` and the full parse `desc`); change both.
 
+## Precursor +-1 Da error per identification stage (`para/sp_para`)
+
+`SpPara` holds one precursor-offset list per stage; each filter/search
+expands a spectrum into one spectrum set per offset with
+`spectrum_set_factory::geneSpectrumSetPtrVecWithPrecError`. Defaults: zero
+shift and one shift `{0, -1 Da, +1 Da}`, variable PTM `{0}`, multi shift
+`{0}` (the diagonal filter and PTM search absorb a 1 Da error into the
+unknown shift, so they have no switch). `PrsmPara` applies the toppic hidden
+options `--disable-zero-shift-prec-error`, `--disable-one-shift-prec-error`
+and `--enable-var-ptm-prec-error` (argument keys `zeroShiftPrecOneDaError`,
+`oneShiftPrecOneDaError`, `varPtmPrecOneDaError`) through the
+`SpPara::set*PrecOneDaError` setters; absent keys keep the defaults, so
+topmg is unaffected. The fragment-mass `ext_offsets_` expansion is separate.
+
 ## Source layout
 
 `src` is the include root, so headers are included by their path from `src`

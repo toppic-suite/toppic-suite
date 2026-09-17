@@ -87,6 +87,17 @@ PrsmPara::PrsmPara(const std::map<std::string, std::string>& arguments) {
   if (getArg(arguments, "envCnnCutoff") != "") {
     sp_para_ptr_->setEnvCnnCutoff(std::stod(getArg(arguments, "envCnnCutoff")));
   }
+  // +-1 Da precursor mass error per stage; absent keys keep the defaults
+  // (allowed for zero/one shift, not for variable PTMs)
+  if (getArg(arguments, "zeroShiftPrecOneDaError") == "false") {
+    sp_para_ptr_->setZeroShiftPrecOneDaError(false);
+  }
+  if (getArg(arguments, "oneShiftPrecOneDaError") == "false") {
+    sp_para_ptr_->setOneShiftPrecOneDaError(false);
+  }
+  if (getArg(arguments, "varPtmPrecOneDaError") == "true") {
+    sp_para_ptr_->setVarPtmPrecOneDaError(true);
+  }
 }
 
 bool PrsmPara::allowProtType(const ProteoformTypePtr& type_ptr) const {

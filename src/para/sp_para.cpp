@@ -18,6 +18,7 @@
 #include <cstddef>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "common/base/activation_base.hpp"
 #include "common/base/mass_constant.hpp"
@@ -41,13 +42,35 @@ SpPara::SpPara(const std::string& activation_name, double n_term_label_mass,
   // the set of offsets used to expand the monoisotopic mass list
   ext_offsets_ = {0, -IM, IM};
 
-  zero_shift_search_prec_error_vec_ = {0, -IM, IM};
-
-  var_ptm_search_prec_error_vec_ = {0};
-
-  one_shift_search_prec_error_vec_ = {0, -IM, IM};
-
+  setZeroShiftPrecOneDaError(true);
+  setOneShiftPrecOneDaError(true);
+  setVarPtmPrecOneDaError(false);
+  // multi-shift stages absorb a 1 Da error into an unknown mass shift
   multi_shift_search_prec_error_vec_ = {0};
+}
+
+namespace {
+
+std::vector<double> precErrorVec(bool allow_one_da) {
+  if (allow_one_da) {
+    double IM = mass_constant::getIsotopeMass();
+    return {0, -IM, IM};
+  }
+  return {0};
+}
+
+}  // namespace
+
+void SpPara::setZeroShiftPrecOneDaError(bool allow) {
+  zero_shift_search_prec_error_vec_ = precErrorVec(allow);
+}
+
+void SpPara::setOneShiftPrecOneDaError(bool allow) {
+  one_shift_search_prec_error_vec_ = precErrorVec(allow);
+}
+
+void SpPara::setVarPtmPrecOneDaError(bool allow) {
+  var_ptm_search_prec_error_vec_ = precErrorVec(allow);
 }
 
 SpPara::SpPara(XmlDOMElement element) {

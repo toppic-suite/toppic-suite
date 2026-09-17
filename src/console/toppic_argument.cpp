@@ -80,6 +80,9 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["outputPrsmCoverage"] = "false";
   arguments["postMassMatch"] = "true";
   arguments["postMinPeakNum"] = "1";
+  arguments["zeroShiftPrecOneDaError"] = "true";
+  arguments["oneShiftPrecOneDaError"] = "true";
+  arguments["varPtmPrecOneDaError"] = "false";
 
   arguments["version"] = "";
   return arguments;
@@ -485,6 +488,9 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "output-raw-prsm-table,o", "")("output-prsm-coverage,O", "")(
         "disable-post-match,E", "")(
         "post-min-peak-num,I", po::value<std::string>(&post_min_peak_num), "")(
+        "disable-zero-shift-prec-error", "")(
+        "disable-one-shift-prec-error", "")(
+        "enable-var-ptm-prec-error", "")(
         "filtering-result-number",
         po::value<std::string>(&filtering_result_num),
         "Filtering result number. Default value: 20.")(
@@ -693,6 +699,15 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
 
     if (vm.count("post-min-peak-num")) {
       arguments_["postMinPeakNum"] = post_min_peak_num;
+    }
+    if (vm.count("disable-zero-shift-prec-error")) {
+      arguments_["zeroShiftPrecOneDaError"] = "false";
+    }
+    if (vm.count("disable-one-shift-prec-error")) {
+      arguments_["oneShiftPrecOneDaError"] = "false";
+    }
+    if (vm.count("enable-var-ptm-prec-error")) {
+      arguments_["varPtmPrecOneDaError"] = "true";
     }
 
     if (vm.count("filtering-result-number")) {

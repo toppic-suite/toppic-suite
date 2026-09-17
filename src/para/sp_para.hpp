@@ -69,6 +69,12 @@ class SpPara {
 
   void setEnvCnnCutoff(double cutoff) { env_cnn_cutoff_ = cutoff; }
 
+  // Allow (true) or disallow (false) a +-1 Da precursor mass error in the
+  // zero-shift, one-shift and variable-PTM filtering and search stages.
+  void setZeroShiftPrecOneDaError(bool allow);
+  void setOneShiftPrecOneDaError(bool allow);
+  void setVarPtmPrecOneDaError(bool allow);
+
   void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) const;
 
   static std::string getXmlElementName() { return "sp_para"; }
@@ -94,7 +100,8 @@ class SpPara {
 
   ActivationPtr activation_ptr_;
 
-  // the 1 Da error in precursor mass used in zeroptm filtering
+  // the precursor mass offsets tried by each filtering/search stage: {0}
+  // (exact) or {0, -1 Da, +1 Da} (a +-1 Da precursor mass error is allowed)
   std::vector<double> zero_shift_search_prec_error_vec_;
 
   std::vector<double> one_shift_search_prec_error_vec_;
