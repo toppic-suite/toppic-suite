@@ -188,7 +188,7 @@ std::map<std::string, std::string> toppic_para{
     {"groupSpectrumNumber", "-r "},
     {"localPtmFileName", "-B "},
     {"localThreshold", "-H "},
-    {"postMassMatch", "-E "},
+    {"postMassMatch", "-D "},
     {"postMinPeakNum", "-I "}};
 
 std::string geneToppicCommand(std::map<std::string, std::string> arguments_,
@@ -230,7 +230,7 @@ std::string geneToppicCommand(std::map<std::string, std::string> arguments_,
           command = command + toppic_para[it->first];
         }
       } else if (it->first == "postMassMatch") {
-        // on by default; -E (--disable-post-match) turns it off
+        // on by default; -D (--disable-post-match) turns it off
         if (it->second == "false") {
           command = command + toppic_para[it->first];
         }

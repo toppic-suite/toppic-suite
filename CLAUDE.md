@@ -302,7 +302,7 @@ writers, and nothing checks them against the code, so:
 - Do not document an option the parser does not accept. Cross-tool facts
   that several manuals repeat and must stay consistent: result-file naming
   (`_post_ms2` after TopPIC's default post mass matching, plain `_ms2` for
-  TopMG and with `-E`), which tool needs which TopFD file, the modification
+  TopMG and with `-D`), which tool needs which TopFD file, the modification
   file format (`Name,Mass,Residues,Position,UnimodID`), and the shared PrSM
   table columns (documented once in the TopPIC manual, referenced by TopMG).
 - `topfd_manual.md` specifics: its examples use no `-a` (activation
@@ -374,7 +374,7 @@ downstream step (clustering, FDR, tables, SQL output) then reads instead of
 the input. Facts to keep straight:
 
 - **It is on by default.** `initArguments()` sets `postMassMatch = "true"`;
-  `-E` / `--disable-post-match` sets it to false (there is no enabling flag
+  `-D` / `--disable-post-match` sets it to false (there is no enabling flag
   any more), and `-I` / `--post-min-peak-num` (default 1) is the minimum
   number of observed isotopic peaks per accepted fragment.
 - **A missing database is an error, not a skip.** The database name comes
@@ -387,7 +387,7 @@ the input. Facts to keep straight:
   dialog before toppic is launched). Keep all three in step.
 - **Result file names carry `_post_ms2`** whenever post matching ran; the
   cleanup in `toppic_process` (`cleanToppicDir`) takes that name to find the
-  intermediate files. With `-E` the names are the plain `<base>_ms2` ones.
+  intermediate files. With `-D` the names are the plain `<base>_ms2` ones.
 - **Combined runs (`-c`) never post-match the merged file** (it has no
   SQLite database): `TopPICProgress_multi_file` forces `postMassMatch` to
   false for the merged `TopPIC_post`. Per fraction, `cleanToppicDir` keeps
@@ -399,7 +399,7 @@ the input. Facts to keep straight:
 - **GUI wiring.** `toppicwindow.ui` has `postMassMatchCheckBox` (checked by
   default from the parser's argument map, enables `postMinPeakNumEdit`) on the
   bottom row of the Advanced Parameters tab; `gui/util/command.cpp` emits
-  `-E` when the box is **cleared** and `-I <n>` only while it is checked.
+  `-D` when the box is **cleared** and `-I <n>` only while it is checked.
 - **Short options in `toppic_argument.cpp` are nearly exhausted.** Before
   adding one, list the letters in use with
   `grep -oE '"[a-z-]+,[A-Za-z]"' src/console/toppic_argument.cpp`; a clash is

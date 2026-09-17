@@ -437,7 +437,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
             "No TopFD feature file for proteoform identification.")(
             "keep-temp-files,k", "Keep intermediate files.")(
             "keep-decoy-ids,K", "Keep decoy identifications.")(
-            "disable-post-match,E",
+            "disable-post-match,D",
             "Disable post mass matching. By default, after the search, the "
             "theoretical fragment masses of each PrSM that no deconvoluted "
             "mass matched are matched against the centroided MS/MS peaks in "
@@ -489,7 +489,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "no-topfd-feature,x", "")("keep-temp-files,k", "")(
         "keep-decoy-ids,K", "")("combine-result-only,C", "")(
         "output-raw-prsm-table,o", "")("output-prsm-coverage,O", "")(
-        "disable-post-match,E", "")(
+        "disable-post-match,D", "")(
         "post-min-peak-num,I", po::value<std::string>(&post_min_peak_num), "")(
         "disable-zero-shift-prec-error", "")(
         "enable-one-shift-prec-error", "")(

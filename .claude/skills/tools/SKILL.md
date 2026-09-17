@@ -71,7 +71,7 @@ Key options (defaults): `-c` max charge 30, `-m` max mass 50000,
 
 - **Do not use `-N` if TopPIC will search the spectra**: TopPIC's default
   post mass matching needs `sample.sqlite` and fails without it (or run
-  `toppic -E`).
+  `toppic -D`).
 - `-T` mode: only the MS/MS options apply; the peak list need not be
   sorted; it writes `peaks_ms2.msalign`, `peaks_ms2.env` (one line per
   matched peak, `PEAK_IDX` is the index after sorting by m/z) and
@@ -83,7 +83,7 @@ Key options (defaults): `-c` max charge 30, `-m` max mass 50000,
 
 ```sh
 topdia [options] sample.mzML ...
-toppic -E ... proteins.fasta sample_ms2.msalign    # search the pseudo spectra
+toppic -D ... proteins.fasta sample_ms2.msalign    # search the pseudo spectra
 ```
 
 Needs MS1 and DIA MS/MS scans with recorded isolation windows. Writes the
@@ -94,7 +94,7 @@ defaults (`-w` 4.0, `-t` 0, `-b` 2) plus fragment-feature and pseudo-spectrum
 options: `-T`/`-B` MS2 ECScore cutoff and min scans (0, 1), `-p`/`-P`
 intensity-correlation cutoffs (0.5), `-v` pseudo score cutoff 0.55,
 `-V` fragments always added 25. No `-N`, `-D` or `-T`-peak-list mode.
-**Search pseudo spectra with `toppic -E`** (post mass matching assumes one
+**Search pseudo spectra with `toppic -D`** (post mass matching assumes one
 scan per spectrum). Never pass `-o`: the run aborts at the pseudo-spectrum
 step.
 
@@ -118,7 +118,7 @@ with `-d`); delete `_idx/` to reclaim space.
 toppic [options] proteins.fasta sample_ms2.msalign ...
 ```
 
-Needs `sample_ms2.feature` (unless `-x`) and `sample.sqlite` (unless `-E`)
+Needs `sample_ms2.feature` (unless `-x`) and `sample.sqlite` (unless `-D`)
 next to the spectrum file; a missing database is reported before the
 search starts. Steps: zero-shift search, variable-PTM search (`-b`),
 one-shift (`-s` >= 1) and two-shift (`-s 2`) searches, E-values, top PrSM,
@@ -131,14 +131,14 @@ N-terminal forms all four, `-R` proteoform types all four, `-d` decoy,
 `-b` variable-PTM file with `-S` max 3, `-B` common-modification file for
 characterization with `-H` MIScore threshold 0.15, `-e` tolerance 10 ppm,
 `-F` EnvCNN filter 0.2, `-p` cluster tolerance 1.2 Da, `-r` combined
-spectra 1, `-x` no feature file, `-E` disable post matching, `-I` post
+spectra 1, `-x` no feature file, `-D` disable post matching, `-I` post
 min peaks 1, cutoffs `-t/-v`, `-T/-V`, `-y/-Y` (EVALUE 0.01 each; `FDR`
 needs `-d`), `-c <name>` combine fractions, `-u` threads, `-k` keep temp
 files, `-K` keep decoy ids.
 
 Result naming: with post mass matching (default) everything is named
 `sample_post_ms2_toppic_{prsm,proteoform,protein}[_single].tsv` and `.xml`,
-plus `sample_post_ms2.msalign`; with `-E` the names are `sample_ms2_toppic_*`.
+plus `sample_post_ms2.msalign`; with `-D` the names are `sample_ms2_toppic_*`.
 `_single` tables have one line per PrSM; the others add a line per extra
 protein containing the proteoform. `sample_ms2.toppic_raw_prsm` is always
 kept. Combined runs (`-c name`) always produce `name_ms2_toppic_*` and no

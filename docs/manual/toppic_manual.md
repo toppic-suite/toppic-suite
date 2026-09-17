@@ -177,7 +177,7 @@ Post mass matching:
 
 | Option | Default | Meaning |
 |---|---|---|
-| `-E`, `--disable-post-match` | off | Do not run post mass matching; result files keep the `_ms2` name and the SQLite database is not needed. |
+| `-D`, `--disable-post-match` | off | Do not run post mass matching; result files keep the `_ms2` name and the SQLite database is not needed. |
 | `-I`, `--post-min-peak-num <int>` | 1 | Minimum number of observed isotopic peaks of a fragment accepted by post mass matching (at least 1). |
 
 Cutoffs and output:
