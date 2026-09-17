@@ -290,11 +290,11 @@ p, li { white-space: pre-wrap; }
      <widget class="QWidget" name="horizontalLayoutWidget_precTole">
       <property name="geometry">
        <rect>
-        <x>560</x>
-        <y>190</y>
-        <width>331</width>
-        <height>31</height>
-       </rect>
+      <x>560</x>
+      <y>150</y>
+      <width>331</width>
+      <height>31</height>
+     </rect>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_precTole">
        <item alignment="Qt::AlignLeft">
@@ -343,11 +343,11 @@ p, li { white-space: pre-wrap; }
    <widget class="QWidget" name="horizontalLayoutWidget_14">
     <property name="geometry">
      <rect>
-      <x>560</x>
-      <y>150</y>
-      <width>331</width>
-      <height>31</height>
-     </rect>
+        <x>560</x>
+        <y>190</y>
+        <width>331</width>
+        <height>31</height>
+       </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_14">
      <item alignment="Qt::AlignLeft">

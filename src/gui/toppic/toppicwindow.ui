@@ -410,9 +410,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
      <widget class="QWidget" name="horizontalLayoutWidget_precTole">
       <property name="geometry">
        <rect>
-        <x>480</x>
+        <x>10</x>
         <y>170</y>
-        <width>391</width>
+        <width>401</width>
         <height>31</height>
        </rect>
       </property>
@@ -448,9 +448,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
      <widget class="QWidget" name="horizontalLayoutWidget_11">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>480</x>
         <y>170</y>
-        <width>401</width>
+        <width>391</width>
         <height>31</height>
        </rect>
       </property>
