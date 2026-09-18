@@ -60,7 +60,7 @@ sudo apt-get update
 sudo apt-get install build-essential cmake clang git git-lfs \
     zlib1g-dev libsqlite3-dev libpugixml-dev \
     libboost-filesystem-dev libboost-iostreams-dev libboost-thread-dev \
-    libboost-chrono-dev libboost-system-dev libboost-serialization-dev \
+    libboost-chrono-dev libboost-serialization-dev \
     libboost-program-options-dev \
     qt6-base-dev
 ```

@@ -224,7 +224,13 @@ endif()
 # as a static library against Boost + zlib and linked into toppic_common. The
 # vendored sources include themselves as "pwiz/...", so ext/ is the include root.
 # WITHOUT_MZ5 drops the HDF5-backed mz5 format so no HDF5 dependency is needed.
-find_package(Boost 1.74 REQUIRED COMPONENTS filesystem iostreams thread chrono system serialization program_options)
+#
+# Boost.System is deliberately not a component: it has been header-only since
+# Boost 1.69 (below our 1.74 minimum), and Boost >= 1.90 (Ubuntu 26.04) no
+# longer ships the compiled stub library or its boost_system CMake config, so
+# requesting it makes find_package fail there. Its symbols (error_code etc.,
+# used through Boost.Filesystem) come from the headers on every platform.
+find_package(Boost 1.74 REQUIRED COMPONENTS filesystem iostreams thread chrono serialization program_options)
 file(GLOB PWIZ_SRCS CONFIGURE_DEPENDS
   ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/utility/minimxml/*.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/utility/misc/*.cpp
@@ -241,7 +247,7 @@ list(APPEND PWIZ_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/ext/boost/nowide/iostream.cpp)
 add_library(pwiz STATIC ${PWIZ_SRCS})
 target_include_directories(pwiz SYSTEM PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/ext)
 target_link_libraries(pwiz PUBLIC
-  Boost::filesystem Boost::iostreams Boost::thread Boost::chrono Boost::system
+  Boost::filesystem Boost::iostreams Boost::thread Boost::chrono
   ZLIB::ZLIB)
 target_compile_definitions(pwiz PUBLIC WITHOUT_MZ5)
 # SpectrumList_mzML.cpp includes <boost/bind.hpp>, whose "#pragma message"
