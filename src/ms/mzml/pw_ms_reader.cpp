@@ -334,6 +334,11 @@ int PwMsReader::readNextWithVoltage(double voltage) {
   while (!found) {
     if (input_sp_id_ >= input_sp_num_) {
       LOG_DEBUG("Only " << input_sp_num_ << " spectra in the input data!");
+      // The last spectrum read while skipping other voltages is still in
+      // header_ptr_/peak_list_; drop it, or the caller (which only tests
+      // header_ptr_ for null) would emit it into this voltage's outputs.
+      peak_list_.clear();
+      header_ptr_ = nullptr;
       return -1;
     }
     bool valid = readOneMs(input_sp_id_, peak_list_, header_ptr_);
