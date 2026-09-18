@@ -28,7 +28,7 @@ class PtmBase {
 
   static const PtmPtrVec& getBasePtmPtrVec() { return ptm_ptr_vec_; }
 
-  static PtmPtr getEmptyPtmPtr() { return empty_ptm_ptr_; }
+  static const PtmPtr& getEmptyPtmPtr() { return empty_ptm_ptr_; }
 
   static bool isEmptyPtmPtr(const PtmPtr& ptm_ptr) {
     return ptm_ptr == empty_ptm_ptr_;
@@ -41,7 +41,7 @@ class PtmBase {
    * Returns a PTM based on the abbreviation name. Returns null if the
    * abbreviation name does not exist.
    */
-  static PtmPtr getPtmPtrByAbbrName(const std::string& abbr_name);
+  static const PtmPtr& getPtmPtrByAbbrName(const std::string& abbr_name);
 
   static PtmPtr getPtmPtr(const PtmPtr& p);
 

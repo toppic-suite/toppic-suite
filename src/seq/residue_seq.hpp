@@ -33,18 +33,18 @@ using ResSeqPtrVec = std::vector<ResSeqPtr>;
 
 class ResidueSeq {
  public:
-  explicit ResidueSeq(const ResiduePtrVec& residues);
+  explicit ResidueSeq(ResiduePtrVec residues);
 
   explicit ResidueSeq(const ResiduePtrVec& residues, const ModPtr& n_mod_ptr);
 
   // Returns a sub-peptide of the original peptide.
   ResSeqPtr getSubResidueSeq(int bgn, int end);
 
-  ModPtr getNModPtr() const { return n_mod_ptr_; }
+  const ModPtr& getNModPtr() const { return n_mod_ptr_; }
 
   int getLen() const { return residues_.size(); }
 
-  ResiduePtr getResiduePtr(int i) const { return residues_[i]; }
+  const ResiduePtr& getResiduePtr(int i) const { return residues_[i]; }
 
   const ResiduePtrVec& getResidues() const { return residues_; }
 

@@ -36,9 +36,14 @@ class AminoAcidBase {
   // acid name does not exist.
   static AminoAcidPtr getAminoAcidPtrByName(const std::string& name);
 
+  // Returns the amino acid with the one-letter code c, or a null pointer.
+  // The reference is into the base table, so no shared_ptr copy is made.
+  static const AminoAcidPtr& getAminoAcidPtrByOneLetter(char c);
+
   // Returns an amino acid based on the one letter representation. Returns
   // null if the one letter representation does not exist.
-  static AminoAcidPtr getAminoAcidPtrByOneLetter(const std::string& one_letter);
+  static const AminoAcidPtr& getAminoAcidPtrByOneLetter(
+      const std::string& one_letter);
 
   // Returns an amino acid based on the three letter representation. Returns
   // null if the three letter representation does not exist.

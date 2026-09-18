@@ -86,12 +86,23 @@ AminoAcidPtr AminoAcidBase::getAminoAcidPtrByName(const std::string& name) {
   return it->second;
 }
 
-AminoAcidPtr AminoAcidBase::getAminoAcidPtrByOneLetter(
+const AminoAcidPtr& AminoAcidBase::getAminoAcidPtrByOneLetter(char c) {
+  static const AminoAcidPtr null_ptr;
+  auto it = amino_acid_one_letter_map_.find(std::string(1, c));
+  if (it == amino_acid_one_letter_map_.end()) {
+    LOG_WARN("Amino acid " << c << " cannot be found!");
+    return null_ptr;
+  }
+  return it->second;
+}
+
+const AminoAcidPtr& AminoAcidBase::getAminoAcidPtrByOneLetter(
     const std::string& one_letter) {
+  static const AminoAcidPtr null_ptr;
   auto it = amino_acid_one_letter_map_.find(one_letter);
   if (it == amino_acid_one_letter_map_.end()) {
     LOG_WARN("Amino acid " << one_letter << " cannot be found!");
-    return nullptr;
+    return null_ptr;
   }
   return it->second;
 }

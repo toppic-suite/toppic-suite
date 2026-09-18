@@ -124,6 +124,21 @@ introduces and the compiler will **not** catch: if a function mutates the
 container its `shared_ptr` argument was passed from while still using the
 argument, the reference can dangle — pass such an argument by value.
 
+- **Getters of `shared_ptr` members on hot paths → `const&` too**, and never
+  copy a `shared_ptr` to a *shared* object (base-table residues, amino
+  acids, PTMs, `BasePeakType::ORIGINAL`, `ProteoformType::*`) inside a
+  per-residue or per-peak loop. The atomic refcount update lands on a cache
+  line every search thread hammers, and it collapsed the threaded zero/one
+  shift searches to a 2x speedup on 16 threads: per-residue copies in
+  `residue_util::convertStrToResiduePtrVec` (a temporary `Residue` per
+  residue in `ResidueBase::getBaseResiduePtr`), `ResidueSeq::getResiduePtr`
+  and `Residue::getAminoAcidPtr/getPtmPtr` (by value, hit by `BpSpec`), and
+  `PrmPeak::getBaseTypePtr` (copied per iteration of
+  `diag_pair_util::compDiagPair`). Fixing those gave 6.8x and 11x. Compare
+  such pointers with `.get()` or `==` on references; `AminoAcidBase::
+  getAminoAcidPtrByOneLetter`, `PtmBase::getPtmPtrByAbbrName` and
+  `getEmptyPtmPtr` return `const&` for this reason.
+
 ## Vendored htslib (`seq` indexed-FASTA access)
 
 `seq/fasta_index_reader` uses htslib's `faidx` API for random access into
@@ -552,6 +567,16 @@ above it, never the reverse:
 - `src/search` — sequence/spectrum alignment (`diag`/`graph`/`graphalign`/
   `oneptmsearch`/`ptmsearch`/`varptmsearch`/`zeroptmsearch`). `graph` uses the
   header-only Boost Graph Library (`adjacency_list`, `graph_traits`, `graphviz`).
+  All four search stages are multithreaded. The zero-shift and one-shift
+  searches run one task per spectrum on a `SimpleThreadPool` through
+  `common/thread/ordered_task_runner.hpp` (`OrderedTaskRunner<Result>`:
+  results are handed back on the submitting thread in submission order, with
+  a bounded number of tasks in flight), so they still write a single output
+  file per proteoform type in spectrum order, byte-identical to the former
+  sequential loops; the variable-PTM and PTM searches instead write one file
+  per thread and merge them with `PrsmStrMerge`. Use the runner for a new
+  stage whose output order matters; `ZeroPtmSearchMng` and `PtmSearchMng`
+  carry the thread number from the toppic `-u` option.
 - `src/stat` — E-value/p-value estimation (`count`/`local`/`mcmc`/`tdgf`).
 - `src/merge` — the topdiff feature-merge backend (`feature_prsm`,
   `feature_sample_merge`), used by `console/topdiff_process`.

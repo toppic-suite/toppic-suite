@@ -70,18 +70,19 @@ std::string rmUnknownResidues(const std::string& ori_seq) {
 ResiduePtrVec convertStrToResiduePtrVec(const std::string& ori_seq) {
   std::string seq = rmUnknownResidues(ori_seq);
   ResiduePtrVec residue_ptr_vec;
+  residue_ptr_vec.reserve(seq.length());
+  const PtmPtr& ptm_ptr = PtmBase::getEmptyPtmPtr();
   for (size_t i = 0; i < seq.length(); i++) {
-    AminoAcidPtr acid_ptr =
-        AminoAcidBase::getAminoAcidPtrByOneLetter(seq.substr(i, 1));
+    const AminoAcidPtr& acid_ptr =
+        AminoAcidBase::getAminoAcidPtrByOneLetter(seq[i]);
     if (acid_ptr == nullptr) {
       LOG_ERROR("Sequence "
                 << seq << " contain invalid letters: " << seq.substr(i, 1));
       throw std::runtime_error("Sequence contains invalid letters: " +
                                seq.substr(i, 1));
     }
-    PtmPtr ptm_ptr = PtmBase::getEmptyPtmPtr();
-    ResiduePtr residue_ptr = ResidueBase::getBaseResiduePtr(acid_ptr, ptm_ptr);
-    residue_ptr_vec.push_back(residue_ptr);
+    residue_ptr_vec.push_back(
+        ResidueBase::getBaseResiduePtr(acid_ptr, ptm_ptr));
   }
   return residue_ptr_vec;
 }
@@ -107,19 +108,27 @@ ResiduePtrVec convertStrToResiduePtrVec(const std::string& seq,
 
 ResiduePtrVec convertStrToResiduePtrVec(const StringPairVec& string_pair_vec) {
   ResiduePtrVec residue_ptr_vec;
+  residue_ptr_vec.reserve(string_pair_vec.size());
+  // This runs once per residue of every protein a search loads; keep it free
+  // of temporaries and shared_ptr copies (see ResidueBase::getBaseResiduePtr).
+  const PtmPtr& empty_ptm_ptr = PtmBase::getEmptyPtmPtr();
+  const std::string& empty_ptm_str = empty_ptm_ptr->getAbbrName();
   for (size_t i = 0; i < string_pair_vec.size(); i++) {
-    std::string acid_str = string_pair_vec[i].first;
-    AminoAcidPtr acid_ptr = AminoAcidBase::getAminoAcidPtrByOneLetter(acid_str);
+    const std::string& acid_str = string_pair_vec[i].first;
+    const AminoAcidPtr& acid_ptr =
+        AminoAcidBase::getAminoAcidPtrByOneLetter(acid_str);
     if (acid_ptr == nullptr) {
       throw std::runtime_error("Unknown amino acid: " + acid_str);
     }
-    std::string ptm_str = string_pair_vec[i].second;
-    PtmPtr ptm_ptr = PtmBase::getPtmPtrByAbbrName(ptm_str);
+    const std::string& ptm_str = string_pair_vec[i].second;
+    const PtmPtr& ptm_ptr = ptm_str == empty_ptm_str
+                                ? empty_ptm_ptr
+                                : PtmBase::getPtmPtrByAbbrName(ptm_str);
     if (ptm_ptr == nullptr) {
       throw std::runtime_error("Unknown PTM: " + ptm_str);
     }
-    ResiduePtr residue_ptr = ResidueBase::getBaseResiduePtr(acid_ptr, ptm_ptr);
-    residue_ptr_vec.push_back(residue_ptr);
+    residue_ptr_vec.push_back(
+        ResidueBase::getBaseResiduePtr(acid_ptr, ptm_ptr));
   }
   return residue_ptr_vec;
 }

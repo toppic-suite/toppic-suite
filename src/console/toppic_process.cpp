@@ -274,7 +274,8 @@ int TopPIC_identify(std::map<std::string, std::string>& arguments) {
 
     std::cout << "Zero unexpected shift search - started." << std::endl;
     ZeroPtmSearchMngPtr zero_search_mng_ptr =
-        std::make_shared<ZeroPtmSearchMng>(prsm_para_ptr, "toppic_zero_filter",
+        std::make_shared<ZeroPtmSearchMng>(prsm_para_ptr, thread_num,
+                                           "toppic_zero_filter",
                                            "toppic_zero_shift");
     ZeroPtmSearchProcessorPtr zero_search_processor =
         std::make_shared<ZeroPtmSearchProcessor>(zero_search_mng_ptr);
