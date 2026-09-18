@@ -177,14 +177,19 @@ path and linked into `toppic_common`:
   per-call free-function wrappers (they would restore the per-scan
   transaction/prepare cost this rewrite removed).
 - **Boost** — `find_package(Boost ... COMPONENTS filesystem iostreams thread
-  chrono system serialization program_options)`. `ms/mzml`'s pwiz reader needs
-  `filesystem`/`iostreams`/`thread`/`chrono`/`system`; `filter/massmatch/
+  chrono serialization program_options)`. `ms/mzml`'s pwiz reader needs
+  `filesystem`/`iostreams`/`thread`/`chrono`; `filter/massmatch/
   mass_match` needs `serialization` (its binary index archive — linked PUBLIC
   into `toppic_common` because the header exposes `boost::serialization::access`);
   the GUI argument parsers need `program_options`. `search/graph` additionally
   uses the **header-only** Boost Graph Library (no link). Prefer `std::mutex` etc.
   over `boost::*` in our own code (the filter/index mutexes were converted from
-  `boost::mutex`; only `mass_match`'s serialization genuinely needs Boost). (Boost
+  `boost::mutex`; only `mass_match`'s serialization genuinely needs Boost).
+  **Do not add `system` back** to the component list or `Boost::system` to a
+  link line: Boost.System is header-only since 1.69, and Boost >= 1.90
+  (Ubuntu 26.04) ships neither the stub library nor a `boost_system` CMake
+  config, so `find_package` fails with "Could not find ... boost_system";
+  Ubuntu 26.04 has no `libboost-system-dev` package either. (Boost
   headers pulled in through the third-party `ext/` tree are silenced by the
   system-include treatment below; if you include a Boost header directly in our
   own code and it warns — e.g. uBLAS still deriving from the C++17-deprecated
