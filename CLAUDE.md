@@ -564,6 +564,19 @@ above it, never the reverse:
   filter/index mutexes) live in **anonymous namespaces** — they previously had
   external linkage and the same name in several TUs, which only becomes a
   multiple-definition error once everything compiles into one library.
+  The filters are memory-bound: each thread streams every spectrum against
+  one database block's index (117 blocks of ~1 GB one-shift index files for
+  the human target+decoy database), so `compScores` misses cache on every
+  increment and 16 threads scale about 2x, not 16x. In
+  `massmatch/mass_match_util` the candidate finders take the index vectors
+  by `const&` (they used to copy ~3.5 MB per call, four calls per spectrum
+  set) and `findOneShiftTopProteinsWithRestrict` skips a protein whose best
+  N-row plus best C-row score cannot reach the threshold and a row that
+  cannot beat the current best; both are exact (the skipped pairs could not
+  update the best) and cut the one-shift filter from 712 s to 389 s on
+  480_F3_02. The scores are not sparse (about 40% of truncation rows score
+  >= 1 per spectrum), so a sparse or sliding-window pair finder was slower
+  and was not kept.
 - `src/search` — sequence/spectrum alignment (`diag`/`graph`/`graphalign`/
   `oneptmsearch`/`ptmsearch`/`varptmsearch`/`zeroptmsearch`). `graph` uses the
   header-only Boost Graph Library (`adjacency_list`, `graph_traits`, `graphviz`).

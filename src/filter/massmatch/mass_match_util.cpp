@@ -32,9 +32,9 @@ inline bool cmpScore(const std::pair<int, int>& a,
 void addTruncShifts(ProtCandidatePtrVec& prot_ptrs,
                     const MassMatchPtr& index_ptr, std::vector<short>& scores,
                     int term_shift_num, bool is_n_term) {
-  std::vector<int> row_begins = index_ptr->getProteoRowBegins();
-  std::vector<int> row_ends = index_ptr->getProteoRowEnds();
-  std::vector<double> trunc_shifts = index_ptr->getTruncShifts();
+  const std::vector<int>& row_begins = index_ptr->getProteoRowBegins();
+  const std::vector<int>& row_ends = index_ptr->getProteoRowEnds();
+  const std::vector<double>& trunc_shifts = index_ptr->getTruncShifts();
   for (size_t i = 0; i < prot_ptrs.size(); i++) {
     ProtCandidatePtr prot_ptr = prot_ptrs[i];
     int prot_id = prot_ptr->getProteinId();
@@ -82,15 +82,15 @@ inline bool cmpScoreIndex(const TruncScorePosition& a,
 void addTruncShiftsWithRestriction(
     ProtCandidatePtrVec& prot_ptrs, const MassMatchPtr& index_ptr,
     const MassMatchPtr& rev_index_ptr,
-    std::vector<double>& proteo_minus_water_masses, std::vector<short>& scores,
-    std::vector<short>& rev_scores, double min_mass, double max_mass,
-    int term_group_num) {
-  std::vector<int> row_begins = index_ptr->getProteoRowBegins();
-  std::vector<int> row_ends = index_ptr->getProteoRowEnds();
-  std::vector<double> trunc_shifts = index_ptr->getTruncShifts();
-  std::vector<int> rev_row_begins = rev_index_ptr->getProteoRowBegins();
-  std::vector<int> rev_row_ends = rev_index_ptr->getProteoRowEnds();
-  std::vector<double> rev_trunc_shifts = rev_index_ptr->getTruncShifts();
+    const std::vector<double>& proteo_minus_water_masses,
+    std::vector<short>& scores, std::vector<short>& rev_scores,
+    double min_mass, double max_mass, int term_group_num) {
+  const std::vector<int>& row_begins = index_ptr->getProteoRowBegins();
+  const std::vector<int>& row_ends = index_ptr->getProteoRowEnds();
+  const std::vector<double>& trunc_shifts = index_ptr->getTruncShifts();
+  const std::vector<int>& rev_row_begins = rev_index_ptr->getProteoRowBegins();
+  const std::vector<int>& rev_row_ends = rev_index_ptr->getProteoRowEnds();
+  const std::vector<double>& rev_trunc_shifts = rev_index_ptr->getTruncShifts();
 
   int bgn, end, rev_bgn, rev_end;
   int k_start, k_end;
@@ -161,14 +161,13 @@ ProtCandidatePtrVec findZeroShiftTopProteins(std::vector<short>& scores,
   int prec_match_score = MassMatch::getPrecursorMatchScore();
   double min_mass = prec_minus_water_mass - prec_error_tole;
   double max_mass = prec_minus_water_mass + prec_error_tole;
-  std::vector<int> row_begins = index_ptr->getProteoRowBegins();
-  std::vector<int> row_ends = index_ptr->getProteoRowEnds();
-  std::vector<double> proteo_minus_water_masses =
-      index_ptr->getProteoMinusWaterMasses();
-  std::vector<double> trunc_shifts = index_ptr->getTruncShifts();
-  std::vector<int> rev_row_begins = rev_index_ptr->getProteoRowBegins();
-  std::vector<int> rev_row_ends = rev_index_ptr->getProteoRowEnds();
-  std::vector<double> rev_trunc_shifts = rev_index_ptr->getTruncShifts();
+  const std::vector<int>& row_begins = index_ptr->getProteoRowBegins();
+  const std::vector<int>& row_ends = index_ptr->getProteoRowEnds();
+  const std::vector<double>& proteo_minus_water_masses = index_ptr->getProteoMinusWaterMasses();
+  const std::vector<double>& trunc_shifts = index_ptr->getTruncShifts();
+  const std::vector<int>& rev_row_begins = rev_index_ptr->getProteoRowBegins();
+  const std::vector<int>& rev_row_ends = rev_index_ptr->getProteoRowEnds();
+  const std::vector<double>& rev_trunc_shifts = rev_index_ptr->getTruncShifts();
 
   ProtScorePtrVec proteo_scores;
   int bgn, end, rev_bgn, rev_end;
@@ -233,10 +232,10 @@ ProtCandidatePtrVec simpleFindZeroShiftTopProteins(
     const MassMatchPtr& index_ptr, const MassMatchPtr& rev_index_ptr,
     double prec_minus_water_mass, double prec_error_tole, int threshold,
     int top_num) {
-  std::vector<int> row_begins = index_ptr->getProteoRowBegins();
-  std::vector<int> row_ends = index_ptr->getProteoRowEnds();
-  std::vector<int> rev_row_begins = rev_index_ptr->getProteoRowBegins();
-  std::vector<int> rev_row_ends = rev_index_ptr->getProteoRowEnds();
+  const std::vector<int>& row_begins = index_ptr->getProteoRowBegins();
+  const std::vector<int>& row_ends = index_ptr->getProteoRowEnds();
+  const std::vector<int>& rev_row_begins = rev_index_ptr->getProteoRowBegins();
+  const std::vector<int>& rev_row_ends = rev_index_ptr->getProteoRowEnds();
 
   ProtScorePtrVec proteo_scores;
   int bgn, end, rev_bgn, rev_end;
@@ -282,10 +281,10 @@ inline ProtCandidatePtrVec findOneShiftTopProteinsWithoutRestrict(
     std::vector<short>& scores, std::vector<short>& rev_scores,
     const MassMatchPtr& index_ptr, const MassMatchPtr& rev_index_ptr,
     int term_shift_num, int threshold, int top_num) {
-  std::vector<int> row_begins = index_ptr->getProteoRowBegins();
-  std::vector<int> row_ends = index_ptr->getProteoRowEnds();
-  std::vector<int> rev_row_begins = rev_index_ptr->getProteoRowBegins();
-  std::vector<int> rev_row_ends = rev_index_ptr->getProteoRowEnds();
+  const std::vector<int>& row_begins = index_ptr->getProteoRowBegins();
+  const std::vector<int>& row_ends = index_ptr->getProteoRowEnds();
+  const std::vector<int>& rev_row_begins = rev_index_ptr->getProteoRowBegins();
+  const std::vector<int>& rev_row_ends = rev_index_ptr->getProteoRowEnds();
   std::vector<std::pair<int, int>> proteo_scores;
   for (size_t i = 0; i < row_begins.size(); i++) {
     int bgn = row_begins[i];
@@ -327,14 +326,13 @@ inline ProtCandidatePtrVec findOneShiftTopProteinsWithRestrict(
   double min_mass = prec_minus_water_mass - max_shift - prec_error_tole;
   double max_mass = prec_minus_water_mass - min_shift + prec_error_tole;
   // LOG_DEBUG("min mass " << min_mass << " max mass " << max_mass);
-  std::vector<int> row_begins = index_ptr->getProteoRowBegins();
-  std::vector<int> row_ends = index_ptr->getProteoRowEnds();
-  std::vector<double> proteo_minus_water_masses =
-      index_ptr->getProteoMinusWaterMasses();
-  std::vector<double> trunc_shifts = index_ptr->getTruncShifts();
-  std::vector<int> rev_row_begins = rev_index_ptr->getProteoRowBegins();
-  std::vector<int> rev_row_ends = rev_index_ptr->getProteoRowEnds();
-  std::vector<double> rev_trunc_shifts = rev_index_ptr->getTruncShifts();
+  const std::vector<int>& row_begins = index_ptr->getProteoRowBegins();
+  const std::vector<int>& row_ends = index_ptr->getProteoRowEnds();
+  const std::vector<double>& proteo_minus_water_masses = index_ptr->getProteoMinusWaterMasses();
+  const std::vector<double>& trunc_shifts = index_ptr->getTruncShifts();
+  const std::vector<int>& rev_row_begins = rev_index_ptr->getProteoRowBegins();
+  const std::vector<int>& rev_row_ends = rev_index_ptr->getProteoRowEnds();
+  const std::vector<double>& rev_trunc_shifts = rev_index_ptr->getTruncShifts();
 
   ProtScorePtrVec proteo_scores;
   int bgn, end, rev_bgn, rev_end;
@@ -347,6 +345,26 @@ inline ProtCandidatePtrVec findOneShiftTopProteinsWithRestrict(
     end = row_ends[i];
     rev_bgn = rev_row_begins[i];
     rev_end = rev_row_ends[i];
+
+    // Most rows score 0. A protein whose best N-terminal row plus best
+    // C-terminal row cannot reach the threshold is skipped, and below, a row
+    // that cannot beat the current best skips the window scan. Both keep the
+    // result exact: the skipped pairs could not have updated best_score.
+    int max_score = 0;
+    for (int j = bgn; j <= end; j++) {
+      if (scores[j] > max_score) {
+        max_score = scores[j];
+      }
+    }
+    int rev_max_score = 0;
+    for (int k = rev_bgn; k <= rev_end; k++) {
+      if (rev_scores[k] > rev_max_score) {
+        rev_max_score = rev_scores[k];
+      }
+    }
+    if (max_score + rev_max_score < threshold) {
+      continue;
+    }
 
     k_start = rev_end;
     k_end = rev_end;
@@ -368,6 +386,9 @@ inline ProtCandidatePtrVec findOneShiftTopProteinsWithRestrict(
         if (mass > max_mass) {
           break;
         }
+      }
+      if (scores[j] + rev_max_score <= best_score) {
+        continue;
       }
 
       for (int k = k_start; k >= k_end; k--) {
@@ -444,14 +465,13 @@ ProtCandidatePtrVec findVarPtmTopProteins(
   int prec_match_score = MassMatch::getPrecursorMatchScore();
   double min_mass = prec_minus_water_mass - prec_error_tole;
   double max_mass = prec_minus_water_mass + prec_error_tole;
-  std::vector<int> row_begins = index_ptr->getProteoRowBegins();
-  std::vector<int> row_ends = index_ptr->getProteoRowEnds();
-  std::vector<double> proteo_minus_water_masses =
-      index_ptr->getProteoMinusWaterMasses();
-  std::vector<double> trunc_shifts = index_ptr->getTruncShifts();
-  std::vector<int> rev_row_begins = rev_index_ptr->getProteoRowBegins();
-  std::vector<int> rev_row_ends = rev_index_ptr->getProteoRowEnds();
-  std::vector<double> rev_trunc_shifts = rev_index_ptr->getTruncShifts();
+  const std::vector<int>& row_begins = index_ptr->getProteoRowBegins();
+  const std::vector<int>& row_ends = index_ptr->getProteoRowEnds();
+  const std::vector<double>& proteo_minus_water_masses = index_ptr->getProteoMinusWaterMasses();
+  const std::vector<double>& trunc_shifts = index_ptr->getTruncShifts();
+  const std::vector<int>& rev_row_begins = rev_index_ptr->getProteoRowBegins();
+  const std::vector<int>& rev_row_ends = rev_index_ptr->getProteoRowEnds();
+  const std::vector<double>& rev_trunc_shifts = rev_index_ptr->getTruncShifts();
 
   ProtScorePtrVec proteo_scores;
   for (size_t i = 0; i < row_begins.size(); i++) {
