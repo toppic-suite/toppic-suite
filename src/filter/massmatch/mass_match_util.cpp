@@ -163,7 +163,8 @@ ProtCandidatePtrVec findZeroShiftTopProteins(std::vector<short>& scores,
   double max_mass = prec_minus_water_mass + prec_error_tole;
   const std::vector<int>& row_begins = index_ptr->getProteoRowBegins();
   const std::vector<int>& row_ends = index_ptr->getProteoRowEnds();
-  const std::vector<double>& proteo_minus_water_masses = index_ptr->getProteoMinusWaterMasses();
+  const std::vector<double>& proteo_minus_water_masses =
+      index_ptr->getProteoMinusWaterMasses();
   const std::vector<double>& trunc_shifts = index_ptr->getTruncShifts();
   const std::vector<int>& rev_row_begins = rev_index_ptr->getProteoRowBegins();
   const std::vector<int>& rev_row_ends = rev_index_ptr->getProteoRowEnds();
@@ -227,54 +228,39 @@ ProtCandidatePtrVec findZeroShiftTopProteins(std::vector<short>& scores,
   return proteins;
 }
 
-ProtCandidatePtrVec simpleFindZeroShiftTopProteins(
-    std::vector<short>& scores, std::vector<short>& rev_scores,
-    const MassMatchPtr& index_ptr, const MassMatchPtr& rev_index_ptr,
-    double prec_minus_water_mass, double prec_error_tole, int threshold,
-    int top_num) {
+void compProteoMaxScores(const std::vector<short>& scores,
+                         const MassMatchPtr& index_ptr,
+                         std::vector<int>& max_scores) {
   const std::vector<int>& row_begins = index_ptr->getProteoRowBegins();
   const std::vector<int>& row_ends = index_ptr->getProteoRowEnds();
-  const std::vector<int>& rev_row_begins = rev_index_ptr->getProteoRowBegins();
-  const std::vector<int>& rev_row_ends = rev_index_ptr->getProteoRowEnds();
+  max_scores.assign(row_begins.size(), 0);
+  for (size_t i = 0; i < row_begins.size(); i++) {
+    int best = 0;
+    for (int j = row_begins[i]; j <= row_ends[i]; j++) {
+      if (scores[j] > best) {
+        best = scores[j];
+      }
+    }
+    max_scores[i] = best;
+  }
+}
 
+ProtCandidatePtrVec simpleFindZeroShiftTopProteins(
+    const std::vector<int>& max_scores, const std::vector<int>& rev_max_scores,
+    int threshold, int top_num) {
   ProtScorePtrVec proteo_scores;
-  int bgn, end, rev_bgn, rev_end;
-  int best_n_score, best_c_score, best_total_score;
   // shift information is not used in simple filtering
   double best_n_trunc_shift = 0.0;
   double best_c_trunc_shift = 0.0;
-  for (size_t i = 0; i < row_begins.size(); i++) {
-    bgn = row_begins[i];
-    end = row_ends[i];
-    // get precursor match rows
-    best_n_score = 0;
-    for (int j = bgn; j <= end; j++) {
-      if (scores[j] > best_n_score) {
-        best_n_score = scores[j];
-      }
-    }
-
-    // get reverse precursor match rows
-    rev_bgn = rev_row_begins[i];
-    rev_end = rev_row_ends[i];
-    best_c_score = 0;
-    for (int j = rev_bgn; j <= rev_end; j++) {
-      if (rev_scores[j] > best_c_score) {
-        best_c_score = rev_scores[j];
-      }
-    }
-
-    best_total_score = best_n_score + best_c_score;
+  for (size_t i = 0; i < max_scores.size(); i++) {
+    int best_total_score = max_scores[i] + rev_max_scores[i];
     if (best_total_score >= threshold) {
       ProtScorePtr proteo_score = std::make_shared<ProtScore>(
           i, best_total_score, best_n_trunc_shift, best_c_trunc_shift);
       proteo_scores.push_back(proteo_score);
     }
   }
-
-  ProtCandidatePtrVec proteins =
-      ProtCandidate::geneResults(proteo_scores, threshold, top_num);
-  return proteins;
+  return ProtCandidate::geneResults(proteo_scores, threshold, top_num);
 }
 
 inline ProtCandidatePtrVec findOneShiftTopProteinsWithoutRestrict(
@@ -328,7 +314,8 @@ inline ProtCandidatePtrVec findOneShiftTopProteinsWithRestrict(
   // LOG_DEBUG("min mass " << min_mass << " max mass " << max_mass);
   const std::vector<int>& row_begins = index_ptr->getProteoRowBegins();
   const std::vector<int>& row_ends = index_ptr->getProteoRowEnds();
-  const std::vector<double>& proteo_minus_water_masses = index_ptr->getProteoMinusWaterMasses();
+  const std::vector<double>& proteo_minus_water_masses =
+      index_ptr->getProteoMinusWaterMasses();
   const std::vector<double>& trunc_shifts = index_ptr->getTruncShifts();
   const std::vector<int>& rev_row_begins = rev_index_ptr->getProteoRowBegins();
   const std::vector<int>& rev_row_ends = rev_index_ptr->getProteoRowEnds();
@@ -467,7 +454,8 @@ ProtCandidatePtrVec findVarPtmTopProteins(
   double max_mass = prec_minus_water_mass + prec_error_tole;
   const std::vector<int>& row_begins = index_ptr->getProteoRowBegins();
   const std::vector<int>& row_ends = index_ptr->getProteoRowEnds();
-  const std::vector<double>& proteo_minus_water_masses = index_ptr->getProteoMinusWaterMasses();
+  const std::vector<double>& proteo_minus_water_masses =
+      index_ptr->getProteoMinusWaterMasses();
   const std::vector<double>& trunc_shifts = index_ptr->getTruncShifts();
   const std::vector<int>& rev_row_begins = rev_index_ptr->getProteoRowBegins();
   const std::vector<int>& rev_row_ends = rev_index_ptr->getProteoRowEnds();
@@ -539,10 +527,9 @@ ProtCandidatePtrVec findVarPtmTopProteins(
 }
 
 // Find top proteins for diagonal filtering
-ProtCandidatePtrVec findDiagTopProteins(std::vector<short>& scores,
-                                        std::vector<int>& proteo_row_begins,
-                                        std::vector<int>& proteo_row_ends,
-                                        int threshold, int top_num) {
+ProtCandidatePtrVec findDiagTopProteins(
+    const std::vector<short>& scores, const std::vector<int>& proteo_row_begins,
+    const std::vector<int>& proteo_row_ends, int threshold, int top_num) {
   std::vector<std::pair<int, int>> diag_scores;
   for (size_t i = 0; i < proteo_row_begins.size(); i++) {
     int bgn = proteo_row_begins[i];

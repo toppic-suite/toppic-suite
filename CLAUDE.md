@@ -576,7 +576,14 @@ above it, never the reverse:
   update the best) and cut the one-shift filter from 712 s to 389 s on
   480_F3_02. The scores are not sparse (about 40% of truncation rows score
   >= 1 per spectrum), so a sparse or sliding-window pair finder was slower
-  and was not kept.
+  and was not kept. The zero-shift filter has no pair scan (its finder is
+  `simpleFindZeroShiftTopProteins` on per-proteoform maxima that
+  `ZeroPtmFilter::computeBestMatch` computes once with
+  `compProteoMaxScores` and shares between the four proteoform types); its
+  time is the index scoring itself. The diagonal filter scores all peaks
+  once per anchor peak (O(peaks^2 x index entries), ~40 ms per spectrum set
+  on this database) with a full fill and max-scan of the rows per anchor;
+  a touched-row list instead was 1.8x slower because most rows are touched.
 - `src/search` — sequence/spectrum alignment (`diag`/`graph`/`graphalign`/
   `oneptmsearch`/`ptmsearch`/`varptmsearch`/`zeroptmsearch`). `graph` uses the
   header-only Boost Graph Library (`adjacency_list`, `graph_traits`, `graphviz`).

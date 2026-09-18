@@ -32,11 +32,18 @@ ProtCandidatePtrVec findZeroShiftTopProteins(std::vector<short>& scores,
                                              int threshold, int num);
 
 // the simple version is faster, but less accurate
+// max_scores[i]: the best row score of proteoform i in the index
+void compProteoMaxScores(const std::vector<short>& scores,
+                         const MassMatchPtr& index_ptr,
+                         std::vector<int>& max_scores);
+
+// Zero-shift candidates: the proteoforms whose best N-terminal row score
+// plus best C-terminal row score reaches the threshold (no truncation shift
+// is recorded). The maxima come from compProteoMaxScores, so the four
+// proteoform types share four scans of the score arrays.
 ProtCandidatePtrVec simpleFindZeroShiftTopProteins(
-    std::vector<short>& scores, std::vector<short>& rev_scores,
-    const MassMatchPtr& index_ptr, const MassMatchPtr& rev_index_ptr,
-    double prec_minus_water_mass, double prec_error_tole, int threshold,
-    int top_num);
+    const std::vector<int>& max_scores, const std::vector<int>& rev_max_scores,
+    int threshold, int top_num);
 
 ProtCandidatePtrVec findOneShiftTopProteins(
     std::vector<short>& scores, std::vector<short>& rev_scores,
@@ -50,10 +57,9 @@ ProtCandidatePtrVec findVarPtmTopProteins(
     double prec_minus_water_mass, double prec_error_tole,
     std::vector<double>& ptm_shifts, int threshold, int top_num);
 
-ProtCandidatePtrVec findDiagTopProteins(std::vector<short>& scores,
-                                        std::vector<int>& proteo_row_begins,
-                                        std::vector<int>& proteo_row_ends,
-                                        int threshold, int top_num);
+ProtCandidatePtrVec findDiagTopProteins(
+    const std::vector<short>& scores, const std::vector<int>& proteo_row_begins,
+    const std::vector<int>& proteo_row_ends, int threshold, int top_num);
 
 }  // namespace mass_match_util
 

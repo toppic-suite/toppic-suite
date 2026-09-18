@@ -99,8 +99,8 @@ SimplePrsmPtrVec DiagFilter::compute(const PrmMsPtrVec& ms_ptr_vec) {
                                        mng_ptr_->filter_scale_, true, false);
   SimplePrsmPtrVec match_ptrs;
   int row_num = index_ptr_->getRowNum();
-  std::vector<int> proteo_row_begins = index_ptr_->getProteoRowBegins();
-  std::vector<int> proteo_row_ends = index_ptr_->getProteoRowEnds();
+  const std::vector<int>& proteo_row_begins = index_ptr_->getProteoRowBegins();
+  const std::vector<int>& proteo_row_ends = index_ptr_->getProteoRowEnds();
   int threshold = 4;
   std::vector<short> scores(row_num, 0);
   std::vector<short> max_scores(row_num, 0);

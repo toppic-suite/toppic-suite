@@ -144,22 +144,23 @@ void ZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec& ms_ptr_vec) {
   rev_diag_index_ptr_->compMatchScores(
       suff_mass_errors, prec_minus_water_mass_error, rev_diag_scores);
 
-  double prec_minus_water_mass =
-      ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMassMinusWater();
-  double prec_error_tole =
-      ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecErrorTolerance(
-          tole_ptr->getPpo());
-
   int threshold = MassMatch::getPrecursorMatchScore() * 2 + 4;
   int group_spec_num = ms_ptr_vec.size();
+  // the best row score of each proteoform in each index, computed once and
+  // shared by the four proteoform types below
+  std::vector<int> term_max, diag_max, rev_term_max, rev_diag_max;
+  mass_match_util::compProteoMaxScores(term_scores, term_index_ptr_, term_max);
+  mass_match_util::compProteoMaxScores(diag_scores, diag_index_ptr_, diag_max);
+  mass_match_util::compProteoMaxScores(rev_term_scores, rev_term_index_ptr_,
+                                       rev_term_max);
+  mass_match_util::compProteoMaxScores(rev_diag_scores, rev_diag_index_ptr_,
+                                       rev_diag_max);
   LOG_DEBUG("allow complete prot"
             << mng_ptr_->prsm_para_ptr_->allowCompleteProt());
   if (mng_ptr_->prsm_para_ptr_->allowCompleteProt()) {
     ProtCandidatePtrVec comp_prots =
         mass_match_util::simpleFindZeroShiftTopProteins(
-            term_scores, rev_term_scores, term_index_ptr_, rev_term_index_ptr_,
-            prec_minus_water_mass, prec_error_tole, threshold,
-            mng_ptr_->comp_num_);
+            term_max, rev_term_max, threshold, mng_ptr_->comp_num_);
     comp_match_ptrs_.clear();
     for (size_t i = 0; i < comp_prots.size(); i++) {
       int id = comp_prots[i]->getProteinId();
@@ -171,9 +172,7 @@ void ZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec& ms_ptr_vec) {
   if (mng_ptr_->prsm_para_ptr_->allowPrefixProt()) {
     ProtCandidatePtrVec pref_prots =
         mass_match_util::simpleFindZeroShiftTopProteins(
-            term_scores, rev_diag_scores, term_index_ptr_, rev_diag_index_ptr_,
-            prec_minus_water_mass, prec_error_tole, threshold,
-            mng_ptr_->pref_suff_num_);
+            term_max, rev_diag_max, threshold, mng_ptr_->pref_suff_num_);
     pref_match_ptrs_.clear();
     for (size_t i = 0; i < pref_prots.size(); i++) {
       int id = pref_prots[i]->getProteinId();
@@ -186,9 +185,7 @@ void ZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec& ms_ptr_vec) {
   if (mng_ptr_->prsm_para_ptr_->allowSuffixProt()) {
     ProtCandidatePtrVec suff_prots =
         mass_match_util::simpleFindZeroShiftTopProteins(
-            diag_scores, rev_term_scores, diag_index_ptr_, rev_term_index_ptr_,
-            prec_minus_water_mass, prec_error_tole, threshold,
-            mng_ptr_->pref_suff_num_);
+            diag_max, rev_term_max, threshold, mng_ptr_->pref_suff_num_);
     suff_match_ptrs_.clear();
     for (size_t i = 0; i < suff_prots.size(); i++) {
       int id = suff_prots[i]->getProteinId();
@@ -201,9 +198,7 @@ void ZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec& ms_ptr_vec) {
   if (mng_ptr_->prsm_para_ptr_->allowInternalProt()) {
     ProtCandidatePtrVec internal_prots =
         mass_match_util::simpleFindZeroShiftTopProteins(
-            diag_scores, rev_diag_scores, diag_index_ptr_, rev_diag_index_ptr_,
-            prec_minus_water_mass, prec_error_tole, threshold,
-            mng_ptr_->inte_num_);
+            diag_max, rev_diag_max, threshold, mng_ptr_->inte_num_);
     internal_match_ptrs_.clear();
     for (size_t i = 0; i < internal_prots.size(); i++) {
       int id = internal_prots[i]->getProteinId();
