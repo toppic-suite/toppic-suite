@@ -20,7 +20,10 @@ paths must be at most 200 characters long.
 ## 1. Input
 
 **Protein database.** A FASTA file (`.fasta`, `.fa`, `.FASTA` or `.FA`).
-Every protein needs a unique accession; duplicated accessions stop the run.
+If two records share an accession (the header text up to the first
+space), the tool writes `<database>_dedup.fasta` next to the input,
+keeping the first record of each accession, prints a notice, and searches
+that file instead; its indexes go to `<database>_dedup.fasta_idx/`.
 
 **Spectrum files.** One or more `_ms2.msalign` files written by TopFD (or
 by TopDIA, whose pseudo-MS/MS spectra use the same format). Several files

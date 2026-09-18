@@ -18,9 +18,11 @@ executable must not contain spaces), and the database path must be at most
 ## 1. Input
 
 A protein database in FASTA format (`.fasta`, `.fa`, `.FASTA` or `.FA`).
-Every protein needs a unique accession: if two share one, TopIndex reports
-it, deletes the whole `<database>_idx/` directory (including index files
-from earlier runs), and stops.
+If two records share an accession (the header text up to the first
+space), TopIndex writes `<database>_dedup.fasta` next to the input,
+keeping the first record of each accession, prints a notice, and builds
+the indexes for that file in `<database>_dedup.fasta_idx/`. TopPIC and
+TopMG do the same when given the original file, so they find the indexes.
 
 ## 2. What TopIndex does
 

@@ -19,8 +19,11 @@ paths must be at most 200 characters long.
 
 ## 1. Input
 
-**Protein database.** A FASTA file (`.fasta`, `.fa`, `.FASTA` or `.FA`)
-with unique protein accessions.
+**Protein database.** A FASTA file (`.fasta`, `.fa`, `.FASTA` or `.FA`).
+If two records share an accession (the header text up to the first
+space), the tool writes `<database>_dedup.fasta` next to the input,
+keeping the first record of each accession, prints a notice, and searches
+that file instead; its indexes go to `<database>_dedup.fasta_idx/`.
 
 **Modification file (required).** TopMG has no built-in list of
 modifications: the variable modifications used to build the proteoform

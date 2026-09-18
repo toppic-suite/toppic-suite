@@ -29,6 +29,7 @@
 #include "common/util/version.hpp"
 #include "common/xml/xml_dom_util.hpp"
 #include "prsm/prsm_post_mass_match.hpp"
+#include "seq/fasta_util.hpp"
 
 namespace toppic {
 
@@ -616,13 +617,6 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
       arguments_["searchType"] = "TARGET+DECOY";
     }
 
-    if (arguments_["searchType"] == "TARGET+DECOY") {
-      arguments_["databaseFileName"] =
-          arguments_["oriDatabaseFileName"] + "_target_decoy";
-    } else {
-      arguments_["databaseFileName"] =
-          arguments_["oriDatabaseFileName"] + "_target";
-    }
 
     if (vm.count("frag-error-tolerance")) {
       arguments_["fragErrorTolerance"] = frag_error_tole;
@@ -780,6 +774,20 @@ bool ToppicArgument::validateArguments() {
     LOG_ERROR("Database file " << arguments_["oriDatabaseFileName"]
                                << " path is too long!");
     return false;
+  }
+
+  // A database whose protein ids (the header text up to the first
+  // whitespace) repeat cannot be indexed by htslib: search its
+  // _dedup.fasta copy, which keeps the first record of every id, instead.
+  arguments_["oriDatabaseFileName"] =
+      fasta_util::removeDuplicatedIds(arguments_["oriDatabaseFileName"]);
+
+  if (arguments_["searchType"] == "TARGET+DECOY") {
+    arguments_["databaseFileName"] =
+        arguments_["oriDatabaseFileName"] + "_target_decoy";
+  } else {
+    arguments_["databaseFileName"] =
+        arguments_["oriDatabaseFileName"] + "_target";
   }
 
   for (size_t k = 0; k < spec_file_list_.size(); k++) {

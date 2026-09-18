@@ -38,6 +38,13 @@ void dbPreprocess(const std::string& ori_db_file_name,
 
 int countProteinNum(const std::string& fasta_file);
 
+// Check whether the FASTA file contains duplicated protein ids (the header
+// text after '>' up to the first whitespace, which htslib's faidx indexes
+// sequences by). Returns fasta_file when all ids are unique; otherwise
+// writes <fasta_file minus its extension>_dedup.fasta, keeping the first
+// record of every id and dropping the later ones, and returns that name.
+std::string removeDuplicatedIds(const std::string& fasta_file);
+
 }  // namespace fasta_util
 
 }  // namespace toppic
