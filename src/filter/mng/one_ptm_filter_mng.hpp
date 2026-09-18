@@ -50,7 +50,7 @@ class OnePtmFilterMng {
   int max_proteoform_mass_ = 50000;
 
   // Candidate protein number for each spectrum
-  unsigned int comp_num_ = 5;
+  unsigned int comp_num_ = 10;
   unsigned int pref_suff_num_ = 10;
   unsigned int inte_num_ = 10;
 
