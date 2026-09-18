@@ -534,6 +534,15 @@ above it, never the reverse:
   step when changing either. `prsm`/`simple_prsm`/`expected_value`/
   `peak_ion_pair` carry the pugixml XML (de)serialization (`toXmlElement`/`toXml`/
   `appendXml` take a parent `XmlDOMElement` and return the attached node).
+  `search_fasta_match` (the "# Protein hits" / `prsm_protein_match` lookup
+  of every protein containing a proteoform's sequence, run several times
+  per PrSM by the table and SQL writers) is a 4-mer position index over
+  the concatenated database: a query verifies only the positions of its
+  rarest 4-mer, which gave the same results as the previous
+  `std::string::find` scan of every protein and ran 59x faster on 1216
+  real proteoforms against the 20k-protein human database (6.9 ms -> 0.12
+  ms per query; queries shorter than 4 residues fall back to the scan).
+  The index costs about 4 bytes per residue on top of the sequences.
 - `src/filter` — proteoform filtering (`diag`/`index`/`massmatch`/`mng`/
   `oneptm`/`varptm`/`zeroptm`). `massmatch/mass_match` (de)serializes its binary
   index with Boost.Serialization. The file-global `serial_mutex` (and the other
