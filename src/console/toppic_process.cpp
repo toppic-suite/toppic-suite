@@ -397,7 +397,8 @@ int TopPIC_identify(std::map<std::string, std::string>& arguments) {
   return 0;
 }
 
-// proteoform clustering + FDR + HTML generation
+// Recounting, proteoform and protein clustering, PTM characterization,
+// FDR computation and the spectrum-level cutoff of the first-pass PrSMs.
 int TopPIC_post(std::map<std::string, std::string>& arguments) {
   try {
     std::string resource_dir = arguments["resourceDir"];
@@ -431,23 +432,8 @@ int TopPIC_post(std::map<std::string, std::string>& arguments) {
     std::cout << "Recounting matched masses and fragments - finished."
               << std::endl;
 
-    if (arguments["postMassMatch"] == "true") {
-      std::cout << "Post mass matching - started." << std::endl;
-      int min_peak_num = std::stoi(arguments["postMinPeakNum"]);
-      // the EnvCNN model scores the added masses
-      onnx_env_cnn::initModel(resource_dir,
-                              std::stoi(arguments["threadNumber"]));
-      sp_file_name = prsm_post_mass_match::process(
-          prsm_para_ptr, "toppic_recount", "toppic_recount", min_peak_num);
-      // The steps below read the spectra with the added masses and the PrSMs
-      // with the recounted matches, and name their files after the new
-      // spectrum file.
-      arguments["spectrumFileName"] = sp_file_name;
-      prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
-      msalign_util::geneSpIndex(sp_file_name);
-      std::cout << "Post mass matching - finished." << std::endl;
-    }
-
+    // Post mass matching is applied by TopPIC_multi_ptm_post to the final
+    // identifications.
     std::cout << "Finding PrSM proteoform clusters - started." << std::endl;
     bool is_proteoform_ppm_error = (arguments["proteoformPpmError"] == "true");
     double proteoform_error_tole =
@@ -531,45 +517,9 @@ int TopPIC_post(std::map<std::string, std::string>& arguments) {
               << std::endl;
     cur_suffix = "toppic_prsm_cutoff";
 
-    // With the multiple unexpected shifts stage still to come, the
-    // proteoform and protein cutoffs are applied by TopPIC_multi_ptm_post to
-    // the union of the identifications.
-    if (std::stoi(arguments["shiftNumber"]) >= 2) {
-      return 0;
-    }
-
-    std::string form_cutoff_type =
-        (arguments["cutoffProteoformType"] == "FDR") ? "FORMFDR" : "EVALUE";
-    std::cout << "Proteoform filtering by " << form_cutoff_type << " - started."
-              << std::endl;
-    std::istringstream(arguments["cutoffProteoformValue"]) >> cutoff_value;
-    prsm_cutoff_selector::process(db_file_name, sp_file_name, cur_suffix,
-                                  "toppic_form_cutoff", form_cutoff_type,
-                                  cutoff_value);
-    std::cout << "Proteoform filtering by " << form_cutoff_type
-              << " - finished." << std::endl;
-
-    std::cout << "Selecting top PrSMs for proteoforms - started." << std::endl;
-    prsm_form_filter::process(db_file_name, sp_file_name, "toppic_form_cutoff",
-                              "toppic_form_cutoff_form");
-    std::cout << "Selecting top PrSMs for proteoforms - finished." << std::endl;
-
-    std::string prot_cutoff_type =
-        (arguments["cutoffProteinType"] == "FDR") ? "PROTFDR" : "EVALUE";
-    std::cout << "Protein filtering by " << prot_cutoff_type << " - started."
-              << std::endl;
-    std::istringstream(arguments["cutoffProteinValue"]) >> cutoff_value;
-    prsm_cutoff_selector::process(db_file_name, sp_file_name,
-                                  "toppic_form_cutoff", "toppic_prot_cutoff",
-                                  prot_cutoff_type, cutoff_value);
-    std::cout << "Protein filtering by " << prot_cutoff_type << " - finished."
-              << std::endl;
-
-    std::cout << "Selecting top PrSMs for proteins - started." << std::endl;
-    prsm_prot_filter::process(db_file_name, sp_file_name, "toppic_prot_cutoff",
-                              "toppic_prot_cutoff_prot");
-    std::cout << "Selecting top PrSMs for proteins - finished." << std::endl;
-
+    // The proteoform and protein cutoffs, the post mass matching and the
+    // outputs are applied by TopPIC_multi_ptm_post to the final
+    // identifications (with -s 2 the union with the multiple-shift ones).
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;
@@ -748,9 +698,9 @@ int TopPIC_multi_ptm_search(std::map<std::string, std::string>& arguments) {
 
 // Post-processing of the multiple unexpected shifts PrSMs (their FDRs are
 // estimated on them alone), their union with the first-pass PrSMs that
-// passed the spectrum-level cutoff, the proteoform and protein cutoffs on
-// the union, and the tables and the SQLite file. Without -s 2 only the
-// tables and the SQLite file are written, from TopPIC_post's files.
+// passed the spectrum-level cutoff, then, on the final identifications
+// (TopPIC_post's toppic_prsm_cutoff without -s 2), the post mass matching,
+// the proteoform and protein cutoffs, the tables and the SQLite file.
 int TopPIC_multi_ptm_post(std::map<std::string, std::string>& arguments) {
   try {
     std::string resource_dir = arguments["resourceDir"];
@@ -777,12 +727,6 @@ int TopPIC_multi_ptm_post(std::map<std::string, std::string>& arguments) {
       std::cout << "Multiple-shift recounting matched masses and fragments - "
                    "finished."
                 << std::endl;
-      if (arguments["postMassMatch"] == "true") {
-        std::cout << "Post mass matching is not applied to the multiple-shift "
-                     "PrSMs on this branch."
-                  << std::endl;
-      }
-
       bool is_proteoform_ppm_error =
           (arguments["proteoformPpmError"] == "true");
       double proteoform_error_tole =
@@ -873,7 +817,30 @@ int TopPIC_multi_ptm_post(std::map<std::string, std::string>& arguments) {
       cluster("toppic_all_prsm_cutoff_top", "toppic_all_proteoform_cluster",
               "toppic_prsm_cutoff");
       std::cout << "Merging the identifications - finished." << std::endl;
+    }
 
+    if (arguments["postMassMatch"] == "true") {
+      // On the reported PrSMs only: the FDRs and the spectrum-level cutoff
+      // use the E-values, which the added masses do not change.
+      std::cout << "Post mass matching - started." << std::endl;
+      int min_peak_num = std::stoi(arguments["postMinPeakNum"]);
+      // the EnvCNN model scores the added masses
+      onnx_env_cnn::initModel(resource_dir,
+                              std::stoi(arguments["threadNumber"]));
+      sp_file_name = prsm_post_mass_match::process(
+          prsm_para_ptr, "toppic_prsm_cutoff", "toppic_prsm_cutoff",
+          min_peak_num);
+      // The steps below read the spectra with the added masses and the PrSMs
+      // with the recounted matches, and name their files after the new
+      // spectrum file.
+      arguments["spectrumFileName"] = sp_file_name;
+      prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
+      msalign_util::geneSpIndex(sp_file_name);
+      std::cout << "Post mass matching - finished." << std::endl;
+    }
+
+    {
+      double cutoff_value;
       std::string form_cutoff_type =
           (arguments["cutoffProteoformType"] == "FDR") ? "FORMFDR" : "EVALUE";
       std::cout << "Proteoform filtering by " << form_cutoff_type
