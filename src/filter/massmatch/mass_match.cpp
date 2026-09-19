@@ -18,7 +18,10 @@
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/serialization/vector.hpp>
+#include <algorithm>
 #include <cmath>
+#include <cstdint>
+#include <cstring>
 #include <fstream>
 #include <iostream>
 
@@ -26,6 +29,7 @@
 #include "common/util/logger.hpp"
 
 namespace toppic {
+
 
 /* proteo_minus_water_masses[i]: the mass (minus water) of the ith proteoform
  * mass_2d[i]: a vector containing prefix residue masses of the ith proteoform
@@ -54,6 +58,7 @@ MassMatch::MassMatch(std::vector<double>& proteo_minus_water_masses,
 
   LOG_DEBUG("init indexes");
   initIndexes(mass_2d, float_shift_2d, pos_2d);
+  initColIndexBounds();
 }
 
 void MassMatch::serializeMassMatch(std::string file_name,
@@ -109,6 +114,7 @@ void MassMatch::deserializeMassMatch(std::string new_file,
     ia >> col_indexes_;
 
     file_to_read.close();
+    initColIndexBounds();
   } else {
     LOG_ERROR("Failed to open the index file:" << file_path);
     exit(EXIT_FAILURE);
@@ -222,6 +228,11 @@ void MassMatch::initIndexes(std::vector<std::vector<int>>& mass_2d,
   fillColumnIndex(mass_2d, shift_2d, pos_2d, col_index_pnts);
 }
 
+void MassMatch::initColIndexBounds() {
+  col_index_bounds_ = col_index_begins_;
+  col_index_bounds_.push_back(static_cast<int>(col_indexes_.size()));
+}
+
 void MassMatch::compScores(
     const std::vector<std::pair<int, int>>& pref_mass_errors,
     std::vector<short>& scores) {
@@ -254,6 +265,124 @@ void MassMatch::compScores(
     for (int j = begin_index; j <= end_index; j++) {
       scores[col_indexes_[j]]++;
     }
+  }
+}
+
+// The anchor loop of DiagFilter::compute for the anchors [anchor_begin,
+// anchor_end) with the score array of the current anchor in Score. The rows
+// whose score reaches the threshold are noted by the increment loop itself
+// (a rarely taken branch) and only they are folded into max_scores after the
+// anchor, and the array is cleared with memset, so the per-anchor work on
+// the whole array is one sequential write instead of a fill, a read and a
+// read-modify-write of 16-bit scores. The column bounds and the first
+// entries of the next pairs are prefetched: each pair reads them from memory
+// the hardware prefetcher cannot predict.
+template <typename Score>
+void MassMatch::compDiagMaxScoresImpl(
+    const std::vector<std::pair<int, int>>& pref_mass_errors, int anchor_begin,
+    int anchor_end, int threshold, std::vector<Score>& scores,
+    std::vector<int>& hot_rows, std::vector<short>& max_scores) {
+  scores.assign(row_num_, 0);
+  const int* bounds = col_index_bounds_.data();
+  const int* entries = col_indexes_.data();
+  Score* s = scores.data();
+  short* mx = max_scores.data();
+  const int n = static_cast<int>(pref_mass_errors.size());
+  const int col_num = col_num_;
+  const int row_num = row_num_;
+  const int pf_bound = 8;  // pairs ahead for the column bound prefetch
+  const int pf_entry = 3;  // pairs ahead for the entry prefetch
+  const Score t = static_cast<Score>(threshold);
+  for (int i = anchor_begin; i < anchor_end; i++) {
+    if (i > anchor_begin) {
+      std::memset(s, 0, sizeof(Score) * row_num);
+    }
+    hot_rows.clear();
+    int shift = -pref_mass_errors[i].first;
+    for (int k = i; k < n; k++) {
+      if (k + pf_bound < n) {
+        int m2 = pref_mass_errors[k + pf_bound].first + shift;
+        int left2 = m2 - pref_mass_errors[k + pf_bound].second;
+        int right2 = m2 + pref_mass_errors[k + pf_bound].second;
+        if (left2 < 0) {
+          left2 = 0;
+        }
+        if (right2 >= 0 && right2 < col_num) {
+          __builtin_prefetch(bounds + left2);
+          __builtin_prefetch(bounds + right2 + 1);
+        }
+      }
+      if (k + pf_entry < n) {
+        int m2 = pref_mass_errors[k + pf_entry].first + shift;
+        int left2 = m2 - pref_mass_errors[k + pf_entry].second;
+        int right2 = m2 + pref_mass_errors[k + pf_entry].second;
+        if (left2 < 0) {
+          left2 = 0;
+        }
+        if (right2 >= 0 && right2 < col_num) {
+          int begin2 = bounds[left2];
+          __builtin_prefetch(entries + begin2);
+          __builtin_prefetch(entries + begin2 + 16);
+        }
+      }
+      int m = pref_mass_errors[k].first + shift;
+      int left = m - pref_mass_errors[k].second;
+      if (left < 0) {
+        left = 0;
+      }
+      int right = m + pref_mass_errors[k].second;
+      if (right < 0 || right >= col_num) {
+        continue;
+      }
+      int begin_index = bounds[left];
+      int end_index = bounds[right + 1];
+      for (int j = begin_index; j < end_index; j++) {
+        int row = entries[j];
+        if (++s[row] == t) {
+          hot_rows.push_back(row);
+        }
+      }
+    }
+    for (size_t h = 0; h < hot_rows.size(); h++) {
+      int row = hot_rows[h];
+      if (s[row] > mx[row]) {
+        mx[row] = static_cast<short>(s[row]);
+      }
+    }
+  }
+}
+
+// An anchor's score for a row is at most the number of pairs of the anchor
+// that hit the row, and a row is hit at most once by a pair when the column
+// windows are narrower than the smallest residue mass (a row's entries are
+// at least one residue mass apart). So the anchors with at most 255 later
+// peaks are scored with 8-bit arrays and the earlier ones with 16-bit arrays.
+void MassMatch::compDiagMaxScores(
+    const std::vector<std::pair<int, int>>& pref_mass_errors, int threshold,
+    std::vector<short>& max_scores) {
+  // scratch arrays, kept per thread across spectrum sets and blocks
+  static thread_local std::vector<uint8_t> scores8;
+  static thread_local std::vector<uint16_t> scores16;
+  static thread_local std::vector<int> hot_rows;
+  max_scores.assign(row_num_, 0);
+  const int n = static_cast<int>(pref_mass_errors.size());
+  int max_error = 0;
+  for (int k = 0; k < n; k++) {
+    max_error = std::max(max_error, pref_mass_errors[k].second);
+  }
+  // glycine, 57.02 Da, scaled by the index scale
+  const int min_residue_mass = static_cast<int>(57.0 * scale_);
+  int first8 = n;
+  if (2 * max_error + 1 < min_residue_mass) {
+    first8 = std::max(0, n - 255);
+  }
+  if (first8 > 0) {
+    compDiagMaxScoresImpl(pref_mass_errors, 0, first8, threshold, scores16,
+                          hot_rows, max_scores);
+  }
+  if (first8 < n) {
+    compDiagMaxScoresImpl(pref_mass_errors, first8, n, threshold, scores8,
+                          hot_rows, max_scores);
   }
 }
 
