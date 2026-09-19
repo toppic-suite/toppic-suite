@@ -30,6 +30,12 @@ int TopPIC_identify(std::map<std::string, std::string>& arguments);
 // proteoform clustering + FDR + HTML generation
 int TopPIC_post(std::map<std::string, std::string>& arguments);
 
+// the multiple unexpected shifts stage on the spectra without a first-pass
+// identification, and its post-processing with the union of the results
+int TopPIC_multi_ptm_search(std::map<std::string, std::string>& arguments);
+
+int TopPIC_multi_ptm_post(std::map<std::string, std::string>& arguments);
+
 int TopPICProgress_multi_file(std::map<std::string, std::string>& arguments,
                               const std::vector<std::string>& spec_file_lst);
 
