@@ -98,21 +98,12 @@ SimplePrsmPtrVec DiagFilter::compute(const PrmMsPtrVec& ms_ptr_vec) {
       prm_ms_util::getIntMassErrorList(ms_ptr_vec, tole_ptr,
                                        mng_ptr_->filter_scale_, true, false);
   SimplePrsmPtrVec match_ptrs;
-  int row_num = index_ptr_->getRowNum();
   const std::vector<int>& proteo_row_begins = index_ptr_->getProteoRowBegins();
   const std::vector<int>& proteo_row_ends = index_ptr_->getProteoRowEnds();
   int threshold = 4;
-  std::vector<short> scores(row_num, 0);
-  std::vector<short> max_scores(row_num, 0);
-  for (size_t i = 0; i < mass_errors.size(); i++) {
-    std::fill(scores.begin(), scores.end(), 0);
-    index_ptr_->compScores(mass_errors, i, -mass_errors[i].first, scores);
-    for (int j = 0; j < row_num; j++) {
-      if (scores[j] > max_scores[j]) {
-        max_scores[j] = scores[j];
-      }
-    }
-  }
+  // the best score over anchors of every row that reaches the threshold
+  std::vector<short> max_scores;
+  index_ptr_->compDiagMaxScores(mass_errors, threshold, max_scores);
 
   ProtCandidatePtrVec results = mass_match_util::findDiagTopProteins(
       max_scores, proteo_row_begins, proteo_row_ends, threshold,

@@ -54,6 +54,15 @@ class MassMatch {
       const std::vector<std::pair<int, int>>& prec_minus_water_mass_errors,
       std::vector<short>& scores);
 
+  // Diagonal scoring for the multiple-shift filter: for every anchor peak i,
+  // the peaks k >= i shifted by -mass_i are scored against the index (as
+  // compScores(pref_mass_errors, i, -mass_i, scores) does), and max_scores
+  // receives, for the rows whose score reaches threshold for some anchor,
+  // the maximum of that score over the anchors; the other rows are 0.
+  void compDiagMaxScores(
+      const std::vector<std::pair<int, int>>& pref_mass_errors, int threshold,
+      std::vector<short>& max_scores);
+
   void serializeMassMatch(std::string file_name, std::string dir_name);
 
   void deserializeMassMatch(std::string file_name, std::string dir_name);
@@ -96,6 +105,20 @@ class MassMatch {
   std::vector<int> col_index_begins_;
   std::vector<int> col_index_ends_;
   std::vector<int> col_indexes_;
+
+  // col_index_begins_ followed by the end of the last column, so that the
+  // entries of columns [left, right] are [begins[left], begins[right + 1]);
+  // built after construction or deserialization, not serialized.
+  std::vector<int> col_index_bounds_;
+
+  void initColIndexBounds();
+
+  template <typename Score>
+  void compDiagMaxScoresImpl(
+      const std::vector<std::pair<int, int>>& pref_mass_errors,
+      int anchor_begin, int anchor_end, int threshold,
+      std::vector<Score>& scores, std::vector<int>& hot_rows,
+      std::vector<short>& max_scores);
 
   void initProteoformBeginEnds(std::vector<std::vector<double>>& shift_2d);
 

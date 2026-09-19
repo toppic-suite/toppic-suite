@@ -16,7 +16,12 @@
 #ifndef TOPPIC_FILTER_DIAG_DIAG_FILTER_PROCESSOR_HPP_
 #define TOPPIC_FILTER_DIAG_DIAG_FILTER_PROCESSOR_HPP_
 
+#include <mutex>
+#include <vector>
+
 #include "filter/mng/diag_filter_mng.hpp"
+#include "prsm/simple_prsm.hpp"
+#include "prsm/simple_prsm_str.hpp"
 
 namespace toppic {
 
@@ -26,8 +31,20 @@ class DiagFilterProcessor {
 
   void process();
 
+  // Adds the candidates of one spectrum set found in one database block to
+  // the running top list of the spectrum (thread-safe).
+  void addResults(int spec_id, const SimplePrsmPtrVec& match_ptrs);
+
  private:
   DiagFilterMngPtr mng_ptr_;
+
+  // the best candidates of each spectrum over the blocks processed so far,
+  // as the text records that the combined output file receives
+  std::vector<SimplePrsmStrPtrVec> spec_results_;
+  std::vector<std::mutex> spec_mutexes_;
+  std::mutex resize_mutex_;
+
+  void writeResults(const std::string& output_file_name);
 };
 
 using DiagFilterProcessorPtr = std::shared_ptr<DiagFilterProcessor>;
