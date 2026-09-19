@@ -46,13 +46,18 @@ DiagHeaderPtrVec PtmSlowMatch::getNTermShiftListCommonHeaders() {
       prm_ms_util::getIntMassErrorList(ms_six_ptr_vec_, tole_ptr, scale, true,
                                        false);
 
-  CompShiftLowMemPtr comp_shift_ptr = std::make_shared<CompShiftLowMem>();
+  // The difference count buffer of CompShiftLowMem is reused by the
+  // candidates of a thread. It has one bin per 0.01 Da of the range of the
+  // differences between a spectrum mass and a residue mass of the protein
+  // (about 14 million bins, 28 MB, for this dataset), and it was allocated,
+  // filled bin by bin and freed for every candidate. findBestShift zeroes the
+  // bins it uses before counting, so a reused buffer gives the same counts as
+  // a new one.
+  static thread_local CompShiftLowMem comp_shift;
 
-  std::vector<double> best_shifts = comp_shift_ptr->findBestShift(
+  std::vector<double> best_shifts = comp_shift.findBestShift(
       sp_masses_toles, proteo_ptr_->getBpSpecPtr()->getScaledPrmMasses(scale),
       mng_ptr_->n_top_diagonals_, mng_ptr_->min_diagonal_gap_, scale);
-  // release memory for comp_shift
-  comp_shift_ptr = nullptr;
 
   DiagHeaderPtrVec header_ptrs;
   for (size_t i = 0; i < best_shifts.size(); i++) {
