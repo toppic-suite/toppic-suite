@@ -24,9 +24,24 @@ namespace toppic {
 
 namespace mass_match_util {
 
-inline bool cmpScore(const std::pair<int, int>& a,
-                     const std::pair<int, int>& b) {
-  return a.second > b.second;
+// The best term_shift_num rows of a proteoform, ordered by score descending
+// and, among equal scores, in the order in which the rows are visited. Only
+// term_shift_num rows are kept, instead of sorting every row of the
+// proteoform.
+inline void addBestRow(int row, int score, int keep_num,
+                       std::vector<std::pair<int, int>>& best) {
+  if (static_cast<int>(best.size()) >= keep_num &&
+      score <= best.back().second) {
+    return;
+  }
+  size_t pos = best.size();
+  while (pos > 0 && score > best[pos - 1].second) {
+    pos--;
+  }
+  best.insert(best.begin() + pos, std::pair<int, int>(row, score));
+  if (static_cast<int>(best.size()) > keep_num) {
+    best.pop_back();
+  }
 }
 
 void addTruncShifts(ProtCandidatePtrVec& prot_ptrs,
@@ -35,27 +50,20 @@ void addTruncShifts(ProtCandidatePtrVec& prot_ptrs,
   const std::vector<int>& row_begins = index_ptr->getProteoRowBegins();
   const std::vector<int>& row_ends = index_ptr->getProteoRowEnds();
   const std::vector<double>& trunc_shifts = index_ptr->getTruncShifts();
-  // the buffer is reused by the proteoforms of the call
-  std::vector<std::pair<int, int>> pos_scores;
+  std::vector<std::pair<int, int>> best;
   for (size_t i = 0; i < prot_ptrs.size(); i++) {
     ProtCandidatePtr prot_ptr = prot_ptrs[i];
     int prot_id = prot_ptr->getProteinId();
     int bgn = row_begins[prot_id];
     int end = row_ends[prot_id];
-    pos_scores.resize(end - bgn + 1);
+    best.clear();
     for (int j = bgn; j <= end; j++) {
-      std::pair<int, int> cur_pos_score(j, scores[j]);
-      pos_scores[j - bgn] = cur_pos_score;
+      addBestRow(j, scores[j], term_shift_num, best);
     }
-    std::sort(pos_scores.begin(), pos_scores.end(), cmpScore);
     std::vector<double> shifts;
-    for (size_t j = 0; j < pos_scores.size(); j++) {
-      if (static_cast<int>(shifts.size()) >= term_shift_num) {
-        break;
-      }
+    for (size_t j = 0; j < best.size(); j++) {
       // check if the shift is the best score shift
-      double shift = trunc_shifts[pos_scores[j].first];
-      shifts.push_back(shift);
+      shifts.push_back(trunc_shifts[best[j].first]);
     }
     if (is_n_term) {
       prot_ptr->setNTermShifts(shifts);
@@ -67,25 +75,43 @@ void addTruncShifts(ProtCandidatePtrVec& prot_ptrs,
 
 class TruncScorePosition {
  public:
-  TruncScorePosition(double score, int n_idx, int c_idx)
+  TruncScorePosition(int score, int n_idx, int c_idx)
       : score_(score), n_idx_(n_idx), c_idx_(c_idx) {};
 
-  double score_;
+  int score_;
   int n_idx_;
   int c_idx_;
 };
 
-inline bool cmpScoreIndex(const TruncScorePosition& a,
-                          const TruncScorePosition& b) {
-  return a.score_ > b.score_;
+// The best term_group_num row pairs, ordered by score descending and, among
+// equal scores, in the order in which the pairs are visited.
+inline void addBestRowPair(const TruncScorePosition& pair_score, int keep_num,
+                           std::vector<TruncScorePosition>& best) {
+  if (static_cast<int>(best.size()) >= keep_num &&
+      pair_score.score_ <= best.back().score_) {
+    return;
+  }
+  size_t pos = best.size();
+  while (pos > 0 && pair_score.score_ > best[pos - 1].score_) {
+    pos--;
+  }
+  best.insert(best.begin() + pos, pair_score);
+  if (static_cast<int>(best.size()) > keep_num) {
+    best.pop_back();
+  }
 }
 
+// The truncation shifts reported for the candidate proteoforms: the pairs of
+// an N-terminal and a C-terminal truncation row whose proteoform mass is in
+// the precursor mass window. Only the best term_group_num pairs are kept
+// while the window is scanned, instead of collecting and sorting every pair.
 void addTruncShiftsWithRestriction(
     ProtCandidatePtrVec& prot_ptrs, const MassMatchPtr& index_ptr,
     const MassMatchPtr& rev_index_ptr,
     const std::vector<double>& proteo_minus_water_masses,
     std::vector<short>& scores, std::vector<short>& rev_scores,
-    double min_mass, double max_mass, int term_group_num) {
+    const std::vector<int>& rev_max_scores, double min_mass, double max_mass,
+    int term_group_num) {
   const std::vector<int>& row_begins = index_ptr->getProteoRowBegins();
   const std::vector<int>& row_ends = index_ptr->getProteoRowEnds();
   const std::vector<double>& trunc_shifts = index_ptr->getTruncShifts();
@@ -95,8 +121,7 @@ void addTruncShiftsWithRestriction(
 
   int bgn, end, rev_bgn, rev_end;
   int k_start, k_end;
-  // the buffer is reused by the proteoforms of the call
-  std::vector<TruncScorePosition> score_idxes;
+  std::vector<TruncScorePosition> best;
   for (size_t i = 0; i < prot_ptrs.size(); i++) {
     ProtCandidatePtr prot_ptr = prot_ptrs[i];
     int prot_id = prot_ptr->getProteinId();
@@ -109,7 +134,7 @@ void addTruncShiftsWithRestriction(
     k_start = rev_end;
     k_end = rev_end;
 
-    score_idxes.clear();
+    best.clear();
     for (int j = bgn; j <= end; j++) {
       double n_trunc_shift = trunc_shifts[j];
       // find k_start
@@ -126,28 +151,27 @@ void addTruncShiftsWithRestriction(
           break;
         }
       }
+      // a row that cannot beat the worst kept pair adds nothing
+      if (static_cast<int>(best.size()) >= term_group_num &&
+          scores[j] + rev_max_scores[prot_id] <= best.back().score_) {
+        continue;
+      }
 
       for (int k = k_start; k >= k_end; k--) {
         double c_trunc_shift = rev_trunc_shifts[k];
         double mass = proteo_mass + n_trunc_shift + c_trunc_shift;
-        double score = scores[j] + rev_scores[k];
+        int score = scores[j] + rev_scores[k];
         if (mass >= min_mass && mass <= max_mass) {
           TruncScorePosition score_pos(score, j, k);
-          score_idxes.push_back(score_pos);
+          addBestRowPair(score_pos, term_group_num, best);
         }
       }
     }
-    std::sort(score_idxes.begin(), score_idxes.end(), cmpScoreIndex);
     std::vector<double> n_shifts;
     std::vector<double> c_shifts;
-    for (size_t j = 0; j < score_idxes.size(); j++) {
-      if (static_cast<int>(n_shifts.size()) >= term_group_num) {
-        break;
-      }
-      double n_shift = trunc_shifts[score_idxes[j].n_idx_];
-      n_shifts.push_back(n_shift);
-      double c_shift = rev_trunc_shifts[score_idxes[j].c_idx_];
-      c_shifts.push_back(c_shift);
+    for (size_t j = 0; j < best.size(); j++) {
+      n_shifts.push_back(trunc_shifts[best[j].n_idx_]);
+      c_shifts.push_back(rev_trunc_shifts[best[j].c_idx_]);
     }
     prot_ptr->setNTermShifts(n_shifts);
     prot_ptr->setCTermShifts(c_shifts);
@@ -454,7 +478,8 @@ inline ProtCandidatePtrVec findOneShiftTopProteinsWithRestrict(
   // add trunc shifts
   addTruncShiftsWithRestriction(proteins, index_ptr, rev_index_ptr,
                                 proteo_minus_water_masses, scores, rev_scores,
-                                min_mass, max_mass, term_shift_num);
+                                rev_max_scores, min_mass, max_mass,
+                                term_shift_num);
   return proteins;
 }
 
