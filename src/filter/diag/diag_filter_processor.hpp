@@ -19,6 +19,7 @@
 #include <mutex>
 #include <vector>
 
+#include "filter/diag/diag_filter.hpp"
 #include "filter/mng/diag_filter_mng.hpp"
 #include "prsm/simple_prsm.hpp"
 #include "prsm/simple_prsm_str.hpp"
@@ -35,8 +36,16 @@ class DiagFilterProcessor {
   // the running top list of the spectrum (thread-safe).
   void addResults(int spec_id, const SimplePrsmPtrVec& match_ptrs);
 
+  // The spectrum sets converted once for all blocks (empty for topmg's
+  // variable-modification variants, which are generated per block).
+  const DiagFilterSpectrumPtrVec& getSpectra() const { return spectra_; }
+
  private:
   DiagFilterMngPtr mng_ptr_;
+
+  DiagFilterSpectrumPtrVec spectra_;
+
+  void readSpectra();
 
   // the best candidates of each spectrum over the blocks processed so far,
   // as the text records that the combined output file receives
