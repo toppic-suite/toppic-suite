@@ -113,21 +113,28 @@ void OnePtmFilter::computeBestMatch(const PrmMsPtrVec& prm_ms_ptr_vec,
       prm_ms_util::getIntMassErrorList(srm_ms_ptr_vec, tole_ptr,
                                        mng_ptr_->filter_scale_, false, true);
 
-  int term_row_num = term_index_ptr_->getRowNum();
-  std::vector<short> term_scores(term_row_num, 0);
-  term_index_ptr_->compScores(pref_mass_errors, term_scores);
+  term_scores_.assign(term_index_ptr_->getRowNum(), 0);
+  term_index_ptr_->compScores(pref_mass_errors, term_scores_);
 
-  int diag_row_num = diag_index_ptr_->getRowNum();
-  std::vector<short> diag_scores(diag_row_num, 0);
-  diag_index_ptr_->compScores(pref_mass_errors, diag_scores);
+  diag_scores_.assign(diag_index_ptr_->getRowNum(), 0);
+  diag_index_ptr_->compScores(pref_mass_errors, diag_scores_);
 
-  int rev_term_row_num = rev_term_index_ptr_->getRowNum();
-  std::vector<short> rev_term_scores(rev_term_row_num, 0);
-  rev_term_index_ptr_->compScores(suff_mass_errors, rev_term_scores);
+  rev_term_scores_.assign(rev_term_index_ptr_->getRowNum(), 0);
+  rev_term_index_ptr_->compScores(suff_mass_errors, rev_term_scores_);
 
-  int rev_diag_row_num = rev_diag_index_ptr_->getRowNum();
-  std::vector<short> rev_diag_scores(rev_diag_row_num, 0);
-  rev_diag_index_ptr_->compScores(suff_mass_errors, rev_diag_scores);
+  rev_diag_scores_.assign(rev_diag_index_ptr_->getRowNum(), 0);
+  rev_diag_index_ptr_->compScores(suff_mass_errors, rev_diag_scores_);
+
+  // the best row score of each proteoform in each index, computed once and
+  // shared by the four proteoform types below
+  mass_match_util::compProteoMaxScores(term_scores_, term_index_ptr_,
+                                       term_max_);
+  mass_match_util::compProteoMaxScores(diag_scores_, diag_index_ptr_,
+                                       diag_max_);
+  mass_match_util::compProteoMaxScores(rev_term_scores_, rev_term_index_ptr_,
+                                       rev_term_max_);
+  mass_match_util::compProteoMaxScores(rev_diag_scores_, rev_diag_index_ptr_,
+                                       rev_diag_max_);
 
   double prec_minus_water_mass =
       prm_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMassMinusWater();
@@ -136,7 +143,8 @@ void OnePtmFilter::computeBestMatch(const PrmMsPtrVec& prm_ms_ptr_vec,
           tole_ptr->getPpo());
 
   ProtCandidatePtrVec comp_prots = mass_match_util::findOneShiftTopProteins(
-      term_scores, rev_term_scores, term_index_ptr_, rev_term_index_ptr_,
+      term_scores_, rev_term_scores_, term_max_, rev_term_max_,
+      term_index_ptr_, rev_term_index_ptr_,
       prec_minus_water_mass, prec_error_tole, mng_ptr_->min_shift_,
       mng_ptr_->max_shift_, mng_ptr_->comp_cand_shift_num_,
       mng_ptr_->threshold_, mng_ptr_->comp_num_);
@@ -151,7 +159,8 @@ void OnePtmFilter::computeBestMatch(const PrmMsPtrVec& prm_ms_ptr_vec,
   }
 
   ProtCandidatePtrVec pref_prots = mass_match_util::findOneShiftTopProteins(
-      term_scores, rev_diag_scores, term_index_ptr_, rev_diag_index_ptr_,
+      term_scores_, rev_diag_scores_, term_max_, rev_diag_max_,
+      term_index_ptr_, rev_diag_index_ptr_,
       prec_minus_water_mass, prec_error_tole, mng_ptr_->min_shift_,
       mng_ptr_->max_shift_, mng_ptr_->cand_shift_num_, mng_ptr_->threshold_,
       mng_ptr_->pref_suff_num_);
@@ -168,7 +177,8 @@ void OnePtmFilter::computeBestMatch(const PrmMsPtrVec& prm_ms_ptr_vec,
   }
 
   ProtCandidatePtrVec suff_prots = mass_match_util::findOneShiftTopProteins(
-      diag_scores, rev_term_scores, diag_index_ptr_, rev_term_index_ptr_,
+      diag_scores_, rev_term_scores_, diag_max_, rev_term_max_,
+      diag_index_ptr_, rev_term_index_ptr_,
       prec_minus_water_mass, prec_error_tole, mng_ptr_->min_shift_,
       mng_ptr_->max_shift_, mng_ptr_->cand_shift_num_, mng_ptr_->threshold_,
       mng_ptr_->pref_suff_num_);
@@ -184,7 +194,8 @@ void OnePtmFilter::computeBestMatch(const PrmMsPtrVec& prm_ms_ptr_vec,
   }
 
   ProtCandidatePtrVec internal_prots = mass_match_util::findOneShiftTopProteins(
-      diag_scores, rev_diag_scores, diag_index_ptr_, rev_diag_index_ptr_,
+      diag_scores_, rev_diag_scores_, diag_max_, rev_diag_max_,
+      diag_index_ptr_, rev_diag_index_ptr_,
       prec_minus_water_mass, prec_error_tole, mng_ptr_->min_shift_,
       mng_ptr_->max_shift_, mng_ptr_->cand_shift_num_, mng_ptr_->threshold_,
       mng_ptr_->inte_num_);

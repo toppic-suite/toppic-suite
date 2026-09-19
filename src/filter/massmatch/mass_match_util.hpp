@@ -45,8 +45,16 @@ ProtCandidatePtrVec simpleFindZeroShiftTopProteins(
     const std::vector<int>& max_scores, const std::vector<int>& rev_max_scores,
     int threshold, int top_num);
 
+// One-shift candidates: the proteoforms with the best total score of an
+// N-terminal row and a C-terminal row whose masses leave a shift in
+// [min_shift, max_shift] of the precursor mass. The per-proteoform maxima
+// come from compProteoMaxScores, so the four proteoform types share four
+// scans of the score arrays, and they bound the total score of a proteoform,
+// which keeps the truncation row scan to the proteoforms that can be
+// reported.
 ProtCandidatePtrVec findOneShiftTopProteins(
     std::vector<short>& scores, std::vector<short>& rev_scores,
+    const std::vector<int>& max_scores, const std::vector<int>& rev_max_scores,
     const MassMatchPtr& index_ptr, const MassMatchPtr& rev_index_ptr,
     double prec_minus_water_mass, double prec_error_tole, double min_shift,
     double max_shift, int term_shift_num, int threshold, int top_num);
