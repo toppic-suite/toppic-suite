@@ -54,6 +54,16 @@ class MassMatch {
       const std::vector<std::pair<int, int>>& prec_minus_water_mass_errors,
       std::vector<short>& scores);
 
+  // The same scoring, with the rows that received the precursor bonus
+  // appended to prec_rows. Only those rows can belong to a candidate of the
+  // variable-PTM filter, whose score threshold is twice the precursor match
+  // score, so the caller can work from them instead of scanning every row of
+  // the index. scores must be zero on entry.
+  void compMatchScores(
+      const std::vector<std::pair<int, int>>& pref_mass_errors,
+      const std::vector<std::pair<int, int>>& prec_minus_water_mass_errors,
+      std::vector<short>& scores, std::vector<int>& prec_rows);
+
   // Diagonal scoring for the multiple-shift filter: for every anchor peak i,
   // the peaks k >= i shifted by -mass_i are scored against the index (as
   // compScores(pref_mass_errors, i, -mass_i, scores) does), and max_scores
@@ -70,6 +80,8 @@ class MassMatch {
   int getRowNum() { return row_num_; }
 
   static int getPrecursorMatchScore() { return 10000; }
+
+  const std::vector<int>& getRowProteoIds() { return row_proteo_ids_; }
 
   const std::vector<int>& getProteoRowBegins() { return proteo_row_begins_; }
 
@@ -138,6 +150,11 @@ class MassMatch {
 
   void updatePrecScore(const std::pair<int, int> mass_error,
                        std::vector<short>& scores);
+
+  template <bool TrackPrecRows>
+  void updatePrecScoreImpl(const std::pair<int, int>& mass_error,
+                           std::vector<short>& scores,
+                           std::vector<int>* prec_rows);
 };
 
 using MassMatchPtr = std::shared_ptr<MassMatch>;

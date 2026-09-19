@@ -386,8 +386,10 @@ void MassMatch::compDiagMaxScores(
   }
 }
 
-void MassMatch::updatePrecScore(const std::pair<int, int> mass_error,
-                                std::vector<short>& scores) {
+template <bool TrackPrecRows>
+void MassMatch::updatePrecScoreImpl(const std::pair<int, int>& mass_error,
+                                    std::vector<short>& scores,
+                                    std::vector<int>* prec_rows) {
   // precursor mass
   int begin_index, end_index;
   int m = mass_error.first;
@@ -407,11 +409,20 @@ void MassMatch::updatePrecScore(const std::pair<int, int> mass_error,
     begin_index = col_index_begins_[left];
     end_index = col_index_ends_[right];
     for (int j = begin_index; j <= end_index; j++) {
-      if (scores[col_indexes_[j]] < getPrecursorMatchScore()) {
-        scores[col_indexes_[j]] += getPrecursorMatchScore();
+      int row = col_indexes_[j];
+      if (scores[row] < getPrecursorMatchScore()) {
+        scores[row] += getPrecursorMatchScore();
+        if (TrackPrecRows) {
+          prec_rows->push_back(row);
+        }
       }
     }
   }
+}
+
+void MassMatch::updatePrecScore(const std::pair<int, int> mass_error,
+                                std::vector<short>& scores) {
+  updatePrecScoreImpl<false>(mass_error, scores, nullptr);
 }
 
 void MassMatch::compMatchScores(
@@ -431,6 +442,17 @@ void MassMatch::compMatchScores(
   for (size_t i = 0; i < prec_minus_water_mass_errors.size(); i++) {
     std::pair<int, int> mass_error = prec_minus_water_mass_errors[i];
     updatePrecScore(mass_error, scores);
+  }
+}
+
+void MassMatch::compMatchScores(
+    const std::vector<std::pair<int, int>>& pref_mass_errors,
+    const std::vector<std::pair<int, int>>& prec_minus_water_mass_errors,
+    std::vector<short>& scores, std::vector<int>& prec_rows) {
+  compScores(pref_mass_errors, 0, 0.0, scores);
+  for (size_t i = 0; i < prec_minus_water_mass_errors.size(); i++) {
+    updatePrecScoreImpl<true>(prec_minus_water_mass_errors[i], scores,
+                              &prec_rows);
   }
 }
 

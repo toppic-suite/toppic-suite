@@ -65,6 +65,26 @@ ProtCandidatePtrVec findVarPtmTopProteins(
     double prec_minus_water_mass, double prec_error_tole,
     std::vector<double>& ptm_shifts, int threshold, int top_num);
 
+// prec_match_rows[i]: the rows of proteoform i that received the precursor
+// bonus, in ascending row order, collected from the rows the scoring noted
+// instead of a pass over every row of the index. A row without the bonus
+// scores at most the number of masses of the spectrum, far below the bonus,
+// and the threshold of the variable-PTM filter is twice the bonus, so no
+// other row can belong to a candidate.
+void compPrecMatchRows(const MassMatchPtr& index_ptr,
+                       const std::vector<int>& prec_rows,
+                       std::vector<std::vector<int>>& prec_match_rows);
+
+// The same candidates from those row lists, which the four proteoform types
+// of a spectrum share.
+ProtCandidatePtrVec findVarPtmTopProteins(
+    const std::vector<short>& scores, const std::vector<short>& rev_scores,
+    const std::vector<std::vector<int>>& prec_match_rows,
+    const std::vector<std::vector<int>>& rev_prec_match_rows,
+    const MassMatchPtr& index_ptr, const MassMatchPtr& rev_index_ptr,
+    double prec_minus_water_mass, double prec_error_tole,
+    std::vector<double>& ptm_shifts, int threshold, int top_num);
+
 ProtCandidatePtrVec findDiagTopProteins(
     const std::vector<short>& scores, const std::vector<int>& proteo_row_begins,
     const std::vector<int>& proteo_row_ends, int threshold, int top_num);

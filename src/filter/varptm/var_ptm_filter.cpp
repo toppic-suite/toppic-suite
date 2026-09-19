@@ -140,25 +140,40 @@ void VarPtmFilter::computeBestMatch(const PrmMsPtrVec& prm_ms_ptr_vec,
       getShiftedMassErrors(prec_minus_water_mass_error,
                            mng_ptr_->int_shift_list_);
 
-  int term_row_num = term_index_ptr_->getRowNum();
-  std::vector<short> term_scores(term_row_num, 0);
+  term_scores_.assign(term_index_ptr_->getRowNum(), 0);
+  term_prec_rows_.clear();
   term_index_ptr_->compMatchScores(pref_mass_errors,
-                                   prec_minus_water_mass_errors, term_scores);
+                                   prec_minus_water_mass_errors, term_scores_,
+                                   term_prec_rows_);
 
-  int diag_row_num = diag_index_ptr_->getRowNum();
-  std::vector<short> diag_scores(diag_row_num, 0);
+  diag_scores_.assign(diag_index_ptr_->getRowNum(), 0);
+  diag_prec_rows_.clear();
   diag_index_ptr_->compMatchScores(pref_mass_errors,
-                                   prec_minus_water_mass_errors, diag_scores);
+                                   prec_minus_water_mass_errors, diag_scores_,
+                                   diag_prec_rows_);
 
-  int rev_term_row_num = rev_term_index_ptr_->getRowNum();
-  std::vector<short> rev_term_scores(rev_term_row_num, 0);
-  rev_term_index_ptr_->compMatchScores(
-      suff_mass_errors, prec_minus_water_mass_errors, rev_term_scores);
+  rev_term_scores_.assign(rev_term_index_ptr_->getRowNum(), 0);
+  rev_term_prec_rows_.clear();
+  rev_term_index_ptr_->compMatchScores(suff_mass_errors,
+                                       prec_minus_water_mass_errors,
+                                       rev_term_scores_, rev_term_prec_rows_);
 
-  int rev_diag_row_num = rev_diag_index_ptr_->getRowNum();
-  std::vector<short> rev_diag_scores(rev_diag_row_num, 0);
-  rev_diag_index_ptr_->compMatchScores(
-      suff_mass_errors, prec_minus_water_mass_errors, rev_diag_scores);
+  rev_diag_scores_.assign(rev_diag_index_ptr_->getRowNum(), 0);
+  rev_diag_prec_rows_.clear();
+  rev_diag_index_ptr_->compMatchScores(suff_mass_errors,
+                                       prec_minus_water_mass_errors,
+                                       rev_diag_scores_, rev_diag_prec_rows_);
+
+  // the bonus rows of each proteoform, collected once and shared by the four
+  // proteoform types below
+  mass_match_util::compPrecMatchRows(term_index_ptr_, term_prec_rows_,
+                                     term_rows_2d_);
+  mass_match_util::compPrecMatchRows(diag_index_ptr_, diag_prec_rows_,
+                                     diag_rows_2d_);
+  mass_match_util::compPrecMatchRows(rev_term_index_ptr_, rev_term_prec_rows_,
+                                     rev_term_rows_2d_);
+  mass_match_util::compPrecMatchRows(rev_diag_index_ptr_, rev_diag_prec_rows_,
+                                     rev_diag_rows_2d_);
 
   int group_spec_num = prm_ms_ptr_vec.size();
   double prec_minus_water_mass =
@@ -168,7 +183,8 @@ void VarPtmFilter::computeBestMatch(const PrmMsPtrVec& prm_ms_ptr_vec,
           tole_ptr->getPpo());
 
   ProtCandidatePtrVec comp_prots = mass_match_util::findVarPtmTopProteins(
-      term_scores, rev_term_scores, term_index_ptr_, rev_term_index_ptr_,
+      term_scores_, rev_term_scores_,
+      term_rows_2d_, rev_term_rows_2d_, term_index_ptr_, rev_term_index_ptr_,
       prec_minus_water_mass, prec_error_tole, mng_ptr_->shift_list_,
       mng_ptr_->comp_threshold_, mng_ptr_->comp_num_);
   comp_match_ptrs_.clear();
@@ -180,7 +196,8 @@ void VarPtmFilter::computeBestMatch(const PrmMsPtrVec& prm_ms_ptr_vec,
   }
 
   ProtCandidatePtrVec pref_prots = mass_match_util::findVarPtmTopProteins(
-      term_scores, rev_diag_scores, term_index_ptr_, rev_diag_index_ptr_,
+      term_scores_, rev_diag_scores_,
+      term_rows_2d_, rev_diag_rows_2d_, term_index_ptr_, rev_diag_index_ptr_,
       prec_minus_water_mass, prec_error_tole, mng_ptr_->shift_list_,
       mng_ptr_->pref_suff_threshold_, mng_ptr_->pref_suff_num_);
   pref_match_ptrs_.clear();
@@ -192,7 +209,8 @@ void VarPtmFilter::computeBestMatch(const PrmMsPtrVec& prm_ms_ptr_vec,
   }
 
   ProtCandidatePtrVec suff_prots = mass_match_util::findVarPtmTopProteins(
-      diag_scores, rev_term_scores, diag_index_ptr_, rev_term_index_ptr_,
+      diag_scores_, rev_term_scores_,
+      diag_rows_2d_, rev_term_rows_2d_, diag_index_ptr_, rev_term_index_ptr_,
       prec_minus_water_mass, prec_error_tole, mng_ptr_->shift_list_,
       mng_ptr_->pref_suff_threshold_, mng_ptr_->pref_suff_num_);
   suff_match_ptrs_.clear();
@@ -204,7 +222,8 @@ void VarPtmFilter::computeBestMatch(const PrmMsPtrVec& prm_ms_ptr_vec,
   }
 
   ProtCandidatePtrVec internal_prots = mass_match_util::findVarPtmTopProteins(
-      diag_scores, rev_diag_scores, diag_index_ptr_, rev_diag_index_ptr_,
+      diag_scores_, rev_diag_scores_,
+      diag_rows_2d_, rev_diag_rows_2d_, diag_index_ptr_, rev_diag_index_ptr_,
       prec_minus_water_mass, prec_error_tole, mng_ptr_->shift_list_,
       mng_ptr_->internal_threshold_, mng_ptr_->internal_num_);
   internal_match_ptrs_.clear();
