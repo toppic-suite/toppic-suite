@@ -22,6 +22,16 @@
 
 namespace toppic {
 
+namespace {
+// The count buffer is kept for the next candidate (it is reused by the
+// candidates of a thread) unless it is larger than this, which happens only
+// for a very long protein: one bin per 0.01 Da of the range of the
+// differences, so 64 M bins are 128 MB and cover a protein of about 640 kDa.
+// Titin (3.8 MDa) would need 760 MB per thread, which is not worth keeping
+// between candidates.
+const size_t max_kept_bin_num = 64 * 1024 * 1024;
+}  // namespace
+
 std::vector<std::vector<int>> CompShiftLowMem::findBestShift(
     const std::vector<int>& a, const std::vector<int>& b) {
   return findBestShift(a, b, 1, 0);
@@ -100,10 +110,9 @@ std::vector<std::vector<int>> CompShiftLowMem::findBestShift(
   int minD = delta - 1;
   int maxD = a[a_length - 1] - b[0] + 1 + errors[a_length - 1];
   if (maxD - minD + 1 >= (int)num_.size()) {
-    size_t required_len = maxD - minD + 1;
-    for (size_t i = num_.size(); i < required_len; i++) {
-      num_.push_back(0);
-    }
+    // one allocation instead of one push_back per bin; the buffer is tens of
+    // MB and is reused by the candidates of a thread
+    num_.resize(maxD - minD + 1, 0);
   }
 
   resetNumbers(a, errors, b);
@@ -119,15 +128,20 @@ std::vector<std::vector<int>> CompShiftLowMem::findBestShift(
         start = d - errors[i];
       }
       for (int k = start; k <= d + errors[i]; k++) {
-        num_[k]++;
-        current_minimum =
-            checkShift(best_shifts, k, current_minimum, total, minimum_gap);
+        // checkShift returns cur_min unchanged when num_[k] < cur_min
+        if (++num_[k] >= current_minimum) {
+          current_minimum =
+              checkShift(best_shifts, k, current_minimum, total, minimum_gap);
+        }
       }
     }
   }
 
   for (size_t i = 0; i < best_shifts.size(); i++) {
     best_shifts[i][0] += minD;
+  }
+  if (num_.size() > max_kept_bin_num) {
+    std::vector<short>().swap(num_);
   }
   return best_shifts;
 }
@@ -142,10 +156,7 @@ inline std::vector<std::vector<int>> CompShiftLowMem::findBestShift(
   const int minD = delta - 1;
   const int maxD = a[a_length - 1] - b[0] + 1;
   if (maxD - minD + 1 >= (int)num_.size()) {
-    int required_len = maxD - minD + 1;
-    for (int i = num_.size(); i < required_len; i++) {
-      num_.push_back(0);
-    }
+    num_.resize(maxD - minD + 1, 0);
   }
 
   resetNumbers(a, b);
