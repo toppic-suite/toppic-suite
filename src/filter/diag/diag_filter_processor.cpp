@@ -61,15 +61,47 @@ SimplePrsmStrPtr toPrsmStr(const SimplePrsmPtr& prsm_ptr) {
 
 }  // namespace
 
-inline void filterBlock(const ProteoformPtrVec& raw_forms, int block_idx,
-                        const DiagFilterMngPtr& mng_ptr,
-                        const std::vector<double>& mod_mass_list,
-                        DiagFilterProcessor* processor) {
-  std::string block_str = std::to_string(block_idx);
+// Scores the converted spectrum sets against one block (toppic).
+inline void filterBlockCached(const DiagFilterPtr& filter_ptr, int block_idx,
+                              const DiagFilterMngPtr& mng_ptr,
+                              DiagFilterProcessor* processor) {
+  const DiagFilterSpectrumPtrVec& spectra = processor->getSpectra();
+  int group_spec_num = mng_ptr->prsm_para_ptr_->getGroupSpecNum();
+  int block_num = static_cast<int>(mng_ptr->cnts_.size());
+  int spec_num = mng_ptr->n_spec_block_ / block_num;
+  size_t report_step = 100;
+  for (size_t i = 0; i < spectra.size(); i++) {
+    const DiagFilterSpectrum& spectrum = *spectra[i];
+    SimplePrsmPtrVec match_ptrs = filter_ptr->getBestMatch(spectrum);
+    processor->addResults(spectrum.getHeaderPtr()->getSpecId(), match_ptrs);
+    if ((i + 1) % report_step == 0 || i + 1 == spectra.size()) {
+      // the count covers the spectra without precursor as well
+      mng_ptr->cnts_[block_idx] =
+          i + 1 == spectra.size()
+              ? spec_num
+              : static_cast<int>((i + 1) * group_spec_num);
+      int cnt_sum = 0;
+      for (size_t k = 0; k < mng_ptr->cnts_.size(); k++) {
+        cnt_sum = cnt_sum + mng_ptr->cnts_[k];
+      }
+      double perc = cnt_sum * 100.0 / mng_ptr->n_spec_block_;
+      std::stringstream msg;
+      msg << std::flush
+          << "Multiple unexpected shifts filtering - processing "
+          << std::setprecision(3) << perc << "%.     \r";
+      mng_ptr->mutex_.lock();
+      std::cout << msg.str();
+      mng_ptr->mutex_.unlock();
+    }
+  }
+}
 
-  DiagFilterPtr filter_ptr =
-      std::make_shared<DiagFilter>(raw_forms, mng_ptr, block_str);
-
+// Reads the spectra per block and scores every variable-modification
+// variant of each set (topmg, var_num_ > 0).
+inline void filterBlockVariants(const DiagFilterPtr& filter_ptr,
+                                int block_idx, const DiagFilterMngPtr& mng_ptr,
+                                const std::vector<double>& mod_mass_list,
+                                DiagFilterProcessor* processor) {
   PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
@@ -92,27 +124,19 @@ inline void filterBlock(const ProteoformPtrVec& raw_forms, int block_idx,
         SpectrumSetPtr spec_set_ptr = spec_set_vec[k];
         if (spec_set_ptr->isValid()) {
           int spec_id = spec_set_ptr->getSpectrumId();
-          if (mng_ptr->var_num_ == 0) {
-            PrmMsPtrVec ms_ptr_vec = spec_set_ptr->getMsTwoPtrVec();
-            SimplePrsmPtrVec match_ptrs = filter_ptr->getBestMatch(ms_ptr_vec);
-            processor->addResults(spec_id, match_ptrs);
-          } else {
-            DeconvMsPtrVec deconv_ms_ptr_vec =
-                spec_set_ptr->getDeconvMsPtrVec();
-            double prec_mono_mass = spec_set_ptr->getPrecMonoMass();
-            double n_term_label_mass = spec_set_ptr->getNTermLabelMass();
-            std::vector<double> mod_mass(3);
-            for (size_t i = 0; i < mod_mass_list.size(); i++) {
-              for (size_t k1 = 0; k1 < mod_mass.size(); k1++) {
-                std::fill(mod_mass.begin(), mod_mass.end(), 0.0);
-                mod_mass[k1] += mod_mass_list[i];
-                PrmMsPtrVec ms_ptr_vec = prm_ms_factory::geneMsTwoPtrVec(
-                    deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass,
-                    n_term_label_mass, mod_mass);
-                SimplePrsmPtrVec match_ptrs =
-                    filter_ptr->getBestMatch(ms_ptr_vec);
-                processor->addResults(spec_id, match_ptrs);
-              }
+          DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
+          double prec_mono_mass = spec_set_ptr->getPrecMonoMass();
+          double n_term_label_mass = spec_set_ptr->getNTermLabelMass();
+          std::vector<double> mod_mass(3);
+          for (size_t i = 0; i < mod_mass_list.size(); i++) {
+            for (size_t k1 = 0; k1 < mod_mass.size(); k1++) {
+              std::fill(mod_mass.begin(), mod_mass.end(), 0.0);
+              mod_mass[k1] += mod_mass_list[i];
+              PrmMsPtrVec ms_ptr_vec = prm_ms_factory::geneMsTwoPtrVec(
+                  deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass,
+                  n_term_label_mass, mod_mass);
+              SimplePrsmPtrVec match_ptrs = filter_ptr->getBestMatch(ms_ptr_vec);
+              processor->addResults(spec_id, match_ptrs);
             }
           }
         }
@@ -132,6 +156,23 @@ inline void filterBlock(const ProteoformPtrVec& raw_forms, int block_idx,
     mng_ptr->mutex_.unlock();
 
     deconv_ms_ptr_vec = reader_ptr->getNextMsPtrVec();
+  }
+}
+
+inline void filterBlock(const ProteoformPtrVec& raw_forms, int block_idx,
+                        const DiagFilterMngPtr& mng_ptr,
+                        const std::vector<double>& mod_mass_list,
+                        DiagFilterProcessor* processor) {
+  std::string block_str = std::to_string(block_idx);
+
+  DiagFilterPtr filter_ptr =
+      std::make_shared<DiagFilter>(raw_forms, mng_ptr, block_str);
+
+  if (mng_ptr->var_num_ == 0) {
+    filterBlockCached(filter_ptr, block_idx, mng_ptr, processor);
+  } else {
+    filterBlockVariants(filter_ptr, block_idx, mng_ptr, mod_mass_list,
+                        processor);
   }
 }
 
@@ -182,6 +223,36 @@ void DiagFilterProcessor::addResults(int spec_id,
   }
 }
 
+// Reads the msalign once and converts every valid spectrum set to the
+// integer mass-error list the index scores, so that the block threads do
+// not each re-read and re-convert the file.
+void DiagFilterProcessor::readSpectra() {
+  PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
+  SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
+  std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
+  int group_spec_num = prsm_para_ptr->getGroupSpecNum();
+  MsAlignReaderPtr reader_ptr = std::make_shared<MsAlignReader>(
+      sp_file_name, group_spec_num, sp_para_ptr->getActivationPtr(),
+      sp_para_ptr->getEnvCnnCutoff());
+  std::vector<double> prec_error_vec =
+      sp_para_ptr->getMultiShiftSearchPrecErrorVec();
+  DeconvMsPtrVec deconv_ms_ptr_vec = reader_ptr->getNextMsPtrVec();
+  while (deconv_ms_ptr_vec.size() != 0) {
+    if (deconv_ms_ptr_vec[0]->getMsHeaderPtr()->containsPrec()) {
+      SpectrumSetPtrVec spec_set_vec =
+          spectrum_set_factory::geneSpectrumSetPtrVecWithPrecError(
+              deconv_ms_ptr_vec, sp_para_ptr, prec_error_vec);
+      for (size_t k = 0; k < spec_set_vec.size(); k++) {
+        if (spec_set_vec[k]->isValid()) {
+          spectra_.push_back(DiagFilter::convert(
+              spec_set_vec[k]->getMsTwoPtrVec(), mng_ptr_));
+        }
+      }
+    }
+    deconv_ms_ptr_vec = reader_ptr->getNextMsPtrVec();
+  }
+}
+
 void DiagFilterProcessor::writeResults(const std::string& output_file_name) {
   SimplePrsmXmlWriter writer(output_file_name);
   size_t top_num = mng_ptr_->filter_result_num_;
@@ -214,6 +285,9 @@ void DiagFilterProcessor::process() {
   spec_results_.resize(spec_num);
   std::vector<std::mutex> mutexes(64);
   spec_mutexes_.swap(mutexes);
+  if (mng_ptr_->var_num_ == 0) {
+    readSpectra();
+  }
 
   SimpleThreadPoolPtr pool_ptr =
       std::make_shared<SimpleThreadPool>(mng_ptr_->thread_num_);

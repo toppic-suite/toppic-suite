@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <filesystem>
 #include <mutex>
+#include <utility>
 
 #include "common/util/file_util.hpp"
 #include "filter/massmatch/mass_match_factory.hpp"
@@ -69,8 +70,24 @@ DiagFilter::DiagFilter(const ProteoformPtrVec& proteo_ptrs,
   }
 }
 
+DiagFilterSpectrumPtr DiagFilter::convert(const PrmMsPtrVec& ms_ptr_vec,
+                                          const DiagFilterMngPtr& mng_ptr) {
+  PeakTolerancePtr tole_ptr =
+      mng_ptr->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr();
+  std::vector<std::pair<int, int> > mass_errors =
+      prm_ms_util::getIntMassErrorList(ms_ptr_vec, tole_ptr,
+                                       mng_ptr->filter_scale_, true, false);
+  return std::make_shared<DiagFilterSpectrum>(
+      ms_ptr_vec[0]->getMsHeaderPtr(), static_cast<int>(ms_ptr_vec.size()),
+      std::move(mass_errors));
+}
+
 SimplePrsmPtrVec DiagFilter::getBestMatch(const PrmMsPtrVec& ms_ptr_vec) {
-  SimplePrsmPtrVec match_ptrs = compute(ms_ptr_vec);
+  return getBestMatch(*convert(ms_ptr_vec, mng_ptr_));
+}
+
+SimplePrsmPtrVec DiagFilter::getBestMatch(const DiagFilterSpectrum& spectrum) {
+  SimplePrsmPtrVec match_ptrs = compute(spectrum);
   SimplePrsmPtrVec unique_match_ptrs =
       simple_prsm_util::getUniqueMatches(match_ptrs);
   std::sort(unique_match_ptrs.begin(), unique_match_ptrs.end(),
@@ -91,19 +108,15 @@ SimplePrsmPtrVec DiagFilter::getBestMatch(const PrmMsPtrVec& ms_ptr_vec) {
   return result_ptrs;
 }
 
-SimplePrsmPtrVec DiagFilter::compute(const PrmMsPtrVec& ms_ptr_vec) {
-  PeakTolerancePtr tole_ptr =
-      mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr();
-  std::vector<std::pair<int, int> > mass_errors =
-      prm_ms_util::getIntMassErrorList(ms_ptr_vec, tole_ptr,
-                                       mng_ptr_->filter_scale_, true, false);
+SimplePrsmPtrVec DiagFilter::compute(const DiagFilterSpectrum& spectrum) {
   SimplePrsmPtrVec match_ptrs;
   const std::vector<int>& proteo_row_begins = index_ptr_->getProteoRowBegins();
   const std::vector<int>& proteo_row_ends = index_ptr_->getProteoRowEnds();
   int threshold = 4;
   // the best score over anchors of every row that reaches the threshold
   std::vector<short> max_scores;
-  index_ptr_->compDiagMaxScores(mass_errors, threshold, max_scores);
+  index_ptr_->compDiagMaxScores(spectrum.getMassErrors(), threshold,
+                                max_scores);
 
   ProtCandidatePtrVec results = mass_match_util::findDiagTopProteins(
       max_scores, proteo_row_begins, proteo_row_ends, threshold,
@@ -112,7 +125,7 @@ SimplePrsmPtrVec DiagFilter::compute(const PrmMsPtrVec& ms_ptr_vec) {
     int id = results[j]->getProteinId();
     int score = results[j]->getScore();
     match_ptrs.push_back(std::make_shared<SimplePrsm>(
-        ms_ptr_vec[0]->getMsHeaderPtr(), ms_ptr_vec.size(), proteo_ptrs_[id],
+        spectrum.getHeaderPtr(), spectrum.getSpectrumNum(), proteo_ptrs_[id],
         score));
   }
   return match_ptrs;
