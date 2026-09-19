@@ -130,6 +130,7 @@ void cleanToppicDir(const std::string& fa_name, const std::string& sp_name,
     file_util::delFile(out_base + ".toppic_multi_prsm_cutoff");
     file_util::delFile(out_base + ".toppic_first_prsm_cutoff");
     file_util::delFile(out_base + ".toppic_all_prsm_cutoff");
+    file_util::delFile(out_base + ".toppic_all_prsm_cutoff_top");
     file_util::delFile(out_base + ".toppic_all_proteoform_cluster");
     file_util::delDir(out_base + "_toppic_proteoform_cutoff_xml");
     file_util::delDir(out_base + "_toppic_prsm_cutoff_xml");
@@ -606,44 +607,53 @@ int TopPIC_multi_ptm_search(std::map<std::string, std::string>& arguments) {
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
     msalign_util::geneSpIndex(sp_file_name);
 
-    // The spectra the earlier stages identified are not searched again:
-    // those with a target PrSM passing the spectrum-level cutoff
-    // (toppic_prsm_cutoff), and, so that target and decoy spectra are
-    // treated alike, those whose best first-pass PrSM (toppic_recount,
-    // targets and decoys) has an E-value at or below the largest E-value
-    // among the passing PrSMs. Decoy spectra that the first pass matched
-    // that well were counted in its FDR and must not be counted again in
-    // the FDR of the multiple-shift PrSMs.
+    // The spectra the earlier stages identified are not searched again.
+    // The cutoff E-value is the largest E-value among the target PrSMs
+    // passing the spectrum-level cutoff (toppic_prsm_cutoff); a spectrum
+    // is skipped when its best first-pass PrSM (toppic_recount, targets
+    // and decoys alike) has an E-value at or below the cutoff E-value
+    // times multiSkipEvalueRatio (hidden option --multi-skip-evalue-ratio,
+    // default 1). Decoy spectra that the first pass matched that well were
+    // counted in its FDR and must not be counted again in the FDR of the
+    // multiple-shift PrSMs; with a ratio below 1 the identified spectra
+    // near the cutoff are searched again and their first-pass PrSM
+    // competes with the multiple-shift one.
     std::string base_name = file_util::basename(sp_file_name);
     std::set<int> identified_spec_ids;
-    int decoy_identified_num = 0;
     double cutoff_evalue = 0;
+    double skip_evalue = 0;
+    int skipped_target_num = 0;
+    int skipped_decoy_num = 0;
     {
       PrsmStrPtrVec cutoff_ptrs = prsm_reader_util::readAllPrsmStrs(
           base_name + ".toppic_prsm_cutoff");
       for (size_t i = 0; i < cutoff_ptrs.size(); i++) {
-        identified_spec_ids.insert(cutoff_ptrs[i]->getSpectrumId());
         if (cutoff_ptrs[i]->getEValue() > cutoff_evalue) {
           cutoff_evalue = cutoff_ptrs[i]->getEValue();
         }
       }
-      size_t target_num = identified_spec_ids.size();
+      skip_evalue = cutoff_evalue * std::stod(arguments["multiSkipEvalueRatio"]);
       PrsmStrPtrVec first_ptrs =
           prsm_reader_util::readAllPrsmStrs(base_name + ".toppic_recount");
       for (size_t i = 0; i < first_ptrs.size(); i++) {
-        if (first_ptrs[i]->getEValue() <= cutoff_evalue) {
-          identified_spec_ids.insert(first_ptrs[i]->getSpectrumId());
+        if (first_ptrs[i]->getEValue() <= skip_evalue) {
+          int spec_id = first_ptrs[i]->getSpectrumId();
+          if (identified_spec_ids.insert(spec_id).second) {
+            if (first_ptrs[i]->getSeqName().find("DECOY_") == 0) {
+              skipped_decoy_num++;
+            } else {
+              skipped_target_num++;
+            }
+          }
         }
       }
-      decoy_identified_num = identified_spec_ids.size() - target_num;
     }
     std::cout << "Multiple unexpected shifts stage - "
               << identified_spec_ids.size()
               << " spectra identified by the earlier stages are skipped ("
-              << decoy_identified_num
-              << " of them by a PrSM at or below the cutoff E-value "
-              << cutoff_evalue << " that did not pass the cutoff)."
-              << std::endl;
+              << skipped_target_num << " target, " << skipped_decoy_num
+              << " decoy; first-pass E-value <= " << skip_evalue
+              << ", cutoff E-value " << cutoff_evalue << ")." << std::endl;
 
     std::vector<std::string> input_exts;
     {
@@ -853,7 +863,14 @@ int TopPIC_multi_ptm_post(std::map<std::string, std::string>& arguments) {
           std::numeric_limits<int>::max(), false, false);
       merge_ptr->process();
       merge_ptr = nullptr;
-      cluster("toppic_all_prsm_cutoff", "toppic_all_proteoform_cluster",
+      // A spectrum searched again although its first-pass PrSM passed the
+      // cutoff (--multi-skip-evalue-ratio below 1) can be in both files;
+      // keep its best PrSM (the multiple-shift pass's, which is the best of
+      // both passes).
+      int n_top = std::stoi(arguments["numOfTopPrsms"]);
+      prsm_top_selector::process(sp_file_name, "toppic_all_prsm_cutoff",
+                                 "toppic_all_prsm_cutoff_top", n_top);
+      cluster("toppic_all_prsm_cutoff_top", "toppic_all_proteoform_cluster",
               "toppic_prsm_cutoff");
       std::cout << "Merging the identifications - finished." << std::endl;
 

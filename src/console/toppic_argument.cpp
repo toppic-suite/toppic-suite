@@ -90,6 +90,7 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["varPtmPrecOneDaError"] = "true";
   arguments["fragMassExtension"] = "true";
   arguments["fragExtendMinMass"] = "5000";
+  arguments["multiSkipEvalueRatio"] = "1";
 
   arguments["version"] = "";
   return arguments;
@@ -324,6 +325,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
   std::string top_prsm_number = "";
   std::string post_min_peak_num = "";
   std::string frag_extend_min_mass = "";
+  std::string multi_skip_evalue_ratio = "";
 
   /** Define and parse the program options*/
   try {
@@ -510,6 +512,8 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "disable-frag-mass-extension", "")(
         "frag-extend-min-mass", po::value<std::string>(&frag_extend_min_mass),
         "")(
+        "multi-skip-evalue-ratio",
+        po::value<std::string>(&multi_skip_evalue_ratio), "")(
         "filtering-result-number",
         po::value<std::string>(&filtering_result_num),
         "Filtering result number. Default value: 20.")(
@@ -730,6 +734,9 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
     }
     if (vm.count("frag-extend-min-mass")) {
       arguments_["fragExtendMinMass"] = frag_extend_min_mass;
+    }
+    if (vm.count("multi-skip-evalue-ratio")) {
+      arguments_["multiSkipEvalueRatio"] = multi_skip_evalue_ratio;
     }
 
     if (vm.count("filtering-result-number")) {
@@ -1096,6 +1103,19 @@ bool ToppicArgument::validateArguments() {
   } catch (const std::exception& ex) {
     LOG_ERROR("Fragment extension minimum mass " << frag_extend_min_mass
                                                  << " should be a number.");
+    return false;
+  }
+
+  std::string multi_skip_evalue_ratio = arguments_["multiSkipEvalueRatio"];
+  try {
+    if (std::stod(multi_skip_evalue_ratio) < 0) {
+      LOG_ERROR("Multiple-shift skip E-value ratio "
+                << multi_skip_evalue_ratio << " should not be negative.");
+      return false;
+    }
+  } catch (const std::exception& ex) {
+    LOG_ERROR("Multiple-shift skip E-value ratio "
+              << multi_skip_evalue_ratio << " should be a number.");
     return false;
   }
 
