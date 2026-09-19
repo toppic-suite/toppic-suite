@@ -63,6 +63,7 @@
 #include "prsm/prsm_str_merge.hpp"
 #include "prsm/prsm_top_selector.hpp"
 #include "prsm/prsm_util.hpp"
+#include "prsm/prsm_xml_writer.hpp"
 #include "search/oneptmsearch/one_ptm_search_processor.hpp"
 #include "search/oneptmsearch/ptm_search_mng.hpp"
 #include "search/ptmsearch/ptm_search_processor.hpp"
@@ -150,6 +151,8 @@ void cleanToppicDir(const std::string& fa_name, const std::string& sp_name,
     file_util::cleanPrefix(sp_name, sp_base + ".toppic_multi_filter_");
     file_util::delFile(sp_base + ".toppic_multi_combined");
     file_util::delFile(sp_base + ".toppic_multi_evalue");
+    file_util::delFile(sp_base + ".toppic_multi_first");
+    file_util::delFile(sp_base + ".toppic_multi_evalue_all");
     file_util::delFile(sp_base + ".toppic_multi_raw_prsm");
     file_util::delFile(sp_base + ".toppic_multi_shift");
     file_util::cleanPrefix(sp_name, sp_base + ".toppic_multi_shift_");
@@ -603,20 +606,43 @@ int TopPIC_multi_ptm_search(std::map<std::string, std::string>& arguments) {
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
     msalign_util::geneSpIndex(sp_file_name);
 
-    // the spectra identified by the earlier stages
+    // The spectra the earlier stages identified are not searched again:
+    // those with a target PrSM passing the spectrum-level cutoff
+    // (toppic_prsm_cutoff), and, so that target and decoy spectra are
+    // treated alike, those whose best first-pass PrSM (toppic_recount,
+    // targets and decoys) has an E-value at or below the largest E-value
+    // among the passing PrSMs. Decoy spectra that the first pass matched
+    // that well were counted in its FDR and must not be counted again in
+    // the FDR of the multiple-shift PrSMs.
+    std::string base_name = file_util::basename(sp_file_name);
     std::set<int> identified_spec_ids;
+    int decoy_identified_num = 0;
+    double cutoff_evalue = 0;
     {
-      std::string cutoff_file_name =
-          file_util::basename(sp_file_name) + ".toppic_prsm_cutoff";
-      PrsmStrPtrVec prsm_str_ptrs =
-          prsm_reader_util::readAllPrsmStrs(cutoff_file_name);
-      for (size_t i = 0; i < prsm_str_ptrs.size(); i++) {
-        identified_spec_ids.insert(prsm_str_ptrs[i]->getSpectrumId());
+      PrsmStrPtrVec cutoff_ptrs = prsm_reader_util::readAllPrsmStrs(
+          base_name + ".toppic_prsm_cutoff");
+      for (size_t i = 0; i < cutoff_ptrs.size(); i++) {
+        identified_spec_ids.insert(cutoff_ptrs[i]->getSpectrumId());
+        if (cutoff_ptrs[i]->getEValue() > cutoff_evalue) {
+          cutoff_evalue = cutoff_ptrs[i]->getEValue();
+        }
       }
+      size_t target_num = identified_spec_ids.size();
+      PrsmStrPtrVec first_ptrs =
+          prsm_reader_util::readAllPrsmStrs(base_name + ".toppic_recount");
+      for (size_t i = 0; i < first_ptrs.size(); i++) {
+        if (first_ptrs[i]->getEValue() <= cutoff_evalue) {
+          identified_spec_ids.insert(first_ptrs[i]->getSpectrumId());
+        }
+      }
+      decoy_identified_num = identified_spec_ids.size() - target_num;
     }
     std::cout << "Multiple unexpected shifts stage - "
               << identified_spec_ids.size()
-              << " spectra identified by the earlier stages are skipped."
+              << " spectra identified by the earlier stages are skipped ("
+              << decoy_identified_num
+              << " of them by a PrSM at or below the cutoff E-value "
+              << cutoff_evalue << " that did not pass the cutoff)."
               << std::endl;
 
     std::vector<std::string> input_exts;
@@ -676,8 +702,31 @@ int TopPIC_multi_ptm_search(std::map<std::string, std::string>& arguments) {
     processor = nullptr;
     std::cout << "Multiple-shift E-value computation - finished." << std::endl;
 
+    // The first-pass PrSMs of the searched spectra (their E-values come
+    // from the same tables) compete with the multiple-shift PrSMs for the
+    // best PrSM of each spectrum, so that a spectrum a first-pass PrSM
+    // matched better keeps that PrSM, target or decoy, in the FDR
+    // estimation of the multiple-shift pass.
     std::cout << "Multiple-shift top PrSM selecting - started" << std::endl;
-    prsm_top_selector::process(sp_file_name, "toppic_multi_evalue",
+    {
+      PrsmStrPtrVec first_ptrs =
+          prsm_reader_util::readAllPrsmStrs(base_name + ".toppic_recount");
+      PrsmXmlWriter writer(base_name + ".toppic_multi_first");
+      for (size_t i = 0; i < first_ptrs.size(); i++) {
+        if (identified_spec_ids.count(first_ptrs[i]->getSpectrumId()) == 0) {
+          writer.write(first_ptrs[i]);
+        }
+      }
+      writer.close();
+      std::vector<std::string> all_exts = {"toppic_multi_evalue",
+                                           "toppic_multi_first"};
+      PrsmStrMergePtr all_merge_ptr = std::make_shared<PrsmStrMerge>(
+          sp_file_name, all_exts, "toppic_multi_evalue_all",
+          std::numeric_limits<int>::max(), false, false);
+      all_merge_ptr->process();
+      all_merge_ptr = nullptr;
+    }
+    prsm_top_selector::process(sp_file_name, "toppic_multi_evalue_all",
                                "toppic_multi_raw_prsm", n_top);
     std::cout << "Multiple-shift top PrSM selecting - finished." << std::endl;
   } catch (const char* e) {
