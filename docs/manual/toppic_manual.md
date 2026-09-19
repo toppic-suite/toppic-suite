@@ -36,7 +36,7 @@ TopPIC also reads, from the same directory:
 | File | Needed when | Purpose |
 |---|---|---|
 | `sample_ms2.feature` | Always, unless `--no-topfd-feature` is given | The proteoform feature of each MS/MS spectrum, used to cluster the identifications of one proteoform across spectra and to report abundances. |
-| `sample.sqlite` | Always, unless `--disable-post-match` is given | The centroided MS/MS peaks, used by post mass matching (section 2, step 9). TopFD writes it unless run with `-N`. A missing database is an error, reported before the search starts. |
+| `sample.sqlite` | Always, unless `--disable-post-match` is given | The centroided MS/MS peaks, used by post mass matching (section 2, step 13). TopFD writes it unless run with `-N`. A missing database is an error, reported before the search starts. |
 
 **Database indexes.** TopPIC does not require `topindex`. It prepares the
 database itself in a `<database>_idx/` directory next to the FASTA file, and
@@ -62,44 +62,53 @@ except `sample_ms2.toppic_raw_prsm`, which is always kept.
 3. **One unexpected shift filtering and search** (with `--num-shift` of at
    least 1): alignment allowing one unexpected mass shift between
    `--min-shift` and `--max-shift`.
-4. **Multiple unexpected shifts filtering and search** (with `--num-shift`
-   2): alignment allowing two unexpected shifts.
-5. **Merging PrSMs.** The proteoform-spectrum matches (PrSMs) of all searches
-   are merged.
-6. **E-value computation.** A generating-function method estimates the
+4. **Merging PrSMs.** The proteoform-spectrum matches (PrSMs) of the
+   searches above are merged.
+5. **E-value computation.** A generating-function method estimates the
    E-value of each PrSM.
-7. **Top PrSM selection.** The best PrSM of each spectrum is kept.
-8. **Recounting matched masses and fragments.** The search uses only the
+6. **Top PrSM selection.** The best PrSM of each spectrum is kept.
+7. **Recounting matched masses and fragments.** The search uses only the
    masses whose EnvCNN score is at least `--filter-by-env-cnn`; matched
    masses and fragments are recounted against the complete spectra.
-9. **Post mass matching** (default; off with `--disable-post-match`). For
-   each PrSM, the theoretical fragment masses that no deconvoluted mass
-   matched are searched in the centroided MS/MS peaks of the spectrum, stored
-   in the TopFD SQLite database, using the isotopic-envelope test of
-   MSPathFinderT: an envelope is accepted when its most abundant peak and at
-   least `--post-min-peak-num` of its peaks are present and its intensities
-   fit the theoretical ones. Each accepted fragment adds one mass to the
-   spectrum, scored by EnvCNN. The spectra with the added masses are written
-   to `sample_post_ms2.msalign`, and **all following steps and result files
-   use that name**. The added envelopes are also stored in the database.
-10. **Proteoform and protein clustering.** PrSMs whose spectrum has no
-    TopFD feature are discarded (unless `--no-topfd-feature`). PrSMs sharing
-    a TopFD feature form one proteoform; proteoforms of the same protein
-    whose adjusted precursor masses agree within
-    `--proteoform-error-tolerance` are merged; proteoforms are then grouped
-    by protein.
-11. **PTM characterization** (only with `--local-ptm-file-name`). Each
-    unexpected mass shift is compared with the listed common modifications,
-    and the modification and its site are reported when the MIScore reaches
-    `--miscore-threshold`.
-12. **FDR computation** (only with `--decoy`). Spectrum-, proteoform- and
+8. **Proteoform and protein clustering.** PrSMs whose spectrum has no
+   TopFD feature are discarded (unless `--no-topfd-feature`). PrSMs sharing
+   a TopFD feature form one proteoform; proteoforms of the same protein
+   whose adjusted precursor masses agree within
+   `--proteoform-error-tolerance` are merged; proteoforms are then grouped
+   by protein.
+9. **PTM characterization** (only with `--local-ptm-file-name`). Each
+   unexpected mass shift is compared with the listed common modifications,
+   and the modification and its site are reported when the MIScore reaches
+   `--miscore-threshold`.
+10. **FDR computation** (only with `--decoy`). Spectrum-, proteoform- and
     protein-level false discovery rates are estimated from the decoy hits.
-13. **Filtering and output at three levels.** PrSMs are filtered by the
-    spectrum-level cutoff and written to the PrSM tables; the best PrSM per
-    proteoform is filtered by the proteoform-level cutoff and written to the
-    proteoform tables; the best PrSM per protein is filtered by the
-    protein-level cutoff and written to the protein tables.
-14. **Writing identifications to the SQLite database**, for visualization.
+11. **PrSM filtering** by the spectrum-level cutoff.
+12. **Multiple unexpected shifts filtering and search** (with `--num-shift`
+    2): alignment allowing two unexpected shifts, only for the spectra that
+    the steps above did not identify (a spectrum is skipped when its best
+    PrSM, target or decoy, has an E-value at or below the largest E-value
+    among the PrSMs passing the spectrum-level cutoff). The new PrSMs are
+    merged, get E-values, and, together with the earlier PrSMs of the
+    searched spectra, the best PrSM per spectrum is kept; steps 7-11 are
+    repeated on these PrSMs alone (their FDRs are estimated on them alone)
+    and the surviving ones are added to the identifications of step 11,
+    which are clustered again.
+13. **Post mass matching** (default; off with `--disable-post-match`). For
+    each reported PrSM, the theoretical fragment masses that no deconvoluted
+    mass matched are searched in the centroided MS/MS peaks of the spectrum,
+    stored in the TopFD SQLite database, using the isotopic-envelope test of
+    MSPathFinderT: an envelope is accepted when its most abundant peak and at
+    least `--post-min-peak-num` of its peaks are present and its intensities
+    fit the theoretical ones. Each accepted fragment adds one mass to the
+    spectrum, scored by EnvCNN. The spectra with the added masses are written
+    to `sample_post_ms2.msalign`, and **the result files use that name**.
+    The added envelopes are also stored in the database.
+14. **Filtering and output at three levels.** The PrSMs of step 11 (and 12)
+    are written to the PrSM tables; the best PrSM per proteoform is filtered
+    by the proteoform-level cutoff and written to the proteoform tables; the
+    best PrSM per protein is filtered by the protein-level cutoff and written
+    to the protein tables.
+15. **Writing identifications to the SQLite database**, for visualization.
 
 ## 3. Output files
 
