@@ -35,12 +35,13 @@ void addTruncShifts(ProtCandidatePtrVec& prot_ptrs,
   const std::vector<int>& row_begins = index_ptr->getProteoRowBegins();
   const std::vector<int>& row_ends = index_ptr->getProteoRowEnds();
   const std::vector<double>& trunc_shifts = index_ptr->getTruncShifts();
+  // the buffer is reused by the proteoforms of the call
+  std::vector<std::pair<int, int>> pos_scores;
   for (size_t i = 0; i < prot_ptrs.size(); i++) {
     ProtCandidatePtr prot_ptr = prot_ptrs[i];
     int prot_id = prot_ptr->getProteinId();
     int bgn = row_begins[prot_id];
     int end = row_ends[prot_id];
-    std::vector<std::pair<int, int>> pos_scores;
     pos_scores.resize(end - bgn + 1);
     for (int j = bgn; j <= end; j++) {
       std::pair<int, int> cur_pos_score(j, scores[j]);
@@ -94,6 +95,8 @@ void addTruncShiftsWithRestriction(
 
   int bgn, end, rev_bgn, rev_end;
   int k_start, k_end;
+  // the buffer is reused by the proteoforms of the call
+  std::vector<TruncScorePosition> score_idxes;
   for (size_t i = 0; i < prot_ptrs.size(); i++) {
     ProtCandidatePtr prot_ptr = prot_ptrs[i];
     int prot_id = prot_ptr->getProteinId();
@@ -106,7 +109,7 @@ void addTruncShiftsWithRestriction(
     k_start = rev_end;
     k_end = rev_end;
 
-    std::vector<TruncScorePosition> score_idxes;
+    score_idxes.clear();
     for (int j = bgn; j <= end; j++) {
       double n_trunc_shift = trunc_shifts[j];
       // find k_start
@@ -265,33 +268,13 @@ ProtCandidatePtrVec simpleFindZeroShiftTopProteins(
 
 inline ProtCandidatePtrVec findOneShiftTopProteinsWithoutRestrict(
     std::vector<short>& scores, std::vector<short>& rev_scores,
+    const std::vector<int>& max_scores, const std::vector<int>& rev_max_scores,
     const MassMatchPtr& index_ptr, const MassMatchPtr& rev_index_ptr,
     int term_shift_num, int threshold, int top_num) {
-  const std::vector<int>& row_begins = index_ptr->getProteoRowBegins();
-  const std::vector<int>& row_ends = index_ptr->getProteoRowEnds();
-  const std::vector<int>& rev_row_begins = rev_index_ptr->getProteoRowBegins();
-  const std::vector<int>& rev_row_ends = rev_index_ptr->getProteoRowEnds();
   std::vector<std::pair<int, int>> proteo_scores;
-  for (size_t i = 0; i < row_begins.size(); i++) {
-    int bgn = row_begins[i];
-    int end = row_ends[i];
-    int best_score = 0;
-    for (int j = bgn; j <= end; j++) {
-      if (scores[j] > best_score) {
-        best_score = scores[j];
-      }
-    }
-
-    int rev_bgn = rev_row_begins[i];
-    int rev_end = rev_row_ends[i];
-    int rev_best_score = 0;
-    for (int j = rev_bgn; j <= rev_end; j++) {
-      if (rev_scores[j] > rev_best_score) {
-        rev_best_score = rev_scores[j];
-      }
-    }
-
-    std::pair<int, int> proteo_score(i, best_score + rev_best_score);
+  proteo_scores.reserve(max_scores.size());
+  for (size_t i = 0; i < max_scores.size(); i++) {
+    std::pair<int, int> proteo_score(i, max_scores[i] + rev_max_scores[i]);
     proteo_scores.push_back(proteo_score);
   }
 
@@ -304,8 +287,77 @@ inline ProtCandidatePtrVec findOneShiftTopProteinsWithoutRestrict(
   return proteins;
 }
 
+// A proteoform kept by the bounded candidate list of the one-shift search.
+class ShiftCand {
+ public:
+  ShiftCand(int id, int score, double n_shift, double c_shift)
+      : id_(id), score_(score), n_shift_(n_shift), c_shift_(c_shift) {}
+
+  int id_;
+  int score_;
+  double n_shift_;
+  double c_shift_;
+};
+
+// The order of ProtCandidate::geneResults: score descending, protein id
+// ascending.
+inline bool cmpShiftCand(const ShiftCand& a, const ShiftCand& b) {
+  if (a.score_ != b.score_) {
+    return a.score_ > b.score_;
+  }
+  return a.id_ < b.id_;
+}
+
+// The proteoform ids with a bound (best N-terminal row score + best
+// C-terminal row score) of at least the threshold, ordered by decreasing
+// bound. A counting sort is used because the bounds are small integers.
+inline void sortProteoIdsByBound(const std::vector<int>& max_scores,
+                                 const std::vector<int>& rev_max_scores,
+                                 int threshold, std::vector<int>& order) {
+  order.clear();
+  int max_bound = threshold - 1;
+  for (size_t i = 0; i < max_scores.size(); i++) {
+    int bound = max_scores[i] + rev_max_scores[i];
+    if (bound > max_bound) {
+      max_bound = bound;
+    }
+  }
+  if (max_bound < threshold) {
+    return;
+  }
+  std::vector<int> bucket_begins(max_bound + 1, 0);
+  for (size_t i = 0; i < max_scores.size(); i++) {
+    int bound = max_scores[i] + rev_max_scores[i];
+    if (bound >= threshold) {
+      bucket_begins[bound]++;
+    }
+  }
+  int pnt = 0;
+  for (int bound = max_bound; bound >= threshold; bound--) {
+    int cnt = bucket_begins[bound];
+    bucket_begins[bound] = pnt;
+    pnt += cnt;
+  }
+  order.resize(pnt);
+  for (size_t i = 0; i < max_scores.size(); i++) {
+    int bound = max_scores[i] + rev_max_scores[i];
+    if (bound >= threshold) {
+      order[bucket_begins[bound]] = static_cast<int>(i);
+      bucket_begins[bound]++;
+    }
+  }
+}
+
+// The proteoforms are visited in decreasing order of their bound and the
+// search stops when the bound can no longer reach the score of the last kept
+// candidate, so that the truncation window scan below is run only for the
+// proteoforms that can be reported. The bound is an upper bound of the total
+// score of a proteoform, and the visiting order does not change the result
+// because the kept candidates are ordered with the comparator of
+// ProtCandidate::geneResults.
 inline ProtCandidatePtrVec findOneShiftTopProteinsWithRestrict(
     std::vector<short>& scores, std::vector<short>& rev_scores,
+    const std::vector<int>& max_scores, const std::vector<int>& rev_max_scores,
     const MassMatchPtr& index_ptr, const MassMatchPtr& rev_index_ptr,
     double prec_minus_water_mass, double prec_error_tole, double min_shift,
     double max_shift, int term_shift_num, int threshold, int top_num) {
@@ -321,43 +373,33 @@ inline ProtCandidatePtrVec findOneShiftTopProteinsWithRestrict(
   const std::vector<int>& rev_row_ends = rev_index_ptr->getProteoRowEnds();
   const std::vector<double>& rev_trunc_shifts = rev_index_ptr->getTruncShifts();
 
-  ProtScorePtrVec proteo_scores;
+  std::vector<int> order;
+  sortProteoIdsByBound(max_scores, rev_max_scores, threshold, order);
+
+  std::vector<ShiftCand> cands;
+  cands.reserve(top_num + 1);
   int bgn, end, rev_bgn, rev_end;
   int k_start, k_end;
-  int best_score;
-  double best_n_term_shift, best_c_term_shift;
-  for (size_t i = 0; i < row_begins.size(); i++) {
+  for (size_t idx = 0; idx < order.size(); idx++) {
+    int i = order[idx];
+    int rev_max_score = rev_max_scores[i];
+    int bound = max_scores[i] + rev_max_score;
+    int cutoff = static_cast<int>(cands.size()) >= top_num ? cands.back().score_
+                                                           : threshold;
+    if (bound < cutoff) {
+      break;
+    }
+
     double proteo_mass = proteo_minus_water_masses[i];
     bgn = row_begins[i];
     end = row_ends[i];
     rev_bgn = rev_row_begins[i];
     rev_end = rev_row_ends[i];
-
-    // Most rows score 0. A protein whose best N-terminal row plus best
-    // C-terminal row cannot reach the threshold is skipped, and below, a row
-    // that cannot beat the current best skips the window scan. Both keep the
-    // result exact: the skipped pairs could not have updated best_score.
-    int max_score = 0;
-    for (int j = bgn; j <= end; j++) {
-      if (scores[j] > max_score) {
-        max_score = scores[j];
-      }
-    }
-    int rev_max_score = 0;
-    for (int k = rev_bgn; k <= rev_end; k++) {
-      if (rev_scores[k] > rev_max_score) {
-        rev_max_score = rev_scores[k];
-      }
-    }
-    if (max_score + rev_max_score < threshold) {
-      continue;
-    }
-
     k_start = rev_end;
     k_end = rev_end;
-    best_score = 0;
-    best_n_term_shift = 0;
-    best_c_term_shift = 0;
+    int best_score = 0;
+    double best_n_term_shift = 0;
+    double best_c_term_shift = 0;
     for (int j = bgn; j <= end; j++) {
       double n_trunc_shift = trunc_shifts[j];
       // find k_start
@@ -391,14 +433,24 @@ inline ProtCandidatePtrVec findOneShiftTopProteinsWithRestrict(
     }
 
     if (best_score >= threshold) {
-      ProtScorePtr proteo_score = std::make_shared<ProtScore>(
-          i, best_score, best_n_term_shift, best_c_term_shift);
-      proteo_scores.push_back(proteo_score);
+      ShiftCand cand(i, best_score, best_n_term_shift, best_c_term_shift);
+      std::vector<ShiftCand>::iterator pos =
+          std::upper_bound(cands.begin(), cands.end(), cand, cmpShiftCand);
+      if (static_cast<int>(pos - cands.begin()) < top_num) {
+        cands.insert(pos, cand);
+        if (static_cast<int>(cands.size()) > top_num) {
+          cands.pop_back();
+        }
+      }
     }
   }
 
-  ProtCandidatePtrVec proteins =
-      ProtCandidate::geneResults(proteo_scores, threshold, top_num);
+  ProtCandidatePtrVec proteins;
+  for (size_t i = 0; i < cands.size(); i++) {
+    ProtScorePtr proteo_score = std::make_shared<ProtScore>(
+        cands[i].id_, cands[i].score_, cands[i].n_shift_, cands[i].c_shift_);
+    proteins.push_back(std::make_shared<ProtCandidate>(proteo_score));
+  }
   // add trunc shifts
   addTruncShiftsWithRestriction(proteins, index_ptr, rev_index_ptr,
                                 proteo_minus_water_masses, scores, rev_scores,
@@ -408,15 +460,16 @@ inline ProtCandidatePtrVec findOneShiftTopProteinsWithRestrict(
 
 ProtCandidatePtrVec findOneShiftTopProteins(
     std::vector<short>& scores, std::vector<short>& rev_scores,
+    const std::vector<int>& max_scores, const std::vector<int>& rev_max_scores,
     const MassMatchPtr& index_ptr, const MassMatchPtr& rev_index_ptr,
     double prec_minus_water_mass, double prec_error_tole, double min_shift,
     double max_shift, int term_shift_num, int threshold, int top_num) {
   // if allowed mass shifts is small, use restricted search
   if ((max_shift - min_shift) <= 2000) {
     return findOneShiftTopProteinsWithRestrict(
-        scores, rev_scores, index_ptr, rev_index_ptr, prec_minus_water_mass,
-        prec_error_tole, min_shift, max_shift, term_shift_num, threshold,
-        top_num);
+        scores, rev_scores, max_scores, rev_max_scores, index_ptr,
+        rev_index_ptr, prec_minus_water_mass, prec_error_tole, min_shift,
+        max_shift, term_shift_num, threshold, top_num);
   } else {
     ProtCandidatePtrVec cand_prots;
     double adjust_max_shift = 1000;
@@ -429,14 +482,15 @@ ProtCandidatePtrVec findOneShiftTopProteins(
     }
     if (adjust_max_shift > adjust_min_shift) {
       cand_prots = findOneShiftTopProteinsWithRestrict(
-          scores, rev_scores, index_ptr, rev_index_ptr, prec_minus_water_mass,
-          prec_error_tole, adjust_min_shift, adjust_max_shift, term_shift_num,
-          threshold, top_num);
+          scores, rev_scores, max_scores, rev_max_scores, index_ptr,
+          rev_index_ptr, prec_minus_water_mass, prec_error_tole,
+          adjust_min_shift, adjust_max_shift, term_shift_num, threshold,
+          top_num);
     }
     ProtCandidatePtrVec unrestrict_cand_prots =
-        findOneShiftTopProteinsWithoutRestrict(scores, rev_scores, index_ptr,
-                                               rev_index_ptr, term_shift_num,
-                                               threshold, top_num);
+        findOneShiftTopProteinsWithoutRestrict(
+            scores, rev_scores, max_scores, rev_max_scores, index_ptr,
+            rev_index_ptr, term_shift_num, threshold, top_num);
     // concatenate
     cand_prots.insert(cand_prots.end(), unrestrict_cand_prots.begin(),
                       unrestrict_cand_prots.end());
