@@ -87,9 +87,9 @@ inline void CompProbValue::clearVar() {
   // the prob that a randam protein has the same precursor to the spectrum
   prec_probs_.clear();
 
-  // page_table_ = new double[page_len_ * max_table_height_];
-  memset(pos_scores_, 0, (max_sp_len_ + block_len_) * sizeof(short));
-  memset(page_table_, 0, page_len_ * max_table_height_ * sizeof(double));
+  // The score arrays and the page table are not cleared here: only the
+  // region a computation reads is cleared, in compute(), once the peak
+  // positions and the table height are known (clearUsedRegions).
 }
 
 void CompProbValue::compute(const ResFreqPtrVec& n_residue_ptrs,
@@ -124,6 +124,16 @@ void CompProbValue::compute(const ResFreqPtrVec& n_residue_ptrs,
   }
 
   setMassErr(peak_ptr_2d, strict, prec_mass, tole_ptr);
+  // the extent of the position score arrays the computation touches: every
+  // read is below sp_len_ (the last peak plus the average residue length)
+  // rounded up to a block boundary
+  int last_peak_index = prob_peaks_.size() - 1;
+  pos_len_ = prob_peaks_[last_peak_index].mass_end_ + residue_avg_len_ +
+             2 * block_len_;
+  if (pos_len_ > max_sp_len_ + block_len_) {
+    pos_len_ = max_sp_len_ + block_len_;
+  }
+  memset(pos_scores_, 0, pos_len_ * sizeof(short));
   int group_spec_num = peak_ptr_2d.size();
   setPosScores(prob_peaks_, group_spec_num);
   setVars(thresh);
@@ -135,6 +145,24 @@ void CompProbValue::compute(const ResFreqPtrVec& n_residue_ptrs,
     LOG_ERROR("Number of unexpected PTMs is too large " << shift_num);
     return;
   }
+  // Every block of the circular page table is zeroed (runClear) before it
+  // is written, so only the cells a wrap-around read can reach before they
+  // are written need to be cleared: the reads of runAddProb go back at most
+  // the largest residue distance from the current block, and the first
+  // blocks wrap to the end of the page. The rest of the table is written
+  // before it is read, or never read.
+  int tail_size = 0;
+  for (size_t i = 0; i < acid_dists_.size(); i++) {
+    if (acid_dists_[i] > tail_size) {
+      tail_size = acid_dists_[i];
+    }
+  }
+  tail_size += block_table_size_;
+  if (tail_size > page_table_size_) {
+    tail_size = page_table_size_;
+  }
+  memset(page_table_ + (page_table_size_ - tail_size), 0,
+         tail_size * sizeof(double));
   shift_num_ = shift_num;
   comp();
 }
@@ -163,7 +191,7 @@ inline void CompProbValue::setMassErr(const PrmPeakPtrVec2D& peak_ptr_2d,
 
 inline void CompProbValue::updatePosScores(
     const std::vector<ProbPeak>& prob_peaks, int spectrum_id) {
-  int len = max_sp_len_ + block_len_;
+  int len = pos_len_;
   memset(tmp_pos_scores_, 0, len * sizeof(short));
   // mass 0 and residue sum mass are not used for scoring
   for (size_t i = 1; i < prob_peaks.size() - 1; i++) {
