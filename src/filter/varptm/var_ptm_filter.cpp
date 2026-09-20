@@ -123,21 +123,40 @@ std::vector<std::pair<int, int>> getShiftedMassErrors(
   return result;
 }
 
-void VarPtmFilter::computeBestMatch(const PrmMsPtrVec& prm_ms_ptr_vec,
-                                    const PrmMsPtrVec& srm_ms_ptr_vec) {
+FilterSpecPtr VarPtmFilter::geneFilterSpec(
+    const PrmMsPtrVec& prm_ms_ptr_vec, const PrmMsPtrVec& srm_ms_ptr_vec,
+    const VarPtmFilterMngPtr& mng_ptr) {
   PeakTolerancePtr tole_ptr =
-      mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr();
+      mng_ptr->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr();
   std::vector<std::pair<int, int>> pref_mass_errors =
       prm_ms_util::getIntMassErrorList(prm_ms_ptr_vec, tole_ptr,
-                                       mng_ptr_->filter_scale_, true, false);
+                                       mng_ptr->filter_scale_, true, false);
   std::vector<std::pair<int, int>> suff_mass_errors =
       prm_ms_util::getIntMassErrorList(srm_ms_ptr_vec, tole_ptr,
-                                       mng_ptr_->filter_scale_, false, true);
+                                       mng_ptr->filter_scale_, false, true);
   std::pair<int, int> prec_minus_water_mass_error =
       prm_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMassMinusWaterError(
-          tole_ptr->getPpo(), mng_ptr_->filter_scale_);
+          tole_ptr->getPpo(), mng_ptr->filter_scale_);
+  return std::make_shared<FilterSpec>(
+      prm_ms_ptr_vec[0]->getMsHeaderPtr(),
+      static_cast<int>(prm_ms_ptr_vec.size()), std::move(pref_mass_errors),
+      std::move(suff_mass_errors), prec_minus_water_mass_error);
+}
+
+void VarPtmFilter::computeBestMatch(const PrmMsPtrVec& prm_ms_ptr_vec,
+                                    const PrmMsPtrVec& srm_ms_ptr_vec) {
+  computeBestMatch(geneFilterSpec(prm_ms_ptr_vec, srm_ms_ptr_vec, mng_ptr_));
+}
+
+void VarPtmFilter::computeBestMatch(const FilterSpecPtr& spec_ptr) {
+  PeakTolerancePtr tole_ptr =
+      mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr();
+  const std::vector<std::pair<int, int>>& pref_mass_errors =
+      spec_ptr->getPrefMassErrors();
+  const std::vector<std::pair<int, int>>& suff_mass_errors =
+      spec_ptr->getSuffMassErrors();
   std::vector<std::pair<int, int>> prec_minus_water_mass_errors =
-      getShiftedMassErrors(prec_minus_water_mass_error,
+      getShiftedMassErrors(spec_ptr->getPrecMinusWaterMassError(),
                            mng_ptr_->int_shift_list_);
 
   term_scores_.assign(term_index_ptr_->getRowNum(), 0);
@@ -175,12 +194,11 @@ void VarPtmFilter::computeBestMatch(const PrmMsPtrVec& prm_ms_ptr_vec,
   mass_match_util::compPrecMatchRows(rev_diag_index_ptr_, rev_diag_prec_rows_,
                                      rev_diag_rows_2d_);
 
-  int group_spec_num = prm_ms_ptr_vec.size();
+  int group_spec_num = spec_ptr->getGroupSpecNum();
   double prec_minus_water_mass =
-      prm_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMassMinusWater();
+      spec_ptr->getHeaderPtr()->getFirstPrecMonoMassMinusWater();
   double prec_error_tole =
-      prm_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecErrorTolerance(
-          tole_ptr->getPpo());
+      spec_ptr->getHeaderPtr()->getFirstPrecErrorTolerance(tole_ptr->getPpo());
 
   ProtCandidatePtrVec comp_prots = mass_match_util::findVarPtmTopProteins(
       term_scores_, rev_term_scores_,
@@ -191,7 +209,7 @@ void VarPtmFilter::computeBestMatch(const PrmMsPtrVec& prm_ms_ptr_vec,
   for (size_t i = 0; i < comp_prots.size(); i++) {
     int id = comp_prots[i]->getProteinId();
     comp_match_ptrs_.push_back(std::make_shared<SimplePrsm>(
-        prm_ms_ptr_vec[0]->getMsHeaderPtr(), group_spec_num, proteo_ptrs_[id],
+        spec_ptr->getHeaderPtr(), group_spec_num, proteo_ptrs_[id],
         comp_prots[i]));
   }
 
@@ -204,7 +222,7 @@ void VarPtmFilter::computeBestMatch(const PrmMsPtrVec& prm_ms_ptr_vec,
   for (size_t i = 0; i < pref_prots.size(); i++) {
     int id = pref_prots[i]->getProteinId();
     pref_match_ptrs_.push_back(std::make_shared<SimplePrsm>(
-        prm_ms_ptr_vec[0]->getMsHeaderPtr(), group_spec_num, proteo_ptrs_[id],
+        spec_ptr->getHeaderPtr(), group_spec_num, proteo_ptrs_[id],
         pref_prots[i]));
   }
 
@@ -217,7 +235,7 @@ void VarPtmFilter::computeBestMatch(const PrmMsPtrVec& prm_ms_ptr_vec,
   for (size_t i = 0; i < suff_prots.size(); i++) {
     int id = suff_prots[i]->getProteinId();
     suff_match_ptrs_.push_back(std::make_shared<SimplePrsm>(
-        prm_ms_ptr_vec[0]->getMsHeaderPtr(), group_spec_num, proteo_ptrs_[id],
+        spec_ptr->getHeaderPtr(), group_spec_num, proteo_ptrs_[id],
         suff_prots[i]));
   }
 
@@ -230,7 +248,7 @@ void VarPtmFilter::computeBestMatch(const PrmMsPtrVec& prm_ms_ptr_vec,
   for (size_t i = 0; i < internal_prots.size(); i++) {
     int id = internal_prots[i]->getProteinId();
     internal_match_ptrs_.push_back(std::make_shared<SimplePrsm>(
-        prm_ms_ptr_vec[0]->getMsHeaderPtr(), group_spec_num, proteo_ptrs_[id],
+        spec_ptr->getHeaderPtr(), group_spec_num, proteo_ptrs_[id],
         internal_prots[i]));
   }
 }

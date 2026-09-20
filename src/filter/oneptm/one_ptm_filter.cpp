@@ -102,16 +102,35 @@ OnePtmFilter::OnePtmFilter(const ProteoformPtrVec& proteo_ptrs,
   };
 }
 
-void OnePtmFilter::computeBestMatch(const PrmMsPtrVec& prm_ms_ptr_vec,
-                                    const PrmMsPtrVec& srm_ms_ptr_vec) {
+FilterSpecPtr OnePtmFilter::geneFilterSpec(
+    const PrmMsPtrVec& prm_ms_ptr_vec, const PrmMsPtrVec& srm_ms_ptr_vec,
+    const OnePtmFilterMngPtr& mng_ptr) {
   PeakTolerancePtr tole_ptr =
-      mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr();
+      mng_ptr->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr();
   std::vector<std::pair<int, int>> pref_mass_errors =
       prm_ms_util::getIntMassErrorList(prm_ms_ptr_vec, tole_ptr,
-                                       mng_ptr_->filter_scale_, true, false);
+                                       mng_ptr->filter_scale_, true, false);
   std::vector<std::pair<int, int>> suff_mass_errors =
       prm_ms_util::getIntMassErrorList(srm_ms_ptr_vec, tole_ptr,
-                                       mng_ptr_->filter_scale_, false, true);
+                                       mng_ptr->filter_scale_, false, true);
+  return std::make_shared<FilterSpec>(
+      prm_ms_ptr_vec[0]->getMsHeaderPtr(),
+      static_cast<int>(prm_ms_ptr_vec.size()), std::move(pref_mass_errors),
+      std::move(suff_mass_errors), std::pair<int, int>(0, 0));
+}
+
+void OnePtmFilter::computeBestMatch(const PrmMsPtrVec& prm_ms_ptr_vec,
+                                    const PrmMsPtrVec& srm_ms_ptr_vec) {
+  computeBestMatch(geneFilterSpec(prm_ms_ptr_vec, srm_ms_ptr_vec, mng_ptr_));
+}
+
+void OnePtmFilter::computeBestMatch(const FilterSpecPtr& spec_ptr) {
+  PeakTolerancePtr tole_ptr =
+      mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr();
+  const std::vector<std::pair<int, int>>& pref_mass_errors =
+      spec_ptr->getPrefMassErrors();
+  const std::vector<std::pair<int, int>>& suff_mass_errors =
+      spec_ptr->getSuffMassErrors();
 
   term_scores_.assign(term_index_ptr_->getRowNum(), 0);
   term_index_ptr_->compScores(pref_mass_errors, term_scores_);
@@ -137,10 +156,9 @@ void OnePtmFilter::computeBestMatch(const PrmMsPtrVec& prm_ms_ptr_vec,
                                        rev_diag_max_);
 
   double prec_minus_water_mass =
-      prm_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMassMinusWater();
+      spec_ptr->getHeaderPtr()->getFirstPrecMonoMassMinusWater();
   double prec_error_tole =
-      prm_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecErrorTolerance(
-          tole_ptr->getPpo());
+      spec_ptr->getHeaderPtr()->getFirstPrecErrorTolerance(tole_ptr->getPpo());
 
   ProtCandidatePtrVec comp_prots = mass_match_util::findOneShiftTopProteins(
       term_scores_, rev_term_scores_, term_max_, rev_term_max_,
@@ -149,12 +167,12 @@ void OnePtmFilter::computeBestMatch(const PrmMsPtrVec& prm_ms_ptr_vec,
       mng_ptr_->max_shift_, mng_ptr_->comp_cand_shift_num_,
       mng_ptr_->threshold_, mng_ptr_->comp_num_);
   comp_match_ptrs_.clear();
-  int group_spec_num = prm_ms_ptr_vec.size();
+  int group_spec_num = spec_ptr->getGroupSpecNum();
   for (size_t i = 0; i < comp_prots.size(); i++) {
     int id = comp_prots[i]->getProteinId();
     int score = comp_prots[i]->getScore();
     comp_match_ptrs_.push_back(
-        std::make_shared<SimplePrsm>(prm_ms_ptr_vec[0]->getMsHeaderPtr(),
+        std::make_shared<SimplePrsm>(spec_ptr->getHeaderPtr(),
                                      group_spec_num, proteo_ptrs_[id], score));
   }
 
@@ -169,7 +187,7 @@ void OnePtmFilter::computeBestMatch(const PrmMsPtrVec& prm_ms_ptr_vec,
     int id = pref_prots[i]->getProteinId();
     int score = pref_prots[i]->getScore();
     SimplePrsmPtr prsm_ptr =
-        std::make_shared<SimplePrsm>(prm_ms_ptr_vec[0]->getMsHeaderPtr(),
+        std::make_shared<SimplePrsm>(spec_ptr->getHeaderPtr(),
                                      group_spec_num, proteo_ptrs_[id], score);
     std::vector<double> shifts = pref_prots[i]->getCTermShifts();
     prsm_ptr->setCTermShifts(pref_prots[i]->getCTermShifts());
@@ -187,7 +205,7 @@ void OnePtmFilter::computeBestMatch(const PrmMsPtrVec& prm_ms_ptr_vec,
     int id = suff_prots[i]->getProteinId();
     int score = suff_prots[i]->getScore();
     SimplePrsmPtr prsm_ptr =
-        std::make_shared<SimplePrsm>(prm_ms_ptr_vec[0]->getMsHeaderPtr(),
+        std::make_shared<SimplePrsm>(spec_ptr->getHeaderPtr(),
                                      group_spec_num, proteo_ptrs_[id], score);
     prsm_ptr->setNTermShifts(suff_prots[i]->getNTermShifts());
     suff_match_ptrs_.push_back(prsm_ptr);
@@ -204,7 +222,7 @@ void OnePtmFilter::computeBestMatch(const PrmMsPtrVec& prm_ms_ptr_vec,
     int id = internal_prots[i]->getProteinId();
     int score = internal_prots[i]->getScore();
     SimplePrsmPtr prsm_ptr =
-        std::make_shared<SimplePrsm>(prm_ms_ptr_vec[0]->getMsHeaderPtr(),
+        std::make_shared<SimplePrsm>(spec_ptr->getHeaderPtr(),
                                      group_spec_num, proteo_ptrs_[id], score);
     prsm_ptr->setNTermShifts(internal_prots[i]->getNTermShifts());
     prsm_ptr->setCTermShifts(internal_prots[i]->getCTermShifts());

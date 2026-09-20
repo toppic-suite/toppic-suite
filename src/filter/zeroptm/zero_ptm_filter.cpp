@@ -109,20 +109,38 @@ ZeroPtmFilter::ZeroPtmFilter(const ProteoformPtrVec& proteo_ptrs,
   }
 }
 
-void ZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec& ms_ptr_vec) {
+FilterSpecPtr ZeroPtmFilter::geneFilterSpec(
+    const ExtendMsPtrVec& ms_ptr_vec, const ZeroPtmFilterMngPtr& mng_ptr) {
   PeakTolerancePtr tole_ptr =
-      mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr();
+      mng_ptr->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr();
   bool pref = true;
   std::vector<std::pair<int, int> > pref_mass_errors =
       extend_ms_util::getExtendIntMassErrorList(ms_ptr_vec, pref,
-                                                mng_ptr_->filter_scale_);
+                                                mng_ptr->filter_scale_);
   pref = false;
   std::vector<std::pair<int, int> > suff_mass_errors =
       extend_ms_util::getExtendIntMassErrorList(ms_ptr_vec, pref,
-                                                mng_ptr_->filter_scale_);
+                                                mng_ptr->filter_scale_);
   std::pair<int, int> prec_minus_water_mass_error =
       ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMassMinusWaterError(
-          tole_ptr->getPpo(), mng_ptr_->filter_scale_);
+          tole_ptr->getPpo(), mng_ptr->filter_scale_);
+  return std::make_shared<FilterSpec>(
+      ms_ptr_vec[0]->getMsHeaderPtr(), static_cast<int>(ms_ptr_vec.size()),
+      std::move(pref_mass_errors), std::move(suff_mass_errors),
+      prec_minus_water_mass_error);
+}
+
+void ZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec& ms_ptr_vec) {
+  computeBestMatch(geneFilterSpec(ms_ptr_vec, mng_ptr_));
+}
+
+void ZeroPtmFilter::computeBestMatch(const FilterSpecPtr& spec_ptr) {
+  const std::vector<std::pair<int, int> >& pref_mass_errors =
+      spec_ptr->getPrefMassErrors();
+  const std::vector<std::pair<int, int> >& suff_mass_errors =
+      spec_ptr->getSuffMassErrors();
+  const std::pair<int, int>& prec_minus_water_mass_error =
+      spec_ptr->getPrecMinusWaterMassError();
 
   int term_row_num = term_index_ptr_->getRowNum();
   std::vector<short> term_scores(term_row_num, 0);
@@ -145,7 +163,7 @@ void ZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec& ms_ptr_vec) {
       suff_mass_errors, prec_minus_water_mass_error, rev_diag_scores);
 
   int threshold = MassMatch::getPrecursorMatchScore() * 2 + 4;
-  int group_spec_num = ms_ptr_vec.size();
+  int group_spec_num = spec_ptr->getGroupSpecNum();
   // the best row score of each proteoform in each index, computed once and
   // shared by the four proteoform types below
   std::vector<int> term_max, diag_max, rev_term_max, rev_diag_max;
@@ -165,7 +183,7 @@ void ZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec& ms_ptr_vec) {
     for (size_t i = 0; i < comp_prots.size(); i++) {
       int id = comp_prots[i]->getProteinId();
       comp_match_ptrs_.push_back(std::make_shared<SimplePrsm>(
-          ms_ptr_vec[0]->getMsHeaderPtr(), group_spec_num, proteo_ptrs_[id],
+          spec_ptr->getHeaderPtr(), group_spec_num, proteo_ptrs_[id],
           comp_prots[i]));
     }
   }
@@ -177,7 +195,7 @@ void ZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec& ms_ptr_vec) {
     for (size_t i = 0; i < pref_prots.size(); i++) {
       int id = pref_prots[i]->getProteinId();
       pref_match_ptrs_.push_back(std::make_shared<SimplePrsm>(
-          ms_ptr_vec[0]->getMsHeaderPtr(), group_spec_num, proteo_ptrs_[id],
+          spec_ptr->getHeaderPtr(), group_spec_num, proteo_ptrs_[id],
           pref_prots[i]));
     }
   }
@@ -190,7 +208,7 @@ void ZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec& ms_ptr_vec) {
     for (size_t i = 0; i < suff_prots.size(); i++) {
       int id = suff_prots[i]->getProteinId();
       suff_match_ptrs_.push_back(std::make_shared<SimplePrsm>(
-          ms_ptr_vec[0]->getMsHeaderPtr(), group_spec_num, proteo_ptrs_[id],
+          spec_ptr->getHeaderPtr(), group_spec_num, proteo_ptrs_[id],
           suff_prots[i]));
     }
   }
@@ -203,7 +221,7 @@ void ZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec& ms_ptr_vec) {
     for (size_t i = 0; i < internal_prots.size(); i++) {
       int id = internal_prots[i]->getProteinId();
       internal_match_ptrs_.push_back(std::make_shared<SimplePrsm>(
-          ms_ptr_vec[0]->getMsHeaderPtr(), group_spec_num, proteo_ptrs_[id],
+          spec_ptr->getHeaderPtr(), group_spec_num, proteo_ptrs_[id],
           internal_prots[i]));
     }
   }
