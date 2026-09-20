@@ -405,17 +405,40 @@ the input. Facts to keep straight:
   `ToppicArgument::validateArguments` (so a run fails before the search),
   `process()` itself (abort), and `toppic_gui`'s `checkError()` (a warning
   dialog before toppic is launched). Keep all three in step.
+- **It runs on the reported PrSMs, at the end.** `TopPIC_multi_ptm_post`
+  post-matches `toppic_prsm_cutoff` (the PrSMs passing the spectrum-level
+  cutoff, after the FDR) and applies the proteoform and protein cutoffs and
+  the outputs under the new name; the FDR and the cutoff use E-values, which
+  the added masses do not change. PTM characterization (`-l`) runs before
+  it, on the spectra without the added masses.
 - **Result file names carry `_post_ms2`** whenever post matching ran; the
   cleanup in `toppic_process` (`cleanToppicDir`) takes that name to find the
   intermediate files. With `-D` the names are the plain `<base>_ms2` ones.
 - **Combined runs (`-c`) never post-match the merged file** (it has no
   SQLite database): `TopPICProgress_multi_file` forces `postMassMatch` to
-  false for the merged `TopPIC_post`. Per fraction, `cleanToppicDir` keeps
-  `<frac>_post_ms2.toppic_recount` when a combined run follows; the merge
-  uses `<frac>_post_ms2.msalign` + that file for every fraction if all exist
-  (then deletes the recount files unless `-k`), else TopFD's `_ms2.msalign`
-  + `.toppic_raw_prsm`. `msalign_frac_merge::mergeFractions` takes the MS/MS
-  file suffix for this. Combined results are always `<name>_ms2_toppic_*`.
+  false for the merged post-processing. The merge uses TopFD's
+  `<frac>_ms2.msalign` and the PrSMs before the cutoffs:
+  `<frac>_ms2.toppic_all_raw_prsm` (the best PrSM of every spectrum over
+  both passes of a `-s 2` run) when every fraction has it, else
+  `<frac>_ms2.toppic_raw_prsm`; both are always kept by `cleanToppicDir`.
+  `msalign_frac_merge::mergeFractions` takes the MS/MS file suffix. Combined
+  results are always `<name>_ms2_toppic_*`.
+- **The multiple-shift stage runs after the first-pass top selection
+  (`TopPIC_identify` → `TopPIC_multi_ptm_search` → `TopPIC_multi_ptm_post`,
+  no `TopPIC_post` any more).** `TopPIC_multi_ptm_search` reads
+  `toppic_raw_prsm`, skips the spectra whose best PrSM has an E-value
+  strictly below the smallest E-value of a decoy PrSM (no decoys: the
+  spectrum-level E-value cutoff if given, else nothing is skipped; the
+  hidden `--multi-skip-evalue <x>` overrides the threshold), searches the
+  rest (`DiagFilterMng::skip_spec_ids_`), and keeps the best of the
+  first-pass and multiple-shift PrSMs per searched spectrum
+  (`toppic_multi_raw_prsm`); the skipped spectra's PrSMs go to
+  `toppic_multi_skipped`. `TopPIC_multi_ptm_post` merges the two into
+  `toppic_all_raw_prsm` and runs the recount, clustering, characterization,
+  FDR and cutoffs once on it, then the post mass matching and the outputs.
+  Do not reintroduce a separate FDR for the multiple-shift PrSMs: with the
+  skipped targets missing from its denominator it under-reports (toppic_test
+  reports 0023/0024).
 - **GUI wiring.** `toppicwindow.ui` has `postMassMatchCheckBox` (checked by
   default from the parser's argument map, enables `postMinPeakNumEdit`) on the
   bottom row of the Advanced Parameters tab; `gui/util/command.cpp` emits
