@@ -20,6 +20,7 @@
 #include <iostream>
 #include <limits>
 #include <map>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -56,11 +57,13 @@
 #include "prsm/prsm_post_mass_match.hpp"
 #include "prsm/prsm_prot_cluster.hpp"
 #include "prsm/prsm_prot_filter.hpp"
+#include "prsm/prsm_reader_util.hpp"
 #include "prsm/prsm_simple_cluster.hpp"
 #include "prsm/prsm_sql_output.hpp"
 #include "prsm/prsm_str_merge.hpp"
 #include "prsm/prsm_top_selector.hpp"
 #include "prsm/prsm_util.hpp"
+#include "prsm/prsm_xml_writer.hpp"
 #include "search/oneptmsearch/one_ptm_search_processor.hpp"
 #include "search/oneptmsearch/ptm_search_mng.hpp"
 #include "search/ptmsearch/ptm_search_processor.hpp"
@@ -119,6 +122,12 @@ void cleanToppicDir(const std::string& fa_name, const std::string& sp_name,
     file_util::delFile(out_base + ".toppic_prot_cutoff");
     file_util::delFile(out_base + ".toppic_prot_cutoff_prot");
     file_util::delFile(out_base + ".toppic_form_cutoff_form");
+    file_util::delFile(out_base + ".toppic_first_prsm_cutoff");
+    file_util::delFile(out_base + ".toppic_all_recount");
+    file_util::delFile(out_base + ".toppic_all_proteoform_cluster");
+    file_util::delFile(out_base + ".toppic_all_cluster");
+    file_util::delFile(out_base + ".toppic_all_cluster_local");
+    file_util::delFile(out_base + ".toppic_all_cluster_fdr");
     file_util::delDir(out_base + "_toppic_proteoform_cutoff_xml");
     file_util::delDir(out_base + "_toppic_prsm_cutoff_xml");
   }
@@ -137,6 +146,13 @@ void cleanToppicDir(const std::string& fa_name, const std::string& sp_name,
     file_util::cleanPrefix(sp_name, sp_base + ".toppic_one_shift_");
     file_util::delFile(sp_base + ".toppic_multi_filter");
     file_util::cleanPrefix(sp_name, sp_base + ".toppic_multi_filter_");
+    file_util::delFile(sp_base + ".toppic_multi_combined");
+    file_util::delFile(sp_base + ".toppic_multi_evalue");
+    file_util::delFile(sp_base + ".toppic_multi_first");
+    file_util::delFile(sp_base + ".toppic_multi_skipped");
+    file_util::delFile(sp_base + ".toppic_all_raw_prsm");
+    file_util::delFile(sp_base + ".toppic_multi_evalue_all");
+    file_util::delFile(sp_base + ".toppic_multi_raw_prsm");
     file_util::delFile(sp_base + ".toppic_multi_shift");
     file_util::cleanPrefix(sp_name, sp_base + ".toppic_multi_shift_");
     file_util::delFile(sp_base + ".toppic_combined");
@@ -225,7 +241,6 @@ int TopPIC_identify(std::map<std::string, std::string>& arguments) {
     double max_shift_mass = std::stod(arguments["maxShiftMass"]);
     double min_shift_mass = std::stod(arguments["minShiftMass"]);
 
-    int filter_result_num = std::stoi(arguments["filteringResultNumber"]);
     int thread_num = std::stoi(arguments["threadNumber"]);
 
     // Filter steps requires a large amount of memory.
@@ -235,10 +250,6 @@ int TopPIC_identify(std::map<std::string, std::string>& arguments) {
       filter_thread_num = thread_num;
     }
     LOG_DEBUG("Filter thread number " << filter_thread_num);
-    int diag_filter_thread_num = mem_check::getMaxThreads("diag_filter");
-    if (diag_filter_thread_num > thread_num) {
-      diag_filter_thread_num = thread_num;
-    }
 
     // var_ptm_type number is used for E-value computation
     int var_ptm_type_num = 0;
@@ -343,35 +354,10 @@ int TopPIC_identify(std::map<std::string, std::string>& arguments) {
       input_exts.push_back("toppic_one_shift_INTERNAL");
     }
 
-    if (shift_num >= 2) {
-      std::cout << "Multiple unexpected shifts filtering - started."
-                << std::endl;
-      // thread number is used because diagonal filter uses only one index
-      DiagFilterMngPtr diag_filter_mng_ptr = std::make_shared<DiagFilterMng>(
-          prsm_para_ptr, index_file_para, filter_result_num,
-          diag_filter_thread_num, "toppic_multi_filter");
-      DiagFilterProcessorPtr diag_filter_processor =
-          std::make_shared<DiagFilterProcessor>(diag_filter_mng_ptr);
-      diag_filter_processor->process();
-      diag_filter_processor = nullptr;
-      std::cout << "Multiple unexpected shifts filtering - finished."
-                << std::endl;
-
-      std::cout << "Multiple unexpected shifts search - started." << std::endl;
-      PtmSearchMngPtr multi_search_mng_ptr = std::make_shared<PtmSearchMng>(
-          prsm_para_ptr, n_top, min_shift_mass, max_shift_mass, shift_num,
-          thread_num, "toppic_multi_filter", "toppic_multi_shift");
-      PtmSearchProcessorPtr processor =
-          std::make_shared<PtmSearchProcessor>(multi_search_mng_ptr);
-      processor->process();
-      processor = nullptr;
-      std::cout << "Multiple unexpected shifts search - finished." << std::endl;
-
-      input_exts.push_back("toppic_multi_shift_COMPLETE_2");
-      input_exts.push_back("toppic_multi_shift_PREFIX_2");
-      input_exts.push_back("toppic_multi_shift_SUFFIX_2");
-      input_exts.push_back("toppic_multi_shift_INTERNAL_2");
-    }
+    // the multiple unexpected shifts stage runs after the post-processing
+    // of these stages, on the spectra they left unidentified
+    // (TopPIC_multi_ptm_search); it needs the variable-PTM type count
+    arguments["varPtmTypeNum"] = std::to_string(var_ptm_type_num);
 
     std::cout << "Merging PrSMs - started." << std::endl;
     int prsm_top_num = std::numeric_limits<int>::max();
@@ -409,7 +395,8 @@ int TopPIC_identify(std::map<std::string, std::string>& arguments) {
   return 0;
 }
 
-// proteoform clustering + FDR + HTML generation
+// Recounting, proteoform and protein clustering, PTM characterization,
+// FDR computation and the spectrum-level cutoff of the first-pass PrSMs.
 int TopPIC_post(std::map<std::string, std::string>& arguments) {
   try {
     std::string resource_dir = arguments["resourceDir"];
@@ -443,23 +430,8 @@ int TopPIC_post(std::map<std::string, std::string>& arguments) {
     std::cout << "Recounting matched masses and fragments - finished."
               << std::endl;
 
-    if (arguments["postMassMatch"] == "true") {
-      std::cout << "Post mass matching - started." << std::endl;
-      int min_peak_num = std::stoi(arguments["postMinPeakNum"]);
-      // the EnvCNN model scores the added masses
-      onnx_env_cnn::initModel(resource_dir,
-                              std::stoi(arguments["threadNumber"]));
-      sp_file_name = prsm_post_mass_match::process(
-          prsm_para_ptr, "toppic_recount", "toppic_recount", min_peak_num);
-      // The steps below read the spectra with the added masses and the PrSMs
-      // with the recounted matches, and name their files after the new
-      // spectrum file.
-      arguments["spectrumFileName"] = sp_file_name;
-      prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
-      msalign_util::geneSpIndex(sp_file_name);
-      std::cout << "Post mass matching - finished." << std::endl;
-    }
-
+    // Post mass matching is applied by TopPIC_multi_ptm_post to the final
+    // identifications.
     std::cout << "Finding PrSM proteoform clusters - started." << std::endl;
     bool is_proteoform_ppm_error = (arguments["proteoformPpmError"] == "true");
     double proteoform_error_tole =
@@ -543,12 +515,396 @@ int TopPIC_post(std::map<std::string, std::string>& arguments) {
               << std::endl;
     cur_suffix = "toppic_prsm_cutoff";
 
+    // The proteoform and protein cutoffs, the post mass matching and the
+    // outputs are applied by TopPIC_multi_ptm_post to the final
+    // identifications (with -s 2 the union with the multiple-shift ones).
+  } catch (const char* e) {
+    std::cout << "[Exception]" << std::endl;
+    std::cout << e << std::endl;
+  }
+  return 0;
+}
+
+// The multiple unexpected shifts stage (-s 2): the diagonal filter and the
+// PTM search on the spectra that TopPIC_identify left without a PrSM passing
+// the spectrum-level cutoff, then the merge, E-value computation and top
+// PrSM selection of the new PrSMs alone.
+int TopPIC_multi_ptm_search(std::map<std::string, std::string>& arguments) {
+  try {
+    int shift_num = std::stoi(arguments["shiftNumber"]);
+    if (shift_num < 2) {
+      return 0;
+    }
+    std::string resource_dir = arguments["resourceDir"];
+    base_data::init(resource_dir);
+
+    std::string sp_file_name = arguments["spectrumFileName"];
+    int n_top = std::stoi(arguments["numOfTopPrsms"]);
+    double max_shift_mass = std::stod(arguments["maxShiftMass"]);
+    double min_shift_mass = std::stod(arguments["minShiftMass"]);
+    int filter_result_num = std::stoi(arguments["filteringResultNumber"]);
+    int thread_num = std::stoi(arguments["threadNumber"]);
+    int diag_filter_thread_num = mem_check::getMaxThreads("diag_filter");
+    if (diag_filter_thread_num > thread_num) {
+      diag_filter_thread_num = thread_num;
+    }
+    int var_ptm_type_num = std::stoi(arguments["varPtmTypeNum"]);
+
+    IndexFileNamePtr file_name_ptr = std::make_shared<IndexFileName>();
+    std::string index_file_para = file_name_ptr->geneFileName(arguments);
+    PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
+    msalign_util::geneSpIndex(sp_file_name);
+
+    // The spectra the earlier stages identified are not searched again.
+    // The cutoff E-value is the largest E-value among the target PrSMs
+    // passing the spectrum-level cutoff (toppic_prsm_cutoff); by default a
+    // spectrum is skipped when its best first-pass PrSM (toppic_recount,
+    // targets and decoys alike) has an E-value at or below the cutoff
+    // E-value times multiSkipEvalueRatio (hidden option
+    // --multi-skip-evalue-ratio, default 1). Decoy spectra that the first
+    // pass matched that well were counted in its FDR and must not be
+    // counted again in the FDR of the multiple-shift PrSMs; with a lower
+    // threshold the identified spectra near the cutoff are searched again
+    // and their first-pass PrSM competes with the multiple-shift one. The
+    // hidden --multi-skip-evalue <x> skips the spectra with an E-value
+    // strictly below x instead, and --multi-skip-evalue-decoy those
+    // strictly below the smallest E-value of a first-pass decoy PrSM.
+    std::string base_name = file_util::basename(sp_file_name);
+    std::set<int> identified_spec_ids;
+    double cutoff_evalue = 0;
+    double skip_evalue = 0;
+    bool skip_strict = false;
+    int skipped_target_num = 0;
+    int skipped_decoy_num = 0;
+    {
+      PrsmStrPtrVec cutoff_ptrs = prsm_reader_util::readAllPrsmStrs(
+          base_name + ".toppic_prsm_cutoff");
+      for (size_t i = 0; i < cutoff_ptrs.size(); i++) {
+        if (cutoff_ptrs[i]->getEValue() > cutoff_evalue) {
+          cutoff_evalue = cutoff_ptrs[i]->getEValue();
+        }
+      }
+      PrsmStrPtrVec first_ptrs =
+          prsm_reader_util::readAllPrsmStrs(base_name + ".toppic_recount");
+      if (arguments["multiSkipEvalueDecoy"] == "true") {
+        skip_strict = true;
+        skip_evalue = std::numeric_limits<double>::max();
+        for (size_t i = 0; i < first_ptrs.size(); i++) {
+          if (first_ptrs[i]->getSeqName().find("DECOY_") == 0 &&
+              first_ptrs[i]->getEValue() < skip_evalue) {
+            skip_evalue = first_ptrs[i]->getEValue();
+          }
+        }
+      } else if (arguments["multiSkipEvalue"] != "") {
+        skip_strict = true;
+        skip_evalue = std::stod(arguments["multiSkipEvalue"]);
+      } else {
+        skip_evalue =
+            cutoff_evalue * std::stod(arguments["multiSkipEvalueRatio"]);
+      }
+      for (size_t i = 0; i < first_ptrs.size(); i++) {
+        double e_value = first_ptrs[i]->getEValue();
+        if (skip_strict ? (e_value < skip_evalue) : (e_value <= skip_evalue)) {
+          int spec_id = first_ptrs[i]->getSpectrumId();
+          if (identified_spec_ids.insert(spec_id).second) {
+            if (first_ptrs[i]->getSeqName().find("DECOY_") == 0) {
+              skipped_decoy_num++;
+            } else {
+              skipped_target_num++;
+            }
+          }
+        }
+      }
+    }
+    std::cout << "Multiple unexpected shifts stage - "
+              << identified_spec_ids.size()
+              << " spectra identified by the earlier stages are skipped ("
+              << skipped_target_num << " target, " << skipped_decoy_num
+              << " decoy; first-pass E-value " << (skip_strict ? "< " : "<= ")
+              << skip_evalue << ", cutoff E-value " << cutoff_evalue << ")."
+              << std::endl;
+
+    std::vector<std::string> input_exts;
+    {
+      std::cout << "Multiple unexpected shifts filtering - started."
+                << std::endl;
+      // thread number is used because diagonal filter uses only one index
+      DiagFilterMngPtr diag_filter_mng_ptr = std::make_shared<DiagFilterMng>(
+          prsm_para_ptr, index_file_para, filter_result_num,
+          diag_filter_thread_num, "toppic_multi_filter");
+      diag_filter_mng_ptr->skip_spec_ids_ = identified_spec_ids;
+      DiagFilterProcessorPtr diag_filter_processor =
+          std::make_shared<DiagFilterProcessor>(diag_filter_mng_ptr);
+      diag_filter_processor->process();
+      diag_filter_processor = nullptr;
+      std::cout << "Multiple unexpected shifts filtering - finished."
+                << std::endl;
+
+      std::cout << "Multiple unexpected shifts search - started." << std::endl;
+      PtmSearchMngPtr multi_search_mng_ptr = std::make_shared<PtmSearchMng>(
+          prsm_para_ptr, n_top, min_shift_mass, max_shift_mass, shift_num,
+          thread_num, "toppic_multi_filter", "toppic_multi_shift");
+      PtmSearchProcessorPtr processor =
+          std::make_shared<PtmSearchProcessor>(multi_search_mng_ptr);
+      processor->process();
+      processor = nullptr;
+      std::cout << "Multiple unexpected shifts search - finished." << std::endl;
+
+      input_exts.push_back("toppic_multi_shift_COMPLETE_2");
+      input_exts.push_back("toppic_multi_shift_PREFIX_2");
+      input_exts.push_back("toppic_multi_shift_SUFFIX_2");
+      input_exts.push_back("toppic_multi_shift_INTERNAL_2");
+    }
+
+
+    std::cout << "Merging multiple-shift PrSMs - started." << std::endl;
+    int prsm_top_num = std::numeric_limits<int>::max();
+    bool norm = false;
+    bool remove_dup = false;
+    PrsmStrMergePtr merge_ptr = std::make_shared<PrsmStrMerge>(
+        sp_file_name, input_exts, "toppic_multi_combined", prsm_top_num, norm,
+        remove_dup);
+    merge_ptr->process();
+    merge_ptr = nullptr;
+    std::cout << "Merging multiple-shift PrSMs - finished." << std::endl;
+
+    std::cout << "Multiple-shift E-value computation - started." << std::endl;
+    TdgfMngPtr tdgf_mng_ptr = std::make_shared<TdgfMng>(
+        prsm_para_ptr, shift_num,
+        std::max(std::abs(max_shift_mass), std::abs(min_shift_mass)),
+        var_ptm_type_num, thread_num, "toppic_multi_combined",
+        "toppic_multi_evalue");
+    EValueProcessorPtr processor =
+        std::make_shared<EValueProcessor>(tdgf_mng_ptr);
+    processor->init();
+    processor->process(false);
+    processor = nullptr;
+    std::cout << "Multiple-shift E-value computation - finished." << std::endl;
+
+    // The first-pass PrSMs of the searched spectra (their E-values come
+    // from the same tables) compete with the multiple-shift PrSMs for the
+    // best PrSM of each spectrum, so that a spectrum a first-pass PrSM
+    // matched better keeps that PrSM, target or decoy, in the FDR
+    // estimation of the multiple-shift pass.
+    std::cout << "Multiple-shift top PrSM selecting - started" << std::endl;
+    {
+      // the first-pass PrSMs of the searched spectra join the multiple-shift
+      // PrSMs (toppic_multi_first); those of the skipped spectra go straight
+      // to the final set (toppic_multi_skipped, read by TopPIC_multi_ptm_post)
+      PrsmStrPtrVec first_ptrs =
+          prsm_reader_util::readAllPrsmStrs(base_name + ".toppic_recount");
+      PrsmXmlWriter writer(base_name + ".toppic_multi_first");
+      PrsmXmlWriter skipped_writer(base_name + ".toppic_multi_skipped");
+      for (size_t i = 0; i < first_ptrs.size(); i++) {
+        if (identified_spec_ids.count(first_ptrs[i]->getSpectrumId()) == 0) {
+          writer.write(first_ptrs[i]);
+        } else {
+          skipped_writer.write(first_ptrs[i]);
+        }
+      }
+      writer.close();
+      skipped_writer.close();
+      std::vector<std::string> all_exts = {"toppic_multi_evalue",
+                                           "toppic_multi_first"};
+      PrsmStrMergePtr all_merge_ptr = std::make_shared<PrsmStrMerge>(
+          sp_file_name, all_exts, "toppic_multi_evalue_all",
+          std::numeric_limits<int>::max(), false, false);
+      all_merge_ptr->process();
+      all_merge_ptr = nullptr;
+    }
+    prsm_top_selector::process(sp_file_name, "toppic_multi_evalue_all",
+                               "toppic_multi_raw_prsm", n_top);
+    std::cout << "Multiple-shift top PrSM selecting - finished." << std::endl;
+  } catch (const char* e) {
+    std::cout << "[Exception]" << std::endl;
+    std::cout << e << std::endl;
+  }
+  return 0;
+}
+
+// With -s 2: the best PrSM of every spectrum (the first-pass PrSM of the
+// skipped spectra, the best of both passes for the searched ones) is
+// recounted, clustered and given one FDR and the spectrum-level cutoff.
+// Then, on the final identifications (TopPIC_post's toppic_prsm_cutoff
+// without -s 2), the post mass matching, the proteoform and protein cutoffs,
+// the tables and the SQLite file.
+int TopPIC_multi_ptm_post(std::map<std::string, std::string>& arguments) {
+  try {
+    std::string resource_dir = arguments["resourceDir"];
+    base_data::init(resource_dir);
+
+    std::string sp_file_name = arguments["spectrumFileName"];
+    std::string ori_db_file_name = arguments["oriDatabaseFileName"];
+    std::string db_file_name =
+        ori_db_file_name + "_idx" + file_util::getFileSeparator() +
+        file_util::filenameFromEntirePath(arguments["databaseFileName"]);
+    double max_shift_mass = std::stod(arguments["maxShiftMass"]);
+    double min_shift_mass = std::stod(arguments["minShiftMass"]);
+    int shift_num = std::stoi(arguments["shiftNumber"]);
+    PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
+    msalign_util::geneSpIndex(sp_file_name);
+    std::string base_name = file_util::basename(sp_file_name);
+
+    if (shift_num >= 2) {
+      // The final set is the best PrSM of every spectrum: the first-pass
+      // PrSM of the skipped spectra (toppic_multi_skipped) and, for the
+      // searched spectra, the best of their first-pass and multiple-shift
+      // PrSMs (toppic_multi_raw_prsm). It is recounted, clustered and given
+      // ONE FDR, as in a single-pass run; the first-pass FDR of TopPIC_post
+      // only served to build the skip set. (Estimating a second FDR on the
+      // searched spectra alone leaves the skipped targets out of its
+      // denominator and lets the re-searched first-pass decoys set its
+      // cutoff, report 0024.)
+      std::cout << "Merging the first-pass and multiple-shift PrSMs - started."
+                << std::endl;
+      std::filesystem::rename(base_name + ".toppic_prsm_cutoff",
+                              base_name + ".toppic_first_prsm_cutoff");
+      std::vector<std::string> raw_exts = {"toppic_multi_skipped",
+                                           "toppic_multi_raw_prsm"};
+      PrsmStrMergePtr merge_ptr = std::make_shared<PrsmStrMerge>(
+          sp_file_name, raw_exts, "toppic_all_raw_prsm",
+          std::numeric_limits<int>::max(), false, false);
+      merge_ptr->process();
+      merge_ptr = nullptr;
+      std::cout << "Merging the first-pass and multiple-shift PrSMs - finished."
+                << std::endl;
+
+      std::cout << "Recounting matched masses and fragments - started."
+                << std::endl;
+      prsm_match_num_recount::process(prsm_para_ptr, "toppic_all_raw_prsm",
+                                      "toppic_all_recount");
+      std::cout << "Recounting matched masses and fragments - finished."
+                << std::endl;
+
+      bool is_proteoform_ppm_error =
+          (arguments["proteoformPpmError"] == "true");
+      double proteoform_error_tole =
+          std::stod(arguments["proteoformErrorTolerance"]);
+      if (is_proteoform_ppm_error) {
+        proteoform_error_tole = proteoform_error_tole / 1000000;
+      }
+      bool use_feature = (arguments["useFeatureFile"] == "true");
+      std::cout << "Finding PrSM proteoform clusters - started." << std::endl;
+      if (use_feature) {
+        prsm_feature_cluster::process(sp_file_name, "toppic_all_recount",
+                                      "toppic_all_proteoform_cluster",
+                                      is_proteoform_ppm_error,
+                                      proteoform_error_tole);
+      } else {
+        prsm_simple_cluster::process(
+            db_file_name, sp_file_name, "toppic_all_recount",
+            prsm_para_ptr->getFixModPtrVec(), "toppic_all_proteoform_cluster",
+            is_proteoform_ppm_error, proteoform_error_tole);
+      }
+      std::cout << "Finding PrSM proteoform clusters - finished." << std::endl;
+      std::cout << "Finding PrSM protein clusters - started." << std::endl;
+      prsm_prot_cluster::process(sp_file_name, "toppic_all_proteoform_cluster",
+                                 "toppic_all_cluster");
+      std::cout << "Finding PrSM protein clusters - finished." << std::endl;
+      std::string cur_suffix = "toppic_all_cluster";
+
+      if (arguments["localPtmFileName"] != "") {
+        std::cout << "PTM characterization - started." << std::endl;
+        LocalMngPtr local_mng = std::make_shared<LocalMng>(
+            prsm_para_ptr, std::stod(arguments["localThreshold"]),
+            arguments["localPtmFileName"], min_shift_mass, max_shift_mass,
+            cur_suffix, "toppic_all_cluster_local");
+        LocalProcessorPtr local_ptr =
+            std::make_shared<LocalProcessor>(local_mng);
+        local_ptr->process();
+        local_ptr = nullptr;
+        std::cout << "PTM characterization - finished." << std::endl;
+        cur_suffix = "toppic_all_cluster_local";
+      }
+
+      if (arguments["searchType"] == "TARGET+DECOY") {
+        std::cout << "FDR computation - started. " << std::endl;
+        prsm_fdr::process(sp_file_name, cur_suffix, "toppic_all_cluster_fdr",
+                          arguments["keepDecoyResults"]);
+        std::cout << "FDR computation - finished." << std::endl;
+        cur_suffix = "toppic_all_cluster_fdr";
+      }
+
+      std::string spectra_cutoff_type = arguments["cutoffSpectralType"];
+      double cutoff_value;
+      std::istringstream(arguments["cutoffSpectralValue"]) >> cutoff_value;
+      std::cout << "PrSM filtering by " << spectra_cutoff_type << " - started."
+                << std::endl;
+      prsm_cutoff_selector::process(db_file_name, sp_file_name, cur_suffix,
+                                    "toppic_prsm_cutoff", spectra_cutoff_type,
+                                    cutoff_value);
+      std::cout << "PrSM filtering by " << spectra_cutoff_type
+                << " - finished." << std::endl;
+    }
+
+    if (arguments["postMassMatch"] == "true") {
+      // On the reported PrSMs only: the FDRs and the spectrum-level cutoff
+      // use the E-values, which the added masses do not change.
+      std::cout << "Post mass matching - started." << std::endl;
+      int min_peak_num = std::stoi(arguments["postMinPeakNum"]);
+      // the EnvCNN model scores the added masses
+      onnx_env_cnn::initModel(resource_dir,
+                              std::stoi(arguments["threadNumber"]));
+      sp_file_name = prsm_post_mass_match::process(
+          prsm_para_ptr, "toppic_prsm_cutoff", "toppic_prsm_cutoff",
+          min_peak_num);
+      // The steps below read the spectra with the added masses and the PrSMs
+      // with the recounted matches, and name their files after the new
+      // spectrum file.
+      arguments["spectrumFileName"] = sp_file_name;
+      prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
+      msalign_util::geneSpIndex(sp_file_name);
+      std::cout << "Post mass matching - finished." << std::endl;
+    }
+
+    {
+      double cutoff_value;
+      std::string form_cutoff_type =
+          (arguments["cutoffProteoformType"] == "FDR") ? "FORMFDR" : "EVALUE";
+      std::cout << "Proteoform filtering by " << form_cutoff_type
+                << " - started." << std::endl;
+      std::istringstream(arguments["cutoffProteoformValue"]) >> cutoff_value;
+      prsm_cutoff_selector::process(db_file_name, sp_file_name,
+                                    "toppic_prsm_cutoff", "toppic_form_cutoff",
+                                    form_cutoff_type, cutoff_value);
+      std::cout << "Proteoform filtering by " << form_cutoff_type
+                << " - finished." << std::endl;
+      std::cout << "Selecting top PrSMs for proteoforms - started."
+                << std::endl;
+      prsm_form_filter::process(db_file_name, sp_file_name,
+                                "toppic_form_cutoff",
+                                "toppic_form_cutoff_form");
+      std::cout << "Selecting top PrSMs for proteoforms - finished."
+                << std::endl;
+
+      std::string prot_cutoff_type =
+          (arguments["cutoffProteinType"] == "FDR") ? "PROTFDR" : "EVALUE";
+      std::cout << "Protein filtering by " << prot_cutoff_type << " - started."
+                << std::endl;
+      std::istringstream(arguments["cutoffProteinValue"]) >> cutoff_value;
+      prsm_cutoff_selector::process(db_file_name, sp_file_name,
+                                    "toppic_form_cutoff", "toppic_prot_cutoff",
+                                    prot_cutoff_type, cutoff_value);
+      std::cout << "Protein filtering by " << prot_cutoff_type << " - finished."
+                << std::endl;
+      std::cout << "Selecting top PrSMs for proteins - started." << std::endl;
+      prsm_prot_filter::process(db_file_name, sp_file_name,
+                                "toppic_prot_cutoff",
+                                "toppic_prot_cutoff_prot");
+      std::cout << "Selecting top PrSMs for proteins - finished." << std::endl;
+    }
+
+    std::time_t end = time(nullptr);
+    char buf[50];
+    std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&end));
+    arguments["endTime"] = buf;
+    std::string argu_str = ToppicArgument::outputTsvArguments(arguments);
+
     std::cout << "Outputting PrSM table - started." << std::endl;
     PrsmMatchTableWriterPtr table_out = std::make_shared<PrsmMatchTableWriter>(
-        prsm_para_ptr, argu_str, cur_suffix);
+        prsm_para_ptr, argu_str, "toppic_prsm_cutoff");
     table_out->write("_toppic_prsm_single.tsv", false);
     table_out->write("_toppic_prsm.tsv", true);
-
     table_out = nullptr;
     std::cout << "Outputting PrSM table - finished." << std::endl;
 
@@ -561,21 +917,6 @@ int TopPIC_post(std::map<std::string, std::string>& arguments) {
       std::cout << "Outputting PrSM coverage - finished." << std::endl;
     }
 
-    std::string form_cutoff_type =
-        (arguments["cutoffProteoformType"] == "FDR") ? "FORMFDR" : "EVALUE";
-    std::cout << "Proteoform filtering by " << form_cutoff_type << " - started."
-              << std::endl;
-    std::istringstream(arguments["cutoffProteoformValue"]) >> cutoff_value;
-    prsm_cutoff_selector::process(db_file_name, sp_file_name, cur_suffix,
-                                  "toppic_form_cutoff", form_cutoff_type,
-                                  cutoff_value);
-    std::cout << "Proteoform filtering by " << form_cutoff_type
-              << " - finished." << std::endl;
-
-    std::cout << "Selecting top PrSMs for proteoforms - started." << std::endl;
-    prsm_form_filter::process(db_file_name, sp_file_name, "toppic_form_cutoff",
-                              "toppic_form_cutoff_form");
-    std::cout << "Selecting top PrSMs for proteoforms - finished." << std::endl;
     std::cout << "Outputting proteoform table - started." << std::endl;
     PrsmMatchTableWriterPtr form_out = std::make_shared<PrsmMatchTableWriter>(
         prsm_para_ptr, argu_str, "toppic_form_cutoff_form");
@@ -584,21 +925,6 @@ int TopPIC_post(std::map<std::string, std::string>& arguments) {
     form_out = nullptr;
     std::cout << "Outputting proteoform table - finished." << std::endl;
 
-    std::string prot_cutoff_type =
-        (arguments["cutoffProteinType"] == "FDR") ? "PROTFDR" : "EVALUE";
-    std::cout << "Protein filtering by " << prot_cutoff_type << " - started."
-              << std::endl;
-    std::istringstream(arguments["cutoffProteinValue"]) >> cutoff_value;
-    prsm_cutoff_selector::process(db_file_name, sp_file_name,
-                                  "toppic_form_cutoff", "toppic_prot_cutoff",
-                                  prot_cutoff_type, cutoff_value);
-    std::cout << "Protein filtering by " << prot_cutoff_type << " - finished."
-              << std::endl;
-
-    std::cout << "Selecting top PrSMs for proteins - started." << std::endl;
-    prsm_prot_filter::process(db_file_name, sp_file_name, "toppic_prot_cutoff",
-                              "toppic_prot_cutoff_prot");
-    std::cout << "Selecting top PrSMs for proteins - finished." << std::endl;
     std::cout << "Outputting protein table - started." << std::endl;
     PrsmMatchTableWriterPtr prot_out = std::make_shared<PrsmMatchTableWriter>(
         prsm_para_ptr, argu_str, "toppic_prot_cutoff_prot");
@@ -621,6 +947,8 @@ int TopPIC_post(std::map<std::string, std::string>& arguments) {
 int TopPICProgress(std::map<std::string, std::string>& arguments) {
   TopPIC_identify(arguments);
   TopPIC_post(arguments);
+  TopPIC_multi_ptm_search(arguments);
+  TopPIC_multi_ptm_post(arguments);
   return 0;
 }
 

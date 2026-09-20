@@ -237,19 +237,31 @@ void DiagFilterProcessor::readSpectra() {
   std::vector<double> prec_error_vec =
       sp_para_ptr->getMultiShiftSearchPrecErrorVec();
   DeconvMsPtrVec deconv_ms_ptr_vec = reader_ptr->getNextMsPtrVec();
+  int skipped = 0;
   while (deconv_ms_ptr_vec.size() != 0) {
     if (deconv_ms_ptr_vec[0]->getMsHeaderPtr()->containsPrec()) {
       SpectrumSetPtrVec spec_set_vec =
           spectrum_set_factory::geneSpectrumSetPtrVecWithPrecError(
               deconv_ms_ptr_vec, sp_para_ptr, prec_error_vec);
       for (size_t k = 0; k < spec_set_vec.size(); k++) {
-        if (spec_set_vec[k]->isValid()) {
-          spectra_.push_back(DiagFilter::convert(
-              spec_set_vec[k]->getMsTwoPtrVec(), mng_ptr_));
+        if (!spec_set_vec[k]->isValid()) {
+          continue;
         }
+        if (mng_ptr_->skip_spec_ids_.count(spec_set_vec[k]->getSpectrumId()) >
+            0) {
+          skipped++;
+          continue;
+        }
+        spectra_.push_back(DiagFilter::convert(
+            spec_set_vec[k]->getMsTwoPtrVec(), mng_ptr_));
       }
     }
     deconv_ms_ptr_vec = reader_ptr->getNextMsPtrVec();
+  }
+  if (mng_ptr_->skip_spec_ids_.size() > 0) {
+    std::cout << "Multiple unexpected shifts filtering - " << spectra_.size()
+              << " spectra to search, " << skipped
+              << " already identified spectra skipped." << std::endl;
   }
 }
 

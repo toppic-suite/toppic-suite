@@ -17,6 +17,7 @@
 #define TOPPIC_FILTER_MNG_DIAG_FILTER_MNG_HPP_
 
 #include <mutex>
+#include <set>
 
 #include "para/prsm_para.hpp"
 
@@ -48,6 +49,10 @@ class DiagFilterMng {
   std::string residue_mod_file_name_;
 
   int var_num_;
+
+  // spectra (by id) that the filter leaves out, e.g. those already
+  // identified by the earlier stages (toppic's reordered pipeline)
+  std::set<int> skip_spec_ids_;
 
   // for counting spectra
   int n_spec_block_ = 0;
