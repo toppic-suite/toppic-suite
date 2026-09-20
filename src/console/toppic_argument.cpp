@@ -87,7 +87,7 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["postMinPeakNum"] = "1";
   arguments["zeroShiftPrecOneDaError"] = "true";
   arguments["oneShiftPrecOneDaError"] = "false";
-  arguments["varPtmPrecOneDaError"] = "true";
+  arguments["varPtmPrecOneDaError"] = "false";
   arguments["fragMassExtension"] = "true";
   arguments["fragExtendMinMass"] = "5000";
 
@@ -506,7 +506,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "post-min-peak-num,I", po::value<std::string>(&post_min_peak_num), "")(
         "disable-zero-shift-prec-error", "")(
         "enable-one-shift-prec-error", "")(
-        "disable-var-ptm-prec-error", "")(
+        "enable-var-ptm-prec-error", "")(
         "disable-frag-mass-extension", "")(
         "frag-extend-min-mass", po::value<std::string>(&frag_extend_min_mass),
         "")(
@@ -722,8 +722,8 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
     if (vm.count("enable-one-shift-prec-error")) {
       arguments_["oneShiftPrecOneDaError"] = "true";
     }
-    if (vm.count("disable-var-ptm-prec-error")) {
-      arguments_["varPtmPrecOneDaError"] = "false";
+    if (vm.count("enable-var-ptm-prec-error")) {
+      arguments_["varPtmPrecOneDaError"] = "true";
     }
     if (vm.count("disable-frag-mass-extension")) {
       arguments_["fragMassExtension"] = "false";

@@ -462,14 +462,15 @@ shift and one shift `{0, -1 Da, +1 Da}`, variable PTM `{0}`, multi shift
 `{0}` (the diagonal filter and PTM search absorb a 1 Da error into the
 unknown shift, so they have no switch). `PrsmPara` applies the toppic hidden
 options `--disable-zero-shift-prec-error`, `--enable-one-shift-prec-error`
-and `--disable-var-ptm-prec-error` (argument keys `zeroShiftPrecOneDaError`,
+and `--enable-var-ptm-prec-error` (argument keys `zeroShiftPrecOneDaError`,
 `oneShiftPrecOneDaError`, `varPtmPrecOneDaError`) through the
 `SpPara::set*PrecOneDaError` setters. **toppic's defaults differ from
-`SpPara`'s for two stages**: `ToppicArgument::initArguments` sets
+`SpPara`'s for one stage**: `ToppicArgument::initArguments` sets
 `oneShiftPrecOneDaError = "false"` (one-shift stage searched with `{0}`;
 `--enable-one-shift-prec-error` restores `{0, -1, +1}`) and
-`varPtmPrecOneDaError = "true"` (variable-PTM stage searched with
-`{0, -1, +1}`; `--disable-var-ptm-prec-error` restores `{0}`). Absent keys
+`varPtmPrecOneDaError = "false"` (variable-PTM stage searched with `{0}`,
+matching the `SpPara` default; `--enable-var-ptm-prec-error` switches it to
+`{0, -1, +1}`, the pre-2026-09 toppic default). Absent keys
 keep the `SpPara` defaults, so topmg is unaffected. The fragment-mass
 `frag_ext_offsets_` expansion (`{0, -1 Da, +1 Da}` applied by
 `extend_ms_factory` to every fragment above `frag_extend_min_mass_`) is separate:

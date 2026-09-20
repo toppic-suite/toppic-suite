@@ -91,9 +91,9 @@ PrsmPara::PrsmPara(const std::map<std::string, std::string>& arguments) {
   }
   // +-1 Da precursor mass error per stage; absent keys keep the SpPara
   // defaults (allowed for zero/one shift, not for variable PTMs). toppic
-  // overrides two of them: oneShiftPrecOneDaError = "false" unless
-  // --enable-one-shift-prec-error is given, and varPtmPrecOneDaError =
-  // "true" unless --disable-var-ptm-prec-error is given.
+  // overrides oneShiftPrecOneDaError = "false" unless
+  // --enable-one-shift-prec-error is given; varPtmPrecOneDaError = "false"
+  // (the SpPara default) unless --enable-var-ptm-prec-error is given.
   if (getArg(arguments, "zeroShiftPrecOneDaError") == "false") {
     sp_para_ptr_->setZeroShiftPrecOneDaError(false);
   }
