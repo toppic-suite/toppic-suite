@@ -560,19 +560,23 @@ int TopPIC_multi_ptm_search(std::map<std::string, std::string>& arguments) {
 
     // The spectra the earlier stages identified are not searched again.
     // The cutoff E-value is the largest E-value among the target PrSMs
-    // passing the spectrum-level cutoff (toppic_prsm_cutoff); a spectrum
-    // is skipped when its best first-pass PrSM (toppic_recount, targets
-    // and decoys alike) has an E-value at or below the cutoff E-value
-    // times multiSkipEvalueRatio (hidden option --multi-skip-evalue-ratio,
-    // default 1). Decoy spectra that the first pass matched that well were
-    // counted in its FDR and must not be counted again in the FDR of the
-    // multiple-shift PrSMs; with a ratio below 1 the identified spectra
-    // near the cutoff are searched again and their first-pass PrSM
-    // competes with the multiple-shift one.
+    // passing the spectrum-level cutoff (toppic_prsm_cutoff); by default a
+    // spectrum is skipped when its best first-pass PrSM (toppic_recount,
+    // targets and decoys alike) has an E-value at or below the cutoff
+    // E-value times multiSkipEvalueRatio (hidden option
+    // --multi-skip-evalue-ratio, default 1). Decoy spectra that the first
+    // pass matched that well were counted in its FDR and must not be
+    // counted again in the FDR of the multiple-shift PrSMs; with a lower
+    // threshold the identified spectra near the cutoff are searched again
+    // and their first-pass PrSM competes with the multiple-shift one. The
+    // hidden --multi-skip-evalue <x> skips the spectra with an E-value
+    // strictly below x instead, and --multi-skip-evalue-decoy those
+    // strictly below the smallest E-value of a first-pass decoy PrSM.
     std::string base_name = file_util::basename(sp_file_name);
     std::set<int> identified_spec_ids;
     double cutoff_evalue = 0;
     double skip_evalue = 0;
+    bool skip_strict = false;
     int skipped_target_num = 0;
     int skipped_decoy_num = 0;
     {
@@ -583,11 +587,27 @@ int TopPIC_multi_ptm_search(std::map<std::string, std::string>& arguments) {
           cutoff_evalue = cutoff_ptrs[i]->getEValue();
         }
       }
-      skip_evalue = cutoff_evalue * std::stod(arguments["multiSkipEvalueRatio"]);
       PrsmStrPtrVec first_ptrs =
           prsm_reader_util::readAllPrsmStrs(base_name + ".toppic_recount");
+      if (arguments["multiSkipEvalueDecoy"] == "true") {
+        skip_strict = true;
+        skip_evalue = std::numeric_limits<double>::max();
+        for (size_t i = 0; i < first_ptrs.size(); i++) {
+          if (first_ptrs[i]->getSeqName().find("DECOY_") == 0 &&
+              first_ptrs[i]->getEValue() < skip_evalue) {
+            skip_evalue = first_ptrs[i]->getEValue();
+          }
+        }
+      } else if (arguments["multiSkipEvalue"] != "") {
+        skip_strict = true;
+        skip_evalue = std::stod(arguments["multiSkipEvalue"]);
+      } else {
+        skip_evalue =
+            cutoff_evalue * std::stod(arguments["multiSkipEvalueRatio"]);
+      }
       for (size_t i = 0; i < first_ptrs.size(); i++) {
-        if (first_ptrs[i]->getEValue() <= skip_evalue) {
+        double e_value = first_ptrs[i]->getEValue();
+        if (skip_strict ? (e_value < skip_evalue) : (e_value <= skip_evalue)) {
           int spec_id = first_ptrs[i]->getSpectrumId();
           if (identified_spec_ids.insert(spec_id).second) {
             if (first_ptrs[i]->getSeqName().find("DECOY_") == 0) {
@@ -603,8 +623,9 @@ int TopPIC_multi_ptm_search(std::map<std::string, std::string>& arguments) {
               << identified_spec_ids.size()
               << " spectra identified by the earlier stages are skipped ("
               << skipped_target_num << " target, " << skipped_decoy_num
-              << " decoy; first-pass E-value <= " << skip_evalue
-              << ", cutoff E-value " << cutoff_evalue << ")." << std::endl;
+              << " decoy; first-pass E-value " << (skip_strict ? "< " : "<= ")
+              << skip_evalue << ", cutoff E-value " << cutoff_evalue << ")."
+              << std::endl;
 
     std::vector<std::string> input_exts;
     {
