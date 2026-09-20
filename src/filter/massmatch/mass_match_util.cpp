@@ -178,6 +178,51 @@ void addTruncShiftsWithRestriction(
   }
 }
 
+// The best keep_num proteoform scores, kept in a small ordered list while
+// the proteoforms are scanned in id order: score descending and, among equal
+// scores, protein id ascending - the order ProtCandidate::geneResults
+// reports. The candidates are stored by value; a ProtScore object is only
+// allocated for the survivors.
+class BoundedProtScores {
+ public:
+  explicit BoundedProtScores(int keep_num) : keep_num_(keep_num) {}
+
+  void add(int id, int score, double n_shift, double c_shift) {
+    if (static_cast<int>(best_.size()) >= keep_num_ &&
+        score <= best_.back().score_) {
+      return;
+    }
+    size_t pos = best_.size();
+    while (pos > 0 && score > best_[pos - 1].score_) {
+      pos--;
+    }
+    best_.insert(best_.begin() + pos, Entry{id, score, n_shift, c_shift});
+    if (static_cast<int>(best_.size()) > keep_num_) {
+      best_.pop_back();
+    }
+  }
+
+  ProtCandidatePtrVec toResults() const {
+    ProtCandidatePtrVec results;
+    for (size_t i = 0; i < best_.size(); i++) {
+      ProtScorePtr prot_score = std::make_shared<ProtScore>(
+          best_[i].id_, best_[i].score_, best_[i].n_shift_, best_[i].c_shift_);
+      results.push_back(std::make_shared<ProtCandidate>(prot_score));
+    }
+    return results;
+  }
+
+ private:
+  struct Entry {
+    int id_;
+    int score_;
+    double n_shift_;
+    double c_shift_;
+  };
+  int keep_num_;
+  std::vector<Entry> best_;
+};
+
 ProtCandidatePtrVec findZeroShiftTopProteins(std::vector<short>& scores,
                                              std::vector<short>& rev_scores,
                                              const MassMatchPtr& index_ptr,
@@ -275,19 +320,15 @@ void compProteoMaxScores(const std::vector<short>& scores,
 ProtCandidatePtrVec simpleFindZeroShiftTopProteins(
     const std::vector<int>& max_scores, const std::vector<int>& rev_max_scores,
     int threshold, int top_num) {
-  ProtScorePtrVec proteo_scores;
+  BoundedProtScores best(top_num);
   // shift information is not used in simple filtering
-  double best_n_trunc_shift = 0.0;
-  double best_c_trunc_shift = 0.0;
   for (size_t i = 0; i < max_scores.size(); i++) {
     int best_total_score = max_scores[i] + rev_max_scores[i];
     if (best_total_score >= threshold) {
-      ProtScorePtr proteo_score = std::make_shared<ProtScore>(
-          i, best_total_score, best_n_trunc_shift, best_c_trunc_shift);
-      proteo_scores.push_back(proteo_score);
+      best.add(i, best_total_score, 0.0, 0.0);
     }
   }
-  return ProtCandidate::geneResults(proteo_scores, threshold, top_num);
+  return best.toResults();
 }
 
 inline ProtCandidatePtrVec findOneShiftTopProteinsWithoutRestrict(
@@ -642,7 +683,7 @@ ProtCandidatePtrVec findVarPtmTopProteins(
   const std::vector<double>& trunc_shifts = index_ptr->getTruncShifts();
   const std::vector<double>& rev_trunc_shifts = rev_index_ptr->getTruncShifts();
 
-  ProtScorePtrVec proteo_scores;
+  BoundedProtScores best(top_num);
   for (size_t i = 0; i < prec_match_rows_2d.size(); i++) {
     const std::vector<int>& prec_match_rows = prec_match_rows_2d[i];
     const std::vector<int>& rev_prec_match_rows = rev_prec_match_rows_2d[i];
@@ -679,20 +720,24 @@ ProtCandidatePtrVec findVarPtmTopProteins(
       }
     }
     if (best_score >= threshold) {
-      ProtScorePtr proteo_score = std::make_shared<ProtScore>(
-          i, best_score, best_n_trunc_shift, best_c_trunc_shift);
-      proteo_scores.push_back(proteo_score);
+      best.add(i, best_score, best_n_trunc_shift, best_c_trunc_shift);
     }
   }
 
-  return ProtCandidate::geneResults(proteo_scores, threshold, top_num);
+  return best.toResults();
 }
 
 // Find top proteins for diagonal filtering
 ProtCandidatePtrVec findDiagTopProteins(
     const std::vector<short>& scores, const std::vector<int>& proteo_row_begins,
     const std::vector<int>& proteo_row_ends, int threshold, int top_num) {
-  std::vector<std::pair<int, int>> diag_scores;
+  // The best top_num proteoforms are kept in a small ordered list while the
+  // proteoforms are scanned, instead of collecting the score of every
+  // proteoform and sorting them all. The kept order - score descending and,
+  // among equal scores, protein id ascending, because the proteoforms are
+  // visited in id order - is exactly the order ProtCandidate::geneResults
+  // reports.
+  std::vector<std::pair<int, int>> best;
   for (size_t i = 0; i < proteo_row_begins.size(); i++) {
     int bgn = proteo_row_begins[i];
     int end = proteo_row_ends[i];
@@ -702,10 +747,16 @@ ProtCandidatePtrVec findDiagTopProteins(
         best_score = scores[j];
       }
     }
-    std::pair<int, int> diag_score(i, best_score);
-    diag_scores.push_back(diag_score);
+    if (best_score >= threshold) {
+      addBestRow(i, best_score, top_num, best);
+    }
   }
-  return ProtCandidate::geneResults(diag_scores, threshold, top_num);
+  ProtCandidatePtrVec prot_results;
+  for (size_t j = 0; j < best.size(); j++) {
+    prot_results.push_back(
+        std::make_shared<ProtCandidate>(best[j].first, best[j].second));
+  }
+  return prot_results;
 }
 
 }  // namespace mass_match_util
