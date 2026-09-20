@@ -89,10 +89,11 @@ except `sample_ms2.toppic_raw_prsm`, which is always kept.
     PrSM, target or decoy, has an E-value at or below the largest E-value
     among the PrSMs passing the spectrum-level cutoff). The new PrSMs are
     merged, get E-values, and, together with the earlier PrSMs of the
-    searched spectra, the best PrSM per spectrum is kept; steps 7-11 are
-    repeated on these PrSMs alone (their FDRs are estimated on them alone)
-    and the surviving ones are added to the identifications of step 11,
-    which are clustered again.
+    searched spectra, the best PrSM per spectrum is kept; then steps 7-11
+    are repeated once on the best PrSM of every spectrum (the earlier PrSM
+    of the skipped spectra, the best of both passes for the searched ones),
+    so that the reported identifications carry a single FDR; the cutoff of
+    step 11 only served to choose the skipped spectra.
 13. **Post mass matching** (default; off with `--disable-post-match`). For
     each reported PrSM, the theoretical fragment masses that no deconvoluted
     mass matched are searched in the centroided MS/MS peaks of the spectrum,
