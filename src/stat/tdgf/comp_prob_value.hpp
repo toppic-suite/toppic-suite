@@ -73,6 +73,8 @@ class CompProbValue {
 
   // Spectrum
   int max_sp_len_ = 0;
+  // the extent of pos_scores_/tmp_pos_scores_ used by this computation
+  int pos_len_ = 0;
 
   std::vector<ProbPeak> prob_peaks_;
   int sp_len_;

@@ -53,8 +53,14 @@ std::function<void()> geneTask(const SpectrumSetPtr& spec_set_ptr,
     for (size_t i = 0; i < sele_prsm_ptrs.size(); i++) {
       prsm_vec.push_back(std::make_shared<Prsm>(*sele_prsm_ptrs[i].get()));
     }
-    CompPValueArrayPtr comp_pvalue_ptr =
-        std::make_shared<CompPValueArray>(test_num_ptr, mng_ptr);
+    // one CompPValueArray per worker thread: its CompProbValue allocates
+    // a 138 MB page table and two 5.5 MB score arrays, which were allocated
+    // and freed for every spectrum
+    static thread_local CompPValueArrayPtr comp_pvalue_ptr;
+    if (comp_pvalue_ptr == nullptr) {
+      comp_pvalue_ptr = std::make_shared<CompPValueArray>(test_num_ptr,
+                                                          mng_ptr);
+    }
     comp_pvalue_ptr->process(spec_set_ptr, prsm_vec, ppo, is_separate);
 
     for (unsigned i = 0; i < prsm_vec.size(); i++) {
