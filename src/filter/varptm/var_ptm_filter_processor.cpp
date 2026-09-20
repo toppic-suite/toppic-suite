@@ -119,9 +119,10 @@ inline void filterBlock(const ProteoformPtrVec& raw_forms, int block_idx,
               combiner->add(2, block_idx, add_idx, filter_ptr->getSuffMatchPtrs());
             }
             if (prsm_para_ptr->allowInternalProt()) {
-              combiner->add(3, block_idx, add_idx, filter_ptr->getInternalMatchPtrs());
-              add_idx++;
+              combiner->add(3, block_idx, add_idx,
+                            filter_ptr->getInternalMatchPtrs());
             }
+            add_idx++;
           }
         }
       }
