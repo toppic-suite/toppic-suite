@@ -70,13 +70,19 @@ int findMatchedPos(const ProteoformPtr& proteo_ptr, double n_term_trunc) {
 
 std::function<void()> geneTask(const SpectrumSetPtr& spec_set_ptr,
                                const SimplePrsmPtrVec& simple_prsm_ptr_vec,
-                               const FastaIndexReaderPtr& reader_ptr,
+                               const std::string& db_file_name,
                                const VarPtmSearchMngPtr& mng_ptr,
                                const ProteoformTypePtr& type_ptr,
                                const SimpleThreadPoolPtr& pool_ptr,
                                const PrsmXmlWriterPtrVec& writer_ptr_vec) {
-  return [spec_set_ptr, simple_prsm_ptr_vec, reader_ptr, mng_ptr, type_ptr,
+  return [spec_set_ptr, simple_prsm_ptr_vec, db_file_name, mng_ptr, type_ptr,
           pool_ptr, writer_ptr_vec]() {
+    // one indexed FASTA reader per worker thread, so that the candidate
+    // fetches of the threads do not serialize on one reader
+    static thread_local FastaIndexReaderPtr reader_ptr;
+    if (reader_ptr == nullptr) {
+      reader_ptr = std::make_shared<FastaIndexReader>(db_file_name);
+    }
     ModPtrVec fix_mod_list = mng_ptr->prsm_para_ptr_->getFixModPtrVec();
     ProtModPtrVec prot_mod_ptr_vec =
         mng_ptr->prsm_para_ptr_->getProtModPtrVec();
@@ -227,9 +233,6 @@ void VarPtmSearchProcessor::process() {
 
   // init variables
   std::string db_file_name = prsm_para_ptr->getSearchDbFileNameWithFolder();
-
-  FastaIndexReaderPtr reader_ptr =
-      std::make_shared<FastaIndexReader>(db_file_name);
   int spectrum_num = msalign_util::getSpNum(sp_file_name);
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
   ModPtrVec fix_mod_ptr_vec = prsm_para_ptr->getFixModPtrVec();
@@ -270,8 +273,9 @@ void VarPtmSearchProcessor::process() {
               std::this_thread::sleep_for(std::chrono::milliseconds(100));
             }
             pool_ptr->enqueue(geneTask(
-                spec_set_vec[k], comp_selected_prsm_ptrs, reader_ptr, mng_ptr_,
-                ProteoformType::COMPLETE, pool_ptr, comp_writer_ptr_vec));
+                spec_set_vec[k], comp_selected_prsm_ptrs, db_file_name,
+                mng_ptr_, ProteoformType::COMPLETE, pool_ptr,
+                comp_writer_ptr_vec));
           }
         }
 
@@ -291,8 +295,9 @@ void VarPtmSearchProcessor::process() {
               std::this_thread::sleep_for(std::chrono::milliseconds(100));
             }
             pool_ptr->enqueue(geneTask(
-                spec_set_vec[k], pref_selected_prsm_ptrs, reader_ptr, mng_ptr_,
-                ProteoformType::PREFIX, pool_ptr, pref_writer_ptr_vec));
+                spec_set_vec[k], pref_selected_prsm_ptrs, db_file_name,
+                mng_ptr_, ProteoformType::PREFIX, pool_ptr,
+                pref_writer_ptr_vec));
           }
         }
 
@@ -312,8 +317,9 @@ void VarPtmSearchProcessor::process() {
               std::this_thread::sleep_for(std::chrono::milliseconds(100));
             }
             pool_ptr->enqueue(geneTask(
-                spec_set_vec[k], suff_selected_prsm_ptrs, reader_ptr, mng_ptr_,
-                ProteoformType::SUFFIX, pool_ptr, suff_writer_ptr_vec));
+                spec_set_vec[k], suff_selected_prsm_ptrs, db_file_name,
+                mng_ptr_, ProteoformType::SUFFIX, pool_ptr,
+                suff_writer_ptr_vec));
           }
         }
 
@@ -333,9 +339,10 @@ void VarPtmSearchProcessor::process() {
               std::this_thread::sleep_for(std::chrono::milliseconds(100));
             }
             pool_ptr->enqueue(geneTask(spec_set_vec[k],
-                                       internal_selected_prsm_ptrs, reader_ptr,
-                                       mng_ptr_, ProteoformType::INTERNAL,
-                                       pool_ptr, internal_writer_ptr_vec));
+                                       internal_selected_prsm_ptrs,
+                                       db_file_name, mng_ptr_,
+                                       ProteoformType::INTERNAL, pool_ptr,
+                                       internal_writer_ptr_vec));
           }
         }
       }
