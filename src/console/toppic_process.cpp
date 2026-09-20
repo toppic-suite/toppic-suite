@@ -130,6 +130,7 @@ void cleanToppicDir(const std::string& fa_name, const std::string& sp_name,
     file_util::delFile(out_base + ".toppic_multi_prsm_cutoff");
     file_util::delFile(out_base + ".toppic_first_prsm_cutoff");
     file_util::delFile(out_base + ".toppic_all_prsm_cutoff");
+    file_util::delFile(out_base + ".toppic_all_prsm_cutoff_best");
     file_util::delFile(out_base + ".toppic_all_prsm_cutoff_top");
     file_util::delFile(out_base + ".toppic_all_proteoform_cluster");
     file_util::delDir(out_base + "_toppic_proteoform_cutoff_xml");
@@ -813,7 +814,14 @@ int TopPIC_multi_ptm_post(std::map<std::string, std::string>& arguments) {
       // both passes).
       int n_top = std::stoi(arguments["numOfTopPrsms"]);
       prsm_top_selector::process(sp_file_name, "toppic_all_prsm_cutoff",
-                                 "toppic_all_prsm_cutoff_top", n_top);
+                                 "toppic_all_prsm_cutoff_best", n_top);
+      // The two passes numbered their PrSMs independently; the cutoff
+      // selector (which keeps every PrSM at this E-value) renumbers the
+      // union, as the SQLite prsm table needs unique ids.
+      prsm_cutoff_selector::process(db_file_name, sp_file_name,
+                                    "toppic_all_prsm_cutoff_best",
+                                    "toppic_all_prsm_cutoff_top", "EVALUE",
+                                    std::numeric_limits<double>::max());
       cluster("toppic_all_prsm_cutoff_top", "toppic_all_proteoform_cluster",
               "toppic_prsm_cutoff");
       std::cout << "Merging the identifications - finished." << std::endl;
