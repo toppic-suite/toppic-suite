@@ -17,6 +17,7 @@
 #define TOPPIC_SEQ_FASTA_INDEX_READER_HPP_
 
 #include <memory>
+#include <mutex>
 #include <string>
 
 #include "htslib/faidx.h"
@@ -34,6 +35,7 @@ class FastaIndexReader {
 
  private:
   faidx_t* fai_;
+  std::mutex mutex_;
 };
 
 using FastaIndexReaderPtr = std::shared_ptr<FastaIndexReader>;
