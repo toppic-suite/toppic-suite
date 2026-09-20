@@ -268,9 +268,13 @@ void VarPtmSearchProcessor::process() {
         if (comp_selected_prsm_ptrs.size() > 0) {
           // LOG_DEBUG("start processing one spectrum.");
           for (size_t k = 0; k < spec_set_vec.size(); k++) {
+            // the tasks average ~26 ms, so the 16 workers drain the whole
+            // queue in far less than the previous 100 ms polling sleep and
+            // starved while the producer overslept; poll at 1 ms and keep
+            // enough tasks queued to cover the producer's reading bursts
             while (pool_ptr->getQueueSize() >=
-                   static_cast<std::size_t>(mng_ptr_->thread_num_) * 2) {
-              std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                   static_cast<std::size_t>(mng_ptr_->thread_num_) * 8) {
+              std::this_thread::sleep_for(std::chrono::milliseconds(1));
             }
             pool_ptr->enqueue(geneTask(
                 spec_set_vec[k], comp_selected_prsm_ptrs, db_file_name,
@@ -290,9 +294,13 @@ void VarPtmSearchProcessor::process() {
         if (pref_selected_prsm_ptrs.size() > 0) {
           // LOG_DEBUG("start processing one spectrum.");
           for (size_t k = 0; k < spec_set_vec.size(); k++) {
+            // the tasks average ~26 ms, so the 16 workers drain the whole
+            // queue in far less than the previous 100 ms polling sleep and
+            // starved while the producer overslept; poll at 1 ms and keep
+            // enough tasks queued to cover the producer's reading bursts
             while (pool_ptr->getQueueSize() >=
-                   static_cast<std::size_t>(mng_ptr_->thread_num_) * 2) {
-              std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                   static_cast<std::size_t>(mng_ptr_->thread_num_) * 8) {
+              std::this_thread::sleep_for(std::chrono::milliseconds(1));
             }
             pool_ptr->enqueue(geneTask(
                 spec_set_vec[k], pref_selected_prsm_ptrs, db_file_name,
@@ -312,9 +320,13 @@ void VarPtmSearchProcessor::process() {
         if (suff_selected_prsm_ptrs.size() > 0) {
           // LOG_DEBUG("start processing one spectrum.");
           for (size_t k = 0; k < spec_set_vec.size(); k++) {
+            // the tasks average ~26 ms, so the 16 workers drain the whole
+            // queue in far less than the previous 100 ms polling sleep and
+            // starved while the producer overslept; poll at 1 ms and keep
+            // enough tasks queued to cover the producer's reading bursts
             while (pool_ptr->getQueueSize() >=
-                   static_cast<std::size_t>(mng_ptr_->thread_num_) * 2) {
-              std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                   static_cast<std::size_t>(mng_ptr_->thread_num_) * 8) {
+              std::this_thread::sleep_for(std::chrono::milliseconds(1));
             }
             pool_ptr->enqueue(geneTask(
                 spec_set_vec[k], suff_selected_prsm_ptrs, db_file_name,
@@ -334,9 +346,13 @@ void VarPtmSearchProcessor::process() {
         if (internal_selected_prsm_ptrs.size() > 0) {
           // LOG_DEBUG("start processing one spectrum.");
           for (size_t k = 0; k < spec_set_vec.size(); k++) {
+            // the tasks average ~26 ms, so the 16 workers drain the whole
+            // queue in far less than the previous 100 ms polling sleep and
+            // starved while the producer overslept; poll at 1 ms and keep
+            // enough tasks queued to cover the producer's reading bursts
             while (pool_ptr->getQueueSize() >=
-                   static_cast<std::size_t>(mng_ptr_->thread_num_) * 2) {
-              std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                   static_cast<std::size_t>(mng_ptr_->thread_num_) * 8) {
+              std::this_thread::sleep_for(std::chrono::milliseconds(1));
             }
             pool_ptr->enqueue(geneTask(spec_set_vec[k],
                                        internal_selected_prsm_ptrs,
