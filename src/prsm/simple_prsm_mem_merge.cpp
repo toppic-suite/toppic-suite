@@ -55,6 +55,33 @@ const int mutex_num = 64;
 
 }  // namespace
 
+// Total order of the candidates of one spectrum: the order they are written
+// in (decreasing score, then sequence name, as SimplePrsmStr sorts them) with
+// the block, the call inside the block and the position in the call as the
+// tie breaker. The tie breaker makes both the trimming and the written order
+// independent of the order in which the blocks finish, which the score and
+// the sequence name alone do not: a spectrum often has several candidates of
+// the same protein and score that differ only in the precursor variant.
+bool SimplePrsmMemMerge::cmpEntry(const Entry& a, const Entry& b) {
+  double a_score = a.prsm_ptr_->getScore();
+  double b_score = b.prsm_ptr_->getScore();
+  if (a_score != b_score) {
+    return a_score > b_score;
+  }
+  std::string a_name = a.prsm_ptr_->getSeqName();
+  std::string b_name = b.prsm_ptr_->getSeqName();
+  if (a_name != b_name) {
+    return a_name < b_name;
+  }
+  if (a.block_idx_ != b.block_idx_) {
+    return a.block_idx_ < b.block_idx_;
+  }
+  if (a.call_idx_ != b.call_idx_) {
+    return a.call_idx_ < b.call_idx_;
+  }
+  return a.pos_idx_ < b.pos_idx_;
+}
+
 SimplePrsmMemMerge::SimplePrsmMemMerge(const std::string& sp_file_name,
                                        const std::string& output_file_ext,
                                        const std::vector<int>& top_nums,
@@ -93,21 +120,12 @@ void SimplePrsmMemMerge::add(int type_idx, int block_idx, int call_idx,
     results.push_back(entry);
   }
   if (results.size() > 2 * top_num) {
-    // drop only the records that score below the top_num-th score, so that
-    // the records that tie with it are all kept
-    std::vector<double> scores;
-    scores.reserve(results.size());
-    for (size_t i = 0; i < results.size(); i++) {
-      scores.push_back(results[i].prsm_ptr_->getScore());
-    }
-    std::nth_element(scores.begin(), scores.begin() + top_num - 1,
-                     scores.end(), std::greater<double>());
-    double threshold = scores[top_num - 1];
-    results.erase(std::remove_if(results.begin(), results.end(),
-                                 [threshold](const Entry& e) {
-                                   return e.prsm_ptr_->getScore() < threshold;
-                                 }),
-                  results.end());
+    // keep the best top_num candidates of the total order, the ones that are
+    // written; which of them are kept does not depend on the order the blocks
+    // reached this point in
+    std::nth_element(results.begin(), results.begin() + top_num, results.end(),
+                     cmpEntry);
+    results.resize(top_num);
   }
 }
 
@@ -128,28 +146,9 @@ void SimplePrsmMemMerge::write() {
       if (results.size() == 0) {
         continue;
       }
-      // the order the merge read the records in: block file by block file,
-      // write order inside a block
-      std::sort(results.begin(), results.end(),
-                [](const Entry& a, const Entry& b) {
-                  if (a.block_idx_ != b.block_idx_) {
-                    return a.block_idx_ < b.block_idx_;
-                  }
-                  if (a.call_idx_ != b.call_idx_) {
-                    return a.call_idx_ < b.call_idx_;
-                  }
-                  return a.pos_idx_ < b.pos_idx_;
-                });
-      SimplePrsmStrPtrVec str_ptrs;
-      str_ptrs.reserve(results.size());
-      for (size_t i = 0; i < results.size(); i++) {
-        str_ptrs.push_back(toPrsmStr(results[i].prsm_ptr_));
-      }
-      // the sort of the merge, on the records in its order
-      std::sort(str_ptrs.begin(), str_ptrs.end(),
-                SimplePrsmStr::cmpScoreDecSeqInc);
-      for (size_t i = 0; i < str_ptrs.size() && i < top_num; i++) {
-        writer.write(str_ptrs[i]);
+      std::sort(results.begin(), results.end(), cmpEntry);
+      for (size_t i = 0; i < results.size() && i < top_num; i++) {
+        writer.write(toPrsmStr(results[i].prsm_ptr_));
       }
       std::vector<Entry>().swap(results);
     }

@@ -77,6 +77,9 @@ class SimplePrsmMemMerge {
     int pos_idx_;
   };
 
+  // the order the candidates of a spectrum are trimmed and written in
+  static bool cmpEntry(const Entry& a, const Entry& b);
+
   // results_[type][spectrum id]
   std::vector<std::vector<std::vector<Entry>>> results_;
   std::vector<std::unique_ptr<std::mutex>> mutexes_;
