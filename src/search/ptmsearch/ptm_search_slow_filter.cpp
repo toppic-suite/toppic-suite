@@ -28,8 +28,12 @@ PtmSearchSlowFilter::PtmSearchSlowFilter(
     const SimplePrsmPtrVec& simple_prsm_ptrs, const PtmSearchMngPtr& mng_ptr) {
   std::string db_file_name =
       mng_ptr->prsm_para_ptr_->getSearchDbFileNameWithFolder();
-  FastaIndexReaderPtr reader_ptr =
-      std::make_shared<FastaIndexReader>(db_file_name);
+  // one indexed FASTA reader per worker thread: a reader was constructed -
+  // an fai_load parsing the 40k-entry .fai index - for every spectrum task
+  static thread_local FastaIndexReaderPtr reader_ptr;
+  if (reader_ptr == nullptr) {
+    reader_ptr = std::make_shared<FastaIndexReader>(db_file_name);
+  }
   ModPtrVec fix_mod_list = mng_ptr->prsm_para_ptr_->getFixModPtrVec();
   ProtModPtrVec prot_mod_ptr_vec = mng_ptr->prsm_para_ptr_->getProtModPtrVec();
   ProteoformPtrVec proteoform_ptr_vec;
