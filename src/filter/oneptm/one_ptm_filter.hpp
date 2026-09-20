@@ -18,6 +18,7 @@
 
 #include <vector>
 
+#include "filter/massmatch/filter_spec.hpp"
 #include "filter/massmatch/mass_match.hpp"
 #include "filter/mng/one_ptm_filter_mng.hpp"
 #include "ms/spec/prm_ms.hpp"
@@ -32,6 +33,13 @@ class OnePtmFilter {
                const OnePtmFilterMngPtr& mng_ptr, std::string block_str);
   void computeBestMatch(const PrmMsPtrVec& prm_ms_ptr_vec,
                         const PrmMsPtrVec& srm_ms_ptr_vec);
+
+  // the block independent part of a spectrum set, computed once per stage
+  static FilterSpecPtr geneFilterSpec(const PrmMsPtrVec& prm_ms_ptr_vec,
+                                     const PrmMsPtrVec& srm_ms_ptr_vec,
+                                     const OnePtmFilterMngPtr& mng_ptr);
+
+  void computeBestMatch(const FilterSpecPtr& spec_ptr);
 
   SimplePrsmPtrVec getCompMatchPtrs() { return comp_match_ptrs_; }
   SimplePrsmPtrVec getPrefMatchPtrs() { return pref_match_ptrs_; }

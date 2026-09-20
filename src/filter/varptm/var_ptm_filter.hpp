@@ -16,6 +16,7 @@
 #ifndef TOPPIC_FILTER_VARPTM_VAR_PTM_FILTER_HPP_
 #define TOPPIC_FILTER_VARPTM_VAR_PTM_FILTER_HPP_
 
+#include "filter/massmatch/filter_spec.hpp"
 #include "filter/massmatch/mass_match.hpp"
 #include "filter/mng/var_ptm_filter_mng.hpp"
 #include "ms/spec/prm_ms.hpp"
@@ -27,6 +28,13 @@ class VarPtmFilter {
  public:
   VarPtmFilter(const ProteoformPtrVec& proteo_ptrs,
                const VarPtmFilterMngPtr& mng_ptr, std::string block_str);
+
+  // the block independent part of a spectrum set, computed once per stage
+  static FilterSpecPtr geneFilterSpec(const PrmMsPtrVec& prm_ms_ptr_vec,
+                                     const PrmMsPtrVec& srm_ms_ptr_vec,
+                                     const VarPtmFilterMngPtr& mng_ptr);
+
+  void computeBestMatch(const FilterSpecPtr& spec_ptr);
 
   void computeBestMatch(const PrmMsPtrVec& prm_ms_ptr_vec,
                         const PrmMsPtrVec& srm_ms_ptr_vec);
