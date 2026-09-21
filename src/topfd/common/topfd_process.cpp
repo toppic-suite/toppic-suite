@@ -118,8 +118,16 @@ int process(const TopfdParaPtr& para_ptr,
   // init data, envelope base, envcnn model, and ecscore model
   base_data::init(para_ptr->getResourceDir());
   EnvBase::initBase(para_ptr->getResourceDir());
-  onnx_env_cnn::initModel(para_ptr->getResourceDir(), para_ptr->getThreadNum());
-  onnx_ecscore::initModel(para_ptr->getResourceDir(), para_ptr->getThreadNum());
+  // Both ONNX sessions run with one intra-op thread: the EnvCNN model is
+  // called concurrently from the deconvolution's worker threads (one call
+  // per spectrum), and the ECScore model once per candidate feature from the
+  // single feature-detection thread. With intra-op threads = -u, ONNX
+  // Runtime's pool (16 threads per session) oversubscribed the cores during
+  // the deconvolution and spun between the per-feature calls during the
+  // feature detection (toppic_test experiment 36).
+  int onnx_thread_num = 1;
+  onnx_env_cnn::initModel(para_ptr->getResourceDir(), onnx_thread_num);
+  onnx_ecscore::initModel(para_ptr->getResourceDir(), onnx_thread_num);
 
   for (const std::string& spec_file_name : spec_file_list) {
     if (!file_util::isValidMzmlFile(spec_file_name)) {
