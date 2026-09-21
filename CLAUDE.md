@@ -472,7 +472,11 @@ per-file runs, the cleanup and the `-c` merge all see monoisotopic files.
 `prsm_post_mass_match::sqlFileName` strips the `_mono` suffix so the post
 mass matching finds `<base>.sqlite` and still writes `<base>_post_ms2.*`.
 Do not convert masses inside `MsAlignReader` instead: the converted file
-is what every later step (and the user) sees.
+is what every later step (and the user) sees. GUI: `toppicwindow.ui` has
+`averageMassCheckBox` (Advanced Parameters tab, above the localization
+box; the keep-decoy row moved up to make room), read into
+`arguments_["averageMass"]`, and `gui/util/command.cpp` emits `-g` when it
+is checked.
 
 ## Precursor and fragment mass tolerances (`para/sp_para`)
 

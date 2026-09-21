@@ -1283,9 +1283,9 @@ level:</string>
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>210</y>
+        <y>184</y>
         <width>341</width>
-        <height>33</height>
+        <height>30</height>
        </rect>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_24">
@@ -1299,6 +1299,34 @@ level:</string>
          </property>
          <property name="text">
           <string>Keep decoy identifications</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="horizontalLayoutWidget_32">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>216</y>
+        <width>451</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_32">
+       <item>
+        <widget class="QCheckBox" name="averageMassCheckBox">
+         <property name="minimumSize">
+          <size>
+           <width>120</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>The spectrum files report average masses of precursor and fragment ions (TopFD run with --average-mass). Before the search, each file is converted to &lt;name&gt;_mono_ms2.msalign with monoisotopic masses, which is then searched.</string>
+         </property>
+         <property name="text">
+          <string>Spectrum files with average masses (TopFD --average-mass)</string>
          </property>
         </widget>
        </item>

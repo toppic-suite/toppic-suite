@@ -180,6 +180,7 @@ void ToppicWindow::on_defaultButton_clicked() {
   ui->postMinPeakNumEdit->setText(
       QString::fromStdString(arguments_["postMinPeakNum"]));
   ui->postMinPeakNumEdit->setEnabled(ui->postMassMatchCheckBox->isChecked());
+  ui->averageMassCheckBox->setChecked(arguments_["averageMass"] == "true");
 }
 
 void ToppicWindow::updatedir(QString s) {
@@ -406,6 +407,11 @@ std::map<std::string, std::string> ToppicWindow::getArguments() {
     arguments_["postMassMatch"] = "false";
   }
   arguments_["postMinPeakNum"] = ui->postMinPeakNumEdit->text().toStdString();
+  if (ui->averageMassCheckBox->isChecked()) {
+    arguments_["averageMass"] = "true";
+  } else {
+    arguments_["averageMass"] = "false";
+  }
   arguments_["localThreshold"] = ui->miscoreThresholdEdit->text().toStdString();
   arguments_["groupSpectrumNumber"] = ui->numCombinedEdit->text().toStdString();
   arguments_["localPtmFileName"] = ui->modFileEdit->text().toStdString();
@@ -525,6 +531,7 @@ void ToppicWindow::lockDialog() {
   ui->keepTempCheckBox->setEnabled(false);
   ui->postMassMatchCheckBox->setEnabled(false);
   ui->postMinPeakNumEdit->setEnabled(false);
+  ui->averageMassCheckBox->setEnabled(false);
 }
 
 void ToppicWindow::unlockDialog() {
@@ -578,6 +585,7 @@ void ToppicWindow::unlockDialog() {
   ui->keepTempCheckBox->setEnabled(true);
   ui->postMassMatchCheckBox->setEnabled(true);
   ui->postMinPeakNumEdit->setEnabled(ui->postMassMatchCheckBox->isChecked());
+  ui->averageMassCheckBox->setEnabled(true);
 }
 
 bool ToppicWindow::checkError() {
@@ -765,7 +773,8 @@ void ToppicWindow::showArguments() {
        "\nthreadNumber:" + arguments_["threadNumber"] + "\nuseFeatureFile:" +
        arguments_["useFeatureFile"] + "\npostMassMatch:" +
        arguments_["postMassMatch"] + "\npostMinPeakNum:" +
-       arguments_["postMinPeakNum"] + "\nskipList:" + arguments_["skipList"])
+       arguments_["postMinPeakNum"] + "\naverageMass:" +
+       arguments_["averageMass"] + "\nskipList:" + arguments_["skipList"])
           .c_str(),
       QMessageBox::Yes);
 }
