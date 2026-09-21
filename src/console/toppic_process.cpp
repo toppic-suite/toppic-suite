@@ -418,14 +418,21 @@ int TopPIC_multi_ptm_search(std::map<std::string, std::string>& arguments) {
     // The spectra the earlier stages identified are not searched again: a
     // spectrum is skipped when its best first-pass PrSM (toppic_raw_prsm,
     // targets and decoys alike) has an E-value strictly below the skip
-    // E-value (hidden --multi-skip-evalue, default 0.02, below the smallest
-    // decoy E-value seen so far, 0.033 on 480_F3_02): every spectrum a
-    // decoy could compete with is searched again, so the decoys of the
-    // final set are those of a full search, while the spectra no decoy can
-    // reach keep their first-pass PrSM (report 0024).
+    // E-value: hidden --multi-skip-evalue, by default 0.02 with a decoy
+    // database (below the smallest decoy E-value seen so far, 0.033 on
+    // 480_F3_02, so that every spectrum a decoy could compete with is
+    // searched again and the decoys of the final set are those of a full
+    // search) and 0.01 without one.
     std::string base_name = file_util::basename(sp_file_name);
     std::set<int> identified_spec_ids;
-    double skip_evalue = std::stod(arguments["multiSkipEvalue"]);
+    double skip_evalue;
+    if (arguments["multiSkipEvalue"] != "") {
+      skip_evalue = std::stod(arguments["multiSkipEvalue"]);
+    } else if (arguments["searchType"] == "TARGET+DECOY") {
+      skip_evalue = 0.02;
+    } else {
+      skip_evalue = 0.01;
+    }
     int skipped_target_num = 0;
     int skipped_decoy_num = 0;
     PrsmStrPtrVec first_ptrs =
