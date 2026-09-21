@@ -50,7 +50,7 @@ and saves time when the same database is searched repeatedly (see the
 For each spectrum file TopPIC prints its parameters and runs these steps.
 Intermediate files carry the spectrum file name plus a `.toppic_*`
 extension and are deleted at the end unless `--keep-temp-files` is given,
-except `sample_ms2.toppic_raw_prsm`, which is always kept.
+except `sample_ms2.toppic_all_raw_prsm`, which is always kept.
 
 1. **Zero unexpected shift filtering and search.** Protein candidates are
    selected with index-based filters and aligned to each spectrum without any
@@ -121,8 +121,7 @@ after `<name>_ms2`:
 | `sample_post_ms2_toppic_protein.tsv`, `..._protein_single.tsv` | One PrSM per identified protein (the best one), passing the protein-level cutoff. |
 | `sample_post_ms2_toppic_prsm.xml`, `..._proteoform.xml`, `..._protein.xml` | The same three sets of PrSMs in XML, read by TopDiff and the visualization tools. |
 | `sample.sqlite` | Updated with the tables `prsm`, `proteoform`, `protein`, `prsm_mass_shift`, `prsm_protein_match` and `fasta_seq`, for visualization. |
-| `sample_ms2.toppic_raw_prsm` | The PrSMs of the zero-shift, variable-PTM and one-shift searches before recounting and cutoffs. Always kept, even without `--keep-temp-files`; a later combined run (`-c`) reads it. |
-| `sample_ms2.toppic_all_raw_prsm` | With `--num-shift 2`: the best PrSM of every spectrum after the multiple-shift search, before recounting and cutoffs. Always kept; a combined run (`-c`) reads it instead of `toppic_raw_prsm` when every fraction has it. |
+| `sample_ms2.toppic_all_raw_prsm` | The best PrSM of every spectrum before recounting and cutoffs (after the multiple-shift search with `--num-shift 2`). Always kept, even without `--keep-temp-files`; a later combined run (`-c`) reads it. |
 
 The `_single` tables have one line per PrSM. The tables without `_single`
 add, after each PrSM, one line for every other protein that contains the
@@ -206,8 +205,7 @@ Cutoffs and output:
 post-matched on its own first (post mass matching needs the fraction's own
 TopFD SQLite database, and it is applied to the reported PrSMs only). The
 merge then takes, for every fraction, the TopFD spectra and the PrSMs before
-the cutoffs (`<fraction>_ms2.toppic_all_raw_prsm` when every fraction was
-searched with `--num-shift 2`, else `<fraction>_ms2.toppic_raw_prsm`) and
+the post-processing (`<fraction>_ms2.toppic_all_raw_prsm`) and
 repeats steps 8-12 and 14 on the merged data. Post mass matching is not
 applied to the merged file, which has no SQLite database. The combined
 results are always named `<name>_ms2_toppic_*`, and the merged spectra

@@ -83,9 +83,9 @@ namespace toppic {
 
 // post_sp_name is the spectrum file written by the post mass matching (on by
 // default; --disable-post-match turns it off), whose name the result files
-// carry; "" if it did not run. toppic_raw_prsm and, with -s 2,
-// toppic_all_raw_prsm (the best PrSM of every spectrum over both passes)
-// are always kept: a later combined run (-c) merges them.
+// carry; "" if it did not run. toppic_all_raw_prsm (the best PrSM of every
+// spectrum before the post-processing) is always kept: a later combined run
+// (-c) merges it.
 void cleanToppicDir(const std::string& fa_name, const std::string& sp_name,
                     bool keep_temp_files, const std::string& post_sp_name) {
   std::string abs_sp_name = file_util::absoluteName(sp_name);
@@ -142,6 +142,7 @@ void cleanToppicDir(const std::string& fa_name, const std::string& sp_name,
     file_util::delFile(sp_base + ".toppic_multi_skipped");
     file_util::delFile(sp_base + ".toppic_multi_evalue_all");
     file_util::delFile(sp_base + ".toppic_multi_raw_prsm");
+    file_util::delFile(sp_base + ".toppic_raw_prsm");
     file_util::delFile(sp_base + ".toppic_multi_shift");
     file_util::cleanPrefix(sp_name, sp_base + ".toppic_multi_shift_");
     file_util::delFile(sp_base + ".toppic_combined");
@@ -567,7 +568,9 @@ int TopPIC_multi_ptm_post(std::map<std::string, std::string>& arguments) {
     msalign_util::geneSpIndex(sp_file_name);
     std::string base_name = file_util::basename(sp_file_name);
 
-    std::string raw_ext = "toppic_raw_prsm";
+    // toppic_all_raw_prsm, the best PrSM of every spectrum before the
+    // post-processing, is the file a later combined run (-c) merges; it is
+    // the only PrSM file kept without -k (toppic_raw_prsm is deleted)
     if (std::filesystem::exists(base_name + ".toppic_multi_raw_prsm")) {
       std::cout << "Merging the first-pass and multiple-shift PrSMs - started."
                 << std::endl;
@@ -580,14 +583,17 @@ int TopPIC_multi_ptm_post(std::map<std::string, std::string>& arguments) {
       merge_ptr = nullptr;
       std::cout << "Merging the first-pass and multiple-shift PrSMs - finished."
                 << std::endl;
-      raw_ext = "toppic_all_raw_prsm";
+    } else {
+      file_util::copyFile(base_name + ".toppic_raw_prsm",
+                          base_name + ".toppic_all_raw_prsm", true);
     }
 
     std::cout << "Recounting matched masses and fragments - started."
               << std::endl;
     // the search counted only the masses above the EnvCNN cutoff; recount
     // against the full spectra
-    prsm_match_num_recount::process(prsm_para_ptr, raw_ext, "toppic_recount");
+    prsm_match_num_recount::process(prsm_para_ptr, "toppic_all_raw_prsm",
+                                    "toppic_recount");
     std::cout << "Recounting matched masses and fragments - finished."
               << std::endl;
 
@@ -846,23 +852,13 @@ int TopPICProgress_multi_file(std::map<std::string, std::string>& arguments,
           base_path + file_util::getFileSeparator() + merged_file_name;
     }
     // Post mass matching runs only on the reported PrSMs of a fraction, so
-    // the merge takes TopFD's spectra and the PrSMs before the cutoffs: with
-    // -s 2 the best PrSM of every spectrum over both passes
-    // (<frac>_ms2.toppic_all_raw_prsm, always kept, like toppic_raw_prsm),
-    // otherwise (or for fractions searched without -s 2 earlier) the
-    // first-pass toppic_raw_prsm. The merged file has no SQLite database, so
-    // post mass matching is not applied to the merged results.
-    bool use_all = true;
-    for (size_t k = 0; k < raw_file_list.size(); k++) {
-      if (!std::filesystem::exists(raw_file_list[k] +
-                                   "_ms2.toppic_all_raw_prsm")) {
-        use_all = false;
-        break;
-      }
-    }
+    // the merge takes TopFD's spectra and the PrSMs before the
+    // post-processing, <frac>_ms2.toppic_all_raw_prsm (always kept; the
+    // best PrSM of every spectrum over both passes with -s 2). The merged
+    // file has no SQLite database, so post mass matching is not applied to
+    // the merged results.
     std::string ms2_suffix = "_ms2.msalign";
-    std::string prsm_ext =
-        use_all ? "_ms2.toppic_all_raw_prsm" : "_ms2.toppic_raw_prsm";
+    std::string prsm_ext = "_ms2.toppic_all_raw_prsm";
     std::string para_str = "";
     std::cout << "Merging files started." << std::endl;
     std::cout << "Merging msalign files started." << std::endl;

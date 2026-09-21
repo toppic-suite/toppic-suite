@@ -417,10 +417,11 @@ the input. Facts to keep straight:
 - **Combined runs (`-c`) never post-match the merged file** (it has no
   SQLite database): `TopPICProgress_multi_file` forces `postMassMatch` to
   false for the merged post-processing. The merge uses TopFD's
-  `<frac>_ms2.msalign` and the PrSMs before the cutoffs:
-  `<frac>_ms2.toppic_all_raw_prsm` (the best PrSM of every spectrum over
-  both passes of a `-s 2` run) when every fraction has it, else
-  `<frac>_ms2.toppic_raw_prsm`; both are always kept by `cleanToppicDir`.
+  `<frac>_ms2.msalign` and `<frac>_ms2.toppic_all_raw_prsm`, the best PrSM
+  of every spectrum before the post-processing (over both passes of a
+  `-s 2` run; a copy of `toppic_raw_prsm` otherwise), the one PrSM file
+  `cleanToppicDir` always keeps (`toppic_raw_prsm` is deleted without
+  `-k`).
   `msalign_frac_merge::mergeFractions` takes the MS/MS file suffix. Combined
   results are always `<name>_ms2_toppic_*`.
 - **The multiple-shift stage runs after the first-pass top selection
