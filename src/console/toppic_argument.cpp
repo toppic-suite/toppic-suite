@@ -80,6 +80,7 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["useFeatureFile"] = "true";
   arguments["keepTempFiles"] = "false";
   arguments["keepDecoyResults"] = "false";
+  arguments["useFdrGroups"] = "false";
   arguments["combineResultOnly"] = "false";
   arguments["outputRawPrsmTable"] = "false";
   arguments["outputPrsmCoverage"] = "false";
@@ -163,6 +164,11 @@ void ToppicArgument::outputArguments(
     output << std::setw(gap) << std::left
            << "Use approximate spectra in protein filtering:" << sep
            << arguments["useApproxSpectra"] << std::endl;
+    if (arguments.at("useFdrGroups") == "true") {
+      output << std::setw(gap) << std::left
+             << "FDR computation:" << sep << "separate PrSM groups"
+             << std::endl;
+    }
     output << std::setw(gap) << std::left
            << "Variable modifications file name:" << sep
            << arguments["variablePtmFileName"] << std::endl;
@@ -519,6 +525,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "disable-zero-shift-prec-error", "")(
         "enable-one-shift-prec-error", "")(
         "enable-var-ptm-prec-error", "")(
+        "fdr-groups", "")(
         "disable-frag-mass-extension", "")(
         "frag-extend-min-mass", po::value<std::string>(&frag_extend_min_mass),
         "")(
@@ -708,6 +715,9 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
     }
     if (vm.count("keep-decoy-ids")) {
       arguments_["keepDecoyResults"] = "true";
+    }
+    if (vm.count("fdr-groups")) {
+      arguments_["useFdrGroups"] = "true";
     }
 
     if (vm.count("combine-result-only")) {
