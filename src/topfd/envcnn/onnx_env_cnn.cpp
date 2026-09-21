@@ -39,7 +39,11 @@ namespace {
 Ort::Env* env;
 Ort::SessionOptions* session_options;
 Ort::Session* session;
-int batch_size = 1024;
+// Envelopes per ONNX call. Smaller batches keep the layers' intermediate
+// tensors nearer the caches: on st_1 the inference thread time was 149 s
+// with 1,024, 137 s with 256, 139 s with 64 and 178 s with 16 (toppic_test
+// experiment 36). The per-envelope arithmetic does not depend on the batch.
+int batch_size = 256;
 std::vector<const char*> input_node_names = {"input"};
 std::vector<const char*> output_node_names = {"output"};
 
