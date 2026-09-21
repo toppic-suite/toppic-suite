@@ -90,7 +90,7 @@ FAIMS data `sample_<voltage>` per voltage level, e.g. `sample_-40`).
 | File | Contents |
 |---|---|
 | `sample_ms1.msalign` | Deconvoluted MS1 spectra (monoisotopic masses). |
-| `sample_ms2.msalign` | Deconvoluted MS/MS spectra with precursor information. **This is the input of TopPIC and TopMG.** |
+| `sample_ms2.msalign` | Deconvoluted MS/MS spectra with precursor information (monoisotopic masses; average masses with `-A`). **This is the input of TopPIC and TopMG.** |
 | `sample_ms1.feature` | Proteoform features detected in the LC-MS map: one line per feature with its mass, intensity, retention-time and scan range, charge range, apex and ECScore. |
 | `sample_ms2.feature` | The features assigned to each MS/MS spectrum (precursor mass, m/z, charge and intensity), one line per spectrum and feature. |
 | `sample_feature.xml` | The proteoform features in XML, with their per-charge envelope information; read by TopPIC and TopMG when they combine fractions (`-c`). |
@@ -104,7 +104,13 @@ msalign file itself, per voltage level for FAIMS data), `SPECTRUM_ID`,
 `PRECURSOR_MZ`, `PRECURSOR_CHARGE`, `PRECURSOR_MASS`, `PRECURSOR_INTENSITY`,
 `PRECURSOR_FEATURE_ID`, `DECONVOLUTED_MASS_NUMBER`) followed by one line per
 deconvoluted mass with four tab-separated columns: monoisotopic neutral
-mass, intensity, charge and score. When several features fall in the
+mass, intensity, charge and score. With `--average-mass` the MS/MS file
+reports average masses instead: each fragment mass, `PRECURSOR_MASS` and
+`PRECURSOR_MZ` are the intensity-weighted average mass (m/z) of the
+theoretical isotopic distribution of the monoisotopic mass, from the
+distribution table in `res/base_data/theo_patt.txt`; the parameter block
+says `Reported precursor and fragment masses: Average`, and TopPIC reads
+such a file with `--average-mass`. When several features fall in the
 isolation window of an MS/MS spectrum, those with at least a tenth of the
 strongest feature's intensity are all kept and the `PRECURSOR_*` values are
 separated by `:`. The parameters used are recorded as `#` comment lines at
@@ -129,6 +135,7 @@ Parameters that apply to both MS1 and MS/MS deconvolution:
 | `-u`, `--thread-number <int>` | 1 | Number of threads. Must not exceed the number of hardware threads; TopFD warns (but still runs) when the available memory looks too small for the requested number. |
 | `-o`, `--missing-level-one` | off | The file has no MS1 spectra: skip MS1 deconvolution and feature detection. |
 | `-N`, `--no-sql` | off | Do not write the `.sqlite` database. **Do not use it if TopPIC will search the spectra**: TopPIC's post mass matching, which is on by default, reads the centroided MS/MS peaks from this database and stops with an error when it is missing (see the [TopPIC manual](toppic_manual.md); `toppic --disable-post-match` is the alternative). |
+| `-A`, `--average-mass` | off | Report average masses instead of monoisotopic masses for the precursor and fragment ions in `sample_ms2.msalign` (section 1.3). The MS1 msalign file, the feature files and the SQLite database keep monoisotopic masses. Search such a file with `toppic --average-mass`. Also applies to `-T`. |
 | `-D`, `--sql-3d` | off | Also store the raw MS1 peaks for 3D visualisation in the `.sqlite` database: `PEAKS0` holds every MS1 peak and `PEAKS1`, `PEAKS2`, ... progressively down-sampled copies, with one `CONFIG` row per table. Cannot be combined with `--no-sql`; has no effect with `-T` or `-o`. In `topfd_gui`, the checkbox "Add MS1 peaks for 3D visualization" under "Additional settings" turns this on (it is greyed out while "Do not generate SQLite database" is checked). |
 | `-T`, `--text-peak-list` | off | The input is a text peak list (one MS/MS spectrum), not an mzML file; see section 2. |
 

@@ -34,6 +34,7 @@ SeedEnv::SeedEnv(const DeconvPeakPtr& peak_ptr) {
                                                  theo_env_ptr->getInte(i));
     peak_ptr_list_.push_back(p_ptr);
   }
+  updateAvgMz();
   // init for seed envelope
   spec_id_ = peak_ptr->getSpId();
   seed_inte_ = peak_ptr->getIntensity();
@@ -53,6 +54,7 @@ SeedEnv::SeedEnv(const SeedEnvPtr& env_ptr, int new_charge) {
     EnvPeakPtr p_ptr = std::make_shared<EnvPeak>(new_mz, i->getIntensity());
     peak_ptr_list_.push_back(p_ptr);
   }
+  updateAvgMz();
   // init for seed envelope
   spec_id_ = env_ptr->spec_id_;
   seed_inte_ = env_ptr->seed_inte_;
@@ -76,6 +78,7 @@ SeedEnv::SeedEnv(const SeedEnvPtr& env_ptr, EnvPeakPtrVec& peak_ptr_list) {
       peak_ptr_list_.push_back(peak_ptr_list[i]);
     }
   }
+  updateAvgMz();
   // init for seed envelope
   spec_id_ = env_ptr->spec_id_;
   seed_inte_ = env_ptr->seed_inte_;
@@ -91,6 +94,7 @@ SeedEnv::SeedEnv(const SeedEnvPtr& env_ptr) {
         std::make_shared<EnvPeak>(i->getPosition(), i->getIntensity());
     peak_ptr_list_.push_back(p_ptr);
   }
+  updateAvgMz();
   // init for seed envelope
   spec_id_ = env_ptr->spec_id_;
   seed_inte_ = env_ptr->seed_inte_;

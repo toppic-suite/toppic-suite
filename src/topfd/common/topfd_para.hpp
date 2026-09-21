@@ -69,6 +69,7 @@ class TopfdPara {
   bool isSql3d() const { return sql_3d_; }
   bool isKeepUnusedPeaks() const { return keep_unused_peaks_; }
   bool isOutputMultipleMass() const { return output_multiple_mass_; }
+  bool isOutputAvgMass() const { return output_avg_mass_; }
   bool isOutputCsvFeatureFile() const { return output_csv_feature_file_; }
   bool isOutputDpEnvs() const { return output_dp_envs_; }
   int getThreadNum() const { return thread_num_; }
@@ -119,6 +120,7 @@ class TopfdPara {
   }
   void setKeepUnusedPeaks(bool keep) { keep_unused_peaks_ = keep; }
   void setOutputMultipleMass(bool output) { output_multiple_mass_ = output; }
+  void setOutputAvgMass(bool output) { output_avg_mass_ = output; }
   void setOutputCsvFeatureFile(bool output) {
     output_csv_feature_file_ = output;
   }
@@ -226,6 +228,9 @@ class TopfdPara {
   // estimate min intensity using the method in Thrash.
   bool estimate_min_inte_ = true;
   bool output_multiple_mass_ = false;
+  // report average masses (not monoisotopic masses) of precursor and
+  // fragment ions in the MS/MS msalign file
+  bool output_avg_mass_ = false;
   bool output_match_env_ = false;
   // When true, dump the windowed candidate envelopes and the DP-selected
   // envelopes of every deconvoluted spectrum to win_envs.txt / dp_envs.txt

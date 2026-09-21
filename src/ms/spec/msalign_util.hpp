@@ -30,6 +30,10 @@ void geneSpIndex(const std::string& spectrum_file_name);
 // Get spectrum number information from the index file
 int getSpNum(const std::string& spectrum_file_name);
 
+// The parameter block (the comment lines before the first spectrum) of an
+// msalign file, without a trailing newline.
+std::string readParaStr(const std::string& spectrum_file_name);
+
 }  // namespace msalign_util
 
 }  // namespace toppic

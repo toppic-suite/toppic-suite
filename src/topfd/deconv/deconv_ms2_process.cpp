@@ -26,6 +26,7 @@
 #include "common/thread/simple_thread_pool.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
+#include "ms/env/avg_mass_util.hpp"
 #include "ms/env/match_env_util.hpp"
 #include "ms/feature/spec_feature_reader.hpp"
 #include "ms/mzml/mzml_ms_group_reader.hpp"
@@ -149,6 +150,11 @@ void deconvMsTwo(const MzmlMsPtr& ms_ptr, SpecFeaturePtrVec sp_feat_ptr_vec,
   // 4. Write to msalign file
   DeconvMsPtr deconv_ms_ptr =
       match_env_util::getDeconvMsPtr(header_ptr, deconv_envs);
+  if (topfd_para_ptr->isOutputAvgMass()) {
+    // the msalign file gets average masses; the SQLite record below keeps
+    // the envelopes with their monoisotopic masses
+    deconv_ms_ptr = avg_mass_util::getAvgMassMs(deconv_ms_ptr);
+  }
 
   std::thread::id thread_id = std::this_thread::get_id();
   int writer_id = pool_ptr->getId(thread_id);

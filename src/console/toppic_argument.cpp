@@ -84,6 +84,7 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["outputRawPrsmTable"] = "false";
   arguments["outputPrsmCoverage"] = "false";
   arguments["postMassMatch"] = "true";
+  arguments["averageMass"] = "false";
   arguments["postMinPeakNum"] = "1";
   arguments["zeroShiftPrecOneDaError"] = "true";
   arguments["oneShiftPrecOneDaError"] = "false";
@@ -106,6 +107,9 @@ void ToppicArgument::outputArguments(
          << arguments["oriDatabaseFileName"] << std::endl;
   output << std::setw(gap) << std::left << "Spectrum file:" << sep
          << arguments["spectrumFileName"] << std::endl;
+  output << std::setw(gap) << std::left << "Spectrum file masses:" << sep
+         << (arguments["averageMass"] == "true" ? "Average" : "Monoisotopic")
+         << std::endl;
   output << std::setw(gap) << std::left << "Number of combined spectra:" << sep
          << arguments["groupSpectrumNumber"] << std::endl;
   output << std::setw(gap) << std::left << "Fragmentation method:" << sep
@@ -461,7 +465,12 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
             "post-min-peak-num,I", po::value<std::string>(&post_min_peak_num),
             "<a positive integer>. Minimum number of observed isotopic peaks "
             "of a fragment mass matched by the post mass matching. Default "
-            "value: 1.");
+            "value: 1.")(
+            "average-mass,g",
+            "The spectrum files report average masses of precursor and "
+            "fragment ions (topfd --average-mass). Before the search, each "
+            "file is converted to <name>_mono_ms2.msalign with monoisotopic "
+            "masses, which is then searched.");
 
     po::options_description desc("Options");
 
@@ -506,6 +515,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "output-raw-prsm-table,o", "")("output-prsm-coverage,O", "")(
         "disable-post-match,D", "")(
         "post-min-peak-num,I", po::value<std::string>(&post_min_peak_num), "")(
+        "average-mass,g", "")(
         "disable-zero-shift-prec-error", "")(
         "enable-one-shift-prec-error", "")(
         "enable-var-ptm-prec-error", "")(
@@ -718,6 +728,9 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
 
     if (vm.count("post-min-peak-num")) {
       arguments_["postMinPeakNum"] = post_min_peak_num;
+    }
+    if (vm.count("average-mass")) {
+      arguments_["averageMass"] = "true";
     }
     if (vm.count("disable-zero-shift-prec-error")) {
       arguments_["zeroShiftPrecOneDaError"] = "false";

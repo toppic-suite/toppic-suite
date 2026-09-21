@@ -452,6 +452,32 @@ the input. Facts to keep straight:
   collided with `--proteoform-ppm-error`). Every option is declared twice
   (the visible `display_desc` and the full parse `desc`); change both.
 
+## Average masses in msalign files (`ms/env/avg_mass_util`)
+
+`topfd --average-mass` (`-A`, `TopfdPara::output_avg_mass_`) writes the
+MS/MS msalign file with average masses: `deconv_ms2_process::deconvMsTwo`
+and `topfd_single_process` pass the `DeconvMs` through
+`avg_mass_util::getAvgMassMs` just before `MsAlignWriter::writeMs`, which
+copies the header (precursor m/z and mass) and the peaks with every
+monoisotopic mass replaced by `EnvBase::convertMonoMassToAvgMass` (the
+intensity-weighted average of the `theo_patt.txt` distribution, cached in
+`Env::avg_mz_`). The SQLite record, the feature files and the MS1 file keep
+monoisotopic masses. `toppic --average-mass` (`-g`, argument key
+`averageMass`) converts each input file in `TopPICProgress_multi_file`,
+before any search, with `avg_mass_util::convertToMonoMass` to
+`<base>_mono_ms2.msalign` (`EnvBase::convertAvgMassToMonoMass` inverts the
+table by fixed-point iteration; the feature file is copied to the new
+name) and replaces the spectrum file list with the converted names, so the
+per-file runs, the cleanup and the `-c` merge all see monoisotopic files.
+`prsm_post_mass_match::sqlFileName` strips the `_mono` suffix so the post
+mass matching finds `<base>.sqlite` and still writes `<base>_post_ms2.*`.
+Do not convert masses inside `MsAlignReader` instead: the converted file
+is what every later step (and the user) sees. GUI: `toppicwindow.ui` has
+`averageMassCheckBox` (Advanced Parameters tab, above the localization
+box; the keep-decoy row moved up to make room), read into
+`arguments_["averageMass"]`, and `gui/util/command.cpp` emits `-g` when it
+is checked.
+
 ## Precursor and fragment mass tolerances (`para/sp_para`)
 
 `SpPara` holds two `PeakTolerance` objects, `prec_tolerance_ptr_` and

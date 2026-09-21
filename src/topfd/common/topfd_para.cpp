@@ -251,6 +251,8 @@ std::string TopfdPara::getTopfdParaStr(const std::string& prefix,
       << ms2_env_cnn_score_cutoff_ << std::endl;
   kv("Filtering fragments using estimated fragment number:")
       << (aa_num_based_filter_ ? "Yes" : "No") << std::endl;
+  kv("Reported precursor and fragment masses:")
+      << (output_avg_mass_ ? "Average" : "Monoisotopic") << std::endl;
 
   return output.str();
 }
