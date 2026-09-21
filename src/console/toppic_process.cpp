@@ -668,8 +668,15 @@ int TopPIC_multi_ptm_post(std::map<std::string, std::string>& arguments) {
 
     if (arguments["searchType"] == "TARGET+DECOY") {
       std::cout << "FDR computation - started. " << std::endl;
-      prsm_fdr::process(sp_file_name, cur_suffix, "toppic_cluster_fdr",
-                        arguments["keepDecoyResults"]);
+      if (arguments["useFdrGroups"] == "true") {
+        // hidden option --fdr-groups: separate FDRs for the PrSM groups
+        // (0 shifts without/with variable PTMs, 1 shift, 2 shifts)
+        prsm_fdr_groups::process(sp_file_name, cur_suffix, "toppic_cluster_fdr",
+                                 arguments["keepDecoyResults"]);
+      } else {
+        prsm_fdr::process(sp_file_name, cur_suffix, "toppic_cluster_fdr",
+                          arguments["keepDecoyResults"]);
+      }
       std::cout << "FDR computation - finished." << std::endl;
       cur_suffix = "toppic_cluster_fdr";
     }
