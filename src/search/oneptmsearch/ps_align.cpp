@@ -88,49 +88,80 @@ void PsAlign::initDpPair() {
   last_pair_ptr_->setDiagPrevPairPtr(nullptr);
   dp_pair_ptrs_.push_back(last_pair_ptr_);
   std::sort(dp_pair_ptrs_.begin(), dp_pair_ptrs_.end(), Pair::cmpPosInc);
-  // init indexes
-  for (size_t i = 0; i < dp_pair_ptrs_.size(); i++) {
-    std::vector<int> ends(diagonal_ptrs_.size(), -1);
-    std::vector<bool> large_shifts(diagonal_ptrs_.size(), false);
-    DpPairPtr cur_pair_ptr = dp_pair_ptrs_[i];
-    if (cur_pair_ptr == last_pair_ptr_ || cur_pair_ptr == first_pair_ptr_) {
+  // init indexes. The scan over all previous pairs for every pair is the
+  // hot loop of the multiple-shift search; it reads only the position and
+  // the diagonal of each pair and a per-diagonal-pair shift test, so those
+  // are flattened into plain arrays first. The shift between two pairs
+  // depends only on their diagonals, not on the pairs, and calling the
+  // shared_ptr getters inside the loop cost four atomic reference count
+  // updates per visited pair.
+  size_t pair_num = dp_pair_ptrs_.size();
+  size_t diag_num = diagonal_ptrs_.size();
+  std::vector<int> pair_xs(pair_num);
+  std::vector<int> pair_ys(pair_num);
+  // the diagonal of each pair; -1 for the first and last pair
+  std::vector<int> pair_diags(pair_num);
+  for (size_t i = 0; i < pair_num; i++) {
+    const DpPairPtr& pair_ptr = dp_pair_ptrs_[i];
+    pair_xs[i] = pair_ptr->getX();
+    pair_ys[i] = pair_ptr->getY();
+    if (pair_ptr == first_pair_ptr_ || pair_ptr == last_pair_ptr_) {
+      pair_diags[i] = -1;
+    } else {
+      pair_diags[i] = pair_ptr->getDiagHeader()->getId();
+    }
+  }
+  // shift_allowed[prev][cur]: the shift from diagonal prev to diagonal cur
+  // is inside [align_min_shift_, align_max_shift_] and the diagonals differ;
+  // shift_large[prev][cur]: its absolute value is above the penalty
+  // threshold
+  std::vector<double> diag_shifts(diag_num);
+  for (size_t d = 0; d < diag_num; d++) {
+    diag_shifts[d] = diagonal_ptrs_[d]->getHeader()->getProtNTermShift();
+  }
+  std::vector<std::vector<char>> shift_allowed(
+      diag_num, std::vector<char>(diag_num, 0));
+  std::vector<std::vector<char>> shift_large(
+      diag_num, std::vector<char>(diag_num, 0));
+  for (size_t prev = 0; prev < diag_num; prev++) {
+    for (size_t cur = 0; cur < diag_num; cur++) {
+      if (prev == cur) {
+        continue;
+      }
+      double shift = diag_shifts[cur] - diag_shifts[prev];
+      if (shift > para_ptr_->align_max_shift_ ||
+          shift < para_ptr_->align_min_shift_) {
+        continue;
+      }
+      shift_allowed[prev][cur] = 1;
+      if (std::abs(shift) > para_ptr_->align_large_shift_thresh_) {
+        shift_large[prev][cur] = 1;
+      }
+    }
+  }
+  for (size_t i = 0; i < pair_num; i++) {
+    std::vector<int> ends(diag_num, -1);
+    std::vector<bool> large_shifts(diag_num, false);
+    int cur_diag = pair_diags[i];
+    if (cur_diag < 0) {
+      // the first and last pair
       idxes_.push_back(ends);
       penalties_.push_back(large_shifts);
       continue;
     }
-    int cur_x = cur_pair_ptr->getX();
-    int cur_y = cur_pair_ptr->getY();
-
+    int cur_x = pair_xs[i];
+    int cur_y = pair_ys[i];
     // cur pair is not last pair
-    // first pair can not shift, so q starts from 1
+    // first pair can not shift, so j starts from 1
     for (size_t j = 1; j < i; j++) {
-      DpPairPtr prev_pair_ptr = dp_pair_ptrs_[j];
-
-      int prev_x = prev_pair_ptr->getX();
-
-      int prev_y = prev_pair_ptr->getY();
-
-      double prev_pair_nterm_shift =
-          prev_pair_ptr->getDiagHeader()->getProtNTermShift();
-
-      double cur_pair_nterm_shift =
-          cur_pair_ptr->getDiagHeader()->getProtNTermShift();
-
-      double shift = cur_pair_nterm_shift - prev_pair_nterm_shift;
-
-      if (prev_x >= cur_x || prev_y >= cur_y ||
-          prev_pair_ptr->getDiagHeader() == cur_pair_ptr->getDiagHeader() ||
-          shift > para_ptr_->align_max_shift_ ||
-          shift < para_ptr_->align_min_shift_) {
+      int prev_diag = pair_diags[j];
+      if (prev_diag < 0 || pair_xs[j] >= cur_x || pair_ys[j] >= cur_y ||
+          !shift_allowed[prev_diag][cur_diag]) {
         continue;
       }
-
-      int diag_id = prev_pair_ptr->getDiagHeader()->getId();
-
-      ends[diag_id] = j;
-
-      if (std::abs(shift) > para_ptr_->align_large_shift_thresh_) {
-        large_shifts[diag_id] = true;
+      ends[prev_diag] = j;
+      if (shift_large[prev_diag][cur_diag]) {
+        large_shifts[prev_diag] = true;
       }
     }
     idxes_.push_back(ends);
