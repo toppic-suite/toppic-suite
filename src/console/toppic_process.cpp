@@ -416,46 +416,19 @@ int TopPIC_multi_ptm_search(std::map<std::string, std::string>& arguments) {
 
     // The spectra the earlier stages identified are not searched again: a
     // spectrum is skipped when its best first-pass PrSM (toppic_raw_prsm,
-    // targets and decoys alike) has an E-value strictly below the smallest
-    // E-value of a first-pass decoy PrSM. Every spectrum a decoy could
-    // compete with is searched again, so the decoys of the final set are
-    // those of a full search, while the spectra no decoy can reach keep
-    // their first-pass PrSM (report 0024). Without a decoy PrSM the
-    // threshold is the spectrum-level E-value cutoff when one is given,
-    // otherwise nothing is skipped. The hidden --multi-skip-evalue <x>
-    // replaces the threshold for experiments.
+    // targets and decoys alike) has an E-value strictly below the skip
+    // E-value (hidden --multi-skip-evalue, default 0.02, below the smallest
+    // decoy E-value seen so far, 0.033 on 480_F3_02): every spectrum a
+    // decoy could compete with is searched again, so the decoys of the
+    // final set are those of a full search, while the spectra no decoy can
+    // reach keep their first-pass PrSM (report 0024).
     std::string base_name = file_util::basename(sp_file_name);
     std::set<int> identified_spec_ids;
-    double skip_evalue = 0;
-    std::string skip_source;
+    double skip_evalue = std::stod(arguments["multiSkipEvalue"]);
     int skipped_target_num = 0;
     int skipped_decoy_num = 0;
     PrsmStrPtrVec first_ptrs =
         prsm_reader_util::readAllPrsmStrs(base_name + ".toppic_raw_prsm");
-    if (arguments["multiSkipEvalue"] != "") {
-      skip_evalue = std::stod(arguments["multiSkipEvalue"]);
-      skip_source = "--multi-skip-evalue";
-    } else {
-      bool has_decoy = false;
-      skip_evalue = std::numeric_limits<double>::max();
-      for (size_t i = 0; i < first_ptrs.size(); i++) {
-        if (first_ptrs[i]->getSeqName().find("DECOY_") == 0) {
-          has_decoy = true;
-          if (first_ptrs[i]->getEValue() < skip_evalue) {
-            skip_evalue = first_ptrs[i]->getEValue();
-          }
-        }
-      }
-      if (has_decoy) {
-        skip_source = "the smallest E-value of a first-pass decoy PrSM";
-      } else if (arguments["cutoffSpectralType"] == "EVALUE") {
-        std::istringstream(arguments["cutoffSpectralValue"]) >> skip_evalue;
-        skip_source = "the spectrum-level E-value cutoff, no decoy PrSM";
-      } else {
-        skip_evalue = 0;
-        skip_source = "no decoy PrSM and no E-value cutoff: all spectra";
-      }
-    }
     for (size_t i = 0; i < first_ptrs.size(); i++) {
       if (first_ptrs[i]->getEValue() < skip_evalue) {
         int spec_id = first_ptrs[i]->getSpectrumId();
@@ -472,8 +445,8 @@ int TopPIC_multi_ptm_search(std::map<std::string, std::string>& arguments) {
               << identified_spec_ids.size()
               << " spectra identified by the earlier stages are skipped ("
               << skipped_target_num << " target, " << skipped_decoy_num
-              << " decoy; first-pass E-value < " << skip_evalue << ", "
-              << skip_source << ")." << std::endl;
+              << " decoy; first-pass E-value < " << skip_evalue << ")."
+              << std::endl;
 
     std::vector<std::string> input_exts;
     {

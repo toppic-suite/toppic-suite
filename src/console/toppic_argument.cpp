@@ -90,7 +90,7 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["varPtmPrecOneDaError"] = "false";
   arguments["fragMassExtension"] = "true";
   arguments["fragExtendMinMass"] = "5000";
-  arguments["multiSkipEvalue"] = "";
+  arguments["multiSkipEvalue"] = "0.02";
 
   arguments["version"] = "";
   return arguments;
@@ -1106,18 +1106,16 @@ bool ToppicArgument::validateArguments() {
   }
 
   std::string multi_skip_evalue = arguments_["multiSkipEvalue"];
-  if (multi_skip_evalue != "") {
-    try {
-      if (std::stod(multi_skip_evalue) < 0) {
-        LOG_ERROR("Multiple-shift skip E-value " << multi_skip_evalue
-                                                 << " should not be negative.");
-        return false;
-      }
-    } catch (const std::exception& ex) {
+  try {
+    if (std::stod(multi_skip_evalue) < 0) {
       LOG_ERROR("Multiple-shift skip E-value " << multi_skip_evalue
-                                               << " should be a number.");
+                                               << " should not be negative.");
       return false;
     }
+  } catch (const std::exception& ex) {
+    LOG_ERROR("Multiple-shift skip E-value " << multi_skip_evalue
+                                             << " should be a number.");
+    return false;
   }
 
   return true;
