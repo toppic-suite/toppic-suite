@@ -30,6 +30,19 @@ class MsMap {
         const MsHeaderPtrVec& ms1_header_ptr_vec, double bin_size,
         double sn_ratio, bool single_scan_noise);
 
+  // Windowed construction: compute the global statistics from compact
+  // per-scan peak arrays and create all rows hollow; peak data is
+  // materialized per row with fillRow and released with evictRow.
+  MsMap(const std::vector<std::vector<double>>& mz_2d,
+        const std::vector<std::vector<double>>& inte_2d,
+        const MsHeaderPtrVec& ms1_header_ptr_vec, double bin_size);
+
+  void fillRow(int row_id, const std::vector<double>& mz,
+               const std::vector<double>& inte, double sn_ratio,
+               bool single_scan_noise, double neighbor_mz_tole);
+
+  void evictRow(int row_id);
+
   int getColNum() const { return col_num_; }
 
   int getRowNum() const { return row_ptr_list_.size(); }
