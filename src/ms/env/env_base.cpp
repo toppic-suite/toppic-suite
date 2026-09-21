@@ -30,10 +30,11 @@ EnvBasePtr EnvBase::env_base_ptr_;
 
 EnvBase::EnvBase(std::string file_name, int entry_num, double mass_interval)
     : entry_num_(entry_num), mass_interval_(mass_interval) {
+  file_util::checkResourceFile(file_name);
   std::ifstream input;
   input.open(file_name.c_str(), std::ios::in);
   if (!input.is_open()) {
-    LOG_ERROR("Env file  " << file_name << " does not exist.");
+    LOG_ERROR("Env file  " << file_name << " cannot be opened.");
     exit(EXIT_FAILURE);
   }
   for (int i = 0; i < entry_num_; i++) {

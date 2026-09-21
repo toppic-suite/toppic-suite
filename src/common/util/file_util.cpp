@@ -17,6 +17,7 @@
 
 #include <algorithm>
 #include <cctype>
+#include <cstdlib>
 #include <filesystem>
 #include <fstream>
 #include <iterator>
@@ -315,6 +316,13 @@ bool isValidMzmlFile(const std::string& file_name) {
          str_util::endsWith(file_name, "mzXML") ||
          str_util::endsWith(file_name, "mzml") ||
          str_util::endsWith(file_name, "mzxml");
+}
+
+void checkResourceFile(const std::string& file_name) {
+  if (!fs::exists(file_name)) {
+    LOG_ERROR("The resource file " << file_name << " does not exist!");
+    exit(EXIT_FAILURE);
+  }
 }
 
 }  // namespace file_util

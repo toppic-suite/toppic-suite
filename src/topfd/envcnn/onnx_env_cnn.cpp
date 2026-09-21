@@ -60,6 +60,7 @@ void initModel(const std::string& dir_name, int thread_num,
   std::string file_name = dir_name + file_util::getFileSeparator() +
                           "envcnn_models" + file_util::getFileSeparator() +
                           "envcnn_two_block.onnx";
+  file_util::checkResourceFile(file_name);
   // a session may be replaced between stages (topfd_process)
   delete session;
   delete session_options;
