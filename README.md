@@ -68,6 +68,10 @@ sudo apt-get install build-essential cmake clang git git-lfs \
     qt6-base-dev
 ```
 
+The same packages can be installed with the script
+[`scripts/install_ubuntu_packages.sh`](scripts/install_ubuntu_packages.sh)
+(run `scripts/install_ubuntu_packages.sh` from the repository root).
+
 Notes:
 
 - The build defaults to **clang/clang++** when they are found; if clang is not
