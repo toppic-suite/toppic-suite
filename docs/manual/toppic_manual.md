@@ -69,8 +69,9 @@ except `sample_ms2.toppic_all_raw_prsm`, which is always kept.
 6. **Top PrSM selection.** The best PrSM of each spectrum is kept.
 7. **Multiple unexpected shifts filtering and search** (with `--num-shift`
    2): alignment allowing two unexpected shifts, only for the spectra whose
-   best PrSM so far has an E-value of 0.02 or more (0.01 or more without
-   `--decoy`); the spectra with a better PrSM keep it. The new PrSMs are merged, get E-values, and,
+   best PrSM so far has an E-value at or above the smallest E-value of a
+   decoy PrSM (every spectrum a decoy could compete with is searched
+   again; 0.01 without `--decoy`); the spectra with a better PrSM keep it. The new PrSMs are merged, get E-values, and,
    together with the earlier PrSMs of the searched spectra, the best PrSM per
    spectrum is kept.
 8. **Recounting matched masses and fragments.** The search uses only the

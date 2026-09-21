@@ -1105,8 +1105,8 @@ bool ToppicArgument::validateArguments() {
     return false;
   }
 
-  // empty: the default of the multiple-shift stage (0.02 with decoys, 0.01
-  // without)
+  // empty: the default of the multiple-shift stage (the smallest decoy
+  // E-value with a decoy database, 0.01 without)
   std::string multi_skip_evalue = arguments_["multiSkipEvalue"];
   if (multi_skip_evalue != "") {
     try {

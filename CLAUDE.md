@@ -428,10 +428,10 @@ the input. Facts to keep straight:
   (`TopPIC_identify` → `TopPIC_multi_ptm_search` → `TopPIC_multi_ptm_post`,
   no `TopPIC_post` any more).** `TopPIC_multi_ptm_search` reads
   `toppic_raw_prsm`, skips the spectra whose best PrSM has an E-value
-  strictly below the skip E-value (hidden `--multi-skip-evalue <x>`; by
-  default 0.02 with `-d`, chosen below the smallest decoy E-value observed
-  so that every spectrum a decoy could compete with is searched again, and
-  0.01 without a decoy database), searches the
+  strictly below the skip E-value (with `-d` the smallest E-value of a
+  decoy PrSM of the first pass, so that every spectrum a decoy could
+  compete with is searched again; 0.01 without a decoy database; the
+  hidden `--multi-skip-evalue <x>` overrides both), searches the
   rest (`DiagFilterMng::skip_spec_ids_`), and keeps the best of the
   first-pass and multiple-shift PrSMs per searched spectrum
   (`toppic_multi_raw_prsm`); the skipped spectra's PrSMs go to
