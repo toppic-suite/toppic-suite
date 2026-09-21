@@ -90,9 +90,7 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["varPtmPrecOneDaError"] = "false";
   arguments["fragMassExtension"] = "true";
   arguments["fragExtendMinMass"] = "5000";
-  arguments["multiSkipEvalueRatio"] = "1";
-  arguments["multiSkipEvalue"] = "";
-  arguments["multiSkipEvalueDecoy"] = "false";
+  arguments["multiSkipEvalue"] = "0.02";
 
   arguments["version"] = "";
   return arguments;
@@ -327,7 +325,6 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
   std::string top_prsm_number = "";
   std::string post_min_peak_num = "";
   std::string frag_extend_min_mass = "";
-  std::string multi_skip_evalue_ratio = "";
   std::string multi_skip_evalue = "";
 
   /** Define and parse the program options*/
@@ -515,10 +512,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "disable-frag-mass-extension", "")(
         "frag-extend-min-mass", po::value<std::string>(&frag_extend_min_mass),
         "")(
-        "multi-skip-evalue-ratio",
-        po::value<std::string>(&multi_skip_evalue_ratio), "")(
         "multi-skip-evalue", po::value<std::string>(&multi_skip_evalue), "")(
-        "multi-skip-evalue-decoy", "")(
         "filtering-result-number",
         po::value<std::string>(&filtering_result_num),
         "Filtering result number. Default value: 20.")(
@@ -740,14 +734,8 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
     if (vm.count("frag-extend-min-mass")) {
       arguments_["fragExtendMinMass"] = frag_extend_min_mass;
     }
-    if (vm.count("multi-skip-evalue-ratio")) {
-      arguments_["multiSkipEvalueRatio"] = multi_skip_evalue_ratio;
-    }
     if (vm.count("multi-skip-evalue")) {
       arguments_["multiSkipEvalue"] = multi_skip_evalue;
-    }
-    if (vm.count("multi-skip-evalue-decoy")) {
-      arguments_["multiSkipEvalueDecoy"] = "true";
     }
 
     if (vm.count("filtering-result-number")) {
@@ -1117,32 +1105,17 @@ bool ToppicArgument::validateArguments() {
     return false;
   }
 
-  std::string multi_skip_evalue_ratio = arguments_["multiSkipEvalueRatio"];
+  std::string multi_skip_evalue = arguments_["multiSkipEvalue"];
   try {
-    if (std::stod(multi_skip_evalue_ratio) < 0) {
-      LOG_ERROR("Multiple-shift skip E-value ratio "
-                << multi_skip_evalue_ratio << " should not be negative.");
+    if (std::stod(multi_skip_evalue) < 0) {
+      LOG_ERROR("Multiple-shift skip E-value " << multi_skip_evalue
+                                               << " should not be negative.");
       return false;
     }
   } catch (const std::exception& ex) {
-    LOG_ERROR("Multiple-shift skip E-value ratio "
-              << multi_skip_evalue_ratio << " should be a number.");
+    LOG_ERROR("Multiple-shift skip E-value " << multi_skip_evalue
+                                             << " should be a number.");
     return false;
-  }
-
-  std::string multi_skip_evalue = arguments_["multiSkipEvalue"];
-  if (multi_skip_evalue != "") {
-    try {
-      if (std::stod(multi_skip_evalue) < 0) {
-        LOG_ERROR("Multiple-shift skip E-value " << multi_skip_evalue
-                                                 << " should not be negative.");
-        return false;
-      }
-    } catch (const std::exception& ex) {
-      LOG_ERROR("Multiple-shift skip E-value " << multi_skip_evalue
-                                               << " should be a number.");
-      return false;
-    }
   }
 
   return true;

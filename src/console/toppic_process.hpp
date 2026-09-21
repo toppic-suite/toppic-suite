@@ -27,13 +27,12 @@ int TopPICProgress(std::map<std::string, std::string>& arguments);
 // protein filtering + database searching + E-value computation
 int TopPIC_identify(std::map<std::string, std::string>& arguments);
 
-// proteoform clustering + FDR + HTML generation
-int TopPIC_post(std::map<std::string, std::string>& arguments);
-
-// the multiple unexpected shifts stage on the spectra without a first-pass
-// identification, and its post-processing with the union of the results
+// the multiple unexpected shifts stage (-s 2) on the spectra whose first-pass
+// PrSM no decoy PrSM could compete with
 int TopPIC_multi_ptm_search(std::map<std::string, std::string>& arguments);
 
+// recounting, clustering, PTM characterization, FDR, cutoffs, post mass
+// matching and outputs on the best PrSM of every spectrum
 int TopPIC_multi_ptm_post(std::map<std::string, std::string>& arguments);
 
 int TopPICProgress_multi_file(std::map<std::string, std::string>& arguments,
