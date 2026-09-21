@@ -169,6 +169,7 @@ void processMs1Windowed(const TopfdParaPtr& topfd_para_ptr) {
   }
 
   /// Extract Features
+  env_coll_util::EnvCollRtCache rt_cache;
   LOG_DEBUG("Number of seed envelopes: " << seed_ptrs.size());
   int seed_num = seed_ptrs.size();
   int count = 0;
@@ -193,7 +194,7 @@ void processMs1Windowed(const TopfdParaPtr& topfd_para_ptr) {
       if (env_coll_ptr == nullptr) continue;
       if (env_coll_util::checkExistingFeatures(matrix_ptr, env_coll_ptr,
                                                env_coll_list, score_para_ptr,
-                                               sn_ratio)) {
+                                               sn_ratio, &rt_cache)) {
         env_coll_ptr->removePeakData(matrix_ptr);
         continue;
       }
@@ -217,6 +218,7 @@ void processMs1Windowed(const TopfdParaPtr& topfd_para_ptr) {
     score_para_ptr->min_scan_num_ = 1;
     score_para_ptr->min_match_peak_ = 1;
     sn_ratio = 0;
+    rt_cache.clear();
     // rematerialize rows with sn 0 and no neighbor filter, window by window
     // (the whole-run implementation reconstructs the full matrix here; a
     // refilled row restores the original peak intensities, while reconstruct
@@ -273,7 +275,7 @@ void processMs1Windowed(const TopfdParaPtr& topfd_para_ptr) {
         if (env_coll_ptr == nullptr) continue;
         if (env_coll_util::checkExistingFeatures(matrix_ptr, env_coll_ptr,
                                                  env_coll_list, score_para_ptr,
-                                                 sn_ratio)) {
+                                                 sn_ratio, &rt_cache)) {
           env_coll_ptr->removePeakData(matrix_ptr);
           continue;
         }
