@@ -44,11 +44,27 @@ class MsMapRow {
     peak_ptr_2d_[idx].push_back(peak_ptr);
   }
 
-  const MsMapPeakPtrVec& getPeakPtrVec(int i) const { return peak_ptr_2d_[i]; }
+  const MsMapPeakPtrVec& getPeakPtrVec(int i) const {
+    if (peak_ptr_2d_.empty()) {
+      // hollow row of a windowed matrix: no peak data resident
+      return emptyPeakVec();
+    }
+    return peak_ptr_2d_[i];
+  }
 
   void setPeakPtrVec(int i, const MsMapPeakPtrVec& peak_ptr_vec) {
+    if (peak_ptr_2d_.empty()) {
+      return;
+    }
     peak_ptr_2d_[i] = peak_ptr_vec;
   }
+
+  // windowed matrix support: (re)allocate or release this row's bins
+  void fillBins(int bin_num) { peak_ptr_2d_.assign(bin_num, MsMapPeakPtrVec()); }
+  void dropBins() { MsMapPeakPtr2D().swap(peak_ptr_2d_); }
+  bool isHollow() const { return peak_ptr_2d_.empty(); }
+
+  static const MsMapPeakPtrVec& emptyPeakVec();
 
   void clearPeaks();
 

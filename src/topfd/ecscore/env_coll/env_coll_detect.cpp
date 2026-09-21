@@ -27,6 +27,8 @@
 #include "ms/msmap/ms_map.hpp"
 #include "ms/mzml/mzml_ms_group_reader.hpp"
 #include "ms/spec/deconv_ms.hpp"
+#include <cstdlib>
+
 #include "ms/spec/ms_header.hpp"
 #include "ms/spec/msalign_reader_util.hpp"
 #include "topfd/common/topfd_para.hpp"
@@ -43,8 +45,299 @@ namespace toppic {
 
 namespace env_coll_detect {
 
+
+// Windowed variant of processMs1 (enabled with TOPFD_MS1_WINDOW=1): the raw
+// peaks are kept only as compact m/z + intensity arrays, and the peak matrix
+// holds materialized rows only for a sliding retention-time window. Seeds are
+// processed window by window (intensity order inside a window) instead of in
+// one global intensity order, so results can differ slightly from the
+// whole-run implementation near window boundaries.
+void processMs1Windowed(const TopfdParaPtr& topfd_para_ptr) {
+  EcscoreParaPtr score_para_ptr = std::make_shared<EcscorePara>(
+      topfd_para_ptr->getFracId(), topfd_para_ptr->getMzmlFileName(),
+      topfd_para_ptr->getMaxCharge(), topfd_para_ptr->getMs1MinScanNum());
+  score_para_ptr->seed_env_inte_corr_tole_cutoff_ =
+      topfd_para_ptr->getSeedEnvInteCorrToleCutoff();
+  // read deconvoluted MS1 peaks
+  std::string output_base_name = topfd_para_ptr->getOutputBaseName();
+  std::string ms1_file_name = output_base_name + "_ms1.msalign";
+  DeconvMsPtrVec deconv_ms1_ptr_vec;
+  msalign_reader_util::readAllSpectra(ms1_file_name, deconv_ms1_ptr_vec);
+
+  // read ms1 raw peaks incrementally into compact arrays and ms2 headers
+  std::vector<std::vector<double>> mz_2d;
+  std::vector<std::vector<double>> inte_2d;
+  MsHeaderPtr2D ms2_header_ptr_2d;
+  {
+    MzmlMsGroupReaderPtr mzml_reader_ptr = std::make_shared<MzmlMsGroupReader>(
+        topfd_para_ptr->getMzmlFileName(), topfd_para_ptr->getPrecWindowWidth(),
+        topfd_para_ptr->getActivation(), topfd_para_ptr->getFracId(),
+        topfd_para_ptr->isFaims(), topfd_para_ptr->getFaimsVoltage(),
+        topfd_para_ptr->isMissingLevelOne());
+    while (true) {
+      MzmlMsGroupPtr group_ptr = mzml_reader_ptr->getNextMsGroupPtr();
+      if (group_ptr == nullptr) {
+        break;
+      }
+      const PeakPtrVec& peak_list = group_ptr->getMsOnePtr()->getPeakPtrVec();
+      std::vector<double> mz_list;
+      std::vector<double> inte_list;
+      mz_list.reserve(peak_list.size());
+      inte_list.reserve(peak_list.size());
+      for (auto& peak : peak_list) {
+        mz_list.push_back(peak->getPosition());
+        inte_list.push_back(peak->getIntensity());
+      }
+      mz_2d.push_back(std::move(mz_list));
+      inte_2d.push_back(std::move(inte_list));
+      const MzmlMsPtrVec& ms2_ptr_vec = group_ptr->getMsTwoPtrVec();
+      MsHeaderPtrVec header_vec;
+      for (size_t i = 0; i < ms2_ptr_vec.size(); i++) {
+        header_vec.push_back(ms2_ptr_vec[i]->getMsHeaderPtr());
+      }
+      ms2_header_ptr_2d.push_back(header_vec);
+    }
+  }
+  size_t ms1_raw_spec_num = mz_2d.size();
+
+  // Prepare seed envelopes
+  SeedEnvPtrVec seed_ptrs;
+  SeedEnvPtr2D seed_ptr_2d;
+  for (auto& ms1_data : deconv_ms1_ptr_vec) {
+    DeconvPeakPtrVec peaks = ms1_data->getPeakPtrVec();
+    SeedEnvPtrVec one_spec_seed_ptrs;
+    for (auto& peak : peaks) {
+      SeedEnvPtr seed_ptr = std::make_shared<SeedEnv>(peak);
+      seed_ptrs.push_back(seed_ptr);
+      one_spec_seed_ptrs.push_back(seed_ptr);
+    }
+    seed_ptr_2d.push_back(one_spec_seed_ptrs);
+  }
+  std::sort(seed_ptrs.begin(), seed_ptrs.end(), SeedEnv::cmpSeedInteDec);
+
+  double sn_ratio = topfd_para_ptr->getMsOneSnRatio();
+  bool single_scan_noise = topfd_para_ptr->isUseSingleScanNoiseLevel();
+  MsHeaderPtrVec ms1_header_ptr_vec;
+  for (auto& ms1_spectrum : deconv_ms1_ptr_vec) {
+    ms1_header_ptr_vec.push_back(ms1_spectrum->getMsHeaderPtr());
+  }
+  // Peak matrix shell: global statistics, hollow rows
+  MsMapPtr matrix_ptr = std::make_shared<MsMap>(
+      mz_2d, inte_2d, ms1_header_ptr_vec, score_para_ptr->bin_size_);
+  double neighbor_tole = -1;
+  if (score_para_ptr->min_scan_num_ >= 2) {
+    neighbor_tole = score_para_ptr->neighbor_mz_tole_;
+  }
+
+  const int win_rows = 150;
+  const int win_margin = 150;
+  int row_num = matrix_ptr->getRowNum();
+  int num_wins = (row_num + win_rows - 1) / win_rows;
+  int max_live_rows = 0;
+  int filled_lo = 0;
+  int filled_hi = 0;
+  double fill_sn_ratio = sn_ratio;
+  double fill_neighbor_tole = neighbor_tole;
+  auto slide = [&](int lo, int hi) {
+    while (filled_lo < lo && filled_lo < filled_hi) {
+      matrix_ptr->evictRow(filled_lo);
+      filled_lo++;
+    }
+    if (filled_lo >= filled_hi) {
+      filled_lo = lo;
+      filled_hi = lo;
+    }
+    while (filled_hi < hi) {
+      matrix_ptr->fillRow(filled_hi, mz_2d[filled_hi], inte_2d[filled_hi],
+                          fill_sn_ratio, single_scan_noise,
+                          fill_neighbor_tole);
+      filled_hi++;
+    }
+    if (filled_hi - filled_lo > max_live_rows) {
+      max_live_rows = filled_hi - filled_lo;
+    }
+  };
+
+  // bucket seeds by window of their apex spectrum; the global sort keeps
+  // intensity order inside each bucket
+  std::vector<SeedEnvPtrVec> win_seed_ptrs(num_wins);
+  for (auto& seed_ptr : seed_ptrs) {
+    int w = seed_ptr->getSpecId() / win_rows;
+    if (w >= 0 && w < num_wins) {
+      win_seed_ptrs[w].push_back(seed_ptr);
+    }
+  }
+
+  /// Extract Features
+  LOG_DEBUG("Number of seed envelopes: " << seed_ptrs.size());
+  int seed_num = seed_ptrs.size();
+  int count = 0;
+  EnvCollPtrVec env_coll_list;
+  ECScorePtrVec ecscore_list;
+  for (int w = 0; w < num_wins; w++) {
+    slide(std::max(0, w * win_rows - win_margin),
+          std::min(row_num, (w + 1) * win_rows + win_margin));
+    for (auto& sorted_seed_ptr : win_seed_ptrs[w]) {
+      count = count + 1;
+      if (count % 100 == 0 || count == seed_num) {
+        double perc = static_cast<int>(count * 100 / seed_num);
+        std::cout << "\r" << "Processing feature " << count << " ...       "
+                  << perc << "\% finished." << std::flush;
+      }
+      SeedEnvPtr seed_ptr = seed_env_util::preprocessSeedEnvPtr(
+          sorted_seed_ptr, matrix_ptr, score_para_ptr, sn_ratio);
+      if (seed_ptr == nullptr) continue;
+      EnvCollPtr env_coll_ptr = env_coll_util::findEnvColl(
+          matrix_ptr, seed_ptr, score_para_ptr, sn_ratio,
+          topfd_para_ptr->getSplitIntensityRatio());
+      if (env_coll_ptr == nullptr) continue;
+      if (env_coll_util::checkExistingFeatures(matrix_ptr, env_coll_ptr,
+                                               env_coll_list, score_para_ptr,
+                                               sn_ratio)) {
+        env_coll_ptr->removePeakData(matrix_ptr);
+        continue;
+      }
+      env_coll_ptr->refineMonoMass();
+      ECScorePtr ecscore_ptr =
+          std::make_shared<ECScore>(env_coll_ptr, matrix_ptr, sn_ratio);
+      if (ecscore_ptr->getScore() < topfd_para_ptr->getMs1EcscoreCutoff()) {
+        continue;
+      }
+      env_coll_ptr->setEcscore(ecscore_ptr->getScore());
+      env_coll_ptr->removePeakData(matrix_ptr);
+      env_coll_list.push_back(env_coll_ptr);
+      ecscore_list.push_back(ecscore_ptr);
+    }
+  }
+  std::cout << std::endl;
+
+  if (topfd_para_ptr->isSearchPrecWindow()) {
+    // add ms1 feature based on precursor windows
+    // set min match envelope to 1 to accept single scan features
+    score_para_ptr->min_scan_num_ = 1;
+    score_para_ptr->min_match_peak_ = 1;
+    sn_ratio = 0;
+    // rematerialize rows with sn 0 and no neighbor filter, window by window
+    // (the whole-run implementation reconstructs the full matrix here; a
+    // refilled row restores the original peak intensities, while reconstruct
+    // keeps the reductions made by removePeakData)
+    while (filled_lo < filled_hi) {
+      matrix_ptr->evictRow(filled_lo);
+      filled_lo++;
+    }
+    filled_lo = 0;
+    filled_hi = 0;
+    fill_sn_ratio = 0;
+    fill_neighbor_tole = -1;
+    int ms1_spec_num = deconv_ms1_ptr_vec.size();
+    for (std::size_t ms1_idx = 0; ms1_idx < deconv_ms1_ptr_vec.size();
+         ms1_idx++) {
+      slide(std::max(0, static_cast<int>(ms1_idx) - win_margin),
+            std::min(row_num, static_cast<int>(ms1_idx) + win_margin + 1));
+      double perc = static_cast<int>((ms1_idx + 1) * 100 / ms1_spec_num);
+      int scan =
+          deconv_ms1_ptr_vec[ms1_idx]->getMsHeaderPtr()->getFirstScanNum();
+      std::cout << "\r" << "Additional feature search MS1 spectrum scan "
+                << scan << " ...       " << perc << "\% finished."
+                << std::flush;
+      for (std::size_t i = 0; i < ms2_header_ptr_2d[ms1_idx].size(); i++) {
+        MsHeaderPtr header_ptr = ms2_header_ptr_2d[ms1_idx][i];
+        if (env_coll_assign::checkEnvColl(header_ptr, env_coll_list)) {
+          continue;
+        }
+        double prec_win_begin = header_ptr->getPrecWinBegin();
+        double prec_win_end = header_ptr->getPrecWinEnd();
+        SeedEnvPtrVec seed_ptr_list = seed_ptr_2d[ms1_idx];
+        SeedEnvPtrVec selected_seed_list;
+        for (std::size_t j = 0; j < seed_ptr_list.size(); j++) {
+          double ref_mz = seed_ptr_list[j]->getReferMz();
+          if (ref_mz > prec_win_begin && ref_mz < prec_win_end) {
+            selected_seed_list.push_back(seed_ptr_list[j]);
+          }
+        }
+        SeedEnvPtr seed_ptr;
+        if (selected_seed_list.size() > 0) {
+          // choose the highest intensity one
+          std::sort(selected_seed_list.begin(), selected_seed_list.end(),
+                    SeedEnv::cmpSeedInteDec);
+          seed_ptr = selected_seed_list[0];
+          seed_ptr = seed_env_util::relaxProcessSeedEnvPtr(
+              seed_ptr, matrix_ptr, score_para_ptr, sn_ratio);
+        }
+        if (seed_ptr == nullptr) {
+          continue;
+        }
+        EnvCollPtr env_coll_ptr = env_coll_util::findEnvCollWithSingleEnv(
+            matrix_ptr, seed_ptr, score_para_ptr, sn_ratio,
+            topfd_para_ptr->getSplitIntensityRatio());
+        if (env_coll_ptr == nullptr) continue;
+        if (env_coll_util::checkExistingFeatures(matrix_ptr, env_coll_ptr,
+                                                 env_coll_list, score_para_ptr,
+                                                 sn_ratio)) {
+          env_coll_ptr->removePeakData(matrix_ptr);
+          continue;
+        }
+        env_coll_ptr->refineMonoMass();
+        ECScorePtr ecscore_ptr =
+            std::make_shared<ECScore>(env_coll_ptr, matrix_ptr, sn_ratio);
+        if (ecscore_ptr->getScore() < 0 ||
+            std::isnan(ecscore_ptr->getScore())) {
+          continue;
+        }
+        env_coll_ptr->setEcscore(ecscore_ptr->getScore());
+        env_coll_ptr->removePeakData(matrix_ptr);
+        env_coll_list.push_back(env_coll_ptr);
+        ecscore_list.push_back(ecscore_ptr);
+      }
+    }
+    std::cout << std::endl;
+  }
+
+  std::cout << "Sliding window: max resident rows " << max_live_rows << " of "
+            << row_num << std::endl;
+
+  FracFeaturePtrVec frac_features;
+  for (std::size_t i = 0; i < env_coll_list.size(); i++) {
+    EnvCollPtr env_coll_ptr = env_coll_list[i];
+    FracFeaturePtr frac_feat_ptr = env_coll_util::getFracFeature(
+        i, deconv_ms1_ptr_vec, score_para_ptr->frac_id_,
+        score_para_ptr->file_name_, env_coll_ptr, matrix_ptr, sn_ratio);
+    frac_features.push_back(frac_feat_ptr);
+  }
+
+  // map MS2 features
+  SpecFeaturePtrVec ms2_features;
+  env_coll_assign::assignEnvColls(frac_features, env_coll_list,
+                                  ms2_header_ptr_2d, ms2_features,
+                                  topfd_para_ptr->getMs1EcscoreCutoff());
+  std::cout << "Number of proteoform features: " << env_coll_list.size()
+            << std::endl;
+  /// output files
+  if (topfd_para_ptr->isOutputCsvFeatureFile()) {
+    std::string feat_file_name = output_base_name + "_ms1.csv";
+    ecscore_writer::writeScores(feat_file_name, ecscore_list);
+    std::string batmass_file_name =
+        output_base_name + "_" + "frac_ms1.mzrt.csv";
+    int num_spec = ms1_raw_spec_num;
+    frac_feature_writer::writeBatMassFeatures(batmass_file_name, frac_features,
+                                              num_spec);
+  }
+
+  std::string frac_feat_xml_file_name = output_base_name + "_feature.xml";
+  frac_feature_writer::writeXmlFeatures(frac_feat_xml_file_name, frac_features);
+  std::string frac_feat_file_name = output_base_name + "_" + "ms1.feature";
+  frac_feature_writer::writeFeatures(frac_feat_file_name, frac_features);
+
+  std::string ms2_feat_file_name = output_base_name + "_" + "ms2.feature";
+  spec_feature_writer::writeFeatures(ms2_feat_file_name, ms2_features);
+}
+
 void processMs1(const TopfdParaPtr& topfd_para_ptr) {
   if (topfd_para_ptr->isMissingLevelOne()) {
+    return;
+  }
+  if (std::getenv("TOPFD_MS1_WINDOW") != nullptr) {
+    processMs1Windowed(topfd_para_ptr);
     return;
   }
 
@@ -77,10 +370,11 @@ void processMs1(const TopfdParaPtr& topfd_para_ptr) {
     DeconvPeakPtrVec peaks = ms1_data->getPeakPtrVec();
     SeedEnvPtrVec one_spec_seed_ptrs;
     for (auto& peak : peaks) {
-      SeedEnvPtr seed_ptr_1 = std::make_shared<SeedEnv>(peak);
-      seed_ptrs.push_back(seed_ptr_1);
-      SeedEnvPtr seed_ptr_2 = std::make_shared<SeedEnv>(peak);
-      one_spec_seed_ptrs.push_back(seed_ptr_2);
+      // SeedEnv objects are immutable after construction; the global
+      // intensity-sorted list and the per-spectrum list share them.
+      SeedEnvPtr seed_ptr = std::make_shared<SeedEnv>(peak);
+      seed_ptrs.push_back(seed_ptr);
+      one_spec_seed_ptrs.push_back(seed_ptr);
     }
     seed_ptr_2d.push_back(one_spec_seed_ptrs);
   }
@@ -98,6 +392,10 @@ void processMs1(const TopfdParaPtr& topfd_para_ptr) {
   MsMapPtr matrix_ptr = std::make_shared<MsMap>(
       ms1_mzml_peaks, ms1_header_ptr_vec, score_para_ptr->bin_size_, sn_ratio,
       single_scan_noise);
+  // The raw peaks were copied into the matrix; only the spectrum count is
+  // needed below. Release the whole-run raw peak buffer.
+  size_t ms1_raw_spec_num = ms1_mzml_peaks.size();
+  PeakPtrVec2D().swap(ms1_mzml_peaks);
 
   if (score_para_ptr->min_scan_num_ >= 2) {
     matrix_ptr->removeNonNeighbors(score_para_ptr->neighbor_mz_tole_);
@@ -236,7 +534,7 @@ void processMs1(const TopfdParaPtr& topfd_para_ptr) {
     ecscore_writer::writeScores(feat_file_name, ecscore_list);
     std::string batmass_file_name =
         output_base_name + "_" + "frac_ms1.mzrt.csv";
-    int num_spec = ms1_mzml_peaks.size();
+    int num_spec = ms1_raw_spec_num;
     frac_feature_writer::writeBatMassFeatures(batmass_file_name, frac_features,
                                               num_spec);
   }
