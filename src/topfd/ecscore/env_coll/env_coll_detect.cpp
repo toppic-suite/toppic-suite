@@ -98,6 +98,10 @@ void processMs1(const TopfdParaPtr& topfd_para_ptr) {
   MsMapPtr matrix_ptr = std::make_shared<MsMap>(
       ms1_mzml_peaks, ms1_header_ptr_vec, score_para_ptr->bin_size_, sn_ratio,
       single_scan_noise);
+  // The raw peaks were copied into the matrix; only the spectrum count is
+  // needed below. Release the whole-run raw peak buffer.
+  size_t ms1_raw_spec_num = ms1_mzml_peaks.size();
+  PeakPtrVec2D().swap(ms1_mzml_peaks);
 
   if (score_para_ptr->min_scan_num_ >= 2) {
     matrix_ptr->removeNonNeighbors(score_para_ptr->neighbor_mz_tole_);
@@ -236,7 +240,7 @@ void processMs1(const TopfdParaPtr& topfd_para_ptr) {
     ecscore_writer::writeScores(feat_file_name, ecscore_list);
     std::string batmass_file_name =
         output_base_name + "_" + "frac_ms1.mzrt.csv";
-    int num_spec = ms1_mzml_peaks.size();
+    int num_spec = ms1_raw_spec_num;
     frac_feature_writer::writeBatMassFeatures(batmass_file_name, frac_features,
                                               num_spec);
   }
