@@ -43,6 +43,10 @@ namespace topfd_process {
 
 namespace {
 
+// Intra-op threads of the ONNX sessions used by the deconvolution stages
+// (see process() and processFraction()).
+constexpr int kDeconvOnnxThreadNum = 1;
+
 // Deconvolute one fraction (a single FAIMS voltage level, or the whole file
 // when the data is not FAIMS): optional MS1 deconvolution and feature
 // detection, followed by MS/MS deconvolution.
@@ -59,7 +63,19 @@ void processFraction(const TopfdParaPtr& para_ptr) {
     ms1_proc_ptr = nullptr;
     std::cout << "MS1 deconvolution finished." << std::endl;
     std::cout << "MS1 feature detection started." << std::endl;
+    // The feature detection scores one envelope per EnvCNN call, 87,000
+    // calls on 480_F3_02, each streaming the model's 87 MB of weights
+    // through the CPU: memory-bound. Two intra-op threads that sleep
+    // between the calls stream them fastest (st_1 feature stage: 26.1 s
+    // with 1 thread, 18.7 s with 2, 19.4 s with 4, 22.9 s with 8, 27.6 s
+    // with 16; toppic_test experiment 36). The single-thread session is
+    // restored for the MS/MS deconvolution, whose workers call in parallel.
+    int feat_onnx_thread_num = 2;
+    bool feat_onnx_spinning = false;
+    onnx_env_cnn::initModel(para_ptr->getResourceDir(), feat_onnx_thread_num,
+                            feat_onnx_spinning);
     env_coll_detect::processMs1(para_ptr);
+    onnx_env_cnn::initModel(para_ptr->getResourceDir(), kDeconvOnnxThreadNum);
     std::cout << "MS1 feature detection finished." << std::endl;
   }
 
@@ -125,9 +141,8 @@ int process(const TopfdParaPtr& para_ptr,
   // Runtime's pool (16 threads per session) oversubscribed the cores during
   // the deconvolution and spun between the per-feature calls during the
   // feature detection (toppic_test experiment 36).
-  int onnx_thread_num = 1;
-  onnx_env_cnn::initModel(para_ptr->getResourceDir(), onnx_thread_num);
-  onnx_ecscore::initModel(para_ptr->getResourceDir(), onnx_thread_num);
+  onnx_env_cnn::initModel(para_ptr->getResourceDir(), kDeconvOnnxThreadNum);
+  onnx_ecscore::initModel(para_ptr->getResourceDir(), kDeconvOnnxThreadNum);
 
   for (const std::string& spec_file_name : spec_file_list) {
     if (!file_util::isValidMzmlFile(spec_file_name)) {
