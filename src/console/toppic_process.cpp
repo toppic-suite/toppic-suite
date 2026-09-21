@@ -41,6 +41,7 @@
 #include "filter/oneptm/one_ptm_filter_processor.hpp"
 #include "filter/varptm/var_ptm_filter_processor.hpp"
 #include "filter/zeroptm/zero_ptm_filter_processor.hpp"
+#include "ms/env/avg_mass_util.hpp"
 #include "ms/env/env_base.hpp"
 #include "ms/feature/feature_merge.hpp"
 #include "ms/spec/msalign_frac_merge.hpp"
@@ -799,7 +800,8 @@ int TopPICProgress(std::map<std::string, std::string>& arguments) {
 }
 
 int TopPICProgress_multi_file(std::map<std::string, std::string>& arguments,
-                              const std::vector<std::string>& spec_file_lst) {
+                              const std::vector<std::string>& ori_spec_file_lst) {
+  std::vector<std::string> spec_file_lst = ori_spec_file_lst;
   std::string base_path = file_util::absoluteDir(spec_file_lst[0]);
 
   std::time_t start = time(nullptr);
@@ -836,6 +838,22 @@ int TopPICProgress_multi_file(std::map<std::string, std::string>& arguments,
   std::string ori_db_file_name = arguments["oriDatabaseFileName"];
 
   bool combine_result_only = (arguments["combineResultOnly"] == "true");
+
+  // Average-mass spectrum files (topfd --average-mass): every step below,
+  // including the merge of a combined run, works on the converted
+  // <name>_mono_ms2.msalign files with monoisotopic masses.
+  if (arguments["averageMass"] == "true") {
+    std::cout << "Converting average masses to monoisotopic masses - started."
+              << std::endl;
+    EnvBase::initBase(arguments["resourceDir"]);
+    for (size_t k = 0; k < spec_file_lst.size(); k++) {
+      spec_file_lst[k] = avg_mass_util::convertToMonoMass(spec_file_lst[k]);
+      std::cout << "Converted " << ori_spec_file_lst[k] << " to "
+                << spec_file_lst[k] << "." << std::endl;
+    }
+    std::cout << "Converting average masses to monoisotopic masses - finished."
+              << std::endl;
+  }
 
   if (!combine_result_only) {
     for (size_t k = 0; k < spec_file_lst.size(); k++) {

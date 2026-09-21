@@ -26,6 +26,7 @@
 #include "common/base/base_data.hpp"
 #include "common/util/str_util.hpp"
 #include "common/util/time_util.hpp"
+#include "ms/env/avg_mass_util.hpp"
 #include "ms/env/env_base.hpp"
 #include "ms/env/match_env_util.hpp"
 #include "ms/env/match_env_writer.hpp"
@@ -100,6 +101,9 @@ void processOneFile(const TopfdParaPtr& para_ptr,
 
     DeconvMsPtr ms_ptr =
         match_env_util::getDeconvMsPtr(header_ptr, result_envs);
+    if (para_ptr->isOutputAvgMass()) {
+      ms_ptr = avg_mass_util::getAvgMassMs(ms_ptr);
+    }
 
     std::string output_base_name = para_ptr->getOutputBaseName();
     std::string ms2_msalign_name = output_base_name + "_ms2.msalign";

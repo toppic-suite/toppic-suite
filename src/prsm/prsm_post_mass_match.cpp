@@ -46,6 +46,7 @@
 #include "ms/spec/deconv_peak.hpp"
 #include "ms/spec/ms_header.hpp"
 #include "ms/spec/msalign_reader.hpp"
+#include "ms/spec/msalign_util.hpp"
 #include "ms/spec/msalign_writer.hpp"
 #include "ms/spec/peak.hpp"
 #include "ms/spec/peak_util.hpp"
@@ -381,23 +382,6 @@ void addMatchesToPrsm(const PrsmPtr& prsm_ptr, const PostMatchVec& matches,
   prsm_ptr->updateMatchNum(sp_para_ptr);
 }
 
-// The parameter block (comment lines) at the top of an msalign file.
-std::string readMsalignPara(const std::string& file_name) {
-  std::ifstream input(file_name);
-  std::string line;
-  std::string para_str;
-  while (std::getline(input, line)) {
-    if (line == "BEGIN IONS") {
-      break;
-    }
-    if (!para_str.empty()) {
-      para_str += "\n";
-    }
-    para_str += line;
-  }
-  return para_str;
-}
-
 // Write the spectra of the input msalign file, with the matched masses
 // appended, to the new msalign file.
 void writeMsalign(const std::string& sp_file_name,
@@ -405,7 +389,7 @@ void writeMsalign(const std::string& sp_file_name,
                   const SpParaPtr& sp_para_ptr,
                   const std::map<int, PostMatchVec>& spec_matches) {
   MsAlignWriter writer(post_sp_file_name);
-  writer.writePara(readMsalignPara(sp_file_name));
+  writer.writePara(msalign_util::readParaStr(sp_file_name));
   MsAlignReader reader(sp_file_name, 1, sp_para_ptr->getActivationPtr());
   DeconvMsPtr ms_ptr = reader.getNextMsPtr();
   while (ms_ptr != nullptr) {
@@ -485,6 +469,12 @@ std::string sqlFileName(const std::string& sp_file_name) {
   std::string sql_base = file_util::basename(sp_file_name);
   if (str_util::endsWith(sql_base, "_ms2")) {
     sql_base = sql_base.substr(0, sql_base.size() - 4);
+  }
+  // <base>_mono_ms2.msalign, the monoisotopic-mass copy TopPIC writes for
+  // an average-mass file (--average-mass), shares the database of
+  // <base>_ms2.msalign
+  if (str_util::endsWith(sql_base, "_mono")) {
+    sql_base = sql_base.substr(0, sql_base.size() - 5);
   }
   return sql_base + ".sqlite";
 }

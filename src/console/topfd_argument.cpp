@@ -146,6 +146,11 @@ bool Argument::parse(int argc, char* argv[]) {
         "thread-number,u", po::value<std::string>(&thread_number),
         "<a positive integer>. Number of threads used in spectral "
         "deconvolution. The default value is 1.")(
+        "average-mass,A",
+        "Report average masses instead of monoisotopic masses for the "
+        "precursor and fragment ions in the MS/MS msalign file. TopPIC reads "
+        "such a file with its --average-mass option. The feature files and "
+        "the SQLite database keep monoisotopic masses.")(
         "no-sql,N", "Do not write the deconvoluted spectra to an SQLite database.")(
         "sql-3d,D",
         "Add the MS1 peaks for 3D visualization to the SQLite database.")(
@@ -308,6 +313,10 @@ bool Argument::parse(int argc, char* argv[]) {
 
     if (vm.count("multiple-mass")) {
       topfd_para_ptr_->setOutputMultipleMass(true);
+    }
+
+    if (vm.count("average-mass")) {
+      topfd_para_ptr_->setOutputAvgMass(true);
     }
 
     if (vm.count("no-sql")) {

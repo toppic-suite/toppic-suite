@@ -44,6 +44,11 @@ class EnvBase {
 
   static double convertRefMassToMonoMass(double mass);
 
+  // The inverse of convertMonoMassToAvgMass: the monoisotopic mass whose
+  // theoretical distribution has the given average mass. The average mass
+  // is returned unchanged when it is beyond the distribution table.
+  static double convertAvgMassToMonoMass(double avg_mass);
+
  private:
   // number of distribution entries
   int entry_num_;

@@ -52,6 +52,22 @@ int getSpNum(const std::string& spectrum_file_name) {
   return sp_num;
 }
 
+std::string readParaStr(const std::string& spectrum_file_name) {
+  std::ifstream input(spectrum_file_name);
+  std::string line;
+  std::string para_str;
+  while (std::getline(input, line)) {
+    if (line == "BEGIN IONS") {
+      break;
+    }
+    if (!para_str.empty()) {
+      para_str += "\n";
+    }
+    para_str += line;
+  }
+  return para_str;
+}
+
 }  // namespace msalign_util
 
 }  // namespace toppic

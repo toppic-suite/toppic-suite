@@ -28,7 +28,9 @@ that file instead; its indexes go to `<database>_dedup.fasta_idx/`.
 **Spectrum files.** One or more `_ms2.msalign` files written by TopFD (or
 by TopDIA, whose pseudo-MS/MS spectra use the same format). Several files
 given on one command line are searched one after another with the same
-parameters.
+parameters. A file written by `topfd --average-mass`, whose precursor and
+fragment masses are average masses, must be searched with `--average-mass`
+(section 2).
 
 **Companion files from TopFD.** For a spectrum file `sample_ms2.msalign`,
 TopPIC also reads, from the same directory:
@@ -51,6 +53,18 @@ For each spectrum file TopPIC prints its parameters and runs these steps.
 Intermediate files carry the spectrum file name plus a `.toppic_*`
 extension and are deleted at the end unless `--keep-temp-files` is given,
 except `sample_ms2.toppic_all_raw_prsm`, which is always kept.
+
+With `--average-mass`, every spectrum file is first converted: the average
+precursor and fragment masses of `sample_ms2.msalign` are converted back to
+monoisotopic masses with the theoretical isotopic distributions TopFD used
+(the inverse of its conversion), the spectra are written to
+`sample_mono_ms2.msalign` (the input file is left unchanged, a comment line
+records the conversion), `sample_ms2.feature` is copied to
+`sample_mono_ms2.feature`, and the steps below, the result file names and
+the merge of a `-c` run all use the converted file. Post mass matching
+reads the database of the original file, `sample.sqlite`, and its results
+are named after `sample_post_ms2` as usual; with `--disable-post-match`
+the result files are named after `sample_mono_ms2`.
 
 1. **Zero unexpected shift filtering and search.** Protein candidates are
    selected with index-based filters and aligned to each spectrum without any
@@ -182,6 +196,7 @@ Spectra and tolerances:
 | `-r`, `--num-combined-spectra <int>` | 1 | Number of consecutive MS/MS spectra of one precursor searched together, for alternating fragmentation (2 for pairs, 3 for triplets). |
 | `-A`, `--approximate-spectra` | off | Use approximate spectra in protein filtering, for higher sensitivity. Only affects the variable PTM filtering step (`-b`). |
 | `-x`, `--no-topfd-feature` | off | Run without the TopFD feature file; proteoforms are then clustered by protein and precursor mass only, the `Feature ...` columns are `-` and the proteoform intensity is `-1`. |
+| `-g`, `--average-mass` | off | The spectrum files report average masses (`topfd --average-mass`): each is converted to `<name>_mono_ms2.msalign` with monoisotopic masses before the search (section 2). |
 
 Post mass matching:
 
