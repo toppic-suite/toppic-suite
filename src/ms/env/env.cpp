@@ -21,6 +21,7 @@
 #include <iterator>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "common/base/mass_constant.hpp"
@@ -65,6 +66,14 @@ Env::Env(int refer_idx, int charge, double mono_mz, EnvPeakPtrVec& peaks)
   updateAvgMz();
 }
 
+Env::Env(int refer_idx, int charge, double mono_mz, EnvPeakPtrVec&& peaks)
+    : refer_idx_(refer_idx),
+      charge_(charge),
+      mono_mz_(mono_mz),
+      peak_ptr_list_(std::move(peaks)) {
+  updateAvgMz();
+}
+
 EnvPtr Env::convertToTheo(double mass_diff, int new_charge) {
   int ori_charge = 1;
   double new_mono_mz = (mono_mz_ * ori_charge + mass_diff) / new_charge;
@@ -74,7 +83,8 @@ EnvPtr Env::convertToTheo(double mass_diff, int new_charge) {
     new_peaks[i] =
         std::make_shared<EnvPeak>(new_mz, peak_ptr_list_[i]->getIntensity());
   }
-  return std::make_shared<Env>(refer_idx_, new_charge, new_mono_mz, new_peaks);
+  return std::make_shared<Env>(refer_idx_, new_charge, new_mono_mz,
+                               std::move(new_peaks));
 }
 
 // Convert a theoretical distribution to a theoretical envelope
@@ -173,8 +183,8 @@ EnvPtr Env::addZero(int num) {
     new_peaks[i]->setPosition(pos);
   }
   int new_refer_idx = refer_idx_ + num;
-  EnvPtr env_ptr =
-      std::make_shared<Env>(new_refer_idx, charge_, mono_mz_, new_peaks);
+  EnvPtr env_ptr = std::make_shared<Env>(new_refer_idx, charge_, mono_mz_,
+                                         std::move(new_peaks));
   return env_ptr;
 }
 

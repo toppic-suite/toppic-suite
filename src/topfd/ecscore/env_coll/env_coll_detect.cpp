@@ -406,6 +406,7 @@ void processMs1(const TopfdParaPtr& topfd_para_ptr) {
   int seed_num = seed_ptrs.size();
   EnvCollPtrVec env_coll_list;
   ECScorePtrVec ecscore_list;
+  env_coll_util::EnvCollRtCache rt_cache;
   for (int seed_env_idx = 0; seed_env_idx < seed_num; seed_env_idx++) {
     int count = seed_env_idx + 1;
     if (count % 100 == 0 || count == seed_num) {
@@ -423,7 +424,7 @@ void processMs1(const TopfdParaPtr& topfd_para_ptr) {
     if (env_coll_ptr == nullptr) continue;
     if (env_coll_util::checkExistingFeatures(matrix_ptr, env_coll_ptr,
                                              env_coll_list, score_para_ptr,
-                                             sn_ratio)) {
+                                             sn_ratio, &rt_cache)) {
       env_coll_ptr->removePeakData(matrix_ptr);
       continue;
     }
@@ -447,6 +448,7 @@ void processMs1(const TopfdParaPtr& topfd_para_ptr) {
     score_para_ptr->min_match_peak_ = 1;
     sn_ratio = 0;
     matrix_ptr->reconstruct(sn_ratio, single_scan_noise);
+    rt_cache.clear();
     int ms1_spec_num = deconv_ms1_ptr_vec.size();
     for (std::size_t ms1_idx = 0; ms1_idx < deconv_ms1_ptr_vec.size();
          ms1_idx++) {
@@ -492,7 +494,7 @@ void processMs1(const TopfdParaPtr& topfd_para_ptr) {
         if (env_coll_ptr == nullptr) continue;
         if (env_coll_util::checkExistingFeatures(matrix_ptr, env_coll_ptr,
                                                  env_coll_list, score_para_ptr,
-                                                 sn_ratio)) {
+                                                 sn_ratio, &rt_cache)) {
           env_coll_ptr->removePeakData(matrix_ptr);
           continue;
         }
@@ -641,6 +643,7 @@ void processMs2(const TopfdParaPtr& topfd_para_ptr) {
       LOG_DEBUG("Number of seed envelopes: " << seed_ptrs.size());
       int seed_num = static_cast<int>(seed_ptrs.size());
       EnvCollPtrVec env_coll_list;
+      env_coll_util::EnvCollRtCache rt_cache;
       for (int seed_env_idx = 0; seed_env_idx < seed_num; seed_env_idx++) {
         int count = seed_env_idx + 1;
         if (count % 100 == 0 || count == seed_num) {
@@ -658,7 +661,7 @@ void processMs2(const TopfdParaPtr& topfd_para_ptr) {
         if (env_coll_ptr == nullptr) continue;
         if (env_coll_util::checkExistingFeatures(matrix_ptr, env_coll_ptr,
                                                  env_coll_list, score_para_ptr,
-                                                 sn_ratio)) {
+                                                 sn_ratio, &rt_cache)) {
           env_coll_ptr->removePeakData(matrix_ptr);
           continue;
         }

@@ -16,6 +16,9 @@
 #ifndef TOPPIC_TOPFD_ECSCORE_ENV_COLL_ENV_COLL_UTIL_HPP_
 #define TOPPIC_TOPFD_ECSCORE_ENV_COLL_ENV_COLL_UTIL_HPP_
 
+#include <cstddef>
+#include <vector>
+
 #include "ms/feature/frac_feature.hpp"
 #include "ms/msmap/ms_map.hpp"
 #include "ms/spec/deconv_ms.hpp"
@@ -37,10 +40,35 @@ EnvCollPtr findEnvCollWithSingleEnv(const MsMapPtr& matrix_ptr,
                                     const EcscoreParaPtr& para_ptr,
                                     double sn_ratio, double split_ratio);
 
+// The retention-time ranges of the features of an EnvCollPtrVec in
+// contiguous arrays, for checkExistingFeatures, which scans the whole list
+// for every candidate feature (88,000 candidates against up to 42,000
+// features on 480_F3_02, 90 s spent chasing the feature and header objects;
+// toppic_test experiment 36). sync appends the entries of the features
+// added since the last call, refresh updates one feature after a merge,
+// and clear must be called when the map is rebuilt (its retention times
+// are copied here).
+class EnvCollRtCache {
+ public:
+  void sync(const MsMapPtr& matrix_ptr, const EnvCollPtrVec& env_coll_list);
+  void refresh(const MsMapPtr& matrix_ptr, const EnvCollPtr& coll_ptr,
+               std::size_t idx);
+  void clear() {
+    start_rt_.clear();
+    end_rt_.clear();
+  }
+  std::vector<double> start_rt_;
+  std::vector<double> end_rt_;
+};
+
+// With a cache, the retention-time ranges of the listed features are read
+// from it (same result, same first match) instead of from the feature and
+// header objects.
 bool checkExistingFeatures(const MsMapPtr& matrix_ptr,
                            const EnvCollPtr& coll_ptr,
                            EnvCollPtrVec& env_coll_list,
-                           const EcscoreParaPtr& para_ptr, double sn_ratio);
+                           const EcscoreParaPtr& para_ptr, double sn_ratio,
+                           EnvCollRtCache* cache = nullptr);
 
 FracFeaturePtr getFracFeature(int feat_id, DeconvMsPtrVec& ms1_ptr_vec,
                               int frac_id, std::string& file_name,

@@ -34,7 +34,12 @@ class Env {
   // used by env_base to create envelopes
   Env(int num, std::vector<std::string>& line_List);
 
+  // copies the peaks
   Env(int refer_idx, int charge, double mono_mz, EnvPeakPtrVec& peaks);
+
+  // takes the peaks over without copying them: for a peak list built for
+  // this envelope only (convertToTheo, addZero)
+  Env(int refer_idx, int charge, double mono_mz, EnvPeakPtrVec&& peaks);
 
   EnvPtr convertToTheo(double mass_diff, int new_charge);
 

@@ -153,13 +153,14 @@ EnvCollPtr findEnvCollWithSingleEnv(const MsMapPtr& matrix_ptr,
   return env_coll_ptr;
 }
 
-bool checkOverlap(MsMapRowHeaderPtrVec& spectrum_list,
-                  const EnvCollPtr& coll_ptr, double feature_start_rt,
-                  double feature_end_rt, double time_tol) {
-  int start_spec_id = coll_ptr->getStartSpecId();
-  int end_spec_id = coll_ptr->getEndSpecId();
-  double start_rt = spectrum_list[start_spec_id]->getRt();
-  double end_rt = spectrum_list[end_spec_id]->getRt();
+double rowRt(const MsMapPtr& matrix_ptr, int spec_id) {
+  return matrix_ptr->getRowPtr(spec_id)->getHeaderPtr()->getRt();
+}
+
+// overlap test on the retention-time range [start_rt, end_rt] of a listed
+// feature
+bool checkOverlapRt(double start_rt, double end_rt, double feature_start_rt,
+                    double feature_end_rt, double time_tol) {
   double start = -1;
   if (start_rt <= feature_start_rt) {
     start = feature_start_rt;
@@ -193,10 +194,36 @@ bool checkOverlap(MsMapRowHeaderPtrVec& spectrum_list,
   return false;
 }
 
+bool checkOverlap(const MsMapPtr& matrix_ptr, const EnvCollPtr& coll_ptr,
+                  double feature_start_rt, double feature_end_rt,
+                  double time_tol) {
+  double start_rt = rowRt(matrix_ptr, coll_ptr->getStartSpecId());
+  double end_rt = rowRt(matrix_ptr, coll_ptr->getEndSpecId());
+  return checkOverlapRt(start_rt, end_rt, feature_start_rt, feature_end_rt,
+                        time_tol);
+}
+
+void EnvCollRtCache::sync(const MsMapPtr& matrix_ptr,
+                          const EnvCollPtrVec& env_coll_list) {
+  for (std::size_t i = start_rt_.size(); i < env_coll_list.size(); i++) {
+    start_rt_.push_back(rowRt(matrix_ptr, env_coll_list[i]->getStartSpecId()));
+    end_rt_.push_back(rowRt(matrix_ptr, env_coll_list[i]->getEndSpecId()));
+  }
+}
+
+void EnvCollRtCache::refresh(const MsMapPtr& matrix_ptr,
+                             const EnvCollPtr& coll_ptr, std::size_t idx) {
+  if (idx < start_rt_.size()) {
+    start_rt_[idx] = rowRt(matrix_ptr, coll_ptr->getStartSpecId());
+    end_rt_[idx] = rowRt(matrix_ptr, coll_ptr->getEndSpecId());
+  }
+}
+
 bool checkExistingFeatures(const MsMapPtr& matrix_ptr,
                            const EnvCollPtr& env_coll_ptr,
                            EnvCollPtrVec& env_coll_list,
-                           const EcscoreParaPtr& para_ptr, double sn_ratio) {
+                           const EcscoreParaPtr& para_ptr, double sn_ratio,
+                           EnvCollRtCache* cache) {
   double env_mass = env_coll_ptr->getMonoNeutralMass();
   double mass_tol = para_ptr->match_feature_ppm_tolerance_ * env_mass;
   std::vector<int> charge_states = env_coll_ptr->getChargeList();
@@ -204,17 +231,28 @@ bool checkExistingFeatures(const MsMapPtr& matrix_ptr,
   std::vector<double> extended_masses = {env_mass - isotope_mass, env_mass,
                                          env_mass + isotope_mass};
   int num_env_colls = env_coll_list.size();
-  MsMapRowHeaderPtrVec spectrum_list = matrix_ptr->getHeaderPtrList();
   int start_spec_id = env_coll_ptr->getStartSpecId();
   int end_spec_id = env_coll_ptr->getEndSpecId();
-  double feature_start_rt = spectrum_list[start_spec_id]->getRt();
-  double feature_end_rt = spectrum_list[end_spec_id]->getRt();
+  double feature_start_rt = rowRt(matrix_ptr, start_spec_id);
+  double feature_end_rt = rowRt(matrix_ptr, end_spec_id);
+  double time_tol = para_ptr->match_feature_time_overlap_tole_;
+  if (cache != nullptr) {
+    cache->sync(matrix_ptr, env_coll_list);
+  }
 
+  // the first feature of the list that overlaps in time and matches the
+  // mass
   EnvCollPtr overlap_env_coll_ptr;
+  int overlap_idx = -1;
   for (int i = 0; i < num_env_colls; i++) {
-    bool overlap = checkOverlap(spectrum_list, env_coll_list[i],
-                                feature_start_rt, feature_end_rt,
-                                para_ptr->match_feature_time_overlap_tole_);
+    bool overlap;
+    if (cache != nullptr) {
+      overlap = checkOverlapRt(cache->start_rt_[i], cache->end_rt_[i],
+                               feature_start_rt, feature_end_rt, time_tol);
+    } else {
+      overlap = checkOverlap(matrix_ptr, env_coll_list[i], feature_start_rt,
+                             feature_end_rt, time_tol);
+    }
     if (overlap) {
       double min_mass_diff = std::numeric_limits<double>::max();
       for (auto ext_mass : extended_masses) {
@@ -224,6 +262,7 @@ bool checkExistingFeatures(const MsMapPtr& matrix_ptr,
       }
       if (min_mass_diff < mass_tol) {
         overlap_env_coll_ptr = env_coll_list[i];
+        overlap_idx = i;
         break;
       }
     }
@@ -249,6 +288,10 @@ bool checkExistingFeatures(const MsMapPtr& matrix_ptr,
       if (env_set_ptr != nullptr) {
         overlap_env_coll_ptr->mergeEnvSet(env_set_ptr);
       }
+    }
+    if (cache != nullptr) {
+      // the merge may have widened the feature's scan range
+      cache->refresh(matrix_ptr, overlap_env_coll_ptr, overlap_idx);
     }
     return true;
   } else {

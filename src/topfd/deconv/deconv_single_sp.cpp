@@ -215,11 +215,13 @@ MatchEnvPtrVec DeconvSingleSp::deconv() {
     return result_envs_;
   }
   PeakPtrVec peak_list = data_ptr_->getPeakList();
-  // envelope detection
+  // envelope detection; the candidates that env_filter::filter's first
+  // test would remove are not built (check_real_env)
+  bool check_real_env = true;
   MatchEnvPtr2D cand_envs = env_detect::getCandidateEnv(
       peak_list, data_ptr_->getMaxCharge(), data_ptr_->getMaxMass(),
       data_ptr_->getMinInte(), data_ptr_->getMinRefInte(),
-      data_ptr_->getNoiseInte(), env_para_ptr_);
+      data_ptr_->getNoiseInte(), env_para_ptr_, check_real_env);
   LOG_DEBUG("candidate complete");
 
   if (topfd_para_ptr_->isOutputDpEnvs()) {
