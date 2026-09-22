@@ -52,7 +52,7 @@ and saves time when the same database is searched repeatedly (see the
 For each spectrum file TopPIC prints its parameters and runs these steps.
 Intermediate files carry the spectrum file name plus a `.toppic_*`
 extension and are deleted at the end unless `--keep-temp-files` is given,
-except `sample_ms2.toppic_all_raw_prsm`, which is always kept.
+except the three `toppic_record_*` files (section 3), which are always kept.
 
 With `--average-mass`, every spectrum file is first converted: the average
 precursor and fragment masses of `sample_ms2.msalign` are converted back to
@@ -103,7 +103,12 @@ the result files are named after `sample_mono_ms2`.
     `--miscore-threshold`.
 11. **FDR computation** (only with `--decoy`). Spectrum-, proteoform- and
     protein-level false discovery rates are estimated from the decoy hits.
-12. **PrSM filtering** by the spectrum-level cutoff.
+12. **Record files and decoy removal.** The PrSMs with their FDRs are
+    kept as `sample_post_ms2.toppic_record_prsm`, the best PrSM of each
+    proteoform as `.toppic_record_proteoform` and the best PrSM of each protein
+    as `.toppic_record_protein`, decoy identifications included. Unless
+    `--keep-decoy-ids` is given, the decoy identifications are then removed
+    from the PrSMs.
 13. **Post mass matching** (default; off with `--disable-post-match`). For
     each reported PrSM, the theoretical fragment masses that no deconvoluted
     mass matched are searched in the centroided MS/MS peaks of the spectrum,
@@ -114,11 +119,11 @@ the result files are named after `sample_mono_ms2`.
     spectrum, scored by EnvCNN. The spectra with the added masses are written
     to `sample_post_ms2.msalign`, and **the result files use that name**.
     The added envelopes are also stored in the database.
-14. **Filtering and output at three levels.** The PrSMs of step 12 are
-    written to the PrSM tables; the best PrSM per proteoform is filtered by
-    the proteoform-level cutoff and written to the proteoform tables; the
-    best PrSM per protein is filtered by the protein-level cutoff and
-    written to the protein tables.
+14. **Filtering and output at three levels.** The PrSMs passing the
+    spectrum-level cutoff are written to the PrSM tables; the best PrSM per
+    proteoform passing the proteoform-level cutoff to the proteoform tables;
+    the best PrSM per protein passing the protein-level cutoff to the
+    protein tables.
 15. **Writing identifications to the SQLite database**, for visualization.
 
 ## 3. Output files
@@ -136,7 +141,7 @@ after `<name>_ms2`:
 | `sample_post_ms2_toppic_protein.tsv`, `..._protein_single.tsv` | One PrSM per identified protein (the best one), passing the protein-level cutoff. |
 | `sample_post_ms2_toppic_prsm.xml`, `..._proteoform.xml`, `..._protein.xml` | The same three sets of PrSMs in XML, read by TopDiff and the visualization tools. |
 | `sample.sqlite` | Updated with the tables `prsm`, `proteoform`, `protein`, `prsm_mass_shift`, `prsm_protein_match` and `fasta_seq`, for visualization. |
-| `sample_ms2.toppic_all_raw_prsm` | The best PrSM of every spectrum before recounting and cutoffs (after the multiple-shift search with `--num-shift 2`). Always kept, even without `--keep-temp-files`; a later combined run (`-c`) reads it. |
+| `sample_post_ms2.toppic_record_prsm`, `.toppic_record_proteoform`, `.toppic_record_protein` | The best PrSM of every spectrum, of every proteoform and of every protein after the FDR computation and before the cutoffs, decoy identifications included. Always kept. |
 
 The `_single` tables have one line per PrSM. The tables without `_single`
 add, after each PrSM, one line for every other protein that contains the
@@ -220,9 +225,12 @@ Cutoffs and output:
 **Combining fractions.** With `-c`, each fraction is searched and
 post-matched on its own first (post mass matching needs the fraction's own
 TopFD SQLite database, and it is applied to the reported PrSMs only). The
-merge then takes, for every fraction, the TopFD spectra and the PrSMs before
-the post-processing (`<fraction>_ms2.toppic_all_raw_prsm`) and
-repeats steps 8-12 and 14 on the merged data. Post mass matching is not
+merge then takes, for every fraction, the TopFD spectra and the best PrSM
+of every proteoform after the fraction's FDR computation
+(`<fraction>_post_ms2.toppic_record_proteoform`, or
+`<fraction>_ms2.toppic_record_proteoform` with `--disable-post-match`; decoy
+identifications included), and repeats steps 8-12 and 14 on the merged
+data. Post mass matching is not
 applied to the merged file, which has no SQLite database. The combined
 results are always named `<name>_ms2_toppic_*`, and the merged spectra
 `<name>_ms2.msalign`. No SQLite database is written for the combined results.

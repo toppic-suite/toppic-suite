@@ -33,7 +33,11 @@ int TopPIC_multi_ptm_search(std::map<std::string, std::string>& arguments);
 
 // recounting, clustering, PTM characterization, FDR, cutoffs, post mass
 // matching and outputs on the best PrSM of every spectrum
-int TopPIC_multi_ptm_post(std::map<std::string, std::string>& arguments);
+// merged_input: the PrSM set to post-process is <base>.toppic_raw_prsm (the
+// merged file of a -c run, which has no multiple-shift stage whatever -s
+// says) rather than the multiple-shift output.
+int TopPIC_multi_ptm_post(std::map<std::string, std::string>& arguments,
+                          bool merged_input = false);
 
 int TopPICProgress_multi_file(std::map<std::string, std::string>& arguments,
                               const std::vector<std::string>& spec_file_lst);

@@ -13,6 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "console/toppic_process.hpp"
+
 #include <cstdlib>
 #include <ctime>
 #include <filesystem>
@@ -30,6 +32,7 @@
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
 #include "common/util/mem_check.hpp"
+#include "common/util/str_util.hpp"
 #include "common/util/version.hpp"
 #include "console/toppic_argument.hpp"
 #include "filter/diag/diag_filter_processor.hpp"
@@ -89,24 +92,21 @@ namespace toppic {
 // <base>.<input_file_ext> (toppic_cluster_fdr with -d; toppic_cluster, or
 // toppic_cluster_local with -l, without), <base> being the spectrum file's
 // name without its extension (the _post_ms2 name when the post mass
-// matching ran) -- to <base>.report_raw_prsm, which is kept after the run
+// matching ran) -- to <base>.toppic_record_prsm, which is kept after the run
 // (cleanToppicDir does not delete it).
-void copyReportRawPrsm(const std::string& sp_file_name,
+void copyRecordPrsm(const std::string& sp_file_name,
                        const std::string& input_file_ext) {
   std::string base_name = file_util::basename(sp_file_name);
   file_util::copyFile(base_name + "." + input_file_ext,
-                      base_name + ".report_raw_prsm", true);
+                      base_name + ".toppic_record_prsm", true);
 }
 
 // post_sp_name is the spectrum file written by the post mass matching (on by
 // default; --disable-post-match turns it off), whose name the result files
-// carry; "" if it did not run. toppic_all_raw_prsm (the best PrSM of every
-// spectrum before the post-processing) is deleted with the other
-// intermediate files unless keep_all_raw_prsm: the fractions of a combined
-// run (-c) keep it until the merge has read it.
+// carry; "" if it did not run. The three toppic_record_* files are never
+// deleted.
 void cleanToppicDir(const std::string& fa_name, const std::string& sp_name,
-                    bool keep_temp_files, const std::string& post_sp_name,
-                    bool keep_all_raw_prsm) {
+                    bool keep_temp_files, const std::string& post_sp_name) {
   std::string abs_sp_name = file_util::absoluteName(sp_name);
   std::string sp_base = file_util::basename(abs_sp_name);
   std::replace(sp_base.begin(), sp_base.end(), '\\', '/');
@@ -132,8 +132,8 @@ void cleanToppicDir(const std::string& fa_name, const std::string& sp_name,
     file_util::delFile(out_base + ".toppic_proteoform_cluster");
     file_util::delFile(out_base + ".toppic_cluster");
     file_util::delFile(out_base + ".toppic_cluster_fdr");
-    file_util::delFile(out_base + ".toppic_cluster_target");
     file_util::delFile(out_base + ".toppic_cluster_local");
+    file_util::delFile(out_base + ".toppic_prsm_target");
     file_util::delFile(out_base + ".toppic_prsm_cutoff");
     file_util::delFile(out_base + ".toppic_form_cutoff");
     file_util::delFile(out_base + ".toppic_prot_cutoff");
@@ -159,14 +159,9 @@ void cleanToppicDir(const std::string& fa_name, const std::string& sp_name,
     file_util::cleanPrefix(sp_name, sp_base + ".toppic_multi_filter_");
     file_util::delFile(sp_base + ".toppic_multi_combined");
     file_util::delFile(sp_base + ".toppic_multi_evalue");
-    file_util::delFile(sp_base + ".toppic_multi_first");
-    file_util::delFile(sp_base + ".toppic_multi_skipped");
     file_util::delFile(sp_base + ".toppic_multi_evalue_all");
-    file_util::delFile(sp_base + ".toppic_multi_raw_prsm");
     file_util::delFile(sp_base + ".toppic_raw_prsm");
-    if (!keep_all_raw_prsm) {
-      file_util::delFile(sp_base + ".toppic_all_raw_prsm");
-    }
+    file_util::delFile(sp_base + ".toppic_all_raw_prsm");
     file_util::delFile(sp_base + ".toppic_multi_shift");
     file_util::cleanPrefix(sp_name, sp_base + ".toppic_multi_shift_");
     file_util::delFile(sp_base + ".toppic_combined");
@@ -177,6 +172,7 @@ void cleanToppicDir(const std::string& fa_name, const std::string& sp_name,
     file_util::delFile(sp_base + ".toppic_cluster");
     file_util::delFile(sp_base + ".toppic_cluster_fdr");
     file_util::delFile(sp_base + ".toppic_cluster_local");
+    file_util::delFile(sp_base + ".toppic_prsm_target");
     file_util::delFile(sp_base + ".toppic_prsm_cutoff");
     file_util::delFile(sp_base + ".toppic_form_cutoff");
     file_util::delFile(sp_base + ".toppic_prot_cutoff");
@@ -564,7 +560,7 @@ int TopPIC_multi_ptm_search(std::map<std::string, std::string>& arguments) {
       all_merge_ptr = nullptr;
     }
     prsm_top_selector::process(sp_file_name, "toppic_multi_evalue_all",
-                               "toppic_multi_raw_prsm", n_top);
+                               "toppic_all_raw_prsm", n_top);
     std::cout << "Multiple-shift top PrSM selecting - finished." << std::endl;
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
@@ -581,7 +577,8 @@ int TopPIC_multi_ptm_search(std::map<std::string, std::string>& arguments) {
 // masses are in every later step), then clustered, characterized and given
 // one FDR and the spectrum-level cutoff; then the proteoform and protein
 // cutoffs, the tables and the SQLite file.
-int TopPIC_multi_ptm_post(std::map<std::string, std::string>& arguments) {
+int TopPIC_multi_ptm_post(std::map<std::string, std::string>& arguments,
+                          bool merged_input) {
   try {
     std::string resource_dir = arguments["resourceDir"];
     base_data::init(resource_dir);
@@ -597,7 +594,13 @@ int TopPIC_multi_ptm_post(std::map<std::string, std::string>& arguments) {
     msalign_util::geneSpIndex(sp_file_name);
     std::string base_name = file_util::basename(sp_file_name);
 
-    if (!std::filesystem::exists(base_name + ".toppic_multi_raw_prsm")) {
+    // with -s 2 the multiple-shift stage wrote toppic_all_raw_prsm;
+    // otherwise (and for the merged file of a -c run) the set is
+    // toppic_raw_prsm, copied to that name -- unconditionally, so that a
+    // toppic_all_raw_prsm left in the directory by an earlier -s 2 run
+    // is not picked up
+    int shift_num = std::stoi(arguments["shiftNumber"]);
+    if (shift_num < 2 || merged_input) {
       file_util::copyFile(base_name + ".toppic_raw_prsm",
                           base_name + ".toppic_all_raw_prsm", true);
     }
@@ -672,8 +675,8 @@ int TopPIC_multi_ptm_post(std::map<std::string, std::string>& arguments) {
 
     if (arguments["searchType"] == "TARGET+DECOY") {
       std::cout << "FDR computation - started. " << std::endl;
-      // the decoys are kept here so that report_raw_prsm and the raw PrSM
-      // tables carry them; without -K they are removed below
+      // the decoys are kept here so that the toppic_record_* files carry them;
+      // without -K they are removed below
       std::string keep_decoy = "true";
       if (arguments["useFdrGroups"] == "true") {
         // hidden option --fdr-groups: separate FDRs for the PrSM groups
@@ -687,27 +690,29 @@ int TopPIC_multi_ptm_post(std::map<std::string, std::string>& arguments) {
       std::cout << "FDR computation - finished." << std::endl;
       cur_suffix = "toppic_cluster_fdr";
     }
-    copyReportRawPrsm(sp_file_name, cur_suffix);
+    copyRecordPrsm(sp_file_name, cur_suffix);
 
-    if (arguments["outputRawPrsmTable"] == "true") {
-      std::cout << "Outputting Raw PrSM table - started." << std::endl;
-      std::string raw_argu_str = ToppicArgument::outputTsvArguments(arguments);
-      PrsmMatchTableWriterPtr raw_table_out =
-          std::make_shared<PrsmMatchTableWriter>(prsm_para_ptr, raw_argu_str,
-                                                 cur_suffix);
-      raw_table_out->write("_toppic_raw_prsm_single.tsv", false);
-      raw_table_out->write("_toppic_raw_prsm.tsv", true);
-      raw_table_out = nullptr;
-      std::cout << "Outputting Raw PrSM table - finished." << std::endl;
-    }
+    // the best PrSM of every proteoform cluster and of every protein
+    // cluster, kept as <base>.toppic_record_proteoform and
+    // <base>.toppic_record_protein (decoys included, like toppic_record_prsm)
+    std::cout << "Selecting top PrSMs for proteoforms - started." << std::endl;
+    prsm_form_filter::process(db_file_name, sp_file_name, cur_suffix,
+                              "toppic_record_proteoform");
+    std::cout << "Selecting top PrSMs for proteoforms - finished."
+              << std::endl;
+
+    std::cout << "Selecting top PrSMs for proteins - started." << std::endl;
+    prsm_prot_filter::process(db_file_name, sp_file_name,
+                              "toppic_record_proteoform", "toppic_record_protein");
+    std::cout << "Selecting top PrSMs for proteins - finished." << std::endl;
 
     if (arguments["searchType"] == "TARGET+DECOY" &&
         arguments["keepDecoyResults"] != "true") {
       std::cout << "Removing decoy identifications - started." << std::endl;
       prsm_decoy_filter::process(sp_file_name, cur_suffix,
-                                 "toppic_cluster_target");
+                                 "toppic_prsm_target");
+      cur_suffix = "toppic_prsm_target";
       std::cout << "Removing decoy identifications - finished." << std::endl;
-      cur_suffix = "toppic_cluster_target";
     }
 
     std::string spectra_cutoff_type = arguments["cutoffSpectralType"];
@@ -885,10 +890,8 @@ int TopPICProgress_multi_file(std::map<std::string, std::string>& arguments,
       if (arguments["spectrumFileName"] != spec_file_lst[k]) {
         post_sp_name = arguments["spectrumFileName"];
       }
-      // a combined run merges the fractions' toppic_all_raw_prsm files:
-      // they are deleted after the merge (below)
       cleanToppicDir(ori_db_file_name, spec_file_lst[k], keep_temp_files,
-                     post_sp_name, arguments["combinedOutputName"] != "");
+                     post_sp_name);
     }
   }
 
@@ -906,14 +909,13 @@ int TopPICProgress_multi_file(std::map<std::string, std::string>& arguments,
           base_path + file_util::getFileSeparator() + merged_file_name;
     }
     // The merge takes TopFD's spectra (without the masses the post mass
-    // matching of a fraction added) and the PrSMs before the
-    // post-processing, <frac>_ms2.toppic_all_raw_prsm (the best PrSM of
-    // every spectrum over both passes with -s 2; kept by the fractions'
-    // cleanup for this merge, so -C needs fractions that were run with -k).
-    // The merged file has no SQLite database, so post mass matching is not
-    // applied to the merged results.
+    // matching of a fraction added; the PrSM files store no peak ids, and
+    // the merged set is recounted) and each fraction's
+    // toppic_record_proteoform, the best PrSM of every proteoform after the
+    // FDR computation, decoys included; that file is always kept, so -C
+    // works without -k. The merged file has no SQLite database, so post
+    // mass matching is not applied to the merged results.
     std::string ms2_suffix = "_ms2.msalign";
-    std::string prsm_ext = "_ms2.toppic_all_raw_prsm";
     std::string para_str = "";
     std::cout << "Merging files started." << std::endl;
     std::cout << "Merging msalign files started." << std::endl;
@@ -929,9 +931,19 @@ int TopPICProgress_multi_file(std::map<std::string, std::string>& arguments,
     }
     // merge TOP files
     std::cout << "Merging identification files started." << std::endl;
+    // the record files are named after the post-matched spectrum file,
+    // <frac>_post_ms2 (<frac>_ms2 with -D), <frac> being the mzML base
+    // without the _mono suffix of a -g run (see
+    // prsm_post_mass_match::sqlFileName)
+    bool post_matched = arguments["postMassMatch"] == "true";
     std::vector<std::string> prsm_file_lst(raw_file_list.size());
     for (size_t i = 0; i < raw_file_list.size(); i++) {
-      prsm_file_lst[i] = raw_file_list[i] + prsm_ext;
+      std::string record_base = raw_file_list[i];
+      if (post_matched && str_util::endsWith(record_base, "_mono")) {
+        record_base = record_base.substr(0, record_base.size() - 5);
+      }
+      record_base += post_matched ? "_post_ms2" : "_ms2";
+      prsm_file_lst[i] = record_base + ".toppic_record_proteoform";
     }
     prsm_util::mergePrsmFiles(prsm_file_lst, SpPara::getMaxSpecNumPerFile(),
                               SpPara::getMaxFeatureNumPerFile(),
@@ -946,7 +958,7 @@ int TopPICProgress_multi_file(std::map<std::string, std::string>& arguments,
     // no SQLite database for the merged spectra: no post mass matching
     std::string post_mass_match = arguments["postMassMatch"];
     arguments["postMassMatch"] = "false";
-    TopPIC_multi_ptm_post(arguments);
+    TopPIC_multi_ptm_post(arguments, true);
     arguments["postMassMatch"] = post_mass_match;
     sp_file_name = merged_file_name + "_ms2.msalign";
     std::string post_sp_name = "";
@@ -954,12 +966,7 @@ int TopPICProgress_multi_file(std::map<std::string, std::string>& arguments,
       post_sp_name = arguments["spectrumFileName"];
     }
     cleanToppicDir(ori_db_file_name, sp_file_name, keep_temp_files,
-                   post_sp_name, false);
-    if (!keep_temp_files) {
-      for (size_t k = 0; k < raw_file_list.size(); k++) {
-        file_util::delFile(raw_file_list[k] + prsm_ext);
-      }
-    }
+                   post_sp_name);
   }
 
   base_data::release();
