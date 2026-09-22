@@ -82,6 +82,18 @@
 
 namespace toppic {
 
+// Copies the PrSM file the post-processing reports from -- the best PrSM of
+// every spectrum after the recount and the post mass matching,
+// <base>.toppic_recount, <base> being the spectrum file's name without its
+// extension (the _post_ms2 name when the post mass matching ran) -- to
+// <base>.report_raw_prsm, which is kept after the run (cleanToppicDir does
+// not delete it).
+void copyReportRawPrsm(const std::string& sp_file_name) {
+  std::string base_name = file_util::basename(sp_file_name);
+  file_util::copyFile(base_name + ".toppic_recount",
+                      base_name + ".report_raw_prsm", true);
+}
+
 // post_sp_name is the spectrum file written by the post mass matching (on by
 // default; --disable-post-match turns it off), whose name the result files
 // carry; "" if it did not run. toppic_all_raw_prsm (the best PrSM of every
@@ -643,6 +655,7 @@ int TopPIC_multi_ptm_post(std::map<std::string, std::string>& arguments) {
       msalign_util::geneSpIndex(sp_file_name);
       std::cout << "Post mass matching - finished." << std::endl;
     }
+    copyReportRawPrsm(sp_file_name);
 
     bool is_proteoform_ppm_error = (arguments["proteoformPpmError"] == "true");
     double proteoform_error_tole =

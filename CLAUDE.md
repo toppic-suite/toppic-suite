@@ -411,6 +411,10 @@ the input. Facts to keep straight:
   characterization (`-l`), FDR, cutoffs, tables and SQL output all read the
   spectra with the added masses under the new name; the FDR and the cutoffs
   use E-values, which are not recomputed.
+- **`<base>.report_raw_prsm` is a kept copy of `toppic_recount`** taken
+  right after the post mass matching (`copyReportRawPrsm`): the best PrSM
+  of every spectrum, targets and decoys, with the added masses, before the
+  clustering and the FDR. `cleanToppicDir` never deletes it.
 - **Result file names carry `_post_ms2`** whenever post matching ran; the
   cleanup in `toppic_process` (`cleanToppicDir`) takes that name to find the
   intermediate files. With `-D` the names are the plain `<base>_ms2` ones.
