@@ -82,12 +82,13 @@
 
 namespace toppic {
 
-// Copies the PrSM file the FDR computation reads -- the best PrSM of every
-// spectrum after the recount, the post mass matching, the clustering and the
-// PTM characterization, <base>.<input_file_ext> (toppic_cluster, or
-// toppic_cluster_local with -l), <base> being the spectrum file's name
-// without its extension (the _post_ms2 name when the post mass matching
-// ran) -- to <base>.report_raw_prsm, which is kept after the run
+// Copies the PrSM file the spectrum-level cutoff reads -- the best PrSM of
+// every spectrum after the recount, the post mass matching, the clustering,
+// the PTM characterization and the FDR computation,
+// <base>.<input_file_ext> (toppic_cluster_fdr with -d; toppic_cluster, or
+// toppic_cluster_local with -l, without), <base> being the spectrum file's
+// name without its extension (the _post_ms2 name when the post mass
+// matching ran) -- to <base>.report_raw_prsm, which is kept after the run
 // (cleanToppicDir does not delete it).
 void copyReportRawPrsm(const std::string& sp_file_name,
                        const std::string& input_file_ext) {
@@ -707,7 +708,6 @@ int TopPIC_multi_ptm_post(std::map<std::string, std::string>& arguments) {
       raw_table_out = nullptr;
       std::cout << "Outputting Raw PrSM table - finished." << std::endl;
     }
-    copyReportRawPrsm(sp_file_name, cur_suffix);
 
     if (arguments["searchType"] == "TARGET+DECOY") {
       std::cout << "FDR computation - started. " << std::endl;
@@ -723,6 +723,7 @@ int TopPIC_multi_ptm_post(std::map<std::string, std::string>& arguments) {
       std::cout << "FDR computation - finished." << std::endl;
       cur_suffix = "toppic_cluster_fdr";
     }
+    copyReportRawPrsm(sp_file_name, cur_suffix);
 
     std::string spectra_cutoff_type = arguments["cutoffSpectralType"];
     double spectra_cutoff_value;
