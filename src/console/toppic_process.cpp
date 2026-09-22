@@ -85,10 +85,12 @@ namespace toppic {
 // post_sp_name is the spectrum file written by the post mass matching (on by
 // default; --disable-post-match turns it off), whose name the result files
 // carry; "" if it did not run. toppic_all_raw_prsm (the best PrSM of every
-// spectrum before the post-processing) is always kept: a later combined run
-// (-c) merges it.
+// spectrum before the post-processing) is deleted with the other
+// intermediate files unless keep_all_raw_prsm: the fractions of a combined
+// run (-c) keep it until the merge has read it.
 void cleanToppicDir(const std::string& fa_name, const std::string& sp_name,
-                    bool keep_temp_files, const std::string& post_sp_name) {
+                    bool keep_temp_files, const std::string& post_sp_name,
+                    bool keep_all_raw_prsm) {
   std::string abs_sp_name = file_util::absoluteName(sp_name);
   std::string sp_base = file_util::basename(abs_sp_name);
   std::replace(sp_base.begin(), sp_base.end(), '\\', '/');
@@ -110,6 +112,7 @@ void cleanToppicDir(const std::string& fa_name, const std::string& sp_name,
   if (!keep_temp_files && post_sp_name != "") {
     file_util::delFile(file_util::absoluteName(post_sp_name) + "_index");
     file_util::delFile(out_base + ".feature");
+    file_util::delFile(out_base + ".toppic_recount");
     file_util::delFile(out_base + ".toppic_proteoform_cluster");
     file_util::delFile(out_base + ".toppic_cluster");
     file_util::delFile(out_base + ".toppic_cluster_fdr");
@@ -144,6 +147,9 @@ void cleanToppicDir(const std::string& fa_name, const std::string& sp_name,
     file_util::delFile(sp_base + ".toppic_multi_evalue_all");
     file_util::delFile(sp_base + ".toppic_multi_raw_prsm");
     file_util::delFile(sp_base + ".toppic_raw_prsm");
+    if (!keep_all_raw_prsm) {
+      file_util::delFile(sp_base + ".toppic_all_raw_prsm");
+    }
     file_util::delFile(sp_base + ".toppic_multi_shift");
     file_util::cleanPrefix(sp_name, sp_base + ".toppic_multi_shift_");
     file_util::delFile(sp_base + ".toppic_combined");
@@ -568,9 +574,10 @@ int TopPIC_multi_ptm_search(std::map<std::string, std::string>& arguments) {
 // of every spectrum: the first-pass PrSM of the skipped spectra and, for the
 // searched spectra, the best of their first-pass and multiple-shift PrSMs
 // (toppic_all_raw_prsm); without -s 2 (and for the merged file of a -c run)
-// it is toppic_raw_prsm. The set is recounted, clustered, characterized and
-// given one FDR and the spectrum-level cutoff; then the post mass matching,
-// the proteoform and protein cutoffs, the tables and the SQLite file.
+// it is toppic_raw_prsm. The set is recounted and post-matched (the added
+// masses are in every later step), then clustered, characterized and given
+// one FDR and the spectrum-level cutoff; then the proteoform and protein
+// cutoffs, the tables and the SQLite file.
 int TopPIC_multi_ptm_post(std::map<std::string, std::string>& arguments) {
   try {
     std::string resource_dir = arguments["resourceDir"];
@@ -615,6 +622,27 @@ int TopPIC_multi_ptm_post(std::map<std::string, std::string>& arguments) {
                                     "toppic_recount");
     std::cout << "Recounting matched masses and fragments - finished."
               << std::endl;
+
+    if (arguments["postMassMatch"] == "true") {
+      // On the best PrSM of every spectrum, targets and decoys alike, before
+      // the clustering, characterization, FDR and cutoffs: every later step
+      // sees the added masses. The E-values, which the FDR and the
+      // spectrum-level cutoff use, are not recomputed.
+      std::cout << "Post mass matching - started." << std::endl;
+      int min_peak_num = std::stoi(arguments["postMinPeakNum"]);
+      // the EnvCNN model scores the added masses
+      onnx_env_cnn::initModel(resource_dir,
+                              std::stoi(arguments["threadNumber"]));
+      sp_file_name = prsm_post_mass_match::process(
+          prsm_para_ptr, "toppic_recount", "toppic_recount", min_peak_num);
+      // The steps below read the spectra with the added masses and the PrSMs
+      // with the recounted matches, and name their files after the new
+      // spectrum file.
+      arguments["spectrumFileName"] = sp_file_name;
+      prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
+      msalign_util::geneSpIndex(sp_file_name);
+      std::cout << "Post mass matching - finished." << std::endl;
+    }
 
     bool is_proteoform_ppm_error = (arguments["proteoformPpmError"] == "true");
     double proteoform_error_tole =
@@ -691,26 +719,6 @@ int TopPIC_multi_ptm_post(std::map<std::string, std::string>& arguments) {
                                   spectra_cutoff_value);
     std::cout << "PrSM filtering by " << spectra_cutoff_type << " - finished."
               << std::endl;
-
-    if (arguments["postMassMatch"] == "true") {
-      // On the reported PrSMs only: the FDRs and the spectrum-level cutoff
-      // use the E-values, which the added masses do not change.
-      std::cout << "Post mass matching - started." << std::endl;
-      int min_peak_num = std::stoi(arguments["postMinPeakNum"]);
-      // the EnvCNN model scores the added masses
-      onnx_env_cnn::initModel(resource_dir,
-                              std::stoi(arguments["threadNumber"]));
-      sp_file_name = prsm_post_mass_match::process(
-          prsm_para_ptr, "toppic_prsm_cutoff", "toppic_prsm_cutoff",
-          min_peak_num);
-      // The steps below read the spectra with the added masses and the PrSMs
-      // with the recounted matches, and name their files after the new
-      // spectrum file.
-      arguments["spectrumFileName"] = sp_file_name;
-      prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
-      msalign_util::geneSpIndex(sp_file_name);
-      std::cout << "Post mass matching - finished." << std::endl;
-    }
 
     {
       double cutoff_value;
@@ -876,8 +884,10 @@ int TopPICProgress_multi_file(std::map<std::string, std::string>& arguments,
       if (arguments["spectrumFileName"] != spec_file_lst[k]) {
         post_sp_name = arguments["spectrumFileName"];
       }
+      // a combined run merges the fractions' toppic_all_raw_prsm files:
+      // they are deleted after the merge (below)
       cleanToppicDir(ori_db_file_name, spec_file_lst[k], keep_temp_files,
-                     post_sp_name);
+                     post_sp_name, arguments["combinedOutputName"] != "");
     }
   }
 
@@ -894,12 +904,13 @@ int TopPICProgress_multi_file(std::map<std::string, std::string>& arguments,
       merged_file_name =
           base_path + file_util::getFileSeparator() + merged_file_name;
     }
-    // Post mass matching runs only on the reported PrSMs of a fraction, so
-    // the merge takes TopFD's spectra and the PrSMs before the
-    // post-processing, <frac>_ms2.toppic_all_raw_prsm (always kept; the
-    // best PrSM of every spectrum over both passes with -s 2). The merged
-    // file has no SQLite database, so post mass matching is not applied to
-    // the merged results.
+    // The merge takes TopFD's spectra (without the masses the post mass
+    // matching of a fraction added) and the PrSMs before the
+    // post-processing, <frac>_ms2.toppic_all_raw_prsm (the best PrSM of
+    // every spectrum over both passes with -s 2; kept by the fractions'
+    // cleanup for this merge, so -C needs fractions that were run with -k).
+    // The merged file has no SQLite database, so post mass matching is not
+    // applied to the merged results.
     std::string ms2_suffix = "_ms2.msalign";
     std::string prsm_ext = "_ms2.toppic_all_raw_prsm";
     std::string para_str = "";
@@ -942,7 +953,12 @@ int TopPICProgress_multi_file(std::map<std::string, std::string>& arguments,
       post_sp_name = arguments["spectrumFileName"];
     }
     cleanToppicDir(ori_db_file_name, sp_file_name, keep_temp_files,
-                   post_sp_name);
+                   post_sp_name, false);
+    if (!keep_temp_files) {
+      for (size_t k = 0; k < raw_file_list.size(); k++) {
+        file_util::delFile(raw_file_list[k] + prsm_ext);
+      }
+    }
   }
 
   base_data::release();

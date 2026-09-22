@@ -405,12 +405,12 @@ the input. Facts to keep straight:
   `ToppicArgument::validateArguments` (so a run fails before the search),
   `process()` itself (abort), and `toppic_gui`'s `checkError()` (a warning
   dialog before toppic is launched). Keep all three in step.
-- **It runs on the reported PrSMs, at the end.** `TopPIC_multi_ptm_post`
-  post-matches `toppic_prsm_cutoff` (the PrSMs passing the spectrum-level
-  cutoff, after the FDR) and applies the proteoform and protein cutoffs and
-  the outputs under the new name; the FDR and the cutoff use E-values, which
-  the added masses do not change. PTM characterization (`-l`) runs before
-  it, on the spectra without the added masses.
+- **It runs on the best PrSM of every spectrum, right after the match
+  recount.** `TopPIC_multi_ptm_post` post-matches `toppic_recount` (targets
+  and decoys alike, before the clustering), and the clustering, PTM
+  characterization (`-l`), FDR, cutoffs, tables and SQL output all read the
+  spectra with the added masses under the new name; the FDR and the cutoffs
+  use E-values, which are not recomputed.
 - **Result file names carry `_post_ms2`** whenever post matching ran; the
   cleanup in `toppic_process` (`cleanToppicDir`) takes that name to find the
   intermediate files. With `-D` the names are the plain `<base>_ms2` ones.
@@ -419,9 +419,11 @@ the input. Facts to keep straight:
   false for the merged post-processing. The merge uses TopFD's
   `<frac>_ms2.msalign` and `<frac>_ms2.toppic_all_raw_prsm`, the best PrSM
   of every spectrum before the post-processing (over both passes of a
-  `-s 2` run; a copy of `toppic_raw_prsm` otherwise), the one PrSM file
-  `cleanToppicDir` always keeps (`toppic_raw_prsm` is deleted without
-  `-k`).
+  `-s 2` run; a copy of `toppic_raw_prsm` otherwise). Without `-k` the
+  fractions' cleanup keeps that file until the merge has read it, and the
+  combined run deletes it afterwards (a single-file run deletes it with the
+  other intermediates), so `-C` (combine-result-only) needs fractions that
+  were run with `-k`.
   `msalign_frac_merge::mergeFractions` takes the MS/MS file suffix. Combined
   results are always `<name>_ms2_toppic_*`.
 - **The multiple-shift stage runs after the first-pass top selection
@@ -436,8 +438,8 @@ the input. Facts to keep straight:
   first-pass and multiple-shift PrSMs per searched spectrum
   (`toppic_multi_raw_prsm`); the skipped spectra's PrSMs go to
   `toppic_multi_skipped`. `TopPIC_multi_ptm_post` merges the two into
-  `toppic_all_raw_prsm` and runs the recount, clustering, characterization,
-  FDR and cutoffs once on it, then the post mass matching and the outputs.
+  `toppic_all_raw_prsm` and runs the recount, the post mass matching,
+  clustering, characterization, FDR and cutoffs once on it, then the outputs.
   Do not reintroduce a separate FDR for the multiple-shift PrSMs: with the
   skipped targets missing from its denominator it under-reports (toppic_test
   reports 0023/0024).
