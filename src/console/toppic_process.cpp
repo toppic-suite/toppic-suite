@@ -49,6 +49,7 @@
 #include "para/prsm_para.hpp"
 #include "prsm/prsm_coverage.hpp"
 #include "prsm/prsm_cutoff_selector.hpp"
+#include "prsm/prsm_decoy_filter.hpp"
 #include "prsm/prsm_fdr.hpp"
 #include "prsm/prsm_fdr_groups.hpp"
 #include "prsm/prsm_feature_cluster.hpp"
@@ -131,6 +132,7 @@ void cleanToppicDir(const std::string& fa_name, const std::string& sp_name,
     file_util::delFile(out_base + ".toppic_proteoform_cluster");
     file_util::delFile(out_base + ".toppic_cluster");
     file_util::delFile(out_base + ".toppic_cluster_fdr");
+    file_util::delFile(out_base + ".toppic_cluster_target");
     file_util::delFile(out_base + ".toppic_cluster_local");
     file_util::delFile(out_base + ".toppic_prsm_cutoff");
     file_util::delFile(out_base + ".toppic_form_cutoff");
@@ -553,22 +555,8 @@ int TopPIC_multi_ptm_search(std::map<std::string, std::string>& arguments) {
     // estimation of the multiple-shift pass.
     std::cout << "Multiple-shift top PrSM selecting - started" << std::endl;
     {
-      // the first-pass PrSMs of the searched spectra join the multiple-shift
-      // PrSMs (toppic_multi_first); those of the skipped spectra go straight
-      // to the final set (toppic_multi_skipped, read by TopPIC_multi_ptm_post)
-      PrsmXmlWriter writer(base_name + ".toppic_multi_first");
-      PrsmXmlWriter skipped_writer(base_name + ".toppic_multi_skipped");
-      for (size_t i = 0; i < first_ptrs.size(); i++) {
-        if (identified_spec_ids.count(first_ptrs[i]->getSpectrumId()) == 0) {
-          writer.write(first_ptrs[i]);
-        } else {
-          skipped_writer.write(first_ptrs[i]);
-        }
-      }
-      writer.close();
-      skipped_writer.close();
       std::vector<std::string> all_exts = {"toppic_multi_evalue",
-                                           "toppic_multi_first"};
+                                           "toppic_raw_prsm"};
       PrsmStrMergePtr all_merge_ptr = std::make_shared<PrsmStrMerge>(
           sp_file_name, all_exts, "toppic_multi_evalue_all",
           std::numeric_limits<int>::max(), false, false);
@@ -609,22 +597,7 @@ int TopPIC_multi_ptm_post(std::map<std::string, std::string>& arguments) {
     msalign_util::geneSpIndex(sp_file_name);
     std::string base_name = file_util::basename(sp_file_name);
 
-    // toppic_all_raw_prsm, the best PrSM of every spectrum before the
-    // post-processing, is the file a later combined run (-c) merges; it is
-    // the only PrSM file kept without -k (toppic_raw_prsm is deleted)
-    if (std::filesystem::exists(base_name + ".toppic_multi_raw_prsm")) {
-      std::cout << "Merging the first-pass and multiple-shift PrSMs - started."
-                << std::endl;
-      std::vector<std::string> raw_exts = {"toppic_multi_skipped",
-                                           "toppic_multi_raw_prsm"};
-      PrsmStrMergePtr merge_ptr = std::make_shared<PrsmStrMerge>(
-          sp_file_name, raw_exts, "toppic_all_raw_prsm",
-          std::numeric_limits<int>::max(), false, false);
-      merge_ptr->process();
-      merge_ptr = nullptr;
-      std::cout << "Merging the first-pass and multiple-shift PrSMs - finished."
-                << std::endl;
-    } else {
+    if (!std::filesystem::exists(base_name + ".toppic_multi_raw_prsm")) {
       file_util::copyFile(base_name + ".toppic_raw_prsm",
                           base_name + ".toppic_all_raw_prsm", true);
     }
@@ -697,6 +670,25 @@ int TopPIC_multi_ptm_post(std::map<std::string, std::string>& arguments) {
       cur_suffix = "toppic_cluster_local";
     }
 
+    if (arguments["searchType"] == "TARGET+DECOY") {
+      std::cout << "FDR computation - started. " << std::endl;
+      // the decoys are kept here so that report_raw_prsm and the raw PrSM
+      // tables carry them; without -K they are removed below
+      std::string keep_decoy = "true";
+      if (arguments["useFdrGroups"] == "true") {
+        // hidden option --fdr-groups: separate FDRs for the PrSM groups
+        // (0 shifts without/with variable PTMs, 1 shift, 2 shifts)
+        prsm_fdr_groups::process(sp_file_name, cur_suffix, "toppic_cluster_fdr",
+                                 keep_decoy);
+      } else {
+        prsm_fdr::process(sp_file_name, cur_suffix, "toppic_cluster_fdr",
+                          keep_decoy);
+      }
+      std::cout << "FDR computation - finished." << std::endl;
+      cur_suffix = "toppic_cluster_fdr";
+    }
+    copyReportRawPrsm(sp_file_name, cur_suffix);
+
     if (arguments["outputRawPrsmTable"] == "true") {
       std::cout << "Outputting Raw PrSM table - started." << std::endl;
       std::string raw_argu_str = ToppicArgument::outputTsvArguments(arguments);
@@ -709,21 +701,14 @@ int TopPIC_multi_ptm_post(std::map<std::string, std::string>& arguments) {
       std::cout << "Outputting Raw PrSM table - finished." << std::endl;
     }
 
-    if (arguments["searchType"] == "TARGET+DECOY") {
-      std::cout << "FDR computation - started. " << std::endl;
-      if (arguments["useFdrGroups"] == "true") {
-        // hidden option --fdr-groups: separate FDRs for the PrSM groups
-        // (0 shifts without/with variable PTMs, 1 shift, 2 shifts)
-        prsm_fdr_groups::process(sp_file_name, cur_suffix, "toppic_cluster_fdr",
-                                 arguments["keepDecoyResults"]);
-      } else {
-        prsm_fdr::process(sp_file_name, cur_suffix, "toppic_cluster_fdr",
-                          arguments["keepDecoyResults"]);
-      }
-      std::cout << "FDR computation - finished." << std::endl;
-      cur_suffix = "toppic_cluster_fdr";
+    if (arguments["searchType"] == "TARGET+DECOY" &&
+        arguments["keepDecoyResults"] != "true") {
+      std::cout << "Removing decoy identifications - started." << std::endl;
+      prsm_decoy_filter::process(sp_file_name, cur_suffix,
+                                 "toppic_cluster_target");
+      std::cout << "Removing decoy identifications - finished." << std::endl;
+      cur_suffix = "toppic_cluster_target";
     }
-    copyReportRawPrsm(sp_file_name, cur_suffix);
 
     std::string spectra_cutoff_type = arguments["cutoffSpectralType"];
     double spectra_cutoff_value;

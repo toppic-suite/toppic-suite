@@ -416,8 +416,13 @@ the input. Facts to keep straight:
   `toppic_cluster`, or `toppic_cluster_local` with `-l`, without), taken by
   `copyReportRawPrsm` after the FDR computation: the best PrSM of every
   spectrum with the added masses, the cluster ids and the FDRs, before the
-  cutoffs (decoys included only with `-K`). `cleanToppicDir` never deletes
-  it.
+  cutoffs, **decoys included** (the FDR step is always called with
+  `keep_decoy = "true"`; the `-o` raw PrSM tables are written from the
+  same file). Without `-K`, `prsm_decoy_filter::process` then writes
+  `toppic_cluster_fdr` without the decoy PrSMs (sequence names starting
+  with `DECOY_`) to `toppic_cluster_target`, which the cutoffs read.
+  `cleanToppicDir` deletes that file with the other intermediates and never
+  deletes `report_raw_prsm`.
 - **Result file names carry `_post_ms2`** whenever post matching ran; the
   cleanup in `toppic_process` (`cleanToppicDir`) takes that name to find the
   intermediate files. With `-D` the names are the plain `<base>_ms2` ones.
