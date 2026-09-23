@@ -227,14 +227,14 @@ path and linked into `toppic_common`:
   headers are silenced even when our own `-Wall` sources include them.
 - **ONNX Runtime** — `topfd/envcnn` and `topfd/ecscore/score` run the EnvCNN /
   ECScore neural-network models through the ONNX Runtime C++ API. A prebuilt
-  `libonnxruntime.so.1.14.1` and the C/C++ API headers are vendored under
+  `libonnxruntime.so.1.23.2` (SONAME symlink `libonnxruntime.so.1`; glibc >= 2.27) and the C/C++ API headers are vendored under
   `ext/onnx` (sources include it as `"onnx/onnxruntime_cxx_api.h"`, covered by
   the `SYSTEM` `ext/` include); it is linked as an `IMPORTED` shared object,
   `PRIVATE`, into `toppic_common`. The vendored `.so` is Linux x86-64 only;
   on macOS and Windows `CMakeLists.txt` instead locates the system package
   (Homebrew's `libonnxruntime.dylib`; MSYS2 UCRT64's `libonnxruntime.dll.a`)
   with `find_library` (overridable with `-DONNXRUNTIME_LIBRARY=...`) as an
-  `UNKNOWN IMPORTED` target, and still compiles against the vendored 1.14
+  `UNKNOWN IMPORTED` target, and still compiles against the vendored 1.23
   headers. Windows also links `ws2_32` into the vendored htslib and pwiz
   (Winsock), builds the GUI targets as `WIN32_EXECUTABLE`, and installs `res/`
   next to the executables because `getResourceDir()` does not consult the
@@ -256,7 +256,7 @@ custom prefix both work:
   six `*_gui` counterparts in `<prefix>/bin`. **When you add a new executable
   target, append it to the `TOPPIC_EXECUTABLES` list** (end of the file) so it
   is installed and gets the rpath below — nothing else is needed.
-- On Linux the vendored `ext/onnx/libonnxruntime.so.1.14.1` (which every
+- On Linux the vendored `ext/onnx/libonnxruntime.so.1.23.2` and its SONAME symlink (which every
   executable loads at run time, via `toppic_common`) is installed to
   `<prefix>/${CMAKE_INSTALL_LIBDIR}` (= `lib/toppic`), and the executables get
   `INSTALL_RPATH "$ORIGIN/../lib/toppic"` so the installed tree is relocatable.
