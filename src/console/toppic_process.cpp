@@ -86,8 +86,7 @@ namespace toppic {
 
 // post_sp_name is the spectrum file written by the post mass matching (on by
 // default; --disable-post-match turns it off), whose name the result files
-// carry; "" if it did not run. The three toppic_record_* files are never
-// deleted.
+// carry; "" if it did not run. toppic_record_prsm is never deleted.
 void cleanToppicDir(const std::string& fa_name, const std::string& sp_name,
                     bool keep_temp_files, const std::string& post_sp_name) {
   std::string abs_sp_name = file_util::absoluteName(sp_name);
@@ -557,9 +556,9 @@ int TopPIC_multi_ptm_search(std::map<std::string, std::string>& arguments) {
 // searched spectra, the best of their first-pass and multiple-shift PrSMs
 // (toppic_raw_prsm); without -s 2 it is toppic_pre_raw_prsm. The set is
 // recounted and post-matched (the added masses are in every later step),
-// then clustered, characterized and given one FDR; the best PrSMs per
-// spectrum, proteoform and protein are kept as the toppic_record_* files,
-// from which TopPIC_report writes the results.
+// then clustered, characterized and given one FDR; the best PrSM of every
+// spectrum is kept as toppic_record_prsm, from which TopPIC_report writes
+// the results.
 int TopPIC_postprocess(std::map<std::string, std::string>& arguments) {
   try {
     std::string resource_dir = arguments["resourceDir"];
@@ -656,8 +655,8 @@ int TopPIC_postprocess(std::map<std::string, std::string>& arguments) {
 
     if (arguments["searchType"] == "TARGET+DECOY") {
       std::cout << "FDR computation - started. " << std::endl;
-      // the decoys are kept here so that the toppic_record_* files carry them;
-      // without -K they are removed below
+      // the decoys are kept here so that toppic_record_prsm carries them;
+      // without -K TopPIC_report removes them
       std::string keep_decoy = "true";
       if (arguments["useFdrGroups"] == "true") {
         // hidden option --fdr-groups: separate FDRs for the PrSM groups
@@ -682,20 +681,6 @@ int TopPIC_postprocess(std::map<std::string, std::string>& arguments) {
     std::string record_base_name = file_util::basename(sp_file_name);
     file_util::copyFile(record_base_name + "." + cur_suffix,
                         record_base_name + ".toppic_record_prsm", true);
-
-    // the best PrSM of every proteoform cluster and of every protein
-    // cluster, kept as <base>.toppic_record_proteoform and
-    // <base>.toppic_record_protein (decoys included, like toppic_record_prsm)
-    std::cout << "Selecting top PrSMs for proteoforms - started." << std::endl;
-    prsm_form_filter::process(db_file_name, sp_file_name, cur_suffix,
-                              "toppic_record_proteoform");
-    std::cout << "Selecting top PrSMs for proteoforms - finished."
-              << std::endl;
-
-    std::cout << "Selecting top PrSMs for proteins - started." << std::endl;
-    prsm_prot_filter::process(db_file_name, sp_file_name,
-                              "toppic_record_proteoform", "toppic_record_protein");
-    std::cout << "Selecting top PrSMs for proteins - finished." << std::endl;
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;
@@ -703,9 +688,9 @@ int TopPIC_postprocess(std::map<std::string, std::string>& arguments) {
   return 0;
 }
 
-// Reporting: the cutoffs, the tables and the SQLite file, from the three
-// toppic_record_* files that TopPIC_postprocess left. The decoys are removed
-// first unless -K keeps them.
+// Reporting: the cutoffs, the tables and the SQLite file, from the
+// toppic_record_prsm file that TopPIC_postprocess left. The decoys are
+// removed first unless -K keeps them.
 int TopPIC_report(std::map<std::string, std::string>& arguments) {
   try {
     std::string sp_file_name = arguments["spectrumFileName"];
@@ -933,11 +918,11 @@ int TopPICProgress_multi_file(std::map<std::string, std::string>& arguments,
         record_base = record_base.substr(0, record_base.size() - 5);
       }
       record_base += post_matched ? "_post_ms2" : "_ms2";
-      prsm_file_lst[i] = record_base + ".toppic_record_proteoform";
+      prsm_file_lst[i] = record_base + ".toppic_record_prsm";
     }
     prsm_util::mergePrsmFiles(prsm_file_lst, SpPara::getMaxSpecNumPerFile(),
                               SpPara::getMaxFeatureNumPerFile(),
-                              merged_file_name + "_ms2.toppic_raw_prsm");
+                              merged_file_name + "_ms2.toppic_record_prsm");
     std::cout << "Merging identification files finished." << std::endl;
     std::cout << "Merging files - finished." << std::endl;
 

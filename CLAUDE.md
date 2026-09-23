@@ -417,35 +417,30 @@ the input. Facts to keep straight:
   inline in `TopPIC_postprocess` after the FDR computation: the best PrSM of every
   spectrum with the added masses, the cluster ids and the FDRs, before the
   cutoffs, **decoys included** (the FDR step is always called with
-  `keep_decoy = "true"`). `prsm_form_filter` and `prsm_prot_filter` then
-  select the best PrSM of every proteoform cluster and of every protein
-  cluster from it into `<base>.toppic_record_proteoform` and
-  `<base>.toppic_record_protein` (decoys included as well); nothing in the
-  single-file run reads these two, but a combined run (`-c`) merges the
-  fractions' `toppic_record_proteoform` files. The three record files are
-  where `TopPIC_postprocess` ends; `TopPIC_report` (the decoy removal, the
-  cutoffs, the tables and the SQL output) starts from `toppic_record_prsm`
-  and re-derives everything else from the argument map, so the two can be
-  run separately. Without `-K`, `prsm_decoy_filter::process` writes the
+  `keep_decoy = "true"`). It is where `TopPIC_postprocess` ends;
+  `TopPIC_report` (the decoy removal, the cutoffs, the tables and the SQL
+  output) starts from it and re-derives everything else from the argument
+  map, so the two can be run separately, and a combined run (`-c`) merges
+  the fractions' `toppic_record_prsm` files. Without `-K`, `prsm_decoy_filter::process` writes the
   PrSM file without the decoy PrSMs (sequence names starting with
   `DECOY_`) to `toppic_prsm_target`, which the spectrum-level cutoff reads
   (with `-K` it reads `toppic_record_prsm` itself); the proteoform and
   protein cutoffs and their best-PrSM selections then chain from
-  `toppic_prsm_cutoff` as before. `cleanToppicDir` deletes `toppic_prsm_target` and the cutoff
-  files with the other intermediates and never deletes the three
-  `toppic_record_*` files.
+  `toppic_prsm_cutoff` as before. `cleanToppicDir` deletes
+  `toppic_prsm_target` and the cutoff files with the other intermediates
+  and never deletes `toppic_record_prsm`.
 - **Result file names carry `_post_ms2`** whenever post matching ran; the
   cleanup in `toppic_process` (`cleanToppicDir`) takes that name to find the
   intermediate files. With `-D` the names are the plain `<base>_ms2` ones.
 - **Combined runs (`-c`) merge only the record files and report.**
   `TopPICProgress_multi_file` merges each fraction's
-  `toppic_record_proteoform`, named after the post-matched file:
-  `<frac>_post_ms2.toppic_record_proteoform`, or `<frac>_ms2.…` with `-D`,
+  `toppic_record_prsm`, named after the post-matched file:
+  `<frac>_post_ms2.toppic_record_prsm`, or `<frac>_ms2.…` with `-D`,
   where `<frac>` is the mzML base without the `_mono` suffix of a `-g` run
   (the same rule as `prsm_post_mass_match::sqlFileName`), into
-  `<name>_ms2.toppic_raw_prsm` and then calls `TopPIC_report` (not
+  `<name>_ms2.toppic_record_prsm` and then calls `TopPIC_report` (not
   `TopPIC_postprocess`) on `<name>_ms2.msalign`; it no longer merges the
-  msalign or feature files. The record files are always kept, so `-C`
+  msalign or feature files. The record file is always kept, so `-C`
   (combine-result-only) does not need `-k`; `toppic_raw_prsm` is an
   ordinary intermediate again. Combined results are always
   `<name>_ms2_toppic_*`.
@@ -463,7 +458,7 @@ the input. Facts to keep straight:
   `-s 2` `TopPIC_postprocess` copies `toppic_pre_raw_prsm` to that name).
   `TopPIC_postprocess` runs the recount, the post mass matching,
   clustering, characterization and FDR once on `toppic_raw_prsm` and
-  writes the record files; `TopPIC_report` runs the cutoffs and the
+  writes `toppic_record_prsm`; `TopPIC_report` runs the cutoffs and the
   outputs.
   Do not reintroduce a separate FDR for the multiple-shift PrSMs: with the
   skipped targets missing from its denominator it under-reports (toppic_test

@@ -32,11 +32,11 @@ int TopPIC_identify(std::map<std::string, std::string>& arguments);
 int TopPIC_multi_ptm_search(std::map<std::string, std::string>& arguments);
 
 // recounting, post mass matching, clustering, PTM characterization and FDR
-// on the best PrSM of every spectrum; leaves the toppic_record_* files
+// on the best PrSM of every spectrum; leaves toppic_record_prsm
 int TopPIC_postprocess(std::map<std::string, std::string>& arguments);
 
 // decoy removal (without -K), cutoffs, tables and SQLite output from the
-// toppic_record_* files
+// toppic_record_prsm file
 int TopPIC_report(std::map<std::string, std::string>& arguments);
 
 int TopPICProgress_multi_file(std::map<std::string, std::string>& arguments,
