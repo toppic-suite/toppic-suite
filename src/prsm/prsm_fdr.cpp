@@ -72,11 +72,11 @@ PrsmStrPtrVec2D getProteinGroups(const PrsmStrPtrVec2D& proteoforms) {
   return results;
 }
 
-// Split the proteoform groups of getProteoformGroups (targets and decoys grouped
-// together, ordered by their best E-value) by their best PrSM: a proteoform
-// is a target proteoform if its best (lowest E-value) PrSM is a target PrSM,
-// a decoy proteoform otherwise. Both outputs keep the best-E-value order, as
-// computeProteoformFdr needs.
+// Split the proteoform groups of getProteoformGroups (targets and decoys
+// grouped together, ordered by their best E-value) by their best PrSM: a
+// proteoform is a target proteoform if its best (lowest E-value) PrSM is a
+// target PrSM, a decoy proteoform otherwise. Both outputs keep the
+// best-E-value order, as computeProteoformFdr needs.
 void splitTargetDecoyProteoforms(const PrsmStrPtrVec2D& all_proteoforms,
                                  PrsmStrPtrVec2D& target_proteoforms,
                                  PrsmStrPtrVec2D& decoy_proteoforms) {

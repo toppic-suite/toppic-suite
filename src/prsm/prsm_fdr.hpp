@@ -37,9 +37,9 @@ PrsmStrPtrVec2D getProteoformGroups(const PrsmStrPtrVec& prsm_ptrs);
 // proteoform groups (ordered by best E-value) grouped by protein cluster
 PrsmStrPtrVec2D getProteinGroups(const PrsmStrPtrVec2D& proteoforms);
 
-// the proteoform groups of getProteoformGroups (targets and decoys grouped together)
-// split by their best PrSM: a proteoform is a target or a decoy according
-// to that PrSM
+// the proteoform groups of getProteoformGroups (targets and decoys grouped
+// together) split by their best PrSM: a proteoform is a target or a decoy
+// according to that PrSM
 void splitTargetDecoyProteoforms(const PrsmStrPtrVec2D& all_proteoforms,
                                  PrsmStrPtrVec2D& target_proteoforms,
                                  PrsmStrPtrVec2D& decoy_proteoforms);

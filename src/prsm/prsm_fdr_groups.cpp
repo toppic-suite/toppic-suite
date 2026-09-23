@@ -38,23 +38,23 @@ void process(const std::string& spec_file_name,
 
   PrsmStrPtrVec prsm_str_ptrs =
       prsm_reader_util::readAllPrsmStrs(input_file_name);
-  PrsmStrPtrVec all_ptrs1;
-  PrsmStrPtrVec all_ptrs2;
-  PrsmStrPtrVec all_ptrs3;
-  PrsmStrPtrVec all_ptrs4;
+  PrsmStrPtrVec all_prsms1;
+  PrsmStrPtrVec all_prsms2;
+  PrsmStrPtrVec all_prsms3;
+  PrsmStrPtrVec all_prsms4;
 
   // Group 1: No mass shift and 0 variable PTMS
-  PrsmStrPtrVec target_ptrs1;
-  PrsmStrPtrVec decoy_ptrs1;
+  PrsmStrPtrVec target_prsms1;
+  PrsmStrPtrVec decoy_prsms1;
   // Group2: No mass shift and >0 variable PTMs
-  PrsmStrPtrVec target_ptrs2;
-  PrsmStrPtrVec decoy_ptrs2;
+  PrsmStrPtrVec target_prsms2;
+  PrsmStrPtrVec decoy_prsms2;
   // Group3: 1 mass shift
-  PrsmStrPtrVec target_ptrs3;
-  PrsmStrPtrVec decoy_ptrs3;
+  PrsmStrPtrVec target_prsms3;
+  PrsmStrPtrVec decoy_prsms3;
   // Group4: 2 mass shift
-  PrsmStrPtrVec target_ptrs4;
-  PrsmStrPtrVec decoy_ptrs4;
+  PrsmStrPtrVec target_prsms4;
+  PrsmStrPtrVec decoy_prsms4;
   for (size_t i = 0; i < prsm_str_ptrs.size(); i++) {
     if (prsm_str_ptrs[i]->getEValue() == 0.0) {
       LOG_ERROR("toppic::PRSMFdr zero E value is reported");
@@ -64,65 +64,65 @@ void process(const std::string& spec_file_name,
         if (prsm_str_ptrs[i]->getUnexpectedPtmNum() == 0) {
           // 0 variable PTMs
           if (prsm_str_ptrs[i]->getVariablePtmNum() == 0) {
-            decoy_ptrs1.push_back(prsm_str_ptrs[i]);
+            decoy_prsms1.push_back(prsm_str_ptrs[i]);
           }
           //>0 variable PTMs
           else {
-            decoy_ptrs2.push_back(prsm_str_ptrs[i]);
+            decoy_prsms2.push_back(prsm_str_ptrs[i]);
           }
         }
         // 1 mass shift
         else if (prsm_str_ptrs[i]->getUnexpectedPtmNum() == 1) {
-          decoy_ptrs3.push_back(prsm_str_ptrs[i]);
+          decoy_prsms3.push_back(prsm_str_ptrs[i]);
         }
         // 2 mass shift
         else {
-          decoy_ptrs4.push_back(prsm_str_ptrs[i]);
+          decoy_prsms4.push_back(prsm_str_ptrs[i]);
         }
       } else {
         // 0 mass shift
         if (prsm_str_ptrs[i]->getUnexpectedPtmNum() == 0) {
           // 0 variable PTMs
           if (prsm_str_ptrs[i]->getVariablePtmNum() == 0) {
-            target_ptrs1.push_back(prsm_str_ptrs[i]);
+            target_prsms1.push_back(prsm_str_ptrs[i]);
           }
           //>0 variable PTMs
           else {
-            target_ptrs2.push_back(prsm_str_ptrs[i]);
+            target_prsms2.push_back(prsm_str_ptrs[i]);
           }
         }
         // 1 mass shift
         else if (prsm_str_ptrs[i]->getUnexpectedPtmNum() == 1) {
-          target_ptrs3.push_back(prsm_str_ptrs[i]);
+          target_prsms3.push_back(prsm_str_ptrs[i]);
         }
         // 2 mass shift
         else {
-          target_ptrs4.push_back(prsm_str_ptrs[i]);
+          target_prsms4.push_back(prsm_str_ptrs[i]);
         }
       }
     }
   }
-  std::sort(target_ptrs1.begin(), target_ptrs1.end(),
+  std::sort(target_prsms1.begin(), target_prsms1.end(),
             PrsmStr::cmpEValueIncProtInc);
-  std::sort(decoy_ptrs1.begin(), decoy_ptrs1.end(),
+  std::sort(decoy_prsms1.begin(), decoy_prsms1.end(),
             PrsmStr::cmpEValueIncProtInc);
-  std::sort(target_ptrs2.begin(), target_ptrs2.end(),
+  std::sort(target_prsms2.begin(), target_prsms2.end(),
             PrsmStr::cmpEValueIncProtInc);
-  std::sort(decoy_ptrs2.begin(), decoy_ptrs2.end(),
+  std::sort(decoy_prsms2.begin(), decoy_prsms2.end(),
             PrsmStr::cmpEValueIncProtInc);
-  std::sort(target_ptrs3.begin(), target_ptrs3.end(),
+  std::sort(target_prsms3.begin(), target_prsms3.end(),
             PrsmStr::cmpEValueIncProtInc);
-  std::sort(decoy_ptrs3.begin(), decoy_ptrs3.end(),
+  std::sort(decoy_prsms3.begin(), decoy_prsms3.end(),
             PrsmStr::cmpEValueIncProtInc);
-  std::sort(target_ptrs4.begin(), target_ptrs4.end(),
+  std::sort(target_prsms4.begin(), target_prsms4.end(),
             PrsmStr::cmpEValueIncProtInc);
-  std::sort(decoy_ptrs4.begin(), decoy_ptrs4.end(),
+  std::sort(decoy_prsms4.begin(), decoy_prsms4.end(),
             PrsmStr::cmpEValueIncProtInc);
 
-  prsm_fdr::computePrsmFdr(target_ptrs1, decoy_ptrs1);
-  prsm_fdr::computePrsmFdr(target_ptrs2, decoy_ptrs2);
-  prsm_fdr::computePrsmFdr(target_ptrs3, decoy_ptrs3);
-  prsm_fdr::computePrsmFdr(target_ptrs4, decoy_ptrs4);
+  prsm_fdr::computePrsmFdr(target_prsms1, decoy_prsms1);
+  prsm_fdr::computePrsmFdr(target_prsms2, decoy_prsms2);
+  prsm_fdr::computePrsmFdr(target_prsms3, decoy_prsms3);
+  prsm_fdr::computePrsmFdr(target_prsms4, decoy_prsms4);
 
   // Within each group, targets and decoys are grouped together by proteoform
   // cluster in E-value order, and a proteoform is a target or a decoy
@@ -136,11 +136,12 @@ void process(const std::string& spec_file_name,
   PrsmStrPtrVec2D target4_proteoforms;
   PrsmStrPtrVec2D decoy4_proteoforms;
   {
-    PrsmStrPtrVec* targets[] = {&target_ptrs1, &target_ptrs2, &target_ptrs3,
-                                &target_ptrs4};
-    PrsmStrPtrVec* decoys[] = {&decoy_ptrs1, &decoy_ptrs2, &decoy_ptrs3,
-                               &decoy_ptrs4};
-    PrsmStrPtrVec* alls[] = {&all_ptrs1, &all_ptrs2, &all_ptrs3, &all_ptrs4};
+    PrsmStrPtrVec* targets[] = {&target_prsms1, &target_prsms2, &target_prsms3,
+                                &target_prsms4};
+    PrsmStrPtrVec* decoys[] = {&decoy_prsms1, &decoy_prsms2, &decoy_prsms3,
+                               &decoy_prsms4};
+    PrsmStrPtrVec* alls[] = {&all_prsms1, &all_prsms2, &all_prsms3,
+                             &all_prsms4};
     PrsmStrPtrVec2D* target_forms[] = {&target1_proteoforms,
                                        &target2_proteoforms,
                                        &target3_proteoforms,
@@ -193,20 +194,21 @@ void process(const std::string& spec_file_name,
   PrsmXmlWriter writer(output_file_name);
 
   // every PrSM, targets and decoys, group by group in spectrum order
-  PrsmStrPtrVec* alls[] = {&all_ptrs1, &all_ptrs2, &all_ptrs3, &all_ptrs4};
+  PrsmStrPtrVec* alls[] = {&all_prsms1, &all_prsms2, &all_prsms3,
+                           &all_prsms4};
   for (int g = 0; g < 4; g++) {
     std::sort(alls[g]->begin(), alls[g]->end(),
               PrsmStr::cmpSpecIncPrecIncEvalueIncProtInc);
     writer.writeVector(*alls[g]);
   }
-  std::cout << "Group 1 target_ptrs: " << target_ptrs1.size()
-            << ", Group 1 decoy_ptrs: " << decoy_ptrs1.size() << std::endl;
-  std::cout << "Group 2 target_ptrs: " << target_ptrs2.size()
-            << ", Group 2 decoy_ptrs: " << decoy_ptrs2.size() << std::endl;
-  std::cout << "Group 3 target_ptrs: " << target_ptrs3.size()
-            << ", Group 3 decoy_ptrs: " << decoy_ptrs3.size() << std::endl;
-  std::cout << "Group 4 target_ptrs: " << target_ptrs4.size()
-            << ", Group 4 decoy_ptrs: " << decoy_ptrs4.size() << std::endl;
+  std::cout << "Group 1 target_prsms: " << target_prsms1.size()
+            << ", Group 1 decoy_prsms: " << decoy_prsms1.size() << std::endl;
+  std::cout << "Group 2 target_prsms: " << target_prsms2.size()
+            << ", Group 2 decoy_prsms: " << decoy_prsms2.size() << std::endl;
+  std::cout << "Group 3 target_prsms: " << target_prsms3.size()
+            << ", Group 3 decoy_prsms: " << decoy_prsms3.size() << std::endl;
+  std::cout << "Group 4 target_prsms: " << target_prsms4.size()
+            << ", Group 4 decoy_prsms: " << decoy_prsms4.size() << std::endl;
   writer.close();
 }
 
