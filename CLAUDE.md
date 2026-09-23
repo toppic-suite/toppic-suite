@@ -411,24 +411,36 @@ the input. Facts to keep straight:
   characterization (`-l`), FDR, cutoffs, tables and SQL output all read the
   spectra with the added masses under the new name; the FDR and the cutoffs
   use E-values, which are not recomputed.
-- **`<base>.toppic_record_prsm` is a kept copy of the PrSM file the
-  spectrum-level cutoff reads** (`toppic_cluster_fdr` with `-d`;
-  `toppic_cluster`, or `toppic_cluster_local` with `-l`, without), copied
-  inline in `TopPIC_postprocess` after the FDR computation: the best PrSM of every
+- **`<base>.toppic_record_prsm` is where `TopPIC_postprocess` ends and
+  `TopPIC_report` starts.** It is a copy, made inline at the end of
+  `TopPIC_postprocess`, of the PrSM file after the FDR computation
+  (`toppic_cluster_fdr` with `-d`; `toppic_cluster`, or
+  `toppic_cluster_local` with `-l`, without): the best PrSM of every
   spectrum with the added masses, the cluster ids and the FDRs, before the
   cutoffs, **decoys included** (the FDR step is always called with
-  `keep_decoy = "true"`). It is where `TopPIC_postprocess` ends;
-  `TopPIC_report` (the decoy removal, the cutoffs, the tables and the SQL
-  output) starts from it and re-derives everything else from the argument
-  map, so the two can be run separately, and a combined run (`-c`) merges
-  the fractions' `toppic_record_prsm` files. Without `-K`, `prsm_decoy_filter::process` writes the
-  PrSM file without the decoy PrSMs (sequence names starting with
-  `DECOY_`) to `toppic_prsm_target`, which the spectrum-level cutoff reads
-  (with `-K` it reads `toppic_record_prsm` itself); the proteoform and
-  protein cutoffs and their best-PrSM selections then chain from
-  `toppic_prsm_cutoff` as before. `cleanToppicDir` deletes
-  `toppic_prsm_target` and the cutoff files with the other intermediates
-  and never deletes `toppic_record_prsm`.
+  `keep_decoy = "true"`). `cleanToppicDir` never deletes it. `TopPIC_report`
+  (the decoy removal, the cutoffs, the tables and the SQL output) reads
+  only the argument map and re-derives the file names from it, so the two
+  stages can be run separately, and a combined run (`-c`) merges the
+  fractions' record files and runs the report alone. Without `-K`,
+  `prsm_decoy_filter::process` writes the PrSMs whose sequence name does
+  not start with `DECOY_` to `toppic_prsm_target`, which the spectrum-level
+  cutoff reads (with `-K` it reads `toppic_record_prsm` itself); the
+  proteoform and protein cutoffs and their best-PrSM selections chain from
+  `toppic_prsm_cutoff`, and `cleanToppicDir` deletes `toppic_prsm_target`
+  and the cutoff files with the other intermediates.
+- **The PrSM-only output steps take the spectrum base name, not the
+  spectrum file.** `prsm_decoy_filter`, `prsm_cutoff_selector`,
+  `prsm_form_filter`, `prsm_prot_filter` and `prsm_sql_output::write` only
+  ever name `<base>.<ext>` files (the SQL writer strips `_ms2`/`_post_ms2`
+  from it for the `.sqlite` name), so their first name argument is
+  `base_name`, the spectrum file name without its extension
+  (`file_util::basename(sp_file)`); `TopPIC_report` and `TopMG_post`
+  compute it once. Do not pass the spectrum file name to them. The steps
+  that need the spectra themselves — `PrsmMatchTableWriter` through
+  `prsm_reader_util::readPrsmsWithSpectra`, and `PrsmCoverage` — open the
+  msalign named in `PrsmPara`, so the report still needs `<base>.msalign`
+  on disk for the tables (the PrSM XML stores no peaks).
 - **Result file names carry `_post_ms2`** whenever post matching ran; the
   cleanup in `toppic_process` (`cleanToppicDir`) takes that name to find the
   intermediate files. With `-D` the names are the plain `<base>_ms2` ones.
@@ -451,18 +463,23 @@ the input. Facts to keep straight:
   (`TopPIC_identify` → `TopPIC_multi_ptm_search` → `TopPIC_postprocess` →
   `TopPIC_report`, no `TopPIC_post` any more).** `TopPIC_multi_ptm_search`
   reads `toppic_pre_raw_prsm` (the first-pass top selection), skips the
-  spectra whose best PrSM has an E-value strictly below the skip E-value (with `-d` the smallest E-value of a
-  decoy PrSM of the first pass, so that every spectrum a decoy could
-  compete with is searched again; 0.01 without a decoy database; the
-  hidden `--multi-skip-evalue <x>` overrides both), searches the
-  rest (`DiagFilterMng::skip_spec_ids_`), merges all first-pass PrSMs
-  (`toppic_pre_raw_prsm`, skipped spectra included) with the multiple-shift
-  ones and keeps the best PrSM per spectrum (`toppic_raw_prsm`; without
-  `-s 2` `TopPIC_postprocess` copies `toppic_pre_raw_prsm` to that name).
-  `TopPIC_postprocess` runs the recount, the post mass matching,
-  clustering, characterization and FDR once on `toppic_raw_prsm` and
-  writes `toppic_record_prsm`; `TopPIC_report` runs the cutoffs and the
-  outputs.
+  spectra whose best PrSM has an E-value strictly below the skip E-value
+  (with `-d` the smallest E-value of a decoy PrSM of the first pass, so
+  that every spectrum a decoy could compete with is searched again; 0.01
+  without a decoy database; the hidden `--multi-skip-evalue <x>` overrides
+  both), searches the rest (`DiagFilterMng::skip_spec_ids_`), merges all
+  first-pass PrSMs (`toppic_pre_raw_prsm`, skipped spectra included) with
+  the multiple-shift ones and keeps the best PrSM per spectrum
+  (`toppic_raw_prsm`; without `-s 2` `TopPIC_postprocess` copies
+  `toppic_pre_raw_prsm` to that name). `TopPIC_postprocess` runs the
+  recount, the post mass matching, clustering, characterization and FDR
+  once on `toppic_raw_prsm` and writes `toppic_record_prsm`;
+  `TopPIC_report` runs the decoy removal, the cutoffs and the outputs.
+  The PrSM file chain is therefore `toppic_pre_raw_prsm` → `toppic_raw_prsm`
+  → `toppic_recount` → `toppic_proteoform_cluster` → `toppic_cluster`
+  [→ `toppic_cluster_local`] [→ `toppic_cluster_fdr`] → `toppic_record_prsm`
+  [→ `toppic_prsm_target`] → `toppic_prsm_cutoff` → `toppic_form_cutoff`
+  → `toppic_form_cutoff_form` / `toppic_prot_cutoff` → `toppic_prot_cutoff_prot`.
   Do not reintroduce a separate FDR for the multiple-shift PrSMs: with the
   skipped targets missing from its denominator it under-reports (toppic_test
   reports 0023/0024).

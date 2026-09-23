@@ -38,7 +38,7 @@ TopPIC also reads, from the same directory:
 | File | Needed when | Purpose |
 |---|---|---|
 | `sample_ms2.feature` | Always, unless `--no-topfd-feature` is given | The proteoform feature of each MS/MS spectrum, used to cluster the identifications of one proteoform across spectra and to report abundances. |
-| `sample.sqlite` | Always, unless `--disable-post-match` is given | The centroided MS/MS peaks, used by post mass matching (section 2, step 13). TopFD writes it unless run with `-N`. A missing database is an error, reported before the search starts. |
+| `sample.sqlite` | Always, unless `--disable-post-match` is given | The centroided MS/MS peaks, used by post mass matching (section 2, step 9). TopFD writes it unless run with `-N`. A missing database is an error, reported before the search starts. |
 
 **Database indexes.** TopPIC does not require `topindex`. It prepares the
 database itself in a `<database>_idx/` directory next to the FASTA file, and
@@ -91,32 +91,34 @@ the result files are named after `sample_mono_ms2`.
 8. **Recounting matched masses and fragments.** The search uses only the
    masses whose EnvCNN score is at least `--filter-by-env-cnn`; matched
    masses and fragments are recounted against the complete spectra.
-9. **Proteoform and protein clustering.** PrSMs whose spectrum has no
-   TopFD feature are discarded (unless `--no-topfd-feature`). PrSMs sharing
-   a TopFD feature form one proteoform; proteoforms of the same protein
-   whose adjusted precursor masses agree within
-   `--proteoform-error-tolerance` are merged; proteoforms are then grouped
-   by protein.
-10. **PTM characterization** (only with `--local-ptm-file-name`). Each
+9. **Post mass matching** (default; off with `--disable-post-match`). For
+   the best PrSM of every spectrum, target or decoy, the theoretical
+   fragment masses that no deconvoluted mass matched are searched in the
+   centroided MS/MS peaks of the spectrum, stored in the TopFD SQLite
+   database, using the isotopic-envelope test of MSPathFinderT: an envelope
+   is accepted when its most abundant peak and at least
+   `--post-min-peak-num` of its peaks are present and its intensities fit
+   the theoretical ones. Each accepted fragment adds one mass to the
+   spectrum, scored by EnvCNN. The spectra with the added masses are
+   written to `sample_post_ms2.msalign`, **the steps below and the result
+   files use that name**, and the added envelopes are also stored in the
+   database. The E-values are not recomputed.
+10. **Proteoform and protein clustering.** PrSMs whose spectrum has no
+    TopFD feature are discarded (unless `--no-topfd-feature`). PrSMs sharing
+    a TopFD feature form one proteoform; proteoforms of the same protein
+    whose adjusted precursor masses agree within
+    `--proteoform-error-tolerance` are merged; proteoforms are then grouped
+    by protein.
+11. **PTM characterization** (only with `--local-ptm-file-name`). Each
     unexpected mass shift is compared with the listed common modifications,
     and the modification and its site are reported when the MIScore reaches
     `--miscore-threshold`.
-11. **FDR computation** (only with `--decoy`). Spectrum-, proteoform- and
+12. **FDR computation** (only with `--decoy`). Spectrum-, proteoform- and
     protein-level false discovery rates are estimated from the decoy hits.
-12. **Record file and decoy removal.** The PrSMs with their FDRs are
+13. **Record file and decoy removal.** The PrSMs with their FDRs are
     kept as `sample_post_ms2.toppic_record_prsm`, decoy identifications
     included. Unless `--keep-decoy-ids` is given, the decoy identifications
     are then removed from the PrSMs.
-13. **Post mass matching** (default; off with `--disable-post-match`). For
-    each reported PrSM, the theoretical fragment masses that no deconvoluted
-    mass matched are searched in the centroided MS/MS peaks of the spectrum,
-    stored in the TopFD SQLite database, using the isotopic-envelope test of
-    MSPathFinderT: an envelope is accepted when its most abundant peak and at
-    least `--post-min-peak-num` of its peaks are present and its intensities
-    fit the theoretical ones. Each accepted fragment adds one mass to the
-    spectrum, scored by EnvCNN. The spectra with the added masses are written
-    to `sample_post_ms2.msalign`, and **the result files use that name**.
-    The added envelopes are also stored in the database.
 14. **Filtering and output at three levels.** The PrSMs passing the
     spectrum-level cutoff are written to the PrSM tables; the best PrSM per
     proteoform passing the proteoform-level cutoff to the proteoform tables;
@@ -215,24 +217,24 @@ Cutoffs and output:
 | `-t`, `--spectrum-cutoff-type <EVALUE\|FDR>`, `-v`, `--spectrum-cutoff-value <number>` | EVALUE, 0.01 | Cutoff for PrSMs. |
 | `-T`, `--proteoform-cutoff-type <EVALUE\|FDR>`, `-V`, `--proteoform-cutoff-value <number>` | EVALUE, 0.01 | Cutoff for proteoforms. |
 | `-y`, `--protein-cutoff-type <EVALUE\|FDR>`, `-Y`, `--protein-cutoff-value <number>` | EVALUE, 0.01 | Cutoff for proteins; with `FDR` a protein is represented by its best proteoform. |
-| `-c`, `--combined-file-name <name>` | none | Combine several fractions: after the files are searched, their spectra, features (unless `-x`) and PrSMs are merged under `<name>_ms2.msalign` and the post-search steps (clustering, cutoffs, tables) are repeated on the merged data. A relative `<name>` is placed in the directory of the first spectrum file and must differ from the input file names. See the note below. |
+| `-c`, `--combined-file-name <name>` | none | Combine several fractions: after the files are searched, their spectra and their best PrSMs per spectrum are merged under `<name>_ms2` and the decoy removal, cutoffs and tables are repeated on the merged data. A relative `<name>` is placed in the directory of the first spectrum file and must differ from the input file names. See the note below. |
 | `-u`, `--thread-number <int>` | 1 | Number of threads. The filtering steps may use fewer, depending on the available memory. |
 | `-k`, `--keep-temp-files` | off | Keep the intermediate files. |
 | `-K`, `--keep-decoy-ids` | off | Keep decoy identifications in the result tables. |
 
-**Combining fractions.** With `-c`, each fraction is searched and
-post-matched on its own first (post mass matching needs the fraction's own
-TopFD SQLite database, and it is applied to the reported PrSMs only). The
-merge then takes, for every fraction, the post-matched spectra
+**Combining fractions.** With `-c`, each fraction is searched,
+post-matched, clustered and given its FDRs on its own first (post mass
+matching needs the fraction's own TopFD SQLite database). The merge then
+takes, for every fraction, the post-matched spectra
 (`<fraction>_post_ms2.msalign`, or `<fraction>_ms2.msalign` with
 `--disable-post-match`) and the best PrSM of every spectrum after the
 fraction's FDR computation (`<fraction>_post_ms2.toppic_record_prsm`, or
 `<fraction>_ms2.toppic_record_prsm`; decoy identifications included), and
 repeats the decoy removal, the cutoffs and the output steps on the merged
-data. Post mass matching is not
-applied to the merged file, which has no SQLite database. The combined
-results are always named `<name>_ms2_toppic_*`, and the merged spectra
-`<name>_ms2.msalign`. No SQLite database is written for the combined results.
+data; the clustering, PTM characterization and FDRs of the fractions are
+kept. The feature files are not merged. The combined results are always
+named `<name>_ms2_toppic_*`, and the merged spectra `<name>_ms2.msalign`.
+No SQLite database is written for the combined results.
 
 ## 5. Modification files
 
