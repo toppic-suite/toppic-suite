@@ -38,9 +38,12 @@ PrsmPtrVec readAllPrsms(const std::string& prsm_file_name,
 
 // Read the PrSMs of <spectrum base name>.<input_file_ext> and attach to each
 // its deconvoluted spectra (from the msalign file) and refined spectra, as the
-// table and SQL writers need them.
+// table and SQL writers need them. Masses whose EnvCNN score is below
+// env_cnn_cutoff are left out; the default 0 keeps every mass (the reader
+// gives a mass without a score the score 1).
 PrsmPtrVec readPrsmsWithSpectra(const PrsmParaPtr& prsm_para_ptr,
-                                const std::string& input_file_ext);
+                                const std::string& input_file_ext,
+                                double env_cnn_cutoff = 0.0);
 
 }  // namespace prsm_reader_util
 
