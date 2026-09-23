@@ -9,7 +9,7 @@ Two GitHub repositories hold the TopPIC Suite:
 
 | Role | Repository | Branch |
 |---|---|---|
-| **Private, the source of truth** | `https://github.com/liuxiaowen/toppic_suite_private.git` (the remote of this checkout may still show its old name `proteomics_cpp`; GitHub redirects) | `main` |
+| **Private, the source of truth** | `https://github.com/liuxiaowen/toppic_suite_private.git` (the `origin` of this checkout) | `main` |
 | **Public release copy** | `https://github.com/toppic-suite/toppic-suite.git` | `main` |
 
 Development happens in the private repository. Publishing means making the
