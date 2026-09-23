@@ -255,7 +255,7 @@ void process(const PrsmParaPtr& prsm_para_ptr,
        << "Peptide" << "\t"
        << "#unexpected_modifications" << "\t"
        << "#matched_peaks" << "\t"
-       << "#matched_fragment_ions" << "\t"
+       << "#matched_theo_frag_ions" << "\t"
        << "P-Value" << "\t"
        << "E-Value" << "\t"
        << "One_Protein_probabilty" << "\t"

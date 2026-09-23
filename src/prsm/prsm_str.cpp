@@ -54,9 +54,9 @@ PrsmStr::PrsmStr(const std::vector<std::string>& str_vec) {
   line = prsm_util::getXmlLine(str_vec_, "<match_peak_num>");
   match_peak_num_ = std::stod(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<match_theo_frag_num>");
-  match_frag_num_ = std::stod(prsm_util::getValueStr(line));
+  match_theo_frag_num_ = std::stod(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<norm_match_theo_frag_num>");
-  norm_match_frag_num_ = std::stod(prsm_util::getValueStr(line));
+  norm_match_theo_frag_num_ = std::stod(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<e_value>");
   if (line == "") {
     e_value_ = 0.0;
@@ -291,11 +291,11 @@ bool PrsmStr::cmpEValueIncProtInc(const PrsmStrPtr& a, const PrsmStrPtr& b) {
   }
 }
 
-bool PrsmStr::cmpMatchFragDecMatchPeakDecProtInc(const PrsmStrPtr& a,
-                                                 const PrsmStrPtr& b) {
-  if (a->getMatchFragNum() > b->getMatchFragNum()) {
+bool PrsmStr::cmpMatchTheoFragDecMatchPeakDecProtInc(const PrsmStrPtr& a,
+                                                     const PrsmStrPtr& b) {
+  if (a->getMatchTheoFragNum() > b->getMatchTheoFragNum()) {
     return true;
-  } else if (a->getMatchFragNum() < b->getMatchFragNum()) {
+  } else if (a->getMatchTheoFragNum() < b->getMatchTheoFragNum()) {
     return false;
   } else if (a->getMatchPeakNum() > b->getMatchPeakNum()) {
     return true;
@@ -306,11 +306,11 @@ bool PrsmStr::cmpMatchFragDecMatchPeakDecProtInc(const PrsmStrPtr& a,
   }
 }
 
-bool PrsmStr::cmpNormMatchFragDecProtInc(const PrsmStrPtr& a,
-                                         const PrsmStrPtr& b) {
-  if (a->getNormMatchFragNum() > b->getNormMatchFragNum()) {
+bool PrsmStr::cmpNormMatchTheoFragDecProtInc(const PrsmStrPtr& a,
+                                             const PrsmStrPtr& b) {
+  if (a->getNormMatchTheoFragNum() > b->getNormMatchTheoFragNum()) {
     return true;
-  } else if (a->getNormMatchFragNum() < b->getNormMatchFragNum()) {
+  } else if (a->getNormMatchTheoFragNum() < b->getNormMatchTheoFragNum()) {
     return false;
   } else {
     return a->getSeqName() < b->getSeqName();

@@ -55,7 +55,7 @@ void PrsmMatchTableWriter::writeHeader(std::ofstream& file) {
        << "Fixed PTMs" << delim << "# Unexpected modifications" << delim
        << "Unexpected modifications" << delim << "# Variable PTMs" << delim
        << "Variable PTMs" << delim << "MIScore" << delim << "# Matched masses"
-       << delim << "# Matched fragments" << delim << "E-value" << delim
+       << delim << "# Matched theo fragments" << delim << "E-value" << delim
        << "Spectrum-level Q-value" << delim << "Proteoform-level Q-value"
        << delim << "Protein-level Q-value" << std::endl;
 }

@@ -76,9 +76,9 @@ class PrsmStr {
 
   double getMatchPeakNum() { return match_peak_num_; }
 
-  double getMatchFragNum() { return match_frag_num_; }
+  double getMatchTheoFragNum() { return match_theo_frag_num_; }
 
-  double getNormMatchFragNum() { return norm_match_frag_num_; }
+  double getNormMatchTheoFragNum() { return norm_match_theo_frag_num_; }
 
   double getEValue() { return e_value_; }
 
@@ -128,11 +128,11 @@ class PrsmStr {
 
   static bool cmpEValueIncProtInc(const PrsmStrPtr& a, const PrsmStrPtr& b);
 
-  static bool cmpMatchFragDecMatchPeakDecProtInc(const PrsmStrPtr& a,
-                                                 const PrsmStrPtr& b);
+  static bool cmpMatchTheoFragDecMatchPeakDecProtInc(const PrsmStrPtr& a,
+                                                     const PrsmStrPtr& b);
 
-  static bool cmpNormMatchFragDecProtInc(const PrsmStrPtr& a,
-                                         const PrsmStrPtr& b);
+  static bool cmpNormMatchTheoFragDecProtInc(const PrsmStrPtr& a,
+                                             const PrsmStrPtr& b);
 
   static bool cmpSpecIncPrecIncEvalueIncProtInc(const PrsmStrPtr& a,
                                                 const PrsmStrPtr& b);
@@ -206,9 +206,9 @@ class PrsmStr {
   // The information below is stored in the prsm class
   double match_peak_num_;
 
-  double match_frag_num_;
+  double match_theo_frag_num_;
 
-  double norm_match_frag_num_;
+  double norm_match_theo_frag_num_;
 
   double e_value_;
 

@@ -65,7 +65,7 @@ std::function<void()> geneTask(const SpectrumSetPtr& spec_set_ptr,
 
     for (unsigned i = 0; i < prsm_vec.size(); i++) {
       if (std::round(prsm_vec[i]->getMatchTheoFragNum()) <=
-          std::round(mng_ptr->comp_evalue_min_match_frag_num_)) {
+          std::round(mng_ptr->comp_evalue_min_match_theo_frag_num_)) {
         prsm_vec[i]->setExpectedValuePtr(ExpectedValue::getMaxEvaluePtr());
       } else {
         if (prsm_vec[i]->getEValue() == 0.0) {
@@ -204,7 +204,7 @@ void EValueProcessor::compEvalues(const SpectrumSetPtr& spec_set_ptr,
   // with a max evalue.
   for (unsigned i = 0; i < sele_prsm_ptrs.size(); i++) {
     if (std::round(sele_prsm_ptrs[i]->getMatchTheoFragNum()) <=
-        std::round(mng_ptr_->comp_evalue_min_match_frag_num_)) {
+        std::round(mng_ptr_->comp_evalue_min_match_theo_frag_num_)) {
       // LOG_DEBUG("Set max e value ");
       sele_prsm_ptrs[i]->setExpectedValuePtr(ExpectedValue::getMaxEvaluePtr());
     } else {
