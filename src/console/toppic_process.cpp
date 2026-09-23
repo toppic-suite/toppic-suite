@@ -46,6 +46,7 @@
 #include "filter/zeroptm/zero_ptm_filter_processor.hpp"
 #include "ms/env/avg_mass_util.hpp"
 #include "ms/env/env_base.hpp"
+#include "ms/spec/msalign_frac_merge.hpp"
 #include "ms/spec/msalign_util.hpp"
 #include "para/prsm_para.hpp"
 #include "prsm/prsm_coverage.hpp"
@@ -901,22 +902,36 @@ int TopPICProgress_multi_file(std::map<std::string, std::string>& arguments,
       merged_file_name =
           base_path + file_util::getFileSeparator() + merged_file_name;
     }
-    // merge TOP files
-    std::cout << "Merging identification files started." << std::endl;
-    // the record files are named after the post-matched spectrum file,
+    // The record file of each fraction and the spectra it was matched
+    // against are named after the post-matched spectrum file,
     // <frac>_post_ms2 (<frac>_ms2 with -D), <frac> being the mzML base
     // without the _mono suffix of a -g run (see
-    // prsm_post_mass_match::sqlFileName)
+    // prsm_post_mass_match::sqlFileName).
     bool post_matched = arguments["postMassMatch"] == "true";
+    std::string ms2_suffix =
+        post_matched ? "_post_ms2.msalign" : "_ms2.msalign";
+    std::vector<std::string> record_base_list(raw_file_list.size());
     std::vector<std::string> prsm_file_lst(raw_file_list.size());
     for (size_t i = 0; i < raw_file_list.size(); i++) {
       std::string record_base = raw_file_list[i];
       if (post_matched && str_util::endsWith(record_base, "_mono")) {
         record_base = record_base.substr(0, record_base.size() - 5);
       }
+      record_base_list[i] = record_base;
       record_base += post_matched ? "_post_ms2" : "_ms2";
       prsm_file_lst[i] = record_base + ".toppic_record_prsm";
     }
+
+    std::cout << "Merging files - started." << std::endl;
+    // The merged spectra (<name>_ms2.msalign, with the masses the post mass
+    // matching added) are what the report attaches to the merged PrSMs.
+    std::cout << "Merging msalign files started." << std::endl;
+    std::string para_str = "";
+    msalign_frac_merge::mergeFractions(record_base_list, merged_file_name,
+                                       para_str, ms2_suffix);
+    std::cout << "Merging msalign files finished." << std::endl;
+
+    std::cout << "Merging identification files started." << std::endl;
     prsm_util::mergePrsmFiles(prsm_file_lst, SpPara::getMaxSpecNumPerFile(),
                               SpPara::getMaxFeatureNumPerFile(),
                               merged_file_name + "_ms2.toppic_record_prsm");

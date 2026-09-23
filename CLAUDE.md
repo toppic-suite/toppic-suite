@@ -432,15 +432,18 @@ the input. Facts to keep straight:
 - **Result file names carry `_post_ms2`** whenever post matching ran; the
   cleanup in `toppic_process` (`cleanToppicDir`) takes that name to find the
   intermediate files. With `-D` the names are the plain `<base>_ms2` ones.
-- **Combined runs (`-c`) merge only the record files and report.**
-  `TopPICProgress_multi_file` merges each fraction's
-  `toppic_record_prsm`, named after the post-matched file:
-  `<frac>_post_ms2.toppic_record_prsm`, or `<frac>_ms2.…` with `-D`,
-  where `<frac>` is the mzML base without the `_mono` suffix of a `-g` run
-  (the same rule as `prsm_post_mass_match::sqlFileName`), into
-  `<name>_ms2.toppic_record_prsm` and then calls `TopPIC_report` (not
-  `TopPIC_postprocess`) on `<name>_ms2.msalign`; it no longer merges the
-  msalign or feature files. The record file is always kept, so `-C`
+- **Combined runs (`-c`) merge the spectra and the record files, then
+  report.** `TopPICProgress_multi_file` merges each fraction's post-matched
+  spectra (`<frac>_post_ms2.msalign`, or `<frac>_ms2.msalign` with `-D`)
+  into `<name>_ms2.msalign` with `msalign_frac_merge::mergeFractions`, and
+  each fraction's `toppic_record_prsm` (`<frac>_post_ms2.toppic_record_prsm`,
+  or `<frac>_ms2.…` with `-D`), into `<name>_ms2.toppic_record_prsm`;
+  `<frac>` is the mzML base without the `_mono` suffix of a `-g` run (the
+  same rule as `prsm_post_mass_match::sqlFileName`). It then calls
+  `TopPIC_report` (not `TopPIC_postprocess`) on the merged files; the
+  spectra are merged from the post-matched files because the report
+  attaches them to the PrSMs, whose matches were counted on those spectra.
+  The feature files are not merged. The record file is always kept, so `-C`
   (combine-result-only) does not need `-k`; `toppic_raw_prsm` is an
   ordinary intermediate again. Combined results are always
   `<name>_ms2_toppic_*`.

@@ -223,12 +223,13 @@ Cutoffs and output:
 **Combining fractions.** With `-c`, each fraction is searched and
 post-matched on its own first (post mass matching needs the fraction's own
 TopFD SQLite database, and it is applied to the reported PrSMs only). The
-merge then takes, for every fraction, the best PrSM of every spectrum
-after the fraction's FDR computation
-(`<fraction>_post_ms2.toppic_record_prsm`, or
-`<fraction>_ms2.toppic_record_prsm` with `--disable-post-match`; decoy
-identifications included), and repeats the decoy removal, the cutoffs and
-the output steps on the merged data. Post mass matching is not
+merge then takes, for every fraction, the post-matched spectra
+(`<fraction>_post_ms2.msalign`, or `<fraction>_ms2.msalign` with
+`--disable-post-match`) and the best PrSM of every spectrum after the
+fraction's FDR computation (`<fraction>_post_ms2.toppic_record_prsm`, or
+`<fraction>_ms2.toppic_record_prsm`; decoy identifications included), and
+repeats the decoy removal, the cutoffs and the output steps on the merged
+data. Post mass matching is not
 applied to the merged file, which has no SQLite database. The combined
 results are always named `<name>_ms2_toppic_*`, and the merged spectra
 `<name>_ms2.msalign`. No SQLite database is written for the combined results.
