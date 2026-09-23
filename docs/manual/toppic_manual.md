@@ -161,7 +161,7 @@ columns are:
 | `# Protein hits`, `Protein accession`, `Protein description` | Number of proteins containing the proteoform, and the reported protein. |
 | `First residue`, `Last residue`, `Special amino acids`, `Database protein sequence`, `Previous amino acid`, `Proteoform`, `Next amino acid`, `Proteoform mass` | Position of the proteoform in the protein, the protein sequence, the proteoform with its modifications (the annotation is explained in [Proteoform annotation](proteoform.md)), and its mass. |
 | `Protein N-terminal form`, `Fixed PTMs`, `# Unexpected modifications`, `Unexpected modifications`, `# Variable PTMs`, `Variable PTMs`, `MIScore` | The N-terminal form, the modifications of the proteoform as `name:[position]` lists (see [Proteoform annotation](proteoform.md)), and the modification identification score of the PTM characterization. |
-| `# Matched masses`, `# Matched fragments`, `E-value` | The match statistics and the E-value. |
+| `# Matched exp fragments`, `# Matched theo fragments`, `E-value` | The match statistics and the E-value. |
 | `Spectrum-level Q-value`, `Proteoform-level Q-value`, `Protein-level Q-value` | The FDR-based q-values (only with `--decoy`; `-` otherwise). |
 
 A `-` marks a value that does not apply.

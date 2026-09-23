@@ -86,7 +86,7 @@ PrsmPtrVec OnePtmSearchProcessor::onePtmSearchOneSpec(
     }
   }
   std::sort(prsms.begin(), prsms.end(),
-            Prsm::cmpMatchFragDecMatchPeakDecProtInc);
+            Prsm::cmpMatchTheoFragDecMatchExpFragDecProtInc);
 
   PrsmPtrVec top_prsms = prsm_util::getTopPrsms(prsms, mng_ptr->n_report_);
   return top_prsms;

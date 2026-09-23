@@ -104,8 +104,8 @@ void PrsmCoverage::printTitle(std::ofstream& file) {
        << "Last_residue" << "\t"
        << "Peptide" << "\t"
        << "#unexpected_modifications" << "\t"
-       << "#matched_peaks" << "\t"
-       << "#matched_fragment_ions" << "\t"
+       << "#matched_exp_frag_ions" << "\t"
+       << "#matched_theo_frag_ions" << "\t"
        << "P-Value" << "\t"
        << "E-Value" << "\t"
        << "One_Protein_probabilty" << "\t"
@@ -141,8 +141,8 @@ void PrsmCoverage::printTwoTitle(std::ofstream& file) {
        << "Last_residue" << "\t"
        << "Peptide" << "\t"
        << "#unexpected_modifications" << "\t"
-       << "#matched_peaks" << "\t"
-       << "#matched_fragment_ions" << "\t"
+       << "#matched_exp_frag_ions" << "\t"
+       << "#matched_theo_frag_ions" << "\t"
        << "P-Value" << "\t"
        << "E-Value" << "\t"
        << "One_Protein_probabilty" << "\t"
@@ -271,8 +271,9 @@ void PrsmCoverage::compOneCoverage(std::ofstream& file, const PrsmPtr& prsm_ptr,
        << prsm_ptr->getProteoformPtr()->getEndPos() << "\t"
        << prsm_ptr->getProteoformPtr()->getProteoformMatchSeq() << "\t"
        << prsm_ptr->getProteoformPtr()->getAlterNum(AlterType::UNEXPECTED)
-       << "\t" << prsm_ptr->getMatchPeakNum() << "\t"
-       << prsm_ptr->getMatchFragNum() << "\t" << prsm_ptr->getPValue() << "\t"
+       << "\t" << prsm_ptr->getMatchExpFragNum() << "\t"
+       << prsm_ptr->getMatchTheoFragNum() << "\t"
+       << prsm_ptr->getPValue() << "\t"
        << prsm_ptr->getEValue() << "\t" << prsm_ptr->getOneProtProb() << "\t"
        << prsm_ptr->getFdr() << "\t";
   computeCoverage(file, prsm_ptr, pair_ptrs, prsm_para_ptr);
@@ -318,8 +319,9 @@ void PrsmCoverage::compTwoCoverage(std::ofstream& file, const PrsmPtr& prsm_ptr,
        << prsm_ptr->getProteoformPtr()->getEndPos() << "\t"
        << prsm_ptr->getProteoformPtr()->getProteoformMatchSeq() << "\t"
        << prsm_ptr->getProteoformPtr()->getAlterNum(AlterType::UNEXPECTED)
-       << "\t" << prsm_ptr->getMatchPeakNum() << "\t"
-       << prsm_ptr->getMatchFragNum() << "\t" << prsm_ptr->getPValue() << "\t"
+       << "\t" << prsm_ptr->getMatchExpFragNum() << "\t"
+       << prsm_ptr->getMatchTheoFragNum() << "\t"
+       << prsm_ptr->getPValue() << "\t"
        << prsm_ptr->getEValue() << "\t" << prsm_ptr->getOneProtProb() << "\t"
        << prsm_ptr->getFdr() << "\t";
   computeCoverage(file, prsm_ptr, pair_ptrs_1, prsm_para_ptr);

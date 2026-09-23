@@ -70,10 +70,10 @@ void process(const std::string& db_file_name, const std::string& base_name,
       prsms[i]->setPrsmId(id);
       selected_prsms.push_back(prsms[i]);
       id++;
-    } else if (frag_cutoff && prsms[i]->getMatchFragNum() >= cutoff_value) {
+    } else if (frag_cutoff && prsms[i]->getMatchTheoFragNum() >= cutoff_value) {
       prsms[i]->setPrsmId(id);
-      ExpectedValuePtr ev_ptr =
-          std::make_shared<ExpectedValue>(-prsms[i]->getMatchFragNum(), 1, 1);
+      ExpectedValuePtr ev_ptr = std::make_shared<ExpectedValue>(
+          -prsms[i]->getMatchTheoFragNum(), 1, 1);
       prsms[i]->setExpectedValuePtr(ev_ptr);
       selected_prsms.push_back(prsms[i]);
       id++;

@@ -92,8 +92,8 @@ void PrsmSqlWriter::createPrsmTable(const std::string& table_name) {
                                  "variable_ptm_num INT NOT NULL,"
                                  "variable_ptms TEXT NOT NULL,"
                                  "mi_score TEXT NOT NULL,"
-                                 "matched_peak_num INT NOT NULL,"
-                                 "matched_fragment_num INT NOT NULL,"
+                                 "matched_exp_frag_num INT NOT NULL,"
+                                 "matched_theo_frag_num INT NOT NULL,"
                                  "e_value REAL NOT NULL,"
                                  "spectrum_fdr REAL,"
                                  "proteoform_fdr REAL,"
@@ -218,8 +218,10 @@ void PrsmSqlWriter::writePrsm(sqlite3_stmt* stmt, const PrsmPtr& prsm_ptr) {
   sqlite3_bind_int(stmt, idx++, form_ptr->getAlterNum(AlterType::VARIABLE));
   bindText(stmt, idx++, form_ptr->getAlterStr(AlterType::VARIABLE));
   bindText(stmt, idx++, form_ptr->getMIScore());
-  sqlite3_bind_int(stmt, idx++, static_cast<int>(prsm_ptr->getMatchPeakNum()));
-  sqlite3_bind_int(stmt, idx++, static_cast<int>(prsm_ptr->getMatchFragNum()));
+  sqlite3_bind_int(stmt, idx++,
+                   static_cast<int>(prsm_ptr->getMatchExpFragNum()));
+  sqlite3_bind_int(stmt, idx++,
+                   static_cast<int>(prsm_ptr->getMatchTheoFragNum()));
   sqlite3_bind_double(stmt, idx++, prsm_ptr->getEValue());
   bindFdr(stmt, idx++, prsm_ptr->getFdr());
   bindFdr(stmt, idx++, prsm_ptr->getProteoformFdr());

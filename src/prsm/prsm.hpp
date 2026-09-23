@@ -83,12 +83,12 @@ class Prsm {
 
   ExtendMsPtrVec getRefineMsPtrVec() { return refine_ms_three_vec_; }
 
-  double getMatchPeakNum() { return match_peak_num_; }
+  double getMatchExpFragNum() { return match_exp_frag_num_; }
 
-  double getMatchFragNum() { return match_fragment_num_; }
+  double getMatchTheoFragNum() { return match_theo_frag_num_; }
 
   // Normalized match fragment number is used in TopMG for ranking PrSMs
-  double getNormMatchFragNum();
+  double getNormMatchTheoFragNum();
 
   // Expected related functions
   double getEValue();
@@ -157,12 +157,12 @@ class Prsm {
   void setFracFeatureId(int id) { frac_feature_id_ = id; }
 
   // comparison
-  static bool cmpMatchFragDecMatchPeakDecProtInc(const PrsmPtr& a,
-                                                 const PrsmPtr& b);
+  static bool cmpMatchTheoFragDecMatchExpFragDecProtInc(const PrsmPtr& a,
+                                                        const PrsmPtr& b);
 
   // sort by number of matched fragment ions, then start position
-  static bool cmpMatchFragDecMatchPeakDecProtIncStartPosInc(const PrsmPtr& a,
-                                                            const PrsmPtr& b);
+  static bool cmpMatchTheoFragDecMatchExpFragDecProtIncStartPosInc(
+      const PrsmPtr& a, const PrsmPtr& b);
 
   static bool cmpEValueIncProtInc(const PrsmPtr& a, const PrsmPtr& b);
 
@@ -220,10 +220,10 @@ class Prsm {
 
   ExpectedValuePtr expected_value_ptr_;
 
-  double match_peak_num_ = 0;
-  double match_fragment_num_ = 0;
-  // norm_match_fragment_num is computed in a function,
-  // not stored in the class
+  double match_exp_frag_num_ = 0;
+  double match_theo_frag_num_ = 0;
+  // the normalized number is computed by getNormMatchTheoFragNum(), not
+  // stored in the class
 
   double fdr_ = -1;
   double proteoform_fdr_ = -1;

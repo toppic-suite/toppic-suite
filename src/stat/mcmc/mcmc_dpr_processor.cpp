@@ -325,7 +325,7 @@ std::function<void()> geneTask(
 void DprProcessor::processOnePrsm(const PrsmPtr& prsm_ptr,
                                   const SpectrumSetPtr& spec_set_ptr,
                                   const PrsmXmlWriterPtr& prsm_writer) {
-  if (prsm_ptr->getMatchFragNum() < 4) {
+  if (prsm_ptr->getMatchTheoFragNum() < 4) {
     prsm_ptr->setExpectedValuePtr(ExpectedValue::getMaxEvaluePtr());
     prsm_writer->write(prsm_ptr);
     return;

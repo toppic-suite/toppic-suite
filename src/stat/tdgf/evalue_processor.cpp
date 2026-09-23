@@ -64,8 +64,8 @@ std::function<void()> geneTask(const SpectrumSetPtr& spec_set_ptr,
     comp_pvalue_ptr->process(spec_set_ptr, prsm_vec, ppo, is_separate);
 
     for (unsigned i = 0; i < prsm_vec.size(); i++) {
-      if (std::round(prsm_vec[i]->getMatchFragNum()) <=
-          std::round(mng_ptr->comp_evalue_min_match_frag_num_)) {
+      if (std::round(prsm_vec[i]->getMatchTheoFragNum()) <=
+          std::round(mng_ptr->comp_evalue_min_match_theo_frag_num_)) {
         prsm_vec[i]->setExpectedValuePtr(ExpectedValue::getMaxEvaluePtr());
       } else {
         if (prsm_vec[i]->getEValue() == 0.0) {
@@ -185,7 +185,7 @@ bool EValueProcessor::checkPrsms(const PrsmPtrVec& prsm_ptrs) {
     ExpectedValuePtr extreme_value_ptr = prsm_ptrs[i]->getExpectedValuePtr();
     if (extreme_value_ptr != nullptr) {
       double evalue = extreme_value_ptr->getEValue();
-      double frag_num = prsm_ptrs[i]->getMatchFragNum();
+      double frag_num = prsm_ptrs[i]->getMatchTheoFragNum();
       if (evalue <= mng_ptr_->computation_evalue_cutoff &&
           frag_num >= mng_ptr_->computation_frag_num_cutoff) {
         return false;
@@ -203,9 +203,8 @@ void EValueProcessor::compEvalues(const SpectrumSetPtr& spec_set_ptr,
   // if matched peak number is too small or E-value is 0, replace it
   // with a max evalue.
   for (unsigned i = 0; i < sele_prsm_ptrs.size(); i++) {
-    // LOG_DEBUG("Fragment number " << sele_prsm_ptrs[i]->getMatchFragNum());
-    if (std::round(sele_prsm_ptrs[i]->getMatchFragNum()) <=
-        std::round(mng_ptr_->comp_evalue_min_match_frag_num_)) {
+    if (std::round(sele_prsm_ptrs[i]->getMatchTheoFragNum()) <=
+        std::round(mng_ptr_->comp_evalue_min_match_theo_frag_num_)) {
       // LOG_DEBUG("Set max e value ");
       sele_prsm_ptrs[i]->setExpectedValuePtr(ExpectedValue::getMaxEvaluePtr());
     } else {
