@@ -413,11 +413,12 @@ the input. Facts to keep straight:
   characterization (`-l`), FDR, cutoffs, tables and SQL output all read the
   spectra with the added masses under the new name; the FDR and the cutoffs
   use E-values, which are not recomputed.
-- **Cluster protein filtering runs between the PTM characterization and
-  the FDR** (`prsm/prsm_cluster_prot_filter`, branch `cluster_prot_filter`):
-  in every proteoform cluster only the PrSMs of the protein of the
-  cluster's lowest-E-value PrSM survive (`toppic_cluster_prot`, deleted
-  without `-k`); the FDR reads that file. Combined runs
+- **Cluster protein filtering runs between the clustering and the PTM
+  characterization** (`prsm/prsm_cluster_prot_filter`, branch
+  `cluster_prot_filter`): in every proteoform cluster only the PrSMs of the
+  protein of the cluster's lowest-E-value PrSM survive
+  (`toppic_cluster_prot`, deleted without `-k`); the PTM characterization
+  (`-l`) and the FDR read that file. Combined runs
   (`TopPIC_multi_postprocess`) do not run it.
 - **`<base>.toppic_record_prsm` is where `TopPIC_postprocess` ends and
   `TopPIC_report` starts.** It is a copy, made inline at the end of
@@ -496,7 +497,8 @@ the input. Facts to keep straight:
   `TopPIC_report` runs the decoy removal, the cutoffs and the outputs.
   The PrSM file chain is therefore `toppic_pre_raw_prsm` → `toppic_raw_prsm`
   → `toppic_recount` → `toppic_proteoform_cluster` → `toppic_cluster`
-  [→ `toppic_cluster_local`] [→ `toppic_cluster_fdr`] → `toppic_record_prsm`
+  → `toppic_cluster_prot` [→ `toppic_cluster_local`] [→ `toppic_cluster_fdr`]
+  → `toppic_record_prsm`
   [→ `toppic_prsm_target`] → `toppic_prsm_cutoff` → `toppic_form_cutoff`
   → `toppic_form_cutoff_form` / `toppic_prot_cutoff` → `toppic_prot_cutoff_prot`.
   Do not reintroduce a separate FDR for the multiple-shift PrSMs: with the

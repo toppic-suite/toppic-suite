@@ -109,14 +109,14 @@ the result files are named after `sample_mono_ms2`.
     whose adjusted precursor masses agree within
     `--proteoform-error-tolerance` are merged; proteoforms are then grouped
     by protein.
-11. **PTM characterization** (only with `--local-ptm-file-name`). Each
-    unexpected mass shift is compared with the listed common modifications,
-    and the modification and its site are reported when the MIScore reaches
-    `--miscore-threshold`.
-12. **Cluster protein filtering.** In every proteoform cluster the PrSMs
+11. **Cluster protein filtering.** In every proteoform cluster the PrSMs
     whose protein differs from the protein of the cluster's PrSM with the
     lowest E-value are removed, so that a proteoform mass matched to two
     proteins is counted once, for the better-supported protein.
+12. **PTM characterization** (only with `--local-ptm-file-name`). Each
+    unexpected mass shift is compared with the listed common modifications,
+    and the modification and its site are reported when the MIScore reaches
+    `--miscore-threshold`.
 13. **FDR computation** (only with `--decoy`). Spectrum-, proteoform- and
     protein-level false discovery rates are estimated from the decoy hits.
 14. **Record file and decoy removal.** The PrSMs with their FDRs are

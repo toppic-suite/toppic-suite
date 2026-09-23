@@ -644,6 +644,18 @@ int TopPIC_postprocess(std::map<std::string, std::string>& arguments) {
     std::cout << "Finding PrSM protein clusters - finished." << std::endl;
     std::string cur_suffix = "toppic_cluster";
 
+    // In every proteoform cluster keep only the PrSMs of the protein of the
+    // cluster's best-E-value PrSM (the others are the same proteoform mass
+    // matched to another protein); the PTM characterization and the FDR run
+    // on the rest.
+    std::cout << "Cluster protein filtering - started." << std::endl;
+    int removed_num = prsm_cluster_prot_filter::process(
+        file_util::basename(sp_file_name), cur_suffix, "toppic_cluster_prot");
+    std::cout << "Cluster protein filtering - removed " << removed_num
+              << " PrSMs." << std::endl;
+    std::cout << "Cluster protein filtering - finished." << std::endl;
+    cur_suffix = "toppic_cluster_prot";
+
     if (arguments["localPtmFileName"] != "") {
       std::cout << "PTM characterization - started." << std::endl;
       LocalMngPtr local_mng = std::make_shared<LocalMng>(
@@ -656,17 +668,6 @@ int TopPIC_postprocess(std::map<std::string, std::string>& arguments) {
       std::cout << "PTM characterization - finished." << std::endl;
       cur_suffix = "toppic_cluster_local";
     }
-
-    // In every proteoform cluster keep only the PrSMs of the protein of the
-    // cluster's best-E-value PrSM (the others are the same proteoform mass
-    // matched to another protein); the FDR is computed on the rest.
-    std::cout << "Cluster protein filtering - started." << std::endl;
-    int removed_num = prsm_cluster_prot_filter::process(
-        file_util::basename(sp_file_name), cur_suffix, "toppic_cluster_prot");
-    std::cout << "Cluster protein filtering - removed " << removed_num
-              << " PrSMs." << std::endl;
-    std::cout << "Cluster protein filtering - finished." << std::endl;
-    cur_suffix = "toppic_cluster_prot";
 
     if (arguments["searchType"] == "TARGET+DECOY") {
       std::cout << "FDR computation - started. " << std::endl;
