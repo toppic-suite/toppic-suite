@@ -142,6 +142,19 @@ void computeProteoformFdr(PrsmStrPtrVec2D& target_proteoforms,
       target_proteoforms[i][k]->setProteoformFdr(fdr);
     }
   }
+  // A decoy proteoform (a cluster whose best PrSM is a decoy) may hold
+  // target PrSMs of other spectra of the cluster. They are not a target
+  // proteoform and must not inherit the decoy proteoform's FDR, which would
+  // let them pass the proteoform-level cutoff (toppic_test experiment 40):
+  // they get FDR 1. (The decoy PrSMs of a target proteoform keep the target
+  // proteoform's FDR; they are only reported with -K.)
+  for (size_t j = 0; j < decoy_proteoforms.size(); j++) {
+    for (size_t k = 0; k < decoy_proteoforms[j].size(); k++) {
+      if (!isDecoy(decoy_proteoforms[j][k])) {
+        decoy_proteoforms[j][k]->setProteoformFdr(1.0);
+      }
+    }
+  }
 }
 
 // Protein-level FDR: each protein is represented by its best proteoform (the
@@ -175,6 +188,15 @@ void computeProteinFdr(PrsmStrPtrVec2D& target_proteins,
   for (size_t j = n_decoy; j < decoy_proteins.size(); j++) {
     for (size_t k = 0; k < decoy_proteins[j].size(); k++) {
       decoy_proteins[j][k]->setProteinFdr(1.0);
+    }
+  }
+  // the target PrSMs of a decoy protein (see computeProteoformFdr) are not
+  // a target protein: FDR 1
+  for (size_t j = 0; j < decoy_proteins.size(); j++) {
+    for (size_t k = 0; k < decoy_proteins[j].size(); k++) {
+      if (!isDecoy(decoy_proteins[j][k])) {
+        decoy_proteins[j][k]->setProteinFdr(1.0);
+      }
     }
   }
 }
