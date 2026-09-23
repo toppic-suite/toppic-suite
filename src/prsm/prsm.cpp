@@ -133,7 +133,7 @@ XmlDOMElement Prsm::toXmlElement(XmlDOMDocument* xml_doc,
   xml_doc->addElement(element, "match_peak_num", str.c_str());
   str = str_util::toString(match_theo_frag_num_);
   xml_doc->addElement(element, "match_fragment_num", str.c_str());
-  str = str_util::toString(getNormMatchFragNum());
+  str = str_util::toString(getNormMatchTheoFragNum());
   xml_doc->addElement(element, "norm_match_fragment_num", str.c_str());
   str = str_util::toString(fdr_);
   xml_doc->addElement(element, "fdr", str.c_str());
@@ -234,7 +234,7 @@ double Prsm::getOneProtProb() {
 }
 
 /* this function is temporary for testing mass graph alignment */
-double Prsm::getNormMatchFragNum() {
+double Prsm::getNormMatchTheoFragNum() {
   int var_change_num = proteoform_ptr_->getAlterNum(AlterType::VARIABLE);
   int unexp_change_num = proteoform_ptr_->getAlterNum(AlterType::UNEXPECTED);
   int start_pos = proteoform_ptr_->getStartPos();
@@ -266,8 +266,8 @@ void Prsm::setProteoformPtr(ProteoformPtr proteoform,
 
 // sort by the number of matched fragments, then the number of matched peaks
 // then protein name in the increasing order
-bool Prsm::cmpMatchFragDecMatchPeakDecProtInc(const PrsmPtr& a,
-                                              const PrsmPtr& b) {
+bool Prsm::cmpMatchTheoFragDecMatchPeakDecProtInc(const PrsmPtr& a,
+                                                  const PrsmPtr& b) {
   if (a->getMatchTheoFragNum() > b->getMatchTheoFragNum()) {
     return true;
   } else if (a->getMatchTheoFragNum() < b->getMatchTheoFragNum()) {
@@ -286,8 +286,8 @@ bool Prsm::cmpMatchFragDecMatchPeakDecProtInc(const PrsmPtr& a,
 
 // sort by number of matched fragment ions, then matched peaks,
 // then protein name, then start position
-bool Prsm::cmpMatchFragDecMatchPeakDecProtIncStartPosInc(const PrsmPtr& a,
-                                                         const PrsmPtr& b) {
+bool Prsm::cmpMatchTheoFragDecMatchPeakDecProtIncStartPosInc(
+    const PrsmPtr& a, const PrsmPtr& b) {
   if (a->getMatchTheoFragNum() > b->getMatchTheoFragNum()) {
     return true;
   } else if (a->getMatchTheoFragNum() < b->getMatchTheoFragNum()) {

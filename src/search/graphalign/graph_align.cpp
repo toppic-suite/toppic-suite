@@ -641,8 +641,8 @@ PrsmPtr GraphAlign::geneResult(int s) {
       }
 
       if (valid && (best_prsm_ptr == nullptr ||
-                    best_prsm_ptr->getNormMatchFragNum() <
-                        cur_prsm_ptr->getNormMatchFragNum())) {
+                    best_prsm_ptr->getNormMatchTheoFragNum() <
+                        cur_prsm_ptr->getNormMatchTheoFragNum())) {
         best_prsm_ptr = cur_prsm_ptr;
       }
     }

@@ -88,7 +88,7 @@ class Prsm {
   double getMatchTheoFragNum() { return match_theo_frag_num_; }
 
   // Normalized match fragment number is used in TopMG for ranking PrSMs
-  double getNormMatchFragNum();
+  double getNormMatchTheoFragNum();
 
   // Expected related functions
   double getEValue();
@@ -157,12 +157,12 @@ class Prsm {
   void setFracFeatureId(int id) { frac_feature_id_ = id; }
 
   // comparison
-  static bool cmpMatchFragDecMatchPeakDecProtInc(const PrsmPtr& a,
-                                                 const PrsmPtr& b);
+  static bool cmpMatchTheoFragDecMatchPeakDecProtInc(const PrsmPtr& a,
+                                                     const PrsmPtr& b);
 
   // sort by number of matched fragment ions, then start position
-  static bool cmpMatchFragDecMatchPeakDecProtIncStartPosInc(const PrsmPtr& a,
-                                                            const PrsmPtr& b);
+  static bool cmpMatchTheoFragDecMatchPeakDecProtIncStartPosInc(
+      const PrsmPtr& a, const PrsmPtr& b);
 
   static bool cmpEValueIncProtInc(const PrsmPtr& a, const PrsmPtr& b);
 
@@ -222,8 +222,8 @@ class Prsm {
 
   double match_peak_num_ = 0;
   double match_theo_frag_num_ = 0;
-  // norm_match_fragment_num is computed in a function,
-  // not stored in the class
+  // the normalized number is computed by getNormMatchTheoFragNum(), not
+  // stored in the class
 
   double fdr_ = -1;
   double proteoform_fdr_ = -1;

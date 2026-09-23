@@ -172,7 +172,7 @@ std::function<void()> geneTask(const SpectrumSetPtr& spec_set_ptr,
       }
     }
     std::sort(prsms.begin(), prsms.end(),
-              Prsm::cmpMatchFragDecMatchPeakDecProtInc);
+              Prsm::cmpMatchTheoFragDecMatchPeakDecProtInc);
     PrsmPtrVec selected_prsms =
         prsm_util::getTopPrsms(prsms, mng_ptr->n_report_);
 
