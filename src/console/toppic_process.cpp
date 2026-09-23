@@ -689,9 +689,70 @@ int TopPIC_postprocess(std::map<std::string, std::string>& arguments) {
   return 0;
 }
 
+// Post-processing of the merged PrSMs of a combined run (-c): the merged
+// record files of the fractions (<name>_ms2.toppic_raw_prsm) are clustered
+// again into proteoforms and proteins across the fractions (the fractions'
+// cluster ids overlap) and given one FDR, and the result is written to
+// <name>_ms2.toppic_record_prsm for TopPIC_report. No recount, post mass
+// matching or PTM characterization: the fractions' values are kept.
+int TopPIC_multi_postprocess(std::map<std::string, std::string>& arguments) {
+  try {
+    std::string sp_file_name = arguments["spectrumFileName"];
+    std::string base_name = file_util::basename(sp_file_name);
+    std::string ori_db_file_name = arguments["oriDatabaseFileName"];
+    std::string db_file_name =
+        ori_db_file_name + "_idx" + file_util::getFileSeparator() +
+        file_util::filenameFromEntirePath(arguments["databaseFileName"]);
+    PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
+    msalign_util::geneSpIndex(sp_file_name);
+
+    bool is_proteoform_ppm_error = (arguments["proteoformPpmError"] == "true");
+    double proteoform_error_tole =
+        std::stod(arguments["proteoformErrorTolerance"]);
+    if (is_proteoform_ppm_error) {
+      proteoform_error_tole = proteoform_error_tole / 1000000;
+    }
+    std::cout << "Finding PrSM proteoform clusters - started." << std::endl;
+    // by protein and precursor mass, whether or not the fractions had
+    // feature files
+    prsm_simple_cluster::process(
+        db_file_name, sp_file_name, "toppic_raw_prsm",
+        prsm_para_ptr->getFixModPtrVec(), "toppic_proteoform_cluster",
+        is_proteoform_ppm_error, proteoform_error_tole);
+    std::cout << "Finding PrSM proteoform clusters - finished." << std::endl;
+    std::cout << "Finding PrSM protein clusters - started." << std::endl;
+    prsm_prot_cluster::process(sp_file_name, "toppic_proteoform_cluster",
+                               "toppic_cluster");
+    std::cout << "Finding PrSM protein clusters - finished." << std::endl;
+    std::string cur_suffix = "toppic_cluster";
+
+    if (arguments["searchType"] == "TARGET+DECOY") {
+      std::cout << "FDR computation - started. " << std::endl;
+      // decoys kept, as in TopPIC_postprocess; TopPIC_report removes them
+      std::string keep_decoy = "true";
+      if (arguments["useFdrGroups"] == "true") {
+        prsm_fdr_groups::process(sp_file_name, cur_suffix, "toppic_cluster_fdr",
+                                 keep_decoy);
+      } else {
+        prsm_fdr::process(sp_file_name, cur_suffix, "toppic_cluster_fdr",
+                          keep_decoy);
+      }
+      std::cout << "FDR computation - finished." << std::endl;
+      cur_suffix = "toppic_cluster_fdr";
+    }
+    file_util::copyFile(base_name + "." + cur_suffix,
+                        base_name + ".toppic_record_prsm", true);
+  } catch (const char* e) {
+    std::cout << "[Exception]" << std::endl;
+    std::cout << e << std::endl;
+  }
+  return 0;
+}
+
 // Reporting: the cutoffs, the tables and the SQLite file, from the
-// toppic_record_prsm file that TopPIC_postprocess left. The decoys are
-// removed first unless -K keeps them.
+// toppic_record_prsm file that TopPIC_postprocess (or, for a combined run,
+// TopPIC_multi_postprocess) left. The decoys are removed first unless -K
+// keeps them.
 int TopPIC_report(std::map<std::string, std::string>& arguments) {
   try {
     std::string base_name = file_util::basename(arguments["spectrumFileName"]);
@@ -934,7 +995,7 @@ int TopPICProgress_multi_file(std::map<std::string, std::string>& arguments,
     std::cout << "Merging identification files started." << std::endl;
     prsm_util::mergePrsmFiles(prsm_file_lst, SpPara::getMaxSpecNumPerFile(),
                               SpPara::getMaxFeatureNumPerFile(),
-                              merged_file_name + "_ms2.toppic_record_prsm");
+                              merged_file_name + "_ms2.toppic_raw_prsm");
     std::cout << "Merging identification files finished." << std::endl;
     std::cout << "Merging files - finished." << std::endl;
 
@@ -942,6 +1003,7 @@ int TopPICProgress_multi_file(std::map<std::string, std::string>& arguments,
     arguments["spectrumFileName"] = sp_file_name;
     arguments["startTime"] = combined_start_time;
 
+    TopPIC_multi_postprocess(arguments);
     TopPIC_report(arguments);
     cleanToppicDir(ori_db_file_name, sp_file_name, keep_temp_files, "");
   }

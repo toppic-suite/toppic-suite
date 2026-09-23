@@ -35,6 +35,10 @@ int TopPIC_multi_ptm_search(std::map<std::string, std::string>& arguments);
 // on the best PrSM of every spectrum; leaves toppic_record_prsm
 int TopPIC_postprocess(std::map<std::string, std::string>& arguments);
 
+// combined runs (-c): clustering and FDR of the merged record PrSMs
+// (<name>_ms2.toppic_raw_prsm); leaves <name>_ms2.toppic_record_prsm
+int TopPIC_multi_postprocess(std::map<std::string, std::string>& arguments);
+
 // decoy removal (without -K), cutoffs, tables and SQLite output from the
 // toppic_record_prsm file
 int TopPIC_report(std::map<std::string, std::string>& arguments);

@@ -217,7 +217,7 @@ Cutoffs and output:
 | `-t`, `--spectrum-cutoff-type <EVALUE\|FDR>`, `-v`, `--spectrum-cutoff-value <number>` | EVALUE, 0.01 | Cutoff for PrSMs. |
 | `-T`, `--proteoform-cutoff-type <EVALUE\|FDR>`, `-V`, `--proteoform-cutoff-value <number>` | EVALUE, 0.01 | Cutoff for proteoforms. |
 | `-y`, `--protein-cutoff-type <EVALUE\|FDR>`, `-Y`, `--protein-cutoff-value <number>` | EVALUE, 0.01 | Cutoff for proteins; with `FDR` a protein is represented by its best proteoform. |
-| `-c`, `--combined-file-name <name>` | none | Combine several fractions: after the files are searched, their spectra and their best PrSMs per spectrum are merged under `<name>_ms2` and the decoy removal, cutoffs and tables are repeated on the merged data. A relative `<name>` is placed in the directory of the first spectrum file and must differ from the input file names. See the note below. |
+| `-c`, `--combined-file-name <name>` | none | Combine several fractions: after the files are searched, their spectra and best PrSMs per spectrum are merged under `<name>_ms2`, and the clustering (by protein and precursor mass), FDR computation, decoy removal, cutoffs and tables are repeated on the merged data. A relative `<name>` is placed in the directory of the first spectrum file and must differ from the input file names. See the note below. |
 | `-u`, `--thread-number <int>` | 1 | Number of threads. The filtering steps may use fewer, depending on the available memory. |
 | `-k`, `--keep-temp-files` | off | Keep the intermediate files. |
 | `-K`, `--keep-decoy-ids` | off | Keep decoy identifications in the result tables. |
@@ -228,13 +228,18 @@ matching needs the fraction's own TopFD SQLite database). The merge then
 takes, for every fraction, the post-matched spectra
 (`<fraction>_post_ms2.msalign`, or `<fraction>_ms2.msalign` with
 `--disable-post-match`) and the best PrSM of every spectrum after the
-fraction's FDR computation (`<fraction>_post_ms2.toppic_record_prsm`, or
-`<fraction>_ms2.toppic_record_prsm`; decoy identifications included), and
-repeats the decoy removal, the cutoffs and the output steps on the merged
-data; the clustering, PTM characterization and FDRs of the fractions are
-kept. The feature files are not merged. The combined results are always
-named `<name>_ms2_toppic_*`, and the merged spectra `<name>_ms2.msalign`.
-No SQLite database is written for the combined results.
+fraction's FDR computation
+(`<fraction>_post_ms2.toppic_record_prsm`, or
+`<fraction>_ms2.toppic_record_prsm`; decoy identifications included). The
+merged PrSMs are clustered again into proteoforms and proteins across the
+fractions, by protein and precursor mass as with `-x` (the feature files
+are not merged), and given one set of FDRs (steps 10 and 12), and the decoy
+removal, the cutoffs and the output steps are repeated on them; the
+recount, post mass matching and PTM characterization of the fractions are
+kept. The combined results are always named `<name>_ms2_toppic_*`, the
+merged spectra `<name>_ms2.msalign` and the merged best PrSMs
+`<name>_ms2.toppic_record_prsm`. No SQLite database is written for the
+combined results.
 
 ## 5. Modification files
 

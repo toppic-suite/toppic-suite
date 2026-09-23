@@ -444,24 +444,34 @@ the input. Facts to keep straight:
 - **Result file names carry `_post_ms2`** whenever post matching ran; the
   cleanup in `toppic_process` (`cleanToppicDir`) takes that name to find the
   intermediate files. With `-D` the names are the plain `<base>_ms2` ones.
-- **Combined runs (`-c`) merge the spectra and the record files, then
-  report.** `TopPICProgress_multi_file` merges each fraction's post-matched
-  spectra (`<frac>_post_ms2.msalign`, or `<frac>_ms2.msalign` with `-D`)
-  into `<name>_ms2.msalign` with `msalign_frac_merge::mergeFractions`, and
-  each fraction's `toppic_record_prsm` (`<frac>_post_ms2.toppic_record_prsm`,
-  or `<frac>_ms2.…` with `-D`), into `<name>_ms2.toppic_record_prsm`;
-  `<frac>` is the mzML base without the `_mono` suffix of a `-g` run (the
-  same rule as `prsm_post_mass_match::sqlFileName`). It then calls
-  `TopPIC_report` (not `TopPIC_postprocess`) on the merged files; the
-  spectra are merged from the post-matched files because the report
-  attaches them to the PrSMs, whose matches were counted on those spectra.
-  The feature files are not merged. The record file is always kept, so `-C`
-  (combine-result-only) does not need `-k`; `toppic_raw_prsm` is an
-  ordinary intermediate again. Combined results are always
-  `<name>_ms2_toppic_*`.
+- **Combined runs (`-c`) merge the spectra and record files, re-cluster,
+  compute one FDR and report.** `TopPICProgress_multi_file` merges each
+  fraction's post-matched spectra (`<frac>_post_ms2.msalign`, or
+  `<frac>_ms2.msalign` with `-D`) into `<name>_ms2.msalign` with
+  `msalign_frac_merge::mergeFractions`, and each fraction's
+  `toppic_record_prsm` (`<frac>_post_ms2.toppic_record_prsm`, or
+  `<frac>_ms2.…` with `-D`) into `<name>_ms2.toppic_raw_prsm`; `<frac>` is
+  the mzML base without the `_mono` suffix of a `-g` run (the same rule as
+  `prsm_post_mass_match::sqlFileName`). The spectra are merged from the
+  post-matched files because the report attaches them to the PrSMs, whose
+  matches were counted on those spectra. `TopPIC_multi_postprocess` then
+  clusters the merged PrSMs into proteoforms and proteins across the
+  fractions with `prsm_simple_cluster` (by protein and precursor mass, not
+  by feature; the feature files are not merged) and computes one FDR
+  (decoys kept), writing
+  `<name>_ms2.toppic_record_prsm`, and `TopPIC_report` runs on it. The
+  re-clustering is required: `prsm_util::mergePrsmFiles` offsets the
+  spectrum and feature ids per fraction but not the proteoform/protein
+  cluster ids, so without it the fractions' clusters collide and the
+  best-PrSM filters collapse them (79 combined proteoforms instead of 142
+  on st_1 + st_2). There is no recount, post mass matching or PTM
+  characterization on the merged set. The record file is always kept, so
+  `-C` (combine-result-only) does not need `-k`. Combined results are
+  always `<name>_ms2_toppic_*`.
 - **The multiple-shift stage runs after the first-pass top selection
   (`TopPIC_identify` → `TopPIC_multi_ptm_search` → `TopPIC_postprocess` →
-  `TopPIC_report`, no `TopPIC_post` any more).** `TopPIC_multi_ptm_search`
+  `TopPIC_report`, no `TopPIC_post` any more; a combined run's merged set
+  goes `TopPIC_multi_postprocess` → `TopPIC_report`).** `TopPIC_multi_ptm_search`
   reads `toppic_pre_raw_prsm` (the first-pass top selection), skips the
   spectra whose best PrSM has an E-value strictly below the skip E-value
   (with `-d` the smallest E-value of a decoy PrSM of the first pass, so
