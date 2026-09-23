@@ -413,13 +413,23 @@ the input. Facts to keep straight:
   characterization (`-l`), FDR, cutoffs, tables and SQL output all read the
   spectra with the added masses under the new name; the FDR and the cutoffs
   use E-values, which are not recomputed.
-- **Cluster protein filtering runs between the clustering and the PTM
-  characterization** (`prsm/prsm_cluster_prot_filter`, branch
-  `cluster_prot_filter`): in every proteoform cluster only the PrSMs of the
-  protein of the cluster's lowest-E-value PrSM survive
-  (`toppic_cluster_prot`, deleted without `-k`); the PTM characterization
-  (`-l`) and the FDR read that file. Combined runs
-  (`TopPIC_multi_postprocess`) do not run it.
+- **Cluster protein correction runs between the clustering and the PTM
+  characterization** (`stat/tdgf/cluster_prot_corrector`; it lives in
+  `stat` because it needs `EValueProcessor`): in every proteoform cluster
+  the PrSMs whose protein differs from the protein of the cluster's
+  lowest-E-value PrSM (the same proteoform mass matched to another
+  protein) get that PrSM's proteoform (shared pointer; its mass becomes
+  their adjusted precursor mass), their matched fragment numbers are
+  recounted on the spectra read with the search's EnvCNN cutoff, and their
+  E-values are recomputed with `EValueProcessor::compEvalues` on those
+  spectra (a `TdgfMng` built from the same values as the search's, with
+  `varPtmTypeNum` from the argument map, 0 if absent). Nothing is removed;
+  a corrected PrSM that matches at most
+  `comp_evalue_min_match_theo_frag_num_` fragments gets the maximum
+  E-value and fails the cutoffs. The output is `toppic_cluster_prot`
+  (deleted without `-k`); the PTM characterization (`-l`) and the FDR read
+  it. Combined runs (`TopPIC_multi_postprocess`) do not run it. The
+  earlier `prsm_cluster_prot_filter`, which dropped those PrSMs, is gone.
 - **`<base>.toppic_record_prsm` is where `TopPIC_postprocess` ends and
   `TopPIC_report` starts.** It is a copy, made inline at the end of
   `TopPIC_postprocess`, of the PrSM file after the FDR computation
@@ -720,7 +730,9 @@ above it, never the reverse:
   per thread and merge them with `PrsmStrMerge`. Use the runner for a new
   stage whose output order matters; `ZeroPtmSearchMng` and `PtmSearchMng`
   carry the thread number from the toppic `-u` option.
-- `src/stat` — E-value/p-value estimation (`count`/`local`/`mcmc`/`tdgf`).
+- `src/stat` — E-value/p-value estimation (`count`/`local`/`mcmc`/`tdgf`);
+  `tdgf/cluster_prot_corrector` (see the post mass matching section) is
+  here rather than in `prsm` because it recomputes E-values.
 - `src/merge` — the topdiff feature-merge backend (`feature_prsm`,
   `feature_sample_merge`), used by `console/topdiff_process`.
 
