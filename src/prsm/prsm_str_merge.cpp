@@ -111,7 +111,7 @@ void PrsmStrMerge::process() {
     if (cur_str_ptrs.size() > 0) {
       if (!norm_) {
         std::sort(cur_str_ptrs.begin(), cur_str_ptrs.end(),
-                  PrsmStr::cmpMatchTheoFragDecMatchPeakDecProtInc);
+                  PrsmStr::cmpMatchTheoFragDecMatchExpFragDecProtInc);
       } else {
         std::sort(cur_str_ptrs.begin(), cur_str_ptrs.end(),
                   PrsmStr::cmpNormMatchTheoFragDecProtInc);

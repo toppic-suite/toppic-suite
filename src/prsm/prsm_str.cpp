@@ -52,7 +52,7 @@ PrsmStr::PrsmStr(const std::vector<std::string>& str_vec) {
   line = prsm_util::getXmlLine(str_vec_, "<seq_desc>");
   seq_desc_ = prsm_util::getValueStr(line);
   line = prsm_util::getXmlLine(str_vec_, "<match_exp_frag_num>");
-  match_peak_num_ = std::stod(prsm_util::getValueStr(line));
+  match_exp_frag_num_ = std::stod(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<match_theo_frag_num>");
   match_theo_frag_num_ = std::stod(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<norm_match_theo_frag_num>");
@@ -291,15 +291,15 @@ bool PrsmStr::cmpEValueIncProtInc(const PrsmStrPtr& a, const PrsmStrPtr& b) {
   }
 }
 
-bool PrsmStr::cmpMatchTheoFragDecMatchPeakDecProtInc(const PrsmStrPtr& a,
-                                                     const PrsmStrPtr& b) {
+bool PrsmStr::cmpMatchTheoFragDecMatchExpFragDecProtInc(const PrsmStrPtr& a,
+                                                        const PrsmStrPtr& b) {
   if (a->getMatchTheoFragNum() > b->getMatchTheoFragNum()) {
     return true;
   } else if (a->getMatchTheoFragNum() < b->getMatchTheoFragNum()) {
     return false;
-  } else if (a->getMatchPeakNum() > b->getMatchPeakNum()) {
+  } else if (a->getMatchExpFragNum() > b->getMatchExpFragNum()) {
     return true;
-  } else if (a->getMatchPeakNum() < b->getMatchPeakNum()) {
+  } else if (a->getMatchExpFragNum() < b->getMatchExpFragNum()) {
     return false;
   } else {
     return a->getSeqName() < b->getSeqName();
