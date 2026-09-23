@@ -1,4 +1,3 @@
 *.onnx filter=lfs diff=lfs merge=lfs -text
 res/base_data/theo_patt.txt filter=lfs diff=lfs merge=lfs -text
 ext/onnx/libonnxruntime.so.* filter=lfs diff=lfs merge=lfs -text
-ext/onnx/libonnxruntime.so.1.23.2 filter=lfs diff=lfs merge=lfs -text
