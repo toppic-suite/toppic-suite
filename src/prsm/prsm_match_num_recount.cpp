@@ -30,10 +30,11 @@ namespace prsm_match_num_recount {
 
 void process(const PrsmParaPtr& prsm_para_ptr,
              const std::string& input_file_ext,
-             const std::string& output_file_ext) {
-  // attaches the full deconvoluted and refined spectra to each PrSM
-  PrsmPtrVec prsm_ptrs =
-      prsm_reader_util::readPrsmsWithSpectra(prsm_para_ptr, input_file_ext);
+             const std::string& output_file_ext, double env_cnn_cutoff) {
+  // attaches the deconvoluted spectra (masses at or above the cutoff) and
+  // the refined spectra to each PrSM
+  PrsmPtrVec prsm_ptrs = prsm_reader_util::readPrsmsWithSpectra(
+      prsm_para_ptr, input_file_ext, env_cnn_cutoff);
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     prsm_ptrs[i]->updateMatchNum(sp_para_ptr);

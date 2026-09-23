@@ -621,8 +621,11 @@ above it, never the reverse:
   Because the search stores matched mass/fragment numbers counted on the
   filtered masses, toppic and topmg run `prsm/prsm_match_num_recount` on
   `<tool>_raw_prsm` (writing `<tool>_recount`) before clustering to recount
-  them against the full spectra; the number of masses in the tables is not
-  stored in the PrSM but computed from the attached full spectra at output.
+  them against the full spectra (`prsm_match_num_recount::process` and
+  `prsm_reader_util::readPrsmsWithSpectra` take an EnvCNN cutoff whose
+  default, 0, keeps every mass; both drivers use the default); the number
+  of masses in the tables is not stored in the PrSM but computed from the
+  attached full spectra at output.
 - `src/topfd` — the TopFD deconvolution/feature-detection layer, built on `ms`:
   `common` (`topfd_para` config + the `topfd_process`/`topfd_single_process`
   orchestrators), `dp` (dynamic-programming envelope assignment), `envcnn` and
