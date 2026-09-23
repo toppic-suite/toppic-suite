@@ -25,13 +25,14 @@ namespace toppic {
 namespace prsm_sql_output {
 
 // Writes the identifications of a search into the topfd SQLite database of
-// the spectrum file (<spectrum base name without _ms2>.sqlite): the prsm
-// table (with mass-shift and protein-match details) from
-// <base>.<prsm_file_ext>, the proteoform table from <base>.<form_file_ext>,
-// the protein table from <base>.<prot_file_ext>, and the fasta_seq table from
-// the FASTA file. Does nothing (with a message) when the database does not
-// exist, e.g. when topfd was run with --no-sql.
-void write(const PrsmParaPtr& prsm_para_ptr, const std::string& sp_file_name,
+// the spectrum file (<base_name without _ms2 / _post_ms2>.sqlite; base_name
+// is the spectrum file name without its extension): the prsm table (with
+// mass-shift and protein-match details) from <base_name>.<prsm_file_ext>,
+// the proteoform table from <base_name>.<form_file_ext>, the protein table
+// from <base_name>.<prot_file_ext>, and the fasta_seq table from the FASTA
+// file. Does nothing (with a message) when the database does not exist,
+// e.g. when topfd was run with --no-sql.
+void write(const PrsmParaPtr& prsm_para_ptr, const std::string& base_name,
            const std::string& fasta_file_name,
            const std::string& prsm_file_ext,
            const std::string& form_file_ext,

@@ -22,7 +22,6 @@
 #include <iostream>
 #include <string>
 
-#include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
 #include "para/prsm_para.hpp"
@@ -33,12 +32,12 @@ namespace toppic {
 
 namespace prsm_sql_output {
 
-void write(const PrsmParaPtr& prsm_para_ptr, const std::string& sp_file_name,
+void write(const PrsmParaPtr& prsm_para_ptr, const std::string& base_name,
            const std::string& fasta_file_name,
            const std::string& prsm_file_ext,
            const std::string& form_file_ext,
            const std::string& prot_file_ext) {
-  std::string sql_base = file_util::basename(sp_file_name);
+  std::string sql_base = base_name;
   // the spectra written by the post mass matching keep TopFD's database name
   if (str_util::endsWith(sql_base, "_post_ms2")) {
     sql_base = sql_base.substr(0, sql_base.size() - 9);

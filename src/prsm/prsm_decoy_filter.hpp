@@ -22,10 +22,11 @@ namespace toppic {
 
 namespace prsm_decoy_filter {
 
-// Reads the PrSMs of <base>.<input_file_ext>, drops those matched to a decoy
-// protein (sequence name starting with "DECOY_") and writes the rest to
-// <base>.<output_file_ext>.
-void process(const std::string& spec_file_name,
+// Reads the PrSMs of <base_name>.<input_file_ext>, drops those matched to a
+// decoy protein (sequence name starting with "DECOY_") and writes the rest
+// to <base_name>.<output_file_ext>. base_name is the spectrum file name
+// without its extension.
+void process(const std::string& base_name,
              const std::string& input_file_ext,
              const std::string& output_file_ext);
 

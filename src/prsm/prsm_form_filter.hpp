@@ -16,13 +16,16 @@
 #ifndef TOPPIC_PRSM_PRSM_FORM_FILTER_HPP_
 #define TOPPIC_PRSM_PRSM_FORM_FILTER_HPP_
 
-#include <memory>
+#include <string>
 
 namespace toppic {
 
 namespace prsm_form_filter {
 
-void process(const std::string& db_file_name, const std::string& spec_file_name,
+// Keep, for each proteoform cluster of <base_name>.<input_file_ext>, only
+// its best PrSM and write them to <base_name>.<output_file_ext>; base_name
+// is the spectrum file name without its extension.
+void process(const std::string& db_file_name, const std::string& base_name,
              const std::string& input_file_ext,
              const std::string& output_file_ext);
 

@@ -693,7 +693,7 @@ int TopPIC_postprocess(std::map<std::string, std::string>& arguments) {
 // removed first unless -K keeps them.
 int TopPIC_report(std::map<std::string, std::string>& arguments) {
   try {
-    std::string sp_file_name = arguments["spectrumFileName"];
+    std::string base_name = file_util::basename(arguments["spectrumFileName"]);
     std::string ori_db_file_name = arguments["oriDatabaseFileName"];
     std::string db_file_name =
         ori_db_file_name + "_idx" + file_util::getFileSeparator() +
@@ -704,8 +704,7 @@ int TopPIC_report(std::map<std::string, std::string>& arguments) {
     if (arguments["searchType"] == "TARGET+DECOY" &&
         arguments["keepDecoyResults"] != "true") {
       std::cout << "Removing decoy identifications - started." << std::endl;
-      prsm_decoy_filter::process(sp_file_name, cur_suffix,
-                                 "toppic_prsm_target");
+      prsm_decoy_filter::process(base_name, cur_suffix, "toppic_prsm_target");
       cur_suffix = "toppic_prsm_target";
       std::cout << "Removing decoy identifications - finished." << std::endl;
     }
@@ -715,7 +714,7 @@ int TopPIC_report(std::map<std::string, std::string>& arguments) {
     std::istringstream(arguments["cutoffSpectralValue"]) >> spectra_cutoff_value;
     std::cout << "PrSM filtering by " << spectra_cutoff_type << " - started."
               << std::endl;
-    prsm_cutoff_selector::process(db_file_name, sp_file_name, cur_suffix,
+    prsm_cutoff_selector::process(db_file_name, base_name, cur_suffix,
                                   "toppic_prsm_cutoff", spectra_cutoff_type,
                                   spectra_cutoff_value);
     std::cout << "PrSM filtering by " << spectra_cutoff_type << " - finished."
@@ -728,15 +727,14 @@ int TopPIC_report(std::map<std::string, std::string>& arguments) {
       std::cout << "Proteoform filtering by " << form_cutoff_type
                 << " - started." << std::endl;
       std::istringstream(arguments["cutoffProteoformValue"]) >> cutoff_value;
-      prsm_cutoff_selector::process(db_file_name, sp_file_name,
+      prsm_cutoff_selector::process(db_file_name, base_name,
                                     "toppic_prsm_cutoff", "toppic_form_cutoff",
                                     form_cutoff_type, cutoff_value);
       std::cout << "Proteoform filtering by " << form_cutoff_type
                 << " - finished." << std::endl;
       std::cout << "Selecting top PrSMs for proteoforms - started."
                 << std::endl;
-      prsm_form_filter::process(db_file_name, sp_file_name,
-                                "toppic_form_cutoff",
+      prsm_form_filter::process(db_file_name, base_name, "toppic_form_cutoff",
                                 "toppic_form_cutoff_form");
       std::cout << "Selecting top PrSMs for proteoforms - finished."
                 << std::endl;
@@ -746,14 +744,13 @@ int TopPIC_report(std::map<std::string, std::string>& arguments) {
       std::cout << "Protein filtering by " << prot_cutoff_type << " - started."
                 << std::endl;
       std::istringstream(arguments["cutoffProteinValue"]) >> cutoff_value;
-      prsm_cutoff_selector::process(db_file_name, sp_file_name,
+      prsm_cutoff_selector::process(db_file_name, base_name,
                                     "toppic_form_cutoff", "toppic_prot_cutoff",
                                     prot_cutoff_type, cutoff_value);
       std::cout << "Protein filtering by " << prot_cutoff_type << " - finished."
                 << std::endl;
       std::cout << "Selecting top PrSMs for proteins - started." << std::endl;
-      prsm_prot_filter::process(db_file_name, sp_file_name,
-                                "toppic_prot_cutoff",
+      prsm_prot_filter::process(db_file_name, base_name, "toppic_prot_cutoff",
                                 "toppic_prot_cutoff_prot");
       std::cout << "Selecting top PrSMs for proteins - finished." << std::endl;
     }
@@ -797,7 +794,7 @@ int TopPIC_report(std::map<std::string, std::string>& arguments) {
     prot_out = nullptr;
     std::cout << "Outputting protein table - finished." << std::endl;
 
-    prsm_sql_output::write(prsm_para_ptr, sp_file_name, ori_db_file_name,
+    prsm_sql_output::write(prsm_para_ptr, base_name, ori_db_file_name,
                            "toppic_prsm_cutoff", "toppic_form_cutoff_form",
                            "toppic_prot_cutoff_prot");
 

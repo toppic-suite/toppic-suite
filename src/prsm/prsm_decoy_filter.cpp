@@ -18,7 +18,6 @@
 #include <cstddef>
 #include <string>
 
-#include "common/util/file_util.hpp"
 #include "prsm/prsm_reader_util.hpp"
 #include "prsm/prsm_str.hpp"
 #include "prsm/prsm_xml_writer.hpp"
@@ -27,10 +26,9 @@ namespace toppic {
 
 namespace prsm_decoy_filter {
 
-void process(const std::string& spec_file_name,
+void process(const std::string& base_name,
              const std::string& input_file_ext,
              const std::string& output_file_ext) {
-  std::string base_name = file_util::basename(spec_file_name);
   std::string input_file_name = base_name + "." + input_file_ext;
   PrsmStrPtrVec prsm_str_ptrs =
       prsm_reader_util::readAllPrsmStrs(input_file_name);

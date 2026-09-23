@@ -23,10 +23,10 @@ namespace toppic {
 namespace prsm_prot_filter {
 
 // Keep, for each protein cluster (prot_cluster_id, see prsm_prot_cluster) of
-// <base>.<input_file_ext>, only its best PrSM (the lowest E-value), and write
-// them to <base>.<output_file_ext>. The protein counterpart of
-// prsm_form_filter.
-void process(const std::string& db_file_name, const std::string& spec_file_name,
+// <base_name>.<input_file_ext>, only its best PrSM (the lowest E-value), and
+// write them to <base_name>.<output_file_ext>; base_name is the spectrum file
+// name without its extension. The protein counterpart of prsm_form_filter.
+void process(const std::string& db_file_name, const std::string& base_name,
              const std::string& input_file_ext,
              const std::string& output_file_ext);
 
