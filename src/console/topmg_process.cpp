@@ -37,6 +37,7 @@
 #include "ms/spec/msalign_util.hpp"
 #include "para/prsm_para.hpp"
 #include "prsm/prsm_cutoff_selector.hpp"
+#include "prsm/prsm_decoy_filter.hpp"
 #include "prsm/prsm_fdr.hpp"
 #include "prsm/prsm_fdr_groups.hpp"
 #include "prsm/prsm_feature_cluster.hpp"
@@ -103,6 +104,7 @@ void cleanTopmgDir(const std::string& fa_name, const std::string& sp_name,
     file_util::delFile(sp_base + ".topmg_proteoform_cluster");
     file_util::delFile(sp_base + ".topmg_cluster");
     file_util::delFile(sp_base + ".topmg_cluster_fdr");
+    file_util::delFile(sp_base + ".topmg_prsm_target");
     file_util::delFile(sp_base + ".topmg_form_cutoff");
     file_util::delFile(sp_base + ".topmg_prot_cutoff");
     file_util::delDir(sp_base + "_topmg_proteoform_cutoff_xml");
@@ -345,12 +347,19 @@ int TopMG_post(std::map<std::string, std::string>& arguments) {
 
     if (arguments["searchType"] == "TARGET+DECOY") {
       std::cout << "FDR computation - started. " << std::endl;
-      prsm_fdr::process(sp_file_name, "topmg_cluster", "topmg_cluster_fdr",
-                        arguments["keepDecoyResults"]);
+      // the FDR step writes the decoys too; they are removed below unless -K
+      prsm_fdr::process(sp_file_name, "topmg_cluster", "topmg_cluster_fdr");
       // prsm_fdr_groups::process(sp_file_name, "topmg_cluster",
-      // "topmg_cluster_fdr", arguments["keepDecoyResults"]);
+      // "topmg_cluster_fdr");
       std::cout << "FDR computation - finished." << std::endl;
       cur_suffix = "topmg_cluster_fdr";
+      if (arguments["keepDecoyResults"] != "true") {
+        std::cout << "Removing decoy identifications - started." << std::endl;
+        prsm_decoy_filter::process(base_name, cur_suffix, "topmg_prsm_target");
+        cur_suffix = "topmg_prsm_target";
+        std::cout << "Removing decoy identifications - finished."
+                  << std::endl;
+      }
     }
 
     std::string cutoff_type = arguments["cutoffSpectralType"];

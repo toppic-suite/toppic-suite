@@ -423,8 +423,9 @@ the input. Facts to keep straight:
   (`toppic_cluster_fdr` with `-d`; `toppic_cluster`, or
   `toppic_cluster_local` with `-l`, without): the best PrSM of every
   spectrum with the added masses, the cluster ids and the FDRs, before the
-  cutoffs, **decoys included** (the FDR step is always called with
-  `keep_decoy = "true"`). `cleanToppicDir` never deletes it. `TopPIC_report`
+  cutoffs, **decoys included** (`prsm_fdr::process` and
+  `prsm_fdr_groups::process` always write the decoys; their former
+  keep-decoy parameter is gone). `cleanToppicDir` never deletes it. `TopPIC_report`
   (the decoy removal, the cutoffs, the tables and the SQL output) reads
   only the argument map and re-derives the file names from it, so the two
   stages can be run separately, and a combined run (`-c`) merges the

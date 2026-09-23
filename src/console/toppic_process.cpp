@@ -670,17 +670,15 @@ int TopPIC_postprocess(std::map<std::string, std::string>& arguments) {
 
     if (arguments["searchType"] == "TARGET+DECOY") {
       std::cout << "FDR computation - started. " << std::endl;
-      // the decoys are kept here so that toppic_record_prsm carries them;
-      // without -K TopPIC_report removes them
-      std::string keep_decoy = "true";
+      // the FDR step keeps the decoys so that toppic_record_prsm carries
+      // them; without -K TopPIC_report removes them
       if (arguments["useFdrGroups"] == "true") {
         // hidden option --fdr-groups: separate FDRs for the PrSM groups
         // (0 shifts without/with variable PTMs, 1 shift, 2 shifts)
-        prsm_fdr_groups::process(sp_file_name, cur_suffix, "toppic_cluster_fdr",
-                                 keep_decoy);
+        prsm_fdr_groups::process(sp_file_name, cur_suffix,
+                                 "toppic_cluster_fdr");
       } else {
-        prsm_fdr::process(sp_file_name, cur_suffix, "toppic_cluster_fdr",
-                          keep_decoy);
+        prsm_fdr::process(sp_file_name, cur_suffix, "toppic_cluster_fdr");
       }
       std::cout << "FDR computation - finished." << std::endl;
       cur_suffix = "toppic_cluster_fdr";
@@ -743,13 +741,11 @@ int TopPIC_multi_postprocess(std::map<std::string, std::string>& arguments) {
     if (arguments["searchType"] == "TARGET+DECOY") {
       std::cout << "FDR computation - started. " << std::endl;
       // decoys kept, as in TopPIC_postprocess; TopPIC_report removes them
-      std::string keep_decoy = "true";
       if (arguments["useFdrGroups"] == "true") {
-        prsm_fdr_groups::process(sp_file_name, cur_suffix, "toppic_cluster_fdr",
-                                 keep_decoy);
+        prsm_fdr_groups::process(sp_file_name, cur_suffix,
+                                 "toppic_cluster_fdr");
       } else {
-        prsm_fdr::process(sp_file_name, cur_suffix, "toppic_cluster_fdr",
-                          keep_decoy);
+        prsm_fdr::process(sp_file_name, cur_suffix, "toppic_cluster_fdr");
       }
       std::cout << "FDR computation - finished." << std::endl;
       cur_suffix = "toppic_cluster_fdr";

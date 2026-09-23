@@ -16,10 +16,10 @@
 #include "prsm/prsm_fdr_groups.hpp"
 
 #include <algorithm>
-#include <map>
 
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
+#include "prsm/prsm_fdr.hpp"
 #include "prsm/prsm_reader_util.hpp"
 #include "prsm/prsm_str.hpp"
 #include "prsm/prsm_xml_writer.hpp"
@@ -28,138 +28,11 @@ namespace toppic {
 
 namespace prsm_fdr_groups {
 
-inline PrsmStrPtrVec2D getGroups(PrsmStrPtrVec& prsm_ptrs) {
-  PrsmStrPtrVec2D results;
-  for (size_t i = 0; i < prsm_ptrs.size(); i++) {
-    bool found = false;
-    for (size_t j = 0; j < results.size(); j++) {
-      if (results[j][0]->getProteoClusterId() ==
-          prsm_ptrs[i]->getProteoClusterId()) {
-        found = true;
-        results[j].push_back(prsm_ptrs[i]);
-        break;
-      }
-    }
-    if (!found) {
-      PrsmStrPtrVec new_group;
-      new_group.push_back(prsm_ptrs[i]);
-      results.push_back(new_group);
-    }
-  }
-  return results;
-}
-
-double computeFdr(int n_decoy, int n_target) {
-  double fdr = static_cast<double>(n_decoy) / static_cast<double>(n_target);
-  if (fdr > 1) {
-    fdr = 1.0;
-  }
-  return fdr;
-}
-
-void computeFdr(PrsmStrPtrVec& target_ptrs, PrsmStrPtrVec& decoy_ptrs) {
-  int n_decoy = 0;
-  for (size_t i = 0; i < target_ptrs.size(); i++) {
-    int n_target = i + 1;
-    double target_evalue = target_ptrs[i]->getEValue();
-    for (size_t j = n_decoy; j < decoy_ptrs.size(); j++) {
-      if (decoy_ptrs[j]->getEValue() <= target_evalue) {
-        n_decoy++;
-        double fdr = computeFdr(n_decoy, n_target);
-        decoy_ptrs[j]->setFdr(fdr);
-      } else {
-        break;
-      }
-    }
-    double fdr = computeFdr(n_decoy, n_target);
-    target_ptrs[i]->setFdr(fdr);
-  }
-}
-
-void computeProteoformFdr(PrsmStrPtrVec2D& target_proteoforms,
-                          PrsmStrPtrVec2D& decoy_proteoforms) {
-  int n_decoy = 0;
-  for (size_t i = 0; i < target_proteoforms.size(); i++) {
-    int n_target = i + 1;
-    double target_evalue = target_proteoforms[i][0]->getEValue();
-    for (size_t j = n_decoy; j < decoy_proteoforms.size(); j++) {
-      if (decoy_proteoforms[j][0]->getEValue() <= target_evalue) {
-        n_decoy++;
-        double fdr = computeFdr(n_decoy, n_target);
-        for (size_t k = 0; k < decoy_proteoforms[j].size(); k++) {
-          decoy_proteoforms[j][k]->setProteoformFdr(fdr);
-        }
-      } else {
-        break;
-      }
-    }
-    double fdr = computeFdr(n_decoy, n_target);
-    for (size_t k = 0; k < target_proteoforms[i].size(); k++) {
-      target_proteoforms[i][k]->setProteoformFdr(fdr);
-    }
-  }
-}
-
-// Group a best-E-value-ordered proteoform list by protein cluster: the
-// first proteoform of a protein contributes its best PrSM at position 0,
-// so the protein groups come out ordered by their best E-value.
-PrsmStrPtrVec2D getProteinGroupsFromProteoforms(
-    const PrsmStrPtrVec2D& proteoforms) {
-  PrsmStrPtrVec2D results;
-  std::map<int, size_t> group_idx;
-  for (size_t i = 0; i < proteoforms.size(); i++) {
-    int cluster_id = proteoforms[i][0]->getProtClusterId();
-    auto it = group_idx.find(cluster_id);
-    if (it == group_idx.end()) {
-      group_idx[cluster_id] = results.size();
-      results.push_back(proteoforms[i]);
-    } else {
-      results[it->second].insert(results[it->second].end(),
-                                 proteoforms[i].begin(),
-                                 proteoforms[i].end());
-    }
-  }
-  return results;
-}
-
-// Protein-level FDR over the combined proteoforms of all groups: the
-// per-group FDRs above leave the protein level to a single target-decoy
-// competition, since one protein can collect proteoforms from several
-// groups.
-void computeProteinFdr(PrsmStrPtrVec2D& target_proteins,
-                       PrsmStrPtrVec2D& decoy_proteins) {
-  int n_decoy = 0;
-  for (size_t i = 0; i < target_proteins.size(); i++) {
-    int n_target = i + 1;
-    double target_evalue = target_proteins[i][0]->getEValue();
-    for (size_t j = n_decoy; j < decoy_proteins.size(); j++) {
-      if (decoy_proteins[j][0]->getEValue() <= target_evalue) {
-        n_decoy++;
-        double fdr = computeFdr(n_decoy, n_target);
-        for (size_t k = 0; k < decoy_proteins[j].size(); k++) {
-          decoy_proteins[j][k]->setProteinFdr(fdr);
-        }
-      } else {
-        break;
-      }
-    }
-    double fdr = computeFdr(n_decoy, n_target);
-    for (size_t k = 0; k < target_proteins[i].size(); k++) {
-      target_proteins[i][k]->setProteinFdr(fdr);
-    }
-  }
-  // decoy proteins ranked below every target protein
-  for (size_t j = n_decoy; j < decoy_proteins.size(); j++) {
-    for (size_t k = 0; k < decoy_proteins[j].size(); k++) {
-      decoy_proteins[j][k]->setProteinFdr(1.0);
-    }
-  }
-}
+// The grouping and FDR helpers are shared with prsm_fdr (prsm_fdr.hpp).
 
 void process(const std::string& spec_file_name,
              const std::string& input_file_ext,
-             const std::string& output_file_ext,
-             std::string keep_decoy_results) {
+             const std::string& output_file_ext) {
   std::string base_name = file_util::basename(spec_file_name);
   std::string input_file_name = base_name + "." + input_file_ext;
 
@@ -186,9 +59,7 @@ void process(const std::string& spec_file_name,
     if (prsm_str_ptrs[i]->getEValue() == 0.0) {
       LOG_ERROR("toppic::PRSMFdr zero E value is reported");
     } else {
-      std::string seq_name = prsm_str_ptrs[i]->getSeqName();
-      // LOG_DEBUG("seq name " << seq_name);
-      if (seq_name.find("DECOY_") == 0) {
+      if (prsm_fdr::isDecoy(prsm_str_ptrs[i])) {
         // 0 mass shift
         if (prsm_str_ptrs[i]->getUnexpectedPtmNum() == 0) {
           // 0 variable PTMs
@@ -248,24 +119,49 @@ void process(const std::string& spec_file_name,
   std::sort(decoy_ptrs4.begin(), decoy_ptrs4.end(),
             PrsmStr::cmpEValueIncProtInc);
 
-  computeFdr(target_ptrs1, decoy_ptrs1);
-  computeFdr(target_ptrs2, decoy_ptrs2);
-  computeFdr(target_ptrs3, decoy_ptrs3);
-  computeFdr(target_ptrs4, decoy_ptrs4);
+  prsm_fdr::computeFdr(target_ptrs1, decoy_ptrs1);
+  prsm_fdr::computeFdr(target_ptrs2, decoy_ptrs2);
+  prsm_fdr::computeFdr(target_ptrs3, decoy_ptrs3);
+  prsm_fdr::computeFdr(target_ptrs4, decoy_ptrs4);
 
-  PrsmStrPtrVec2D target1_proteoforms = getGroups(target_ptrs1);
-  PrsmStrPtrVec2D decoy1_proteoforms = getGroups(decoy_ptrs1);
-  PrsmStrPtrVec2D target2_proteoforms = getGroups(target_ptrs2);
-  PrsmStrPtrVec2D decoy2_proteoforms = getGroups(decoy_ptrs2);
-  PrsmStrPtrVec2D target3_proteoforms = getGroups(target_ptrs3);
-  PrsmStrPtrVec2D decoy3_proteoforms = getGroups(decoy_ptrs3);
-  PrsmStrPtrVec2D target4_proteoforms = getGroups(target_ptrs4);
-  PrsmStrPtrVec2D decoy4_proteoforms = getGroups(decoy_ptrs4);
+  // Within each group, targets and decoys are grouped together by proteoform
+  // cluster in E-value order, and a proteoform is a target or a decoy
+  // according to its best PrSM (prsm_fdr::splitTargetDecoyProteoforms).
+  PrsmStrPtrVec2D target1_proteoforms;
+  PrsmStrPtrVec2D decoy1_proteoforms;
+  PrsmStrPtrVec2D target2_proteoforms;
+  PrsmStrPtrVec2D decoy2_proteoforms;
+  PrsmStrPtrVec2D target3_proteoforms;
+  PrsmStrPtrVec2D decoy3_proteoforms;
+  PrsmStrPtrVec2D target4_proteoforms;
+  PrsmStrPtrVec2D decoy4_proteoforms;
+  {
+    PrsmStrPtrVec* targets[] = {&target_ptrs1, &target_ptrs2, &target_ptrs3,
+                                &target_ptrs4};
+    PrsmStrPtrVec* decoys[] = {&decoy_ptrs1, &decoy_ptrs2, &decoy_ptrs3,
+                               &decoy_ptrs4};
+    PrsmStrPtrVec* alls[] = {&all_ptrs1, &all_ptrs2, &all_ptrs3, &all_ptrs4};
+    PrsmStrPtrVec2D* target_forms[] = {&target1_proteoforms,
+                                       &target2_proteoforms,
+                                       &target3_proteoforms,
+                                       &target4_proteoforms};
+    PrsmStrPtrVec2D* decoy_forms[] = {&decoy1_proteoforms, &decoy2_proteoforms,
+                                      &decoy3_proteoforms, &decoy4_proteoforms};
+    for (int g = 0; g < 4; g++) {
+      *alls[g] = *targets[g];
+      alls[g]->insert(alls[g]->end(), decoys[g]->begin(), decoys[g]->end());
+      std::sort(alls[g]->begin(), alls[g]->end(),
+                PrsmStr::cmpEValueIncProtInc);
+      PrsmStrPtrVec2D all_proteoforms = prsm_fdr::getGroups(*alls[g]);
+      prsm_fdr::splitTargetDecoyProteoforms(all_proteoforms, *target_forms[g],
+                                            *decoy_forms[g]);
+    }
+  }
 
-  computeProteoformFdr(target1_proteoforms, decoy1_proteoforms);
-  computeProteoformFdr(target2_proteoforms, decoy2_proteoforms);
-  computeProteoformFdr(target3_proteoforms, decoy3_proteoforms);
-  computeProteoformFdr(target4_proteoforms, decoy4_proteoforms);
+  prsm_fdr::computeProteoformFdr(target1_proteoforms, decoy1_proteoforms);
+  prsm_fdr::computeProteoformFdr(target2_proteoforms, decoy2_proteoforms);
+  prsm_fdr::computeProteoformFdr(target3_proteoforms, decoy3_proteoforms);
+  prsm_fdr::computeProteoformFdr(target4_proteoforms, decoy4_proteoforms);
 
   // protein-level FDR from the combined proteoforms of all four groups
   PrsmStrPtrVec2D target_proteoforms_all;
@@ -288,68 +184,29 @@ void process(const std::string& spec_file_name,
   std::sort(decoy_proteoforms_all.begin(), decoy_proteoforms_all.end(),
             cmp_form);
   PrsmStrPtrVec2D target_proteins =
-      getProteinGroupsFromProteoforms(target_proteoforms_all);
+      prsm_fdr::getProteinGroups(target_proteoforms_all);
   PrsmStrPtrVec2D decoy_proteins =
-      getProteinGroupsFromProteoforms(decoy_proteoforms_all);
-  computeProteinFdr(target_proteins, decoy_proteins);
+      prsm_fdr::getProteinGroups(decoy_proteoforms_all);
+  prsm_fdr::computeProteinFdr(target_proteins, decoy_proteins);
 
   std::string output_file_name = base_name + "." + output_file_ext;
   PrsmXmlWriter writer(output_file_name);
 
-  if (keep_decoy_results == "true") {
-    // concat target_ptrs and decoy_ptrs;
-    all_ptrs1.insert(all_ptrs1.begin(), target_ptrs1.begin(),
-                     target_ptrs1.end());
-    all_ptrs1.insert(all_ptrs1.end(), decoy_ptrs1.begin(), decoy_ptrs1.end());
-    std::sort(all_ptrs1.begin(), all_ptrs1.end(),
+  // every PrSM, targets and decoys, group by group in spectrum order
+  PrsmStrPtrVec* alls[] = {&all_ptrs1, &all_ptrs2, &all_ptrs3, &all_ptrs4};
+  for (int g = 0; g < 4; g++) {
+    std::sort(alls[g]->begin(), alls[g]->end(),
               PrsmStr::cmpSpecIncPrecIncEvalueIncProtInc);
-    std::cout << "Group 1 target_ptrs: " << target_ptrs1.size()
-              << ", Group 1 decoy_ptrs: " << decoy_ptrs1.size() << std::endl;
-    writer.writeVector(all_ptrs1);
-
-    all_ptrs2.insert(all_ptrs2.begin(), target_ptrs2.begin(),
-                     target_ptrs2.end());
-    all_ptrs2.insert(all_ptrs2.end(), decoy_ptrs2.begin(), decoy_ptrs2.end());
-    std::sort(all_ptrs2.begin(), all_ptrs2.end(),
-              PrsmStr::cmpSpecIncPrecIncEvalueIncProtInc);
-    std::cout << "Group 2 target_ptrs: " << target_ptrs2.size()
-              << ", Group 2 decoy_ptrs: " << decoy_ptrs2.size() << std::endl;
-    writer.writeVector(all_ptrs2);
-
-    all_ptrs3.insert(all_ptrs3.begin(), target_ptrs3.begin(),
-                     target_ptrs3.end());
-    all_ptrs3.insert(all_ptrs3.end(), decoy_ptrs3.begin(), decoy_ptrs3.end());
-    std::sort(all_ptrs3.begin(), all_ptrs3.end(),
-              PrsmStr::cmpSpecIncPrecIncEvalueIncProtInc);
-    std::cout << "Group 3 target_ptrs: " << target_ptrs3.size()
-              << ", Group 3 decoy_ptrs: " << decoy_ptrs3.size() << std::endl;
-    writer.writeVector(all_ptrs3);
-
-    all_ptrs4.insert(all_ptrs4.begin(), target_ptrs4.begin(),
-                     target_ptrs4.end());
-    all_ptrs4.insert(all_ptrs4.end(), decoy_ptrs4.begin(), decoy_ptrs4.end());
-    std::sort(all_ptrs4.begin(), all_ptrs4.end(),
-              PrsmStr::cmpSpecIncPrecIncEvalueIncProtInc);
-    std::cout << "Group 4 target_ptrs: " << target_ptrs4.size()
-              << ", Group 4 decoy_ptrs: " << decoy_ptrs4.size() << std::endl;
-    writer.writeVector(all_ptrs4);
-  } else {
-    std::sort(target_ptrs1.begin(), target_ptrs1.end(),
-              PrsmStr::cmpSpecIncPrecIncEvalueIncProtInc);
-    writer.writeVector(target_ptrs1);
-
-    std::sort(target_ptrs2.begin(), target_ptrs2.end(),
-              PrsmStr::cmpSpecIncPrecIncEvalueIncProtInc);
-    writer.writeVector(target_ptrs2);
-
-    std::sort(target_ptrs3.begin(), target_ptrs3.end(),
-              PrsmStr::cmpSpecIncPrecIncEvalueIncProtInc);
-    writer.writeVector(target_ptrs3);
-
-    std::sort(target_ptrs4.begin(), target_ptrs4.end(),
-              PrsmStr::cmpSpecIncPrecIncEvalueIncProtInc);
-    writer.writeVector(target_ptrs4);
+    writer.writeVector(*alls[g]);
   }
+  std::cout << "Group 1 target_ptrs: " << target_ptrs1.size()
+            << ", Group 1 decoy_ptrs: " << decoy_ptrs1.size() << std::endl;
+  std::cout << "Group 2 target_ptrs: " << target_ptrs2.size()
+            << ", Group 2 decoy_ptrs: " << decoy_ptrs2.size() << std::endl;
+  std::cout << "Group 3 target_ptrs: " << target_ptrs3.size()
+            << ", Group 3 decoy_ptrs: " << decoy_ptrs3.size() << std::endl;
+  std::cout << "Group 4 target_ptrs: " << target_ptrs4.size()
+            << ", Group 4 decoy_ptrs: " << decoy_ptrs4.size() << std::endl;
   writer.close();
 }
 

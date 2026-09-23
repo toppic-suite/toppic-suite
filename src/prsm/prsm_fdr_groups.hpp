@@ -22,10 +22,12 @@ namespace toppic {
 
 namespace prsm_fdr_groups {
 
+// Like prsm_fdr::process (every PrSM is written, decoys included), with the
+// spectrum- and proteoform-level FDRs computed separately for four PrSM
+// groups: no mass shift without / with variable PTMs, one shift, two shifts.
 void process(const std::string& spec_file_name,
              const std::string& input_file_ext,
-             const std::string& output_file_ext,
-             std::string keep_decoy_results);
+             const std::string& output_file_ext);
 
 }
 
