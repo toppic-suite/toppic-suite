@@ -22,6 +22,8 @@
 *.dylib
 *.dll
 *.so.*
+# the vendored ONNX Runtime library is tracked (with Git LFS)
+!ext/onnx/libonnxruntime.so.*
 
 
 # Fortran module files

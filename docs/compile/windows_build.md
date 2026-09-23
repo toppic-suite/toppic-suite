@@ -17,7 +17,9 @@ TopDIA need, only for its UCRT64 and CLANG64 environments, not for MINGW64.
 ## 2. Install the required packages
 
 ```sh
-# version control (Git LFS is needed for the model files under res/)
+# version control (Git LFS is needed for the model files under res/; the
+# vendored Linux ONNX Runtime library under ext/onnx/ is LFS-tracked too but
+# not used on Windows)
 pacman -S git mingw-w64-ucrt-x86_64-git-lfs
 
 # compiler and build tools

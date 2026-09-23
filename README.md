@@ -51,7 +51,7 @@ annotated fragment ions. It is distributed separately; see the
 * Boost version >= 1.74 (filesystem, iostreams, thread, chrono, system, serialization, program_options)
 * pugixml, SQLite3 and zlib development libraries
 * Qt6 (Core, Gui, Widgets) for the GUI tools
-* Git LFS for some runtime resources under `res/`
+* Git LFS for some runtime resources under `res/` and the vendored ONNX Runtime library under `ext/onnx/`
 
 ## Building on Ubuntu Linux
 
@@ -59,7 +59,8 @@ annotated fragment ions. It is distributed separately; see the
 
 ```sh
 sudo apt-get update
-# build tools and libraries (Git LFS is needed for the model files under res/)
+# build tools and libraries (Git LFS is needed for the model files under res/
+# and the ONNX Runtime library under ext/onnx/)
 sudo apt-get install build-essential cmake clang git git-lfs \
     zlib1g-dev libsqlite3-dev libpugixml-dev \
     libboost-filesystem-dev libboost-iostreams-dev libboost-thread-dev \
@@ -93,7 +94,9 @@ cd toppic-suite
 ```
 
 If the clone was made before installing Git LFS, run `git lfs pull` inside the
-repository to replace the LFS pointer files with the real model files.
+repository to replace the LFS pointer files with the real model files and the
+ONNX Runtime library (`ext/onnx/libonnxruntime.so.1.23.2`); without it the
+build fails to link.
 
 ### 3. Configure and build
 

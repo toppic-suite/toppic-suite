@@ -25,7 +25,8 @@ sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-10.no
 ## 2. Install the required packages
 
 ```sh
-# compilers and build tools (Git LFS is needed for the model files under res/)
+# compilers and build tools (Git LFS is needed for the model files under res/
+# and the ONNX Runtime library under ext/onnx/)
 sudo dnf install cmake gcc-c++ make clang git git-lfs
 
 # libraries (zlib-ng-compat-devel is RHEL 10's replacement for zlib-devel)
@@ -54,7 +55,9 @@ cd toppic-suite
 ```
 
 If the clone was made before installing Git LFS, run `git lfs pull` inside the
-repository to replace the LFS pointer files with the real model files.
+repository to replace the LFS pointer files with the real model files and the
+ONNX Runtime library (`ext/onnx/libonnxruntime.so.1.23.2`); without it the
+build fails to link.
 
 ## 4. Configure and build
 

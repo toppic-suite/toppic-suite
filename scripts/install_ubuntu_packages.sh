@@ -24,7 +24,8 @@ else
     exit 1
 fi
 
-# Build tools and libraries (Git LFS is needed for the model files under res/).
+# Build tools and libraries (Git LFS is needed for the model files under res/
+# and the ONNX Runtime library under ext/onnx/).
 PACKAGES=(
     build-essential
     cmake

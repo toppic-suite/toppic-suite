@@ -227,7 +227,9 @@ path and linked into `toppic_common`:
   headers are silenced even when our own `-Wall` sources include them.
 - **ONNX Runtime** — `topfd/envcnn` and `topfd/ecscore/score` run the EnvCNN /
   ECScore neural-network models through the ONNX Runtime C++ API. A prebuilt
-  `libonnxruntime.so.1.23.2` (SONAME symlink `libonnxruntime.so.1`; glibc >= 2.27) and the C/C++ API headers are vendored under
+  `libonnxruntime.so.1.23.2` (SONAME symlink `libonnxruntime.so.1`; glibc >= 2.27; **stored with Git LFS**, rule
+  `ext/onnx/libonnxruntime.so.*` in `.gitattributes`, with a `.gitignore`
+  exception to the `*.so.*` rule) and the C/C++ API headers are vendored under
   `ext/onnx` (sources include it as `"onnx/onnxruntime_cxx_api.h"`, covered by
   the `SYSTEM` `ext/` include); it is linked as an `IMPORTED` shared object,
   `PRIVATE`, into `toppic_common`. The vendored `.so` is Linux x86-64 only;
