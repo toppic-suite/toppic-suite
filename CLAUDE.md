@@ -411,6 +411,12 @@ the input. Facts to keep straight:
   characterization (`-l`), FDR, cutoffs, tables and SQL output all read the
   spectra with the added masses under the new name; the FDR and the cutoffs
   use E-values, which are not recomputed.
+- **Cluster protein filtering runs between the PTM characterization and
+  the FDR** (`prsm/prsm_cluster_prot_filter`, branch `cluster_prot_filter`):
+  in every proteoform cluster only the PrSMs of the protein of the
+  cluster's lowest-E-value PrSM survive (`toppic_cluster_prot`, deleted
+  without `-k`); the FDR reads that file. Combined runs
+  (`TopPIC_multi_postprocess`) do not run it.
 - **`<base>.toppic_record_prsm` is where `TopPIC_postprocess` ends and
   `TopPIC_report` starts.** It is a copy, made inline at the end of
   `TopPIC_postprocess`, of the PrSM file after the FDR computation

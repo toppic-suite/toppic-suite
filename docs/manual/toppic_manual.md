@@ -113,18 +113,22 @@ the result files are named after `sample_mono_ms2`.
     unexpected mass shift is compared with the listed common modifications,
     and the modification and its site are reported when the MIScore reaches
     `--miscore-threshold`.
-12. **FDR computation** (only with `--decoy`). Spectrum-, proteoform- and
+12. **Cluster protein filtering.** In every proteoform cluster the PrSMs
+    whose protein differs from the protein of the cluster's PrSM with the
+    lowest E-value are removed, so that a proteoform mass matched to two
+    proteins is counted once, for the better-supported protein.
+13. **FDR computation** (only with `--decoy`). Spectrum-, proteoform- and
     protein-level false discovery rates are estimated from the decoy hits.
-13. **Record file and decoy removal.** The PrSMs with their FDRs are
+14. **Record file and decoy removal.** The PrSMs with their FDRs are
     kept as `sample_post_ms2.toppic_record_prsm`, decoy identifications
     included. Unless `--keep-decoy-ids` is given, the decoy identifications
     are then removed from the PrSMs.
-14. **Filtering and output at three levels.** The PrSMs passing the
+15. **Filtering and output at three levels.** The PrSMs passing the
     spectrum-level cutoff are written to the PrSM tables; the best PrSM per
     proteoform passing the proteoform-level cutoff to the proteoform tables;
     the best PrSM per protein passing the protein-level cutoff to the
     protein tables.
-15. **Writing identifications to the SQLite database**, for visualization.
+16. **Writing identifications to the SQLite database**, for visualization.
 
 ## 3. Output files
 
