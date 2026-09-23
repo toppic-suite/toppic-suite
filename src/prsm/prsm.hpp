@@ -85,7 +85,7 @@ class Prsm {
 
   double getMatchPeakNum() { return match_peak_num_; }
 
-  double getMatchFragNum() { return match_fragment_num_; }
+  double getMatchTheoFragNum() { return match_theo_frag_num_; }
 
   // Normalized match fragment number is used in TopMG for ranking PrSMs
   double getNormMatchFragNum();
@@ -221,7 +221,7 @@ class Prsm {
   ExpectedValuePtr expected_value_ptr_;
 
   double match_peak_num_ = 0;
-  double match_fragment_num_ = 0;
+  double match_theo_frag_num_ = 0;
   // norm_match_fragment_num is computed in a function,
   // not stored in the class
 

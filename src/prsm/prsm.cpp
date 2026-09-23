@@ -77,12 +77,12 @@ void Prsm::initMatchNum(double min_mass) {
       proteoform_ptr_, refine_ms_three_vec_, min_mass);
 
   match_peak_num_ = 0;
-  match_fragment_num_ = 0;
+  match_theo_frag_num_ = 0;
   TheoPeakPtr prev_ion(nullptr);
   for (size_t i = 0; i < pairs.size(); i++) {
     if (pairs[i]->getTheoPeakPtr() != prev_ion) {
       prev_ion = pairs[i]->getTheoPeakPtr();
-      match_fragment_num_ += pairs[i]->getRealPeakPtr()->getScore();
+      match_theo_frag_num_ += pairs[i]->getRealPeakPtr()->getScore();
     }
   }
   std::sort(pairs.begin(), pairs.end(), PeakIonPair::cmpRealPeakPosInc);
@@ -96,13 +96,13 @@ void Prsm::initMatchNum(double min_mass) {
 }
 
 void Prsm::initScores(const SpParaPtr& sp_para_ptr) {
-  match_fragment_num_ = 0;
+  match_theo_frag_num_ = 0;
   match_peak_num_ = 0;
   for (size_t i = 0; i < refine_ms_three_vec_.size(); i++) {
     // refined one
     PeakIonPairPtrVec pairs = peak_ion_pair_util::genePeakIonPairs(
         proteoform_ptr_, refine_ms_three_vec_[i], sp_para_ptr->getMinMass());
-    match_fragment_num_ += peak_ion_pair_util::compMatchFragNum(pairs);
+    match_theo_frag_num_ += peak_ion_pair_util::compMatchFragNum(pairs);
     match_peak_num_ += peak_ion_pair_util::compMatchPeakNum(pairs);
   }
 }
@@ -131,7 +131,7 @@ XmlDOMElement Prsm::toXmlElement(XmlDOMDocument* xml_doc,
   xml_doc->addElement(element, "adjusted_prec_mass", str.c_str());
   str = str_util::toString(match_peak_num_);
   xml_doc->addElement(element, "match_peak_num", str.c_str());
-  str = str_util::toString(match_fragment_num_);
+  str = str_util::toString(match_theo_frag_num_);
   xml_doc->addElement(element, "match_fragment_num", str.c_str());
   str = str_util::toString(getNormMatchFragNum());
   xml_doc->addElement(element, "norm_match_fragment_num", str.c_str());
@@ -195,7 +195,7 @@ void Prsm::parseXml(XmlDOMElement element) {
   protein_fdr_ = xml_dom_util::getDoubleChildValue(element, "protein_fdr", 0);
   match_peak_num_ =
       xml_dom_util::getDoubleChildValue(element, "match_peak_num", 0);
-  match_fragment_num_ =
+  match_theo_frag_num_ =
       xml_dom_util::getDoubleChildValue(element, "match_fragment_num", 0);
 
   int prob_count = xml_dom_util::getChildCount(element, "extreme_value");
@@ -240,7 +240,7 @@ double Prsm::getNormMatchFragNum() {
   int start_pos = proteoform_ptr_->getStartPos();
   int end_pos = proteoform_ptr_->getEndPos();
   double score =
-      match_fragment_num_ - 2 * var_change_num - 6 * unexp_change_num;
+      match_theo_frag_num_ - 2 * var_change_num - 6 * unexp_change_num;
   int trunc_len =
       getProteoformPtr()->getProtModPtr()->getTruncPtr()->getTruncLen();
 
@@ -268,9 +268,9 @@ void Prsm::setProteoformPtr(ProteoformPtr proteoform,
 // then protein name in the increasing order
 bool Prsm::cmpMatchFragDecMatchPeakDecProtInc(const PrsmPtr& a,
                                               const PrsmPtr& b) {
-  if (a->getMatchFragNum() > b->getMatchFragNum()) {
+  if (a->getMatchTheoFragNum() > b->getMatchTheoFragNum()) {
     return true;
-  } else if (a->getMatchFragNum() < b->getMatchFragNum()) {
+  } else if (a->getMatchTheoFragNum() < b->getMatchTheoFragNum()) {
     return false;
   } else if (a->getMatchPeakNum() > b->getMatchPeakNum()) {
     return true;
@@ -288,9 +288,9 @@ bool Prsm::cmpMatchFragDecMatchPeakDecProtInc(const PrsmPtr& a,
 // then protein name, then start position
 bool Prsm::cmpMatchFragDecMatchPeakDecProtIncStartPosInc(const PrsmPtr& a,
                                                          const PrsmPtr& b) {
-  if (a->getMatchFragNum() > b->getMatchFragNum()) {
+  if (a->getMatchTheoFragNum() > b->getMatchTheoFragNum()) {
     return true;
-  } else if (a->getMatchFragNum() < b->getMatchFragNum()) {
+  } else if (a->getMatchTheoFragNum() < b->getMatchTheoFragNum()) {
     return false;
   } else if (a->getMatchPeakNum() > b->getMatchPeakNum()) {
     return true;

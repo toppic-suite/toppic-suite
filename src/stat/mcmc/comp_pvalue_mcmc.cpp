@@ -198,9 +198,9 @@ double CompPValueMCMC::compOneProbMCMC(const PrsmPtr& prsm_ptr,
     if (scr >= static_cast<int>(p.size())) {
       scr = p.size() - 1;
     }
-    if (prsm_ptr->getMatchFragNum() < 10) {
+    if (prsm_ptr->getMatchTheoFragNum() < 10) {
       int corrected_scr =
-          std::min(scr, static_cast<int>(prsm_ptr->getMatchFragNum()));
+          std::min(scr, static_cast<int>(prsm_ptr->getMatchTheoFragNum()));
       one_prob = std::accumulate(p.begin() + corrected_scr, p.end(), 0.0);
     } else {
       one_prob = std::accumulate(p.begin() + scr, p.end(), 0.0);

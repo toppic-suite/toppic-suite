@@ -434,7 +434,7 @@ ProteoformPtr LocalProcessor::processTwoKnownPtms(const PrsmPtr& prsm_ptr) {
     LOG_DEBUG(best_ptm_pair.second->getName());
   }
 
-  int ori_match_score = prsm_ptr->getMatchFragNum();
+  int ori_match_score = prsm_ptr->getMatchTheoFragNum();
   if (best_match_score <= 0 ||
       best_match_score < ori_match_score - mng_ptr_->DESC_MATCH_LIMIT_ ||
       best_match_score < ori_match_score * mng_ptr_->desc_ratio_) {
