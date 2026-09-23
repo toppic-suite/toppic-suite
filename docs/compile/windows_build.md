@@ -39,8 +39,8 @@ and built automatically.
 
 ```sh
 git lfs install
-git clone https://github.com/toppic_suite/toppic_suite.git
-cd toppic_suite
+git clone https://github.com/toppic-suite/toppic-suite.git
+cd toppic-suite
 ```
 
 If the clone was made before installing Git LFS, run `git lfs pull` inside the
