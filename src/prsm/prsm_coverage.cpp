@@ -271,7 +271,7 @@ void PrsmCoverage::compOneCoverage(std::ofstream& file, const PrsmPtr& prsm_ptr,
        << prsm_ptr->getProteoformPtr()->getEndPos() << "\t"
        << prsm_ptr->getProteoformPtr()->getProteoformMatchSeq() << "\t"
        << prsm_ptr->getProteoformPtr()->getAlterNum(AlterType::UNEXPECTED)
-       << "\t" << prsm_ptr->getMatchPeakNum() << "\t"
+       << "\t" << prsm_ptr->getMatchExpFragNum() << "\t"
        << prsm_ptr->getMatchTheoFragNum() << "\t"
        << prsm_ptr->getPValue() << "\t"
        << prsm_ptr->getEValue() << "\t" << prsm_ptr->getOneProtProb() << "\t"
@@ -319,7 +319,7 @@ void PrsmCoverage::compTwoCoverage(std::ofstream& file, const PrsmPtr& prsm_ptr,
        << prsm_ptr->getProteoformPtr()->getEndPos() << "\t"
        << prsm_ptr->getProteoformPtr()->getProteoformMatchSeq() << "\t"
        << prsm_ptr->getProteoformPtr()->getAlterNum(AlterType::UNEXPECTED)
-       << "\t" << prsm_ptr->getMatchPeakNum() << "\t"
+       << "\t" << prsm_ptr->getMatchExpFragNum() << "\t"
        << prsm_ptr->getMatchTheoFragNum() << "\t"
        << prsm_ptr->getPValue() << "\t"
        << prsm_ptr->getEValue() << "\t" << prsm_ptr->getOneProtProb() << "\t"

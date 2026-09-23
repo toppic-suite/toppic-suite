@@ -76,7 +76,7 @@ void Prsm::initMatchNum(double min_mass) {
   PeakIonPairPtrVec pairs = peak_ion_pair_util::genePeakIonPairs(
       proteoform_ptr_, refine_ms_three_vec_, min_mass);
 
-  match_peak_num_ = 0;
+  match_exp_frag_num_ = 0;
   match_theo_frag_num_ = 0;
   TheoPeakPtr prev_ion(nullptr);
   for (size_t i = 0; i < pairs.size(); i++) {
@@ -90,20 +90,20 @@ void Prsm::initMatchNum(double min_mass) {
   for (size_t i = 0; i < pairs.size(); i++) {
     if (pairs[i]->getRealPeakPtr()->getBasePeakPtr() != prev_deconv_peak) {
       prev_deconv_peak = pairs[i]->getRealPeakPtr()->getBasePeakPtr();
-      match_peak_num_ += pairs[i]->getRealPeakPtr()->getScore();
+      match_exp_frag_num_ += pairs[i]->getRealPeakPtr()->getScore();
     }
   }
 }
 
 void Prsm::initScores(const SpParaPtr& sp_para_ptr) {
   match_theo_frag_num_ = 0;
-  match_peak_num_ = 0;
+  match_exp_frag_num_ = 0;
   for (size_t i = 0; i < refine_ms_three_vec_.size(); i++) {
     // refined one
     PeakIonPairPtrVec pairs = peak_ion_pair_util::genePeakIonPairs(
         proteoform_ptr_, refine_ms_three_vec_[i], sp_para_ptr->getMinMass());
     match_theo_frag_num_ += peak_ion_pair_util::compMatchFragNum(pairs);
-    match_peak_num_ += peak_ion_pair_util::compMatchPeakNum(pairs);
+    match_exp_frag_num_ += peak_ion_pair_util::compMatchPeakNum(pairs);
   }
 }
 
@@ -129,7 +129,7 @@ XmlDOMElement Prsm::toXmlElement(XmlDOMDocument* xml_doc,
   xml_doc->addElement(element, "ori_prec_mass", str.c_str());
   str = str_util::toString(adjusted_prec_mass_);
   xml_doc->addElement(element, "adjusted_prec_mass", str.c_str());
-  str = str_util::toString(match_peak_num_);
+  str = str_util::toString(match_exp_frag_num_);
   xml_doc->addElement(element, "match_peak_num", str.c_str());
   str = str_util::toString(match_theo_frag_num_);
   xml_doc->addElement(element, "match_theo_frag_num", str.c_str());
@@ -193,7 +193,7 @@ void Prsm::parseXml(XmlDOMElement element) {
   proteoform_fdr_ =
       xml_dom_util::getDoubleChildValue(element, "proteoform_fdr", 0);
   protein_fdr_ = xml_dom_util::getDoubleChildValue(element, "protein_fdr", 0);
-  match_peak_num_ =
+  match_exp_frag_num_ =
       xml_dom_util::getDoubleChildValue(element, "match_peak_num", 0);
   match_theo_frag_num_ =
       xml_dom_util::getDoubleChildValue(element, "match_theo_frag_num", 0);
@@ -266,15 +266,15 @@ void Prsm::setProteoformPtr(ProteoformPtr proteoform,
 
 // sort by the number of matched fragments, then the number of matched peaks
 // then protein name in the increasing order
-bool Prsm::cmpMatchTheoFragDecMatchPeakDecProtInc(const PrsmPtr& a,
-                                                  const PrsmPtr& b) {
+bool Prsm::cmpMatchTheoFragDecMatchExpFragDecProtInc(const PrsmPtr& a,
+                                                     const PrsmPtr& b) {
   if (a->getMatchTheoFragNum() > b->getMatchTheoFragNum()) {
     return true;
   } else if (a->getMatchTheoFragNum() < b->getMatchTheoFragNum()) {
     return false;
-  } else if (a->getMatchPeakNum() > b->getMatchPeakNum()) {
+  } else if (a->getMatchExpFragNum() > b->getMatchExpFragNum()) {
     return true;
-  } else if (a->getMatchPeakNum() < b->getMatchPeakNum()) {
+  } else if (a->getMatchExpFragNum() < b->getMatchExpFragNum()) {
     return false;
   } else if (a->getProteoformPtr()->getSeqName() <
              b->getProteoformPtr()->getSeqName()) {
@@ -286,15 +286,15 @@ bool Prsm::cmpMatchTheoFragDecMatchPeakDecProtInc(const PrsmPtr& a,
 
 // sort by number of matched fragment ions, then matched peaks,
 // then protein name, then start position
-bool Prsm::cmpMatchTheoFragDecMatchPeakDecProtIncStartPosInc(
+bool Prsm::cmpMatchTheoFragDecMatchExpFragDecProtIncStartPosInc(
     const PrsmPtr& a, const PrsmPtr& b) {
   if (a->getMatchTheoFragNum() > b->getMatchTheoFragNum()) {
     return true;
   } else if (a->getMatchTheoFragNum() < b->getMatchTheoFragNum()) {
     return false;
-  } else if (a->getMatchPeakNum() > b->getMatchPeakNum()) {
+  } else if (a->getMatchExpFragNum() > b->getMatchExpFragNum()) {
     return true;
-  } else if (a->getMatchPeakNum() < b->getMatchPeakNum()) {
+  } else if (a->getMatchExpFragNum() < b->getMatchExpFragNum()) {
     return false;
   } else if (a->getProteoformPtr()->getSeqName() <
              b->getProteoformPtr()->getSeqName()) {

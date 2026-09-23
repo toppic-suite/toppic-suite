@@ -218,7 +218,8 @@ void PrsmSqlWriter::writePrsm(sqlite3_stmt* stmt, const PrsmPtr& prsm_ptr) {
   sqlite3_bind_int(stmt, idx++, form_ptr->getAlterNum(AlterType::VARIABLE));
   bindText(stmt, idx++, form_ptr->getAlterStr(AlterType::VARIABLE));
   bindText(stmt, idx++, form_ptr->getMIScore());
-  sqlite3_bind_int(stmt, idx++, static_cast<int>(prsm_ptr->getMatchPeakNum()));
+  sqlite3_bind_int(stmt, idx++,
+                   static_cast<int>(prsm_ptr->getMatchExpFragNum()));
   sqlite3_bind_int(stmt, idx++,
                    static_cast<int>(prsm_ptr->getMatchTheoFragNum()));
   sqlite3_bind_double(stmt, idx++, prsm_ptr->getEValue());

@@ -204,7 +204,7 @@ void PrsmMatchTableWriter::writePrsmStandardFormat(
            << form_ptr->getAlterStr(AlterType::UNEXPECTED) << delim
            << form_ptr->getAlterNum(AlterType::VARIABLE) << delim
            << form_ptr->getAlterStr(AlterType::VARIABLE) << delim
-           << form_ptr->getMIScore() << delim << prsm_ptr->getMatchPeakNum()
+           << form_ptr->getMIScore() << delim << prsm_ptr->getMatchExpFragNum()
            << delim << prsm_ptr->getMatchTheoFragNum() << delim
            << prsm_ptr->getEValue() << delim;
 
