@@ -130,7 +130,7 @@ XmlDOMElement Prsm::toXmlElement(XmlDOMDocument* xml_doc,
   str = str_util::toString(adjusted_prec_mass_);
   xml_doc->addElement(element, "adjusted_prec_mass", str.c_str());
   str = str_util::toString(match_exp_frag_num_);
-  xml_doc->addElement(element, "match_peak_num", str.c_str());
+  xml_doc->addElement(element, "match_exp_frag_num", str.c_str());
   str = str_util::toString(match_theo_frag_num_);
   xml_doc->addElement(element, "match_theo_frag_num", str.c_str());
   str = str_util::toString(getNormMatchTheoFragNum());
@@ -194,7 +194,7 @@ void Prsm::parseXml(XmlDOMElement element) {
       xml_dom_util::getDoubleChildValue(element, "proteoform_fdr", 0);
   protein_fdr_ = xml_dom_util::getDoubleChildValue(element, "protein_fdr", 0);
   match_exp_frag_num_ =
-      xml_dom_util::getDoubleChildValue(element, "match_peak_num", 0);
+      xml_dom_util::getDoubleChildValue(element, "match_exp_frag_num", 0);
   match_theo_frag_num_ =
       xml_dom_util::getDoubleChildValue(element, "match_theo_frag_num", 0);
 

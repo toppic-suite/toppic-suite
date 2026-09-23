@@ -51,7 +51,7 @@ PrsmStr::PrsmStr(const std::vector<std::string>& str_vec) {
   seq_name_ = prsm_util::getValueStr(line);
   line = prsm_util::getXmlLine(str_vec_, "<seq_desc>");
   seq_desc_ = prsm_util::getValueStr(line);
-  line = prsm_util::getXmlLine(str_vec_, "<match_peak_num>");
+  line = prsm_util::getXmlLine(str_vec_, "<match_exp_frag_num>");
   match_peak_num_ = std::stod(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<match_theo_frag_num>");
   match_theo_frag_num_ = std::stod(prsm_util::getValueStr(line));
