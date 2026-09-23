@@ -299,6 +299,7 @@ int TopMG_post(std::map<std::string, std::string>& arguments) {
         ori_db_file_name + "_idx" + file_util::getFileSeparator() +
         file_util::filenameFromEntirePath(arguments["databaseFileName"]);
     std::string sp_file_name = arguments["spectrumFileName"];
+    std::string base_name = file_util::basename(sp_file_name);
     std::string var_mod_file_name = arguments["varModFileName"];
 
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
@@ -356,7 +357,7 @@ int TopMG_post(std::map<std::string, std::string>& arguments) {
     std::cout << "PrSM filtering by " << cutoff_type << " - started."
               << std::endl;
     double cutoff_value = std::stod(arguments["cutoffSpectralValue"]);
-    prsm_cutoff_selector::process(db_file_name, sp_file_name, cur_suffix,
+    prsm_cutoff_selector::process(db_file_name, base_name, cur_suffix,
                                   "topmg_prsm_cutoff", cutoff_type,
                                   cutoff_value);
     std::cout << "PrSM filtering by " << cutoff_type << " - finished."
@@ -383,14 +384,14 @@ int TopMG_post(std::map<std::string, std::string>& arguments) {
     std::cout << "Proteoform filtering by " << cutoff_type << " - started."
               << std::endl;
     std::istringstream(arguments["cutoffProteoformValue"]) >> cutoff_value;
-    prsm_cutoff_selector::process(db_file_name, sp_file_name, cur_suffix,
+    prsm_cutoff_selector::process(db_file_name, base_name, cur_suffix,
                                   "topmg_form_cutoff", cutoff_type,
                                   cutoff_value);
     std::cout << "Proteoform filtering by " << cutoff_type << " - finished."
               << std::endl;
 
     std::cout << "Selecting top PrSMs for proteoforms - started." << std::endl;
-    prsm_form_filter::process(db_file_name, sp_file_name, "topmg_form_cutoff",
+    prsm_form_filter::process(db_file_name, base_name, "topmg_form_cutoff",
                               "topmg_form_cutoff_form");
     std::cout << "Selecting top PrSMs for proteoforms - finished." << std::endl;
     std::cout << "Outputting proteoform table - started." << std::endl;
@@ -406,14 +407,14 @@ int TopMG_post(std::map<std::string, std::string>& arguments) {
     std::cout << "Protein filtering by " << cutoff_type << " - started."
               << std::endl;
     std::istringstream(arguments["cutoffProteinValue"]) >> cutoff_value;
-    prsm_cutoff_selector::process(db_file_name, sp_file_name,
+    prsm_cutoff_selector::process(db_file_name, base_name,
                                   "topmg_form_cutoff", "topmg_prot_cutoff",
                                   cutoff_type, cutoff_value);
     std::cout << "Protein filtering by " << cutoff_type << " - finished."
               << std::endl;
 
     std::cout << "Selecting top PrSMs for proteins - started." << std::endl;
-    prsm_prot_filter::process(db_file_name, sp_file_name, "topmg_prot_cutoff",
+    prsm_prot_filter::process(db_file_name, base_name, "topmg_prot_cutoff",
                               "topmg_prot_cutoff_prot");
     std::cout << "Selecting top PrSMs for proteins - finished." << std::endl;
     std::cout << "Outputting protein table - started." << std::endl;
@@ -424,7 +425,7 @@ int TopMG_post(std::map<std::string, std::string>& arguments) {
     prot_out = nullptr;
     std::cout << "Outputting protein table - finished." << std::endl;
 
-    prsm_sql_output::write(prsm_para_ptr, sp_file_name, ori_db_file_name,
+    prsm_sql_output::write(prsm_para_ptr, base_name, ori_db_file_name,
                            "topmg_prsm_cutoff", "topmg_form_cutoff_form",
                            "topmg_prot_cutoff_prot");
 

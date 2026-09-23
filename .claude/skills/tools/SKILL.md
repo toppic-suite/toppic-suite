@@ -123,7 +123,8 @@ next to the spectrum file; a missing database is reported before the
 search starts. Steps: zero-shift search, variable-PTM search (`-b`),
 one-shift (`-s` >= 1) and two-shift (`-s 2`) searches, E-values, top PrSM,
 recount, **post mass matching** (default), clustering, PTM characterization
-(`-B`), FDR (`-d`), three-level cutoffs, SQLite tables.
+(`-B`), FDR (`-d`), the kept record file, decoy removal (unless `-K`),
+three-level cutoffs, SQLite tables.
 
 Key options (defaults): `-f` fixed mod none (`C57`, `C58` or file), `-n`
 N-terminal forms all four, `-R` proteoform types all four, `-d` decoy,
@@ -141,9 +142,15 @@ Result naming: with post mass matching (default) everything is named
 `sample_post_ms2_toppic_{prsm,proteoform,protein}[_single].tsv` and `.xml`,
 plus `sample_post_ms2.msalign`; with `-D` the names are `sample_ms2_toppic_*`.
 `_single` tables have one line per PrSM; the others add a line per extra
-protein containing the proteoform. `sample_ms2.toppic_raw_prsm` is always
-kept. Combined runs (`-c name`) always produce `name_ms2_toppic_*` and no
-SQLite output; `name` must differ from the input base names.
+protein containing the proteoform. `sample_post_ms2.toppic_record_prsm`
+(`sample_ms2.…` with `-D`), the best PrSM of every spectrum after the FDR
+computation with the decoys, is always kept. Combined runs (`-c name`)
+merge the fractions' post-matched spectra and record files into
+`name_ms2.msalign` / `name_ms2.toppic_record_prsm`, re-cluster them by
+protein and precursor mass, compute one FDR and report; they always
+produce `name_ms2_toppic_*` and no SQLite output, and `-C` redoes only the
+combining from the kept record files. `name` must differ from the input
+base names.
 
 Modification file (for `-f`, `-b`, `-B`): one `Name,Mass,Residues,Position,UnimodID`
 per line, `#` comments, `Residues` may be `*` (not together with `Position`

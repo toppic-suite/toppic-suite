@@ -31,9 +31,17 @@ int TopPIC_identify(std::map<std::string, std::string>& arguments);
 // PrSM no decoy PrSM could compete with
 int TopPIC_multi_ptm_search(std::map<std::string, std::string>& arguments);
 
-// recounting, clustering, PTM characterization, FDR, cutoffs, post mass
-// matching and outputs on the best PrSM of every spectrum
-int TopPIC_multi_ptm_post(std::map<std::string, std::string>& arguments);
+// recounting, post mass matching, clustering, PTM characterization and FDR
+// on the best PrSM of every spectrum; leaves toppic_record_prsm
+int TopPIC_postprocess(std::map<std::string, std::string>& arguments);
+
+// combined runs (-c): clustering and FDR of the merged record PrSMs
+// (<name>_ms2.toppic_raw_prsm); leaves <name>_ms2.toppic_record_prsm
+int TopPIC_multi_postprocess(std::map<std::string, std::string>& arguments);
+
+// decoy removal (without -K), cutoffs, tables and SQLite output from the
+// toppic_record_prsm file
+int TopPIC_report(std::map<std::string, std::string>& arguments);
 
 int TopPICProgress_multi_file(std::map<std::string, std::string>& arguments,
                               const std::vector<std::string>& spec_file_lst);

@@ -48,6 +48,9 @@ class Prsm {
 
   std::string getSpectrumScan() { return spectrum_scan_; }
 
+  // retention time of the first spectrum in seconds; -1 if unknown
+  double getRetentionTime() { return retention_time_; }
+
   int getPrecursorId() { return precursor_id_; }
 
   int getFracFeatureId() { return frac_feature_id_; }
@@ -184,6 +187,10 @@ class Prsm {
   int spectrum_id_;
 
   std::string spectrum_scan_;
+
+  // seconds, as MsHeader stores it (the msalign file and the tables use
+  // minutes); written to the XML as <rt>
+  double retention_time_ = -1;
 
   int precursor_id_;
 

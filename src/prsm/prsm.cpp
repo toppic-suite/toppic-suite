@@ -34,6 +34,7 @@ Prsm::Prsm(const ProteoformPtr& proteoform_ptr,
   MsHeaderPtr header_ptr = deconv_ms_ptr_vec[0]->getMsHeaderPtr();
   spectrum_id_ = header_ptr->getSpecId();
   spectrum_scan_ = header_ptr->getScansString();
+  retention_time_ = header_ptr->getRetentionTime();
   precursor_id_ = header_ptr->getFirstPrecId();
   spectrum_num_ = deconv_ms_ptr_vec.size();
   ori_prec_mass_ = header_ptr->getFirstPrecMonoMass();
@@ -116,6 +117,8 @@ XmlDOMElement Prsm::toXmlElement(XmlDOMDocument* xml_doc,
   str = std::to_string(spectrum_id_);
   xml_doc->addElement(element, "spectrum_id", str.c_str());
   xml_doc->addElement(element, "spectrum_scan", spectrum_scan_.c_str());
+  str = str_util::toString(retention_time_);
+  xml_doc->addElement(element, "rt", str.c_str());
   str = std::to_string(precursor_id_);
   xml_doc->addElement(element, "precursor_id", str.c_str());
   str = std::to_string(frac_feature_id_);
@@ -164,6 +167,10 @@ void Prsm::parseXml(XmlDOMElement element) {
   prsm_id_ = xml_dom_util::getIntChildValue(element, "prsm_id", 0);
   spectrum_id_ = xml_dom_util::getIntChildValue(element, "spectrum_id", 0);
   spectrum_scan_ = xml_dom_util::getChildValue(element, "spectrum_scan", 0);
+  // PrSM files written before <rt> was added have no such element
+  if (xml_dom_util::getChildCount(element, "rt") > 0) {
+    retention_time_ = xml_dom_util::getDoubleChildValue(element, "rt", 0);
+  }
   precursor_id_ = xml_dom_util::getIntChildValue(element, "precursor_id", 0);
   frac_feature_id_ =
       xml_dom_util::getIntChildValue(element, "frac_feature_id", 0);
