@@ -51,6 +51,7 @@
 #include "para/prsm_para.hpp"
 #include "prsm/prsm_coverage.hpp"
 #include "prsm/prsm_cutoff_selector.hpp"
+#include "prsm/prsm_cluster_prot_filter.hpp"
 #include "prsm/prsm_decoy_filter.hpp"
 #include "prsm/prsm_fdr.hpp"
 #include "prsm/prsm_fdr_groups.hpp"
@@ -116,6 +117,7 @@ void cleanToppicDir(const std::string& fa_name, const std::string& sp_name,
     file_util::delFile(out_base + ".toppic_cluster");
     file_util::delFile(out_base + ".toppic_cluster_fdr");
     file_util::delFile(out_base + ".toppic_cluster_local");
+    file_util::delFile(out_base + ".toppic_cluster_prot");
     file_util::delFile(out_base + ".toppic_prsm_target");
     file_util::delFile(out_base + ".toppic_prsm_cutoff");
     file_util::delFile(out_base + ".toppic_form_cutoff");
@@ -155,6 +157,7 @@ void cleanToppicDir(const std::string& fa_name, const std::string& sp_name,
     file_util::delFile(sp_base + ".toppic_cluster");
     file_util::delFile(sp_base + ".toppic_cluster_fdr");
     file_util::delFile(sp_base + ".toppic_cluster_local");
+    file_util::delFile(sp_base + ".toppic_cluster_prot");
     file_util::delFile(sp_base + ".toppic_prsm_target");
     file_util::delFile(sp_base + ".toppic_prsm_cutoff");
     file_util::delFile(sp_base + ".toppic_form_cutoff");
@@ -654,19 +657,28 @@ int TopPIC_postprocess(std::map<std::string, std::string>& arguments) {
       cur_suffix = "toppic_cluster_local";
     }
 
+    // In every proteoform cluster keep only the PrSMs of the protein of the
+    // cluster's best-E-value PrSM (the others are the same proteoform mass
+    // matched to another protein); the FDR is computed on the rest.
+    std::cout << "Cluster protein filtering - started." << std::endl;
+    int removed_num = prsm_cluster_prot_filter::process(
+        file_util::basename(sp_file_name), cur_suffix, "toppic_cluster_prot");
+    std::cout << "Cluster protein filtering - removed " << removed_num
+              << " PrSMs." << std::endl;
+    std::cout << "Cluster protein filtering - finished." << std::endl;
+    cur_suffix = "toppic_cluster_prot";
+
     if (arguments["searchType"] == "TARGET+DECOY") {
       std::cout << "FDR computation - started. " << std::endl;
-      // the decoys are kept here so that toppic_record_prsm carries them;
-      // without -K TopPIC_report removes them
-      std::string keep_decoy = "true";
+      // the FDR step keeps the decoys so that toppic_record_prsm carries
+      // them; without -K TopPIC_report removes them
       if (arguments["useFdrGroups"] == "true") {
         // hidden option --fdr-groups: separate FDRs for the PrSM groups
         // (0 shifts without/with variable PTMs, 1 shift, 2 shifts)
-        prsm_fdr_groups::process(sp_file_name, cur_suffix, "toppic_cluster_fdr",
-                                 keep_decoy);
+        prsm_fdr_groups::process(sp_file_name, cur_suffix,
+                                 "toppic_cluster_fdr");
       } else {
-        prsm_fdr::process(sp_file_name, cur_suffix, "toppic_cluster_fdr",
-                          keep_decoy);
+        prsm_fdr::process(sp_file_name, cur_suffix, "toppic_cluster_fdr");
       }
       std::cout << "FDR computation - finished." << std::endl;
       cur_suffix = "toppic_cluster_fdr";
@@ -729,13 +741,11 @@ int TopPIC_multi_postprocess(std::map<std::string, std::string>& arguments) {
     if (arguments["searchType"] == "TARGET+DECOY") {
       std::cout << "FDR computation - started. " << std::endl;
       // decoys kept, as in TopPIC_postprocess; TopPIC_report removes them
-      std::string keep_decoy = "true";
       if (arguments["useFdrGroups"] == "true") {
-        prsm_fdr_groups::process(sp_file_name, cur_suffix, "toppic_cluster_fdr",
-                                 keep_decoy);
+        prsm_fdr_groups::process(sp_file_name, cur_suffix,
+                                 "toppic_cluster_fdr");
       } else {
-        prsm_fdr::process(sp_file_name, cur_suffix, "toppic_cluster_fdr",
-                          keep_decoy);
+        prsm_fdr::process(sp_file_name, cur_suffix, "toppic_cluster_fdr");
       }
       std::cout << "FDR computation - finished." << std::endl;
       cur_suffix = "toppic_cluster_fdr";

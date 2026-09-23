@@ -90,7 +90,10 @@ is given; `sample_ms2.topmg_raw_prsm` is always kept.
    one proteoform; proteoforms of the same protein whose precursor masses
    agree within `--proteoform-error-tolerance` are merged; proteoforms are
    then grouped by protein.
-10. **FDR computation** (only with `--decoy`).
+10. **FDR computation** (only with `--decoy`). Spectrum-, proteoform- and
+    protein-level false discovery rates are estimated from the decoy hits;
+    the decoy identifications are then removed unless `--keep-decoy-ids`
+    is given.
 11. **Filtering and output at three levels.** PrSMs by the spectrum-level
     cutoff, the best PrSM per proteoform by the proteoform-level cutoff, and
     the best PrSM per protein by the protein-level cutoff.

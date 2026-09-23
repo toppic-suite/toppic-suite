@@ -413,14 +413,21 @@ the input. Facts to keep straight:
   characterization (`-l`), FDR, cutoffs, tables and SQL output all read the
   spectra with the added masses under the new name; the FDR and the cutoffs
   use E-values, which are not recomputed.
+- **Cluster protein filtering runs between the PTM characterization and
+  the FDR** (`prsm/prsm_cluster_prot_filter`, branch `cluster_prot_filter`):
+  in every proteoform cluster only the PrSMs of the protein of the
+  cluster's lowest-E-value PrSM survive (`toppic_cluster_prot`, deleted
+  without `-k`); the FDR reads that file. Combined runs
+  (`TopPIC_multi_postprocess`) do not run it.
 - **`<base>.toppic_record_prsm` is where `TopPIC_postprocess` ends and
   `TopPIC_report` starts.** It is a copy, made inline at the end of
   `TopPIC_postprocess`, of the PrSM file after the FDR computation
   (`toppic_cluster_fdr` with `-d`; `toppic_cluster`, or
   `toppic_cluster_local` with `-l`, without): the best PrSM of every
   spectrum with the added masses, the cluster ids and the FDRs, before the
-  cutoffs, **decoys included** (the FDR step is always called with
-  `keep_decoy = "true"`). `cleanToppicDir` never deletes it. `TopPIC_report`
+  cutoffs, **decoys included** (`prsm_fdr::process` and
+  `prsm_fdr_groups::process` always write the decoys; their former
+  keep-decoy parameter is gone). `cleanToppicDir` never deletes it. `TopPIC_report`
   (the decoy removal, the cutoffs, the tables and the SQL output) reads
   only the argument map and re-derives the file names from it, so the two
   stages can be run separately, and a combined run (`-c`) merges the
