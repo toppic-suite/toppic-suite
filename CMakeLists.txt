@@ -322,17 +322,19 @@ target_link_libraries(toppic_common PUBLIC Boost::serialization)
 # so the existing SYSTEM ext/ include covers the headers) and the library is an
 # IMPORTED target linked into toppic_common.
 #
-# The vendored prebuilt libonnxruntime.so.1.14.1 is a Linux x86-64 binary and is
-# used on Linux. On macOS and Windows no library is vendored: the system package
-# is used instead (`brew install onnxruntime` on macOS; the MSYS2 package
+# The vendored prebuilt libonnxruntime.so.1.23.2 (SONAME libonnxruntime.so.1,
+# the symlink next to it, from Microsoft's onnxruntime-linux-x64-1.23.2.tgz
+# release archive; needs glibc >= 2.27) is a Linux x86-64 binary and is used on
+# Linux. On macOS and Windows no library is vendored: the system package is
+# used instead (`brew install onnxruntime` on macOS; the MSYS2 package
 # mingw-w64-ucrt-x86_64-onnxruntime in a UCRT64 shell on Windows), located with
-# find_library. A newer runtime serves the vendored 1.14 API headers (the ONNX
+# find_library. A newer runtime serves the vendored 1.23 API headers (the ONNX
 # Runtime C API is backward compatible).
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   add_library(onnxruntime SHARED IMPORTED)
   set_target_properties(onnxruntime PROPERTIES
-    IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/ext/onnx/libonnxruntime.so.1.14.1
-    IMPORTED_SONAME libonnxruntime.so.1.14.1)
+    IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/ext/onnx/libonnxruntime.so.1.23.2
+    IMPORTED_SONAME libonnxruntime.so.1)
 else()
   find_library(ONNXRUNTIME_LIBRARY onnxruntime
     HINTS /opt/homebrew/lib /usr/local/lib)
@@ -458,7 +460,9 @@ install(TARGETS ${TOPPIC_EXECUTABLES}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-  install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/ext/onnx/libonnxruntime.so.1.14.1
+  # the library and its SONAME symlink, which the executables load it by
+  install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/ext/onnx/libonnxruntime.so.1.23.2
+                ${CMAKE_CURRENT_SOURCE_DIR}/ext/onnx/libonnxruntime.so.1
           DESTINATION ${CMAKE_INSTALL_LIBDIR})
   set_target_properties(${TOPPIC_EXECUTABLES} PROPERTIES
     INSTALL_RPATH "$ORIGIN/../${CMAKE_INSTALL_LIBDIR}")
