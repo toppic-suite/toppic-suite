@@ -51,7 +51,6 @@
 #include "para/prsm_para.hpp"
 #include "prsm/prsm_coverage.hpp"
 #include "prsm/prsm_cutoff_selector.hpp"
-#include "prsm/prsm_cluster_prot_filter.hpp"
 #include "prsm/prsm_decoy_filter.hpp"
 #include "prsm/prsm_fdr.hpp"
 #include "prsm/prsm_fdr_groups.hpp"
@@ -80,6 +79,7 @@
 #include "seq/fasta_util.hpp"
 #include "stat/local/local_mng.hpp"
 #include "stat/local/local_processor.hpp"
+#include "stat/tdgf/cluster_prot_corrector.hpp"
 #include "stat/tdgf/evalue_processor.hpp"
 #include "stat/tdgf/tdgf_mng.hpp"
 #include "topfd/envcnn/onnx_env_cnn.hpp"
@@ -644,16 +644,28 @@ int TopPIC_postprocess(std::map<std::string, std::string>& arguments) {
     std::cout << "Finding PrSM protein clusters - finished." << std::endl;
     std::string cur_suffix = "toppic_cluster";
 
-    // In every proteoform cluster keep only the PrSMs of the protein of the
-    // cluster's best-E-value PrSM (the others are the same proteoform mass
-    // matched to another protein); the PTM characterization and the FDR run
-    // on the rest.
-    std::cout << "Cluster protein filtering - started." << std::endl;
-    int removed_num = prsm_cluster_prot_filter::process(
-        file_util::basename(sp_file_name), cur_suffix, "toppic_cluster_prot");
-    std::cout << "Cluster protein filtering - removed " << removed_num
-              << " PrSMs." << std::endl;
-    std::cout << "Cluster protein filtering - finished." << std::endl;
+    // In every proteoform cluster, the PrSMs whose protein differs from the
+    // protein of the cluster's best-E-value PrSM (the same proteoform mass
+    // matched to another protein) get that PrSM's proteoform; their matched
+    // fragment numbers are recounted on the spectra as the search read them
+    // (EnvCNN cutoff) and their E-values recomputed. The PTM
+    // characterization and the FDR run on the corrected PrSMs.
+    std::cout << "Cluster protein correction - started." << std::endl;
+    {
+      int var_ptm_type_num = arguments["varPtmTypeNum"] == ""
+                                 ? 0
+                                 : std::stoi(arguments["varPtmTypeNum"]);
+      TdgfMngPtr tdgf_mng_ptr = std::make_shared<TdgfMng>(
+          prsm_para_ptr, shift_num,
+          std::max(std::abs(max_shift_mass), std::abs(min_shift_mass)),
+          var_ptm_type_num, std::stoi(arguments["threadNumber"]), "", "");
+      int corrected_num = cluster_prot_corrector::process(
+          prsm_para_ptr, tdgf_mng_ptr, cur_suffix, "toppic_cluster_prot",
+          prsm_para_ptr->getSpParaPtr()->getEnvCnnCutoff());
+      std::cout << "Cluster protein correction - corrected " << corrected_num
+                << " PrSMs." << std::endl;
+    }
+    std::cout << "Cluster protein correction - finished." << std::endl;
     cur_suffix = "toppic_cluster_prot";
 
     if (arguments["localPtmFileName"] != "") {
