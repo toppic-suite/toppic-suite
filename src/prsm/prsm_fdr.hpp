@@ -32,12 +32,12 @@ inline bool isDecoy(const PrsmStrPtr& prsm_ptr) {
 
 // PrSMs (sorted by E-value) grouped by proteoform cluster, groups ordered by
 // their best E-value
-PrsmStrPtrVec2D getGroups(const PrsmStrPtrVec& prsm_ptrs);
+PrsmStrPtrVec2D getProteoformGroups(const PrsmStrPtrVec& prsm_ptrs);
 
 // proteoform groups (ordered by best E-value) grouped by protein cluster
 PrsmStrPtrVec2D getProteinGroups(const PrsmStrPtrVec2D& proteoforms);
 
-// the proteoform groups of getGroups (targets and decoys grouped together)
+// the proteoform groups of getProteoformGroups (targets and decoys grouped together)
 // split by their best PrSM: a proteoform is a target or a decoy according
 // to that PrSM
 void splitTargetDecoyProteoforms(const PrsmStrPtrVec2D& all_proteoforms,
@@ -46,7 +46,7 @@ void splitTargetDecoyProteoforms(const PrsmStrPtrVec2D& all_proteoforms,
 
 // spectrum-, proteoform- and protein-level FDRs; the inputs are sorted /
 // ordered by E-value
-void computeFdr(PrsmStrPtrVec& target_ptrs, PrsmStrPtrVec& decoy_ptrs);
+void computePrsmFdr(PrsmStrPtrVec& target_prsms, PrsmStrPtrVec& decoy_prsms);
 void computeProteoformFdr(PrsmStrPtrVec2D& target_proteoforms,
                           PrsmStrPtrVec2D& decoy_proteoforms);
 void computeProteinFdr(PrsmStrPtrVec2D& target_proteins,

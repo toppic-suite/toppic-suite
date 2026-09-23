@@ -119,10 +119,10 @@ void process(const std::string& spec_file_name,
   std::sort(decoy_ptrs4.begin(), decoy_ptrs4.end(),
             PrsmStr::cmpEValueIncProtInc);
 
-  prsm_fdr::computeFdr(target_ptrs1, decoy_ptrs1);
-  prsm_fdr::computeFdr(target_ptrs2, decoy_ptrs2);
-  prsm_fdr::computeFdr(target_ptrs3, decoy_ptrs3);
-  prsm_fdr::computeFdr(target_ptrs4, decoy_ptrs4);
+  prsm_fdr::computePrsmFdr(target_ptrs1, decoy_ptrs1);
+  prsm_fdr::computePrsmFdr(target_ptrs2, decoy_ptrs2);
+  prsm_fdr::computePrsmFdr(target_ptrs3, decoy_ptrs3);
+  prsm_fdr::computePrsmFdr(target_ptrs4, decoy_ptrs4);
 
   // Within each group, targets and decoys are grouped together by proteoform
   // cluster in E-value order, and a proteoform is a target or a decoy
@@ -152,7 +152,7 @@ void process(const std::string& spec_file_name,
       alls[g]->insert(alls[g]->end(), decoys[g]->begin(), decoys[g]->end());
       std::sort(alls[g]->begin(), alls[g]->end(),
                 PrsmStr::cmpEValueIncProtInc);
-      PrsmStrPtrVec2D all_proteoforms = prsm_fdr::getGroups(*alls[g]);
+      PrsmStrPtrVec2D all_proteoforms = prsm_fdr::getProteoformGroups(*alls[g]);
       prsm_fdr::splitTargetDecoyProteoforms(all_proteoforms, *target_forms[g],
                                             *decoy_forms[g]);
     }
