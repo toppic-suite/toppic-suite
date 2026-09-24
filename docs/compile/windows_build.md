@@ -3,6 +3,22 @@
 This document explains how to build the command-line and GUI tools of the
 TopPIC Suite on Windows with [MSYS2](https://www.msys2.org).
 
+## System requirements
+
+* The MSYS2 UCRT64 environment
+* GCC (the MSYS2 `mingw-w64-ucrt-x86_64-gcc` package), not clang: the
+  MSYS2 libraries are built with GCC, and mixing compilers fails at link time
+* CMake >= 3.16 and Ninja
+* Boost >= 1.74 (filesystem, iostreams, thread, chrono, serialization,
+  program_options)
+* pugixml, SQLite3 and zlib development libraries
+* ONNX Runtime from MSYS2 (the vendored library under `ext/onnx/` is for
+  Linux only)
+* Qt6 (Core, Gui, Widgets) for the GUI tools
+* Git LFS, for the model files under `res/`
+
+The packages in step 2 provide all of these.
+
 ## 1. Install MSYS2
 
 Follow the instructions on the MSYS2 website to install MSYS2 and to update

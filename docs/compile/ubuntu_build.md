@@ -4,6 +4,20 @@ This document explains how to build the command-line and GUI tools of the
 TopPIC Suite on Ubuntu Linux (22.04 or later). The same steps work on other
 Debian-based distributions with the matching package names.
 
+## System requirements
+
+* A C++17 compiler: Clang >= 7 (the default when installed) or GCC >= 8
+* CMake >= 3.16
+* Boost >= 1.74 (filesystem, iostreams, thread, chrono, serialization,
+  program_options; Boost.System is header-only and not needed as a library)
+* pugixml, SQLite3 and zlib development libraries
+* Qt6 (Core, Gui, Widgets) for the GUI tools
+* Git LFS, for the model files under `res/` and the vendored ONNX Runtime
+  library under `ext/onnx/`; the vendored library is a Linux x86-64 binary,
+  so the build needs an x86-64 machine
+
+The packages in step 1 provide all of these on Ubuntu 22.04 and later.
+
 ## 1. Install the required packages
 
 ```sh

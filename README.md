@@ -44,32 +44,9 @@ features, and the identified proteoform-spectrum matches with their
 annotated fragment ions. It is distributed separately; see the
 [TopMSV manual](https://toppic.org/software/topmsv/manual.html).
 
-## System requirements
+## Building TopPIC Suite
 
-* A C++17 compiler: Clang >= 7 (default) or GCC >= 8
-* CMake version >= 3.16
-* Boost version >= 1.74 (filesystem, iostreams, thread, chrono, system, serialization, program_options)
-* pugixml, SQLite3 and zlib development libraries
-* Qt6 (Core, Gui, Widgets) for the GUI tools
-* Git LFS for some runtime resources under `res/` and the vendored ONNX Runtime library under `ext/onnx/`
-
-## Building on Ubuntu Linux
-
-Ubuntu is the primary build platform. Please follow the instructions from
-[here](docs/compile/ubuntu_build.md) (packages, clone with Git LFS,
-configure/build, install and uninstall).
-
-## Building on Red Hat Enterprise Linux
-
-The steps are the same as for Ubuntu; only the package installation
-differs. Please follow the instructions from [here](docs/compile/redhat_build.md).
-
-## Building on Windows
-
-[MSYS2](http://www.msys2.org/) is used for building TopPIC Suite on Windows systems. Please follow the instructions from [here](docs/compile/windows_build.md).
-
-
-## Building on macOS
-
-Xcode Command Line Tools and [Homebrew](https://brew.sh/) are used for building
-TopPIC Suite on macOS. Please follow the instructions from [here](docs/compile/macos_build.md).
+* [Ubuntu Linux](docs/compile/ubuntu_build.md)
+* [Red Hat Enterprise Linux](docs/compile/redhat_build.md)
+* [Windows](docs/compile/windows_build.md)
+* [macOS](docs/compile/macos_build.md)

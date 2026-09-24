@@ -284,9 +284,12 @@ that was left empty (the manifest lists files only). Consequences:
 
 ## Platform build documentation
 
-The build instructions are split by platform. `README.md` carries the system
-requirements and a one-paragraph link per platform; the details live in
-`docs/compile/`, all laid out with the same six steps:
+The build instructions are split by platform. `README.md` has one "Building
+TopPIC Suite" section with a link per platform; the details live in
+`docs/compile/`, each
+starting with a "System requirements" list for that platform (compiler,
+CMake, Boost components, libraries, where ONNX Runtime comes from, Git
+LFS) followed by the same six numbered steps:
 
 - `docs/compile/ubuntu_build.md` — the primary platform: `apt-get` package
   list (also `scripts/install_ubuntu_packages.sh`), clone with Git LFS,

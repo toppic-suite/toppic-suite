@@ -6,6 +6,21 @@ to RHEL-compatible distributions such as Rocky Linux and AlmaLinux 10, except
 that the CodeReady Builder repository is enabled with `dnf config-manager`
 instead of `subscription-manager` (see step 1).
 
+## System requirements
+
+* A C++17 compiler: Clang >= 7 (the default when installed) or GCC >= 8
+* CMake >= 3.16
+* Boost >= 1.74 (filesystem, iostreams, thread, chrono, serialization,
+  program_options; Boost.System is header-only and not needed as a library)
+* pugixml, SQLite3 and zlib development libraries
+* Qt6 (Core, Gui, Widgets) for the GUI tools
+* Git LFS, for the model files under `res/` and the vendored ONNX Runtime
+  library under `ext/onnx/`; the vendored library is a Linux x86-64 binary,
+  so the build needs an x86-64 machine
+
+The repositories in step 1 and the packages in step 2 provide all of these
+on RHEL 10.
+
 ## 1. Enable the extra repositories
 
 `pugixml-devel` is not in RHEL 10 itself and comes from EPEL (Extra Packages

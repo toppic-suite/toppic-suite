@@ -6,6 +6,20 @@ and [Homebrew](https://brew.sh/) provides everything else. Both Apple Silicon
 (Homebrew in `/opt/homebrew`) and Intel Macs (Homebrew in `/usr/local`) are
 supported.
 
+## System requirements
+
+* A C++17 compiler: the Apple clang of the Xcode Command Line Tools
+* CMake >= 3.16
+* Boost >= 1.74 (filesystem, iostreams, thread, chrono, serialization,
+  program_options)
+* pugixml, SQLite3 and zlib development libraries
+* ONNX Runtime from Homebrew (the vendored library under `ext/onnx/` is for
+  Linux only)
+* Qt6 (Core, Gui, Widgets) for the GUI tools
+* Git LFS, for the model files under `res/`
+
+Steps 1 and 2 install all of these.
+
 ## 1. Install the compiler and Homebrew
 
 ```sh
