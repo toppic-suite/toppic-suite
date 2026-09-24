@@ -389,6 +389,47 @@ against the sequence's b/y ions (46 exact / 14 off-by-one-isotope is the
 reference), and count envelopes whose theoretical apex exceeds the observed
 apex by > 20% (77 of 611 before the core fit, 1 after).
 
+## FLASHDeconv MS/MS deconvolution (`topfd/deconv/flashdeconv_ms2_process`)
+
+`FlashDeconvMs2Process` is a second `DeconvMs2Process`: the same mzML group
+reading, one task per MS/MS spectrum on the thread pool, per-thread msalign
+files merged at the end and buffered SQLite records, but the spectrum is
+deconvoluted with the FLASHDeconv algorithm (OpenMS `SpectralDeconvolution`,
+`PeakGroup`, `PeakGroupScoring`, `FLASHHelperClasses`) instead of
+`DeconvSingleSp`. The hidden `topfd --flashdeconv` selects it
+(`TopfdPara::isUseFlashDeconv`, `topfd_process.cpp`). Facts to keep straight:
+
+- **Everything lives in the cpp**, in the namespace `flashdeconv_ms2_process`:
+  `Averagine` (the theoretical distributions), `LogMzPeak`, `PeakGroup` (one
+  deconvoluted mass with its scores) and `FlashDeconvSingleSp` (one spectrum).
+  Each function's comment names the OpenMS function it ports; keep that when
+  editing so the two can be compared.
+- **FLASHDeconv's constants, not TopFD's.** The tolerance is 10 ppm
+  (`kMs2TolerancePpm`), the isotope spacing 1.002371 Da (`kIsoDaDistance`, not
+  1.00335), the log m/z bin is tolerance / 2.5, the thresholds are cosine 0.85,
+  charge SNR 0.25, QScore 0.2, charge score 0.7, and the QScore weights are
+  the fixed ones of `PeakGroupScoring`. TopFD's `-e` (m/z error) is used only
+  to match the theoretical envelopes to the peaks for the output.
+- **The averagine table is EnvBase's** (`res/base_data/theo_patt.txt`, one
+  entry per 25 Da from 50 Da to `-m`), prepared as `PrecalculatedAveragine`
+  prepares CoarseIsotopePatternGenerator's: the weak end isotopes are trimmed
+  until 0.01% of the power is gone, the intensities are L2-normalised (so
+  `getCosine` needs no norm of the theoretical side), and the left / right
+  isotope counts from the apex are a running maximum over the masses. It is
+  built once per run in `process()` and shared read-only by the threads.
+- **Output.** Every surviving peak group becomes a `MatchEnv` of its
+  representative (highest per-charge SNR) charge: the EnvBase envelope of the
+  monoisotopic mass, scaled so its intensity sum is the group's intensity over
+  all charges, matched to the peaks by `ExpEnv`. The QScore is stored as the
+  EnvCNN score (what `match_env_util::getDeconvMsPtr` reports and sorts by)
+  and the isotope cosine as the MsDeconv score; no EnvCNN model runs. Note
+  FLASHDeconv's own msalign writer reports the maximum charge of the range,
+  this path the representative charge.
+- **Not ported:** the MS1 side and the precursor peak group search (the MS/MS
+  max mass and charge come from TopFD's precursor features, as in
+  `DeconvMs2Process`), decoy / FDR runs, target masses, and the tolerance
+  auto-estimation.
+
 ## Post mass matching (`prsm/prsm_post_mass_match`, toppic only)
 
 After the search and the match recount, `console/toppic_process` runs
