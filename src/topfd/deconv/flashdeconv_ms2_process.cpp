@@ -2304,7 +2304,8 @@ void FlashDeconvMs2Process::process() {
           topfd_para_ptr_->getMaxMass());
   EnvParaPtr env_para_ptr = std::make_shared<EnvPara>(
       topfd_para_ptr_->getMzError(), topfd_para_ptr_->getMaxMissPeakNum(),
-      topfd_para_ptr_->isRunFilterByMz());
+      topfd_para_ptr_->isRunFilterByMz(),
+      topfd_para_ptr_->getMassGroupBoundary());
   // One SQLite writer shared across the worker threads; created only when
   // SQLite output is enabled.
   MzmlMsSqlWriterPtr sql_writer_ptr =

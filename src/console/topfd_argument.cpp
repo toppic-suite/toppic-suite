@@ -81,6 +81,7 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string ecscore_cutoff = "";
   std::string min_scan_num = "";
   std::string max_miss_peak_num = "";
+  std::string mass_group_boundary = "";
 
   // Define and parse the program options
   try {
@@ -171,6 +172,9 @@ bool Argument::parse(int argc, char* argv[]) {
         "flashdeconv",
         "Deconvolute the MS/MS spectra with the FLASHDeconv algorithm "
         "(FlashDeconvMs2Process) instead of TopFD's own (experimental).")(
+        "mass-group-boundary", po::value<std::string>(&mass_group_boundary),
+        "The mass above which envelope validation requires three matched and "
+        "three consecutive isotopic peaks instead of two (default 4250).")(
         "max-miss-peak-num", po::value<std::string>(&max_miss_peak_num),
         "<a non-negative integer>. Maximum number of missing peaks allowed in "
         "a matched envelope. The default value is 1.")(
@@ -341,6 +345,16 @@ bool Argument::parse(int argc, char* argv[]) {
 
     if (vm.count("flashdeconv")) {
       topfd_para_ptr_->setUseFlashDeconv(true);
+    }
+
+    if (vm.count("mass-group-boundary")) {
+      double mass = 0;
+      if (!toDouble(mass_group_boundary, mass) || mass <= 0) {
+        LOG_ERROR("Mass group boundary "
+                  << mass_group_boundary << " should be a positive number.");
+        return false;
+      }
+      topfd_para_ptr_->setMassGroupBoundary(mass);
     }
 
     if (vm.count("max-miss-peak-num")) {

@@ -51,6 +51,8 @@ class TopfdPara {
   const std::string& getResourceDir() const { return resource_dir_; }
   bool isMissingLevelOne() const { return missing_level_one_; }
   int getMaxCharge() const { return max_charge_; }
+
+  double getMassGroupBoundary() const { return mass_group_boundary_; }
   double getMaxMass() const { return max_mass_; }
   double getMzError() const { return mz_error_; }
   int getMaxMissPeakNum() const { return max_miss_peak_num_; }
@@ -105,6 +107,10 @@ class TopfdPara {
   void setResourceDir(std::string dir) { resource_dir_ = std::move(dir); }
   void setMissingLevelOne(bool missing) { missing_level_one_ = missing; }
   void setMaxCharge(int charge) { max_charge_ = charge; }
+
+  void setMassGroupBoundary(double mass) {
+    mass_group_boundary_ = mass;
+  }
   void setMaxMass(double mass) { max_mass_ = mass; }
   void setMzError(double error) { mz_error_ = error; }
   void setMsOneSnRatio(double ratio) { ms_one_sn_ratio_ = ratio; }
@@ -180,6 +186,13 @@ class TopfdPara {
 
   // parameters for deconcovolution
   int max_charge_ = 30;
+
+  // hidden option --mass-group-boundary: EnvPara::mass_group_boundary_[2],
+  // above which envelope validation needs three matched and three
+  // consecutive isotopic peaks instead of two
+  // keep in step with EnvPara::DEFAULT_MASS_GROUP_BOUNDARY; this header
+  // deliberately has no project includes, so the value is repeated
+  double mass_group_boundary_ = 4250;
   double max_mass_ = 50000;
   // precursor window is used only when the mzML file does not
   // contain the precursor window information
