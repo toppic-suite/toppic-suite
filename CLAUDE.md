@@ -396,7 +396,7 @@ reading, one task per MS/MS spectrum on the thread pool, per-thread msalign
 files merged at the end and buffered SQLite records, but the spectrum is
 deconvoluted with the FLASHDeconv algorithm (OpenMS `SpectralDeconvolution`,
 `PeakGroup`, `PeakGroupScoring`, `FLASHHelperClasses`) instead of
-`DeconvSingleSp`. The hidden `topfd --flashdeconv` selects it
+`DeconvSingleSp`. The option `topfd --ms2-flashdeconv` selects it
 (`TopfdPara::isUseFlashDeconv`, `topfd_process.cpp`). Facts to keep straight:
 
 - **Everything lives in the cpp**, in the namespace `flashdeconv_ms2_process`:

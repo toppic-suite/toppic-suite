@@ -251,7 +251,7 @@ class TopfdPara {
   // envelopes of every deconvoluted spectrum to win_envs.txt / dp_envs.txt
   // (debugging aid).
   bool output_dp_envs_ = false;
-  // hidden option --flashdeconv: deconvolute the MS/MS spectra with the
+  // option --ms2-flashdeconv: deconvolute the MS/MS spectra with the
   // FLASHDeconv algorithm (FlashDeconvMs2Process) instead of DeconvMs2Process
   bool use_flashdeconv_ = false;
 
