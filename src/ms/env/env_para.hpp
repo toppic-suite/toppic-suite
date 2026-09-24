@@ -27,11 +27,19 @@ using EnvParaPtr = std::shared_ptr<EnvPara>;
 
 class EnvPara {
  public:
+  // the default third mass group boundary (experiment 48 of toppic_test)
+  static constexpr double DEFAULT_MASS_GROUP_BOUNDARY = 4250;
+
   // EnvPara() to be removed
   EnvPara() {};
   // set mz tolerance, the maximum number of missing peaks, and whether to run
   // the filtering-by-mz step
-  EnvPara(double mz_tolerance, int max_miss_peak_num, bool run_filter_by_mz);
+  // mass_group_boundary is the third entry of mass_group_boundary_: the mass
+  // above which envelope validation requires three matched and three
+  // consecutive isotopic peaks instead of two. topfd passes the value of its
+  // hidden --mass-group-boundary option.
+  EnvPara(double mz_tolerance, int max_miss_peak_num, bool run_filter_by_mz,
+          double mass_group_boundary = DEFAULT_MASS_GROUP_BOUNDARY);
 
   double getMzTolerance(int charge);
 
@@ -44,13 +52,22 @@ class EnvPara {
 
   int getMassGroup(double base_mass);
 
+  // the boundary between the second and the third mass group
+  double getMassGroupBoundary() const { return mass_group_boundary_[2]; }
+
+
   // the minimum monoisotopic envelope for an envelope
   double min_mass_ = 50;
 
   // Several parameters are related with the mass of envelopes. We classify
-  // envelopes into 3 groups based on its base mass. See getMassGroup()
+  // envelopes into 3 groups based on its base mass. See getMassGroup().
+  // The third value is the boundary above which an envelope must show three
+  // matched and three consecutive isotopic peaks instead of two
+  // (min_match_peak_num_, min_consecutive_peak_num_ below); topfd sets it from
+  // the hidden --mass-group-boundary option.
   std::vector<double> mass_group_boundary_ = {
-      min_mass_, min_mass_, 1500, std::numeric_limits<double>::max()};
+      min_mass_, min_mass_, DEFAULT_MASS_GROUP_BOUNDARY,
+      std::numeric_limits<double>::max()};
 
   //  maximum number of peaks left and right to the base peak in theoretical
   //  envelopes
