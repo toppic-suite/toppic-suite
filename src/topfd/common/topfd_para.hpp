@@ -72,6 +72,7 @@ class TopfdPara {
   bool isOutputAvgMass() const { return output_avg_mass_; }
   bool isOutputCsvFeatureFile() const { return output_csv_feature_file_; }
   bool isOutputDpEnvs() const { return output_dp_envs_; }
+  bool isUseFlashDeconv() const { return use_flashdeconv_; }
   int getThreadNum() const { return thread_num_; }
   double getMs1EcscoreCutoff() const { return ms1_ecscore_cutoff_; }
   double getMs2EcscoreCutoff() const { return ms2_ecscore_cutoff_; }
@@ -127,6 +128,7 @@ class TopfdPara {
   void setGeneSql(bool gene_sql) { gene_sql_ = gene_sql; }
   void setSql3d(bool sql_3d) { sql_3d_ = sql_3d; }
   void setOutputDpEnvs(bool output) { output_dp_envs_ = output; }
+  void setUseFlashDeconv(bool use) { use_flashdeconv_ = use; }
   void setMaxMissPeakNum(int num) { max_miss_peak_num_ = num; }
   void setRunFilterByMz(bool run) { run_filter_by_mz_ = run; }
   void setThreadNum(int num) { thread_num_ = num; }
@@ -236,6 +238,9 @@ class TopfdPara {
   // envelopes of every deconvoluted spectrum to win_envs.txt / dp_envs.txt
   // (debugging aid).
   bool output_dp_envs_ = false;
+  // hidden option --flashdeconv: deconvolute the MS/MS spectra with the
+  // FLASHDeconv algorithm (FlashDeconvMs2Process) instead of DeconvMs2Process
+  bool use_flashdeconv_ = false;
 
   //** information for each run **
   int frac_id_ = -1;

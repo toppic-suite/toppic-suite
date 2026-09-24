@@ -168,6 +168,9 @@ bool Argument::parse(int argc, char* argv[]) {
         "output-dp-envs",
         "Dump the windowed candidate envelopes and DP-selected envelopes of "
         "each spectrum to win_envs.txt / dp_envs.txt (debugging).")(
+        "flashdeconv",
+        "Deconvolute the MS/MS spectra with the FLASHDeconv algorithm "
+        "(FlashDeconvMs2Process) instead of TopFD's own (experimental).")(
         "max-miss-peak-num", po::value<std::string>(&max_miss_peak_num),
         "<a non-negative integer>. Maximum number of missing peaks allowed in "
         "a matched envelope. The default value is 1.")(
@@ -334,6 +337,10 @@ bool Argument::parse(int argc, char* argv[]) {
 
     if (vm.count("output-dp-envs")) {
       topfd_para_ptr_->setOutputDpEnvs(true);
+    }
+
+    if (vm.count("flashdeconv")) {
+      topfd_para_ptr_->setUseFlashDeconv(true);
     }
 
     if (vm.count("max-miss-peak-num")) {
