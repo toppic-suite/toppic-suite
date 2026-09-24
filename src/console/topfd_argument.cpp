@@ -158,7 +158,10 @@ bool Argument::parse(int argc, char* argv[]) {
         "text-peak-list,T",
         "Deconvolute a single MS/MS spectrum given as a text peak list: one "
         "peak per line, m/z and intensity separated by a space. The output "
-        "files are named after the input file.");
+        "files are named after the input file.")(
+        "ms2-flashdeconv",
+        "Deconvolute the MS/MS spectra with the FLASHDeconv algorithm instead "
+        "of TopFD's own (experimental).");
 
     // Advanced options accepted on the command line but hidden from the help
     // message; the positional spectrum file argument is also hidden here.
@@ -169,9 +172,6 @@ bool Argument::parse(int argc, char* argv[]) {
         "output-dp-envs",
         "Dump the windowed candidate envelopes and DP-selected envelopes of "
         "each spectrum to win_envs.txt / dp_envs.txt (debugging).")(
-        "flashdeconv",
-        "Deconvolute the MS/MS spectra with the FLASHDeconv algorithm "
-        "(FlashDeconvMs2Process) instead of TopFD's own (experimental).")(
         "mass-group-boundary", po::value<std::string>(&mass_group_boundary),
         "The mass above which envelope validation requires three matched and "
         "three consecutive isotopic peaks instead of two (default 4250).")(
@@ -343,7 +343,7 @@ bool Argument::parse(int argc, char* argv[]) {
       topfd_para_ptr_->setOutputDpEnvs(true);
     }
 
-    if (vm.count("flashdeconv")) {
+    if (vm.count("ms2-flashdeconv")) {
       topfd_para_ptr_->setUseFlashDeconv(true);
     }
 
