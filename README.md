@@ -50,3 +50,33 @@ annotated fragment ions. It is distributed separately; see the
 * [Red Hat Enterprise Linux](docs/compile/redhat_build.md)
 * [Windows](docs/compile/windows_build.md)
 * [macOS](docs/compile/macos_build.md)
+
+## Citation
+
+If you use TopPIC Suite in your research, please cite the paper of each tool
+you used.
+
+**TopFD**\
+Abdul Rehman Basharat, Yong Zang, Liangliang Sun, and Xiaowen Liu. TopFD: a
+proteoform feature detection tool for top-down proteomics. *Analytical
+Chemistry*, 95:8189-8196, 2023.
+[PubMed](https://pubmed.ncbi.nlm.nih.gov/37196155/)
+
+**TopPIC**\
+Qiang Kou, Likun Xun, and Xiaowen Liu. TopPIC: a software tool for top-down
+mass spectrometry-based proteoform identification and characterization.
+*Bioinformatics*, 32:3495-3497, 2016.
+[PubMed](https://pubmed.ncbi.nlm.nih.gov/27423895/)
+
+**TopMG**\
+Qiang Kou, Si Wu, Nikola Tolić, Ljiljana Paša-Tolić, Yunlong Liu, and Xiaowen
+Liu. A mass graph-based approach for the identification of modified
+proteoforms using top-down tandem mass spectra. *Bioinformatics*,
+33:1309-1316, 2017.
+[PubMed](https://pubmed.ncbi.nlm.nih.gov/28453668/)
+
+**TopDIA**\
+Abdul Rehman Basharat, Xingzhao Xiong, Tian Xu, Yong Zang, Liangliang Sun, and
+Xiaowen Liu. TopDIA: a software tool for top-down data-independent acquisition
+proteomics. *Journal of Proteome Research*, 24:55-64, 2025.
+[PubMed](https://pubmed.ncbi.nlm.nih.gov/39641251/)
