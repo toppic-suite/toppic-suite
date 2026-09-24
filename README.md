@@ -55,103 +55,13 @@ annotated fragment ions. It is distributed separately; see the
 
 ## Building on Ubuntu Linux
 
-### 1. Install the build dependencies
-
-```sh
-sudo apt-get update
-# build tools and libraries (Git LFS is needed for the model files under res/
-# and the ONNX Runtime library under ext/onnx/)
-sudo apt-get install build-essential cmake clang git git-lfs \
-    zlib1g-dev libsqlite3-dev libpugixml-dev \
-    libboost-filesystem-dev libboost-iostreams-dev libboost-thread-dev \
-    libboost-chrono-dev libboost-serialization-dev \
-    libboost-program-options-dev \
-    qt6-base-dev
-```
-
-The same packages can be installed with the script
-[`scripts/install_ubuntu_packages.sh`](scripts/install_ubuntu_packages.sh)
-(run `scripts/install_ubuntu_packages.sh` from the repository root).
-
-Notes:
-
-- The build defaults to **clang/clang++** when they are found; if clang is not
-  installed, CMake falls back to the system default compiler (g++ works too).
-  To force a compiler, pass `-DCMAKE_CXX_COMPILER=...` at configure time.
-- **Boost ≥ 1.74** is required. The Ubuntu packages above are sufficient
-  (`libboost-all-dev` also works if you prefer one package).
-- **Qt6** (`qt6-base-dev`) is needed for the GUI tools (`topfd_gui`, etc.).
-- Other third-party code (htslib, ProteoWizard, ONNX Runtime) is vendored
-  under `ext/` and built/linked automatically — no packages needed.
-
-### 2. Clone (with Git LFS)
-
-```sh
-# register the Git LFS hooks/filters for your user (one time per machine)
-git lfs install
-git clone https://github.com/toppic-suite/toppic-suite.git
-cd toppic-suite
-```
-
-If the clone was made before installing Git LFS, run `git lfs pull` inside the
-repository to replace the LFS pointer files with the real model files and the
-ONNX Runtime library (`ext/onnx/libonnxruntime.so.1.23.2`); without it the
-build fails to link.
-
-### 3. Configure and build
-
-```sh
-mkdir -p build
-cd build
-cmake ..
-make -j$(nproc)
-```
-
-The build type defaults to `Release`. The executables (`topfd`, `topdia`,
-`topindex`, `toppic`, `topmg`, `topdiff` and their `*_gui` counterparts) are
-placed in the repository's `bin/` directory. To build just one tool, e.g.
-TopFD:
-
-```sh
-make -j$(nproc) topfd
-```
-
-### 4. Install
-
-```sh
-sudo make install
-```
-
-This installs the binaries to `/usr/local/bin`, the ONNX Runtime shared
-library they use to `/usr/local/lib/toppic`, and the runtime resources (model
-files, isotope tables, ...) to `/usr/local/share/toppic`. Use
-`cmake -DCMAKE_INSTALL_PREFIX=<dir> ..` at configure time for a different
-prefix.
-
-The tools can also be run directly from `bin/` **without** installing: they
-find the runtime resources in the repository's `res/` directory (the tools
-look in `res` next to the executable first, then in `../res`, then in the
-installed shared directory).
-
-### 5. Uninstall
-
-To remove everything that `make install` placed under the prefix (the
-binaries, the ONNX Runtime library and the runtime resources), run the
-following from the **same build directory** that was used for `make install`:
-
-```sh
-sudo make uninstall
-```
-
-The command reads the `install_manifest.txt` written into the build directory
-by `make install`, deletes every file listed there, and removes any directories
-(e.g. `/usr/local/share/toppic`) that are left empty. If the build directory
-has been deleted, there is no manifest and `make uninstall` will report an
-error; in that case remove the installed files by hand.
+Ubuntu is the primary build platform. Please follow the instructions from
+[here](docs/compile/ubuntu_build.md) (packages, clone with Git LFS,
+configure/build, install and uninstall).
 
 ## Building on Red Hat Enterprise Linux
 
-The steps are the same as for Ubuntu above; only the package installation
+The steps are the same as for Ubuntu; only the package installation
 differs. Please follow the instructions from [here](docs/compile/redhat_build.md).
 
 ## Building on Windows

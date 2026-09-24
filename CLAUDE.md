@@ -284,11 +284,13 @@ that was left empty (the manifest lists files only). Consequences:
 
 ## Platform build documentation
 
-The build instructions are split by platform. `README.md` carries the full
-Ubuntu walkthrough (packages, clone with Git LFS, configure/build, install,
-uninstall) and only a one-paragraph link for each other platform; the details
-live in `docs/compile/`, all laid out with the same six steps:
+The build instructions are split by platform. `README.md` carries the system
+requirements and a one-paragraph link per platform; the details live in
+`docs/compile/`, all laid out with the same six steps:
 
+- `docs/compile/ubuntu_build.md` — the primary platform: `apt-get` package
+  list (also `scripts/install_ubuntu_packages.sh`), clone with Git LFS,
+  configure/build, run from `bin/`, install, uninstall.
 - `docs/compile/windows_build.md` — MSYS2 **UCRT64** shell, Ninja generator, GCC (not
   clang; see the compiler-default note above), `pacman` package list, system
   ONNX Runtime, `res/` installed next to the executables.
@@ -300,7 +302,7 @@ live in `docs/compile/`, all laid out with the same six steps:
 
 When you change anything platform-specific in `CMakeLists.txt` — a required
 package, the compiler choice, how a library is located, the install layout —
-update the matching doc (and the README for Ubuntu) in the same commit; the
+update the matching doc in the same commit; the
 docs are hand-written and nothing checks them against the build.
 
 ## User manuals (`docs/manual/`)
