@@ -44,6 +44,7 @@
 #include "ms/feature/spec_feature_reader.hpp"
 #include "ms/mzml/mzml_ms_group_reader.hpp"
 #include "ms/mzml/mzml_ms_sql_writer.hpp"
+#include "ms/spec/baseline_util.hpp"
 #include "ms/spec/msalign_thread_merge.hpp"
 #include "ms/spec/msalign_writer.hpp"
 #include "ms/spec/peak.hpp"
@@ -2093,9 +2094,24 @@ PeakGroupVec FlashDeconvSingleSp::deconv() {
 // charges, matched against the spectrum peaks (ExpEnv). The QScore is stored
 // as the EnvCNN score (the score the msalign file reports and sorts by) and
 // the isotope cosine as the MsDeconv score.
+//
+// bound_inte is the spectrum's noise floor (0 when TopFD's own noise
+// estimation is off); after scaling, the theoretical envelope is trimmed to
+// the peaks whose intensity stays above it, exactly as the standard
+// DeconvMs2Process pipeline trims its own final envelope
+// (env_detect::compFullEnv, via getCandidateEnv: getSubEnv(1.0, bound_inte,
+// INT_MAX, INT_MAX)). Skipping this step left every envelope carrying the
+// averagine table's full isotope tail -- peaks orders of magnitude below the
+// apex that no real spectrum could show above noise -- which inflated the
+// envelopes this class writes to the SQLite database (toppic_test experiment,
+// median 14 peaks per MS/MS envelope against DeconvMs2Process's 4 on the same
+// data). min_inte is the matching threshold ExpEnv itself applies to observed
+// peaks (DeconvData::initMinInte's min_inte_, equal to bound_inte whenever
+// -ms2-sn-ratio is left at its default of 1).
 MatchEnvPtrVec toMatchEnvs(const PeakGroupVec& peak_groups,
                            const PeakPtrVec& peak_list,
-                           const EnvParaPtr& env_para_ptr) {
+                           const EnvParaPtr& env_para_ptr, double min_inte,
+                           double bound_inte) {
   MatchEnvPtrVec envs;
   envs.reserve(peak_groups.size());
   for (const PeakGroup& pg : peak_groups) {
@@ -2112,9 +2128,12 @@ MatchEnvPtrVec toMatchEnvs(const PeakGroupVec& peak_groups,
     if (theo_sum > 0) {
       theo_env->changeIntensity(pg.getIntensity() / theo_sum);
     }
+    theo_env =
+        theo_env->getSubEnv(1.0, bound_inte, std::numeric_limits<int>::max(),
+                            std::numeric_limits<int>::max());
     double tolerance = env_para_ptr->getMzTolerance(charge);
     ExpEnvPtr exp_env =
-        std::make_shared<ExpEnv>(peak_list, theo_env, tolerance, 0.0);
+        std::make_shared<ExpEnv>(peak_list, theo_env, tolerance, min_inte);
     int mass_group = env_para_ptr->getMassGroup(mono_mass);
     MatchEnvPtr match_env =
         std::make_shared<MatchEnv>(mass_group, theo_env, exp_env);
@@ -2214,7 +2233,19 @@ void deconvMsTwo(const MzmlMsPtr& ms_ptr, SpecFeaturePtrVec sp_feat_ptr_vec,
     FlashDeconvSingleSp deconv(peak_list, kMs2TolerancePpm * 1e-6, max_charge,
                                max_mass, avg_ptr);
     PeakGroupVec peak_groups = deconv.deconv();
-    deconv_envs = toMatchEnvs(peak_groups, peak_list, env_para_ptr);
+    // The spectrum's noise floor (DeconvData::initMinInte's estimate, reused
+    // here so the reported envelopes are trimmed the way DeconvMs2Process
+    // trims its own -- see toMatchEnvs); 0 when TopFD's noise estimation is
+    // off, which also disables the trim, matching the standard pipeline.
+    double min_inte = 0;
+    double bound_inte = 0;
+    if (topfd_para_ptr->isEstimateMinInte()) {
+      bound_inte = baseline_util::getBaseLine(peak_list);
+      double sn_ratio = topfd_para_ptr->getMsTwoSnRatio();
+      min_inte = sn_ratio < 1.0 ? bound_inte * sn_ratio : bound_inte;
+    }
+    deconv_envs =
+        toMatchEnvs(peak_groups, peak_list, env_para_ptr, min_inte, bound_inte);
   }
   // 3. Add precursor information
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
