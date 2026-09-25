@@ -24,6 +24,7 @@
 #include "common/base/mod.hpp"
 #include "common/util/file_util.hpp"
 #include "ms/factory/spectrum_set_factory.hpp"
+#include "ms/spec/deconv_ms_util.hpp"
 #include "ms/spec/msalign_reader.hpp"
 #include "para/sp_para.hpp"
 #include "prsm/prsm.hpp"
@@ -39,7 +40,8 @@ namespace cluster_prot_corrector {
 
 int process(const PrsmParaPtr& prsm_para_ptr, const TdgfMngPtr& tdgf_mng_ptr,
             const std::string& input_file_ext,
-            const std::string& output_file_ext, double env_cnn_cutoff) {
+            const std::string& output_file_ext, double env_cnn_cutoff,
+            double dedup_ppo) {
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
   std::string base_name = file_util::basename(sp_file_name);
   FastaIndexReaderPtr seq_reader = std::make_shared<FastaIndexReader>(
@@ -105,7 +107,22 @@ int process(const PrsmParaPtr& prsm_para_ptr, const TdgfMngPtr& tdgf_mng_ptr,
             prsm_ptr->setProteoformPtr(form_ptr, sp_para_ptr);
             sele_prsm_ptrs.push_back(prsm_ptr);
           }
-          evalue_processor->compEvalues(spec_set_ptr, sele_prsm_ptrs, ppo,
+          // the recount above uses the masses of the file; the E-value uses
+          // the deduplicated ones, as the main E-value stage does. A merge
+          // can push a spectrum below the minimum peak number, and losing the
+          // E-value would be worse than computing it undeduplicated.
+          SpectrumSetPtr evalue_set_ptr = spec_set_ptr;
+          if (dedup_ppo > 0) {
+            SpectrumSetPtr dedup_set_ptr =
+                spectrum_set_factory::geneSpectrumSetPtr(
+                    deconv_ms_util::combineCloseMasses(deconv_ms_ptr_vec,
+                                                       dedup_ppo),
+                    sp_para_ptr, prec_mono_mass);
+            if (dedup_set_ptr != nullptr && dedup_set_ptr->isValid()) {
+              evalue_set_ptr = dedup_set_ptr;
+            }
+          }
+          evalue_processor->compEvalues(evalue_set_ptr, sele_prsm_ptrs, ppo,
                                         false);
         }
       }

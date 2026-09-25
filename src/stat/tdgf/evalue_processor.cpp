@@ -107,7 +107,8 @@ void EValueProcessor::process(bool is_separate) {
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
   MsAlignReaderPtr reader_ptr = std::make_shared<MsAlignReader>(
       sp_file_name, group_spec_num, sp_para_ptr->getActivationPtr(),
-      sp_para_ptr->getEnvCnnCutoff());
+      sp_para_ptr->getEnvCnnCutoff(),
+        sp_para_ptr->getFragDedupPpo());
 
   PrsmXmlWriterPtrVec writer_ptr_vec = prsm_xml_writer_util::geneWriterPtrVec(
       output_file_name, mng_ptr_->thread_num_);

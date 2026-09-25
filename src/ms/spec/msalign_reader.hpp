@@ -38,6 +38,16 @@ class MsAlignReader {
   MsAlignReader(const std::string& file_name, int group_spec_num,
                 const ActivationPtr& activation_ptr, double env_cnn_cutoff);
 
+  // Also combines the masses of one spectrum that agree within dedup_ppo (a
+  // relative tolerance) into one intensity-weighted average mass. Only the
+  // readers of database filtering, the search and the E-value computation use
+  // this constructor; the readers that feed the matched mass recount and the
+  // XML, table and SQLite output do not, so the reported masses are the ones
+  // in the file.
+  MsAlignReader(const std::string& file_name, int group_spec_num,
+                const ActivationPtr& activation_ptr, double env_cnn_cutoff,
+                double dedup_ppo);
+
   ~MsAlignReader();
 
   std::vector<std::string> readOneStrSpectrum();
@@ -55,6 +65,10 @@ class MsAlignReader {
 
   // masses with an EnvCNN score below the cutoff are skipped (0 = keep all)
   double env_cnn_cutoff_ = 0.0;
+
+  // masses within this relative tolerance of each other are combined into one
+  // (0 = no deduplication)
+  double dedup_ppo_ = 0.0;
 
   std::ifstream input_;
 

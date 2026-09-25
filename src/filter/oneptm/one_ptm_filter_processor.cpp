@@ -53,7 +53,8 @@ inline void filterBlockVariants(const ProteoformPtrVec& raw_forms,
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
   MsAlignReaderPtr reader_ptr = std::make_shared<MsAlignReader>(
       sp_file_name, group_spec_num, sp_para_ptr->getActivationPtr(),
-      sp_para_ptr->getEnvCnnCutoff());
+      sp_para_ptr->getEnvCnnCutoff(),
+        sp_para_ptr->getFragDedupPpo());
   int add_idx = 0;
   DeconvMsPtrVec deconv_ms_ptr_vec = reader_ptr->getNextMsPtrVec();
   std::vector<double> prec_error_vec =
@@ -155,7 +156,8 @@ inline FilterSpecPtrVec readSpectra(const OnePtmFilterMngPtr& mng_ptr) {
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
   MsAlignReaderPtr reader_ptr = std::make_shared<MsAlignReader>(
       prsm_para_ptr->getSpectrumFileName(), group_spec_num,
-      sp_para_ptr->getActivationPtr(), sp_para_ptr->getEnvCnnCutoff());
+      sp_para_ptr->getActivationPtr(), sp_para_ptr->getEnvCnnCutoff(),
+        sp_para_ptr->getFragDedupPpo());
   std::vector<double> prec_error_vec =
       sp_para_ptr->getOneShiftSearchPrecErrorVec();
 

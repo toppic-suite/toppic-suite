@@ -62,7 +62,8 @@ std::function<void()> geneTask(const GraphAlignMngPtr& mng_ptr,
     int group_spec_num = prsm_para_ptr->getGroupSpecNum();
     MsAlignReaderPtr ms_reader_ptr = std::make_shared<MsAlignReader>(
         sp_file_name, group_spec_num, sp_para_ptr->getActivationPtr(),
-        sp_para_ptr->getEnvCnnCutoff());
+        sp_para_ptr->getEnvCnnCutoff(),
+        sp_para_ptr->getFragDedupPpo());
 
     SpecGraphReader spec_reader(sp_file_name, prsm_para_ptr->getGroupSpecNum(),
                                 mng_ptr->convert_ratio_, sp_para_ptr);
