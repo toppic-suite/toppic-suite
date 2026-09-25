@@ -38,11 +38,11 @@ class PtmSearchSlowFilter {
   // modification form). Each entry is aligned as COMPLETE and PREFIX (when
   // allowed) plus, for ProtMod::NONE forms only, also as SUFFIX and INTERNAL
   // (which widen the search to internal fragments), all types requested in a
-  // single PtmSlowMatch::compute call, which runs one PsAlign pass per type
-  // by default or, with the hidden --multi-type-align option
-  // (PrsmPara::useMultiTypeAlign), one fused dynamic program for every type
-  // together (search/ptmsearch/ps_align_multi_type.hpp) - transparent to
-  // this class either way.
+  // single PtmSlowMatch::compute call, which by default runs one fused
+  // dynamic program for every type together
+  // (search/ptmsearch/ps_align_multi_type.hpp), or, with the hidden
+  // --disable-multi-type-align option (PrsmPara::useMultiTypeAlign), one
+  // PsAlign pass per type - transparent to this class either way.
   PtmSlowMatchPtrVec slow_match_ptrs_;
   PrsmPtrVec2D complete_prsm_2d_ptrs_;
   PrsmPtrVec2D prefix_prsm_2d_ptrs_;

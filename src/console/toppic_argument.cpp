@@ -93,7 +93,7 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["fragMassExtension"] = "true";
   arguments["fragExtendMinMass"] = "5000";
   arguments["multiSkipEvalue"] = "";
-  arguments["multiTypeAlign"] = "false";
+  arguments["multiTypeAlign"] = "true";
 
   arguments["version"] = "";
   return arguments;
@@ -526,7 +526,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "fdr-groups", "")("disable-frag-mass-extension", "")(
         "frag-extend-min-mass", po::value<std::string>(&frag_extend_min_mass),
         "")("multi-skip-evalue", po::value<std::string>(&multi_skip_evalue),
-            "")("multi-type-align", "")(
+            "")("disable-multi-type-align", "")(
         "filtering-result-number",
         po::value<std::string>(&filtering_result_num),
         "Filtering result number. Default value: 20.")(
@@ -715,11 +715,13 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
     if (vm.count("fdr-groups")) {
       arguments_["useFdrGroups"] = "true";
     }
-    // hidden: the multiple-unexpected-shift search computes
+    // hidden: by default, the multiple-unexpected-shift search computes
     // COMPLETE/PREFIX/SUFFIX/INTERNAL with one fused dynamic program instead
-    // of one PsAlign pass per type (PrsmPara::useMultiTypeAlign).
-    if (vm.count("multi-type-align")) {
-      arguments_["multiTypeAlign"] = "true";
+    // of one PsAlign pass per type (PrsmPara::useMultiTypeAlign);
+    // --disable-multi-type-align falls back to the original one-pass-per-type
+    // PsAlign search.
+    if (vm.count("disable-multi-type-align")) {
+      arguments_["multiTypeAlign"] = "false";
     }
 
     if (vm.count("combine-result-only")) {

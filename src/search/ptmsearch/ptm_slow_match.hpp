@@ -44,11 +44,12 @@ class PtmSlowMatch {
   // Computes PrSMs for every type in type_ptrs, one PrsmPtrVec appended to
   // prsm_ptr_2d per entry of type_ptrs in the same order. Two interchangeable
   // implementations, chosen once in init() by PrsmPara::useMultiTypeAlign()
-  // (toppic hidden --multi-type-align):
-  // - default: one PsAlign pass per type (multi_align_ptr_ unused).
-  // - --multi-type-align: one fused dynamic program computing every
-  //   requested type together (search/ptmsearch/ps_align_multi_type.hpp;
-  //   ps_align_ptr_ unused).
+  // (toppic hidden --disable-multi-type-align):
+  // - default: one fused dynamic program computing every requested type
+  //   together (search/ptmsearch/ps_align_multi_type.hpp; ps_align_ptr_
+  //   unused).
+  // - --disable-multi-type-align: one PsAlign pass per type
+  //   (multi_align_ptr_ unused).
   void compute(const ProteoformTypePtrVec& type_ptrs,
                std::vector<PrsmPtrVec>& prsm_ptr_2d);
 

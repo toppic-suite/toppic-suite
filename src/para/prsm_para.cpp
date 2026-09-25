@@ -120,8 +120,8 @@ PrsmPara::PrsmPara(const std::map<std::string, std::string>& arguments) {
     sp_para_ptr_->setFragExtendMinMass(
         std::stod(getArg(arguments, "fragExtendMinMass")));
   }
-  // toppic hidden --multi-type-align
-  use_multi_type_align_ = (getArg(arguments, "multiTypeAlign") == "true");
+  // toppic hidden --disable-multi-type-align; default true
+  use_multi_type_align_ = (getArg(arguments, "multiTypeAlign") != "false");
 }
 
 bool PrsmPara::allowProtType(const ProteoformTypePtr& type_ptr) const {
