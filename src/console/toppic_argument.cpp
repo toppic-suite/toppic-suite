@@ -93,6 +93,7 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["fragMassExtension"] = "true";
   arguments["fragExtendMinMass"] = "5000";
   arguments["multiSkipEvalue"] = "";
+  arguments["multiTypeAlign"] = "true";
 
   arguments["version"] = "";
   return arguments;
@@ -165,9 +166,8 @@ void ToppicArgument::outputArguments(
            << "Use approximate spectra in protein filtering:" << sep
            << arguments["useApproxSpectra"] << std::endl;
     if (arguments.at("useFdrGroups") == "true") {
-      output << std::setw(gap) << std::left
-             << "FDR computation:" << sep << "separate PrSM groups"
-             << std::endl;
+      output << std::setw(gap) << std::left << "FDR computation:" << sep
+             << "separate PrSM groups" << std::endl;
     }
     output << std::setw(gap) << std::left
            << "Variable modifications file name:" << sep
@@ -521,15 +521,12 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "output-raw-prsm-table,o", "")("output-prsm-coverage,O", "")(
         "disable-post-match,D", "")(
         "post-min-peak-num,I", po::value<std::string>(&post_min_peak_num), "")(
-        "average-mass,g", "")(
-        "disable-zero-shift-prec-error", "")(
-        "enable-one-shift-prec-error", "")(
-        "enable-var-ptm-prec-error", "")(
-        "fdr-groups", "")(
-        "disable-frag-mass-extension", "")(
+        "average-mass,g", "")("disable-zero-shift-prec-error", "")(
+        "enable-one-shift-prec-error", "")("enable-var-ptm-prec-error", "")(
+        "fdr-groups", "")("disable-frag-mass-extension", "")(
         "frag-extend-min-mass", po::value<std::string>(&frag_extend_min_mass),
-        "")(
-        "multi-skip-evalue", po::value<std::string>(&multi_skip_evalue), "")(
+        "")("multi-skip-evalue", po::value<std::string>(&multi_skip_evalue),
+            "")("disable-multi-type-align", "")(
         "filtering-result-number",
         po::value<std::string>(&filtering_result_num),
         "Filtering result number. Default value: 20.")(
@@ -637,7 +634,6 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
       arguments_["searchType"] = "TARGET+DECOY";
     }
 
-
     if (vm.count("frag-error-tolerance")) {
       arguments_["fragErrorTolerance"] = frag_error_tole;
     }
@@ -718,6 +714,14 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
     }
     if (vm.count("fdr-groups")) {
       arguments_["useFdrGroups"] = "true";
+    }
+    // hidden: by default, the multiple-unexpected-shift search computes
+    // COMPLETE/PREFIX/SUFFIX/INTERNAL with one fused dynamic program instead
+    // of one PsAlign pass per type (PrsmPara::useMultiTypeAlign);
+    // --disable-multi-type-align falls back to the original one-pass-per-type
+    // PsAlign search.
+    if (vm.count("disable-multi-type-align")) {
+      arguments_["multiTypeAlign"] = "false";
     }
 
     if (vm.count("combine-result-only")) {

@@ -184,26 +184,47 @@ void PtmSlowMatch::init() {
   for (size_t i = 0; i < prm_peaks.size(); i++) {
     ms_masses[i] = prm_peaks[i]->getPosition();
   }
-  ps_align_ptr_ = std::make_shared<PsAlign>(
-      ms_masses, seq_masses, diagonal_ptrs, mng_ptr_->align_para_ptr_);
-}
-
-void PtmSlowMatch::compute(const ProteoformTypePtr& type_ptr,
-                           PrsmPtrVec& prsm_ptrs) {
-  ps_align_ptr_->compute(type_ptr);
-  for (int s = 2; s <= mng_ptr_->align_para_ptr_->getUnknownShiftNum(); s++) {
-    PrsmPtr prsm_ptr =
-        ps_align_ptr_->geneResult(s, proteo_ptr_, deconv_ms_ptr_vec_,
-                                  ms_three_ptr_vec_, mng_ptr_->prsm_para_ptr_);
-    prsm_ptrs.push_back(prsm_ptr);
+  // Only one of the two alignment objects is built: PsAlign's and
+  // PsAlignMultiType's constructors both do an O(diagonal count squared)
+  // shift-candidate precomputation, so building both unconditionally would
+  // pay that cost twice regardless of which method compute() ends up using.
+  if (mng_ptr_->prsm_para_ptr_->useMultiTypeAlign()) {
+    multi_align_ptr_ = std::make_shared<PsAlignMultiType>(
+        ms_masses, seq_masses, diagonal_ptrs, mng_ptr_->align_para_ptr_);
+  } else {
+    ps_align_ptr_ = std::make_shared<PsAlign>(
+        ms_masses, seq_masses, diagonal_ptrs, mng_ptr_->align_para_ptr_);
   }
 }
 
-PrsmPtr PtmSlowMatch::compute(const ProteoformTypePtr& align_type_ptr,
-                              int shift_num) {
-  ps_align_ptr_->compute(align_type_ptr_);
-  return ps_align_ptr_->geneResult(shift_num, proteo_ptr_, deconv_ms_ptr_vec_,
-                                   ms_three_ptr_vec_, mng_ptr_->prsm_para_ptr_);
+void PtmSlowMatch::compute(const ProteoformTypePtrVec& type_ptrs,
+                           std::vector<PrsmPtrVec>& prsm_ptr_2d) {
+  int max_shift_num = mng_ptr_->align_para_ptr_->getUnknownShiftNum();
+  if (multi_align_ptr_ != nullptr) {
+    multi_align_ptr_->compute(type_ptrs);
+    for (size_t i = 0; i < type_ptrs.size(); i++) {
+      PrsmPtrVec prsm_ptrs;
+      for (int s = 2; s <= max_shift_num; s++) {
+        PrsmPtr prsm_ptr = multi_align_ptr_->geneResult(
+            type_ptrs[i], s, proteo_ptr_, deconv_ms_ptr_vec_, ms_three_ptr_vec_,
+            mng_ptr_->prsm_para_ptr_);
+        prsm_ptrs.push_back(prsm_ptr);
+      }
+      prsm_ptr_2d.push_back(prsm_ptrs);
+    }
+    return;
+  }
+  for (size_t i = 0; i < type_ptrs.size(); i++) {
+    ps_align_ptr_->compute(type_ptrs[i]);
+    PrsmPtrVec prsm_ptrs;
+    for (int s = 2; s <= max_shift_num; s++) {
+      PrsmPtr prsm_ptr = ps_align_ptr_->geneResult(
+          s, proteo_ptr_, deconv_ms_ptr_vec_, ms_three_ptr_vec_,
+          mng_ptr_->prsm_para_ptr_);
+      prsm_ptrs.push_back(prsm_ptr);
+    }
+    prsm_ptr_2d.push_back(prsm_ptrs);
+  }
 }
 
 } /* namespace toppic */
