@@ -34,8 +34,12 @@ class PtmSearchSlowFilter {
                       const ProteoformTypePtr& type_ptr);
 
  private:
-  PtmSlowMatchPtrVec complete_prefix_slow_match_ptrs_;
-  PtmSlowMatchPtrVec suffix_internal_slow_match_ptrs_;
+  // One PtmSlowMatch per candidate proteoform (protein x N/C-term
+  // modification form). Each entry is aligned as COMPLETE and PREFIX (when
+  // allowed) plus, for ProtMod::NONE forms only, also as SUFFIX and INTERNAL
+  // (which widen the search to internal fragments), all types computed
+  // together in a single PtmSlowMatch::compute call.
+  PtmSlowMatchPtrVec slow_match_ptrs_;
   PrsmPtrVec2D complete_prsm_2d_ptrs_;
   PrsmPtrVec2D prefix_prsm_2d_ptrs_;
   PrsmPtrVec2D suffix_prsm_2d_ptrs_;

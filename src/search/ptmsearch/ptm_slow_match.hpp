@@ -23,8 +23,8 @@
 #include "ms/spec/spectrum_set.hpp"
 #include "prsm/prsm.hpp"
 #include "search/diag/diag_header.hpp"
-#include "search/oneptmsearch/ps_align.hpp"
 #include "search/oneptmsearch/ptm_search_mng.hpp"
+#include "search/ptmsearch/ps_align_multi_type.hpp"
 #include "seq/proteoform.hpp"
 
 namespace toppic {
@@ -40,9 +40,12 @@ class PtmSlowMatch {
 
   void init();
 
-  PrsmPtr compute(const ProteoformTypePtr& align_type_ptr, int shift_num);
-
-  void compute(const ProteoformTypePtr& type_ptr, PrsmPtrVec& prsm_ptrs);
+  // Computes PrSMs for every type in type_ptrs together (one fused dynamic
+  // program, search/ptmsearch/ps_align_multi_type.hpp) instead of one
+  // PsAlign pass per type. prsm_ptr_2d gets one PrsmPtrVec appended per
+  // entry of type_ptrs, in the same order.
+  void compute(const ProteoformTypePtrVec& type_ptrs,
+               std::vector<PrsmPtrVec>& prsm_ptr_2d);
 
  private:
   PtmSearchMngPtr mng_ptr_;
@@ -52,7 +55,7 @@ class PtmSlowMatch {
   PrmMsPtrVec ms_six_ptr_vec_;
   ExtendMsPtrVec ms_three_ptr_vec_;
   ProteoformTypePtr align_type_ptr_;
-  PsAlignPtr ps_align_ptr_;
+  PsAlignMultiTypePtr ps_align_ptr_;
 
   DiagHeaderPtrVec getNTermShiftListCommonHeaders();
 
