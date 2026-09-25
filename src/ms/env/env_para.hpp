@@ -164,10 +164,6 @@ class EnvPara {
   // charge state and monoisotopic mass, we will
   // add several envelopes with two consecutive charges
   // and envelopes with -1 and +1 Dalton shift
-  // See match_env_util::addMultipleMass
-  double multiple_min_mass_ = 5000;
-  int multiple_min_charge_ = 20;
-  double multiple_min_ratio_ = 0.9;
 
  private:
   // *** mz_tolerance and score_error_tolerance,
