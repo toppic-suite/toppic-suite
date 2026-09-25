@@ -372,7 +372,7 @@ std::map<std::string, std::string> ToppicWindow::getArguments() {
   if (ui->SuffixCheckBox->isChecked()) {
     arguments_["allowProtType"] = arguments_["allowProtType"] + ",SUFFIX";
   }
-  if (ui->MACCheckBox->isChecked()) {
+  if (ui->InternalCheckBox->isChecked()) {
     arguments_["allowProtType"] = arguments_["allowProtType"] + ",INTERNAL";
   }
   if (arguments_["allowProtType"] != "") {
