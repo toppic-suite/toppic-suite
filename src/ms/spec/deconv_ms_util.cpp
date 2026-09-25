@@ -119,33 +119,17 @@ DeconvPeakPtrVec combineCloseMasses(const DeconvPeakPtrVec& peak_ptr_list,
     }
   }
 
-  std::vector<double> mass_sum(n, 0.0);
-  std::vector<double> inte_sum(n, 0.0);
-  std::vector<std::size_t> group_size(n, 0);
-  for (std::size_t i = 0; i < n; i++) {
-    std::size_t s = seed_of[i];
-    double inte = peak_ptr_list[i]->getIntensity();
-    mass_sum[s] += peak_ptr_list[i]->getMonoMass() * inte;
-    inte_sum[s] += inte;
-    group_size[s]++;
-  }
-
+  // a group is represented by the mass that seeded it, the most intense one,
+  // and that peak is passed through unchanged: its mass, its peak id, its
+  // charge, its score and its intensity all belong to the same measured mass.
+  // Building a new peak with an averaged mass would leave the reported mass
+  // and the reported id describing different things.
   DeconvPeakPtrVec result;
   result.reserve(n);
   for (std::size_t i = 0; i < n; i++) {
-    if (seed_of[i] != i) {
-      continue;
-    }
-    if (group_size[i] == 1) {
+    if (seed_of[i] == i) {
       result.push_back(peak_ptr_list[i]);
-      continue;
     }
-    DeconvPeakPtr seed = peak_ptr_list[i];
-    double mass = (inte_sum[i] > 0) ? (mass_sum[i] / inte_sum[i])
-                                    : seed->getMonoMass();
-    result.push_back(std::make_shared<DeconvPeak>(
-        seed->getSpId(), seed->getPeakId(), mass, inte_sum[i],
-        seed->getCharge(), seed->getScore()));
   }
   return result;
 }
