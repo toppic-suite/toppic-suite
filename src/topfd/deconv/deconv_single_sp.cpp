@@ -141,6 +141,60 @@ void outputFilteredEnvs(const MatchEnvPtr2D& cand_envs, int ms_level) {
   }
 }
 
+// The isotope cosine of a matched envelope: the cosine between the
+// theoretical peak intensities and the observed ones over the envelope's
+// positions, a missing peak contributing zero to the observed vector. This is
+// what FLASHDeconv tests a harmonic parent with (its isotope cosine against
+// the averagine distribution, kMinIsotopeCosine = 0.85); TopFD's theoretical
+// envelope is the averagine distribution scaled to the observed intensities,
+// so the same quantity is the cosine between the two vectors here.
+double compIsotopeCosine(const MatchEnvPtr& env) {
+  EnvPtr theo_env = env->getTheoEnvPtr();
+  ExpEnvPtr exp_env = env->getExpEnvPtr();
+  int peak_num = theo_env->getPeakNum();
+  if (peak_num != exp_env->getPeakNum() || peak_num == 0) {
+    return 0;
+  }
+  double dot = 0;
+  double theo_norm = 0;
+  double exp_norm = 0;
+  for (int i = 0; i < peak_num; i++) {
+    double theo_inte = theo_env->getInte(i);
+    double exp_inte = exp_env->isExist(i) ? exp_env->getInte(i) : 0;
+    dot += theo_inte * exp_inte;
+    theo_norm += theo_inte * theo_inte;
+    exp_norm += exp_inte * exp_inte;
+  }
+  if (theo_norm <= 0 || exp_norm <= 0) {
+    return 0;
+  }
+  return dot / std::sqrt(theo_norm * exp_norm);
+}
+
+// The signal-to-noise ratio of a matched envelope, in the sense
+// PeakGroup::updateSnr uses: of the observed power, the part the theoretical
+// shape explains (cos^2) against the part it does not ((1 - cos^2)) plus the
+// noise floor of the spectrum over the envelope's positions.
+double compEnvSnr(const MatchEnvPtr& env, double noise_inte) {
+  double cosine = compIsotopeCosine(env);
+  ExpEnvPtr exp_env = env->getExpEnvPtr();
+  int peak_num = exp_env->getPeakNum();
+  double signal_power = 0;
+  for (int i = 0; i < peak_num; i++) {
+    if (exp_env->isExist(i)) {
+      double inte = exp_env->getInte(i);
+      signal_power += inte * inte;
+    }
+  }
+  double cos_squared = cosine * cosine;
+  double noise_power = peak_num * noise_inte * noise_inte;
+  double denominator = (1 - cos_squared) * signal_power + noise_power;
+  if (denominator <= 0) {
+    return 0;
+  }
+  return cos_squared * signal_power / denominator;
+}
+
 // The harmonic check, ported from the FLASHDeconv implementation in this
 // repository (FlashDeconvSingleSp::removeHarmonicPeakGroups and the harmonic
 // vetoes of updateCandidateMassBins), applied to the envelopes the dynamic
@@ -166,6 +220,8 @@ void replaceHarmonicEnvs(MatchEnvPtrVec& envs, const PeakPtrVec& peak_list,
                          const DeconvDataPtr& data_ptr,
                          const EnvParaPtr& env_para_ptr) {
   const std::vector<int> harmonic_factors = {2, 3};
+  // FLASHDeconv's kMinIsotopeCosine, the floor its own harmonic removal uses
+  const double min_isotope_cosine = 0.85;
   double min_inte = data_ptr->getMinInte();
   double min_ref_inte = data_ptr->getMinRefInte();
   double bound_inte = data_ptr->getNoiseInte();
@@ -238,6 +294,18 @@ void replaceHarmonicEnvs(MatchEnvPtrVec& envs, const PeakPtrVec& peak_list,
       }
       parent->compMsdeconvScr(env_para_ptr);
       if (parent->getMsdeconvScore() <= score) {
+        continue;
+      }
+      // The shape guard of the reference implementation
+      // (FlashDeconvSingleSp::removeHarmonicPeakGroups requires the parent to
+      // score under kMinIsotopeCosine and to have the higher SNR). Without it
+      // the two tests above are nearly one test: both the matched peak count
+      // and the MS-Deconv score grow with the number of matched peaks, and a
+      // high charge envelope in a dense region matches many peaks by chance.
+      if (compIsotopeCosine(parent) < min_isotope_cosine) {
+        continue;
+      }
+      if (compEnvSnr(parent, bound_inte) <= compEnvSnr(envs[i], bound_inte)) {
         continue;
       }
       if (best_parent == nullptr ||
