@@ -55,6 +55,31 @@ PrsmStrPtrVec2D setProtId(PrsmStrPtrVec& prsm_ptrs) {
   return proteins;
 }
 
+// Two proteoforms of one protein belong to the same cluster only if their
+// sequences overlap by at least this fraction of the shorter one; without the
+// check, two PrSMs of the same protein and mass covering disjoint regions of
+// the protein (an N-terminal and a C-terminal fragment of equal mass) are
+// clustered together.
+const double kMinOverlapRatio = 0.7;
+
+// Start and end positions are inclusive, so a one-residue proteoform has
+// length 1.
+bool isOverlapMatch(const PrsmStrPtr& a, const PrsmStrPtr& b) {
+  int a_start = a->getProteoformStartPos();
+  int a_end = a->getProteoformEndPos();
+  int b_start = b->getProteoformStartPos();
+  int b_end = b->getProteoformEndPos();
+  int overlap = std::min(a_end, b_end) - std::max(a_start, b_start) + 1;
+  if (overlap <= 0) {
+    return false;
+  }
+  int shorter_len = std::min(a_end - a_start + 1, b_end - b_start + 1);
+  if (shorter_len <= 0) {
+    return false;
+  }
+  return overlap >= kMinOverlapRatio * shorter_len;
+}
+
 void setClusterId(PrsmStrPtrVec2D& proteins, bool is_ppm_error,
                   double error_tole) {
   PrsmStrPtrVec2D clusters;
@@ -69,7 +94,8 @@ void setClusterId(PrsmStrPtrVec2D& proteins, bool is_ppm_error,
       }
       for (size_t m = 0; m < protein_clusters.size(); m++) {
         PrsmStrPtr ref_prsm = protein_clusters[m][0];
-        if (PrsmStr::isSimpleMatch(cur_prsm, ref_prsm, dalton_error_tole)) {
+        if (PrsmStr::isSimpleMatch(cur_prsm, ref_prsm, dalton_error_tole) &&
+            isOverlapMatch(cur_prsm, ref_prsm)) {
           protein_clusters[m].push_back(cur_prsm);
           is_found = true;
           break;
