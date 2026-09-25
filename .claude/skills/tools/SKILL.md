@@ -67,7 +67,9 @@ Key options (defaults): `-c` max charge 30, `-m` max mass 50000,
 `-e` m/z error 0.02, `-a` activation FILE, `-u` threads 1,
 `-r`/`-s` MS1/MS2 S/N ratio 3/1, `-t` ECScore cutoff 0.1, `-b` min scans 1,
 `-o` no MS1 scans (no features, precursor set to the `-m`/`-c` limits),
-`-N` no SQLite, `-D` also store raw MS1 peaks for 3D views.
+`-N` no SQLite, `-D` also store raw MS1 peaks for 3D views,
+`--ms2-flashdeconv` deconvolute the MS/MS spectra with FLASHDeconv instead
+of TopFD's own algorithm (experimental; MS1 and the features are unchanged).
 
 - **Do not use `-N` if TopPIC will search the spectra**: TopPIC's default
   post mass matching needs `sample.sqlite` and fails without it (or run
@@ -132,7 +134,7 @@ N-terminal forms all four, `-R` proteoform types all four, `-d` decoy,
 `-b` variable-PTM file with `-S` max 3, `-B` common-modification file for
 characterization with `-H` MIScore threshold 0.15, `-e` fragment and `-E`
 precursor tolerance 10 ppm,
-`-F` EnvCNN filter 0.2, `-p` cluster tolerance 1.2 Da, `-r` combined
+`-F` EnvCNN filter 0.4, `-p` cluster tolerance 1.2 Da, `-r` combined
 spectra 1, `-x` no feature file, `-D` disable post matching, `-I` post
 min peaks 1, cutoffs `-t/-v`, `-T/-V`, `-y/-Y` (EVALUE 0.01 each; `FDR`
 needs `-d`), `-c <name>` combine fractions, `-u` threads, `-k` keep temp
@@ -147,7 +149,8 @@ protein containing the proteoform. `sample_post_ms2.toppic_record_prsm`
 computation with the decoys, is always kept. Combined runs (`-c name`)
 merge the fractions' post-matched spectra and record files into
 `name_ms2.msalign` / `name_ms2.toppic_record_prsm`, re-cluster them by
-protein and precursor mass, compute one FDR and report; they always
+protein, precursor mass and proteoform sequence overlap, compute one FDR
+and report; they always
 produce `name_ms2_toppic_*` and no SQLite output, and `-C` redoes only the
 combining from the kept record files. `name` must differ from the input
 base names.
@@ -171,7 +174,8 @@ same file format as TopPIC). Needs `sample_ms2.feature` unless `-x`;
 `-P` max variable PTMs 5, `-j` graph gap 40, `-G` PTMs per gap 5, `-s`
 unexpected shifts 0, `-M` max shift 500, `-D` add the ASF-Diagonal filter,
 `-w` whole proteins only, plus the same `-f -n -d -a -e -E -F -p -x`, cutoff,
-`-c`, `-u`, `-k`, `-K` options as TopPIC. PrSMs with fewer than four
+`-c`, `-u`, `-k`, `-K` options as TopPIC, except that `-F` still defaults
+to 0.2 where TopPIC now uses 0.4. PrSMs with fewer than four
 matched fragments get the maximum E-value.
 
 ## topdiff

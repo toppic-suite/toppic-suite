@@ -12,9 +12,9 @@ land in `<repo>/bin/` and run from there without installing, because they
 find the runtime resources in `<repo>/res/` (`res` next to the executable,
 then `../res`, then the installed share directory).
 
-The authoritative, user-facing instructions are `README.md` (Ubuntu) and
-`docs/compile/{redhat,windows,macos}_build.md`. Keep them in step with
-`CMakeLists.txt` when the build changes.
+The authoritative, user-facing instructions are the four guides
+`docs/compile/{ubuntu,redhat,windows,macos}_build.md`, which `README.md`
+links to. Keep them in step with `CMakeLists.txt` when the build changes.
 
 ## Quick path (an existing checkout on Linux or macOS)
 
@@ -49,7 +49,7 @@ make -j$(nproc)          # macOS: make -j$(sysctl -n hw.ncpu)
   tools failing to load models at run time.
 - Vendored, nothing to install: htslib (`ext/htslib`), ProteoWizard
   (`ext/pwiz`), and on Linux x86-64 the ONNX Runtime shared library
-  (`ext/onnx/libonnxruntime.so.1.14.1`).
+  (`ext/onnx/libonnxruntime.so.1.23.2`, a Git LFS object).
 
 ## Platform notes
 
