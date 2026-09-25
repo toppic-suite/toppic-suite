@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Install the Ubuntu packages needed to build the TopPIC Suite from source.
 #
-# The package list mirrors the "Install the build dependencies" step of
-# README.md; keep the two in step. Other third-party code (htslib,
-# ProteoWizard, ONNX Runtime) is vendored under ext/ and needs no package.
+# The package list mirrors the one in docs/compile/ubuntu_build.md; keep the
+# two in step. Other third-party code (htslib, ProteoWizard, ONNX Runtime) is
+# vendored under ext/ and needs no package.
 #
 # Usage: scripts/install_ubuntu_packages.sh
 # Run as a user with sudo rights (or as root).
@@ -48,4 +48,5 @@ $SUDO apt-get update
 $SUDO apt-get install -y "${PACKAGES[@]}"
 
 echo "All build dependencies are installed."
-echo "Next: 'git lfs install', then configure and build with CMake (see README.md)."
+echo "Next: 'git lfs install', then configure and build with CMake"
+echo "(see docs/compile/ubuntu_build.md)."
