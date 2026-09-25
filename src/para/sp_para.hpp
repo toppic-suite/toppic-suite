@@ -67,7 +67,20 @@ class SpPara {
 
   double getEnvCnnCutoff() const { return env_cnn_cutoff_; }
 
+  bool isFragMassDedup() const { return frag_mass_dedup_; }
+
+  // The relative tolerance the msalign readers of database filtering, the
+  // search and the E-value computation combine close masses within, and 0 when
+  // the deduplication is switched off. It is the fragment mass tolerance the
+  // user gave (-e, in ppm), deliberately not compStrictErrorTole, whose
+  // 0.01 Dalton floor would dominate every fragment below 1,000 Dalton.
+  double getFragDedupPpo() const {
+    return frag_mass_dedup_ ? frag_tolerance_ptr_->getPpo() : 0.0;
+  }
+
   void setEnvCnnCutoff(double cutoff) { env_cnn_cutoff_ = cutoff; }
+
+  void setFragMassDedup(bool dedup) { frag_mass_dedup_ = dedup; }
 
   // Fragment masses at or below this value (Da) are not extended.
   void setFragExtendMinMass(double mass) { frag_extend_min_mass_ = mass; }
@@ -101,6 +114,11 @@ class SpPara {
 
   // envelopes with an EnvCNN score below env_cnn_cutoff are removed
   double env_cnn_cutoff_ = 0.2;
+
+  // combine fragment masses that agree within the fragment mass tolerance
+  // before database filtering, the search and the E-value computation; off by
+  // default, so topmg and topdia, which have no such argument, are unchanged
+  bool frag_mass_dedup_ = false;
 
   ActivationPtr activation_ptr_;
 

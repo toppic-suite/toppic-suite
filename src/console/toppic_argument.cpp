@@ -92,6 +92,7 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["varPtmPrecOneDaError"] = "false";
   arguments["fragMassExtension"] = "true";
   arguments["fragExtendMinMass"] = "5000";
+  arguments["fragMassDedup"] = "false";
   arguments["multiSkipEvalue"] = "";
   arguments["multiTypeAlign"] = "true";
 
@@ -216,6 +217,10 @@ void ToppicArgument::outputArguments(
          << arguments["fragErrorTolerance"] << " ppm" << std::endl;
   output << std::setw(gap) << std::left << "EnvCNN score cutoff:" << sep
          << arguments["envCnnCutoff"] << std::endl;
+  output << std::setw(gap) << std::left
+         << "Fragment mass deduplication:" << sep
+         << (arguments["fragMassDedup"] == "true" ? "True" : "False")
+         << std::endl;
   if (arguments["postMassMatch"] == "true") {
     output << std::setw(gap) << std::left << "Post mass matching:" << sep
            << "True" << std::endl;
@@ -524,6 +529,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "average-mass,g", "")("disable-zero-shift-prec-error", "")(
         "enable-one-shift-prec-error", "")("enable-var-ptm-prec-error", "")(
         "fdr-groups", "")("disable-frag-mass-extension", "")(
+        "frag-mass-dedup", "")(
         "frag-extend-min-mass", po::value<std::string>(&frag_extend_min_mass),
         "")("multi-skip-evalue", po::value<std::string>(&multi_skip_evalue),
             "")("disable-multi-type-align", "")(
@@ -757,6 +763,9 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
     }
     if (vm.count("disable-frag-mass-extension")) {
       arguments_["fragMassExtension"] = "false";
+    }
+    if (vm.count("frag-mass-dedup")) {
+      arguments_["fragMassDedup"] = "true";
     }
     if (vm.count("frag-extend-min-mass")) {
       arguments_["fragExtendMinMass"] = frag_extend_min_mass;

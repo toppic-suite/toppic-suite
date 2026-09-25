@@ -109,7 +109,8 @@ inline void filterBlockVariants(const DiagFilterPtr& filter_ptr,
 
   MsAlignReaderPtr reader_ptr = std::make_shared<MsAlignReader>(
       sp_file_name, group_spec_num, sp_para_ptr->getActivationPtr(),
-      sp_para_ptr->getEnvCnnCutoff());
+      sp_para_ptr->getEnvCnnCutoff(),
+        sp_para_ptr->getFragDedupPpo());
 
   DeconvMsPtrVec deconv_ms_ptr_vec = reader_ptr->getNextMsPtrVec();
   std::vector<double> prec_error_vec =
@@ -233,7 +234,8 @@ void DiagFilterProcessor::readSpectra() {
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
   MsAlignReaderPtr reader_ptr = std::make_shared<MsAlignReader>(
       sp_file_name, group_spec_num, sp_para_ptr->getActivationPtr(),
-      sp_para_ptr->getEnvCnnCutoff());
+      sp_para_ptr->getEnvCnnCutoff(),
+        sp_para_ptr->getFragDedupPpo());
   std::vector<double> prec_error_vec =
       sp_para_ptr->getMultiShiftSearchPrecErrorVec();
   DeconvMsPtrVec deconv_ms_ptr_vec = reader_ptr->getNextMsPtrVec();

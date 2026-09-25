@@ -15,6 +15,8 @@
 
 #include "ms/spec/msalign_reader.hpp"
 
+#include "ms/spec/deconv_ms_util.hpp"
+
 #include <cstddef>
 #include <memory>
 #include <string>
@@ -55,6 +57,14 @@ MsAlignReader::MsAlignReader(const std::string& file_name, int group_spec_num,
                              double env_cnn_cutoff)
     : MsAlignReader(file_name, group_spec_num, activation_ptr) {
   env_cnn_cutoff_ = env_cnn_cutoff;
+}
+
+MsAlignReader::MsAlignReader(const std::string& file_name, int group_spec_num,
+                             const ActivationPtr& activation_ptr,
+                             double env_cnn_cutoff, double dedup_ppo)
+    : MsAlignReader(file_name, group_spec_num, activation_ptr,
+                    env_cnn_cutoff) {
+  dedup_ppo_ = dedup_ppo;
 }
 
 MsAlignReader::~MsAlignReader() {
@@ -239,6 +249,11 @@ void MsAlignReader::readNext() {
       }
       peak_id++;
     }
+  }
+
+  if (dedup_ppo_ > 0) {
+    peak_ptr_list = deconv_ms_util::combineCloseMasses(peak_ptr_list,
+                                                       dedup_ppo_);
   }
 
   deconv_ms_ptr_ = std::make_shared<Ms<DeconvPeakPtr> >(

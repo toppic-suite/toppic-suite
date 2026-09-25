@@ -171,7 +171,8 @@ void DprProcessor::process() {
   MsAlignReaderPtr ms_reader_ptr = std::make_shared<MsAlignReader>(
       sp_file_name,
       1,  // prsm_para_ptr->getGroupSpecNum()
-      sp_para_ptr_->getActivationPtr(), sp_para_ptr_->getEnvCnnCutoff());
+      sp_para_ptr_->getActivationPtr(), sp_para_ptr_->getEnvCnnCutoff(),
+        sp_para_ptr_->getFragDedupPpo());
 
   int peak_num_limit = 500;
 
