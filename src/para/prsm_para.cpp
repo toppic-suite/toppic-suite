@@ -116,8 +116,9 @@ PrsmPara::PrsmPara(const std::map<std::string, std::string>& arguments) {
   }
   // minimum fragment mass for the extension (toppic hidden
   // --frag-extend-min-mass); an absent key keeps the SpPara default
-  // fragment mass deduplication (toppic --disable-frag-mass-dedup); an absent
-  // key keeps the SpPara default, so topmg and topdia are unchanged
+  // fragment mass deduplication (toppic hidden --frag-mass-dedup, off by
+  // default); an absent key keeps the SpPara default, so topmg and topdia are
+  // unchanged
   std::string frag_mass_dedup = getArg(arguments, "fragMassDedup");
   if (frag_mass_dedup == "true") {
     sp_para_ptr_->setFragMassDedup(true);
