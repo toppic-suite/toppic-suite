@@ -213,25 +213,6 @@ void filter(MatchEnvPtr2D& match_envs, const PeakPtrVec& peak_list,
   LOG_DEBUG("Valid match envelope number " << cntValid(match_envs));
 }
 
-// Filtering methods
-void multipleMassFilter(MatchEnvPtr2D& match_envs,
-                        const EnvParaPtr& env_para_ptr) {
-  LOG_DEBUG("Valid match envelope number " << cntValid(match_envs));
-  LOG_DEBUG("Filtering by real envelope peaks...");
-  filterEnvByRealEnv(match_envs, env_para_ptr);
-
-  LOG_DEBUG("Valid match envelope number " << cntValid(match_envs));
-  LOG_DEBUG("Filtering by score...");
-  // compute scores of matching envelopes here to peak_listeed up
-  filterEnvByScr(match_envs, env_para_ptr);
-
-  LOG_DEBUG("Valid match envelope number " << cntValid(match_envs));
-  LOG_DEBUG("Filtering by charge...");
-  filterEnvByChrg(match_envs);
-
-  LOG_DEBUG("Valid match envelope number " << cntValid(match_envs));
-}  // namespace env_filter
-
 }  // namespace env_filter
 
 }  // namespace toppic

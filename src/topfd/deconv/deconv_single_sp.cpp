@@ -328,18 +328,6 @@ void DeconvSingleSp::postprocess(MatchEnvPtrVec& dp_envs, int ms_level) {
   }
   // reassign intensity
   match_env_util::assignIntensity(peak_list, result_envs_);
-
-  // if output multiple masses sharing the same envelope
-  if (topfd_para_ptr_->isOutputMultipleMass()) {
-    MatchEnvPtr2D cand_envs = env_detect::getCandidateEnv(
-        peak_list, data_ptr_->getMaxCharge(), data_ptr_->getMaxMass(),
-        data_ptr_->getMinInte(), data_ptr_->getMinRefInte(),
-        data_ptr_->getNoiseInte(), env_para_ptr_);
-    // envelope filter
-    env_filter::multipleMassFilter(cand_envs, env_para_ptr_);
-    result_envs_ =
-        match_env_util::addMultipleMass(result_envs_, cand_envs, env_para_ptr_);
-  }
 }
 
 MatchEnvPtrVec DeconvSingleSp::deconv() {

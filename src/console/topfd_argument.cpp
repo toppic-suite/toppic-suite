@@ -170,8 +170,6 @@ bool Argument::parse(int argc, char* argv[]) {
     // message; the positional spectrum file argument is also hidden here.
     po::options_description hidden_desc("Hidden options");
     hidden_desc.add_options()(
-        "multiple-mass,M",
-        "Output multiple monoisotopic masses for each MS/MS spectrum.")(
         "output-dp-envs",
         "Dump the windowed candidate envelopes and DP-selected envelopes of "
         "each spectrum to win_envs.txt / dp_envs.txt (debugging).")(
@@ -331,10 +329,6 @@ bool Argument::parse(int argc, char* argv[]) {
         return false;
       }
       topfd_para_ptr_->setMs2EnvCnnScoreCutoff(cutoff);
-    }
-
-    if (vm.count("multiple-mass")) {
-      topfd_para_ptr_->setOutputMultipleMass(true);
     }
 
     if (vm.count("average-mass")) {
