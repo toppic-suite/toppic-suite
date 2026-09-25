@@ -81,6 +81,8 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string ecscore_cutoff = "";
   std::string min_scan_num = "";
   std::string max_miss_peak_num = "";
+  std::string ms1_rank_peak_distance = "";
+  std::string ms2_rank_peak_distance = "";
   std::string mass_group_boundary = "";
 
   // Define and parse the program options
@@ -181,6 +183,18 @@ bool Argument::parse(int argc, char* argv[]) {
         "disable-filter-by-mz",
         "Skip the filtering-by-mz step that removes an envelope outranked by a "
         "higher-scoring neighbor with the same charge.")(
+        "ms1-rank-peak-distance",
+        po::value<std::string>(&ms1_rank_peak_distance),
+        "<a positive number>. The window of the filtering-by-mz step for MS1 "
+        "spectra, in Daltons: only the best scoring envelope of one charge "
+        "within the window is kept. The default value is 12.")(
+        "ms2-rank-peak-distance",
+        po::value<std::string>(&ms2_rank_peak_distance),
+        "<a positive number>. The same window for MS/MS spectra. The default "
+        "value is 2.")(
+        "disable-ms2-harmonic-check",
+        "Skip the harmonic check of MS/MS spectra, which replaces an envelope "
+        "by a better scoring harmonic parent mass.")(
         "keep,k",
         "Report monoisotopic masses extracted from low quality isotopic "
         "envelopes.")(
@@ -369,6 +383,30 @@ bool Argument::parse(int argc, char* argv[]) {
 
     if (vm.count("disable-filter-by-mz")) {
       topfd_para_ptr_->setRunFilterByMz(false);
+    }
+
+    if (vm.count("ms1-rank-peak-distance")) {
+      double distance = 0;
+      if (!toDouble(ms1_rank_peak_distance, distance) || distance <= 0) {
+        LOG_ERROR("MS1 rank peak distance "
+                  << ms1_rank_peak_distance << " should be a positive number.");
+        return false;
+      }
+      topfd_para_ptr_->setMsOneRankPeakDistance(distance);
+    }
+
+    if (vm.count("ms2-rank-peak-distance")) {
+      double distance = 0;
+      if (!toDouble(ms2_rank_peak_distance, distance) || distance <= 0) {
+        LOG_ERROR("MS/MS rank peak distance "
+                  << ms2_rank_peak_distance << " should be a positive number.");
+        return false;
+      }
+      topfd_para_ptr_->setMsTwoRankPeakDistance(distance);
+    }
+
+    if (vm.count("disable-ms2-harmonic-check")) {
+      topfd_para_ptr_->setMsTwoHarmonicCheck(false);
     }
 
     if (vm.count("output-batmass-feature")) {

@@ -16,10 +16,14 @@
 #include "topfd/deconv/deconv_single_sp.hpp"
 
 #include <algorithm>
+#include <cmath>
 #include <cstddef>
 #include <fstream>
 #include <mutex>
 #include <ostream>
+#include <set>
+#include <utility>
+#include <vector>
 
 #include "common/util/logger.hpp"
 #include "ms/env/env_detect.hpp"
@@ -28,6 +32,7 @@
 #include "ms/env/match_env_filter.hpp"
 #include "ms/env/match_env_refine.hpp"
 #include "ms/env/match_env_util.hpp"
+#include "ms/spec/peak_list_util.hpp"
 #include "topfd/deconv/deconv_data_util.hpp"
 #include "topfd/dp/co_table.hpp"
 #include "topfd/dp/dp_a.hpp"
@@ -37,8 +42,9 @@
 
 namespace toppic {
 
-// Helpers for the --output-dp-envs debugging dumps (win_envs.txt /
-// dp_envs.txt). They live in an unnamed namespace so they have internal
+// File-private helpers: the --output-dp-envs debugging dumps (win_envs.txt /
+// dp_envs.txt) and the MS/MS harmonic check. They live in an unnamed namespace
+// so they have internal
 // linkage: they are private to this file, stay out of the class interface in
 // the header, and their generic names (writeEnv, g_*_count, ...) cannot clash
 // with same-named symbols elsewhere in the single toppic_common library.
@@ -135,6 +141,114 @@ void outputFilteredEnvs(const MatchEnvPtr2D& cand_envs, int ms_level) {
   }
 }
 
+// The harmonic check, ported from the FLASHDeconv implementation in this
+// repository (FlashDeconvSingleSp::removeHarmonicPeakGroups and the harmonic
+// vetoes of updateCandidateMassBins), applied to the envelopes the dynamic
+// programming selected.
+//
+// An envelope of mass M at charge z whose peaks are every k-th isotopic
+// position of a real envelope of mass k*M at charge k*z is a harmonic
+// artefact: the peaks in between belong to the parent, and TopFD's own filters
+// cannot see them, because they compare envelopes only at a shared reference
+// peak. For each selected envelope the parents of k = 2 and 3 are built from
+// the same peak list and scored; a parent that matches more peaks with a
+// better MS-Deconv score replaces the harmonic. The parent is not required to
+// pass envelope validation - that validation is what hides these masses - but
+// it must match more peaks than the validation of its own mass group requires.
+//
+// The parent is built by detectEnvByRefPeak from the peak nearest its
+// theoretical reference position, the way every other selected envelope is
+// built: match_env_refine::mzRefine, which runs next, re-derives the reference
+// distribution from the experimental reference peak and reads as many peaks
+// from it as the experimental envelope has on each side, which an envelope
+// built around its monoisotopic peak does not guarantee.
+void replaceHarmonicEnvs(MatchEnvPtrVec& envs, const PeakPtrVec& peak_list,
+                         const DeconvDataPtr& data_ptr,
+                         const EnvParaPtr& env_para_ptr) {
+  const std::vector<int> harmonic_factors = {2, 3};
+  double min_inte = data_ptr->getMinInte();
+  double min_ref_inte = data_ptr->getMinRefInte();
+  double bound_inte = data_ptr->getNoiseInte();
+  double max_mass = data_ptr->getMaxMass();
+  int max_charge = data_ptr->getMaxCharge();
+  bool is_full = true;
+  bool check_real_env = false;
+  // the masses already reported, so that a parent is not added twice
+  std::set<std::pair<long, int> > reported;
+  auto mass_key = [](double mass, int charge) {
+    return std::make_pair(std::lround(mass * 10), charge);
+  };
+  for (const MatchEnvPtr& env : envs) {
+    reported.insert(mass_key(env->getTheoEnvPtr()->getMonoNeutralMass(),
+                             env->getTheoEnvPtr()->getCharge()));
+  }
+  for (std::size_t i = 0; i < envs.size(); i++) {
+    double mass = envs[i]->getTheoEnvPtr()->getMonoNeutralMass();
+    int charge = envs[i]->getTheoEnvPtr()->getCharge();
+    int match_num = envs[i]->getExpEnvPtr()->getMatchPeakNum();
+    double score = envs[i]->getMsdeconvScore();
+    MatchEnvPtr best_parent = nullptr;
+    for (int factor : harmonic_factors) {
+      double parent_mass = mass * factor;
+      int parent_charge = charge * factor;
+      if (parent_charge > max_charge || parent_mass >= max_mass) {
+        continue;
+      }
+      if (reported.count(mass_key(parent_mass, parent_charge)) > 0) {
+        continue;
+      }
+      // where the parent's reference (most intense) peak would be
+      MatchEnvPtr probe = env_detect::detectEnvByMonoMass(
+          peak_list, parent_mass, parent_charge, min_inte, bound_inte,
+          env_para_ptr, is_full);
+      if (probe == nullptr || probe->getTheoEnvPtr()->getPeakNum() == 0) {
+        continue;
+      }
+      double tolerance = env_para_ptr->getMzTolerance(parent_charge);
+      int ref_peak = peak_list_util::getNearPeakIdx(
+          peak_list, probe->getTheoEnvPtr()->getReferMz(), tolerance);
+      if (ref_peak < 0) {
+        continue;
+      }
+      MatchEnvPtr parent = env_detect::detectEnvByRefPeak(
+          peak_list, ref_peak, parent_charge, max_mass, min_inte, min_ref_inte,
+          bound_inte, env_para_ptr, is_full, check_real_env);
+      if (parent == nullptr || parent->getExpEnvPtr()->getPeakNum() == 0) {
+        continue;
+      }
+      // the envelope built from the reference peak must be the parent mass
+      double built_mass = parent->getTheoEnvPtr()->getMonoNeutralMass();
+      if (std::abs(built_mass - parent_mass) >
+          std::max(parent_mass * 2e-5, 0.05)) {
+        continue;
+      }
+      int mass_group = env_para_ptr->getMassGroup(built_mass);
+      if (mass_group < 0) {
+        continue;
+      }
+      if (parent->getExpEnvPtr()->getMatchPeakNum() <=
+          std::max(match_num, env_para_ptr->min_match_peak_num_[mass_group])) {
+        continue;
+      }
+      parent->compMsdeconvScr(env_para_ptr);
+      if (parent->getMsdeconvScore() <= score) {
+        continue;
+      }
+      if (best_parent == nullptr ||
+          parent->getMsdeconvScore() > best_parent->getMsdeconvScore()) {
+        best_parent = parent;
+      }
+    }
+    if (best_parent != nullptr) {
+      reported.erase(mass_key(mass, charge));
+      reported.insert(
+          mass_key(best_parent->getTheoEnvPtr()->getMonoNeutralMass(),
+                   best_parent->getTheoEnvPtr()->getCharge()));
+      envs[i] = best_parent;
+    }
+  }
+}
+
 }  // namespace
 
 DeconvSingleSp::DeconvSingleSp(const TopfdParaPtr& topfd_para_ptr,
@@ -145,6 +259,12 @@ DeconvSingleSp::DeconvSingleSp(const TopfdParaPtr& topfd_para_ptr,
       topfd_para_ptr->getMzError(), topfd_para_ptr->getMaxMissPeakNum(),
       topfd_para_ptr->isRunFilterByMz(),
       topfd_para_ptr->getMassGroupBoundary());
+  // EnvPara is shared by the MS1 and the MS/MS deconvolution, so the window of
+  // the filtering-by-mz step is set for this level here rather than through the
+  // EnvPara constructor
+  env_para_ptr_->rank_peak_distance_ =
+      (ms_level == 2) ? topfd_para_ptr->getMsTwoRankPeakDistance()
+                      : topfd_para_ptr->getMsOneRankPeakDistance();
   dp_para_ptr_ = std::make_shared<DpPara>(topfd_para_ptr->getMzError());
   ms_level_ = ms_level;
   double sn_ratio;
@@ -161,6 +281,11 @@ DeconvSingleSp::DeconvSingleSp(const TopfdParaPtr& topfd_para_ptr,
 void DeconvSingleSp::postprocess(MatchEnvPtrVec& dp_envs, int ms_level) {
   // assign intensity
   PeakPtrVec peak_list = data_ptr_->getPeakList();
+
+  // replace harmonic envelopes by their parent masses
+  if (ms_level == 2 && topfd_para_ptr_->isMsTwoHarmonicCheck()) {
+    replaceHarmonicEnvs(dp_envs, peak_list, data_ptr_, env_para_ptr_);
+  }
   match_env_util::assignIntensity(peak_list, dp_envs);
 
   // refinement

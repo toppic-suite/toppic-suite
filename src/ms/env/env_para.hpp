@@ -30,6 +30,14 @@ class EnvPara {
   // the default third mass group boundary (experiment 48 of toppic_test)
   static constexpr double DEFAULT_MASS_GROUP_BOUNDARY = 4250;
 
+  // the default windows of the filtering-by-mz step, in Daltons, for MS1 and
+  // for MS/MS spectra (experiment 58 of toppic_test). The step keeps only the
+  // best scoring envelope of one charge whose monoisotopic mass is within the
+  // window; 12 Da removes MS/MS envelopes that share no peak with the envelope
+  // outranking them, so MS/MS uses a narrower window than MS1.
+  static constexpr double DEFAULT_MS1_RANK_PEAK_DISTANCE = 12;
+  static constexpr double DEFAULT_MS2_RANK_PEAK_DISTANCE = 2;
+
   // EnvPara() to be removed
   EnvPara() {};
   // set mz tolerance, the maximum number of missing peaks, and whether to run
@@ -136,7 +144,7 @@ class EnvPara {
   // 5. filtering by comparing envelopes with similar mz and same charge
   // If two envelopes have the same charge and their monoisotopic mass
   // difference is less than 12 Dalton, then only the top scoring one is keep.
-  double rank_peak_distance_ = 12;
+  double rank_peak_distance_ = DEFAULT_MS1_RANK_PEAK_DISTANCE;
   // Only keep the top envelope
   int max_similar_mz_env_rank_ = 0;
   // When false, the "filtering by mz" step (filterEnvByMz) is skipped.
