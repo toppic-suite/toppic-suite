@@ -43,8 +43,8 @@
 namespace toppic {
 
 // File-private helpers: the --output-dp-envs debugging dumps (win_envs.txt /
-// dp_envs.txt) and the MS/MS harmonic check. They live in an unnamed namespace
-// so they have internal
+// dp_envs.txt) and the MS/MS harmonic check. They live in an unnamed
+// namespace so they have internal
 // linkage: they are private to this file, stay out of the class interface in
 // the header, and their generic names (writeEnv, g_*_count, ...) cannot clash
 // with same-named symbols elsewhere in the single toppic_common library.
@@ -194,6 +194,9 @@ void replaceHarmonicEnvs(MatchEnvPtrVec& envs, const PeakPtrVec& peak_list,
       if (parent_charge > max_charge || parent_mass >= max_mass) {
         continue;
       }
+      // a cheap pre-check on the nominal mass; the mass actually built is
+      // checked against the same set below, because the two can fall in
+      // different buckets
       if (reported.count(mass_key(parent_mass, parent_charge)) > 0) {
         continue;
       }
@@ -220,6 +223,9 @@ void replaceHarmonicEnvs(MatchEnvPtrVec& envs, const PeakPtrVec& peak_list,
       double built_mass = parent->getTheoEnvPtr()->getMonoNeutralMass();
       if (std::abs(built_mass - parent_mass) >
           std::max(parent_mass * 2e-5, 0.05)) {
+        continue;
+      }
+      if (reported.count(mass_key(built_mass, parent_charge)) > 0) {
         continue;
       }
       int mass_group = env_para_ptr->getMassGroup(built_mass);

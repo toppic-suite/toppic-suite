@@ -19,6 +19,7 @@
 #include <exception>
 #include <filesystem>
 #include <iostream>
+#include <cmath>
 #include <string>
 
 #include "common/util/file_util.hpp"
@@ -387,7 +388,8 @@ bool Argument::parse(int argc, char* argv[]) {
 
     if (vm.count("ms1-rank-peak-distance")) {
       double distance = 0;
-      if (!toDouble(ms1_rank_peak_distance, distance) || distance <= 0) {
+      if (!toDouble(ms1_rank_peak_distance, distance) || !std::isfinite(distance) ||
+          distance <= 0) {
         LOG_ERROR("MS1 rank peak distance "
                   << ms1_rank_peak_distance << " should be a positive number.");
         return false;
@@ -397,7 +399,8 @@ bool Argument::parse(int argc, char* argv[]) {
 
     if (vm.count("ms2-rank-peak-distance")) {
       double distance = 0;
-      if (!toDouble(ms2_rank_peak_distance, distance) || distance <= 0) {
+      if (!toDouble(ms2_rank_peak_distance, distance) || !std::isfinite(distance) ||
+          distance <= 0) {
         LOG_ERROR("MS/MS rank peak distance "
                   << ms2_rank_peak_distance << " should be a positive number.");
         return false;
