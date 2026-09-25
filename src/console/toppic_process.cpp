@@ -739,8 +739,8 @@ int TopPIC_multi_postprocess(std::map<std::string, std::string>& arguments) {
       proteoform_error_tole = proteoform_error_tole / 1000000;
     }
     std::cout << "Finding PrSM proteoform clusters - started." << std::endl;
-    // by protein and precursor mass, whether or not the fractions had
-    // feature files
+    // by protein, precursor mass and proteoform sequence overlap, whether or
+    // not the fractions had feature files
     prsm_simple_cluster::process(
         db_file_name, sp_file_name, "toppic_raw_prsm",
         prsm_para_ptr->getFixModPtrVec(), "toppic_proteoform_cluster",

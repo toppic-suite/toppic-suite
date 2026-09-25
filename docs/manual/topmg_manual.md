@@ -51,7 +51,9 @@ TopDIA, searched one after another with the same parameters.
 of one proteoform and to report abundances; a missing feature file is an
 error, and PrSMs whose spectrum has no feature are discarded at the
 clustering step. `--no-topfd-feature` (`-x`) runs without it, clustering
-proteoforms by protein and precursor mass instead. If `sample.sqlite`
+proteoforms by protein, precursor mass and sequence overlap instead (two
+PrSMs share a proteoform only if their proteoform sequences overlap by at
+least 70% of the shorter one). If `sample.sqlite`
 exists, the identifications are also written into it; it is not required.
 
 **Database indexes.** `topindex` is optional. TopMG prepares the database in

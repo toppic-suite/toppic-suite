@@ -138,6 +138,7 @@ Parameters that apply to both MS1 and MS/MS deconvolution:
 | `-A`, `--average-mass` | off | Report average masses instead of monoisotopic masses for the precursor and fragment ions in `sample_ms2.msalign` (section 1.3). The MS1 msalign file, the feature files and the SQLite database keep monoisotopic masses. Search such a file with `toppic --average-mass`. Also applies to `-T`. |
 | `-D`, `--sql-3d` | off | Also store the raw MS1 peaks for 3D visualisation in the `.sqlite` database: `PEAKS0` holds every MS1 peak and `PEAKS1`, `PEAKS2`, ... progressively down-sampled copies, with one `CONFIG` row per table. Cannot be combined with `--no-sql`; has no effect with `-T` or `-o`. In `topfd_gui`, the checkbox "Add MS1 peaks for 3D visualization" under "Additional settings" turns this on (it is greyed out while "Do not generate SQLite database" is checked). |
 | `-T`, `--text-peak-list` | off | The input is a text peak list (one MS/MS spectrum), not an mzML file; see section 2. |
+| `--ms2-flashdeconv` | off | Deconvolute the MS/MS spectra with the FLASHDeconv algorithm instead of TopFD's own. Experimental: the MS1 deconvolution and the feature detection are unchanged, and the output files are the same. |
 
 MS1 deconvolution and proteoform feature detection:
 
