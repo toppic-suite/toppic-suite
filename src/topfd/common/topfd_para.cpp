@@ -220,6 +220,10 @@ std::string TopfdPara::getTopfdParaStr(const std::string& prefix,
            << banner(prefix, "MS1 spectral deconvolution parameters")
            << std::endl;
     kv("MS1 signal/noise ratio:") << ms_one_sn_ratio_ << std::endl;
+    if (run_filter_by_mz_) {
+      kv("Precursor envelope ranking window:")
+          << ms1_rank_peak_distance_ << " Dalton" << std::endl;
+    }
 
     output << std::endl
            << banner(prefix, "MS1 feature detection parameters") << std::endl;
@@ -249,6 +253,17 @@ std::string TopfdPara::getTopfdParaStr(const std::string& prefix,
       << (sort_use_msdeconv_ ? "MS-Deconv score" : "EnvCNN score") << std::endl;
   kv("Fragment envelope EnvCNN score cutoff:")
       << ms2_env_cnn_score_cutoff_ << std::endl;
+  // both steps belong to TopFD's own MS/MS deconvolution: the FLASHDeconv
+  // path (--ms2-flashdeconv) does not run them, and the ranking window has no
+  // meaning when the filtering-by-mz step is disabled
+  if (!use_flashdeconv_) {
+    if (run_filter_by_mz_) {
+      kv("Fragment envelope ranking window:")
+          << ms2_rank_peak_distance_ << " Dalton" << std::endl;
+    }
+    kv("Fragment harmonic check:")
+        << (ms2_harmonic_check_ ? "Yes" : "No") << std::endl;
+  }
   kv("Filtering fragments using estimated fragment number:")
       << (aa_num_based_filter_ ? "Yes" : "No") << std::endl;
   kv("Reported precursor and fragment masses:")

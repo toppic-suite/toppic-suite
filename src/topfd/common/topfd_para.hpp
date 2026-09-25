@@ -56,6 +56,9 @@ class TopfdPara {
   double getMaxMass() const { return max_mass_; }
   double getMzError() const { return mz_error_; }
   int getMaxMissPeakNum() const { return max_miss_peak_num_; }
+  double getMsOneRankPeakDistance() const { return ms1_rank_peak_distance_; }
+  double getMsTwoRankPeakDistance() const { return ms2_rank_peak_distance_; }
+  bool isMsTwoHarmonicCheck() const { return ms2_harmonic_check_; }
   bool isRunFilterByMz() const { return run_filter_by_mz_; }
 
   bool isEstimateMinInte() const { return estimate_min_inte_; }
@@ -136,6 +139,9 @@ class TopfdPara {
   void setOutputDpEnvs(bool output) { output_dp_envs_ = output; }
   void setUseFlashDeconv(bool use) { use_flashdeconv_ = use; }
   void setMaxMissPeakNum(int num) { max_miss_peak_num_ = num; }
+  void setMsOneRankPeakDistance(double d) { ms1_rank_peak_distance_ = d; }
+  void setMsTwoRankPeakDistance(double d) { ms2_rank_peak_distance_ = d; }
+  void setMsTwoHarmonicCheck(bool check) { ms2_harmonic_check_ = check; }
   void setRunFilterByMz(bool run) { run_filter_by_mz_ = run; }
   void setThreadNum(int num) { thread_num_ = num; }
   void setSearchPrecWindow(bool search) { search_prec_window_ = search; }
@@ -205,6 +211,17 @@ class TopfdPara {
   // When false, the "filtering by mz" step is skipped; used to initialize
   // EnvPara::run_filter_by_mz_.
   bool run_filter_by_mz_ = true;
+  // The window of the filtering-by-mz step, in Daltons, one value per
+  // deconvolution level; used to set EnvPara::rank_peak_distance_, which is
+  // shared by the two levels. Keep in step with
+  // EnvPara::DEFAULT_MS1_RANK_PEAK_DISTANCE and
+  // DEFAULT_MS2_RANK_PEAK_DISTANCE; this header deliberately has no project
+  // includes, so the values are repeated.
+  double ms1_rank_peak_distance_ = 12;
+  double ms2_rank_peak_distance_ = 2;
+  // When true, an MS/MS envelope selected by the dynamic programming is
+  // replaced by a better scoring harmonic parent. On by default.
+  bool ms2_harmonic_check_ = true;
   double ms_one_sn_ratio_ = 3.0;
   double ms_two_sn_ratio_ = 1.0;
   int thread_num_ = 1;

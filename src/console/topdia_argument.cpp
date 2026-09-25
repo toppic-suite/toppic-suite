@@ -15,6 +15,7 @@
 
 #include "console/topdia_argument.hpp"
 
+#include <cmath>
 #include <cstddef>
 #include <exception>
 #include <filesystem>
@@ -81,6 +82,8 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string max_charge = "";
   std::string max_mass = "";
   std::string mz_error = "";
+  std::string ms1_rank_peak_distance = "";
+  std::string ms2_rank_peak_distance = "";
   std::string ms_two_sn_ratio = "";
   std::string ms_one_sn_ratio = "";
   std::string prec_window = "";
@@ -169,6 +172,18 @@ bool Argument::parse(int argc, char* argv[]) {
     // message; the positional spectrum file argument is also hidden here.
     po::options_description hidden_desc("Hidden options");
     hidden_desc.add_options()(
+        "ms1-rank-peak-distance",
+        po::value<std::string>(&ms1_rank_peak_distance),
+        "<a positive number>. The window of the filtering-by-mz step for MS1 "
+        "spectra, in Daltons: only the best scoring envelope of one charge "
+        "within the window is kept. The default value is 12.")(
+        "ms2-rank-peak-distance",
+        po::value<std::string>(&ms2_rank_peak_distance),
+        "<a positive number>. The same window for MS/MS spectra. The default "
+        "value is 2.")(
+        "disable-ms2-harmonic-check",
+        "Skip the harmonic check of MS/MS spectra, which replaces an envelope "
+        "by a better scoring harmonic parent mass.")(
         "keep,k",
         "Report monoisotopic masses extracted from low quality isotopic "
         "envelopes.")(
@@ -235,6 +250,32 @@ bool Argument::parse(int argc, char* argv[]) {
 
     if (vm.count("keep")) {
       topfd_para_ptr_->setKeepUnusedPeaks(true);
+    }
+
+    if (vm.count("ms1-rank-peak-distance")) {
+      double distance = 0;
+      if (!toDouble(ms1_rank_peak_distance, distance) ||
+          !std::isfinite(distance) || distance <= 0) {
+        LOG_ERROR("MS1 rank peak distance "
+                  << ms1_rank_peak_distance << " should be a positive number.");
+        return false;
+      }
+      topfd_para_ptr_->setMsOneRankPeakDistance(distance);
+    }
+
+    if (vm.count("ms2-rank-peak-distance")) {
+      double distance = 0;
+      if (!toDouble(ms2_rank_peak_distance, distance) ||
+          !std::isfinite(distance) || distance <= 0) {
+        LOG_ERROR("MS/MS rank peak distance "
+                  << ms2_rank_peak_distance << " should be a positive number.");
+        return false;
+      }
+      topfd_para_ptr_->setMsTwoRankPeakDistance(distance);
+    }
+
+    if (vm.count("disable-ms2-harmonic-check")) {
+      topfd_para_ptr_->setMsTwoHarmonicCheck(false);
     }
 
     if (vm.count("msdeconv")) {

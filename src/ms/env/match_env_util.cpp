@@ -159,6 +159,16 @@ MatchEnvPtrVec addMultipleMass(MatchEnvPtrVec& envs, MatchEnvPtr2D& candidates,
     // we use non-overlapping envelopes here
     // Current charge stored in [ref_peak][charge-1]
     charge_envs[0] = candidates[refer_peak][charge - 1];
+    // The reported envelope need not have a candidate at its reference peak
+    // and charge: mzRefine can move the reference peak, addUnusedMasses adds
+    // envelopes at peaks that never carried a candidate, and the harmonic
+    // check replaces an envelope by one the filters would remove. This
+    // function returns the whole output, so such an envelope is kept as it is
+    // rather than dropped; only its additional charge states are lost.
+    if (charge_envs[0] == nullptr) {
+      mass_envs.push_back(envs[i]);
+      continue;
+    }
     double min_score =
         charge_envs[0]->getMsdeconvScore() * env_para_ptr->multiple_min_ratio_;
     if (charge >= env_para_ptr->multiple_min_charge_) {

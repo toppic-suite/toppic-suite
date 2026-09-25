@@ -73,8 +73,12 @@ class MatchEnv {
   int id_;
   // we divide envelopes into several groups based on monoisotopic masses
   int mass_group_;
-  double msdeconv_score_;
-  double envcnn_score_;
+  // both scores are set later, by env_filter::filterEnvByScr and
+  // onnx_env_cnn::computeEnvScores; the envelopes match_env_util::
+  // addUnusedMasses creates under topfd -k never get an MS-Deconv score, so the
+  // members are initialized here rather than read indeterminate
+  double msdeconv_score_ = 0;
+  double envcnn_score_ = 0;
   EnvPtr theo_env_ptr_;
   ExpEnvPtr exp_env_ptr_;
 
