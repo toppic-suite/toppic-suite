@@ -111,7 +111,7 @@ installed files again.
 
 `scripts\win_release.bat` bundles a finished build into a self-contained
 `toppic-windows-<version>.zip` in the repository root (default version
-`1.9.0.0`; pass another as the first argument). Run it from a Windows
+`2.0.0.0`; pass another as the first argument). Run it from a Windows
 command prompt or PowerShell in the repository root after building:
 
 ```bat
