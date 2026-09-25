@@ -83,9 +83,8 @@ PrsmPara::PrsmPara(const std::map<std::string, std::string>& arguments) {
   if (getArg(arguments, "nTermLabelMass") != "") {
     n_term_label_mass = std::stod(getArg(arguments, "nTermLabelMass"));
   }
-  sp_para_ptr_ =
-      std::make_shared<SpPara>(activation_name, n_term_label_mass, prec_ppm,
-                               frag_ppm);
+  sp_para_ptr_ = std::make_shared<SpPara>(activation_name, n_term_label_mass,
+                                          prec_ppm, frag_ppm);
   if (getArg(arguments, "envCnnCutoff") != "") {
     sp_para_ptr_->setEnvCnnCutoff(std::stod(getArg(arguments, "envCnnCutoff")));
   }
@@ -121,6 +120,8 @@ PrsmPara::PrsmPara(const std::map<std::string, std::string>& arguments) {
     sp_para_ptr_->setFragExtendMinMass(
         std::stod(getArg(arguments, "fragExtendMinMass")));
   }
+  // toppic hidden --multi-type-align
+  use_multi_type_align_ = (getArg(arguments, "multiTypeAlign") == "true");
 }
 
 bool PrsmPara::allowProtType(const ProteoformTypePtr& type_ptr) const {

@@ -23,6 +23,7 @@
 #include "ms/spec/spectrum_set.hpp"
 #include "prsm/prsm.hpp"
 #include "search/diag/diag_header.hpp"
+#include "search/oneptmsearch/ps_align.hpp"
 #include "search/oneptmsearch/ptm_search_mng.hpp"
 #include "search/ptmsearch/ps_align_multi_type.hpp"
 #include "seq/proteoform.hpp"
@@ -40,10 +41,14 @@ class PtmSlowMatch {
 
   void init();
 
-  // Computes PrSMs for every type in type_ptrs together (one fused dynamic
-  // program, search/ptmsearch/ps_align_multi_type.hpp) instead of one
-  // PsAlign pass per type. prsm_ptr_2d gets one PrsmPtrVec appended per
-  // entry of type_ptrs, in the same order.
+  // Computes PrSMs for every type in type_ptrs, one PrsmPtrVec appended to
+  // prsm_ptr_2d per entry of type_ptrs in the same order. Two interchangeable
+  // implementations, chosen once in init() by PrsmPara::useMultiTypeAlign()
+  // (toppic hidden --multi-type-align):
+  // - default: one PsAlign pass per type (multi_align_ptr_ unused).
+  // - --multi-type-align: one fused dynamic program computing every
+  //   requested type together (search/ptmsearch/ps_align_multi_type.hpp;
+  //   ps_align_ptr_ unused).
   void compute(const ProteoformTypePtrVec& type_ptrs,
                std::vector<PrsmPtrVec>& prsm_ptr_2d);
 
@@ -55,7 +60,8 @@ class PtmSlowMatch {
   PrmMsPtrVec ms_six_ptr_vec_;
   ExtendMsPtrVec ms_three_ptr_vec_;
   ProteoformTypePtr align_type_ptr_;
-  PsAlignMultiTypePtr ps_align_ptr_;
+  PsAlignPtr ps_align_ptr_;
+  PsAlignMultiTypePtr multi_align_ptr_;
 
   DiagHeaderPtrVec getNTermShiftListCommonHeaders();
 
