@@ -582,7 +582,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
        <item>
         <widget class="QLineEdit" name="envCnnCutoffEdit">
          <property name="text">
-          <string>0.4</string>
+          <string>0.2</string>
          </property>
         </widget>
        </item>

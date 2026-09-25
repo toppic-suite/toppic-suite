@@ -62,7 +62,7 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["filteringResultNumber"] = "20";
   arguments["precErrorTolerance"] = "10";
   arguments["fragErrorTolerance"] = "10";
-  arguments["envCnnCutoff"] = "0.4";
+  arguments["envCnnCutoff"] = "0.2";
   arguments["proteoformPpmError"] = "false";
   arguments["proteoformErrorTolerance"] = "1.2";
   arguments["cutoffSpectralType"] = "EVALUE";
@@ -403,7 +403,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
             "filter-by-env-cnn,F", po::value<std::string>(&env_cnn_cutoff),
             "<a number between 0 and 1>. Remove the deconvoluted masses whose "
             "EnvCNN score is below the cutoff before spectral filtering, "
-            "database search and E-value computation. Default value: 0.4.")(
+            "database search and E-value computation. Default value: 0.2.")(
             "proteoform-error-tolerance,p",
             po::value<std::string>(&form_error_tole),
             "<a positive number>. Error tolerance for identifying PrSM "
