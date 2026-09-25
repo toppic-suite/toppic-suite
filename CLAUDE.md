@@ -420,11 +420,20 @@ deconvoluted with the FLASHDeconv algorithm (OpenMS `SpectralDeconvolution`,
 - **Output.** Every surviving peak group becomes a `MatchEnv` of its
   representative (highest per-charge SNR) charge: the EnvBase envelope of the
   monoisotopic mass, scaled so its intensity sum is the group's intensity over
-  all charges, matched to the peaks by `ExpEnv`. The QScore is stored as the
-  EnvCNN score (what `match_env_util::getDeconvMsPtr` reports and sorts by)
-  and the isotope cosine as the MsDeconv score; no EnvCNN model runs. Note
-  FLASHDeconv's own msalign writer reports the maximum charge of the range,
-  this path the representative charge.
+  all charges, **trimmed to the noise floor exactly as `env_detect::compFullEnv`
+  trims the standard pipeline's own envelope** (`getSubEnv(1.0, bound_inte,
+  INT_MAX, INT_MAX)`; `bound_inte`/`min_inte` are `deconvMsTwo`'s own estimate
+  of `DeconvData::initMinInte`, via `baseline_util::getBaseLine` on the
+  spectrum, gated by `-estimate-min-inte`/`isEstimateMinInte()`) before
+  matching to the peaks by `ExpEnv`. Without this trim every envelope carried
+  the averagine table's full isotope tail (EnvBase's entries run to 100+
+  peaks for large masses) into the SQLite output, 3–4x more than
+  `DeconvMs2Process` writes for the same data (toppic_test experiment,
+  2026-09). The QScore is stored as the EnvCNN score (what
+  `match_env_util::getDeconvMsPtr` reports and sorts by) and the isotope
+  cosine as the MsDeconv score; no EnvCNN model runs. Note FLASHDeconv's own
+  msalign writer reports the maximum charge of the range, this path the
+  representative charge.
 - **Not ported:** the MS1 side and the precursor peak group search (the MS/MS
   max mass and charge come from TopFD's precursor features, as in
   `DeconvMs2Process`), decoy / FDR runs, target masses, and the tolerance
