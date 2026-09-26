@@ -69,6 +69,10 @@ accession, precursor mass and aligned retention time.
 5. **Writes** the table and prints the number of proteoform rows and how
    many of them were found in all samples.
 
+The console prints the result file read for each sample, then
+`Aligning retention times of sample <k> - started/finished` for samples 2
+to n and `Matching proteoforms across samples - started/finished`.
+
 ## 3. Output
 
 One tab-separated file, written into the directory of the **first** spectrum
@@ -104,8 +108,12 @@ A sample in which the proteoform was not found has five empty fields.
 | `-t`, `--tool-name <toppic\|topmg>` | toppic | Which tool's result files to read. |
 | `-o`, `--output <name>` | sample_diff.tsv | Name of the output table, written next to the first spectrum file. |
 
-TopDiff stops with an error when fewer than two spectrum files are given
-or when one of them does not exist.
+TopDiff stops with an error when fewer than two spectrum files are given,
+when one of them does not exist, or when a result file was written by an
+earlier version of TopPIC Suite (`The result file ... was written by an
+earlier version of TopPIC Suite and cannot be read by this version`): the
+tools of one version read only the result files of that version, so the
+samples must be searched again with the current TopPIC or TopMG.
 
 ## 5. Example
 

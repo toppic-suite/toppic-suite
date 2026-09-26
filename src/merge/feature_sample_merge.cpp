@@ -20,6 +20,8 @@
 #include <filesystem>
 #include <iomanip>
 #include <iostream>
+#include <unordered_map>
+#include <unordered_set>
 
 #include "common/base/mod_util.hpp"
 #include "common/util/file_util.hpp"
@@ -58,20 +60,13 @@ void normalizeTime(FeaturePrsmPtrVec& features) {
   }
 }
 
-class Cell {
- public:
-  Cell() {
-    sim_ = -1;
-    pre_ = -1;
-  }
+// One cell of the alignment matrix; the matrix is a flat vector of
+// (a_size + 1) x (b_size + 1) cells indexed by cell(i, j).
+struct Cell {
   double sim_ = -1;
-  // 0: left, 1: up, 2, diag
-  double pre_ = -1;
+  // 0: left, 1: up, 2: diag
+  int pre_ = -1;
 };
-
-using CellPtr = std::shared_ptr<Cell>;
-using CellPtrVec = std::vector<CellPtr>;
-using CellPtrVec2D = std::vector<CellPtrVec>;
 
 inline FeaturePrsmPtrVec getTopFeatures(FeaturePrsmPtrVec& features) {
   std::sort(features.begin(), features.end(), FeaturePrsm::cmpInteDec);
@@ -84,25 +79,19 @@ inline FeaturePrsmPtrVec getTopFeatures(FeaturePrsmPtrVec& features) {
   return result;
 }
 
-inline CellPtrVec2D initCells(size_t a_size, size_t b_size) {
-  CellPtrVec2D cell_2d;
-  for (size_t i = 0; i < a_size + 1; i++) {
-    CellPtrVec cells(b_size + 1);
-    for (size_t j = 0; j < b_size + 1; j++) {
-      cells[j] = std::make_shared<Cell>();
-    }
-    cell_2d.push_back(cells);
-  }
-  cell_2d[0][0]->sim_ = 0;
+inline std::vector<Cell> initCells(size_t a_size, size_t b_size) {
+  size_t cols = b_size + 1;
+  std::vector<Cell> cells((a_size + 1) * cols);
+  cells[0].sim_ = 0;
   for (size_t i = 1; i < a_size + 1; i++) {
-    cell_2d[i][0]->sim_ = 0;
-    cell_2d[i][0]->pre_ = 1;  // up
+    cells[i * cols].sim_ = 0;
+    cells[i * cols].pre_ = 1;  // up
   }
   for (size_t j = 1; j < b_size; j++) {
-    cell_2d[0][j]->sim_ = 0;
-    cell_2d[0][j]->pre_ = 0;  // left
+    cells[j].sim_ = 0;
+    cells[j].pre_ = 0;  // left
   }
-  return cell_2d;
+  return cells;
 }
 
 int findMatch(const FeaturePrsmPtr& a, FeaturePrsmPtrVec& second,
@@ -148,49 +137,47 @@ void sampleAlignTime(FeaturePrsmPtrVec& first, FeaturePrsmPtrVec& second,
 
   size_t a_size = a.size();
   size_t b_size = b.size();
-  CellPtrVec2D cell_2d = initCells(a_size, b_size);
+  size_t cols = b_size + 1;
+  std::vector<Cell> cells = initCells(a_size, b_size);
+  // the match findMatch(a[i-1], b, j-1) of every cell, kept for the
+  // backtracking so that it is not searched twice
+  std::vector<int> match_pos(a_size * b_size, -1);
   // alignment
   for (size_t i = 1; i < a_size + 1; i++) {
     for (size_t j = 1; j < b_size + 1; j++) {
-      double left_sim = cell_2d[i][j - 1]->sim_;
-      double up_sim = cell_2d[i - 1][j]->sim_;
-      double diag_sim = cell_2d[i - 1][j - 1]->sim_;
+      double left_sim = cells[i * cols + j - 1].sim_;
+      double up_sim = cells[(i - 1) * cols + j].sim_;
+      double diag_sim = cells[(i - 1) * cols + j - 1].sim_;
       int pos = findMatch(a[i - 1], b, j - 1, mass_tole);
+      match_pos[(i - 1) * b_size + j - 1] = pos;
       // if there is a match
       if (pos >= 0) {
         double inte = a[i - 1]->getProteoInte();
         double log_inte = std::log10(inte + 1);
         diag_sim += log_inte;
       }
+      Cell& cell = cells[i * cols + j];
       if (diag_sim >= left_sim && diag_sim >= up_sim) {
-        cell_2d[i][j]->sim_ = diag_sim;
-        cell_2d[i][j]->pre_ = 2;  // diag
+        cell.sim_ = diag_sim;
+        cell.pre_ = 2;  // diag
       } else if (up_sim >= left_sim) {
-        cell_2d[i][j]->sim_ = up_sim;
-        cell_2d[i][j]->pre_ = 1;  // up
+        cell.sim_ = up_sim;
+        cell.pre_ = 1;  // up
       } else {
-        cell_2d[i][j]->sim_ = left_sim;
-        cell_2d[i][j]->pre_ = 0;  // left
+        cell.sim_ = left_sim;
+        cell.pre_ = 0;  // left
       }
     }
   }
-  /*
-  for (size_t i = 0; i < a_size; i++) {
-    LOG_ERROR("A " << i << " time " << a[i]->getAlignApexTime());
-  }
-  for (size_t i = 0; i < b_size; i++) {
-    LOG_ERROR("B " << i << " time " << b[i]->getAlignApexTime());
-  }
-  */
   // backtracking
   size_t i = a_size;
   size_t j = b_size;
   std::pair<double, double> last_pair(1, 1);
   time_pairs.push_back(last_pair);
   while (i > 0 && j > 0) {
-    int pre = cell_2d[i][j]->pre_;
+    int pre = cells[i * cols + j].pre_;
     if (pre == 2) {  // diag
-      int pos = findMatch(a[i - 1], b, j - 1, mass_tole);
+      int pos = match_pos[(i - 1) * b_size + j - 1];
       if (pos >= 0) {
         double a_time = a[i - 1]->getAlignApexTime();
         double b_time = b[pos]->getAlignApexTime();
@@ -255,55 +242,78 @@ void setAlignTime(FeaturePrsmPtrVec& features,
   }
 }
 
-// sort feature 2d by intensities
-FeaturePrsmPtr findMatchFeature(const FeaturePrsmPtr& feature,
-                                FeaturePrsmPtrVec& features, double mass_tole) {
-  double time_tole = 0.3;
-  double strict_mass_tole = 0.01;
-  double strict_time_tole = 0.01;
+// The positions of one sample's features (sorted by decreasing intensity)
+// grouped by protein name, in the sorted order, so that the match of a
+// proteoform is looked for only among the features of its protein.
+using ProtIndex = std::unordered_map<std::string, std::vector<size_t>>;
+
+ProtIndex indexByProt(const FeaturePrsmPtrVec& features) {
+  ProtIndex index;
+  for (size_t i = 0; i < features.size(); i++) {
+    index[features[i]->getProtName()].push_back(i);
+  }
+  return index;
+}
+
+// The first position in positions whose feature is unused and matches
+// feature within the tolerances, or features.size() if there is none.
+size_t firstMatch(const FeaturePrsmPtr& feature, FeaturePrsmPtrVec& features,
+                  const std::vector<size_t>& positions, double mass_tole,
+                  double time_tole) {
   double cur_mass = feature->getPrecMass();
   double cur_time = feature->getAlignApexTime();
-  std::string cur_prot = feature->getProtName();
-  for (size_t i = 0; i < features.size(); i++) {
+  for (size_t k = 0; k < positions.size(); k++) {
+    size_t i = positions[k];
     if (features[i] == nullptr) {
       continue;
     }
-    std::string prot = features[i]->getProtName();
-    double mass = features[i]->getPrecMass();
-    double time = features[i]->getAlignApexTime();
-    if (cur_prot == prot) {
-      if (std::abs(time - cur_time) <= time_tole &&
-          std::abs(mass - cur_mass) <= mass_tole) {
-        FeaturePrsmPtr result = features[i];
-        features[i] = nullptr;
-        return result;
-      }
-    }
-    if (prot == "") {
-      if (std::abs(time - cur_time) <= strict_time_tole &&
-          std::abs(mass - cur_mass) <= strict_mass_tole) {
-        FeaturePrsmPtr result = features[i];
-        features[i] = nullptr;
-        return result;
-      }
+    if (std::abs(features[i]->getAlignApexTime() - cur_time) <= time_tole &&
+        std::abs(features[i]->getPrecMass() - cur_mass) <= mass_tole) {
+      return i;
     }
   }
-  return nullptr;
+  return features.size();
 }
 
-bool featureUsed(const FeaturePrsmPtr& feature, FeaturePrsmPtrVec2D& table) {
-  int cur_sample = feature->getSampleId();
-  int feature_id = feature->getProteoId();
-  for (size_t i = 0; i < table.size(); i++) {
-    FeaturePrsmPtr cur_feature = table[i][cur_sample];
-    if (cur_feature != nullptr) {
-      int cur_id = cur_feature->getProteoId();
-      if (feature_id == cur_id) {
-        return true;
+// The most abundant unused feature of features with the same protein name
+// as feature, a precursor mass within mass_tole and an aligned apex time
+// within 0.3, or, for features without a protein name, within 0.01 Da and
+// 0.01; the feature is marked used (nulled) and returned. Same result as a
+// scan of features in order, which is by decreasing intensity.
+FeaturePrsmPtr findMatchFeature(const FeaturePrsmPtr& feature,
+                                FeaturePrsmPtrVec& features,
+                                const ProtIndex& index, double mass_tole) {
+  double time_tole = 0.3;
+  double strict_mass_tole = 0.01;
+  double strict_time_tole = 0.01;
+  size_t best = features.size();
+  auto it = index.find(feature->getProtName());
+  if (it != index.end()) {
+    best = firstMatch(feature, features, it->second, mass_tole, time_tole);
+  }
+  if (feature->getProtName() != "") {
+    auto no_prot = index.find("");
+    if (no_prot != index.end()) {
+      size_t pos = firstMatch(feature, features, no_prot->second,
+                              strict_mass_tole, strict_time_tole);
+      if (pos < best) {
+        best = pos;
       }
     }
   }
-  return false;
+  if (best == features.size()) {
+    return nullptr;
+  }
+  FeaturePrsmPtr result = features[best];
+  features[best] = nullptr;
+  return result;
+}
+
+// The proteoform cluster ids already in the table, one set per sample.
+using UsedSets = std::vector<std::unordered_set<int>>;
+
+bool featureUsed(const FeaturePrsmPtr& feature, const UsedSets& used) {
+  return used[feature->getSampleId()].count(feature->getProteoId()) > 0;
 }
 
 void getFeatureTable(FeaturePrsmPtrVec& all_features,
@@ -311,12 +321,16 @@ void getFeatureTable(FeaturePrsmPtrVec& all_features,
                      FeaturePrsmPtrVec2D& table, FeaturePrsmPtrVec& examples,
                      double mass_tole) {
   size_t sample_size = features_2d.size();
+  std::vector<ProtIndex> indexes;
+  for (size_t j = 0; j < sample_size; j++) {
+    indexes.push_back(indexByProt(features_2d[j]));
+  }
+  UsedSets used(sample_size);
   for (size_t i = 0; i < all_features.size(); i++) {
     if (all_features[i]->getProtName() == "") {
       continue;
     }
-    // to do check if it is used
-    if (featureUsed(all_features[i], table)) {
+    if (featureUsed(all_features[i], used)) {
       continue;
     }
     int cur_sample = all_features[i]->getSampleId();
@@ -326,11 +340,16 @@ void getFeatureTable(FeaturePrsmPtrVec& all_features,
       if ((int)j == cur_sample) {
         cur_row[j] = all_features[i];
       } else {
-        FeaturePrsmPtr feature_ptr =
-            findMatchFeature(all_features[i], features_2d[j], mass_tole);
-        if (feature_ptr != nullptr && !featureUsed(feature_ptr, table)) {
+        FeaturePrsmPtr feature_ptr = findMatchFeature(
+            all_features[i], features_2d[j], indexes[j], mass_tole);
+        if (feature_ptr != nullptr && !featureUsed(feature_ptr, used)) {
           cur_row[j] = feature_ptr;
         }
+      }
+    }
+    for (size_t j = 0; j < sample_size; j++) {
+      if (cur_row[j] != nullptr) {
+        used[j].insert(cur_row[j]->getProteoId());
       }
     }
     table.push_back(cur_row);
@@ -460,13 +479,18 @@ void FeatureSampleMerge::process() {
     }
     normalizeTime(features);
     if (k > 0) {
+      std::cout << "Aligning retention times of sample " << (k + 1)
+                << " - started." << std::endl;
       std::vector<std::pair<double, double>> time_pairs;
       sampleAlignTime(features_2d[0], features, error_tole_, time_pairs);
       setAlignTime(features, time_pairs);
+      std::cout << "Aligning retention times of sample " << (k + 1)
+                << " - finished." << std::endl;
     }
     features_2d.push_back(features);
     all_features.insert(all_features.end(), features.begin(), features.end());
   }
+  std::cout << "Matching proteoforms across samples - started." << std::endl;
   std::sort(all_features.begin(), all_features.end(), FeaturePrsm::cmpInteDec);
   for (size_t k = 0; k < sample_num; k++) {
     std::sort(features_2d[k].begin(), features_2d[k].end(),
@@ -475,6 +499,7 @@ void FeatureSampleMerge::process() {
   FeaturePrsmPtrVec2D table;
   FeaturePrsmPtrVec examples;
   getFeatureTable(all_features, features_2d, table, examples, error_tole_);
+  std::cout << "Matching proteoforms across samples - finished." << std::endl;
   outputTable(table, examples, sample_num);
 }
 
