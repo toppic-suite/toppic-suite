@@ -41,6 +41,8 @@ class PrsmReader {
   void close();
 
  private:
+  std::string file_name_;
+
   std::ifstream input_;
 };
 
