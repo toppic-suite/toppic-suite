@@ -87,7 +87,7 @@ inline std::vector<Cell> initCells(size_t a_size, size_t b_size) {
     cells[i * cols].sim_ = 0;
     cells[i * cols].pre_ = 1;  // up
   }
-  for (size_t j = 1; j < b_size; j++) {
+  for (size_t j = 1; j < b_size + 1; j++) {
     cells[j].sim_ = 0;
     cells[j].pre_ = 0;  // left
   }
