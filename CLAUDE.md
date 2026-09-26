@@ -802,7 +802,11 @@ above it, never the reverse:
   separate builds (the three stage processes still exist for that), so
   changing a manager's defaults is safe; but do not make the files of one
   family differ from the others' by anything other than the column limit
-  without removing the joint path.
+  without removing the joint path. The joint tasks serialize **without** a
+  mutex: each writes its own `MassMatch` into its own archive (Boost 1.90's
+  singletons are built before `main`, so separate archives in separate
+  threads do not interact), and a single writer would have been busy for
+  most of the wall once every task writes two files.
   The filters are memory-bound: each thread streams every spectrum against
   one database block's index (117 blocks of ~1 GB one-shift index files for
   the human target+decoy database), so `compScores` misses cache on every

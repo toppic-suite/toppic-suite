@@ -19,7 +19,6 @@
 #include <functional>
 #include <iostream>
 #include <memory>
-#include <mutex>
 #include <thread>
 
 #include "common/thread/simple_thread_pool.hpp"
@@ -36,10 +35,12 @@ namespace toppic {
 
 namespace joint_index {
 
+// The tasks write their files without the serialization mutex the stage
+// processes hold: each task serializes its own MassMatch into its own
+// archive, and the writers of an index build (one 60-400 MB file every few
+// seconds per thread) would otherwise queue behind one another for a
+// growing share of the run once each task writes two files.
 namespace {
-// serialization mutex.
-std::mutex serial_mutex;
-
 // the kinds of index, in the order of the managers' file name vectors
 const int kKindNum = 4;
 const int kDiagKind = 1;
@@ -128,10 +129,7 @@ std::function<void()> geneIndexTask(const BlockInputPtr& input_ptr,
     MassMatchPtr index_ptr =
         buildIndex(kind, input_ptr, zero_mng_ptr->max_proteoform_mass_,
                    zero_mng_ptr->filter_scale_);
-    {
-      std::lock_guard<std::mutex> lock(serial_mutex);
-      index_ptr->serializeMassMatch(zero_file, dir_name);
-    }
+    index_ptr->serializeMassMatch(zero_file, dir_name);
     if (index_ptr->canTruncateColumns(one_mng_ptr->max_proteoform_mass_)) {
       index_ptr->truncateColumns(one_mng_ptr->max_proteoform_mass_);
     } else {
@@ -143,10 +141,7 @@ std::function<void()> geneIndexTask(const BlockInputPtr& input_ptr,
       index_ptr = buildIndex(kind, input_ptr, one_mng_ptr->max_proteoform_mass_,
                              one_mng_ptr->filter_scale_);
     }
-    {
-      std::lock_guard<std::mutex> lock(serial_mutex);
-      index_ptr->serializeMassMatch(one_file, dir_name);
-    }
+    index_ptr->serializeMassMatch(one_file, dir_name);
     index_ptr = nullptr;
 
     if (kind == kDiagKind) {
