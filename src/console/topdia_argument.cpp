@@ -55,6 +55,11 @@ bool toInt(const std::string& str, int& val) {
   }
 }
 
+// The deconvolution defaults of version 1.9.0.0, which topdia keeps; see
+// getTopfdParaPtrForTopdia().
+const double TOPDIA_MS2_RANK_PEAK_DISTANCE = 12;
+const double TOPDIA_MASS_GROUP_BOUNDARY = 1500;
+
 }  // namespace
 
 Argument::Argument() {
@@ -68,6 +73,19 @@ TopfdParaPtr Argument::getTopfdParaPtrForTopdia() {
   topfd_para_ptr->setMs1MinScanNum(2);
   topfd_para_ptr->setPrecWindowWidth(4.0);
   topfd_para_ptr->setOutputCsvFeatureFile(true);
+  // TopDIA keeps the deconvolution defaults of version 1.9.0.0. The three
+  // defaults TopFD changed in 2.0.0.0 - the 2 Dalton MS/MS envelope ranking
+  // window, the MS/MS harmonic check and the 4250 Dalton mass group boundary -
+  // were measured on DDA data. A DIA MS/MS scan holds the fragments of every
+  // co-isolated precursor of a wide isolation window, so they roughly double
+  // the reported fragment masses and with them the fragment features that
+  // pseudo spectrum generation holds in memory; on the tutorial data set that
+  // was enough to make topdia run out of memory (experiment 61 of
+  // toppic_test). The hidden --ms2-rank-peak-distance and
+  // --disable-ms2-harmonic-check options still override these.
+  topfd_para_ptr->setMsTwoRankPeakDistance(TOPDIA_MS2_RANK_PEAK_DISTANCE);
+  topfd_para_ptr->setMsTwoHarmonicCheck(false);
+  topfd_para_ptr->setMassGroupBoundary(TOPDIA_MASS_GROUP_BOUNDARY);
   return topfd_para_ptr;
 }
 
