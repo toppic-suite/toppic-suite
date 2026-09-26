@@ -771,7 +771,7 @@ p, li { white-space: pre-wrap; }
          <bool>false</bool>
         </property>
         <property name="text">
-         <string>Add MS1 peaks for 3D visualization</string>
+         <string>MS1 3D visualization data</string>
         </property>
         <property name="checkable">
          <bool>true</bool>
