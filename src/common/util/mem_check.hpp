@@ -24,6 +24,12 @@ namespace mem_check {
 
 int getMaxThreads(const std::string& app_name);
 
+// the thread number one filtering stage will use: its own memory budget,
+// lowered to the requested thread number. The filtering stages of toppic and
+// topmg and the warning of checkThreadNum all go through this function, so
+// that the reported and the used numbers cannot drift apart.
+int getStageThreadNum(const std::string& stage_entry, int thread_num);
+
 double getTotalMemInGb();
 
 double getAvailMemInGb();

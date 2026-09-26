@@ -22,6 +22,8 @@
 #include <limits>
 #include <map>
 #include <thread>
+#include <utility>
+#include <vector>
 
 #if defined(_WIN32) || defined(_WIN64) || defined(__MINGW32__) || \
     defined(__MINGW64__)
@@ -62,6 +64,27 @@ const std::map<std::string, double> memory_per_thread_list{
     {"zero_shift_filter", 1.25},
     // diag filter memory requirement per thread: about 0.4 gb
     {"diag_filter", 0.5}};
+
+// The protein sequence filtering stages of toppic and topmg budget their
+// thread number per stage (see toppic_process.cpp and topmg_process.cpp):
+// each one divides the available memory by its own entry of
+// memory_per_thread_list, so the stages of one run do not all get the same
+// number. checkThreadNum's warning reports what those stages will do, and
+// this list is what it reports from: an entry missing here is a stage whose
+// reduced thread number the user is never told about, and an entry naming
+// the wrong memory_per_thread_list key is a number that does not match the
+// stage. Keep it in step with the drivers; the names are the stage banners
+// the drivers print.
+const std::map<std::string, std::vector<std::pair<std::string, std::string>>>
+    filter_stage_list{
+        {"toppic",
+         {{"Zero unexpected shift filtering", "zero_shift_filter"},
+          {"Variable PTM filtering", "zero_one_shift_filter"},
+          {"One unexpected shift filtering", "zero_one_shift_filter"},
+          {"Multiple unexpected shifts filtering", "diag_filter"}}},
+        {"topmg",
+         {{"ASF-One PTM filtering", "zero_one_shift_filter"},
+          {"ASF-Diagonal PTM filtering", "diag_filter"}}}};
 
 double getTotalMemInGb() {
 #if defined(_WIN32) || defined(_WIN64) || defined(__MINGW32__) || \
@@ -167,6 +190,14 @@ int getMaxThreads(const std::string& app_name) {
   return max_thread_num;
 }
 
+int getStageThreadNum(const std::string& stage_entry, int thread_num) {
+  int max_thread_num = getMaxThreads(stage_entry);
+  if (max_thread_num > thread_num) {
+    return thread_num;
+  }
+  return max_thread_num;
+}
+
 bool checkThreadNum(int thread_number, const std::string& prog) {
   if (thread_number <= 0) {
     LOG_ERROR("Thread number " << thread_number
@@ -190,24 +221,39 @@ bool checkThreadNum(int thread_number, const std::string& prog) {
               << total_thread_num << " threads are supported.");
     return false;
   }
-  int max_thread = mem_check::getMaxThreads(prog);
-  if (max_thread < thread_number) {
-    // in toppic, we automatically control thread numbers for filtering
-    if (prog != "toppic" && prog != "topmg") {
-      std::cout << "WARNING: Based on the available memory size, up to "
-                << max_thread << " threads can be used!" << std::endl;
-      std::cout << "WARNING: Please set the thread number to " << max_thread
-                << " or the program may crash!" << std::endl;
-      std::cout << std::endl;
-    } else {
-      std::cout << "WARNING: Based on the available memory size, " << max_thread
-                << " threads will be used for protein sequence filtering and "
-                << thread_number
-                << " threads will be used for other steps in proteoform "
-                   "identification!"
-                << std::endl;
+  // in toppic and topmg, we automatically control thread numbers for
+  // filtering, one budget per filtering stage: report the stages the
+  // available memory limits, and the number each one of them will use.
+  if (filter_stage_list.find(prog) != filter_stage_list.end()) {
+    std::vector<std::pair<std::string, int>> limited_stages;
+    for (const auto& stage : filter_stage_list.at(prog)) {
+      int stage_thread_num = getStageThreadNum(stage.second, thread_number);
+      if (stage_thread_num < thread_number) {
+        limited_stages.emplace_back(stage.first, stage_thread_num);
+      }
+    }
+    if (!limited_stages.empty()) {
+      std::cout << "WARNING: Based on the available memory size, these protein"
+                << " sequence filtering steps will use" << std::endl;
+      std::cout << "WARNING: fewer than the " << thread_number
+                << " threads requested:" << std::endl;
+      for (const auto& stage : limited_stages) {
+        std::cout << "WARNING:   " << stage.first << ": " << stage.second
+                  << " threads" << std::endl;
+      }
+      std::cout << "WARNING: All other steps of proteoform identification will"
+                << " use " << thread_number << " threads!" << std::endl;
       std::cout << std::endl;
     }
+    return true;
+  }
+  int max_thread = mem_check::getMaxThreads(prog);
+  if (max_thread < thread_number) {
+    std::cout << "WARNING: Based on the available memory size, up to "
+              << max_thread << " threads can be used!" << std::endl;
+    std::cout << "WARNING: Please set the thread number to " << max_thread
+              << " or the program may crash!" << std::endl;
+    std::cout << std::endl;
   }
   return true;
 }

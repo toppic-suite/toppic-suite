@@ -172,15 +172,11 @@ int TopMG_identify(std::map<std::string, std::string>& arguments) {
     int thread_num = std::stoi(arguments["threadNumber"]);
     // Filter steps requires a large amount of memory.
     // We use only one thread to reduce the memory requirement.
-    int filter_thread_num = mem_check::getMaxThreads("zero_one_shift_filter");
-    if (filter_thread_num > thread_num) {
-      filter_thread_num = thread_num;
-    }
+    int filter_thread_num =
+        mem_check::getStageThreadNum("zero_one_shift_filter", thread_num);
     LOG_DEBUG("Filter thread number " << filter_thread_num);
-    int diag_filter_thread_num = mem_check::getMaxThreads("diag_filter");
-    if (diag_filter_thread_num > thread_num) {
-      diag_filter_thread_num = thread_num;
-    }
+    int diag_filter_thread_num =
+        mem_check::getStageThreadNum("diag_filter", thread_num);
 
     bool decoy = false;
     if (arguments["searchType"] == "TARGET+DECOY") {

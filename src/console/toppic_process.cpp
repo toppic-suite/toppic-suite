@@ -241,10 +241,8 @@ int TopPIC_identify(std::map<std::string, std::string>& arguments) {
 
     // Filter steps requires a large amount of memory.
     // We use only one thread to reduce the memory requirement.
-    int filter_thread_num = mem_check::getMaxThreads("zero_one_shift_filter");
-    if (filter_thread_num > thread_num) {
-      filter_thread_num = thread_num;
-    }
+    int filter_thread_num =
+        mem_check::getStageThreadNum("zero_one_shift_filter", thread_num);
     LOG_DEBUG("Filter thread number " << filter_thread_num);
     // With the block indexes loading in parallel, every zero-shift filter
     // worker holds its full ~0.95 GB block at once, so that stage gets a
@@ -252,10 +250,8 @@ int TopPIC_identify(std::map<std::string, std::string>& arguments) {
     // cannot change the output - each (spectrum, block) score is a pure
     // function of the index and the spectrum, and the in-memory block
     // combiner is order-independent (toppic_test reports 0022/0066).
-    int zero_filter_thread_num = mem_check::getMaxThreads("zero_shift_filter");
-    if (zero_filter_thread_num > thread_num) {
-      zero_filter_thread_num = thread_num;
-    }
+    int zero_filter_thread_num =
+        mem_check::getStageThreadNum("zero_shift_filter", thread_num);
     LOG_DEBUG("Zero-shift filter thread number " << zero_filter_thread_num);
 
     // var_ptm_type number is used for E-value computation
@@ -421,10 +417,8 @@ int TopPIC_multi_ptm_search(std::map<std::string, std::string>& arguments) {
     double min_shift_mass = std::stod(arguments["minShiftMass"]);
     int filter_result_num = std::stoi(arguments["filteringResultNumber"]);
     int thread_num = std::stoi(arguments["threadNumber"]);
-    int diag_filter_thread_num = mem_check::getMaxThreads("diag_filter");
-    if (diag_filter_thread_num > thread_num) {
-      diag_filter_thread_num = thread_num;
-    }
+    int diag_filter_thread_num =
+        mem_check::getStageThreadNum("diag_filter", thread_num);
     int var_ptm_type_num = std::stoi(arguments["varPtmTypeNum"]);
 
     IndexFileNamePtr file_name_ptr = std::make_shared<IndexFileName>();
