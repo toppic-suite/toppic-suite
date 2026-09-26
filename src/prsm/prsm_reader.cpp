@@ -66,15 +66,19 @@ PrsmStrPtr PrsmReader::readOnePrsmStr() {
   if (prsm_str_vec.size() == 0) {
     return PrsmStrPtr(nullptr);
   }
-  // Result files of TopPIC Suite 1.9 and earlier name the matched numbers
-  // match_peak_num / match_fragment_num and have no rt element; PrsmStr
-  // would fail on them with an uncaught std::invalid_argument. The tools of
-  // this version read only the result files this version writes.
-  if (prsm_util::getXmlLine(prsm_str_vec, "<match_exp_frag_num>") == "") {
+  // Every PrSM carries the version of TopPIC Suite that wrote it (the
+  // version element, since 2.0.0); the tools read only the PrSM files of
+  // their own version. Files of 1.9 and earlier have no version element.
+  std::string version_line = prsm_util::getXmlLine(prsm_str_vec, "<version>");
+  std::string file_version =
+      version_line == "" ? "" : prsm_util::getValueStr(version_line);
+  if (file_version != Version::getVersion()) {
     LOG_ERROR("The result file "
-              << file_name_
-              << " was written by an earlier version of TopPIC Suite and "
-                 "cannot be read by this version (" << Version::getVersion()
+              << file_name_ << " was written by "
+              << (file_version == "" ? std::string("an earlier version")
+                                     : "version " + file_version)
+              << " of TopPIC Suite and cannot be read by this version ("
+              << Version::getVersion()
               << "). Run the database search again with this version.");
     exit(EXIT_FAILURE);
   }

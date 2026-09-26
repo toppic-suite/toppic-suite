@@ -60,6 +60,8 @@ OnePtmFilter::OnePtmFilter(const ProteoformPtrVec& proteo_ptrs,
                                  file_name)) {
       // if any of the index files for this ptm is missing
       index_files_exist = false;
+      // the diagonal file's earlier names
+      mass_match_util::warnOldIndexLayout(index_dir, suffix);
       break;
     }
   }
@@ -94,7 +96,29 @@ OnePtmFilter::OnePtmFilter(const ProteoformPtrVec& proteo_ptrs,
         one_ptm_filter_warmed.store(true, std::memory_order_release);
       }
     }
-  } else {
+    // the files must have been built at this filter's column limits (the
+    // diagonal one is shared with the multiple-shift filter)
+    MassMatchPtr read_ptrs[] = {term_index_ptr_, diag_index_ptr_,
+                                rev_term_index_ptr_, rev_diag_index_ptr_};
+    for (size_t t = 0; t < 4; t++) {
+      if (!mass_match_util::hasFilterLimits(read_ptrs[t],
+                                            mng_ptr->max_proteoform_mass_,
+                                            mng_ptr->filter_scale_)) {
+        mass_match_util::warnIndexLimits(
+            mng_ptr->one_ptm_file_vec_[t] + suffix, read_ptrs[t],
+            mng_ptr->max_proteoform_mass_, mng_ptr->filter_scale_);
+        index_files_exist = false;
+        break;
+      }
+    }
+    if (!index_files_exist) {
+      term_index_ptr_ = nullptr;
+      diag_index_ptr_ = nullptr;
+      rev_term_index_ptr_ = nullptr;
+      rev_diag_index_ptr_ = nullptr;
+    }
+  }
+  if (!index_files_exist) {
     std::vector<std::vector<double>> shift_2d =
         proteoform_util::getNTermShift2D(
             proteo_ptrs, mng_ptr->prsm_para_ptr_->getProtModPtrVec());

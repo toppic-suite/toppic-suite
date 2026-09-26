@@ -81,6 +81,8 @@ class MassMatch {
 
   int getColNum() { return col_num_; }
 
+  double getScale() { return scale_; }
+
   // Whether truncateColumns(max_proteoform_mass) gives the index that the
   // constructor builds at that limit: the limit is at most this index's, and
   // every proteoform's masses were nondecreasing, so that the construction

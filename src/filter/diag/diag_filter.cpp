@@ -59,6 +59,8 @@ DiagFilter::DiagFilter(const ProteoformPtrVec& proteo_ptrs,
                                  file_name)) {
       // if any of the index files for this ptm is missing
       index_files_exist = false;
+      // the file's earlier names
+      mass_match_util::warnOldIndexLayout(index_dir, suffix);
       break;
     }
   }
@@ -81,7 +83,19 @@ DiagFilter::DiagFilter(const ProteoformPtrVec& proteo_ptrs,
         diag_filter_warmed.store(true, std::memory_order_release);
       }
     }
-  } else {
+    // the file is shared with the one-shift filter; it must have been built
+    // at this filter's column limits
+    if (!mass_match_util::hasFilterLimits(index_ptr_,
+                                          mng_ptr->max_proteoform_mass_,
+                                          mng_ptr->filter_scale_)) {
+      mass_match_util::warnIndexLimits(file_name, index_ptr_,
+                                       mng_ptr->max_proteoform_mass_,
+                                       mng_ptr->filter_scale_);
+      index_files_exist = false;
+      index_ptr_ = nullptr;
+    }
+  }
+  if (!index_files_exist) {
     index_ptr_ = mass_match_factory::getPrmDiagMassMatchPtr(
         proteo_ptrs, mng_ptr->max_proteoform_mass_, mng_ptr->filter_scale_);
   }

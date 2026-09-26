@@ -49,9 +49,6 @@ std::map<std::string, std::string> TopIndexArgument::initArguments() {
   arguments["threadNumber"] = "1";
   arguments["version"] = "";
 
-  // filtering result number is for diagonal filter
-  arguments["filteringResultNumber"] = "20";
-
   // the following two arguments are used for the initializatio of prsm para
   arguments["groupSpectrumNumber"] = "1";
   arguments["activation"] = "FILE";
