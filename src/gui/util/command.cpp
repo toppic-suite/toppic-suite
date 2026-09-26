@@ -189,12 +189,10 @@ std::map<std::string, std::string> toppic_para{
     {"combinedOutputName", "-c "},
     {"fragErrorTolerance", "-e "},
     {"precErrorTolerance", "-E "},
-    {"envCnnCutoff", "-F "},
     {"groupSpectrumNumber", "-r "},
     {"localPtmFileName", "-B "},
     {"localThreshold", "-H "},
     {"postMassMatch", "-D "},
-    {"postMinPeakNum", "-I "},
     {"averageMass", "-g "}};
 
 std::string geneToppicCommand(std::map<std::string, std::string> arguments_,
@@ -239,11 +237,6 @@ std::string geneToppicCommand(std::map<std::string, std::string> arguments_,
         // on by default; -D (--disable-post-match) turns it off
         if (it->second == "false") {
           command = command + toppic_para[it->first];
-        }
-      } else if (it->first == "postMinPeakNum") {
-        // only meaningful while post mass matching is on
-        if (arguments_["postMassMatch"] == "true") {
-          command = command + toppic_para[it->first] + it->second + " ";
         }
       } else if (it->first == "averageMass") {
         // -g (--average-mass): the spectrum files hold average masses

@@ -59,11 +59,9 @@ ToppicWindow::ToppicWindow(QWidget* parent)
       new QRegularExpressionValidator(rx2, this);
   ui->miscoreThresholdEdit->setValidator(validator2);
   ui->threadNumberEdit->setValidator(new QIntValidator(0, 2147483647, this));
-  ui->postMinPeakNumEdit->setValidator(new QIntValidator(1, 2147483647, this));
   ui->errorToleranceEdit->setValidator(new QIntValidator(0, 2147483647, this));
   ui->precErrorToleranceEdit->setValidator(
       new QIntValidator(0, 2147483647, this));
-  ui->envCnnCutoffEdit->setValidator(new QDoubleValidator(0, 1, 4, this));
   ui->formErrorToleranceEdit->setValidator(
       new QDoubleValidator(0, 2147483647, 4, this));
   QRegularExpression rx3("^-?\\d{1,8}\\.\\d{0,2}$");
@@ -127,8 +125,6 @@ void ToppicWindow::on_defaultButton_clicked() {
       QString::fromStdString(arguments_["fragErrorTolerance"]));
   ui->precErrorToleranceEdit->setText(
       QString::fromStdString(arguments_["precErrorTolerance"]));
-  ui->envCnnCutoffEdit->setText(
-      QString::fromStdString(arguments_["envCnnCutoff"]));
   ui->formErrorToleranceEdit->setText(
       QString::fromStdString(arguments_["proteoformErrorTolerance"]));
   ui->varPtmNumEdit->setText(
@@ -177,9 +173,6 @@ void ToppicWindow::on_defaultButton_clicked() {
   ui->keepTempCheckBox->setChecked(false);
   // post mass matching is on by default (arguments_["postMassMatch"])
   ui->postMassMatchCheckBox->setChecked(arguments_["postMassMatch"] == "true");
-  ui->postMinPeakNumEdit->setText(
-      QString::fromStdString(arguments_["postMinPeakNum"]));
-  ui->postMinPeakNumEdit->setEnabled(ui->postMassMatchCheckBox->isChecked());
   ui->averageMassCheckBox->setChecked(arguments_["averageMass"] == "true");
 }
 
@@ -329,7 +322,6 @@ std::map<std::string, std::string> ToppicWindow::getArguments() {
       ui->errorToleranceEdit->text().toStdString();
   arguments_["precErrorTolerance"] =
       ui->precErrorToleranceEdit->text().toStdString();
-  arguments_["envCnnCutoff"] = ui->envCnnCutoffEdit->text().toStdString();
   arguments_["proteoformErrorTolerance"] =
       ui->formErrorToleranceEdit->text().toStdString();
   arguments_["cutoffSpectralType"] =
@@ -406,13 +398,17 @@ std::map<std::string, std::string> ToppicWindow::getArguments() {
   } else {
     arguments_["postMassMatch"] = "false";
   }
-  arguments_["postMinPeakNum"] = ui->postMinPeakNumEdit->text().toStdString();
   if (ui->averageMassCheckBox->isChecked()) {
     arguments_["averageMass"] = "true";
   } else {
     arguments_["averageMass"] = "false";
   }
   arguments_["localThreshold"] = ui->miscoreThresholdEdit->text().toStdString();
+  // the EnvCNN score cutoff and the minimum isotopic peak number of post mass
+  // matching are not shown by the GUI, so the command line leaves them out and
+  // toppic applies its own defaults
+  arguments_.erase("envCnnCutoff");
+  arguments_.erase("postMinPeakNum");
   arguments_["groupSpectrumNumber"] = ui->numCombinedEdit->text().toStdString();
   arguments_["localPtmFileName"] = ui->modFileEdit->text().toStdString();
   arguments_["threadNumber"] = ui->threadNumberEdit->text().toStdString();
@@ -492,7 +488,6 @@ void ToppicWindow::lockDialog() {
   ui->fixedModFileButton->setEnabled(false);
   ui->errorToleranceEdit->setEnabled(false);
   ui->precErrorToleranceEdit->setEnabled(false);
-  ui->envCnnCutoffEdit->setEnabled(false);
   ui->formErrorToleranceEdit->setEnabled(false);
   ui->maxModEdit->setEnabled(false);
   ui->minModEdit->setEnabled(false);
@@ -530,7 +525,6 @@ void ToppicWindow::lockDialog() {
   ui->keepDecoyCheckBox->setEnabled(false);
   ui->keepTempCheckBox->setEnabled(false);
   ui->postMassMatchCheckBox->setEnabled(false);
-  ui->postMinPeakNumEdit->setEnabled(false);
   ui->averageMassCheckBox->setEnabled(false);
 }
 
@@ -544,7 +538,6 @@ void ToppicWindow::unlockDialog() {
   ui->fixedModFileEdit->setEnabled(true);
   ui->errorToleranceEdit->setEnabled(true);
   ui->precErrorToleranceEdit->setEnabled(true);
-  ui->envCnnCutoffEdit->setEnabled(true);
   ui->formErrorToleranceEdit->setEnabled(true);
   ui->maxModEdit->setEnabled(true);
   ui->minModEdit->setEnabled(true);
@@ -584,7 +577,6 @@ void ToppicWindow::unlockDialog() {
   ui->keepDecoyCheckBox->setEnabled(true);
   ui->keepTempCheckBox->setEnabled(true);
   ui->postMassMatchCheckBox->setEnabled(true);
-  ui->postMinPeakNumEdit->setEnabled(ui->postMassMatchCheckBox->isChecked());
   ui->averageMassCheckBox->setEnabled(true);
 }
 
@@ -638,11 +630,6 @@ bool ToppicWindow::checkError() {
                          QMessageBox::Yes);
     return true;
   }
-  if (ui->envCnnCutoffEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("EnvCNN score cutoff is empty!"), QMessageBox::Yes);
-    return true;
-  }
   if (ui->formErrorToleranceEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
                          tr("Proteoform error tolerance is empty!"),
@@ -691,14 +678,6 @@ bool ToppicWindow::checkError() {
   if (ui->threadNumberEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"), tr("Thread number is empty!"),
                          QMessageBox::Yes);
-    return true;
-  }
-  if (ui->postMassMatchCheckBox->isChecked() &&
-      ui->postMinPeakNumEdit->text().isEmpty()) {
-    QMessageBox::warning(
-        this, tr("Warning"),
-        tr("Minimum isotopic peak number for post mass matching is empty!"),
-        QMessageBox::Yes);
     return true;
   }
   // Post mass matching reads the TopFD SQLite database of each spectrum file;
@@ -772,8 +751,7 @@ void ToppicWindow::showArguments() {
        "\nlocalPtmFileName:" + arguments_["localPtmFileName"] +
        "\nthreadNumber:" + arguments_["threadNumber"] + "\nuseFeatureFile:" +
        arguments_["useFeatureFile"] + "\npostMassMatch:" +
-       arguments_["postMassMatch"] + "\npostMinPeakNum:" +
-       arguments_["postMinPeakNum"] + "\naverageMass:" +
+       arguments_["postMassMatch"] + "\naverageMass:" +
        arguments_["averageMass"] + "\nskipList:" + arguments_["skipList"])
           .c_str(),
       QMessageBox::Yes);
@@ -915,12 +893,6 @@ void ToppicWindow::on_cutoffProteinTypeComboBox_currentIndexChanged(int index) {
                          QMessageBox::Yes);
     ui->cutoffProteinTypeComboBox->setCurrentIndex(0);
   }
-}
-
-// The minimum isotopic peak number only matters when post mass matching is
-// on, so the edit follows the checkbox.
-void ToppicWindow::on_postMassMatchCheckBox_clicked(bool checked) {
-  ui->postMinPeakNumEdit->setEnabled(checked);
 }
 
 void ToppicWindow::on_decoyCheckBox_clicked(bool checked) {
