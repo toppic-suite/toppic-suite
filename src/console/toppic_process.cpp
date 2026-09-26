@@ -239,21 +239,6 @@ int TopPIC_identify(std::map<std::string, std::string>& arguments) {
 
     int thread_num = std::stoi(arguments["threadNumber"]);
 
-    // Filter steps requires a large amount of memory.
-    // We use only one thread to reduce the memory requirement.
-    int filter_thread_num =
-        mem_check::getStageThreadNum("zero_one_shift_filter", thread_num);
-    LOG_DEBUG("Filter thread number " << filter_thread_num);
-    // With the block indexes loading in parallel, every zero-shift filter
-    // worker holds its full ~0.95 GB block at once, so that stage gets a
-    // budget matching its true residency (mem_check.cpp); the thread count
-    // cannot change the output - each (spectrum, block) score is a pure
-    // function of the index and the spectrum, and the in-memory block
-    // combiner is order-independent (toppic_test reports 0022/0066).
-    int zero_filter_thread_num =
-        mem_check::getStageThreadNum("zero_shift_filter", thread_num);
-    LOG_DEBUG("Zero-shift filter thread number " << zero_filter_thread_num);
-
     // var_ptm_type number is used for E-value computation
     int var_ptm_type_num = 0;
 
@@ -279,6 +264,17 @@ int TopPIC_identify(std::map<std::string, std::string>& arguments) {
     std::vector<std::string> input_exts;
 
     std::cout << "Zero unexpected shift filtering - started." << std::endl;
+    // The filtering steps require a large amount of memory, so each one asks
+    // mem_check for its own thread number where it starts, from its own
+    // per-thread budget and the memory available then; mem_check reports the
+    // number when it differs from the one it announced at the start of the
+    // run. The thread count cannot change the output of a filtering step -
+    // each (spectrum, block) score is a pure function of the index and the
+    // spectrum, and the in-memory block combiner is order-independent
+    // (toppic_test reports 0022/0066).
+    int zero_filter_thread_num = mem_check::getStageThreadNum(
+        "Zero unexpected shift filtering", thread_num);
+    LOG_DEBUG("Zero-shift filter thread number " << zero_filter_thread_num);
     ZeroPtmFilterMngPtr zero_filter_mng_ptr =
         std::make_shared<ZeroPtmFilterMng>(prsm_para_ptr, index_file_para,
                                            zero_filter_thread_num,
@@ -304,13 +300,16 @@ int TopPIC_identify(std::map<std::string, std::string>& arguments) {
 
     if (var_ptm_num >= 1 && var_ptm_file_name != "") {
       std::cout << "Variable PTM filtering - started." << std::endl;
+      int var_filter_thread_num =
+          mem_check::getStageThreadNum("Variable PTM filtering", thread_num);
+      LOG_DEBUG("Variable PTM filter thread number " << var_filter_thread_num);
       bool use_approx_spec = false;
       if (arguments["useApproxSpectra"] == "true") {
         use_approx_spec = true;
       }
       VarPtmFilterMngPtr var_filter_mng_ptr = std::make_shared<VarPtmFilterMng>(
           prsm_para_ptr, index_file_para, var_ptm_file_name, var_ptm_num,
-          filter_thread_num, use_approx_spec, "toppic_var_filter");
+          var_filter_thread_num, use_approx_spec, "toppic_var_filter");
       var_ptm_type_num = var_filter_mng_ptr->getSingleShiftNum();
       var_ptm_filter_processor::process(var_filter_mng_ptr);
       std::cout << "Variable PTM filtering - finished." << std::endl;
@@ -333,10 +332,13 @@ int TopPIC_identify(std::map<std::string, std::string>& arguments) {
 
     if (shift_num >= 1) {
       std::cout << "One unexpected shift filtering - started." << std::endl;
+      int one_filter_thread_num = mem_check::getStageThreadNum(
+          "One unexpected shift filtering", thread_num);
+      LOG_DEBUG("One-shift filter thread number " << one_filter_thread_num);
       OnePtmFilterMngPtr one_ptm_filter_mng_ptr =
           std::make_shared<OnePtmFilterMng>(
               prsm_para_ptr, index_file_para, "toppic_one_filter",
-              filter_thread_num, min_shift_mass, max_shift_mass);
+              one_filter_thread_num, min_shift_mass, max_shift_mass);
       one_ptm_filter_processor::process(one_ptm_filter_mng_ptr);
       std::cout << "One unexpected shift filtering - finished." << std::endl;
 
@@ -417,8 +419,6 @@ int TopPIC_multi_ptm_search(std::map<std::string, std::string>& arguments) {
     double min_shift_mass = std::stod(arguments["minShiftMass"]);
     int filter_result_num = std::stoi(arguments["filteringResultNumber"]);
     int thread_num = std::stoi(arguments["threadNumber"]);
-    int diag_filter_thread_num =
-        mem_check::getStageThreadNum("diag_filter", thread_num);
     int var_ptm_type_num = std::stoi(arguments["varPtmTypeNum"]);
 
     IndexFileNamePtr file_name_ptr = std::make_shared<IndexFileName>();
@@ -483,6 +483,9 @@ int TopPIC_multi_ptm_search(std::map<std::string, std::string>& arguments) {
       std::cout << "Multiple unexpected shifts filtering - started."
                 << std::endl;
       // thread number is used because diagonal filter uses only one index
+      int diag_filter_thread_num = mem_check::getStageThreadNum(
+          "Multiple unexpected shifts filtering", thread_num);
+      LOG_DEBUG("Diagonal filter thread number " << diag_filter_thread_num);
       DiagFilterMngPtr diag_filter_mng_ptr = std::make_shared<DiagFilterMng>(
           prsm_para_ptr, index_file_para, filter_result_num,
           diag_filter_thread_num, "toppic_multi_filter");

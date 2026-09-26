@@ -67,24 +67,66 @@ const std::map<std::string, double> memory_per_thread_list{
 
 // The protein sequence filtering stages of toppic and topmg budget their
 // thread number per stage (see toppic_process.cpp and topmg_process.cpp):
-// each one divides the available memory by its own entry of
+// each one divides the memory available when it starts by its own entry of
 // memory_per_thread_list, so the stages of one run do not all get the same
-// number. checkThreadNum's warning reports what those stages will do, and
-// this list is what it reports from: an entry missing here is a stage whose
-// reduced thread number the user is never told about, and an entry naming
-// the wrong memory_per_thread_list key is a number that does not match the
-// stage. Keep it in step with the drivers; the names are the stage banners
-// the drivers print.
-const std::map<std::string, std::vector<std::pair<std::string, std::string>>>
-    filter_stage_list{
-        {"toppic",
-         {{"Zero unexpected shift filtering", "zero_shift_filter"},
-          {"Variable PTM filtering", "zero_one_shift_filter"},
-          {"One unexpected shift filtering", "zero_one_shift_filter"},
-          {"Multiple unexpected shifts filtering", "diag_filter"}}},
-        {"topmg",
-         {{"ASF-One PTM filtering", "zero_one_shift_filter"},
-          {"ASF-Diagonal PTM filtering", "diag_filter"}}}};
+// number. These two lists are what checkThreadNum reports from and what
+// getStageThreadNum computes from, so the message and the stages cannot name
+// different budgets. A stage missing here is a stage whose reduced thread
+// number the user is never told about, and a wrong memory_per_thread_list
+// key is a reported number no stage uses. Keep them in step with the
+// drivers; the names are the stage banners the drivers print.
+const std::map<std::string, std::string> filter_stage_mem_entry_list{
+    {"Zero unexpected shift filtering", "zero_shift_filter"},
+    {"Variable PTM filtering", "zero_one_shift_filter"},
+    {"One unexpected shift filtering", "zero_one_shift_filter"},
+    {"Multiple unexpected shifts filtering", "diag_filter"},
+    {"ASF-One PTM filtering", "zero_one_shift_filter"},
+    {"ASF-Diagonal PTM filtering", "diag_filter"}};
+
+const std::map<std::string, std::vector<std::string>> filter_stage_list{
+    {"toppic",
+     {"Zero unexpected shift filtering", "Variable PTM filtering",
+      "One unexpected shift filtering",
+      "Multiple unexpected shifts filtering"}},
+    {"topmg", {"ASF-One PTM filtering", "ASF-Diagonal PTM filtering"}}};
+
+namespace {
+
+// the thread number a memory_per_thread_list entry allows with this much
+// memory available, never zero
+int threadNumForMem(const std::string& mem_entry, double avail_mem_in_gb) {
+  double mem_per_thread = memory_per_thread_list.at(mem_entry);
+  int thread_num = std::floor(avail_mem_in_gb / mem_per_thread);
+  if (thread_num == 0) {
+    thread_num = 1;
+  }
+  return thread_num;
+}
+
+// the memory_per_thread_list entry a filtering stage budgets with
+const std::string& stageMemEntry(const std::string& stage_name) {
+  auto it = filter_stage_mem_entry_list.find(stage_name);
+  if (it == filter_stage_mem_entry_list.end()) {
+    LOG_ERROR("invalid filtering stage name " << stage_name << "!");
+    static const std::string default_entry = "zero_one_shift_filter";
+    return default_entry;
+  }
+  return it->second;
+}
+
+// what checkThreadNum reports for a stage: its thread number computed from
+// the memory available at the start of the run, which is the figure the same
+// message prints
+int getStageStartThreadNum(const std::string& stage_name, int thread_num) {
+  int stage_thread_num =
+      threadNumForMem(stageMemEntry(stage_name), getStartupAvailMemInGb());
+  if (stage_thread_num > thread_num) {
+    return thread_num;
+  }
+  return stage_thread_num;
+}
+
+}  // namespace
 
 double getTotalMemInGb() {
 #if defined(_WIN32) || defined(_WIN64) || defined(__MINGW32__) || \
@@ -181,21 +223,40 @@ int getMaxThreads(const std::string& app_name) {
     LOG_ERROR("invalid application name!");
     return 0;
   }
-  double avail_mem_in_gb = getAvailMemInGb();
-  double mem_per_thread = memory_per_thread_list.at(app_name);
-  int max_thread_num = std::floor(avail_mem_in_gb / mem_per_thread);
-  if (max_thread_num == 0) {
-    max_thread_num = 1;
-  }
-  return max_thread_num;
+  return threadNumForMem(app_name, getAvailMemInGb());
 }
 
-int getStageThreadNum(const std::string& stage_entry, int thread_num) {
-  int max_thread_num = getMaxThreads(stage_entry);
-  if (max_thread_num > thread_num) {
-    return thread_num;
+double getStartupAvailMemInGb() {
+  // sampled at the first call, which is checkThreadNum's while it validates
+  // the arguments, and returned unchanged afterwards: the figure the run
+  // reports its thread numbers from stays the figure it printed
+  static const double startup_avail_mem_in_gb = getAvailMemInGb();
+  return startup_avail_mem_in_gb;
+}
+
+int getStageThreadNum(const std::string& stage_name, int thread_num) {
+  // one sample of the available memory, so the number the stage uses and the
+  // number the message below explains it with are the same measurement
+  double avail_mem_in_gb = getAvailMemInGb();
+  int stage_thread_num =
+      threadNumForMem(stageMemEntry(stage_name), avail_mem_in_gb);
+  if (stage_thread_num > thread_num) {
+    stage_thread_num = thread_num;
   }
-  return max_thread_num;
+  // the drivers call this where the stage starts, so this is the number the
+  // stage will really use; say so whenever the memory available now has moved
+  // it away from the number checkThreadNum reported at the start of the run
+  int start_thread_num = getStageStartThreadNum(stage_name, thread_num);
+  if (stage_thread_num != start_thread_num) {
+    std::cout << "WARNING: " << stage_name << " will use " << stage_thread_num
+              << " threads, not the " << start_thread_num
+              << " reported at the start of the run: "
+              << (stage_thread_num < start_thread_num ? "less" : "more")
+              << " memory is available now (" << std::setprecision(4)
+              << avail_mem_in_gb << " GiB)." << std::endl;
+    std::cout << std::setprecision(6);
+  }
+  return stage_thread_num;
 }
 
 bool checkThreadNum(int thread_number, const std::string& prog) {
@@ -206,7 +267,7 @@ bool checkThreadNum(int thread_number, const std::string& prog) {
   }
   int total_thread_num = static_cast<int>(std::thread::hardware_concurrency());
   double total_mem_in_gb = mem_check::getTotalMemInGb();
-  double avail_mem_in_gb = mem_check::getAvailMemInGb();
+  double avail_mem_in_gb = mem_check::getStartupAvailMemInGb();
   std::cout << "Total thread number: " << total_thread_num << std::endl;
   std::cout << "Total memory: " << std::setprecision(4) << total_mem_in_gb
             << " GiB" << std::endl;
@@ -223,17 +284,19 @@ bool checkThreadNum(int thread_number, const std::string& prog) {
   }
   // in toppic and topmg, we automatically control thread numbers for
   // filtering, one budget per filtering stage: report the stages the
-  // available memory limits, and the number each one of them will use.
+  // available memory limits and the number each one of them will use. Each
+  // stage recomputes its number from the memory available when it starts,
+  // through getStageThreadNum, which reports the difference if there is one.
   if (filter_stage_list.find(prog) != filter_stage_list.end()) {
     std::vector<std::pair<std::string, int>> limited_stages;
-    for (const auto& stage : filter_stage_list.at(prog)) {
-      int stage_thread_num = getStageThreadNum(stage.second, thread_number);
+    for (const std::string& stage_name : filter_stage_list.at(prog)) {
+      int stage_thread_num = getStageStartThreadNum(stage_name, thread_number);
       if (stage_thread_num < thread_number) {
-        limited_stages.emplace_back(stage.first, stage_thread_num);
+        limited_stages.emplace_back(stage_name, stage_thread_num);
       }
     }
     if (!limited_stages.empty()) {
-      std::cout << "WARNING: Based on the available memory size, these protein"
+      std::cout << "WARNING: With the memory available now, these protein"
                 << " sequence filtering steps will use" << std::endl;
       std::cout << "WARNING: fewer than the " << thread_number
                 << " threads requested:" << std::endl;

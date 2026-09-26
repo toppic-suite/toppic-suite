@@ -24,15 +24,23 @@ namespace mem_check {
 
 int getMaxThreads(const std::string& app_name);
 
-// the thread number one filtering stage will use: its own memory budget,
-// lowered to the requested thread number. The filtering stages of toppic and
-// topmg and the warning of checkThreadNum all go through this function, so
-// that the reported and the used numbers cannot drift apart.
-int getStageThreadNum(const std::string& stage_entry, int thread_num);
+// The thread number one protein sequence filtering stage of toppic or topmg
+// will use: the stage's own memory budget applied to the memory available
+// now, lowered to the requested thread number. Call it where the stage
+// starts, and pass the stage's banner name: the returned number is the one
+// the stage uses, and the function reports it when the available memory has
+// moved it away from the number checkThreadNum reported for that stage at
+// the start of the run.
+int getStageThreadNum(const std::string& stage_name, int thread_num);
 
 double getTotalMemInGb();
 
 double getAvailMemInGb();
+
+// the available memory as it was when the run started (sampled once, at the
+// first call), the figure checkThreadNum prints and reports its per-stage
+// thread numbers from
+double getStartupAvailMemInGb();
 
 bool checkThreadNum(int thread_num, const std::string& prog);
 
