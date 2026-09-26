@@ -202,6 +202,94 @@ void MassMatch::fillColumnIndex(std::vector<std::vector<int>>& mass_2d,
   }
 }
 
+// The column index built range by range. Row r = (proteoform i, shift s)
+// contributes the entries (mass + shift, r) for its masses from the start
+// position on while 0 < mass + shift < col_num, in the order of the masses;
+// with nondecreasing masses those entries are one run of the row's masses,
+// and the part of the run that falls into a range of columns [c0, c1)
+// starts where the part for the previous range ended. The columns are
+// therefore processed in ranges of kColRangeWidth: a count pass and a fill
+// pass over the rows' runs in that range, whose counts and write pointers
+// stay in cache, and the running total of the entries gives the begins
+// and ends. The result is the same as two passes over all columns at once
+// (compColumnMatchNums, fillColumnIndex), whose random accesses to arrays
+// of col_num entries miss the cache on every entry.
+namespace {
+const int kColRangeWidth = 1 << 16;
+
+void buildColumnIndexByRange(const std::vector<std::vector<int>>& mass_2d,
+                             const std::vector<std::vector<int>>& shift_2d,
+                             const std::vector<std::vector<int>>& pos_2d,
+                             int col_num, int row_num,
+                             const std::vector<int>& proteo_row_begins,
+                             std::vector<int>& col_index_begins,
+                             std::vector<int>& col_index_ends,
+                             std::vector<int>& col_indexes) {
+  // each row's run: its current position and its end
+  std::vector<int> row_cur(row_num);
+  std::vector<int> row_end(row_num);
+  size_t entry_num = 0;
+  for (size_t i = 0; i < mass_2d.size(); i++) {
+    const std::vector<int>& masses = mass_2d[i];
+    for (size_t s = 0; s < shift_2d[i].size(); s++) {
+      int r = proteo_row_begins[i] + s;
+      int shift = shift_2d[i][s];
+      auto begin = masses.begin() + pos_2d[i][s];
+      // mass + shift > 0 and mass + shift < col_num
+      auto lo = std::lower_bound(begin, masses.end(), 1 - shift);
+      auto hi = std::lower_bound(lo, masses.end(), col_num - shift);
+      row_cur[r] = lo - masses.begin();
+      row_end[r] = hi - masses.begin();
+      entry_num += hi - lo;
+    }
+  }
+  col_index_begins.resize(col_num);
+  col_index_ends.resize(col_num);
+  col_indexes.resize(entry_num);
+
+  std::vector<int> counts(kColRangeWidth);
+  std::vector<int> pnts(kColRangeWidth);
+  std::vector<int> range_end(row_num);
+  int base = 0;
+  for (int c0 = 0; c0 < col_num; c0 += kColRangeWidth) {
+    int c1 = std::min(c0 + kColRangeWidth, col_num);
+    std::fill(counts.begin(), counts.begin() + (c1 - c0), 0);
+    for (size_t i = 0; i < mass_2d.size(); i++) {
+      const int* masses = mass_2d[i].data();
+      for (size_t s = 0; s < shift_2d[i].size(); s++) {
+        int r = proteo_row_begins[i] + s;
+        int shift = shift_2d[i][s];
+        int cur = row_cur[r];
+        int end = row_end[r];
+        while (cur < end && masses[cur] + shift < c1) {
+          counts[masses[cur] + shift - c0]++;
+          cur++;
+        }
+        range_end[r] = cur;
+      }
+    }
+    for (int c = c0; c < c1; c++) {
+      col_index_begins[c] = base;
+      pnts[c - c0] = base;
+      col_index_ends[c] = base + counts[c - c0] - 1;
+      base += counts[c - c0];
+    }
+    for (size_t i = 0; i < mass_2d.size(); i++) {
+      const int* masses = mass_2d[i].data();
+      for (size_t s = 0; s < shift_2d[i].size(); s++) {
+        int r = proteo_row_begins[i] + s;
+        int shift = shift_2d[i][s];
+        int end = range_end[r];
+        for (int cur = row_cur[r]; cur < end; cur++) {
+          col_indexes[pnts[masses[cur] + shift - c0]++] = r;
+        }
+        row_cur[r] = end;
+      }
+    }
+  }
+}
+}  // namespace
+
 void MassMatch::initIndexes(std::vector<std::vector<int>>& mass_2d,
                             std::vector<std::vector<double>>& float_shift_2d,
                             std::vector<std::vector<int>>& pos_2d) {
@@ -214,6 +302,15 @@ void MassMatch::initIndexes(std::vector<std::vector<int>>& mass_2d,
       break;
     }
   }
+  if (rows_nondecreasing_) {
+    buildColumnIndexByRange(mass_2d, shift_2d, pos_2d, col_num_, row_num_,
+                            proteo_row_begins_, col_index_begins_,
+                            col_index_ends_, col_indexes_);
+    LOG_DEBUG("indexes size: " << col_indexes_.size());
+    return;
+  }
+  // masses that are not nondecreasing (no index of the suite makes them):
+  // the two passes over all columns
   std::vector<int> col_match_nums(col_num_, 0);
   // no need to initialize
   std::vector<int> col_index_pnts(col_num_);
