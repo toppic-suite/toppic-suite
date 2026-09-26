@@ -17,6 +17,8 @@
 
 #include <limits>
 
+#include "common/base/mass_constant.hpp"
+
 #include "topfd/ecscore/score/comp_env_cnn_score.hpp"
 #include "topfd/envcnn/onnx_env_cnn.hpp"
 
@@ -371,24 +373,78 @@ inline bool regionsIntersect(const ReadRegion& a, const ReadRegion& b) {
          b.spec_lo <= a.spec_hi;
 }
 
-std::vector<ReadRegion> getReadRegions(const EnvCollPtr& coll_ptr) {
+// the m/z range of the theoretical envelope of one charge of this seed
+bool chargeMzRange(const SeedEnvPtr& seed_ptr, int charge, double* lo,
+                   double* hi) {
+  SeedEnvPtr charge_seed_ptr = std::make_shared<SeedEnv>(seed_ptr, charge);
+  EnvPeakPtrVec peaks = charge_seed_ptr->getPeakPtrList();
+  *lo = std::numeric_limits<double>::max();
+  *hi = std::numeric_limits<double>::lowest();
+  for (auto& peak_ptr : peaks) {
+    if (peak_ptr == nullptr) continue;
+    *lo = std::min(*lo, peak_ptr->getPosition());
+    *hi = std::max(*hi, peak_ptr->getPosition());
+  }
+  return *hi >= *lo;
+}
+
+// Everything a candidate's construction and scoring read, which is more than
+// the envelope sets it keeps: searchEnvSet walks max_miss_env_ spectra past
+// each end before it gives up, getEnvCollPtr probes max_miss_charge_ charges
+// past the last one it kept, and the EnvCNN input reaches 0.1 Dalton past the
+// theoretical peaks for its noise array.
+std::vector<ReadRegion> getReadRegions(const EnvCollPtr& coll_ptr,
+                                       const EcscoreParaPtr& para_ptr) {
   std::vector<ReadRegion> regions;
+  int spec_margin = para_ptr->max_miss_env_;
+  int min_charge = para_ptr->para_max_charge_;
+  int max_charge = para_ptr->para_min_charge_;
+  int spec_lo = std::numeric_limits<int>::max();
+  int spec_hi = std::numeric_limits<int>::lowest();
   for (auto& env_set_ptr : coll_ptr->getEnvSetList()) {
     if (env_set_ptr == nullptr) continue;
-    EnvPeakPtrVec peaks = env_set_ptr->getSeedPtr()->getPeakPtrList();
-    double lo = std::numeric_limits<double>::max();
-    double hi = std::numeric_limits<double>::lowest();
-    for (auto& peak_ptr : peaks) {
-      if (peak_ptr == nullptr) continue;
-      lo = std::min(lo, peak_ptr->getPosition());
-      hi = std::max(hi, peak_ptr->getPosition());
-    }
-    if (hi < lo) continue;
-    regions.push_back({lo - 0.1, hi + 0.1, env_set_ptr->getStartSpecId(),
-                       env_set_ptr->getEndSpecId()});
+    double lo, hi;
+    int charge = env_set_ptr->getSeedPtr()->getCharge();
+    if (!chargeMzRange(env_set_ptr->getSeedPtr(), charge, &lo, &hi)) continue;
+    regions.push_back({lo - 0.1, hi + 0.1,
+                       env_set_ptr->getStartSpecId() - spec_margin,
+                       env_set_ptr->getEndSpecId() + spec_margin});
+    min_charge = std::min(min_charge, charge);
+    max_charge = std::max(max_charge, charge);
+    spec_lo = std::min(spec_lo, env_set_ptr->getStartSpecId());
+    spec_hi = std::max(spec_hi, env_set_ptr->getEndSpecId());
+  }
+  if (regions.empty()) return regions;
+  // the charges the sweep probed and did not keep, and the half charge
+  // findEnvColl tests when the even and odd peaks are out of balance
+  SeedEnvPtr seed_ptr = coll_ptr->getSeedPtr();
+  std::vector<int> probed;
+  for (int charge = min_charge - para_ptr->max_miss_charge_;
+       charge <= max_charge + para_ptr->max_miss_charge_; charge++)
+    probed.push_back(charge);
+  probed.push_back(seed_ptr->getCharge() / 2);
+  probed.push_back(seed_ptr->getCharge() * 2);
+  for (int charge : probed) {
+    if (charge < para_ptr->para_min_charge_ ||
+        charge > para_ptr->para_max_charge_)
+      continue;
+    if (charge >= min_charge && charge <= max_charge) continue;
+    double lo, hi;
+    if (!chargeMzRange(seed_ptr, charge, &lo, &hi)) continue;
+    regions.push_back({lo - 0.1, hi + 0.1, spec_lo - spec_margin,
+                       spec_hi + spec_margin});
   }
   return regions;
 }
+
+// what an acceptance made during a batch can invalidate: the peaks it
+// removed, and the fact that it exists - a later candidate of the same mass
+// and overlapping retention time would have been merged into it
+struct BatchChange {
+  std::vector<ReadRegion> removed;
+  double mass;
+  int spec_lo, spec_hi;
+};
 
 // a candidate waiting for its batch to be scored
 struct ParkedCand {
@@ -396,7 +452,9 @@ struct ParkedCand {
   EnvCollPtr coll_ptr;
   std::vector<float> tensor;           // the EnvCNN input as of parking
   std::vector<ReadRegion> regions;
-  size_t removal_num;                  // removals made before it was parked
+  double mass;
+  int spec_lo, spec_hi;
+  size_t change_num;                   // changes made before it was parked
 };
 
 }  // namespace
@@ -479,13 +537,30 @@ void processMs1(const TopfdParaPtr& topfd_para_ptr) {
   // the candidates waiting to be scored, and the peak removals made since
   // the oldest of them was parked (issue #586)
   std::vector<ParkedCand> parked;
-  std::vector<ReadRegion> removals;
+  std::vector<BatchChange> changes;
   long batch_call_num = 0, cand_num = 0, rebuilt_num = 0;
 
   auto removePeaks = [&](const EnvCollPtr& coll_ptr) {
-    std::vector<ReadRegion> regions = getReadRegions(coll_ptr);
-    removals.insert(removals.end(), regions.begin(), regions.end());
+    changes.push_back({getReadRegions(coll_ptr, score_para_ptr),
+                       coll_ptr->getMonoNeutralMass(),
+                       coll_ptr->getStartSpecId(),
+                       coll_ptr->getEndSpecId()});
     coll_ptr->removePeakData(matrix_ptr);
+  };
+
+  // would this change have altered the candidate, by removing a peak it reads
+  // or by being a feature checkExistingFeatures would have merged it into?
+  auto disturbs = [&](const BatchChange& change, const ParkedCand& cand) {
+    for (const auto& removed : change.removed)
+      for (const auto& region : cand.regions)
+        if (regionsIntersect(removed, region)) return true;
+    double isotope_mass = mass_constant::getIsotopeMass();
+    double tole = score_para_ptr->match_feature_ppm_tolerance_ * cand.mass;
+    for (int shift = -1; shift <= 1; shift++)
+      if (std::abs(cand.mass + shift * isotope_mass - change.mass) < tole &&
+          cand.spec_lo <= change.spec_hi && change.spec_lo <= cand.spec_hi)
+        return true;
+    return false;
   };
 
   // score the parked candidates in one call and apply them in parking order
@@ -501,12 +576,8 @@ void processMs1(const TopfdParaPtr& topfd_para_ptr) {
     for (size_t i = 0; i < parked.size(); i++) {
       ParkedCand& cand = parked[i];
       bool stale = false;
-      for (size_t r = cand.removal_num; r < removals.size() && !stale; r++)
-        for (const auto& region : cand.regions)
-          if (regionsIntersect(removals[r], region)) {
-            stale = true;
-            break;
-          }
+      for (size_t c = cand.change_num; c < changes.size() && !stale; c++)
+        stale = disturbs(changes[c], cand);
       EnvCollPtr env_coll_ptr = cand.coll_ptr;
       double envcnn_score = batch_scores[i];
       if (stale) {
@@ -541,7 +612,7 @@ void processMs1(const TopfdParaPtr& topfd_para_ptr) {
       ecscore_list.push_back(ecscore_ptr);
     }
     parked.clear();
-    removals.clear();
+    changes.clear();
   };
 
   for (int seed_env_idx = 0; seed_env_idx < seed_num; seed_env_idx++) {
@@ -570,7 +641,10 @@ void processMs1(const TopfdParaPtr& topfd_para_ptr) {
     parked.push_back({orig_seed_ptr, env_coll_ptr,
                       comp_env_cnn_score::getEnvcnnTensor(matrix_ptr,
                                                           env_coll_ptr),
-                      getReadRegions(env_coll_ptr), removals.size()});
+                      getReadRegions(env_coll_ptr, score_para_ptr),
+                      env_coll_ptr->getMonoNeutralMass(),
+                      env_coll_ptr->getStartSpecId(),
+                      env_coll_ptr->getEndSpecId(), changes.size()});
     if (parked.size() >= kEnvcnnBatchSize) flushBatch();
   }
   flushBatch();
