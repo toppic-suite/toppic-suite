@@ -82,7 +82,7 @@ fall back to in-memory indexes.
 | `-d`, `--decoy` | off | Also index a shuffled decoy database. |
 | `-e`, `--frag-error-tolerance <int>` | 10 | Error tolerance of fragment masses (ppm). |
 | `-E`, `--prec-error-tolerance <int>` | 10 | Error tolerance of precursor masses (ppm). |
-| `-u`, `--thread-number <int>` | 1 | Number of threads; database blocks are processed in parallel. Must not exceed the number of hardware threads. Each thread needs about 0.5 GiB of memory; TopIndex warns (but still runs) when the machine has too little for the requested number. |
+| `-u`, `--thread-number <int>` | 1 | Number of threads; database blocks are processed in parallel. Must not exceed the number of hardware threads. Each thread needs about 0.5 GiB of memory; TopIndex warns (but still runs) when the machine has too little for the requested number. The build is limited by memory and disk bandwidth rather than by cores, so more threads than physical cores gain nothing (on an 8-core machine, `-u 8` was faster than `-u 16`). |
 
 
 ## 5. Example
