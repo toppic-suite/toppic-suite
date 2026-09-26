@@ -67,6 +67,9 @@ std::string geneTopfdCommand(const TopfdParaPtr& para_ptr,
   } else if (para_ptr->isSql3d()) {
     command = command + "-D ";
   }
+  if (para_ptr->isUseFlashDeconv()) {
+    command = command + "-F ";
+  }
   for (size_t i = 0; i < spec_file_lst.size(); i++) {
     command = command + spec_file_lst[i] + " ";
   }

@@ -162,7 +162,7 @@ bool Argument::parse(int argc, char* argv[]) {
         "Deconvolute a single MS/MS spectrum given as a text peak list: one "
         "peak per line, m/z and intensity separated by a space. The output "
         "files are named after the input file.")(
-        "ms2-flashdeconv",
+        "ms2-flashdeconv,F",
         "Deconvolute the MS/MS spectra with the FLASHDeconv algorithm instead "
         "of TopFD's own (experimental).");
 
