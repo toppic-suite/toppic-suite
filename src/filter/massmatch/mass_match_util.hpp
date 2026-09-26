@@ -23,6 +23,26 @@ namespace toppic {
 
 namespace mass_match_util {
 
+// Whether an index read from a file was built at a filter's column limits
+// (the largest proteoform mass and the scale of the integer masses).
+bool hasFilterLimits(const MassMatchPtr& index_ptr, int max_proteoform_mass,
+                     int filter_scale);
+
+// Prints, once per run, that the index file does not have the filter's
+// limits and that the filter builds its indexes in memory instead.
+void warnIndexLimits(const std::string& file_name,
+                     const MassMatchPtr& index_ptr, int max_proteoform_mass,
+                     int filter_scale);
+
+// Prints, once per run, that the index directory holds the files of an
+// earlier version, which wrote the diagonal index the one-shift and
+// multiple-shift filters share as one_ptm_diag_index and multi_ptm_index
+// instead of ptm_diag_index (suffix: the parameter and block part of the
+// file names), so that those filters build their indexes in memory.
+// Prints nothing when neither old file exists.
+void warnOldIndexLayout(const std::string& index_dir,
+                        const std::string& suffix);
+
 ProtCandidatePtrVec findZeroShiftTopProteins(std::vector<short>& scores,
                                              std::vector<short>& rev_scores,
                                              const MassMatchPtr& index_ptr,

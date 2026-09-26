@@ -34,22 +34,29 @@ TopMG do the same when given the original file, so they find the indexes.
    proteins whose accessions start with `DECOY_`), its block files and block
    index, and its `.fai` index for random access. These are the same files
    TopPIC and TopMG create when they run without an index.
-3. Writes three families of index files, one file per index name and
+3. Writes two families of index files, one file per index name and
    database block, in one pass over the blocks (`Generating index files`);
    blocks are processed in parallel on the `-u` threads:
    - the zero-shift indexes `zero_ptm_term_index`, `zero_ptm_diag_index`,
      `zero_ptm_rev_term_index` and `zero_ptm_rev_diag_index`, used by
      TopPIC's zero-shift and variable-PTM filters, cover proteoform masses
      up to 100 kDa;
-   - the one-shift indexes `one_ptm_term_index`, `one_ptm_diag_index`,
+   - the one-shift indexes `one_ptm_term_index`, `ptm_diag_index`,
      `one_ptm_rev_term_index` and `one_ptm_rev_diag_index`, used by TopPIC's
      one-shift filter and TopMG's ASF-One PTM filter, are the zero-shift
      indexes cut at 50 kDa, so each is written from the index just built
-     rather than built a second time;
-   - `multi_ptm_index`, used by TopPIC's multiple-shift filter and TopMG's
-     ASF-Diagonal filter, is the same index as `one_ptm_diag_index`, so it is
-     written as a hard link to that file (a copy on file systems without
-     hard links); `du` counts the pair once.
+     rather than built a second time. `ptm_diag_index` is also the index of
+     TopPIC's multiple-shift filter and TopMG's ASF-Diagonal filter, which
+     read the same file; there is no separate multiple-shift index file.
+
+   Index directories written by earlier versions hold that index twice, as
+   `one_ptm_diag_index` and `multi_ptm_index`. The searches do not read
+   those names: their zero-shift and variable-PTM filters still use such a
+   directory, but the one-shift and multiple-shift filters build their
+   indexes in memory and print a warning. Either run TopIndex again on the
+   directory (it rewrites the index files and leaves the two old names in
+   place, which can be deleted) or rename the `one_ptm_diag_index` files to
+   `ptm_diag_index` and delete the `multi_ptm_index` files.
 
 Each file name carries the parameters the index depends on, in the form
 `<family>_<fixed mod>_<N-terminal forms>_<error tolerance>_<no_decoy|decoy><block>`,
@@ -67,9 +74,9 @@ Indexes built with other settings are ignored silently, and the search
 builds its own in memory. TopIndex skips database files that already exist,
 so several parameter sets can be indexed into the same `_idx` directory.
 
-The index files are large: roughly ten thousand times the size of the FASTA
-file, spread over the three families, and about twice as much with
-`--decoy`. A few-megabyte database can produce tens of gigabytes of index
+The index files are large: roughly seven thousand times the size of the
+FASTA file, spread over the two families, and about twice as much with
+`--decoy` (184 GB for the 14 MB human SwissProt database with `--decoy`). A few-megabyte database can produce tens of gigabytes of index
 files. Delete the `_idx` directory to reclaim the space; the searches then
 fall back to in-memory indexes.
 

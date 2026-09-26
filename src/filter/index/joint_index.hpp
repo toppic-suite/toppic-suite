@@ -16,7 +16,6 @@
 #ifndef TOPPIC_FILTER_INDEX_JOINT_INDEX_HPP_
 #define TOPPIC_FILTER_INDEX_JOINT_INDEX_HPP_
 
-#include "filter/mng/diag_filter_mng.hpp"
 #include "filter/mng/one_ptm_filter_mng.hpp"
 #include "filter/mng/zero_ptm_filter_mng.hpp"
 
@@ -24,19 +23,18 @@ namespace toppic {
 
 namespace joint_index {
 
-// Writes the zero-shift, one-shift and multiple-shift index files of every
-// database block in one pass over the blocks. Each of the four kinds of
-// index (N-terminal, PRM diagonal, C-terminal, SRM diagonal) is built once
-// per block at the zero-shift column limit and written as the zero-shift
-// file; its truncation to the one-shift limit is the one-shift index of the
-// same kind (MassMatch::canTruncateColumns), written next; and the
-// multiple-shift index is the one-shift diagonal index under another name,
-// linked to it (diag_index::linkOnePtmDiagIndex). When the managers' limits
-// do not allow the truncation, the three stage processes run one after the
-// other as before.
+// Writes the zero-shift and one-shift index files of every database block
+// in one pass over the blocks. Each of the four kinds of index (N-terminal,
+// PRM diagonal, C-terminal, SRM diagonal) is built once per block at the
+// zero-shift column limit and written as the zero-shift file; its
+// truncation to the one-shift limit is the one-shift index of the same
+// kind (MassMatch::canTruncateColumns), written next. The one-shift PRM
+// diagonal file, ptm_diag_index, is also the multiple-shift filter's index
+// (see filter/mng/ptm_diag_index.hpp), so no further family is written.
+// When the managers' limits do not allow the truncation, the two stage
+// processes run one after the other as before.
 void process(const ZeroPtmFilterMngPtr& zero_mng_ptr,
-             const OnePtmFilterMngPtr& one_mng_ptr,
-             const DiagFilterMngPtr& diag_mng_ptr);
+             const OnePtmFilterMngPtr& one_mng_ptr);
 
 }  // namespace joint_index
 
