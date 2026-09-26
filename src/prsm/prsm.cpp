@@ -19,6 +19,7 @@
 
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
+#include "common/util/version.hpp"
 #include "common/xml/xml_dom_util.hpp"
 #include "ms/factory/extend_ms_factory.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
@@ -111,6 +112,9 @@ XmlDOMElement Prsm::toXmlElement(XmlDOMDocument* xml_doc,
                                  XmlDOMElement parent) {
   std::string element_name = Prsm::getXmlElementName();
   XmlDOMElement element = xml_doc->addElement(parent, element_name.c_str());
+  // the version of TopPIC Suite that wrote the PrSM; the readers refuse a
+  // PrSM of another version (PrsmReader::readOnePrsmStr)
+  xml_doc->addElement(element, "version", Version::getVersion().c_str());
   xml_doc->addElement(element, "file_name", file_name_.c_str());
   std::string str = std::to_string(prsm_id_);
   xml_doc->addElement(element, "prsm_id", str.c_str());

@@ -644,12 +644,15 @@ of the same protein within `--error-tolerance` and 0.3 aligned apex time
   of one result set: 14.8 s -> 2.4 s; two samples: 0.56 s -> 0.17 s, most
   of it now the XML reading. `initCells` used to leave cell (0, b_size)
   uninitialized (fixed; no output change on that data).
-- **Result files of earlier versions are refused**, not parsed:
-  `PrsmReader::readOnePrsmStr` exits with "was written by an earlier
-  version of TopPIC Suite and cannot be read by this version" when a PrSM
-  has no `match_exp_frag_num` line (1.9 wrote `match_peak_num` /
+- **Result files of other versions are refused**, not parsed: every
+  `<prsm>` starts with a `<version>` element (`Prsm::toXmlElement`,
+  `Version::getVersion()`), and `PrsmReader::readOnePrsmStr` exits with
+  "was written by version X of TopPIC Suite and cannot be read by this
+  version" when it differs from the running version, or "by an earlier
+  version" when it is absent (1.9 and earlier wrote `match_peak_num` /
   `match_fragment_num` and no `rt`; `PrsmStr` threw `std::invalid_argument`
-  on them). Every tool that reads PrSM files gets this check.
+  on them). Every tool that reads PrSM files gets this check; a result
+  file needs the search rerun after a version change.
 - The console prints `Aligning retention times of sample <k>` and
   `Matching proteoforms across samples` as started/finished steps (the
   manual lists them); the table is written next to the **first** input

@@ -109,11 +109,13 @@ A sample in which the proteoform was not found has five empty fields.
 | `-o`, `--output <name>` | sample_diff.tsv | Name of the output table, written next to the first spectrum file. |
 
 TopDiff stops with an error when fewer than two spectrum files are given,
-when one of them does not exist, or when a result file was written by an
-earlier version of TopPIC Suite (`The result file ... was written by an
-earlier version of TopPIC Suite and cannot be read by this version`): the
-tools of one version read only the result files of that version, so the
-samples must be searched again with the current TopPIC or TopMG.
+when one of them does not exist, or when a result file was written by
+another version of TopPIC Suite (`The result file ... was written by
+version 2.0.0.0 of TopPIC Suite and cannot be read by this version`; files
+of 1.9 and earlier carry no version and are reported as "an earlier
+version"): every PrSM of a result file records the version that wrote it,
+the tools of one version read only the result files of that version, so
+the samples must be searched again with the current TopPIC or TopMG.
 
 ## 5. Example
 
