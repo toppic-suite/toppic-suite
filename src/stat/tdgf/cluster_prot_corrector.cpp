@@ -15,13 +15,16 @@
 
 #include "stat/tdgf/cluster_prot_corrector.hpp"
 
+#include <chrono>
 #include <cstddef>
 #include <map>
 #include <memory>
 #include <string>
+#include <thread>
 #include <vector>
 
 #include "common/base/mod.hpp"
+#include "common/thread/simple_thread_pool.hpp"
 #include "common/util/file_util.hpp"
 #include "ms/factory/spectrum_set_factory.hpp"
 #include "ms/spec/msalign_reader.hpp"
@@ -84,6 +87,17 @@ int process(const PrsmParaPtr& prsm_para_ptr, const TdgfMngPtr& tdgf_mng_ptr,
         sp_file_name, prsm_para_ptr->getGroupSpecNum(),
         sp_para_ptr->getActivationPtr(), sp_para_ptr->getEnvCnnCutoff(),
         sp_para_ptr->getFragDedupPpo());
+    // The E-value dynamic programs ran one after another on this thread
+    // while the pool sat idle (8.5 s of the stage's 18 s on the 480
+    // benchmark, toppic_test experiment 66); they now run as one task per
+    // spectrum, like the E-value stage's own pool. The tasks are
+    // independent: a PrSM belongs to one spectrum, so the sets they write
+    // E-values into are disjoint, and the proteoform reads are the same
+    // sharing the E-value stage's tasks already do. The output file is
+    // written after the pool drains, from prsm_ptrs in its original order,
+    // so the result is byte-identical.
+    SimpleThreadPoolPtr pool_ptr =
+        std::make_shared<SimpleThreadPool>(tdgf_mng_ptr->thread_num_);
     DeconvMsPtrVec deconv_ms_ptr_vec = ms_reader_ptr->getNextMsPtrVec();
     while (deconv_ms_ptr_vec.size() != 0) {
       MsHeaderPtr header_ptr = deconv_ms_ptr_vec[0]->getMsHeaderPtr();
@@ -108,12 +122,21 @@ int process(const PrsmParaPtr& prsm_para_ptr, const TdgfMngPtr& tdgf_mng_ptr,
             prsm_ptr->setProteoformPtr(form_ptr, sp_para_ptr);
             sele_prsm_ptrs.push_back(prsm_ptr);
           }
-          evalue_processor->compEvalues(spec_set_ptr, sele_prsm_ptrs, ppo,
-                                        false);
+          while (pool_ptr->getQueueSize() >=
+                 static_cast<std::size_t>(tdgf_mng_ptr->thread_num_) + 2) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+          }
+          pool_ptr->enqueue([evalue_processor, spec_set_ptr, sele_prsm_ptrs,
+                             ppo]() mutable {
+            evalue_processor->compEvaluesThreadLocal(spec_set_ptr,
+                                                     sele_prsm_ptrs, ppo,
+                                                     false);
+          });
         }
       }
       deconv_ms_ptr_vec = ms_reader_ptr->getNextMsPtrVec();
     }
+    pool_ptr->shutDown();
   }
 
   PrsmXmlWriter writer(base_name + "." + output_file_ext);

@@ -18,6 +18,8 @@
 #include <cmath>
 #include <cstddef>
 #include <limits>
+#include <map>
+#include <mutex>
 
 #include "common/thread/simple_thread_pool.hpp"
 #include "common/util/file_util.hpp"
@@ -32,10 +34,56 @@
 
 namespace toppic {
 
+namespace {
+// CountTestNum is a deterministic pure function of these parameters (a full
+// target+decoy database scan, about 9 s on the human database with a decoy),
+// and one toppic -s 2 run used to build the identical object three times:
+// the first-pass E-value computation, the multiple-shift E-value computation
+// and the cluster protein correction. It is immutable after construction and
+// already shared read-only across the worker threads of one stage, so one
+// instance serves all three consumers; reuse changes no arithmetic, order or
+// tie-break (toppic_test experiment 66). The key holds every input the
+// constructor reads: its three numeric parameters and, from PrsmPara, the
+// search database file and the fixed/N-terminal modification lists (each
+// pipeline step builds its own PrsmPara object from the same arguments, so
+// the key must compare values, not the PrsmPara pointer).
+std::mutex count_test_num_cache_mutex;
+std::map<std::string, CountTestNumPtr> count_test_num_cache;
+
+std::string countTestNumKey(const TdgfMngPtr& mng_ptr) {
+  const PrsmParaPtr& para_ptr = mng_ptr->prsm_para_ptr_;
+  std::string key = std::to_string(mng_ptr->convert_ratio_) + "|" +
+                    std::to_string(mng_ptr->max_ptm_mass_) + "|" +
+                    std::to_string(mng_ptr->max_prec_mass_) + "|" +
+                    para_ptr->getSearchDbFileNameWithFolder() + "|";
+  for (const ModPtr& mod_ptr : para_ptr->getFixModPtrVec()) {
+    key += mod_ptr->getOriResiduePtr()->toString() + ">" +
+           mod_ptr->getModResiduePtr()->toString() + ",";
+  }
+  key += "|";
+  for (const ProtModPtr& prot_mod_ptr : para_ptr->getProtModPtrVec()) {
+    key += prot_mod_ptr->getName() + ",";
+  }
+  return key;
+}
+}  // namespace
+
 void EValueProcessor::init() {
-  test_num_ptr_ = std::make_shared<CountTestNum>(
-      mng_ptr_->convert_ratio_, mng_ptr_->max_ptm_mass_,
-      mng_ptr_->max_prec_mass_, mng_ptr_->prsm_para_ptr_);
+  const std::string key = countTestNumKey(mng_ptr_);
+  {
+    std::lock_guard<std::mutex> lock(count_test_num_cache_mutex);
+    auto it = count_test_num_cache.find(key);
+    if (it != count_test_num_cache.end()) {
+      test_num_ptr_ = it->second;
+    }
+  }
+  if (test_num_ptr_ == nullptr) {
+    test_num_ptr_ = std::make_shared<CountTestNum>(
+        mng_ptr_->convert_ratio_, mng_ptr_->max_ptm_mass_,
+        mng_ptr_->max_prec_mass_, mng_ptr_->prsm_para_ptr_);
+    std::lock_guard<std::mutex> lock(count_test_num_cache_mutex);
+    count_test_num_cache[key] = test_num_ptr_;
+  }
 
   ResFreqPtrVec residue_freqs = test_num_ptr_->getResFreqPtrVec();
   comp_pvalue_ptr_ = std::make_shared<CompPValueArray>(test_num_ptr_, mng_ptr_);
@@ -196,13 +244,9 @@ bool EValueProcessor::checkPrsms(const PrsmPtrVec& prsm_ptrs) {
   return true;
 }
 
-void EValueProcessor::compEvalues(const SpectrumSetPtr& spec_set_ptr,
-                                  PrsmPtrVec& sele_prsm_ptrs, double ppo,
-                                  bool is_separate) {
-  comp_pvalue_ptr_->process(spec_set_ptr, sele_prsm_ptrs, ppo, is_separate);
-
-  // if matched peak number is too small or E-value is 0, replace it
-  // with a max evalue.
+// if matched peak number is too small or E-value is 0, replace it
+// with a max evalue.
+void EValueProcessor::fixupEvalues(PrsmPtrVec& sele_prsm_ptrs) {
   for (unsigned i = 0; i < sele_prsm_ptrs.size(); i++) {
     if (std::round(sele_prsm_ptrs[i]->getMatchTheoFragNum()) <=
         std::round(mng_ptr_->comp_evalue_min_match_theo_frag_num_)) {
@@ -216,6 +260,30 @@ void EValueProcessor::compEvalues(const SpectrumSetPtr& spec_set_ptr,
       }
     }
   }
+}
+
+void EValueProcessor::compEvalues(const SpectrumSetPtr& spec_set_ptr,
+                                  PrsmPtrVec& sele_prsm_ptrs, double ppo,
+                                  bool is_separate) {
+  comp_pvalue_ptr_->process(spec_set_ptr, sele_prsm_ptrs, ppo, is_separate);
+  fixupEvalues(sele_prsm_ptrs);
+}
+
+void EValueProcessor::compEvaluesThreadLocal(const SpectrumSetPtr& spec_set_ptr,
+                                             PrsmPtrVec& sele_prsm_ptrs,
+                                             double ppo, bool is_separate) {
+  // one CompPValueArray per worker thread, exactly as geneTask above: its
+  // CompProbValue tables are large and not shareable between threads
+  static thread_local CompPValueArrayPtr comp_pvalue_ptr;
+  static thread_local const CountTestNum* comp_pvalue_built_for = nullptr;
+  if (comp_pvalue_ptr == nullptr ||
+      comp_pvalue_built_for != test_num_ptr_.get()) {
+    comp_pvalue_ptr = std::make_shared<CompPValueArray>(test_num_ptr_,
+                                                        mng_ptr_);
+    comp_pvalue_built_for = test_num_ptr_.get();
+  }
+  comp_pvalue_ptr->process(spec_set_ptr, sele_prsm_ptrs, ppo, is_separate);
+  fixupEvalues(sele_prsm_ptrs);
 }
 
 }  // namespace toppic

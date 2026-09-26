@@ -34,6 +34,14 @@ class EValueProcessor {
   void compEvalues(const SpectrumSetPtr& spectrum_set_ptr,
                    PrsmPtrVec& sele_prsm_ptrs, double ppo, bool is_separate);
 
+  // compEvalues through a per-worker-thread CompPValueArray (the same
+  // pattern the process() thread pool uses), for callers that run one
+  // spectrum's E-values per pool task. Safe to call concurrently for
+  // disjoint PrSM sets.
+  void compEvaluesThreadLocal(const SpectrumSetPtr& spectrum_set_ptr,
+                              PrsmPtrVec& sele_prsm_ptrs, double ppo,
+                              bool is_separate);
+
  private:
   TdgfMngPtr mng_ptr_;
 
@@ -42,6 +50,8 @@ class EValueProcessor {
   CompPValueArrayPtr comp_pvalue_ptr_;
 
   bool checkPrsms(const PrsmPtrVec& prsm_ptrs);
+
+  void fixupEvalues(PrsmPtrVec& sele_prsm_ptrs);
 };
 
 using EValueProcessorPtr = std::shared_ptr<EValueProcessor>;
