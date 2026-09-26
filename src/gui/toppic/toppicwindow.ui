@@ -633,10 +633,38 @@ li.checked::marker { content: &quot;\2612&quot;; }
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="horizontalLayoutWidget_25">
+     <widget class="QWidget" name="horizontalLayoutWidget_30">
       <property name="geometry">
        <rect>
         <x>10</x>
+        <y>210</y>
+        <width>451</width>
+        <height>33</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_30">
+       <item>
+        <widget class="QCheckBox" name="postMassMatchCheckBox">
+         <property name="minimumSize">
+          <size>
+           <width>120</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>After the search, match the theoretical fragment masses of each PrSM that no deconvoluted mass matched against the centroided MS/MS peaks in the TopFD SQLite database (run TopFD with the SQLite database output enabled), and add the matched masses to the spectra.</string>
+         </property>
+         <property name="text">
+          <string>Post mass matching (needs the TopFD SQLite database)</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="horizontalLayoutWidget_25">
+      <property name="geometry">
+       <rect>
+        <x>480</x>
         <y>210</y>
         <width>391</width>
         <height>33</height>
@@ -1289,34 +1317,6 @@ level:</string>
          </property>
          <property name="text">
           <string>Spectrum files with average masses (TopFD --average-mass)</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="horizontalLayoutWidget_30">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>348</y>
-        <width>451</width>
-        <height>33</height>
-       </rect>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_30">
-       <item>
-        <widget class="QCheckBox" name="postMassMatchCheckBox">
-         <property name="minimumSize">
-          <size>
-           <width>120</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="toolTip">
-          <string>After the search, match the theoretical fragment masses of each PrSM that no deconvoluted mass matched against the centroided MS/MS peaks in the TopFD SQLite database (run TopFD with the SQLite database output enabled), and add the matched masses to the spectra.</string>
-         </property>
-         <property name="text">
-          <string>Post mass matching (needs the TopFD SQLite database)</string>
          </property>
         </widget>
        </item>
