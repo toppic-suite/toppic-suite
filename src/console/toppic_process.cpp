@@ -246,6 +246,17 @@ int TopPIC_identify(std::map<std::string, std::string>& arguments) {
       filter_thread_num = thread_num;
     }
     LOG_DEBUG("Filter thread number " << filter_thread_num);
+    // With the block indexes loading in parallel, every zero-shift filter
+    // worker holds its full ~0.95 GB block at once, so that stage gets a
+    // budget matching its true residency (mem_check.cpp); the thread count
+    // cannot change the output - each (spectrum, block) score is a pure
+    // function of the index and the spectrum, and the in-memory block
+    // combiner is order-independent (toppic_test reports 0022/0066).
+    int zero_filter_thread_num = mem_check::getMaxThreads("zero_shift_filter");
+    if (zero_filter_thread_num > thread_num) {
+      zero_filter_thread_num = thread_num;
+    }
+    LOG_DEBUG("Zero-shift filter thread number " << zero_filter_thread_num);
 
     // var_ptm_type number is used for E-value computation
     int var_ptm_type_num = 0;
@@ -274,7 +285,7 @@ int TopPIC_identify(std::map<std::string, std::string>& arguments) {
     std::cout << "Zero unexpected shift filtering - started." << std::endl;
     ZeroPtmFilterMngPtr zero_filter_mng_ptr =
         std::make_shared<ZeroPtmFilterMng>(prsm_para_ptr, index_file_para,
-                                           filter_thread_num,
+                                           zero_filter_thread_num,
                                            "toppic_zero_filter");
     zero_ptm_filter_processor::process(zero_filter_mng_ptr);
     std::cout << "Zero unexpected shift filtering - finished." << std::endl;

@@ -52,6 +52,14 @@ const std::map<std::string, double> memory_per_thread_list{
     {"topmg", 1.0},
     // zero or one shift filter memory requirement per thread: about 0.75 gb
     {"zero_one_shift_filter", 1.0},
+    // the zero-shift filter's four block index files are about 0.95 gb per
+    // thread, and with the block loads running in parallel every worker
+    // holds its full block at once (serialized loading used to keep several
+    // workers empty-handed at any moment, which is what the shared 1.0 gb
+    // estimate was calibrated against): budgeting the true residency keeps
+    // the stage's peak memory inside the machine (toppic_test experiment 66
+    // measured 14.0 gb peak at 12 threads on a 14 gb machine without this)
+    {"zero_shift_filter", 1.25},
     // diag filter memory requirement per thread: about 0.4 gb
     {"diag_filter", 0.5}};
 
