@@ -34,6 +34,11 @@ The GUI tools (`topfd_gui`, `topdia_gui`, `topindex_gui`, `toppic_gui`,
 `topmg_gui`, `topdiff_gui`) offer the same options as the command-line tools
 and run them.
 
+Claude Code loads the skills in `.claude/skills/` automatically when it is
+started in this repository: `tools` for running the command-line tools and
+reading their outputs, `compile` for building and installing the suite, and
+`repo` for publishing the private repository to the public one.
+
 **TopMSV** (Top-down Mass Spectrometry Visualization) is the web-based
 viewer for TopPIC Suite results. It reads the SQLite database written by
 TopFD and TopPIC and shows the MS1 and MS/MS spectra with their
