@@ -175,9 +175,9 @@ same file format as TopPIC). Needs `sample_ms2.feature` unless `-x`;
 `-P` max variable PTMs 5, `-j` graph gap 40, `-G` PTMs per gap 5, `-s`
 unexpected shifts 0, `-M` max shift 500, `-D` add the ASF-Diagonal filter,
 `-w` whole proteins only, plus the same `-f -n -d -a -e -E -F -p -x`, cutoff,
-`-c`, `-u`, `-k`, `-K` options as TopPIC, except that `-F` still defaults
-to 0.2 where TopPIC now uses 0.4. PrSMs with fewer than four
-matched fragments get the maximum E-value.
+`-c`, `-u`, `-k`, `-K` options as TopPIC, `-F` EnvCNN filter 0.4 as in
+TopPIC. PrSMs with fewer than four matched fragments get the maximum
+E-value.
 
 ## topdiff
 

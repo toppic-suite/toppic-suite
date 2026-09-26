@@ -694,7 +694,9 @@ above it, never the reverse:
 - `src/ms` — mass-spectrum layer: `spec` (peaks/spectra/msalign), `msmap`,
   `factory`, `env` (envelope detection), `feature`, `mzml`.
   `MsAlignReader` has a four-argument constructor taking an EnvCNN score
-  cutoff (`SpPara::getEnvCnnCutoff()`, default 0.2): masses whose fourth
+  cutoff (`SpPara::getEnvCnnCutoff()`, whose own default is 0.2, but both
+  toppic and topmg set the key from their `-F`, which defaults to 0.4 in
+  each): masses whose fourth
   msalign column is below it are skipped, keeping the file's peak ids. The
   filter, search and E-value/p-value stages (`filter/*`, `search/*`,
   `stat/tdgf`, `stat/mcmc`, `search/graph/spec_graph_reader`) construct their

@@ -787,7 +787,7 @@ level:</string>
        <item>
         <widget class="QLineEdit" name="envCnnCutoffEdit">
          <property name="text">
-          <string>0.2</string>
+          <string>0.4</string>
          </property>
         </widget>
        </item>
