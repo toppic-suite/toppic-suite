@@ -15,14 +15,19 @@
 
 #include "prsm/prsm_reader.hpp"
 
+#include <cstdlib>
+
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
+#include "common/util/version.hpp"
 #include "common/xml/xml_dom_document.hpp"
 #include "common/xml/xml_dom_parser.hpp"
+#include "prsm/prsm_util.hpp"
 
 namespace toppic {
 
 PrsmReader::PrsmReader(const std::string& file_name) {
+  file_name_ = file_name;
   input_.open(file_name.c_str(), std::ios::in);
 }
 
@@ -60,6 +65,18 @@ PrsmStrPtr PrsmReader::readOnePrsmStr() {
   std::vector<std::string> prsm_str_vec = readOnePrsmLines();
   if (prsm_str_vec.size() == 0) {
     return PrsmStrPtr(nullptr);
+  }
+  // Result files of TopPIC Suite 1.9 and earlier name the matched numbers
+  // match_peak_num / match_fragment_num and have no rt element; PrsmStr
+  // would fail on them with an uncaught std::invalid_argument. The tools of
+  // this version read only the result files this version writes.
+  if (prsm_util::getXmlLine(prsm_str_vec, "<match_exp_frag_num>") == "") {
+    LOG_ERROR("The result file "
+              << file_name_
+              << " was written by an earlier version of TopPIC Suite and "
+                 "cannot be read by this version (" << Version::getVersion()
+              << "). Run the database search again with this version.");
+    exit(EXIT_FAILURE);
   }
   return std::make_shared<PrsmStr>(prsm_str_vec);
 }
