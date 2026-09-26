@@ -207,6 +207,13 @@ void MassMatch::initIndexes(std::vector<std::vector<int>>& mass_2d,
                             std::vector<std::vector<int>>& pos_2d) {
   std::vector<std::vector<int>> shift_2d = convertToInt(float_shift_2d, scale_);
   LOG_DEBUG("column num " << col_num_);
+  rows_nondecreasing_ = true;
+  for (size_t i = 0; i < mass_2d.size(); i++) {
+    if (!std::is_sorted(mass_2d[i].begin(), mass_2d[i].end())) {
+      rows_nondecreasing_ = false;
+      break;
+    }
+  }
   std::vector<int> col_match_nums(col_num_, 0);
   // no need to initialize
   std::vector<int> col_index_pnts(col_num_);
@@ -231,6 +238,28 @@ void MassMatch::initIndexes(std::vector<std::vector<int>>& mass_2d,
 void MassMatch::initColIndexBounds() {
   col_index_bounds_ = col_index_begins_;
   col_index_bounds_.push_back(static_cast<int>(col_indexes_.size()));
+}
+
+bool MassMatch::canTruncateColumns(double max_proteoform_mass) const {
+  int col_num = max_proteoform_mass * scale_;
+  return rows_nondecreasing_ && col_num >= 0 && col_num <= col_num_;
+}
+
+void MassMatch::truncateColumns(double max_proteoform_mass) {
+  if (!canTruncateColumns(max_proteoform_mass)) {
+    LOG_ERROR("The index cannot be truncated to the proteoform mass "
+              << max_proteoform_mass);
+    exit(EXIT_FAILURE);
+  }
+  // the same conversion as the constructor's
+  int col_num = max_proteoform_mass * scale_;
+  // the entries of the columns below col_num come first
+  int entry_num = col_index_bounds_[col_num];
+  col_index_begins_.resize(col_num);
+  col_index_ends_.resize(col_num);
+  col_indexes_.resize(entry_num);
+  col_num_ = col_num;
+  initColIndexBounds();
 }
 
 void MassMatch::compScores(

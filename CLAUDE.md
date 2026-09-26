@@ -787,12 +787,22 @@ above it, never the reverse:
   `diag_index` each build, per database block, `MassMatch` objects from the
   same factory calls with only the manager's `max_proteoform_mass_` /
   `filter_scale_` differing (zero-shift 100000/100, one-shift and diagonal
-  50000/100). The diagonal stage's `multi_ptm_index` is therefore the same
-  bytes as the one-shift stage's `one_ptm_diag_index`, and `diag_index::process`
-  hard-links (or copies) that file instead of rebuilding it whenever the two
-  managers' limits and index parameters match — keep that equivalence check if
-  either manager's defaults change, and do not make `multi_ptm_index` differ
-  from `one_ptm_diag_index` without removing the link path.
+  50000/100). Because the construction loops stop at the first mass beyond
+  the column limit and the prefix/suffix masses are nondecreasing, a
+  one-shift index is the zero-shift index of the same kind cut at the
+  one-shift limit (`MassMatch::truncateColumns`, guarded by
+  `canTruncateColumns`, which checks that the rows were nondecreasing), and
+  the diagonal stage's `multi_ptm_index` is the same bytes as
+  `one_ptm_diag_index`. topindex therefore runs `joint_index::process`: one
+  pass over the blocks with one task per (block, kind) that builds the index
+  once, writes the zero-shift file, truncates, writes the one-shift file,
+  and hard-links (or copies) `multi_ptm_index` to `one_ptm_diag_index`
+  (`diag_index::linkOnePtmDiagIndex`). Every shortcut is checked at run time
+  against the managers' limits and index parameters and falls back to the
+  separate builds (the three stage processes still exist for that), so
+  changing a manager's defaults is safe; but do not make the files of one
+  family differ from the others' by anything other than the column limit
+  without removing the joint path.
   The filters are memory-bound: each thread streams every spectrum against
   one database block's index (117 blocks of ~1 GB one-shift index files for
   the human target+decoy database), so `compScores` misses cache on every

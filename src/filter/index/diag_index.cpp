@@ -40,6 +40,7 @@ std::string indexDir(const DiagFilterMngPtr& mng_ptr) {
   return mng_ptr->prsm_para_ptr_->getOriDbName() + "_idx" +
          file_util::getFileSeparator();
 }
+}  // namespace
 
 // The multi_ptm_index of a block is the PRM diagonal MassMatch of its
 // proteoforms at mng_ptr's column limits - the same object the one-shift
@@ -54,10 +55,6 @@ bool canReuseOnePtmDiagIndex(const DiagFilterMngPtr& mng_ptr,
          one_ptm_mng_ptr->getIndexFilePara() == mng_ptr->getIndexFilePara();
 }
 
-// Hard-link (or, where that fails, copy) the block's one_ptm_diag_index to
-// its multi_ptm_index name. Returns false when the source is missing or
-// neither the link nor the copy could be made, so the caller can build the
-// file instead.
 bool linkOnePtmDiagIndex(const DiagFilterMngPtr& mng_ptr,
                          const OnePtmFilterMngPtr& one_ptm_mng_ptr,
                          const std::string& block_str) {
@@ -90,7 +87,6 @@ bool linkOnePtmDiagIndex(const DiagFilterMngPtr& mng_ptr,
   fs::copy_file(src, dst, fs::copy_options::overwrite_existing, ec);
   return !ec;
 }
-}  // namespace
 
 void geneDiagIndexFile(const ProteoformPtrVec& proteo_ptrs,
                        const DiagFilterMngPtr& mng_ptr, std::string block_str) {
