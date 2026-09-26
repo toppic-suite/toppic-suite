@@ -23,7 +23,6 @@
 
 #include "common/thread/simple_thread_pool.hpp"
 #include "common/util/logger.hpp"
-#include "filter/index/diag_index.hpp"
 #include "filter/index/one_ptm_index.hpp"
 #include "filter/index/zero_ptm_index.hpp"
 #include "filter/massmatch/mass_match_factory.hpp"
@@ -43,7 +42,7 @@ namespace joint_index {
 namespace {
 // the kinds of index, in the order of the managers' file name vectors
 const int kKindNum = 4;
-const int kDiagKind = 1;
+const int kDiagKind = 1;  // the PRM diagonal index
 
 // A block's proteoforms and the shift lists the four kinds are built from,
 // read once per block and shared by its four tasks (read only).
@@ -109,15 +108,12 @@ bool canJoinStages(const ZeroPtmFilterMngPtr& zero_mng_ptr,
          static_cast<int>(one_mng_ptr->one_ptm_file_vec_.size()) == kKindNum;
 }
 
-// Writes the zero-shift and one-shift files of one kind for one block, and
-// after the diagonal kind the block's multiple-shift file.
+// Writes the zero-shift and one-shift files of one kind for one block.
 std::function<void()> geneIndexTask(const BlockInputPtr& input_ptr,
                                     int block_idx, int kind,
                                     const ZeroPtmFilterMngPtr& zero_mng_ptr,
-                                    const OnePtmFilterMngPtr& one_mng_ptr,
-                                    const DiagFilterMngPtr& diag_mng_ptr) {
-  return [input_ptr, block_idx, kind, zero_mng_ptr, one_mng_ptr,
-          diag_mng_ptr]() {
+                                    const OnePtmFilterMngPtr& one_mng_ptr) {
+  return [input_ptr, block_idx, kind, zero_mng_ptr, one_mng_ptr]() {
     std::string block_str = std::to_string(block_idx);
     std::string dir_name =
         zero_mng_ptr->prsm_para_ptr_->getOriDbName() + "_idx";
@@ -143,32 +139,15 @@ std::function<void()> geneIndexTask(const BlockInputPtr& input_ptr,
     }
     index_ptr->serializeMassMatch(one_file, dir_name);
     index_ptr = nullptr;
-
-    if (kind == kDiagKind) {
-      bool reuse = diag_index::canReuseOnePtmDiagIndex(diag_mng_ptr,
-                                                       one_mng_ptr);
-      if (reuse && !diag_index::linkOnePtmDiagIndex(diag_mng_ptr, one_mng_ptr,
-                                                    block_str)) {
-        LOG_WARN("Could not link the one-shift diagonal index of block "
-                 << block_idx << "; building the multiple-shift index file.");
-        reuse = false;
-      }
-      if (!reuse) {
-        diag_index::geneDiagIndexFile(input_ptr->proteo_ptrs, diag_mng_ptr,
-                                      block_str);
-      }
-    }
   };
 }
 }  // namespace
 
 void process(const ZeroPtmFilterMngPtr& zero_mng_ptr,
-             const OnePtmFilterMngPtr& one_mng_ptr,
-             const DiagFilterMngPtr& diag_mng_ptr) {
+             const OnePtmFilterMngPtr& one_mng_ptr) {
   if (!canJoinStages(zero_mng_ptr, one_mng_ptr)) {
     zero_ptm_index::process(zero_mng_ptr);
     one_ptm_index::process(one_mng_ptr);
-    diag_index::process(diag_mng_ptr, one_mng_ptr);
     return;
   }
 
@@ -190,8 +169,8 @@ void process(const ZeroPtmFilterMngPtr& zero_mng_ptr,
              pool_ptr->getIdleThreadNum() == 0) {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
       }
-      pool_ptr->enqueue(geneIndexTask(input_ptr, block_idx, kind, zero_mng_ptr,
-                                      one_mng_ptr, diag_mng_ptr));
+      pool_ptr->enqueue(
+          geneIndexTask(input_ptr, block_idx, kind, zero_mng_ptr, one_mng_ptr));
     }
   }
   pool_ptr->shutDown();

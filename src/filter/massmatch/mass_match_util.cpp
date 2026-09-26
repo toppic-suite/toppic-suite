@@ -16,13 +16,59 @@
 #include "filter/massmatch/mass_match_util.hpp"
 
 #include <algorithm>
+#include <atomic>
+#include <filesystem>
+#include <iostream>
 
+#include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
 #include "seq/prot_score.hpp"
 
 namespace toppic {
 
 namespace mass_match_util {
+
+bool hasFilterLimits(const MassMatchPtr& index_ptr, int max_proteoform_mass,
+                     int filter_scale) {
+  return index_ptr->getScale() == filter_scale &&
+         index_ptr->getColNum() == max_proteoform_mass * filter_scale;
+}
+
+void warnIndexLimits(const std::string& file_name,
+                     const MassMatchPtr& index_ptr, int max_proteoform_mass,
+                     int filter_scale) {
+  static std::atomic<bool> warned{false};
+  if (warned.exchange(true)) {
+    return;
+  }
+  std::cout << "WARNING: The index file " << file_name << " has "
+            << index_ptr->getColNum() << " columns at scale "
+            << index_ptr->getScale() << ", not the "
+            << max_proteoform_mass * filter_scale << " at scale "
+            << filter_scale
+            << " of this filter; the filter builds its indexes in memory. "
+            << "Run topindex again." << std::endl;
+}
+
+void warnOldIndexLayout(const std::string& index_dir,
+                        const std::string& suffix) {
+  // the two names earlier versions gave the shared diagonal index
+  static std::atomic<bool> warned{false};
+  std::string dir = index_dir + file_util::getFileSeparator();
+  if (!std::filesystem::exists(dir + "one_ptm_diag_index" + suffix) &&
+      !std::filesystem::exists(dir + "multi_ptm_index" + suffix)) {
+    return;
+  }
+  if (warned.exchange(true)) {
+    return;
+  }
+  std::cout << "WARNING: The index directory " << index_dir
+            << " was written by an earlier version (one_ptm_diag_index, "
+            << "multi_ptm_index); the one-shift and multiple-shift filters "
+            << "build their indexes in memory. Run topindex again, or rename "
+            << "the one_ptm_diag_index files to ptm_diag_index and delete "
+            << "the multi_ptm_index files." << std::endl;
+}
 
 // The best term_shift_num rows of a proteoform, ordered by score descending
 // and, among equal scores, in the order in which the rows are visited. Only

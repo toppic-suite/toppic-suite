@@ -19,6 +19,7 @@
 #include <mutex>
 #include <set>
 
+#include "filter/mng/ptm_diag_index.hpp"
 #include "para/prsm_para.hpp"
 
 namespace toppic {
@@ -36,13 +37,15 @@ class DiagFilterMng {
 
   std::string index_file_para_;
 
-  /** parameters for fast filteration */
-  int max_proteoform_mass_ = 50000;
+  // parameters for fast filteration; the column limits of the diagonal
+  // index file this filter shares with the one-shift filter (see
+  // ptm_diag_index.hpp)
+  int max_proteoform_mass_ = ptm_diag_index::kMaxProteoformMass;
 
   // Candidate protein number for each spectrum
   size_t filter_result_num_ = 20;
   int db_block_size_ = 5000000;
-  int filter_scale_ = 100;
+  int filter_scale_ = ptm_diag_index::kFilterScale;
   int thread_num_ = 1;
 
   std::string output_file_ext_;
@@ -59,8 +62,9 @@ class DiagFilterMng {
   std::mutex mutex_;
   std::vector<int> cnts_;
 
-  // file name vector
-  std::vector<std::string> multi_ptm_file_vec_{"multi_ptm_index"};
+  // file name vector: the one-shift family's PRM diagonal file, which
+  // topindex writes once for both filters
+  std::vector<std::string> multi_ptm_file_vec_{ptm_diag_index::kFileName};
 };
 
 using DiagFilterMngPtr = std::shared_ptr<DiagFilterMng>;

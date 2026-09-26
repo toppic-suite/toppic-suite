@@ -24,7 +24,6 @@
 #include "common/util/version.hpp"
 #include "console/topindex_argument.hpp"
 #include "filter/index/joint_index.hpp"
-#include "filter/mng/diag_filter_mng.hpp"
 #include "filter/mng/index_file_name.hpp"
 #include "filter/mng/one_ptm_filter_mng.hpp"
 #include "filter/mng/zero_ptm_filter_mng.hpp"
@@ -46,7 +45,6 @@ void TopIndexProcess(std::map<std::string, std::string>& arguments) {
     std::string db_file_name = arguments["databaseFileName"];
 
     int thread_num = std::stoi(arguments["threadNumber"]);
-    int filter_result_num = std::stoi(arguments["filteringResultNumber"]);
 
     if (!std::filesystem::exists(ori_db_file_name + "_idx")) {
       file_util::createFolder(ori_db_file_name + "_idx");
@@ -72,12 +70,9 @@ void TopIndexProcess(std::map<std::string, std::string>& arguments) {
     OnePtmFilterMngPtr one_ptm_filter_mng_ptr =
         std::make_shared<OnePtmFilterMng>(prsm_para_ptr, index_file_para,
                                           "toppic_one_filter", thread_num);
-    DiagFilterMngPtr diag_filter_mng_ptr = std::make_shared<DiagFilterMng>(
-        prsm_para_ptr, index_file_para, filter_result_num, thread_num,
-        "toppic_multi_filter");
-    // one pass over the blocks writes the three index families
-    joint_index::process(zero_filter_mng_ptr, one_ptm_filter_mng_ptr,
-                         diag_filter_mng_ptr);
+    // one pass over the blocks writes both index families; the one-shift
+    // family's diagonal file also serves the multiple-shift filter
+    joint_index::process(zero_filter_mng_ptr, one_ptm_filter_mng_ptr);
 
     base_data::release();
 
