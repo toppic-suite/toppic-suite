@@ -163,13 +163,19 @@ std::vector<std::vector<float>> getEnvcnnInputMatrix(
   return data_matrix;
 }
 
-double compEnvcnnScore(const MsMapPtr& matrix_ptr, const EnvCollPtr& coll_ptr) {
+std::vector<float> getEnvcnnTensor(const MsMapPtr& matrix_ptr,
+                                   const EnvCollPtr& coll_ptr) {
   std::vector<std::vector<float>> matrix =
       getEnvcnnInputMatrix(matrix_ptr, coll_ptr);
   std::vector<float> tensor;
   for (size_t i = 0; i < matrix.size(); i++) {
     tensor.insert(std::end(tensor), std::begin(matrix[i]), std::end(matrix[i]));
   }
+  return tensor;
+}
+
+double compEnvcnnScore(const MsMapPtr& matrix_ptr, const EnvCollPtr& coll_ptr) {
+  std::vector<float> tensor = getEnvcnnTensor(matrix_ptr, coll_ptr);
   std::vector<double> results = onnx_env_cnn::predict(1, tensor);
   return results[0];
 }

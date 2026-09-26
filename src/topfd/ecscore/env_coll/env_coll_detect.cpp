@@ -15,6 +15,11 @@
 
 #include "topfd/ecscore/env_coll/env_coll_detect.hpp"
 
+#include <limits>
+
+#include "topfd/ecscore/score/comp_env_cnn_score.hpp"
+#include "topfd/envcnn/onnx_env_cnn.hpp"
+
 #include <algorithm>
 #include <ctime>
 #include <iostream>
@@ -334,6 +339,68 @@ void processMs1Windowed(const TopfdParaPtr& topfd_para_ptr) {
   spec_feature_writer::writeFeatures(ms2_feat_file_name, ms2_features);
 }
 
+
+namespace {
+
+// Batched EnvCNN scoring for the MS1 feature detection (issue #586).
+//
+// Scoring one candidate per EnvCNN call streams the model's 83 MB of weights
+// once per candidate: 2.85 ms each, 246 s of a 610 s run on 480_F3_02.
+// Scoring 64 at a time costs 0.162 ms per candidate. The loop cannot simply
+// score in batches, because an accepted feature removes its peaks from the
+// matrix that later candidates are built and scored from, so a candidate is
+// parked with the region it reads and is rebuilt and rescored on its own when
+// a removal made after it was parked touches that region. On 480_F3_02 that
+// happens to 0.5% of the candidates (toppic_test experiment 62).
+//
+// Two candidates that checkExistingFeatures would merge have the same mass
+// and overlapping retention times, so their regions intersect and the second
+// one is rebuilt; that is why a parked candidate needs no second existing
+// feature check.
+constexpr size_t kEnvcnnBatchSize = 64;
+
+// the m/z range an envelope set covers, widened by the 0.1 Dalton the EnvCNN
+// input reaches for its noise peaks, and the scans it spans
+struct ReadRegion {
+  double mz_lo, mz_hi;
+  int spec_lo, spec_hi;
+};
+
+inline bool regionsIntersect(const ReadRegion& a, const ReadRegion& b) {
+  return a.mz_lo <= b.mz_hi && b.mz_lo <= a.mz_hi && a.spec_lo <= b.spec_hi &&
+         b.spec_lo <= a.spec_hi;
+}
+
+std::vector<ReadRegion> getReadRegions(const EnvCollPtr& coll_ptr) {
+  std::vector<ReadRegion> regions;
+  for (auto& env_set_ptr : coll_ptr->getEnvSetList()) {
+    if (env_set_ptr == nullptr) continue;
+    EnvPeakPtrVec peaks = env_set_ptr->getSeedPtr()->getPeakPtrList();
+    double lo = std::numeric_limits<double>::max();
+    double hi = std::numeric_limits<double>::lowest();
+    for (auto& peak_ptr : peaks) {
+      if (peak_ptr == nullptr) continue;
+      lo = std::min(lo, peak_ptr->getPosition());
+      hi = std::max(hi, peak_ptr->getPosition());
+    }
+    if (hi < lo) continue;
+    regions.push_back({lo - 0.1, hi + 0.1, env_set_ptr->getStartSpecId(),
+                       env_set_ptr->getEndSpecId()});
+  }
+  return regions;
+}
+
+// a candidate waiting for its batch to be scored
+struct ParkedCand {
+  SeedEnvPtr orig_seed_ptr;            // to rebuild it if it goes stale
+  EnvCollPtr coll_ptr;
+  std::vector<float> tensor;           // the EnvCNN input as of parking
+  std::vector<ReadRegion> regions;
+  size_t removal_num;                  // removals made before it was parked
+};
+
+}  // namespace
+
 void processMs1(const TopfdParaPtr& topfd_para_ptr) {
   if (topfd_para_ptr->isMissingLevelOne()) {
     return;
@@ -409,6 +476,74 @@ void processMs1(const TopfdParaPtr& topfd_para_ptr) {
   EnvCollPtrVec env_coll_list;
   ECScorePtrVec ecscore_list;
   env_coll_util::EnvCollRtCache rt_cache;
+  // the candidates waiting to be scored, and the peak removals made since
+  // the oldest of them was parked (issue #586)
+  std::vector<ParkedCand> parked;
+  std::vector<ReadRegion> removals;
+  long batch_call_num = 0, cand_num = 0, rebuilt_num = 0;
+
+  auto removePeaks = [&](const EnvCollPtr& coll_ptr) {
+    std::vector<ReadRegion> regions = getReadRegions(coll_ptr);
+    removals.insert(removals.end(), regions.begin(), regions.end());
+    coll_ptr->removePeakData(matrix_ptr);
+  };
+
+  // score the parked candidates in one call and apply them in parking order
+  auto flushBatch = [&]() {
+    if (parked.empty()) return;
+    std::vector<float> tensor;
+    tensor.reserve(parked.size() * parked[0].tensor.size());
+    for (auto& cand : parked)
+      tensor.insert(tensor.end(), cand.tensor.begin(), cand.tensor.end());
+    std::vector<double> batch_scores =
+        onnx_env_cnn::predict(static_cast<int>(parked.size()), tensor);
+    batch_call_num++;
+    for (size_t i = 0; i < parked.size(); i++) {
+      ParkedCand& cand = parked[i];
+      bool stale = false;
+      for (size_t r = cand.removal_num; r < removals.size() && !stale; r++)
+        for (const auto& region : cand.regions)
+          if (regionsIntersect(removals[r], region)) {
+            stale = true;
+            break;
+          }
+      EnvCollPtr env_coll_ptr = cand.coll_ptr;
+      double envcnn_score = batch_scores[i];
+      if (stale) {
+        // a removal touched what this candidate reads: redo it against the
+        // matrix as it stands now, exactly as the sequential loop would
+        rebuilt_num++;
+        SeedEnvPtr seed_ptr = seed_env_util::preprocessSeedEnvPtr(
+            cand.orig_seed_ptr, matrix_ptr, score_para_ptr, sn_ratio);
+        if (seed_ptr == nullptr) continue;
+        env_coll_ptr = env_coll_util::findEnvColl(
+            matrix_ptr, seed_ptr, score_para_ptr, sn_ratio,
+            topfd_para_ptr->getSplitIntensityRatio());
+        if (env_coll_ptr == nullptr) continue;
+        if (env_coll_util::checkExistingFeatures(matrix_ptr, env_coll_ptr,
+                                                 env_coll_list, score_para_ptr,
+                                                 sn_ratio, &rt_cache)) {
+          removePeaks(env_coll_ptr);
+          continue;
+        }
+        env_coll_ptr->refineMonoMass();
+        envcnn_score =
+            comp_env_cnn_score::compEnvcnnScore(matrix_ptr, env_coll_ptr);
+      }
+      ECScorePtr ecscore_ptr = std::make_shared<ECScore>(
+          env_coll_ptr, matrix_ptr, sn_ratio, envcnn_score);
+      if (ecscore_ptr->getScore() < topfd_para_ptr->getMs1EcscoreCutoff()) {
+        continue;
+      }
+      env_coll_ptr->setEcscore(ecscore_ptr->getScore());
+      removePeaks(env_coll_ptr);
+      env_coll_list.push_back(env_coll_ptr);
+      ecscore_list.push_back(ecscore_ptr);
+    }
+    parked.clear();
+    removals.clear();
+  };
+
   for (int seed_env_idx = 0; seed_env_idx < seed_num; seed_env_idx++) {
     int count = seed_env_idx + 1;
     if (count % 100 == 0 || count == seed_num) {
@@ -416,9 +551,9 @@ void processMs1(const TopfdParaPtr& topfd_para_ptr) {
       std::cout << "\r" << "Processing feature " << count << " ...       "
                 << perc << "\% finished." << std::flush;
     }
-    SeedEnvPtr seed_ptr = seed_ptrs[seed_env_idx];
-    seed_ptr = seed_env_util::preprocessSeedEnvPtr(seed_ptr, matrix_ptr,
-                                                   score_para_ptr, sn_ratio);
+    SeedEnvPtr orig_seed_ptr = seed_ptrs[seed_env_idx];
+    SeedEnvPtr seed_ptr = seed_env_util::preprocessSeedEnvPtr(
+        orig_seed_ptr, matrix_ptr, score_para_ptr, sn_ratio);
     if (seed_ptr == nullptr) continue;
     EnvCollPtr env_coll_ptr = env_coll_util::findEnvColl(
         matrix_ptr, seed_ptr, score_para_ptr, sn_ratio,
@@ -427,21 +562,22 @@ void processMs1(const TopfdParaPtr& topfd_para_ptr) {
     if (env_coll_util::checkExistingFeatures(matrix_ptr, env_coll_ptr,
                                              env_coll_list, score_para_ptr,
                                              sn_ratio, &rt_cache)) {
-      env_coll_ptr->removePeakData(matrix_ptr);
+      removePeaks(env_coll_ptr);
       continue;
     }
     env_coll_ptr->refineMonoMass();
-    ECScorePtr ecscore_ptr =
-        std::make_shared<ECScore>(env_coll_ptr, matrix_ptr, sn_ratio);
-    if (ecscore_ptr->getScore() < topfd_para_ptr->getMs1EcscoreCutoff()) {
-      continue;
-    }
-    env_coll_ptr->setEcscore(ecscore_ptr->getScore());
-    env_coll_ptr->removePeakData(matrix_ptr);
-    env_coll_list.push_back(env_coll_ptr);
-    ecscore_list.push_back(ecscore_ptr);
+    cand_num++;
+    parked.push_back({orig_seed_ptr, env_coll_ptr,
+                      comp_env_cnn_score::getEnvcnnTensor(matrix_ptr,
+                                                          env_coll_ptr),
+                      getReadRegions(env_coll_ptr), removals.size()});
+    if (parked.size() >= kEnvcnnBatchSize) flushBatch();
   }
+  flushBatch();
   std::cout << std::endl;
+  std::cout << "EnvCNN scoring: " << cand_num << " candidates in "
+            << batch_call_num << " batched calls, " << rebuilt_num
+            << " rebuilt" << std::endl;
 
   if (topfd_para_ptr->isSearchPrecWindow()) {
     // add ms1 feature based on precursor windows
