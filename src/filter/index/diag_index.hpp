@@ -17,12 +17,36 @@
 #define TOPPIC_FILTER_INDEX_DIAG_INDEX_HPP_
 
 #include "filter/mng/diag_filter_mng.hpp"
+#include "filter/mng/one_ptm_filter_mng.hpp"
+#include "seq/proteoform.hpp"
 
 namespace toppic {
 
 namespace diag_index {
 
-void process(const DiagFilterMngPtr& mng_ptr);
+// Builds the multi_ptm_index file of one block from its proteoforms.
+void geneDiagIndexFile(const ProteoformPtrVec& proteo_ptrs,
+                       const DiagFilterMngPtr& mng_ptr, std::string block_str);
+
+// Whether the one-shift stage's one_ptm_diag_index files are byte-identical
+// to the multi_ptm_index files this stage would build: the two managers'
+// column limits (max_proteoform_mass_, filter_scale_) and index parameters
+// are equal.
+bool canReuseOnePtmDiagIndex(const DiagFilterMngPtr& mng_ptr,
+                             const OnePtmFilterMngPtr& one_ptm_mng_ptr);
+
+// Hard-links (or, where that fails, copies) a block's one_ptm_diag_index to
+// its multi_ptm_index name. Returns false when the source is missing or
+// neither the link nor the copy could be made.
+bool linkOnePtmDiagIndex(const DiagFilterMngPtr& mng_ptr,
+                         const OnePtmFilterMngPtr& one_ptm_mng_ptr,
+                         const std::string& block_str);
+
+// Writes the multi_ptm_index file of every block. When one_ptm_mng_ptr is
+// given and canReuseOnePtmDiagIndex holds, the files are linked to the
+// one-shift stage's instead of rebuilt.
+void process(const DiagFilterMngPtr& mng_ptr,
+             const OnePtmFilterMngPtr& one_ptm_mng_ptr = nullptr);
 
 }
 

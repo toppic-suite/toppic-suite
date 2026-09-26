@@ -833,6 +833,30 @@ above it, never the reverse:
   filter/index mutexes) live in **anonymous namespaces** — they previously had
   external linkage and the same name in several TUs, which only becomes a
   multiple-definition error once everything compiles into one library.
+  `filter/index` is topindex's side: `zero_ptm_index`, `one_ptm_index` and
+  `diag_index` each build, per database block, `MassMatch` objects from the
+  same factory calls with only the manager's `max_proteoform_mass_` /
+  `filter_scale_` differing (zero-shift 100000/100, one-shift and diagonal
+  50000/100). Because the construction loops stop at the first mass beyond
+  the column limit and the prefix/suffix masses are nondecreasing, a
+  one-shift index is the zero-shift index of the same kind cut at the
+  one-shift limit (`MassMatch::truncateColumns`, guarded by
+  `canTruncateColumns`, which checks that the rows were nondecreasing), and
+  the diagonal stage's `multi_ptm_index` is the same bytes as
+  `one_ptm_diag_index`. topindex therefore runs `joint_index::process`: one
+  pass over the blocks with one task per (block, kind) that builds the index
+  once, writes the zero-shift file, truncates, writes the one-shift file,
+  and hard-links (or copies) `multi_ptm_index` to `one_ptm_diag_index`
+  (`diag_index::linkOnePtmDiagIndex`). Every shortcut is checked at run time
+  against the managers' limits and index parameters and falls back to the
+  separate builds (the three stage processes still exist for that), so
+  changing a manager's defaults is safe; but do not make the files of one
+  family differ from the others' by anything other than the column limit
+  without removing the joint path. The joint tasks serialize **without** a
+  mutex: each writes its own `MassMatch` into its own archive (Boost 1.90's
+  singletons are built before `main`, so separate archives in separate
+  threads do not interact), and a single writer would have been busy for
+  most of the wall once every task writes two files.
   The filters are memory-bound: each thread streams every spectrum against
   one database block's index (117 blocks of ~1 GB one-shift index files for
   the human target+decoy database), so `compScores` misses cache on every
