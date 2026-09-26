@@ -31,21 +31,18 @@ namespace cluster_prot_corrector {
 // differs from the protein of the cluster's PrSM with the lowest E-value
 // (ties: the lowest sequence name) are the same proteoform mass matched to
 // another protein; each of them is given the best PrSM's proteoform (and
-// its mass as adjusted precursor mass), its matched experimental and
-// theoretical fragment numbers are recounted on its spectra read with the
-// EnvCNN score cutoff env_cnn_cutoff (the search's cutoff, so that the
-// numbers are comparable with the other PrSMs' ones), and its E-value is
-// recomputed with the generating-function method of tdgf_mng_ptr on those
-// spectra. All PrSMs are written, in the input order, to
+// its mass as adjusted precursor mass), and its matched experimental and
+// theoretical fragment numbers and its E-value (the generating-function
+// method of tdgf_mng_ptr) are recomputed on its spectra read as the search
+// and the E-value computation read them: the masses below the EnvCNN score
+// cutoff (SpPara::getEnvCnnCutoff) removed and, with --frag-mass-dedup, the
+// close masses combined (SpPara::getFragDedupPpo). The matched numbers are
+// only for the E-value: TopPIC_postprocess recounts every PrSM against the
+// full spectra afterwards. All PrSMs are written, in the input order, to
 // <base>.<output_file_ext>. Returns the number of corrected PrSMs.
-// env_cnn_cutoff is applied to the spectra this function reads, as in the
-// search. dedup_ppo combines close fragment masses for the E-value
-// computation only: the matched fragment numbers are recounted here as well,
-// and those must come from the masses the file reports.
 int process(const PrsmParaPtr& prsm_para_ptr, const TdgfMngPtr& tdgf_mng_ptr,
             const std::string& input_file_ext,
-            const std::string& output_file_ext, double env_cnn_cutoff,
-            double dedup_ppo);
+            const std::string& output_file_ext);
 
 }  // namespace cluster_prot_corrector
 
