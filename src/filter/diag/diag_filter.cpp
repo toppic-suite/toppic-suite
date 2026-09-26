@@ -16,12 +16,14 @@
 #include "filter/diag/diag_filter.hpp"
 
 #include <algorithm>
+#include <atomic>
 #include <filesystem>
 #include <mutex>
 #include <utility>
 
 #include "common/util/file_util.hpp"
 #include "filter/massmatch/mass_match_factory.hpp"
+#include "filter/massmatch/index_load_gate.hpp"
 #include "filter/massmatch/mass_match_util.hpp"
 #include "ms/factory/prm_ms_util.hpp"
 #include "prsm/simple_prsm_util.hpp"
@@ -29,9 +31,14 @@
 
 namespace toppic {
 
-// serialization mutex.
+// The first block of the stage is deserialized under the mutex (warming
+// Boost.Serialization's lazy type-registration singletons on one thread);
+// later blocks load in parallel — see the comment in zero_ptm_filter.cpp.
+// On the 480 benchmark this stage read 42 s of index one block at a time
+// through the old always-held lock (toppic_test experiment 66).
 namespace {
 std::mutex diag_filter_mutex;
+std::atomic<bool> diag_filter_warmed{false};
 }  // namespace
 DiagFilter::DiagFilter(const ProteoformPtrVec& proteo_ptrs,
                        const DiagFilterMngPtr& mng_ptr, std::string block_str) {
@@ -63,8 +70,18 @@ DiagFilter::DiagFilter(const ProteoformPtrVec& proteo_ptrs,
     std::string file_name = mng_ptr->multi_ptm_file_vec_[0] + suffix;
 
     {
-      std::lock_guard<std::mutex> lock(diag_filter_mutex);
+      std::unique_lock<std::mutex> lock(diag_filter_mutex, std::defer_lock);
+      if (!diag_filter_warmed.load(std::memory_order_acquire)) {
+        lock.lock();
+        if (diag_filter_warmed.load(std::memory_order_relaxed)) {
+          lock.unlock();
+        }
+      }
+      IndexLoadGate::Slot load_slot(index_load_gate);
       index_ptr_->deserializeMassMatch(file_name, index_dir);
+      if (lock.owns_lock()) {
+        diag_filter_warmed.store(true, std::memory_order_release);
+      }
     }
     // the file is shared with the one-shift filter; it must have been built
     // at this filter's column limits

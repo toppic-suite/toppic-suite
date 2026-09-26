@@ -15,12 +15,14 @@
 
 #include "filter/zeroptm/zero_ptm_filter.hpp"
 
+#include <atomic>
 #include <filesystem>
 #include <mutex>
 
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
 #include "filter/massmatch/mass_match_factory.hpp"
+#include "filter/massmatch/index_load_gate.hpp"
 #include "filter/massmatch/mass_match_util.hpp"
 #include "ms/factory/extend_ms_util.hpp"
 #include "seq/prot_candidate.hpp"
@@ -28,9 +30,19 @@
 
 namespace toppic {
 
-// serialization mutex.
+// The first block of the stage is deserialized under the mutex, which
+// initializes Boost.Serialization's lazily-constructed type-registration
+// singletons on one thread; after that, concurrent binary_iarchive instances
+// on distinct streams are safe, and the per-block loads run in parallel.
+// Fully serializing every load, as this mutex used to, made the loads the
+// stage's floor: on the 480 benchmark the 12 worker threads spent 823
+// thread-seconds waiting on this lock around 98 s of one-at-a-time reading,
+// so the 100 s stage was the serialized load channel itself (toppic_test
+// experiment 66). Concurrency changes only when each block's vectors fill,
+// never their contents.
 namespace {
 std::mutex zero_ptm_filter_mutex;
+std::atomic<bool> zero_ptm_filter_warmed{false};
 }  // namespace
 ZeroPtmFilter::ZeroPtmFilter(const ProteoformPtrVec& proteo_ptrs,
                              const ZeroPtmFilterMngPtr& mng_ptr,
@@ -64,7 +76,16 @@ ZeroPtmFilter::ZeroPtmFilter(const ProteoformPtrVec& proteo_ptrs,
     rev_diag_index_ptr_ = std::make_shared<MassMatch>();
     {
       LOG_DEBUG("Loading index files");
-      std::lock_guard<std::mutex> lock(zero_ptm_filter_mutex);
+      std::unique_lock<std::mutex> lock(zero_ptm_filter_mutex,
+                                        std::defer_lock);
+      if (!zero_ptm_filter_warmed.load(std::memory_order_acquire)) {
+        lock.lock();
+        // threads that queued behind the first load proceed in parallel
+        if (zero_ptm_filter_warmed.load(std::memory_order_relaxed)) {
+          lock.unlock();
+        }
+      }
+      IndexLoadGate::Slot load_slot(index_load_gate);
       term_index_ptr_->deserializeMassMatch(
           mng_ptr->zero_ptm_file_vec_[0] + suffix, index_dir);
       diag_index_ptr_->deserializeMassMatch(
@@ -73,6 +94,9 @@ ZeroPtmFilter::ZeroPtmFilter(const ProteoformPtrVec& proteo_ptrs,
           mng_ptr->zero_ptm_file_vec_[2] + suffix, index_dir);
       rev_diag_index_ptr_->deserializeMassMatch(
           mng_ptr->zero_ptm_file_vec_[3] + suffix, index_dir);
+      if (lock.owns_lock()) {
+        zero_ptm_filter_warmed.store(true, std::memory_order_release);
+      }
     }
   } else {
     LOG_DEBUG("get shifts");

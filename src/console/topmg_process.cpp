@@ -170,17 +170,6 @@ int TopMG_identify(std::map<std::string, std::string>& arguments) {
     double max_shift_mass = std::stod(arguments["maxShiftMass"]);
 
     int thread_num = std::stoi(arguments["threadNumber"]);
-    // Filter steps requires a large amount of memory.
-    // We use only one thread to reduce the memory requirement.
-    int filter_thread_num = mem_check::getMaxThreads("zero_one_shift_filter");
-    if (filter_thread_num > thread_num) {
-      filter_thread_num = thread_num;
-    }
-    LOG_DEBUG("Filter thread number " << filter_thread_num);
-    int diag_filter_thread_num = mem_check::getMaxThreads("diag_filter");
-    if (diag_filter_thread_num > thread_num) {
-      diag_filter_thread_num = thread_num;
-    }
 
     bool decoy = false;
     if (arguments["searchType"] == "TARGET+DECOY") {
@@ -204,6 +193,12 @@ int TopMG_identify(std::map<std::string, std::string>& arguments) {
     std::vector<std::string> input_exts;
 
     std::cout << "ASF-One PTM filtering - started." << std::endl;
+    // The filtering steps require a large amount of memory, so each one asks
+    // mem_check for its own thread number where it starts, from its own
+    // per-thread budget and the memory available then.
+    int filter_thread_num =
+        mem_check::getStageThreadNum("ASF-One PTM filtering", thread_num);
+    LOG_DEBUG("Filter thread number " << filter_thread_num);
     int var_ptm_num_in_filtering = 1;
     OnePtmFilterMngPtr one_ptm_filter_mng_ptr =
         std::make_shared<OnePtmFilterMng>(
@@ -223,6 +218,10 @@ int TopMG_identify(std::map<std::string, std::string>& arguments) {
 
     if (arguments["useAsfDiag"] == "true") {
       std::cout << "ASF-Diagonal PTM filtering - started." << std::endl;
+      int diag_filter_thread_num =
+          mem_check::getStageThreadNum("ASF-Diagonal PTM filtering",
+                                       thread_num);
+      LOG_DEBUG("Diagonal filter thread number " << diag_filter_thread_num);
       filter_result_num = 15;
       DiagFilterMngPtr diag_filter_mng_ptr = std::make_shared<DiagFilterMng>(
           prsm_para_ptr, index_file_para, filter_result_num,

@@ -15,12 +15,14 @@
 
 #include "filter/varptm/var_ptm_filter.hpp"
 
+#include <atomic>
 #include <filesystem>
 #include <mutex>
 
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
 #include "filter/massmatch/mass_match_factory.hpp"
+#include "filter/massmatch/index_load_gate.hpp"
 #include "filter/massmatch/mass_match_util.hpp"
 #include "ms/factory/prm_ms_util.hpp"
 #include "seq/prot_candidate.hpp"
@@ -28,9 +30,12 @@
 
 namespace toppic {
 
-// serialization mutex.
+// The first block of the stage is deserialized under the mutex (warming
+// Boost.Serialization's lazy type-registration singletons on one thread);
+// later blocks load in parallel — see the comment in zero_ptm_filter.cpp.
 namespace {
 std::mutex var_ptm_filter_mutex;
+std::atomic<bool> var_ptm_filter_warmed{false};
 }  // namespace
 VarPtmFilter::VarPtmFilter(const ProteoformPtrVec& proteo_ptrs,
                            const VarPtmFilterMngPtr& mng_ptr,
@@ -64,7 +69,15 @@ VarPtmFilter::VarPtmFilter(const ProteoformPtrVec& proteo_ptrs,
     rev_diag_index_ptr_ = std::make_shared<MassMatch>();
     {
       LOG_DEBUG("Loading index files");
-      std::lock_guard<std::mutex> lock(var_ptm_filter_mutex);
+      std::unique_lock<std::mutex> lock(var_ptm_filter_mutex,
+                                        std::defer_lock);
+      if (!var_ptm_filter_warmed.load(std::memory_order_acquire)) {
+        lock.lock();
+        if (var_ptm_filter_warmed.load(std::memory_order_relaxed)) {
+          lock.unlock();
+        }
+      }
+      IndexLoadGate::Slot load_slot(index_load_gate);
       term_index_ptr_->deserializeMassMatch(
           mng_ptr->var_ptm_file_vec_[0] + suffix, index_dir);
       diag_index_ptr_->deserializeMassMatch(
@@ -73,6 +86,9 @@ VarPtmFilter::VarPtmFilter(const ProteoformPtrVec& proteo_ptrs,
           mng_ptr->var_ptm_file_vec_[2] + suffix, index_dir);
       rev_diag_index_ptr_->deserializeMassMatch(
           mng_ptr->var_ptm_file_vec_[3] + suffix, index_dir);
+      if (lock.owns_lock()) {
+        var_ptm_filter_warmed.store(true, std::memory_order_release);
+      }
     }
   } else {
     LOG_DEBUG("get shifts");
