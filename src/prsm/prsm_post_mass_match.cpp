@@ -420,8 +420,22 @@ void writeMsalign(const std::string& sp_file_name,
 // continuing the envelope ids of each spectrum.
 void writeSqlEnvs(sqlite3* db,
                   const std::map<int, PostMatchVec>& sql_spec_matches) {
+  // One scan for every spectrum's next envelope id. The per-spectrum
+  // "SELECT COALESCE(MAX(env_id)+1,0) ... WHERE spec_id = ?" this replaces
+  // ran once per matched spectrum against a table TopFD writes without an
+  // index, so each query scanned all of ms2_env: ~3,600 scans of a ~395k-row
+  // table, 36 s of the post mass matching step against 0.07 s for this one
+  // GROUP BY (toppic_test experiment 66) - the same defect class as the
+  // ms2_peak scan fixed by 4bdf749f, one table over. MAX is
+  // order-independent and every spectrum is visited once below, so
+  // prefetching before the inserts is exact.
+  std::map<int, int> next_env_ids;
   sqlite3_stmt* max_stmt = sql_util::prepareSql(
-      db, "SELECT COALESCE(MAX(env_id) + 1, 0) FROM ms2_env WHERE spec_id = ?;");
+      db, "SELECT spec_id, MAX(env_id) + 1 FROM ms2_env GROUP BY spec_id;");
+  while (sqlite3_step(max_stmt) == SQLITE_ROW) {
+    next_env_ids[sqlite3_column_int(max_stmt, 0)] =
+        sqlite3_column_int(max_stmt, 1);
+  }
   sqlite3_stmt* env_stmt = sql_util::prepareSql(
       db,
       "INSERT INTO ms2_env(spec_id, env_id, mono_mass, ref_mass, charge, "
@@ -433,13 +447,11 @@ void writeSqlEnvs(sqlite3* db,
   sql_util::execSql(db, "BEGIN TRANSACTION;");
   for (const auto& entry : sql_spec_matches) {
     int spec_id = entry.first;
-    sqlite3_bind_int(max_stmt, 1, spec_id);
     int env_id = 0;
-    if (sqlite3_step(max_stmt) == SQLITE_ROW) {
-      env_id = sqlite3_column_int(max_stmt, 0);
+    auto next_it = next_env_ids.find(spec_id);
+    if (next_it != next_env_ids.end()) {
+      env_id = next_it->second;
     }
-    sqlite3_clear_bindings(max_stmt);
-    sqlite3_reset(max_stmt);
     for (const PostMatch& match : entry.second) {
       EnvPtr env_ptr = match.env;
       int peak_num = env_ptr->getPeakNum();
