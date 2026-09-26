@@ -94,34 +94,43 @@ inline std::vector<Cell> initCells(size_t a_size, size_t b_size) {
   return cells;
 }
 
-int findMatch(const FeaturePrsmPtr& a, FeaturePrsmPtrVec& second,
-              size_t b_index, double mass_tole) {
-  double time_tole = 0.1;
+// The positions in second (sorted by increasing apex time) whose precursor
+// mass is within mass_tole of a's, in increasing order.
+std::vector<int> matchPositions(const FeaturePrsmPtr& a,
+                                const FeaturePrsmPtrVec& second,
+                                double mass_tole) {
+  std::vector<int> positions;
   double a_mass = a->getPrecMass();
-  // if (mass_tole < 0.01) {
-  //   mass_tole = 0.01;
-  // }
-  double b_time = second[b_index]->getAlignApexTime();
-  for (int i = b_index; i >= 0; i--) {
-    double mass = second[i]->getPrecMass();
-    double time = second[i]->getAlignApexTime();
-    if (b_time - time > time_tole) {
-      break;
-    }
-    double error = std::abs(a_mass - mass);
-    if (error <= mass_tole) {
-      return i;
+  for (size_t i = 0; i < second.size(); i++) {
+    if (std::abs(a_mass - second[i]->getPrecMass()) <= mass_tole) {
+      positions.push_back(static_cast<int>(i));
     }
   }
-  for (size_t i = b_index; i < second.size(); i++) {
-    double mass = second[i]->getPrecMass();
-    double time = second[i]->getAlignApexTime();
-    if (time - b_time > time_tole) {
-      break;
+  return positions;
+}
+
+// The position of a feature of second matching a near b_index: the nearest
+// matching position at or below b_index whose apex time is within
+// time_tole of second[b_index]'s, else the nearest matching position above
+// it within time_tole, else -1. positions is matchPositions(a, second).
+// (The same result as scanning second downwards from b_index and then
+// upwards, stopping where the time difference exceeds time_tole.)
+int findMatch(const std::vector<int>& positions, FeaturePrsmPtrVec& second,
+              size_t b_index) {
+  double time_tole = 0.1;
+  double b_time = second[b_index]->getAlignApexTime();
+  auto up = std::upper_bound(positions.begin(), positions.end(),
+                             static_cast<int>(b_index));
+  if (up != positions.begin()) {
+    int pos = *(up - 1);
+    if (b_time - second[pos]->getAlignApexTime() <= time_tole) {
+      return pos;
     }
-    double error = std::abs(a_mass - mass);
-    if (error <= mass_tole) {
-      return i;
+  }
+  if (up != positions.end()) {
+    int pos = *up;
+    if (second[pos]->getAlignApexTime() - b_time <= time_tole) {
+      return pos;
     }
   }
   return -1;
@@ -144,11 +153,12 @@ void sampleAlignTime(FeaturePrsmPtrVec& first, FeaturePrsmPtrVec& second,
   std::vector<int> match_pos(a_size * b_size, -1);
   // alignment
   for (size_t i = 1; i < a_size + 1; i++) {
+    std::vector<int> positions = matchPositions(a[i - 1], b, mass_tole);
     for (size_t j = 1; j < b_size + 1; j++) {
       double left_sim = cells[i * cols + j - 1].sim_;
       double up_sim = cells[(i - 1) * cols + j].sim_;
       double diag_sim = cells[(i - 1) * cols + j - 1].sim_;
-      int pos = findMatch(a[i - 1], b, j - 1, mass_tole);
+      int pos = findMatch(positions, b, j - 1);
       match_pos[(i - 1) * b_size + j - 1] = pos;
       // if there is a match
       if (pos >= 0) {
