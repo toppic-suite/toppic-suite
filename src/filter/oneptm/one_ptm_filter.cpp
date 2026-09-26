@@ -15,6 +15,7 @@
 
 #include "filter/oneptm/one_ptm_filter.hpp"
 
+#include <atomic>
 #include <filesystem>
 #include <iostream>
 #include <mutex>
@@ -22,6 +23,7 @@
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
 #include "filter/massmatch/mass_match_factory.hpp"
+#include "filter/massmatch/index_load_gate.hpp"
 #include "filter/massmatch/mass_match_util.hpp"
 #include "ms/factory/prm_ms_util.hpp"
 #include "seq/prot_candidate.hpp"
@@ -29,9 +31,14 @@
 
 namespace toppic {
 
-// serialization mutex.
+// The first block of the stage is deserialized under the mutex (warming
+// Boost.Serialization's lazy type-registration singletons on one thread);
+// later blocks load in parallel — see the comment in zero_ptm_filter.cpp.
+// On the 480 benchmark this stage read 84 s of index one block at a time
+// through the old always-held lock (toppic_test experiment 66).
 namespace {
 std::mutex one_ptm_filter_mutex;
+std::atomic<bool> one_ptm_filter_warmed{false};
 }  // namespace
 OnePtmFilter::OnePtmFilter(const ProteoformPtrVec& proteo_ptrs,
                            const OnePtmFilterMngPtr& mng_ptr,
@@ -64,7 +71,15 @@ OnePtmFilter::OnePtmFilter(const ProteoformPtrVec& proteo_ptrs,
     rev_diag_index_ptr_ = std::make_shared<MassMatch>();
 
     {
-      std::lock_guard<std::mutex> lock(one_ptm_filter_mutex);
+      std::unique_lock<std::mutex> lock(one_ptm_filter_mutex,
+                                        std::defer_lock);
+      if (!one_ptm_filter_warmed.load(std::memory_order_acquire)) {
+        lock.lock();
+        if (one_ptm_filter_warmed.load(std::memory_order_relaxed)) {
+          lock.unlock();
+        }
+      }
+      IndexLoadGate::Slot load_slot(index_load_gate);
       // complete file name is a ptm type from topindexfile vector + parameters
       // + db block id (block_str)
       term_index_ptr_->deserializeMassMatch(
@@ -75,6 +90,9 @@ OnePtmFilter::OnePtmFilter(const ProteoformPtrVec& proteo_ptrs,
           mng_ptr->one_ptm_file_vec_[2] + suffix, index_dir);
       rev_diag_index_ptr_->deserializeMassMatch(
           mng_ptr->one_ptm_file_vec_[3] + suffix, index_dir);
+      if (lock.owns_lock()) {
+        one_ptm_filter_warmed.store(true, std::memory_order_release);
+      }
     }
   } else {
     std::vector<std::vector<double>> shift_2d =
