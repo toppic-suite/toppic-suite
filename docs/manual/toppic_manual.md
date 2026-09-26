@@ -88,24 +88,25 @@ the result files are named after `sample_mono_ms2`.
    again; 0.01 without `--decoy`); the spectra with a better PrSM keep it. The new PrSMs are merged, get E-values, and,
    together with the earlier PrSMs of the searched spectra, the best PrSM per
    spectrum is kept.
-8. **Recounting matched masses and fragments.** The search uses only the
-   masses whose EnvCNN score is at least `--filter-by-env-cnn`; matched
-   masses and fragments are recounted against the complete spectra.
-9. **Proteoform and protein clustering.** PrSMs whose spectrum has no
+8. **Proteoform and protein clustering.** PrSMs whose spectrum has no
    TopFD feature are discarded (unless `--no-topfd-feature`). PrSMs sharing
    a TopFD feature form one proteoform; proteoforms of the same protein
    whose adjusted precursor masses agree within
    `--proteoform-error-tolerance` are merged; proteoforms are then grouped
    by protein.
-10. **Cluster protein correction.** In every proteoform cluster the PrSMs
-    whose protein differs from the protein of the cluster's PrSM with the
-    lowest E-value are given that PrSM's proteoform, so that a proteoform
-    mass matched to two proteins is reported once, for the better-supported
-    protein; their matched fragments are recounted and their E-values
-    recomputed for the new proteoform.
+9. **Cluster protein correction.** In every proteoform cluster the PrSMs
+   whose protein differs from the protein of the cluster's PrSM with the
+   lowest E-value are given that PrSM's proteoform, so that a proteoform
+   mass matched to two proteins is reported once, for the better-supported
+   protein; their E-values are recomputed for the new proteoform on the
+   masses the search used.
+10. **Recounting matched masses and fragments.** The search and the
+    cluster protein correction use only the masses whose EnvCNN score is at
+    least `--filter-by-env-cnn`; the matched masses and fragments of every
+    PrSM are recounted against the complete spectra.
 11. **Post mass matching** (default; off with `--disable-post-match`). For
-    the best PrSM of every spectrum, target or decoy, after the clustering
-    and the cluster protein correction, the theoretical
+    the best PrSM of every spectrum, target or decoy, after the clustering,
+    the cluster protein correction and the recount, the theoretical
     fragment masses that no deconvoluted mass matched are searched in the
     centroided MS/MS peaks of the spectrum, stored in the TopFD SQLite
     database, using the isotopic-envelope test of MSPathFinderT: an envelope
@@ -242,7 +243,7 @@ fraction's FDR computation
 `<fraction>_ms2.toppic_record_prsm`; decoy identifications included). The
 merged PrSMs are clustered again into proteoforms and proteins across the
 fractions, by protein and precursor mass as with `-x` (the feature files
-are not merged), and given one set of FDRs (steps 9 and 13), and the decoy
+are not merged), and given one set of FDRs (steps 8 and 13), and the decoy
 removal, the cutoffs and the output steps are repeated on them; the
 recount, post mass matching and PTM characterization of the fractions are
 kept. The combined results are always named `<name>_ms2_toppic_*`, the

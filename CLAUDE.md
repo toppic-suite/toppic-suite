@@ -445,8 +445,8 @@ deconvoluted with the FLASHDeconv algorithm (OpenMS `SpectralDeconvolution`,
 
 ## Post mass matching (`prsm/prsm_post_mass_match`, toppic only)
 
-After the search, the match recount, the clustering and the cluster
-protein correction, `console/toppic_process` runs
+After the search, the clustering, the cluster protein correction and the
+match recount, `console/toppic_process` runs
 `prsm_post_mass_match::process`, which matches the theoretical fragment
 masses of each PrSM that no deconvoluted mass matched against the
 **centroided MS/MS peaks stored in TopFD's SQLite database** (MSPathFinderT's
@@ -467,10 +467,12 @@ instead of the input. Facts to keep straight:
   `ToppicArgument::validateArguments` (so a run fails before the search),
   `process()` itself (abort), and `toppic_gui`'s `checkError()` (a warning
   dialog before toppic is launched). Keep all three in step.
-- **It runs on the best PrSM of every spectrum, after the cluster protein
-  correction.** `TopPIC_postprocess` recounts, clusters and corrects the
-  PrSMs on the spectra TopFD wrote, then post-matches `toppic_cluster_prot`
-  (targets and decoys alike) into `<base>_post_ms2.toppic_cluster_prot`,
+- **It runs on the best PrSM of every spectrum, after the clustering, the
+  cluster protein correction and the recount.** `TopPIC_postprocess`
+  clusters and corrects the PrSMs (`toppic_raw_prsm` → `toppic_cluster_prot`),
+  recounts them against the full spectra (`toppic_recount`), then
+  post-matches `toppic_recount` (targets and decoys alike) into
+  `<base>_post_ms2.toppic_recount`,
   and the PTM characterization (`-l`), FDR, cutoffs, tables and SQL output
   read the spectra with the added masses under the new name. Post matching
   changes neither E-values nor cluster ids, so the FDRs and the
@@ -487,8 +489,8 @@ instead of the input. Facts to keep straight:
   Without the index every query scans the whole table: on 480_F3_02
   (4.5 M peaks, ~4,000 PrSMs) the step took 11 of the 18 minutes of a
   default run. Keep any new per-spectrum query on the SQLite file indexed.
-- **Cluster protein correction runs between the clustering and the post
-  mass matching** (`stat/tdgf/cluster_prot_corrector`; it lives in
+- **Cluster protein correction runs right after the clustering, before
+  the match recount** (`stat/tdgf/cluster_prot_corrector`; it lives in
   `stat` because it needs `EValueProcessor`): in every proteoform cluster
   the PrSMs whose protein differs from the protein of the cluster's
   lowest-E-value PrSM (the same proteoform mass matched to another
@@ -501,15 +503,16 @@ instead of the input. Facts to keep straight:
   a corrected PrSM that matches at most
   `comp_evalue_min_match_theo_frag_num_` fragments gets the maximum
   E-value and fails the cutoffs. The output is `toppic_cluster_prot`
-  (deleted without `-k`); the post mass matching reads it and writes it
-  under the `_post_ms2` name, which the PTM characterization (`-l`) and
-  the FDR read (with `-D` they read `toppic_cluster_prot` itself).
+  (deleted without `-k`); the recount reads it and writes `toppic_recount`
+  with the matched numbers of every PrSM, corrected ones included, counted
+  on the full spectra, which the post mass matching, the PTM
+  characterization (`-l`) and the FDR use.
   Combined runs (`TopPIC_multi_postprocess`) do not run it. The earlier
   `prsm_cluster_prot_filter`, which dropped those PrSMs, is gone.
 - **`<base>.toppic_record_prsm` is where `TopPIC_postprocess` ends and
   `TopPIC_report` starts.** It is a copy, made inline at the end of
   `TopPIC_postprocess`, of the PrSM file after the FDR computation
-  (`toppic_cluster_fdr` with `-d`; `toppic_cluster_prot`, or
+  (`toppic_cluster_fdr` with `-d`; `toppic_recount`, or
   `toppic_cluster_local` with `-l`, without): the best PrSM of every
   spectrum with the added masses, the cluster ids and the FDRs, before the
   cutoffs, **decoys included** (`prsm_fdr::process` and
@@ -578,13 +581,13 @@ instead of the input. Facts to keep straight:
   the multiple-shift ones and keeps the best PrSM per spectrum
   (`toppic_raw_prsm`; without `-s 2` `TopPIC_postprocess` copies
   `toppic_pre_raw_prsm` to that name). `TopPIC_postprocess` runs the
-  recount, clustering, cluster protein correction, post mass matching,
+  clustering, cluster protein correction, recount, post mass matching,
   characterization and FDR once on `toppic_raw_prsm` and writes
   `toppic_record_prsm`;
   `TopPIC_report` runs the decoy removal, the cutoffs and the outputs.
   The PrSM file chain is therefore `toppic_pre_raw_prsm` → `toppic_raw_prsm`
-  → `toppic_recount` → `toppic_proteoform_cluster` → `toppic_cluster`
-  → `toppic_cluster_prot` [→ the same under the `_post_ms2` name]
+  → `toppic_proteoform_cluster` → `toppic_cluster` → `toppic_cluster_prot`
+  → `toppic_recount` [→ the same under the `_post_ms2` name]
   [→ `toppic_cluster_local`] [→ `toppic_cluster_fdr`]
   → `toppic_record_prsm`
   [→ `toppic_prsm_target`] → `toppic_prsm_cutoff` → `toppic_form_cutoff`
@@ -718,9 +721,10 @@ above it, never the reverse:
   read the unfiltered spectra. Use the cutoff constructor in a new
   identification stage, and the three-argument one in a new output stage.
   Because the search stores matched mass/fragment numbers counted on the
-  filtered masses, toppic and topmg run `prsm/prsm_match_num_recount` on
-  `<tool>_raw_prsm` (writing `<tool>_recount`) before clustering to recount
-  them against the full spectra (`prsm_match_num_recount::process` and
+  filtered masses, toppic and topmg run `prsm/prsm_match_num_recount`
+  (writing `<tool>_recount`) to recount them against the full spectra --
+  topmg on `topmg_raw_prsm` before its clustering, toppic on
+  `toppic_cluster_prot` after its clustering and cluster protein correction (`prsm_match_num_recount::process` and
   `prsm_reader_util::readPrsmsWithSpectra` take an EnvCNN cutoff whose
   default, 0, keeps every mass; both drivers use the default); the number
   of masses in the tables is not stored in the PrSM but computed from the
