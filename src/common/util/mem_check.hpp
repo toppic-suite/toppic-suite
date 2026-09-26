@@ -17,6 +17,8 @@
 #define TOPPIC_COMMON_UTIL_MEMCHECK_HPP_
 
 #include <string>
+#include <utility>
+#include <vector>
 
 namespace toppic {
 
@@ -41,6 +43,15 @@ double getAvailMemInGb();
 // first call), the figure checkThreadNum prints and reports its per-stage
 // thread numbers from
 double getStartupAvailMemInGb();
+
+// The protein sequence filtering steps of toppic or topmg whose thread number
+// the memory available at the start of the run lowers below thread_num, each
+// with the number it will use; empty when no step is lowered, and for a
+// program that does not control filtering thread numbers itself. The console
+// warning of checkThreadNum and the GUI dialogs are both built from it, so
+// the two cannot describe the same run differently.
+std::vector<std::pair<std::string, int>> getLimitedFilterStages(
+    const std::string& prog, int thread_num);
 
 bool checkThreadNum(int thread_num, const std::string& prog);
 

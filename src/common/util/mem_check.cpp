@@ -259,6 +259,21 @@ int getStageThreadNum(const std::string& stage_name, int thread_num) {
   return stage_thread_num;
 }
 
+std::vector<std::pair<std::string, int>> getLimitedFilterStages(
+    const std::string& prog, int thread_num) {
+  std::vector<std::pair<std::string, int>> limited_stages;
+  if (filter_stage_list.find(prog) == filter_stage_list.end()) {
+    return limited_stages;
+  }
+  for (const std::string& stage_name : filter_stage_list.at(prog)) {
+    int stage_thread_num = getStageStartThreadNum(stage_name, thread_num);
+    if (stage_thread_num < thread_num) {
+      limited_stages.emplace_back(stage_name, stage_thread_num);
+    }
+  }
+  return limited_stages;
+}
+
 bool checkThreadNum(int thread_number, const std::string& prog) {
   if (thread_number <= 0) {
     LOG_ERROR("Thread number " << thread_number
@@ -288,13 +303,8 @@ bool checkThreadNum(int thread_number, const std::string& prog) {
   // stage recomputes its number from the memory available when it starts,
   // through getStageThreadNum, which reports the difference if there is one.
   if (filter_stage_list.find(prog) != filter_stage_list.end()) {
-    std::vector<std::pair<std::string, int>> limited_stages;
-    for (const std::string& stage_name : filter_stage_list.at(prog)) {
-      int stage_thread_num = getStageStartThreadNum(stage_name, thread_number);
-      if (stage_thread_num < thread_number) {
-        limited_stages.emplace_back(stage_name, stage_thread_num);
-      }
-    }
+    std::vector<std::pair<std::string, int>> limited_stages =
+        getLimitedFilterStages(prog, thread_number);
     if (!limited_stages.empty()) {
       std::cout << "WARNING: With the memory available now, these protein"
                 << " sequence filtering steps will use" << std::endl;
