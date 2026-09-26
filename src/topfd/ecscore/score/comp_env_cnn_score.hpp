@@ -16,6 +16,8 @@
 #ifndef TOPPIC_TOPFD_ECSCORE_SCORE_COMP_ENV_CNN_SCORE_HPP_
 #define TOPPIC_TOPFD_ECSCORE_SCORE_COMP_ENV_CNN_SCORE_HPP_
 
+#include <vector>
+
 #include "ms/msmap/ms_map.hpp"
 #include "topfd/ecscore/env_coll/env_coll.hpp"
 
@@ -25,6 +27,11 @@ namespace comp_env_cnn_score {
 
 double compEnvcnnScore(const MsMapPtr& matrix_ptr,
                        const EnvCollPtr& env_coll_ptr);
+
+// The 4 x 300 input of the EnvCNN model for one envelope collection,
+// flattened, so that several of them can be scored in one call.
+std::vector<float> getEnvcnnTensor(const MsMapPtr& matrix_ptr,
+                                   const EnvCollPtr& env_coll_ptr);
 
 }
 }  // namespace toppic

@@ -79,6 +79,20 @@ class MassMatch {
 
   int getRowNum() { return row_num_; }
 
+  int getColNum() { return col_num_; }
+
+  // Whether truncateColumns(max_proteoform_mass) gives the index that the
+  // constructor builds at that limit: the limit is at most this index's, and
+  // every proteoform's masses were nondecreasing, so that the construction
+  // loops, which stop at the first mass beyond the limit, put the same
+  // entries in the same order into the columns below it. False for an index
+  // read from a file, whose masses are not known.
+  bool canTruncateColumns(double max_proteoform_mass) const;
+
+  // Drops the columns from max_proteoform_mass * scale on and their entries
+  // (see canTruncateColumns).
+  void truncateColumns(double max_proteoform_mass);
+
   static int getPrecursorMatchScore() { return 10000; }
 
   const std::vector<int>& getRowProteoIds() { return row_proteo_ids_; }
@@ -122,6 +136,10 @@ class MassMatch {
   // entries of columns [left, right] are [begins[left], begins[right + 1]);
   // built after construction or deserialization, not serialized.
   std::vector<int> col_index_bounds_;
+
+  // whether every proteoform's masses were nondecreasing at construction
+  // (see canTruncateColumns); not serialized
+  bool rows_nondecreasing_ = false;
 
   void initColIndexBounds();
 

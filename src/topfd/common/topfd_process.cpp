@@ -64,14 +64,16 @@ void processFraction(const TopfdParaPtr& para_ptr) {
     ms1_proc_ptr = nullptr;
     std::cout << "MS1 deconvolution finished." << std::endl;
     std::cout << "MS1 feature detection started." << std::endl;
-    // The feature detection scores one envelope per EnvCNN call, 87,000
-    // calls on 480_F3_02, each streaming the model's 87 MB of weights
-    // through the CPU: memory-bound. Two intra-op threads that sleep
-    // between the calls stream them fastest (st_1 feature stage: 26.1 s
-    // with 1 thread, 18.7 s with 2, 19.4 s with 4, 22.9 s with 8, 27.6 s
-    // with 16; toppic_test experiment 36). The single-thread session is
-    // restored for the MS/MS deconvolution, whose workers call in parallel.
-    int feat_onnx_thread_num = 2;
+    // The feature detection scores its candidates in batches of 64
+    // (env_coll_detect.cpp, issue #586). One call then carries enough
+    // arithmetic to divide among cores, where a single-envelope call was
+    // pure weight streaming and two threads served it best (experiment 36).
+    // Per envelope at batch 64: 0.616 ms with 1 thread, 0.320 with 2, 0.172
+    // with 4, 0.162 with 8 (toppic_test experiment 62). The stage is
+    // single-threaded, so those cores are idle anyway; the single-thread
+    // session is restored for the MS/MS deconvolution, whose workers call in
+    // parallel.
+    int feat_onnx_thread_num = 8;
     bool feat_onnx_spinning = false;
     onnx_env_cnn::initModel(para_ptr->getResourceDir(), feat_onnx_thread_num,
                             feat_onnx_spinning);

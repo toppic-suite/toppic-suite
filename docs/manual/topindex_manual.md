@@ -35,17 +35,21 @@ TopMG do the same when given the original file, so they find the indexes.
    index, and its `.fai` index for random access. These are the same files
    TopPIC and TopMG create when they run without an index.
 3. Writes three families of index files, one file per index name and
-   database block; blocks are processed in parallel on the `-u` threads:
-   - `Generating non shift index files`: the zero-shift indexes
-     `zero_ptm_term_index`, `zero_ptm_diag_index`, `zero_ptm_rev_term_index`
-     and `zero_ptm_rev_diag_index`, used by TopPIC's zero-shift and
-     variable-PTM filters.
-   - `Generating one shift index files`: the one-shift indexes
-     `one_ptm_term_index`, `one_ptm_diag_index`, `one_ptm_rev_term_index` and
-     `one_ptm_rev_diag_index`, used by TopPIC's one-shift filter and TopMG's
-     ASF-One PTM filter.
-   - `Generating multiple shift index files`: `multi_ptm_index`, used by
-     TopPIC's multiple-shift filter and TopMG's ASF-Diagonal filter.
+   database block, in one pass over the blocks (`Generating index files`);
+   blocks are processed in parallel on the `-u` threads:
+   - the zero-shift indexes `zero_ptm_term_index`, `zero_ptm_diag_index`,
+     `zero_ptm_rev_term_index` and `zero_ptm_rev_diag_index`, used by
+     TopPIC's zero-shift and variable-PTM filters, cover proteoform masses
+     up to 100 kDa;
+   - the one-shift indexes `one_ptm_term_index`, `one_ptm_diag_index`,
+     `one_ptm_rev_term_index` and `one_ptm_rev_diag_index`, used by TopPIC's
+     one-shift filter and TopMG's ASF-One PTM filter, are the zero-shift
+     indexes cut at 50 kDa, so each is written from the index just built
+     rather than built a second time;
+   - `multi_ptm_index`, used by TopPIC's multiple-shift filter and TopMG's
+     ASF-Diagonal filter, is the same index as `one_ptm_diag_index`, so it is
+     written as a hard link to that file (a copy on file systems without
+     hard links); `du` counts the pair once.
 
 Each file name carries the parameters the index depends on, in the form
 `<family>_<fixed mod>_<N-terminal forms>_<error tolerance>_<no_decoy|decoy><block>`,
@@ -78,7 +82,7 @@ fall back to in-memory indexes.
 | `-d`, `--decoy` | off | Also index a shuffled decoy database. |
 | `-e`, `--frag-error-tolerance <int>` | 10 | Error tolerance of fragment masses (ppm). |
 | `-E`, `--prec-error-tolerance <int>` | 10 | Error tolerance of precursor masses (ppm). |
-| `-u`, `--thread-number <int>` | 1 | Number of threads; database blocks are processed in parallel. Must not exceed the number of hardware threads. Each thread needs about 0.5 GiB of memory; TopIndex warns (but still runs) when the machine has too little for the requested number. |
+| `-u`, `--thread-number <int>` | 1 | Number of threads; database blocks are processed in parallel. Must not exceed the number of hardware threads. Each thread needs about 0.5 GiB of memory; TopIndex warns (but still runs) when the machine has too little for the requested number. The build is limited by memory and disk bandwidth rather than by cores, so more threads than physical cores gain nothing (on an 8-core machine, `-u 8` was faster than `-u 16`). |
 
 
 ## 5. Example
@@ -92,5 +96,5 @@ toppic -d -f C57 -e 15 proteins.fasta sample_ms2.msalign
 topmg  -d -f C57 -e 15 -i mods.txt proteins.fasta sample_ms2.msalign
 ```
 
-The console shows the three phases with one progress line per block and ends
-with `TopIndex - finished.`
+The console shows one progress line per block and ends with
+`TopIndex - finished.`

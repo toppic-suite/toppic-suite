@@ -109,7 +109,11 @@ topindex [-d] [-f C57|C58|file] [-e ppm] [-n forms] [-u N] proteins.fasta
 
 Optional; without it the search tools build the same indexes in memory
 each run. Writes `<database>_idx/` with the prepared database (`_standard`,
-`_target` or `_target_decoy`, block files, `.fai`) and three index families.
+`_target` or `_target_decoy`, block files, `.fai`) and three index families
+in one pass over the blocks: the `one_ptm_*` files are the `zero_ptm_*`
+ones cut at 50 kDa, written from the same in-memory index, and
+`multi_ptm_index` is a hard link to `one_ptm_diag_index` (the same index
+under a second name).
 **The searches use the index only when their `-f`, `-n`, `-e` and `-d`
 match** the ones given to topindex; otherwise they fall back silently.
 Index files are large (roughly ten thousand times the FASTA size, double

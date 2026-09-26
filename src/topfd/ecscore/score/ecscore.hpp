@@ -34,6 +34,11 @@ class ECScore {
   ECScore(const EnvCollPtr& env_coll_ptr, const MsMapPtr& matrix_ptr,
           double sn_ratio);
 
+  // the same, with the EnvCNN score already computed - the MS1 feature
+  // detection scores its candidates in batches
+  ECScore(const EnvCollPtr& env_coll_ptr, const MsMapPtr& matrix_ptr,
+          double sn_ratio, double envcnn_score);
+
   std::vector<float> getEcscoreInput(double max_retention_time);
 
   // int getEcscoreId() const { return score_id_; }
