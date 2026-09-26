@@ -802,7 +802,7 @@ p, li { white-space: pre-wrap; }
          <bool>false</bool>
         </property>
         <property name="text">
-         <string>Use FLASHDeconv for MS/MS (experimental)</string>
+         <string>Use FLASHDeconv for MS/MS</string>
         </property>
         <property name="checkable">
          <bool>true</bool>
@@ -906,7 +906,7 @@ p, li { white-space: pre-wrap; }
         </size>
        </property>
        <property name="text">
-        <string>Feature min scan number:</string>
+        <string>Feature min scan num:</string>
        </property>
       </widget>
      </item>
