@@ -240,7 +240,11 @@ path and linked into `toppic_common`:
   headers. Windows also links `ws2_32` into the vendored htslib and pwiz
   (Winsock), builds the GUI targets as `WIN32_EXECUTABLE`, and installs `res/`
   next to the executables because `getResourceDir()` does not consult the
-  compiled-in shared dir there. Treat it as third-party.
+  compiled-in shared dir there. Treat it as third-party, with one local
+  patch: `onnxruntime_c_api.h` defines `ORT_API_CALL` as `__stdcall` on
+  Windows (upstream writes `_stdcall`, which GCC rejects under the strict
+  `-std=c++17` that `CMAKE_CXX_EXTENSIONS OFF` selects; MSYS2 patches its
+  packaged header the same way). Re-apply it when re-vendoring the headers.
 
 `file_util::getResourceDir()` looks for the resources in `<exec_dir>/res`
 (installed layout on macOS/Windows), then `<exec_dir>/../res` (the build tree:
