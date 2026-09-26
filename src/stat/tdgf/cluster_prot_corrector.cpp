@@ -24,7 +24,6 @@
 #include "common/base/mod.hpp"
 #include "common/util/file_util.hpp"
 #include "ms/factory/spectrum_set_factory.hpp"
-#include "ms/spec/deconv_ms_util.hpp"
 #include "ms/spec/msalign_reader.hpp"
 #include "para/sp_para.hpp"
 #include "prsm/prsm.hpp"
@@ -78,11 +77,13 @@ int process(const PrsmParaPtr& prsm_para_ptr, const TdgfMngPtr& tdgf_mng_ptr,
     evalue_processor->init();
     SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
     double ppo = sp_para_ptr->getPrecTolerancePtr()->getPpo();
-    double dedup_ppo = sp_para_ptr->getFragDedupPpo();
-    // the spectra as the search saw them: masses below the cutoff removed
+    // the spectra as the search and the E-value computation saw them: masses
+    // below the EnvCNN cutoff removed, close masses combined with
+    // --frag-mass-dedup
     MsAlignReaderPtr ms_reader_ptr = std::make_shared<MsAlignReader>(
         sp_file_name, prsm_para_ptr->getGroupSpecNum(),
-        sp_para_ptr->getActivationPtr(), sp_para_ptr->getEnvCnnCutoff());
+        sp_para_ptr->getActivationPtr(), sp_para_ptr->getEnvCnnCutoff(),
+        sp_para_ptr->getFragDedupPpo());
     DeconvMsPtrVec deconv_ms_ptr_vec = ms_reader_ptr->getNextMsPtrVec();
     while (deconv_ms_ptr_vec.size() != 0) {
       MsHeaderPtr header_ptr = deconv_ms_ptr_vec[0]->getMsHeaderPtr();
@@ -107,22 +108,7 @@ int process(const PrsmParaPtr& prsm_para_ptr, const TdgfMngPtr& tdgf_mng_ptr,
             prsm_ptr->setProteoformPtr(form_ptr, sp_para_ptr);
             sele_prsm_ptrs.push_back(prsm_ptr);
           }
-          // the recount above uses the masses of the file; the E-value uses
-          // the deduplicated ones, as the main E-value stage does. A merge
-          // can push a spectrum below the minimum peak number, and losing the
-          // E-value would be worse than computing it undeduplicated.
-          SpectrumSetPtr evalue_set_ptr = spec_set_ptr;
-          if (dedup_ppo > 0) {
-            SpectrumSetPtr dedup_set_ptr =
-                spectrum_set_factory::geneSpectrumSetPtr(
-                    deconv_ms_util::combineCloseMasses(deconv_ms_ptr_vec,
-                                                       dedup_ppo),
-                    sp_para_ptr, prec_mono_mass);
-            if (dedup_set_ptr != nullptr && dedup_set_ptr->isValid()) {
-              evalue_set_ptr = dedup_set_ptr;
-            }
-          }
-          evalue_processor->compEvalues(evalue_set_ptr, sele_prsm_ptrs, ppo,
+          evalue_processor->compEvalues(spec_set_ptr, sele_prsm_ptrs, ppo,
                                         false);
         }
       }

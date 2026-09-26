@@ -495,10 +495,12 @@ instead of the input. Facts to keep straight:
   the PrSMs whose protein differs from the protein of the cluster's
   lowest-E-value PrSM (the same proteoform mass matched to another
   protein) get that PrSM's proteoform (shared pointer; its mass becomes
-  their adjusted precursor mass), their matched fragment numbers are
-  recounted on the spectra read with the search's EnvCNN cutoff, and their
-  E-values are recomputed with `EValueProcessor::compEvalues` on those
-  spectra (a `TdgfMng` built from the same values as the search's, with
+  their adjusted precursor mass), and their matched fragment numbers and
+  E-values (`EValueProcessor::compEvalues`) are recomputed on the spectra
+  read as the search read them: `MsAlignReader` with the EnvCNN cutoff and
+  `SpPara::getFragDedupPpo()` (the combined masses of `--frag-mass-dedup`);
+  the recount that follows replaces the matched numbers with full-spectrum
+  counts (a `TdgfMng` built from the same values as the search's, with
   `varPtmTypeNum` from the argument map, 0 if absent). Nothing is removed;
   a corrected PrSM that matches at most
   `comp_evalue_min_match_theo_frag_num_` fragments gets the maximum

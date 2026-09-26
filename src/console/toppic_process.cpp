@@ -617,10 +617,10 @@ int TopPIC_postprocess(std::map<std::string, std::string>& arguments) {
     // In every proteoform cluster, the PrSMs whose protein differs from the
     // protein of the cluster's best-E-value PrSM (the same proteoform mass
     // matched to another protein) get that PrSM's proteoform; their matched
-    // fragment numbers are recounted on the spectra as the search read them
-    // (EnvCNN cutoff) and their E-values recomputed. The recount, the post
-    // mass matching, the PTM characterization and the FDR run on the
-    // corrected PrSMs.
+    // fragment numbers and E-values are recomputed on the spectra as the
+    // search read them (EnvCNN cutoff, deduplicated masses). The recount,
+    // the post mass matching, the PTM characterization and the FDR run on
+    // the corrected PrSMs.
     std::cout << "Cluster protein correction - started." << std::endl;
     {
       int var_ptm_type_num = arguments["varPtmTypeNum"] == ""
