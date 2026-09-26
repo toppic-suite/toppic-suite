@@ -257,7 +257,6 @@ void processMs1Windowed(const TopfdParaPtr& topfd_para_ptr) {
   const int win_margin = 150;
   int row_num = matrix_ptr->getRowNum();
   int num_wins = (row_num + win_rows - 1) / win_rows;
-  int max_live_rows = 0;
   int filled_lo = 0;
   int filled_hi = 0;
   double fill_sn_ratio = sn_ratio;
@@ -276,9 +275,6 @@ void processMs1Windowed(const TopfdParaPtr& topfd_para_ptr) {
                           fill_sn_ratio, single_scan_noise,
                           fill_neighbor_tole);
       filled_hi++;
-    }
-    if (filled_hi - filled_lo > max_live_rows) {
-      max_live_rows = filled_hi - filled_lo;
     }
   };
 
@@ -299,7 +295,6 @@ void processMs1Windowed(const TopfdParaPtr& topfd_para_ptr) {
   // parked candidate can never lose the rows it was built from.
   std::vector<ParkedCand> parked;
   std::vector<BatchChange> changes;
-  long batch_call_num = 0, cand_num = 0, rebuilt_num = 0;
   LOG_DEBUG("Number of seed envelopes: " << seed_ptrs.size());
   int seed_num = seed_ptrs.size();
   int count = 0;
@@ -334,7 +329,6 @@ void processMs1Windowed(const TopfdParaPtr& topfd_para_ptr) {
       tensor.insert(tensor.end(), cand.tensor.begin(), cand.tensor.end());
     std::vector<double> batch_scores =
         onnx_env_cnn::predict(static_cast<int>(parked.size()), tensor);
-    batch_call_num++;
     for (size_t i = 0; i < parked.size(); i++) {
       ParkedCand& cand = parked[i];
       bool stale = false;
@@ -343,7 +337,6 @@ void processMs1Windowed(const TopfdParaPtr& topfd_para_ptr) {
       EnvCollPtr env_coll_ptr = cand.coll_ptr;
       double envcnn_score = batch_scores[i];
       if (stale) {
-        rebuilt_num++;
         SeedEnvPtr seed_ptr = seed_env_util::preprocessSeedEnvPtr(
             cand.orig_seed_ptr, matrix_ptr, score_para_ptr, sn_ratio);
         if (seed_ptr == nullptr) continue;
@@ -400,7 +393,6 @@ void processMs1Windowed(const TopfdParaPtr& topfd_para_ptr) {
         continue;
       }
       env_coll_ptr->refineMonoMass();
-      cand_num++;
       parked.push_back({sorted_seed_ptr, env_coll_ptr,
                         comp_env_cnn_score::getEnvcnnTensor(matrix_ptr,
                                                             env_coll_ptr),
@@ -413,9 +405,6 @@ void processMs1Windowed(const TopfdParaPtr& topfd_para_ptr) {
   }
   flushBatch();
   std::cout << std::endl;
-  std::cout << "EnvCNN scoring: " << cand_num << " candidates in "
-            << batch_call_num << " batched calls, " << rebuilt_num
-            << " rebuilt" << std::endl;
 
   if (topfd_para_ptr->isSearchPrecWindow()) {
     // add ms1 feature based on precursor windows
@@ -499,9 +488,6 @@ void processMs1Windowed(const TopfdParaPtr& topfd_para_ptr) {
     }
     std::cout << std::endl;
   }
-
-  std::cout << "Sliding window: max resident rows " << max_live_rows << " of "
-            << row_num << std::endl;
 
   FracFeaturePtrVec frac_features;
   for (std::size_t i = 0; i < env_coll_list.size(); i++) {
@@ -620,7 +606,6 @@ void processMs1(const TopfdParaPtr& topfd_para_ptr) {
   // the oldest of them was parked (issue #586)
   std::vector<ParkedCand> parked;
   std::vector<BatchChange> changes;
-  long batch_call_num = 0, cand_num = 0, rebuilt_num = 0;
 
   auto removePeaks = [&](const EnvCollPtr& coll_ptr) {
     changes.push_back({getReadRegions(coll_ptr, score_para_ptr),
@@ -654,7 +639,6 @@ void processMs1(const TopfdParaPtr& topfd_para_ptr) {
       tensor.insert(tensor.end(), cand.tensor.begin(), cand.tensor.end());
     std::vector<double> batch_scores =
         onnx_env_cnn::predict(static_cast<int>(parked.size()), tensor);
-    batch_call_num++;
     for (size_t i = 0; i < parked.size(); i++) {
       ParkedCand& cand = parked[i];
       bool stale = false;
@@ -665,7 +649,6 @@ void processMs1(const TopfdParaPtr& topfd_para_ptr) {
       if (stale) {
         // a removal touched what this candidate reads: redo it against the
         // matrix as it stands now, exactly as the sequential loop would
-        rebuilt_num++;
         SeedEnvPtr seed_ptr = seed_env_util::preprocessSeedEnvPtr(
             cand.orig_seed_ptr, matrix_ptr, score_para_ptr, sn_ratio);
         if (seed_ptr == nullptr) continue;
@@ -719,7 +702,6 @@ void processMs1(const TopfdParaPtr& topfd_para_ptr) {
       continue;
     }
     env_coll_ptr->refineMonoMass();
-    cand_num++;
     parked.push_back({orig_seed_ptr, env_coll_ptr,
                       comp_env_cnn_score::getEnvcnnTensor(matrix_ptr,
                                                           env_coll_ptr),
@@ -731,9 +713,6 @@ void processMs1(const TopfdParaPtr& topfd_para_ptr) {
   }
   flushBatch();
   std::cout << std::endl;
-  std::cout << "EnvCNN scoring: " << cand_num << " candidates in "
-            << batch_call_num << " batched calls, " << rebuilt_num
-            << " rebuilt" << std::endl;
 
   if (topfd_para_ptr->isSearchPrecWindow()) {
     // add ms1 feature based on precursor windows
