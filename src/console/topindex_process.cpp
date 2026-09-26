@@ -81,7 +81,8 @@ void TopIndexProcess(std::map<std::string, std::string>& arguments) {
     DiagFilterMngPtr diag_filter_mng_ptr = std::make_shared<DiagFilterMng>(
         prsm_para_ptr, index_file_para, filter_result_num, thread_num,
         "toppic_multi_filter");
-    diag_index::process(diag_filter_mng_ptr);
+    // the one-shift stage's diagonal index is reused when the limits match
+    diag_index::process(diag_filter_mng_ptr, one_ptm_filter_mng_ptr);
 
     base_data::release();
 

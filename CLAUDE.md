@@ -783,6 +783,16 @@ above it, never the reverse:
   filter/index mutexes) live in **anonymous namespaces** — they previously had
   external linkage and the same name in several TUs, which only becomes a
   multiple-definition error once everything compiles into one library.
+  `filter/index` is topindex's side: `zero_ptm_index`, `one_ptm_index` and
+  `diag_index` each build, per database block, `MassMatch` objects from the
+  same factory calls with only the manager's `max_proteoform_mass_` /
+  `filter_scale_` differing (zero-shift 100000/100, one-shift and diagonal
+  50000/100). The diagonal stage's `multi_ptm_index` is therefore the same
+  bytes as the one-shift stage's `one_ptm_diag_index`, and `diag_index::process`
+  hard-links (or copies) that file instead of rebuilding it whenever the two
+  managers' limits and index parameters match — keep that equivalence check if
+  either manager's defaults change, and do not make `multi_ptm_index` differ
+  from `one_ptm_diag_index` without removing the link path.
   The filters are memory-bound: each thread streams every spectrum against
   one database block's index (117 blocks of ~1 GB one-shift index files for
   the human target+decoy database), so `compScores` misses cache on every

@@ -45,7 +45,10 @@ TopMG do the same when given the original file, so they find the indexes.
      `one_ptm_rev_diag_index`, used by TopPIC's one-shift filter and TopMG's
      ASF-One PTM filter.
    - `Generating multiple shift index files`: `multi_ptm_index`, used by
-     TopPIC's multiple-shift filter and TopMG's ASF-Diagonal filter.
+     TopPIC's multiple-shift filter and TopMG's ASF-Diagonal filter. This
+     file is the same index as `one_ptm_diag_index`, so it is written as a
+     hard link to that file (a copy on file systems without hard links)
+     rather than built a second time; `du` counts the pair once.
 
 Each file name carries the parameters the index depends on, in the form
 `<family>_<fixed mod>_<N-terminal forms>_<error tolerance>_<no_decoy|decoy><block>`,
