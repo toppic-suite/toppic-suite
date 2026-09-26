@@ -111,6 +111,12 @@ using PostMatchVec = std::vector<PostMatch>;
 class RawPeakReader {
  public:
   explicit RawPeakReader(sqlite3* db) : db_(db) {
+    // TopFD writes ms2_peak without an index; without one every spectrum's
+    // peak query scans the whole table (4.5 M rows on 480_F3_02, 11 of the
+    // 18 minutes of a default toppic run).
+    sql_util::execSql(db_,
+                      "CREATE INDEX IF NOT EXISTS ms2_peak_spec_id_index "
+                      "ON ms2_peak(spec_id);");
     id_stmt_ = sql_util::prepareSql(
         db_, "SELECT id FROM ms2_spectrum WHERE scan = ?;");
     peak_stmt_ = sql_util::prepareSql(

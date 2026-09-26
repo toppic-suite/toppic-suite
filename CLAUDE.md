@@ -468,6 +468,12 @@ the input. Facts to keep straight:
   characterization (`-l`), FDR, cutoffs, tables and SQL output all read the
   spectra with the added masses under the new name; the FDR and the cutoffs
   use E-values, which are not recomputed.
+- **It reads each PrSM's peaks with one query on `ms2_peak` by `spec_id`**
+  (`RawPeakReader`), and TopFD writes that table without an index, so the
+  reader first runs `CREATE INDEX IF NOT EXISTS ms2_peak_spec_id_index`.
+  Without the index every query scans the whole table: on 480_F3_02
+  (4.5 M peaks, ~4,000 PrSMs) the step took 11 of the 18 minutes of a
+  default run. Keep any new per-spectrum query on the SQLite file indexed.
 - **Cluster protein correction runs between the clustering and the PTM
   characterization** (`stat/tdgf/cluster_prot_corrector`; it lives in
   `stat` because it needs `EValueProcessor`): in every proteoform cluster
