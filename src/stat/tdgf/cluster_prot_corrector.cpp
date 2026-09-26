@@ -40,8 +40,7 @@ namespace cluster_prot_corrector {
 
 int process(const PrsmParaPtr& prsm_para_ptr, const TdgfMngPtr& tdgf_mng_ptr,
             const std::string& input_file_ext,
-            const std::string& output_file_ext, double env_cnn_cutoff,
-            double dedup_ppo) {
+            const std::string& output_file_ext) {
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
   std::string base_name = file_util::basename(sp_file_name);
   FastaIndexReaderPtr seq_reader = std::make_shared<FastaIndexReader>(
@@ -79,10 +78,11 @@ int process(const PrsmParaPtr& prsm_para_ptr, const TdgfMngPtr& tdgf_mng_ptr,
     evalue_processor->init();
     SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
     double ppo = sp_para_ptr->getPrecTolerancePtr()->getPpo();
+    double dedup_ppo = sp_para_ptr->getFragDedupPpo();
     // the spectra as the search saw them: masses below the cutoff removed
     MsAlignReaderPtr ms_reader_ptr = std::make_shared<MsAlignReader>(
         sp_file_name, prsm_para_ptr->getGroupSpecNum(),
-        sp_para_ptr->getActivationPtr(), env_cnn_cutoff);
+        sp_para_ptr->getActivationPtr(), sp_para_ptr->getEnvCnnCutoff());
     DeconvMsPtrVec deconv_ms_ptr_vec = ms_reader_ptr->getNextMsPtrVec();
     while (deconv_ms_ptr_vec.size() != 0) {
       MsHeaderPtr header_ptr = deconv_ms_ptr_vec[0]->getMsHeaderPtr();

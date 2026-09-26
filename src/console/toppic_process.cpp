@@ -631,9 +631,7 @@ int TopPIC_postprocess(std::map<std::string, std::string>& arguments) {
           std::max(std::abs(max_shift_mass), std::abs(min_shift_mass)),
           var_ptm_type_num, std::stoi(arguments["threadNumber"]), "", "");
       int corrected_num = cluster_prot_corrector::process(
-          prsm_para_ptr, tdgf_mng_ptr, cur_suffix, "toppic_cluster_prot",
-          prsm_para_ptr->getSpParaPtr()->getEnvCnnCutoff(),
-          prsm_para_ptr->getSpParaPtr()->getFragDedupPpo());
+          prsm_para_ptr, tdgf_mng_ptr, cur_suffix, "toppic_cluster_prot");
       std::cout << "Cluster protein correction - corrected " << corrected_num
                 << " PrSMs." << std::endl;
     }
