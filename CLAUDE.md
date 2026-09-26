@@ -445,14 +445,15 @@ deconvoluted with the FLASHDeconv algorithm (OpenMS `SpectralDeconvolution`,
 
 ## Post mass matching (`prsm/prsm_post_mass_match`, toppic only)
 
-After the search and the match recount, `console/toppic_process` runs
+After the search, the match recount, the clustering and the cluster
+protein correction, `console/toppic_process` runs
 `prsm_post_mass_match::process`, which matches the theoretical fragment
 masses of each PrSM that no deconvoluted mass matched against the
 **centroided MS/MS peaks stored in TopFD's SQLite database** (MSPathFinderT's
 envelope test), scores the added masses with EnvCNN, and writes
 `<base>_post_ms2.msalign` plus PrSM/feature files under that name, which every
-downstream step (clustering, FDR, tables, SQL output) then reads instead of
-the input. Facts to keep straight:
+downstream step (PTM characterization, FDR, tables, SQL output) then reads
+instead of the input. Facts to keep straight:
 
 - **It is on by default.** `initArguments()` sets `postMassMatch = "true"`;
   `-D` / `--disable-post-match` sets it to false (there is no enabling flag
@@ -466,20 +467,28 @@ the input. Facts to keep straight:
   `ToppicArgument::validateArguments` (so a run fails before the search),
   `process()` itself (abort), and `toppic_gui`'s `checkError()` (a warning
   dialog before toppic is launched). Keep all three in step.
-- **It runs on the best PrSM of every spectrum, right after the match
-  recount.** `TopPIC_postprocess` post-matches `toppic_recount` (targets
-  and decoys alike, before the clustering), and the clustering, PTM
-  characterization (`-l`), FDR, cutoffs, tables and SQL output all read the
-  spectra with the added masses under the new name; the FDR and the cutoffs
-  use E-values, which are not recomputed.
+- **It runs on the best PrSM of every spectrum, after the cluster protein
+  correction.** `TopPIC_postprocess` recounts, clusters and corrects the
+  PrSMs on the spectra TopFD wrote, then post-matches `toppic_cluster_prot`
+  (targets and decoys alike) into `<base>_post_ms2.toppic_cluster_prot`,
+  and the PTM characterization (`-l`), FDR, cutoffs, tables and SQL output
+  read the spectra with the added masses under the new name. Post matching
+  changes neither E-values nor cluster ids, so the FDRs and the
+  identifications equal those of a `-D` run; only the matched masses and
+  fragments differ. (It used to run before the clustering, which let the
+  cluster protein correction recompute E-values on the post-matched
+  spectra: 42 E-values and 6 PrSMs at the 1% cutoff differed from `-D` on
+  480_F3_02, toppic_test report 0062.) The PrSM XML carries the cluster
+  ids (`proteo_cluster_id`, `prot_id`, `prot_cluster_id` in the proteoform
+  element), so the read-modify-write in `process()` keeps them.
 - **It reads each PrSM's peaks with one query on `ms2_peak` by `spec_id`**
   (`RawPeakReader`), and TopFD writes that table without an index, so the
   reader first runs `CREATE INDEX IF NOT EXISTS ms2_peak_spec_id_index`.
   Without the index every query scans the whole table: on 480_F3_02
   (4.5 M peaks, ~4,000 PrSMs) the step took 11 of the 18 minutes of a
   default run. Keep any new per-spectrum query on the SQLite file indexed.
-- **Cluster protein correction runs between the clustering and the PTM
-  characterization** (`stat/tdgf/cluster_prot_corrector`; it lives in
+- **Cluster protein correction runs between the clustering and the post
+  mass matching** (`stat/tdgf/cluster_prot_corrector`; it lives in
   `stat` because it needs `EValueProcessor`): in every proteoform cluster
   the PrSMs whose protein differs from the protein of the cluster's
   lowest-E-value PrSM (the same proteoform mass matched to another
@@ -492,13 +501,15 @@ the input. Facts to keep straight:
   a corrected PrSM that matches at most
   `comp_evalue_min_match_theo_frag_num_` fragments gets the maximum
   E-value and fails the cutoffs. The output is `toppic_cluster_prot`
-  (deleted without `-k`); the PTM characterization (`-l`) and the FDR read
-  it. Combined runs (`TopPIC_multi_postprocess`) do not run it. The
-  earlier `prsm_cluster_prot_filter`, which dropped those PrSMs, is gone.
+  (deleted without `-k`); the post mass matching reads it and writes it
+  under the `_post_ms2` name, which the PTM characterization (`-l`) and
+  the FDR read (with `-D` they read `toppic_cluster_prot` itself).
+  Combined runs (`TopPIC_multi_postprocess`) do not run it. The earlier
+  `prsm_cluster_prot_filter`, which dropped those PrSMs, is gone.
 - **`<base>.toppic_record_prsm` is where `TopPIC_postprocess` ends and
   `TopPIC_report` starts.** It is a copy, made inline at the end of
   `TopPIC_postprocess`, of the PrSM file after the FDR computation
-  (`toppic_cluster_fdr` with `-d`; `toppic_cluster`, or
+  (`toppic_cluster_fdr` with `-d`; `toppic_cluster_prot`, or
   `toppic_cluster_local` with `-l`, without): the best PrSM of every
   spectrum with the added masses, the cluster ids and the FDRs, before the
   cutoffs, **decoys included** (`prsm_fdr::process` and
@@ -567,12 +578,14 @@ the input. Facts to keep straight:
   the multiple-shift ones and keeps the best PrSM per spectrum
   (`toppic_raw_prsm`; without `-s 2` `TopPIC_postprocess` copies
   `toppic_pre_raw_prsm` to that name). `TopPIC_postprocess` runs the
-  recount, the post mass matching, clustering, characterization and FDR
-  once on `toppic_raw_prsm` and writes `toppic_record_prsm`;
+  recount, clustering, cluster protein correction, post mass matching,
+  characterization and FDR once on `toppic_raw_prsm` and writes
+  `toppic_record_prsm`;
   `TopPIC_report` runs the decoy removal, the cutoffs and the outputs.
   The PrSM file chain is therefore `toppic_pre_raw_prsm` → `toppic_raw_prsm`
   → `toppic_recount` → `toppic_proteoform_cluster` → `toppic_cluster`
-  → `toppic_cluster_prot` [→ `toppic_cluster_local`] [→ `toppic_cluster_fdr`]
+  → `toppic_cluster_prot` [→ the same under the `_post_ms2` name]
+  [→ `toppic_cluster_local`] [→ `toppic_cluster_fdr`]
   → `toppic_record_prsm`
   [→ `toppic_prsm_target`] → `toppic_prsm_cutoff` → `toppic_form_cutoff`
   → `toppic_form_cutoff_form` / `toppic_prot_cutoff` → `toppic_prot_cutoff_prot`.

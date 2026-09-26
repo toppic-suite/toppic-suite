@@ -559,10 +559,10 @@ int TopPIC_multi_ptm_search(std::map<std::string, std::string>& arguments) {
 // of every spectrum: the first-pass PrSM of the skipped spectra and, for the
 // searched spectra, the best of their first-pass and multiple-shift PrSMs
 // (toppic_raw_prsm); without -s 2 it is toppic_pre_raw_prsm. The set is
-// recounted and post-matched (the added masses are in every later step),
-// then clustered, characterized and given one FDR; the best PrSM of every
-// spectrum is kept as toppic_record_prsm, from which TopPIC_report writes
-// the results.
+// recounted, clustered and protein-corrected on the spectra TopFD wrote,
+// then post-matched (the added masses are in every later step),
+// characterized and given one FDR; the best PrSM of every spectrum is kept
+// as toppic_record_prsm, from which TopPIC_report writes the results.
 int TopPIC_postprocess(std::map<std::string, std::string>& arguments) {
   try {
     std::string resource_dir = arguments["resourceDir"];
@@ -598,27 +598,6 @@ int TopPIC_postprocess(std::map<std::string, std::string>& arguments) {
     std::cout << "Recounting matched masses and fragments - finished."
               << std::endl;
 
-    if (arguments["postMassMatch"] == "true") {
-      // On the best PrSM of every spectrum, targets and decoys alike, before
-      // the clustering, characterization, FDR and cutoffs: every later step
-      // sees the added masses. The E-values, which the FDR and the
-      // spectrum-level cutoff use, are not recomputed.
-      std::cout << "Post mass matching - started." << std::endl;
-      int min_peak_num = std::stoi(arguments["postMinPeakNum"]);
-      // the EnvCNN model scores the added masses
-      onnx_env_cnn::initModel(resource_dir,
-                              std::stoi(arguments["threadNumber"]));
-      sp_file_name = prsm_post_mass_match::process(
-          prsm_para_ptr, "toppic_recount", "toppic_recount", min_peak_num);
-      // The steps below read the spectra with the added masses and the PrSMs
-      // with the recounted matches, and name their files after the new
-      // spectrum file.
-      arguments["spectrumFileName"] = sp_file_name;
-      prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
-      msalign_util::geneSpIndex(sp_file_name);
-      std::cout << "Post mass matching - finished." << std::endl;
-    }
-
     bool is_proteoform_ppm_error = (arguments["proteoformPpmError"] == "true");
     double proteoform_error_tole =
         std::stod(arguments["proteoformErrorTolerance"]);
@@ -648,8 +627,8 @@ int TopPIC_postprocess(std::map<std::string, std::string>& arguments) {
     // protein of the cluster's best-E-value PrSM (the same proteoform mass
     // matched to another protein) get that PrSM's proteoform; their matched
     // fragment numbers are recounted on the spectra as the search read them
-    // (EnvCNN cutoff) and their E-values recomputed. The PTM
-    // characterization and the FDR run on the corrected PrSMs.
+    // (EnvCNN cutoff) and their E-values recomputed. The post mass matching,
+    // the PTM characterization and the FDR run on the corrected PrSMs.
     std::cout << "Cluster protein correction - started." << std::endl;
     {
       int var_ptm_type_num = arguments["varPtmTypeNum"] == ""
@@ -668,6 +647,27 @@ int TopPIC_postprocess(std::map<std::string, std::string>& arguments) {
     }
     std::cout << "Cluster protein correction - finished." << std::endl;
     cur_suffix = "toppic_cluster_prot";
+
+    if (arguments["postMassMatch"] == "true") {
+      // On the best PrSM of every spectrum, targets and decoys alike, after
+      // the clustering and the cluster protein correction: it adds matched
+      // masses and fragments but changes no E-value or cluster, so the FDR
+      // and the cutoffs give the identifications of a run without it.
+      std::cout << "Post mass matching - started." << std::endl;
+      int min_peak_num = std::stoi(arguments["postMinPeakNum"]);
+      // the EnvCNN model scores the added masses
+      onnx_env_cnn::initModel(resource_dir,
+                              std::stoi(arguments["threadNumber"]));
+      sp_file_name = prsm_post_mass_match::process(prsm_para_ptr, cur_suffix,
+                                                   cur_suffix, min_peak_num);
+      // The steps below read the spectra with the added masses and the PrSMs
+      // with the recounted matches, and name their files after the new
+      // spectrum file.
+      arguments["spectrumFileName"] = sp_file_name;
+      prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
+      msalign_util::geneSpIndex(sp_file_name);
+      std::cout << "Post mass matching - finished." << std::endl;
+    }
 
     if (arguments["localPtmFileName"] != "") {
       std::cout << "PTM characterization - started." << std::endl;
@@ -698,10 +698,11 @@ int TopPIC_postprocess(std::map<std::string, std::string>& arguments) {
       cur_suffix = "toppic_cluster_fdr";
     }
     // Copy the PrSM file the spectrum-level cutoff reads -- the best PrSM of
-    // every spectrum after the recount, the post mass matching, the
-    // clustering, the PTM characterization and the FDR computation,
-    // <base>.<cur_suffix> (toppic_cluster_fdr with -d; toppic_cluster, or
-    // toppic_cluster_local with -l, without), <base> being the spectrum
+    // every spectrum after the recount, the clustering, the cluster protein
+    // correction, the post mass matching, the PTM characterization and the
+    // FDR computation,
+    // <base>.<cur_suffix> (toppic_cluster_fdr with -d; toppic_cluster_prot,
+    // or toppic_cluster_local with -l, without), <base> being the spectrum
     // file's name without its extension (the _post_ms2 name when the post
     // mass matching ran) -- to <base>.toppic_record_prsm, which is kept
     // after the run (cleanToppicDir does not delete it).
