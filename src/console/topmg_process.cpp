@@ -186,8 +186,8 @@ int TopMG_identify(std::map<std::string, std::string>& arguments) {
 
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
     // the unexpected shifts of the graph alignment: TopMG's own --num-shift,
-    // which is not toppic's shiftNumber (PrsmPara::getGraphShiftNum)
-    int shift_num = prsm_para_ptr->getGraphShiftNum();
+    // which is not toppic's shiftNumber (PrsmPara::getTopmgShiftNum)
+    int shift_num = prsm_para_ptr->getTopmgShiftNum();
     LOG_DEBUG("num of unknown shift " << shift_num);
 
     // index file name

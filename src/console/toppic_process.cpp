@@ -456,7 +456,7 @@ int TopPIC_topmg_identify(std::map<std::string, std::string>& arguments) {
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
     // the unexpected shifts of the graph alignment: TopMG's own number, not
     // toppic's --num-shift
-    int shift_num = prsm_para_ptr->getGraphShiftNum();
+    int shift_num = prsm_para_ptr->getTopmgShiftNum();
     // TopMG keeps the +-1 Da precursor error that SpPara allows by default in
     // the one-shift filtering, and toppic's defaults turn it off; these
     // stages filter as TopMG filters (toppic_test experiment 71)

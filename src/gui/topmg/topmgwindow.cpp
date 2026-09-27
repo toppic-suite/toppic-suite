@@ -142,7 +142,7 @@ void TopmgWindow::on_defaultButton_clicked() {
   ui->cutoffProteinTypeComboBox->setCurrentIndex(0);
   // number of variable PTMs: 5
   ui->numModComboBox->setCurrentIndex(4);
-  // number of unknown mass shifts: 1, TopMG's own number (graphShiftNumber)
+  // number of unknown mass shifts: 1, TopMG's own number (topmgShiftNumber)
   ui->numUnknownShiftComboBox->setCurrentIndex(1);
   ui->NONECheckBox->setChecked(true);
   ui->NMECheckBox->setChecked(true);
@@ -287,7 +287,7 @@ std::map<std::string, std::string> TopmgWindow::getArguments() {
     arguments_["fixedMod"] = ui->fixedModFileEdit->text().toStdString();
   }
   arguments_["varPtmNumber"] = ui->numModComboBox->currentText().toStdString();
-  arguments_["graphShiftNumber"] =
+  arguments_["topmgShiftNumber"] =
       ui->numUnknownShiftComboBox->currentText().toStdString();
   arguments_["fragErrorTolerance"] =
       ui->errorToleranceEdit->text().toStdString();
@@ -328,7 +328,7 @@ std::map<std::string, std::string> TopmgWindow::getArguments() {
   arguments_["maxShiftMass"] = ui->maxModEdit->text().toStdString();
   arguments_["proteoGraphGap"] = ui->maxGapLength->text().toStdString();
   arguments_["varPtmNumber"] = ui->numModComboBox->currentText().toStdString();
-  arguments_["graphShiftNumber"] =
+  arguments_["topmgShiftNumber"] =
       ui->numUnknownShiftComboBox->currentText().toStdString();
   arguments_["varPtmNumInGap"] = ui->maxVarPTMGap->text().toStdString();
   arguments_["varModFileName"] = ui->modFileEdit->text().toStdString();
@@ -678,7 +678,7 @@ void TopmgWindow::showArguments() {
        "\ncombinedOutputName:" + arguments_["combinedOutputName"] +
        "\nactivation:" + arguments_["activation"] + "\nsearchType:" +
        arguments_["searchType"] + "\nfixedMod:" + arguments_["fixedMod"] +
-       "\ngraphShiftNumber:" + arguments_["graphShiftNumber"] +
+       "\ntopmgShiftNumber:" + arguments_["topmgShiftNumber"] +
        "\nprecErrorTolerance:" + arguments_["precErrorTolerance"] +
        "\nfragErrorTolerance:" + arguments_["fragErrorTolerance"] +
        "\nformErrorTolerance:" + arguments_["proteoformErrorTolerance"] +

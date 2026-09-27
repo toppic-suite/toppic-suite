@@ -57,7 +57,7 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   // --topmg-identify option: TopMG's own defaults, so that the two agree
   // when neither is set
   arguments["topmgIdentify"] = "false";
-  arguments["graphShiftNumber"] = "1";
+  arguments["topmgShiftNumber"] = "1";
   // the results the ASF filtering of that stage keeps per spectrum, TopMG's
   // own number; toppic's own stages keep filteringResultNumber
   arguments["asfFilteringResultNumber"] = "15";
@@ -331,7 +331,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
   std::string variable_ptm_num = "";
   std::string variable_ptm_file_name = "";
   std::string shift_num = "";
-  std::string graph_shift_num = "";
+  std::string topmg_shift_num = "";
   std::string asf_filtering_result_num = "";
   std::string min_shift_mass = "";
   std::string max_shift_mass = "";
@@ -547,7 +547,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "frag-extend-min-mass", po::value<std::string>(&frag_extend_min_mass),
         "")("multi-skip-evalue", po::value<std::string>(&multi_skip_evalue),
             "")("disable-multi-type-align", "")("topmg-identify", "")(
-        "graph-num-shift", po::value<std::string>(&graph_shift_num), "")(
+        "topmg-num-shift", po::value<std::string>(&topmg_shift_num), "")(
         "asf-filtering-result-number",
         po::value<std::string>(&asf_filtering_result_num), "")(
         "filtering-result-number",
@@ -756,8 +756,8 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
     }
     // hidden: the unexpected shifts of that graph alignment, TopMG's own
     // number, which --num-shift does not change
-    if (vm.count("graph-num-shift")) {
-      arguments_["graphShiftNumber"] = graph_shift_num;
+    if (vm.count("topmg-num-shift")) {
+      arguments_["topmgShiftNumber"] = topmg_shift_num;
     }
     // hidden: the ASF filtering result number of that stage, TopMG's own,
     // which --filtering-result-number does not change
