@@ -776,15 +776,12 @@ int TopPIC_postprocess(std::map<std::string, std::string>& arguments,
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
     msalign_util::geneSpIndex(sp_file_name);
     std::string base_name = file_util::basename(sp_file_name);
-    // the E-value model of the cluster protein correction below. TopMG's
-    // PrSMs carry up to its own number of unexpected shifts, which is not
-    // toppic's --num-shift, so the model has to allow for the larger of the
-    // two or it refuses to score them ("Number of unexpected PTMs is too
-    // large").
+    // the E-value model of the cluster protein correction below. The PrSMs it
+    // scores carry the proteoform of their cluster's best PrSM, which is one
+    // of toppic's own whenever anything is corrected at all - a cluster whose
+    // best PrSM comes from the graph alignment has the others dropped
+    // instead - so toppic's own number of unexpected shifts is enough.
     int shift_num = std::stoi(arguments["shiftNumber"]);
-    if (arguments["topmgIdentify"] == "true") {
-      shift_num = std::max(shift_num, prsm_para_ptr->getTopmgShiftNum());
-    }
 
     // raw_prsm_ext is the file the last stage that produced a PrSM set
     // reported: toppic_pre_raw_prsm, or toppic_multi_ptm_raw_prsm after the
@@ -835,8 +832,15 @@ int TopPIC_postprocess(std::map<std::string, std::string>& arguments,
           prsm_para_ptr, shift_num,
           std::max(std::abs(max_shift_mass), std::abs(min_shift_mass)),
           var_ptm_type_num, std::stoi(arguments["threadNumber"]), "", "");
+      int removed_num = 0;
       int corrected_num = cluster_prot_corrector::process(
-          prsm_para_ptr, tdgf_mng_ptr, cur_suffix, "toppic_cluster_prot");
+          prsm_para_ptr, tdgf_mng_ptr, cur_suffix, "toppic_cluster_prot",
+          &removed_num);
+      if (removed_num > 0) {
+        std::cout << "Cluster protein correction - removed " << removed_num
+                  << " PrSMs of other proteins in clusters whose best PrSM "
+                     "comes from the graph alignment." << std::endl;
+      }
       std::cout << "Cluster protein correction - corrected " << corrected_num
                 << " PrSMs." << std::endl;
     }

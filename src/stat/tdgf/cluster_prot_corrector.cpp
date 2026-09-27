@@ -19,6 +19,7 @@
 #include <cstddef>
 #include <map>
 #include <memory>
+#include <set>
 #include <string>
 #include <thread>
 #include <vector>
@@ -42,7 +43,7 @@ namespace cluster_prot_corrector {
 
 int process(const PrsmParaPtr& prsm_para_ptr, const TdgfMngPtr& tdgf_mng_ptr,
             const std::string& input_file_ext,
-            const std::string& output_file_ext) {
+            const std::string& output_file_ext, int* removed_num) {
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
   std::string base_name = file_util::basename(sp_file_name);
   FastaIndexReaderPtr seq_reader = std::make_shared<FastaIndexReader>(
@@ -61,13 +62,25 @@ int process(const PrsmParaPtr& prsm_para_ptr, const TdgfMngPtr& tdgf_mng_ptr,
       best_ptrs[cluster_id] = prsm_ptrs[i];
     }
   }
-  // the PrSMs to correct, by spectrum id, with the proteoform they get
+  // the PrSMs to correct, by spectrum id, with the proteoform they get, and
+  // the PrSMs to drop instead
   std::map<int, std::vector<std::pair<PrsmPtr, ProteoformPtr>>> corrections;
+  std::set<PrsmPtr> removals;
   int corrected_num = 0;
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     ProteoformPtr form_ptr = prsm_ptrs[i]->getProteoformPtr();
     PrsmPtr best_ptr = best_ptrs[form_ptr->getProteoClusterId()];
-    if (form_ptr->getProtId() != best_ptr->getProteoformPtr()->getProtId()) {
+    if (form_ptr->getProtId() == best_ptr->getProteoformPtr()->getProtId()) {
+      continue;
+    }
+    if (best_ptr->getTool() == "topmg") {
+      // The cluster's best PrSM comes from the graph alignment, whose
+      // proteoform carries TopMG's variable PTMs and gaps. Giving it to a
+      // PrSM of another protein and asking the generating-function method for
+      // an E-value is not a computation that method can do, so the PrSM is
+      // dropped instead: the cluster keeps the graph alignment's own protein.
+      removals.insert(prsm_ptrs[i]);
+    } else {
       corrections[prsm_ptrs[i]->getSpectrumId()].emplace_back(
           prsm_ptrs[i], best_ptr->getProteoformPtr());
       corrected_num++;
@@ -140,8 +153,21 @@ int process(const PrsmParaPtr& prsm_para_ptr, const TdgfMngPtr& tdgf_mng_ptr,
   }
 
   PrsmXmlWriter writer(base_name + "." + output_file_ext);
-  writer.writeVector(prsm_ptrs);
+  if (removals.empty()) {
+    writer.writeVector(prsm_ptrs);
+  } else {
+    PrsmPtrVec kept_ptrs;
+    for (size_t i = 0; i < prsm_ptrs.size(); i++) {
+      if (removals.count(prsm_ptrs[i]) == 0) {
+        kept_ptrs.push_back(prsm_ptrs[i]);
+      }
+    }
+    writer.writeVector(kept_ptrs);
+  }
   writer.close();
+  if (removed_num != nullptr) {
+    *removed_num = static_cast<int>(removals.size());
+  }
   return corrected_num;
 }
 

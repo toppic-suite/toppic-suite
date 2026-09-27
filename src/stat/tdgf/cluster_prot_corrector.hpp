@@ -38,11 +38,21 @@ namespace cluster_prot_corrector {
 // cutoff (SpPara::getEnvCnnCutoff) removed and, with --frag-mass-dedup, the
 // close masses combined (SpPara::getFragDedupPpo). The matched numbers are
 // only for the E-value: TopPIC_postprocess recounts every PrSM against the
-// full spectra afterwards. All PrSMs are written, in the input order, to
-// <base>.<output_file_ext>. Returns the number of corrected PrSMs.
+// full spectra afterwards.
+//
+// One exception: when the cluster's best PrSM comes from the graph alignment
+// (its tool element is topmg), the PrSMs of the other proteins are dropped
+// rather than corrected. Their proteoform would be the graph alignment's,
+// with TopMG's variable PTMs and gaps, and the generating-function method
+// cannot give that an E-value; the cluster keeps the graph alignment's own
+// protein.
+//
+// The surviving PrSMs are written, in the input order, to
+// <base>.<output_file_ext>. Returns the number of corrected PrSMs, and sets
+// *removed_num, when it is given, to the number dropped.
 int process(const PrsmParaPtr& prsm_para_ptr, const TdgfMngPtr& tdgf_mng_ptr,
             const std::string& input_file_ext,
-            const std::string& output_file_ext);
+            const std::string& output_file_ext, int* removed_num = nullptr);
 
 }  // namespace cluster_prot_corrector
 
