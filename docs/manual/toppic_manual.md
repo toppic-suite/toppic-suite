@@ -149,7 +149,7 @@ after `<name>_ms2`:
 | `sample_post_ms2_toppic_prsm.tsv`, `..._prsm_single.tsv` | All PrSMs that pass the spectrum-level cutoff. |
 | `sample_post_ms2_toppic_proteoform.tsv`, `..._proteoform_single.tsv` | One PrSM per identified proteoform (the best one), passing the proteoform-level cutoff. |
 | `sample_post_ms2_toppic_protein.tsv`, `..._protein_single.tsv` | One PrSM per identified protein (the best one), passing the protein-level cutoff. |
-| `sample_post_ms2_toppic_prsm.xml`, `..._proteoform.xml`, `..._protein.xml` | The same three sets of PrSMs in XML, read by TopDiff and the visualization tools. |
+| `sample_post_ms2_toppic_prsm.xml`, `..._proteoform.xml`, `..._protein.xml` | The same three sets of PrSMs in XML, read by TopDiff and the visualization tools. Every PrSM records the TopPIC Suite version that wrote it, and TopDiff reads only the files of its own version. |
 | `sample.sqlite` | Updated with the tables `prsm`, `proteoform`, `protein`, `prsm_mass_shift`, `prsm_protein_match` and `fasta_seq`, for visualization. |
 | `sample_post_ms2.toppic_record_prsm` | The best PrSM of every spectrum after the FDR computation and before the cutoffs, decoy identifications included. Always kept. |
 
@@ -228,7 +228,7 @@ Cutoffs and output:
 | `-T`, `--proteoform-cutoff-type <EVALUE\|FDR>`, `-V`, `--proteoform-cutoff-value <number>` | EVALUE, 0.01 | Cutoff for proteoforms. |
 | `-y`, `--protein-cutoff-type <EVALUE\|FDR>`, `-Y`, `--protein-cutoff-value <number>` | EVALUE, 0.01 | Cutoff for proteins; with `FDR` a protein is represented by its best proteoform. |
 | `-c`, `--combined-file-name <name>` | none | Combine several fractions: after the files are searched, their spectra and best PrSMs per spectrum are merged under `<name>_ms2`, and the clustering (by protein, precursor mass and sequence overlap), FDR computation, decoy removal, cutoffs and tables are repeated on the merged data. A relative `<name>` is placed in the directory of the first spectrum file and must differ from the input file names. See the note below. |
-| `-u`, `--thread-number <int>` | 1 | Number of threads. The filtering steps may use fewer, depending on the available memory. |
+| `-u`, `--thread-number <int>` | 1 | Number of threads; must not exceed the number of hardware threads. Each protein filtering step may use fewer: it fits its thread number to the memory available when it starts (about 1.25 GiB per thread for zero-shift filtering, 1 GiB for variable-PTM and one-shift filtering, 0.5 GiB for multiple-shift filtering). The run starts with a warning listing the filtering steps that will use fewer threads and how many, and a step prints its number again if the memory available when it starts gives a different one. All other steps use the full number. |
 | `-k`, `--keep-temp-files` | off | Keep the intermediate files. |
 | `-K`, `--keep-decoy-ids` | off | Keep decoy identifications in the result tables. |
 

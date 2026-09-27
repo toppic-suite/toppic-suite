@@ -114,7 +114,7 @@ For an input `sample_ms2.msalign`:
 | `sample_ms2_topmg_prsm.tsv`, `..._prsm_single.tsv` | All PrSMs that pass the spectrum-level cutoff. |
 | `sample_ms2_topmg_proteoform.tsv`, `..._proteoform_single.tsv` | One PrSM per identified proteoform, passing the proteoform-level cutoff. |
 | `sample_ms2_topmg_protein.tsv`, `..._protein_single.tsv` | One PrSM per identified protein, passing the protein-level cutoff. |
-| `sample_ms2_topmg_prsm.xml`, `..._proteoform.xml`, `..._protein.xml` | The same three sets in XML, read by TopDiff and the visualization tools. |
+| `sample_ms2_topmg_prsm.xml`, `..._proteoform.xml`, `..._protein.xml` | The same three sets in XML, read by TopDiff and the visualization tools. Every PrSM records the TopPIC Suite version that wrote it, and TopDiff reads only the files of its own version. |
 | `sample.sqlite` | Updated with the identification tables when it exists. |
 | `sample_ms2.topmg_raw_prsm` | The PrSMs before recounting and cutoffs. Always kept, even without `--keep-temp-files`; a later combined run (`-c`) reads it. |
 
@@ -170,7 +170,7 @@ Cutoffs and output:
 | `-T`, `--proteoform-cutoff-type <EVALUE\|FDR>`, `-V`, `--proteoform-cutoff-value <number>` | EVALUE, 0.01 | Cutoff for proteoforms. |
 | `-y`, `--protein-cutoff-type <EVALUE\|FDR>`, `-Y`, `--protein-cutoff-value <number>` | EVALUE, 0.01 | Cutoff for proteins; with `FDR` a protein is represented by its best proteoform. |
 | `-c`, `--combined-file-name <name>` | none | Combine fractions: after the files are searched, their spectra, features (unless `-x`) and raw PrSMs are merged into `<name>_ms2.msalign`, `<name>_ms2.feature` and `<name>_ms2.topmg_raw_prsm`, and the post-search steps are repeated on them, giving `<name>_ms2_topmg_*` results. A relative `<name>` is placed in the directory of the first spectrum file and must differ from the input file names. No SQLite database is written for the combined results. |
-| `-u`, `--thread-number <int>` | 1 | Number of threads. The filtering steps may use fewer, depending on the available memory. |
+| `-u`, `--thread-number <int>` | 1 | Number of threads; must not exceed the number of hardware threads. Each protein filtering step may use fewer: it fits its thread number to the memory available when it starts (about 1 GiB per thread for ASF-One PTM filtering, 0.5 GiB for ASF-Diagonal filtering). The run starts with a warning listing the filtering steps that will use fewer threads and how many, and a step prints its number again if the memory available when it starts gives a different one. All other steps use the full number. |
 | `-k`, `--keep-temp-files` | off | Keep the intermediate files. |
 | `-K`, `--keep-decoy-ids` | off | Keep decoy identifications in the result tables. |
 

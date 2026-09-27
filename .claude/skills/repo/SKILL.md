@@ -33,8 +33,11 @@ a sync should produce, and works without manual conflict resolution.
   repository and pushed to the public one explicitly (steps below).
 - Push rights on `toppic-suite/toppic-suite` (an HTTPS token or SSH key that
   git can use non-interactively).
-- The private `main` is at the state to publish (merge `release_1.9` into
-  `main` first if needed) and the release tag exists there.
+- The private `main` is at the state to publish and the release tag exists
+  there. Release tags are annotated, `v<version>` with the message
+  `TopPIC Suite <version>`, where `<version>` is the `project(... VERSION
+  ...)` of `CMakeLists.txt` (e.g. `v2.0.0.0`):
+  `git tag -a v2.0.0.0 -m "TopPIC Suite 2.0.0.0" && git push origin v2.0.0.0`.
 
 ## Procedure
 
@@ -86,7 +89,7 @@ Verify from anywhere:
 
 ```sh
 git ls-remote --heads https://github.com/toppic-suite/toppic-suite.git main
-git ls-remote --tags  https://github.com/toppic-suite/toppic-suite.git v1.9.0.0
+git ls-remote --tags  https://github.com/toppic-suite/toppic-suite.git v2.0.0.0
 ```
 
 The public `main` hash is the new merge commit (or, after a fast-forward,
@@ -96,7 +99,7 @@ private repository.
 ## Optional: publish other branches
 
 Only `main` and the tags are synced above. The public repository also lacks
-`release_1.9` (and the private working branches `mdec`, `post_mass_match`,
+`release_1.9` (and the private working branches such as `mdec` and
 `low_resolution`, which stay private). To publish the release branch too:
 
 ```sh

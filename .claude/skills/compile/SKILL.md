@@ -38,8 +38,10 @@ make -j$(nproc)          # macOS: make -j$(sysctl -n hw.ncpu)
 - C++17 compiler: Clang >= 7 (default) or GCC >= 8. Force one with
   `-DCMAKE_CXX_COMPILER=...`.
 - CMake >= 3.16.
-- Boost >= 1.74: filesystem, iostreams, thread, chrono, system,
-  serialization, program_options.
+- Boost >= 1.74: filesystem, iostreams, thread, chrono, serialization,
+  program_options. Not `system`: Boost.System is header-only since 1.69,
+  and Boost >= 1.90 (Ubuntu 26.04) ships no `boost_system` library or CMake
+  config, so listing it makes `find_package(Boost)` fail.
 - pugixml, SQLite3, zlib development packages.
 - Qt6 (Core, Gui, Widgets) for the `*_gui` targets only.
 - Git LFS: the EnvCNN/ECScore model files and the isotope table under

@@ -48,7 +48,12 @@ Rules that hold across the tools:
 - Several input files on one command line are processed one after another
   with the same parameters (TopMG sorts them alphabetically).
 - Threads: `-u N` on every tool except topdiff; N must not exceed the
-  hardware threads, and the search tools may use fewer for filtering.
+  hardware threads. In toppic and topmg each protein filtering step fits
+  its own thread number to the memory available when it starts (toppic:
+  1.25 GiB per thread zero-shift, 1 GiB variable-PTM/one-shift, 0.5 GiB
+  multiple-shift; topmg: 1 GiB ASF-One, 0.5 GiB ASF-Diagonal); the start of
+  the run warns which steps will use fewer, and a step reprints its number
+  if the memory has changed by then. The other tools only warn.
 
 ## topfd
 
@@ -120,8 +125,10 @@ filters build their indexes in memory (slower, with a warning) until it is
 re-indexed or the files renamed.
 **The searches use the index only when their `-f`, `-n`, `-e` and `-d`
 match** the ones given to topindex; otherwise they fall back silently.
-Index files are large (roughly ten thousand times the FASTA size, double
-with `-d`); delete `_idx/` to reclaim space.
+Index files are large (roughly seven thousand times the FASTA size,
+double with `-d`: 184 GB for the 14 MB human SwissProt database with
+`-d`); delete `_idx/` to reclaim space. The build is limited by memory and
+disk bandwidth, so `-u` beyond the physical cores gains nothing.
 
 ## toppic
 
@@ -132,10 +139,14 @@ toppic [options] proteins.fasta sample_ms2.msalign ...
 Needs `sample_ms2.feature` (unless `-x`) and `sample.sqlite` (unless `-D`)
 next to the spectrum file; a missing database is reported before the
 search starts. Steps: zero-shift search, variable-PTM search (`-b`),
-one-shift (`-s` >= 1) and two-shift (`-s 2`) searches, E-values, top PrSM,
-recount, **post mass matching** (default), clustering, PTM characterization
-(`-B`), FDR (`-d`), the kept record file, decoy removal (unless `-K`),
-three-level cutoffs, SQLite tables.
+one-shift (`-s` >= 1) search, E-values, top PrSM, two-shift (`-s 2`)
+search of the spectra without a confident first-pass PrSM, clustering,
+cluster protein correction, recount on the full spectra, **post mass
+matching** (default), PTM characterization (`-B`), FDR (`-d`), the kept
+record file, decoy removal (unless `-K`), three-level cutoffs, SQLite
+tables. Post mass matching runs after the clustering and changes neither
+E-values nor clusters, so the identifications and FDRs equal a `-D` run's;
+only the matched masses and fragments grow.
 
 Key options (defaults): `-f` fixed mod none (`C57`, `C58` or file), `-n`
 N-terminal forms all four, `-R` proteoform types all four, `-d` decoy,
@@ -161,8 +172,8 @@ merge the fractions' post-matched spectra and record files into
 protein, precursor mass and proteoform sequence overlap, compute one FDR
 and report; they always
 produce `name_ms2_toppic_*` and no SQLite output, and `-C` redoes only the
-combining from the kept record files. `name` must differ from the input
-base names.
+combining from the kept record files (which must come from the same
+version, see topdiff). `name` must differ from the input base names.
 
 Modification file (for `-f`, `-b`, `-B`): one `Name,Mass,Residues,Position,UnimodID`
 per line, `#` comments, `Residues` may be `*` (not together with `Position`
@@ -198,7 +209,11 @@ At least two samples. For each spectrum file it reads
 (so either `_ms2.msalign` or `_post_ms2.msalign` may be given), prints the
 name, and warns "does not contain any PrSM identifications" when neither
 exists. Samples must have been searched with the feature file (not `-x`)
-for abundances. Output: one TSV next to the first sample with the
+for abundances. **Result files of another TopPIC Suite version are
+refused** ("was written by version X ... cannot be read by this
+version", or "by an earlier version" for 1.9 and earlier, which wrote no
+version): every PrSM records the version that wrote it, so re-run the
+search after upgrading. Output: one TSV next to the first sample with the
 proteoform, precursor mass, `# matched samples`, then five columns per
 sample (abundance, spectrum id, RT begin/end in seconds, normalized apex).
 
