@@ -289,7 +289,7 @@ std::map<std::string, std::string> topmg_para{
     {"useAsfDiag", "-D "},
     {"varModFileName", "-i "},
     {"varPtmNumber", "-P "},
-    {"wholeProteinOnly", "-w "},
+    {"allowProtType", "-w "},
     {"proteoGraphGap", "-j "},
     {"varPtmNumInGap", "-G "}};
 
@@ -328,8 +328,15 @@ std::string geneTopmgCommand(std::map<std::string, std::string> arguments_,
         }
       }
       // some parameters require extra processing
-      else if (it->first == "useAsfDiag" || it->first == "wholeProteinOnly") {
+      else if (it->first == "useAsfDiag") {
         if (it->second == "true") {
+          command = command + topmg_para[it->first];
+        }
+      }
+      // whole proteins only, which topmg spells -w, is the proteoform type
+      // COMPLETE alone
+      else if (it->first == "allowProtType") {
+        if (it->second == "COMPLETE") {
           command = command + topmg_para[it->first];
         }
       } else {

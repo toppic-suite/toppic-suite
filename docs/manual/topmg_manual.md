@@ -148,7 +148,7 @@ Proteoform graphs and mass shifts:
 | `-G`, `--var-ptm-in-gap <int>` | 5 | Maximum number of variable modifications on one edge (never more than `--var-ptm`). |
 | `-s`, `--num-shift <0\|1\|2>` | 1 | Maximum number of unexpected mass shifts in a proteoform, in addition to the variable modifications. TopMG keeps its own number: `toppic --num-shift` does not change it. |
 | `-M`, `--max-shift <number>` | 500 | Maximum absolute mass of an unexpected shift (Da). |
-| `-w`, `--whole-protein-only` | off | Report only proteoforms covering whole proteins, not truncated ones. |
+| `-w`, `--whole-protein-only` | off | Report only proteoforms covering whole proteins, not truncated ones, that is, allow the proteoform type COMPLETE alone. |
 | `-D`, `--use-asf-diagonal` | off | Add the ASF-Diagonal filtering step (more candidates, more sensitive, slower). |
 
 Spectra and tolerances:

@@ -519,7 +519,9 @@ int TopPIC_topmg_identify(std::map<std::string, std::string>& arguments) {
     int gap = std::stoi(arguments["proteoGraphGap"]);
     int var_ptm_in_gap =
         std::min(std::stoi(arguments["varPtmNumInGap"]), max_mod_num);
-    bool whole_protein_only = (arguments["wholeProteinOnly"] == "true");
+    // whole proteins only is the proteoform type COMPLETE alone, which is one
+    // of the two values the argument check allows with --topmg-identify
+    bool whole_protein_only = (arguments["allowProtType"] == "COMPLETE");
     GraphAlignMngPtr ga_mng_ptr = std::make_shared<GraphAlignMng>(
         prsm_para_ptr, var_mod_file_name, shift_num, max_mod_num, gap,
         var_ptm_in_gap, max_shift_mass, thread_num, whole_protein_only,

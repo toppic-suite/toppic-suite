@@ -79,7 +79,6 @@ std::map<std::string, std::string> TopmgArgument::initArguments() {
   arguments["useAsfDiag"] = "false";
   arguments["varPtmNumber"] = "5";
   arguments["varPtmNumInGap"] = "5";
-  arguments["wholeProteinOnly"] = "false";
   arguments["keepDecoyResults"] = "false";
   arguments["version"] = "";
   return arguments;
@@ -162,7 +161,8 @@ void TopmgArgument::outputArguments(
          << "Maximum number of variable PTMs in a graph gap:" << sep
          << arguments["varPtmNumInGap"] << std::endl;
 
-  if (arguments["wholeProteinOnly"] == "true") {
+  // whole proteins only is the proteoform type COMPLETE alone
+  if (arguments["allowProtType"] == "COMPLETE") {
     output << std::setw(gap) << std::left
            << "Report only proteoforms from whole proteins:" << sep << "True"
            << std::endl;
@@ -354,7 +354,9 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
         "5.")("num-shift,s", po::value<std::string>(&shift_num),
               "<0|1|2>. Maximum number of unexpected modifications in a "
               "proteoform spectrum-match. Default value: 0.")(
-        "whole-protein-only,w", "Report only proteoforms from whole proteins.")(
+        "whole-protein-only,w",
+        "Report only proteoforms from whole proteins, that is, allow the "
+        "proteoform type COMPLETE alone.")(
         "combined-file-name,c", po::value<std::string>(&combined_output_name),
         "Specify a file name for the combined spectrum data file and analysis "
         "results.")("keep-temp-files,k", "Keep intermediate files.")(
@@ -562,8 +564,10 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
       arguments_["varPtmNumInGap"] = var_ptm_in_gap;
     }
 
+    // --whole-protein-only is the proteoform type COMPLETE alone, from which
+    // TopMG_identify reads it; there is no separate wholeProteinOnly argument
     if (vm.count("whole-protein-only")) {
-      arguments_["wholeProteinOnly"] = "true";
+      arguments_["allowProtType"] = "COMPLETE";
     }
 
     if (vm.count("keep-temp-files")) {

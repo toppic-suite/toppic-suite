@@ -63,7 +63,6 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["asfFilteringResultNumber"] = "15";
   arguments["proteoGraphGap"] = "40";
   arguments["varPtmNumInGap"] = "5";
-  arguments["wholeProteinOnly"] = "false";
   arguments["useAsfDiag"] = "false";
   arguments["shiftNumber"] = "1";
   arguments["minShiftMass"] = "-500";

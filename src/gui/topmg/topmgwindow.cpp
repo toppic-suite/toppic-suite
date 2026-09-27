@@ -353,10 +353,11 @@ std::map<std::string, std::string> TopmgWindow::getArguments() {
   } else {
     arguments_["useAsfDiag"] = "false";
   }
+  // whole proteins only is the proteoform type COMPLETE alone
   if (ui->wholeProteinCheckBox->isChecked()) {
-    arguments_["wholeProteinOnly"] = "true";
+    arguments_["allowProtType"] = "COMPLETE";
   } else {
-    arguments_["wholeProteinOnly"] = "false";
+    arguments_["allowProtType"] = "COMPLETE,PREFIX,SUFFIX,INTERNAL";
   }
   // showArguments();
   return arguments_;
